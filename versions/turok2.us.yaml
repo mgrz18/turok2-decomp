@@ -1,0 +1,40 @@
+name: Turok 2 - Seeds of Evil
+sha1: fb0400f21e3f043939ab56500c7b12a3231006f1
+
+options:
+  basename: turok2
+  base_path: ../us
+  target_path: ../baserom.us.z64
+  src_path: ../src/us
+  asm_path: ../us/asm
+  symbol_addrs_path: ../versions/symbol_addrs.us.txt
+  undefined_funcs_auto_path: ../versions/undefined_funcs_auto.us.txt
+  undefined_syms_auto_path: ../versions/undefined_syms_auto.us.txt
+
+  compiler: SN64
+  platform: n64
+  find_file_boundaries: True
+  use_legacy_include_asm: False
+  generated_c_preamble: "#include \"include_asm.h\""
+  generated_s_preamble: ".set fp=64"
+  enable_ld_alignment_hack: yes
+
+# Initial bootstrap config — segment boundaries beyond the boot stub are
+# unverified. Run `make setup` to splat-disasm and refine.
+segments:
+  - name: header
+    type: header
+    start: 0x0
+
+  - name: boot
+    type: bin
+    start: 0x40
+
+  - name: main
+    type: code
+    start: 0x1000
+    vram: 0x80000400
+    subsegments:
+      - [0x1000, asm]
+
+  - [0x2000000]

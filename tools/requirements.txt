@@ -1,0 +1,4 @@
+splat64
+spimdisasm
+rabbitizer
+pyyaml

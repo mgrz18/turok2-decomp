@@ -27,6 +27,19 @@ __pycache__/
 # External reference repos (cloned locally, not part of this project)
 references/
 
+# Vendored toolchain & headers — populated locally by
+# scripts/setup-from-references.sh from references/. Third-party origin,
+# not under our license.
+tools/sn64/
+include/types/
+include/libtengine/
+
+# Generated symbol seeds (derived from third-party functions.csv)
+versions/functions.csv.libtengine
+versions/symbol_addrs.us.txt
+versions/undefined_funcs_auto.us.txt
+versions/undefined_syms_auto.us.txt
+
 # Editor / OS
 .DS_Store
 .vscode/

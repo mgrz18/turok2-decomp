@@ -24,6 +24,28 @@ If you only want to play Turok 2, an emulator is 100× less work and totally fin
   - Expected SHA1: `fb0400f21e3f043939ab56500c7b12a3231006f1`
   - Internal name: `Turok 2: Seeds of Ev`, cartridge ID `NT2E`, 32 MB.
 
+## Setup (Apple Silicon macOS)
+
+```bash
+# 1. Clone reference projects (gitignored, not part of this repo)
+mkdir -p references && cd references
+git clone --recursive https://github.com/Drahsid/turok3.git
+git clone https://github.com/Drahsid/LibTEngine.git
+cd ..
+
+# 2. Pull SN64 toolchain + LibTEngine headers into the working tree
+./scripts/setup-from-references.sh
+
+# 3. Build the linux/amd64 container (needed because cc1 is i386 ELF
+#    and asn64.exe is Win32 — Apple Silicon runs both via Rosetta-for-Linux)
+brew install orbstack   # or Docker Desktop with Rosetta-for-Linux enabled
+docker build --platform=linux/amd64 -t turok2-build .
+
+# 4. Disasm the ROM
+docker run --platform=linux/amd64 --rm -it -v "$PWD":/work turok2-build \
+    bash -c "pip install -r tools/requirements.txt && make setup"
+```
+
 ## Standing on the shoulders of
 
 - **[Drahsid/turok3](https://github.com/Drahsid/turok3)** — in-progress decomp of Turok 3 (same engine). Foundation for the official Turok 3 Remastered.
