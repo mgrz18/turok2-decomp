@@ -1,0 +1,31 @@
+# ROM dumps — never commit
+baserom*.z64
+baserom*.n64
+baserom*.v64
+*.z64
+*.n64
+*.v64
+
+# Build artifacts
+build/
+*.o
+*.a
+*.elf
+*.bin
+*.map
+
+# Splat outputs (regenerated from baserom)
+asm/
+assets/
+.splat_cache
+
+# Tool caches
+__pycache__/
+*.pyc
+.venv/
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
