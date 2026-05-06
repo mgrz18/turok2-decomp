@@ -24,6 +24,9 @@ __pycache__/
 *.pyc
 .venv/
 
+# External reference repos (cloned locally, not part of this project)
+references/
+
 # Editor / OS
 .DS_Store
 .vscode/
