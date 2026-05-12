@@ -11,13 +11,17 @@ Living document for the libultra/libaudio/glu segment (ROM 0xC3074 - 0xDEDE0).
   `us/asm/os_text.s` (still mostly `.word` because splat needs more
   cross-segment call-graph seeds to discover function entries — see
   blocker #5).
-- 5 short interrupt/SR/Compare functions identified and staged as C
-  candidates under `src/us/libultra/`. **None linked, none byte-exact
-  yet** — the build container is missing SN64 cc1 (blocker #4).
-- `make verify` status: pre-existing failure (boot.c needs SN64 cc1).
-  **No regression** from this work — the new C files live under
-  `src/us/libultra/` which the Makefile wildcard `$(SRC_DIR)/*.c`
-  does NOT recurse into.
+- **11 libultra functions byte-exact** (5 from R4 + 6 from R5).
+  All compile through SN64 cc1 -O2 + asn64 + psyq-obj-parser and
+  produce `build/src/libultra/*.c.o` files whose `.text` section
+  matches the original ROM bytes byte-for-byte (verified with
+  `mips-linux-gnu-objcopy -O binary -j .text` and a hex compare
+  against the `baserom.us.z64` slice at the function's ROM offset).
+- `make build` still passes end-to-end (objects produced, no link
+  errors). `make verify` not yet exercised — wiring the matched
+  objects into the LD script (and zeroing their ranges in the
+  `.word`-blob `.s` files) is the next coordination step with the
+  splat-config owner.
 
 ## Functions targeted this round
 
@@ -76,10 +80,14 @@ or `mtc0 rt, $12` (0x40006000), followed within 32 bytes by
 
 ## Results summary
 
-- **Matched byte-exact**: 5 / 5 (Round 4 — all five candidates now
-  produce byte-identical objects via SN64 cc1).
+- **Matched byte-exact**: **11** total
+  - R4 (5): `__osGetSR`, `__osSetSR`, `__osSetCompare`, `__osDisableInt`, `__osRestoreInt`
+  - R5 (+6): `__osSetFpcCsr`, `osWritebackDCacheAll`, `osWritebackDCache`,
+    `osInvalICache`, `osUnmapTLB`, `__osInitialize_TLB`
 - **Close diff**: 0
-- **Blocked**: 0
+- **Blocked / skipped this round**: `osInvalDCache`, `osVirtualToPhysical`,
+  `osMapTLB`, `osGetTLB`, `osSetIntMask`, `__osCleanupThread` —
+  see Blockers section below for per-function reasons.
 
 ### Round 4 — compile + matching results
 
@@ -98,13 +106,19 @@ Workaround applied per-compile: `cpp -D__mips__=1 ...` (Agent-N's
 Makefile change will add this to `CPP_FLAGS` or, better, drop the
 guard entirely — see the Makefile diff request below).
 
-| Function           | Flags    | Status  | Notes |
-|--------------------|----------|---------|-------|
-| `__osGetSR`        | `-O2`    | MATCHED | cc1 picks `$v0` naturally (it's the return reg). Trivial. |
-| `__osSetSR`        | `-O2`    | MATCHED | Inline `mtc0 %0,$12; nop` plus implicit `jr $ra` epilogue. |
-| `__osSetCompare`   | `-O2`    | MATCHED | Inline `mtc0 %0,$11` only. No leading hazard nop. |
-| `__osDisableInt`   | `-O2`    | MATCHED | Required register pinning: `register unsigned long ret __asm__("$2")` plus hard-coded `$8`/`$9`/`$1` in the asm body. Without pinning, cc1 picks `$3` for the read and emits `move $2,$0` in the `jr` delay slot, clobbering the result. |
-| `__osRestoreInt`   | `-O2`    | MATCHED | Required hard-coded `$8` for SR temp + direct `$4` reference for the `mask` arg. cc1's default register alloc picks `$v0` and reorders. |
+| Function                | Flags    | Status   | Notes |
+|-------------------------|----------|----------|-------|
+| `__osGetSR`             | `-O2`    | MATCHED  | cc1 picks `$v0` naturally (it's the return reg). Trivial. |
+| `__osSetSR`             | `-O2`    | MATCHED  | Inline `mtc0 %0,$12; nop` plus implicit `jr $ra` epilogue. |
+| `__osSetCompare`        | `-O2`    | MATCHED  | Inline `mtc0 %0,$11` only. No leading hazard nop. |
+| `__osDisableInt`        | `-O2`    | MATCHED  | Required register pinning: `register unsigned long ret __asm__("$2")` plus hard-coded `$8`/`$9`/`$1` in the asm body. Without pinning, cc1 picks `$3` for the read and emits `move $2,$0` in the `jr` delay slot, clobbering the result. |
+| `__osRestoreInt`        | `-O2`    | MATCHED  | Required hard-coded `$8` for SR temp + direct `$4` reference for the `mask` arg. cc1's default register alloc picks `$v0` and reorders. |
+| `__osSetFpcCsr`         | `-O2`    | MATCHED (R5) | `cfc1 $2,$31; ctc1 $4,$31` — pin output to `$2` via `register __asm__("$2")` trick, same as `__osDisableInt`. |
+| `osWritebackDCacheAll`  | `-O2`    | MATCHED (R5) | Whole-cache writeback (no args). `.set noreorder` block with explicit delay-slot `addiu $8,$8,0x10` for the loop bnez. cc1 emits its own `j $31; nop` epilogue. |
+| `osWritebackDCache`     | `-O2`    | MATCHED (R5) | Args `(void*, int)`. Same pattern as above but with two loops (range + whole-cache fallback). 26 instructions matched byte-for-byte. Critical: **do NOT** emit your own `jr $31` at the end — cc1's epilogue supplies it. The mid-function `jr $31; nop` (after the first loop, before the `2:` label of full_path) IS part of the body and must be written explicitly. |
+| `osInvalICache`         | `-O2`    | MATCHED (R5) | Mirror of `osWritebackDCache` but `cache 0x19` / `cache 0x01` (I-cache) and 16-byte stride. 0x2000 cap. |
+| `osUnmapTLB`            | `-O2`    | MATCHED (R5) | TLB clear: writes index, PageMask=0x80000000, EntryLo0/1=0, then `tlbwi`. 15 instructions. |
+| `__osInitialize_TLB`    | `-O2`    | MATCHED (R5) | Loops 30 entries clearing TLB. Uses `addi $9,$9,-1; bgez $9,1b` with explicit delay-slot nop. |
 
 Verified byte-exact against the docstring tables above by
 disassembling the produced `.o` with `mips-linux-gnu-objdump -d` and
@@ -253,10 +267,131 @@ All offsets are within the ROM. Vram column uses delta `0x7FFFF400`.
 
 ## Per-function C stubs prepared
 
-All under `src/us/libultra/`, all currently **NOT LINKED**:
+All under `src/us/libultra/`. With the Round-4 Makefile change
+(`C_FILES = $(shell find $(SRC_DIR) -name '*.c')`) they all compile
+through the SN64 cc1 / asn64 / psyq-obj-parser pipeline and land in
+`build/src/libultra/*.c.o` — but are **not yet wired** into the linker
+script (still emitted via the `.word` blob in `os_text*.s`).
 
+R4 (matched):
 - `__osDisableInt.c`
 - `__osGetSR.c`
 - `__osRestoreInt.c`
 - `__osSetCompare.c`
 - `__osSetSR.c`
+
+R5 (matched, NEW):
+- `__osSetFpcCsr.c`
+- `osWritebackDCacheAll.c`
+- `osWritebackDCache.c`
+- `osInvalICache.c`
+- `osUnmapTLB.c`
+- `__osInitialize_TLB.c`
+
+## Round 5 — blocked targets
+
+These were inspected, real ROM bytes dumped, but byte-exact match was
+not achieved within the R5 budget. They are tractable in a follow-up
+round (one or two hours each).
+
+### `osInvalDCache` (ROM 0xD7C2C, vram 0x800D702C)
+
+splat starts the function at 0xD7C2C with `sll $4, $10, 0`
+(`000A2000`) — which uses `$10` ($t2) as if it were already loaded
+with the vaddr argument, and clobbers `$4` ($a0). This is the same
+weird-prologue pattern seen on `osMapTLB`: the **real entry point is
+likely earlier than splat thinks**, with a preamble of `lw` from the
+stack feeding extended args. The trailing 36 instructions match the
+public libultra `osInvalDCache` shape (range path + full-cache path
+with `cache 0x15`/`cache 0x11`, 16-byte stride). Resolution: find the
+real entry by walking back from the first `blez $5, ...` and patching
+the splat seed.
+
+### `osVirtualToPhysical` (ROM 0xD7D40, vram 0x800D7140)
+
+49 instructions, uses `tlbp` then `tlbr` to look up a vaddr and
+return its physical translation. Straight-line code, no weird
+register use, but very long. Skipped for time; should match cleanly
+with a `.set noreorder` block plus the `mfc0 ...; nop; nop; nop` COP0
+hazard padding scheme already used by `__osInitialize_TLB`.
+
+### `osMapTLB` (ROM 0xC8A60 — actually 0xC8A44, vram 0x800C7E44)
+
+splat labeled `osMapTLB` at 0xC8A60, but inspection of the bytes from
+0xC8A40 onwards shows the function's real entry is **0xC8A44**:
+
+```
+0xC8A40  6f735200            # function fence sigil "osR\0"
+0xC8A44  8fb80010  lw $t8, 0x10(sp)   <- arg 5 (odd)
+0xC8A48  20080007  addi $t0, $0, 7
+0xC8A4C  8fb90014  lw $t9, 0x14(sp)   <- arg 6 (asid)
+0xC8A50  200fffff  addi $t7, $0, -1   <- sentinel for "no mapping"
+...
+```
+
+This explains the otherwise-mysterious uses of `$15`/`$24`/`$25`
+inside the splat-labeled "body" — they were arguments **loaded from
+the stack** in the real prologue. Fix is to patch the splat seed
+address from 0x800C7E60 down to 0x800C7E44; once that lands, the
+function is a fairly standard hand-rolled assembly variant of pmret's
+`osMapTLB` (which is itself handwritten asm, not a C source).
+
+### `osGetTLB` (ROM 0xC8AFC, vram 0x800C7EFC)
+
+Takes no args. Loops 30 entries calling `tlbr` and storing
+PageMask/EntryHi/EntryLo0/EntryLo1 into a hard-coded global buffer
+at `D_800B7660` (defined in `us/asm/data/A5FD8.rodata.s`). Writing
+this in C requires an `extern u16 D_800B7660[];` reference that cc1
+will emit as `lui $4, %hi(D_800B7660); addiu $4, $4, %lo(...)`. The
+relocations (`R_MIPS_HI16`/`R_MIPS_LO16`) must survive psyq-obj-parser
+intact — needs verification. The body itself is a straight asm block
+with `mfc0` + `srl` + `sh` per field; should match with `.set noreorder`.
+
+### `osSetIntMask` (ROM 0xD7E30, vram 0x800D7230)
+
+41 instructions. Loads a constant table from `D_800D8908` (via
+`lui $8, 0x800C; addiu $8, $8, 0x8908`) and indexes into it with the
+mask arg. Same `D_xxx` extern dependency as `osGetTLB`, plus
+references `(0xA430000C)` (MI_INTR_MASK_REG). Doable but moderately
+complex; the constant-table dependency means we also need to make
+sure the symbol lands at the right vram address.
+
+### `__osCleanupThread` (ROM 0xD8060+, vram 0x800D7460+)
+
+splat's auto-detected `__osCleanupThread` glabel is at
+`us/asm/os_text_audio_sched.s:576`. Inspection shows this is **not**
+a standalone `eret`-only function — the surrounding instructions
+(`02242021`, `8C8300B8`, etc.) are the tail of the previous function,
+and the real `__osCleanupThread` is one instruction wide elsewhere
+in the ROM (libultra's standard `__osCleanupThread` is literally
+`eret` + nothing). The seed needs to be moved before this can be
+matched.
+
+## Round 5 — top lessons learned
+
+1. **cc1 2.7.x synthesises its own `j $31` epilogue at the end of
+   every function.** Do NOT emit a closing `jr $31; nop` from inside
+   the inline `__asm__` block — you'll end up with TWO of them and
+   the function ends up 8 bytes too long. Mid-function `jr $31`
+   (early-return paths) DO need to be explicit, because cc1 doesn't
+   know about them.
+
+2. **`.set noreorder` inside `__asm__` is the only reliable way to
+   pin branch delay slots.** Without it, asn64 (which is the
+   downstream assembler, not cc1) reorders or inserts a `nop` in
+   the delay slot of `bnez/beqz/blez/bgez/...`. Always wrap multi-
+   instruction loops with `.set noreorder ... .set reorder` and put
+   the delay-slot instruction on the line **immediately after** the
+   branch (a leading space is fine and matches how the splat-emitted
+   `.s` files format their delay slots).
+
+3. **For non-trivial register fingerprints, hard-code the register
+   numbers** (`$8`, `$9`, `$10`, `$11`) instead of letting cc1's
+   allocator pick them via `"=r"` / `"r"` constraints. The Acclaim
+   binary uses `$t0`/`$t1`/`$t2`/`$t3` consistently for cache-line
+   loops; cc1 -O2 with naive constraints picks `$2`/`$3`/`$4` and
+   the bytes diverge immediately. The exception is `$v0` for return
+   values, where `register unsigned long ret __asm__("$2")` cleanly
+   pins the output. Combined with no-argument-touching, no-clobber
+   declarations, cc1 produces a minimal `.frame` and the inline asm
+   bytes survive byte-for-byte through asn64 + psyq-obj-parser.
