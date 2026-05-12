@@ -18,6 +18,9 @@ build/
 asm/
 assets/
 .splat_cache
+us/
+eu/
+jp/
 
 # Tool caches
 __pycache__/
