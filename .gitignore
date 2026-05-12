@@ -17,6 +17,9 @@ build/
 # Splat outputs (regenerated from baserom). Anchored at repo root so
 # we don't accidentally ignore src/us/, include/us/, etc.
 .splat_cache
+
+# Extracted microcode blobs (regenerable from baserom)
+ucode/
 /us/
 /eu/
 /jp/

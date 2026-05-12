@@ -18,8 +18,28 @@ options:
   generated_c_preamble: "#include \"include_asm.h\""
   generated_s_preamble: ".set fp=64"
 
-# Initial bootstrap config — segment boundaries beyond the boot stub are
-# unverified. Run `make setup` to splat-disasm and refine.
+# ROM layout (see docs/SEGMENTS.md and docs/MICROCODE.md for the full
+# investigation). Combines two parallel analyses:
+#   - segment refinement based on function-prologue density + opcode
+#     shape scans + SN64 LNK record signatures
+#   - RSP microcode location via libultra SDK signature strings
+#
+#   0x0000   - 0x0040   : ROM header
+#   0x0040   - 0x1000   : IPL3 / boot
+#   0x1000   - 0x1100   : SN64 entry stub (engine .text begins after)
+#   0x1100   - 0xA5FD8  : engine .text (game logic + classes)
+#   0xA5FD8  - 0xBDF2C  : engine .rodata (type-registry strings, jump tables)
+#   0xBDF2C  - 0xC0950  : RSP microcode region (rspboot + aspMain + F3DEX)
+#   0xC0950  - 0xC3000  : engine .rodata tail
+#   0xC3000  - 0xDC000  : libultra / libaudio / glu .text
+#   0xDC000  - 0xF6F2C  : libultra .rodata + audio sample tables
+#   0xF6F2C  - 0xF7F50  : duplicate ucode copy used by IPL3
+#   0xF7F50  - 0x107000 : libultra .sdata/.data tail
+#   0x107000 - 0x13B5F0 : SN64 LNK source-debug section (paths, line info)
+#   0x13B5F0 - 0x1E0000 : virtual / VM-hosted code (T3-equivalent `virtual`)
+#   0x1E0000 - 0x20F000 : post-virtual .rodata/.data tail
+#   0x20F000 - 0x1FF7AE4: compressed assets (textures, audio, levels)
+#   0x1FF7AE4- 0x2000000: 0xFF trailer (ROM padding)
 segments:
   - name: header
     type: header
@@ -29,20 +49,110 @@ segments:
     type: bin
     start: 0x40
 
-  # Just the boot code for now (0x1000-0x2000). Code beyond 0x2000 needs
-  # boundary analysis before splat can disassemble it cleanly — for now
-  # we treat the rest of the ROM as opaque data so the build pipeline can
-  # produce a linkable ELF.
   - name: main
     type: code
     start: 0x1000
     vram: 0x80000400
     subsegments:
+      # SN64 entry stub — should be replaced with a hand-written
+      # src/common/asm/SNMAIN.s once the build pipeline integrates it.
       - [0x1000, asm]
-      - [0x2000]
 
-  - name: rest
+  - name: code
+    type: code
+    start: 0x1100
+    vram: 0x80000500
+    subsegments:
+      # Engine .text (game logic). Splat-suggested file boundaries
+      # (~140 sub-files) integrated coarsely; refine per-file during
+      # matching.
+      - [0x1100, asm]
+      - [0x1F100, asm]
+      - [0x438B0, asm]
+      # Engine .rodata: type-registry strings, jump-tables, format
+      # strings. Splat misinterpreted parts of this as code without
+      # the explicit type tag.
+      - [0xA5FD8, rodata]
+
+  # ---------------------------------------------------------------------------
+  # RSP microcode blobs. Do NOT disassemble as MIPS — see docs/MICROCODE.md.
+  # Verdict from byte-signature analysis: stock libultra "F3DEX.NoN fifo 2.05"
+  # + stock aspMain. Means RT64's existing F3DEX handler renders Turok 2 with
+  # no microcode-specific work.
+  # ---------------------------------------------------------------------------
+  - name: rspbootText
     type: bin
-    start: 0x2000
+    start: 0xBDF2C        # size 0xD4 — standard libultra rspboot
+  - name: aspMainText
+    type: bin
+    start: 0xBE000        # size 0xEE0 — N64 SDK aspMain audio ucode
+  - name: gspF3DEX_NoN_fifoText
+    type: bin
+    start: 0xBF2BC        # size 0x107C — F3DEX.NoN fifo 2.05 graphics text
+  - name: gfx_ucode_data
+    type: bin
+    start: 0xC0400        # F3DEX data + L3DEX text/data follow until ~0xC0950
+
+  # Engine .rodata continuation (between ucode region and libultra .text)
+  - name: code_rodata_tail
+    type: code
+    start: 0xC0950
+    vram: 0x80000500
+    subsegments:
+      - [0xC0950, rodata]
+
+  - name: libultra
+    type: code
+    start: 0xC3000
+    vram: 0x80000500
+    subsegments:
+      # libultra / libaudio / glu .text — densely populated MIPS prologues.
+      - [0xC3000, asm]
+      # libultra .rodata + audio sample-bank tables.
+      - [0xDC000, data]
+
+  # Duplicate ucode copy used by the IPL3/boot path. Mirrors the
+  # 0xBDF2C..0xC094E region byte-for-byte.
+  - name: ucode_copy2
+    type: bin
+    start: 0xF6F2C        # ends ~0xF7F50
+
+  - name: libultra_tail
+    type: code
+    start: 0xF7F50
+    vram: 0x80000500
+    subsegments:
+      # libultra .sdata/.data tail (pointer-heavy initializer region).
+      - [0xF7F50, data]
+
+  # SN64 LNK source-debug section (paths, line numbers, symbol tables).
+  # Not code, not data — pure linker metadata. Identified by literal
+  # `4c 4e 4b 02` markers throughout, and `D:\turok2\n64\source\...`
+  # path strings.
+  - name: lnk_debug
+    type: bin
+    start: 0x107000
+
+  # Virtual / VM-hosted code (T3-equivalent of the `virtual` segment).
+  # Hot-loaded engine code that gets relocated by VMASM.S at runtime.
+  - name: virtual
+    type: code
+    start: 0x13B5F0
+    vram: 0x8013AAF0
+    subsegments:
+      - [0x13B5F0, asm]
+      # Trailing .rodata/.data of the virtual segment.
+      - [0x1E0000, data]
+
+  # Compressed asset/level/audio/texture data. Treated as binary until
+  # the cartridge index is decoded.
+  - name: assets
+    type: bin
+    start: 0x20F000
+
+  # Final 0xFF trailer (ROM padding).
+  - name: trailer
+    type: bin
+    start: 0x1FF7AE4
 
   - [0x2000000]
