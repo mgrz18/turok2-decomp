@@ -56,4 +56,39 @@ awk -F'","' 'NR>1 {
 }' "$ROOT/versions/functions.csv.libtengine" > "$ROOT/versions/symbol_addrs.us.txt"
 echo "   $(wc -l < "$ROOT/versions/symbol_addrs.us.txt") T2 symbols seeded"
 
+# -- libultra overrides --------------------------------------------------
+# The LibTEngine CSV is sourced from Turok 3 and its libultra addresses
+# do NOT match Turok 2's layout. The names below were identified by
+# direct disassembly of the T2 libultra segment (ROM 0xC3000..0xDC000)
+# using COP0/cache prologue signatures. Addresses use the corrected
+# segment VRAM delta of 0x7FFFF400 (see docs/SEGMENTS.md and
+# docs/LIBULTRA-MATCHING.md).
+#
+# Appending these AFTER the awk pass intentionally lets splat resolve
+# them later in the file — splat takes the last definition for a given
+# VRAM. Any T3-stale libultra entries from the CSV are therefore
+# shadowed by these.
+{
+    echo ""
+    echo "// --- T2 libultra (identified via prologue/COP0 disasm) ---"
+    echo "osMapTLB             = 0x800C7E60; // type:func"
+    echo "osUnmapTLB           = 0x800C7EC0; // type:func"
+    echo "osGetTLB             = 0x800C7EFC; // type:func"
+    echo "__osCleanupThread    = 0x800C86D8; // type:func"
+    echo "__osGetSR            = 0x800D6BE0; // type:func"
+    echo "__osDisableInt       = 0x800D6BF0; // type:func"
+    echo "__osRestoreInt       = 0x800D6C10; // type:func"
+    echo "osInvalDCache        = 0x800D6C2C; // type:func"
+    echo "osWritebackDCache    = 0x800D6CD0; // type:func"
+    echo "osVirtualToPhysical  = 0x800D6D40; // type:func"
+    echo "__osSetCompare       = 0x800D6E10; // type:func"
+    echo "__osSetFpcCsr        = 0x800D6E20; // type:func"
+    echo "osSetIntMask         = 0x800D6E30; // type:func"
+    echo "__osSetSR            = 0x800D6EE0; // type:func"
+    echo "__osInitialize_TLB   = 0x800D6EF0; // type:func"
+    echo "osInvalICache        = 0x800D6F40; // type:func"
+    echo "osWritebackDCacheAll = 0x800D6FB0; // type:func"
+} >> "$ROOT/versions/symbol_addrs.us.txt"
+echo "   17 libultra names appended"
+
 echo "done."
