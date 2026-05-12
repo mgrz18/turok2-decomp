@@ -49,6 +49,7 @@ versions/functions.csv.libtengine
 versions/symbol_addrs.us.txt
 versions/undefined_funcs_auto.us.txt
 versions/undefined_syms_auto.us.txt
+versions/symbols_from_lnk.us.txt
 
 # Editor / OS
 .DS_Store
