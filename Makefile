@@ -76,13 +76,13 @@ endif
 OBJCOPY_FLAGS     = -O binary
 
 # Source enumeration
-S_FILES   = $(wildcard $(ASM_DIR)/*.s) $(wildcard $(SRC_ASM_DIR)/*.s)
+S_FILES   = $(wildcard $(ASM_DIR)/*.s) $(wildcard $(ASM_DIR)/data/*.s) $(wildcard $(SRC_ASM_DIR)/*.s)
 C_FILES   = $(wildcard $(SRC_DIR)/*.c)
 BIN_FILES = $(wildcard $(BIN_DIR)/*.bin)
 
 # Object outputs (path mirrors splat ld script: build/asm/*.s.o, build/assets/*.bin.o)
 S_OBJS   = $(patsubst $(SPLAT_DIR)/%.s,$(BUILD_DIR)/%.s.o,$(filter $(ASM_DIR)/%,$(S_FILES))) \
-           $(patsubst $(SRC_ASM_DIR)/%.s,$(BUILD_DIR)/asm/%.s.o,$(filter $(SRC_ASM_DIR)/%,$(S_FILES)))
+           $(patsubst %.s,$(BUILD_DIR)/%.s.o,$(filter $(SRC_ASM_DIR)/%,$(S_FILES)))
 C_OBJS   = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/src/%.c.o,$(C_FILES))
 BIN_OBJS = $(patsubst $(SPLAT_DIR)/%.bin,$(BUILD_DIR)/%.bin.o,$(BIN_FILES))
 
@@ -142,7 +142,9 @@ $(BUILD_DIR)/asm/%.s.o: $(ASM_DIR)/%.s
 	sed 's/^\.set noat$$/.set at/' $< | $(AS) $(AS_FLAGS) -o $@ -
 
 # Hand-written asm in src/us/asm/*.s
-$(BUILD_DIR)/asm/%.s.o: $(SRC_ASM_DIR)/%.s
+# Output mirrors source layout (build/src/us/asm/foo.s.o) so the
+# splat-generated ld script's hasm references resolve.
+$(BUILD_DIR)/$(SRC_ASM_DIR)/%.s.o: $(SRC_ASM_DIR)/%.s
 	@mkdir -p $(dir $@)
 	$(AS) $(AS_FLAGS) -o $@ $<
 

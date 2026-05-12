@@ -1,15 +1,14 @@
 /*
- * src/us/boot.s — hand-written boot routine for Turok 2 (US).
+ * src/us/asm/boot.s — hand-written boot routine for Turok 2 (US).
  *
  * Mirrors the original SN64 SNMAIN.s (boot_main + STVM_MapTLB) at
  * ROM 0x1000 / VRAM 0x80000400. Verified byte-exact against
  * baserom.us.z64 bytes 0x1000..0x10FC by scripts/verify_boot_asm.sh.
  *
- * This file is intentionally NOT picked up by the default build —
- * the active source for 0x80000400..0x80000500 is still the splat-
- * emitted us/asm/1000.s. To swap them in, remove the relevant chunk
- * from us/asm/1000.s (or from the splat segment range in
- * versions/turok2.us.yaml) and add `src/us/boot.s` to S_FILES.
+ * Wired into the main build via `hasm` in versions/turok2.us.yaml
+ * (main segment, subsegment ../src/us/asm/boot) — splat now emits
+ * the ld script referencing build/src/us/asm/boot.s.o instead of an
+ * auto-generated 1000.s.
  *
  * Why hand-written asm and not C:
  *   - The routine reads/writes CP0 registers (Index, EntryHi,
@@ -22,7 +21,6 @@
  *
  * Sibling references (do not modify):
  *   references/turok3/src/common/asm/SNMAIN.s   — bit-identical
- *   us/asm/1000.s                                — splat output
  */
 
 .include "macro.inc"
