@@ -28,6 +28,10 @@ echo ">> SN64 toolchain → tools/sn64/"
 mkdir -p "$ROOT/tools/sn64"
 cp -R "$REFS/turok3/tools/mips-gcc/sn64/." "$ROOT/tools/sn64/"
 
+echo ">> psyq-obj-parser binary → tools/psyq-obj-parser"
+cp "$REFS/turok3/tools/psyq-obj-parser" "$ROOT/tools/psyq-obj-parser"
+chmod +x "$ROOT/tools/psyq-obj-parser"
+
 echo ">> LibTEngine T2 struct headers → include/types/"
 mkdir -p "$ROOT/include/types"
 cp -R "$REFS/LibTEngine/lib/libtengine/lib/types/." "$ROOT/include/types/"

@@ -29,11 +29,20 @@ segments:
     type: bin
     start: 0x40
 
+  # Just the boot code for now (0x1000-0x2000). Code beyond 0x2000 needs
+  # boundary analysis before splat can disassemble it cleanly — for now
+  # we treat the rest of the ROM as opaque data so the build pipeline can
+  # produce a linkable ELF.
   - name: main
     type: code
     start: 0x1000
     vram: 0x80000400
     subsegments:
       - [0x1000, asm]
+      - [0x2000]
+
+  - name: rest
+    type: bin
+    start: 0x2000
 
   - [0x2000000]

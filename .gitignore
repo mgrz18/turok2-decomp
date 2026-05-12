@@ -14,13 +14,15 @@ build/
 *.bin
 *.map
 
-# Splat outputs (regenerated from baserom)
-asm/
-assets/
+# Splat outputs (regenerated from baserom). Anchored at repo root so
+# we don't accidentally ignore src/us/, include/us/, etc.
 .splat_cache
-us/
-eu/
-jp/
+/us/
+/eu/
+/jp/
+/us/asm/
+/us/assets/
+/us/bin/
 
 # Tool caches
 __pycache__/
@@ -34,6 +36,8 @@ references/
 # scripts/setup-from-references.sh from references/. Third-party origin,
 # not under our license.
 tools/sn64/
+tools/psyq-obj-parser
+tools/n64crc
 include/types/
 include/libtengine/
 
