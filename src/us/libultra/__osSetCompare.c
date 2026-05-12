@@ -2,9 +2,9 @@
  * src/us/libultra/__osSetCompare.c — candidate match for `__osSetCompare`
  * at T2 vram 0x800D7210 (ROM 0xD7E10).
  *
- * STATUS: NOT YET BYTE-EXACT, NOT LINKED INTO THE ROM.
- *         Pending SN64 cc1 in the container (see blocker #4 in
- *         docs/LIBULTRA-MATCHING.md).
+ * STATUS: BYTE-EXACT MATCH (Round 4) — NOT YET LINKED.
+ *         Compiled with SN64 cc1 -O2. Wiring blocked on Makefile
+ *         `C_FILES` glob.
  *
  * Real T2 bytes at 0x800D7210 (3 instructions, 12 bytes):
  *   40845800   mtc0  a0, $11        # write Compare register
@@ -19,10 +19,6 @@
 typedef unsigned int u32;
 
 void __osSetCompare(u32 value) {
-#ifdef __mips__
     unsigned long w = value;
     __asm__ volatile("mtc0 %0, $11" : : "r"(w));
-#else
-    (void)value; /* host stub */
-#endif
 }

@@ -2,9 +2,10 @@
  * src/us/libultra/__osSetSR.c — candidate match for `__osSetSR` at
  * T2 vram 0x800D72E0 (ROM 0xD7EE0).
  *
- * STATUS: NOT YET BYTE-EXACT, NOT LINKED INTO THE ROM.
- *         Pending SN64 cc1 in the container (see blocker #4 in
- *         docs/LIBULTRA-MATCHING.md).
+ * STATUS: BYTE-EXACT MATCH (Round 4) — NOT YET LINKED.
+ *         Compiled with SN64 cc1 -O2 (full flags in
+ *         docs/LIBULTRA-MATCHING.md). Wiring blocked on Makefile
+ *         `C_FILES` glob.
  *
  * Real T2 bytes at 0x800D72E0 (4 instructions, 16 bytes):
  *   40846000   mtc0  a0, $12        # write Status register
@@ -20,10 +21,6 @@
 typedef unsigned int u32;
 
 void __osSetSR(u32 sr) {
-#ifdef __mips__
     unsigned long w = sr;
-    __asm__ volatile("mtc0 %0, $12\nnop" : : "r"(w));
-#else
-    (void)sr; /* host stub */
-#endif
+    __asm__ volatile("mtc0 %0, $12\n\tnop" : : "r"(w));
 }

@@ -2,9 +2,10 @@
  * src/us/libultra/__osRestoreInt.c — candidate match for `__osRestoreInt`
  * at T2 vram 0x800D7010 (ROM 0xD7C10).
  *
- * STATUS: NOT YET BYTE-EXACT, NOT LINKED INTO THE ROM.
- *         Pending SN64 cc1 in the container (see blocker #4 in
- *         docs/LIBULTRA-MATCHING.md).
+ * STATUS: BYTE-EXACT MATCH (Round 4) — NOT YET LINKED.
+ *         Compiled with SN64 cc1 -O2. Hard-coded register names in
+ *         the inline asm (see body comment). Wiring blocked on
+ *         Makefile `C_FILES` glob.
  *
  * Real T2 bytes at 0x800D7010 (7 instructions, 28 bytes):
  *   40086000   mfc0  t0, $12        # read Status
@@ -24,18 +25,18 @@
 typedef unsigned int u32;
 
 void __osRestoreInt(u32 mask) {
-#ifdef __mips__
-    unsigned long sr;
-    unsigned long m = mask;
+    /*
+     * Force $8 (t0) for the SR scratch register; cc1 -O2 otherwise
+     * picks $2 (v0). mask is passed in $a0 by the SN64 ABI so we
+     * reference it directly. Trailing pair of nops matches the COP0
+     * hazard pad emitted by the real T2 binary.
+     */
+    (void)mask;
     __asm__ volatile(
-        "mfc0 %0, $12\n"
-        "or   %0, %0, %1\n"
-        "mtc0 %0, $12\n"
-        "nop\n"
-        "nop\n"
-        : "=&r"(sr)
-        : "r"(m));
-#else
-    (void)mask; /* host stub */
-#endif
+        "mfc0 $8, $12\n\t"
+        "or   $8, $8, $4\n\t"
+        "mtc0 $8, $12\n\t"
+        "nop\n\t"
+        "nop"
+        : : : "$8");
 }
