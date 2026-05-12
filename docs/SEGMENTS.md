@@ -480,3 +480,106 @@ Rough diff size: ~50 lines added, ~10 removed.
 - Splat's `find_file_boundaries` per-edge log was not dumped to a
   file by the current `make setup`, so the "~140 sub-files" claim
   could not be verified from this worktree.
+
+## Pass 4 — Applied
+
+The pass-4 unified diff was applied to `versions/turok2.us.yaml` in this
+round. Concrete results:
+
+### YAML changes (applied verbatim, except one fix-up)
+
+- Header comment block updated with the new layout breakdown.
+- `libultra` segment: single `os_text` subsegment replaced with the
+  7 named asm cuts (`os_text_audio_sched`, `os_text_io`, `os_text_gu`,
+  `os_text_thread`, `os_text_msg_timer`, `os_text_exception`,
+  `os_text_tail`).
+- `virtual` segment: single `[0x13B5F0, asm] / [0x1E0000, data]` pair
+  replaced with 3 asm + 3 rodata-as-data subsegments
+  (`virtual_text_0/1/2`, `virtual_rodata_0/1/2`).
+- New `assets_index` segment (ROM 0x20E334, **type `bin`** — splat 0.40
+  rejects standalone `data` segments without a vram; `bin` is the
+  closest typed alternative that does not require a vram. The byte
+  range is preserved; only the spimdisasm labelling differs).
+- `assets` start moved from 0x20F000 → 0x20F178.
+- `trailer` start moved from 0x1FF7AE4 → 0x1FF7AEC.
+
+### Build pipeline status
+
+- `make setup` (splat): clean run, 17 segments produced, **98.33 %
+  defined coverage** (vs 98.63 % before — the small drop is because
+  `virtual_rodata_*` is now typed `data` and `assets_index` is `bin`;
+  no asm/rodata content moved into `bin` that wasn't already opaque).
+- `make build`: **35 object files compile** (was 9 before this pass).
+  Every new asm subsegment assembles cleanly through `mips-linux-gnu-as`.
+- `make rom` (link): **still fails with 2 676 `undefined reference`
+  errors over 1 820 distinct func symbols.** SHA1 not reached.
+
+### Why the link still fails (and where pass-4 left it)
+
+Distribution of the unresolved symbols by /64 KB VRAM prefix:
+
+| Prefix    | Count |
+|-----------|-------|
+| 0x8028    | 279   |
+| 0x8024    | 234   |
+| 0x8029    | 223   |
+| 0x8022    | 218   |
+| 0x8027    | 202   |
+| 0x8025    | 196   |
+| 0x8023    | 175   |
+| 0x8026    | 163   |
+| 0x802A    | 83    |
+| 0x8021    | 33    |
+| 0x8020    | 8     |
+| other     | 7     |
+
+Every one of these unresolved targets lives in the **0x80210000 ..
+0x802A50C4** vram range. Crucially, that range is **above** the highest
+function splat actually defines (max `.globl` is `func_8020D274` in
+`virtual_text_2.s`). With the current `virtual` vram base of
+`0x8013AAF0` and delta `0x7FFFF500`, vram `0x802A0000` back-maps to ROM
+`0x2A0B00` — deep inside the `assets` blob, which is not code.
+
+This is strong evidence that the **three `virtual_text_*` modules are
+overlay-style and do not share a single linear vram base**. Splat is
+assigning them sequential vrams (continuing from 0x8013AAF0), but the
+runtime VMASM dispatcher almost certainly **relocates** each module to
+a different vram at load time. The `j func_802AXXXX` instructions in
+`virtual_text_2` are real jumps within the module *as it would be
+loaded at runtime*, but they reference an address space that doesn't
+exist statically in the ROM.
+
+Resolving this requires either:
+
+1. Per-module overlay vram tagging in the YAML (splat's
+   `subalign`/`vram` per subsegment) — needs the VM dispatch table at
+   ROM ~0x13B5F0..0x13C000 decoded to learn each module's load vram.
+2. Treating `virtual_text_1/2` as opaque `bin` until the dispatcher is
+   reverse-engineered. That gets the link to pass but loses the
+   disassembly of ~600 KB of game code.
+
+Neither is a YAML-only tweak — both depend on first understanding the
+VMASM relocation table. That's a separate investigation pass and is
+handed off to the next round (probably Agent N or a dedicated
+"virtual-overlay decode" sub-task).
+
+### Surprises encountered
+
+- Splat 0.40.3 requires `vram` for any segment typed `data`. The
+  pass-4 diff specified `type: data` for `assets_index`; this had to be
+  downgraded to `type: bin`. Conceptually identical for byte-exact
+  rebuild; only the label/symbol granularity is reduced.
+- The 2 668 → 2 676 unresolved-symbol count is virtually unchanged
+  because the unresolved set was never *bounded* by the old
+  single-`virtual` segment — they're all jumps into a vram range
+  splat cannot reach with a linear ROM→VRAM mapping. Splitting
+  `virtual` into three text modules did not change that root cause.
+- Build now yields 35 objects (was 9), which confirms the new YAML
+  drives the toolchain correctly end-to-end; only the link/relocation
+  stage is blocked by the overlay-vram issue.
+
+### Files committed in this pass
+
+- `versions/turok2.us.yaml` (the unified diff, with `assets_index`
+  type adjusted from `data` to `bin`).
+- `docs/SEGMENTS.md` (this section appended).
