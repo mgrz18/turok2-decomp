@@ -20,7 +20,11 @@
 
 typedef unsigned int u32;
 
+#ifdef __APPLE__
+void __osSetSR(u32 sr) { (void)sr; } /* host-clang stub */
+#else
 void __osSetSR(u32 sr) {
     unsigned long w = sr;
     __asm__ volatile("mtc0 %0, $12\n\tnop" : : "r"(w));
 }
+#endif

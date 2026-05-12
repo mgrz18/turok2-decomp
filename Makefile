@@ -168,6 +168,10 @@ $(BUILD_DIR)/src/%.s_c: $(BUILD_DIR)/src/%.i
 	$(CC) $(CC_FLAGS) -o $@ $<
 
 $(BUILD_DIR)/src/%.c.obj: $(BUILD_DIR)/src/%.s_c
+	# Prepend `.set noat` BEFORE unix2dos so the inserted line gets CRLF
+	# along with the rest. asn64 returns nonzero on $at warnings under
+	# wine, so we silence them at the source.
+	sed -i -e '1i\.set noat' $<
 	unix2dos $<
 	sed -i -e 's/.version/#.version/g' $<
 	sed -i -e 's/.size/#.size/g' $<

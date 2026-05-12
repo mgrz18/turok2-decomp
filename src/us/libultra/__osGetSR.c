@@ -22,8 +22,15 @@
 
 typedef unsigned int u32;
 
+#ifdef __APPLE__
+/* Host-clang stub. macOS clang lacks a MIPS target, so the inline asm
+ * is replaced with a noop for IDE static analysis. The real body
+ * compiles only under SN64 cc1 inside the build container. */
+u32 __osGetSR(void) { return 0; }
+#else
 u32 __osGetSR(void) {
     unsigned long sr;
     __asm__ volatile("mfc0 %0, $12" : "=r"(sr));
     return (u32)sr;
 }
+#endif

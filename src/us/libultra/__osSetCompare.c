@@ -18,7 +18,11 @@
 
 typedef unsigned int u32;
 
+#ifdef __APPLE__
+void __osSetCompare(u32 value) { (void)value; } /* host-clang stub */
+#else
 void __osSetCompare(u32 value) {
     unsigned long w = value;
     __asm__ volatile("mtc0 %0, $11" : : "r"(w));
 }
+#endif

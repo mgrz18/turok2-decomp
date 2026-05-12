@@ -25,6 +25,9 @@
 
 typedef unsigned int OSIntMask;
 
+#ifdef __APPLE__
+OSIntMask __osDisableInt(void) { return 0; } /* host-clang stub */
+#else
 OSIntMask __osDisableInt(void) {
     /*
      * Pin output to %0 (=> $v0 via the named return slot trick): we
@@ -45,3 +48,4 @@ OSIntMask __osDisableInt(void) {
         : "=r"(ret) : : "$1", "$8", "$9");
     return (OSIntMask)ret;
 }
+#endif

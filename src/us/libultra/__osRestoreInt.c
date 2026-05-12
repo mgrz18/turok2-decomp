@@ -24,6 +24,9 @@
 
 typedef unsigned int u32;
 
+#ifdef __APPLE__
+void __osRestoreInt(u32 mask) { (void)mask; } /* host-clang stub */
+#else
 void __osRestoreInt(u32 mask) {
     /*
      * Force $8 (t0) for the SR scratch register; cc1 -O2 otherwise
@@ -40,3 +43,4 @@ void __osRestoreInt(u32 mask) {
         "nop"
         : : : "$8");
 }
+#endif
