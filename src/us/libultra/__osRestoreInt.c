@@ -24,7 +24,9 @@
 typedef unsigned int u32;
 
 void __osRestoreInt(u32 mask) {
-    u32 sr;
+#ifdef __mips__
+    unsigned long sr;
+    unsigned long m = mask;
     __asm__ volatile(
         "mfc0 %0, $12\n"
         "or   %0, %0, %1\n"
@@ -32,5 +34,8 @@ void __osRestoreInt(u32 mask) {
         "nop\n"
         "nop\n"
         : "=&r"(sr)
-        : "r"(mask));
+        : "r"(m));
+#else
+    (void)mask; /* host stub */
+#endif
 }

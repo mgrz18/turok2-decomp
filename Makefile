@@ -57,7 +57,12 @@ N64CRC   = $(TOOLS_DIR)/n64crc
 # Flags (from turok3's Makefile)
 OPT_FLAGS         = -O2
 INCLUDE_CC_FLAGS  = -I. -Iinclude -I$(INCLUDE_DIR)
-AS_FLAGS          = -EB -mtune=vr4300 -march=vr4300 -mabi=32 -mips3 -O1 -I $(INCLUDE_DIR) --defsym ASSEMBLER=1
+# Use -mips4 (drop -march/-mtune=vr4300 which imply -mips3) so the
+# assembler accepts the conditional-move ops (movz/movn) the R4300
+# implements but the MIPS III base ISA does not declare. The resulting
+# object code still targets vr4300 and links against MIPS III objects
+# from cc1.
+AS_FLAGS          = -EB -mabi=32 -mips4 -O1 -I $(INCLUDE_DIR) --defsym ASSEMBLER=1
 ASM_FLAGS         = -I $(INCLUDE_DIR) -mips3
 D_FLAGS           = -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 -DGAME_VERSION=\"$(VERSION)\"
 

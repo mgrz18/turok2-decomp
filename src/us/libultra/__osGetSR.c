@@ -20,7 +20,11 @@
 typedef unsigned int u32;
 
 u32 __osGetSR(void) {
-    u32 sr;
+#ifdef __mips__
+    unsigned long sr;
     __asm__ volatile("mfc0 %0, $12" : "=r"(sr));
-    return sr;
+    return (u32)sr;
+#else
+    return 0; /* host stub — real impl compiled inside container */
+#endif
 }

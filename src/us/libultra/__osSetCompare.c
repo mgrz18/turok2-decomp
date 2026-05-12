@@ -19,5 +19,10 @@
 typedef unsigned int u32;
 
 void __osSetCompare(u32 value) {
-    __asm__ volatile("mtc0 %0, $11" : : "r"(value));
+#ifdef __mips__
+    unsigned long w = value;
+    __asm__ volatile("mtc0 %0, $11" : : "r"(w));
+#else
+    (void)value; /* host stub */
+#endif
 }

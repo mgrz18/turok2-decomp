@@ -27,8 +27,12 @@
 typedef unsigned int OSIntMask;
 
 OSIntMask __osDisableInt(void) {
-    OSIntMask sr;
-    OSIntMask prev;
+#ifdef __mips__
+    /* Real implementation. Compiled with SN64 cc1 inside the build
+     * container; host clang lacks the MIPS target so the inline asm
+     * is guarded out for IDE-level static analysis. */
+    unsigned long sr;
+    unsigned long prev;
     __asm__ volatile(
         "mfc0 %0, $12\n"
         "addiu $1, $0, -2\n"
@@ -36,8 +40,9 @@ OSIntMask __osDisableInt(void) {
         "mtc0 $9, $12\n"
         "andi %1, %0, 0x1\n"
         "nop\n"
-        : "=r"(sr), "=r"(prev)
-        :
-        : "$1", "$9");
-    return prev;
+        : "=r"(sr), "=r"(prev));
+    return (OSIntMask)prev;
+#else
+    return 0; /* host stub */
+#endif
 }

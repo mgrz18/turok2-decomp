@@ -20,5 +20,10 @@
 typedef unsigned int u32;
 
 void __osSetSR(u32 sr) {
-    __asm__ volatile("mtc0 %0, $12\nnop" : : "r"(sr));
+#ifdef __mips__
+    unsigned long w = sr;
+    __asm__ volatile("mtc0 %0, $12\nnop" : : "r"(w));
+#else
+    (void)sr; /* host stub */
+#endif
 }
