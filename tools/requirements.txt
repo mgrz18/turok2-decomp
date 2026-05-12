@@ -2,3 +2,10 @@ splat64
 spimdisasm
 rabbitizer
 pyyaml
+n64img
+pylibyaml
+intervaltree
+colorama
+tqdm
+pygfxd
+crunch64

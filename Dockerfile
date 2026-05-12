@@ -31,8 +31,7 @@ RUN dpkg --add-architecture i386 && \
 
 WORKDIR /work
 
-# Splat and friends are installed via pip at first build.
-# Run `pip install -r tools/requirements.txt` inside the container after
-# initial setup if needed.
+COPY tools/requirements.txt /tmp/requirements.txt
+RUN pip3 install --break-system-packages --no-cache-dir -r /tmp/requirements.txt
 
 CMD ["/bin/bash"]

@@ -17,7 +17,6 @@ options:
   use_legacy_include_asm: False
   generated_c_preamble: "#include \"include_asm.h\""
   generated_s_preamble: ".set fp=64"
-  enable_ld_alignment_hack: yes
 
 # Initial bootstrap config — segment boundaries beyond the boot stub are
 # unverified. Run `make setup` to splat-disasm and refine.

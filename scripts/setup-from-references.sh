@@ -41,9 +41,15 @@ echo ">> functions.csv → versions/ (untracked, used to seed symbols)"
 cp "$REFS/LibTEngine/functions.csv" "$ROOT/versions/functions.csv.libtengine"
 
 echo ">> generating versions/symbol_addrs.us.txt from functions.csv"
-awk -F'","' 'NR>1 {gsub(/"/,""); n=split($0,a,","); name=a[1]; loc=a[2];
-    if (loc ~ /^800/) print name " = 0x" loc "; // type:func"}' \
-    "$ROOT/versions/functions.csv.libtengine" > "$ROOT/versions/symbol_addrs.us.txt"
+# LibTEngine repeats names (compiler-emitted trampolines etc). Splat wants
+# unique symbol names per address — disambiguate by appending the addr.
+awk -F'","' 'NR>1 {
+    gsub(/"/,""); n=split($0,a,","); name=a[1]; loc=a[2];
+    if (loc !~ /^800/) next;
+    seen[name]++;
+    sym = (seen[name] == 1) ? name : name "_" loc;
+    print sym " = 0x" loc "; // type:func"
+}' "$ROOT/versions/functions.csv.libtengine" > "$ROOT/versions/symbol_addrs.us.txt"
 echo "   $(wc -l < "$ROOT/versions/symbol_addrs.us.txt") T2 symbols seeded"
 
 echo "done."

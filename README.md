@@ -2,7 +2,7 @@
 
 Work-in-progress decompilation of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0).
 
-> ⚠️ **Status: bootstrap.** No matched code yet. Workspace is being set up.
+> ⚠️ **Status: bootstrap verified.** Toolchain runs end-to-end; ROM splat-disassembles into ~8.6M lines of MIPS asm. No matched C yet — segment boundaries and data/code separation are next.
 
 ## Why
 
@@ -58,8 +58,10 @@ docker run --platform=linux/amd64 --rm -it -v "$PWD":/work turok2-build \
 
 ### Phase 1 — Bootstrap
 - [x] Confirm ROM dump (SHA1 verified)
-- [ ] Initial `splat.yaml` (header, boot, main, gfx segments)
-- [ ] Identify entry points and code segment size
+- [x] Toolchain working (Docker linux/amd64 + Rosetta-for-Linux + SN64 binaries)
+- [x] First splat pass produces asm + linker script
+- [x] Entry point confirmed at `0x80000400` (`romMain`)
+- [ ] Refine segment boundaries (code vs data vs assets vs audio)
 - [ ] Dump RSP `ucode_text` / `ucode_data` and diff against stock F3DEX
 
 ### Phase 2 — Microcode triage
