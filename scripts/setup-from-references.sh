@@ -6,12 +6,35 @@
 #   references/turok3/      ← https://github.com/Drahsid/turok3
 #   references/LibTEngine/  ← https://github.com/Drahsid/LibTEngine
 #
-# Re-run any time the references update.
+# Re-run any time the references update. Idempotent.
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 REFS="$ROOT/references"
+
+# ---------------------------------------------------------------------------
+# Worktree bootstrap: if we're running inside .claude/worktrees/agent-*,
+# symlink the heavy artifacts (baserom, references/) from the main checkout
+# at ../../../ so each worktree doesn't need its own copy. Skip if the
+# target already exists (idempotent).
+# ---------------------------------------------------------------------------
+case "$ROOT" in
+    */.claude/worktrees/agent-*)
+        MAIN_ROOT="$(cd "$ROOT/../../.." && pwd)"
+        echo ">> worktree detected — bootstrapping from $MAIN_ROOT"
+
+        if [ ! -e "$ROOT/baserom.us.z64" ] && [ -f "$MAIN_ROOT/baserom.us.z64" ]; then
+            echo "   symlink baserom.us.z64"
+            ln -s "$MAIN_ROOT/baserom.us.z64" "$ROOT/baserom.us.z64"
+        fi
+
+        if [ ! -e "$ROOT/references" ] && [ -d "$MAIN_ROOT/references" ]; then
+            echo "   symlink references/"
+            ln -s "$MAIN_ROOT/references" "$ROOT/references"
+        fi
+        ;;
+esac
 
 require_dir() {
     if [ ! -d "$1" ]; then
@@ -27,6 +50,10 @@ require_dir "$REFS/LibTEngine"
 echo ">> SN64 toolchain → tools/sn64/"
 mkdir -p "$ROOT/tools/sn64"
 cp -R "$REFS/turok3/tools/mips-gcc/sn64/." "$ROOT/tools/sn64/"
+# Make sure native binaries are executable (cp may strip the +x bit when
+# the source lives on a filesystem without exec perms, e.g. some FUSE
+# mounts). This was a Round 3 gap.
+chmod +x "$ROOT/tools/sn64/"* 2>/dev/null || true
 
 echo ">> psyq-obj-parser binary → tools/psyq-obj-parser"
 cp "$REFS/turok3/tools/psyq-obj-parser" "$ROOT/tools/psyq-obj-parser"
@@ -47,9 +74,20 @@ cp "$REFS/LibTEngine/functions.csv" "$ROOT/versions/functions.csv.libtengine"
 echo ">> generating versions/symbol_addrs.us.txt from functions.csv"
 # LibTEngine repeats names (compiler-emitted trampolines etc). Splat wants
 # unique symbol names per address — disambiguate by appending the addr.
+#
+# T3-STALE FILTER (Agent K, Pass 4 — docs/SEGMENTS.md § 4.1):
+# The LibTEngine CSV is harvested from Turok 3, whose libultra is laid
+# out at higher VRAMs than T2's. T2's libultra .text ends at 0xDEDE0
+# (vram 0x800DEDE0). Any entry at or above that whose name begins with
+# `os` or `__os` is a Turok 3 address — drop it so it doesn't confuse
+# splat/m2c about T2's actual libultra layout. The hand-verified T2
+# libultra names are appended further below.
 awk -F'","' 'NR>1 {
     gsub(/"/,""); n=split($0,a,","); name=a[1]; loc=a[2];
     if (loc !~ /^800/) next;
+    # T3-stale libultra filter: drop os* / __os* at >= 0x800DEDE0
+    locu = toupper(loc);
+    if ((name ~ /^os/ || name ~ /^__os/) && locu >= "800DEDE0") next;
     seen[name]++;
     sym = (seen[name] == 1) ? name : name "_" loc;
     print sym " = 0x" loc "; // type:func"
@@ -94,5 +132,64 @@ echo "   $(wc -l < "$ROOT/versions/symbol_addrs.us.txt") T2 symbols seeded"
     echo "osWritebackDCacheAll = 0x800D73B0; // type:func"
 } >> "$ROOT/versions/symbol_addrs.us.txt"
 echo "   17 libultra names appended"
+
+# -- LNK decoder integration (Agent J) -----------------------------------
+# tools/lnk_decoder.py extracts symbol names embedded in the SN64 LNK
+# debug records around ROM offset 0x107000. The addresses are
+# section-relative (small offsets like 0x160, not VRAM), so they're not
+# usable as splat seeds directly — but the *names* (InitPTimers,
+# UpdatePTimers, DoInit, DoUpdate, UpdateProfileTimer, VM_PhysicalPool)
+# are real T2 symbols that downstream tooling can pick up once a real
+# linker pass assigns VRAMs.
+#
+# We append the decoder output verbatim, deduped by symbol name against
+# what's already in the seed. If the decoder fails (missing baserom,
+# python missing, etc.) we warn and continue.
+LNK_PY="$ROOT/tools/lnk_decoder.py"
+BASEROM="$ROOT/baserom.us.z64"
+if [ -f "$LNK_PY" ] && [ -f "$BASEROM" ]; then
+    echo ">> running lnk_decoder.py and appending to symbol seed"
+    LNK_OUT="$(mktemp)"
+    if python3 "$LNK_PY" --rom "$BASEROM" --symbols > "$LNK_OUT" 2>/dev/null; then
+        # Dedupe: collect existing symbol names from the seed, then emit
+        # only LNK lines whose name is new. Pass-through comment lines.
+        awk -v seed="$ROOT/versions/symbol_addrs.us.txt" '
+            BEGIN {
+                while ((getline line < seed) > 0) {
+                    if (line ~ /^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=/) {
+                        n = line
+                        sub(/[[:space:]]*=.*/, "", n)
+                        gsub(/^[[:space:]]+|[[:space:]]+$/, "", n)
+                        seen[n] = 1
+                    }
+                }
+                close(seed)
+                print ""
+                print "// --- symbols from tools/lnk_decoder.py (section-relative offsets) ---"
+            }
+            /^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=/ {
+                # extract symbol name
+                name = $0
+                sub(/[[:space:]]*=.*/, "", name)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", name)
+                if (name in seen) next
+                seen[name] = 1
+                # LNK offsets are section-relative (tiny, collide with each
+                # other and with VRAMs), so comment them out: keep the name
+                # discoverable but do not feed it to splat as a live symbol.
+                print "// " $0
+                next
+            }
+            { print }
+        ' "$LNK_OUT" >> "$ROOT/versions/symbol_addrs.us.txt"
+        ADDED="$(grep -cE '^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=' "$LNK_OUT" || true)"
+        echo "   ${ADDED:-0} LNK symbol candidates considered (deduped against seed)"
+    else
+        echo "   warning: lnk_decoder.py failed, skipping LNK integration" >&2
+    fi
+    rm -f "$LNK_OUT"
+else
+    echo "   warning: skipping LNK integration (missing $LNK_PY or $BASEROM)" >&2
+fi
 
 echo "done."

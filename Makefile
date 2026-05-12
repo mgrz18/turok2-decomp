@@ -82,7 +82,7 @@ OBJCOPY_FLAGS     = -O binary
 
 # Source enumeration
 S_FILES   = $(wildcard $(ASM_DIR)/*.s) $(wildcard $(ASM_DIR)/data/*.s) $(wildcard $(SRC_ASM_DIR)/*.s)
-C_FILES   = $(wildcard $(SRC_DIR)/*.c)
+C_FILES   = $(shell find $(SRC_DIR) -name '*.c' 2>/dev/null)
 BIN_FILES = $(wildcard $(BIN_DIR)/*.bin)
 
 # Object outputs (path mirrors splat ld script: build/asm/*.s.o, build/assets/*.bin.o)
