@@ -77,6 +77,10 @@ docker run --platform=linux/amd64 --rm -it -v "$PWD":/work turok2-build \
 - [ ] N64Recomp on the matched ELF
 - [ ] First window opens with RT64
 
+## Built with
+
+This decomp is being developed with the assistance of **[Claude](https://claude.com/claude-code)** (Anthropic's Claude Code, Opus 4.7). Reverse-engineering work, splat configuration, toolchain scaffolding, and most of the prose in this repository were produced in collaboration with Claude under human direction.
+
 ## Legal
 
 The ROM is not distributed here. Provide your own dump from a cartridge you own. Original game code and assets are property of the Turok IP rights holders.
