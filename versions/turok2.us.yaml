@@ -56,9 +56,10 @@ segments:
     start: 0x1000
     vram: 0x80000400
     subsegments:
-      # SN64 entry stub — should be replaced with a hand-written
-      # src/common/asm/SNMAIN.s once the build pipeline integrates it.
-      - [0x1000, asm]
+      # SN64 entry stub — wired via hasm so the splat-emitted asm is
+      # replaced by the hand-written src/us/asm/boot.s (byte-exact).
+      # `base_path` is ../us, hence the ../ prefix.
+      - [0x1000, hasm, ../src/us/asm/boot]
 
   - name: code
     type: code

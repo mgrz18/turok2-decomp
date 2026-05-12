@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 # scripts/verify_boot_asm.sh
 #
-# Assemble src/us/boot.s standalone (inside the turok2-build linux/amd64
-# docker image) and diff its .text against bytes 0x1000..0x10FC of
-# baserom.us.z64. Used to prove that the hand-written boot.s is byte-
-# exact with the original boot routine without having to wire it into
-# the main link (which would clash with splat's us/asm/1000.s).
+# Assemble src/us/asm/boot.s standalone (inside the turok2-build
+# linux/amd64 docker image) and diff its .text against bytes
+# 0x1000..0x10FC of baserom.us.z64.
+#
+# NOTE: boot.s is now wired into the main build via `hasm` in
+# versions/turok2.us.yaml (subsegment ../src/us/asm/boot), so
+# `make verify` is the canonical end-to-end check once the full ROM
+# links. This script remains useful as a focused sanity check that
+# isolates the boot.s assembly from the rest of the pipeline — handy
+# when iterating on the boot routine itself.
 #
 # Usage:
 #   ./scripts/verify_boot_asm.sh           # run via docker
@@ -35,7 +40,7 @@ cat >"$WORK/stubs.s" <<'EOF'
 .set main, 0x0028D380
 EOF
 
-cat "$WORK/stubs.s" src/us/boot.s >"$WORK/boot.s"
+cat "$WORK/stubs.s" src/us/asm/boot.s >"$WORK/boot.s"
 
 mips-linux-gnu-as -EB -mtune=vr4300 -march=vr4300 -mabi=32 -mips3 -O1 \
     -I us/include --defsym ASSEMBLER=1 \
@@ -61,12 +66,12 @@ dd if=baserom.us.z64 of="$WORK/ref.bin" bs=1 skip=4096 count=256 \
     status=none
 
 if cmp -s "$WORK/boot.bin" "$WORK/ref.bin"; then
-    echo "OK: src/us/boot.s assembles byte-exact with baserom 0x1000..0x10FC"
+    echo "OK: src/us/asm/boot.s assembles byte-exact with baserom 0x1000..0x10FC"
     exit 0
 fi
 
 echo "MISMATCH: showing first 16 bytes of diff context"
-echo "--- assembled (src/us/boot.s) ---"
+echo "--- assembled (src/us/asm/boot.s) ---"
 xxd "$WORK/boot.bin" | head -20
 echo "--- expected (baserom 0x1000) ---"
 xxd "$WORK/ref.bin" | head -20
