@@ -38,10 +38,15 @@ options:
 #   0xF6F2C  - 0xF7F50  : duplicate ucode copy used by IPL3
 #   0xF7F50  - 0x107000 : libultra .sdata/.data tail
 #   0x107000 - 0x13B5F0 : SN64 LNK source-debug section (paths, line info)
-#   0x13B5F0 - 0x1E0000 : virtual / VM-hosted code (T3-equivalent `virtual`)
-#   0x1E0000 - 0x20F000 : post-virtual .rodata/.data tail
-#   0x20F000 - 0x1FF7AE4: compressed assets (textures, audio, levels)
-#   0x1FF7AE4- 0x2000000: 0xFF trailer (ROM padding)
+#   0x13B5F0 - 0x17A600 : virtual_text_0 (VM module 1 .text)
+#   0x17A600 - 0x186000 : virtual_rodata_0
+#   0x186000 - 0x1B3400 : virtual_text_1 (VM module 2 .text)
+#   0x1B3400 - 0x1BFA00 : virtual_rodata_1
+#   0x1BFA00 - 0x1DEE00 : virtual_text_2 (VM module 3 .text)
+#   0x1DEE00 - 0x20E334 : virtual_rodata_2 / .sdata
+#   0x20E334 - 0x20F178 : assets_index (913 x uint32 offset table)
+#   0x20F178 - 0x1FF7AEC: compressed assets (textures, audio, levels)
+#   0x1FF7AEC- 0x2000000: 0xFF trailer (ROM padding)
 segments:
   - name: header
     type: header
@@ -125,9 +130,15 @@ segments:
     start: 0xC3074
     vram: 0x800C2474     # was 0x80000500 — overlapped with `code`. ROM 0xC3074 + delta 0x7FFFF400
     subsegments:
-      - [0xC3074, asm, libaudio]      # libaudio .text
-      - [0xC8A60, asm, os_text]       # libultra OS / gu math / threads
-      - [0xDEDE0, data, os_rodata]    # libultra .rodata + segment-2 jump tables
+      - [0xC3074, asm, libaudio]              # libaudio .text
+      - [0xC8A60, asm, os_text_audio_sched]   # audio post + scheduler glue
+      - [0xCB000, asm, os_text_io]            # osPi*/osSi* I/O wrappers
+      - [0xD1000, asm, os_text_gu]            # gu* matrix math (fp-dense)
+      - [0xD5000, asm, os_text_thread]        # thread dispatch / queue (COP0)
+      - [0xD8000, asm, os_text_msg_timer]     # osSendMesg / osSetTimer
+      - [0xDC800, asm, os_text_exception]     # exception vectors / fault (eret)
+      - [0xDDE00, asm, os_text_tail]          # trailing helpers up to 0xDEDE0
+      - [0xDEDE0, data, os_rodata]            # libultra .rodata + jump tables
 
   # Duplicate ucode copy used by the IPL3/boot path. Mirrors the
   # 0xBDF2C..0xC094E region byte-for-byte.
@@ -158,19 +169,31 @@ segments:
     start: 0x13B5F0
     vram: 0x8013AAF0
     subsegments:
-      - [0x13B5F0, asm]
-      # Trailing .rodata/.data of the virtual segment.
-      - [0x1E0000, data]
+      # Three VM modules separated by two .rodata pools (pass-4 prologue-density
+      # sweep). The dispatcher in VMASM.S swaps these in overlay-style.
+      - [0x13B5F0, asm,  virtual_text_0]
+      - [0x17A600, data, virtual_rodata_0]
+      - [0x186000, asm,  virtual_text_1]
+      - [0x1B3400, data, virtual_rodata_1]
+      - [0x1BFA00, asm,  virtual_text_2]
+      - [0x1DEE00, data, virtual_rodata_2]
+
+  # 913-entry uint32 BE monotonic offset table (assets directory).
+  # Discovered in pass 4: it actually starts 0xCCC bytes earlier than
+  # 0x20F000 was claiming. Ends at 0x20F178.
+  - name: assets_index
+    type: bin
+    start: 0x20E334
 
   # Compressed asset/level/audio/texture data. Treated as binary until
   # the cartridge index is decoded.
   - name: assets
     type: bin
-    start: 0x20F000
+    start: 0x20F178
 
-  # Final 0xFF trailer (ROM padding).
+  # Final 0xFF trailer (ROM padding). Last non-FF byte at 0x1FF7AEB.
   - name: trailer
     type: bin
-    start: 0x1FF7AE4
+    start: 0x1FF7AEC
 
   - [0x2000000]
