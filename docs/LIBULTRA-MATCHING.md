@@ -76,11 +76,72 @@ or `mtc0 rt, $12` (0x40006000), followed within 32 bytes by
 
 ## Results summary
 
-- **Matched byte-exact**: 0
-- **Close diff** (cannot measure without cc1): 5 (candidates exist
-  but the toolchain to verify them is absent)
-- **Blocked**: 0 functions newly blocked. The whole class is blocked
-  on blocker #4 (no SN64 cc1).
+- **Matched byte-exact**: 5 / 5 (Round 4 — all five candidates now
+  produce byte-identical objects via SN64 cc1).
+- **Close diff**: 0
+- **Blocked**: 0
+
+### Round 4 — compile + matching results
+
+Toolchain bootstrap: `bash scripts/setup-from-references.sh` brought
+`tools/sn64/cc1`, `asn64.exe`, and `psyq-obj-parser` into the worktree.
+All compiles run inside the `turok2-build` linux/amd64 image. Scratch
+artefacts land in `build/scratch/libultra/` (gitignored).
+
+`__mips__` predefine: the host Linux `cpp` invoked by the Makefile
+**does NOT** define `__mips__` (verified with
+`printf "#ifdef __mips__\nMIPS_DEFINED\n#endif" | cpp -P -undef -lang-c
+-D_LANGUAGE_C -D__GNUC__=2`). So the existing `#ifdef __mips__` guards
+in the Round-3 candidates left them as `return 0` stubs.
+
+Workaround applied per-compile: `cpp -D__mips__=1 ...` (Agent-N's
+Makefile change will add this to `CPP_FLAGS` or, better, drop the
+guard entirely — see the Makefile diff request below).
+
+| Function           | Flags    | Status  | Notes |
+|--------------------|----------|---------|-------|
+| `__osGetSR`        | `-O2`    | MATCHED | cc1 picks `$v0` naturally (it's the return reg). Trivial. |
+| `__osSetSR`        | `-O2`    | MATCHED | Inline `mtc0 %0,$12; nop` plus implicit `jr $ra` epilogue. |
+| `__osSetCompare`   | `-O2`    | MATCHED | Inline `mtc0 %0,$11` only. No leading hazard nop. |
+| `__osDisableInt`   | `-O2`    | MATCHED | Required register pinning: `register unsigned long ret __asm__("$2")` plus hard-coded `$8`/`$9`/`$1` in the asm body. Without pinning, cc1 picks `$3` for the read and emits `move $2,$0` in the `jr` delay slot, clobbering the result. |
+| `__osRestoreInt`   | `-O2`    | MATCHED | Required hard-coded `$8` for SR temp + direct `$4` reference for the `mask` arg. cc1's default register alloc picks `$v0` and reorders. |
+
+Verified byte-exact against the docstring tables above by
+disassembling the produced `.o` with `mips-linux-gnu-objdump -d` and
+extracting `.text` with `objcopy -O binary`. See
+`build/scratch/libultra/*.bin` (gitignored).
+
+## Makefile diff request
+
+The current `Makefile` line 85 uses
+
+```make
+C_FILES = $(wildcard $(SRC_DIR)/*.c)
+```
+
+which does NOT recurse into `src/us/libultra/`, so none of the
+matched objects link into the ELF. Agent N (Makefile owner) should
+change it to recurse, e.g.:
+
+```make
+C_FILES = $(shell find $(SRC_DIR) -name '*.c')
+```
+
+Additionally, to let the `#ifdef __mips__` guards in any other future
+candidates take the live path, please add `-D__mips__=1` to either
+`D_FLAGS` or `CPP_FLAGS`:
+
+```make
+D_FLAGS = -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 -DGAME_VERSION=\"$(VERSION)\" -D__mips__=1
+```
+
+The five committed candidates already work without this (their guards
+were removed / register pins inserted in Round 4) — but downstream
+inline-asm work will benefit. With the `find` change in place,
+`build/src/us/libultra/*.c.o` will be produced and need to be added
+to the linker script (Agent who owns `versions/turok2.us.yaml` /
+splat config must also blank out the corresponding `.word` ranges
+in `us/asm/os_text.s` so the same instructions don't appear twice).
 
 ## Blockers
 

@@ -2,11 +2,10 @@
  * src/us/libultra/__osDisableInt.c — candidate match for the libultra
  * interrupt-disable primitive at T2 vram 0x800D6FF0 (ROM 0xD7BF0).
  *
- * STATUS: NOT YET BYTE-EXACT, NOT LINKED INTO THE ROM.
- *         Pending SN64 cc1 in the container (see blocker #4 in
- *         docs/LIBULTRA-MATCHING.md).  Previous notes had the vram off
- *         by 0x400 (0x800D6BF0); corrected after the splat libultra
- *         vram fix landed.
+ * STATUS: BYTE-EXACT MATCH (Round 4) — NOT YET LINKED.
+ *         Compiled with SN64 cc1 -O2. Register pinning required
+ *         (see body comment). Wiring blocked on Makefile `C_FILES`
+ *         glob.
  *
  * Real T2 bytes at 0x800D6FF0 (8 instructions, 32 bytes):
  *   40086000   mfc0  t0, $12        # save SR -> t0
@@ -27,22 +26,22 @@
 typedef unsigned int OSIntMask;
 
 OSIntMask __osDisableInt(void) {
-#ifdef __mips__
-    /* Real implementation. Compiled with SN64 cc1 inside the build
-     * container; host clang lacks the MIPS target so the inline asm
-     * is guarded out for IDE-level static analysis. */
-    unsigned long sr;
-    unsigned long prev;
+    /*
+     * Pin output to %0 (=> $v0 via the named return slot trick): we
+     * declare a register variable bound to $2 and let cc1 see it as
+     * the function's return path. The mfc0/and/mtc0 chain uses fixed
+     * temps $8/$9 + $1 to match the real T2 binary exactly. Without
+     * this, -O2 picks $3 for the read and emits a `move $2,$0` in the
+     * jr delay slot, clobbering our result.
+     */
+    register unsigned long ret __asm__("$2");
     __asm__ volatile(
-        "mfc0 %0, $12\n"
-        "addiu $1, $0, -2\n"
-        "and  $9, %0, $1\n"
-        "mtc0 $9, $12\n"
-        "andi %1, %0, 0x1\n"
-        "nop\n"
-        : "=r"(sr), "=r"(prev));
-    return (OSIntMask)prev;
-#else
-    return 0; /* host stub */
-#endif
+        "mfc0 $8, $12\n\t"
+        "addiu $1, $0, -2\n\t"
+        "and  $9, $8, $1\n\t"
+        "mtc0 $9, $12\n\t"
+        "andi $2, $8, 0x1\n\t"
+        "nop"
+        : "=r"(ret) : : "$1", "$8", "$9");
+    return (OSIntMask)ret;
 }
