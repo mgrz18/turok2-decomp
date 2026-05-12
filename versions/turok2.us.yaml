@@ -30,9 +30,11 @@ options:
 #   0x1100   - 0xA5FD8  : engine .text (game logic + classes)
 #   0xA5FD8  - 0xBDF2C  : engine .rodata (type-registry strings, jump tables)
 #   0xBDF2C  - 0xC0950  : RSP microcode region (rspboot + aspMain + F3DEX)
-#   0xC0950  - 0xC3000  : engine .rodata tail
-#   0xC3000  - 0xDC000  : libultra / libaudio / glu .text
-#   0xDC000  - 0xF6F2C  : libultra .rodata + audio sample tables
+#   0xC0950  - 0xC2ED8  : engine .rodata tail
+#   0xC2ED8  - 0xC3074  : 3 trailing engine functions (pass 3 prologue scan)
+#   0xC3074  - 0xC8A60  : libaudio .text (no COP0 ops; float DSP)
+#   0xC8A60  - 0xDEDE0  : libultra OS .text (threads, exceptions, gu math)
+#   0xDEDE0  - 0xF6F2C  : libultra .rodata + audio sample tables
 #   0xF6F2C  - 0xF7F50  : duplicate ucode copy used by IPL3
 #   0xF7F50  - 0x107000 : libultra .sdata/.data tail
 #   0x107000 - 0x13B5F0 : SN64 LNK source-debug section (paths, line info)
@@ -93,23 +95,38 @@ segments:
     type: bin
     start: 0xC0400        # F3DEX data + L3DEX text/data follow until ~0xC0950
 
-  # Engine .rodata continuation (between ucode region and libultra .text)
+  # Engine .rodata continuation, with 3 trailing engine functions tucked
+  # between the rodata block and libultra .text. Pass 3 surfaced these via
+  # prologue scan (`27bdXXXX` with negative imm): 0xC2ED8, 0xC2F2C, 0xC2FE0.
   - name: code_rodata_tail
     type: code
     start: 0xC0950
     vram: 0x80000500
     subsegments:
       - [0xC0950, rodata]
+      - [0xC2ED8, asm]              # 3 last engine funcs (ends @ 0xC3074)
 
+  # libultra block, refined in pass 3 via libultra-signature scan:
+  #   * .text starts at 0xC3074 (first true `addiu sp, sp, -X` prologue;
+  #     previous 0xC3000 cut mid-engine-function).
+  #   * libaudio occupies 0xC3074..0xC8A60 (no COP0 ops; pure float DSP).
+  #   * libultra OS core starts at 0xC8A60 (first mtc0/mfc0 of the segment;
+  #     thread / exception / interrupt handlers).
+  #   * libultra `gu*` math block clusters around 0xD1000 (238 lwc1/swc1
+  #     per 4 KB, vs <40 elsewhere) — kept inside the OS subsegment for now.
+  #   * .text really ends at 0xDEDE0 (jr-ra of __osDispatchThread-like
+  #     routine at 0xDEDD8 then string `header\0ESTRUCTIB\0texture\0`).
+  #     Previous boundary 0xDC000 was 0x2DE0 too early — that region is
+  #     still libultra interrupt/exception code (mtc0+eret patterns).
+  #   * .rodata + audio/jump-table data spans 0xDEDE0..end of segment.
   - name: libultra
     type: code
-    start: 0xC3000
+    start: 0xC3074
     vram: 0x80000500
     subsegments:
-      # libultra / libaudio / glu .text — densely populated MIPS prologues.
-      - [0xC3000, asm]
-      # libultra .rodata + audio sample-bank tables.
-      - [0xDC000, data]
+      - [0xC3074, asm, libaudio]      # libaudio .text
+      - [0xC8A60, asm, os_text]       # libultra OS / gu math / threads
+      - [0xDEDE0, data, os_rodata]    # libultra .rodata + segment-2 jump tables
 
   # Duplicate ucode copy used by the IPL3/boot path. Mirrors the
   # 0xBDF2C..0xC094E region byte-for-byte.

@@ -27,12 +27,16 @@
 typedef unsigned int OSIntMask;
 
 OSIntMask __osDisableInt(void) {
-    register unsigned int sr;
-    register unsigned int prev;
+    /* MIPS III GPRs are 64-bit, so "=r"/"r" constraints want an
+     * unsigned long. The SN64 cc1 target handles either width, but
+     * passing unsigned int trips clang's -Wasm-operand-widths during
+     * host static analysis on macOS. */
+    unsigned long sr;
+    unsigned int prev;
 
     __asm__ volatile("mfc0 %0, $12" : "=r"(sr));
-    prev = sr & 1;
-    __asm__ volatile("mtc0 %0, $12" : : "r"(sr & ~1));
+    prev = (unsigned int)(sr & 1);
+    __asm__ volatile("mtc0 %0, $12" : : "r"(sr & ~1UL));
 
     return prev;
 }

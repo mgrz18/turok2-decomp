@@ -27,8 +27,8 @@
  *     (c) replace `versions/turok2.us.yaml`'s 0x1000 asm chunk with
  *         a `c` segment pointing at this directory.
  *   Each requires coordinated edits in files owned by sibling
- *   agents (Makefile / versions/*.yaml), so this commit leaves the
- *   boot.s file as a verified-but-detached reference.
+ *   agents (Makefile and the per-version splat yaml), so this
+ *   commit leaves boot.s as a verified-but-detached reference.
  *
  * Real C functions for this translation unit will land here once
  * we start matching non-boot code (libultra init, main(), etc.).
