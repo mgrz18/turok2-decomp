@@ -583,3 +583,34 @@ handed off to the next round (probably Agent N or a dedicated
 - `versions/turok2.us.yaml` (the unified diff, with `assets_index`
   type adjusted from `data` to `bin`).
 - `docs/SEGMENTS.md` (this section appended).
+
+## Pass 5 (Agent O) — VMASM overlay bank fix
+
+See `docs/VMASM.md` for the full investigation. Highlights:
+
+* The `virtual` segment was split into two splat segments:
+  `virtual_text_0` (static, VRAM 0x8013AAF0) and
+  `virtual_overlay_bank` (VRAM 0x80210000), containing modules 1 and 2
+  plus their rodata back-to-back.
+* The dispatch table was **not** found in `virtual_rodata_0` nor in the
+  engine `.rodata` block; row-scan returned zero candidates. Working
+  hypothesis: VMASM builds the table at runtime from the LNK records.
+  Round 5 therefore adopted load VRAMs derived from gap-analysis of the
+  unresolved-reference cluster, not from a literal table.
+* `make rom` does **not** link cleanly yet: 2,414 unresolved references
+  remain, of which ~620 cluster at 0x80400000 – 0x8042F3D0 — suggesting
+  module 2 may be **double-banked** (loaded to two distinct VRAM slots
+  by VMASM depending on game state). This is the next round's puzzle.
+* Added `main = 0x8000aa50` alias to the symbol seed so the SN64 entry
+  stub at ROM 0x1000 resolves its `j main` properly.
+
+### Files committed in this pass
+
+- `versions/turok2.us.yaml` (virtual segment restructured into
+  `virtual_text_0` + `virtual_overlay_bank`).
+- `scripts/setup-from-references.sh` (rewrites `main_8000aa50` → `main`
+  in the seed).
+- `tools/vmasm_decode.py` (new — 170 LoC; prints the adopted table and
+  supports `--scan` / `--yaml-snippet`).
+- `docs/VMASM.md` (new).
+- `docs/SEGMENTS.md` (this section appended).

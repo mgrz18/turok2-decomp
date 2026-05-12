@@ -133,6 +133,23 @@ echo "   $(wc -l < "$ROOT/versions/symbol_addrs.us.txt") T2 symbols seeded"
 } >> "$ROOT/versions/symbol_addrs.us.txt"
 echo "   17 libultra names appended"
 
+# -- Pass 5 (Agent O): main entry alias ----------------------------------
+# The SN64 entry stub at ROM 0x1000 jumps to `main` at VRAM 0x8000aa50.
+# The LibTEngine CSV already contains a duplicate-disambiguated `main_8000aa50`
+# entry, so we rewrite it in-place to the canonical name `main` (the awk
+# pass above appends `_<addr>` when it sees the name twice; we only want
+# the first occurrence to win as the real entrypoint).
+if grep -q '^main_8000aa50 = 0x8000AA50;' "$ROOT/versions/symbol_addrs.us.txt" \
+ || grep -q '^main_8000aa50 = 0x8000aa50;' "$ROOT/versions/symbol_addrs.us.txt"; then
+    sed -i.bak -E 's/^main_8000aa50 = (0x[0-9A-Fa-f]+);/main = \1;/' \
+        "$ROOT/versions/symbol_addrs.us.txt"
+    rm -f "$ROOT/versions/symbol_addrs.us.txt.bak"
+    echo "   main alias renamed main_8000aa50 -> main"
+else
+    echo "main = 0x8000aa50; // type:func" >> "$ROOT/versions/symbol_addrs.us.txt"
+    echo "   main alias appended (0x8000aa50)"
+fi
+
 # -- LNK decoder integration (Agent J) -----------------------------------
 # tools/lnk_decoder.py extracts symbol names embedded in the SN64 LNK
 # debug records around ROM offset 0x107000. The addresses are
