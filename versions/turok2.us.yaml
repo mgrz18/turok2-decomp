@@ -191,15 +191,25 @@ segments:
   # These modules are TLB-paged by VMASM.S/VMEMORY.C, not statically resident,
   # so a single splat vram cannot be right for all of them anyway — see #23 and
   # #13 (hand them to N64Recomp as relocatable sections).
+  # El tramo 0x13B5F0-0x14A000 NO es este modulo: su densidad de prologos es
+  # 7.2/4KB contra los 12.4 del codigo sano, o sea contenido mixto. Se aisla
+  # como bin hasta saber que es, para que no se decodifique como codigo.
+  - name: pre_virtual
+    type: bin
+    start: 0x13B5F0
+
   - name: virtual
     type: code
-    start: 0x13B5F0
-    vram: 0x003F15F0     # useg. Turok 3 pone su `virtual` en 0x00400000;
-                         # aqui ROM 0x14A000 -> 0x400000 es lo que mejor puntua.
+    start: 0x14A000
+    vram: 0x00400000     # useg, igual que el `virtual` de Turok 3.
+                         # Delta 0x2B6000 gana el barrido: 170/364 targets caen
+                         # sobre un prologo (46.7% contra ~1% de azar), y 147 de
+                         # esos vienen precedidos de `jr ra`, o sea inicios de
+                         # funcion reales. ROM 0x14A000 abre con 27BDFFE8.
     subsegments:
       # Three VM modules separated by two .rodata pools (pass-4 prologue-density
       # sweep). The dispatcher in VMASM.S swaps these in overlay-style.
-      - [0x13B5F0, asm,  virtual_text_0]
+      - [0x14A000, asm,  virtual_text_0]
       - [0x17A600, data, virtual_rodata_0]
       - [0x186000, asm,  virtual_text_1]
       - [0x1B3400, data, virtual_rodata_1]

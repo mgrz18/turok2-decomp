@@ -92,6 +92,13 @@ def fix(lines):
         if stripped.strip() == ".set noreorder":
             yield ".set nomacro\n"
 
+    # A file can end with a function still open — the last one splat emits gets
+    # no closing `.end` once we have split it. gas then records size 0, and
+    # N64Recomp rejects zero-size functions as jump targets ("No function found
+    # for jal target: 0x002A5310").
+    if current:
+        yield f".end {current}\n"
+
 
 def main():
     sys.stdout.writelines(fix(sys.stdin))
