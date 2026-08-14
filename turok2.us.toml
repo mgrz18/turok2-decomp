@@ -19,3 +19,9 @@ output_func_path = "RecompiledFuncs"
 # docs/VRAM-LAYOUT.md). Without this the recompiler refuses them as jump
 # targets.
 use_absolute_symbols = true
+
+manual_funcs = [
+    { name = "func_0029FCF0", section = ".code", vram = 0x0029FCF0, size = 0x354 },
+    { name = "func_002A58A0", section = ".code", vram = 0x002A58A0, size = 0x40 },
+    { name = "func_0029FBD4", section = ".code", vram = 0x0029FBD4, size = 0x120 },
+]
