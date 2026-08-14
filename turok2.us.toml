@@ -26,3 +26,7 @@ manual_funcs = [
     { name = "func_002A58A0", section = ".code", vram = 0x002A58A0, size = 0x40 },
     { name = "func_0029FBD4", section = ".code", vram = 0x0029FBD4, size = 0x120 },
 ]
+
+[patches]
+ignored = [
+]

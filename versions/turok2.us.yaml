@@ -104,16 +104,32 @@ segments:
   # ---------------------------------------------------------------------------
   - name: rspbootText
     type: bin
-    start: 0xBDF2C        # size 0xD4 — standard libultra rspboot
+    start: 0xBDF2C
+    vram: 0x800BD32C     # ROM-derived; without it splat packs the
+                         # blob after the previous section and the
+                         # drift overlaps its neighbour.
+    vram: 0x800BD32C        # size 0xD4 — standard libultra rspboot
   - name: aspMainText
     type: bin
-    start: 0xBE000        # size 0xEE0 — N64 SDK aspMain audio ucode
+    start: 0xBE000
+    vram: 0x800BD400     # ROM-derived; without it splat packs the
+                         # blob after the previous section and the
+                         # drift overlaps its neighbour.
+    vram: 0x800BD400        # size 0xEE0 — N64 SDK aspMain audio ucode
   - name: gspF3DEX_NoN_fifoText
     type: bin
-    start: 0xBF2BC        # size 0x107C — F3DEX.NoN fifo 2.05 graphics text
+    start: 0xBF2BC
+    vram: 0x800BE6BC     # ROM-derived; without it splat packs the
+                         # blob after the previous section and the
+                         # drift overlaps its neighbour.
+    vram: 0x800BE6BC        # size 0x107C — F3DEX.NoN fifo 2.05 graphics text
   - name: gfx_ucode_data
     type: bin
-    start: 0xC0400        # F3DEX data + L3DEX text/data follow until ~0xC0950
+    start: 0xC0400
+    vram: 0x800BF800     # ROM-derived; without it splat packs the
+                         # blob after the previous section and the
+                         # drift overlaps its neighbour.
+    vram: 0x800BF800        # F3DEX data + L3DEX text/data follow until ~0xC0950
 
   # Engine .rodata continuation, with 3 trailing engine functions tucked
   # between the rodata block and libultra .text. Pass 3 surfaced these via
@@ -159,7 +175,11 @@ segments:
   # 0xBDF2C..0xC094E region byte-for-byte.
   - name: ucode_copy2
     type: bin
-    start: 0xF6F2C        # ends ~0xF7F50
+    start: 0xF6F2C
+    vram: 0x800F632C     # ROM-derived; without it splat packs the
+                         # blob after the previous section and the
+                         # drift overlaps its neighbour.
+    vram: 0x800F632C        # ends ~0xF7F50
 
   - name: libultra_tail
     type: code
