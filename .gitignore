@@ -66,3 +66,6 @@ versions/undefined_funcs_extra.us.txt
 CLAUDE.md
 RecompiledFuncs/
 turok2.us.toml.local
+
+# Claude Code workspace state — never publish
+.claude/
