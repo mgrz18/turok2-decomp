@@ -62,13 +62,17 @@ def fix(lines):
             # its delay slot. Splitting at an interior branch target instead
             # produces functions whose branches leave their own body, which
             # N64Recomp rejects with "Unhandled branch".
-            if JR_RA_RE.match(prev_prev_insn):
-                if current:
-                    yield f".end {current}\n"
-                yield f".globl {name}\n.ent {name}\n"
-                current = name
-                continue
-            yield line
+            # Promote every one of them. Requiring a preceding `jr ra` keeps
+            # the split honest but leaves the rest as NOTYPE/size 0, which
+            # N64Recomp rejects as a jump target ("Manual function ... already
+            # exists!" when you then try to declare it). A function that ends
+            # up with a branch leaving its body is a shared tail the recompiler
+            # cannot model either way; that is handled per-function, not by
+            # withholding the symbol.
+            if current:
+                yield f".end {current}\n"
+            yield f".globl {name}\n.ent {name}\n"
+            current = name
             continue
 
         m = ENT_RE.match(stripped)

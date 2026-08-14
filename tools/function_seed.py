@@ -174,13 +174,20 @@ def scan(rom, segments):
                 pc = vram + (off - start)
                 target = (pc & 0xF0000000) | ((word & 0x03FFFFFF) << 2)
                 if vram_to_segment(segments, target):
-                    # Only attribute the target to an overlay when the target
-                    # itself lands in the shared window. An overlay calling
-                    # into the window is calling itself, since nothing else is
-                    # resident; but an overlay calling the engine must not tag
-                    # the engine's address with the overlay's name.
-                    jal_targets.add(
-                        (target, owner if in_overlay(segments, target) else None))
+                    # Seed only where there is positive evidence of a boundary.
+                    # A `jal` target is usually a function entry, but some of
+                    # these words are data misread as instructions, and seeding
+                    # those splits a real function into pieces its own branches
+                    # then cross — N64Recomp rejects that with "Unhandled
+                    # branch". func_0029EAC0 alone had 11 such splits inside its
+                    # 0x3E0 bytes. Anything genuinely called and dropped here
+                    # comes back through the link-log harvest.
+                    if is_function_start(rom, segments, target):
+                        # Attribute to an overlay only when the target itself
+                        # lands in the shared window: an overlay calling the
+                        # engine must not tag the engine's address.
+                        jal_targets.add(
+                            (target, owner if in_overlay(segments, target) else None))
                 else:
                     outside[target >> 16] += 1
                     outside_targets.add(target)
