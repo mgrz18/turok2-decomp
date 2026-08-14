@@ -1,0 +1,21 @@
+# N64Recomp config for Turok 2: Seeds of Evil (US).
+#
+# Modelled on ~/Documents/Proyectos/1964/GoldenRecomp/us.toml, which is the
+# working reference for this pipeline on Apple Silicon.
+
+[input]
+# Cartridge entry point, confirmed in the ROM header and in the hand-written
+# boot stub at ROM 0x1000 (src/us/asm/boot.s).
+entrypoint = 0x80000400
+
+# Paths are relative to the location of this config file.
+elf_path = "build/turok2.us.elf"
+rom_file_path = "baserom.us.z64"
+output_func_path = "RecompiledFuncs"
+
+# The build defines 965 symbols absolutely: addresses that no segment places
+# yet, harvested from the linker in versions/undefined_funcs_extra.us.txt.
+# Most of them are the 0x80400000 cluster, which is TLB-paged code (see
+# docs/VRAM-LAYOUT.md). Without this the recompiler refuses them as jump
+# targets.
+use_absolute_symbols = true

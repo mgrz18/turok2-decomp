@@ -76,16 +76,20 @@ D_FLAGS           = -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 -DGAME_VERSION=\"$(
 CC_FLAGS          = -quiet -G0 -mips3 $(OPT_FLAGS) -mgas -meb -mcpu=VR4300 -mhard-float -mfp64
 CPP_FLAGS         = -P -undef -Wall -lang-c $(D_FLAGS) $(INCLUDE_CC_FLAGS) -nostdinc
 
+# Symbol files are filtered first: anything the objects already define must not
+# also be defined by the linker script, or it lands as ABS and N64Recomp stops
+# treating it as a function. See tools/filter_defined_syms.py.
+FILTERED_DIR      = $(BUILD_DIR)/syms
 LD_FLAGS          = -T $(LD_SCRIPT) -Map $(TARGET).map --no-check-sections
 # Add splat-generated symbol tables only if they exist
 ifneq (,$(wildcard $(UNDEFINED_SYMS)))
-LD_FLAGS         += -T $(UNDEFINED_SYMS)
+LD_FLAGS         += -T $(FILTERED_DIR)/$(notdir $(UNDEFINED_SYMS))
 endif
 ifneq (,$(wildcard $(UNDEFINED_FUNCS)))
-LD_FLAGS         += -T $(UNDEFINED_FUNCS)
+LD_FLAGS         += -T $(FILTERED_DIR)/$(notdir $(UNDEFINED_FUNCS))
 endif
 ifneq (,$(wildcard $(UNDEFINED_EXTRA)))
-LD_FLAGS         += -T $(UNDEFINED_EXTRA)
+LD_FLAGS         += -T $(FILTERED_DIR)/$(notdir $(UNDEFINED_EXTRA))
 endif
 ifneq (,$(wildcard $(SYMS_MANUAL)))
 LD_FLAGS         += -T $(SYMS_MANUAL)
@@ -138,6 +142,8 @@ $(TARGET).z64: $(TARGET).elf | $(N64CRC)
 
 $(TARGET).elf: $(O_FILES) $(LD_SCRIPT)
 	@mkdir -p $(dir $@)
+	$(PYTHON) $(TOOLS_DIR)/filter_defined_syms.py $(FILTERED_DIR) \
+		$(UNDEFINED_SYMS) $(UNDEFINED_FUNCS) $(UNDEFINED_EXTRA) $(SYMS_MANUAL)
 	$(LD) $(LD_FLAGS) -o $@
 
 verify: $(TARGET).z64
