@@ -174,14 +174,24 @@ def scan(rom, segments):
                 pc = vram + (off - start)
                 target = (pc & 0xF0000000) | ((word & 0x03FFFFFF) << 2)
                 if vram_to_segment(segments, target):
-                    # Seed only where there is positive evidence of a boundary.
-                    # A `jal` target is usually a function entry, but some of
-                    # these words are data misread as instructions, and seeding
-                    # those splits a real function into pieces its own branches
-                    # then cross — N64Recomp rejects that with "Unhandled
-                    # branch". func_0029EAC0 alone had 11 such splits inside its
-                    # 0x3E0 bytes. Anything genuinely called and dropped here
-                    # comes back through the link-log harvest.
+                    # Seed a real boundary, or a call that crosses sections.
+                    #
+                    # N64Recomp's resolve_jal creates a static function itself
+                    # when a call lands mid-function *within the same section*
+                    # (JalResolutionResult::CreateStatic). Seeding those fights
+                    # it: the split leaves the parent too small and its own jump
+                    # tables then point outside it. func_0029C270 came out 0x28
+                    # bytes against a 0x658 body that way.
+                    #
+                    # That path is only taken for in-section targets. A call
+                    # from another section — the `virtual` modules reaching into
+                    # the engine — falls through to NoMatch, so those do need a
+                    # symbol even when they land mid-function.
+                    # Cross-section calls were also seeded here for a while,
+                    # on the reasoning that CreateStatic only fires in-section.
+                    # It measured worse: the extra symbols re-broke boundaries
+                    # faster than they resolved calls. Left out until there is
+                    # a way to add them without splitting their parent.
                     if is_function_start(rom, segments, target):
                         # Attribute to an overlay only when the target itself
                         # lands in the shared window: an overlay calling the

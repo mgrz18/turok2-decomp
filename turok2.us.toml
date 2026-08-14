@@ -21,12 +21,6 @@ output_func_path = "RecompiledFuncs"
 use_absolute_symbols = true
 
 
-manual_funcs = [
-    { name = "func_0029D32C", section = ".code", vram = 0x0029D32C, size = 0x364 },
-    { name = "func_0029FCF0", section = ".code", vram = 0x0029FCF0, size = 0x354 },
-    { name = "func_002A58A0", section = ".code", vram = 0x002A58A0, size = 0x40 },
-    { name = "func_0029FBD4", section = ".code", vram = 0x0029FBD4, size = 0x120 },
-]
 
 [patches]
 # Deliberately empty. An experiment that stubbed every function N64Recomp
@@ -43,6 +37,7 @@ stubs = [
     "D_0029BFF0",  # mfc0 Cause, mfc0 Status, mtc0 Status
     "D_002A3090",  # mtc0 ErrorEPC
     "D_002A30C8",  # mtc0 ErrorEPC
+    "D_002A3280",  # mfc0 Cause
     "D_002A3310",  # mfc0 Cause, mfc0 EPC, mtc0 Cause
     "func_00201074",  # mfc0 c0r19, mtc0 c0r18
     "func_0028EE40",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, mtc0 PageMask, tlbwi
@@ -64,7 +59,6 @@ stubs = [
     "func_002A31F0",  # mtc0 Status
     "func_002A31FC",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 Index, tlbr
     "func_002A325C",  # mtc0 EntryHi
-    "func_002A3280",  # mfc0 Cause
     "func_002A34C4",  # eret, mfc0 ErrorEPC, mtc0 ErrorEPC, mtc0 c0r19
     "func_002A3708",  # eret, mfc0 EPC, mfc0 ErrorEPC, mtc0 EPC
     "func_002A37CC",  # mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 c0r18

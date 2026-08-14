@@ -82,17 +82,22 @@ def fix(lines):
             # its delay slot. Splitting at an interior branch target instead
             # produces functions whose branches leave their own body, which
             # N64Recomp rejects with "Unhandled branch".
-            if _addr_of(name) in BAD_BOUNDARIES:
+            # Promote only at a real boundary — the two preceding instructions
+            # being a return and its delay slot.
+            #
+            # Promoting the rest was working against the recompiler rather than
+            # with it. N64Recomp's resolve_jal already handles a call landing
+            # inside a known function: when the target is in the current
+            # section and no function starts exactly there, it returns
+            # CreateStatic and emits one itself. Splitting the function to
+            # provide that entry point instead leaves the parent too small, so
+            # its own jump tables end up pointing outside it and sizing fails
+            # ("Failed to determine size of jump table"). func_0029C270 came
+            # out 0x28 bytes against a body of 0x658 that way.
+            if not JR_RA_RE.match(prev_prev_insn):
                 yield line
                 continue
 
-            # Promote every one of them. Requiring a preceding `jr ra` keeps
-            # the split honest but leaves the rest as NOTYPE/size 0, which
-            # N64Recomp rejects as a jump target ("Manual function ... already
-            # exists!" when you then try to declare it). A function that ends
-            # up with a branch leaving its body is a shared tail the recompiler
-            # cannot model either way; that is handled per-function, not by
-            # withholding the symbol.
             if current:
                 yield f".end {current}\n"
             yield f".globl {name}\n.ent {name}\n"
