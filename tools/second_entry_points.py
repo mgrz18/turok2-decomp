@@ -231,11 +231,16 @@ def main():
                 first_data = bad
                 break
 
-        # objdump's `.word` is not the only tell. A string can decode as a
-        # perfectly ordinary-looking instruction: 0x74656D44 is "temD" and
-        # renders as `jalx`, which N64Recomp still rejects as INVALID. Text is
-        # the more reliable signal -- four printable bytes in a row do not
-        # happen by accident in compiled MIPS.
+        # objdump's `.word` is not the only tell, and printable bytes are not
+        # the answer either. 0x2442602C reads as "$B`," and is `addiu v0, v0,
+        # 0x602C` -- 0x24 is both the `addiu` opcode prefix and the character
+        # `$`, so text-shaped words are common in ordinary code. Truncating on
+        # that cut entry_00418CA4 from 168 bytes to 104 and broke it.
+        #
+        # The opcode is exact. MIPS III leaves 0x1C-0x1F unassigned, and both
+        # words that actually stopped the recompiler fall there: 0x794C6179
+        # ("yLay") is opcode 0x1E, and 0x74656D44 ("temD") is 0x1D, which
+        # objdump renders as the MIPS16 `jalx` and N64Recomp reports as INVALID.
         base = vram_to_rom(segments, target)
         if base is not None:
             for k in range(0, length, 4):
@@ -243,8 +248,7 @@ def main():
                     break
                 if target + k >= (first_data or 1 << 32):
                     break
-                chunk = rom[base + k:base + k + 4]
-                if all(0x20 <= b < 0x7F for b in chunk):
+                if (struct.unpack_from(">I", rom, base + k)[0] >> 26) in (0x1C, 0x1D, 0x1E, 0x1F):
                     first_data = target + k
                     break
 
