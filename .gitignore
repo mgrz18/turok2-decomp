@@ -56,3 +56,7 @@ versions/symbols_from_lnk.us.txt
 .vscode/
 .idea/
 *.swp
+
+# Seeds recuperados del ROM por tools/function_seed.py (regenerables en segundos)
+versions/symbols_from_scan.us.txt
+versions/*.libtengine-bak
