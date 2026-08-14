@@ -29,5 +29,9 @@ manual_funcs = [
 ]
 
 [patches]
-ignored = [
-]
+# Deliberately empty. An experiment that stubbed every function N64Recomp
+# refused reached 75 entries and 3.3 MB of emitted C before segfaulting — but
+# 25 of those 75 were `.L` local branch labels, so stubbing them deletes real
+# code paths rather than isolating unsupported ones. See #32.
+stubs = []
+ignored = []
