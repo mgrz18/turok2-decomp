@@ -26,7 +26,10 @@ ROOT = Path(__file__).resolve().parent.parent
 ROM = ROOT / "baserom.us.z64"
 YAML = ROOT / "versions" / "turok2.us.yaml"
 ASM_DIR = ROOT / "us" / "asm"
-SYMBOL_ADDRS = ROOT / "versions" / "symbol_addrs.us.txt"
+SYMBOL_FILES = (
+    ROOT / "versions" / "symbol_addrs.us.txt",
+    ROOT / "versions" / "symbols_from_scan.us.txt",
+)
 
 # Lines splat emits for instructions are indented; directives sit at column 0.
 INSTRUCTION_RE = re.compile(r"^\s{2,}[a-z]")
@@ -113,9 +116,11 @@ def collect():
         files[path.stem] = stats
 
     symbols = 0
-    if SYMBOL_ADDRS.exists():
-        symbols = sum(
-            1 for line in SYMBOL_ADDRS.read_text(errors="replace").splitlines()
+    for path in SYMBOL_FILES:
+        if not path.exists():
+            continue
+        symbols += sum(
+            1 for line in path.read_text(errors="replace").splitlines()
             if "=" in line and not line.strip().startswith("//")
         )
 
