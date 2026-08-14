@@ -79,17 +79,21 @@ segments:
   - name: code
     type: code
     start: 0x1100
-    vram: 0x80200500
+    vram: 0x00200500     # useg: el codigo corre mapeado por TLB
     subsegments:
-      # Engine .text (game logic). Splat-suggested file boundaries
-      # (~140 sub-files) integrated coarsely; refine per-file during
-      # matching.
       - [0x1100, asm]
       - [0x1F100, asm]
       - [0x438B0, asm]
-      # Engine .rodata: type-registry strings, jump-tables, format
-      # strings. Splat misinterpreted parts of this as code without
-      # the explicit type tag.
+
+  # El .rodata NO es useg: se linkea directo desde 0x80000400 en KSEG0, igual
+  # que en Turok 3 (`code_data`, "linked mapped to 0x80000400"). Por eso vive
+  # en su propio segmento — splat solo admite un vram por segmento.
+  # Lo confirman 2,652 referencias sin resolver en el bloque 0x800A.
+  - name: code_rodata
+    type: code
+    start: 0xA5FD8
+    vram: 0x800A53D8     # 0xA5FD8 + 0x7FFFF400
+    subsegments:
       - [0xA5FD8, rodata]
 
   # ---------------------------------------------------------------------------
@@ -117,7 +121,7 @@ segments:
   - name: code_rodata_tail
     type: code
     start: 0xC0950
-    vram: 0x802BFD50     # pass 6: era 0x80000500, colisionaba con libultra_tail
+    vram: 0x800BFD50     # KSEG0: datos, no useg (0xC0950 + 0x7FFFF400)
     subsegments:
       - [0xC0950, rodata]
       - [0xC2ED8, asm]              # 3 last engine funcs (ends @ 0xC3074)
@@ -138,7 +142,8 @@ segments:
   - name: libultra
     type: code
     start: 0xC3074
-    vram: 0x802C2474     # pass 6: mismo delta 0x801FF400 que el engine (era 0x800C2474)
+    vram: 0x800C2474     # KSEG0: libultra corre SIN mapear — trae los vectores de
+                         # excepcion y el handler de TLB miss. El valor original era correcto.
     subsegments:
       - [0xC3074, asm, libaudio]              # libaudio .text
       - [0xC8A60, asm, os_text_audio_sched]   # audio post + scheduler glue
@@ -159,7 +164,7 @@ segments:
   - name: libultra_tail
     type: code
     start: 0xF7F50
-    vram: 0x802F7350     # pass 6: era 0x80000500, colisionaba con code_rodata_tail
+    vram: 0x800F7350     # KSEG0: datos (0xF7F50 + 0x7FFFF400)
     subsegments:
       # libultra .sdata/.data tail (pointer-heavy initializer region).
       - [0xF7F50, data]
@@ -189,7 +194,8 @@ segments:
   - name: virtual
     type: code
     start: 0x13B5F0
-    vram: 0x803F15F0
+    vram: 0x003F15F0     # useg. Turok 3 pone su `virtual` en 0x00400000;
+                         # aqui ROM 0x14A000 -> 0x400000 es lo que mejor puntua.
     subsegments:
       # Three VM modules separated by two .rodata pools (pass-4 prologue-density
       # sweep). The dispatcher in VMASM.S swaps these in overlay-style.
