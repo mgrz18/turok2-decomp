@@ -22,6 +22,687 @@ use_absolute_symbols = true
 
 
 
+manual_funcs = [
+    { name = "entry_00201580", section = ".code", vram = 0x00201580, size = 552 },
+    { name = "entry_00207C48", section = ".code", vram = 0x00207C48, size = 28 },
+    { name = "entry_00207C58", section = ".code", vram = 0x00207C58, size = 12 },
+    { name = "entry_00207FC0", section = ".code", vram = 0x00207FC0, size = 44 },
+    { name = "entry_00207FD0", section = ".code", vram = 0x00207FD0, size = 28 },
+    { name = "entry_00226F90", section = ".code", vram = 0x00226F90, size = 500 },
+    { name = "entry_00232D60", section = ".code", vram = 0x00232D60, size = 8 },
+    { name = "entry_0023587C", section = ".code", vram = 0x0023587C, size = 28 },
+    { name = "entry_002572B8", section = ".code", vram = 0x002572B8, size = 16 },
+    { name = "entry_00257350", section = ".code", vram = 0x00257350, size = 16 },
+    { name = "entry_00257394", section = ".code", vram = 0x00257394, size = 8 },
+    { name = "entry_0025AD24", section = ".code", vram = 0x0025AD24, size = 12 },
+    { name = "entry_0025B4CC", section = ".code", vram = 0x0025B4CC, size = 1460 },
+    { name = "entry_0025B578", section = ".code", vram = 0x0025B578, size = 1288 },
+    { name = "entry_00260FC0", section = ".code", vram = 0x00260FC0, size = 56 },
+    { name = "entry_0026138C", section = ".code", vram = 0x0026138C, size = 76 },
+    { name = "entry_00262314", section = ".code", vram = 0x00262314, size = 216 },
+    { name = "entry_00262D6C", section = ".code", vram = 0x00262D6C, size = 8 },
+    { name = "entry_0026514C", section = ".code", vram = 0x0026514C, size = 176 },
+    { name = "entry_00266D10", section = ".code", vram = 0x00266D10, size = 20 },
+    { name = "entry_0026F5E0", section = ".code", vram = 0x0026F5E0, size = 16 },
+    { name = "entry_00271784", section = ".code", vram = 0x00271784, size = 12 },
+    { name = "entry_00272D58", section = ".code", vram = 0x00272D58, size = 8 },
+    { name = "entry_00274008", section = ".code", vram = 0x00274008, size = 52 },
+    { name = "entry_0028B5A4", section = ".code", vram = 0x0028B5A4, size = 112 },
+    { name = "entry_00291B00", section = ".code", vram = 0x00291B00, size = 244 },
+    { name = "entry_00291BB0", section = ".code", vram = 0x00291BB0, size = 68 },
+    { name = "entry_0029ECD0", section = ".code", vram = 0x0029ECD0, size = 464 },
+    { name = "entry_00403BF0", section = ".virtual", vram = 0x00403BF0, size = 36 },
+    { name = "entry_00403C08", section = ".virtual", vram = 0x00403C08, size = 12 },
+    { name = "entry_00403CE0", section = ".virtual", vram = 0x00403CE0, size = 24 },
+    { name = "entry_0040456C", section = ".virtual", vram = 0x0040456C, size = 16 },
+    { name = "entry_00404750", section = ".virtual", vram = 0x00404750, size = 1268 },
+    { name = "entry_004048A0", section = ".virtual", vram = 0x004048A0, size = 932 },
+    { name = "entry_004049EC", section = ".virtual", vram = 0x004049EC, size = 600 },
+    { name = "entry_00404A8C", section = ".virtual", vram = 0x00404A8C, size = 440 },
+    { name = "entry_00404FB4", section = ".virtual", vram = 0x00404FB4, size = 44 },
+    { name = "entry_00404FC8", section = ".virtual", vram = 0x00404FC8, size = 24 },
+    { name = "entry_00405054", section = ".virtual", vram = 0x00405054, size = 140 },
+    { name = "entry_004050C8", section = ".virtual", vram = 0x004050C8, size = 24 },
+    { name = "entry_00405268", section = ".virtual", vram = 0x00405268, size = 32 },
+    { name = "entry_0040527C", section = ".virtual", vram = 0x0040527C, size = 12 },
+    { name = "entry_00405338", section = ".virtual", vram = 0x00405338, size = 140 },
+    { name = "entry_004053AC", section = ".virtual", vram = 0x004053AC, size = 24 },
+    { name = "entry_004054C4", section = ".virtual", vram = 0x004054C4, size = 536 },
+    { name = "entry_004056C8", section = ".virtual", vram = 0x004056C8, size = 20 },
+    { name = "entry_00405850", section = ".virtual", vram = 0x00405850, size = 264 },
+    { name = "entry_00405934", section = ".virtual", vram = 0x00405934, size = 36 },
+    { name = "entry_00405AA8", section = ".virtual", vram = 0x00405AA8, size = 32 },
+    { name = "entry_00405F0C", section = ".virtual", vram = 0x00405F0C, size = 244 },
+    { name = "entry_00405FDC", section = ".virtual", vram = 0x00405FDC, size = 36 },
+    { name = "entry_004063E4", section = ".virtual", vram = 0x004063E4, size = 436 },
+    { name = "entry_00406460", section = ".virtual", vram = 0x00406460, size = 312 },
+    { name = "entry_004064D8", section = ".virtual", vram = 0x004064D8, size = 192 },
+    { name = "entry_00406570", section = ".virtual", vram = 0x00406570, size = 40 },
+    { name = "entry_0040675C", section = ".virtual", vram = 0x0040675C, size = 304 },
+    { name = "entry_00406864", section = ".virtual", vram = 0x00406864, size = 40 },
+    { name = "entry_00406948", section = ".virtual", vram = 0x00406948, size = 352 },
+    { name = "entry_00406B20", section = ".virtual", vram = 0x00406B20, size = 300 },
+    { name = "entry_00406C38", section = ".virtual", vram = 0x00406C38, size = 20 },
+    { name = "entry_004072B8", section = ".virtual", vram = 0x004072B8, size = 16 },
+    { name = "entry_0040778C", section = ".virtual", vram = 0x0040778C, size = 32 },
+    { name = "entry_0040799C", section = ".virtual", vram = 0x0040799C, size = 32 },
+    { name = "entry_00407A6C", section = ".virtual", vram = 0x00407A6C, size = 84 },
+    { name = "entry_00407D58", section = ".virtual", vram = 0x00407D58, size = 20 },
+    { name = "entry_00407E4C", section = ".virtual", vram = 0x00407E4C, size = 192 },
+    { name = "entry_00408120", section = ".virtual", vram = 0x00408120, size = 28 },
+    { name = "entry_00408124", section = ".virtual", vram = 0x00408124, size = 24 },
+    { name = "entry_004084AC", section = ".virtual", vram = 0x004084AC, size = 244 },
+    { name = "entry_00408560", section = ".virtual", vram = 0x00408560, size = 64 },
+    { name = "entry_00408574", section = ".virtual", vram = 0x00408574, size = 44 },
+    { name = "entry_00408690", section = ".virtual", vram = 0x00408690, size = 544 },
+    { name = "entry_00408750", section = ".virtual", vram = 0x00408750, size = 352 },
+    { name = "entry_004087D0", section = ".virtual", vram = 0x004087D0, size = 224 },
+    { name = "entry_00408880", section = ".virtual", vram = 0x00408880, size = 48 },
+    { name = "entry_00408888", section = ".virtual", vram = 0x00408888, size = 40 },
+    { name = "entry_00408898", section = ".virtual", vram = 0x00408898, size = 24 },
+    { name = "entry_00408AD0", section = ".virtual", vram = 0x00408AD0, size = 80 },
+    { name = "entry_00408CCC", section = ".virtual", vram = 0x00408CCC, size = 40 },
+    { name = "entry_00408CE0", section = ".virtual", vram = 0x00408CE0, size = 20 },
+    { name = "entry_00408DB8", section = ".virtual", vram = 0x00408DB8, size = 20 },
+    { name = "entry_00408FA0", section = ".virtual", vram = 0x00408FA0, size = 16 },
+    { name = "entry_004090BC", section = ".virtual", vram = 0x004090BC, size = 644 },
+    { name = "entry_004091CC", section = ".virtual", vram = 0x004091CC, size = 372 },
+    { name = "entry_004091D0", section = ".virtual", vram = 0x004091D0, size = 368 },
+    { name = "entry_0040927C", section = ".virtual", vram = 0x0040927C, size = 196 },
+    { name = "entry_00409288", section = ".virtual", vram = 0x00409288, size = 184 },
+    { name = "entry_00409314", section = ".virtual", vram = 0x00409314, size = 44 },
+    { name = "entry_0040931C", section = ".virtual", vram = 0x0040931C, size = 36 },
+    { name = "entry_004098D0", section = ".virtual", vram = 0x004098D0, size = 404 },
+    { name = "entry_00409C24", section = ".virtual", vram = 0x00409C24, size = 296 },
+    { name = "entry_00409C30", section = ".virtual", vram = 0x00409C30, size = 284 },
+    { name = "entry_00409F7C", section = ".virtual", vram = 0x00409F7C, size = 500 },
+    { name = "entry_0040A090", section = ".virtual", vram = 0x0040A090, size = 224 },
+    { name = "entry_0040A0A4", section = ".virtual", vram = 0x0040A0A4, size = 204 },
+    { name = "entry_0040A138", section = ".virtual", vram = 0x0040A138, size = 56 },
+    { name = "entry_0040A224", section = ".virtual", vram = 0x0040A224, size = 56 },
+    { name = "entry_0040A388", section = ".virtual", vram = 0x0040A388, size = 144 },
+    { name = "entry_0040A3D0", section = ".virtual", vram = 0x0040A3D0, size = 72 },
+    { name = "entry_0040A404", section = ".virtual", vram = 0x0040A404, size = 20 },
+    { name = "entry_0040A40C", section = ".virtual", vram = 0x0040A40C, size = 12 },
+    { name = "entry_0040A55C", section = ".virtual", vram = 0x0040A55C, size = 88 },
+    { name = "entry_0040A560", section = ".virtual", vram = 0x0040A560, size = 84 },
+    { name = "entry_0040A9C4", section = ".virtual", vram = 0x0040A9C4, size = 496 },
+    { name = "entry_0040AA64", section = ".virtual", vram = 0x0040AA64, size = 336 },
+    { name = "entry_0040AB40", section = ".virtual", vram = 0x0040AB40, size = 116 },
+    { name = "entry_0040AB48", section = ".virtual", vram = 0x0040AB48, size = 108 },
+    { name = "entry_0040B904", section = ".virtual", vram = 0x0040B904, size = 20 },
+    { name = "entry_0040CA14", section = ".virtual", vram = 0x0040CA14, size = 276 },
+    { name = "entry_0040D3F0", section = ".virtual", vram = 0x0040D3F0, size = 216 },
+    { name = "entry_0040D70C", section = ".virtual", vram = 0x0040D70C, size = 156 },
+    { name = "entry_0040D754", section = ".virtual", vram = 0x0040D754, size = 84 },
+    { name = "entry_0040D814", section = ".virtual", vram = 0x0040D814, size = 156 },
+    { name = "entry_0040D85C", section = ".virtual", vram = 0x0040D85C, size = 84 },
+    { name = "entry_0040D91C", section = ".virtual", vram = 0x0040D91C, size = 156 },
+    { name = "entry_0040D964", section = ".virtual", vram = 0x0040D964, size = 84 },
+    { name = "entry_0040DA7C", section = ".virtual", vram = 0x0040DA7C, size = 20 },
+    { name = "entry_0040DED4", section = ".virtual", vram = 0x0040DED4, size = 156 },
+    { name = "entry_0040DF1C", section = ".virtual", vram = 0x0040DF1C, size = 84 },
+    { name = "entry_0040E1D8", section = ".virtual", vram = 0x0040E1D8, size = 164 },
+    { name = "entry_0040E1E0", section = ".virtual", vram = 0x0040E1E0, size = 156 },
+    { name = "entry_0040E418", section = ".virtual", vram = 0x0040E418, size = 24 },
+    { name = "entry_0040EE30", section = ".virtual", vram = 0x0040EE30, size = 112 },
+    { name = "entry_0040EE44", section = ".virtual", vram = 0x0040EE44, size = 92 },
+    { name = "entry_0040F58C", section = ".virtual", vram = 0x0040F58C, size = 44 },
+    { name = "entry_0040F9C0", section = ".virtual", vram = 0x0040F9C0, size = 52 },
+    { name = "entry_0040FE58", section = ".virtual", vram = 0x0040FE58, size = 864 },
+    { name = "entry_0040FF84", section = ".virtual", vram = 0x0040FF84, size = 564 },
+    { name = "entry_004100CC", section = ".virtual", vram = 0x004100CC, size = 236 },
+    { name = "entry_00410174", section = ".virtual", vram = 0x00410174, size = 68 },
+    { name = "entry_00410190", section = ".virtual", vram = 0x00410190, size = 40 },
+    { name = "entry_00410388", section = ".virtual", vram = 0x00410388, size = 500 },
+    { name = "entry_00410558", section = ".virtual", vram = 0x00410558, size = 36 },
+    { name = "entry_00410A3C", section = ".virtual", vram = 0x00410A3C, size = 56 },
+    { name = "entry_00410CD8", section = ".virtual", vram = 0x00410CD8, size = 16 },
+    { name = "entry_00410EA4", section = ".virtual", vram = 0x00410EA4, size = 552 },
+    { name = "entry_004111EC", section = ".virtual", vram = 0x004111EC, size = 2728 },
+    { name = "entry_0041123C", section = ".virtual", vram = 0x0041123C, size = 2648 },
+    { name = "entry_00411294", section = ".virtual", vram = 0x00411294, size = 2560 },
+    { name = "entry_004112CC", section = ".virtual", vram = 0x004112CC, size = 2504 },
+    { name = "entry_00411338", section = ".virtual", vram = 0x00411338, size = 2396 },
+    { name = "entry_00411388", section = ".virtual", vram = 0x00411388, size = 2316 },
+    { name = "entry_004113D8", section = ".virtual", vram = 0x004113D8, size = 2236 },
+    { name = "entry_00411428", section = ".virtual", vram = 0x00411428, size = 2156 },
+    { name = "entry_00411490", section = ".virtual", vram = 0x00411490, size = 2052 },
+    { name = "entry_004114E0", section = ".virtual", vram = 0x004114E0, size = 1972 },
+    { name = "entry_00411538", section = ".virtual", vram = 0x00411538, size = 1884 },
+    { name = "entry_00411570", section = ".virtual", vram = 0x00411570, size = 1828 },
+    { name = "entry_004115DC", section = ".virtual", vram = 0x004115DC, size = 1720 },
+    { name = "entry_0041162C", section = ".virtual", vram = 0x0041162C, size = 1640 },
+    { name = "entry_00411688", section = ".virtual", vram = 0x00411688, size = 1548 },
+    { name = "entry_004116CC", section = ".virtual", vram = 0x004116CC, size = 1480 },
+    { name = "entry_004117BC", section = ".virtual", vram = 0x004117BC, size = 1240 },
+    { name = "entry_00411800", section = ".virtual", vram = 0x00411800, size = 1172 },
+    { name = "entry_00411858", section = ".virtual", vram = 0x00411858, size = 1084 },
+    { name = "entry_00411890", section = ".virtual", vram = 0x00411890, size = 1028 },
+    { name = "entry_004118FC", section = ".virtual", vram = 0x004118FC, size = 920 },
+    { name = "entry_0041194C", section = ".virtual", vram = 0x0041194C, size = 840 },
+    { name = "entry_0041199C", section = ".virtual", vram = 0x0041199C, size = 760 },
+    { name = "entry_004119EC", section = ".virtual", vram = 0x004119EC, size = 680 },
+    { name = "entry_00411A48", section = ".virtual", vram = 0x00411A48, size = 588 },
+    { name = "entry_00411A98", section = ".virtual", vram = 0x00411A98, size = 508 },
+    { name = "entry_00411AF0", section = ".virtual", vram = 0x00411AF0, size = 420 },
+    { name = "entry_00411B28", section = ".virtual", vram = 0x00411B28, size = 364 },
+    { name = "entry_00411B88", section = ".virtual", vram = 0x00411B88, size = 268 },
+    { name = "entry_00411BD8", section = ".virtual", vram = 0x00411BD8, size = 188 },
+    { name = "entry_00411C34", section = ".virtual", vram = 0x00411C34, size = 96 },
+    { name = "entry_00411C78", section = ".virtual", vram = 0x00411C78, size = 28 },
+    { name = "entry_00411ED0", section = ".virtual", vram = 0x00411ED0, size = 40 },
+    { name = "entry_00411F78", section = ".virtual", vram = 0x00411F78, size = 924 },
+    { name = "entry_00411FB4", section = ".virtual", vram = 0x00411FB4, size = 864 },
+    { name = "entry_00412014", section = ".virtual", vram = 0x00412014, size = 768 },
+    { name = "entry_00412074", section = ".virtual", vram = 0x00412074, size = 672 },
+    { name = "entry_00412180", section = ".virtual", vram = 0x00412180, size = 404 },
+    { name = "entry_004121F0", section = ".virtual", vram = 0x004121F0, size = 292 },
+    { name = "entry_00412260", section = ".virtual", vram = 0x00412260, size = 180 },
+    { name = "entry_004122CC", section = ".virtual", vram = 0x004122CC, size = 72 },
+    { name = "entry_004122F0", section = ".virtual", vram = 0x004122F0, size = 36 },
+    { name = "entry_004123AC", section = ".virtual", vram = 0x004123AC, size = 140 },
+    { name = "entry_004124B8", section = ".virtual", vram = 0x004124B8, size = 144 },
+    { name = "entry_00412538", section = ".virtual", vram = 0x00412538, size = 16 },
+    { name = "entry_004125F8", section = ".virtual", vram = 0x004125F8, size = 116 },
+    { name = "entry_00412640", section = ".virtual", vram = 0x00412640, size = 44 },
+    { name = "entry_004128A0", section = ".virtual", vram = 0x004128A0, size = 248 },
+    { name = "entry_00412900", section = ".virtual", vram = 0x00412900, size = 152 },
+    { name = "entry_00412908", section = ".virtual", vram = 0x00412908, size = 144 },
+    { name = "entry_00412930", section = ".virtual", vram = 0x00412930, size = 104 },
+    { name = "entry_00412AB4", section = ".virtual", vram = 0x00412AB4, size = 96 },
+    { name = "entry_00412AE0", section = ".virtual", vram = 0x00412AE0, size = 52 },
+    { name = "entry_00412C3C", section = ".virtual", vram = 0x00412C3C, size = 16 },
+    { name = "entry_00412CF4", section = ".virtual", vram = 0x00412CF4, size = 16 },
+    { name = "entry_00412D1C", section = ".virtual", vram = 0x00412D1C, size = 136 },
+    { name = "entry_00412FEC", section = ".virtual", vram = 0x00412FEC, size = 12 },
+    { name = "entry_0041320C", section = ".virtual", vram = 0x0041320C, size = 16 },
+    { name = "entry_00413220", section = ".virtual", vram = 0x00413220, size = 16 },
+    { name = "entry_00413314", section = ".virtual", vram = 0x00413314, size = 144 },
+    { name = "entry_00413388", section = ".virtual", vram = 0x00413388, size = 28 },
+    { name = "entry_00413494", section = ".virtual", vram = 0x00413494, size = 424 },
+    { name = "entry_004134E4", section = ".virtual", vram = 0x004134E4, size = 344 },
+    { name = "entry_0041361C", section = ".virtual", vram = 0x0041361C, size = 32 },
+    { name = "entry_0041377C", section = ".virtual", vram = 0x0041377C, size = 2040 },
+    { name = "entry_00413780", section = ".virtual", vram = 0x00413780, size = 2036 },
+    { name = "entry_00413784", section = ".virtual", vram = 0x00413784, size = 2032 },
+    { name = "entry_004137C8", section = ".virtual", vram = 0x004137C8, size = 1964 },
+    { name = "entry_00413808", section = ".virtual", vram = 0x00413808, size = 1900 },
+    { name = "entry_0041384C", section = ".virtual", vram = 0x0041384C, size = 1832 },
+    { name = "entry_0041391C", section = ".virtual", vram = 0x0041391C, size = 1624 },
+    { name = "entry_00413A20", section = ".virtual", vram = 0x00413A20, size = 1364 },
+    { name = "entry_00413A24", section = ".virtual", vram = 0x00413A24, size = 1360 },
+    { name = "entry_00413A28", section = ".virtual", vram = 0x00413A28, size = 1356 },
+    { name = "entry_00413AF0", section = ".virtual", vram = 0x00413AF0, size = 1156 },
+    { name = "entry_00413B7C", section = ".virtual", vram = 0x00413B7C, size = 1016 },
+    { name = "entry_00413E10", section = ".virtual", vram = 0x00413E10, size = 356 },
+    { name = "entry_00413E14", section = ".virtual", vram = 0x00413E14, size = 352 },
+    { name = "entry_00413E8C", section = ".virtual", vram = 0x00413E8C, size = 232 },
+    { name = "entry_00413F30", section = ".virtual", vram = 0x00413F30, size = 68 },
+    { name = "entry_0041411C", section = ".virtual", vram = 0x0041411C, size = 704 },
+    { name = "entry_00414120", section = ".virtual", vram = 0x00414120, size = 700 },
+    { name = "entry_00414124", section = ".virtual", vram = 0x00414124, size = 696 },
+    { name = "entry_004141B0", section = ".virtual", vram = 0x004141B0, size = 556 },
+    { name = "entry_004141FC", section = ".virtual", vram = 0x004141FC, size = 480 },
+    { name = "entry_004142CC", section = ".virtual", vram = 0x004142CC, size = 272 },
+    { name = "entry_004142FC", section = ".virtual", vram = 0x004142FC, size = 224 },
+    { name = "entry_004144E4", section = ".virtual", vram = 0x004144E4, size = 204 },
+    { name = "entry_00414598", section = ".virtual", vram = 0x00414598, size = 24 },
+    { name = "entry_00414AF8", section = ".virtual", vram = 0x00414AF8, size = 944 },
+    { name = "entry_00414CA8", section = ".virtual", vram = 0x00414CA8, size = 512 },
+    { name = "entry_0041524C", section = ".virtual", vram = 0x0041524C, size = 208 },
+    { name = "entry_004152F4", section = ".virtual", vram = 0x004152F4, size = 40 },
+    { name = "entry_004157DC", section = ".virtual", vram = 0x004157DC, size = 1292 },
+    { name = "entry_004159D8", section = ".virtual", vram = 0x004159D8, size = 784 },
+    { name = "entry_00415C50", section = ".virtual", vram = 0x00415C50, size = 152 },
+    { name = "entry_00415C60", section = ".virtual", vram = 0x00415C60, size = 136 },
+    { name = "entry_00415EE8", section = ".virtual", vram = 0x00415EE8, size = 208 },
+    { name = "entry_00415F7C", section = ".virtual", vram = 0x00415F7C, size = 60 },
+    { name = "entry_004160C8", section = ".virtual", vram = 0x004160C8, size = 40 },
+    { name = "entry_00416120", section = ".virtual", vram = 0x00416120, size = 72 },
+    { name = "entry_004162D0", section = ".virtual", vram = 0x004162D0, size = 20 },
+    { name = "entry_004163B4", section = ".virtual", vram = 0x004163B4, size = 12 },
+    { name = "entry_00416530", section = ".virtual", vram = 0x00416530, size = 40 },
+    { name = "entry_00416740", section = ".virtual", vram = 0x00416740, size = 32 },
+    { name = "entry_0041686C", section = ".virtual", vram = 0x0041686C, size = 40 },
+    { name = "entry_00416BE0", section = ".virtual", vram = 0x00416BE0, size = 32 },
+    { name = "entry_00416F70", section = ".virtual", vram = 0x00416F70, size = 28 },
+    { name = "entry_00416F74", section = ".virtual", vram = 0x00416F74, size = 24 },
+    { name = "entry_00416F78", section = ".virtual", vram = 0x00416F78, size = 20 },
+    { name = "entry_0041706C", section = ".virtual", vram = 0x0041706C, size = 16 },
+    { name = "entry_004171BC", section = ".virtual", vram = 0x004171BC, size = 20 },
+    { name = "entry_004173F8", section = ".virtual", vram = 0x004173F8, size = 32 },
+    { name = "entry_00417574", section = ".virtual", vram = 0x00417574, size = 152 },
+    { name = "entry_004175E0", section = ".virtual", vram = 0x004175E0, size = 44 },
+    { name = "entry_004176EC", section = ".virtual", vram = 0x004176EC, size = 160 },
+    { name = "entry_00417760", section = ".virtual", vram = 0x00417760, size = 44 },
+    { name = "entry_00417870", section = ".virtual", vram = 0x00417870, size = 160 },
+    { name = "entry_004178E4", section = ".virtual", vram = 0x004178E4, size = 44 },
+    { name = "entry_00417AC4", section = ".virtual", vram = 0x00417AC4, size = 8 },
+    { name = "entry_00417B4C", section = ".virtual", vram = 0x00417B4C, size = 40 },
+    { name = "entry_00417BA4", section = ".virtual", vram = 0x00417BA4, size = 12 },
+    { name = "entry_00417C84", section = ".virtual", vram = 0x00417C84, size = 28 },
+    { name = "entry_00417CF8", section = ".virtual", vram = 0x00417CF8, size = 24 },
+    { name = "entry_00418004", section = ".virtual", vram = 0x00418004, size = 140 },
+    { name = "entry_00418028", section = ".virtual", vram = 0x00418028, size = 104 },
+    { name = "entry_00418148", section = ".virtual", vram = 0x00418148, size = 16 },
+    { name = "entry_0041814C", section = ".virtual", vram = 0x0041814C, size = 12 },
+    { name = "entry_00418478", section = ".virtual", vram = 0x00418478, size = 48 },
+    { name = "entry_00418554", section = ".virtual", vram = 0x00418554, size = 48 },
+    { name = "entry_00418654", section = ".virtual", vram = 0x00418654, size = 12 },
+    { name = "entry_00418764", section = ".virtual", vram = 0x00418764, size = 168 },
+    { name = "entry_004187F8", section = ".virtual", vram = 0x004187F8, size = 20 },
+    { name = "entry_004187FC", section = ".virtual", vram = 0x004187FC, size = 16 },
+    { name = "entry_00418980", section = ".virtual", vram = 0x00418980, size = 44 },
+    { name = "entry_00418A58", section = ".virtual", vram = 0x00418A58, size = 48 },
+    { name = "entry_00418B34", section = ".virtual", vram = 0x00418B34, size = 48 },
+    { name = "entry_00418CA4", section = ".virtual", vram = 0x00418CA4, size = 168 },
+    { name = "entry_00418DB4", section = ".virtual", vram = 0x00418DB4, size = 168 },
+    { name = "entry_00418E48", section = ".virtual", vram = 0x00418E48, size = 20 },
+    { name = "entry_00418E4C", section = ".virtual", vram = 0x00418E4C, size = 16 },
+    { name = "entry_00418F18", section = ".virtual", vram = 0x00418F18, size = 48 },
+    { name = "entry_00418FF4", section = ".virtual", vram = 0x00418FF4, size = 48 },
+    { name = "entry_00419164", section = ".virtual", vram = 0x00419164, size = 168 },
+    { name = "entry_00419274", section = ".virtual", vram = 0x00419274, size = 168 },
+    { name = "entry_00419308", section = ".virtual", vram = 0x00419308, size = 20 },
+    { name = "entry_0041930C", section = ".virtual", vram = 0x0041930C, size = 16 },
+    { name = "entry_004193F8", section = ".virtual", vram = 0x004193F8, size = 168 },
+    { name = "entry_004196A4", section = ".virtual", vram = 0x004196A4, size = 12 },
+    { name = "entry_00419748", section = ".virtual", vram = 0x00419748, size = 64 },
+    { name = "entry_004199E4", section = ".virtual", vram = 0x004199E4, size = 28 },
+    { name = "entry_00419CCC", section = ".virtual", vram = 0x00419CCC, size = 200 },
+    { name = "entry_00419CDC", section = ".virtual", vram = 0x00419CDC, size = 184 },
+    { name = "entry_00419E1C", section = ".virtual", vram = 0x00419E1C, size = 200 },
+    { name = "entry_00419E2C", section = ".virtual", vram = 0x00419E2C, size = 184 },
+    { name = "entry_00419F60", section = ".virtual", vram = 0x00419F60, size = 200 },
+    { name = "entry_00419F70", section = ".virtual", vram = 0x00419F70, size = 184 },
+    { name = "entry_00419FD0", section = ".virtual", vram = 0x00419FD0, size = 88 },
+    { name = "entry_0041A00C", section = ".virtual", vram = 0x0041A00C, size = 28 },
+    { name = "entry_0041A08C", section = ".virtual", vram = 0x0041A08C, size = 64 },
+    { name = "entry_0041A174", section = ".virtual", vram = 0x0041A174, size = 100 },
+    { name = "entry_0041A26C", section = ".virtual", vram = 0x0041A26C, size = 192 },
+    { name = "entry_0041A36C", section = ".virtual", vram = 0x0041A36C, size = 32 },
+    { name = "entry_0041A3E8", section = ".virtual", vram = 0x0041A3E8, size = 52 },
+    { name = "entry_0041A4B8", section = ".virtual", vram = 0x0041A4B8, size = 20 },
+    { name = "entry_0041A4E4", section = ".virtual", vram = 0x0041A4E4, size = 224 },
+    { name = "entry_0041A5CC", section = ".virtual", vram = 0x0041A5CC, size = 16 },
+    { name = "entry_0041A6C4", section = ".virtual", vram = 0x0041A6C4, size = 556 },
+    { name = "entry_0041A734", section = ".virtual", vram = 0x0041A734, size = 444 },
+    { name = "entry_0041A7AC", section = ".virtual", vram = 0x0041A7AC, size = 324 },
+    { name = "entry_0041A81C", section = ".virtual", vram = 0x0041A81C, size = 212 },
+    { name = "entry_0041A838", section = ".virtual", vram = 0x0041A838, size = 184 },
+    { name = "entry_0041A844", section = ".virtual", vram = 0x0041A844, size = 172 },
+    { name = "entry_0041A9BC", section = ".virtual", vram = 0x0041A9BC, size = 228 },
+    { name = "entry_0041AAC8", section = ".virtual", vram = 0x0041AAC8, size = 176 },
+    { name = "entry_0041AC78", section = ".virtual", vram = 0x0041AC78, size = 88 },
+    { name = "entry_0041ACB4", section = ".virtual", vram = 0x0041ACB4, size = 28 },
+    { name = "entry_0041AD48", section = ".virtual", vram = 0x0041AD48, size = 28 },
+    { name = "entry_0041AD84", section = ".virtual", vram = 0x0041AD84, size = 300 },
+    { name = "entry_0041AE50", section = ".virtual", vram = 0x0041AE50, size = 96 },
+    { name = "entry_0041AE94", section = ".virtual", vram = 0x0041AE94, size = 28 },
+    { name = "entry_0041AF04", section = ".virtual", vram = 0x0041AF04, size = 232 },
+    { name = "entry_0041AF3C", section = ".virtual", vram = 0x0041AF3C, size = 176 },
+    { name = "entry_0041AF84", section = ".virtual", vram = 0x0041AF84, size = 104 },
+    { name = "entry_0041B0A8", section = ".virtual", vram = 0x0041B0A8, size = 160 },
+    { name = "entry_0041B17C", section = ".virtual", vram = 0x0041B17C, size = 4 },
+    { name = "entry_0041B204", section = ".virtual", vram = 0x0041B204, size = 76 },
+    { name = "entry_0041B238", section = ".virtual", vram = 0x0041B238, size = 24 },
+    { name = "entry_0041B28C", section = ".virtual", vram = 0x0041B28C, size = 76 },
+    { name = "entry_0041B2C0", section = ".virtual", vram = 0x0041B2C0, size = 24 },
+    { name = "entry_0041B314", section = ".virtual", vram = 0x0041B314, size = 76 },
+    { name = "entry_0041B348", section = ".virtual", vram = 0x0041B348, size = 24 },
+    { name = "entry_0041B39C", section = ".virtual", vram = 0x0041B39C, size = 76 },
+    { name = "entry_0041B3D0", section = ".virtual", vram = 0x0041B3D0, size = 24 },
+    { name = "entry_0041B424", section = ".virtual", vram = 0x0041B424, size = 76 },
+    { name = "entry_0041B458", section = ".virtual", vram = 0x0041B458, size = 24 },
+    { name = "entry_0041B4AC", section = ".virtual", vram = 0x0041B4AC, size = 76 },
+    { name = "entry_0041B4E0", section = ".virtual", vram = 0x0041B4E0, size = 24 },
+    { name = "entry_0041B534", section = ".virtual", vram = 0x0041B534, size = 76 },
+    { name = "entry_0041B568", section = ".virtual", vram = 0x0041B568, size = 24 },
+    { name = "entry_0041B5BC", section = ".virtual", vram = 0x0041B5BC, size = 76 },
+    { name = "entry_0041B5F0", section = ".virtual", vram = 0x0041B5F0, size = 24 },
+    { name = "entry_0041B644", section = ".virtual", vram = 0x0041B644, size = 76 },
+    { name = "entry_0041B678", section = ".virtual", vram = 0x0041B678, size = 24 },
+    { name = "entry_0041B6CC", section = ".virtual", vram = 0x0041B6CC, size = 76 },
+    { name = "entry_0041B700", section = ".virtual", vram = 0x0041B700, size = 24 },
+    { name = "entry_0041B754", section = ".virtual", vram = 0x0041B754, size = 76 },
+    { name = "entry_0041B788", section = ".virtual", vram = 0x0041B788, size = 24 },
+    { name = "entry_0041B7DC", section = ".virtual", vram = 0x0041B7DC, size = 76 },
+    { name = "entry_0041B810", section = ".virtual", vram = 0x0041B810, size = 24 },
+    { name = "entry_0041B864", section = ".virtual", vram = 0x0041B864, size = 76 },
+    { name = "entry_0041B898", section = ".virtual", vram = 0x0041B898, size = 24 },
+    { name = "entry_0041B8FC", section = ".virtual", vram = 0x0041B8FC, size = 36 },
+    { name = "entry_0041B930", section = ".virtual", vram = 0x0041B930, size = 8 },
+    { name = "entry_0041B974", section = ".virtual", vram = 0x0041B974, size = 60 },
+    { name = "entry_0041B9A8", section = ".virtual", vram = 0x0041B9A8, size = 8 },
+    { name = "entry_0041B9B8", section = ".virtual", vram = 0x0041B9B8, size = 8 },
+    { name = "entry_0041BD34", section = ".virtual", vram = 0x0041BD34, size = 8 },
+    { name = "entry_0041BDA8", section = ".virtual", vram = 0x0041BDA8, size = 180 },
+    { name = "entry_0041BDEC", section = ".virtual", vram = 0x0041BDEC, size = 112 },
+    { name = "entry_0041BE60", section = ".virtual", vram = 0x0041BE60, size = 168 },
+    { name = "entry_0041BF24", section = ".virtual", vram = 0x0041BF24, size = 72 },
+    { name = "entry_0041BF28", section = ".virtual", vram = 0x0041BF28, size = 68 },
+    { name = "entry_0041BFE8", section = ".virtual", vram = 0x0041BFE8, size = 76 },
+    { name = "entry_0041C0AC", section = ".virtual", vram = 0x0041C0AC, size = 72 },
+    { name = "entry_0041C0B0", section = ".virtual", vram = 0x0041C0B0, size = 68 },
+    { name = "entry_0041C174", section = ".virtual", vram = 0x0041C174, size = 72 },
+    { name = "entry_0041C178", section = ".virtual", vram = 0x0041C178, size = 68 },
+    { name = "entry_0041C23C", section = ".virtual", vram = 0x0041C23C, size = 56 },
+    { name = "entry_0041C240", section = ".virtual", vram = 0x0041C240, size = 52 },
+    { name = "entry_0041C2D8", section = ".virtual", vram = 0x0041C2D8, size = 16 },
+    { name = "entry_0041C318", section = ".virtual", vram = 0x0041C318, size = 32 },
+    { name = "entry_0041C31C", section = ".virtual", vram = 0x0041C31C, size = 28 },
+    { name = "entry_0041C3A0", section = ".virtual", vram = 0x0041C3A0, size = 36 },
+    { name = "entry_0041C534", section = ".virtual", vram = 0x0041C534, size = 184 },
+    { name = "entry_0041C660", section = ".virtual", vram = 0x0041C660, size = 184 },
+    { name = "entry_0041C6BC", section = ".virtual", vram = 0x0041C6BC, size = 92 },
+    { name = "entry_0041C768", section = ".virtual", vram = 0x0041C768, size = 48 },
+    { name = "entry_0041C9C8", section = ".virtual", vram = 0x0041C9C8, size = 20 },
+    { name = "entry_0041CA30", section = ".virtual", vram = 0x0041CA30, size = 72 },
+    { name = "entry_0041CC60", section = ".virtual", vram = 0x0041CC60, size = 84 },
+    { name = "entry_0041CE7C", section = ".virtual", vram = 0x0041CE7C, size = 236 },
+    { name = "entry_0041CF90", section = ".virtual", vram = 0x0041CF90, size = 188 },
+    { name = "entry_0041D0A8", section = ".virtual", vram = 0x0041D0A8, size = 540 },
+    { name = "entry_0041D104", section = ".virtual", vram = 0x0041D104, size = 448 },
+    { name = "entry_0041D348", section = ".virtual", vram = 0x0041D348, size = 204 },
+    { name = "entry_0041D5D8", section = ".virtual", vram = 0x0041D5D8, size = 252 },
+    { name = "entry_0041D6B0", section = ".virtual", vram = 0x0041D6B0, size = 36 },
+    { name = "entry_0041DB7C", section = ".virtual", vram = 0x0041DB7C, size = 224 },
+    { name = "entry_0041DBCC", section = ".virtual", vram = 0x0041DBCC, size = 144 },
+    { name = "entry_0041DBDC", section = ".virtual", vram = 0x0041DBDC, size = 128 },
+    { name = "entry_0041DCA4", section = ".virtual", vram = 0x0041DCA4, size = 12 },
+    { name = "entry_0041DCA8", section = ".virtual", vram = 0x0041DCA8, size = 8 },
+    { name = "entry_0041DDB0", section = ".virtual", vram = 0x0041DDB0, size = 416 },
+    { name = "entry_0041DE50", section = ".virtual", vram = 0x0041DE50, size = 256 },
+    { name = "entry_0041DF30", section = ".virtual", vram = 0x0041DF30, size = 32 },
+    { name = "entry_0041DF90", section = ".virtual", vram = 0x0041DF90, size = 584 },
+    { name = "entry_0041E0D0", section = ".virtual", vram = 0x0041E0D0, size = 264 },
+    { name = "entry_0041E0D8", section = ".virtual", vram = 0x0041E0D8, size = 256 },
+    { name = "entry_0041E0E0", section = ".virtual", vram = 0x0041E0E0, size = 248 },
+    { name = "entry_0041E274", section = ".virtual", vram = 0x0041E274, size = 32 },
+    { name = "entry_0041E27C", section = ".virtual", vram = 0x0041E27C, size = 24 },
+    { name = "entry_0041E308", section = ".virtual", vram = 0x0041E308, size = 108 },
+    { name = "entry_0041E354", section = ".virtual", vram = 0x0041E354, size = 32 },
+    { name = "entry_0041E400", section = ".virtual", vram = 0x0041E400, size = 256 },
+    { name = "entry_0041E81C", section = ".virtual", vram = 0x0041E81C, size = 8 },
+    { name = "entry_0041E8D8", section = ".virtual", vram = 0x0041E8D8, size = 164 },
+    { name = "entry_0041EA5C", section = ".virtual", vram = 0x0041EA5C, size = 40 },
+    { name = "entry_0041EB40", section = ".virtual", vram = 0x0041EB40, size = 260 },
+    { name = "entry_0041EB48", section = ".virtual", vram = 0x0041EB48, size = 252 },
+    { name = "entry_0041EB50", section = ".virtual", vram = 0x0041EB50, size = 244 },
+    { name = "entry_0041ECE0", section = ".virtual", vram = 0x0041ECE0, size = 256 },
+    { name = "entry_0041ECE8", section = ".virtual", vram = 0x0041ECE8, size = 248 },
+    { name = "entry_0041ED00", section = ".virtual", vram = 0x0041ED00, size = 224 },
+    { name = "entry_0041ED58", section = ".virtual", vram = 0x0041ED58, size = 136 },
+    { name = "entry_0041EF2C", section = ".virtual", vram = 0x0041EF2C, size = 412 },
+    { name = "entry_0041EFA0", section = ".virtual", vram = 0x0041EFA0, size = 296 },
+    { name = "entry_0041EFB4", section = ".virtual", vram = 0x0041EFB4, size = 276 },
+    { name = "entry_0041EFC4", section = ".virtual", vram = 0x0041EFC4, size = 260 },
+    { name = "entry_0041EFE8", section = ".virtual", vram = 0x0041EFE8, size = 224 },
+    { name = "entry_0041F044", section = ".virtual", vram = 0x0041F044, size = 132 },
+    { name = "entry_0041F208", section = ".virtual", vram = 0x0041F208, size = 292 },
+    { name = "entry_0041F224", section = ".virtual", vram = 0x0041F224, size = 264 },
+    { name = "entry_0041F2B8", section = ".virtual", vram = 0x0041F2B8, size = 116 },
+    { name = "entry_0041F3E0", section = ".virtual", vram = 0x0041F3E0, size = 1904 },
+    { name = "entry_0041FA38", section = ".virtual", vram = 0x0041FA38, size = 280 },
+    { name = "entry_0041FA44", section = ".virtual", vram = 0x0041FA44, size = 268 },
+    { name = "entry_0041FAD4", section = ".virtual", vram = 0x0041FAD4, size = 124 },
+    { name = "entry_0041FB54", section = ".virtual", vram = 0x0041FB54, size = 416 },
+    { name = "entry_0041FC54", section = ".virtual", vram = 0x0041FC54, size = 160 },
+    { name = "entry_0041FD20", section = ".virtual", vram = 0x0041FD20, size = 420 },
+    { name = "entry_0041FD68", section = ".virtual", vram = 0x0041FD68, size = 348 },
+    { name = "entry_0041FDC4", section = ".virtual", vram = 0x0041FDC4, size = 256 },
+    { name = "entry_0041FE4C", section = ".virtual", vram = 0x0041FE4C, size = 120 },
+    { name = "entry_0041FE74", section = ".virtual", vram = 0x0041FE74, size = 80 },
+    { name = "entry_0041FF3C", section = ".virtual", vram = 0x0041FF3C, size = 608 },
+    { name = "entry_00420098", section = ".virtual", vram = 0x00420098, size = 260 },
+    { name = "entry_00420174", section = ".virtual", vram = 0x00420174, size = 40 },
+    { name = "entry_004202A8", section = ".virtual", vram = 0x004202A8, size = 264 },
+    { name = "entry_00420308", section = ".virtual", vram = 0x00420308, size = 168 },
+    { name = "entry_00420364", section = ".virtual", vram = 0x00420364, size = 76 },
+    { name = "entry_004203E8", section = ".virtual", vram = 0x004203E8, size = 108 },
+    { name = "entry_00420614", section = ".virtual", vram = 0x00420614, size = 164 },
+    { name = "entry_004206A4", section = ".virtual", vram = 0x004206A4, size = 20 },
+    { name = "entry_0042075C", section = ".virtual", vram = 0x0042075C, size = 256 },
+    { name = "entry_00420768", section = ".virtual", vram = 0x00420768, size = 244 },
+    { name = "entry_00420AA4", section = ".virtual", vram = 0x00420AA4, size = 396 },
+    { name = "entry_00420B1C", section = ".virtual", vram = 0x00420B1C, size = 276 },
+    { name = "entry_00420B2C", section = ".virtual", vram = 0x00420B2C, size = 260 },
+    { name = "entry_00420B38", section = ".virtual", vram = 0x00420B38, size = 248 },
+    { name = "entry_00420BC8", section = ".virtual", vram = 0x00420BC8, size = 104 },
+    { name = "entry_00420C18", section = ".virtual", vram = 0x00420C18, size = 24 },
+    { name = "entry_00420C9C", section = ".virtual", vram = 0x00420C9C, size = 664 },
+    { name = "entry_00420D5C", section = ".virtual", vram = 0x00420D5C, size = 472 },
+    { name = "entry_00420E2C", section = ".virtual", vram = 0x00420E2C, size = 264 },
+    { name = "entry_00420E38", section = ".virtual", vram = 0x00420E38, size = 252 },
+    { name = "entry_00420EB4", section = ".virtual", vram = 0x00420EB4, size = 128 },
+    { name = "entry_00420FB4", section = ".virtual", vram = 0x00420FB4, size = 504 },
+    { name = "entry_004210A4", section = ".virtual", vram = 0x004210A4, size = 264 },
+    { name = "entry_004210B0", section = ".virtual", vram = 0x004210B0, size = 252 },
+    { name = "entry_004210BC", section = ".virtual", vram = 0x004210BC, size = 240 },
+    { name = "entry_00421170", section = ".virtual", vram = 0x00421170, size = 60 },
+    { name = "entry_00421628", section = ".virtual", vram = 0x00421628, size = 44 },
+    { name = "entry_00421658", section = ".virtual", vram = 0x00421658, size = 48 },
+    { name = "entry_00421708", section = ".virtual", vram = 0x00421708, size = 152 },
+    { name = "entry_00421738", section = ".virtual", vram = 0x00421738, size = 104 },
+    { name = "entry_00421770", section = ".virtual", vram = 0x00421770, size = 48 },
+    { name = "entry_004218F4", section = ".virtual", vram = 0x004218F4, size = 180 },
+    { name = "entry_0042192C", section = ".virtual", vram = 0x0042192C, size = 124 },
+    { name = "entry_004219F0", section = ".virtual", vram = 0x004219F0, size = 48 },
+    { name = "entry_00421BA8", section = ".virtual", vram = 0x00421BA8, size = 60 },
+    { name = "entry_00421C28", section = ".virtual", vram = 0x00421C28, size = 120 },
+    { name = "entry_00421D14", section = ".virtual", vram = 0x00421D14, size = 12 },
+    { name = "entry_00421DEC", section = ".virtual", vram = 0x00421DEC, size = 16 },
+    { name = "entry_00421DF4", section = ".virtual", vram = 0x00421DF4, size = 8 },
+    { name = "entry_00421F6C", section = ".virtual", vram = 0x00421F6C, size = 28 },
+    { name = "entry_0042203C", section = ".virtual", vram = 0x0042203C, size = 36 },
+    { name = "entry_00422098", section = ".virtual", vram = 0x00422098, size = 88 },
+    { name = "entry_00422170", section = ".virtual", vram = 0x00422170, size = 32 },
+    { name = "entry_0042222C", section = ".virtual", vram = 0x0042222C, size = 44 },
+    { name = "entry_00422320", section = ".virtual", vram = 0x00422320, size = 272 },
+    { name = "entry_00422348", section = ".virtual", vram = 0x00422348, size = 232 },
+    { name = "entry_004224F4", section = ".virtual", vram = 0x004224F4, size = 128 },
+    { name = "entry_004225D0", section = ".virtual", vram = 0x004225D0, size = 56 },
+    { name = "entry_004225D4", section = ".virtual", vram = 0x004225D4, size = 52 },
+    { name = "entry_004227C8", section = ".virtual", vram = 0x004227C8, size = 4 },
+    { name = "entry_004228F4", section = ".virtual", vram = 0x004228F4, size = 232 },
+    { name = "entry_00422A20", section = ".virtual", vram = 0x00422A20, size = 232 },
+    { name = "entry_00422B4C", section = ".virtual", vram = 0x00422B4C, size = 232 },
+    { name = "entry_00422C78", section = ".virtual", vram = 0x00422C78, size = 232 },
+    { name = "entry_00422DA4", section = ".virtual", vram = 0x00422DA4, size = 232 },
+    { name = "entry_00422DF0", section = ".virtual", vram = 0x00422DF0, size = 156 },
+    { name = "entry_00422EC8", section = ".virtual", vram = 0x00422EC8, size = 16 },
+    { name = "entry_00422F40", section = ".virtual", vram = 0x00422F40, size = 128 },
+    { name = "entry_00422FB8", section = ".virtual", vram = 0x00422FB8, size = 8 },
+    { name = "entry_00422FE8", section = ".virtual", vram = 0x00422FE8, size = 88 },
+    { name = "entry_00423020", section = ".virtual", vram = 0x00423020, size = 32 },
+    { name = "entry_0042311C", section = ".virtual", vram = 0x0042311C, size = 20 },
+    { name = "entry_00423184", section = ".virtual", vram = 0x00423184, size = 140 },
+    { name = "entry_00423270", section = ".virtual", vram = 0x00423270, size = 8 },
+    { name = "entry_004233E0", section = ".virtual", vram = 0x004233E0, size = 8 },
+    { name = "entry_00423410", section = ".virtual", vram = 0x00423410, size = 104 },
+    { name = "entry_00423448", section = ".virtual", vram = 0x00423448, size = 48 },
+    { name = "entry_004234D8", section = ".virtual", vram = 0x004234D8, size = 128 },
+    { name = "entry_0042350C", section = ".virtual", vram = 0x0042350C, size = 76 },
+    { name = "entry_0042354C", section = ".virtual", vram = 0x0042354C, size = 12 },
+    { name = "entry_00423598", section = ".virtual", vram = 0x00423598, size = 40 },
+    { name = "entry_004235E8", section = ".virtual", vram = 0x004235E8, size = 12 },
+    { name = "entry_0042366C", section = ".virtual", vram = 0x0042366C, size = 36 },
+    { name = "entry_004236C0", section = ".virtual", vram = 0x004236C0, size = 168 },
+    { name = "entry_004236FC", section = ".virtual", vram = 0x004236FC, size = 108 },
+    { name = "entry_00423784", section = ".virtual", vram = 0x00423784, size = 120 },
+    { name = "entry_00423840", section = ".virtual", vram = 0x00423840, size = 64 },
+    { name = "entry_0042387C", section = ".virtual", vram = 0x0042387C, size = 4 },
+    { name = "entry_004238CC", section = ".virtual", vram = 0x004238CC, size = 100 },
+    { name = "entry_004238FC", section = ".virtual", vram = 0x004238FC, size = 52 },
+    { name = "entry_00423934", section = ".virtual", vram = 0x00423934, size = 48 },
+    { name = "entry_00423A60", section = ".virtual", vram = 0x00423A60, size = 24 },
+    { name = "entry_00423ADC", section = ".virtual", vram = 0x00423ADC, size = 108 },
+    { name = "entry_00423B58", section = ".virtual", vram = 0x00423B58, size = 108 },
+    { name = "entry_00423BD4", section = ".virtual", vram = 0x00423BD4, size = 108 },
+    { name = "entry_00423C50", section = ".virtual", vram = 0x00423C50, size = 108 },
+    { name = "entry_00423D28", section = ".virtual", vram = 0x00423D28, size = 8 },
+    { name = "entry_00423D88", section = ".virtual", vram = 0x00423D88, size = 28 },
+    { name = "entry_00423E00", section = ".virtual", vram = 0x00423E00, size = 16 },
+    { name = "entry_00423E04", section = ".virtual", vram = 0x00423E04, size = 12 },
+    { name = "entry_00423F28", section = ".virtual", vram = 0x00423F28, size = 224 },
+    { name = "entry_00424260", section = ".virtual", vram = 0x00424260, size = 140 },
+    { name = "entry_004244B0", section = ".virtual", vram = 0x004244B0, size = 80 },
+    { name = "entry_0042456C", section = ".virtual", vram = 0x0042456C, size = 116 },
+    { name = "entry_004245C4", section = ".virtual", vram = 0x004245C4, size = 28 },
+    { name = "entry_004245C8", section = ".virtual", vram = 0x004245C8, size = 24 },
+    { name = "entry_00424740", section = ".virtual", vram = 0x00424740, size = 64 },
+    { name = "entry_0042483C", section = ".virtual", vram = 0x0042483C, size = 308 },
+    { name = "entry_0042491C", section = ".virtual", vram = 0x0042491C, size = 84 },
+    { name = "entry_00424A88", section = ".virtual", vram = 0x00424A88, size = 264 },
+    { name = "entry_00424C38", section = ".virtual", vram = 0x00424C38, size = 284 },
+    { name = "entry_00424D30", section = ".virtual", vram = 0x00424D30, size = 36 },
+    { name = "entry_00424DD8", section = ".virtual", vram = 0x00424DD8, size = 284 },
+    { name = "entry_00424ED4", section = ".virtual", vram = 0x00424ED4, size = 32 },
+    { name = "entry_00424F74", section = ".virtual", vram = 0x00424F74, size = 20 },
+    { name = "entry_00425014", section = ".virtual", vram = 0x00425014, size = 72 },
+    { name = "entry_004250B4", section = ".virtual", vram = 0x004250B4, size = 72 },
+    { name = "entry_00425128", section = ".virtual", vram = 0x00425128, size = 116 },
+    { name = "entry_00425388", section = ".virtual", vram = 0x00425388, size = 636 },
+    { name = "entry_00425680", section = ".virtual", vram = 0x00425680, size = 144 },
+    { name = "entry_00425808", section = ".virtual", vram = 0x00425808, size = 224 },
+    { name = "entry_00425904", section = ".virtual", vram = 0x00425904, size = 436 },
+    { name = "entry_00425910", section = ".virtual", vram = 0x00425910, size = 424 },
+    { name = "entry_00425980", section = ".virtual", vram = 0x00425980, size = 312 },
+    { name = "entry_004259A8", section = ".virtual", vram = 0x004259A8, size = 272 },
+    { name = "entry_00425A74", section = ".virtual", vram = 0x00425A74, size = 68 },
+    { name = "entry_00425A98", section = ".virtual", vram = 0x00425A98, size = 32 },
+    { name = "entry_00425AE0", section = ".virtual", vram = 0x00425AE0, size = 224 },
+    { name = "entry_00425BD8", section = ".virtual", vram = 0x00425BD8, size = 444 },
+    { name = "entry_00425C6C", section = ".virtual", vram = 0x00425C6C, size = 296 },
+    { name = "entry_00425D64", section = ".virtual", vram = 0x00425D64, size = 48 },
+    { name = "entry_00425E44", section = ".virtual", vram = 0x00425E44, size = 48 },
+    { name = "entry_00425F54", section = ".virtual", vram = 0x00425F54, size = 48 },
+    { name = "entry_00425F58", section = ".virtual", vram = 0x00425F58, size = 44 },
+    { name = "entry_00426034", section = ".virtual", vram = 0x00426034, size = 48 },
+    { name = "entry_00426038", section = ".virtual", vram = 0x00426038, size = 44 },
+    { name = "entry_0042606C", section = ".virtual", vram = 0x0042606C, size = 24 },
+    { name = "entry_004262CC", section = ".virtual", vram = 0x004262CC, size = 212 },
+    { name = "entry_004263AC", section = ".virtual", vram = 0x004263AC, size = 48 },
+    { name = "entry_00426428", section = ".virtual", vram = 0x00426428, size = 12 },
+    { name = "entry_00426454", section = ".virtual", vram = 0x00426454, size = 40 },
+    { name = "entry_00426600", section = ".virtual", vram = 0x00426600, size = 44 },
+    { name = "entry_004266C0", section = ".virtual", vram = 0x004266C0, size = 76 },
+    { name = "entry_004266E0", section = ".virtual", vram = 0x004266E0, size = 44 },
+    { name = "entry_004267DC", section = ".virtual", vram = 0x004267DC, size = 56 },
+    { name = "entry_00426884", section = ".virtual", vram = 0x00426884, size = 76 },
+    { name = "entry_00426898", section = ".virtual", vram = 0x00426898, size = 56 },
+    { name = "entry_004269A4", section = ".virtual", vram = 0x004269A4, size = 32 },
+    { name = "entry_004269B4", section = ".virtual", vram = 0x004269B4, size = 16 },
+    { name = "entry_00426ACC", section = ".virtual", vram = 0x00426ACC, size = 44 },
+    { name = "entry_00426B98", section = ".virtual", vram = 0x00426B98, size = 64 },
+    { name = "entry_00426BA8", section = ".virtual", vram = 0x00426BA8, size = 48 },
+    { name = "entry_00426BAC", section = ".virtual", vram = 0x00426BAC, size = 44 },
+    { name = "entry_00426C50", section = ".virtual", vram = 0x00426C50, size = 36 },
+    { name = "entry_00426C78", section = ".virtual", vram = 0x00426C78, size = 16 },
+    { name = "entry_00426C90", section = ".virtual", vram = 0x00426C90, size = 28 },
+    { name = "entry_00426D24", section = ".virtual", vram = 0x00426D24, size = 48 },
+    { name = "entry_00426D70", section = ".virtual", vram = 0x00426D70, size = 28 },
+    { name = "entry_00426D98", section = ".virtual", vram = 0x00426D98, size = 24 },
+    { name = "entry_00426EBC", section = ".virtual", vram = 0x00426EBC, size = 100 },
+    { name = "entry_004270A0", section = ".virtual", vram = 0x004270A0, size = 12 },
+    { name = "entry_00427318", section = ".virtual", vram = 0x00427318, size = 524 },
+    { name = "entry_00427414", section = ".virtual", vram = 0x00427414, size = 272 },
+    { name = "entry_00427444", section = ".virtual", vram = 0x00427444, size = 224 },
+    { name = "entry_004274E4", section = ".virtual", vram = 0x004274E4, size = 64 },
+    { name = "entry_004275E0", section = ".virtual", vram = 0x004275E0, size = 192 },
+    { name = "entry_00427610", section = ".virtual", vram = 0x00427610, size = 144 },
+    { name = "entry_004276C0", section = ".virtual", vram = 0x004276C0, size = 48 },
+    { name = "entry_004278A8", section = ".virtual", vram = 0x004278A8, size = 260 },
+    { name = "entry_004278CC", section = ".virtual", vram = 0x004278CC, size = 224 },
+    { name = "entry_00427944", section = ".virtual", vram = 0x00427944, size = 104 },
+    { name = "entry_00427A6C", section = ".virtual", vram = 0x00427A6C, size = 212 },
+    { name = "entry_00427B1C", section = ".virtual", vram = 0x00427B1C, size = 36 },
+    { name = "entry_00427CBC", section = ".virtual", vram = 0x00427CBC, size = 416 },
+    { name = "entry_00427D50", section = ".virtual", vram = 0x00427D50, size = 268 },
+    { name = "entry_00427D80", section = ".virtual", vram = 0x00427D80, size = 220 },
+    { name = "entry_00427E70", section = ".virtual", vram = 0x00427E70, size = 264 },
+    { name = "entry_00427EA0", section = ".virtual", vram = 0x00427EA0, size = 216 },
+    { name = "entry_00428234", section = ".virtual", vram = 0x00428234, size = 252 },
+    { name = "entry_00428250", section = ".virtual", vram = 0x00428250, size = 224 },
+    { name = "entry_0042839C", section = ".virtual", vram = 0x0042839C, size = 976 },
+    { name = "entry_004283F4", section = ".virtual", vram = 0x004283F4, size = 888 },
+    { name = "entry_00428654", section = ".virtual", vram = 0x00428654, size = 280 },
+    { name = "entry_0042865C", section = ".virtual", vram = 0x0042865C, size = 272 },
+    { name = "entry_0042868C", section = ".virtual", vram = 0x0042868C, size = 224 },
+    { name = "entry_004287D8", section = ".virtual", vram = 0x004287D8, size = 224 },
+    { name = "entry_0042890C", section = ".virtual", vram = 0x0042890C, size = 268 },
+    { name = "entry_00428B58", section = ".virtual", vram = 0x00428B58, size = 68 },
+    { name = "entry_00428C10", section = ".virtual", vram = 0x00428C10, size = 40 },
+    { name = "entry_00428F98", section = ".virtual", vram = 0x00428F98, size = 396 },
+    { name = "entry_00429014", section = ".virtual", vram = 0x00429014, size = 272 },
+    { name = "entry_00429050", section = ".virtual", vram = 0x00429050, size = 212 },
+    { name = "entry_004291EC", section = ".virtual", vram = 0x004291EC, size = 244 },
+    { name = "entry_00429200", section = ".virtual", vram = 0x00429200, size = 224 },
+    { name = "entry_004292D4", section = ".virtual", vram = 0x004292D4, size = 12 },
+    { name = "entry_00429308", section = ".virtual", vram = 0x00429308, size = 332 },
+    { name = "entry_00429348", section = ".virtual", vram = 0x00429348, size = 268 },
+    { name = "entry_00429380", section = ".virtual", vram = 0x00429380, size = 212 },
+    { name = "entry_00429640", section = ".virtual", vram = 0x00429640, size = 264 },
+    { name = "entry_00429668", section = ".virtual", vram = 0x00429668, size = 224 },
+    { name = "entry_004297D8", section = ".virtual", vram = 0x004297D8, size = 224 },
+    { name = "entry_004299B0", section = ".virtual", vram = 0x004299B0, size = 244 },
+    { name = "entry_004299C4", section = ".virtual", vram = 0x004299C4, size = 224 },
+    { name = "entry_00429B10", section = ".virtual", vram = 0x00429B10, size = 524 },
+    { name = "entry_00429C74", section = ".virtual", vram = 0x00429C74, size = 168 },
+    { name = "entry_00429CA4", section = ".virtual", vram = 0x00429CA4, size = 120 },
+    { name = "entry_00429CD4", section = ".virtual", vram = 0x00429CD4, size = 72 },
+    { name = "entry_00429D54", section = ".virtual", vram = 0x00429D54, size = 48 },
+    { name = "entry_00429DD4", section = ".virtual", vram = 0x00429DD4, size = 16 },
+    { name = "entry_00429E40", section = ".virtual", vram = 0x00429E40, size = 132 },
+    { name = "entry_0042A44C", section = ".virtual", vram = 0x0042A44C, size = 1588 },
+    { name = "entry_0042A594", section = ".virtual", vram = 0x0042A594, size = 1260 },
+    { name = "entry_0042A6DC", section = ".virtual", vram = 0x0042A6DC, size = 932 },
+    { name = "entry_0042A824", section = ".virtual", vram = 0x0042A824, size = 604 },
+    { name = "entry_0042A96C", section = ".virtual", vram = 0x0042A96C, size = 276 },
+    { name = "entry_0042A9A0", section = ".virtual", vram = 0x0042A9A0, size = 224 },
+    { name = "entry_0042AC10", section = ".virtual", vram = 0x0042AC10, size = 2004 },
+    { name = "entry_0042AC18", section = ".virtual", vram = 0x0042AC18, size = 1996 },
+    { name = "entry_0042AE90", section = ".virtual", vram = 0x0042AE90, size = 1364 },
+    { name = "entry_0042AE9C", section = ".virtual", vram = 0x0042AE9C, size = 1352 },
+    { name = "entry_0042AF44", section = ".virtual", vram = 0x0042AF44, size = 1184 },
+    { name = "entry_0042BC8C", section = ".virtual", vram = 0x0042BC8C, size = 700 },
+    { name = "entry_0042BDF8", section = ".virtual", vram = 0x0042BDF8, size = 336 },
+    { name = "entry_0042BE68", section = ".virtual", vram = 0x0042BE68, size = 224 },
+    { name = "entry_0042C0B4", section = ".virtual", vram = 0x0042C0B4, size = 224 },
+    { name = "entry_0042C2DC", section = ".virtual", vram = 0x0042C2DC, size = 176 },
+    { name = "entry_0042C338", section = ".virtual", vram = 0x0042C338, size = 84 },
+    { name = "entry_0042C6BC", section = ".virtual", vram = 0x0042C6BC, size = 68 },
+    { name = "entry_0042C88C", section = ".virtual", vram = 0x0042C88C, size = 224 },
+    { name = "entry_0042CA64", section = ".virtual", vram = 0x0042CA64, size = 80 },
+    { name = "entry_0042CBF4", section = ".virtual", vram = 0x0042CBF4, size = 272 },
+    { name = "entry_0042CE88", section = ".virtual", vram = 0x0042CE88, size = 252 },
+    { name = "entry_0042CEB0", section = ".virtual", vram = 0x0042CEB0, size = 212 },
+    { name = "entry_0042D2B8", section = ".virtual", vram = 0x0042D2B8, size = 336 },
+    { name = "entry_0042D2BC", section = ".virtual", vram = 0x0042D2BC, size = 332 },
+    { name = "entry_0042D2C0", section = ".virtual", vram = 0x0042D2C0, size = 328 },
+    { name = "entry_0042D330", section = ".virtual", vram = 0x0042D330, size = 216 },
+    { name = "entry_0042DD60", section = ".virtual", vram = 0x0042DD60, size = 276 },
+    { name = "entry_0042DD94", section = ".virtual", vram = 0x0042DD94, size = 224 },
+    { name = "entry_0042E0AC", section = ".virtual", vram = 0x0042E0AC, size = 160 },
+    { name = "entry_0042E0F4", section = ".virtual", vram = 0x0042E0F4, size = 88 },
+    { name = "entry_0042E2A4", section = ".virtual", vram = 0x0042E2A4, size = 172 },
+    { name = "entry_0042E340", section = ".virtual", vram = 0x0042E340, size = 16 },
+    { name = "entry_0042E420", section = ".virtual", vram = 0x0042E420, size = 16 },
+    { name = "entry_0042E4A8", section = ".virtual", vram = 0x0042E4A8, size = 260 },
+    { name = "entry_0042E720", section = ".virtual", vram = 0x0042E720, size = 276 },
+    { name = "entry_0042E7B4", section = ".virtual", vram = 0x0042E7B4, size = 128 },
+    { name = "entry_0042E974", section = ".virtual", vram = 0x0042E974, size = 48 },
+    { name = "entry_0042EA24", section = ".virtual", vram = 0x0042EA24, size = 184 },
+    { name = "entry_0042EAD4", section = ".virtual", vram = 0x0042EAD4, size = 8 },
+    { name = "entry_0042F074", section = ".virtual", vram = 0x0042F074, size = 112 },
+    { name = "entry_0042F37C", section = ".virtual", vram = 0x0042F37C, size = 372 },
+    { name = "entry_0042F3D0", section = ".virtual", vram = 0x0042F3D0, size = 288 },
+    { name = "entry_0042FE0C", section = ".virtual", vram = 0x0042FE0C, size = 64 },
+    { name = "entry_0042FE78", section = ".virtual", vram = 0x0042FE78, size = 116 },
+    { name = "entry_004300E8", section = ".virtual", vram = 0x004300E8, size = 224 },
+]
+
 [patches]
 # Deliberately empty. An experiment that stubbed every function N64Recomp
 # refused reached 75 entries and 3.3 MB of emitted C before segfaulting — but
@@ -63,175 +744,35 @@ stubs = [
     "func_002A51E0",  # cache, eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 c0r1, mtc0 c0r18, mtc0 c0r19, mtc0 c0r25, mtc0 c0r7, tlbp, tlbr, tlbwi
     "func_00425710",  # mfc0 c0r19, mtc0 c0r18
     "func_00430500",  # cache, mfc0 BadVAddr, mfc0 Context, mfc0 EPC, mfc0 EntryHi, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r20, mfc0 c0r21, mfc0 c0r24, mfc0 c0r28, mfc0 c0r31, mtc0 Context, mtc0 Index, mtc0 c0r25
-    "func_0043C264",  # manual
-    "func_0043CC14",  # manual
-    "func_0043CF3C",  # manual
-    "func_0043D450",  # manual
-    "func_0043D57C",  # manual
     "func_0043DC44",  # manual
-    "func_0043DFE0",  # manual
     "func_0043E0E0",  # manual
-    "func_0043E288",  # manual
     "func_0043E3C4",  # manual
-    "func_0043E6DC",  # manual
-    "func_0043EE04",  # manual
-    "func_0043F000",  # manual
-    "func_0043F598",  # manual
-    "func_0043FAA8",  # manual
-    "func_00440284",  # manual
-    "func_004406B0",  # manual
-    "func_004408B8",  # manual
-    "func_00440DC0",  # manual
-    "func_004412A0",  # manual
-    "func_004415A0",  # manual
-    "func_004419E0",  # manual
-    "func_00441C10",  # manual
-    "func_00441CF4",  # manual
-    "func_00441EAC",  # manual
     "func_00441FF8",  # manual
-    "func_00442784",  # manual
-    "func_00442A64",  # manual
     "func_00442D4C",  # manual
-    "func_00443170",  # manual
     "func_0044325C",  # manual
-    "func_00443418",  # manual
-    "func_004438FC",  # manual
-    "func_0044480C",  # manual
-    "func_00444C64",  # manual
-    "func_0044584C",  # manual
-    "func_004463A8",  # manual
-    "func_004469B8",  # manual
-    "func_00447108",  # manual
-    "func_0044730C",  # manual
-    "func_00447DB0",  # manual
-    "func_004481D8",  # manual
-    "func_004485B8",  # manual
-    "func_00448D6C",  # manual
-    "func_00449CE8",  # manual
-    "func_0044AC94",  # manual
-    "func_0044AEF8",  # manual
-    "func_0044B314",  # manual
-    "func_0044B548",  # manual
-    "func_0044B798",  # manual
-    "func_0044C21C",  # manual
     "func_0044C22C",  # manual
     "func_0044C3A4",  # manual
     "func_0044C63C",  # manual
-    "func_0044CF74",  # manual
-    "func_0044D3DC",  # manual
-    "func_0044D938",  # manual
-    "func_0044E1B4",  # manual
-    "func_0044E6FC",  # manual
-    "func_0044ECE8",  # manual
-    "func_0044EFB8",  # manual
-    "func_0044F0F0",  # manual
-    "func_0044F1B4",  # manual
     "func_0044F2FC",  # manual
-    "func_0044F33C",  # manual
-    "func_0044F48C",  # manual
-    "func_0044F644",  # manual
-    "func_0044F760",  # manual
-    "func_0044FBAC",  # manual
-    "func_0044FEA8",  # manual
     "func_0044FF8C",  # manual
     "func_0045007C",  # manual
-    "func_004502F8",  # manual
-    "func_00450484",  # manual
-    "func_0045060C",  # manual
-    "func_0045078C",  # manual
     "func_00450910",  # manual
-    "func_00450F4C",  # manual
-    "func_004511B4",  # manual
     "func_004515C0",  # manual
     "func_004516B0",  # manual
-    "func_004517BC",  # manual
-    "func_0045190C",  # manual
     "func_00451BA0",  # manual
     "func_00451D00",  # manual
-    "func_00451E0C",  # manual
     "func_00452060",  # manual
     "func_004521C0",  # manual
-    "func_004522CC",  # manual
     "func_00452314",  # manual
-    "func_00452578",  # manual
-    "func_004526E8",  # manual
     "func_00452960",  # manual
-    "func_00452C14",  # manual
-    "func_00452D64",  # manual
-    "func_00452EA8",  # manual
-    "func_00452F88",  # manual
-    "func_0045302C",  # manual
-    "func_00453334",  # manual
-    "func_004533AC",  # manual
     "func_0045353C",  # manual
-    "func_0045386C",  # manual
-    "func_00453C38",  # manual
-    "func_00453CCC",  # manual
-    "func_00453E18",  # manual
-    "func_00453E58",  # manual
-    "func_00453F54",  # manual
     "func_00453FC4",  # manual
     "func_004540B0",  # manual
-    "func_004541D4",  # manual
-    "func_0045425C",  # manual
-    "func_004542E4",  # manual
-    "func_0045436C",  # manual
-    "func_004543F4",  # manual
-    "func_0045447C",  # manual
-    "func_00454504",  # manual
-    "func_0045458C",  # manual
-    "func_00454614",  # manual
-    "func_0045469C",  # manual
-    "func_00454724",  # manual
-    "func_004547AC",  # manual
-    "func_00454834",  # manual
-    "func_00454944",  # manual
-    "func_00454CC4",  # manual
-    "func_00454DBC",  # manual
-    "func_00454ECC",  # manual
-    "func_00455054",  # manual
-    "func_0045511C",  # manual
-    "func_00455298",  # manual
-    "func_00455324",  # manual
-    "func_00455678",  # manual
-    "func_004558B4",  # manual
-    "func_00455A04",  # manual
-    "func_00455EBC",  # manual
-    "func_00455FA0",  # manual
-    "func_00456214",  # manual
-    "func_0045646C",  # manual
-    "func_00456B7C",  # manual
-    "func_00456CB0",  # manual
-    "func_00456E70",  # manual
-    "func_004570F8",  # manual
-    "func_00457294",  # manual
-    "func_00457420",  # manual
-    "func_004579A4",  # manual
-    "func_00457B64",  # manual
-    "func_00457D00",  # manual
-    "func_00457FE8",  # manual
-    "func_0045824C",  # manual
-    "func_00458A70",  # manual
-    "func_00458C14",  # manual
-    "func_00458DE4",  # manual
-    "func_004590BC",  # manual
-    "func_004595D8",  # manual
     "func_0045977C",  # manual
     "func_00459B50",  # manual
     "func_00459E54",  # manual
-    "func_0045A5E0",  # manual
-    "func_0045A6C0",  # manual
-    "func_0045A8C8",  # manual
-    "func_0045A900",  # manual
-    "func_0045A974",  # manual
-    "func_0045AB04",  # manual
-    "func_0045ABC0",  # manual
-    "func_0045AD98",  # manual
     "func_0045AEA8",  # manual
-    "func_0045B010",  # manual
     "func_0045B234",  # manual
-    "func_0045B3A4",  # manual
-    "func_0045B57C",  # manual
     "func_0045B784",  # manual
     "func_0045B7D0",  # manual
     "func_0045B8FC",  # manual
@@ -239,13 +780,6 @@ stubs = [
     "func_0045BB54",  # manual
     "func_0045BC80",  # manual
     "func_0045BDAC",  # manual
-    "func_0045C098",  # manual
-    "func_0045C4AC",  # manual
-    "func_0045C4E0",  # manual
-    "func_0045C514",  # manual
-    "func_0045C688",  # manual
-    "func_0045C7A0",  # manual
-    "func_0045C884",  # manual
     "func_0045C9EC",  # manual
     "func_0045CA68",  # manual
     "func_0045CAE4",  # manual
@@ -253,73 +787,14 @@ stubs = [
     "func_0045CBDC",  # manual
     "func_0045CC58",  # manual
     "func_0045CCC4",  # manual
-    "func_0045CD30",  # manual
-    "func_0045D56C",  # manual
-    "func_0045D6A0",  # manual
     "func_0045D97C",  # manual
     "func_0045DAB0",  # manual
     "func_0045DC74",  # manual
-    "func_0045DEA8",  # manual
     "func_0045DEDC",  # manual
     "func_0045DF7C",  # manual
     "func_0045E01C",  # manual
-    "func_0045E0BC",  # manual
-    "func_0045E140",  # manual
     "func_0045E630",  # mfc0 c0r19, mtc0 c0r18
-    "func_0045E674",  # manual
-    "func_0045E808",  # manual
-    "func_0045E9D8",  # manual
-    "func_0045EAE0",  # manual
-    "func_0045EF84",  # manual
-    "func_0045F084",  # manual
-    "func_0045F3A0",  # manual
-    "func_0045F4D0",  # manual
-    "func_0045F734",  # manual
-    "func_0045F7F0",  # manual
-    "func_0045F940",  # manual
-    "func_0045FB34",  # manual
-    "func_0045FBF4",  # manual
-    "func_0045FC74",  # manual
-    "func_00460094",  # manual
-    "func_00460444",  # manual
-    "func_004606A0",  # manual
-    "func_004608CC",  # manual
-    "func_00460A6C",  # manual
-    "func_00460B3C",  # manual
-    "func_00460D7C",  # manual
-    "func_00461080",  # manual
-    "func_00461250",  # manual
-    "func_0046168C",  # manual
-    "func_004617D8",  # manual
-    "func_00461938",  # manual
-    "func_00461C0C",  # manual
-    "func_00462044",  # manual
-    "func_00462200",  # manual
-    "func_00462374",  # manual
-    "func_004627D8",  # manual
-    "func_004629C4",  # manual
-    "func_00462E38",  # manual
-    "func_00462EC0",  # manual
-    "func_00463B2C",  # manual
-    "func_00464960",  # manual
-    "func_004652DC",  # manual
-    "func_00465678",  # manual
-    "func_004658FC",  # manual
-    "func_004659D4",  # manual
-    "func_00465D30",  # manual
-    "func_004660D8",  # manual
-    "func_00466328",  # manual
-    "func_00466B38",  # manual
-    "func_0046706C",  # manual
-    "func_004671BC",  # manual
-    "func_00467350",  # manual
-    "func_004674CC",  # manual
-    "func_004677B4",  # manual
-    "func_00467A6C",  # manual
-    "func_00468264",  # manual
-    "func_00468F88",  # manual
-    "func_004692CC",  # manual
-    "func_00469374",  # cache, eret, manual, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 Wired, mtc0 c0r1, mtc0 c0r15, mtc0 c0r16, mtc0 c0r17, mtc0 c0r18, mtc0 c0r19, mtc0 c0r20, mtc0 c0r21, mtc0 c0r22, mtc0 c0r23, mtc0 c0r24, mtc0 c0r25, mtc0 c0r26, mtc0 c0r27, mtc0 c0r28, mtc0 c0r29, mtc0 c0r31, mtc0 c0r7, tlbp, tlbr, tlbwi
+    "func_00469374",  # cache, eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 Wired, mtc0 c0r1, mtc0 c0r15, mtc0 c0r16, mtc0 c0r17, mtc0 c0r18, mtc0 c0r19, mtc0 c0r20, mtc0 c0r21, mtc0 c0r22, mtc0 c0r23, mtc0 c0r24, mtc0 c0r25, mtc0 c0r26, mtc0 c0r27, mtc0 c0r28, mtc0 c0r29, mtc0 c0r31, mtc0 c0r7, tlbp, tlbr, tlbwi
 ]
 ignored = [
 ]

@@ -58,7 +58,7 @@ def fix(lines):
     # Rolling window of the last two emitted instructions. A function only ends
     # at `jr ra` plus its delay slot, so that pair is what makes a following
     # label a real boundary rather than a branch target inside the function.
-    prev_insn = prev_prev_insn = ""
+    prev_insn = prev_prev_insn = prev_prev_prev_insn = ""
 
     for line in lines:
         stripped = line.rstrip("\n")
@@ -94,7 +94,23 @@ def fix(lines):
             # its own jump tables end up pointing outside it and sizing fails
             # ("Failed to determine size of jump table"). func_0029C270 came
             # out 0x28 bytes against a body of 0x658 that way.
-            if not JR_RA_RE.match(prev_prev_insn):
+            # The window skips alignment padding. The rule is that a function
+            # ends at `jr ra` plus its delay slot, but the assembler pads to
+            # the next boundary, so what actually precedes the next label is
+            #
+            #     jr    $31
+            #      addiu $29, $29, 0x30      <- delay slot
+            #     nop                        <- padding
+            #     .globl func_00227240
+            #
+            # and looking exactly two instructions back finds the delay slot
+            # instead of the return. Those labels stayed NOTYPE with no `.end`,
+            # so gas recorded size 0, and N64Recomp skips a zero-sized symbol
+            # when resolving a call: "No function found for jal target:
+            # 0x00227240". 455 functions were in that state.
+            if not (JR_RA_RE.match(prev_prev_insn)
+                    or (prev_insn.strip() == "nop"
+                        and JR_RA_RE.match(prev_prev_prev_insn))):
                 yield line
                 continue
 
@@ -129,7 +145,8 @@ def fix(lines):
             continue
 
         if INSN_RE.match(stripped):
-            prev_prev_insn, prev_insn = prev_insn, stripped
+            prev_prev_prev_insn, prev_prev_insn, prev_insn = (
+                prev_prev_insn, prev_insn, stripped)
 
         yield line
         if stripped.strip() == ".set noreorder":

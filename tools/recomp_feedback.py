@@ -50,6 +50,11 @@ REJECTED = ROOT / "versions" / "rejected_boundaries.us.txt"
 # one. `function_seed.py` merges this file into its output.
 MISSING = ROOT / "versions" / "recomp_seeds.us.txt"
 
+# Past this, a forward branch says more about the start than about the extent.
+# The largest real function the segmentation has produced is a few KB; 0x12580
+# is not a function, it is a wrong boundary picking up someone else's branch.
+MAX_FUNCTION_SPAN = 0x4000
+
 # Unhandled branch in func_00262CFC at 0x00262D04 to 0x00262CF4
 BRANCH = re.compile(
     r"Unhandled branch in (\S+?) at 0x([0-9A-Fa-f]+) to 0x([0-9A-Fa-f]+)")
@@ -141,7 +146,19 @@ def harvest(text):
             # func_004208E0 jumps to 0x00420C18, which objdump names
             # `.L00420BC8+0x50` -- 0x50 into a label, so not an entry. The
             # label at 0x00420BC8 was the false boundary.
-            backward |= {a for a in seeded_now if start < a <= t}
+            #
+            # Bounded, because the reasoning inverts past a certain distance.
+            # A function reaching 0x12580 forward is far less likely than a
+            # wrong start, and clearing a span that wide would drop hundreds of
+            # sound boundaries with it. func_00293D8C is the case: its first
+            # instruction is `bne t2,at,2a630c`, 75 KB away and landing in
+            # rodata, and its second is `addiu sp,sp,-40`. The function starts
+            # at 0x00293D90 and the `bne` belongs to whatever precedes it, so
+            # the start we declared is what is wrong.
+            if t - start > MAX_FUNCTION_SPAN:
+                backward.add(start)
+            else:
+                backward |= {a for a in seeded_now if start < a <= t}
     for name, target in OUTSIDE.findall(text):
         start = addr_of(name)
         if start is not None and int(target, 16) < start:
@@ -192,6 +209,36 @@ def main():
     text = args.log.read_text(errors="replace")
     backward, forward = harvest(text)
     missing = {int(a, 16) for a in NOFUNC.findall(text)}
+
+    # A target outside every code section cannot be given a symbol, so asking
+    # for it again every run is a loop that never ends. What is wrong is the
+    # function that names it.
+    #
+    # N64Recomp resolves a branch leaving its function like a call, so this
+    # message covers branches too, and func_00293D8C is one: its first
+    # instruction is `bne t2,at,2a630c`, 75 KB forward into rodata, and its
+    # second is `addiu sp,sp,-40`. The function starts one instruction later
+    # and the `bne` is the tail of whatever precedes it.
+    #
+    # Pairing the two messages is sound here, unlike the jump-table case,
+    # because both are written to stderr -- which is unbuffered, so adjacency
+    # in that stream is real adjacency.
+    import sys
+    sys.path.insert(0, str(ROOT / "tools"))
+    from function_seed import load_code_segments, vram_to_segment
+    segments = load_code_segments()
+    unplaceable = {a for a in missing if not vram_to_segment(segments, a)}
+    if unplaceable:
+        for m in re.finditer(
+                r"No function found for jal target: 0x([0-9A-Fa-f]+)\s*\n"
+                r"Error (?:in )?recompiling ([A-Za-z_.][A-Za-z0-9_.]*)", text):
+            if int(m.group(1), 16) in unplaceable:
+                caller = addr_of(m.group(2))
+                if caller is not None:
+                    backward.add(caller)
+        missing -= unplaceable
+        print(f"targets outside every section (caller rejected instead): "
+              f"{len(unplaceable):,}")
     print(f"call targets with no function: {len(missing):,}")
     print(f"false boundaries (branch goes back past the start): {len(backward):,}")
     for a in sorted(backward):
