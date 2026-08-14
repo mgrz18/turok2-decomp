@@ -142,7 +142,29 @@ def main():
     sizeless = elf_sizeless()
     all_starts = sorted(starts + sorted(sizeless))
     sections = elf_sections()
+    # Addresses objdump rendered as `.word` rather than an instruction.
+    data_words = []
+    dis = ROOT / "build" / "dis.txt"
+    if dis.exists():
+        for line in dis.read_text(errors="replace").splitlines():
+            m = re.match(r"^\s*([0-9a-f]+):\s+[0-9a-f]{8}\s+\.word\b", line)
+            if m:
+                data_words.append(int(m.group(1), 16))
+    data_words.sort()
     by_name = {name for _v, _s, name in funcs}
+
+    # Addresses already stubbed. Declaring one again puts a second, unstubbed
+    # function at the same vram, and the recompiler then tries to translate the
+    # very thing the stub exists to avoid: entry_002A31FC failed on
+    # `mfc0 $10` while func_002A31FC, the same address, was stubbed for exactly
+    # that COP0 access.
+    stubbed = set()
+    toml = ROOT / "turok2.us.toml"
+    if toml.exists():
+        block = re.search(r"stubs = \[(.*?)\n\]", toml.read_text(), re.S)
+        if block:
+            for m in re.finditer(r'"(\S*?([0-9A-Fa-f]{8}))"', block.group(1)):
+                stubbed.add(int(m.group(2), 16))
 
     entries = []
     unplaced = 0
@@ -165,6 +187,9 @@ def main():
         if vram == target:
             continue                      # a sized function starts here already
 
+        if target in stubbed:
+            continue                      # the stub already covers this address
+
         if target < vram + size:
             # A second entry into a sized function. It runs to that function's
             # end, since that is where the shared body stops.
@@ -183,9 +208,83 @@ def main():
                 unplaced += 1
                 continue
             length = all_starts[j] - target
+
         else:
             unplaced += 1                 # inside no function at all
             continue
+
+        # Truncate where objdump stops seeing instructions. "Runs to whatever
+        # begins next" overshoots when what sits between is data rather than
+        # another symbol: entry_002010C0 came out 1812 bytes and swept up
+        # `.word 0x794c6179` at 0x002017AC -- the tail of the string
+        # "meSkyLay" -- which N64Recomp reports as "Unhandled instruction:
+        # INVALID".
+        #
+        # The last `jr ra` in the span is not the anchor. There is one at
+        # 0x002017CC, past the data, because a random word in a string pool can
+        # equal 0x03E00008. objdump has already made the judgement and written
+        # `.word`, so that is what to trust -- the same signal
+        # word_bodied_funcs.py uses.
+        first_data = None
+        for bad in data_words:
+            if target < bad < target + length:
+                first_data = bad
+                break
+
+        # objdump's `.word` is not the only tell. A string can decode as a
+        # perfectly ordinary-looking instruction: 0x74656D44 is "temD" and
+        # renders as `jalx`, which N64Recomp still rejects as INVALID. Text is
+        # the more reliable signal -- four printable bytes in a row do not
+        # happen by accident in compiled MIPS.
+        base = vram_to_rom(segments, target)
+        if base is not None:
+            for k in range(0, length, 4):
+                if base + k + 4 > len(rom):
+                    break
+                if target + k >= (first_data or 1 << 32):
+                    break
+                chunk = rom[base + k:base + k + 4]
+                if all(0x20 <= b < 0x7F for b in chunk):
+                    first_data = target + k
+                    break
+
+        # Back up to the last return before the data, so the function ends at
+        # its own epilogue rather than in the middle of one.
+        if first_data is not None and base is not None:
+            end = first_data - target
+            last = None
+            for k in range(0, end, 4):
+                if struct.unpack_from(">I", rom, base + k)[0] == 0x03E00008:
+                    last = k
+            length = (last + 8) if last is not None else end
+        # Stretch to cover the function's own branches. A branch cannot leave
+        # its function, so if one inside the declared range lands past the end,
+        # the range is short -- which the recompiler reports as "Unhandled
+        # branch in entry_00418CA4". Bounded by whatever data was found above,
+        # so growing it can never swallow the string pool the trim just avoided.
+        if base is not None:
+            limit = (first_data - target) if first_data is not None else length * 4
+            grew = True
+            while grew and length < limit:
+                grew = False
+                for k in range(0, length, 4):
+                    if base + k + 4 > len(rom):
+                        break
+                    dest = branch_target(
+                        struct.unpack_from(">I", rom, base + k)[0], target + k)
+                    op = struct.unpack_from(">I", rom, base + k)[0] >> 26
+                    if dest is None or op == 3:
+                        continue          # a `jal` leaves and comes back
+                    if op == 2 and dest in targets:
+                        continue          # a `j` to an entry is a tail call
+                    # Everything else stays inside: a conditional branch cannot
+                    # leave its function, and a `j` to an address that is nobody's
+                    # entry is the jump to a shared epilogue. entry_00418CA4 has
+                    # one at 0x00418CB0 reaching 0x00418D44, 0xA0 past a body
+                    # declared 104 bytes long.
+                    if target < dest and dest - target >= length:
+                        length = min(dest - target + 4, limit)
+                        grew = True
 
         section = next((n for n, sv, ss in sections if sv <= target < sv + ss), None)
         if section is None or length <= 0:
