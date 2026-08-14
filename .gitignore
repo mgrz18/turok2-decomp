@@ -64,3 +64,5 @@ versions/undefined_funcs_extra.us.txt
 
 # Instrucciones de workspace para Claude Code — locales, no se publican
 CLAUDE.md
+RecompiledFuncs/
+turok2.us.toml.local

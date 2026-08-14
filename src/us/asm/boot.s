@@ -33,7 +33,12 @@
 
 # ----- boot_main (== romMain at 0x80000400) -------------------------------
 
+# `.ent`/`.end` are what make gas emit these as STT_FUNC with a size. Without
+# them the symbols land as NOTYPE/size 0, and N64Recomp — which only walks FUNC
+# symbols — reports "Could not find entrypoint function" for 0x80000400.
+# They are metadata: the emitted .text bytes are unchanged.
 .globl boot_main
+.ent boot_main
 boot_main:
 /* 1000 80000400 */  la         $sp, 0x80400000 - 0x40    # sp = 0x803EFFC0
 /* 1008 80000408 */  addiu      $a0, $zero, 0x1E          # TLB clear loop counter
@@ -69,10 +74,12 @@ boot_main:
 /* 107C 8000047C */  jalr       $a0
 /* 1080 80000480 */   nop
 /* 1084 80000484 */  .word      0x0001008d                # break 1, 2
+.end boot_main
 
 # ----- STVM_MapTLB (== func_80000488) -------------------------------------
 
 .globl STVM_MapTLB
+.ent STVM_MapTLB
 STVM_MapTLB:
 /* 1088 80000488 */  lw         $t8, 0x10($sp)            # paddr1 (caller slot)
 /* 108C 8000048C */  addi       $t0, $zero, 7
@@ -107,3 +114,4 @@ STVM_MapTLB:
 /* 10F4 800004F4 */  mtc0       $t0, $10                  # restore EntryHi
 /* 10F8 800004F8 */  jr         $ra
 /* 10FC 800004FC */   nop
+.end STVM_MapTLB

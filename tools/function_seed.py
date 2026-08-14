@@ -146,7 +146,7 @@ def load_existing():
     return known
 
 
-def harvest_link_log(path, segments):
+def harvest_link_log(path, segments, rom):
     """Split `ld` undefined references into seedable vs absolute-only.
 
     The linker names every address the disassembly reaches that we failed to
@@ -180,9 +180,30 @@ def harvest_link_log(path, segments):
         # matter where we seed them. Those always go the absolute route.
         if name.startswith(".L") or not vram_to_segment(segments, addr):
             outside[name] = addr
-        else:
+        elif is_function_start(rom, segments, addr):
             inside[name] = addr
+        else:
+            # Inside a segment but not at a function boundary: a jump-table or
+            # branch target in the middle of a function. Seeding it makes splat
+            # cut the function there, and N64Recomp then rejects the piece with
+            # "Unhandled branch" because the body jumps past its own end.
+            outside[name] = addr
     return inside, outside
+
+
+def is_function_start(rom, segments, addr):
+    """True when `addr` sits right after a `jr ra` + delay slot in the ROM."""
+    off = vram_to_rom(segments, addr)
+    if off is None or off < 8 or off >= len(rom) - 3:
+        return False
+    return struct.unpack_from(">I", rom, off - 8)[0] == JR_RA
+
+
+def vram_to_rom(segments, addr):
+    for start, end, vram, _name in segments:
+        if vram <= addr < vram + (end - start):
+            return start + (addr - vram)
+    return None
 
 
 def main():
@@ -194,7 +215,8 @@ def main():
 
     if args.from_link_log:
         segments = load_code_segments()
-        inside, outside = harvest_link_log(args.from_link_log, segments)
+        inside, outside = harvest_link_log(args.from_link_log, segments,
+                                           ROM.read_bytes())
         print(f"simbolos sin definir en el log : {len(inside) + len(outside):,}")
         print(f"  dentro de segmento (sembrar) : {len(inside):,}")
         print(f"  fuera  de segmento (absoluto): {len(outside):,}")
