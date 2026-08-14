@@ -23,14 +23,18 @@ use_absolute_symbols = true
 
 
 manual_funcs = [
-    { name = "entry_00201580", section = ".code", vram = 0x00201580, size = 552 },
     { name = "entry_00207C48", section = ".code", vram = 0x00207C48, size = 28 },
     { name = "entry_00207C58", section = ".code", vram = 0x00207C58, size = 12 },
     { name = "entry_00207FC0", section = ".code", vram = 0x00207FC0, size = 44 },
     { name = "entry_00207FD0", section = ".code", vram = 0x00207FD0, size = 28 },
     { name = "entry_00226F90", section = ".code", vram = 0x00226F90, size = 500 },
+    { name = "entry_00228910", section = ".code", vram = 0x00228910, size = 416 },
+    { name = "entry_00229340", section = ".code", vram = 0x00229340, size = 728 },
     { name = "entry_00232D60", section = ".code", vram = 0x00232D60, size = 8 },
     { name = "entry_0023587C", section = ".code", vram = 0x0023587C, size = 28 },
+    { name = "entry_00240800", section = ".code", vram = 0x00240800, size = 1680 },
+    { name = "entry_00241860", section = ".code", vram = 0x00241860, size = 52 },
+    { name = "entry_00241960", section = ".code", vram = 0x00241960, size = 848 },
     { name = "entry_002572B8", section = ".code", vram = 0x002572B8, size = 16 },
     { name = "entry_00257350", section = ".code", vram = 0x00257350, size = 16 },
     { name = "entry_00257394", section = ".code", vram = 0x00257394, size = 8 },
@@ -653,7 +657,8 @@ manual_funcs = [
     { name = "entry_00429CA4", section = ".virtual", vram = 0x00429CA4, size = 120 },
     { name = "entry_00429CD4", section = ".virtual", vram = 0x00429CD4, size = 72 },
     { name = "entry_00429D54", section = ".virtual", vram = 0x00429D54, size = 48 },
-    { name = "entry_00429DD4", section = ".virtual", vram = 0x00429DD4, size = 16 },
+    { name = "entry_00429DD4", section = ".virtual", vram = 0x00429DD4, size = 40 },
+    { name = "entry_00429DE4", section = ".virtual", vram = 0x00429DE4, size = 24 },
     { name = "entry_00429E40", section = ".virtual", vram = 0x00429E40, size = 132 },
     { name = "entry_0042A44C", section = ".virtual", vram = 0x0042A44C, size = 1588 },
     { name = "entry_0042A594", section = ".virtual", vram = 0x0042A594, size = 1260 },
@@ -737,8 +742,7 @@ stubs = [
     "func_002A31C8",  # cache
     "func_002A31E4",  # mfc0 Status
     "func_002A31F0",  # mtc0 Status
-    "func_002A31FC",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 EntryHi, mtc0 Index, tlbr
-    "func_002A3280",  # eret, mfc0 Cause, mfc0 EPC, mfc0 ErrorEPC, mtc0 Cause, mtc0 EPC, mtc0 ErrorEPC, mtc0 Status, mtc0 c0r18, mtc0 c0r19
+    "func_002A31FC",  # eret, mfc0 Cause, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 PageMask, mtc0 Cause, mtc0 EPC, mtc0 EntryHi, mtc0 ErrorEPC, mtc0 Index, mtc0 Status, mtc0 c0r18, mtc0 c0r19, tlbr
     "func_002A3774",  # eret, mfc0 EPC, mfc0 ErrorEPC, mtc0 EPC
     "func_002A37CC",  # mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 c0r18
     "func_002A51E0",  # cache, eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 c0r1, mtc0 c0r18, mtc0 c0r19, mtc0 c0r25, mtc0 c0r7, tlbp, tlbr, tlbwi

@@ -122,7 +122,15 @@ def main():
 
     entries = []
     unplaced = 0
-    for target in sorted(targets - seeded):
+    # Not `targets - seeded`. Being seeded is not the same as being usable: a
+    # seed at a second entry point comes out of gas with no size, because
+    # fix_asm.py rightly declines to promote a label whose preceding
+    # instructions are not a return, and the symbol stays NOTYPE with no
+    # `.end`. N64Recomp skips a zero-sized symbol when resolving a call, so
+    # `func_00241860` was seeded, emitted, and still reported as "No function
+    # found for jal target". The ELF is what decides -- a target only needs no
+    # declaring if a *sized* function starts exactly there.
+    for target in sorted(targets):
         # It only needs declaring if no function starts there.
         i = bisect.bisect_right(starts, target) - 1
         if i < 0:
