@@ -1,0 +1,197 @@
+{
+  "files": {
+    "1100": {
+      "lines": 31047,
+      "words": 24904,
+      "instructions": 5816,
+      "labels": 111,
+      "is_code": true,
+      "prologues": 218
+    },
+    "1F100": {
+      "lines": 39569,
+      "words": 37,
+      "instructions": 37319,
+      "labels": 35,
+      "is_code": true,
+      "prologues": 320
+    },
+    "438B0": {
+      "lines": 106383,
+      "words": 14705,
+      "instructions": 86105,
+      "labels": 100,
+      "is_code": true,
+      "prologues": 1225
+    },
+    "C2ED8": {
+      "lines": 132,
+      "words": 0,
+      "instructions": 103,
+      "labels": 7,
+      "is_code": true,
+      "prologues": 3
+    },
+    "A5FD8.rodata": {
+      "lines": 33775,
+      "words": 13294,
+      "instructions": 0,
+      "labels": 3115,
+      "is_code": false,
+      "prologues": 0
+    },
+    "C0950.rodata": {
+      "lines": 2416,
+      "words": 2402,
+      "instructions": 0,
+      "labels": 3,
+      "is_code": false,
+      "prologues": 0
+    },
+    "F7F50.data": {
+      "lines": 15736,
+      "words": 15404,
+      "instructions": 0,
+      "labels": 109,
+      "is_code": false,
+      "prologues": 0
+    },
+    "os_rodata.data": {
+      "lines": 26575,
+      "words": 23946,
+      "instructions": 0,
+      "labels": 193,
+      "is_code": false,
+      "prologues": 0
+    },
+    "virtual_rodata_0.data": {
+      "lines": 11912,
+      "words": 11904,
+      "instructions": 0,
+      "labels": 1,
+      "is_code": false,
+      "prologues": 0
+    },
+    "virtual_rodata_1.data": {
+      "lines": 12680,
+      "words": 12672,
+      "instructions": 0,
+      "labels": 1,
+      "is_code": false,
+      "prologues": 0
+    },
+    "virtual_rodata_2.data": {
+      "lines": 49030,
+      "words": 48461,
+      "instructions": 0,
+      "labels": 188,
+      "is_code": false,
+      "prologues": 0
+    },
+    "header": {
+      "lines": 16,
+      "words": 10,
+      "instructions": 0,
+      "labels": 0,
+      "is_code": true,
+      "prologues": 0
+    },
+    "libaudio": {
+      "lines": 6051,
+      "words": 4119,
+      "instructions": 1636,
+      "labels": 47,
+      "is_code": true,
+      "prologues": 80
+    },
+    "os_text_audio_sched": {
+      "lines": 2447,
+      "words": 2335,
+      "instructions": 73,
+      "labels": 6,
+      "is_code": true,
+      "prologues": 24
+    },
+    "os_text_exception": {
+      "lines": 1425,
+      "words": 1408,
+      "instructions": 0,
+      "labels": 2,
+      "is_code": true,
+      "prologues": 5
+    },
+    "os_text_gu": {
+      "lines": 4130,
+      "words": 4014,
+      "instructions": 82,
+      "labels": 5,
+      "is_code": true,
+      "prologues": 51
+    },
+    "os_text_io": {
+      "lines": 6167,
+      "words": 6099,
+      "instructions": 45,
+      "labels": 3,
+      "is_code": true,
+      "prologues": 65
+    },
+    "os_text_msg_timer": {
+      "lines": 4858,
+      "words": 2858,
+      "instructions": 1750,
+      "labels": 27,
+      "is_code": true,
+      "prologues": 47
+    },
+    "os_text_tail": {
+      "lines": 1176,
+      "words": 213,
+      "instructions": 803,
+      "labels": 16,
+      "is_code": true,
+      "prologues": 1
+    },
+    "os_text_thread": {
+      "lines": 3200,
+      "words": 2733,
+      "instructions": 339,
+      "labels": 24,
+      "is_code": true,
+      "prologues": 31
+    },
+    "virtual_text_0": {
+      "lines": 64555,
+      "words": 64460,
+      "instructions": 56,
+      "labels": 5,
+      "is_code": true,
+      "prologues": 705
+    },
+    "virtual_text_1": {
+      "lines": 46357,
+      "words": 46336,
+      "instructions": 0,
+      "labels": 3,
+      "is_code": true,
+      "prologues": 551
+    },
+    "virtual_text_2": {
+      "lines": 33994,
+      "words": 20,
+      "instructions": 31980,
+      "labels": 20,
+      "is_code": true,
+      "prologues": 371
+    }
+  },
+  "totals": {
+    "lines": 351507,
+    "words": 174251,
+    "instructions": 166107,
+    "labels": 411,
+    "prologues": 3697,
+    "symbols": 199,
+    "data_lines": 152124
+  }
+}
