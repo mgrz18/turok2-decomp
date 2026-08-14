@@ -34,6 +34,7 @@ ROOT = Path(__file__).resolve().parent.parent
 ROM = ROOT / "baserom.us.z64"
 YAML = ROOT / "versions" / "turok2.us.yaml"
 OUT = ROOT / "versions" / "symbols_from_scan.us.txt"
+ABSOLUTE = ROOT / "versions" / "undefined_funcs_extra.us.txt"
 EXISTING = ROOT / "versions" / "symbol_addrs.us.txt"
 
 JAL_OPCODE = 0x03          # 000011
@@ -145,10 +146,94 @@ def load_existing():
     return known
 
 
+def harvest_link_log(path, segments):
+    """Split `ld` undefined references into seedable vs absolute-only.
+
+    The linker names every address the disassembly reaches that we failed to
+    define -- including function-pointer and jump-table targets, which a `jal`
+    scan cannot see. Two different fixes apply:
+
+    * address inside a known segment -> seed it, so splat emits a real label
+      there. This is the case worth having: it adds a function boundary, which
+      is the actual deliverable for N64Recomp.
+    * address outside every segment -> nothing can place it yet, so define it
+      absolutely for the linker. A `jal` to an absolute symbol still assembles
+      back to the original word, so byte-exactness is unaffected.
+    """
+    import re
+
+    names = set()
+    with open(path, errors="replace") as fh:
+        for line in fh:
+            m = re.search(r"undefined reference to `([^']+)'", line)
+            if m:
+                names.add(m.group(1))
+
+    inside, outside = {}, {}
+    for name in names:
+        m = re.search(r"(8[0-9A-Fa-f]{7})", name)
+        if not m:
+            continue
+        addr = int(m.group(1), 16)
+        # GNU as keeps `.L`-prefixed symbols local, so they never reach the
+        # symbol table and cross-object references to them cannot resolve no
+        # matter where we seed them. Those always go the absolute route.
+        if name.startswith(".L") or not vram_to_segment(segments, addr):
+            outside[name] = addr
+        else:
+            inside[name] = addr
+    return inside, outside
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--write", action="store_true", help="escribir el archivo de seeds")
+    ap.add_argument("--from-link-log", type=Path,
+                    help="cosechar simbolos sin definir de un log de ld")
     args = ap.parse_args()
+
+    if args.from_link_log:
+        segments = load_code_segments()
+        inside, outside = harvest_link_log(args.from_link_log, segments)
+        print(f"simbolos sin definir en el log : {len(inside) + len(outside):,}")
+        print(f"  dentro de segmento (sembrar) : {len(inside):,}")
+        print(f"  fuera  de segmento (absoluto): {len(outside):,}")
+        if args.write:
+            existing = OUT.read_text() if OUT.exists() else ""
+            extra = [f"{n} = 0x{a:08X}; // type:func"
+                     for n, a in sorted(inside.items(), key=lambda kv: kv[1])
+                     if n not in existing]
+            if extra:
+                with OUT.open("a") as fh:
+                    fh.write("\n// Cosechados de referencias sin definir del linker.\n")
+                    fh.write("\n".join(extra) + "\n")
+            # Merge, never replace: each link pass only reports what still
+            # fails, so overwriting would drop everything a previous pass
+            # already fixed and the link would regress.
+            merged = dict(outside)
+            if ABSOLUTE.exists():
+                for line in ABSOLUTE.read_text(errors="replace").splitlines():
+                    line = line.strip()
+                    if not line or line.startswith(("/*", "*", "//")) or "=" not in line:
+                        continue
+                    name, _, value = line.partition("=")
+                    try:
+                        merged.setdefault(name.strip(),
+                                          int(value.strip().rstrip(";"), 16))
+                    except ValueError:
+                        continue
+            ABSOLUTE.write_text(
+                "/* Generado por tools/function_seed.py --from-link-log.\n"
+                " * Direcciones que ningun segmento ubica todavia; se definen\n"
+                " * absolutas para que el link cierre. Un jal a un simbolo\n"
+                " * absoluto reensambla al word original. */\n"
+                + "\n".join(f"{n} = 0x{a:08X};"
+                            for n, a in sorted(merged.items(), key=lambda kv: kv[1]))
+                + "\n")
+            print(f"\nsembrados nuevos : {len(extra):,} -> {OUT.relative_to(ROOT)}")
+            print(f"absolutos        : {len(merged):,} "
+                  f"({len(outside):,} de este log) -> {ABSOLUTE.relative_to(ROOT)}")
+        return
 
     if not ROM.exists():
         sys.exit(f"falta {ROM}")
