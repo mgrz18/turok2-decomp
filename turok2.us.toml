@@ -34,6 +34,62 @@ manual_funcs = [
 # 25 of those 75 were `.L` local branch labels, so stubbing them deletes real
 # code paths rather than isolating unsupported ones. See #32.
 stubs = [
+    ".L0029C170",  # mfc0 EPC
+    ".L0029C2B8",  # mfc0 Compare, mtc0 Compare
+    ".L0029C4F4",  # mtc0 Cause
+    ".L0029C518",  # mtc0 Cause
+    ".L0029C554",  # mfc0 BadVAddr
+    ".L002A3430",  # mtc0 EPC, mtc0 Status, mtc0 c0r18
+    "D_0029BFF0",  # mfc0 Cause, mfc0 Status, mtc0 Status
+    "D_002A3090",  # mtc0 ErrorEPC
+    "D_002A30C8",  # mtc0 ErrorEPC
+    "D_002A3310",  # mfc0 Cause, mfc0 EPC, mtc0 Cause
+    "func_00201074",  # mfc0 c0r19, mtc0 c0r18
+    "func_0028EE40",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, mtc0 PageMask, tlbwi
+    "func_0028EEC0",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, tlbr, tlbwi
+    "func_0029C200",  # mfc0 Cause
+    "func_0029C6DC",  # mfc0 Status
+    "func_0029C930",  # mtc0 EPC, mtc0 Status
+    "func_0029CACC",  # eret
+    "func_0029DFC0",  # mfc0 Count
+    "func_0029DFE0",  # mfc0 Status
+    "func_0029DFF0",  # mfc0 Status, mtc0 Status
+    "func_0029E010",  # mfc0 Status, mtc0 Status
+    "func_0029E140",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 Index, mfc0 PageMask, mtc0 EntryHi, tlbp, tlbr
+    "func_0029E210",  # mtc0 Compare
+    "func_0029E230",  # mfc0 Status, mtc0 Status
+    "func_0029E2E0",  # mtc0 Status
+    "func_0029E2F0",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, tlbwi
+    "func_002A31E4",  # mfc0 Status
+    "func_002A31F0",  # mtc0 Status
+    "func_002A31FC",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 Index, tlbr
+    "func_002A325C",  # mtc0 EntryHi
+    "func_002A3280",  # mfc0 Cause
+    "func_002A34C4",  # eret, mfc0 ErrorEPC, mtc0 ErrorEPC, mtc0 c0r19
+    "func_002A3708",  # eret, mfc0 EPC, mfc0 ErrorEPC, mtc0 EPC
+    "func_002A37CC",  # mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 c0r18
+    "func_002A5310",  # eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 c0r1, mtc0 c0r18, mtc0 c0r19, mtc0 c0r25, mtc0 c0r7, tlbp, tlbr, tlbwi
+    "func_00425710",  # mfc0 c0r19, mtc0 c0r18
+    "func_00430500",  # mfc0 BadVAddr, mfc0 Context, mfc0 EPC, mfc0 EntryHi, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r20, mfc0 c0r21, mfc0 c0r24, mfc0 c0r28, mfc0 c0r31, mtc0 Context, mtc0 Index, mtc0 c0r25
+    "func_0045E630",  # mfc0 c0r19, mtc0 c0r18
+    "func_00469374",  # mfc0 BadVAddr, mfc0 Context, mfc0 EPC, mfc0 EntryHi, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r20, mfc0 c0r21, mfc0 c0r24, mfc0 c0r28, mfc0 c0r31, mtc0 Context, mtc0 Index, mtc0 c0r25
+    "func_00480700",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, mtc0 PageMask, tlbwi
+    "func_004807BC",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 Index, tlbr
+    "func_0048D8A0",  # mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 EPC, mfc0 Status, mtc0 Cause, mtc0 Compare, mtc0 Status
+    "func_0048E1A0",  # eret, mtc0 EPC, mtc0 Status
+    "func_0048F87C",  # mfc0 Count
+    "func_0048F89C",  # mfc0 Status
+    "func_0048F8AC",  # mfc0 Status, mtc0 Status
+    "func_0048F8D0",  # mfc0 Status, mtc0 Status
+    "func_0048F9F8",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 Index, mfc0 PageMask, mtc0 EntryHi, tlbp, tlbr
+    "func_0048FAC8",  # mtc0 Compare
+    "func_0048FAF0",  # mfc0 Status, mtc0 Status
+    "func_0048FB98",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, mtc0 Status, tlbwi
+    "func_00494948",  # mtc0 ErrorEPC
+    "func_00494AA4",  # mfc0 Status
+    "func_00494AB0",  # mtc0 Status
+    "func_00494ABC",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 EntryHi, mtc0 Index, tlbr
+    "func_00494B40",  # eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 Wired, mtc0 c0r1, mtc0 c0r15, mtc0 c0r16, mtc0 c0r17, mtc0 c0r18, mtc0 c0r19, mtc0 c0r20, mtc0 c0r21, mtc0 c0r22, mtc0 c0r23, mtc0 c0r24, mtc0 c0r25, mtc0 c0r26, mtc0 c0r27, mtc0 c0r28, mtc0 c0r29, mtc0 c0r31, mtc0 c0r7, tlbr
 ]
 ignored = [
 ]
