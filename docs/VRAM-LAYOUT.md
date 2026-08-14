@@ -113,6 +113,32 @@ matching known-good code exactly, while `0x13B5F0`–`0x14A000` sits at 7.2 —
 mixed content, neither code nor pure data. That stretch is parked as
 `pre_virtual` (bin) until it is identified.
 
+## The ROM carries libultra three times
+
+Searching for TLB opcodes turned up 37 `tlbr`/`tlbwi`/`tlbp`/`eret` instructions
+in three groups whose *relative* spacing is identical (`+0x3C`, `+0x74`,
+`+0xDC38`, `+0xF2C8`). Comparing only opcode fields, so immediates and addresses
+drop out, gives **98.7-98.8%** agreement over 64 KB against a control of 10.7%.
+It is the same code linked at three different base addresses.
+
+| copy | ROM range | size |
+|---|---|---|
+| A | `0x08AAA0`-`0x0C2AA0` | 224 KB |
+| B | `0x0C3AA0`-`0x0FBAA0` | 224 KB |
+| C (partial) | `0x1CA760`-`0x1DF760` | 84 KB |
+
+A and B sit `0x39000` apart, the offset `MICROCODE.md` already noted for a
+"duplicate ucode copy". The duplication is far larger than that: it covers all
+of libultra.
+
+Copy B is essentially the declared `libultra` segment. Copy A falls inside the
+declared `code` segment, so the tail of `code` is misattributed.
+
+This is also why delta voting kept returning several plausible winners: when the
+same code exists at more than one ROM offset, more than one delta genuinely
+aligns `jal` targets onto prologues. Treat every mapping below as provisional
+until each caller is traced to the copy it actually reaches (#29).
+
 ## Still open
 
 - The `code`/`rodata` boundary at ROM `0xA5FD8` is where the strings start
