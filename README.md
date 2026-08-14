@@ -80,24 +80,24 @@ The goal is a native binary, not source code, so the recompiler comes before any
 matching. N64Recomp consumes an ELF with function boundaries — it does not need
 matched C, and a byte-exact ROM is a validation step rather than a prerequisite.
 
-### Phase 1 — Bootstrap ✅
+### Phase 1 — Bootstrap (complete)
 - [x] Confirm ROM dump (SHA1 verified)
 - [x] Toolchain working (SN64 binaries; splat runs natively on arm64)
 - [x] First splat pass produces asm + linker script
 - [x] Entry point confirmed at `0x80000400` (`romMain`)
 
-### Phase 2 — Microcode triage ✅
+### Phase 2 — Microcode triage (complete)
 - [x] Dump RSP `ucode_text` / `ucode_data` and diff against stock
 - [x] **Verdict: stock `F3DEX.NoN fifo 2.05` + `aspMain`.** No custom RSP code, so
       RT64 needs no microcode work — go on the native-port path
 
-### Phase 3 — Segmentation and symbols 🔶
+### Phase 3 — Segmentation and symbols (in progress)
 - [x] Recover the memory map: code in useg (TLB-mapped), data and libultra in KSEG0
 - [x] 95.2% of the ROM decoded, 13,275 functions delimited
 - [x] ELF links; ROM rebuilds to within 108 bytes of the original
 - [ ] Locate the `virtual` segment's real start ([#23](https://github.com/mgrz18/turok2-decomp/issues/23))
 
-### Phase 4 — Recomp 🔶
+### Phase 4 — Recomp (in progress)
 - [x] N64Recomp runs against the ELF
 - [ ] Full C output without errors
 - [ ] TLB: the engine pages code through the TLB and N64Recomp does not support it
