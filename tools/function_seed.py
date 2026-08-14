@@ -107,8 +107,8 @@ def vram_to_segment(segments, addr):
 
 
 def _is_virtual(addr):
-    """The provisionally-mapped VM window — see the note in scan()."""
-    return 0x00400000 <= addr < 0x004C4340
+    """The one VM module whose calls do not resolve — see the note in scan()."""
+    return 0x00475A00 <= addr < 0x00494E00
 
 
 def in_overlay(segments, addr):
@@ -169,20 +169,33 @@ def scan(rom, segments):
         for off in range(start, end, 4):
             word = struct.unpack_from(">I", rom, off)[0]
 
-            # The `virtual` segment's mapping is still provisional — delta
-            # voting gave it 46.7% against ~1% chance, which is well above
-            # noise but far from the 65.6% the engine scored (#23). At that
-            # confidence a good share of what reads as `jal` there is data,
-            # and the targets it produces are noise.
+            # Only the third VM module is held back, not the whole window.
             #
-            # Measured: of the cross-section calls landing at an address with
-            # no boundary evidence at all, 1,680 come from `virtual` and 3
-            # from `code`. Seeding those fragments real engine functions, and
-            # that is what has been making boundary fixes oscillate — each
-            # pass corrected one class and the noise re-broke another.
+            # Scoring each caller by how often its calls land on a function
+            # boundary — `jr ra` two instructions before, or a prologue at the
+            # target — separates them cleanly. Chance is ~1.2%.
             #
-            # So `virtual` contributes prologues, which are local evidence,
-            # but not jal targets, which depend on its mapping being right.
+            #     code                 88.0%
+            #     virtual @0x400000    94.8%
+            #     virtual @0x43C000    79.5%
+            #     virtual @0x475A00     3.6%   <- this one
+            #
+            # The first two are as good as the engine itself, so withholding
+            # them was throwing away sound seeds.
+            #
+            # The third is a second, differently-linked copy of the engine's
+            # top 128 KB: 59.6% of its words are identical to ROM 0x84D40
+            # onwards, and of the calls that do differ, 94.8% differ by
+            # exactly +0x330 in the 26-bit field — +0xCC0 of target address.
+            # Its own base is therefore 0x00284140 + 0xCC0 = 0x00284E00, at
+            # which 82.0% of its calls resolve to a boundary, against 1.7% at
+            # the un-shifted 0x00284140 and 0% where it is mapped today.
+            #
+            # That address overlaps `code`, so it is an overlay — a paged copy
+            # that replaces engine code at runtime — and cannot simply be
+            # re-based in place. Until it is declared as one its targets are
+            # noise, so it contributes prologues, which are local evidence,
+            # and nothing that depends on the layout. See #38.
             if (word >> 26) == JAL_OPCODE and not _is_virtual(vram):
                 # A `jal` carries only bits [27:2]; the top nibble comes from
                 # the delay slot's PC. Hardcoding KSEG0 here was wrong: the
