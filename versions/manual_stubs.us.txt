@@ -1,0 +1,9 @@
+# Not COP0. Functions N64Recomp cannot translate for a structural reason, one
+# per line, with the reason. Merged into the `stubs` block by cop0_stubs.py.
+
+# Duplicated between the two VM modules. Both copies read the jump table at
+# 0x800C0FA8, whose 14 entries (0x419128, 0x419138, ... 0x10 apart) are the
+# case bodies of the copy in virtual_text_0. For this copy they all fall
+# outside its own body, so the table cannot be sized. The virtual_text_0 twin
+# recompiles normally.
+func_00452060

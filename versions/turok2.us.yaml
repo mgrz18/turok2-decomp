@@ -152,6 +152,23 @@ segments:
     vram: 0x800BFD50     # KSEG0: datos, no useg (0xC0950 + 0x7FFFF400)
     subsegments:
       - [0xC0950, rodata]
+
+  # Same split, same reason, and this one is what stopped the recompiler.
+  #
+  # These three functions used to be a subsegment of code_rodata_tail. splat
+  # emits text before data, so 0xC3074-0xC2ED8 = 0x19C bytes of code, aligned
+  # to 0x1A0, were placed ahead of the rodata pool and pushed every jump table
+  # in it 0x1A0 higher in the ELF. The recompiler then read the table for
+  # `jr v0` at 0x00446680 from 0x800C1148 and found 5A000000 59000000 ... --
+  # a descending ramp, not addresses -- and gave up with "Failed to determine
+  # size of jump table". The real table sits 0x1A0 below, and its entries
+  # 0x419128 0x419138 0x419148 0x419158 are exactly that switch's case bodies,
+  # 0x10 apart.
+  - name: code_tail_funcs
+    type: code
+    start: 0xC2ED8
+    vram: 0x800C22D8     # 0xC2ED8 + 0x7FFFF400
+    subsegments:
       - [0xC2ED8, asm]              # 3 last engine funcs (ends @ 0xC3074)
 
   # libultra block, refined in pass 3 via libultra-signature scan:
@@ -244,6 +261,32 @@ segments:
       # The third module is not one of these — see vm_overlay_2 below.
       - [0x14A000, asm,  virtual_text_0]
       - [0x17A600, data, virtual_rodata_0]
+
+  # Split from `virtual` rather than left as two more subsegments of it.
+  #
+  # splat's linker script groups a segment's inputs by type -- every `.text`
+  # first, between virtual_TEXT_START and virtual_TEXT_END, then every `.data`.
+  # That is right for a segment laid out text-then-data and wrong here, because
+  # this ROM interleaves them: text_0, rodata_0, text_1, rodata_1. Grouping
+  # emitted text_0, text_1, rodata_0, rodata_1, so everything after the first
+  # rodata pool sat at the wrong address in the ELF -- virtual_text_1 landed at
+  # 0x430600 while every seed and symbol named it 0x43C000, 0xBA00 away.
+  #
+  # Measured against the ROM at the declared mapping, before the split:
+  #
+  #     virtual_text_0     96.1%      virtual_rodata_0    0.9%
+  #     virtual_text_1      0.6%      virtual_rodata_1   99.0%
+  #
+  # and at the grouped order, 96.1 / 96.1 / 98.2 / 99.0 -- the residual being
+  # relocations, which resolve differently once the addresses move.
+  #
+  # One segment per text/rodata pair keeps each pair in ROM order, since within
+  # a pair text does come first. See #39.
+  - name: virtual_1
+    type: code
+    start: 0x186000
+    vram: 0x0043C000     # 0x400000 + (0x186000 - 0x14A000)
+    subsegments:
       - [0x186000, asm,  virtual_text_1]
       - [0x1B3400, data, virtual_rodata_1]
 

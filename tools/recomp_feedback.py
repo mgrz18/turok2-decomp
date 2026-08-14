@@ -45,6 +45,10 @@ ROOT = Path(__file__).resolve().parent.parent
 # non-boundaries cost 308 sound seeds and 272 KB of emitted C. What lands here
 # instead is only what the recompiler itself rejected, which is ground truth.
 REJECTED = ROOT / "versions" / "rejected_boundaries.us.txt"
+# Call targets the recompiler could not resolve to any function. These are the
+# opposite correction: an address that needs a symbol, not one that has a wrong
+# one. `function_seed.py` merges this file into its output.
+MISSING = ROOT / "versions" / "recomp_seeds.us.txt"
 
 # Unhandled branch in func_00262CFC at 0x00262D04 to 0x00262CF4
 BRANCH = re.compile(
@@ -52,6 +56,8 @@ BRANCH = re.compile(
 # [Warn] Function func_00299EB0 is branching outside of the function (to 0x...)
 OUTSIDE = re.compile(
     r"Function (\S+?) is branching outside of the function \(to 0x([0-9A-Fa-f]+)\)")
+# No function found for jal target: 0x00416B44
+NOFUNC = re.compile(r"No function found for jal target: 0x([0-9A-Fa-f]+)")
 # Failed to determine size of jump table at 0x800A8468 for instruction at 0x0027BB0C
 JTBL = re.compile(
     r"Failed to determine size of jump table at 0x([0-9A-Fa-f]+) "
@@ -167,7 +173,10 @@ def main():
     ap.add_argument("--write", action="store_true", help="merge into the list")
     args = ap.parse_args()
 
-    backward, forward = harvest(args.log.read_text(errors="replace"))
+    text = args.log.read_text(errors="replace")
+    backward, forward = harvest(text)
+    missing = {int(a, 16) for a in NOFUNC.findall(text)}
+    print(f"call targets with no function: {len(missing):,}")
     print(f"false boundaries (branch goes back past the start): {len(backward):,}")
     for a in sorted(backward):
         print(f"  0x{a:08X}")
@@ -176,6 +185,18 @@ def main():
         for a in sorted(forward)[:10]:
             print(f"  0x{a:08X}")
         print("  (these want a seed, not a correction -- left alone)")
+
+    if args.write and missing:
+        have = set()
+        if MISSING.exists():
+            for line in MISSING.read_text().split():
+                try:
+                    have.add(int(line, 16))
+                except ValueError:
+                    pass
+        merged = have | missing
+        MISSING.write_text("\n".join(f"0x{a:08X}" for a in sorted(merged)) + "\n")
+        print(f"seeds added       : {len(merged) - len(have):,}  (total {len(merged):,})")
 
     if args.write and backward:
         have = set()

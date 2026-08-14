@@ -123,6 +123,19 @@ def main():
             if what:
                 found.setdefault(name, set()).add(what)
 
+    # Functions that cannot be translated for a reason other than COP0, listed
+    # by hand with the reason. The only class so far is a routine duplicated
+    # between two VM modules: both copies read the same jump table, whose
+    # entries name the first copy's case bodies, so for the second copy every
+    # entry falls outside its own body and N64Recomp cannot size the table.
+    # Its twin is recompiled normally, so nothing is lost by stubbing it.
+    manual = ROOT / "versions" / "manual_stubs.us.txt"
+    if manual.exists():
+        for line in manual.read_text(errors="replace").splitlines():
+            line = line.split("#")[0].strip()
+            if line:
+                found.setdefault(line, set()).add("manual")
+
     if args.toml:
         print("stubs = [")
         for name in sorted(found):

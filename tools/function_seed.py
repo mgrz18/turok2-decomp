@@ -438,7 +438,21 @@ def main():
     jal_targets, prologues, epilogues, outside, outside_targets = scan(rom, segments)
 
     known = load_existing()
-    found = prologues | jal_targets | epilogues
+    # Targets the recompiler said it could not resolve. They are function
+    # entries by definition -- a `jal` names one -- but our evidence tests miss
+    # them, so they are fed back rather than derived.
+    extra = ROOT / "versions" / "recomp_seeds.us.txt"
+    from_recomp = set()
+    if extra.exists():
+        for line in extra.read_text(errors="replace").split():
+            try:
+                a = int(line, 16)
+            except ValueError:
+                continue
+            if vram_to_segment(segments, a):
+                from_recomp.add((a, None))
+
+    found = prologues | jal_targets | epilogues | from_recomp
     rejected = {t for t in found if t[0] in BAD_BOUNDARIES}
     pairs = sorted(found - rejected, key=lambda t: (t[0], t[1] or ""))
     seeds = [(a, o) for a, o in pairs if a not in known]
@@ -447,6 +461,7 @@ def main():
     print(f"targets de jal           : {len(jal_targets):,}")
     print(f"prologos tras `jr ra`    : {len(prologues):,}")
     print(f"tras `jr ra` + delay slot: {len(epilogues):,}")
+    print(f"realimentados del recomp : {len(from_recomp):,}")
     print(f"union                    : {len(found):,}")
     print(f"  menos límites rechazados: {len(rejected):,}")
     print(f"ya conocidos (symbol_addrs): {len(known):,}")
