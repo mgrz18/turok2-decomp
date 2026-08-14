@@ -81,3 +81,22 @@ func_0045977C
 # called a second entry point into another function in another section, and
 # those addresses are now declared in the `manual_funcs` block of
 # turok2.us.toml by tools/second_entry_points.py. See #41.
+
+# Same class, found by tracking the table base through a register
+# rather than only the `at` form. Their tables' entries name the
+# `virtual` copy's case bodies, so nothing in them falls inside these.
+func_0045342C
+func_00453E58
+func_0045E808
+func_00465B04
+
+# The SN64 boot stub. It sets the stack, then writes Index, EntryHi, EntryLo0
+# and EntryLo1 and issues `tlbwi` to map the engine into useg -- TLB setup and
+# nothing else. N64Recomp has no C for `mfc0 $10` and stops on it, and there
+# would be no point translating it if it could: removing the TLB is the whole
+# approach, and N64ModernRuntime supplies the entry. GoldenRecomp stubs its own
+# `boot` for the same reason.
+#
+# cop0_stubs.py cannot find it on its own -- it scans us/asm/*.s, and this one
+# is hand-written in src/us/asm/boot.s to keep the bytes exact.
+boot_main

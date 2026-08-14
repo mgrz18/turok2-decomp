@@ -46,10 +46,19 @@ TLB_OPS = {0x42000001: "tlbr", 0x42000002: "tlbwi", 0x42000006: "tlbwr",
 # operate on.
 CACHE_OPCODE = 0x2F
 
+# Coprocessor 2 loads and stores. The N64's CPU has no COP2 -- that space is
+# the RSP's -- so N64Recomp has nothing to translate them to and stops with
+# "Unhandled instruction: sdc2". Whatever these are (unused opcodes the
+# compiler emitted, or bytes we are reading as code that are not), they cannot
+# be recompiled and belong in stubs alongside COP0 and `cache`.
+COP2_OPCODES = {0x32: "lwc2", 0x36: "ldc2", 0x3A: "swc2", 0x3E: "sdc2"}
+
 
 def classify(word):
     if (word >> 26) == CACHE_OPCODE:
         return "cache"
+    if (word >> 26) in COP2_OPCODES:
+        return COP2_OPCODES[word >> 26]
     if word in TLB_OPS:
         return TLB_OPS[word]
     if (word >> 26) != 0x10:

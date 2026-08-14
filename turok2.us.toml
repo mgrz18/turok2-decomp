@@ -6,7 +6,15 @@
 [input]
 # Cartridge entry point, confirmed in the ROM header and in the hand-written
 # boot stub at ROM 0x1000 (src/us/asm/boot.s).
-entrypoint = 0x80000400
+# entrypoint = 0x80000400
+#
+# Left out on purpose. The SN64 stub at that address is TLB setup and nothing
+# else: it sets the stack, then writes Index, EntryHi, EntryLo0 and EntryLo1
+# and issues `tlbwi` to map the engine into useg. N64Recomp has no C for
+# `mfc0 $10`, so it stops with "Unhandled cop0 register in mfc0: 10" -- and
+# there would be no point translating it if it could, because removing the TLB
+# is the whole approach. N64ModernRuntime supplies the entry, exactly as
+# GoldenRecomp stubs its own `boot`, and as Perfect Dark's port did.
 
 # Paths are relative to the location of this config file.
 elf_path = "build/turok2.us.elf"
@@ -58,10 +66,11 @@ manual_funcs = [
     { name = "entry_00262314", section = ".code", vram = 0x00262314, size = 216 },
     { name = "entry_00262D6C", section = ".code", vram = 0x00262D6C, size = 8 },
     { name = "entry_0026514C", section = ".code", vram = 0x0026514C, size = 176 },
-    { name = "entry_00266D10", section = ".code", vram = 0x00266D10, size = 20 },
     { name = "entry_00271784", section = ".code", vram = 0x00271784, size = 12 },
     { name = "entry_00272D58", section = ".code", vram = 0x00272D58, size = 8 },
     { name = "entry_00274008", section = ".code", vram = 0x00274008, size = 52 },
+    { name = "entry_002893B0", section = ".code", vram = 0x002893B0, size = 40 },
+    { name = "entry_00289428", section = ".code", vram = 0x00289428, size = 76 },
     { name = "entry_0028B5A4", section = ".code", vram = 0x0028B5A4, size = 112 },
     { name = "entry_00291B00", section = ".code", vram = 0x00291B00, size = 244 },
     { name = "entry_00291BB0", section = ".code", vram = 0x00291BB0, size = 68 },
@@ -423,6 +432,7 @@ manual_funcs = [
     { name = "entry_0041D348", section = ".virtual", vram = 0x0041D348, size = 204 },
     { name = "entry_0041D5D8", section = ".virtual", vram = 0x0041D5D8, size = 252 },
     { name = "entry_0041D6B0", section = ".virtual", vram = 0x0041D6B0, size = 36 },
+    { name = "entry_0041D9A0", section = ".virtual", vram = 0x0041D9A0, size = 136 },
     { name = "entry_0041DB7C", section = ".virtual", vram = 0x0041DB7C, size = 224 },
     { name = "entry_0041DBCC", section = ".virtual", vram = 0x0041DBCC, size = 144 },
     { name = "entry_0041DBDC", section = ".virtual", vram = 0x0041DBDC, size = 128 },
@@ -616,7 +626,8 @@ manual_funcs = [
     { name = "entry_00426BAC", section = ".virtual", vram = 0x00426BAC, size = 44 },
     { name = "entry_00426C50", section = ".virtual", vram = 0x00426C50, size = 36 },
     { name = "entry_00426C78", section = ".virtual", vram = 0x00426C78, size = 16 },
-    { name = "entry_00426C90", section = ".virtual", vram = 0x00426C90, size = 28 },
+    { name = "entry_00426C90", section = ".virtual", vram = 0x00426C90, size = 68 },
+    { name = "entry_00426CAC", section = ".virtual", vram = 0x00426CAC, size = 40 },
     { name = "entry_00426D24", section = ".virtual", vram = 0x00426D24, size = 48 },
     { name = "entry_00426D70", section = ".virtual", vram = 0x00426D70, size = 28 },
     { name = "entry_00426D98", section = ".virtual", vram = 0x00426D98, size = 24 },
@@ -648,6 +659,7 @@ manual_funcs = [
     { name = "entry_0042868C", section = ".virtual", vram = 0x0042868C, size = 224 },
     { name = "entry_004287D8", section = ".virtual", vram = 0x004287D8, size = 224 },
     { name = "entry_0042890C", section = ".virtual", vram = 0x0042890C, size = 268 },
+    { name = "entry_00428ABC", section = ".virtual", vram = 0x00428ABC, size = 224 },
     { name = "entry_00428B58", section = ".virtual", vram = 0x00428B58, size = 68 },
     { name = "entry_00428C10", section = ".virtual", vram = 0x00428C10, size = 40 },
     { name = "entry_00428F98", section = ".virtual", vram = 0x00428F98, size = 396 },
@@ -661,6 +673,7 @@ manual_funcs = [
     { name = "entry_00429380", section = ".virtual", vram = 0x00429380, size = 212 },
     { name = "entry_00429640", section = ".virtual", vram = 0x00429640, size = 264 },
     { name = "entry_00429668", section = ".virtual", vram = 0x00429668, size = 224 },
+    { name = "entry_004297B4", section = ".virtual", vram = 0x004297B4, size = 260 },
     { name = "entry_004297D8", section = ".virtual", vram = 0x004297D8, size = 224 },
     { name = "entry_004299B0", section = ".virtual", vram = 0x004299B0, size = 244 },
     { name = "entry_004299C4", section = ".virtual", vram = 0x004299C4, size = 224 },
@@ -728,7 +741,9 @@ manual_funcs = [
 # 25 of those 75 were `.L` local branch labels, so stubbing them deletes real
 # code paths rather than isolating unsupported ones. See #32.
 stubs = [
+    "boot_main",  # manual
     "func_00201074",  # mfc0 c0r19, mtc0 c0r18
+    "func_00228908",  # sdc2
     "func_0028EE44",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, mtc0 PageMask, tlbwi
     "func_0028EEC0",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, tlbwi
     "func_0028EEFC",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 Index, tlbr
@@ -759,9 +774,10 @@ stubs = [
     "func_002A31FC",  # eret, mfc0 Cause, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 PageMask, mtc0 Cause, mtc0 EPC, mtc0 EntryHi, mtc0 ErrorEPC, mtc0 Index, mtc0 Status, mtc0 c0r18, mtc0 c0r19, tlbr
     "func_002A3774",  # eret, mfc0 EPC, mfc0 ErrorEPC, mtc0 EPC
     "func_002A37CC",  # mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 c0r18
-    "func_002A51E0",  # cache, eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 c0r1, mtc0 c0r18, mtc0 c0r19, mtc0 c0r25, mtc0 c0r7, tlbp, tlbr, tlbwi
+    "func_002A51E0",  # cache, ldc2, lwc2, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EntryHi, mfc0 EntryLo0, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r25, mfc0 c0r7, mtc0 BadVAddr, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, mtc0 PageMask, mtc0 c0r1, mtc0 c0r25, mtc0 c0r7, sdc2, swc2
+    "func_002C23D8",  # cache, eret, ldc2, lwc2, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 c0r1, mtc0 c0r18, mtc0 c0r19, mtc0 c0r25, mtc0 c0r7, sdc2, swc2, tlbp, tlbr, tlbwi
     "func_00425710",  # mfc0 c0r19, mtc0 c0r18
-    "func_00430500",  # cache, mfc0 BadVAddr, mfc0 Context, mfc0 EPC, mfc0 EntryHi, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r20, mfc0 c0r21, mfc0 c0r24, mfc0 c0r28, mfc0 c0r31, mtc0 Context, mtc0 Index, mtc0 c0r25
+    "func_00430500",  # cache, ldc2, lwc2, mfc0 BadVAddr, mfc0 Context, mfc0 EPC, mfc0 EntryHi, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r20, mfc0 c0r21, mfc0 c0r24, mfc0 c0r28, mfc0 c0r31, mtc0 Context, mtc0 Index, mtc0 c0r25, sdc2, swc2
     "func_0043DC44",  # manual
     "func_0043E0E0",  # manual
     "func_0043E3C4",  # manual
@@ -783,7 +799,9 @@ stubs = [
     "func_004521C0",  # manual
     "func_00452314",  # manual
     "func_00452960",  # manual
+    "func_0045342C",  # manual
     "func_0045353C",  # manual
+    "func_00453E58",  # manual
     "func_00453FC4",  # manual
     "func_004540B0",  # manual
     "func_0045977C",  # manual
@@ -812,7 +830,8 @@ stubs = [
     "func_0045DF7C",  # manual
     "func_0045E01C",  # manual
     "func_0045E630",  # mfc0 c0r19, mtc0 c0r18
-    "func_00469374",  # cache, eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 Wired, mtc0 c0r1, mtc0 c0r15, mtc0 c0r16, mtc0 c0r17, mtc0 c0r18, mtc0 c0r19, mtc0 c0r20, mtc0 c0r21, mtc0 c0r22, mtc0 c0r23, mtc0 c0r24, mtc0 c0r25, mtc0 c0r26, mtc0 c0r27, mtc0 c0r28, mtc0 c0r29, mtc0 c0r31, mtc0 c0r7, tlbp, tlbr, tlbwi
+    "func_0045E808",  # manual
+    "func_00465B04",  # manual
 ]
 ignored = [
 ]

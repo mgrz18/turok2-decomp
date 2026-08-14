@@ -164,10 +164,17 @@ segments:
   # size of jump table". The real table sits 0x1A0 below, and its entries
   # 0x419128 0x419138 0x419148 0x419158 are exactly that switch's case bodies,
   # 0x10 apart.
+  # useg, not KSEG0. These are engine functions, and the engine runs TLB-mapped,
+  # so the top nibble of every `jal` they issue comes from a useg PC. Given
+  # KSEG0 their five calls resolved 0/5 -- each one landing on 0x802xxxxx, an
+  # address no section covers -- and the harvested absolute symbols papered over
+  # it by defining phantom aliases like `func_802888BC` next to the real
+  # `func_002888BC`, which N64Recomp then could not resolve. In useg all five
+  # land in a section and three sit on a function boundary.
   - name: code_tail_funcs
     type: code
     start: 0xC2ED8
-    vram: 0x800C22D8     # 0xC2ED8 + 0x7FFFF400
+    vram: 0x002C22D8     # useg; 0x200500 + (0xC2ED8 - 0x1100)
     subsegments:
       - [0xC2ED8, asm]              # 3 last engine funcs (ends @ 0xC3074)
 
