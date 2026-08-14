@@ -39,7 +39,7 @@ EXISTING = ROOT / "versions" / "symbol_addrs.us.txt"
 
 JAL_OPCODE = 0x03          # 000011
 JR_RA = 0x03E00008
-KSEG0 = 0x80000000
+KSEG0 = 0x80000000  # solo para datos; el codigo corre en useg
 
 
 def load_code_segments():
@@ -113,7 +113,14 @@ def scan(rom, segments):
             word = struct.unpack_from(">I", rom, off)[0]
 
             if (word >> 26) == JAL_OPCODE:
-                target = KSEG0 | ((word & 0x03FFFFFF) << 2)
+                # A `jal` carries only bits [27:2]; the top nibble comes from
+                # the delay slot's PC. Hardcoding KSEG0 here was wrong: the
+                # engine runs TLB-mapped in useg, so its calls resolve to
+                # 0x002xxxxx, not 0x802xxxxx. libultra and the data segments
+                # do live in KSEG0, and taking the nibble from the PC gets
+                # both right. See docs/VRAM-LAYOUT.md.
+                pc = vram + (off - start)
+                target = (pc & 0xF0000000) | ((word & 0x03FFFFFF) << 2)
                 if vram_to_segment(segments, target):
                     jal_targets.add(target)
                 else:
@@ -168,10 +175,19 @@ def harvest_link_log(path, segments, rom):
             m = re.search(r"undefined reference to `([^']+)'", line)
             if m:
                 names.add(m.group(1))
+                continue
+            # N64Recomp reports its own gaps differently, and they are the same
+            # problem: an address the code calls that no function covers.
+            m = re.search(r"No function found for jal target: 0x([0-9A-Fa-f]+)", line)
+            if m:
+                names.add(f"func_{int(m.group(1), 16):08X}")
 
     inside, outside = {}, {}
     for name in names:
-        m = re.search(r"(8[0-9A-Fa-f]{7})", name)
+        # Match the trailing hex of `func_00202110` / `.L002206DC`, not a
+        # leading 8: code now lives in useg, so most addresses start at 0 and
+        # an 0x8-anchored pattern silently stopped matching anything.
+        m = re.search(r"([0-9A-Fa-f]{6,8})$", name)
         if not m:
             continue
         addr = int(m.group(1), 16)
