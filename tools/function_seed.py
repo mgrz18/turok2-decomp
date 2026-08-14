@@ -125,6 +125,32 @@ def seed_name(addr, owner):
     return f"{owner}_func_{addr:08X}" if owner else f"func_{addr:08X}"
 
 
+def harvest_overlay_asm(segments):
+    """Give module-unique names to overlay functions splat found on its own.
+
+    splat discovers functions our scan misses and auto-names them `func_<addr>`.
+    In the shared window that produces the same name in more than one module,
+    which the linker rejects. Re-seeding each of them under the owning segment
+    makes splat use our name instead.
+    """
+    import re
+
+    globl = re.compile(r"^\s*\.globl\s+(func_[0-9A-Fa-f]{8})\s*$")
+    found = set()
+    for start, _end, _vram, name, owner in segments:
+        if not owner:
+            continue
+        path = ROOT / "us" / "asm" / f"{name}.s"
+        if not path.exists():
+            continue
+        with path.open(errors="replace") as fh:
+            for line in fh:
+                m = globl.match(line)
+                if m:
+                    found.add((int(m.group(1)[5:], 16), owner))
+    return found
+
+
 def scan(rom, segments):
     # Sets of (address, owner): the same address is a distinct function in each
     # overlay, so it can legitimately appear more than once.
@@ -265,7 +291,28 @@ def main():
     ap.add_argument("--write", action="store_true", help="escribir el archivo de seeds")
     ap.add_argument("--from-link-log", type=Path,
                     help="cosechar simbolos sin definir de un log de ld")
+    ap.add_argument("--from-overlay-asm", action="store_true",
+                    help="renombrar por modulo los func_ que splat auto-nombro en overlays")
     args = ap.parse_args()
+
+    if args.from_overlay_asm:
+        segments = load_code_segments()
+        found = harvest_overlay_asm(segments)
+        print(f"funciones de overlay auto-nombradas por splat: {len(found):,}")
+        by = Counter(o for _a, o in found)
+        for o, n in sorted(by.items()):
+            print(f"  {o}: {n:,}")
+        if args.write and found:
+            existing = OUT.read_text() if OUT.exists() else ""
+            new = [f"{seed_name(a, o)} = 0x{a:08X}; // type:func segment:{o}"
+                   for a, o in sorted(found, key=lambda t: (t[0], t[1]))
+                   if seed_name(a, o) not in existing]
+            if new:
+                with OUT.open("a") as fh:
+                    fh.write("\n// Overlay functions splat auto-named; re-seeded per module.\n")
+                    fh.write("\n".join(new) + "\n")
+            print(f"\nagregados: {len(new):,} -> {OUT.relative_to(ROOT)}")
+        return
 
     if args.from_link_log:
         segments = load_code_segments()

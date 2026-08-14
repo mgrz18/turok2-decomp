@@ -20,12 +20,6 @@ output_func_path = "RecompiledFuncs"
 # targets.
 use_absolute_symbols = true
 
-# The `virtual` modules are overlays: VMASM pages them into a TLB-mapped window
-# at runtime rather than leaving them statically resident. Declaring the section
-# relocatable makes the recompiler emit RELOC_HI16/RELOC_LO16 macros instead of
-# baking in addresses, so the runtime can fix them up wherever the section is
-# loaded. This is the mechanism N64Recomp offers for exactly this case.
-relocatable_sections_path = "overlays.us.txt"
 
 manual_funcs = [
     { name = "func_0029FCF0", section = ".code", vram = 0x0029FCF0, size = 0x354 },
