@@ -47,6 +47,15 @@ DIS = ROOT / "build" / "dis.txt"
 STUBS = ROOT / "versions" / "manual_stubs.us.txt"
 IMAGE = "turok2-build"
 
+def _module(addr):
+    """Which code section an address belongs to, coarsely."""
+    if addr < 0x002A5200:
+        return "code"
+    if addr < 0x0043C000:
+        return "virtual"
+    return "virtual_1"
+
+
 INSN = re.compile(r"^\s*([0-9a-f]+):\s+([0-9a-f]{8})\s+(\S+)\s*(.*)$")
 FUNC = re.compile(r"^([0-9a-f]+) <(\S+)>:")
 
@@ -99,6 +108,7 @@ def main():
     regs = {}
     prev = None
     foreign = {}
+    misplaced = {}
 
     for line in lines:
         m = FUNC.match(line)
@@ -150,19 +160,69 @@ def main():
                     plausible = first is not None and (
                         0x00200500 <= first < 0x002A5200
                         or 0x00400000 <= first < 0x004C4340)
-                    if plausible and not (func_start <= first < addr + 0x2000):
-                        foreign.setdefault(current, (table, first, prev[0]))
+                    if plausible:
+                        # An entry below the function's start says the start is
+                        # wrong, not that the table is foreign. A `switch`
+                        # cannot jump out of its own function backwards, so if
+                        # the table names an address before the boundary we
+                        # declared, the real function began earlier.
+                        #
+                        # func_00268188 is 0x34 bytes and its table names
+                        # 0x00268180 -- eight bytes before it -- along with
+                        # 0x002682F4 well past its end.
+                        lowest = first
+                        for k in range(1, 64):
+                            nxt = read_word(table + k * 4)
+                            if nxt is None or not (
+                                    0x00200500 <= nxt < 0x002A5200
+                                    or 0x00400000 <= nxt < 0x004C4340):
+                                break
+                            lowest = min(lowest, nxt)
+                        # Same section or not is what separates the two. A
+                        # table naming an address just before the reader is a
+                        # boundary set a few instructions too late; one naming
+                        # an address in the *other* VM module is the shared
+                        # table of #40. func_00268188 sits 8 bytes above its
+                        # lowest entry; func_0043DC44 sits 0x38F80 above one in
+                        # `virtual`, a different section entirely.
+                        if lowest < func_start and _module(lowest) == _module(func_start):
+                            misplaced.setdefault(current, (table, lowest, prev[0]))
+                        elif not (func_start <= first < addr + 0x2000):
+                            foreign.setdefault(current, (table, first, prev[0]))
         prev = None
 
     already = {l.strip() for l in STUBS.read_text().splitlines()
                if l.strip().startswith("func_")}
     new = sorted(f for f in foreign if f not in already)
 
+    print(f"tables reaching before the reader's start (bad boundary): {len(misplaced):,}")
+    for name in sorted(misplaced)[:6]:
+        table, low, at = misplaced[name]
+        print(f"  {name:<20} table 0x{table:08X} -> as low as 0x{low:08X}")
+    print()
     print(f"jump tables whose entries lie outside the reader: {len(foreign):,}")
     print(f"  not stubbed yet                              : {len(new):,}")
     for name in new[:8]:
         table, first, at = foreign[name]
         print(f"  {name:<20} table 0x{table:08X} -> 0x{first:08X}  (jr at 0x{at:08X})")
+
+    if opts.write and misplaced:
+        rej = ROOT / "versions" / "rejected_boundaries.us.txt"
+        have = set()
+        if rej.exists():
+            for line in rej.read_text().split():
+                try:
+                    have.add(int(line, 16))
+                except ValueError:
+                    pass
+        add = set()
+        for name in misplaced:
+            m = re.search(r"([0-9A-Fa-f]{8})$", name)
+            if m:
+                add.add(int(m.group(1), 16))
+        merged = have | add
+        rej.write_text("\n".join(f"0x{a:08X}" for a in sorted(merged)) + "\n")
+        print(f"rechazados: +{len(merged) - len(have):,} (total {len(merged):,})")
 
     if opts.write and new:
         with STUBS.open("a") as fh:

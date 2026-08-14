@@ -228,17 +228,36 @@ def main():
     from function_seed import load_code_segments, vram_to_segment
     segments = load_code_segments()
     unplaceable = {a for a in missing if not vram_to_segment(segments, a)}
+    unstubbable = set()
     if unplaceable:
         for m in re.finditer(
                 r"No function found for jal target: 0x([0-9A-Fa-f]+)\s*\n"
                 r"Error (?:in )?recompiling ([A-Za-z_.][A-Za-z0-9_.]*)", text):
             if int(m.group(1), 16) in unplaceable:
-                caller = addr_of(m.group(2))
-                if caller is not None:
-                    backward.add(caller)
+                # Stub the caller rather than reject its boundary. Rejecting
+                # only hands the same stray word to whichever function then
+                # encloses it: 0x002A630C outlived the rejection of
+                # func_00293D8C and came straight back as func_00293D40. The
+                # branch to it is not translatable wherever it lands, so the
+                # function carrying it is what has to go.
+                unstubbable.add(m.group(2))
         missing -= unplaceable
-        print(f"targets outside every section (caller rejected instead): "
-              f"{len(unplaceable):,}")
+        print(f"targets outside every section: {len(unplaceable):,}"
+              f"  -> stubbing {len(unstubbable):,} caller(s)")
+        if unstubbable:
+            stubs = ROOT / "versions" / "manual_stubs.us.txt"
+            have = {l.strip() for l in stubs.read_text().splitlines()
+                    if l.strip().startswith("func_")}
+            new_stubs = sorted(unstubbable - have)
+            if new_stubs:
+                for n in new_stubs:
+                    print(f"    {n}")
+                if args.write:
+                    with stubs.open("a") as fh:
+                        fh.write("\n# Branches to an address no section covers, so no symbol can be\n"
+                                 "# placed there. Rejecting the boundary only moves the stray word\n"
+                                 "# to the next enclosing function.\n")
+                        fh.write("\n".join(new_stubs) + "\n")
     print(f"call targets with no function: {len(missing):,}")
     print(f"false boundaries (branch goes back past the start): {len(backward):,}")
     for a in sorted(backward):

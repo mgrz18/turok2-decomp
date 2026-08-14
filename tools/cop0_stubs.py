@@ -118,6 +118,24 @@ def main():
     # instead of being cut short at every interior label. #32 is the same
     # mistake in its earlier form: a third of the names stubbed back then were
     # branch labels our own segmentation had invented.
+    # Named functions need their address looked up. The address used to come
+    # from the name, which works for `func_002A5130` and not for anything the
+    # LibTEngine signatures gave a real name to. STVM_MapTLB is the one that
+    # mattered: it is the VM's TLB mapper, it reads EntryHi, and it was invisible
+    # to this scan for want of eight hex digits in its name.
+    named = {}
+    elf = ROOT / "build" / "turok2.us.elf"
+    if elf.exists():
+        import subprocess
+        out = subprocess.run(
+            ["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+             "turok2-build", "mips-linux-gnu-nm", "--defined-only", "build/turok2.us.elf"],
+            capture_output=True, text=True).stdout
+        for line in out.splitlines():
+            parts = line.split()
+            if len(parts) == 3 and parts[1] in ("t", "T"):
+                named[parts[2]] = int(parts[0], 16)
+
     labels = []
     for path in sorted(glob.glob(str(ASM / "*.s"))):
         for line in open(path, errors="replace"):
@@ -129,6 +147,8 @@ def main():
                 a = re.search(r"([0-9A-Fa-f]{8})$", name)
                 if a:
                     labels.append((int(a.group(1), 16), name))
+                elif name in named:
+                    labels.append((named[name], name))
     labels.sort()
 
     found = {}

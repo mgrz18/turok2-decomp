@@ -100,3 +100,20 @@ func_00465B04
 # cop0_stubs.py cannot find it on its own -- it scans us/asm/*.s, and this one
 # is hand-written in src/us/asm/boot.s to keep the bytes exact.
 boot_main
+
+# Branches to an address no section covers, so no symbol can be
+# placed there. Rejecting the boundary only moves the stray word
+# to the next enclosing function.
+func_00293D40
+
+# Branches to an address no section covers, so no symbol can be
+# placed there. Rejecting the boundary only moves the stray word
+# to the next enclosing function.
+func_00226F8C
+
+# The VM's TLB mapper, named by the LibTEngine signatures. It reads EntryHi, so
+# N64Recomp stops on it exactly as it does on the boot stub -- and for the same
+# reason there is nothing to gain by translating it: N64ModernRuntime does not
+# page, so the mapping it installs has no meaning. This is the TLB itself, which
+# the port exists to remove.
+STVM_MapTLB

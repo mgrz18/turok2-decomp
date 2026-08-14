@@ -231,6 +231,8 @@ manual_funcs = [
     { name = "entry_00412538", section = ".virtual", vram = 0x00412538, size = 16 },
     { name = "entry_004125F8", section = ".virtual", vram = 0x004125F8, size = 116 },
     { name = "entry_00412640", section = ".virtual", vram = 0x00412640, size = 44 },
+    { name = "entry_004126FC", section = ".virtual", vram = 0x004126FC, size = 156 },
+    { name = "entry_0041276C", section = ".virtual", vram = 0x0041276C, size = 44 },
     { name = "entry_004128A0", section = ".virtual", vram = 0x004128A0, size = 248 },
     { name = "entry_00412900", section = ".virtual", vram = 0x00412900, size = 152 },
     { name = "entry_00412908", section = ".virtual", vram = 0x00412908, size = 144 },
@@ -432,10 +434,13 @@ manual_funcs = [
     { name = "entry_0041D348", section = ".virtual", vram = 0x0041D348, size = 204 },
     { name = "entry_0041D5D8", section = ".virtual", vram = 0x0041D5D8, size = 252 },
     { name = "entry_0041D6B0", section = ".virtual", vram = 0x0041D6B0, size = 36 },
+    { name = "entry_0041D948", section = ".virtual", vram = 0x0041D948, size = 224 },
     { name = "entry_0041D9A0", section = ".virtual", vram = 0x0041D9A0, size = 136 },
+    { name = "entry_0041DAE4", section = ".virtual", vram = 0x0041DAE4, size = 376 },
+    { name = "entry_0041DAFC", section = ".virtual", vram = 0x0041DAFC, size = 352 },
+    { name = "entry_0041DB38", section = ".virtual", vram = 0x0041DB38, size = 292 },
     { name = "entry_0041DB7C", section = ".virtual", vram = 0x0041DB7C, size = 224 },
     { name = "entry_0041DBCC", section = ".virtual", vram = 0x0041DBCC, size = 144 },
-    { name = "entry_0041DBDC", section = ".virtual", vram = 0x0041DBDC, size = 128 },
     { name = "entry_0041DCA4", section = ".virtual", vram = 0x0041DCA4, size = 12 },
     { name = "entry_0041DCA8", section = ".virtual", vram = 0x0041DCA8, size = 8 },
     { name = "entry_0041DDB0", section = ".virtual", vram = 0x0041DDB0, size = 416 },
@@ -450,6 +455,7 @@ manual_funcs = [
     { name = "entry_0041E308", section = ".virtual", vram = 0x0041E308, size = 108 },
     { name = "entry_0041E354", section = ".virtual", vram = 0x0041E354, size = 32 },
     { name = "entry_0041E400", section = ".virtual", vram = 0x0041E400, size = 256 },
+    { name = "entry_0041E73C", section = ".virtual", vram = 0x0041E73C, size = 148 },
     { name = "entry_0041E81C", section = ".virtual", vram = 0x0041E81C, size = 8 },
     { name = "entry_0041E8D8", section = ".virtual", vram = 0x0041E8D8, size = 164 },
     { name = "entry_0041EA5C", section = ".virtual", vram = 0x0041EA5C, size = 40 },
@@ -573,6 +579,7 @@ manual_funcs = [
     { name = "entry_00423E04", section = ".virtual", vram = 0x00423E04, size = 12 },
     { name = "entry_00423F28", section = ".virtual", vram = 0x00423F28, size = 224 },
     { name = "entry_00424260", section = ".virtual", vram = 0x00424260, size = 140 },
+    { name = "entry_0042444C", section = ".virtual", vram = 0x0042444C, size = 180 },
     { name = "entry_004244B0", section = ".virtual", vram = 0x004244B0, size = 80 },
     { name = "entry_0042456C", section = ".virtual", vram = 0x0042456C, size = 116 },
     { name = "entry_004245C4", section = ".virtual", vram = 0x004245C4, size = 28 },
@@ -741,12 +748,15 @@ manual_funcs = [
 # 25 of those 75 were `.L` local branch labels, so stubbing them deletes real
 # code paths rather than isolating unsupported ones. See #32.
 stubs = [
+    "STVM_MapTLB",  # manual
     "boot_main",  # manual
     "func_00201074",  # mfc0 c0r19, mtc0 c0r18
+    "func_00226F8C",  # manual
     "func_00228908",  # sdc2
     "func_0028EE44",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, mtc0 PageMask, tlbwi
     "func_0028EEC0",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, tlbwi
     "func_0028EEFC",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 Index, tlbr
+    "func_00293D40",  # manual
     "func_0029BFE0",  # mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 EPC, mfc0 Status, mtc0 Cause, mtc0 Compare, mtc0 Status
     "func_0029C6DC",  # mfc0 Status
     "func_0029C8E0",  # eret, mtc0 EPC, mtc0 Status
