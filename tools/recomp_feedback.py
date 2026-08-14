@@ -118,14 +118,30 @@ def addr_of(name):
 
 def harvest(text):
     backward, forward = set(), set()
+    seeded_now = load_seeded()
     for name, _at, target in BRANCH.findall(text):
         start = addr_of(name)
         if start is None:
             continue
-        if int(target, 16) < start:
+        t = int(target, 16)
+        if t < start:
             backward.add(start)
+        elif t in seeded_now:
+            # Forward, and the target is a function entry: a tail call. The
+            # address is real and simply wants a symbol, which the seed pass
+            # will supply. Nothing to correct here.
+            forward.add(t)
         else:
-            forward.add(int(target, 16))
+            # Forward, and the target is not any function's entry. A branch
+            # cannot leave its function and a tail call can only land on an
+            # entry, so this function has to reach at least as far as `t` and
+            # something between cut it short. Everything seeded in that span
+            # is inside one function.
+            #
+            # func_004208E0 jumps to 0x00420C18, which objdump names
+            # `.L00420BC8+0x50` -- 0x50 into a label, so not an entry. The
+            # label at 0x00420BC8 was the false boundary.
+            backward |= {a for a in seeded_now if start < a <= t}
     for name, target in OUTSIDE.findall(text):
         start = addr_of(name)
         if start is not None and int(target, 16) < start:

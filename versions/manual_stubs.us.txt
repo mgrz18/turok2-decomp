@@ -1,9 +1,78 @@
 # Not COP0. Functions N64Recomp cannot translate for a structural reason, one
-# per line, with the reason. Merged into the `stubs` block by cop0_stubs.py.
-
-# Duplicated between the two VM modules. Both copies read the jump table at
-# 0x800C0FA8, whose 14 entries (0x419128, 0x419138, ... 0x10 apart) are the
-# case bodies of the copy in virtual_text_0. For this copy they all fall
-# outside its own body, so the table cannot be sized. The virtual_text_0 twin
-# recompiles normally.
+# per line. Merged into the `stubs` block by cop0_stubs.py.
+#
+# All 48 below are one class: a routine that reads a jump table in
+# code_rodata_tail which a second routine, in the other VM module, reads too.
+# Every one of the 49 duplicated table reads in the ELF is split across the two
+# modules -- none is internal to either -- and the table's entries name the
+# case bodies of the copy in `virtual` (below 0x43C000). For the copy in
+# `virtual_1` they all fall outside its own body, so N64Recomp reports
+#
+#     Failed to determine size of jump table at 0x800C1438
+#
+# and stops.
+#
+# The likely reason is that the VM loader relocates these tables when it pages
+# a module in: a table of absolute code addresses cannot be shared by two
+# modules that live at different addresses unless someone rewrites it. That is
+# what VMASM.S / VMEMORY.C are for. A static recompiler cannot follow a table
+# that is rewritten at load time, so these need the runtime to supply the
+# behaviour -- the same answer the TLB itself gets.
+#
+# Stubbing loses the `virtual_1` copy. Its twin in `virtual` is translated
+# normally, so the code exists in the output; what is missing is the entry
+# point at the second address. Revisit once the VM loader is understood well
+# enough to say which copy actually runs. See #40.
+func_0043DC44
+func_0043E0E0
+func_0043E3C4
+func_00441FF8
+func_00442D4C
+func_0044325C
+func_0044C22C
+func_0044C3A4
+func_0044C63C
+func_0044F2FC
+func_0044FF8C
+func_0045007C
+func_00450910
+func_004515C0
+func_004516B0
+func_00451BA0
+func_00451D00
 func_00452060
+func_004521C0
+func_00452314
+func_00452960
+func_0045353C
+func_00453FC4
+func_004540B0
+func_00459B50
+func_00459E54
+func_0045AEA8
+func_0045B234
+func_0045B784
+func_0045B7D0
+func_0045B8FC
+func_0045BA28
+func_0045BB54
+func_0045BC80
+func_0045BDAC
+func_0045C9EC
+func_0045CA68
+func_0045CAE4
+func_0045CB60
+func_0045CBDC
+func_0045CC58
+func_0045CCC4
+func_0045D97C
+func_0045DAB0
+func_0045DC74
+func_0045DEDC
+func_0045DF7C
+func_0045E01C
+
+# Cross-module caller of an address a branch crosses: 0x00420B38 is named by
+# its `jal` and crossed by a branch inside the function that contains it, so no
+# symbol can satisfy both. Same class as the 48 above.
+func_0045977C

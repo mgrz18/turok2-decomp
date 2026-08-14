@@ -449,7 +449,14 @@ def main():
                 a = int(line, 16)
             except ValueError:
                 continue
-            if vram_to_segment(segments, a):
+            # A rejected boundary wins over a call that wants one. The two
+            # can both be true of the same address -- a `jal` names it and a
+            # branch crosses it -- and then seeding and rejecting it in turn
+            # makes the loop oscillate forever. 0x00420B38 did exactly that.
+            # The call is the one that has to give: an unresolved cross-section
+            # call is handled by stubbing its caller, whereas a boundary in the
+            # middle of a function breaks that function outright.
+            if vram_to_segment(segments, a) and a not in BAD_BOUNDARIES:
                 from_recomp.add((a, None))
 
     found = prologues | jal_targets | epilogues | from_recomp
