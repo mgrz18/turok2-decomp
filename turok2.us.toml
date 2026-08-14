@@ -39,50 +39,199 @@ stubs = [
     "func_0029DFE0",  # mfc0 Status
     "func_0029DFF0",  # mfc0 Status, mtc0 Status
     "func_0029E010",  # mfc0 Status, mtc0 Status
+    "func_0029E030",  # cache
+    "func_0029E0A4",  # cache
+    "func_0029E0D0",  # cache
+    "func_0029E114",  # cache
     "func_0029E140",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 Index, mfc0 PageMask, mtc0 EntryHi, tlbp, tlbr
     "func_0029E210",  # mtc0 Compare
     "func_0029E230",  # mfc0 Status, mtc0 Status
     "func_0029E2E0",  # mtc0 Status
     "func_0029E2F0",  # mfc0 EntryHi, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 Index, tlbwi
+    "func_0029E340",  # cache
+    "func_0029E384",  # cache
+    "func_0029E3B0",  # cache
     "func_002A3088",  # mtc0 ErrorEPC
+    "func_002A31AC",  # cache
+    "func_002A31C8",  # cache
     "func_002A31E4",  # mfc0 Status
     "func_002A31F0",  # mtc0 Status
     "func_002A31FC",  # mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 PageMask, mtc0 EntryHi, mtc0 Index, tlbr
     "func_002A3280",  # eret, mfc0 Cause, mfc0 EPC, mfc0 ErrorEPC, mtc0 Cause, mtc0 EPC, mtc0 ErrorEPC, mtc0 Status, mtc0 c0r18, mtc0 c0r19
     "func_002A3774",  # eret, mfc0 EPC, mfc0 ErrorEPC, mtc0 EPC
     "func_002A37CC",  # mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 c0r18
-    "func_002A51E0",  # eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 c0r1, mtc0 c0r18, mtc0 c0r19, mtc0 c0r25, mtc0 c0r7, tlbp, tlbr, tlbwi
+    "func_002A51E0",  # cache, eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 c0r1, mtc0 c0r18, mtc0 c0r19, mtc0 c0r25, mtc0 c0r7, tlbp, tlbr, tlbwi
     "func_00425710",  # mfc0 c0r19, mtc0 c0r18
-    "func_00430500",  # mfc0 BadVAddr, mfc0 Context, mfc0 EPC, mfc0 EntryHi, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r20, mfc0 c0r21, mfc0 c0r24, mfc0 c0r28, mfc0 c0r31, mtc0 Context, mtc0 Index, mtc0 c0r25
+    "func_00430500",  # cache, mfc0 BadVAddr, mfc0 Context, mfc0 EPC, mfc0 EntryHi, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r20, mfc0 c0r21, mfc0 c0r24, mfc0 c0r28, mfc0 c0r31, mtc0 Context, mtc0 Index, mtc0 c0r25
+    "func_0043C264",  # manual
+    "func_0043CC14",  # manual
+    "func_0043CF3C",  # manual
+    "func_0043D450",  # manual
+    "func_0043D57C",  # manual
     "func_0043DC44",  # manual
+    "func_0043DFE0",  # manual
     "func_0043E0E0",  # manual
+    "func_0043E288",  # manual
     "func_0043E3C4",  # manual
+    "func_0043E6DC",  # manual
+    "func_0043EE04",  # manual
+    "func_0043F000",  # manual
+    "func_0043F598",  # manual
+    "func_0043FAA8",  # manual
+    "func_00440284",  # manual
+    "func_004406B0",  # manual
+    "func_004408B8",  # manual
+    "func_00440DC0",  # manual
+    "func_004412A0",  # manual
+    "func_004415A0",  # manual
+    "func_004419E0",  # manual
+    "func_00441C10",  # manual
+    "func_00441CF4",  # manual
+    "func_00441EAC",  # manual
     "func_00441FF8",  # manual
+    "func_00442784",  # manual
+    "func_00442A64",  # manual
     "func_00442D4C",  # manual
+    "func_00443170",  # manual
     "func_0044325C",  # manual
+    "func_00443418",  # manual
+    "func_004438FC",  # manual
+    "func_0044480C",  # manual
+    "func_00444C64",  # manual
+    "func_0044584C",  # manual
+    "func_004463A8",  # manual
+    "func_004469B8",  # manual
+    "func_00447108",  # manual
+    "func_0044730C",  # manual
+    "func_00447DB0",  # manual
+    "func_004481D8",  # manual
+    "func_004485B8",  # manual
+    "func_00448D6C",  # manual
+    "func_00449CE8",  # manual
+    "func_0044AC94",  # manual
+    "func_0044AEF8",  # manual
+    "func_0044B314",  # manual
+    "func_0044B548",  # manual
+    "func_0044B798",  # manual
+    "func_0044C21C",  # manual
     "func_0044C22C",  # manual
     "func_0044C3A4",  # manual
     "func_0044C63C",  # manual
+    "func_0044CF74",  # manual
+    "func_0044D3DC",  # manual
+    "func_0044D938",  # manual
+    "func_0044E1B4",  # manual
+    "func_0044E6FC",  # manual
+    "func_0044ECE8",  # manual
+    "func_0044EFB8",  # manual
+    "func_0044F0F0",  # manual
+    "func_0044F1B4",  # manual
     "func_0044F2FC",  # manual
+    "func_0044F33C",  # manual
+    "func_0044F48C",  # manual
+    "func_0044F644",  # manual
+    "func_0044F760",  # manual
+    "func_0044FBAC",  # manual
+    "func_0044FEA8",  # manual
     "func_0044FF8C",  # manual
     "func_0045007C",  # manual
+    "func_004502F8",  # manual
+    "func_00450484",  # manual
+    "func_0045060C",  # manual
+    "func_0045078C",  # manual
     "func_00450910",  # manual
+    "func_00450F4C",  # manual
+    "func_004511B4",  # manual
     "func_004515C0",  # manual
     "func_004516B0",  # manual
+    "func_004517BC",  # manual
+    "func_0045190C",  # manual
     "func_00451BA0",  # manual
     "func_00451D00",  # manual
+    "func_00451E0C",  # manual
     "func_00452060",  # manual
     "func_004521C0",  # manual
+    "func_004522CC",  # manual
     "func_00452314",  # manual
+    "func_00452578",  # manual
+    "func_004526E8",  # manual
     "func_00452960",  # manual
+    "func_00452C14",  # manual
+    "func_00452D64",  # manual
+    "func_00452EA8",  # manual
+    "func_00452F88",  # manual
+    "func_0045302C",  # manual
+    "func_00453334",  # manual
+    "func_004533AC",  # manual
     "func_0045353C",  # manual
+    "func_0045386C",  # manual
+    "func_00453C38",  # manual
+    "func_00453CCC",  # manual
+    "func_00453E18",  # manual
+    "func_00453E58",  # manual
+    "func_00453F54",  # manual
     "func_00453FC4",  # manual
     "func_004540B0",  # manual
+    "func_004541D4",  # manual
+    "func_0045425C",  # manual
+    "func_004542E4",  # manual
+    "func_0045436C",  # manual
+    "func_004543F4",  # manual
+    "func_0045447C",  # manual
+    "func_00454504",  # manual
+    "func_0045458C",  # manual
+    "func_00454614",  # manual
+    "func_0045469C",  # manual
+    "func_00454724",  # manual
+    "func_004547AC",  # manual
+    "func_00454834",  # manual
+    "func_00454944",  # manual
+    "func_00454CC4",  # manual
+    "func_00454DBC",  # manual
+    "func_00454ECC",  # manual
+    "func_00455054",  # manual
+    "func_0045511C",  # manual
+    "func_00455298",  # manual
+    "func_00455324",  # manual
+    "func_00455678",  # manual
+    "func_004558B4",  # manual
+    "func_00455A04",  # manual
+    "func_00455EBC",  # manual
+    "func_00455FA0",  # manual
+    "func_00456214",  # manual
+    "func_0045646C",  # manual
+    "func_00456B7C",  # manual
+    "func_00456CB0",  # manual
+    "func_00456E70",  # manual
+    "func_004570F8",  # manual
+    "func_00457294",  # manual
+    "func_00457420",  # manual
+    "func_004579A4",  # manual
+    "func_00457B64",  # manual
+    "func_00457D00",  # manual
+    "func_00457FE8",  # manual
+    "func_0045824C",  # manual
+    "func_00458A70",  # manual
+    "func_00458C14",  # manual
+    "func_00458DE4",  # manual
+    "func_004590BC",  # manual
+    "func_004595D8",  # manual
     "func_0045977C",  # manual
     "func_00459B50",  # manual
     "func_00459E54",  # manual
+    "func_0045A5E0",  # manual
+    "func_0045A6C0",  # manual
+    "func_0045A8C8",  # manual
+    "func_0045A900",  # manual
+    "func_0045A974",  # manual
+    "func_0045AB04",  # manual
+    "func_0045ABC0",  # manual
+    "func_0045AD98",  # manual
     "func_0045AEA8",  # manual
+    "func_0045B010",  # manual
     "func_0045B234",  # manual
+    "func_0045B3A4",  # manual
+    "func_0045B57C",  # manual
     "func_0045B784",  # manual
     "func_0045B7D0",  # manual
     "func_0045B8FC",  # manual
@@ -90,6 +239,13 @@ stubs = [
     "func_0045BB54",  # manual
     "func_0045BC80",  # manual
     "func_0045BDAC",  # manual
+    "func_0045C098",  # manual
+    "func_0045C4AC",  # manual
+    "func_0045C4E0",  # manual
+    "func_0045C514",  # manual
+    "func_0045C688",  # manual
+    "func_0045C7A0",  # manual
+    "func_0045C884",  # manual
     "func_0045C9EC",  # manual
     "func_0045CA68",  # manual
     "func_0045CAE4",  # manual
@@ -97,14 +253,73 @@ stubs = [
     "func_0045CBDC",  # manual
     "func_0045CC58",  # manual
     "func_0045CCC4",  # manual
+    "func_0045CD30",  # manual
+    "func_0045D56C",  # manual
+    "func_0045D6A0",  # manual
     "func_0045D97C",  # manual
     "func_0045DAB0",  # manual
     "func_0045DC74",  # manual
+    "func_0045DEA8",  # manual
     "func_0045DEDC",  # manual
     "func_0045DF7C",  # manual
     "func_0045E01C",  # manual
+    "func_0045E0BC",  # manual
+    "func_0045E140",  # manual
     "func_0045E630",  # mfc0 c0r19, mtc0 c0r18
-    "func_00469374",  # eret, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 Wired, mtc0 c0r1, mtc0 c0r15, mtc0 c0r16, mtc0 c0r17, mtc0 c0r18, mtc0 c0r19, mtc0 c0r20, mtc0 c0r21, mtc0 c0r22, mtc0 c0r23, mtc0 c0r24, mtc0 c0r25, mtc0 c0r26, mtc0 c0r27, mtc0 c0r28, mtc0 c0r29, mtc0 c0r31, mtc0 c0r7, tlbp, tlbr, tlbwi
+    "func_0045E674",  # manual
+    "func_0045E808",  # manual
+    "func_0045E9D8",  # manual
+    "func_0045EAE0",  # manual
+    "func_0045EF84",  # manual
+    "func_0045F084",  # manual
+    "func_0045F3A0",  # manual
+    "func_0045F4D0",  # manual
+    "func_0045F734",  # manual
+    "func_0045F7F0",  # manual
+    "func_0045F940",  # manual
+    "func_0045FB34",  # manual
+    "func_0045FBF4",  # manual
+    "func_0045FC74",  # manual
+    "func_00460094",  # manual
+    "func_00460444",  # manual
+    "func_004606A0",  # manual
+    "func_004608CC",  # manual
+    "func_00460A6C",  # manual
+    "func_00460B3C",  # manual
+    "func_00460D7C",  # manual
+    "func_00461080",  # manual
+    "func_00461250",  # manual
+    "func_0046168C",  # manual
+    "func_004617D8",  # manual
+    "func_00461938",  # manual
+    "func_00461C0C",  # manual
+    "func_00462044",  # manual
+    "func_00462200",  # manual
+    "func_00462374",  # manual
+    "func_004627D8",  # manual
+    "func_004629C4",  # manual
+    "func_00462E38",  # manual
+    "func_00462EC0",  # manual
+    "func_00463B2C",  # manual
+    "func_00464960",  # manual
+    "func_004652DC",  # manual
+    "func_00465678",  # manual
+    "func_004658FC",  # manual
+    "func_004659D4",  # manual
+    "func_00465D30",  # manual
+    "func_004660D8",  # manual
+    "func_00466328",  # manual
+    "func_00466B38",  # manual
+    "func_0046706C",  # manual
+    "func_004671BC",  # manual
+    "func_00467350",  # manual
+    "func_004674CC",  # manual
+    "func_004677B4",  # manual
+    "func_00467A6C",  # manual
+    "func_00468264",  # manual
+    "func_00468F88",  # manual
+    "func_004692CC",  # manual
+    "func_00469374",  # cache, eret, manual, mfc0 BadVAddr, mfc0 Cause, mfc0 Compare, mfc0 Context, mfc0 Count, mfc0 EPC, mfc0 EntryHi, mfc0 EntryLo0, mfc0 EntryLo1, mfc0 ErrorEPC, mfc0 Index, mfc0 PageMask, mfc0 Status, mfc0 Wired, mfc0 c0r1, mfc0 c0r15, mfc0 c0r16, mfc0 c0r17, mfc0 c0r18, mfc0 c0r19, mfc0 c0r20, mfc0 c0r21, mfc0 c0r22, mfc0 c0r23, mfc0 c0r24, mfc0 c0r25, mfc0 c0r26, mfc0 c0r27, mfc0 c0r28, mfc0 c0r29, mfc0 c0r31, mfc0 c0r7, mtc0 BadVAddr, mtc0 Cause, mtc0 Compare, mtc0 Context, mtc0 Count, mtc0 EPC, mtc0 EntryHi, mtc0 EntryLo0, mtc0 EntryLo1, mtc0 ErrorEPC, mtc0 Index, mtc0 PageMask, mtc0 Status, mtc0 Wired, mtc0 c0r1, mtc0 c0r15, mtc0 c0r16, mtc0 c0r17, mtc0 c0r18, mtc0 c0r19, mtc0 c0r20, mtc0 c0r21, mtc0 c0r22, mtc0 c0r23, mtc0 c0r24, mtc0 c0r25, mtc0 c0r26, mtc0 c0r27, mtc0 c0r28, mtc0 c0r29, mtc0 c0r31, mtc0 c0r7, tlbp, tlbr, tlbwi
 ]
 ignored = [
 ]

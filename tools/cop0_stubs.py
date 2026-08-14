@@ -39,7 +39,17 @@ TLB_OPS = {0x42000001: "tlbr", 0x42000002: "tlbwi", 0x42000006: "tlbwr",
            0x42000008: "tlbp", 0x42000018: "eret"}
 
 
+# The cache-control instruction. N64Recomp reports it as "Unhandled
+# instruction: cache" and stops, for the same reason it cannot do COP0: there
+# is no C for it. It belongs in `stubs` on the same grounds -- N64ModernRuntime
+# keeps its own memory coherent, so a translated cache op would have nothing to
+# operate on.
+CACHE_OPCODE = 0x2F
+
+
 def classify(word):
+    if (word >> 26) == CACHE_OPCODE:
+        return "cache"
     if word in TLB_OPS:
         return TLB_OPS[word]
     if (word >> 26) != 0x10:
