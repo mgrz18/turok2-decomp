@@ -79,7 +79,10 @@ segments:
   - name: code
     type: code
     start: 0x1100
-    vram: 0x00200500     # useg: el codigo corre mapeado por TLB
+    vram: 0x80200500     # KSEG0-consistent view of the useg address the game
+                         # actually runs at (0x00200500). Expressing the whole
+                         # image in one space is what lets splat model the VM
+                         # window as overlays — see the note on virtual_N below.
     subsegments:
       - [0x1100, asm]
       - [0x1F100, asm]
@@ -198,21 +201,39 @@ segments:
     type: bin
     start: 0x13B5F0
 
-  - name: virtual
+  # The three VM modules are fixed-address overlays: VMASM maps each of them to
+  # the SAME virtual address, 0x00400000, one at a time. They are not
+  # relocatable — see #13, where declaring them through
+  # relocatable_sections_path made the recompiler correctly refuse static calls
+  # into them.
+  #
+  # So each module gets its own segment at the same vram, grouped by
+  # exclusive_ram_id so splat knows they share the window rather than
+  # overlapping by mistake.
+  - name: virtual_0
     type: code
     start: 0x14A000
-    vram: 0x00400000     # useg, igual que el `virtual` de Turok 3.
-                         # Delta 0x2B6000 gana el barrido: 170/364 targets caen
-                         # sobre un prologo (46.7% contra ~1% de azar), y 147 de
-                         # esos vienen precedidos de `jr ra`, o sea inicios de
-                         # funcion reales. ROM 0x14A000 abre con 27BDFFE8.
+    vram: 0x80400000
+    exclusive_ram_id: vm_window
     subsegments:
-      # Three VM modules separated by two .rodata pools (pass-4 prologue-density
-      # sweep). The dispatcher in VMASM.S swaps these in overlay-style.
       - [0x14A000, asm,  virtual_text_0]
       - [0x17A600, data, virtual_rodata_0]
+
+  - name: virtual_1
+    type: code
+    start: 0x186000
+    vram: 0x80400000
+    exclusive_ram_id: vm_window
+    subsegments:
       - [0x186000, asm,  virtual_text_1]
       - [0x1B3400, data, virtual_rodata_1]
+
+  - name: virtual_2
+    type: code
+    start: 0x1BFA00
+    vram: 0x80400000
+    exclusive_ram_id: vm_window
+    subsegments:
       - [0x1BFA00, asm,  virtual_text_2]
       - [0x1DEE00, data, virtual_rodata_2]
 

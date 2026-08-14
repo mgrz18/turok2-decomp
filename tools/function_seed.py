@@ -83,31 +83,57 @@ def load_code_segments():
         if kind not in ("asm", "hasm") or "vram" not in parent:
             continue
         vram = parent["vram"] + (start - parent["start"])
-        out.append((start, end, vram, name))
+        # Overlay members share a VRAM window, so a bare address does not say
+        # which one a symbol belongs to. splat resolves that with a
+        # `segment:<name>` attribute, and the owning segment is knowable here
+        # because the seed came from a specific ROM range.
+        owner = parent.get("name") if parent.get("exclusive_ram_id") else None
+        out.append((start, end, vram, name, owner))
     return out
 
 
 def rom_to_vram(segments, off):
-    for start, end, vram, _ in segments:
+    for start, end, vram, _name, _owner in segments:
         if start <= off < end:
             return vram + (off - start)
     return None
 
 
 def vram_to_segment(segments, addr):
-    for start, end, vram, name in segments:
+    for start, end, vram, name, _owner in segments:
         if vram <= addr < vram + (end - start):
             return name
     return None
 
 
+def in_overlay(segments, addr):
+    """True when the address falls inside a segment that shares a VRAM window."""
+    for start, end, vram, _name, owner in segments:
+        if owner and vram <= addr < vram + (end - start):
+            return True
+    return False
+
+
+def seed_name(addr, owner):
+    """Overlay members need module-unique names.
+
+    Three modules share the window at 0x80400000, so the same address is a
+    different function in each. A single `func_804xxxxx` per address makes the
+    linker see 91 duplicate definitions; prefixing with the owning segment
+    keeps them distinct.
+    """
+    return f"{owner}_func_{addr:08X}" if owner else f"func_{addr:08X}"
+
+
 def scan(rom, segments):
+    # Sets of (address, owner): the same address is a distinct function in each
+    # overlay, so it can legitimately appear more than once.
     jal_targets = set()
     prologues = set()
     outside = Counter()
     outside_targets = set()
 
-    for start, end, vram, _name in segments:
+    for start, end, vram, _name, owner in segments:
         end = min(end, len(rom) - 3)
         for off in range(start, end, 4):
             word = struct.unpack_from(">I", rom, off)[0]
@@ -122,7 +148,13 @@ def scan(rom, segments):
                 pc = vram + (off - start)
                 target = (pc & 0xF0000000) | ((word & 0x03FFFFFF) << 2)
                 if vram_to_segment(segments, target):
-                    jal_targets.add(target)
+                    # Only attribute the target to an overlay when the target
+                    # itself lands in the shared window. An overlay calling
+                    # into the window is calling itself, since nothing else is
+                    # resident; but an overlay calling the engine must not tag
+                    # the engine's address with the overlay's name.
+                    jal_targets.add(
+                        (target, owner if in_overlay(segments, target) else None))
                 else:
                     outside[target >> 16] += 1
                     outside_targets.add(target)
@@ -133,7 +165,7 @@ def scan(rom, segments):
                 if off - 8 >= start:
                     prev = struct.unpack_from(">I", rom, off - 8)[0]
                     if prev == JR_RA:
-                        prologues.add(vram + (off - start))
+                        prologues.add((vram + (off - start), owner))
 
     return jal_targets, prologues, outside, outside_targets
 
@@ -194,7 +226,13 @@ def harvest_link_log(path, segments, rom):
         # GNU as keeps `.L`-prefixed symbols local, so they never reach the
         # symbol table and cross-object references to them cannot resolve no
         # matter where we seed them. Those always go the absolute route.
-        if name.startswith(".L") or not vram_to_segment(segments, addr):
+        # An address inside the shared overlay window cannot be attributed to a
+        # module from the linker's message alone, and seeding it unqualified
+        # defines the same name in every module that covers it. Route those to
+        # the absolute file instead.
+        if (name.startswith(".L")
+                or not vram_to_segment(segments, addr)
+                or in_overlay(segments, addr)):
             outside[name] = addr
         elif is_function_start(rom, segments, addr):
             inside[name] = addr
@@ -216,7 +254,7 @@ def is_function_start(rom, segments, addr):
 
 
 def vram_to_rom(segments, addr):
-    for start, end, vram, _name in segments:
+    for start, end, vram, _name, _owner in segments:
         if vram <= addr < vram + (end - start):
             return start + (addr - vram)
     return None
@@ -281,7 +319,8 @@ def main():
     jal_targets, prologues, outside, outside_targets = scan(rom, segments)
 
     known = load_existing()
-    seeds = sorted((jal_targets | prologues) - known)
+    pairs = sorted(prologues | jal_targets, key=lambda t: (t[0], t[1] or ""))
+    seeds = [(a, o) for a, o in pairs if a not in known]
 
     print(f"segmentos de codigo      : {len(segments)}")
     print(f"targets de jal           : {len(jal_targets):,}")
@@ -292,7 +331,7 @@ def main():
     print()
 
     per_segment = Counter()
-    for addr in seeds:
+    for addr, _o in seeds:
         per_segment[vram_to_segment(segments, addr) or "?"] += 1
     print("seeds por segmento:")
     for name, n in per_segment.most_common():
@@ -326,7 +365,9 @@ def main():
         lines = ["// Generado por tools/function_seed.py — no editar a mano.",
                  "// Entradas de funcion recuperadas por targets de jal + prologos tras `jr ra`.",
                  ""]
-        lines += [f"func_{a:08X} = 0x{a:08X}; // type:func" for a in seeds]
+        lines += [f"{seed_name(a, o)} = 0x{a:08X}; // type:func"
+                  + (f" segment:{o}" if o else "")
+                  for a, o in seeds]
         OUT.write_text("\n".join(lines) + "\n")
         print()
         print(f"escrito: {OUT.relative_to(ROOT)} ({len(seeds):,} simbolos)")
