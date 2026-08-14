@@ -40,6 +40,13 @@ TARGET        = $(BUILD_DIR)/$(BASENAME).$(VERSION)
 # Symbol seeds (gitignored; produced by setup script / splat)
 UNDEFINED_SYMS  = $(VERSIONS_DIR)/undefined_syms_auto.$(VERSION).txt
 UNDEFINED_FUNCS = $(VERSIONS_DIR)/undefined_funcs_auto.$(VERSION).txt
+# Addresses no segment places yet, harvested from the linker's own complaints
+# by `tools/function_seed.py --from-link-log`. Defining them absolutely still
+# reassembles each `jal` to the original word.
+UNDEFINED_EXTRA = $(VERSIONS_DIR)/undefined_funcs_extra.$(VERSION).txt
+# Hand-derived symbols with their derivation recorded. Tracked, unlike the two
+# generated files above.
+SYMS_MANUAL     = $(VERSIONS_DIR)/symbols_manual.$(VERSION).txt
 
 # Toolchain (Linux container)
 CROSS    = mips-linux-gnu-
@@ -76,6 +83,12 @@ LD_FLAGS         += -T $(UNDEFINED_SYMS)
 endif
 ifneq (,$(wildcard $(UNDEFINED_FUNCS)))
 LD_FLAGS         += -T $(UNDEFINED_FUNCS)
+endif
+ifneq (,$(wildcard $(UNDEFINED_EXTRA)))
+LD_FLAGS         += -T $(UNDEFINED_EXTRA)
+endif
+ifneq (,$(wildcard $(SYMS_MANUAL)))
+LD_FLAGS         += -T $(SYMS_MANUAL)
 endif
 
 OBJCOPY_FLAGS     = -O binary
@@ -137,14 +150,17 @@ verify: $(TARGET).z64
 
 # Splat-produced asm -> build/asm/*.s.o   (us/asm/foo.s -> build/asm/foo.s.o)
 #
-# Note: splat emits `.set noat` at the top, but the dumped code contains
-# 2-operand `div`/`divu`/`mul` etc. pseudo-ops whose gas expansion uses
-# $at. We flip to `.set at` on the fly; literal $at references downstream
-# still resolve fine — `.set at` only suppresses gas's warning, the
-# register name binding is unchanged.
+# splat emits 2-operand `div`/`divu`/`mult` pseudo-ops (633 sites). gas treats
+# those as MACROS and expands each into the instruction plus divide-by-zero
+# checks, which needs $at. Flipping `.set noat` to `.set at` let that through
+# and silently inflated the build by 4,412 bytes — the first divergence from
+# the baserom landed at ROM 0x160B, where a `beq +0x15` had become `beq +0x18`.
+#
+# Keep `.set noat` and add `.set nomacro` instead, so gas emits the bare
+# instruction the original SN64 toolchain produced.
 $(BUILD_DIR)/asm/%.s.o: $(ASM_DIR)/%.s
 	@mkdir -p $(dir $@)
-	sed 's/^\.set noat$$/.set at/' $< | $(AS) $(AS_FLAGS) -o $@ -
+	$(PYTHON) $(TOOLS_DIR)/fix_asm.py < $< | $(AS) $(AS_FLAGS) -o $@ -
 
 # Hand-written asm in src/us/asm/*.s
 # Output mirrors source layout (build/src/us/asm/foo.s.o) so the

@@ -117,7 +117,7 @@ segments:
   - name: code_rodata_tail
     type: code
     start: 0xC0950
-    vram: 0x80000500
+    vram: 0x802BFD50     # pass 6: era 0x80000500, colisionaba con libultra_tail
     subsegments:
       - [0xC0950, rodata]
       - [0xC2ED8, asm]              # 3 last engine funcs (ends @ 0xC3074)
@@ -138,7 +138,7 @@ segments:
   - name: libultra
     type: code
     start: 0xC3074
-    vram: 0x800C2474     # was 0x80000500 — overlapped with `code`. ROM 0xC3074 + delta 0x7FFFF400
+    vram: 0x802C2474     # pass 6: mismo delta 0x801FF400 que el engine (era 0x800C2474)
     subsegments:
       - [0xC3074, asm, libaudio]              # libaudio .text
       - [0xC8A60, asm, os_text_audio_sched]   # audio post + scheduler glue
@@ -159,7 +159,7 @@ segments:
   - name: libultra_tail
     type: code
     start: 0xF7F50
-    vram: 0x80000500
+    vram: 0x802F7350     # pass 6: era 0x80000500, colisionaba con code_rodata_tail
     subsegments:
       # libultra .sdata/.data tail (pointer-heavy initializer region).
       - [0xF7F50, data]
@@ -174,10 +174,22 @@ segments:
 
   # Virtual / VM-hosted code (T3-equivalent of the `virtual` segment).
   # Hot-loaded engine code that gets relocated by VMASM.S at runtime.
+  # PROVISIONAL. The old 0x8013AAF0 collided with `code` once that moved to
+  # 0x80200500 (duplicate symbol definitions at 0x8020D5xx), so it had to move.
+  #
+  # This value is the best-supported guess, not a confirmed mapping. Delta
+  # voting over the 370 `jal` targets in 0x80400000-0x80430B20 favours
+  # 0x802B6000 at 45.9% (chance is ~1%), which maps ROM 0x14A000 -> 0x80400000
+  # and implies 0x803F15F0 at this segment's start. Runner-up scored 38.6%, so
+  # the margin is thin.
+  #
+  # These modules are TLB-paged by VMASM.S/VMEMORY.C, not statically resident,
+  # so a single splat vram cannot be right for all of them anyway — see #23 and
+  # #13 (hand them to N64Recomp as relocatable sections).
   - name: virtual
     type: code
     start: 0x13B5F0
-    vram: 0x8013AAF0
+    vram: 0x803F15F0
     subsegments:
       # Three VM modules separated by two .rodata pools (pass-4 prologue-density
       # sweep). The dispatcher in VMASM.S swaps these in overlay-style.

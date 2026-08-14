@@ -1,0 +1,20 @@
+/* Hand-derived symbols, fed to `ld` via -T.
+ *
+ * Unlike versions/symbols_from_scan.us.txt (recovered mechanically from the
+ * ROM) and versions/undefined_funcs_extra.us.txt (harvested from linker
+ * complaints), everything here was worked out by hand and carries its
+ * derivation. This file is tracked.
+ */
+
+/* Called by the hand-written boot stub at ROM 0x1074:
+ *
+ *     ROM 0x1074: 3C040029   lui   $a0, 0x0029
+ *     ROM 0x1078: 2484D380   addiu $a0, $a0, -11392
+ *
+ * so the value is (0x0029 << 16) + (-0x2C80) = 0x0028D380.
+ *
+ * Note this is a useg address, not KSEG0: the stub programs a TLB entry
+ * mapping vaddr 0x00200000 to paddr 0x0 with a 2 MB page mask, and the game
+ * runs mapped. See docs/VRAM-LAYOUT.md.
+ */
+main = 0x0028D380;

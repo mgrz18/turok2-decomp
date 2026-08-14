@@ -60,3 +60,7 @@ versions/symbols_from_lnk.us.txt
 # Seeds recuperados del ROM por tools/function_seed.py (regenerables en segundos)
 versions/symbols_from_scan.us.txt
 versions/*.libtengine-bak
+versions/undefined_funcs_extra.us.txt
+
+# Instrucciones de workspace para Claude Code — locales, no se publican
+CLAUDE.md
