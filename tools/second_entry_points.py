@@ -63,6 +63,24 @@ def elf_functions():
     return funcs
 
 
+def elf_sizeless():
+    """Function symbols the ELF carries with no size, as a set of addresses.
+
+    `nm -S` prints four fields for a sized symbol and three for an unsized one,
+    so the field count is the test.
+    """
+    out = subprocess.run(
+        ["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+         IMAGE, "mips-linux-gnu-nm", "-S", "--defined-only", str(ELF.relative_to(ROOT))],
+        capture_output=True, text=True).stdout
+    addrs = set()
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) == 3 and parts[1] in ("t", "T"):
+            addrs.add(int(parts[0], 16))
+    return addrs
+
+
 def elf_sections():
     """[(name, vram, size)] for the loadable code sections."""
     out = subprocess.run(
@@ -117,6 +135,12 @@ def main():
 
     funcs = elf_functions()
     starts = [f[0] for f in funcs]
+    # Sizeless function symbols are invisible to `nm -S`'s size column but they
+    # still occupy space, so they bound the ones around them. Both sets are
+    # needed: `funcs` to know what is already usable, `all_starts` to know
+    # where anything at all begins.
+    sizeless = elf_sizeless()
+    all_starts = sorted(starts + sorted(sizeless))
     sections = elf_sections()
     by_name = {name for _v, _s, name in funcs}
 
@@ -131,26 +155,47 @@ def main():
     # found for jal target". The ELF is what decides -- a target only needs no
     # declaring if a *sized* function starts exactly there.
     for target in sorted(targets):
-        # It only needs declaring if no function starts there.
+        # Two different things end up needing a declaration, and they want
+        # different sizes.
         i = bisect.bisect_right(starts, target) - 1
         if i < 0:
             continue
         vram, size, _name = funcs[i]
+
         if vram == target:
-            continue
-        if target >= vram + size:
-            unplaced += 1        # inside no function at all
+            continue                      # a sized function starts here already
+
+        if target < vram + size:
+            # A second entry into a sized function. It runs to that function's
+            # end, since that is where the shared body stops.
+            length = vram + size - target
+        elif target in sizeless:
+            # A genuine function start that lost its size. splat emitted it as
+            # an indented `.globl` with no `.ent`, fix_asm declined to promote
+            # it because the instructions before it are not a return, and gas
+            # recorded nothing. N64Recomp then skips it when resolving a call.
+            # func_00214F68 is one: the sized function before it ends at
+            # exactly 0x00214F68, so it begins where that one stops.
+            #
+            # Its extent is whatever comes next, sized or not.
+            j = bisect.bisect_right(all_starts, target)
+            if j >= len(all_starts):
+                unplaced += 1
+                continue
+            length = all_starts[j] - target
+        else:
+            unplaced += 1                 # inside no function at all
             continue
 
         section = next((n for n, sv, ss in sections if sv <= target < sv + ss), None)
-        if section is None:
+        if section is None or length <= 0:
             unplaced += 1
             continue
 
         name = f"entry_{target:08X}"
         if name in by_name:
             continue
-        entries.append((name, section, target, vram + size - target))
+        entries.append((name, section, target, length))
 
     if args.toml:
         print("manual_funcs = [")
