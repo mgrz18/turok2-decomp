@@ -161,14 +161,13 @@ segments:
     vram: 0x800C2474     # KSEG0: libultra corre SIN mapear — trae los vectores de
                          # excepcion y el handler de TLB miss. El valor original era correcto.
     subsegments:
-      - [0xC3074, asm, libaudio]              # libaudio .text
-      - [0xC8A60, asm, os_text_audio_sched]   # audio post + scheduler glue
-      - [0xCB000, asm, os_text_io]            # osPi*/osSi* I/O wrappers
-      - [0xD1000, asm, os_text_gu]            # gu* matrix math (fp-dense)
-      - [0xD5000, asm, os_text_thread]        # thread dispatch / queue (COP0)
-      - [0xD8000, asm, os_text_msg_timer]     # osSendMesg / osSetTimer
-      - [0xDC800, asm, os_text_exception]     # exception vectors / fault (eret)
-      - [0xDDE00, asm, os_text_tail]          # trailing helpers up to 0xDEDE0
+      # This whole block is a DEAD duplicate of the libultra that is linked
+      # into the engine image at ROM 0x08AAA0. Measured over every j/jal in
+      # the ROM: the copy inside `code` receives 4,699 calls to 1,208 distinct
+      # targets, this one receives zero. Disassembling it as code produced
+      # ~114 KB of functions nothing can reach, and it is why os_text_* decoded
+      # so badly. Its data is still referenced, so only the text becomes bin.
+      - [0xC3074, bin]
       - [0xDEDE0, data, os_rodata]            # libultra .rodata + jump tables
 
   # Duplicate ucode copy used by the IPL3/boot path. Mirrors the
