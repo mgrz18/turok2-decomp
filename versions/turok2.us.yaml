@@ -89,12 +89,24 @@ segments:
   # que en Turok 3 (`code_data`, "linked mapped to 0x80000400"). Por eso vive
   # en su propio segmento — splat solo admite un vram por segmento.
   # Lo confirman 2,652 referencias sin resolver en el bloque 0x800A.
+  #
+  # Start moved back 0x1E0 from 0xA5FD8. The recompiler located it: it needs a
+  # jump table at 0x800A51F8, for the `jr` at 0x00206CC4, and could not size it
+  # because the address fell outside every rodata section. Checking the bytes
+  # settles which side of the boundary they are on:
+  #
+  #   0xA5C18-0xA5DF8   0/120 words are valid code addresses  -> instructions
+  #   0xA5DF8-0xA5FD8   100/120                               -> jump tables
+  #   0xA5FD8           "simple object index", "geometry"     -> strings
+  #
+  # and the table opens on 0x00206CCC, the instruction after the `jr` that
+  # reads it. So rodata starts with its jump tables and the string pool follows.
   - name: code_rodata
     type: code
-    start: 0xA5FD8
-    vram: 0x800A53D8     # 0xA5FD8 + 0x7FFFF400
+    start: 0xA5DF8
+    vram: 0x800A51F8     # 0xA5DF8 + 0x7FFFF400
     subsegments:
-      - [0xA5FD8, rodata]
+      - [0xA5DF8, rodata]
 
   # ---------------------------------------------------------------------------
   # RSP microcode blobs. Do NOT disassemble as MIPS — see docs/MICROCODE.md.
@@ -226,13 +238,65 @@ segments:
                          # esos vienen precedidos de `jr ra`, o sea inicios de
                          # funcion reales. ROM 0x14A000 abre con 27BDFFE8.
     subsegments:
-      # Three VM modules separated by two .rodata pools (pass-4 prologue-density
-      # sweep). The dispatcher in VMASM.S swaps these in overlay-style.
+      # Two VM modules separated by a .rodata pool. Both are sound at this base:
+      # scored by how often their `jal`s land on a function boundary, they hit
+      # 94.8% and 79.5% against the engine's own 88.0% and ~1.2% chance.
+      # The third module is not one of these — see vm_overlay_2 below.
       - [0x14A000, asm,  virtual_text_0]
       - [0x17A600, data, virtual_rodata_0]
       - [0x186000, asm,  virtual_text_1]
       - [0x1B3400, data, virtual_rodata_1]
-      - [0x1BFA00, asm,  virtual_text_2]
+
+  # Not a third VM module: a second, differently-linked copy of the engine's
+  # top 128 KB. 59.6% of its words are byte-identical to ROM 0x84D40 onwards
+  # with no identical run reaching 1 KB, which is relocated code — same
+  # instructions, different addresses. Of the 12,940 words that do differ, the
+  # ones that are `jal` on both sides differ by a single value: +0x330 in the
+  # 26-bit field, +0xCC0 of target address, in 94.8% of cases.
+  #
+  # ROM 0x1BFA00 corresponds to engine ROM 0x84D40, i.e. vram 0x00284140.
+  # Adding the 0xCC0 its own calls carry gives 0x00284E00, where 82.0% of them
+  # resolve to a function boundary — against 1.7% at 0x00284140 and 0% at the
+  # 0x00475A00 the linear layout used to give it.
+  #
+  # That base overlaps `code`, so this is a real overlay: a paged copy that
+  # replaces engine code at runtime, which is what VMEMORY.C / VMASM.S describe.
+  #
+  # splat cannot express it. Declaring it with `exclusive_ram_id` is rejected:
+  #
+  #   Overlay segment vm_overlay_2 with vram range ([0x00284E00, 0x002A4200])
+  #   overlaps with the global vram range ([0x00200500, 0x80106400])
+  #
+  # splat requires overlays to sit outside the interval spanned by the global
+  # segments, and this ROM's mixed model — engine TLB-mapped in useg, libultra
+  # and the data segments direct in KSEG0 — stretches that interval across
+  # nearly the whole address space, so no overlay address can be outside it.
+  # Marking `code` exclusive too would shrink the interval, but that rewrites
+  # the symbol scope of the entire engine to gain a second disassembly of code
+  # the ROM already carries.
+  #
+  # So it stays `bin`. Nothing is lost: this is a copy, and the original is at
+  # ROM 0x84D40 inside `code`, mapped correctly and already disassembled. What
+  # the copy contributed was 1,596 `jal`s resolving against a base 0x1F1B00
+  # from where its code was linked — noise, and the reason the recompiler
+  # aborted on func_0048CE6C. Removing the TLB copy is also what the recomp
+  # path wants: N64ModernRuntime does not page, so the engine's own copy is the
+  # one that runs.
+  #
+  # Same conclusion as #31 reached for the libultra text. Revisit if splat
+  # gains overlay support that does not require a contiguous global range.
+  - name: vm_dup_engine
+    type: bin
+    start: 0x1BFA00
+
+  # Left at the address the old linear layout gave it. If this pool belongs to
+  # the copy above it is misplaced, but moving both at once would make the
+  # effect of either impossible to attribute.
+  - name: virtual_tail
+    type: code
+    start: 0x1DEE00
+    vram: 0x00494E00
+    subsegments:
       - [0x1DEE00, data, virtual_rodata_2]
 
   # 913-entry uint32 BE monotonic offset table (assets directory).

@@ -39,6 +39,24 @@ EXISTING = ROOT / "versions" / "symbol_addrs.us.txt"
 
 JAL_OPCODE = 0x03          # 000011
 JR_RA = 0x03E00008
+
+# Addresses the recompiler itself rejected as function starts: it reported a
+# branch reaching back past the start we declared, which a branch cannot do,
+# so the function began earlier and our boundary cut it in half. Harvested by
+# `tools/recomp_feedback.py`.
+#
+# Deliberately not bad_boundaries.us.txt. That one is a heuristic over data
+# regions and cannot tell a `switch` table from a table of function pointers;
+# excluding its 2,905 entries dropped 308 real function starts and took the
+# emitted C from 492 KB to 220 KB.
+_BAD = ROOT / "versions" / "rejected_boundaries.us.txt"
+BAD_BOUNDARIES = set()
+if _BAD.exists():
+    for _line in _BAD.read_text(errors="replace").split():
+        try:
+            BAD_BOUNDARIES.add(int(_line, 16))
+        except ValueError:
+            pass
 KSEG0 = 0x80000000  # solo para datos; el codigo corre en useg
 
 
@@ -106,11 +124,6 @@ def vram_to_segment(segments, addr):
     return None
 
 
-def _is_virtual(addr):
-    """The one VM module whose calls do not resolve — see the note in scan()."""
-    return 0x00475A00 <= addr < 0x00494E00
-
-
 def in_overlay(segments, addr):
     """True when the address falls inside a segment that shares a VRAM window."""
     for start, end, vram, _name, owner in segments:
@@ -161,6 +174,7 @@ def scan(rom, segments):
     # overlay, so it can legitimately appear more than once.
     jal_targets = set()
     prologues = set()
+    epilogues = set()
     outside = Counter()
     outside_targets = set()
 
@@ -169,34 +183,19 @@ def scan(rom, segments):
         for off in range(start, end, 4):
             word = struct.unpack_from(">I", rom, off)[0]
 
-            # Only the third VM module is held back, not the whole window.
+            # Every code segment contributes jal targets again. Scored by how
+            # often their calls land on a function boundary, against ~1.2%
+            # chance, the remaining callers are all sound:
             #
-            # Scoring each caller by how often its calls land on a function
-            # boundary — `jr ra` two instructions before, or a prologue at the
-            # target — separates them cleanly. Chance is ~1.2%.
+            #     code                88.0%
+            #     virtual_text_0      94.8%
+            #     virtual_text_1      79.5%
             #
-            #     code                 88.0%
-            #     virtual @0x400000    94.8%
-            #     virtual @0x43C000    79.5%
-            #     virtual @0x475A00     3.6%   <- this one
-            #
-            # The first two are as good as the engine itself, so withholding
-            # them was throwing away sound seeds.
-            #
-            # The third is a second, differently-linked copy of the engine's
-            # top 128 KB: 59.6% of its words are identical to ROM 0x84D40
-            # onwards, and of the calls that do differ, 94.8% differ by
-            # exactly +0x330 in the 26-bit field — +0xCC0 of target address.
-            # Its own base is therefore 0x00284140 + 0xCC0 = 0x00284E00, at
-            # which 82.0% of its calls resolve to a boundary, against 1.7% at
-            # the un-shifted 0x00284140 and 0% where it is mapped today.
-            #
-            # That address overlaps `code`, so it is an overlay — a paged copy
-            # that replaces engine code at runtime — and cannot simply be
-            # re-based in place. Until it is declared as one its targets are
-            # noise, so it contributes prologues, which are local evidence,
-            # and nothing that depends on the layout. See #38.
-            if (word >> 26) == JAL_OPCODE and not _is_virtual(vram):
+            # The one that was not — virtual_text_2 at 3.6% — is no longer
+            # disassembled. It was a relocated copy of engine code the ROM
+            # already carries at 0x84D40, so it is `bin` now and never reaches
+            # this scan. See #38 and the note in versions/turok2.us.yaml.
+            if (word >> 26) == JAL_OPCODE:
                 # A `jal` carries only bits [27:2]; the top nibble comes from
                 # the delay slot's PC. Hardcoding KSEG0 here was wrong: the
                 # engine runs TLB-mapped in useg, so its calls resolve to
@@ -242,7 +241,31 @@ def scan(rom, segments):
                     if prev == JR_RA:
                         prologues.add((vram + (off - start), owner))
 
-    return jal_targets, prologues, outside, outside_targets
+            # Whatever follows a return and its delay slot starts a function.
+            #
+            # This is the same test `is_function_start` applies as a filter,
+            # run generatively. It is worth its own class because the two
+            # generators above are blind to a whole population: a leaf function
+            # that never touches the stack has no `addiu sp` to find, and one
+            # only ever reached by `j` or through a jump table is nobody's `jal`
+            # target. That is exactly what stalled the recompiler on
+            # func_00299EB0 — it ran on past 0x00299F80, where a `jr ra` and its
+            # delay slot plainly end it, because the function beginning at
+            # 0x00299F84 opens on `bc1f` and had no symbol.
+            #
+            # Measured over the code segments: 4,662 addresses follow a return,
+            # and 63.8% of them are already known as a jal target or a prologue.
+            # Agreeing with the other two generators on two thirds of its
+            # output is what makes the remaining 1,686 credible. They open on
+            # `lui`, `lw`, `addiu`, `cop1` — ordinary function entries — and
+            # only 18 land on a `nop`, which is alignment padding rather than
+            # code and is dropped below.
+            if word == JR_RA and off + 8 < end:
+                nxt = struct.unpack_from(">I", rom, off + 8)[0]
+                if nxt != 0:
+                    epilogues.add((vram + (off + 8 - start), owner))
+
+    return jal_targets, prologues, epilogues, outside, outside_targets
 
 
 def load_existing():
@@ -412,16 +435,20 @@ def main():
 
     rom = ROM.read_bytes()
     segments = load_code_segments()
-    jal_targets, prologues, outside, outside_targets = scan(rom, segments)
+    jal_targets, prologues, epilogues, outside, outside_targets = scan(rom, segments)
 
     known = load_existing()
-    pairs = sorted(prologues | jal_targets, key=lambda t: (t[0], t[1] or ""))
+    found = prologues | jal_targets | epilogues
+    rejected = {t for t in found if t[0] in BAD_BOUNDARIES}
+    pairs = sorted(found - rejected, key=lambda t: (t[0], t[1] or ""))
     seeds = [(a, o) for a, o in pairs if a not in known]
 
     print(f"segmentos de codigo      : {len(segments)}")
     print(f"targets de jal           : {len(jal_targets):,}")
     print(f"prologos tras `jr ra`    : {len(prologues):,}")
-    print(f"union                    : {len(jal_targets | prologues):,}")
+    print(f"tras `jr ra` + delay slot: {len(epilogues):,}")
+    print(f"union                    : {len(found):,}")
+    print(f"  menos límites rechazados: {len(rejected):,}")
     print(f"ya conocidos (symbol_addrs): {len(known):,}")
     print(f"seeds nuevos             : {len(seeds):,}")
     print()

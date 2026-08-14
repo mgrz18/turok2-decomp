@@ -69,3 +69,7 @@ turok2.us.toml.local
 
 # Claude Code workspace state — never publish
 .claude/
+
+# qemu-x86_64 dumps these when it crashes emulating the amd64 build image
+core
+core.*

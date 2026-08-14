@@ -218,3 +218,12 @@ nuke: clean
 
 .SECONDARY:
 SHELL = /bin/bash -e -o pipefail
+
+# Remove a target whose recipe failed. Without this make leaves the partial
+# file behind, and because it is newer than its source the next run treats it
+# as up to date. That is how an 812-byte virtual_rodata_0.data.s.o survived for
+# a 47 KB region: fix_asm.py segfaulted mid-pipe, pipefail correctly failed the
+# rule with Error 139, and the truncated object then linked cleanly into every
+# build after it. The link failed 235 symbols away, on symbols that really were
+# defined -- in the part of the file the crash had cut off.
+.DELETE_ON_ERROR:

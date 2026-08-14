@@ -31,7 +31,7 @@ DIV_RE = re.compile(r"^(\s*)(divu?)\s+(\$\w+),\s*(\$\w+)\s*$")
 # inside a larger function rather than beginning one. Promoting them anyway is
 # what produced the "Unhandled branch" class of failure. The list is generated
 # by running the recompiler, so it corrects itself as the segmentation improves.
-_BAD = pathlib.Path(__file__).resolve().parent.parent / "versions" / "bad_boundaries.us.txt"
+_BAD = pathlib.Path(__file__).resolve().parent.parent / "versions" / "rejected_boundaries.us.txt"
 BAD_BOUNDARIES = set()
 if _BAD.exists():
     for _line in _BAD.read_text().split():
@@ -95,6 +95,16 @@ def fix(lines):
             # ("Failed to determine size of jump table"). func_0029C270 came
             # out 0x28 bytes against a body of 0x658 that way.
             if not JR_RA_RE.match(prev_prev_insn):
+                yield line
+                continue
+
+            # The list above was loaded and never consulted, so every address
+            # the recompiler rejected got promoted again on the next pass. That
+            # is why feeding its complaints back changed nothing: the loop kept
+            # re-creating the boundary it had just been told was wrong, and the
+            # same `.L0021EC4C` came back ten runs in a row.
+            addr = _addr_of(name)
+            if addr is not None and addr in BAD_BOUNDARIES:
                 yield line
                 continue
 

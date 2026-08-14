@@ -85,14 +85,31 @@ def main():
     rom = ROM.read_bytes()
     segments = load_segments()
 
+    # Only real functions. `stubs` is a list of things N64Recomp will replace,
+    # and it only ever walks STT_FUNC symbols — naming anything else there is
+    # rejected outright ("Function .L0029C170 is stubbed out in the config file
+    # but does not exist!"), which aborts the whole run before a single
+    # function is emitted.
+    #
+    # Dropping them is not just about satisfying the parser. A `.L` is a branch
+    # target and a `D_` a data label; both sit *inside* a function, so a COP0
+    # instruction found under one belongs to whichever function encloses it.
+    # Filtering them out before the ranges are computed is what makes that
+    # attribution happen — each range now runs from one function to the next
+    # instead of being cut short at every interior label. #32 is the same
+    # mistake in its earlier form: a third of the names stubbed back then were
+    # branch labels our own segmentation had invented.
     labels = []
     for path in sorted(glob.glob(str(ASM / "*.s"))):
         for line in open(path, errors="replace"):
             m = re.match(r"^\s*\.globl (\S+)", line)
             if m:
-                a = re.search(r"([0-9A-Fa-f]{8})$", m.group(1))
+                name = m.group(1)
+                if name.startswith(".L") or name.startswith("D_"):
+                    continue
+                a = re.search(r"([0-9A-Fa-f]{8})$", name)
                 if a:
-                    labels.append((int(a.group(1), 16), m.group(1)))
+                    labels.append((int(a.group(1), 16), name))
     labels.sort()
 
     found = {}
