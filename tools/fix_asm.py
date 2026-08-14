@@ -20,10 +20,30 @@ Two problems, both of which silently changed the output bytes:
    rather than next to `.set noat`.
 """
 
+import pathlib
 import re
 import sys
 
 DIV_RE = re.compile(r"^(\s*)(divu?)\s+(\$\w+),\s*(\$\w+)\s*$")
+
+# Addresses N64Recomp has told us are not function boundaries: it reported a
+# branch leaving the function that starts there, which means the label sits
+# inside a larger function rather than beginning one. Promoting them anyway is
+# what produced the "Unhandled branch" class of failure. The list is generated
+# by running the recompiler, so it corrects itself as the segmentation improves.
+_BAD = pathlib.Path(__file__).resolve().parent.parent / "versions" / "bad_boundaries.us.txt"
+BAD_BOUNDARIES = set()
+if _BAD.exists():
+    for _line in _BAD.read_text().split():
+        try:
+            BAD_BOUNDARIES.add(int(_line, 16))
+        except ValueError:
+            pass
+
+
+def _addr_of(name):
+    m = re.search(r"([0-9A-Fa-f]{8})$", name)
+    return int(m.group(1), 16) if m else None
 ENT_RE = re.compile(r"^\.ent\s+(\S+)")
 END_RE = re.compile(r"^\.end\s+(\S+)")
 INNER_GLOBL_RE = re.compile(r"^\s+\.globl\s+(\S+)\s*$")
@@ -62,6 +82,10 @@ def fix(lines):
             # its delay slot. Splitting at an interior branch target instead
             # produces functions whose branches leave their own body, which
             # N64Recomp rejects with "Unhandled branch".
+            if _addr_of(name) in BAD_BOUNDARIES:
+                yield line
+                continue
+
             # Promote every one of them. Requiring a preceding `jr ra` keeps
             # the split honest but leaves the rest as NOTYPE/size 0, which
             # N64Recomp rejects as a jump target ("Manual function ... already
