@@ -1,116 +1,115 @@
-# VMASM — Acclaim Studios London Overlay Dispatcher
+# VMASM — the TLB-paged code system
 
-## What VMASM is
+The SN64 LNK records name three source files that matter here:
 
-The Turok 2 SN64 LNK records contain an explicit reference to a source file
-named `VMASM.S`. That assembly file implements a tiny overlay dispatcher
-that hot-loads chunks of code from ROM into a fixed VRAM bank, in the
-classic N64 style of `osPiStartDma(rom_offset, dest_vram, size)`.
+```
+engine/PTIMER.CPP
+engine/Virtual/VMEMORY.C
+engine/Virtual/VMASM.S
+```
 
-The Turok 1 source leak at
-`references/Turok-N64-Source-code/src/PR/tengine/dosvers/overlay/`
-shows the same idiom (structural reference only — we do **not** copy code).
+`VM` is **virtual memory**, not virtual machine. Turok 2 runs its engine code
+through the R4300's TLB and pages parts of it in from ROM at runtime. Earlier
+passes of this document read the subsystem as a conventional overlay swapper
+and drew conclusions that turned out to be wrong; those are recorded at the
+bottom so nobody repeats them.
 
-The same engine is used in Turok 3, Rage Wars, and Armorines, so any work
-done here transfers directly to the Armorines port.
+## What the boot stub proves
 
-## What lives in ROM
+`src/us/asm/boot.s` — hand-written, byte-verified against the ROM — programs a
+TLB entry before jumping into the game:
 
-| ROM range            | size      | content                                      |
-|---                   |---        |---                                           |
-| 0x13B5F0 – 0x17A600  | 0x3F010   | `virtual_text_0`   (statically resident)     |
-| 0x17A600 – 0x186000  | 0xBA00    | `virtual_rodata_0`                           |
-| 0x186000 – 0x1B3400  | 0x2D400   | `virtual_text_1`   (overlay)                 |
-| 0x1B3400 – 0x1BFA00  | 0xC600    | `virtual_rodata_1`                           |
-| 0x1BFA00 – 0x1DEE00  | 0x1F400   | `virtual_text_2`   (overlay)                 |
-| 0x1DEE00 – 0x20E334  | 0x2F534   | `virtual_rodata_2`                           |
+```
+li  $a0, 0x1F           # TLB index 31
+li  $a1, 0x001FE000     # PageMask: 2 MB pages
+li  $a2, 0x00200000     # vaddr
+li  $a3, 0              # paddr0
+li  $t1, 0x00100000     # paddr1
+```
 
-## Adopted VRAM layout (Round 5)
+So virtual `0x00200000`–`0x003FFFFF` maps to physical `0x0`–`0x001FFFFF`. The
+engine is DMA'd to physical 0 and executes at `0x00200500`, which is why the
+`code` segment's VRAM is what it is (see `VRAM-LAYOUT.md`).
 
-Pass 5 (Agent O) reached the following layout by **gap-analysis of the
-1820 unresolved references** that splat produced when the whole `virtual`
-segment was assumed to be sequentially placed in VRAM from 0x8013AAF0:
+That entry covers the engine. It does **not** cover the `virtual` modules,
+which live at `0x00400000` and up — outside the 2 MB window. Those need
+further TLB entries, and `VMASM.S` is what installs them.
 
-| module                | VRAM load      | rationale                              |
-|---                    |---             |---                                     |
-| `virtual_text_0`      | 0x8013AAF0     | statically resident, ROM-natural VRAM  |
-| `virtual_rodata_0`    | 0x80179B00     | follows text_0 (in-place)              |
-| `virtual_text_1`      | 0x80210000     | covers first unresolved cluster        |
-| `virtual_rodata_1`    | 0x8023D400     | follows text_1 in same bank            |
-| `virtual_text_2`      | 0x80249A00     | follows rodata_1 in same bank          |
-| `virtual_rodata_2`    | 0x80268E00     | follows text_2; ends at 0x80298334     |
+## Memory map
 
-`virtual_text_0` is its own segment; modules 1 and 2 share a single splat
-segment named `virtual_overlay_bank` that begins at VRAM 0x80210000.
+| region | ROM | address | space |
+|---|---|---|---|
+| boot stub | 0x1000 | `0x80000400` | KSEG0, unmapped |
+| engine `.text` | 0x1100 | `0x00200500` | useg, TLB-mapped |
+| engine `.rodata` | 0xA5FD8 | `0x800A53D8` | KSEG0, direct |
+| libultra | 0xC3074 | `0x800C2474` | KSEG0, direct |
+| `virtual` modules | 0x14A000 | `0x00400000` | useg, TLB-mapped |
 
-## Dispatch table — search status
+libultra has to stay unmapped: it holds the exception vectors and the TLB
+refill handler itself.
 
-The structural goal of the round was to **locate the dispatch table** in
-the ROM and read the actual VRAMs directly. We did not find it in the
-likely locations:
+Turok 3 uses the same layout — `references/turok3/versions/turok3.us.yaml`
+places its `code` at `0x00200500` and its `virtual` at `0x00400000`, with the
+comment "some functions are mapped as virtual, and get hot-loaded from rom".
 
-* `virtual_rodata_0` (ROM 0x17A600 – 0x186000) does not contain a
-  table shaped like `(rom_offset, vram_load, size, entry_point)`.
-* The engine `.rodata` block (ROM 0xA5FD8 – 0xBDF2C) does not contain
-  literal BE encodings of `0x00186000` / `0x001BFA00` / `0x80210000` /
-  `0x80280000`.
-* A whole-ROM 4-uint32-BE row-scan returned **zero** plausible candidates
-  whose first field equals a known overlay rom_start and whose second
-  field is in the kernel VRAM range.
+## What is still open
 
-This is consistent with the table being **built at runtime** from the
-LNK section-relative records at ROM 0x107000 – 0x13B5F0 — VMASM walks
-those records and computes the load addresses dynamically. To extract it
-properly would require simulating the dispatcher boot path on a CPU
-trace; that is left for Pass 6.
+Whether the paging is **relocation** or **overcommit**. That is the question
+that decides whether this project can produce a TLB-free build:
 
-In the meantime `tools/vmasm_decode.py` prints the round-5 adopted layout
-and supports `--scan` / `--table-offset <hex>` so future passes can drop
-in a discovered table without rewriting tooling.
+- If each ROM region maps to one distinct virtual address and nothing is ever
+  swapped, the TLB is only relocating. Load everything at its address on an
+  8 MB machine and the TLB stops being necessary.
+- If two ROM regions share a virtual address, code really is paged in and out,
+  and removing the TLB means restructuring the game's memory model.
 
-## Outstanding mystery: the 0x80400000 cluster
+`VM_PhysicalPool`, exported from `VMEMORY.C`, is the allocator to read. Its
+size relative to the ~800 KB of `virtual` code is the answer.
 
-After fixing the YAML to use the bank layout above, ~620 references in
-the 0x80403BF0 – 0x8042F3D0 range remained unresolved. The cluster is
-contiguous and roughly the size of `virtual_text_2` plus its rodata,
-which suggests **module 2 may load to a second VRAM slot at runtime**
-(double-banked overlay). Splat can only express one VRAM per ROM region,
-so this cluster cannot be resolved without either:
+This matters because N64Recomp does not support TLB — its README lists
+relocations for TLB mapping as planned, not implemented. Every TLB-using N64
+game running natively today got there through a full decompilation: GoldenEye
+builds a TLB-free ROM from a dedicated decomp branch, Perfect Dark ships as a
+decomp-based port. Neither route is available here, so a TLB-free build made
+at the assembly level would be new ground.
 
-1. Duplicating the ROM region into a second pseudo-segment with the
-   alternate VRAM (requires splat patch or post-link symbol aliasing),
-   or
-2. Stubbing the unresolved targets with shim functions that trampoline
-   to the primary VRAM at runtime.
+## Refuted hypotheses
 
-Pass 6 should pick one of these strategies and run with it.
+Kept on record so they are not retried. Each is also a closed issue with the
+full evidence.
 
-## Round 5 link status
+**The modules are compressed.** No `RNC`/`Yay0`/`Yaz0`/`MIO0`/`LZ77` magic
+anywhere in the ROM, entropy is ordinary (173–193 unique bytes per 4 KB against
+180 for known-good code), and `virtual_text_0` opens on `27bd ffe0`, a valid
+prologue.
 
-`make rom` still fails to link: **2,414 unresolved references remain**
-(down from ~1,820 in the assumed-sequential layout — the rise comes
-from the new 0x80400000 cluster, which was previously masked when
-splat absorbed those bytes into a continuous segment). The bank-layout
-fix is structurally correct (text_0 has been separated, the
-unresolved cluster between 0x80210000 and 0x80298334 is now genuinely
-resolvable bytes), but the dual-VRAM problem blocks the final link
-this round.
+**The dispatch table lives in the rodata pools.** The `0000ff01`-delimited
+records in `virtual_rodata_0` (292) and `virtual_rodata_1` (310) looked like a
+linkage table, and 602 records sat suspiciously close to the ~620 unresolved
+references then being reported. But the `0x0040xxxx`–`0x0043xxxx` values in
+those pools have **zero** intersection with the unresolved functions in that
+cluster. Coincidence.
 
-**SHA1 verify:** not attempted — no `.z64` produced.
+**VMASM builds the table at runtime from the LNK records.** A shipping game
+does not parse linker debug records at runtime; they are build leftovers, as
+`LNK-FORMAT.md` says. The volumes do not work either — 3 records totalling
+~10 KB inside a 214 KB region. This hypothesis was built on the premise that
+the blocker was VRAM-related, which was itself wrong.
 
-## Regenerating the table read-out
+**The blocker is a dual-VRAM conflict.** What actually stalled the project was
+that the whole address space was shifted by 0x200000 and assumed to be KSEG0
+when the code runs in useg. Correcting that took the disassembly from 48.8% to
+95.2% and made the `jal` graph close on itself.
+
+## Regenerating the layout read-out
 
 ```bash
-python3 tools/vmasm_decode.py             # pretty-print the table
-python3 tools/vmasm_decode.py --scan      # rerun the row-scan
-python3 tools/vmasm_decode.py --yaml-snippet  # emit YAML lines
+python3 tools/function_seed.py            # jal targets, prologues, unplaced banks
+python3 tools/metrics.py                  # decode and symbol coverage
 ```
 
 ## Implication for Armorines
 
-Armorines uses the same engine and almost certainly the same VMASM
-dispatcher. The layout will differ in ROM offsets and probably in the
-VRAM bank addresses, but the **shape** is the same: one static text
-module plus N overlays sharing one or two banks. Re-using
-`tools/vmasm_decode.py` for that title should be a 30-minute job once
-the bank VRAMs are identified.
+Same engine, so the same `VMASM.S` / `VMEMORY.C` pair and almost certainly the
+same split of useg code against KSEG0 data. The ROM offsets will differ; the
+method in `VRAM-LAYOUT.md` recovers them without any prior knowledge.
