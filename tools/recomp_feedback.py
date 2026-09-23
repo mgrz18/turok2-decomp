@@ -49,6 +49,14 @@ REJECTED = ROOT / "versions" / "rejected_boundaries.us.txt"
 # opposite correction: an address that needs a symbol, not one that has a wrong
 # one. `function_seed.py` merges this file into its output.
 MISSING = ROOT / "versions" / "recomp_seeds.us.txt"
+# Declared entry points that the recompiler refused. The sizes in
+# `second_entry_points.py` are inferred from the bytes, and inference is never
+# going to be right everywhere -- entry_002199F4 fails on an instruction
+# rabbitizer calls INVALID that is in neither the ROM nor the ELF anywhere in
+# its 460 bytes. Rather than keep sharpening the guess, drop the ones that do
+# not work: the address loses its declaration, its callers stop resolving, and
+# the existing rule stubs them. The loop converges either way.
+BAD_ENTRIES = ROOT / "versions" / "bad_entries.us.txt"
 
 # Past this, a forward branch says more about the start than about the extent.
 # The largest real function the segmentation has produced is a few KB; 0x12580
@@ -207,6 +215,19 @@ def main():
     args = ap.parse_args()
 
     text = args.log.read_text(errors="replace")
+
+    failed_entries = set(re.findall(r"Error (?:in )?recompiling (entry_[0-9A-Fa-f]{8})", text))
+    if failed_entries:
+        have = set()
+        if BAD_ENTRIES.exists():
+            have = {l.strip() for l in BAD_ENTRIES.read_text().splitlines() if l.strip()}
+        merged = have | failed_entries
+        print(f"declared entries the recompiler refused: {len(failed_entries)}"
+              f"  (total {len(merged)})")
+        for n in sorted(failed_entries - have):
+            print(f"    {n}")
+        if args.write and merged != have:
+            BAD_ENTRIES.write_text("\n".join(sorted(merged)) + "\n")
     backward, forward = harvest(text)
     missing = {int(a, 16) for a in NOFUNC.findall(text)}
 
@@ -227,7 +248,20 @@ def main():
     sys.path.insert(0, str(ROOT / "tools"))
     from function_seed import load_code_segments, vram_to_segment
     segments = load_code_segments()
-    unplaceable = {a for a in missing if not vram_to_segment(segments, a)}
+    # A target whose declaration was dropped is in the same position as one no
+    # section covers: nothing can be placed there, so asking again every run is
+    # a loop that never ends. Dropping entry_002199F4 left 0x0041E400
+    # unresolvable and took the output from 26 MB back to 17 MB, because the
+    # callers had nothing to bind to and no rule was stubbing them.
+    dropped = set()
+    if BAD_ENTRIES.exists():
+        for line in BAD_ENTRIES.read_text().splitlines():
+            m = re.search(r"entry_([0-9A-Fa-f]{8})", line.strip())
+            if m:
+                dropped.add(int(m.group(1), 16))
+
+    unplaceable = {a for a in missing
+                   if not vram_to_segment(segments, a) or a in dropped}
     unstubbable = set()
     if unplaceable:
         for m in re.finditer(

@@ -82,8 +82,8 @@ segments:
     vram: 0x00200500     # useg: el codigo corre mapeado por TLB
     subsegments:
       - [0x1100, asm]
-      - [0x1F100, asm]
-      - [0x438B0, asm]
+      - [0x1F440, asm]     # a 16-aligned function start: 0x1F100 cut a function at a bc1f, and objects link 16-aligned
+      - [0x43D70, asm]     # likewise: 0x438B0 cut func_00242C00, which branches to 0x00242CB8
 
   # El .rodata NO es useg: se linkea directo desde 0x80000400 en KSEG0, igual
   # que en Turok 3 (`code_data`, "linked mapped to 0x80000400"). Por eso vive

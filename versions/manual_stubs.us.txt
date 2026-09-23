@@ -117,3 +117,17 @@ func_00226F8C
 # page, so the mapping it installs has no meaning. This is the TLB itself, which
 # the port exists to remove.
 STVM_MapTLB
+
+# Branches to an address no section covers, so no symbol can be
+# placed there. Rejecting the boundary only moves the stray word
+# to the next enclosing function.
+func_00457294
+
+# Branches to an address no section covers, so no symbol can be
+# placed there. Rejecting the boundary only moves the stray word
+# to the next enclosing function.
+func_00460444
+
+# Calls a declared entry the recompiler refused (versions/bad_entries.us.txt),
+# so the jal has nothing to bind to.
+func_004671BC

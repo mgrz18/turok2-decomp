@@ -47,7 +47,6 @@ manual_funcs = [
     { name = "entry_0020BEE8", section = ".code", vram = 0x0020BEE8, size = 484 },
     { name = "entry_00214F68", section = ".code", vram = 0x00214F68, size = 336 },
     { name = "entry_002150C0", section = ".code", vram = 0x002150C0, size = 492 },
-    { name = "entry_002199F4", section = ".code", vram = 0x002199F4, size = 460 },
     { name = "entry_00226F90", section = ".code", vram = 0x00226F90, size = 500 },
     { name = "entry_00228910", section = ".code", vram = 0x00228910, size = 416 },
     { name = "entry_00229340", section = ".code", vram = 0x00229340, size = 728 },
@@ -453,7 +452,6 @@ manual_funcs = [
     { name = "entry_0041E27C", section = ".virtual", vram = 0x0041E27C, size = 24 },
     { name = "entry_0041E308", section = ".virtual", vram = 0x0041E308, size = 108 },
     { name = "entry_0041E354", section = ".virtual", vram = 0x0041E354, size = 32 },
-    { name = "entry_0041E400", section = ".virtual", vram = 0x0041E400, size = 256 },
     { name = "entry_0041E73C", section = ".virtual", vram = 0x0041E73C, size = 592 },
     { name = "entry_0041E81C", section = ".virtual", vram = 0x0041E81C, size = 8 },
     { name = "entry_0041E8D8", section = ".virtual", vram = 0x0041E8D8, size = 348 },
@@ -643,8 +641,6 @@ manual_funcs = [
     { name = "entry_00427414", section = ".virtual", vram = 0x00427414, size = 272 },
     { name = "entry_00427444", section = ".virtual", vram = 0x00427444, size = 224 },
     { name = "entry_004274E4", section = ".virtual", vram = 0x004274E4, size = 64 },
-    { name = "entry_004275E0", section = ".virtual", vram = 0x004275E0, size = 192 },
-    { name = "entry_00427610", section = ".virtual", vram = 0x00427610, size = 144 },
     { name = "entry_004276C0", section = ".virtual", vram = 0x004276C0, size = 48 },
     { name = "entry_004278A8", section = ".virtual", vram = 0x004278A8, size = 260 },
     { name = "entry_004278CC", section = ".virtual", vram = 0x004278CC, size = 224 },
@@ -724,7 +720,6 @@ manual_funcs = [
     { name = "entry_0042E0AC", section = ".virtual", vram = 0x0042E0AC, size = 160 },
     { name = "entry_0042E0F4", section = ".virtual", vram = 0x0042E0F4, size = 88 },
     { name = "entry_0042E2A4", section = ".virtual", vram = 0x0042E2A4, size = 384 },
-    { name = "entry_0042E340", section = ".virtual", vram = 0x0042E340, size = 64 },
     { name = "entry_0042E420", section = ".virtual", vram = 0x0042E420, size = 16 },
     { name = "entry_0042E4A8", section = ".virtual", vram = 0x0042E4A8, size = 260 },
     { name = "entry_0042E720", section = ".virtual", vram = 0x0042E720, size = 276 },
@@ -747,6 +742,7 @@ manual_funcs = [
 # 25 of those 75 were `.L` local branch labels, so stubbing them deletes real
 # code paths rather than isolating unsupported ones. See #32.
 stubs = [
+    "func_004671BC",  # calls a refused entry
     "STVM_MapTLB",  # manual
     "boot_main",  # manual
     "func_00201074",  # mfc0 c0r19, mtc0 c0r18
@@ -813,6 +809,7 @@ stubs = [
     "func_00453E58",  # manual
     "func_00453FC4",  # manual
     "func_004540B0",  # manual
+    "func_00457294",  # manual
     "func_0045977C",  # manual
     "func_00459B50",  # manual
     "func_00459E54",  # manual
@@ -840,6 +837,7 @@ stubs = [
     "func_0045E01C",  # manual
     "func_0045E630",  # mfc0 c0r19, mtc0 c0r18
     "func_0045E808",  # manual
+    "func_00460444",  # manual
     "func_00465B04",  # manual
 ]
 ignored = [

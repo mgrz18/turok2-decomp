@@ -61,6 +61,10 @@ docker build --platform=linux/amd64 -t turok2-build .
 # 6. Assemble and link
 docker run --platform=linux/amd64 --rm -v "$PWD":/work turok2-build \
     bash -c "make rom C_FILES="
+
+# 7. Recompile to C. Use the mac-port branch of mgrz18/N64Recomp: upstream
+#    assumes a jump table shares its function's section and crashes here.
+path/to/N64Recomp turok2.us.toml
 ```
 
 Progress is measured with `./.venv/bin/python tools/metrics.py`, which reports decode
@@ -99,7 +103,9 @@ matched C, and a byte-exact ROM is a validation step rather than a prerequisite.
 
 ### Phase 4 — Recomp (in progress)
 - [x] N64Recomp runs against the ELF
-- [ ] Full C output without errors
+- [x] Full C output without errors: 31.4 MB of C, 5,525 functions, every sized
+      function in the ELF (needs the jump-table fix in
+      [mgrz18/N64Recomp@mac-port](https://github.com/mgrz18/N64Recomp/tree/mac-port))
 - [ ] TLB: the engine pages code through the TLB and N64Recomp does not support it
       yet — see the note below
 - [ ] First window opens with RT64

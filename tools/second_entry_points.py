@@ -153,6 +153,14 @@ def main():
     data_words.sort()
     by_name = {name for _v, _s, name in funcs}
 
+    # Entries a previous run refused. See the note in recomp_feedback.py: the
+    # sizes here are inferred, inference has a tail of hard cases, and dropping
+    # one costs a stubbed caller rather than a stuck loop.
+    bad_entries = set()
+    bad_path = ROOT / "versions" / "bad_entries.us.txt"
+    if bad_path.exists():
+        bad_entries = {l.strip() for l in bad_path.read_text().splitlines() if l.strip()}
+
     # Addresses already stubbed. Declaring one again puts a second, unstubbed
     # function at the same vram, and the recompiler then tries to translate the
     # very thing the stub exists to avoid: entry_002A31FC failed on
@@ -296,7 +304,7 @@ def main():
             continue
 
         name = f"entry_{target:08X}"
-        if name in by_name:
+        if name in by_name or name in bad_entries:
             continue
         entries.append((name, section, target, length))
 
