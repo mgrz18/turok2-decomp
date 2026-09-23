@@ -1,17 +1,18 @@
 # turok2-decomp
 
-[![status](https://img.shields.io/badge/status-recomp%20bring--up-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
+[![status](https://img.shields.io/badge/status-matching%20decomp-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
+[![ROM](https://img.shields.io/badge/ROM-rebuilds%20byte--exact-brightgreen)](docs/MATCHING.md)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
 [![RSP ucode](https://img.shields.io/badge/RSP%20ucode-stock%20F3DEX-success)](docs/MICROCODE.md)
 [![built with](https://img.shields.io/badge/built%20with-Claude%20Opus%205-D97757)](https://claude.com/claude-code)
 [![license](https://img.shields.io/badge/license-CC0--1.0-lightgrey)](LICENSE)
 
-Work-in-progress decompilation of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0), aimed at a native macOS port.
+Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0): C source that compiles back to the exact original ROM.
 
-> **Status: recomp bring-up.** 95.2% of the ROM decodes to MIPS with 13,275 functions delimited. The ELF links and N64Recomp translates it. RSP microcode is **stock Nintendo**, so RT64 renders this game with no new handlers — that go/no-go is settled in favour.
+> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2` + `asn64`. Eight engine functions match so far ([docs/MATCHING.md](docs/MATCHING.md)).
 >
-> Current blocker: the `virtual` segment's start boundary is still provisional, so that region decodes data as code ([#23](https://github.com/mgrz18/turok2-decomp/issues/23)).
+> A parallel native-port track recompiles the same ELF with N64Recomp; it runs clean, and the TLB is its open question.
 
 ## Why
 
@@ -80,9 +81,10 @@ and symbol coverage rather than matched-function counts.
 
 ## Roadmap
 
-The goal is a native binary, not source code, so the recompiler comes before any
-matching. N64Recomp consumes an ELF with function boundaries — it does not need
-matched C, and a byte-exact ROM is a validation step rather than a prerequisite.
+The goal is readable C that rebuilds the original ROM byte for byte. That
+source is what makes real modding possible, and it is also the way out of the
+TLB for a native port: GoldenEye's and Perfect Dark's ports both stand on a
+decomp.
 
 ### Phase 1 — Bootstrap (complete)
 - [x] Confirm ROM dump (SHA1 verified)
@@ -101,7 +103,16 @@ matched C, and a byte-exact ROM is a validation step rather than a prerequisite.
 - [x] ELF links and the ROM rebuilds byte-exact from asm: `make verify` passes the SHA1
 - [ ] Locate the `virtual` segment's real start ([#23](https://github.com/mgrz18/turok2-decomp/issues/23))
 
-### Phase 4 — Recomp (in progress)
+### Phase 4 — Matching decomp (in progress)
+- [x] ROM rebuilds byte-exact from asm (`make verify`)
+- [x] Compiler identified: SN64 GCC 2.8.1 `cc1 -O2`, confirmed on 8 engine functions
+- [x] Per-function check against the ROM: `tools/match_func.py`
+- [ ] Split `.code` into one segment per original source file
+- [ ] libultra from [decompals/ultralib](https://github.com/decompals/ultralib) (`libgultra`)
+- [ ] Matched C linked into the ROM, with a progress metric
+- [ ] Settle C vs C++: sources are `.CPP`; C-style code matches with `cc1`
+
+### Phase 5 — Native-port track: recomp (in progress)
 - [x] N64Recomp runs against the ELF
 - [x] Full C output without errors: 31.4 MB of C, 5,525 functions, every sized
       function in the ELF (needs the jump-table fix in
@@ -110,7 +121,7 @@ matched C, and a byte-exact ROM is a validation step rather than a prerequisite.
       yet — see the note below
 - [ ] First window opens with RT64
 
-### Phase 5 — Input
+### Phase 6 — Input
 - [ ] Keyboard and mouse, with a patch on the aim path for real mouse-look
 
 ## The TLB question

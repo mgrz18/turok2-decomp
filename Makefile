@@ -190,15 +190,16 @@ $(BUILD_DIR)/src/%.s_c: $(BUILD_DIR)/src/%.i
 	$(CC) $(CC_FLAGS) -o $@ $<
 
 $(BUILD_DIR)/src/%.c.obj: $(BUILD_DIR)/src/%.s_c
-	# Prepend `.set noat` BEFORE unix2dos so the inserted line gets CRLF
-	# along with the rest. asn64 returns nonzero on $at warnings under
-	# wine, so we silence them at the source.
-	sed -i -e '1i\.set noat' $<
+	# No `.set noat` here. It used to be prepended to quiet asn64's $at
+	# warnings, but it turns a float load from a symbol (`l.s $f1, sym`, which
+	# needs $at for the %hi) into a hard error. asn64 exits nonzero on the
+	# warnings alone under wine, so judge it by the object it writes.
 	unix2dos $<
 	sed -i -e 's/.version/#.version/g' $<
 	sed -i -e 's/.size/#.size/g' $<
 	sed -i -e 's/.type/#.type/g' $<
-	$(ASN64) $(ASM_FLAGS) -o $@ $<
+	-$(ASN64) $(ASM_FLAGS) -o $@ $<
+	@test -s $@
 
 $(BUILD_DIR)/src/%.c.o: $(BUILD_DIR)/src/%.c.obj
 	$(LNKCONV) $< -o $@ -b -n

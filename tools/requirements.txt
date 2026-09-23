@@ -9,3 +9,5 @@ colorama
 tqdm
 pygfxd
 crunch64
+m2c @ git+https://github.com/matt-kempster/m2c.git
+pyelftools
