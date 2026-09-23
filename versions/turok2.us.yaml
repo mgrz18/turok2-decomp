@@ -14,6 +14,13 @@ options:
   undefined_syms_auto_path: ../versions/undefined_syms_auto.us.txt
 
   compiler: SN64
+  # Link objects at their exact ROM positions. GAS gives every MIPS object a
+  # 16-byte section alignment and splat pads each segment to 16 on top, and
+  # together they pushed .code_rodata from 0x800A51F8 to 0x800A5200 -- every
+  # %lo into it came out 8 high, and the ROM grew by 124 bytes.
+  subalign: 4
+  ld_align_segment_vram_end: False
+  ld_align_section_vram_end: False
   platform: n64
   find_file_boundaries: True
   use_legacy_include_asm: False
@@ -60,6 +67,7 @@ segments:
 
   - name: main
     type: code
+    align: 4
     start: 0x1000
     vram: 0x80000400
     subsegments:
@@ -78,11 +86,12 @@ segments:
   # El stub SN64 de 0x1000 es el que hace el DMA a este banco.
   - name: code
     type: code
+    align: 4
     start: 0x1100
     vram: 0x00200500     # useg: el codigo corre mapeado por TLB
     subsegments:
       - [0x1100, asm]
-      - [0x1F440, asm]     # a 16-aligned function start: 0x1F100 cut a function at a bc1f, and objects link 16-aligned
+      - [0x1F440, asm]     # a function start: 0x1F100 cut a function at a bc1f
       - [0x43D70, asm]     # likewise: 0x438B0 cut func_00242C00, which branches to 0x00242CB8
 
   # El .rodata NO es useg: se linkea directo desde 0x80000400 en KSEG0, igual
@@ -103,6 +112,7 @@ segments:
   # reads it. So rodata starts with its jump tables and the string pool follows.
   - name: code_rodata
     type: code
+    align: 4
     start: 0xA5DF8
     vram: 0x800A51F8     # 0xA5DF8 + 0x7FFFF400
     subsegments:
@@ -148,6 +158,7 @@ segments:
   # prologue scan (`27bdXXXX` with negative imm): 0xC2ED8, 0xC2F2C, 0xC2FE0.
   - name: code_rodata_tail
     type: code
+    align: 4
     start: 0xC0950
     vram: 0x800BFD50     # KSEG0: datos, no useg (0xC0950 + 0x7FFFF400)
     subsegments:
@@ -173,6 +184,7 @@ segments:
   # land in a section and three sit on a function boundary.
   - name: code_tail_funcs
     type: code
+    align: 4
     start: 0xC2ED8
     vram: 0x002C22D8     # useg; 0x200500 + (0xC2ED8 - 0x1100)
     subsegments:
@@ -193,6 +205,7 @@ segments:
   #   * .rodata + audio/jump-table data spans 0xDEDE0..end of segment.
   - name: libultra
     type: code
+    align: 4
     start: 0xC3074
     vram: 0x800C2474     # KSEG0: libultra corre SIN mapear — trae los vectores de
                          # excepcion y el handler de TLB miss. El valor original era correcto.
@@ -218,6 +231,7 @@ segments:
 
   - name: libultra_tail
     type: code
+    align: 4
     start: 0xF7F50
     vram: 0x800F7350     # KSEG0: datos (0xF7F50 + 0x7FFFF400)
     subsegments:
@@ -255,6 +269,7 @@ segments:
 
   - name: virtual
     type: code
+    align: 4
     start: 0x14A000
     vram: 0x00400000     # useg, igual que el `virtual` de Turok 3.
                          # Delta 0x2B6000 gana el barrido: 170/364 targets caen
@@ -291,6 +306,7 @@ segments:
   # a pair text does come first. See #39.
   - name: virtual_1
     type: code
+    align: 4
     start: 0x186000
     vram: 0x0043C000     # 0x400000 + (0x186000 - 0x14A000)
     subsegments:
@@ -344,6 +360,7 @@ segments:
   # effect of either impossible to attribute.
   - name: virtual_tail
     type: code
+    align: 4
     start: 0x1DEE00
     vram: 0x00494E00
     subsegments:

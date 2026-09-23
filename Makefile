@@ -69,7 +69,7 @@ INCLUDE_CC_FLAGS  = -I. -Iinclude -I$(INCLUDE_DIR)
 # implements but the MIPS III base ISA does not declare. The resulting
 # object code still targets vr4300 and links against MIPS III objects
 # from cc1.
-AS_FLAGS          = -EB -mabi=32 -mips4 -O1 -I $(INCLUDE_DIR) --defsym ASSEMBLER=1
+AS_FLAGS          = -EB -mabi=32 -mips4 -O1 -I $(INCLUDE_DIR) --defsym ASSEMBLER=1 --no-pad-sections
 ASM_FLAGS         = -I $(INCLUDE_DIR) -mips3
 D_FLAGS           = -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 -DGAME_VERSION=\"$(VERSION)\"
 

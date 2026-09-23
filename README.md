@@ -98,7 +98,7 @@ matched C, and a byte-exact ROM is a validation step rather than a prerequisite.
 ### Phase 3 — Segmentation and symbols (in progress)
 - [x] Recover the memory map: code in useg (TLB-mapped), data and libultra in KSEG0
 - [x] 95.2% of the ROM decoded, 13,275 functions delimited
-- [x] ELF links; ROM rebuilds to within 108 bytes of the original
+- [x] ELF links and the ROM rebuilds byte-exact from asm: `make verify` passes the SHA1
 - [ ] Locate the `virtual` segment's real start ([#23](https://github.com/mgrz18/turok2-decomp/issues/23))
 
 ### Phase 4 — Recomp (in progress)
