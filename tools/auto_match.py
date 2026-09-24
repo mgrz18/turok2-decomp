@@ -395,6 +395,14 @@ def main():
     # func_002682FC was. Leave those to versions/function_sizes.us.txt.
     case_targets = {t for blk in JTBLS.values() for t in re.findall(r"\.word (func_[0-9A-F]{8})", blk)}
     cands = [f for f in cands if f[2] not in case_targets]
+    # Likewise a function start that another function reaches by `j` or a
+    # branch: GCC 2.8 has no sibling calls, so that is the tail of a larger
+    # function cut at a false boundary, not a unit of its own.
+    jumped = set()
+    for path in list(ROOT.glob("us/asm/*.s")) + list(ROOT.glob("us/asm/nonmatchings/**/*.s")):
+        jumped |= {f"func_{a}" for a in re.findall(
+            r"^\s+(?:j|b\w*)\s+(?:[^,\n]*,\s*)*\.L([0-9A-F]{8})\b", path.read_text(), re.M)}
+    cands = [f for f in cands if f[2] not in jumped]
     if args.names:
         text = args.names.read_text()
         wanted = (set(json.loads(text).get("differ", {})) if args.names.suffix == ".json"
