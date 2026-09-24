@@ -1,0 +1,15 @@
+// Function extents splat cannot find on its own. Tracked; read by splat
+// (symbol_addrs_path in turok2.us.yaml).
+//
+// A switch whose last case sits after the function's final `jr ra` looks to
+// splat like a new function starting there. The jump table says otherwise:
+// every entry is a case of the one switch.
+
+// jtbl_800A7E60 sends 4 of its 13 cases to 0x002682FC, after the jr ra.
+func_002682CC = 0x002682CC; // type:func size:0x38
+
+// jtbl_800A7C18 has 5 entries; the fifth is 0x00264160 (`return 0x528A`),
+// past the last jr ra, and two paths leave through a `jr ra` at 0x00264168
+// that they reach by `j`. splat stopped the table at 4 and read the fifth
+// entry as a .double.
+func_002640DC = 0x002640DC; // type:func size:0x94

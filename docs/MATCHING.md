@@ -162,6 +162,46 @@ ROM has, while gas builds it in registers. `tools/sn_as.sh` now does what
 asn64 does. Such a function carries its own `.rodata`, so it waits for the
 file's rodata to move to C.
 
+### Switch functions and their .rdata (#45)
+
+A `switch` emits its jump table into .rdata, so a function with one needs its
+slice of .rdata to come from C too. Each function's slice is what its code
+references in `0x800A51F8`-`0x800AB000`, contiguous and in text order for 634
+of 662 functions. The C file gets a second subsegment, `[rom, .rodata,
+code/<name>]`, in the code_rodata segment (`auto_link_sections` keeps splat
+from also listing it beside the .text). Slices can end on 4-byte boundaries,
+since floats pack at 4 within a source file. `tools/fix_data_align.py` turns
+the data asm's `.align` lines into `.org` at each label's exact offset and
+switches off gas's auto-alignment of `.double`, so the asm that resumes after
+a slice lands exactly.
+
+`auto_match.py --switch` hands m2c the jump tables, checks the object's
+.rodata against the ROM with the table relocations resolved, and wires both
+subsegments.
+
+**Float pools come from `li.s`.** cc1 writes float constants as
+`li.s $f0, 6.0`, and asn64 expands that into a `.rodata` literal plus
+lui/lwc1, which is what the ROM has, where gas builds the value in registers.
+`tools/sn_as.sh` does what asn64 does, so a function's float pool comes from
+its C literals in order of appearance. `auto_match.py --rdata` hands m2c the
+pool values too, so it writes `75.0f` rather than `D_800A7948`. The first
+pass matched 18 functions that way, with their slices.
+
+**Splat cuts switches after their last `jr ra`.** A case placed after the
+function's final return looks to splat like a new function. When a table
+entry points past the end, splat also stops the table early and reads the
+rest as data (jtbl_800A7C18 lost its fifth entry to a `.double`).
+`versions/function_sizes.us.txt`, tracked and read by splat, pins those
+functions' real extent.
+
+**Some accepted C "functions" are fragments.** 81 of the functions the bulk
+passes put in C are reached from another function by `j` or a branch. GCC 2.8
+has no sibling calls, so these are tails of larger functions cut at false
+boundaries: right bytes, wrong unit. Three have been folded back so far
+(func_002682FC, func_00264160, func_00264168). The rest fold in when the
+function they belong to is matched, and `auto_match` no longer accepts a jump
+or branch target, or a jump-table target, as a function.
+
 ## The fast assembler
 
 `asn64` only runs under wine, which costs ~30 s a file in the emulated amd64
