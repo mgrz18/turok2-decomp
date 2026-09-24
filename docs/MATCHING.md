@@ -46,11 +46,103 @@ and the repo does not have it.
 `PTIMER.CPP` itself is not linked into the retail ROM. Its code is only in the
 leftover LNK record, so it cannot be the first target the plan assumed.
 
+## Linking matched C into the ROM
+
+A matched function gets its own `c` subsegment in `versions/turok2.us.yaml`:
+
+    python3 tools/c_subsegment.py code/func_0025FA54 func_0025FA54 --write
+    make setup      # splat writes src/us/code/func_0025FA54.c with INCLUDE_ASM
+
+then the INCLUDE_ASM line is replaced by the C, and `make verify` must still
+pass. A file may hold a run of contiguous functions, some matched and the rest
+INCLUDE_ASM. `tools/progress.py` counts the bytes defined in C.
+
+Asm pulled in with INCLUDE_ASM uses numeric registers (`named_regs_for_c_funcs:
+False`), since asn64 reads `$sp` as a hex literal. Splitting a file can leave
+a branch aimed at a `.L` label in the neighbouring object;
+`tools/function_seed.py --from-link-log build/link.log --write` defines those
+absolutely, and the branch reassembles to the same word.
+
+### Where the files begin and end
+
+For now each matched function is its own file, named by address. The
+original files cannot be recovered yet, and for `.text` it does not matter,
+because the ROM's `.text` has no padding between objects. 2,852 of 2,879
+functions in `.code` sit flush against the previous one, none ends in
+alignment zeros, and the rate of 8-aligned starts (55%) is chance. Cutting at
+any function start links byte-for-byte the same.
+
+The boundaries start to matter when a file's `.rodata` moves into C. What is
+known about that so far:
+
+- **Jump tables are strictly in text order.** All 61 in `.code` sit in
+  `0x800A51F8`-`0x800AAC60`, and their order never inverts against the
+  functions that use them. They are the cleanest per-file signal available.
+- **Float constants do not mark files.** GCC 2.x keeps one constant pool
+  per function, not per file, so one file repeats the same float in several
+  places. Treating repeats as file changes produced 364 contradictory
+  constraints.
+- **The block after `.code` is not all read-only.** Stores start at
+  `0x800AB000`, and strings run almost to its end, so `.rodata` and `.data`
+  are interleaved in some way that is still unmapped.
+
+## Bulk matching
+
+`tools/auto_match.py` drafts many functions with `m2c -t mips-gcc-c
+--valid-syntax`, compiles them all in one container run, and keeps the ones
+that come out identical:
+
+    python3 tools/auto_match.py --max-size 300 --limit 5000           # report
+    python3 tools/auto_match.py --max-size 300 --limit 5000 --accept  # wire in
+
+then `make setup` and `make verify`. The first pass over every `.code`
+function up to 300 bytes gave:
+
+| size (bytes) | m2c drafts | match |
+|---|---|---|
+| up to 48 | 722 | 425 |
+| 52-120 | 495 | 131 |
+| 124-300 | 651 | 54 |
+
+617 were accepted, taking the engine from 0.06% to 4.34%. The drafts keep
+m2c's `M2C_FIELD(ptr, type *, offset)` for fields of structs not yet
+recovered; they match because SN64 GCC compiles that pointer arithmetic to
+the same load a struct member gives. Naming those structs is a separate
+readability pass.
+
+Skipped automatically:
+
+- functions that read a jump table, since a `switch` makes the C emit its own
+  `.rodata`, which still lives in asm;
+- drafts m2c flags with `missing "jr $ra"`, which are fragments left by a
+  wrong boundary, not whole functions;
+- any object that carries data of its own.
+
+**Check what a relocation resolves to, not only the rest of the word.** The
+first bulk pass let one function through with `&D_800A5858 + 4`. m2c meant
+four bytes, and C scaled it by `sizeof(s32)`. With the whole `%lo` field
+masked, the words compared equal, and only the SHA1 caught it. The symbol
+names encode their addresses, so `match_func.reloc_target_ok` now computes the
+linked `%lo` and `jal` target and holds them against the ROM, and
+`auto_match.py` rewrites the pattern as byte arithmetic.
+
+## The fast assembler
+
+`asn64` only runs under wine, which costs ~30 s a file in the emulated amd64
+container and turns a full build into 20+ minutes. `tools/sn_as.sh` assembles
+cc1's output with GNU as instead and reproduces the two things asn64 does
+differently: `move` becomes `addu rd, rs, $0`, and only the c.cond -> bc1x
+hazard gets a nop (cc1 marks every hazard with `#nop`; asn64 fills just that
+one). All eight probe functions match either way, and a full build takes
+seconds. `make ASSEMBLER=asn64` and `match_func.py --assembler asn64` keep
+the original tool available as a cross-check, and `make verify` decides.
+
 ## Checking a function
 
     python3 tools/match_func.py path/to/file.c [-v] [--cc cc1 ...] [--opt -O2]
 
-compiles the file in the `turok2-build` container (`tools/cc_func.sh`), looks
+compiles the file in the `turok2-build` container (`tools/cc_func.sh`, GNU as
+by default, `--assembler asn64` for the original), looks
 each function it defines up by name in `build/turok2.us.elf`, and compares the
 words with the ROM. Relocated fields (`jal` targets, `%hi`/`%lo`) are masked,
 since the object is unlinked. `-v` prints both sides instruction by

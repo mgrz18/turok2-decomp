@@ -99,13 +99,16 @@ OBJCOPY_FLAGS     = -O binary
 
 # Source enumeration
 S_FILES   = $(wildcard $(ASM_DIR)/*.s) $(wildcard $(ASM_DIR)/data/*.s) $(wildcard $(SRC_ASM_DIR)/*.s)
-C_FILES   = $(shell find $(SRC_DIR) -name '*.c' 2>/dev/null)
+# Only the C files the linker script links. src/ also holds work that is not
+# wired in yet (the libultra candidates), and compiling it costs a wine run
+# per file for nothing.
+C_FILES   = $(patsubst $(BUILD_DIR)/%.c.o,%.c,$(sort $(shell grep -o '$(BUILD_DIR)/src/[^ ()]*\.c\.o' $(LD_SCRIPT) 2>/dev/null)))
 BIN_FILES = $(wildcard $(BIN_DIR)/*.bin)
 
 # Object outputs (path mirrors splat ld script: build/asm/*.s.o, build/assets/*.bin.o)
 S_OBJS   = $(patsubst $(SPLAT_DIR)/%.s,$(BUILD_DIR)/%.s.o,$(filter $(ASM_DIR)/%,$(S_FILES))) \
            $(patsubst %.s,$(BUILD_DIR)/%.s.o,$(filter $(SRC_ASM_DIR)/%,$(S_FILES)))
-C_OBJS   = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/src/%.c.o,$(C_FILES))
+C_OBJS   = $(patsubst %.c,$(BUILD_DIR)/%.c.o,$(C_FILES))
 BIN_OBJS = $(patsubst $(SPLAT_DIR)/%.bin,$(BUILD_DIR)/%.bin.o,$(BIN_FILES))
 
 O_FILES  = $(S_OBJS) $(C_OBJS) $(BIN_OBJS)
@@ -180,8 +183,16 @@ $(BUILD_DIR)/assets/%.bin.o: $(BIN_DIR)/%.bin
 	@mkdir -p $(dir $@)
 	$(LD) -r -b binary -o $@ $<
 
-# C compile pipeline: .c -> .i (cpp) -> .s_c (cc1) -> .obj (asn64) -> .o (psyq-obj-parser)
-$(BUILD_DIR)/src/%.i: $(SRC_DIR)/%.c
+# C compile pipeline: .c -> .i (cpp) -> .s_c (cc1) -> .o
+#
+# The assembler step has two routes. The default, gas, goes through
+# tools/sn_as.sh, which reproduces what asn64 does differently (see the
+# script); it runs natively in the container. ASSEMBLER=asn64 uses SN's
+# original assembler under wine plus psyq-obj-parser, ~30 s a file under
+# emulation. Either way `make verify` is the arbiter.
+ASSEMBLER ?= gas
+
+$(BUILD_DIR)/src/%.i: src/%.c
 	@mkdir -p $(dir $@)
 	$(CPP) -MMD -MP -MT $@ -MF $@.d $(CPP_FLAGS) -o $@ $<
 
@@ -189,6 +200,7 @@ $(BUILD_DIR)/src/%.s_c: $(BUILD_DIR)/src/%.i
 	unix2dos $<
 	$(CC) $(CC_FLAGS) -o $@ $<
 
+ifeq ($(ASSEMBLER),asn64)
 $(BUILD_DIR)/src/%.c.obj: $(BUILD_DIR)/src/%.s_c
 	# No `.set noat` here. It used to be prepended to quiet asn64's $at
 	# warnings, but it turns a float load from a symbol (`l.s $f1, sym`, which
@@ -203,6 +215,10 @@ $(BUILD_DIR)/src/%.c.obj: $(BUILD_DIR)/src/%.s_c
 
 $(BUILD_DIR)/src/%.c.o: $(BUILD_DIR)/src/%.c.obj
 	$(LNKCONV) $< -o $@ -b -n
+else
+$(BUILD_DIR)/src/%.c.o: $(BUILD_DIR)/src/%.s_c
+	INC_DIR=$(INCLUDE_DIR) $(TOOLS_DIR)/sn_as.sh $< $@
+endif
 
 # n64crc helper tool
 $(N64CRC): $(TOOLS_DIR)/n64crc.c

@@ -38,6 +38,10 @@ sed -i -e 's/\.version/#.version/g' -e 's/\.size/#.size/g' \
     -e 's/\.type/#.type/g' "$WORK/f.s"
 unix2dos -q "$WORK/f.s"
 cp "$WORK/f.s" "${OUT%.o}.s"
+if [ "${ASSEMBLER:-gas}" = gas ]; then
+    INC_DIR=/work/us/include "$TOOLS/sn_as.sh" "$WORK/f.s" "$OUT"
+    exit 0
+fi
 ( cd "$WORK" && wine "$TOOLS/sn64/asn64.exe" -I /work/include -mips3 -o f.obj f.s ) >"$WORK/as.log" 2>&1 || true
 [ -s "$WORK/f.obj" ] || { cat "$WORK/as.log" >&2; exit 1; }
 "$TOOLS/psyq-obj-parser" "$WORK/f.obj" -o "$OUT" -b -n >/dev/null
