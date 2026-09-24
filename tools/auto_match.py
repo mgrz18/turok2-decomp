@@ -389,6 +389,12 @@ def main():
              if args.min_size <= f[1] <= args.max_size and f[2] not in done
              and f[2] in bodies
              and ("jtbl_" not in bodies[f[2]] or (args.switch and switch_only(bodies[f[2]])))]
+    # A jump-table entry that names a func_ is a case of someone's switch that
+    # splat cut off after the switch function's last `jr ra`. As a function
+    # of its own it can "match" (`return 0;`) and still be the wrong unit:
+    # func_002682FC was. Leave those to versions/function_sizes.us.txt.
+    case_targets = {t for blk in JTBLS.values() for t in re.findall(r"\.word (func_[0-9A-F]{8})", blk)}
+    cands = [f for f in cands if f[2] not in case_targets]
     if args.names:
         text = args.names.read_text()
         wanted = (set(json.loads(text).get("differ", {})) if args.names.suffix == ".json"

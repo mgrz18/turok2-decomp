@@ -10,6 +10,7 @@ options:
   symbol_addrs_path:
     - ../versions/symbol_addrs.us.txt
     - ../versions/symbols_from_scan.us.txt
+    - ../versions/function_sizes.us.txt
   undefined_funcs_auto_path: ../versions/undefined_funcs_auto.us.txt
   undefined_syms_auto_path: ../versions/undefined_syms_auto.us.txt
 
@@ -837,8 +838,7 @@ segments:
       - [0x68DBC, asm]
       - [0x68EA4, c, code/func_002682A4]
       - [0x68EB8, c, code/func_002682B8]
-      - [0x68ECC, asm]
-      - [0x68EFC, c, code/func_002682FC]
+      - [0x68ECC, c, code/func_002682CC]
       - [0x68F04, asm]
       - [0x69010, c, code/func_00268410]
       - [0x6901C, asm]
@@ -1382,6 +1382,8 @@ segments:
       - [0xA84C4, rodata]
       - [0xA8A38, .rodata, code/func_00268160]
       - [0xA8A5C, rodata]
+      - [0xA8A60, .rodata, code/func_002682CC]
+      - [0xA8A94, rodata]
 
   # ---------------------------------------------------------------------------
   # RSP microcode blobs. Do NOT disassemble as MIPS — see docs/MICROCODE.md.
