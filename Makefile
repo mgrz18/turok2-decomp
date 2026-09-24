@@ -171,6 +171,15 @@ $(BUILD_DIR)/asm/%.s.o: $(ASM_DIR)/%.s
 	@mkdir -p $(dir $@)
 	$(PYTHON) $(TOOLS_DIR)/fix_asm.py < $< | $(AS) $(AS_FLAGS) -o $@ -
 
+# Data asm: its `.align` lines become `.org` at each label's exact offset
+# (tools/fix_data_align.py), so a file can start at 4 mod 8. That happens when
+# a function's .rdata slice moves to C and ends on a 4-byte boundary.
+# Only the engine's .rdata files (named by ROM offset, `<hex>.rodata.s`) are
+# split this way; the others keep their `.align` as splat wrote it.
+$(BUILD_DIR)/asm/data/%.rodata.s.o: $(ASM_DIR)/data/%.rodata.s
+	@mkdir -p $(dir $@)
+	$(PYTHON) $(TOOLS_DIR)/fix_data_align.py < $< | $(AS) $(AS_FLAGS) -o $@ -
+
 # Hand-written asm in src/us/asm/*.s
 # Output mirrors source layout (build/src/us/asm/foo.s.o) so the
 # splat-generated ld script's hasm references resolve.

@@ -23,6 +23,10 @@ options:
   # assembler, which reads `$29` as a register but not `$sp` -- a bare `$`
   # is its hex prefix. Keep those files numeric.
   named_regs_for_c_funcs: False
+  # A C file's .rodata is linked only where an explicit `.rodata` subsegment
+  # puts it, in the KSEG0 rodata segment. Auto-listing it next to the file's
+  # .text would claim the section first, in the wrong segment.
+  auto_link_sections: [".data", ".bss"]
   ld_align_segment_vram_end: False
   ld_align_section_vram_end: False
   platform: n64
@@ -614,6 +618,8 @@ segments:
       - [0x5FB2C, c, code/func_0025EF2C]
       - [0x5FB48, c, code/func_0025EF48]
       - [0x5FB68, asm]
+      - [0x5FBF8, c, code/func_0025EFF8]
+      - [0x5FC68, asm]
       - [0x5FDB4, c, code/func_0025F1B4]
       - [0x5FDD0, asm]
       - [0x5FF58, c, code/func_0025F358]
@@ -827,7 +833,8 @@ segments:
       - [0x68D48, c, code/func_00268148]
       - [0x68D50, c, code/func_00268150]
       - [0x68D58, c, code/func_00268158]
-      - [0x68D60, asm]
+      - [0x68D60, c, code/func_00268160]
+      - [0x68DBC, asm]
       - [0x68EA4, c, code/func_002682A4]
       - [0x68EB8, c, code/func_002682B8]
       - [0x68ECC, asm]
@@ -1371,6 +1378,10 @@ segments:
     vram: 0x800A51F8     # 0xA5DF8 + 0x7FFFF400
     subsegments:
       - [0xA5DF8, rodata]
+      - [0xA8420, .rodata, code/func_0025EFF8]
+      - [0xA84C4, rodata]
+      - [0xA8A38, .rodata, code/func_00268160]
+      - [0xA8A5C, rodata]
 
   # ---------------------------------------------------------------------------
   # RSP microcode blobs. Do NOT disassemble as MIPS — see docs/MICROCODE.md.

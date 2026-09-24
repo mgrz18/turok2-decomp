@@ -20,14 +20,14 @@ Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Ninte
 This decomp is a stepping stone. The end goals are:
 
 1. A native macOS (Apple Silicon) port via [N64Recomp](https://github.com/Mr-Wiseguy/N64Recomp) + [RT64](https://github.com/rt64/rt64).
-2. Reusing ~70% of the work to port **Armorines: Project S.W.A.R.M.**, which shares the Acclaim Studios London engine.
+2. Reusing the work to port **Armorines: Project S.W.A.R.M.**, which Acclaim Studios London built on the Turok 2 engine.
 3. Stretch goal: Android via RT64's Vulkan backend.
 
 If you only want to play Turok 2, an emulator is 100× less work and totally fine. This project exists for native ports, modding (HD textures, real widescreen, 60 FPS), and preservation.
 
 ## Engine
 
-**Acclaim Studios London engine** — also used by Turok 3, Armorines, Re-Volt, Forsaken, parts of NBA Jam.
+**Turok engine** (Iguana Entertainment / Acclaim Studios Austin) — descended from Turok 1's, and reused by Turok 3, Turok: Rage Wars, and by Acclaim Studios London for Armorines.
 
 ## Required input
 

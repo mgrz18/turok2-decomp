@@ -138,11 +138,18 @@ def draft(name, asm, opts=()):
     """
     src = WORK / f"{name}.s"
     src.write_text(asm.replace(name, name + "_draft"))
+    files = [str(src)]
+    tables = sorted(set(re.findall(r"\bjtbl_[0-9A-F]{8}\b", asm)))
+    if tables:
+        # m2c rebuilds a switch only if it can read the table.
+        data = WORK / f"{name}.rodata.s"
+        data.write_text(".section .rodata\n" + "".join(".align 3\n" + JTBLS[t] for t in tables if t in JTBLS))
+        files.append(str(data))
     res = subprocess.run(
         # m2c patched for -mfp64 (tools/m2c_fp64.py): odd float registers
         # hold whole values in this engine, not halves of a double.
         [sys.executable, str(ROOT / "tools" / "m2c_fp64.py"), "-t", "mips-gcc-c", "--valid-syntax",
-         "--context", str(CONTEXT), *opts, str(src)],
+         "--context", str(CONTEXT), *opts, *files],
         capture_output=True, text=True)
     out = res.stdout.replace(name + "_draft", name)
     # "missing jr $ra" means the range is not a whole function: a fragment left
@@ -161,6 +168,33 @@ def draft(name, asm, opts=()):
     if decls:
         out = "\n".join(decls) + "\n\n" + out
     return out
+
+
+RDATA = (0x800A51F8, 0x800AB000)   # the engine's .rdata: jump tables, float pools
+RODATA_SEG_ROM = 0xA5DF8             # ROM offset of RDATA[0]
+JTBLS = {}                           # jtbl name -> its asm block
+
+
+def load_jtbls():
+    for path in sorted(ROOT.glob("us/asm/data/*.rodata.s")):
+        if path.name == "A5FD8.rodata.s":   # stale from an old split; not linked
+            continue
+        text = path.read_text()
+        for m in re.finditer(r"^\.globl (jtbl_[0-9A-F]{8})\n\1:\n((?:\s+\.word .*\n)+)", text, re.M):
+            JTBLS[m.group(1)] = m.group(0)
+
+
+def rdata_refs(body):
+    """Addresses in the engine's .rdata that a function's asm references."""
+    return sorted({int(a, 16) for a in re.findall(r"%lo\((?:D|jtbl)_([0-9A-F]{8})\)", body)
+                   if RDATA[0] <= int(a, 16) < RDATA[1]})
+
+
+def switch_only(body):
+    """True when the function's only .rdata use is its own jump tables."""
+    refs = re.findall(r"%lo\(((?:D|jtbl)_([0-9A-F]{8}))\)", body)
+    in_rdata = [n for n, a in refs if RDATA[0] <= int(a, 16) < RDATA[1]]
+    return bool(in_rdata) and all(n.startswith("jtbl_") for n in in_rdata)
 
 
 SIG = re.compile(r"^(?P<ret>[^\n(]*?\b)(?P<name>func_[0-9A-F]{8})\((?P<params>[^)]*)\) \{", re.M)
@@ -216,8 +250,10 @@ def declare_stack_vars(name, src):
     return src[:m.end()] + "\n" + decl + body.lstrip("\n") if body.startswith("\n") else src[:m.end()] + "\n" + decl + body
 
 
-def accept(chosen):
-    """Give each matched function its C subsegment and its file."""
+def accept(chosen, rodata=None):
+    """Give each matched function its C subsegment and its file, and a
+    switch function its .rodata subsegment too."""
+    rodata = rodata or {}
     SRC.mkdir(parents=True, exist_ok=True)
     wired = 0
     for name in sorted(chosen):
@@ -227,10 +263,89 @@ def accept(chosen):
         if res.returncode:
             print(f"  skip {name}: {res.stderr.strip() or res.stdout.strip()}")
             continue
+        if name in rodata:
+            start, size = rodata[name]
+            if not rodata_subsegment(name, start, start + size):
+                # The .text subsegment is in already; the build will say it
+                # links the function's tables twice. Better to know than guess.
+                print(f"  WARNING {name}: its .rodata slice does not fit; fix the yaml by hand")
         (SRC / f"{name}.c").write_text(chosen[name])
         wired += 1
     print(f"wired into the build: {wired}  (now run make setup && make verify)")
     return 0
+
+
+def rodata_slice(obj, name, body, rom):
+    """Check a switch function's .rodata against its slice of the ROM.
+
+    Returns (rom start, size) when the object's .rodata is the function's
+    jump tables byte for byte, else None. The tables hold .text addresses: in
+    the object those are relocations against .text with the offset in place,
+    and the function is the object's only code, so the linked value is its
+    vram plus that offset. The slice starts at the lowest .rdata address the
+    code references. Whatever follows it, padding or the next function's
+    constants, stays in asm: data asm is assembled without its `.align` lines
+    (see the Makefile), so a split can fall on any 4-byte boundary.
+    """
+    import struct
+    from elftools.elf.relocation import RelocationSection
+    refs = rdata_refs(body)
+    if not refs:
+        return None
+    start = refs[0]
+    vram = int(name[5:], 16)
+    with open(obj, "rb") as fh:
+        elf = ELFFile(fh)
+        ro = elf.get_section_by_name(".rodata")
+        if ro is None or not ro["sh_size"]:
+            return None
+        data = bytearray(ro.data())
+        idx = next(i for i, sec in enumerate(elf.iter_sections()) if sec.name == ".rodata")
+        for sec in elf.iter_sections():
+            if isinstance(sec, RelocationSection) and sec["sh_info"] == idx:
+                for r in sec.iter_relocations():
+                    if r["r_info_type"] != 2:          # R_MIPS_32 only
+                        return None
+                    off = r["r_offset"]
+                    val = struct.unpack(">I", data[off:off + 4])[0] + vram
+                    data[off:off + 4] = struct.pack(">I", val)
+    size = len(data)
+    rom_off = RODATA_SEG_ROM + (start - RDATA[0])
+    if size % 4 or rom[rom_off:rom_off + size] != bytes(data):
+        return None
+    return rom_off, size
+
+
+def rodata_subsegment(name, rom_start, rom_end):
+    """Insert `[start, .rodata, name]` and `[end, rodata]` in code_rodata."""
+    ypath = ROOT / "versions" / "turok2.us.yaml"
+    lines = ypath.read_text().splitlines()
+    seg = next(i for i, l in enumerate(lines) if l.strip() == "- name: code_rodata")
+    stop = next((i for i in range(seg + 1, len(lines)) if lines[i].startswith("  - ")), len(lines))
+    ent = re.compile(r"^(\s+)- \[(0x[0-9A-Fa-f]+),\s*([.\w]+)")
+    entries = [(i, ent.match(lines[i])) for i in range(seg, stop)]
+    entries = [(i, m) for i, m in entries if m]
+    indent = entries[0][1].group(1)
+    starts = {int(m.group(2), 16): (i, m) for i, m in entries}
+    host = max(a for a in starts if a <= rom_start)
+    if starts[host][1].group(3) != "rodata":
+        return False
+    nxt = min((a for a in starts if a > rom_start), default=None)
+    if nxt is not None and nxt < rom_end:
+        return False
+    new = []
+    if rom_start == host:
+        lines[starts[host][0]] = f"{indent}- [0x{rom_start:X}, .rodata, code/{name}]"
+    else:
+        new.append(f"{indent}- [0x{rom_start:X}, .rodata, code/{name}]")
+    if rom_end != nxt:
+        new.append(f"{indent}- [0x{rom_end:X}, rodata]")
+    at = starts[host][0] + 1
+    for text in new:
+        lines.insert(at, text)
+        at += 1
+    ypath.write_text("\n".join(lines) + "\n")
+    return True
 
 
 def own_data(obj):
@@ -250,13 +365,15 @@ def main():
     ap.add_argument("--variants", action="store_true", help="try several m2c option sets")
     ap.add_argument("--accept-existing", action="store_true",
                     help="wire in the matches of the last run (build/auto/results.json) without redoing it")
+    ap.add_argument("--switch", action="store_true",
+                    help="also take functions whose only .rdata is their jump tables")
     ap.add_argument("--names", type=Path, help="only these functions (one per line, or a results.json)")
     args = ap.parse_args()
 
     if args.accept_existing:
         results = json.loads((WORK / "results.json").read_text())
         chosen = {n: (WORK / f"{n}__v{k}.c").read_text() for n, k in results["match"].items()}
-        return accept(chosen)
+        return accept(chosen, results.get("rodata", {}))
 
     WORK.mkdir(parents=True, exist_ok=True)
     for old in WORK.glob("*"):
@@ -265,11 +382,13 @@ def main():
     subprocess.run([sys.executable, str(ROOT / "tools" / "gen_prototypes.py")], check=True,
                    capture_output=True)
     write_context()
+    load_jtbls()
     done = functions_in_c()
     bodies = extract_asm()
     cands = [f for f in engine_functions()
              if args.min_size <= f[1] <= args.max_size and f[2] not in done
-             and f[2] in bodies and "jtbl_" not in bodies[f[2]]]
+             and f[2] in bodies
+             and ("jtbl_" not in bodies[f[2]] or (args.switch and switch_only(bodies[f[2]])))]
     if args.names:
         text = args.names.read_text()
         wanted = (set(json.loads(text).get("differ", {})) if args.names.suffix == ".json"
@@ -329,6 +448,7 @@ def main():
     rom = match_func.ROM.read_bytes()
     results = {"match": {}, "differ": {}, "no_compile": [], "own_data": []}
     chosen = {}
+    rodata = {}
     for name, drafts in drafted.items():
         off, size = syms[name]
         want = struct.unpack(f">{size // 4}I", rom[off:off + size])
@@ -349,7 +469,14 @@ def main():
                       or match_func.mask(words[i], relocs.get(i)) != match_func.mask(want[i], relocs.get(i))
                       or not match_func.reloc_target_ok(words[i], want[i], relocs.get(i)))
             if bad == 0:
-                if own_data(obj):
+                extra = own_data(obj)
+                if extra == ".rodata" and "jtbl_" in bodies[name]:
+                    sl = rodata_slice(obj, name, bodies[name], rom)
+                    if sl:
+                        rodata[name] = sl
+                        best = ("match", k, 0)
+                        break
+                if extra:
                     best = ("own_data", k, 0)
                     continue
                 best = ("match", k, 0)
@@ -374,10 +501,11 @@ def main():
             by[k] = by.get(k, 0) + 1
         print("  matches by variant:", {(" ".join(VARIANTS[k // 10]) or "default") + (" +swap" if k % 10 else ""): c
                                         for k, c in sorted(by.items())})
+    results["rodata"] = rodata
     (WORK / "results.json").write_text(json.dumps(results, indent=1))
 
     if args.accept and results["match"]:
-        accept(chosen)
+        accept(chosen, rodata)
     return 0
 
 
