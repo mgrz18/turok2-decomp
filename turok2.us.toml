@@ -742,6 +742,7 @@ manual_funcs = [
 # 25 of those 75 were `.L` local branch labels, so stubbing them deletes real
 # code paths rather than isolating unsupported ones. See #32.
 stubs = [
+    "func_00293D8C",  # calls a refused entry
     "func_004671BC",  # calls a refused entry
     "STVM_MapTLB",  # manual
     "boot_main",  # manual

@@ -131,3 +131,7 @@ func_00460444
 # Calls a declared entry the recompiler refused (versions/bad_entries.us.txt),
 # so the jal has nothing to bind to.
 func_004671BC
+
+# Calls a declared entry the recompiler refused (versions/bad_entries.us.txt),
+# so the jal has nothing to bind to.
+func_00293D8C
