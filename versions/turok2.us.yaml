@@ -1057,6 +1057,7 @@ segments:
       - [0x7C00C, asm]
       - [0x7C0EC, c, code/func_0027B4EC]
       - [0x7C0FC, asm]
+      - [0x7C6EC, c, code/func_0027BAEC]
       - [0x7C774, c, code/func_0027BB74]
       - [0x7C77C, asm]
       - [0x7C860, c, code/func_0027BC60]
@@ -1384,6 +1385,8 @@ segments:
       - [0xA8A5C, rodata]
       - [0xA8A60, .rodata, code/func_002682CC]
       - [0xA8A94, rodata]
+      - [0xA9060, .rodata, code/func_0027BAEC]
+      - [0xA9090, rodata]
 
   # ---------------------------------------------------------------------------
   # RSP microcode blobs. Do NOT disassemble as MIPS — see docs/MICROCODE.md.
