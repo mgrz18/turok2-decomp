@@ -179,6 +179,14 @@ a slice lands exactly.
 .rodata against the ROM with the table relocations resolved, and wires both
 subsegments.
 
+**Float pools come from `li.s`.** cc1 writes float constants as
+`li.s $f0, 6.0`, and asn64 expands that into a `.rodata` literal plus
+lui/lwc1, which is what the ROM has, where gas builds the value in registers.
+`tools/sn_as.sh` does what asn64 does, so a function's float pool comes from
+its C literals in order of appearance. `auto_match.py --rdata` hands m2c the
+pool values too, so it writes `75.0f` rather than `D_800A7948`. The first
+pass matched 18 functions that way, with their slices.
+
 **Splat cuts switches after their last `jr ra`.** A case placed after the
 function's final return looks to splat like a new function. When a table
 entry points past the end, splat also stops the table early and reads the

@@ -140,10 +140,21 @@ def draft(name, asm, opts=()):
     src.write_text(asm.replace(name, name + "_draft"))
     files = [str(src)]
     tables = sorted(set(re.findall(r"\bjtbl_[0-9A-F]{8}\b", asm)))
-    if tables:
-        # m2c rebuilds a switch only if it can read the table.
+    consts = [] if not WITH_CONSTS else sorted(set(
+        n for n in re.findall(r"%lo\((D_[0-9A-F]{8})\)", asm)
+        if RDATA[0] <= int(n[2:], 16) < RDATA[1]))
+    if tables or consts:
+        # m2c rebuilds a switch only if it can read the table, and writes a
+        # float literal instead of an extern only if it can read the value.
+        body = "".join(".align 3\n" + JTBLS[t] for t in tables if t in JTBLS)
+        for n in consts:
+            off = RODATA_SEG_ROM + (int(n[2:], 16) - RDATA[0])
+            dbl = re.search(rf"ldc1\s+[^,]+,\s*%lo\({n}\)", asm)
+            words = ROM_BYTES[off:off + (8 if dbl else 4)]
+            body += f".globl {n}\n{n}:\n" + "".join(
+                f"     .word 0x{int.from_bytes(words[i:i + 4], 'big'):08X}\n" for i in range(0, len(words), 4))
         data = WORK / f"{name}.rodata.s"
-        data.write_text(".section .rodata\n" + "".join(".align 3\n" + JTBLS[t] for t in tables if t in JTBLS))
+        data.write_text(".section .rodata\n" + body)
         files.append(str(data))
     res = subprocess.run(
         # m2c patched for -mfp64 (tools/m2c_fp64.py): odd float registers
@@ -163,6 +174,13 @@ def draft(name, asm, opts=()):
     out = re.sub(r"&(\w+) \+ (0x[0-9A-Fa-f]+|\d+)\b", r"(void *)((s8 *)&\1 + \2)", out)
     out = fill_leading_params(name, out)
     out = declare_stack_vars(name, out)
+    # m2c leaves undeclared any symbol it read from the data file it was
+    # given (a pool entry it addressed at an offset rather than inlined).
+    used = set(re.findall(r"\b(D_[0-9A-F]{8})\b", out))
+    declared = set(re.findall(r"\bextern\b[^;]*\b(D_[0-9A-F]{8})\b", out))
+    missing = sorted(used - declared)
+    if missing:
+        out = "".join(f"extern M2C_UNK {d};\n" for d in missing) + "\n" + out
     called = sorted(set(re.findall(r"\b(func_[0-9A-F]{8})\b", out)) - {name})
     decls = [PROTOS[c] for c in called if c in PROTOS and f" {c}(" not in out.split("{")[0]]
     if decls:
@@ -170,6 +188,8 @@ def draft(name, asm, opts=()):
     return out
 
 
+WITH_CONSTS = False                 # --rdata: hand m2c the float pool values too
+ROM_BYTES = b""
 RDATA = (0x800A51F8, 0x800AB000)   # the engine's .rdata: jump tables, float pools
 RODATA_SEG_ROM = 0xA5DF8             # ROM offset of RDATA[0]
 JTBLS = {}                           # jtbl name -> its asm block
@@ -365,6 +385,8 @@ def main():
     ap.add_argument("--variants", action="store_true", help="try several m2c option sets")
     ap.add_argument("--accept-existing", action="store_true",
                     help="wire in the matches of the last run (build/auto/results.json) without redoing it")
+    ap.add_argument("--rdata", action="store_true",
+                    help="only functions with .rdata (tables, float pools), each owning its slice")
     ap.add_argument("--switch", action="store_true",
                     help="also take functions whose only .rdata is their jump tables")
     ap.add_argument("--names", type=Path, help="only these functions (one per line, or a results.json)")
@@ -383,12 +405,17 @@ def main():
                    capture_output=True)
     write_context()
     load_jtbls()
+    global WITH_CONSTS, ROM_BYTES
+    WITH_CONSTS = args.rdata
+    ROM_BYTES = match_func.ROM.read_bytes()
     done = functions_in_c()
     bodies = extract_asm()
     cands = [f for f in engine_functions()
              if args.min_size <= f[1] <= args.max_size and f[2] not in done
              and f[2] in bodies
-             and ("jtbl_" not in bodies[f[2]] or (args.switch and switch_only(bodies[f[2]])))]
+             and (args.rdata and rdata_refs(bodies[f[2]])
+                  or not args.rdata and ("jtbl_" not in bodies[f[2]]
+                                         or (args.switch and switch_only(bodies[f[2]]))))]
     # A jump-table entry that names a func_ is a case of someone's switch that
     # splat cut off after the switch function's last `jr ra`. As a function
     # of its own it can "match" (`return 0;`) and still be the wrong unit:
@@ -484,7 +511,7 @@ def main():
                       or not match_func.reloc_target_ok(words[i], want[i], relocs.get(i)))
             if bad == 0:
                 extra = own_data(obj)
-                if extra == ".rodata" and "jtbl_" in bodies[name]:
+                if extra == ".rodata" and rdata_refs(bodies[name]):
                     sl = rodata_slice(obj, name, bodies[name], rom)
                     if sl:
                         rodata[name] = sl
