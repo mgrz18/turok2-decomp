@@ -2,7 +2,7 @@
 
 [![status](https://img.shields.io/badge/status-matching%20decomp-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
 [![ROM](https://img.shields.io/badge/ROM-rebuilds%20byte--exact-brightgreen)](docs/MATCHING.md)
-[![engine matched](https://img.shields.io/badge/engine%20matched-4.34%25-orange)](tools/progress.py)
+[![engine matched](https://img.shields.io/badge/engine%20matched-6.27%25-orange)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
 [![RSP ucode](https://img.shields.io/badge/RSP%20ucode-stock%20F3DEX-success)](docs/MICROCODE.md)
@@ -11,7 +11,7 @@
 
 Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0): C source that compiles back to the exact original ROM.
 
-> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2` + `asn64`. 625 engine functions (4.34% of engine code) are matched and linked into the ROM as C so far ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
+> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2` + `asn64`. 852 engine functions (6.27% of engine code) are matched and linked into the ROM as C so far ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
 >
 > A parallel native-port track recompiles the same ELF with N64Recomp; it runs clean, and the TLB is its open question.
 
@@ -110,7 +110,7 @@ decomp.
 - [x] Per-function check against the ROM: `tools/match_func.py`
 - [x] Matched C linked into the ROM (`make verify` still passes), with a progress metric
 - [x] Fast C path: GNU as reproducing asn64 (`tools/sn_as.sh`), a full build in seconds
-- [x] Bulk matching from m2c drafts (`tools/auto_match.py`): 617 functions in one pass
+- [x] Bulk matching from m2c drafts (`tools/auto_match.py`): 840 functions over three passes
 - [ ] Readability pass: name the structs behind `M2C_FIELD` accesses
 - [ ] Hand-match the functions m2c gets close to but not exact
 - [ ] Recover the original source-file boundaries (needed once `.rodata` moves to C)
