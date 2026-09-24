@@ -126,6 +126,42 @@ names encode their addresses, so `match_func.reloc_target_ok` now computes the
 linked `%lo` and `jal` target and holds them against the ROM, and
 `auto_match.py` rewrites the pattern as byte arithmetic.
 
+### Later passes (#43)
+
+Three more passes took the engine from 4.34% to 6.27% (852 functions):
+
+- **Inferred prototypes** (`tools/gen_prototypes.py`) gave the largest
+  gain, 155 of 163 matches in one pass. m2c drafts a call from the registers
+  the caller sets, and a C++ method calling another on the same object sets
+  only `$a1`, leaving `this` in `$a0`. Knowing each callee's parameter count
+  (argument registers read before written, stack slots above the frame for
+  five and on), m2c passes `this` through.
+- **Draft rewrites**: leading parameters m2c leaves out (`f(s32 arg3)`),
+  stack locals it forgets to declare, `x << n` for its `x * 2^n` (GCC 2.8
+  orders the following `addu` differently), and `&sym + n` as byte
+  arithmetic.
+- **-mfp64** (`tools/m2c_fp64.py`): odd float registers hold whole values in
+  this engine, and stock m2c reads `$f1` as half of a double. The wrapper lets
+  m2c draft every pending function, though that added few matches by itself.
+
+What is left, by engine bytes: 53% of drafts are far off (over 25% of words
+differ), 18% do not compile, 10% have no usable draft (often fragments of a
+wrong boundary), 8% use `switch` (they need their file's `.rodata`), and 3%
+are near misses. That is hand work, or `.rodata` migration.
+
+**Delay slots are GCC's call, not the assembler's.** Letting gas fill delay
+slots (`-O2`) matched one function and broke 87 that already matched. asn64
+never moves a load into a slot, never fills a conditional branch's slot, and
+leaves stores in place too. Where the ROM has a filled return slot and a
+draft does not, GCC filled it (emitting the pair under `noreorder`), so the
+fix is in the C.
+
+**`li.d` is an asn64 macro.** cc1 emits `li.d $f0, 4.294967296e9`; asn64
+puts the double in `.rodata` and loads it with `lui`/`ldc1`, which is what the
+ROM has, while gas builds it in registers. `tools/sn_as.sh` now does what
+asn64 does. Such a function carries its own `.rodata`, so it waits for the
+file's rodata to move to C.
+
 ## The fast assembler
 
 `asn64` only runs under wine, which costs ~30 s a file in the emulated amd64

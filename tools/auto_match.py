@@ -8,7 +8,8 @@ whole loop in bulk:
   1. pick candidates from the engine's `.code`, smallest first, skipping any
      function already in C and any that reads a jump table (a `switch` makes
      the C emit its own .rodata, which still lives in asm);
-  2. draft each with `m2c -t mips-gcc-c --valid-syntax`, unknown struct fields
+  2. draft each with `m2c -t mips-gcc-c --valid-syntax` (patched for -mfp64 by
+     tools/m2c_fp64.py), unknown struct fields
      as M2C_FIELD (include/m2c_macros.h);
   3. compile every draft in one container run (tools/cc_func.sh, GNU as);
   4. compare each with the ROM, relocations masked, the way match_func.py does,
@@ -138,7 +139,9 @@ def draft(name, asm, opts=()):
     src = WORK / f"{name}.s"
     src.write_text(asm.replace(name, name + "_draft"))
     res = subprocess.run(
-        [str(ROOT / ".venv" / "bin" / "m2c"), "-t", "mips-gcc-c", "--valid-syntax",
+        # m2c patched for -mfp64 (tools/m2c_fp64.py): odd float registers
+        # hold whole values in this engine, not halves of a double.
+        [sys.executable, str(ROOT / "tools" / "m2c_fp64.py"), "-t", "mips-gcc-c", "--valid-syntax",
          "--context", str(CONTEXT), *opts, str(src)],
         capture_output=True, text=True)
     out = res.stdout.replace(name + "_draft", name)
