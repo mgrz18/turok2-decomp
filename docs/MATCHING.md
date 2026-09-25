@@ -218,9 +218,11 @@ frequency:
 | statements in a different order | reorder them: GCC 2.8 keeps source order for independent stores |
 | m2c's pointer offsets 4 or 8 times too far | m2c writes offsets in bytes; `byte_arith` rewrites them |
 
-Still open: a float argument that the ROM passes as bits in `$a1`
-(`lui $a1, 0x4160`, i.e. 14.0f). An `f32` prototype puts it in `$f5` under
--mfp64, and an int prototype orders the argument set-up differently.
+A float argument after an int one travels in an integer register (`lui $a1,
+0x4160` is 14.0f). cc1 writes `li.s $5, 14.0` for it, SN's cc1n64 exactly the
+same, and asn64 loads the float's bits into $5. `tools/sn_li.py` does that for
+an integer destination and the .rodata literal for a float one; before, the
+float case was forced on both and the argument came out in the wrong place.
 
 ## The fast assembler
 

@@ -250,6 +250,12 @@ def byte_arith(src):
     """
     ptrs = {m.group(3) for m in PTR_DECL.finditer(src)
             if len(m.group(2)) > 1 or m.group(1).strip() not in BYTE_TYPES}
+    # Parameters too: `void **arg0` then `arg0 + 4`.
+    for sig in re.finditer(r"^\w[\w \*]*?\bfunc_[0-9A-F]{8}\(([^)]*)\) \{", src, re.M):
+        for p in sig.group(1).split(","):
+            pm = re.match(r"^\s*([A-Za-z_][\w ]*?)\s*(\*+)\s*(\w+)\s*$", p)
+            if pm and (len(pm.group(2)) > 1 or pm.group(1).strip() not in BYTE_TYPES):
+                ptrs.add(pm.group(3))
     # var += N;  var -= N;
     def repl_var(m):
         var, op, val = m.group(2), m.group(3), m.group(4)
@@ -257,6 +263,14 @@ def byte_arith(src):
             return m.group(0)
         return f"{m.group(1)}{var} = (__typeof__({var}))((s8 *){var} {op} {val});"
     src = re.sub(r"^(\s+)(\w+) ([+-])= (0x[0-9A-Fa-f]+|\d+);", repl_var, src, flags=re.M)
+    # ptr + N   ptr - N   (a pointer-typed variable with a constant, not a
+    # field access or an address-of)
+    def repl_expr(m):
+        var, op, val = m.group(1), m.group(2), m.group(3)
+        if var not in ptrs:
+            return m.group(0)
+        return f"((__typeof__({var}))((s8 *){var} {op} {val}))"
+    src = re.sub(r"(?<![&\w>.])(\w+) ([+-]) (0x[0-9A-Fa-f]+|\d+)\b(?! *[*/])", repl_expr, src)
     # &SYM + E   &SYM - E
     out, i = [], 0
     for m in re.finditer(r"&(\w+) ([+-]) ", src):
