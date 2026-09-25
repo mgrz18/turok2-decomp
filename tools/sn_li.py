@@ -43,10 +43,15 @@ def expand_mem(line):
         hi = ((n + 0x8000) >> 16) & 0xFFFF
         lo = n - (((n + 0x8000) >> 16) << 16)
         return [f"{ind}lui $at,0x{hi:X}", f"{ind}addu $at,{base},$at", f"{ind}{op} {rt},{lo}($at)"]
-    # A symbol off a base register (`lw $2, jtbl_X($2)`) is left to gas: the
-    # ROM has `addu $at, $at, base` there, which is gas's order already.
-    # Only large numeric offsets take the reversed order.
-    return None
+    # A symbol off a base register (`lbu $2, D_X($4)`): the ROM has
+    # `lui $at; addu $at, $at, base`. gas writes that order too, but for a
+    # load it builds the address in the destination register instead of $at,
+    # so loads are expanded here; stores already come out right from gas.
+    if op.startswith(("s", "sw", "sd")) and not op.startswith("sub"):
+        return None
+    if not re.match(r"^[A-Za-z_.$][\w.$]*([+-](0x[0-9A-Fa-f]+|\d+))?$", off):
+        return None
+    return [f"{ind}lui $at,%hi({off})", f"{ind}addu $at,$at,{base}", f"{ind}{op} {rt},%lo({off})($at)"]
 
 
 def main():
