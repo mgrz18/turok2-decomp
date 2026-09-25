@@ -170,8 +170,8 @@ def draft(name, asm, opts=()):
             or 'missing "jr $ra"' in out):
         return None
     # `&D_800A5858 + 4` is m2c for "four bytes past the symbol", but in C it
-    # scales by the pointee (M2C_UNK is s32) and lands 16 bytes out.
-    out = re.sub(r"&(\w+) \+ (0x[0-9A-Fa-f]+|\d+)\b", r"(void *)((s8 *)&\1 + \2)", out)
+    # scales by the pointee and lands 16 bytes out; likewise `var += 0x224`.
+    out = byte_arith(out)
     out = fill_leading_params(name, out)
     out = declare_stack_vars(name, out)
     # m2c leaves undeclared any symbol it read from the data file it was
@@ -218,6 +218,58 @@ def switch_only(body):
 
 
 SIG = re.compile(r"^(?P<ret>[^\n(]*?\b)(?P<name>func_[0-9A-F]{8})\((?P<params>[^)]*)\) \{", re.M)
+
+
+PTR_DECL = re.compile(r"^\s+([A-Za-z_][\w ]*?)\s*(\*+)\s*(\w+);", re.M)
+BYTE_TYPES = {"s8", "u8", "char", "void"}
+
+
+def _operand(text, i):
+    """The operand starting at text[i]: a parenthesised group or a token."""
+    if i < len(text) and text[i] == "(":
+        depth = 0
+        for j in range(i, len(text)):
+            depth += text[j] == "("
+            depth -= text[j] == ")"
+            if depth == 0:
+                return text[i:j + 1], j + 1
+        return None, i
+    m = re.match(r"(?:0x[0-9A-Fa-f]+|\d+|\w+)", text[i:])
+    return (m.group(0), i + m.end()) if m else (None, i)
+
+
+def byte_arith(src):
+    """Make m2c's pointer arithmetic mean bytes, as m2c means it.
+
+    m2c writes offsets on pointers in bytes: `var_s0 += 0x224` on an M2C_UNK *,
+    `&D_800D8D7C - 0x14`, `var_a0 += 0x10` on a u32 *. C scales those by the
+    pointee size, so the draft lands 4 or 8 times too far. Each becomes byte
+    arithmetic cast back to the original type with __typeof__, which GCC 2.8
+    has, so every use of the result keeps its type.
+    """
+    ptrs = {m.group(3) for m in PTR_DECL.finditer(src)
+            if len(m.group(2)) > 1 or m.group(1).strip() not in BYTE_TYPES}
+    # var += N;  var -= N;
+    def repl_var(m):
+        var, op, val = m.group(2), m.group(3), m.group(4)
+        if var not in ptrs:
+            return m.group(0)
+        return f"{m.group(1)}{var} = (__typeof__({var}))((s8 *){var} {op} {val});"
+    src = re.sub(r"^(\s+)(\w+) ([+-])= (0x[0-9A-Fa-f]+|\d+);", repl_var, src, flags=re.M)
+    # &SYM + E   &SYM - E
+    out, i = [], 0
+    for m in re.finditer(r"&(\w+) ([+-]) ", src):
+        if m.start() < i:
+            continue
+        opnd, end = _operand(src, m.end())
+        if opnd is None:
+            continue
+        out.append(src[i:m.start()])
+        sym, op = m.group(1), m.group(2)
+        out.append(f"((__typeof__(&{sym}))((s8 *)&{sym} {op} {opnd}))")
+        i = end
+    out.append(src[i:])
+    return "".join(out)
 
 
 def fill_leading_params(name, src):
