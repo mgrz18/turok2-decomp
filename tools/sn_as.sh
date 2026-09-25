@@ -13,6 +13,11 @@
 #    register it puts the constant in .rodata and loads it (the ROM's form,
 #    e.g. func_0027BAEC's pool); into an integer register (a float argument
 #    in $a1) it loads the float's bits as an integer. tools/sn_li.py.
+#  - cc1 writes a real nop after an FPU multiply whose result the next
+#    instruction uses. asn64 would insert the same nop, but only in reorder
+#    regions: when the next instruction is a jump in a `.set noreorder` block
+#    (the use sits in its delay slot) the ROM has none. A nop right before
+#    `.set noreorder` is dropped (func_00256584).
 #  - asn64 fills the c.cond -> bc1t/bc1f hazard with a nop, and no other
 #    hazard (not the load delay, not mtc1). cc1 marks every hazard it leaves
 #    to the assembler with a `#nop` comment, so turning exactly the one after
@@ -28,6 +33,10 @@ INC_DIR=${INC_DIR:-us/include}
 
 tr -d '\r' < "$IN" \
     | sed -E 's/^([[:space:]]+)move([[:space:]]+)([^,]+),([^,#]+)/\1addu\2\3,\4,$0/' \
+    | awk '{ if (held != "") { if ($0 ~ /^[[:space:]]*\.set[[:space:]]+noreorder/) { held = "" } else { print held; held = "" } }
+             if ($0 ~ /^[[:space:]]*nop[[:space:]]*$/) { held = $0; next }
+             print }
+           END { if (held != "") print held }' \
     | awk '{ if (prev_cmp && $0 ~ /^[[:space:]]*#nop[[:space:]]*$/) { print "\tnop"; prev_cmp = 0; next }
              prev_cmp = ($1 ~ /^c\.[a-z]+\.[sd]$/); print }' \
     | python3 "$(dirname "$0")/sn_li.py" \
