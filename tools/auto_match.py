@@ -105,6 +105,7 @@ VARIANTS = [
 
 POW2 = {"2": 1, "4": 2, "8": 3, "16": 4, "32": 5, "64": 6, "128": 7, "256": 8}
 SHIFT = re.compile(r"\b(\w+) \* (2|4|8|16|32|64|128|256)\b")
+SHIFT_PAREN = re.compile(r"\) \* (2|4|8|16|32|64|128|256)\)")
 SWAP = re.compile(r"\((\w+) \+ \((\w+ \* \d+)\)\)")
 CONTEXT = WORK / "m2c_context.h"
 PROTOS = {}      # name -> prototype line, from include/functions.h
@@ -506,6 +507,8 @@ def main():
                 # GCC 2.8 does not treat `i * 4` and `i << 2` the same: the
                 # operand order of the addu that follows differs.
                 sh = SHIFT.sub(lambda m: f"({m.group(1)} << {POW2[m.group(2)]})", c)
+                # The same for a parenthesised operand, `(M2C_FIELD(...) * 2)`.
+                sh = SHIFT_PAREN.sub(lambda m: f") << {POW2[m.group(1)]})", sh)
                 # It also keeps the order of `a + b*4` into the addu, and m2c
                 # always writes the base first.
                 sw = SWAP.sub(r"((\2) + \1)", c)
