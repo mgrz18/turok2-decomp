@@ -11,11 +11,11 @@
 Literals are numbered in order of appearance, which is the order of the
 function's pool.
 
-Loads and stores whose address does not fit one instruction, a large offset
-(`sb $2, 147425($4)`) or a symbol off a base register (`lw $2, D_X($4)`), are
-macros too. asn64 builds the address in $at as `lui $at, hi; addu $at, base,
-$at`; gas writes `addu $at, $at, base`, and for a load it may use the
-destination register instead of $at. Both differ from the ROM.
+A load or store with an offset too large for one instruction (`sb $2,
+147425($4)`) is a macro too. asn64 builds the address in $at as `lui $at, hi;
+addu $at, base, $at`; gas writes `addu $at, $at, base`, and for a load may
+use the destination register instead. A symbol off a base register (`lw $2,
+jtbl_X($2)`) is different: there the ROM has gas's order, so it is left alone.
 """
 
 import re
@@ -43,9 +43,10 @@ def expand_mem(line):
         hi = ((n + 0x8000) >> 16) & 0xFFFF
         lo = n - (((n + 0x8000) >> 16) << 16)
         return [f"{ind}lui $at,0x{hi:X}", f"{ind}addu $at,{base},$at", f"{ind}{op} {rt},{lo}($at)"]
-    if not re.match(r"^[A-Za-z_.$][\w.$]*([+-](0x[0-9A-Fa-f]+|\d+))?$", off):
-        return None
-    return [f"{ind}lui $at,%hi({off})", f"{ind}addu $at,{base},$at", f"{ind}{op} {rt},%lo({off})($at)"]
+    # A symbol off a base register (`lw $2, jtbl_X($2)`) is left to gas: the
+    # ROM has `addu $at, $at, base` there, which is gas's order already.
+    # Only large numeric offsets take the reversed order.
+    return None
 
 
 def main():
