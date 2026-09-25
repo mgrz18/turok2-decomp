@@ -202,6 +202,26 @@ boundaries: right bytes, wrong unit. Three have been folded back so far
 function they belong to is matched, and `auto_match` no longer accepts a jump
 or branch target, or a jump-table target, as a function.
 
+### Hand-matching patterns (#46)
+
+Recurring fixes when a draft is a word or two off, in rough order of
+frequency:
+
+| Diff | Fix |
+|---|---|
+| call sets `$a1`/`$a2` and leaves `$a0` alone | a method: pass `this` (and any other passthrough arguments) first; the inferred prototype under-counted |
+| `sw` where the ROM has `sb`/`sh` | the global is a byte/halfword array: `extern u8 D_X[]; D_X[i] = ...` |
+| `addu` operands swapped on an index | write `(i << n)`, not `i * 2^n`; the tools do this for any operand now |
+| `srav` where the ROM has `srlv` | the shifted value is unsigned (the callee returns `u32`) |
+| store `$a3` to its home slot, read above the frame | a struct passed by value that starts in `$a3` |
+| a loaded field lands in a different register | load it into a local first (`s32 v = x->c8; v += n; ...`) |
+| statements in a different order | reorder them: GCC 2.8 keeps source order for independent stores |
+| m2c's pointer offsets 4 or 8 times too far | m2c writes offsets in bytes; `byte_arith` rewrites them |
+
+Still open: a float argument that the ROM passes as bits in `$a1`
+(`lui $a1, 0x4160`, i.e. 14.0f). An `f32` prototype puts it in `$f5` under
+-mfp64, and an int prototype orders the argument set-up differently.
+
 ## The fast assembler
 
 `asn64` only runs under wine, which costs ~30 s a file in the emulated amd64
