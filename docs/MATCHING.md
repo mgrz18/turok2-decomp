@@ -217,6 +217,8 @@ frequency:
 | a loaded field lands in a different register | load it into a local first (`s32 v = x->c8; v += n; ...`) |
 | statements in a different order | reorder them: GCC 2.8 keeps source order for independent stores |
 | m2c's pointer offsets 4 or 8 times too far | m2c writes offsets in bytes; `byte_arith` rewrites them |
+| `lbu $v0, D_X($a0)` in the ROM, a register-built address in the draft | index the global as an array, `extern u8 D_X[]; D_X[i]` (`global_arrays` variant) |
+| a qsort comparator's loads in the wrong order | write the comparison `a > b`, not `b < a` |
 
 A float argument after an int one travels in an integer register (`lui $a1,
 0x4160` is 14.0f). cc1 writes `li.s $5, 14.0` for it, SN's cc1n64 exactly the

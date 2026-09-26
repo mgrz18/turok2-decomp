@@ -287,6 +287,27 @@ def byte_arith(src):
     return "".join(out)
 
 
+def global_arrays(src, elem):
+    """Index an unknown global as an array, the way the ROM addresses it.
+
+    m2c writes `*((typeof(&D))((s8 *)&D + i))` for an M2C_UNK global D. GCC
+    then builds the address in a register, where the ROM has `lbu $v0,
+    D($a0)`: a symbol off a base register, which is what `D[i]` gives. D
+    becomes `extern u8 D[]`, each access `*(elem *)(D + i)`, and a cast
+    around a load, `(u8) *(...)`, becomes a load of that width. The element
+    type is a guess, so this is tried once per width and the comparison picks.
+    """
+    names = set(re.findall(r"\(\(__typeof__\(&(D_[0-9A-F]{8})\)\)\(\(s8 \*\)&\1 [+-] ", src))
+    if not names:
+        return src
+    for d in names:
+        src = re.sub(rf"^extern [^;\n]*\b{d};", f"extern u8 {d}[];", src, flags=re.M)
+        src = src.replace(f"((__typeof__(&{d}))((s8 *)&{d} ", f"(({elem} *)({d} ")
+    # (u8) *((u8 *)(D + i))  ->  *((u8 *)(D + i))
+    src = re.sub(r"\((u8|s8|u16|s16)\) \*\(\(\w+ \*\)", r"*((\1 *)", src)
+    return src
+
+
 def fill_leading_params(name, src):
     """Declare the parameters m2c left out ahead of the ones it kept.
 
@@ -526,7 +547,8 @@ def main():
                 # It also keeps the order of `a + b*4` into the addu, and m2c
                 # always writes the base first.
                 sw = SWAP.sub(r"((\2) + \1)", c)
-                for form in (sh, sw, SWAP.sub(r"((\2) + \1)", sh)):
+                arrays = [global_arrays(c, t) for t in ("M2C_UNK", "u8", "s8", "u16", "s16")]
+                for form in (sh, sw, SWAP.sub(r"((\2) + \1)", sh), *arrays):
                     if form != c and form not in forms:
                         forms.append(form)
             for j, form in enumerate(forms):
