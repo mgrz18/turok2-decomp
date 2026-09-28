@@ -705,8 +705,11 @@ def main():
                         todo.setdefault(name, {})[key] = fixed
         if not todo:
             break
-        for f in WORK.glob("*.c"):
-            f.unlink()
+        # Compile only this round's drafts: set the others aside meanwhile
+        # (they are what --accept-existing reads back afterwards).
+        kept = list(WORK.glob("*.c"))
+        for f in kept:
+            f.rename(f.with_suffix(".c.keep"))
         for name, extra in todo.items():
             drafted[name].update(extra)
             for key, src in extra.items():
@@ -715,6 +718,8 @@ def main():
         subprocess.run(["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
                         "-w", "/work", "-e", "ASSEMBLER=gas", IMAGE, "bash", "-c", script],
                        capture_output=True, text=True)
+        for f in kept:
+            f.with_suffix(".c.keep").rename(f)
 
     import struct
     syms = match_func.rom_symbols()
