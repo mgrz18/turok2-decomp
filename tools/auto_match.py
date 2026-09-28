@@ -384,7 +384,7 @@ def declare_stack_vars(name, src):
 # Unary `*(`: m2c writes a binary multiply with a space after the `*`.
 DEREF = re.compile(r"(?<![\w)\]])(\s?)\*\(((?:[^()]|\((?:[^()]|\([^()]*\))*\))+)\)")
 SCALE = re.compile(r"\*\s*(\d+)\)|<<\s*(\d+)\)")
-DEREF_TYPES = {1: ("u8", "s8"), 2: ("s16", "u16"), 4: ("s32", "f32"), 8: ("s32",)}
+DEREF_TYPES = {1: ("u8", "s8", "s32"), 2: ("s16", "u16"), 4: ("s32", "f32"), 8: ("s32",)}
 
 
 def repair(src, err):
