@@ -287,6 +287,29 @@ def byte_arith(src):
     return "".join(out)
 
 
+def scalars_as_arrays(src):
+    """Declare every scalar global as an array and use element 0.
+
+    GCC 2.8 keeps a global's address in a register (`lui/addiu $a0` then
+    `lw 0($a0)` and `sw 0($a0)`) when the global is an array element or a
+    struct field, and uses the `lw $v1, D` macro for each access when it is
+    a plain scalar. The engine's globals are fields and arrays, m2c declares
+    them as scalars. `D` becomes `D[0]`, `&D` becomes `D`.
+    """
+    names = re.findall(r"^extern (?!M2C_UNK\b)[\w ]+?\*?\s*(D_[0-9A-F]{8});", src, re.M)
+    if not names:
+        return src
+    for d in names:
+        src = re.sub(rf"^(extern [\w ]+?\*?\s*){d};", rf"\g<1>{d}[];", src, flags=re.M)
+        body_start = src.find("{")
+        head, body = src[:body_start], src[body_start:]
+        body = re.sub(rf"&{d}\b", f"@@{d}@@", body)
+        body = re.sub(rf"\b{d}\b(?!\[)", f"{d}[0]", body)
+        body = body.replace(f"@@{d}@@", d)
+        src = head + body
+    return src
+
+
 def global_arrays(src, elem):
     """Index an unknown global as an array, the way the ROM addresses it.
 
@@ -548,6 +571,7 @@ def main():
                 # always writes the base first.
                 sw = SWAP.sub(r"((\2) + \1)", c)
                 arrays = [global_arrays(c, t) for t in ("M2C_UNK", "u8", "s8", "u16", "s16")]
+                arrays.append(scalars_as_arrays(c))
                 for form in (sh, sw, SWAP.sub(r"((\2) + \1)", sh), *arrays):
                     if form != c and form not in forms:
                         forms.append(form)

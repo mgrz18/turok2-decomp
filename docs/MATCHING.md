@@ -219,6 +219,8 @@ frequency:
 | m2c's pointer offsets 4 or 8 times too far | m2c writes offsets in bytes; `byte_arith` rewrites them |
 | `lbu $v0, D_X($a0)` in the ROM, a register-built address in the draft | index the global as an array, `extern u8 D_X[]; D_X[i]` (`global_arrays` variant) |
 | a qsort comparator's loads in the wrong order | write the comparison `a > b`, not `b < a` |
+| ROM keeps a global's address in a register (`lui/addiu $a0`, then `0($a0)`) | the global is an array element or struct field: `extern T D[]; D[0]` (`scalars_as_arrays` variant) |
+| a load scheduled earlier than the draft's | read it into a local before the statements it precedes |
 
 A float argument after an int one travels in an integer register (`lui $a1,
 0x4160` is 14.0f). cc1 writes `li.s $5, 14.0` for it, SN's cc1n64 exactly the
