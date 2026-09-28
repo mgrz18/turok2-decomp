@@ -381,6 +381,35 @@ def declare_stack_vars(name, src):
     return src[:m.end()] + "\n" + decl + body.lstrip("\n") if body.startswith("\n") else src[:m.end()] + "\n" + decl + body
 
 
+def rename_swallowed(src, v0, v1):
+    """Point references past a symbol the function's .rodata slice swallows.
+
+    Splat labels .rdata by the addresses the code uses, so a function that
+    reads a float pool at D_X+4 finds it drafted as M2C_FIELD(&D_X, f32 *, 4).
+    Once the function owns [v0, v1) and D_X sits inside it, the asm no longer
+    defines D_X and the link fails; the value it reads lies past the slice,
+    where splat labels it D_(X+4). Rename to that (func_00294D18).
+    """
+    field = re.compile(r"M2C_FIELD\(&D_([0-9A-F]{8}), (\w+) \*, (0x[0-9A-Fa-f]+|\d+)\)")
+
+    def fix(m):
+        base, off = int(m.group(1), 16), int(m.group(3), 0)
+        if v0 <= base < v1 and base + off >= v1:
+            return f"D_{base + off:08X}"
+        return m.group(0)
+
+    out = field.sub(fix, src)
+    for m in field.finditer(src):
+        base, off = int(m.group(1), 16), int(m.group(3), 0)
+        if v0 <= base < v1 and base + off >= v1:
+            new = f"D_{base + off:08X}"
+            decl = f"extern {m.group(2)} {new};"
+            out = re.sub(rf"^extern [^;]*\bD_{m.group(1)};$", decl, out, flags=re.M)
+            if decl not in out:
+                out = out.replace(HEADER, HEADER + decl + "\n", 1)
+    return out
+
+
 def accept(chosen, rodata=None):
     """Give each matched function its C subsegment and its file, and a
     switch function its .rodata subsegment too."""
@@ -400,7 +429,12 @@ def accept(chosen, rodata=None):
                 # The .text subsegment is in already; the build will say it
                 # links the function's tables twice. Better to know than guess.
                 print(f"  WARNING {name}: its .rodata slice does not fit; fix the yaml by hand")
-        (SRC / f"{name}.c").write_text(chosen[name])
+        src = chosen[name]
+        if name in rodata:
+            start, size = rodata[name]
+            v0 = RDATA[0] + (start - RODATA_SEG_ROM)
+            src = rename_swallowed(src, v0, v0 + size)
+        (SRC / f"{name}.c").write_text(src)
         wired += 1
     print(f"wired into the build: {wired}  (now run make setup && make verify)")
     return 0
