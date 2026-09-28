@@ -571,8 +571,11 @@ def main():
                 # always writes the base first.
                 sw = SWAP.sub(r"((\2) + \1)", c)
                 arrays = [global_arrays(c, t) for t in ("M2C_UNK", "u8", "s8", "u16", "s16")]
-                arrays.append(scalars_as_arrays(c))
-                for form in (sh, sw, SWAP.sub(r"((\2) + \1)", sh), *arrays):
+                base_forms = [c, sh, sw, SWAP.sub(r"((\2) + \1)", sh), *arrays]
+                # Globals-as-arrays is independent of the other rewrites, so it
+                # is also tried on top of each of them.
+                combined = base_forms + [scalars_as_arrays(f) for f in base_forms]
+                for form in combined:
                     if form != c and form not in forms:
                         forms.append(form)
             for j, form in enumerate(forms):
