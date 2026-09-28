@@ -11,7 +11,7 @@ import shutil, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, 'tools'); import auto_match as A
 from elftools.elf.elffile import ELFFile
-W = Path('build/auto/man'); W.mkdir(parents=True, exist_ok=True)
+W = Path('build/manual_obj'); W.mkdir(parents=True, exist_ok=True)
 files = [Path(p) for p in sys.argv[1:]]
 names = [p.name.split('__')[0].removesuffix('.c') for p in files]
 for p, n in zip(files, names):
