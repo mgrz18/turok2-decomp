@@ -772,8 +772,11 @@ def main():
         by = {}
         for k in results["match"].values():
             by[k] = by.get(k, 0) + 1
-        print("  matches by variant:", {(" ".join(VARIANTS[k // 10]) or "default") + (" +swap" if k % 10 else ""): c
-                                        for k, c in sorted(by.items())})
+        def label(k):
+            if k >= 1000:
+                return f"repaired (round {k // 1000})"
+            return (" ".join(VARIANTS[k // 10]) or "default") + (" +swap" if k % 10 else "")
+        print("  matches by variant:", {label(k): c for k, c in sorted(by.items())})
     results["rodata"] = rodata
     (WORK / "results.json").write_text(json.dumps(results, indent=1))
 
