@@ -22,6 +22,7 @@ Usage:
 """
 
 import argparse
+import os
 import re
 import struct
 import subprocess
@@ -33,7 +34,9 @@ from elftools.elf.elffile import ELFFile
 from elftools.elf.relocation import RelocationSection
 
 ROOT = Path(__file__).resolve().parent.parent
-ELF = ROOT / "build" / "turok2.us.elf"
+# The symbol table to look functions up in. MATCH_ELF points it at a copy,
+# so drafts can be checked while a build is relinking the real one.
+ELF = Path(os.environ.get("MATCH_ELF", ROOT / "build" / "turok2.us.elf"))
 ROM = ROOT / "baserom.us.z64"
 IMAGE = "turok2-build"
 

@@ -263,3 +263,6 @@ registers to ABI names (splat emits `$31`, m2c wants `$ra`), and run `m2c`.
 | loads come out in the wrong order | flip the comparison: `o->v > G`, not `G < o->v` |
 | an extra `andi 0xFF` after a byte load | the temp is `u32`, not `u8` |
 | `addu` operands swapped on an array index | index the array directly (`p->slots[i].x`) |
+| `bnez v; addu v0, v` then a default | early return: `if (v != 0) return v; return DEF;`, not `if (!v) v = DEF;` |
+| `jal` then `j .Lend` + `nop`, else branch sets `v0` | one result variable: `if (c) r = f(); else r = 0; return r;` |
+| a NULL check's `return 0` placed after the loop body | spell the `else`: `if (e != NULL) { ... } else { return 0; }` |

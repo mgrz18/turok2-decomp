@@ -73,7 +73,10 @@ AS_FLAGS          = -EB -mabi=32 -mips4 -O1 -I $(INCLUDE_DIR) --defsym ASSEMBLER
 ASM_FLAGS         = -I $(INCLUDE_DIR) -mips3
 D_FLAGS           = -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 -DGAME_VERSION=\"$(VERSION)\"
 
-CC_FLAGS          = -quiet -G0 -mips3 $(OPT_FLAGS) -mgas -meb -mcpu=VR4300 -mhard-float -mfp64
+# -mcpu=VR4300 turns on fix4300, a nop after every mul.s/mul.d; no function
+# in the ROM has one after each of its multiplies, so the engine was built
+# without it.
+CC_FLAGS          = -quiet -G0 -mips3 $(OPT_FLAGS) -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64
 CPP_FLAGS         = -P -undef -Wall -lang-c $(D_FLAGS) $(INCLUDE_CC_FLAGS) -nostdinc
 
 # Symbol files are filtered first: anything the objects already define must not

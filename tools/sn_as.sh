@@ -13,11 +13,12 @@
 #    register it puts the constant in .rodata and loads it (the ROM's form,
 #    e.g. func_0027BAEC's pool); into an integer register (a float argument
 #    in $a1) it loads the float's bits as an integer. tools/sn_li.py.
-#  - cc1 writes a real nop after an FPU multiply whose result the next
-#    instruction uses. asn64 would insert the same nop, but only in reorder
-#    regions: when the next instruction is a jump in a `.set noreorder` block
-#    (the use sits in its delay slot) the ROM has none. A nop right before
-#    `.set noreorder` is dropped (func_00256584).
+#  - asn64 works around the VR4300 multiply erratum itself: in a reorder
+#    region it puts a nop between a mul.s/mul.d and a multiply right after
+#    it, and nowhere else (the ROM has 323 such nops and not one mul.[sd]
+#    followed directly by another multiply). cc1 is run with -mno-fix4300,
+#    since its own fix4300 puts a nop after every mul.s/mul.d. A real nop
+#    cc1 leaves right before `.set noreorder` is still dropped.
 #  - asn64 fills the c.cond -> bc1t/bc1f hazard with a nop, and no other
 #    hazard (not the load delay, not mtc1). cc1 marks every hazard it leaves
 #    to the assembler with a `#nop` comment, so turning exactly the one after
@@ -39,6 +40,11 @@ tr -d '\r' < "$IN" \
            END { if (held != "") print held }' \
     | awk '{ if (prev_cmp && $0 ~ /^[[:space:]]*#nop[[:space:]]*$/) { print "\tnop"; prev_cmp = 0; next }
              prev_cmp = ($1 ~ /^c\.[a-z]+\.[sd]$/); print }' \
+    | awk '/^[[:space:]]*\.set[[:space:]]+noreorder/ { noreorder = 1 }
+           /^[[:space:]]*\.set[[:space:]]+reorder/ { noreorder = 0 }
+           { if (prev_mul && !noreorder && $1 ~ /^(mul\.[sd]|mult|multu|dmult|dmultu)$/) print "\tnop"
+             if ($1 != "" && $1 !~ /^[#.]/) prev_mul = ($1 ~ /^mul\.[sd]$/)
+             print }' \
     | python3 "$(dirname "$0")/sn_li.py" \
     | mips-linux-gnu-as -EB -mabi=32 -march=vr4300 -mtune=vr4300 -mips3 -O1 \
         --no-pad-sections -I "$INC_DIR" -o "$OUT" -
