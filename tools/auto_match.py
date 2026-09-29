@@ -587,6 +587,8 @@ def main():
     ap.add_argument("--switch", action="store_true",
                     help="also take functions whose only .rdata is their jump tables")
     ap.add_argument("--names", type=Path, help="only these functions (one per line, or a results.json)")
+    ap.add_argument("--save-near", type=Path,
+                    help="write each non-matching function's closest draft here, for tools/permuter")
     args = ap.parse_args()
 
     if args.accept_existing:
@@ -771,6 +773,10 @@ def main():
         else:
             results["differ"][name] = [best[2], best[3], best[1]]
 
+    if args.save_near:
+        args.save_near.mkdir(parents=True, exist_ok=True)
+        for name, (bad, n, key) in results["differ"].items():
+            (args.save_near / f"{name}.c").write_text(drafted[name][key])
     for k, v in results.items():
         print(f"{k:11s} {len(v)}")
     if args.variants and results["match"]:
