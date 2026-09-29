@@ -381,6 +381,58 @@ def declare_stack_vars(name, src):
     return src[:m.end()] + "\n" + decl + body.lstrip("\n") if body.startswith("\n") else src[:m.end()] + "\n" + decl + body
 
 
+# Unary `*(`: m2c writes a binary multiply with a space after the `*`.
+DEREF = re.compile(r"(?<![\w)\]])(\s?)\*\(((?:[^()]|\((?:[^()]|\([^()]*\))*\))+)\)")
+SCALE = re.compile(r"\*\s*(\d+)\)|<<\s*(\d+)\)")
+DEREF_TYPES = {1: ("u8", "s8", "s32"), 2: ("s16", "u16"), 4: ("s32", "f32"), 8: ("s32",)}
+
+
+def repair(src, err):
+    """Drafts of a draft that does not compile, fixed from cc1's errors.
+
+    Two causes cover most of the engine code whose drafts do not build:
+    - a prototype from include/functions.h (inferred from the callee's asm)
+      with the wrong argument count: `too many/few arguments`. Declaring the
+      callee without a parameter list takes the call as m2c wrote it;
+    - an address m2c typed as s32 (the return of such a callee) that the
+      code dereferences, `*((i * 2) + p)`: `invalid type argument of unary *`.
+      The index scale gives the element width; its sign is a guess, so each
+      is tried.
+    Returns a list of candidate sources, empty when nothing applies.
+    """
+    out = [src]
+    changed = False
+    for fn in set(re.findall(r"(?:too many|too few) arguments to function `(\w+)'", err)):
+        new = []
+        for s in out:
+            s2 = re.sub(rf"^([\w\s\*]*?\b){fn}\([^;{{]*\);$", rf"\g<1>{fn}();", s, flags=re.M)
+            if s2 == s:
+                s2 = s.replace(HEADER, HEADER + f"s32 {fn}();\n", 1)
+            new.append(s2)
+        out, changed = new, True
+    if "invalid type argument of `unary *'" in err:
+        new = []
+        for s in out:
+            scales = set()
+            for m in DEREF.finditer(s):
+                sc = SCALE.search(m.group(2))
+                scales.add(int(sc.group(1)) if sc and sc.group(1) else (1 << int(sc.group(2)) if sc else 1))
+            if not scales:
+                continue
+            choices = [{}]
+            for sc in sorted(scales):
+                choices = [{**c, sc: t} for c in choices for t in DEREF_TYPES.get(sc, ("s32",))]
+            for c in choices[:4]:
+                def cast(m, c=c):
+                    sc = SCALE.search(m.group(2))
+                    k = int(sc.group(1)) if sc and sc.group(1) else (1 << int(sc.group(2)) if sc else 1)
+                    return f"{m.group(1)}*({c[k]} *)({m.group(2)})"
+                new.append(DEREF.sub(cast, s))
+        if new:
+            out, changed = new, True
+    return out if changed else []
+
+
 def rename_swallowed(src, v0, v1):
     """Point references past a symbol the function's .rodata slice swallows.
 
@@ -636,6 +688,39 @@ def main():
                     "-w", "/work", "-e", "ASSEMBLER=gas", IMAGE, "bash", "-c", script],
                    capture_output=True, text=True)
 
+    # Drafts that did not compile: repair them from cc1's errors and try
+    # again, twice, since fixing one error can uncover the next.
+    for rnd in (1, 2):
+        todo = {}
+        for name, drafts in drafted.items():
+            if any((WORK / f"{name}__v{k}.o").exists() for k in drafts):
+                continue
+            for k in sorted(drafts):
+                err = WORK / f"{name}__v{k}.err"
+                if not err.exists():
+                    continue
+                for j, fixed in enumerate(repair(drafts[k], err.read_text())):
+                    key = 1000 * rnd + k * 4 + j
+                    if fixed not in drafts.values():
+                        todo.setdefault(name, {})[key] = fixed
+        if not todo:
+            break
+        # Compile only this round's drafts: set the others aside meanwhile
+        # (they are what --accept-existing reads back afterwards).
+        kept = list(WORK.glob("*.c"))
+        for f in kept:
+            f.rename(f.with_suffix(".c.keep"))
+        for name, extra in todo.items():
+            drafted[name].update(extra)
+            for key, src in extra.items():
+                (WORK / f"{name}__v{key}.c").write_text(src)
+        print(f"repair round {rnd}: {sum(len(v) for v in todo.values())} drafts for {len(todo)} functions")
+        subprocess.run(["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+                        "-w", "/work", "-e", "ASSEMBLER=gas", IMAGE, "bash", "-c", script],
+                       capture_output=True, text=True)
+        for f in kept:
+            f.with_suffix(".c.keep").rename(f)
+
     import struct
     syms = match_func.rom_symbols()
     rom = match_func.ROM.read_bytes()
@@ -692,8 +777,11 @@ def main():
         by = {}
         for k in results["match"].values():
             by[k] = by.get(k, 0) + 1
-        print("  matches by variant:", {(" ".join(VARIANTS[k // 10]) or "default") + (" +swap" if k % 10 else ""): c
-                                        for k, c in sorted(by.items())})
+        def label(k):
+            if k >= 1000:
+                return f"repaired (round {k // 1000})"
+            return (" ".join(VARIANTS[k // 10]) or "default") + (" +swap" if k % 10 else "")
+        print("  matches by variant:", {label(k): c for k, c in sorted(by.items())})
     results["rodata"] = rodata
     (WORK / "results.json").write_text(json.dumps(results, indent=1))
 
