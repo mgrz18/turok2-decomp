@@ -13,6 +13,17 @@
 # out of the next start.
 set -uo pipefail
 cd "$(dirname "$0")/../.."
+# One batch at a time: two share the CPUs for nothing.
+LOCK=build/permuter/.batch.lock
+if ! mkdir "$LOCK" 2>/dev/null; then
+  if kill -0 "$(cat "$LOCK/pid" 2>/dev/null)" 2>/dev/null; then
+    echo "another batch is running (pid $(cat "$LOCK/pid"))"; exit 1
+  fi
+  rm -rf "$LOCK"; mkdir "$LOCK"   # stale: its owner is gone
+fi
+echo $$ > "$LOCK/pid"
+trap 'rm -rf "$LOCK"' EXIT
+NAME=turok2-permuter-$$
 SECS=$1
 shift
 END=$(( $(date +%s) + SECS ))
@@ -25,8 +36,16 @@ while :; do
   done
   [ ${#DIRS[@]} -gt 0 ] || break
   echo "== start: ${#DIRS[@]} functions, ${LEFT}s left"
-  timeout "$LEFT" docker run --platform=linux/amd64 --rm --name turok2-permuter-batch \
+  T0=$(date +%s)
+  timeout "$LEFT" docker run --platform=linux/amd64 --rm --name "$NAME" \
       -v "$PWD:/work" -w /work turok2-permuter \
       python3 references/decomp-permuter/permuter.py -j4 --stop-on-zero "${DIRS[@]}" </dev/null
-  docker kill turok2-permuter-batch >/dev/null 2>&1 || true
+  docker kill "$NAME" >/dev/null 2>&1 || true
+  # A run that dies at once is not qemu's cpp: stop instead of spinning.
+  if [ $(( $(date +%s) - T0 )) -lt 15 ]; then
+    FAST=$(( ${FAST:-0} + 1 ))
+    [ "$FAST" -lt 5 ] || { echo "== five runs in a row died at once; giving up"; exit 1; }
+  else
+    FAST=0
+  fi
 done
