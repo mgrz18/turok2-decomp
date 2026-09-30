@@ -382,7 +382,7 @@ def declare_stack_vars(name, src):
 
 
 # Unary `*(`: m2c writes a binary multiply with a space after the `*`.
-DEREF = re.compile(r"(?<![\w)\]])(\s?)\*\(((?:[^()]|\((?:[^()]|\([^()]*\))*\))+)\)")
+DEREF = re.compile(r"(?<![\w)\]])(\s?)\*\((?!\s*\w+\s*\*+\s*\))((?:[^()]|\((?:[^()]|\([^()]*\))*\))+)\)")
 SCALE = re.compile(r"\*\s*(\d+)\)|<<\s*(\d+)\)")
 DEREF_TYPES = {1: ("u8", "s8", "s32"), 2: ("s16", "u16"), 4: ("s32", "f32"), 8: ("s32",)}
 
@@ -411,6 +411,12 @@ def repair(src, err):
             new.append(s2)
         out, changed = new, True
     if "invalid type argument of `unary *'" in err:
+        # `*v` on a local m2c declared as a scalar: cast it to a pointer.
+        scalars = set(re.findall(r"^\s+(?:s32|u32|s16|u16|s8|u8|M2C_UNK)\s+(\w+);$", out[0], re.M))
+        var = re.compile(r"(?<=[(\s,=!~-])\*(" + "|".join(sorted(scalars)) + r")\b(?!\s*[;=])") if scalars else None
+        if var and any(var.search(s) for s in out):
+            out = [var.sub(rf"*({t} *)\1", s) for s in out for t in ("s32", "u16", "u8")]
+            changed = True
         new = []
         for s in out:
             scales = set()
@@ -418,6 +424,7 @@ def repair(src, err):
                 sc = SCALE.search(m.group(2))
                 scales.add(int(sc.group(1)) if sc and sc.group(1) else (1 << int(sc.group(2)) if sc else 1))
             if not scales:
+                new.append(s)
                 continue
             choices = [{}]
             for sc in sorted(scales):
@@ -431,6 +438,46 @@ def repair(src, err):
         if new:
             out, changed = new, True
     return out if changed else []
+
+
+CRASH = re.compile(r"Segmentation fault|core dumped|Illegal instruction")
+
+
+def pending_drafts():
+    """Drafts with no result yet: no object, and no real compiler error.
+
+    qemu crashes now and then, either one compile (a segfault in its .err)
+    or the whole container run, which leaves the drafts after it untouched.
+    Either way the draft was never really tried.
+    """
+    out = []
+    for c in WORK.glob("*.c"):
+        err = c.with_suffix(".err")
+        if c.with_suffix(".o").exists():
+            continue
+        if err.exists() and err.stat().st_size and not CRASH.search(err.read_text(errors="replace")):
+            continue
+        out.append(c)
+    return out
+
+
+def compile_drafts():
+    """Compile every draft in build/auto, retrying what qemu crashed on."""
+    script = ("cat build/auto/.pending | xargs -P 8 -I{} bash -c "
+              "'f={}; n=${f%.c}; rm -f $n.o; tools/cc_func.sh $f $n.o cc1 -O2 >/dev/null 2>$n.err || true'")
+    for attempt in range(4):
+        todo = pending_drafts()
+        if not todo:
+            return
+        if attempt:
+            print(f"  recompiling {len(todo)} drafts qemu crashed on")
+        (WORK / ".pending").write_text("".join(f"build/auto/{c.name}\n" for c in todo))
+        subprocess.run(["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+                        "-w", "/work", "-e", "ASSEMBLER=gas", IMAGE, "bash", "-c", script],
+                       capture_output=True, text=True)
+    left = len(pending_drafts())
+    if left:
+        print(f"  WARNING: {left} drafts never compiled; they count as no_compile")
 
 
 def rename_swallowed(src, v0, v1):
@@ -684,11 +731,7 @@ def main():
                     (WORK / f"{name}__v{key}.c").write_text(src)
     print(f"m2c drafts: {sum(len(v) for v in drafted.values())} for {len(drafted)} functions")
 
-    script = ("ls build/auto/*.c | xargs -P 8 -I{} bash -c "
-              "'f={}; n=${f%.c}; tools/cc_func.sh $f $n.o cc1 -O2 >/dev/null 2>$n.err || true'")
-    subprocess.run(["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
-                    "-w", "/work", "-e", "ASSEMBLER=gas", IMAGE, "bash", "-c", script],
-                   capture_output=True, text=True)
+    compile_drafts()
 
     # Drafts that did not compile: repair them from cc1's errors and try
     # again, twice, since fixing one error can uncover the next.
@@ -717,9 +760,7 @@ def main():
             for key, src in extra.items():
                 (WORK / f"{name}__v{key}.c").write_text(src)
         print(f"repair round {rnd}: {sum(len(v) for v in todo.values())} drafts for {len(todo)} functions")
-        subprocess.run(["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
-                        "-w", "/work", "-e", "ASSEMBLER=gas", IMAGE, "bash", "-c", script],
-                       capture_output=True, text=True)
+        compile_drafts()
         for f in kept:
             f.with_suffix(".c.keep").rename(f)
 
