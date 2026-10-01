@@ -50,6 +50,8 @@ ASM_GLOB = "us/asm/*.s"
 IMAGE = match_func.IMAGE
 
 ENGINE = (0x00200500, 0x002A5200)
+# The paged VM modules (virtual, virtual_1): their own vram, same toolchain?
+REGIONS = {"engine": ENGINE, "virtual": (0x00400000, 0x00500000)}
 REGS = match_func.REGS
 HEADER = '#include "common.h"\n#include "m2c_macros.h"\n\n'
 # Sections an object may carry without adding bytes the asm build lacks.
@@ -637,6 +639,8 @@ def own_data(obj):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--region", choices=sorted(REGIONS), default="engine",
+                    help="which code to draft from (default: the engine's .code)")
     ap.add_argument("--max-size", type=int, default=64, help="largest function, in bytes")
     ap.add_argument("--min-size", type=int, default=0)
     ap.add_argument("--limit", type=int, default=200, help="candidates to try")
@@ -652,6 +656,8 @@ def main():
     ap.add_argument("--save-near", type=Path,
                     help="write each non-matching function's closest draft here, for tools/permuter")
     args = ap.parse_args()
+    global ENGINE
+    ENGINE = REGIONS[args.region]
 
     if args.accept_existing:
         results = json.loads((WORK / "results.json").read_text())
