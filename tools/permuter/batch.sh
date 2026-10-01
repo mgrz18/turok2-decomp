@@ -39,7 +39,7 @@ while :; do
   T0=$(date +%s)
   timeout "$LEFT" docker run --platform=linux/amd64 --rm --name "$NAME" \
       -v "$PWD:/work" -w /work turok2-permuter \
-      python3 references/decomp-permuter/permuter.py -j4 --stop-on-zero "${DIRS[@]}" </dev/null
+      python3 tools/permuter/run_permuter.py -j4 --stop-on-zero "${DIRS[@]}" </dev/null
   docker kill "$NAME" >/dev/null 2>&1 || true
   # A run that dies at once is not qemu's cpp: stop instead of spinning.
   if [ $(( $(date +%s) - T0 )) -lt 15 ]; then
