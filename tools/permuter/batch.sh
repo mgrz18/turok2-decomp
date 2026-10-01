@@ -24,6 +24,9 @@ fi
 echo $$ > "$LOCK/pid"
 trap 'rm -rf "$LOCK"' EXIT
 NAME=turok2-permuter-$$
+# On macOS keep the machine from idle-sleeping while this runs (a closed lid
+# still sleeps it, and the run freezes until it wakes).
+command -v caffeinate >/dev/null && caffeinate -i -w $$ &
 SECS=$1
 shift
 END=$(( $(date +%s) + SECS ))
