@@ -13,4 +13,4 @@ for i in $(seq 1 25); do
   # a killed link leaves an empty ELF that make would take as up to date
   [ -s build/turok2.us.elf ] || rm -f build/turok2.us.elf build/turok2.us.z64
 done
-{ echo "tries=$i"; tail -1 build/verify$T.log; ./.venv/bin/python tools/progress.py | grep engine; } > build/verify$T.out 2>&1
+{ echo "tries=$i"; tail -1 build/verify$T.log; ./.venv/bin/python tools/progress.py | grep -E "engine|virtual"; } > build/verify$T.out 2>&1

@@ -21,8 +21,11 @@ subprocess.run(['docker', 'run', '--platform=linux/amd64', '--rm', '-v', f'{Path
                 'turok2-build', 'bash', '-c',
                 ' '.join(f'tools/cc_func.sh {W}/{n}.c {W}/{n}.o cc1 -O2 2>/dev/null;' for n in names)], check=True)
 bodies = A.extract_asm(); rom = open('baserom.us.z64', 'rb').read()
+entered = A.entered_from_outside(bodies)
 src, ro = {}, {}
 for n in names:
+    if n in entered:
+        print(f'  skip {n}: another function branches into it (a false boundary)'); continue
     obj = W / f'{n}.o'
     if not obj.exists():
         print(f'  skip {n}: did not compile (a qemu crash? run it again)'); continue

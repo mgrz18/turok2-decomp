@@ -69,14 +69,23 @@ def main():
     start, end = ranges[0][0], ranges[-1][1]
 
     lines = YAML.read_text().splitlines()
-    # The `code` segment's subsegment list: from its `- name: code` to the next
-    # top-level segment.
-    seg = next(i for i, l in enumerate(lines) if l.strip() == "- name: code")
-    stop = next((i for i in range(seg + 1, len(lines)) if lines[i].startswith("  - ")), len(lines))
-    entries = [(i, ENTRY.match(lines[i])) for i in range(seg, stop)]
-    entries = [(i, m) for i, m in entries if m]
-    if not entries:
-        sys.exit("no subsegments found under `- name: code`")
+    # The code segment that holds the run: `code` for the engine, `virtual`
+    # or `virtual_1` for the VM modules. A segment's subsegment list runs
+    # from its `- name:` line to the next top-level segment; take the one
+    # whose first subsegment starts last at or before the run.
+    heads = [i for i, l in enumerate(lines) if l.startswith("  - name: ")]
+    best = None
+    for k, seg in enumerate(heads):
+        stop = heads[k + 1] if k + 1 < len(heads) else len(lines)
+        ents = [(i, ENTRY.match(lines[i])) for i in range(seg, stop)]
+        ents = [(i, m) for i, m in ents if m and m.group(3) in ("asm", "c", "hasm")]
+        if ents and int(ents[0][1].group(2), 16) <= start:
+            if best is None or int(ents[0][1].group(2), 16) > best[0]:
+                allents = [(i, ENTRY.match(lines[i])) for i in range(seg, stop)]
+                best = (int(ents[0][1].group(2), 16), [(i, m) for i, m in allents if m])
+    if best is None:
+        sys.exit(f"no code segment holds 0x{start:X}")
+    entries = best[1]
     indent = entries[0][1].group(1)
 
     starts = {int(m.group(2), 16): (i, m) for i, m in entries}

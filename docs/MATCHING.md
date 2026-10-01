@@ -266,3 +266,5 @@ registers to ABI names (splat emits `$31`, m2c wants `$ra`), and run `m2c`.
 | `bnez v; addu v0, v` then a default | early return: `if (v != 0) return v; return DEF;`, not `if (!v) v = DEF;` |
 | `jal` then `j .Lend` + `nop`, else branch sets `v0` | one result variable: `if (c) r = f(); else r = 0; return r;` |
 | a NULL check's `return 0` placed after the loop body | spell the `else`: `if (e != NULL) { ... } else { return 0; }` |
+| a float pool `[-pi, 2pi, pi, 2pi]` read as `D_X` and `D_X + 4` | write every value as a literal, in order of use: GCC 2.8 does not merge equal float literals, so a repeated one gets its own slot (func_002118B0) |
+| only the frame size differs (`addiu $sp, -0x90` vs `-0x30`) | a local buffer m2c typed as a scalar: give it the size, `u8 sp10[0x68]` (the permuter scores frame size near zero, so its "matches" need this check) |
