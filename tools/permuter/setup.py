@@ -35,6 +35,19 @@ CPP = ("cpp -P -undef -Wall -lang-c -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 "
        "-I/work/include -I/work/us/include -nostdinc")
 
 
+COMPILE_SH = """#!/bin/bash
+# invoked as: compile.sh input.c -o output.o
+# A compile qemu kills by a signal (exit >= 128) is run again; a real compile
+# error is returned at once, since most permutations are expected to fail.
+for i in 1 2 3; do
+    /work/tools/cc_func.sh "$1" "$3" cc1 -O2 2>/dev/null
+    rc=$?
+    [ $rc -lt 128 ] && exit $rc
+done
+exit $rc
+"""
+
+
 def target_asm(func):
     """The function's asm with its file's header, or None."""
     for path in sorted(ROOT.glob("us/asm/*.s")):
@@ -57,8 +70,7 @@ def prepare(draft, func):
     (out / "target.s").write_text(asm)
     (out / "settings.toml").write_text(f'func_name = "{func}"\ncompiler_type = "gcc"\n')
     compile_sh = out / "compile.sh"
-    compile_sh.write_text('#!/bin/bash\n# invoked as: compile.sh input.c -o output.o\n'
-                          'exec /work/tools/cc_func.sh "$1" "$3" cc1 -O2 2>/dev/null\n')
+    compile_sh.write_text(COMPILE_SH)
     compile_sh.chmod(0o755)
     (out / "draft.c").write_text(draft.read_text())
     rel = out.relative_to(ROOT)

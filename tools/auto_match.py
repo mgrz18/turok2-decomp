@@ -440,6 +440,21 @@ def repair(src, err):
     return out if changed else []
 
 
+def entered_from_outside(bodies):
+    """Functions with an internal label that another function branches to."""
+    owner = {}
+    for name, body in bodies.items():
+        for lab in re.findall(r"^\s*\.L([0-9A-F]{8}):", body, re.M):
+            owner[lab] = name
+    out = set()
+    for name, body in bodies.items():
+        for lab in re.findall(r"^\s+(?:j|b\w*)\s+(?:[^,\n]*,\s*)*\.L([0-9A-F]{8})\b", body, re.M):
+            o = owner.get(lab)
+            if o and o != name:
+                out.add(o)
+    return out
+
+
 CRASH = re.compile(r"Segmentation fault|core dumped|Illegal instruction")
 
 
@@ -676,6 +691,10 @@ def main():
         jumped |= {f"func_{a}" for a in re.findall(
             r"^\s+(?:j|b\w*)\s+(?:[^,\n]*,\s*)*\.L([0-9A-F]{8})\b", path.read_text(), re.M)}
     cands = [f for f in cands if f[2] not in jumped]
+    # And a function with a label some other function branches to: the other
+    # one is the head of the same function, cut off by a false boundary
+    # (func_002943D8, eight bytes that branch into func_002943E0).
+    cands = [f for f in cands if f[2] not in entered_from_outside(bodies)]
     if args.names:
         text = args.names.read_text()
         wanted = (set(json.loads(text).get("differ", {})) if args.names.suffix == ".json"
