@@ -32,6 +32,7 @@ while :; do
   [ "$LEFT" -gt 60 ] || break
   DIRS=()
   for f in "$@"; do
+    [ -f "build/permuter/$f/target.o" ] || continue
     ls -d "build/permuter/$f"/output-0-* >/dev/null 2>&1 || DIRS+=("build/permuter/$f")
   done
   [ ${#DIRS[@]} -gt 0 ] || break
