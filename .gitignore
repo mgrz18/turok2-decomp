@@ -41,6 +41,7 @@ references/
 tools/sn64/
 tools/psyq-obj-parser
 tools/n64crc
+tools/n64crc-*
 include/types/
 include/libtengine/
 

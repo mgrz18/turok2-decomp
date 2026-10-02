@@ -59,7 +59,8 @@ PYTHON  ?= python3
 ASN64    = wine $(TOOLS_DIR)/sn64/asn64.exe
 CC       = $(TOOLS_DIR)/sn64/cc1
 LNKCONV  = $(TOOLS_DIR)/psyq-obj-parser
-N64CRC   = $(TOOLS_DIR)/n64crc
+# Built per architecture: the amd64 and native images share tools/.
+N64CRC   = $(TOOLS_DIR)/n64crc-$(shell uname -m)
 
 # Flags (from turok3's Makefile)
 OPT_FLAGS         = -O2
@@ -234,7 +235,7 @@ endif
 
 # n64crc helper tool
 $(N64CRC): $(TOOLS_DIR)/n64crc.c
-	$(MAKE) -C $(TOOLS_DIR)
+	cc -O2 -o $@ $<
 
 clean:
 	rm -rf $(BUILD_DIR)
