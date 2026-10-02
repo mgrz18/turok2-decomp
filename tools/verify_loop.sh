@@ -30,4 +30,4 @@ for i in $(seq 1 25); do
   docker ps -q --filter ancestor=turok2-build | xargs -r docker kill >/dev/null 2>&1
 done
 nat make verify >> build/verify$T.log 2>&1
-{ echo "build tries=$i"; tail -1 build/verify$T.log; ./.venv/bin/python tools/progress.py | grep -E "engine|virtual"; } > build/verify$T.out 2>&1
+{ echo "build tries=$i"; tail -1 build/verify$T.log; ./.venv/bin/python tools/progress.py | grep -E "engine|virtual|total"; } > build/verify$T.out 2>&1

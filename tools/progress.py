@@ -17,6 +17,10 @@ linked ELF, split by where it runs:
 Usage:
     python3 tools/progress.py            # table
     python3 tools/progress.py --badge    # one line for the README badge
+    python3 tools/progress.py --badge --all   # the same over all the code
+
+The `total` row adds the regions up: every byte of code in the game, the
+engine and the VM modules alike.
 """
 
 import argparse
@@ -49,6 +53,7 @@ def linked_c_files():
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--badge", action="store_true")
+    ap.add_argument("--all", action="store_true", help="with --badge: all the code, not just the engine")
     args = ap.parse_args()
 
     sizes = {}
@@ -71,8 +76,9 @@ def main():
                 done[reg] += size
                 count[reg] += 1
 
+    all_done, all_total = sum(done.values()), sum(total.values())
     if args.badge:
-        pct = 100 * done["engine"] / total["engine"]
+        pct = (100 * all_done / all_total) if args.all else 100 * done["engine"] / total["engine"]
         print(f"{pct:.2f}%")
         return 0
 
@@ -80,6 +86,7 @@ def main():
     for reg in ("engine", "virtual", "libultra"):
         t = total[reg] or 1
         print(f"{reg:10s} {done[reg]:10,d} {total[reg]:10,d} {100 * done[reg] / t:7.3f}% {count[reg]:9d}")
+    print(f"{'total':10s} {all_done:10,d} {all_total:10,d} {100 * all_done / all_total:7.3f}% {sum(count.values()):9d}")
     return 0
 
 
