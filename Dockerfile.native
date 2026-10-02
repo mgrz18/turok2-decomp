@@ -1,0 +1,31 @@
+# Native (arm64 on Apple Silicon) image for everything but cc1: splat, GNU as,
+# ld and objcopy. Under the amd64 image these run in qemu, and the link of a
+# ROM with ~1,600 C files took longer than the 30-minute timeout. cc1 is an
+# i386 binary, so C objects are still built in turok2-build (`make build`);
+# `make verify` then runs here, with every object up to date.
+#
+# Build:  docker build -f Dockerfile.native -t turok2-native .
+
+FROM debian:bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        binutils-mips-linux-gnu \
+        build-essential \
+        ca-certificates \
+        cpp \
+        git \
+        make \
+        python3 \
+        python3-pip \
+        xxd && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /work
+
+COPY tools/requirements.txt /tmp/requirements.txt
+RUN pip3 install --break-system-packages --no-cache-dir -r /tmp/requirements.txt
+
+CMD ["/bin/bash"]
