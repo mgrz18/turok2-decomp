@@ -2420,6 +2420,8 @@ segments:
       - [0x179FB0, c, code/func_0042FFB0]
       - [0x179FF0, c, code/func_0042FFF0]
       - [0x17A068, asm]
+      - [0x17A3AC, c, code/func_004303AC]
+      - [0x17A454, asm]
       - [0x17A600, data, virtual_rodata_0]
 
   # Split from `virtual` rather than left as two more subsegments of it.
@@ -2894,6 +2896,8 @@ segments:
       - [0x1B2ED0, c, code/func_00468ED0]
       - [0x1B2F10, c, code/func_00468F10]
       - [0x1B2F88, asm]
+      - [0x1B32CC, c, code/func_004692CC]
+      - [0x1B3374, asm]
       - [0x1B3400, data, virtual_rodata_1]
 
   # Not a third VM module: a second, differently-linked copy of the engine's
