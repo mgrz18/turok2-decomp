@@ -2,7 +2,7 @@
 
 [![status](https://img.shields.io/badge/status-matching%20decomp-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
 [![ROM](https://img.shields.io/badge/ROM-rebuilds%20byte--exact-brightgreen)](docs/MATCHING.md)
-[![engine matched](https://img.shields.io/badge/engine%20matched-10.33%25-orange)](tools/progress.py)
+[![engine matched](https://img.shields.io/badge/engine%20matched-10.40%25-orange)](tools/progress.py)
 [![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-7.00%25-orange)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
@@ -12,7 +12,7 @@
 
 Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0): C source that compiles back to the exact original ROM.
 
-> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 1,126 engine functions (10.33% of engine code) and 588 functions of the paged VM modules (7.00%), which build with the same toolchain, are matched and linked into the ROM as C so far ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
+> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 1,128 engine functions (10.40% of engine code) and 588 functions of the paged VM modules (7.00%), which build with the same toolchain, are matched and linked into the ROM as C so far ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
 >
 > A parallel native-port track recompiles the same ELF with N64Recomp; it runs clean, and the TLB is its open question.
 
