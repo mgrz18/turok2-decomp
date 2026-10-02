@@ -36,6 +36,10 @@ while :; do
   DIRS=()
   for f in "$@"; do
     [ -f "build/permuter/$f/target.o" ] || continue
+    # Scored zero before any permutation: the permuter calls it a match while
+    # match_func.py does not (it weighs the frame size near zero). Each start
+    # would end at once on it; leave it for hand work.
+    [ -f "build/permuter/$f/.base0" ] && continue
     ls -d "build/permuter/$f"/output-0-* >/dev/null 2>&1 || DIRS+=("build/permuter/$f")
   done
   [ ${#DIRS[@]} -gt 0 ] || break
@@ -43,7 +47,10 @@ while :; do
   T0=$(date +%s)
   timeout "$LEFT" docker run --platform=linux/amd64 --rm --name "$NAME" \
       -v "$PWD:/work" -w /work turok2-permuter \
-      python3 tools/permuter/run_permuter.py -j4 --stop-on-zero "${DIRS[@]}" </dev/null
+      python3 tools/permuter/run_permuter.py -j4 --stop-on-zero "${DIRS[@]}" </dev/null | tee build/permuter/.last_run
+  for b in $(grep -o '\[func_[0-9A-F]*\] base score = 0$' build/permuter/.last_run | grep -o 'func_[0-9A-F]*'); do
+    touch "build/permuter/$b/.base0"; echo "== $b: base score 0, set aside"
+  done
   docker kill "$NAME" >/dev/null 2>&1 || true
   # A run that dies at once is not qemu's cpp: stop instead of spinning.
   if [ $(( $(date +%s) - T0 )) -lt 15 ]; then

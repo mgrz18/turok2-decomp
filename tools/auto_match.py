@@ -442,6 +442,24 @@ def repair(src, err):
     return out if changed else []
 
 
+BUFFER_SIZES = (0x8, 0x10, 0x18, 0x20, 0x28, 0x30, 0x40, 0x50, 0x68)
+
+
+def stack_buffers(src):
+    """The draft with its first address-taken scalar stack local as a buffer."""
+    m = re.search(r"^(\s+)(?:M2C_UNK|s32|u32|s16|u16|s8|u8|f32)\s+(sp[0-9A-F]+);$", src, re.M)
+    while m and f"&{m.group(2)}" not in src:
+        m = re.compile(r"^(\s+)(?:M2C_UNK|s32|u32|s16|u16|s8|u8|f32)\s+(sp[0-9A-F]+);$", re.M).search(src, m.end())
+    if not m:
+        return []
+    name = m.group(2)
+    out = []
+    for size in BUFFER_SIZES:
+        t = src[:m.start()] + f"{m.group(1)}u8 {name}[0x{size:X}];" + src[m.end():]
+        out.append(re.sub(rf"&{name}\b", name, t))
+    return out
+
+
 def entered_from_outside(bodies):
     """Functions with an internal label that another function branches to."""
     owner = {}
@@ -735,6 +753,10 @@ def main():
                 # Globals-as-arrays is independent of the other rewrites, so it
                 # is also tried on top of each of them.
                 combined = base_forms + [scalars_as_arrays(f) for f in base_forms]
+                # A stack local whose address is passed on is often a buffer
+                # that m2c typed as a scalar; only the frame size then differs
+                # (func_0021EA3C, func_004303AC). Try it at a few sizes.
+                combined += stack_buffers(c)
                 for form in combined:
                     if form != c and form not in forms:
                         forms.append(form)
