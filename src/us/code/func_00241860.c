@@ -6,7 +6,7 @@ extern M2C_UNK D_0042D510;
 extern M2C_UNK *D_800F1ADC;
 extern M2C_UNK D_800F1CE0;
 
-void func_00241860(void) {
+void CCollisionInfo__Reset(void) {
     D_800F1ADC = &D_800F1CE0;
     func_002418C0(&D_0042D510);
 }

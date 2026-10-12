@@ -8,6 +8,7 @@ options:
   src_path: ../src/us
   asm_path: ../us/asm
   symbol_addrs_path:
+    - ../versions/symbols_names.us.txt
     - ../versions/symbol_addrs.us.txt
     - ../versions/symbols_from_scan.us.txt
     - ../versions/function_sizes.us.txt

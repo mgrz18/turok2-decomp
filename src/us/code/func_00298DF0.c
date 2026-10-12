@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00298DF0(void) {
+s32 __osDpDeviceBusy(void) {
     register u32 stat = *(volatile u32 *)0xA410000C;
 
     if (stat & 0x100) {

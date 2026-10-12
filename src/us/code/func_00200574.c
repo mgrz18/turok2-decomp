@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00200574(void *arg0, s32 arg1) {
+void CList__AddTail(void *arg0, s32 arg1) {
     s32 temp_v1;
 
     temp_v1 = M2C_FIELD(arg0, s32 *, 4);

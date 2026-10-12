@@ -11,7 +11,7 @@ extern M2C_UNK D_800A9D50;
 extern M2C_UNK D_800F6CB0;
 extern M2C_UNK D_8011F188;
 
-void func_00288860(void) {
+void mainproc(void) {
     func_0029E3E0(&D_8011F188, &D_800A9D3C, &D_800A9D44, &D_800A9D50);
     func_0029E220(func_0029DFD0() | 0x400);
     func_00286674(&D_800F6CB0);

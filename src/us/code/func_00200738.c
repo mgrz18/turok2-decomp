@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00200738(void *arg0, s32 arg1) {
+void CList__Remove(void *arg0, s32 arg1) {
     s32 temp_a2;
     s32 temp_a2_2;
     s32 temp_v0;

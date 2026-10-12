@@ -7,7 +7,7 @@ s32 func_0029B820(s32, s32, s32);
 void func_0029E030(s32, s32);
 void func_0029E340(s32, s32);
 
-M2C_UNK func_002020C8(s32, void *);                 /* extern */
+M2C_UNK CLoader__DeallocLoaderEntry(s32, void *);                 /* extern */
 
 void func_00201FBC(s32 arg0)
 {
@@ -28,7 +28,7 @@ void func_00201FBC(s32 arg0)
   {
     func_0029B820(temp_a0, *((s32 *) (((s8 *) sp10) + 0x10)), 1);
   }
-  func_002020C8(arg0, sp10);
+  CLoader__DeallocLoaderEntry(arg0, sp10);
   var_a0 = arg0 + 0x230;
   goto loop_1;
 }
