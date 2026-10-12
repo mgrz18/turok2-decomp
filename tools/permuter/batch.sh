@@ -45,7 +45,7 @@ while :; do
   [ ${#DIRS[@]} -gt 0 ] || break
   echo "== start: ${#DIRS[@]} functions, ${LEFT}s left"
   T0=$(date +%s)
-  timeout "$LEFT" docker run --platform=linux/amd64 --rm --name "$NAME" \
+  timeout "$LEFT" docker run --platform=linux/amd64 --ulimit core=0 --rm --name "$NAME" \
       -v "$PWD:/work" -w /work turok2-permuter \
       python3 tools/permuter/run_permuter.py -j4 --stop-on-zero "${DIRS[@]}" </dev/null | tee build/permuter/.last_run
   for b in $(grep -o '\[func_[0-9A-F]*\] base score = 0$' build/permuter/.last_run | grep -o 'func_[0-9A-F]*'); do

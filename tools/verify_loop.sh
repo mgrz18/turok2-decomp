@@ -15,7 +15,7 @@
 # usage: tools/verify_loop.sh <tag>   ->  build/verify<tag>.log, build/verify<tag>.out
 cd "$(dirname "$0")/.."
 T=$1
-amd() { timeout 1800 docker run --platform=linux/amd64 --rm -v "$PWD:/work" -w /work turok2-build "$@"; }
+amd() { timeout 1800 docker run --platform=linux/amd64 --ulimit core=0 --rm -v "$PWD:/work" -w /work turok2-build "$@"; }
 if docker image inspect turok2-native >/dev/null 2>&1; then
   nat() { timeout 1800 docker run --rm -v "$PWD:/work" -w /work turok2-native "$@"; }
 else

@@ -88,7 +88,7 @@ def main():
         print(__doc__)
         return 1
     cmds = [c for c in (prepare(d, f) for d, f in jobs) if c]
-    res = subprocess.run(["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+    res = subprocess.run(["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
                           "-w", "/work", IMAGE, "bash", "-c", "; ".join(cmds)],
                          capture_output=True, text=True)
     failed = re.findall(r"FAILED (func_\w+)", res.stdout)

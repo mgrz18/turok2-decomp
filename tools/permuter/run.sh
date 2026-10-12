@@ -9,5 +9,5 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 FUNC=$1
 shift
-exec docker run --platform=linux/amd64 --rm -v "$PWD:/work" -w /work turok2-permuter \
+exec docker run --platform=linux/amd64 --ulimit core=0 --rm -v "$PWD:/work" -w /work turok2-permuter \
     python3 references/decomp-permuter/permuter.py "build/permuter/$FUNC" -j4 "$@"

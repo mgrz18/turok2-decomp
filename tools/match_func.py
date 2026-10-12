@@ -184,7 +184,7 @@ def main():
         script = " && ".join(
             f"tools/cc_func.sh {rel} {tmp_rel}/{cc}.o {cc} {args.opt}" for cc in args.cc)
         res = subprocess.run(
-            ["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+            ["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
              "-w", "/work",
              # A fresh wine prefix per container crashes asn64 while wine is
              # still initialising it; keep one prefix in build/ across runs.
