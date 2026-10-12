@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00200518(s32, s32);
-s32 func_00200738(s32, s32);
+s32 CList__AddHead(s32, s32);
+s32 CList__Remove(s32, s32);
 
 extern void *D_801198D0;
 
@@ -24,8 +24,8 @@ void func_002819E0(s32 arg0)
     do
     {
       temp_s0 = *var_s1;
-      func_00200738((s32) (temp_s2 + 0xE28), (s32) var_s1);
-      func_00200518(arg0 + 0xF0C, (s32) var_s1);
+      CList__Remove((s32) (temp_s2 + 0xE28), (s32) var_s1);
+      CList__AddHead(arg0 + 0xF0C, (s32) var_s1);
       var_s1 = temp_s0;
       var_a0 = temp_s2 + 0xE28;
     }
@@ -43,8 +43,8 @@ void func_002819E0(s32 arg0)
         do
         {
           temp_s0_2 = *var_s1_2;
-          func_00200738((s32) var_a0_2, (s32) var_s1_2);
-          func_00200518(arg0 + 0xF0C, (s32) var_s1_2);
+          CList__Remove((s32) var_a0_2, (s32) var_s1_2);
+          CList__AddHead(arg0 + 0xF0C, (s32) var_s1_2);
           var_s1_2 = temp_s0_2;
           var_a0_2 = var_s2 + 0xE28;
         }

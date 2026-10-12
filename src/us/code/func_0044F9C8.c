@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00200738(s32, s32);
+s32 CList__Remove(s32, s32);
 s32 func_002052D8(s32, s32);
 s32 func_0041531C(s32, s32);
 
@@ -32,7 +32,7 @@ block_6:
                     M2C_FIELD(temp_v0_2, s32 *, 0xB0) = 0;
                     M2C_FIELD(temp_v0_2, s32 *, 0xB4) = 0;
                     M2C_FIELD(temp_v0_2, s32 *, 0xBC) = 0;
-                    func_00200738((s32) arg0, (s32) var_s0);
+                    CList__Remove((s32) arg0, (s32) var_s0);
                     func_002052D8(0, M2C_FIELD(var_s0, s32 *, 8));
                 }
             }

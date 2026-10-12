@@ -3,7 +3,7 @@
 
 extern void *D_800C1BB0;
 
-s32 func_00284188(void) {
+s32 Cinema_PathPlaying(void) {
     f32 temp_f1;
     s32 var_a0;
 

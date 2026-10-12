@@ -1,0 +1,34 @@
+// Real names for Turok 2 functions, one per line: name = vram; // source.
+// tools/apply_names.py puts them into symbol_addrs.us.txt and renames the C.
+// Only names with evidence go here; say which.
+
+// Turok 3's decomp (Drahsid/turok3) has these in C with Acclaim's names;
+// compiled with this toolchain they are identical to these functions word
+// for word (tools/xmatch_t3.py). Tiny ones that match many (boot, idle,
+// __main) are left out.
+CList__Construct = 0x00200500; // turok3 list.c
+CList__AddHead = 0x00200518; // turok3 list.c
+CList__AddTail = 0x00200574; // turok3 list.c
+CList__Remove = 0x00200738; // turok3 list.c
+CMutex__Construct = 0x00201AA4; // turok3 mutex.c
+CLoader__DeallocLoaderEntry = 0x002020C8; // turok3 loader.c
+CHashTable__Construct = 0x00202860; // turok3 hash.c
+CSunFrameData__Construct = 0x00228BB0; // turok3 sun.c
+CSun__GetSunData = 0x00228BF8; // turok3 sun.c
+CCollisionInfo__Reset = 0x00241860; // turok3 colinfo.c
+Cinema_PathPlaying = 0x00284188; // turok3 cinema.c
+CEngineApp__Boot = 0x0028820C; // turok3 tengine.c
+mainproc = 0x00288860; // turok3 tengine.c
+osMapTLBRdb = 0x0028E5D0; // turok3 vhandler.c (libultra)
+
+// libultra, by what the code does.
+// sqrtf = 0x00298470: a lone sqrt.s, but not in C yet: GCC takes a call to
+// sqrtf as its builtin and inlines sqrt.s with an errno check (7 more words
+// per call). Named in Ghidra only until the flag Acclaim used is known.
+osAiGetStatus = 0x00298480; // returns AI_STATUS_REG
+__osAiDeviceBusy = 0x00298650; // AI_STATUS_REG & AI_STATUS_FIFO_FULL
+__osDpDeviceBusy = 0x00298DF0; // DPC_STATUS_REG & DPC_STATUS_DMA_BUSY
+__osSiDeviceBusy = 0x0029A140; // SI_STATUS_REG & (DMA_BUSY | IO_READ_BUSY)
+__osSpDeviceBusy = 0x0029A380; // SP_STATUS_REG & (IO_FULL | DMA_FULL | DMA_BUSY)
+__osSpSetStatus = 0x0029A4D0; // writes SP_STATUS_REG
+__osSpGetStatus = 0x0029A560; // returns SP_STATUS_REG

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00200574(s32, s32);
+s32 CList__AddTail(s32, s32);
 s32 func_002005D0(s32, s32, s32);
 
 extern void *D_800D81F4;
@@ -25,7 +25,7 @@ loop_1:
         }
     } else {
 block_5:
-        func_00200574((s32) &D_800D81F4, (s32) arg1);
+        CList__AddTail((s32) &D_800D81F4, (s32) arg1);
     }
     M2C_FIELD(arg1, s32 *, 0xC) = (s32) (M2C_FIELD(arg1, s32 *, 0xC) | 0x1000);
 }
