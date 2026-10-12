@@ -141,7 +141,8 @@
   "004470E0": "int func_004470E0(CGameObjectInstance * pThis, int param_2)",
   "00447430": "int func_00447430(CGameObjectInstance * pThis, int param_2)",
   "0044AEF8": "int func_0044AEF8(CCamera * pCam)",
-  "004688D0": "int func_004688D0(CCamera * pCam)"
+  "004688D0": "int func_004688D0(CCamera * pCam)",
+  "0024C648": "void func_0024C648(CPlayer * pPlayer, CCamera * pCam)"
  },
  "locals": [
   [
@@ -158,13 +159,21 @@
   ]
  ],
  "data_names": {
-  "801100F0": "g_OnScreen"
+  "801100F0": "g_OnScreen",
+  "800ADB84": "g_HudScript_Ammo",
+  "800ADBC0": "g_HudScript_Lives",
+  "800ADC00": "g_HudScript_Tokens",
+  "800ADC40": "g_HudScript_TotalKills",
+  "800ADC80": "g_HudScript_TotalTags",
+  "800B2C50": "g_HudScript_Boss",
+  "800B2C64": "g_HudScript_Boss2"
  },
  "comments": {
   "00277328": "HUD element script interpreter: runs a COverlay's m_pScript (opcodes in docs/HUD.md). Called for the player's ammo, health, lives, tokens and kill-count overlays.",
   "0027AD00": "Starts a script on a HUD element: m_pScript = script, m_Mode = 2 (run), then runs the interpreter (func_00277328).",
   "00277CF0": "Draws a number digit by digit (thousands, hundreds, tens, units) through func_0027A7A0: the HUD counters (ammo, health, lives). Real name unknown.",
-  "0024C648": "Gives the player's HUD overlays their scripts: ammo D_800ADB84, lives D_800ADBC0, tokens D_800ADC00, total kills D_800ADC40, total tags D_800ADC80.",
-  "0027C1E8": "Finds the player whose m_pCamera is this camera (player list from D_80119890 by m_pNext), then fills the viewport with the fog colour and the screen flash."
+  "0024C648": "Draws the player HUD every frame: steps every overlay script, restarts ammo/lives/tokens/kill counters when their value changes (scripts in docs/HUD.md), draws icons (func_0027B320) and numbers (func_00277CF0). Health has no script: always drawn at its position, value (m_Health+0xFF)>>8.",
+  "0027C1E8": "Finds the player whose m_pCamera is this camera (player list from D_80119890 by m_pNext), then fills the viewport with the fog colour and the screen flash.",
+  "0027B320": "Draws a HUD sprite: (id, frame, x, y, scaleX, scaleY, ?). 300 = box behind ammo/health, 0x1F7 = health icon."
  }
 }
