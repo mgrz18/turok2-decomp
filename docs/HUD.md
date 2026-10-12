@@ -10,7 +10,7 @@ are into `baserom.us.z64`.
 | What | Where | Notes |
 |---|---|---|
 | Player HUD, drawn every frame | `func_0024C648(CPlayer *, CCamera *)` | runs each overlay's script, restarts it when its value changes, draws icons and numbers |
-| Overlay script interpreter | `func_00277328(COverlay *)` | one step of a `COverlay`'s script per frame (below) |
+| Overlay script interpreter | `func_00277328(COverlay *)` | one step of a `COverlay`'s script per frame (below); matched C in [`src/us/code/func_00277328.c`](../src/us/code/func_00277328.c) |
 | Start a script on an overlay | `func_0027AD00(COverlay *, int *script)` | `m_pScript = script; m_Mode = 2;` then one interpreter step |
 | Draw a HUD sprite | `func_0027B320(id, frame, x, y, scaleX, scaleY, ?)` | 300 is the box behind ammo and health; 0x1F7 is the health icon |
 | Draw a number | `func_00277CF0(value, x, y, scaleX, scaleY, ...)` | digit by digit through `func_0027A7A0` |
