@@ -76,6 +76,8 @@ FIELD_NAMES = {}
 
 def load(header, typename):
     text = (ROOT / "include" / header).read_text()
+    if header != "structs/game_object.h":
+        text = (ROOT / "include" / "structs" / "game_object.h").read_text() + "\n" + text
     structs = S.parse_header(text)
     # parse_header keeps types and offsets; collect the names here.
     cur = None
@@ -93,11 +95,16 @@ def load(header, typename):
         if m and cur is not None:
             cur.append((int(m.group(1), 16), m.group(4)))
     structs["CMtxF"] = [(0, "f32", False, [16])]
+    structs.setdefault("Mtx", [(0, "u8", False, [0x40])])
+    FIELD_NAMES.setdefault(("Mtx", 0), "m")
     return paths(structs, typename)
 
 
 def norm(t):
     return re.sub(r"\s+", " ", t.strip())
+
+
+MIN_OFFSET = 0
 
 
 def rewrite(text, slots, typename, header):
@@ -111,6 +118,8 @@ def rewrite(text, slots, typename, header):
     # A single field deep into the struct (0x80 on) is distinctive enough.
     offs = {int(off, 0) for _, off in uses}
     if len(offs) < 2 and max(offs, default=0) < 0x80:
+        return None
+    if max(offs, default=0) < MIN_OFFSET:
         return None
     for t, off in uses:
         slot = slots.get(int(off, 0))
@@ -138,7 +147,12 @@ def main():
     ap.add_argument("header")
     ap.add_argument("typename")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--min-offset", type=lambda x: int(x, 0), default=0,
+                    help="require a field at this offset or deeper (CPlayer starts with a "
+                         "CGameObjectInstance, so 0x510 tells the two apart)")
     args = ap.parse_args()
+    global MIN_OFFSET
+    MIN_OFFSET = args.min_offset
     slots = load(args.header, args.typename)
     size = max(slots) + 4
     done = kept = 0
