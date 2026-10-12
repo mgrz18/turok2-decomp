@@ -2177,7 +2177,7 @@ segments:
       - [0x161D78, asm]
       - [0x161E7C, c, code/func_00417E7C]
       - [0x161E84, c, code/func_00417E84]
-      - [0x161EBC, asm]
+      - [0x161EBC, c, code/func_00417EBC]
       - [0x161F18, c, code/func_00417F18]
       - [0x161F50, c, code/func_00417F50]
       - [0x161F9C, asm]
