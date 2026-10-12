@@ -82,7 +82,7 @@ and symbol coverage rather than matched-function counts.
 - **[ethteck/splat](https://github.com/ethteck/splat)** — disassembler / segment splitter.
 - **[matt-kempster/m2c](https://github.com/matt-kempster/m2c)** — MIPS → C decompiler for matching.
 - **[simonlindholm/decomp-permuter](https://github.com/simonlindholm/decomp-permuter)** — randomized C rewrites for near-matches (`tools/permuter/`).
-- **[Ghidra](https://github.com/NationalSecurityAgency/ghidra)** + **[GhidraMCP](https://github.com/LaurieWired/GhidraMCP)** — analysis and readable decompilation for understanding systems (HUD, camera, player) before they are matched. Run headless with `tools/ghidra/serve.sh`; every name, prototype, struct and comment lives in the repo (`versions/names.us.txt`, `tools/ghidra/annotations.json`, `include/structs/`) and is re-applied on start, so the Ghidra project is a disposable working copy.
+- **[Ghidra](https://github.com/NationalSecurityAgency/ghidra)** — analysis and readable decompilation for understanding systems (HUD, camera, player) before they are matched. Every name, prototype, struct and comment lives in the repo (`versions/names.us.txt`, `tools/ghidra/annotations.json`, `include/structs/`) and is re-applied to the Ghidra project by `tools/ghidra/`, so the project is a disposable working copy.
 
 ## Roadmap
 
