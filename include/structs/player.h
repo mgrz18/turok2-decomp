@@ -13,8 +13,7 @@
  * own compiler. Fields named unk_ are not yet known. */
 
 #include "structs/game_object.h"
-
-typedef struct { u8 m[0x40]; } Mtx;     /* libultra gbi.h, 4x4 fixed point */
+#include "structs/gbi.h"
 
 /* A HUD element: health, ammo, lives, air... slide in, fade, show a value. */
 typedef struct {
