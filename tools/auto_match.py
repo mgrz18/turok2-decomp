@@ -114,6 +114,33 @@ PROTOS = {}      # name -> prototype line, from include/functions.h
 TYPEDEFS = ""
 
 
+ARG0_TYPE = None
+
+
+def use_arg0_struct(header, typename):
+    """Give m2c a struct and have it type every candidate's arg0 with it.
+
+    The struct goes into m2c's context and into each draft's includes; each
+    candidate gets a prototype under its draft name (draft() renames the
+    function to <name>_draft) with the first parameter a pointer to it, and the
+    rest as tools/gen_prototypes.py inferred them.
+    """
+    global HEADER, ARG0_TYPE
+    ARG0_TYPE = typename
+    body = "\n".join(l for l in (ROOT / "include" / header).read_text().splitlines()
+                     if not l.startswith("#"))
+    HEADER = HEADER.replace('#include "m2c_macros.h"\n', f'#include "m2c_macros.h"\n#include "{header}"\n')
+    protos = []
+    for name, proto in PROTOS.items():
+        m = re.match(r"^(\w+) (func_[0-9A-F]{8})\((.*)\);$", proto)
+        if not m or m.group(3) in ("", "void"):
+            continue
+        params = [p.strip() for p in m.group(3).split(",")]
+        params[0] = f"{typename} *"
+        protos.append(f"{m.group(1)} {name}_draft({', '.join(params)});")
+    CONTEXT.write_text(TYPEDEFS + body + "\n" + "\n".join(PROTOS.values()) + "\n" + "\n".join(protos) + "\n")
+
+
 def write_context():
     """Load common.h's typedefs and include/functions.h's prototypes.
 
@@ -671,6 +698,9 @@ def main():
     ap.add_argument("--switch", action="store_true",
                     help="also take functions whose only .rdata is their jump tables")
     ap.add_argument("--names", type=Path, help="only these functions (one per line, or a results.json)")
+    ap.add_argument("--arg0-struct", metavar="HEADER:TYPE",
+                    help="draft with arg0 typed as TYPE * (struct from include/HEADER), e.g. "
+                         "structs/game_object.h:CGameObjectInstance")
     ap.add_argument("--save-near", type=Path,
                     help="write each non-matching function's closest draft here, for tools/permuter")
     args = ap.parse_args()
@@ -689,6 +719,8 @@ def main():
     subprocess.run([sys.executable, str(ROOT / "tools" / "gen_prototypes.py")], check=True,
                    capture_output=True)
     write_context()
+    if args.arg0_struct:
+        use_arg0_struct(*args.arg0_struct.split(":"))
     load_jtbls()
     global WITH_CONSTS, ROM_BYTES
     WITH_CONSTS = args.rdata
