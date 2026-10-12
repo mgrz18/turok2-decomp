@@ -11,6 +11,11 @@
 Literals are numbered in order of appearance, which is the order of the
 function's pool.
 
+A division (`div $3,$5,$2`, `rem`, `divu`, `remu`) is a macro too, with
+checks for a zero divisor (break 7) and, signed, for INT_MIN / -1 (break
+6). asn64 issues the div first and leaves the bnez's delay slot empty; gas
+moves the div into it. All 137 divisions in the ROM have asn64's form.
+
 A load or store with an offset too large for one instruction (`sb $2,
 147425($4)`) is a macro too. asn64 builds the address in $at as `lui $at, hi;
 addu $at, base, $at`; gas writes `addu $at, $at, base`, and for a load may
@@ -54,11 +59,44 @@ def expand_mem(line):
     return [f"{ind}lui $at,%hi({off})", f"{ind}addu $at,$at,{base}", f"{ind}{op} {rt},%lo({off})($at)"]
 
 
+DIV = re.compile(r"^(\s*)(div|divu|rem|remu)\s+(\$\w+)\s*,\s*(\$\w+)\s*,\s*(\$\w+)\s*(#.*)?$")
+
+
+def expand_div(line, n, noreorder):
+    """asn64's expansion of a three-operand division macro, or None.
+    cc1 only writes macros in reorder regions; one inside a noreorder region
+    is expanded without switching modes."""
+    m = DIV.match(line)
+    if not m:
+        return None
+    ind, op, rd, rs, rt = m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)
+    unsigned = op.endswith("u")
+    ok = f".Lsn_div{n}"
+    out = [f"{ind}.set noreorder", f"{ind}.set noat"] if not noreorder else [f"{ind}.set noat"]
+    out += [
+           f"{ind}{'divu' if unsigned else 'div'} $0,{rs},{rt}",
+           f"{ind}bnez {rt},{ok}a", f"{ind}nop", f"{ind}break 7", f"{ok}a:"]
+    if not unsigned:
+        out += [f"{ind}li $1,-1", f"{ind}bne {rt},$1,{ok}b", f"{ind}lui $1,0x8000",
+                f"{ind}bne {rs},$1,{ok}b", f"{ind}nop", f"{ind}break 6", f"{ok}b:"]
+    out += [f"{ind}{'mfhi' if op.startswith('rem') else 'mflo'} {rd}", f"{ind}.set at"]
+    if not noreorder:
+        out.append(f"{ind}.set reorder")
+    return out
+
+
 def main():
     n = 0
+    ndiv = 0
+    noreorder = False
     out = []
     for line in sys.stdin.read().splitlines():
-        exp = expand_mem(line)
+        ndiv += 1
+        if re.match(r"^\s*\.set\s+noreorder", line):
+            noreorder = True
+        elif re.match(r"^\s*\.set\s+reorder", line):
+            noreorder = False
+        exp = expand_div(line, ndiv, noreorder) or expand_mem(line)
         if exp:
             out += exp
             continue
