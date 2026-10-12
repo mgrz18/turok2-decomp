@@ -534,7 +534,7 @@ def compile_drafts():
         if attempt:
             print(f"  recompiling {len(todo)} drafts qemu crashed on")
         (WORK / ".pending").write_text("".join(f"build/auto/{c.name}\n" for c in todo))
-        subprocess.run(["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+        subprocess.run(["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
                         "-w", "/work", "-e", "ASSEMBLER=gas", IMAGE, "bash", "-c", script],
                        capture_output=True, text=True)
     left = len(pending_drafts())

@@ -128,7 +128,7 @@ def main():
     if elf.exists():
         import subprocess
         out = subprocess.run(
-            ["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+            ["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
              "turok2-build", "mips-linux-gnu-nm", "--defined-only", "build/turok2.us.elf"],
             capture_output=True, text=True).stdout
         for line in out.splitlines():

@@ -51,7 +51,7 @@ IMAGE = "turok2-build"
 def elf_functions():
     """[(vram, size, name)] for every sized function symbol, sorted."""
     out = subprocess.run(
-        ["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+        ["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
          IMAGE, "mips-linux-gnu-nm", "-S", "--defined-only", str(ELF.relative_to(ROOT))],
         capture_output=True, text=True).stdout
     funcs = []
@@ -70,7 +70,7 @@ def elf_sizeless():
     so the field count is the test.
     """
     out = subprocess.run(
-        ["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+        ["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
          IMAGE, "mips-linux-gnu-nm", "-S", "--defined-only", str(ELF.relative_to(ROOT))],
         capture_output=True, text=True).stdout
     addrs = set()
@@ -84,7 +84,7 @@ def elf_sizeless():
 def elf_sections():
     """[(name, vram, size)] for the loadable code sections."""
     out = subprocess.run(
-        ["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+        ["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
          IMAGE, "mips-linux-gnu-readelf", "-S", str(ELF.relative_to(ROOT))],
         capture_output=True, text=True).stdout
     secs = []

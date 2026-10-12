@@ -49,7 +49,7 @@ def compile_all():
         f"tools/sn_as.sh build/xmatch/{s.stem}.s build/xmatch/{s.stem}.o 2>>build/xmatch/{s.stem}.err "
         f"|| echo FAILED {s.stem}"
         for s in srcs)
-    res = subprocess.run(["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+    res = subprocess.run(["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
                           "-w", "/work", match_func.IMAGE, "bash", "-c", script],
                          capture_output=True, text=True)
     failed = [l.split()[1] for l in res.stdout.splitlines() if l.startswith("FAILED")]

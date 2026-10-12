@@ -63,7 +63,7 @@ FUNC = re.compile(r"^([0-9a-f]+) <(\S+)>:")
 def disassembly():
     if not DIS.exists():
         subprocess.run(
-            ["docker", "run", "--platform=linux/amd64", "--rm", "-v", f"{ROOT}:/work",
+            ["docker", "run", "--platform=linux/amd64", "--ulimit", "core=0", "--rm", "-v", f"{ROOT}:/work",
              IMAGE, "bash", "-c",
              f"mips-linux-gnu-objdump -d {ELF.relative_to(ROOT)} > /work/build/dis.txt"],
             check=True)
