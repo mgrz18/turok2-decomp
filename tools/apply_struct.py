@@ -77,7 +77,8 @@ FIELD_NAMES = {}
 def load(header, typename):
     text = (ROOT / "include" / header).read_text()
     if header != "structs/game_object.h":
-        text = (ROOT / "include" / "structs" / "game_object.h").read_text() + "\n" + text
+        text = "".join((ROOT / "include" / "structs" / h).read_text() + "\n"
+                       for h in ("game_object.h", "gbi.h")) + text
     structs = S.parse_header(text)
     # parse_header keeps types and offsets; collect the names here.
     cur = None
@@ -95,8 +96,9 @@ def load(header, typename):
         if m and cur is not None:
             cur.append((int(m.group(1), 16), m.group(4)))
     structs["CMtxF"] = [(0, "f32", False, [16])]
-    structs.setdefault("Mtx", [(0, "u8", False, [0x40])])
-    FIELD_NAMES.setdefault(("Mtx", 0), "m")
+    for name, field, size in (("Mtx", "m", 0x40), ("LookAt", "l", 0x20), ("CList", "b", 0x14)):
+        structs.setdefault(name, [(0, "u8", False, [size])])
+        FIELD_NAMES.setdefault((name, 0), field)
     return paths(structs, typename)
 
 
