@@ -22,6 +22,9 @@ else
   nat() { amd "$@"; }
 fi
 
+# Real names (versions/names.us.txt) into any C added since: a new draft
+# still calls func_VRAM for a function that has a name by now.
+./.venv/bin/python tools/apply_names.py >/dev/null
 for i in 1 2 3; do nat bash -c "make setup >/dev/null 2>&1" && break; done
 for i in $(seq 1 25); do
   amd make -j4 build > build/verify$T.log 2>&1 && break

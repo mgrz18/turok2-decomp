@@ -1,6 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/player.h"
 
-s32 func_00253CF0(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0x524) < 0x6400;
+s32 func_00253CF0(CPlayer *arg0) {
+    return arg0->m_Data.m_Health < 0x6400;
 }

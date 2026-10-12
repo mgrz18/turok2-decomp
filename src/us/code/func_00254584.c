@@ -1,18 +1,19 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/player.h"
 
 s32 func_00249358(s32, s32, s32, s32, s32);
 s32 func_00254430(s32, s32);
 
 extern s32 D_8011AAD8;
 
-void func_00254584(void *arg0, void *arg1) {
+void func_00254584(CPlayer *arg0, void *arg1) {
     s32 var_v0;
 
     if (D_8011AAD8 & 0x10) {
         var_v0 = 1;
     } else {
-        var_v0 = M2C_FIELD(arg0, u8 *, 0x6A8) & 0xF;
+        var_v0 = arg0->m_Data.m_SpecialPickupCount[380] & 0xF;
     }
     if (var_v0 != 0) {
         if (M2C_FIELD(arg1, s32 *, 0x140) & 0x80) {
