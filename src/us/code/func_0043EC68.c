@@ -1,5 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/game_object.h"
 
 M2C_UNK func_00236314(void *, M2C_UNK *);           /* extern */
 extern M2C_UNK D_00431A74;
@@ -9,7 +10,7 @@ extern f32 D_800C0490;
 extern M2C_UNK D_8012F608;
 extern M2C_UNK D_8012F9DC;
 
-void func_0043EC68(void *arg0) {
+void func_0043EC68(CGameObjectInstance *arg0) {
     void *temp_s2;
 
     if (M2C_FIELD(&D_8012F9DC, s32 *, 0) == 2) {
@@ -19,13 +20,13 @@ void func_0043EC68(void *arg0) {
     }
     temp_s2 = ((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x3D4));
     if (M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 1) {
-        M2C_FIELD(arg0, f32 *, 0x1FC) = (f32) D_800C0488;
+        arg0->m_AI.m_AnimSpeed = (f32) D_800C0488;
     }
     if (M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 2) {
-        M2C_FIELD(arg0, f32 *, 0x1FC) = (f32) D_800C048C;
+        arg0->m_AI.m_AnimSpeed = (f32) D_800C048C;
     }
     if (M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 3) {
-        M2C_FIELD(arg0, f32 *, 0x1FC) = (f32) D_800C0490;
+        arg0->m_AI.m_AnimSpeed = (f32) D_800C0490;
     }
     if ((M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 1) && (M2C_FIELD(temp_s2, s32 *, 0x18) == 0)) {
         func_00236314(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x284)), &D_00431A74);
@@ -43,5 +44,5 @@ void func_0043EC68(void *arg0) {
         func_00236314(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0x88)), &D_00431A74);
         M2C_FIELD(&D_8012F608, s32 *, 0x18) = (s32) (M2C_FIELD(&D_8012F608, s32 *, 0x18) + 1);
     }
-    M2C_FIELD(arg0, s32 *, 0xD4) = (s32) (M2C_FIELD(arg0, s32 *, 0xD4) | 0x2000);
+    arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2000);
 }

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0026E48C(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0xD4) = (s32) (M2C_FIELD(arg0, s32 *, 0xD4) & 0xFFFEFFFF);
+void func_0026E48C(CGameObjectInstance *arg0) {
+    arg0->m_dwFlags = (s32) (arg0->m_dwFlags & 0xFFFEFFFF);
 }
