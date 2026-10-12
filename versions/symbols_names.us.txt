@@ -20,3 +20,6 @@ __osSiDeviceBusy = 0x0029A140; // type:func
 __osSpDeviceBusy = 0x0029A380; // type:func
 __osSpSetStatus = 0x0029A4D0; // type:func
 __osSpGetStatus = 0x0029A560; // type:func
+COnScreen__SetFontColor = 0x0027B094; // type:func
+COnScreen__SetFontScale = 0x0027B0C0; // type:func
+COnScreen__DrawText = 0x0027874C; // type:func

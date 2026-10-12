@@ -32,3 +32,10 @@ __osSiDeviceBusy = 0x0029A140; // SI_STATUS_REG & (DMA_BUSY | IO_READ_BUSY)
 __osSpDeviceBusy = 0x0029A380; // SP_STATUS_REG & (IO_FULL | DMA_FULL | DMA_BUSY)
 __osSpSetStatus = 0x0029A4D0; // writes SP_STATUS_REG
 __osSpGetStatus = 0x0029A560; // returns SP_STATUS_REG
+
+// The HUD's text (COnScreen, one global at 0x801100F0). LibTEngine names
+// these with their signatures, from another game's build; found here by
+// what they do to that global.
+COnScreen__SetFontColor = 0x0027B094; // stores its 6 args to m_TopR..m_BottomB, as LibTEngine's (tr,tg,tb,br,bg,bb), 44 bytes there and here
+COnScreen__SetFontScale = 0x0027B0C0; // stores its 2 float args to m_FontXScale/m_FontYScale, 20 bytes there and here
+COnScreen__DrawText = 0x0027874C; // walks a string to '\n' through the font's lookup table, colours from m_Top*/m_Bottom*, shadow offset; signature differs from LibTEngine's
