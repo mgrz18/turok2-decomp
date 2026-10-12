@@ -427,7 +427,7 @@ segments:
       - [0x33740, c, code/func_00232B40]
       - [0x33784, asm]
       - [0x33968, c, code/func_00232D68]
-      - [0x33A1C, asm]
+      - [0x33A1C, c, code/func_00232E1C]
       - [0x33A80, c, code/func_00232E80]
       - [0x33AAC, c, code/func_00232EAC]
       - [0x33ACC, c, code/func_00232ECC]
