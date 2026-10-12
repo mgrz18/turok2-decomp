@@ -81,6 +81,8 @@ and symbol coverage rather than matched-function counts.
 - **[Mr-Wiseguy/N64Recomp](https://github.com/Mr-Wiseguy/N64Recomp)** + **[N64ModernRuntime](https://github.com/Mr-Wiseguy/N64ModernRuntime)** + **[RT64](https://github.com/rt64/rt64)** — the native-port pipeline.
 - **[ethteck/splat](https://github.com/ethteck/splat)** — disassembler / segment splitter.
 - **[matt-kempster/m2c](https://github.com/matt-kempster/m2c)** — MIPS → C decompiler for matching.
+- **[simonlindholm/decomp-permuter](https://github.com/simonlindholm/decomp-permuter)** — randomized C rewrites for near-matches (`tools/permuter/`).
+- **[Ghidra](https://github.com/NationalSecurityAgency/ghidra)** + **[GhidraMCP](https://github.com/LaurieWired/GhidraMCP)** — analysis and readable decompilation for understanding systems (HUD, camera, player) before they are matched. Run headless with `tools/ghidra/serve.sh`; every name, prototype, struct and comment lives in the repo (`versions/names.us.txt`, `tools/ghidra/annotations.json`, `include/structs/`) and is re-applied on start, so the Ghidra project is a disposable working copy.
 
 ## Roadmap
 
@@ -113,8 +115,11 @@ decomp.
 - [x] Matched C linked into the ROM (`make verify` still passes), with a progress metric
 - [x] Fast C path: GNU as reproducing asn64 (`tools/sn_as.sh`), a full build in seconds
 - [x] Bulk matching from m2c drafts (`tools/auto_match.py`): 840 functions over three passes
-- [ ] Readability pass: name the structs behind `M2C_FIELD` accesses
-- [ ] Hand-match the functions m2c gets close to but not exact
+- [ ] Readability pass: name the structs behind `M2C_FIELD` accesses — started: `CGameObjectInstance`, `CPlayer`, `COverlay`, `CCamera` in `include/structs/`, offsets checked with the game's compiler (`tools/check_structs.py`)
+- [x] Ghidra in the loop: structs, names and prototypes loaded into a Ghidra project (`tools/ghidra/`) to read systems before matching them
+- [x] Function names from the ROM's LNK records and from Turok 3's decomp (`versions/names.us.txt`, `tools/xmatch_t3.py`)
+- [ ] Hand-match the functions m2c gets close to but not exact — started with the HUD: overlay script interpreter matched ([docs/HUD.md](docs/HUD.md))
+- [x] decomp-permuter batches for near-matches (`tools/permuter/`)
 - [x] Functions own their `.rdata` slice from C: switch tables and float pools (`--switch`, `--rdata`)
 - [ ] Recover the original source-file boundaries
 - [ ] libultra from [decompals/ultralib](https://github.com/decompals/ultralib) (`libgultra`)
