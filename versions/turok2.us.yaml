@@ -1271,6 +1271,8 @@ segments:
       - [0x77C88, asm]
       - [0x77F28, c, code/func_00277328]
       - [0x78268, asm]
+      - [0x78D88, c, code/func_00278188]
+      - [0x78E78, asm]
       - [0x7B8C4, c, code/func_0027ACC4]
       - [0x7B900, c, code/func_0027AD00]
       - [0x7B924, c, code/func_0027AD24]
