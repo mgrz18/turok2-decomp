@@ -1,0 +1,2 @@
+// Sembrado limpio: los simbolos de LibTEngine no aplican a este ROM.
+// Ver el issue de invalidacion. Respaldo en symbol_addrs.us.txt.libtengine-bak

@@ -47,7 +47,6 @@ include/libtengine/
 
 # Generated symbol seeds (derived from third-party functions.csv)
 versions/functions.csv.libtengine
-versions/symbol_addrs.us.txt
 versions/undefined_funcs_auto.us.txt
 versions/undefined_syms_auto.us.txt
 versions/symbols_from_lnk.us.txt
@@ -58,10 +57,10 @@ versions/symbols_from_lnk.us.txt
 .idea/
 *.swp
 
-# Seeds recuperados del ROM por tools/function_seed.py (regenerables en segundos)
-versions/symbols_from_scan.us.txt
+# Seeds recuperados del ROM por tools/function_seed.py: symbols_from_scan y
+# undefined_funcs_extra SI se versionan (el split y el link dependen de ellos,
+# y regenerar el segundo pide un log de link), igual que symbol_addrs.
 versions/*.libtengine-bak
-versions/undefined_funcs_extra.us.txt
 
 # Instrucciones de workspace para Claude Code — locales, no se publican
 CLAUDE.md

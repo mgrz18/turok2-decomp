@@ -39,6 +39,10 @@ If you only want to play Turok 2, an emulator is 100× less work and totally fin
 
 ## Setup (Apple Silicon macOS)
 
+On an x86_64 Linux host the same steps run without containers: install
+`binutils-mips-linux-gnu`, `cpp`, `dos2unix` and the i386 C runtime
+(`libc6:i386`), and `cc1` runs natively, far faster than emulated.
+
 ```bash
 # 1. Clone reference projects (gitignored, not part of this repo)
 mkdir -p references && cd references
@@ -54,9 +58,9 @@ cd ..
 python3 -m venv .venv && ./.venv/bin/pip install -r tools/requirements.txt
 make setup PYTHON=./.venv/bin/python
 
-# 4. Recover function entry points from the ROM and re-split with them
-./.venv/bin/python tools/function_seed.py --write
-make setup PYTHON=./.venv/bin/python
+# 4. The recovered function entry points (versions/symbols_from_scan.us.txt,
+#    undefined_funcs_extra.us.txt) are committed; re-derive them only when
+#    changing the seeding: ./.venv/bin/python tools/function_seed.py --write
 
 # 5. Build the linux/amd64 container. Only the assemble/link path needs it:
 #    cc1 is an i386 ELF and asn64.exe is Win32.
