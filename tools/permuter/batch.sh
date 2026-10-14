@@ -3,7 +3,7 @@
 #
 #   tools/permuter/batch.sh <seconds> <func> [<func>...]
 #
-# The permuter shares its -j4 workers across the directories it is given
+# The permuter shares its -j4 workers (PERMUTER_JOBS) across the directories it is given
 # (set up first with tools/permuter/setup.py --dir). A function it matches
 # stops there (--stop-on-zero); collect them with tools/permuter/harvest.py.
 #
@@ -47,7 +47,7 @@ while :; do
   T0=$(date +%s)
   timeout "$LEFT" docker run --platform=linux/amd64 --ulimit core=0 --rm --name "$NAME" \
       -v "$PWD:/work" -w /work turok2-permuter \
-      python3 tools/permuter/run_permuter.py -j4 --stop-on-zero "${DIRS[@]}" </dev/null | tee build/permuter/.last_run
+      python3 tools/permuter/run_permuter.py -j"${PERMUTER_JOBS:-4}" --stop-on-zero "${DIRS[@]}" </dev/null | tee build/permuter/.last_run
   for b in $(grep -o '\[func_[0-9A-F]*\] base score = 0$' build/permuter/.last_run | grep -o 'func_[0-9A-F]*'); do
     touch "build/permuter/$b/.base0"; echo "== $b: base score 0, set aside"
   done
