@@ -33,6 +33,7 @@ Usage:
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -525,7 +526,8 @@ def pending_drafts():
 
 def compile_drafts():
     """Compile every draft in build/auto, retrying what qemu crashed on."""
-    script = ("cat build/auto/.pending | xargs -P 8 -I{} bash -c "
+    # COMPILE_JOBS: 8 suits qemu on the Mac; a native x86 box takes its cores.
+    script = (f"cat build/auto/.pending | xargs -P {os.environ.get('COMPILE_JOBS', '8')} -I{{}} bash -c "
               "'f={}; n=${f%.c}; rm -f $n.o; tools/cc_func.sh $f $n.o cc1 -O2 >/dev/null 2>$n.err || true'")
     for attempt in range(4):
         todo = pending_drafts()
