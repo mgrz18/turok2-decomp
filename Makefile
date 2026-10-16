@@ -98,6 +98,10 @@ endif
 ifneq (,$(wildcard $(SYMS_MANUAL)))
 LD_FLAGS         += -T $(SYMS_MANUAL)
 endif
+FOREIGN_LABELS  = $(VERSIONS_DIR)/foreign_labels.$(VERSION).txt
+ifneq (,$(wildcard $(FOREIGN_LABELS)))
+LD_FLAGS         += -T $(FOREIGN_LABELS)
+endif
 
 OBJCOPY_FLAGS     = -O binary
 
