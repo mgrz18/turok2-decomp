@@ -16,8 +16,8 @@ typedef s32 M2C_UNK32;
 typedef s64 M2C_UNK64;
 s32 func_002021F0(s32, s32, s32);
 s32 func_002031E8(s32, s32);
-s32 func_0029B6F0(s32, s32, s32);
-s32 func_0029B820(s32, s32, s32);
+s32 osRecvMesg(s32, s32, s32);
+s32 osSendMesg(s32, s32, s32);
 s32 func_0029DFF0(void);
 void func_0029E010(s32);
 M2C_UNK func_002062F8(M2C_UNK, s32);
@@ -39,7 +39,7 @@ s32 func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
   if (temp_v1 != 1)
   {
     func_0029E010(temp_a0);
-    func_0029B6F0((s32) (&D_800D8DB0), 0, 1);
+    osRecvMesg((s32) (&D_800D8DB0), 0, 1);
   }
   else
   {
@@ -70,13 +70,13 @@ s32 func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
     if (D_800D8DCC || var_s0)
     {
       func_0029E010(temp_v0_2);
-      func_0029B820((s32) (&D_800D8DB0), 0, 1);
+      osSendMesg((s32) (&D_800D8DB0), 0, 1);
       return var_s0;
     }
     else
     {
       func_0029E010(temp_v0_2);
-      func_0029B820((s32) (&D_800D8DB0), 0, 1);
+      osSendMesg((s32) (&D_800D8DB0), 0, 1);
       return var_s0;
     }
   }

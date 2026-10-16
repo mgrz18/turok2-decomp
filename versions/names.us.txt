@@ -39,3 +39,10 @@ __osSpGetStatus = 0x0029A560; // returns SP_STATUS_REG
 COnScreen__SetFontColor = 0x0027B094; // stores its 6 args to m_TopR..m_BottomB, as LibTEngine's (tr,tg,tb,br,bg,bb), 44 bytes there and here
 COnScreen__SetFontScale = 0x0027B0C0; // stores its 2 float args to m_FontXScale/m_FontYScale, 20 bytes there and here
 COnScreen__DrawText = 0x0027874C; // walks a string to '\n' through the font's lookup table, colours from m_Top*/m_Bottom*, shadow offset; signature differs from LibTEngine's
+
+// From Turok 3's decomp (Drahsid/turok3): its C for CDecompressor__Main,
+// compiled here, is func_00201C60's code once one call Turok 2 lacks is
+// removed; the two calls it makes there are osRecvMesg and osSendMesg.
+CDecompressor__Main = 0x00201C60; // turok3 src/us/decompressor.c, matched C
+osRecvMesg = 0x0029B6F0; // the call at CDecompressor__Main's top: (queue, &msg, OS_MESG_BLOCK)
+osSendMesg = 0x0029B820; // the call at its bottom: (entry->decompressReplyQueue, entry, OS_MESG_BLOCK)

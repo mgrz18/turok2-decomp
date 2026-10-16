@@ -3,7 +3,7 @@
 
 s32 func_002949A4(s32, s32, s32, s32);
 s32 func_002985C0(s32, s32);
-s32 func_0029B6F0(s32, s32, s32);
+s32 osRecvMesg(s32, s32, s32);
 s32 func_0029BF80(s32);
 void func_0029E3B0(void);
 
@@ -41,7 +41,7 @@ s32 func_0026FD88(void *arg0) {
     func_0028B3E8(&D_8011AD90, arg0 + 8);
     D_800B2668 ^= 1;
     func_0027592C();
-    func_0029B6F0((s32) &D_800F2820, (s32) &sp14, 1);
+    osRecvMesg((s32) &D_800F2820, (s32) &sp14, 1);
     func_002985C0(M2C_FIELD(arg0, s32 *, 0), (s16) M2C_FIELD(arg0, u16 *, 4) * 4);
     return 1;
 }

@@ -3,7 +3,7 @@
 
 M2C_UNK func_002933B0(void *);                      /* extern */
 M2C_UNK func_002933E0(void *, void *);              /* extern */
-M2C_UNK func_0029B6F0(M2C_UNK *, s32 *, M2C_UNK);   /* extern */
+M2C_UNK osRecvMesg(M2C_UNK *, s32 *, M2C_UNK);   /* extern */
 extern u32 D_800B2660;
 extern u32 D_800B2664;
 extern M2C_UNK D_800F2778;
@@ -19,7 +19,7 @@ void func_0026FEA0(void) {
     sp10 = 0;
     if (D_800B2664 != 0) {
         do {
-            func_0029B6F0(&D_800F2778, &sp10, 1);
+            osRecvMesg(&D_800F2778, &sp10, 1);
             var_s0 += 1;
         } while (var_s0 < (u32) D_800B2664);
     }
