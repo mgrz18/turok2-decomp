@@ -1,0 +1,27 @@
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B53FC_de_padding_B5FFC_12.c, func_802B5540_de.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+typedef signed int s32;
+struct Obj_func_802B3EDC_de;
+struct Obj_func_802B3EDC_de {
+    char pad14[0x14];
+    s32 count;
+    char pad18[0x4];
+    s32 *base;
+};
+struct Obj_func_802B3EDC_de;
+typedef struct Obj_func_802B3EDC_de Obj_func_802B3EDC_de;
+s32 func_002964A0(Obj_func_802B3EDC_de *arg0, s32 arg1, s32 arg2) {
+    int new_var;
+    s32 *base;
+    s32 count;
+    base = arg0->base;
+    if (arg1 == 2) {
+        new_var = arg0->count;
+        count = new_var;
+        base[count] = arg2;
+        new_var = count + 1;
+        arg0->count = new_var;
+    }
+    return 0;
+}
