@@ -2,9 +2,9 @@
 
 [![status](https://img.shields.io/badge/status-matching%20decomp-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
 [![ROM](https://img.shields.io/badge/ROM-rebuilds%20byte--exact-brightgreen)](docs/MATCHING.md)
-[![total matched](https://img.shields.io/badge/total%20matched-18.02%25-orange)](tools/progress.py)
-[![engine matched](https://img.shields.io/badge/engine%20matched-22.08%25-orange)](tools/progress.py)
-[![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-10.84%25-orange)](tools/progress.py)
+[![total matched](https://img.shields.io/badge/total%20matched-20.61%25-orange)](tools/progress.py)
+[![engine matched](https://img.shields.io/badge/engine%20matched-26.12%25-orange)](tools/progress.py)
+[![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-10.88%25-orange)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
 [![RSP ucode](https://img.shields.io/badge/RSP%20ucode-stock%20F3DEX-success)](docs/MICROCODE.md)
@@ -13,7 +13,7 @@
 
 Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0): C source that compiles back to the exact original ROM.
 
-> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 1,490 engine functions (22.08% of engine code) and 709 functions of the paged VM modules (10.84%), which build with the same toolchain, are matched and linked into the ROM as C so far: 18.02% of all the game's code ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
+> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 1,552 engine functions (26.12% of engine code) and 710 functions of the paged VM modules (10.88%), which build with the same toolchain, are matched and linked into the ROM as C so far: 20.61% of all the game's code ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
 >
 > A parallel native-port track recompiles the same ELF with N64Recomp; it runs clean, and the TLB is its open question.
 

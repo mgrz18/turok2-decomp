@@ -168,20 +168,32 @@ def asm_symbols(body):
 
 
 def object_relocs(obj, fname):
-    """Compiled reference: instruction index -> symbol its relocation names."""
+    """Compiled reference: instruction index -> (symbol, relocation type,
+    the instruction word, whose low half is the addend for a LO16)."""
     res = subprocess.run(["mips-linux-gnu-objdump", "-dr", str(obj)], capture_output=True, text=True).stdout
-    out, inside, base = {}, False, 0
+    out, inside, base, word = {}, False, 0, 0
     for line in res.splitlines():
         m = re.match(r"^([0-9a-f]+) <(\S+)>:", line)
         if m:
             inside, base = m.group(2) == fname, int(m.group(1), 16)
             continue
         if inside:
-            r = re.match(r"^\s+([0-9a-f]+): R_MIPS_\w+\s+(\S+)", line)
+            w = re.match(r"^\s+[0-9a-f]+:\s+([0-9a-f]{8})\s", line)
+            if w:
+                word = int(w.group(1), 16)
+            r = re.match(r"^\s+([0-9a-f]+): (R_MIPS_\w+)\s+(\S+)", line)
             if r:
-                sym = re.sub(r"\+0x[0-9a-f]+$", "", r.group(2))
-                out[(int(r.group(1), 16) - base) // 4] = sym
+                sym = re.sub(r"\+0x[0-9a-f]+$", "", r.group(3))
+                out[(int(r.group(1), 16) - base) // 4] = (sym, r.group(2), word)
     return out
+
+
+ELF_SYMS = {}
+
+
+def sym_addr(name):
+    m = re.match(r"^[DB]_([0-9A-F]{8})$", name)
+    return int(m.group(1), 16) if m else ELF_SYMS.get(name)
 
 
 def build(target, m, args, bodies):
@@ -202,18 +214,39 @@ def build(target, m, args, bodies):
     relocs = object_relocs(obj, m["ref"]) if obj.exists() else {}
     t2 = asm_symbols(bodies.get(target, ""))
     rename = {m["ref"]: target}
-    for i, sym in relocs.items():
+    bases, new_syms = {}, {}
+    for i, (sym, rtype, word) in relocs.items():
         if sym.startswith(".") or i not in t2:
             continue
         tsym, off = t2[i]
-        if off:
-            return target, f"{sym} is {tsym}{off} here: an offset form, left for later"
-        if rename.get(sym, tsym) != tsym:
-            return target, f"{sym} maps to both {rename[sym]} and {tsym}"
-        rename[sym] = tsym
+        if rtype == "R_MIPS_26" or not off and rtype != "R_MIPS_LO16":
+            if not off and rename.get(sym, tsym) != tsym and sym not in bases:
+                return target, f"{sym} maps to both {rename[sym]} and {tsym}"
+            rename.setdefault(sym, tsym)
+            continue
+        # Data through %hi/%lo: the reference reads sym+addend where Turok 2's
+        # asm names tsym+off, so sym itself sits at tsym+off-addend. Splat may
+        # have cut that array into several symbols, or started one 4 bytes in.
+        if rtype != "R_MIPS_LO16":
+            continue
+        addr = sym_addr(tsym)
+        if addr is None:
+            return target, f"{tsym} has no address"
+        addend = (word & 0xFFFF) - 0x10000 if word & 0x8000 else word & 0xFFFF
+        base = addr + int(off or "0", 0) - addend
+        if bases.setdefault(sym, base) != base:
+            return target, f"{sym} reads at two bases"
+    for sym, base in bases.items():
+        name = next((n for n, a in ELF_SYMS.items() if a == base and re.match(r"^[DB]_", n)), None)
+        name = name or f"D_{base:08X}"
+        if sym_addr(name) is None or name not in ELF_SYMS:
+            new_syms[name] = base
+        rename[sym] = name
     text = IDENT.sub(lambda x: rename.get(x.group(0), x.group(0)), text)
-    out = ROOT / "build" / "manual" / args.tag / f"{target}.c"
+    out = ROOT / "build" / "manual" / args.out_tag / f"{target}.c"
     out.parent.mkdir(parents=True, exist_ok=True)
+    if new_syms:
+        (out.parent / f"{target}.syms").write_text("".join(f"{n} = 0x{a:08X};\n" for n, a in new_syms.items()))
     out.write_text(f"/* From {args.credit}: {m['file']}, {m['ref']}.\n"
                    f" * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */\n\n" + text)
     res = subprocess.run([sys.executable, str(ROOT / "tools" / "match_func.py"), str(out)],
@@ -231,18 +264,30 @@ def main():
     ap.add_argument("--credit", required=True)
     ap.add_argument("--names", nargs="*")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 8)
+    ap.add_argument("--near", type=float, help="take the near ones (>= this ratio, < 1) instead, as permuter "
+                    "drafts, into build/manual/<tag>_near/")
     args = ap.parse_args()
+    if args.near:
+        args.out_tag = f"{args.tag}_near"
+    else:
+        args.out_tag = args.tag
     found = json.loads((ROOT / "build" / f"xmatch_{args.tag}" / "matches.json").read_text())
-    todo = {n: m for n, m in found.items() if m["ratio"] == 1.0 and (not args.names or n in args.names)}
+    lo, hi = (args.near, 1.0) if args.near else (1.0, 1.01)
+    todo = {n: m for n, m in found.items() if lo <= m["ratio"] < hi and (not args.names or n in args.names)}
     bodies = auto_match.extract_asm()
+    from elftools.elf.elffile import ELFFile
+    with open(ROOT / "build" / "ref.elf", "rb") as fh:
+        for sym in ELFFile(fh).get_section_by_name(".symtab").iter_symbols():
+            if sym.name and not sym.name.startswith("."):
+                ELF_SYMS.setdefault(sym.name, sym["st_value"])
     with ThreadPoolExecutor(args.jobs) as pool:
         results = list(pool.map(lambda kv: build(kv[0], kv[1], args, bodies), sorted(todo.items())))
     ok = sorted(t for t, r in results if r == "MATCH")
-    (ROOT / "build" / "manual" / args.tag).mkdir(parents=True, exist_ok=True)
-    (ROOT / "build" / "manual" / args.tag / "MATCHED").write_text("".join(f"{t}\n" for t in ok))
+    (ROOT / "build" / "manual" / args.out_tag).mkdir(parents=True, exist_ok=True)
+    (ROOT / "build" / "manual" / args.out_tag / "MATCHED").write_text("".join(f"{t}\n" for t in ok))
     from collections import Counter
     why = Counter(re.sub(r"\d+ of \d+ words differ.*", "words differ", r)[:60] for t, r in results if r != "MATCH")
-    print(f"{len(todo)} identical functions: {len(ok)} match standalone")
+    print(f"{len(todo)} {'near' if args.near else 'identical'} functions: {len(ok)} match standalone")
     for k, v in why.most_common(8):
         print(f"  {v:4d}  {k}")
     return 0

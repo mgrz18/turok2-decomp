@@ -26,3 +26,6 @@ COnScreen__DrawText = 0x0027874C; // type:func
 CDecompressor__Main = 0x00201C60; // type:func
 osRecvMesg = 0x0029B6F0; // type:func
 osSendMesg = 0x0029B820; // type:func
+__udivdi3 = 0x002A4650; // type:func
+__cmpdi2 = 0x002A50E0; // type:func
+__floatdisf = 0x002A5130; // type:func

@@ -46,3 +46,11 @@ COnScreen__DrawText = 0x0027874C; // walks a string to '\n' through the font's l
 CDecompressor__Main = 0x00201C60; // turok3 src/us/decompressor.c, matched C
 osRecvMesg = 0x0029B6F0; // the call at CDecompressor__Main's top: (queue, &msg, OS_MESG_BLOCK)
 osSendMesg = 0x0029B820; // the call at its bottom: (entry->decompressReplyQueue, entry, OS_MESG_BLOCK)
+
+// libgcc's 64-bit helpers, which cc1 calls on its own for long long
+// arithmetic: Rage Wars' C for func_0028A914 (AbuN64/ragewars-decomp)
+// compiles to calls to these names at the instructions where Turok 2's
+// code calls these addresses.
+__udivdi3 = 0x002A4650; // unsigned 64-bit divide
+__cmpdi2 = 0x002A50E0; // signed 64-bit compare
+__floatdisf = 0x002A5130; // s64 to float
