@@ -173,13 +173,13 @@ def draft(name, asm, opts=()):
     tables = sorted(set(re.findall(r"\bjtbl_[0-9A-F]{8}\b", asm)))
     consts = [] if not WITH_CONSTS else sorted(set(
         n for n in re.findall(r"%lo\((D_[0-9A-F]{8})\)", asm)
-        if RDATA[0] <= int(n[2:], 16) < RDATA[1]))
+        if in_rdata(int(n[2:], 16))))
     if tables or consts:
         # m2c rebuilds a switch only if it can read the table, and writes a
         # float literal instead of an extern only if it can read the value.
         body = "".join(".align 3\n" + JTBLS[t] for t in tables if t in JTBLS)
         for n in consts:
-            off = RODATA_SEG_ROM + (int(n[2:], 16) - RDATA[0])
+            off = rdata_rom(int(n[2:], 16))
             dbl = re.search(rf"ldc1\s+[^,]+,\s*%lo\({n}\)", asm)
             words = ROM_BYTES[off:off + (8 if dbl else 4)]
             body += f".globl {n}\n{n}:\n" + "".join(
@@ -223,6 +223,33 @@ WITH_CONSTS = False                 # --rdata: hand m2c the float pool values to
 ROM_BYTES = b""
 RDATA = (0x800A51F8, 0x800AB000)   # the engine's .rdata: jump tables, float pools
 RODATA_SEG_ROM = 0xA5DF8             # ROM offset of RDATA[0]
+# Both pools, as (vram start, vram end, ROM offset of the start, yaml segment).
+# The second, after the microcode, holds the paged VM modules' jump tables and
+# float literals too: their code reads it at KSEG0 addresses like the engine's.
+RDATA_REGIONS = [(0x800A51F8, 0x800AB000, 0xA5DF8, "code_rodata"),
+                 (0x800BFD50, 0x800C22D8, 0xC0950, "code_rodata_tail")]
+
+
+def rdata_region(vram=None, rom=None):
+    """The pool a vram address (or ROM offset) is in, or None."""
+    for lo, hi, base, seg in RDATA_REGIONS:
+        if vram is not None and lo <= vram < hi or rom is not None and base <= rom < base + hi - lo:
+            return lo, hi, base, seg
+    return None
+
+
+def in_rdata(vram):
+    return rdata_region(vram=vram) is not None
+
+
+def rdata_rom(vram):
+    lo, _, base, _ = rdata_region(vram=vram)
+    return base + vram - lo
+
+
+def rdata_vram(rom):
+    lo, _, base, _ = rdata_region(rom=rom)
+    return lo + rom - base
 JTBLS = {}                           # jtbl name -> its asm block
 
 
@@ -238,14 +265,14 @@ def load_jtbls():
 def rdata_refs(body):
     """Addresses in the engine's .rdata that a function's asm references."""
     return sorted({int(a, 16) for a in re.findall(r"%lo\((?:D|jtbl)_([0-9A-F]{8})\)", body)
-                   if RDATA[0] <= int(a, 16) < RDATA[1]})
+                   if in_rdata(int(a, 16))})
 
 
 def switch_only(body):
     """True when the function's only .rdata use is its own jump tables."""
     refs = re.findall(r"%lo\(((?:D|jtbl)_([0-9A-F]{8}))\)", body)
-    in_rdata = [n for n, a in refs if RDATA[0] <= int(a, 16) < RDATA[1]]
-    return bool(in_rdata) and all(n.startswith("jtbl_") for n in in_rdata)
+    pool = [n for n, a in refs if in_rdata(int(a, 16))]
+    return bool(pool) and all(n.startswith("jtbl_") for n in pool)
 
 
 SIG = re.compile(r"^(?P<ret>[^\n(]*?\b)(?P<name>func_[0-9A-F]{8})\((?P<params>[^)]*)\) \{", re.M)
@@ -595,7 +622,7 @@ def accept(chosen, rodata=None):
         src = chosen[name]
         if name in rodata:
             start, size = rodata[name]
-            v0 = RDATA[0] + (start - RODATA_SEG_ROM)
+            v0 = rdata_vram(start)
             src = rename_swallowed(src, v0, v0 + size)
         (SRC / f"{name}.c").write_text(src)
         wired += 1
@@ -638,17 +665,18 @@ def rodata_slice(obj, name, body, rom):
                     val = struct.unpack(">I", data[off:off + 4])[0] + vram
                     data[off:off + 4] = struct.pack(">I", val)
     size = len(data)
-    rom_off = RODATA_SEG_ROM + (start - RDATA[0])
+    rom_off = rdata_rom(start)
     if size % 4 or rom[rom_off:rom_off + size] != bytes(data):
         return None
     return rom_off, size
 
 
 def rodata_subsegment(name, rom_start, rom_end):
-    """Insert `[start, .rodata, name]` and `[end, rodata]` in code_rodata."""
+    """Insert `[start, .rodata, name]` and `[end, rodata]` in its pool's segment."""
     ypath = ROOT / "versions" / "turok2.us.yaml"
     lines = ypath.read_text().splitlines()
-    seg = next(i for i, l in enumerate(lines) if l.strip() == "- name: code_rodata")
+    segname = rdata_region(rom=rom_start)[3]
+    seg = next(i for i, l in enumerate(lines) if l.strip() == f"- name: {segname}")
     stop = next((i for i in range(seg + 1, len(lines)) if lines[i].startswith("  - ")), len(lines))
     ent = re.compile(r"^(\s+)- \[(0x[0-9A-Fa-f]+),\s*([.\w]+)")
     entries = [(i, ent.match(lines[i])) for i in range(seg, stop)]
