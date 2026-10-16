@@ -1,0 +1,50 @@
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B7B80_us_26.c, func_802B8AA0_de.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef signed int s32;
+typedef unsigned int u32;
+struct Block40;
+struct Block40 {
+    u8 bytes[0x28];
+};
+struct Block40;
+typedef struct Block40 Block40;
+extern u32 D_80130E20[];
+extern u32 func_00299E00(u32 arg0);
+void func_00299C60(s32 arg0, s32 arg1, u8 *arg2) {
+    Block40 packet;
+    u8 *dst;
+    s32 i;
+    u8 tail;
+    u32 checksum;
+    s32 shifted;
+    dst = (u8 *)D_80130E20;
+    tail = 0xFF;
+    D_80130E20[0xF] = 1;
+    packet.bytes[0] = tail;
+    packet.bytes[1] = 0x23;
+    packet.bytes[2] = 1;
+    packet.bytes[3] = 3;
+    checksum = func_00299E00(arg1 & 0xFFFF);
+    shifted = arg1 << 5;
+    *(u16 *)&packet.bytes[4] = (checksum & 0xFF) | shifted;
+    packet.bytes[0x26] = tail;
+    i = 0;
+    do {
+        ((Block40 *)((u8 *)&packet + i))->bytes[6] = *arg2++;
+        i++;
+    } while (i < 0x20);
+    if (arg0 != 0) {
+        i = 0;
+        if (arg0 > 0) {
+            do {
+                *dst++ = 0;
+                i++;
+            } while (i < arg0);
+        }
+    }
+    *(Block40 *)dst = packet;
+    dst[0x28] = 0xFE;
+}
