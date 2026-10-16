@@ -154,3 +154,26 @@
 ".L0042868C" = 0x0042868C;
 ".L00429308" = 0x00429308;
 ".L00429348" = 0x00429348;
+
+/* Pool symbols a C file now carries in its .rodata slice that asm still names:
+ * both copies of a VM module read the same constants. Plain addresses for ld. */
+D_800C0988 = 0x800C0988;
+D_800C09A8 = 0x800C09A8;
+D_800C0C60 = 0x800C0C60;
+D_800C1348 = 0x800C1348;
+jtbl_800C0E00 = 0x800C0E00;
+jtbl_800C0E30 = 0x800C0E30;
+jtbl_800C1280 = 0x800C1280;
+jtbl_800C1438 = 0x800C1438;
+jtbl_800C14B0 = 0x800C14B0;
+jtbl_800C14F0 = 0x800C14F0;
+jtbl_800C1530 = 0x800C1530;
+jtbl_800C1570 = 0x800C1570;
+jtbl_800C15B0 = 0x800C15B0;
+jtbl_800C15F0 = 0x800C15F0;
+jtbl_800C1670 = 0x800C1670;
+jtbl_800C1688 = 0x800C1688;
+jtbl_800C16A0 = 0x800C16A0;
+jtbl_800C16B8 = 0x800C16B8;
+jtbl_800C16E8 = 0x800C16E8;
+jtbl_800C1700 = 0x800C1700;
