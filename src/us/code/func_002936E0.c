@@ -317,13 +317,13 @@ struct ALSoundState {
     u8 fxMix;
 };
 extern void func_00291034(ALEventQueue *, ALEvent *, s32);
-extern s32 func_00293F60(ALSynth_func_802B3000_de *, ALVoice_s *, ALVoiceConfig_s *);
+extern s32 alSynAllocVoice(ALSynth_func_802B3000_de *, ALVoice_s *, ALVoiceConfig_s *);
 extern void func_002944A0(ALSynth_func_802B3000_de *, ALVoice_s *, void *);
 extern void func_002942B0(ALSynth_func_802B3000_de *, ALVoice_s *, u8);
-extern void func_002943E0(ALSynth_func_802B3000_de *, ALVoice_s *, s16, s32);
+extern void alSynSetVol(ALSynth_func_802B3000_de *, ALVoice_s *, s16, s32);
 extern void func_00294340(ALSynth_func_802B3000_de *, ALVoice_s *, f32);
 extern void func_00294200(ALSynth_func_802B3000_de *, ALVoice_s *, u8);
-extern void func_00294650(ALSynth_func_802B3000_de *, ALVoice_s *);
+extern void alSynStopVoice(ALSynth_func_802B3000_de *, ALVoice_s *);
 extern void func_00294160(ALSynth_func_802B3000_de *, ALVoice_s *);
 extern void func_00293BA8(ALEventQueue *, ALSoundState *);
 void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
@@ -351,7 +351,7 @@ void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
             vc.priority = state->priority;
             vc.unityPitch = 0;
             voice = &state->voice;
-            func_00293F60(sndp->drvr, voice, &vc);
+            alSynAllocVoice(sndp->drvr, voice, &vc);
             vol = (s16)((s32)snd->envelope->attackVolume * state->vol / 127);
             tmp = state->pan - 64 + ((const ALSound_s_func_802B2780_de *)snd)->samplePan;
             tmp = ((tmp) > (0) ? (tmp) : (0));
@@ -361,7 +361,7 @@ void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
             func_002944A0(sndp->drvr, voice, snd->wavetable);
             state->state = 1;
             func_002942B0(sndp->drvr, voice, pan);
-            func_002943E0(sndp->drvr, voice, vol, delta);
+            alSynSetVol(sndp->drvr, voice, vol, delta);
             func_00294340(sndp->drvr, voice, pitch);
             func_00294200(sndp->drvr, voice, state->fxMix);
             evt.common.type = 6;
@@ -373,14 +373,14 @@ void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
             if (state->state != 1 || !snd)
                 return;
             delta = (s32)func_00293C50(snd->envelope->releaseTime, state->pitch);
-            func_002943E0(sndp->drvr, &state->voice, 0, delta);
+            alSynSetVol(sndp->drvr, &state->voice, 0, delta);
             if (delta) {
                 evt.common.type = 7;
                 evt.common.state = state;
                 func_00291034(&sndp->evtq, (ALEvent *)&evt, delta);
                 state->state = 2;
             } else {
-                func_00294650(sndp->drvr, &state->voice);
+                alSynStopVoice(sndp->drvr, &state->voice);
                 func_00294160(sndp->drvr, &state->voice);
                 func_00293BA8(&sndp->evtq, state);
                 state->state = 0;
@@ -414,21 +414,21 @@ void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
             state->vol = event_view->vol.vol;
             if (state->state == 1 && snd) {
                 vtmp = snd->envelope->decayVolume * state->vol / 127;
-                func_002943E0(sndp->drvr, &state->voice, (s16)vtmp, 1000);
+                alSynSetVol(sndp->drvr, &state->voice, (s16)vtmp, 1000);
             }
             break;
         case 6:
             if (snd->envelope->decayTime != -1) {
                 vtmp = snd->envelope->decayVolume * state->vol / 127;
                 delta = (s32)func_00293C50(snd->envelope->decayTime, state->pitch);
-                func_002943E0(sndp->drvr, &state->voice, (s16)vtmp, delta);
+                alSynSetVol(sndp->drvr, &state->voice, (s16)vtmp, delta);
                 evt.common.type = 1;
                 evt.common.state = state;
                 func_00291034(&sndp->evtq, (ALEvent *)&evt, delta);
             }
             break;
         case 7:
-            func_00294650(sndp->drvr, &state->voice);
+            alSynStopVoice(sndp->drvr, &state->voice);
             func_00294160(sndp->drvr, &state->voice);
             func_00293BA8(&sndp->evtq, state);
             state->state = 0;

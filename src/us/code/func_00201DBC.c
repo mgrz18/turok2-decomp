@@ -52,8 +52,8 @@ typedef struct CartridgeReadWorker CartridgeReadWorker;
 struct OSMesgQueue;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern Chunk *func_0020205C(CartridgeReadWorker *arg0);
-extern s32 func_0029B5B0(void *arg0, void *arg1, s32 arg2);
-extern s32 func_0029B5B0(void *, void *, s32);
+extern s32 osJamMesg(void *arg0, void *arg1, s32 arg2);
+extern s32 osJamMesg(void *, void *, s32);
 void func_00201DBC(struct CartridgeReadWorker *arg0, u32 arg1, s32 arg2, void *arg3) {
     extern void func_0029B030(void *arg0, s32 arg1, s32 arg2);
     char queue[0x18];
@@ -77,7 +77,7 @@ void func_00201DBC(struct CartridgeReadWorker *arg0, u32 arg1, s32 arg2, void *a
         }
         chunk->length = length;
         chunk->queue = queue;
-        func_0029B5B0(&arg0->requestQueueStorage, chunk, 1);
+        osJamMesg(&arg0->requestQueueStorage, chunk, 1);
         osRecvMesg(queue, &completed, 1);
         remaining -= length;
     } while (remaining != 0);

@@ -2129,6 +2129,8 @@ segments:
       - [0x9F088, c, code/func_0029E488]
       - [0x9F0C0, c, code/func_0029E4C0]
       - [0x9F0E4, asm]
+      - [0x9F634, c, code/func_0029EA34]
+      - [0x9FAA0, asm]
       - [0x9FCF0, c, code/func_0029F0F0]
       - [0x9FD78, asm]
       - [0x9FD80, c, code/func_0029F180]
@@ -2355,6 +2357,8 @@ segments:
       - [0xAB2B4, rodata]
       - [0xAB2D8, .rodata, code/func_00296AF4]
       - [0xAB2F8, rodata]
+      - [0xAB678, .rodata, code/func_0029EA34]
+      - [0xAB7C8, rodata]
 
   # ---------------------------------------------------------------------------
   # RSP microcode blobs. Do NOT disassemble as MIPS — see docs/MICROCODE.md.
@@ -3112,7 +3116,8 @@ segments:
       - [0x172160, asm]
       - [0x172330, c, code/func_00428330]
       - [0x17276C, c, code/func_0042876C]
-      - [0x1728B8, asm]
+      - [0x1728B8, c, code/func_004288B8]
+      - [0x172A18, asm]
       - [0x172B9C, c, code/func_00428B9C]
       - [0x172C38, c, code/func_00428C38]
       - [0x172CEC, asm]

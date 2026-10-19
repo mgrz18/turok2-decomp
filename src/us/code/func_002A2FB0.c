@@ -37,7 +37,7 @@ struct OSIoMesg {
 typedef struct Queue Queue;
 extern s32 D_800B8960;
 extern Queue *func_002A3060(void);
-extern s32 func_0029B5B0(Queue *, void *, s32);
+extern s32 osJamMesg(Queue *, void *, s32);
 extern s32 osSendMesg(Queue *, s32, s32);
 s32 func_002A2FB0(OSIoMesg *entry, s32 subtype, s32 arg2, s32 arg3,
                    s32 arg4, s32 arg5, Opaque_OSMesgQueue *arg6) {
@@ -59,5 +59,5 @@ s32 func_002A2FB0(OSIoMesg *entry, s32 subtype, s32 arg2, s32 arg3,
     if (subtype != 1) {
         return osSendMesg(func_002A3060(), (s32)entry, 0);
     }
-    return func_0029B5B0(func_002A3060(), entry, 0);
+    return osJamMesg(func_002A3060(), entry, 0);
 }

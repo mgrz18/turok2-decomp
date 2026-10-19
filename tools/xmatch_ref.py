@@ -38,7 +38,7 @@ CC = ("tools/sn64/cc1 -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300
       "-mhard-float -mfp64")
 
 
-def compile_one(src, out, incs, defs, repo=None):
+def compile_one(src, out, incs, defs, repo=None, cc=None):
     import hashlib
     o = out / (hashlib.sha1(src.as_posix().encode()).hexdigest()[:16] + ".o")   # names can be too long for a file
     if o.exists():
@@ -48,7 +48,7 @@ def compile_one(src, out, incs, defs, repo=None):
            + [f"-D{d}" for d in defs] + [f"-I{d}" for d in incs + [str(src.parent)]] + [str(src), "-o", str(i)])
     if subprocess.run(cpp, capture_output=True).returncode:
         return None
-    if subprocess.run(CC.split() + [str(i), "-o", str(s)], capture_output=True).returncode:
+    if subprocess.run((cc or CC).split() + [str(i), "-o", str(s)], capture_output=True).returncode:
         return None
     # Its asm may .include files relative to its own root (include/labels.inc).
     env = {**os.environ, "INC_DIR": str(repo)} if repo else None
@@ -66,15 +66,17 @@ def main():
     ap.add_argument("--exclude", nargs="*", default=[], help="path substrings to skip")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 8)
     ap.add_argument("--near", type=float, default=0.85)
+    ap.add_argument("--src", default="src", help="where under the repo its C is")
+    ap.add_argument("--cc", help="the cc1 command line instead of the game's (libultra: -O3 ...)")
     args = ap.parse_args()
 
     out = ROOT / "build" / f"xmatch_{args.tag}"
     out.mkdir(parents=True, exist_ok=True)
     incs = [str(args.repo / d) for d in args.include]
-    srcs = [p for p in sorted(args.repo.rglob("src/**/*.c"))
+    srcs = [p for p in sorted((args.repo / args.src).rglob("*.c"))
             if not any(x in p.as_posix() for x in args.exclude)]
     with ThreadPoolExecutor(args.jobs) as pool:
-        objs = list(pool.map(lambda p: compile_one(p, out, incs, args.define, args.repo), srcs))
+        objs = list(pool.map(lambda p: compile_one(p, out, incs, args.define, args.repo, args.cc), srcs))
     built = [(s, o) for s, o in zip(srcs, objs) if o]
     print(f"{len(srcs)} files, {len(built)} compiled")
 

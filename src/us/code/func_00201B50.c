@@ -14,7 +14,7 @@ typedef s8 M2C_UNK8;
 typedef s16 M2C_UNK16;
 typedef s32 M2C_UNK32;
 typedef s64 M2C_UNK64;
-s32 func_0029B5B0(s32, s32, s32);
+s32 osJamMesg(s32, s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 func_0029B9B0(s32, s32);
 M2C_UNK func_0029B030(M2C_UNK *, M2C_UNK *, M2C_UNK);
@@ -35,7 +35,7 @@ s32 func_00201B50(s32 arg0, void *arg1)
   *((M2C_UNK **) (((s8 *) arg1) + 0x20)) = sp10;
   D_800B6E54 = 2;
   func_0029B9B0(arg0, new_var3);
-  func_0029B5B0(arg0 + 0x230, (s32) arg1, 1);
+  osJamMesg(arg0 + 0x230, (s32) arg1, 1);
   osRecvMesg((s32) sp10, (s32) (&sp2C), new_var2);
   return 1;
 }

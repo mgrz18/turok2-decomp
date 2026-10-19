@@ -44,7 +44,7 @@ struct DecodeResult;
 typedef struct DecodeResult DecodeResult;
 void func_0028F61C(RuntimeState *state, DecodeResult_func_802AE6BC_de *result) {
     extern u32 func_0028F98C(RuntimeState *state, u32 index);
-    extern s32 func_0028EF90(RuntimeState *state, u32 index, DecodeResult *result);
+    extern s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result);
     u32 minimum;
     u32 index;
     u32 selected;
@@ -64,7 +64,7 @@ void func_0028F61C(RuntimeState *state, DecodeResult_func_802AE6BC_de *result) {
         }
         index++;
     } while (index < 16);
-    func_0028EF90(state, selected, result);
+    __alCSeqGetTrackEvent(state, selected, result);
     result->value = minimum;
     state->previous = minimum;
     state->total += minimum;

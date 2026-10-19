@@ -66,7 +66,7 @@ extern OSThread_s *D_800B8918;
 extern OSThread_s *D_800B8920;
 extern u32 func_0029DFF0(void);
 extern void func_0029E010(u32 mask);
-extern void func_0029BC30(OSThread_s **queue, OSThread_s *t);
+extern void __osDequeueThread(OSThread_s **queue, OSThread_s *t);
 extern void func_0029C878(OSThread_s **queue, OSThread_s *t);
 extern void func_0029C6DC(OSThread_s **queue);
 void func_0029B9B0(OSThread_s *t, s32 pri)
@@ -80,7 +80,7 @@ void func_0029B9B0(OSThread_s *t, s32 pri)
     if (t->priority != pri) {
         t->priority = pri;
         if (t != D_800B8920 && t->state != 1) {
-            func_0029BC30(t->queue, t);
+            __osDequeueThread(t->queue, t);
             func_0029C878(t->queue, t);
         }
         runQueue = &D_800B8918;

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00299EB0(s32, s32, s32, s32);
+s32 osPiRawStartDma(s32, s32, s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 void func_0029E030(s32, s32);
@@ -20,7 +20,7 @@ void func_00201FBC(s32 arg0)
   osRecvMesg(arg0 + 0x230, (s32) (&sp10), 1);
 
   func_0029E340(*((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
-  func_00299EB0(0, *((s32 *) (((s8 *) sp10) + 0)), *((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
+  osPiRawStartDma(0, *((s32 *) (((s8 *) sp10) + 0)), *((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
   osRecvMesg(arg0 + 0xA48, (s32) (&sp14), 1);
   func_0029E030(*((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
   temp_a0 = *((s32 *) (((s8 *) sp10) + 0xC));

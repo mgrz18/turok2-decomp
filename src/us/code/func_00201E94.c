@@ -44,9 +44,9 @@ typedef struct Chunk Chunk;
 struct CartridgeReadWorker;
 typedef struct CartridgeReadWorker CartridgeReadWorker;
 extern Chunk *func_0020205C(CartridgeReadWorker *arg0);
-extern s32 func_0029B5B0(void *arg0, void *arg1, s32 arg2);
+extern s32 osJamMesg(void *arg0, void *arg1, s32 arg2);
 typedef struct Queue Queue;
-extern s32 func_0029B5B0(void *, void *, s32);
+extern s32 osJamMesg(void *, void *, s32);
 extern s32 osSendMesg(void *, s32, s32);
 void func_00201E94(struct CartridgeReadWorker *arg0, u32 source, s32 length, void *destination,
                    Queue *queue, s32 value, s32 direct) {
@@ -61,7 +61,7 @@ void func_00201E94(struct CartridgeReadWorker *arg0, u32 source, s32 length, voi
             chunk->length = length;
             chunk->queue = queue;
             chunk->value = value;
-            func_0029B5B0(&arg0->requestQueueStorage, chunk, 1);
+            osJamMesg(&arg0->requestQueueStorage, chunk, 1);
         }
     } else {
         remaining = length;
