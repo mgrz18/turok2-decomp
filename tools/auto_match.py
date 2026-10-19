@@ -145,8 +145,16 @@ def use_arg0_struct(header, typename):
     """
     global HEADER, ARG0_TYPE
     ARG0_TYPE = typename
-    body = "\n".join(l for l in (ROOT / "include" / header).read_text().splitlines()
-                     if not l.startswith("#"))
+    def inline(h, seen):
+        """The header and, first, those it includes from include/ (once each)."""
+        if h in seen:
+            return ""
+        seen.add(h)
+        text = (ROOT / "include" / h).read_text()
+        deps = "".join(inline(m, seen) for m in re.findall(r'^#include "([^"]+)"', text, re.M)
+                       if (ROOT / "include" / m).exists() and m != "common.h")
+        return deps + "\n".join(l for l in text.splitlines() if not l.startswith("#")) + "\n"
+    body = inline(header, set())
     HEADER = HEADER.replace('#include "m2c_macros.h"\n', f'#include "m2c_macros.h"\n#include "{header}"\n')
     protos = []
     for name, proto in PROTOS.items():
