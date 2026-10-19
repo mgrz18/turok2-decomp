@@ -90,11 +90,15 @@ def reduce(text, keep):
         if item.endswith("}") and is_function(item):
             name = func_name(item)
             if name == keep:
-                out.append(item)
+                # Turok 2's other code calls it: it cannot stay file-local.
+                out.append(re.sub(r"^\s*static\s+", "", item))
             else:
                 out.append(re.sub(r"^\s*(static\s+|inline\s+)*", "", item.split("{", 1)[0]).strip() + ";")
             continue
         head = item.lstrip()
+        if "(" in head and func_name(head.rstrip(";").rstrip()) == keep:
+            out.append(re.sub(r"^\s*static\s+", "", item))   # its prototype: the first declaration sets linkage
+            continue
         if head.startswith(("typedef", "extern")) or re.match(r"^(struct|union|enum)\b[^=]*\}\s*;$", head, re.S) \
                 or re.match(r"^(struct|union|enum)\s+\w+\s*;$", head) or "(" in head.split("=", 1)[0] and "=" not in head:
             out.append(item)                    # a type, a prototype or a declaration already
@@ -247,8 +251,10 @@ def build(target, m, args, bodies):
     out.parent.mkdir(parents=True, exist_ok=True)
     if new_syms:
         (out.parent / f"{target}.syms").write_text("".join(f"{n} = 0x{a:08X};\n" for n, a in new_syms.items()))
+    flags = f"/* cc1-flags: {args.cc_flags} */\n" if args.cc_flags else ""
     out.write_text(f"/* From {args.credit}: {m['file']}, {m['ref']}.\n"
-                   f" * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */\n\n" + text)
+                   f" * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */\n"
+                   + flags + "\n" + text)
     res = subprocess.run([sys.executable, str(ROOT / "tools" / "match_func.py"), str(out)],
                          capture_output=True, text=True, env={**os.environ, "MATCH_ELF": "build/ref.elf"})
     line = next((l for l in res.stdout.splitlines() if re.match(rf"^\s+{target}\s", l)), res.stdout[-200:])
@@ -262,6 +268,7 @@ def main():
     ap.add_argument("--include", nargs="*", default=["include"])
     ap.add_argument("--define", nargs="*", default=[])
     ap.add_argument("--credit", required=True)
+    ap.add_argument("--cc-flags", help="cc1 flags the file is built with, written as `/* cc1-flags: */`")
     ap.add_argument("--names", nargs="*")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 8)
     ap.add_argument("--near", type=float, help="take the near ones (>= this ratio, < 1) instead, as permuter "

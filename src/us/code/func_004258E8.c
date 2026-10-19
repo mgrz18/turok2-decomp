@@ -74,7 +74,7 @@ extern OSMesgQueue D_800F6798;
 extern OSPfs D_80130C80[];
 extern s32 D_80130C70[];
 extern s32 D_80130C60[];
-s32 func_00428160(OSMesgQueue *queue, OSPfs *pfs, int channel);
+s32 osPfsInitPak(OSMesgQueue *queue, OSPfs *pfs, int channel);
 s32 func_00425760(s32 pad);
 s32 func_004258E8(s32 pad) {
     s32 i;
@@ -89,7 +89,7 @@ s32 func_004258E8(s32 pad) {
     } else {
         i = 0;
         do {
-            r = func_00428160(&D_800F6798, &D_80130C80[pad], pad);
+            r = osPfsInitPak(&D_800F6798, &D_80130C80[pad], pad);
             switch (r) {
             case 0:
             case 2:

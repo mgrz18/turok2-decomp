@@ -81,10 +81,10 @@ extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
 extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
 extern s32 func_00429EC4(OSPfs *pfs);
 extern s32 func_00429DFC(OSPfs *pfs);
-extern s32 func_004298B8(OSPfs *pfs);
+extern s32 __osGetId(OSPfs *pfs);
 extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 extern s32 func_0042876C(OSPfs *pfs, __OSInodeCache *cache);
-extern s32 func_004288B8(OSPfs *pfs, __OSInodeUnit fpage, __OSInodeCache *cache);
+extern s32 corrupted(OSPfs *pfs, __OSInodeUnit fpage, __OSInodeCache *cache);
 s32 func_00428330(OSPfs *pfs)
 {
     int j;
@@ -102,7 +102,7 @@ s32 func_00428330(OSPfs *pfs)
     int offset;
     ret = func_00429DFC(pfs);
     if (ret == 2) {
-        ret = func_004298B8(pfs);
+        ret = __osGetId(pfs);
     }
     if (ret != 0) {
         return ret;
@@ -128,7 +128,7 @@ s32 func_00428330(OSPfs *pfs)
                     }
                 }
                 if ((cc =
-func_004288B8
+corrupted
 (pfs, next_page, &cache) - cl) != 0) {
                     break;
                 }

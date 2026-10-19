@@ -18,7 +18,7 @@ extern void func_0029C8E0();
 extern Func802C1F10Node *D_800B891C;
 extern void *D_800B8920;
 extern u32 func_0029DFF0(void);
-extern void func_0029BC30(void *arg0, Func802C1F10Node *arg1);
+extern void __osDequeueThread(void *arg0, Func802C1F10Node *arg1);
 extern void func_0029E010(u32);
 void func_0029DE00(Func802C1F10Node *arg0) {
     Func802C1F10Node *node;
@@ -30,7 +30,7 @@ void func_0029DE00(Func802C1F10Node *arg0) {
     if (node == 0) {
         node = D_800B8920;
     } else if (node->field10 != 1) {
-        func_0029BC30(node->field8, node);
+        __osDequeueThread(node->field8, node);
     }
     head = &D_800B891C;
     if (*head == node) {

@@ -56,3 +56,43 @@ __cmpdi2 = 0x002A50E0; // signed 64-bit compare
 __floatdisf = 0x002A5130; // s64 to float
 __divdi3 = 0x002A3AE0; // signed 64-bit divide: called where Rage Wars' C for func_0029F0F0 (thejunkman9000) divides long longs
 __moddi3 = 0x002A40D0; // signed 64-bit remainder: same function
+
+// libultra 2.0I, from decompals/ultralib: compiled with Turok 2's cc1 the way libultra
+// was built (-O3 -mgp32 -mfp32 -fforce-addr -fno-builtin), these are word for word
+// the functions at these addresses (tools/xmatch_ref.py). The VM modules carry a
+// second copy of the Controller Pak code: those are suffixed _2.
+__alCSeqGetTrackEvent = 0x0028EF90; // ultralib 2.0I src/audio/cseq.c: same code
+__CSPHandleMetaMsg = 0x00290ACC; // ultralib 2.0I src/audio/csplayer.c: same code
+alSynAllocVoice = 0x00293F60; // ultralib 2.0I src/audio/synallocvoice.c: same code
+alSynSetVol = 0x002943E0; // ultralib 2.0I src/audio/synsetvol.c: same code
+alSynStopVoice = 0x00294650; // ultralib 2.0I src/audio/synstopvoice.c: same code
+alSynNew = 0x002946D0; // ultralib 2.0I src/audio/synthesizer.c: same code
+osMotorInit = 0x00299198; // ultralib 2.0I src/io/motor.c: same code
+osPiRawStartDma = 0x00299EB0; // ultralib 2.0I src/io/pirawdma.c: same code
+osCreateViManager = 0x0029A720; // ultralib 2.0I src/io/vimgr.c: same code
+osJamMesg = 0x0029B5B0; // ultralib 2.0I src/os/jammesg.c: same code
+__osDequeueThread = 0x0029BC30; // ultralib 2.0I src/os/thread.c: same code
+__osLeoResume = 0x0029D0D4; // ultralib 2.0I src/io/leointerrupt.c: same code
+_Putfld = 0x0029EA34; // ultralib 2.0I src/libc/xprintf.c: same code
+osPfsDeleteFile = 0x00427780; // ultralib 2.0I src/io/pfsdeletefile.c: same code
+osPfsFreeBlocks = 0x00427E60; // ultralib 2.0I src/io/pfsfreeblocks.c: same code
+osPfsInitPak = 0x00428160; // ultralib 2.0I src/io/pfsinitpak.c: same code
+corrupted = 0x004288B8; // ultralib 2.0I src/io/pfschecker.c: same code
+osPfsReadWriteFile = 0x00428CF0; // ultralib 2.0I src/io/pfsreadwritefile.c: same code
+osPfsRepairId = 0x00429130; // ultralib 2.0I src/io/pfsrepairid.c: same code
+__osRepairPackId = 0x00429460; // ultralib 2.0I src/io/contpfs.c: same code
+__osCheckPackId = 0x00429748; // ultralib 2.0I src/io/contpfs.c: same code
+__osGetId = 0x004298B8; // ultralib 2.0I src/io/contpfs.c: same code
+__osIdCheckSum = 0x00429DB4; // ultralib 2.0I src/io/contpfs.c: same code
+__osPfsDeclearPage = 0x00460444; // ultralib 2.0I src/io/pfsallocatefile.c: same code
+osPfsDeleteFile_2 = 0x004606A0; // ultralib 2.0I src/io/pfsdeletefile.c: same code
+__osPfsReleasePages = 0x004608CC; // ultralib 2.0I src/io/pfsdeletefile.c: same code
+__osBlockSum = 0x00460A6C; // ultralib 2.0I src/io/pfsdeletefile.c: same code
+osPfsInitPak_2 = 0x00461080; // ultralib 2.0I src/io/pfsinitpak.c: same code
+osPfsChecker = 0x00461250; // ultralib 2.0I src/io/pfschecker.c: same code
+corrupted_2 = 0x004617D8; // ultralib 2.0I src/io/pfschecker.c: same code
+osPfsFindFile = 0x00462200; // ultralib 2.0I src/io/pfssearchfile.c: same code
+__osCheckPackId_2 = 0x00462668; // ultralib 2.0I src/io/contpfs.c: same code
+__osGetId_2 = 0x004627D8; // ultralib 2.0I src/io/contpfs.c: same code
+__osPfsRWInode = 0x004629C4; // ultralib 2.0I src/io/contpfs.c: same code
+__osCheckId = 0x00462D1C; // ultralib 2.0I src/io/contpfs.c: same code

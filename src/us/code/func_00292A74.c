@@ -165,7 +165,7 @@ typedef struct {
     ALSeqMarker *loopEnd;
     s32 loopCount;
 } ALSeqPlayerFull;
-void func_002943E0(void *drvr, ALVoice *voice, s16 vol, s32 time);
+void alSynSetVol(void *drvr, ALVoice *voice, s16 vol, s32 time);
 void func_002943D0(void *drvr, ALVoice *voice, s16 priority);
 void func_00291034(ALEventQueue *evtq, ALEventFull *evt, ALMicroTime delta);
 void func_002933E0(ALLink *ln, ALLink *to);
@@ -199,7 +199,7 @@ void func_00292A74(ALSeqPlayerFull *seqp, ALVoice *voice, s32 deltaTime) {
     vs->envGain = 0;
     vs->envEndTime = seqp->curTime + deltaTime;
     func_002943D0(seqp->drvr, voice, 0);
-    func_002943E0(seqp->drvr, voice, 0, deltaTime);
+    alSynSetVol(seqp->drvr, voice, 0, deltaTime);
     evt.type = 5;
     evt.msg.voice.voice = voice;
     func_00291034(&seqp->evtq, &evt, deltaTime);

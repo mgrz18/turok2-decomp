@@ -342,13 +342,13 @@ extern void func_0029B020(void *arg0, void *arg1, s32 arg2);
 extern void *func_00292640(void *, s32, s32, s32);
 extern void *func_0029247C(void *, u8, u8, u8);
 extern ALVoiceState *func_002925E0(ALSeqPlayer *, u8, u8);
-extern s32 func_00293F60(ALSynth_func_802B3000_de *, ALVoice_s_func_802B3000_de *, ALVoiceConfig_s *);
+extern s32 alSynAllocVoice(ALSynth_func_802B3000_de *, ALVoice_s_func_802B3000_de *, ALVoiceConfig_s *);
 extern s32 func_00292804(void *, void *);
 extern s16 func_00292774(ALVoiceState *, ALSeqPlayer *);
 extern s32 func_002927E8(void *, s32);
 extern void func_00294540(ALSynth_func_802B3000_de *, ALVoice_s_func_802B3000_de *, void *, f32, s16, u8, u8, s32);
 extern void func_00292A74(void *, void *, s32);
-extern void func_002943E0(void *, void *, s16, s32);
+extern void alSynSetVol(void *, void *, s16, s32);
 extern void func_002942B0(void *, void *, u8);
 extern void func_00294200(void *, void *, u8);
 extern void func_00294340(void *, void *, f32);
@@ -400,7 +400,7 @@ void func_00290240(void *object, ALEvent *message)
             if (!vstate)
                 return;
             voice = &vstate->voice;
-            func_00293F60(seqp->drvr, (ALVoice_s_func_802B3000_de *)voice, &config);
+            alSynAllocVoice(seqp->drvr, (ALVoice_s_func_802B3000_de *)voice, &config);
             vstate->sound = sound;
             vstate->envPhase = 0;
             if (seqp->chanState[chan].sustain > 63)
@@ -490,14 +490,14 @@ void func_00290240(void *object, ALEvent *message)
         if (!vstate)
             return;
         vstate->velocity = byte2;
-        func_002943E0(seqp->drvr, &vstate->voice, func_00292774((ALVoiceState *)vstate, (ALSeqPlayer *)seqp),
+        alSynSetVol(seqp->drvr, &vstate->voice, func_00292774((ALVoiceState *)vstate, (ALSeqPlayer *)seqp),
                       func_002927E8(vstate, seqp->curTime));
         break;
     case 0xD0:
         for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
             if (vs->channel == chan) {
                 vs->velocity = byte1;
-                func_002943E0(seqp->drvr, &vs->voice, func_00292774((ALVoiceState *)vs, (ALSeqPlayer *)seqp),
+                alSynSetVol(seqp->drvr, &vs->voice, func_00292774((ALVoiceState *)vs, (ALSeqPlayer *)seqp),
                               func_002927E8(vs, seqp->curTime));
             }
         }
@@ -518,7 +518,7 @@ void func_00290240(void *object, ALEvent *message)
             for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
                 if ((vs->channel == chan) && (vs->envPhase != 3)) {
                     vol = func_00292774((ALVoiceState *)vs, (ALSeqPlayer *)seqp);
-                    func_002943E0(seqp->drvr, &vs->voice, vol, func_002927E8(vs, seqp->curTime));
+                    alSynSetVol(seqp->drvr, &vs->voice, vol, func_002927E8(vs, seqp->curTime));
                 }
             }
             break;

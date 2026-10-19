@@ -67,7 +67,7 @@ struct __OSDir {
 struct OSMesgQueue;
 extern s32 func_00429DFC(OSPfs *pfs);
 extern s32 func_004292E0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 *file_no);
-extern s32 func_00427E60(OSPfs *pfs, s32 *bytes_not_used);
+extern s32 osPfsFreeBlocks(OSPfs *pfs, s32 *bytes_not_used);
 extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 extern s32 func_00427524(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
                          int *decleared, int *last_page);
@@ -109,7 +109,7 @@ s32 func_00427180(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8
     if (*file_no != -1) {
         return 9;
     }
-    ret = func_00427E60(pfs, &bytes);
+    ret = osPfsFreeBlocks(pfs, &bytes);
     if (file_size_in_bytes > bytes) {
         return 7;
     }

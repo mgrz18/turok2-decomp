@@ -213,9 +213,11 @@ $(BUILD_DIR)/src/%.i: src/%.c
 	@mkdir -p $(dir $@)
 	$(CPP) -MMD -MP -MT $@ -MF $@.d $(CPP_FLAGS) -o $@ $<
 
+# A file may name its own flags in a line `/* cc1-flags: ... */` (libultra
+# was built -O3 -mgp32 -mfp32 -fforce-addr -fno-builtin, not as the game).
 $(BUILD_DIR)/src/%.s_c: $(BUILD_DIR)/src/%.i
 	unix2dos $<
-	$(CC) $(CC_FLAGS) -o $@ $<
+	$(CC) $(or $(shell sed -n 's|^/\* cc1-flags: \(.*\) \*/$$|\1|p' src/$*.c),$(CC_FLAGS)) -o $@ $<
 
 ifeq ($(ASSEMBLER),asn64)
 $(BUILD_DIR)/src/%.c.obj: $(BUILD_DIR)/src/%.s_c

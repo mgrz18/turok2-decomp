@@ -6,7 +6,7 @@ typedef signed int s32;
 typedef unsigned int u32;
 extern int D_800B8908;
 extern void func_0029D000();
-extern void func_0029D0D4();
+extern void __osLeoResume();
 typedef struct DiskTransferInfo {
     u16 command;
     u16 mode;
@@ -30,7 +30,7 @@ void func_0029D000(void) {
         status = *(volatile u32 *)0xA4600010;
     }
     *(volatile u32 *)0xA5000510 = temp_a2->bmControl;
-    func_0029D0D4();
+    __osLeoResume();
     {
         volatile u32 *statusAddr = (volatile u32 *)0xA4600010;
         s32 mask = 0x100401;
@@ -40,4 +40,4 @@ void func_0029D000(void) {
         *flagsAddr = flags | mask;
     }
 }
-void func_0029D0D4(void);
+void __osLeoResume(void);

@@ -28,8 +28,10 @@ esac
 cpp -P -undef -Wall -lang-c -D_LANGUAGE_C -DF3DEX_GBI_2 -D__GNUC__=2 \
     -I/work/include -I/work/us/include -nostdinc -o "$WORK/f.i" "$IN"
 unix2dos -q "$WORK/f.i"
-$CC -quiet -G0 -mips3 $OPT -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 \
-    -o "$WORK/f.s" "$WORK/f.i" 2>"$WORK/cc.log" || { cat "$WORK/cc.log" >&2; exit 1; }
+# A file may name its own flags (`/* cc1-flags: ... */`, as the Makefile reads).
+FLAGS=$(sed -n 's|^/\* cc1-flags: \(.*\) \*/$|\1|p' "$IN" | head -1)
+FLAGS=${FLAGS:-"-quiet -G0 -mips3 $OPT -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64"}
+$CC $FLAGS -o "$WORK/f.s" "$WORK/f.i" 2>"$WORK/cc.log" || { cat "$WORK/cc.log" >&2; exit 1; }
 # asn64 refuses the GNU directives. The Makefile also prepends `.set noat` to
 # quiet $at warnings, but that turns a float load from a symbol (`l.s $f1,
 # D_800A7948`, which needs $at for the %hi) into a hard error. Leave $at alone
