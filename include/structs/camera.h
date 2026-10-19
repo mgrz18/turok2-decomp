@@ -7,14 +7,22 @@
  *     both are libultra's Mtx (8-byte aligned in PR/gbi.h) lining up, so
  *     they are written out as _pad6 and _pad7 here (this Mtx is a plain
  *     byte array, which LibTEngine's CPlayerOverlay at 0x0C needs);
- *   - CMenuPool, CSkySystem and CList are kept opaque at the sizes CCamera
- *     and CCameraPool leave for them.
+ *   - CMenuPool and CSkySystem are kept opaque at the sizes CCamera and
+ *     CCameraPool leave for them.
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
 #include "structs/game_object.h"
 #include "structs/gbi.h"
 
-typedef struct { u8 b[0x14]; } CList;          /* Acclaim's intrusive list; see CList__* */
+/* Acclaim's intrusive list (CList__*): the head and tail element, and where
+ * in an element its links are (the IntrusiveList of the Rage Wars decomp). */
+typedef struct {
+    /* 0x00 */ void *m_pHead;
+    /* 0x04 */ void *m_pTail;
+    /* 0x08 */ s32 m_LastOffset;
+    /* 0x0C */ s32 m_NextOffset;
+    /* 0x10 */ s32 m_nCount;
+} CList; /* size 0x14 */
 
 typedef struct {
     /* 0x00 */ CVector3 m_vNormal;
