@@ -108,6 +108,11 @@ def one(tag, files, write):
     # over the files does too: when an item first appears, everything it
     # needs came before it in that file and is already out.
     out = [pool[k] for k in order]
+    # The basic types are common.h's own, word for word: let a file that has
+    # common.h already (an m2c draft) include this header too.
+    basic = {"s8", "u8", "s16", "u16", "s32", "u32", "s64", "u64", "f32", "f64"}
+    out = [f"#ifndef COMMON_H\n{it}\n#endif" if re.match(r"^\s*typedef\s+[\w\s]+\b(\w+)\s*;\s*$", it)
+           and re.match(r"^\s*typedef\s+[\w\s]+\b(\w+)\s*;\s*$", it).group(1) in basic else it for it in out]
     src = next(k for k, v in SOURCES.items() if v == tag)
     text = (f"/* Types of the functions taken from {src} (tools/import_ref.py),\n"
             " * gathered in one place by tools/centralize_types.py. Their names are that\n"
