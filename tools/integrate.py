@@ -18,7 +18,8 @@ them out and tries again, until `make verify` passes. What it handles:
     left out.
 
 Left-out functions are listed in build/integrate/excluded.txt, with why, so
-the next batch skips them.
+the next batch skips them. It starts from the last commit: src/ and the yaml
+are put back first, so commit one batch before running the next.
 
 Usage (on the build box):
     tools/integrate.py build/manual/abu/func_X.c [...]      # or @list.txt
@@ -70,6 +71,9 @@ def main():
     files = [Path(l.strip()) for a in args for l in (Path(a[1:]).read_text().split() if a.startswith("@") else [a])]
     OUT.mkdir(parents=True, exist_ok=True)
     excluded = dict(l.split(" ", 1) for l in EXCL.read_text().splitlines() if l) if EXCL.exists() else {}
+    # Each attempt starts from the last commit: anything not committed in src/
+    # and the yaml is put back. Commit a finished batch before the next.
+    sh("git checkout -q -- versions/turok2.us.yaml versions/foreign_labels.us.txt src && git clean -fdq src")
     have = {p.stem for p in (ROOT / "src").rglob("func_*.c")}
     todo = {p.stem: p for p in files if p.stem not in have and p.stem not in excluded}
     print(f"{len(files)} files, {len(todo)} to try")
