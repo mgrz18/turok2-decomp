@@ -82,16 +82,33 @@ def engine_functions():
     return sorted(out)
 
 
+def named_addresses():
+    """versions/names.us.txt: real name -> its func_XXXXXXXX name."""
+    text = (ROOT / "versions" / "names.us.txt").read_text()
+    return {n: f"func_{int(a, 16):08X}" for n, a in re.findall(r"^(\w+)\s*=\s*0x([0-9A-Fa-f]+);", text, re.M)}
+
+
 def extract_asm():
-    """name -> the function's asm with ABI register names, for m2c."""
+    """name -> the function's asm with ABI register names, for m2c.
+
+    A function versions/names.us.txt names (osJamMesg) is in the asm under that
+    name; it is also given under its func_XXXXXXXX name, written that way, so
+    the tools that address functions by their address find it.
+    """
     bodies = {}
+    alias = named_addresses()
     for path in sorted(ROOT.glob(ASM_GLOB)):
         text = path.read_text()
-        for m in re.finditer(r"^\.globl (func_[0-9A-F]{8})\n.*?^\.end \1\n", text, re.S | re.M):
+        for m in re.finditer(r"^\.globl (\w+)\n.*?^\.end \1\n", text, re.S | re.M):
+            name = m.group(1)
+            if not name.startswith("func_") and name not in alias:
+                continue
             body = m.group(0)
-            body = body.replace(f".ent {m.group(1)}\n", "").replace(f".end {m.group(1)}\n", "")
+            body = body.replace(f".ent {name}\n", "").replace(f".end {name}\n", "")
             body = re.sub(r"\$(\d+)\b", lambda r: "$" + REGS[int(r.group(1))], body)
-            bodies[m.group(1)] = ".set noat\n.set noreorder\n.section .text\n" + body
+            bodies[name] = ".set noat\n.set noreorder\n.section .text\n" + body
+            if name in alias:
+                bodies[alias[name]] = re.sub(rf"\b{name}\b", alias[name], bodies[name])
     return bodies
 
 

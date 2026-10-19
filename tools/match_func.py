@@ -60,6 +60,11 @@ def rom_symbols():
                 if seg["p_vaddr"] <= v < seg["p_vaddr"] + seg["p_filesz"]:
                     out[sym.name] = (seg["p_paddr"] + v - seg["p_vaddr"], sym["st_size"])
                     break
+    # A named function (versions/names.us.txt) is also found by its address name.
+    text = (ROOT / "versions" / "names.us.txt").read_text()
+    for name, addr in re.findall(r"^(\w+)\s*=\s*0x([0-9A-Fa-f]+);", text, re.M):
+        if name in out:
+            out.setdefault(f"func_{int(addr, 16):08X}", out[name])
     return out
 
 
