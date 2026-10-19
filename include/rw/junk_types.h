@@ -5,13 +5,27 @@
 #ifndef RW_JUNK_TYPES_H
 #define RW_JUNK_TYPES_H
 
+#ifndef COMMON_H
 typedef unsigned char u8;
+#endif
+#ifndef COMMON_H
 typedef signed char s8;
+#endif
+#ifndef COMMON_H
 typedef unsigned short u16;
+#endif
+#ifndef COMMON_H
 typedef unsigned int u32;
+#endif
+#ifndef COMMON_H
 typedef unsigned long long u64;
+#endif
+#ifndef COMMON_H
 typedef signed int s32;
+#endif
+#ifndef COMMON_H
 typedef float f32;
+#endif
 typedef void *OSMesg;
 typedef s32 OSPri;
 typedef s32 OSId;
@@ -119,7 +133,9 @@ typedef struct B12Msg {
 typedef struct Vec3f {
     f32 x, y, z;
 } Vec3f;
+#ifndef COMMON_H
 typedef signed short s16;
+#endif
 typedef struct R05Anim {
                f32 time;
                s16 f4;
@@ -800,7 +816,9 @@ typedef struct {
     s32 f44;
     s32 motion;
 } ALEnvMixer;
+#ifndef COMMON_H
 typedef signed long long s64;
+#endif
 typedef struct {
     s64 quot;
     s64 rem;

@@ -142,6 +142,29 @@ def use_arg0_struct(header, typename):
     CONTEXT.write_text(TYPEDEFS + body + "\n" + "\n".join(PROTOS.values()) + "\n" + "\n".join(protos) + "\n")
 
 
+def use_rw_protos():
+    """Type the drafts with Rage Wars' real prototypes (tools/rw_protos.py).
+
+    The types (include/rw/abu_types.h, minus the basic ones common.h already
+    has) go into m2c's context and the drafts include include/rw/abu_protos.h.
+    A callee in it is declared that way; a candidate in it also gets its own
+    prototype under its draft name, so m2c types its parameters.
+    """
+    global HEADER
+    types = (ROOT / "include" / "rw" / "abu_types.h").read_text()
+    types = re.sub(r"#ifndef COMMON_H\n.*?\n#endif\n?", "", types)            # common.h's own
+    types = re.sub(r"__attribute__\s*\(\((?:[^()]|\([^()]*\))*\)\)", "", types)                 # m2c's parser has no GCC attributes
+    types = "\n".join(l for l in types.splitlines() if not l.startswith("#"))
+    HEADER = HEADER.replace('#include "m2c_macros.h"\n', '#include "m2c_macros.h"\n#include "rw/abu_protos.h"\n')
+    own = []
+    for line in (ROOT / "include" / "rw" / "abu_protos.h").read_text().splitlines():
+        m = re.match(r"^.*?\b(\w+)\s*\(", line)
+        if m and line.rstrip().endswith(";") and not line.startswith(("#", "/*", " *")):
+            PROTOS[m.group(1)] = line
+            own.append(re.sub(rf"\b{m.group(1)}\s*\(", f"{m.group(1)}_draft(", line, count=1))
+    CONTEXT.write_text(TYPEDEFS + types + "\n" + "\n".join(PROTOS.values()) + "\n" + "\n".join(own) + "\n")
+
+
 def write_context():
     """Load common.h's typedefs and include/functions.h's prototypes.
 
@@ -731,6 +754,8 @@ def main():
     ap.add_argument("--arg0-struct", metavar="HEADER:TYPE",
                     help="draft with arg0 typed as TYPE * (struct from include/HEADER), e.g. "
                          "structs/game_object.h:CGameObjectInstance")
+    ap.add_argument("--rw-protos", action="store_true",
+                    help="type the drafts with Rage Wars' prototypes (include/rw/abu_protos.h)")
     ap.add_argument("--save-near", type=Path,
                     help="write each non-matching function's closest draft here, for tools/permuter")
     args = ap.parse_args()
@@ -751,6 +776,8 @@ def main():
     write_context()
     if args.arg0_struct:
         use_arg0_struct(*args.arg0_struct.split(":"))
+    if args.rw_protos:
+        use_rw_protos()
     load_jtbls()
     global WITH_CONSTS, ROM_BYTES
     WITH_CONSTS = args.rdata

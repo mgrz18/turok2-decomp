@@ -27,14 +27,30 @@ typedef struct {
                unsigned int flags;
                char qual;
 } _Pft;
+#ifndef COMMON_H
 typedef unsigned char u8;
+#endif
+#ifndef COMMON_H
 typedef unsigned short u16;
+#endif
+#ifndef COMMON_H
 typedef unsigned long u32;
+#endif
+#ifndef COMMON_H
 typedef unsigned long long u64;
+#endif
+#ifndef COMMON_H
 typedef signed char s8;
+#endif
+#ifndef COMMON_H
 typedef long s32;
+#endif
+#ifndef COMMON_H
 typedef float f32;
+#endif
+#ifndef COMMON_H
 typedef double f64;
+#endif
 typedef s32 OSPri;
 typedef s32 OSId;
 typedef union {

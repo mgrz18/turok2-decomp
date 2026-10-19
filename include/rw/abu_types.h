@@ -5,7 +5,9 @@
 #ifndef RW_ABU_TYPES_H
 #define RW_ABU_TYPES_H
 
+#ifndef COMMON_H
 typedef signed int s32;
+#endif
 struct IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -15,9 +17,15 @@ struct IntrusiveList {
     s32 count;
 };
 typedef struct IntrusiveList IntrusiveList;
+#ifndef COMMON_H
 typedef unsigned char u8;
+#endif
+#ifndef COMMON_H
 typedef unsigned int u32;
+#endif
+#ifndef COMMON_H
 typedef signed char s8;
+#endif
 struct Access_u8_3;
 struct Access_u8_3 {
     char pad[0x3];
@@ -229,7 +237,9 @@ struct EntryList {
 };
 typedef struct EntryList EntryList;
 typedef struct EntryRecAt18V3 EntryRecAt18V3;
+#ifndef COMMON_H
 typedef unsigned long long u64;
+#endif
 typedef union Gfx {
     struct { u32 w0; u32 w1; } words;
     u64 force_structure_alignment;
@@ -252,7 +262,9 @@ struct TreeNode {
     struct TreeNode *link1c;
 };
 typedef struct TreeNode TreeNode;
+#ifndef COMMON_H
 typedef float f32;
+#endif
 struct BoxRecAtC;
 typedef struct BoxRecAtC BoxRecAtC;
 struct BoxRecAtC {
@@ -336,7 +348,9 @@ struct ObjectRecAtBC {
     u8 animationSeed;
 };
 typedef struct ObjectRecAtBC ObjectRecAtBC;
+#ifndef COMMON_H
 typedef double f64;
+#endif
 struct Output8025EF54;
 typedef struct Output8025EF54 Output8025EF54;
 struct Output8025EF54 {
@@ -383,7 +397,9 @@ struct Segment8025FFD0 {
     s32 unk28;
     s32 unk2C;
 };
+#ifndef COMMON_H
 typedef signed short s16;
+#endif
 struct Triple;
 struct Triple {
     s32 x;
@@ -483,7 +499,9 @@ struct Stream {
     u32 unk24;
     s32 unk28;
 };
+#ifndef COMMON_H
 typedef unsigned short u16;
+#endif
 typedef struct AnimRef {
                char pad0[4];
                u16 id;
@@ -2273,7 +2291,9 @@ struct Obj80264124 {
     char object[1];
 };
 typedef struct Obj80264124 Obj80264124;
+#ifndef COMMON_H
 typedef signed long long s64;
+#endif
 struct OSSched;
 struct View_func_8028FA60_de;
 typedef struct View_func_8028FA60_de View_func_8028FA60_de;
