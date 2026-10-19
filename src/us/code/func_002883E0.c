@@ -1,14 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80291074_de_8.c, func_8029311C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef unsigned long long u64;
-typedef union Gfx {
-    struct { u32 w0; u32 w1; } words;
-    u64 force_structure_alignment;
-} Gfx;
+#include "rw/abu_types.h"
+
 extern Gfx *D_800D8E24;
 extern s32 func_00207FEC(s32);
 extern void func_00207A70(u32);

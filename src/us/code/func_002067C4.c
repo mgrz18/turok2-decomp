@@ -1,24 +1,12 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80254D44_de.c, func_80254F9C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 extern s32 D_800D81D0;
 extern int D_800D8210[];
 extern s32 D_800D8DA4[];
 extern s32 D_800D8DD0;
-struct Node80254C10;
-typedef struct Node80254C10 Node80254C10;
-struct Node80254C10;
-struct Node80254C10 {
-    u32 start;
-    u32 end;
-    s32 unk_8;
-    u32 flags;
-    s32 stamp;
-    char pad14[0x10];
-    struct Node80254C10 *next;
-};
 extern int D_800AB0C0;
 extern void osSendMesg(void *arg0, s32 arg1, s32 arg2);
 void func_002067C4(s32 unused, s32 arg1) {

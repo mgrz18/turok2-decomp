@@ -1,71 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025D928_de_12.c, func_802B3A44_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef signed int s32;
-typedef struct {
-    unsigned int w0;
-    unsigned int w1;
-} Awords;
-typedef union {
-    Awords words;
-    long long int force_union_align;
-} Acmd;
-typedef Acmd *(*ALCmdHandler)(void *, short *, int, int, Acmd *);
-typedef int (*ALVoiceHandler)(void *);
-typedef int (*ALSetParam)(void *, int, void *);
-struct ALPlayer_s14;
-struct ALPlayer_s14 {
-    struct ALPlayer_s14 *next;
-    void *clientData;
-    ALVoiceHandler handler;
-    s32 callTime;
-    s32 samplesLeft;
-};
-struct ALPlayer_s14;
-typedef struct ALPlayer_s14 ALPlayer_s14;
-struct ListLink;
-struct ListLink {
-    struct ListLink *next;
-    struct ListLink *prev;
-};
-struct ListLink;
-typedef struct ListLink ListLink;
-struct ALFilter_sC;
-struct ALFilter_sC {
-    struct ALFilter_sC *source;
-    ALCmdHandler handler;
-    ALSetParam setParam;
-};
-struct ALFilter_sC;
-typedef struct ALFilter_sC ALFilter_sC;
-struct ALSynth4C;
-struct ALSynth4C {
-    ALPlayer_s14 *head;
-    ListLink pFreeList;
-    ListLink pAllocList;
-    ListLink pLameList;
-    s32 paramSamples;
-    s32 curSamples;
-    void *dma;
-    void *heap;
-    void *paramList;
-    void *mainBus;
-    void *auxBus;
-    ALFilter_sC *outputFilter;
-    s32 numPVoices;
-    s32 maxAuxBusses;
-    s32 outputRate;
-    s32 maxOutSamples;
-};
-struct ALSynth4C;
-typedef struct ALSynth4C ALSynth4C;
-struct ALGlobals;
-struct ALGlobals {
-    ALSynth4C drvr;
-};
-struct ALGlobals;
-typedef struct ALGlobals ALGlobals;
+#include "rw/abu_types.h"
+
 extern s32 func_00294C70(ALSynth4C *drvr, ALPlayer_s14 **client);
 extern s32 func_00294D18(ALSynth4C *, s32);
 extern void func_00294BDC(ALSynth4C *);

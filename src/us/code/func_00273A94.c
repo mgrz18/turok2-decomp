@@ -1,50 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025A844_de_4.c, func_8025B758_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-struct RecordCode8025A3EC;
-typedef struct RecordCode8025A3EC RecordCode8025A3EC;
-struct RecordCode8025A3EC;
-struct RecordCode8025A3EC {
-    s32 index;
-    char pad04[4];
-    s32 f08;
-    s32 f0C;
-    char pad10[4];
-    s32 f14;
-    char pad18[0x14];
-    f32 f2C;
-    char pad30[4];
-    f32 f34;
-    s16 f38;
-    s16 f3A;
-    char pad3C[4];
-    s32 f40;
-    char pad44[0x14];
-    s32 f58;
-    s32 f5C;
-    char pad60[0x44];
-    s32 fA4;
-    char padA8[4];
-    s32 fAC;
-    s32 owner;
-    s32 fB4;
-    f32 fB8;
-    s32 fBC;
-    s32 fC0;
-    s32 fC4;
-    f32 fC8;
-};
-struct ObjRecAt4V6;
-struct ObjRecAt4V6 {
-    char pad0[0x4];
-    RecordCode8025A3EC unk4;
-};
-struct ObjRecAt4V6;
-typedef struct ObjRecAt4V6 ObjRecAt4V6;
+#include "rw/abu_types.h"
+
 extern float D_800A8174;
 extern float D_800A8178;
 extern s16 D_800F2940[];

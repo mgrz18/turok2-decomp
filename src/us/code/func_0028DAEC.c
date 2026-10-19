@@ -1,28 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0023BC64.c, func_0023BC64.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef struct B09LNode B09LNode;
-struct B09LNode {
-               B09LNode *next;
-               B09LNode *prev;
-               u16 slot;
-               u8 id;
-               u8 tlb;
-               s32 unkC;
-};
-typedef struct B09SlotA {
-            u16 key;
-            u8 a;
-            u8 b;
-} B09SlotA;
-typedef struct B09SlotCtl {
-            u16 cur;
-            u16 start;
-} B09SlotCtl;
+#include "rw/junk_types.h"
+
 extern B09SlotA D_80121318[];
 extern B09LNode D_80120FC0[];
 extern B09SlotCtl D_80121390;

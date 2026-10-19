@@ -1,82 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BE0D0_de_9.c, func_802BE514_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct {
-    unsigned int w0;
-    unsigned int w1;
-} Awords;
-typedef union {
-    Awords words;
-    long long int force_union_align;
-} Acmd;
-typedef Acmd *(*ALCmdHandler)(void *, short *, int, int, Acmd *);
-typedef int (*ALDMAproc)(int addr, int len, void *state);
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef unsigned int u32;
-struct ALFilter_s14;
-typedef struct ALFilter_s14 ALFilter_s14;
-struct ALFilter_s14;
-struct ALFilter_s14 {
-    struct ALFilter_s14 *source;
-    ALCmdHandler handler;
-    void *setParam;
-    s16 inp;
-    s16 outp;
-    s32 type;
-};
-struct ALRawLoop;
-typedef struct ALRawLoop ALRawLoop;
-struct ALRawLoop;
-struct ALRawLoop {
-    u32 start;
-    u32 end;
-    u32 count;
-};
-struct ALADPCMWaveInfo_func_802BE514_de;
-typedef struct ALADPCMWaveInfo_func_802BE514_de ALADPCMWaveInfo_func_802BE514_de;
-struct ALADPCMBook;
-typedef struct ALADPCMBook ALADPCMBook;
-struct ALADPCMBook;
-struct ALADPCMBook {
-    s32 order;
-    s32 npredictors;
-    s16 book[1];
-};
-struct ALADPCMWaveInfo_func_802BE514_de;
-struct ALADPCMWaveInfo_func_802BE514_de {
-    void *loop;
-    ALADPCMBook *book;
-};
-struct ALWaveTableSCode802BE0D0;
-struct ALWaveTableSCode802BE0D0 {
-    u8 *base;
-    s32 len;
-    u8 type;
-    u8 flags;
-    union {
-        ALADPCMWaveInfo_func_802BE514_de adpcmWave;
-    } waveInfo;
-};
-struct ALLoadFilter_func_802BE514_de;
-struct ALWaveTableSCode802BE0D0;
-struct ALLoadFilter_func_802BE514_de {
-    ALFilter_s14 filter;
-    void *state;
-    void *lstate;
-    ALRawLoop loop;
-    struct ALWaveTableSCode802BE0D0 *table;
-    s32 bookSize;
-    ALDMAproc dma;
-    void *dmaState;
-    s32 sample;
-    s32 lastsam;
-    s32 first;
-    s32 memin;
-};
-struct ALLoadFilter_func_802BE514_de;
-typedef struct ALLoadFilter_func_802BE514_de ALLoadFilter_func_802BE514_de;
+#include "rw/abu_types.h"
+
 extern Acmd *func_0029F5D4(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
 Acmd *func_0029F5D4(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {

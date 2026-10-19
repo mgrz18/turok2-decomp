@@ -1,26 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802744AC_de_4.c, func_80275AA4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct Packed;
-struct Packed {
-    unsigned short unk0;
-    unsigned short unk2;
-    unsigned short first[3];
-    unsigned short second[3];
-    int unk10;
-};
-struct Packed;
-typedef struct Packed Packed;
-struct HeaderRecAt1C;
-struct HeaderRecAt1C {
-    short unk0;
-    short unk2;
-    void *first[3];
-    void *second[3];
-    int unk1C;
-};
-struct HeaderRecAt1C;
-typedef struct HeaderRecAt1C HeaderRecAt1C;
+#include "rw/abu_types.h"
+
 extern void func_0026BB30(HeaderRecAt1C *dst, Packed *src, char *base, int unused, char *extra);
 void func_0026BB30(HeaderRecAt1C *dst, Packed *src, char *base, int unused, char *extra) {
     int i;

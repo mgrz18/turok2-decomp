@@ -1,42 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra/part_800C7F20/code_802B8200.c, func_802B3130_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-struct ListLink;
-struct ListLink {
-    struct ListLink *next;
-    struct ListLink *prev;
-};
-struct ListLink;
-typedef struct ListLink ListLink;
-struct ALSynth_func_802B3000_de;
-typedef struct ALSynth_func_802B3000_de ALSynth_func_802B3000_de;
-struct ALSynth_func_802B3000_de;
-struct ALSynth_func_802B3000_de {
-    void *head;
-    ListLink pFreeList;
-    ListLink pAllocList;
-    ListLink pLameList;
-    s32 paramSamples;
-};
-struct Limit;
-struct Limit {
-    char pad[0x16];
-    s16 limit;
-};
-struct Node_func_802B3130_de;
-typedef struct Node_func_802B3130_de Node_func_802B3130_de;
-struct Limit;
-struct Node_func_802B3130_de;
-struct Node_func_802B3130_de {
-    struct Node_func_802B3130_de *next;
-    char pad4[4];
-    struct Limit *limit;
-    char padC[0xCC];
-    s32 flags;
-};
+#include "rw/abu_types.h"
+
 extern void func_002933B0(void *arg0);
 extern void func_002933E0(void *arg0, void **arg1);
 s32 func_00294090(void *arg0, void **arg1, s16 arg2) {

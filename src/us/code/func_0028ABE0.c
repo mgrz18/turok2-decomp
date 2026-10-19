@@ -1,33 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8028DF90_de_7.c, func_8028F544_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-struct Ctx_func_8028F544_de;
-struct Node_func_8028F544_de;
+#include "rw/abu_types.h"
+
 extern s32 func_0028ABE0(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
 extern void *func_0029A6E0();
-struct Ctx_func_8028F544_de;
-typedef struct Ctx_func_8028F544_de Ctx_func_8028F544_de;
-struct Node_func_8028F544_de;
-typedef struct Node_func_8028F544_de Node_func_8028F544_de;
-struct Node_func_8028F544_de;
-struct Node_func_8028F544_de {
-    struct Node_func_8028F544_de *unk0;
-    s32 unk4;
-    s32 unk8;
-    s32 unkC;
-};
-struct Ctx_func_8028F544_de;
-struct Node_func_8028F544_de;
-struct Ctx_func_8028F544_de {
-    char p0[0x2E4];
-    struct Node_func_8028F544_de *unk2E4;
-    struct Node_func_8028F544_de *unk2E8;
-    s32 unk2EC;
-    s32 unk2F0;
-    char p1[0xC];
-    s32 unk300;
-};
 extern s32 D_8011B098;
 extern s32 D_8011B0A0;
 s32 func_0028ABE0(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node_func_8028F544_de **arg2, s32 arg3) {

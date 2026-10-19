@@ -1,31 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8044D668_de.c, func_8044D804_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-struct GroupCode8044E2B8;
-typedef struct GroupCode8044E2B8 GroupCode8044E2B8;
-struct Piece;
-typedef struct Piece Piece;
-struct Piece;
-struct Piece {
-    char pad0[0x14];
-    s32 tag;
-    s32 unk18;
-    s32 unk1C;
-    s32 unk20;
-    s32 unk24;
-    s32 unk28;
-    s32 unk2C;
-    s32 unk30;
-    s32 unk34;
-    s32 unk38;
-};
-struct GroupCode8044E2B8;
-struct GroupCode8044E2B8 {
-    s32 unk0;
-    s32 count;
-    Piece pieces[1];
-};
+#include "rw/abu_types.h"
+
 extern s32 func_00200B00(void ***, s32);
 extern void *func_002017D4(void *, s32);
 extern s32 func_00224F84(s32, s32);

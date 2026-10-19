@@ -1,38 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B8F48_de_39.c, func_802B9E78_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef unsigned long long u64;
+#include "rw/abu_types.h"
+
 extern int __osSpDeviceBusy();
-struct OSTask_t;
-struct OSTask_t {
-    u32 type;
-    u32 flags;
-    u64 *ucode_boot;
-    u32 ucode_boot_size;
-    u64 *ucode;
-    u32 ucode_size;
-    u64 *ucode_data;
-    u32 ucode_data_size;
-    u64 *dram_stack;
-    u32 dram_stack_size;
-    u64 *output_buff;
-    u64 *output_buff_size;
-    u64 *data_ptr;
-    u32 data_size;
-    u64 *yield_data_ptr;
-    u32 yield_data_size;
-};
-struct OSTask_t;
-typedef struct OSTask_t OSTask_t;
-union OSTask;
-union OSTask {
-    OSTask_t t;
-    long long force_structure_alignment;
-};
-union OSTask;
-typedef union OSTask OSTask;
 extern void __osSpSetStatus(unsigned int arg0);
 extern s32 func_0029A3A0(s32 direction, s32 spAddress, s32 dramAddress, s32 size);
 extern OSTask *func_0029A160(OSTask *arg0);

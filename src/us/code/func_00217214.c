@@ -1,26 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025E590_de_8.c, func_8025FD74_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-typedef double f64;
-struct Curve;
-typedef struct Curve Curve;
-struct Curve;
-struct Curve {
-    s32 unk0;
-    f32 unk4;
-    f32 unk8;
-    s32 unkC;
-    f32 unk10;
-    f32 unk14;
-    f32 unk18;
-    f32 unk1C;
-    u32 unk20;
-    s32 unk24;
-    s32 unk28;
-};
+#include "rw/abu_types.h"
+
 s32 func_00217C58(s32 *, s32);
 void func_00217214(Curve *arg0)
 {

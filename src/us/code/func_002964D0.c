@@ -1,43 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B53FC_de_padding_B5FFC_12.c, func_802B5570_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct {
-    unsigned int w0;
-    unsigned int w1;
-} Awords;
-typedef union {
-    Awords words;
-    long long int force_union_align;
-} Acmd;
-typedef Acmd *(*ALCmdHandler)(void *, short *, int, int, Acmd *);
-typedef signed short s16;
-typedef signed int s32;
-typedef float f32;
-struct ALFilter_s14_2;
-typedef struct ALFilter_s14_2 ALFilter_s14_2;
-struct ALFilter_s14_2;
-struct ALFilter_s14_2 {
-    struct ALFilter_s14_2 *source;
-    ALCmdHandler handler;
-    void *setParam;
-    s16 inp;
-    s16 outp;
-    s32 type;
-};
-struct ALResampler_s;
-struct ALResampler_s {
-    ALFilter_s14_2 filter;
-    void *state;
-    f32 ratio;
-    s32 upitch;
-    f32 delta;
-    s32 first;
-    void *ctrlList;
-    void *ctrlTail;
-    s32 motion;
-};
-struct ALResampler_s;
-typedef struct ALResampler_s ALResampler_s;
+#include "rw/abu_types.h"
+
 extern float D_800AA688;
 extern float D_800AA680;
 extern float D_800AA684;

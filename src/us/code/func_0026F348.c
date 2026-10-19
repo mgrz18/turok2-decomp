@@ -1,23 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80295FF4_de_8.c, func_80296878_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef float f32;
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
-struct PlaneEquation;
-struct PlaneEquation {
-    Vec3 normal;
-    f32 distance;
-};
-struct PlaneEquation;
-typedef struct PlaneEquation PlaneEquation;
+#include "rw/abu_types.h"
+
 void func_0026F348(void *arg0, void *arg1, void *arg2, void *arg3) {
     extern void func_0020F040(void *out);
     extern void func_0020EFDC(void *out, void *a, void *b);

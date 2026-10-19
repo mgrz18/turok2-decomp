@@ -1,40 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B7B80_us_30.c, func_802B8CF0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-struct Queue;
-struct Queue {
-    char pad[0x14];
-    s32 items[4];
-};
-struct Queue;
+#include "rw/abu_types.h"
+
 extern int D_800B8960;
-struct OSIoMesg;
-typedef struct OSIoMesg OSIoMesg;
-struct OSIoMesgHdr;
-typedef struct OSIoMesgHdr OSIoMesgHdr;
-struct Opaque_OSMesgQueue;
-typedef struct Opaque_OSMesgQueue Opaque_OSMesgQueue;
-struct OSIoMesgHdr;
-struct OSIoMesgHdr {
-    u16 type;
-    u8 pri;
-    u8 status;
-    Opaque_OSMesgQueue *retQueue;
-};
-struct OSIoMesg;
-struct OSIoMesg {
-    OSIoMesgHdr hdr;
-    void *dramAddr;
-    u32 devAddr;
-    u32 size;
-    void *piHandle;
-};
-typedef struct Queue Queue;
 extern s32 D_800B8960;
 extern Queue *func_002A3060(void);
 extern s32 osJamMesg(Queue *, void *, s32);

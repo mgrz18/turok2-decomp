@@ -1,70 +1,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BA210_de_34.c, func_802BA910_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-typedef double f64;
-struct __OSViScale;
-struct __OSViScale {
-    f32 factor;
-    u16 offset;
-    u32 scale;
-};
+#include "rw/abu_types.h"
+
 extern float D_800AA8D8;
-struct OSViCommonRegs;
-struct OSViCommonRegs {
-    u32 ctrl;
-    u32 width;
-    u32 burst;
-    u32 vSync;
-    u32 hSync;
-    u32 leap;
-    u32 hStart;
-    u32 xScale;
-    u32 vCurrent;
-};
 extern double D_800AA8D0;
-struct OSViFieldRegs;
-typedef struct OSViFieldRegs OSViFieldRegs;
 extern void func_0029ACE0();
-struct OSViCommonRegs;
-typedef struct OSViCommonRegs OSViCommonRegs;
-struct OSViFieldRegs;
-struct OSViFieldRegs {
-    u32 origin;
-    u32 yScale;
-    u32 vStart;
-    u32 vBurst;
-    u32 vIntr;
-};
-struct Modep;
-struct Modep {
-    u8 type;
-    OSViCommonRegs comRegs;
-    OSViFieldRegs fldRegs[2];
-};
-struct Modep;
-typedef struct Modep Modep;
-struct __OSViScale;
-typedef struct __OSViScale __OSViScale;
-struct Modep;
-struct __OSViContext_func_802BA910_de;
-struct __OSViContext_func_802BA910_de {
-    u16 state;
-    u16 retraceCount;
-    void *framep;
-    struct Modep *modep;
-    u32 control;
-    void *msgq;
-    void *msg;
-    __OSViScale x;
-    __OSViScale y;
-};
-struct __OSViContext_func_802BA910_de;
-typedef struct __OSViContext_func_802BA910_de __OSViContext_func_802BA910_de;
 extern __OSViContext_func_802BA910_de *D_800B7AC0;
 extern __OSViContext_func_802BA910_de *D_800B7AC4;
 extern u32 func_0029BF80(void *addr);

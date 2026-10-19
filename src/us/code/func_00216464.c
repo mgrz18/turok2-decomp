@@ -1,36 +1,13 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025E590_de_6.c, func_8025EF34_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-typedef double f64;
+#include "rw/abu_types.h"
+
 extern float D_800E679C;
-struct Output8025EF54;
-typedef struct Output8025EF54 Output8025EF54;
-struct Output8025EF54;
-struct Output8025EF54 {
-    f32 value;
-    s32 pad04;
-    s32 pad08;
-    s32 pad0C;
-};
 extern void func_00216464(u32 *stream, Output8025EF54 *out, s32 count);
 extern float func_00217AD4(float value, int bits);
-struct Decode8025EF54;
-struct Decode8025EF54 {
-    s32 bits;
-    f32 base;
-    f32 range;
-    s32 unused;
-    u32 stream;
-    s32 first_bits;
-    s32 second_bits;
-};
 extern double D_800A5958;
 extern double D_800A5960;
-struct Decode8025EF54;
-typedef struct Decode8025EF54 Decode8025EF54;
 extern s32 D_800E6798;
 extern s32 D_800E6798;
 extern f32 D_800E67A0;

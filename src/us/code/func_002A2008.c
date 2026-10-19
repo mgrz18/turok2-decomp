@@ -1,8 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002012D8.c, func_002012D8.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned int u32;
-typedef signed int s32;
+#include "rw/junk_types.h"
+
 u32 func_002A1384(u32 addr);
 void func_002A1350(u32 addr, u32 val);
 void func_002A13BC(s32 n);

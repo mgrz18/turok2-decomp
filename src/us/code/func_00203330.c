@@ -1,32 +1,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80250938_de_3.c, func_802515F0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-struct IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-typedef struct IntrusiveList IntrusiveList;
+#include "rw/abu_types.h"
+
 extern void func_002007D0(IntrusiveList *arg0);
 extern void func_00203330(s32, s32);
 extern IntrusiveList D_800D81F4;
-struct Node80254C10;
-typedef struct Node80254C10 Node80254C10;
-struct Node80254C10;
-struct Node80254C10 {
-    u32 start;
-    u32 end;
-    s32 unk_8;
-    u32 flags;
-    s32 stamp;
-    char pad14[0x10];
-    struct Node80254C10 *next;
-};
 extern void CList__Construct(IntrusiveList *list, s32 prevOffset, s32 nextOffset);
 extern s32 CList__AddTail(IntrusiveList *list, void *node);
 extern s32 func_002024E0(void *, s32);

@@ -1,13 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802609AC_de.c, func_80260DA8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct BitFieldSource;
-typedef struct BitFieldSource BitFieldSource;
-struct BitFieldSource;
-struct BitFieldSource {
-    int base;
-    unsigned int width;
-};
+#include "rw/abu_types.h"
+
 extern int func_00218248(BitFieldSource *arg0, int arg1);
 int func_00218248(BitFieldSource *arg0, int arg1) {
     int bitAddress;

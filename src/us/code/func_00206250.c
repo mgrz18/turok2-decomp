@@ -1,30 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80250938_de_14.c, func_80254A28_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-struct Pool;
-struct Pool {
-    s32 count;
-    char pad[0x40];
-    s32 field44;
-};
-struct Pool;
-typedef struct Pool Pool;
-struct ResourceCacheEntry;
-struct ResourceCacheEntry {
-    s32 resource;
-    s32 size;
-    s32 references;
-    s32 flags;
-    s32 lastUsed;
-    s32 owner;
-    struct ResourceCacheEntry *next;
-    s32 key;
-    s32 pending;
-    s32 callback;
-};
-struct ResourceCacheEntry;
-typedef struct ResourceCacheEntry ResourceCacheEntry;
+#include "rw/abu_types.h"
+
 extern void *func_00206250(s32 unused0, s32 arg1);
 extern s32 CList__AddHead(void *arg0, s32 arg1);
 void *func_00206250(s32 unused0, s32 arg1) {

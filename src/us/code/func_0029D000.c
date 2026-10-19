@@ -1,20 +1,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BCC90_de_18.c, func_802BCC90_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 extern int D_800B8908;
 extern void func_0029D000();
 extern void __osLeoResume();
-typedef struct DiskTransferInfo {
-    u16 command;
-    u16 mode;
-    u32 block;
-    s32 sector;
-    u32 deviceAddress;
-    u32 bmControl;
-} DiskTransferInfo;
 extern char *D_80123AD4;
 void func_0029D000(void) {
     DiskTransferInfo *temp_a2;

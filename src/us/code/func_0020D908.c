@@ -1,18 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8026E1F8_de_6.c, func_80270910_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
+#include "rw/abu_types.h"
+
 extern float D_800A54FC;
 extern float D_800A54F8;
-struct PackedMatrixWords;
-struct PackedMatrixWords {
-    u32 upper[8];
-    u32 lower[8];
-};
-struct PackedMatrixWords;
-typedef struct PackedMatrixWords PackedMatrixWords;
 void func_0020D908(f32 *dst, PackedMatrixWords *src) {
     u32 upper;
     u32 lower;

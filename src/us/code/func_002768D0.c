@@ -1,60 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025C524_de_8.c, func_8025CC90_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-struct SongHeader;
-struct SongHeader {
-    u32 tempo;
-    u16 volume;
-};
-struct SongHeader;
-typedef struct SongHeader SongHeader;
-struct Bank;
-struct Bank {
-    char pad0[0x2B50];
-    void *songs;
-};
-struct Bank;
-struct PlayerRecAt24;
-struct PlayerRecAt24 {
-    struct Bank *bank;
-    char pad4[4];
-    u32 state;
-    s32 loop;
-    s32 song;
-    s32 speed;
-    char pad18[3];
-    u8 priority;
-    char pad1C[2];
-    s16 id;
-    f32 tempoScale;
-    f32 volume;
-};
-struct QueueRec;
-typedef struct QueueRec QueueRec;
-struct QueueRec;
-struct QueueRec {
-    void *sequence;
-    s32 head;
-    u8 kind;
-    s32 tail;
-};
-struct Bank;
-typedef struct Bank Bank;
-struct PlayerRecAt24;
-typedef struct PlayerRecAt24 PlayerRecAt24;
-struct func_80203E78_S1;
-struct func_80203E78_S1 {
-    char pad0[0x4];
-    s32 unk4;
-};
-struct func_80203E78_S1;
-typedef struct func_80203E78_S1 func_80203E78_S1;
+#include "rw/abu_types.h"
+
 extern void func_002A12DC();
 extern QueueRec D_800F55F4[];
 extern void func_002A12CC(void);

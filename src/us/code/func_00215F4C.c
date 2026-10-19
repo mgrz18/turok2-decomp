@@ -1,25 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0025EA3C.c, func_0025EA3C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef struct R05Anim {
-               f32 time;
-               s16 f4;
-               s16 f6;
-               s16 count;
-               u8 padA[2];
-               u32 loopStart;
-               void **data;
-} R05Anim;
-typedef struct R05CurveCfg {
-               u8 pad0[0x18];
-               f32 n;
-               f32 scale;
-} R05CurveCfg;
+#include "rw/junk_types.h"
+
 extern const f32 D_800A58F4;
 void *func_002017D4(void *t, s32 i);
 void func_0020DAA4(f32 *out, f32 t, void *a, void *b);

@@ -1,24 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80246E44_de_7.c, func_802480F0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
-struct SineTable;
-struct SineTable {
-    f32 count;
-    f32 value[120];
-};
-struct SineTable;
-typedef struct SineTable SineTable;
+#include "rw/abu_types.h"
+
 extern SineTable D_800ACBF8;
 extern s32 D_800B6D18;
 extern void func_0020F040(Vec3 *);

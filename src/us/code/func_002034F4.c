@@ -1,50 +1,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80250938_de_3.c, func_802517B4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-struct IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-typedef struct IntrusiveList IntrusiveList;
-struct Shape_func_8021A2D4_de_2;
-struct Shape_func_8021A2D4_de_2 {
-    int field_0;
-};
-struct OSMesgQueue;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
+#include "rw/abu_types.h"
+
 extern int D_800D8DCC;
-struct OSMesgQueue;
-struct HashNode;
-struct HashNode {
-    s32 key;
-    void *value;
-    s32 unk08;
-    struct HashNode *next;
-};
-struct OSMesgQueue;
-struct HashNode;
-typedef struct HashNode HashNode;
 extern void *func_002034F4(s32 arg0, s32 arg1);
-struct OSMesgQueue;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct Shape_func_8021A2D4_de_2;
-struct Shape_func_8021A2D4_de_2;
 extern u32 func_0029DFF0(void);
 extern void func_0029E010(u32);
 extern struct Shape_func_8021A2D4_de_2 D_800D81C0;

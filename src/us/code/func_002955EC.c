@@ -1,24 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B450C_de_7.c, func_802B468C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef signed int s32;
-typedef signed long long s64;
-typedef double f64;
-typedef signed short AudioPoleFilterState[4];
-struct AudioLowPassFilter;
-struct AudioLowPassFilter {
-    s16 cutoff;
-    s16 gain;
-    union {
-        s16 taps[16];
-        s64 alignment;
-    } coefficients;
-    AudioPoleFilterState *state;
-    s32 first;
-};
-struct AudioLowPassFilter;
-typedef struct AudioLowPassFilter AudioLowPassFilter;
+#include "rw/abu_types.h"
+
 extern void func_002955EC(AudioLowPassFilter *lp);
 extern const f64 D_800AA528;
 extern const f64 D_800AA530;

@@ -1,53 +1,15 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80409144_de_13.c, func_80409144_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef signed int s32;
-struct PakMenuSlot;
-struct PakMenuSlot {
-    char pad0[0x4];
-    s8 unk4;
-    char pad05[0xB0 - 5];
-    s32 unkB0;
-};
-struct PakMenuSlot;
-typedef struct PakMenuSlot PakMenuSlot;
+#include "rw/abu_types.h"
+
 extern char D_0043BDB0[];
-struct MenuRecAt24;
-typedef struct MenuRecAt24 MenuRecAt24;
-struct Messages;
-struct Messages {
-    char pad0[0x554];
-    char text[1];
-};
-struct Messages;
-struct PlayerRecAt5EC;
-struct PlayerRecAt5EC {
-    char pad0[0x5DC];
-    struct Messages *messages;
-    char pad5E0[0xC];
-    s32 menu;
-};
 extern s32 D_801309BC;
-struct MenuRecAt24;
-struct PlayerRecAt5EC;
-struct MenuRecAt24 {
-    char pad0[0x1C];
-    struct PlayerRecAt5EC *player;
-    PakMenuSlot *slot;
-    char *prompt;
-};
-struct MenuRecAt24;
-struct MenuRecAt24;
-struct MenuRecAt24;
 extern int func_00420C30(void * owner, struct MenuRecAt24 * menu, void * arg);
-struct PlayerRecAt5EC;
-typedef struct PlayerRecAt5EC PlayerRecAt5EC;
 extern int D_801309C4;
 extern char D_0043BE1C[];
 extern s32 D_800C2028;
 extern s32 D_8011B114;
-struct PakMenuSlot;
 extern s32 D_80130990;
 extern char D_80119E2C[];
 extern s32 func_00426064(s32 ch, s32 index);

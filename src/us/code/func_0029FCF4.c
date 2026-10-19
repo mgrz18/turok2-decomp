@@ -1,55 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BE0D0_de_10.c, func_802BEC34_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct {
-    unsigned int w0;
-    unsigned int w1;
-} Awords;
-typedef union {
-    Awords words;
-    long long int force_union_align;
-} Acmd;
-typedef Acmd *(*ALCmdHandler)(void *, short *, int, int, Acmd *);
-typedef int (*ALDMAproc)(int addr, int len, void *state);
-typedef signed short s16;
-typedef signed int s32;
-typedef unsigned int u32;
-struct ALFilter_s14;
-typedef struct ALFilter_s14 ALFilter_s14;
-struct ALFilter_s14;
-struct ALFilter_s14 {
-    struct ALFilter_s14 *source;
-    ALCmdHandler handler;
-    void *setParam;
-    s16 inp;
-    s16 outp;
-    s32 type;
-};
-struct ALLoadFilter48_2;
-typedef struct ALLoadFilter48_2 ALLoadFilter48_2;
-struct ALRawLoop;
-typedef struct ALRawLoop ALRawLoop;
-struct ALRawLoop;
-struct ALRawLoop {
-    u32 start;
-    u32 end;
-    u32 count;
-};
-struct ALLoadFilter48_2;
-struct ALLoadFilter48_2 {
-    ALFilter_s14 filter;
-    void *state;
-    void *lstate;
-    ALRawLoop loop;
-    void *table;
-    s32 bookSize;
-    ALDMAproc dma;
-    void *dmaState;
-    s32 sample;
-    s32 lastsam;
-    s32 first;
-    s32 memin;
-};
+#include "rw/abu_types.h"
+
 Acmd *func_0029FCF4(Acmd *ptr, ALLoadFilter48_2 *f, s32 tsam, s32 nbytes, s16 outp, s16 inp, u32 flags)
 {
     s32 dramAlign, dramLoc;

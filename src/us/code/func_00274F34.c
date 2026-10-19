@@ -1,49 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025C524_de_13.c, func_8025D844_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-struct AudioHeapD844 {
-    u8 *start;
-    u8 *cursor;
-    u32 size;
-};
-struct AudioRootD844 {
-    char pad0[0x1DA8];
-    struct AudioHeapD844 heap;
-};
-struct AudioParamsD844 {
-    s32 count38, count1C;
-    u8 kind;
-    u8 pad9[3];
-    struct AudioHeapD844 *context;
-    s32 value10, value14, value18;
-};
-struct AudioStateD844 {
-    struct AudioRootD844 *root;
-    char pad4[0xC];
-    void *allocation;
-    void *player;
-    s32 mode, flags, unused20, timer, index, unused2C;
-    f32 first, second;
-    s32 counter;
-    f32 third, fourth;
-};
-struct InitParams;
-struct InitParams {
-    s32 count38;
-    s32 count1C;
-    u8 kind;
-    u8 pad09[3];
-    s32 context;
-    s32 value10;
-    s32 value14;
-    s32 value18;
-};
-struct InitParams;
-typedef struct InitParams InitParams;
+#include "rw/abu_types.h"
+
 extern float D_800A81C8;
 extern float D_800A81CC;
 s32 func_002912A0(s32 a, s32 b, void *c, s32 d, s32 e);

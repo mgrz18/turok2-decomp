@@ -1,57 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B450C_de_9.c, func_802B4C7C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef double f64;
+#include "rw/abu_types.h"
+
 extern s16 func_00295EC8(f64 vol, f64 tgt, s32 count, u16 *ratel);
-typedef struct {
-    unsigned int w0;
-    unsigned int w1;
-} Awords;
-typedef union {
-    Awords words;
-    long long int force_union_align;
-} Acmd;
-typedef Acmd *(*ALCmdHandler)(void *, short *, int, int, Acmd *);
-struct ALFilter_s14_2;
-typedef struct ALFilter_s14_2 ALFilter_s14_2;
-struct ALFilter_s14_2;
-struct ALFilter_s14_2 {
-    struct ALFilter_s14_2 *source;
-    ALCmdHandler handler;
-    void *setParam;
-    s16 inp;
-    s16 outp;
-    s32 type;
-};
-struct ALEnvMixer_s;
-typedef struct ALEnvMixer_s ALEnvMixer_s;
-struct ALEnvMixer_s;
-struct ALEnvMixer_s {
-    ALFilter_s14_2 filter;
-    void *state;
-    s16 pan;
-    s16 volume;
-    s16 cvolL;
-    s16 cvolR;
-    s16 dryamt;
-    s16 wetamt;
-    u16 lratl;
-    s16 lratm;
-    s16 ltgt;
-    u16 rratl;
-    s16 rratm;
-    s16 rtgt;
-    s32 delta;
-    s32 segEnd;
-    s32 first;
-    void *ctrlList;
-    void *ctrlTail;
-    ALFilter_s14_2 **sources;
-    s32 motion;
-};
 extern s16 D_800B7900[128];
 extern char D_800AA540[];
 extern char D_800AA544[];

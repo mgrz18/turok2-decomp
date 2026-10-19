@@ -1,19 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025C524_de_8.c, func_8025D158_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef signed int s32;
-struct Shape_typemap_110;
-struct Shape_typemap_110 {
-    int field_0;
-    int field_4;
-    int field_8;
-    int field_C;
-    int field_10;
-    int field_14;
-    int field_18;
-    int field_1C;
-};
+#include "rw/abu_types.h"
+
 extern s16 func_00293470(void *, void *);
 void func_00276D98(struct Shape_typemap_110 *record, s32 resource) {
     extern void *func_002718F4(s32);

@@ -1,26 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043CDF8_de.c, func_8043CDF8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef unsigned int u32;
-struct IntPair;
-struct IntPair {
-    int field_0;
-    int field_4;
-};
-struct IntPair;
-struct CheatCode;
-struct CheatCode {
-    u8 *code;
-    s32 unk4;
-    s32 flags;
-    s32 sound;
-};
+#include "rw/abu_types.h"
+
 extern int D_80110060;
-struct CheatCode;
-typedef struct CheatCode CheatCode;
 extern CheatCode D_00439770[];
 extern u8 D_800C1F8C[];
 extern struct IntPair D_8011AAD8;

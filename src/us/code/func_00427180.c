@@ -1,70 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80446C5C_de_2.c, func_80445F80_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-struct OSMesgQueue;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSPfs;
-struct OSPfs {
-    int status;
-    struct OSMesgQueue *queue;
-    int channel;
-    u8 id[32];
-    u8 label[32];
-    int version;
-    int dir_size;
-    int inode_table;
-    int minode_table;
-    int dir_table;
-    int inode_start_page;
-    u8 banks;
-    u8 activebank;
-};
-struct OSPfs;
-typedef struct OSPfs OSPfs;
-struct __OSInode;
-typedef struct __OSInode __OSInode;
-union __OSInodeUnit;
-union __OSInodeUnit {
-    struct {
-        u8 bank;
-        u8 page;
-    } inode_t;
-    u16 ipage;
-};
-union __OSInodeUnit;
-typedef union __OSInodeUnit __OSInodeUnit;
-struct __OSInode;
-struct __OSInode {
-    __OSInodeUnit inode_page[128];
-};
-struct OSMesgQueue;
-struct __OSDir;
-typedef struct __OSDir __OSDir;
-struct __OSDir;
-struct __OSDir {
-    u32 game_code;
-    u16 company_code;
-    __OSInodeUnit start_page;
-    u8 status;
-    s8 reserved;
-    u16 data_sum;
-    u8 ext_name[4];
-    u8 game_name[16];
-};
-struct OSMesgQueue;
+#include "rw/abu_types.h"
+
 extern s32 func_00429DFC(OSPfs *pfs);
 extern s32 func_004292E0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 *file_no);
 extern s32 osPfsFreeBlocks(OSPfs *pfs, s32 *bytes_not_used);

@@ -1,16 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8026E1F8_de.c, func_8026E4F8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned int u32;
-struct Node8026E4F8;
-typedef struct Node8026E4F8 Node8026E4F8;
-struct Node8026E4F8;
-struct Node8026E4F8 {
-    u32 key;
-    char pad4[0x14];
-    struct Node8026E4F8 *left;
-    struct Node8026E4F8 *right;
-};
+#include "rw/abu_types.h"
+
 extern void *func_0020BFE8(Node8026E4F8 **arg0, u32 arg1);
 void *func_0020BFE8(Node8026E4F8 **arg0, u32 arg1)
 {

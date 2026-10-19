@@ -1,15 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80254D44_de_9.c, func_8025558C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 extern s32 D_800AB0B8;
 extern s32 D_800AB0B0;
-typedef struct Shared_HashLink Shared_HashLink;
-struct Shared_HashLink {
-    u32 unknown0[3];
-    Shared_HashLink *next;
-};
 void func_00202B0C(void) {
     extern s32 D_800D81C4;
     s32 var_a1;

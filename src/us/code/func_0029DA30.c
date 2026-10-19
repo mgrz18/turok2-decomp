@@ -1,26 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B8F48_de_25.c, func_802B9590_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef unsigned int u32;
-struct OSPiHandle_s;
-typedef struct OSPiHandle_s OSPiHandle_s;
-struct OSPiHandle_s {
-    struct OSPiHandle_s *next;
-    u8 type;
-    u8 latency;
-    u8 pageSize;
-    u8 relDuration;
-    u8 pulse;
-    u8 domain;
-    u32 baseAddress;
-    u32 speed;
-    u8 transferInfo[0x60];
-};
-struct OSPiHandle_s;
+#include "rw/abu_types.h"
+
 extern s32 func_0029DA30(struct OSPiHandle_s *handle, u32 address, u32 *value);
-struct OSPiHandle_s;
 extern OSPiHandle_s *D_800B8980[];
 extern s32 D_800AA9B0;
 extern s32 D_800AA9B4;

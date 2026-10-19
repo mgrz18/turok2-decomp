@@ -1,14 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002ABED4.c, func_002ABED4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef float f32;
-typedef struct AtlasCell {
-    u32 w;
-    u32 h;
-} AtlasCell;
+#include "rw/junk_types.h"
+
 void func_00279528(u8 *, u8 *, f32, f32, u32, u32, f32, f32);
 void func_0027B614(u16 *hdr, f32 x0, f32 y, f32 sx, f32 sy) {
     f32 rows, cols, x;

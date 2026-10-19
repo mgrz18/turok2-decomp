@@ -1,18 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00400E50.c, func_00400E50.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-typedef struct O01Vec3 {
-    f32 x, y, z;
-} O01Vec3;
-typedef struct O01SplRec {
-               f32 x, y, z;
-               f32 cx, cy, cz;
-               f32 arc;
-               f32 t;
-               f32 c2;
-} O01SplRec;
+#include "rw/junk_types.h"
+
 extern const f32 D_800C097C;
 extern const f32 D_800C0980;
 extern const f32 D_800C0984;

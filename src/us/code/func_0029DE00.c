@@ -1,19 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BCC90_de_20.c, func_802BCE20_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-struct Func802C1F10Node;
-struct Func802C1F10Node {
-    s32 field0;
-    s32 field4;
-    void *field8;
-    struct Func802C1F10Node *next;
-    u16 field10;
-};
-struct Func802C1F10Node;
-typedef struct Func802C1F10Node Func802C1F10Node;
+#include "rw/abu_types.h"
+
 extern void func_0029C8E0();
 extern Func802C1F10Node *D_800B891C;
 extern void *D_800B8920;

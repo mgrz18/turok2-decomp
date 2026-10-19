@@ -1,10 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00271B18.c, func_00271B18.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef float f32;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "rw/junk_types.h"
+
 f32 func_00298470(f32 x);
 f32 func_0021153C(f32 x);
 f32 func_0020EAA0(Vec3f *v) {

@@ -1,31 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802B7E2C_eu_padding_A25BC_14.c, func_802B75F4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-struct ContReadFormat;
-typedef struct ContReadFormat ContReadFormat;
-struct ContReadFormat;
-struct ContReadFormat {
-    u8 dummy;
-    u8 txsize;
-    u8 rxsize;
-    u8 cmd;
-    u16 button;
-    s8 stick_x;
-    s8 stick_y;
-};
-struct ContPad;
-struct ContPad {
-    u16 button;
-    s8 stick_x;
-    s8 stick_y;
-    u8 error;
-};
-struct ContPad;
-typedef struct ContPad ContPad;
+#include "rw/abu_types.h"
+
 extern void func_002987B4(ContPad *data);
 extern s8 D_801213DC;
 void func_002987B4(ContPad *data) {

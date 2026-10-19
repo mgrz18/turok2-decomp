@@ -1,22 +1,12 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BAE40_de_14.c, func_802BAE40_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef unsigned long long u64;
+#include "rw/abu_types.h"
+
 extern int D_8000030C;
 extern void func_0029B1F0();
 extern int func_0029B4B0(unsigned int devAddr, unsigned int * data);
 extern int func_0029B540(unsigned int devAddr, unsigned int data);
-struct Quad_func_802A1BE0_de;
-typedef struct Quad_func_802A1BE0_de Quad_func_802A1BE0_de;
-struct Quad_func_802A1BE0_de;
-struct Quad_func_802A1BE0_de {
-    u32 x;
-    u32 y;
-    u32 z;
-    u32 w;
-};
 extern s32 func_0029B410(s32 arg0, s32 *arg1);
 extern void osMapTLBRdb();
 extern u32 D_80122998;

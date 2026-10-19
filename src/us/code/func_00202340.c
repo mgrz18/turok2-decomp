@@ -1,29 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80254D44_de_16.c, func_80255780_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-struct Pool80255720;
-typedef struct Pool80255720 Pool80255720;
-struct Block80255720;
-struct Block80255720 {
-    struct Block80255720 *prev;
-    struct Block80255720 *next;
-    struct Block80255720 *prev_phys;
-    struct Block80255720 *next_phys;
-    s32 offset;
-    s32 size;
-};
-struct Block80255720;
-typedef struct Block80255720 Block80255720;
-struct Block80255720;
-struct Pool80255720;
-struct Pool80255720 {
-    s32 unk0;
-    s32 unk4;
-    struct Block80255720 *head;
-    struct Block80255720 *tail;
-    struct Block80255720 *anchor;
-};
+#include "rw/abu_types.h"
+
 extern void func_00202340(Pool80255720 *arg0);
 void func_00202340(Pool80255720 *arg0)
 {

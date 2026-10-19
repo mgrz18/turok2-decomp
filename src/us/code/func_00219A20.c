@@ -1,27 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80262480_de_3.c, func_802625F0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-typedef struct AnimRef {
-               char pad0[4];
-               u16 id;
-               u16 frame;
-               u16 count;
-               u8 flags[2];
-               u32 span;
-               void **data;
-} AnimRef;
+#include "rw/abu_types.h"
+
 extern f32 func_00210DB4(f32,f32,f32);
-typedef struct ResidentDataChunk {
-    s32 width;
-    s32 count;
-    u8 data[1];
-} ResidentDataChunk;
 extern float D_800A5AB8;
 extern void *func_0021793C(void *arg0);
 extern f32 func_00210DB4(f32, f32, f32);

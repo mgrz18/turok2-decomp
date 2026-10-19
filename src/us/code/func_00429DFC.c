@@ -1,42 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80446F60_de_11.c, func_80448BFC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-struct OSMesgQueue;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSPfs;
-struct OSPfs {
-    int status;
-    struct OSMesgQueue *queue;
-    int channel;
-    u8 id[32];
-    u8 label[32];
-    int version;
-    int dir_size;
-    int inode_table;
-    int minode_table;
-    int dir_table;
-    int inode_start_page;
-    u8 banks;
-    u8 activebank;
-};
-struct OSPfs;
-typedef struct OSPfs OSPfs;
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct OSMesgQueue;
+#include "rw/abu_types.h"
+
 extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
 extern s32 func_00429EC4(OSPfs *pfs);
 s32 func_00429DFC(OSPfs *pfs)

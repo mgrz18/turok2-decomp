@@ -1,15 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043E830_de_13.c, func_8043EE24_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-struct Field_f32_10;
-typedef struct Field_f32_10 Field_f32_10;
-struct Field_f32_10;
-struct Field_f32_10 {
-    char pad[0x10];
-    f32 value;
-};
+#include "rw/abu_types.h"
+
 extern struct Field_f32_10 D_8011ACB0;
 extern f32 D_800B6D28;
 s32 func_0041A494(void) {
