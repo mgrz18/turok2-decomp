@@ -1,13 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80271C54_de_2.c, func_80272CB0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef float f32;
-struct Matrix;
-typedef struct Matrix Matrix;
-struct Matrix;
-struct Matrix {
-    f32 m[16];
-};
+#include "rw/abu_types.h"
+
 extern void func_0020FC74(void *matrix, f32 x, f32 y, f32 z);
 void func_0020FC74(void *arg0, f32 arg1, f32 arg2, f32 arg3) {
     extern f32 D_800A55F4[2];

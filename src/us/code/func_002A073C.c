@@ -1,19 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BE0D0_de_13.c, func_802BF67C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
+#include "rw/abu_types.h"
+
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-struct FftTables;
-typedef struct FftTables FftTables;
-struct FftTables;
-struct FftTables {
-    f32 *sines;
-    f32 *cosines;
-    s32 *order;
-    s32 size;
-};
 extern FftTables *func_002A073C(s32 n);
 extern float D_800AAC30;
 extern FftTables D_800B8A30;

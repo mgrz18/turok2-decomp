@@ -1,15 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80409A5C_de_12.c, func_8040AA4C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct ItemRecAt24;
-typedef struct ItemRecAt24 ItemRecAt24;
-struct ItemRecAt24;
-struct ItemRecAt24 {
-    char pad[0x1C];
-    int x;
-    int y;
-    char *label;
-};
+#include "rw/abu_types.h"
+
 extern int func_0042265C(int unused, ItemRecAt24 *item);
 extern int D_80130960;
 extern char D_80119E2C[];

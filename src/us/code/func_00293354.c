@@ -1,23 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra/part_800C7F20/code_802B6F50_2.c, func_802B23F4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef float f32;
-struct ALSeq_s;
-typedef struct ALSeq_s ALSeq_s;
-struct ALSeq_s;
-struct ALSeq_s {
-    u8 *base;
-    u8 *trackStart;
-    u8 *curPtr;
-    s32 lastTicks;
-    s32 len;
-    f32 qnpt;
-    s16 division;
-    s16 lastStatus;
-};
+#include "rw/abu_types.h"
+
 int func_00293354(void *arg0) {
     struct ALSeq_s *stream = arg0;
     unsigned char *p;

@@ -1,21 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BB6C0_de_14.c, func_802BB750_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 extern u32 func_0029DFF0(void);
 extern void func_0029E010(u32 mask);
-struct ThreadNode;
-struct ThreadNode {
-    struct ThreadNode *next;
-    s32 priority;
-    struct ThreadNode **queue;
-    s32 unk0C;
-    u16 state;
-};
-struct ThreadNode;
-typedef struct ThreadNode ThreadNode;
 extern void func_0029C8E0();
 extern s32 D_800B8918;
 extern ThreadNode *D_800B8920;

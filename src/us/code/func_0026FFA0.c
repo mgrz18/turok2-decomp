@@ -1,21 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80256280_de_14.c, func_802570C0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 extern int D_800B2674;
-struct CacheEntry;
-struct CacheEntry {
-    struct CacheEntry *next;
-    void *key;
-    u16 state;
-    u16 size;
-    s32 padC;
-    char data[0x80];
-};
-struct CacheEntry;
-typedef struct CacheEntry CacheEntry;
 extern CacheEntry *D_800F279C;
 extern void *D_800F2840;
 extern void *func_0029E460(void *destination, const void *source, int count);

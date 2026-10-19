@@ -1,11 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00260F18.c, func_00260F18.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned int u32;
-typedef float f32;
-typedef struct B14FRange { u32 n; f32 min; f32 range; } B14FRange;
-typedef struct B14FieldRd { u32 addr; B14FRange r; } B14FieldRd;
-typedef struct { u32 pad; B14FRange r; } B14Tmp;
+#include "rw/junk_types.h"
+
 f32 func_00218398(B14FieldRd *f) {
     B14Tmp t1;
     B14Tmp t2;

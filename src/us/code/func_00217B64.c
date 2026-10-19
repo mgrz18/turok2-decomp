@@ -1,6 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025E590_de_9.c, func_802606C4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "rw/abu_types.h"
+
 int func_00217B64(int bitAddress, unsigned int width) {
     int shift;
     int *word;

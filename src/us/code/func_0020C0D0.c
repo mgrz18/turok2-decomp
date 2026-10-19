@@ -1,15 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8026E1F8_de_6.c, func_8026EE20_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-struct BoxRecAtC;
-typedef struct BoxRecAtC BoxRecAtC;
-struct BoxRecAtC;
-struct BoxRecAtC {
-    f32 min[3];
-    f32 max[3];
-};
+#include "rw/abu_types.h"
+
 void func_0020C0D0(f32 m[4][4], BoxRecAtC *box, BoxRecAtC *out) {
     f32 min[3];
     f32 max[3];

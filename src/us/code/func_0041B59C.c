@@ -1,16 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/rodata.func_8043DD2C_us_rev1.800E2330.c, func_8043D630_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-struct StateRecAt14;
-struct StateRecAt14 {
-    char a[8];
-    s32 unk8;
-    char b[8];
-    char *unk14;
-};
-struct StateRecAt14;
-typedef struct StateRecAt14 StateRecAt14;
+#include "rw/abu_types.h"
+
 extern char D_800B5950[];
 extern char D_800B5934[];
 extern s32 D_8011AAD8;

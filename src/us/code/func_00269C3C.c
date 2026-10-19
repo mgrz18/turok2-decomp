@@ -1,32 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802744AC_de.c, func_8027525C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
-struct Node75;
-typedef struct Node75 Node75;
-struct Node75;
-struct Node75 {
-    s32 pad0;
-    Vec3 *prev;
-    Vec3 *cur;
-    Vec3 *next;
-};
+#include "rw/abu_types.h"
+
 extern float D_800A7F68;
-typedef struct CollisionBuildVertex {
-    f32 x;
-    f32 y;
-    f32 z;
-    f32 ceiling;
-} CollisionBuildVertex;
 extern int D_800F2000;
 extern int D_800B2600;
 extern int D_800F2000;

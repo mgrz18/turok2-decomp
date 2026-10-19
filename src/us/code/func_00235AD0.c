@@ -1,35 +1,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802A25D0_de_17.c, func_802A5020_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned int u32;
-typedef float f32;
+#include "rw/abu_types.h"
+
 extern f32 func_0021153C(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
-struct Vector4f;
-typedef struct Vector4f Vector4f;
-struct Vector4f;
-struct Vector4f {
-    float x;
-    float y;
-    float z;
-    float w;
-};
-struct func_802077F4_S2;
-typedef struct func_802077F4_S2 func_802077F4_S2;
-struct func_802077F4_S2;
-struct func_802077F4_S2 {
-    char pad0[0x4];
-    f32 unk4;
-};
 extern float D_800A6508;
 extern Vector4f *func_00235AD0(Vector4f *out, u32 bx, u32 by, u32 bz);
 extern f32 D_800DD78C;

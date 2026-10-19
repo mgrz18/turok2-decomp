@@ -1,36 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802AD270_de_9.c, func_802AE5B8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-typedef double f64;
-struct ResourceTable;
-typedef struct ResourceTable ResourceTable;
+#include "rw/abu_types.h"
+
 extern double D_800AA240;
 extern float D_800AA248;
-struct ResourceTable;
-struct ResourceTable {
-    u32 entries[17];
-};
-struct ResourceTable;
-struct RuntimeStateRecAtB8;
-struct RuntimeStateRecAtB8 {
-    struct ResourceTable *resources;
-    u32 active;
-    f32 scale;
-    u32 unkC;
-    u32 unk10;
-    u32 one14;
-    void *objects[16];
-    u32 unk58[16];
-    s8 flags98[16];
-    s8 flagsA8[16];
-    u32 results[16];
-};
-struct RuntimeStateRecAtB8;
-typedef struct RuntimeStateRecAtB8 RuntimeStateRecAtB8;
 void func_0028F518(RuntimeStateRecAtB8 *state, u32 base) {
     extern u32 func_0028F98C(RuntimeStateRecAtB8 *state, u32 index);
     f64 converted;

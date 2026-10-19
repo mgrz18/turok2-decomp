@@ -1,29 +1,14 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80250938_de_3.c, func_802511AC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 extern void func_0020656C(s32, s32);
-struct OSMesgQueue;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
 extern int D_800D8218;
 extern int D_800D8DCC;
-struct OSMesgQueue;
-struct OSMesgQueue;
 extern int D_800D8208[];
 extern int D_800D8210[];
-struct OSMesgQueue;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-struct OSMesgQueue;
-struct OSMesgQueue;
 extern s32 D_800D8DA4[];
 extern s32 D_800D8DD0;
 extern s32 D_800D8DA4[];

@@ -1,41 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BE0D0_de_12.c, func_802BEF84_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 extern unsigned short D_800B8BAA;
 extern unsigned short D_800B8BAC;
-typedef struct DecodeNode {
-    u16 first;
-    u16 second;
-} DecodeNode;
-typedef struct DecodeSample {
-    u16 tag;
-    u16 value;
-} DecodeSample;
-typedef struct DecodePhrase {
-    u8 pad0[0xA0];
-    DecodeSample samples[64];
-    s32 count;
-    u8 pad1A4[0x14];
-} DecodePhrase;
-typedef struct DecodeTable {
-    u8 pad0[0xE];
-    u16 width;
-    u8 pad10[0xC];
-    DecodePhrase *phrases;
-    DecodeNode *tree;
-} DecodeTable;
-typedef struct DecodeBlock {
-    s32 kind;
-    s32 start;
-    s32 length;
-    s32 offset;
-    DecodeTable *table;
-} DecodeBlock;
 extern u16 func_0029FE70(u16 *, u16, s32, s32, void *);
 s32 func_002A0044(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                     u16 *arg3, void *arg4) {

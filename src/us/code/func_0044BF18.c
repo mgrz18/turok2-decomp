@@ -1,13 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80400000_de_11.c, func_80403B70_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-struct IntPair;
-struct IntPair {
-    int field_0;
-    int field_4;
-};
-struct IntPair;
+#include "rw/abu_types.h"
+
 s32 func_0044BF18(void *object) {
     extern struct IntPair *func_002017D4(void *, s32);
     struct IntPair *first = func_002017D4(object, 0);

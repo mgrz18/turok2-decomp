@@ -1,13 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8040B868_de_4.c, func_8040B868_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-struct FieldRecAt14;
-struct FieldRecAt14 {
-    char pad[0x14];
-    char *text;
-};
+#include "rw/abu_types.h"
+
 extern char D_800B5168[];
 extern char D_800B51C4[];
 extern char D_800B5200[];

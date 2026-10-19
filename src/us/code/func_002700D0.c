@@ -1,20 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80256280_de_14.c, func_802571F0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 extern u32 func_002700D0(s32 offset, s32 length);
-struct Window;
-typedef struct Window Window;
 extern int D_800F2040;
-struct Window;
-struct Window {
-    struct Window *next;
-    struct Window *prev;
-    u32 base;
-    s32 frame;
-    s32 buffer;
-};
 extern Window *D_800F2798;
 extern char D_800D1CD8;
 extern void func_00201E94(void *, u32, s32, s32, void *, s32, s32);

@@ -1,41 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025FFB0_de.c, func_8025FFB0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
+#include "rw/abu_types.h"
+
 extern float D_800E679C;
-struct Segment8025FFD0;
-typedef struct Segment8025FFD0 Segment8025FFD0;
 extern float func_00217AD4(float value, int bits);
-struct Segment8025FFD0;
-struct Segment8025FFD0 {
-    s32 unk0;
-    f32 unk4;
-    f32 unk8;
-    u32 unkC;
-    u8 pad10[0x24 - 0x10];
-    s32 unk24;
-    s32 unk28;
-    s32 unk2C;
-};
-struct Curve;
-typedef struct Curve Curve;
-struct Curve;
-struct Curve {
-    s32 unk0;
-    f32 unk4;
-    f32 unk8;
-    s32 unkC;
-    f32 unk10;
-    f32 unk14;
-    f32 unk18;
-    f32 unk1C;
-    u32 unk20;
-    s32 unk24;
-    s32 unk28;
-};
 extern s32 D_800E6798;
 extern s32 D_800E67A0;
 extern u32 func_00217C58(u32 *arg0, s32 arg1);

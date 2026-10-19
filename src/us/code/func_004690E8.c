@@ -1,46 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0044BC58.c, func_0044BC58.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed int s32;
-typedef struct S5CtlEnt {
-            u8 a;
-            u8 b;
-            u8 c;
-            u8 d;
-} S5CtlEnt;
-typedef struct S5Ctl {
-                s32 f0;
-                s8 port;
-                u8 pad5[3];
-                s32 f8;
-                s32 fC;
-                s32 f10;
-                s32 f14;
-                s32 f18;
-                s32 f1C;
-                s32 f20;
-                s32 f24;
-                s32 f28;
-                S5CtlEnt ent[32];
-                u8 padAC[0xC4 - 0xAC];
-                u8 fC4;
-                u8 fC5;
-                u8 fC6;
-                u8 fC7;
-                s32 fC8;
-                s32 fCC;
-                s32 fD0;
-                s32 fD4;
-                u8 padD8[0x140 - 0xD8];
-                u8 blkA[0x2C];
-                u8 blkB[0xB4];
-                s32 f220;
-} S5Ctl;
-typedef struct S5PortFlags {
-            u8 b[4];
-} S5PortFlags;
+#include "rw/junk_types.h"
+
 extern S5PortFlags D_800F6778[];
 extern void func_0026EB3C(void *a, void *b, s32 n);
 s32 func_004690E8(S5Ctl *c, s32 port) {

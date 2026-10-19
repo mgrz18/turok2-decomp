@@ -1,6 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80403E90_de_6.c, func_80405160_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "rw/abu_types.h"
+
 extern int D_80130C60[];
 extern int D_80130C70[];
 int func_004267A0(int slot, int *score) {

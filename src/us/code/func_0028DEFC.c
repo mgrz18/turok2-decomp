@@ -1,27 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8023A294_de_12.c, func_8023C084_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
+#include "rw/abu_types.h"
+
 extern void func_0028EEC0(int arg0);
-struct EntryRecAt3;
-struct EntryRecAt3 {
-    u16 id;
-    u8 team;
-    u8 slot;
-};
-struct EntryRecAt3;
-typedef struct EntryRecAt3 EntryRecAt3;
-struct Mapping;
-typedef struct Mapping Mapping;
-struct Mapping;
-struct Mapping {
-    char pad0[8];
-    u16 flags;
-    char padA;
-    u8 slot;
-};
 extern char D_80132000;
 extern EntryRecAt3 D_80121318[];
 void func_0028DEFC(Mapping *mapping) {

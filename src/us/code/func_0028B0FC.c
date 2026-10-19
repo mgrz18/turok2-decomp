@@ -1,55 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8028DF90_de_7.c, func_8028FA60_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-struct OSMesgQueue;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct View_func_8028FA60_de;
-typedef struct View_func_8028FA60_de View_func_8028FA60_de;
+#include "rw/abu_types.h"
+
 extern int D_800B6E60;
-struct Scene_func_8028FA60_de;
-struct Scene_func_8028FA60_de {
-    s32 pad0;
-    s32 flags;
-    s32 options;
-    s32 padC;
-    s32 mode;
-    char pad14[0x38 - 0x14];
-    s32 music;
-    s64 *time;
-};
-struct Scene_func_8028FA60_de;
-struct View_func_8028FA60_de;
-struct View_func_8028FA60_de {
-    char pad0[0x78];
-    struct OSMesgQueue messages;
-    char pad90[0x2F4 - 0x90];
-    struct Scene_func_8028FA60_de *current;
-    struct Scene_func_8028FA60_de *next;
-    char pad2FC[4];
-    s32 pending;
-};
-struct Scene_func_8028FA60_de;
-typedef struct Scene_func_8028FA60_de Scene_func_8028FA60_de;
-struct Scene_func_8028FA60_de;
-struct View_func_8028FA60_de;
 extern void func_0028B0FC(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
-struct OSMesgQueue;
-struct OSMesgQueue;
 extern s64 D_8011F170;
 extern f32 D_8011F158;
 extern s64 D_8011F168;

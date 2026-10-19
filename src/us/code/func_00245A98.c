@@ -1,22 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80213ED4_de_10.c, func_802166F4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef signed int s32;
-struct IntPair;
-struct IntPair {
-    int field_0;
-    int field_4;
-};
-struct IntPair;
-struct WeightedTable;
-struct WeightedTable {
-    s16 count;
-    s16 entries[25][2];
-    s16 reserved;
-};
-struct WeightedTable;
-typedef struct WeightedTable WeightedTable;
+#include "rw/abu_types.h"
+
 extern void func_0026D5DC(WeightedTable *);
 extern void func_0026D5E4(WeightedTable *, s32, s32);
 extern s16 func_0026D628(WeightedTable *);

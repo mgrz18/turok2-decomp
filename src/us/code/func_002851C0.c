@@ -1,41 +1,12 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802636B0_de_8.c, func_80264104_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
+#include "rw/abu_types.h"
+
 extern void func_0026ECF0(void *arg0);
-struct Triple;
-struct Triple {
-    s32 x;
-    s32 y;
-    s32 z;
-};
-struct Triple;
-typedef struct Triple Triple;
 extern int D_80110028;
-struct Triple;
 extern u32 func_00298E10(struct Triple *);
-struct Obj80264124;
-struct Obj80264124 {
-    s32 flags;
-    s8 enabled;
-    char pad05[3];
-    s32 x;
-    s32 y;
-    s32 z;
-    char pad14[0xB4];
-    s32 active;
-    s32 state;
-    f32 amount;
-    f32 timer;
-    char status[0x68];
-    char object[1];
-};
 extern float D_800A9CF8;
-struct Obj80264124;
-typedef struct Obj80264124 Obj80264124;
 extern f32 func_0026E760(void *arg0, s32 arg1, s32 arg2, s32 arg3);
 extern s32 D_800F5A50;
 extern s32 D_8011ACA4;

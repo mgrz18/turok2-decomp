@@ -1,42 +1,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80233930_de.c, func_80233930_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
+#include "rw/abu_types.h"
+
 extern f32 func_002119FC(f32 arg0, f32 arg1);
 extern float func_002982F0(float x);
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
-struct StateRecAt10;
-typedef struct StateRecAt10 StateRecAt10;
-struct StateRecAt10;
-struct StateRecAt10 {
-    s32 mode;
-    f32 value;
-    f32 limit;
-    f32 rate;
-    f32 accumulator;
-};
-typedef StateRecAt10 AxisWave;
 extern float D_800A97E0;
-struct Effect33920;
-typedef struct Effect33920 Effect33920;
-struct Effect33920;
-struct Effect33920 {
-    s32 unk00;
-    Effect33920 *next;
-    Vec3 origin;
-    f32 radius;
-    AxisWave x;
-    AxisWave y;
-    AxisWave z;
-};
 extern void func_0027BE90(Effect33920 *arg0, Vec3 position, Vec3 *out);
 extern float D_800A97E8;
 extern float D_800A97E4;

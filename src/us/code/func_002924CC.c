@@ -1,21 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra/part_800C7F20/seqplayer.c, func_802B156C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct Node_func_80239AF4_de;
-typedef struct Node_func_80239AF4_de Node_func_80239AF4_de;
-struct Node_func_80239AF4_de;
-struct Node_func_80239AF4_de {
-    struct Node_func_80239AF4_de *next;
-};
-struct List802B663C;
-typedef struct List802B663C List802B663C;
-struct List802B663C;
-struct List802B663C {
-    char pad[0x64];
-    Node_func_80239AF4_de *head;
-    Node_func_80239AF4_de *tail;
-    Node_func_80239AF4_de *free;
-};
+#include "rw/abu_types.h"
+
 extern void func_002924CC(List802B663C *arg0, void *arg1);
 void func_002924CC(List802B663C *arg0, void *arg1) {
     Node_func_80239AF4_de *node;

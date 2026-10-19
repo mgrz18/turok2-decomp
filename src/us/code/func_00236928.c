@@ -1,52 +1,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802A5AD0_de_2.c, func_802A6068_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-struct ImageHeader;
-struct ImageHeader {
-    char pad0[2];
-    unsigned char widthShift;
-    unsigned char heightShift;
-    char pad4[0x1D - 4];
-    unsigned char scale;
-    char pad1E[0x21 - 0x1E];
-    unsigned char width;
-    unsigned char height;
-    unsigned char format;
-    char data[1];
-};
-struct Image;
-struct ImageHeader;
-struct Image {
-    char pad0[8];
-    struct ImageHeader *header;
-    s32 fieldC;
-    s32 field10;
-    char pad14[0x3C - 0x14];
-    s32 flags;
-};
-struct Sprite;
-struct Sprite {
-    s32 format;
-    char *data;
-    s32 field8;
-    s32 fieldC;
-    f32 width;
-    f32 height;
-    f32 extentX;
-    f32 extentY;
-    f32 step;
-};
+#include "rw/abu_types.h"
+
 extern float D_800A652C;
 extern float D_800A6524;
-struct Sprite;
-typedef struct Sprite Sprite;
-struct Image;
 extern void func_00236928(struct Image * image, struct Image * texture, Sprite * sprite);
-struct ImageHeader;
-typedef struct ImageHeader ImageHeader;
-typedef struct Image Image;
 void func_00236928(Image *image, Image *texture, Sprite *sprite) {
     f32 scale;
     s32 height;

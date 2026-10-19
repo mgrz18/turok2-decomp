@@ -1,9 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802BCC90_de.c, func_802B6D54_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
+#include "rw/abu_types.h"
+
 extern void func_00297CB4(f32 *arg0, s32 *arg1);
 extern float D_800AA7D0;
 void func_00297CB4(f32 *arg0, s32 *arg1) {

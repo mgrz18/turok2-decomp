@@ -1,17 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8026E1F8_de.c, func_8026E540_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct TreeNode;
-struct TreeNode {
-    unsigned int key;
-    unsigned char padding[12];
-    struct TreeNode *link10;
-    struct TreeNode *link14;
-    struct TreeNode *link18;
-    struct TreeNode *link1c;
-};
-struct TreeNode;
-typedef struct TreeNode TreeNode;
+#include "rw/abu_types.h"
+
 void func_0020C030(TreeNode **root, TreeNode **empty_root, TreeNode *node, TreeNode *current) {
     if (current != 0) {
         if (node->key < current->key) {

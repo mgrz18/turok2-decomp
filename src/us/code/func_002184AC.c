@@ -1,7 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8025E590_de_9.c, func_802607B8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned int u32;
+#include "rw/abu_types.h"
+
 u32 func_002184AC(u32 *stream, u32 width) {
     u32 bitAddress;
     u32 shift;

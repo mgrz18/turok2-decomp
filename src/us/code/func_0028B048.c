@@ -1,19 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8028DF90_de_7.c, func_8028F9AC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-struct OSScTask_s;
-struct OSScTask_s {
-    struct OSScTask_s *next;
-    u32 state;
-    u32 flags;
-    void *framebuffer;
-    struct { s32 type; } list;
-};
-struct OSScTask_s;
-typedef struct OSScTask_s OSScTask_s;
-struct OSScTask_s;
+#include "rw/abu_types.h"
+
 extern void *func_0028B048(struct OSScTask_s *arg0);
 extern void *func_0029A6E0();
 extern s32 D_8011B098;

@@ -2,29 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 /* cc1-flags: -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float -funsigned-char -O3 -mcpu=VR4300 -mgp32 -mfp32 -fforce-addr -fno-builtin */
 
-typedef unsigned size_t;
+#include "rw/ultralib_types.h"
+
 size_t func_0029E4C0(const char *);
-typedef char * __gnuc_va_list;
-typedef __gnuc_va_list va_list;
-typedef long double ldouble;
-typedef struct {
-              union {
-                  long long ll;
-                  ldouble ld;
-    } v;
-              unsigned char* s;
-              int n0;
-               int nz0;
-               int n1;
-               int nz1;
-               int n2;
-               int nz2;
-               int prec;
-               int width;
-               size_t nchar;
-               unsigned int flags;
-               char qual;
-} _Pft;
 void func_0029EEA0(_Pft *px, char code);
 void func_0029F180(_Pft* px, char code);
 void _Putfld(_Pft *px, va_list *pap, char code, char *ac);

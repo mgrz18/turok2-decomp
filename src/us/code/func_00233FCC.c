@@ -1,66 +1,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802A25D0_de_8.c, func_802A339C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
-struct Node802A697C;
-struct Node802A697C {
-    u32 unk0;
-    f32 value;
-    s32 childValue;
-    s32 matrixIndex;
-};
-struct Node802A697C;
-typedef struct Node802A697C Node802A697C;
-struct State802A6DF8;
-struct State802A6DF8 {
-    struct State802A6DF8 *prev;
-    struct State802A6DF8 *next;
-    Node802A697C *node;
-    u8 padC[0x10];
-    void *object;
-    s32 contextId;
-    f32 value;
-    u8 pad28[0xC];
-    s32 renderMode;
-    u8 pad38[4];
-    u32 flags;
-    struct Node438C *vertices;
-    u8 pad44[4];
-    s32 vertexCount;
-};
-struct State802A6DF8;
-struct State802A6DF8;
-typedef struct State802A6DF8 State802A6DF8;
-struct Node438C;
-typedef struct Node438C Node438C;
-struct Node438C;
-struct Node438C {
-    u8 pad0[4];
-    struct Node438C *next;
-    u8 pad8[8];
-    Vec3 position;
-    f32 a;
-    f32 b;
-    f32 c;
-    f32 matrices[2][16];
-};
-struct Node438C;
-struct Node802A697C;
+#include "rw/abu_types.h"
+
 extern s32 D_800B6D1C;
 extern void func_0020FC74(void *, f32, f32, f32);
 extern void func_0020F79C(void *);
-struct GameplayCamera;
 extern void func_00233E18(Node438C *, Node438C *, struct GameplayCamera *, void *);
 extern void func_0020D274(void *, s32);
 void func_00233FCC(void *arg0, void *arg1) {

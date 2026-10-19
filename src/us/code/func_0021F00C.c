@@ -1,22 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8024BA7C_de_2.c, func_8024BC94_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-struct Triple;
-struct Triple {
-    s32 x;
-    s32 y;
-    s32 z;
-};
-struct Triple;
-typedef struct Triple Triple;
-struct Triple;
-struct IntPair;
-struct IntPair {
-    int field_0;
-    int field_4;
-};
-struct IntPair;
+#include "rw/abu_types.h"
+
 extern void func_0021AE6C(void *arg0);
 extern void func_00211114(void *arg0, void *arg1);
 extern void func_0020F85C(void *, void *, void *);

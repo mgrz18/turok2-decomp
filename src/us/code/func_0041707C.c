@@ -1,23 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80442FB0_de.c, func_80442FB0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct Binding;
-typedef struct Binding Binding;
-struct ItemRecAt14;
-typedef struct ItemRecAt14 ItemRecAt14;
-struct Binding;
-struct Binding {
-    int pad0;
-    int type;
-    char pad8[16];
-    void *(*storage)(void);
-};
-struct Binding;
-struct ItemRecAt14;
-struct ItemRecAt14 {
-    char pad[20];
-    struct Binding *binding;
-};
+#include "rw/abu_types.h"
+
 void func_0041707C(ItemRecAt14 *item,float value) {
  float *storage;
  struct Binding *binding;

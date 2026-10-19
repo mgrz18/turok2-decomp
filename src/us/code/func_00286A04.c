@@ -1,23 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002917E8.c, func_002917E8.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef struct DlCmd {
-    u32 w0;
-    u32 w1;
-} DlCmd;
-typedef struct B21Vp {
-    s16 vscale[4];
-    s16 vtrans[4];
-} B21Vp;
-typedef struct B21Hdr {
-    u8 pad0[0x114];
-    DlCmd *unk114;
-} B21Hdr;
+#include "rw/junk_types.h"
+
 extern DlCmd *D_800D8E24;
 extern B21Hdr *D_800F7070;
 extern u8 D_800AB100[];

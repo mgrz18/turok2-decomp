@@ -1,17 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043C688_de_11.c, func_8043CCD0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-struct Shared_Entry;
-typedef struct Shared_Entry Shared_Entry;
-struct Shared_Entry;
-struct Shared_Entry {
-    s32 value;
-    s32 timer;
-    s32 count;
-    u8 text[24];
-};
+#include "rw/abu_types.h"
+
 extern s32 D_80130920;
 s32 func_00453BA4(void) {
     extern Shared_Entry D_800C1F80;

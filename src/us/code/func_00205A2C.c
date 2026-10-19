@@ -1,60 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80250938_de_11.c, func_80253F8C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
-struct OSMesgQueue;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
+#include "rw/abu_types.h"
+
 extern int D_800D8DCC;
-struct OSMesgQueue;
-struct HashNode;
-struct HashNode {
-    s32 key;
-    void *value;
-    s32 unk08;
-    struct HashNode *next;
-};
-struct OSMesgQueue;
-struct HashNode;
-typedef struct HashNode HashNode;
-struct CachedResource;
-typedef struct CachedResource CachedResource;
-struct CachedResource;
-struct ResourceLoadRequest;
-struct CachedResource {
-    void *data;
-    s32 unk04;
-    s32 count;
-    s32 flags;
-    s32 stamp;
-    struct ResourceLoadRequest *owner;
-};
-struct ResourceLoadRequest {
-    struct CachedResource *node;
-    struct CachedResource *extra;
-    s32 key;
-    s32 priority;
-    s32 flags;
-    void *tag;
-    s32 owner;
-    s32 mode;
-    void *replyQueue;
-    struct ResourceLoadRequest *next;
-};
-struct ResourceLoadRequest;
-struct CachedResource;
-struct ResourceLoadRequest;
-typedef struct ResourceLoadRequest ResourceLoadRequest;
-struct ResourceLoadRequest;
-struct OSMesgQueue;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 func_0029DFF0(void);
 extern void func_0029E010(u32 arg0);

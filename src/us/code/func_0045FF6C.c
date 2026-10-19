@@ -1,7 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8029F888_de_2.c, func_802A0444_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
+#include "rw/abu_types.h"
+
 extern u8 *func_0045FF6C(u8 *s, int c);
 u8 *func_0045FF6C(u8 *s, int c) {
     u8 *start = s;

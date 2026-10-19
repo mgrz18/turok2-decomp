@@ -1,21 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80272FBC_de.c, func_8027310C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef float f32;
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
-struct Matrix;
-typedef struct Matrix Matrix;
-struct Matrix;
-struct Matrix {
-    f32 m[16];
-};
+#include "rw/abu_types.h"
+
 extern float D_800A5604;
 void func_00210004(void *arg0, void *arg1, f32 arg2) {
     Vec3 *direction = arg1;

@@ -1,21 +1,12 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802AD270_de_9.c, func_802AE7BC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-typedef double f64;
-struct ObjRecAt40V1;
-typedef struct ObjRecAt40V1 ObjRecAt40V1;
-struct ObjRecAt40V1;
-struct ObjRecAt40V1 {
-    char p[0x40];
-    s32 unk40;
-};
+#include "rw/abu_types.h"
+
 extern double D_800AA258;
 extern f32 func_0028F71C(void **arg0, s32 arg1, s32 arg2);
 extern double D_800AA250;
 extern float D_800AA260;
-struct ObjRecAt40V1;
 f32 func_0028F71C(void **arg0, s32 arg1, s32 arg2) {
     f64 angle;
     f32 arg1f;

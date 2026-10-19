@@ -1,28 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80446C5C_de_8.c, func_80446EE4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-struct EntryRecAt3;
-struct EntryRecAt3 {
-    u16 id;
-    u8 team;
-    u8 slot;
-};
-struct EntryRecAt3;
-typedef struct EntryRecAt3 EntryRecAt3;
-struct __OSContRequesFormatShort;
-typedef struct __OSContRequesFormatShort __OSContRequesFormatShort;
-struct __OSContRequesFormatShort;
-struct __OSContRequesFormatShort {
-    u8 txsize;
-    u8 rxsize;
-    u8 cmd;
-    u8 typeh;
-    u8 typel;
-    u8 status;
-};
+#include "rw/abu_types.h"
+
 extern void func_00461004(int channel, EntryRecAt3 *data);
 void func_00461004(s32 channel, EntryRecAt3 *data) {
     extern char D_80130E20;

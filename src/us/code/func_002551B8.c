@@ -1,24 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8022BAA0_de_4.c, func_8022C67C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "rw/abu_types.h"
+
 extern float func_002551B8(void * arg0);
-typedef struct ObjRecAtB8 {
-    int unk0;
-    int unk4;
-    int unk8;
-    char padC[0x90 - 0xC];
-    float unk90;
-    float unk94;
-    float unk98;
-    int unk9C;
-    float unkA0;
-    int unkA4;
-    int unkA8;
-    float unkAC;
-    float unkB0;
-    int unkB4;
-    int unkB8;
-} ObjRecAtB8;
 extern float D_800A7140;
 extern float D_800A7148;
 extern float D_800A7150;
