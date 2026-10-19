@@ -38,7 +38,7 @@ CC = ("tools/sn64/cc1 -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300
       "-mhard-float -mfp64")
 
 
-def compile_one(src, out, incs, defs):
+def compile_one(src, out, incs, defs, repo=None):
     import hashlib
     o = out / (hashlib.sha1(src.as_posix().encode()).hexdigest()[:16] + ".o")   # names can be too long for a file
     if o.exists():
@@ -50,7 +50,9 @@ def compile_one(src, out, incs, defs):
         return None
     if subprocess.run(CC.split() + [str(i), "-o", str(s)], capture_output=True).returncode:
         return None
-    if subprocess.run(["tools/sn_as.sh", str(s), str(o)], capture_output=True).returncode:
+    # Its asm may .include files relative to its own root (include/labels.inc).
+    env = {**os.environ, "INC_DIR": str(repo)} if repo else None
+    if subprocess.run(["tools/sn_as.sh", str(s), str(o)], capture_output=True, env=env).returncode:
         return None
     return o
 
@@ -72,7 +74,7 @@ def main():
     srcs = [p for p in sorted(args.repo.rglob("src/**/*.c"))
             if not any(x in p.as_posix() for x in args.exclude)]
     with ThreadPoolExecutor(args.jobs) as pool:
-        objs = list(pool.map(lambda p: compile_one(p, out, incs, args.define), srcs))
+        objs = list(pool.map(lambda p: compile_one(p, out, incs, args.define, args.repo), srcs))
     built = [(s, o) for s, o in zip(srcs, objs) if o]
     print(f"{len(srcs)} files, {len(built)} compiled")
 

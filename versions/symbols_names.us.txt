@@ -29,3 +29,5 @@ osSendMesg = 0x0029B820; // type:func
 __udivdi3 = 0x002A4650; // type:func
 __cmpdi2 = 0x002A50E0; // type:func
 __floatdisf = 0x002A5130; // type:func
+__divdi3 = 0x002A3AE0; // type:func
+__moddi3 = 0x002A40D0; // type:func
