@@ -1,7 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/camera.h"
 
-void func_00281054(void *arg0, s8 arg1, s8 arg2) {
-    M2C_FIELD(arg0, s8 *, 0x530) = arg1;
-    M2C_FIELD(arg0, s8 *, 0x531) = arg2;
+/* Sets the flash level and how fast it fades. */
+void func_00281054(CCamera *cam, s8 flash, s8 dec) {
+    cam->m_Flash = flash;
+    cam->m_FlashDec = dec;
 }

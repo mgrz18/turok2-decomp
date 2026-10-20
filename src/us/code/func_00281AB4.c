@@ -1,18 +1,19 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/camera.h"
 
 M2C_UNK CList__AddTail(s32, s32);                    /* extern */
 M2C_UNK CList__Remove(void *, s32);                 /* extern */
 M2C_UNK func_00281B58(s32);                         /* extern */
 
-s32 func_00281AB4(void *arg0, s32 arg1) {
-    s32 temp_s0;
+/* Takes a free text from the pool and puts it on the camera's active texts. */
+CCameraText *func_00281AB4(CCameraPool *pool, CCamera *cam) {
+    CCameraText *text = pool->m_FreeTextList.m_pHead;
 
-    temp_s0 = M2C_FIELD(arg0, s32 *, 0xF0C);
-    if (temp_s0 != 0) {
-        func_00281B58(temp_s0);
-        CList__Remove(arg0 + 0xF0C, temp_s0);
-        CList__AddTail(arg1 + 0xE28, temp_s0);
+    if (text != NULL) {
+        func_00281B58(text);
+        CList__Remove(&pool->m_FreeTextList, text);
+        CList__AddTail(&cam->m_ActiveTextList, text);
     }
-    return temp_s0;
+    return text;
 }

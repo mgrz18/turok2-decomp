@@ -1,7 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/camera.h"
 
-void func_002812AC(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0xF4) = 0;
-    M2C_FIELD(arg0, s32 *, 0xF0) = 1;
+/* Starts warp 1. */
+void func_002812AC(CCamera *cam) {
+    cam->m_WarpTime = 0.0f;
+    cam->m_WarpMode = 1;
 }

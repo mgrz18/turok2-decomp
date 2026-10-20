@@ -1,20 +1,17 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/camera.h"
 
 s32 *func_00204EDC(M2C_UNK, s32, M2C_UNK, M2C_UNK *); /* extern */
 M2C_UNK func_00266C5C(s32, M2C_UNK, s32);           /* extern */
 extern M2C_UNK D_800A9A08;
 
-void func_00281FF8(void *arg0, s32 arg1) {
-    s32 *temp_v0;
-    s32 temp_a0;
-    s32 temp_s1;
+/* Allocates the pool's on-screen texts (0x40 bytes each) and clears them. */
+void func_00281FF8(CCameraPool *pool, s32 count) {
+    s32 size = count * sizeof(CCameraText);
 
-    temp_s1 = arg1 << 6;
-    M2C_FIELD(arg0, s32 *, 0xF08) = arg1;
-    temp_v0 = func_00204EDC(0, temp_s1, 0x23, &D_800A9A08);
-    M2C_FIELD(arg0, s32 **, 0xF00) = temp_v0;
-    temp_a0 = *temp_v0;
-    M2C_FIELD(arg0, s32 *, 0xF04) = temp_a0;
-    func_00266C5C(temp_a0, 0, temp_s1);
+    pool->m_nTexts = count;
+    pool->m_pmeTexts = func_00204EDC(0, size, 0x23, &D_800A9A08);
+    pool->m_Texts = *(CCameraText **) pool->m_pmeTexts;
+    func_00266C5C(pool->m_Texts, 0, size);
 }

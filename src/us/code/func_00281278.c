@@ -1,13 +1,15 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/camera.h"
 
-void func_00281278(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0xF0) = 0;
-    M2C_FIELD(arg0, s32 *, 0xF4) = 0;
-    M2C_FIELD(arg0, s32 *, 0xF8) = 0;
-    M2C_FIELD(arg0, s32 *, 0xFC) = 0;
-    M2C_FIELD(arg0, s32 *, 0x100) = 0;
-    M2C_FIELD(arg0, s32 *, 0x10C) = 0;
-    M2C_FIELD(arg0, f32 *, 0x104) = 1.0f;
-    M2C_FIELD(arg0, f32 *, 0x108) = 1.0f;
+/* Resets the warp: none, still, centred, no spin, scale 1. */
+void func_00281278(CCamera *cam) {
+    cam->m_WarpMode = 0;
+    cam->m_WarpTime = 0.0f;
+    cam->m_vWarpPos.x = 0.0f;
+    cam->m_vWarpPos.y = 0.0f;
+    cam->m_vWarpPos.z = 0.0f;
+    cam->m_WarpSpin = 0.0f;
+    cam->m_WarpXScale = 1.0f;
+    cam->m_WarpYScale = 1.0f;
 }
