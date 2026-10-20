@@ -1,15 +1,18 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/camera.h"
 
-void func_00281060(void *arg0, s8 arg1, s8 arg2, s8 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7) {
-    M2C_FIELD(arg0, s8 *, 0x532) = arg1;
-    M2C_FIELD(arg0, s8 *, 0x536) = arg2;
-    M2C_FIELD(arg0, s8 *, 0x537) = arg3;
-    M2C_FIELD(arg0, s8 *, 0x539) = 0;
-    M2C_FIELD(arg0, s32 *, 0x520) = 0;
-    M2C_FIELD(arg0, s32 *, 0x52C) = 1;
-    M2C_FIELD(arg0, s8 *, 0x538) = (s8) arg4;
-    M2C_FIELD(arg0, s8 *, 0x533) = (s8) arg5;
-    M2C_FIELD(arg0, s8 *, 0x534) = (s8) arg6;
-    M2C_FIELD(arg0, s8 *, 0x535) = (s8) arg7;
+/* Starts a screen flash: the colour, the most opaque it gets, and how many
+ * frames it takes to rise, hold and fade. */
+void func_00281060(CCamera *cam, s8 maxOpacity, s8 red, s8 green, s32 blue, s32 attack, s32 sustain, s32 decay) {
+    cam->m_MaxOpacity = maxOpacity;
+    cam->m_FlashColor[0] = red;
+    cam->m_FlashColor[1] = green;
+    cam->m_FlashColor[3] = 0;
+    cam->m_FlashTimer = 0.0f;
+    cam->m_FlashMode = 1;
+    cam->m_FlashColor[2] = blue;
+    cam->m_AttackTime = attack;
+    cam->m_SustainTime = sustain;
+    cam->m_DecayTime = decay;
 }

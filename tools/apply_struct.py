@@ -149,6 +149,8 @@ def main():
     ap.add_argument("header")
     ap.add_argument("typename")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--names", nargs="+", help="only these functions: offsets that fit a struct by chance "
+                    "do not make its argument one (type only where the code shows it is)")
     ap.add_argument("--min-offset", type=lambda x: int(x, 0), default=0,
                     help="require a field at this offset or deeper (CPlayer starts with a "
                          "CGameObjectInstance, so 0x510 tells the two apart)")
@@ -159,6 +161,8 @@ def main():
     size = max(slots) + 4
     done = kept = 0
     for path in sorted(SRC.glob("func_*.c")):
+        if args.names and path.stem not in args.names:
+            continue
         text = path.read_text()
         if args.typename in text:
             continue
