@@ -17,3 +17,10 @@ func_002640DC = 0x002640DC; // type:func size:0x94
 // CDecompressor__Main (Turok 3's name) loops forever and ends in `j`, so
 // splat runs it into the 8 bytes of data that follow it, before 0x00201CC0.
 func_00201C60 = 0x00201C60; // type:func size:0x58
+
+// Each of these returns early with a `jr ra` and goes on after it, and splat
+// took the code after that `jr ra` for a function of its own, which the
+// first then reached through a label defined by hand. One function each.
+func_0027BC34 = 0x0027BC34; // type:func size:0x34
+func_002810A0 = 0x002810A0; // type:func size:0x4C
+func_00281194 = 0x00281194; // type:func size:0x38
