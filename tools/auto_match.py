@@ -312,8 +312,11 @@ def load_jtbls():
 
 def rdata_refs(body):
     """Addresses in the engine's .rdata that a function's asm references."""
-    return sorted({int(a, 16) for a in re.findall(r"%lo\((?:D|jtbl)_([0-9A-F]{8})\)", body)
-                   if in_rdata(int(a, 16))})
+    # `%lo(D_X + 0x4)`: splat names a pool entry past the one it labelled by
+    # that label and an offset (func_0027C074's first float is D_800A97F8+4).
+    refs = {int(a, 16) + int(o or "0", 0) for a, o in
+            re.findall(r"%lo\((?:D|jtbl)_([0-9A-F]{8})(?:\s*\+\s*(0x[0-9A-Fa-f]+|\d+))?\)", body)}
+    return sorted(r for r in refs if in_rdata(r))
 
 
 def switch_only(body):
