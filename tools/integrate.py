@@ -125,6 +125,11 @@ def main():
         excluded.update(bad)
         for n in bad:
             todo.pop(n, None)
+    if "z64: OK" not in link_errors():
+        # Everything left was taken out: back to the last commit, which verifies.
+        sh("git checkout -q -- versions/turok2.us.yaml versions/foreign_labels.us.txt src && git clean -fdq src")
+        clean_build()
+        print("nothing in this batch verifies; the tree is back at the last commit")
     EXCL.write_text("".join(f"{n} {why}\n" for n, why in sorted(excluded.items())))
     sh("cp build/turok2.us.elf build/ref.elf")
     print(sh(f"{PY} tools/progress.py").stdout)
