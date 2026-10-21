@@ -110,14 +110,22 @@ def main():
     inner = {lab for lab in labels for ch in groups if ch[0] <= lab < ch[-1] + funcs[ch[-1]][1]}
     EXTRA.write_text("".join(l for l in EXTRA.read_text().splitlines(keepends=True)
                              if not (m := re.match(r"^\.L([0-9A-F]{8}) =", l)) or int(m.group(1), 16) not in inner))
-    with SIZES.open("a") as fh:
-        fh.write("\n// Functions splat cut at an early jr ra, joined (tools/join_cut.py).\n")
-        for ch in groups:
-            total = ch[-1] + funcs[ch[-1]][1] - ch[0]
-            fh.write(f"{funcs[ch[0]][0]} = 0x{ch[0]:08X}; // type:func size:0x{total:X}\n")
+    sizes = SIZES.read_text()
+    new = []
+    for ch in groups:
+        total = ch[-1] + funcs[ch[-1]][1] - ch[0]
+        entry = f"{funcs[ch[0]][0]} = 0x{ch[0]:08X}; // type:func size:0x{total:X}"
+        # A function joined before (cut twice) has its size here already.
+        sizes, n = re.subn(rf"^{funcs[ch[0]][0]} = .*$", entry, sizes, flags=re.M)
+        if not n:
+            new.append(entry)
+    if new:
+        sizes += "\n// Functions splat cut at an early jr ra, joined (tools/join_cut.py).\n" + "\n".join(new) + "\n"
+    SIZES.write_text(sizes)
     yaml = YAML.read_text()
     for ch in groups:
-        for a in ch[1:]:
+        # A head matched as it was (shorter) no longer is: it goes back too.
+        for a in ch:
             n = funcs[a][0]
             yaml = re.sub(rf"^\s+- \[0x[0-9A-F]+, c, code/{n}\]\n", "", yaml, flags=re.M)
             if n in have:
