@@ -205,7 +205,7 @@ def build(target, m, args, bodies):
     i_file = ROOT / "build" / f"import_{args.tag}" / f"{target}.i"
     i_file.parent.mkdir(parents=True, exist_ok=True)
     incs = [f"-I{args.repo / d}" for d in args.include] + [f"-I{src.parent}"]
-    cpp = (["cpp", "-P", "-undef", "-lang-c", "-D_LANGUAGE_C", "-DF3DEX_GBI_2", "-D__GNUC__=2", "-nostdinc"]
+    cpp = (["cpp", "-x", "c", "-P", "-undef", "-lang-c", "-D_LANGUAGE_C", "-DF3DEX_GBI_2", "-D__GNUC__=2", "-nostdinc"]
            + [f"-D{d}" for d in args.define] + incs + [str(src), "-o", str(i_file)])
     if subprocess.run(cpp, capture_output=True).returncode:
         return target, "cpp failed"
