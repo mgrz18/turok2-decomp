@@ -74,7 +74,8 @@ same bytes), **read** (understood, described here, not yet written).
 | `func_0027F64C` | fill rectangles around the viewport: the borders of a split screen | read |
 | `func_00282340` | draws the sky system (`m_SkySystem`) through the camera, culled against its view | read |
 | `func_002803E8` | a glare drawn from a screen point, fading with its distance to the centre (the sun's lens flare) | read |
-| `func_0027C4E4` | animates colours in a display list palette (`D_800AB0D0`) with the frame counter | read |
+| `func_00280AA0` | the glares of the objects this camera sees (flag 0x80000), each through `func_002803E8` | matched |
+| `func_0027C4E4` | cycles a display list light (`D_800AB0D0`) and the fog colour with the frame counter | matched |
 | `func_002812CC` | `gSPMatrix` of the on-screen projection | matched |
 
 ## Effects
@@ -103,7 +104,9 @@ same bytes), **read** (understood, described here, not yet written).
 `func_00281194` (the player whose camera this is), `func_0028130C`
 (distance to a point), `func_0028205C` (free the cameras), `func_0027BA8C`
 (a 128-entry lookup table from pairs), `func_0027BC34` (a value of the state
-at `D_800F56B0`): matched.
+at `D_800F56B0`), `func_002810EC` (where a world point falls on the screen),
+`func_00281444` (the active camera nearest a point, for sound),
+`func_00281518` (average distance from the active cameras): matched.
 
 ## Globals met on the way
 
