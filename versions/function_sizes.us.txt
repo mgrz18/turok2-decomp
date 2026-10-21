@@ -89,6 +89,6 @@ func_002265E8 = 0x002265E8; // type:func size:0x78
 func_00253460 = 0x00253460; // type:func size:0x80
 func_00267EA8 = 0x00267EA8; // type:func size:0x40
 func_00267F10 = 0x00267F10; // type:func size:0x54
-func_00268460 = 0x00268460; // type:func size:0x9C
+func_00268460 = 0x00268460; // type:func size:0xA8
 func_0026EF30 = 0x0026EF30; // type:func size:0x7C
 func_00288780 = 0x00288780; // type:func size:0x80
