@@ -44,7 +44,7 @@ def compile_one(src, out, incs, defs, repo=None, cc=None):
     if o.exists():
         return o
     i, s = o.with_suffix(".i"), o.with_suffix(".s")
-    cpp = (["cpp", "-P", "-undef", "-lang-c", "-D_LANGUAGE_C", "-DF3DEX_GBI_2", "-D__GNUC__=2", "-nostdinc"]
+    cpp = (["cpp", "-x", "c", "-P", "-undef", "-lang-c", "-D_LANGUAGE_C", "-DF3DEX_GBI_2", "-D__GNUC__=2", "-nostdinc"]
            + [f"-D{d}" for d in defs] + [f"-I{d}" for d in incs + [str(src.parent)]] + [str(src), "-o", str(i)])
     if subprocess.run(cpp, capture_output=True).returncode:
         return None
@@ -73,7 +73,10 @@ def main():
     out = ROOT / "build" / f"xmatch_{args.tag}"
     out.mkdir(parents=True, exist_ok=True)
     incs = [str(args.repo / d) for d in args.include]
-    srcs = [p for p in sorted((args.repo / args.src).rglob("*.c"))
+    # .CPP too: AbuN64's tree now keeps the original file names (src/CAMERA/
+    # ...CPP), compiled as C all the same.
+    srcs = [p for p in sorted((args.repo / args.src).rglob("*"))
+            if p.suffix in (".c", ".CPP", ".cpp")
             if not any(x in p.as_posix() for x in args.exclude)]
     with ThreadPoolExecutor(args.jobs) as pool:
         objs = list(pool.map(lambda p: compile_one(p, out, incs, args.define, args.repo, args.cc), srcs))
