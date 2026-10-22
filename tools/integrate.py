@@ -110,6 +110,8 @@ def main():
                     bad[m.group(1)] = f"calls {s}, which nothing defines here"
                 if o:
                     bad[o] = f"holds {s}, which other code reaches"
+            for m in re.finditer(r"code/(func_[0-9A-F]{8})\.c\.o: defined in discarded section", log):
+                bad[m.group(1)] = "its .rodata has no place in the build (discarded)"
             if not bad:
                 diff = sh(f"{PY} tools/romdiff.py --max-runs 5000").stdout
                 for n in set(re.findall(r"^code/(func_[0-9A-F]{8})\s+c\s", diff, re.M)):
