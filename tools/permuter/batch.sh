@@ -40,6 +40,9 @@ while :; do
     # match_func.py does not (it weighs the frame size near zero). Each start
     # would end at once on it; leave it for hand work.
     [ -f "build/permuter/$f/.base0" ] && continue
+    # The permuter rewrote its base into C the compiler rejects (pycparser
+    # mangles some casts and sizeofs); one such base stops every start.
+    [ -f "build/permuter/$f/.nocompile" ] && continue
     ls -d "build/permuter/$f"/output-0-* >/dev/null 2>&1 || DIRS+=("build/permuter/$f")
   done
   [ ${#DIRS[@]} -gt 0 ] || break
@@ -47,9 +50,12 @@ while :; do
   T0=$(date +%s)
   timeout "$LEFT" docker run --platform=linux/amd64 --ulimit core=0 --rm --name "$NAME" \
       -v "$PWD:/work" -w /work turok2-permuter \
-      python3 tools/permuter/run_permuter.py -j"${PERMUTER_JOBS:-4}" --stop-on-zero "${DIRS[@]}" </dev/null | tee build/permuter/.last_run
+      python3 tools/permuter/run_permuter.py -j"${PERMUTER_JOBS:-4}" --stop-on-zero "${DIRS[@]}" </dev/null 2>&1 | tee build/permuter/.last_run
   for b in $(grep -o '\[func_[0-9A-F]*\] base score = 0$' build/permuter/.last_run | grep -o 'func_[0-9A-F]*'); do
     touch "build/permuter/$b/.base0"; echo "== $b: base score 0, set aside"
+  done
+  for b in $(grep -o "Unable to compile build/permuter/func_[0-9A-F]*/" build/permuter/.last_run | grep -o "func_[0-9A-F]*"); do
+    touch "build/permuter/$b/.nocompile"; echo "== $b: the permuter cannot compile its base, set aside"; FAST=0
   done
   docker kill "$NAME" >/dev/null 2>&1 || true
   # A run that dies at once is not qemu's cpp: stop instead of spinning.
