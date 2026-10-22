@@ -2,10 +2,10 @@
 
 [![status](https://img.shields.io/badge/status-matching%20decomp-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
 [![ROM](https://img.shields.io/badge/ROM-rebuilds%20byte--exact-brightgreen)](docs/MATCHING.md)
-[![total matched](https://img.shields.io/badge/total%20matched-25.34%25-orange)](tools/progress.py)
-[![engine matched](https://img.shields.io/badge/engine%20matched-29.46%25-orange)](tools/progress.py)
-[![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-16.44%25-orange)](tools/progress.py)
-[![readable](https://img.shields.io/badge/readable%20C-16.48%25-blue)](tools/progress.py)
+[![total matched](https://img.shields.io/badge/total%20matched-30.97%25-orange)](tools/progress.py)
+[![engine matched](https://img.shields.io/badge/engine%20matched-35.78%25-orange)](tools/progress.py)
+[![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-20.59%25-orange)](tools/progress.py)
+[![readable](https://img.shields.io/badge/readable%20C-22.11%25-blue)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
 [![RSP ucode](https://img.shields.io/badge/RSP%20ucode-stock%20F3DEX-success)](docs/MICROCODE.md)
@@ -14,7 +14,7 @@
 
 Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0): C source that compiles back to the exact original ROM.
 
-> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 1,580 engine functions (29.46% of engine code) and 581 functions of the paged VM modules (16.44%), which build with the same toolchain, are matched and linked into the ROM as C so far: 25.34% of all the game's code. The VM modules' second copy (70 KB, the first copy's bytes again, which cannot be C of its own) is left out of both sides of that figure. 16.48% of the code is also *readable* C, with named fields rather than m2c's offset macros ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
+> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 1,730 engine functions (35.78% of engine code) and 628 functions of the paged VM modules (20.59%), which build with the same toolchain, are matched and linked into the ROM as C so far: 30.97% of all the game's code. The VM modules' second copy (70 KB, the first copy's bytes again, which cannot be C of its own) is left out of both sides of that figure. 22.11% of the code is also *readable* C, with named fields rather than m2c's offset macros ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
 >
 > A parallel native-port track recompiles the same ELF with N64Recomp; it runs clean, and the TLB is its open question.
 
@@ -82,7 +82,7 @@ and symbol coverage rather than matched-function counts.
 ## Standing on the shoulders of
 
 - **[Drahsid/turok3](https://github.com/Drahsid/turok3)** — in-progress decomp of Turok 3 (same engine). Foundation for the official Turok 3 Remastered.
-- **[AbuN64/ragewars-decomp](https://github.com/AbuN64/ragewars-decomp)** — matching decomp of Turok: Rage Wars, the same engine a year later. Hundreds of Turok 2 functions compile from its C unchanged; those files carry its C, cut down to the one function and with Turok 2's symbol names (`tools/xmatch_ref.py`, `tools/import_ref.py`), and say so in their header.
+- **[AbuN64/ragewars-decomp](https://github.com/AbuN64/ragewars-decomp)** — matching decomp of Turok: Rage Wars, the same engine a year later. Hundreds of Turok 2 functions compile from its C unchanged; those files carry its C, cut down to the one function and with Turok 2's symbol names (`tools/xmatch_ref.py`, `tools/import_ref.py`), and say so in their header. Hundreds more are *near* copies: the same code over structs laid out differently (Turok 2's level actor is 0x288 bytes, Rage Wars' 0x2E8) or with other constants; those were retyped by hand to Turok 2's layouts.
 - **[thejunkman9000/Turok-Rage-Wars-Decomp](https://github.com/thejunkman9000/Turok-Rage-Wars-Decomp)** — another Rage Wars decomp, with a native PC port; Turok 2 functions taken from its C the same way say so in their header.
 - **[Drahsid/LibTEngine](https://github.com/Drahsid/LibTEngine)** — reverse-engineered structs and function signatures for the Turok 2 / Turok 3 engine. Major head start.
 - **[Mr-Wiseguy/N64Recomp](https://github.com/Mr-Wiseguy/N64Recomp)** + **[N64ModernRuntime](https://github.com/Mr-Wiseguy/N64ModernRuntime)** + **[RT64](https://github.com/rt64/rt64)** — the native-port pipeline.
