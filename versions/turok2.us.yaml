@@ -1349,7 +1349,7 @@ segments:
       - [0x7020C, c, code/func_0026F60C]
       - [0x702C8, c, code/func_0026F6C8]
       - [0x70360, c, code/func_0026F760]
-      - [0x70770, asm]
+      - [0x70770, c, code/func_0026FB70]
       - [0x7094C, c, code/func_0026FD4C]
       - [0x70988, c, code/func_0026FD88]
       - [0x70AA0, c, code/func_0026FEA0]
