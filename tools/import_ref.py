@@ -92,6 +92,13 @@ def reduce(text, keep):
             if name == keep:
                 # Turok 2's other code calls it: it cannot stay file-local.
                 out.append(re.sub(r"^\s*static\s+", "", item))
+            elif re.search(r"\b(__)?inline(__)?\b", item.split("{", 1)[0]):
+                # An inline helper: Turok 2 has it inlined into the function,
+                # so its body has to come along. Kept file-local, so that a
+                # copy the compiler does not inline is not a second global.
+                head, body = item.split("{", 1)
+                head = re.sub(r"^\s*((static|extern)\s+|(__)?inline(__)?\s+)*", "", head)
+                out.append("static __inline__ " + head.strip() + " {" + body)
             else:
                 out.append(re.sub(r"^\s*(static\s+|inline\s+)*", "", item.split("{", 1)[0]).strip() + ";")
             continue
