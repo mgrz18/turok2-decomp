@@ -144,6 +144,9 @@ def main():
         sizes, n = re.subn(rf"^{funcs[ch[0]][0]} = .*$", entry, sizes, flags=re.M)
         if not n:
             new.append(entry)
+    # A tail's own size entry would keep splat cutting there: drop it.
+    tails = {funcs[a][0] for ch in groups for a in ch[1:]}
+    sizes = "".join(l for l in sizes.splitlines(keepends=True) if l.split(" =", 1)[0] not in tails)
     if new:
         sizes += "\n// Functions splat cut at an early jr ra, joined (tools/join_cut.py).\n" + "\n".join(new) + "\n"
     SIZES.write_text(sizes)
