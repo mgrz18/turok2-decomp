@@ -58,9 +58,20 @@ def main():
     bodies = A.extract_asm()
     called = set()
     for b in bodies.values():
-        called |= set(re.findall(r"\b(?:jal|j)\s+(func_[0-9A-F]{8})\b", b))
+        called |= set(re.findall(r"\bjal\s+(func_[0-9A-F]{8})\b", b))
+    # A jump into a function from anywhere but the part just before it is a
+    # real entry (a tail call); from the part before, it is the same function.
+    jumped = {}
+    for n, b in bodies.items():
+        for t in re.findall(r"\bj\s+(func_[0-9A-F]{8})\b", b):
+            jumped.setdefault(t, set()).add(n)
     for p in (ROOT / "src").rglob("*.c"):
         called |= set(re.findall(r"\b(func_[0-9A-F]{8})\s*\(", re.sub(r"^\w[^\n]*\{", "", p.read_text(), flags=re.M)))
+
+    # Every name a function's asm goes by: func_X and its real name.
+    aliases = {a: {n} for a, (n, _) in funcs.items()}
+    for real, fx in A.named_addresses().items():
+        aliases.setdefault(int(fx[5:], 16), set()).add(real)
 
     def owner(addr):
         import bisect
@@ -71,6 +82,11 @@ def main():
                 return a
         return None
 
+    # A branch (not a call) to the very start of the next function names it
+    # (func_X), not a label: those count as cut points too.
+    for b in bodies.values():
+        for t in re.findall(r"\b(?:b\w*|j)\s+(?:[^,\n]*,\s*)*func_([0-9A-F]{8})\b", b):
+            labels.add(int(t, 16))
     # first part -> second part, for every label one branches to in the next
     join = {}
     for lab in labels:
@@ -83,9 +99,9 @@ def main():
             continue
         f = prev[-1]
         fname, fsize = funcs[f]
-        if f + fsize != g or gname in called or gname in named:
+        if f + fsize != g or gname in called or gname in named or jumped.get(gname, set()) - aliases.get(f, {fname}):
             continue
-        if not re.search(rf"\b(?:b\w*|j)\s+(?:[^,\n]*,\s*)*\.L{lab:08X}\b", bodies.get(fname, "")):
+        if not re.search(rf"\b(?:b\w*|j)\s+(?:[^,\n]*,\s*)*(?:\.L|func_){lab:08X}\b", bodies.get(fname, "")):
             continue
         join[f] = g
     # chains: a -> b -> c joins into a
@@ -108,6 +124,15 @@ def main():
         return 0
 
     inner = {lab for lab in labels for ch in groups if ch[0] <= lab < ch[-1] + funcs[ch[-1]][1]}
+    # A label other code still reaches (the VM modules' second copy jumps
+    # into the first) stays defined.
+    for ch in groups:
+        mine = {funcs[a][0] for a in ch}
+        for n, b in bodies.items():
+            if n in mine:
+                continue
+            for t in re.findall(r"\.L([0-9A-F]{8})\b", b):
+                inner.discard(int(t, 16))
     EXTRA.write_text("".join(l for l in EXTRA.read_text().splitlines(keepends=True)
                              if not (m := re.match(r"^\.L([0-9A-F]{8}) =", l)) or int(m.group(1), 16) not in inner))
     sizes = SIZES.read_text()
@@ -127,10 +152,17 @@ def main():
         # A head matched as it was (shorter) no longer is: it goes back too.
         for a in ch:
             n = funcs[a][0]
-            yaml = re.sub(rf"^\s+- \[0x[0-9A-F]+, c, code/{n}\]\n", "", yaml, flags=re.M)
+            yaml = re.sub(rf"^\s+- \[0x[0-9A-F]+, (?:c|\.rodata|\.data|\.rdata|\.bss), code/{n}\]\n", "", yaml, flags=re.M)
             if n in have:
                 have[n].unlink()
     YAML.write_text(yaml)
+    # A tail with a name of its own in the scan's symbols stays a global
+    # symbol (and a function to every tool) inside the joined asm: drop it,
+    # so splat makes it a label.
+    scan = ROOT / "versions" / "symbols_from_scan.us.txt"
+    tails = {funcs[a][0] for ch in groups for a in ch[1:]}
+    scan.write_text("".join(l for l in scan.read_text().splitlines(keepends=True)
+                            if l.split(" =", 1)[0].strip() not in tails))
     return 0
 
 
