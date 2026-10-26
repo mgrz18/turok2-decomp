@@ -42,6 +42,8 @@ for n in names:
         if any(op not in ('j', 'jal') for op, _ in jumps.get(n, [])):
             print(f'  skip {n}: another function branches into it (a false boundary)'); continue
         labels |= {lab for _, lab in jumps[n]}
+    if n not in bodies:
+        print(f'  skip {n}: not a function of its own in the asm (joined or cut elsewhere)'); continue
     obj = W / f'{n}.o'
     if not obj.exists():
         print(f'  skip {n}: did not compile (a qemu crash? run it again)'); continue
