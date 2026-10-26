@@ -11,5 +11,4 @@ it moves to `src/` through `tools/integrate.py` and leaves this folder.
 |---|---|---|
 | `camera/func_0027E000.c` | CCamera DisplayListSetup: projection, viewport, scissor, look-at, z-buffer clear, fog | same size, 473 of 477 words |
 | `camera/func_0027E770.c` | CCamera DrawScene: the scene through a camera, layer by layer, then a viewport clear | 149 of 198 words |
-| `camera/func_0027EA88.c` | moves the viewport toward a size and place (split screen opening/closing) | 106 of 154 words |
 | `camera/func_002817A0.c` | CCameraPool AddMultiLineText: a string over a camera, one text per line | 83 of 117 words |

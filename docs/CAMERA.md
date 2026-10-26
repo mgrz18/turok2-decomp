@@ -86,7 +86,7 @@ same bytes), **read** (understood, described here, not yet written).
 | `func_0028135C` / `func_002811CC` | **shake**: start one of the pool's sources (or reuse the newest) / set the camera's own — position, radius, wave type, a tenth of each amplitude | matched |
 | `func_00281D1C` | **tremor** of a region flagged 0x10000: eases toward 0.5° and 0.25 high, random offset each frame | matched |
 | `func_00281278` / `func_002812AC` / `func_002812BC` | **warp**: reset it, start mode 1 or 2 | matched |
-| `func_0027EA88` | moves the viewport toward a size and a place, 16 pixels a frame | nonmatching |
+| `func_0027EA88` | moves the viewport toward a size and a place, 16 pixels a frame | matched |
 | `func_00280FD8` | draws the flash over the viewport | matched |
 | `func_002810A0` | the fog colour to 5 bits a channel, or black under flag 0x4000 | matched |
 
