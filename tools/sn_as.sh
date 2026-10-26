@@ -40,6 +40,14 @@ tr -d '\r' < "$IN" \
            END { if (held != "") print held }' \
     | awk '{ if (prev_cmp && $0 ~ /^[[:space:]]*#nop[[:space:]]*$/) { print "\tnop"; prev_cmp = 0; next }
              prev_cmp = ($1 ~ /^c\.[a-z]+\.[sd]$/); print }' \
+    | awk '# asn64: an FP compare right before a label whose first instruction
+           # is a bc1 branch gets its hazard nop after the label (cc1 writes
+           # no #nop there; every path into the label must wait a cycle).
+           { ins = ($1 != "" && $1 !~ /^[#.]/ && $1 !~ /:$/) }
+           $1 ~ /^[$.]?L?[A-Za-z0-9_$.]*:$/ && last_cmp { at_label = 1; print; next }
+           ins { if (at_label && $1 ~ /^bc1[tf]l?$/) print "\tnop"
+                 at_label = 0; last_cmp = ($1 ~ /^c\.[a-z]+\.[sd]$/) }
+           { print }' \
     | awk '/^[[:space:]]*\.set[[:space:]]+noreorder/ { noreorder = 1 }
            /^[[:space:]]*\.set[[:space:]]+reorder/ { noreorder = 0 }
            { if (prev_mul && !noreorder && $1 ~ /^(mul\.[sd]|mult|multu|dmult|dmultu)$/) print "\tnop"
