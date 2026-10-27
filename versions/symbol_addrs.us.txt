@@ -1,2 +1,4 @@
 // Sembrado limpio: los simbolos de LibTEngine no aplican a este ROM.
 // Ver el issue de invalidacion. Respaldo en symbol_addrs.us.txt.libtengine-bak
+// Floats that splat would otherwise read as a string once a C file splits the pool before them.
+D_800A6AA0 = 0x800A6AA0; // type:f32
