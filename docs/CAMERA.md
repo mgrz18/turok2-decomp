@@ -69,7 +69,7 @@ same bytes), **read** (understood, described here, not yet written).
 | Function | | Status |
 |---|---|---|
 | `func_0027E000` *DisplayListSetup* | pipe sync and the RDP setup lists; `gSPMatrix` (projection), `gSPPerspNormalize`; the `Vp` (scale = 2×size×warp scale, translation from it) and `gSPViewport`; `gDPSetScissor` clamped to the screen; both `LookAt`s. Then, unless it is the main camera with others active: the z buffer cleared (colour image at the z buffer, fill colour max z, fill rectangle), `G_FOG` on, `gSPFogPosition(m_FogStart, 1000)`, the fog colour (the camera's, black under game flag 0x4000, or a cinematic's) and the view cleared to it | nonmatching |
-| `func_0027E770` *DrawScene* | the scene through the camera layer by layer (world, objects, effects, particles, sky, clip ratio, ...), then with game flag 0x200 a fill rectangle over the viewport | nonmatching |
+| `func_0027E770` *DrawScene* | the scene through the camera layer by layer (world, objects, effects, particles, sky, clip ratio, ...), then with game flag 0x200 a fill rectangle over the viewport | matched |
 | `func_0027C1E8` *DrawTints* | the fog colour over the view while the player is under water (AI flags 0x880) or a tint is forced (`D_800AE340`, colour `D_800F1FE4`); the screen flash; the red flash of a hit fading at `m_FlashDec` a frame; one more thing in game mode 13 | matched |
 | `func_0027F64C` | fill rectangles around the viewport: the borders of a split screen | read |
 | `func_00282340` | draws the sky system (`m_SkySystem`) through the camera, culled against its view | read |
@@ -94,7 +94,7 @@ same bytes), **read** (understood, described here, not yet written).
 
 | Function | | Status |
 |---|---|---|
-| `func_002817A0` *AddMultiLineText* | a string over a camera, one text per line, centred, 80 pixels above the bottom; texts with the same id go first | nonmatching |
+| `func_002817A0` *AddMultiLineText* | a string over a camera, one text per line, centred, 80 pixels above the bottom; texts with the same id go first | matched |
 | `func_0027FDE4` *AdvanceText* | stacks the texts from 81% down, draws them, fades them in and out with a quarter sine wave, starts the waiting ones | matched |
 | `func_00281AB4` | takes a free text for a camera | matched |
 | `func_00281FF8` / `func_002820B4` | allocate / free the pool's texts | matched |

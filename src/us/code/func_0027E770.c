@@ -2,6 +2,8 @@
 #include "gfx.h"
 #include "structs/camera.h"
 
+#define GFX_WORDS(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+
 extern s32 D_8011AAD8;          /* game flags */
 /* The global at D_80119870: what this reads of it. */
 typedef struct {
@@ -30,9 +32,6 @@ void func_00207FEC(s32 arg0);
  * DrawScene), and with game flag 0x200 up clears its viewport after: a
  * fill rectangle in fill mode, blend colour and prim depth all ones. */
 void func_0027E770(CCamera *cam, u8 *world) {
-    Gfx *g;
-    Gfx *gdl;
-
     func_002847D0();
     func_002222E0(world, cam);
     if (Cinema_PathPlaying() == 0) {
@@ -55,30 +54,19 @@ void func_0027E770(CCamera *cam, u8 *world) {
         func_002531D0(&D_80119870, cam);
     }
     if (D_8011AAD8 & 0x200) {
-        gdl = D_800D8E24;
-        gdl->w0 = 0xE7000000;               /* gDPPipeSync */
-        gdl->w1 = 0;
-        gdl++;
-        gdl->w0 = 0xE3000A01;               /* gDPSetCycleType(G_CYC_FILL) */
-        gdl->w1 = 0;
-        gdl++;
-        gdl->w0 = 0xF9000000;               /* gDPSetBlendColor */
-        gdl->w1 = 0xFFFFFFFF;
-        gdl++;
-        gdl->w0 = 0xEE000000;               /* gDPSetPrimDepth */
-        gdl->w1 = 0xFFFFFFFF;
-        gdl++;
-        g = gdl++;
-        D_800D8E24 = gdl;
-        g->w0 = 0xE2001D00;                 /* gDPSetRenderMode, z compare */
-        g->w1 = 4;
+        GFX_WORDS(0xE7000000, 0);                   /* gDPPipeSync */
+        GFX_WORDS(0xE3000A01, 0);                   /* gDPSetCycleType(G_CYC_FILL) */
+        GFX_WORDS(0xF9000000, 0xFFFFFFFF);          /* gDPSetBlendColor */
+        GFX_WORDS(0xEE000000, 0xFFFFFFFF);          /* gDPSetPrimDepth */
+        GFX_WORDS(0xE2001D00, 4);                   /* gDPSetRenderMode, z compare */
         func_00207FEC(0x16);
-        g = D_800D8E24;                     /* gDPFillRectangle over the viewport */
-        D_800D8E24 = g + 1;
+        {                                           /* gDPFillRectangle over the viewport */
+        Gfx *g = D_800D8E24++;
         g->w0 = 0xF6000000
               | ((u32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width) & 0x3FF) << 14
               | ((u32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height) & 0x3FF) << 2;
         g->w1 = ((u32) cam->m_Viewport.m_ScreenPosX & 0x3FF) << 14
               | ((u32) cam->m_Viewport.m_ScreenPosY & 0x3FF) << 2;
+        }
     }
 }
