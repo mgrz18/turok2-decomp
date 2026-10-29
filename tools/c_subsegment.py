@@ -36,18 +36,23 @@ ENTRY = re.compile(r"^(\s+)- \[(0x[0-9A-Fa-f]+),\s*(\w+)(?:,\s*([^\]\s]+))?\s*\]
 def function_ranges(names):
     """name -> (rom start, rom end) from the linked ELF."""
     want = set(names)
+    # A function with a real name (versions/names.us.txt) is in the ELF under
+    # it; its file is still code/func_<vram>.
+    alias = {n: f"func_{int(a, 16):08X}" for n, a in re.findall(
+        r"^(\w+)\s*=\s*0x([0-9A-Fa-f]+);", (ROOT / "versions" / "names.us.txt").read_text(), re.M)}
     out = {}
     with ELF.open("rb") as fh:
         elf = ELFFile(fh)
         loads = [s for s in elf.iter_segments() if s["p_type"] == "PT_LOAD"]
         for sym in elf.get_section_by_name(".symtab").iter_symbols():
-            if sym.name not in want or sym["st_info"]["type"] != "STT_FUNC":
+            name = sym.name if sym.name in want else alias.get(sym.name)
+            if name not in want or sym["st_info"]["type"] != "STT_FUNC":
                 continue
             v = sym["st_value"]
             for seg in loads:
                 if seg["p_vaddr"] <= v < seg["p_vaddr"] + seg["p_filesz"]:
                     rom = seg["p_paddr"] + v - seg["p_vaddr"]
-                    out[sym.name] = (rom, rom + sym["st_size"])
+                    out[name] = (rom, rom + sym["st_size"])
                     break
     missing = want - set(out)
     if missing:

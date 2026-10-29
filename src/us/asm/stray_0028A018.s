@@ -1,5 +1,5 @@
 /* 0x0028A018-0x0028A020: 2 words splat took for the start of a
- * function. Never executed: lwc1, addu; func_0028ADF0 starts the thread at 0x28A020.
+ * function. Never executed: lwc1, addu; func_0028ADF0 passes 0x28A020 by address.
  * Written by tools/fix_cut.py from the ROM; edit versions/cuts.us.txt. */
 
 .set noreorder

@@ -127,10 +127,78 @@ def stub_text(a, b, rom_off, rom, why):
             + f".size {name}, . - {name}\n")
 
 
+def find_strays():
+    """Candidates for `stray` lines, from the linked ELF and the asm.
+
+    The stray words are the padding before an object that starts 16-aligned
+    (SN's linker aligns each object's .text to 16 and fills the gap with
+    whatever its buffer held, often a copy of code from elsewhere), so a
+    candidate is a function at A, not 16-aligned, whose next 16-aligned
+    address B is inside it, where
+      - nothing reaches A or any word before B (jal, j, branch, a .word in
+        the data), and
+      - B is reached (jal, a pointer in the data) or opens with a prologue
+        (addiu $sp, $sp, -N).
+    Each one still wants a look: print it with the disassembly.
+    """
+    import bisect
+    import subprocess
+    from elftools.elf.elffile import ELFFile
+    elf_path = ROOT / "build" / "turok2.us.elf"
+    funcs = []
+    with elf_path.open("rb") as fh:
+        for s in ELFFile(fh).get_section_by_name(".symtab").iter_symbols():
+            if s["st_info"]["type"] == "STT_FUNC" and s["st_size"]:
+                funcs.append((s["st_value"], s["st_size"], s.name))
+    funcs.sort()
+    reached, called = set(), set()
+    lo, hi = funcs[0][0], funcs[-1][0] + funcs[-1][1]
+    dis = subprocess.run(["mips-linux-gnu-objdump", "-d", "--no-show-raw-insn", "-M", "reg-names=numeric",
+                          str(elf_path)], capture_output=True, text=True).stdout
+    words = {}
+    for line in dis.splitlines():
+        m = re.match(r"^\s*([0-9a-f]+):\s+(\S+)\s*(.*)$", line)
+        if not m:
+            continue
+        pc, op, ops = int(m.group(1), 16), m.group(2), m.group(3)
+        words[pc] = (op, ops)
+        if op == "jal" or op == "j" or op.startswith("b"):
+            t = re.match(r"\s*([0-9a-f]+)\b", ops.split(",")[-1])
+            if t:
+                (called if op == "jal" else reached).add(int(t.group(1), 16))
+    for p in (ROOT / "us" / "asm" / "data").glob("*.s"):
+        for v in re.findall(r"\.word\s+(?:0x|func_|D_|\.L)([0-9A-Fa-f]{8})\b", p.read_text()):
+            called.add(int(v, 16))
+    # Code that names the function (a pointer, %hi/%lo) other than its own file.
+    asm = [p for p in (ROOT / "us" / "asm").glob("*.s")] + list((ROOT / "src").rglob("*.c"))
+    texts = {p: re.sub(r"^\.globl.*\n|^\.ent.*\n|^\.end.*\n|^\w+:\n", "", p.read_text(), flags=re.M) for p in asm}
+    for a, size, name in funcs:
+        if a % 16 == 0:
+            continue
+        b = (a + 15) & ~15
+        if b > a + size or b - a > 12:
+            continue
+        if b == a + size and not any(f[0] == b for f in funcs):
+            continue
+        if any(x in reached or x in called for x in range(a, b, 4)):
+            continue
+        op = words.get(b, ("", ""))
+        prologue = op[0] == "addiu" and op[1].startswith("$29,$29,-")
+        if not (b in called or prologue):
+            continue
+        why = "reached" if b in called else "a prologue"
+        named = [p.name for p in asm if re.search(rf"\b{name}\b", texts[p])]
+        print(f"stray 0x{a:08X} 0x{b:08X} // {name}: {(b - a) // 4} words; 0x{b:08X} is {why}"
+              + (f"; {name} named in {', '.join(named[:3])}" if named else ""))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--find", action="store_true", help="list candidate stray lines (needs a build)")
     args = ap.parse_args()
+    if args.find:
+        return find_strays()
     cuts = read_cuts()
     named = names_by_addr()
     rom = ROM.read_bytes()
@@ -199,6 +267,29 @@ def main():
     # is the one place they live), so no file disagrees with it.
     owned = set(sizes) | drop
 
+    # A C file wired for a function inside a fixed range (named by address,
+    # code/func_X) is a fragment too, even when no symbol file lists it.
+    for l in lines:
+        m = ENTRY.match(l)
+        if m and m.group(3) == "c" and (f := re.match(r"code/func_([0-9A-F]{8})$", m.group(4) or "")):
+            v = int(f.group(1), 16)
+            if any(s < v < e for s, e in ranges) and f"func_{v:08X}" not in sizes:
+                drop.add(f"func_{v:08X}")
+    # Taking a fragment's C out leaves two asm subsegments in a row, and splat
+    # would cut the function at the second: one asm entry each run.
+    out, prev = [], None
+    for l in lines:
+        m = ENTRY.match(l)
+        if m and m.group(3) in ("c", ".rodata") and re.match(rf"code/(?:{'|'.join(sorted(drop)) or '-'})$", m.group(4) or ""):
+            print(f"  {m.group(4)[5:]}: its C goes back to asm (a fragment of a whole function)")
+            if args.write:
+                (SRC / "code" / f"{m.group(4)[5:]}.c").unlink(missing_ok=True)
+            continue
+        if m and m.group(3) == "asm" and prev == "asm":
+            continue
+        prev = m.group(3) if m else (prev if l.strip().startswith("#") or not l.strip() else None)
+        out.append(l)
+    lines = out
     yaml_text = "\n".join(lines) + "\n"
     for n in sorted(drop):
         # C wired for a fragment goes back to asm, inside the whole function.

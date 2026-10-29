@@ -37,3 +37,29 @@ func 0x002A2650 0x1B4 // the I/O thread: an endless loop with no epilogue
 func 0x002A2804 0x54 // opens with its own addiu $sp, $sp, -0x18
 func 0x0029D690 0x398 // __osDevMgrMain
 stray 0x0029DA28 0x0029DA30 // mul.s, mfc1 after __osDevMgrMain's last j; also in Rage Wars
+
+// Kind C: a stray stub splat made a function of its own, whose junk branch
+// lands inside the real function (so that one looked entered from outside).
+stray 0x00284654 0x00284660 // li, lw, bnez into func_00284660+0xC
+stray 0x00296334 0x00296340 // lhu, andi, bnez into alMainBusPull+0x20
+stray 0x0029B5AC 0x0029B5B0 // a jal whose delay slot is osJamMesg's first word
+stray 0x0029B6E4 0x0029B6F0 // sw, addiu, sw ahead of osRecvMesg
+stray 0x0029B814 0x0029B820 // beqz into osSendMesg+4, nop, jal
+// func_0026BBB8 (`return 0`, matched as C) is the exit of func_0026BB9C's
+// loop, and the loop itself (.L0026BBC0) opened us/asm/6C7C0.s, which made
+// the four functions after it labels inside one asm function.
+func 0x0026BB9C 0xB8 // the loop's bc1t returns through 0x26BBB8
+
+// libgcc's 64-bit helpers each start 16-aligned, after padding.
+stray 0x002A3AD4 0x002A3AE0 // ahead of __divdi3
+stray 0x002A40CC 0x002A40D0 // ahead of __moddi3
+stray 0x002A4648 0x002A4650 // ahead of __udivdi3
+stray 0x002A4BD4 0x002A4BE0 // ahead of __umoddi3
+stray 0x002A50D4 0x002A50E0 // ahead of __cmpdi2
+stray 0x002A5128 0x002A5130 // ahead of __floatdisf
+
+// Older cuts found by hand.
+stray 0x0025AD88 0x0025AD90 // sw, bnez; callers jal 0x25AD90
+stray 0x00277088 0x00277090 // bne, nop; callers jal 0x277090
+stray 0x00246BBC 0x00246BC0 // a jal; callers jal 0x246BC0
+stray 0x00257A3C 0x00257A40 // an extra addiu $sp, $sp, -0x90 ahead of the real prologue
