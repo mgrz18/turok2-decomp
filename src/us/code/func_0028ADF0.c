@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern char D_0028A020;
+extern void func_0028A020(void *sc);
 extern void func_0029B030(char *row, char *slots, s32 count);
 extern void func_0029B950(s32 slot, char *row, s32 text);
 extern void func_0029AA20(char *row, s32 text, s32 style);
@@ -27,6 +27,6 @@ void func_0028ADF0(Panel *panel, s32 arg1, s32 arg2, s32 arg3, unsigned char sty
     func_0029B950(9, panel->row0, 0x29C);
     func_0029B950(0xE, panel->row0, 0x29D);
     func_0029AA20(panel->row0, 0x29A, style);
-    func_0029B060(panel->elements, 7, &D_0028A020, panel, arg1, arg2);
+    func_0029B060(panel->elements, 7, (void *) func_0028A020, panel, arg1, arg2);
     func_0029BB10(panel->elements);
 }

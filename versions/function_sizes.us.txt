@@ -74,7 +74,6 @@ func_002743D0 = 0x002743D0; // type:func size:0x70
 func_00283550 = 0x00283550; // type:func size:0x194
 func_00284330 = 0x00284330; // type:func size:0x28
 func_00284358 = 0x00284358; // type:func size:0x28
-func_0028E7A4 = 0x0028E7A4; // type:func size:0x23C
 func_002925E0 = 0x002925E0; // type:func size:0x60
 func_002982F0 = 0x002982F0; // type:func size:0x7C
 func_0029A4A0 = 0x0029A4A0; // type:func size:0x2C
@@ -121,7 +120,6 @@ func_0025739C = 0x0025739C; // type:func size:0x60
 func_002576AC = 0x002576AC; // type:func size:0x74
 func_00260360 = 0x00260360; // type:func size:0x90
 func_00262C20 = 0x00262C20; // type:func size:0x154
-func_00265954 = 0x00265954; // type:func size:0x12C
 func_002660D0 = 0x002660D0; // type:func size:0x6C
 func_00266B90 = 0x00266B90; // type:func size:0xCC
 func_00266D24 = 0x00266D24; // type:func size:0x68
@@ -208,5 +206,29 @@ func_00266C00 = 0x00266C00; // type:func size:0x5C
 
 // --- true extents from versions/cuts.us.txt (tools/fix_cut.py) ---
 // Generated from versions/cuts.us.txt by tools/fix_cut.py; edit that.
+func_00263A20 = 0x00263A20; // type:func
 func_002649A0 = 0x002649A0; // type:func
+func_00265200 = 0x00265200; // type:func
+func_00265954 = 0x00265954; // type:func size:0xD0
+func_00265A30 = 0x00265A30; // type:func
+func_00267090 = 0x00267090; // type:func size:0x124
+func_0026E760 = 0x0026E760; // type:func
+func_0026F080 = 0x0026F080; // type:func
+func_00285CF0 = 0x00285CF0; // type:func
+func_0028A020 = 0x0028A020; // type:func
+func_0028D380 = 0x0028D380; // type:func
+func_0028E7A4 = 0x0028E7A4; // type:func size:0x100
+func_0028E8A4 = 0x0028E8A4; // type:func size:0xE8
+func_0028E98C = 0x0028E98C; // type:func size:0x54
+func_00291330 = 0x00291330; // type:func
+func_00296360 = 0x00296360; // type:func
+func_002972E0 = 0x002972E0; // type:func
+func_002975D0 = 0x002975D0; // type:func
+func_00297FB0 = 0x00297FB0; // type:func
+func_0029D370 = 0x0029D370; // type:func
+func_0029D450 = 0x0029D450; // type:func
+func_0029D690 = 0x0029D690; // type:func size:0x398
+func_0029DA30 = 0x0029DA30; // type:func
+func_002A2650 = 0x002A2650; // type:func size:0x1B4
+func_002A2804 = 0x002A2804; // type:func size:0x54
 // --- end cuts ---

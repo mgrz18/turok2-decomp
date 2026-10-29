@@ -8,3 +8,32 @@
 // func_00264C94 stores func_00264994 + 0xC as a callback; nothing reaches the
 // three words before it (lw, a beqz into the function, lui).
 stray 0x00264994 0x002649A0 // the only reference, func_00264C94, stores func_00264994 + 0xC
+
+// Kind A: words ahead of the prologue that nothing reaches. Each real start
+// is what the callers' jal, a data pointer or a thread entry names.
+stray 0x002651FC 0x00265200 // a lone `jal func_0022F1C8`; the data's pointer is 0x00265200
+stray 0x00263A14 0x00263A20 // addu, addu, jal func_0020EEF8; func_00264378 calls 0x263A20
+stray 0x00285CE8 0x00285CF0 // swc1, sw; the pointer in AB858.rodata.s is 0x00285CF0
+stray 0x0026E758 0x0026E760 // sw, j .L0023587C; func_002851C0 calls 0x26E760
+stray 0x0026F078 0x0026F080 // addiu, jal func_0026D288; callers jal 0x26F080
+stray 0x002972D8 0x002972E0 // jal func_0025AAA4, addu; alSavePull starts at 0x2972E0
+stray 0x002975C4 0x002975D0 // mov.s, c.lt.s, nop after cosf; guLookAt starts at 0x2975D0
+stray 0x00297FAC 0x00297FB0 // a bne; guPerspective starts at 0x297FB0
+stray 0x00291324 0x00291330 // swc1, lh, jal func_0024E700; alCSPNew starts at 0x291330
+stray 0x0029635C 0x00296360 // a bnez; alMainBusPull starts at 0x296360
+stray 0x0028D374 0x0028D380 // jal func_0021E03C, swc1, addu; the boot stub enters at 0x28D380 (main)
+stray 0x0028A018 0x0028A020 // lwc1, addu; func_0028ADF0 passes 0x28A020 by address
+stray 0x0029D364 0x0029D370 // lw, lw, ldc1 (an epilogue's loads); the function starts at 0x29D370
+stray 0x0029D444 0x0029D450 // an epilogue (jr ra, addiu sp) and a lw; osCreatePiManager starts at 0x29D450
+func 0x00267090 0x124 // splat cut its first word (lw $2, 0x14($4)) into a function of its own
+
+// Kind B: one cut holding several functions, or junk at the end.
+func 0x00265954 0xD0 // an animation check; a nop and two stray words follow it
+stray 0x00265A24 0x00265A30 // nop, beq, sll; the init callback's pointer in the data is 0x00265A30
+func 0x0028E7A4 0x100
+func 0x0028E8A4 0xE8 // the reader thread, started by address
+func 0x0028E98C 0x54 // an unlink, after the thread
+func 0x002A2650 0x1B4 // the I/O thread: an endless loop with no epilogue
+func 0x002A2804 0x54 // opens with its own addiu $sp, $sp, -0x18
+func 0x0029D690 0x398 // __osDevMgrMain
+stray 0x0029DA28 0x0029DA30 // mul.s, mfc1 after __osDevMgrMain's last j; also in Rage Wars
