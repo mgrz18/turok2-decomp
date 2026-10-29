@@ -10,3 +10,10 @@ it moves to `src/` through `tools/integrate.py` and leaves this folder.
 | File | What it is | Distance when added |
 |---|---|---|
 | `camera/func_0027E000.c` | CCamera DisplayListSetup: projection, viewport, scissor, look-at, z-buffer clear, fog | same size, 473 of 477 words |
+| `engine/func_00204778.c` | heap debug view: the heap's blocks as coloured bands | 0x5B8 vs 0x618 bytes, 245 of 390 words |
+| `engine/func_00209AF4.c` | expands a packed model into an F3DEX2 display-list resource | 414 of 530 words |
+| `engine/func_00213A70.c` | box filter and vertex count (Rage Wars func_00278530) | 19 of 264 words (one register swap) |
+| `engine/func_0021D39C.c` | draws an actor for one view | 35 of 264 words (registers only) |
+| `engine/func_00220D00.c` | walks the 0xC0-byte level records | 12 of 324 words (registers only) |
+| `engine/func_00221D3C.c` | builds the cached geometry display list behind a patched branch | 190 of 362 words, one word longer |
+| `engine/func_002222E0.c` | per-region object pass over the world's object table | same size, 206 of 385 words |
