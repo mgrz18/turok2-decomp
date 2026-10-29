@@ -202,6 +202,66 @@ boundaries: right bytes, wrong unit. Three have been folded back so far
 function they belong to is matched, and `auto_match` no longer accepts a jump
 or branch target, or a jump-table target, as a function.
 
+**Stray words before an object, and other wrong cuts (`tools/fix_cut.py`).**
+SN's linker starts each object's `.text` on a 16-byte boundary and fills the
+gap with whatever its buffer held, not zeros: one to three words that are
+often a copy of instructions from elsewhere (the three before `__umoddi3`
+repeat code from 0x26BBD4). splat reads them as the start of the next
+function, so its `func_X` begins a few words early and the real function
+starts at the next 16-aligned address, where callers' `jal`, data pointers
+and thread entries point (`D_002972E0` was alSavePull's real start). A junk
+word can also branch into the function after it, which made `accept_manual`
+see a false boundary at osJamMesg, osRecvMesg and osSendMesg, or stand as a
+little "function" of its own. A run of junk words therefore marks an
+original object boundary, which helps recover the source files.
+
+`versions/cuts.us.txt` lists the fixes and `tools/fix_cut.py --write` applies
+them (idempotent; then `make setup`, `make verify`):
+
+- `stray <from> <to>`: the words are kept as `src/us/asm/stray_<from>.s`,
+  `.word` by `.word` from the ROM, wired in as a `hasm` subsegment. Its symbol
+  (`func_<from>`, which C may still name) is an object, so no tool counts it
+  as code and N64Recomp does not translate it; `<to>` gets a function symbol.
+- `func <start> <size>`: a function's true extent. One line per start splits
+  a cut that holds several functions (func_0028E7A4 held three), trims junk
+  words at an end (func_0029D690), or joins a fragment back, whose C then
+  goes back to asm (func_0026BBB8, `return 0`, was the exit of
+  func_0026BB9C's loop, and that loop had opened an asm file, making the four
+  functions after it labels inside one asm function).
+
+The entries live in a block of `versions/function_sizes.us.txt` the tool
+owns, and `symbols_from_scan` loses the ones they override. Two `asm`
+subsegments left in a row (from C taken out earlier) are folded into one,
+since splat cuts a function at a file boundary: that alone made
+func_0041BC50 and func_00454BB0 whole. `fix_cut.py --find` lists candidate
+`stray` lines from a build (a function not 16-aligned whose next 16-aligned
+address is reached or opens with a prologue, with nothing reaching the words
+before); each wants a look before it goes in the list.
+
+The list holds 250 such runs so far: the ones found by hand while matching,
+then every `--find` candidate in the engine, libultra and the VM modules'
+first copy whose words are plainly not a function. Left alone: eleven runs
+already matched as C "functions" of their own (`jr ra; nop` and the like,
+the same bytes either way), twelve that are pieces of strings (splat named
+them `D_`, and `rejected_boundaries` holds them), and three in the VM
+modules whose old start the second copy names. A stub can split an asm file
+between a branch and its label: the label then goes in
+`undefined_funcs_extra`, as for any cross-file branch (`.L0041A490`).
+
+Matched C for the real function goes in under the real name, one function a
+file (`integrate.py` wires a file by its name). A matched caller that named
+a real start as data (`extern u8 D_002972E0[]`) has to name the function
+instead once the symbol is a function.
+
+Two kinds of exclusion in `build/integrate/excluded.txt` were tool bugs,
+fixed along the way. A named function is in `extract_asm`'s bodies twice
+(osJamMesg and func_0029B5B0), and `entered_from_outside` took its own
+branches for another function's, so every named function with a branch
+looked "entered from outside". And `rodata_slice` started a slice only at
+the lowest address the code reads, so C that leaves a table in asm through an
+`extern` (cosf's polynomial) and owns just the literals after it never
+matched; it now tries each address the code reads.
+
 ### Hand-matching patterns (#46)
 
 Recurring fixes when a draft is a word or two off, in rough order of
