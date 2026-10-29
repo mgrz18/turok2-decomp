@@ -28,12 +28,13 @@ entered = A.entered_from_outside(bodies)
 # first copy's labels. A function only `j`-entered that way can be C; its
 # labels are then defined for the linker as plain addresses
 # (versions/foreign_labels.us.txt).
-owner = {lab: f for f, b in bodies.items() for lab in re.findall(r'^\s*\.L([0-9A-F]{8}):', b, re.M)}
+canon = A.named_addresses()          # osJamMesg -> func_0029B5B0: one function, two bodies
+owner = {lab: canon.get(f, f) for f, b in bodies.items() for lab in re.findall(r'^\s*\.L([0-9A-F]{8}):', b, re.M)}
 jumps = {}
 for f, b in bodies.items():
     for op, lab in re.findall(r'^\s+(jal|j|b\w*)\s+(?:[^,\n]*,\s*)*\.L([0-9A-F]{8})\b', b, re.M):
         o = owner.get(lab)
-        if o and o != f:
+        if o and o != canon.get(f, f):
             jumps.setdefault(o, []).append((op, lab))
 labels = set()
 src, ro = {}, {}
