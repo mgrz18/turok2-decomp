@@ -106,3 +106,4 @@ D_800C097C = 0x800C097C;
 D_800C0984 = 0x800C0984;
 D_800D7BE0 = 0x800D7BE0;
 rspbootTextEnd = 0x800BC400; /* end of rspboot, the same address as the gfx ucode D_800BC400 */
+D_800B6CCC = 0x800B6CCC; /* f32 after D_800B6CC8, read on its own by the camera pool */
