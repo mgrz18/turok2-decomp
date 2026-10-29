@@ -280,6 +280,12 @@ def main():
     out, prev = [], None
     for l in lines:
         m = ENTRY.match(l)
+        # A stub taken off the list goes back to plain asm.
+        if m and m.group(3) == "hasm" and (s := re.match(r"\.\./src/us/asm/stray_([0-9A-F]{8})$", m.group(4) or "")) \
+                and int(s.group(1), 16) not in stubs:
+            print(f"  stray_{s.group(1)}: off the list, back to asm (restore its symbols by hand)")
+            l = f"{m.group(1)}- [{m.group(2)}, asm]"
+            m = ENTRY.match(l)
         if m and m.group(3) in ("c", ".rodata") and re.match(rf"code/(?:{'|'.join(sorted(drop)) or '-'})$", m.group(4) or ""):
             print(f"  {m.group(4)[5:]}: its C goes back to asm (a fragment of a whole function)")
             if args.write:
