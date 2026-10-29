@@ -205,3 +205,8 @@ func_0045FFBC = 0x0045FFBC; // type:func size:0x4C
 func_00460008 = 0x00460008; // type:func size:0x4C
 func_00467B4C = 0x00467B4C; // type:func size:0xC4
 func_00266C00 = 0x00266C00; // type:func size:0x5C
+
+// --- true extents from versions/cuts.us.txt (tools/fix_cut.py) ---
+// Generated from versions/cuts.us.txt by tools/fix_cut.py; edit that.
+func_002649A0 = 0x002649A0; // type:func
+// --- end cuts ---

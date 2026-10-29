@@ -1,0 +1,10 @@
+// Function boundaries splat got wrong, fixed by tools/fix_cut.py (see its
+// docstring and docs/MATCHING.md). One fix a line:
+//   stray <from> <to>   the words [from, to) are never executed; the function
+//                       splat started at <from> really starts at <to>
+//   func <start> <size> the function at <start> is <size> bytes
+// Addresses are vram, sizes hex. Run tools/fix_cut.py --write, make setup.
+
+// func_00264C94 stores func_00264994 + 0xC as a callback; nothing reaches the
+// three words before it (lw, a beqz into the function, lui).
+stray 0x00264994 0x002649A0 // the only reference, func_00264C94, stores func_00264994 + 0xC
