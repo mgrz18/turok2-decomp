@@ -5,8 +5,8 @@
 #
 # asn64 is the original assembler, but it only runs under wine, and inside
 # the emulated amd64 container that costs ~30 s a file against well under one
-# for gas. Matching the same sources through both showed two differences, and
-# both are reproduced here:
+# for gas. Matching the same sources through both showed these differences, all
+# reproduced here:
 #
 #  - asn64 spells `move` as `addu rd, rs, $0`; gas uses `or`.
 #  - asn64 expands `li.d`/`li.s` differently from gas: into a float
@@ -19,6 +19,14 @@
 #    followed directly by another multiply). cc1 is run with -mno-fix4300,
 #    since its own fix4300 puts a nop after every mul.s/mul.d. A real nop
 #    cc1 leaves right before `.set noreorder` is still dropped.
+#  - asn64 keeps the HI/LO hazard (mfhi/mflo two instructions ahead of a
+#    multiply or divide) counting every instruction a macro expands to, and
+#    moves a multiply or divide out of a delay slot. gas runs with -G0 so a
+#    symbol load (`lw $2, D_X`, lui+lw) is not taken for a one-instruction
+#    $gp load when it counts; tools/sn_li.py writes its literal pool without
+#    a section change after every li.s (gas pads the hazard at one); and
+#    tools/sn_hilo.py moves the delay-slot multiplies and pads the hazard
+#    inside noreorder regions, where gas does not.
 #  - asn64 fills the c.cond -> bc1t/bc1f hazard with a nop, and no other
 #    hazard (not the load delay, not mtc1). cc1 marks every hazard it leaves
 #    to the assembler with a `#nop` comment, so turning exactly the one after
@@ -54,5 +62,6 @@ tr -d '\r' < "$IN" \
              if ($1 != "" && $1 !~ /^[#.]/) prev_mul = ($1 ~ /^mul\.[sd]$/)
              print }' \
     | python3 "$(dirname "$0")/sn_li.py" \
-    | mips-linux-gnu-as -EB -mabi=32 -march=vr4300 -mtune=vr4300 -mips3 -O1 \
+    | python3 "$(dirname "$0")/sn_hilo.py" \
+    | mips-linux-gnu-as -EB -mabi=32 -march=vr4300 -mtune=vr4300 -mips3 -O1 -G0 \
         --no-pad-sections -I "$INC_DIR" -o "$OUT" -
