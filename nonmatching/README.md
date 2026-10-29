@@ -17,3 +17,6 @@ it moves to `src/` through `tools/integrate.py` and leaves this folder.
 | `engine/func_00220D00.c` | walks the 0xC0-byte level records | 12 of 324 words (registers only) |
 | `engine/func_00221D3C.c` | builds the cached geometry display list behind a patched branch | 190 of 362 words, one word longer |
 | `engine/func_002222E0.c` | per-region object pass over the world's object table | same size, 206 of 385 words |
+| `engine/func_0022D2FC.c` | particle matrix build (Rage Wars Particle_BuildMatrix) | 13 of 624 words (registers in the depth scale) |
+| `engine/func_00246BC0.c` | player input from the controller | 6 of 330 words (a dead reload; needs a pinned register) |
+| `engine/func_00248BA8.c` | player warp / spawn | 68 of 348 words (registers only) |
