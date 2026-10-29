@@ -568,15 +568,18 @@ def stack_buffers(src):
 
 def entered_from_outside(bodies):
     """Functions with an internal label that another function branches to."""
+    # A named function is in `bodies` twice (osJamMesg and func_0029B5B0):
+    # one function, so its own branches are not entries from outside.
+    canon = named_addresses()
     owner = {}
     for name, body in bodies.items():
         for lab in re.findall(r"^\s*\.L([0-9A-F]{8}):", body, re.M):
-            owner[lab] = name
+            owner[lab] = canon.get(name, name)
     out = set()
     for name, body in bodies.items():
         for lab in re.findall(r"^\s+(?:j|b\w*)\s+(?:[^,\n]*,\s*)*\.L([0-9A-F]{8})\b", body, re.M):
             o = owner.get(lab)
-            if o and o != name:
+            if o and o != canon.get(name, name):
                 out.add(o)
     return out
 
@@ -716,10 +719,18 @@ def rodata_slice(obj, name, body, rom):
                     val = struct.unpack(">I", data[off:off + 4])[0] + vram
                     data[off:off + 4] = struct.pack(">I", val)
     size = len(data)
-    rom_off = rdata_rom(start)
-    if size % 4 or rom[rom_off:rom_off + size] != bytes(data):
+    if size % 4:
         return None
-    return rom_off, size
+    # The slice starts at the lowest address the code reads, unless the C
+    # leaves what is there in asm (an `extern` table, a string) and only its
+    # own literals or jump tables move: then at the first address it reads
+    # where the objects .rodata is the ROMs (cosf reads its polynomial
+    # through externs and owns the 0.5/0.0/0.5 after it).
+    for start in refs:
+        rom_off = rdata_rom(start)
+        if rom[rom_off:rom_off + size] == bytes(data):
+            return rom_off, size
+    return None
 
 
 def rodata_subsegment(name, rom_start, rom_end):

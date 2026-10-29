@@ -63,3 +63,20 @@ stray 0x0025AD88 0x0025AD90 // sw, bnez; callers jal 0x25AD90
 stray 0x00277088 0x00277090 // bne, nop; callers jal 0x277090
 stray 0x00246BBC 0x00246BC0 // a jal; callers jal 0x246BC0
 stray 0x00257A3C 0x00257A40 // an extra addiu $sp, $sp, -0x90 ahead of the real prologue
+
+// Stray stubs whose junk branch made integrate.py see a false boundary in
+// the function after them (found with --find, from build/integrate/excluded.txt).
+stray 0x0026EE24 0x0026EE30 // c.lt.s, nop, bc1f into func_0026EE40
+stray 0x00274B34 0x00274B40 // beqz into func_00274B40
+stray 0x002847C8 0x002847D0 // nop, bc1fl into func_002847E0
+stray 0x002847D8 0x002847E0 // lwc1, sub.s
+stray 0x0028EF84 0x0028EF90 // beqz into __alCSeqGetTrackEvent
+stray 0x00293E2C 0x00293E30 // beql into alSynAllocVoice
+stray 0x002943D8 0x002943E0 // bne into alSynSetVol
+stray 0x00294644 0x00294650 // bnel into alSynStopVoice
+stray 0x002946CC 0x002946D0 // beqz into alSynNew
+stray 0x00297AD8 0x00297AE0 // bne into func_00297AE0
+stray 0x00299EA8 0x00299EB0 // bc1f into osPiRawStartDma
+stray 0x0029A718 0x0029A720 // bne into osCreateViManager
+stray 0x0029BC24 0x0029BC30 // beq, slti, beqz into func_0029BC70
+stray 0x0029BC64 0x0029BC70 // li, beq, slt
