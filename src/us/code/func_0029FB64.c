@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void func_00291270(unsigned char *source, unsigned char *destination, int count);
-extern char D_0029F190;
+extern void func_0029F190(void);
 extern char func_0029F5D4;
 extern char func_0029F958;
 s32 func_0029FB64(void *filter, s32 paramID, struct ALWaveTable_s *param)
@@ -18,7 +18,7 @@ s32 func_0029FB64(void *filter, s32 paramID, struct ALWaveTable_s *param)
             a->sample = 0;
             switch (a->table->type) {
                 case 0:
-                    f->handler = &D_0029F190;
+                    f->handler = (void *) func_0029F190;
                     a->bookSize = 2 * a->table->waveInfo.adpcmWave.book->order *
                         a->table->waveInfo.adpcmWave.book->npredictors * 8;
                     if (a->table->waveInfo.adpcmWave.loop) {

@@ -5,10 +5,10 @@
 
 void func_00296340(ALFilter *f, void *handler, void *setParam, s32 type);
 void *func_002912A0(u8 *file, s32 line, ALHeap *hp, s32 num, s32 size);
-void *D_00295690(void);
+void *func_00295690(void);
 s32 D_00296118(void *filter, s32 paramID, void *param);
 void func_0029553C(ALEnvMixer *e, ALHeap *hp) {
-    func_00296340(&e->filter, D_00295690, D_00296118, 4);
+    func_00296340(&e->filter, func_00295690, D_00296118, 4);
     e->state = func_002912A0(0, 0, hp, 1, 0x50);
     e->first = 1;
     e->motion = 0;

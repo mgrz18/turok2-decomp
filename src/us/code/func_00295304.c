@@ -53,10 +53,10 @@ struct ALLoadFilter48_2 {
 typedef s32 (*FuncPtr)(void *);
 extern void func_00296340(void *arg0, void *a, void *b, s32 c);
 extern s32 func_002912A0(s32, s32, void *, s32, s32);
-extern char D_0029F190;
+extern void func_0029F190(void);
 extern char func_0029FB64;
 void func_00295304(void *arg0, FuncPtr arg1, s32 arg2) {
-    func_00296340(arg0, &D_0029F190, &func_0029FB64, 0);
+    func_00296340(arg0, (void *) func_0029F190, &func_0029FB64, 0);
     ((ALLoadFilter48_2 *)arg0)->state = func_002912A0(0, 0, arg2, 1, 0x20);
     ((ALLoadFilter48_2 *)arg0)->lstate = func_002912A0(0, 0, arg2, 1, 0x20);
     ((ALLoadFilter48_2 *)arg0)->dma = arg1(&((ALLoadFilter48_2 *)arg0)->dmaState);
