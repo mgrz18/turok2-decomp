@@ -703,6 +703,8 @@ def rodata_slice(obj, name, body, rom):
         return None
     start = refs[0]
     vram = int(name[5:], 16)
+    if 0x0043CC14 <= vram < 0x00475A00:
+        vram -= 0x39000     # the second VM module runs 0x39000 below its names (docs/VMASM.md)
     with open(obj, "rb") as fh:
         elf = ELFFile(fh)
         ro = elf.get_section_by_name(".rodata")

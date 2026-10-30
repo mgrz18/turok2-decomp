@@ -46,20 +46,34 @@ REGS = ("zero at v0 v1 a0 a1 a2 a3 t0 t1 t2 t3 t4 t5 t6 t7 "
         "s0 s1 s2 s3 s4 s5 s6 s7 t8 t9 k0 k1 gp sp fp ra").split()
 
 
+def sym_rom(elf, sym):
+    """A symbol's ROM offset, through its own section: the two VM modules are
+    linked over the same addresses (virtual_1 0x39000 below where it is named,
+    docs/VMASM.md), so an address alone does not say which PT_LOAD holds it."""
+    shndx = sym["st_shndx"]
+    if not isinstance(shndx, int):
+        return None
+    sec = elf.get_section(shndx)
+    if sec["sh_type"] != "SHT_PROGBITS" or not sec["sh_addr"]:
+        return None
+    off = sec["sh_offset"] + sym["st_value"] - sec["sh_addr"]
+    for seg in elf.iter_segments():
+        if seg["p_type"] == "PT_LOAD" and seg["p_offset"] <= off < seg["p_offset"] + seg["p_filesz"]:
+            return seg["p_paddr"] + off - seg["p_offset"]
+    return None
+
+
 def rom_symbols():
     """name -> (rom offset, size) for every sized function in the linked ELF."""
     out = {}
     with ELF.open("rb") as fh:
         elf = ELFFile(fh)
-        loads = [s for s in elf.iter_segments() if s["p_type"] == "PT_LOAD"]
         for sym in elf.get_section_by_name(".symtab").iter_symbols():
             if sym["st_info"]["type"] != "STT_FUNC" or not sym["st_size"]:
                 continue
-            v = sym["st_value"]
-            for seg in loads:
-                if seg["p_vaddr"] <= v < seg["p_vaddr"] + seg["p_filesz"]:
-                    out[sym.name] = (seg["p_paddr"] + v - seg["p_vaddr"], sym["st_size"])
-                    break
+            rom = sym_rom(elf, sym)
+            if rom is not None:
+                out[sym.name] = (rom, sym["st_size"])
     # A named function (versions/names.us.txt) is also found by its address name.
     text = (ROOT / "versions" / "names.us.txt").read_text()
     for name, addr in re.findall(r"^(\w+)\s*=\s*0x([0-9A-Fa-f]+);", text, re.M):

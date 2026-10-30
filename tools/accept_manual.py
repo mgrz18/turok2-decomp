@@ -23,9 +23,9 @@ subprocess.run(['docker', 'run', '--platform=linux/amd64', '--rm', '-v', f'{Path
                 ' '.join(f'tools/cc_func.sh {W}/{n}.c {W}/{n}.o cc1 -O2 2>/dev/null;' for n in names)], check=True)
 bodies = A.extract_asm(); rom = open('baserom.us.z64', 'rb').read()
 entered = A.entered_from_outside(bodies)
-# A paged VM module is in the ROM twice, the second copy 0x39000 on, and the
-# copy's absolute jumps and calls (`j`, `jal`) still land in the first: splat writes them as the
-# first copy's labels. A function only `j`-entered that way can be C; its
+# The second VM module is linked 0x39000 below where splat names it, over the
+# first (docs/VMASM.md), so its absolute jumps and calls (`j`, `jal`) land on
+# the first module's addresses: splat writes them as the first module's labels. A function only `j`-entered that way can be C; its
 # labels are then defined for the linker as plain addresses
 # (versions/foreign_labels.us.txt).
 canon = A.named_addresses()          # osJamMesg -> func_0029B5B0: one function, two bodies
