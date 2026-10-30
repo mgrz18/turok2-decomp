@@ -24,12 +24,11 @@ engine and the VM modules alike.
 
 Two refinements, so the numbers say what is left to do:
 
-  - The paged VM modules are in the ROM twice: the second copy, 0x39000 (or
-    0x38F20) after the first, is the first's bytes over again, and its
-    absolute jumps still land in the first copy, so it cannot be C of its
-    own. A VM function whose bytes equal the one at that distance before it
-    counts in neither total nor matched: the code to decompile is the first
-    copy.
+  - Much of the second VM module is the first's bytes over again: it is
+    linked at the first one's addresses (0x39000 below where splat names it,
+    docs/VMASM.md), and a function of it whose bytes equal the first
+    module's function at its link address (or 0xE0 on) counts in neither
+    total nor matched: the code to decompile is the first copy.
   - `readable` is the matched code whose C has none of m2c's offset macros
     (M2C_FIELD and the like): C that names its fields, as opposed to C that
     only compiles to the right bytes.
