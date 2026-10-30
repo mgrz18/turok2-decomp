@@ -230,14 +230,12 @@ stray 0x002C23D8 0x002C23E0 // lui $3,0x800c; lw $3,8240($3)
 stray 0x00407F14 0x00407F20 // cvt.s.w $f7,$f7; sll $3,$17,0x1; addu $3,$3,$17
 stray 0x0040C84C 0x0040C850 // addu $2,$3,$17
 stray 0x0040F238 0x0040F240 // addiu $2,$3,648; beq $2,$16,40f200
-stray 0x00412548 0x00412550 // lui $2,0x800c; lw $2,7096($2)
 stray 0x00417484 0x00417490 // move $4,$2; jal 2017d4; move $5,$18
 stray 0x0041A41C 0x0041A420 // move $5,$17
 stray 0x0041BA48 0x0041BA50 // li $5,16; lui $4,0x800f
 stray 0x0041C954 0x0041C960 // li $4,1; li $2,8; beql $3,$2,41c970
 stray 0x0041D04C 0x0041D050 // lb $3,406($16)
 stray 0x0041D884 0x0041D890 // bne $3,$2,41d9c8; addiu $16,$29,48; addiu $4,$29,72
-stray 0x00422ED8 0x00422EE0 // addiu $29,$29,-24; sw $31,16($29)
 stray 0x00424A5C 0x00424A60 // ldc1 $f20,32($29)
 stray 0x00425754 0x00425760 // lui $2,0x800b; lw $2,31724($2); addiu $3,$6,8
 stray 0x00427178 0x00427180 // sw $16,24($2); sw $17,20($2)
@@ -247,8 +245,6 @@ stray 0x00428CEC 0x00428CF0 // jal 268b48
 stray 0x00429124 0x00429130 // beqz $19,4291e8; mov.s $f0,$f21; lw $8,4($16)
 stray 0x00429454 0x00429460 // lw $8,72($29); lw $9,76($29); sw $8,16($29)
 stray 0x00429F18 0x00429F20 // sw $3,16($29); sw $8,20($29)
-stray 0x0042C758 0x0042C760 // addiu $29,$29,-24; sw $16,16($29)
-stray 0x0042CF88 0x0042CF90 // lw $2,64($4); sw $2,0($3)
 stray 0x0042D114 0x0042D120 // add.s $f2,$f2,$f0; mtc1 $0,$f20; c.le.s $f20,$f2
 stray 0x0042D1B8 0x0042D1C0 // move $5,$6; move $6,$17
 stray 0x0042D214 0x0042D220 // addiu $4,$29,32; move $5,$17; jal 20ef2c
@@ -312,3 +308,71 @@ stray 0x00291268 0x00291270 // c.lt.s, nop
 stray 0x002912E8 0x002912F0 // c.lt.s, nop
 stray 0x00299DF8 0x00299E00 // c.lt.s, nop
 stray 0x0029B4A4 0x0029B4B0 // neg.s, c.lt.s, nop
+
+// Found by the VM hand-matching pass (#46): the true extents of functions
+// splat cut at branch targets, delay slots or case blocks in the first VM
+// module, each matched over that extent (build/manual/V). The v7 block
+// (0x426000-0x42F0E4: Controller Pak, string helpers, libultra pfs) was cut
+// worst. Four old stray lines were really prologues or scheduled loads
+// (0x412548, 0x422ED8, 0x42C758) or started a word late (0x42CF88).
+func 0x00410A74 0x140 // its clamp and epilogue were func_00410B5C
+func 0x00412548 0x124 // its first two words (lui/lw of D_800C1BB8, tested at 0x412570) were a stray; func_00412550 is not a start
+func 0x004131B0 0x78 // its shared return (addu, jr ra, nop) opened func_0041321C
+stray 0x00413228 0x00413230 // a padding nop and a junk word between func_004131B0 and func_00413230
+func 0x0041531C 0x3E0 // cut at branch targets into func_004154C4 ... func_004156D8
+func 0x00416894 0x134 // its epilogue was func_004169A0
+func 0x00416B30 0x7C // its loop was func_00416B44
+func 0x00418294 0xEC // cut in a call's argument setup (func_004182E8)
+func 0x00418750 0xBC // its last case and return were func_004187FC
+func 0x00418DA0 0xBC // its last case and return were func_00418E4C
+func 0x00419260 0xBC // its last case and return were func_0041930C
+stray 0x0041A3AC 0x0041A3B0 // a bc1f word never executed; the function starts at 0x41A3B0
+func 0x0041B148 0x80 // its switch cases (jtbl_800C12E0) were cut as functions
+func 0x0041B8CC 0x6C // cut at branch targets (func_0041B8EC, func_0041B920)
+func 0x0041B954 0x6C // cut at a branch target (func_0041B9B0)
+func 0x0041BA50 0x1B4 // its tail was func_0041BBB0
+func 0x0041C880 0x4C // cut in a call's argument setup (func_0041C89C)
+func 0x0041D6D4 0x98 // cut between a lui and its store (func_0041D740)
+func 0x0041D76C 0xE0 // cut in an index computation (func_0041D7B0)
+func 0x0041E1D8 0x19C // cut at a jal's delay slot (func_0041E294)
+func 0x00421D20 0xDC // its second half was func_00421D90
+func 0x00422484 0x184 // its range tests and copy loop were func_00422574
+func 0x00422ED8 0x3C // its prologue was a stray: a data word 0x00422EE0 of the other module misled it
+func 0x00423768 0x118 // its second half was func_004237FC, from a bnel's delay slot
+func 0x00423CBC 0x7C // a switch (jtbl_800C16D0); its cases and its `return 0` (func_00423D30) were cut off
+func 0x00426064 0x100 // v7: Controller Pak / string helpers / pfs, cut at branch targets
+func 0x00426164 0x278
+func 0x00426434 0x4C
+func 0x00426480 0xDC
+func 0x004265B0 0x15C
+func 0x0042670C 0x94
+func 0x00426A94 0x144
+func 0x00426C14 0x74
+func 0x00426C88 0x4C
+func 0x00426D54 0x38
+func 0x00426F5C 0x58
+func 0x00426FB4 0x48
+func 0x00427524 0x1CC
+func 0x004279AC 0x1A0
+func 0x00427F80 0xD8
+func 0x00428058 0x8C
+func 0x00429AA4 0x2E0
+func 0x0042AA80 0x18C
+func 0x0042BF48 0x24C
+func 0x0042C194 0x228
+func 0x0042C3BC 0x5C
+func 0x0042C46C 0x4C
+func 0x0042C560 0x1A0
+func 0x0042C758 0x44 // its prologue (addiu sp, sw s0) was a stray
+func 0x0042CE10 0x174
+stray 0x0042CF84 0x0042CF90 // a padding nop, then lw $2,64($4); sw $2,0($3)
+func 0x0042CF90 0x110
+func 0x0042D120 0x98
+func 0x0042D220 0x1E8
+func 0x0042EBBC 0x70
+stray 0x0042EC2C 0x0042EC30 // a padding nop before the 16-aligned func_0042EC30
+func 0x0042ECF0 0x23C
+func 0x0042FEEC 0x6C // split at func_0042FF10
+func 0x004301C8 0xD0 // split at func_00430250
+func 0x004302A0 0x90 // split at func_004302CC
+func 0x00430330 0x7C // split at func_00430374
