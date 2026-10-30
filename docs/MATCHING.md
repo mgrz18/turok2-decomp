@@ -325,7 +325,7 @@ steered:
 
 ### Globals and branches (the VM pass)
 
-Four more from matching the VM modules by hand:
+Five more from matching the VM modules by hand:
 
 - **Globals read inside a `static __inline__` helper are addressed by
   symbol** at each use, which reproduces the ROM's `lui`+`lw` reloads where
@@ -337,6 +337,11 @@ Four more from matching the VM modules by hand:
   the ROM's store and reload of the counter.
 - **`if (i != -1) { ... } else { ... }`** gave the ROM's `beql` where the
   test written the other way round did not.
+- **A pool word one ulp off is the literal's spelling.** func_00406598 has
+  0x3C27C5AD where `0.01024f` gives 0x3C27C5AC; `0.0102400007f` rounds to
+  the ROM's bits. A function excluded because "its .rodata is not in the ROM
+  where the code reads it" may be only that: compare the object's .rodata
+  with the ROM before suspecting the placement.
 
 The second VM module is linked 0x39000 below the addresses splat names it at
 (docs/VMASM.md), so its calls and jumps name the first module's addresses.
