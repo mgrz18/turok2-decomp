@@ -323,6 +323,27 @@ steered:
   thread (func_00286674) matches only with such a duplicate in case 4;
   func_0026B4A4 and func_0021D39C come close with one.
 
+### Globals and branches (the VM pass)
+
+Four more from matching the VM modules by hand:
+
+- **Globals read inside a `static __inline__` helper are addressed by
+  symbol** at each use, which reproduces the ROM's `lui`+`lw` reloads where
+  the same reads written in the caller share one base register.
+- **`State *s = &GLOBAL;` at the top stops GCC folding `sym+off`**: the
+  fields are then reached from one base register, as the ROM has them,
+  instead of each through its own `%hi`/`%lo`.
+- **`x.cnt++;` as its own statement, then reading the field again,** gives
+  the ROM's store and reload of the counter.
+- **`if (i != -1) { ... } else { ... }`** gave the ROM's `beql` where the
+  test written the other way round did not.
+
+The second VM module is linked 0x39000 below the addresses splat names it at
+(docs/VMASM.md), so its calls and jumps name the first module's addresses.
+When a cut fix or C in the first module stops defining one of them (it was a
+function start or a label there), the integrate step reports it as called or
+held; define the address absolutely in `versions/undefined_funcs_extra.us.txt`.
+
 ### One file with its neighbour
 
 A function that matches alone can still be cut wrong: if its `.rodata`

@@ -44,7 +44,6 @@ it moves to `src/` through `tools/integrate.py` and leaves this folder.
 | `camera/func_0027D160.c` | CCamera Advance: position, orientation, frustum and clip planes per frame | 147 of 936 words (FP registers, frustum store order) |
 | `camera/func_0027E000.c` | CCamera DisplayListSetup: projection, viewport, scissor, look-at, z-buffer clear, fog | 442 of 476 words differ (much of it one word's shift) |
 
-
 ## The VM modules (`vm/`)
 
 Drafts from the hand-matching pass over the paged VM modules (#46,
