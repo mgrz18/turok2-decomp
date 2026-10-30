@@ -33,6 +33,9 @@ ELF = ROOT / "build" / "turok2.us.elf"
 ENTRY = re.compile(r"^(\s+)- \[(0x[0-9A-Fa-f]+),\s*(\w+)(?:,\s*([^\]\s]+))?\s*\](.*)$")
 
 
+from match_func import sym_rom  # noqa: E402
+
+
 def function_ranges(names):
     """name -> (rom start, rom end) from the linked ELF."""
     want = set(names)
@@ -43,17 +46,13 @@ def function_ranges(names):
     out = {}
     with ELF.open("rb") as fh:
         elf = ELFFile(fh)
-        loads = [s for s in elf.iter_segments() if s["p_type"] == "PT_LOAD"]
         for sym in elf.get_section_by_name(".symtab").iter_symbols():
             name = sym.name if sym.name in want else alias.get(sym.name)
             if name not in want or sym["st_info"]["type"] != "STT_FUNC":
                 continue
-            v = sym["st_value"]
-            for seg in loads:
-                if seg["p_vaddr"] <= v < seg["p_vaddr"] + seg["p_filesz"]:
-                    rom = seg["p_paddr"] + v - seg["p_vaddr"]
-                    out[name] = (rom, rom + sym["st_size"])
-                    break
+            rom = sym_rom(elf, sym)
+            if rom is not None:
+                out[name] = (rom, rom + sym["st_size"])
     missing = want - set(out)
     if missing:
         sys.exit(f"not in the ELF: {', '.join(sorted(missing))}")

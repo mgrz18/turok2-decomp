@@ -138,8 +138,18 @@ help:
 
 all: rom
 
+# The second VM module (virtual_1) is named at the address splat gives it,
+# 0x43CC14, but was linked 0x39000 lower, at 0x403C14, over the first one: its
+# own j, jal and jump tables point there (docs/VMASM.md). splat cannot place a
+# segment at one address and name it at another, so the linker script gets the
+# link address here.
+VIRTUAL_1_NAMED  = 0x43CC14
+VIRTUAL_1_LINKED = 0x403C14
+
 setup:
 	$(PYTHON) -m splat split $(SPLAT_YAML)
+	sed -i 's/^\(    \.virtual_1 \)$(VIRTUAL_1_NAMED) :/\1$(VIRTUAL_1_LINKED) :/' $(LD_SCRIPT)
+	grep -q '^    \.virtual_1 $(VIRTUAL_1_LINKED) :' $(LD_SCRIPT)
 
 build: $(O_FILES)
 

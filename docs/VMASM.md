@@ -52,6 +52,51 @@ Turok 3 uses the same layout — `references/turok3/versions/turok3.us.yaml`
 places its `code` at `0x00200500` and its `virtual` at `0x00400000`, with the
 comment "some functions are mapped as virtual, and get hot-loaded from rom".
 
+## The second module is linked over the first
+
+The second module (`virtual_1`, ROM 0x186C14-0x1BFA00) is named by splat at
+0x43CC14, right after the first, but it was linked 0x39000 lower, at
+0x403C14: every `j`, every `jal` into its own code and every jump table it
+reads points there. Scored by how many of its 613 `jal`s into
+0x400000-0x440000 land on a prologue, the distance 0x39000 gets 457 and no
+other distance more than 75, and it holds from the module's first code to
+its last. The first module occupies 0x400000-0x43CC14, so the two cover the
+same addresses: the second is paged in over the first.
+
+That answers the question below for these two: **overcommit**. A TLB-free
+build cannot just load everything at its address, since two ROM regions
+want the same one.
+
+What this means for the build:
+
+- `versions/turok2.us.yaml` still names `virtual_1` at 0x43CC14 (its
+  symbols keep their names), and `make setup` writes the link address,
+  0x403C14, into the linker script (`VIRTUAL_1_LINKED` in the Makefile;
+  splat has no way to name a segment at one address and link it at another).
+  Before that, C for the second module linked but built other bytes: its
+  `j` and jump-table words came out 0x39000 too high. 118 functions went in
+  once it linked at 0x403C14.
+- ROM 0x186000-0x186C14, which splat had put at the start of `virtual_1`, is
+  the end of the first module's .rodata: descriptor records (`0x0000FF01`,
+  pointers to the first module's functions) that the engine and the first
+  module pass as 0x43C05C ... 0x43CAB4. `virtual_rodata_0` now runs to
+  0x186C14.
+- With the modules overlapping, an address does not say which one a symbol
+  is in. `tools/match_func.py` (`sym_rom`), `tools/c_subsegment.py` and
+  `tools/progress.py` go through the symbol's section; `progress.py`'s
+  second-copy rule compares a `virtual_1` function with the first module's
+  function at its link address (or 0xE0 on).
+- The second module still calls and jumps to addresses that are labels or
+  function starts of the first module's layout (0x426D24, 0x429D1C,
+  `.L004237FC`, ...): they are its own code at its link address. When a cut
+  fix or C in the first module stops defining one, it goes in
+  `versions/undefined_funcs_extra.us.txt` as an absolute address.
+- Many of the second module's functions are byte copies of the first's at
+  the same link address (`progress.py` counts them once).
+- `func_0045007C` does not live at 0x0045007C any more, and the one word in
+  `virtual_rodata_2` with that value is data: the symbol has
+  `can_be_referenced:False`.
+
 ## What is still open
 
 Whether the paging is **relocation** or **overcommit**. That is the question
