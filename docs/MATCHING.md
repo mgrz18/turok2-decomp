@@ -299,6 +299,33 @@ one). All eight probe functions match either way, and a full build takes
 seconds. `make ASSEMBLER=asn64` and `match_func.py --assembler asn64` keep
 the original tool available as a cross-check, and `make verify` decides.
 
+**Multiplies, divides and the HI/LO hazard.** asn64 keeps an mfhi/mflo two
+instructions ahead of the next mult/div/mthi/mtlo, in noreorder regions too,
+counting every instruction a macro expands to, and it never leaves an integer
+multiply or divide in a delay slot. Probed with wine asn64 on small inputs,
+the rules are:
+
+- a mult/multu/div/divu (or a d- form) cc1 put in a delay slot moves in front
+  of its branch or jump, of any kind (likely, `jal`, `jr $31`), with a nop in
+  the slot; a label on the branch stays on the moved instruction;
+- unless the instruction before the branch is an mfhi/mflo: then the slot
+  keeps it and the one hazard nop goes before the branch;
+- the moved instruction is not checked again (`mflo; addu; bgez; mult`
+  becomes `mflo; addu; mult; bgez; nop`), but the mul.s -> multiply nop of
+  the erratum still applies to it;
+- a section directive in the source pads the hazard pending at that point
+  (gas does the same), but `li.s`, expanded inside asn64, has none.
+
+gas differed three ways, each fixed in the fast path: it read `lw $2, D_X`
+as a possible one-instruction $gp load when counting the distance (gas now
+runs with `-G0`); `tools/sn_li.py` wrote a `.section .rodata` after every
+`li.s`, so an `li.s` right after an mfhi got two nops asn64 never wrote (the
+pool is now written at cc1's next section directive); and gas neither moves
+the delay-slot multiplies nor pads the hazard inside noreorder regions, which
+`tools/sn_hilo.py` does. None of the already-matched functions changed (every object's
+.text and .rodata came out the same), and two functions held back by them
+matched: func_00282340 and func_00279528.
+
 ## Checking a function
 
     python3 tools/match_func.py path/to/file.c [-v] [--cc cc1 ...] [--opt -O2]

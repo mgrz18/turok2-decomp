@@ -9,7 +9,13 @@
   integer, `lui $5, 0x4160`, with `li` picking lui, ori or both.
 
 Literals are numbered in order of appearance, which is the order of the
-function's pool.
+function's pool. They are written out at the next section directive of cc1's
+own (or at the end), not where the li.s stands: gas emits the HI/LO hazard
+nops still pending at every section change, as asn64 does at a section
+directive in the source, but asn64 expands li.s without one. A `.section
+.rodata` right after an mfhi cost two nops asn64 never wrote (func_00282340,
+`rem` then `li.s`). cc1's jump tables are in .rodata too, so flushing before
+its next directive keeps the pool's order against them.
 
 A division (`div $3,$5,$2`, `rem`, `divu`, `remu`) is a macro too, with
 checks for a zero divisor (break 7) and, signed, for INT_MIN / -1 (break
@@ -85,13 +91,20 @@ def expand_div(line, n, noreorder):
     return out
 
 
+SECTION = re.compile(r"^\s*\.(section|text|data|rdata|bss|sdata|sbss|previous|pushsection|popsection)\b")
+
+
 def main():
     n = 0
     ndiv = 0
     noreorder = False
     out = []
+    pool = []
     for line in sys.stdin.read().splitlines():
         ndiv += 1
+        if pool and SECTION.match(line):
+            out += ["\t.section .rodata"] + pool
+            pool = []
         if re.match(r"^\s*\.set\s+noreorder", line):
             noreorder = True
         elif re.match(r"^\s*\.set\s+reorder", line):
@@ -109,17 +122,19 @@ def main():
             n += 1
             lab = f".Lsn_lit{n}"
             if kind == "d":
-                out += ["\t.section .rodata", "\t.align 3", f"{lab}:", f"\t.double {value}", "\t.text",
-                        f"\tlui $at,%hi({lab})", f"\tldc1 ${reg},%lo({lab})($at)"]
+                pool += ["\t.align 3", f"{lab}:", f"\t.double {value}"]
+                out += [f"\tlui $at,%hi({lab})", f"\tldc1 ${reg},%lo({lab})($at)"]
             else:
-                out += ["\t.section .rodata", "\t.align 2", f"{lab}:", f"\t.float {value}", "\t.text",
-                        f"\tlui $at,%hi({lab})", f"\tlwc1 ${reg},%lo({lab})($at)"]
+                pool += ["\t.align 2", f"{lab}:", f"\t.float {value}"]
+                out += [f"\tlui $at,%hi({lab})", f"\tlwc1 ${reg},%lo({lab})($at)"]
         else:
             if kind != "s":
                 out.append(line)   # li.d into an integer pair: not seen yet; leave to gas
                 continue
             bits = struct.unpack(">I", struct.pack(">f", float(value)))[0]
             out.append(f"{ind}li ${reg},0x{bits:08X}")
+    if pool:
+        out += ["\t.section .rodata"] + pool
     sys.stdout.write("\n".join(out) + "\n")
 
 
