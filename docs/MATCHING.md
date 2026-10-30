@@ -288,6 +288,60 @@ same, and asn64 loads the float's bits into $5. `tools/sn_li.py` does that for
 an integer destination and the .rodata literal for a float one; before, the
 float case was forced on both and the argument came out in the wrong place.
 
+### Register allocation and loops
+
+When a draft's only difference is which pseudo gets which register, the
+cause is usually how GCC 2.8 ranks them, and the ranking can be read and
+steered:
+
+- **References are weighted by loop depth.** local-alloc and global.c
+  order pseudos by their use counts, each scaled by the depth of the loop it
+  sits in. An empty `do { } while (0)` opens a loop as far as that count goes
+  (cc1 keeps its loop notes), so wrapping a few statements in one raises the
+  priority of what they use. It is how func_00220D00 and func_00213A70 get
+  the ROM's `$s` order, and most likely what the original's macro bodies
+  were. `cc1 -dg -dl` writes the `.greg` and `.lreg` dumps with each pseudo's
+  refs, priority and the register it got.
+- **A local used in more than one block goes to the global allocator.** One
+  function-wide temporary that several blocks share is allocated by global.c,
+  with its whole-function priority, where a temporary declared in each block
+  stays a local-alloc pseudo. Which of the two the source had shows in the
+  registers: func_0025CAC8's level and delay are shared by its three
+  reactions; func_0026AD94 needs its own temporary in a block, since a
+  function-wide one costs a register copy.
+- **Loop invariants are hoisted by a count.** loop.c moves an invariant out
+  of a loop only when threshold x savings x lifetime reaches the loop's insn
+  count (threshold is 2 x (1 + the non-fixed registers), halved when the
+  loop calls a function). So the size of the loop body decides what is
+  hoisted: a constant kept in `$s1` across a loop in the draft but
+  rematerialised in the ROM means the original loop had more insns, and a
+  dead store can keep a constant out (func_0024D344's `ok`).
+- **A redundant duplicated block can be original.** Rage Wars' sources carry
+  blocks repeated under both arms of a test, which cross-jumping merges into
+  one in the output. They leave no trace in the code but still count insns
+  and references, for the hoisting above and the priorities. The engine
+  thread (func_00286674) matches only with such a duplicate in case 4;
+  func_0026B4A4 and func_0021D39C come close with one.
+
+### One file with its neighbour
+
+A function that matches alone can still be cut wrong: if its `.rodata`
+starts 4 past an 8-byte boundary and holds a double or a jump table, its
+object (8-aligned in `.rodata`, linked with SUBALIGN 4) puts those 4 bytes
+off. Its pool continues the previous function's, so the two are one file,
+and the file starts at the nearest pool that opens 8-aligned; every pool
+between is 4 past a boundary for the same reason (func_0024C47C to
+func_0024D344). A function of the file that does not match yet stays in it
+as INCLUDE_ASM, with its pool in `src/us/asm/rodata/` through
+INCLUDE_RODATA, ahead of the pools the C emits (func_0022D2FC). Merged
+parts written apart need one view of the globals they share: reading one
+through a cast (`*(T *) &D_X`) instead of its declared type changed
+func_0022F350's register allocation. Two more signs of one file: a string
+literal two functions name at the same address (GCC shares a string only
+within a file), and a non-static inline function, whose own copy GCC 2.8
+emits at the end of the file (func_00219A20 and func_00219ACC, the out-of-line
+copies of what func_00218DCC and func_00218B10 inline).
+
 ## The fast assembler
 
 `asn64` only runs under wine, which costs ~30 s a file in the emulated amd64
