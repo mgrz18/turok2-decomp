@@ -383,3 +383,4 @@ func 0x0045C688 0x118
 func 0x0045CF28 0x2E4
 stray 0x0045337C 0x00453380 // a c.lt.s never executed; the function starts 16-aligned
 stray 0x0045342C 0x00453430 // a jal never executed; the function starts 16-aligned
+func 0x00430500 0x2A8 // runs to 0x4307A8, past where virtual_text_0 used to end (0x430600)

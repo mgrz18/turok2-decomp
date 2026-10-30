@@ -57,8 +57,8 @@ options:
 #   0xF6F2C  - 0xF7F50  : duplicate ucode copy used by IPL3
 #   0xF7F50  - 0x107000 : libultra .sdata/.data tail
 #   0x107000 - 0x13B5F0 : SN64 LNK source-debug section (paths, line info)
-#   0x13B5F0 - 0x17A600 : virtual_text_0 (VM module 1 .text)
-#   0x17A600 - 0x186C14 : virtual_rodata_0
+#   0x13B5F0 - 0x17A7A8 : virtual_text_0 (VM module 1 .text)
+#   0x17A7A8 - 0x186C14 : virtual_rodata_0
 #   0x186C14 - 0x1B3400 : virtual_text_1 (VM module 2 .text, linked at 0x403C14)
 #   0x1B3400 - 0x1BFA00 : virtual_rodata_1
 #   0x1BFA00 - 0x1DEE00 : virtual_text_2 (VM module 3 .text)
@@ -4683,8 +4683,8 @@ segments:
       - [0x17A3AC, c, code/func_004303AC]
       - [0x17A454, asm]
       - [0x17A4FC, hasm, ../src/us/asm/stray_004304FC]
-      - [0x17A500, asm]
-      - [0x17A600, data, virtual_rodata_0]
+      - [0x17A500, c, code/func_00430500]
+      - [0x17A7A8, data, virtual_rodata_0]   # func_00430500 runs to 0x4307A8; two junk words, then the data at 0x4307B0
 
   # Split from `virtual` rather than left as two more subsegments of it.
   #
