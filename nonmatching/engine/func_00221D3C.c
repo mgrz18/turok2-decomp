@@ -1,4 +1,4 @@
-/* NON-MATCHING: 190 of 362 words differ: structure follows the ROM, but r=0/D_800ACDE0 scheduling, the object loop's off=0 copy (one extra word) and the s3-s6 allocation differ, which shifts everything after. */
+/* NON-MATCHING: 182 of 362 words differ: r = 0 placed later and a do { } while (0) around the region setup (GCC weights refs by loop depth) fix the start and part of the allocation; still off: the region pointer and the object count swap s5/s6, the object loop takes its 0 for k/off from $a1/$a0 instead of k (one extra word), and the sorted-list branch gets a beql where the ROM has beq + j. */
 #include "common.h"
 #include "gfx.h"
 
@@ -121,7 +121,6 @@ void func_00221D3C(World *w) {
         if (views == NULL) {
             return;
         }
-        r = 0;
         D_800ACDE0 = D_800D8E24;
         {
             Gfx *g = D_800D8E24++;
@@ -160,6 +159,7 @@ void func_00221D3C(World *w) {
             g->w0 = 0xDB04001C;
             g->w1 = 0xFFFE;
         }
+        r = 0;
         n = w->regionCount;
         regions = w->regions;
         if (n > 0) {
@@ -177,9 +177,11 @@ void func_00221D3C(World *w) {
                 v = v->next;
             }
             if (found) {
+            do {
             func_0020565C(0, region->data);
             k = 0;
             grp = *region->data;
+            } while (0);
             t = func_002017D4(grp, k);
             cnt = t->count;
             objs = t->entries;

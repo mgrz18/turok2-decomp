@@ -112,7 +112,7 @@ stray 0x00266B7C 0x00266B80 // lw $6,340($29)
 stray 0x00267088 0x00267090 // ldc1 $f20,232($29); jr $31
 stray 0x00269048 0x00269050 // and $4,$4,$30; jal 26d128
 stray 0x00269A8C 0x00269A90 // lw $19,684($29)
-stray 0x0026D06C 0x0026D070 // lwc1 $f1,24($4)
+stray 0x0026D068 0x0026D070 // nop, lwc1 $f1,24($4)
 stray 0x0026D1F8 0x0026D200 // sw $9,4($2); sw $10,8($2)
 stray 0x0026D228 0x0026D230 // jal 20d908; addu $5,$16,$5
 stray 0x0027551C 0x00275520 // mul.s $f0,$f0,$f1
@@ -136,7 +136,7 @@ stray 0x0029129C 0x002912A0 // lui $1,0x800a
 stray 0x002933A4 0x002933B0 // sll $2,$2,0x10; sra $5,$2,0x10; jal 26d5e4
 stray 0x0029346C 0x00293470 // lw $17,124($29)
 stray 0x00293528 0x00293530 // sw $31,16($29); lw $2,20($4)
-stray 0x0029357C 0x00293580 // addiu $29,$29,-24
+stray 0x00293574 0x00293580 // jr ra, addiu $sp (an epilogue), addiu $29,$29,-24
 stray 0x002935A4 0x002935B0 // addiu $29,$29,24; addiu $29,$29,-24; sw $31,16($29)
 stray 0x00293CD8 0x00293CE0 // j 25ad24; addiu $2,$2,100
 stray 0x00293D8C 0x00293D90 // bne $10,$1,2a630c
@@ -199,7 +199,7 @@ stray 0x0029BA74 0x0029BA80 // lui $1,0x800e; swc1 $f0,-10356($1); jal 2974c0
 stray 0x0029BB0C 0x0029BB10 // jal 21034c
 stray 0x0029BF74 0x0029BF80 // addiu $2,$30,268; swc1 $f0,32($29); lw $11,24($23)
 stray 0x0029D18C 0x0029D190 // lw $31,16($29)
-stray 0x0029D5CC 0x0029D5D0 // lui $1,0x800b
+stray 0x0029D5C8 0x0029D5D0 // nop, lui $1,0x800b
 stray 0x0029DBC4 0x0029DBD0 // mfc1 $5,$f20; mfc1 $7,$f20; jal 210318
 stray 0x0029DDF8 0x0029DE00 // move $17,$5; sw $31,44($29)
 stray 0x0029DED8 0x0029DEE0 // mtc1 $2,$f0; cvt.s.w $f0,$f0
@@ -294,3 +294,21 @@ stray 0x004660D8 0x004660E0 // li $2,-1; jal 291bb0
 stray 0x00466134 0x00466140 // jal 2017d4; ori $5,$16,0x1; lw $3,0($17)
 stray 0x00466328 0x00466330 // jal 291b00; move $6,$0
 stray 0x00468F88 0x00468F90 // mtc1 $7,$f0; cvt.s.w $f0,$f0
+
+// Found while matching by hand (#46): splat cut a function's tail, loop or
+// epilogue into functions of their own, or took junk words for a function.
+func 0x002982F0 0x17C // sinf; its `return 0.0f` tail was func_0029845C
+func 0x0025398C 0x90 // its loop (.L002539DC) was cut off
+func 0x00253A1C 0xA4 // its tail, return *ammo, was func_00253AB4
+func 0x00253AC0 0x94 // its loop was func_00253AD4
+func 0x00256AF0 0x44 // its low-nibble return was func_00256B24; like its twin func_00256AAC
+func 0x00268AB4 0x9C // its epilogue was func_00268B48
+func 0x00271BA8 0x44 // its found-return (func_00271BBC) and its loop (func_00271BC4)
+stray 0x0026EFAC 0x0026EFB0 // move $v1,$v0 after func_0026EF30's object; an empty function starts at 0x26EFB0
+func 0x0026EFB0 0x8 // void f(void) {}: jr ra, nop
+stray 0x00228BA4 0x00228BB0 // a nop and two data words ahead of CSunFrameData__Construct
+stray 0x00275BC4 0x00275BE0 // a stale copy of a tail: lw, lw, sw, li, sw, jr ra, sw
+stray 0x00291268 0x00291270 // c.lt.s, nop
+stray 0x002912E8 0x002912F0 // c.lt.s, nop
+stray 0x00299DF8 0x00299E00 // c.lt.s, nop
+stray 0x0029B4A4 0x0029B4B0 // neg.s, c.lt.s, nop
