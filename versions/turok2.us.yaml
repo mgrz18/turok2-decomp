@@ -4543,7 +4543,7 @@ segments:
       - [0x170C14, c, code/func_00426C14]
       - [0x170C88, c, code/func_00426C88]
       - [0x170CD4, c, code/func_00426CD4]
-      - [0x170D54, asm]
+      - [0x170D54, c, code/func_00426D54]
       - [0x170D8C, c, code/func_00426D8C]
       - [0x170DB0, c, code/func_00426DB0]
       - [0x170E04, c, code/func_00426E04]
