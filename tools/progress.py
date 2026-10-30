@@ -49,7 +49,11 @@ LD_SCRIPT = ROOT / "us" / "turok2.ld"
 DEF = re.compile(r"^[A-Za-z_][\w \t\*]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.M)
 
 
-VM_COPY = (0x39000, 0x38F20)     # where a VM module's second copy sits after the first
+VM2_NAMED = (0x0043CC14, 0x00475A00)   # the second VM module, at the addresses splat names it
+VM2_SHIFT = 0x39000                    # ... which are this far above where it is linked
+OLD_COPY = (0x39000, 0x38F20)   # the same distances, between code linked where it is named
+VM_COPY = (0, 0xE0)     # where the first module's copy of a second-module function sits,
+                        # from the second's link address (named 0x39000 or 0x38F20 apart)
 
 
 def region(addr):
@@ -78,19 +82,40 @@ def main():
         elf = ELFFile(fh)
         secs = [s for s in elf.iter_sections() if s["sh_type"] == "SHT_PROGBITS" and s["sh_addr"]]
 
-        def body(addr, size):
-            for s in secs:
-                if s["sh_addr"] <= addr < s["sh_addr"] + s["sh_size"]:
-                    return s.data()[addr - s["sh_addr"]:addr - s["sh_addr"] + size]
-            return None
+        data = {s.name: (s["sh_addr"], s.data()) for s in secs}
 
-        funcs = {sym["st_value"]: (sym.name, sym["st_size"])
-                 for sym in elf.get_section_by_name(".symtab").iter_symbols()
-                 if sym["st_info"]["type"] == "STT_FUNC" and sym["st_size"]}
-        for addr, (name, size) in funcs.items():
-            if region(addr) == "virtual" and any(
-                    funcs.get(addr - d, (None, -1))[1] == size and body(addr, size) == body(addr - d, size)
-                    for d in VM_COPY):
+        def body(sec, addr, size):
+            base, d = data[sec]
+            return d[addr - base:addr - base + size]
+
+        # The second VM module (.virtual_1) is linked over the first, so an
+        # address can name two functions: key them by section too.
+        funcs = {}
+        for sym in elf.get_section_by_name(".symtab").iter_symbols():
+            if sym["st_info"]["type"] != "STT_FUNC" or not sym["st_size"]:
+                continue
+            if isinstance(sym["st_shndx"], int):
+                sec = elf.get_section(sym["st_shndx"]).name
+            elif VM2_NAMED[0] <= sym["st_value"] < VM2_NAMED[1]:   # absolute, by its name in the second module
+                funcs[(".virtual_1", sym["st_value"] - VM2_SHIFT)] = (sym.name, sym["st_size"])
+                continue
+            else:   # defined absolutely: the section that covers it
+                sec = next((n for n, (a, d) in data.items() if a <= sym["st_value"] < a + len(d)), None)
+            if sec in data:
+                funcs[(sec, sym["st_value"])] = (sym.name, sym["st_size"])
+        by_addr = {addr: (sec, size) for (sec, addr), (_, size) in funcs.items() if sec != ".virtual_1"}
+
+        def same(sec, addr, size, sec2, addr2):
+            return sec2 is not None and body(sec, addr, size) == body(sec2, addr2, size)
+
+        for (sec, addr), (name, size) in funcs.items():
+            if sec == ".virtual_1":
+                twin = [(".virtual", addr + d) for d in VM_COPY]
+            elif region(addr) == "virtual":
+                twin = [(by_addr.get(addr - d, (None, 0))[0], addr - d) for d in OLD_COPY]
+            else:
+                twin = []
+            if any(funcs.get(k, (None, -1))[1] == size and same(sec, addr, size, *k) for k in twin):
                 copy += size
                 continue
             sizes[name] = (size, region(addr))

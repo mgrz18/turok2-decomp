@@ -58,8 +58,8 @@ options:
 #   0xF7F50  - 0x107000 : libultra .sdata/.data tail
 #   0x107000 - 0x13B5F0 : SN64 LNK source-debug section (paths, line info)
 #   0x13B5F0 - 0x17A600 : virtual_text_0 (VM module 1 .text)
-#   0x17A600 - 0x186000 : virtual_rodata_0
-#   0x186000 - 0x1B3400 : virtual_text_1 (VM module 2 .text)
+#   0x17A600 - 0x186C14 : virtual_rodata_0
+#   0x186C14 - 0x1B3400 : virtual_text_1 (VM module 2 .text, linked at 0x403C14)
 #   0x1B3400 - 0x1BFA00 : virtual_rodata_1
 #   0x1BFA00 - 0x1DEE00 : virtual_text_2 (VM module 3 .text)
 #   0x1DEE00 - 0x20E334 : virtual_rodata_2 / .sdata
@@ -4701,10 +4701,16 @@ segments:
   - name: virtual_1
     type: code
     align: 4
-    start: 0x186000
-    vram: 0x0043C000     # 0x400000 + (0x186000 - 0x14A000)
+    start: 0x186C14
+    vram: 0x0043CC14     # 0x400000 + (0x186C14 - 0x14A000)
+    # Named here, but linked 0x39000 lower, at 0x403C14 (the Makefile's setup
+    # puts that address in the linker script): its own j, jal and jump tables
+    # all point 0x39000 below where splat names them, so the second module is
+    # paged in over the first. ROM 0x186000-0x186C14 is not this module: it is
+    # the end of the first one's .rodata (descriptor records with pointers
+    # into it, which the engine passes as 0x43C05C ... 0x43CAB4).
     subsegments:
-      - [0x186000, asm,  virtual_text_1]
+      - [0x186C14, asm,  virtual_text_1]
       - [0x188C68, c, code/func_0043EC68]
       - [0x188E04, asm]
       - [0x189F10, c, code/func_0043FF10]
