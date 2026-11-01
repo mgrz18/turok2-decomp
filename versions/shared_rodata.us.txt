@@ -82,3 +82,4 @@ func_0045DEDC 0x800C17B0  # W batch, jtbl
 func_0045DF7C 0x800C17D0  # W batch, jtbl
 func_0045E01C 0x800C17F0  # W batch, jtbl
 func_0045646C 0x800C13E0  # copy of func_0041D51C (W): its pool is the original's
+func_004688D0 0x800A97F0  # copy of func_0042F9B0 (W), in the engine .rodata

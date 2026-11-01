@@ -5415,6 +5415,8 @@ segments:
       - [0x1B26E8, c, code/func_004686E8]
       - [0x1B2758, c, code/func_00468758]
       - [0x1B2788, asm]
+      - [0x1B28D0, c, code/func_004688D0]
+      - [0x1B2AC4, asm]
       - [0x1B2D6C, c, code/func_00468D6C]
       - [0x1B2E0C, c, code/func_00468E0C]
       - [0x1B2E78, c, code/func_00468E78]
