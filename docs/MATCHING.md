@@ -349,6 +349,16 @@ When a cut fix or C in the first module stops defining one of them (it was a
 function start or a label there), the integrate step reports it as called or
 held; define the address absolutely in `versions/undefined_funcs_extra.us.txt`.
 
+The second module was also linked against the first module's .rodata: its
+copies read the originals' literals, strings and jump tables at their
+addresses. C for a second-module function is written with its own literals
+and switches, and `versions/shared_rodata.us.txt` places its .rodata NOLOAD
+over the first module's; `make verify` checks the two agree, jump-table
+entries included (docs/VMASM.md). A function excluded because its .rodata
+"has no place in the build" or "is not in the ROM where the code reads it"
+in the second module usually goes in that way. When the yaml gave a pool
+word to the copy, give it to the original and put the copy over it.
+
 ### One file with its neighbour
 
 A function that matches alone can still be cut wrong: if its `.rodata`
