@@ -17,10 +17,10 @@ into the first module's pool, and the bytes come from the first module's
 object alone.
 
 `--check` (run by `make verify`) holds every such object's .rodata against
-the built ROM at its address, word by word, skipping the words the object
-relocates (jump-table entries, which name the second module's own labels
-while the ROM's name the first module's): what the C says has to be what is
-there.
+the built ROM at its address, word by word: what the C says has to be what is there. A
+jump-table entry names the second module's own label in the object and the
+first module's in the ROM; the two copies of a function are laid out alike,
+so each entry has to keep its distance from the table's first entry.
 """
 
 import re
@@ -32,7 +32,7 @@ ROOT = Path(__file__).resolve().parent.parent
 LIST = ROOT / "versions" / "shared_rodata.us.txt"
 LD = ROOT / "us" / "turok2.ld"
 ELF = ROOT / "build" / "turok2.us.elf"
-Z64 = ROOT / "build" / "turok2.us.z64"
+Z64 = ROOT / "baserom.us.z64"  # the reference; make verify runs this once the build equals it
 MARK = "    /* versions/shared_rodata.us.txt */\n"
 
 
@@ -96,9 +96,22 @@ def check():
                 print(f"{stem}: 0x{addr:08X} is in no loaded segment")
                 bad += 1
                 continue
+            word = lambda b, i: struct.unpack(">I", b[i:i + 4])[0]
+            base = None
             for i in range(0, len(data) - len(data) % 4, 4):
                 if i in rel:
+                    # A jump-table entry: the ROM's names the first module's
+                    # label, the object's (its addend) the copy's own. The two
+                    # copies of the code are laid out alike, so the entries
+                    # must keep their distances from the table's first one.
+                    if base is None:
+                        base = i
+                    elif (word(rom, off + i) - word(rom, off + base)) != (word(data, i) - word(data, base)):
+                        print(f"{stem}: jump-table entry 0x{addr + i:08X} is 0x{word(rom, off + i):08X}, "
+                              f"which is not where the C's case goes")
+                        bad += 1
                     continue
+                base = None
                 if data[i:i + 4] != rom[off + i:off + i + 4]:
                     print(f"{stem}: 0x{addr + i:08X} is {rom[off + i:off + i + 4].hex()}, "
                           f"the C has {data[i:i + 4].hex()}")
