@@ -57,3 +57,5 @@ func_0045CB60 0x800C16B8  # jtbl
 func_0045CBDC 0x800C16D0  # jtbl
 func_0045CCC4 0x800C1700  # jtbl
 func_004498CC 0x800C0988  # copy of func_004108CC (cinema): 1.0f
+func_00465EB0 0x800A6050  # copy of func_0042CF90: its literal, in the engine .rodata
+func_00466040 0x800A60B8  # copy of func_0042D120: its literal, in the engine .rodata
