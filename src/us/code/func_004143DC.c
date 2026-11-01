@@ -1,9 +1,22 @@
 #include "common.h"
+#include "rw/abu_types.h"
 
-/* One file: func_004143DC, func_004145B0 and func_00414938. func_00414938's
- * .rodata (0x800C0BEC) starts 4 past an 8-byte boundary, right after
- * func_004143DC's literal, so its pool continues this file's. Each part keeps
- * its own types (suffixed by address) from when it was matched alone. */
+/* One file from func_004143DC to func_004156FC (0x4143DC-0x415CE8). Its pools
+ * run on from one function to the next: func_00414938's (0x800C0BEC) starts 4
+ * past an 8-byte boundary right after func_004143DC's literal, and
+ * func_004156FC's double at 0x800C0C28 is 8-aligned only counted from this
+ * file's start (0x800C0BE8). func_00414EA8, func_004151B4 and func_0041531C
+ * do not start 16-aligned, so they cannot open an object of their own.
+ * Each part keeps its own types (suffixed by address) from when it was
+ * matched alone.
+ *
+ * The object is larger still: objects start 16-aligned in .text and in
+ * .rodata (with junk words before), the nearest such start is 0x413230
+ * (after stray_00413228; its pool opens at 0x800C0AF0 after the junk at
+ * 0x800C0AE8), and the string "menu" (0x800C0C54) is shared by
+ * func_00415FB8, func_00416644, func_00416760, func_00416894 and
+ * func_004172F8. So the file most likely runs 0x413230-0x417484 with
+ * .rodata 0x800C0AF0-0x800C0E64; folding the rest in is still to do. */
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0044044C.c, func_0044044C, with Turok 2's layouts. */
 
@@ -47,7 +60,7 @@ extern GameState_4143DC D_8011AAF0;
 extern s32 D_800C1BD0; /* current draw mode */
 
 extern s32 func_00266B80(void);
-extern void func_0027AF4C(void);
+extern void func_0027AF4C(); /* called with and without an argument */
 extern void func_002778A8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
 extern void func_00279028(s32 alpha);
 extern void func_0027B320(s32 image, s32 b, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 g);
@@ -444,6 +457,512 @@ void func_00414938(MenuItem_414938 *o, MenuSelection_414938 *idp, s32 unused, Me
             func_0020B5D4();
             func_0021D39C(fx, w->cam);
             func_0020B624();
+        }
+    }
+}
+
+
+/* ---- func_00414EA8 ---- */
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00440F10.c, func_00440F10.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+typedef struct { s16 type; u8 pad2[2]; u32 flags; u16 w8; u16 wA; u8 bC, bD, bE, bF; s32 f10; u8 pad14[0x24 - 0x14]; } Q04Tpl;
+typedef struct { void *unk0; s16 n; u8 pad6[2]; void (*unk8)(void *, void *); u8 pad0C[0x18 - 0xC]; u16 w18; u16 w1A; u16 w1C; } Q04Hdr;
+typedef struct { u8 pad[4]; u32 flags; u8 pad8[0x1C - 8]; void (*unk1C)(void *, void *, void *); } Q04ItemDef;
+typedef struct { s32 idx; u16 w4; u8 pad6[2]; u32 flags; u16 wC; u16 wE; u8 b10, b11, b12, b13; s32 f14; Q04ItemDef *def; s32 f1C; void *p20; void *owner; } Q04Itm;
+typedef struct { u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0E[3]; u8 e; u8 pad12[3]; u8 f; u8 pad16[2]; } Q04Tab;
+typedef struct { u16 w0, w2, w4, w6, w8, wA; u8 bC, bD, bE, bF; } Q04Rec;
+typedef struct {
+    u16 w0, w2, w4;
+    u8 pad6[2];
+    void *p8;
+    Q04Itm *items;
+    s32 n;
+    void *hdr;
+    s32 f18;
+    s32 f1C;
+    void *f20;
+    s32 f24;
+    u16 w28;
+    u16 w2A;
+    s32 f2C, f30, f34, f38, f3C;
+    s32 f40;
+    void *f44;
+    Q04Rec rec[2][8];
+} Q04Panel_414EA8;
+extern void *func_00416B28();
+extern void func_00416C00();
+extern void func_00416C0C(void *p);
+extern Q04Tab D_800C1CD2[];
+void func_00414EA8(Q04Panel_414EA8 *p, void *a1, Q04Hdr *t, s32 a3, s32 a4, void *a5, s32 a6, void *a7)
+{
+  s32 i;
+  s32 j;
+  u8 new_var;
+  s32 k;
+  s32 k2;
+  s32 off;
+  u8 *e;
+  s32 new_var2;
+  Q04Itm *ib;
+  u8 *ext;
+  u8 **pc;
+  p->w0 = t->w18;
+  p->w2 = t->w1A;
+  p->w4 = t->w1C;
+  p->p8 = a1;
+  ib = (Q04Itm *) (((u8 *) p) + 0x1D8);
+  p->items = ib;
+  p->n = t->n;
+  ext = (u8 *) ib;
+  ext = ((u8 *) ib) + (t->n * 0x28);
+  for (i = 0; i < t->n; i++)
+  {
+    Q04Itm *it = (Q04Itm *) ((i * 0x28) + ((s32) p->items));
+    Q04Tpl *tp = (Q04Tpl *) ((i * 0x24) + ((s32) t->unk0));
+    it->idx = i;
+    pc = &ext;
+    {
+      it->w4 = tp->type;
+      it->flags = tp->flags | 0x01800000;
+      it->wC = tp->w8;
+      it->wE = tp->wA;
+      it->b10 = tp->bC;
+    }
+    it->b11 = tp->bD;
+    it->b12 = tp->bE;
+    it->b13 = tp->bF;
+    new_var2 = tp->f10;
+    it->def = (Q04ItemDef *) tp;
+    it->f1C = -1;
+    it->owner = p;
+    it->f14 = new_var2;
+    k = 0;
+    if (tp->type == 3)
+    {
+      k = 0x330;
+    }
+    if (k != 0)
+    {
+      e = *pc;
+      it->p20 = e;
+      if (tp->type == 3)
+      {
+        *((s32 *) (e + 0x328)) = 1;
+      }
+      k2 = 0;
+      if (tp->type == 3)
+      {
+        k2 = 0x330;
+      }
+      *pc += k2;
+    }
+  }
+  p->hdr = t;
+  p->f18 = a3;
+  p->f1C = a4;
+  p->f20 = a5;
+  p->f24 = a6;
+  p->w28 = 0;
+  p->w2A = *((u16 *) (((u8 *) a7) + 0x14));
+  p->f2C = 0;
+  p->f30 = 0;
+  p->f34 = 0;
+  p->f38 = 1;
+  p->f3C = 0;
+  p->f40 = (s32) func_00416B28(a7);
+  p->f44 = a7;
+  for (j = 0; j < 2; j++)
+  {
+    for (i = 0; i < 8; i++)
+    {
+      u8 *rb = ((u8 *)p) + ((j << 7) + i * 16);
+      *((u16 *) (rb + 0x48)) = D_800C1CD2[i].a;
+      *((u16 *) (rb + 0x4A)) = D_800C1CD2[i].b;
+      *((u16 *) (rb + 0x4C)) = D_800C1CD2[i].c;
+      *((u8 *) (rb + 0x54)) = D_800C1CD2[i].d;
+      *((u8 *) (rb + 0x55)) = D_800C1CD2[i].e;
+      new_var = D_800C1CD2[i].f;
+      *((u8 *) (rb + 0x57)) = 0xFF;
+      *((u16 *) (rb + 0x50)) = 0;
+      *((u16 *) (rb + 0x52)) = 0;
+      *((u8 *) (rb + 0x56)) = new_var;
+    }
+  }
+  *((s32 *) (((u8 *) a5) + 0xB0)) = 0;
+  *((s32 *) (((u8 *) a5) + 0xB4)) = 0;
+  *((s32 *) (((u8 *) a5) + 0xBC)) = 0;
+  func_00416C00(p);
+  func_00416C0C(p);
+  if (t->unk8 != 0)
+  {
+    t->unk8(p, a7);
+  }
+  {
+    Q04Itm *it;
+    i = p->n;
+    it = p->items;
+    i--;
+    if (i != (-1))
+    {
+      do
+      {
+        Q04ItemDef *d = it->def;
+        if (d->flags & 0x04000000)
+        {
+          if (d->unk1C != (off = 0))
+          {
+            d->unk1C(it, p, a7);
+          }
+        }
+        i--;
+        it++;
+      }
+      while (i != (-1));
+    }
+  }
+}
+
+
+/* ---- func_004151B4 ---- */
+/* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043F52C_de_4.c, func_804410AC_de.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+
+void func_004151B4(struct MenuRecAt10 *menu, u8 dir) {
+    struct EntryRecAt18V2 *entry;
+    s32 old;
+    entry = &menu->entries[menu->cursor];
+    do {
+        old = menu->cursor;
+        menu->cursor += ((s8 *)entry)[dir];
+        if (menu->cursor < 0) {
+            menu->cursor = menu->count - 1;
+        } else if (menu->cursor >= menu->count) {
+            menu->cursor = 0;
+        }
+        entry = &menu->entries[menu->cursor];
+        old -= menu->cursor;
+        switch (dir) {
+        case 16:
+            if (entry->flags & 0x80000) {
+                entry->back[1] = old;
+            }
+            break;
+        case 17:
+            if (entry->flags & 0x40000) {
+                entry->back[0] = old;
+            }
+            break;
+        case 18:
+            if (entry->flags & 0x200000) {
+                entry->back[3] = old;
+            }
+            break;
+        case 19:
+            if (entry->flags & 0x100000) {
+                entry->back[2] = old;
+            }
+            break;
+        }
+    } while ((entry->flags & 0x1800000) != 0x1800000 || entry->target->locked == 0);
+}
+
+
+/* ---- func_0041531C ---- */
+/* WRONG CUT: real function 0x0041531C, size 0x3E0 (through 0x004156FC): splat cut it into
+ * func_0041531C, func_004154C4, func_00415500, func_00415508, func_004155AC,
+ * func_0041560C and func_004156D8 at branch targets. */
+/* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00441384.c, func_00441384, with Turok 2's layouts. */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0xB0];
+    /* 0xB0 */ u32 buttons;
+} MenuController_41531C;
+
+typedef struct MenuItemDef_41531C {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ void (*update)(void *item, void *menu, void *arg);
+    /* 0x1C */ s32 (*select)(void *item, void *menu, void *arg);
+} MenuItemDef_41531C;
+
+typedef struct {
+    /* 0x00 */ s32 index;
+    /* 0x04 */ s16 type;
+    /* 0x06 */ u8 pad6[2];
+    /* 0x08 */ u32 flags;
+    /* 0x0C */ u8 padC[0xC];
+    /* 0x18 */ MenuItemDef_41531C *def;
+    /* 0x1C */ s32 value;
+    /* 0x20 */ u8 pad20[8];
+} MenuItem_41531C; /* 0x28 bytes */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x14];
+    /* 0x14 */ s32 (*poll)(void);
+} MenuTemplate_41531C;
+
+typedef struct {
+    /* 0x00 */ s16 cursor;
+    /* 0x02 */ u8 pad2[0xA];
+    /* 0x0C */ MenuItem_41531C *items;
+    /* 0x10 */ s32 count;
+    /* 0x14 */ MenuTemplate_41531C *tmpl;
+    /* 0x18 */ u8 pad18[8];
+    /* 0x20 */ MenuController_41531C *ctl;
+    /* 0x24 */ u8 pad24[4];
+    /* 0x28 */ s16 state;
+    /* 0x2A */ u8 pad2A[2];
+    /* 0x2C */ f32 time;
+    /* 0x30 */ f32 fade;
+    /* 0x34 */ f32 open;
+} Menu_41531C;
+
+extern f32 D_800B6D28; /* frame delta */
+extern s32 func_002855E8(MenuController_41531C *ctl);
+extern s32 func_00285628(MenuController_41531C *ctl);
+extern s32 func_00285670(MenuController_41531C *ctl);
+extern s32 func_002856B8(MenuController_41531C *ctl);
+extern s32 func_00285700(MenuController_41531C *ctl);
+extern void func_00416C28(Menu_41531C *menu);
+
+s32 func_0041531C(Menu_41531C *menu, void *arg) {
+    MenuItem_41531C *item;
+    s32 quit;
+    s32 i;
+    s32 moveV;
+    u32 horizontal;
+
+    quit = 0;
+    if (menu->tmpl->poll != NULL) {
+        quit = menu->tmpl->poll();
+    }
+    i = menu->count;
+    item = menu->items;
+    i--;
+    if (i != -1) {
+        do {
+            if (item->def->update != NULL) {
+                item->def->update(item, menu, arg);
+            }
+            i--;
+            item++;
+        } while (i != -1);
+    }
+    item = (MenuItem_41531C *) ((u8 *) menu->items + menu->cursor * 0x28);
+    menu->time = menu->time + D_800B6D28;
+    horizontal = item->flags & 0x400000;
+    func_00416C28(menu);
+    switch (menu->state) {
+    case 0:
+        menu->fade = menu->fade + D_800B6D28;
+        if (1.0f <= menu->fade) {
+            menu->fade = 1.0f;
+            menu->state = 1;
+        }
+        break;
+    case 1:
+        menu->open = menu->open + D_800B6D28 * 0.4f;
+        if (1.0f <= menu->open) {
+            menu->open = 1.0f;
+            menu->state = 2;
+        }
+        break;
+    case 3:
+        menu->open = menu->open - D_800B6D28 * 0.4f;
+        if (menu->open <= 0.0f) {
+            menu->open = 0.0f;
+            menu->state = 4;
+        }
+        break;
+    case 4:
+        menu->fade = menu->fade - D_800B6D28;
+        if (menu->fade <= 0.0f) {
+            menu->fade = 0.0f;
+            return 1;
+        }
+        break;
+    }
+    if (menu->state < 3) if (menu->state >= 0) {
+        if (quit != 0) {
+            menu->state = 4;
+        }
+        if (!(item->flags & 8)) {
+            u32 buttons;
+
+            moveV = 1;
+            if (item->type == 2) {
+                buttons = menu->ctl->buttons;
+                if (buttons & 0x20202) {
+                    moveV = 0;
+                    item->value -= 2;
+                    if (item->value < 0) {
+                        item->value = 0;
+                    }
+                } else if (buttons & 0x40101) {
+                    item->value += 2;
+                    moveV = 0;
+                    if (item->value >= 0x100) {
+                        item->value = 0xFF;
+                    }
+                }
+            }
+            if (horizontal == 0) {
+                if (func_00285628(menu->ctl) != 0) {
+                    func_004151B4((struct MenuRecAt10 *) menu, 0x10);
+                }
+                if (func_00285670(menu->ctl) != 0) {
+                    func_004151B4((struct MenuRecAt10 *) menu, 0x11);
+                }
+            } else if (menu->ctl->buttons & 0x60303) {
+                moveV = 0;
+            }
+            if (moveV != 0) {
+                if (func_002856B8(menu->ctl) != 0) {
+                    func_004151B4((struct MenuRecAt10 *) menu, 0x12);
+                }
+                if (func_00285700(menu->ctl) != 0) {
+                    func_004151B4((struct MenuRecAt10 *) menu, 0x13);
+                }
+            }
+            if (menu->state == 2 && (func_002855E8(menu->ctl) != 0 || (func_00285628(menu->ctl) != 0 && horizontal != 0)
+                                     || (func_00285670(menu->ctl) != 0 && horizontal != 0))) {
+                if (item->def->select == NULL || item->def->select(item, menu, arg) != 0) {
+                    menu->state = 3;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+
+/* ---- func_004156FC ---- */
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00441764.c, func_00441764.
+ * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+
+f32 func_002982F0(f32 x);
+typedef struct Q04Item_4156FC {
+    s32 idx;
+    s16 w4;
+    u8 pad6[2];
+    u32 flags;
+    u16 wC;
+    u16 wE;
+    u8 b10, b11, b12, b13;
+    s32 f14;
+    void *def;
+    s32 f1C;
+    void *p20;
+    void *owner;
+} Q04Item_4156FC;
+typedef struct Q04Info_4156FC {
+    s32 f0, f4, f8;
+    f32 fC, f10;
+    s32 x0, x1, y0, y1;
+} Q04Info_4156FC;
+typedef struct { u8 pad[0x14]; void (*f14)(void *, void *, void *, void *); } Q04DefB;
+typedef struct { s16 cur; s16 w2; s16 w4; u8 pad6[6]; Q04Item_4156FC *items; s32 n; u8 pad14[0x30 - 0x14]; f32 f30; f32 f34; } Q04Pn;
+typedef struct { u8 pad[0x288]; f32 f288; f32 f28C; f32 f290; f32 f294; } Q04Cm; /* Turok 2: viewport at 0x288 (Rage Wars: 0x29C) */
+extern void func_002778A8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
+extern f32 func_002982F0(f32 x);
+extern s32 D_800C1BD0;
+void func_004156FC(Q04Pn *p, void *a1) {
+    struct { s32 f, w, h, g; } sz;
+    struct { s32 f, x0, x1, y0, y1; } r;
+    Q04Info_4156FC info;
+    Q04Info_4156FC cp;
+    Q04Cm *cam;
+    Q04Item_4156FC *it;
+    s32 i, v, v2, v3, v4;
+    f32 cx, cy, hw, hh, fa, fb, sv, tt;
+    u32 al;
+    i = 0;
+    cam = func_00416B28(a1);
+    r.x0 = 0x400; r.x1 = -0x400; r.y0 = 0x400; r.y1 = -0x400;
+    info.f4 = 0; info.f8 = 0; info.x0 = 0; info.x1 = 0; info.y0 = 0; info.y1 = 0;
+    for (; i < p->n; i++) {
+        it = &p->items[i];
+        if (it->flags & 0x800000) {
+            if (it->flags & 0x20000000) {
+                info.x0 = 0x400; info.x1 = -0x400; info.y0 = 0x400; info.y1 = -0x400;
+                info.f4 = 0; info.f8 = 0;
+            } else {
+                func_0041363C((MenuItem_4145B0 *) it, (MenuInfo_4145B0 *) &info);
+            }
+            v = info.x0; if (r.x0 < v) v = r.x0; r.x0 = v;
+            v2 = info.x1; if (v2 < r.x1) v2 = r.x1; r.x1 = v2;
+            v3 = info.y0; if (r.y0 < v3) v3 = r.y0; r.y0 = v3;
+            v4 = info.y1; if (v4 < r.y1) v4 = r.y1; r.y1 = v4;
+        }
+    }
+    sz.w = r.x1 - r.x0;
+    sz.h = r.y1 - r.y0;
+    if (sz.w >= 0 && sz.h >= 0) {
+        cx = cam->f290 + cam->f288 * 0.5f + (f32)p->w2;
+        cy = cam->f294 + cam->f28C * 0.5f + (f32)p->w4;
+        info.f4 = 0; info.f8 = 0; info.x0 = 0; info.x1 = 0;
+        hw = (f32)(sz.w / 2);
+        hh = (f32)(sz.h / 2);
+        info.y0 = 0; info.y1 = 0;
+        r.x0 = (s32)(cx - hw);
+        r.x1 = (s32)(cx + hw);
+        r.y0 = (s32)(cy - hh);
+        r.y1 = (s32)(cy + hh);
+        D_800C1BD0 = -1;
+        for (i = 0; i < p->n; i++) {
+            it = &p->items[i];
+            if (it->flags & 0x800000) {
+                info.f0 = i;
+                if (it->flags & 0x20000000) {
+                    func_0041363C((MenuItem_4145B0 *) it, (MenuInfo_4145B0 *) &info);
+                    info.f4 = 0; info.f8 = 0;
+                    info.x0 = (s32)cam->f290;
+                    info.x1 = 0;
+                    info.y0 = (s32)cam->f294;
+                    info.y1 = 0;
+                } else {
+                    func_0041363C((MenuItem_4145B0 *) it, (MenuInfo_4145B0 *) &info);
+                }
+                cp = info;
+                if (!(it->flags & 0x20000000)) {
+                    cp.x0 += r.x0;
+                    cp.x1 += r.x0;
+                    cp.y0 += r.y0;
+                    cp.y1 += r.y0;
+                }
+                if (it->flags & 1) {
+                    cp.x0 = (s32)(cx - (f32)(info.f4 / 2));
+                    cp.x1 = cp.x0 + info.f4;
+                }
+                if (it->flags & 2) {
+                    cp.x0 = r.x0;
+                    cp.x1 = r.x0 + info.f4;
+                }
+                if (it->flags & 4) {
+                    cp.x1 = r.x1;
+                    cp.x0 = r.x1 - info.f4;
+                }
+                if (it->flags & 0x800000) {
+                    if (p->cur == i && it->w4 != 3) {
+                        if (!(it->flags & 8)) {
+                            fb = (f32)cp.y0;
+                            fa = (f32)cp.y1;
+                            fa = fb + (fa - fb);
+                            func_0027AF4C(it);
+                            tt = func_002982F0((f32)((u32) D_800B6D20 * 10) * 0.017453294f);
+                            sv = p->f30 * p->f34 * ((tt + 1.0f) * 50.0f + 50.0f);
+                            if (it->flags & 0x10) {
+                                func_002778A8(cp.x0 - 4, (s32)fb, cp.x1 + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
+                            } else {
+                                func_002778A8(cp.x0 - 4, (s32)fb, cp.x1 + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
+                            }
+                            D_800C1BD0 = -1;
+                        }
+                    }
+                    ((Q04DefB *)it->def)->f14(it, &cp, &sz, p);
+                }
+            }
         }
     }
 }
