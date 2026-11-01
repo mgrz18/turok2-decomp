@@ -1,0 +1,10 @@
+# Second-module C files whose .rodata is the first module's pool: the second
+# VM module was linked against the first module's .rodata (docs/VMASM.md).
+# Each file's .rodata is placed at the address below, NOLOAD, so its code's
+# relocations land in the first module's pool and the bytes come from there
+# (tools/shared_rodata.py; `make verify` checks that they agree).
+#
+# file          first-module data
+func_004491B8 0x800C097C  # copy of func_004101B8 (cinema): 1.0f, 1.0f, 1/6
+func_0044AC94 0x800C0A6C  # copy of func_00411C94 (cinema): 1.0f, 0.5f, 0.3f, 1.0f, 1.0f, 2^31
+func_00451408 0x800C0E84  # "  %02d", "none" (menu)

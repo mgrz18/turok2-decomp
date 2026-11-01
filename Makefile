@@ -143,6 +143,9 @@ all: rom
 # own j, jal and jump tables point there (docs/VMASM.md). splat cannot place a
 # segment at one address and name it at another, so the linker script gets the
 # link address here.
+#
+# Second-module C whose .rodata is the first module's pool gets that pool's
+# address, NOLOAD (versions/shared_rodata.us.txt, tools/shared_rodata.py).
 VIRTUAL_1_NAMED  = 0x43CC14
 VIRTUAL_1_LINKED = 0x403C14
 
@@ -150,6 +153,7 @@ setup:
 	$(PYTHON) -m splat split $(SPLAT_YAML)
 	sed -i 's/^\(    \.virtual_1 \)$(VIRTUAL_1_NAMED) :/\1$(VIRTUAL_1_LINKED) :/' $(LD_SCRIPT)
 	grep -q '^    \.virtual_1 $(VIRTUAL_1_LINKED) :' $(LD_SCRIPT)
+	$(PYTHON) $(TOOLS_DIR)/shared_rodata.py
 
 build: $(O_FILES)
 
@@ -172,6 +176,7 @@ verify: $(TARGET).z64
 		|| (echo "produced: $$(sha1sum $(TARGET).z64 | cut -d' ' -f1)"; \
 		    echo "expected: $(EXPECTED_SHA1)"; \
 		    exit 1)
+	@$(PYTHON) $(TOOLS_DIR)/shared_rodata.py --check
 
 # ---- Recipes -------------------------------------------------------------
 
