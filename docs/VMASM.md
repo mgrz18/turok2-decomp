@@ -97,6 +97,78 @@ What this means for the build:
   `virtual_rodata_2` with that value is data: the symbol has
   `can_be_referenced:False`.
 
+## The second module shares the first module's .rodata
+
+The second module's code reads the first module's .rodata: the literals and
+strings of its copies and even jump tables, whose entries point at the first
+module's code. Evidence:
+
+- The cinema file (0x40F240-0x413228) and the file 0x4143DC-0x415CE8 are in
+  the second module byte for byte at the same link addresses (named
+  0x448240-0x44C228 and 0x44D3DC-0x44ECE8), and every load of a literal in
+  them names the first module's pool (0x800C0950-0x800C0AE8, 0x800C0BE8-).
+- The menu block (named 0x450490 on, linked at 0x417490 like the first
+  module's) is a variant build: some functions are shorter (0x28 bytes each
+  at 0x417E84, 0x417F18, ...), so from 0x417E84 on the copies sit 0x50 below
+  their originals. They still read the originals' strings ("  %02d",
+  "none", " %3d", ...) at the first module's addresses.
+- func_00452960 (link 0x419960) indexes jtbl_800C1048, func_00419A00's
+  table: its six entries 0x419A28 ... 0x419A78 are the original's case
+  labels, past the end of the copy. The copies 0xE0 below their originals
+  (func_00465EB0/func_0042CF90, func_0045BDAC/func_00422E8C, ...) do the
+  same.
+
+So the second module's objects were compiled from the same sources (with
+some differences) and linked against the first module's data, which the ROM
+holds once. The build models it so:
+
+- C for a second-module function is written as its source was, with its
+  literals, strings and switches, and emits its own .rodata, laid out like
+  the first module's for the same source.
+- `versions/shared_rodata.us.txt` names the file and the first-module
+  address its .rodata stands for. `make setup` (`tools/shared_rodata.py`)
+  gives each one an output section at that address, NOLOAD: the code's
+  relocations resolve into the first module's pool, and the bytes come from
+  the first module's object only.
+- `make verify` then runs `shared_rodata.py --check`: each such object's
+  .rodata has to equal the ROM at its address, and each jump-table entry has
+  to keep its distance from the table's first entry (the object's entries
+  name the copy's labels, the ROM's the original's). That check caught
+  func_0045BDAC, whose Rage Wars case list linked byte-exact but did not
+  give Turok 2's table.
+- Where the copy is the original file byte for byte, the copy is one C file
+  made from the original's source with the second-module names
+  (src/us/code/func_00448240.c from func_0040F240.c, func_0044D3DC.c from
+  func_004143DC.c); its .rodata alignment then works as the original's did.
+- A string the original file emits in an earlier function stays an extern
+  (func_0045190C's " %3d", as func_004189AC has it).
+- The second module's own data (virtual_rodata_1) is named by link address
+  in its code (`D_00438824`, named 0x471824): defined absolutely in
+  `versions/undefined_funcs_extra.us.txt`.
+
+Which of the two owns a pool word in the yaml is the first module's call
+now: func_0042CF90 and func_0042D120 own their literals in the engine's
+.rodata (0x800A6050, 0x800A60B8) and their copies func_00465EB0 and
+func_00466040 go over them.
+
+Open: the VM pools are interleaved with the engine's in its .rodata
+(0x800A600C is func_0042C560's, 0x800A6010 the engine's func_002261A8's,
+0x800A6014 func_0042CBE4's), probably in link order of the objects, and
+func_0042CBE4's jump table at 0x800A6018 is 8-aligned only if its object's
+.rodata starts at 0x800A6010. func_0042CBE4 and its copy func_00465B04 stay
+asm until it is known which object that word belongs to.
+
+Object boundaries in the VM modules: each object starts 16-aligned in .text
+and in .rodata, with junk words before (often copies of instructions). The
+cinema object ends at the junk at 0x413228 in .text and at 0x800C0AE8 in
+.rodata, and func_004131B0, its last function, is the out-of-line copy of
+an inline helper (GCC 2.8 emits a non-static inline function's own copy at
+the end of the file). By the same rule the file holding func_004143DC opens
+at 0x413230 (.rodata 0x800C0AF0) and runs to 0x417484 (.rodata to
+0x800C0E64): the string "menu" at 0x800C0C54 is read by func_00415FB8,
+func_00416644, func_00416760, func_00416894 and func_004172F8. It is still
+split into func_00413230 ... and the file from func_004143DC.
+
 ## What is still open
 
 Whether the paging is **relocation** or **overcommit**. That is the question

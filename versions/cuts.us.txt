@@ -381,6 +381,27 @@ func 0x0045AEA8 0xD8
 func 0x0045C398 0xE0
 func 0x0045C688 0x118
 func 0x0045CF28 0x2E4
+
+// Second-module switches whose cases splat cut into functions of their own.
+func 0x004540B0 0x80 // a switch over the first module's jtbl_800C12E0 (func_0041B148's); splat cut each case into a function (func_004540E0 ... func_00454128)
+func 0x0045CC58 0x6C // a switch over jtbl_800C16E8; splat cut its last case into func_0045CCB0
 stray 0x0045337C 0x00453380 // a c.lt.s never executed; the function starts 16-aligned
 stray 0x0045342C 0x00453430 // a jal never executed; the function starts 16-aligned
 func 0x00430500 0x2A8 // runs to 0x4307A8, past where virtual_text_0 used to end (0x430600)
+
+// From the W hand-matching batch: functions splat cut at case bodies, tail
+// jumps or delay-slot loads, and junk words before 16-aligned objects.
+func 0x0044F2FC 0xC4 // absorbs func_0044F33C, its case bodies (copy of func_004162FC)
+func 0x00420454 0x264 // absorbs func_004205B8 and func_004205C4, cut inside straight-line code
+func 0x0041DC5C 0x134 // absorbs func_0041DCB0, cut at a load in a delay slot
+func 0x0040A6F0 0x20C // cut at its tail jumps
+func 0x00469374 0xA8 // as its first-module copy func_00430454
+func 0x0045FED4 0x48 // strncmp; absorbs func_0045FEE4 (copy of func_00426FB4)
+stray 0x004691B8 0x004691C0 // sw v0,0(t3); move a1,zero: junk between objects
+func 0x004691C0 0x90
+stray 0x00467B4C 0x00467B50 // lw v1,0x20(sp): junk between objects
+func 0x00467B50 0xC0
+stray 0x00428A18 0x00428A20 // two junk words before osPfsIsPlug, 16-aligned
+func 0x00428A20 0x17C // absorbs func_00428ABC and func_00428B58
+stray 0x0045E674 0x0045E680 // linker fill after the hand-written func_0045E630
+func 0x0045E680 0x188

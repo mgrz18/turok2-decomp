@@ -62,7 +62,7 @@ def address(name):
 
 def owner(addr, names):
     """The batch function whose code holds addr: the nearest start below it."""
-    below = [n for n in names if int(n[5:], 16) <= addr]
+    below = [n for n in names if re.match(r"^func_[0-9A-F]{8}$", n) and int(n[5:], 16) <= addr]
     return max(below, key=lambda n: int(n[5:], 16)) if below else None
 
 

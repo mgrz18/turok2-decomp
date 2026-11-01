@@ -1,3 +1,4 @@
+/* NON-MATCHING: 154 of 161 words differ (W batch). */
 /* NON-MATCHING: 159 of 166 words differ: right structure, but the counter/flag schedule at the top and the struct-copy and loop register choice differ (needs more work). */
 /* WRONG CUT: REAL func_0042EF2C size 0x298 (splat cut it into func_0042EF2C + func_0042F0E4). */
 #include "common.h"

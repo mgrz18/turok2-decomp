@@ -1,3 +1,4 @@
+/* NON-MATCHING: 227 of 231 words differ (W batch). */
 /* NON-MATCHING: 235 of 245 words differ: m2c draft of the whole function, not worked on (time) */
 /* WRONG CUT: one function 0x0042085C-0x00420C30 (size 0x3D4); splat cut it into func_0042085C, func_00420878 and func_004208E0. */
 #include "common.h"

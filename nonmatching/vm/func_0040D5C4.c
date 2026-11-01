@@ -1,6 +1,6 @@
-/* NON-MATCHING: 46 of 55 words differ: the ROM stores script via the call-argument base but reads it back
- * and stores obj through their own symbols (D_801306F8, D_80130200) and does the warp-id store first;
- * GCC here CSEs one base for all of them. Logic is complete. */
+/* NON-MATCHING: 6 of 55 words differ (W batch). */
+/* NON-MATCHING: 6 of 55 words differ: only the load of D_801306F8 (D_80130200.script, read back through its
+ * own symbol) is scheduled above the script store here; the ROM keeps it after the store. */
 #include "common.h"
 
 /* AI init of the second boss: sets the level's warp id, the anim table and callbacks, starts the phase script
@@ -76,7 +76,8 @@ typedef struct {
 } CAI;
 
 extern State2 D_80130200;
-extern s32 D_80110048; /* warp id */
+extern ScriptStep *D_801306F8[]; /* D_80130200.script */
+extern s32 D_80110048[]; /* warp id */
 extern u8 D_800C1910[];
 extern ScriptStep D_00432340[];
 extern u8 D_801100F0[];
@@ -87,17 +88,19 @@ extern void func_0040EC14(State2 *state, s32 id);
 extern void func_00243414(Actor *obj, CAI *ai, s32 state);
 extern void func_0027AD24(void *hud, Actor *obj, char *name);
 
-void func_0040D5C4(Actor *obj, CAI *ai) {
-    State2 *state = &D_80130200;
+static __inline__ void startScript(State2 *state, ScriptStep *script, Actor *obj) {
+    state->script = script;
+    D_80130200.obj = (Obj2 *)obj;
+    func_0040EC14(state, D_801306F8[0]->id);
+}
 
-    D_80110048 = 0x1CE9;
+void func_0040D5C4(Actor *obj, CAI *ai) {
+    D_80110048[0] = 0x1CE9;
     ai->anims = D_800C1910;
     ai->callbackF0 = func_0040DA90;
     ai->callbackF8 = func_0040D9B8;
     ai->callbackF4 = func_0040EDB0;
-    D_80130200.script = D_00432340;
-    D_80130200.obj = (Obj2 *)obj;
-    func_0040EC14(state, D_80130200.script->id);
+    startScript(&D_80130200, D_00432340, obj);
     obj->flags &= ~0x10000000;
     ai->unk10C = 0;
     ai->hitTimer = 0.0f;

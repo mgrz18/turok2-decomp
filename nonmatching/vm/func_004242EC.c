@@ -1,3 +1,4 @@
+/* NON-MATCHING: 78 of 133 words differ (W batch). */
 /* NON-MATCHING: 80 of 135 words differ: the mode-cycling loop and the two maxima are scheduled differently */
 /* WRONG CUT: one function 0x004242EC-0x00424508 (size 0x21C); splat cut its epilogue
  * (jr ra; addiu sp) into func_00424500. */
