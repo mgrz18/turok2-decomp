@@ -1,10 +1,10 @@
 #include "common.h"
 #include "rw/abu_types.h"
 
-/* The cinema system: one file from func_0040F240 to func_00412F88 (0x40F240-0x412FF8).
+/* The cinema system: one file from func_0040F240 to func_004131B0 (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
  * the block, which GCC does only within one file, and its .rodata is the ROM's
- * 0x190 bytes at 0x800C0950. The second VM module has a copy of the block at the
+ * 0x198 bytes at 0x800C0950. The second VM module has a copy of the block at the
  * same link address (func_004491B8, func_0044AC94, ...) that reads this pool. */
 
 /* A spline record: a point, the second derivatives of its coordinates over the
@@ -177,8 +177,10 @@ static __inline__ void TempFree(f32 *data) {
     }
 }
 
-/* Whether a cue's object is one the cinema waits for (a separate function in Rage Wars). */
-static __inline__ s32 CueObjectReady(CueObject *k) {
+/* Whether a cue's object is one the cinema waits for (a separate function in
+ * Rage Wars). Inline but not static: GCC inlines it where it is called and
+ * emits its own copy at the end of the file, func_004131B0. */
+__inline__ s32 func_004131B0(CueObject *k) {
     s32 r = 0;
     switch (k->kind) {
     case 1:
@@ -1240,7 +1242,7 @@ s32 func_0041266C(void) {
         } else {
             k = (CueObject *)(D_800F7078->recB + e->unk8 * 20);
         }
-        if (CueObjectReady(k) != 0) {
+        if (func_004131B0(k) != 0) {
             any = 1;
         }
     }
@@ -1290,7 +1292,7 @@ void func_00412798(void) {
                     } else {
                         k = (CueObject *)(D_800F7078->recB + e->unk8 * 20);
                     }
-                    if (CueObjectReady(k) != 0) {
+                    if (func_004131B0(k) != 0) {
                         func_00412314(0, k);
                         D_800C1BB0->field58 = 0;
                     } else {
@@ -1515,4 +1517,35 @@ s32 **func_00412F88(void) {
         return NULL;
     }
     return func_0020367C(0, loaded, size, 0x13, 0, NULL, "Cinema", 1);
+}
+
+/* A Hermite basis term, (1 - t)^3 - (1 - t) and t^3 - t, weighted. */
+f32 func_00412FF8(f32 a, f32 b, f32 t) {
+    f32 u;
+    u = 1.0f - t;
+    return (a * ((u * u * u) - u)) + (b * ((t * t * t) - t));
+}
+
+f32 func_00413038(f32 a, f32 b, f32 t) {
+    return (a * (1.0f - t)) + (b * t);
+}
+
+void *func_0041305C(s32 index) {
+    return func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index);
+}
+
+s32 func_0041309C(s32 index) {
+    return *(s32 *)func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index), 2);
+}
+
+s32 func_004130EC(s32 index) {
+    return ((s32 *)func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index), 2))[1];
+}
+
+void *func_0041313C(s32 index) {
+    return func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index), 1);
+}
+
+void *func_00413188(void) {
+    return func_002017D4(D_800C1BB0->resource, 3);
 }
