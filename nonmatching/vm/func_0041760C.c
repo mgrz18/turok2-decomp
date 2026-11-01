@@ -1,5 +1,7 @@
-/* NON-MATCHING: 86 of 97 words differ: same code as func_00417490 (match start from setup bytes);
- * the inlined func_00417BB0 stores and the time check schedule differently. */
+/* NON-MATCHING: 74 of 97 words differ (W batch). */
+/* NON-MATCHING: 74 of 97 words differ: same code as func_00417490 and func_0041778C (both match), but with
+ * started = a3 = 0 the ROM never forms the &match pointer (the -1.0f store goes off &D_8011AAD8) and
+ * schedules the 900.0f/0.0f loads differently. */
 #include "common.h"
 
 typedef struct {
@@ -27,7 +29,7 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u8 pad0[0x20];
     /* 0x020 */ s8 minutes;
-    /* 0x021 */ s8 unk;
+    /* 0x021 */ s8 unk26;
     /* 0x022 */ s8 level;
     /* 0x023 */ u8 pad23[0x80 - 0x23];
     /* 0x080 */ SetupSlot slots[4];
@@ -44,7 +46,7 @@ extern s32 func_002855E8(void *ctl);
 extern s32 func_002113A4(void);
 extern void func_00430454(void *a, s32 level);
 
-/* func_00417BB0 without its check of the time, inlined. */
+/* func_00417BB0, inlined. */
 static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
     MatchState *m = &D_8011AAD8.match;
 
@@ -57,6 +59,9 @@ static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
     m->unk28 = 0;
     m->unk20 = 0;
     m->time = minutes * 900.0f;
+    if (m->time == 0.0f) {
+        m->time = -1.0f;
+    }
 }
 
 s32 func_0041760C(void) {
@@ -66,11 +71,8 @@ s32 func_0041760C(void) {
     s32 i;
     u8 *ctl;
 
-    StartMatch(setup->minutes, setup->unk, 0, 0);
     level = setup->level;
-    if (D_8011AAD8.match.time == 0.0f) {
-        D_8011AAD8.match.time = -1.0f;
-    }
+    StartMatch(setup->minutes, setup->unk26, 0, 0);
     for (i = 3; i >= 0; i--) {
         setup->slots[i].unk30 = 0;
     }

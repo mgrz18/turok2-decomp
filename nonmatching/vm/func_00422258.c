@@ -1,4 +1,7 @@
-/* NON-MATCHING: 5 of 47 words differ: the space-fill loop keeps a recomputed index instead of the ROM pointer giv (register choice) */
+/* NON-MATCHING: 3 of 47 words differ (W batch). */
+/* NON-MATCHING: 3 of 47 words differ: the space-fill loop compares the old count (i-- > 0) instead of the
+ * ROM's decremented count with bgez and a pointer giv; do/while(--i >= 0) gets the test but GCC then does not
+ * strength-reduce field[i]. */
 #include "common.h"
 
 extern char D_800B4B04[];
@@ -17,6 +20,7 @@ s32 func_00422258(MenuItem *item) {
     char *field;
     char *dst;
     s32 i;
+    char c;
 
     if (D_801309A8 != 0) {
         item->text = D_800B4B04;
@@ -28,9 +32,10 @@ s32 func_00422258(MenuItem *item) {
         }
         field = item->text;
         field += 11;
+        c = ' ';
         i = 8;
-        while (i--) {
-            field[i] = ' ';
+        while (i-- > 0) {
+            field[i] = c;
         }
         dst = &field[8 - len];
         for (i = 0; i < len; i++) {

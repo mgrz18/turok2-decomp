@@ -1,4 +1,5 @@
-/* NON-MATCHING: 18 of 42 words differ (checked at the real start): $s0/$s1 swapped between game and warpId, li 2 scheduled earlier. */
+/* NON-MATCHING: 7 of 42 words differ (W batch). */
+/* MATCHES at its real extent (checked with the symbol size patched to 0xA8); the do/while(0) blocks give the register choice and store order (as in func_00430454, its first-module copy). */
 /* WRONG CUT: the real function is 0x00469374-0x0046941C (size 0xA8 = 168):
  * splat cut it at the data label D_00469400. */
 #include "common.h"
@@ -41,8 +42,12 @@ void func_00469374(Game *game, s32 warpId) {
     D_8011ACB0.values[2] = 0;
     D_8011ACB0.values[3] = 0;
     D_8011ACB0.value44 = 0;
-    game->warpFlags = 0;
-    game->warpId = id;
-    game->mode = 2;
-    game->nextState = 13;
+    do {
+        game->warpFlags = 0;
+        game->warpId = id;
+    } while (0);
+    do {
+        game->mode = 2;
+        game->nextState = 13;
+    } while (0);
 }
