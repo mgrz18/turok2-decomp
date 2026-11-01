@@ -22,6 +22,10 @@ struct SplineNode {
 };
 struct SplineNode;
 typedef struct SplineNode SplineNode;
+/* The pool is the first module's: this copy of func_004101B8 reads it. */
+extern const f32 D_800C097C;
+extern const f32 D_800C0980;
+extern const f32 D_800C0984;
 CVector3 func_004491B8(SplineNode *nodes, s32 count, f32 w) {
     CVector3 out;
     SplineNode *a;
@@ -94,7 +98,7 @@ CVector3 func_004491B8(SplineNode *nodes, s32 count, f32 w) {
         } else {
             u = 0.0f;
         }
-        s = as * (1.0f - u) + bs * u + (inSlope - (bs - as)) * (u - (u + u) * u + u * u * u) + (outSlope - (bs - as)) * (u * u * u - u * u);
+        s = as * (D_800C097C - u) + bs * u + (inSlope - (bs - as)) * (u - (u + u) * u + u * u * u) + (outSlope - (bs - as)) * (u * u * u - u * u);
         for (i = 0; i < count - 1; i++) {
             a = &nodes[i];
             b = &nodes[i + 1];
@@ -109,10 +113,10 @@ CVector3 func_004491B8(SplineNode *nodes, s32 count, f32 w) {
             hi = (s - start) / h;
         }
         h2 = h * h;
-        lo = 1.0f - hi;
-        out.x = a->p.x * lo + b->p.x * hi + (a->d2p.x * (lo * lo * lo - lo) + b->d2p.x * (hi * hi * hi - hi)) * h2 * 0.16666667f;
-        out.y = a->p.y * lo + b->p.y * hi + (a->d2p.y * (lo * lo * lo - lo) + b->d2p.y * (hi * hi * hi - hi)) * h2 * 0.16666667f;
-        out.z = a->p.z * lo + b->p.z * hi + (a->d2p.z * (lo * lo * lo - lo) + b->d2p.z * (hi * hi * hi - hi)) * h2 * 0.16666667f;
+        lo = D_800C0980 - hi;
+        out.x = a->p.x * lo + b->p.x * hi + (a->d2p.x * (lo * lo * lo - lo) + b->d2p.x * (hi * hi * hi - hi)) * h2 * D_800C0984;
+        out.y = a->p.y * lo + b->p.y * hi + (a->d2p.y * (lo * lo * lo - lo) + b->d2p.y * (hi * hi * hi - hi)) * h2 * D_800C0984;
+        out.z = a->p.z * lo + b->p.z * hi + (a->d2p.z * (lo * lo * lo - lo) + b->d2p.z * (hi * hi * hi - hi)) * h2 * D_800C0984;
     }
     return out;
 }
