@@ -5,8 +5,6 @@
 # (tools/shared_rodata.py; `make verify` checks that they agree).
 #
 # file          first-module data
-func_004491B8 0x800C097C  # copy of func_004101B8 (cinema): 1.0f, 1.0f, 1/6
-func_0044AC94 0x800C0A6C  # copy of func_00411C94 (cinema): 1.0f, 0.5f, 0.3f, 1.0f, 1.0f, 2^31
 func_00451408 0x800C0E84  # "  %02d", "none" (menu)
 func_00452960 0x800C1048  # jtbl of func_00419A00 (menu)
 func_0045190C 0x800C0F40  # 1.0f (menu)
@@ -29,8 +27,6 @@ func_00455324 0x800C1310  # string (menu)
 func_00455484 0x800C1318  # strings (menu)
 func_004555B0 0x800C1318  # strings (menu)
 func_0045582C 0x800C1318  # string (menu)
-func_0044A0CC 0x800C09A8  # copy of func_004110CC (cinema): 2^31 and other floats
-func_0044B998 0x800C0AD8  # copy of func_00412998 (cinema): 10.0f
 func_0044ECE8 0x800C0C3C  # copy of func_00415CE8
 func_0044FC74 0x800C0DF4  # copy of func_00416C74
 func_0044FF8C 0x800C0E00  # jtbl of func_00416F8C, and 30.0f
@@ -55,9 +51,9 @@ func_0045CAE4 0x800C16A0  # jtbl
 func_0045CB60 0x800C16B8  # jtbl
 func_0045CBDC 0x800C16D0  # jtbl
 func_0045CCC4 0x800C1700  # jtbl
-func_004498CC 0x800C0988  # copy of func_004108CC (cinema): 1.0f
 func_00465EB0 0x800A6050  # copy of func_0042CF90: its literal, in the engine .rodata
 func_00466040 0x800A60B8  # copy of func_0042D120: its literal, in the engine .rodata
 func_004540B0 0x800C12E0  # jtbl of func_0041B148
 func_0045CC58 0x800C16E8  # jtbl
 func_0044D3DC 0x800C0BE8  # copy of the file from func_004143DC (to 0x415CE8)
+func_00448240 0x800C0950  # copy of the cinema file (func_0040F240 to func_004131B0)
