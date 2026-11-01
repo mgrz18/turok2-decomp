@@ -57,3 +57,27 @@ func_004540B0 0x800C12E0  # jtbl of func_0041B148
 func_0045CC58 0x800C16E8  # jtbl
 func_0044D3DC 0x800C0BE8  # copy of the file from func_004143DC (to 0x415CE8)
 func_00448240 0x800C0950  # copy of the cinema file (func_0040F240 to func_004131B0)
+func_0043CCF8 0x800C038C  # W batch
+func_0043DC44 0x800C03E8  # W batch, jtbl
+func_0043FAA8 0x800C04E8  # W batch
+func_0044519C 0x800C08A8  # W batch
+func_004456F4 0x800C08C4  # W batch
+func_00445CC0 0x800C08D4  # W batch: copy of func_0040CCC0, "Blind"
+func_00445FC4 0x800C08DC  # W batch: copy of func_0040CFC4
+func_004460F0 0x800C08E0  # W batch
+func_004469B8 0x800C08FC  # W batch
+func_00446DB4 0x800C0908  # W batch
+func_0044759C 0x800C0930  # W batch
+func_0044772C 0x800C0934  # W batch
+func_004478BC 0x800C0938  # W batch
+func_00450490 0x800C0E94  # W batch: copy of func_00417490
+func_0045078C 0x800C0EA8  # W batch: copy of func_0041778C
+func_0045386C 0x800C126C  # W batch: copy of func_0041A904
+func_00459E54 0x800C1450  # W batch, jtbl
+func_0045B234 0x800C1488  # W batch, jtbl
+func_0045D980 0x800C1750  # W batch, jtbl
+func_0045DAB0 0x800C1770  # W batch, jtbl
+func_0045DC74 0x800C1790  # W batch, jtbl
+func_0045DEDC 0x800C17B0  # W batch, jtbl
+func_0045DF7C 0x800C17D0  # W batch, jtbl
+func_0045E01C 0x800C17F0  # W batch, jtbl
