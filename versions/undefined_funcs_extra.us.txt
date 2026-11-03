@@ -1182,3 +1182,27 @@ func_0042868C = 0x0042868C;
 ".L0040A7AC" = 0x0040A7AC;
 ".L0040A8A0" = 0x0040A8A0;
 ".L0040A8A4" = 0x0040A8A4;
+/* Player code (func_0042DC18, func_0042DE74 and their second-module copies):
+ * callbacks passed by link address into code no segment places yet, and an
+ * engine .rodata literal (0.1875f) that only C reads, so no asm names it. */
+func_00438728 = 0x00438728;
+func_00438800 = 0x00438800;
+func_00438808 = 0x00438808;
+func_004388E0 = 0x004388E0;
+func_0043908C = 0x0043908C;
+func_0043916C = 0x0043916C;
+D_800A6AAC = 0x800A6AAC;
+/* Second-module callees and callbacks named by link address in X-batch C
+ * (func_00462EC0, func_00463B2C): inside first-module code that is asm,
+ * where the asm has func_0042CAB4 + 0x50, D_0042C9D4, D_0042B304, D_0042B5D0,
+ * .L0042B960 and func_0042CBE4 + 0x40 for them. */
+func_0042B304 = 0x0042B304;
+func_0042B5D0 = 0x0042B5D0;
+func_0042B960 = 0x0042B960;
+func_0042C9D4 = 0x0042C9D4;
+func_0042CB04 = 0x0042CB04;
+func_0042CC24 = 0x0042CC24;
+/* func_004088B0 (X): no asm names it any more. */
+D_8012FB5C = 0x8012FB5C;
+/* A second-module pointer to func_004533AC by its link address (virtual_rodata_1). */
+func_0041A3AC = 0x0041A3AC;

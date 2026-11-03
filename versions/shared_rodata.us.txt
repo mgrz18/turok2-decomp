@@ -27,11 +27,6 @@ func_00455324 0x800C1310  # string (menu)
 func_00455484 0x800C1318  # strings (menu)
 func_004555B0 0x800C1318  # strings (menu)
 func_0045582C 0x800C1318  # string (menu)
-func_0044ECE8 0x800C0C3C  # copy of func_00415CE8
-func_0044FC74 0x800C0DF4  # copy of func_00416C74
-func_0044FF8C 0x800C0E00  # jtbl of func_00416F8C, and 30.0f
-func_0045007C 0x800C0E30  # jtbl of func_0041707C, and 2^31
-func_004501F4 0x800C0E60  # copy of func_004171F4: 255.0f
 func_00450D78 0x800C0EE8  # floats
 func_00452EA8 0x800C1030  # "  %2d", " %3d" (menu)
 func_00453430 0x800C11B0  # jtbl of func_0041A4D0
@@ -55,7 +50,6 @@ func_00465EB0 0x800A6050  # copy of func_0042CF90: its literal, in the engine .r
 func_00466040 0x800A60B8  # copy of func_0042D120: its literal, in the engine .rodata
 func_004540B0 0x800C12E0  # jtbl of func_0041B148
 func_0045CC58 0x800C16E8  # jtbl
-func_0044D3DC 0x800C0BE8  # copy of the file from func_004143DC (to 0x415CE8)
 func_00448240 0x800C0950  # copy of the cinema file (func_0040F240 to func_004131B0)
 func_0043CCF8 0x800C038C  # W batch
 func_0043DC44 0x800C03E8  # W batch, jtbl
@@ -83,4 +77,24 @@ func_0045DF7C 0x800C17D0  # W batch, jtbl
 func_0045E01C 0x800C17F0  # W batch, jtbl
 func_0045646C 0x800C13E0  # copy of func_0041D51C (W): its pool is the original's
 func_004688D0 0x800A97F0  # copy of func_0042F9B0 (W), in the engine .rodata
-func_0044F2FC 0x800C0C60  # copy of func_004162FC (W): jtbl and floats
+func_0044C230 0x800C0AF0  # copy of the file from func_00413230 (to 0x417484)
+func_00452314 0x800C1008  # X batch: jtbl of func_004193B4
+func_00453E58 0x800C1280  # X batch: jtbl of func_0041AEF0
+func_0045E808 0x800C1870  # X batch: jtbl of func_004258E8
+func_00468AC4 0x800A9A18  # X batch: 1.0f of func_0042FBA4, in the engine .rodata
+func_0043F000 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
+func_0045060C 0x800C0EA0  # copy of func_0041760C (X), which now owns the pool
+func_0045D6A0 0x800C1720  # copy of func_00424780 (X), which now owns the pool
+func_0043CF3C 0x800C0398  # X batch
+func_00442000 0x800C05C0  # X batch
+func_00443BB4 0x800C0878  # X batch, twin of func_0040ABB4
+func_0045353C 0x800C11E0  # X batch: the warp menu of func_0041A5DC
+func_004549B0 0x800C1328  # X batch: copy of func_0041BA50
+func_00462EC0 0x800A5EA0  # X batch: 1.0f of func_00429FA0, in the engine .rodata
+func_00442500 0x800C05D4  # copy of func_00409500 (X), which now owns the pool
+func_00442784 0x800C05EC  # copy of func_00409784 (X), which now owns the pool
+func_00442A64 0x800C05F8  # twin of func_00409A64 (X), which now owns the pool
+func_004465C4 0x800C08F4  # copy of func_0040D5C4 (X), which now owns the pool
+func_0043EAC8 0x800C0478  # twin of func_00405AC8 (X), which now owns the pool
+func_0043D57C 0x800C03B8  # twin of func_0040457C (FAKEMATCH, as there)
+func_0043CC14 0x800C0388  # twin of func_00403C14

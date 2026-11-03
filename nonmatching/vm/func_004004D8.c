@@ -1,942 +1,592 @@
-/* NON-MATCHING: 1408 of 1430 words differ: raw m2c draft only (with the two jump tables jtbl_800C0268/jtbl_800C0298 fed to m2c), not worked on; display-list renderer, 0x1658 bytes. */
+/* NON-MATCHING: 44 of 1430 words differ, register allocation only: the ROM keeps nVtx in $t1
+ * and the D_80129200 write pointer in $t2 (here $t3/$t1), the strip loop's start/index
+ * pointer in $t1/$t0 (here swapped), initialises the e*4 giv from e ($t5) rather than 0,
+ * and computes (f32)(H/2) - 16.0f with $f0/$f1 the other way round. Code shape, DL
+ * prologue, region walk, vertex colours, strips, arrow and compass all match. */
 #include "common.h"
-#include "m2c_macros.h"
+#include "gfx.h"
+#include "structs/gbi.h"
 
-void *func_002017D4();   /* extern */
-M2C_UNK func_0020C208(M2C_UNK *, M2C_UNK *);        /* extern */
-M2C_UNK func_0020D274(M2C_UNK *, void *);           /* extern */
-M2C_UNK func_0020F85C(M2C_UNK *, f32 *, f32 *);     /* extern */
-M2C_UNK func_0020FC24(M2C_UNK *, f32, f32, M2C_UNK); /* extern */
-M2C_UNK func_0020FC74(M2C_UNK *, f32, f32, M2C_UNK); /* extern */
-M2C_UNK func_00210318(M2C_UNK *, f32, f32, M2C_UNK); /* extern */
-M2C_UNK func_00210478(M2C_UNK *, f32, f32, M2C_UNK); /* extern */
-M2C_UNK func_00210B38(M2C_UNK *, f32);              /* extern */
-f32 func_002974C0(f32);                             /* extern */
-M2C_UNK func_00297D50(M2C_UNK *, M2C_UNK, f32, M2C_UNK, f32, f32, f32, f32); /* extern */
-f32 func_002982F0(f32); /* extern */
-extern M2C_UNK D_800AB100;
-extern M2C_UNK D_800AB130;
-extern s32 D_800B6D1C;
+/* The automap: the level's navigation regions are drawn as lines in a 2D
+ * orthographic view around the player, with an arrow for the player and a
+ * compass in the corner. */
+
+#define GFX(a, b)                       \
+    {                                   \
+        Gfx *_g = D_800D8E24++;         \
+        _g->w0 = (a);                   \
+        _g->w1 = (b);                   \
+    }
+
+/* gSPVertex(pkt, v, n, 0) and gSPLine3D(pkt, v0, v1, 0) (F3DEX2). */
+#define VTX_W0(n) (0x01000000 | (((n) & 0xFF) << 12) | (((n) & 0x7F) << 1))
+#define LINE_W0(a, b) (0x08000000 | (((((a) * 2) & 0xFF) << 16) | ((((b) * 2) & 0xFF) << 8)))
+
+typedef struct {
+    f32 x, y, z;
+} Vec3f;
+
+typedef struct MapVtx {
+    /* 0x0 */ s16 ob[3];
+    /* 0x6 */ u16 flag;
+    /* 0x8 */ s16 tc[2];
+    /* 0xC */ u8 cn[4];
+} MapVtx; /* 0x10 bytes */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[8];
+    /* 0x08 */ f32 fade;
+    /* 0x0C */ s32 visible;
+    /* 0x10 */ f32 angle;
+    /* 0x14 */ Vec3f pos;
+    /* 0x20 */ Vec3f offset;
+} MapView;
+
+/* A navigation region (see func_00400000). */
+typedef struct Region {
+    /* 0x00 */ u16 index;
+    /* 0x02 */ u16 flags; /* 0x400: registered */
+    /* 0x04 */ Vec3f *corner[3];
+    /* 0x10 */ struct Region *neighbour[3];
+    /* 0x1C */ u8 pad1C[4];
+} Region; /* 0x20 bytes */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x44];
+    /* 0x44 */ s32 flags;
+    /* 0x48 */ u8 pad48[0x5C - 0x48];
+    /* 0x5C */ u8 colour;
+    /* 0x5D */ u8 pad5D[0x64 - 0x5D];
+} RegionInfo; /* 0x64 bytes */
+
+typedef struct {
+    /* 0x00 */ f32 minX;
+    /* 0x04 */ f32 minZ;
+    /* 0x08 */ f32 maxX;
+    /* 0x0C */ f32 maxZ;
+    /* 0x10 */ u32 count;
+} Area; /* 0x14 bytes */
+
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 count;
+    /* 0x08 */ Area areas[1];
+} AreaList;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x58];
+    /* 0x58 */ s32 *data;
+} World;
+
+typedef struct {
+    /* 0x000 */ u8 pad0[0x110];
+    /* 0x110 */ void *colorImage;
+} FrameBuffers;
+
+extern s32 D_800B6D1C;      /* buffer index */
 extern s32 D_800B6D54;
-extern M2C_UNK D_800C0230;
-extern M2C_UNK D_800C0238;
-extern M2C_UNK D_800C0240;
-extern M2C_UNK D_800C0248;
-extern f32 D_800C0250;
-extern f32 D_800C0254;
-extern M2C_UNK D_800C0258;
-extern f32 D_800C0260;
-extern f32 D_800C0294;
-extern M2C_UNK D_800C02C0;
-extern M2C_UNK D_800C02C8;
-extern M2C_UNK D_800C02D0;
-extern f32 D_800C02D8;
-extern f32 D_800C02DC;
-extern M2C_UNK D_800C02E0;
-extern M2C_UNK D_800C02E8;
-extern f32 D_800C02F0;
-extern f32 D_800C02F4;
-extern f32 D_800C02F8;
-extern f32 D_800C02FC;
-extern f32 D_800C0300;
-extern f32 D_800C0304;
-extern f32 D_800C0308;
-extern f32 D_800C030C;
-extern f32 D_800C0310;
-extern s32 D_800C2030;
-extern s32 D_800C2034;
-extern s32 *D_800D8E24;
-extern void *D_800F7070;
-extern M2C_UNK D_800F7078;
+extern s32 D_800C2030;      /* screen width */
+extern s32 D_800C2034;      /* screen height */
+extern FrameBuffers *D_800F7070[];
+extern World D_800F7078;
 extern s32 D_8011AAD8;
 extern s32 D_8011AC8C;
-extern M2C_UNK D_8011B0A8;
-extern M2C_UNK D_80129100;
-extern M2C_UNK D_80129180;
-extern M2C_UNK D_801291FE;
-extern M2C_UNK D_80129200;
-extern u16 D_80129202;
-extern M2C_UNK D_80129A00;
-extern M2C_UNK D_80129A40;
-extern M2C_UNK D_8012DA40;
-extern M2C_UNK D_8012F340;
+extern Vp D_8011B0A8[];
+extern Mtx D_80129100[2];
+extern Mtx D_80129180[2];
+extern u16 D_80129200[];    /* line vertex indices */
+extern Mtx D_80129A00;
+extern MapVtx D_80129A40[2][0x200];
+extern MapVtx D_8012DA40[2][8];
+extern MapVtx D_8012F340[2][3];
+extern u8 D_800AB100[];
+extern u8 D_800AB130[];
 
-void func_004004D8(void *arg0) {
-    s32 sp20;
-    s32 sp28;
-    s32 sp24;
-    s32 sp134;
-    M2C_UNK sp30;
-    M2C_UNK sp70;
-    M2C_UNK spB0;
-    f32 spF0;
-    f32 spF4;
-    f32 spF8;
-    f32 spFC;
-    f32 sp100;
-    f32 sp104;
-    f32 sp108;
-    f32 sp10C;
-    f32 sp110;
-    f32 sp114;
-    f32 sp118;
-    f32 sp11C;
-    f32 sp120;
-    f32 sp124;
-    f32 sp128;
-    f32 sp12C;
-    f32 sp130;
-    M2C_UNK sp13C;
-    s32 sp160;
-    s32 sp164;
-    void *sp168;
-    s32 sp170;
-    M2C_UNK *var_v1;
-    f32 *var_s2;
-    f32 *var_s3;
-    f32 *var_v0_2;
-    f32 *var_v1_3;
-    f32 temp_f0;
-    f32 temp_f0_2;
-    f32 temp_f0_3;
-    f32 temp_f0_4;
-    f32 temp_f0_5;
-    f32 temp_f0_6;
-    f32 temp_f1;
-    f32 temp_f1_2;
-    f32 temp_f1_3;
-    f32 temp_f1_4;
-    f32 temp_f20;
-    f32 temp_f20_2;
-    f32 temp_f20_3;
-    f32 temp_f20_4;
-    f32 temp_f21;
-    f32 temp_f21_2;
-    f32 temp_f21_3;
-    f32 temp_f22;
-    f32 temp_f22_2;
-    f32 temp_f22_3;
-    f32 temp_f23;
-    f32 temp_f25;
-    f32 temp_f2;
-    f32 temp_f2_2;
-    f32 temp_f2_3;
-    f32 temp_f3;
-    f32 temp_f3_2;
-    f32 temp_f4;
-    f32 temp_f4_2;
-    f32 temp_f5;
-    f32 var_f0;
-    f32 var_f0_10;
-    f32 var_f0_2;
-    f32 var_f0_3;
-    f32 var_f0_4;
-    f32 var_f0_5;
-    f32 var_f0_6;
-    f32 var_f0_7;
-    f32 var_f0_8;
-    f32 var_f0_9;
-    f32 var_f1;
-    s16 *var_t2;
-    s16 *var_t2_2;
-    s16 temp_v1_7;
-    s16 var_a2_4;
-    s16 var_t1;
-    s16 var_t2_3;
-    s32 *temp_a0;
-    s32 *temp_a0_2;
-    s32 *temp_a0_5;
-    s32 *temp_a1;
-    s32 *temp_a1_3;
-    s32 *temp_a1_4;
-    s32 *temp_a1_5;
-    s32 *temp_a1_6;
-    s32 *temp_a2;
-    s32 *temp_a2_2;
-    s32 *temp_a3;
-    s32 *temp_a3_2;
-    s32 *temp_t0;
-    s32 *temp_t0_2;
-    s32 *temp_t0_5;
-    s32 *temp_t1;
-    s32 *temp_t1_2;
-    s32 *temp_t1_3;
-    s32 *temp_t2;
-    s32 *temp_t2_2;
-    s32 *temp_t3;
-    s32 *temp_t4;
-    s32 *temp_v0;
-    s32 *temp_v0_5;
-    s32 *temp_v1;
-    s32 *temp_v1_11;
-    s32 *temp_v1_12;
-    s32 *temp_v1_13;
-    s32 *temp_v1_2;
-    s32 *temp_v1_3;
-    s32 *temp_v1_6;
-    s32 *var_v1_2;
-    s32 temp_a1_2;
-    s32 temp_f8;
-    s32 temp_f8_2;
-    s32 temp_t9;
-    s32 temp_v0_4;
-    s32 var_a0_2;
-    s32 var_a0_3;
-    s32 var_a0_4;
-    s32 var_a1;
-    s32 var_a2;
-    s32 var_a2_2;
-    s32 var_a2_3;
-    s32 var_a3;
-    s32 var_a3_2;
-    s32 var_condition_bit;
-    s32 var_condition_bit_2;
-    s32 var_condition_bit_3;
-    s32 var_condition_bit_4;
-    s32 var_s1;
-    s32 var_s1_2;
-    s32 var_s1_4;
-    s32 var_s3_2;
-    s32 var_s5;
-    s32 var_s7;
-    s32 var_t1_2;
-    s32 var_t3;
-    s32 var_t4_2;
-    s32 var_t5;
-    s32 var_t6;
-    s32 var_t6_2;
-    s32 var_v0;
-    s32 var_v0_3;
-    s32 var_v1_10;
-    s32 var_v1_11;
-    s32 var_v1_12;
-    s32 var_v1_6;
-    s32 var_v1_7;
-    s32 var_v1_8;
-    s32 var_v1_9;
-    s8 temp_v1_10;
-    s8 temp_v1_5;
-    s8 temp_v1_8;
-    s8 temp_v1_9;
-    s8 var_v0_4;
-    s8 var_v0_5;
-    s8 var_v1_4;
-    s8 var_v1_5;
-    u16 *temp_v0_3;
-    u16 *var_t0;
-    u16 temp_v1_4;
-    u32 var_s1_3;
-    u8 temp_a0_3;
-    u8 temp_a0_4;
-    void *temp_s2;
-    void *temp_s2_2;
-    void *temp_s2_3;
-    void *temp_s4;
-    void *temp_t0_3;
-    void *temp_t0_4;
-    void *temp_t3_2;
-    void *temp_v0_2;
-    void *var_a0;
-    void *var_a1_2;
-    void *var_s0;
-    void *var_t4;
-    void *var_t7;
+extern char *func_002017D4(s32 *data, s32 index);
+extern void func_0020C208(f32 *out, f32 *m);
+extern void func_0020D274(f32 *m, Mtx *out);
+extern void func_0020F85C(f32 *m, Vec3f *in, Vec3f *out);
+extern void func_0020FC24(f32 *m, f32 x, f32 y, f32 z);
+extern void func_0020FC74(f32 *m, f32 x, f32 y, f32 z);
+extern void func_00210318(f32 *m, f32 x, f32 y, f32 z);
+extern void func_00210478(f32 *m, f32 x, f32 y, f32 z);
+extern void func_00210B38(f32 *m, f32 angle);
+extern f32 func_002974C0(f32 x); /* cos */
+extern void func_00297D50(Mtx *m, f32 l, f32 r, f32 b, f32 t, f32 n, f32 f, f32 scale);
+extern f32 func_002982F0(f32 x); /* sin */
 
-    sp168 = (D_800B6D1C * 0x10) + &D_8011B0A8;
-    if (D_8011AC8C != 1) {
-        func_00297D50(&D_80129A00, 0, (f32) (D_800C2030 - 1), 0, (f32) (D_800C2034 - 1), M2C_FIELD(&D_800C0230, f32 *, 0), M2C_FIELD(&D_800C0230, f32 *, 4), M2C_FIELD(&D_800C0238, f32 *, 0));
-        if ((M2C_FIELD(arg0, s32 *, 0xC) != 0) && (D_800B6D54 != 0)) {
-            sp170 = 0xDB04001C;
-            temp_v1 = D_800D8E24;
-            temp_a0 = D_800D8E24 + 8;
-            temp_a1 = temp_a0 + 8;
-            D_800D8E24 = temp_a0;
-            M2C_FIELD(temp_v1, s32 *, 0) = 0xDB060000;
-            M2C_FIELD(temp_v1, s32 *, 4) = 0;
-            temp_t0 = temp_a0 + 0x10;
-            D_800D8E24 = temp_a1;
-            M2C_FIELD(temp_a0, M2C_UNK **, 4) = &D_800AB100;
-            temp_t4 = temp_a0 + 0x18;
-            M2C_FIELD(D_800D8E24, s32 *, 8) = 0xDE000000;
-            D_800D8E24 = temp_t0;
-            M2C_FIELD(temp_a0, s32 *, 8) = 0xDE000000;
-            M2C_FIELD(temp_a1, M2C_UNK **, 4) = &D_800AB130;
-            temp_t2 = temp_a0 + 0x20;
-            temp_t3 = temp_a0 + 0x28;
-            temp_t1 = temp_a0 + 0x30;
-            D_800D8E24 = temp_t4;
-            M2C_FIELD(temp_a0, s32 *, 0x10) = 0xED000000;
-            D_800D8E24 = temp_t2;
-            temp_a3 = temp_a0 + 0x38;
-            D_800D8E24 = temp_t3;
-            temp_a1_2 = D_800C2030 - 1;
-            D_800D8E24 = temp_t1;
-            D_800D8E24 = temp_a3;
-            M2C_FIELD(temp_t0, s32 *, 4) = (s32) ((((s32) ((f32) temp_a1_2 * M2C_FIELD(&D_800C0238, f32 *, 4)) & 0xFFF) << 0xC) | ((s32) ((f32) (D_800C2034 - 1) * M2C_FIELD(&D_800C0238, f32 *, 4)) & 0xFFF));
-            temp_v1_2 = temp_a0 + 0x40;
-            M2C_FIELD(temp_a0, s32 *, 0x18) = (s32) ((temp_a1_2 & 0xFFF) | 0xFF100000);
-            temp_a1_3 = temp_a0 + 0x48;
-            D_800D8E24 = temp_v1_2;
-            temp_t0_2 = temp_a0 + 0x60;
-            D_800D8E24 = temp_a1_3;
-            M2C_FIELD(temp_t4, s32 *, 4) = (s32) M2C_FIELD(D_800F7070, s32 *, 0x110);
-            M2C_FIELD(temp_a0, s32 *, 0x20) = 0xDC080008;
-            M2C_FIELD(temp_t2, void **, 4) = sp168;
-            M2C_FIELD(temp_a0, s32 *, 0x28) = 0xE7000000;
-            temp_t2_2 = temp_a0 + 0x50;
-            M2C_FIELD(temp_t3, s32 *, 4) = 0;
-            M2C_FIELD(temp_a0, s32 *, 0x30) = 0xE3000A01;
-            M2C_FIELD(temp_t1, s32 *, 4) = 0;
-            M2C_FIELD(temp_a0, s32 *, 0x38) = 0xE200001C;
-            M2C_FIELD(temp_a3, s32 *, 4) = 0x507048;
-            M2C_FIELD(temp_a0, s32 *, 0x40) = 0xFCFFFFFF;
-            M2C_FIELD(temp_v1_2, s32 *, 4) = 0xFFFE793C;
-            M2C_FIELD(temp_a0, s32 *, 0x48) = 0xD9000000;
-            temp_t1_2 = temp_a0 + 0x58;
-            M2C_FIELD(temp_a1_3, s32 *, 4) = 0;
-            M2C_FIELD(temp_a0, s32 *, 0x50) = 0xD9FFFFFF;
-            M2C_FIELD(temp_t2_2, s32 *, 4) = 0x200004;
-            M2C_FIELD(temp_a0, s32 *, 0x58) = 0xD7000000;
-            temp_a3_2 = temp_a0 + 0x68;
-            temp_a1_4 = temp_a0 + 0x70;
-            M2C_FIELD(temp_t1_2, s32 *, 4) = 0;
-            M2C_FIELD(temp_a0, s32 *, 0x60) = 0xDB040004;
-            M2C_FIELD(temp_t0_2, s32 *, 4) = 6;
-            M2C_FIELD(temp_a0, s32 *, 0x68) = 0xDB04000C;
-            M2C_FIELD(temp_a3_2, s32 *, 4) = 6;
-            M2C_FIELD(temp_a0, s32 *, 0x70) = 0xDB040014;
-            M2C_FIELD(temp_a1_4, s32 *, 4) = 0xFFFA;
-            temp_v1_3 = temp_a0 + 0x78;
-            M2C_FIELD(temp_a0, s32 *, 0x78) = 0xDB04001C;
-            M2C_FIELD(temp_v1_3, s32 *, 4) = 0xFFFA;
-            temp_v0 = temp_a0 + 0x80;
-            M2C_FIELD(temp_a0, s32 *, 0x80) = 0xDA380007;
-            M2C_FIELD(temp_v0, M2C_UNK **, 4) = &D_80129A00;
-            temp_f21 = M2C_FIELD(arg0, f32 *, 0x14);
-            temp_f20 = M2C_FIELD(arg0, f32 *, 0x1C);
-            temp_a0_2 = temp_a0 + 0x88;
-            D_800D8E24 = temp_t2_2;
-            D_800D8E24 = temp_t1_2;
-            D_800D8E24 = temp_t0_2;
-            D_800D8E24 = temp_a3_2;
-            D_800D8E24 = temp_a1_4;
-            D_800D8E24 = temp_v1_3;
-            D_800D8E24 = temp_v0;
-            D_800D8E24 = temp_a0_2;
-            temp_f25 = func_002982F0(M2C_FIELD(arg0, f32 *, 0x10));
-            temp_f0 = func_002974C0(M2C_FIELD(arg0, f32 *, 0x10));
-            temp_f2 = M2C_FIELD(arg0, f32 *, 0x28);
-            temp_f1 = M2C_FIELD(arg0, f32 *, 0x20);
-            temp_f21_2 = temp_f21 + ((temp_f2 * temp_f25) - (temp_f1 * temp_f0));
-            temp_f22 = M2C_FIELD(&D_800C0240, f32 *, 0);
-            temp_f20_2 = temp_f20 + ((temp_f2 * temp_f0) + (temp_f1 * temp_f25));
-            var_f1 = M2C_FIELD(&D_800C0240, f32 *, 4);
-            temp_f23 = temp_f22;
-            if ((var_f1 < temp_f21_2) || (var_f0 = M2C_FIELD(&D_800C0248, f32 *, 0), !(temp_f21_2 < var_f0))) {
-                var_f0 = temp_f21_2;
-                if (var_f1 < var_f0) {
-                    var_f0 = var_f1;
-                }
-                var_f1 = M2C_FIELD(&D_800C0248, f32 *, 4);
-            }
-            if ((var_f1 < temp_f20_2) || (var_f0_2 = D_800C0250, !(temp_f20_2 < var_f0_2))) {
-                var_f0_2 = temp_f20_2;
-                if (var_f1 < var_f0_2) {
-                    var_f0_2 = var_f1;
-                }
-            }
-            func_0020FC24(&sp30, -var_f0, -var_f0_2, 0);
-            func_00210478(&sp30, temp_f23, temp_f22, 0x3F800000);
-            var_s1 = 0;
-            var_s3 = &sp130;
-            var_s2 = &sp100;
-            func_00210B38(&sp30, M2C_FIELD(arg0, f32 *, 0x10) + D_800C0254);
-            func_00210318(&sp30, (f32) ((s32) D_800C2030 / 2), (f32) ((s32) D_800C2034 / 2) - M2C_FIELD(&D_800C0258, f32 *, 0), 0);
-            func_0020C208(&sp70, &sp30);
-            temp_f0_2 = (f32) D_800C2030;
-            sp10C = temp_f0_2;
-            sp118 = temp_f0_2;
-            temp_f0_3 = (f32) D_800C2034;
-            sp100 = 0.0f;
-            sp104 = 0.0f;
-            sp108 = 0.0f;
-            sp110 = 0.0f;
-            sp114 = 0.0f;
-            sp11C = temp_f0_3;
-            sp120 = 0.0f;
-            sp124 = 0.0f;
-            sp128 = temp_f0_3;
-            sp12C = 0.0f;
-            do {
-                func_0020F85C(&sp70, var_s2, var_s3);
-                var_s3 += 0xC;
-                var_s1 += 1;
-                var_s2 += 0xC;
-            } while (var_s1 < 4);
-            var_s1_2 = 1;
-            var_v1 = &sp13C;
-            spF8 = sp130;
-            spF0 = sp130;
-            spFC = sp134;
-            spF4 = sp134;
-            do {
-                var_f0_3 = M2C_FIELD(var_v1, f32 *, 0);
-                if (!(var_f0_3 <= spF0)) {
-                    var_f0_3 = spF0;
-                }
-                spF0 = var_f0_3;
-                var_f0_4 = M2C_FIELD(var_v1, f32 *, 4);
-                if (!(var_f0_4 <= spF4)) {
-                    var_f0_4 = spF4;
-                }
-                spF4 = var_f0_4;
-                var_f0_5 = M2C_FIELD(var_v1, f32 *, 0);
-                if (!(spF8 <= var_f0_5)) {
-                    var_f0_5 = spF8;
-                }
-                spF8 = var_f0_5;
-                var_f0_6 = M2C_FIELD(var_v1, f32 *, 4);
-                if (!(spFC <= var_f0_6)) {
-                    var_f0_6 = spFC;
-                }
-                spFC = var_f0_6;
-                var_s1_2 += 1;
-                var_v1 += 0xC;
-            } while (var_s1_2 < 4);
-            func_0020D274(&sp30, (D_800B6D1C << 6) + &D_80129100);
-            temp_a2 = D_800D8E24 + 8;
-            M2C_FIELD(D_800D8E24, s32 *, 0) = 0xDA380003;
-            M2C_FIELD(D_800D8E24, void **, 4) = (void *) ((D_800B6D1C << 6) + &D_80129100);
-            temp_s2 = (D_800B6D1C << 0xD) + &D_80129A40;
-            D_800D8E24 = temp_a2;
-            sp160 = func_002017D4(M2C_FIELD(&D_800F7078, s32 *, 0x58), 2, temp_a2, &D_800D8E24) + 8;
-            temp_v0_2 = func_002017D4(M2C_FIELD(&D_800F7078, s32 *, 0x58), 3);
-            var_s0 = temp_v0_2 + 8;
-            sp164 = M2C_FIELD(temp_v0_2, s32 *, 4);
-            var_t6 = 0;
-            var_s5 = 0;
-            var_s7 = 0;
-            var_t1 = 0;
-            temp_t9 = func_002017D4(M2C_FIELD(&D_800F7078, s32 *, 0x58), 0) + 8;
-            sp170 = (u32) (D_8011AAD8 & 0x2000) > 0U;
-            if (sp164 > 0) {
-loop_27:
-                if ((spF0 < M2C_FIELD(var_s0, f32 *, 8)) && (M2C_FIELD(var_s0, f32 *, 0) < spF8) && (spF4 < M2C_FIELD(var_s0, f32 *, 0xC)) && (M2C_FIELD(var_s0, f32 *, 4) < spFC)) {
-                    var_s1_3 = 0;
-                    if (M2C_FIELD(var_s0, u32 *, 0x10) != 0) {
-                        var_t4 = (var_s5 << 5) + sp160;
-loop_33:
-                        temp_s4 = temp_t9 + (M2C_FIELD(var_t4, u16 *, 0) * 0x64);
-                        if (!(M2C_FIELD(temp_s4, s32 *, 0x44) & 0x200)) {
-                            var_a1 = 0;
-                            var_v1_2 = &sp20;
-                            var_a0 = var_t4;
-                            do {
-                                temp_t0_3 = M2C_FIELD(var_a0, void **, 4);
-                                temp_f1_2 = M2C_FIELD(temp_t0_3, f32 *, 0);
-                                if (temp_f1_2 < spF0) {
-                                    *var_v1_2 = 1;
-                                } else if (spF8 <= temp_f1_2) {
-                                    *var_v1_2 = 4;
-                                } else {
-                                    *var_v1_2 = 0;
-                                }
-                                temp_f1_3 = M2C_FIELD(temp_t0_3, f32 *, 8);
-                                if (temp_f1_3 < spF4) {
-                                    var_v0 = *var_v1_2 | 8;
-                                    goto block_44;
-                                }
-                                if (spFC <= temp_f1_3) {
-                                    var_v0 = *var_v1_2 | 2;
-block_44:
-                                    *var_v1_2 = var_v0;
-                                }
-                                var_v1_2 += 4;
-                                var_a1 += 1;
-                                var_a0 += 4;
-                            } while (var_a1 < 3);
-                            if (!(sp20 & sp24 & sp28) && ((var_t5 = 0, (sp170 != 0)) || (M2C_FIELD(var_t4, u16 *, 2) & 0x400))) {
-                                var_t7 = var_t4;
-                                var_s3_2 = 0;
-                                var_a1_2 = (var_t1 * 0x10) + temp_s2;
-                                var_t2 = (var_t6 * 2) + &D_80129200;
-loop_50:
-                                temp_v0_3 = M2C_FIELD(var_t7, u16 **, 0x10);
-                                var_a0_2 = 0;
-                                if (temp_v0_3 == NULL) {
-                                    var_a0_2 = 1;
-                                } else if ((u16) M2C_FIELD(var_t4, u16 *, 0) < (u16) *temp_v0_3) {
-                                    var_a0_2 = 1;
-                                }
-                                if (var_a0_2 != 0) {
-                                    var_a0_3 = 0;
-                                    if (var_t5 != 2) {
-                                        var_a0_3 = var_t5 + 1;
-                                    }
-                                    if (!(*(&sp20 + var_s3_2) & (&sp20)[var_a0_3])) {
-                                        var_a2 = 0;
-                                        var_v1_3 = &sp130;
-                                        var_a3 = 0xC;
-                                        temp_t0_4 = M2C_FIELD(var_t7, void **, 4);
-                                        temp_t3_2 = M2C_FIELD((var_t4 + (var_a0_3 * 4)), void **, 4);
-loop_59:
-                                        var_v0_2 = &sp130;
-                                        if (var_a2 != 3) {
-                                            var_v0_2 += var_a3;
-                                        }
-                                        temp_f3 = M2C_FIELD(var_v1_3, f32 *, 4);
-                                        temp_f2_2 = M2C_FIELD(var_v1_3, f32 *, 0);
-                                        temp_f5 = M2C_FIELD(var_v0_2, f32 *, 4) - temp_f3;
-                                        temp_f4 = temp_f2_2 - M2C_FIELD(var_v0_2, f32 *, 0);
-                                        var_v1_3 += 0xC;
-                                        if (!(((temp_f5 * (M2C_FIELD(temp_t0_4, f32 *, 0) - temp_f2_2)) + (temp_f4 * (M2C_FIELD(temp_t0_4, f32 *, 8) - temp_f3))) > 0.0f) || (var_v0_3 = 0, !(((temp_f5 * (M2C_FIELD(temp_t3_2, f32 *, 0) - temp_f2_2)) + (temp_f4 * (M2C_FIELD(temp_t3_2, f32 *, 8) - temp_f3))) > 0.0f))) {
-                                            var_a2 += 1;
-                                            var_a3 += 0xC;
-                                            if (var_a2 >= 4) {
-                                                var_v0_3 = 1;
-                                            } else {
-                                                goto loop_59;
-                                            }
-                                        }
-                                        if (var_v0_3 != 0) {
-                                            var_a0_4 = 1;
-                                            if ((var_t1 != 0) && (M2C_FIELD(var_a1_2, s16 *, -0x10) == (s16) (s32) M2C_FIELD(temp_t0_4, f32 *, 0))) {
-                                                var_a0_4 = M2C_FIELD((var_a1_2 - 0x10), s16 *, 2) != (s16) (s32) M2C_FIELD(temp_t0_4, f32 *, 8);
-                                            }
-                                            if (var_a0_4 != 0) {
-                                                *var_t2 = var_t1;
-                                                M2C_FIELD(var_a1_2, s16 *, 0) = (s16) (s32) M2C_FIELD(temp_t0_4, f32 *, 0);
-                                                M2C_FIELD(var_a1_2, s16 *, 2) = (s16) (s32) M2C_FIELD(temp_t0_4, f32 *, 8);
-                                                var_t2_2 = var_t2 + 2;
-                                                var_t6_2 = var_t6 + 1;
-                                                temp_f8 = (s32) ((M2C_FIELD(temp_t0_4, f32 *, 4) - M2C_FIELD(arg0, f32 *, 0x18)) * D_800C0260);
-                                                var_v1_4 = temp_f8 + 0xC8;
-                                                var_a2_2 = 0xFF;
-                                                if (var_v1_4 < 0x96) {
-                                                    var_v1_4 = 0x96;
-                                                } else if (var_v1_4 >= 0x100) {
-                                                    var_v1_4 = -1;
-                                                }
-                                                if (temp_f8 >= 0x33) {
-                                                    var_a2_2 = 0x131 - temp_f8;
-                                                    goto block_78;
-                                                }
-                                                if (temp_f8 < -0x32) {
-                                                    var_a2_2 = temp_f8 + 0xCD;
-block_78:
-                                                    if (var_a2_2 < 0x4B) {
-                                                        var_a2_2 = 0x4B;
-                                                    }
-                                                }
-                                                temp_a0_3 = M2C_FIELD(temp_s4, u8 *, 0x5C);
-                                                switch (temp_a0_3) { /* switch 1 */
-                                                case 0: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_4;
-block_93:
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xD) = var_v1_4;
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xE) = var_v1_4;
-                                                    break;
-                                                case 1: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = 0;
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xD) = var_v1_4;
-block_98:
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xE) = 0;
-                                                    break;
-                                                case 2: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = 0;
-block_88:
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xD) = 0;
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xE) = var_v1_4;
-                                                    break;
-                                                case 3: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_4;
-block_97:
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xD) = 0;
-                                                    goto block_98;
-                                                case 4: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_4;
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xD) = 0;
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xE) = (s8) (var_v1_4 / 2);
-                                                    break;
-                                                case 5: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_4;
-                                                    goto block_88;
-                                                case 6: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = (s8) (var_v1_4 / 2);
-                                                    var_v0_4 = var_v1_4;
-                                                    if (var_v1_4 < 0) {
-                                                        var_v0_4 = var_v1_4 + 3;
-                                                    }
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xD) = (s8) (var_v0_4 >> 2);
-                                                    goto block_98;
-                                                case 7: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = 0;
-                                                    goto block_93;
-                                                case 8: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_4;
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xD) = var_v1_4;
-                                                    goto block_98;
-                                                case 9: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_4;
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xD) = (s8) (var_v1_4 / 2);
-                                                    goto block_98;
-                                                case 10: /* switch 1 */
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xC) = 0;
-                                                    goto block_97;
-                                                }
-                                                temp_f0_4 = (f32) var_a2_2 * M2C_FIELD(arg0, f32 *, 8);
-                                                if (!(M2C_FIELD(&D_800C0258, f32 *, 4) <= temp_f0_4)) {
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xF) = (s8) (s32) temp_f0_4;
-                                                } else {
-                                                    M2C_FIELD(var_a1_2, s8 *, 0xF) = (s8) ((s32) (temp_f0_4 - M2C_FIELD(&D_800C0258, f32 *, 4)) | 0x80000000);
-                                                }
-                                                var_a1_2 += 0x10;
-                                                var_t1 += 1;
-                                            } else {
-                                                *var_t2 = var_t1 - 1;
-                                                var_t2_2 = var_t2 + 2;
-                                                var_t6_2 = var_t6 + 1;
-                                            }
-                                            *var_t2_2 = var_t1;
-                                            M2C_FIELD(var_a1_2, s16 *, 0) = (s16) (s32) M2C_FIELD(temp_t3_2, f32 *, 0);
-                                            M2C_FIELD(var_a1_2, s16 *, 2) = (s16) (s32) M2C_FIELD(temp_t3_2, f32 *, 8);
-                                            var_t2 = var_t2_2 + 2;
-                                            var_t6 = var_t6_2 + 1;
-                                            temp_f8_2 = (s32) ((M2C_FIELD(temp_t0_4, f32 *, 4) - M2C_FIELD(arg0, f32 *, 0x18)) * D_800C0294);
-                                            var_v1_5 = temp_f8_2 + 0xC8;
-                                            var_a2_3 = 0xFF;
-                                            if (var_v1_5 < 0x96) {
-                                                var_v1_5 = 0x96;
-                                            } else if (var_v1_5 >= 0x100) {
-                                                var_v1_5 = -1;
-                                            }
-                                            if (temp_f8_2 >= 0x33) {
-                                                var_a2_3 = 0x131 - temp_f8_2;
-                                                goto block_112;
-                                            }
-                                            if (temp_f8_2 < -0x32) {
-                                                var_a2_3 = temp_f8_2 + 0xCD;
-block_112:
-                                                if (var_a2_3 < 0x4B) {
-                                                    var_a2_3 = 0x4B;
-                                                }
-                                            }
-                                            temp_a0_4 = M2C_FIELD(temp_s4, u8 *, 0x5C);
-                                            switch (temp_a0_4) { /* switch 2 */
-                                            case 0: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_5;
-block_127:
-                                                M2C_FIELD(var_a1_2, s8 *, 0xD) = var_v1_5;
-                                                M2C_FIELD(var_a1_2, s8 *, 0xE) = var_v1_5;
-                                                break;
-                                            case 1: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = 0;
-                                                M2C_FIELD(var_a1_2, s8 *, 0xD) = var_v1_5;
-block_132:
-                                                M2C_FIELD(var_a1_2, s8 *, 0xE) = 0;
-                                                break;
-                                            case 2: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = 0;
-block_122:
-                                                M2C_FIELD(var_a1_2, s8 *, 0xD) = 0;
-                                                M2C_FIELD(var_a1_2, s8 *, 0xE) = var_v1_5;
-                                                break;
-                                            case 3: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_5;
-block_131:
-                                                M2C_FIELD(var_a1_2, s8 *, 0xD) = 0;
-                                                goto block_132;
-                                            case 4: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_5;
-                                                M2C_FIELD(var_a1_2, s8 *, 0xD) = 0;
-                                                M2C_FIELD(var_a1_2, s8 *, 0xE) = (s8) (var_v1_5 / 2);
-                                                break;
-                                            case 5: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_5;
-                                                goto block_122;
-                                            case 6: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = (s8) (var_v1_5 / 2);
-                                                var_v0_5 = var_v1_5;
-                                                if (var_v1_5 < 0) {
-                                                    var_v0_5 = var_v1_5 + 3;
-                                                }
-                                                M2C_FIELD(var_a1_2, s8 *, 0xD) = (s8) (var_v0_5 >> 2);
-                                                goto block_132;
-                                            case 7: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = 0;
-                                                goto block_127;
-                                            case 8: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_5;
-                                                M2C_FIELD(var_a1_2, s8 *, 0xD) = var_v1_5;
-                                                goto block_132;
-                                            case 9: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = var_v1_5;
-                                                M2C_FIELD(var_a1_2, s8 *, 0xD) = (s8) (var_v1_5 / 2);
-                                                goto block_132;
-                                            case 10: /* switch 2 */
-                                                M2C_FIELD(var_a1_2, s8 *, 0xC) = 0;
-                                                goto block_131;
-                                            }
-                                            temp_f0_5 = (f32) var_a2_3 * M2C_FIELD(arg0, f32 *, 8);
-                                            if (!(M2C_FIELD(&D_800C0258, f32 *, 4) <= temp_f0_5)) {
-                                                M2C_FIELD(var_a1_2, s8 *, 0xF) = (s8) (s32) temp_f0_5;
-                                            } else {
-                                                M2C_FIELD(var_a1_2, s8 *, 0xF) = (s8) ((s32) (temp_f0_5 - M2C_FIELD(&D_800C0258, f32 *, 4)) | 0x80000000);
-                                            }
-                                            var_t1 += 1;
-                                            var_a1_2 += 0x10;
-                                            if (var_t1 < 0x1FF) {
-                                                goto block_137;
-                                            }
-                                        } else {
-                                            goto block_137;
-                                        }
-                                    } else {
-                                        goto block_137;
-                                    }
-                                } else {
-block_137:
-                                    var_t7 += 4;
-                                    var_t5 += 1;
-                                    var_s3_2 += 4;
-                                    if (var_t5 >= 3) {
-                                        goto block_138;
-                                    }
-                                    goto loop_50;
-                                }
-                            } else {
-                                goto block_138;
-                            }
-                        } else {
-block_138:
-                            var_t4 += 0x20;
-                            var_s1_3 += 1;
-                            var_s5 += 1;
-                            if (var_s1_3 >= (u32) M2C_FIELD(var_s0, u32 *, 0x10)) {
-                                var_s0 += 0x14;
-                                goto block_142;
-                            }
-                            goto loop_33;
-                        }
-                    } else {
-                        goto block_141;
-                    }
-                } else {
-                    var_s5 += M2C_FIELD(var_s0, u32 *, 0x10);
-block_141:
-                    var_s0 += 0x14;
-block_142:
-                    var_s7 += 1;
-                    if (var_s7 < sp164) {
-                        goto loop_27;
-                    }
-                }
-            }
-            var_t2_3 = var_t1;
-            var_t1_2 = 0;
-            var_s1_4 = 0;
-            if (var_t2_3 >= 2) {
-                var_t0 = &D_80129202;
-                var_t4_2 = 1;
-                do {
-                    var_a2_4 = 0x20;
-                    if (var_t2_3 < 0x21) {
-                        var_a2_4 = var_t2_3;
-                    }
-                    var_t3 = var_t4_2;
-                    M2C_FIELD(D_800D8E24, s32 *, 0) = ((var_a2_4 & 0xFF) << 0xC) | (((var_a2_4 & 0x7F) * 2) | 0x01000000);
-                    M2C_FIELD(D_800D8E24, void **, 4) = (void *) (temp_s2 + (var_t1_2 * 0x10));
-                    D_800D8E24 += 8;
-                    if ((*var_t0 - var_t1_2) < var_a2_4) {
-                        var_a3_2 = (var_s1_4 * 2) + 2;
-loop_149:
-                        temp_v0_4 = var_t3 * 2;
-                        if (var_s1_4 < (var_t6 - 1)) {
-                            temp_v1_4 = *(&D_801291FE + var_a3_2);
-                            var_a3_2 += 4;
-                            var_t0 += 4;
-                            var_t4_2 += 2;
-                            var_s1_4 += 2;
-                            var_t3 = var_s1_4 + 1;
-                            M2C_FIELD(D_800D8E24, s32 *, 0) = ((((temp_v1_4 - var_t1_2) * 2) & 0xFF) << 0x10) | (((*(&D_80129200 + temp_v0_4) - var_t1_2) << 9) & 0xFE00) | 0x08000000;
-                            M2C_FIELD(D_800D8E24, void **, 4) = NULL;
-                            D_800D8E24 += 8;
-                            if ((*(&D_80129200 + var_a3_2) - var_t1_2) < var_a2_4) {
-                                goto loop_149;
-                            }
-                        }
-                    }
-                    if ((*var_t0 - var_t1_2) == var_a2_4) {
-                        var_a2_4 -= 1;
-                    }
-                    var_t2_3 -= var_a2_4;
-                    var_t1_2 += var_a2_4;
-                } while (var_t2_3 >= 2);
-            }
-            temp_f1_4 = temp_f25 * M2C_FIELD(&D_800C02C0, f32 *, 4);
-            temp_s2_2 = (D_800B6D1C * 0x30) + &D_8012F340;
-            temp_f3_2 = temp_f0 * M2C_FIELD(&D_800C02C0, f32 *, 4);
-            M2C_FIELD(temp_s2_2, s16 *, 0) = (s16) (s32) (M2C_FIELD(arg0, f32 *, 0x14) - temp_f1_4);
-            temp_f4_2 = temp_f0 * M2C_FIELD(&D_800C02C8, f32 *, 0);
-            M2C_FIELD(temp_s2_2, s16 *, 2) = (s16) (s32) (M2C_FIELD(arg0, f32 *, 0x1C) - temp_f3_2);
-            temp_f2_3 = temp_f25 * M2C_FIELD(&D_800C02C8, f32 *, 0);
-            M2C_FIELD(temp_s2_2, s16 *, 0x10) = (s16) (s32) (M2C_FIELD(arg0, f32 *, 0x14) + temp_f4_2 + temp_f1_4);
-            M2C_FIELD(temp_s2_2, s16 *, 0x12) = (s16) (s32) ((M2C_FIELD(arg0, f32 *, 0x1C) - temp_f2_3) + temp_f3_2);
-            temp_f22_2 = M2C_FIELD(arg0, f32 *, 8) * M2C_FIELD(&D_800C02C8, f32 *, 4);
-            M2C_FIELD(temp_s2_2, s16 *, 0x20) = (s16) (s32) ((M2C_FIELD(arg0, f32 *, 0x14) - temp_f4_2) + temp_f1_4);
-            M2C_FIELD(temp_s2_2, s16 *, 0x22) = (s16) (s32) (M2C_FIELD(arg0, f32 *, 0x1C) + temp_f2_3 + temp_f3_2);
-            if (!(M2C_FIELD(&D_800C02D0, f32 *, 0) <= temp_f22_2)) {
-                var_v1_6 = (s32) temp_f22_2;
-            } else {
-                var_v1_6 = (s32) (temp_f22_2 - M2C_FIELD(&D_800C02D0, f32 *, 0)) | 0x80000000;
-            }
-            var_f0_7 = M2C_FIELD(&D_800C02D0, f32 *, 4);
-            var_condition_bit = var_f0_7 <= temp_f22_2;
-            M2C_FIELD(temp_s2_2, s8 *, 0xF) = (s8) var_v1_6;
-            if (!(var_f0_7 <= temp_f22_2)) {
-                M2C_FIELD(temp_s2_2, s8 *, 0x1F) = (s8) (s32) temp_f22_2;
-            } else {
-                temp_v1_5 = (s32) (temp_f22_2 - var_f0_7) | 0x80000000;
-                var_f0_7 = D_800C02D8;
-                M2C_FIELD(temp_s2_2, s8 *, 0x1F) = temp_v1_5;
-                var_condition_bit = var_f0_7 <= temp_f22_2;
-            }
-            if (var_condition_bit) {
-                var_v1_7 = (s32) (temp_f22_2 - var_f0_7) | 0x80000000;
-            } else {
-                var_v1_7 = (s32) temp_f22_2;
-            }
-            M2C_FIELD(temp_s2_2, s8 *, 0x2F) = (s8) var_v1_7;
-            temp_t1_3 = D_800D8E24;
-            temp_t0_5 = D_800D8E24 + 8;
-            M2C_FIELD(temp_t1_3, void **, 4) = temp_s2_2;
-            temp_s2_3 = (D_800B6D1C << 7) + &D_8012DA40;
-            temp_v1_6 = temp_t0_5 + 8;
-            D_800D8E24 = temp_t0_5;
-            M2C_FIELD(temp_t1_3, s32 *, 0) = 0x01003006;
-            D_800D8E24 = temp_v1_6;
-            M2C_FIELD(D_800D8E24, s32 *, 8) = 0x08000200;
-            M2C_FIELD(temp_t0_5, s32 *, 4) = 0;
-            D_800D8E24 = temp_t0_5 + 0x10;
-            M2C_FIELD(temp_t0_5, s32 *, 8) = 0x08000400;
-            M2C_FIELD(temp_v1_6, s32 *, 4) = 0;
-            func_0020FC74(&spB0, D_800C02DC, D_800C02DC, 0x3F800000);
-            func_00210318(&spB0, (f32) ((s32) D_800C2030 / 2), 32.0f, 0);
-            func_0020D274(&spB0, (D_800B6D1C << 6) + &D_80129180);
-            temp_a0_5 = D_800D8E24;
-            M2C_FIELD(temp_a0_5, s32 *, 0) = 0xDA380003;
-            M2C_FIELD(temp_a0_5, void **, 4) = (void *) ((D_800B6D1C << 6) + &D_80129180);
-            temp_f21_3 = M2C_FIELD(&D_800C02E0, f32 *, 4);
-            temp_f22_3 = M2C_FIELD(arg0, f32 *, 8) * M2C_FIELD(&D_800C02E0, f32 *, 0);
-            D_800D8E24 += 8;
-            M2C_FIELD(temp_s2_3, s16 *, 0) = (s16) (s32) (func_002982F0(M2C_FIELD(arg0, f32 *, 0x10)) * temp_f21_3);
-            M2C_FIELD(temp_s2_3, s16 *, 2) = (s16) (s32) (func_002974C0(M2C_FIELD(arg0, f32 *, 0x10)) * M2C_FIELD(&D_800C02E8, f32 *, 0));
-            temp_f20_3 = M2C_FIELD(&D_800C02E8, f32 *, 4);
-            M2C_FIELD(temp_s2_3, s16 *, 0x10) = (s16) (s32) ((f32) M2C_FIELD(temp_s2_3, s16 *, 0) - (func_002982F0(-M2C_FIELD(arg0, f32 *, 0x10)) * temp_f20_3));
-            M2C_FIELD(temp_s2_3, s16 *, 0x12) = (s16) (s32) ((f32) M2C_FIELD(temp_s2_3, s16 *, 2) - (func_002974C0(-M2C_FIELD(arg0, f32 *, 0x10)) * temp_f20_3));
-            temp_f20_4 = D_800C02F0;
-            M2C_FIELD(temp_s2_3, s16 *, 0x20) = (s16) (s32) ((f32) M2C_FIELD(temp_s2_3, s16 *, 0x10) + (func_002982F0(-M2C_FIELD(arg0, f32 *, 0x10) - temp_f20_4) * temp_f21_3));
-            M2C_FIELD(temp_s2_3, s16 *, 0x22) = (s16) (s32) ((f32) M2C_FIELD(temp_s2_3, s16 *, 0x12) + (func_002974C0(-M2C_FIELD(arg0, f32 *, 0x10) - temp_f20_4) * temp_f21_3));
-            M2C_FIELD(temp_s2_3, s16 *, 0x30) = (s16) (s32) ((f32) M2C_FIELD(temp_s2_3, s16 *, 0x10) + (func_002982F0(temp_f20_4 - M2C_FIELD(arg0, f32 *, 0x10)) * temp_f21_3));
-            temp_f0_6 = func_002974C0(temp_f20_4 - M2C_FIELD(arg0, f32 *, 0x10));
-            M2C_FIELD(temp_s2_3, s16 *, 0x40) = -7;
-            M2C_FIELD(temp_s2_3, s16 *, 0x42) = -7;
-            M2C_FIELD(temp_s2_3, s16 *, 0x50) = -7;
-            M2C_FIELD(temp_s2_3, u16 *, 0x52) = 8U;
-            M2C_FIELD(temp_s2_3, s16 *, 0x60) = 8;
-            M2C_FIELD(temp_s2_3, s16 *, 0x70) = 8;
-            temp_v1_7 = M2C_FIELD(temp_s2_3, u16 *, 0x52) - 0xF;
-            M2C_FIELD(temp_s2_3, s16 *, 0x62) = temp_v1_7;
-            M2C_FIELD(temp_s2_3, s16 *, 0x72) = (s16) (temp_v1_7 + 0xF);
-            M2C_FIELD(temp_s2_3, s16 *, 0x32) = (s16) (s32) ((f32) M2C_FIELD(temp_s2_3, s16 *, 0x12) + (temp_f0_6 * temp_f21_3));
-            if (!(D_800C02F4 <= temp_f22_3)) {
-                var_v1_8 = (s32) temp_f22_3;
-            } else {
-                var_v1_8 = (s32) (temp_f22_3 - D_800C02F4) | 0x80000000;
-            }
-            var_f0_8 = D_800C02F8;
-            var_condition_bit_2 = var_f0_8 <= temp_f22_3;
-            M2C_FIELD(temp_s2_3, s8 *, 0xF) = (s8) var_v1_8;
-            if (!(var_f0_8 <= temp_f22_3)) {
-                M2C_FIELD(temp_s2_3, s8 *, 0x1F) = (s8) (s32) temp_f22_3;
-            } else {
-                temp_v1_8 = (s32) (temp_f22_3 - var_f0_8) | 0x80000000;
-                var_f0_8 = D_800C02FC;
-                M2C_FIELD(temp_s2_3, s8 *, 0x1F) = temp_v1_8;
-                var_condition_bit_2 = var_f0_8 <= temp_f22_3;
-            }
-            if (var_condition_bit_2) {
-                var_v1_9 = (s32) (temp_f22_3 - var_f0_8) | 0x80000000;
-            } else {
-                var_v1_9 = (s32) temp_f22_3;
-            }
-            var_f0_9 = D_800C0300;
-            var_condition_bit_3 = var_f0_9 <= temp_f22_3;
-            M2C_FIELD(temp_s2_3, s8 *, 0x2F) = (s8) var_v1_9;
-            if (!(var_f0_9 <= temp_f22_3)) {
-                M2C_FIELD(temp_s2_3, s8 *, 0x3F) = (s8) (s32) temp_f22_3;
-            } else {
-                temp_v1_9 = (s32) (temp_f22_3 - var_f0_9) | 0x80000000;
-                var_f0_9 = D_800C0304;
-                M2C_FIELD(temp_s2_3, s8 *, 0x3F) = temp_v1_9;
-                var_condition_bit_3 = var_f0_9 <= temp_f22_3;
-            }
-            if (var_condition_bit_3) {
-                var_v1_10 = (s32) (temp_f22_3 - var_f0_9) | 0x80000000;
-            } else {
-                var_v1_10 = (s32) temp_f22_3;
-            }
-            var_f0_10 = D_800C0308;
-            var_condition_bit_4 = var_f0_10 <= temp_f22_3;
-            M2C_FIELD(temp_s2_3, s8 *, 0x4F) = (s8) var_v1_10;
-            if (!(var_f0_10 <= temp_f22_3)) {
-                M2C_FIELD(temp_s2_3, s8 *, 0x5F) = (s8) (s32) temp_f22_3;
-            } else {
-                temp_v1_10 = (s32) (temp_f22_3 - var_f0_10) | 0x80000000;
-                var_f0_10 = D_800C030C;
-                M2C_FIELD(temp_s2_3, s8 *, 0x5F) = temp_v1_10;
-                var_condition_bit_4 = var_f0_10 <= temp_f22_3;
-            }
-            if (var_condition_bit_4) {
-                var_v1_11 = (s32) (temp_f22_3 - var_f0_10) | 0x80000000;
-            } else {
-                var_v1_11 = (s32) temp_f22_3;
-            }
-            M2C_FIELD(temp_s2_3, s8 *, 0x6F) = (s8) var_v1_11;
-            if (!(D_800C0310 <= temp_f22_3)) {
-                var_v1_12 = (s32) temp_f22_3;
-            } else {
-                var_v1_12 = (s32) (temp_f22_3 - D_800C0310) | 0x80000000;
-            }
-            M2C_FIELD(temp_s2_3, s8 *, 0x7F) = (s8) var_v1_12;
-            temp_v1_11 = D_800D8E24;
-            temp_v0_5 = D_800D8E24 + 8;
-            D_800D8E24 = temp_v0_5;
-            M2C_FIELD(temp_v1_11, s32 *, 0) = 0x01008010;
-            M2C_FIELD(temp_v1_11, void **, 4) = temp_s2_3;
-            temp_v1_12 = temp_v0_5 + 8;
-            temp_a1_5 = temp_v0_5 + 0x10;
-            D_800D8E24 = temp_v1_12;
-            M2C_FIELD(D_800D8E24, s32 *, 8) = 0x08000200;
-            M2C_FIELD(temp_v0_5, s32 *, 4) = 0;
-            D_800D8E24 = temp_a1_5;
-            M2C_FIELD(temp_v0_5, s32 *, 8) = 0x08020400;
-            M2C_FIELD(temp_v1_12, s32 *, 4) = 0;
-            temp_v1_13 = temp_v0_5 + 0x18;
-            D_800D8E24 = temp_v1_13;
-            M2C_FIELD(temp_v0_5, s32 *, 0x10) = 0x08020600;
-            M2C_FIELD(temp_a1_5, s32 *, 4) = 0;
-            temp_a1_6 = temp_v0_5 + 0x20;
-            temp_a2_2 = temp_v0_5 + 0x28;
-            D_800D8E24 = temp_a1_6;
-            M2C_FIELD(temp_v0_5, s32 *, 0x18) = 0x08080A00;
-            M2C_FIELD(temp_v1_13, s32 *, 4) = 0;
-            D_800D8E24 = temp_a2_2;
-            M2C_FIELD(temp_v0_5, s32 *, 0x20) = 0x080A0C00;
-            M2C_FIELD(temp_a1_6, s32 *, 4) = 0;
-            D_800D8E24 = temp_v0_5 + 0x30;
-            M2C_FIELD(temp_v0_5, s32 *, 0x28) = 0x080C0E00;
-            M2C_FIELD(temp_a2_2, s32 *, 4) = 0;
+#define MIN(a, b) ((b) < (a) ? (b) : (a))
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
+
+static __inline__ s32 TestFlag(s32 flags, s32 bit) {
+    return flags & bit;
+}
+
+static __inline__ s32 EdgeVisible(Vec3f *corners, Vec3f *p0, Vec3f *p1) {
+    Vec3f *a;
+    Vec3f *b;
+    f32 dx;
+    f32 dz;
+    s32 k;
+
+    for (k = 0; k < 4; k++) {
+        a = &corners[k];
+        b = (k != 3) ? &corners[k + 1] : &corners[0];
+        dz = b->y - a->y;
+        dx = a->x - b->x;
+        if (dz * (p0->x - a->x) + dx * (p0->z - a->y) > 0.0f &&
+            dz * (p1->x - a->x) + dx * (p1->z - a->y) > 0.0f) {
+            return 0;
         }
     }
+    return 1;
+}
+
+void func_004004D8(MapView *view) {
+    s32 codes[3];
+    f32 world[16];
+    f32 inverse[16];
+    f32 screen[16];
+    struct {
+        f32 minX, minZ, maxX, maxZ;
+    } box;
+    Vec3f corners[4];
+    Vec3f viewCorners[4];
+    Region *regions;
+    s32 areaCount;
+    Vp *vp;
+    s32 showAll;
+    Area *areas;
+    Area *area;
+    Region *region;
+    RegionInfo *infos;
+    RegionInfo *info;
+    MapVtx *vtx;
+    Vec3f *p0;
+    Vec3f *p1;
+    Vec3f *a;
+    char *data;
+    World *w;
+    f32 s;
+    f32 c;
+    f32 cx;
+    f32 scaleX;
+    f32 scaleZ;
+    f32 cz;
+    f32 alpha;
+    f32 len;
+    f32 radius;
+    f32 stem;
+    f32 spread;
+    f32 wid;
+    s32 i;
+    s32 n;
+    s32 e;
+    s32 next;
+    s32 newVtx;
+    s32 nVtx;
+    s32 nIdx;
+    s32 base;
+    s32 height;
+    s32 bright;
+    s32 fade;
+    s32 remaining;
+    s32 start;
+    s32 count;
+    s32 k;
+    s32 *code;
+
+    vp = &D_8011B0A8[D_800B6D1C];
+    if (D_8011AC8C == 1) {
+        return;
+    }
+    func_00297D50(&D_80129A00, 0.0f, D_800C2030 - 1, 0.0f, D_800C2034 - 1, -200.0f, 200.0f, 32.0f);
+    if (view->visible == 0 || D_800B6D54 == 0) {
+        return;
+    }
+    GFX(0xDB060000, 0);                                 /* gSPSegment(0, 0) */
+    GFX(0xDE000000, (u32) D_800AB100);                  /* gSPDisplayList */
+    GFX(0xDE000000, (u32) D_800AB130);
+    GFX(0xED000000, ((((s32) ((f32) (D_800C2030 - 1) * 4.0f)) & 0xFFF) << 12) |
+                        (((s32) ((f32) (D_800C2034 - 1) * 4.0f)) & 0xFFF)); /* gDPSetScissor */
+    GFX(0xFF100000 | ((D_800C2030 - 1) & 0xFFF), (u32) D_800F7070[0]->colorImage); /* gDPSetColorImage */
+    GFX(0xDC080008, (u32) vp);                          /* gSPViewport */
+    GFX(0xE7000000, 0);                                 /* gDPPipeSync */
+    GFX(0xE3000A01, 0);                                 /* gDPSetCycleType(G_CYC_1CYCLE) */
+    GFX(0xE200001C, 0x507048);                          /* gDPSetRenderMode */
+    GFX(0xFCFFFFFF, 0xFFFE793C);                        /* gDPSetCombineMode(G_CC_SHADE, G_CC_SHADE) */
+    GFX(0xD9000000, 0);                                 /* gSPClearGeometryMode(~0) */
+    GFX(0xD9FFFFFF, 0x200004);                          /* gSPSetGeometryMode(G_SHADE | G_SHADING_SMOOTH) */
+    GFX(0xD7000000, 0);                                 /* gSPTexture(0, 0, 0, 0, G_OFF) */
+    GFX(0xDB040004, 6);                                 /* gSPClipRatio(FRUSTRATIO_6) */
+    GFX(0xDB04000C, 6);
+    GFX(0xDB040014, 0xFFFA);
+    GFX(0xDB04001C, 0xFFFA);
+    GFX(0xDA380007, (u32) &D_80129A00);                 /* gSPMatrix(projection, load) */
+
+    cx = view->pos.x;
+    cz = view->pos.z;
+    s = func_002982F0(view->angle);
+    c = func_002974C0(view->angle);
+    cx += view->offset.z * s - view->offset.x * c;
+    cz += view->offset.z * c + view->offset.x * s;
+    scaleX = scaleZ = 0.1f;
+    cx = MAX(MIN(cx, 32000.0f), -32000.0f);
+    cz = MAX(MIN(cz, 32000.0f), -32000.0f);
+    func_0020FC24(world, -cx, -cz, 0.0f);
+    func_00210478(world, scaleX, scaleZ, 1.0f);
+    func_00210B38(world, view->angle + 3.1415929f);
+    func_00210318(world, D_800C2030 / 2, D_800C2034 / 2 - 16.0f, 0.0f);
+    func_0020C208(inverse, world);
+
+    corners[0].x = 0.0f;
+    corners[0].y = 0.0f;
+    corners[0].z = 0.0f;
+    corners[1].x = D_800C2030;
+    corners[1].y = 0.0f;
+    corners[1].z = 0.0f;
+    corners[2].x = D_800C2030;
+    corners[2].y = D_800C2034;
+    corners[2].z = 0.0f;
+    corners[3].x = 0.0f;
+    corners[3].y = D_800C2034;
+    corners[3].z = 0.0f;
+    for (i = 0; i < 4; i++) {
+        func_0020F85C(inverse, &corners[i], &viewCorners[i]);
+    }
+    box.minX = box.maxX = viewCorners[0].x;
+    box.minZ = box.maxZ = viewCorners[0].y;
+    for (i = 1; i < 4; i++) {
+        a = &viewCorners[i];
+        box.minX = !(a->x <= box.minX) ? box.minX : a->x;
+        box.minZ = !(a->y <= box.minZ) ? box.minZ : a->y;
+        box.maxX = !(box.maxX <= a->x) ? box.maxX : a->x;
+        box.maxZ = !(box.maxZ <= a->y) ? box.maxZ : a->y;
+    }
+
+    func_0020D274(world, &D_80129100[D_800B6D1C]);
+    GFX(0xDA380003, (u32) &D_80129100[D_800B6D1C]);    /* gSPMatrix(modelview, load) */
+
+    vtx = D_80129A40[D_800B6D1C];
+    w = &D_800F7078;
+    regions = (Region *) (func_002017D4(w->data, 2) + 8);
+    data = func_002017D4(w->data, 3);
+    areas = (Area *) (data + 8);
+    areaCount = *(s32 *) (data + 4);
+    infos = (RegionInfo *) (func_002017D4(w->data, 0) + 8);
+    nIdx = 0;
+    base = 0;
+    nVtx = 0;
+    showAll = TestFlag(D_8011AAD8, 0x2000) != 0;
+    for (n = 0; n < areaCount; n++) {
+        area = &areas[n];
+        if (area->maxX > box.minX && area->minX < box.maxX && area->maxZ > box.minZ && area->minZ < box.maxZ) {
+            for (i = 0; i < area->count; base++, i++) {
+                region = &regions[base];
+                info = &infos[region->index];
+                if (info->flags & 0x200) {
+                    continue;
+                }
+                /* Outcodes of the region's corners against the view box. */
+                for (k = 0; k < 3; k++) {
+                    code = &codes[k];
+                    p0 = region->corner[k];
+                    if (p0->x < box.minX) {
+                        *code = 1;
+                    } else if (box.maxX <= p0->x) {
+                        *code = 4;
+                    } else {
+                        *code = 0;
+                    }
+                    if (p0->z < box.minZ) {
+                        *code |= 8;
+                    } else if (box.maxZ <= p0->z) {
+                        *code |= 2;
+                    }
+                }
+                if (codes[0] & codes[1] & codes[2]) {
+                    continue;
+                }
+                e = 0; /* before the test: the ROM sets it in the branch delay slot */
+                if (!showAll && !(region->flags & 0x400)) {
+                    continue;
+                }
+                for (; e < 3; e++) {
+                    newVtx = 0;
+                    if (region->neighbour[e] == NULL) {
+                        newVtx = 1;
+                    } else if (region->index < region->neighbour[e]->index) {
+                        newVtx = 1;
+                    }
+                    if (!newVtx) {
+                        continue;
+                    }
+                    next = 0;
+                    if (e != 2) {
+                        next = e + 1;
+                    }
+                    if (codes[e] & codes[next]) {
+                        continue;
+                    }
+                    p0 = region->corner[e];
+                    p1 = region->corner[next];
+                    if (!EdgeVisible(viewCorners, p0, p1)) {
+                        continue;
+                    }
+                    newVtx = 1;
+                    if (nVtx != 0 && vtx[nVtx - 1].ob[0] == (s16) p0->x) {
+                        newVtx = vtx[nVtx - 1].ob[1] != (s16) p0->z;
+                    }
+                    if (newVtx) {
+                        D_80129200[nIdx++] = nVtx;
+                        vtx[nVtx].ob[0] = p0->x;
+                        vtx[nVtx].ob[1] = p0->z;
+                        height = (p0->y - view->pos.y) * 0.390625f;
+                        bright = height + 200;
+                        fade = 255;
+                        if (bright < 150) {
+                            bright = 150;
+                        } else if (bright >= 256) {
+                            bright = 255;
+                        }
+                        if (height > 50) {
+                            fade -= height - 50;
+                            if (fade < 75) {
+                                fade = 75;
+                            }
+                        } else if (height < -50) {
+                            fade += height - 50;
+                            if (fade < 75) {
+                                fade = 75;
+                            }
+                        }
+                        switch (info->colour) {
+                            case 0:
+                                vtx[nVtx].cn[0] = bright;
+                                vtx[nVtx].cn[1] = bright;
+                                vtx[nVtx].cn[2] = bright;
+                                break;
+                            case 1:
+                                vtx[nVtx].cn[0] = 0;
+                                vtx[nVtx].cn[1] = bright;
+                                vtx[nVtx].cn[2] = 0;
+                                break;
+                            case 2:
+                                vtx[nVtx].cn[0] = 0;
+                                vtx[nVtx].cn[1] = 0;
+                                vtx[nVtx].cn[2] = bright;
+                                break;
+                            case 3:
+                                vtx[nVtx].cn[0] = bright;
+                                vtx[nVtx].cn[1] = 0;
+                                vtx[nVtx].cn[2] = 0;
+                                break;
+                            case 4:
+                                vtx[nVtx].cn[0] = bright;
+                                vtx[nVtx].cn[1] = 0;
+                                vtx[nVtx].cn[2] = bright / 2;
+                                break;
+                            case 5:
+                                vtx[nVtx].cn[0] = bright;
+                                vtx[nVtx].cn[1] = 0;
+                                vtx[nVtx].cn[2] = bright;
+                                break;
+                            case 6:
+                                vtx[nVtx].cn[0] = bright / 2;
+                                vtx[nVtx].cn[1] = bright / 4;
+                                vtx[nVtx].cn[2] = 0;
+                                break;
+                            case 7:
+                                vtx[nVtx].cn[0] = 0;
+                                vtx[nVtx].cn[1] = bright;
+                                vtx[nVtx].cn[2] = bright;
+                                break;
+                            case 8:
+                                vtx[nVtx].cn[0] = bright;
+                                vtx[nVtx].cn[1] = bright;
+                                vtx[nVtx].cn[2] = 0;
+                                break;
+                            case 9:
+                                vtx[nVtx].cn[0] = bright;
+                                vtx[nVtx].cn[1] = bright / 2;
+                                vtx[nVtx].cn[2] = 0;
+                                break;
+                            case 10:
+                                vtx[nVtx].cn[0] = 0;
+                                vtx[nVtx].cn[1] = 0;
+                                vtx[nVtx].cn[2] = 0;
+                                break;
+                        }
+                        vtx[nVtx].cn[3] = fade * view->fade;
+                        nVtx++;
+                    } else {
+                        D_80129200[nIdx++] = nVtx - 1;
+                    }
+                    D_80129200[nIdx++] = nVtx;
+                    vtx[nVtx].ob[0] = p1->x;
+                    vtx[nVtx].ob[1] = p1->z;
+                    height = (p0->y - view->pos.y) * 0.390625f;
+                    bright = height + 200;
+                    fade = 255;
+                    if (bright < 150) {
+                        bright = 150;
+                    } else if (bright >= 256) {
+                        bright = 255;
+                    }
+                    if (height > 50) {
+                        fade -= height - 50;
+                        if (fade < 75) {
+                            fade = 75;
+                        }
+                    } else if (height < -50) {
+                        fade += height - 50;
+                        if (fade < 75) {
+                            fade = 75;
+                        }
+                    }
+                    switch (info->colour) {
+                        case 0:
+                            vtx[nVtx].cn[0] = bright;
+                            vtx[nVtx].cn[1] = bright;
+                            vtx[nVtx].cn[2] = bright;
+                            break;
+                        case 1:
+                            vtx[nVtx].cn[0] = 0;
+                            vtx[nVtx].cn[1] = bright;
+                            vtx[nVtx].cn[2] = 0;
+                            break;
+                        case 2:
+                            vtx[nVtx].cn[0] = 0;
+                            vtx[nVtx].cn[1] = 0;
+                            vtx[nVtx].cn[2] = bright;
+                            break;
+                        case 3:
+                            vtx[nVtx].cn[0] = bright;
+                            vtx[nVtx].cn[1] = 0;
+                            vtx[nVtx].cn[2] = 0;
+                            break;
+                        case 4:
+                            vtx[nVtx].cn[0] = bright;
+                            vtx[nVtx].cn[1] = 0;
+                            vtx[nVtx].cn[2] = bright / 2;
+                            break;
+                        case 5:
+                            vtx[nVtx].cn[0] = bright;
+                            vtx[nVtx].cn[1] = 0;
+                            vtx[nVtx].cn[2] = bright;
+                            break;
+                        case 6:
+                            vtx[nVtx].cn[0] = bright / 2;
+                            vtx[nVtx].cn[1] = bright / 4;
+                            vtx[nVtx].cn[2] = 0;
+                            break;
+                        case 7:
+                            vtx[nVtx].cn[0] = 0;
+                            vtx[nVtx].cn[1] = bright;
+                            vtx[nVtx].cn[2] = bright;
+                            break;
+                        case 8:
+                            vtx[nVtx].cn[0] = bright;
+                            vtx[nVtx].cn[1] = bright;
+                            vtx[nVtx].cn[2] = 0;
+                            break;
+                        case 9:
+                            vtx[nVtx].cn[0] = bright;
+                            vtx[nVtx].cn[1] = bright / 2;
+                            vtx[nVtx].cn[2] = 0;
+                            break;
+                        case 10:
+                            vtx[nVtx].cn[0] = 0;
+                            vtx[nVtx].cn[1] = 0;
+                            vtx[nVtx].cn[2] = 0;
+                            break;
+                    }
+                    vtx[nVtx].cn[3] = fade * view->fade;
+                    nVtx++;
+                    if (nVtx >= 0x1FF) {
+                        goto draw;
+                    }
+                }
+            }
+        } else {
+            base += area->count;
+        }
+    }
+draw:
+    remaining = nVtx;
+    start = 0;
+    i = 0;
+    while (remaining >= 2) {
+        count = MIN(remaining, 32);
+        GFX(VTX_W0(count), (u32) &vtx[start]);
+        while (D_80129200[i + 1] - start < count && i < nIdx - 1) {
+            GFX(LINE_W0(D_80129200[i] - start, D_80129200[i + 1] - start), 0);
+            i += 2;
+        }
+        if (D_80129200[i + 1] - start == count) {
+            count--;
+        }
+        remaining -= count;
+        start += count;
+    }
+
+    /* The player's arrow. */
+    vtx = D_8012F340[D_800B6D1C];
+    len = 40.0f;
+    wid = 25.0f;
+    alpha = view->fade * 255.0f;
+    vtx[0].ob[0] = view->pos.x - s * len;
+    vtx[0].ob[1] = view->pos.z - c * len;
+    vtx[1].ob[0] = view->pos.x + c * wid + s * len;
+    vtx[1].ob[1] = view->pos.z - s * wid + c * len;
+    vtx[2].ob[0] = view->pos.x - c * wid + s * len;
+    vtx[2].ob[1] = view->pos.z + s * wid + c * len;
+    vtx[0].cn[3] = alpha;
+    vtx[1].cn[3] = alpha;
+    vtx[2].cn[3] = alpha;
+    GFX(VTX_W0(3), (u32) vtx);
+    GFX(LINE_W0(0, 1), 0);
+    GFX(LINE_W0(0, 2), 0);
+
+    /* The compass. */
+    vtx = D_8012DA40[D_800B6D1C];
+    func_0020FC74(screen, 0.5f, 0.5f, 1.0f);
+    func_00210318(screen, D_800C2030 / 2, 32.0f, 0.0f);
+    func_0020D274(screen, &D_80129180[D_800B6D1C]);
+    GFX(0xDA380003, (u32) &D_80129180[D_800B6D1C]);
+    alpha = view->fade * 255.0f;
+    radius = 15.0f;
+    vtx[0].ob[0] = func_002982F0(view->angle) * radius;
+    vtx[0].ob[1] = func_002974C0(view->angle) * -15.0f;
+    stem = 40.0f;
+    vtx[1].ob[0] = vtx[0].ob[0] - func_002982F0(-view->angle) * stem;
+    vtx[1].ob[1] = vtx[0].ob[1] - func_002974C0(-view->angle) * stem;
+    spread = 0.4f;
+    vtx[2].ob[0] = vtx[1].ob[0] + func_002982F0(-view->angle - spread) * radius;
+    vtx[2].ob[1] = vtx[1].ob[1] + func_002974C0(-view->angle - spread) * radius;
+    vtx[3].ob[0] = vtx[1].ob[0] + func_002982F0(spread - view->angle) * radius;
+    vtx[3].ob[1] = vtx[1].ob[1] + func_002974C0(spread - view->angle) * radius;
+    vtx[4].ob[0] = -7;
+    vtx[4].ob[1] = -7;
+    vtx[5].ob[0] = vtx[4].ob[0];
+    vtx[5].ob[1] = vtx[4].ob[1] + 15;
+    vtx[6].ob[0] = vtx[5].ob[0] + 15;
+    vtx[6].ob[1] = vtx[5].ob[1] - 15;
+    vtx[7].ob[0] = vtx[6].ob[0];
+    vtx[7].ob[1] = vtx[6].ob[1] + 15;
+    vtx[0].cn[3] = alpha;
+    vtx[1].cn[3] = alpha;
+    vtx[2].cn[3] = alpha;
+    vtx[3].cn[3] = alpha;
+    vtx[4].cn[3] = alpha;
+    vtx[5].cn[3] = alpha;
+    vtx[6].cn[3] = alpha;
+    vtx[7].cn[3] = alpha;
+    GFX(VTX_W0(8), (u32) vtx);
+    GFX(LINE_W0(0, 1), 0);
+    GFX(LINE_W0(1, 2), 0);
+    GFX(LINE_W0(1, 3), 0);
+    GFX(LINE_W0(4, 5), 0);
+    GFX(LINE_W0(5, 6), 0);
+    GFX(LINE_W0(6, 7), 0);
 }

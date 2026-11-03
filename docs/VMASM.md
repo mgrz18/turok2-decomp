@@ -138,8 +138,8 @@ holds once. The build models it so:
   give Turok 2's table.
 - Where the copy is the original file byte for byte, the copy is one C file
   made from the original's source with the second-module names
-  (src/us/code/func_00448240.c from func_0040F240.c, func_0044D3DC.c from
-  func_004143DC.c); its .rodata alignment then works as the original's did.
+  (src/us/code/func_00448240.c from func_0040F240.c, func_0044C230.c from
+  func_00413230.c); its .rodata alignment then works as the original's did.
 - A string the original file emits in an earlier function stays an extern
   (func_0045190C's " %3d", as func_004189AC has it).
 - The second module's own data (virtual_rodata_1) is named by link address
@@ -151,12 +151,36 @@ now: func_0042CF90 and func_0042D120 own their literals in the engine's
 .rodata (0x800A6050, 0x800A60B8) and their copies func_00465EB0 and
 func_00466040 go over them.
 
-Open: the VM pools are interleaved with the engine's in its .rodata
-(0x800A600C is func_0042C560's, 0x800A6010 the engine's func_002261A8's,
-0x800A6014 func_0042CBE4's), probably in link order of the objects, and
-func_0042CBE4's jump table at 0x800A6018 is 8-aligned only if its object's
-.rodata starts at 0x800A6010. func_0042CBE4 and its copy func_00465B04 stay
-asm until it is known which object that word belongs to.
+The VM pools are interleaved with the engine's in its .rodata (0x800A600C
+is func_0042C560's, 0x800A6010 the engine's func_002261A8's, 0x800A6014
+func_0042CBE4's). The word at 0x800A6010 (-1.0f) is the engine's: only
+func_002261A8 reads it (`bestIdx = -1.0f`, matched C), and no VM code names
+it. But func_0042CBE4 cannot open an object of its own at 0x800A6014: cc1
+puts a jump table after `.align 3`, so its .rodata is 1.0f, a pad word, then
+the table at offset 8, and an object there puts the table at 0x800A601C
+(all 61 named jump tables in the ROM are 8-aligned). The ROM's 1.0f at
+0x800A6014 and table at 0x800A6018 fit only a pool that is already 4 bytes
+in at 0x800A6014, that is, one .rodata section holding func_002261A8's
+-1.0f and func_0042CBE4's literal and table: one source file whose
+functions went to two segments, the engine's .text and the VM's. cc1 can do
+that (`-ffunction-sections` names each function's section `.func_X`, and
+splat can link a subsegment's `linker_section`), but nothing else in the
+build works that way, the object's other members are unknown, and the
+second module's copy func_00465B04 would need the same object with its
+engine half thrown away. So func_0042CBE4 and func_00465B04 stay asm (both
+have matching C in build/manual/X), and this is the first evidence that
+some engine and VM functions share a source file.
+
+The X batch moved eight pools from the second module's C to the first
+module's: func_00405AC8, func_00406000, func_00409500, func_00409784,
+func_00409A64, func_0040D5C4, func_0041760C and func_00424780 own them now
+(and func_004088B0 its strings), and their copies go NOLOAD over them.
+Second-module code also names first-module addresses inside functions that
+are still asm (func_0042CAB4 + 0x50, .L0042B960, func_0042CBE4 + 0x40) as
+callees or callbacks; those are defined absolutely too. The second module's
+text does not end at 0x469400: func_00469374 runs to 0x46941C, and the
+words after it still decode as code, so virtual_rodata_1 likely starts
+later still.
 
 Object boundaries in the VM modules: each object starts 16-aligned in .text
 and in .rodata, with junk words before (often copies of instructions). The
@@ -166,8 +190,14 @@ an inline helper (GCC 2.8 emits a non-static inline function's own copy at
 the end of the file). By the same rule the file holding func_004143DC opens
 at 0x413230 (.rodata 0x800C0AF0) and runs to 0x417484 (.rodata to
 0x800C0E64): the string "menu" at 0x800C0C54 is read by func_00415FB8,
-func_00416644, func_00416760, func_00416894 and func_004172F8. It is still
-split into func_00413230 ... and the file from func_004143DC.
+func_00416644, func_00416760, func_00416894 and func_004172F8. That file is
+now one C file, src/us/code/func_00413230.c: 46 parts each matched alone
+first, put together with their own types (a name two parts both define gets
+the part's address as a suffix) and their own prototypes (where two parts
+declare one symbol differently, the later one names it through an alias,
+`extern T D_8011AAF0_413F74 __asm__("D_8011AAF0");`, so each part compiles
+as it did alone). "menu" is a string constant again, and the file's .rodata
+is the ROM's 0x374 bytes from 0x800C0AF0, gaps included.
 
 ## What is still open
 

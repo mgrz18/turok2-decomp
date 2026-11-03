@@ -1,5 +1,4 @@
-/* NON-MATCHING: 4 of 153 words differ (W batch). */
-/* NON-MATCHING: 4 of 153 words differ: after the save sound calls the ROM tests r again and falls into the success message; GCC knows r == 0 there and jumps (block order of the two messages swapped). */
+/* NON-MATCHING: 3 of 153 words differ: the ROM tests r again after the save sounds (bnez s0 then falls into the success message); CSE (cse2 here, cse1 without the do/while) threads the first test straight to the failure message and drops the second. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00407578.c, func_00407578, with Turok 2's layouts. */
 #include "common.h"
 
@@ -123,14 +122,16 @@ s32 func_00457FE8(s32 unused, MenuOwner *own) {
     if (!written) {
         return 1;
     }
+    do {
+        if (r == 0) {
+            func_00412B14();
+            func_00412438(0x191);
+        }
+    } while (0);
     if (r == 0) {
-        func_00412B14();
-        func_00412438(0x191);
-    }
-    if (r != 0) {
-        func_00416644(D_80119E2C, D_0043BD18, plr, plr->controller, (s32)D_0043BE14);
-    } else {
         func_00416644(D_80119E2C, D_0043BC88, plr, plr->controller, (s32)D_0043BE14);
+    } else {
+        func_00416644(D_80119E2C, D_0043BD18, plr, plr->controller, (s32)D_0043BE14);
     }
     return 1;
 }

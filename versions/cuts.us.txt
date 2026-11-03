@@ -238,7 +238,7 @@ stray 0x0041D04C 0x0041D050 // lb $3,406($16)
 stray 0x0041D884 0x0041D890 // bne $3,$2,41d9c8; addiu $16,$29,48; addiu $4,$29,72
 stray 0x00424A5C 0x00424A60 // ldc1 $f20,32($29)
 stray 0x00425754 0x00425760 // lui $2,0x800b; lw $2,31724($2); addiu $3,$6,8
-stray 0x00427178 0x00427180 // sw $16,24($2); sw $17,20($2)
+stray 0x00427174 0x00427180 // nop; sw $16,24($2); sw $17,20($2)
 stray 0x00427C1C 0x00427C20 // lw $3,-8460($1)
 stray 0x00427E5C 0x00427E60 // beqzl $2,427ea4
 stray 0x00428CEC 0x00428CF0 // jal 268b48
@@ -255,8 +255,8 @@ stray 0x004304FC 0x00430500 // swc1 $f0,2604($16)
 stray 0x00440F14 0x00440F20 // li $2,1; sh $2,2568($18); lw $2,2640($18)
 stray 0x00441FF8 0x00442000 // mov.s $f20,$f0; lui $1,0x800a
 stray 0x0044584C 0x00445850 // lw $2,28($16)
-stray 0x0044823C 0x00448240 // lw $2,2660($4)
-stray 0x0044C22C 0x0044C230 // lui $7,0x4270
+stray 0x00448238 0x00448240 // nop; lw $2,2660($4)
+stray 0x0044C228 0x0044C230 // nop; lui $7,0x4270
 stray 0x00450484 0x00450490 // lb $2,199($5); beqz $2,450498; nop
 stray 0x00453308 0x00453310 // mtc1 $0,$f1; lui $1,0x800b
 stray 0x004558B4 0x004558C0 // mfc1 $6,$f0; jal 210318; move $4,$18
@@ -271,7 +271,7 @@ stray 0x00462044 0x00462050 // lw $20,4($19); beqz $20,4620f0; li $17,-1
 stray 0x00462374 0x00462380 // j 271784; nop; jal 29ecd0
 stray 0x00462E38 0x00462E40 // beq $5,$2,462e84; addiu $17,$18,96
 stray 0x00465EA4 0x00465EB0 // sw $31,20($29); lw $2,28($16); andi $2,$2,0x2
-stray 0x0046603C 0x00466040 // li $2,2
+stray 0x00466034 0x00466040 // jr ra; addiu sp,32; li $2,2
 stray 0x004660D8 0x004660E0 // li $2,-1; jal 291bb0
 stray 0x00466134 0x00466140 // jal 2017d4; ori $5,$16,0x1; lw $3,0($17)
 stray 0x00466328 0x00466330 // jal 291b00; move $6,$0
@@ -312,7 +312,7 @@ func 0x00418294 0xEC // cut in a call's argument setup (func_004182E8)
 func 0x00418750 0xBC // its last case and return were func_004187FC
 func 0x00418DA0 0xBC // its last case and return were func_00418E4C
 func 0x00419260 0xBC // its last case and return were func_0041930C
-stray 0x0041A3AC 0x0041A3B0 // a bc1f word never executed; the function starts at 0x41A3B0
+stray 0x0041A3A8 0x0041A3B0 // a nop and a bc1f word never executed; the function starts at 0x41A3B0
 func 0x0041B148 0x80 // its switch cases (jtbl_800C12E0) were cut as functions
 func 0x0041B8CC 0x6C // cut at branch targets (func_0041B8EC, func_0041B920)
 func 0x0041B954 0x6C // cut at a branch target (func_0041B9B0)
@@ -340,6 +340,7 @@ func 0x00426F5C 0x58
 func 0x00426FB4 0x48
 func 0x00427524 0x1CC
 func 0x004279AC 0x1A0
+stray 0x00427F78 0x00427F80 // addiu sp,96; addiu sp,-32: junk before the 16-aligned func_00427F80
 func 0x00427F80 0xD8
 func 0x00428058 0x8C
 func 0x00429AA4 0x2E0
@@ -405,3 +406,53 @@ stray 0x00428A18 0x00428A20 // two junk words before osPfsIsPlug, 16-aligned
 func 0x00428A20 0x17C // absorbs func_00428ABC and func_00428B58
 stray 0x0045E674 0x0045E680 // linker fill after the hand-written func_0045E630
 func 0x0045E680 0x188
+
+// The player code splat took for one data object, D_0042D50C (0x42D50C-0x42EBB4),
+// and its second-module copy D_0046642C: a junk word and a table (src/us/asm/data_*.s),
+// then 14 functions; 0x42EB4C is fill before the 16-aligned func_0042EB50.
+stray 0x0042EB4C 0x0042EB50 // linker fill before the 16-aligned func_0042EB50
+stray 0x00467A6C 0x00467A70 // the same fill in the second-module copy
+func 0x0042DA60 0x1B8
+func 0x0042DC18 0x25C
+func 0x0042DE74 0x2D8
+func 0x0042E14C 0x150
+func 0x0042E29C 0x194
+func 0x0042E430 0x17C
+func 0x0042E5AC 0x288
+func 0x0042E834 0x60
+func 0x0042E894 0x88
+func 0x0042E91C 0x88
+func 0x0042E9A4 0x5C
+func 0x0042EA00 0x104
+func 0x0042EB04 0x48
+func 0x0042EB50 0x64
+func 0x00466980 0x1B8 // copy of func_0042DA60
+func 0x00466B38 0x25C // copy of func_0042DC18
+func 0x00466D94 0x2D8 // copy of func_0042DE74
+func 0x0046706C 0x150 // copy of func_0042E14C
+func 0x004671BC 0x194 // copy of func_0042E29C
+func 0x00467350 0x17C // copy of func_0042E430
+func 0x004674CC 0x288 // copy of func_0042E5AC
+func 0x00467754 0x60 // copy of func_0042E834
+func 0x004677B4 0x88 // copy of func_0042E894
+func 0x0046783C 0x88 // copy of func_0042E91C
+func 0x004678C4 0x5C // copy of func_0042E9A4
+func 0x00467920 0x104 // copy of func_0042EA00
+func 0x00467A24 0x48 // copy of func_0042EB04
+func 0x00467A70 0x64 // copy of func_0042EB50
+
+// From the X hand-matching batch: functions splat cut at their tails, case
+// bodies or epilogues, and junk words before 16-aligned objects.
+func 0x00405AC8 0x1A0 // absorbs func_00405BFC, its tail (reached by a j)
+stray 0x00408FF8 0x00409000 // two junk words; func_00409340 installs func_00408FF8 + 8 = func_00409000
+func 0x00409000 0x340
+func 0x0041E500 0x584 // absorbs func_0041E7D0, func_0041E824 and func_0041E97C
+func 0x0042019C 0x2B8 // absorbs func_004203B0, its tail
+func 0x0042085C 0x3D4 // absorbs func_00420878 and func_004208E0
+func 0x004242EC 0x21C // absorbs func_00424500, its epilogue
+func 0x00425BC0 0x2B4 // absorbs func_00425D94, its tail
+func 0x00425E74 0x1F0 // absorbs func_00425F84, its tail
+func 0x0042AC0C 0x7D8 // absorbs D_0042B304
+func 0x0042EF2C 0x298 // absorbs func_0042F0E4
+stray 0x004567AC 0x004567B0 // junk between objects; callers jal 0x41D7B0
+func 0x004567B0 0x198

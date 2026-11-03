@@ -359,6 +359,36 @@ entries included (docs/VMASM.md). A function excluded because its .rodata
 in the second module usually goes in that way. When the yaml gave a pool
 word to the copy, give it to the original and put the copy over it.
 
+### The X pass
+
+From the sixth hand-matching batch:
+
+- **Gotos out of a test give the ROM's `bnez`/`bnel` + `j` layout** where
+  the ROM jumps from a row test to a body placed later (func_00424978).
+- **An inline helper keeps GCC from strength-reducing** `&s->a[i]` across
+  per-element calls (func_0042F344), and re-addresses a global by symbol
+  at each call (func_00424A60), as the VM pass found.
+- **Store order follows the declared shape**: a global written as an array
+  (`D_8012FA04[k] = ...`) kept the order that leaves `li a2, 0x13` in the
+  jal's delay slot (func_00405AC8); one scratch pointer reused for a call's
+  result and an array kept a load in `$v0` (func_0042AC0C).
+- **A loop written out in the function, not as an inline,** let two loops
+  share one counter register (func_0042EF2C).
+- **FAKEMATCH, accepted where the permuter or a register pin is the only
+  way found**: a lookup written twice under an always-true test that GCC
+  merges but whose doubled references move the `$s` registers
+  (func_0040457C), and `register T *p asm("$2")` pins standing for a copy
+  the ROM makes (func_0041EA84, func_004579A4). Each says so in its first
+  comment.
+- **Matching alone is not the whole check for a wrong cut**: a function
+  that matches "over its real extent" still needs that extent in
+  `versions/cuts.us.txt` (and, at a segment's end, the next subsegment
+  moved: func_00469374 ran 0x1C bytes into what the yaml called
+  virtual_rodata_1). match_func also masks the targets of local `j`s, so
+  a `j` that lands on the wrong block (func_0026C148, where GCC did not
+  thread an inline's NULL return to the epilogue) shows only at
+  `make verify`.
+
 ### One file with its neighbour
 
 A function that matches alone can still be cut wrong: if its `.rodata`
