@@ -485,6 +485,45 @@ Twenty-one close drafts from `nonmatching/` finished by hand:
   functions as handlers name them by link address, defined absolutely in
   `versions/undefined_funcs_extra.us.txt` (func_00467E4C).
 
+### The B pass
+
+Seven agents on the big drafts; six matched, among them CCamera Advance
+(func_0027D160, 3744 bytes) and the level-geometry display lists
+(func_00221D3C, func_002222E0):
+
+- **One variable per block.** Reusing one variable across unrelated
+  blocks makes a local pseudo a global one, which the other allocator
+  places; give each block its own locals (func_0027D160's block-local
+  temporaries).
+- **Calls duplicated into each branch.** Where the ROM has the call in both
+  arms of an if/else, write it in both, not once after it.
+- **loop.c's invariant hoisting depends on the inner loop's insn count**,
+  and a `memcpy` counts as one insn: Rage Wars' `memcpy` of a Vec3 in place
+  of three stores is what gives the ROM's hoists (func_0042BA40).
+- **An index as the induction variable** (`spawns[i].f`) gives other givs
+  than a walking pointer (func_0042BA40).
+- **Spill slots follow declaration order.**
+- **`do { } while (0)` raises a pseudo's priority** (refs are weighted by
+  loop depth), but placed around call-argument moves its NOTE_INSN_LOOP_END
+  is a scheduling barrier there; put the block where it leaves the moves
+  free (func_00221D3C, func_002222E0).
+- **Table pointers written as `base + off + n`** let loop.c and cse2 create
+  the copies the ROM has (func_00209AF4).
+- **Reading a field twice** gives reload-CSE's `mov.s` copy of the first
+  load (func_0027E000's m_WarpXScale).
+- **Struct-typed globals** are MEM_IN_STRUCT, which changes alias decisions
+  and so the order of stores.
+- **Cross-jumping compares REG_EQUAL notes**: two moves with the same note
+  (a0 = D_801198B0) are merged; the ROM keeps the tag branch's apart, so its
+  move must carry no constant note (func_002478C8, still 134 words off).
+- **flow deletes a frame store overwritten before an aliasing read**, and a
+  read through a pointer argument counts as aliasing: the ROM keeps both
+  halfword stores of each pair (func_00424008, 32 words off).
+- func_00209AF4 starts at 0x209AF4, not 16-aligned, right after
+  func_002097AC, but has no .rodata: its own file links byte-exact.
+  func_0042BA40 owns its pool at 0x800A5F54 and links alone; its
+  second-module twin func_00464960 goes NOLOAD over it.
+
 ## The fast assembler
 
 `asn64` only runs under wine, which costs ~30 s a file in the emulated amd64
