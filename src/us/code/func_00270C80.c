@@ -54,8 +54,8 @@ typedef struct {
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
-extern u32 func_0029DFF0(void); /* __osDisableInt */
-extern void func_0029E010(u32 mask); /* __osRestoreInt */
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32 mask);
 extern s32 func_002113A4(void);
 extern f32 func_0021149C(f32 range);
 extern s32 func_00266D8C(void *ranges, s32 count, s16 id, s32 *lo, s32 *hi);
@@ -64,25 +64,25 @@ extern void func_00270A60(SndMgr *m, void *layer, Vec3f *pos, s32 variant, s32 h
 
 static __inline__ void SndMgr_Lock(SndMgr *m) {
     SndLock *l = &m->lock;
-    u32 mask = func_0029DFF0();
+    u32 mask = __osDisableInt();
 
     if (++l->count != 1) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osRecvMesg(l, 0, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
 }
 
 static __inline__ void SndMgr_Unlock(SndMgr *m) {
     SndLock *l = &m->lock;
-    u32 mask = func_0029DFF0();
+    u32 mask = __osDisableInt();
 
     if (--l->count != 0) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osSendMesg(l, 0, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
 }
 

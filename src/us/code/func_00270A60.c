@@ -239,29 +239,29 @@ struct SndInfo {
                  s16 w12;
                  s16 w14;
 };
-u32 func_0029DFF0(void);         /* __osDisableInt */
-void func_0029E010(u32 mask);    /* __osRestoreInt */
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 /* Static inlines from the Rage Wars header b13_types.h (dropped by the importer). */
 static inline void SndMgr_Lock(SndMgr *m) {
     SndLock *l = &m->lock;
-    u32 mask = func_0029DFF0();
+    u32 mask = __osDisableInt();
     if (++l->count != 1) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osRecvMesg(&l->q, 0, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
 }
 static inline void SndMgr_Unlock(SndMgr *m) {
     SndLock *l = &m->lock;
-    u32 mask = func_0029DFF0();
+    u32 mask = __osDisableInt();
     if (--l->count != 0) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osSendMesg(&l->q, 0, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
 }
 extern u8 D_801198B0[];

@@ -141,7 +141,7 @@ stray 0x002935A4 0x002935B0 // addiu $29,$29,24; addiu $29,$29,-24; sw $31,16($2
 stray 0x00293CD8 0x00293CE0 // j 25ad24; addiu $2,$2,100
 stray 0x00293D8C 0x00293D90 // bne $10,$1,2a630c
 stray 0x00293DDC 0x00293DE0 // sdc1 $f20,112($29)
-stray 0x00293E5C 0x00293E60 // lw $2,128($18)
+stray 0x00293E58 0x00293E60 // nop; lw $2,128($18)
 stray 0x00293EBC 0x00293EC0 // lui $11,0x800b
 stray 0x00293F08 0x00293F10 // add.s $f1,$f1,$f0; swc1 $f1,52($29)
 stray 0x00294148 0x00294150 // li $2,-1; lb $3,80($16)
@@ -456,3 +456,33 @@ func 0x0042AC0C 0x7D8 // absorbs D_0042B304
 func 0x0042EF2C 0x298 // absorbs func_0042F0E4
 stray 0x004567AC 0x004567B0 // junk between objects; callers jal 0x41D7B0
 func 0x004567B0 0x198
+
+// From the E hand-matching batch (the last engine functions). Fill before
+// 16-aligned objects that splat read as data or as a function of its own:
+// pieces of strings from the linker's buffer.
+stray 0x00200AD4 0x00200AE0 // "Color" and two words; func_00224D54 passes 0x200AE0 as a load callback
+stray 0x00200C38 0x00200C40 // "oosh", nop: ahead of the hand-written RNC code
+stray 0x00201AC8 0x00201AD0 // "ObjectIn"
+stray 0x00202128 0x00202130 // "Style", two bytes; func_00286674 calls 0x202130
+func 0x00202130 0xB8
+stray 0x002021E8 0x002021F0 // nop, "\0\x12m_"
+stray 0x0020285C 0x00202860 // "temD"
+stray 0x00202BA8 0x00202BB0 // two data words
+stray 0x00206918 0x00206920 // "sh" and a data word
+stray 0x00206984 0x00206990 // "m_YScale|"; func_0020793C and func_0020798C pass 0x206990 as a load callback
+stray 0x00207A64 0x00207A70 // "\0\0\x11m_GameTim"
+stray 0x0020C0CC 0x0020C0D0 // "ISTO"
+stray 0x002150B8 0x002150C0 // "ICKUP_SA"; func_00220D00 calls 0x2150C0
+stray 0x00219BBC 0x00219BC0 // "FIRE"
+stray 0x00228C38 0x00228C40 // two data words ahead of func_00228C40
+stray 0x002A51E0 0x002A51F8 // "header", three words, "texture": the end of .code, after __floatdisf
+// Hand-written asm with C after it in the same cut.
+func 0x002010C0 0x6E8 // the RNC decompressor's asm (addi, a jalr into itself)
+stray 0x002017A8 0x002017B0 // "meSkyLay"
+func 0x002017B0 0x24
+func 0x0029C8E0 0x1FC // __osDispatchThread (exceptasm.s), ends in eret
+func 0x0029CADC 0x8 // __osCleanupThread: jal osDestroyThread(NULL)
+stray 0x0029CAE4 0x0029CAF0 // lwc1, add.s, swc1
+func 0x0029CAF0 0x510 // __osLeoInterrupt (leointerrupt.c)
+// A false end: splat cut memmove's copy loop off as func_00266C00.
+func 0x00266B90 0xCC

@@ -7,7 +7,7 @@ extern int __osSpDeviceBusy();
 extern void __osSpSetStatus(unsigned int arg0);
 extern s32 func_0029A3A0(s32 direction, s32 spAddress, s32 dramAddress, s32 size);
 extern OSTask *func_0029A160(OSTask *arg0);
-extern void func_0029E340(OSTask *, s32);
+extern void osWritebackDCache(OSTask *, s32);
 extern void __osSpSetStatus(u32 arg0);
 extern s32 func_0029A4A0(u32 arg0);
 extern s32 __osSpDeviceBusy(void);
@@ -24,7 +24,7 @@ void func_0029A248(OSTask *arg0) {
             block->t.ucode = (u64 *)(*(volatile u32 *)(((u32)arg0->t.yield_data_ptr + 0xBFCU) | 0xA0000000U));
         }
     }
-    func_0029E340(block, 0x40);
+    osWritebackDCache(block, 0x40);
     __osSpSetStatus(0x2B00);
     do {
         result = func_0029A4A0(0x04001000);

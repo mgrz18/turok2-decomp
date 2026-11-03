@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 
 s32 func_002933E0(s32, s32);
-s32 func_0029E230(s32);
+s32 osSetIntMask(s32);
 
 M2C_UNK func_002933B0(void *);                      /* extern */
 
@@ -12,7 +12,7 @@ void func_002911B8(void *arg0, s16 arg1)
   void *temp_s1;
   s32 new_var;
   void *var_s0;
-  new_var = func_0029E230(1);
+  new_var = osSetIntMask(1);
   var_s0 = *((void **) (((s8 *) arg0) + 8));
   temp_s4 = new_var;
   if (var_s0 != 0)
@@ -33,5 +33,5 @@ void func_002911B8(void *arg0, s16 arg1)
     }
     while (var_s0 != 0);
   }
-  func_0029E230(temp_s4);
+  osSetIntMask(temp_s4);
 }

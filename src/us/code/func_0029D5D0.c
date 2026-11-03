@@ -20,8 +20,8 @@ extern PiHandle D_80124D30;     /* CartRomHandle */
 extern PiHandle *D_800B897C;    /* __osPiTable */
 extern s32 func_0029B410(u32 devAddr, u32 *data);   /* osPiRawReadIo */
 extern void func_00266C5C(void *p, s32 c, s32 n);   /* memset */
-extern u32 func_0029DFF0(void);                     /* __osDisableInt */
-extern void func_0029E010(u32 mask);                /* __osRestoreInt */
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32 mask);
 
 PiHandle *func_0029D5D0(void) {
     u32 piConfig;
@@ -40,10 +40,10 @@ PiHandle *func_0029D5D0(void) {
         D_80124D30.domain = 0;
         D_80124D30.speed = 0;
         func_00266C5C(&D_80124D30.transferInfo, 0, 0x60);
-        saveMask = func_0029DFF0();
+        saveMask = __osDisableInt();
         D_80124D30.next = D_800B897C;
         D_800B897C = &D_80124D30;
-        func_0029E010(saveMask);
+        __osRestoreInt(saveMask);
     }
 
     return &D_80124D30;

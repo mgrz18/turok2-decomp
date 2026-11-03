@@ -31,8 +31,8 @@ extern void func_0029DD10(void);                            /* __osPiCreateAcces
 extern void func_0029B950(s32 event, void *mq, void *msg);  /* osSetEventMesg */
 extern s32 func_0029B150(void *thread);                     /* osGetThreadPri */
 extern void func_0029B9B0(void *thread, s32 pri);           /* osSetThreadPri */
-extern u32 func_0029DFF0(void);                             /* __osDisableInt */
-extern void func_0029E010(u32 mask);                        /* __osRestoreInt */
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32 mask);
 extern void func_0029B060(void *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri); /* osCreateThread */
 extern void func_0029BB10(void *thread);                    /* osStartThread */
 
@@ -58,7 +58,7 @@ void func_0029D450(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
             func_0029B9B0(NULL, pri);
         }
 
-        savedMask = func_0029DFF0();
+        savedMask = __osDisableInt();
 
         D_800B8960.initialized = 1;
         D_800B8960.acsQueue = D_80124DB8;
@@ -71,7 +71,7 @@ void func_0029D450(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
         func_0029B060(D_80123AE0, 0, func_0029D690, &D_800B8960, &D_80123D10[0x1000], pri);
         func_0029BB10(D_80123AE0);
 
-        func_0029E010(savedMask);
+        __osRestoreInt(savedMask);
 
         if (oldPri != -1) {
             func_0029B9B0(NULL, oldPri);

@@ -4,13 +4,13 @@
 #include "rw/abu_types.h"
 
 extern void *D_800B7AC4;
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32);
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32);
 void func_0029A580(s32 arg0) {
     u32 temp_a0;
     u16 *ptr;
     u16 v;
-    temp_a0 = func_0029DFF0();
+    temp_a0 = __osDisableInt();
     if (arg0 & 0xFF) {
         ptr = (u16 *)D_800B7AC4;
         v = *ptr | 0x20;
@@ -19,5 +19,5 @@ void func_0029A580(s32 arg0) {
         v = *ptr & 0xFFDF;
     }
     *ptr = v;
-    func_0029E010(temp_a0);
+    __osRestoreInt(temp_a0);
 }

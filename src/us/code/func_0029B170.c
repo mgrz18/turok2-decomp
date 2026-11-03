@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern u32 func_0029DFF0(void);
+extern u32 __osDisableInt(void);
 extern u32 func_0029DFC0(void);
-extern void func_0029E010(u32);
+extern void __osRestoreInt(u32);
 extern s32 D_80122A20;
 extern u64 D_80122A28;
 u64 func_0029B170(void) {
@@ -13,10 +13,10 @@ u64 func_0029B170(void) {
     u32 count;
     u32 elapsed;
     u64 time;
-    saved = func_0029DFF0();
+    saved = __osDisableInt();
     count = func_0029DFC0();
     elapsed = count - D_80122A20;
     time = D_80122A28;
-    func_0029E010(saved);
+    __osRestoreInt(saved);
     return time + elapsed;
 }

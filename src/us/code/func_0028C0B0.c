@@ -62,7 +62,7 @@ extern void func_0028CF38(char *s);             /* draws a string */
 extern void func_0028B614(u32 value, char *name, u8 *descriptions);
 extern void func_0028B7C0(char *name1, u32 value1, char *name2, u32 value2);
 extern void func_0028BDFC(u8 *stack, s32 size, ThreadContext *context, u8 id);
-extern void func_0029E3B0(void);
+extern void osWritebackDCacheAll(void);
 
 static __inline__ void clearScreen(void) {
     u16 *p = D_8011F180;
@@ -183,7 +183,7 @@ void func_0028C0B0(Thread *thread) {
         func_0028BDFC(D_800C7C80, 0x8000, context, thread->id);
         break;
     }
-    func_0029E3B0();
+    osWritebackDCacheAll();
     while (D_800B75EC == 0) {
     }
 }

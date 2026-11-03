@@ -14,13 +14,13 @@ typedef struct OSTimer_s {
     OSMesg msg;
 } OSTimer;
 extern OSTimer *D_800B8930;
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32 mask);
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32 mask);
 u64 func_0029BE6C(OSTimer *t)
 {
     OSTimer *timep;
     u64 tim;
-    u32 savedMask = func_0029DFF0();
+    u32 savedMask = __osDisableInt();
     timep = D_800B8930->next;
     tim = t->value;
     for (; timep != D_800B8930 && tim > timep->value; timep = timep->next) {
@@ -34,6 +34,6 @@ u64 func_0029BE6C(OSTimer *t)
     t->prev = timep->prev;
     timep->prev->next = t;
     timep->prev = t;
-    func_0029E010(savedMask);
+    __osRestoreInt(savedMask);
     return tim;
 }

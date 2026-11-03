@@ -56,8 +56,8 @@ extern s32 D_800D1CD8;
 extern s32 D_800D8DF0;
 extern s32 D_800D6D68;
 
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32);
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32);
 extern s32 osRecvMesg(void *mq, void **msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
 extern void func_00200818(void *, CachedResource *);
@@ -75,26 +75,26 @@ extern void CList__Remove(void *list, void *node);
 extern s32 CList__AddTail(void *list, void *node);
 
 static __inline__ void acquire(void) {
-    u32 token = func_0029DFF0();
+    u32 token = __osDisableInt();
     s32 count = D_800D8DCC + 1;
     D_800D8DCC = count;
     if (count != 1) {
-        func_0029E010(token);
+        __osRestoreInt(token);
         osRecvMesg(D_800D8450.lock, 0, 1);
     } else {
-        func_0029E010(token);
+        __osRestoreInt(token);
     }
 }
 
 static __inline__ void release(void) {
-    u32 token = func_0029DFF0();
+    u32 token = __osDisableInt();
     s32 count = D_800D8DCC - 1;
     D_800D8DCC = count;
     if (count != 0) {
-        func_0029E010(token);
+        __osRestoreInt(token);
         osSendMesg(D_800D8450.lock, 0, 1);
     } else {
-        func_0029E010(token);
+        __osRestoreInt(token);
     }
 }
 

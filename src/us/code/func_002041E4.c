@@ -3,8 +3,8 @@
 
 #include "rw/junk_types.h"
 
-u32 func_0029DFF0(void);
-void func_0029E010(u32 mask);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
@@ -29,20 +29,20 @@ void func_002041E4(void) {
     while (1) {
         osRecvMesg(&D_800D7BE0.q870, (OSMesg *)&msg, 1);
         if ((u32)msg < 2) {
-            mask = func_0029DFF0();
+            mask = __osDisableInt();
             if (++D_800D8DCC != 1) {
-                func_0029E010(mask);
+                __osRestoreInt(mask);
                 osRecvMesg(&D_800D7BE0.q11D0, 0, 1);
             } else {
-                func_0029E010(mask);
+                __osRestoreInt(mask);
             }
             func_002067C4(0, (u32)msg);
-            m2 = func_0029DFF0();
+            m2 = __osDisableInt();
             if (--D_800D8DCC != 0) {
-                func_0029E010(m2);
+                __osRestoreInt(m2);
                 osSendMesg(&D_800D8DB0, 0, 1);
             } else {
-                func_0029E010(m2);
+                __osRestoreInt(m2);
             }
         } else {
             msg->flags &= ~2;
@@ -51,12 +51,12 @@ void func_002041E4(void) {
                 if (func_00201BDC(D_800D6D68, msg, &D_800D7BE0.q870) != 0) {
                     continue;
                 }
-                mask = func_0029DFF0();
+                mask = __osDisableInt();
                 if (++D_800D8DCC != 1) {
-                    func_0029E010(mask);
+                    __osRestoreInt(mask);
                     osRecvMesg(&D_800D7BE0.q11D0, 0, 1);
                 } else {
-                    func_0029E010(mask);
+                    __osRestoreInt(mask);
                 }
                 CList__Remove(&D_800D7BE0.lists3[2], msg);
                 CList__AddHead(&D_800D7BE0.lists3[1], msg);
@@ -74,29 +74,29 @@ void func_002041E4(void) {
                     func_002062F8(0, p);
                 }
                 func_002066B0(0, msg);
-                m2 = func_0029DFF0();
+                m2 = __osDisableInt();
                 if (--D_800D8DCC != 0) {
-                    func_0029E010(m2);
+                    __osRestoreInt(m2);
                     osSendMesg(&D_800D8DB0, 0, 1);
                 } else {
-                    func_0029E010(m2);
+                    __osRestoreInt(m2);
                 }
             } else {
                 msg->flags &= ~4;
-                mask = func_0029DFF0();
+                mask = __osDisableInt();
                 if (++D_800D8DCC != 1) {
-                    func_0029E010(mask);
+                    __osRestoreInt(mask);
                     osRecvMesg(&D_800D7BE0.q11D0, 0, 1);
                 } else {
-                    func_0029E010(mask);
+                    __osRestoreInt(mask);
                 }
                 func_002044A8(0, msg, 1);
-                m2 = func_0029DFF0();
+                m2 = __osDisableInt();
                 if (--D_800D8DCC != 0) {
-                    func_0029E010(m2);
+                    __osRestoreInt(m2);
                     osSendMesg(&D_800D8DB0, 0, 1);
                 } else {
-                    func_0029E010(m2);
+                    __osRestoreInt(m2);
                 }
             }
         }

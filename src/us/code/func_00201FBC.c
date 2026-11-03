@@ -4,8 +4,8 @@
 s32 osPiRawStartDma(s32, s32, s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
-void func_0029E030(s32, s32);
-void func_0029E340(s32, s32);
+void osInvalDCache(s32, s32);
+void osWritebackDCache(s32, s32);
 
 M2C_UNK CLoader__DeallocLoaderEntry(s32, void *);                 /* extern */
 
@@ -19,10 +19,10 @@ void func_00201FBC(s32 arg0)
   loop_1:
   osRecvMesg(arg0 + 0x230, (s32) (&sp10), 1);
 
-  func_0029E340(*((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
+  osWritebackDCache(*((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
   osPiRawStartDma(0, *((s32 *) (((s8 *) sp10) + 0)), *((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
   osRecvMesg(arg0 + 0xA48, (s32) (&sp14), 1);
-  func_0029E030(*((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
+  osInvalDCache(*((s32 *) (((s8 *) sp10) + 4)), *((s32 *) (((s8 *) sp10) + 8)));
   temp_a0 = *((s32 *) (((s8 *) sp10) + 0xC));
   if (temp_a0 != 0)
   {

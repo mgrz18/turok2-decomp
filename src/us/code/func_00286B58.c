@@ -69,7 +69,7 @@ extern s32 D_80130A50;
 extern s32 D_80130A80;
 extern s32 D_80130A84;
 
-extern void func_0029E3B0(void);
+extern void osWritebackDCacheAll(void);
 extern void func_0028B3E8(void *, ScTask *);
 
 /* Builds the RSP task(s) for a frame, hands them to the scheduler, moves to the next frame. */
@@ -132,7 +132,7 @@ void func_00286B58(GfxState *gfx, GfxTask *task) {
         t->msg = &task->msg;
         t->framebuffer = task->framebuffer;
     }
-    func_0029E3B0();
+    osWritebackDCacheAll();
     func_0028B3E8(D_8011AD90, &task->sc[0]);
     if (task->twoTasks) {
         func_0028B3E8(D_8011AD90, &task->sc[1]);

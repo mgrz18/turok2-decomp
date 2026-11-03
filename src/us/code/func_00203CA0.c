@@ -82,8 +82,8 @@ extern s32 CList__AddTail(IntrusiveList *list, void *node);
 struct OSMesgQueue;
 typedef void *OSMesg;
 typedef u32 OSIntMask;
-extern void func_0029E010(OSIntMask mask);
-extern OSIntMask func_0029DFF0(void);
+extern void __osRestoreInt(OSIntMask mask);
+extern OSIntMask __osDisableInt(void);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 extern void func_002066B0(s32 arg0, void *arg1);
@@ -93,7 +93,7 @@ extern s32 D_800D81E0;
 extern s32 D_800D8DF0;
 extern s32 D_800D81C0;
 extern s32 D_800D81C4;
-extern u32 func_0029DFF0(void);
+extern u32 __osDisableInt(void);
 extern ResourceLoadRequest *func_002066F8(s32, s32);
 extern void func_00201B50(s32 *, ResourceLoadRequest *);
 extern void func_00200818(void *, CachedResource *);
@@ -113,40 +113,40 @@ static __inline__ void unref(CachedResource *node) {
 }
 static __inline__ void acquire(void) {
     extern Manager D_800D8450;
-    u32 token = func_0029DFF0();
+    u32 token = __osDisableInt();
     s32 counter = D_800D8DCC + 1;
     D_800D8DCC = counter;
     if (counter != 1) {
-        func_0029E010(token);
+        __osRestoreInt(token);
         osRecvMesg(D_800D8450.lock, 0, 1);
     } else {
-        func_0029E010(token);
+        __osRestoreInt(token);
     }
 }
 static __inline__ void release(void) {
     extern Manager D_800D8450;
-    u32 token = func_0029DFF0();
+    u32 token = __osDisableInt();
     s32 counter = D_800D8DCC - 1;
     D_800D8DCC = counter;
     if (counter != 0) {
-        func_0029E010(token);
+        __osRestoreInt(token);
         osSendMesg(D_800D8450.lock, 0, 1);
     } else {
-        func_0029E010(token);
+        __osRestoreInt(token);
     }
 }
 extern s32 func_00201BDC(void *, void *, Manager *);
 extern s32 D_800D6D68;
 static __inline__ void lock(void) {
     extern Manager D_800D8450;
-    u32 token = func_0029DFF0();
+    u32 token = __osDisableInt();
     s32 counter = D_800D8DCC + 1;
     D_800D8DCC = counter;
     if (counter != 1) {
-        func_0029E010(token);
+        __osRestoreInt(token);
         osRecvMesg(D_800D8450.lock, 0, 1);
     } else {
-        func_0029E010(token);
+        __osRestoreInt(token);
     }
 }
 CachedResource *func_00203CA0(s32 unused, s32 key, CachedResource *first, CachedResource *second, s32 mode, void *owner,

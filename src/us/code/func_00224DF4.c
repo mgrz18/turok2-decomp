@@ -18,7 +18,7 @@ typedef struct Owner {
 extern s32 func_00266D24(void *entries, s32 count, s32 id);
 extern s32 func_0020185C(s32 arg0, s32 arg1, s32 index, s32 *out);
 extern s32 func_0020367C(s32 arg0, s32 arg1, s32 arg2, s32 flags, s32 arg4, void *arg5, void *arg6, s32 arg7);
-extern u8 D_00200AE0[];
+extern u8 func_00200AE0[];
 extern u8 D_800A5F48[];
 
 s32 func_00224DF4(Owner *owner, s32 id, s32 flags, s32 arg3) {
@@ -48,5 +48,5 @@ s32 func_00224DF4(Owner *owner, s32 id, s32 flags, s32 arg3) {
         break;
     }
     return func_0020367C(0, func_0020185C(owner->unk48, owner->unk1C, index, &out), out, flags, 0,
-                         D_00200AE0, D_800A5F48, arg3);
+                         func_00200AE0, D_800A5F48, arg3);
 }

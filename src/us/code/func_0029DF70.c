@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32 mask);
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32 mask);
 extern void func_0029DF70();
-s32 func_0029C6DC(s32 *, s32);
+s32 __osEnqueueAndYield(s32 *, s32);
 extern s32 D_800B8918;
 extern void *D_800B8920;
 void func_0029DF70(void)
@@ -15,9 +15,9 @@ void func_0029DF70(void)
   s32 *new_var2;
   s8 *new_var;
   int new_var3;
-  temp_s0 = func_0029DFF0();
+  temp_s0 = __osDisableInt();
   ((OSThread_s *)(new_var = (s8 *) D_800B8920))->state = (new_var3 = 2);
   new_var2 = &D_800B8918;
-  func_0029C6DC(new_var2, new_var3);
-  func_0029E010(temp_s0);
+  __osEnqueueAndYield(new_var2, new_var3);
+  __osRestoreInt(temp_s0);
 }

@@ -3,15 +3,15 @@
 
 #include "rw/junk_types.h"
 
-u32 func_0029DFF0(void);
-void func_0029E010(u32 mask);
-u32 func_0029DFF0(void);
-void func_0029E010(u32);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32);
 s32 func_0026EE40(void *);
 void CList__Remove(void *, void *);
 void CList__AddTail(void *, void *);
 void func_0026ECF0(B19Pool *pool) {
-    u32 mask = func_0029DFF0();
+    u32 mask = __osDisableInt();
     B19Spawn *n;
     B19Spawn *next;
     s32 r;
@@ -25,5 +25,5 @@ void func_0026ECF0(B19Pool *pool) {
             CList__AddTail(pool, n);
         }
     }
-    func_0029E010(mask);
+    __osRestoreInt(mask);
 }

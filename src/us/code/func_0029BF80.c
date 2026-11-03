@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_0029E140(void);
+extern s32 __osProbeTLB(void);
 s32 func_0029BF80(s32 arg0) {
     if (arg0 < 0 && (u32)arg0 <= 0x9FFFFFFFU) {
         return arg0 & 0x1FFFFFFF;
     }
     if ((u32)(arg0 + 0x60000000) > 0x1FFFFFFFU) {
-        return func_0029E140();
+        return __osProbeTLB();
     }
     return arg0 & 0x1FFFFFFF;
 }

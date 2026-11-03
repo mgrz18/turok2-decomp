@@ -3,18 +3,18 @@
 
 #include "rw/abu_types.h"
 
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32 mask);
-extern void func_0029C8E0();
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32 mask);
+extern void __osDispatchThread();
 extern s32 D_800B8918;
 extern ThreadNode *D_800B8920;
-extern void func_0029C878(ThreadNode **queue, ThreadNode *node);
-extern ThreadNode *func_0029C8C8(ThreadNode **queue);
-extern void func_0029C6DC(ThreadNode **queue, ThreadNode *node);
+extern void __osEnqueueThread(ThreadNode **queue, ThreadNode *node);
+extern ThreadNode *__osPopThread(ThreadNode **queue);
+extern void __osEnqueueAndYield(ThreadNode **queue, ThreadNode *node);
 void func_0029BB10(ThreadNode *arg0) {
     ThreadNode **sentinel;
     u32 token;
-    token = func_0029DFF0();
+    token = __osDisableInt();
     if (arg0->state == 1) {
         goto state_one;
     }
@@ -22,7 +22,7 @@ void func_0029BB10(ThreadNode *arg0) {
         goto state_done;
     }
     arg0->state = 2;
-    func_0029C878((ThreadNode **)&D_800B8918, arg0);
+    __osEnqueueThread((ThreadNode **)&D_800B8918, arg0);
     goto state_done;
 state_one:
     if (arg0->queue == 0) {
@@ -32,18 +32,18 @@ state_one:
     if (arg0->queue == sentinel) {
 insert_arg:
         arg0->state = 2;
-        func_0029C878((ThreadNode **)&D_800B8918, arg0);
+        __osEnqueueThread((ThreadNode **)&D_800B8918, arg0);
     } else {
         arg0->state = 8;
-        func_0029C878(arg0->queue, arg0);
-        func_0029C878(sentinel, func_0029C8C8(arg0->queue));
+        __osEnqueueThread(arg0->queue, arg0);
+        __osEnqueueThread(sentinel, __osPopThread(arg0->queue));
     }
 state_done:
     if (D_800B8920 == 0) {
-        func_0029C8E0();
+        __osDispatchThread();
     } else if (D_800B8920->priority < (*(ThreadNode **)&D_800B8918)->priority) {
         D_800B8920->state = 2;
-        func_0029C6DC((ThreadNode **)&D_800B8918, D_800B8920);
+        __osEnqueueAndYield((ThreadNode **)&D_800B8918, D_800B8920);
     }
-    func_0029E010(token);
+    __osRestoreInt(token);
 }

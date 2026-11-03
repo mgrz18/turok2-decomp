@@ -216,13 +216,21 @@ def main():
             sys.exit(f"stray 0x{a:08X} 0x{b:08X}: not a run of words")
         ranges.append((a, b))
         seg, ra = locate(lines, a)
-        _, rb = locate(lines, b)
+        # A run can end a code segment (the fill after its last function):
+        # then nothing starts at <to>, which gets neither a symbol nor an entry.
+        _, rb = locate(lines, b - 4)
+        rb += 4
+        try:
+            locate(lines, b)
+            at_end = False
+        except SystemExit:
+            at_end = True
         stubs[a] = (b, stub_text(a, b, ra, rom, why))
         drop.add(f"func_{a:08X}")
         if a in named:
             sys.exit(f"stray 0x{a:08X} has a real name ({named[a]}): move it to the real start first")
         # The real start needs a symbol; a `func` line may give its size.
-        if fname(b, named) not in sizes:
+        if fname(b, named) not in sizes and not at_end:
             sizes[fname(b, named)] = (b, None)
         # yaml: [ra, hasm, stray] and [rb, asm] in the asm subsegment holding them.
         ents = subsegments(lines, seg)
@@ -243,7 +251,7 @@ def main():
             lines[hj] = f"{indent}- [0x{ra:X}, hasm, {path}]"
         else:
             new.append(f"{indent}- [0x{ra:X}, hasm, {path}]")
-        if nxt != rb:
+        if nxt != rb and not at_end:
             new.append(f"{indent}- [0x{rb:X}, asm]")
         lines[hj + 1:hj + 1] = new
         print(f"stray 0x{a:08X}-0x{b:08X}: yaml " + (", ".join(x.strip() for x in new) or "replaced in place"))

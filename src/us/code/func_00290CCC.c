@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void func_00290CCC(void *arg0, Node_func_802AFD6C_de *arg1);
-extern s32 func_0029E230(s32);
+extern s32 osSetIntMask(s32);
 void func_00290CCC(void *arg0, Node_func_802AFD6C_de *arg1) {
     extern void func_002933E0(void *, void * *);
     ObjRecAt8V3 *object = arg0;
@@ -13,7 +13,7 @@ void func_00290CCC(void *arg0, Node_func_802AFD6C_de *arg1) {
     Node_func_802AFD6C_de *node;
     s32 value;
     s32 node_value;
-    saved = func_0029E230(1);
+    saved = osSetIntMask(1);
     link = &object->unk8;
     if (link != 0) {
 loop:
@@ -36,5 +36,5 @@ insert:
         }
     }
 done:
-    func_0029E230(saved);
+    osSetIntMask(saved);
 }

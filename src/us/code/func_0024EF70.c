@@ -1,4 +1,3 @@
-/* NON-MATCHING: 39 of 129 words differ: the turn rate and look rate computations are scheduled in the other order (look rate first here) */
 #include "common.h"
 
 typedef struct {
@@ -55,16 +54,19 @@ void func_0024EF70(Player *player, Body *body, LookTuning *tuning) {
     f32 turnRate;
     f32 lookRate;
     f32 tilt;
-    f32 scale;
-    f32 range;
+    f32 speed;
 
     if (player->locked != 0) {
         return;
     }
     options = player->options;
     zoomScale = 1.0f - player->zoom * 0.99f;
-    turnRate = ((options->turnSpeed * (1.0f / 128) - 1.0f) * 0.5f + 0.875f) * (zoomScale * tuning->turnRate);
-    lookRate = ((options->lookSpeed * (1.0f / 128) - 1.0f) * 0.4f + 0.6f) * (zoomScale * tuning->lookRate * tuning->lookRateScale);
+    speed = options->turnSpeed * (1.0f / 128) - 1.0f;
+    turnRate = speed * 0.5f + 0.875f;
+    turnRate *= zoomScale * tuning->turnRate;
+    speed = options->lookSpeed * (1.0f / 128) - 1.0f;
+    lookRate = speed * 0.4f + 0.6f;
+    lookRate *= zoomScale * tuning->lookRate * tuning->lookRateScale;
     switch (options->lookMode) {
         case 0:
             if (!options->lookSpring) {
@@ -83,11 +85,9 @@ void func_0024EF70(Player *player, Body *body, LookTuning *tuning) {
     }
     tilt = -player->stickY * 80.0f;
     if (tilt < 0.0f) {
-        scale = tilt * -0.71619713f;
-        range = tuning->lookDown;
+        tilt = tilt * -0.71619713f * tuning->lookDown;
     } else {
-        scale = tilt * 0.71619713f;
-        range = tuning->lookUp;
+        tilt = tilt * 0.71619713f * tuning->lookUp;
     }
-    func_002117DC(&player->pitch, scale * range * 0.017453294f, lookRate);
+    func_002117DC(&player->pitch, tilt * 0.017453294f, lookRate);
 }

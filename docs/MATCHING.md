@@ -408,6 +408,46 @@ within a file), and a non-static inline function, whose own copy GCC 2.8
 emits at the end of the file (func_00219A20 and func_00219ACC, the out-of-line
 copies of what func_00218DCC and func_00218B10 inline).
 
+### The E pass (the last engine functions)
+
+- **One float variable through a lerp chain.** `level = ai->intensity;
+  level *= (1.0f / 255); level = level * -45.0f + 105.0f;`, reusing one
+  `f32` for every step, gives the ROM's FP registers where a temporary per
+  step does not (func_0025F29C, func_0025F9FC, func_0025FCB8). func_0025F928
+  wants the opposite, 240.0f passed through two variables, for its
+  alternating `$f0`/`$f1`; func_0025F2F8 and func_0025FBB8 are still a
+  register off in the final add.
+- **Copy Rage Wars' redundant re-reads.** func_0024B88C tests
+  `pad->stickX != 0` and returns 5 either way, as Rage Wars' source does;
+  the dead test shapes the branch layout. When a reference decomp has such
+  a read, keep it (func_00246BC0's doubled load of `controlMode` looks like
+  the same thing).
+- **libgcc.** `__divdi3`, `__moddi3`, `__udivdi3` and `__umoddi3` are GCC
+  2.8.1's libgcc2.c units with longlong.h's MIPS `umul_ppmm`/`udiv_qrnnd`,
+  built `-mgp32 -mfp32 -msplit-addresses` (`__floatdisf` without the last),
+  given in each file's `/* cc1-flags: */` line. Each unit is its own object
+  with its own static copy of `__clz_tab`, 256 bytes of .rodata at
+  0x800AAC90, 0x800AAD90, 0x800AAE90 and 0x800AAF90. `__floatdisf`'s
+  doubles follow at 0x800AB090, past what `auto_match` takes for the
+  engine's .rdata, so its .rodata subsegment was wired by hand.
+- **`case 2: default:` first.** COnScreen__DrawText switches on the
+  language twice; written with the shared `case 2: default:` as the first
+  label pair, the switch comes out in the ROM's test order and layout.
+- **A pool read through externs may own less than the ROM's slice.**
+  func_00228C40 read its three 1/85 weights as `D_800A60D0`..`D8`, so its
+  object held only the three 2^31 of its `(u32)` conversions; as literals the
+  object's pool is the whole 0x800A60D0-0x800A60E8. A misspelt `D_` is
+  worse: `integrate.py` defines an undefined `D_X` at the address its name
+  gives, so `D_800BB0D0` for `D_800AB0D0` (func_002150C0) linked and only
+  `romdiff` caught it.
+- **Wrong cuts at hand-written asm.** splat's func_002010C0 was the RNC
+  decompressor's asm, a string's tail and a 0x24-byte C function;
+  func_0029C8E0 was `__osDispatchThread`, `__osCleanupThread`, fill and the C
+  `__osLeoInterrupt`. The asm keeps its `func` extent in
+  `versions/cuts.us.txt`, and the C after it goes in under its own start.
+  The fill at the end of `.code` (after `__floatdisf`) is a stray that runs to
+  the segment's end, which `fix_cut.py` now accepts.
+
 ## The fast assembler
 
 `asn64` only runs under wine, which costs ~30 s a file in the emulated amd64

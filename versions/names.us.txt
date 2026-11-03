@@ -33,6 +33,36 @@ __osSpDeviceBusy = 0x0029A380; // SP_STATUS_REG & (IO_FULL | DMA_FULL | DMA_BUSY
 __osSpSetStatus = 0x0029A4D0; // writes SP_STATUS_REG
 __osSpGetStatus = 0x0029A560; // returns SP_STATUS_REG
 
+// libultra's hand-written asm, which stays asm: exceptasm.s (in its order
+// there, __osException to __osCleanupThread) and the one-function .s files
+// of src/os/, in link order. Each is the ultralib 2.0I routine by its code
+// (cfc1/ctc1 $31, mfc0/mtc0 $12, the cache ops and strides, the TLB probe
+// and unmap loops, the thread queue walks), and sizes agree.
+__osException = 0x0029BFE0; // exceptasm.s: the general exception handler
+send_mesg = 0x0029C5D8; // exceptasm.s: posts an event's message (static there)
+__osEnqueueAndYield = 0x0029C6DC; // exceptasm.s: saves __osRunningThread's context
+__osEnqueueThread = 0x0029C878; // exceptasm.s: priority insert
+__osPopThread = 0x0029C8C8; // exceptasm.s
+__osDispatchThread = 0x0029C8E0; // exceptasm.s: restores a context, ends in eret
+__osCleanupThread = 0x0029CADC; // exceptasm.s: osDestroyThread(NULL); osCreateThread's return address
+__osGetFpcCsr = 0x0029DFD0; // cfc1 $2, $31
+__osGetSR = 0x0029DFE0; // mfc0 $2, $12
+__osDisableInt = 0x0029DFF0; // clears SR.IE, returns the old bit
+__osRestoreInt = 0x0029E010; // ors its argument into SR
+osInvalDCache = 0x0029E030; // cache 0x11/0x15, 16-byte lines
+osInvalICache = 0x0029E0D0; // cache 0x10, 32-byte lines
+__osProbeTLB = 0x0029E140; // tlbp on EntryHi, physical address or -1
+__osSetFpcCsr = 0x0029E220; // cfc1/ctc1 $31
+osSetIntMask = 0x0029E230; // SR and MI_INTR_MASK from __osRcpImTable
+__osSetSR = 0x0029E2E0; // mtc0 $4, $12
+__osUnmapTLBAll = 0x0029E2F0; // invalidates TLB entries 30 down to 0
+osWritebackDCache = 0x0029E340; // cache 0x19, 16-byte lines
+osWritebackDCacheAll = 0x0029E3B0; // the whole 8 KB data cache
+
+// leointerrupt.c (64DD), matched C after Rage Wars' decomp of the same file.
+__osLeoInterrupt = 0x0029CAF0; // ultralib 2.0I src/io/leointerrupt.c
+__osLeoAbnormalResume = 0x0029D000; // ultralib 2.0I src/io/leointerrupt.c
+
 // The HUD's text (COnScreen, one global at 0x801100F0). LibTEngine names
 // these with their signatures, from another game's build; found here by
 // what they do to that global.

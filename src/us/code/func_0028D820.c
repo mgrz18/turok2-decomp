@@ -73,7 +73,7 @@ extern u8 D_3CAE0[];                /* its size */
 extern char D_800D1CD8[];           /* the cartridge reader */
 
 u32 func_00266B80(void);            /* osGetMemSize */
-void func_0029E2F0(void);           /* osUnmapTLBAll */
+void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
 void func_0028E9E0(PageChain *chain, PageSlot *slot);
 void func_0029B030(OSMesgQueue *queue, void **msg, s32 count);
 s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
@@ -106,7 +106,7 @@ void func_0028D820(void) {
     fill(&D_801206A0, 0, sizeof(Pager));
     fill(D_801206A0.lookup, 0xFF, sizeof(D_801206A0.lookup));
     fill(D_801206A0.slots, 0xFF, sizeof(D_801206A0.slots));
-    func_0029E2F0();
+    __osUnmapTLBAll();
     for (i = 0; i < 24; i++) {
         D_801206A0.entries[i].id = 0xFFFF;
         D_801206A0.entries[i].team = 0xFF;

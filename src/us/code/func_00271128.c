@@ -51,8 +51,8 @@ typedef struct OSMesgQueue_s {
                s32 msgCount;
                OSMesg *msg;
 } OSMesgQueue;
-u32 func_0029DFF0(void);
-void func_0029E010(u32 mask);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 typedef struct Vec3f {
@@ -229,22 +229,22 @@ struct SndMgr {
 };
 static __inline__ void SndMgr_Lock(SndMgr *m) {
     SndLock *l = &m->lock;
-    u32 mask = func_0029DFF0();
+    u32 mask = __osDisableInt();
     if (++l->count != 1) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osRecvMesg(&l->q, 0, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
 }
 static __inline__ void SndMgr_Unlock(SndMgr *m) {
     SndLock *l = &m->lock;
-    u32 mask = func_0029DFF0();
+    u32 mask = __osDisableInt();
     if (--l->count != 0) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osSendMesg(&l->q, 0, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
 }
 void *func_002017D4(void *node, s32 idx);

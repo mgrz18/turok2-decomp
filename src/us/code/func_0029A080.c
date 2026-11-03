@@ -7,9 +7,9 @@ extern s32 func_0029A080(s32, s32);
 extern int __osSiDeviceBusy();
 extern void func_0029B020(void *arg0, void *arg1, s32 arg2);
 extern int __osSiDeviceBusy(void);
-extern void func_0029E340(s32 arg0, s32 arg1);
+extern void osWritebackDCache(s32 arg0, s32 arg1);
 extern s32 func_0029BF80(s32);
-extern void func_0029E030(s32 arg0, s32 arg1);
+extern void osInvalDCache(s32 arg0, s32 arg1);
 extern s32 D_800AA890;
 extern s32 D_800AA894;
 s32 func_0029A080(s32 arg0, s32 arg1) {
@@ -20,7 +20,7 @@ s32 func_0029A080(s32 arg0, s32 arg1) {
         return -1;
     }
     if (arg0 == 1) {
-        func_0029E340(arg1, 0x40);
+        osWritebackDCache(arg1, 0x40);
     }
     (*(volatile u32 *)(0xA4800000U) = (func_0029BF80(arg1)));
     if (arg0 == 0) {
@@ -29,7 +29,7 @@ s32 func_0029A080(s32 arg0, s32 arg1) {
         (*(volatile u32 *)(0xA4800010U) = (0x1FC007C0U));
     }
     if (arg0 == 0) {
-        func_0029E030(arg1, 0x40);
+        osInvalDCache(arg1, 0x40);
     }
     return 0;
 }
