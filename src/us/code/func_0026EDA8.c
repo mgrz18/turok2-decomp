@@ -5,13 +5,13 @@
 
 extern s32 CList__AddTail(IntrusiveList *list, void *node);
 void func_0026EDA8(void *arg0) {
-    extern void func_0029E010(s32 arg0);
-    extern s32 func_0029DFF0(void);
+    extern void __osRestoreInt(s32 arg0);
+    extern s32 __osDisableInt(void);
     extern void CList__Remove(void *, s32);
     void *node;
     void *next;
     s32 saved;
-    saved = func_0029DFF0();
+    saved = __osDisableInt();
     node = ((PoolRecAt28V1 *)arg0)->active.head;
     if (node != 0) {
         do {
@@ -22,5 +22,5 @@ void func_0026EDA8(void *arg0) {
         } while (node != 0);
     }
     ((PoolRecAt28V1 *)arg0)->baseLevel = 0;
-    func_0029E010(saved);
+    __osRestoreInt(saved);
 }

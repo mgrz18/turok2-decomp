@@ -7,7 +7,7 @@ extern int D_800B2674;
 extern CacheEntry *D_800F279C;
 extern void *D_800F2840;
 extern void *func_0029E460(void *destination, const void *source, int count);
-extern void func_0029E340(void *, s32);
+extern void osWritebackDCache(void *, s32);
 extern s32 func_002912A0(s32, s32, void *, s32, s32);
 u32 func_0026FFA0(void *block, s32 size) {
     extern u32 func_0029BF80(void *);
@@ -20,7 +20,7 @@ u32 func_0026FFA0(void *block, s32 size) {
             if (entry->size != size) {
                 entry->size = size;
                 func_0029E460(entry->data, block, size);
-                func_0029E340(entry->data, size);
+                osWritebackDCache(entry->data, size);
             }
             return func_0029BF80(entry->data);
         }

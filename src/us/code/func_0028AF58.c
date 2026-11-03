@@ -4,15 +4,15 @@
 #include "rw/abu_types.h"
 
 extern void func_0028AF58(struct OSSched *arg0, void *arg1);
-s32 func_0029E230(s32);
-extern s32 func_0029E230(s32);
+s32 osSetIntMask(s32);
+extern s32 osSetIntMask(s32);
 void func_0028AF58(OSSched *arg0, void *arg1) {
     s32 saved;
     OSScClientWork *cur;
     OSScClientWork *prev;
     prev = 0;
     cur = arg0->clientList;
-    saved = func_0029E230(1);
+    saved = osSetIntMask(1);
     while (cur != 0) {
         if (cur == arg1) {
             if (prev != 0) {
@@ -25,5 +25,5 @@ void func_0028AF58(OSSched *arg0, void *arg1) {
         prev = cur;
         cur = cur->next;
     }
-    func_0029E230(saved);
+    osSetIntMask(saved);
 }

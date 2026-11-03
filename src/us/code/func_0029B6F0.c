@@ -27,24 +27,24 @@ typedef struct {
 #define OS_STATE_WAITING 8
 
 extern OSThread *D_800B8920; /* __osRunningThread */
-u32 func_0029DFF0(void);                    /* __osDisableInt */
-void func_0029E010(u32);                    /* __osRestoreInt */
-void func_0029C6DC(OSThread **);             /* __osEnqueueAndYield */
-OSThread *func_0029C8C8(OSThread **);       /* __osPopThread */
+u32 __osDisableInt(void);
+void __osRestoreInt(u32);
+void __osEnqueueAndYield(OSThread **);
+OSThread *__osPopThread(OSThread **);
 void func_0029BB10(OSThread *);             /* osStartThread */
 
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flags) {
     register u32 saveMask;
 
-    saveMask = func_0029DFF0();
+    saveMask = __osDisableInt();
 
     while (mq->validCount == 0) {
         if (flags == OS_MESG_NOBLOCK) {
-            func_0029E010(saveMask);
+            __osRestoreInt(saveMask);
             return -1;
         } else {
             D_800B8920->state = OS_STATE_WAITING;
-            func_0029C6DC(&mq->mtqueue);
+            __osEnqueueAndYield(&mq->mtqueue);
         }
     }
 
@@ -56,9 +56,9 @@ s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flags) {
     mq->validCount--;
 
     if (mq->fullqueue->next != 0) {
-        func_0029BB10(func_0029C8C8(&mq->fullqueue));
+        func_0029BB10(__osPopThread(&mq->fullqueue));
     }
 
-    func_0029E010(saveMask);
+    __osRestoreInt(saveMask);
     return 0;
 }

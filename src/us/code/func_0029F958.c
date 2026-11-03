@@ -6,7 +6,7 @@
 extern Acmd *func_0029F958(ALLoadFilter_func_802BE514_de *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p);
 extern s32 D_800B8A20;
 extern s32 func_002A122C();
-extern void func_0029E340(s32 buffer, s32 size);
+extern void osWritebackDCache(s32 buffer, s32 size);
 Acmd *func_0029F958(ALLoadFilter_func_802BE514_de *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;
@@ -32,7 +32,7 @@ Acmd *func_0029F958(ALLoadFilter_func_802BE514_de *filter, s16 *outp, s32 byteCo
                     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(op) & (0xFFFFFFFFU >> (32 - (24)))) << (0)); _a->words.w1 = (unsigned int)(byteCount << 1); };
                     return ptr;
                 }
-                func_0029E340(D_800B8A20, 0x200);
+                osWritebackDCache(D_800B8A20, 0x200);
                 f->sample = 0x100;
             }
             if (f->sample < byteCount) {

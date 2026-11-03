@@ -27,8 +27,8 @@ typedef struct {
     /* 0x28 */ f32 base;
 } EmitterList;
 
-extern s32 func_0029DFF0(void);         /* disable interrupts */
-extern void func_0029E010(s32 mask);    /* restore interrupts */
+extern s32 __osDisableInt(void);         /* disable interrupts */
+extern void __osRestoreInt(s32 mask);    /* restore interrupts */
 extern s32 func_0027BC34(void);
 extern s32 Cinema_PathPlaying(void);
 extern f32 func_00298470(f32);          /* sqrtf */
@@ -52,7 +52,7 @@ f32 func_0026E760(EmitterList *list, Vec3f pos) {
     f32 a;
 
     total = list->base;
-    mask = func_0029DFF0();
+    mask = __osDisableInt();
     if (func_0027BC34() || Cinema_PathPlaying()) {
         total = 0.0f;
     } else {
@@ -71,6 +71,6 @@ f32 func_0026E760(EmitterList *list, Vec3f pos) {
             total += falloff * a * func_0026EF30(e->curveB);
         }
     }
-    func_0029E010(mask);
+    __osRestoreInt(mask);
     return MAX(MIN(total, 1.0f), 0.0f);
 }

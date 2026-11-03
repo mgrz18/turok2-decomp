@@ -30,8 +30,8 @@ typedef struct {
 extern __OSEventState D_801229E0; /* __osEventStateTab[OS_EVENT_PI] */
 extern OSThread *D_800B8918;      /* __osRunQueue */
 
-extern void func_0029C878(OSThread **queue, OSThread *thread); /* __osEnqueueThread */
-extern OSThread *func_0029C8C8(OSThread **queue);              /* __osPopThread */
+extern void __osEnqueueThread(OSThread **queue, OSThread *thread);
+extern OSThread *__osPopThread(OSThread **queue);
 
 void __osLeoResume(void) {
     __OSEventState *es = &D_801229E0;
@@ -47,6 +47,6 @@ void __osLeoResume(void) {
     mq->validCount++;
 
     if (mq->mtqueue->next != NULL) {
-        func_0029C878(&D_800B8918, func_0029C8C8(&mq->mtqueue));
+        __osEnqueueThread(&D_800B8918, __osPopThread(&mq->mtqueue));
     }
 }

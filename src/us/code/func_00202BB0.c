@@ -50,8 +50,8 @@ typedef struct OSMesgQueue_s {
                s32 msgCount;
                OSMesg *msg;
 } OSMesgQueue;
-u32 func_0029DFF0(void);
-void func_0029E010(u32 mask);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
 void func_0029BB10(OSThread *thread);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 void *func_00266C5C(void *s, int c, u32 n);
@@ -136,12 +136,12 @@ void func_00202BB0(s32 unused, s32 id) {
     u32 i1;
     s32 *t;
     CMutex__Construct(&D_800D7BE0.q11D0);
-    mask = func_0029DFF0();
+    mask = __osDisableInt();
     if (++D_800D8DCC != 1) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osRecvMesg(&D_800D7BE0.q11D0, 0, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
     D_800AB0C0 = 0x400;
     if (func_00266B80() > 0x400000) {
@@ -183,12 +183,12 @@ void func_00202BB0(s32 unused, s32 id) {
     }
     CHashTable__Construct(D_800AB0C0);
     func_0029B030(&D_800D7BE0.q870, D_800D7BE0.buf870, 0x40);
-    m2 = func_0029DFF0();
+    m2 = __osDisableInt();
     if (--D_800D8DCC != 0) {
-        func_0029E010(m2);
+        __osRestoreInt(m2);
         osSendMesg(&D_800D7BE0.q11D0, 0, 1);
     } else {
-        func_0029E010(m2);
+        __osRestoreInt(m2);
     }
     func_00266C5C(D_800D7BE0.stack, (u8)id, 0x800);
     func_0029B060(&D_800D7BE0.thread, id, D_002041E4, 0, D_800D7BE0.stack + 0x800, D_800B6E8C);

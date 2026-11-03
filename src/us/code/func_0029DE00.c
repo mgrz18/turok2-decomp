@@ -3,19 +3,19 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0029C8E0();
+extern void __osDispatchThread();
 extern Func802C1F10Node *D_800B891C;
 extern void *D_800B8920;
-extern u32 func_0029DFF0(void);
+extern u32 __osDisableInt(void);
 extern void __osDequeueThread(void *arg0, Func802C1F10Node *arg1);
-extern void func_0029E010(u32);
+extern void __osRestoreInt(u32);
 void func_0029DE00(Func802C1F10Node *arg0) {
     Func802C1F10Node *node;
     Func802C1F10Node *cur;
     Func802C1F10Node **head;
     s32 token;
     node = arg0;
-    token = func_0029DFF0();
+    token = __osDisableInt();
     if (node == 0) {
         node = D_800B8920;
     } else if (node->field10 != 1) {
@@ -35,7 +35,7 @@ void func_0029DE00(Func802C1F10Node *arg0) {
         }
     }
     if (node == D_800B8920) {
-        func_0029C8E0();
+        __osDispatchThread();
     }
-    func_0029E010(token);
+    __osRestoreInt(token);
 }

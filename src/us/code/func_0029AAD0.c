@@ -5,11 +5,11 @@
 
 extern void func_0029AAD0(s32 arg0);
 extern State_func_802BA700_de *D_800B7AC4;
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32 arg0);
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32 arg0);
 void func_0029AAD0(s32 arg0) {
     u32 token;
-    token = func_0029DFF0();
+    token = __osDisableInt();
     if (arg0 & 1) {
         D_800B7AC4->flags |= 8;
     }
@@ -36,5 +36,5 @@ void func_0029AAD0(s32 arg0) {
         D_800B7AC4->flags |= D_800B7AC4->inner->w1 & 0x300;
     }
     D_800B7AC4->status |= 8;
-    func_0029E010(token);
+    __osRestoreInt(token);
 }

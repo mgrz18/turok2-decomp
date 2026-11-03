@@ -54,16 +54,16 @@ struct OSMesgQueue;
 struct OSMesgQueue;
 typedef void *OSMesg;
 typedef u32 OSIntMask;
-extern void func_0029E010(OSIntMask mask);
+extern void __osRestoreInt(OSIntMask mask);
 extern void func_0029B030(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
-extern OSIntMask func_0029DFF0(void);
+extern OSIntMask __osDisableInt(void);
 struct OSMesgQueue;
 extern u64 D_80121910[];
 extern void D_0029A890(void *arg);
 extern OSIoMesgCode802BA23C D_80122970;
 extern OSIoMesgCode802BA23C D_80122950;
 extern OSDevMgr_func_802BA350_de D_800B7AD0;
-extern u32 func_0029DFF0(void);
+extern u32 __osDisableInt(void);
 extern void func_0029BDB8();
 extern void func_0029A5E0(void);
 extern void osCreateViManager(s32 pri);
@@ -81,7 +81,7 @@ extern s32 func_0029B150(OSThread *t);
 extern void func_0029B9B0(OSThread *t, s32 pri);
 extern void func_0029B060(OSThread *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
 extern void func_0029BB10(OSThread *t);
-extern u32 func_0029DFF0(void);
+extern u32 __osDisableInt(void);
 void osCreateViManager(s32 pri)
 {
     u32 savedMask;
@@ -106,7 +106,7 @@ void osCreateViManager(s32 pri)
         oldPri = myPri;
         func_0029B9B0(0, pri);
     }
-    savedMask = func_0029DFF0();
+    savedMask = __osDisableInt();
     D_800B7AD0.active = 1;
     D_800B7AD0.thread = &D_801216E0;
     D_800B7AD0.cmdQueue = &D_80122910;
@@ -117,7 +117,7 @@ void osCreateViManager(s32 pri)
     func_0029B060(&D_801216E0, 0, D_0029A890, &D_800B7AD0, D_80121910 + 0x1000 / sizeof(u64), pri);
     func_0029A5E0();
     func_0029BB10(&D_801216E0);
-    func_0029E010(savedMask);
+    __osRestoreInt(savedMask);
     if (oldPri != -1) {
         func_0029B9B0(0, oldPri);
     }

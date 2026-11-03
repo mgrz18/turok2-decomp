@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 
 extern int D_800B8908;
-extern void func_0029D000();
+extern void __osLeoAbnormalResume();
 extern void __osLeoResume();
 extern char *D_80123AD4;
-void func_0029D000(void) {
+void __osLeoAbnormalResume(void) {
     DiskTransferInfo *temp_a2;
     u32 status;
     status = *(volatile u32 *)0xA4600010;

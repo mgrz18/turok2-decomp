@@ -5,8 +5,8 @@
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern void func_002765F4(struct ChannelSet *arg0, s32 arg1);
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32);
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32);
 extern void osSendMesg(void *, s32, s32);
 extern void func_00273DD8(void *, s16);
 s32 func_002708C0(void *arg0, s32 id) {
@@ -23,15 +23,15 @@ s32 func_002708C0(void *arg0, s32 id) {
         return found;
     }
     temp_s0 = &((ContextRecAt2BC0 *)(arg0))->lock;
-    temp_a0 = func_0029DFF0();
+    temp_a0 = __osDisableInt();
     temp_v1 = ((MenuRules *)(temp_s0))->locked + 1;
     ((MenuRules *)(temp_s0))->locked = temp_v1;
     if (temp_v1 != 1) {
-        func_0029E010(temp_a0);
+        __osRestoreInt(temp_a0);
         osRecvMesg(temp_s0, 0, 1);
         var_a0 = &((ContextRecAt2BC0 *)(arg0))->view[0];
     } else {
-        func_0029E010(temp_a0);
+        __osRestoreInt(temp_a0);
         var_a0 = &((ContextRecAt2BC0 *)(arg0))->view[0];
     }
     func_002765F4(var_a0, id);
@@ -57,17 +57,17 @@ s32 func_002708C0(void *arg0, s32 id) {
         }
     }
     temp_s0 = &((ContextRecAt2BC0 *)(arg0))->lock;
-    temp_v0 = func_0029DFF0();
+    temp_v0 = __osDisableInt();
     temp_v1 = ((MenuRules *)(temp_s0))->locked - 1;
     ((MenuRules *)(temp_s0))->locked = temp_v1;
     if (temp_v1 != 0) {
-        func_0029E010(temp_v0);
+        __osRestoreInt(temp_v0);
         osSendMesg(temp_s0, 0, 1);
     } else {
-        func_0029E010(temp_v0);
+        __osRestoreInt(temp_v0);
     }
     return found;
 }
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32);
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32);
 extern void osSendMesg(void *, s32, s32);

@@ -380,8 +380,8 @@ struct Voice {
 };
 typedef void *OSMesg;
 typedef u32 OSIntMask;
-extern void func_0029E010(OSIntMask mask);
-extern OSIntMask func_0029DFF0(void);
+extern void __osRestoreInt(OSIntMask mask);
+extern OSIntMask __osDisableInt(void);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 struct GameplayCamera;
@@ -652,7 +652,7 @@ typedef struct MenuMatchGlobals {
 extern MenuMatchGlobals D_801198B0;
 extern void func_0027403C(void **arg0);
 extern void func_00275018(void *arg0);
-extern u32 func_0029DFF0(void);
+extern u32 __osDisableInt(void);
 extern void func_00276180(void *arg0);
 extern void func_002768D0(void *arg0);
 extern void func_00274B40(void *arg0);
@@ -670,26 +670,26 @@ s32 func_002712E8(void *arg0) {
     ((struct ContextRecAt2BC0 *)(object))->blue = (f32)bytes[1] * D_800A80D0;
     queue = object + 0x110;
     ((struct ContextRecAt2BC0 *)(object))->field2BB0 = bytes[-2];
-    mask = func_0029DFF0();
+    mask = __osDisableInt();
     count = ((MenuRules *)(queue))->locked + 1;
     ((MenuRules *)(queue))->locked = count;
     if (count != 1) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osRecvMesg(queue, 0, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
     func_0027403C(&((struct ContextRecAt2BC0 *)(object))->menu[0]);
     {
         char *queue2 = object + 0x110;
-        u32 mask2 = func_0029DFF0();
+        u32 mask2 = __osDisableInt();
         s32 count2 = ((MenuRules *)(queue2))->locked - 1;
         ((MenuRules *)(queue2))->locked = count2;
         if (count2 != 0) {
-            func_0029E010(mask2);
+            __osRestoreInt(mask2);
             osSendMesg(queue2, 0, 1);
         } else {
-            func_0029E010(mask2);
+            __osRestoreInt(mask2);
         }
     }
     func_00276180((char *)object + 0x138);
@@ -715,6 +715,6 @@ s32 func_002712E8(void *arg0) {
     }
     return ++((struct ContextRecAt2BC0 *)(object))->frame;
 }
-extern u32 func_0029DFF0(void);
-extern u32 func_0029DFF0(void);
-extern u32 func_0029DFF0(void);
+extern u32 __osDisableInt(void);
+extern u32 __osDisableInt(void);
+extern u32 __osDisableInt(void);

@@ -119,8 +119,8 @@ typedef struct ResourcePageJob {
 } ResourcePageJob;
 extern PagerState D_801206A0;
 extern char D_80121140[];
-extern void func_0029E030(u32, s32);
-extern void func_0029E0D0(u32, s32);
+extern void osInvalDCache(u32, s32);
+extern void osInvalICache(u32, s32);
 extern void func_0029BB10(void *);
 static __inline__ void writeLink(ResourcePageMapping **where, ResourcePageMapping *value) { *where = value; }
 void func_0028ED10(ResourcePageJob *req) {
@@ -137,8 +137,8 @@ void func_0028ED10(ResourcePageJob *req) {
             D_80121290 = link;
         }
         func_0028DBAC(req->page, req->mapping, req->thread->slot, req->slot);
-        func_0029E030(req->page << 12, 0x1000);
-        func_0029E0D0(req->page << 12, 0x1000);
+        osInvalDCache(req->page << 12, 0x1000);
+        osInvalICache(req->page << 12, 0x1000);
     } else {
         link = req->mapping;
         writeLink(&link->prev, 0);

@@ -41,8 +41,8 @@ struct Pool_func_80285B64_de {
 struct Pool_func_80285B64_de;
 typedef struct Pool_func_80285B64_de Pool_func_80285B64_de;
 extern char D_800F7078;
-extern s32 func_0029DFF0(void);
-extern void func_0029E010(s32 mask);
+extern s32 __osDisableInt(void);
+extern void __osRestoreInt(s32 mask);
 extern void CList__Remove(Pool_func_80285B64_de *pool, Node_func_80285B64_de *node);
 extern void CList__AddTail(Node_func_80285B64_de **list, Node_func_80285B64_de *node);
 extern s32 func_00225D94(void *table, s32 id);
@@ -65,13 +65,13 @@ static __inline__ void init(Node_func_80285B64_de *node, Clip *key, Vec3 positio
 Node_func_80285B64_de *func_0026EBDC(Pool_func_80285B64_de *pool, Clip *key, Vec3 position, f32 value0, f32 value1, Node_func_80285B64_de **owner) {
     s32 mask;
     Node_func_80285B64_de *node;
-    mask = func_0029DFF0();
+    mask = __osDisableInt();
     node = pool->free;
     if (node != 0) {
         CList__Remove(pool, node);
         CList__AddTail(&pool->active, node);
         init(node, key, position, value0, value1, owner);
     }
-    func_0029E010(mask);
+    __osRestoreInt(mask);
     return node;
 }

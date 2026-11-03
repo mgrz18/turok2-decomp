@@ -16,8 +16,8 @@ typedef s32 M2C_UNK32;
 typedef s64 M2C_UNK64;
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
-s32 func_0029DFF0(void);
-void func_0029E010(s32);
+s32 __osDisableInt(void);
+void __osRestoreInt(s32);
 s32 func_00271904(void *arg0, s32 arg1)
 {
   s32 temp_a0;
@@ -31,18 +31,18 @@ s32 func_00271904(void *arg0, s32 arg1)
   void *var_v1;
   temp_s0 = arg0 + 0x110;
   var_s1 = 0;
-  temp_a0 = func_0029DFF0();
+  temp_a0 = __osDisableInt();
   temp_v1 = (*((s32 *) (((s8 *) temp_s0) + 0x1C))) + 1;
   *((s32 *) (((s8 *) temp_s0) + 0x1C)) = temp_v1;
   if (temp_v1 != 1)
   {
-    func_0029E010(temp_a0);
+    __osRestoreInt(temp_a0);
     osRecvMesg((s32) temp_s0, 0, 1);
     var_a0 = 0;
   }
   else
   {
-    func_0029E010(temp_a0);
+    __osRestoreInt(temp_a0);
     var_a0 = 0;
   }
  do { var_v1 = arg0; } while (0);
@@ -57,23 +57,23 @@ s32 func_00271904(void *arg0, s32 arg1)
   }
   while (var_a0 < 0x11);
   temp_s0_2 = arg0 + 0x110;
-  temp_v0 = func_0029DFF0();
+  temp_v0 = __osDisableInt();
   temp_v1_2 = (*((s32 *) (((s8 *) temp_s0_2) + 0x1C))) - 1;
   *((s32 *) (((s8 *) temp_s0_2) + 0x1C)) = temp_v1_2;
   if (temp_v1_2 != 0)
   {
-    func_0029E010(temp_v0);
+    __osRestoreInt(temp_v0);
     osSendMesg((s32) temp_s0_2, 0, 1);
     return var_s1;
   }
   if (arg0)
   {
-    func_0029E010(temp_v0);
+    __osRestoreInt(temp_v0);
     return var_s1;
   }
   else
   {
-    func_0029E010(temp_v0);
+    __osRestoreInt(temp_v0);
     return var_s1;
   }
 }

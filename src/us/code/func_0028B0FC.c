@@ -11,7 +11,7 @@ extern s64 D_8011F168;
 extern s32 D_800B6E64;
 extern u64 D_8011F150;
 extern u64 D_8011F160;
-extern void func_0029E3B0();
+extern void osWritebackDCacheAll();
 extern u64 D_8011F150;
 extern f32 D_8011F158;
 extern u64 D_8011F160;
@@ -29,7 +29,7 @@ void func_0028B0FC(View_func_8028FA60_de *view, Scene_func_8028FA60_de *current,
     }
     if (current != 0) {
         if (current->mode == 2) {
-            func_0029E3B0();
+            osWritebackDCacheAll();
             D_8011F150 = func_0029B170();
         } else if (current->options & 0x20) {
             now = func_0029B170();

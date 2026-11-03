@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void func_00291270(unsigned char *source, unsigned char *destination, int count);
-extern s32 func_0029E230(s32);
+extern s32 osSetIntMask(s32);
 void func_00291034(ALEventQueue *evtq, ALEvent *evt, s32 delta)
 {
     extern void func_002933E0(ListLink *, ListLink *);
@@ -14,10 +14,10 @@ void func_00291034(ALEventQueue *evtq, ALEvent *evt, s32 delta)
     ListLink *node;
     s32 postAtEnd = 0;
     s32 mask;
-    mask = func_0029E230(1);
+    mask = osSetIntMask(1);
     item = (ALEventListItem *)evtq->freeList.next;
     if (!item) {
-        func_0029E230(mask);
+        osSetIntMask(mask);
         return;
     }
     func_002933B0((ListLink *)item);
@@ -43,5 +43,5 @@ void func_00291034(ALEventQueue *evtq, ALEvent *evt, s32 delta)
             delta -= nextItem->delta;
         }
     }
-    func_0029E230(mask);
+    osSetIntMask(mask);
 }

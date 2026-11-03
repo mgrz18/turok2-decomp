@@ -94,8 +94,8 @@ extern u8 D_8011AAED[];     /* volume settings (bytes from -2) */
 extern s32 D_80130A40;      /* audio heap base */
 extern s32 D_80130A7C;      /* audio heap size */
 
-extern s32 func_0029DFF0(void);         /* disable interrupts */
-extern void func_0029E010(s32 mask);    /* restore interrupts */
+extern s32 __osDisableInt(void);         /* disable interrupts */
+extern void __osRestoreInt(s32 mask);    /* restore interrupts */
 extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
 extern void CMutex__Construct(SndLock *lock);
@@ -111,25 +111,25 @@ extern void func_00276D98(void *fx, SndMgr *m);
 
 static __inline__ void SndMgr_Lock(SndMgr *m) {
     SndLock *l = &m->lock;
-    s32 mask = func_0029DFF0();
+    s32 mask = __osDisableInt();
 
     if (++l->count != 1) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osRecvMesg(l, NULL, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
 }
 
 static __inline__ void SndMgr_Unlock(SndMgr *m) {
     SndLock *l = &m->lock;
-    s32 mask = func_0029DFF0();
+    s32 mask = __osDisableInt();
 
     if (--l->count != 0) {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
         osSendMesg(l, NULL, 1);
     } else {
-        func_0029E010(mask);
+        __osRestoreInt(mask);
     }
 }
 

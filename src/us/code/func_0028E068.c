@@ -87,8 +87,8 @@ extern void func_0028DEFC(PageMapping *mapping);   /* releases its TLB slot */
 extern Region *func_0028EA40(u16 page);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **msg, s32 block);
 extern s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
-extern void func_0029E3B0(void);
-extern void func_0029E230(s32);
+extern void osWritebackDCacheAll(void);
+extern void osSetIntMask(s32);
 extern void func_0028CF80(void);
 extern void func_0029BB10(void *thread);
 
@@ -193,8 +193,8 @@ void func_0028E068(void) {
         do {
         } while ((f32)(((func_0029B170() - start) * 64) / 3000) * 0.000001f < 2.0f);
     }
-    func_0029E3B0();
-    func_0029E230(1);
+    osWritebackDCacheAll();
+    osSetIntMask(1);
     func_0028CF80();
     ((void (*)(void))0x80000400)();
     D_800B7658 = -1;

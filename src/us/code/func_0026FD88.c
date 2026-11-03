@@ -5,7 +5,7 @@ s32 func_002949A4(s32, s32, s32, s32);
 s32 func_002985C0(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 func_0029BF80(s32);
-void func_0029E3B0(void);
+void osWritebackDCacheAll(void);
 
 M2C_UNK func_0026FEA0();                            /* extern */
 M2C_UNK func_0027592C();                            /* extern */
@@ -37,7 +37,7 @@ s32 func_0026FD88(void *arg0) {
     temp_v0 = D_800B2668 * 4;
     M2C_FIELD(arg0, s32 *, 0x48) = (s32) *(((__typeof__(&D_800F27C0))((s8 *)&D_800F27C0 + temp_v0)));
     M2C_FIELD(arg0, s32 *, 0x4C) = (s32) (((s32) (temp_s0_2 - *(((__typeof__(&D_800F27C0))((s8 *)&D_800F27C0 + temp_v0)))) >> 3) * 8);
-    func_0029E3B0();
+    osWritebackDCacheAll();
     func_0028B3E8(&D_8011AD90, arg0 + 8);
     D_800B2668 ^= 1;
     func_0027592C();

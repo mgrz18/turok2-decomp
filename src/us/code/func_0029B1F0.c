@@ -14,12 +14,12 @@ extern Quad_func_802A1BE0_de D_0029BFE0[];
 extern u64 D_80122990;
 extern s32 D_800B8900;
 extern unsigned char D_8000031C[];
-extern void func_0029E2E0(unsigned int sr);
-extern unsigned int func_0029E220(unsigned int csr);
-extern unsigned int func_0029DFE0();
+extern void __osSetSR(unsigned int sr);
+extern unsigned int __osSetFpcCsr(unsigned int csr);
+extern unsigned int __osGetSR();
 extern s32 D_80000300;
-extern void func_0029E340(void *addr, s32 size);
-extern void func_0029E0D0(void *addr, s32 size);
+extern void osWritebackDCache(void *addr, s32 size);
+extern void osInvalICache(void *addr, s32 size);
 extern void *func_00266C5C(void *dst, s32 value, u32 size);
 void func_0029B1F0(void)
 {
@@ -27,10 +27,10 @@ void func_0029B1F0(void)
     u32 clock = 0;
     u64 *rate;
     D_80122998 = 1;
-    func_0029E2E0(
-func_0029DFE0
+    __osSetSR(
+__osGetSR
 () | 0x20000000);
-    func_0029E220(0x01000800);
+    __osSetFpcCsr(0x01000800);
     while (func_0029B4B0(0x1FC007FC, &pifdata)) {
         ;
     }
@@ -41,8 +41,8 @@ func_0029DFE0
     *(Quad_func_802A1BE0_de *)0x80000080 = *D_0029BFE0;
     *(Quad_func_802A1BE0_de *)0x80000100 = *D_0029BFE0;
     *(Quad_func_802A1BE0_de *)0x80000180 = *D_0029BFE0;
-    func_0029E340((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(Quad_func_802A1BE0_de));
-    func_0029E0D0((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(Quad_func_802A1BE0_de));
+    osWritebackDCache((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(Quad_func_802A1BE0_de));
+    osInvalICache((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(Quad_func_802A1BE0_de));
     osMapTLBRdb();
     func_0029B410(4, &clock);
     clock &= ~0xf;

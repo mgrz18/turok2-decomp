@@ -1,4 +1,4 @@
-/* WRONG CUT: splat cut func_0029C8E0 (0x720 bytes) = __osDispatchThread (hand-written asm, exceptasm.s, 0x29C8E0-0x29CADC)
+/* WRONG CUT: splat cut __osDispatchThread (0x720 bytes) = __osDispatchThread (hand-written asm, exceptasm.s, 0x29C8E0-0x29CADC)
  * + __osCleanupThread (0x29CADC) + 3 junk words; the C function __osLeoInterrupt really starts at 0x29CAF0 (16-aligned, size 0x510). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/libultra/__osLeoInterrupt.c, __osLeoInterrupt, with Turok 2's layouts. */
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
@@ -85,11 +85,11 @@ extern OSPiHandle *__osDiskHandle;
 
 extern u32 D_800B8908;          /* __OSGlobalIntMask */
 extern OSPiHandle *D_80123AD4;  /* __osDiskHandle */
-void func_0029D000(void);       /* __osLeoAbnormalResume */
+void __osLeoAbnormalResume(void);
 void __osLeoResume(void);
 s32 func_0029D190(OSPiHandle *pihandle, s32 dir, u32 cart_addr, void *dram_addr, u32 size); /* osEPiRawStartDma */
 
-s32 func_0029CAF0(void) {
+s32 __osLeoInterrupt(void) {
     u32 stat = 0;
     volatile u32 pi_stat;
     u32 bm_stat;
@@ -131,7 +131,7 @@ s32 func_0029CAF0(void) {
         if ((stat & LEO_STATUS_DATA_REQUEST) == 0) {
             if (info->sectorNum + 1 != info->transferMode * 85) {
                 blockInfo->errStatus = LEO_ERROR_24;
-                func_0029D000();
+                __osLeoAbnormalResume();
                 return 1;
             }
 
@@ -150,13 +150,13 @@ s32 func_0029CAF0(void) {
         if (info->transferMode == LEO_SECTOR_MODE) {
             if (info->sectorNum > (s32)blockInfo->C1ErrNum + 17) {
                 blockInfo->errStatus = LEO_ERROR_GOOD;
-                func_0029D000();
+                __osLeoAbnormalResume();
                 return 1;
             }
 
             if ((stat & LEO_STATUS_DATA_REQUEST) == 0) {
                 blockInfo->errStatus = LEO_ERROR_23;
-                func_0029D000();
+                __osLeoAbnormalResume();
                 return 1;
             }
         } else {
@@ -168,7 +168,7 @@ s32 func_0029CAF0(void) {
             if (blockInfo->C1ErrNum > 3) {
                 if (info->transferMode != LEO_SECTOR_MODE || info->sectorNum > 0x52) {
                     blockInfo->errStatus = LEO_ERROR_23;
-                    func_0029D000();
+                    __osLeoAbnormalResume();
                     return 1;
                 }
             } else {
@@ -182,7 +182,7 @@ s32 func_0029CAF0(void) {
         if (stat & LEO_STATUS_C2_TRANSFER) {
             if (info->sectorNum + 1 != 88) {
                 blockInfo->errStatus = LEO_ERROR_24;
-                func_0029D000();
+                __osLeoAbnormalResume();
             }
 
             if (info->transferMode == LEO_TRACK_MODE && info->blockNum == 0) {
@@ -207,7 +207,7 @@ s32 func_0029CAF0(void) {
             if (bptr->C1ErrNum == 0) {
                 if (((u32 *)bptr->C2Addr)[0] | ((u32 *)bptr->C2Addr)[1] | ((u32 *)bptr->C2Addr)[2] | ((u32 *)bptr->C2Addr)[3]) {
                     bptr->errStatus = LEO_ERROR_24;
-                    func_0029D000();
+                    __osLeoAbnormalResume();
                     return 1;
                 }
             }
@@ -219,7 +219,7 @@ s32 func_0029CAF0(void) {
         if (stat & LEO_STATUS_DATA_REQUEST) {
             if (info->sectorNum > 0x54) {
                 blockInfo->errStatus = LEO_ERROR_24;
-                func_0029D000();
+                __osLeoAbnormalResume();
                 return 1;
             }
 
@@ -228,14 +228,14 @@ s32 func_0029CAF0(void) {
             return 1;
         } else if (info->sectorNum <= 0x54) {
             blockInfo->errStatus = LEO_ERROR_24;
-            func_0029D000();
+            __osLeoAbnormalResume();
             return 1;
         }
 
         return 1;
     } else {
         blockInfo->errStatus = LEO_ERROR_4;
-        func_0029D000();
+        __osLeoAbnormalResume();
         return 1;
     }
 }

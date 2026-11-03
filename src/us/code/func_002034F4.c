@@ -6,8 +6,8 @@
 extern int D_800D8DCC;
 extern void *func_002034F4(s32 arg0, s32 arg1);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern u32 func_0029DFF0(void);
-extern void func_0029E010(u32);
+extern u32 __osDisableInt(void);
+extern void __osRestoreInt(u32);
 extern struct Shape_func_8021A2D4_de_2 D_800D81C0;
 extern struct Shape_func_8021A2D4_de_2 D_800D81C4;
 extern void func_00200818(void *, s32);
@@ -24,14 +24,14 @@ void *func_002034F4(s32 arg0, s32 arg1) {
     void *value;
     void **out;
     struct IntrusiveList *object;
-    temp_a0 = func_0029DFF0();
+    temp_a0 = __osDisableInt();
     temp_v1 = D_800D8DCC + 1;
     D_800D8DCC = temp_v1;
     if (temp_v1 != 1) {
-        func_0029E010(temp_a0);
+        __osRestoreInt(temp_a0);
         osRecvMesg(&D_800D8DB0, 0, 1);
     } else {
-        func_0029E010(temp_a0);
+        __osRestoreInt(temp_a0);
     }
     out = &value;
     node = (HashNode *)((s32)D_800D81C4.field_0 +
@@ -67,14 +67,14 @@ found:
         object->count = D_800D8DF0.field_0;
         func_00200818(&D_800D81E0, object);
     }
-    temp_v0 = func_0029DFF0();
+    temp_v0 = __osDisableInt();
     temp_v1_2 = D_800D8DCC - 1;
     D_800D8DCC = temp_v1_2;
     if (temp_v1_2 != 0) {
-        func_0029E010(temp_v0);
+        __osRestoreInt(temp_v0);
         osSendMesg(&D_800D8DB0, 0, 1);
     } else {
-        func_0029E010(temp_v0);
+        __osRestoreInt(temp_v0);
     }
     return object;
 }
