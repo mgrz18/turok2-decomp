@@ -78,3 +78,7 @@ func_0045E01C 0x800C17F0  # W batch, jtbl
 func_0045646C 0x800C13E0  # copy of func_0041D51C (W): its pool is the original's
 func_004688D0 0x800A97F0  # copy of func_0042F9B0 (W), in the engine .rodata
 func_0044C230 0x800C0AF0  # copy of the file from func_00413230 (to 0x417484)
+func_00452314 0x800C1008  # X batch: jtbl of func_004193B4
+func_00453E58 0x800C1280  # X batch: jtbl of func_0041AEF0
+func_0045E808 0x800C1870  # X batch: jtbl of func_004258E8
+func_00468AC4 0x800A9A18  # X batch: 1.0f of func_0042FBA4, in the engine .rodata
