@@ -59,8 +59,8 @@ options:
 #   0x107000 - 0x13B5F0 : SN64 LNK source-debug section (paths, line info)
 #   0x13B5F0 - 0x17A7A8 : virtual_text_0 (VM module 1 .text)
 #   0x17A7A8 - 0x186C14 : virtual_rodata_0
-#   0x186C14 - 0x1B3400 : virtual_text_1 (VM module 2 .text, linked at 0x403C14)
-#   0x1B3400 - 0x1BFA00 : virtual_rodata_1
+#   0x186C14 - 0x1B341C : virtual_text_1 (VM module 2 .text, linked at 0x403C14)
+#   0x1B341C - 0x1BFA00 : virtual_rodata_1
 #   0x1BFA00 - 0x1DEE00 : virtual_text_2 (VM module 3 .text)
 #   0x1DEE00 - 0x20E334 : virtual_rodata_2 / .sdata
 #   0x20E334 - 0x20F178 : assets_index (913 x uint32 offset table)
@@ -5396,8 +5396,8 @@ segments:
       - [0x1B31C0, c, code/func_004691C0]
       - [0x1B3250, c, code/func_00469250]
       - [0x1B32CC, c, code/func_004692CC]
-      - [0x1B3374, asm]
-      - [0x1B3400, data, virtual_rodata_1]
+      - [0x1B3374, c, code/func_00469374]
+      - [0x1B341C, data, virtual_rodata_1]   # func_00469374 runs to 0x46941C; what follows still looks like code
 
   # Not a third VM module: a second, differently-linked copy of the engine's
   # top 128 KB. 59.6% of its words are byte-identical to ROM 0x84D40 onwards
