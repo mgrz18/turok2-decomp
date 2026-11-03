@@ -5350,6 +5350,8 @@ segments:
       - [0x1ADB2C, c, code/func_00463B2C]
       - [0x1AE304, c, code/func_00464304]
       - [0x1AE5D0, asm]
+      - [0x1AE960, c, code/func_00464960]
+      - [0x1AEE68, asm]
       - [0x1AF2DC, c, code/func_004652DC]
       - [0x1AF338, c, code/func_00465338]
       - [0x1AF38C, c, code/func_0046538C]
