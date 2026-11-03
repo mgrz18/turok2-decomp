@@ -4675,10 +4675,11 @@ segments:
     # the end of the first one's .rodata (descriptor records with pointers
     # into it, which the engine passes as 0x43C05C ... 0x43CAB4).
     subsegments:
-      - [0x186C14, asm,  virtual_text_1]
+      - [0x186C14, c, code/func_0043CC14]
       - [0x186CF8, c, code/func_0043CCF8]
       - [0x186F3C, c, code/func_0043CF3C]
       - [0x187450, asm]
+      - [0x18757C, c, code/func_0043D57C]
       - [0x187C44, c, code/func_0043DC44]
       - [0x187FE0, asm]
       - [0x188AC8, c, code/func_0043EAC8]

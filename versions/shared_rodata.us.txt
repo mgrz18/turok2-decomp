@@ -96,3 +96,5 @@ func_00442784 0x800C05EC  # copy of func_00409784 (X), which now owns the pool
 func_00442A64 0x800C05F8  # twin of func_00409A64 (X), which now owns the pool
 func_004465C4 0x800C08F4  # copy of func_0040D5C4 (X), which now owns the pool
 func_0043EAC8 0x800C0478  # twin of func_00405AC8 (X), which now owns the pool
+func_0043D57C 0x800C03B8  # twin of func_0040457C (FAKEMATCH, as there)
+func_0043CC14 0x800C0388  # twin of func_00403C14
