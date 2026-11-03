@@ -1,4 +1,4 @@
-/* NON-MATCHING: 13 of 624 words differ: register allocation only, in the inlined depth scale (ROM keeps the depth argument in $f5 and the clamped factor in $f0; this build uses $f1 and $f2). */
+/* NON-MATCHING: 13 of 624 words differ: register allocation only, in the inlined depth scale: local-alloc gives distanceRange's min/max $f0/$f1, which the ROM leaves free (ROM keeps the depth argument in $f5 and the clamped factor in $f0; this build uses $f1 and $f2). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_4.CPP, Particle_BuildMatrix, with Turok 2's layouts. */
 #include "common.h"
 

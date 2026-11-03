@@ -1,4 +1,4 @@
-/* NON-MATCHING: 35 of 219 words differ: only the projectile loop of usesProjectile: cse (-fcse-follow-jumps) threads the found path (return 1) past the caller test and moves that block, which also costs the ROM constant 1 kept in $a2 for the anim == 1 test. Everything else matches (anim if-chain with a shared CHARGE block, case 3 tests type == 2, the 6.0f clamp as a ternary, D_800ACE10/D_800ACE14 as two scalars). */
+/* NON-MATCHING: 35 of 219 words differ: only the projectile loop of usesProjectile: loop.c (find_and_verify_loops) moves the found block (return 1) out of the loop, not cse, which also costs the ROM constant 1 kept in $a2 for the anim == 1 test. Everything else matches (anim if-chain with a shared CHARGE block, case 3 tests type == 2, the 6.0f clamp as a ternary, D_800ACE10/D_800ACE14 as two scalars). */
 #include "common.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
