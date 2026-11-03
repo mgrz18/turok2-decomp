@@ -238,7 +238,7 @@ stray 0x0041D04C 0x0041D050 // lb $3,406($16)
 stray 0x0041D884 0x0041D890 // bne $3,$2,41d9c8; addiu $16,$29,48; addiu $4,$29,72
 stray 0x00424A5C 0x00424A60 // ldc1 $f20,32($29)
 stray 0x00425754 0x00425760 // lui $2,0x800b; lw $2,31724($2); addiu $3,$6,8
-stray 0x00427178 0x00427180 // sw $16,24($2); sw $17,20($2)
+stray 0x00427174 0x00427180 // nop; sw $16,24($2); sw $17,20($2)
 stray 0x00427C1C 0x00427C20 // lw $3,-8460($1)
 stray 0x00427E5C 0x00427E60 // beqzl $2,427ea4
 stray 0x00428CEC 0x00428CF0 // jal 268b48
@@ -255,8 +255,8 @@ stray 0x004304FC 0x00430500 // swc1 $f0,2604($16)
 stray 0x00440F14 0x00440F20 // li $2,1; sh $2,2568($18); lw $2,2640($18)
 stray 0x00441FF8 0x00442000 // mov.s $f20,$f0; lui $1,0x800a
 stray 0x0044584C 0x00445850 // lw $2,28($16)
-stray 0x0044823C 0x00448240 // lw $2,2660($4)
-stray 0x0044C22C 0x0044C230 // lui $7,0x4270
+stray 0x00448238 0x00448240 // nop; lw $2,2660($4)
+stray 0x0044C228 0x0044C230 // nop; lui $7,0x4270
 stray 0x00450484 0x00450490 // lb $2,199($5); beqz $2,450498; nop
 stray 0x00453308 0x00453310 // mtc1 $0,$f1; lui $1,0x800b
 stray 0x004558B4 0x004558C0 // mfc1 $6,$f0; jal 210318; move $4,$18
@@ -271,7 +271,7 @@ stray 0x00462044 0x00462050 // lw $20,4($19); beqz $20,4620f0; li $17,-1
 stray 0x00462374 0x00462380 // j 271784; nop; jal 29ecd0
 stray 0x00462E38 0x00462E40 // beq $5,$2,462e84; addiu $17,$18,96
 stray 0x00465EA4 0x00465EB0 // sw $31,20($29); lw $2,28($16); andi $2,$2,0x2
-stray 0x0046603C 0x00466040 // li $2,2
+stray 0x00466034 0x00466040 // jr ra; addiu sp,32; li $2,2
 stray 0x004660D8 0x004660E0 // li $2,-1; jal 291bb0
 stray 0x00466134 0x00466140 // jal 2017d4; ori $5,$16,0x1; lw $3,0($17)
 stray 0x00466328 0x00466330 // jal 291b00; move $6,$0
@@ -312,7 +312,7 @@ func 0x00418294 0xEC // cut in a call's argument setup (func_004182E8)
 func 0x00418750 0xBC // its last case and return were func_004187FC
 func 0x00418DA0 0xBC // its last case and return were func_00418E4C
 func 0x00419260 0xBC // its last case and return were func_0041930C
-stray 0x0041A3AC 0x0041A3B0 // a bc1f word never executed; the function starts at 0x41A3B0
+stray 0x0041A3A8 0x0041A3B0 // a nop and a bc1f word never executed; the function starts at 0x41A3B0
 func 0x0041B148 0x80 // its switch cases (jtbl_800C12E0) were cut as functions
 func 0x0041B8CC 0x6C // cut at branch targets (func_0041B8EC, func_0041B920)
 func 0x0041B954 0x6C // cut at a branch target (func_0041B9B0)
@@ -340,6 +340,7 @@ func 0x00426F5C 0x58
 func 0x00426FB4 0x48
 func 0x00427524 0x1CC
 func 0x004279AC 0x1A0
+stray 0x00427F78 0x00427F80 // addiu sp,96; addiu sp,-32: junk before the 16-aligned func_00427F80
 func 0x00427F80 0xD8
 func 0x00428058 0x8C
 func 0x00429AA4 0x2E0

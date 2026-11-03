@@ -1204,3 +1204,5 @@ func_0042CB04 = 0x0042CB04;
 func_0042CC24 = 0x0042CC24;
 /* func_004088B0 (X): no asm names it any more. */
 D_8012FB5C = 0x8012FB5C;
+/* A second-module pointer to func_004533AC by its link address (virtual_rodata_1). */
+func_0041A3AC = 0x0041A3AC;

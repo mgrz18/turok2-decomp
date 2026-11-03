@@ -16,7 +16,7 @@ typedef struct {
 
 extern u8 D_80130E20[];
 
-void func_00427F78(s32 channel);
+void func_00460F78(s32 channel);
 s32 func_0029A080(s32 enable, void *timer);
 s32 osRecvMesg(void *mq, void *msg, s32 flag);
 void func_00428004(s32 channel, PakStatus *status);
@@ -26,7 +26,7 @@ s32 func_00460EA0(void *mq, s32 channel) {
     void *msg;
     s32 ret;
 
-    func_00427F78(channel);
+    func_00460F78(channel);
     func_0029A080(1, D_80130E20);
     osRecvMesg(mq, &msg, 1);
     ret = func_0029A080(0, D_80130E20);
