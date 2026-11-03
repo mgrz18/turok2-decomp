@@ -95,3 +95,4 @@ func_00442500 0x800C05D4  # copy of func_00409500 (X), which now owns the pool
 func_00442784 0x800C05EC  # copy of func_00409784 (X), which now owns the pool
 func_00442A64 0x800C05F8  # twin of func_00409A64 (X), which now owns the pool
 func_004465C4 0x800C08F4  # copy of func_0040D5C4 (X), which now owns the pool
+func_0043EAC8 0x800C0478  # twin of func_00405AC8 (X), which now owns the pool
