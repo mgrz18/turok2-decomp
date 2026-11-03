@@ -1206,3 +1206,8 @@ func_0042CC24 = 0x0042CC24;
 D_8012FB5C = 0x8012FB5C;
 /* A second-module pointer to func_004533AC by its link address (virtual_rodata_1). */
 func_0041A3AC = 0x0041A3AC;
+/* func_00467E4C (N) passes the second module's func_00467C10, func_0046867C and
+ * func_004686E8 by their link addresses. */
+func_0042EC10 = 0x0042EC10;
+func_0042F67C = 0x0042F67C;
+func_0042F6E8 = 0x0042F6E8;
