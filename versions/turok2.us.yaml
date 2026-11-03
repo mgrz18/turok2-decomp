@@ -386,7 +386,7 @@ segments:
       - [0x15B14, c, code/func_00214F14]
       - [0x15B68, c, code/func_00214F68]
       - [0x15CB8, hasm, ../src/us/asm/stray_002150B8]
-      - [0x15CC0, asm]
+      - [0x15CC0, c, code/func_002150C0]
       - [0x15EAC, c, code/func_002152AC]
       - [0x160DC, c, code/func_002154DC]
       - [0x162D4, c, code/func_002156D4]
@@ -2819,7 +2819,7 @@ segments:
       - [0xA5CD4, hasm, ../src/us/asm/stray_002A50D4]
       - [0xA5CE0, c, code/func_002A50E0]
       - [0xA5D28, hasm, ../src/us/asm/stray_002A5128]
-      - [0xA5D30, asm]
+      - [0xA5D30, c, code/func_002A5130]
       - [0xA5DE0, hasm, ../src/us/asm/stray_002A51E0]
 
   # El .rodata NO es useg: se linkea directo desde 0x80000400 en KSEG0, igual
@@ -2881,6 +2881,7 @@ segments:
       - [0xA63D0, .rodata, code/func_002141F0]
       - [0xA63EC, .rodata, code/func_00214564]
       - [0xA63F8, rodata]
+      - [0xA6440, .rodata, code/func_002150C0]
       - [0xA644C, .rodata, code/func_002154DC]
       - [0xA645C, rodata]
       - [0xA6480, .rodata, code/func_002156FC]
@@ -3484,7 +3485,8 @@ segments:
       - [0xAB990, .rodata, code/func_002A40D0]
       - [0xABA90, .rodata, code/func_002A4650]
       - [0xABB90, .rodata, code/func_002A4BE0]
-      - [0xABC90, rodata]
+      - [0xABC90, .rodata, code/func_002A5130]
+      - [0xABCA8, rodata]
 
   # ---------------------------------------------------------------------------
   # RSP microcode blobs. Do NOT disassemble as MIPS — see docs/MICROCODE.md.
