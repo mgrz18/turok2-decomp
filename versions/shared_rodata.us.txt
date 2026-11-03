@@ -82,3 +82,6 @@ func_00452314 0x800C1008  # X batch: jtbl of func_004193B4
 func_00453E58 0x800C1280  # X batch: jtbl of func_0041AEF0
 func_0045E808 0x800C1870  # X batch: jtbl of func_004258E8
 func_00468AC4 0x800A9A18  # X batch: 1.0f of func_0042FBA4, in the engine .rodata
+func_0043F000 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
+func_0045060C 0x800C0EA0  # copy of func_0041760C (X), which now owns the pool
+func_0045D6A0 0x800C1720  # copy of func_00424780 (X), which now owns the pool
