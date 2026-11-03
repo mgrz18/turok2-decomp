@@ -45,7 +45,8 @@ ROOT = Path(__file__).resolve().parent.parent
 ELF = ROOT / "build" / "turok2.us.elf"
 LD_SCRIPT = ROOT / "us" / "turok2.ld"
 
-DEF = re.compile(r"^[A-Za-z_][\w \t\*]*?\b(\w+)\s*\([^;{]*\)\s*\{", re.M)
+# The return type may be on the line before the name (libgcc's style).
+DEF = re.compile(r"^(?:[A-Za-z_][\w \t\*]*?\b)?(\w+)\s*\([^;{]*\)\s*\{", re.M)
 
 
 VM2_NAMED = (0x0043CC14, 0x00475A00)   # the second VM module, at the addresses splat names it
