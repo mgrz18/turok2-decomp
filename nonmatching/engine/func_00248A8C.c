@@ -1,4 +1,4 @@
-/* NON-MATCHING: 12 of 71 words differ: the clearing loops; the ROM indexes from the player base (sh 0x934(v1)) with the counter in v0, these pointer loops address from the element */
+/* NON-MATCHING: 6 of 71 words differ: the clearing loops now match (count-up loops, reversed by GCC); left: in the multiplayer branch the ROM fills the bne delay slot with the shared li 1 (owned[] stores) where this C gets li 0x18 from the else branch, so the then-branch constants load in the other order. */
 #include "common.h"
 
 typedef struct {
@@ -36,17 +36,11 @@ void func_00248A8C(ArmsPlayer *p) {
     s32 i;
     s16 weapon;
 
-    {
-        s16 *a = &p->ammo[0x1E];
-        s8 *o;
-
-        for (i = 0x1E; i >= 0; i--) {
-            *a-- = 0;
-        }
-        o = &p->owned[0x22];
-        for (i = 0x22; i >= 0; i--) {
-            *o-- = 0;
-        }
+    for (i = 0; i < 0x1F; i++) {
+        p->ammo[i] = 0;
+    }
+    for (i = 0; i < 0x23; i++) {
+        p->owned[i] = 0;
     }
     if (D_8011AAF1) {
         if (p->character == 10) {

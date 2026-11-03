@@ -1,4 +1,4 @@
-/* NON-MATCHING: 153 of 245 words differ: the health update (prev - damage clamped, stored to 0x524/0x144/0x3CC through two register copies) and the flash clamp shape differ; the code after shifts */
+/* NON-MATCHING: 5 of 245 words differ: register allocation only around the handicap and the surface check: the ROM keeps p->options in $v1 and the handicap / check values in $v0; here they swap ($v0/$v1). The health update (nested store giving the ROM two register copies), the clamps and the rumble MIN are matched. */
 #include "common.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
@@ -73,7 +73,7 @@ void func_00281054(void *camera, s32 alpha, s32 time);
 void func_00275624(s32 sound);
 void func_00275544(s16 sound, Vec3f pos, s32, s32);
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 /* Hurts a player: damage (8.8) scaled by the reduced-damage state and the
@@ -88,6 +88,7 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
     s32 prev;
     s32 health;
     s32 dead;
+    s32 wasDead;
     s32 alpha;
     s32 time;
     s32 amount;
@@ -133,16 +134,16 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
         return;
     }
     prev = p->health;
+    wasDead = prev == 0;
     health = prev - damage;
     if (health < 0) {
         health = 0;
     }
-    p->health = health;
-    p->aiHealth = health;
-    p->shownHealth = health;
-    dead = health == 0;
+    p->aiHealth = (p->health = health);
+    p->shownHealth = p->health;
+    dead = p->health == 0;
     if (dead) {
-        if (prev != 0) {
+        if (!wasDead) {
             func_00249118(p, src, arg3, type);
         }
         alpha = 0xFF;
@@ -157,10 +158,7 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
         }
         amount = damage >> 8;
         if (amount != 0) {
-            f = amount * (1.0f / 15);
-            if (f > 1.0f) {
-                f = 1.0f;
-            }
+            f = MIN(amount * (1.0f / 15), 1.0f);
             zero.x = 0;
             zero.y = 0;
             zero.z = 0;

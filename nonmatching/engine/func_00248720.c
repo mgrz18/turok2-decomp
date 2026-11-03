@@ -1,4 +1,4 @@
-/* NON-MATCHING: 215 of 233 words differ: readable draft from the asm (m2c fails on it); control flow of the ammo/animation switch and the projectile choice not yet tuned */
+/* NON-MATCHING: 35 of 219 words differ: only the projectile loop of usesProjectile: cse (-fcse-follow-jumps) threads the found path (return 1) past the caller test and moves that block, which also costs the ROM constant 1 kept in $a2 for the anim == 1 test. Everything else matches (anim if-chain with a shared CHARGE block, case 3 tests type == 2, the 6.0f clamp as a ternary, D_800ACE10/D_800ACE14 as two scalars). */
 #include "common.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
@@ -56,7 +56,8 @@ typedef struct {
 
 extern WeaponDef *D_800AF618[];  /* the weapons */
 extern f32 D_800AE350;
-extern f32 D_800ACE10[2];
+extern f32 D_800ACE10;          /* projectile speed scale */
+extern f32 D_800ACE14;          /* projectile power */
 extern u8 D_800F8928[];
 
 Quat func_0021AE6C(FirePlayer *p);
@@ -64,6 +65,7 @@ AmmoInfo *func_0025398C(FirePlayer *p, s32 weapon);
 void func_0022F350(void *list, FirePlayer *src, FirePlayer *owner, s32 a3, s32 target, s32 type,
                    Vec3f vel, Quat aim, Vec3f pos, s32 a40, s32 a44, s32 a48);
 
+#define CHARGE(p) if ((p)->charge >= 3.0f) { (p)->charge -= 3.0f; }
 /* Whether the weapon fires the given projectile. */
 static __inline__ s32 usesProjectile(s32 weapon, s32 type) {
     WeaponDef *def = D_800AF618[weapon];
@@ -71,7 +73,7 @@ static __inline__ s32 usesProjectile(s32 weapon, s32 type) {
 
     for (i = 0; i < 3; i++) {
         if (def->ammo[i] == NULL) {
-            return 0;
+            break;
         }
         if (def->ammo[i]->projectile == type) {
             return 1;
@@ -106,27 +108,22 @@ void func_00248720(FirePlayer *p, s32 type) {
             *ammo = 0;
         }
         type = info->projectile;
-        switch (p->anim) {
-            case 1:
-                p->anim = 0x1130;
-                break;
-            case 0xA28:
-                p->anim = 0x1135;
-                break;
-            case 0x14:
-                p->anim = 0x1144;
-                break;
-            case 0x1130:
-            case 0x1135:
-            case 0x1144:
-                if (p->charge >= 3.0f) {
-                    p->charge -= 3.0f;
-                }
-                break;
+        if (p->anim == 1) {
+            p->anim = 0x1130;
+        } else if (p->anim == 0x1130) {
+            CHARGE(p);
+        } else if (p->anim == 0xA28) {
+            p->anim = 0x1135;
+        } else if (p->anim == 0x1135) {
+            CHARGE(p);
+        } else if (p->anim == 0x14) {
+            p->anim = 0x1144;
+        } else if (p->anim == 0x1144) {
+            CHARGE(p);
         }
         p->firing = 0;
     }
-    D_800ACE10[0] = D_800AE350;
+    D_800ACE10 = D_800AE350;
     target = 0;
     if (camera != NULL) {
         pos = camera->pos;
@@ -137,7 +134,7 @@ void func_00248720(FirePlayer *p, s32 type) {
     if (p->lockMode == 2) {
         target = p->lockTarget;
     }
-    D_800ACE10[1] = p->power;
+    D_800ACE14 = p->power;
     if (p->sniperMode) {
         switch (p->weapon) {
             case 10:
@@ -147,7 +144,7 @@ void func_00248720(FirePlayer *p, s32 type) {
                 type = 0x13A;
                 break;
             case 3:
-                if (type == 4) {
+                if (type == 2) {
                     type = 0x111;
                 } else if (type == 0x56) {
                     type = 0x126;
@@ -156,12 +153,9 @@ void func_00248720(FirePlayer *p, s32 type) {
         }
     }
     if (type == 4) {
-        f = D_800ACE10[1] * 6.0f;
-        type = 0x1D2;
-        if (!(6.0f < f)) {
-            type = f + 460.0f;
-        }
+        f = D_800ACE14 * 6.0f;
+        type = (s32)((f > 6.0f ? 6.0f : f) + 460.0f);
     }
     func_0022F350(D_800F8928, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->aiFlags & 0x80) ? 5 : 1);
-    D_800ACE10[0] = D_800AE350 = p->power = D_800ACE10[1] = 1.0f;
+    D_800ACE14 = p->power = D_800AE350 = D_800ACE10 = 1.0f;
 }

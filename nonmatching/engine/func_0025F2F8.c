@@ -1,4 +1,4 @@
-/* NON-MATCHING: 8 of 24 words differ: FP register allocation only. The ROM keeps the 0..1 level in $f1, the scaled value in $f0 and the sum in $f1 (each result tied to its constant operand); this C gives the chain one register. Same issue in func_0025F29C/F2F8/F928/F9FC/FBB8/FCB8 (the += in F9FC gets the sum right, 3 words left). */
+/* NON-MATCHING: 2 of 24 words differ: FP register allocation of the final add only. Writing the lerp as `b -= a; b *= level;` loads the folded (b - a) straight into b's pseudo, so level*(b - a) lands in that constant's register like the ROM; the ROM does the same for the sum (it lands in the register of the 15.0 constant, $f1), here the 'a' constant gets a fresh pseudo and the sum goes to $f0. Same shape in func_0025F29C/F928/F9FC/FBB8/FCB8. */
 #include "common.h"
 
 typedef struct {
@@ -20,11 +20,13 @@ typedef struct {
 
 /* func_0025EB50, inlined: from a to b by the AI's 0xC8 level (0..255). */
 static __inline__ f32 LevelLerp(Actor *self, AI *ai, f32 a, f32 b) {
-    return a + ai->unkC8 * (1.0f / 255) * (b - a);
+    b -= a;
+    b *= ai->unkC8 * (1.0f / 255);
+    return a + b;
 }
 
 /* AI callback: clears AI flag 0x4000000 and actor flag 0x20000; sets 0x64
- * from 0xC8 (0..255 -> 15..45). */
+ * from the 0xC8 level (0..255 -> 15..45). */
 void func_0025F2F8(Actor *self, AI *ai) {
     ai->flags &= ~0x4000000;
     self->flags &= ~0x20000;
