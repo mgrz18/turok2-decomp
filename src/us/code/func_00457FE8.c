@@ -1,5 +1,6 @@
-/* NON-MATCHING: 3 of 153 words differ: the ROM tests r again after the save sounds (bnez s0 then falls into the success message); CSE (cse2 here, cse1 without the do/while) threads the first test straight to the failure message and drops the second. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00407578.c, func_00407578, with Turok 2's layouts. */
+/* Second VM module copy of func_0041F0C8 (same C, second-module symbols). */
+/* The result is tested through a copy (err = r): it stops jump threading before cse1, so the second r == 0 test survives as in the ROM. */
 #include "common.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
@@ -76,6 +77,7 @@ s32 func_00457FE8(s32 unused, MenuOwner *own) {
     PakInfo pad;
     Player *plr;
     s32 r = 0;
+    s32 err;
     s32 ok = 1;
     s32 written = 0;
     s32 padv;
@@ -122,13 +124,12 @@ s32 func_00457FE8(s32 unused, MenuOwner *own) {
     if (!written) {
         return 1;
     }
-    do {
-        if (r == 0) {
-            func_00412B14();
-            func_00412438(0x191);
-        }
-    } while (0);
     if (r == 0) {
+        func_00412B14();
+        func_00412438(0x191);
+    }
+    err = r;
+    if (err == 0) {
         func_00416644(D_80119E2C, D_0043BC88, plr, plr->controller, (s32)D_0043BE14);
     } else {
         func_00416644(D_80119E2C, D_0043BD18, plr, plr->controller, (s32)D_0043BE14);

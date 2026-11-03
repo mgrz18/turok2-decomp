@@ -1,4 +1,3 @@
-/* NON-MATCHING: 5 of 151 words differ: the ROM copies the aimed actor to $v0 before checking kind == 1 against a register holding 1 (bne); here lbu+xori */
 #include "common.h"
 
 typedef struct Vec3 {
@@ -74,7 +73,11 @@ typedef struct Player {
     /* 0x1284 */ s32 unk1284;
 } Player;
 
-extern Mount *D_800F1CE0;           /* what the player is aiming at */
+typedef struct {
+    /* 0x00 */ Mount *current; /* what the player is aiming at */
+} CollisionResult;
+
+extern CollisionResult D_800F1CE0;
 extern Vec3 D_800ADCBC;             /* rider seat */
 extern u8 D_800F5EC0[][0x224];      /* controller settings, one per player */
 
@@ -88,10 +91,6 @@ s32 func_0024E5F0(Player *player, Body *body, s32 arg2);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-static __inline__ s32 isActor(Mount *m) {
-    return m->kind == 1;
-}
-
 static __inline__ void setVec3(Vec3 *v, f32 x, f32 y, f32 z) {
     v->z = z;
     v->y = y;
@@ -102,13 +101,11 @@ static __inline__ void setVec3(Vec3 *v, f32 x, f32 y, f32 z) {
  * heading and the player is not holding 0x8000: the player takes its seat
  * and heading, and the movement state is reset. */
 s32 func_0024EAF8(Player *p, Body *body) {
-    Mount *aim;
     Mount *mount;
 
     if (p->mount == NULL && !(p->held & 0x8000)) {
-        aim = D_800F1CE0;
-        if (aim != NULL && isActor(aim)) {
-            mount = aim;
+        if (D_800F1CE0.current != NULL && D_800F1CE0.current->kind == 1) {
+            mount = D_800F1CE0.current;
             if (mount->type == 0x136 && ABS(func_00246310(body, mount->pos)) < 0.785398245f) {
                 p->mount = mount;
                 p->mountType = 0x136;

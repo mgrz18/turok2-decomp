@@ -1,7 +1,4 @@
-/* NON-MATCHING: 5 of 131 words differ (W batch). */
-/* NON-MATCHING: 5 of 131 words differ: the flags test loads ai->flags into $v1 instead of $v0 and the
- * dist copy (mov.s $f2, $f20) lands in the delay slot instead of before the andi. */
-/* Second-module twin of func_0040A6F0 (nonmatching/vm); here the cut is whole (0x004436F0, 0x20C). */
+/* Second-module twin of func_0040A6F0 (src/us/code); here the cut is whole (0x004436F0, 0x20C). Both flag masks are computed before the tests (found with the permuter). */
 #include "common.h"
 
 /* Picks the next attack anim from a weighted table: close to the target only 0x10/0xD, otherwise 0xF
@@ -102,13 +99,17 @@ void func_004436F0(Obj *obj, CAI *ai) {
     s32 flagged;
     f32 dist;
     f32 ratio;
+    s32 flag2;
+    s32 flag20;
 
     n = 0;
     dist = getTargetDist(obj, &found);
     flagged = 0;
-    if (ai->flags & 2) {
-        if (ai->flags & 0x20) {
-            flagged++;
+    flag2 = ai->flags & 2;
+    flag20 = ai->flags & 0x20;
+    if (flag2) {
+        if (flag20) {
+            flagged = 1;
         }
     }
     if (state->unk674 != 0) {

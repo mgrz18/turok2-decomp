@@ -1,4 +1,3 @@
-/* NON-MATCHING: 51 of 87 words differ: the ROM loads each actor into $a0 and copies it to $s0 (and bumps the pointer before the call); here the actor goes straight to $s0 */
 #include "common.h"
 
 typedef struct {
@@ -18,14 +17,14 @@ typedef struct {
     /* 0xDF8 */ s32 actorCount;
 } DrawWorld;
 
-/* The global at D_80119870: what this reads of it. */
 typedef struct {
     /* 0x0000 */ u8 _pad[0x1418];
-    /* 0x1418 */ s32 m_Mode;           /* D_8011AC88: game mode */
+    /* 0x1418 */ s32 m_Mode;
 } Game80119870;
 
+/* The global at D_80119870: what this reads of it. */
 extern Game80119870 D_80119870;
-extern f32 D_800B6D28;          /* the frame's time step */
+extern f32 D_800B6D28;          /* the frame time step */
 extern u8 D_800F6CB0[];
 
 void func_0021F1B4(DrawActor *actor);
@@ -36,7 +35,7 @@ void func_00430330(u8 *);
 s32 func_00275F7C(void);
 void func_00275E98(s32);
 
-/* Draws one actor, keeping the frame's time step. */
+/* Draws one actor, keeping the frame time step. */
 static __inline__ void drawActor(DrawActor *actor) {
     f32 step = D_800B6D28;
 
@@ -46,19 +45,21 @@ static __inline__ void drawActor(DrawActor *actor) {
     }
     D_800B6D28 = step;
 }
-
-/* Draws the type-2 actors at the head of the list, then the mode's extras,
- * then the remaining actors. */
+/* Draws the leading run of type-2 actors, then the mode extras, then the rest.
+ * One actor variable for both loops: its pseudo outlives the first loop, so
+ * the first loop keeps the kind-test load ($a0) apart from it ($s0). */
 void func_00226490(DrawWorld *world) {
+    DrawActor *actor;
     s32 i = 0;
     s32 count = world->actorCount;
     DrawActor **actors = world->actors;
 
-    for (; i < count; i++) {
+    while (i < count) {
         if (actors[i]->def->type != 2) {
             break;
         }
-        drawActor(actors[i]);
+        actor = actors[i++];
+        drawActor(actor);
     }
     if (D_80119870.m_Mode == 13) {
         func_00251FC4(&D_80119870);
@@ -66,8 +67,9 @@ void func_00226490(DrawWorld *world) {
     if (func_00253460(&D_80119870)) {
         func_00430330(D_800F6CB0);
     }
-    for (; i < count; i++) {
-        drawActor(actors[i]);
+    while (i < count) {
+        actor = actors[i++];
+        drawActor(actor);
     }
     func_00275E98(func_00275F7C());
 }

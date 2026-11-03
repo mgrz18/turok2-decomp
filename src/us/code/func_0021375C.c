@@ -1,4 +1,3 @@
-/* NON-MATCHING: 27 of 197 words differ: register allocation only in the inner vertex loops (i/n/vp/src pointer get a0..a3 in a different order); structure, frame and schedule match */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002782E4.c, func_002782E4, with Turok 2's layouts. */
 
 #include "common.h"
@@ -34,9 +33,7 @@ VtxBlk *func_002017D4(s32 *file, s32 index); /* returns chunk `index` of a chunk
  * flag 0x4000. */
 void func_0021375C(s32 *file, Vec3f *src) {
     s32 i;
-    s32 n;
     VtxBlk *b;
-    LitVtx *vp;
     Vec3f t;
     f32 f, x, a;
     s32 j, v, r;
@@ -45,6 +42,9 @@ void func_0021375C(s32 *file, Vec3f *src) {
     f = MN(1.0f, (f32) D_8011AAE4 * 0.003921568859f);
     if (D_8011AAD8 & 0x4000) {
         for (j = 0; j < *file; j++) {
+            s32 n;
+            LitVtx *vp;
+
             b = func_002017D4(file, j);
             i = 0;
             n = b->count;
@@ -57,6 +57,9 @@ void func_0021375C(s32 *file, Vec3f *src) {
         }
     } else {
         for (j = 0; j < *file; j++) {
+            s32 n;
+            LitVtx *vp;
+
             b = func_002017D4(file, j);
             i = 0;
             n = b->count;

@@ -1,4 +1,4 @@
-/* NON-MATCHING: 1 of 135 words differ: the branch on mount->aiState == 0x2E is bne in the ROM, bnel here (the -1 arg setup is hoisted into the delay slot differently) */
+/* NON-MATCHING: 1 of 135 words differ: the branch on mount->aiState == 0x2E is bne in the ROM, bnel here: reorg fills the delay slot as annulled because $v0 is live on the fall-through path (mark_target_live_regs), where the ROM's slot fill is plain. */
 #include "common.h"
 
 typedef struct { f32 x, y, z; } Vec3f;

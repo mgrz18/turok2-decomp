@@ -1,4 +1,3 @@
-/* NON-MATCHING: 3 of 237 words differ: only the schedule of `li $a1, 2` (the first func_002017D4 argument) against the zero inits; uses a FAKEMATCH-style duplicated branch to get the ROM's register allocation. */
 #include "common.h"
 
 typedef struct {
@@ -108,16 +107,15 @@ Triangle *func_0026B4A4(Triangle *skip, Vec3f pos) {
     if (!D_800B6D54) {
         return NULL;
     }
-    index = 0;
-    i = 0;
-    best = NULL;
-    bestDist = 0.0f;
     world = &D_800F7078;
     tris = (Triangle *) ((u8 *) func_002017D4(world->level, 2) + 8);
     list = func_002017D4(world->level, 3);
     n = list->count;
     groups = list->groups;
-    for (; i < n; i++) {
+    best = NULL;
+    bestDist = 0.0f;
+    index = 0;
+    for (i = 0; i < n; i++) {
         group = &groups[i];
         if (pos.x >= group->minX && group->maxX >= pos.x && pos.z >= group->minZ && group->maxZ >= pos.z) {
             for (j = 0; j < group->count; j++) {
@@ -126,18 +124,12 @@ Triangle *func_0026B4A4(Triangle *skip, Vec3f pos) {
                     h = TriHeight(tri, pos.x, pos.z);
                     if (h < pos.y) {
                         d = pos.y - h;
-                        if (best == NULL || d < bestDist) {
-                            /* FAKEMATCH: identical branches, merged by
-                             * cross-jumping; the extra uses of pos.z and
-                             * group->count only reproduce the ROM's register
-                             * allocation (skip in $fp, tris spilled). */
-                            if (pos.z != 0.0f || group->count != 0) {
-                                best = tri;
-                                bestDist = d;
-                            } else {
-                                best = tri;
-                                bestDist = d;
-                            }
+                        if (best == NULL) {
+                            best = tri;
+                            bestDist = d;
+                        } else if (d < bestDist) {
+                            best = tri;
+                            bestDist = d;
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-/* NON-MATCHING: 9 of 145 words differ: the load of ai->flags (for &= ~1) is scheduled after the -1 stores instead of before them, so v0/v1 swap */
+/* NON-MATCHING: 9 of 145 words differ: the shared -1 lands in $v0 instead of $v1, so sched2 cannot hoist the load of ai->flags (for &= ~1) above the -1 stores, and v0/v1 swap. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AI/NAV/80212C90_18.CPP, ACTOR_SETUP, with Turok 2's layouts. */
 
 #include "common.h"

@@ -1,5 +1,5 @@
-/* NON-MATCHING: 6 of 75 words differ: only the store to D_80110060 is scheduled earlier (before the third match
- * float store) than in the ROM, which puts it after the loop-count load; no statement order or declaration moved it. */
+/* Second VM module copy of func_00421528 (same C). */
+/* D_80110060 is declared as an array so its store keeps its place after the save buffer reads (a scalar is assumed not to alias them and is hoisted). */
 #include "common.h"
 
 /* Restores the player and the multiplayer setup from a loaded save (the reverse of func_0041D890); the setup
@@ -44,10 +44,10 @@ typedef struct {
 extern SaveBuffer *D_800C201C;
 extern Level D_800F7078;
 extern Game D_8011AAD8;
-extern s32 D_80110060;
+extern s32 D_80110060[];
 extern u8 D_800EBAC0[];
 
-void func_00421528(Player *p) {
+void func_0045A448(Player *p) {
     Level *level = &D_800F7078;
     u8 keep;
     s32 i;
@@ -61,7 +61,7 @@ void func_00421528(Player *p) {
     D_8011AAD8.match[1] = D_800C201C->match[1];
     D_8011AAD8.match[2] = D_800C201C->match[2];
     D_8011AAD8.match[3] = D_800C201C->match[3];
-    D_80110060 = D_8011AAD8.warpId;
+    D_80110060[0] = D_8011AAD8.warpId;
     D_8011AAD8.unk180 = keep;
     src = D_800C201C->text;
     dst = D_800EBAC0;

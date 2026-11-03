@@ -1,6 +1,4 @@
-/* NON-MATCHING: 5 of 166 words differ (W batch). */
-/* NON-MATCHING: 5 of 166 words differ: the multiplayer team loop swaps $a1/$a2 (loop index vs the copy of 1). */
-/* Second VM module copy of func_0042EF2C (linked 0xE0 lower). The two copies of the parameter (owner/config) and the inline helpers reproduce the ROM copy of config in $t0. */
+/* Second VM module copy of func_0042EF2C (linked 0x39000 lower; here the cut is whole, 0x298). The settings loop is written out in the function (not an inline) so both loops share the counter i ($a2), as in the ROM. */
 #include "common.h"
 
 /* The match configuration handed in by the menu. */
@@ -96,9 +94,17 @@ static __inline__ void initSetting(Setting *t, MatchConfig *config, s32 index, v
     t->value = value;
 }
 
-static __inline__ void resetSettings(MatchState *s, MatchConfig *owner, MatchConfig *config) {
+/* Starts a match from config: sets up the per-player settings and the game setup. */
+void func_00467E4C(MatchConfig *arg) {
+    MatchState *s = &D_800F56B0;
+    GameSetup *setup;
     s32 i;
+    s32 r;
 
+    MatchConfig *owner = arg;
+    MatchConfig *config = arg;
+
+    D_800B6D60++;
     s->unk4 = 0;
     s->unk8 = 1;
     s->unk10 = 0;
@@ -118,20 +124,6 @@ static __inline__ void resetSettings(MatchState *s, MatchConfig *owner, MatchCon
         }
     }
     initSetting(&s->d, owner, 0, func_0042F6E8, config->unk6);
-}
-
-/* Starts a match from config: sets up the per-player settings and the game setup. */
-void func_00467E4C(MatchConfig *arg) {
-    MatchState *s = &D_800F56B0;
-    GameSetup *setup;
-    s32 i;
-    s32 r;
-
-    MatchConfig *owner = arg;
-    MatchConfig *config = arg;
-
-    D_800B6D60++;
-    resetSettings(s, owner, config);
     s->playerCount = config->playerCount;
     s->unk1B8 = 0;
     s->unk1BC = config->unk4;

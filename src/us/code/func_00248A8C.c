@@ -1,4 +1,3 @@
-/* NON-MATCHING: 6 of 71 words differ: the clearing loops now match (count-up loops, reversed by GCC); left: in the multiplayer branch the ROM fills the bne delay slot with the shared li 1 (owned[] stores) where this C gets li 0x18 from the else branch, so the then-branch constants load in the other order. */
 #include "common.h"
 
 typedef struct {
@@ -34,7 +33,6 @@ extern WeaponDef *D_800AF618[];  /* the weapons */
  * knife-and-bow set with 20 rounds. */
 void func_00248A8C(ArmsPlayer *p) {
     s32 i;
-    s16 weapon;
 
     for (i = 0; i < 0x1F; i++) {
         p->ammo[i] = 0;
@@ -44,20 +42,21 @@ void func_00248A8C(ArmsPlayer *p) {
     }
     if (D_8011AAF1) {
         if (p->character == 10) {
-            weapon = 0x22;
             p->owned[0x22] = 1;
-            p->weapon2 = weapon;
-            p->weapon3 = weapon;
+            p->weapon2 = 0x22;
+            p->weapon3 = 0x22;
+            p->weapon4 = -1;
+            p->queuedWeapon = 0x22;
+            p->weapon = 0x22;
         } else {
-            weapon = 0x18;
             p->owned[0x18] = 1;
             p->owned[0x20] = 1;
+            p->weapon2 = 0x18;
             p->weapon3 = 0x20;
-            p->weapon2 = weapon;
+            p->weapon4 = -1;
+            p->queuedWeapon = 0x18;
+            p->weapon = 0x18;
         }
-        p->weapon4 = -1;
-        p->queuedWeapon = weapon;
-        p->weapon = weapon;
     } else {
         p->owned[0] = 1;
         p->owned[2] = 1;

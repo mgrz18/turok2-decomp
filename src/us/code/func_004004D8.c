@@ -1,8 +1,3 @@
-/* NON-MATCHING: 44 of 1430 words differ, register allocation only: the ROM keeps nVtx in $t1
- * and the D_80129200 write pointer in $t2 (here $t3/$t1), the strip loop's start/index
- * pointer in $t1/$t0 (here swapped), initialises the e*4 giv from e ($t5) rather than 0,
- * and computes (f32)(H/2) - 16.0f with $f0/$f1 the other way round. Code shape, DL
- * prologue, region walk, vertex colours, strips, arrow and compass all match. */
 #include "common.h"
 #include "gfx.h"
 #include "structs/gbi.h"
@@ -191,7 +186,6 @@ void func_004004D8(MapView *view) {
     s32 bright;
     s32 fade;
     s32 remaining;
-    s32 start;
     s32 count;
     s32 k;
     s32 *code;
@@ -236,7 +230,12 @@ void func_004004D8(MapView *view) {
     func_0020FC24(world, -cx, -cz, 0.0f);
     func_00210478(world, scaleX, scaleZ, 1.0f);
     func_00210B38(world, view->angle + 3.1415929f);
-    func_00210318(world, D_800C2030 / 2, D_800C2034 / 2 - 16.0f, 0.0f);
+    {
+        f32 centreY = D_800C2034 / 2;
+
+        centreY -= 16.0f;
+        func_00210318(world, D_800C2030 / 2, centreY, 0.0f);
+    }
     func_0020C208(inverse, world);
 
     corners[0].x = 0.0f;
@@ -281,11 +280,11 @@ void func_004004D8(MapView *view) {
     for (n = 0; n < areaCount; n++) {
         area = &areas[n];
         if (area->maxX > box.minX && area->minX < box.maxX && area->maxZ > box.minZ && area->minZ < box.maxZ) {
-            for (i = 0; i < area->count; base++, i++) {
+            for (i = 0; i < area->count; i++) {
                 region = &regions[base];
                 info = &infos[region->index];
                 if (info->flags & 0x200) {
-                    continue;
+                    goto next;
                 }
                 /* Outcodes of the region's corners against the view box. */
                 for (k = 0; k < 3; k++) {
@@ -305,13 +304,12 @@ void func_004004D8(MapView *view) {
                     }
                 }
                 if (codes[0] & codes[1] & codes[2]) {
-                    continue;
+                    goto next;
                 }
-                e = 0; /* before the test: the ROM sets it in the branch delay slot */
                 if (!showAll && !(region->flags & 0x400)) {
-                    continue;
+                    goto next;
                 }
-                for (; e < 3; e++) {
+                for (e = 0; e < 3; e++) {
                     newVtx = 0;
                     if (region->neighbour[e] == NULL) {
                         newVtx = 1;
@@ -507,27 +505,31 @@ void func_004004D8(MapView *view) {
                         goto draw;
                     }
                 }
+            next: /* skipped regions still advance base */
+                base++;
             }
         } else {
             base += area->count;
         }
     }
 draw:
+    /* Draw the lines in batches of up to 32 vertices; nVtx now counts the
+     * batch's first vertex. */
     remaining = nVtx;
-    start = 0;
+    nVtx = 0;
     i = 0;
     while (remaining >= 2) {
         count = MIN(remaining, 32);
-        GFX(VTX_W0(count), (u32) &vtx[start]);
-        while (D_80129200[i + 1] - start < count && i < nIdx - 1) {
-            GFX(LINE_W0(D_80129200[i] - start, D_80129200[i + 1] - start), 0);
+        GFX(VTX_W0(count), (u32) &vtx[nVtx]);
+        while (D_80129200[i + 1] - nVtx < count && i < nIdx - 1) {
+            GFX(LINE_W0(D_80129200[i] - nVtx, D_80129200[i + 1] - nVtx), 0);
             i += 2;
         }
-        if (D_80129200[i + 1] - start == count) {
+        if (D_80129200[i + 1] - nVtx == count) {
             count--;
         }
         remaining -= count;
-        start += count;
+        nVtx += count;
     }
 
     /* The player's arrow. */

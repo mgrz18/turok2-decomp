@@ -1,4 +1,3 @@
-/* NON-MATCHING: 5 of 245 words differ: register allocation only around the handicap and the surface check: the ROM keeps p->options in $v1 and the handicap / check values in $v0; here they swap ($v0/$v1). The health update (nested store giving the ROM two register copies), the clamps and the rumble MIN are matched. */
 #include "common.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
@@ -82,7 +81,6 @@ void func_00275544(s16 sound, Vec3f pos, s32, s32);
 void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     s32 old;
     f32 f;
-    s32 handicap;
     s32 check;
     RegionInfo *info;
     s32 prev;
@@ -115,13 +113,13 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
         damage /= 5;
     }
     if (D_801198B0.settings.multiplayer) {
-        handicap = p->options->handicap;
-        if (handicap) {
-            damage = damage * (1.0f / 256) / ((handicap + f) * 0.3f) * 256.0f;
+        if (p->options->handicap) {
+            damage = damage * (1.0f / 256) / ((p->options->handicap + f) * 0.3f) * 256.0f;
         }
     }
-    check = 1;
-    if (!(D_801198B0.settings.flags & 0x10)) {
+    if (D_801198B0.settings.flags & 0x10) {
+        check = 1;
+    } else {
         check = p->surface & 0xF;
     }
     if (check && p->region != NULL) {
