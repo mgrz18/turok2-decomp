@@ -405,3 +405,37 @@ stray 0x00428A18 0x00428A20 // two junk words before osPfsIsPlug, 16-aligned
 func 0x00428A20 0x17C // absorbs func_00428ABC and func_00428B58
 stray 0x0045E674 0x0045E680 // linker fill after the hand-written func_0045E630
 func 0x0045E680 0x188
+
+// The player code splat took for one data object, D_0042D50C (0x42D50C-0x42EBB4),
+// and its second-module copy D_0046642C: a junk word and a table (src/us/asm/data_*.s),
+// then 14 functions; 0x42EB4C is fill before the 16-aligned func_0042EB50.
+stray 0x0042EB4C 0x0042EB50 // linker fill before the 16-aligned func_0042EB50
+stray 0x00467A6C 0x00467A70 // the same fill in the second-module copy
+func 0x0042DA60 0x1B8
+func 0x0042DC18 0x25C
+func 0x0042DE74 0x2D8
+func 0x0042E14C 0x150
+func 0x0042E29C 0x194
+func 0x0042E430 0x17C
+func 0x0042E5AC 0x288
+func 0x0042E834 0x60
+func 0x0042E894 0x88
+func 0x0042E91C 0x88
+func 0x0042E9A4 0x5C
+func 0x0042EA00 0x104
+func 0x0042EB04 0x48
+func 0x0042EB50 0x64
+func 0x00466980 0x1B8 // copy of func_0042DA60
+func 0x00466B38 0x25C // copy of func_0042DC18
+func 0x00466D94 0x2D8 // copy of func_0042DE74
+func 0x0046706C 0x150 // copy of func_0042E14C
+func 0x004671BC 0x194 // copy of func_0042E29C
+func 0x00467350 0x17C // copy of func_0042E430
+func 0x004674CC 0x288 // copy of func_0042E5AC
+func 0x00467754 0x60 // copy of func_0042E834
+func 0x004677B4 0x88 // copy of func_0042E894
+func 0x0046783C 0x88 // copy of func_0042E91C
+func 0x004678C4 0x5C // copy of func_0042E9A4
+func 0x00467920 0x104 // copy of func_0042EA00
+func 0x00467A24 0x48 // copy of func_0042EB04
+func 0x00467A70 0x64 // copy of func_0042EB50
