@@ -171,6 +171,17 @@ engine half thrown away. So func_0042CBE4 and func_00465B04 stay asm (both
 have matching C in build/manual/X), and this is the first evidence that
 some engine and VM functions share a source file.
 
+The X batch moved eight pools from the second module's C to the first
+module's: func_00405AC8, func_00406000, func_00409500, func_00409784,
+func_00409A64, func_0040D5C4, func_0041760C and func_00424780 own them now
+(and func_004088B0 its strings), and their copies go NOLOAD over them.
+Second-module code also names first-module addresses inside functions that
+are still asm (func_0042CAB4 + 0x50, .L0042B960, func_0042CBE4 + 0x40) as
+callees or callbacks; those are defined absolutely too. The second module's
+text does not end at 0x469400: func_00469374 runs to 0x46941C, and the
+words after it still decode as code, so virtual_rodata_1 likely starts
+later still.
+
 Object boundaries in the VM modules: each object starts 16-aligned in .text
 and in .rodata, with junk words before (often copies of instructions). The
 cinema object ends at the junk at 0x413228 in .text and at 0x800C0AE8 in

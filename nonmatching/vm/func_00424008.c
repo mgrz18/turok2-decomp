@@ -1,6 +1,7 @@
-/* NON-MATCHING: 169 of 185 words differ (W batch). */
-/* NON-MATCHING: draft, see the report: the ROM keeps both fields' vStart words on the stack and edits them as s16
- * halves (sh/lh at sp+0x10..0x22), which this plain-integer version does not reproduce. */
+/* NON-MATCHING: 131 of 185 words differ (size 0x2D8 vs 0x2E4): the ROM keeps both vStart words and their copies on the
+ * stack (sp+0x10..0x1C) and the centres at sp+0x20, edited as s16 halves; this union-array version reproduces that
+ * layout but GCC deletes the first of each pair of halfword stores (center pre/post -y, v[1].end pre/post -3) that the
+ * ROM keeps, and schedules the field-1 loads earlier. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BDB8_de, with Turok 2's layouts. */
 #include "common.h"
 
@@ -33,6 +34,15 @@ typedef struct {
     /* 0x28 */ ViFieldRegs fldRegs[2];
 } ViMode; /* OSViMode, 0x50 */
 
+/* A vStart register: the start line in the high half, the end line in the low half. */
+typedef union {
+    u32 w;
+    struct {
+        s16 start;
+        s16 end;
+    } h;
+} Span;
+
 extern s16 D_801309D0; /* selected VI mode */
 extern ViMode D_801309D8;
 extern ViMode D_800B7BE0[]; /* osViModeTable */
@@ -41,43 +51,56 @@ extern void func_0029AA80(ViMode *mode); /* osViSetMode */
 
 void func_00424008(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY) {
     ViMode *mode = &D_801309D8;
-    s32 centerX, centerY0, centerY1;
-    s32 left, right, top0, bottom0, top1, bottom1;
-    s32 oldRight, oldBottom0, oldBottom1;
-    u32 scaleY;
+    Span v[2];
+    Span old[2];
+    struct {
+        s16 y0;
+        s16 y1;
+    } center;
+    u32 hStart, oldHStart;
+    u32 xScale, yScale;
+    s32 oldRight;
+    s32 cx;
 
     func_0029E460(mode, &D_800B7BE0[D_801309D0], 0x50);
-    oldRight = (s16)mode->comRegs.hStart;
-    oldBottom0 = (s16)mode->fldRegs[0].vStart;
-    oldBottom1 = (s16)mode->fldRegs[1].vStart;
-    centerX = ((oldRight - ((s32)mode->comRegs.hStart >> 16)) / 2 + ((s32)mode->comRegs.hStart >> 16)) - x;
-    centerY0 = (mode->fldRegs[0].vStart >> 16) + (oldBottom0 - (s16)(mode->fldRegs[0].vStart >> 16)) / 2 - y;
-    centerY1 = (mode->fldRegs[1].vStart >> 16) + (oldBottom1 - (s16)(mode->fldRegs[1].vStart >> 16)) / 2 - y;
-    left = (s16)(centerX - width / 2 + borderX / 2);
-    right = (s16)(centerX + width / 2 - borderX * 2);
-    top0 = (s16)(centerY0 - height / 2 + borderY / 2);
-    bottom0 = (s16)(centerY0 + height / 2 - borderY * 2);
-    top1 = (s16)(centerY1 - height / 2 + borderY / 2);
-    bottom1 = (s16)(centerY1 + height / 2 - borderY * 2 - 3);
-    mode->comRegs.xScale = (width << 10) / (right - left);
-    scaleY = (mode->fldRegs[0].yScale & 0xFFFF0000) | (((height << 11) / (bottom0 - top0)) & 0xFFFF);
-    bottom0 = (s16)(bottom0 - 3);
-    if (oldBottom0 < bottom0) {
-        bottom0 = oldBottom0;
+    oldHStart = hStart = mode->comRegs.hStart;
+    oldRight = (s16)hStart;
+    cx = (oldRight - ((s32)hStart >> 16)) / 2 + ((s32)hStart >> 16) - x;
+    hStart = ((cx - width / 2 + borderX / 2) << 16) | (u16)(cx + width / 2 - borderX * 2);
+
+    old[0].w = v[0].w = mode->fldRegs[0].vStart;
+    center.y0 = v[0].h.start + (v[0].h.end - v[0].h.start) / 2;
+    center.y0 -= y;
+    v[0].h.start = center.y0 - height / 2 + borderY / 2;
+    v[0].h.end = center.y0 + height / 2 - borderY * 2;
+    yScale = (mode->fldRegs[0].yScale & 0xFFFF0000) | (((height << 11) / (v[0].h.end - v[0].h.start)) & 0xFFFF);
+    v[0].h.end -= 3;
+
+    old[1].w = v[1].w = mode->fldRegs[1].vStart;
+    center.y1 = v[1].h.start + (v[1].h.end - v[1].h.start) / 2;
+    center.y1 -= y;
+    v[1].h.start = center.y1 - height / 2 + borderY / 2;
+    v[1].h.end = center.y1 + height / 2 - borderY * 2;
+    v[1].h.end -= 3;
+
+    xScale = (width << 10) / ((s16)hStart - ((s32)hStart >> 16));
+    if (old[0].h.end < v[0].h.end) {
+        v[0].h.end = old[0].h.end;
     }
-    if (oldBottom1 < bottom1) {
-        bottom1 = oldBottom1;
+    if (old[1].h.end < v[1].h.end) {
+        v[1].h.end = old[1].h.end;
     }
-    if (oldRight < right) {
-        right = oldRight;
+    if (oldRight < (s16)hStart) {
+        hStart = (hStart & 0xFFFF0000) | (u16)oldHStart;
     }
-    mode->fldRegs[0].yScale = scaleY;
-    mode->fldRegs[1].yScale = scaleY;
+    mode->fldRegs[0].yScale = yScale;
+    mode->fldRegs[1].yScale = yScale;
     mode->fldRegs[0].origin = 0;
     mode->fldRegs[1].origin = width * 2;
     mode->comRegs.width = width;
-    mode->comRegs.hStart = ((u32)left << 16) | (u16)right;
-    mode->fldRegs[0].vStart = ((u32)top0 << 16) | (u16)bottom0;
-    mode->fldRegs[1].vStart = ((u32)top1 << 16) | (u16)bottom1;
+    mode->comRegs.xScale = xScale;
+    mode->comRegs.hStart = hStart;
+    mode->fldRegs[0].vStart = v[0].w;
+    mode->fldRegs[1].vStart = v[1].w;
     func_0029AA80(mode);
 }
