@@ -236,7 +236,7 @@ segments:
       - [0x8BEC, c, code/func_00207FEC]
       - [0xA258, c, code/func_00209658]
       - [0xA3AC, c, code/func_002097AC]
-      - [0xA6F4, asm]
+      - [0xA6F4, c, code/func_00209AF4]
       - [0xAF3C, c, code/func_0020A33C]
       - [0xB168, c, code/func_0020A568]
       - [0xB594, c, code/func_0020A994]
