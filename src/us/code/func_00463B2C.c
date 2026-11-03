@@ -75,7 +75,7 @@ extern u8 D_80119870[];
 extern u8 *D_80119890; /* player list */
 extern u8 D_8011AAF1;  /* multiplayer */
 
-extern s32 D_00200AE0(s32, s32);
+extern s32 func_00200AE0(s32, s32);
 extern void CCollisionInfo__Reset(void);
 extern s32 func_00201848(s32 *levelCount, s32 file, s32 index);
 extern void func_00201C08(void *);
@@ -251,7 +251,7 @@ loaded:
     block = func_00205D0C(0, w->levelFile, 1, key, w, func_0042B5D0, D_800A5ECC);
     w->matrixBlock = block;
     w->matrices = *block;
-    block = func_00205D0C(0, w->levelFile, 4, key, w, D_00200AE0, D_800A5ED8);
+    block = func_00205D0C(0, w->levelFile, 4, key, w, func_00200AE0, D_800A5ED8);
     w->collisionBlock = block;
     w->collision = *block;
     w->infoKey = func_00201848(w->levelFile, key, 5);
@@ -263,7 +263,7 @@ loaded:
     w->bounds = *block;
     func_0042A9A0(w);
     D_800AB8A0 = (w->bounds[0x10] >> 2) & 1;
-    block = func_00205D0C(0, w->levelFile, 6, key, w, D_00200AE0, D_800A5F18);
+    block = func_00205D0C(0, w->levelFile, 6, key, w, func_00200AE0, D_800A5F18);
     w->sectionsBlock = block;
     data = *block;
     w->sections = data + 8;

@@ -79,7 +79,7 @@ extern u8 D_800E6AC0[];
 extern u8 D_800EBAC0[];
 extern u8 D_80119870[];
 
-extern s32 D_00200AE0();
+extern s32 func_00200AE0();
 extern s32 func_0020B490();
 extern s32 func_0042CBE4();
 extern s32 func_0042CAB4();
@@ -167,9 +167,9 @@ void func_00429FA0(World *w, s32 file) {
     w->unk28 = func_0020185C(cart, file, 6, &w->unk30);
     w->unk70 = D_800E6AC0;
     w->unk2C = func_0020185C(cart, file, 7, &w->unk34);
-    w->curves = *func_00205D0C(0, cart, 0xD, file, w, D_00200AE0, D_800A5E38);
-    w->rumbles = *func_00205D0C(0, cart, 0xE, file, w, D_00200AE0, D_800A5E40);
-    w->rumbleTypes = *func_00205D0C(0, cart, 0xF, file, w, D_00200AE0, D_800A5E48);
+    w->curves = *func_00205D0C(0, cart, 0xD, file, w, func_00200AE0, D_800A5E38);
+    w->rumbles = *func_00205D0C(0, cart, 0xE, file, w, func_00200AE0, D_800A5E40);
+    w->rumbleTypes = *func_00205D0C(0, cart, 0xF, file, w, func_00200AE0, D_800A5E48);
     w->graphicSetTypes = *func_00205D0C(0, cart, 0x11, file, w, NULL, D_800A5E58);
     res = func_00201848(cart, file, 0x10);
     w->graphicSets = res;

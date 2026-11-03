@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern OSThread_s *D_800B891C;
-extern void D_0029CADC(void);
+extern void func_0029CADC(void);
 extern u32 func_0029DFF0(void);
 extern void func_0029E010(u32 mask);
 void func_0029B060(OSThread_s *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 p)
@@ -19,7 +19,7 @@ void func_0029B060(OSThread_s *t, s32 id, void (*entry)(void *), void *arg, void
     t->context.pc = (u32)entry;
     t->context.a0 = (s64)(s32)arg;
     t->context.sp = (s64)(s32)sp - 16;
-    t->context.ra = (s64)(s32)D_0029CADC;
+    t->context.ra = (s64)(s32)func_0029CADC;
     mask = 0x3FFF01;
     t->context.sr = (mask & 0xFF01) | 0x04000002;
     t->context.rcp = (mask & 0x3F0000) >> 16;
