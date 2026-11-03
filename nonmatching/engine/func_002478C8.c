@@ -1,85 +1,84 @@
-/* NON-MATCHING: 205 of 210 words differ: the ROM keeps the 1.5f message time in $f20 (two pool loads) so the tag and kill branches are not cross-jumped; here they merge and the code shifts */
+/* NON-MATCHING: 134 of 210 words differ (size 0x2fc vs 0x348): everything up to the tag branch's killer message matches (the victim's 1.5f in $f20 comes from the block-local `time`, the `s2 - 0x1228` game pointer from the block-local `game`). The ROM keeps the tag branch's killer message (a0 = s2) apart; here jump2's cross-jumping merges it with the "you killed" tail, because the a0 moves of both carry a REG_EQUAL D_801198B0 note (find_cross_jump compares notes). In the ROM the tag branch's a0 move must carry no constant note; the permuter only splits them with fake temporaries. */
 #include "common.h"
+#include "structs/player.h"
 
-typedef struct {
+typedef struct CPlayerOptions {
     /* 0x00 */ u8 pad0[0x33];
-    /* 0x33 */ char name[0xB];
+    /* 0x33 */ char name[0x3E - 0x33];
     /* 0x3E */ u8 tagMode;
-} PlayerOptions;
+} CPlayerOptions;
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x518];
-    /* 0x0518 */ PlayerOptions *options;
-    /* 0x051C */ void *camera;
-    /* 0x0520 */ u8 pad520[0x12B4 - 0x520];
-    /* 0x12B4 */ s32 messageIndex;
-    /* 0x12B8 */ char messages[4][25];
-} Player;
-
-typedef struct {
+typedef struct HitTarget {
     /* 0x00 */ u8 pad0[0x65];
-    /* 0x65 */ u8 part;             /* & 3: 1 for the head */
-} HitPart;
+    /* 0x65 */ u8 region;           /* low two bits: 1 = head */
+} HitTarget;
 
-typedef struct {
+typedef struct Hit {
     /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ HitPart *part;
+    /* 0x10 */ HitTarget *target;
 } Hit;
 
-typedef struct {
+typedef struct MatchSettings {
     /* 0x00 */ u8 pad0[0x19];
-    /* 0x19 */ u8 multiplayer;
-} Settings;
+    /* 0x19 */ u8 messages;         /* show kill messages */
+} MatchSettings;
 
 /* The global at D_801198B0: what this reads of it. */
 typedef struct Game {
     /* 0x0000 */ u8 pad0[0x1228];
-    /* 0x1228 */ Settings settings;    /* D_8011AAD8 */
+    /* 0x1228 */ MatchSettings settings;    /* D_8011AAD8 */
 } Game;
 
 extern Game D_801198B0;
-extern char D_800B53D0[];       /* "head shot!" */
-extern char D_800B53FC[];       /* "tagged by " */
-extern char D_800B5408[];       /* "you tagged " */
-extern char D_800B5414[];       /* "killed by " */
-extern char D_800B5420[];       /* "you killed " */
-extern char D_800B542C[];       /* "you killed yourself" */
 
 char *func_00288800(char *dst, char *src); /* strcpy */
-void func_00281610(Game *game, void *camera, char *text, f32 time);
+void func_00281610(Game *game, struct CCamera *camera, char *text, f32 time);
 
-/* Shows a player's newest message for time, and moves on in its ring of four. */
-static __inline__ void postMessage(Game *game, Player *p, f32 time) {
-    func_00281610(game, p->camera, p->messages[p->messageIndex], time);
-    p->messageIndex++;
-    p->messageIndex %= 4;
-}
+/* Shows a player's newest message (ring of four) on its camera. */
+#define SHOW_MESSAGE(game, player, time)                                                         \
+    func_00281610(game, (player)->m_pCamera,                                                     \
+                  (player)->m_DeathMatchString[(player)->m_nDeathmatchString], time);            \
+    (player)->m_nDeathmatchString++;                                                             \
+    (player)->m_nDeathmatchString %= 4;
 
-/* The multiplayer kill (or tag) messages for victim and killer. */
-void func_002478C8(Player *victim, Player *killer, Hit *hit) {
-    Settings *settings = &D_801198B0.settings;
+/* Deathmatch messages for a kill: "killed by" or "tagged by" on the victim's
+   screen, "you killed", "you tagged" or "head shot!" on the killer's. */
+void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit) {
+    MatchSettings *settings = &D_801198B0.settings;
+    HitTarget *target;
 
-    if (!settings->multiplayer) {
-        return;
-    }
-    if (victim == killer) {
-        func_00288800(killer->messages[killer->messageIndex], D_800B542C);
-    } else if (victim->options->tagMode) {
-        func_00288800(victim->messages[victim->messageIndex], D_800B53FC);
-        func_00288800(victim->messages[victim->messageIndex] + 10, killer->options->name);
-        postMessage(&D_801198B0, victim, 1.5f);
-        func_00288800(killer->messages[killer->messageIndex], D_800B5408);
-        func_00288800(killer->messages[killer->messageIndex] + 11, victim->options->name);
-    } else {
-        func_00288800(victim->messages[victim->messageIndex], D_800B5414);
-        func_00288800(victim->messages[victim->messageIndex] + 10, killer->options->name);
-        postMessage(&D_801198B0, victim, 1.5f);
-        if (hit->part != NULL && (hit->part->part & 3) == 1) {
-            func_00288800(killer->messages[killer->messageIndex], D_800B53D0);
+    if (settings->messages != 0) {
+        if (victim == killer) {
+            func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], "you killed yourself");
+            SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
+        } else if (victim->m_pOptions->tagMode != 0) {
+            f32 time = 1.5f;
+            Game *game;
+
+            func_00288800(victim->m_DeathMatchString[victim->m_nDeathmatchString], "tagged by ");
+            func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->name);
+            game = &D_801198B0;
+            SHOW_MESSAGE(game, victim, time);
+            func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], "you tagged ");
+            func_00288800(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->name);
+            SHOW_MESSAGE(game, killer, 1.5f);
         } else {
-            func_00288800(killer->messages[killer->messageIndex], D_800B5420);
-            func_00288800(killer->messages[killer->messageIndex] + 11, victim->options->name);
+            f32 time = 1.5f;
+            Game *game;
+
+            func_00288800(victim->m_DeathMatchString[victim->m_nDeathmatchString], "killed by ");
+            func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->name);
+            game = &D_801198B0;
+            SHOW_MESSAGE(game, victim, time);
+            target = hit->target;
+            if (target != NULL && (target->region & 3) == 1) {
+                func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], "head shot!");
+                SHOW_MESSAGE(game, killer, 1.5f);
+            } else {
+                func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], "you killed ");
+                func_00288800(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->name);
+                SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
+            }
         }
     }
-    postMessage(&D_801198B0, killer, 1.5f);
 }

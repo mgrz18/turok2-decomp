@@ -1,4 +1,4 @@
-/* NON-MATCHING: 206 of 385 words differ: same size and structure; the region counter is spilled and the object-table base kept in fp (ROM: counter in fp, base spilled), so the region pointer increment lands in bc1fl delay slots and registers shift. */
+/* The do { } while (0) around the region-loop setup raises the region counter's priority (GCC weights refs by loop depth) so it gets fp and the object-table base is spilled, as in the ROM. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
@@ -228,9 +228,11 @@ found:
             g->w1 = 0xFFFE;
         }
     }
-    i = 0;
-    n = w->regionCount;
-    regions = w->regions;
+    do {
+        i = 0;
+        n = w->regionCount;
+        regions = w->regions;
+    } while (0);
     if (n > 0) {
         do {
             region = regions + i;

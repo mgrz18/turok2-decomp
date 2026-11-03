@@ -1,11 +1,17 @@
-/* NON-MATCHING: 414 of 530 words differ: same control flow and instruction mix, but the ROM keeps extra copies of the table pointers (lod/part tables reloaded from two stack slots each, a register copy in the vertex loop; frame 0xA8 vs 0xA0) that this C does not produce, so register allocation and scheduling differ throughout. */
 /* Close in structure to thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0026AD8C.c, with Turok 2's extra level-of-detail table. */
 #include "common.h"
+#include "gfx.h"
 
-typedef struct Gfx {
-    u32 w0;
-    u32 w1;
-} Gfx;
+/* An F3DEX2 vertex (libultra's Vtx), 16 bytes. */
+typedef struct Vtx {
+    /* 0x0 */ s16 ob[3];
+    /* 0x6 */ u16 flag;
+    /* 0x8 */ s16 tc[2];
+    /* 0xC */ u8 cn[4];
+} Vtx;
+
+/* F3DEX2 triangle word: three vertex indices, each times 2 (libultra's __gsSP1Triangle_w1). */
+#define TRI_WORD(a, b, c) (((((a) * 2) & 0xFF) << 16) | ((((b) * 2) & 0xFF) << 8) | (((c) * 2) & 0xFF))
 
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
@@ -20,6 +26,26 @@ void **func_00205D7C(s32 heap, void ***handle, s32 size);
 void func_002057B0(s32 heap, void ***handle, void **block);
 void func_0026D070(void *dst, void *material);
 void *func_0029E460(void *dst, const void *src, u32 n); /* memcpy */
+
+/* An offset table: a count, then the offset of each entry and the offset after the last one. */
+typedef struct Table {
+    /* 0x0 */ s32 count;
+    /* 0x4 */ s32 offsets[1];
+} Table;
+
+/* Sets an offset table's entry count and the offset where the next entry starts. */
+static __inline__ void TableSet(s32 *tbl, s32 count, s32 end) {
+    Table *t = (Table *)tbl;
+    t->count = count;
+    t->offsets[count] = end;
+}
+
+/* Appends an entry to an offset table: bumps its count and records where the next entry starts. */
+static __inline__ s32 TableAppend(s32 *tbl, s32 count, s32 end) {
+    count++;
+    TableSet(tbl, count, end);
+    return count;
+}
 
 /* Builds the drawable form of a packed model resource. Its entries are offset tables (a count,
  * then the offset of each entry and of the end): the vertex frames, a block copied as is, the
@@ -46,16 +72,17 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
     s32 *parts;
     s32 *partTbl;
     u8 *base;
-    Gfx *vtxBase;
+    Vtx *vtxBase;
     void **block;
     s32 *vtxTbl;
-    s32 *frameTbl;
     s32 *frames;
+    s32 *frameTbl;
     s32 vtxCount;
     s32 count;
     void *src;
     s32 size;
     s32 i;
+    s32 frame;
     s32 j;
     s32 partCount;
     s32 n;
@@ -73,16 +100,14 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
     s32 r;
     s32 g;
     s32 b;
-    s32 hi;
-    s32 lo;
     s32 first;
-    s32 next;
     s32 segment1;
     s32 cnt;
-    s32 b0;
-    s32 b1;
+    s32 len;
+    s32 mtx;
+    s32 r2;
+    s32 g2;
     s32 b2;
-    s32 b3;
 
     if (func_00200B00(handle, 1) == 0) {
         return;
@@ -109,9 +134,9 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
         partCount = *parts;
         size += TABLE_SIZE(partCount);
         for (j = 0; j < partCount; j++) {
-            s32 len;
             u8 op;
 
+            /* Display list bytes: one command per packed command, plus the end and 8-alignment. */
             part = func_002017D4(parts, j);
             size += 0x30;
             p = func_002017D4(part, 1);
@@ -159,146 +184,116 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
         dst = *block;
         base = (u8 *)dst;
         n = TABLE_SIZE(vtxCount);
-        vtxTbl = (s32 *)(base + off);
-        dst[0] = 0;
-        dst[1] = off;
-        vtxTbl[0] = 0;
-        vtxTbl[1] = n;
+        vtxTbl = (s32 *)((u8 *)dst + off);
+        TableSet(dst, 0, off);
+        TableSet(vtxTbl, 0, n);
         frameTbl = vtxTbl;
-        for (i = 0; i < vtxCount;) {
-            func_0020192C(func_002017E8(frames, i, &frameSize), (u8 *)frameTbl + n, 0);
-            next = i + 1;
+        for (frame = 0; frame < vtxCount;) {
+            func_0020192C(func_002017E8(frames, frame, &frameSize), base + off + n, 0);
             n += frameSize;
-            frameTbl[0] = next;
-            frameTbl[next + 1] = n;
-            i = next;
+            frame = TableAppend(frameTbl, frame, n);
         }
-        off += n;
-        dst[0] = 1;
-        dst[2] = off;
+        TableSet(dst, 1, off += n);
         func_0029E460(base + off, data, dataSize);
         lodOff = TABLE_SIZE(lodCount);
-        dst[0] = 2;
-        off += dataSize;
-        dst[3] = off;
+        TableSet(dst, 2, off += dataSize);
         lodTbl = (s32 *)(base + off);
-        lodTbl[0] = 0;
-        lodTbl[1] = lodOff;
+        TableSet(lodTbl, 0, lodOff);
         segment1 = 0x01000000;
         for (i = 0; i < lodCount;) {
             parts = func_002017D4(lods, i);
             vtxCounter = 0;
             partCount = *parts;
-            partTbl = (s32 *)((u8 *)lodTbl + lodOff);
+            partTbl = (s32 *)(base + off + lodOff);
             partOff = TABLE_SIZE(partCount);
-            partTbl[0] = 0;
-            partTbl[1] = partOff;
-            vtxBase = (Gfx *)((u8 *)func_002017D4(frameTbl, i) + 8);
+            TableSet(partTbl, 0, partOff);
+            vtxBase = (Vtx *)((u8 *)func_002017D4(frameTbl, i) + 8);
             for (j = 0; j < partCount;) {
                 part = func_002017D4(parts, j);
                 partSize = 0x10;
-                outPart = (s32 *)((u8 *)partTbl + partOff);
-                outPart[0] = 0;
-                outPart[1] = partSize;
+                outPart = (s32 *)(base + off + lodOff + partOff);
+                TableSet(outPart, 0, partSize);
                 func_0026D070((u8 *)outPart + partSize, func_002017D4(part, 0));
                 partSize = 0x30;
-                outPart[0] = 1;
-                outPart[2] = partSize;
+                TableSet(outPart, 1, partSize);
                 p = func_002017D4(part, 1);
                 start = (Gfx *)((u8 *)outPart + partSize);
-                gfx = start;
                 c = *p;
+                gfx = start;
                 while (c != 0) {
                     if (c & 0x80) {
-                        hi = *p++;
-                        lo = *p++;
-                        w = (hi << 8) | lo;
+                        w = *p++ << 8;
+                        w |= *p++;
                         r = (w >> 10) & 0x1F;
                         g = (w >> 5) & 0x1F;
                         b = w & 0x1F;
                         if (*p & 0x80) {
-                            hi = *p++;
-                            lo = *p++;
-                            w = (hi << 8) | lo;
-                            GFX_W(gfx++, (r << 17) | (g << 9) | (b << 1) | 0x06000000,        /* gSP2Triangles */
-                                  (((w >> 9) & 0x3E) << 16) | ((w << 4) & 0x3E00) | ((w & 0x1F) << 1));
+                            w = *p++ << 8;
+                            w |= *p++;
+                            r2 = (w >> 10) & 0x1F;
+                            g2 = (w >> 5) & 0x1F;
+                            b2 = w & 0x1F;
+                            GFX_W(gfx++, 0x06000000 | TRI_WORD(r, g, b), TRI_WORD(r2, g2, b2));     /* gSP2Triangles */
                         } else {
-                            GFX_W(gfx++, (r << 17) | (g << 9) | (b << 1) | 0x05000000, 0);  /* gSP1Triangle */
+                            GFX_W(gfx++, 0x05000000 | TRI_WORD(r, g, b), 0);                   /* gSP1Triangle */
                         }
                     } else {
                         switch (c & 0x60) {
                         case 0x20:
-                            hi = *p++;
-                            lo = *p;
-                            w = (hi << 8) | lo;
+                            w = *p++ << 8;
+                            w |= *p++;
                             first = (w >> 5) & 0x1F;
                             cnt = w & 0x1F;
                             if (cnt == 0) {
                                 cnt = 32;
                             }
-                            p++;
                             GFX_W(gfx++, (cnt << 12) | (((first + cnt) << 1) | segment1),     /* gSPVertex */
-                                  (u32)&vtxBase[vtxCounter * 2] - (u32)vtxTbl + 0x02000000);
+                                  (u32)&vtxBase[vtxCounter] - (u32)vtxTbl + 0x02000000);    /* segment 2 */
                             vtxCounter += cnt;
                             break;
                         case 0x40:
                             p++;
-                            cnt = *p++;
-                            GFX_W(gfx++, 0xDA380003, (cnt << 6) + segment1);                    /* gSPMatrix */
+                            mtx = *p++;
+                            GFX_W(gfx++, 0xDA380003, (mtx << 6) + segment1);                    /* gSPMatrix */
                             break;
                         case 0x60:
                             first = c & 0x1F;
                             p++;
-                            b0 = *p++;
-                            b1 = *p++;
-                            b2 = *p++;
-                            b3 = *p++;
-                            GFX_W(gfx++, (first << 1) | 0x02140000, (b0 << 24) | (b1 << 16) | (b2 << 8) | b3);
+                            w = *p++ << 24;
+                            w |= *p++ << 16;
+                            w |= *p++ << 8;
+                            w |= *p++;
+                            GFX_W(gfx++, (first << 1) | 0x02140000, w);                         /* moveword */
                             break;
                         }
                     }
                     c = *p;
                 }
-                partSize += ((u8 *)gfx - (u8 *)start + 0xF) & ~7;
+                len = (u8 *)gfx - (u8 *)start;
+                partSize += (len + 0xF) & ~7;
                 partOff += partSize;
-                next = j + 1;
                 GFX_W(gfx++, 0xDF000000, 0);                                                   /* gSPEndDisplayList */
-                outPart[0] = 2;
-                outPart[3] = partSize;
-                partTbl[0] = next;
-                partTbl[next + 1] = partOff;
-                j = next;
+                TableSet(outPart, 2, partSize);
+                j = TableAppend(partTbl, j, partOff);
             }
-            next = i + 1;
             lodOff += partOff;
-            lodTbl[0] = next;
-            lodTbl[next + 1] = lodOff;
-            i = next;
+            i = TableAppend(lodTbl, i, lodOff);
         }
-        off += lodOff;
-        dst[0] = 3;
-        dst[4] = off;
+        TableSet(dst, 3, off += lodOff);
         if (withTerminator != 0) {
             s32 *e = (s32 *)(base + off);
 
             e[0] = -1;
             e[1] = 0;
-            dst[0] = 4;
-            dst[5] = off;
+            TableSet(dst, 4, off);
         }
         if (withExtra != 0) {
             func_0029E460(base + off, extra3, extra3Size);
-            dst[0] = 4;
-            off += extra3Size;
-            dst[5] = off;
+            TableSet(dst, 4, off += extra3Size);
             func_0029E460(base + off, extra4, extra4Size);
-            dst[0] = 5;
-            off += extra4Size;
-            dst[6] = off;
+            TableSet(dst, 5, off += extra4Size);
             func_0029E460(base + off, extra5, extra5Size);
-            dst[0] = 6;
-            off += extra5Size;
-            dst[7] = off;
+            TableSet(dst, 6, off += extra5Size);
         }
     }
     func_002057B0(0, handle, block);

@@ -1,4 +1,3 @@
-/* NON-MATCHING: 147 of 936 words differ: the ROM's code path, call sequence and float pool, but the floating-point register allocation differs (posX/posZ/rotYOffset get $f27/$f28/$f26 instead of $f26/$f27/$f28, the fov block's temporaries are permuted), the last view matrix pointer lives in $s3 instead of $s1, and the frustum corner and view-box stores are scheduled differently. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80233920_6.CPP, func_80234FEC_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/camera.h"
@@ -103,11 +102,13 @@ void func_0027D160(CCamera *cam) {
     void (*update)(CCamera *);
     CShake *s;
     CFloor *floor;
-    f32 (*final)[4];
     f32 rotX, rotZ, rotY, rotYOffset, posX, posY, posZ, yOffset, zoomBlend, zoomFov;
     f32 half, a, sn, swim, inv;
-    f32 fov, aspect, t, ty, far, halfX, halfY, radius, r15, v, scale, max;
+    f32 fov, aspect, t, ty, far, halfX, halfY, radius, r15, v;
     f32 x, y, z, height;
+    /* Block-local temporaries: separate variables keep each in its own block (GCC's local allocator). */
+    f32 cornerX, cornerY, yawCam, yawPath, ang, above, depth;
+    f32 boxX, boxY, boxZ;
     s32 n;
 
     for (node = D_80119890; node != NULL; node = node->m_pNext) {
@@ -160,13 +161,13 @@ found:
         qX.y = 0.0f;
         qX.z = 0.0f;
         qX.w = func_002974C0(a);
-        a = (rotY + rotYOffset) * half;
-        sn = func_002982F0(a);
+        yawCam = (rotY + rotYOffset) * half;
+        sn = func_002982F0(yawCam);
         D_800DD78C = sn;
         qY.x = 0.0f;
         qY.y = sn;
         qY.z = 0.0f;
-        qY.w = func_002974C0(a);
+        qY.w = func_002974C0(yawCam);
         func_00210F68(&qXY, &qX, &qY);
         func_00210F68(&cam->m_qViewAlignNoZ, &qXY, &qGround);
         func_00210F68(&cam->m_qViewAlign, &qZ, &cam->m_qViewAlignNoZ);
@@ -192,8 +193,9 @@ found:
         posY += shakeOffset.y;
         posZ += shakeOffset.z;
         func_0020C618(m, mRot, mYOffset);
-        final = mOrient;
-        func_0020C618(final, m, mGround);
+        func_0020C618(mOrient, m, mGround);
+        func_0020FC24(mTrans, posX, posY, posZ);
+        func_0020C618(cam->m_mfViewOrient, mOrient, mTrans);
     } else {
         half = 0.5f;
         a = rotZ * half;
@@ -210,21 +212,20 @@ found:
         qX.y = 0.0f;
         qX.z = 0.0f;
         qX.w = func_002974C0(a);
-        a = (rotY + rotYOffset) * half;
-        sn = func_002982F0(a);
+        yawPath = (rotY + rotYOffset) * half;
+        sn = func_002982F0(yawPath);
         D_800DD78C = sn;
         qY.x = 0.0f;
         qY.y = sn;
         qY.z = 0.0f;
-        qY.w = func_002974C0(a);
+        qY.w = func_002974C0(yawPath);
         func_00210F68(&qXY, &qX, &qY);
         cam->m_qViewAlignNoZ = qXY;
         func_00210F68(&cam->m_qViewAlign, &qZ, &cam->m_qViewAlignNoZ);
-        final = mRot;
-        func_00211114(&qXY, final);
+        func_00211114(&qXY, mRot);
+        func_0020FC24(mTrans, posX, posY, posZ);
+        func_0020C618(cam->m_mfViewOrient, mRot, mTrans);
     }
-    func_0020FC24(mTrans, posX, posY, posZ);
-    func_0020C618(cam->m_mfViewOrient, final, mTrans);
     func_002101A0(cam->m_mfViewOrient, &cam->m_vPos);
     cam->m_vRotation.x = rotX;
     cam->m_vRotation.y = rotY;
@@ -249,7 +250,7 @@ found:
         func_002117DC(&cam->m_WaterWobbleXScale, 0.1f, 0.5f);
         func_002117DC(&cam->m_WaterWobbleYScale, 0.05f, 0.5f);
         inv = 1.0f - swim;
-        func_002117DC(&cam->m_WaterWobbleXSpeed, swim * 0.10471976f + inv * 0.06981318f, 0.16666667f);
+        func_002117DC(&cam->m_WaterWobbleXSpeed, swim * 0.104719765f + inv * 0.06981318f, 0.16666667f);
         func_002117DC(&cam->m_WaterWobbleYSpeed, swim * 0.087266475f + inv * 0.03490659f, 0.16666667f);
     } else {
         cam->m_YScale = 1.0f;
@@ -262,8 +263,7 @@ found:
     }
     fov = fov * 0.017453294f;
     aspect = cam->m_Viewport.m_Width / cam->m_Viewport.m_Height;
-    ty = func_002982F0(fov);
-    ty = ty / func_002974C0(fov);
+    ty = func_002982F0(fov) / func_002974C0(fov);
     t = ty * 1.2792794f;
     ty = t / aspect;
     ty = ty / cam->m_YScale;
@@ -294,25 +294,23 @@ found:
         func_00210968(mLight, cam->m_Time * 0.008726647f);
     }
     func_0020F7EC(mLight);
-    scale = 128.0f;
-    max = 127.0f;
-    v = mLight[0][0] * scale;
-    if (!(v <= max)) v = max;
+    v = mLight[0][0] * 128.0f;
+    if (!(v <= 127.0f)) v = 127.0f;
     lookAt->l[0x08] = (s32) v;
-    v = mLight[1][0] * scale;
-    if (!(v <= max)) v = max;
+    v = mLight[1][0] * 128.0f;
+    if (!(v <= 127.0f)) v = 127.0f;
     lookAt->l[0x09] = (s32) v;
-    v = mLight[2][0] * scale;
-    if (!(v <= max)) v = max;
+    v = mLight[2][0] * 128.0f;
+    if (!(v <= 127.0f)) v = 127.0f;
     lookAt->l[0x0A] = (s32) v;
-    v = mLight[0][1] * scale;
-    if (!(v <= max)) v = max;
+    v = mLight[0][1] * 128.0f;
+    if (!(v <= 127.0f)) v = 127.0f;
     lookAt->l[0x18] = (s32) v;
-    v = mLight[1][1] * scale;
-    if (!(v <= max)) v = max;
+    v = mLight[1][1] * 128.0f;
+    if (!(v <= 127.0f)) v = 127.0f;
     lookAt->l[0x19] = (s32) v;
-    v = mLight[2][1] * scale;
-    if (!(v <= max)) v = max;
+    v = mLight[2][1] * 128.0f;
+    if (!(v <= 127.0f)) v = 127.0f;
     lookAt->l[0x1A] = (s32) v;
     lookAt->l[0x00] = 0;
     lookAt->l[0x01] = 0;
@@ -331,39 +329,46 @@ found:
     lookAt->l[0x16] = 0;
     lookAt->l[0x17] = 0;
     if (!D_80119870.m_bWideViewVolume) {
-        a = fov * aspect * 0.008726647f;
-        radius = cam->m_FarClip / func_002974C0(a);
+        ang = fov * aspect * 0.008726647f;
+        radius = cam->m_FarClip / func_002974C0(ang);
         corners[0].x = 0.0f;
         corners[0].y = 0.0f;
         corners[0].z = 0.0f;
-        halfX = radius * func_002982F0(a);
-        halfY = halfX / aspect;
-        corners[1].x = halfX;
-        corners[1].y = halfY;
-        corners[2].x = -halfX;
-        corners[2].y = halfY;
-        corners[3].x = halfX;
-        corners[3].y = -halfY;
-        corners[4].x = -halfX;
-        corners[4].y = -halfY;
-        corners[1].z = corners[2].z = corners[3].z = corners[4].z = -cam->m_FarClip;
+        cornerX = radius * func_002982F0(ang);
+        cornerY = cornerX / aspect;
+        corners[1].x = cornerX;
+        corners[1].y = cornerY;
+        depth = -cam->m_FarClip;
+        corners[2].x = -cornerX;
+        corners[2].y = cornerY;
+        corners[3].x = cornerX;
+        corners[3].y = -cornerY;
+        corners[4].x = -cornerX;
+        corners[4].y = -cornerY;
+        corners[1].z = depth;
+        corners[2].z = depth;
+        corners[3].z = depth;
+        corners[4].z = depth;
     } else {
-        halfX = halfX * 0.5f;
-        halfY = halfY * 0.5f;
+        boxX = halfX * 0.5f;
+        boxY = halfY * 0.5f;
         corners[0].x = 0.0f;
         corners[0].y = 0.0f;
         corners[0].z = 0.0f;
-        corners[1].x = halfX;
-        corners[1].y = halfY;
-        z = -cam->m_FarClip;
-        corners[2].x = -halfX;
-        corners[2].y = halfY;
-        corners[3].x = halfX;
-        corners[3].y = -halfY;
-        corners[4].x = -halfX;
-        corners[4].y = -halfY;
-        corners[1].z = corners[2].z = corners[3].z = corners[4].z = z;
-        radius = func_00298470(halfX * halfX + halfY * halfY + z * z);
+        corners[1].x = boxX;
+        corners[1].y = boxY;
+        boxZ = -cam->m_FarClip;
+        corners[2].x = -boxX;
+        corners[2].y = boxY;
+        corners[3].x = boxX;
+        corners[3].y = -boxY;
+        corners[4].x = -boxX;
+        corners[4].y = -boxY;
+        corners[1].z = boxZ;
+        corners[2].z = boxZ;
+        corners[3].z = boxZ;
+        corners[4].z = boxZ;
+        radius = func_00298470(boxX * boxX + boxY * boxY + boxZ * boxZ);
     }
     func_0020F908(cam->m_mfViewOrient, corners, cam->m_vTCorners, 5);
     func_0026F080(cam->m_ViewVolume, &cam->m_vTCorners[0], &cam->m_vTCorners[1], &cam->m_vTCorners[2],
@@ -372,10 +377,10 @@ found:
     r15 = radius * 1.5f;
     cam->m_AnimMin.x = cam->m_vTCorners[0].x - radius;
     cam->m_AnimMax.x = cam->m_vTCorners[0].x + radius;
-    cam->m_AnimMin.z = cam->m_vTCorners[0].z - radius;
-    cam->m_AnimMax.z = cam->m_vTCorners[0].z + radius;
     cam->m_AnimMin.y = cam->m_vTCorners[0].y - r15;
     cam->m_AnimMax.y = cam->m_vTCorners[0].y + r15;
+    cam->m_AnimMin.z = cam->m_vTCorners[0].z - radius;
+    cam->m_AnimMax.z = cam->m_vTCorners[0].z + radius;
     func_00211114(&cam->m_qViewAlignNoZ, cam->m_mfFaceScreen);
     func_002105A4(cam->m_mfFaceScreenYAxisUp, cam->m_vRotation.y);
     if (D_801198E8 != 0) {
@@ -399,8 +404,8 @@ found:
     height = cam->m_ViewParams.m_YPosOffset;
     cam->m_ViewParams.m_VisBits = D_800B6D00;
     if (floor != NULL && Cinema_PathPlaying() == 0) {
-        t = ((y + height) - func_0026BE60(floor, x, z)) * 0.09765625f;
-        if (t < 11.0f && t > 5.0f) {
+        above = ((y + height) - func_0026BE60(floor, x, z)) * 0.09765625f;
+        if (above < 11.0f && above > 5.0f) {
             cam->m_ViewParams.m_VisBits = floor->m_VisBits;
         }
     }

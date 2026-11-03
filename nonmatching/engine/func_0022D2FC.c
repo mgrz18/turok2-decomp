@@ -1,4 +1,4 @@
-/* NON-MATCHING: 13 of 624 words differ: register allocation only, in the inlined depth scale: local-alloc gives distanceRange's min/max $f0/$f1, which the ROM leaves free (ROM keeps the depth argument in $f5 and the clamped factor in $f0; this build uses $f1 and $f2). */
+/* NON-MATCHING: 13 of 624 words differ: register allocation only, in the inlined depth scale (ROM: depth $f5, size $f4, near $f1, zero $f3, farness $f0, 1.0 $f2, distanceRange max/min loaded into $f2/$f3). This build lets local-alloc put max/min in $f0/$f1, so farness (highest global priority) conflicts with those hard regs and gets $f2, then size/zero land in $f3/$f4 and depth in $f1; in the ROM $f0/$f1 were already busy where max/min are loaded and depth conflicts with every inline value. Tried in round B without effect: RW `size *=` form, inline param reused as size, early return, MAX or lerp as inline functions, depth - 16 in place of near. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_4.CPP, Particle_BuildMatrix, with Turok 2's layouts. */
 #include "common.h"
 
