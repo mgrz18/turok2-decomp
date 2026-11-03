@@ -1,6 +1,8 @@
 /* NON-MATCHING: 245 of 390 words differ (size 0x5b8 vs 0x618): the highlight's `bright = (b * 3) >> 1`
- * is folded to a constant here (cse skips the `if (hi < lo)` block and knows b = 0xFF), the ROM computes it at
- * run time and rebuilds the last rect's words; the extra hoisted -1 then shifts the loop's register allocation.
+ * is folded to a constant here, the ROM computes it at run time and rebuilds the last rect's words; the extra
+ * hoisted -1 then shifts the loop's register allocation. The cause: -fcse-skip-blocks lets CSE skip the
+ * `if (hi < lo)` block and know b = 0xFF at the join (with -fno-cse-skip-blocks -fno-cse-follow-jumps it
+ * drops to 181 words, size 0x614 vs 0x618), so the original source must give that label more uses.
  * Everything before the highlight (globals as struct fields for aliasing, the cmd pointer for the 0x646400 band)
  * matches. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCENE/802508E0_6.CPP, func_80252A44_de, with Turok 2's layouts. */

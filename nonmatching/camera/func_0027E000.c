@@ -1,4 +1,4 @@
-/* NON-MATCHING: 442 of 476 words differ (one word short, 0x76c vs 0x770): the structure is the ROM's (Rage Wars' Camera_SetupViewportAndFog with Turok 2's layouts) but the scheduling of the viewport loads around the m_PixelXScale/YScale stores (the ROM loads m_WarpXScale and the screen size before them and keeps a copy of the scale, mov.s), and of the display-list pointer stores in the fog block, differ; the permuter got no closer. */
+/* NON-MATCHING: 54 of 476 words differ, same size: everything after 0x180 matches except the FP temp of the trunc.w.s ($f7 vs $f5, a consequence of the head); the head (0x84-0x17C) is sched1's order: in the ROM the m_WarpXScale load that feeds the m_PixelXScale store comes first, the store is issued right after the 1.0 resets and the second m_WarpXScale load (sx) becomes reload_cse's mov.s $f0,$f1, so ulx/uly land in $s5/$s4; here the sx load gets the longer critical path and is scheduled first, so the copy goes the other way and the x/y truncs swap. 300+ statement orders (random and hill-climbing) and 30 min of permuter on the head found nothing closer than 51 (with an unnatural order). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80233920_6.CPP, Camera_SetupViewportAndFog, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
@@ -7,12 +7,22 @@
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 extern s32 D_800B6D1C;          /* which of the two frame buffers is drawn */
-extern s32 D_8011AAD8;          /* game flags */
+typedef struct {
+    /* 0x00 */ s32 m_Flags;
+} GameFlags;
+extern GameFlags D_8011AAD8;    /* game flags */
 extern Gfx D_800AB100[];        /* RDP setup display lists */
 extern Gfx D_800AB130[];
 extern CCamera D_801198F0;      /* the main camera (camera pool + 0x40) */
 extern s32 D_801198E0;          /* the pool's active camera count */
-extern u8 *D_800F7070;          /* the frame being drawn; its colour image at 0x110 */
+typedef struct {
+    /* 0x000 */ u8 _pad[0x110];
+    /* 0x110 */ void *m_ColorImage;
+} Frame;
+typedef struct {
+    /* 0x00 */ Frame *m_pFrame;
+} FrameRef;
+extern FrameRef D_800F7070;     /* the frame being drawn */
 extern void *D_80130A78;        /* the z buffer */
 void func_00207A54(void);
 void func_00207FEC(s32 arg0);
@@ -41,7 +51,7 @@ void func_0027E000(CCamera *cam) {
     s16 vx, vy;
     s32 maxx, maxy;
     f32 sx, sy, width, height, x, y;
-    u8 *buffer;
+    Frame *buffer;
     s32 frame;
 
     {
@@ -50,28 +60,30 @@ void func_0027E000(CCamera *cam) {
         GFX(*setup, 0xE7000000, 0);                         /* gDPPipeSync */
         GFX(*setup, 0xDE000000, (u32) D_800AB100);          /* gSPDisplayList */
         GFX(*setup, 0xDE000000, (u32) D_800AB130);
+        ResetPixelScale(cam);
+        /* Read twice: the ROM loads m_WarpXScale for the store and again
+         * for sx (the second load becomes a mov.s after reload). */
+        cam->m_PixelXScale = cam->m_WarpXScale;
         sx = cam->m_WarpXScale;
+        sy = cam->m_WarpYScale;
+        cam->m_PixelYScale = sy;
+        maxx = (u16) D_800C2030 - 1;
+        maxy = (u16) D_800C2034 - 1;
         width = cam->m_Viewport.m_Width;
-        vx = (s32) ((width + width) * sx);
-        y = cam->m_Viewport.m_ScreenPosY;
-        uly = (s32) y;
         height = cam->m_Viewport.m_Height;
         x = cam->m_Viewport.m_ScreenPosX;
-        lrx = (s32) (x + width);
-        maxx = (u16) D_800C2030 - 1;
-        sy = cam->m_WarpYScale;
-        vy = (s32) ((height + height) * sy);
-        lry = (s32) (y + height);
-        ResetPixelScale(cam);
-        maxy = (u16) D_800C2034 - 1;
+        y = cam->m_Viewport.m_ScreenPosY;
         ulx = (s32) x;
-        cam->m_PixelXScale = sx;
-        cam->m_PixelYScale = sy;
+        uly = (s32) y;
+        lrx = (s32) (x + width);
+        lry = (s32) (y + height);
+        vx = (s32) ((width + width) * sx);
+        vy = (s32) ((height + height) * sy);
         if (D_800C2030 - 1 < lrx) lrx = maxx;
         if (ulx < 0) ulx = 0;
         if (uly < 0) uly = 0;
         if (lry > D_800C2034 - 1) lry = maxy;
-        buffer = D_800F7070;
+        buffer = D_800F7070.m_pFrame;
         frame = D_800B6D1C;
         GFX(*setup, 0xDA380007, (u32) &cam->m_mProjection[frame]);   /* gSPMatrix */
         GFX(*setup, 0xDB0E0000, cam->m_PerspNorm);                    /* gSPPerspNormalize */
@@ -97,9 +109,14 @@ void func_0027E000(CCamera *cam) {
         GFX(*clearDl, 0xE7000000, 0);
         GFX(*clearDl, 0xE3000A01, 0x300000);
         GFX(*clearDl, 0xF7000000, 0xFFFCFFFC);              /* gDPSetFillColor(max z) */
-        GFX(*clearDl, 0xF6000000 | (lrx & 0x3FF) << 14 | (lry & 0x3FF) << 2,
-            (ulx & 0x3FF) << 14 | (uly & 0x3FF) << 2);      /* gDPFillRectangle */
-        if (D_8011AAD8 & 0x4000) {
+        {
+            Gfx *cmd = *clearDl;
+
+            GFX(cmd, 0xF6000000 | (lrx & 0x3FF) << 14 | (lry & 0x3FF) << 2,
+                (ulx & 0x3FF) << 14 | (uly & 0x3FF) << 2);  /* gDPFillRectangle */
+            *clearDl = cmd;
+        }
+        if (D_8011AAD8.m_Flags & 0x4000) {
             rgb.red = 0;
             rgb.green = 0;
             rgb.blue = 0;
@@ -134,8 +151,8 @@ void func_0027E000(CCamera *cam) {
             g->w1 = red << 24 | green << 16 | blue << 8 | 0xFF;
         }
         fill = ((red << 8) & 0xF800) | ((green << 3) & 0x7C0) | ((blue >> 2) & 0x3E);
-        GFX(D_800D8E24, 0xFF100000 | ((D_800C2030 - 1) & 0xFFF), *(u32 *) (buffer + 0x110));
-        GFX(D_800D8E24, 0xF7000000, ((fill | 1) << 16 | 1) | (u16) fill);
+        GFX(D_800D8E24, 0xFF100000 | ((D_800C2030 - 1) & 0xFFF), (u32) buffer->m_ColorImage);
+        GFX(D_800D8E24, 0xF7000000, ((fill | 1) << 16 | 1) + (u16) fill);
         GFX(D_800D8E24, 0xF6000000 | (lrx & 0x3FF) << 14 | (lry & 0x3FF) << 2,
             (ulx & 0x3FF) << 14 | (uly & 0x3FF) << 2);
     }
