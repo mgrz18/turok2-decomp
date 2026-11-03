@@ -151,12 +151,25 @@ now: func_0042CF90 and func_0042D120 own their literals in the engine's
 .rodata (0x800A6050, 0x800A60B8) and their copies func_00465EB0 and
 func_00466040 go over them.
 
-Open: the VM pools are interleaved with the engine's in its .rodata
-(0x800A600C is func_0042C560's, 0x800A6010 the engine's func_002261A8's,
-0x800A6014 func_0042CBE4's), probably in link order of the objects, and
-func_0042CBE4's jump table at 0x800A6018 is 8-aligned only if its object's
-.rodata starts at 0x800A6010. func_0042CBE4 and its copy func_00465B04 stay
-asm until it is known which object that word belongs to.
+The VM pools are interleaved with the engine's in its .rodata (0x800A600C
+is func_0042C560's, 0x800A6010 the engine's func_002261A8's, 0x800A6014
+func_0042CBE4's). The word at 0x800A6010 (-1.0f) is the engine's: only
+func_002261A8 reads it (`bestIdx = -1.0f`, matched C), and no VM code names
+it. But func_0042CBE4 cannot open an object of its own at 0x800A6014: cc1
+puts a jump table after `.align 3`, so its .rodata is 1.0f, a pad word, then
+the table at offset 8, and an object there puts the table at 0x800A601C
+(all 61 named jump tables in the ROM are 8-aligned). The ROM's 1.0f at
+0x800A6014 and table at 0x800A6018 fit only a pool that is already 4 bytes
+in at 0x800A6014, that is, one .rodata section holding func_002261A8's
+-1.0f and func_0042CBE4's literal and table: one source file whose
+functions went to two segments, the engine's .text and the VM's. cc1 can do
+that (`-ffunction-sections` names each function's section `.func_X`, and
+splat can link a subsegment's `linker_section`), but nothing else in the
+build works that way, the object's other members are unknown, and the
+second module's copy func_00465B04 would need the same object with its
+engine half thrown away. So func_0042CBE4 and func_00465B04 stay asm (both
+have matching C in build/manual/X), and this is the first evidence that
+some engine and VM functions share a source file.
 
 Object boundaries in the VM modules: each object starts 16-aligned in .text
 and in .rodata, with junk words before (often copies of instructions). The
