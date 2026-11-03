@@ -1202,3 +1202,5 @@ func_0042B960 = 0x0042B960;
 func_0042C9D4 = 0x0042C9D4;
 func_0042CB04 = 0x0042CB04;
 func_0042CC24 = 0x0042CC24;
+/* func_004088B0 (X): no asm names it any more. */
+D_8012FB5C = 0x8012FB5C;

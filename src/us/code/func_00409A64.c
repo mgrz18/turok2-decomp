@@ -1,0 +1,128 @@
+/* First-module twin of src/us/code/func_00442A64.c. */
+#include "common.h"
+
+/* Teleports the current target (when it is a flagged actor) to a random spot: around the spawn point
+ * nearest to it (within 460.8) inside that point's angle range, else around itself; retried until the spot
+ * is at least 460.8 away from every spawn point. */
+
+typedef struct {
+    f32 x, y, z;
+} Vec3f;
+
+typedef struct {
+    /* 0x00 */ Vec3f pos;
+    /* 0x0C */ f32 minAngle;
+    /* 0x10 */ f32 maxAngle;
+} SpawnPoint;
+
+typedef struct {
+    /* 0x000 */ u8 pad0[0x4];
+    /* 0x004 */ Vec3f pos;
+    /* 0x010 */ u8 pad10[0xD4 - 0x10];
+    /* 0x0D4 */ u32 flags;
+} Actor;
+
+typedef struct {
+    /* 0x00 */ s32 kind;
+    /* 0x04 */ Actor *actor;
+    /* 0x08 */ u8 pad8[0x44 - 0x8];
+} Target;
+
+typedef struct {
+    /* 0x00 */ Target a;
+    /* 0x44 */ Target b;
+} Targets;
+
+extern SpawnPoint D_00431D20[4];
+extern void func_00246108(Actor *actor, void *ai, Targets *t, s32 f1, s32 f2);
+extern f32 func_002119FC(f32 min, f32 max);
+extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b); /* out = a - b */
+extern f32 func_00298470(f32 x); /* sqrt */
+extern f32 func_002982F0(f32 angle); /* sin */
+extern f32 func_002974C0(f32 angle); /* cos */
+extern void func_00246690(Actor *actor, s32 id, Vec3f pos, s32 a5);
+
+static __inline__ void FindTarget(Actor *obj, Actor **target) {
+    Targets targets;
+
+    *target = NULL;
+    func_00246108(obj, (u8 *)obj + 0x140, &targets, 1, 0);
+    if (targets.b.actor != NULL && (targets.b.actor->flags & 0x300000)) {
+        *target = targets.b.actor;
+    }
+}
+
+static __inline__ f32 DistXZ(Vec3f a, Vec3f *b) {
+    Vec3f d;
+
+    a.y = 0.0f;
+    func_0020EF2C(&d, &a, b);
+    return func_00298470(d.x * d.x + d.y * d.y + d.z * d.z);
+}
+
+void func_00409A64(Actor *obj, s32 nearSelf) {
+    Vec3f p;
+    Actor *target;
+    s32 retry;
+    s32 idx;
+    s32 i;
+    f32 baseX;
+    f32 baseZ;
+    f32 r;
+    f32 angle;
+    f32 dx;
+    f32 dz;
+    f32 height;
+
+    retry = 1;
+    FindTarget(obj, &target);
+    if (target == NULL) {
+        return;
+    }
+    i = 0;
+    idx = -1;
+    for (; i < 4; i++) {
+        if (idx >= 0) {
+            break;
+        }
+        func_0020EF2C(&p, &target->pos, &D_00431D20[i].pos);
+        if (func_00298470(p.x * p.x + p.y * p.y + p.z * p.z) < 460.8f) {
+            idx = i;
+        }
+    }
+    if (retry) {
+        height = 1024.0f;
+        do {
+            if (idx >= 0) {
+                baseX = D_00431D20[idx].pos.x;
+                baseZ = D_00431D20[idx].pos.z;
+                r = func_002119FC(460.8f, 921.6f);
+                angle = func_002119FC(D_00431D20[idx].minAngle, D_00431D20[idx].maxAngle);
+            } else {
+                baseX = target->pos.x;
+                baseZ = target->pos.z;
+                if (nearSelf) {
+                    r = 0.0f;
+                    angle = 0.0f;
+                } else {
+                    r = func_002119FC(204.79999f, 921.6f);
+                    angle = func_002119FC(-3.1415927f, 3.1415927f);
+                }
+            }
+            dx = r * func_002982F0(angle);
+            dz = r * func_002974C0(angle);
+            retry = 0;
+            baseX += dx;
+            baseZ += dz;
+            p.x = baseX;
+            p.y = height;
+            p.z = baseZ;
+            for (i = 0; i < 4 && !retry; i++) {
+                if (DistXZ(p, &D_00431D20[i].pos) < 460.8f) {
+                    retry = 1;
+                }
+            }
+        } while (retry);
+    }
+    func_00246690(target, 0x112, p, 0);
+}
