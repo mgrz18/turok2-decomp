@@ -85,3 +85,9 @@ func_00468AC4 0x800A9A18  # X batch: 1.0f of func_0042FBA4, in the engine .rodat
 func_0043F000 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
 func_0045060C 0x800C0EA0  # copy of func_0041760C (X), which now owns the pool
 func_0045D6A0 0x800C1720  # copy of func_00424780 (X), which now owns the pool
+func_0043CF3C 0x800C0398  # X batch
+func_00442000 0x800C05C0  # X batch
+func_00443BB4 0x800C0878  # X batch, twin of func_0040ABB4
+func_0045353C 0x800C11E0  # X batch: the warp menu of func_0041A5DC
+func_004549B0 0x800C1328  # X batch: copy of func_0041BA50
+func_00462EC0 0x800A5EA0  # X batch: 1.0f of func_00429FA0, in the engine .rodata

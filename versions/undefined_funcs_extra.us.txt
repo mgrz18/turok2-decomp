@@ -1192,3 +1192,13 @@ func_004388E0 = 0x004388E0;
 func_0043908C = 0x0043908C;
 func_0043916C = 0x0043916C;
 D_800A6AAC = 0x800A6AAC;
+/* Second-module callees and callbacks named by link address in X-batch C
+ * (func_00462EC0, func_00463B2C): inside first-module code that is asm,
+ * where the asm has func_0042CAB4 + 0x50, D_0042C9D4, D_0042B304, D_0042B5D0,
+ * .L0042B960 and func_0042CBE4 + 0x40 for them. */
+func_0042B304 = 0x0042B304;
+func_0042B5D0 = 0x0042B5D0;
+func_0042B960 = 0x0042B960;
+func_0042C9D4 = 0x0042C9D4;
+func_0042CB04 = 0x0042CB04;
+func_0042CC24 = 0x0042CC24;
