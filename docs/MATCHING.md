@@ -448,6 +448,43 @@ copies of what func_00218DCC and func_00218B10 inline).
   The fill at the end of `.code` (after `__floatdisf`) is a stray that runs to
   the segment's end, which `fix_cut.py` now accepts.
 
+### The N pass
+
+Twenty-one close drafts from `nonmatching/` finished by hand:
+
+- **Where a variable lives decides its pseudo.** Declared inside each loop's
+  block, a variable is a separate pseudo per loop (func_0021375C); one
+  declared for the whole function lives longer, which keeps CSE from
+  merging it with a nearby load (func_00226490: one actor variable for both
+  loops keeps the kind-test load in `$a0` apart from it in `$s0`). Reusing a
+  variable as a later loop's index can be the ROM's shape too
+  (func_004004D8, the automap: `nVtx`).
+- **`goto next;` with the increment at the end of the body**, in place of
+  `continue`, lets reorg fill a delay slot from the loop test's target
+  (func_004004D8).
+- **Copy a matched sibling's exact statement shape.** func_0025F2F8 and
+  func_0025FBB8, a register off in the E pass, match with their siblings'
+  `level = x; level *= 1/255.f; level = level*K + B;`.
+- **`err = r;` before a second identical test** stops jump threading from
+  joining the two tests before cse1 (func_0041F0C8 and its twin
+  func_00457FE8).
+- **Write both arms of an if/else in full** when the ROM's tails are shared:
+  cross-jumping merges them as the original did.
+- **Initialisations placed after the calls** fix sched2's order: insns that
+  tie are taken by LUID, so the statement's place in the source decides
+  (func_00248A8C).
+- **`extern s32 G[]` and `G[0] = ...` instead of a scalar** keeps the store
+  after pointer reads: GCC assumes a scalar global does not alias them and
+  hoists it (func_00421528 and its twin func_0045A448).
+- **`if (x == NULL) { A } else if (c) { A }`** is a natural form of a
+  duplicated-branch fake (func_0026B4A4).
+- **One file with its neighbour, again.** func_00409D4C's pool opens 4 past
+  an 8-byte boundary with a jump table, so it went into func_00409A64.c; its
+  1228.8 is `0x44999999` in the ROM, written `1228.7999f`, and the zero word
+  after the pool stays in asm. Second-module copies that pass the module's own
+  functions as handlers name them by link address, defined absolutely in
+  `versions/undefined_funcs_extra.us.txt` (func_00467E4C).
+
 ## The fast assembler
 
 `asn64` only runs under wine, which costs ~30 s a file in the emulated amd64
