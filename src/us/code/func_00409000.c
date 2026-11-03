@@ -1,0 +1,178 @@
+/* 0x00409000-0x00409340. splat started it at 0x00408FF8, two junk words before
+ * it (src/us/asm/stray_00408FF8.s); func_00409340 installs func_00408FF8 + 8,
+ * this function, as the AI hit callback. */
+#include "common.h"
+
+/* Boss hit callback: finds which weak spot the hit part covers, takes the
+ * damage off the matching live spot for the current phase, and when a spot
+ * dies plays the stagger animation and clears its bit; when all spots of the
+ * phase are gone, moves the boss to its next state. */
+
+typedef struct {
+    /* 0x00 */ s32 health;
+    /* 0x04 */ u8 data[0x68 - 0x4];
+} Slot;
+
+typedef struct {
+    /* 0x000 */ void *obj;
+    /* 0x004 */ u8 pad4[0x18 - 0x4];
+    /* 0x018 */ Slot slots[15];
+    /* 0x630 */ u8 pad630[0x65C - 0x630];
+    /* 0x65C */ s32 phase;
+    /* 0x660 */ s32 activeMask;
+    /* 0x664 */ s32 liveMask;
+    /* 0x668 */ u8 pad668[0x670 - 0x668];
+    /* 0x670 */ s32 alive;
+    /* 0x674 */ s32 totalHealth;
+    /* 0x678 */ s32 health;
+} State;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x6C];
+    /* 0x6C */ s32 mask;
+} HitPart;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x4];
+    /* 0x04 */ s32 damage;
+    /* 0x08 */ u8 pad8[0x10 - 0x8];
+    /* 0x10 */ HitPart *part;
+} Hit;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ s32 flags;
+} CAI;
+
+extern State D_8012FB70;
+extern u8 D_00431E54[];
+
+extern void func_0040BDD0(void *obj, void *sounds, s32 flags);
+extern void func_00243414(void *obj, CAI *ai, s32 state);
+
+void func_00409000(void *obj, CAI *ai, Hit *hit) {
+    State *s;
+    s32 mask;
+    s32 spot;
+    s32 i;
+    s32 kind;
+    s32 fx;
+    s32 target;
+    s32 damage;
+    s32 bit;
+
+    if (hit->part == NULL) {
+        return;
+    }
+    i = 0;
+    spot = -1;
+    s = &D_8012FB70;
+    mask = s->activeMask & hit->part->mask;
+    for (; i < 15; i++) {
+        if (spot >= 0) {
+            break;
+        }
+        bit = 1 << i;
+        if (bit & mask) {
+            spot = i;
+        }
+    }
+    switch (spot) {
+    case 10:
+    case 11:
+        kind = 0;
+        fx = 0xC00;
+        break;
+    case 12:
+    case 14:
+        kind = 1;
+        fx = 0x5000;
+        break;
+    case 13:
+        kind = 2;
+        fx = 0x2000;
+        break;
+    default:
+        return;
+    }
+    target = -1;
+    switch (s->phase) {
+    case 0:
+        if (kind == 0) {
+            if (s->slots[2].health > 0) {
+                target = 2;
+            } else if (s->slots[3].health > 0) {
+                target = 3;
+            } else if (s->slots[4].health > 0) {
+                target = 4;
+            }
+        } else if (kind == 1) {
+            if (s->slots[6].health > 0) {
+                target = 6;
+            } else if (s->slots[7].health > 0) {
+                target = 7;
+            } else if (s->slots[8].health > 0) {
+                target = 8;
+            }
+        }
+        break;
+    case 1:
+        if (kind == 0) {
+            if (s->slots[1].health > 0) {
+                target = 1;
+            }
+        } else if (kind == 1) {
+            if (s->slots[5].health > 0) {
+                target = 5;
+            }
+        }
+        break;
+    case 2:
+        if (kind == 2) {
+            if (s->slots[13].health > 0) {
+                target = 13;
+            }
+        }
+        break;
+    }
+    if (target == -1) {
+        return;
+    }
+    damage = s->slots[target].health < hit->damage ? (s->slots + target)->health : hit->damage;
+    s->slots[target].health -= damage;
+    s->health -= damage;
+    func_0040BDD0(obj, D_00431E54, fx);
+    if (s->slots[target].health > 0) {
+        return;
+    }
+    if (s->phase == 0) {
+        s->alive--;
+        switch (kind) {
+        case 0:
+            func_00243414(obj, ai, 7);
+            break;
+        case 1:
+            func_00243414(obj, ai, 8);
+            break;
+        }
+    }
+    bit = 1 << target;
+    if (s->phase != 2) {
+        ai->flags &= ~bit;
+    }
+    s->liveMask &= ~bit;
+    if (s->liveMask != 0) {
+        return;
+    }
+    switch (s->phase) {
+    case 0:
+        func_00243414(obj, ai, 9);
+        break;
+    case 1:
+        func_00243414(obj, ai, 0x13);
+        break;
+    case 2:
+        func_00243414(obj, ai, 0x1E);
+        break;
+    }
+}
