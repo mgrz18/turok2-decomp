@@ -3,6 +3,7 @@
  * jump table at 0x800A6B28 is 8-aligned from there (from its own start,
  * 0x800A6B0C, it would not be). */
 #include "common.h"
+#include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/weapon.h"
 
@@ -57,14 +58,6 @@ struct AimActor {
     /* 0x1320 */ AimActor *next;
 };
 
-/* Game state from the player list on; the multiplayer flag is at +0x1261. */
-typedef struct GameState {
-    /* 0x0000 */ AimActor *players;
-    /* 0x0004 */ u8 pad4[0x1261 - 4];
-    /* 0x1261 */ u8 multiplayer;
-} GameState;
-
-extern GameState D_80119890;
 extern s32 D_800F7E70;
 extern AimActor *D_800F7C70[];
 extern f32 D_800DD78C;
@@ -127,8 +120,8 @@ CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) 
     bestDir.y = 0.0f;
     bestDir.z = 0.0f;
 
-    if (D_80119890.multiplayer) {
-        for (t = D_80119890.players; t != NULL; t = t->next) {
+    if (D_80119870.m_Settings.multiplayer) {
+        for (t = (AimActor *)D_80119870.m_PlayerList.m_ActiveList.m_pHead; t != NULL; t = t->next) {
             if (func_00249A58(pl, t) && t != pl) {
                 if (pl->weapon == 29) {
                     tpos = t->aimPos;
