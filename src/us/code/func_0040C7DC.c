@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x0 */ s32 unk0;
@@ -17,13 +18,12 @@ s32 func_00248BA8(s32, s32, s32, s32);
 
 CPlayer *func_002532A8(Game *);                     /* extern */
 extern Game D_80119870;
-extern CGameObjectInstance *D_8012FB70;
 
 void func_0040C7DC(void) {
     CPlayer *temp_v0;
     GameFlags *temp_v1;
 
-    func_00243414(D_8012FB70, &D_8012FB70->m_AI, 1);
+    func_00243414(D_8012FB70.obj, &D_8012FB70.obj->m_AI, 1);
     temp_v0 = func_002532A8(&D_80119870);
     if (temp_v0 != NULL) {
         temp_v1 = &D_80119870.flags;

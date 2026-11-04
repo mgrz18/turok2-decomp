@@ -1,24 +1,13 @@
 #include "common.h"
+#include "structs/boss.h"
 
 /* Draw callback of the module's actors: draws each body part (anim group) whose slot is active in the
  * module object's mask, refreshing the slot's state first unless a cinema path is playing. */
 
 typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14C];
     /* 0x14C */ s32 partMask;
 } ModuleObj;
-
-typedef struct {
-    /* 0x000 */ ModuleObj *obj;
-    /* 0x004 */ s32 count;
-    /* 0x008 */ void *actors[4];
-    /* 0x018 */ Slot slots[15];
-} State;
 
 typedef struct {
     /* 0x00 */ s32 animate;
@@ -43,7 +32,6 @@ typedef struct {
     /* 0x151 */ s8 unk151;
 } Actor;
 
-extern State D_8012FB70;
 extern s32 D_800B6D1C; /* current view */
 extern s32 D_800AB8B0; /* fade mode */
 extern void func_0021DC84(Actor *actor, void *ai, AnimRequest *req);
@@ -53,7 +41,7 @@ extern void func_00235898(void);
 extern void func_0020A33C(s32 *anim, s32 model, s32 one, AnimSlot *slot, s32 zero, s32 index, s32 second);
 
 void func_0040BEE4(Actor *actor, void *ai, AnimRequest *req) {
-    State *state;
+    MotherBossState *state;
     u8 *data;
     s32 mask;
     s32 i;
@@ -62,8 +50,8 @@ void func_0040BEE4(Actor *actor, void *ai, AnimRequest *req) {
     i = 0;
     one = 1;
     state = &D_8012FB70;
-    mask = state->obj->partMask;
-    data = state->slots[0].data;
+    mask = ((ModuleObj *)state->obj)->partMask;
+    data = state->slots[0].anim;
     do {
         if (mask & (one << i)) {
             req->first = i;
@@ -77,6 +65,6 @@ void func_0040BEE4(Actor *actor, void *ai, AnimRequest *req) {
             D_800AB8B0 = 0;
         }
         i++;
-        data += sizeof(Slot);
+        data += sizeof(BossWeakSpot);
     } while (i < 15);
 }

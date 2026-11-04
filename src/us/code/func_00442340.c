@@ -1,31 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Module init: find the module actors (0x1DB1) and the controller (0x1DB2), hook the level callbacks,
  * then attach every slot to the object. */
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ s32 count;
-    /* 0x008 */ CGameObjectInstance *actors[4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ CGameObjectInstance *parts[7];
-    /* 0x64C */ s32 partCount;
-    /* 0x650 */ CGameObjectInstance *controller;
-    /* 0x654 */ u8 pad654[0x658 - 0x654];
-    /* 0x658 */ void *handle;
-    /* 0x65C */ u8 pad65C[0x670 - 0x65C];
-    /* 0x670 */ s32 partsLeft;
-    /* 0x674 */ u8 pad674[0x680 - 0x674];
-    /* 0x680 */ s32 unk680;
-    /* 0x684 */ s32 unk684;
-} State;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x2C];
@@ -44,7 +22,6 @@ typedef struct {
     /* 0xD4 */ s32 flags;
 } Obj;
 
-extern State D_8012FB70;
 extern s32 D_80110048;
 extern s32 D_800F1F10[];
 extern u8 D_800F7078[];
@@ -60,7 +37,7 @@ extern void func_0040BEE4();
 extern void func_0040BFF0();
 
 void func_00442340(Obj *obj, Level *level) {
-    State *state = &D_8012FB70;
+    MotherBossState *state = &D_8012FB70;
     s32 i;
 
     D_80110048 = 0x1DB1;
@@ -73,7 +50,7 @@ void func_00442340(Obj *obj, Level *level) {
     state->partsLeft = state->partCount;
     func_00225F6C(D_800F7078, 0x650, 10, 0x1DB2, &state->controller, 1);
     state->controller->m_AI.m_VarBuffer[1] = 1;
-    state->handle = func_00225EBC(D_800F7078, 1, 0x1DB1);
+    state->intel = func_00225EBC(D_800F7078, 1, 0x1DB1);
     level->data = D_00431E20;
     level->onReset = func_0040BC64;
     level->onHit = (u8 *)func_00408FF8 + 8;
@@ -85,6 +62,6 @@ void func_00442340(Obj *obj, Level *level) {
     D_800F1F10[0] &= ~0x300;
     obj->flags |= 0x04000000;
     for (i = 0; i < 15; i++) {
-        func_002362E4(D_8012FB70.slots[i].data, obj);
+        func_002362E4(D_8012FB70.slots[i].anim, obj);
     }
 }
