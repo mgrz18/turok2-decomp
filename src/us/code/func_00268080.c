@@ -1,22 +1,13 @@
+#include "structs/game_object.h"
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
-s32 func_00268080(void *arg0)
+s32 func_00268080(CGameObjectInstance *actor)
 {
-  s8 *new_var;
-  void *temp_a0;
-  temp_a0 = *((void **) (((s8 *) arg0) + 0x14));
-  if ((*((s32 *) (((s8 *) temp_a0) + 0))) != 1)
+  u32 *flags;
+  CIntelligence *def;
+  def = actor->header.m_pIntelligence;
+  if (def->m_Type != INTELLIGENCE_ENEMY)
   {
-    if (temp_a0 || new_var)
+    if (def || flags)
     {
       return 0;
     }
@@ -25,6 +16,6 @@ s32 func_00268080(void *arg0)
       return 0;
     }
   }
-  new_var = ((s8 *) temp_a0) + 0x48;
-  return (*((s32 *) new_var)) & 0x20;
+  flags = &def->m_Enemy.m_dwEnemyFlags;
+  return *flags & 0x20;
 }
