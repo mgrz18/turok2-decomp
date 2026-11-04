@@ -51,6 +51,23 @@ typedef struct CROMParticleImpact {
     /* 0xA8 */ u16 m_ImpactSoundType[14];
 } CROMParticleImpact; /* size 0xC4 */
 
+/* How a template spawns: life, chance, count, which active list... */
+typedef struct CROMParticleParams {
+    /* 0x00 */ s16 m_LifeBase;
+    /* 0x02 */ s16 m_LifeRange;
+    /* 0x04 */ s8 m_Chance;           /* percent */
+    /* 0x05 */ s8 m_Group;
+    /* 0x06 */ s8 m_CountBase;
+    /* 0x07 */ s8 m_CountRange;
+    /* 0x08 */ s8 m_nList;            /* CParticleSystem.m_ActiveList index */
+    /* 0x09 */ u8 unk_09[0x0B - 0x09];
+    /* 0x0B */ s8 unk_0B;
+    /* 0x0C */ u8 unk_0C;
+    /* 0x0D */ s8 m_Spread;
+    /* 0x0E */ s8 m_Mode;
+    /* 0x0F */ u8 m_Event;
+} CROMParticleParams; /* size 0x10 */
+
 /* A particle template (block 2 of the particle data; CParticle.m_pEffect). */
 typedef struct CROMParticleEffect {
     /* 0x00 */ u32 m_dwFlags;
@@ -74,7 +91,7 @@ typedef struct CROMParticleEffect {
     /* 0x2C */ void *m_pOscillation;
     /* 0x30 */ void *m_pMotion;
     /* 0x34 */ void *m_pColors;
-    /* 0x38 */ void *m_pParams;
+    /* 0x38 */ CROMParticleParams *m_pParams;
 } CROMParticleEffect; /* size 0x3C */
 
 typedef struct CParticle {

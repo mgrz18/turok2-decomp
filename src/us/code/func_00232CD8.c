@@ -2,55 +2,30 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
-#include "structs/list.h"
+#include "structs/particle.h"
 
-typedef struct EffectParams {
-    char pad0[8];
-    s8 listIndex;
-} EffectParams;
-typedef struct EffectEntry {
-    char pad0[0x38];
-    EffectParams *params;
-} EffectEntry;
-/* Turok 2 offsets: entry 0xF8, ownerId 0x104, next 0x1C8
- * (Rage Wars 0x118 / 0x124 / 0x1EC). */
-typedef struct ParticleEffect {
-    char pad0[0xF8];
-    EffectEntry *entry;
-    char padFC[8];
-    s32 ownerId;
-    char pad108[0xC0];
-    struct ParticleEffect *next;
-} ParticleEffect;
-/* Turok 2: the lists sit 0x1000 earlier than in Rage Wars. */
-typedef struct EffectSystem {
-    char pad0[0xEC00];
-    CList free;
-    CList groups;
-    CList lists[3];
-} EffectSystem;
-/* Finds the effect of owner arg1 (and of entry arg2, when given). */
-void *func_00232CD8(EffectSystem *arg0, s32 arg1, EffectEntry *arg2) {
-    ParticleEffect *record;
+/* Finds the particle of owner arg1 (and of template arg2, when given) in the template's active list. */
+void *func_00232CD8(CParticleSystem *arg0, s32 arg1, CROMParticleEffect *arg2) {
+    CParticle *record;
     /* index[array] order matches the original addu operand order */
-    record = arg2->params->listIndex[arg0->lists].m_pHead;
+    record = arg2->m_pParams->m_nList[arg0->m_ActiveList].m_pHead;
     if (arg2 != 0) {
         if (record != 0) {
             do {
-                if (record->ownerId == arg1) {
-                    if (record->entry == arg2) {
+                if ((s32) record->m_pOwnerID == arg1) {
+                    if (record->m_pEffect == arg2) {
                         return record;
                     }
                 }
-                record = record->next;
+                record = record->m_pNext;
             } while (record != 0);
         }
     } else if (record != 0) {
         do {
-            if (record->ownerId == arg1) {
+            if ((s32) record->m_pOwnerID == arg1) {
                 return record;
             }
-            record = record->next;
+            record = record->m_pNext;
         } while (record != 0);
     }
     return 0;

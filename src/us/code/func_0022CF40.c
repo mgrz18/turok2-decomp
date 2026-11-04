@@ -1,22 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_4.CPP, Particle_ParentTransform, with Turok 2's layouts. */
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/particle.h"
 
 /* The transform a particle's position is relative to, picked by its
  * attachment mode: the particle's own facing, the owner's effect transforms,
  * the region's ground or wall orientation, or a fixed one. */
 
 typedef f32 Mtx4f[4][4];
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ void *region;
-    /* 0x014 */ u8 pad14[0x150 - 0x14];
-    /* 0x150 */ CVector3 dir;
-    /* 0x15C */ u8 pad15C[0x1AC - 0x15C];
-    /* 0x1AC */ s8 attach;
-} Particle;
 
 extern void func_00210090(Mtx4f m, CVector3 *dir);             /* matrix facing dir */
 extern f32 func_0026BE60(void *region, f32 x, f32 z);        /* ground height */
@@ -29,13 +19,13 @@ extern void func_002105A4(Mtx4f m, f32 angle);
 extern Mtx4f D_800F1810;
 extern Mtx4f D_800F18F0;
 
-Mtx4f *func_0022CF40(Particle *p, u8 *view) {
+Mtx4f *func_0022CF40(CParticle *p, u8 *view) {
     Mtx4f output;
     CQuaternion state;
 
-    switch (p->attach) {
+    switch (p->m_Alignment) {
     case -8:
-        func_00210090(D_800F1810, &p->dir);
+        func_00210090(D_800F1810, &p->m_vDirection);
         return &D_800F1810;
     case -6:
         if (view == NULL) {
@@ -49,8 +39,8 @@ Mtx4f *func_0022CF40(Particle *p, u8 *view) {
         }
         return (Mtx4f *)(view + 0xE3C);
     case -3:
-        if (p->pos.y - func_0026BE60(p->region, p->pos.x, p->pos.z) <= 0.01f) {
-            func_0026A9C0(&state, p->region);
+        if (p->header.m_vPos.y - func_0026BE60(p->header.m_pCurrentRegion, p->header.m_vPos.x, p->header.m_vPos.z) <= 0.01f) {
+            func_0026A9C0(&state, p->header.m_pCurrentRegion);
             func_00211114(&state, output);
             func_0020C618(D_800F1810, D_800F18F0, output);
             return &D_800F1810;
@@ -58,14 +48,14 @@ Mtx4f *func_0022CF40(Particle *p, u8 *view) {
     case -5:
         return &D_800F18F0;
     case -2:
-        func_0026AC38(&state, p->region);
+        func_0026AC38(&state, p->header.m_pCurrentRegion);
         func_00211114(&state, output);
         func_0020C618(D_800F1810, D_800F18F0, output);
         return &D_800F1810;
     case 0:
     case 1:
     case 2:
-        func_002105A4(D_800F1810, func_0026C240(p->region, p->attach));
+        func_002105A4(D_800F1810, func_0026C240(p->header.m_pCurrentRegion, p->m_Alignment));
         return &D_800F1810;
     }
     return NULL;
