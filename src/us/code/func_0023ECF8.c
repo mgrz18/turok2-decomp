@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/weapon.h"
 
 /* Pickup effect descriptor. */
 typedef struct PickupEntry {
@@ -15,13 +16,7 @@ typedef struct PickupEntry {
     s16 argument2;  /* 0x10 */
 } PickupEntry;
 
-typedef struct KeyInfo {
-    char pad0[0x14];
-    s32 flags;      /* 0x14 */
-} KeyInfo;
-
 extern char D_801198B0[];
-extern KeyInfo *D_800AF618[];
 extern u8 D_8011AAF1;
 
 s32 func_00253B54(CPlayer *player, s32 index, s32 argument);
@@ -30,9 +25,10 @@ void func_0027FC2C(void *arg0, void *ui, void *resource);
 s32 func_00275544(s32 sound, CVector3 position, s32 arg4, s32 arg5);
 void func_0027580C(s32 callback);
 
-/* Key pickup: mark the key as held and play the descriptor's feedback. */
+/* Weapon pickup: gives the weapon, selects it when it is better than the
+ * current one, and plays the descriptor's feedback. */
 s32 func_0023ECF8(CPlayer *player, PickupEntry *entry) {
-    KeyInfo *info;
+    WeaponInfo *info;
     void *resource;
     s32 sound;
     s32 callback;

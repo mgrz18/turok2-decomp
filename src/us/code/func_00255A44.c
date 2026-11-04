@@ -26,9 +26,9 @@ void func_00255A44(CPlayer *player, CGameObjectInstance *actor) {
     player->m_bOxygenOut = 0;
     func_00280EAC(player->m_pCamera);
     s = &player->m_Barrel;
-    s->m_nItems = 0;
-    s->unk_0x4 = 0;
-    s->m_nLastItem = -1;
-    s->unk_0x8 = 0;
+    s->m_State = 0;
+    s->m_Turn = 0;
+    s->m_nCursor = -1;
+    s->m_Open = 0;
     func_00275544(2000, actor->header.m_vPos, 0, -1);
 }

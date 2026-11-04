@@ -37,10 +37,10 @@ f32 func_002982F0(f32 x);
 void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 static __inline__ void reset_strokes(CBarrel *s) {
-    s->m_nItems = 0;
-    s->unk_0x4 = 0.0f;
-    s->m_nLastItem = -1;
-    s->unk_0x8 = 0.0f;
+    s->m_State = 0;
+    s->m_Turn = 0.0f;
+    s->m_nCursor = -1;
+    s->m_Open = 0.0f;
 }
 
 static __inline__ s32 try_jump(CPlayer *player, Body *body) {

@@ -3,13 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/controller.h"
-
-typedef struct {
-    /* 0x00 */ s32 model;
-    /* 0x04 */ u8 pad4[0x48 - 0x4];
-    /* 0x48 */ s32 unk48;
-    /* 0x4C */ s32 unk4C;
-} WeaponInfo;
+#include "structs/weapon.h"
 
 
 typedef struct {
@@ -23,7 +17,6 @@ typedef struct {
 } PoseInfo;   /* 0x18 bytes */
 
 extern PoseInfo D_800ADF68[];
-extern WeaponInfo *D_800AF618[];   /* weapon table */
 extern u32 D_800B6D20;
 extern s32 D_800F7078;
 extern u8 D_801198B0[];
@@ -43,10 +36,10 @@ static __inline__ void switchWeapon(Object *obj, CAI *ai) {
 
     if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || D_800F7078 != 4) {
         player->m_Data.m_CurrentWeapon = player->m_RequestedWeapon;
-        ai->m_pModeTable = D_800AF618[player->m_Data.m_CurrentWeapon]->unk48;
-        ai->m_pfEffects = D_800AF618[player->m_Data.m_CurrentWeapon]->unk4C;
+        ai->m_pModeTable = D_800AF618[player->m_Data.m_CurrentWeapon]->modeTable;
+        ai->m_pfEffects = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;
         if (D_800B6D20 >= 5) {
-            func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->model);
+            func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
         }
         ai->m_VarS32[0] = 0;
         ai->m_VarS32[1] = 0;

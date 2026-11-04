@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ u16 zoomModel;       /* the scope model shown when zoomed, 0 = none */
-} WeaponDef;
+#include "structs/weapon.h"
 
 /* The scope model raised to the view (see func_00247170). */
 typedef struct {
@@ -15,7 +11,6 @@ typedef struct {
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
 
-extern WeaponDef *D_800AF618[];
 extern s32 D_8011AAA0;
 
 void func_00247170(HudModel *m, CPlayer *owner);

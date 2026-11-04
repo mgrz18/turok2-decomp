@@ -4,11 +4,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x2C];
-    /* 0x2C */ CVector3 viewOffset;
-} WeaponInfo;
+#include "structs/weapon.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x34];
@@ -19,7 +15,6 @@ typedef struct {
     /* 0x1A8 */ CPlayer *owner;
 } WeaponModel;
 
-extern WeaponInfo *D_800AF618[];   /* weapon table */
 extern s32 D_800AE37C;             /* flip x */
 extern s32 D_800AE380;             /* flip y */
 extern s32 D_800AE384;             /* flip z */

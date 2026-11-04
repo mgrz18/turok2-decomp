@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "structs/weapon.h"
 
 
 typedef struct Player {
@@ -28,17 +29,11 @@ typedef struct Hit {
     /* 0x18 */ s32 amount;
 } Hit;
 
-typedef struct WeaponDef {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u16 id;
-} WeaponDef;
-
 extern s32 D_800AB8B0;       /* screen flash mode */
 extern f32 D_800AB8B4[3];    /* screen flash color */
 extern f32 D_800AB8C0[2];    /* screen flash range */
 extern s32 D_800B6D1C;
 extern s32 D_800ADB5C;
-extern WeaponDef *D_800AF618[];
 
 s32 *func_002017D4(s32 arg0, s32 arg1);
 s32 func_002548FC(Player *player);
@@ -49,7 +44,7 @@ void func_0020A33C(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5
 void func_0020B6A0(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 
 #define HIT_LIMIT(hit) (*func_002017D4(*(hit)->unkC, 2))
-#define WEAPON_INDEX(player) (D_800AF618[(player)->weapon]->id - 0x5E0)
+#define WEAPON_INDEX(player) (D_800AF618[(player)->weapon]->model - 0x5E0)
 
 void func_00247FB0(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
     Player *player = ((Player *)actor->m_AI.m_pParent);

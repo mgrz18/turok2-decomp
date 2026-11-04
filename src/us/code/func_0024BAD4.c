@@ -3,27 +3,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/controller.h"
-
-typedef struct MenuSlot {
-    /* 0x00 */ s32 weapon;
-    /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ s32 available;
-    /* 0x0C */ f32 angle;
-    /* 0x10 */ f32 lift;
-    /* 0x14 */ f32 scale;
-} MenuSlot;
-
-typedef struct WeaponMenu {
-    /* 0x000 */ s32 state;
-    /* 0x004 */ u8 pad4[0x18];
-    /* 0x01C */ MenuSlot slots[36];
-    /* 0x37C */ s32 cursor;
-    /* 0x380 */ u8 pad380[4];
-    /* 0x384 */ s32 unk384;
-    /* 0x388 */ s32 bothHeld;
-    /* 0x38C */ s32 unk38C;
-    /* 0x390 */ s32 hover;
-} WeaponMenu;
+#include "structs/weapon.h"
 
 /* A slot seen from the menu's base: menu + i * 0x18 (as Rage Wars' Block24). */
 typedef struct MenuRow {
@@ -40,23 +20,16 @@ typedef struct MenuRow {
 } MenuRow;
 
 
-typedef struct WeaponInfo {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ s16 alternate;
-} WeaponInfo;
-
-extern WeaponInfo *D_800AF618[];
-
 s32 func_002548FC(CPlayer *player);
-void func_0024C2A0(WeaponMenu *menu, s32 open, CPlayer *player);
-s32 func_0024B88C(WeaponMenu *menu, CPlayer *player);
+void func_0024C2A0(CBarrel *menu, s32 open, CPlayer *player);
+s32 func_0024B88C(CBarrel *menu, CPlayer *player);
 void func_00275624(s32 sound);
 
 /* Runs the player's weapon menu each frame: the menu buttons open or
  * rebuild it, and the slot under the stick becomes the hovered entry,
  * moving the cursor and choosing the slot's weapon (or its alternate the
  * player holds). */
-void func_0024BAD4(WeaponMenu *menu, CPlayer *player, u32 *input) {
+void func_0024BAD4(CBarrel *menu, CPlayer *player, u32 *input) {
     s32 open;
     s32 next;
     s32 slot;
@@ -69,15 +42,15 @@ void func_0024BAD4(WeaponMenu *menu, CPlayer *player, u32 *input) {
     if (func_002548FC(player) != 0) {
         open = next = 0;
     }
-    if (menu->state == 0 || menu->state == 3) {
+    if (menu->m_State == 0 || menu->m_State == 3) {
         if (!open && !next) {
             return;
         }
         func_0024C2A0(menu, open, player);
         player->m_bHeadMovementDisabled = 1;
-        menu->state = 1;
+        menu->m_State = 1;
     } else {
-        if (menu->unk38C != 0) {
+        if (menu->m_bUnderwater != 0) {
             if (!(player->m_CharacterActor.m_AI.m_dwFlags & 0x80)) {
                 goto toggle;
             }
@@ -85,16 +58,16 @@ void func_0024BAD4(WeaponMenu *menu, CPlayer *player, u32 *input) {
         toggle:
             func_0024C2A0(menu, open, player);
         }
-        if (open && next && menu->bothHeld == 0) {
-            if (menu->unk384 != 0) {
+        if (open && next && menu->m_bBothHeld == 0) {
+            if (menu->m_Group != 0) {
                 func_0024C2A0(menu, 0, player);
             } else {
                 func_0024C2A0(menu, 1, player);
             }
-            menu->bothHeld = 1;
+            menu->m_bBothHeld = 1;
         } else if (!open || !next) {
-            menu->bothHeld = 0;
-            if (menu->unk384 != 0) {
+            menu->m_bBothHeld = 0;
+            if (menu->m_Group != 0) {
                 if (!open) {
                     goto checkNext;
                 }
@@ -113,30 +86,30 @@ void func_0024BAD4(WeaponMenu *menu, CPlayer *player, u32 *input) {
     }
 stick:
     slot = func_0024B88C(menu, player);
-    if (slot == menu->hover) {
+    if (slot == menu->m_Hover) {
         return;
     }
     if (slot != -1) {
-        entry = (MenuRow *) ((u8 *) menu + slot * sizeof(MenuSlot));
+        entry = (MenuRow *) ((u8 *) menu + slot * sizeof(CBarrelItem));
         if (entry->available == 0) {
             func_00275624(0x1455);
             return;
         }
         if (entry->weapon.id == -1) {
-            menu->hover = -1;
+            menu->m_Hover = -1;
             return;
         }
-        if (slot != menu->cursor) {
-            menu->cursor = slot;
+        if (slot != menu->m_nCursor) {
+            menu->m_nCursor = slot;
         }
         weapon = entry->weapon.half.lo;
         if (weapon == player->m_Data.m_CurrentWeapon) {
-            menu->hover = slot;
+            menu->m_Hover = slot;
             return;
         }
         player->m_RequestedWeapon = entry->weapon.half.lo;
         if (*input & 0x80) {
-            menu->hover = slot;
+            menu->m_Hover = slot;
             return;
         }
         alternate = D_800AF618[weapon]->alternate;
@@ -144,5 +117,5 @@ stick:
             entry->weapon.id = alternate;
         }
     }
-    menu->hover = slot;
+    menu->m_Hover = slot;
 }

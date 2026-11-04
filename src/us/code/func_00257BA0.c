@@ -1,12 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/weapon.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 flags;   /* 1: usable on land, 2: usable under water */
-} WeaponInfo;
-
-extern WeaponInfo *D_800AF618[];   /* weapon table */
 extern s32 D_80110058;             /* first weapon - 1 */
 extern s32 D_8011005C;             /* weapon count */
 extern u8 D_8011AAF1;

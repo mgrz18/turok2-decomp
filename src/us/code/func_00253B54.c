@@ -1,25 +1,14 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ s16 type;
-    /* 0x02 */ s16 max;
-} AmmoDef;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ AmmoDef *ammo[3]; /* [1] is the lower ammo */
-} WeaponDef;
-
-extern WeaponDef *D_800AF618[];
+#include "structs/weapon.h"
 
 /* func_00253AC0, inlined. */
 static __inline__ s32 GetMaxAmmo(CPlayer *player, s32 type, s32 heldOnly) {
     s32 max;
     s32 w;
     s32 i;
-    WeaponDef *def;
-    AmmoDef *ammo;
+    WeaponInfo *def;
+    AmmoInfo *ammo;
     s32 n;
 
     if (type == -1) {

@@ -656,7 +656,7 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/vector.h` | CVector3, CQuaternion, CMtxF: the engine math types (included by game_object.h) |
 | `structs/game_object.h` | CGameObjectInstance (0x288, an "actor") and its parts: CInstanceHeader, CAnimationState, CPathTrack, CAI (the AI state at 0x140, with typed views of its per-type m_VarBuffer and CEnemyAIVars), CAIModeInfo (a mode-table row), CAITarget / CAITargets (what the AI aims at), CListedInstance (an instance with its world-list links, 0x294) |
 | `structs/intelligence.h` | CIntelligence, the definition `header.m_pIntelligence` points at: a common header and a union of per-type bodies (CEnemyIntelligence, CTurretIntelligence, CDoorIntelligence, CPlatformIntelligence, CGeneratorIntelligence, CActionIntelligence, CPlayerIntelligence...), Rage Wars' names (included by game_object.h) |
-| `structs/player.h` | CPlayer (0x1328) and the HUD: COverlay, COnScreen, CPlayerOverlay, CPlayerContState, CBarrel (the weapon wheel), CPlayerLoadSaveData (the save blob); includes controller.h and player_list.h |
+| `structs/player.h` | CPlayer (0x1328) and the HUD: COverlay, COnScreen, CPlayerOverlay, CPlayerContState, CPlayerLoadSaveData (the save blob); includes controller.h, player_list.h and weapon.h |
 | `structs/player_list.h` | CPlayerList / CPlayerCList: the player list at the start of CGame (D_80119870; its active list is D_80119890) |
 | `structs/player_options.h` | CPlayerOptions (0x40): a player's options and per-opponent counts, `CPlayer::m_pOptions`; GameSettings holds five (included by player.h and game.h) |
 | `structs/game.h` | GameSettings (D_8011AAD8, the game settings and the multiplayer setup) and GameMatch (D_8011ACB0, the play clock and the running match's rules); CGame (D_80119870: the player list, the camera pool D_801198B0 and its menu pool D_80119E2C, the settings) |
@@ -670,6 +670,7 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/controller.h` | ControllerProfile (D_800F5EC0[4], 0x224): a controller's buttons (held, single, double, repeat...), stick and Rumble Pak state, `CPlayer::m_ContState.m_pContState`; rw/abu_types.h includes it |
 | `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo (includes libaudio.h) |
 | `structs/libaudio.h` | the libaudio types the sound manager and the imported libaudio code share: ALHeap, ALBank, ALBankFile, ALInstrument, ALFilter, ALMainBus, ALAuxBus, Acmd |
+| `structs/weapon.h` | the weapons: WeaponInfo (the weapon table D_800AF618) and its AmmoInfo, CBarrel (the weapon wheel, CPlayer m_Barrel) with CBarrelItem and CBarrelIcon (included by player.h) |
 | `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
 | `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs, OSPfsState and the Controller Pak internals, plus the engine's CMutex |
 | `gfx.h` | Gfx (w0/w1) and the display-list pointer the engine appends to |
