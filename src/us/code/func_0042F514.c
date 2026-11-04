@@ -8,7 +8,7 @@ void func_0042F514(void) {
 
     if (s->saved != 0) {
         s->saved = 0;
-        *(DemoSettings *)&D_8011AAD8 = s->settings;
+        *(GameSettingsBlock *)&D_8011AAD8 = s->settings;
     }
     s->active = 0;
     s->unk4 = 0;

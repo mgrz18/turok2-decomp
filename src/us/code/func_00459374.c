@@ -56,7 +56,7 @@ s32 func_00459374(s32 unused, Menu *own) {
         save = D_8011AC58;
         plr->m_Data = D_800C201C->player;
         {
-            *(SaveSettings *)&D_8011AAD8 = D_800C201C->settings;
+            *(GameSettingsBlock *)&D_8011AAD8 = D_800C201C->settings;
             c = D_800C201C;
         }
         new_var = &c->seconds;

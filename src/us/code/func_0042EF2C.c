@@ -37,7 +37,7 @@ void func_0042EF2C(DemoHeader *arg) {
     s->fastForward = 1;
     if (s->saved == 0) {
         s->saved = 1;
-        s->settings = *(DemoSettings *)&D_8011AAD8;
+        s->settings = *(GameSettingsBlock *)&D_8011AAD8;
     }
     {
         GameSettings *g = &D_8011AAD8;

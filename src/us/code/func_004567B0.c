@@ -45,7 +45,7 @@ void func_004567B0(CPlayer *player) {
     D_800C2018 = D_800C2010->data;
     func_00266C5C(D_800C2018, 0, allocSize);
     D_800C2018->player = player->m_Data;
-    D_800C2018->settings = *(SaveSettings *)&D_8011AAD8;
+    D_800C2018->settings = *(GameSettingsBlock *)&D_8011AAD8;
     data = D_800C2018;
     data->frames = D_8011ACB0.frames;
     data->seconds = D_8011ACB0.seconds;

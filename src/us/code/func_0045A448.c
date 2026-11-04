@@ -19,7 +19,7 @@ void func_0045A448(CPlayer *p) {
 
     keep = D_8011AAD8.unk180;
     p->m_Data = D_800C201C->player;
-    *(SaveSettings *)&D_8011AAD8 = D_800C201C->settings;
+    *(GameSettingsBlock *)&D_8011AAD8 = D_800C201C->settings;
     D_8011AAD8.match.frames = D_800C201C->frames;
     D_8011AAD8.match.seconds = D_800C201C->seconds;
     D_8011AAD8.match.minutes = D_800C201C->minutes;

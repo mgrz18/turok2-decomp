@@ -57,7 +57,7 @@ s32 func_00420454(void *menu, Menu *c) {
         world = &D_800F7078;
         keep = D_8011AC58[0];
         player->m_Data = D_800C201C->player;
-        *(SaveSettings *)&D_8011AAD8 = D_800C201C->settings;
+        *(GameSettingsBlock *)&D_8011AAD8 = D_800C201C->settings;
         D_8011ACB0.frames = D_800C201C->frames;
         D_8011ACB4[0] = D_800C201C->seconds;
         D_8011ACB8[0] = D_800C201C->minutes;

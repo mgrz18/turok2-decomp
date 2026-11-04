@@ -13,6 +13,7 @@
  * tools/check_structs.py checks the offsets. */
 
 #include "common.h"
+#include "structs/game.h"
 
 /* The header of a demo: the match it plays and where each stream starts. */
 typedef struct DemoHeader {
@@ -39,11 +40,6 @@ typedef struct DemoStream {
     /* 0x1C */ s32 unk1C;
 } DemoStream; /* size 0x20 */
 
-/* The first 0x184 bytes of GameSettings (structs/game.h), as one block. */
-typedef struct DemoSettings {
-    /* 0x000 */ s32 words[0x184 / 4];
-} DemoSettings; /* size 0x184 */
-
 typedef struct DemoPlayer {
     /* 0x000 */ s32 active;             /* the attract mode plays demos (func_0042F57C) */
     /* 0x004 */ s32 unk4;
@@ -60,7 +56,7 @@ typedef struct DemoPlayer {
     /* 0x1C0 */ f32 time;
     /* 0x1C4 */ s32 checksum;
     /* 0x1C8 */ s32 saved;              /* settings holds the game settings */
-    /* 0x1CC */ DemoSettings settings;
+    /* 0x1CC */ GameSettingsBlock settings;  /* structs/game.h */
     /* 0x350 */ s32 index;              /* the next demo of the list */
 } DemoPlayer; /* size 0x354 */
 

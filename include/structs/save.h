@@ -13,15 +13,7 @@
 
 #include "common.h"
 #include "structs/player.h"
-
-/* The first 0x184 bytes of GameSettings (structs/game.h), copied as one
- * block to and from D_8011AAD8. */
-typedef struct SaveSettings {
-    /* 0x000 */ u32 cheatFlags;
-    /* 0x004 */ u32 unlockedCheats;
-    /* 0x008 */ u32 difficulty;        /* 8, 16 or 32 */
-    /* 0x00C */ s32 rest[(0x184 - 0xC) / 4];
-} SaveSettings; /* size 0x184 */
+#include "structs/game.h"
 
 typedef struct SaveGame {
     /* 0x000 */ s32 size;              /* the whole save, checksum included: levelFlagsSize + 0x688 */
@@ -31,7 +23,7 @@ typedef struct SaveGame {
     /* 0x010 */ f32 minutes;
     /* 0x014 */ f32 hours;
     /* 0x018 */ CPlayerLoadSaveData player;
-    /* 0x500 */ SaveSettings settings;
+    /* 0x500 */ GameSettingsBlock settings;  /* structs/game.h */
     /* 0x684 */ u8 levelFlags[4];      /* levelFlagsSize bytes, then the checksum */
 } SaveGame; /* size 0x688 + the level flags */
 

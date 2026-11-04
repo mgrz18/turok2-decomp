@@ -4,7 +4,6 @@
 extern s32 D_800B6D20;
 extern f32 D_800B6D28;
 extern s32 D_800F5D2C;
-extern char D_800F6CB0[];
 
 void func_00430330(void *);
 void func_00288C5C(void *, s32);
@@ -30,9 +29,9 @@ void func_0042F1C4(void) {
     if (s->done == 0) {
         if (--s->countdown <= 0 || D_800F5D2C != 0) {
             s->done = 1;
-            func_00430330(D_800F6CB0);
+            func_00430330(&D_800F6CB0);
             if (D_800F5D2C != 0) {
-                func_00288C5C(D_800F6CB0, 8);
+                func_00288C5C(&D_800F6CB0, 8);
             }
         }
     }

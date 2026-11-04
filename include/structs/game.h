@@ -4,8 +4,8 @@
 /* The game settings block, D_8011AAD8 (the game state at D_80119870 +
  * 0x1268), and the match state inside it, D_8011ACB0 (+ 0x1D8).
  *
- * The first 0x184 bytes are what the save and the multiplayer menu copy
- * (func_0042F514, func_0041D890). Rage Wars' Shared_Game (D_801462C8, at the
+ * The first 0x184 bytes (GameSettingsBlock) are what the save and the demo
+ * player copy (func_0041D890, func_0042F514). Rage Wars' Shared_Game (D_801462C8, at the
  * same place in its game state) is the same block with 4 more bytes before
  * 0x08, so its `local` at 0x1D is `multiplayer` here at 0x19.
  *
@@ -62,6 +62,16 @@ typedef struct CSun {
 /* The game settings, D_8011AAD8. The options at 0x20 come in three groups
  * of five, one per kind of match (func_0041760C, func_00417490 and
  * func_0041778C start them): deathmatch, tag and team. */
+/* The first 0x184 bytes of GameSettings: the block the save (SaveGame,
+ * structs/save.h) and the demo player (DemoPlayer, structs/demo.h) copy to and
+ * from D_8011AAD8 in one go, as *(GameSettingsBlock *)&D_8011AAD8. */
+typedef struct GameSettingsBlock {
+    /* 0x000 */ u32 cheatFlags;
+    /* 0x004 */ u32 unlockedCheats;
+    /* 0x008 */ u32 difficulty;        /* 8, 16 or 32 */
+    /* 0x00C */ s32 rest[(0x184 - 0xC) / 4];
+} GameSettingsBlock; /* size 0x184 */
+
 typedef struct GameSettings {
     /* 0x000 */ u32 cheatFlags;        /* the cheats on: 0x4000 black fog, 0x800/0x1000 big heads... */
     /* 0x004 */ u32 unlockedCheats;    /* set by the cheat codes (func_0041AD64) and bosses (func_00407F20) */
