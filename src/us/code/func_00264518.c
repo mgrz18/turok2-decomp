@@ -9,9 +9,9 @@ typedef struct Actor { /* Turok 2 layout */
 } Actor;
 void func_0026E110(Actor *actor, s32 flags, Actor *actor2);
 void func_00264518(Actor *actor, u32 *flags) {
-    CEnemyIntelligence *info = &actor->def->m_Enemy;
+    CPlatformIntelligence *info = &actor->def->m_Platform;
     func_0026E110(actor, 0x10000, actor);
-    if (!(info->m_dwFlags2 & 0x40)) {
+    if (!(info->m_dwPlatformFlags & 0x40)) {
         *flags &= 0xF7FFFFFF;
     }
 }

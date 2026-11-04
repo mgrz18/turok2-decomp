@@ -1,14 +1,11 @@
 /* The two inlined helpers after AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD/8028E6FC.CPP, func_8028E860_de and func_8028E78C_de (func_00226EBC and func_00226DE8 here), with Turok 2's layouts. */
 
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct Vec3f {
     f32 x, y, z;
 } Vec3f;
-
-typedef struct ActorDef {
-    /* 0x00 */ s32 type;
-} ActorDef;
 
 typedef struct Entity Entity;
 struct Entity {
@@ -16,7 +13,7 @@ struct Entity {
     /* 0x001 */ u8 pad1[3];
     /* 0x004 */ Vec3f pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xB8 - 0x18];
     /* 0x0B8 */ u16 typeId;
     /* 0x0BA */ u8 padBA[0x140 - 0xBA];
@@ -53,7 +50,7 @@ static __inline__ s32 blastStrength(Entity *e, Vec3f *target) {
     f32 dist;
     u32 t;
 
-    if (e->kind == 1 && e->def->type == 7) {
+    if (e->kind == 1 && e->def->m_Type == 7) {
         func_0020EF2C(&d, &e->pos, target);
         dist = d.x * d.x + d.z * d.z;
         d.y = 0;
@@ -62,7 +59,7 @@ static __inline__ s32 blastStrength(Entity *e, Vec3f *target) {
         }
         return 0xFF;
     }
-    if (e->def->type == 1) {
+    if (e->def->m_Type == 1) {
         t = e->typeId;
         if (t == 0x44E || t == 0x453 || t == 0x451 || t == 0x450 || t == 0x454 || t == 0x455 || t == 0x456) {
             return 0xFF;
@@ -79,7 +76,7 @@ static __inline__ s32 inBlastRange(Entity *e, Vec3f *target) {
 
     func_0020EF2C(&d, &e->pos, target);
     dist = d.x * d.x + d.y * d.y + d.z * d.z;
-    if (e->def->type == 1) {
+    if (e->def->m_Type == 1) {
         t = e->typeId;
         if (t == 0x44E || t == 0x453 || t == 0x451 || t == 0x450 || t == 0x454 || t == 0x455 || t == 0x456) {
             return 0;

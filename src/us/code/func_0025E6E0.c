@@ -1,18 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ s32 anim;
-} AnimOverride;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ AnimOverride override;
-} ActorDef;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorDef *def;
+    /* 0x14 */ CIntelligence *def;
     /* 0x18 */ u8 pad18[0xB8 - 0x18];
     /* 0xB8 */ u16 type;
 } Actor;
@@ -28,22 +19,22 @@ s32 func_00259E8C(Actor *actor, State *state);
 s32 func_00259EB8(Actor *actor, State *state);
 
 s32 func_0025E6E0(Actor *actor, State *state) {
-    AnimOverride *ov = &actor->def->override;
+    CEnemyIntelligence *ov = &actor->def->m_Enemy;
 
-    if (ov->anim != 0) {
+    if (ov->m_StartAnim != 0) {
         if (actor->type == 0x1F9 || actor->type == 0x385) {
-            switch (ov->anim) {
+            switch (ov->m_StartAnim) {
                 case 0x2B16:
                 case 0x2B20:
                 case 0x2B2A:
                 case 0x2B34:
                 case 0x2B3E:
-                    return ov->anim + 1;
+                    return ov->m_StartAnim + 1;
                 default:
-                    return ov->anim;
+                    return ov->m_StartAnim;
             }
         }
-        return ov->anim;
+        return ov->m_StartAnim;
     }
     if (state->unk130) {
         return func_00259E60(actor, state);

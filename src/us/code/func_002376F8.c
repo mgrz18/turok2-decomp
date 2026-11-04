@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SYSTEM_2/802661FC_2.CPP, func_80267958_de (inlined here), with Turok 2's layouts. */
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* Applies a hit from an attacker to a target: marks the attacker, shakes the
  * target player's camera for heavy and medium hits, sprays blood from a
@@ -22,15 +23,11 @@ typedef struct {
 } Player;
 
 typedef struct {
-    /* 0x00 */ s32 type;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[0x3];
     /* 0x004 */ Vec3f pos;
     /* 0x010 */ u8 pad10[0x14 - 0x10];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ Vec3f velocity;
     /* 0x024 */ u8 pad24[0x50 - 0x24];
     /* 0x050 */ f32 spin;
@@ -123,7 +120,7 @@ void func_002376F8(Actor *target, Actor *source, s32 hit, Vec3f pos, Vec3f dir, 
             func_0026E110(target, 0x10, attacker);
         }
     }
-    if (target->def->type == 1 || target->def->type == 11) {
+    if (target->def->m_Type == 1 || target->def->m_Type == 11) {
         func_0020EEF8(&target->velocity, &target->velocity, &dir);
         if (push) {
             target->spin += func_00246310(target, source->pos) * 0.5f;

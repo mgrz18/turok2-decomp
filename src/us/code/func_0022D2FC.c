@@ -1091,10 +1091,6 @@ typedef struct {
 } Render;
 
 typedef struct {
-    /* 0x00 */ s32 type;
-} ActorDef;
-
-typedef struct {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[0x10];
     /* 0x14 */ s32 large;
@@ -1105,7 +1101,7 @@ typedef struct Actor {
     /* 0x001 */ u8 pad1[3];
     /* 0x004 */ Vec3f pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x40 - 0x18];
     /* 0x040 */ u32 flags;
     /* 0x044 */ u8 pad44[4];
@@ -1319,7 +1315,7 @@ static __inline__ void aimEffect(Effect *effect, Vec3f *vel) {
         effect->target = (s32) targetActor;
         effect->flags |= 0x10000;
         effect->shake = D_800F1CE0.frame;
-        if (targetActor->def->type == 1) {
+        if (targetActor->def->m_Type == 1) {
             if (effect->owner != 0) {
                 func_0025E52C(targetActor, &targetActor->ai, &effect->owner->pos, 3);
             } else {

@@ -1,17 +1,14 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
-
-typedef struct {
-    /* 0x00 */ s32 type;
-} ActorDef;
 
 typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[3];
     /* 0x004 */ Vec3f pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ Vec3f vel;
     /* 0x024 */ u8 pad24[0x140 - 0x24];
     /* 0x140 */ u32 aiFlags;
@@ -61,7 +58,7 @@ s32 func_0024ED54(Player *player, Body *body) {
     if ((player->buttons & 0x8000) && aim != NULL) {
         mount = player->mount;
         if (aim != mount && aim->kind == 1) {
-            type = aim->def->type;
+            type = aim->def->m_Type;
             if (type == 1 && mount != NULL) {
                 target = aim;
                 if (target->health != 0) {

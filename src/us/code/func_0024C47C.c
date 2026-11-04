@@ -10,6 +10,7 @@
  * (WheelPlayer, HudPlayer, SwitchPlayer, Player), and they share one
  * WeaponInfo. func_0024D344 is after Rage Wars (func_80220ED4_de). */
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct WeaponMenu WeaponMenu;
 
@@ -493,13 +494,6 @@ typedef struct Model {
     /* 0x02 */ u16 flags;
 } Model;
 
-typedef struct ActorDef {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s16 kind;
-    /* 0x0E */ u8 padE[0x18 - 0xE];
-    /* 0x18 */ s32 maxHealth;
-} ActorDef;
-
 /* What the actor stands in (func_00268A2C). */
 typedef struct Surface {
     /* 0x00 */ u8 pad0[0x44];
@@ -541,7 +535,7 @@ typedef struct Player {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ Vec3f pos;
     /* 0x0010 */ Model *model;
-    /* 0x0014 */ ActorDef *def;
+    /* 0x0014 */ CIntelligence *def;
     /* 0x0018 */ u8 pad18[4];
     /* 0x001C */ f32 velY;
     /* 0x0020 */ u8 pad20[0x40 - 0x20];
@@ -847,7 +841,7 @@ void func_0024D344(Player *p) {
             f32 max;
 
             regen = health + (f32) (s32) (rate * 256.0f) * (D_800B6D28 * 0.06666667f);
-            max = (u32) (p->def->maxHealth << 8);
+            max = (u32) (p->def->m_Player.m_StartHealth << 8);
             if (!(max <= regen)) {
                 max = regen;
             }
@@ -1104,7 +1098,7 @@ void func_0024D344(Player *p) {
             if (D_8011ACE4 != 0 && p->options->tagMode != 0) {
                 sound = D_800ADB5C;
             } else {
-                sound = D_800ADB30[p->def->kind];
+                sound = D_800ADB30[p->def->m_Id];
             }
         }
         func_002241D8(&D_800F7078, p, sound, p->action);

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* AI attack-wait callback: state 0 counts the delay down; once it has run out
  * (more than 30 frames left means an attack is due) it plays the attack
@@ -8,20 +9,10 @@
 typedef struct { f32 x, y, z; } Vec3;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x7E];
-    /* 0x7E */ u16 attackMask; /* 5 bits per mode */
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ Vec3 pos;
     /* 0x010 */ u8 pad10[0x14 - 0x10];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
 } Actor;
 
 typedef struct {
@@ -51,17 +42,17 @@ extern u8 D_800F7078[];
 extern void func_00243414(Actor *actor, CAI *ai, s32 anim);
 extern s16 func_002261A8(void *level, s32 id, Vec3 *pos);
 
-static __inline__ s32 canAttack(CAI *ai, ActorInfo *info, s32 state) {
+static __inline__ s32 canAttack(CAI *ai, CEnemyIntelligence *info, s32 state) {
     if (state == 0x20 || state == 0x3D) {
         return 0;
     }
     switch (ai->modeIndex) {
     case 0:
-        return (info->attackMask & 0x1F) != 0;
+        return (info->m_wAlertAnimFlags & 0x1F) != 0;
     case 1:
-        return (info->attackMask & 0x3E0) != 0;
+        return (info->m_wAlertAnimFlags & 0x3E0) != 0;
     case 2:
-        return (info->attackMask & 0x7C00) != 0;
+        return (info->m_wAlertAnimFlags & 0x7C00) != 0;
     }
     return 0;
 }
@@ -79,7 +70,7 @@ void func_0025C430(Actor *actor, CAI *ai) {
     switch (ai->waitState) {
     case 0:
         if (ai->wait > 30.0f) {
-            if (canAttack(ai, &actor->def->info, state)) {
+            if (canAttack(ai, &actor->def->m_Enemy, state)) {
                 func_00243414(actor, ai, 0xC);
             }
             D_800B06A0 = D_800B06AC;

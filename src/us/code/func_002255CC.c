@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x0 */ s32 type;
-} ActorDef;
+#include "structs/intelligence.h"
 
 typedef struct LevelActor {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xB8 - 0x18];
     /* 0x0B8 */ u16 typeFlag;
     /* 0x0BA */ u8 padBA[0xD4 - 0xBA];
@@ -76,7 +73,7 @@ void func_002255CC(World *arg0, LevelActor *arg1) {
         arg0->n2 = (s32) (temp_v1_3 + 1);
     }
     temp_a0 = arg0->n3;
-    if ((temp_a0 < 0x40) && (arg1->def->type == 1)) {
+    if ((temp_a0 < 0x40) && (arg1->def->m_Type == 1)) {
         arg0->l3[temp_a0] = arg1;
         temp_v0 = arg0->n3;
         arg1->enemyIndex = (s8) temp_v0;
@@ -88,7 +85,7 @@ void func_002255CC(World *arg0, LevelActor *arg1) {
         arg0->n4 = (s32) (temp_v1_4 + 1);
     }
     temp_a0_2 = arg0->n5;
-    if ((temp_a0_2 < 0x10) && (arg1->def->type == 5)) {
+    if ((temp_a0_2 < 0x10) && (arg1->def->m_Type == 5)) {
         arg0->l5[temp_a0_2] = arg1;
         arg0->n5 = (s32) (temp_a0_2 + 1);
     }

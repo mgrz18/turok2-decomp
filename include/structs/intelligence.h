@@ -51,7 +51,7 @@ enum {
  * first 0x34 bytes are shared with the turret (type 4). */
 typedef struct CEnemyIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
-    /* 0x04 (0x18) */ s32 m_Health;
+    /* 0x04 (0x18) */ u32 m_Health;
     /* 0x08 (0x1C) */ s32 m_StartAnim;
     /* 0x0C (0x20) */ s16 unk0C;
     /* 0x0E (0x22) */ u8 pad0E[2];
@@ -60,7 +60,7 @@ typedef struct CEnemyIntelligence {
     /* 0x18 (0x2C) */ f32 m_CollisionWallRadius;
     /* 0x1C (0x30) */ f32 m_CollisionHeight;
     /* 0x20 (0x34) */ f32 m_CollisionDeadHeight;
-    /* 0x24 (0x38) */ u32 m_dwFlags2;
+    /* 0x24 (0x38) */ f32 m_CollisionHeightOffset;
     /* 0x28 (0x3C) */ f32 m_LeashRadius;
     /* 0x2C (0x40) */ u8 m_Aggression;
     /* 0x2D (0x41) */ u8 m_TranqHealth;      /* also the flinch countdown's reload */
@@ -73,8 +73,13 @@ typedef struct CEnemyIntelligence {
     /* 0x40 (0x54) */ f32 m_AttackDartRadius;
     /* 0x44 (0x58) */ f32 m_AttackProjectileRadius;
     /* 0x48 (0x5C) */ f32 m_AttackWeaponRadius;
-    /* 0x4C (0x60) */ u8 m_GroundBehavior;
-    /* 0x4D (0x61) */ u8 m_AirBehavior;
+    /* 0x4C (0x60) */ union {
+        s8 m_Behaviors[2];                  /* indexed by the AI's mode */
+        struct {
+            s8 m_GroundBehavior;
+            s8 m_AirBehavior;
+        };
+    };
     /* 0x4E (0x62) */ u8 m_UnderwaterBehavior;
     /* 0x4F (0x63) */ u8 pad4F[0x58 - 0x4F];
     /* 0x58 (0x6C) */ s16 m_DeathAnims[5];
@@ -98,6 +103,39 @@ typedef struct CEnemyIntelligence {
     /* 0x84 (0x98) */ u16 m_wRightArmWoundAnimFlags;
     /* 0x86 (0x9A) */ u16 m_wFleeAnimFlags;
 } CEnemyIntelligence; /* size 0x88 */
+
+/* Type 2: moving platforms (and lifts). Checked: the flags at 0x24 and the
+ * move time at 0x38 (func_00264740 counts the timer down by dt / it). */
+typedef struct CPlatformIntelligence {
+    /* 0x00 (0x14) */ u32 m_dwFlags;
+    /* 0x04 (0x18) */ u16 m_CollisionType;
+    /* 0x06 (0x1A) */ u16 pad06;
+    /* 0x08 (0x1C) */ f32 m_CollisionRadius;
+    /* 0x0C (0x20) */ f32 m_CollisionWidth;
+    /* 0x10 (0x24) */ f32 m_CollisionHeight;
+    /* 0x14 (0x28) */ f32 m_CollisionLength;
+    /* 0x18 (0x2C) */ f32 m_CollisionXOffset;
+    /* 0x1C (0x30) */ f32 m_CollisionYOffset;
+    /* 0x20 (0x34) */ f32 m_CollisionZOffset;
+    /* 0x24 (0x38) */ u32 m_dwPlatformFlags;
+    /* 0x28 (0x3C) */ u8 m_Type;
+    /* 0x29 (0x3D) */ u8 m_MotionStyle;
+    /* 0x2A (0x3E) */ u8 m_RotationType;
+    /* 0x2B (0x3F) */ u8 pad2B;
+    /* 0x2C (0x40) */ f32 m_VertDist;
+    /* 0x30 (0x44) */ f32 m_HorizDist;
+    /* 0x34 (0x48) */ f32 m_HorizDir;
+    /* 0x38 (0x4C) */ f32 m_MoveTime;
+    /* 0x3C (0x50) */ f32 m_Rotation;
+    /* 0x40 (0x54) */ f32 m_StartOffset;
+    /* 0x44 (0x58) */ f32 m_HoverAmplitude;
+    /* 0x48 (0x5C) */ f32 m_HoverPeriod;
+    /* 0x4C (0x60) */ f32 m_GoDelayTime;
+    /* 0x50 (0x64) */ f32 m_ReturnDelayTime;
+    /* 0x54 (0x68) */ f32 m_SpecialDelay;
+    /* 0x58 (0x6C) */ f32 m_SpecialSinkDist;
+    /* 0x5C (0x70) */ f32 m_SpecialSinkTime;
+} CPlatformIntelligence; /* size 0x60 */
 
 /* Type 3: spawns objects or particle effects. */
 typedef struct CGeneratorIntelligence {
@@ -184,10 +222,15 @@ typedef struct CActionIntelligence {
     /* 0x1B (0x2F) */ s8 m_GoTexture;
 } CActionIntelligence; /* size 0x1C */
 
-/* Type 11: a player character. */
+/* Type 11: a player character. Smaller than Rage Wars' (which has its
+ * scale at 0xE8): the player code copies its scale from 0x24. */
 typedef struct CPlayerIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
     /* 0x04 (0x18) */ u32 m_StartHealth;
+    /* 0x08 (0x1C) */ u8 pad08[0x24 - 0x08];
+    /* 0x24 (0x38) */ f32 m_ScaleX;
+    /* 0x28 (0x3C) */ f32 m_ScaleY;
+    /* 0x2C (0x40) */ f32 m_ScaleZ;
 } CPlayerIntelligence;
 
 typedef struct CIntelligence {
@@ -204,6 +247,7 @@ typedef struct CIntelligence {
     /* 0x14 */ union {
         u32 m_dwTypeFlags;                   /* every body starts with its flags */
         CEnemyIntelligence m_Enemy;
+        CPlatformIntelligence m_Platform;
         CGeneratorIntelligence m_Generator;
         CTurretIntelligence m_Turret;
         CDoorIntelligence m_Door;

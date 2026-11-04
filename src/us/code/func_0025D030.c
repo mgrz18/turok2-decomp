@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* Picks an attack for the current mode: every attack the definition enables
  * for this mode and whose range test passes goes into a weighted random
@@ -18,28 +19,8 @@ typedef struct {
 } Targets;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x38];
-    /* 0x38 */ f32 meleeRange;
-    /* 0x3C */ f32 rangeA;
-    /* 0x40 */ f32 rangeB;
-    /* 0x44 */ f32 rangeC;
-    /* 0x48 */ f32 rangeD;
-    /* 0x4C */ u8 pad4C[0x6A - 0x4C];
-    /* 0x6A */ u16 meleeMask; /* 5 bits per mode */
-    /* 0x6C */ u16 maskA;
-    /* 0x6E */ u16 maskB;
-    /* 0x70 */ u16 maskC;
-    /* 0x72 */ u16 maskD;
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
 } Actor;
 
 typedef struct {
@@ -60,7 +41,7 @@ extern s16 func_0026D628(Chooser *c);
 
 s16 func_0025D030(Actor *actor, CAI *ai, Targets *t) {
     Chooser chooser;
-    ActorInfo *info = &actor->def->info;
+    CEnemyIntelligence *info = &actor->def->m_Enemy;
     s32 melee;
     s32 a;
     s32 b;
@@ -77,41 +58,41 @@ s16 func_0025D030(Actor *actor, CAI *ai, Targets *t) {
     mode = ai->modeIndex;
     if (t->ground.kind < 2) {
         if (mode == 0) {
-            melee = info->meleeMask & 0x1F;
-            a = info->maskA & 0x1F;
-            b = info->maskB & 0x1F;
-            c = info->maskC & 0x1F;
-            d = info->maskD & 0x1F;
+            melee = info->m_wCombatAnimFlags & 0x1F;
+            a = info->m_wLeapAnimFlags & 0x1F;
+            b = info->m_wDartAnimFlags & 0x1F;
+            c = info->m_wProjectileAnimFlags & 0x1F;
+            d = info->m_wWeaponAnimFlags & 0x1F;
         } else if (mode == 1) {
-            melee = info->meleeMask & 0x3E0;
-            a = info->maskA & 0x3E0;
-            b = info->maskB & 0x3E0;
-            c = info->maskC & 0x3E0;
-            d = info->maskD & 0x3E0;
+            melee = info->m_wCombatAnimFlags & 0x3E0;
+            a = info->m_wLeapAnimFlags & 0x3E0;
+            b = info->m_wDartAnimFlags & 0x3E0;
+            c = info->m_wProjectileAnimFlags & 0x3E0;
+            d = info->m_wWeaponAnimFlags & 0x3E0;
         } else if (mode == 2) {
-            melee = info->meleeMask & 0x7C00;
-            a = info->maskA & 0x7C00;
-            b = info->maskB & 0x7C00;
-            c = info->maskC & 0x7C00;
-            d = info->maskD & 0x7C00;
+            melee = info->m_wCombatAnimFlags & 0x7C00;
+            a = info->m_wLeapAnimFlags & 0x7C00;
+            b = info->m_wDartAnimFlags & 0x7C00;
+            c = info->m_wProjectileAnimFlags & 0x7C00;
+            d = info->m_wWeaponAnimFlags & 0x7C00;
         }
     }
     func_0026D5DC(&chooser);
     if (t->air.kind != 7) {
-        if (melee && t->air.visible && t->air.dist <= info->meleeRange) {
+        if (melee && t->air.visible && t->air.dist <= info->m_AttackCombatRadius) {
             func_0026D5E4(&chooser, 0xE, 100);
         }
-        if (a && t->air.visible && info->rangeA - 20.48f <= t->air.dist && t->air.dist <= info->rangeA + 20.48f) {
+        if (a && t->air.visible && info->m_AttackLeapRadius - 20.48f <= t->air.dist && t->air.dist <= info->m_AttackLeapRadius + 20.48f) {
             func_0026D5E4(&chooser, 0xF, 100);
         }
-        if (b && t->air.visible && info->rangeB - 20.48f <= t->air.dist && t->air.dist <= info->rangeB + 20.48f) {
+        if (b && t->air.visible && info->m_AttackDartRadius - 20.48f <= t->air.dist && t->air.dist <= info->m_AttackDartRadius + 20.48f) {
             func_0026D5E4(&chooser, 0x10, 100);
         }
     }
-    if (c && ai->cooldown <= 0.0f && t->ground.dist <= info->rangeC) {
+    if (c && ai->cooldown <= 0.0f && t->ground.dist <= info->m_AttackProjectileRadius) {
         func_0026D5E4(&chooser, 0x12, 100);
     }
-    if (d && ai->cooldown <= 0.0f && t->ground.dist <= info->rangeD) {
+    if (d && ai->cooldown <= 0.0f && t->ground.dist <= info->m_AttackWeaponRadius) {
         func_0026D5E4(&chooser, 0x11, 100);
     }
     if (chooser.count != 0) {

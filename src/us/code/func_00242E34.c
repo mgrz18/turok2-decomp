@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct Vec3 {
     f32 x, y, z;
@@ -18,10 +19,6 @@ typedef struct RegionInfo {
     u16 damage;        /* 0x50 */
 } RegionInfo;
 
-typedef struct ActorDef {
-    s32 type;          /* 0x00 */
-} ActorDef;
-
 typedef struct Owner {
     char pad0[0x51C];
     char *player;      /* 0x51C */
@@ -31,7 +28,7 @@ typedef struct Actor {
     char pad0[4];
     Vec3 pos;          /* 0x04 */
     Region *region;    /* 0x10 */
-    ActorDef *def;     /* 0x14 */
+    CIntelligence *def;     /* 0x14 */
     char pad18[0x30 - 0x18];
     void *unk30;       /* 0x30 */
     char pad34[0xD4 - 0x34];
@@ -119,7 +116,7 @@ void func_00242E34(Actor *actor, Dest *dst) {
     if (info->flags & 0x80000) {
         hurt = 1;
         if (info->flags & 4) {
-            hurt = actor->def->type != 1;
+            hurt = actor->def->m_Type != 1;
         }
         if (dst->flags & 0xC0000) {
             hurt = 0;

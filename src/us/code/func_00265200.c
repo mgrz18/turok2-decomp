@@ -3,6 +3,7 @@
  * stray word ahead of the prologue, never executed. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0020486C.c, func_0020486C, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct {
     f32 x, y, z;
@@ -14,21 +15,10 @@ typedef struct {
 } EventArg;
 
 typedef struct {
-    /* 0x0 */ u32 flags;
-    /* 0x4 */ f32 duration;
-    /* 0x8 */ s8 eventFrame; /* in 1/127ths of the animation, -1: none */
-} ActionInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActionInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ Vec3f pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xA2];
     /* 0x0BA */ s16 unkBA;
     /* 0x0BC */ u8 padBC[0x18];
@@ -70,19 +60,19 @@ static __inline__ s32 animReached(Actor *actor, ActionState *state, f32 scale) {
 }
 
 void func_00265200(Actor *actor, ActionState *state) {
-    ActionInfo *info = &actor->def->info;
+    CDoorIntelligence *info = &actor->def->m_Door;
     EventArg extra;
     f32 t;
 
-    if (info->eventFrame != -1) {
-        if (animReached(actor, state, (f32) info->eventFrame * 0.007874016f)) {
+    if (info->m_OpenDoorEvent != -1) {
+        if (animReached(actor, state, (f32) info->m_OpenDoorEvent * 0.007874016f)) {
             extra.a = 0;
             func_00237EE4(actor, actor, 6, actor->pos, extra);
             func_00220260(D_800F7078, actor, 1);
         }
     }
-    if ((info->flags & 1) && state->active != 0) {
-        t = info->duration;
+    if ((info->m_dwFlags & 1) && state->active != 0) {
+        t = info->m_OpenDuration;
         if (t == 0.0f || state->duration < t) {
             if (state->duration == 0.0f) {
                 state->timer = 0.0f;

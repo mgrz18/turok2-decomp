@@ -1,14 +1,11 @@
 #include "common.h"
-
-typedef struct ActorDef {
-    /* 0x00 */ s32 kind;
-} ActorDef;
+#include "structs/intelligence.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ f32 x, y, z;
     /* 0x010 */ u8 pad10[0x4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x140 - 0x18];
     /* 0x140 */ u8 ai[1];
 } Actor;
@@ -39,7 +36,7 @@ Actor *func_00225848(World *world, Actor *target) {
     actors = world->actors;
     for (; i < count; i++) {
         actor = actors[i];
-        if (actor->def->kind != 5) {
+        if (actor->def->m_Type != 5) {
             continue;
         }
         if (func_00264C80(actor, actor->ai) != 0) {

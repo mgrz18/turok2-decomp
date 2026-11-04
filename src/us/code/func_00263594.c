@@ -1,20 +1,10 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80204E78_7.CPP, func_80206080_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ f32 delayMin;
-    /* 0x10 */ f32 delayMax;
-} TriggerDef;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ TriggerDef trigger;
-} ActorDef;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorDef *def;
+    /* 0x14 */ CIntelligence *def;
 } Actor;
 
 typedef struct {
@@ -43,11 +33,11 @@ extern f32 func_002119FC(f32 lo, f32 hi); /* random in range */
 /* AI init: a random delay from the definition's range, shortened by 25% per
  * player beyond two in multiplayer. */
 void func_00263594(Actor *actor, AI *ai) {
-    TriggerDef *trigger = &actor->def->trigger;
+    CGeneratorIntelligence *trigger = &actor->def->m_Generator;
     f32 delay;
     GameOptions *opts;
 
-    delay = func_002119FC(trigger->delayMin, trigger->delayMax);
+    delay = func_002119FC(trigger->m_IntervalTime1, trigger->m_IntervalTime2);
     ai->delay = delay;
     opts = &D_80119870.options;
     if (opts->multiplayer && D_80119870.playerCount >= 3) {

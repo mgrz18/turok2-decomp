@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct Vec3 {
     f32 x, y, z;
@@ -16,20 +17,6 @@ typedef struct Settings {
     s32 useLevelB;     /* 0x20C */
 } Settings;
 
-typedef struct ActorDef {
-    s32 type;          /* 0x00 */
-    char pad4[0x12 - 0x4];
-    s8 level;          /* 0x12 */
-    char pad13[0x18 - 0x13];
-    union {
-        u32 u;
-        s16 s;
-    } health;          /* 0x18 */
-    char pad1C[0x40 - 0x1C];
-    u8 unk40;          /* 0x40 */
-    u8 unk41;          /* 0x41 */
-} ActorDef;
-
 typedef struct Dest {
     char pad0[4];
     s32 health;        /* 0x04 */
@@ -45,7 +32,7 @@ extern Settings D_8011AAD8;
 extern s32 D_8011AAE0;  /* difficulty: 8, 16 or 32 */
 
 /* Initial health and level of an actor from its definition, scaled by difficulty. */
-void func_002427E0(Dest *dst, ActorDef *def, Vec3 pos, void *actor) {
+void func_002427E0(Dest *dst, CIntelligence *def, Vec3 pos, void *actor) {
     Settings *settings;
     s32 level;
     f32 health;
@@ -60,28 +47,28 @@ void func_002427E0(Dest *dst, ActorDef *def, Vec3 pos, void *actor) {
     health = a;
     if (def != NULL) {
         settings = &D_8011AAD8;
-        level = def->level;
-        if (settings->multiplayer != 0 && def->type != 1 && def->type != 11) {
+        level = def->m_nTexture;
+        if (settings->multiplayer != 0 && def->m_Type != 1 && def->m_Type != 11) {
             if (settings->useLevelB != 0) {
                 level = settings->levelB;
             } else {
                 level = settings->levelA;
             }
         }
-        switch (def->type) {
+        switch (def->m_Type) {
             case 1:
-                health = def->health.u;
-                a = def->unk41;
-                b = def->unk40;
+                health = def->m_Enemy.m_Health;
+                a = def->m_Enemy.m_TranqHealth;
+                b = def->m_Enemy.m_Aggression;
                 break;
             case 4:
-                health = def->health.u;
+                health = def->m_Enemy.m_Health;
                 break;
             case 7:
-                health = def->health.s;
+                health = def->m_Destructible.m_Health;
                 break;
         }
-        if (def->type == 1 || def->type == 4) {
+        if (def->m_Type == 1 || def->m_Type == 4) {
             switch (D_8011AAE0) {
                 case 8:
                     t = health * 0.5f;

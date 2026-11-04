@@ -1,25 +1,11 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct {
     f32 x, y, z;
 } Vec3f;
 
 typedef struct Object Object;
-
-typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x30 - 0x4];
-    /* 0x30 */ u16 hurtSound;
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ u8 pad4[0x14 - 0x4];
-    /* 0x14 */ ActorInfo info;
-    /* 0x48 */ u8 pad48[0x96 - 0x48];
-    /* 0x96 */ u16 headshotModes;   /* hit-region reactions, 5 bits per mode slot */
-    /* 0x98 */ u16 headshotModes2;
-} ActorDef;
 
 typedef struct AI {
     /* 0x000 */ u32 flags;
@@ -52,7 +38,7 @@ struct Object {
     /* 0x002 */ u16 particleType;
     /* 0x004 */ Vec3f pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xB8 - 0x18];
     /* 0x0B8 */ u16 typeId;
     /* 0x0BA */ u8 padBA[0xD4 - 0xBA];
@@ -112,8 +98,8 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
     Object *owner;
     Object *newTarget;
     s32 left;
-    ActorInfo *info;
-    ActorDef *def;
+    CEnemyIntelligence *info;
+    CIntelligence *def;
     f32 volume;
     s32 index;
     s32 health;
@@ -129,7 +115,7 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
     def = obj->def;
     volume = 1.0f;
     index = ai->modeIndex;
-    info = &def->info;
+    info = &def->m_Enemy;
     if (ai->state == 0x3D) {
         func_002600E8(obj, ai);
         return;
@@ -150,10 +136,10 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
                 break;
             case 2:
                 if (source->particleType == 10) {
-                    if ((def->info.flags & 0x80) && ai->health != 0) {
+                    if ((def->m_Enemy.m_dwFlags & 0x80) && ai->health != 0) {
                         func_00243414(obj, ai, 0x1F);
                     }
-                    if (info->flags & 0x40000) {
+                    if (info->m_dwFlags & 0x40000) {
                         dmg->amount += 0x3200;
                         ai->burnTime += 60.0f;
                     }
@@ -178,7 +164,7 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
                 break;
         }
         if (!D_8011001C && attacker != NULL && attacker->typeId != obj->typeId) {
-            if (attacker->def->kind == 1) {
+            if (attacker->def->m_Type == 1) {
                 ai->target = attacker;
                 ai->attacker = attacker;
                 ai->flags |= 0x20000000;
@@ -202,13 +188,13 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
     if (dead) {
         justDied = health != 0;
     }
-    if ((health != 0 || (ai->state != 0x3C && !ai->grounded)) && info->hurtSound != 0 && ai->age >= 11) {
+    if ((health != 0 || (ai->state != 0x3C && !ai->grounded)) && info->m_PainSound != 0 && ai->age >= 11) {
         if (D_8011AAD8 & 0x40) {
             volume = 2.5f;
         } else if (D_8011AAD8 & 0x20) {
             volume = 0.35f;
         }
-        func_002755B0(info->hurtSound, obj->pos, 0, -1, volume);
+        func_002755B0(info->m_PainSound, obj->pos, 0, -1, volume);
         ai->age = 0;
     }
     ai->pain = (ai->pain + dmg->amount < 255) ? 255 : ai->pain + dmg->amount;
@@ -249,14 +235,14 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
         region = dmg->region;
         if (region != NULL && !(ai->state >= 0x1C && ai->state < 0x23) && (region->flags & 3) == 2) {
             if (!(region->flags & 4)) {
-                if ((index == 0 && (obj->def->headshotModes & 0x1F)) || (index == 1 && (obj->def->headshotModes & 0x3E0))
-                    || (index == 2 && (obj->def->headshotModes & 0x7C00))) {
+                if ((index == 0 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x1F)) || (index == 1 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x3E0))
+                    || (index == 2 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x7C00))) {
                     func_00243414(obj, ai, 0x24);
                     return;
                 }
             } else {
-                if ((index == 0 && (obj->def->headshotModes2 & 0x1F)) || (index == 1 && (obj->def->headshotModes2 & 0x3E0))
-                    || (index == 2 && (obj->def->headshotModes2 & 0x7C00))) {
+                if ((index == 0 && (obj->def->m_Enemy.m_wRightArmWoundAnimFlags & 0x1F)) || (index == 1 && (obj->def->m_Enemy.m_wRightArmWoundAnimFlags & 0x3E0))
+                    || (index == 2 && (obj->def->m_Enemy.m_wRightArmWoundAnimFlags & 0x7C00))) {
                     func_00243414(obj, ai, 0x25);
                     return;
                 }
@@ -264,7 +250,7 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
         }
         if (ai->grounded && (ai->state == 0x11 || ai->state == 0x12)) {
             func_00243414(obj, ai, 4);
-        } else if (ai->state != 0x33 && (dmg->flags & 0xC00000) && (info->flags & 0x20000)) {
+        } else if (ai->state != 0x33 && (dmg->flags & 0xC00000) && (info->m_dwFlags & 0x20000)) {
             func_00243414(obj, ai, 0x33);
             pushed = 1;
         }

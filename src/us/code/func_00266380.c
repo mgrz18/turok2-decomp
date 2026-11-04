@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x3E];
@@ -17,17 +18,8 @@ typedef struct {
 } Game;
 
 typedef struct {
-    /* 0x00 */ u32 flags;
-} ActionInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActionInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xA0];
     /* 0x0B8 */ u16 typeId;
     /* 0x0BA */ u8 padBA[0x1A];
@@ -51,7 +43,7 @@ extern Player *func_002532B4(Game *game);
 extern void func_00243414(Actor *actor, ActionState *state, s32 mode);
 
 void func_00266380(Actor *actor, ActionState *state) {
-    ActionInfo *info = &actor->def->info;
+    CDoorIntelligence *info = &actor->def->m_Door;
     Game *game;
     Player *player;
     s32 mode;
@@ -70,7 +62,7 @@ void func_00266380(Actor *actor, ActionState *state) {
         }
     }
     if (state->active != 0) {
-        if (info->flags & 2) {
+        if (info->m_dwFlags & 2) {
             actor->flags &= ~0x2000;
             actor->flags &= ~0x100;
         }

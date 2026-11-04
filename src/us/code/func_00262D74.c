@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
@@ -14,25 +15,10 @@ typedef struct {
 } Quatf;
 
 typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ s32 dropKind;
-    /* 0x08 */ u8 pad8[0x14 - 0x8];
-    /* 0x14 */ s16 dropId;
-    /* 0x16 */ s16 dropModel;
-    /* 0x18 */ Vec3f dropScale;
-    /* 0x24 */ s16 dropEffect;
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x4];
     /* 0x04 */ Vec3f pos;
     /* 0x10 */ s32 region;
-    /* 0x14 */ ActorDef *def;
+    /* 0x14 */ CIntelligence *def;
     /* 0x18 */ Vec3f vel;
     /* 0x24 */ u8 pad24[0x40 - 0x24];
     /* 0x40 */ Quatf rot;
@@ -126,7 +112,7 @@ void func_00262D74(Actor *actor, CAI *ai) {
     Vec3f scale;
     PickTable picks;
     PickTable unlocked;
-    ActorInfo *info;
+    CGeneratorIntelligence *info;
     s32 region;
     s32 *model;
     s32 id;
@@ -139,7 +125,7 @@ void func_00262D74(Actor *actor, CAI *ai) {
     Pick *e;
     void *player;
 
-    info = &actor->def->info;
+    info = &actor->def->m_Generator;
     pos = actor->pos;
     region = actor->region;
     if (region != 0) {
@@ -148,12 +134,12 @@ void func_00262D74(Actor *actor, CAI *ai) {
             pos.y = ground;
         }
     }
-    switch (info->dropKind) {
+    switch (info->m_Type) {
     case 0:
-        model = func_00225E88(D_800F7078, info->dropModel);
+        model = func_00225E88(D_800F7078, info->m_VariationIndex);
         switch (*model) {
         case 8:
-            id = func_002241C0(D_800F7078, info->dropId);
+            id = func_002241C0(D_800F7078, info->m_ObjectIndex);
             if (func_00262C20(id)) {
                 spawnPickup(actor, ai, pos, region, id);
             }
@@ -167,15 +153,15 @@ void func_00262D74(Actor *actor, CAI *ai) {
         case 7:
         case 9:
         case 10:
-            scale.x = info->dropScale.x;
-            scale.y = info->dropScale.y;
-            scale.z = info->dropScale.z;
-            spawnObject(actor, ai, pos, scale, region, info->dropId, model);
+            scale.x = info->m_ScaleX;
+            scale.y = info->m_ScaleY;
+            scale.z = info->m_ScaleZ;
+            spawnObject(actor, ai, pos, scale, region, info->m_ObjectIndex, model);
             break;
         }
         break;
     case 1:
-        spawnEffect(actor, ai, pos, region, info->dropEffect);
+        spawnEffect(actor, ai, pos, region, info->m_ParticleType);
         break;
     case 2:
         weapon = -1;
@@ -183,13 +169,13 @@ void func_00262D74(Actor *actor, CAI *ai) {
         item = -1;
         flags = &D_8011AAD8;
         if (flags->multiplayer) {
-            if (info->flags & 0x20) {
+            if (info->m_dwFlags & 0x20) {
                 weapon = func_0026D518(D_800B1F38);
             }
-            if (info->flags & 0x40) {
+            if (info->m_dwFlags & 0x40) {
                 ammo = func_0026D518(D_800B1F78);
             }
-            if (info->flags & 0x80) {
+            if (info->m_dwFlags & 0x80) {
                 func_0026D5DC(&unlocked);
                 for (e = D_800B1FE4; e->id != -1; e++) {
                     pickId = e->id;
@@ -204,7 +190,7 @@ void func_00262D74(Actor *actor, CAI *ai) {
             if (player == NULL) {
                 break;
             }
-            if (info->flags & 0x20) {
+            if (info->m_dwFlags & 0x20) {
                 func_0026D5DC(&picks);
                 for (e = D_800B1EE0; e->id != -1; e++) {
                     pickId = e->id;
@@ -214,7 +200,7 @@ void func_00262D74(Actor *actor, CAI *ai) {
                 }
                 weapon = func_0026D628(&picks);
             }
-            if (info->flags & 0x40) {
+            if (info->m_dwFlags & 0x40) {
                 func_0026D5DC(&picks);
                 e = D_800B1F5C;
                 if (D_8011001C) {
@@ -228,7 +214,7 @@ void func_00262D74(Actor *actor, CAI *ai) {
                 }
                 ammo = func_0026D628(&picks);
             }
-            if (info->flags & 0x80) {
+            if (info->m_dwFlags & 0x80) {
                 item = func_0026D518(D_800B1F88);
             }
         }
