@@ -26,7 +26,6 @@
  * offset in CIntelligence too. Fields named unk are not yet known. */
 
 #include "common.h"
-#include "structs/game_object.h"
 
 /* m_Type, in Rage Wars' order (which Turok 2 follows: 1 and 4 read the
  * common enemy block, 7 a halfword health, 11 is the player's own). */
@@ -108,7 +107,9 @@ typedef struct CGeneratorIntelligence {
     /* 0x10 (0x24) */ f32 m_IntervalTime2;
     /* 0x14 (0x28) */ s16 m_ObjectIndex;
     /* 0x16 (0x2A) */ s16 m_VariationIndex;
-    /* 0x18 (0x2C) */ CVector3 m_vScale;
+    /* 0x18 (0x2C) */ f32 m_ScaleX;
+    /* 0x1C (0x30) */ f32 m_ScaleY;
+    /* 0x20 (0x34) */ f32 m_ScaleZ;
     /* 0x24 (0x38) */ s16 m_ParticleType;
     /* 0x26 (0x3A) */ s16 m_Unused;
 } CGeneratorIntelligence; /* size 0x28 */

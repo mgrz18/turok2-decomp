@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct {
     f32 x, y, z;
@@ -56,16 +57,11 @@ struct AI {
     /* 0x133 */ s8 modeIndex;
 };
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ u32 flags;
-} ActorDef;
-
 struct Object {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ Vec3f pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xD4 - 0x18];
     /* 0x0D4 */ u32 flags;
     /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
@@ -151,7 +147,7 @@ void func_0025C5F8(Object *obj, AI *ai) {
         }
     }
     index = ai->modeIndex;
-    if (obj->def->flags & 0x40) {
+    if (obj->def->m_dwTypeFlags & 0x40) {
         ai->idleTime -= D_800B6D28;
         if (ai->idleTime < 0.0f) {
             ai->idleTime = 0.0f;

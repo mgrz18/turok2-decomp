@@ -1,13 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x76];
-    /* 0x76 */ u16 anim;
-} ActorDef;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorDef *def;
+    /* 0x14 */ CIntelligence *def;
 } Actor;
 
 /* Three override slots, 6 bytes apart. */
@@ -25,7 +21,7 @@ s32 func_0025AC88(Actor *actor, void *state) {
     } else if (slots[3] != 0) {
         r = func_00245A98(actor, state, D_800B0630, slots[3]) + 100;
     } else if (slots[6] == 0) {
-        r = func_00245A98(actor, state, D_800AF6F0, actor->def->anim);
+        r = func_00245A98(actor, state, D_800AF6F0, actor->def->m_Enemy.m_wIdleAnimFlags);
     } else {
         r = func_00245A98(actor, state, D_800B0630, slots[6]) + 200;
     }

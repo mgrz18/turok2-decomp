@@ -27,7 +27,7 @@ typedef struct {
 
 typedef f32 CMtxF[4][4];
 
-/* The definition m_pIntelligence points at (needs CVector3 above). */
+/* The definition m_pIntelligence points at. */
 #include "structs/intelligence.h"
 
 typedef struct {

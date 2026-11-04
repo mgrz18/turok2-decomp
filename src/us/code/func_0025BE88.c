@@ -1,18 +1,14 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* AI init dispatcher: the 0x44E..0x456 types have their own init in the paged
  * VM code; everything else gets the generic init. */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ u32 flags;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ f32 pos[3];
     /* 0x010 */ u8 pad10[0x14 - 0x10];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xB8 - 0x18];
     /* 0x0B8 */ u16 type;
     /* 0x0BA */ u8 padBA[0xD4 - 0xBA];
@@ -38,7 +34,7 @@ extern void func_0025E52C(Actor *actor, CAI *ai, f32 *pos, s32 arg3);
 extern s32 func_00220408(void *mgr, Actor *actor);
 
 void func_0025BE88(Actor *actor, CAI *ai) {
-    u32 *defFlags = &actor->def->flags;
+    u32 *defFlags = &actor->def->m_dwTypeFlags;
 
     switch (actor->type) {
     case 0x451:
