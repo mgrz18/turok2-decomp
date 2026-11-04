@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
 
-/* The weapon AI's own variables, in its m_VarBuffer. */
-#define ANGLE(ai) (*(f32 *) &(ai)->m_VarBuffer[0])
-#define TILT(ai) (*(f32 *) &(ai)->m_VarBuffer[1])
-
 extern f32 func_00211774(f32 value, f32 target, f32 rate);
 extern void func_00253DE0(CPlayer *player, s32 sound);
 extern void func_00253E68(CPlayer *player);
@@ -26,7 +22,7 @@ void func_002593D8(void *obj, CAI *state) {
         if (player->m_Speed < 0.0f) {
             dir = -1.0f;
         }
-        if (TILT(state) < 0.0f ? dir != -1.0f : dir != 1.0f) {
+        if (state->m_Weapon.m_BarrelSpeed < 0.0f ? dir != -1.0f : dir != 1.0f) {
             rate *= 4.0f;
         }
         if (player->m_pLoopingSound_WeaponBackground == 0) {
@@ -35,14 +31,14 @@ void func_002593D8(void *obj, CAI *state) {
     } else {
         rate = 0.008726647124f;
         target = -0.017453294f;
-        if (TILT(state) > 0.0f) {
+        if (state->m_Weapon.m_BarrelSpeed > 0.0f) {
             target = 0.017453294f;
         }
         if (player->m_pLoopingSound_WeaponBackground != 0) {
             func_00253E68(player);
         }
     }
-    tilt = func_00211774(TILT(state), target, rate);
-    TILT(state) = tilt;
-    ANGLE(state) -= tilt;
+    tilt = func_00211774(state->m_Weapon.m_BarrelSpeed, target, rate);
+    state->m_Weapon.m_BarrelSpeed = tilt;
+    state->m_Weapon.m_BarrelAngle -= tilt;
 }

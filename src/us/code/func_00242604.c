@@ -1,16 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-typedef struct DefInfo {
-    char pad0[4];
-    u16 kind;          /* 0x04 */
-} DefInfo;
-
-typedef struct Def {
-    char pad0[0x14];
-    DefInfo info;      /* 0x14 */
-} Def;
-
 
 typedef struct Target {
     char pad0[4];
@@ -37,14 +27,14 @@ s32 func_00242284(Controller *ctrl, CGameObjectInstance *actor);
 s32 func_00241FC8(Controller *ctrl, CGameObjectInstance *actor);
 
 void func_00242604(Controller *ctrl, CGameObjectInstance *actor) {
-    DefInfo *info;
+    CPlatformIntelligence *info;
     Target *target;
     s32 ok;
 
-    info = &((Def *)actor->header.m_pIntelligence)->info;
+    info = &actor->header.m_pIntelligence->m_Platform;
     target = ctrl->target;
     if (target != &D_800F1E10 && target->active != 0) {
-        switch (info->kind) {
+        switch (info->m_CollisionType) {
             case 0:
                 ok = func_00241E30(ctrl, actor);
                 break;

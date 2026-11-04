@@ -1,11 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x50];
-    /* 0x50 */ s32 spinMode;
-} Def;
-
 extern f32 D_800DD78C;
 
 f32 func_002982F0(f32 x);
@@ -22,7 +17,7 @@ void func_00262A1C(CGameObjectInstance *self, CAI *ai) {
     CQuaternion rot;
     f32 sinHalf;
 
-    if (((Def *)self->header.m_pIntelligence)->spinMode == -1) {
+    if (self->header.m_pIntelligence->m_Turret.m_RotNode == -1) {
         sinHalf = func_002982F0(self->m_RotY * 0.5f);
         q.x = 0.0f;
         q.y = sinHalf;

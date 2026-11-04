@@ -16,7 +16,7 @@ void func_0040E108(CGameObjectInstance *actor, CAI *ai) {
     f32 sum;
 
     func_00246108(actor, ai, &t, 0, 1);
-    ai->m_VarF32[4] = t.m_Sight.m_FlatDist;
+    ai->m_BlindOne.m_SightDist = t.m_Sight.m_FlatDist;
     switch (actor->m_nTypeFlag) {
         case 0x454:
             rate = 0.06981318f;

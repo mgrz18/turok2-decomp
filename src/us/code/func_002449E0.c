@@ -36,7 +36,7 @@ static __inline__ s32 Kind(CGameObjectInstance *self, CAI *plan, CGameObjectInst
     if (target == plan->m_pParent) {
         return 2;
     }
-    if (*((s32 *)target->header.m_pIntelligence) == 5) {
+    if (target->header.m_pIntelligence->m_Type == 5) {
         return 5;
     }
     if (target->m_nTypeFlag == 0x64F) {
@@ -72,7 +72,7 @@ void func_002449E0(CGameObjectInstance *self, CAI *plan, s32 unused, CAITarget *
     if (plan->m_PathFindCount == D_800F7F78 && (!(plan->m_dwFlags & 0x40000000) || plan->m_pTargetOverride != NULL)) {
         plan->m_pSightTarget = func_00243C90(self, plan, 1, 0);
     }
-    if (*((s32 *)self->header.m_pIntelligence) == 1 && plan->m_Mode == 0xB && Kind(self, plan, plan->m_pPathTarget) == 4) {
+    if (self->header.m_pIntelligence->m_Type == 1 && plan->m_Mode == 0xB && Kind(self, plan, plan->m_pPathTarget) == 4) {
         target = plan->m_pPathTarget;
         kind = 4;
     } else {

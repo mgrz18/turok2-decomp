@@ -56,8 +56,10 @@ typedef struct CAIModeInfo {
     /* 0x1C */ u32 unk_1C;
 } CAIModeInfo; /* size 0x20 */
 
-/* The views of CAI::m_VarBuffer (CEnemyAIVars m_Enemy...). */
+/* The views of CAI::m_VarBuffer: CEnemyAIVars m_Enemy, m_Turret, m_Platform,
+ * m_Generator (ai_vars.h); the bosses and the weapon actor (ai_vars_boss.h). */
 #include "structs/ai_vars.h"
+#include "structs/ai_vars_boss.h"
 
 /* AI state embedded in every game object at 0x140. Health is 24.8 fixed point. */
 typedef struct {
@@ -136,6 +138,9 @@ typedef struct {
         /* 0x10C */ u16 m_VarU16[24];
         /* 0x10C */ s8 m_VarS8[48];
         /* 0x10C */ u8 m_VarU8[48];
+        /* 0x10C */ CBlindOneAIVars m_BlindOne;
+        /* 0x10C */ CMotherAIVars m_Mother;
+        /* 0x10C */ CWeaponAIVars m_Weapon;
         /* 0x10C */ CEnemyAIVars m_Enemy;
         /* 0x10C */ CTurretAIVars m_Turret;
         /* 0x10C */ CPlatformAIVars m_Platform;

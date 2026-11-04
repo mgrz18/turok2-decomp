@@ -28,7 +28,7 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(state->slots[i].anim, src);
+            func_00236314(&state->slots[i].anim, src);
         }
     }
 }
@@ -59,8 +59,8 @@ void func_0040ABB4(void *obj, CAI *ai) {
 
     for (i = 0; i < state->count; i++) {
         actor = state->actors[i];
-        actor->m_AI.m_VarF32[2] = 1.0f;
-        actor->m_AI.m_VarF32[1] = 0.0f;
+        actor->m_AI.m_Mother.m_GrowScale = 1.0f;
+        actor->m_AI.m_Mother.m_PulseScale = 0.0f;
     }
     enterPhase2(&D_8012FB70, ai);
     func_00283FF8(0xDC, func_0040C7B4, NULL);

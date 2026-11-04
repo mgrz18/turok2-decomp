@@ -27,9 +27,9 @@ void func_00446DB4(void *obj, CAI *ai, DamageEvent *event) {
             health = 0;
         }
         ai->m_Health = health;
-        if (ai->m_VarF32[3] == 0.0f) {
-            ai->m_VarF32[3] = 2.25f;
-            func_00236314(&state->faders[ai->m_VarS32[2]], D_00432384);
+        if (ai->m_BlindOne.m_HitTimer == 0.0f) {
+            ai->m_BlindOne.m_HitTimer = 2.25f;
+            func_00236314(&state->faders[ai->m_BlindOne.m_nFader], D_00432384);
         }
         if (ai->m_Health == 0) {
             func_00243414(obj, ai, 6);

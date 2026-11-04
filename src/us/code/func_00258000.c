@@ -41,10 +41,10 @@ static __inline__ void switchWeapon(Object *obj, CAI *ai) {
         if (D_800B6D20 >= 5) {
             func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
         }
-        ai->m_VarS32[0] = 0;
-        ai->m_VarS32[1] = 0;
-        ai->m_VarS32[7] = 0;
-        ai->m_VarS32[3] = 0;
+        ai->m_Weapon.m_BarrelAngle = 0;
+        ai->m_Weapon.m_BarrelSpeed = 0;
+        ai->m_Weapon.m_nLod = 0;
+        ai->m_Weapon.m_FireDelay = 0;
     }
     func_00243414(obj, ai, 0);
 }
@@ -62,7 +62,7 @@ void func_00258000(Object *obj, CAI *ai) {
         player->m_RequestedWeapon = func_00257BA0(player);
     }
     player->m_ContState.m_pContState->rumbleBase = 0;
-    ai->m_VarS32[5] = 0;
+    ai->m_Weapon.m_SpinTime = 0;
     if (D_8011ACE4.enabled && player->m_pOptions->m_TagMode) {
         if (player->m_ContState.m_dwButtonsSingle & 0x2000) {
             func_00275544(0x27D8, player->m_CharacterActor.header.m_vPos, &player->m_CharacterActor.header.m_vPos, -1);

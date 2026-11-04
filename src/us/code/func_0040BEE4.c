@@ -43,7 +43,7 @@ void func_0040BEE4(CGameObjectInstance *actor, void *ai, AnimRequest *req) {
     one = 1;
     state = &D_8012FB70;
     mask = ((ModuleObj *)state->obj)->partMask;
-    data = state->slots[0].anim;
+    data = (u8 *) &state->slots[0].anim;
     do {
         if (mask & (one << i)) {
             req->first = i;

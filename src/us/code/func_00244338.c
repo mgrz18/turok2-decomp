@@ -73,7 +73,7 @@ void func_00244338(CGameObjectInstance *self, CAI *plan, s32 boost, CAITarget *o
     Location *loc;
 
     boost = 0; /* FAKEMATCH: the unused third parameter doubles as the boost flag (as in Rage Wars' func_80214DD4_de); a separate local gives the same code but swaps $s5/$s6 in the prologue. */
-    if (*((s32 *)self->header.m_pIntelligence) == 1) {
+    if (self->header.m_pIntelligence->m_Type == 1) {
         mode = func_0025E428(self, plan);
     } else {
         mode = -1;
@@ -98,7 +98,7 @@ void func_00244338(CGameObjectInstance *self, CAI *plan, s32 boost, CAITarget *o
     } else {
         kind = 2;
         if (target != plan->m_pParent) {
-            if (*((s32 *)target->header.m_pIntelligence) == 5) {
+            if (target->header.m_pIntelligence->m_Type == 5) {
                 kind = 5;
             } else if (target->m_nTypeFlag == 0x64F) {
                 kind = 7;

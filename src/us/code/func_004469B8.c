@@ -33,8 +33,8 @@ void func_004469B8(void *obj, CAI *ai, DamageEvent *event) {
                 health = 0;
             }
             ai->m_Health = health;
-            if (ai->m_VarF32[3] == 0.0f) {
-                ai->m_VarF32[3] = 2.25f;
+            if (ai->m_BlindOne.m_HitTimer == 0.0f) {
+                ai->m_BlindOne.m_HitTimer = 2.25f;
                 func_00236314(&state->faders[0], D_00432384);
             }
             if (ai->m_Health == 0) {

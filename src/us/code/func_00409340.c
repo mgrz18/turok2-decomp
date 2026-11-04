@@ -34,11 +34,11 @@ void func_00409340(Obj *obj, CAI *ai) {
     s->unk684 = 0;
     s->partCount = func_00225F6C(D_800F7078, 0x650, 10, 0x1DB1, (CGameObjectInstance **)s->parts, 6);
     for (i = 0; i < s->partCount; i++) {
-        ((CGameObjectInstance *)s->parts[i])->m_AI.m_VarS32[1] = 1;
+        ((CGameObjectInstance *)s->parts[i])->m_AI.m_Mother.m_bActive = 1;
     }
     s->partsLeft = s->partCount;
     func_00225F6C(D_800F7078, 0x650, 10, 0x1DB2, (CGameObjectInstance **)&s->controller, 1);
-    ((CGameObjectInstance *)s->controller)->m_AI.m_VarS32[1] = 1;
+    ((CGameObjectInstance *)s->controller)->m_AI.m_Mother.m_bActive = 1;
     s->intel = (void *)func_00225EBC(D_800F7078, 1, 0x1DB1);
     ai->m_pModeTable = D_00431F00;
     ai->m_pfStep = func_0040BC64;
@@ -51,6 +51,6 @@ void func_00409340(Obj *obj, CAI *ai) {
     D_800F1F10[0] &= ~0x300;
     obj->flags |= 0x04000000;
     for (i = 0; i < 15; i++) {
-        func_002362E4(D_8012FB70.slots[i].anim, obj);
+        func_002362E4(&D_8012FB70.slots[i].anim, obj);
     }
 }

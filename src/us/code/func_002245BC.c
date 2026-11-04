@@ -5,11 +5,6 @@
 #include "common.h"
 #include "structs/world.h"
 
-struct Def {
-    s32 type;
-    s32 flags;
-};
-
 /* Turok 2 level actor: 0x288 bytes (0x2E8 in Rage Wars). */
 
 void *func_002017D4(void *table, s32 index);
@@ -17,7 +12,7 @@ extern void func_00201818(s32 arg0, s32 arg1);
 
 void func_002245BC(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     void *entry;
-    struct Def *cond;
+    CIntelligence *cond;
     void *field80;
     void *temp_v0;
     u8 *base1;
@@ -30,9 +25,9 @@ void func_002245BC(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     }
     if (((CWorld *)arg0)->m_nLevel == arg1) {
         entry = (char *)((CWorld *)arg0)->m_pActors + (s32) arg2 * 0x288;
-        cond = ((struct Def *)((CGameObjectInstance *)entry)->header.m_pIntelligence);
-        if ((u32) (cond->type - 9) < 2) {
-            if (cond->flags & 0x200) {
+        cond = ((CGameObjectInstance *)entry)->header.m_pIntelligence;
+        if ((u32) (cond->m_Type - 9) < 2) {
+            if (cond->m_dwFlags & 0x200) {
                 return;
             }
         }

@@ -26,7 +26,7 @@ void func_00446A90(void *obj, CAI *ai) {
     if (ai->m_pModeCurrent != NULL && ai->m_pModeCurrent->m_pfCallback != NULL) {
         ai->m_pModeCurrent->m_pfCallback(obj, ai);
     }
-    ai->m_VarF32[3] = MAX(ai->m_VarF32[3] - D_800B6D28, 0.0f);
+    ai->m_BlindOne.m_HitTimer = MAX(ai->m_BlindOne.m_HitTimer - D_800B6D28, 0.0f);
     if (D_0043232C[state->phase].update != NULL) {
         D_0043232C[state->phase].update(state);
     }

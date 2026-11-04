@@ -5,11 +5,6 @@
 #include "common.h"
 #include "structs/world.h"
 
-struct Def {
-    s32 type;                  /* 0x00 */
-    s32 flags;                 /* 0x04 */
-};
-
 /* Turok 2 LevelActor: 0x288 bytes (Rage Wars 0x2E8). */
 
 void *func_002017D4(void *table, s32 index);
@@ -18,7 +13,7 @@ extern void func_00201818(s32 arg0, s32 arg1);
 /* Set or clear the actor's bit in the current level's saved-actor bitmap. */
 void func_00220260(CWorld *arg0, void *arg1, s32 arg2) {
     CGameObjectInstance *entry;
-    struct Def *cond;
+    CIntelligence *cond;
     void *field80;
     void *temp_v0;
     u8 *base1;
@@ -51,9 +46,9 @@ void func_00220260(CWorld *arg0, void *arg1, s32 arg2) {
         return;
     }
     entry = (CGameObjectInstance *)&arg0->m_pActors[index];
-    cond = ((struct Def *)entry->header.m_pIntelligence);
-    if ((u32) (cond->type - 9) < 2) {
-        if (cond->flags & 0x200) {
+    cond = entry->header.m_pIntelligence;
+    if ((u32) (cond->m_Type - 9) < 2) {
+        if (cond->m_dwFlags & 0x200) {
             return;
         }
     }

@@ -88,7 +88,7 @@ s32 func_002438C0(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *ta
     } else {
         mode = 2;
         if (target != plan->ignore) {
-            if (*((s32 *)target->header.m_pIntelligence) == 5) {
+            if (target->header.m_pIntelligence->m_Type == 5) {
                 mode = 5;
             } else if (target->m_nTypeFlag == 0x64F) {
                 mode = 7;
