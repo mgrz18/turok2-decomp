@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/sound.h"
+#include "structs/camera.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
@@ -48,7 +49,7 @@ s32 func_00270A60(SndMgr *m, SoundEffectInfo *info, s32 id, s32 a3, s32 a4, s32 
         if (func_00273D88(&m->pool, m->cueId) != 0) {
             return -1;
         }
-        if (func_002743D0(id, m->listener + 0x114) == 0.0f) {
+        if (func_002743D0(id, (s32)&m->listener->m_vPos) == 0.0f) {
             return -1;
         }
     }

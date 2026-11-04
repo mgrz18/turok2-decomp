@@ -108,7 +108,7 @@ typedef union {
 
 /* What the sound player is given for one voice (M04VP). */
 typedef struct {
-    /* 0x00 */ s32 w0;
+    /* 0x00 */ s32 frame;        /* SndMgr.frame when it started */
     /* 0x04 */ s32 w4;
     /* 0x08 */ s32 vol;        /* alSndpSetVol, times scale and the volume setting */
     /* 0x0C */ s32 wC;
@@ -125,21 +125,22 @@ typedef struct {
     /* 0x2C */ s16 s2C;
     /* 0x2E */ u8 pad2E[6];
     /* 0x34 */ CVector3 pos;   /* world position of a 3D sound */
-    /* 0x40 */ s32 f40;
+    /* 0x40 */ s32 state;
     /* 0x44 */ s8 distanceMode;
     /* 0x45 */ u8 pad45[3];
     /* 0x48 */ f32 distSq;     /* squared distance to the listener */
     /* 0x4C */ f32 prevDistSq;
 } SndVoiceParams; /* size 0x50 */
 
-/* One envelope segment (M04Rec12). */
+/* One envelope segment (M04Rec12): after delay frames the value steps
+ * toward target. */
 typedef struct {
-    /* 0x0 */ u16 w0;
-    /* 0x2 */ u16 a;
-    /* 0x4 */ u16 b;
+    /* 0x0 */ u16 level;
+    /* 0x2 */ u16 unk2;
+    /* 0x4 */ u16 target;
     /* 0x6 */ s16 frames;
-    /* 0x8 */ u16 w8;
-    /* 0xA */ u16 wA;
+    /* 0x8 */ s16 delay;
+    /* 0xA */ u16 unkA;
 } SndEnv; /* size 0xC */
 
 /* A playing sound (M04Emitter; rw_abu's Voice). */
@@ -160,7 +161,7 @@ typedef struct SndVoice {
     /* 0x98 */ f32 env3Value;
     /* 0x9C */ f32 env3Step;
     /* 0xA0 */ s32 pending;
-    /* 0xA4 */ u32 flags;      /* 0x4 keep at volume 0, 0x8 stop, 0x200 music volume */
+    /* 0xA4 */ u32 flags;      /* 0x4 enveloped, 0x8 stop, 0x200 music volume, 0x400 positional */
     /* 0xA8 */ s32 soundId;
     /* 0xAC */ s32 stopping;
     /* 0xB0 */ SndMgr *mgr;
@@ -272,7 +273,7 @@ struct SndMgr {
     /* 0x2B90 */ s32 cueArg;
     /* 0x2B94 */ s8 cueVolume;      /* also the default pan */
     /* 0x2B95 */ u8 pad2B95[3];
-    /* 0x2B98 */ void *listener;       /* the camera sounds are heard from */
+    /* 0x2B98 */ struct CCamera *listener; /* sounds are heard from its m_vPos, out to m_FarClip */
     /* 0x2B9C */ s32 fxMix;            /* added to each voice's FX mix */
     /* 0x2BA0 */ f32 sfxVolume;        /* option byte D_8011AAED / 255 */
     /* 0x2BA4 */ f32 volume2BA4;       /* option byte D_8011AAEC / 255 */
