@@ -399,7 +399,7 @@ and the file starts at the nearest pool that opens 8-aligned; every pool
 between is 4 past a boundary for the same reason (func_0024C47C to
 func_0024D344). A function of the file that does not match yet stays in it
 as INCLUDE_ASM, with its pool in `src/us/asm/rodata/` through
-INCLUDE_RODATA, ahead of the pools the C emits (func_0022D2FC). Merged
+INCLUDE_RODATA, ahead of the pools the C emits (func_0022D2FC until the F pass). Merged
 parts written apart need one view of the globals they share: reading one
 through a cast (`*(T *) &D_X`) instead of its declared type changed
 func_0022F350's register allocation. Two more signs of one file: a string
@@ -515,14 +515,79 @@ Seven agents on the big drafts; six matched, among them CCamera Advance
   and so the order of stores.
 - **Cross-jumping compares REG_EQUAL notes**: two moves with the same note
   (a0 = D_801198B0) are merged; the ROM keeps the tag branch's apart, so its
-  move must carry no constant note (func_002478C8, still 134 words off).
+  move must carry no constant note (func_002478C8, matched in the F pass).
 - **flow deletes a frame store overwritten before an aliasing read**, and a
   read through a pointer argument counts as aliasing: the ROM keeps both
-  halfword stores of each pair (func_00424008, 32 words off).
+  halfword stores of each pair (func_00424008, matched in the F pass).
 - func_00209AF4 starts at 0x209AF4, not 16-aligned, right after
   func_002097AC, but has no .rodata: its own file links byte-exact.
   func_0042BA40 owns its pool at 0x800A5F54 and links alone; its
   second-module twin func_00464960 goes NOLOAD over it.
+
+### The F pass
+
+Seven agents on the last eleven drafts in `nonmatching/`; eight matched
+(func_00204778, func_0022D2FC, func_002429BC, func_002478C8, func_00248720,
+func_0024ED54, func_00255D70, func_00424008):
+
+- **The base symbol decides the REG_EQUAL notes.** func_002478C8 reaches the
+  game struct through the settings pointer, `(Game *)((u8 *)&D_8011AAD8 -
+  0x1228)`, instead of naming `D_801198B0`: the a0 moves of the tagged and
+  head-shot messages then carry another note than the "you killed" one, and
+  cross-jumping no longer merges their tails (the B pass's 134 words).
+- **Strings outside the pool are named by address.** The same function's
+  messages sit in the data after `.rodata` (0x800B53D0-0x800B543C, "head
+  shot!" among the hit-region names), not in its pool: as literals the
+  object carried them in its own `.rodata` and no ROM slice matched, so the
+  file declares them `extern char D_800B5420[];` and its `.rodata` is the two
+  1.5f alone.
+- **A hidden argument changes the prologue.** func_00255D70 calls
+  func_0042EB04 with the player (as func_00249118 does): the value already in
+  `$a0` at the call is what lets sched2 keep the mask's lui/ori together.
+- **One return after the if/else, not one per branch.** With a `return 1` in
+  each arm, reorg sees `$v0` live on the fall-through and annuls the slot
+  (`bnel`); the shared return gives the ROM's plain `bne` (func_0024ED54).
+- **An empty `do { } while (0)` before a `return`** in an inlined search
+  loop (a debug print compiled out) leaves loop notes that stop
+  find_and_verify_loops from moving the found block out of the loop
+  (func_00248720). The inline's result goes in a user variable.
+- **A constant in a user variable** (`s32 readyAnim = 1;` compared with
+  `p->anim`) gets a global register (`$a2`, held across the block) and
+  fills a delay slot, as in the ROM (func_00248720).
+- **A dead store can be a CSE fence.** func_00204778's `else { upper =
+  lower; }` is dead and flow deletes it after cse2, but until then the
+  if/else stops -fcse-skip-blocks from running past the `upper < lower`
+  block, so `b` is not known to be 0xFF at the join and `(b * 3) >> 1` stays
+  a run-time multiply (FAKEMATCH; after Rage Wars' func_002529E4, which
+  needs empty asms for the same).
+- **Unions written by halves.** The VI registers are `Span` unions (one
+  `u32`, or two `s16`); writing `h.h.start` and `h.h.end` on a copy held in
+  a register gives the ROM's and/or inserts (func_00424008).
+- **CSE's canonical register is the one used last.** Of two pseudos with the
+  same value, cse makes canonical the one whose last use comes later:
+  func_00424008's `h` must die before `oldH`, or the centre is computed
+  from the load instead of `oldH`'s copy.
+- func_00248720's pool opens at 0x800A6AB4, 4 past a boundary, after a
+  1.5707964f only the VM's func_0042DE74 reads; it holds floats only, so its
+  own file links and no merge was needed. func_0022D2FC took its place at the
+  head of the particle file (`src/us/code/func_0022D2FC.c`): left
+  undeclared until the later parts, its matrix helpers took their float
+  arguments as doubles, so it declares them with the later parts' `Mtx44 *`
+  prototypes, and its own types are `Mtx`-prefixed.
+
+Still not matching: func_0027E000 (54 of 476 words, a sched1 tie: ulx's HI
+move, with no birth boost since the clamp assigns ulx twice, and the
+m_PixelXScale store are both priority 3, and the store wins on potential
+hazard), func_00246BC0 (6 of 330) and func_0026C148 (1 of 62).
+
+**Where the FAKEMATCH functions are.** Matches that rely on something the
+original source surely did not have (a `register ... asm` pin, an
+always-true test, a dead store) say so in a `/* FAKEMATCH: ... */` comment,
+on the first line or at the trick. 22 files in `src/` have one
+(`grep -rl FAKEMATCH src`): seventeen from earlier passes (register pins,
+doubled code, always-true tests), func_00409A64.c for func_00409D4C, and this pass's
+func_00204778, func_0022D2FC, func_002429BC and func_00424008. They match
+byte for byte; the marker is for whoever looks for the original source.
 
 ## The fast assembler
 

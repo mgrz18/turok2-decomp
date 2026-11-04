@@ -1,4 +1,3 @@
-/* NON-MATCHING: 1 of 135 words differ: the branch on mount->aiState == 0x2E is bne in the ROM, bnel here: reorg fills the delay slot as annulled because $v0 is live on the fall-through path (mark_target_live_regs), where the ROM's slot fill is plain. */
 #include "common.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
@@ -50,13 +49,15 @@ void func_00243414(Actor *actor, void *ai, s32 state);
 
 /* While riding, button 0x8000 rams the creature in front: a live one is
  * thrown along the heading (knocked out of a state 0x2E with flag 0x400000)
- * and shakes the view hard, anything else just shakes it. */
+ * and shakes the view hard, anything else just shakes it.
+ * The single `return 1` after the if/else (not one per branch) is what gives
+ * the ROMs plain bne at the 0x2E test: with two returns, reorgs liveness at
+ * the fall-through keeps $v0 and annuls the slot (bnel). */
 s32 func_0024ED54(Player *player, Body *body) {
     Actor *aim = D_800F1CE0;
     Actor *target;
     Actor *mount;
     s32 type;
-
     if ((player->buttons & 0x8000) && aim != NULL) {
         mount = player->mount;
         if (aim != mount && aim->kind == 1) {
@@ -76,9 +77,9 @@ s32 func_0024ED54(Player *player, Body *body) {
                     }
                     target->aiNext = -1;
                     func_00243414(target, &target->aiFlags, 0x34);
-                    return 1;
-                }
+                } else {
                 func_002811CC(player->camera, 30.0f, 60.0f, 30.0f, 1.0f, type, body->pos);
+                }
                 return 1;
             }
         }

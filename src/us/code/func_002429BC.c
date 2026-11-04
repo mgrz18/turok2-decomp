@@ -1,4 +1,4 @@
-/* NON-MATCHING: 9 of 145 words differ: the shared -1 lands in $v0 instead of $v1, so sched2 cannot hoist the load of ai->flags (for &= ~1) above the -1 stores, and v0/v1 swap. */
+/* FAKEMATCH: the shared -1 is pinned to $v1 (register asm, see the body): local-alloc gives it $v0, which keeps sched2 from hoisting the load of actor->flags above the stores. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AI/NAV/80212C90_18.CPP, ACTOR_SETUP, with Turok 2's layouts. */
 
 #include "common.h"
@@ -91,6 +91,10 @@ void func_002429BC(SetupSource *source, SetupActor *actor, SetupCallbacks *callb
     s32 saved;
     f32 default_;
     void *region;
+    /* The shared -1 is pinned to $v1: GCC's local allocator always gives
+     * it $v0 (it outranks the flags temporary), which stops sched2 from
+     * hoisting the load of actor->flags above these stores. */
+    register s16 none asm("$3");
 
     saved = actor->field68;
     func_00266C5C(actor, 0, 0x13C);
@@ -129,13 +133,14 @@ void func_002429BC(SetupSource *source, SetupActor *actor, SetupCallbacks *callb
     actor->fieldC6 = -1;
     actor->field13 = 0x14;
     actor->field95 = 0xFF;
-    actor->fieldC4 = -1;
-    actor->field35 = -1;
-    actor->sentinel14[0] = -1;
-    actor->sentinel14[1] = -1;
-    actor->sentinel14[2] = -1;
-    actor->sentinel14[3] = -1;
-    actor->field96 = -1;
+    none = -1;
+    actor->fieldC4 = none;
+    actor->field35 = none;
+    actor->sentinel14[0] = none;
+    actor->sentinel14[1] = none;
+    actor->sentinel14[2] = none;
+    actor->sentinel14[3] = none;
+    actor->field96 = none;
     actor->fieldC7 = 0;
     actor->fieldCC = 0;
     actor->fieldD0 = 0;

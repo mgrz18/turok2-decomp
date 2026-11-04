@@ -1,4 +1,3 @@
-/* NON-MATCHING: 35 of 219 words differ: only the projectile loop of usesProjectile: loop.c (find_and_verify_loops) moves the found block (return 1) out of the loop, not cse, which also costs the ROM constant 1 kept in $a2 for the anim == 1 test. Everything else matches (anim if-chain with a shared CHARGE block, case 3 tests type == 2, the 6.0f clamp as a ternary, D_800ACE10/D_800ACE14 as two scalars). */
 #include "common.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
@@ -65,6 +64,11 @@ AmmoInfo *func_0025398C(FirePlayer *p, s32 weapon);
 void func_0022F350(void *list, FirePlayer *src, FirePlayer *owner, s32 a3, s32 target, s32 type,
                    Vec3f vel, Quat aim, Vec3f pos, s32 a40, s32 a44, s32 a48);
 
+/* A debug print compiled out of the release build. Its empty loop notes stop
+ * loop.c (find_and_verify_loops) from moving the found block out of the
+ * projectile loop, as in the ROM. */
+#define DEBUG_MSG() do { } while (0)
+
 #define CHARGE(p) if ((p)->charge >= 3.0f) { (p)->charge -= 3.0f; }
 /* Whether the weapon fires the given projectile. */
 static __inline__ s32 usesProjectile(s32 weapon, s32 type) {
@@ -76,6 +80,7 @@ static __inline__ s32 usesProjectile(s32 weapon, s32 type) {
             break;
         }
         if (def->ammo[i]->projectile == type) {
+            DEBUG_MSG();
             return 1;
         }
     }
@@ -94,34 +99,39 @@ void func_00248720(FirePlayer *p, s32 type) {
     s16 *ammo;
     s32 target;
     f32 f;
+    s32 found;
 
     if (p->state < 2) {
         return;
     }
     aim = func_0021AE6C(p);
     info = func_0025398C(p, p->weapon);
-    if (info != NULL && usesProjectile(p->weapon, type)) {
-        aim = p->aim;
-        ammo = &p->ammo[info->index];
-        *ammo -= info->cost;
-        if (*ammo < 0) {
-            *ammo = 0;
+    if (info != NULL) {
+        found = usesProjectile(p->weapon, type); /* a user variable: loop.c keeps found = 1 in the loop */
+        if (found) {
+            s32 readyAnim = 1; /* compared below; held in $a2 from here */
+            aim = p->aim;
+            ammo = &p->ammo[info->index];
+            *ammo -= info->cost;
+            if (*ammo < 0) {
+                *ammo = 0;
+            }
+            type = info->projectile;
+            if (p->anim == readyAnim) {
+                p->anim = 0x1130;
+            } else if (p->anim == 0x1130) {
+                CHARGE(p);
+            } else if (p->anim == 0xA28) {
+                p->anim = 0x1135;
+            } else if (p->anim == 0x1135) {
+                CHARGE(p);
+            } else if (p->anim == 0x14) {
+                p->anim = 0x1144;
+            } else if (p->anim == 0x1144) {
+                CHARGE(p);
+            }
+            p->firing = 0;
         }
-        type = info->projectile;
-        if (p->anim == 1) {
-            p->anim = 0x1130;
-        } else if (p->anim == 0x1130) {
-            CHARGE(p);
-        } else if (p->anim == 0xA28) {
-            p->anim = 0x1135;
-        } else if (p->anim == 0x1135) {
-            CHARGE(p);
-        } else if (p->anim == 0x14) {
-            p->anim = 0x1144;
-        } else if (p->anim == 0x1144) {
-            CHARGE(p);
-        }
-        p->firing = 0;
     }
     D_800ACE10 = D_800AE350;
     target = 0;

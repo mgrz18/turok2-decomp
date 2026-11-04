@@ -1,4 +1,3 @@
-/* NON-MATCHING: 3 of 53 words differ: prologue scheduling only; the ROM puts the `ori` of the ~0x800000 mask right after its `lui`, before `sw $ra` and the flags load. */
 #include "common.h"
 
 typedef struct {
@@ -29,10 +28,12 @@ extern char D_0043AC14;
 extern char D_0043AC38;
 extern char D_0043AC5C;
 
-void func_0042EB04(void);
+void func_0042EB04(Player *);
 s32 func_0025340C(Players *players, Player *player);
 void func_00416644(void *pool, void *screen, Player *p, void *controller, s32);
 
+/* func_0042EB04 takes the player (as in func_00249118): the call keeps it in $a0,
+ * which is what lets sched2 keep the mask's lui/ori together. */
 /* Clears the player's flag 0x800000 and, in multiplayer, opens the screen of
  * the player's slot (one of four) on the player's camera. */
 void func_00255D70(Player *player) {
@@ -40,7 +41,7 @@ void func_00255D70(Player *player) {
 
     player->unk1298 = 0;
     player->flags &= ~0x800000;
-    func_0042EB04();
+    func_0042EB04(player);
     if (D_80119870.multiplayer) {
         switch ((u32)func_0025340C(&D_80119870, player)) {
         case 0:
