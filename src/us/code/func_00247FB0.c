@@ -1,15 +1,11 @@
 #include "common.h"
-
-typedef struct PlayerOptions {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} PlayerOptions;
+#include "structs/player.h"
 
 typedef struct Player {
     /* 0x000 */ u8 pad0[0xB8];
     /* 0x0B8 */ u16 typeId;
     /* 0x0BA */ u8 padBA[0x518 - 0xBA];
-    /* 0x518 */ PlayerOptions *options;
+    /* 0x518 */ CPlayerOptions *options;
     /* 0x51C */ u8 pad51C[0x520 - 0x51C];
     /* 0x520 */ s32 mode;
     /* 0x524 */ s32 unk524;
@@ -81,7 +77,7 @@ void func_00247FB0(Actor *actor, s32 arg1, Hit *hit) {
     }
     flags = &D_8011AAD8.messages;
     if (*flags != 0) {
-        if (player->options->tagMode != 0 && player->unk524 == 0) {
+        if (player->options->m_TagMode != 0 && player->unk524 == 0) {
             return;
         }
         if (*(s32 *) (flags + (0x1FC - 0x19)) != 0) {
@@ -122,7 +118,7 @@ void func_00247FB0(Actor *actor, s32 arg1, Hit *hit) {
     } else {
         func_0021D7BC(actor, arg1, hit);
     }
-    if (player->mode != 10 && player->options->tagMode == 0 && player->unk524 != 0 && player->typeId != D_800ADB5C) {
+    if (player->mode != 10 && player->options->m_TagMode == 0 && player->unk524 != 0 && player->typeId != D_800ADB5C) {
         index = WEAPON_INDEX(player);
         if (index >= 0 && index < HIT_LIMIT(hit)) {
             func_0020B6A0(hit->unkC, actor->unk98, 1, actor->slots[D_800B6D1C], 0, WEAPON_INDEX(player), actor->unk151);

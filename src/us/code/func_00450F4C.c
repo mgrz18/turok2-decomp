@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 /* A menu item: its text is a format line whose last characters get the value. */
 typedef struct MenuItem {
@@ -36,14 +37,9 @@ extern MenuSettings D_8011AAD8;
 s32 func_004160F0(MenuItem *item); /* length of the item's text line */
 s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
 
-typedef struct PlayerOptions {
-    /* 0x00 */ u8 pad0[0x32];
-    /* 0x32 */ u8 handicap;
-} PlayerOptions;
-
 typedef struct MenuPlayer {
     /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ PlayerOptions *options;
+    /* 0x518 */ CPlayerOptions *options;
 } MenuPlayer;
 
 typedef struct MenuPad {
@@ -66,7 +62,7 @@ extern char D_800B4200[];
 
 /* Shows the player's handicap: two special values, otherwise a per-port line with the number. */
 s32 func_00450F4C(MenuItem *item, MenuContext *ctx) {
-    s32 handicap = ctx->player->options->handicap;
+    s32 handicap = ctx->player->options->m_Handicap;
 
     if (handicap == 0) {
         item->text = D_800B41F0;

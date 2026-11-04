@@ -1,29 +1,12 @@
 /* Player code: func_0042DC18, 0x0042DC18-0x0042DE74 (splat had it inside the data D_0042D50C). */
 #include "common.h"
-
-typedef struct Options {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s16 unk6;
-    /* 0x08 */ s16 unk8[4];
-    /* 0x10 */ s16 unk10[4];
-    /* 0x18 */ s16 unk18[4];
-    /* 0x20 */ s16 unk20[4];
-    /* 0x28 */ u8 pad28[0x30 - 0x28];
-    /* 0x30 */ s8 character;
-    /* 0x31 */ u8 pad31[0x3C - 0x31];
-    /* 0x3C */ u8 dead;
-    /* 0x3D */ u8 unk3D;
-    /* 0x3E */ u8 tagMode;
-    /* 0x3F */ u8 unk3F;
-} Options;
+#include "structs/player.h"
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x510];
     /* 0x0510 */ s32 active;
     /* 0x0514 */ s32 index;
-    /* 0x0518 */ Options *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 *camera;
     /* 0x0520 */ s32 character;
     /* 0x0524 */ u8 pad524[0x528 - 0x524];
@@ -109,19 +92,19 @@ void func_0042DC18(Player *p, s32 character, s32 arg2) {
     p->unkC04 = -1;
     p->unkC08 = -1;
     for (i = 0; i < 4; i++) {
-        p->options->unk18[i] = 0;
-        p->options->unk20[i] = 0;
-        p->options->unk8[i] = 0;
-        p->options->unk10[i] = 0;
+        p->options->m_KilledBy[i] = 0;
+        p->options->m_Killed[i] = 0;
+        p->options->m_TaggedBy[i] = 0;
+        p->options->m_Tagged[i] = 0;
     }
-    p->options->unk0 = 0;
-    p->options->unk2 = 0;
-    p->options->unk4 = 0;
-    p->options->unk6 = 0;
-    p->options->dead = 0;
-    p->options->unk3D = 0;
-    p->options->tagMode = 0;
-    p->options->unk3F = 0;
+    p->options->m_Suicides = 0;
+    p->options->m_Deaths = 0;
+    p->options->m_Kills = 0;
+    p->options->m_Tags = 0;
+    p->options->m_bDead = 0;
+    p->options->unk_0x3D = 0;
+    p->options->m_TagMode = 0;
+    p->options->m_LastTagMode = 0;
     for (i = 0; i < 6; i++) {
         p->unk9A0[i] = 0;
         p->unk9B8[i] = 0;
@@ -144,7 +127,7 @@ void func_0042DC18(Player *p, s32 character, s32 arg2) {
     }
     if (arg2) {
         if (flags->multiplayer) {
-            p->options->character = 0;
+            p->options->m_nCharacter = 0;
             p->character = 0;
             p->unkBF8 = 1;
             if (flags->unk1FC) {

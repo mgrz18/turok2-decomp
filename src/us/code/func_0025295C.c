@@ -1,22 +1,9 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ u16 frags[4];        /* per opponent slot */
-} PlayerOptions;
-
-typedef struct Player {
-    /* 0x0000 */ u8 pad0[0x518];
-    /* 0x0518 */ PlayerOptions *options;
-    /* 0x051C */ u8 pad51C[0xBF4 - 0x51C];
-    /* 0x0BF4 */ s32 team;
-    /* 0x0BF8 */ u8 padBF8[0x1320 - 0xBF8];
-    /* 0x1320 */ struct Player *next;
-} Player;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ Player *head;
+    /* 0x20 */ CPlayer *head;
 } PlayerList;
 
 typedef struct {
@@ -27,13 +14,13 @@ typedef struct {
 } GameState;
 
 extern GameState D_8011ACB0;
-extern s32 func_0025340C(PlayerList *list, Player *player);
+extern s32 func_0025340C(PlayerList *list, CPlayer *player);
 
 /* Whether the frag limit is reached: by either team's total in team games,
  * otherwise by one player's frags (the slot func_0025340C names left out). */
 s32 func_0025295C(PlayerList *list) {
     GameState *state = &D_8011ACB0;
-    Player *p;
+    CPlayer *p;
     s32 i;
 
     if (state->teams) {
@@ -41,16 +28,16 @@ s32 func_0025295C(PlayerList *list) {
         s32 team0 = 0;
         s32 skip;
 
-        for (p = list->head; p != NULL; p = p->next) {
+        for (p = list->head; p != NULL; p = p->m_pNext) {
             skip = func_0025340C(list, p);
             for (i = 0; i < 4; i++) {
                 if (i != skip) {
-                    switch (p->team) {
+                    switch (p->m_nDeathmatchTeamSelected) {
                         case 0:
-                            team0 += p->options->frags[i];
+                            team0 += p->m_pOptions->m_Killed[i];
                             break;
                         case 1:
-                            team1 += p->options->frags[i];
+                            team1 += p->m_pOptions->m_Killed[i];
                             break;
                     }
                 }
@@ -65,7 +52,7 @@ s32 func_0025295C(PlayerList *list) {
     } else {
         GameState *gs = state;
 
-        for (p = list->head; p != NULL; p = p->next) {
+        for (p = list->head; p != NULL; p = p->m_pNext) {
             s32 skip;
             s32 sum;
 
@@ -73,7 +60,7 @@ s32 func_0025295C(PlayerList *list) {
             sum = 0;
             for (i = 0; i < 4; i++) {
                 if (i != skip) {
-                    sum += p->options->frags[i];
+                    sum += p->m_pOptions->m_Killed[i];
                 }
             }
             if (sum >= gs->limit) {

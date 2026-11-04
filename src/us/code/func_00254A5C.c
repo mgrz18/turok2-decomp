@@ -2,11 +2,6 @@
 #include "structs/player.h"
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ u16 field10[4];
-} PlayerOptions;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x20];
     /* 0x20 */ CPlayer *head;
 } PlayerList;
@@ -34,7 +29,7 @@ s32 func_00254A5C(PlayerList *list) {
         sum = 0;
         for (i = 0; i < 4; i++) {
             if (i != skip) {
-                sum += ((PlayerOptions *)p->m_pOptions)->field10[i];
+                sum += ((CPlayerOptions *)p->m_pOptions)->m_Tagged[i];
             }
         }
         if (sum >= state->limit) {

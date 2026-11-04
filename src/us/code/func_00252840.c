@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 /* Spawn point record from func_00225EBC: a position and a starting health. */
 typedef struct {
@@ -7,11 +8,6 @@ typedef struct {
     /* 0x1C */ u8 pad1C[0x38 - 0x1C];
     /* 0x38 */ f32 pos[3];
 } SpawnPoint;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} PlayerOptions;
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x14];
@@ -23,7 +19,7 @@ typedef struct Player {
     /* 0x0148 */ u8 pad148[0x151 - 0x148];
     /* 0x0151 */ s8 skin;
     /* 0x0152 */ u8 pad152[0x518 - 0x152];
-    /* 0x0518 */ PlayerOptions *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 pad51C[4];
     /* 0x0520 */ s32 character;
     /* 0x0524 */ s32 health;
@@ -45,7 +41,7 @@ static __inline__ void place_at_spawn(Player *p) {
     SpawnPoint *sp;
     s32 character = p->character;
 
-    if (p->options->tagMode == 1) {
+    if (p->options->m_TagMode == 1) {
         character = 11;
     }
     sp = func_00225EBC(D_800F7078, 11, character);
@@ -70,7 +66,7 @@ void func_00252840(PlayerList *list) {
     if (p == NULL) return;
 loop:
     {
-        p->options->tagMode = 0;
+        p->options->m_TagMode = 0;
         place_at_spawn(p);
         p->health = p->spawn->health << 8;
         p->actorHealth = p->spawn->health << 8;

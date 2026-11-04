@@ -4,11 +4,6 @@
 #include "structs/player.h"
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ s8 team;
-} PlayerOptions;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
     /* 0x1C */ CPlayer *player;
     /* 0x20 */ void *controller;
@@ -32,19 +27,19 @@ extern void func_00416894(s32 pool, MenuCaller *c, void *tmpl);
 /* Team selection item: left/right cycles the team, A confirms. */
 s32 func_00418294(s32 menu, MenuCaller *c, s32 pool) {
     CPlayer *player = c->player;
-    PlayerOptions *options = player->m_pOptions;
+    CPlayerOptions *options = player->m_pOptions;
 
     if (func_002855E8(c->controller)) {
-        func_0042E430(player, options->team);
+        func_0042E430(player, options->m_nCharacter);
         func_00275624(D_800C1E78[player->m_Data.m_nDeathmatchCharacter].sound);
         func_00416894(pool, c, D_00438748);
         return 1;
     } else {
-        s8 team = func_00416558(c, options->team, 1, 0, 10, 1);
+        s8 team = func_00416558(c, options->m_nCharacter, 1, 0, 10, 1);
 
-        options->team = team;
+        options->m_nCharacter = team;
         func_0042E430(player, team);
-        func_00416214(menu, 0xB, options->team);
+        func_00416214(menu, 0xB, options->m_nCharacter);
         return 0;
     }
 }

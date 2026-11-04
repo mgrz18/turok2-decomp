@@ -1,15 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-    /* 0x3F */ u8 tagModeSaved;
-} PlayerOptions;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ PlayerOptions *options;
-} Player;
+#include "structs/player.h"
 
 typedef struct {
     /* 0x0000 */ u8 pad0[0x1480];
@@ -47,23 +37,23 @@ typedef struct {
 } ActionState;
 
 extern Game D_80119870;
-extern Player *func_002532B4(Game *game);
+extern CPlayer *func_002532B4(Game *game);
 extern void func_00243414(Actor *actor, ActionState *state, s32 mode);
 
 void func_00266380(Actor *actor, ActionState *state) {
     ActionInfo *info = &actor->def->info;
     Game *game;
-    Player *player;
+    CPlayer *player;
     s32 mode;
 
     if (actor->typeId == 0x64E && state->unk36 != state->unk34) {
         game = &D_80119870;
         player = func_002532B4(game);
         if (player != NULL && state->tagCleared == 0) {
-            mode = player->options->tagMode;
+            mode = player->m_pOptions->m_TagMode;
             if (mode == 1) {
-                player->options->tagMode = 0;
-                player->options->tagModeSaved = mode;
+                player->m_pOptions->m_TagMode = 0;
+                player->m_pOptions->m_LastTagMode = mode;
                 game->unk1480 = mode;
                 state->tagCleared = mode;
             }

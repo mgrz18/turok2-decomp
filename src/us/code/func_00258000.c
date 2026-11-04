@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     f32 x, y, z;
@@ -12,11 +13,6 @@ typedef struct {
 } WeaponInfo;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} Options;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x168];
     /* 0x168 */ s32 unk168;
 } Controller;
@@ -25,7 +21,7 @@ typedef struct {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ Vec3 pos;
     /* 0x010 */ u8 pad10[0x518 - 0x10];
-    /* 0x518 */ Options *options;
+    /* 0x518 */ CPlayerOptions *options;
     /* 0x51C */ s32 camera;
     /* 0x520 */ u8 pad520[0x996 - 0x520];
     /* 0x996 */ s16 weapon;
@@ -114,7 +110,7 @@ void func_00258000(Object *obj, AI *ai) {
     }
     player->controller->unk168 = 0;
     ai->unk120 = 0;
-    if (D_8011ACE4.enabled && player->options->tagMode) {
+    if (D_8011ACE4.enabled && player->options->m_TagMode) {
         if (player->pressedButtons & 0x2000) {
             func_00275544(0x27D8, player->pos, &player->pos, -1);
         }

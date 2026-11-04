@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/802ABDBC_11.CPP, func_802ACB18_de (the pickup feedback), with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct Vec3 {
     f32 x, y, z;
@@ -17,18 +18,13 @@ typedef struct PickupEntry {
     s16 argument2;  /* 0x10 */
 } PickupEntry;
 
-typedef struct PlayerOptions {
-    char pad0[0x3E];
-    u8 unk3E;       /* 0x3E */
-} PlayerOptions;
-
 typedef struct Player {
     char pad0[4];
     Vec3 position;  /* 0x004 */
     char pad10[0x140 - 0x10];
     s32 flags;      /* 0x140 */
     char pad144[0x518 - 0x144];
-    PlayerOptions *options; /* 0x518 */
+    CPlayerOptions *options; /* 0x518 */
     void *ui;       /* 0x51C */
     char pad520[0x972 - 0x520];
     s8 keys[0x24];  /* 0x972 */
@@ -65,7 +61,7 @@ s32 func_0023ECF8(Player *player, PickupEntry *entry) {
     result = 0;
     if (entry->argument != -1 && player->keys[entry->index] != 0 &&
         (result = func_00253B54(player, entry->argument, entry->argument2)) == 0 &&
-        (!D_8011AAF1 || !player->options->unk3E)) {
+        (!D_8011AAF1 || !player->options->m_TagMode)) {
         return 0;
     }
     if (D_8011AAF1) {

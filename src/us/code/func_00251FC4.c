@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     f32 x, y, z;
@@ -22,11 +23,6 @@ typedef struct {
 } Controller;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x28];
-    /* 0x28 */ s8 joined;
-} Options;
-
-typedef struct {
     /* 0x000 */ s32 count;
     /* 0x004 */ f32 a;
     /* 0x008 */ f32 b;
@@ -45,7 +41,7 @@ typedef struct Player {
     /* 0x03C8 */ u8 ai[0x510 - 0x3C8];
     /* 0x0510 */ s32 joined;
     /* 0x0514 */ s32 port;
-    /* 0x0518 */ Options *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ Camera *camera;
     /* 0x0520 */ u8 pad520[4];
     /* 0x0524 */ s32 health;
@@ -230,7 +226,7 @@ void func_00251FC4(PlayerList *list) {
             && ((p->controller->buttons & 0x1000) || p->joined)) {
             p->joined = 1;
             character = D_8011AB88[p->port].character;
-            p->options->joined = 1;
+            p->options->m_bActive = 1;
             func_0042DC18(p, character, 1);
             func_00243414(p->actor, p->ai, 2);
             func_00248BA8(p, D_8011ACA8, 0, 1);

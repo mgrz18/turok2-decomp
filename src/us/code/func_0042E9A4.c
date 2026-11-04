@@ -1,16 +1,12 @@
 /* Player code: func_0042E9A4, 0x0042E9A4-0x0042EA00 (splat had it inside the data D_0042D50C). */
 #include "common.h"
-
-typedef struct Options {
-    /* 0x00 */ u8 pad0[0x28];
-    /* 0x28 */ u8 unk28;
-} Options;
+#include "structs/player.h"
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x288];
     /* 0x0288 */ u8 unk288[0x3C8 - 0x288];
     /* 0x03C8 */ u8 unk3C8[0x518 - 0x3C8];
-    /* 0x0518 */ Options *options;
+    /* 0x0518 */ CPlayerOptions *options;
 } Player;
 
 extern s32 D_8011ACA8;
@@ -20,7 +16,7 @@ extern void func_00243414(void *, void *, s32);
 extern void func_00248BA8(Player *p, s32 warp, s32 arg2, s32 respawn);
 
 void func_0042E9A4(Player *p, s32 arg1) {
-    p->options->unk28 = 1;
+    p->options->m_bActive = 1;
     func_0042DC18(p, arg1, 1);
     func_00243414(p->unk288, p->unk3C8, 2);
     func_00248BA8(p, D_8011ACA8, 0, 1);

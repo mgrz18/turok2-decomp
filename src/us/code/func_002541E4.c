@@ -2,11 +2,6 @@
 #include "structs/player.h"
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 field3E;
-} PlayerOptions;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ s16 index;
 } Intelligence;
@@ -31,7 +26,7 @@ void func_002541E4(CPlayer *player) {
     if (state->field19 == 0) {
         id = 0x66;
     } else if (state->field20C != 0
-               && ((PlayerOptions *)player->m_pOptions)->field3E != 0) {
+               && ((CPlayerOptions *)player->m_pOptions)->m_TagMode != 0) {
         id = D_800ADB5C;
     } else {
         id = D_800ADB30[((Intelligence *)player->m_CharacterActor.header.m_pIntelligence)->index];

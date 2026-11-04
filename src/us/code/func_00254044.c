@@ -1,9 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 unk3E;
-} Settings;
+#include "structs/player.h"
 
 /* A spawn point record (from func_00225EBC). */
 typedef struct {
@@ -18,7 +14,7 @@ typedef struct {
     /* 0x018 */ u8 pad18[0x34 - 0x18];
     /* 0x034 */ f32 pos[3];
     /* 0x040 */ u8 pad40[0x518 - 0x40];
-    /* 0x518 */ Settings *settings;
+    /* 0x518 */ CPlayerOptions *settings;
     /* 0x51C */ u8 pad51C[4];
     /* 0x520 */ s32 team;
 } Player;
@@ -35,7 +31,7 @@ void func_00254044(Player *arg0) {
 
     var_s0 = arg0;
     var_a2 = var_s0->team;
-    if (var_s0->settings->unk3E == 1) {
+    if (var_s0->settings->m_TagMode == 1) {
         var_a2 = 0xB;
     }
     var_s1 = &D_800F7078;

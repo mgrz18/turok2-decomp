@@ -1,5 +1,6 @@
 /* Second VM module copy of func_0042E430 (same source, linked 0x0042E350). */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct PlayerDef {
     /* 0x00 */ u8 pad0[0xC];
@@ -9,11 +10,6 @@ typedef struct PlayerDef {
     /* 0x1C */ u8 pad1C[0x38 - 0x1C];
     /* 0x38 */ f32 scale[3];
 } PlayerDef;
-
-typedef struct Options {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} Options;
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x14];
@@ -25,7 +21,7 @@ typedef struct Player {
     /* 0x0148 */ u8 pad148[0x151 - 0x148];
     /* 0x0151 */ s8 unk151;
     /* 0x0152 */ u8 pad152[0x518 - 0x152];
-    /* 0x0518 */ Options *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 pad51C[0x520 - 0x51C];
     /* 0x0520 */ s32 character;
     /* 0x0524 */ s32 health2;       /* 8.8 */
@@ -53,7 +49,7 @@ void func_00467350(Player *p, s32 character) {
     s32 sound;
 
     p->character = character;
-    if (p->options->tagMode == 1) {
+    if (p->options->m_TagMode == 1) {
         character = 11;
     }
     def = findDef(11, character);
@@ -77,7 +73,7 @@ void func_00467350(Player *p, s32 character) {
     func_00248A8C(p);
     sound = 0x66;
     if (D_8011AAF1) {
-        if (D_8011ACE4 != 0 && p->options->tagMode != 0) {
+        if (D_8011ACE4 != 0 && p->options->m_TagMode != 0) {
             sound = D_800ADB5C;
         } else {
             sound = D_800ADB30[p->def->kind];

@@ -1,13 +1,9 @@
 #include "common.h"
-
-typedef struct PlayerOptions {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 unk3E;
-} PlayerOptions;
+#include "structs/player.h"
 
 typedef struct Player {
     /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ PlayerOptions *options;
+    /* 0x518 */ CPlayerOptions *options;
     /* 0x51C */ u8 pad51C[0xB2C - 0x51C];
     /* 0xB2C */ s32 markersOn;
     /* 0xB30 */ u8 padB30[0xB3C - 0xB30];
@@ -37,7 +33,7 @@ void func_0024A86C(Player *player, void *view) {
     f32 scale;
 
     player->frame += D_800B6D28;
-    if (player->markersOn == 0 || player->options->unk3E == 1) {
+    if (player->markersOn == 0 || player->options->m_TagMode == 1) {
         return;
     }
     func_00279028(0xFF);

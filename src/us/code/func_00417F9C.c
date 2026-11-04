@@ -1,19 +1,10 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
     /* 0x14 */ char *text;
 } MenuItemTmpl;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x32];
-    /* 0x32 */ u8 handicap;
-} PlayerOptions;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ PlayerOptions *options;
-} Player;
 
 typedef struct {
     /* 0x0 */ u8 pad0[4];
@@ -22,7 +13,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ Player *player;
+    /* 0x1C */ CPlayer *player;
     /* 0x20 */ MenuCtl *ctl;
 } MenuCaller;
 
@@ -38,7 +29,7 @@ extern void func_0029E3E0(char *dst, char *fmt, s32 value);
 
 /* Label of the handicap item, with the handicap value printed into it. */
 s32 func_00417F9C(MenuItemTmpl *a, MenuCaller *c) {
-    s32 handicap = c->player->options->handicap;
+    s32 handicap = c->player->m_pOptions->m_Handicap;
 
     if (handicap == 0) {
         a->text = D_800B41F0;

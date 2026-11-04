@@ -10,6 +10,7 @@
  * (WheelPlayer, HudPlayer, SwitchPlayer, Player), and they share one
  * WeaponInfo. func_0024D344 is after Rage Wars (func_80220ED4_de). */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct WeaponMenu WeaponMenu;
 
@@ -321,7 +322,6 @@ void func_0024C648(HudPlayer *player, View *view) {
     }
 }
 
-
 typedef struct Quad {
     s32 w[4];
 } Quad;
@@ -405,7 +405,6 @@ void func_0024CF58(ViewState *view, Target *target) {
                       target->z + D_800AE30C * func_002974C0(angle), 0.0f, target->quad, target->region, 0.0f, 3.0f);
     }
 }
-
 
 typedef struct SwitchPlayer {
     /* 0x0000 */ u8 pad0[0x288];
@@ -511,11 +510,6 @@ typedef struct Surface {
     /* 0x54 */ u16 unk54;
 } Surface;
 
-typedef struct Options {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} Options;
-
 typedef struct Controller {
     /* 0x00 */ u8 pad0[8];
     /* 0x08 */ Vec3f pos;
@@ -572,7 +566,7 @@ typedef struct Player {
     /* 0x0434 */ u8 pad434[0x510 - 0x434];
     /* 0x0510 */ s32 control;
     /* 0x0514 */ u8 pad514[4];
-    /* 0x0518 */ Options *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 pad51C[4];
     /* 0x0520 */ s32 character;
     /* 0x0524 */ s32 health;               /* 8.8 */
@@ -843,7 +837,7 @@ void func_0024D344(Player *p) {
     if (D_8011AAF1.multiplayer != 0 && (rate = D_800ADD88[p->character]) != 0.0f) {
         f32 health = p->health;
 
-        if (health != 0.0f && p->options->tagMode == 0) {
+        if (health != 0.0f && p->options->m_TagMode == 0) {
             f32 max;
 
             regen = health + (f32) (s32) (rate * 256.0f) * (D_800B6D28 * 0.06666667f);
@@ -867,7 +861,7 @@ void func_0024D344(Player *p) {
     if (link_enabled(&p->unk6AB)) {
         linkFlags |= 0x1000;
     }
-    if (p->options->tagMode == 1) {
+    if (p->options->m_TagMode == 1) {
         linkFlags |= 0x2000;
         soundFlags |= 0x400000;
     }
@@ -1101,7 +1095,7 @@ void func_0024D344(Player *p) {
     if (human) {
         sound = 102;
         if (D_8011AAF1.multiplayer != 0) {
-            if (D_8011ACE4 != 0 && p->options->tagMode != 0) {
+            if (D_8011ACE4 != 0 && p->options->m_TagMode != 0) {
                 sound = D_800ADB5C;
             } else {
                 sound = D_800ADB30[p->def->kind];

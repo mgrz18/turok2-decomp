@@ -1,13 +1,9 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct Vec3 {
     f32 x, y, z;
 } Vec3;
-
-typedef struct PlayerOptions {
-    /* 0x00 */ u8 pad0[0x3C];
-    /* 0x3C */ u8 dead;
-} PlayerOptions;
 
 /* The player fields this resets. */
 typedef struct Player {
@@ -15,7 +11,7 @@ typedef struct Player {
     /* 0x0004 */ Vec3 pos;
     /* 0x0010 */ u8 pad10[0x514 - 0x10];
     /* 0x0514 */ s32 index;
-    /* 0x0518 */ PlayerOptions *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 pad51C[0xA10 - 0x51C];
     /* 0x0A10 */ s32 unkA10;
     /* 0x0A14 */ u8 padA14[0xA20 - 0xA14];
@@ -177,6 +173,6 @@ void func_00248340(Player *p) {
     p->unkBE0 = zero;
     p->unkBE4 = zero;
     p->unkBEC = 0;
-    p->options->dead = 0;
+    p->options->m_bDead = 0;
     p->unkAAC = zero;
 }

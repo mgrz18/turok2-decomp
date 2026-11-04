@@ -1,10 +1,6 @@
 /* Player code: func_0042E29C, 0x0042E29C-0x0042E430 (splat had it inside the data D_0042D50C). */
 #include "common.h"
-
-typedef struct Options {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} Options;
+#include "structs/player.h"
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0xE2];
@@ -12,7 +8,7 @@ typedef struct Player {
     /* 0x00E3 */ u8 padE3[0x144 - 0xE3];
     /* 0x0144 */ s32 health;
     /* 0x0148 */ u8 pad148[0x518 - 0x148];
-    /* 0x0518 */ Options *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 pad51C[0x524 - 0x51C];
     /* 0x0524 */ s32 health2;       /* 8.8 */
     /* 0x0528 */ s16 lives;
@@ -66,7 +62,7 @@ void func_0042E29C(Player *p) {
         p->keys--;
     }
     if (p->keys <= 0) {
-        if (D_8011AAF1 == 0 || p->unkE2 != 0 || p->options->tagMode != 0) {
+        if (D_8011AAF1 == 0 || p->unkE2 != 0 || p->options->m_TagMode != 0) {
             func_0024E5F0(p, p, 15);
         }
         return;

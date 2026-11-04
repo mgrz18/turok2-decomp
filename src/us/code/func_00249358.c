@@ -1,13 +1,7 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x32];
-    /* 0x32 */ u8 handicap;
-    /* 0x33 */ u8 pad33[0xB];
-    /* 0x3E */ u8 tagMode;
-} PlayerOptions;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
@@ -28,7 +22,7 @@ typedef struct {
     /* 0x148 */ u8 pad148[0x3CC - 0x148];
     /* 0x3CC */ s32 shownHealth;
     /* 0x3D0 */ u8 pad3D0[0x518 - 0x3D0];
-    /* 0x518 */ PlayerOptions *options;
+    /* 0x518 */ CPlayerOptions *options;
     /* 0x51C */ void *camera;
     /* 0x520 */ u8 pad520[4];
     /* 0x524 */ s32 health;         /* 8.8 */
@@ -113,8 +107,8 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
         damage /= 5;
     }
     if (D_801198B0.settings.multiplayer) {
-        if (p->options->handicap) {
-            damage = damage * (1.0f / 256) / ((p->options->handicap + f) * 0.3f) * 256.0f;
+        if (p->options->m_Handicap) {
+            damage = damage * (1.0f / 256) / ((p->options->m_Handicap + f) * 0.3f) * 256.0f;
         }
     }
     if (D_801198B0.settings.flags & 0x10) {
@@ -168,7 +162,7 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
     }
     if ((old >> 8) != (p->health >> 8)) {
         if (D_801198B0.settings.multiplayer) {
-            if (p->options->tagMode == 1) {
+            if (p->options->m_TagMode == 1) {
                 func_00275624(0x27DA);
             }
         } else if (!(p->aiFlags & 0x80)) {

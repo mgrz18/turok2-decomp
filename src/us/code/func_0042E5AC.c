@@ -1,20 +1,12 @@
 /* Player code: func_0042E5AC, 0x0042E5AC-0x0042E834 (splat had it inside the data D_0042D50C). */
 #include "common.h"
-
-typedef struct Options {
-    /* 0x00 */ u8 pad0[0x28];
-    /* 0x28 */ u8 active;
-    /* 0x29 */ u8 pad29[0x2F - 0x29];
-    /* 0x2F */ s8 controller;
-    /* 0x30 */ s8 character;
-    /* 0x31 */ u8 pad31[0x40 - 0x31];
-} Options;
+#include "structs/player.h"
 
 typedef struct GameFlags {
     /* 0x000 */ u8 pad0[0x19];
     /* 0x019 */ u8 multiplayer;     /* D_8011AAF1 */
     /* 0x01A */ u8 pad1A[0x40 - 0x1A];
-    /* 0x040 */ Options options[5];
+    /* 0x040 */ CPlayerOptions options[5];
 } GameFlags;
 
 typedef struct Controller {
@@ -25,7 +17,7 @@ typedef struct Player {
     /* 0x0000 */ u8 pad0[0x510];
     /* 0x0510 */ s32 unk510;
     /* 0x0514 */ s32 index;
-    /* 0x0518 */ Options *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 pad51C[0x92C - 0x51C];
     /* 0x092C */ s32 unk92C;
     /* 0x0930 */ s32 unk930;
@@ -65,7 +57,7 @@ extern void func_00248340(Player *p);
 extern void func_0042DC18(Player *p, s32 character, s32 arg2);
 
 /* func_0042E91C, inlined. */
-static __inline__ void initPlayer(Player *p, s32 index, Options *options) {
+static __inline__ void initPlayer(Player *p, s32 index, CPlayerOptions *options) {
     p->unk510 = 0;
     func_002470E8(p->unkA40, &D_800F5EC0[index]);
     p->index = index;
@@ -80,7 +72,7 @@ static __inline__ void initPlayer(Player *p, s32 index, Options *options) {
 
 void func_0042E5AC(PlayerList *list, s32 count, s32 arg2) {
     GameFlags *flags;
-    Options *options;
+    CPlayerOptions *options;
     Player *p;
     s32 i;
 
@@ -111,16 +103,16 @@ void func_0042E5AC(PlayerList *list, s32 count, s32 arg2) {
             p = &list->players[i];
             options = &flags->options[i + 1];
             initPlayer(p, i, options);
-            if (options->active) {
-                func_0042DC18(p, options->character, 1);
+            if (options->m_bActive) {
+                func_0042DC18(p, options->m_nCharacter, 1);
                 CList__Remove(list->list0, p);
                 CList__AddHead(list->list1, p);
             }
         }
     } else {
         p = list->players;
-        initPlayer(p, options->controller, options);
-        func_0042DC18(p, options->character, arg2);
+        initPlayer(p, options->m_nController, options);
+        func_0042DC18(p, options->m_nCharacter, arg2);
         CList__Remove(list->list0, p);
         CList__AddHead(list->list1, p);
     }
