@@ -1,9 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0xA08];
-    /* 0xA08 */ s16 mode;
-} Player;
+#include "structs/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0xD4];
@@ -12,7 +8,7 @@ typedef struct {
     /* 0x0D4 */ u32 flag10000 : 1;
     /* 0x0D4 */ u32 flagsLo : 16;
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ Player *owner;
+    /* 0x1A8 */ CPlayer *owner;
 } Actor;
 
 typedef struct {
@@ -29,15 +25,15 @@ typedef struct {
 void func_00243414(Actor *self, AI *ai, s32 mode);
 
 void func_0025FE18(Actor *self, AI *ai) {
-    Player *player = ai->target->owner;
+    CPlayer *player = ai->target->owner;
 
     self->flag20000 = 0;
     self->flag10000 = 0;
     ai->unkF4 = 0;
     if (ai->mode != 0x2E || ai->unkC7 != 0) {
-        if (player->mode == 0x21) {
+        if (player->m_Mode == 0x21) {
             func_00243414(self, ai, 0x2C);
-        } else if (player->mode == 0x22) {
+        } else if (player->m_Mode == 0x22) {
             func_00243414(self, ai, 0x2D);
         }
     }

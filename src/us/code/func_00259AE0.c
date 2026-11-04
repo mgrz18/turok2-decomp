@@ -1,15 +1,11 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x934];
-    /* 0x934 */ s16 unk934[1];
-} Player;
+#include "structs/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0xD8];
     /* 0x0D8 */ f32 unkD8;
     /* 0x0DC */ u8 padDC[0x1A8 - 0xDC];
-    /* 0x1A8 */ Player *owner;
+    /* 0x1A8 */ CPlayer *owner;
 } Actor;
 
 typedef struct {
@@ -32,7 +28,7 @@ extern struct {
     /* 0x8 */ f32 delta;
 } D_800B6D20;
 f32 func_00211774(f32 value, f32 target, f32 rate);
-s16 *func_0025398C(Player *player, s32 id);
+s16 *func_0025398C(CPlayer *player, s32 id);
 
 void func_00259AE0(Actor *actor, State *state) {
     f32 v;
@@ -50,7 +46,7 @@ void func_00259AE0(Actor *actor, State *state) {
             state->unk128 = 0;
         }
     } else {
-        Player *player = actor->owner;
+        CPlayer *player = actor->owner;
 
         if (*(s16 *) ((s8 *) player + *func_0025398C(player, 0x15) * 2 + 0x934) != 0) {
             state->unk128 = 0;

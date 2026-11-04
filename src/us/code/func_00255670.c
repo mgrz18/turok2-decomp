@@ -1,14 +1,8 @@
 #include "common.h"
+#include "structs/player.h"
 
 s32 func_0024E5F0(s32, s32, s32);
 s32 func_00255714(s32, s32);
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0xA10];
-    /* 0xA10 */ f32 modeTime;
-    /* 0xA14 */ u8 padA14[0xA64 - 0xA14];
-    /* 0xA64 */ u32 buttons;
-} Player;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x20];
@@ -30,14 +24,14 @@ typedef struct {
 extern Tuning D_800A7170;
 extern s32 D_80110048;
 
-void func_00255670(Player *arg0, MoveState *arg1) {
+void func_00255670(CPlayer *arg0, MoveState *arg1) {
     f32 var_f2;
 
     var_f2 = D_800A7170.scale;
     if (D_80110048 == 0x1DB1) {
         var_f2 = 481.28f;
     }
-    if (!(arg0->buttons & 0x10) || (arg0->modeTime >= 3.0f)) {
+    if (!(arg0->m_ContState.m_dwButtons & 0x10) || (arg0->m_ModeTime >= 3.0f)) {
         func_0024E5F0((s32) arg0, (s32) arg1, 5);
     } else {
         arg1->speed = (f32) (var_f2 * arg1->def->speed);

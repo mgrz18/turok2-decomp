@@ -3,6 +3,7 @@
  * jal), and the rest into func_00267094. Written whole under its real name.
  * Its switch reads jtbl_800A7D30, which still lives in the asm .rodata. */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ s32 kind;
@@ -16,11 +17,6 @@ typedef struct {
 } Attachment;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0xBF8];
-    /* 0xBF8 */ s32 unkBF8;
-} Player;
-
-typedef struct {
     /* 0x000 */ u8 type; /* 1: player */
     /* 0x001 */ u8 pad1[0x13];
     /* 0x014 */ ActorDef *def;
@@ -29,13 +25,13 @@ typedef struct {
     /* 0x0D8 */ u8 padD8[0x98];
     /* 0x170 */ Attachment *attachment;
     /* 0x174 */ u8 pad174[0x34];
-    /* 0x1A8 */ Player *owner;
+    /* 0x1A8 */ CPlayer *owner;
 } Actor;
 
 extern u8 D_8011AAF1;
 
 s32 func_00267090(Actor *actor) {
-    Player *owner;
+    CPlayer *owner;
     Attachment *attachment;
     u32 flags;
     u32 mask;
@@ -47,7 +43,7 @@ s32 func_00267090(Actor *actor) {
             }
             if (actor->flags & 0x300000) {
                 owner = actor->owner;
-                if (D_8011AAF1 != 0 && owner->unkBF8 != 0) {
+                if (D_8011AAF1 != 0 && owner->m_bEnteringDeathmatch != 0) {
                     return 0;
                 }
             }

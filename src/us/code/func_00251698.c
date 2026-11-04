@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 #include "structs/camera.h"
 
 /* A 0x64-byte record of the world model sections (func_0022425C finds it from an id). */
@@ -7,23 +8,6 @@ typedef struct {
     /* 0x44 */ s32 flags;
     /* 0x48 */ u8 pad48[0x64 - 0x48];
 } ModelRecord; /* size 0x64 */
-
-/* The player; past 0xA00 include/structs/player.h does not line up with the code
- * (buttons at 0xA1C as in func_0024ED54). */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x10];
-    /* 0x010 */ s32 region;
-    /* 0x014 */ u8 pad14[0x34 - 0x14];
-    /* 0x034 */ f32 unk34;
-    /* 0x038 */ f32 unk38;
-    /* 0x03C */ f32 unk3C;
-    /* 0x040 */ u8 pad40[0x51C - 0x40];
-    /* 0x51C */ CCamera *camera;
-    /* 0x520 */ u8 pad520[0xA1C - 0x520];
-    /* 0xA1C */ u32 buttons;
-    /* 0xA20 */ u8 padA20[0xBF0 - 0xA20];
-    /* 0xBF0 */ s32 unkBF0;
-} Player;
 
 /* What func_00225EBC finds (id 0xC45): three floats at 0x38. */
 typedef struct {
@@ -46,7 +30,7 @@ extern s32 D_8011001C;
 extern s32 D_80119878;
 extern s32 func_00257784;
 
-void func_00251698(Player *arg0, s32 arg1, s32 arg2) {
+void func_00251698(CPlayer *arg0, s32 arg1, s32 arg2) {
     s32 temp_a0;
     s32 temp_a1;
     ModelRecord *temp_v0;
@@ -56,7 +40,7 @@ void func_00251698(Player *arg0, s32 arg1, s32 arg2) {
     s32 var_v1;
 
     var_s0 = 1;
-    temp_a1 = arg0->region;
+    temp_a1 = arg0->m_CharacterActor.header.m_pCurrentRegion;
     var_s1 = 0;
     if (temp_a1 != 0) {
         temp_v0 = func_0022425C((s32) &D_800F7078, temp_a1);
@@ -67,7 +51,7 @@ void func_00251698(Player *arg0, s32 arg1, s32 arg2) {
     if (D_8011001C != 0) {
         var_s0 = 0;
     }
-    temp_a0 = arg0->buttons & 0x8000;
+    temp_a0 = arg0->m_ModeFlags & 0x8000;
     if (temp_a0 != 0) {
         var_s0 = 0;
     }
@@ -89,13 +73,13 @@ void func_00251698(Player *arg0, s32 arg1, s32 arg2) {
     if ((var_s1 & 0x80000) && (arg2 != 0x14) && (arg2 != 0x28) && (arg2 != 0x1E)) {
         var_s0 = 0;
     }
-    arg0->unkBF0 = var_s0;
+    arg0->m_DoDeathCin = var_s0;
     if (var_s0 != 0) {
         if (arg2 == 0x32) {
             D_800AE340 = 1;
             var_v1 = 0;
             do {
-                D_800F1FE4[var_v1] = arg0->camera->m_FogColor[var_v1];
+                D_800F1FE4[var_v1] = arg0->m_pCamera->m_FogColor[var_v1];
                 var_v1 += 1;
             } while (var_v1 < 4);
         }
@@ -105,8 +89,8 @@ void func_00251698(Player *arg0, s32 arg1, s32 arg2) {
     }
     temp_v0_2 = func_00225EBC((s32) &D_800F7078, -1, 0xC45);
     if (temp_v0_2 != 0) {
-        arg0->unk34 = temp_v0_2->unk38;
-        arg0->unk38 = temp_v0_2->unk3C;
-        arg0->unk3C = temp_v0_2->unk40;
+        arg0->m_CharacterActor.m_vScale.x = temp_v0_2->unk38;
+        arg0->m_CharacterActor.m_vScale.y = temp_v0_2->unk3C;
+        arg0->m_CharacterActor.m_vScale.z = temp_v0_2->unk40;
     }
 }

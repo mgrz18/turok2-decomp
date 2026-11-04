@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
 
@@ -28,17 +29,6 @@ typedef struct {
     /* 0x50 */ f32 yaw;
 } Body;
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x51C];
-    /* 0x051C */ void *camera;
-    /* 0x0520 */ u8 pad520[0xA1C - 0x520];
-    /* 0x0A1C */ u32 buttons;
-    /* 0x0A20 */ u8 padA20[0xA78 - 0xA20];
-    /* 0x0A78 */ f32 forward;
-    /* 0x0A7C */ u8 padA7C[0xBB0 - 0xA7C];
-    /* 0x0BB0 */ Actor *mount;
-} Player;
-
 extern Actor *D_800F1CE0;       /* what the player is aiming at */
 
 f32 func_002982F0(f32);         /* sinf */
@@ -53,22 +43,22 @@ void func_00243414(Actor *actor, void *ai, s32 state);
  * The single `return 1` after the if/else (not one per branch) is what gives
  * the ROMs plain bne at the 0x2E test: with two returns, reorgs liveness at
  * the fall-through keeps $v0 and annuls the slot (bnel). */
-s32 func_0024ED54(Player *player, Body *body) {
+s32 func_0024ED54(CPlayer *player, Body *body) {
     Actor *aim = D_800F1CE0;
     Actor *target;
     Actor *mount;
     s32 type;
-    if ((player->buttons & 0x8000) && aim != NULL) {
-        mount = player->mount;
+    if ((player->m_ModeFlags & 0x8000) && aim != NULL) {
+        mount = player->m_pOnEnemy;
         if (aim != mount && aim->kind == 1) {
             type = aim->def->type;
             if (type == 1 && mount != NULL) {
                 target = aim;
                 if (target->health != 0) {
-                    target->vel.x = player->forward * func_002982F0(body->yaw + 3.1415927f) * 20.0f;
-                    target->vel.y = player->forward * 30.0f;
-                    target->vel.z = player->forward * func_002974C0(body->yaw + 3.1415927f) * 20.0f;
-                    func_002811CC(player->camera, 50.0f, 100.0f, 50.0f, 1.0f, type, body->pos);
+                    target->vel.x = player->m_Speed * func_002982F0(body->yaw + 3.1415927f) * 20.0f;
+                    target->vel.y = player->m_Speed * 30.0f;
+                    target->vel.z = player->m_Speed * func_002974C0(body->yaw + 3.1415927f) * 20.0f;
+                    func_002811CC(player->m_pCamera, 50.0f, 100.0f, 50.0f, 1.0f, type, body->pos);
                     if (mount->aiState == 0x2E) {
                         target->aiFlags |= 0x400000;
                         func_00275544(0x278E, target->pos, 0, -1);
@@ -78,7 +68,7 @@ s32 func_0024ED54(Player *player, Body *body) {
                     target->aiNext = -1;
                     func_00243414(target, &target->aiFlags, 0x34);
                 } else {
-                func_002811CC(player->camera, 30.0f, 60.0f, 30.0f, 1.0f, type, body->pos);
+                func_002811CC(player->m_pCamera, 30.0f, 60.0f, 30.0f, 1.0f, type, body->pos);
                 }
                 return 1;
             }

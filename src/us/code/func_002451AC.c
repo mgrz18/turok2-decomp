@@ -1,14 +1,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215B90.c, func_00215B90, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xA64 - 0x998];
-    /* 0xA64 */ u32 flagsA64;
-} Player;
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
@@ -23,12 +17,12 @@ typedef struct {
     /* 0x0D8 */ u8 padD8[0x174 - 0xD8];
     /* 0x174 */ s8 state;
     /* 0x175 */ u8 pad175[0x1A8 - 0x175];
-    /* 0x1A8 */ Player *owner;
+    /* 0x1A8 */ CPlayer *owner;
     /* 0x1AC */ u8 pad1AC[0x204 - 0x1AC];
     /* 0x204 */ s16 anim;
 } Actor;
 
-s32 func_0024E700(Player *player, s32 weapon);   /* ammo for a weapon */
+s32 func_0024E700(CPlayer *player, s32 weapon);   /* ammo for a weapon */
 f32 func_002671B4(Actor *a);                     /* height */
 f32 func_0021153C(f32 x);                        /* acos */
 f32 func_002982F0(f32 x);                        /* sin */
@@ -79,17 +73,17 @@ s32 func_002451AC(Actor *self, s32 unused, Actor *target, f32 cone) {
     f32 hi;
     f32 y;
     f32 angle;
-    Player *player;
+    CPlayer *player;
 
     if (target == NULL) {
         return 0;
     }
     if (target->flags & 0x300000) {
         player = target->owner;
-        if (func_0024E700(player, player->weapon) <= 0) {
+        if (func_0024E700(player, player->m_Data.m_CurrentWeapon) <= 0) {
             return 0;
         }
-        if (!(player->flagsA64 & 0x2000)) {
+        if (!(player->m_ContState.m_dwButtons & 0x2000)) {
             return 0;
         }
         goto body;

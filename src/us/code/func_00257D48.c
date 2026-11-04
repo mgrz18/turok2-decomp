@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -25,20 +26,9 @@ struct AI {
     /* 0x130 */ f32 timer130;
 };
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xA08 - 0x998];
-    /* 0xA08 */ s16 pose;
-    /* 0xA0A */ u8 padA0A[0xB14 - 0xA0A];
-    /* 0xB14 */ s16 queuedWeapon;
-    /* 0xB16 */ u8 padB16[0xB8C - 0xB16];
-    /* 0xB8C */ s32 unkB8C;
-} Player;
-
 struct Object {
     /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ Player *owner;
+    /* 0x1A8 */ CPlayer *owner;
 };
 
 typedef struct {
@@ -64,15 +54,15 @@ extern void func_002241D8(void *level, Object *obj, s32 model, s32 animType);
  * player's pose asks for it or a weapon change is queued, runs the state's
  * and the weapon's updates, then animates the weapon model. */
 void func_00257D48(Object *obj, AI *ai) {
-    Player *player;
+    CPlayer *player;
     s32 mode;
 
     player = obj->owner;
-    mode = D_800ADF68[player->pose].mode;
+    mode = D_800ADF68[player->m_Mode].mode;
     if (ai->timer130 > 0.0f) {
         ai->timer130 -= D_800B6D28;
     }
-    if (player->weapon != 21) {
+    if (player->m_Data.m_CurrentWeapon != 21) {
         ai->unk128 = 0;
     }
     if (ai->timer118 > 0.0f) {
@@ -81,15 +71,15 @@ void func_00257D48(Object *obj, AI *ai) {
     if (mode == 1) {
         func_00243414(obj, ai, 1);
     }
-    if (player->queuedWeapon != player->weapon) {
-        player->unkB8C = 0;
+    if (player->m_RequestedWeapon != player->m_Data.m_CurrentWeapon) {
+        player->m_SniperMode = 0;
         func_00243414(obj, ai, 1);
     }
     if (ai->state != NULL && ai->state->update != NULL) {
         ai->state->update(obj, ai);
     }
-    if (D_800AF618[player->weapon]->update != NULL) {
-        D_800AF618[player->weapon]->update(obj, ai);
+    if (D_800AF618[player->m_Data.m_CurrentWeapon]->update != NULL) {
+        D_800AF618[player->m_Data.m_CurrentWeapon]->update(obj, ai);
     }
-    func_002241D8(D_800F7078, obj, D_800AF618[player->weapon]->model, ai->anim->animType);
+    func_002241D8(D_800F7078, obj, D_800AF618[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
 }

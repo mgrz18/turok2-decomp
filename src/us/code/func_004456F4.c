@@ -1,21 +1,12 @@
 /* Second-module copy of func_0040C6F4 (src/us/code/func_0040C6F4.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
-
-/* End of the fight: when the module object has a target, gives its owner (the player) D_00431C9C, refreshes
- * its view and turns it around; then sends the module object to anim state 0xA. */
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x50];
-    /* 0x050 */ f32 rotY;
-    /* 0x054 */ u8 pad54[0x2D8 - 0x54];
-    /* 0x2D8 */ f32 viewRotY;
-} Player;
+#include "structs/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0xD4];
     /* 0x0D4 */ s32 flags;
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ Player *owner;
+    /* 0x1A8 */ CPlayer *owner;
 } Actor;
 
 typedef struct {
@@ -44,8 +35,8 @@ typedef struct {
 extern State D_8012FB70;
 extern u8 D_00431C9C[];
 extern void func_00246108(Obj *obj, void *ai, Targets *t, s32 f1, s32 f2);
-extern void func_00253D68(Player *player, void *arg1);
-extern void func_0024CF58(Player *player, Player *other);
+extern void func_00253D68(CPlayer *player, void *arg1);
+extern void func_0024CF58(CPlayer *player, CPlayer *other);
 extern void func_00243414(Obj *obj, void *ai, s32 state);
 
 /* func_0040BD60 */
@@ -66,7 +57,7 @@ static __inline__ f32 getTargetDist(Obj *obj, Actor **found) {
 void func_004456F4(void) {
     Obj *obj = D_8012FB70.obj;
     Actor *found;
-    Player *player;
+    CPlayer *player;
 
     player = NULL;
     getTargetDist(obj, &found);
@@ -76,7 +67,7 @@ void func_004456F4(void) {
     if (player != NULL) {
         func_00253D68(player, D_00431C9C);
         func_0024CF58(player, player);
-        player->viewRotY = player->rotY = 3.141593f;
+        player->m_WeaponActor.m_RotY = player->m_CharacterActor.m_RotY = 3.141593f;
         obj->unk50 = 0;
     }
     func_00243414(obj, obj->ai, 0xA);
