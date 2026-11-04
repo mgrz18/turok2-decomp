@@ -4,9 +4,9 @@
 /* The player and the HUD. Layouts and names from LibTEngine's Turok 2 types
  * (Drahsid/LibTEngine, lib/libtengine/lib/types: CPlayer.h, COverlay.h,
  * COnScreen.h...), with these departures:
- *   - CBarrel (the weapon wheel) is kept opaque: LibTEngine's offsets jump
- *     from 0x00C to 0x100 and its 36-entry list does not fit the space, while
- *     its size, 0x394, is what CPlayer leaves for it;
+ *   - CBarrel (the weapon wheel) has only the fields the code reads:
+ *     LibTEngine's offsets jump from 0x00C to 0x100 and its 36-entry list
+ *     does not fit the space, while its size, 0x394, is what CPlayer leaves;
  *   - checked against the code (the local Player views of ~180 files):
  *     CPlayerLoadSaveData is 0x4E8 (no m_dwLevelMissionObjFlags: the level
  *     intro and first-time masks are followed by the nuke parts at 0x4DC),
@@ -97,6 +97,17 @@ typedef struct {
     /* 0x30 */ u32 m_dwButtonsDouble;
     /* 0x34 */ u32 m_dwButtonsRepeat;
 } CPlayerContState; /* size 0x38 */
+
+/* The weapon wheel (the "barrel"), reset to 0 items and no last item. */
+typedef struct {
+    /* 0x000 */ s32 m_nItems;
+    /* 0x004 */ f32 unk_0x4;
+    /* 0x008 */ f32 unk_0x8;
+    /* 0x00C */ u8 unk_0xC[0x37C - 0xC];
+    /* 0x37C */ s32 m_nLastItem;
+    /* 0x380 */ s32 m_bUnderwater;        /* the wheel's underwater variant */
+    /* 0x384 */ u8 unk_0x384[0x394 - 0x384];
+} CBarrel; /* size 0x394 */
 
 /* What a save game keeps of the player. Health is 24.8 fixed point. */
 typedef struct {
@@ -255,7 +266,7 @@ typedef struct CPlayer {
     /* 0x0C08 */ s32 m_LastCharAnim;
     /* 0x0C0C */ s32 _pad2;                      /* m_Overlay is 8-byte aligned */
     /* 0x0C10 */ CPlayerOverlay m_Overlay;
-    /* 0x0CD0 */ u8 m_Barrel[0x394];           /* CBarrel, the weapon wheel */
+    /* 0x0CD0 */ CBarrel m_Barrel;
     /* 0x1064 */ COverlay m_AmmoOverlay;
     /* 0x10A0 */ COverlay m_HealthOverlay;
     /* 0x10DC */ COverlay m_LivesOverlay;

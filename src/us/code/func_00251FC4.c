@@ -21,14 +21,6 @@ typedef struct {
 } Controller;
 
 typedef struct {
-    /* 0x000 */ s32 count;
-    /* 0x004 */ f32 a;
-    /* 0x008 */ f32 b;
-    /* 0x00C */ u8 padC[0x37C - 0xC];
-    /* 0x37C */ s32 last;
-} Strokes;
-
-typedef struct {
     /* 0x00 */ CPlayer *head;
     /* 0x04 */ u8 pad4[0x10 - 4];
     /* 0x10 */ u32 count;
@@ -103,11 +95,11 @@ void func_0042FFB0(void *pool, Camera *cam);
 void func_0025492C(PlayerList *list);
 void func_002525BC(PlayerList *list);
 
-static __inline__ void reset_strokes(Strokes *s) {
-    s->count = 0;
-    s->a = 0.0f;
-    s->last = -1;
-    s->b = 0.0f;
+static __inline__ void reset_strokes(CBarrel *s) {
+    s->m_nItems = 0;
+    s->unk_0x4 = 0.0f;
+    s->m_nLastItem = -1;
+    s->unk_0x8 = 0.0f;
 }
 
 static __inline__ s32 in_cinema(CPlayer *p) {

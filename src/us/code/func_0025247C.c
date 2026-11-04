@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 /* Spawn point record from func_00225EBC: a position and a starting health. */
 typedef struct {
@@ -12,16 +13,6 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x3E];
     /* 0x3E */ u8 tagMode;
 } PlayerOptions;
-
-/* CBarrel, the weapon wheel (opaque in structs/player.h). */
-typedef struct {
-    /* 0x000 */ s32 field0;
-    /* 0x004 */ s32 field4;
-    /* 0x008 */ s32 field8;
-    /* 0x00C */ u8 padC[0x37C - 0xC];
-    /* 0x37C */ s32 field37C;
-    /* 0x380 */ u8 pad380[0x394 - 0x380];
-} Barrel;
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x14];
@@ -38,7 +29,7 @@ typedef struct Player {
     /* 0x0520 */ s32 character;
     /* 0x0524 */ s32 health;
     /* 0x0528 */ u8 pad528[0xCD0 - 0x528];
-    /* 0x0CD0 */ Barrel barrel;
+    /* 0x0CD0 */ CBarrel barrel;
     /* 0x1064 */ u8 pad1064[0x1284 - 0x1064];
     /* 0x1284 */ s32 headMovementDisabled;
     /* 0x1288 */ u8 pad1288[0x1320 - 0x1288];
@@ -80,15 +71,15 @@ static __inline__ void place_at_spawn(Player *p) {
 /* Put the player into tag mode ("it"): a sound, the weapon wheel and the
  * weapon reset, then respawn with full health. */
 void func_0025247C(Player *p) {
-    Barrel *barrel;
+    CBarrel *barrel;
 
     p->options->tagMode = 1;
     func_00275624(0x27D8);
     barrel = &p->barrel;
-    barrel->field0 = 0;
-    barrel->field4 = 0;
-    barrel->field37C = -1;
-    barrel->field8 = 0;
+    barrel->m_nItems = 0;
+    barrel->unk_0x4 = 0;
+    barrel->m_nLastItem = -1;
+    barrel->unk_0x8 = 0;
     p->headMovementDisabled = 0;
     func_00243414((u8 *)p + 0x288, (u8 *)p + 0x3C8, 1);
     place_at_spawn(p);

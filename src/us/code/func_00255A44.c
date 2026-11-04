@@ -12,14 +12,6 @@ typedef struct {
     /* 0x1C */ f32 velY;
 } Actor;
 
-typedef struct {
-    /* 0x000 */ s32 unk0;
-    /* 0x004 */ s32 unk4;
-    /* 0x008 */ s32 unk8;
-    /* 0x00C */ u8 padC[0x370];
-    /* 0x37C */ s32 unk37C;
-} PlayerCD0;
-
 extern f32 func_00268A5C(Actor *actor);
 extern void func_00280EAC(void *camera);
 extern void func_00275544(s16 sound, Vec3f pos, s32, s32);
@@ -28,7 +20,7 @@ extern void func_00275544(s16 sound, Vec3f pos, s32, s32);
  * vertical speed (clamped at -51.2), resets state and plays sound 2000 there. */
 void func_00255A44(CPlayer *player, Actor *actor) {
     f32 h;
-    PlayerCD0 *s;
+    CBarrel *s;
 
     h = func_00268A5C(actor) - player->m_vEyeOffset.y;
     if (h < player->m_vDesiredPos.y) {
@@ -43,9 +35,9 @@ void func_00255A44(CPlayer *player, Actor *actor) {
     player->m_bOxygenOut = 0;
     func_00280EAC(player->m_pCamera);
     s = &player->m_Barrel;
-    s->unk0 = 0;
-    s->unk4 = 0;
-    s->unk37C = -1;
-    s->unk8 = 0;
+    s->m_nItems = 0;
+    s->unk_0x4 = 0;
+    s->m_nLastItem = -1;
+    s->unk_0x8 = 0;
     func_00275544(2000, actor->pos, 0, -1);
 }
