@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408870.c, func_00408870, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/menu.h"
 
 /* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
  * and shows the "loaded" message; otherwise reports whether the note could be read. */
@@ -41,18 +42,6 @@ typedef struct {
     /* 0x38 */ s32 unk38;
 } World;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s8 pad;
-} MenuPad;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ void *player;
-    /* 0x20 */ MenuPad *pad;
-    /* 0x24 */ s32 unk24;
-} MenuOwner;
-
 extern s32 D_80130990;
 extern s32 D_800C2028; /* pad */
 extern s32 D_801309BC;
@@ -74,12 +63,12 @@ extern u8 D_80119E2C[];
 extern u8 D_0043BC40[];
 extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
-s32 func_0041DCB0(MenuOwner *o, s32 pad, s32 z);
-Player *func_0025342C(World *w, MenuPad *s);
+s32 func_0041DCB0(Menu *o, s32 pad, s32 z);
+Player *func_0025342C(World *w, MenuController *s);
 s32 func_00425F84(s32 pad, s32 idx);
 void func_00416644(u8 *a, void *b, void *c, s32 d, s32 e);
 
-s32 func_00459374(s32 unused, MenuOwner *own) {
+s32 func_00459374(s32 unused, Menu *own) {
     f32 *new_var;
     s32 pad;
     Player *plr;
@@ -93,14 +82,14 @@ s32 func_00459374(s32 unused, MenuOwner *own) {
     if (D_80130990 != 0) {
         pad = D_800C2028;
     } else {
-        pad = own->pad->pad;
+        pad = own->controller->port;
     }
     if (func_0041DCB0(own, pad, 0) != 0) {
         D_801309BC = 1;
         return 1;
     }
     if (D_801309B8 != 0) {
-        plr = func_0025342C(&D_80119870, own->pad);
+        plr = func_0025342C(&D_80119870, own->controller);
         g = D_800F7078;
         save = D_8011AC58;
         plr->unk520 = D_800C201C->blk18;
@@ -126,9 +115,9 @@ s32 func_00459374(s32 unused, MenuOwner *own) {
         return 1;
     }
     if (func_00425F84(pad, D_801309C4) == 0) {
-        func_00416644(D_80119E2C, D_0043BCD0, own->player, own->pad, own->unk24);
+        func_00416644(D_80119E2C, D_0043BCD0, own->player, own->controller, own->context);
     } else {
-        func_00416644(D_80119E2C, D_0043BD3C, own->player, own->pad, own->unk24);
+        func_00416644(D_80119E2C, D_0043BD3C, own->player, own->controller, own->context);
     }
     return 1;
 }

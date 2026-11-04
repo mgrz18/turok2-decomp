@@ -1,19 +1,9 @@
 /* First-module twin of src/us/code/func_004590BC.c. WRONG CUT: REAL func_0042019C size 0x2B8 (0x0042019C-0x00420454); splat cut its tail into func_004203B0. Matches whole (checked with the size overridden). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004085E0.c, func_004085E0, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/menu.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
-
-typedef struct {
-    u8 pad0[4];
-    s8 pad; /* 0x04 */
-} MenuPad;
-
-typedef struct {
-    u8 pad0[0x1C];
-    s32 player;   /* 0x1C */
-    MenuPad *pad; /* 0x20 */
-} MenuArg;
 
 typedef struct {
     u8 pad0[0x51C];
@@ -52,7 +42,7 @@ void func_002052D8(s32 a, s32 b);
 Player *func_0025342C(void *a, void *b);
 void func_00416644(void *a, void *b, s32 c, s32 d, s32 e);
 
-s32 func_0042019C(s32 a0, MenuArg *arg) {
+s32 func_0042019C(s32 a0, Menu *arg) {
     struct {
         s32 m;
         s32 pad;
@@ -79,27 +69,27 @@ s32 func_0042019C(s32 a0, MenuArg *arg) {
     if (D_80130990 != 0) {
         mm.m = D_800C2028;
     } else {
-        mm.m = arg->pad->pad;
+        mm.m = arg->controller->port;
     }
     if (D_80130990 != 0) {
         D_8011F148 = 0;
         D_8011B108 = 0;
         D_8011F144 = 1;
         D_8011B114 = 0;
-        func_00416644(D_80119E2C, D_0043B738, 0, (s32)arg->pad, 0);
+        func_00416644(D_80119E2C, D_0043B738, 0, (s32)arg->controller, 0);
         return 1;
     }
     if (D_801309B4 != 0) {
         if (D_80130994 != 0) {
             D_801309BC = 1;
-            plr = func_0025342C(D_80119870, arg->pad);
+            plr = func_0025342C(D_80119870, arg->controller);
             func_00416644(plr->hud + 0x53C, D_00438808, (s32)plr, plr->controller, mm.m);
             return 1;
         }
         if (D_80130984 != 0) {
             D_801309BC = 1;
             u = (Player *)arg->player;
-            sw = arg->pad->pad;
+            sw = arg->controller->port;
             mm.m = sw;
             plr = u;
             switch (sw) {
@@ -122,7 +112,7 @@ s32 func_0042019C(s32 a0, MenuArg *arg) {
         }
         return 0;
     }
-    plr = func_0025342C(D_80119870, arg->pad);
+    plr = func_0025342C(D_80119870, arg->controller);
     if (D_80130994 != 0) {
         D_801309BC = 1;
         func_00416644(D_80119870 + 0x5BC, D_00439190, (s32)plr, plr->controller, mm.m);

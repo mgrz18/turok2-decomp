@@ -1,6 +1,7 @@
 /* First-module twin of src/us/code/func_00458C14.c. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408118.c, func_00408118, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/menu.h"
 
 /* Controller pak menu item: picks the item's text for the pak state and prints the pak's free blocks and
  * the blocks a save needs into it ("%3d"-style, three characters each). */
@@ -8,21 +9,6 @@
 typedef struct {
     char c[4];
 } Chars4;
-
-typedef struct {
-    u8 pad0[4];
-    s8 pad; /* 0x04 */
-} MenuPad;
-
-typedef struct {
-    u8 pad0[0x20];
-    MenuPad *pad; /* 0x20 */
-} MenuOwner;
-
-typedef struct {
-    u8 pad0[0x14];
-    char *text; /* 0x14 */
-} MenuItem;
 
 extern s32 D_80130990;
 extern s32 D_800C2028; /* pad */
@@ -39,7 +25,7 @@ s32 func_004267A0(s32 pad, s32 *out);
 u32 func_00426E6C(u32 n);
 void func_0029E3E0(char *dst, u8 *fmt, s32 a);
 
-s32 func_0041FCF4(MenuItem *item, MenuOwner *own) {
+s32 func_0041FCF4(MenuItem *item, Menu *own) {
     Chars4 buf;
     char *bp;
     s32 pad;
@@ -53,7 +39,7 @@ s32 func_0041FCF4(MenuItem *item, MenuOwner *own) {
     if (D_80130990 != 0) {
         pad = D_800C2028;
     } else {
-        pad = own->pad->pad;
+        pad = own->controller->port;
     }
     buf = D_800C1408;
     bp = buf.c;
