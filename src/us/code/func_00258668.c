@@ -4,19 +4,6 @@
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x2C];
-    /* 0x02C */ s32 unk_2C;
-    /* 0x030 */ u8 pad30[0x108 - 0x30];
-    /* 0x108 */ s32 unk_108;
-    /* 0x10C */ s32 unk_10C;
-    /* 0x110 */ s32 unk_110;
-    /* 0x114 */ u8 pad114[4];
-    /* 0x118 */ s32 unk_118;
-    /* 0x11C */ u8 pad11C[0x128 - 0x11C];
-    /* 0x128 */ s32 unk_128;
-} WeaponState;
-
 extern u32 D_800B6D20;
 extern s32 D_800F7078;
 extern u8 D_801198B0[];
@@ -24,20 +11,20 @@ extern u8 D_801198B0[];
 extern void func_0027FC2C(void *arg0, void *camera, s32 model);
 
 /* Switches the weapon actor to its owner's requested weapon. */
-void func_00258668(CGameObjectInstance *weapon, WeaponState *state) {
+void func_00258668(CGameObjectInstance *weapon, CAI *state) {
     CPlayer *player = *(CPlayer **)((u8 *)weapon + 0x1A8);
     s16 requested = *(s16 *)((u8 *)player + 0xB14);
 
     if (player->m_Data.m_CurrentWeapon != requested || D_800F7078 != 4) {
         player->m_Data.m_CurrentWeapon = *(s16 *)((u8 *)player + 0xB14);
-        state->unk_2C = D_800AF618[requested]->modeTable;
-        state->unk_108 = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;
+        state->m_pModeTable = D_800AF618[requested]->modeTable;
+        state->m_pfEffects = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;
         if (D_800B6D20 >= 5) {
             func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
         }
-        state->unk_10C = 0;
-        state->unk_110 = 0;
-        state->unk_128 = 0;
-        state->unk_118 = 0;
+        state->m_VarBuffer[0] = 0;
+        state->m_VarBuffer[1] = 0;
+        state->m_VarBuffer[7] = 0;
+        state->m_VarBuffer[3] = 0;
     }
 }

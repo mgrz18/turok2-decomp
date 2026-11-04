@@ -21,12 +21,6 @@ typedef struct {
 } WeaponActor;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0x128];
-    /* 0x128 */ s32 unk_128;
-    /* 0x12C */ s32 unk_12C;
-} WeaponState;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x8];
     /* 0x08 */ s32 camera;
     /* 0x0C */ s32 *hit;
@@ -41,7 +35,7 @@ extern s32 func_0021D7BC(s32, s32, s32);
 extern void func_0021D39C(WeaponActor *actor, s32 camera);
 extern void func_0020B6A0(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 
-void func_0025883C(WeaponActor *obj, WeaponState *state, DrawArgs *args) {
+void func_0025883C(WeaponActor *obj, CAI *state, DrawArgs *args) {
     CPlayer *player = obj->owner;
     WeaponActor *muzzle;
     s32 arg6 = -1;
@@ -58,7 +52,7 @@ void func_0025883C(WeaponActor *obj, WeaponState *state, DrawArgs *args) {
         muzzle->drawHook = NULL;
     }
     if (player->m_Data.m_CurrentWeapon == 0x15) {
-        arg6 = state->unk_12C;
+        arg6 = state->m_VarBuffer[8];
     }
-    func_0020B6A0(args->hit, obj->model, 1, obj->slots[D_800B6D1C], 0, state->unk_128, arg6);
+    func_0020B6A0(args->hit, obj->model, 1, obj->slots[D_800B6D1C], 0, state->m_VarBuffer[7], arg6);
 }
