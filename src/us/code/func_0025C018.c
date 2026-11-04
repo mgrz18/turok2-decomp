@@ -7,21 +7,10 @@
 
 typedef struct { f32 m[4][4]; } Mtx44;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ u8 pad10[0x34 - 0x10];
-    /* 0x34 */ CVector3 scale;
-    /* 0x40 */ CQuaternion rot;
-    /* 0x50 */ f32 yaw;
-    /* 0x54 */ u8 pad54[0x4];
-    /* 0x58 */ Mtx44 mtx;
-} Actor;
-
 extern f32 D_800DD78C;
 extern s32 D_8011AAD8;
 
-extern void func_0025FEB0(Actor *actor, CAI *ai);
+extern void func_0025FEB0(CGameObjectInstance *actor, CAI *ai);
 extern f32 func_0021170C(f32 angle, f32 step);
 extern void func_00210630(Mtx44 *m, f32 angle);
 extern void func_00210790(Mtx44 *m, f32 angle);
@@ -35,7 +24,7 @@ extern void func_0020F510(CVector3 *v, f32 limit);
 extern void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);
 extern void func_00210C3C(Mtx44 *m);
 
-void func_0025C018(Actor *actor, CAI *ai) {
+void func_0025C018(CGameObjectInstance *actor, CAI *ai) {
     Mtx44 look;
     Mtx44 rotMtx;
     CQuaternion spin;
@@ -51,21 +40,21 @@ void func_0025C018(Actor *actor, CAI *ai) {
     }
     func_00210630(&look, ai->m_VarF32[1]);
     func_00210790(&look, ai->m_VarF32[0]);
-    sin = func_002982F0(actor->yaw * 0.5f);
+    sin = func_002982F0(actor->m_RotY * 0.5f);
     spin.x = 0.0f;
     spin.y = sin;
     spin.z = 0.0f;
     D_800DD78C = sin;
-    spin.w = func_002974C0(actor->yaw * 0.5f);
-    func_00210F68(&rot, &spin, &actor->rot);
+    spin.w = func_002974C0(actor->m_RotY * 0.5f);
+    func_00210F68(&rot, &spin, &actor->m_qGround);
     func_00211114(&rot, &rotMtx);
-    func_0020C618(&actor->mtx, &look, &rotMtx);
+    func_0020C618((Mtx44 *) &actor->m_mfOrient, &look, &rotMtx);
     if (D_8011AAD8 & 0x40) {
-        func_0021034C(&actor->mtx, actor->scale.x * 0.5f, actor->scale.y * 0.5f, actor->scale.z * 0.5f);
+        func_0021034C((Mtx44 *) &actor->m_mfOrient, actor->m_vScale.x * 0.5f, actor->m_vScale.y * 0.5f, actor->m_vScale.z * 0.5f);
     } else {
-        func_0021034C(&actor->mtx, actor->scale.x, actor->scale.y, actor->scale.z);
+        func_0021034C((Mtx44 *) &actor->m_mfOrient, actor->m_vScale.x, actor->m_vScale.y, actor->m_vScale.z);
     }
-    func_0020F510(&actor->pos, 20000.0f);
-    func_00210318(&actor->mtx, actor->pos.x, actor->pos.y, actor->pos.z);
-    func_00210C3C(&actor->mtx);
+    func_0020F510(&actor->header.m_vPos, 20000.0f);
+    func_00210318((Mtx44 *) &actor->m_mfOrient, actor->header.m_vPos.x, actor->header.m_vPos.y, actor->header.m_vPos.z);
+    func_00210C3C((Mtx44 *) &actor->m_mfOrient);
 }
