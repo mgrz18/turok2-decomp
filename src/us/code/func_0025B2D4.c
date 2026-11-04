@@ -1,32 +1,9 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 
 typedef struct Object Object;
-
-typedef struct AI {
-    /* 0x000 */ u32 flags;
-    /* 0x004 */ s32 health;
-    /* 0x008 */ u8 pad8[0x34 - 0x8];
-    /* 0x034 */ s8 state;
-    /* 0x035 */ u8 pad35[0x40 - 0x35];
-    /* 0x040 */ s32 unk40;
-    /* 0x044 */ u8 pad44[0x80 - 0x44];
-    /* 0x080 */ Object *target;
-    /* 0x084 */ u8 pad84[4];
-    /* 0x088 */ Object *attacker;
-    /* 0x08C */ u8 pad8C[0xC4 - 0x8C];
-    /* 0x0C4 */ s16 node;
-    /* 0x0C6 */ s8 nodeIndex;
-    /* 0x0C7 */ s8 grounded;
-    /* 0x0C8 */ u8 pain;
-    /* 0x0C9 */ u8 padC9[2];
-    /* 0x0CB */ s8 age;
-    /* 0x0CC */ u8 padCC[0xD0 - 0xCC];
-    /* 0x0D0 */ f32 burnTime;
-    /* 0x0D4 */ u8 padD4[0x133 - 0xD4];
-    /* 0x133 */ s8 modeIndex;
-} AI;
 
 /* An object or a particle: the first byte tells which. */
 struct Object {
@@ -43,8 +20,7 @@ struct Object {
     /* 0x0D8 */ u8 padD8[0x10C - 0xD8];
     /* 0x10C */ Object *particleOwner;
     /* 0x110 */ u8 pad110[0x140 - 0x110];
-    /* 0x140 */ AI ai;
-    /* 0x274 */ u8 pad274[0x27C - 0x274];
+    /* 0x140 */ CAI ai;
     /* 0x27C */ u32 fxFlags;
 };
 
@@ -66,16 +42,16 @@ extern s32 D_8011001C;
 extern s32 D_8011AAD8;          /* cheats */
 extern u8 D_800B06A0[];         /* origin */
 
-void func_002600E8(Object *obj, AI *ai);
-void func_002460FC(Object *obj, AI *ai, Object *owner, f32 time);
-void func_0025E52C(Object *obj, AI *ai, CVector3 *from, s32);
-void func_00243414(Object *obj, AI *ai, s32 state);
+void func_002600E8(Object *obj, CAI *ai);
+void func_002460FC(Object *obj, CAI *ai, Object *owner, f32 time);
+void func_0025E52C(Object *obj, CAI *ai, CVector3 *from, s32);
+void func_00243414(Object *obj, CAI *ai, s32 state);
 void func_002755B0(s16 sound, CVector3 pos, s32, s32, f32 volume);
 s32 func_002113A4(void);
-void func_00246918(Object *obj, AI *ai);
-s32 func_0025B078(Object *obj, AI *ai, Damage *dmg);
+void func_00246918(Object *obj, CAI *ai);
+s32 func_0025B078(Object *obj, CAI *ai, Damage *dmg);
 void func_004089C8(void);
-s32 func_0025DF04(Object *obj, AI *ai);
+s32 func_0025DF04(Object *obj, CAI *ai);
 s32 func_00219F74(Object *obj, s32 node, s32);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_00298470(f32 x);
@@ -87,7 +63,7 @@ f32 func_0020EAA0(CVector3 *v);
 /* AI damage: retarget the attacker, take the health, play the hurt sound and
  * pick the death, fall or flinch reaction; a knock back turns the actor to
  * face the push when the source was near enough. */
-void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
+void func_0025B2D4(Object *obj, CAI *ai, Damage *dmg) {
     CVector3 delta;
     s32 pushed;
     Object *attacker;
@@ -111,9 +87,9 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
     pushed = 0;
     def = obj->def;
     volume = 1.0f;
-    index = ai->modeIndex;
+    index = ai->m_Enemy.m_BehaviorIndex;
     info = &def->m_Enemy;
-    if (ai->state == 0x3D) {
+    if (ai->m_Mode == 0x3D) {
         func_002600E8(obj, ai);
         return;
     }
@@ -123,9 +99,9 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
             case 1:
                 if ((source->flags & 0x300000) && (u32)(D_80110048 - 7100) <= 400) {
                     newTarget = OWNER(source);
-                    if (obj->ai.target != newTarget) {
+                    if (obj->ai.m_pSightTarget != newTarget) {
                         func_002460FC(obj, ai, newTarget, 60.0f);
-                        ai->flags &= ~0x40000000;
+                        ai->m_dwFlags &= ~0x40000000;
                     }
                 }
                 attacker = source;
@@ -133,21 +109,21 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
                 break;
             case 2:
                 if (source->particleType == 10) {
-                    if ((def->m_Enemy.m_dwFlags & 0x80) && ai->health != 0) {
+                    if ((def->m_Enemy.m_dwFlags & 0x80) && ai->m_Health != 0) {
                         func_00243414(obj, ai, 0x1F);
                     }
                     if (info->m_dwFlags & 0x40000) {
                         dmg->amount += 0x3200;
-                        ai->burnTime += 60.0f;
+                        ai->m_OnFireTimer += 60.0f;
                     }
                 }
                 owner = source->particleOwner;
                 if (owner != NULL) {
                     if ((owner->flags & 0x300000) && (u32)(D_80110048 - 7100) <= 400) {
                         newTarget = OWNER(owner);
-                        if (ai->target != newTarget) {
+                        if (ai->m_pSightTarget != newTarget) {
                             func_002460FC(obj, ai, newTarget, 60.0f);
-                            ai->flags &= ~0x40000000;
+                            ai->m_dwFlags &= ~0x40000000;
                         }
                     }
                     func_0025E52C(obj, ai, &source->pos, 3);
@@ -162,47 +138,47 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
         }
         if (!D_8011001C && attacker != NULL && attacker->typeId != obj->typeId) {
             if (attacker->def->m_Type == 1) {
-                ai->target = attacker;
-                ai->attacker = attacker;
-                ai->flags |= 0x20000000;
-                ai->flags |= 0x40000000;
+                ai->m_pSightTarget = attacker;
+                ai->m_pPathTarget = attacker;
+                ai->m_dwFlags |= 0x20000000;
+                ai->m_dwFlags |= 0x40000000;
             } else {
-                ai->flags &= ~0x20000000;
-                ai->flags &= ~0x40000000;
+                ai->m_dwFlags &= ~0x20000000;
+                ai->m_dwFlags &= ~0x40000000;
             }
         }
     } else {
         func_0025E52C(obj, ai, (CVector3 *)D_800B06A0, 3);
     }
-    health = ai->health;
+    health = ai->m_Health;
     left = health - dmg->amount;
     if (left < 0) {
         left = 0;
     }
-    ai->health = left;
+    ai->m_Health = left;
     dead = left == 0;
     justDied = 0;
     if (dead) {
         justDied = health != 0;
     }
-    if ((health != 0 || (ai->state != 0x3C && !ai->grounded)) && info->m_PainSound != 0 && ai->age >= 11) {
+    if ((health != 0 || (ai->m_Mode != 0x3C && !ai->m_AnimRepeatedCount)) && info->m_PainSound != 0 && ai->m_LastHurtSFXTimer >= 11) {
         if (D_8011AAD8 & 0x40) {
             volume = 2.5f;
         } else if (D_8011AAD8 & 0x20) {
             volume = 0.35f;
         }
         func_002755B0(info->m_PainSound, obj->pos, 0, -1, volume);
-        ai->age = 0;
+        ai->m_LastHurtSFXTimer = 0;
     }
-    ai->pain = (ai->pain + dmg->amount < 255) ? 255 : ai->pain + dmg->amount;
+    ai->m_Aggression = (ai->m_Aggression + dmg->amount < 255) ? 255 : ai->m_Aggression + dmg->amount;
     if ((dmg->flags & 0x400000) && func_002113A4() % 1000 < 500) {
         dmg->flags = 0x800000;
     }
     if ((dmg->flags & 0x100000) && func_002113A4() % 1000 < 500) {
         dmg->flags = 0x200000;
     }
-    ai->flags &= 0xFC0FFFFF;
-    ai->flags |= dmg->flags;
+    ai->m_dwFlags &= 0xFC0FFFFF;
+    ai->m_dwFlags |= dmg->flags;
     if (justDied) {
         func_00246918(obj, ai);
         obj->fxFlags |= 8;
@@ -214,23 +190,23 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
         func_004089C8();
     } else if (dead) {
         func_00246918(obj, ai);
-        if (ai->state != 0x35 && ai->state != 0x3C && ai->grounded && (dmg->flags & 0xC00000)) {
-            ai->flags = (ai->flags & 0xFC0FFFFF) | 0x400000;
+        if (ai->m_Mode != 0x35 && ai->m_Mode != 0x3C && ai->m_AnimRepeatedCount && (dmg->flags & 0xC00000)) {
+            ai->m_dwFlags = (ai->m_dwFlags & 0xFC0FFFFF) | 0x400000;
             node = func_0025DF04(obj, ai);
             if (node != -1) {
                 slot = func_00219F74(obj, node, -1);
                 if (slot != -1) {
                     pushed = 1;
-                    ai->node = node;
-                    ai->nodeIndex = slot;
-                    ai->grounded = 0;
-                    ai->unk40 = 0;
+                    ai->m_AnimType = node;
+                    ai->m_AnimIndex = slot;
+                    ai->m_AnimRepeatedCount = 0;
+                    ai->m_ModeTime = 0;
                 }
             }
         }
     } else {
         region = dmg->region;
-        if (region != NULL && !(ai->state >= 0x1C && ai->state < 0x23) && (region->flags & 3) == 2) {
+        if (region != NULL && !(ai->m_Mode >= 0x1C && ai->m_Mode < 0x23) && (region->flags & 3) == 2) {
             if (!(region->flags & 4)) {
                 if ((index == 0 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x1F)) || (index == 1 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x3E0))
                     || (index == 2 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x7C00))) {
@@ -245,9 +221,9 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
                 }
             }
         }
-        if (ai->grounded && (ai->state == 0x11 || ai->state == 0x12)) {
+        if (ai->m_AnimRepeatedCount && (ai->m_Mode == 0x11 || ai->m_Mode == 0x12)) {
             func_00243414(obj, ai, 4);
-        } else if (ai->state != 0x33 && (dmg->flags & 0xC00000) && (info->m_dwFlags & 0x20000)) {
+        } else if (ai->m_Mode != 0x33 && (dmg->flags & 0xC00000) && (info->m_dwFlags & 0x20000)) {
             func_00243414(obj, ai, 0x33);
             pushed = 1;
         }
