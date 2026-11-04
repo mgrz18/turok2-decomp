@@ -119,7 +119,7 @@ typedef struct {
     /* 0x40C */ s32 m_CheckPointWarpID;
     /* 0x410 */ s32 m_SavePointWarpID;
     /* 0x414 */ s16 m_AmmoList[31];
-    /* 0x452 */ u8 m_WeaponList[35];
+    /* 0x452 */ s8 m_WeaponList[35];
     /* 0x475 */ u8 _pad0;
     /* 0x476 */ s16 m_CurrentWeapon;
     /* 0x478 */ s16 m_LastWeapon[3];
