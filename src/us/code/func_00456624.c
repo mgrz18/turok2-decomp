@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "structs/game.h"
+#include "structs/menu.h"
 
 struct ObjRecAt5D8;
 typedef struct ObjRecAt5D8 ObjRecAt5D8;
@@ -15,30 +16,20 @@ struct EntryRecAt1C {
     char pad[0x1C];
     ObjRecAt5D8 *unk1C;
 };
-struct TextEntryRecAtC;
-typedef struct TextEntryRecAtC TextEntryRecAtC;
-struct TextEntryRecAtC;
-struct TextEntryRecAtC {
-    s32 length;
-    s32 cursor;
-    s32 count;
-    char text[12];
-};
 struct EntryRecAt1C;
 typedef struct EntryRecAt1C EntryRecAt1C;
-extern TextEntryRecAtC D_800C1FB0[];
 extern s32 func_0025340C(void *table, void *player);
 s32 func_00456624(s32 unused, EntryRecAt1C *arg1) {
     s32 i;
     s32 count;
     i = func_0025340C(&D_80119870.m_PlayerList, arg1->unk1C);
-    count = D_800C1FB0[i].count;
-    D_800C1FB0[i].cursor = 0;
+    count = D_800C1FB0[i].length;
+    D_800C1FB0[i].timer = 0;
     if (count == 0) {
         return 0;
     }
-    D_800C1FB0[i].count = count - 1;
-    D_800C1FB0[i].length--;
-    D_800C1FB0[i].text[D_800C1FB0[i].length] = 0;
+    D_800C1FB0[i].length = count - 1;
+    D_800C1FB0[i].cursor--;
+    D_800C1FB0[i].name[D_800C1FB0[i].cursor] = 0;
     return 0;
 }

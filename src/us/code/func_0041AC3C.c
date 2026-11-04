@@ -2,21 +2,21 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/menu.h"
 
 extern s32 D_80130920;
 s32 func_0041AC3C(void) {
-    extern Shared_Entry D_800C1F80;
     s32 index;
     s32 next;
     D_80130920 = -1;
     D_800C1F80.timer = 0;
-    if (D_800C1F80.count == 0) {
+    if (D_800C1F80.length == 0) {
         return 0;
     }
-    if (D_800C1F80.value == 0) {
+    if (D_800C1F80.cursor == 0) {
         return 0;
     }
-    index = D_800C1F80.value - 1;
+    index = D_800C1F80.cursor - 1;
     if (index < 0x17) {
         do {
             next = index + 1;
@@ -24,7 +24,7 @@ s32 func_0041AC3C(void) {
             index = next;
         } while (index < 0x17);
     }
-    D_800C1F80.value--;
-    D_800C1F80.count--;
+    D_800C1F80.cursor--;
+    D_800C1F80.length--;
     return 0;
 }

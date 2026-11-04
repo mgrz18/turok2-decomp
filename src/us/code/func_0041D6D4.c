@@ -4,21 +4,13 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 
-typedef struct {
-    /* 0x00 */ s32 cursor;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 length;
-    /* 0x0C */ u8 name[12];
-} NameEntry; /* 0x18 bytes */
-
-extern NameEntry D_800C1FB0[];
 extern s32 func_0025340C(void *players, void *player);
 
 /* Name entry: delete the last character. */
 s32 func_0041D6D4(s32 menu, Menu *c) {
     s32 i = func_0025340C(&D_80119870.m_PlayerList, c->player);
 
-    D_800C1FB0[i].unk4 = 0;
+    D_800C1FB0[i].timer = 0;
     if (D_800C1FB0[i].length == 0) {
         return 0;
     }

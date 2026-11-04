@@ -2,8 +2,8 @@
  * src/ovl_a/func_00404018.c, func_00404018); callees named by their link addresses. */
 
 #include "rw/junk_types.h"
+#include "structs/controller.h"
 
-extern O01Pad4 D_800F6778[];
 extern OSMesgQueue D_800F6798;
 extern OSPfs D_80130C80[];
 extern s32 D_80130C70[];
@@ -17,7 +17,7 @@ s32 func_0045E808(s32 pad) {
     s32 code;
     s32 ok;
     s32 ret;
-    if (D_800F6778[pad].unk3 != 0) {
+    if (D_800F6778[pad].errno != 0) {
         D_80130C70[pad] = -2;
         ret = 0;
     } else {

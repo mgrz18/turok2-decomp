@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/save.h"
 
 s32 func_0026EFB8(s32 id);
 
-extern u8 *D_800C201C;
 extern char D_800B4A40[];
 extern char D_800B4A50[];
 extern char D_800B4A60[];
@@ -14,7 +14,7 @@ extern char D_800B4AB4[];
 extern char D_800B4ABC[];
 
 s32 func_00421F88(MenuItem *item) {
-    switch (func_0026EFB8(*(s32 *)(D_800C201C + 0x424))) {
+    switch (func_0026EFB8(D_800C201C->player.m_CheckPointWarpID)) {
         case -1:
         default:
             item->text = D_800B4ABC;

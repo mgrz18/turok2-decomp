@@ -4,13 +4,12 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "structs/save.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
 extern s32 D_800C2010;
 extern s32 D_800C2014;
-extern s32 D_800C2018;
-extern s32 D_800C201C;
 extern s32 D_80130940;
 extern s32 D_80130990;
 extern s32 D_801309B4;

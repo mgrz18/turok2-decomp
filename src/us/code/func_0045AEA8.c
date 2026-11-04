@@ -1,20 +1,11 @@
 /* WRONG CUT: the real function starts at 0x0045AEA8 (size 0xD8 = 216): splat
  * cut its first two words (lui/lw D_800C201C) as func_0045AEA8. */
 #include "common.h"
+#include "structs/menu.h"
+#include "structs/save.h"
 
 /* Set the menu item's text from a state of the current object. */
 
-typedef struct {
-    u8 pad0[0x14];
-    char *text; /* 0x14 */
-} MenuItem;
-
-typedef struct {
-    u8 pad0[0x424];
-    void *object; /* 0x424 */
-} MenuOwner;
-
-extern MenuOwner *D_800C201C;
 extern char D_800B4ABC[];
 extern char D_800B4AB4[];
 extern char D_800B4A40[];
@@ -24,10 +15,10 @@ extern char D_800B4A70[];
 extern char D_800B4A88[];
 extern char D_800B4A9C[];
 
-s32 func_0026EFB8(void *object);
+s32 func_0026EFB8(s32 id);
 
 s32 func_0045AEA8(MenuItem *item) {
-    switch (func_0026EFB8(D_800C201C->object)) {
+    switch (func_0026EFB8(D_800C201C->player.m_CheckPointWarpID)) {
     case -1:
     default:
         item->text = D_800B4ABC;

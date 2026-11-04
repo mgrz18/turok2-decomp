@@ -4,12 +4,6 @@
 /* Text entry item: draws the item, with a blinking 2-pixel cursor bar under the character being edited
  * (sibling of func_0045646C, for a single entry). */
 
-typedef struct {
-    s32 cursor; /* 0x00 */
-    f32 timer;  /* 0x04 */
-} TextEntry;
-
-extern TextEntry D_800C1F80;
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C1BD0;
 

@@ -6,41 +6,9 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "structs/pager.h"
 
 
-typedef struct PageMapping {
-    /* 0x0 */ struct PageMapping *next;
-    /* 0x4 */ struct PageMapping *prev;
-    /* 0x8 */ u16 id;
-    /* 0xA */ u8 index;
-    /* 0xB */ u8 slot;
-} PageMapping;
-
-/* A request to the resource manager thread. */
-typedef struct PageJob {
-    /* 0x00 */ s16 type;
-    /* 0x04 */ u8 *source;
-    /* 0x08 */ s32 size;
-    /* 0x0C */ u16 page;
-    /* 0x10 */ PageMapping *mapping;
-    /* 0x14 */ void *thread;
-    /* 0x18 */ u8 *slot;
-} PageJob;
-
-typedef struct PageChain {
-    PageMapping *head;
-    PageMapping *tail;
-} PageChain;
-
-/* The resource pager at D_801206A0, as this reads it. */
-typedef struct Pager {
-    /* 0x000 */ u8 pad0[0x24];
-    /* 0x024 */ OSMesgQueue completion;     /* D_801206C4 */
-    /* 0x03C */ u8 pad3C[0xAD8 - 0x3C];
-    /* 0xAD8 */ OSMesgQueue pending;        /* D_80121178 */
-} Pager;
-
-extern Pager D_801206A0;
 extern char D_80120DC0[];               /* the reader thread's stack; its OSThread is 0x230 below */
 extern char D_800D1CD8[];               /* the cartridge reader */
 extern char D_80132000[];               /* the page array, 0x1000 per page */

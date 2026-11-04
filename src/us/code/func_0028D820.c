@@ -3,71 +3,16 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "structs/pager.h"
 
 
-typedef struct PageSlot {
-    /* 0x0 */ struct PageSlot *next;
-    /* 0x4 */ struct PageSlot *prev;
-    /* 0x8 */ u16 id;
-    /* 0xA */ u8 index;
-    /* 0xB */ u8 slot;
-    /* 0xC */ s32 fieldC;
-} PageSlot;
-
-typedef struct PageChain {
-    PageSlot *head;
-    PageSlot *tail;
-} PageChain;
-
-typedef struct PageEntry {
-    /* 0x0 */ u16 id;
-    /* 0x2 */ u8 team;
-    /* 0x3 */ u8 slot;
-} PageEntry;
-
-typedef struct PageRegion {
-    /* 0x00 */ struct PageRegion *next;
-    /* 0x04 */ u16 start;
-    /* 0x06 */ u16 pages;
-    /* 0x08 */ u8 *source;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 *map;
-} PageRegion;
-
-/* The resource pager at D_801206A0 (0xCF8 bytes). */
-typedef struct Pager {
-    /* 0x000 */ u8 pad0[0x20];
-    /* 0x020 */ s16 event;
-    /* 0x024 */ OSMesgQueue completion;
-    /* 0x03C */ void *list0Data[0x21];
-    /* 0x0C0 */ u8 thread[0x230];           /* the manager thread (func_0028E7A4) */
-    /* 0x2F0 */ u8 stack[0x200];            /* its stack */
-    /* 0x4F0 */ u8 readerThread[0x230];     /* the reader thread (func_0028E8A4) */
-    /* 0x720 */ u8 readerStack[0x200];
-    /* 0x920 */ PageSlot slots[24];
-    /* 0xAA0 */ OSMesgQueue jobs;
-    /* 0xAB8 */ void *list1Data[8];
-    /* 0xAD8 */ OSMesgQueue pending;
-    /* 0xAF0 */ void *list2Data[8];
-    /* 0xB10 */ u8 channels[8][0x1C];
-    /* 0xBF0 */ PageChain chain;
-    /* 0xBF8 */ u8 lookup[0x80];
-    /* 0xC78 */ PageEntry entries[24];
-    /* 0xCD8 */ PageRegion regions;
-    /* 0xCEC */ u8 padCEC[4];
-    /* 0xCF0 */ s16 expanded;
-    /* 0xCF2 */ s16 mapped;
-    /* 0xCF4 */ u8 padCF4[4];
-} Pager;
-
-extern Pager D_801206A0;
 extern u8 D_14A000[];               /* the paged data in the ROM */
 extern u8 D_3CAE0[];                /* its size */
 extern char D_800D1CD8[];           /* the cartridge reader */
 
 u32 func_00266B80(void);            /* osGetMemSize */
 void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
-void func_0028E9E0(PageChain *chain, PageSlot *slot);
+void func_0028E9E0(PageChain *chain, PageMapping *slot);
 void func_0029B030(OSMesgQueue *queue, void **msg, s32 count);
 s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
 void func_00201DBC(void *reader, u8 *source, void *size, u32 dest);
@@ -113,9 +58,9 @@ void func_0028D820(void) {
         func_0028E9E0(&D_801206A0.chain, &D_801206A0.slots[i]);
         D_801206A0.slots[i].index = i;
     }
-    func_0029B030(&D_801206A0.completion, D_801206A0.list0Data, 0x21);
-    func_0029B030(&D_801206A0.jobs, D_801206A0.list1Data, 8);
-    func_0029B030(&D_801206A0.pending, D_801206A0.list2Data, 8);
+    func_0029B030(&D_801206A0.completion, D_801206A0.completionMsgs, 0x21);
+    func_0029B030(&D_801206A0.jobs, D_801206A0.jobMsgs, 8);
+    func_0029B030(&D_801206A0.pending, D_801206A0.pendingMsgs, 8);
     D_801206A0.regions.start = 0x400;
     D_801206A0.regions.pages = 0x80;
     D_801206A0.regions.map = D_801206A0.lookup;

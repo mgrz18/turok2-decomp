@@ -2,6 +2,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_7.CPP, func_80404E28_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/pak.h"
+#include "structs/controller.h"
 
 extern void **D_800C2228;
 extern s32 D_800C2220;
@@ -16,7 +17,6 @@ extern void func_002858A4(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size);
 extern s32 func_004258E8(s32 ch);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
-extern u8 D_800F6778[][4];
 extern u8 D_800F6798[];
 extern s32 osMotorInit(void *queue, void *pfs, s32 channel);
 
@@ -30,7 +30,7 @@ void func_00426480(s32 ch) {
     D_800F6750 = 2;
 
     cur = &D_80130AA0[ch];
-    if (D_800F6778[ch][3] != 0) {
+    if (D_800F6778[ch].errno != 0) {
         cur->present = 0;
         ready = 0;
     } else {

@@ -6,6 +6,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "structs/save.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
@@ -24,7 +25,6 @@ extern s32 D_801309BC;
 extern s32 D_80130990;
 extern s32 D_800C2020;
 extern s32 D_80130940;
-extern u8 *D_800C2018; /* save buffer */
 extern s32 D_800F70A8; /* save size */
 extern u8 D_80119E2C[];
 extern u8 D_0043BE14[];

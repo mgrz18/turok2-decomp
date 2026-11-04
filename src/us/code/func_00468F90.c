@@ -6,11 +6,6 @@
 
 /* Controller / rumble slot, 0x224 bytes (Controller in func_00285AE0). */
 
-/* OSContStatus, 4 bytes per port (errno bit 3 = no controller). */
-typedef struct PortStatus {
-    /* 0 */ u8 b[4];
-} PortStatus;
-
 extern char D_800F5A50[];
 extern char D_800F5A80[];
 extern s8 D_800F6750;     /* pak queue state */
@@ -19,7 +14,6 @@ extern char D_800F6798[]; /* SI OSMesgQueue */
 extern char D_800F6770[];
 extern char D_800F5E9C[];
 extern u8 D_800B6CF1;     /* controller bit pattern */
-extern PortStatus D_800F6778[];
 extern s16 D_800F5EB8;    /* lowest port with a controller */
 extern u8 D_800B6CF2;     /* number of controllers */
 extern u8 D_800B6CF0;     /* controllers initialised */
@@ -30,7 +24,7 @@ extern s32 D_800F5EA8[];
 s32 func_0026EB3C(void *dst, void *src, s32 n);
 void func_0029B030(void *mq, void *msgBuf, s32 count); /* osCreateMesgQueue */
 void func_0029B950(s32 event, void *mq, s32 msg);     /* osSetEventMesg */
-s32 func_00298A40(void *mq, u8 *bitpattern, PortStatus *status); /* osContInit */
+s32 func_00298A40(void *mq, u8 *bitpattern, OSContStatus *status); /* osContInit */
 s32 osSendMesg(void *mq, void *msg, s32 flag);
 void func_00285A80(s32);
 s32 func_004300E8(ControllerProfile *, s32);

@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00292910.c, func_00292910, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game.h"
+#include "structs/frame.h"
 
 typedef struct VideoRate {
     /* 0x0 */ s32 unk0;
@@ -18,8 +19,6 @@ extern s32 D_801308F8;
 extern s32 D_800C2034;          /* screen height */
 extern VideoRate D_8011B0A0;
 extern f32 D_800B6D28;          /* frame time */
-extern void *D_800F7070;
-extern void *D_8011F140;
 extern s32 D_801198A8;
 extern s32 D_80130940;
 extern u8 D_80119E2C[];

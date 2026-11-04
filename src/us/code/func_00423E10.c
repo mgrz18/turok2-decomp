@@ -1,18 +1,9 @@
 #include "common.h"
+#include "structs/frame.h"
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BBB0_de, with Turok 2's layouts. */
 /* Video setup: picks the low or high resolution set (high when an expansion pak is present, decided once), then
  * the mode for the TV type, copies its flags to the display globals and starts the display. */
-
-typedef struct {
-    /* 0x00 */ s32 width;
-    /* 0x04 */ s32 height;
-    /* 0x08 */ s32 a2;
-    /* 0x0C */ s32 a3;
-    /* 0x10 */ s32 a4;
-    /* 0x14 */ s32 a5;
-    /* 0x18 */ s32 unk18;
-} VideoMode;
 
 typedef struct {
     s32 a, b, c, d, e;
@@ -28,8 +19,6 @@ extern s32 D_800AB890;
 extern s32 D_800AB894;
 extern s32 D_800AB898;
 extern s32 D_800AB89C;
-extern VideoMode D_800C2054[]; /* NTSC */
-extern VideoMode D_800C20E0[]; /* PAL, MPAL */
 extern VideoFlags D_800C216C[];
 extern s32 func_00266B80(void); /* osGetMemSize */
 extern void func_0042464C(s32 width, s32 height, s32 a2, s32 a3, s32 a4, s32 a5);
@@ -63,7 +52,7 @@ void func_00423E10(void) {
     }
     switch (D_80000300) {
         case 1:
-            mode = &D_800C2054[D_800C2038];
+            mode = &D_800C2054[0][D_800C2038];
             break;
         case 0:
         case 2:

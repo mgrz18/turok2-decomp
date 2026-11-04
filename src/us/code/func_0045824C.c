@@ -33,7 +33,7 @@ extern u8 D_800B4B1C[];
 extern s32 D_800C2010;
 extern s32 D_800C2014;
 extern s32 D_800C2018;
-extern s32 D_800C201C;
+extern s32 D_800C201C; /* a SaveGame * (structs/save.h); kept an s32 for the address arithmetic below */
 extern u8 D_800C13F0[];
 extern u8 D_80119E2C[];
 extern u8 D_0043B994[];

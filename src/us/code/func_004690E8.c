@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
+#include "structs/controller.h"
 
-extern S5PortFlags D_800F6778[];
 extern void func_0026EB3C(void *a, void *b, s32 n);
 s32 func_004690E8(S5Ctl *c, s32 port) {
     s32 i;
@@ -31,7 +31,7 @@ s32 func_004690E8(S5Ctl *c, s32 port) {
         c->ent[i].c = 0x30;
         c->ent[i].d = 0;
     }
-    c->f0 = ((D_800F6778[port].b[3] >> 3) ^ 1) & 1;
+    c->f0 = ((D_800F6778[port].errno >> 3) ^ 1) & 1;
     c->fD0 = 0;
     c->fD4 = 0;
     func_0026EB3C(c->blkA, c->blkB, 3);

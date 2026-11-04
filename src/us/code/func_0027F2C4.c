@@ -2,12 +2,8 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "structs/frame.h"
 
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x110];
-    /* 0x110 */ void *frameBuffer;
-} GfxTask;
 
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
@@ -18,7 +14,6 @@ extern s32 D_800B6D1C;              /* frame buffer index */
 extern s32 D_800C2030;              /* screen width */
 extern s32 D_800C2034;              /* screen height */
 extern Gfx *D_800D8E24;             /* display list head */
-extern GfxTask *D_800F7070;
 extern s32 D_80130940;
 extern Gfx D_800AB100[];
 extern Gfx D_800AB130[];
@@ -70,7 +65,7 @@ void func_0027F2C4(CCameraPool *pool, void *world) {
             w = D_800C2030;
             h = D_800C2034;
             GFX_CMD(0xED000000, ((((s32)((f32)(w - 1) * 4.0f)) & 0xFFF) << 12) | (((s32)((f32)(h - 1) * 4.0f)) & 0xFFF))
-            GFX_CMD(0xFF100000 | ((w - 1) & 0xFFF), (u32)D_800F7070->frameBuffer)
+            GFX_CMD(0xFF100000 | ((w - 1) & 0xFFF), D_800F7070->colorImage)
             GFX_CMD(0xE3000A01, 0x300000)
             GFX_CMD(0xFCFFFFFF, 0xFFFE793C)
             GFX_CMD(0xE200001C, 0)
