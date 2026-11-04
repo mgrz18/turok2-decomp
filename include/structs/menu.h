@@ -100,7 +100,8 @@ typedef struct MenuDesc {
 typedef struct MenuController {
     /* 0x00 */ u8 _pad0[4];
     /* 0x04 */ s8 port;
-    /* 0x05 */ u8 _pad5[0xB0 - 0x5];
+    /* 0x05 */ u8 _pad5[0xA0 - 0x5];
+    /* 0xA0 */ u8 body[0xB0 - 0xA0]; /* its address is what func_004162E4 returns */
     /* 0xB0 */ u32 buttons;
     /* 0xB4 */ s32 connection;
     /* 0xB8 */ u8 _padB8[4];
