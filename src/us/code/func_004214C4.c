@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern s32 D_80130970;          /* preceded by 4 u16s at D_80130968 */
+extern s32 D_80130970;          /* the character of the pak profile D_80130968 (structs/pak.h), after its 4 counts */
 extern u8 D_80130974[];
 
 /* Copies the saved values into the options of the player. */
