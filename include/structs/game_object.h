@@ -56,22 +56,8 @@ typedef struct CAIModeInfo {
     /* 0x1C */ u32 unk_1C;
 } CAIModeInfo; /* size 0x20 */
 
-/* CAI::m_VarBuffer as the enemy AI (func_0025BC70 sets it up) uses it: the
- * definition's behaviour for each mode (CEnemyIntelligence::m_Behaviors[0],
- * [1], m_UnderwaterBehavior) and which of them is current, and its timers
- * (in frames, counted down by D_800B6D28). m_Timer and m_Timer2 run one after
- * the other (func_0025F624 seeds both); when both are out the AI goes to
- * mode 0x19, whose draw fades with m_Timer (func_0025BA80). */
-typedef struct {
-    /* 0x00 */ u8 _pad0[0x14];
-    /* 0x14 */ f32 m_AttackDelay;   /* no projectile/weapon attack until it is out */
-    /* 0x18 */ u8 _pad18[0x20 - 0x18];
-    /* 0x20 */ f32 m_IdleTimer;
-    /* 0x24 */ s8 m_Behavior[3];
-    /* 0x27 */ s8 m_BehaviorIndex;
-    /* 0x28 */ f32 m_Timer;
-    /* 0x2C */ f32 m_Timer2;
-} CEnemyAIVars; /* size 0x30 */
+/* The views of CAI::m_VarBuffer (CEnemyAIVars m_Enemy...). */
+#include "structs/ai_vars.h"
 
 /* AI state embedded in every game object at 0x140. Health is 24.8 fixed point. */
 typedef struct {
@@ -151,6 +137,9 @@ typedef struct {
         /* 0x10C */ s8 m_VarS8[48];
         /* 0x10C */ u8 m_VarU8[48];
         /* 0x10C */ CEnemyAIVars m_Enemy;
+        /* 0x10C */ CTurretAIVars m_Turret;
+        /* 0x10C */ CPlatformAIVars m_Platform;
+        /* 0x10C */ CGeneratorAIVars m_Generator;
     };
 } CAI; /* size 0x13C */
 

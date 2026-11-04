@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* Flying AI steering, scaled by speed: like func_00260730, but the bank and
- * pitch ease faster when they have to swing to the other side. */
+/* Flying AI steering, scaled by speed: like func_00260730, but the pitch and
+ * roll ease faster when they have to swing to the other side. */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4C];
@@ -24,10 +24,10 @@ void func_00245BAC(CGameObjectInstance *self, CAI *ai, f32 angle, f32 turn);
 void func_00260D60(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *limits, f32 speed, f32 turnRate) {
     f32 v;
     f32 max;
-    f32 bank;
     f32 pitch;
-    f32 bankSide;
+    f32 roll;
     f32 pitchSide;
+    f32 rollSide;
 
     func_00245BAC(self, ai, turnRate * 0.13962635f, steer->turn);
     if (func_0025E428(self, ai) == 1) {
@@ -39,22 +39,7 @@ void func_00260D60(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *lim
         } else if (v < -max) {
             self->m_vVelocity.y = -max;
         }
-        bank = self->m_vVelocity.y * 0.008726647f;
-        if (bank > 0.436332345f) {
-            bank = 0.436332345f;
-        } else if (bank < -0.436332345f) {
-            bank = -0.436332345f;
-        }
-        bankSide = 1.0f;
-        if (bank < 0.0f) {
-            bankSide = -1.0f;
-        }
-        if (bankSide != (ai->m_VarF32[0] < 0.0f ? -1.0f : 1.0f)) {
-            ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], bank, 0.17453295f);
-        } else {
-            ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], bank, 0.087266475f);
-        }
-        pitch = steer->turn * 0.75f;
+        pitch = self->m_vVelocity.y * 0.008726647f;
         if (pitch > 0.436332345f) {
             pitch = 0.436332345f;
         } else if (pitch < -0.436332345f) {
@@ -64,10 +49,25 @@ void func_00260D60(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *lim
         if (pitch < 0.0f) {
             pitchSide = -1.0f;
         }
-        if (pitchSide != (ai->m_VarF32[1] < 0.0f ? -1.0f : 1.0f)) {
-            ai->m_VarF32[1] = func_00211774(ai->m_VarF32[1], pitch, 0.3490659f);
+        if (pitchSide != (ai->m_Enemy.m_Pitch < 0.0f ? -1.0f : 1.0f)) {
+            ai->m_Enemy.m_Pitch = func_00211774(ai->m_Enemy.m_Pitch, pitch, 0.17453295f);
         } else {
-            ai->m_VarF32[1] = func_00211774(ai->m_VarF32[1], pitch, 0.17453295f);
+            ai->m_Enemy.m_Pitch = func_00211774(ai->m_Enemy.m_Pitch, pitch, 0.087266475f);
+        }
+        roll = steer->turn * 0.75f;
+        if (roll > 0.436332345f) {
+            roll = 0.436332345f;
+        } else if (roll < -0.436332345f) {
+            roll = -0.436332345f;
+        }
+        rollSide = 1.0f;
+        if (roll < 0.0f) {
+            rollSide = -1.0f;
+        }
+        if (rollSide != (ai->m_Enemy.m_Roll < 0.0f ? -1.0f : 1.0f)) {
+            ai->m_Enemy.m_Roll = func_00211774(ai->m_Enemy.m_Roll, roll, 0.3490659f);
+        } else {
+            ai->m_Enemy.m_Roll = func_00211774(ai->m_Enemy.m_Roll, roll, 0.17453295f);
         }
     }
 }

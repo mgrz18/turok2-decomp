@@ -24,7 +24,7 @@ void func_00261CAC(Self *self, CAI *ai) {
     Steer steer;
     CAITargets *tp;
 
-    ai->m_VarF32[3] = func_00211774(ai->m_VarF32[3], 0.20943953f, 0.25f);
+    ai->m_Enemy.m_TurnRate = func_00211774(ai->m_Enemy.m_TurnRate, 0.20943953f, 0.25f);
     ai->m_AnimSpeed = func_00211774(ai->m_AnimSpeed, 6.0f, 0.25f);
     func_00246108(self, ai, &t, 1, 1);
     func_0024599C(self, ai, &steer);
@@ -36,7 +36,7 @@ void func_00261CAC(Self *self, CAI *ai) {
     } else if (self->pitch < -81.92f) {
         self->pitch = -81.92f;
     }
-    func_00245BAC(self, ai, ai->m_VarF32[3], tp->m_Path.m_Angle);
+    func_00245BAC(self, ai, ai->m_Enemy.m_TurnRate, tp->m_Path.m_Angle);
 
     if (ai->m_ModeTime > 15.0f && (t.m_Path.m_FlatDist < 81.92f || ai->m_ModeTime > 90.0f)) {
         func_00243414(self, ai, 4);

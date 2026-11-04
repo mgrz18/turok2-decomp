@@ -97,7 +97,7 @@ void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
             } else if (bank < -0.43633235f) {
                 bank = -0.43633235f;
             }
-            ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], bank, 0.069813177f);
+            ai->m_Enemy.m_Pitch = func_00211774(ai->m_Enemy.m_Pitch, bank, 0.069813177f);
         }
     } else if (!(ai->m_ModeFlags & 0x400)) {
         angle = 0.261799425f;
