@@ -1588,21 +1588,9 @@ struct ObjRecAtCV4 {
     SlotCode8025A3EC slots[16];
 };
 typedef struct ObjRecAtCV4 ObjRecAtCV4;
-struct AudioHeapD844 {
-    u8 *start;
-    u8 *cursor;
-    u32 size;
-};
 struct AudioRootD844 {
     char pad0[0x1DA8];
-    struct AudioHeapD844 heap;
-};
-struct AudioParamsD844 {
-    s32 count38, count1C;
-    u8 kind;
-    u8 pad9[3];
-    struct AudioHeapD844 *context;
-    s32 value10, value14, value18;
+    ALHeap heap; /* SndMgr.heap (structs/sound.h) */
 };
 struct AudioStateD844 {
     struct AudioRootD844 *root;
@@ -1614,18 +1602,6 @@ struct AudioStateD844 {
     s32 counter;
     f32 third, fourth;
 };
-struct InitParams;
-struct InitParams {
-    s32 count38;
-    s32 count1C;
-    u8 kind;
-    u8 pad09[3];
-    s32 context;
-    s32 value10;
-    s32 value14;
-    s32 value18;
-};
-typedef struct InitParams InitParams;
 typedef struct SequenceResource {
     char pad[0x2B50];
     void *sections;

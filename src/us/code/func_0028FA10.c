@@ -5,15 +5,15 @@
 
 extern char func_0028FB80;
 extern void func_002928F0(void *);
-extern void *D_800B7760;
+extern ALGlobals *D_800B7760; /* alGlobals */
 extern s32 func_002912A0(s32, s32, void *, s32, s32);
 extern void func_00290F20(void *, void *, s32);
-extern void func_00293F10(s32, void *);
-void func_0028FA10(void *arg0, InitParams *arg1) {
-    ALSeqPlayer *obj = arg0;
-    InitParams *params = arg1;
-    s32 context = params->context;
-    s32 global = D_800B7760;
+extern void func_00293F10(ALSynth *, ALPlayer *); /* alSynAddPlayer */
+void func_0028FA10(ALCSPlayer *arg0, ALSeqpConfig *arg1) {
+    ALCSPlayer *obj = arg0;
+    ALSeqpConfig *params = arg1;
+    ALHeap *heap = params->heap;
+    ALSynth *drvr = &D_800B7760->drvr;
     s32 allocation;
     s32 i;
     obj->chanMask = 0xFF;
@@ -25,18 +25,18 @@ void func_0028FA10(void *arg0, InitParams *arg1) {
     obj->state = 0;
     obj->frameTime = 0x3E80;
     obj->curTime = 0;
-    obj->drvr = global;
-    obj->initOsc = params->value10;
-    obj->updateOsc = params->value14;
-    obj->stopOsc = params->value18;
+    obj->drvr = drvr;
+    obj->initOsc = params->initOsc;
+    obj->updateOsc = params->updateOsc;
+    obj->stopOsc = params->stopOsc;
     obj->nextEvent.type = 9;
-    obj->maxChannels = params->kind;
-    obj->chanState = func_002912A0(0, 0, (void *)context, params->kind, 0x10);
+    obj->maxChannels = params->maxChannels;
+    obj->chanState = func_002912A0(0, 0, heap, params->maxChannels, 0x10);
     func_002928F0(obj);
-    allocation = func_002912A0(0, 0, (void *)context, params->count38, 0x38);
+    allocation = func_002912A0(0, 0, heap, params->maxVoices, 0x38);
     obj->vFreeList = 0;
     i = 0;
-    if (params->count38 > 0) {
+    if (params->maxVoices > 0) {
         {
             ALVoiceState *records = (ALVoiceState *)allocation;
             do {
@@ -44,18 +44,18 @@ void func_0028FA10(void *arg0, InitParams *arg1) {
                 obj->vFreeList = records;
                 i++;
                 records++;
-            } while (i < params->count38);
+            } while (i < params->maxVoices);
         }
     }
     obj->vAllocHead = 0;
     obj->vAllocTail = 0;
-    allocation = func_002912A0(0, 0, (void *)context, params->count1C, 0x1C);
-    func_00290F20(&obj->evtq, (void *)allocation, params->count1C);
+    allocation = func_002912A0(0, 0, heap, params->maxEvents, 0x1C);
+    func_00290F20(&obj->evtq, (void *)allocation, params->maxEvents);
     {
         ALPlayer *node = &obj->node;
         node->next = 0;
         node->handler = &func_0028FB80;
         node->clientData = node;
-        func_00293F10(D_800B7760, node);
+        func_00293F10(&D_800B7760->drvr, node);
     }
 }

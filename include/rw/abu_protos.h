@@ -287,7 +287,7 @@ f32 func_0028F71C(void **arg0, s32 arg1, s32 arg2);
 void func_0028F828(CopyDest802B3998 *dst, CopySource802B3998 *src);
 void func_0028F89C(CopyDest802B3998 *src, CopySource802B3998 *dst);
 s32 func_0028F910(s32 arg0, s32 *arg1);
-void func_0028FA10(void *arg0, InitParams *arg1);
+void func_0028FA10(ALCSPlayer *seqp, ALSeqpConfig *c); /* alCSPNew */
 void func_00290240(void *object, ALEvent *message);
 void func_00290C60(void *arg0);
 void func_00290CCC(void *arg0, Node_func_802AFD6C_de *arg1);

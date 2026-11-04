@@ -1,13 +1,16 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/libaudio.h"
 
-s32 alSynNew(s32, s32);
+void alSynNew(ALSynth *drvr, ALSynConfig *c);
 
-extern s32 D_800B7760[];
+extern ALGlobals *D_800B7760; /* alGlobals */
 
-void func_00293400(s32 arg0, s32 arg1) {
-    if (D_800B7760[0] == 0) {
-        D_800B7760[0] = arg0;
-        alSynNew(arg0, arg1);
+/* libultra's alInit (audio.c). The ROM keeps &alGlobals in a register. */
+void func_00293400(ALGlobals *g, ALSynConfig *c) {
+    ALGlobals **glob = &D_800B7760;
+
+    if (*glob == NULL) {
+        *glob = g;
+        alSynNew(&g->drvr, c);
     }
 }
