@@ -294,6 +294,25 @@ struct SndMgr {
     /* 0x2BC0 */ SndFx fx;
 }; /* size 0x2C00 */
 
+/* A sound source in a level's source list (rw_abu's SoundSourceNode): its
+ * play handle and sound, restarted at pos by func_00275E1C, dropped when the
+ * handle stops playing (func_00275E98). The list is a CList at 0x14 of its
+ * owner (func_00275EFC). */
+typedef struct SndSource {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ struct SndSource *next;
+    /* 0x08 */ s32 handle;
+    /* 0x0C */ union {
+        s32 w;
+        struct {
+            s16 hi;
+            s16 lo;    /* the sound id */
+        } h;
+    } sound;
+    /* 0x10 */ CVector3 pos;
+    /* 0x1C */ s32 flags;
+} SndSource; /* size 0x20 */
+
 /* A sound effect descriptor (SndInfo in rw/junk_types.h), read through the
  * accessors at 0x276820..0x2768BC. */
 typedef struct SoundEffectInfo {
