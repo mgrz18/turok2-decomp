@@ -16,16 +16,8 @@
 #include "ultra_types.h"
 #include "structs/vector.h"
 #include "structs/libaudio.h"
+#include "structs/list.h" /* CList (Rage Wars' IntrusiveList) */
 
-struct IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-typedef struct IntrusiveList IntrusiveList;
 struct Access_u8_3;
 struct Access_u8_3 {
     char pad[0x3];
@@ -55,8 +47,8 @@ struct CartridgeReadWorker {
     u8 reserved231[0xA48 - 0x231];
     u8 completionQueueStorage;
     u8 reservedA49[0x5068 - 0xA49];
-    IntrusiveList available;
-    IntrusiveList pending;
+    CList available;
+    CList pending;
 };
 struct Chunk {
     u32 source;
@@ -1020,7 +1012,7 @@ struct GameplayCamera {
     u8 pad56C[4];
     s8 unk570;
     char pad571[0xE40 - 0x571];
-    IntrusiveList objects;
+    CList objects;
     f32 unkE54;
     char padE58[0x3C];
     s8 unkE94;
@@ -1256,8 +1248,8 @@ struct NodeCode8028469C {
 typedef struct NodeCode8028469C NodeCode8028469C;
 struct PoolRecAt28V1;
 struct PoolRecAt28V1 {
-    IntrusiveList free;
-    IntrusiveList active;
+    CList free;
+    CList active;
     s32 baseLevel;
 };
 typedef struct PoolRecAt28V1 PoolRecAt28V1;
@@ -1650,8 +1642,8 @@ typedef struct SequenceState {
 } SequenceState;
 typedef struct SequenceCommand { s32 command; u16 duration; } SequenceCommand;
 typedef struct SoundVoicePool {
-    IntrusiveList available;
-    IntrusiveList playing;
+    CList available;
+    CList playing;
     s32 state;
 } SoundVoicePool;
 struct SoundSourceNode;
@@ -2217,7 +2209,7 @@ struct Draw {
     s32 allocationMode;
     void *model;
     char reserved10[0x10];
-    IntrusiveList recycled;
+    CList recycled;
 };
 struct Block10;
 typedef struct Block10 Block10;

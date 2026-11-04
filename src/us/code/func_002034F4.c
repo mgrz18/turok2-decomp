@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/cache.h"
 
 extern int D_800D8DCC;
 extern void *func_002034F4(s32 arg0, s32 arg1);
@@ -23,7 +24,7 @@ void *func_002034F4(s32 arg0, s32 arg1) {
     HashNode *node;
     void *value;
     void **out;
-    struct IntrusiveList *object;
+    CMemEntry *object;
     temp_a0 = __osDisableInt();
     temp_v1 = D_800D8DCC + 1;
     D_800D8DCC = temp_v1;
@@ -62,9 +63,9 @@ found:
     object = 0;
     if (value != 0) {
         object = *(void **)value;
-        object->prevOffset += 1;
-        object->nextOffset |= 0x100;
-        object->count = D_800D8DF0.field_0;
+        object->lockCount += 1;
+        object->flags |= MEMENTRY_FLAG_LOCKED;
+        object->age = D_800D8DF0.field_0;
         func_00200818(&D_800D81E0, object);
     }
     temp_v0 = __osDisableInt();

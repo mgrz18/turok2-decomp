@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002007F4(IntrusiveList *arg0);
-void func_002007F4(IntrusiveList *arg0) {
-    char *cursor = arg0->tail;
-    int stride = arg0->prevOffset;
+extern void func_002007F4(CList *arg0);
+void func_002007F4(CList *arg0) {
+    char *cursor = arg0->m_pTail;
+    int stride = arg0->m_LastOffset;
     int value = *(int *)(cursor + stride);
-    int count = arg0->count - 1;
-    arg0->count = count;
-    arg0->tail = value;
+    int count = arg0->m_nCount - 1;
+    arg0->m_nCount = count;
+    arg0->m_pTail = value;
 }

@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-int func_00200A9C(IntrusiveList *arg0, int arg1) {
-    int node = arg0->head;
+int func_00200A9C(CList *arg0, int arg1) {
+    int node = arg0->m_pHead;
     if (node != 0) {
         do {
             if (node == arg1) {
                 return 1;
             }
-            node = *(int *)(node + arg0->nextOffset);
+            node = *(int *)(node + arg0->m_NextOffset);
         } while (node != 0);
     }
     return 0;

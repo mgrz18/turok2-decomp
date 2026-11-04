@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "structs/list.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 void func_0029BB10(OSThread *thread);
@@ -24,13 +25,6 @@ struct B12Node {
                B12Node *prev;
                B12Node *next;
 };
-typedef struct B12List {
-               u8 *head;
-               u8 *tail;
-               s32 prevOff;
-               s32 nextOff;
-               s32 count;
-} B12List;
 typedef struct B12Bucket B12Bucket;
 struct B12Bucket {
               u32 unk0;
@@ -44,7 +38,7 @@ typedef struct B12Mgr {
                 B12Node ** stk;
                 B12Node * cur;
                 u8 * pool2;
-                B12List lists[2];
+                CList lists[2];
                 s32 tbl628[2];
                 s32 tbl630[2];
                 s32 f638;
@@ -54,7 +48,7 @@ typedef struct B12Mgr {
                 OSMesgQueue q870;
                 OSMesg buf870[0x40];
                 u8 stack[0x800];
-                 B12List lists3[3];
+                 CList lists3[3];
                  s32 tbl11C4[2];
                  s32 cnt;
                  OSMesgQueue q11D0;
@@ -76,8 +70,8 @@ extern u8 D_800D1CC0[];
 void CMutex__Construct(void *lock);
 u32 func_00266B80(void);
 u8 *func_002024E0(void *heap, u32 size);
-void CList__Construct(B12List *l, s32 prevOff, s32 nextOff);
-void CList__AddTail(B12List *l, void *n);
+void CList__Construct(CList *l, s32 prevOff, s32 nextOff);
+void CList__AddTail(CList *l, void *n);
 void CHashTable__Construct(u32 n);
 void D_002041E4(void *arg);
 void func_00202BB0(s32 unused, s32 id) {

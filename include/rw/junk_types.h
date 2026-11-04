@@ -16,6 +16,7 @@
 #include "ultra_types.h"
 #include "structs/vector.h"
 #include "structs/libaudio.h"
+#include "structs/list.h" /* CList (Rage Wars' B12List) */
 
 typedef struct B12Node B12Node;
 struct B12Node {
@@ -30,13 +31,6 @@ struct B12Node {
                B12Node *prev;
                B12Node *next;
 };
-typedef struct B12List {
-               u8 *head;
-               u8 *tail;
-               s32 prevOff;
-               s32 nextOff;
-               s32 count;
-} B12List;
 typedef struct B12Bucket B12Bucket;
 struct B12Bucket {
               u32 unk0;
@@ -50,7 +44,7 @@ typedef struct B12Mgr {
                 B12Node ** stk;
                 B12Node * cur;
                 u8 * pool2;
-                B12List lists[2];
+                CList lists[2];
                 s32 tbl628[2];
                 s32 tbl630[2];
                 s32 f638;
@@ -60,7 +54,7 @@ typedef struct B12Mgr {
                 OSMesgQueue q870;
                 OSMesg buf870[0x40];
                 u8 stack[0x800];
-                 B12List lists3[3];
+                 CList lists3[3];
                  s32 tbl11C4[2];
                  s32 cnt;
                  CMutex lock;          /* 0x11D0 (ultra_types.h) */

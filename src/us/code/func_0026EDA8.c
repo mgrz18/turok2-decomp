@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern s32 CList__AddTail(IntrusiveList *list, void *node);
+extern s32 CList__AddTail(CList *list, void *node);
 void func_0026EDA8(void *arg0) {
     extern void __osRestoreInt(s32 arg0);
     extern s32 __osDisableInt(void);
@@ -12,7 +12,7 @@ void func_0026EDA8(void *arg0) {
     void *next;
     s32 saved;
     saved = __osDisableInt();
-    node = ((PoolRecAt28V1 *)arg0)->active.head;
+    node = ((PoolRecAt28V1 *)arg0)->active.m_pHead;
     if (node != 0) {
         do {
             next = ((NodeCode8028469C *)node)->next;

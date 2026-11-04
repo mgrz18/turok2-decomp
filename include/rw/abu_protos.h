@@ -9,8 +9,8 @@
 struct CWorld; /* structs/world.h */
 
 s32 CList__AddHead(void *, s32);
-s32 CList__AddTail(IntrusiveList *list, void *node);
-void CList__Construct(IntrusiveList *list, s32 prevOffset, s32 nextOffset);
+s32 CList__AddTail(CList *list, void *node);
+void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 void CList__Remove(void *, s32);
 void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shadow, s32 alpha, s32 language);
 s32 Cinema_PathPlaying(void);
@@ -27,8 +27,8 @@ void alSynSetVol(void *, void *, s16, s32);
 void alSynStopVoice(ALSynth *, ALVoice *);
 s32 corrupted(OSPfs *pfs, __OSInodeUnit fpage, __OSInodeCache *cache);
 void func_002005D0(void *, s32, s32);
-void func_002007D0(IntrusiveList *arg0);
-void func_002007F4(IntrusiveList *arg0);
+void func_002007D0(CList *arg0);
+void func_002007F4(CList *arg0);
 void func_00200818(void *, s32);
 s32 func_00200B00(void ***, s32);
 s32 func_00200C40();
