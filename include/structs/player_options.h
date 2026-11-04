@@ -23,10 +23,10 @@ typedef struct CPlayerOptions {
     /* 0x28 */ u8 m_bActive;               /* joined the game */
     /* 0x29 */ u8 m_SettingX;              /* 0x80-centred, stepped by 8 in the menu */
     /* 0x2A */ u8 m_SettingY;              /* 0x80-centred, stepped by 8 in the menu */
-    /* 0x2B */ s8 unk_0x2B;
-    /* 0x2C */ u8 unk_0x2C;
-    /* 0x2D */ u8 unk_0x2D;
-    /* 0x2E */ u8 unk_0x2E;
+    /* 0x2B */ s8 m_ControlType;           /* 0: expert, 1: arcade */
+    /* 0x2C */ u8 m_ControlSide;           /* 0: right, 1: left */
+    /* 0x2D */ u8 m_bLookSpring;
+    /* 0x2E */ u8 m_bAutoAim;
     /* 0x2F */ s8 m_nController;
     /* 0x30 */ s8 m_nCharacter;            /* also the team in team games */
     /* 0x31 */ u8 m_ControlStyle;
