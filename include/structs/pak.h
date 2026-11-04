@@ -19,6 +19,14 @@ typedef struct PakDirectory {
     /* 0x004 */ OSPfsState notes[16];
 } PakDirectory; /* size 0x204 */
 
+/* A channel's Rumble Pak: what func_00426480 probes into D_80130AA0[4]
+ * (the pak states D_80130C60 follow it). */
+typedef struct RumblePak {
+    /* 0x00 */ u8 present;          /* osMotorInit succeeded */
+    /* 0x01 */ u8 _pad1[7];
+    /* 0x08 */ OSPfs pfs;
+} RumblePak; /* size 0x70 */
+
 /* The free-space query of the pak save menus (func_0041F0C8,
  * func_00457FE8), on the stack. */
 typedef struct PakQuery {
@@ -27,6 +35,7 @@ typedef struct PakQuery {
     /* 0x08 */ s32 freeNotes;       /* func_0042670C */
 } PakQuery; /* size 0xC */
 
+extern RumblePak D_80130AA0[];      /* per channel: its Rumble Pak */
 extern s32 D_80130C60[];            /* per channel: the pak state (3: mounted, directory read) */
 extern s32 D_80130C70[];            /* per channel: the last pak error (0: none) */
 extern OSPfs D_80130C80[];          /* per channel: the pak's file system */

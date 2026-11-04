@@ -14,23 +14,21 @@ extern void func_002858A4(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size);
 extern s32 func_004258E8(s32 ch);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
-
-extern u8 D_80130AA0[];
 extern u8 D_800F6778[][4];
 extern u8 D_800F6798[];
 extern s32 osMotorInit(void *queue, void *pfs, s32 channel);
 
 /* Probes slot ch for a Rumble Pak; returns whether one answered. */
 s32 func_00426C14(s32 ch) {
-    u8 *cur;
+    RumblePak *cur;
     s32 ready;
 
-    cur = D_80130AA0 + ch * 112;
+    cur = &D_80130AA0[ch];
     if (D_800F6778[ch][3] == 0) {
-        cur[0] = osMotorInit(D_800F6798, cur + 8, ch) == 0;
-        ready = cur[0];
+        cur->present = osMotorInit(D_800F6798, &cur->pfs, ch) == 0;
+        ready = cur->present;
     } else {
-        cur[0] = 0;
+        cur->present = 0;
         ready = 0;
     }
     return ready;
