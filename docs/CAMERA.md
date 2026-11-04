@@ -6,9 +6,9 @@ functions). Structs: [`include/structs/camera.h`](../include/structs/camera.h)
 (`CCamera`, `CCameraPool`, `CShake`, `CCameraText`, `CList`). Names in
 *italics* are LibTEngine's for the Turok 3 equivalent; the rest are ours.
 
-Status: **matched** (in `src/`, builds byte for byte), **nonmatching**
-(readable C in [`nonmatching/camera/`](../nonmatching/camera/), not yet the
-same bytes), **read** (understood, described here, not yet written).
+Status: **matched** (in `src/`, builds byte for byte) or **read**
+(understood, described here, not yet written). The last camera draft,
+`func_0027E000`, matched in the G pass and shares `func_0027D160`'s file.
 
 ## A frame
 
@@ -68,7 +68,7 @@ same bytes), **read** (understood, described here, not yet written).
 
 | Function | | Status |
 |---|---|---|
-| `func_0027E000` *DisplayListSetup* | pipe sync and the RDP setup lists; `gSPMatrix` (projection), `gSPPerspNormalize`; the `Vp` (scale = 2×size×warp scale, translation from it) and `gSPViewport`; `gDPSetScissor` clamped to the screen; both `LookAt`s. Then, unless it is the main camera with others active: the z buffer cleared (colour image at the z buffer, fill colour max z, fill rectangle), `G_FOG` on, `gSPFogPosition(m_FogStart, 1000)`, the fog colour (the camera's, black under game flag 0x4000, or a cinematic's) and the view cleared to it | nonmatching |
+| `func_0027E000` *DisplayListSetup* | pipe sync and the RDP setup lists; `gSPMatrix` (projection), `gSPPerspNormalize`; the `Vp` (scale = 2×size×warp scale, translation from it) and `gSPViewport`; `gDPSetScissor` clamped to the screen; both `LookAt`s. Then, unless it is the main camera with others active: the z buffer cleared (colour image at the z buffer, fill colour max z, fill rectangle), `G_FOG` on, `gSPFogPosition(m_FogStart, 1000)`, the fog colour (the camera's, black under game flag 0x4000, or a cinematic's) and the view cleared to it | matched |
 | `func_0027E770` *DrawScene* | the scene through the camera layer by layer (world, objects, effects, particles, sky, clip ratio, ...), then with game flag 0x200 a fill rectangle over the viewport | matched |
 | `func_0027C1E8` *DrawTints* | the fog colour over the view while the player is under water (AI flags 0x880) or a tint is forced (`D_800AE340`, colour `D_800F1FE4`); the screen flash; the red flash of a hit fading at `m_FlashDec` a frame; one more thing in game mode 13 | matched |
 | `func_0027F64C` | fill rectangles around the viewport: the borders of a split screen | matched |
