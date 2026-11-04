@@ -1,8 +1,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004449FC.c, func_004449FC, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game.h"
 #include "structs/menu.h"
 
-extern u16 D_8011AAE8; /* D_8011AAD8 + 0x10 */
 extern char D_800B4008[];
 extern char D_800B4020[];
 extern char D_800B4038[];
@@ -11,7 +11,7 @@ extern s32 func_004160F0(MenuItem *a);
 extern void func_0029E3E0(char *dst, char *fmt, ...);
 
 s32 func_0041C3C4(MenuItem *a) {
-    u32 h = D_8011AAE8 >> 4;
+    u32 h = D_8011AAD8.hudAlphaSetting.value >> 4;
 
     if (h == 0) {
         a->text = D_800B4008;

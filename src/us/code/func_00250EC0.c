@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/player.h"
 
@@ -21,11 +22,6 @@ typedef struct {
     /* 0x140 */ s32 flags;
 } Body;
 
-typedef struct {
-    u8 multiplayer;
-} GameMode;
-
-extern GameMode D_8011AAF1;
 extern u8 D_800F7078[];
 extern s16 D_800AE312[];        /* per character: climbing step sound (stride 4) */
 
@@ -155,7 +151,7 @@ void func_00250EC0(CPlayer *player, Body *body) {
         up = 0;
     }
     down = 0;
-    if (!D_8011AAF1.multiplayer && player->m_ContState.m_FinalMoveY < 0.0f) {
+    if (!D_8011AAD8.multiplayer && player->m_ContState.m_FinalMoveY < 0.0f) {
         down = 1;
     }
     lastForward = player->m_Speed;
@@ -182,7 +178,7 @@ void func_00250EC0(CPlayer *player, Body *body) {
         player->m_ModeTime = time - 11.25f;
         player->m_Speed *= 0.1f;
         player->m_SideSpeed *= 0.1f;
-        if (D_8011AAF1.multiplayer) {
+        if (D_8011AAD8.multiplayer) {
             if (player->m_pOptions->m_TagMode == 1) {
                 func_00275624(0x27DB);
             } else {

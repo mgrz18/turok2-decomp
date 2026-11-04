@@ -39,17 +39,16 @@ struct PoolRecAt28V1 {
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
 s32 func_002855E8(char *);
-extern char D_800F5C78;
 extern u32 D_8011AAE0[];
 s32 func_00454CC4(void) {
- if(((s32 (*)(char *))func_00285628)(&D_800F5C78)) {
+ if(((s32 (*)(char *))func_00285628)((char *)&D_800F5C78)) {
  switch(D_8011AAE0[0]) {
  case 8: D_8011AAE0[0]=32; break;
  case 16: D_8011AAE0[0]=8; break;
  case 32: D_8011AAE0[0]=16; break;
  }
  }
- if(((s32 (*)(char *))func_00285670)(&D_800F5C78) || func_002855E8(&D_800F5C78)) {
+ if(((s32 (*)(char *))func_00285670)((char *)&D_800F5C78) || func_002855E8((char *)&D_800F5C78)) {
  switch(D_8011AAE0[0]) {
  case 8: D_8011AAE0[0]=16; break;
  case 16: D_8011AAE0[0]=32; break;

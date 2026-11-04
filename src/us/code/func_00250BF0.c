@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/player.h"
 
@@ -22,11 +23,6 @@ typedef struct {
 } Body;
 
 extern f32 D_800B6D28;      /* frame time */
-typedef struct {
-    u8 multiplayer;
-} GameMode;
-
-extern GameMode D_8011AAF1;
 extern char D_800ADF00;     /* swimming look tuning */
 extern Tuning D_800ADEDC;   /* swimming move tuning */
 
@@ -63,7 +59,7 @@ void func_00250BF0(CPlayer *player, Body *body) {
     if (!(body->flags & 0x80) && 2.0f < player->m_ModeTime) {
         reset_strokes(&player->m_Barrel);
         body->climb = 0.0f;
-        if (!D_8011AAF1.multiplayer) {
+        if (!D_8011AAD8.multiplayer) {
             if (player->m_bOxygenOut) {
                 func_00275544(0x3AC3, player->m_CharacterActor.header.m_vPos, &player->m_CharacterActor.header.m_vPos, -1);
             } else if (52.5f < player->m_Oxygen) {

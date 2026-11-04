@@ -144,7 +144,7 @@ typedef struct CWorld {
     /* 0x018AC */ u8 unk_18AC[0x4];
     /* 0x018B0 */ u8 m_ParticleSystem[0x10518 - 0x18B0];
     /* 0x10518 */ u8 m_ActorPool[0x13B28 - 0x10518];
-    /* 0x13B28 */ u8 unk_13B28[0x18E50 - 0x13B28];
+    /* 0x13B28 */ CInstancePool m_InstancePool;     /* D_8010ABA0 (structs/game_object.h) */
     /* 0x18E50 */ CLevelHeader *m_pLevelHeader;
     /* 0x18E54 */ u8 unk_18E54[0x8];
     /* 0x18E5C */ u8 unk_18E5C[0x40];

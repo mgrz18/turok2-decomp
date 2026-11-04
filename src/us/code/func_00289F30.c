@@ -1,13 +1,10 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00294BB0.c, func_00294BB0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
+#include "common.h"
+#include "structs/game.h"
+
 /* Turok 2 layouts (Rage Wars offsets in parentheses). */
-typedef struct B21Game {
-    u8 pad0[0x23FF4];
-    s32 unk23FF4;       /* 0x23FF4 (0x26DD4) */
-} B21Game;
 typedef struct B21GameBlk {
     u8 pad0[0x44];
     s32 unk44;          /* 0x44 (0x88) */
@@ -25,7 +22,7 @@ s32 Cinema_PathPlaying();
 s32 func_00284408();
 s32 func_00284240();
 void func_00412B14();
-s32 func_00289F30(B21Game *g) {
+s32 func_00289F30(CEngineApp *g) {
     B21GameBlk *b;
     s32 r;
     if (func_00416AF8(D_80119850.sub5DC) == 0) {
@@ -35,7 +32,7 @@ s32 func_00289F30(B21Game *g) {
                 if (b->unk44 != 0) {
                     goto check;
                 }
-                if (g->unk23FF4 == 0) {
+                if (g->m_Settings.paused == 0) {
                     b->unk44 = 1;
                     func_00412B14();
                 }

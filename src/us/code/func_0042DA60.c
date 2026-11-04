@@ -1,14 +1,10 @@
 /* CPlayer code: func_0042DA60, 0x0042DA60-0x0042DC18 (splat had it inside the data D_0042D50C). */
 #include "common.h"
+#include "structs/game.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
 
-typedef struct GameMode {
-    u8 multiplayer;
-} GameMode;
-
-extern GameMode D_8011AAF1;
 extern f32 D_800A6A98; /* 0.5f, in the engine's .rodata */
 
 extern void func_0021E6AC(void *obj, void *rec, s32 mode, s32 index);
@@ -33,14 +29,14 @@ void func_0042DA60(CPlayer *p, void *rec, s32 mode) {
     p->m_CharacterActor.m_dwFlags |= 0x10000;
     p->m_CharacterActor.m_dwFlags |= 0x1000000;
     p->m_CharacterActor.m_dwFlags |= 0x2000000;
-    if (!D_8011AAF1.multiplayer) {
+    if (!D_8011AAD8.multiplayer) {
         p->m_CharacterActor.m_dwFlags |= 0x10000000;
     }
     p->m_CharacterActor.m_AI.m_pfCalculateOrientationMatrix = func_0021E840;
     p->m_CharacterActor.m_AI.m_pfEffects = func_00256738;
     p->m_CharacterActor.m_AI.m_pfHurt = func_00247C10;
     p->m_CharacterActor.m_AI.m_pfHit = func_0025689C;
-    if (D_8011AAF1.multiplayer) {
+    if (D_8011AAD8.multiplayer) {
         p->m_CharacterActor.m_AI.m_pfDraw = func_00247FB0;
     }
 

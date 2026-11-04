@@ -17,30 +17,16 @@ extern s32 D_800B6D54;
 extern u8 D_800F7078[];
 extern s32 D_8011001C;
 
-/* A pooled instance: a CGameObjectInstance plus the pool bookkeeping. */
-typedef struct SceneEffect {
-    /* 0x000 */ CGameObjectInstance obj;
-    /* 0x288 */ u8 pad288[0x290 - 0x288];
-    /* 0x290 */ s32 *ref;
-    /* 0x294 */ u8 pad294[4];
-} SceneEffect;                          /* 0x298 bytes */
-
-typedef struct SceneEffectPool {
-    /* 0x0000 */ SceneEffect effects[0x20];
-    /* 0x5300 */ CList freeEffects;
-    /* 0x5314 */ CList activeEffects;
-} SceneEffectPool;
-
 /* func_002283FC without the owner counter. */
-static __inline__ CGameObjectInstance *take_free_instance(SceneEffectPool *world) {
+static __inline__ CGameObjectInstance *take_free_instance(CInstancePool *world) {
     CGameObjectInstance *node;
 
-    if (D_8011001C != 0 || (u32)world->activeEffects.m_nCount < 3) {
-        node = (CGameObjectInstance *)world->freeEffects.m_pHead;
+    if (D_8011001C != 0 || (u32)world->m_ActiveList.m_nCount < 3) {
+        node = (CGameObjectInstance *)world->m_FreeList.m_pHead;
         if (node != NULL) {
-            CList__Remove(&world->freeEffects, node);
-            CList__AddHead(&world->activeEffects, node);
-            ((SceneEffect *)node)->ref = 0;
+            CList__Remove(&world->m_FreeList, node);
+            CList__AddHead(&world->m_ActiveList, node);
+            ((CListedInstance *)node)->m_pOwnerCount = 0;
         }
         return node;
     }
@@ -57,7 +43,7 @@ typedef struct {
     /* 0x30 */ CVector3 scale;
 } SpawnInfo;
 
-CGameObjectInstance *func_00227EE8(SceneEffectPool *world, CGameObjectInstance *src) {
+CGameObjectInstance *func_00227EE8(CInstancePool *world, CGameObjectInstance *src) {
     s32 kind = src->header.m_Type;
     s32 type = (u16)src->m_nTypeFlag;
     void *intelligence = src->header.m_pIntelligence;

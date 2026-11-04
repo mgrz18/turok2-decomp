@@ -292,25 +292,41 @@ views were replaced in about 230 files. Still local, and why:
   func_0025C018, func_0025D474, func_0025F3A4, func_0025FE18,
   func_0025FEB0, func_002620B4, func_002623EC, func_00262D74,
   func_00263A20, func_0026426C.
-- **CListedInstance**: the Effect (func_002280B0, func_00228484,
-  func_0022D2FC), Enemy (func_00401E30, func_004021C8, func_00402404) and
-  Enemy0040457C views are the same 0x294-byte object.
+- **CListedInstance** (done, u3): the D_8010FEB4 views and the pool
+  functions use CListedInstance (0x298) / CInstancePool (D_8010ABA0,
+  CWorld.m_InstancePool). func_0022D2FC's Effect is not one: it is the
+  particle effect (fields to 0x1D0, in the 0xEC00 effect system), for the
+  particle family. D_80119890 (the player list head): the GameState views read D_80119870;
+  M04Node, PlayerEntry, Player_40CFC4 are CPlayer. Left: the CPlayer views
+  of D_80119890 in func_0022A4C8 (ProjNode, also the projectile's target),
+  func_0022AFB4, func_00230AB0, func_0040F240 / func_00448240 (Actor) and
+  func_00407F20 (its 0x9D0 bossKilled[5] is m_Data.m_bLevel1TotemFlags...
+  in player.h: one of the two names is wrong).
 - **BossWeakSpot.anim** (structs/boss.h) is a ScriptAnimator but stays a
   `u8[0x64]`: its 7 users pass it as a pointer (`state->slots[i].anim`);
   typing it needs `&` in each.
-- **D_800F6CB0** (CEngineApp, game.h): only the GameSettings at 0x23E28 and
-  CGame (+0x22BC0) are laid out. Left local: func_0040EDB0 (D_8013023C), the
-  Rage Wars imports func_00284080, func_002841D0, func_002844F0 (rw/ types),
-  and the engine views that use other parts of D_800F6CB0 (func_00286440,
-  func_00286674, func_00287248, func_00287ABC, func_00288B1C, func_0028932C,
-  func_00289910, func_00289F30, func_002718D0, func_002718E0).
-- **CGame** (`D_80119870`): func_00262D74, func_002892D8, func_00289C0C
-  reach it as D_8011AAD8 - 0x1268 (the ROM uses that symbol); the D_801198B0
-  and D_80119E2C users keep those symbols (Game/MenuMatchGlobals/Globals
-  views).
-- **ControllerProfile** (`D_800F5EC0`): func_0027BB80 (reaches the four
-  through D_800F5F6C = D_800F5EC0 + 0xAC) and the differing declarations of
-  D_800F5C78 (the merged fifth profile).
+- **D_800F6CB0** (CEngineApp, game.h; done, u3): laid out after Turok 3's
+  CEngineApp (references/turok3/include/tengine.h): CFrameData m_FrameData[3],
+  m_pCurrentFrameData (D_800F7070), m_CartridgeIndex, the world, CGame m_Game
+  (m_Settings is also a direct member). The engine views use it; the files
+  that include game.h take D_800F6CB0 from it. Left: the ~30 other files
+  declaring D_800F6CB0 as u8[] / s32 (they only pass its address), the
+  CFrameData views of D_800F7070 (GfxTask, FrameBuffers, FrameRef...: the
+  type is in game.h now) and func_0028A43C / func_0028A914 (View /
+  FrameSchedule arrays based at D_800F6CB0), the Rage Wars imports
+  func_00284080, func_002841D0, func_002844F0 and func_0042D1C0 (CSun, still
+  rw/ types).
+- **Fields of GameSettings / CGame with symbols of their own** (u3): most
+  views now read D_8011AAD8 / D_80119870 fields (the offsets resolve to the
+  same addresses). Kept, because the code changes through the other symbol:
+  func_00256E6C (D_8011AAF1 view), func_00221210 and func_00221D3C
+  (D_8011AAE0 view), the u8 D_8011AAF1 of func_0042E14C, func_0042E29C,
+  func_0046706C, func_004671BC, func_00271694 (D_801198B0 view to the mode),
+  func_00249358 / func_002478C8 / func_002237C4 (CGameFromCameraPool),
+  func_00262D74 (a CAI file), func_00289C0C and func_002892D8 (based on
+  D_8011AAD8 / D_8011ACB0), func_002712E8 (a Rage Wars MenuMatchGlobals whose offsets do not fit).
+- **ControllerProfile** (done, u3): D_800F5C78 is declared in controller.h;
+  func_0027BB80 reads D_800F5EC0[i] (it matches).
 - The rw/ header leftovers (above): junk_types.h vs abu_types.h libaudio
   internals; junk's B12List and abu's IntrusiveList are CList.
 - The top of the census below: Obj (28 files, mostly a view of the

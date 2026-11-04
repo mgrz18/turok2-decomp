@@ -65,5 +65,6 @@ typedef struct ControllerProfile {
 } ControllerProfile; /* size 0x224 */
 
 extern ControllerProfile D_800F5EC0[4];
+extern ControllerProfile D_800F5C78;   /* the four merged */
 
 #endif

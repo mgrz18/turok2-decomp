@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/controller.h"
 
 /* What this reads of the state at D_800F56B0. */
 typedef struct {
@@ -9,21 +10,7 @@ typedef struct {
     /* 0x1B4 */ s32 m_Value;
 } State800F56B0;
 
-/* ControllerProfile (structs/controller.h) seen from its previousButtons:
- * the ROM addresses the four through D_800F5F6C = D_800F5EC0 + 0xAC, so this
- * file keeps that symbol and this local view. */
-typedef struct {
-    /* 0x00 */ s32 m_Prev;     /* previousButtons */
-    /* 0x04 */ s32 m_Held;     /* buttons */
-    /* 0x08 */ s32 m_Pressed;  /* buttonsSingle */
-    /* 0x0C */ s32 m_unkC;     /* buttonsSingleNoHold */
-    /* 0x10 */ s32 m_unk10;    /* buttonsDouble */
-    /* 0x14 */ s32 m_unk14;    /* buttonsRepeat */
-    /* 0x18 */ u8 _pad[0x224 - 0x18];
-} PadState;
-
 extern State800F56B0 D_800F56B0;
-extern PadState D_800F5F6C[4];
 
 void func_0042F344(void);
 
@@ -43,10 +30,10 @@ void func_0027BB80(void) {
     if (func_0027BC34()) {
         func_0042F344();
         for (i = 0; i < 4; i++) {
-            D_800F5F6C[i].m_unkC = 0;
-            D_800F5F6C[i].m_unk10 = 0;
-            D_800F5F6C[i].m_unk14 = 0;
-            D_800F5F6C[i].m_Pressed = (D_800F5F6C[i].m_Prev ^ D_800F5F6C[i].m_Held) & D_800F5F6C[i].m_Held;
+            D_800F5EC0[i].buttonsSingleNoHold = 0;
+            D_800F5EC0[i].buttonsDouble = 0;
+            D_800F5EC0[i].buttonsRepeat = 0;
+            D_800F5EC0[i].buttonsSingle = (D_800F5EC0[i].previousButtons ^ D_800F5EC0[i].buttons) & D_800F5EC0[i].buttons;
         }
     }
 }

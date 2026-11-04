@@ -1,6 +1,7 @@
 /* Second VM module twin of func_0040457C (same source, same link address). */
 /* FAKEMATCH: the player lookup is written twice under an always-true test (found by the permuter): GCC merges the copies, but the doubled refs give actor $s2 and nextWave $s3 as in the ROM; with one call the two swap (26 words), and a do{}while(0) instead lets loop.c hoist &D_80119870 above the actor->pos loads (5 words). */
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/game.h"
 
 typedef struct {
@@ -55,18 +56,6 @@ typedef struct {
     /* 0x424 */ s32 resetRegion;
 } ModeState0040457C;
 
-typedef struct Enemy0040457C {
-    /* 0x000 */ u8 pad0[0x144];
-    /* 0x144 */ s32 health;
-    /* 0x148 */ u8 pad1[0x1EC - 0x148];
-    /* 0x1EC */ s32 unk1EC;
-    /* 0x1F0 */ f32 range;
-    /* 0x1F4 */ s32 unk1F4;
-    /* 0x1F8 */ s32 region;
-    /* 0x1FC */ u8 pad2[0x28C - 0x1FC];
-    /* 0x28C */ struct Enemy0040457C *next;
-} Enemy0040457C;
-
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ Vec3_0040457C pos;
@@ -83,7 +72,7 @@ typedef struct {
 
 extern ModeState0040457C D_8012F608;
 extern u8 D_8010ABA0[];
-extern Enemy0040457C *D_8010FEB4;
+extern CListedInstance *D_8010FEB4;
 extern s32 D_800F1F50;
 Entity0040457C *func_002532EC(void *game, Vec3_0040457C pos);
 void func_00243414(void *actor, void *ai, s32 event);
@@ -106,7 +95,7 @@ void func_0043D57C(Entity0040457C *actor, void *level) {
     Vec3_0040457C pos;
     s32 nextWave = 0;
     Entity0040457C *player;
-    Enemy0040457C *enemy;
+    CListedInstance *enemy;
     Wave0040457C *wave;
     s32 extra;
     f32 delay;
@@ -211,12 +200,12 @@ void func_0043D57C(Entity0040457C *actor, void *level) {
         }
     }
     D_8012F608.enemiesAlive = 0;
-    for (enemy = D_8010FEB4; enemy != NULL; enemy = enemy->next) {
-        enemy->unk1EC = 0;
-        enemy->range = 768.0f;
-        enemy->unk1F4 = 0;
-        enemy->region = D_8012F608.region;
-        if (enemy->health > 0) {
+    for (enemy = D_8010FEB4; enemy != NULL; enemy = enemy->m_pNext) {
+        enemy->m_Instance.m_AI.m_vLeashPos.x = 0;
+        enemy->m_Instance.m_AI.m_vLeashPos.y = 768.0f;
+        enemy->m_Instance.m_AI.m_vLeashPos.z = 0;
+        enemy->m_Instance.m_AI.m_pLeashRegion = (struct CGameRegion *)D_8012F608.region;
+        if (enemy->m_Instance.m_AI.m_Health > 0) {
             D_8012F608.enemiesAlive++;
         }
     }

@@ -10,9 +10,9 @@ extern char D_800B4008[];
 extern char D_800B4020[];
 extern char D_800B4038[];
 
-/* Shows setting 0x10 in sixteenths: two fixed lines for 0 and 16, otherwise the number. */
+/* Shows the HUD alpha setting in sixteenths: two fixed lines for 0 and 16, otherwise the number. */
 s32 func_00455324(MenuItem *item) {
-    s32 value = D_8011AAD8.unk10 >> 4;
+    s32 value = D_8011AAD8.hudAlphaSetting.value >> 4;
 
     if (value == 0) {
         item->text = D_800B4008;
