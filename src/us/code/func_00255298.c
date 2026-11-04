@@ -7,11 +7,6 @@ extern void func_0024E5F0(CPlayer *player, CGameObjectInstance *other, s32 mode)
 #define PLAYER_MODE(p) (*(s16 *)((u8 *)(p) + 0xA08))
 #define PLAYER_FLAGS_A1C(p) (*(s32 *)((u8 *)(p) + 0xA1C))
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 flags;
-} Intelligence;
-
 static __inline__ s32 InMode10To12(CPlayer *player) {
     s32 mode = PLAYER_MODE(player);
 
@@ -27,7 +22,7 @@ s32 func_00255298(CPlayer *player, CGameObjectInstance *actor) {
     if (InMode10To12(player)) {
         return 0;
     }
-    if (((Intelligence *)actor->header.m_pIntelligence)->flags & 1) {
+    if (actor->header.m_pIntelligence->m_dwTypeFlags & 1) {
         if (PLAYER_MODE(player) == 0x23) {
             return 0;
         }

@@ -7,11 +7,6 @@ typedef struct {
 } PlayerOptions;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s16 index;
-} Intelligence;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x19];
     /* 0x019 */ u8 field19;
     /* 0x01A */ u8 pad1A[0x20C - 0x1A];
@@ -37,7 +32,7 @@ void func_002541E4(CPlayer *player) {
                && ((PlayerOptions *)player->m_pOptions)->field3E != 0) {
         id = D_800ADB5C;
     } else {
-        id = D_800ADB30[((Intelligence *)player->m_CharacterActor.header.m_pIntelligence)->index];
+        id = D_800ADB30[player->m_CharacterActor.header.m_pIntelligence->m_Id];
     }
     func_002241D8(D_800F7078, player, id, PLAYER_C04(player));
 }
