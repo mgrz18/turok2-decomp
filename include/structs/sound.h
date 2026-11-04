@@ -16,7 +16,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
-#include "structs/libaudio.h" /* ALHeap, ALBank, ALFilter, Acmd... */
+#include "structs/libaudio.h" /* ALHeap, ALBank, ALSndPlayer, ALSndpConfig, Acmd... */
 #include "structs/game_object.h" /* CVector3 */
 
 typedef struct SndMgr SndMgr;
@@ -162,11 +162,11 @@ typedef struct {
 
 struct SndMgr {
     /* 0x0000 */ u8 pad0[0x24];
-    /* 0x0024 */ s32 playerConfig[3];  /* ALSndpConfig: maxSounds, maxEvents, heap */
+    /* 0x0024 */ ALSndpConfig playerConfig;
     /* 0x0030 */ u8 pad30[0x4C];
     /* 0x007C */ ALBank *bank;         /* bankFile->bankArray[0] */
     /* 0x0080 */ ALBankFile *bankFile;
-    /* 0x0084 */ u8 player[0x54];      /* ALSndPlayer */
+    /* 0x0084 */ ALSndPlayer player;
     /* 0x00D8 */ s32 soundState;
     /* 0x00DC */ s16 handles[16];
     /* 0x00FC */ u8 padFC[6];

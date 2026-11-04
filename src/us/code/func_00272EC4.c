@@ -29,8 +29,8 @@ static __inline__ f32 centsToPitch(f32 x) {
 static __inline__ void setPitch(SndVoice *s, f32 pitch) {
     SndMgr *bank = s->mgr;
 
-    func_00293E60(bank->player, bank->handles[s->index]);
-    func_00293DE0(bank->player, pitch * s->vp.doppler * s->pitchScale);
+    func_00293E60(&bank->player, bank->handles[s->index]);
+    func_00293DE0(&bank->player, pitch * s->vp.doppler * s->pitchScale);
 }
 
 void func_00272EC4(SndVoice *s) {

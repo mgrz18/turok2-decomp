@@ -12,7 +12,7 @@ s32 func_00274A98(SndVoicePool *p, s16 idx) {
     (v) = (SndVoice *)((idx) * 0xCC + (u32)(p)); (v) = (SndVoice *)((u8 *)(v) + 4);
     m = v->mgr;
     c = (SndCore *)((u8 *)m + 0x7C);
-    func_00293530(m->player, c->snd[v->index]);
+    func_00293530(&m->player, c->snd[v->index]);
     c->snd[v->index] = -1;
     v->vp.priority = 0;
     v->id = -1;

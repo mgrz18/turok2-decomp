@@ -48,7 +48,7 @@ s32 func_002706A0(SndMgr *m, s32 id)
     return -1;
   }
   p = (SndVoiceParams *) ((u8 *)((((s16) idx) * 0xCC) + (u32) m) + 0x1DCC);
-  pl = m->player;
+  pl = &m->player;
   if (p->vol == 0)
   {
     if (!((*((u32 *) ((((u8 *) m) - (-(((s16) idx) * 0xCC))) + 0x1E60))) & 4))

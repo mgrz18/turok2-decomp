@@ -112,10 +112,10 @@ void func_00270240(SndMgr *m) {
             }
         }
     }
-    m->playerConfig[0] = 0x11;
-    m->playerConfig[1] = 0xC0;
-    m->playerConfig[2] = (s32)&m->heap;
-    func_002935B0(m->player, m->playerConfig);
+    m->playerConfig.maxSounds = 0x11;
+    m->playerConfig.maxEvents = 0xC0;
+    m->playerConfig.heap = &m->heap;
+    func_002935B0(&m->player, &m->playerConfig);
     for (n = 0; n < 16; n++) {
         m->handles[n] = -1;
     }
