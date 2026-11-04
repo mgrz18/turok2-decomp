@@ -1,31 +1,21 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/CODE_8023CBF8.CPP, func_8023CDD4_de, with Turok 2's layouts. */
 #include "common.h"
-
-/* Page region, followed by its page map. */
-typedef struct Region {
-    struct Region *next; /* 0x00 */
-    u16 start;           /* 0x04 first page */
-    u16 pages;           /* 0x06 */
-    u8 pad8[0x8];
-    u8 *map;             /* 0x10 */
-    u8 pad14[0x4];
-} Region; /* size 0x18 */
+#include "structs/pager.h"
 
 typedef struct {
     u8 pad0[0x4];
     s32 size;            /* 0x04 */
-    Region *region;      /* 0x08 */
+    PageRegion *region;      /* 0x08 */
     void *mq;            /* 0x0C reply queue */
 } RegionDesc;
 
 s32 osSendMesg(void *mq, void *msg, s32 flag);
 
-extern Region D_80121378; /* region list head */
 
 void func_0028EC54(RegionDesc *desc) {
-    Region *p;
-    Region *prev;
-    Region *r;
+    PageRegion *p;
+    PageRegion *prev;
+    PageRegion *r;
     u32 start;
     s32 pages;
     s32 count;

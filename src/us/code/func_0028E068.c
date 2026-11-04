@@ -14,8 +14,6 @@ typedef struct FaultedThread {
     /* 0x124 */ u32 badVaddr;
 } FaultedThread;
 
-extern PageMapping *D_80121290;    /* D_801206A0.chain.head */
-extern PageMapping *D_80121294;    /* D_801206A0.chain.tail */
 extern OSMesgQueue D_80121178;
 extern s32 D_800B7658;
 

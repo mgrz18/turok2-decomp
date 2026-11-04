@@ -90,5 +90,8 @@ typedef struct Pager {
 } Pager; /* size 0xCF8 */
 
 extern Pager D_801206A0;
+extern PageMapping *D_80121290;    /* D_801206A0.chain.head */
+extern PageMapping *D_80121294;    /* D_801206A0.chain.tail */
+extern PageRegion D_80121378;     /* D_801206A0.regions, the head of the region list */
 
 #endif

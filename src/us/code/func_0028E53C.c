@@ -1,26 +1,16 @@
 #include "common.h"
+#include "structs/pager.h"
 
 /* Four words of memory stats ending at D_801206BC. */
 extern s32 D_801206BC;
 extern u32 D_80120FCC;
-typedef struct {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ s32 unkC;
-} Unk80121290;
-extern Unk80121290 *D_80121290;
 
 /* Byte-offset field access: a struct member reference here reorders the
  * stores below. */
 #define FIELD_AT(ptr, type, T, field) (*(type *)((s8 *)(ptr) + (s32) &((T *)0)->field))
-typedef struct Region80121378 {
-    /* 0x0 */ struct Region80121378 *next;
-    /* 0x4 */ u16 start;   /* first page */
-    /* 0x6 */ u16 pages;   /* in 4 KB units */
-} Region80121378;
-extern Region80121378 D_80121378;
 
 void func_0028E53C(void) {
-    Region80121378 *var_v1;
+    PageRegion *var_v1;
     s32 var_a0_2;
     s32 var_a1;
     u16 temp_v0;
@@ -57,5 +47,5 @@ void func_0028E53C(void) {
     *(s32 *)((s8 *)&D_801206BC + 0) = var_a0_2;     /* total pages << 12 */
     *(s32 *)((s8 *)&D_801206BC - 0xC) = var_a2;   /* largest counter */
     *(s32 *)((s8 *)&D_801206BC - 0x8) = var_a3;   /* smallest counter */
-    *(s32 *)((s8 *)&D_801206BC - 0x4) = FIELD_AT(D_80121290, s32, Unk80121290, unkC);
+    *(s32 *)((s8 *)&D_801206BC - 0x4) = FIELD_AT(D_80121290, s32, PageMapping, age);
 }
