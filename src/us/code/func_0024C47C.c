@@ -69,6 +69,7 @@ void func_0024C47C(CBarrel *menu, CPlayer *player) {
 
 #include "gfx.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 /* An animated HUD item (func_00277328 ticks it, func_0027AD00 restarts it). */
 typedef struct {
@@ -585,10 +586,6 @@ typedef struct PlayerStateInfo {
     /* 0x0C */ u8 padC[0x18 - 0xC];
 } PlayerStateInfo;
 
-
-typedef struct DamageEvent {
-    s32 w[6];
-} DamageEvent;
 
 extern f32 D_800B6D28;              /* frame time */
 extern s32 D_8011AAA0;

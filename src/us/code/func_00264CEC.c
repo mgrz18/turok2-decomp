@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    u8 data[0x18];
-} DamageEvent;
+#include "structs/collision.h"
 
 extern u8 *D_800F1CE0; /* player actor */
 void func_00245828(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, s32 arg5);

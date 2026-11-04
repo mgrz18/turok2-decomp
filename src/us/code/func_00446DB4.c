@@ -2,15 +2,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "structs/collision.h"
 
 /* Damage callback of the second boss' minions: takes the damage, plays the minion's hit effect at most every
  * 2.25 s, and at zero health goes to anim state 6. */
 
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s32 damage;
-} DamageEvent;
 
 extern BlindOneState D_80130200;
 extern u8 D_00432384[];

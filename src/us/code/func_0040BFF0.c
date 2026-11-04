@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 /* When the player (D_800F1CE0) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
  * away from the point (0, 0, 512) (and upward) and deals it 0x500 damage. */
@@ -19,10 +20,6 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x4];
     /* 0x04 */ CVector3 pos;
 } Obj;
-
-typedef struct {
-    u8 data[0x18];
-} DamageEvent;
 
 extern Player *D_800F1CE0;
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */

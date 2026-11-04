@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "structs/collision.h"
 
 typedef struct Object Object;
 
@@ -24,19 +25,6 @@ struct Object {
     /* 0x27C */ u32 fxFlags;
 };
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x65];
-    /* 0x65 */ u8 flags;
-} HitRegion;
-
-typedef struct {
-    /* 0x00 */ Object *source;
-    /* 0x04 */ s32 amount;
-    /* 0x08 */ f32 force;
-    /* 0x0C */ u32 flags;
-    /* 0x10 */ HitRegion *region;
-} Damage;
-
 extern s32 D_80110048;          /* level */
 extern s32 D_8011001C;
 extern s32 D_8011AAD8;          /* cheats */
@@ -49,7 +37,7 @@ void func_00243414(Object *obj, CAI *ai, s32 state);
 void func_002755B0(s16 sound, CVector3 pos, s32, s32, f32 volume);
 s32 func_002113A4(void);
 void func_00246918(Object *obj, CAI *ai);
-s32 func_0025B078(Object *obj, CAI *ai, Damage *dmg);
+s32 func_0025B078(Object *obj, CAI *ai, DamageEvent *dmg);
 void func_004089C8(void);
 s32 func_0025DF04(Object *obj, CAI *ai);
 s32 func_00219F74(Object *obj, s32 node, s32);
@@ -63,7 +51,7 @@ f32 func_0020EAA0(CVector3 *v);
 /* AI damage: retarget the attacker, take the health, play the hurt sound and
  * pick the death, fall or flinch reaction; a knock back turns the actor to
  * face the push when the source was near enough. */
-void func_0025B2D4(Object *obj, CAI *ai, Damage *dmg) {
+void func_0025B2D4(Object *obj, CAI *ai, DamageEvent *dmg) {
     CVector3 delta;
     s32 pushed;
     Object *attacker;
@@ -81,7 +69,7 @@ void func_0025B2D4(Object *obj, CAI *ai, Damage *dmg) {
     s32 anim;
     s32 node;
     s32 slot;
-    HitRegion *region;
+    HitFrame *region;
 
     attacker = NULL;
     pushed = 0;
@@ -113,7 +101,7 @@ void func_0025B2D4(Object *obj, CAI *ai, Damage *dmg) {
                         func_00243414(obj, ai, 0x1F);
                     }
                     if (info->m_dwFlags & 0x40000) {
-                        dmg->amount += 0x3200;
+                        dmg->damage += 0x3200;
                         ai->m_OnFireTimer += 60.0f;
                     }
                 }
@@ -151,7 +139,7 @@ void func_0025B2D4(Object *obj, CAI *ai, Damage *dmg) {
         func_0025E52C(obj, ai, (CVector3 *)D_800B06A0, 3);
     }
     health = ai->m_Health;
-    left = health - dmg->amount;
+    left = health - dmg->damage;
     if (left < 0) {
         left = 0;
     }
@@ -170,7 +158,7 @@ void func_0025B2D4(Object *obj, CAI *ai, Damage *dmg) {
         func_002755B0(info->m_PainSound, obj->pos, 0, -1, volume);
         ai->m_LastHurtSFXTimer = 0;
     }
-    ai->m_Aggression = (ai->m_Aggression + dmg->amount < 255) ? 255 : ai->m_Aggression + dmg->amount;
+    ai->m_Aggression = (ai->m_Aggression + dmg->damage < 255) ? 255 : ai->m_Aggression + dmg->damage;
     if ((dmg->flags & 0x400000) && func_002113A4() % 1000 < 500) {
         dmg->flags = 0x800000;
     }
@@ -205,7 +193,7 @@ void func_0025B2D4(Object *obj, CAI *ai, Damage *dmg) {
             }
         }
     } else {
-        region = dmg->region;
+        region = dmg->frame;
         if (region != NULL && !(ai->m_Mode >= 0x1C && ai->m_Mode < 0x23) && (region->flags & 3) == 2) {
             if (!(region->flags & 4)) {
                 if ((index == 0 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x1F)) || (index == 1 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x3E0))
@@ -228,9 +216,9 @@ void func_0025B2D4(Object *obj, CAI *ai, Damage *dmg) {
             pushed = 1;
         }
     }
-    if (pushed && source != NULL && dmg->force > 0.0f) {
+    if (pushed && source != NULL && dmg->radius > 0.0f) {
         func_0020EF2C(&delta, &obj->pos, &source->pos);
-        if (func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z) < dmg->force) {
+        if (func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z) < dmg->radius) {
             func_0020EAA0(&delta);
         }
     }

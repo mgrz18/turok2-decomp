@@ -1,11 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 extern CListedInstance *D_8010FEB4;  /* active actors */
-
-typedef struct {
-    u8 data[0x18];
-} DamageEvent;
 
 extern f32 func_0021149C(f32 scale);                                      /* random 0..scale */
 extern void func_00246690(void *actor, s32 event, CVector3 pos, s32 arg);

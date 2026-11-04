@@ -42,14 +42,17 @@ typedef struct CCollisionInfo {
     /* 0x18 */ f32 m_WaterFriction;
 } CCollisionInfo; /* size 0x1C */
 
-/* What a hit on an instance's node copies into the results (0x70 bytes). */
+/* A hittable node of an instance (Rage Wars calls it a shield): what a hit on
+ * it copies into the results (m_Frame, 0x70 bytes; D_800F1CF8 is the copy in
+ * D_800F1CE0) and what a DamageEvent carries. */
 typedef struct HitFrame {
     /* 0x00 */ s32 unk_00[0x19];
     /* 0x64 */ u8 unk_64;
-    /* 0x65 */ u8 m_Surface;
-    /* 0x66 */ u8 m_Team;
+    /* 0x65 */ u8 flags;                       /* & 3: 2 a limb; 4: the right side */
+    /* 0x66 */ u8 action;
     /* 0x67 */ u8 unk_67;
-    /* 0x68 */ s32 unk_68[2];
+    /* 0x68 */ f32 damageFactor;
+    /* 0x6C */ s32 unk_6C;
 } HitFrame; /* size 0x70 */
 
 /* What the last collision test hit (D_800F1CE0, 0xF0), one record per kind
@@ -185,5 +188,17 @@ typedef struct CollisionQuad {
     /* 0x00 */ CVector3 corner[4];
     /* 0x30 */ CVector3 normal;
 } CollisionQuad; /* size 0x3C */
+
+/* A hit to deal (Rage Wars' Shared_DamageEvent): func_00245828 fills it,
+ * the AI's damage handlers (func_002465C8, func_0025B2D4, func_00247C10
+ * for the player...) take it. */
+typedef struct DamageEvent {
+    /* 0x00 */ void *source;                   /* what deals it (NULL: the world) */
+    /* 0x04 */ s32 damage;
+    /* 0x08 */ f32 radius;
+    /* 0x0C */ s32 flags;                      /* 0x400000: an explosion */
+    /* 0x10 */ HitFrame *frame;                /* the node hit (Rage Wars: shield) */
+    /* 0x14 */ u8 pad14[4];
+} DamageEvent; /* size 0x18 */
 
 #endif

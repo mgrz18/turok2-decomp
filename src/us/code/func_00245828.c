@@ -1,17 +1,11 @@
 #include "common.h"
+#include "structs/collision.h"
 
-typedef struct {
-    /* 0x00 */ s32 a;
-    /* 0x04 */ s32 b;
-    /* 0x08 */ s32 c;
-    /* 0x0C */ s32 d;
-    /* 0x10 */ s32 e;
-} Words5;
-
-void func_00245828(Words5 *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    arg0->a = arg1;
-    arg0->b = arg2;
-    arg0->c = arg3;
-    arg0->d = arg4;
-    arg0->e = arg5;
+/* Fills a damage event. */
+void func_00245828(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, HitFrame *frame) {
+    event->source = source;
+    event->damage = damage;
+    event->radius = radius;
+    event->flags = flags;
+    event->frame = frame;
 }
