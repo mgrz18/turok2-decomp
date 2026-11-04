@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
@@ -7,24 +8,6 @@
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
  * if it is unlocked), kind 1 a particle effect, kind 2 a pickup picked at
  * random from the weapon/ammo/item tables the definition enables. */
-
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ s32 region;
-    /* 0x14 */ CIntelligence *def;
-    /* 0x18 */ CVector3 vel;
-    /* 0x24 */ u8 pad24[0x40 - 0x24];
-    /* 0x40 */ CQuaternion rot;
-    /* 0x50 */ f32 rotY;
-} Actor;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x10C];
-    /* 0x10C */ s32 spawned;
-    /* 0x110 */ s32 drops;
-} CAI;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
@@ -61,7 +44,7 @@ extern s32 func_00262C20(s32 id);
 extern PoolActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
 extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
-extern s32 func_0022F350(void *sys, Actor *p, Actor *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
+extern s32 func_0022F350(void *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
                          CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
 extern void func_00246690(PoolActor *actor, s32 sound, CVector3 pos, s32 arg);
 extern void *func_002532A8(void *players);
@@ -73,30 +56,30 @@ extern s32 func_0026D5E4(PickTable *t, s16 id, s16 weight);
 extern s16 func_0026D628(PickTable *t);
 
 /* Spawns pool pickup id at pos. */
-static __inline__ void spawnPickup(Actor *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
+static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
     PoolActor *pickup;
 
-    pickup = func_00227240(D_80107590, &ai->spawned, id, actor->vel, pos, region, 0.0f);
+    pickup = func_00227240(D_80107590, &ai->m_VarS32[0], id, actor->m_vVelocity, pos, region, 0.0f);
     if (pickup != NULL) {
-        ai->drops--;
+        ai->m_VarS32[1]--;
         func_00246690(pickup, 0x11D, pickup->pos, 0);
     }
 }
 
 /* Spawns the object model (an intelligence entry) at pos. */
-static __inline__ void spawnObject(Actor *actor, CAI *ai, CVector3 pos, CVector3 scale, s32 region, s32 type, s32 *model) {
-    if (func_00228108(D_8010ABA0, type, 0, model, region, pos, actor->rotY, actor->vel, scale, &ai->spawned)) {
-        ai->drops--;
+static __inline__ void spawnObject(CGameObjectInstance *actor, CAI *ai, CVector3 pos, CVector3 scale, s32 region, s32 type, s32 *model) {
+    if (func_00228108(D_8010ABA0, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_VarS32[0])) {
+        ai->m_VarS32[1]--;
     }
 }
 
 /* Spawns the effect at pos. */
-static __inline__ void spawnEffect(Actor *actor, CAI *ai, CVector3 pos, s32 region, s32 type) {
-    ai->drops -= func_0022F350(D_800F8928, actor, actor, &ai->spawned, 0, type, actor->vel, actor->rot, pos, region,
+static __inline__ void spawnEffect(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 type) {
+    ai->m_VarS32[1] -= func_0022F350(D_800F8928, actor, actor, &ai->m_VarS32[0], 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
                                -1, 0);
 }
 
-void func_00262D74(Actor *actor, CAI *ai) {
+void func_00262D74(CGameObjectInstance *actor, CAI *ai) {
     CVector3 pos;
     CVector3 scale;
     PickTable picks;
@@ -114,11 +97,11 @@ void func_00262D74(Actor *actor, CAI *ai) {
     Pick *e;
     void *player;
 
-    info = &actor->def->m_Generator;
-    pos = actor->pos;
-    region = actor->region;
+    info = &actor->header.m_pIntelligence->m_Generator;
+    pos = actor->header.m_vPos;
+    region = actor->header.m_pCurrentRegion;
     if (region != 0) {
-        ground = func_0026BE60(region, actor->pos.x, actor->pos.z);
+        ground = func_0026BE60(region, actor->header.m_vPos.x, actor->header.m_vPos.z);
         if (pos.y < ground) {
             pos.y = ground;
         }
