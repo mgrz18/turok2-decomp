@@ -1,17 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/player.h"
+
 #include "structs/intelligence.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-    /* 0x3F */ u8 tagModeSaved;
-} PlayerOptions;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ PlayerOptions *options;
-} Player;
 
 typedef struct {
     /* 0x0000 */ u8 pad0[0x1480];
@@ -32,23 +23,23 @@ typedef struct {
 } ActionState;
 
 extern Game D_80119870;
-extern Player *func_002532B4(Game *game);
+extern CPlayer *func_002532B4(Game *game);
 extern void func_00243414(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
 void func_00266380(CGameObjectInstance *actor, ActionState *state) {
     CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
     Game *game;
-    Player *player;
+    CPlayer *player;
     s32 mode;
 
     if (actor->m_nTypeFlag == 0x64E && state->unk36 != state->unk34) {
         game = &D_80119870;
         player = func_002532B4(game);
         if (player != NULL && state->tagCleared == 0) {
-            mode = player->options->tagMode;
+            mode = player->m_pOptions->m_TagMode;
             if (mode == 1) {
-                player->options->tagMode = 0;
-                player->options->tagModeSaved = mode;
+                player->m_pOptions->m_TagMode = 0;
+                player->m_pOptions->m_LastTagMode = mode;
                 game->unk1480 = mode;
                 state->tagCleared = mode;
             }

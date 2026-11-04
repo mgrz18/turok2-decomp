@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct Player {
-    u8 pad0[0x51C];
-    u8 *unk51C;         /* 0x51C */
-} Player;
+#include "structs/player.h"
 
 
 extern void func_0020F85C(void *matrix, CVector3 *in, CVector3 *out);
@@ -19,7 +15,7 @@ void func_0021EF40(CGameObjectInstance *actor, CVector3 v, s32 arg4, s32 arg5) {
     if (actor->m_dwFlags & 0x300000) {
         v.x = -v.x;
         v.z = -v.z;
-        func_0020F85C(((Player *)actor->m_AI.m_pParent)->unk51C + 0x14C, &v, &out);
+        func_0020F85C(((u8 *)((CPlayer *)actor->m_AI.m_pParent)->m_pCamera) + 0x14C, &v, &out);
     } else {
         func_0021F00C(&local, actor, v);
         func_0020EEF8(&out, &actor->header.m_vPos, &local);

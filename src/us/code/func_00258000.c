@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ s32 model;
@@ -9,36 +10,13 @@ typedef struct {
 } WeaponInfo;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} Options;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x168];
     /* 0x168 */ s32 unk168;
 } Controller;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x518 - 0x10];
-    /* 0x518 */ Options *options;
-    /* 0x51C */ s32 camera;
-    /* 0x520 */ u8 pad520[0x996 - 0x520];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xA08 - 0x998];
-    /* 0xA08 */ s16 pose;
-    /* 0xA0A */ u8 padA0A[0xA50 - 0xA0A];
-    /* 0xA50 */ Controller *controller;
-    /* 0xA54 */ u8 padA54[0xA68 - 0xA54];
-    /* 0xA68 */ s32 pressedButtons;
-    /* 0xA6C */ u8 padA6C[0xB14 - 0xA6C];
-    /* 0xB14 */ s16 nextWeapon;
-} Player;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ Player *owner;
+    /* 0x1A8 */ CPlayer *owner;
 } Object;
 
 typedef struct {
@@ -71,8 +49,8 @@ extern u8 D_801198B0[];
 extern struct {
     s32 enabled;
 } D_8011ACE4;
-extern s32 func_0024E700(Player *player, s32 weapon);
-extern s32 func_00257BA0(Player *player);
+extern s32 func_0024E700(CPlayer *player, s32 weapon);
+extern s32 func_00257BA0(CPlayer *player);
 extern void func_00243414(Object *obj, AI *ai, s32 mode);
 extern void func_00275544(s32 sound, CVector3 pos, CVector3 *source, s32 arg);
 extern void func_0027FC2C(void *buf, s32 camera, s32 model);
@@ -80,14 +58,14 @@ extern void func_0027FC2C(void *buf, s32 camera, s32 model);
 /* Switches the weapon model to the player's next weapon (see func_002596B4)
  * and puts the weapon AI back in mode 0. */
 static __inline__ void switchWeapon(Object *obj, AI *ai) {
-    Player *player = obj->owner;
+    CPlayer *player = obj->owner;
 
-    if (player->weapon != player->nextWeapon || D_800F7078 != 4) {
-        player->weapon = player->nextWeapon;
-        ai->unk2C = D_800AF618[player->weapon]->unk48;
-        ai->unk108 = D_800AF618[player->weapon]->unk4C;
+    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || D_800F7078 != 4) {
+        player->m_Data.m_CurrentWeapon = player->m_RequestedWeapon;
+        ai->unk2C = D_800AF618[player->m_Data.m_CurrentWeapon]->unk48;
+        ai->unk108 = D_800AF618[player->m_Data.m_CurrentWeapon]->unk4C;
         if (D_800B6D20 >= 5) {
-            func_0027FC2C(D_801198B0, player->camera, D_800AF618[player->weapon]->model);
+            func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->model);
         }
         ai->unk10C = 0;
         ai->unk110 = 0;
@@ -101,19 +79,19 @@ static __inline__ void switchWeapon(Object *obj, AI *ai) {
  * out, plays sound 0x27D8 on fire in tag mode, otherwise switches to the
  * queued weapon unless the pose (modes 1 and 7) or visibility forbids it. */
 void func_00258000(Object *obj, AI *ai) {
-    Player *player;
+    CPlayer *player;
     s32 mode;
 
     player = obj->owner;
-    mode = D_800ADF68[player->pose].mode;
-    if (ai->visible && !func_0024E700(player, player->weapon)) {
-        player->nextWeapon = func_00257BA0(player);
+    mode = D_800ADF68[player->m_Mode].mode;
+    if (ai->visible && !func_0024E700(player, player->m_Data.m_CurrentWeapon)) {
+        player->m_RequestedWeapon = func_00257BA0(player);
     }
-    player->controller->unk168 = 0;
+    ((Controller *)player->m_ContState.m_pContState)->unk168 = 0;
     ai->unk120 = 0;
-    if (D_8011ACE4.enabled && player->options->tagMode) {
-        if (player->pressedButtons & 0x2000) {
-            func_00275544(0x27D8, player->pos, &player->pos, -1);
+    if (D_8011ACE4.enabled && player->m_pOptions->m_TagMode) {
+        if (player->m_ContState.m_dwButtonsSingle & 0x2000) {
+            func_00275544(0x27D8, player->m_CharacterActor.header.m_vPos, &player->m_CharacterActor.header.m_vPos, -1);
         }
         return;
     }

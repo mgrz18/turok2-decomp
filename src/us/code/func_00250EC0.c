@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -21,44 +22,6 @@ typedef struct {
 } Body;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} Options;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x518];
-    /* 0x0518 */ Options *options;
-    /* 0x051C */ u8 pad51C[4];
-    /* 0x0520 */ s32 character;
-    /* 0x0524 */ u8 pad524[0xA10 - 0x524];
-    /* 0x0A10 */ f32 stateTime;
-    /* 0x0A14 */ u8 padA14[0xA24 - 0xA14];
-    /* 0x0A24 */ f32 moveScale;
-    /* 0x0A28 */ u8 padA28[0xA54 - 0xA28];
-    /* 0x0A54 */ f32 turnInput;
-    /* 0x0A58 */ f32 lookInput;
-    /* 0x0A5C */ f32 strafeInput;
-    /* 0x0A60 */ f32 forwardInput;
-    /* 0x0A64 */ u8 padA64[4];
-    /* 0x0A68 */ u32 pressed;
-    /* 0x0A6C */ u8 padA6C[0xA78 - 0xA6C];
-    /* 0x0A78 */ f32 forward;
-    /* 0x0A7C */ f32 strafe;
-    /* 0x0A80 */ u8 padA80[0xA98 - 0xA80];
-    /* 0x0A98 */ f32 bobSign;
-    /* 0x0A9C */ f32 depth;
-    /* 0x0AA0 */ CVector3 velocity;
-    /* 0x0AAC */ u8 padAAC[0xAC8 - 0xAAC];
-    /* 0x0AC8 */ f32 pitch;
-    /* 0x0ACC */ f32 turn;
-    /* 0x0AD0 */ f32 tilt;
-    /* 0x0AD4 */ u8 padAD4[0xB8C - 0xAD4];
-    /* 0x0B8C */ s32 zoomed;
-    /* 0x0B90 */ u8 padB90[0xC04 - 0xB90];
-    /* 0x0C04 */ s32 animation;
-} Player;
-
-typedef struct {
     u8 multiplayer;
 } GameMode;
 
@@ -67,7 +30,7 @@ extern u8 D_800F7078[];
 extern s16 D_800AE312[];        /* per character: climbing step sound (stride 4) */
 
 s32 func_0026AFC0(void *region);
-s32 func_0024E5F0(Player *player, Body *body, s32 mode);
+s32 func_0024E5F0(CPlayer *player, Body *body, s32 mode);
 void *func_0022425C(u8 *list, void *region);
 f32 func_0026C434(void *region);
 f32 func_00210E64(f32 from, f32 to);
@@ -78,15 +41,15 @@ f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 f32 func_0021170C(f32 value, f32 rate);
 f32 func_0021160C(f32 value, f32 delta, f32 limit);
-void func_0024FC08(Player *player, Body *body);
+void func_0024FC08(CPlayer *player, Body *body);
 void func_00275624(s32 sound);
 void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-static __inline__ s32 try_jump(Player *player, Body *body) {
-    if (player->zoomed == 0 && !(11.25f < player->depth) && !(body->flags & 0x6000)
-        && (body->surface->flags & 2) && (player->pressed & 0x10)) {
+static __inline__ s32 try_jump(CPlayer *player, Body *body) {
+    if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->flags & 0x6000)
+        && (body->surface->flags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
         func_0024E5F0(player, body, 4);
         return 1;
     }
@@ -96,7 +59,7 @@ static __inline__ s32 try_jump(Player *player, Body *body) {
 /* Climbing: face the wall, look up or down with the stick (tilting the view
  * back near the top and the bottom of the climb), jump off, climb with the
  * stick and play a step sound every 11.25 time units. */
-void func_00250EC0(Player *player, Body *body) {
+void func_00250EC0(CPlayer *player, Body *body) {
     f32 angle;
     f32 side;
     f32 sideRaw;
@@ -115,21 +78,21 @@ void func_00250EC0(Player *player, Body *body) {
     s32 anim;
 
     if (!func_0026AFC0(body->region) || !(body->flags & 0x1000)) {
-        player->pitch = 0.0f;
+        player->m_vHeadRotOffset.x = 0.0f;
         func_0024E5F0(player, body, 2);
         return;
     }
     func_0022425C(D_800F7078, body->region);
     func_002117DC(&body->yaw, body->yaw - func_00210E64(body->yaw, func_0026C434(body->region)), 0.9f);
-    func_002117DC(&player->turn, player->turnInput * 3.4906588f, 0.25f);
-    angle = -player->lookInput * 80.0f;
+    func_002117DC(&player->m_vHeadRotOffset.y, player->m_ContState.m_FinalLookX * 3.4906588f, 0.25f);
+    angle = -player->m_ContState.m_FinalLookY * 80.0f;
     if (angle > 0.0f) {
         angle *= 0.1875f;
     } else {
         angle *= 2.25f;
     }
     /* |turn * 80| * 1.625, written as one product of two picked factors */
-    side = player->turnInput;
+    side = player->m_ContState.m_FinalLookX;
     sideRaw = side * 80.0f;
     if (sideRaw < 0.0f) {
         side = 1.625f;
@@ -171,59 +134,59 @@ void func_00250EC0(Player *player, Body *body) {
     if (angle < -90.0f) {
         angle = -90.0f;
     }
-    func_002117DC(&player->pitch, angle * 0.017453294f, 0.5f);
+    func_002117DC(&player->m_vHeadRotOffset.x, angle * 0.017453294f, 0.5f);
     if (try_jump(player, body)) {
         s = func_002982F0(body->yaw + 6.2831855f);
         c = func_002974C0(body->yaw + 6.2831855f);
         body->pushX += s * 384.0f;
         body->pushZ += c * 384.0f;
-        body->yaw += player->turn;
-        player->turn = 0.0f;
+        body->yaw += player->m_vHeadRotOffset.y;
+        player->m_vHeadRotOffset.y = 0.0f;
         return;
     }
-    bob = player->bobSign * player->forward * func_002982F0(player->stateTime * 0.13962635f);
-    if (player->forwardInput > 0.0f || player->forwardInput < 0.0f) {
-        func_002117DC(&player->tilt, bob, 0.25f);
+    bob = player->m_HandSide * player->m_Speed * func_002982F0(player->m_ModeTime * 0.13962635f);
+    if (player->m_ContState.m_FinalMoveY > 0.0f || player->m_ContState.m_FinalMoveY < 0.0f) {
+        func_002117DC(&player->m_vHeadRotOffset.z, bob, 0.25f);
     } else {
-        func_002117DC(&player->tilt, 0.0f, 0.9f);
+        func_002117DC(&player->m_vHeadRotOffset.z, 0.0f, 0.9f);
     }
     up = 1;
-    if (!(player->forwardInput > 0.0f)) {
+    if (!(player->m_ContState.m_FinalMoveY > 0.0f)) {
         up = 0;
     }
     down = 0;
-    if (!D_8011AAF1.multiplayer && player->forwardInput < 0.0f) {
+    if (!D_8011AAF1.multiplayer && player->m_ContState.m_FinalMoveY < 0.0f) {
         down = 1;
     }
-    lastForward = player->forward;
+    lastForward = player->m_Speed;
     if (up || down) {
-        player->forward = func_0021160C(player->forward, player->forwardInput * 2.048f,
-                                        ABS(player->forwardInput) * 14.3359995f);
+        player->m_Speed = func_0021160C(player->m_Speed, player->m_ContState.m_FinalMoveY * 2.048f,
+                                        ABS(player->m_ContState.m_FinalMoveY) * 14.3359995f);
     } else {
-        player->forward = func_0021170C(lastForward, 4.096f);
+        player->m_Speed = func_0021170C(lastForward, 4.096f);
     }
-    if (player->strafeInput != 0.0f) {
-        player->strafe = func_0021160C(player->strafe, player->strafeInput * 2.048f,
-                                       ABS(player->strafeInput) * 14.3359995f);
+    if (player->m_ContState.m_FinalMoveX != 0.0f) {
+        player->m_SideSpeed = func_0021160C(player->m_SideSpeed, player->m_ContState.m_FinalMoveX * 2.048f,
+                                       ABS(player->m_ContState.m_FinalMoveX) * 14.3359995f);
     } else {
-        player->strafe = func_0021170C(player->strafe, 4.096f);
+        player->m_SideSpeed = func_0021170C(player->m_SideSpeed, 4.096f);
     }
-    if (player->forward == 0.0f && player->strafe == 0.0f) {
-        player->stateTime = 0.0f;
+    if (player->m_Speed == 0.0f && player->m_SideSpeed == 0.0f) {
+        player->m_ModeTime = 0.0f;
         if (lastForward != 0.0f) {
-            player->bobSign = -player->bobSign;
+            player->m_HandSide = -player->m_HandSide;
         }
         func_0024FC08(player, body);
-    } else if ((time = player->stateTime) > 11.25f) {
-        player->bobSign = -player->bobSign;
-        player->stateTime = time - 11.25f;
-        player->forward *= 0.1f;
-        player->strafe *= 0.1f;
+    } else if ((time = player->m_ModeTime) > 11.25f) {
+        player->m_HandSide = -player->m_HandSide;
+        player->m_ModeTime = time - 11.25f;
+        player->m_Speed *= 0.1f;
+        player->m_SideSpeed *= 0.1f;
         if (D_8011AAF1.multiplayer) {
-            if (player->options->tagMode == 1) {
+            if (player->m_pOptions->m_TagMode == 1) {
                 func_00275624(0x27DB);
             } else {
-                func_00275544(D_800AE312[player->character * 2], body->pos, 0, -1);
+                func_00275544(D_800AE312[player->m_Data.m_nDeathmatchCharacter * 2], body->pos, 0, -1);
             }
         } else {
             func_00275544(0x3AB7, body->pos, 0, -1);
@@ -231,19 +194,19 @@ void func_00250EC0(Player *player, Body *body) {
     }
     s = func_002982F0(body->yaw - 1.5707964f);
     c = func_002974C0(body->yaw - 1.5707964f);
-    player->velocity.x += s * player->strafe * player->moveScale;
-    player->velocity.z += c * player->strafe * player->moveScale;
-    if (player->forward >= 0.0f) {
+    player->m_vDesiredPos.x += s * player->m_SideSpeed * player->m_FrameIncrementScaled;
+    player->m_vDesiredPos.z += c * player->m_SideSpeed * player->m_FrameIncrementScaled;
+    if (player->m_Speed >= 0.0f) {
         s = func_002982F0(body->yaw + 3.1415927f);
         c = func_002974C0(body->yaw + 3.1415927f);
-        player->velocity.x += s * player->forward * player->moveScale;
-        player->velocity.z += c * player->forward * player->moveScale;
+        player->m_vDesiredPos.x += s * player->m_Speed * player->m_FrameIncrementScaled;
+        player->m_vDesiredPos.z += c * player->m_Speed * player->m_FrameIncrementScaled;
     } else {
-        player->velocity.y += player->forward * 0.5f;
+        player->m_vDesiredPos.y += player->m_Speed * 0.5f;
     }
     anim = 0xA46;
-    if (!(player->forward > 0.0f)) {
+    if (!(player->m_Speed > 0.0f)) {
         anim = 0xA3C;
     }
-    player->animation = anim;
+    player->m_CharAnim = anim;
 }

@@ -2,6 +2,7 @@
 /* Second VM module copy of func_0042BA40 (same source); its calls go to the module's own copies, named by link address. */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
 typedef struct LevelRecord {
     /* 0x00 */ s32 unk0;
@@ -63,11 +64,8 @@ typedef struct World {
 
 extern CVector3 D_80119928;
 extern s32 D_80119948;
-typedef struct Player {
-    u8 pad0[0x1328];
-} Player;
 
-extern Player *D_80119874;
+extern CPlayer *D_80119874;
 extern s32 D_80119878;
 
 extern s32 func_00200B00(Handle **handle, s32);
@@ -80,7 +78,7 @@ extern s32 *func_00225E88(World *world, u16 id);
 extern void func_0021E6AC(LevelActor *obj, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00220A1C(World *world, CVector3 *pos);
 extern void func_00210EF0(f32 *angle);
-extern void func_0042D980(Player *player, LevelRecord *rec, s32 mode, s32 index);
+extern void func_0042D980(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00267DBC(LevelActor *obj);
 extern s32 func_00267D94(LevelActor *obj);
 extern f32 func_002465F0(LevelActor *obj, CVector3 pos);
@@ -108,7 +106,7 @@ void func_00464960(World *world, Handle **handle) {
     LevelRecord *rec;
     LevelRecord *recWalk;
     LevelActor *objWalk;
-    Player *player;
+    CPlayer *player;
     LevelActor *obj;
     LevelActor *other;
     f32 angle;

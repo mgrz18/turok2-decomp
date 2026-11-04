@@ -1,17 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
     /* 0x18 */ f32 unk18;
 } WeaponInfo;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0xA64];
-    /* 0x0A64 */ s32 flags;
-    /* 0x0A68 */ u8 padA68[0x1288 - 0xA68];
-    /* 0x1288 */ s32 unk1288;
-} Player;
 
 
 typedef struct {
@@ -22,17 +16,17 @@ typedef struct {
 } State;
 
 extern WeaponInfo *D_800AF618[];
-void func_00253DE0(Player *player, s32 id);
-void func_00253E68(Player *player);
+void func_00253DE0(CPlayer *player, s32 id);
+void func_00253E68(CPlayer *player);
 void func_00243414(CGameObjectInstance *actor, State *state, s32 mode);
 
 void func_00259878(CGameObjectInstance *actor, State *state) {
-    Player *player = ((Player *)actor->m_AI.m_pParent);
+    CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
 
-    if (player->unk1288 == 0) {
+    if (player->m_pLoopingSound_WeaponBackground == 0) {
         func_00253DE0(player, 0x464);
     }
-    if (!(player->flags & 0x2000)) {
+    if (!(player->m_ContState.m_dwButtons & 0x2000)) {
         func_00253E68(player);
         if (state->unk110 < 0.27925270795822144f /* 16 deg */ || state->unk118 > 0.0f) {
             func_00243414(actor, state, 2);

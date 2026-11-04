@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002343B8.c, func_002343B8, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 #include "structs/camera.h"
 
 /* What a region set gives a camera (the record func_0022425C finds). */
@@ -19,24 +20,12 @@ typedef struct {
     /* 0x5B */ u8 m_Music1;
 } CRegionSetAttributes;
 
-/* What this reads of a player. */
-typedef struct CameraPlayer {
-    /* 0x0000 */ u8 _pad0[0x140];
-    /* 0x0140 */ u32 m_AIFlags;             /* 0x80, 0x800: hold the region set's other values */
-    /* 0x0144 */ u8 _pad144[0x3D8];
-    /* 0x051C */ CCamera *m_pCamera;
-    /* 0x0520 */ u8 _pad520[0x4FC];
-    /* 0x0A1C */ u32 m_Flags;               /* 0x40: under water */
-    /* 0x0A20 */ u8 _padA20[0x900];
-    /* 0x1320 */ struct CameraPlayer *m_pNext;
-} CameraPlayer;
-
 extern s32 D_800F7078[];
 extern s32 D_8011ACA4;
 extern CCamera *D_801198B4;     /* the camera pool's first camera */
 extern s32 D_8011AC88;          /* game mode */
 extern s32 D_8011AC8C;
-extern CameraPlayer *D_80119890; /* the players */
+extern CPlayer *D_80119890; /* the players */
 extern s32 D_80130940;
 extern s32 D_800B6D20;
 extern f32 D_800B6D28;          /* the frame's time step */
@@ -45,12 +34,12 @@ s32 func_00284358(void);
 s32 func_00284330(void);
 void func_00275950(u8 track);
 void func_002759C4(u8 track);
-f32 func_00268AB4(CameraPlayer *player);
+f32 func_00268AB4(CPlayer *player);
 
 /* func_00281194, inlined: the player whose camera this is, or NULL. */
-static __inline__ CameraPlayer *GetPlayer(CCamera *cam) {
-    CameraPlayer *player;
-    CameraPlayer *node;
+static __inline__ CPlayer *GetPlayer(CCamera *cam) {
+    CPlayer *player;
+    CPlayer *node;
 
     for (player = D_80119890; player != NULL; player = player->m_pNext) {
         if (player->m_pCamera == cam) {
@@ -68,8 +57,8 @@ static __inline__ CameraPlayer *GetPlayer(CCamera *cam) {
 void func_0027CAB0(CCamera *cam) {
     u8 target[4];
     CRegionSetAttributes *rec;
-    CameraPlayer *player;
-    CameraPlayer *node;
+    CPlayer *player;
+    CPlayer *node;
     u16 *key;
     u32 hold, freeze;
     u32 fogStart;
@@ -100,9 +89,9 @@ void func_0027CAB0(CCamera *cam) {
     freeze = hold = 0;
     node = GetPlayer(cam);
     if (node != NULL) {
-        hold = node->m_Flags & 0x40;
-        hold |= node->m_AIFlags & 0x80;
-        freeze = node->m_AIFlags & 0x800;
+        hold = node->m_ModeFlags & 0x40;
+        hold |= node->m_CharacterActor.m_AI.m_dwFlags & 0x80;
+        freeze = node->m_CharacterActor.m_AI.m_dwFlags & 0x800;
         player = node;
     } else {
         player = NULL;

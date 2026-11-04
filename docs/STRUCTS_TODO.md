@@ -14,37 +14,43 @@ can also be a generic name reused for unrelated things (State, Arg0, Entry,
 Obj): check the offsets before merging. Pairs like func_00413230 /
 func_0044C230 are the two copies of a VM module and will always repeat.
 
-## include/structs/player.h is shifted between 0xA08 and the HUD
+## include/structs/player.h (fixed and hoisted)
 
-Several agents used a local Player/PlayerRaw instead of CPlayer because the
-header's fields past 0xA00 did not fit the code. Checked against the local
-structs of 182 files (and the code that reads them), the header is right up
-to 0xA04 and again from the overlays (0x10A0 on), but in between it is 4 and
-then 8 bytes high:
+The header was 4 and then 8 bytes high between 0xA08 and the HUD. Fixed
+against the code: CPlayerLoadSaveData is 0x4E8 (no m_dwLevelMissionObjFlags;
+the nuke parts start at 0x4DC), CPlayer has no unk_0xA2C and no
+m_bLevelStarting, and the 8 bytes were the alignment of libultra's Mtx (a
+long long inside): CPlayerOverlay has its matrices at 0x10 and is 0xC0, sits
+at 0xC10 after a pad, and CPlayer is 0x1328 (arrays of players step 0x1328).
+m_WeaponList is s8, as every reader loads it.
 
-| Code reads | as | player.h has there |
-|---|---|---|
-| 0xA08 `s16` (state/mode, 10+ files) | m_Mode | m_Mode at 0xA0C |
-| 0xA10 `f32` (state time) | m_ModeTime | m_ModeTime at 0xA14 |
-| 0xA1C `u32` flags, 0x40 under water (func_0027D160) | m_ModeFlags | m_ModeFlags at 0xA20 |
-| 0xA40, 0x38 bytes (controls, set by func_002470E8) | m_ContState | m_ContState at 0xA48 |
-| 0xA78 / 0xA7C `f32` forward / strafe | m_Speed / m_SideSpeed | at 0xA80 / 0xA84 |
-| 0xA88 onGround, 0xA8C-0xA94 impulse | m_bOnGround, m_Burst* | at 0xA90, 0xA94-0xA9C |
-| 0xAFC / 0xB00 bob amount / speed | m_BreathAmp / m_BreathSpeed | at 0xB04 / 0xB08 |
-| 0xB14 `s16` next weapon (8 files) | m_RequestedWeapon | at 0xB1C |
-| 0xB38 `Actor *` lock target | m_pCrossHairTarget | at 0xB40 |
-| 0xB8C sniper mode | m_SniperMode | at 0xB94 |
-| 0xBF4 team (4 files) | m_nDeathmatchTeamSelected | at 0xBFC |
-| 0x10A0, 0x10DC, ... 0x1244 HUD items | the COverlays | same offsets |
-| 0x1298, 0x12A4, 0x12A8, 0x1320 | m_ShockedTimer, m_UseLowerAmmo, m_pHitMeWithCBore, m_pNext | same offsets |
+player.h now also has CPlayerOptions (CPlayer+0x518; D_8011AB18 and the
+four at D_8011AB58 inside the game options block), CBarrel (the weapon wheel
+at 0xCD0, the fields the code reads), CPlayerList / CPlayerCList (the player
+list D_80119870; D_80119890 is its active list). The local Player,
+PlayerRaw, PlayerOptions, PlayerList, PlayerState/PlayerBlob (the save blob,
+now CPlayerLoadSaveData) and the Weapon/Owner/Zoom/Bob/Camera... player
+views were replaced in about 230 files. Still local, and why:
 
-So CPlayerLoadSaveData is 0x4E8, not 0x4EC (m_Mode at 0xA08), and
-`unk_0xA2C` does not exist (LibTEngine was right to skip it): with both
-fixed, every field from 0xA08 to 0xBFC lands where the code reads it. The 8
-bytes come back somewhere in 0xC18-0x1064 (m_Overlay, m_Barrel and what
-follows), which the code checked here does not touch; m_Barrel's 0x394 was
-sized from the gap, so it is the likely place. Fix the header, run
-`tools/check_structs.py`, then switch the local Player structs over.
+- the m_CharacterActor.m_CurrentAnimation.m_bCycleCompleted byte (0xE2) is
+  read signed by its files: game_object.h has it u8, so they cast `(s8)`;
+- func_00248340: stores integer 0 to the float fields from 0xA10 (sw $zero
+  where a float store would keep 0.0f in a register);
+- func_00229D10, func_00250430, func_002532B4, func_00455298,
+  func_0024C47C (HudPlayer/Strokes/Player): typed differently from the
+  header in ways that change the code;
+- func_0021AE6C (its "Player" is the camera), func_00238914, func_0024B88C,
+  func_00256738, func_00271DB4, func_0041CA00, func_00455960, func_00455D10
+  (imported Rage Wars files, no common.h, or a forward `struct Player`);
+- func_004085A0, func_0040BFF0 (their own CAI clashes with game_object.h);
+- func_0024C47C, func_00248720, func_00420454, func_0042DE74, func_004567B0,
+  func_00459374, func_00466D94 (struct copies between a local Vec/blob type
+  and the header's), func_00247FB0, func_0024E9D0, func_00255B20,
+  func_002584DC, func_00407CB0, func_00407F20, func_0042DC18, func_00466B38,
+  func_004595D8 (an array spanning several header fields, e.g. 0x9D0[10]
+  over the totem and boss flags), func_00451320, func_00451368;
+- MenuData/MenuOptions (the menus' player at 0x518 points into the game
+  options block D_8011AAD8, not at a CPlayerOptions): left to that family.
 
 ## The families to merge first
 
@@ -55,8 +61,7 @@ sized from the gap, so it is the likely place. Fix the header, run
   69 files) for the per-actor AI state. The animation masks are 18 `u16`
   from 0x78 (`m_AnimMasks`, with halfword parameters from 0x76 handed to
   func_00245A98), the same in 18 files.
-- **Player** (182 files, 145 layouts), PlayerRaw (7), PlayerOptions (41),
-  PlayerList (24): CPlayer once player.h is fixed (above).
+- ~~Player, PlayerRaw, PlayerOptions, PlayerList~~: done (above).
 - **Actor** (156 files), ActorDef (94), LevelActor (63), ActorInfo (19),
   ActorDefinitionHeader (18): CGameObjectInstance and its definition.
   PARTLY DONE: 123 files now use CGameObjectInstance instead of a local

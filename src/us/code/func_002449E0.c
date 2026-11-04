@@ -1,18 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215410.c, func_80215410_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
-
-/* The player behind an object (owner 0x1A8 of a player-controlled one). */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xAAC - 0x998];
-    /* 0xAAC */ f32 unkAAC;
-    /* 0xAB0 */ u8 padAB0[0xB2C - 0xAB0];
-    /* 0xB2C */ s32 unkB2C;
-    /* 0xB30 */ u8 padB30[0xB38 - 0xB30];
-    /* 0xB38 */ CGameObjectInstance *unkB38;
-} OwnerPlayer;
+#include "structs/player.h"
 
 
 typedef struct {
@@ -69,7 +58,7 @@ f32 func_00298470(f32 x);                              /* sqrt */
 
 /* What the plan aims at (the same classes as func_002438C0). */
 static __inline__ s32 Kind(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *target) {
-    OwnerPlayer *player;
+    CPlayer *player;
 
     if (plan->active == 0) {
         return 6;
@@ -91,11 +80,11 @@ static __inline__ s32 Kind(CGameObjectInstance *self, Plan *plan, CGameObjectIns
     }
     if (D_8011001C == 0) {
         if (target->m_dwFlags & 0x300000) {
-            player = ((OwnerPlayer *)target->m_AI.m_pParent);
-            if (player->unkAAC > 0.0f && (self->m_nTypeFlag != 0xCA || player->weapon != 0x14)) {
+            player = ((CPlayer *)target->m_AI.m_pParent);
+            if (player->m_FleeTime > 0.0f && (self->m_nTypeFlag != 0xCA || player->m_Data.m_CurrentWeapon != 0x14)) {
                 return 1;
             }
-            if (player->unkB38 == self && player->unkB2C == 2) {
+            if (((CGameObjectInstance *)player->m_pCrossHairTarget) == self && player->m_CrossHairMode == 2) {
                 return 1;
             }
         }

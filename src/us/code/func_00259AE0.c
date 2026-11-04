@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x934];
-    /* 0x934 */ s16 unk934[1];
-} Player;
+#include "structs/player.h"
 
 
 typedef struct {
@@ -27,7 +23,7 @@ extern struct {
     /* 0x8 */ f32 delta;
 } D_800B6D20;
 f32 func_00211774(f32 value, f32 target, f32 rate);
-s16 *func_0025398C(Player *player, s32 id);
+s16 *func_0025398C(CPlayer *player, s32 id);
 
 void func_00259AE0(CGameObjectInstance *actor, State *state) {
     f32 v;
@@ -45,7 +41,7 @@ void func_00259AE0(CGameObjectInstance *actor, State *state) {
             state->unk128 = 0;
         }
     } else {
-        Player *player = ((Player *)actor->m_AI.m_pParent);
+        CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
 
         if (*(s16 *) ((s8 *) player + *func_0025398C(player, 0x15) * 2 + 0x934) != 0) {
             state->unk128 = 0;

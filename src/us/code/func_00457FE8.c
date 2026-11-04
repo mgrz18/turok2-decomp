@@ -2,14 +2,10 @@
 /* Second VM module copy of func_0041F0C8 (same C, second-module symbols). */
 /* The result is tested through a copy (err = r): it stops jump threading before cse1, so the second r == 0 test survives as in the ROM. */
 #include "common.h"
+#include "structs/player.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0xA50];
-    /* 0xA50 */ s32 controller;
-} Player;
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -20,7 +16,7 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x14];
     /* 0x14 */ s32 unk14;
     /* 0x18 */ u8 pad18[4];
-    /* 0x1C */ Player *player;
+    /* 0x1C */ CPlayer *player;
     /* 0x20 */ MenuPad *pad;
 } MenuOwner;
 
@@ -75,7 +71,7 @@ static __inline__ void FreeAll(void) {
 s32 func_00457FE8(s32 unused, MenuOwner *own) {
     u8 ext[8];
     PakInfo pad;
-    Player *plr;
+    CPlayer *plr;
     s32 r = 0;
     s32 err;
     s32 ok = 1;
@@ -84,7 +80,7 @@ s32 func_00457FE8(s32 unused, MenuOwner *own) {
     s32 size;
     s32 need;
     s32 pv;
-    Player *pp;
+    CPlayer *pp;
 
     if (D_80130990 != 0) {
         pv = D_800C2028;
@@ -115,7 +111,7 @@ s32 func_00457FE8(s32 unused, MenuOwner *own) {
                 }
             }
             if (ok != 0) {
-                func_00416644(D_80119E2C, D_0043C0E4, plr, plr->controller, own->unk14);
+                func_00416644(D_80119E2C, D_0043C0E4, plr, plr->m_ContState.m_pContState, own->unk14);
                 return 0;
             }
         }
@@ -130,9 +126,9 @@ s32 func_00457FE8(s32 unused, MenuOwner *own) {
     }
     err = r;
     if (err == 0) {
-        func_00416644(D_80119E2C, D_0043BC88, plr, plr->controller, (s32)D_0043BE14);
+        func_00416644(D_80119E2C, D_0043BC88, plr, plr->m_ContState.m_pContState, (s32)D_0043BE14);
     } else {
-        func_00416644(D_80119E2C, D_0043BD18, plr, plr->controller, (s32)D_0043BE14);
+        func_00416644(D_80119E2C, D_0043BD18, plr, plr->m_ContState.m_pContState, (s32)D_0043BE14);
     }
     return 1;
 }

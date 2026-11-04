@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 field3E;
-} PlayerOptions;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x19];
@@ -19,9 +15,6 @@ extern s32 D_800ADB30[];
 extern u8 D_800F7078[];
 extern void func_002241D8(void *, CPlayer *, s32, s32);
 
-/* 0xC04 is an s32 id, not LibTEngine's f32 m_WaitDeathmatchTimer. */
-#define PLAYER_C04(p) (*(s32 *)&(p)->m_WaitDeathmatchTimer)
-
 void func_002541E4(CPlayer *player) {
     State8011AAD8 *state = &D_8011AAD8;
     s32 id;
@@ -29,10 +22,10 @@ void func_002541E4(CPlayer *player) {
     if (state->field19 == 0) {
         id = 0x66;
     } else if (state->field20C != 0
-               && ((PlayerOptions *)player->m_pOptions)->field3E != 0) {
+               && ((CPlayerOptions *)player->m_pOptions)->m_TagMode != 0) {
         id = D_800ADB5C;
     } else {
         id = D_800ADB30[player->m_CharacterActor.header.m_pIntelligence->m_Id];
     }
-    func_002241D8(D_800F7078, player, id, PLAYER_C04(player));
+    func_002241D8(D_800F7078, player, id, player->m_CharAnim);
 }

@@ -1,18 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_3.CPP, func_80214DD4_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
-
-/* The player behind an object (owner 0x1A8 of a player-controlled one). */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xAAC - 0x998];
-    /* 0xAAC */ f32 unkAAC;
-    /* 0xAB0 */ u8 padAB0[0xB2C - 0xAB0];
-    /* 0xB2C */ s32 unkB2C;
-    /* 0xB30 */ u8 padB30[0xB38 - 0xB30];
-    /* 0xB38 */ CGameObjectInstance *unkB38;
-} OwnerPlayer;
+#include "structs/player.h"
 
 
 typedef struct {
@@ -114,7 +103,7 @@ void func_00244338(CGameObjectInstance *self, Plan *plan, s32 boost, TrackResult
     f32 gap;
     f32 angle;
     f32 reach;
-    OwnerPlayer *player;
+    CPlayer *player;
     Location *loc;
 
     boost = 0; /* FAKEMATCH: the unused third parameter doubles as the boost flag (as in Rage Wars' func_80214DD4_de); a separate local gives the same code but swaps $s5/$s6 in the prologue. */
@@ -151,9 +140,9 @@ void func_00244338(CGameObjectInstance *self, Plan *plan, s32 boost, TrackResult
                 kind = 0;
                 if (D_8011001C == 0) {
                     if ((!(target->m_dwFlags & 0x300000)
-                         || (player = ((OwnerPlayer *)target->m_AI.m_pParent),
-                             (!(player->unkAAC > 0.0f) || (kind = 1, self->m_nTypeFlag == 0xCA && player->weapon == 0x14))
-                             && (player->unkB38 != self || (kind = 1, player->unkB2C != 2))))
+                         || (player = ((CPlayer *)target->m_AI.m_pParent),
+                             (!(player->m_FleeTime > 0.0f) || (kind = 1, self->m_nTypeFlag == 0xCA && player->m_Data.m_CurrentWeapon == 0x14))
+                             && (((CGameObjectInstance *)player->m_pCrossHairTarget) != self || (kind = 1, player->m_CrossHairMode != 2))))
                         && (!(self->m_dwHotPointFlags & 2) || (kind = 1, self->m_nTypeFlag == 0xCA))) {
                         kind = 0;
                     }

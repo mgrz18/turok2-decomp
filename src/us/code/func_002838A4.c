@@ -1,19 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
-/* The player as this reads it. */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ s32 region;
-    /* 0x014 */ u8 pad14[0x3C];
-    /* 0x050 */ f32 rotY;
-    /* 0x054 */ u8 pad54[0x480];
-    /* 0x4D4 */ s32 unk4D4;
-    /* 0x4D8 */ s32 unk4D8;
-    /* 0x4DC */ u8 pad4DC[0xC];
-    /* 0x4E8 */ s32 unk4E8;
-} Player;
 
 /* The state at *D_800C1BB0 (cleared by func_002837E0). */
 typedef struct {
@@ -36,7 +24,7 @@ typedef struct {
 } State;
 
 extern State *D_800C1BB0;
-extern Player *D_80119890;          /* current player */
+extern CPlayer *D_80119890;          /* current player */
 extern u8 D_801198B0[];
 extern u8 D_800F5A50[];
 /* The world and fields of it (see func_002237C4's World). D_80110020 and
@@ -48,7 +36,7 @@ extern s32 D_80110030;              /* world +0x18FB8: selectionFlags */
 extern u8 D_80110034[];             /* world +0x18FBC: selectionSpawn */
 extern s32 D_80110048[];            /* world +0x18FD0: selectionValues */
 
-void func_002568CC(Player *player);
+void func_002568CC(CPlayer *player);
 s32 func_002242B4(void *world, s32 region);
 void func_002819E0(void *game);
 void func_0026EDA8(void *arg0);
@@ -60,7 +48,7 @@ s32 func_0041266C(void);
  * asked, remembering where it starts the first time; warps to the pending
  * warp id unless it is the current one; then marks the state started. */
 void func_002838A4(void) {
-    Player *player;
+    CPlayer *player;
     s32 warp;
     void *world;
     s32 out[3];
@@ -78,13 +66,13 @@ void func_002838A4(void) {
                 D_800C1BB0->startLevel = D_80110048[0];
                 D_800C1BB0->startWarp = D_80110020[0];
                 D_800C1BB0->unk4C = 0;
-                D_800C1BB0->startPos = player->pos;
-                D_800C1BB0->startRotY = player->rotY;
-                D_800C1BB0->startRegion = func_002242B4(D_800F7078, player->region);
+                D_800C1BB0->startPos = player->m_CharacterActor.header.m_vPos;
+                D_800C1BB0->startRotY = player->m_CharacterActor.m_RotY;
+                D_800C1BB0->startRegion = func_002242B4(D_800F7078, player->m_CharacterActor.header.m_pCurrentRegion);
             }
-            player->unk4D4 = 0;
-            player->unk4D8 = 0;
-            player->unk4E8 = 0;
+            player->m_WeaponActor.m_AI.m_VarBuffer[0] = 0;
+            player->m_WeaponActor.m_AI.m_VarBuffer[1] = 0;
+            player->m_WeaponActor.m_AI.m_VarBuffer[5] = 0;
         }
         func_002819E0(D_801198B0);
         func_0026EDA8(D_800F5A50);

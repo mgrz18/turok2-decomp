@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 /* Menu text item: copy a player's 8-character name into the item's text and
  * print one of the current player's u16 counters (per opponent) after it. */
@@ -13,12 +14,6 @@ typedef struct {
     u8 pad0[0x1C];
     u8 *player; /* 0x1C */
 } PlayerEvent;
-
-typedef struct {
-    u8 pad0[0x10];
-    u16 teamCounts[8]; /* 0x10 */
-    u16 counts[8];     /* 0x20 */
-} PlayerOptions;
 
 extern s32 D_8011ACE4;
 extern char D_8011AB8B[];
@@ -36,9 +31,9 @@ s32 func_00455C08(MenuItem *item, PlayerEvent *event) {
     s32 i;
 
     if (D_8011ACE4 != 0) {
-        value = ((PlayerOptions *)*(void **)(player + 0x518))->teamCounts[other];
+        value = ((CPlayerOptions *)*(void **)(player + 0x518))->m_Tagged[other];
     } else {
-        value = ((PlayerOptions *)*(void **)(player + 0x518))->counts[other];
+        value = ((CPlayerOptions *)*(void **)(player + 0x518))->m_Killed[other];
     }
     dst = item->text;
     src = &D_8011AB8B[other * 64];

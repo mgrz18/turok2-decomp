@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "structs/player.h"
 
 
 typedef struct {
@@ -12,16 +13,11 @@ typedef struct {
     /* 0x1C */ u32 flags;
 } Attachment;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xBF8];
-    /* 0xBF8 */ s32 unkBF8;
-} Player;
-
 
 extern u8 D_8011AAF1;
 
 s32 func_00267090(CGameObjectInstance *actor) {
-    Player *owner;
+    CPlayer *owner;
     Attachment *attachment;
     u32 flags;
     u32 mask;
@@ -32,8 +28,8 @@ s32 func_00267090(CGameObjectInstance *actor) {
                 return 1;
             }
             if (actor->m_dwFlags & 0x300000) {
-                owner = ((Player *)actor->m_AI.m_pParent);
-                if (D_8011AAF1 != 0 && owner->unkBF8 != 0) {
+                owner = ((CPlayer *)actor->m_AI.m_pParent);
+                if (D_8011AAF1 != 0 && owner->m_bEnteringDeathmatch != 0) {
                     return 0;
                 }
             }

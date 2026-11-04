@@ -1,6 +1,7 @@
 /* WRONG CUT: real function 0x0041E1D8, size 0x19C (through 0x0041E374): splat cut it in two
  * (func_0041E1D8, func_0041E294) at a jal's delay slot. */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x0 */ u8 pad0[4];
@@ -13,15 +14,10 @@ typedef struct {
 } MenuScreen;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ u8 *pools;
-} Player;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0xC];
     /* 0x0C */ MenuScreen *screen;
     /* 0x10 */ u8 pad10[0xC];
-    /* 0x1C */ Player *player;
+    /* 0x1C */ CPlayer *player;
     /* 0x20 */ MenuCtl *ctl;
 } Menu;
 
@@ -40,7 +36,7 @@ extern u8 D_0043BC00[];
 extern u8 D_0043BC6C[];
 extern u8 D_0043C05C[];
 
-extern void func_00416644(void *pool, void *tmpl, Player *player, MenuCtl *ctl, void *back);
+extern void func_00416644(void *pool, void *tmpl, CPlayer *player, MenuCtl *ctl, void *back);
 extern void func_00426480(s32 kind);
 extern s32 func_0042655C(s32 kind);
 extern s32 func_00426594(s32 kind);
@@ -61,7 +57,7 @@ void func_0041E1D8(Menu *m) {
     kind = m->ctl->kind;
     if (D_800C2020) {
         D_801309BC = 1;
-        func_00416644(m->player->pools + 0x53C, D_0043882C, m->player, m->ctl, NULL);
+        func_00416644(((u8 *)m->player->m_pCamera) + 0x53C, D_0043882C, m->player, m->ctl, NULL);
         return;
     }
     func_00426480(kind);

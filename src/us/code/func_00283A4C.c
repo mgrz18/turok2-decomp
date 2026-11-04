@@ -1,14 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
-/* The player as this reads it. */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ s32 region;
-    /* 0x014 */ u8 pad14[0x3C];
-    /* 0x050 */ f32 rotY;
-} Player;
 
 /* The state at *D_800C1BB0 (cleared by func_002837E0, see func_002838A4). */
 typedef struct {
@@ -24,7 +17,7 @@ typedef struct {
 } State;
 
 extern State *D_800C1BB0;
-extern Player *D_80119890;          /* current player */
+extern CPlayer *D_80119890;          /* current player */
 extern s32 D_8011AC88;
 extern u8 D_800F7078[];             /* the world */
 extern s32 D_80110020;              /* world +0x18FA8: the current warp id */
@@ -36,14 +29,14 @@ extern s32 D_8011004C;
 
 void func_0042AC0C(void *world, s32 id, s32 flags);
 s32 func_002242F8(void *world, s32 region);
-void func_0024CF58(Player *player, Player *other);
+void func_0024CF58(CPlayer *player, CPlayer *other);
 
 /* Puts the current player back where func_002838A4 saw it start (once,
  * when D_8011AC88 is 13 and a start was saved), warping there first if
  * needed; any other D_8011AC88 drops the saved start. */
 void func_00283A4C(void) {
     void *world;
-    Player *player;
+    CPlayer *player;
     CVector3 pos;
     f32 rotY;
     s32 region;
@@ -75,9 +68,9 @@ void func_00283A4C(void) {
         D_80110048 = level;
         D_8011004C = level;
         if (player != NULL) {
-            player->pos = pos;
-            player->rotY = rotY;
-            player->region = func_002242F8(world, region);
+            player->m_CharacterActor.header.m_vPos = pos;
+            player->m_CharacterActor.m_RotY = rotY;
+            player->m_CharacterActor.header.m_pCurrentRegion = func_002242F8(world, region);
             func_0024CF58(player, player);
         }
         D_800C1BB0->saveStart = 0;

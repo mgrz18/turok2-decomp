@@ -8,6 +8,7 @@
  * loop puts the counter in $v0 instead of $v1. */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
@@ -37,17 +38,10 @@ typedef struct Actor {
     /* 0x0D4 */ u32 flags;
     /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
     /* 0x140 */ u8 ai[0x1A8 - 0x140];
-    /* 0x1A8 */ struct Player *owner;
+    /* 0x1A8 */ struct CPlayer *owner;
     /* 0x1AC */ u8 pad1AC[0x28C - 0x1AC];
     /* 0x28C */ struct Actor *next;
 } Actor;
-
-typedef struct Player {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0xA08 - 0x10];
-    /* 0xA08 */ s16 state;
-} Player;
 
 typedef struct {
     /* 0x00 */ s32 kind;
@@ -221,7 +215,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
     State *s = &D_8012FB70;
     Actor *obj = self;
     Actor *found;
-    Player *owner;
+    CPlayer *owner;
     Actor *actor;
     f32 dist;
     s32 i;
@@ -250,13 +244,13 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
         }
         break;
     case 1:
-        if (found != NULL && owner != NULL && dist < 1228.7999f && owner->state != 5) {
+        if (found != NULL && owner != NULL && dist < 1228.7999f && owner->m_Mode != 5) {
             Part part;
 
             part.a = 0xA00;
             part.b = 0x500;
             part.c[0] = part.c[1] = part.c[2] = part.c[3] = 0;
-            func_00236EA0(obj, obj, 3, -1, owner->pos, part);
+            func_00236EA0(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
         }
         break;
     case 2:
@@ -265,8 +259,8 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
                 actor = s->actors[i];
                 r = func_002119FC(153.59999f, 256.0f);
                 angle = found->yaw + 3.1415927f + func_002119FC(-0.5235988f, 0.5235988f);
-                x = owner->pos.x;
-                z = owner->pos.z;
+                x = owner->m_CharacterActor.header.m_vPos.x;
+                z = owner->m_CharacterActor.header.m_vPos.z;
                 dx = r * func_002982F0(angle);
                 dz = r * func_002974C0(angle);
                 x += dx;
@@ -285,7 +279,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             part.a = 0xA00;
             part.b = 0xA00;
             part.c[0] = part.c[1] = part.c[2] = part.c[3] = 0;
-            func_00236EA0(obj, obj, 3, -1, owner->pos, part);
+            func_00236EA0(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
         }
         break;
     case 4:
@@ -295,7 +289,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             part.a = 0xA00;
             part.b = 0x500;
             part.c[0] = part.c[1] = part.c[2] = part.c[3] = 0;
-            func_00236EA0(obj, obj, 3, -1, owner->pos, part);
+            func_00236EA0(obj, obj, 3, -1, owner->m_CharacterActor.header.m_vPos, part);
         }
         break;
     case 5:

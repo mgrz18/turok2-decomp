@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "structs/player.h"
 
 /* Applies a hit from an attacker to a target: marks the attacker, shakes the
  * target player's camera for heavy and medium hits, sprays blood from a
@@ -13,13 +14,6 @@ typedef struct {
     /* 0x114 */ CVector3 offset;
 } PlayerCamera;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ PlayerCamera *camera;
-    /* 0x520 */ u8 pad520[0xA50 - 0x520];
-    /* 0xA50 */ u8 *controller;
-} Player;
-
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x66];
@@ -30,7 +24,7 @@ extern u8 D_800F8928[];
 extern u8 D_800F7078[];
 
 extern void func_002811CC(PlayerCamera *camera, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos);
-extern void func_00253F90(Player *player, CVector3 *v);
+extern void func_00253F90(CPlayer *player, CVector3 *v);
 extern void func_0020E810(CQuaternion *out, CVector3 *dir);
 extern void func_002688C8(CGameObjectInstance *actor, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 flagA, s32 flagB);
 extern s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
@@ -42,21 +36,21 @@ extern f32 func_00246310(CGameObjectInstance *actor, CVector3 point);
 
 /* Its unused target and def parameters still take stack slots when inlined (the frame layout needs them). */
 static __inline__ void sprayBlood(CGameObjectInstance *target, CGameObjectInstance *actor, CVector3 position, CVector3 direction, HitDef *def, s32 kind) {
-    Player *player;
+    CPlayer *player;
     CVector3 v;
     CVector3 point;
     CVector3 zero;
     CQuaternion rotation;
     s32 region;
 
-    player = ((Player *)actor->m_AI.m_pParent);
+    player = ((CPlayer *)actor->m_AI.m_pParent);
     v.x = -direction.x;
     v.y = direction.y;
     v.z = direction.z;
     func_00253F90(player, &v);
-    v.x -= player->camera->offset.x;
-    v.y -= player->camera->offset.y;
-    v.z -= player->camera->offset.z;
+    v.x -= ((PlayerCamera *)player->m_pCamera)->offset.x;
+    v.y -= ((PlayerCamera *)player->m_pCamera)->offset.y;
+    v.z -= ((PlayerCamera *)player->m_pCamera)->offset.z;
     func_0020E810(&rotation, &v);
     func_002688C8(actor, position, &point, &region, 0, 1);
     point = position;
@@ -68,24 +62,24 @@ static __inline__ void sprayBlood(CGameObjectInstance *target, CGameObjectInstan
     point.x = 0;
     point.y = 0;
     point.z = 0;
-    func_00225DB0(D_800F7078, player->controller + 0x140, 3, point, 10.24f, 1.0f);
+    func_00225DB0(D_800F7078, ((u8 *)player->m_ContState.m_pContState) + 0x140, 3, point, 10.24f, 1.0f);
 }
 
 void func_002376F8(CGameObjectInstance *target, CGameObjectInstance *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitDef *def, u32 flags) {
     CGameObjectInstance *attacker;
     u32 bits;
-    Player *player;
+    CPlayer *player;
 
     if (source->header.m_Type == 1) {
         source->m_AI.m_dwFlags |= 0x4000000;
         attacker = source;
         if (target->m_dwFlags & 0x300000) {
             bits = source->m_AI.m_ModeFlags;
-            player = ((Player *)target->m_AI.m_pParent);
+            player = ((CPlayer *)target->m_AI.m_pParent);
             if (bits & 0x4000) {
-                func_002811CC(player->camera, 20.0f, 100.0f, 20.0f, 1.0f, 1, pos);
+                func_002811CC(((PlayerCamera *)player->m_pCamera), 20.0f, 100.0f, 20.0f, 1.0f, 1, pos);
             } else if (bits & 0x2000) {
-                func_002811CC(player->camera, 10.0f, 50.0f, 10.0f, 1.0f, 1, pos);
+                func_002811CC(((PlayerCamera *)player->m_pCamera), 10.0f, 50.0f, 10.0f, 1.0f, 1, pos);
             }
         }
         if (hit) {

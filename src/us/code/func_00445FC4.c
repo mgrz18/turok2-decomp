@@ -1,6 +1,7 @@
 /* Second-module copy of func_0040CFC4 (in src/us/code/func_0040C850.c). */
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/player.h"
 
 /* Script command: waits until the current player is within 716.8 units of the origin, then steps the
  * script to the next command. */
@@ -30,13 +31,8 @@ typedef struct {
     /* 0x4 */ s32 unk4;
 } Command;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ f32 pos[3];
-} Player;
-
 extern Command D_0043232C[];
-extern Player *D_80119890;
+extern CPlayer *D_80119890;
 extern f32 func_00298470(f32);
 
 /* Advances the script by one command, stops the timers and runs the new command. */
@@ -67,11 +63,11 @@ static __inline__ void NextCommand(Manager *m) {
 }
 
 void func_00445FC4(Manager *m) {
-    Player *player = D_80119890;
+    CPlayer *player = D_80119890;
 
     if (player != NULL) {
-        if (func_00298470(player->pos[0] * player->pos[0] + player->pos[1] * player->pos[1] +
-                          player->pos[2] * player->pos[2]) < 716.8f) {
+        if (func_00298470(player->m_CharacterActor.header.m_vPos.x * player->m_CharacterActor.header.m_vPos.x + player->m_CharacterActor.header.m_vPos.y * player->m_CharacterActor.header.m_vPos.y +
+                          player->m_CharacterActor.header.m_vPos.z * player->m_CharacterActor.header.m_vPos.z) < 716.8f) {
             NextCommand(m);
         }
     }

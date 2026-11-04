@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x29];
@@ -28,26 +29,12 @@ typedef struct {
     /* 0x50 */ f32 yaw;
 } Body;
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x518];
-    /* 0x0518 */ LookOptions *options;
-    /* 0x051C */ u8 pad51C[0xA54 - 0x51C];
-    /* 0x0A54 */ f32 stickX;
-    /* 0x0A58 */ f32 stickY;
-    /* 0x0A5C */ u8 padA5C[0xAC8 - 0xA5C];
-    /* 0x0AC8 */ f32 pitch;
-    /* 0x0ACC */ u8 padACC[0xB90 - 0xACC];
-    /* 0x0B90 */ f32 zoom;
-    /* 0x0B94 */ u8 padB94[0x1284 - 0xB94];
-    /* 0x1284 */ s32 locked;
-} Player;
-
 Floor *func_00268A2C(Body *body);
 void func_002117DC(f32 *value, f32 target, f32 rate);
 
 /* Turns the body and tilts the view from the stick, at the rates of the
  * tuning scaled by the player's speed settings and slowed while zoomed. */
-void func_0024EF70(Player *player, Body *body, LookTuning *tuning) {
+void func_0024EF70(CPlayer *player, Body *body, LookTuning *tuning) {
     LookOptions *options;
     Floor *floor;
     f32 zoomScale;
@@ -56,11 +43,11 @@ void func_0024EF70(Player *player, Body *body, LookTuning *tuning) {
     f32 tilt;
     f32 speed;
 
-    if (player->locked != 0) {
+    if (player->m_bHeadMovementDisabled != 0) {
         return;
     }
-    options = player->options;
-    zoomScale = 1.0f - player->zoom * 0.99f;
+    options = player->m_pOptions;
+    zoomScale = 1.0f - player->m_ZoomBlend * 0.99f;
     speed = options->turnSpeed * (1.0f / 128) - 1.0f;
     turnRate = speed * 0.5f + 0.875f;
     turnRate *= zoomScale * tuning->turnRate;
@@ -80,14 +67,14 @@ void func_0024EF70(Player *player, Body *body, LookTuning *tuning) {
     floor = func_00268A2C(body);
     if (floor == NULL || (floor->flags & 0x6000) != 0x2000) {
         if (tuning->turn != 0.0f) {
-            func_002117DC(&body->yaw, body->yaw + player->stickX * 80.0f * tuning->turn * 0.017453294f, turnRate);
+            func_002117DC(&body->yaw, body->yaw + player->m_ContState.m_FinalLookX * 80.0f * tuning->turn * 0.017453294f, turnRate);
         }
     }
-    tilt = -player->stickY * 80.0f;
+    tilt = -player->m_ContState.m_FinalLookY * 80.0f;
     if (tilt < 0.0f) {
         tilt = tilt * -0.71619713f * tuning->lookDown;
     } else {
         tilt = tilt * 0.71619713f * tuning->lookUp;
     }
-    func_002117DC(&player->pitch, tilt * 0.017453294f, lookRate);
+    func_002117DC(&player->m_vHeadRotOffset.x, tilt * 0.017453294f, lookRate);
 }

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -22,29 +23,6 @@ typedef struct {
     /* 0x050 */ f32 yaw;
 } Body;
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x51C];
-    /* 0x051C */ void *hud;
-    /* 0x0520 */ u8 pad520[0xA08 - 0x520];
-    /* 0x0A08 */ s16 state;
-    /* 0x0A0A */ u8 padA0A[0xA50 - 0xA0A];
-    /* 0x0A50 */ Controller *controller;
-    /* 0x0A54 */ u8 padA54[0xA5C - 0xA54];
-    /* 0x0A5C */ f32 strafeInput;
-    /* 0x0A60 */ f32 forwardInput;
-    /* 0x0A64 */ u32 held;
-    /* 0x0A68 */ u32 pressed;
-    /* 0x0A6C */ u8 padA6C[0xA78 - 0xA6C];
-    /* 0x0A78 */ f32 forward;
-    /* 0x0A7C */ f32 strafe;
-    /* 0x0A80 */ u8 padA80[0xAA0 - 0xA80];
-    /* 0x0AA0 */ CVector3 velocity;
-    /* 0x0AAC */ u8 padAAC[0xAC8 - 0xAAC];
-    /* 0x0AC8 */ f32 pitch;
-    /* 0x0ACC */ u8 padACC[0xAD0 - 0xACC];
-    /* 0x0AD0 */ f32 tilt;
-} Player;
-
 extern u8 D_800F7078[];
 extern u8 D_801198B0[];
 extern char D_800A6EA8[]; /* "Fly Mode Off" */
@@ -58,7 +36,7 @@ f32 func_002974C0(f32 x); /* cos */
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 Floor *func_00220A1C(void *world, CVector3 *pos);
-s32 func_0024E5F0(Player *player, Body *body, s32 mode);
+s32 func_0024E5F0(CPlayer *player, Body *body, s32 mode);
 void func_0027FC2C(u8 *game, void *hud, char *msg);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
@@ -66,30 +44,30 @@ void func_0027FC2C(u8 *game, void *hud, char *msg);
 /* Fly mode (cheat): turn and pitch with the stick, fly forward/sideways and
  * up/down with the buttons; holding all three 0xE000 buttons and pressing one
  * again leaves it, dropping onto the middle of the floor under the player. */
-void func_0025005C(Player *player, Body *body) {
+void func_0025005C(CPlayer *player, Body *body) {
     CVector3 move;
     Floor *floor;
     u32 held;
 
-    if (player->state == 0 && !(player->held & 0xE000)) {
-        player->state = 1;
+    if (player->m_Mode == 0 && !(player->m_ContState.m_dwButtons & 0xE000)) {
+        player->m_Mode = 1;
     }
-    player->tilt = 0.0f;
-    func_002117DC(&body->yaw, body->yaw + player->controller->stickX * 0.0043633236f, 0.9f);
-    func_002117DC(&player->pitch, player->pitch + -player->controller->stickY * 0.0021816618f, 0.9f);
-    if (player->forwardInput != 0.0f) {
-        player->forward = func_0021160C(player->forward, player->forwardInput * 8.533333f,
-                                        ABS(player->forwardInput) * 102.399994f);
+    player->m_vHeadRotOffset.z = 0.0f;
+    func_002117DC(&body->yaw, body->yaw + ((Controller *)player->m_ContState.m_pContState)->stickX * 0.0043633236f, 0.9f);
+    func_002117DC(&player->m_vHeadRotOffset.x, player->m_vHeadRotOffset.x + -((Controller *)player->m_ContState.m_pContState)->stickY * 0.0021816618f, 0.9f);
+    if (player->m_ContState.m_FinalMoveY != 0.0f) {
+        player->m_Speed = func_0021160C(player->m_Speed, player->m_ContState.m_FinalMoveY * 8.533333f,
+                                        ABS(player->m_ContState.m_FinalMoveY) * 102.399994f);
     } else {
-        player->forward = func_0021170C(player->forward, 17.066666f);
+        player->m_Speed = func_0021170C(player->m_Speed, 17.066666f);
     }
-    if (player->strafeInput != 0.0f) {
-        player->strafe = func_0021160C(player->strafe, player->strafeInput * 8.533333f,
-                                       ABS(player->strafeInput) * 102.399994f);
+    if (player->m_ContState.m_FinalMoveX != 0.0f) {
+        player->m_SideSpeed = func_0021160C(player->m_SideSpeed, player->m_ContState.m_FinalMoveX * 8.533333f,
+                                       ABS(player->m_ContState.m_FinalMoveX) * 102.399994f);
     } else {
-        player->strafe = func_0021170C(player->strafe, 17.066666f);
+        player->m_SideSpeed = func_0021170C(player->m_SideSpeed, 17.066666f);
     }
-    held = player->held;
+    held = player->m_ContState.m_dwButtons;
     if (held & 0x10) {
         body->velY = func_0021160C(body->velY, 5.9733334f, 71.68f);
     } else if (held & 0x2020) {
@@ -97,20 +75,20 @@ void func_0025005C(Player *player, Body *body) {
     } else {
         body->velY = func_0021170C(body->velY, 11.946667f);
     }
-    move.x = player->forward * func_002982F0(body->yaw + 3.1415927f);
+    move.x = player->m_Speed * func_002982F0(body->yaw + 3.1415927f);
     move.y = body->velY;
-    move.z = player->forward * func_002974C0(body->yaw + 3.1415927f);
-    move.x += player->strafe * func_002982F0(body->yaw - 1.5707964f);
-    move.z += player->strafe * func_002974C0(body->yaw - 1.5707964f);
+    move.z = player->m_Speed * func_002974C0(body->yaw + 3.1415927f);
+    move.x += player->m_SideSpeed * func_002982F0(body->yaw - 1.5707964f);
+    move.z += player->m_SideSpeed * func_002974C0(body->yaw - 1.5707964f);
     func_0020EF60(&move, &move, D_800B6D28);
-    func_0020EEF8(&player->velocity, &player->velocity, &move);
+    func_0020EEF8(&player->m_vDesiredPos, &player->m_vDesiredPos, &move);
     floor = func_00220A1C(D_800F7078, &body->pos);
     if (floor != NULL) {
         body->floor = floor;
     }
-    if (player->state == 1 && (player->held & 0xE000) == 0xE000 && (player->pressed & 0xE000)) {
+    if (player->m_Mode == 1 && (player->m_ContState.m_dwButtons & 0xE000) == 0xE000 && (player->m_ContState.m_dwButtonsSingle & 0xE000)) {
         func_0024E5F0(player, body, 2);
-        func_0027FC2C(D_801198B0, player->hud, D_800A6EA8);
+        func_0027FC2C(D_801198B0, player->m_pCamera, D_800A6EA8);
         if (floor == NULL) {
             floor = body->floor;
             body->pos = *floor->corners[0];

@@ -1,16 +1,10 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215B90.c, func_00215B90, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xA64 - 0x998];
-    /* 0xA64 */ u32 flagsA64;
-} Player;
+#include "structs/player.h"
 
 
-s32 func_0024E700(Player *player, s32 weapon);   /* ammo for a weapon */
+s32 func_0024E700(CPlayer *player, s32 weapon);   /* ammo for a weapon */
 f32 func_002671B4(CGameObjectInstance *a);                     /* height */
 f32 func_0021153C(f32 x);                        /* acos */
 f32 func_002982F0(f32 x);                        /* sin */
@@ -61,17 +55,17 @@ s32 func_002451AC(CGameObjectInstance *self, s32 unused, CGameObjectInstance *ta
     f32 hi;
     f32 y;
     f32 angle;
-    Player *player;
+    CPlayer *player;
 
     if (target == NULL) {
         return 0;
     }
     if (target->m_dwFlags & 0x300000) {
-        player = ((Player *)target->m_AI.m_pParent);
-        if (func_0024E700(player, player->weapon) <= 0) {
+        player = ((CPlayer *)target->m_AI.m_pParent);
+        if (func_0024E700(player, player->m_Data.m_CurrentWeapon) <= 0) {
             return 0;
         }
-        if (!(player->flagsA64 & 0x2000)) {
+        if (!(player->m_ContState.m_dwButtons & 0x2000)) {
             return 0;
         }
         goto body;

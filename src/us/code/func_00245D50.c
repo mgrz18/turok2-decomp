@@ -1,20 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/player.h"
 
 typedef struct Def {
     s32 kind;              /* 0x00 */
 } Def;
-
-typedef struct Player {
-    char pad0[0x996];
-    s16 weapon;            /* 0x996 */
-    char pad998[0xAAC - 0x998];
-    f32 unkAAC;            /* 0xAAC */
-    char padAB0[0xB2C - 0xAB0];
-    s32 unkB2C;            /* 0xB2C */
-    char padB30[0xB38 - 0xB30];
-    void *unkB38;          /* 0xB38 */
-} Player;
 
 
 typedef struct Target {
@@ -33,7 +23,7 @@ extern s32 D_8011001C;
    func_00245D50 and the tail matches func_00245E20 word for word. */
 
 s32 func_00245D50(CGameObjectInstance *self, Target *target, CGameObjectInstance *actor) {
-    Player *owner;
+    CPlayer *owner;
 
     if (target->unk4 == 0) {
         return 6;
@@ -55,13 +45,13 @@ s32 func_00245D50(CGameObjectInstance *self, Target *target, CGameObjectInstance
     }
     if (D_8011001C == 0) {
         if (actor->m_dwFlags & 0x300000) {
-            owner = ((Player *)actor->m_AI.m_pParent);
-            if (0.0f < owner->unkAAC) {
-                if (self->m_nTypeFlag != 0xCA || owner->weapon != 0x14) {
+            owner = ((CPlayer *)actor->m_AI.m_pParent);
+            if (0.0f < owner->m_FleeTime) {
+                if (self->m_nTypeFlag != 0xCA || owner->m_Data.m_CurrentWeapon != 0x14) {
                     return 1;
                 }
             }
-            if (owner->unkB38 == self && owner->unkB2C == 2) {
+            if (owner->m_pCrossHairTarget == self && owner->m_CrossHairMode == 2) {
                 return 1;
             }
         }

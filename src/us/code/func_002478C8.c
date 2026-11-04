@@ -1,12 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
 
-typedef struct CPlayerOptions {
-    /* 0x00 */ u8 pad0[0x33];
-    /* 0x33 */ char name[0x3E - 0x33];
-    /* 0x3E */ u8 tagMode;
-} CPlayerOptions;
-
 typedef struct HitTarget {
     /* 0x00 */ u8 pad0[0x65];
     /* 0x65 */ u8 region;           /* low two bits: 1 = head */
@@ -64,23 +58,23 @@ void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit) {
         if (victim == killer) {
             func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B542C);
             SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
-        } else if (victim->m_pOptions->tagMode != 0) {
+        } else if (victim->m_pOptions->m_TagMode != 0) {
             f32 time = 1.5f;
             Game *game;
 
             func_00288800(victim->m_DeathMatchString[victim->m_nDeathmatchString], D_800B53FC);
-            func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->name);
+            func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
             game = GAME_OF(settings);
             SHOW_MESSAGE(game, victim, time);
             func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B5408);
-            func_00288800(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->name);
+            func_00288800(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->m_Name);
             SHOW_MESSAGE(game, killer, 1.5f);
         } else {
             f32 time = 1.5f;
             Game *game;
 
             func_00288800(victim->m_DeathMatchString[victim->m_nDeathmatchString], D_800B5414);
-            func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->name);
+            func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
             game = GAME_OF(settings);
             SHOW_MESSAGE(game, victim, time);
             target = hit->target;
@@ -89,7 +83,7 @@ void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit) {
                 SHOW_MESSAGE(game, killer, 1.5f);
             } else {
                 func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B5420);
-                func_00288800(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->name);
+                func_00288800(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->m_Name);
                 SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
             }
         }

@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_4.CPP, Particle_Attach, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 #include "structs/game_object.h"
 
 /* Moves a particle attached to an actor along with it: onto a bone of its
@@ -12,11 +13,6 @@ typedef struct {
     /* 0x000 */ u8 pad0[0x14C];
     /* 0x14C */ Mtx4f transform;
 } PlayerView;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ PlayerView *view;
-} Player;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x2];
@@ -82,7 +78,7 @@ void func_0022D09C(Particle *actor, CVector3 *outPosition, CVector3 *outHeading)
         link = actor->owner;
         if (link->m_dwFlags & 0x300000) {
             /* a player: its view's transform */
-            func_0020F85C(((Player *)link->m_AI.m_pParent)->view->transform, &actor->offset, &position);
+            func_0020F85C(((PlayerView *)((CPlayer *)link->m_AI.m_pParent)->m_pCamera)->transform, &actor->offset, &position);
         } else {
             func_0020F85C(link->m_mfOrient, &actor->offset, &position);
         }

@@ -1,6 +1,7 @@
 /* The do { } while (0) around the region-loop setup raises the region counter's priority (GCC weights refs by loop depth) so it gets fp and the object-table base is spilled, as in the ROM. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 #include "gfx.h"
 
 /* Draws the level geometry seen by one view: every static object and level
@@ -92,11 +93,6 @@ typedef struct {
 } World;
 
 typedef struct {
-    u8 pad0[0xA1C];
-    s32 flags;              /* 0xA1C */
-} Player;
-
-typedef struct {
     s32 mask;               /* 0x00 */
     u8 pad4[0xD];
     u8 unk11;               /* 0x11 */
@@ -107,8 +103,8 @@ extern u8 D_8011AAF1;       /* D_8011AAE0.unk11 */
 extern s32 D_800B6D20;
 
 void func_00221D3C(World *);
-Player *func_00281194(View *);
-s32 func_00253720(Player *, s32);
+CPlayer *func_00281194(View *);
+s32 func_00253720(CPlayer *, s32);
 void func_0020B5D4(void);
 void func_0020B624(void);
 void func_0020565C(s32, void **);
@@ -128,7 +124,7 @@ void func_002222E0(World *w, View *v_) {
     s32 vmask;
     s32 idx;
     s32 flag;
-    Player *player;
+    CPlayer *player;
     IdTable *tbl;
     s32 cnt;
     s32 si;
@@ -185,7 +181,7 @@ found:
     }
     func_0020B5D4();
     w->sortedCount = 0;
-    if (player != NULL && (player->flags & 0x100)) {
+    if (player != NULL && (player->m_ModeFlags & 0x100)) {
         {
             Gfx *g = D_800D8E24++;
             g->w0 = 0xDB040004;
