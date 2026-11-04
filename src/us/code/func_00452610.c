@@ -1,12 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_4.CPP, func_8043EA98_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
-struct Part {
-    char pad[0x28];
-    u8 active;         /* 0x28 */
-};
 
 struct ObjRecAt20V2 {
     char pad0[0x20];
@@ -15,7 +11,7 @@ struct ObjRecAt20V2 {
 
 typedef struct GameSession GameSession;
 
-extern struct Part D_8011AB18;
+extern CPlayerOptions D_8011AB18;
 extern signed char D_8011AB47;
 extern char D_800F5EC0[];
 extern GameSession D_800F6CB0;
@@ -26,7 +22,7 @@ extern void func_00430374(void *, s32);
 
 void func_00452610(void *arg0, struct ObjRecAt20V2 *menu) {
     GameSettings *globals;
-    struct Part *settings;
+    CPlayerOptions *settings;
     char *profile;
     s32 on;
     s32 i;
@@ -41,7 +37,7 @@ void func_00452610(void *arg0, struct ObjRecAt20V2 *menu) {
     on = 1;
     for (profile = D_800F5EC0; i < 4; i++) {
         if (func_002855E8(profile) != 0) {
-            settings->active = on;
+            settings->m_bActive = on;
             D_8011AB47 = i;
             menu->unk20 = profile;
             break;

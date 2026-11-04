@@ -8,6 +8,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "gfx.h"
+
 typedef struct IntrusiveList IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -48,11 +49,6 @@ struct StridedTable {
     s32 count;
     char data[1];
 };
-struct Part;
-struct Part {
-    char pad[0x28];
-    u8 active;
-};
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 struct ObjRecAt20V2;
@@ -67,7 +63,7 @@ struct ObjRecAt20V2;
 /* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
 extern void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu);
 extern void func_00275A74();
-extern struct Part D_8011AB18;
+extern CPlayerOptions D_8011AB18;
 extern char D_800F5EC0[];
 struct OSTask_t;
 struct OSTask_t {
@@ -336,7 +332,6 @@ struct ObjectPool {
     s32 field34, field38, field3C, field40;
 };
 struct ObjectPool;
-struct Part;
 struct ScreenMessageOwner;
 typedef struct MessageBuffer {
     s32 *allocation;
@@ -398,7 +393,7 @@ extern void func_00275A74(void);
 extern void func_00430454(char *, s32);
 void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
     GameSettings *globals;
-    struct Part *settings;
+    CPlayerOptions *settings;
     char *profile;
     s32 on;
     s32 i;
@@ -413,7 +408,7 @@ void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
     on = 1;
     for (profile = D_800F5EC0; i < 4; i++) {
         if (func_002855E8(profile) != 0) {
-            settings->active = on;
+            settings->m_bActive = on;
             D_8011AB47 = i;
             menu->unk20 = profile;
             break;
