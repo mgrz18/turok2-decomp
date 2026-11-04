@@ -1,5 +1,6 @@
 /* Second-module copy of func_00422F14 (first module; this one at link address 0x00422E34), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "structs/menu.h"
 
 void func_00285A68(s32 port);
 void func_004263A0(s32 port);
@@ -15,17 +16,7 @@ extern s32 D_801309A0;
 extern s32 D_801309AC;
 extern s32 D_801309B4;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s8 port;
-} MenuController;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ MenuController *controller;
-} MenuEvent;
-
-static __inline__ s32 GetPort(MenuEvent *event) {
+static __inline__ s32 GetPort(Menu *event) {
     if (D_80130990 != 0) {
         return D_800C2028;
     }
@@ -41,7 +32,7 @@ static __inline__ void SelectPort(s32 port) {
     func_00285A68(*p);
 }
 
-void func_0045BE34(MenuEvent *event) {
+void func_0045BE34(Menu *event) {
     MenuController *controller = event->controller;
 
     D_80130990 = 0;

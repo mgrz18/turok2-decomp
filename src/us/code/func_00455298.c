@@ -1,12 +1,5 @@
 #include "common.h"
-
-/* A menu item: its text is a format line whose last characters get the value. */
-typedef struct MenuItem {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ u32 flags;
-    /* 0x0C */ u8 padC[0x14 - 0xC];
-    /* 0x14 */ char *text;
-} MenuItem;
+#include "structs/menu.h"
 
 typedef struct PlayerOptions {
     /* 0x00 */ u8 pad0[0x29];
@@ -18,11 +11,6 @@ typedef struct MenuPlayer {
     /* 0x000 */ u8 pad0[0x518];
     /* 0x518 */ PlayerOptions *options;
 } MenuPlayer;
-
-typedef struct MenuContext {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ MenuPlayer *player;
-} MenuContext;
 
 /* What these read around the multiplayer settings, D_8011AAD8. */
 typedef struct MenuSettings {

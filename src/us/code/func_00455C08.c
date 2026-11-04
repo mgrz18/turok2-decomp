@@ -1,13 +1,8 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Menu text item: copy a player's 8-character name into the item's text and
  * print one of the current player's u16 counters (per opponent) after it. */
-
-typedef struct {
-    s32 index;  /* 0x00 */
-    u8 pad4[0x10];
-    char *text; /* 0x14 */
-} MenuItem;
 
 typedef struct {
     u8 pad0[0x1C];

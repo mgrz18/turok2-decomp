@@ -2,16 +2,7 @@
  * (func_0041DC5C, func_0041DCB0) at a load in a delay slot. MATCHES over the real extent
  * (checked with the symbol size overridden to 0x134). */
 #include "common.h"
-
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ s8 kind;
-} MenuCtl;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ MenuCtl *ctl;
-} MenuCaller;
+#include "structs/menu.h"
 
 extern s32 D_80130984;
 extern s32 D_80130990;
@@ -51,7 +42,7 @@ static __inline__ void *TmplForKind(s32 *kindp) {
 }
 
 /* Picks the menu template to open for the current game mode. */
-void *func_0041DC5C(MenuCaller *c) {
+void *func_0041DC5C(Menu *c) {
     void *tmpl = NULL;
     s32 kind;
 
@@ -60,7 +51,7 @@ void *func_0041DC5C(MenuCaller *c) {
             if (D_80130990) {
                 kind = D_800C2028;
             } else {
-                kind = c->ctl->kind;
+                kind = c->controller->port;
             }
             tmpl = TmplForKind(&kind);
         } else {

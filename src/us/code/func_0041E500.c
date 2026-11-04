@@ -1,20 +1,10 @@
 /* REAL func_0041E500 size 0x584 (0x0041E500-0x0041EA84); splat cut it into func_0041E500 + func_0041E7D0 + func_0041E824 + func_0041E97C. Matches whole (checked with the size overridden). Twin of src/us/code/func_00457420.c. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004069F4.c, func_004069F4, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/menu.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
-
-typedef struct {
-    u8 pad0[0xB0];
-    s32 buttons; /* 0xB0 */
-} MenuPad;
-
-typedef struct {
-    u8 pad0[0x1C];
-    s32 player;   /* 0x1C */
-    MenuPad *pad; /* 0x20 */
-} MenuOwner;
 
 extern s32 D_80130984;
 extern s32 D_801309A0;
@@ -51,18 +41,18 @@ void func_00426978(s32 a, s32 b, s32 *c);
 s32 func_00426BD8(s32 a);
 void func_00426C88(s32 a, u8 *b, s32 c);
 s32 func_00426E6C(s32 a);
-void func_0041DA28(MenuOwner *o);
-s32 func_0041E374(MenuOwner *o, s32 a, s32 *b, s32 *c);
-void func_00416644(u8 *a, u8 *b, s32 c, MenuPad *d, void *e);
+void func_0041DA28(Menu *o);
+s32 func_0041E374(Menu *o, s32 a, s32 *b, s32 *c);
+void func_00416644(u8 *a, u8 *b, s32 c, MenuController *d, void *e);
 
 #define PAK_ERROR()                                                        \
     D_801309BC = 1;                                                        \
     D_8011F144 = 0;                                                        \
-    func_00416644(D_80119E2C, D_0043BCB4, arg0->player, arg0->pad, NULL); \
+    func_00416644(D_80119E2C, D_0043BCB4, arg0->player, arg0->controller, NULL); \
     D_8011F13C = 0;                                                        \
     D_800C202C = 1;
 
-void func_0041E500(MenuOwner *arg0) {
+void func_0041E500(Menu *arg0) {
     u8 buf[16];
     s32 sp28, sp2C, sp30, sp34, sp38, sp3C;
     s32 s0, s1, s2, s3, f1, v0, m1, r2;
@@ -77,7 +67,7 @@ void func_0041E500(MenuOwner *arg0) {
     if (func_00285998() == 0) {
         D_801309BC = 1;
         D_8011F144 = 0;
-        func_00416644(D_80119E2C, D_0043BCFC, arg0->player, arg0->pad, NULL);
+        func_00416644(D_80119E2C, D_0043BCFC, arg0->player, arg0->controller, NULL);
         D_800C202C = 1;
         D_8011F13C = 0;
         return;
@@ -109,7 +99,7 @@ void func_0041E500(MenuOwner *arg0) {
         goto blk59;
     }
     func_002886AC(D_800F6CB0);
-    if ((arg0->pad->buttons & 0x1000) && D_800C202C == 0) {
+    if ((arg0->controller->buttons & 0x1000) && D_800C202C == 0) {
         D_8011B108 = 1;
         D_800C202C = 1;
     }
@@ -214,7 +204,7 @@ L3:
     if (sp38 < m1) {
         D_801309BC = 1;
         D_8011B108 = 1;
-        func_00416644(D_80119E2C, D_0043C1E8, arg0->player, arg0->pad, D_0043B738);
+        func_00416644(D_80119E2C, D_0043C1E8, arg0->player, arg0->controller, D_0043B738);
         goto after;
     }
     if (sp38 < r2) {
@@ -224,7 +214,7 @@ L3:
 L56:
     D_801309BC = 1;
     D_8011B108 = 1;
-    func_00416644(D_80119E2C, D_0043C1C4, arg0->player, arg0->pad, D_0043B738);
+    func_00416644(D_80119E2C, D_0043C1C4, arg0->player, arg0->controller, D_0043B738);
 after:
     if (s0 == 0) {
         goto fin;
@@ -232,7 +222,7 @@ after:
 blk59:
     D_801309BC = 1;
     D_8011B108 = 1;
-    func_00416644(D_80119E2C, D_0043C05C, arg0->player, arg0->pad, D_0043B738);
+    func_00416644(D_80119E2C, D_0043C05C, arg0->player, arg0->controller, D_0043B738);
 fin:
     if (D_801309BC == 0) {
         func_0041DA28(arg0);

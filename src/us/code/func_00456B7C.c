@@ -1,16 +1,7 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Pick the menu page to go back to, from the game mode flags. */
-
-typedef struct {
-    u8 pad0[4];
-    s8 mode; /* 0x04 */
-} MenuArgs;
-
-typedef struct {
-    u8 pad0[0x20];
-    MenuArgs *args; /* 0x20 */
-} MenuEvent;
 
 extern s32 D_80130984;
 extern s32 D_80130990;
@@ -48,7 +39,7 @@ static __inline__ void *modePage(s32 *mode) {
     return page;
 }
 
-void *func_00456B7C(MenuEvent *event) {
+void *func_00456B7C(Menu *event) {
     void *page = NULL;
     s32 mode;
 
@@ -57,7 +48,7 @@ void *func_00456B7C(MenuEvent *event) {
             if (D_80130990 != 0) {
                 mode = D_800C2028;
             } else {
-                mode = event->args->mode;
+                mode = event->controller->port;
             }
             page = modePage(&mode);
         } else {

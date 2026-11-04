@@ -1,17 +1,7 @@
 /* WRONG CUT: the real function is func_00452EA8, size 0xE0 (splat starts it 8 bytes late, at func_00452EA8,
  * past the two loads GCC scheduled ahead of the prologue). */
 #include "common.h"
-
-/* A menu item: its text is a format line whose last characters get the value. */
-typedef struct MenuItem {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s16 type;
-    /* 0x06 */ u8 pad6[0x14 - 6];
-    /* 0x14 */ char *text;
-    /* 0x18 */ u8 pad18[4];
-    /* 0x1C */ void *player;
-    /* 0x20 */ void *options;
-} MenuItem;
+#include "structs/menu.h"
 
 /* The multiplayer settings, D_8011AAD8 (0x184 bytes, see func_0042F514). */
 typedef struct MenuSettings {
