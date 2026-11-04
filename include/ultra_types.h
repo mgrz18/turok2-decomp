@@ -101,6 +101,15 @@ typedef struct {
     /* 0x65 */ u8 activebank;
 } OSPfs; /* size 0x68 */
 
+/* What osPfsFileState fills for one note. */
+typedef struct {
+    /* 0x00 */ u32 file_size;       /* bytes; 0: the note is free */
+    /* 0x04 */ u32 game_code;
+    /* 0x08 */ u16 company_code;
+    /* 0x0A */ char ext_name[4];
+    /* 0x0E */ char game_name[16];
+} OSPfsState; /* size 0x20 */
+
 /* Controller Pak internals (PRinternal/controller.h). */
 typedef union {
     struct {
