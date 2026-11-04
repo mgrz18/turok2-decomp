@@ -18,7 +18,9 @@ typedef struct SharedRecAt564V1 {
     CVector3 position;  /* 0x114 (0x128 in Rage Wars) */
 } SharedRecAt564V1;
 
-/* Match globals; in Turok 2 the match state lives in the same block. */
+/* The camera pool D_801198B0 (CCameraPool, structs/camera.h) seen to the game
+ * mode D_8011AAD8.mode (+0x13D8): the ROM reads the mode through this symbol,
+ * and through D_8011AAD8 the code no longer matches. */
 typedef struct MenuMatchGlobals {
     char pad0[0x13D8];
     s32 state;          /* 0x13D8 (D_8011AC88) */

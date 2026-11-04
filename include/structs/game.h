@@ -161,6 +161,16 @@ typedef struct CGame {
 
 extern CGame D_80119870;
 
+/* CGame seen from its camera pool, D_801198B0 (CGame + 0x40): some files
+ * read the settings through that symbol, as the ROM does there (through
+ * D_8011AAD8 their code no longer matches); they declare D_801198B0 so. The
+ * camera pool files declare it CCameraPool (structs/camera.h). */
+typedef struct CGameFromCameraPool {
+    /* 0x0000 */ u8 m_CameraPool[0x11F0];   /* CCameraPool: m_MainCamera at 0x40 */
+    /* 0x11F0 */ CDebugLines m_DebugLines;
+    /* 0x1228 */ GameSettings m_Settings;   /* D_8011AAD8 */
+} CGameFromCameraPool; /* size 0x1450 */
+
 /* ---- The engine, D_800F6CB0 (CEngineApp) ---- */
 
 /* One frame in flight (Turok 3's CFrameData, 8 bytes longer here: the word

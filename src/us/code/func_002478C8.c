@@ -12,18 +12,12 @@ typedef struct Hit {
     /* 0x10 */ HitTarget *target;
 } Hit;
 
-/* The global at D_801198B0: what this reads of it. */
-typedef struct Game {
-    /* 0x0000 */ u8 pad0[0x1228];
-    /* 0x1228 */ GameSettings settings;    /* D_8011AAD8 */
-} Game;
-
-extern Game D_801198B0;
+extern CGameFromCameraPool D_801198B0;
 
 /* The game the settings belong to, recovered from the settings pointer. Its address is
    D_8011AAD8 - 0x1228 for the compiler, not D_801198B0: that is what keeps the tagged and
    head-shot messages from being cross-jumped into the "you killed" one. */
-#define GAME_OF(settings) ((Game *)((u8 *)(settings) - 0x1228))
+#define GAME_OF(settings) ((CGameFromCameraPool *)((u8 *)(settings) - 0x1228))
 
 /* The messages live in the data after .rodata ("head shot!" in the hit-region names), not in this file's pool. */
 extern char D_800B53D0[]; /* "head shot!" */
@@ -34,7 +28,7 @@ extern char D_800B5420[]; /* "you killed " */
 extern char D_800B542C[]; /* "you killed yourself" */
 
 char *func_00288800(char *dst, char *src); /* strcpy */
-void func_00281610(Game *game, struct CCamera *camera, char *text, f32 time);
+void func_00281610(CGameFromCameraPool *game, struct CCamera *camera, char *text, f32 time);
 
 /* Shows a player's newest message (ring of four) on its camera. */
 #define SHOW_MESSAGE(game, player, time)                                                         \
@@ -55,7 +49,7 @@ void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit) {
             SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
         } else if (victim->m_pOptions->m_TagMode != 0) {
             f32 time = 1.5f;
-            Game *game;
+            CGameFromCameraPool *game;
 
             func_00288800(victim->m_DeathMatchString[victim->m_nDeathmatchString], D_800B53FC);
             func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
@@ -66,7 +60,7 @@ void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit) {
             SHOW_MESSAGE(game, killer, 1.5f);
         } else {
             f32 time = 1.5f;
-            Game *game;
+            CGameFromCameraPool *game;
 
             func_00288800(victim->m_DeathMatchString[victim->m_nDeathmatchString], D_800B5414);
             func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
