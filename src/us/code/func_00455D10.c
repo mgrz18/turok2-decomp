@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* The window's item records are 0x28 bytes apart, item i's flags word at
  * 0x120 + i * 0x28 of the block. */
@@ -9,12 +10,6 @@ typedef struct {
     /* 0xBF8 */ s32 unkBF8;
 } Player;
 
-typedef struct {
-    u8 pad0[0xC];
-    void *items;
-    u8 pad10[0x1C - 0x10];
-    void *player;
-} Menu;
 #include "rw/abu_protos.h"
 
 extern s32 D_8011ACE4;
