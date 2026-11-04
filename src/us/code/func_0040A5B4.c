@@ -5,12 +5,6 @@
 /* Module phase 1 setup: timers, the anim for the phase, slot values; unless ai->m_Mode is 9, resets the
  * phase's active slots and runs func_00409500 three times. */
 
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x27C];
-    /* 0x27C */ s32 flags;
-} Obj;
-
 extern s32 D_00431DE4[];
 extern s32 D_00431DF0[]; /* active slot mask per phase */
 extern s32 D_00431DFC[];
@@ -25,12 +19,12 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(state->slots[i].anim, src);
+            func_00236314(&state->slots[i].anim, src);
         }
     }
 }
 
-void func_0040A5B4(Obj *obj, CAI *ai) {
+void func_0040A5B4(CGameObjectInstance *obj, CAI *ai) {
     MotherBossState *state = &D_8012FB70;
     s32 mask;
     s32 i;
@@ -39,7 +33,7 @@ void func_0040A5B4(Obj *obj, CAI *ai) {
     state->maxRadius = 0x900;
     state->phase = 1;
     state->counter = 0;
-    obj->flags &= ~0x18000000;
+    obj->m_dwHotPointFlags &= ~0x18000000;
     ai->m_VisBits = D_00431DE4[state->phase];
     state->liveMask = D_00431DFC[state->phase];
     mask = D_00431DF0[state->phase];

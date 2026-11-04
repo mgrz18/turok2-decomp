@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 #include "structs/game.h"
+#include "structs/menu.h"
 
 extern int func_00285628(struct ControllerProfile *object);
 extern int func_00285670(struct ControllerProfile *object);
 extern f32 D_800B6D28;
-extern Spinner D_800C1FB0[];
 extern s32 func_0025340C(CPlayerList *, s32);
 s32 func_0041D2C4(void *unused, MenuRecAt20V1 *menu) {
     s32 i;
@@ -19,12 +19,12 @@ s32 func_0041D2C4(void *unused, MenuRecAt20V1 *menu) {
         D_800C1FB0[i].timer = t - (15.0f);
     }
     if (menu->state == 1) {
-        if (((s32 (*)(s32))func_00285628)(menu->input) != 0 && D_800C1FB0[i].value > 0) {
-            D_800C1FB0[i].value--;
+        if (((s32 (*)(s32))func_00285628)(menu->input) != 0 && D_800C1FB0[i].cursor > 0) {
+            D_800C1FB0[i].cursor--;
             D_800C1FB0[i].timer = 0.0f;
         } else if (((s32 (*)(s32))func_00285670)(menu->input) != 0) {
-            if (D_800C1FB0[i].value < D_800C1FB0[i].max) {
-                D_800C1FB0[i].value++;
+            if (D_800C1FB0[i].cursor < D_800C1FB0[i].length) {
+                D_800C1FB0[i].cursor++;
                 D_800C1FB0[i].timer = 0.0f;
             }
         }

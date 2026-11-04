@@ -1,14 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
-
-/* A box: min corner then max corner. */
-typedef struct Box {
-    /* 0x00 */ CVector3 min;
-    /* 0x0C */ CVector3 max;
-} Box;
 
 /* A rectangle on the ground plane. */
 typedef struct Rect {
@@ -18,41 +13,9 @@ typedef struct Rect {
     /* 0x0C */ f32 maxZ;
 } Rect;
 
-typedef struct CollisionDef {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ s8 unk4;
-    /* 0x05 */ s8 unk5;
-} CollisionDef;
-
-/* A segment swept from an instance's position to end (see func_00239F00). */
-typedef struct Sweep {
-    /* 0x00 */ CInstanceHeader *obj;
-    /* 0x04 */ CollisionDef *def;
-    /* 0x08 */ f32 fraction;
-    /* 0x0C */ u8 padC[0x40];
-    /* 0x4C */ CVector3 end;
-    /* 0x58 */ CVector3 delta;
-    /* 0x64 */ u8 pad64[0x38];
-    /* 0x9C */ s32 stop;
-} Sweep;
-
-/* A sweep against a model, in the sweep's own space (see func_0023DBBC). */
-typedef struct ModelSweep {
-    /* 0x00 */ Sweep *sweep;
-    /* 0x04 */ f32 view[4][4];          /* world to sweep space */
-    /* 0x44 */ f32 scale;
-    /* 0x48 */ f32 hitDist;
-    /* 0x4C */ void *model;
-    /* 0x50 */ s32 kind;
-    /* 0x54 */ f32 mtx[4][4];
-    /* 0x94 */ f32 inverse[4][4];
-    /* 0xD4 */ void *meshes;
-    /* 0xD8 */ s32 special;
-} ModelSweep;
-
 /* A scene model's bounds (what func_0023A640 tests). */
 typedef struct ModelBounds {
-    /* 0x00 */ Box box;
+    /* 0x00 */ CBox box;
     /* 0x18 */ u8 pad18[8];
     /* 0x20 */ u16 flags;               /* 0x10: no collisions */
     /* 0x22 */ u8 pad22[6];
@@ -93,7 +56,7 @@ void func_0023DCBC(f32 mf[4][4], f32 xEye, f32 yEye, f32 zEye, f32 xAt, f32 yAt,
                    f32 zUp);
 f32 func_00298470(f32);                 /* sqrtf */
 s32 func_0023A968(Sweep *sweep, Rect *rect, f32 *t);
-s32 func_0023A640(Sweep *sweep, Box *box, f32 *t);
+s32 func_0023A640(Sweep *sweep, CBox *box, f32 *t);
 SceneModels *func_002017D4(s32 *list, s32 index);
 void func_00226F90(void *base, s32 count, s32 size, s32 (*cmp)(), void (*swap)());
 s32 func_0023DB98();
@@ -105,7 +68,7 @@ void func_0023DBBC(ModelSweep *ms);
  * bounds the sweep crosses, nearest first, and sweeps against each until a
  * hit nearer than the next one. */
 void func_0023D050(Sweep *sweep) {
-    Box box;
+    CBox box;
     Rect rect;
     ModelSweep ms;
     ModelHit hits[128];
@@ -122,14 +85,14 @@ void func_0023D050(Sweep *sweep) {
     s32 n;
     s32 j;
 
-    if (!(sweep->def->flags & 0x01000000)) {
+    if (!(sweep->def->m_dwFlags & 0x01000000)) {
         return;
     }
-    if (sweep->def->unk5 == 0) {
+    if (sweep->def->m_WallBehavior == 0) {
         return;
     }
     end = &sweep->end;
-    start = &sweep->obj->m_vPos;
+    start = &sweep->inst->m_vPos;
     if (start->x == end->x && start->y == end->y && start->z == end->z) {
         return;
     }
@@ -137,17 +100,17 @@ void func_0023D050(Sweep *sweep) {
     func_0023DCBC(ms.view, start->x, start->y, start->z, end->x, end->y, end->z, 0.0f, 1.0f, 0.0f);
     ms.scale = -func_00298470(sweep->delta.x * sweep->delta.x + sweep->delta.y * sweep->delta.y
                               + sweep->delta.z * sweep->delta.z);
-    ms.hitDist = ms.scale * sweep->fraction;
-    box.min.x = MIN(end->x, start->x);
-    box.max.x = MAX(end->x, start->x);
-    box.min.y = MIN(end->y, start->y);
-    box.max.y = MAX(end->y, start->y);
-    box.min.z = MIN(end->z, start->z);
-    box.max.z = MAX(end->z, start->z);
-    rect.minX = box.min.x;
-    rect.maxX = box.max.x;
-    rect.maxZ = box.max.z;
-    rect.minZ = box.min.z;
+    ms.hitDist = ms.scale * sweep->hit.fraction;
+    box.m_vMin.x = MIN(end->x, start->x);
+    box.m_vMax.x = MAX(end->x, start->x);
+    box.m_vMin.y = MIN(end->y, start->y);
+    box.m_vMax.y = MAX(end->y, start->y);
+    box.m_vMin.z = MIN(end->z, start->z);
+    box.m_vMax.z = MAX(end->z, start->z);
+    rect.minX = box.m_vMin.x;
+    rect.maxX = box.m_vMax.x;
+    rect.maxZ = box.m_vMax.z;
+    rect.minZ = box.m_vMin.z;
     hit = hits;
     i = 0;
     n = 0;
@@ -161,10 +124,10 @@ void func_0023D050(Sweep *sweep) {
             j = list->count;
             model = list->models;
             while (--j != -1 && !sweep->stop && n < 128) {
-                if (!(model->bounds.flags & 0x10) && box.max.x > model->bounds.box.min.x
-                    && box.min.x < model->bounds.box.max.x && box.max.z > model->bounds.box.min.z
-                    && box.min.z < model->bounds.box.max.z && box.max.y > model->bounds.box.min.y
-                    && box.min.y < model->bounds.box.max.y && func_0023A640(sweep, &model->bounds.box, &t)) {
+                if (!(model->bounds.flags & 0x10) && box.m_vMax.x > model->bounds.box.m_vMin.x
+                    && box.m_vMin.x < model->bounds.box.m_vMax.x && box.m_vMax.z > model->bounds.box.m_vMin.z
+                    && box.m_vMin.z < model->bounds.box.m_vMax.z && box.m_vMax.y > model->bounds.box.m_vMin.y
+                    && box.m_vMin.y < model->bounds.box.m_vMax.y && func_0023A640(sweep, &model->bounds.box, &t)) {
                     n++;
                     hit->model = model;
                     hit->t = t;
@@ -178,7 +141,7 @@ void func_0023D050(Sweep *sweep) {
         func_00226F90(hits, n, sizeof(ModelHit), func_0023DB98, func_0023DB5C);
         hit = hits;
         for (j = 0; j < n; j++, hit++) {
-            if (!(hit->t < sweep->fraction)) {
+            if (!(hit->t < sweep->hit.fraction)) {
                 return;
             }
             model = hit->model;

@@ -3,24 +3,24 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002955EC(AudioLowPassFilter *lp);
+extern void func_002955EC(ALLowPass *lp);
 extern const f64 D_800AA528;
 extern const f64 D_800AA530;
-void func_002955EC(AudioLowPassFilter *lp)
+void func_002955EC(ALLowPass *lp)
 {
     s32 i, temp;
     s16 fc;
     f64 ffc, fcoef;
-    temp = lp->cutoff * 16384;
+    temp = lp->fc * 16384;
     fc = temp >> 15;
-    lp->gain = 16384 - fc;
+    lp->fgain = 16384 - fc;
     lp->first = 1;
     for (i = 0; i < 8; i++)
-        lp->coefficients.taps[i] = 0;
-    lp->coefficients.taps[i++] = fc;
+        lp->fcvec.fccoef[i] = 0;
+    lp->fcvec.fccoef[i++] = fc;
     fcoef = ffc = (f64)fc * D_800AA528;
     for (; i < 16; i++) {
         fcoef *= ffc;
-        lp->coefficients.taps[i] = (s16)(fcoef * D_800AA530);
+        lp->fcvec.fccoef[i] = (s16)(fcoef * D_800AA530);
     }
 }

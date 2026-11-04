@@ -26,7 +26,7 @@ void func_00261FB0(Self *self, CAI *ai) {
     ai->m_vTargetOffset.x = 0.0f;
     ai->m_vTargetOffset.z = 0.0f;
     ai->m_AnimSpeed = func_00211774(ai->m_AnimSpeed, 6.0f, 0.2f);
-    ai->m_VarF32[3] = func_00211774(ai->m_VarF32[3], 0.20943953f, 0.5f);
+    ai->m_Enemy.m_TurnRate = func_00211774(ai->m_Enemy.m_TurnRate, 0.20943953f, 0.5f);
     func_00246108(self, ai, &t, 1, 1);
     func_0024599C(self, ai, &steer);
 
@@ -37,5 +37,5 @@ void func_00261FB0(Self *self, CAI *ai) {
     } else if (self->pitch < -81.92f) {
         self->pitch = -81.92f;
     }
-    func_00245BAC(self, ai, ai->m_VarF32[3], tp->m_Path.m_Angle);
+    func_00245BAC(self, ai, ai->m_Enemy.m_TurnRate, tp->m_Path.m_Angle);
 }

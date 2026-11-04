@@ -1,9 +1,5 @@
 #include "common.h"
-
-typedef struct Sweep {
-    /* 0x00 */ u8 pad0[0x9C];
-    /* 0x9C */ s32 done;
-} Sweep;
+#include "structs/collision.h"
 
 typedef struct SweepModel {
     /* 0x00 */ u8 pad0[0x14];
@@ -12,20 +8,10 @@ typedef struct SweepModel {
     /* 0x28 */ u8 matrix[0x40];
 } SweepModel;
 
-typedef struct ModelSweep {
-    /* 0x00 */ Sweep *sweep;
-    /* 0x04 */ f32 pos[0x12];
-    /* 0x4C */ SweepModel *model;
-    /* 0x50 */ s32 kind;
-    /* 0x54 */ f32 mtx[0x10];
-    /* 0x94 */ f32 inverse[0x10];
-    /* 0xD4 */ void *meshes;
-} ModelSweep;
-
 char *func_002017D4(s32 *list, s32 index);
 void func_002051F4(s32 arg0, s32 *arg1);
-void func_0020C618(f32 *dst, f32 *a, f32 *b);
-void func_0020D908(f32 *mtx, void *packed);
+void func_0020C618(f32 (*dst)[4], f32 (*a)[4], f32 (*b)[4]);
+void func_0020D908(f32 (*mtx)[4], void *packed);
 s32 *func_00214DBC(void *model);
 void func_0023D7CC(ModelSweep *ms, char *group);
 
@@ -43,13 +29,13 @@ void func_0023DBBC(ModelSweep *ms) {
     data = func_00214DBC(model);
     if (data != NULL) {
         func_0020D908(ms->mtx, model->matrix);
-        func_0020C618(ms->inverse, ms->mtx, ms->pos);
+        func_0020C618(ms->inverse, ms->mtx, ms->view);
         root = (s32 *)*data;
         ms->meshes = func_002017D4(root, 0);
         groups = (s32 *)func_002017D4((s32 *)func_002017D4(root, 2), model->def->variant);
         count = *groups;
         sweep = ms->sweep;
-        for (i = 0; i < count && sweep->done == 0; i++) {
+        for (i = 0; i < count && sweep->stop == 0; i++) {
             func_0023D7CC(ms, func_002017D4(groups, i));
         }
         func_002051F4(0, data);

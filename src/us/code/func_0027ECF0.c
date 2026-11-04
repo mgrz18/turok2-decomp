@@ -1,12 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80233920_8.CPP, func_80236874_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/camera.h"
-
-/* A bounding box. */
-typedef struct {
-    /* 0x00 */ CVector3 m_Min;
-    /* 0x0C */ CVector3 m_Max;
-} CBox;
+#include "structs/collision.h"
 
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
@@ -147,41 +142,41 @@ void func_0027ECF0(CCameraPool *pool) {
             do {
                 func_0027D160(view);
                 v = view->m_ViewMin.x;
-                if (!(v <= clip->m_Min.x)) v = clip->m_Min.x;
-                clip->m_Min.x = v;
+                if (!(v <= clip->m_vMin.x)) v = clip->m_vMin.x;
+                clip->m_vMin.x = v;
                 v = view->m_ViewMin.y;
-                if (!(v <= clip->m_Min.y)) v = clip->m_Min.y;
-                clip->m_Min.y = v;
+                if (!(v <= clip->m_vMin.y)) v = clip->m_vMin.y;
+                clip->m_vMin.y = v;
                 v = view->m_ViewMin.z;
-                if (!(v <= clip->m_Min.z)) v = clip->m_Min.z;
-                clip->m_Min.z = v;
+                if (!(v <= clip->m_vMin.z)) v = clip->m_vMin.z;
+                clip->m_vMin.z = v;
                 v = view->m_ViewMax.x;
-                if (!(clip->m_Max.x <= v)) v = clip->m_Max.x;
-                clip->m_Max.x = v;
+                if (!(clip->m_vMax.x <= v)) v = clip->m_vMax.x;
+                clip->m_vMax.x = v;
                 v = view->m_ViewMax.y;
-                if (!(clip->m_Max.y <= v)) v = clip->m_Max.y;
-                clip->m_Max.y = v;
+                if (!(clip->m_vMax.y <= v)) v = clip->m_vMax.y;
+                clip->m_vMax.y = v;
                 v = view->m_ViewMax.z;
-                if (!(clip->m_Max.z <= v)) v = clip->m_Max.z;
-                clip->m_Max.z = v;
+                if (!(clip->m_vMax.z <= v)) v = clip->m_vMax.z;
+                clip->m_vMax.z = v;
                 v = view->m_AnimMin.x;
-                if (!(v <= bounds->m_Min.x)) v = bounds->m_Min.x;
-                bounds->m_Min.x = v;
+                if (!(v <= bounds->m_vMin.x)) v = bounds->m_vMin.x;
+                bounds->m_vMin.x = v;
                 v = view->m_AnimMin.y;
-                if (!(v <= bounds->m_Min.y)) v = bounds->m_Min.y;
-                bounds->m_Min.y = v;
+                if (!(v <= bounds->m_vMin.y)) v = bounds->m_vMin.y;
+                bounds->m_vMin.y = v;
                 v = view->m_AnimMin.z;
-                if (!(v <= bounds->m_Min.z)) v = bounds->m_Min.z;
-                bounds->m_Min.z = v;
+                if (!(v <= bounds->m_vMin.z)) v = bounds->m_vMin.z;
+                bounds->m_vMin.z = v;
                 v = view->m_AnimMax.x;
-                if (!(bounds->m_Max.x <= v)) v = bounds->m_Max.x;
-                bounds->m_Max.x = v;
+                if (!(bounds->m_vMax.x <= v)) v = bounds->m_vMax.x;
+                bounds->m_vMax.x = v;
                 v = view->m_AnimMax.y;
-                if (!(bounds->m_Max.y <= v)) v = bounds->m_Max.y;
-                bounds->m_Max.y = v;
+                if (!(bounds->m_vMax.y <= v)) v = bounds->m_vMax.y;
+                bounds->m_vMax.y = v;
                 v = view->m_AnimMax.z;
-                if (!(bounds->m_Max.z <= v)) v = bounds->m_Max.z;
-                bounds->m_Max.z = v;
+                if (!(bounds->m_vMax.z <= v)) v = bounds->m_vMax.z;
+                bounds->m_vMax.z = v;
                 flags->m_Bits |= view->m_ViewParams.m_VisBits;
                 view = view->m_pNext;
             } while (view != NULL);

@@ -1,16 +1,11 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER/render_screen_overlay.CPP, Render_DrawTextLines, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
-
-typedef struct GfxTask {
-    /* 0x000 */ u8 pad0[0x110];
-    /* 0x110 */ s32 colorImage;
-} GfxTask;
+#include "structs/game.h"
 
 extern s32 D_800C2030;      /* screen width */
 extern s32 D_800C2034;      /* screen height */
 extern s32 D_80130A78;      /* z-buffer */
-extern GfxTask *D_800F7070[]; /* current graphics task */
 extern s32 D_801101B0[2];
 
 extern void func_00207FEC(s32 mode);
@@ -58,7 +53,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
     {
         Gfx *g = D_800D8E24++;
         g->w0 = colorImage;     /* gDPSetColorImage(RGBA, 16b, width, frame) */
-        g->w1 = D_800F7070[0]->colorImage;
+        g->w1 = D_800F6CB0.m_pCurrentFrameData->m_pFrameBuffer;
     }
     {
         Gfx *g = D_800D8E24++;
@@ -74,7 +69,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
 
 /* Draws a NULL-terminated list of scaled strings, over a cleared screen if asked. */
 void func_00286E14(void *state, s32 drawBackdrop, char **lines, s32 x, s32 y, s32 lineStep, f32 scaleX, f32 scaleY) {
-    GfxTask *task = D_800F7070[0];
+    CFrameData *task = D_800F6CB0.m_pCurrentFrameData;
     char *text;
     s32 i;
 
@@ -89,7 +84,7 @@ void func_00286E14(void *state, s32 drawBackdrop, char **lines, s32 x, s32 y, s3
         {
             Gfx *g = D_800D8E24++;
             g->w0 = 0xFF100000 | ((D_800C2030 - 1) & 0xFFF);  /* gDPSetColorImage(frame) */
-            g->w1 = task->colorImage;
+            g->w1 = task->m_pFrameBuffer;
         }
         {
             Gfx *g = D_800D8E24++;

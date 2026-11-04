@@ -64,7 +64,7 @@ SndVoice *func_00273504(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
       }
       p->owner->pendingCue = idx;
       m2 = p->owner;
-      new_var2 = m2->player;
+      new_var2 = &m2->player;
       core = ((u8 *) m2) + 0x7C;
       snd[idx] = func_00293470(new_var2, ((M04Bank2 *) m2->bank)->tab->v[pri], m2);
       sv = snd[idx];

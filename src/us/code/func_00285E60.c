@@ -1,14 +1,9 @@
 #include "common.h"
 #include "gfx.h"
-
-typedef struct FrameBuffers {
-    u8 pad0[0x110];
-    u32 depthBuffer;    /* 0x110 */
-} FrameBuffers;
+#include "structs/frame.h"
 
 extern s32 D_800C2030;              /* screen width */
 extern s32 D_800C2034;              /* screen height */
-extern FrameBuffers *D_800F7070;
 
 extern void func_0028852C(s32, s32, s32, s32, s32);
 extern void func_0027AEA8(s32, s32, s32 *, s32 *);
@@ -16,7 +11,7 @@ extern void func_00279028(s32);
 extern void func_0027B320(s32, s32, s32, s32, f32, f32, s32);
 
 void func_00285E60(s32 arg0) {
-    FrameBuffers *fb;
+    CFrameData *fb;
     s32 width;
     s32 height;
     Gfx *g;
@@ -32,7 +27,7 @@ void func_00285E60(s32 arg0) {
     /* gDPSetColorImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, w, depth buffer) */
     g = D_800D8E24++;
     g->w0 = 0xFF100000 | ((D_800C2030 - 1) & 0xFFF);
-    g->w1 = fb->depthBuffer;
+    g->w1 = fb->m_pFrameBuffer;
     /* gDPSetCycleType(G_CYC_FILL) */
     g = D_800D8E24++;
     g->w0 = 0xE3000A01;

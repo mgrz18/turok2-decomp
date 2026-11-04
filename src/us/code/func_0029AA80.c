@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern __OSViContext_func_802BA6B0_de *D_800B7AC4;
+extern __OSViContext *D_800B7AC4;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 void func_0029AA80(OSViMode *modep) {
     register u32 saveMask = __osDisableInt();
     D_800B7AC4->modep = modep;
     D_800B7AC4->state = 1;
-    D_800B7AC4->control = D_800B7AC4->modep->comRegs.w0;
+    D_800B7AC4->control = D_800B7AC4->modep->comRegs.ctrl;
     __osRestoreInt(saveMask);
 }

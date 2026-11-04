@@ -1,5 +1,5 @@
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
 /* Spawns effect 3 from obj at other's position, with params (0xA00, value << 8). */
 
@@ -9,18 +9,13 @@ typedef struct {
     /* 0x04 */ u8 extra[4];
 } __attribute__((aligned(4))) ActionParams;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-} Obj;
-
 extern void func_00236EA0(void *source, void *p, s32 effect, s32 arg3, CVector3 pos, ActionParams params);
 
-void func_0040C518(Obj *obj, Obj *other, s32 value) {
+void func_0040C518(CGameObjectInstance *obj, CGameObjectInstance *other, s32 value) {
     ActionParams params;
 
     params.upper = 0xA00;
     params.lower = value << 8;
     params.extra[0] = params.extra[1] = params.extra[2] = params.extra[3] = 0;
-    func_00236EA0(obj, obj, 3, -1, other->pos, params);
+    func_00236EA0(obj, obj, 3, -1, other->header.m_vPos, params);
 }

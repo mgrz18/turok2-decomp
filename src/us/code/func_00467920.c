@@ -4,15 +4,6 @@
 #include "structs/game.h"
 
 
-/* D_8011AAF0: the multiplayer flag D_8011AAF1 and the game state D_8011AC88. */
-typedef struct GameState {
-    /* 0x000 */ u8 pad0;
-    /* 0x001 */ u8 multiplayer;     /* D_8011AAF1 */
-    /* 0x002 */ u8 pad2[0x198 - 0x2];
-    /* 0x198 */ s32 state;          /* D_8011AC88 */
-} GameState;
-
-extern GameState D_8011AAF0;
 extern u8 D_8011AAF1; /* multiplayer */
 extern u32 D_800B6D20;
 extern s16 D_800AE2B4[];
@@ -40,7 +31,7 @@ void func_00467920(CPlayer *p) {
     p->m_pHitMeWithChargeDart = 0;
     p->m_nNumArrowsStuckInMe = 0;
     p->m_UseLowerAmmo = 0;
-    if (D_8011AAF0.state == 13 && D_8011AAF0.multiplayer == 0 && D_800B6D20 >= 11) {
+    if (D_8011AAD8.mode == 13 && D_8011AAD8.multiplayer == 0 && D_800B6D20 >= 11) {
         if (p->m_Data.m_Lives < 11) {
             func_0027580C(D_800AE2B4[p->m_Data.m_Lives]);
         }

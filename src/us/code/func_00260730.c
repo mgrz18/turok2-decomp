@@ -2,8 +2,8 @@
 #include "structs/game_object.h"
 
 /* Flying AI steering: for index 1, ease the vertical speed towards the wanted
- * one and bank/pitch with it; then turn. Against a target of another kind,
- * re-roll the attack delay. */
+ * one and pitch/roll with it; then turn. Chasing a target in the other
+ * behaviour (ground/air), cut the behaviour-switch timer to 0-15 frames. */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
@@ -28,8 +28,8 @@ f32 func_002119FC(f32 lo, f32 hi);
 void func_00260730(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *limits) {
     CGameObjectInstance *target = steer->target;
     f32 v;
-    f32 bank;
     f32 pitch;
+    f32 roll;
 
     if (func_0025E428(self, ai) == 1) {
         v = func_0021160C(self->m_vVelocity.y, steer->wantVelY, limits->accel * 8.0f);
@@ -39,25 +39,25 @@ void func_00260730(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *lim
         } else if (v < -81.92f) {
             self->m_vVelocity.y = -81.92f;
         }
-        bank = -self->m_vVelocity.y * 0.030543264f;
-        if (bank > 0.436332345f) {
-            bank = 0.436332345f;
-        } else if (bank < -0.436332345f) {
-            bank = -0.436332345f;
-        }
-        ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], bank, 0.087266475f);
-        pitch = steer->turn * 0.75f;
+        pitch = -self->m_vVelocity.y * 0.030543264f;
         if (pitch > 0.436332345f) {
             pitch = 0.436332345f;
         } else if (pitch < -0.436332345f) {
             pitch = -0.436332345f;
         }
-        ai->m_VarF32[1] = func_00211774(ai->m_VarF32[1], pitch, 0.17453295f);
+        ai->m_Enemy.m_Pitch = func_00211774(ai->m_Enemy.m_Pitch, pitch, 0.087266475f);
+        roll = steer->turn * 0.75f;
+        if (roll > 0.436332345f) {
+            roll = 0.436332345f;
+        } else if (roll < -0.436332345f) {
+            roll = -0.436332345f;
+        }
+        ai->m_Enemy.m_Roll = func_00211774(ai->m_Enemy.m_Roll, roll, 0.17453295f);
     }
     func_00245BAC(self, ai, 0.13962635f, steer->turn);
-    if (steer->mode == 2 && target != NULL && ai->m_VarF32[8] > 15.0f) {
+    if (steer->mode == 2 && target != NULL && ai->m_Enemy.m_IdleTimer > 15.0f) {
         if (func_0025E428(self, ai) != func_0025E428(target, (u8 *)target + 0x140)) {
-            ai->m_VarF32[8] = func_002119FC(0.0f, 15.0f);
+            ai->m_Enemy.m_IdleTimer = func_002119FC(0.0f, 15.0f);
         }
     }
 }

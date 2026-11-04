@@ -52,7 +52,7 @@ void func_0025883C(WeaponActor *obj, CAI *state, DrawArgs *args) {
         muzzle->drawHook = NULL;
     }
     if (player->m_Data.m_CurrentWeapon == 0x15) {
-        arg6 = state->m_VarBuffer[8];
+        arg6 = state->m_Weapon.m_nPass;
     }
-    func_0020B6A0(args->hit, obj->model, 1, obj->slots[D_800B6D1C], 0, state->m_VarBuffer[7], arg6);
+    func_0020B6A0(args->hit, obj->model, 1, obj->slots[D_800B6D1C], 0, state->m_Weapon.m_nLod, arg6);
 }

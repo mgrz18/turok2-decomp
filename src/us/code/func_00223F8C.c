@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "gfx.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
 typedef struct ActorStats {
@@ -66,10 +67,6 @@ struct Actor {
                  u8 pad16DA[6];
                  Actor *next;
 };
-typedef struct DlCmd {
-    u32 w0;
-    u32 w1;
-} DlCmd;
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
 typedef struct Entity { /* Turok 2 layout */
@@ -79,9 +76,8 @@ typedef struct Entity { /* Turok 2 layout */
 void func_0020B5D4();
 void func_0020B624(void);
 void func_0021D39C(Entity *e, s32 a);
-extern DlCmd *D_800D8E24;
 void func_00223F8C(CWorld *lv, s32 arg) {
-    DlCmd *g;
+    Gfx *g;
     s32 i;
     s32 n;
     s32 c;

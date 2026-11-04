@@ -1,17 +1,8 @@
 /* Sets the video mode for the TV type and memory size: screen size, VI features. The mode record is read as an s32 array (an in-struct read changes GCC's alias ordering). */
 #include "common.h"
+#include "structs/frame.h"
 
 /* One screen setting for a TV type and memory size (0x1C bytes). */
-typedef struct {
-    /* 0x00 */ s32 width;
-    /* 0x04 */ s32 height;
-    /* 0x08 */ s32 arg2;
-    /* 0x0C */ s32 arg3;
-    /* 0x10 */ s32 arg4;
-    /* 0x14 */ s32 arg5;
-    /* 0x18 */ s32 pad18;
-} ScreenMode;
-
 typedef struct {
     /* 0x00 */ s32 antialias;
     /* 0x04 */ s32 v[4];
@@ -22,8 +13,6 @@ extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern s32 D_800C2038; /* current video mode */
 extern s32 D_800C2044;
-extern ScreenMode D_800C2054[];
-extern ScreenMode D_800C20E0[];
 extern ScreenExtra D_800C216C[];
 extern s32 D_800AB890;
 extern s32 D_800AB894;
@@ -49,7 +38,7 @@ void func_0045CD30(void) {
     }
     switch (D_80000300) {
         case 1:
-            mode = (s32 *)&D_800C2054[D_800C2038];
+            mode = (s32 *)&D_800C2054[0][D_800C2038];
             break;
         case 0:
         case 2:

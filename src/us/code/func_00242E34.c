@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/region.h"
 #include "structs/intelligence.h"
+#include "structs/collision.h"
 
 typedef struct Owner {
     char pad0[0x51C];
@@ -15,10 +16,6 @@ typedef struct Dest {
     f32 timer;         /* 0xCC */
 } Dest;
 
-typedef struct Damage {
-    char pad[0x18];
-} Damage;
-
 extern char D_800F7078[];
 extern f32 D_800B6D28;  /* frame time scale */
 
@@ -29,14 +26,14 @@ s32 func_0026AFC0(CGameRegion *region);
 s32 func_0021F080(CGameObjectInstance *actor);
 f32 func_0026BE60(CGameRegion *region, f32 x, f32 z);
 s32 func_002685F0(CGameObjectInstance *actor);
-void func_00245828(Damage *damage, s32 arg1, s32 amount, f32 force, s32 kind, s32 arg5);
-void func_002465C8(CGameObjectInstance *actor, Dest *dst, Damage *damage);
+void func_00245828(DamageEvent *damage, s32 arg1, s32 amount, f32 force, s32 kind, s32 arg5);
+void func_002465C8(CGameObjectInstance *actor, Dest *dst, DamageEvent *damage);
 
 /* CGameRegion flags for the actor (water, ground...) and periodic damage from the region it stands in. */
 void func_00242E34(CGameObjectInstance *actor, Dest *dst) {
     CGameRegion *region;
     CRegionInfo *info;
-    Damage damage;
+    DamageEvent damage;
     f32 y;
     f32 top;
     s32 hurt;

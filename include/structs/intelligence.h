@@ -91,8 +91,19 @@ typedef struct CEnemyIntelligence {
         };
     };
     /* 0x4E (0x62) */ u8 m_UnderwaterBehavior;
-    /* 0x4F (0x63) */ s8 m_DeathModels[6];   /* extreme, ..., body hole: func_0021EBE4 */
-    /* 0x55 (0x69) */ u8 pad55[0x58 - 0x55];
+    /* 0x4F (0x63) */ union {
+        s8 m_DeathModels[6];                /* by death mode 0x36 + i: func_0021EBE4, func_0021D7BC */
+        struct {                            /* -1: none (func_0025B078 picks the death) */
+            s8 m_ExplodeDeathModel;         /* modes 0x35/0x36 */
+            s8 m_BlastDeathModel;           /* 0x37 */
+            s8 m_SideDeathModel;            /* 0x38 */
+            s8 m_BackDeathModel;            /* 0x39 */
+            s8 m_BackDeathModel2;           /* 0x3A */
+            s8 m_FrontDeathModel;           /* 0x3B */
+        };
+    };
+    /* 0x55 (0x69) */ u8 pad55;
+    /* 0x56 (0x6A) */ s16 m_GibModel;        /* the gibs' model is m_GibModel + 1 (func_0025B078) */
     /* 0x58 (0x6C) */ s16 m_DeathAnims[5];
     /* 0x62 (0x76) */ u16 m_wIdleAnimFlags;
     /* 0x64 (0x78) */ u16 m_wMoveAnimFlags;

@@ -1,11 +1,15 @@
 #include "common.h"
+#include "structs/libaudio.h"
 
-void func_00294150();                            /* extern */
-extern s32 D_800B7760[];
+void func_00294150(ALSynth *drvr); /* alSynDelete */
+extern ALGlobals *D_800B7760; /* alGlobals */
 
-void func_00293430(void) {
-    if (D_800B7760[0] != 0) {
-        func_00294150();
-        D_800B7760[0] = 0;
+/* libultra's alClose (audio.c). The ROM keeps &alGlobals in a register. */
+void func_00293430(ALGlobals *glob) {
+    ALGlobals **g = &D_800B7760;
+
+    if (*g != NULL) {
+        func_00294150(&glob->drvr);
+        *g = NULL;
     }
 }

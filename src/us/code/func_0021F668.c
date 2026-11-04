@@ -1,27 +1,14 @@
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0024C33C.c, func_0024C33C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 typedef struct B11Box B11Box;
-typedef union { s32 i; f32 f; } B11UIF;
-typedef struct Obj { /* Turok 2 layout */
-    u8 type;
-    u8 pad1[3];
-    CVector3 pos;          /* 0x04 */
-    B11Box *unk10;      /* 0x10: floor region */
-    u8 pad14[0x20];
-    f32 unk34;          /* 0x34: scale x */
-    u8 pad38[4];
-    f32 unk3C;          /* 0x3C: scale z */
-    u8 pad40[0x10];
-    B11UIF unk50;       /* 0x50: yaw */
-} Obj;
 void func_00215AE0(f32 *p, s32 a, f32 t, f32 *out);
 void func_002105A4(f32 *m, s32 a);
 void func_0020F85C(f32 *m, f32 *v, f32 *out);
-void func_002688C8(Obj *a, CVector3 v, CVector3 *out, B11Box **box, s32 e, s32 f);
-void func_0021F668(Obj *a, f32 *p) {
+void func_002688C8(CGameObjectInstance *a, CVector3 v, CVector3 *out, B11Box **box, s32 e, s32 f);
+void func_0021F668(CGameObjectInstance *a, f32 *p) {
     f32 t0[3];
     f32 t1[3];
     f32 d[3];
@@ -33,10 +20,10 @@ void func_0021F668(Obj *a, f32 *p) {
     d[0] = t1[0] - t0[0];
     d[1] = 0.0f;
     d[2] = t1[1] - t0[1];
-    func_002105A4(m, a->unk50.i);
+    func_002105A4(m, *(s32 *)&a->m_RotY);
     func_0020F85C(m, d, r);
-    w.x = a->pos.x + r[0] * a->unk34;
-    w.y = a->pos.y;
-    w.z = a->pos.z + r[2] * a->unk3C;
-    func_002688C8(a, w, &a->pos, (B11Box **)&a->unk10, 0, 0);
+    w.x = a->header.m_vPos.x + r[0] * a->m_vScale.x;
+    w.y = a->header.m_vPos.y;
+    w.z = a->header.m_vPos.z + r[2] * a->m_vScale.z;
+    func_002688C8(a, w, &a->header.m_vPos, (B11Box **)&a->header.m_pCurrentRegion, 0, 0);
 }

@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/CODE_80281A70.CPP, func_80281CA0_de, with Turok 2's layouts. */
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/particle.h"
+#include "structs/collision.h"
 
 /* Steps the particle system once: marks every particle on the three active
  * lists, then (outside a pause) advances the ones inside the visible bounds,
@@ -8,92 +9,32 @@
  * collected type 0x22 particle react to the others and each type 0x57
  * particle expire the non-0x57 ones within range. */
 
-typedef struct { s32 a, b; } IntPair;
-
-typedef struct {
-    /* 0x00 */ CVector3 min;
-    /* 0x0C */ CVector3 max;
-} Bounds;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ f32 colorFade;
-    /* 0x10 */ s16 x;
-    /* 0x12 */ s16 y;
-    /* 0x14 */ s16 z;
-    /* 0x16 */ s16 enabled;
-} DLight;
-
-typedef struct {
-    /* 0x00 */ IntPair eventValue[14];
-    /* 0x70 */ u16 particleType[14];
-    /* 0x8C */ u16 eventType[14];
-    /* 0xA8 */ u16 soundType[14];
-} ParticleImpact;
-
-typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x18 - 0x4];
-    /* 0x18 */ ParticleImpact *impact;
-} ParticleEffect;
-
-typedef struct Particle {
-    /* 0x000 */ u8 pad0[0x2];
-    /* 0x002 */ u16 type;
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x40 - 0x10];
-    /* 0x040 */ u32 flags;
-    /* 0x044 */ u8 pad44[0xF8 - 0x44];
-    /* 0x0F8 */ ParticleEffect *effect;
-    /* 0x0FC */ u8 padFC[0x118 - 0xFC];
-    /* 0x118 */ DLight *light;
-    /* 0x11C */ f32 frame;
-    /* 0x120 */ u8 pad120[0x128 - 0x120];
-    /* 0x128 */ s16 frames;
-    /* 0x12A */ u8 pad12A[0x174 - 0x12A];
-    /* 0x174 */ f32 alpha;
-    /* 0x178 */ u8 pad178[0x1AC - 0x178];
-    /* 0x1AC */ s8 alignment;
-    /* 0x1AD */ u8 pad1AD[0x1C8 - 0x1AD];
-    /* 0x1C8 */ struct Particle *next;
-} Particle;
-
-typedef struct {
-    /* 0x00 */ Particle *head;
-    /* 0x04 */ u8 pad4[0x10];
-} ParticleList;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0xEC28];
-    /* 0xEC28 */ ParticleList active[3];
-} ParticleSystem;
-
 extern f32 D_800B6D28;          /* frame time scale */
 extern f32 D_800B6D30;
 extern s32 D_8011ACA4;
 extern s32 D_80110028;
-extern Bounds D_800F5A10;       /* visible bounds */
+extern CBox D_800F5A10;       /* visible bounds */
 
-extern void func_0022AFB4(Particle *p);
-extern s32 func_002325F0(Particle *p);
-extern void func_00236EA0(Particle *p, Particle *source, s32 type, s32 id, CVector3 pos, IntPair value);
-extern void func_00229340(Particle *p, s32 type, s32 alignment, s32 count);
+extern void func_0022AFB4(CParticle *p);
+extern s32 func_002325F0(CParticle *p);
+extern void func_00236EA0(CParticle *p, CParticle *source, s32 type, s32 id, CVector3 pos, CEventValue value);
+extern void func_00229340(CParticle *p, s32 type, s32 alignment, s32 count);
 extern void func_00275544(s16 sound, CVector3 pos, s32 a, s32 b);
-extern void func_0022F1C8(ParticleSystem *world, Particle *p);
-extern void func_00230AB0(ParticleSystem *world, Particle *p, Particle **others, s32 count);
+extern void func_0022F1C8(CParticleSystem *world, CParticle *p);
+extern void func_00230AB0(CParticleSystem *world, CParticle *p, CParticle **others, s32 count);
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);    /* out = a - b */
 
-void func_00230CB4(ParticleSystem *world) {
-    Particle *colliders[128];
-    Particle *stepped[128];
-    IntPair value;
+void func_00230CB4(CParticleSystem *world) {
+    CParticle *colliders[128];
+    CParticle *stepped[128];
+    CEventValue value;
     CVector3 delta;
-    Particle *p;
-    Particle *node;
-    Particle *focus;
-    Particle **begin;
-    ParticleEffect *effect;
-    DLight *light;
+    CParticle *p;
+    CParticle *node;
+    CParticle *focus;
+    CParticle **begin;
+    CROMParticleEffect *effect;
+    CDLight *light;
     s32 count;
     s32 idx;
     s32 pairCount;
@@ -107,8 +48,8 @@ void func_00230CB4(ParticleSystem *world) {
 
     count = 0;
     for (idx = 0; idx < 3; idx++) {
-        for (node = (world->active + idx)->head; node != 0; node = node->next) {
-            node->flags = (node->flags & 0xFFEFFFFF) | 0x02000000;
+        for (node = (world->m_ActiveList + idx)->m_pHead; node != 0; node = node->m_pNext) {
+            node->m_dwFlags = (node->m_dwFlags & 0xFFEFFFFF) | 0x02000000;
             stepped[count++] = node;
         }
     }
@@ -120,52 +61,52 @@ void func_00230CB4(ParticleSystem *world) {
     pairCount = 0;
     for (idx = 0; idx < count; idx++) {
         p = stepped[idx];
-        if ((p->flags & 0x02000100) != 0x02000100) {
+        if ((p->m_dwFlags & 0x02000100) != 0x02000100) {
             continue;
         }
-        p->flags &= 0xFFEFFF87;
-        if (p->light) {
-            p->light->enabled = 0;
+        p->m_dwFlags &= 0xFFEFFF87;
+        if (p->m_pDLight) {
+            p->m_pDLight->m_bEnabled = 0;
         }
-        if (p->frame < (f32)p->frames && p->frames != 1 && !(p->flags & 0x1000)) {
-            if (D_800F5A10.max.x > p->pos.x && D_800F5A10.max.y > p->pos.y && D_800F5A10.max.z > p->pos.z &&
-                D_800F5A10.min.x <= p->pos.x && D_800F5A10.min.y <= p->pos.y && D_800F5A10.min.z <= p->pos.z) {
+        if (p->m_cFrame < (f32)p->m_nFrames && p->m_nFrames != 1 && !(p->m_dwFlags & 0x1000)) {
+            if (D_800F5A10.m_vMax.x > p->header.m_vPos.x && D_800F5A10.m_vMax.y > p->header.m_vPos.y && D_800F5A10.m_vMax.z > p->header.m_vPos.z &&
+                D_800F5A10.m_vMin.x <= p->header.m_vPos.x && D_800F5A10.m_vMin.y <= p->header.m_vPos.y && D_800F5A10.m_vMin.z <= p->header.m_vPos.z) {
                 func_0022AFB4(p);
-                light = p->light;
+                light = p->m_pDLight;
                 if (light) {
-                    light->enabled = 1;
-                    light->x = p->pos.x;
-                    light->y = p->pos.y;
-                    light->z = p->pos.z;
-                    light->colorFade = p->alpha * (1.0f / 255.0f);
+                    light->m_bEnabled = 1;
+                    light->x = p->header.m_vPos.x;
+                    light->y = p->header.m_vPos.y;
+                    light->z = p->header.m_vPos.z;
+                    light->m_ColorFade = p->m_Alpha * (1.0f / 255.0f);
                 }
-                p->frame += D_800B6D28;
+                p->m_cFrame += D_800B6D28;
             } else {
                 func_0022F1C8(world, p);
             }
         } else {
-            effect = p->effect;
+            effect = p->m_pEffect;
             event = func_002325F0(p) ? 12 : 10;
-            particleType = effect->impact->particleType[event];
-            eventType = effect->impact->eventType[event];
-            value = effect->impact->eventValue[event];
-            soundType = effect->impact->soundType[event];
+            particleType = effect->m_pImpact->m_ImpactParticleType[event];
+            eventType = effect->m_pImpact->m_ImpactEventType[event];
+            value = effect->m_pImpact->m_ImpactEventValue[event];
+            soundType = effect->m_pImpact->m_ImpactSoundType[event];
             if (eventType != 0xFFFF) {
-                func_00236EA0(p, p, eventType, -1, p->pos, value);
+                func_00236EA0(p, p, eventType, -1, p->header.m_vPos, value);
             }
             if (particleType != 0xFFFF) {
-                func_00229340(p, particleType, p->alignment, 1);
+                func_00229340(p, particleType, p->m_Alignment, 1);
             }
             if (soundType != 0xFFFF) {
-                func_00275544(soundType, p->pos, 0, -1);
+                func_00275544(soundType, p->header.m_vPos, 0, -1);
             }
-            if (!(p->flags & 0x100)) {
+            if (!(p->m_dwFlags & 0x100)) {
                 continue;
             }
             func_0022F1C8(world, p);
         }
-        if (p->flags & 0x100) {
-            switch (p->type) {
+        if (p->m_dwFlags & 0x100) {
+            switch (p->header.m_nObjType) {
             case 12:
             case 34:
             case 87:
@@ -178,17 +119,17 @@ void func_00230CB4(ParticleSystem *world) {
         begin = colliders;
         for (i = 0; i < pairCount; i++) {
             focus = begin[i];
-            switch (focus->type) {
+            switch (focus->header.m_nObjType) {
             case 34:
                 func_00230AB0(world, focus, begin, pairCount);
                 break;
             case 87:
                 for (j = 0; j < pairCount; j++) {
                     p = begin[j];
-                    if (p->type != 87) {
-                        func_0020EF2C(&delta, &p->pos, &focus->pos);
+                    if (p->header.m_nObjType != 87) {
+                        func_0020EF2C(&delta, &p->header.m_vPos, &focus->header.m_vPos);
                         if (delta.x * delta.x + delta.y * delta.y + delta.z * delta.z <= 65536.0f) {
-                            p->frames = 1;
+                            p->m_nFrames = 1;
                         }
                     }
                 }

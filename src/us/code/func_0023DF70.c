@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct SweepDef {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ s8 kind;
-} SweepDef;
+#include "structs/collision.h"
 
 typedef struct HitDef {
     /* 0x00 */ s32 kind;
@@ -23,51 +19,6 @@ typedef struct HitInst {
     /* 0x30 */ struct HitInst *standingOn;
 } HitInst;
 
-typedef struct HitTarget {
-    /* 0x00 */ s32 active;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ CVector3 a;
-    /* 0x14 */ CVector3 b;
-} HitTarget;
-
-/* A segment swept from an instance's position to end, and what it hit. */
-typedef struct Sweep {
-    /* 0x00 */ HitInst *inst;
-    /* 0x04 */ SweepDef *def;
-    /* 0x08 */ f32 maxT;
-    /* 0x0C */ u8 padC[0x28];
-    /* 0x34 */ void *hitA;
-    /* 0x38 */ void *hitIndex;
-    /* 0x3C */ void *hitB;
-    /* 0x40 */ s32 hitKind;
-    /* 0x44 */ void *hitOwner;
-    /* 0x48 */ void *hitData;
-    /* 0x4C */ CVector3 end;
-    /* 0x58 */ CVector3 dir;
-    /* 0x64 */ CVector3 missCentre;     /* last cylinder found not hit */
-    /* 0x70 */ CVector3 hitCentre;      /* cylinder hit */
-    /* 0x7C */ f32 missRadius;
-    /* 0x80 */ f32 hitRadius;
-    /* 0x84 */ s32 missKind;
-    /* 0x88 */ s32 hitShape;
-} Sweep;
-
-/* The volume the sweeping instance covers (built by func_0023E4A0). */
-typedef struct SweepBox {
-    /* 0x00 */ f32 radius;
-    /* 0x04 */ f32 bottom;
-    /* 0x08 */ f32 top;
-    /* 0x0C */ f32 startTop;
-    /* 0x10 */ f32 startBottom;
-    /* 0x14 */ f32 endTop;
-    /* 0x18 */ f32 endBottom;
-    /* 0x1C */ f32 minX;
-    /* 0x20 */ f32 minZ;
-    /* 0x24 */ f32 maxX;
-    /* 0x28 */ f32 maxZ;
-    /* 0x2C */ s32 flag;
-} SweepBox;
-
 typedef struct Rect {
     /* 0x0 */ f32 minX;
     /* 0x4 */ f32 minZ;
@@ -75,7 +26,7 @@ typedef struct Rect {
     /* 0xC */ f32 maxZ;
 } Rect;
 
-extern HitTarget *D_800F1ADC;
+extern CCollisionResults *D_800F1ADC;
 
 f32 func_002671B4(HitInst *inst);
 f32 func_002672C8(HitInst *inst);
@@ -105,8 +56,8 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
     f32 dx;
     f32 dz;
     HitInst *inst;
-    SweepDef *def;
-    HitTarget *target;
+    CCollisionInfo *def;
+    CCollisionResults *target;
     s32 result;
     s32 special;
 
@@ -121,7 +72,7 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
         !(box->minZ < rect.maxZ)) {
         return;
     }
-    inst = sweep->inst;
+    inst = (HitInst *)sweep->inst;
     def = sweep->def;
     special = 0;
     if (inst->type == 1 && inst->def->kind == 2) {
@@ -149,14 +100,14 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
     }
     result = 0;
     reach = box->radius + radius;
-    if (box->flag && sweep->dir.y != 0.0f) {
-        if (sweep->missKind == 2 && sweep->missRadius == reach && sweep->missCentre.x == other->pos.x &&
-            sweep->missCentre.y == other->pos.y && sweep->missCentre.z == other->pos.z) {
+    if (box->flag && sweep->delta.y != 0.0f) {
+        if (sweep->lastKind == 2 && sweep->lastRadius == reach && sweep->lastContact.x == other->pos.x &&
+            sweep->lastContact.y == other->pos.y && sweep->lastContact.z == other->pos.z) {
             return;
         }
         if (box->startTop <= bottom && bottom < box->endTop) {
-            t = (bottom - box->startTop) / sweep->dir.y;
-            if (t < sweep->maxT) {
+            t = (bottom - box->startTop) / sweep->delta.y;
+            if (t < sweep->hit.fraction) {
                 func_0020EF8C(&hit, t, &inst->pos, &sweep->end);
                 dx = x - hit.x;
                 dz = z - hit.z;
@@ -167,8 +118,8 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
             }
         }
         if (top <= box->startBottom && box->endBottom < top) {
-            t = (top - box->startBottom) / sweep->dir.y;
-            if (t < sweep->maxT) {
+            t = (top - box->startBottom) / sweep->delta.y;
+            if (t < sweep->hit.fraction) {
                 func_0020EF8C(&hit, t, &inst->pos, &sweep->end);
                 dx = x - hit.x;
                 dz = z - hit.z;
@@ -190,23 +141,23 @@ void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
         }
     }
     result |= func_0023B38C(sweep, &other->pos, reach, 1, top - box->bottom, bottom - box->top, 1,
-                            special ? 7 : def->kind, 0.0f, 1);
+                            special ? 7 : def->m_InstanceBehavior, 0.0f, 1);
     if (result) {
         target = D_800F1ADC;
-        if (target->active) {
-            func_0023C0FC(&sweep->maxT);
+        if (target->m_pInstance) {
+            func_0023C0FC(&sweep->hit.fraction);
         } else {
-            sweep->hitA = &target->a;
-            sweep->hitIndex = &target->unk4;
-            sweep->hitB = &target->b;
-            sweep->hitKind = -1;
-            sweep->hitOwner = target;
-            sweep->hitData = other;
+            sweep->hit.posOut = &target->m_vInstancePos;
+            sweep->hit.regionOut = &target->m_pInstanceRegion;
+            sweep->hit.kindOut = &target->m_nInstanceNode;
+            sweep->hit.kind = -1;
+            sweep->hit.dataOut = (void **)&target->m_pInstance;
+            sweep->hit.data = other;
         }
         if (box->flag) {
-            sweep->hitShape = 2;
-            sweep->hitCentre = other->pos;
-            sweep->hitRadius = reach;
+            sweep->kind = 2;
+            sweep->contact = other->pos;
+            sweep->radius = reach;
         }
     }
 }

@@ -39,8 +39,6 @@ typedef struct OSIoMesg OSIoMesg;
 struct OSIoMesgHdr;
 typedef struct OSIoMesgHdr OSIoMesgHdr;
 struct OSPiHandle_s;
-struct __OSViContext;
-typedef struct __OSViContext __OSViContext;
 struct OSIoMesgHdr;
 struct OSIoMesgHdr {
     u16 type;
@@ -55,16 +53,6 @@ struct OSIoMesg {
     u32 devAddr;
     u32 size;
     void *piHandle;
-};
-struct __OSViContext;
-struct __OSViContext {
-    u16 state;
-    u16 retraceCount;
-    void *framep;
-    void *modep;
-    u32 control;
-    OSMesgQueue *msgq;
-    void * msg;
 };
 extern void func_0029ACE0();
 extern u16 D_801216D0;

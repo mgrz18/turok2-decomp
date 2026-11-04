@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/world.h"
+#include "structs/collision.h"
 
 typedef struct Rect {
     f32 minX, minZ;             /* 0x00 */
@@ -26,7 +27,7 @@ typedef struct Viewer {
 } Viewer;
 
 extern Viewer *D_801198D0;      /* viewers */
-extern f32 D_800F5A10[6];       /* visible bounds: min xyz, max xyz */
+extern CBox D_800F5A10;       /* visible bounds: min xyz, max xyz */
 extern char D_800A5F6C[];       /* "grid section" */
 
 void *func_002017D4(void *table, s32 index);
@@ -79,16 +80,16 @@ void func_002216DC(CWorld *world) {
     cells = (GridCell *)((u8 *)func_002017D4(world->m_pCollision, 4) + 8);
     z1 = nz - 1;
     z0 = 0;
-    while (x0 < nx && xMin[x0] < D_800F5A10[0]) {
+    while (x0 < nx && xMin[x0] < D_800F5A10.m_vMin.x) {
         x0++;
     }
-    while (x1 >= 0 && D_800F5A10[3] < xMax[x1]) {
+    while (x1 >= 0 && D_800F5A10.m_vMax.x < xMax[x1]) {
         x1--;
     }
-    while (z0 < nz && zMin[z0] < D_800F5A10[2]) {
+    while (z0 < nz && zMin[z0] < D_800F5A10.m_vMin.z) {
         z0++;
     }
-    while (z1 >= 0 && D_800F5A10[5] < zMax[z1]) {
+    while (z1 >= 0 && D_800F5A10.m_vMax.z < zMax[z1]) {
         z1--;
     }
     region = world->m_Sectors;

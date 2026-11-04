@@ -22,7 +22,7 @@ s16 func_00293470(PoolRecAt44 *pool, void *owner) {
             slot->value = value;
             slot->flags = flags;
             slot->extra = 0;
-            slot->amount = ((((struct ALSound *)(owner))->sampleVolume * 0x7FFF) / 127);
+            slot->amount = ((((ALSound *)(owner))->sampleVolume * 0x7FFF) / 127);
             return index;
         }
         i++;

@@ -261,4 +261,20 @@ typedef struct CPlayer {
 
 /* CPlayerCList and CPlayerList (D_80119870) are in structs/player_list.h. */
 
+/* The players saved for a restart, D_8011F290: func_0028CF80 arms it (and
+ * steps m_State), func_0028D264 copies the players in, func_0028D100 copies
+ * them back; func_0028D0D0 reads m_WarpID. */
+typedef struct CSavedPlayers {
+    /* 0x0000 */ s32 m_bActive;
+    /* 0x0004 */ s32 m_State;          /* 0 none, 1 back where they were (func_0028D100), 2 back at m_WarpID */
+    /* 0x0008 */ s32 m_Timer;          /* 240 when armed */
+    /* 0x000C */ s32 m_WarpID;         /* the checkpoint warp */
+    /* 0x0010 */ CPlayerLoadSaveData m_Data[4];
+    /* 0x13B0 */ CVector3 m_vPos[4];
+    /* 0x13E0 */ f32 m_RotY[4];
+    /* 0x13F0 */ s32 m_Region[4];      /* region indices (func_002242B4 / func_002242F8) */
+} CSavedPlayers; /* size 0x1400 */
+
+extern CSavedPlayers D_8011F290;
+
 #endif

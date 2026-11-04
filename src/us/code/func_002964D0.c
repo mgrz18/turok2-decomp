@@ -7,13 +7,13 @@ extern float D_800AA688;
 extern float D_800AA680;
 extern float D_800AA684;
 extern unsigned int func_0029BF80(void *);
-Acmd *func_002964D0(ALResampler_s *filter, s16 *outp, s32 outCnt, s32 sampleOffset, Acmd *p)
+Acmd *func_002964D0(ALResampler *filter, s16 *outp, s32 outCnt, s32 sampleOffset, Acmd *p)
 {
-    ALResampler_s *f = filter;
+    ALResampler *f = filter;
     Acmd *ptr = p;
     s16 inp;
     s32 inCount;
-    ALFilter_s14_2 *source = f->filter.source;
+    ALFilter *source = f->filter.source;
     s32 incr;
     f32 finCount;
     f32 ratio;

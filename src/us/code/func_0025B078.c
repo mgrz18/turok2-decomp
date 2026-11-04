@@ -5,18 +5,6 @@
 /* Picks an actor's death animation from what killed it (weapon, projectile, hit direction). */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x4F];
-    /* 0x4F */ s8 deathExplode;
-    /* 0x50 */ s8 deathBlast;
-    /* 0x51 */ s8 deathSide;
-    /* 0x52 */ s8 deathBack;
-    /* 0x53 */ s8 deathBackAlt;
-    /* 0x54 */ s8 deathFront;
-    /* 0x55 */ u8 pad55;
-    /* 0x56 */ s16 gibModel;
-} DeathAnims; /* at actor def + 0x14 */
-
-typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1;
     /* 0x002 */ u16 type;
@@ -45,14 +33,14 @@ extern s32 func_002113A4(void); /* rand */
 extern s32 func_00219F74(CGameObjectInstance *actor, s32 model, s32 arg2);
 
 s32 func_0025B078(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
-    DeathAnims *anims;
+    CEnemyIntelligence *anims;
     Source *src;
     s32 front = 0;
     s32 side = 0;
     s32 back = 0;
     s32 blast = 0;
 
-    anims = (DeathAnims *)(((u8 *)actor->header.m_pIntelligence) + 0x14);
+    anims = &actor->header.m_pIntelligence->m_Enemy;
     if (D_8011AAEF != 0 && (src = hit->source) != NULL) {
         switch (src->kind) {
             case 2:
@@ -84,7 +72,7 @@ s32 func_0025B078(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
                 break;
         }
     }
-    if (blast && anims->deathBlast != -1) {
+    if (blast && anims->m_BlastDeathModel != -1) {
         return 0x37;
     }
     if (func_002113A4() % 1000 < 500) {
@@ -93,30 +81,30 @@ s32 func_0025B078(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
     if (hit->point != NULL) {
         switch (hit->point->direction & 3) {
             case 0:
-                if (front && anims->deathFront != -1) {
+                if (front && anims->m_FrontDeathModel != -1) {
                     return 0x3B;
                 }
                 break;
             case 1:
-                if (side && anims->deathSide != -1) {
+                if (side && anims->m_SideDeathModel != -1) {
                     return 0x38;
                 }
                 break;
             case 2:
                 if (back) {
                     if (!(hit->point->direction & 4)) {
-                        if (anims->deathBack != -1) {
+                        if (anims->m_BackDeathModel != -1) {
                             return 0x39;
                         }
-                    } else if (anims->deathBackAlt != -1) {
+                    } else if (anims->m_BackDeathModel2 != -1) {
                         return 0x3A;
                     }
                 }
                 break;
         }
     }
-    if (D_8011AAEF != 0 && (hit->flags & 0x800000) && anims->deathExplode != -1) {
-        if (func_00219F74(actor, anims->gibModel + 1, -1) != -1) {
+    if (D_8011AAEF != 0 && (hit->flags & 0x800000) && anims->m_ExplodeDeathModel != -1) {
+        if (func_00219F74(actor, anims->m_GibModel + 1, -1) != -1) {
             return 0x35;
         }
         return 0x36;

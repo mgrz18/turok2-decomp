@@ -1,18 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/collision.h"
 
-typedef struct { f32 x, y, z; } V3f;
+extern CCollisionResults *D_800F1ADC;
 
-extern s32 *D_800F1ADC;
-
+/* Clears the collision results: nothing hit yet. */
 void func_00241894(void) {
-    s32 *p = D_800F1ADC;
+    CCollisionResults *p = D_800F1ADC;
 
-    p[0] = 0;
-    p[5] = -1;
-    p[0x22] = 0;
-    p[0x27] = 0;
-    p[0x2C] = 0;
-    p[0x2D] = 0;
-    p[0x31] = 0;
+    p->m_pInstance = 0;
+    p->m_nInstanceNode = -1;
+    p->m_pShape = 0;
+    p->m_pWallRegion = 0;
+    p->m_nFloorKind = 0;
+    p->m_pFloorRegion = 0;
+    p->m_pWaterRegion = 0;
 }

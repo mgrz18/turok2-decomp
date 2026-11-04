@@ -5,14 +5,6 @@
 /* Name entry accepted: copy the edited name (blank-padded to 8 characters)
  * into the current player's record; an empty name restores the default one. */
 
-typedef struct {
-    s32 cursor;    /* 0x00 */
-    f32 timer;     /* 0x04 */
-    s32 length;    /* 0x08 */
-    char name[12]; /* 0x0C */
-} NameEntry; /* 0x18 bytes */
-
-extern NameEntry D_800C1FB0[];
 
 s32 func_0025340C(void *state, void *player);
 void func_0041BBB0(void *options);

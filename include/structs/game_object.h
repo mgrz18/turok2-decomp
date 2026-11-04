@@ -12,6 +12,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/list.h"
 
 /* The definition m_pIntelligence points at. */
 #include "structs/intelligence.h"
@@ -56,22 +57,10 @@ typedef struct CAIModeInfo {
     /* 0x1C */ u32 unk_1C;
 } CAIModeInfo; /* size 0x20 */
 
-/* CAI::m_VarBuffer as the enemy AI (func_0025BC70 sets it up) uses it: the
- * definition's behaviour for each mode (CEnemyIntelligence::m_Behaviors[0],
- * [1], m_UnderwaterBehavior) and which of them is current, and its timers
- * (in frames, counted down by D_800B6D28). m_Timer and m_Timer2 run one after
- * the other (func_0025F624 seeds both); when both are out the AI goes to
- * mode 0x19, whose draw fades with m_Timer (func_0025BA80). */
-typedef struct {
-    /* 0x00 */ u8 _pad0[0x14];
-    /* 0x14 */ f32 m_AttackDelay;   /* no projectile/weapon attack until it is out */
-    /* 0x18 */ u8 _pad18[0x20 - 0x18];
-    /* 0x20 */ f32 m_IdleTimer;
-    /* 0x24 */ s8 m_Behavior[3];
-    /* 0x27 */ s8 m_BehaviorIndex;
-    /* 0x28 */ f32 m_Timer;
-    /* 0x2C */ f32 m_Timer2;
-} CEnemyAIVars; /* size 0x30 */
+/* The views of CAI::m_VarBuffer: CEnemyAIVars m_Enemy, m_Turret, m_Platform,
+ * m_Generator (ai_vars.h); the bosses and the weapon actor (ai_vars_boss.h). */
+#include "structs/ai_vars.h"
+#include "structs/ai_vars_boss.h"
 
 /* AI state embedded in every game object at 0x140. Health is 24.8 fixed point. */
 typedef struct {
@@ -150,7 +139,13 @@ typedef struct {
         /* 0x10C */ u16 m_VarU16[24];
         /* 0x10C */ s8 m_VarS8[48];
         /* 0x10C */ u8 m_VarU8[48];
+        /* 0x10C */ CBlindOneAIVars m_BlindOne;
+        /* 0x10C */ CMotherAIVars m_Mother;
+        /* 0x10C */ CWeaponAIVars m_Weapon;
         /* 0x10C */ CEnemyAIVars m_Enemy;
+        /* 0x10C */ CTurretAIVars m_Turret;
+        /* 0x10C */ CPlatformAIVars m_Platform;
+        /* 0x10C */ CGeneratorAIVars m_Generator;
     };
 } CAI; /* size 0x13C */
 
@@ -202,8 +197,20 @@ typedef struct CListedInstance {
     /* 0x000 */ CGameObjectInstance m_Instance;
     /* 0x288 */ struct CListedInstance *m_pPrev;
     /* 0x28C */ struct CListedInstance *m_pNext;
-    /* 0x290 */ s32 *m_pOwnerCount;
-} CListedInstance; /* size 0x294 */
+    /* 0x290 */ s32 *m_pOwnerCount;   /* counted up when it is taken (func_002283FC), down when it goes (func_002280B0) */
+    /* 0x294 */ s32 _pad294;
+} CListedInstance; /* size 0x298 */
+
+/* The pool of dynamic objects, D_8010ABA0: 32 of them, the free ones on
+ * m_FreeList (D_8010FEA0) and the live ones on m_ActiveList (D_8010FEB4).
+ * func_002283FC takes one (only while fewer than 3 are live, unless
+ * D_8011001C), func_002280B0 / func_00228484 give it back; func_00227C10,
+ * func_00227EE8 and func_00228108 spawn into it. */
+typedef struct CInstancePool {
+    /* 0x0000 */ CListedInstance m_Instances[32];
+    /* 0x5300 */ CList m_FreeList;     /* D_8010FEA0 */
+    /* 0x5314 */ CList m_ActiveList;   /* D_8010FEB4 */
+} CInstancePool; /* size 0x5328 */
 
 /* What an AI aims at this frame: func_002449E0 fills one from CAI's
  * m_pSightTarget, func_00244338 one from m_pPathTarget (or the home point, a

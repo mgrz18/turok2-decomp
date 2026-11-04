@@ -23,5 +23,5 @@ void func_002620B4(CGameObjectInstance *self, CAI *ai, Arg2 *a2, Arg3 *a3) {
     } else if (self->m_vVelocity.y < -81.92f) {
         self->m_vVelocity.y = -81.92f;
     }
-    func_00245BAC(self, ai, ai->m_VarF32[3], a2->unk4C);
+    func_00245BAC(self, ai, ai->m_Enemy.m_TurnRate, a2->unk4C);
 }

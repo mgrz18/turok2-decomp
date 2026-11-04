@@ -15,25 +15,25 @@ extern const float D_800AA400;
 extern const float D_800AA408;
 extern char D_800AA380[];
 extern char D_800AA384[];
-extern ALSound_s *func_00292640(ALSeqPlayer *, u8, u8, u8);
+extern ALSound *func_00292640(ALSeqPlayer *, u8, u8, u8);
 extern ALVoiceState *func_0029247C(ALSeqPlayer *, u8, u8, u8);
 extern ALVoiceState *func_002925E0(ALSeqPlayer *, u8, u8);
-extern s32 alSynAllocVoice(void *, ALVoice_s *, ALVoiceConfig_s *);
+extern s32 alSynAllocVoice(void *, ALVoice *, ALVoiceConfig *);
 extern u8 func_00292804(ALVoiceState *, ALSeqPlayer *);
 extern s16 func_00292774(ALVoiceState *, ALSeqPlayer *);
 extern ALMicroTime func_002927E8(ALVoiceState *, ALMicroTime);
-extern void func_00294540(void *, ALVoice_s *, void *, f32, s16, u8, u8, ALMicroTime);
+extern void func_00294540(void *, ALVoice *, void *, f32, s16, u8, u8, ALMicroTime);
 extern void func_00291034(ALEventQueue *, ALEvent *, ALMicroTime);
-extern void func_00292A74(ALSeqPlayer *, ALVoice_s *, ALMicroTime);
-extern void alSynSetVol(void *, ALVoice_s *, s16, ALMicroTime);
-extern void func_002942B0(void *, ALVoice_s *, u8);
-extern void func_00294200(void *, ALVoice_s *, u8);
-extern void func_00294340(void *, ALVoice_s *, f32);
+extern void func_00292A74(ALSeqPlayer *, ALVoice *, ALMicroTime);
+extern void alSynSetVol(void *, ALVoice *, s16, ALMicroTime);
+extern void func_002942B0(void *, ALVoice *, u8);
+extern void func_00294200(void *, ALVoice *, u8);
+extern void func_00294340(void *, ALVoice *, f32);
 extern void func_00292A20(ALSeqPlayer *, ALInstrument *, s32);
 extern void func_0029B020(char *, char *, s32);
 void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
 {
-    ALVoice_s *voice;
+    ALVoice *voice;
     ALVoiceState *vs;
     s32 status;
     u8 chan;
@@ -56,8 +56,8 @@ void func_00291BF4(ALSeqPlayer *seqp, ALEvent *event)
     switch (status) {
     case 0x90:
         if (vel != 0) {
-            ALVoiceConfig_s config;
-            ALSound_s *sound;
+            ALVoiceConfig config;
+            ALSound *sound;
             s16 cents;
             f32 pitch, oscValue;
             u8 fxmix;

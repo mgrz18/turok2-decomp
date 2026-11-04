@@ -4,7 +4,6 @@
 void func_0028582C(ControllerProfile *ctl);
 
 extern u8 D_800B6CF0;
-extern ControllerProfile D_800F5C78; /* the four merged */
 
 void func_002857C8(void) {
     ControllerProfile *var_s0;

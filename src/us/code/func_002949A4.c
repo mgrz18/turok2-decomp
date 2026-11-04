@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00294C70(ALSynth4C *drvr, ALPlayer_s14 **client);
-extern s32 func_00294D18(ALSynth4C *, s32);
-extern void func_00294BDC(ALSynth4C *);
+extern s32 func_00294C70(ALSynth *drvr, ALPlayer **client);
+extern s32 func_00294D18(ALSynth *, s32);
+extern void func_00294BDC(ALSynth *);
 Acmd *func_002949A4(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
 {
     extern ALGlobals *D_800B7760;
-    ALPlayer_s14 *client;
-    ALFilter_sC *output;
-    ALSynth4C *drvr = &D_800B7760->drvr;
+    ALPlayer *client;
+    ALFilter *output;
+    ALSynth *drvr = &D_800B7760->drvr;
     s16 tmp = 0;
     Acmd *cmdlEnd = cmdList;
     Acmd *cmdPtr;

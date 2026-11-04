@@ -1,12 +1,7 @@
 #include "common.h"
+#include "gfx.h"
 #include "structs/menu.h"
 
-typedef struct {
-    u32 w0;
-    u32 w1;
-} GfxWords;
-
-extern GfxWords *D_800D8E24; /* display list head */
 extern s32 D_800C1BD0;       /* current draw mode */
 
 s32 func_00253748(u8 *player, s32 type);
@@ -49,21 +44,21 @@ void func_00424780(MenuItem *item, MenuItemLayout *box, s32 unused, Menu *window
         func_00279028((s32) (window->fade * (window->alpha * 255.0f)));
     }
     {
-        GfxWords *g = D_800D8E24++;
+        Gfx *g = D_800D8E24++;
         g->w0 = 0xE7000000;
         g->w1 = 0;
     }
     {
-        GfxWords *g = D_800D8E24++;
+        Gfx *g = D_800D8E24++;
         g->w0 = 0xE3000A01;
         g->w1 = 0x100000;
     }
     if (owned) {
-        GfxWords *g = D_800D8E24++;
+        Gfx *g = D_800D8E24++;
         g->w0 = 0xFB000000;
         g->w1 = ((s32) (window->fade * (window->alpha * 255.0f)) & 0xFF) | 0xFFFFFF00;
     } else {
-        GfxWords *g = D_800D8E24++;
+        Gfx *g = D_800D8E24++;
         g->w0 = 0xFB000000;
         g->w1 = ((s32) (window->fade * (window->alpha * 255.0f)) & 0xFF) | 0x32323200;
     }

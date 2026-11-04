@@ -20,7 +20,7 @@ void func_0027421C(SndVoicePool *set, s32 key) {
             voice->stopping = 1;
             voice->vp.follow = 0;
             if (voice->vp.frame != owner->frame) {
-                sound = owner->player;
+                sound = &owner->player;
                 func_00293E60(sound, owner->handles[voice->index]);
                 if (func_00293580(sound)) {
                     func_00293EC0(sound);

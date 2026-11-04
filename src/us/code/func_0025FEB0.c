@@ -56,7 +56,7 @@ void func_0025FEB0(Projectile *self, CAI *ai) {
     CVector3 dir;
     CQuaternion yaw;
     CQuaternion rot;
-    Shooter *shooter = ai->m_VarPtr[2];
+    Shooter *shooter = (Shooter *) ai->m_Enemy.m_pGrabbed;
     Owner *owner = shooter->owner;
     f32 s;
 

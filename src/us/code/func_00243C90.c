@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "structs/collision.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
@@ -52,7 +53,7 @@ typedef struct {
 
 extern u8 D_800F7078[];
 extern u8 D_800F1B40[];
-extern Actor *D_800F1CE0;
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 extern CharacterInfo D_800ADF5C[];
 
 s32 func_002438C0(Actor *self, Plan *plan, Actor *target);
@@ -195,7 +196,7 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                         eye.y = eye.y + func_002671B4(self);
                         eye.y = eye.y + self->eye;
                         r = func_00239F00(t, eye, D_800F1B40);
-                        if (D_800F1CE0 == self) {
+                        if ((Actor *)D_800F1CE0.m_pInstance == self) {
                             r = 0;
                         }
                         *(ActorHead *)t = saved;

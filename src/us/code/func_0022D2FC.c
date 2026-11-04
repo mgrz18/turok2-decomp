@@ -16,6 +16,8 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
+#include "structs/frame.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -400,30 +402,16 @@ typedef struct {
     /* 0x134 */ f32 radius;
 } ShadowActor;
 
-/* The result of the last collision test (D_800F1CE0). */
-typedef struct {
-    /* 0x00 */ struct Actor *hit;
-    u8 pad4[0x4];
-    /* 0x08 */ CVector3 pos;
-    /* 0x14 */ s32 frame;
-    u8 pad18[0x7E - 0x18];
-    /* 0x7E */ u8 team;
-    u8 pad7F[0xD8 - 0x7F];
-    /* 0xD8 */ CVector3 direction;
-    /* 0xE4 */ CVector3 normal;
-} CollisionResult;
-
-struct CollisionInfo;
 extern u8 D_800F7148[];
-extern struct CollisionInfo D_800F1B40;
-extern CollisionResult D_800F1CE0;
+extern CCollisionInfo D_800F1B40;
+extern CCollisionResults D_800F1CE0;
 extern f32 D_800DD78C;
 extern Gfx *D_800D8E24;
 
 void *func_00206950(void *pool, s32 count);
 void func_0026A9C0(CQuaternion *out, void *region);
 f32 func_00267648(ShadowActor *actor, s32 arg1);    /* ground height */
-s32 func_00239F00(void *obj, CVector3 to, struct CollisionInfo *info);
+s32 func_00239F00(void *obj, CVector3 to, CCollisionInfo *info);
 void func_0020E810(CQuaternion *out, CVector3 *dir);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
@@ -468,16 +456,16 @@ void func_0022DCBC(ShadowActor *actor) {
         probe.velocity.y = 0;
         probe.velocity.z = 0;
         func_00239F00(&probe, pos, &D_800F1B40);
-        if (D_800F1CE0.hit == NULL) {
+        if (D_800F1CE0.m_pInstance == NULL) {
             return;
         }
-        func_0020E810(&tilt, &D_800F1CE0.normal);
+        func_0020E810(&tilt, &D_800F1CE0.m_vNormal);
         spin.x = D_800DD78C = func_002982F0(0.785398245f);
         spin.y = 0.0f;
         spin.z = 0.0f;
         spin.w = func_002974C0(0.785398245f);
         func_00210F68(&rot, &spin, &tilt);
-        ground = D_800F1CE0.pos.y;
+        ground = D_800F1CE0.m_vInstancePos.y;
     }
     height = actor->pos.y - ground;
     a = 200.0f - height * 0.30517578f;
@@ -518,11 +506,6 @@ void func_0022DCBC(ShadowActor *actor) {
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct { u8 pad0[0x40]; } Mtx;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Gfx *commands;
-} GfxTask;
 
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
 typedef struct {
@@ -607,18 +590,16 @@ typedef struct {
     /* 0x510 */ f32 fadeRange;
 } ParticleView;
 
-struct CollisionInfo;
 
 extern Gfx *D_800D8E24;             /* display list head */
 extern u32 D_800C2214;              /* command buffer length, in commands */
-extern GfxTask *D_800F7070;
 extern f32 D_800B6D28;              /* frame time */
 extern s32 D_800B6D1C;              /* matrix buffer index */
 extern s32 D_801198E0;
 extern void *D_801198D0; /* the current view */
 extern u8 D_8011AAEF;
 extern s32 D_8011AAD8;
-extern struct CollisionInfo D_800F1B40;
+extern CCollisionInfo D_800F1B40;
 extern u8 D_800F1930[];             /* the sprite's four vertices */
 extern u8 D_800F7148[];             /* matrix pool */
 
@@ -626,7 +607,7 @@ extern void *func_0020798C(s32 *ref);
 extern void func_002079D8(void *model, AnimInfo *info);
 extern void func_00206B30(s32 *ref, void *model, s32 frame, s32 a3, s32 shiftS, s32 shiftT, s32 a6, s32 a7, s32 a8);
 extern ParticleHead *func_00281194(ParticleView *view);
-extern s32 func_00239F00(void *obj, CVector3 to, struct CollisionInfo *info);
+extern s32 func_00239F00(void *obj, CVector3 to, CCollisionInfo *info);
 extern void func_0020F85C(void *m, void *in, void *out);
 extern void *func_00206950(void *pool, s32 count);
 extern void func_00207A70(s32 mode);
@@ -699,7 +680,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     u8 *envFrom;
     u8 *primFrom;
 
-    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->commands) / sizeof(Gfx) < 3000) {
+    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     if (particle->time < 0.0f) {
@@ -1189,8 +1170,8 @@ typedef struct {
 extern s32 D_8011ACA4;              /* frozen; the current player list is 0x1414 bytes before */
 extern u8 D_8011AAF1;
 extern u8 D_8011AAEF;
-extern CollisionResult *D_800F1ADC;
-extern CollisionResult D_800F1CE0;
+extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults D_800F1CE0;
 extern Render D_800F1BA0;
 extern s32 D_801198E0;
 extern s32 D_800B6D1C;
@@ -1292,27 +1273,27 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     CVector3 up;
     Actor *targetActor;
     s32 targetTeam;
-    CollisionResult *scene;
+    CCollisionResults *scene;
 
-    if (D_800F1CE0.frame != -1) {
+    if (D_800F1CE0.m_nInstanceNode != -1) {
         effect->mode = -4;
-        targetActor = D_800F1CE0.hit;
-        targetTeam = D_800F1CE0.team;
-        func_0020D908(&targetMtx, &targetActor->bones[D_800F1CE0.frame]);
+        targetActor = (Actor *)D_800F1CE0.m_pInstance;
+        targetTeam = D_800F1CE0.m_Frame.action;
+        func_0020D908(&targetMtx, &targetActor->bones[D_800F1CE0.m_nInstanceNode]);
         func_0020C208(&targetInv, &targetMtx);
         scene = &D_800F1CE0;
-        func_0020F85C(&targetInv, &scene->pos, &effect->attachPos);
-        up = D_800F1CE0.direction;
+        func_0020F85C(&targetInv, &scene->m_vInstancePos, &effect->attachPos);
+        up = D_800F1CE0.m_vVelocity;
         func_0020F040(&up);
         func_0020FAFC(&targetInv, &up, vel);
         effect->target = (s32) targetActor;
         effect->flags |= 0x10000;
-        effect->shake = D_800F1CE0.frame;
+        effect->shake = D_800F1CE0.m_nInstanceNode;
         if (targetActor->def->m_Type == 1) {
             if (effect->owner != 0) {
                 func_0025E52C(targetActor, &targetActor->ai, &effect->owner->pos, 3);
             } else {
-                func_0025E52C(targetActor, &targetActor->ai, &scene->pos, 3);
+                func_0025E52C(targetActor, &targetActor->ai, &scene->m_vInstancePos, 3);
             }
         }
         if (effect->kind == 0x56 && targetTeam == 2) {
@@ -1330,7 +1311,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
     CVector3 offsetOut;
     CVector3 delta;
     CQuaternion quat;
-    CollisionResult target;
+    CCollisionResults target;
     CVector3 aimDelta;
     s32 first;
     s32 last;
@@ -1611,7 +1592,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                     dirOut = dir;
                 }
                 if (mode == -8) {
-                    effect->direction = D_800F1CE0.normal;
+                    effect->direction = D_800F1CE0.m_vNormal;
                     func_0020F040(&effect->direction);
                 } else {
                     effect->direction = dirOut;
@@ -1735,7 +1716,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                 vel = &effect->velocity;
                 func_0020EF60(vel, vel, D_800ACE10[0]);
                 if ((kind == 0x2D || kind == 0x4F) && source->type == 2) {
-                    if (D_800F1CE0.hit != 0) {
+                    if (D_800F1CE0.m_pInstance != 0) {
                         aimEffect(effect, vel);
                     }
                 }

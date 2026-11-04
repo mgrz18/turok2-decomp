@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 /* libultra __OSThreadContext: 64-bit registers, read here as their low words. */
 typedef struct ThreadContext {
@@ -24,13 +25,6 @@ typedef struct Thread {
     /* 0x20 */ ThreadContext context;
 } Thread;
 
-typedef struct PlayerEntry {
-    /* 0x0000 */ s32 unk0;
-    /* 0x0004 */ f32 x, y, z;
-    /* 0x0010 */ u8 pad10[0x1320 - 0x10];
-    /* 0x1320 */ struct PlayerEntry *next;
-} PlayerEntry;
-
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
 extern u8 D_800AA0F0[];
 extern s32 D_800C2030;              /* screen width */
@@ -43,7 +37,7 @@ extern char D_8011F188[];           /* build string */
 extern char D_8010FED4[];
 extern s32 D_80110030;              /* warping */
 extern s32 D_80110048;              /* warp id */
-extern PlayerEntry *D_80119890;     /* players */
+extern CPlayer *D_80119890;     /* players */
 extern char *D_800B25E4;            /* failed assertion: file */
 extern s32 D_800F1FF0;              /* failed assertion: line */
 extern char *D_800F1FF4;            /* failed assertion: expression */
@@ -102,7 +96,7 @@ static __inline__ void printInt(s32 n) {
 /* The crash screen: waits, then shows the build, the players, and the fault or failed assertion with registers and stack. */
 void func_0028C0B0(Thread *thread) {
     ThreadContext *context = &thread->context;
-    PlayerEntry *player;
+    CPlayer *player;
     s32 i;
     u64 start;
 
@@ -129,16 +123,16 @@ void func_0028C0B0(Thread *thread) {
         printString((u8 *)"NO WARP ID");
     }
     printString(D_800AA0F0);
-    for (player = D_80119890, i = 0; player != NULL; player = player->next, i++) {
+    for (player = D_80119890, i = 0; player != NULL; player = player->m_pNext, i++) {
         printString((u8 *)"PLAYER");
         printInt(i);
         printString((u8 *)" XYZ ");
         printString((u8 *)" ");
-        printInt(player->x * 0.09765625f);
+        printInt(player->m_CharacterActor.header.m_vPos.x * 0.09765625f);
         printString((u8 *)" ");
-        printInt(player->y * 0.09765625f);
+        printInt(player->m_CharacterActor.header.m_vPos.y * 0.09765625f);
         printString((u8 *)" ");
-        printInt(player->z * 0.09765625f);
+        printInt(player->m_CharacterActor.header.m_vPos.z * 0.09765625f);
         printString(D_800AA0F0);
     }
     printString(D_800AA0F0);

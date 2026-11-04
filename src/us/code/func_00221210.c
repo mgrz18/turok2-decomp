@@ -11,6 +11,9 @@
  * (drawn, ..., all, enemies, flagged 2, type 5, and actor types 0x64F and
  * 0x64D); the others lose their "visible" flag 0x200. */
 
+/* D_8011AAD8 (structs/game.h) seen from its difficulty, D_8011AAE0: the
+ * ROM bases the CGame and camera-pool reads below on this symbol, and with
+ * D_8011AAD8 / D_80119870 the code no longer matches. */
 typedef struct {
     s32 mask;               /* 0x00 */
     u8 pad4[0xD];
@@ -154,7 +157,7 @@ void func_00221210(CWorld *w) {
             i++;
         } while (i < lim);
     }
-    func_0022828C(w->unk_13B28, w);
+    func_0022828C(&w->m_InstancePool, w);
     t = w->m_Kind1Cursor + 1;
     w->m_Kind1Cursor = t;
     if (t >= w->m_nKind1) {

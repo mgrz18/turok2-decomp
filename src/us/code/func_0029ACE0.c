@@ -6,13 +6,13 @@
 extern float D_800AA8D8;
 extern double D_800AA8D0;
 extern void func_0029ACE0();
-extern __OSViContext_func_802BA910_de *D_800B7AC0;
-extern __OSViContext_func_802BA910_de *D_800B7AC4;
+extern __OSViContext *D_800B7AC0;
+extern __OSViContext *D_800B7AC4;
 extern u32 func_0029BF80(void *addr);
 void func_0029ACE0(void)
 {
-    register Modep *vm;
-    register __OSViContext_func_802BA910_de *vc;
+    register OSViMode *vm;
+    register __OSViContext *vc;
     u32 origin;
     u32 hStart;
     u32 nomValue;
@@ -21,7 +21,7 @@ void func_0029ACE0(void)
     f32 scale;
     u32 yscale;
     u32 *yscalep;
-    __OSViContext_func_802BA910_de **curr;
+    __OSViContext **curr;
     field = 0;
     vc = D_800B7AC4;
     vm = vc->modep;

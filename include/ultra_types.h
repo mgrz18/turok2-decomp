@@ -163,4 +163,58 @@ typedef struct CMutex {
     /* 0x1C */ s32 count;    /* holders, waiting ones included */
 } CMutex; /* size 0x20 */
 
+/* The video interface (PR/os_vi.h, viint.h). __osViCurr / __osViNext are
+ * D_800B7AC0 / D_800B7AC4 (osViSetEvent, osViSwapBuffer, osViSetYScale... set
+ * the next one; __osViSwapContext, func_0029ACE0, loads it). */
+typedef struct {
+    /* 0x00 */ u32 ctrl;
+    /* 0x04 */ u32 width;
+    /* 0x08 */ u32 burst;
+    /* 0x0C */ u32 vSync;
+    /* 0x10 */ u32 hSync;
+    /* 0x14 */ u32 leap;
+    /* 0x18 */ u32 hStart;
+    /* 0x1C */ u32 xScale;
+    /* 0x20 */ u32 vCurrent;
+} OSViCommonRegs; /* size 0x24 */
+
+typedef struct {
+    /* 0x00 */ u32 origin;
+    /* 0x04 */ u32 yScale;
+    /* 0x08 */ u32 vStart;
+    /* 0x0C */ u32 vBurst;
+    /* 0x10 */ u32 vIntr;
+} OSViFieldRegs; /* size 0x14 */
+
+typedef struct OSViMode {
+    /* 0x00 */ u8 type;
+    /* 0x04 */ OSViCommonRegs comRegs;
+    /* 0x28 */ OSViFieldRegs fldRegs[2];
+} OSViMode; /* size 0x50 */
+
+typedef struct {
+    /* 0x0 */ f32 factor;
+    /* 0x4 */ u16 offset;
+    /* 0x8 */ u32 scale;
+} __OSViScale; /* size 0xC */
+
+#define VI_STATE_MODE_UPDATED   0x01
+#define VI_STATE_XSCALE_UPDATED 0x02
+#define VI_STATE_YSCALE_UPDATED 0x04
+#define VI_STATE_CTRL_UPDATED   0x08
+#define VI_STATE_BUFFER_UPDATED 0x10
+#define VI_STATE_BLACK          0x20
+
+typedef struct __OSViContext {
+    /* 0x00 */ u16 state;          /* VI_STATE_* */
+    /* 0x02 */ u16 retraceCount;
+    /* 0x04 */ void *framep;
+    /* 0x08 */ OSViMode *modep;
+    /* 0x0C */ u32 control;
+    /* 0x10 */ OSMesgQueue *msgq;
+    /* 0x14 */ OSMesg msg;
+    /* 0x18 */ __OSViScale x;
+    /* 0x24 */ __OSViScale y;
+} __OSViContext; /* size 0x30 */
+
 #endif

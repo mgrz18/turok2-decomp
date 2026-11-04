@@ -9,7 +9,6 @@ extern u32 D_800B6CBC;          /* the frame before, */
 extern u32 D_800B6CC0;          /* and the one before that */
 extern s32 D_800AE340;          /* a tint forced over the view */
 extern u8 D_800F1FE4[4];        /* its colour */
-extern u8 D_800F6CB0[];
 extern f32 D_800B6D28;          /* the frame's time step */
 void func_002883E0(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 void func_0027C074(CCamera *cam);
@@ -57,13 +56,13 @@ found:
                 tint[1] >>= 3;
                 tint[2] >>= 3;
             }
-            func_002883E0(D_800F6CB0, tint, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
+            func_002883E0(&D_800F6CB0, tint, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }
         func_0027C074(cam);
         if (cam->m_FlashMode != 0) {
-            func_002883E0(D_800F6CB0, cam->m_FlashColor, (s32) cam->m_Viewport.m_ScreenPosX,
+            func_002883E0(&D_800F6CB0, cam->m_FlashColor, (s32) cam->m_Viewport.m_ScreenPosX,
                           (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
@@ -79,7 +78,7 @@ found:
             hurt[1] = 0;
             hurt[2] = 0;
             hurt[3] = cam->m_Flash;
-            func_002883E0(D_800F6CB0, hurt, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
+            func_002883E0(&D_800F6CB0, hurt, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }

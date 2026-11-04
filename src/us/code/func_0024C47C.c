@@ -69,6 +69,7 @@ void func_0024C47C(CBarrel *menu, CPlayer *player) {
 
 #include "gfx.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 /* An animated HUD item (func_00277328 ticks it, func_0027AD00 restarts it). */
 typedef struct {
@@ -121,15 +122,10 @@ typedef struct {
     /* 0x294 */ f32 y;
 } View;
 
-typedef struct {
-    u8 multiplayer;
-} GameMode;
-
 extern s32 D_8011AC8C;          /* game state */
 extern u8 D_8011AAEA;           /* HUD alpha */
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
-extern GameMode D_8011AAF1;
 extern s32 D_8011ACE4;
 extern u8 D_800ADB84[];
 extern u8 D_800ADBC0[];
@@ -251,7 +247,7 @@ void func_0024C648(HudPlayer *player, View *view) {
         func_00277CF0(player->lives, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
     }
 
-    if (!D_8011AAF1.multiplayer) {
+    if (!D_8011AAD8.multiplayer) {
         value = player->keys;
         if (player->keysItem.value != value) {
             func_0027AD00(&player->keysItem, D_800ADBC0);
@@ -265,7 +261,7 @@ void func_0024C648(HudPlayer *player, View *view) {
             func_00277CF0(player->keys, x + sx * 30.0f, y + sy * 24.0f, sx, sy, 1, 0, 0);
         }
     }
-    if (D_8011AAF1.multiplayer) {
+    if (D_8011AAD8.multiplayer) {
         value = player->options->m_Kills;
         if (player->scoreItem.value != value) {
             func_0027AD00(&player->scoreItem, D_800ADC40);
@@ -586,10 +582,6 @@ typedef struct PlayerStateInfo {
 } PlayerStateInfo;
 
 
-typedef struct DamageEvent {
-    s32 w[6];
-} DamageEvent;
-
 extern f32 D_800B6D28;              /* frame time */
 extern s32 D_8011AAA0;
 extern s32 D_8011ACE4;
@@ -598,8 +590,7 @@ extern f32 D_800ADD88[];           /* health regeneration per character */
 extern PlayerStateInfo D_800ADF54[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
-extern u8 *D_800F1CE0;
-extern void *D_800F1D7C;
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 extern s32 D_800F1D90;
 extern u8 D_800F7078;
 extern s32 D_80110054;
@@ -744,7 +735,7 @@ void func_0024D344(Player *p) {
         enable = *(u32 *) ((u8 *) game - 0xCAC) == 0; /* D_80119E2C, the block before */
     }
     func_00275B08(enable);
-    if (D_8011AAF1.multiplayer == 0) {
+    if (D_8011AAD8.multiplayer == 0) {
         if (!(D_8011AAA0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
             if (p->unk12A4 != 0) {
                 p->unk12A4 = 0;
@@ -752,7 +743,7 @@ void func_0024D344(Player *p) {
                 p->unk12A4 = 1;
             }
         }
-        if (D_8011AAF1.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
+        if (D_8011AAD8.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
             && !(D_8011AAA0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
             WeaponInfo *info = D_800AF618[p->nextWeapon];
             s16 next = info->alternate;
@@ -763,7 +754,7 @@ void func_0024D344(Player *p) {
         }
     }
     regen = 0.0f;   /* also serves the comparisons with 0 (f2 in the ROM) */
-    if (D_8011AAF1.multiplayer != 0 && (rate = D_800ADD88[p->character]) != 0.0f) {
+    if (D_8011AAD8.multiplayer != 0 && (rate = D_800ADD88[p->character]) != 0.0f) {
         f32 health = p->health;
 
         if (health != 0.0f && p->options->m_TagMode == 0) {
@@ -821,7 +812,7 @@ void func_0024D344(Player *p) {
         model = actor->model;
         material = func_00268A2C(actor);
         func_00254640(p, actor, material);
-        if (D_8011AAF1.multiplayer == 0) {
+        if (D_8011AAD8.multiplayer == 0) {
             CVector3 *pos = &p->pos;
 
             if (model != NULL && pos != NULL && (model->flags & 0x40)) {
@@ -905,7 +896,7 @@ void func_0024D344(Player *p) {
         if (actor->aiFlags & 0x6000) {
             flag = 1;
         } else if ((u32) ((u16) p->state - 2) < 2) {
-            if ((p->input.pressed & 0x400) && D_8011AAF1.multiplayer == 0 && !(D_8011AAA0 != 0 && (p->input.held & 0x20))) {
+            if ((p->input.pressed & 0x400) && D_8011AAD8.multiplayer == 0 && !(D_8011AAA0 != 0 && (p->input.held & 0x20))) {
                 p->crouchToggle ^= 1;
             }
         } else {
@@ -957,11 +948,11 @@ void func_0024D344(Player *p) {
         func_002233A8(&D_800F7078, actor, &prev, &actor->pos);
         landed = 0;
         if (hit) {
-            if (D_800F1CE0 != NULL && *D_800F1CE0 == 1) {
-                func_0026E110(D_800F1CE0, soundFlags | 2, actor);
+            if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
+                func_0026E110((u8 *)D_800F1CE0.m_pInstance, soundFlags | 2, actor);
             }
-            if (D_800F1D7C != NULL) {
-                func_0026E19C(D_800F1D7C, linkFlags | 4, actor);
+            if (D_800F1CE0.m_pWallRegion != NULL) {
+                func_0026E19C((Model *)D_800F1CE0.m_pWallRegion, linkFlags | 4, actor);
             }
             func_0024ED54(p, actor, stateFlags);
             landed = func_0024EAF8(p, actor, stateFlags);
@@ -974,8 +965,8 @@ void func_0024D344(Player *p) {
                 p->velX *= 0.1f;
             }
         }
-        if (D_800F1CE0 != NULL && *D_800F1CE0 == 3) {
-            func_0023F05C(p, D_800F1CE0);
+        if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 3) {
+            func_0023F05C(p, (u8 *)D_800F1CE0.m_pInstance);
         }
         if (before != NULL && material != NULL) {
             if ((p->stateFlags & 0x8000) && !landed && !(before->unk54 & 8) && (material->unk54 & 8)) {
@@ -1023,7 +1014,7 @@ void func_0024D344(Player *p) {
     }
     if (human) {
         sound = 102;
-        if (D_8011AAF1.multiplayer != 0) {
+        if (D_8011AAD8.multiplayer != 0) {
             if (D_8011ACE4 != 0 && p->options->m_TagMode != 0) {
                 sound = D_800ADB5C;
             } else {

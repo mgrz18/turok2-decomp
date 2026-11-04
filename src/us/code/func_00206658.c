@@ -12,7 +12,7 @@ void *func_00206658(void) {
     if (temp_s0 != 0) {
         CList__Remove(p, (s32) temp_s0);
         ((ResourceLoadRequest *)temp_s0)->flags = 1;
-        CList__AddHead(((char *)p + sizeof(IntrusiveList)), (s32) temp_s0);
+        CList__AddHead(((char *)p + sizeof(CList)), (s32) temp_s0);
     }
     return temp_s0;
 }

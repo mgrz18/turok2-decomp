@@ -1,15 +1,11 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct Bounds {
-    CVector3 min;                   /* 0x00 */
-    CVector3 max;                   /* 0x0C */
-} Bounds;
+#include "structs/collision.h"
 
 /* A level actor spawned at run time (a pickup), kept in the world's pool. */
 typedef struct PoolActor {
     /* 0x000 */ u8 pad0[0x14C];
-    /* 0x14C */ Bounds bounds;
+    /* 0x14C */ CBox bounds;
     /* 0x164 */ u8 pad164[0x198 - 0x164];
     /* 0x198 */ f32 lifetime;
     /* 0x19C */ f32 timer;
@@ -27,7 +23,7 @@ typedef struct ActorPool {
 } ActorPool;
 
 extern f32 D_800B6D28;                  /* the frame's time step */
-extern Bounds D_800F5A10;               /* visible bounds */
+extern CBox D_800F5A10;               /* visible bounds */
 
 void func_00227680(PoolActor *actor);
 
@@ -74,9 +70,9 @@ void func_002274A4(ActorPool *pool) {
                 expired = 1;
             }
         }
-        if (!(D_800F5A10.max.x > actor->bounds.min.x && D_800F5A10.min.x < actor->bounds.max.x
-              && D_800F5A10.max.z > actor->bounds.min.z && D_800F5A10.min.z < actor->bounds.max.z
-              && D_800F5A10.max.y > actor->bounds.min.y && D_800F5A10.min.y < actor->bounds.max.y)) {
+        if (!(D_800F5A10.m_vMax.x > actor->bounds.m_vMin.x && D_800F5A10.m_vMin.x < actor->bounds.m_vMax.x
+              && D_800F5A10.m_vMax.z > actor->bounds.m_vMin.z && D_800F5A10.m_vMin.z < actor->bounds.m_vMax.z
+              && D_800F5A10.m_vMax.y > actor->bounds.m_vMin.y && D_800F5A10.m_vMin.y < actor->bounds.m_vMax.y)) {
             expired = 1;
         }
         if (expired) {

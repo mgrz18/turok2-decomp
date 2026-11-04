@@ -19,7 +19,7 @@ void func_00243414(void *self, void *ai, s32 mode);
 
 void func_0025F3A4(Self *self, CAI *ai) {
     CAITargets t;
-    u8 *held = ai->m_VarPtr[2];
+    u8 *held = (u8 *) ai->m_Enemy.m_pGrabbed;
     f32 rate;
     s32 anim;
 
@@ -33,7 +33,7 @@ void func_0025F3A4(Self *self, CAI *ai) {
         func_00245BAC(self, ai, rate * 1.5f, t.m_Sight.m_Angle);
         if (held != NULL && self->animLength * 0.7f <= self->animFrame) {
             func_00243414(held, held + 0x140, 2);
-            ai->m_VarPtr[2] = NULL;
+            ai->m_Enemy.m_pGrabbed = NULL;
         }
     }
     if (ai->m_AnimRepeatedCount) {

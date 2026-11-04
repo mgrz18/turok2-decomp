@@ -2,10 +2,6 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 
-typedef struct Def {
-    s32 kind;              /* 0x00 */
-} Def;
-
 
 typedef struct Target {
     char pad0[4];
@@ -37,7 +33,7 @@ s32 func_00245D50(CGameObjectInstance *self, Target *target, CGameObjectInstance
     if (actor == target->unk68) {
         return 2;
     }
-    if (((Def *)actor->header.m_pIntelligence)->kind == 5) {
+    if (actor->header.m_pIntelligence->m_Type == 5) {
         return 5;
     }
     if (actor->m_nTypeFlag == 0x64F) {

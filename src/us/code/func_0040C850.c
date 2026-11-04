@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
@@ -62,7 +63,7 @@ void func_0040C850(BlindOneMover *mover) {
                         actor = state->actors2[i];
                         if (actor->m_AI.m_Health != 0) {
                             more = 0;
-                            if (*(f32 *) &actor->m_AI.m_VarBuffer[4] >= 1228.7999f) {
+                            if (actor->m_AI.m_BlindOne.m_SightDist >= 1228.7999f) {
                                 func_00243414(actor, &actor->m_AI, 5);
                             } else {
                                 func_00243414(actor, &actor->m_AI, 4);
@@ -138,7 +139,7 @@ extern void *func_00225EBC(void *level, s32 arg1, s32 id);
 extern void func_0027AD24(void *hud, CGameObjectInstance *obj, char *name);
 extern void func_00225D0C(void *level);
 
-/* Steps the script: clears the movers and the actors' 0x24C, enters the next phase and runs its init. */
+/* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase_40CCC0(BlindOneState *state) {
     s32 phase;
     s32 i;
@@ -148,13 +149,13 @@ static __inline__ void nextPhase_40CCC0(BlindOneState *state) {
     state->movers[1].seq = NULL;
     state->movers[2].seq = NULL;
     for (i = 0; i < state->count1; i++) {
-        state->actors1[i]->m_AI.m_VarBuffer[0] = 0;
+        state->actors1[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count2; i++) {
-        state->actors2[i]->m_AI.m_VarBuffer[0] = 0;
+        state->actors2[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count3; i++) {
-        state->actors3[i]->m_AI.m_VarBuffer[0] = 0;
+        state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
     if (D_0043240C[phase].init != NULL) {
@@ -173,27 +174,27 @@ void func_0040CCC0(BlindOneState *state) {
     obj = state->boss;
     state->faderCount = 0;
     obj->m_AI.m_Health = obj->m_AI.m_InitialHealth = 0x3200;
-    obj->m_AI.m_VarBuffer[2] = state->faderCount++;
+    obj->m_AI.m_BlindOne.m_nFader = state->faderCount++;
     for (i = 0; i < state->count1; i++) {
         actor = state->actors1[i];
         actor->m_AI.m_Health = 0;
         actor->m_AI.m_InitialHealth = 0x6400;
-        actor->m_AI.m_VarBuffer[1] = i;
-        actor->m_AI.m_VarBuffer[2] = state->faderCount++;
+        actor->m_AI.m_BlindOne.m_nGroupIndex = i;
+        actor->m_AI.m_BlindOne.m_nFader = state->faderCount++;
     }
     for (i = 0; i < state->count2; i++) {
         actor = state->actors2[i];
         actor->m_AI.m_Health = 0;
         actor->m_AI.m_InitialHealth = 0x5000;
-        actor->m_AI.m_VarBuffer[1] = i;
-        actor->m_AI.m_VarBuffer[2] = state->faderCount++;
+        actor->m_AI.m_BlindOne.m_nGroupIndex = i;
+        actor->m_AI.m_BlindOne.m_nFader = state->faderCount++;
     }
     for (i = 0; i < state->count3; i++) {
         actor = state->actors3[i];
         actor->m_AI.m_Health = 0;
         actor->m_AI.m_InitialHealth = 0x6400;
-        actor->m_AI.m_VarBuffer[1] = i;
-        actor->m_AI.m_VarBuffer[2] = state->faderCount++;
+        actor->m_AI.m_BlindOne.m_nGroupIndex = i;
+        actor->m_AI.m_BlindOne.m_nFader = state->faderCount++;
     }
     for (i = 0; i < state->faderCount; i++) {
         func_002362E4(&state->faders[i], 0);
@@ -215,19 +216,10 @@ void func_0040CCC0(BlindOneState *state) {
 /* Second boss phase update: steps the script to the next phase once the player comes within 716.8 of the
  * origin. */
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f_40CFC4;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3f_40CFC4 pos;
-} Player_40CFC4;
-
-extern Player_40CFC4 *D_80119890; /* current player */
+extern CPlayer *D_80119890; /* current player */
 extern f32 func_00298470(f32 x); /* sqrt */
 
-/* Steps the script: clears the movers and the actors' 0x24C, enters the next phase and runs its init. */
+/* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
     s32 phase;
     s32 i;
@@ -237,13 +229,13 @@ static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
     state->movers[1].seq = 0;
     state->movers[2].seq = 0;
     for (i = 0; i < state->count1; i++) {
-        state->actors1[i]->m_AI.m_VarBuffer[0] = 0;
+        state->actors1[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count2; i++) {
-        state->actors2[i]->m_AI.m_VarBuffer[0] = 0;
+        state->actors2[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count3; i++) {
-        state->actors3[i]->m_AI.m_VarBuffer[0] = 0;
+        state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
     if (D_0043240C[phase].init != NULL) {
@@ -252,10 +244,10 @@ static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
 }
 
 void func_0040CFC4(BlindOneState *state) {
-    Player_40CFC4 *player = D_80119890;
+    CPlayer *player = D_80119890;
 
     if (player != NULL &&
-        func_00298470(player->pos.x * player->pos.x + player->pos.y * player->pos.y + player->pos.z * player->pos.z) <
+        func_00298470(player->m_CharacterActor.header.m_vPos.x * player->m_CharacterActor.header.m_vPos.x + player->m_CharacterActor.header.m_vPos.y * player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.header.m_vPos.z * player->m_CharacterActor.header.m_vPos.z) <
             716.8f) {
         nextPhase_40CFC4(state);
     }

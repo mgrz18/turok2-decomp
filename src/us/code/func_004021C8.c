@@ -16,13 +16,6 @@ typedef struct {
 } Slot;
 
 
-typedef struct Enemy {
-    /* 0x000 */ u8 pad0[0x144];
-    /* 0x144 */ s32 health;
-    /* 0x148 */ u8 pad1[0x28C - 0x148];
-    /* 0x28C */ struct Enemy *next;
-} Enemy;
-
 typedef struct {
     /* 0x000 */ CGameObjectInstance *actor;
     /* 0x004 */ u8 pad0[0x8 - 0x4];
@@ -42,7 +35,7 @@ typedef struct {
 
 void func_00243414(void *a0, void *a1, s32 event);
 void func_002666B0(CGameObjectInstance *actor, void *ai, s32 state);
-extern Enemy *D_8010FEB4;
+extern CListedInstance *D_8010FEB4;
 
 /* func_00403520 */
 static __inline__ void State_NextStep(State *s) {
@@ -73,15 +66,15 @@ static __inline__ void State_NextStep(State *s) {
 static __inline__ s32 State_CountActive(State *s) {
     s32 i;
     s32 n = 0;
-    Enemy *e;
+    CListedInstance *e;
 
     for (i = 0; i < s->count; i++) {
         if (s->members[i]->m_AI.m_Mode == 1) {
             n++;
         }
     }
-    for (e = D_8010FEB4; e != NULL; e = e->next) {
-        if (e->health > 0) {
+    for (e = D_8010FEB4; e != NULL; e = e->m_pNext) {
+        if (e->m_Instance.m_AI.m_Health > 0) {
             n++;
         }
     }

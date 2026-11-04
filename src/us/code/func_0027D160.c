@@ -413,14 +413,6 @@ extern Gfx D_800AB100[];        /* RDP setup display lists */
 extern Gfx D_800AB130[];
 extern CCamera D_801198F0;      /* the main camera (camera pool + 0x40) */
 extern s32 D_801198E0;          /* the pool's active camera count */
-typedef struct {
-    /* 0x000 */ u8 _pad[0x110];
-    /* 0x110 */ void *m_ColorImage;
-} Frame;
-typedef struct {
-    /* 0x00 */ Frame *m_pFrame;
-} FrameRef;
-extern FrameRef D_800F7070;     /* the frame being drawn */
 extern void *D_80130A78;        /* the z buffer */
 void func_00207A54(void);
 void func_00207FEC(s32 arg0);
@@ -457,7 +449,7 @@ void func_0027E000(CCamera *cam) {
     s16 vx, vy;
     s32 maxx, maxy;
     f32 sx, sy, width, height, x, y;
-    Frame *buffer;
+    CFrameData *buffer;
     s32 frame;
 
     {
@@ -486,7 +478,7 @@ void func_0027E000(CCamera *cam) {
         if (ulx < 0) ulx = 0;
         if (uly < 0) uly = 0;
         if (lry > D_800C2034 - 1) lry = maxy;
-        buffer = D_800F7070.m_pFrame;
+        buffer = D_800F6CB0.m_pCurrentFrameData;
         frame = D_800B6D1C;
         GFX(*setup, 0xDA380007, (u32) &cam->m_mProjection[frame]);   /* gSPMatrix */
         GFX(*setup, 0xDB0E0000, cam->m_PerspNorm);                    /* gSPPerspNormalize */
@@ -554,7 +546,7 @@ void func_0027E000(CCamera *cam) {
             g->w1 = red << 24 | green << 16 | blue << 8 | 0xFF;
         }
         fill = ((red << 8) & 0xF800) | ((green << 3) & 0x7C0) | ((blue >> 2) & 0x3E);
-        GFX(D_800D8E24, 0xFF100000 | ((D_800C2030 - 1) & 0xFFF), (u32) buffer->m_ColorImage);
+        GFX(D_800D8E24, 0xFF100000 | ((D_800C2030 - 1) & 0xFFF), buffer->m_pFrameBuffer);
         GFX(D_800D8E24, 0xF7000000, ((fill | 1) << 16 | 1) + (u16) fill);
         GFX(D_800D8E24, 0xF6000000 | (lrx & 0x3FF) << 14 | (lry & 0x3FF) << 2,
             (ulx & 0x3FF) << 14 | (uly & 0x3FF) << 2);

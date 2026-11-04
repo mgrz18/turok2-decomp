@@ -1,32 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, Particle_HitTarget, with Turok 2's layouts. */
 
 #include "common.h"
-#include "structs/vector.h"
-#include "structs/intelligence.h"
+#include "structs/particle.h"
+#include "structs/collision.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
 } Bone;
-
-/* Two halfwords of an effect's parameters, or the pair as one word. */
-typedef struct ActionParams {
-    /* 0x00 */ s16 upper;
-    /* 0x02 */ s16 lower;
-    /* 0x04 */ s32 extra;
-} ActionParams;
-
-typedef struct ParticleEvents {
-    /* 0x00 */ ActionParams params[14];
-    /* 0x70 */ u16 models[14];
-    /* 0x8C */ u16 effects[14];
-    /* 0xA8 */ u16 sounds[14];
-} ParticleEvents;
-
-typedef struct ParticleDef {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x14];
-    /* 0x18 */ ParticleEvents *events;
-} ParticleDef;
 
 typedef struct Target Target;
 struct Target {
@@ -47,52 +27,12 @@ struct Target {
     /* 0x12B0 */ s32 extraUses;
 };
 
-typedef struct Particle {
-    /* 0x000 */ u8 pad0[2];
-    /* 0x002 */ u16 type;
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ s32 unk10;
-    /* 0x014 */ u8 pad14[4];
-    /* 0x018 */ CVector3 velocity;
-    /* 0x024 */ u8 pad24[0x34 - 0x24];
-    /* 0x034 */ CVector3 attachPos;
-    /* 0x040 */ u32 flags;
-    /* 0x044 */ u8 pad44[0xF8 - 0x44];
-    /* 0x0F8 */ ParticleDef *def;
-    /* 0x0FC */ u8 padFC[0x10C - 0xFC];
-    /* 0x10C */ Target *owner;
-    /* 0x110 */ u8 pad110[4];
-    /* 0x114 */ Target *target;
-    /* 0x118 */ s32 handle;
-    /* 0x11C */ u8 pad11C[0x194 - 0x11C];
-    /* 0x194 */ s8 mode;
-    /* 0x195 */ s8 hitSurface;
-    /* 0x196 */ u8 pad196[0x1AD - 0x196];
-    /* 0x1AD */ s8 shake;
-    /* 0x1AE */ u8 pad1AE[0x1B5 - 0x1AE];
-    /* 0x1B5 */ u8 drawWhenHidden;
-    /* 0x1B6 */ u8 pad1B6[0x1BC - 0x1B6];
-    /* 0x1BC */ f32 scale;
-} Particle;
-
-/* The result of the last collision test. */
-typedef struct CollisionResult {
-    /* 0x00 */ Target *current;
-    /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ CVector3 origin;
-    /* 0x14 */ s32 frame;
-    /* 0x18 */ u8 pad18[0x7E - 0x18];
-    /* 0x7E */ u8 mode;
-    /* 0x7F */ u8 pad7F[0xD8 - 0x7F];
-    /* 0xD8 */ CVector3 direction;
-} CollisionResult;
-
 typedef struct EffectInfo {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[4];
 } EffectInfo;
 
-extern CollisionResult D_800F1CE0;
+extern CCollisionResults D_800F1CE0;
 extern u8 D_800F1D5D;
 extern u8 D_8011AAF1;
 extern EffectInfo D_800AD084[];
@@ -109,64 +49,64 @@ void func_0020F85C(f32 *matrix, CVector3 *in, CVector3 *out);
 void func_0020F040(CVector3 *v);
 void func_0020FAFC(f32 *matrix, CVector3 *in, CVector3 *out);
 void func_0025E52C(Target *target, s32 *ai, CVector3 *from, s32 arg3);
-void func_002327F4(Particle *p);
-void func_00234E48(void *list, Particle *p);
-void func_00228B4C(void *list, s32 handle);
-s32 func_002325F0(Particle *p);
+void func_002327F4(CParticle *p);
+void func_00234E48(void *list, CParticle *p);
+void func_00228B4C(void *list, CDLight *light);
+s32 func_002325F0(CParticle *p);
 s32 func_00268148(Target *target);
-void func_00236EA0(void *source, Particle *p, s32 effect, s32 arg3, CVector3 pos, ActionParams params);
-void func_00229340(Particle *p, s32 model, s32 arg2, s32 enabled);
+void func_00236EA0(void *source, CParticle *p, s32 effect, s32 arg3, CVector3 pos, CEventValue params);
+void func_00229340(CParticle *p, s32 model, s32 arg2, s32 enabled);
 void func_00275544(s16 sound, CVector3 pos, s32 arg2, s32 arg3);
-void func_0022F1C8(void *list, Particle *p);
-void func_00232B40(Particle *p);
+void func_0022F1C8(void *list, CParticle *p);
+void func_00232B40(CParticle *p);
 
 /* Sticks the particle to the bone it hit: its position and velocity in the bone's frame. */
-static __inline__ void attachParticle(Particle *p, f32 *transform, s32 action) {
+static __inline__ void attachParticle(CParticle *p, f32 *transform, s32 action) {
     f32 localTransform[16];
     f32 inverse[16];
     CVector3 direction;
     Target *attached;
-    CollisionResult *scene;
+    CCollisionResults *scene;
 
-    attached = D_800F1CE0.current;
+    attached = (Target *)D_800F1CE0.m_pInstance;
     if (transform) {
         func_0020C208(inverse, transform);
     } else {
-        func_0020D908(localTransform, &attached->bones[D_800F1CE0.frame]);
+        func_0020D908(localTransform, &attached->bones[D_800F1CE0.m_nInstanceNode]);
         func_0020C208(inverse, localTransform);
     }
     scene = &D_800F1CE0;
-    func_0020F85C(inverse, &scene->origin, &p->attachPos);
-    direction = scene->direction;
+    func_0020F85C(inverse, &scene->m_vInstancePos, &p->m_vAttachPos);
+    direction = scene->m_vVelocity;
     func_0020F040(&direction);
-    func_0020FAFC(inverse, &direction, &p->velocity);
-    p->flags |= 0x10000;
-    p->target = attached;
-    p->shake = D_800F1CE0.frame;
+    func_0020FAFC(inverse, &direction, &p->m_vVelocity);
+    p->m_dwFlags |= 0x10000;
+    p->m_pTarget = (CGameObjectInstance *)attached;
+    p->m_nBone = D_800F1CE0.m_nInstanceNode;
     if (attached->def->m_Type == 1) {
-        if (p->owner != NULL) {
-            func_0025E52C(attached, &attached->aiFlags, &p->owner->pos, 3);
+        if (p->m_pOwner != NULL) {
+            func_0025E52C(attached, &attached->aiFlags, &p->m_pOwner->header.m_vPos, 3);
         } else {
-            func_0025E52C(attached, &attached->aiFlags, &D_800F1CE0.origin, 3);
+            func_0025E52C(attached, &attached->aiFlags, &D_800F1CE0.m_vInstancePos, 3);
         }
     }
-    if (p->type == 0x56 && action == 2) {
-        p->flags |= 0x4000000;
+    if (p->header.m_nObjType == 0x56 && action == 2) {
+        p->m_dwFlags |= 0x4000000;
     }
 }
 
 /* A particle hit the current collision target: attaches to it when its type sticks, then
  * plays the impact's model, effects and sound for the hit's action and removes the particle
  * when its descriptor says so. */
-void func_0022C488(Particle *p) {
-    ActionParams primary;
-    ActionParams secondary;
+void func_0022C488(CParticle *p) {
+    CEventValue primary;
+    CEventValue secondary;
     f32 boneMatrix[16];
     Target *source;
     Target *owner;
-    ParticleDef *def;
-    ParticleEvents *actions;
-    ParticleEvents *extraActions;
+    CROMParticleEffect *def;
+    CROMParticleImpact *actions;
+    CROMParticleImpact *extraActions;
     void *other;
     s32 mode;
     s32 enabled;
@@ -179,32 +119,32 @@ void func_0022C488(Particle *p) {
     s32 extraEffect;
     u16 type;
 
-    source = D_800F1CE0.current;
+    source = (Target *)D_800F1CE0.m_pInstance;
     enabled = 1;
     special = 0;
-    def = p->def;
+    def = p->m_pEffect;
     if (func_002682CC(source)) {
-        mode = p->hitSurface;
+        mode = p->m_bDieOnImpact;
     } else {
-        mode = p->mode;
+        mode = p->m_ObjectImpact;
     }
-    if (p->unk10 == 0) {
-        p->unk10 = source->unk10;
+    if (p->header.m_pCurrentRegion == NULL) {
+        p->header.m_pCurrentRegion = (struct CGameRegion *)source->unk10;
     }
-    if (D_800F1CE0.frame != -1) {
-        action = D_800F1CE0.mode;
-        if (p->type == 13) {
+    if (D_800F1CE0.m_nInstanceNode != -1) {
+        action = D_800F1CE0.m_Frame.action;
+        if (p->header.m_nObjType == 13) {
             action = 4;
         }
-        owner = D_800F1CE0.current;
+        owner = (Target *)D_800F1CE0.m_pInstance;
         if (owner->flags & 0x3000000) {
-            func_0020D908(boneMatrix, &owner->bones[D_800F1CE0.frame]);
+            func_0020D908(boneMatrix, &owner->bones[D_800F1CE0.m_nInstanceNode]);
             if (owner->flags & 0x1000000) {
-                func_0021B39C(owner, &owner->aiFlags, boneMatrix, D_800F1CE0.origin, D_800F1CE0.direction,
-                              D_800F1CE0.frame);
+                func_0021B39C(owner, &owner->aiFlags, boneMatrix, D_800F1CE0.m_vInstancePos, D_800F1CE0.m_vVelocity,
+                              D_800F1CE0.m_nInstanceNode);
             }
             if (owner->flags & 0x2000000) {
-                type = p->type;
+                type = p->header.m_nObjType;
                 if (type == 0x12A || type == 0x132) {
                     if (owner->def->m_Type == 11) {
                         special = owner->extraUses < 1;
@@ -213,16 +153,16 @@ void func_0022C488(Particle *p) {
                         }
                     }
                 }
-                if (p->type == 0x56 || p->type == 2 || p->type == 0x126 || p->type == 15 || special
-                    || (p->type == 11 && (D_800F1D5D & 3) == 1)) {
+                if (p->header.m_nObjType == 0x56 || p->header.m_nObjType == 2 || p->header.m_nObjType == 0x126 || p->header.m_nObjType == 15 || special
+                    || (p->header.m_nObjType == 11 && (D_800F1D5D & 3) == 1)) {
                     attachParticle(p, boneMatrix, action);
-                    if (p->drawWhenHidden) {
+                    if (p->m_ActiveSwooshes) {
                         func_002327F4(p);
                         func_00234E48(D_801102B8, p);
                     }
-                    if (p->handle) {
-                        func_00228B4C(D_8010FF34, p->handle);
-                        p->handle = 0;
+                    if (p->m_pDLight) {
+                        func_00228B4C(D_8010FF34, p->m_pDLight);
+                        p->m_pDLight = NULL;
                     }
                 }
             }
@@ -232,16 +172,16 @@ void func_0022C488(Particle *p) {
     }
     if (action == 5) {
         action = 4;
-        p->flags |= 2;
+        p->m_dwFlags |= 2;
     }
     if (func_002325F0(p) && action < 6 && action >= 4) {
         action = 6;
     }
-    actions = def->events;
-    model = actions->models[action];
-    effect = actions->effects[action];
-    primary = actions->params[action];
-    sound = def->events->sounds[action];
+    actions = def->m_pImpact;
+    model = actions->m_ImpactParticleType[action];
+    effect = actions->m_ImpactEventType[action];
+    primary = actions->m_ImpactEventValue[action];
+    sound = def->m_pImpact->m_ImpactSoundType[action];
     if (source->kind == 1) {
         if (source->callback) {
             source->callback(source, &source->aiFlags, p);
@@ -255,35 +195,35 @@ void func_0022C488(Particle *p) {
     }
     if (effect != 0xFFFF) {
         if (D_800AD084[effect].flags & 4) {
-            if (p->type == 0x56) {
-                primary.lower = primary.lower * p->scale;
+            if (p->header.m_nObjType == 0x56) {
+                primary.lower = primary.lower * p->m_Scale;
             }
         }
         other = source;
         if (D_800AD084[effect].flags & 2) {
             other = p;
         }
-        func_00236EA0(other, p, effect, -1, D_800F1CE0.origin, primary);
+        func_00236EA0(other, p, effect, -1, D_800F1CE0.m_vInstancePos, primary);
     }
     if (action != 4) {
         draw = 1;
         if (D_8011AAF1) {
             draw = source->def->m_Type != 11;
-            if (mode == p->hitSurface) {
+            if (mode == p->m_bDieOnImpact) {
                 draw = 0;
             }
         }
         if (draw) {
-            extraActions = def->events;
-            extraEffect = extraActions->effects[4];
+            extraActions = def->m_pImpact;
+            extraEffect = extraActions->m_ImpactEventType[4];
             if (extraEffect != 0xFFFF) {
-                secondary = extraActions->params[4];
+                secondary = extraActions->m_ImpactEventValue[4];
                 if (D_800AD084[extraEffect].flags & 4) {
                     other = source;
                     if (D_800AD084[extraEffect].flags & 2) {
                         other = p;
                     }
-                    func_00236EA0(other, p, extraEffect, -1, D_800F1CE0.origin, secondary);
+                    func_00236EA0(other, p, extraEffect, -1, D_800F1CE0.m_vInstancePos, secondary);
                 }
             }
         }
@@ -292,9 +232,9 @@ void func_0022C488(Particle *p) {
         func_00229340(p, model, -8, enabled);
     }
     if (sound != 0xFFFF) {
-        func_00275544((s16) sound, D_800F1CE0.origin, 0, -1);
+        func_00275544((s16) sound, D_800F1CE0.m_vInstancePos, 0, -1);
     }
-    if (!(p->flags & 0x30000)) {
+    if (!(p->m_dwFlags & 0x30000)) {
         if (mode == 1 || (effect != 0xFFFF && (D_800AD084[effect].flags & 1))) {
             func_0022F1C8(D_800F8928, p);
             func_00232B40(p);

@@ -1,31 +1,9 @@
 #include "common.h"
+#include "structs/game.h"
 
-typedef struct GfxTask {
-    /* 0x000 */ u8 pad0[0xF0];
-    /* 0x0F0 */ s16 type;
-    /* 0x0F2 */ u8 padF2[0x110 - 0xF2];
-    /* 0x110 */ s32 buffer;
-    /* 0x114 */ u8 pad114[0x12C - 0x114];
-    /* 0x12C */ struct GfxTask *prev;
-    /* 0x130 */ struct GfxTask *next;
-    /* 0x134 */ u8 pad134[0x140 - 0x134];
-} GfxTask; /* size 0x140 */
-
-typedef struct {
-    /* 0x00000 */ GfxTask tasks[1];
-    /* 0x00140 */ u8 pad140[0x23DF0 - 0x140];
-    /* 0x23DF0 */ u8 unk23DF0[0x23FAC - 0x23DF0];
-    /* 0x23FAC */ u8 unk23FAC[0x23FD4 - 0x23FAC];
-    /* 0x23FD4 */ s32 unk23FD4;
-    /* 0x23FD8 */ u8 pad23FD8[0x23FE8 - 0x23FD8];
-    /* 0x23FE8 */ s32 unk23FE8;
-    /* 0x23FEC */ s32 unk23FEC;
-    /* 0x23FF0 */ s32 unk23FF0;
-    /* 0x23FF4 */ s32 unk23FF4;
-} GameState;
-
-/* D_8011ACB0 (GameMatch in structs/game.h). Kept as a local array view: through
- * it the compiler bases both stores on D_8011ACB0 + 0x44, as the ROM does. */
+/* D_8011ACB0 (GameMatch in structs/game.h) as a local array view, under an
+ * alias of the symbol: through it the compiler bases both stores on
+ * D_8011ACB0 + 0x44, as the ROM does. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
     /* 0x44 */ s32 unk44;
@@ -41,9 +19,8 @@ extern u8 D_8011F128[];
 extern s32 D_800D8E24;
 extern u8 D_8011B0C8[];
 extern s32 D_80120690;
-extern u8 D_8011AAD8[];
 extern u32 D_800C2210; /* task count */
-extern Unk8011ACB0 D_8011ACB0[];
+extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("D_8011ACB0");
 extern s32 D_80130940;
 extern s32 D_80130A88[];
 
@@ -51,7 +28,7 @@ extern void func_0029B030(void *, void *, s32);
 extern void func_00266C5C(void *, s32, s32);
 extern void func_0028ADF0(void *, void *, s32, s32, s32);
 extern void func_0028AF00(void *, void *, void *);
-extern void func_0028891C(GameState *);
+extern void func_0028891C(CEngineApp *);
 extern void func_00297AE0(void *);
 extern void func_0028D0B8(void);
 extern void func_0041BA50(void *);
@@ -59,11 +36,11 @@ extern void func_00430500(void *);
 extern void func_002837E0(void);
 extern void func_004302A0(void);
 extern void func_0042D1C0(void *);
-extern void CSunFrameData__Construct(GfxTask *);
-extern void func_00288318(GameState *);
+extern void CSunFrameData__Construct(CFrameData *);
+extern void func_00288318(CEngineApp *);
 extern void func_00275520(void);
 
-void func_00286440(GameState *state) {
+void func_00286440(CEngineApp *state) {
     u32 i;
     u32 prev;
     u32 next;
@@ -72,34 +49,34 @@ void func_00286440(GameState *state) {
     func_00266C5C(D_800CFC80, 7, 0x2000);
     func_0028ADF0(D_8011AD90, D_800CFC80 + 0x2000, D_800B6E98, 0, 1);
     func_0028AF00(D_8011AD90, D_8011F128, D_8011AD28);
-    state->unk23FD4 = -1;
+    state->m_Settings.prevMode = -1;
     func_0028891C(state);
     D_800D8E24 = 0;
     func_00297AE0(D_8011B0C8);
     if (D_80120690 != 0) {
         func_0028D0B8();
-        func_0041BA50(D_8011AAD8);
+        func_0041BA50(&D_8011AAD8);
     }
-    func_00430500(state->unk23DF0);
+    func_00430500(&state->m_Game.m_DebugLines);
     i = 0;
     func_002837E0();
     func_004302A0();
-    func_0042D1C0(state->unk23FAC);
-    state->unk23FF0 = 0;
-    state->unk23FE8 = 1;
-    state->unk23FEC = 0;
-    state->unk23FF4 = 0;
-    D_8011ACB0->unk44 = 0;
-    D_8011ACB0->unk48 = 0;
+    func_0042D1C0(&state->m_Settings.m_Sun);
+    state->m_Settings.unk1C8 = 0;
+    state->m_Settings.ready = 1;
+    state->m_Settings.unk1C4 = 0;
+    state->m_Settings.paused = 0;
+    D_8011ACB0_arr->unk44 = 0;
+    D_8011ACB0_arr->unk48 = 0;
     D_80130940 = 0;
     for (; i < D_800C2210; i++) {
         prev = (i - 1 + D_800C2210) % D_800C2210;
         next = (i + 1 + D_800C2210) % D_800C2210;
-        state->tasks[i].type = 2;
-        state->tasks[i].buffer = D_80130A88[i];
-        state->tasks[i].prev = &state->tasks[prev];
-        state->tasks[i].next = &state->tasks[next];
-        CSunFrameData__Construct(&state->tasks[i]);
+        state->m_FrameData[i].m_Msg.m_Type = 2;
+        state->m_FrameData[i].m_pFrameBuffer = D_80130A88[i];
+        state->m_FrameData[i].m_pPrev = &state->m_FrameData[prev];
+        state->m_FrameData[i].m_pNext = &state->m_FrameData[next];
+        CSunFrameData__Construct(&state->m_FrameData[i]);
     }
     func_00288318(state);
     func_00275520();

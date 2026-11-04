@@ -1,13 +1,9 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002A7164.c, func_002A7164, with Turok 2's layouts. */
 
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/particle.h"
 
 typedef struct Mtx44 { s32 w[16]; } Mtx44;
-
-typedef struct EmitCfg { u8 pad0[0x14]; s32 unk14; } EmitCfg;
-/* Turok 2 actor: matrices at 0x48, cfg at 0xF8. */
-typedef struct EmitActor { u8 pad0[0x48]; Mtx44 mtx[2]; u8 padC8[0x30]; EmitCfg *cfg; } EmitActor;
 
 typedef struct EmitInfo {
     /* 0x00 */ f32 unk0;
@@ -26,7 +22,7 @@ struct EmitNode {
     /* 0x28 */ Mtx44 mtx[2];
     /* 0xA8 */ f32 fraction;
     /* 0xAC */ f32 length;
-    /* 0xB0 */ EmitActor *owner;
+    /* 0xB0 */ CParticle *owner;
 };
 
 typedef struct Emitter {
@@ -52,17 +48,17 @@ void func_0021034C(void *, f32, f32, f32);
 f32 func_00298470(f32);                 /* sqrtf */
 
 /* Rage Wars' func_802A6174: places one node on its owner, or freezes it when the owner went away (-1). */
-static __inline__ void placeNode(Emitter *e, EmitNode *n, EmitActor *o) {
+static __inline__ void placeNode(Emitter *e, EmitNode *n, CParticle *o) {
     u8 m[0x40];
     f32 k;
 
-    if (o == (EmitActor *)-1) {
+    if (o == (CParticle *)-1) {
         n->mtx[D_800B6D1C] = n->mtx[D_800B6D1C ^ 1];
         n->owner = NULL;
     } else {
-        func_0020D908(m, &o->mtx[D_800B6D1C]);
+        func_0020D908(m, o->m_mtxDraw[D_800B6D1C]);
         k = 0.01f;
-        if (o->cfg->unk14 != 0) {
+        if (o->m_pEffect->m_pModel != NULL) {
             k = 0.29257143f;
         }
         func_0021034C(m, k, k, k);
@@ -80,7 +76,7 @@ static __inline__ void placeNode(Emitter *e, EmitNode *n, EmitActor *o) {
 void func_0023417C(Emitter *e) {
     CVector3 d;
     EmitNode *n;
-    EmitActor *o;
+    CParticle *o;
     EmitNode *prev;
     f32 len;
     s32 moved;

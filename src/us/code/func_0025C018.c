@@ -35,11 +35,11 @@ void func_0025C018(CGameObjectInstance *actor, CAI *ai) {
         func_0025FEB0(actor, ai);
     }
     if (ai->m_Health == 0) {
-        ai->m_VarF32[0] = func_0021170C(ai->m_VarF32[0], 0.0872664749f);
-        ai->m_VarF32[1] = func_0021170C(ai->m_VarF32[1], 0.0872664749f);
+        ai->m_Enemy.m_Pitch = func_0021170C(ai->m_Enemy.m_Pitch, 0.0872664749f);
+        ai->m_Enemy.m_Roll = func_0021170C(ai->m_Enemy.m_Roll, 0.0872664749f);
     }
-    func_00210630(&look, ai->m_VarF32[1]);
-    func_00210790(&look, ai->m_VarF32[0]);
+    func_00210630(&look, ai->m_Enemy.m_Roll);
+    func_00210790(&look, ai->m_Enemy.m_Pitch);
     sin = func_002982F0(actor->m_RotY * 0.5f);
     spin.x = 0.0f;
     spin.y = sin;

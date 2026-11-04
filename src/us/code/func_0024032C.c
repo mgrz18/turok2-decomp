@@ -2,16 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/world.h"
 #include "structs/game.h"
-
-typedef struct Box {
-    /* 0x00 */ CVector3 min;
-    /* 0x0C */ CVector3 max;
-} Box;
-
-typedef struct SweepDef {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ s8 kind;
-} SweepDef;
+#include "structs/collision.h"
 
 /* An instance that can be hit: an actor (or the instance sweeping). */
 typedef struct HitInst {
@@ -22,7 +13,7 @@ typedef struct HitInst {
     /* 0x018 */ u8 pad18[0xA0];
     /* 0x0B8 */ u16 typeId;
     /* 0x0BA */ u8 padBA[2];
-    /* 0x0BC */ Box bounds;
+    /* 0x0BC */ CBox bounds;
     /* 0x0D4 */ s32 flags;
     /* 0x0D8 */ u8 padD8[0x20];
     /* 0x0F8 */ s32 *particleDef;
@@ -30,35 +21,22 @@ typedef struct HitInst {
     /* 0x10C */ struct HitInst *owner;
 } HitInst;
 
-/* A segment swept from an instance's position to end. */
-typedef struct Sweep {
-    /* 0x00 */ HitInst *inst;
-    /* 0x04 */ SweepDef *def;
-    /* 0x08 */ f32 maxT;
-    /* 0x0C */ u8 padC[0x40];
-    /* 0x4C */ CVector3 end;
-} Sweep;
-
-typedef struct SweepHit {
+typedef struct InstanceHit {
     /* 0x00 */ HitInst *inst;
     /* 0x04 */ f32 t;
-} SweepHit;
+} InstanceHit;
 
 extern CWorld D_800F7078;
-extern HitInst **D_800F1ADC;
+extern CCollisionResults *D_800F1ADC;
 extern u8 D_8011AAF1;
 
-typedef struct SweepBox {
-    u8 pad[0x30];
-} SweepBox;
-
-s32 func_0023A640(Sweep *sweep, Box *box, f32 *t);
+s32 func_0023A640(Sweep *sweep, CBox *box, f32 *t);
 void func_00226F90(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
 s32 func_002407D8();
 s32 func_0024079C();
 void func_0023E6D8(Sweep *sweep, SweepBox *box);
 void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other);
-void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, Box *box);
+void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box);
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
@@ -66,16 +44,16 @@ void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, Box *box);
 /* Sweep against the actors whose bounds the swept segment's box touches,
  * nearest first, until the sweep's range runs out. */
 void func_0024032C(Sweep *sweep) {
-    Box box;
+    CBox box;
     SweepBox volume;
-    SweepHit hits[0x80];
+    InstanceHit hits[0x80];
     f32 t;
     CVector3 *start;
-    SweepDef *def;
+    CCollisionInfo *def;
     HitInst *inst;
     HitInst *other;
     CWorld *world;
-    SweepHit *hit;
+    InstanceHit *hit;
     GameSettings *multi;
     s32 count;
     s32 nHits;
@@ -83,17 +61,17 @@ void func_0024032C(Sweep *sweep) {
     s32 j;
 
     def = sweep->def;
-    if (def->kind == 0 || !(def->flags & 0x40000000)) {
+    if (def->m_InstanceBehavior == 0 || !(def->m_dwFlags & 0x40000000)) {
         return;
     }
-    inst = sweep->inst;
+    inst = (HitInst *)sweep->inst;
     start = &inst->pos;
-    box.min.x = MIN(sweep->end.x, inst->pos.x);
-    box.max.x = MAX(sweep->end.x, inst->pos.x);
-    box.min.y = MIN(sweep->end.y, start->y);
-    box.max.y = MAX(sweep->end.y, start->y);
-    box.min.z = MIN(sweep->end.z, start->z);
-    box.max.z = MAX(sweep->end.z, start->z);
+    box.m_vMin.x = MIN(sweep->end.x, inst->pos.x);
+    box.m_vMax.x = MAX(sweep->end.x, inst->pos.x);
+    box.m_vMin.y = MIN(sweep->end.y, start->y);
+    box.m_vMax.y = MAX(sweep->end.y, start->y);
+    box.m_vMin.z = MIN(sweep->end.z, start->z);
+    box.m_vMax.z = MAX(sweep->end.z, start->z);
     hit = hits;
     nHits = 0;
     world = &D_800F7078;
@@ -103,10 +81,10 @@ void func_0024032C(Sweep *sweep) {
         if (inst == other) {
             continue;
         }
-        if (def->kind == 7 && *D_800F1ADC == other) {
+        if (def->m_InstanceBehavior == 7 && (HitInst *)D_800F1ADC->m_pInstance == other) {
             continue;
         }
-        if ((def->flags & 0x20000000) && other->typeId == 0x64F) {
+        if ((def->m_dwFlags & 0x20000000) && other->typeId == 0x64F) {
             continue;
         }
         if (inst->type == 2 && inst->owner == other) {
@@ -123,9 +101,9 @@ void func_0024032C(Sweep *sweep) {
                     continue;
             }
         }
-        if (!(box.max.x > other->bounds.min.x) || !(box.min.x < other->bounds.max.x) ||
-            !(box.max.z > other->bounds.min.z) || !(box.min.z < other->bounds.max.z) ||
-            !(box.max.y > other->bounds.min.y) || !(box.min.y < other->bounds.max.y)) {
+        if (!(box.m_vMax.x > other->bounds.m_vMin.x) || !(box.m_vMin.x < other->bounds.m_vMax.x) ||
+            !(box.m_vMax.z > other->bounds.m_vMin.z) || !(box.m_vMin.z < other->bounds.m_vMax.z) ||
+            !(box.m_vMax.y > other->bounds.m_vMin.y) || !(box.m_vMin.y < other->bounds.m_vMax.y)) {
             continue;
         }
         if (func_0023A640(sweep, &other->bounds, &t)) {
@@ -136,10 +114,10 @@ void func_0024032C(Sweep *sweep) {
         }
     }
     if (nHits != 0) {
-        func_00226F90(hits, nHits, sizeof(SweepHit), func_002407D8, func_0024079C);
+        func_00226F90(hits, nHits, sizeof(InstanceHit), func_002407D8, func_0024079C);
         hit = hits;
         for (j = 0; j < nHits; j++, hit++) {
-            if (!(hit->t < sweep->maxT)) {
+            if (!(hit->t < sweep->hit.fraction)) {
                 break;
             }
             other = hit->inst;

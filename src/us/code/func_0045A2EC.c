@@ -1,11 +1,10 @@
 #include "common.h"
+#include "structs/save.h"
 
 s32 func_002052D8(s32, s32);                /* extern */
 s32 func_002053A8(s32);                     /* extern */
 extern s32 D_800C2010;
 extern s32 D_800C2014;
-extern s32 D_800C2018;
-extern s32 D_800C201C;
 
 void func_0045A2EC(void) {
     if ((D_800C2010 != 0) || (D_800C2014 != 0)) {

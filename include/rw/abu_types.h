@@ -16,16 +16,8 @@
 #include "ultra_types.h"
 #include "structs/vector.h"
 #include "structs/libaudio.h"
+#include "structs/list.h" /* CList (Rage Wars' IntrusiveList) */
 
-struct IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-typedef struct IntrusiveList IntrusiveList;
 struct Access_u8_3;
 struct Access_u8_3 {
     char pad[0x3];
@@ -55,8 +47,8 @@ struct CartridgeReadWorker {
     u8 reserved231[0xA48 - 0x231];
     u8 completionQueueStorage;
     u8 reservedA49[0x5068 - 0xA49];
-    IntrusiveList available;
-    IntrusiveList pending;
+    CList available;
+    CList pending;
 };
 struct Chunk {
     u32 source;
@@ -1020,7 +1012,7 @@ struct GameplayCamera {
     u8 pad56C[4];
     s8 unk570;
     char pad571[0xE40 - 0x571];
-    IntrusiveList objects;
+    CList objects;
     f32 unkE54;
     char padE58[0x3C];
     s8 unkE94;
@@ -1256,8 +1248,8 @@ struct NodeCode8028469C {
 typedef struct NodeCode8028469C NodeCode8028469C;
 struct PoolRecAt28V1;
 struct PoolRecAt28V1 {
-    IntrusiveList free;
-    IntrusiveList active;
+    CList free;
+    CList active;
     s32 baseLevel;
 };
 typedef struct PoolRecAt28V1 PoolRecAt28V1;
@@ -1596,21 +1588,9 @@ struct ObjRecAtCV4 {
     SlotCode8025A3EC slots[16];
 };
 typedef struct ObjRecAtCV4 ObjRecAtCV4;
-struct AudioHeapD844 {
-    u8 *start;
-    u8 *cursor;
-    u32 size;
-};
 struct AudioRootD844 {
     char pad0[0x1DA8];
-    struct AudioHeapD844 heap;
-};
-struct AudioParamsD844 {
-    s32 count38, count1C;
-    u8 kind;
-    u8 pad9[3];
-    struct AudioHeapD844 *context;
-    s32 value10, value14, value18;
+    ALHeap heap; /* SndMgr.heap (structs/sound.h) */
 };
 struct AudioStateD844 {
     struct AudioRootD844 *root;
@@ -1622,18 +1602,6 @@ struct AudioStateD844 {
     s32 counter;
     f32 third, fourth;
 };
-struct InitParams;
-struct InitParams {
-    s32 count38;
-    s32 count1C;
-    u8 kind;
-    u8 pad09[3];
-    s32 context;
-    s32 value10;
-    s32 value14;
-    s32 value18;
-};
-typedef struct InitParams InitParams;
 typedef struct SequenceResource {
     char pad[0x2B50];
     void *sections;
@@ -1650,8 +1618,8 @@ typedef struct SequenceState {
 } SequenceState;
 typedef struct SequenceCommand { s32 command; u16 duration; } SequenceCommand;
 typedef struct SoundVoicePool {
-    IntrusiveList available;
-    IntrusiveList playing;
+    CList available;
+    CList playing;
     s32 state;
 } SoundVoicePool;
 struct SoundSourceNode;
@@ -2217,7 +2185,7 @@ struct Draw {
     s32 allocationMode;
     void *model;
     char reserved10[0x10];
-    IntrusiveList recycled;
+    CList recycled;
 };
 struct Block10;
 typedef struct Block10 Block10;
@@ -2280,27 +2248,6 @@ struct Slot_func_8023CCD4_de {
     u16 id;
     u16 unkA;
     s32 unkC;
-};
-struct ALCSeq_s;
-typedef struct ALCSeq_s ALCSeq_s;
-struct ALCMidiHdr;
-struct ALCMidiHdr {
-    u32 trackOffset[16];
-    u32 division;
-};
-typedef struct ALCMidiHdr ALCMidiHdr;
-struct ALCSeq_s {
-    struct ALCMidiHdr *base;
-    u32 validTracks;
-    f32 qnpt;
-    u32 lastTicks;
-    u32 lastDeltaTicks;
-    u32 deltaFlag;
-    u8 *curLoc[16];
-    u8 *curBUPtr[16];
-    u8 curBULen[16];
-    u8 lastStatus[16];
-    u32 evtDeltaTicks[16];
 };
 struct ResourceTable;
 typedef struct ResourceTable ResourceTable;
@@ -2389,253 +2336,17 @@ struct CopyDest802B3998 {
     unsigned char bytesA8[16];
     int wordsB8[16];
 };
-struct ALEventQueue;
-typedef struct ALEventQueue ALEventQueue;
-struct ALNoteEvent;
-struct ALOscEvent;
-struct ALVolumeEvent;
-struct ALEndEvent;
-struct ALTempoEvent;
-struct ALEvent;
-typedef struct ALNoteEvent ALNoteEvent;
-typedef struct ALOscEvent ALOscEvent;
-typedef struct ALVolumeEvent ALVolumeEvent;
-typedef struct ALEndEvent ALEndEvent;
-typedef struct ALTempoEvent ALTempoEvent;
-typedef struct ALEvent ALEvent;
-struct ALEventQueue {
-    ListLink freeList;
-    ListLink allocList;
-    s32 eventCount;
-};
-struct ALVoice_s;
-typedef struct ALVoice_s ALVoice_s;
-struct ALVoice_s {
-    ListLink node;
-    void *pvoice;
-    void *table;
-    void *clientPrivate;
-    s16 state;
-    s16 priority;
-    s16 fxBus;
-    s16 unityPitch;
-};
-struct ALMIDIEvent;
-typedef struct ALMIDIEvent ALMIDIEvent;
 struct InventorySlot;
 struct InventorySlot {
     u8 available;
     u8 slot;
 };
 typedef struct InventorySlot InventorySlot;
-struct ALMIDIEvent {
-    s32 ticks;
-    u8 status;
-    u8 byte1;
-    u8 byte2;
-    u32 duration;
-};
-struct ALPlayer_s;
-typedef struct ALPlayer_s ALPlayer_s;
-struct ALPlayer_s {
-    struct ALPlayer_s *next;
-    void *clientData;
-    void *handler;
-    s32 callTime;
-    s32 samplesLeft;
-};
 struct Request;
 struct Request {
     s16 type;
 };
 typedef struct Request Request;
-struct ALEndEvent {
-    s32 ticks;
-    u8 status;
-    u8 type;
-    u8 len;
-};
-struct ALTempoEvent {
-    s32 ticks;
-    u8 status;
-    u8 type;
-    u8 len;
-    u8 byte1;
-    u8 byte2;
-    u8 byte3;
-};
-struct ALNoteEvent {
-    struct ALVoice_s *voice;
-};
-struct ALVolumeEvent {
-    struct ALVoice_s *voice;
-    s32 delta;
-    u8 vol;
-};
-struct ALOscEvent {
-    struct ALVoiceState *vs;
-    void *oscState;
-    u8 chan;
-};
-struct ALEvent {
-    s16 type;
-    union {
-        ALMIDIEvent midi;
-        ALTempoEvent tempo;
-        ALEndEvent end;
-        ALNoteEvent note;
-        ALVolumeEvent vol;
-        Request spvol;
-        InventorySlot sppriority;
-        func_80284AF4_G2 spseq;
-        func_80284AF4_G2 spbank;
-        ALOscEvent osc;
-    } msg;
-};
-struct ALBank_s;
-typedef struct ALBank_s ALBank_s;
-struct ALKeyMap;
-struct ALKeyMap {
-    u8 velocityMin;
-    u8 velocityMax;
-    u8 keyMin;
-    u8 keyMax;
-    u8 keyBase;
-    s8 detune;
-};
-struct ALVoiceState;
-struct ALSound_s;
-typedef struct ALSound_s ALSound_s;
-typedef struct ALKeyMap ALKeyMap;
-struct ALEnvelope;
-struct ALEnvelope {
-    s32 attackTime;
-    s32 decayTime;
-    s32 releaseTime;
-    u8 attackVolume;
-    u8 decayVolume;
-};
-typedef struct ALEnvelope ALEnvelope;
-struct ALSound_s {
-    ALEnvelope *envelope;
-    ALKeyMap *keyMap;
-    void *wavetable;
-    u8 samplePan;
-    u8 sampleVolume;
-    u8 flags;
-};
-struct ALChanState10;
-struct ALChanState10 {
-    ALInstrument *instrument;
-    s16 bendRange;
-    u8 fxId;
-    u8 pan;
-    u8 priority;
-    u8 vol;
-    u8 fxmix;
-    u8 sustain;
-    f32 pitchBend;
-};
-struct ALSeqPlayer;
-typedef struct ALSeqPlayer ALSeqPlayer;
-struct ALBank_s {
-    s16 instCount;
-    u8 flags;
-    u8 pad;
-    s32 sampleRate;
-    ALInstrument *percussion;
-    ALInstrument *instArray[1];
-};
-typedef struct ALVoiceState ALVoiceState;
-typedef signed int ( *Lane_ALOscUpdate)(void *, float *);
-struct ALVoiceState {
-    struct ALVoiceState *next;
-    ALVoice_s voice;
-    ALSound_s *sound;
-    s32 envEndTime;
-    f32 pitch;
-    f32 vibrato;
-    u8 envGain;
-    u8 channel;
-    u8 key;
-    u8 velocity;
-    u8 envPhase;
-    u8 phase;
-    u8 tremelo;
-    u8 flags;
-};
-typedef signed int ( *Lane_ALOscInit)(void * *, float *, unsigned char, unsigned char, unsigned char, unsigned char);
-typedef void ( *Lane_ALOscStop)(void *);
-typedef int ALMicroTime;
-typedef struct ALChanState10 ALChanState10;
-struct ALSeqPlayer {
-    ALPlayer_s node;
-    void *drvr;
-    void *target;
-    ALMicroTime curTime;
-    ALBank_s *bank;
-    s32 uspt;
-    s32 nextDelta;
-    s32 state;
-    u16 chanMask;
-    s16 vol;
-    u8 maxChannels;
-    u8 debugFlags;
-    ALEvent nextEvent;
-    ALEventQueue evtq;
-    ALMicroTime frameTime;
-    ALChanState10 *chanState;
-    ALVoiceState *vAllocHead;
-    ALVoiceState *vAllocTail;
-    ALVoiceState *vFreeList;
-    Lane_ALOscInit initOsc;
-    Lane_ALOscUpdate updateOsc;
-    Lane_ALOscStop stopOsc;
-};
-typedef int (*ALSetParam)(void *, int, void *);
-struct ALSynth_func_802B3000_de;
-typedef struct ALSynth_func_802B3000_de ALSynth_func_802B3000_de;
-struct ALVoice_s_func_802B3000_de;
-typedef struct ALVoice_s_func_802B3000_de ALVoice_s_func_802B3000_de;
-struct ALSynth_func_802B3000_de {
-    void *head;
-    ListLink pFreeList;
-    ListLink pAllocList;
-    ListLink pLameList;
-    s32 paramSamples;
-};
-struct ALVoiceConfig_s;
-typedef struct ALVoiceConfig_s ALVoiceConfig_s;
-struct ALFilter_s_func_802B3000_de;
-struct ALFilter_s_func_802B3000_de {
-    struct ALFilter_s_func_802B3000_de *source;
-    void *handler;
-    ALSetParam setParam;
-};
-struct PVoice_s_func_802B3000_de;
-struct PVoice_s_func_802B3000_de {
-    ListLink node;
-    struct ALVoice_s_func_802B3000_de *vvoice;
-    struct ALFilter_s_func_802B3000_de *channelKnob;
-    char pad10[0xD8 - 0x10];
-    s32 offset;
-};
-struct ALVoice_s_func_802B3000_de {
-    ListLink node;
-    struct PVoice_s_func_802B3000_de *pvoice;
-    void *table;
-    void *clientPrivate;
-    s16 state;
-    s16 priority;
-    s16 fxBus;
-    s16 unityPitch;
-};
-struct ALVoiceConfig_s {
-    s16 priority;
-    s16 fxBus;
-    u8 unityPitch;
-};
-typedef struct ALFilter_s_func_802B3000_de ALFilter_s_func_802B3000_de;
 struct ObjRecAt8V3;
 typedef struct ObjRecAt8V3 ObjRecAt8V3;
 struct Node_func_802AFD6C_de;
@@ -2661,13 +2372,6 @@ struct Buf16c {
     s8 fA;
     s8 _padB;
     s32 _padC;
-};
-struct ALEventListItem;
-typedef struct ALEventListItem ALEventListItem;
-struct ALEventListItem {
-    ListLink node;
-    s32 delta;
-    ALEvent evt;
 };
 struct Node_func_80239AF4_de;
 typedef struct Node_func_80239AF4_de Node_func_80239AF4_de;
@@ -2712,28 +2416,6 @@ struct ObjRecAt18V1 {
     s16 field18;
 };
 typedef struct ObjRecAt18V1 ObjRecAt18V1;
-struct ALSeq_s;
-typedef struct ALSeq_s ALSeq_s;
-struct ALSeq_s {
-    u8 *base;
-    u8 *trackStart;
-    u8 *curPtr;
-    s32 lastTicks;
-    s32 len;
-    f32 qnpt;
-    s16 division;
-    s16 lastStatus;
-};
-struct ALSound;
-struct ALSound {
-    void *envelope;
-    void *keyMap;
-    void *wavetable;
-    u8 samplePan;
-    u8 sampleVolume;
-    u8 flags;
-};
-typedef struct ALSound ALSound;
 struct PoolRecAt44;
 typedef struct PoolRecAt44 PoolRecAt44;
 struct SlotRecAt2F;
@@ -2753,133 +2435,6 @@ struct PoolRecAt44 {
     char pad0[0x40];
     struct SlotRecAt2F *slots;
     s32 count;
-};
-typedef int (*ALVoiceHandler)(void *);
-struct ALPlayer_s14;
-struct ALPlayer_s14 {
-    struct ALPlayer_s14 *next;
-    void *clientData;
-    ALVoiceHandler handler;
-    s32 callTime;
-    s32 samplesLeft;
-};
-typedef struct ALPlayer_s14 ALPlayer_s14;
-struct ALSynth_func_802B2650_de;
-struct ALSynth_func_802B2650_de {
-    ALPlayer_s14 *head;
-};
-struct ALSndPlayer_func_802B2650_de;
-struct ALSndPlayer_func_802B2650_de {
-    ALPlayer_s14 node;
-    ALEventQueue evtq;
-    ALEvent nextEvent;
-    struct ALSynth_func_802B2650_de *drvr;
-    s32 target;
-    void *sndState;
-    s32 maxSounds;
-    s32 frameTime;
-    s32 nextDelta;
-    s32 curTime;
-};
-struct ALGlobals_func_802B2650_de;
-typedef struct ALGlobals_func_802B2650_de ALGlobals_func_802B2650_de;
-struct ALSndpConfig;
-struct ALSndpConfig {
-    s32 maxSounds;
-    s32 maxEvents;
-    ALHeap *heap;
-};
-struct ALSoundState;
-typedef struct ALSoundState ALSoundState;
-typedef struct ALSndPlayer_func_802B2650_de ALSndPlayer_func_802B2650_de;
-typedef struct ALSndpConfig ALSndpConfig;
-typedef struct ALSynth_func_802B2650_de ALSynth_func_802B2650_de;
-struct ALGlobals_func_802B2650_de {
-    ALSynth_func_802B2650_de drvr;
-};
-struct ALSoundState {
-    ALVoice_s voice;
-    void *sound;
-    s16 priority;
-    f32 pitch;
-    s32 state;
-    s16 vol;
-    u8 pan;
-    u8 fxMix;
-};
-union ALSndpEvent;
-union ALSndpEvent {
-    ALEvent msg;
-    struct {
-        s16 type;
-        void *state;
-    } common;
-};
-struct ALSndPlayer;
-struct ALSndPlayer {
-    ALPlayer_s node;
-    ALEventQueue evtq;
-    ALEvent nextEvent;
-    void *drvr;
-    s32 target;
-    void *sndState;
-    s32 maxSounds;
-    s32 frameTime;
-    s32 nextDelta;
-    s32 curTime;
-};
-typedef struct ALSndPlayer ALSndPlayer;
-typedef union ALSndpEvent ALSndpEvent;
-union ALSndpEvent_func_802B2780_de;
-typedef union ALSndpEvent_func_802B2780_de ALSndpEvent_func_802B2780_de;
-struct ALSoundState_func_802B2780_de;
-typedef struct ALSoundState_func_802B2780_de ALSoundState_func_802B2780_de;
-struct ALSound_s_func_802B2780_de;
-typedef struct ALSound_s_func_802B2780_de ALSound_s_func_802B2780_de;
-struct ALSound_s_func_802B2780_de {
-    ALEnvelope *envelope;
-    void *keyMap;
-    void *wavetable;
-    u8 samplePan;
-    u8 sampleVolume;
-    u8 flags;
-};
-struct ALSoundState_func_802B2780_de {
-    ALVoice_s voice;
-    struct ALSound_s_func_802B2780_de *sound;
-    s16 priority;
-    f32 pitch;
-    s32 state;
-    s16 vol;
-    u8 pan;
-    u8 fxMix;
-};
-union ALSndpEvent_func_802B2780_de {
-    ALEvent msg;
-    struct {
-        s16 type;
-        ALSoundState_func_802B2780_de *state;
-    } common;
-    struct {
-        s16 type;
-        ALSoundState_func_802B2780_de *state;
-        s16 vol;
-    } vol;
-    struct {
-        s16 type;
-        ALSoundState_func_802B2780_de *state;
-        f32 pitch;
-    } pitch;
-    struct {
-        s16 type;
-        ALSoundState_func_802B2780_de *state;
-        u8 pan;
-    } pan;
-    struct {
-        s16 type;
-        ALSoundState_func_802B2780_de *state;
-        u8 mix;
-    } fx;
 };
 struct ParamsRecAt8V1;
 typedef struct ParamsRecAt8V1 ParamsRecAt8V1;
@@ -3021,56 +2576,6 @@ struct ObjectState10_5 {
     char padA[0xC - 0xA - sizeof(u16)];
     s32 unk_C;
 };
-struct ALStartParamAlt;
-struct ALStartParamAlt {
-    struct Node_func_80239AF4_de *next;
-    s32 delta;
-    s16 type;
-    s16 unity;
-    f32 pitch;
-    s16 volume;
-    u8 pan;
-    u8 fxMix;
-    s32 samples;
-    void *wave;
-};
-typedef struct ALStartParamAlt ALStartParamAlt;
-typedef struct {
-    unsigned int w0;
-    unsigned int w1;
-} Awords;
-struct ALFilter_sC;
-struct ALFilter_sC {
-    struct ALFilter_sC *source;
-    ALCmdHandler handler;
-    ALSetParam setParam;
-};
-typedef struct ALFilter_sC ALFilter_sC;
-struct ALSynth4C;
-struct ALSynth4C {
-    ALPlayer_s14 *head;
-    ListLink pFreeList;
-    ListLink pAllocList;
-    ListLink pLameList;
-    s32 paramSamples;
-    s32 curSamples;
-    void *dma;
-    void *heap;
-    void *paramList;
-    void *mainBus;
-    void *auxBus;
-    ALFilter_sC *outputFilter;
-    s32 numPVoices;
-    s32 maxAuxBusses;
-    s32 outputRate;
-    s32 maxOutSamples;
-};
-typedef struct ALSynth4C ALSynth4C;
-struct ALGlobals;
-struct ALGlobals {
-    ALSynth4C drvr;
-};
-typedef struct ALGlobals ALGlobals;
 struct Obj_func_802B3EDC_de;
 struct Obj_func_802B3EDC_de {
     char pad14[0x14];
@@ -3079,168 +2584,11 @@ struct Obj_func_802B3EDC_de {
     s32 *base;
 };
 typedef struct Obj_func_802B3EDC_de Obj_func_802B3EDC_de;
-struct ALFilter_s14;
-typedef struct ALFilter_s14 ALFilter_s14;
-struct ALFilter_s14 {
-    struct ALFilter_s14 *source;
-    ALCmdHandler handler;
-    void *setParam;
-    s16 inp;
-    s16 outp;
-    s32 type;
-};
-typedef signed short AudioPoleFilterState[4];
-struct AudioLowPassFilter;
-struct AudioLowPassFilter {
-    s16 cutoff;
-    s16 gain;
-    union {
-        s16 taps[16];
-        s64 alignment;
-    } coefficients;
-    AudioPoleFilterState *state;
-    s32 first;
-};
-typedef struct AudioLowPassFilter AudioLowPassFilter;
-struct ALDelay28;
-typedef struct ALDelay28 ALDelay28;
-struct ALResampler_s28;
-struct ALResampler_s28 {
-    ALFilter_s14 filter;
-    void *state;
-    f32 ratio;
-    s32 upitch;
-    f32 delta;
-    s32 first;
-};
-struct ALFilter_s14_2;
-typedef struct ALFilter_s14_2 ALFilter_s14_2;
-struct ALFilter_s14_2 {
-    struct ALFilter_s14_2 *source;
-    ALCmdHandler handler;
-    void *setParam;
-    s16 inp;
-    s16 outp;
-    s32 type;
-};
-struct ALResampler_s;
-struct ALResampler_s {
-    ALFilter_s14_2 filter;
-    void *state;
-    f32 ratio;
-    s32 upitch;
-    f32 delta;
-    s32 first;
-    void *ctrlList;
-    void *ctrlTail;
-    s32 motion;
-};
-typedef struct ALResampler_s28 ALResampler_s28;
-struct ALDelay28 {
-    u32 input;
-    u32 output;
-    s16 ffcoef;
-    s16 fbcoef;
-    s16 gain;
-    f32 rsinc;
-    f32 rsval;
-    s32 rsdelta;
-    f32 rsgain;
-    void *lp;
-    ALResampler_s28 *rs;
-};
-typedef struct ALResampler_s ALResampler_s;
-struct ALFx;
-typedef struct ALFx ALFx;
-struct ALFx {
-    ALFilter_s14 filter;
-    s16 *base;
-    s16 *input;
-    u32 length;
-    ALDelay28 *delay;
-    u8 section_count;
-    void *paramHdl;
-};
-struct ALSynConfig;
-typedef struct ALSynConfig ALSynConfig;
-struct ALSynConfig {
-    s32 maxVVoices;
-    s32 maxPVoices;
-    s32 maxUpdates;
-    s32 maxFXbusses;
-    void *dmaproc;
-    ALHeap *heap;
-    s32 outputRate;
-    u8 fxType;
-    s32 *params;
-};
-struct ALEnvMixer_s;
-typedef struct ALEnvMixer_s ALEnvMixer_s;
-struct ALEnvMixer_s {
-    ALFilter_s14_2 filter;
-    void *state;
-    s16 pan;
-    s16 volume;
-    s16 cvolL;
-    s16 cvolR;
-    s16 dryamt;
-    s16 wetamt;
-    u16 lratl;
-    s16 lratm;
-    s16 ltgt;
-    u16 rratl;
-    s16 rratm;
-    s16 rtgt;
-    s32 delta;
-    s32 segEnd;
-    s32 first;
-    void *ctrlList;
-    void *ctrlTail;
-    ALFilter_s14_2 **sources;
-    s32 motion;
-};
 struct LogTab;
 typedef struct LogTab LogTab;
 struct LogTab {
     f64 v[8];
 };
-struct ALParam_s;
-typedef struct ALParam_s ALParam_s;
-struct ALParam_s {
-    struct ALParam_s *next;
-    s32 delta;
-    s32 type;
-    union {
-        s32 i;
-        f32 f;
-        void *p;
-    } data;
-};
-struct ALEnvMixer;
-struct ALEnvMixer {
-    ALFilter filter;
-    void *state;
-    s16 pan;
-    s16 volume;
-    s16 cvolL;
-    s16 cvolR;
-    s16 dryamt;
-    s16 wetamt;
-    u16 lratl;
-    s16 lratm;
-    s16 ltgt;
-    u16 rratl;
-    s16 rratm;
-    s16 rtgt;
-    s32 delta;
-    s32 segEnd;
-    s32 first;
-    struct ALParam_s *ctrlList;
-    struct ALParam_s *ctrlTail;
-    ALFilter **sources;
-    s32 motion;
-};
-typedef struct ALEnvMixer ALEnvMixer;
 struct CallbackStateC;
 struct CallbackStateC {
     unsigned char padding_0[8];
@@ -3266,37 +2614,6 @@ typedef struct func_8022E694_S1 func_8022E694_S1;
 struct func_8022E694_S1 {
     char pad0[0x44];
     s32 unk44;
-};
-struct ALDelay_func_802B5B94_de;
-typedef struct ALDelay_func_802B5B94_de ALDelay_func_802B5B94_de;
-struct ALFxCode802BAC64;
-typedef struct ALFxCode802BAC64 ALFxCode802BAC64;
-struct ALGlobals_func_802B5B94_de;
-typedef struct ALGlobals_func_802B5B94_de ALGlobals_func_802B5B94_de;
-struct ALDelay_func_802B5B94_de {
-    u32 input;
-    u32 output;
-    s16 ffcoef;
-    s16 fbcoef;
-    s16 gain;
-    f32 rsinc;
-    f32 rsval;
-    s32 rsdelta;
-    f32 rsgain;
-    Clip *lp;
-    void *rs;
-};
-struct ALFxCode802BAC64 {
-    ALFilter_s14 filter;
-    s16 *base;
-    s16 *input;
-    u32 length;
-    struct ALDelay_func_802B5B94_de *delay;
-    u8 section_count;
-    void *paramHdl;
-};
-struct ALGlobals_func_802B5B94_de {
-    func_8022E694_S1 drvr;
 };
 struct ContReadFormat;
 typedef struct ContReadFormat ContReadFormat;
@@ -3366,79 +2683,6 @@ union OSTask {
     long long force_structure_alignment;
 };
 typedef union OSTask OSTask;
-struct __OSViScale;
-struct __OSViScale {
-    f32 factor;
-    u16 offset;
-    u32 scale;
-};
-struct OSViCommonRegs;
-struct OSViCommonRegs {
-    u32 ctrl;
-    u32 width;
-    u32 burst;
-    u32 vSync;
-    u32 hSync;
-    u32 leap;
-    u32 hStart;
-    u32 xScale;
-    u32 vCurrent;
-};
-struct OSViFieldRegs;
-typedef struct OSViFieldRegs OSViFieldRegs;
-typedef struct OSViCommonRegs OSViCommonRegs;
-struct OSViFieldRegs {
-    u32 origin;
-    u32 yScale;
-    u32 vStart;
-    u32 vBurst;
-    u32 vIntr;
-};
-struct Modep;
-struct Modep {
-    u8 type;
-    OSViCommonRegs comRegs;
-    OSViFieldRegs fldRegs[2];
-};
-typedef struct Modep Modep;
-typedef struct __OSViScale __OSViScale;
-struct __OSViContext_func_802BA910_de;
-struct __OSViContext_func_802BA910_de {
-    u16 state;
-    u16 retraceCount;
-    void *framep;
-    struct Modep *modep;
-    u32 control;
-    void *msgq;
-    void *msg;
-    __OSViScale x;
-    __OSViScale y;
-};
-typedef struct __OSViContext_func_802BA910_de __OSViContext_func_802BA910_de;
-struct __OSViContext_func_802BA6B0_de;
-typedef struct __OSViContext_func_802BA6B0_de __OSViContext_func_802BA6B0_de;
-struct OSViMode;
-struct OSViMode {
-    u8 type;
-    Awords comRegs;
-};
-struct __OSViContext_func_802BA6B0_de {
-    u16 state;
-    u16 retraceCount;
-    void *framep;
-    struct OSViMode *modep;
-    u32 control;
-};
-typedef struct OSViMode OSViMode;
-struct State_func_802BA700_de;
-typedef struct State_func_802BA700_de State_func_802BA700_de;
-struct State_func_802BA700_de {
-    u16 status;
-    u16 pad2;
-    u32 word4;
-    Awords *inner;
-    u32 flags;
-};
 struct Quad_func_802A1BE0_de;
 typedef struct Quad_func_802A1BE0_de Quad_func_802A1BE0_de;
 struct Quad_func_802A1BE0_de {
@@ -3509,117 +2753,6 @@ struct Func802C1F10Node {
     u16 field10;
 };
 typedef struct Func802C1F10Node Func802C1F10Node;
-typedef int (*ALDMAproc)(int addr, int len, void *state);
-struct ALRawLoop;
-typedef struct ALRawLoop ALRawLoop;
-struct ALRawLoop {
-    u32 start;
-    u32 end;
-    u32 count;
-};
-struct ALADPCMWaveInfo_func_802BE514_de;
-typedef struct ALADPCMWaveInfo_func_802BE514_de ALADPCMWaveInfo_func_802BE514_de;
-struct ALADPCMBook;
-typedef struct ALADPCMBook ALADPCMBook;
-struct ALADPCMBook {
-    s32 order;
-    s32 npredictors;
-    s16 book[1];
-};
-struct ALADPCMWaveInfo_func_802BE514_de {
-    void *loop;
-    ALADPCMBook *book;
-};
-struct ALWaveTableSCode802BE0D0;
-struct ALWaveTableSCode802BE0D0 {
-    u8 *base;
-    s32 len;
-    u8 type;
-    u8 flags;
-    union {
-        ALADPCMWaveInfo_func_802BE514_de adpcmWave;
-    } waveInfo;
-};
-struct ALLoadFilter_func_802BE514_de;
-struct ALLoadFilter_func_802BE514_de {
-    ALFilter_s14 filter;
-    void *state;
-    void *lstate;
-    ALRawLoop loop;
-    struct ALWaveTableSCode802BE0D0 *table;
-    s32 bookSize;
-    ALDMAproc dma;
-    void *dmaState;
-    s32 sample;
-    s32 lastsam;
-    s32 first;
-    s32 memin;
-};
-typedef struct ALLoadFilter_func_802BE514_de ALLoadFilter_func_802BE514_de;
-struct ALADPCMWaveInfo;
-typedef struct ALADPCMWaveInfo ALADPCMWaveInfo;
-struct ALADPCMloop;
-typedef struct ALADPCMloop ALADPCMloop;
-struct ALLoadFilter48;
-typedef struct ALLoadFilter48 ALLoadFilter48;
-struct ALRAWWaveInfo;
-typedef struct ALRAWWaveInfo ALRAWWaveInfo;
-struct ALWaveTable_s;
-typedef struct ALWaveTable_s ALWaveTable_s;
-typedef short ADPCM_STATE[16];
-struct ALADPCMloop {
-    u32 start;
-    u32 end;
-    u32 count;
-    ADPCM_STATE state;
-};
-struct ALADPCMWaveInfo {
-    ALADPCMloop *loop;
-    ALADPCMBook *book;
-};
-struct ALRAWWaveInfo {
-    ALRawLoop *loop;
-};
-struct ALWaveTable_s {
-    u8 *base;
-    s32 len;
-    u8 type;
-    u8 flags;
-    union {
-        ALADPCMWaveInfo adpcmWave;
-        ALRAWWaveInfo rawWave;
-    } waveInfo;
-};
-struct ALLoadFilter48 {
-    ALFilter_s14 filter;
-    ADPCM_STATE *state;
-    ADPCM_STATE *lstate;
-    ALRawLoop loop;
-    ALWaveTable_s *table;
-    s32 bookSize;
-    void *dma;
-    void *dmaState;
-    s32 sample;
-    s32 lastsam;
-    s32 first;
-    s32 memin;
-};
-struct ALLoadFilter48_2;
-typedef struct ALLoadFilter48_2 ALLoadFilter48_2;
-struct ALLoadFilter48_2 {
-    ALFilter_s14 filter;
-    void *state;
-    void *lstate;
-    ALRawLoop loop;
-    void *table;
-    s32 bookSize;
-    ALDMAproc dma;
-    void *dmaState;
-    s32 sample;
-    s32 lastsam;
-    s32 first;
-    s32 memin;
-};
 typedef struct DecodeNode {
     u16 first;
     u16 second;

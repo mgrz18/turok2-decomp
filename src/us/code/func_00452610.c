@@ -9,11 +9,8 @@ struct ObjRecAt20V2 {
     char *unk20;
 };
 
-typedef struct GameSession GameSession;
-
 extern CPlayerOptions D_8011AB18;
 extern signed char D_8011AB47;
-extern GameSession D_800F6CB0;
 extern s32 D_801308F8;
 extern s32 func_002855E8(char *);
 extern void func_00275A74(void);

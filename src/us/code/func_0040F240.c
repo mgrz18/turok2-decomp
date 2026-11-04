@@ -5,6 +5,7 @@
 #include "structs/world.h"
 #include "structs/game_object.h"
 #include "structs/cinema.h"
+#include "structs/collision.h"
 
 /* The cinema system: one file from func_0040F240 to func_004131B0 (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -807,7 +808,7 @@ typedef struct {
 } Camera;
 
 extern u8 D_800F1B40[];   /* collision info */
-extern CVector3 D_800F1CE8;   /* collision point */
+extern CCollisionResults D_800F1CE0;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 func_0041057C(f32 t); /* eye path */
@@ -882,7 +883,7 @@ void func_00410CE8(Camera *cam) {
             func_00226724(D_800F7078);
             player->head = saved;
             if (hit) {
-                eye = D_800F1CE8;
+                eye = D_800F1CE0.m_vInstancePos;
             }
         }
     }

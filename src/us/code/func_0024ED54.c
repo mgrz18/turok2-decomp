@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
+#include "structs/collision.h"
 
 
 typedef struct {
@@ -11,7 +12,7 @@ typedef struct {
     /* 0x50 */ f32 yaw;
 } Body;
 
-extern CGameObjectInstance *D_800F1CE0;       /* what the player is aiming at */
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 
 f32 func_002982F0(f32);         /* sinf */
 f32 func_002974C0(f32);         /* cosf */
@@ -26,7 +27,7 @@ void func_00243414(CGameObjectInstance *actor, void *ai, s32 state);
  * the ROMs plain bne at the 0x2E test: with two returns, reorgs liveness at
  * the fall-through keeps $v0 and annuls the slot (bnel). */
 s32 func_0024ED54(CPlayer *player, Body *body) {
-    CGameObjectInstance *aim = D_800F1CE0;
+    CGameObjectInstance *aim = D_800F1CE0.m_pInstance;
     CGameObjectInstance *target;
     CGameObjectInstance *mount;
     s32 type;

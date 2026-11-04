@@ -1,62 +1,36 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00292318.c, func_00292318, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game.h"
 #include "gfx.h"
-
-typedef struct GfxTask {
-    /* 0x000 */ u8 pad0[0xF0];
-    /* 0x0F0 */ u8 msg[0x20];
-    /* 0x110 */ s32 colorImage;
-    /* 0x114 */ u32 dlStart;
-    /* 0x118 */ u32 dlStart2;
-    /* 0x11C */ s32 dlSize;
-    /* 0x120 */ s32 dlSize2;
-    /* 0x124 */ s32 frame;
-    /* 0x128 */ s32 hasOverlay;
-} GfxTask;
-
-typedef struct Level {
-    /* 0x00000 */ u8 pad0[0x22C00];
-    /* 0x22C00 */ u8 unk22C00[0x23DF0 - 0x22C00];
-    /* 0x23DF0 */ u8 overlay[0x23FD4 - 0x23DF0];
-    /* 0x23FD4 */ s32 prevState;
-    /* 0x23FD8 */ s32 state;
-    /* 0x23FDC */ u8 pad23FDC[4];
-    /* 0x23FE0 */ u8 fastFade;
-    /* 0x23FE1 */ u8 fadeMode;     /* 1 fading in, 2 fading out */
-    /* 0x23FE2 */ u8 pad23FE2[2];
-    /* 0x23FE4 */ f32 fade;
-} Level;
 
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 extern s32 D_800C2040;          /* frames left to clear the screen */
 extern s32 D_80130A78;          /* z-buffer */
-extern GfxTask *D_800F7070[];   /* current graphics task */
-extern GfxTask *D_8011F140;
 extern s32 D_800B6D1C;
 extern f32 D_800B6D28;          /* frame time */
 extern f32 D_800B6D48;          /* render time, seconds */
-extern void (*D_800B6D80[][3])(Level *);
+extern void (*D_800B6D80[][3])(CEngineApp *);
 extern s32 D_8011AD10;
 extern u8 D_8011AD28[];       /* the RSP task queue */
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 
 extern u64 func_0029B170(void);     /* osGetTime */
-extern void func_0020548C(s32, s32, GfxTask *);
+extern void func_0020548C(s32, s32, CFrameData *);
 extern void func_00207A54(void);
 extern void func_0020B554(void);
-extern void func_00286A04(Level *);
+extern void func_00286A04(CEngineApp *);
 extern void func_002288D0(void);
 extern void func_00284CE0(void);
 extern void func_0027ECF0(void *);
-extern void func_002886AC(Level *);
-extern void func_002883E0(Level *, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
+extern void func_002886AC(CEngineApp *);
+extern void func_002883E0(CEngineApp *, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 extern void func_004242EC(void);
 extern void func_00207FEC(s32 mode);
 extern s32 func_00401C1C(void *);
 extern void func_004004D8(void *);
 extern s32 func_00205574(s32);
-extern void func_00286B58(Level *, GfxTask *);
+extern void func_00286B58(CEngineApp *, CFrameData *);
 extern void func_00206078(void);
 extern void func_00283CD4(void);
 
@@ -99,7 +73,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
     {
         Gfx *g = D_800D8E24++;
         g->w0 = colorImage;     /* gDPSetColorImage(RGBA, 16b, width, frame) */
-        g->w1 = D_800F7070[0]->colorImage;
+        g->w1 = D_800F6CB0.m_pCurrentFrameData->m_pFrameBuffer;
     }
     {
         Gfx *g = D_800D8E24++;
@@ -114,7 +88,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
 }
 
 /* func_00288B1C: darkens the whole screen by the level fade. */
-static __inline__ void drawFade(Level *level) {
+static __inline__ void drawFade(CEngineApp *level) {
     u8 col[4];
     f32 t;
     s32 v;
@@ -122,7 +96,7 @@ static __inline__ void drawFade(Level *level) {
     col[0] = 0;
     col[1] = 0;
     col[2] = 0;
-    t = level->fade;
+    t = level->m_Settings.fade;
     if (t < 0.0f) goto opaque;
     if (t > 1.0f) {
         v = 0;
@@ -140,24 +114,24 @@ done:
 }
 
 /* Draws one frame of the level and hands its display list to the RSP. */
-void func_00287248(Level *level) {
+void func_00287248(CEngineApp *level) {
     u64 start;
     f32 inSpeed;
     f32 outSpeed;
 
     start = func_0029B170();
-    func_0020548C(0, D_800B6D1C, D_8011F140 = D_800F7070[0]);
+    func_0020548C(0, D_800B6D1C, D_8011F140 = D_800F6CB0.m_pCurrentFrameData);
     func_00207A54();
     func_0020B554();
     func_00286A04(level);
     func_002288D0();
     func_00284CE0();
-    func_0027ECF0(level->unk22C00);
+    func_0027ECF0(level->m_Game.m_CameraPool);
     func_002886AC(level);
-    if (D_800B6D80[level->state][0] != NULL) {
-        D_800B6D80[level->state][0](level);
+    if (D_800B6D80[level->m_Settings.mode][0] != NULL) {
+        D_800B6D80[level->m_Settings.mode][0](level);
     }
-    if (D_8011F140->hasOverlay == 0) {
+    if (D_8011F140->m_bLines == 0) {
         drawFade(level);
     }
     if (D_800C2040 != 0) {
@@ -173,7 +147,7 @@ void func_00287248(Level *level) {
         {
             Gfx *g = D_800D8E24++;
             g->w0 = 0xFF1001DF;     /* gDPSetColorImage(frame, 480) */
-            g->w1 = D_8011F140->colorImage;
+            g->w1 = D_8011F140->m_pFrameBuffer;
         }
         {
             Gfx *g = D_800D8E24++;
@@ -212,15 +186,15 @@ void func_00287248(Level *level) {
         g->w0 = 0xDF000000;         /* gSPEndDisplayList */
         g->w1 = 0;
     }
-    D_8011F140->dlSize = (u32)D_800D8E24 - D_8011F140->dlStart;
-    if (level->state == 0xD) {
-        D_8011F140->hasOverlay = func_00401C1C(level->overlay);
+    D_8011F140->m_DisplayListSize = (u32)D_800D8E24 - (u32)D_8011F140->m_pDisplayList;
+    if (level->m_Settings.mode == 0xD) {
+        D_8011F140->m_bLines = func_00401C1C(&level->m_Game.m_DebugLines);
     } else {
-        D_8011F140->hasOverlay = 0;
+        D_8011F140->m_bLines = 0;
     }
-    if (D_8011F140->hasOverlay != 0) {
-        D_800D8E24 = (Gfx *)D_800F7070[0]->dlStart2;
-        func_004004D8(level->overlay);
+    if (D_8011F140->m_bLines != 0) {
+        D_800D8E24 = D_800F6CB0.m_pCurrentFrameData->m_pLineList;
+        func_004004D8(&level->m_Game.m_DebugLines);
         drawFade(level);
         {
             Gfx *g = D_800D8E24++;
@@ -232,48 +206,48 @@ void func_00287248(Level *level) {
             g->w0 = 0xDF000000;     /* gSPEndDisplayList */
             g->w1 = 0;
         }
-        D_8011F140->dlSize2 = (u32)D_800D8E24 - D_8011F140->dlStart2;
+        D_8011F140->m_LineListSize = (u32)D_800D8E24 - (u32)D_8011F140->m_pLineList;
     }
-    D_8011F140->frame = D_8011AD10;
+    D_8011F140->m_nPredictTicks = D_8011AD10;
     D_800B6D48 = (f32)(((func_0029B170() - start) * 64) / 3) * 0.000001f;   /* OS_CYCLES_TO_USEC */
     if (func_00205574(0) != 0) {
         func_00286B58(level, D_8011F140);
     } else {
         func_00206078();
-        osSendMesg(D_8011AD28, D_8011F140->msg, 1);
+        osSendMesg(D_8011AD28, &D_8011F140->m_Msg, 1);
     }
-    if (level->fadeMode != 0) {
-        if (level->fastFade != 0) {
+    if (level->m_Settings.fadeMode != 0) {
+        if (level->m_Settings.fastFade != 0) {
             inSpeed = 0.5f;
             outSpeed = 0.5f;
         } else {
             inSpeed = 0.1f;
             outSpeed = 0.1f;
         }
-        switch (level->fadeMode) {
+        switch (level->m_Settings.fadeMode) {
         case 2:
-            if (level->fade > 0.0f) {
-                level->fade -= outSpeed * D_800B6D28;
-                if (level->fade < 0.0f) {
-                    level->fade = 0.0f;
+            if (level->m_Settings.fade > 0.0f) {
+                level->m_Settings.fade -= outSpeed * D_800B6D28;
+                if (level->m_Settings.fade < 0.0f) {
+                    level->m_Settings.fade = 0.0f;
                 }
             } else {
-                level->fade -= 1.0f;
+                level->m_Settings.fade -= 1.0f;
             }
-            if (level->fade < -4.0f) {
-                s32 old = level->state;
-                level->state = 0x11;
-                level->fade = 0.0f;
-                level->fadeMode = 1;
-                level->prevState = old;
+            if (level->m_Settings.fade < -4.0f) {
+                s32 old = level->m_Settings.mode;
+                level->m_Settings.mode = 0x11;
+                level->m_Settings.fade = 0.0f;
+                level->m_Settings.fadeMode = 1;
+                level->m_Settings.prevMode = old;
             }
             break;
         case 1:
-            level->fade += inSpeed * ((D_800B6D28 < 0.5f) ? 0.5f : D_800B6D28);
-            if (level->fade >= 1.0f) {
-                level->fadeMode = 0;
-                level->fade = 1.0f;
-                level->fastFade = 0;
+            level->m_Settings.fade += inSpeed * ((D_800B6D28 < 0.5f) ? 0.5f : D_800B6D28);
+            if (level->m_Settings.fade >= 1.0f) {
+                level->m_Settings.fadeMode = 0;
+                level->m_Settings.fade = 1.0f;
+                level->m_Settings.fastFade = 0;
             }
             break;
         }

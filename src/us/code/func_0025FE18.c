@@ -5,7 +5,7 @@
 void func_00243414(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 void func_0025FE18(CGameObjectInstance *self, CAI *ai) {
-    CPlayer *player = (CPlayer *)ai->m_VarObj[2]->m_AI.m_pParent;
+    CPlayer *player = (CPlayer *)ai->m_Enemy.m_pGrabbed->m_AI.m_pParent;
 
     self->m_dwFlags &= ~0x20000;
     self->m_dwFlags &= ~0x10000;

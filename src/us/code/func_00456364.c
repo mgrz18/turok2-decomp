@@ -5,18 +5,10 @@
 /* Name entry: append the selected character to the current player's name. */
 
 typedef struct {
-    s32 cursor;   /* 0x00 */
-    f32 timer;    /* 0x04 */
-    s32 length;   /* 0x08 */
-    char name[12]; /* 0x0C */
-} NameEntry; /* 0x18 bytes */
-
-typedef struct {
     u8 pad0[0x1C];
     void *player; /* 0x1C */
 } PlayerEvent;
 
-extern NameEntry D_800C1FB0[];
 
 s32 func_0025340C(void *state, void *player);
 

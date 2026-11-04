@@ -1,16 +1,14 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0043D898.c, func_0043D898.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "structs/menu.h"
 
-typedef unsigned char u8;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef struct { u8 pad[8]; u32 unk8; u8 pad2[8]; void *unk14; } O06A;
 extern s32 D_8011AADC;
 extern s32 D_8011AAD8;
-extern u8 D_800B596C[];
-extern u8 D_800B5988[];
-s32 func_0045458C(O06A *a) {
-    if (D_8011AADC & 0x100) a->unk8 |= 0x1000000; else a->unk8 &= ~0x1000000;
-    if (D_8011AAD8 & 0x100) a->unk14 = D_800B596C; else a->unk14 = D_800B5988;
+extern char D_800B596C[];
+extern char D_800B5988[];
+s32 func_0045458C(MenuItem *a) {
+    if (D_8011AADC & 0x100) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
+    if (D_8011AAD8 & 0x100) a->text = D_800B596C; else a->text = D_800B5988;
     return 0;
 }

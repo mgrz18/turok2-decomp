@@ -29,8 +29,8 @@ void func_0027314C(SndVoice *s) {
 
     s->mgr->listener = func_00281444(D_801198B0, &s->vp.pos);
     bank = s->mgr;
-    func_00293E60(bank->player, bank->handles[s->index]);
-    playing = func_00293580(bank->player);
+    func_00293E60(&bank->player, bank->handles[s->index]);
+    playing = func_00293580(&bank->player);
     if ((s->vp.scale <= 0.075f && s->soundId != 0x228) || ((s->flags & 4) && s->vp.vol == 0)) {
         s->stopping = 1;
     }
@@ -42,7 +42,7 @@ void func_0027314C(SndVoice *s) {
             SndMgr *b = s->mgr;
             s->stopping = 1;
             s->vp.follow = NULL;
-            player = b->player;
+            player = &b->player;
             if (s->vp.frame != b->frame) {
                 func_00293E60(player, b->handles[s->index]);
                 if (func_00293580(player)) {
@@ -58,13 +58,13 @@ void func_0027314C(SndVoice *s) {
         return;
     }
     if ((s->flags & 0x18) == 0x10) {
-        func_00293CE0(s->mgr->player);
+        func_00293CE0(&s->mgr->player);
         return;
     }
     if (!playing) {
         SndMgr *b = s->mgr;
         SoundVoice *v = (SoundVoice *)((u8 *)b + 0x7C);
-        func_00293530(b->player, v->ids[s->index]);
+        func_00293530(&b->player, v->ids[s->index]);
         v->ids[s->index] = -1;
         s->vp.priority = 0;
         s->id = -1;

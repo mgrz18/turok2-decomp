@@ -3,7 +3,6 @@
 #include "structs/controller.h"
 
 extern CPlayerOptions D_8011AB58[4]; /* D_8011AAD8.slots */
-extern u8 D_800F6CB0[];
 
 extern s32 func_002855E8(ControllerProfile *ctl);
 extern s32 func_002113A4(void);
@@ -55,6 +54,6 @@ s32 func_0041760C(void) {
     } else {
         arg = func_002113A4() % 13 + 0x2329;
     }
-    func_00430454(D_800F6CB0, arg);
+    func_00430454(&D_800F6CB0, arg);
     return 1;
 }

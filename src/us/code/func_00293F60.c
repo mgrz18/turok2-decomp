@@ -1,91 +1,15 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra/part_800C7F20/synaddplayer.c, func_802B3000_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "structs/libaudio.h"
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef float f32;
-typedef int (*ALSetParam)(void *, int, void *);
-struct ListLink;
-struct ListLink {
-    struct ListLink *next;
-    struct ListLink *prev;
-};
-struct ListLink;
-typedef struct ListLink ListLink;
-struct ALSynth_func_802B3000_de;
-typedef struct ALSynth_func_802B3000_de ALSynth_func_802B3000_de;
-struct ALVoice_s_func_802B3000_de;
-typedef struct ALVoice_s_func_802B3000_de ALVoice_s_func_802B3000_de;
-struct ALSynth_func_802B3000_de;
-struct ALSynth_func_802B3000_de {
-    void *head;
-    ListLink pFreeList;
-    ListLink pAllocList;
-    ListLink pLameList;
-    s32 paramSamples;
-};
-struct ALVoiceConfig_s;
-typedef struct ALVoiceConfig_s ALVoiceConfig_s;
-struct ALFilter_s_func_802B3000_de;
-struct ALFilter_s_func_802B3000_de {
-    struct ALFilter_s_func_802B3000_de *source;
-    void *handler;
-    ALSetParam setParam;
-};
-struct ALFilter_s_func_802B3000_de;
-struct ALVoice_s_func_802B3000_de;
-struct PVoice_s_func_802B3000_de;
-struct PVoice_s_func_802B3000_de {
-    ListLink node;
-    struct ALVoice_s_func_802B3000_de *vvoice;
-    struct ALFilter_s_func_802B3000_de *channelKnob;
-    char pad10[0xD8 - 0x10];
-    s32 offset;
-};
-struct ALVoice_s_func_802B3000_de {
-    ListLink node;
-    struct PVoice_s_func_802B3000_de *pvoice;
-    void *table;
-    void *clientPrivate;
-    s16 state;
-    s16 priority;
-    s16 fxBus;
-    s16 unityPitch;
-};
-struct ALVoiceConfig_s;
-struct ALVoiceConfig_s {
-    s16 priority;
-    s16 fxBus;
-    u8 unityPitch;
-};
-struct ALFilter_s_func_802B3000_de;
-typedef struct ALFilter_s_func_802B3000_de ALFilter_s_func_802B3000_de;
-struct ALParam_s_func_802B3000_de;
-typedef struct ALParam_s_func_802B3000_de ALParam_s_func_802B3000_de;
-struct PVoice_s_func_802B3000_de;
-typedef struct PVoice_s_func_802B3000_de PVoice_s_func_802B3000_de;
-struct ALParam_s_func_802B3000_de;
-struct ALParam_s_func_802B3000_de {
-    struct ALParam_s_func_802B3000_de *next;
-    s32 delta;
-    s16 type;
-    union {
-        f32 f;
-        s32 i;
-    } data;
-    union {
-        f32 f;
-        s32 i;
-    } moredata;
-};
-extern s32 func_00294090(ALSynth_func_802B3000_de *, PVoice_s_func_802B3000_de **, s16);
-extern ALParam_s_func_802B3000_de *func_00294B58(void);
-s32 alSynAllocVoice(ALSynth_func_802B3000_de *drvr, ALVoice_s_func_802B3000_de *voice, ALVoiceConfig_s *vc)
+extern s32 func_00294090(ALSynth *, PVoice **, s16);
+extern ALParam *func_00294B58(void);
+s32 alSynAllocVoice(ALSynth *drvr, ALVoice *voice, ALVoiceConfig *vc)
 {
-    PVoice_s_func_802B3000_de *pvoice = 0;
-    ALFilter_s_func_802B3000_de *f;
-    ALParam_s_func_802B3000_de *update;
+    PVoice *pvoice = 0;
+    ALFilter *f;
+    ALParam *update;
     s32 stolen;
     voice->priority = vc->priority;
     voice->unityPitch = vc->unityPitch;

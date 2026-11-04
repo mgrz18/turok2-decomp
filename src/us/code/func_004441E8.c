@@ -20,7 +20,7 @@ void func_004441E8(void *obj, CAI *ai) {
         state = &D_8012FB70;
         for (i = 0; i < 15; i++) {
             if ((mask >> i) & 1) {
-                func_00236314(state->slots[i].anim, D_00431E04);
+                func_00236314(&state->slots[i].anim, D_00431E04);
             }
         }
         func_00243414(obj, ai, 0xC);

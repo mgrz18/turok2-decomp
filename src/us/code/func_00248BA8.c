@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/world.h"
 
@@ -38,14 +39,6 @@ struct WarpPlayer {
 extern s32 D_8011001C;
 extern s32 D_80110020;
 extern u8 D_800F7078[];
-/* Game state from the player list on; the multiplayer flag is at +0x1261. */
-typedef struct GameState {
-    /* 0x0000 */ WarpPlayer *players;
-    /* 0x0004 */ u8 pad4[0x1261 - 4];
-    /* 0x1261 */ u8 multiplayer;
-} GameState;
-
-extern GameState D_80119890;
 
 void func_0042EB04(void);
 s32 func_00285BD0(s32, s32);
@@ -62,7 +55,7 @@ static __inline__ f32 sumDistance(CWarpPoint *r) {
     f32 dist;
 
     dist = 0.0f;
-    for (other = D_80119890.players; other != NULL; other = other->next) {
+    for (other = (WarpPlayer *)D_80119870.m_PlayerList.m_ActiveList.m_pHead; other != NULL; other = other->next) {
         if (other->active) {
             dist += func_0020F6BC(&r->m_vPos, &other->pos);
         }
@@ -214,7 +207,7 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
         break;
     }
 
-    if (D_80119890.multiplayer) {
+    if (D_80119870.m_Settings.multiplayer) {
         count = func_0042C194(D_800F7078, -1, warp, recs, 32);
         best = -1;
         bestDist = 0.0f;
@@ -236,7 +229,7 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
     } else {
         do { /* a block of its own: it decides which of the two addresses gets $s0 */
             if (func_0042C194(D_800F7078, -1, warp, &rec, 1) && rec.m_nLevel == D_80110020 &&
-                (D_80119890.multiplayer || D_8011001C)) {
+                (D_80119870.m_Settings.multiplayer || D_8011001C)) {
                 pl->spawnPos = rec.m_vPos;
                 pl->pos = pl->spawnPos;
                 pl->angle = pl->spawnAngle = rec.m_RotY;

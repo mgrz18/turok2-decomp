@@ -14,11 +14,6 @@ typedef struct PickupEntry {
     s32 max;        /* 0x10 */
 } PickupEntry;
 
-typedef struct PlayerDef {
-    char pad0[0x18];
-    s32 maxHealth;  /* 0x18 */
-} PlayerDef;
-
 extern u8 D_8011AAF1;
 
 extern char D_801198B0[];
@@ -58,7 +53,7 @@ s32 func_0023F3E4(CPlayer *player, PickupEntry *entry) {
         player->m_Data.m_Health += entry->amount << 8;
         do { /* a block boundary keeps the flag load after the store */
             if (D_8011AAF1) {
-                limit = ((PlayerDef *)player->m_CharacterActor.header.m_pIntelligence)->maxHealth << 8;
+                limit = player->m_CharacterActor.header.m_pIntelligence->m_Player.m_StartHealth << 8;
                 player->m_CharacterActor.m_AI.m_Health = player->m_Data.m_Health = (u32)player->m_Data.m_Health < limit ? (u32)player->m_Data.m_Health : limit;
             } else if (player->m_Data.m_Health > max) {
                 player->m_Data.m_Health = max;
