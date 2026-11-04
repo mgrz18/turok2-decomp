@@ -2,11 +2,6 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 
-typedef struct Box {
-    /* 0x00 */ CVector3 min;
-    /* 0x0C */ CVector3 max;
-} Box;
-
 /* A joint of an animated model: its box at 0x18 in model units. */
 typedef struct Joint {
     /* 0x00 */ u8 pad0[0x18];
@@ -40,7 +35,7 @@ typedef struct HitInst {
     /* 0x0A8 */ u8 padA8[8];
     /* 0x0B0 */ s32 animSize;
     /* 0x0B4 */ u8 padB4[8];
-    /* 0x0BC */ Box bounds;
+    /* 0x0BC */ CBox bounds;
     /* 0x0D4 */ u8 padD4[0x78];
     /* 0x14C */ s32 hitMask;
 } HitInst;
@@ -52,32 +47,32 @@ void **func_0020367C(s32 unused, s32 key, s32 size, s32 mode, s32 owner, s32 tag
 void func_0020D908(f32 (*mtx)[4], Joint *joint);
 void func_0021034C(f32 (*mtx)[4], f32 x, f32 y, f32 z);
 void func_0020F908(f32 (*mtx)[4], CVector3 *in, CVector3 *out, s32 count);
-s32 func_0023A640(Sweep *sweep, Box *box, f32 *t);
-s32 func_0023F880(Sweep *sweep, Box *box, HitInst *other, CVector3 *start, CVector3 *corners, HitNode *node,
+s32 func_0023A640(Sweep *sweep, CBox *box, f32 *t);
+s32 func_0023F880(Sweep *sweep, CBox *box, HitInst *other, CVector3 *start, CVector3 *corners, HitNode *node,
                   s32 index);
 
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
 
 /* The eight corners of a box, bottom face first. */
-static __inline__ void BoxCorners(CVector3 *c, Box *b) {
-    c[0].x = b->min.x; c[0].y = b->min.y; c[0].z = b->min.z;
-    c[1].x = b->max.x; c[1].y = b->min.y; c[1].z = b->min.z;
-    c[2].x = b->max.x; c[2].y = b->min.y; c[2].z = b->max.z;
-    c[3].x = b->min.x; c[3].y = b->min.y; c[3].z = b->max.z;
-    c[4].x = b->min.x; c[4].y = b->max.y; c[4].z = b->min.z;
-    c[5].x = b->max.x; c[5].y = b->max.y; c[5].z = b->min.z;
-    c[6].x = b->max.x; c[6].y = b->max.y; c[6].z = b->max.z;
-    c[7].x = b->min.x; c[7].y = b->max.y; c[7].z = b->max.z;
+static __inline__ void BoxCorners(CVector3 *c, CBox *b) {
+    c[0].x = b->m_vMin.x; c[0].y = b->m_vMin.y; c[0].z = b->m_vMin.z;
+    c[1].x = b->m_vMax.x; c[1].y = b->m_vMin.y; c[1].z = b->m_vMin.z;
+    c[2].x = b->m_vMax.x; c[2].y = b->m_vMin.y; c[2].z = b->m_vMax.z;
+    c[3].x = b->m_vMin.x; c[3].y = b->m_vMin.y; c[3].z = b->m_vMax.z;
+    c[4].x = b->m_vMin.x; c[4].y = b->m_vMax.y; c[4].z = b->m_vMin.z;
+    c[5].x = b->m_vMax.x; c[5].y = b->m_vMax.y; c[5].z = b->m_vMin.z;
+    c[6].x = b->m_vMax.x; c[6].y = b->m_vMax.y; c[6].z = b->m_vMax.z;
+    c[7].x = b->m_vMin.x; c[7].y = b->m_vMax.y; c[7].z = b->m_vMax.z;
 }
 
 /* Sweep against an actor's boxes: each hit volume of its animated model's
  * nodes, or else its animation's box, or else its bounds. */
-void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, Box *box) {
+void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box) {
     CVector3 out[8];
     CVector3 in[8];
     CVector3 centre;
     f32 mtx[4][4];
-    Box nodeBox;
+    CBox nodeBox;
     f32 t;
     void *nodes;
     s32 enlarge;
@@ -92,7 +87,7 @@ void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, Box *box) {
     s32 k;
     void **anim;
     Joint *joint;
-    Box *animBox;
+    CBox *animBox;
 
     enlarge = 0;
     if ((s32)sweep->def->m_dwFlags < 0 && (other->def->m_Type == 1 || other->def->m_Type == 4)) {
@@ -132,15 +127,15 @@ void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, Box *box) {
             if (big) {
                 radius *= 1.5f;
             }
-            nodeBox.min.x = centre.x - radius;
-            nodeBox.min.y = centre.y - radius;
-            nodeBox.min.z = centre.z - radius;
-            nodeBox.max.x = centre.x + radius;
-            nodeBox.max.y = centre.y + radius;
-            nodeBox.max.z = centre.z + radius;
-            if (!(box->min.x < nodeBox.max.x) || !(nodeBox.min.x < box->max.x) ||
-                !(box->min.z < nodeBox.max.z) || !(nodeBox.min.z < box->max.z) ||
-                !(box->min.y < nodeBox.max.y) || !(nodeBox.min.y < box->max.y)) {
+            nodeBox.m_vMin.x = centre.x - radius;
+            nodeBox.m_vMin.y = centre.y - radius;
+            nodeBox.m_vMin.z = centre.z - radius;
+            nodeBox.m_vMax.x = centre.x + radius;
+            nodeBox.m_vMax.y = centre.y + radius;
+            nodeBox.m_vMax.z = centre.z + radius;
+            if (!(box->m_vMin.x < nodeBox.m_vMax.x) || !(nodeBox.m_vMin.x < box->m_vMax.x) ||
+                !(box->m_vMin.z < nodeBox.m_vMax.z) || !(nodeBox.m_vMin.z < box->m_vMax.z) ||
+                !(box->m_vMin.y < nodeBox.m_vMax.y) || !(nodeBox.m_vMin.y < box->m_vMax.y)) {
                 continue;
             }
             if (!func_0023A640(sweep, &nodeBox, &t)) {
