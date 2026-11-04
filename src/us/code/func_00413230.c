@@ -1235,11 +1235,11 @@ void func_004151B4(struct MenuRecAt10 *menu, u8 dir) {
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00441384.c, func_00441384, with Turok 2's layouts. */
 
 extern f32 D_800B6D28; /* frame delta */
-extern s32 func_002855E8(MenuController *ctl);
-extern s32 func_00285628_4143DC(MenuController *ctl) __asm__("func_00285628");
-extern s32 func_00285670_4143DC(MenuController *ctl) __asm__("func_00285670");
-extern s32 func_002856B8(MenuController *ctl);
-extern s32 func_00285700(MenuController *ctl);
+extern s32 func_002855E8(ControllerProfile *ctl);
+extern s32 func_00285628_4143DC(ControllerProfile *ctl) __asm__("func_00285628");
+extern s32 func_00285670_4143DC(ControllerProfile *ctl) __asm__("func_00285670");
+extern s32 func_002856B8(ControllerProfile *ctl);
+extern s32 func_00285700(ControllerProfile *ctl);
 extern void func_00416C28_4143DC(Menu *menu) __asm__("func_00416C28");
 
 s32 func_0041531C(Menu *menu, void *arg) {
@@ -1630,7 +1630,7 @@ s32 func_004160F0(MenuItemTmpl_4160F0 *a) {
     return n;
 }
 
-/* ---- The window functions below use Menu, MenuDesc, MenuController and MenuPool (structs/menu.h) ---- */
+/* ---- The window functions below use Menu, MenuDesc, ControllerProfile and MenuPool (structs/menu.h) ---- */
 
 /* ---------------- func_00416168 ---------------- */
 s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("func_00413F74");
@@ -1721,13 +1721,13 @@ MenuBlob *func_00416214(MenuItem_416214 *a, s32 id, s32 arg) {
 
 /* ---------------- func_004162E4 ---------------- */
 s32 func_004162E4(Menu *arg0) {
-    MenuController *temp_v1;
+    ControllerProfile *temp_v1;
     s32 var_v0;
 
     temp_v1 = arg0->controller;
     var_v0 = 0;
     if (temp_v1 != 0) {
-        var_v0 = (s32) temp_v1->body;
+        var_v0 = (s32) &temp_v1->buttonHistory[29]; /* 0xA0 */
     }
     return var_v0;
 }
@@ -2026,7 +2026,7 @@ extern MenuPool D_80119E2C;
 void func_004169C8(MenuPool *arg0) {
     s32 (*temp_v0)(Menu *, MenuPool *);
     Menu *temp_s2;
-    MenuController *temp_v0_2;
+    ControllerProfile *temp_v0_2;
     Menu *var_s0;
 
     var_s0 = arg0->head;
@@ -2046,8 +2046,8 @@ block_6:
                     }
                     temp_v0_2 = var_s0->controller;
                     temp_v0_2->buttons = 0;
-                    temp_v0_2->connection = 0;
-                    temp_v0_2->history = 0;
+                    temp_v0_2->buttonsSingle = 0;
+                    temp_v0_2->buttonsDouble = 0;
                     CList__Remove((s32) arg0, (s32) var_s0);
                     func_002052D8(0, var_s0->block);
                 }
@@ -2103,7 +2103,7 @@ extern void func_002052D8_416B30(s32, void *mem) __asm__("func_002052D8");
 /* Closes and frees every open menu. */
 void func_00416B30(MenuPool *pool) {
     Menu *menu;
-    MenuController *ctl;
+    ControllerProfile *ctl;
 
 next:
     menu = pool->head;
@@ -2113,8 +2113,8 @@ next:
         }
         ctl = menu->controller;
         ctl->buttons = 0;
-        ctl->connection = 0;
-        ctl->history = 0;
+        ctl->buttonsSingle = 0;
+        ctl->buttonsDouble = 0;
         CList__Remove_416B30(pool, menu);
         func_002052D8_416B30(0, menu->block);
         goto next;
@@ -2409,7 +2409,7 @@ void func_004171F4(O06A_4171F4 *a, s32 b, s32 c) {
 /* ---------------- func_004172B0 ---------------- */
 void func_004172B0(Menu *arg0) {
     s32 (*temp_v0)();
-    MenuController *temp_v0_2;
+    ControllerProfile *temp_v0_2;
 
     temp_v0 = arg0->desc->close;
     if (temp_v0 != NULL) {
@@ -2417,8 +2417,8 @@ void func_004172B0(Menu *arg0) {
     }
     temp_v0_2 = arg0->controller;
     temp_v0_2->buttons = 0;
-    temp_v0_2->connection = 0;
-    temp_v0_2->history = 0;
+    temp_v0_2->buttonsSingle = 0;
+    temp_v0_2->buttonsDouble = 0;
 }
 
 /* ---------------- func_004172F8 ---------------- */
@@ -2484,7 +2484,7 @@ s32 func_002052D8_417418(s32, s32) __asm__("func_002052D8");
 
 void func_00417418(s32 arg0, Menu *arg1) {
     s32 (*temp_v0)(Menu *, s32);
-    MenuController *temp_v0_2;
+    ControllerProfile *temp_v0_2;
 
     temp_v0 = arg1->desc->close;
     if (temp_v0 != NULL) {
@@ -2492,8 +2492,8 @@ void func_00417418(s32 arg0, Menu *arg1) {
     }
     temp_v0_2 = arg1->controller;
     temp_v0_2->buttons = 0;
-    temp_v0_2->connection = 0;
-    temp_v0_2->history = 0;
+    temp_v0_2->buttonsSingle = 0;
+    temp_v0_2->buttonsDouble = 0;
     CList__Remove_417418(arg0, (s32) arg1);
     func_002052D8_417418(0, arg1->block);
 }

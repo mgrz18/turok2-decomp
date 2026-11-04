@@ -58,7 +58,7 @@ extern u8 D_0043BDB0[];
 extern u8 D_0043BE1C[];
 
 extern s32 func_0041DD90(Menu *c, s32 slot, s32 quiet);
-extern Player *func_0025342C(void *players, MenuController *ctl);
+extern Player *func_0025342C(void *players, ControllerProfile *ctl);
 extern s32 func_00426064(s32 slot, s32 note);
 extern void func_00416644(void *menus, void *tmpl, s32 a, void *b, void *parent);
 

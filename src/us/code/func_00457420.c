@@ -42,7 +42,7 @@ void func_00426BA8(s32 a, u8 *b, s32 c);
 s32 func_00426D8C(s32 a);
 void func_0041D948(Menu *o);
 s32 func_0041E294(Menu *o, s32 a, s32 *b, s32 *c);
-void func_00416644(u8 *a, u8 *b, s32 c, MenuController *d, void *e);
+void func_00416644(u8 *a, u8 *b, s32 c, ControllerProfile *d, void *e);
 
 #define PAK_ERROR()                                                        \
     D_801309BC = 1;                                                        \

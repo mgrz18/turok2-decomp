@@ -87,7 +87,7 @@ typedef struct {
     /* 0x04 */ f32 m_LookY;
     /* 0x08 */ f32 m_MoveX;
     /* 0x0C */ f32 m_MoveY;
-    /* 0x10 */ struct CContState *m_pContState;
+    /* 0x10 */ struct ControllerProfile *m_pContState; /* structs/controller.h */
     /* 0x14 */ f32 m_FinalLookX;
     /* 0x18 */ f32 m_FinalLookY;
     /* 0x1C */ f32 m_FinalMoveX;

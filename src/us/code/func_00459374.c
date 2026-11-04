@@ -59,7 +59,7 @@ extern u8 D_0043BC40[];
 extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
 s32 func_0041DCB0(Menu *o, s32 pad, s32 z);
-Player *func_0025342C(World *w, MenuController *s);
+Player *func_0025342C(World *w, ControllerProfile *s);
 s32 func_00425F84(s32 pad, s32 idx);
 void func_00416644(u8 *a, void *b, void *c, s32 d, s32 e);
 

@@ -33,7 +33,7 @@ extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
 
 s32 func_0041DCB0(Menu *event, s32 mode, s32 arg2);
-u8 *func_0025342C(void *state, MenuController *args);
+u8 *func_0025342C(void *state, ControllerProfile *args);
 void func_0042E350(u8 *player, s32 arg1);
 void func_00416894(void *menu, Menu *event, void *page);
 s32 func_00425F84(s32 mode, s32 arg1);
