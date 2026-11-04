@@ -51,6 +51,14 @@ typedef struct CROMParticleImpact {
     /* 0xA8 */ u16 m_ImpactSoundType[14];
 } CROMParticleImpact; /* size 0xC4 */
 
+/* How a particle's size follows its distance from the camera (func_0023270C,
+ * func_0022D2FC): the scale near and far. */
+typedef struct CROMParticleDistance {
+    /* 0x00 */ u8 unk_00[0x1C];
+    /* 0x1C */ f32 m_NearScale;
+    /* 0x20 */ f32 m_FarScale;
+} CROMParticleDistance;
+
 /* How a template spawns: life, chance, count, which active list... */
 typedef struct CROMParticleParams {
     /* 0x00 */ s16 m_LifeBase;
@@ -86,7 +94,7 @@ typedef struct CROMParticleEffect {
     /* 0x18 */ CROMParticleImpact *m_pImpact;
     /* 0x1C */ void *m_pOffset;
     /* 0x20 */ void *unk_20;
-    /* 0x24 */ void *m_pDistanceRange;
+    /* 0x24 */ CROMParticleDistance *m_pDistanceRange;
     /* 0x28 */ void *m_pDirection;
     /* 0x2C */ void *m_pOscillation;
     /* 0x30 */ void *m_pMotion;
