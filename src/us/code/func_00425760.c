@@ -1,29 +1,10 @@
 #include "common.h"
+#include "structs/pak.h"
 
 /* Refreshes the cached state of the 16 notes of a controller pak (osPfsFileState, retried once; an invalid
  * note is cleared) and its free space. */
-
-typedef struct {
-    /* 0x00 */ u8 data[0x68];
-} PfsHandle; /* OSPfs */
-
-typedef struct {
-    /* 0x00 */ u32 file_size;
-    /* 0x04 */ u32 game_code;
-    /* 0x08 */ u16 company_code;
-    /* 0x0A */ char ext_name[4];
-    /* 0x0E */ char game_name[16];
-} PfsNote; /* OSPfsState, 0x20 */
-
-typedef struct {
-    /* 0x000 */ s32 freeBytes;
-    /* 0x004 */ PfsNote notes[16];
-} PakCache; /* 0x204 */
-
-extern PakCache *D_800C2224;
-extern PfsHandle D_80130C80[];
-extern s32 func_00427C20(PfsHandle *pfs, s32 fileNo, PfsNote *state); /* osPfsFileState */
-extern s32 osPfsFreeBlocks(PfsHandle *pfs, s32 *bytes);
+extern s32 func_00427C20(OSPfs *pfs, s32 fileNo, OSPfsState *state); /* osPfsFileState */
+extern s32 osPfsFreeBlocks(OSPfs *pfs, s32 *bytes);
 
 void func_00425760(s32 channel) {
     s32 i;

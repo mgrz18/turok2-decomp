@@ -3,21 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
-typedef struct O01PadEnt {
-               s32 unk0;
-               s32 unk4;
-               u16 unk8;
-               u8 unkA[4];
-               u8 unkE[0x12];
-} O01PadEnt;
-typedef struct O01PadTab {
-                s32 unk0;
-                O01PadEnt ent[16];
-} O01PadTab;
-extern s32 D_80130C60[];
-extern s32 D_80130C70[];
-extern OSPfs D_80130C80[];
-extern O01PadTab *D_800C2224;
+#include "structs/pak.h"
 extern u8 D_800F6750;
 s32 func_00285878(s32 flag);
 void func_002847E0();
@@ -26,7 +12,6 @@ s32 func_00425808(s32 ch);
 s32 func_004276A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name);
 s32 func_0045EF84(s32 pad, s32 idx) {
     s32 r;
-    O01PadEnt *e;
     if (D_80130C60[pad] != 3) {
         return -2;
     }
@@ -35,7 +20,7 @@ s32 func_0045EF84(s32 pad, s32 idx) {
     r = D_80130C70[pad];
     D_800F6750 = 2;
     if (r == 0) {
-        r = func_004276A0(&D_80130C80[pad], D_800C2224[pad].ent[idx].unk8, D_800C2224[pad].ent[idx].unk4, D_800C2224[pad].ent[idx].unkE, D_800C2224[pad].ent[idx].unkA);
+        r = func_004276A0(&D_80130C80[pad], D_800C2224[pad].notes[idx].company_code, D_800C2224[pad].notes[idx].game_code, D_800C2224[pad].notes[idx].game_name, D_800C2224[pad].notes[idx].ext_name);
         if (r != 0) {
             r = -1;
         }
