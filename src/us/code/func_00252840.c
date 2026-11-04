@@ -9,11 +9,6 @@ typedef struct {
     /* 0x38 */ f32 pos[3];
 } SpawnPoint;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ CPlayer *head;
-} PlayerList;
-
 extern u8 D_800F7078[];
 extern SpawnPoint *func_00225EBC(void *spawns, s32 kind, s32 character);
 extern s32 func_002113A4(void);
@@ -41,10 +36,10 @@ static __inline__ void place_at_spawn(CPlayer *p) {
 
 /* Respawn every player at a spawn point, with full health, out of tag mode.
  * A goto loop: as a for/do loop GCC hoists the constant 1 out of it. */
-void func_00252840(PlayerList *list) {
+void func_00252840(CPlayerList *list) {
     CPlayer *p;
 
-    p = list->head;
+    p = list->m_ActiveList.m_pHead;
     if (p == NULL) return;
 loop:
     {

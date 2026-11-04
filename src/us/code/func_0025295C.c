@@ -2,11 +2,6 @@
 #include "structs/player.h"
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ CPlayer *head;
-} PlayerList;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x18];
     /* 0x18 */ s32 limit;
     /* 0x1C */ u8 pad1C[0x24 - 0x1C];
@@ -14,11 +9,11 @@ typedef struct {
 } GameState;
 
 extern GameState D_8011ACB0;
-extern s32 func_0025340C(PlayerList *list, CPlayer *player);
+extern s32 func_0025340C(CPlayerList *list, CPlayer *player);
 
 /* Whether the frag limit is reached: by either team's total in team games,
  * otherwise by one player's frags (the slot func_0025340C names left out). */
-s32 func_0025295C(PlayerList *list) {
+s32 func_0025295C(CPlayerList *list) {
     GameState *state = &D_8011ACB0;
     CPlayer *p;
     s32 i;
@@ -28,7 +23,7 @@ s32 func_0025295C(PlayerList *list) {
         s32 team0 = 0;
         s32 skip;
 
-        for (p = list->head; p != NULL; p = p->m_pNext) {
+        for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
             skip = func_0025340C(list, p);
             for (i = 0; i < 4; i++) {
                 if (i != skip) {
@@ -52,7 +47,7 @@ s32 func_0025295C(PlayerList *list) {
     } else {
         GameState *gs = state;
 
-        for (p = list->head; p != NULL; p = p->m_pNext) {
+        for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
             s32 skip;
             s32 sum;
 

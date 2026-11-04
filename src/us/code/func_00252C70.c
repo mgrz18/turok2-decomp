@@ -3,11 +3,6 @@
 #include "structs/game_object.h"
 #include "structs/camera.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ CPlayer *head;
-} PlayerList;
-
 /* The weapon actor's owner, at 0x1A8 (inside m_AI). */
 #define OWNER(obj) (*(CPlayer **)((u8 *)(obj) + 0x1A8))
 
@@ -22,14 +17,14 @@ extern void func_002051F4(s32 arg0, void **res);
 /* Reload the animation object info of every player's actor that has one. For
  * the player viewing through cam (while cam's word 0x24 is clear) it is the
  * weapon model instead, turned toward its owner's camera. */
-void func_00252C70(PlayerList *list, CCamera *cam) {
+void func_00252C70(CPlayerList *list, CCamera *cam) {
     CPlayer *p;
     CGameObjectInstance *obj;
     void **res;
     CPlayer *owner;
     CVector3 d;
 
-    for (p = list->head; p != NULL; p = p->m_pNext) {
+    for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
         if (p->m_pCamera == cam && *(s32 *)((u8 *)cam + 0x24) == 0) {
             obj = &p->m_WeaponActor;
             if (obj->m_dwFlags & 0x40000) {

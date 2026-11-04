@@ -9,11 +9,6 @@ typedef struct {
     /* 0x38 */ f32 pos[3];
 } SpawnPoint;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ CPlayer *head;
-} PlayerList;
-
 extern u8 D_800F7078[];
 extern SpawnPoint *func_00225EBC(void *spawns, s32 kind, s32 character);
 extern s32 func_002113A4(void);

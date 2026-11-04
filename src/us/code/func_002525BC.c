@@ -2,11 +2,6 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ CPlayer *head;
-} PlayerList;
-
 /* Tag game state. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -26,18 +21,18 @@ extern s32 D_800C2034;          /* screen height */
 
 extern s32 func_002113A4(void);
 extern void func_0025247C(CPlayer *p);
-extern void func_00252840(PlayerList *list);
-extern void func_002534E0(PlayerList *list);
-extern s32 func_00254A5C(PlayerList *list);
-extern CPlayer *func_00254B04(PlayerList *list, u32 index);
-extern void func_00254B6C(PlayerList *list);
-extern s32 func_00254B9C(PlayerList *list);
+extern void func_00252840(CPlayerList *list);
+extern void func_002534E0(CPlayerList *list);
+extern s32 func_00254A5C(CPlayerList *list);
+extern CPlayer *func_00254B04(CPlayerList *list, u32 index);
+extern void func_00254B6C(CPlayerList *list);
+extern s32 func_00254B9C(CPlayerList *list);
 extern void func_00279028(s32 color);
 extern void func_0027B320(s32, s32, s16, s16, f32, f32, s32);
 
 /* Tag: pick who is "it" at the start of a round, flashing over the viewports
  * in turn until the pick lands. */
-void func_002525BC(PlayerList *list) {
+void func_002525BC(CPlayerList *list) {
     s32 count;
     CPlayer *p;
     CCamera *cam;

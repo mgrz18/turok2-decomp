@@ -2,11 +2,6 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ CPlayer *head;
-} PlayerList;
-
 extern s32 D_8011AC8C;
 extern s32 D_8011ACA4;
 extern f32 D_800B6D28;          /* frame time scale */
@@ -30,13 +25,13 @@ static __inline__ s32 menu_open(CPlayer *p) {
 
 /* Animate each living player's weapon model on its own (frame time kept),
  * then put it back on the player; stop the weapon sounds otherwise. */
-void func_00252ADC(PlayerList *list) {
+void func_00252ADC(CPlayerList *list) {
     CPlayer *p;
 
     if (D_8011AC8C == 11 || D_8011AC8C == 8) {
         return;
     }
-    for (p = list->head; p != NULL; p = p->m_pNext) {
+    for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
         if (Cinema_PathPlaying() || p->m_Data.m_Lives == 0) {
             func_00275D34(func_00275F7C(), p->m_pLoopingSound_WeaponBackground);
             p->m_pLoopingSound_WeaponBackground = NULL;

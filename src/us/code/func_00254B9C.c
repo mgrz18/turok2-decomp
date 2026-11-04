@@ -6,18 +6,13 @@ typedef struct {
     /* 0x54C */ s32 unk54C;
 } Owner;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ CPlayer *head;
-} PlayerList;
-
 /* Counts the players whose owner has unk54C clear and settings unk3F clear. */
-s32 func_00254B9C(PlayerList *arg0) {
+s32 func_00254B9C(CPlayerList *arg0) {
     s32 var_a0;
     Owner *temp_v0;
     CPlayer *var_v1;
 
-    var_v1 = arg0->head;
+    var_v1 = arg0->m_ActiveList.m_pHead;
     var_a0 = 0;
     if (var_v1 != NULL) {
         do {
