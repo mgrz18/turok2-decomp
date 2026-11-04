@@ -5,18 +5,11 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/game.h"
 struct LevelActor;
 struct Shared_World;
-struct CVector3_t;
 struct Box;
 typedef struct Box Box;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Box;
 struct Box {
     CVector3 min;
@@ -324,7 +317,6 @@ typedef struct Shared_World {
     struct LevelActor *specialActors[16];
     s32 specialActorCount;
 } Shared_World;
-extern Shared_World D_80119870;
 struct Trigger;
 struct LevelActor;
 struct Shared_World;
@@ -356,6 +348,6 @@ extern void func_0040333C(struct Trigger *arg0);
 extern void func_002535E4(Shared_World *world, float value);
 extern void func_00412438(s32 id);
 void func_0040333C(Trigger *arg0) {
-    func_002535E4(&D_80119870, 900.0f);
+    func_002535E4(&D_80119870.m_PlayerList, 900.0f);
     func_00412438(0x136);
 }

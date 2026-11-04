@@ -1,29 +1,8 @@
 /* Second VM module copy of func_0042DA60 (same source, linked 0x0042D980). */
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
-
-typedef struct Actor {
-    /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ CIntelligence *def;
-    /* 0x018 */ u8 pad18[0x34 - 0x18];
-    /* 0x034 */ f32 scale[3];
-    /* 0x040 */ u8 pad40[0xD4 - 0x40];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
-    /* 0x140 */ u8 ai[0x174 - 0x140];
-    /* 0x174 */ s8 unk174;
-    /* 0x175 */ u8 pad175[0x1A8 - 0x175];
-    /* 0x1A8 */ void *owner;
-    /* 0x1AC */ u8 pad1AC[0x234 - 0x1AC];
-    /* 0x234 */ void *onUpdate;
-    /* 0x238 */ void *onDamage;
-    /* 0x23C */ u8 pad23C[4];
-    /* 0x240 */ void *onCollide;
-    /* 0x244 */ void *onMove;
-    /* 0x248 */ void *onDraw;
-    /* 0x24C */ u8 pad24C[0x288 - 0x24C];
-} Actor;
 
 typedef struct GameMode {
     u8 multiplayer;

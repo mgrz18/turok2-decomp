@@ -9,14 +9,16 @@ typedef struct {
     /* 0x1B4 */ s32 m_Value;
 } State800F56B0;
 
-/* One of four per-controller button states, 0x224 bytes apart. */
+/* ControllerProfile (structs/controller.h) seen from its previousButtons:
+ * the ROM addresses the four through D_800F5F6C = D_800F5EC0 + 0xAC, so this
+ * file keeps that symbol and this local view. */
 typedef struct {
-    /* 0x00 */ s32 m_Prev;
-    /* 0x04 */ s32 m_Held;
-    /* 0x08 */ s32 m_Pressed;
-    /* 0x0C */ s32 m_unkC;
-    /* 0x10 */ s32 m_unk10;
-    /* 0x14 */ s32 m_unk14;
+    /* 0x00 */ s32 m_Prev;     /* previousButtons */
+    /* 0x04 */ s32 m_Held;     /* buttons */
+    /* 0x08 */ s32 m_Pressed;  /* buttonsSingle */
+    /* 0x0C */ s32 m_unkC;     /* buttonsSingleNoHold */
+    /* 0x10 */ s32 m_unk10;    /* buttonsDouble */
+    /* 0x14 */ s32 m_unk14;    /* buttonsRepeat */
     /* 0x18 */ u8 _pad[0x224 - 0x18];
 } PadState;
 

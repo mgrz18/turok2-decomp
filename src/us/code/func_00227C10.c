@@ -3,14 +3,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/world.h"
-
-typedef struct IntrusiveList {
-    /* 0x00 */ void *head;
-    /* 0x04 */ void *tail;
-    /* 0x08 */ s32 prevOffset;
-    /* 0x0C */ s32 nextOffset;
-    /* 0x10 */ s32 count;
-} IntrusiveList;
+#include "structs/list.h"
 
 typedef struct SceneEffect {
     /* 0x000 */ u8 pad0[0x290];
@@ -20,8 +13,8 @@ typedef struct SceneEffect {
 
 typedef struct SceneEffectPool {
     /* 0x0000 */ SceneEffect effects[0x20];
-    /* 0x5300 */ IntrusiveList freeEffects;
-    /* 0x5314 */ IntrusiveList activeEffects;
+    /* 0x5300 */ CList freeEffects;
+    /* 0x5314 */ CList activeEffects;
 } SceneEffectPool;
 
 /* The animation header: what this reads of it. */
@@ -47,8 +40,8 @@ s32 func_00225E88(CWorld *world, s32 index);
 f32 func_0026D210(s32 angle);
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 angle);
 void func_002051F4(s32 heap, s32 *block);
-void CList__Remove(IntrusiveList *list, void *node);
-void CList__AddHead(IntrusiveList *list, void *node);
+void CList__Remove(CList *list, void *node);
+void CList__AddHead(CList *list, void *node);
 void func_00219BC0(SceneEffect *effect, s32 id, s32 variant, s32 unused, s32 count, s32 sound, s32 owner,
                    f32 scale, CVector3 position, s32 flags, CVector3 color, CVector3 direction, s32 arg12);
 void func_0021E5D4(SceneEffect *effect);
@@ -58,10 +51,10 @@ void func_0021E5D4(SceneEffect *effect);
 static __inline__ SceneEffect *take_effect(SceneEffectPool *scene, s32 *ref) {
     SceneEffect *effect;
 
-    if (D_8011001C == 0 && (u32)scene->activeEffects.count >= 3) {
+    if (D_8011001C == 0 && (u32)scene->activeEffects.m_nCount >= 3) {
         return NULL;
     }
-    effect = scene->freeEffects.head;
+    effect = scene->freeEffects.m_pHead;
     if (effect != NULL) {
         CList__Remove(&scene->freeEffects, effect);
         CList__AddHead(&scene->activeEffects, effect);

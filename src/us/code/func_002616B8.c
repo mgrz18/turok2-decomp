@@ -1,25 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x174];
-    /* 0x174 */ s8 kind;
-} TargetObj;
-
-typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ TargetObj *obj;
-    /* 0x08 */ f32 angle;
-    /* 0x0C */ u8 padC[0x1C - 0xC];
-    /* 0x1C */ f32 dy;
-    /* 0x20 */ u8 pad20[0x24 - 0x20];
-    /* 0x24 */ f32 dist;
-    /* 0x28 */ u8 pad28[0x44 - 0x28];
-} VecDst; /* 0x44 */
-
-typedef struct {
-    /* 0x00 */ VecDst a;
-    /* 0x44 */ VecDst b;
-} Targets;
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -46,34 +26,21 @@ typedef struct {
     /* 0x1C */ f32 pitch;
 } Self;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x40];
-    /* 0x040 */ f32 timer;
-    /* 0x044 */ u8 pad44[0xA0 - 0x44];
-    /* 0x0A0 */ f32 homeY;
-    /* 0x0A4 */ u8 padA4[0xB0 - 0xA4];
-    /* 0x0B0 */ f32 targetY;
-    /* 0x0B4 */ u8 padB4[0xBC - 0xB4];
-    /* 0x0BC */ f32 speed;
-    /* 0x0C0 */ u8 padC0[0x118 - 0xC0];
-    /* 0x118 */ f32 turnRate;
-} AI;
-
-void func_00246108(Self *self, AI *ai, Targets *out, s32 f1, s32 f2);
-void func_0024599C(Self *self, AI *ai, Steer *out);
+void func_00246108(Self *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
+void func_0024599C(Self *self, CAI *ai, Steer *out);
 f32 func_002974C0(f32 x);
 f32 func_00211774(f32 cur, f32 target, f32 rate);
 f32 func_0026872C(Self *self, s32 arg1);
 f32 func_00268A5C(Self *self);
 f32 func_0021160C(f32 value, f32 target, f32 rate);
-void func_00245BAC(Self *self, AI *ai, f32 turnRate, f32 angle);
-void func_00243414(Self *self, AI *ai, s32 mode);
+void func_00245BAC(Self *self, CAI *ai, f32 turnRate, f32 angle);
+void func_00243414(Self *self, CAI *ai, s32 mode);
 
-void func_002616B8(Self *self, AI *ai) {
-    Targets t;
+void func_002616B8(Self *self, CAI *ai) {
+    CAITargets t;
     Steer steer;
     Params *params;
-    Targets *tp;
+    CAITargets *tp;
     f32 speed;
     f32 turn;
     f32 y;
@@ -83,22 +50,22 @@ void func_002616B8(Self *self, AI *ai) {
     params = &self->def->params;
     func_00246108(self, ai, &t, 1, 1);
     func_0024599C(self, ai, &steer);
-    if (t.b.type == 2 && t.b.obj->kind == 6) {
+    if (t.m_Path.m_Kind == 2 && t.m_Path.m_pTarget->m_AI.m_Mode == 6) {
         speed = 4.0f;
         turn = 0.20943953f;
-    } else if (t.b.type == 0) {
+    } else if (t.m_Path.m_Kind == 0) {
         speed = 1.5f;
         turn = 0.104719765f;
     } else {
-        speed = (func_002974C0(ai->timer * 0.052359883f) + 1.0f) * 0.25f + 1.0f;
-        turn = (func_002974C0(ai->timer * 2.0f * 0.017453294f) + 1.0f) * 0.043633237f + 0.017453294f;
+        speed = (func_002974C0(ai->m_ModeTime * 0.052359883f) + 1.0f) * 0.25f + 1.0f;
+        turn = (func_002974C0(ai->m_ModeTime * 2.0f * 0.017453294f) + 1.0f) * 0.043633237f + 0.017453294f;
     }
-    ai->turnRate = func_00211774(ai->turnRate, turn, 0.25f);
-    ai->speed = func_00211774(ai->speed, speed, 0.25f);
+    ai->m_VarF32[3] = func_00211774(ai->m_VarF32[3], turn, 0.25f);
+    ai->m_AnimSpeed = func_00211774(ai->m_AnimSpeed, speed, 0.25f);
 
     lo = func_0026872C(self, 0);
     hi = func_00268A5C(self);
-    y = ai->homeY + func_002974C0(ai->timer * 0.0017453295f) * 102.399994f;
+    y = ai->m_vInitialPos.y + func_002974C0(ai->m_ModeTime * 0.0017453295f) * 102.399994f;
     if (y < lo) {
         y += 102.399994f;
     }
@@ -110,25 +77,25 @@ void func_002616B8(Self *self, AI *ai) {
     } else if (hi < y) {
         y = hi;
     }
-    ai->targetY = func_00211774(ai->targetY, y, 5.12f);
+    ai->m_vLeashPos.y = func_00211774(ai->m_vLeashPos.y, y, 5.12f);
 
     tp = &t;
-    self->pitch = func_0021160C(self->pitch, tp->b.dy, steer.pitchRate * 2.0f);
+    self->pitch = func_0021160C(self->pitch, tp->m_Path.m_vDelta.y, steer.pitchRate * 2.0f);
     if (self->pitch > 81.92f) {
         self->pitch = 81.92f;
     } else if (self->pitch < -81.92f) {
         self->pitch = -81.92f;
     }
-    func_00245BAC(self, ai, ai->turnRate, tp->b.angle);
+    func_00245BAC(self, ai, ai->m_VarF32[3], tp->m_Path.m_Angle);
 
-    if (ai->timer > 15.0f) {
+    if (ai->m_ModeTime > 15.0f) {
         if (params->kind != 5) {
-            if (t.b.type == 0 && t.b.dist < 81.92f
-                && (t.b.angle < 0.0f ? -t.b.angle : t.b.angle) < 0.26179942f) {
+            if (t.m_Path.m_Kind == 0 && t.m_Path.m_Dist < 81.92f
+                && (t.m_Path.m_Angle < 0.0f ? -t.m_Path.m_Angle : t.m_Path.m_Angle) < 0.26179942f) {
                 func_00243414(self, ai, 6);
             }
         } else {
-            if (t.b.type == 0 && t.b.dist < params->biteRange) {
+            if (t.m_Path.m_Kind == 0 && t.m_Path.m_Dist < params->biteRange) {
                 func_00243414(self, ai, 16);
             }
         }

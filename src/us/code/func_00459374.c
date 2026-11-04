@@ -33,18 +33,12 @@ typedef struct {
     /* 0xA50 */ s32 controller;
 } Player;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x34];
-    /* 0x34 */ s32 unk34;
-    /* 0x38 */ s32 unk38;
-} World;
 
 extern s32 D_80130990;
 extern s32 D_800C2028; /* pad */
 extern s32 D_801309BC;
 extern s32 D_801309B8;
 extern s32 D_801309C4;
-extern World D_80119870;
 extern CWorld D_800F7078[];
 extern SaveData *D_800C201C;
 extern u8 D_8011AC58;
@@ -59,7 +53,7 @@ extern u8 D_0043BC40[];
 extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
 s32 func_0041DCB0(Menu *o, s32 pad, s32 z);
-Player *func_0025342C(World *w, MenuController *s);
+Player *func_0025342C(CPlayerList *list, ControllerProfile *s);
 s32 func_00425F84(s32 pad, s32 idx);
 void func_00416644(u8 *a, void *b, void *c, s32 d, s32 e);
 
@@ -84,7 +78,7 @@ s32 func_00459374(s32 unused, Menu *own) {
         return 1;
     }
     if (D_801309B8 != 0) {
-        plr = func_0025342C(&D_80119870, own->controller);
+        plr = func_0025342C(&D_80119870.m_PlayerList, own->controller);
         g = D_800F7078;
         save = D_8011AC58;
         plr->unk520 = D_800C201C->blk18;
@@ -104,9 +98,9 @@ s32 func_00459374(s32 unused, Menu *own) {
         for (i = 0; i < g->unk_30; i++) {
             *dp++ = *src++;
         }
-        D_80119870.unk34 = 0;
-        D_80119870.unk38 = 0;
-        func_00416644((u8 *)&D_80119870 + 0x5BC, D_0043BC40, plr, plr->controller, 0);
+        D_80119870.m_PlayerList.m_bCinema = 0;
+        D_80119870.m_PlayerList.m_bCinemaStarted = 0;
+        func_00416644(D_80119870.m_MenuPool, D_0043BC40, plr, plr->controller, 0);
         return 1;
     }
     if (func_00425F84(pad, D_801309C4) == 0) {

@@ -1,22 +1,22 @@
 #include "common.h"
 #include "rw/abu_protos.h"
 
-void func_0020EEF8(Vec3 *, Vec3 *, Vec3 *);
-void func_0020EF60(Vec3 *out, Vec3 *in, f32 scale);
+void func_0020EEF8(CVector3 *, CVector3 *, CVector3 *);
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 
 extern f32 D_800A8010;
 
 typedef struct {
     /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ Vec3 *a;
-    /* 0x8 */ Vec3 *b;
-    /* 0xC */ Vec3 *c;
+    /* 0x4 */ CVector3 *a;
+    /* 0x8 */ CVector3 *b;
+    /* 0xC */ CVector3 *c;
 } Triangle0026CB2C;
 
-void func_0026CB2C(Triangle0026CB2C *arg0, Vec3 *arg1) {
-    Vec3 sp10;
-    Vec3 sp20;
-    Vec3 sp30;
+void func_0026CB2C(Triangle0026CB2C *arg0, CVector3 *arg1) {
+    CVector3 sp10;
+    CVector3 sp20;
+    CVector3 sp30;
     f32 temp_f20;
 
     func_0020EEF8(&sp10, arg0->a, arg0->b);

@@ -9,12 +9,12 @@ extern float func_002982F0(float x);
 extern float D_800A6508;
 extern Vector4f *func_00235AD0(Vector4f *out, u32 bx, u32 by, u32 bz);
 extern f32 D_800DD78C;
-extern void func_0020EFDC(Vec3 *out, Vec3 *a, Vec3 *b);
+extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);
 extern f32 func_00298470(f32);
-extern void func_0020EF60(Vec3 *out, Vec3 *in, f32 scale);
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 Vector4f *func_00235AD0(Vector4f *out, u32 bx, u32 by, u32 bz) {
-    Vec3 axis;
-    Vec3 cross;
+    CVector3 axis;
+    CVector3 cross;
     Vector4f result;
     f32 one;
     f32 magnitude;
@@ -24,7 +24,7 @@ Vector4f *func_00235AD0(Vector4f *out, u32 bx, u32 by, u32 bz) {
     axis.x = 0.0f;
     axis.y = one;
     axis.z = 0.0f;
-    func_0020EFDC(&cross, &axis, (Vec3 *)&bx);
+    func_0020EFDC(&cross, &axis, (CVector3 *)&bx);
     magnitude = func_00298470((cross.x * cross.x) +
                               (cross.y * cross.y) +
                               (cross.z * cross.z));

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_00210C3C(struct Mtx *object) {
+void func_00210C3C(RW_Mtx *object) {
     float t;
     t = object->up.x;
     object->up.x = object->forward.x;

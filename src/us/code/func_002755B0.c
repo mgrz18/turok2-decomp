@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern int D_8011ACA0;
-extern s32 func_00271630(struct ContextRecAt2BC0 *arg0, s32 arg1, Vec3 arg2,
+extern s32 func_00271630(struct ContextRecAt2BC0 *arg0, s32 arg1, CVector3 arg2,
                          s32 arg3, s32 arg4, f32 arg5);
-s32 func_002755B0(s32 arg0, Vec3 arg1, s32 arg4, s32 arg5, f32 arg6) {
+s32 func_002755B0(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5, f32 arg6) {
     extern s32 D_800F2A00;
     if (D_8011ACA0 != 0) {
         return -1;

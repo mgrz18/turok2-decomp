@@ -1,14 +1,14 @@
 #include "common.h"
+#include "structs/game.h"
 
 s32 func_002052D8(s32, s32);
 
-s32 func_002532A8(s32 *);                       /* extern */
+s32 func_002532A8(CPlayerList *);                       /* extern */
 s32 func_002758DC(s32);                     /* extern */
 s32 func_00275B58();                            /* extern */
 s32 func_00275EFC(s32);                         /* extern */
 s32 func_00275F7C();                                /* extern */
 s32 func_0042EA24(s32);                         /* extern */
-extern s32 D_80119870;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x98];
@@ -18,7 +18,7 @@ typedef struct {
 void func_004658FC(Unk004658FC *arg0) {
     s32 temp_v0;
 
-    temp_v0 = func_002532A8(&D_80119870);
+    temp_v0 = func_002532A8(&D_80119870.m_PlayerList);
     if (temp_v0 != 0) {
         func_0042EA24(temp_v0);
     }

@@ -1,65 +1,11 @@
 /* Second-module twin of func_0040A6F0 (src/us/code); here the cut is whole (0x004436F0, 0x20C). Both flag masks are computed before the tests (found with the permuter). */
 #include "common.h"
+#include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target only 0x10/0xD, otherwise 0xF
  * (when flagged and not just used), 0x10 and 0x12 weighted by the module's timer ratio. */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x234];
-    /* 0x234 */ void *callback234;
-    /* 0x238 */ u8 pad238[0x248 - 0x238];
-    /* 0x248 */ void *callback248;
-    /* 0x24C */ u8 pad24C[0x250 - 0x24C];
-    /* 0x250 */ s32 unk250;
-    /* 0x254 */ s32 unk254;
-} LevelActor;
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ s32 count;
-    /* 0x008 */ LevelActor *actors[4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ u8 pad630[0x65C - 0x630];
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ s32 activeMask;
-    /* 0x664 */ s32 unk664;
-    /* 0x668 */ u8 pad668[0x66C - 0x668];
-    /* 0x66C */ s32 lastAnim;
-    /* 0x670 */ u8 pad670[0x674 - 0x670];
-    /* 0x674 */ s32 unk674;
-    /* 0x678 */ s32 unk678;
-    /* 0x67C */ s32 counter;
-    /* 0x680 */ u8 pad680[0x688 - 0x680];
-    /* 0x688 */ s32 unk688;
-    /* 0x68C */ s32 unk68C;
-} State;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xD4];
-    /* 0xD4 */ s32 flags;
-} Actor;
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ Actor *actor;
-    /* 0x08 */ u8 pad8[0x40 - 0x8];
-    /* 0x40 */ f32 dist;
-} Target;
-
-typedef struct {
-    /* 0x00 */ Target a;
-    /* 0x44 */ Target b;
-} Targets;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ u32 flags;
-} CAI;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x140];
@@ -71,30 +17,29 @@ typedef struct {
     s16 weight;
 } Pick;
 
-extern State D_8012FB70;
-extern void func_00246108(Obj *obj, CAI *ai, Targets *t, s32 f1, s32 f2);
+extern void func_00246108(Obj *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern s16 func_0026D518(Pick *table);
 extern void func_00243414(Obj *obj, CAI *ai, s32 state);
 
 /* func_0040BD60 */
-static __inline__ f32 getTargetDist(Obj *obj, Actor **found) {
-    Targets t;
+static __inline__ f32 getTargetDist(Obj *obj, CGameObjectInstance **found) {
+    CAITargets t;
     f32 dist;
 
     dist = -1.0f;
     *found = NULL;
     func_00246108(obj, &obj->ai, &t, 1, 0);
-    if (t.b.actor != NULL && (t.b.actor->flags & 0x300000)) {
-        dist = t.b.dist;
-        *found = t.b.actor;
+    if (t.m_Path.m_pTarget != NULL && (t.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
+        dist = t.m_Path.m_FlatDist;
+        *found = t.m_Path.m_pTarget;
     }
     return dist;
 }
 
 void func_004436F0(Obj *obj, CAI *ai) {
     Pick picks[8];
-    Actor *found;
-    State *state = &D_8012FB70;
+    CGameObjectInstance *found;
+    MotherBossState *state = &D_8012FB70;
     s32 n;
     s32 flagged;
     f32 dist;
@@ -105,15 +50,15 @@ void func_004436F0(Obj *obj, CAI *ai) {
     n = 0;
     dist = getTargetDist(obj, &found);
     flagged = 0;
-    flag2 = ai->flags & 2;
-    flag20 = ai->flags & 0x20;
+    flag2 = ai->m_VisBits & 2;
+    flag20 = ai->m_VisBits & 0x20;
     if (flag2) {
         if (flag20) {
             flagged = 1;
         }
     }
-    if (state->unk674 != 0) {
-        ratio = (f32)state->unk678 / (f32)state->unk674;
+    if (state->totalHealth != 0) {
+        ratio = (f32)state->health / (f32)state->totalHealth;
     } else {
         ratio = 1.0f;
     }

@@ -19,7 +19,7 @@ extern u8 D_0043BC00[];
 extern u8 D_0043BC6C[];
 extern u8 D_0043C05C[];
 
-extern void func_00416644(void *pool, void *tmpl, CPlayer *player, MenuController *ctl, void *back);
+extern void func_00416644(void *pool, void *tmpl, CPlayer *player, ControllerProfile *ctl, void *back);
 extern void func_00426480(s32 kind);
 extern s32 func_0042655C(s32 kind);
 extern s32 func_00426594(s32 kind);

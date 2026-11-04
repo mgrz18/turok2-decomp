@@ -16,7 +16,7 @@ void func_0029DF70(void)
   s8 *new_var;
   int new_var3;
   temp_s0 = __osDisableInt();
-  ((OSThread_s *)(new_var = (s8 *) D_800B8920))->state = (new_var3 = 2);
+  ((OSThread *)(new_var = (s8 *) D_800B8920))->state = (new_var3 = 2);
   new_var2 = &D_800B8918;
   __osEnqueueAndYield(new_var2, new_var3);
   __osRestoreInt(temp_s0);

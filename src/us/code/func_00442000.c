@@ -1,29 +1,11 @@
 #include "common.h"
+#include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Module hit callback (the level's onHit, func_00408FF8 + 8 at the link address): finds the first active part the
  * hit touched; parts 10-14 are three groups, each draining the health of one still-alive slot of the current phase.
  * A slot that dies changes the anim state and clears its bit; when no slot of the phase is left, the next phase
  * state starts. */
-
-typedef struct {
-    /* 0x00 */ s32 health;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ s32 count;
-    /* 0x008 */ void *actors[4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ u8 pad630[0x65C - 0x630];
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ s32 activeMask;
-    /* 0x664 */ s32 aliveMask;
-    /* 0x668 */ u8 pad668[0x670 - 0x668];
-    /* 0x670 */ s32 partsLeft;
-    /* 0x674 */ s32 totalHealth;
-    /* 0x678 */ s32 health;
-} State;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x6C];
@@ -37,18 +19,12 @@ typedef struct {
     /* 0x10 */ Part *part;
 } Hit;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 flags;
-} CAI;
-
-extern State D_8012FB70;
 extern u8 D_00431D74[];
 extern void func_0040BDD0(void *obj, void *sound, s32 a2);
 extern void func_00243414(void *obj, CAI *ai, s32 state);
 
 void func_00442000(void *obj, CAI *ai, Hit *hit) {
-    State *state;
+    MotherBossState *state;
     Part *part;
     s32 mask;
     s32 idx;
@@ -157,10 +133,10 @@ void func_00442000(void *obj, CAI *ai, Hit *hit) {
     }
     bit = 1 << slot;
     if (state->phase != 2) {
-        ai->flags &= ~bit;
+        ai->m_VisBits &= ~bit;
     }
-    state->aliveMask &= ~bit;
-    if (state->aliveMask == 0) {
+    state->liveMask &= ~bit;
+    if (state->liveMask == 0) {
         switch (state->phase) {
             case 0:
                 func_00243414(obj, ai, 9);

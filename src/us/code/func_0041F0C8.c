@@ -3,15 +3,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "structs/pak.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
-
-typedef struct {
-    s32 v;
-    s32 freeb;
-    s32 cnt;
-} PakInfo;
 
 extern s32 D_80130990;
 extern s32 D_800C2028; /* pad */
@@ -57,7 +52,7 @@ static __inline__ void FreeAll(void) {
 
 s32 func_0041F0C8(s32 unused, Menu *own) {
     u8 ext[8];
-    PakInfo pad;
+    PakQuery pad;
     CPlayer *plr;
     s32 r = 0;
     s32 err;
@@ -77,22 +72,22 @@ s32 func_0041F0C8(s32 unused, Menu *own) {
         pp = own->player;
     }
     do {
-        pad.v = pv;
+        pad.channel = pv;
     } while (0);
     plr = pp;
     size = D_800F70A8 + 0x688;
     if (D_80130984 != 0) {
         need = func_00426E6C(size);
-        r = func_004267A0(pad.v, &pad.freeb);
+        r = func_004267A0(pad.channel, &pad.freeBytes);
         if (r == 0) {
-            if (pad.freeb >= need) {
-                r = func_0042670C(pad.v, &pad.cnt);
-                if (r == 0 && pad.cnt != 0) {
+            if (pad.freeBytes >= need) {
+                r = func_0042670C(pad.channel, &pad.freeNotes);
+                if (r == 0 && pad.freeNotes != 0) {
                     ok = 0;
-                    r = func_00426A94(pad.v, ext);
+                    r = func_00426A94(pad.channel, ext);
                     if (r == 0) {
                         written = 1;
-                        padv = pad.v;
+                        padv = pad.channel;
                         r = func_00426164(padv, size, D_800C2018, D_800B45CC, ext, D_800B45D8);
                     }
                 }

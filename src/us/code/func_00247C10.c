@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/region.h"
+#include "structs/game.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 kind;                /* 1 = actor, 2 = particle */
@@ -19,9 +20,7 @@ typedef struct Hit {
     /* 0x0C */ s32 unkC;
 } Hit;
 
-extern s32 D_8011AAD8;
 extern u8 D_800F7078[];
-extern u8 D_80119870[];
 typedef struct TeamGame {
     /* 0x00 */ s32 active;
 } TeamGame;
@@ -70,7 +69,7 @@ void func_00247C10(Actor *actor, s32 arg1, Hit *hit) {
     if (Cinema_PathPlaying() != 0) {
         return;
     }
-    if (D_8011AAD8 & 1) {
+    if (D_8011AAD8.cheatFlags & 1) {
         return;
     }
     if (func_00284174() != 0) {
@@ -116,14 +115,14 @@ void func_00247C10(Actor *actor, s32 arg1, Hit *hit) {
         return;
     }
     player->m_pOptions->m_bDead = 1;
-    killerIndex = func_0025340C(D_80119870, killer);
+    killerIndex = func_0025340C(&D_80119870.m_PlayerList, killer);
     options = player->m_pOptions;
     if (options->m_TagMode == 1) {
         options->m_TaggedBy[killerIndex]++;
     } else {
         options->m_KilledBy[killerIndex]++;
     }
-    victimIndex = func_0025340C(D_80119870, player);
+    victimIndex = func_0025340C(&D_80119870.m_PlayerList, player);
     if (player->m_pOptions->m_TagMode == 1) {
         killer->m_pOptions->m_Tagged[victimIndex]++;
     } else {

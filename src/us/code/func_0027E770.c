@@ -1,22 +1,16 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/camera.h"
+#include "structs/game.h"
 
 #define GFX_WORDS(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
-extern s32 D_8011AAD8;          /* game flags */
-/* The global at D_80119870: what this reads of it. */
-typedef struct {
-    /* 0x0000 */ u8 _pad[0x1418];
-    /* 0x1418 */ s32 m_Mode;           /* D_8011AC88: game mode */
-} Game80119870;
-extern Game80119870 D_80119870;
 extern u8 D_801102B8[];
 void func_002847D0(void);
 void func_002222E0(u8 *world, CCamera *cam);
 s32 Cinema_PathPlaying(void);
-void func_00252C70(Game80119870 *game, CCamera *cam);
-void func_00253148(Game80119870 *game, CCamera *cam);
+void func_00252C70(CPlayerList *list, CCamera *cam);
+void func_00253148(CPlayerList *list, CCamera *cam);
 void func_00223F8C(u8 *world, CCamera *cam);
 void func_00235C30(void *arg0, CCamera *cam);
 void func_0022782C(u8 *arg0, CCamera *cam);
@@ -25,7 +19,7 @@ void func_00283238(u8 *sky, CCamera *cam);
 void func_002240C4(u8 *world, CCamera *cam);
 void func_002352F8(void *arg0, CCamera *cam);
 void func_00280AA0(CCamera *cam);
-void func_002531D0(Game80119870 *game, CCamera *cam);
+void func_002531D0(CPlayerList *list, CCamera *cam);
 void func_00207FEC(s32 arg0);
 
 /* Draws the scene through a camera, layer by layer (LibTEngine's CCamera
@@ -35,10 +29,10 @@ void func_0027E770(CCamera *cam, u8 *world) {
     func_002847D0();
     func_002222E0(world, cam);
     if (Cinema_PathPlaying() == 0) {
-        func_00252C70(&D_80119870, cam);
+        func_00252C70(&D_80119870.m_PlayerList, cam);
     }
-    if (D_80119870.m_Mode == 13) {
-        func_00253148(&D_80119870, cam);
+    if (D_80119870.m_Settings.mode == 13) {
+        func_00253148(&D_80119870.m_PlayerList, cam);
     }
     func_00223F8C(world, cam);
     func_00235C30(D_801102B8, cam);
@@ -50,10 +44,10 @@ void func_0027E770(CCamera *cam, u8 *world) {
     func_002240C4(world, cam);
     func_002352F8(D_801102B8, cam);
     func_00280AA0(cam);
-    if (Cinema_PathPlaying() == 0 && D_80119870.m_Mode == 13) {
-        func_002531D0(&D_80119870, cam);
+    if (Cinema_PathPlaying() == 0 && D_80119870.m_Settings.mode == 13) {
+        func_002531D0(&D_80119870.m_PlayerList, cam);
     }
-    if (D_8011AAD8 & 0x200) {
+    if (D_8011AAD8.cheatFlags & 0x200) {
         GFX_WORDS(0xE7000000, 0);                   /* gDPPipeSync */
         GFX_WORDS(0xE3000A01, 0);                   /* gDPSetCycleType(G_CYC_FILL) */
         GFX_WORDS(0xF9000000, 0xFFFFFFFF);          /* gDPSetBlendColor */

@@ -1,15 +1,10 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/weapon.h"
 
-
-typedef struct WeaponDef {
-    /* 0x00 */ u8 pad0[0xA];
-    /* 0x0A */ u16 pickupId;
-} WeaponDef;
 
 extern u8 D_8011AAF1;           /* multiplayer */
-extern WeaponDef *D_800AF618[];
 
 void func_00285BD0(s32 arg0, s32 arg1);
 void func_002553BC(CPlayer *player, s32 arg1);

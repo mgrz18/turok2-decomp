@@ -1,11 +1,7 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Picks the module object's idle anim for the current phase (0, 1; none in phase 2) from the AI's flags. */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 flags;
-} CAI;
 
 typedef struct {
     s16 id;
@@ -21,21 +17,21 @@ s16 func_0040A170(void *obj, CAI *ai) {
 
     switch (D_801301CC) {
         case 0:
-            if (ai->flags & 0x1C) {
+            if (ai->m_VisBits & 0x1C) {
                 picks[n].id = 0x55FA;
                 picks[n++].weight = 4;
             }
-            if (ai->flags & 0x1C0) {
+            if (ai->m_VisBits & 0x1C0) {
                 picks[n].id = 0x5604;
                 picks[n++].weight = 4;
             }
             break;
         case 1:
-            if (ai->flags & 2) {
+            if (ai->m_VisBits & 2) {
                 picks[n].id = 0x5654;
                 picks[n++].weight = 4;
             }
-            if (ai->flags & 0x20) {
+            if (ai->m_VisBits & 0x20) {
                 picks[n].id = 0x565E;
                 picks[n++].weight = 4;
             }

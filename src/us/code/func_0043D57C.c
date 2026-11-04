@@ -1,6 +1,7 @@
 /* Second VM module twin of func_0040457C (same source, same link address). */
 /* FAKEMATCH: the player lookup is written twice under an always-true test (found by the permuter): GCC merges the copies, but the doubled refs give actor $s2 and nextWave $s3 as in the ROM; with one call the two swap (26 words), and a do{}while(0) instead lets loop.c hoist &D_80119870 above the actor->pos loads (5 words). */
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct {
     f32 x, y, z;
@@ -21,6 +22,10 @@ typedef struct {
     /* 0x140 */ u8 ai[1];
 } Actor0040457C;
 
+/* D_8012F608 is LevelScriptState (structs/boss.h); this file keeps its own
+ * view because the wave spawner reads script2 as its own wave table (steps
+ * laid out as Wave0040457C, not BossStep2: steps = waves, current = wave,
+ * script2On = wavesDone) and found[] as its own actor type. */
 typedef struct {
     /* 0x000 */ s32 mode;
     /* 0x004 */ u8 pad004[0x344 - 0x4];
@@ -77,7 +82,6 @@ typedef struct {
 } Info0040457C;
 
 extern ModeState0040457C D_8012F608;
-extern u8 D_80119870[];
 extern u8 D_8010ABA0[];
 extern Enemy0040457C *D_8010FEB4;
 extern s32 D_800F1F50;
@@ -109,9 +113,9 @@ void func_0043D57C(Entity0040457C *actor, void *level) {
     s32 *flags;
 
     if (&D_8012F608) {
-        player = func_002532EC(D_80119870, actor->pos);
+        player = func_002532EC(&D_80119870.m_PlayerList, actor->pos);
     } else {
-        player = func_002532EC(D_80119870, actor->pos);
+        player = func_002532EC(&D_80119870.m_PlayerList, actor->pos);
     }
     if (player == NULL) {
         return;

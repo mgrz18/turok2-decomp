@@ -2,87 +2,57 @@
 
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct MenuSlot {
-    /* 0x00 */ s32 weapon;
-    /* 0x04 */ u8 pad4[8];
-    /* 0x0C */ f32 angle;
-    /* 0x10 */ f32 lift;
-    /* 0x14 */ f32 scale;
-} MenuSlot;
-
-typedef struct WeaponMenu {
-    /* 0x000 */ s32 active;
-    /* 0x004 */ u8 pad4[4];
-    /* 0x008 */ f32 open;
-    /* 0x00C */ u8 padC[0x1C - 0xC];
-    /* 0x01C */ MenuSlot slots[36];
-    /* 0x37C */ s32 cursor;
-} WeaponMenu;
-
-typedef struct MenuItem {
-    /* 0x00 */ s32 slot;
-    /* 0x04 */ CVector3 position;
-    /* 0x10 */ s32 icon;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ f32 size;
-} MenuItem;
-
-typedef struct WeaponInfo {
-    /* 0x0 */ u8 pad0[6];
-    /* 0x6 */ u16 icon;
-} WeaponInfo;
+#include "structs/weapon.h"
 
 extern f32 D_800AE2D8;              /* slot scale */
-extern WeaponInfo *D_800AF618[];
 
 f32 func_00211774(f32 value, f32 target, f32 rate);
 void func_0020F79C(f32 *m);
 void func_00210B38(f32 *m, f32 angle);
 void func_0020F85C(f32 *m, CVector3 *in, CVector3 *out);
-void func_0024AF68(WeaponMenu *menu, MenuItem *items, s32 count, s32 arg3);
+void func_0024AF68(CBarrel *menu, CBarrelIcon *items, s32 count, s32 arg3);
 
 /* Lays out the eight slots of the weapon wheel, dropping in as it opens,
  * and draws them. */
-void func_00254D5C(WeaponMenu *menu, s32 arg1, s32 arg2) {
+void func_00254D5C(CBarrel *menu, s32 arg1, s32 arg2) {
     f32 m[16];
     CVector3 position;
-    MenuItem items[36];
+    CBarrelIcon items[36];
     CVector3 offset;
-    MenuItem *item;
-    MenuSlot *slot;
+    CBarrelIcon *item;
+    CBarrelItem *slot;
     s32 count;
     s32 i;
     f32 target;
 
-    if (menu->active == 0) {
+    if (menu->m_State == 0) {
         return;
     }
     item = items;
     count = 0;
     offset.x = 0.0f;
-    offset.y = -0.6f - (0.4f - menu->open * 0.4f);
+    offset.y = -0.6f - (0.4f - menu->m_Open * 0.4f);
     offset.z = 0.0f;
     for (i = 0; i < 8; i++) {
-        slot = &menu->slots[i];
-        if (slot->weapon == -1) {
+        slot = &menu->m_Items[i];
+        if (slot->m_Weapon == -1) {
             continue;
         }
-        if (i == menu->cursor) {
+        if (i == menu->m_nCursor) {
             target = D_800AE2D8 * 1.3f;
         } else {
             target = D_800AE2D8;
         }
         count++;
-        slot->scale = func_00211774(slot->scale, target, D_800AE2D8 * 0.1f);
+        slot->m_Scale = func_00211774(slot->m_Scale, target, D_800AE2D8 * 0.1f);
         func_0020F79C(m);
-        func_00210B38(m, slot->angle);
+        func_00210B38(m, slot->m_Angle);
         func_0020F85C(m, &offset, &position);
-        item->slot = i;
-        item->position = position;
-        item->icon = D_800AF618[slot->weapon]->icon;
-        item->unk14 = 1.0f;
-        item->size = 1.0f;
+        item->m_Item = i;
+        item->m_vPos = position;
+        item->m_Icon = D_800AF618[slot->m_Weapon]->icon;
+        item->m_Alpha = 1.0f;
+        item->m_Size = 1.0f;
         item++;
     }
     func_0024AF68(menu, items, count, arg2);

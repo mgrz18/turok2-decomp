@@ -4,13 +4,6 @@
 /* Flying AI steering, scaled by speed: like func_00260730, but the bank and
  * pitch ease faster when they have to swing to the other side. */
 
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x10C];
-    /* 0x10C */ f32 bank;
-    /* 0x110 */ f32 pitch;
-} AI;
-
 typedef struct {
     /* 0x00 */ u8 pad0[0x4C];
     /* 0x4C */ f32 turn;
@@ -26,9 +19,9 @@ typedef struct {
 s32 func_0025E428(CGameObjectInstance *self, void *ai);
 f32 func_0021160C(f32 value, f32 target, f32 step);
 f32 func_00211774(f32 cur, f32 target, f32 rate);
-void func_00245BAC(CGameObjectInstance *self, AI *ai, f32 angle, f32 turn);
+void func_00245BAC(CGameObjectInstance *self, CAI *ai, f32 angle, f32 turn);
 
-void func_00260D60(CGameObjectInstance *self, AI *ai, Steer *steer, Limits *limits, f32 speed, f32 turnRate) {
+void func_00260D60(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *limits, f32 speed, f32 turnRate) {
     f32 v;
     f32 max;
     f32 bank;
@@ -56,10 +49,10 @@ void func_00260D60(CGameObjectInstance *self, AI *ai, Steer *steer, Limits *limi
         if (bank < 0.0f) {
             bankSide = -1.0f;
         }
-        if (bankSide != (ai->bank < 0.0f ? -1.0f : 1.0f)) {
-            ai->bank = func_00211774(ai->bank, bank, 0.17453295f);
+        if (bankSide != (ai->m_VarF32[0] < 0.0f ? -1.0f : 1.0f)) {
+            ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], bank, 0.17453295f);
         } else {
-            ai->bank = func_00211774(ai->bank, bank, 0.087266475f);
+            ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], bank, 0.087266475f);
         }
         pitch = steer->turn * 0.75f;
         if (pitch > 0.436332345f) {
@@ -71,10 +64,10 @@ void func_00260D60(CGameObjectInstance *self, AI *ai, Steer *steer, Limits *limi
         if (pitch < 0.0f) {
             pitchSide = -1.0f;
         }
-        if (pitchSide != (ai->pitch < 0.0f ? -1.0f : 1.0f)) {
-            ai->pitch = func_00211774(ai->pitch, pitch, 0.3490659f);
+        if (pitchSide != (ai->m_VarF32[1] < 0.0f ? -1.0f : 1.0f)) {
+            ai->m_VarF32[1] = func_00211774(ai->m_VarF32[1], pitch, 0.3490659f);
         } else {
-            ai->pitch = func_00211774(ai->pitch, pitch, 0.17453295f);
+            ai->m_VarF32[1] = func_00211774(ai->m_VarF32[1], pitch, 0.17453295f);
         }
     }
 }

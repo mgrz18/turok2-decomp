@@ -1,28 +1,8 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* AI state: turn towards the target with the 10000 animation, the turn rate
  * depending on the stance; release the grabbed actor near the end of it. */
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ u8 padC[0x44 - 0xC];
-} VecDst;
-
-typedef struct {
-    /* 0x00 */ VecDst a;
-    /* 0x44 */ VecDst b;
-} Targets;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x36];
-    /* 0x036 */ u8 stance;
-    /* 0x037 */ u8 pad37[0x90];
-    /* 0x0C7 */ s8 animDone;
-    /* 0x0C8 */ u8 padC8[0x4C];
-    /* 0x114 */ u8 *held;
-} AI;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xD8];
@@ -33,13 +13,13 @@ typedef struct {
 } Self;
 
 s32 func_00219F74(void *self, s32 anim, s32 arg2);
-void func_00246108(void *self, AI *ai, Targets *out, s32 f1, s32 f2);
-void func_00245BAC(void *self, AI *ai, f32 angle, f32 arg3);
+void func_00246108(void *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
+void func_00245BAC(void *self, CAI *ai, f32 angle, f32 arg3);
 void func_00243414(void *self, void *ai, s32 mode);
 
-void func_0025F3A4(Self *self, AI *ai) {
-    Targets t;
-    u8 *held = ai->held;
+void func_0025F3A4(Self *self, CAI *ai) {
+    CAITargets t;
+    u8 *held = ai->m_VarPtr[2];
     f32 rate;
     s32 anim;
 
@@ -47,16 +27,16 @@ void func_0025F3A4(Self *self, AI *ai) {
     if (self->anim == anim) {
         func_00246108(self, ai, &t, 0, 1);
         rate = 0.26179942f;
-        if (ai->stance == 1 || ai->stance == 2) {
+        if (ai->m_ModeBefore == 1 || ai->m_ModeBefore == 2) {
             rate = 1.0471977f;
         }
-        func_00245BAC(self, ai, rate * 1.5f, t.a.unk8);
+        func_00245BAC(self, ai, rate * 1.5f, t.m_Sight.m_Angle);
         if (held != NULL && self->animLength * 0.7f <= self->animFrame) {
             func_00243414(held, held + 0x140, 2);
-            ai->held = NULL;
+            ai->m_VarPtr[2] = NULL;
         }
     }
-    if (ai->animDone) {
+    if (ai->m_AnimRepeatedCount) {
         func_00243414(self, ai, 10);
     }
 }

@@ -6,7 +6,6 @@
 #include "common.h"
 #include "structs/intelligence.h"
 struct LevelActor;
-struct CVector3_t;
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
@@ -20,13 +19,6 @@ struct Shared_ParticleLighting {
 } __attribute__((aligned(4)));
 struct Box;
 typedef struct Box Box;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Box;
 struct Box {
     CVector3 min;

@@ -1,16 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 extern f32 func_002119FC(f32 lo, f32 hi);
 extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
-
-/* Boss module state at 0x8012F9DC. */
-typedef struct {
-    /* 0x0 */ s32 mode;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ f32 timer;
-} BossState;
-extern BossState D_8012F9DC;
 
 void func_00407374(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {

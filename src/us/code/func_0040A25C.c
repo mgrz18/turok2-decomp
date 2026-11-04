@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Per-part callback of the module's actors: in part 0, fades the actor's two blend values in with the module
  * object's anim state (9: first value up to 1; 0x13: after a delay, second value up to 3 then back down to 1;
@@ -11,17 +12,11 @@ typedef struct {
 } ModuleObj;
 
 typedef struct {
-    /* 0x000 */ ModuleObj *obj;
-} State;
-
-
-typedef struct {
     /* 0x00 */ CGameObjectInstance *actor;
     /* 0x04 */ u8 pad4[0x90 - 0x4];
     /* 0x90 */ u32 part;
 } PartInfo;
 
-extern State D_8012FB70;
 extern f32 D_800B6D28; /* frame time */
 extern f32 D_800C1900; /* fade timer */
 extern s32 D_800C1904; /* second value reached its peak */

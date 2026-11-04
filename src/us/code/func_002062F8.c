@@ -1,11 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
-
-typedef struct {
-    /* 0x00 */ s32 resource;
-    /* 0x04 */ u8 pad4[8];
-    /* 0x0C */ s32 flags;
-} Resource;
+#include "structs/cache.h"
 
 /* The resource lists (0x800D81E0 on): every resident resource, the locked ones, and
  * at 0xBCC the free-slot count (D_800D8DAC). The word 8 bytes before is the last
@@ -23,10 +18,10 @@ extern s32 D_800D81D4;
 extern ResourceLists D_800D81E0;
 extern s32 D_800D8DAC;
 
-#define LAST_RESOURCE (((Resource **) &D_800D81E0)[-2])
+#define LAST_RESOURCE (((CMemEntry **) &D_800D81E0)[-2])
 
 /* Drops a resource from the lists and returns its slot to the free stack. */
-void func_002062F8(s32 arg0, Resource *arg1) {
+void func_002062F8(s32 arg0, CMemEntry *arg1) {
     s32 *flags = &arg1->flags;
 
     CList__Remove((s32) &D_800D81E0.resident, (s32) arg1);
@@ -37,6 +32,6 @@ void func_002062F8(s32 arg0, Resource *arg1) {
         LAST_RESOURCE = 0;
     }
     *flags = 0;
-    *(Resource **)((D_800D8DAC * 4) + D_800D81D4) = arg1;
+    *(CMemEntry **)((D_800D8DAC * 4) + D_800D81D4) = arg1;
     D_800D81E0.freeCount = (s32) (D_800D81E0.freeCount + 1);
 }

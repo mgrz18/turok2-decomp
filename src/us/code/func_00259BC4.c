@@ -1,11 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ f32 unk18;
-} WeaponDef;
+#include "structs/weapon.h"
 
 typedef struct {
     /* 0x00 */ f32 unk0;
@@ -14,7 +10,6 @@ typedef struct {
 
 s32 func_00275544(s16, CVector3, s32, s32);
 extern Tuning D_800A7348;
-extern WeaponDef *D_800AF618[];
 
 void func_00259BC4(CGameObjectInstance *obj, CAI *ai) {
     CVector3 *temp_v0;
@@ -24,5 +19,5 @@ void func_00259BC4(CGameObjectInstance *obj, CAI *ai) {
     temp_v0 = &temp_v1->m_vPos;
     func_00275544(0x1BB, *temp_v0, (s32) temp_v0, -1);
     ai->m_ModeTime = 0.0f;
-    *(f32 *) &ai->m_VarBuffer[3] = (f32) (D_800AF618[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->unk18 * D_800A7348.scale);
+    *(f32 *) &ai->m_VarBuffer[3] = (f32) (D_800AF618[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A7348.scale);
 }

@@ -38,10 +38,10 @@ f32 func_0021149C(f32 scale);
 void func_00275544(s16 sound, CVector3 pos, void *source, s32);
 
 static __inline__ void reset_strokes(CBarrel *s) {
-    s->m_nItems = 0;
-    s->unk_0x4 = 0.0f;
-    s->m_nLastItem = -1;
-    s->unk_0x8 = 0.0f;
+    s->m_State = 0;
+    s->m_Turn = 0.0f;
+    s->m_nCursor = -1;
+    s->m_Open = 0.0f;
 }
 
 /* Swimming: sway, move with the swimming tuning, and on surfacing (after two

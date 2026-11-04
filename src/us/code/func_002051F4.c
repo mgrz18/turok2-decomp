@@ -1,13 +1,5 @@
 #include "common.h"
-
-/* A cached resource (as in func_0020367C.c). */
-typedef struct CachedResource {
-    /* 0x00 */ void *data;
-    /* 0x04 */ u32 size;
-    /* 0x08 */ s32 count;           /* users */
-    /* 0x0C */ s32 flags;
-    /* 0x10 */ s32 stamp;
-} CachedResource;
+#include "structs/cache.h"
 
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
@@ -18,7 +10,7 @@ extern u8 D_800D8DB0[];                             /* the cache lock (OSMesgQue
 extern s32 D_800D8DCC;
 
 /* Releases one use of a resource; the last one clears its 0x100 flag. */
-void func_002051F4(s32 arg0, CachedResource *arg1) {
+void func_002051F4(s32 arg0, CMemEntry *arg1) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v0_2;
@@ -34,8 +26,8 @@ void func_002051F4(s32 arg0, CachedResource *arg1) {
     } else {
         __osRestoreInt(temp_a0);
     }
-    temp_v0 = arg1->count - 1;
-    arg1->count = temp_v0;
+    temp_v0 = arg1->lockCount - 1;
+    arg1->lockCount = temp_v0;
     if (temp_v0 == 0) {
         arg1->flags = (s32) (arg1->flags & ~0x100);
     }

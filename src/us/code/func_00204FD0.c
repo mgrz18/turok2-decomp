@@ -1,33 +1,24 @@
+#include "rw/junk_types.h" /* B12Node: a cached resource */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
 s32 func_002021F0(s32, s32, s32);
-s32 func_002031E8(s32, s32);
+B12Node *func_002031E8(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
-void func_002062F8(s32, s32);
-void func_00206498(s32, s32);
+void func_002062F8(s32, B12Node *);
+void func_00206498(s32, B12Node *);
 extern u8 D_800D1CC0[];
 extern u8 D_800D8DB0[];
 extern s32 D_800D8DCC;
-s32 func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
+B12Node *func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
   s32 temp_v0;
   s32 temp_v0_2;
   s32 temp_v1;
   s32 temp_v1_2;
-  s32 var_s0;
+  B12Node *var_s0;
   temp_a0 = __osDisableInt();
   temp_v1 = D_800D8DCC + 1;
   D_800D8DCC = temp_v1;
@@ -44,11 +35,11 @@ s32 func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
   if (var_s0 != 0)
   {
     temp_v0 = func_002021F0((s32) (D_800D1CC0), arg1, arg2);
-    *((s32 *) (((s8 *) var_s0) + 0)) = temp_v0;
+    var_s0->key = temp_v0;
     if (temp_v0 != 0)
     {
-      *((s32 *) (((s8 *) var_s0) + 4)) = arg2;
-      *((s32 *) (((s8 *) var_s0) + 0xC)) = (s32) ((*((s32 *) (((s8 *) var_s0) + 0xC))) | 3);
+      var_s0->unk4 = arg2;
+      var_s0->flags = var_s0->flags | 3;
       func_00206498(0, var_s0);
     }
     else

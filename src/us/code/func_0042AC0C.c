@@ -4,6 +4,7 @@
  * loop its register order, and the sound switch with one shared call keeps w in $s3. */
 #include "common.h"
 #include "structs/world.h"
+#include "structs/game.h"
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
@@ -24,7 +25,6 @@ extern u8 D_800D6D68[];
 extern u8 D_800E68B0[];
 extern u8 D_800E6A90[];
 extern u8 D_801102B8[];
-extern u8 D_80119870[];
 extern u8 *D_80119890; /* player list */
 extern u8 D_8011AAF1;  /* multiplayer */
 
@@ -118,7 +118,7 @@ loaded:
     func_00201C08(D_800D6D68);
     func_002053A8(0);
     if (w->m_nLevel != -1) {
-        ptr = func_002532A8(D_80119870);
+        ptr = func_002532A8(&D_80119870.m_PlayerList);
         if (ptr != NULL) {
             func_0042EB04(ptr);
         }
@@ -251,10 +251,10 @@ loaded:
         func_0021A344(p);
     }
     w->m_Mode = 4;
-    func_0042E894(D_80119870);
-    func_0042FEEC(D_80119870 + 0x40);
-    func_0027ECF0(D_80119870 + 0x40);
-    if (D_80119870[0x1281] != 0 || w->m_bStreamAll != 0) {
+    func_0042E894(&D_80119870.m_PlayerList);
+    func_0042FEEC(D_80119870.m_CameraPool);
+    func_0027ECF0(D_80119870.m_CameraPool);
+    if (D_80119870.m_Settings.multiplayer != 0 || w->m_bStreamAll != 0) {
         func_0042BF48(w);
     }
 }

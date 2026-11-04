@@ -31,7 +31,7 @@ extern f32 D_800A65F8;
 void func_00239254(B15Src *act, B15Src *src, s32 c, CVector3 pos, B15Blk8 k) {
     f32 vol = D_800A65F0;
     void *s = (void *)-1;
-    if (D_8011AAD8.unk1CC == 0 && func_00268E60(act) == k.c) {
+    if (D_8011AAD8.paused == 0 && func_00268E60(act) == k.c) {
         switch (src->type) {
         case 0:
             s = src->unk80;

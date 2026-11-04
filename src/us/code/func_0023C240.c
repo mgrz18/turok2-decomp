@@ -3,14 +3,6 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/ANIM/80241170.CPP, func_80241260_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Plane;
 typedef struct Plane Plane;
 struct Plane;

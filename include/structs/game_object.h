@@ -29,9 +29,9 @@ typedef struct {
     /* 0x00 */ f32 m_AnimationFrame;
     /* 0x04 */ s16 m_nAnimIndex;
     /* 0x06 */ s16 m_nRequestedAnimIndex;
-    /* 0x08 */ u16 m_nFrames;
-    /* 0x0A */ u8 m_bCycleCompleted;
-    /* 0x0B */ u8 m_bAnimActive;
+    /* 0x08 */ s16 m_nFrames;
+    /* 0x0A */ s8 m_bCycleCompleted;
+    /* 0x0B */ s8 m_bAnimActive;
     /* 0x0C */ u32 m_nAnimStartFrame;
     /* 0x10 */ struct CMemEntry *pmeAnimData;
 } CAnimationState; /* size 0x14 */
@@ -41,6 +41,37 @@ typedef struct {
     /* 0x01 */ u8 m_nCurrentPathIndex;
     /* 0x02 */ s16 m_nCurrentPointIndex;
 } CPathTrack; /* size 0x4 */
+
+/* One row of an AI's mode table (CAI::m_pModeTable, e.g. D_800B0A60: a
+ * 0x20-byte header row, then one row per mode; m_pModeCurrent points at the
+ * current one). The AI step calls m_pfCallback while the mode runs. */
+typedef struct CAIModeInfo {
+    /* 0x00 */ s32 m_Mode;
+    /* 0x04 */ s32 unk_04;
+    /* 0x08 */ s32 (*m_pfCallback)();
+    /* 0x0C */ void *m_pData;   /* D_800F1C20 in the enemy table */
+    /* 0x10 */ s32 unk_10;   /* a function in the mode rows */
+    /* 0x14 */ f32 m_AnimSpeed;   /* copied to CAI::m_AnimModeSpeed */
+    /* 0x18 */ s32 unk_18;
+    /* 0x1C */ u32 unk_1C;
+} CAIModeInfo; /* size 0x20 */
+
+/* CAI::m_VarBuffer as the enemy AI (func_0025BC70 sets it up) uses it: the
+ * definition's behaviour for each mode (CEnemyIntelligence::m_Behaviors[0],
+ * [1], m_UnderwaterBehavior) and which of them is current, and its timers
+ * (in frames, counted down by D_800B6D28). m_Timer and m_Timer2 run one after
+ * the other (func_0025F624 seeds both); when both are out the AI goes to
+ * mode 0x19, whose draw fades with m_Timer (func_0025BA80). */
+typedef struct {
+    /* 0x00 */ u8 _pad0[0x14];
+    /* 0x14 */ f32 m_AttackDelay;   /* no projectile/weapon attack until it is out */
+    /* 0x18 */ u8 _pad18[0x20 - 0x18];
+    /* 0x20 */ f32 m_IdleTimer;
+    /* 0x24 */ s8 m_Behavior[3];
+    /* 0x27 */ s8 m_BehaviorIndex;
+    /* 0x28 */ f32 m_Timer;
+    /* 0x2C */ f32 m_Timer2;
+} CEnemyAIVars; /* size 0x30 */
 
 /* AI state embedded in every game object at 0x140. Health is 24.8 fixed point. */
 typedef struct {
@@ -106,7 +137,21 @@ typedef struct {
     /* 0x100 */ void *m_pfHit;
     /* 0x104 */ void *m_pfCalculateOrientationMatrix;
     /* 0x108 */ void *m_pfEffects;
-    /* 0x10C */ u32 m_VarBuffer[12];
+    /* 0x10C */ union {
+        /* Each AI type keeps its own state here (timers, counters, a
+         * second target...), read through the view of the type it needs. */
+        /* 0x10C */ u32 m_VarBuffer[12];
+        /* 0x10C */ s32 m_VarS32[12];
+        /* 0x10C */ f32 m_VarF32[12];
+        /* 0x10C */ void *m_VarPtr[12];
+        /* 0x10C */ struct CGameObjectInstance *m_VarObj[12];
+        /* 0x10C */ CVector3 m_VarVec3[4];
+        /* 0x10C */ s16 m_VarS16[24];
+        /* 0x10C */ u16 m_VarU16[24];
+        /* 0x10C */ s8 m_VarS8[48];
+        /* 0x10C */ u8 m_VarU8[48];
+        /* 0x10C */ CEnemyAIVars m_Enemy;
+    };
 } CAI; /* size 0x13C */
 
 typedef struct CGameObjectInstance {
@@ -148,5 +193,38 @@ typedef struct CGameObjectInstance {
     /* 0x280 */ s32 m_dwUniqueID;
     /* 0x284 */ s32 _pad2;
 } CGameObjectInstance; /* size 0x288 */
+
+/* A dynamic object (an actor spawned at run time, an effect...): the
+ * instance followed by its links in the world's object lists (CList, links
+ * at m_LastOffset 0x288 / m_NextOffset 0x28C: the active list D_8010FEB4,
+ * the free list D_8010FEA0) and the counter it decrements when it goes. */
+typedef struct CListedInstance {
+    /* 0x000 */ CGameObjectInstance m_Instance;
+    /* 0x288 */ struct CListedInstance *m_pPrev;
+    /* 0x28C */ struct CListedInstance *m_pNext;
+    /* 0x290 */ s32 *m_pOwnerCount;
+} CListedInstance; /* size 0x294 */
+
+/* What an AI aims at this frame: func_002449E0 fills one from CAI's
+ * m_pSightTarget, func_00244338 one from m_pPathTarget (or the home point, a
+ * location, the actor itself when there is none; m_Kind says which). The
+ * position, the offset from the actor and its length, in 3D and flattened. */
+typedef struct {
+    /* 0x00 */ s32 m_Kind;
+    /* 0x04 */ struct CGameObjectInstance *m_pTarget;
+    /* 0x08 */ f32 m_Angle;   /* the turn to face it */
+    /* 0x0C */ CVector3 m_vPos;
+    /* 0x18 */ CVector3 m_vDelta;
+    /* 0x24 */ f32 m_Dist;
+    /* 0x28 */ CVector3 m_vFlatPos;
+    /* 0x34 */ CVector3 m_vFlatDelta;
+    /* 0x40 */ f32 m_FlatDist;
+} CAITarget; /* size 0x44 */
+
+/* The pair the AI callbacks hand each other (func_00246108 fills both). */
+typedef struct {
+    /* 0x00 */ CAITarget m_Sight;
+    /* 0x44 */ CAITarget m_Path;
+} CAITargets; /* size 0x88 */
 
 #endif

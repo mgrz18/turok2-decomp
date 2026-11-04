@@ -644,7 +644,8 @@ rewrite taught about the compiler:
 
 The readability pass left each file with local structs where no header fit;
 the struct consolidation then moved the biggest families into shared
-headers, seven branches merged with every function still matching
+headers, in two passes of seven branches each, merged with every function
+still matching
 (docs/STRUCTS_TODO.md has what stayed local and why, and what is next). A
 file includes the header of the object it touches rather than declaring a
 view of its own. `tools/check_structs.py structs/<name>.h` checks every
@@ -654,23 +655,38 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | Header | Holds |
 |---|---|
 | `structs/vector.h` | CVector3, CQuaternion, CMtxF: the engine math types (included by game_object.h) |
-| `structs/game_object.h` | CGameObjectInstance (0x288, an "actor") and its parts: CInstanceHeader, CAnimationState, CPathTrack, CAI (the AI state at 0x140) |
+| `structs/game_object.h` | CGameObjectInstance (0x288, an "actor") and its parts: CInstanceHeader, CAnimationState, CPathTrack, CAI (the AI state at 0x140, with typed views of its per-type m_VarBuffer and CEnemyAIVars), CAIModeInfo (a mode-table row), CAITarget / CAITargets (what the AI aims at), CListedInstance (an instance with its world-list links, 0x294) |
 | `structs/intelligence.h` | CIntelligence, the definition `header.m_pIntelligence` points at: a common header and a union of per-type bodies (CEnemyIntelligence, CTurretIntelligence, CDoorIntelligence, CPlatformIntelligence, CGeneratorIntelligence, CActionIntelligence, CPlayerIntelligence...), Rage Wars' names (included by game_object.h) |
-| `structs/player.h` | CPlayer (0x1328) and the HUD: COverlay, COnScreen, CPlayerOverlay, CPlayerContState, CBarrel (the weapon wheel), CPlayerLoadSaveData (the save blob), CPlayerList / CPlayerCList (D_80119890) |
+| `structs/player.h` | CPlayer (0x1328) and the HUD: COverlay, COnScreen, CPlayerOverlay, CPlayerContState, CPlayerLoadSaveData (the save blob); includes controller.h, player_list.h and weapon.h |
+| `structs/player_list.h` | CPlayerList / CPlayerCList: the player list at the start of CGame (D_80119870; its active list is D_80119890) |
 | `structs/player_options.h` | CPlayerOptions (0x40): a player's options and per-opponent counts, `CPlayer::m_pOptions`; GameSettings holds five (included by player.h and game.h) |
-| `structs/game.h` | GameSettings (D_8011AAD8, the game settings and the multiplayer setup) and GameMatch (D_8011ACB0, the play clock and the running match's rules) |
+| `structs/game.h` | GameSettings (D_8011AAD8, the game settings and the multiplayer setup, with the engine's mode block at 0x1A8), GameMatch (D_8011ACB0, the play clock and the running match's rules) and CEngineApp (D_800F6CB0, which holds GameSettings at 0x23E28); CGame (D_80119870: the player list, the camera pool D_801198B0 and its menu pool D_80119E2C, the settings) |
 | `structs/world.h` | CWorld (D_800F7078, 0x19078): the resource files, the loaded level, its actor lists and pools, the warp state; CWarpPoint, CWorldSector, CWorldRecord, CLevelHeader, CGeomHeader |
 | `structs/region.h` | CGameRegion (the floor triangles an object's `m_pCurrentRegion` points to, linked to their neighbours) and CRegionInfo (the attributes they share by index) |
-| `structs/camera.h` | CCamera and CCameraPool, with CCameraViewParams, CCameraViewport, CShake, CCameraText, CList, CPlane |
-| `structs/menu.h` | the menu system: Menu (a window), MenuItem, MenuItemDesc, MenuDesc, MenuItemLayout, MenuController, MenuColor, MenuPool |
-| `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo, and the libaudio types it uses (ALHeap, ALBank, ALInstrument, ALFilter, ALMainBus, ALAuxBus, Acmd) |
+| `structs/camera.h` | CCamera and CCameraPool, with CCameraViewParams, CCameraViewport, CShake, CCameraText, CPlane |
+| `structs/list.h` | CList, Acclaim's intrusive list (the IntrusiveList of the Rage Wars decomp; included by camera.h) |
+| `structs/cache.h` | the resource cache: CMemEntry (a loaded block: data, size, lock count, flags, age) and CCacheEntry (a load request), Turok 3's names |
+| `structs/pak.h` | the Controller Pak menus: PakDirectory (D_800C2224, the cached note directory per channel), RumblePak (D_80130AA0), PakProfile (the 0x18-byte "T2 MULTI" note, D_80130968), PakQuery; the OSPfs per channel is D_80130C80 |
+| `structs/menu.h` | the menu system: Menu (a window), MenuItem, MenuItemDesc, MenuDesc, MenuItemLayout, MenuColor, MenuPool (a window's controller is a ControllerProfile) |
+| `structs/controller.h` | ControllerProfile (D_800F5EC0[4], 0x224): a controller's buttons (held, single, double, repeat...), stick and Rumble Pak state, `CPlayer::m_ContState.m_pContState`; rw/abu_types.h includes it |
+| `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo (includes libaudio.h) |
+| `structs/libaudio.h` | the libaudio types the sound manager and the imported libaudio code share: ALHeap, ALBank, ALBankFile, ALInstrument, ALFilter, ALMainBus, ALAuxBus, Acmd |
+| `structs/weapon.h` | the weapons: WeaponInfo (the weapon table D_800AF618) and its AmmoInfo, CBarrel (the weapon wheel, CPlayer m_Barrel) with CBarrelItem and CBarrelIcon (included by player.h) |
+| `structs/cinema.h` | the cinema (cutscene) state Cinema (*D_800C1BB0, 0x100) and CinemaEntry / CinemaTable |
+| `structs/boss.h` | the boss and level-script state of the VM modules: LevelScriptState (D_8012F608, with the BossState / BossMode views at D_8012F9D8 / D_8012F9DC, BossStep and the three script runners), MotherBossState (D_8012FB70, its BossWeakSpot), BlindOneState (D_80130200) with the Blind One's script VM (BlindOneStep, BlindOnePhase: the phase tables D_0043240C / D_0043232C, BlindOneMover), ScriptAnimator (the 0x64-byte value/colour animator: lights, weak spots, hit flashes) |
 | `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
-| `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs and the Controller Pak internals, plus the engine's CMutex |
+| `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs, OSPfsState and the Controller Pak internals, plus the engine's CMutex |
 | `gfx.h` | Gfx (w0/w1) and the display-list pointer the engine appends to |
 
-The imported Rage Wars files still take their types from `include/rw/`
-(abu_types.h, junk_types.h, ultralib_types.h), which repeat some of these
-under Rage Wars' names and layouts.
+The imported Rage Wars files still take their own types from `include/rw/`
+(abu_types.h, junk_types.h, ultralib_types.h), but those headers include
+the shared ones above instead of repeating them, so a file can include an
+rw header together with any shared header. Where a Rage Wars type had the
+same name and another layout it was renamed (abu's float matrix is RW_Mtx,
+not gbi.h's Mtx). junk_types.h and abu_types.h still disagree with each
+other on some libaudio internals (ALEvent, ALEventQueue, ALVoice,
+ALVoiceState, ALSound, ALSoundState, ALSynConfig, ALEnvMixer, ALMIDIEvent,
+ALTempoEvent, ALMicroTime), so those two cannot be included together yet.
 
 ## The fast assembler
 

@@ -1,45 +1,21 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Picks a random point on the ground around the origin: a distance in the phase's range
  * [unk688, unk68C] and a random angle in [-pi, pi]. */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ s32 count;
-    /* 0x008 */ CGameObjectInstance *actors[4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ u8 pad630[0x65C - 0x630];
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ s32 activeMask;
-    /* 0x664 */ s32 unk664;
-    /* 0x668 */ u8 pad668[0x674 - 0x668];
-    /* 0x674 */ s32 unk674;
-    /* 0x678 */ s32 unk678;
-    /* 0x67C */ s32 counter;
-    /* 0x680 */ u8 pad680[0x688 - 0x680];
-    /* 0x688 */ s32 unk688;
-    /* 0x68C */ s32 unk68C;
-} State;
-
-extern State D_8012FB70;
 extern f32 func_002119FC(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
 
 void func_0040C110(CVector3 *out) {
-    State *state = &D_8012FB70;
+    MotherBossState *state = &D_8012FB70;
     f32 dist;
     f32 angle;
     f32 z;
 
-    dist = func_002119FC((f32)state->unk688, (f32)state->unk68C);
+    dist = func_002119FC((f32)state->minRadius, (f32)state->maxRadius);
     angle = func_002119FC(-3.1415927f, 3.1415927f);
     out->x = dist * func_002982F0(angle);
     z = dist * func_002974C0(angle);

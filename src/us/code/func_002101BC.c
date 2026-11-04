@@ -6,7 +6,7 @@
 extern f32 func_00298470(f32);
 void func_002101BC(void *arg0, f32 *arg1) {
     Matrix *m = arg0;
-    Vec3 tmp;
+    CVector3 tmp;
     tmp.x = m->m[0];
     tmp.y = m->m[1];
     tmp.z = m->m[2];

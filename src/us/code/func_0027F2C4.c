@@ -1,6 +1,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/camera.h"
+#include "structs/game.h"
 
 
 typedef struct {
@@ -19,7 +20,6 @@ extern s32 D_800C2034;              /* screen height */
 extern Gfx *D_800D8E24;             /* display list head */
 extern GfxTask *D_800F7070;
 extern s32 D_80130940;
-extern u8 D_80119870[];
 extern Gfx D_800AB100[];
 extern Gfx D_800AB130[];
 
@@ -31,7 +31,7 @@ void func_0027C1E8(CCamera *cam);
 void func_002800A0(CCameraPool *pool, CCamera *cam);
 void func_00416AA4(void *menuPool);
 void func_0027F64C(CCamera *cam);
-void func_0025328C(void *game, CCamera *cam);
+void func_0025328C(CPlayerList *list, CCamera *cam);
 
 /* Updates every camera of the pool, then the main camera. While
  * D_800F5A44 counts down, the frame is first cleared to black. */
@@ -95,10 +95,10 @@ void func_0027F2C4(CCameraPool *pool, void *world) {
         func_0027C1E8(main);
     }
     func_002800A0(pool, main);
-    if (D_80119870[0x1281] != 0) {
+    if (D_80119870.m_Settings.multiplayer != 0) {
         cam = pool->m_ActiveList.m_pHead;
         if (cam != NULL) {
-            func_0025328C(D_80119870, cam);
+            func_0025328C(&D_80119870.m_PlayerList, cam);
         }
     }
     func_00416AA4(pool->m_MainCamera.m_MenuPool);

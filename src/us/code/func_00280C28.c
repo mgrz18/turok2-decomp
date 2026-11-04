@@ -7,7 +7,7 @@ extern f32 D_800A9BD4;
 extern f32 D_800A9BD8;
 extern s32 D_800B6D00[];
 void func_00280C28(ObjInit *o) {
-    Vec3f *p;
+    CVector3 *p;
     f32 z;
     o->unk20.i = 0;
     z = o->unk20.f;

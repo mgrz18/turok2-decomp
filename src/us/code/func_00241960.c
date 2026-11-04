@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 
 typedef f32 Mtx4[4][4];
@@ -19,11 +20,6 @@ typedef struct Def {
     BoxInfo info;      /* 0x14 */
 } Def;
 
-typedef struct AI {
-    char pad0[0x11C];
-    f32 angle;         /* 0x11C */
-} AI;
-
 typedef struct Mover {
     char pad0[4];
     CVector3 pos;          /* 0x04 */
@@ -33,7 +29,7 @@ typedef struct Mover {
     CQuaternion rotation;     /* 0x40 */
     f32 spin;          /* 0x50 */
     char pad54[0x140 - 0x54];
-    AI ai;             /* 0x140 */
+    CAI ai;             /* 0x140 */
 } Mover;
 
 typedef struct Collider {
@@ -64,7 +60,7 @@ void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
     CQuaternion q;
     CQuaternion spin;
     BoxInfo *info;
-    AI *ai;
+    CAI *ai;
     f32 halfX;
     f32 halfZ;
     f32 height;
@@ -168,7 +164,7 @@ void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
         points[6].z = minZ;
         points[7].z = minZ;
 
-        func_00210518(&rot, ai->angle);
+        func_00210518(&rot, ai->m_VarF32[4]);
         sinHalf = func_002982F0(mover->spin * 0.5f);
         q.x = 0.0f;
         q.y = sinHalf;

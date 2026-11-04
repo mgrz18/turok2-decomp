@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x00 */ char pad0[0x4];
@@ -20,17 +21,10 @@ typedef struct {
     /* 0xA8 */ s32 region;
 } Spawn40E00C;
 
-typedef struct {
-    /* 0x000 */ char pad0[0x50C];
-    /* 0x50C */ s32 count454;
-    /* 0x510 */ s32 count455;
-    /* 0x514 */ s32 count456;
-} Stats80130200;
-
-extern Stats80130200 D_80130200;
+extern BlindOneState D_80130200;
 
 void func_0040E00C(Actor40E00C *actor, Spawn40E00C *spawn) {
-    Stats80130200 *stats;
+    BlindOneState *stats;
 
     spawn->unk28 = 0;
     spawn->unk24 = 0;
@@ -40,13 +34,13 @@ void func_0040E00C(Actor40E00C *actor, Spawn40E00C *spawn) {
     stats = &D_80130200;
     switch (actor->type) {
         case 0x454:
-            stats->count454++;
+            stats->alive1++;
             break;
         case 0x455:
-            stats->count455++;
+            stats->alive2++;
             break;
         case 0x456:
-            stats->count456++;
+            stats->alive3++;
             break;
     }
 }

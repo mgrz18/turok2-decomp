@@ -9,31 +9,11 @@ typedef struct {
     f32 m[4][4];
 } Mtx4;
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ u8 padC[0x44 - 0xC];
-} VecDst;
-
-typedef struct {
-    /* 0x00 */ VecDst a;
-    /* 0x44 */ VecDst b;
-} Targets;
-
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x40];
-    /* 0x40 */ f32 timer;
-    /* 0x44 */ u8 pad44[0x3C];
-    /* 0x80 */ CGameObjectInstance *obstacle;
-} AI;
-
-void func_00246108(CGameObjectInstance *self, AI *ai, Targets *out, s32 f1, s32 f2);
-void func_00245BAC(CGameObjectInstance *self, AI *ai, f32 angle, f32 arg3);
-f32 func_0025EB50(CGameObjectInstance *self, AI *ai, f32 lo, f32 hi);
-void func_00243414(CGameObjectInstance *self, AI *ai, s32 mode);
-s32 func_002451AC(CGameObjectInstance *self, AI *ai, CGameObjectInstance *target, f32 angle);
+void func_00246108(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
+void func_00245BAC(CGameObjectInstance *self, CAI *ai, f32 angle, f32 arg3);
+f32 func_0025EB50(CGameObjectInstance *self, CAI *ai, f32 lo, f32 hi);
+void func_00243414(CGameObjectInstance *self, CAI *ai, s32 mode);
+s32 func_002451AC(CGameObjectInstance *self, CAI *ai, CGameObjectInstance *target, f32 angle);
 void func_002105A4(f32 m[4][4], f32 angle);
 void func_0020F85C(f32 m[4][4], CVector3 *in, CVector3 *out);
 void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -51,17 +31,17 @@ static __inline__ void sidestep(CGameObjectInstance *self, s32 side) {
     func_0020EEF8(&self->m_vVelocity, &self->m_vVelocity, &dir);
 }
 
-void func_00260B40(CGameObjectInstance *self, AI *ai) {
-    Targets t;
+void func_00260B40(CGameObjectInstance *self, CAI *ai) {
+    CAITargets t;
     s32 side;
 
     func_00246108(self, ai, &t, 1, 1);
-    func_00245BAC(self, ai, 0.13962635f, t.a.unk8);
-    if (func_0025EB50(self, ai, 60.0f, 30.0f) < ai->timer) {
+    func_00245BAC(self, ai, 0.13962635f, t.m_Sight.m_Angle);
+    if (func_0025EB50(self, ai, 60.0f, 30.0f) < ai->m_ModeTime) {
         func_00243414(self, ai, 4);
     }
-    if (ai->obstacle != NULL) {
-        side = func_002451AC(self, ai, ai->obstacle, 0.3490659f);
+    if (ai->m_pSightTarget != NULL) {
+        side = func_002451AC(self, ai, ai->m_pSightTarget, 0.3490659f);
         if (side != 0) {
             sidestep(self, side);
         } else {

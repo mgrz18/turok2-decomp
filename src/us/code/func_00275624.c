@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00270C80(void *, s32, Vec3, s32, s32);
+extern s32 func_00270C80(void *, s32, CVector3, s32, s32);
 extern s32 func_002718C4(struct ContextRecAt2BC0 *arg0);
 extern void func_002718BC(struct ContextRecAt2BC0 *arg0, s32 arg1);
 extern int func_002718C4(struct ContextRecAt2BC0 *arg0);
@@ -17,7 +17,7 @@ s32 func_00275624(s32 arg0) {
         return -1;
     }
     {
-        Vec3 vec;
+        CVector3 vec;
         register f32 zero = 0.0f;
         vec.z = zero;
         vec.y = zero;

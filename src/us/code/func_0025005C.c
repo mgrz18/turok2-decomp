@@ -1,17 +1,13 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ CVector3 *corners[3];
 } Floor;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC6];
-    /* 0xC6 */ s8 stickX;
-    /* 0xC7 */ s8 stickY;
-} Controller;
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
@@ -53,8 +49,8 @@ void func_0025005C(CPlayer *player, Body *body) {
         player->m_Mode = 1;
     }
     player->m_vHeadRotOffset.z = 0.0f;
-    func_002117DC(&body->yaw, body->yaw + ((Controller *)player->m_ContState.m_pContState)->stickX * 0.0043633236f, 0.9f);
-    func_002117DC(&player->m_vHeadRotOffset.x, player->m_vHeadRotOffset.x + -((Controller *)player->m_ContState.m_pContState)->stickY * 0.0021816618f, 0.9f);
+    func_002117DC(&body->yaw, body->yaw + player->m_ContState.m_pContState->stickX * 0.0043633236f, 0.9f);
+    func_002117DC(&player->m_vHeadRotOffset.x, player->m_vHeadRotOffset.x + -player->m_ContState.m_pContState->stickY * 0.0021816618f, 0.9f);
     if (player->m_ContState.m_FinalMoveY != 0.0f) {
         player->m_Speed = func_0021160C(player->m_Speed, player->m_ContState.m_FinalMoveY * 8.533333f,
                                         ABS(player->m_ContState.m_FinalMoveY) * 102.399994f);

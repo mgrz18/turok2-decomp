@@ -4,9 +4,10 @@
 /* The player and the HUD. Layouts and names from LibTEngine's Turok 2 types
  * (Drahsid/LibTEngine, lib/libtengine/lib/types: CPlayer.h, COverlay.h,
  * COnScreen.h...), with these departures:
- *   - CBarrel (the weapon wheel) has only the fields the code reads:
- *     LibTEngine's offsets jump from 0x00C to 0x100 and its 36-entry list
- *     does not fit the space, while its size, 0x394, is what CPlayer leaves;
+ *   - CBarrel (the weapon wheel) is in structs/weapon.h, laid out from the
+ *     code: LibTEngine's offsets jump from 0x00C to 0x100 and its 36-entry
+ *     list does not fit the space, while its size, 0x394, is what CPlayer
+ *     leaves;
  *   - checked against the code (the local Player views of ~180 files):
  *     CPlayerLoadSaveData is 0x4E8 (no m_dwLevelMissionObjFlags: the level
  *     intro and first-time masks are followed by the nuke parts at 0x4DC),
@@ -20,6 +21,9 @@
 #include "structs/game_object.h"
 #include "structs/gbi.h"
 #include "structs/player_options.h"
+#include "structs/controller.h"
+#include "structs/player_list.h"
+#include "structs/weapon.h"
 
 /* A HUD element: health, ammo, lives, air... slide in, fade, show a value. */
 typedef struct {
@@ -87,7 +91,7 @@ typedef struct {
     /* 0x04 */ f32 m_LookY;
     /* 0x08 */ f32 m_MoveX;
     /* 0x0C */ f32 m_MoveY;
-    /* 0x10 */ struct CContState *m_pContState;
+    /* 0x10 */ struct ControllerProfile *m_pContState; /* structs/controller.h */
     /* 0x14 */ f32 m_FinalLookX;
     /* 0x18 */ f32 m_FinalLookY;
     /* 0x1C */ f32 m_FinalMoveX;
@@ -98,17 +102,6 @@ typedef struct {
     /* 0x30 */ u32 m_dwButtonsDouble;
     /* 0x34 */ u32 m_dwButtonsRepeat;
 } CPlayerContState; /* size 0x38 */
-
-/* The weapon wheel (the "barrel"), reset to 0 items and no last item. */
-typedef struct {
-    /* 0x000 */ s32 m_nItems;
-    /* 0x004 */ f32 unk_0x4;
-    /* 0x008 */ f32 unk_0x8;
-    /* 0x00C */ u8 unk_0xC[0x37C - 0xC];
-    /* 0x37C */ s32 m_nLastItem;
-    /* 0x380 */ s32 m_bUnderwater;        /* the wheel's underwater variant */
-    /* 0x384 */ u8 unk_0x384[0x394 - 0x384];
-} CBarrel; /* size 0x394 */
 
 /* What a save game keeps of the player. Health is 24.8 fixed point. */
 typedef struct {
@@ -266,25 +259,6 @@ typedef struct CPlayer {
     /* 0x1324 */ s32 _pad3;                      /* sizeof is a multiple of 8 (Mtx) */
 } CPlayer; /* size 0x1328 */
 
-/* Acclaim's intrusive list (CList in structs/camera.h) holding players. */
-typedef struct {
-    /* 0x00 */ CPlayer *m_pHead;
-    /* 0x04 */ CPlayer *m_pTail;
-    /* 0x08 */ s32 m_LastOffset;
-    /* 0x0C */ s32 m_NextOffset;
-    /* 0x10 */ s32 m_nCount;
-} CPlayerCList; /* size 0x14 */
-
-/* All players (D_80119870, the start of the engine's globals; its active
- * list is D_80119890): the idle ones and the ones in the game. */
-typedef struct {
-    /* 0x00 */ struct CMemEntry *m_pmePlayers;
-    /* 0x04 */ CPlayer *m_Players;
-    /* 0x08 */ s32 m_nPlayers;
-    /* 0x0C */ CPlayerCList m_IdleList;
-    /* 0x20 */ CPlayerCList m_ActiveList;
-    /* 0x34 */ s32 m_bCinema;                    /* a cinema runs for the players */
-    /* 0x38 */ s32 m_bCinemaStarted;
-} CPlayerList; /* 0x3C known */
+/* CPlayerCList and CPlayerList (D_80119870) are in structs/player_list.h. */
 
 #endif

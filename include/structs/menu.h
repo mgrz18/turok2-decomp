@@ -6,11 +6,12 @@
  * controller a window reads. Layouts from the menu VM (func_00413230.c,
  * copied as func_0044C230.c) and the item callbacks; names after Rage Wars
  * (CMenuItem_t and WidgetDescriptor in references/rw_abu/include/MENU/OBJECT1C8.H,
- * ControllerProfile in rw/abu_types.h) where it has them.
+ * ControllerProfile in structs/controller.h) where it has them.
  * An item callback is called as callback(MenuItem *item, Menu *menu, ...).
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
 #include "common.h"
+#include "structs/controller.h"
 
 struct Menu;
 struct MenuItem;
@@ -95,19 +96,6 @@ typedef struct MenuDesc {
     /* 0x20 */ s32 param;           /* handed to the window as its param */
 } MenuDesc; /* size 0x24 */
 
-/* The controller a window reads: a view of Rage Wars' ControllerProfile
- * (rw/abu_types.h). */
-typedef struct MenuController {
-    /* 0x00 */ u8 _pad0[4];
-    /* 0x04 */ s8 port;
-    /* 0x05 */ u8 _pad5[0xA0 - 0x5];
-    /* 0xA0 */ u8 body[0xB0 - 0xA0]; /* its address is what func_004162E4 returns */
-    /* 0xB0 */ u32 buttons;
-    /* 0xB4 */ s32 connection;
-    /* 0xB8 */ u8 _padB8[4];
-    /* 0xBC */ s32 history;
-} MenuController;
-
 /* One of a window's 2x8 colour records, from the table D_800C1CD2. */
 typedef struct MenuColor {
     /* 0x00 */ u16 w0;
@@ -135,7 +123,7 @@ typedef struct Menu {
     /* 0x014 */ MenuDesc *desc;
     /* 0x018 */ s32 param;
     /* 0x01C */ struct CPlayer *player; /* structs/player.h */
-    /* 0x020 */ MenuController *controller;
+    /* 0x020 */ ControllerProfile *controller; /* structs/controller.h */
     union {
     /* 0x024 */ void *context;      /* the opener's argument */
     /* 0x024 */ char *text;

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0020EF8C(Vec3 *arg0, s32 arg1, void *arg2, void *arg3);
+extern void func_0020EF8C(CVector3 *arg0, s32 arg1, void *arg2, void *arg3);
 void func_0021794C(void *arg0, s32 arg1, void *arg2) {
     extern void *func_002017D4(void *arg0, s32 arg1);
     ObjectLinks24_2 *o = arg0;

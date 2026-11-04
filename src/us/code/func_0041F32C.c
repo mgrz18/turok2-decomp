@@ -1,11 +1,9 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00407748.c, func_00407748.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned int u32;
-typedef signed int s32;
+#include "common.h"
+#include "structs/pak.h"
+
 void *func_00266C5C(void *s, int c, u32 n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
 typedef struct K7Obj {
@@ -16,7 +14,6 @@ typedef struct K7Obj {
     s32 f1C;
     K7Sub *f20;
 } K7Obj;
-typedef struct K7Blk { s32 w[6]; } K7Blk;
 typedef struct K7Mem { s32 addr; } K7Mem;
 extern s32 D_800F70A8;
 extern s32 D_80130990;
@@ -27,8 +24,8 @@ extern s32 D_80130994;
 extern s32 D_801309B4;
 extern s32 D_801309C4;
 extern s32 D_80130988;
-extern K7Blk D_80130968;
-extern K7Blk D_80130948;
+extern PakProfile D_80130968;
+extern PakProfile D_80130948;
 extern u8 D_800B45C0[];
 extern u8 D_800B45CC[];
 extern u8 D_800B45D4[];
@@ -116,7 +113,7 @@ s32 func_0041F32C(s32 *arg0, K7Obj *arg1) {
     __asm__("" : : "r"(s3));
     if (s3 == 0) goto L004079A0;
     if (func_004265B0(s4, s5, &D_80130968, 0x18) != 0) goto L0040799B;
-    if (func_00426E78(&D_80130968, 0x14, 4) != D_80130968.w[5]) goto L0040799B;
+    if (func_00426E78(&D_80130968, 0x14, 4) != D_80130968.checksum) goto L0040799B;
     s3 = 0;
     D_80130948 = D_80130968;
     D_801309C4 = s5;
@@ -193,7 +190,7 @@ L00407BBC:
     if (sp48 == 0) goto L00407EE8;
     if (func_00426D54(sp38, D_800B45C0) != 0) goto L00407EE8;
     if (func_004265B0(s4, s5, &D_80130968, 0x18) != 0) goto L00407CD0;
-    if (func_00426E78(&D_80130968, 0x14, 4) != D_80130968.w[5]) goto L00407CD0;
+    if (func_00426E78(&D_80130968, 0x14, 4) != D_80130968.checksum) goto L00407CD0;
     D_80130948 = D_80130968;
     func_00416644(D_80119E2C, D_0043BA50, arg1->f1C, arg1->f20, 0);
     return 1;

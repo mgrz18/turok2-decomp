@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 
 /* When the player (D_800F1CE0) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
@@ -20,17 +21,6 @@ typedef struct {
 } Obj;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ u8 pad8[0x34 - 0x8];
-    /* 0x34 */ u8 state;
-    /* 0x35 */ u8 pad35[0x80 - 0x35];
-    /* 0x80 */ Player *target;
-    /* 0x84 */ u8 pad84[0x88 - 0x84];
-    /* 0x88 */ Player *target2;
-} CAI;
-
-typedef struct {
     u8 data[0x18];
 } DamageEvent;
 
@@ -47,8 +37,8 @@ void func_0040BFF0(Obj *obj, CAI *ai) {
     CVector3 dir;
     Player *player = D_800F1CE0;
 
-    if (player != NULL && player->kind == 1 && (player->flags & 0x300000) && ai->unk4 != 0 &&
-        (ai->state == 0xE || ai->state == 0xF) && (player == ai->target || player == ai->target2)) {
+    if (player != NULL && player->kind == 1 && (player->flags & 0x300000) && ai->m_Health != 0 &&
+        (ai->m_Mode == 0xE || ai->m_Mode == 0xF) && (player == ai->m_pSightTarget || player == ai->m_pPathTarget)) {
         dir.x = 0.0f;
         dir.y = 0.0f;
         dir.z = 512.0f;

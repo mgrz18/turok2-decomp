@@ -1,12 +1,4 @@
-typedef int s32;
-typedef short s16;
-
-typedef struct {
-    char pad0[0x14];
-    s32 flags;                  /* 0x14 */
-} Entry;
-
-extern Entry *D_800AF618[];
+#include "structs/weapon.h"
 
 s32 func_002572FC(s16 id, s32 mode) {
     switch (mode) {

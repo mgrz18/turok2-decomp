@@ -2,27 +2,11 @@
  * work there too). Same source, its own strings and pool. */
 #include "common.h"
 #include "structs/game_object.h"
+#define BOSS_STAGE_AS_WORD
+#include "structs/boss.h"
 
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ CGameObjectInstance *obj;
-    /* 0x08 */ f32 angle;
-    /* 0x0C */ CVector3 a;
-    /* 0x18 */ CVector3 b;
-    /* 0x24 */ f32 dist;
-    /* 0x28 */ u8 pad28[0x88 - 0x28];
-} Targets;
-
-/* One step of a boss attack script (0x14 bytes). */
-typedef struct {
-    /* 0x00 */ u8 type;
-    /* 0x04 */ s32 arg;
-    /* 0x08 */ f32 animSpeed;
-    /* 0x0C */ s32 chance;
-    /* 0x10 */ f32 delay;
-} BossStep;
-
-/* Boss module state from 0x8012F604 (offsets below are from 0x8012F608). */
+/* LevelScriptState (structs/boss.h) seen from 0x8012F604, one word before it
+ * (offsets below are from 0x8012F608): the ROM addresses it through D_8012F604. */
 typedef struct {
     /* -0x04 */ s32 padF604;
     /* 0x000 */ s32 stage;
@@ -43,9 +27,9 @@ typedef struct {
     /* 0x3FC */ s32 index;                  /* 0x8012FA04 */
     /* 0x400 */ u8 pad400[0x28];
     /* 0x428 */ CVector3 dest;              /* 0x8012FA30 */
-} BossModule;
+} LevelScriptF604;
 
-extern void func_00246108(CGameObjectInstance *obj, CAI *ai, Targets *t, s32 f1, s32 f2);
+extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern f32 func_00246310(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
 extern void func_00245BAC(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
@@ -61,7 +45,7 @@ extern s32 func_00404C44(CGameObjectInstance *obj, CAI *ai, f32 dist);
 extern s32 D_800F1F50[];
 extern CVector3 *D_800C18F0[];  /* boss paths, ended by a point with y < 0 */
 extern s32 D_8012FB48;          /* path */
-extern BossModule D_8012F604;
+extern LevelScriptF604 D_8012F604;
 typedef struct {
     /* 0x00 */ s32 unk0;   /* 0x8012F9D4 */
     /* 0x04 */ s32 state;  /* 0x8012F9D8 */
@@ -79,7 +63,7 @@ extern BossStep D_00431004[];
 extern BossStep D_00431158[];
 
 void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
-    Targets t;
+    CAITargets t;
     CVector3 d;
     CVector3 dest;
     CGameObjectInstance *target;
@@ -93,7 +77,7 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
     ctl->unk0 = 3;
     D_800F1F50[0] &= ~0x8000;
     do {
-        target = t.obj;
+        target = t.m_Sight.m_pTarget;
         angle = 0.0f;
     } while (0);
     if (target != NULL) {
@@ -189,6 +173,6 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
                 D_8012F604.index = D_8012FA00;
             } while ((f32) D_8012F9FC[D_8012FA00].chance <= func_002119FC(0.0f, 100.0f));
         }
-        func_00404C44(obj, ai, t.dist);
+        func_00404C44(obj, ai, t.m_Sight.m_Dist);
     }
 }

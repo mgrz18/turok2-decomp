@@ -1,74 +1,68 @@
+#include "common.h"
+#include "structs/sound.h"
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
-s32 func_00271904(void *arg0, s32 arg1)
+/* How many of the manager's voices play the given sound (CMutex taken
+ * around the scan). */
+s32 func_00271904(SndMgr *mgr, s32 sound)
 {
-  s32 temp_a0;
-  s32 temp_v0;
-  s32 temp_v1;
-  s32 temp_v1_2;
-  s32 var_a0;
-  s32 var_s1;
-  void *temp_s0;
-  void *temp_s0_2;
-  void *var_v1;
-  temp_s0 = arg0 + 0x110;
-  var_s1 = 0;
-  temp_a0 = __osDisableInt();
-  temp_v1 = (*((s32 *) (((s8 *) temp_s0) + 0x1C))) + 1;
-  *((s32 *) (((s8 *) temp_s0) + 0x1C)) = temp_v1;
-  if (temp_v1 != 1)
+  s32 mask;
+  s32 mask2;
+  s32 count;
+  s32 count2;
+  s32 i;
+  s32 n;
+  CMutex *lock;
+  CMutex *lock2;
+  SndMgr *m;
+  lock = &mgr->lock;
+  n = 0;
+  mask = __osDisableInt();
+  count = lock->count + 1;
+  lock->count = count;
+  if (count != 1)
   {
-    __osRestoreInt(temp_a0);
-    osRecvMesg((s32) temp_s0, 0, 1);
-    var_a0 = 0;
+    __osRestoreInt(mask);
+    osRecvMesg((s32) lock, 0, 1);
+    i = 0;
   }
   else
   {
-    __osRestoreInt(temp_a0);
-    var_a0 = 0;
+    __osRestoreInt(mask);
+    i = 0;
   }
- do { var_v1 = arg0; } while (0);
+ do { m = mgr; } while (0); /* walked by whole voices, the sound field read at a fixed offset: the ROM's loop */
   do
   {
-    if ((*((s32 *) (((s8 *) var_v1) + 0x1DC0))) == arg1)
+    if (m->pool.voices[0].sound == sound)
     {
-      var_s1 += 1;
+      n += 1;
     }
-    var_a0 += 1;
-    var_v1 += 0xCC;
+    i += 1;
+    m = (SndMgr *) ((u8 *) m + sizeof(SndVoice));
   }
-  while (var_a0 < 0x11);
-  temp_s0_2 = arg0 + 0x110;
-  temp_v0 = __osDisableInt();
-  temp_v1_2 = (*((s32 *) (((s8 *) temp_s0_2) + 0x1C))) - 1;
-  *((s32 *) (((s8 *) temp_s0_2) + 0x1C)) = temp_v1_2;
-  if (temp_v1_2 != 0)
+  while (i < 0x11);
+  lock2 = &mgr->lock;
+  mask2 = __osDisableInt();
+  count2 = lock2->count - 1;
+  lock2->count = count2;
+  if (count2 != 0)
   {
-    __osRestoreInt(temp_v0);
-    osSendMesg((s32) temp_s0_2, 0, 1);
-    return var_s1;
+    __osRestoreInt(mask2);
+    osSendMesg((s32) lock2, 0, 1);
+    return n;
   }
-  if (arg0)
+  if (mgr)
   {
-    __osRestoreInt(temp_v0);
-    return var_s1;
+    __osRestoreInt(mask2);
+    return n;
   }
   else
   {
-    __osRestoreInt(temp_v0);
-    return var_s1;
+    __osRestoreInt(mask2);
+    return n;
   }
 }

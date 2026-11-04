@@ -3,14 +3,6 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_3/80268160.CPP, func_8026826C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Kind;
 typedef struct Kind Kind;
 extern float D_800A65E0;

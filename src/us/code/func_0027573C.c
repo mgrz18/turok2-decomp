@@ -6,10 +6,10 @@
 extern int func_0027573C(int arg0);
 extern s32 func_002718C4(struct ContextRecAt2BC0 *arg0);
 extern void func_002718BC(struct ContextRecAt2BC0 *arg0, s32 arg1);
-extern s32 func_00271128(void *, s32, Vec3, s32);
+extern s32 func_00271128(void *, s32, CVector3, s32);
 extern int func_002718C4(struct ContextRecAt2BC0 *arg0);
 extern void func_002718BC(struct ContextRecAt2BC0 *arg0, int arg1);
-extern int func_00271128(void *arg0, int arg1, Vec3 arg2, int arg3);
+extern int func_00271128(void *arg0, int arg1, CVector3 arg2, int arg3);
 extern int D_8011ACA0;
 int func_0027573C(int arg0) {
     extern signed char D_800F2A00;
@@ -19,7 +19,7 @@ int func_0027573C(int arg0) {
         return -1;
     }
     {
-        Vec3 vec;
+        CVector3 vec;
         register float zero = (float)0;
         vec.z = zero;
         vec.y = zero;

@@ -8,7 +8,7 @@ void func_0026F348(void *arg0, void *arg1, void *arg2, void *arg3) {
     extern void func_0020EFDC(void *out, void *a, void *b);
     extern void func_0020EF2C(void *out, void *a, void *b);
     PlaneEquation *plane = arg0;
-    Vec3 *point = arg1;
+    CVector3 *point = arg1;
     u8 sp10[12];
     u8 sp20[12];
     func_0020EF2C(sp10, arg2, arg1);

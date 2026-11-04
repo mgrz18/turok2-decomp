@@ -83,16 +83,57 @@ typedef struct GameSettings {
     /* 0x040 */ CPlayerOptions defaultSlot;  /* D_8011AB18 */
     /* 0x080 */ CPlayerOptions slots[4];     /* D_8011AB58 */
     /* 0x180 */ u8 unk180;
-    /* 0x181 */ u8 unk181[0x1B0 - 0x181];
-    /* 0x1B0 */ s32 mode;              /* D_8011AC88: the game mode */
-    /* 0x1B4 */ u8 unk1B4[0x1CC - 0x1B4];
-    /* 0x1CC */ s32 unk1CC;
-    /* 0x1D0 */ u32 matchMode;         /* D_8011ACA8 */
-    /* 0x1D4 */ u8 unk1D4[0x1D8 - 0x1D4];
+    /* 0x181 */ u8 unk181[0x1A8 - 0x181];
+    /* 0x1A8 */ f32 modeTimer;         /* the mode's clock: a spin in degrees, a fade threshold (func_00288D3C, func_00289700) */
+    /* 0x1AC */ s32 prevMode;
+    /* 0x1B0 */ s32 mode;              /* D_8011AC88: the game mode (17: switching) */
+    /* 0x1B4 */ s32 nextMode;          /* the mode to switch to (func_00288BC8, func_00288C5C) */
+    /* 0x1B8 */ u8 fastFade;
+    /* 0x1B9 */ u8 fadeMode;           /* 1 fading in, 2 fading out (switch mode) */
+    /* 0x1BA */ u8 unk1BA[0x1BC - 0x1BA];
+    /* 0x1BC */ f32 fade;
+    /* 0x1C0 */ s32 ready;             /* func_00288284 */
+    /* 0x1C4 */ s32 unk1C4;
+    /* 0x1C8 */ s32 unk1C8;            /* set at a retrace while switching (func_00286674) */
+    /* 0x1CC */ s32 paused;
+    /* 0x1D0 */ u32 matchMode;         /* D_8011ACA8; also the warp the mode switch goes to (func_00430454) */
+    /* 0x1D4 */ s32 warpFlags;
     /* 0x1D8 */ GameMatch match;       /* D_8011ACB0 */
 } GameSettings; /* size 0x228 */
 
+/* The engine, D_800F6CB0 (CEngineApp__Boot's object): GameSettings
+ * D_8011AAD8 is inside it at 0x23E28, so its mode block (0x23FD0-0x23FFC)
+ * is GameSettings 0x1A8-0x1D4. Only that part is described here. */
+typedef struct CEngineApp {
+    /* 0x00000 */ u8 pad0[0x23E28];
+    /* 0x23E28 */ GameSettings m_Settings; /* D_8011AAD8 */
+} CEngineApp; /* size 0x24050 */
+
 extern GameSettings D_8011AAD8;
 extern GameMatch D_8011ACB0;
+
+/* ---- The game state, D_80119870 (CGame) ---- */
+
+#include "structs/player_list.h"
+
+/* The engine's globals at D_80119870: the players, the cameras and the
+ * settings. Some parts have symbols of their own, which the ROM uses where
+ * it reaches them through those: D_80119890 (m_PlayerList.m_ActiveList),
+ * D_801198B0 (m_CameraPool), D_80119E2C (m_MenuPool) and D_8011AAD8
+ * (m_Settings). The camera pool is CCameraPool (structs/camera.h), kept as
+ * bytes here so that this header does not pull in the cameras and the game
+ * objects; the menus' pool is the one of its main camera
+ * (m_MainCamera.m_MenuPool), so it is written out. */
+typedef struct CGame {
+    /* 0x0000 */ CPlayerList m_PlayerList;
+    /* 0x003C */ s32 _pad3C;
+    /* 0x0040 */ u8 m_CameraPool[0x57C];   /* CCameraPool, D_801198B0 (0x11F0 bytes) */
+    /* 0x05BC */ u8 m_MenuPool[0x18];      /* its m_MainCamera.m_MenuPool (MenuPool, structs/menu.h), D_80119E2C */
+    /* 0x05D4 */ u8 m_CameraPoolEnd[0x1230 - 0x5D4];
+    /* 0x1230 */ u8 unk1230[0x1268 - 0x1230];
+    /* 0x1268 */ GameSettings m_Settings;  /* D_8011AAD8 */
+} CGame; /* size 0x1490 */
+
+extern CGame D_80119870;
 
 #endif

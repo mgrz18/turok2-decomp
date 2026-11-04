@@ -1,17 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ s16 type;
-    /* 0x02 */ s16 max;
-} AmmoDef;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ AmmoDef *ammo[3];
-} WeaponDef;
-
-extern WeaponDef *D_800AF618[];
+#include "structs/weapon.h"
 
 /* Fills the ammo of every held weapon to its maximum; returns whether any
  * ammo was added. */
@@ -19,8 +8,8 @@ s32 func_002569C8(CPlayer *player) {
     s32 added = 0;
     s32 w;
     s32 i;
-    WeaponDef *def;
-    AmmoDef *ammo;
+    WeaponInfo *def;
+    AmmoInfo *ammo;
     s16 *count;
     s16 n;
 

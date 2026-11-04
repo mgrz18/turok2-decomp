@@ -2,10 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/world.h"
 
-extern Shared_World D_800F7078;
-extern void func_0026E928(NodeCode8028469C *arg0, Clip *arg1, Vec3 arg2, f32 arg5, f32 arg6, void **arg7);
-void func_0026E928(NodeCode8028469C *arg0, Clip *arg1, Vec3 arg2,
+extern CWorld D_800F7078;
+extern void func_0026E928(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2, f32 arg5, f32 arg6, void **arg7);
+void func_0026E928(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
                    f32 arg5, f32 arg6, void **arg7) {
     extern void *func_00225D94(void *object, int index);
     extern void func_0026EE30(unsigned int *record, unsigned int value);

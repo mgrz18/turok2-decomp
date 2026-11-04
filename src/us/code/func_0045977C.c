@@ -24,15 +24,15 @@ extern u8 D_0043B610[];
 extern u8 D_004390B0[];
 extern u8 D_0043B634[];
 extern u8 D_0043B5EC[];
-void func_00285AE0(MenuController *a);
-void func_00285BD0(MenuController *a, s32 b);
+void func_00285AE0(ControllerProfile *a);
+void func_00285BD0(ControllerProfile *a, s32 b);
 void func_00285A80(s32 a);
 s32 func_002858CC(s32 a);
 void func_004263A0(s32 a);
 s32 func_0042647C(s32 a);
 void func_0042C620(u8 *a, s32 b, s32 c);
 void func_004302CC(u8 *a);
-void func_00416644(u8 *a, void *b, CPlayer *c, MenuController *d, s32 e);
+void func_00416644(u8 *a, void *b, CPlayer *c, ControllerProfile *d, s32 e);
 
 s32 func_0045977C(s32 a0, Menu *o) {
     s32 s0, s1, v;

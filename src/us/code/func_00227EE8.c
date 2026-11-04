@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/list.h"
 
 /* Spawns a copy of an actor: takes a free instance off the world's free list
  * and initialises it from src. */
@@ -16,14 +17,6 @@ extern s32 D_800B6D54;
 extern u8 D_800F7078[];
 extern s32 D_8011001C;
 
-typedef struct IntrusiveList {
-    /* 0x00 */ void *head;
-    /* 0x04 */ void *tail;
-    /* 0x08 */ s32 prevOffset;
-    /* 0x0C */ s32 nextOffset;
-    /* 0x10 */ s32 count;
-} IntrusiveList;
-
 /* A pooled instance: a CGameObjectInstance plus the pool bookkeeping. */
 typedef struct SceneEffect {
     /* 0x000 */ CGameObjectInstance obj;
@@ -34,16 +27,16 @@ typedef struct SceneEffect {
 
 typedef struct SceneEffectPool {
     /* 0x0000 */ SceneEffect effects[0x20];
-    /* 0x5300 */ IntrusiveList freeEffects;
-    /* 0x5314 */ IntrusiveList activeEffects;
+    /* 0x5300 */ CList freeEffects;
+    /* 0x5314 */ CList activeEffects;
 } SceneEffectPool;
 
 /* func_002283FC without the owner counter. */
 static __inline__ CGameObjectInstance *take_free_instance(SceneEffectPool *world) {
     CGameObjectInstance *node;
 
-    if (D_8011001C != 0 || (u32)world->activeEffects.count < 3) {
-        node = (CGameObjectInstance *)world->freeEffects.head;
+    if (D_8011001C != 0 || (u32)world->activeEffects.m_nCount < 3) {
+        node = (CGameObjectInstance *)world->freeEffects.m_pHead;
         if (node != NULL) {
             CList__Remove(&world->freeEffects, node);
             CList__AddHead(&world->activeEffects, node);

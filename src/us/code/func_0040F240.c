@@ -1,7 +1,10 @@
 #include "common.h"
 #include "rw/abu_types.h"
+#include "gfx.h"
 #include "structs/vector.h"
 #include "structs/world.h"
+#include "structs/game_object.h"
+#include "structs/cinema.h"
 
 /* The cinema system: one file from func_0040F240 to func_004131B0 (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -37,65 +40,6 @@ typedef struct {
     /* 0x34 */ u8 pad34[0x50 - 0x34];
     /* 0x50 */ f32 yaw;
 } Actor;
-
-/* An entry of the cinema table (0x4C bytes). */
-typedef struct {
-    /* 0x00 */ s32 id0;
-    /* 0x04 */ s32 id4;
-    /* 0x08 */ s32 id;
-    /* 0x0C */ u32 flags;
-    /* 0x10 */ u8 pad10[0x18 - 0x10];
-    /* 0x18 */ char name[0x3C - 0x18];
-    /* 0x3C */ f32 aspect;
-    /* 0x40 */ u8 pad40[0x4C - 0x40];
-} CinemaEntry;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ CinemaEntry entries[1];
-} CinemaTable;
-
-/* The cinema state, D_800C1BB0. */
-typedef struct {
-    /* 0x000 */ s32 **owner;
-    /* 0x004 */ void *resource;
-    /* 0x008 */ u8 pad8[0xC - 0x8];
-    /* 0x00C */ void (*onClose)(void);
-    /* 0x010 */ void (*callback10)(void);
-    /* 0x014 */ u8 pad14[0x18 - 0x14];
-    /* 0x018 */ Actor *target;
-    /* 0x01C */ f32 time;
-    /* 0x020 */ f32 time20;
-    /* 0x024 */ f32 time24;
-    /* 0x028 */ f32 clipStart;
-    /* 0x02C */ f32 clipEnd;
-    /* 0x030 */ f32 start;
-    /* 0x034 */ f32 end;
-    /* 0x038 */ s32 active;
-    /* 0x03C */ u8 pad3C[0x40 - 0x3C];
-    /* 0x040 */ s32 unknown40;
-    /* 0x044 */ s32 initialized44;
-    /* 0x048 */ s32 closed;
-    /* 0x04C */ s32 field4C;
-    /* 0x050 */ s32 field50;
-    /* 0x054 */ s32 pending;
-    /* 0x058 */ s32 field58;
-    /* 0x05C */ u8 pad5C[0x60 - 0x5C];
-    /* 0x060 */ s32 fading;
-    /* 0x064 */ f32 fade;
-    /* 0x068 */ CinemaEntry spec;
-    /* 0x0B4 */ s32 fieldB4;
-    /* 0x0B8 */ s32 mode;
-    /* 0x0BC */ u8 padBC[0xD8 - 0xBC];
-    /* 0x0D8 */ s32 targetD8;
-    /* 0x0DC */ s32 resourceDC;
-    /* 0x0E0 */ u32 request;
-    /* 0x0E4 */ void (*callbackE4)(void);
-    /* 0x0E8 */ void (*callbackE8)(void);
-    /* 0x0EC */ u8 padEC[0xF0 - 0xEC];
-    /* 0x0F0 */ CVector3 position;
-    /* 0x0FC */ f32 yaw;
-} Cinema;
 
 /* A track header: its stride and record count, the records after it. */
 typedef struct {
@@ -458,7 +402,7 @@ s32 func_0040FD6C(s32 index) {
     f32 total;
 
     captured = D_80119890;
-    pending = D_800C1BB0->field58;
+    pending = D_800C1BB0->resetPlayerNext;
     resources = D_800F7078;
     if (resources->m_CinemasKey == 0 || resources->m_pCinemas == 0) {
     failed:
@@ -488,8 +432,8 @@ s32 func_0040FD6C(s32 index) {
                 }
             }
         }
-        D_800C1BB0->start = 0.0f;
-        D_800C1BB0->end = total;
+        D_800C1BB0->startTime = 0.0f;
+        D_800C1BB0->endTime = total;
         D_800C1BB0->clipStart = 0.0f;
         D_800C1BB0->clipEnd = total;
         i = 0;
@@ -502,7 +446,7 @@ s32 func_0040FD6C(s32 index) {
                 i++;
             } while (i < count);
         }
-        setTimes(&D_800C1BB0->time, &D_800C1BB0->time20, &D_800C1BB0->time24, &D_800C1BB0->clipStart);
+        setTimes(&D_800C1BB0->time, &D_800C1BB0->prevTime, &D_800C1BB0->time24, &D_800C1BB0->clipStart);
         previous = D_800C1BB0->spec.id;
         loaded = func_0020185C(D_800F70D8, D_800F709C, 0, &size2);
         if (loaded == 0) {
@@ -513,18 +457,18 @@ s32 func_0040FD6C(s32 index) {
         {
             CinemaTable *entries = (CinemaTable *) *table;
             CinemaEntry *base = entries->entries;
-            D_800C1BB0->pending = pending;
+            D_800C1BB0->resetPlayer = pending;
             D_800C1BB0->active = 1;
             D_800C1BB0->spec = base[index];
         }
-        D_800C1BB0->field50 = 0;
-        D_800C1BB0->unknown40 = 0;
-        D_800C1BB0->initialized44 = 0;
+        D_800C1BB0->unk50 = 0;
+        D_800C1BB0->started = 0;
+        D_800C1BB0->ended = 0;
         D_800C1BB0->closed = 0;
-        D_800C1BB0->request = D_800C1BB0->spec.id;
+        D_800C1BB0->scriptId = D_800C1BB0->spec.id;
         if ((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) {
-            D_800C1BB0->position = D_800C1BB0->target->head.pos;
-            D_800C1BB0->yaw = D_800C1BB0->target->yaw + 1.5707964f;
+            D_800C1BB0->position = D_800C1BB0->target->header.m_vPos;
+            D_800C1BB0->yaw = D_800C1BB0->target->m_RotY + 1.5707964f;
         }
         if (D_800C1BB0->spec.flags & 2) {
             if (captured != NULL) {
@@ -542,30 +486,30 @@ s32 func_0040FD6C(s32 index) {
             void (*first)(void);
             void (*second)(void);
             context = D_800C1BB0;
-            first = context->callbackE4;
-            second = context->callbackE8;
-            context->pending = 1;
-            context->field4C = 0;
-            context->callbackE4 = NULL;
-            context->callbackE8 = NULL;
-            context->mode = context->spec.flags & 8;
+            first = context->nextOnClose;
+            second = context->nextOnEnd;
+            context->resetPlayer = 1;
+            context->restored = 0;
+            context->nextOnClose = NULL;
+            context->nextOnEnd = NULL;
+            context->saveStart = context->spec.flags & 8;
             context->onClose = first;
-            context->callback10 = second;
-            if (context->request - 10U < 0x47U) {
-                context->mode = 0;
+            context->onEnd = second;
+            if (context->scriptId - 10U < 0x47U) {
+                context->saveStart = 0;
             }
-            if (D_800C1BB0->request - 400U < 4U) {
-                D_800C1BB0->mode = 0;
+            if (D_800C1BB0->scriptId - 400U < 4U) {
+                D_800C1BB0->saveStart = 0;
             }
         } else {
             if (D_800C1BB0->spec.id < 3) {
-                D_800C1BB0->request = previous;
+                D_800C1BB0->scriptId = previous;
             }
-            D_800C1BB0->pending = 0;
-            D_800C1BB0->time = D_800C1BB0->start;
+            D_800C1BB0->resetPlayer = 0;
+            D_800C1BB0->time = D_800C1BB0->startTime;
         }
         if (D_800C1BB0->spec.id == 0x9F) {
-            D_800C1BB0->mode = 0;
+            D_800C1BB0->saveStart = 0;
         }
         return 1;
     }
@@ -878,8 +822,8 @@ extern void func_00226724(void *world);
 /* Places the cinema relative to its target (flag 1) or to the player (flag 2). */
 static __inline__ void Cinema_Anchor(Actor *player) {
     if ((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) {
-        D_800C1BB0->position = D_800C1BB0->target->head.pos;
-        D_800C1BB0->yaw = D_800C1BB0->target->yaw + 1.5707964f;
+        D_800C1BB0->position = D_800C1BB0->target->header.m_vPos;
+        D_800C1BB0->yaw = D_800C1BB0->target->m_RotY + 1.5707964f;
     }
     if (D_800C1BB0->spec.flags & 2) {
         if (player != NULL) {
@@ -909,7 +853,7 @@ void func_00410CE8(Camera *cam) {
     if (!D_800C1BB0->active || !Cinema_PathPlaying()) {
         return;
     }
-    if (D_800C1BB0->time < D_800C1BB0->start || D_800C1BB0->end < D_800C1BB0->time) {
+    if (D_800C1BB0->time < D_800C1BB0->startTime || D_800C1BB0->endTime < D_800C1BB0->time) {
         return;
     }
     eye = func_0041057C(D_800C1BB0->time);
@@ -958,26 +902,26 @@ void func_004110CC(s32 inset) {
     func_0020B5B8();
     left = 0.0f;
     top = (f32)inset;
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->words.w1 = (0); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->words.w1 = ((unsigned int)((((unsigned int)(0x0)) << 20))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xFC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (5)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (0))); _gbi->words.w1 = ((((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (28)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (24)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (18)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (6)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (3)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (0))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xE2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (3) - (29)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((29) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->words.w1 = ((unsigned int)((( (((unsigned int)(0x1)) << (3 + 3)) | (((unsigned int)(0x2)) << (3 + 5)) | (((unsigned int)(0x0)) << (3 + 7)) | (((unsigned int)(0x1)) << (3 + 11)) | ( (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (30)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (26)) | (((unsigned int)(((unsigned int)(0x1))) & (0xFFFFFFFFU >> (32 - (2)))) << (22)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (18)) ) )) | (( (((unsigned int)(0x1)) << (3 + 3)) | (((unsigned int)(0x2)) << (3 + 5)) | (((unsigned int)(0x0)) << (3 + 7)) | (((unsigned int)(0x1)) << (3 + 11)) | ( (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (28)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (24)) | (((unsigned int)(((unsigned int)(0x1))) & (0xFFFFFFFFU >> (32 - (2)))) << (20)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (16)) ) )))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x0)) << 20))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xFC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (5)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (0))); _gbi->w1 = ((((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (28)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (24)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (18)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (6)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (3)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (0))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (3) - (29)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((29) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((( (((unsigned int)(0x1)) << (3 + 3)) | (((unsigned int)(0x2)) << (3 + 5)) | (((unsigned int)(0x0)) << (3 + 7)) | (((unsigned int)(0x1)) << (3 + 11)) | ( (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (30)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (26)) | (((unsigned int)(((unsigned int)(0x1))) & (0xFFFFFFFFU >> (32 - (2)))) << (22)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (18)) ) )) | (( (((unsigned int)(0x1)) << (3 + 3)) | (((unsigned int)(0x2)) << (3 + 5)) | (((unsigned int)(0x0)) << (3 + 7)) | (((unsigned int)(0x1)) << (3 + 11)) | ( (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (28)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (24)) | (((unsigned int)(((unsigned int)(0x1))) & (0xFFFFFFFFU >> (32 - (2)))) << (20)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (16)) ) )))); };
     width = (f32)D_800C2030;
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xFA) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->words.w1 = ((((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xFA) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); };
     height = (f32)(D_800C2034 - inset * 2);
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((width - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)((top + (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->words.w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->words.w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->words.w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->words.w1 = ((((unsigned int)(((left + width) - (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->words.w1 = (0); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->words.w1 = ((unsigned int)((((unsigned int)(0x3)) << 20))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xFC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (5)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (0))); _gbi->words.w1 = ((((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (28)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (24)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (18)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (6)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (3)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (0))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xE2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (3) - (29)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((29) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->words.w1 = ((unsigned int)((0) | (0))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->words.w1 = ((unsigned int)(0x10001)); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->words.w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->words.w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->words.w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + width)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->words.w1 = ((((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((width - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)((top + (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(((left + width) - (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x3)) << 20))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xFC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (5)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (0))); _gbi->w1 = ((((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (28)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (24)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (18)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (6)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (3)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (0))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (3) - (29)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((29) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((0) | (0))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = ((unsigned int)(0x10001)); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + width)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
 }
 
 s32 func_00207FEC(s32 a);
@@ -991,16 +935,16 @@ void func_00411C94(void) {
     fs = ((f32)D_800C2034 - (f32)D_800C2030 / D_800C1BB0->spec.aspect) * 0.5f;
     q = 0.3f;
     k = 1.0f;
-    if (D_800C1BB0->time < D_800C1BB0->start) {
-        k = D_800C1BB0->start - D_800C1BB0->time;
+    if (D_800C1BB0->time < D_800C1BB0->startTime) {
+        k = D_800C1BB0->startTime - D_800C1BB0->time;
         k = k / q;
         if (1.0f < k) {
             k = 1.0f;
         }
         k = 1.0f - k;
     }
-    if (D_800C1BB0->time > D_800C1BB0->end) {
-        k = D_800C1BB0->time - D_800C1BB0->end;
+    if (D_800C1BB0->time > D_800C1BB0->endTime) {
+        k = D_800C1BB0->time - D_800C1BB0->endTime;
         k = k / q;
         if (1.0f < k) {
             k = 1.0f;
@@ -1008,13 +952,13 @@ void func_00411C94(void) {
         k = 1.0f - k;
     }
     fs = fs * k;
-    { Gfx *_g = D_800D8E24++; _g->words.w0 = (0xE7000000); _g->words.w1 = (0); }
-    { Gfx *_g = D_800D8E24++; _g->words.w0 = (0xE3000A01); _g->words.w1 = (0); }
+    { Gfx *_g = D_800D8E24++; _g->w0 = (0xE7000000); _g->w1 = (0); }
+    { Gfx *_g = D_800D8E24++; _g->w0 = (0xE3000A01); _g->w1 = (0); }
     func_00207FEC(0x13);
     func_00207A70(0x19);
-    { Gfx *_g = D_800D8E24++; _g->words.w0 = (0xFA00FFFF); _g->words.w1 = (0xFF); }
-    { Gfx *_g = D_800D8E24++; _g->words.w0 = (0xF6000000 | ((((D_800C2030) > (0) ? (D_800C2030) : (0)) & 0x3FF) << 14) | (((((s32)fs) > (0) ? ((s32)fs) : (0)) & 0x3FF) << 2)); _g->words.w1 = (0); }
-    { Gfx *_g = D_800D8E24++; _g->words.w0 = (0xF6000000 | ((((D_800C2030) > (0) ? (D_800C2030) : (0)) & 0x3FF) << 14) | ((((D_800C2034) > (0) ? (D_800C2034) : (0)) & 0x3FF) << 2)); _g->words.w1 = (({ f32 _y = (f32)D_800C2034 - fs; if (!(0.0f <= _y)) _y = 0.0f; (((u32)_y) & 0x3FF) << 2; })); }
+    { Gfx *_g = D_800D8E24++; _g->w0 = (0xFA00FFFF); _g->w1 = (0xFF); }
+    { Gfx *_g = D_800D8E24++; _g->w0 = (0xF6000000 | ((((D_800C2030) > (0) ? (D_800C2030) : (0)) & 0x3FF) << 14) | (((((s32)fs) > (0) ? ((s32)fs) : (0)) & 0x3FF) << 2)); _g->w1 = (0); }
+    { Gfx *_g = D_800D8E24++; _g->w0 = (0xF6000000 | ((((D_800C2030) > (0) ? (D_800C2030) : (0)) & 0x3FF) << 14) | ((((D_800C2034) > (0) ? (D_800C2034) : (0)) & 0x3FF) << 2)); _g->w1 = (({ f32 _y = (f32)D_800C2034 - fs; if (!(0.0f <= _y)) _y = 0.0f; (((u32)_y) & 0x3FF) << 2; })); }
     sh = (s32)fs;
     func_004110CC(sh);
 }
@@ -1133,9 +1077,9 @@ void func_00412314(void *owner, CueObject *obj) {
         }
         if (found != -1) {
             D_800C1BB0->target = owner;
-            D_800C1BB0->targetD8 = idA;
-            D_800C1BB0->resourceDC = found;
-            D_800C1BB0->field58 = 1;
+            D_800C1BB0->warpId = idA;
+            D_800C1BB0->entryIndex = found;
+            D_800C1BB0->resetPlayerNext = 1;
         }
         func_002051F4(0, table);
     }
@@ -1165,15 +1109,15 @@ s32 func_00412438(s32 key) {
     for (; i < n; i++) {
         if (entries[i].id == key) {
             if ((entries[i].flags & 3) == 0) {
-                D_800C1BB0->targetD8 = entries[i].id0;
+                D_800C1BB0->warpId = entries[i].id0;
             }
-            D_800C1BB0->request = key;
-            D_800C1BB0->resourceDC = i;
-            D_800C1BB0->field58 = 1;
+            D_800C1BB0->scriptId = key;
+            D_800C1BB0->entryIndex = i;
+            D_800C1BB0->resetPlayerNext = 1;
         }
     }
     func_002051F4(0, table);
-    return D_800C1BB0->targetD8;
+    return D_800C1BB0->warpId;
 }
 
 extern s32 func_00288780(const char *a, const char *b); /* strcmp */
@@ -1200,11 +1144,11 @@ void func_00412548(const char *name) {
         n = *D_800F70D8 - 1;
         for (; i < n; i++) {
             if (func_00288780(name, entries[i].name) == 0) {
-                D_800C1BB0->request = entries[i].id;
+                D_800C1BB0->scriptId = entries[i].id;
                 id = entries[i].id0;
-                D_800C1BB0->resourceDC = i;
-                D_800C1BB0->field58 = 1;
-                D_800C1BB0->targetD8 = id;
+                D_800C1BB0->entryIndex = i;
+                D_800C1BB0->resetPlayerNext = 1;
+                D_800C1BB0->warpId = id;
                 break;
             }
         }
@@ -1260,12 +1204,12 @@ void func_00412798(void) {
     s32 cnt;
     s32 i;
     if (func_00284174() != 0) {
-        if (D_800C1BB0->field50 != 0) {
+        if (D_800C1BB0->unk50 != 0) {
             n = func_002017D4(D_800C1BB0->resource, 2);
             cnt = n->count;
             ents = (TimedCueRef *)((u8 *)n + 8);
             if (cnt != 0) {
-                if (D_800C1BB0->end <= now) {
+                if (D_800C1BB0->endTime <= now) {
                     flag = 1;
                 }
                 for (i = 0; i < cnt; i++) {
@@ -1285,7 +1229,7 @@ void func_00412798(void) {
                     }
                     if (func_004131B0(k) != 0) {
                         func_00412314(0, k);
-                        D_800C1BB0->field58 = 0;
+                        D_800C1BB0->resetPlayerNext = 0;
                     } else {
                         func_0026E210(k);
                     }
@@ -1348,7 +1292,7 @@ CVector3 func_00412998(void) {
 }
 
 void func_00412B14(void) {
-    D_800C1BB0->fieldB4 = 1;
+    D_800C1BB0->stopAtEnd = 1;
 }
 
 void func_00412B28(s32 a0) {

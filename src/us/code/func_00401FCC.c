@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct {
     f32 x, y, z;
@@ -37,7 +38,6 @@ typedef struct {
     /* 0x08 */ s32 maxActive;
 } Config00401FCC;
 
-extern u8 D_80119870[];
 extern Config00401FCC *D_8012F5B4;
 Entity00401FCC *func_002532EC(void *game, Vec3_00401FCC pos);
 f32 func_002465F0(Member00401FCC *member, Vec3_00401FCC pos);
@@ -54,7 +54,7 @@ void func_00401FCC(State00401FCC *s, s32 *active) {
     Member00401FCC *member;
     s32 i;
 
-    player = func_002532EC(D_80119870, s->actor->pos);
+    player = func_002532EC(&D_80119870.m_PlayerList, s->actor->pos);
     if (player != NULL) {
         pos = player->pos;
     } else {

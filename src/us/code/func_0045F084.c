@@ -1,14 +1,8 @@
 /* Second-module copy of func_00426164 (first module; this one at link address 0x00426084), calling this module's own functions at their link addresses. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_80404958_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/pak.h"
 
-typedef struct PfsPak {
-    u8 pad[0x68];
-} PfsPak;
-
-extern s32 D_80130C60[];
-extern s32 D_80130C70[];
-extern PfsPak D_80130C80[];
 extern u8 D_800F6750;
 extern char D_800C18B0[];
 extern char D_800C18C8[];
@@ -25,7 +19,7 @@ extern s32 func_00266C80(void *a, void *b, s32 size);
 extern s32 func_00425AE0(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u8 *ext_name,
                          u8 *company, u8 *code);
 extern s32 func_00425F84(s32 ch, s32 index);
-extern s32 func_00428C10(PfsPak *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+extern s32 func_00428C10(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
 
 /* Reads note file_no of the pak on channel ch into dst. */
 static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {

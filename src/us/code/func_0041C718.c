@@ -1,30 +1,33 @@
 #include "common.h"
+#include "structs/player.h"
+#include "structs/menu.h"
 
-extern s32 D_800B40B0;
-extern s32 D_800B40C8;
-extern s32 D_8011AB18;
+extern char D_800B40B0[];
+extern char D_800B40C8[];
+extern CPlayerOptions D_8011AB18;
 
-s32 func_0041C718(void *arg0, void *arg1)
+/* The weapon select item's text: quick or normal. */
+s32 func_0041C718(MenuItem *item, Menu *menu)
 {
-  s32 *new_var2;
-  s32 *var_v1;
-  s8 *new_var;
-  void *temp_v0;
-  temp_v0 = *((void **) (((s8 *) arg1) + 0x1C));
-  new_var2 = &D_800B40B0;
-  var_v1 = &D_8011AB18;
-  if (temp_v0 != 0)
+  char *quick;
+  CPlayerOptions *settings;
+  u8 *select;
+  CPlayer *player;
+  player = menu->player;
+  quick = D_800B40B0;
+  settings = &D_8011AB18;
+  if (player != 0)
   {
-    var_v1 = *((s32 **) (((s8 *) temp_v0) + 0x518));
+    settings = player->m_pOptions;
   }
-  new_var = ((s8 *) var_v1) + 0x31;
-  if ((*((u8 *) new_var)) == 1)
+  select = &settings->m_WeaponSelect;
+  if (*select == 1)
   {
-    *((s32 **) (((s8 *) arg0) + 0x14)) = new_var2;
+    item->text = quick;
   }
   else
   {
-    *((s32 **) (((s8 *) arg0) + 0x14)) = &D_800B40C8;
+    item->text = D_800B40C8;
   }
   return 0;
 }

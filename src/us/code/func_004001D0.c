@@ -1,17 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 flags;
-    /* 0x08 */ u8 pad08[0x19 - 0x8];
-    /* 0x19 */ u8 multiplayer;
-} GameSub004001D0;
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x1268];
-    /* 0x1268 */ GameSub004001D0 sub;
-} Game004001D0;
 
 typedef struct {
     /* 0x00 */ s32 state;
@@ -33,22 +24,21 @@ typedef struct {
     /* 0x34 */ f32 pitchTarget;
 } Look004001D0;
 
-extern Game004001D0 D_80119870;
 extern Cinema004001D0 D_8011AC88;
 extern f32 D_800B6D28;
-CPlayer *func_002532A8(Game004001D0 *game);
+CPlayer *func_002532A8(CPlayerList *list);
 s32 func_00416AF8(u8 *a0);
 void func_002117DC(f32 *value, f32 target, f32 rate);
 
 void func_004001D0(Look004001D0 *look) {
     CPlayer *player;
     s32 held;
-    GameSub004001D0 *sub = &D_80119870.sub;
+    GameSettings *sub = &D_80119870.m_Settings;
 
     if (sub->multiplayer) {
         return;
     }
-    player = func_002532A8(&D_80119870);
+    player = func_002532A8(&D_80119870.m_PlayerList);
     if (player == NULL) {
         return;
     }

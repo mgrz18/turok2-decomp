@@ -5,7 +5,7 @@
 
 extern float D_800A5604;
 void func_00210004(void *arg0, void *arg1, f32 arg2) {
-    Vec3 *direction = arg1;
+    CVector3 *direction = arg1;
     Matrix *o = arg0;
     f32 zero = 0.0f;
     f32 temp_f0;

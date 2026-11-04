@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_0026F4E0(Vector4f *planes, s32 n, Vec3 *points) {
+s32 func_0026F4E0(Vector4f *planes, s32 n, CVector3 *points) {
     s32 i;
     s32 j;
     s32 inside;

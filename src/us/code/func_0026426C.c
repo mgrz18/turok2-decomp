@@ -1,13 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x11C];
-    /* 0x11C */ f32 tiltZ;
-    /* 0x120 */ f32 tiltX;
-} AI;
-
 extern f32 D_800DD78C;
 
 void func_00210630(f32 mtx[4][4], f32 angle);
@@ -22,15 +15,15 @@ void func_0020F510(CVector3 *v, f32 limit);
 void func_00210318(f32 mtx[4][4], f32 x, f32 y, f32 z);
 void func_00210C3C(f32 mtx[4][4]);
 
-void func_0026426C(CGameObjectInstance *self, AI *ai) {
+void func_0026426C(CGameObjectInstance *self, CAI *ai) {
     f32 tilt[4][4];
     f32 spin[4][4];
     CQuaternion q;
     CQuaternion rot;
     f32 sinHalf;
 
-    func_00210630(tilt, ai->tiltX);
-    func_00210790(tilt, ai->tiltZ);
+    func_00210630(tilt, ai->m_VarF32[5]);
+    func_00210790(tilt, ai->m_VarF32[4]);
     sinHalf = func_002982F0(self->m_RotY * 0.5f);
     q.x = 0.0f;
     q.y = sinHalf;

@@ -2,6 +2,7 @@
  * 0x25AD8C `bnez $v0, .L0025B284`, whose delay slot is this function's first instruction).
  * The real function is func_0025AD90 (0x2E8 bytes); this C matches it from 0x25AD90 on. */
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 
 /* AI head tracking: turns the head bones toward the target (or the player in state 0xC). */
@@ -13,43 +14,18 @@ typedef struct {
     /* 0x1A */ s8 boneCount;
 } AnimObjectInfo;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x54 - 0x10];
-    /* 0x054 */ f32 eyeOffset;
-    /* 0x058 */ u8 pad58[0xA4 - 0x58];
-    /* 0x0A4 */ s32 animObject;
-    /* 0x0A8 */ u8 padA8[0xB0 - 0xA8];
-    /* 0x0B0 */ s32 animIndex;
-} Actor;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s32 unk_04;
-    /* 0x08 */ u8 pad8[0x24 - 0x8];
-    /* 0x24 */ f32 headYaw;
-    /* 0x28 */ f32 headPitch;
-    /* 0x2C */ u8 pad2C[0x34 - 0x2C];
-    /* 0x34 */ s8 state;
-    /* 0x35 */ u8 pad35[0x3C - 0x35];
-    /* 0x3C */ s32 flags;
-    /* 0x40 */ u8 pad40[0x80 - 0x40];
-    /* 0x80 */ Actor *target;
-} CAI;
-
 extern CVector3 D_800B06A0; /* player position */
 
 extern s32 *func_0020367C(s32, s32, s32, s32, s32, s32, const char *, s32);
 extern AnimObjectInfo *func_002017D4(s32 table, s32 index);
 extern void func_002051F4(s32 arg0, s32 *resource);
-extern f32 func_002671B4(Actor *actor); /* height */
-extern f32 func_00246310(Actor *actor, CVector3 point);
+extern f32 func_002671B4(CGameObjectInstance *actor); /* height */
+extern f32 func_00246310(CGameObjectInstance *actor, CVector3 point);
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 extern f32 func_0020F5C0(CVector3 *v);
 extern void func_002117DC(f32 *value, f32 target, f32 rate);
 
-void func_0025AD90(Actor *actor, CAI *ai, f32 pitchOffset) {
+void func_0025AD90(CGameObjectInstance *actor, CAI *ai, f32 pitchOffset) {
     CVector3 from;
     CVector3 to;
     CVector3 delta;
@@ -60,25 +36,25 @@ void func_0025AD90(Actor *actor, CAI *ai, f32 pitchOffset) {
     f32 yaw;
     f32 pitch;
     f32 n;
-    Actor *target;
+    CGameObjectInstance *target;
 
-    res = func_0020367C(0, actor->animObject, actor->animIndex, 0, 0, 0, "anim object info", 1);
+    res = func_0020367C(0, actor->m_rpObject, actor->m_rpObjectHeader, 0, 0, 0, "anim object info", 1);
     if (res == NULL) {
         return;
     }
     info = func_002017D4(*res, 0);
     if (info->headBone != -1 && info->neckBone != -1 && (count = info->boneCount) != 0) {
-        if ((ai->flags & 2) && ai->unk_04 != 0 && (ai->target != NULL || ai->state == 0xC)) {
-            from.x = actor->pos.x;
-            from.y = actor->pos.y + func_002671B4(actor) * 0.9f + actor->eyeOffset;
-            from.z = actor->pos.z;
-            if (ai->state == 0xC) {
+        if ((ai->m_ModeFlags & 2) && ai->m_Health != 0 && (ai->m_pSightTarget != NULL || ai->m_Mode == 0xC)) {
+            from.x = actor->header.m_vPos.x;
+            from.y = actor->header.m_vPos.y + func_002671B4(actor) * 0.9f + actor->m_CollisionYOffset;
+            from.z = actor->header.m_vPos.z;
+            if (ai->m_Mode == 0xC) {
                 to = D_800B06A0;
             } else {
-                target = ai->target;
-                to.x = target->pos.x;
-                to.y = target->pos.y + func_002671B4(target) * 0.9f + target->eyeOffset;
-                to.z = target->pos.z;
+                target = ai->m_pSightTarget;
+                to.x = target->header.m_vPos.x;
+                to.y = target->header.m_vPos.y + func_002671B4(target) * 0.9f + target->m_CollisionYOffset;
+                to.z = target->header.m_vPos.z;
             }
             yaw = -func_00246310(actor, to);
             if (yaw < -1.5707965f) {
@@ -97,12 +73,12 @@ void func_0025AD90(Actor *actor, CAI *ai, f32 pitchOffset) {
             pitch = yaw = 0.0f;
         }
         n = count;
-        value = ai->headYaw * n;
+        value = ai->m_HeadTurn * n;
         func_002117DC(&value, yaw, 0.25f);
-        ai->headYaw = value / n;
-        value = ai->headPitch * n;
+        ai->m_HeadTurn = value / n;
+        value = ai->m_HeadTilt * n;
         func_002117DC(&value, pitch + pitchOffset, 0.25f);
-        ai->headPitch = value / n;
+        ai->m_HeadTilt = value / n;
     }
     func_002051F4(0, res);
 }

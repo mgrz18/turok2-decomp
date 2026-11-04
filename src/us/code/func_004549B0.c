@@ -1,22 +1,8 @@
 /* Module-2 copy of func_0041BA50 (same code; callee at its link address). */
 #include "common.h"
+#include "structs/player_options.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x28];
-    /* 0x28 */ u8 active;
-    /* 0x29 */ u8 unk29;
-    /* 0x2A */ u8 unk2A;
-    /* 0x2B */ u8 unk2B;
-    /* 0x2C */ u8 unk2C;
-    /* 0x2D */ u8 unk2D;
-    /* 0x2E */ u8 unk2E;
-    /* 0x2F */ s8 index;
-    /* 0x30 */ u8 unk30;
-    /* 0x31 */ u8 unk31;
-    /* 0x32 */ u8 unk32;
-    /* 0x33 */ u8 colors[13];
-} SetupSlot; /* 0x40 bytes */
-
+/* A view of GameSettings (structs/game.h, D_8011AAD8), left to the game-settings family: it names bytes the header keeps in arrays (0x12, 0x3C-0x3F). */
 typedef struct {
     /* 0x000 */ u32 options;
     /* 0x004 */ u32 unlocked;
@@ -56,25 +42,25 @@ typedef struct {
     /* 0x03D */ u8 unk3D;
     /* 0x03E */ u8 unk3E;
     /* 0x03F */ u8 unk3F;
-    /* 0x040 */ SetupSlot extra;
-    /* 0x080 */ SetupSlot slots[4];
+    /* 0x040 */ CPlayerOptions extra;
+    /* 0x080 */ CPlayerOptions slots[4];
     /* 0x180 */ u8 unk180;
 } GameSetup;
 
-extern void func_0041BBB0(SetupSlot *slot);
+extern void func_0041BBB0(CPlayerOptions *slot);
 
-static __inline__ void InitSlot(SetupSlot *slot, u8 index) {
-    slot->active = 0;
-    slot->unk29 = 0x80;
-    slot->unk2A = 0x80;
-    slot->unk2C = 0;
-    slot->unk2B = 0;
-    slot->unk2D = 1;
-    slot->unk2E = 0;
-    slot->index = index;
-    slot->unk30 = 0;
-    slot->unk31 = 1;
-    slot->unk32 = 0;
+static __inline__ void InitSlot(CPlayerOptions *slot, u8 index) {
+    slot->m_bActive = 0;
+    slot->m_SettingX = 0x80;
+    slot->m_SettingY = 0x80;
+    slot->m_ControlSide = 0;
+    slot->m_ControlType = 0;
+    slot->m_bLookSpring = 1;
+    slot->m_bAutoAim = 0;
+    slot->m_nController = index;
+    slot->m_nCharacter = 0;
+    slot->m_WeaponSelect = 1;
+    slot->m_Handicap = 0;
     func_0041BBB0(slot);
 }
 
@@ -120,10 +106,10 @@ void func_004549B0(GameSetup *s) {
     s->unk3E = 0;
     s->unk3F = 3;
     for (i = 0; i < 4; i++) {
-        InitSlot((SetupSlot *) ((u8 *) s + 0x80 + i * 0x40), i);
+        InitSlot((CPlayerOptions *) ((u8 *) s + 0x80 + i * 0x40), i);
     }
-    InitSlot((SetupSlot *) ((u8 *) s + 0x40), 0);
-    s->extra.active = 1;
+    InitSlot((CPlayerOptions *) ((u8 *) s + 0x40), 0);
+    s->extra.m_bActive = 1;
     s->unk19 = 0;
     s->unk1A = 1;
     s->options = 0x4000000;

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -14,20 +15,15 @@ typedef struct {
     /* 0xDF8 */ s32 actorCount;
 } DrawWorld;
 
-typedef struct {
-    /* 0x0000 */ u8 _pad[0x1418];
-    /* 0x1418 */ s32 m_Mode;
-} Game80119870;
 
 /* The global at D_80119870: what this reads of it. */
-extern Game80119870 D_80119870;
 extern f32 D_800B6D28;          /* the frame time step */
 extern u8 D_800F6CB0[];
 
 void func_0021F1B4(DrawActor *actor);
 void func_0021A344(DrawActor *actor);
-void func_00251FC4(Game80119870 *game);
-s32 func_00253460(Game80119870 *game);
+void func_00251FC4(CPlayerList *list);
+s32 func_00253460(CPlayerList *list);
 void func_00430330(u8 *);
 s32 func_00275F7C(void);
 void func_00275E98(s32);
@@ -58,10 +54,10 @@ void func_00226490(DrawWorld *world) {
         actor = actors[i++];
         drawActor(actor);
     }
-    if (D_80119870.m_Mode == 13) {
-        func_00251FC4(&D_80119870);
+    if (D_80119870.m_Settings.mode == 13) {
+        func_00251FC4(&D_80119870.m_PlayerList);
     }
-    if (func_00253460(&D_80119870)) {
+    if (func_00253460(&D_80119870.m_PlayerList)) {
         func_00430330(D_800F6CB0);
     }
     while (i < count) {

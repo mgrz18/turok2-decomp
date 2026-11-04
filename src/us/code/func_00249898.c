@@ -1,17 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "gfx.h"
+#include "structs/weapon.h"
 
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
-
-/* Screen box of a weapon, in viewport-relative units. */
-typedef struct WeaponDef {
-    /* 0x00 */ u8 pad0[0x38];
-    /* 0x38 */ f32 left;
-    /* 0x3C */ f32 top;
-    /* 0x40 */ f32 right;
-    /* 0x44 */ f32 bottom;
-} WeaponDef;
 
 typedef struct Viewport {
     /* 0x0 */ f32 scaleX;
@@ -25,7 +17,6 @@ typedef struct View {
     /* 0x288 */ Viewport vp;
 } View;
 
-extern WeaponDef *D_800AF618[];
 extern u8 D_800F6CB0[];
 void func_0020B5B8(void);
 void func_0020B5D4(void);
@@ -35,7 +26,7 @@ void func_0028852C(void *, s32, s32, s32, s32);
 
 /* Draws the weapon's HUD overlay, scissored to its screen box. */
 void func_00249898(CPlayer *player, View *view) {
-    WeaponDef *def;
+    WeaponInfo *def;
     Viewport *vp;
     f32 sx, sy;
 
@@ -50,10 +41,10 @@ void func_00249898(CPlayer *player, View *view) {
     sx = vp->scaleX;
     sy = vp->scaleY;
     func_0028852C(D_800F6CB0,
-                  def->left * sx + vp->offsetX,
-                  def->right * sx + vp->offsetX,
-                  def->top * sy + vp->offsetY,
-                  def->bottom * sy + vp->offsetY);
+                  def->scopeLeft * sx + vp->offsetX,
+                  def->scopeRight * sx + vp->offsetX,
+                  def->scopeTop * sy + vp->offsetY,
+                  def->scopeBottom * sy + vp->offsetY);
     GFX_CMD(0xD9FFFFFF, 0x10000)
     GFX_CMD(0xDB040004, 1)
     GFX_CMD(0xDB04000C, 1)

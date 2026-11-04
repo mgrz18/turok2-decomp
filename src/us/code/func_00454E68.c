@@ -18,6 +18,6 @@ s32 func_00454E68(s32 arg0, Menu *arg1) {
             var_s0 = temp_v0_2;
         }
     }
-    var_s0->unk_0x2B = func_0041648C((s32) arg1, (s32) var_s0->unk_0x2B, 1, 0, 1, 1);
+    var_s0->m_ControlType = func_0041648C((s32) arg1, (s32) var_s0->m_ControlType, 1, 0, 1, 1);
     return 0;
 }

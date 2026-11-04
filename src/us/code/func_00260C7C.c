@@ -5,29 +5,23 @@ typedef struct {
     f32 m[4][4];
 } Mtx44;
 
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x80];
-    /* 0x80 */ void *target;
-} AI;
-
-s32 func_002451AC(CGameObjectInstance *self, AI *ai, void *target, f32 angle);
+s32 func_002451AC(CGameObjectInstance *self, CAI *ai, void *target, f32 angle);
 void func_002105A4(Mtx44 *mtx, f32 angle);
 void func_0020F85C(Mtx44 *mtx, CVector3 *in, CVector3 *out);
 void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
 /* AI callback: with a target, pushes the actor sideways (by its yaw) by the
  * side func_002451AC reports within 20 degrees; else damps its velocity. */
-void func_00260C7C(CGameObjectInstance *self, AI *ai) {
+void func_00260C7C(CGameObjectInstance *self, CAI *ai) {
     CVector3 push;
     CVector3 dir;
     Mtx44 mtx;
     s32 side;
 
-    if (ai->target == NULL) {
+    if (ai->m_pSightTarget == NULL) {
         return;
     }
-    side = func_002451AC(self, ai, ai->target, 0.3490659f);
+    side = func_002451AC(self, ai, ai->m_pSightTarget, 0.3490659f);
     if (side != 0) {
         push.x = -(f32) side * 204.79999f;
         push.y = 0.0f;

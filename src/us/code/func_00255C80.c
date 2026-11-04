@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define P_S16(p, off) (*(s16 *)((u8 *)(p) + (off)))
 
 /* Multiplayer/menu state: byte 0x1281 (D_8011AAF1) is the "enabled" flag. */
-extern u8 D_80119870[];
 
 extern char D_004396DC[];
 extern char D_00439748[];
@@ -25,8 +25,8 @@ void func_00255C80(CPlayer *player, CGameObjectInstance *actor) {
     actor->m_vVelocity.y = 0.0f;
     actor->m_vVelocity.z = 0.0f;
     func_0042EB04();
-    if (D_80119870[0x1281] != 0) {
-        switch ((u32) func_0025340C(D_80119870, player)) {
+    if (D_80119870.m_Settings.multiplayer != 0) {
+        switch ((u32) func_0025340C(&D_80119870.m_PlayerList, player)) {
         default:
         case 0:
             text = D_0043AB60;

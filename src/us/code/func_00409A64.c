@@ -7,8 +7,10 @@
  * src/us/code/func_0040C4F4.c, func_0040A418.c and func_0040A8FC.c); the plain
  * loop puts the counter in $v0 instead of $v1. */
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
@@ -27,61 +29,23 @@ typedef struct {
     u8 c[4];
 } __attribute__((aligned(4))) Part;
 
-typedef struct Actor {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x18 - 0x10];
-    /* 0x018 */ CVector3 vel;
-    /* 0x024 */ u8 pad24[0x50 - 0x24];
-    /* 0x050 */ f32 yaw;
-    /* 0x054 */ u8 pad54[0xD4 - 0x54];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
-    /* 0x140 */ u8 ai[0x1A8 - 0x140];
-    /* 0x1A8 */ struct CPlayer *owner;
-    /* 0x1AC */ u8 pad1AC[0x28C - 0x1AC];
-    /* 0x28C */ struct Actor *next;
-} Actor;
-
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ Actor *actor;
-    /* 0x08 */ u8 pad8[0x40 - 0x8];
-    /* 0x40 */ f32 dist;
-} Target;
-
-typedef struct {
-    /* 0x00 */ Target a;
-    /* 0x44 */ Target b;
-} Targets;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x630];
-    /* 0x630 */ Actor *actors[7];
-    /* 0x64C */ s32 count;
-    /* 0x650 */ u8 pad650[0x658 - 0x650];
-    /* 0x658 */ s32 coreCount;
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ u8 pad660[0x670 - 0x660];
-    /* 0x670 */ s32 alive;
-} State;
 
 extern SpawnPoint D_00431D20[4];
-extern void func_00246108(Actor *actor, void *ai, Targets *t, s32 f1, s32 f2);
+extern void func_00246108(CListedInstance *actor, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 func_002119FC(f32 min, f32 max);
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern void func_00246690(Actor *actor, s32 id, CVector3 pos, s32 a5);
+extern void func_00246690(CListedInstance *actor, s32 id, CVector3 pos, s32 a5);
 
-static __inline__ void FindTarget(Actor *obj, Actor **target) {
-    Targets targets;
+static __inline__ void FindTarget(CListedInstance *obj, CListedInstance **target) {
+    CAITargets targets;
 
     *target = NULL;
     func_00246108(obj, (u8 *)obj + 0x140, &targets, 1, 0);
-    if (targets.b.actor != NULL && (targets.b.actor->flags & 0x300000)) {
-        *target = targets.b.actor;
+    if (targets.m_Path.m_pTarget != NULL && (targets.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
+        *target = (CListedInstance *) targets.m_Path.m_pTarget;
     }
 }
 
@@ -96,9 +60,9 @@ static __inline__ f32 DistXZ(CVector3 a, CVector3 *b) {
 /* Teleports the current target (when it is a flagged actor) to a random spot: around the spawn point
  * nearest to it (within 460.8) inside that point's angle range, else around itself; retried until the spot
  * is at least 460.8 away from every spawn point. */
-void func_00409A64(Actor *obj, s32 nearSelf) {
+void func_00409A64(CListedInstance *obj, s32 nearSelf) {
     CVector3 p;
-    Actor *target;
+    CListedInstance *target;
     s32 retry;
     s32 idx;
     s32 i;
@@ -121,7 +85,7 @@ void func_00409A64(Actor *obj, s32 nearSelf) {
         if (idx >= 0) {
             break;
         }
-        func_0020EF2C(&p, &target->pos, &D_00431D20[i].pos);
+        func_0020EF2C(&p, &target->m_Instance.header.m_vPos, &D_00431D20[i].pos);
         if (func_00298470(p.x * p.x + p.y * p.y + p.z * p.z) < 460.8f) {
             idx = i;
         }
@@ -135,8 +99,8 @@ void func_00409A64(Actor *obj, s32 nearSelf) {
                 r = func_002119FC(460.8f, 921.6f);
                 angle = func_002119FC(D_00431D20[idx].minAngle, D_00431D20[idx].maxAngle);
             } else {
-                baseX = target->pos.x;
-                baseZ = target->pos.z;
+                baseX = target->m_Instance.header.m_vPos.x;
+                baseZ = target->m_Instance.header.m_vPos.z;
                 if (nearSelf) {
                     r = 0.0f;
                     angle = 0.0f;
@@ -163,27 +127,26 @@ void func_00409A64(Actor *obj, s32 nearSelf) {
     func_00246690(target, 0x112, p, 0);
 }
 
-extern State D_8012FB70;
-extern Actor *D_8010FEB4;
+extern CListedInstance *D_8010FEB4;
 extern u8 D_8010ABA0[];
 
 extern void func_002688C8(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
 extern void *func_00228108(void *world, s32 model, s32 type, s32 intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
 extern void func_00236EA0(void *src, void *dst, s32 kind, s32 id, CVector3 pos, Part part);
-extern void func_00243414(Actor *obj, void *ai, s32 state);
+extern void func_00243414(CListedInstance *obj, void *ai, s32 state);
 extern void func_0020F040(CVector3 *v);
 extern void func_0020EF60(CVector3 *out, CVector3 *a, f32 s);
 extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
 /* func_0040C4F4 */
 static __inline__ s32 fewerActorsThan(s32 max) {
-    Actor *actor;
+    CListedInstance *actor;
     s32 count = 0;
 
-    for (actor = D_8010FEB4; actor != NULL; actor = actor->next) {
+    for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {
         /* both arms are merged by cross-jumping; the extra block gives the ROM's register allocation */
-        if (actor->next != NULL) {
+        if (actor->m_pNext != NULL) {
             count++;
         } else {
             count++;
@@ -193,16 +156,16 @@ static __inline__ s32 fewerActorsThan(s32 max) {
 }
 
 /* func_0040BD60 */
-static __inline__ f32 getTargetDist(Actor *obj, Actor **found) {
-    Targets t;
+static __inline__ f32 getTargetDist(CListedInstance *obj, CListedInstance **found) {
+    CAITargets t;
     f32 dist;
 
     dist = -1.0f;
     *found = NULL;
-    func_00246108(obj, obj->ai, &t, 1, 0);
-    if (t.b.actor != NULL && (t.b.actor->flags & 0x300000)) {
-        dist = t.b.dist;
-        *found = t.b.actor;
+    func_00246108(obj, &obj->m_Instance.m_AI, &t, 1, 0);
+    if (t.m_Path.m_pTarget != NULL && (t.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
+        dist = t.m_Path.m_FlatDist;
+        *found = (CListedInstance *) t.m_Path.m_pTarget;
     }
     return dist;
 }
@@ -212,11 +175,11 @@ static __inline__ f32 getTargetDist(Actor *obj, Actor **found) {
  * live minions around the target, or knocks the target back. 1228.7999f: the
  * ROM's pool word is 0x44999999, one ulp under 1228.8f. */
 void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
-    State *s = &D_8012FB70;
-    Actor *obj = self;
-    Actor *found;
+    MotherBossState *s = &D_8012FB70;
+    CListedInstance *obj = self;
+    CListedInstance *found;
     CPlayer *owner;
-    Actor *actor;
+    CListedInstance *actor;
     f32 dist;
     s32 i;
     s32 region;
@@ -231,7 +194,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
     dist = getTargetDist(obj, &found);
     owner = NULL;
     if (found != NULL) {
-        owner = found->owner;
+        owner = (CPlayer *) found->m_Instance.m_AI.m_pParent;
     }
     switch (ev.type) {
     case 0:
@@ -240,7 +203,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             scale.x = 0.5f;
             scale.y = 0.5f;
             scale.z = 0.5f;
-            func_00228108(D_8010ABA0, -1, 0x458, s->coreCount, region, ev.pos, 0.0f, obj->vel, scale, NULL);
+            func_00228108(D_8010ABA0, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
         }
         break;
     case 1:
@@ -255,20 +218,20 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
         break;
     case 2:
         if (found != NULL && owner != NULL) {
-            for (i = 0; i < s->alive; i++) {
-                actor = s->actors[i];
+            for (i = 0; i < s->partsLeft; i++) {
+                actor = (CGameObjectInstance *)s->parts[i];
                 r = func_002119FC(153.59999f, 256.0f);
-                angle = found->yaw + 3.1415927f + func_002119FC(-0.5235988f, 0.5235988f);
+                angle = found->m_Instance.m_RotY + 3.1415927f + func_002119FC(-0.5235988f, 0.5235988f);
                 x = owner->m_CharacterActor.header.m_vPos.x;
                 z = owner->m_CharacterActor.header.m_vPos.z;
                 dx = r * func_002982F0(angle);
                 dz = r * func_002974C0(angle);
                 x += dx;
                 z += dz;
-                actor->pos.y = func_002119FC(-204.79999f, -51.199997f);
-                actor->pos.x = x;
-                actor->pos.z = z;
-                func_00243414(actor, actor->ai, 1);
+                actor->m_Instance.header.m_vPos.y = func_002119FC(-204.79999f, -51.199997f);
+                actor->m_Instance.header.m_vPos.x = x;
+                actor->m_Instance.header.m_vPos.z = z;
+                func_00243414(actor, &actor->m_Instance.m_AI, 1);
             }
         }
         break;
@@ -296,10 +259,10 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
         if (found != NULL) {
             CVector3 push;
 
-            func_0020EF2C(&push, &obj->pos, &found->pos);
+            func_0020EF2C(&push, &obj->m_Instance.header.m_vPos, &found->m_Instance.header.m_vPos);
             func_0020F040(&push);
             func_0020EF60(&push, &push, dist);
-            func_0020EEF8(&found->vel, &found->vel, &push);
+            func_0020EEF8(&found->m_Instance.m_vVelocity, &found->m_Instance.m_vVelocity, &push);
         }
         break;
     }
