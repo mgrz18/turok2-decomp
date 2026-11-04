@@ -1,16 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, func_8027B720_de, with Turok 2's layouts. */
 
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/particle.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
     /* 0x0C */ CVector3 max;
 } Box;
-
-typedef struct ParticleDef {
-    /* 0x00 */ u32 flags;
-} ParticleDef;
 
 typedef struct Target {
     /* 0x000 */ u8 kind;
@@ -38,42 +34,6 @@ struct Player {
     /* 0x0A0A */ u8 padA0A[0x1320 - 0xA0A];
     /* 0x1320 */ Player *next;
 };
-
-typedef struct Particle {
-    /* 0x000 */ u8 pad0[2];
-    /* 0x002 */ u16 type;
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ s32 unk10;
-    /* 0x014 */ u8 pad14[4];
-    /* 0x018 */ CVector3 velocity;
-    /* 0x024 */ u8 pad24[0x40 - 0x24];
-    /* 0x040 */ u32 flags;
-    /* 0x044 */ u8 pad44[0xF8 - 0x44];
-    /* 0x0F8 */ ParticleDef *def;
-    /* 0x0FC */ u8 padFC[0x114 - 0xFC];
-    /* 0x114 */ Target *target;
-    /* 0x118 */ u8 pad118[4];
-    /* 0x11C */ f32 time;
-    /* 0x120 */ f32 frame;
-    /* 0x124 */ f32 rate;
-    /* 0x128 */ s16 life;
-    /* 0x12A */ u8 pad12A[2];
-    /* 0x12C */ CVector3 size;
-    /* 0x138 */ CVector3 growth;
-    /* 0x144 */ CVector3 prevPos;
-    /* 0x150 */ CVector3 direction;
-    /* 0x15C */ CVector3 rot;
-    /* 0x168 */ CVector3 rotSpeed;
-    /* 0x174 */ u8 pad174[0x190 - 0x174];
-    /* 0x190 */ s32 hitFlags;
-    /* 0x194 */ u8 pad194;
-    /* 0x195 */ u8 hitSurface;
-    /* 0x196 */ u8 pad196[2];
-    /* 0x198 */ f32 fall;
-    /* 0x19C */ u8 pad19C[0x1AC - 0x19C];
-    /* 0x1AC */ s8 space;
-    /* 0x1AD */ s8 shake;
-} Particle;
 
 /* The result of the last collision test. */
 typedef struct CollisionResult {
@@ -116,25 +76,25 @@ extern Listener *D_800F1ADC;
 extern u8 D_800F8928[];
 
 s32 func_002113A4(void);
-s32 func_00239F00(Particle *p, CVector3 pos, s32 *flags);
+s32 func_00239F00(CParticle *p, CVector3 pos, u32 *flags);
 f32 func_002671B4(Player *player);
 f32 func_002672C8(Player *player);
 f32 func_00298470(f32 x);
-void func_002324E8(Particle *p);
-void func_0022F1C8(void *list, Particle *p);
-void func_00232B40(Particle *p);
-void func_002323E0(Particle *p);
-void func_0022A4C8(Particle *p);
+void func_002324E8(CParticle *p);
+void func_0022F1C8(void *list, CParticle *p);
+void func_00232B40(CParticle *p);
+void func_002323E0(CParticle *p);
+void func_0022A4C8(CParticle *p);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_0020F040(CVector3 *v);
-void func_0022AAE0(Particle *p);
-void func_0022BD10(Particle *p);
-void func_0022BA88(Particle *p);
-void func_0022CA90(Particle *p);
-void func_0022C488(Particle *p);
-void func_0022BFA0(Particle *p);
-void func_0022C228(Particle *p);
-void func_00232934(Particle *p);
+void func_0022AAE0(CParticle *p);
+void func_0022BD10(CParticle *p);
+void func_0022BA88(CParticle *p);
+void func_0022CA90(CParticle *p);
+void func_0022C488(CParticle *p);
+void func_0022BFA0(CParticle *p);
+void func_0022C228(CParticle *p);
+void func_00232934(CParticle *p);
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
@@ -143,7 +103,7 @@ void func_00232934(Particle *p);
  * size and spin (dying when a size goes negative) and, when it moves or falls, probes the
  * ground, orients itself to the surface it hit and runs the collision responses its
  * descriptor allows. */
-void func_0022AFB4(Particle *p) {
+void func_0022AFB4(CParticle *p) {
     Box bounds;
     Target *target;
     Player *player;
@@ -160,18 +120,18 @@ void func_0022AFB4(Particle *p) {
     s32 i;
     s8 fade;
 
-    if (p->time < 0.0f) {
+    if (p->m_cFrame < 0.0f) {
         return;
     }
-    extent = p->size.z;
-    scaled = p->size.y * extent;
-    if (!(p->size.x * extent <= scaled)) {
+    extent = p->m_vSize.z;
+    scaled = p->m_vSize.y * extent;
+    if (!(p->m_vSize.x * extent <= scaled)) {
         /* FAKEMATCH: an always-true test (folded only after CSE) keeps CSE from carrying the
          * 0.0f of the time check into the code below, as in the ROM. */
         if (p != NULL) {
-            scaled = p->size.x * extent;
+            scaled = p->m_vSize.x * extent;
         } else {
-            scaled = p->size.x * extent;
+            scaled = p->m_vSize.x * extent;
         }
     }
     if (!(scaled <= extent)) {
@@ -179,25 +139,25 @@ void func_0022AFB4(Particle *p) {
     }
     scaled = extent * 1.4142135f;
     half = scaled * 0.5f;
-    bounds.min.x = p->pos.x - half;
-    bounds.max.x = p->pos.x + half;
-    bounds.min.y = p->pos.y - half;
-    bounds.max.y = p->pos.y + scaled;
-    bounds.min.z = p->pos.z - half;
-    bounds.max.z = p->pos.z + half;
-    if (p->flags & 0x20000) {
-        p->time = 0.0f;
-        p->life = p->rate * 32.0f;
-        half = p->shake - D_800B6D28 * 6.0f;
+    bounds.min.x = p->header.m_vPos.x - half;
+    bounds.max.x = p->header.m_vPos.x + half;
+    bounds.min.y = p->header.m_vPos.y - half;
+    bounds.max.y = p->header.m_vPos.y + scaled;
+    bounds.min.z = p->header.m_vPos.z - half;
+    bounds.max.z = p->header.m_vPos.z + half;
+    if (p->m_dwFlags & 0x20000) {
+        p->m_cFrame = 0.0f;
+        p->m_nFrames = p->m_AnimSpeed * 32.0f;
+        half = p->m_Shake - D_800B6D28 * 6.0f;
         fade = (half < 0.0f) ? 0 : (s32) half;
-        p->shake = fade;
+        p->m_Shake = fade;
     }
-    if (p->flags & 0x10000) {
-        target = p->target;
-        switch (p->type) {
+    if (p->m_dwFlags & 0x10000) {
+        target = (Target *)p->m_pTarget;
+        switch (p->header.m_nObjType) {
             default:
-                p->time = 0.0f;
-                p->life = p->rate * 32.0f;
+                p->m_cFrame = 0.0f;
+                p->m_nFrames = p->m_AnimSpeed * 32.0f;
             case 0x2D:
             case 0x4F:
                 die = 0;
@@ -207,7 +167,7 @@ void func_0022AFB4(Particle *p) {
                 break;
         }
         bounce = die;
-        switch (p->type) {
+        switch (p->header.m_nObjType) {
             case 0x12A:
             case 0x132:
                 die = 0;
@@ -219,7 +179,7 @@ void func_0022AFB4(Particle *p) {
             case 0xF:
             case 0x56:
             case 0x126:
-                if (p->flags & 0x4000000) {
+                if (p->m_dwFlags & 0x4000000) {
                     die = 1;
                 } else if (!(target->flags & 0x100)) {
                     die = 1;
@@ -248,40 +208,40 @@ void func_0022AFB4(Particle *p) {
                 break;
         }
         if (die || bounce) {
-            p->time = 0.0f;
-            p->space = -7;
-            p->flags = (p->flags & ~0x30000) | 0x40000;
-            p->rot.z = (f32) (func_002113A4() % 360) * 0.017453294f;
-            p->velocity.y = 0.0f;
-            if (p->flags & 0x4000000) {
-                p->velocity.x = -p->direction.x;
-                p->velocity.z = -p->direction.z;
+            p->m_cFrame = 0.0f;
+            p->m_Alignment = -7;
+            p->m_dwFlags = (p->m_dwFlags & ~0x30000) | 0x40000;
+            p->m_vRot.z = (f32) (func_002113A4() % 360) * 0.017453294f;
+            p->m_vVelocity.y = 0.0f;
+            if (p->m_dwFlags & 0x4000000) {
+                p->m_vVelocity.x = -p->m_vDirection.x;
+                p->m_vVelocity.z = -p->m_vDirection.z;
             } else {
-                p->velocity.x = 0.0f;
-                p->velocity.z = 0.0f;
+                p->m_vVelocity.x = 0.0f;
+                p->m_vVelocity.z = 0.0f;
             }
-            p->unk10 = target->unk10;
-            p->hitFlags &= ~0x1000000;
+            p->header.m_pCurrentRegion = (struct CGameRegion *)target->unk10;
+            p->m_dwHitFlags &= ~0x1000000;
             if (bounce) {
-                p->life = 1;
+                p->m_nFrames = 1;
             }
         }
     }
-    if ((p->flags & 0x40000) && func_00239F00(p, p->pos, &p->hitFlags) && D_800F1CE0.unkB4 != 0) {
-        p->space = -3;
+    if ((p->m_dwFlags & 0x40000) && func_00239F00(p, p->header.m_vPos, &p->m_dwHitFlags) && D_800F1CE0.unkB4 != 0) {
+        p->m_Alignment = -3;
     }
-    if (p->flags & 0x60000) {
+    if (p->m_dwFlags & 0x60000) {
         for (player = D_80119890; player != NULL; player = player->next) {
             if (player->health != 0 && player->mode != 2) {
                 top = player->pos.y + player->height;
-                if (top - 20.479999f <= p->pos.y && p->pos.y <= top + func_002671B4(player) + 20.479999f) {
-                    dist = func_00298470((player->pos.x - p->pos.x) * (player->pos.x - p->pos.x)
-                                         + (player->pos.z - p->pos.z) * (player->pos.z - p->pos.z));
+                if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + func_002671B4(player) + 20.479999f) {
+                    dist = func_00298470((player->pos.x - p->header.m_vPos.x) * (player->pos.x - p->header.m_vPos.x)
+                                         + (player->pos.z - p->header.m_vPos.z) * (player->pos.z - p->header.m_vPos.z));
                     if (dist < func_002672C8(player) + 51.199997f) {
                         handler = D_800ACE18;
                         for (i = 3; i != -1; handler++, i--) {
-                            if (handler->type == p->type && handler->func(player, handler)) {
-                                p->flags |= 0x1000;
+                            if (handler->type == p->header.m_nObjType && handler->func(player, handler)) {
+                                p->m_dwFlags |= 0x1000;
                                 return;
                             }
                         }
@@ -290,84 +250,84 @@ void func_0022AFB4(Particle *p) {
             }
         }
     }
-    p->prevPos = p->pos;
-    p->frame += D_800B6D28 * p->rate * (D_800B6D30 * 0.06666667f);
-    if (p->def->flags & 0x1000) {
+    p->m_vLastPos = p->header.m_vPos;
+    p->m_AnimFrame += D_800B6D28 * p->m_AnimSpeed * (D_800B6D30 * 0.06666667f);
+    if (p->m_pEffect->m_dwFlags & 0x1000) {
         step = D_800B6D28 * 10.24f;
-        p->size.x += step * p->growth.x;
-        p->size.y += step * p->growth.y;
-        p->size.z += D_800B6D28 * p->growth.z;
-        p->size.x = (p->size.x > 4096.0f) ? 4096.0f : p->size.x;
-        p->size.y = (p->size.y > 4096.0f) ? 4096.0f : p->size.y;
-        p->size.z = (p->size.z > 400.0f) ? 400.0f : p->size.z;
+        p->m_vSize.x += step * p->m_vGrowth.x;
+        p->m_vSize.y += step * p->m_vGrowth.y;
+        p->m_vSize.z += D_800B6D28 * p->m_vGrowth.z;
+        p->m_vSize.x = (p->m_vSize.x > 4096.0f) ? 4096.0f : p->m_vSize.x;
+        p->m_vSize.y = (p->m_vSize.y > 4096.0f) ? 4096.0f : p->m_vSize.y;
+        p->m_vSize.z = (p->m_vSize.z > 400.0f) ? 400.0f : p->m_vSize.z;
     } else {
-        grow = MIN(p->size.x * p->growth.x, 4096.0f);
-        p->size.x += (grow - p->size.x) * D_800B6D28;
-        grow = MIN(p->size.y * p->growth.y, 4096.0f);
-        p->size.y += (grow - p->size.y) * D_800B6D28;
-        grow = MIN(p->size.z * p->growth.z, 400.0f);
-        p->size.z += (grow - p->size.z) * D_800B6D28;
-        if (p->size.x < 0.0f || p->size.y < 0.0f || p->size.z < 0.0f) {
+        grow = MIN(p->m_vSize.x * p->m_vGrowth.x, 4096.0f);
+        p->m_vSize.x += (grow - p->m_vSize.x) * D_800B6D28;
+        grow = MIN(p->m_vSize.y * p->m_vGrowth.y, 4096.0f);
+        p->m_vSize.y += (grow - p->m_vSize.y) * D_800B6D28;
+        grow = MIN(p->m_vSize.z * p->m_vGrowth.z, 400.0f);
+        p->m_vSize.z += (grow - p->m_vSize.z) * D_800B6D28;
+        if (p->m_vSize.x < 0.0f || p->m_vSize.y < 0.0f || p->m_vSize.z < 0.0f) {
             func_002324E8(p);
             func_0022F1C8(D_800F8928, p);
             func_00232B40(p);
             return;
         }
     }
-    p->rot.x += p->rotSpeed.x * D_800B6D28;
-    p->rot.y += p->rotSpeed.y * D_800B6D28;
-    p->rot.z += p->rotSpeed.z * D_800B6D28;
-    D_800F1ADC->direction = p->velocity;
+    p->m_vRot.x += p->m_vRotSpeed.x * D_800B6D28;
+    p->m_vRot.y += p->m_vRotSpeed.y * D_800B6D28;
+    p->m_vRot.z += p->m_vRotSpeed.z * D_800B6D28;
+    D_800F1ADC->direction = p->m_vVelocity;
     func_002323E0(p);
     func_0022A4C8(p);
-    if ((p->fall == 0.0f || (p->pos.y == 0.0f && p->fall < 0.0f))
-        && p->velocity.x * p->velocity.x + p->velocity.y * p->velocity.y + p->velocity.z * p->velocity.z < 0.001f) {
+    if ((p->m_Gravity == 0.0f || (p->header.m_vPos.y == 0.0f && p->m_Gravity < 0.0f))
+        && p->m_vVelocity.x * p->m_vVelocity.x + p->m_vVelocity.y * p->m_vVelocity.y + p->m_vVelocity.z * p->m_vVelocity.z < 0.001f) {
         return;
     }
-    if (!(p->flags & 0x72000)) {
-        die = func_00239F00(p, p->pos, &p->hitFlags);
-        if (p->type == 0x68 && D_800F1CE0.current != NULL) {
-            p->target = D_800F1CE0.current;
+    if (!(p->m_dwFlags & 0x72000)) {
+        die = func_00239F00(p, p->header.m_vPos, &p->m_dwHitFlags);
+        if (p->header.m_nObjType == 0x68 && D_800F1CE0.current != NULL) {
+            p->m_pTarget = (CGameObjectInstance *)D_800F1CE0.current;
         }
         if (die) {
             if (D_800F1CE0.current != NULL) {
-                func_0020EF2C(&p->direction, &p->pos, &D_800F1CE0.origin);
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.origin);
             } else if (D_800F1CE0.unk88 != 0) {
-                func_0020EF2C(&p->direction, &p->pos, &D_800F1CE0.unk90);
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.unk90);
             } else if (D_800F1CE0.unk9C != 0) {
-                func_0020EF2C(&p->direction, &p->pos, &D_800F1CE0.unkA0);
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.unkA0);
             } else if (D_800F1CE0.unkB4 != 0) {
-                func_0020EF2C(&p->direction, &p->pos, &D_800F1CE0.unkB8);
-                if (p->space == -7) {
-                    p->space = -3;
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.unkB8);
+                if (p->m_Alignment == -7) {
+                    p->m_Alignment = -3;
                 }
             } else if (D_800F1CE0.unkC4 != 0) {
-                func_0020EF2C(&p->direction, &p->pos, &D_800F1CE0.unkC8);
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.unkC8);
             }
-            func_0020F040(&p->direction);
+            func_0020F040(&p->m_vDirection);
         }
         func_0022AAE0(p);
         if (D_800F1CE0.unkC4 != 0) {
             func_0022BD10(p);
         }
-        if (p->flags & 0x100) {
+        if (p->m_dwFlags & 0x100) {
             if (D_800F1CE0.unk9C != 0) {
-                if (!(p->def->flags & 0x10000000)) {
+                if (!(p->m_pEffect->m_dwFlags & 0x10000000)) {
                     func_0022BA88(p);
                 }
-                if (p->def->flags & 0x800) {
-                    p->hitSurface = 1;
+                if (p->m_pEffect->m_dwFlags & 0x800) {
+                    p->m_bDieOnImpact = 1;
                 }
             }
-            if (p->flags & 0x100) {
+            if (p->m_dwFlags & 0x100) {
                 if (D_800F1CE0.current != NULL) {
-                    if ((p->hitFlags & 0x1000000) && D_800F1CE0.current->kind == 0) {
+                    if ((p->m_dwHitFlags & 0x1000000) && D_800F1CE0.current->kind == 0) {
                         func_0022CA90(p);
                     } else {
                         func_0022C488(p);
                     }
                 }
-                if ((p->flags & 0x100) && D_800F1CE0.unkB0 != 0 && !(p->def->flags & 0x20000000)) {
+                if ((p->m_dwFlags & 0x100) && D_800F1CE0.unkB0 != 0 && !(p->m_pEffect->m_dwFlags & 0x20000000)) {
                     if (D_800F1CE0.unkB0 == 1) {
                         func_0022BFA0(p);
                     } else {
@@ -377,7 +337,7 @@ void func_0022AFB4(Particle *p) {
             }
         }
     }
-    if ((p->flags & 0x8100) == 0x100) {
+    if ((p->m_dwFlags & 0x8100) == 0x100) {
         func_00232934(p);
     }
 }
