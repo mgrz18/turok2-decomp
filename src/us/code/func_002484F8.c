@@ -1,17 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x0 */ s16 index;            /* into the player's ammo */
-    /* 0x2 */ s16 max;
-} AmmoInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ AmmoInfo *ammo[3];
-} WeaponDef;
-
-extern WeaponDef *D_800AF618[];  /* the weapons */
+#include "structs/weapon.h"
 
 s32 func_0026EFB8(s32 who);
 
@@ -24,7 +13,7 @@ s32 func_002484F8(CPlayer *p, s32 kind, s32 who) {
     s32 any;
     s32 i;
     s32 j;
-    WeaponDef *weapon;
+    WeaponInfo *weapon;
     AmmoInfo *info;
     s16 *ammo;
 
@@ -46,7 +35,7 @@ s32 func_002484F8(CPlayer *p, s32 kind, s32 who) {
                     if (info == NULL) {
                         break;
                     }
-                    ammo = &p->m_Data.m_AmmoList[info->index];
+                    ammo = &p->m_Data.m_AmmoList[info->type];
                     if (*ammo < info->max) {
                         any = 1;
                     }

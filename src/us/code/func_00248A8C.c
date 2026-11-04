@@ -1,14 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x48];
-    /* 0x48 */ s32 unk48;
-    /* 0x4C */ s32 unk4C;
-} WeaponDef;
+#include "structs/weapon.h"
 
 extern u8 D_8011AAF1;            /* multiplayer */
-extern WeaponDef *D_800AF618[];  /* the weapons */
 
 /* Takes every weapon and all ammo away, then gives the starting kit: in
  * multiplayer by character (10 gets weapon 0x22), otherwise the
@@ -53,7 +47,7 @@ void func_00248A8C(CPlayer *p) {
         p->m_Data.m_LastWeapon[2] = 0x13;
     }
     if (D_8011AAF1) {
-        p->m_WeaponActor.m_AI.m_pModeTable = D_800AF618[p->m_RequestedWeapon]->unk48;
-        p->m_WeaponActor.m_AI.m_pfEffects = D_800AF618[p->m_Data.m_CurrentWeapon]->unk4C;
+        p->m_WeaponActor.m_AI.m_pModeTable = D_800AF618[p->m_RequestedWeapon]->modeTable;
+        p->m_WeaponActor.m_AI.m_pfEffects = D_800AF618[p->m_Data.m_CurrentWeapon]->effects;
     }
 }

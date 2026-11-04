@@ -4,6 +4,7 @@
  * 0x800A6B0C, it would not be). */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/weapon.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -11,14 +12,6 @@
 /* Weapon auto-aim: finds the target closest to the player's aim direction
  * within the weapon's cone and returns the rotation that turns the aim
  * toward it (identity when there is none). */
-
-typedef struct WeaponDef {
-    /* 0x00 */ u8 pad0[0xE];
-    /* 0x0E */ s16 aimHold;
-    /* 0x10 */ s16 lockHold;
-    /* 0x12 */ u8 pad12[0x1C - 0x12];
-    /* 0x1C */ f32 aimCone;
-} WeaponDef;
 
 typedef struct AimOptions {
     /* 0x00 */ u8 pad0[0x2E];
@@ -72,7 +65,6 @@ typedef struct GameState {
 } GameState;
 
 extern GameState D_80119890;
-extern WeaponDef *D_800AF618[];
 extern s32 D_800F7E70;
 extern AimActor *D_800F7C70[];
 extern f32 D_800DD78C;

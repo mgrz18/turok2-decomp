@@ -1,17 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct {
-    /* 0x0 */ s16 index;            /* into the player's ammo */
-    /* 0x2 */ s16 max;
-    /* 0x4 */ s16 projectile;
-    /* 0x6 */ u16 cost;
-} AmmoInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ AmmoInfo *ammo[3];
-} WeaponDef;
+#include "structs/weapon.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x114];
@@ -51,7 +40,6 @@ typedef struct {
     /* 0x1294 */ f32 power;
 } FirePlayer;
 
-extern WeaponDef *D_800AF618[];  /* the weapons */
 extern f32 D_800AE350;
 extern f32 D_800ACE10;          /* projectile speed scale */
 extern f32 D_800ACE14;          /* projectile power */
@@ -70,7 +58,7 @@ void func_0022F350(void *list, FirePlayer *src, FirePlayer *owner, s32 a3, s32 t
 #define CHARGE(p) if ((p)->charge >= 3.0f) { (p)->charge -= 3.0f; }
 /* Whether the weapon fires the given projectile. */
 static __inline__ s32 usesProjectile(s32 weapon, s32 type) {
-    WeaponDef *def = D_800AF618[weapon];
+    WeaponInfo *def = D_800AF618[weapon];
     s32 i;
 
     for (i = 0; i < 3; i++) {
@@ -109,7 +97,7 @@ void func_00248720(FirePlayer *p, s32 type) {
         if (found) {
             s32 readyAnim = 1; /* compared below; held in $a2 from here */
             aim = p->aim;
-            ammo = &p->ammo[info->index];
+            ammo = &p->ammo[info->type];
             *ammo -= info->cost;
             if (*ammo < 0) {
                 *ammo = 0;

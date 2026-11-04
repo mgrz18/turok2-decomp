@@ -1,22 +1,16 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ s16 *ammo[3]; /* each points at an ammo type id; [1] is the lower ammo */
-} WeaponDef;
-
-extern WeaponDef *D_800AF618[];
+#include "structs/weapon.h"
 
 /* func_0025398C, inlined. */
-static __inline__ s16 *GetWeaponAmmo(CPlayer *player, s32 weapon) {
-    s16 *ammo;
-    s16 *found;
+static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
+    AmmoInfo *ammo;
+    AmmoInfo *found;
     s32 i;
-    WeaponDef *def = D_800AF618[weapon];
+    WeaponInfo *def = D_800AF618[weapon];
 
     if (player->m_UseLowerAmmo && (ammo = def->ammo[1]) != NULL
-        && player->m_Data.m_AmmoList[*ammo] > 0) {
+        && player->m_Data.m_AmmoList[ammo->type] > 0) {
         return ammo;
     }
     found = NULL;
@@ -26,7 +20,7 @@ static __inline__ s16 *GetWeaponAmmo(CPlayer *player, s32 weapon) {
             break;
         }
         found = ammo;
-        if (player->m_Data.m_AmmoList[*ammo] > 0) {
+        if (player->m_Data.m_AmmoList[ammo->type] > 0) {
             return found;
         }
     }
@@ -35,7 +29,7 @@ static __inline__ s16 *GetWeaponAmmo(CPlayer *player, s32 weapon) {
 
 /* How many rounds of its ammo a weapon has, -1 if none. */
 s32 func_0024E700(CPlayer *player, s32 weapon) {
-    s16 *ammo;
+    AmmoInfo *ammo;
     s32 type;
     s32 count;
 
@@ -43,7 +37,7 @@ s32 func_0024E700(CPlayer *player, s32 weapon) {
         return -1;
     }
     ammo = GetWeaponAmmo(player, weapon);
-    type = (ammo != NULL) ? *ammo : -1;
+    type = (ammo != NULL) ? ammo->type : -1;
     count = -1;
     if (type != -1) {
         count = player->m_Data.m_AmmoList[type];
