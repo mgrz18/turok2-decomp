@@ -28,4 +28,21 @@ typedef struct GfxFrame {
 extern GfxFrame *D_800F7070;    /* the frame being drawn */
 extern GfxFrame *D_8011F140;    /* the frame being finished */
 
+/* A screen mode, as func_0042464C / func_0042456C start it: D_800C2054 holds
+ * the NTSC modes, then the PAL/MPAL ones (D_800C20E0, a symbol of its own
+ * that some files use), each indexed by the resolution set D_800C2038
+ * (1 with the expansion pak). */
+typedef struct VideoMode {
+    /* 0x00 */ s32 width;
+    /* 0x04 */ s32 height;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ s32 unk18;
+} VideoMode; /* size 0x1C */
+
+extern VideoMode D_800C2054[2][5];
+extern VideoMode D_800C20E0[5];
+
 #endif

@@ -1,15 +1,10 @@
 /* Second-module copy of func_004242EC (first module). The mode record is read as an s32 array so the loop reloads its width (alias ordering). */
 #include "common.h"
+#include "structs/frame.h"
 
 s32 func_00266B80(void); /* osGetMemSize */
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
-
-typedef struct {
-    /* 0x00 */ s32 width;
-    /* 0x04 */ s32 height;
-    /* 0x08 */ u8 pad8[0x14];
-} VideoMode; /* size 0x1C */
 
 extern s32 D_80000300; /* osTvType */
 extern s32 D_800C2030;
@@ -17,7 +12,6 @@ extern s32 D_800C2034;
 extern s32 D_800C2038; /* current mode */
 extern s32 D_800C203C; /* previous mode */
 extern s32 D_800C204C[2]; /* mode count per TV region */
-extern VideoMode D_800C2054[2][5];
 
 /* Steps to the next video mode of the TV region that fits in memory. */
 void func_0045D20C(void) {
