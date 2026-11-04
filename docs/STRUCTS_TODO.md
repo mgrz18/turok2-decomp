@@ -230,6 +230,49 @@ matches, `make verify` passes, matched (959,788 bytes) and readable
   it): ScriptAnimator, used by LevelScriptState's lights and the Blind One's
   hit flashes.
 
+## The third pass: collision (u6)
+
+`structs/collision.h` holds the collision code's types, every function still
+matching:
+
+- **CCollisionInfo** (0x1C): an object's collision response, Rage Wars'
+  CCollisionInfo2_t (m_dwFlags, the instance / wall / ground behaviours, the
+  gravity, bounce and friction constants). The SweepDef / CollisionDef
+  views of 15 files and the `struct CollisionInfo` of func_0022D2FC /
+  func_00245E48 are gone.
+- **CCollisionResults** (0xF0, D_800F1CE0; D_800F1ADC points at the one
+  being filled, Turok 3's gCollisionResults / gCollisionResultsP): one
+  record per thing hit (instance and node, shape, wall and edge, floor or
+  ceiling, water or model), the mover's velocity and the plane's normal,
+  with the hit node's HitFrame (0x70) copied at 0x18. The CollisionResult,
+  CollisionOut, HitTarget, HitBuffer, Listener, PlayerState,
+  CollisionState, SpawnSource, SpawnView, SpawnParams, BlastOverride,
+  CollisionPoint and HitInstance views (and the pointer views that read its
+  first word) are gone; D_800F1CE8, D_800F1CF4, D_800F1CF8, D_800F1D7C,
+  D_800F1D94 and D_800F1DA4 are its fields. Kept as before, with a comment:
+  func_002554D0 and func_0025EF68 (read m_pInstance as a pointer variable),
+  func_0022BFA0 and func_0022C228 (D_800F1D94 / D_800F1D98 as their own
+  symbols), func_0022BA88 (the same pattern, not tried).
+- **Sweep** (0xA8) with **SweepHit** (the nearest hit and where
+  func_0023C120 writes it back), **ModelSweep**, **MapSweep**, **SweepBox**:
+  the Sweep / Controller / Outputs views of 26 files. The object a sweep
+  moves is `obj` (CGameObjectInstance) or `inst` (its CInstanceHeader);
+  the files that see a particle there (func_0023DF70, func_0023F880,
+  func_0024032C) cast to their local HitInst.
+- **CollisionQuad** (a box face, 15 files), **DamageEvent** (0x18, Rage
+  Wars' Shared_DamageEvent, func_00245828 fills it: 20 files with the
+  Damage / HitInfo views), **HitFrame** (the 0x70-byte hittable node,
+  Rage Wars' shield: Shield / BlastSrc / HitRegion), **CBox** (D_800F5A10,
+  the cameras' visible box, and the local Bounds / Box of 11 files).
+
+Left: the imported Rage Wars files (func_0021A658, func_002418C0,
+func_00235C30) keep their own types; the Quad of func_00238114,
+func_0024C47C, func_0042DE74 and func_00466D94 is four words copied (a
+CQuaternion), not a box face; the Mover / Collider / HitInst object views
+of the sweep files are instance or particle views (the Actor and Particle
+families). CCollisionResults unk_ fields and the 0x18..0x88 HitFrame words
+are not known yet.
+
 ## include/structs/player.h (fixed and hoisted)
 
 The header was 4 and then 8 bytes high between 0xA08 and the HUD. Fixed
