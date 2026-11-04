@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Module init: find the module actors (0x1DB1) and the controller (0x1DB2), hook the level callbacks,
  * then attach every slot to the object. */
@@ -8,19 +9,15 @@ typedef struct {
     /* 0x04 */ u8 data[0x68 - 0x4];
 } Slot;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x250];
-    /* 0x250 */ s32 unk250;
-} LevelActor;
 
 typedef struct {
     /* 0x000 */ void *obj;
     /* 0x004 */ s32 count;
-    /* 0x008 */ LevelActor *actors[4];
+    /* 0x008 */ CGameObjectInstance *actors[4];
     /* 0x018 */ Slot slots[15];
-    /* 0x630 */ LevelActor *parts[7];
+    /* 0x630 */ CGameObjectInstance *parts[7];
     /* 0x64C */ s32 partCount;
-    /* 0x650 */ LevelActor *controller;
+    /* 0x650 */ CGameObjectInstance *controller;
     /* 0x654 */ u8 pad654[0x658 - 0x654];
     /* 0x658 */ void *handle;
     /* 0x65C */ u8 pad65C[0x670 - 0x65C];
@@ -71,11 +68,11 @@ void func_00442340(Obj *obj, Level *level) {
     state->unk684 = 0;
     state->partCount = func_00225F6C(D_800F7078, 0x650, 10, 0x1DB1, state->parts, 6);
     for (i = 0; i < state->partCount; i++) {
-        state->parts[i]->unk250 = 1;
+        state->parts[i]->m_AI.m_VarBuffer[1] = 1;
     }
     state->partsLeft = state->partCount;
     func_00225F6C(D_800F7078, 0x650, 10, 0x1DB2, &state->controller, 1);
-    state->controller->unk250 = 1;
+    state->controller->m_AI.m_VarBuffer[1] = 1;
     state->handle = func_00225EBC(D_800F7078, 1, 0x1DB1);
     level->data = D_00431E20;
     level->onReset = func_0040BC64;

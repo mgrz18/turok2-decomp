@@ -124,7 +124,7 @@ typedef struct CGameObjectInstance {
     /* 0x0AC */ void *m_rpGeometryHeader;
     /* 0x0B0 */ u32 m_rpObjectHeader;
     /* 0x0B4 */ u32 m_rpGeometryHeaderSize;
-    /* 0x0B8 */ s16 m_nTypeFlag;
+    /* 0x0B8 */ u16 m_nTypeFlag;
     /* 0x0BA */ s16 m_nAnims;
     /* 0x0BC */ CVector3 m_vMin;
     /* 0x0C8 */ CVector3 m_vMax;

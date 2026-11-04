@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ s32 active;
@@ -14,17 +15,6 @@ typedef struct {
     /* 0x04 */ u8 body[0x68 - 0x4];
 } Slot;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 pad1[0x140 - 0xD8];
-    /* 0x140 */ u8 ai[0x174 - 0x140];
-    /* 0x174 */ s8 state;
-    /* 0x175 */ u8 pad2[0x207 - 0x175];
-    /* 0x207 */ s8 active;
-    /* 0x208 */ u8 pad3[0x24C - 0x208];
-    /* 0x24C */ s32 aiState;
-} Actor;
 
 typedef struct Enemy {
     /* 0x000 */ u8 pad0[0x144];
@@ -34,15 +24,15 @@ typedef struct Enemy {
 } Enemy;
 
 typedef struct {
-    /* 0x000 */ Actor *actor;
+    /* 0x000 */ CGameObjectInstance *actor;
     /* 0x004 */ u8 pad0[0x8 - 0x4];
     /* 0x008 */ Slot slots[5];
     /* 0x210 */ s32 stepIndex;
     /* 0x214 */ Step *step;
     /* 0x218 */ s32 total;
     /* 0x21C */ s32 timer;
-    /* 0x220 */ Actor *boss;
-    /* 0x224 */ Actor *members[8];
+    /* 0x220 */ CGameObjectInstance *boss;
+    /* 0x224 */ CGameObjectInstance *members[8];
     /* 0x244 */ s32 count;
     /* 0x248 */ void *handles[2];
     /* 0x250 */ s32 enabled;
@@ -51,7 +41,7 @@ typedef struct {
 } State;
 
 void func_00243414(void *a0, void *a1, s32 event);
-void func_002666B0(Actor *actor, void *ai, s32 state);
+void func_002666B0(CGameObjectInstance *actor, void *ai, s32 state);
 extern Enemy *D_8010FEB4;
 
 /* func_00403520 */
@@ -73,9 +63,9 @@ static __inline__ void State_NextStep(State *s) {
         s->enabled = 0;
     }
     if (s->stepIndex == 7) {
-        func_00243414(s->actor, s->actor->ai, 14);
+        func_00243414(s->actor, ((u8 *)&s->actor->m_AI), 14);
     } else if (s->stepIndex == 8) {
-        func_00243414(s->actor, s->actor->ai, 16);
+        func_00243414(s->actor, ((u8 *)&s->actor->m_AI), 16);
     }
 }
 
@@ -86,7 +76,7 @@ static __inline__ s32 State_CountActive(State *s) {
     Enemy *e;
 
     for (i = 0; i < s->count; i++) {
-        if (s->members[i]->state == 1) {
+        if (s->members[i]->m_AI.m_Mode == 1) {
             n++;
         }
     }
@@ -100,16 +90,16 @@ static __inline__ s32 State_CountActive(State *s) {
 
 /* func_00403430 */
 static __inline__ void State_UpdateBoss(State *s) {
-    Actor *boss = s->boss;
+    CGameObjectInstance *boss = s->boss;
     s32 aiState;
 
-    boss->flags &= ~0x10000000;
-    aiState = boss->aiState;
+    boss->m_dwFlags &= ~0x10000000;
+    aiState = boss->m_AI.m_VarBuffer[0];
     if (aiState == 0x5AB4) {
     } else if (aiState < 0x5AB5) {
     } else if (aiState == 0x5ABE) {
-        if (boss->active != 0) {
-            func_002666B0(s->boss, s->boss->ai, 0x5ADC);
+        if (boss->m_AI.m_AnimRepeatedCount != 0) {
+            func_002666B0(s->boss, ((u8 *)&s->boss->m_AI), 0x5ADC);
         }
     }
 }
@@ -143,7 +133,7 @@ static __inline__ void State_SetStep(State *s, Step *step, s32 index) {
     }
 }
 
-void func_00401E30(State *s, Actor *actor) {
+void func_00401E30(State *s, CGameObjectInstance *actor) {
     s32 i;
 
     s->actor = actor;

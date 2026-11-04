@@ -1,14 +1,6 @@
 #include "common.h"
+#include "structs/game_object.h"
 
-typedef struct {
-    /* 0x000 */ u8 kind;
-    /* 0x001 */ u8 pad1[0xB7];
-    /* 0x0B8 */ u16 type;
-    /* 0x0BA */ u8 padBA[0xBA];
-    /* 0x174 */ s8 unk174;
-    /* 0x175 */ u8 pad175;
-    /* 0x176 */ s8 unk176;
-} Actor;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x3E];
@@ -30,20 +22,20 @@ typedef struct {
     /* 0x1460 */ s32 unk1460;
 } GameState;
 
-extern Actor *D_800F1CE0;
+extern CGameObjectInstance *D_800F1CE0;
 extern GameState D_80119890;
 
 void func_002540E4(Player *p);
 
-static __inline__ u8 ActorKind(Actor *actor) {
-    return actor->kind;
+static __inline__ u8 ActorKind(CGameObjectInstance *actor) {
+    return actor->header.m_Type;
 }
 
 /* In multiplayer, when actor 0x64E is a kind-1 actor whose 0x174/0x176 bytes
  * differ, ends the player's tag mode 1 and records it. */
 s32 func_002554D0(Player *p) {
-    Actor **slot;
-    Actor *a;
+    CGameObjectInstance **slot;
+    CGameObjectInstance *a;
     Options *opts;
     s32 kind;
     s32 mode;
@@ -51,9 +43,9 @@ s32 func_002554D0(Player *p) {
     if (D_800F1CE0 != NULL) {
         slot = &D_800F1CE0; /* read through the slot: the ROM copies the pointer */
         a = *slot;
-        kind = a->kind;
-        if (kind == 1 && D_80119890.multiplayer && D_800F1CE0->type == 0x64E
-            && D_800F1CE0->unk176 != D_800F1CE0->unk174) {
+        kind = a->header.m_Type;
+        if (kind == 1 && D_80119890.multiplayer && D_800F1CE0->m_nTypeFlag == 0x64E
+            && D_800F1CE0->m_AI.m_ModeBefore != D_800F1CE0->m_AI.m_Mode) {
             opts = p->options;
             mode = opts->tagMode;
             if (mode == kind) {

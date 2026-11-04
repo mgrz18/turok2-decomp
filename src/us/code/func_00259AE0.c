@@ -1,16 +1,11 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x934];
     /* 0x934 */ s16 unk934[1];
 } Player;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD8];
-    /* 0x0D8 */ f32 unkD8;
-    /* 0x0DC */ u8 padDC[0x1A8 - 0xDC];
-    /* 0x1A8 */ Player *owner;
-} Actor;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x34];
@@ -34,14 +29,14 @@ extern struct {
 f32 func_00211774(f32 value, f32 target, f32 rate);
 s16 *func_0025398C(Player *player, s32 id);
 
-void func_00259AE0(Actor *actor, State *state) {
+void func_00259AE0(CGameObjectInstance *actor, State *state) {
     f32 v;
 
     v = func_00211774(state->unk110, 0.174532949924469f /* 10 deg */, 0.0175f);
     state->unk110 = v;
     state->unk10C += v * D_800B6D20.delta;
     if (state->unk34 == 4 && state->unkC4 != 0x4E84) {
-        if (7.0f <= actor->unkD8) {
+        if (7.0f <= actor->m_CurrentAnimation.m_AnimationFrame) {
             if (state->unk128 == 0) {
                 state->unk12C = 0;
             }
@@ -50,7 +45,7 @@ void func_00259AE0(Actor *actor, State *state) {
             state->unk128 = 0;
         }
     } else {
-        Player *player = actor->owner;
+        Player *player = ((Player *)actor->m_AI.m_pParent);
 
         if (*(s16 *) ((s8 *) player + *func_0025398C(player, 0x15) * 2 + 0x934) != 0) {
             state->unk128 = 0;

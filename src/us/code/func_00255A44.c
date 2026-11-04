@@ -1,12 +1,6 @@
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ u8 pad10[0xC];
-    /* 0x1C */ f32 velY;
-} Actor;
 
 typedef struct {
     /* 0x000 */ s32 unk0;
@@ -32,13 +26,13 @@ typedef struct {
     /* 0xCD0 */ PlayerCD0 unkCD0;
 } Player;
 
-extern f32 func_00268A5C(Actor *actor);
+extern f32 func_00268A5C(CGameObjectInstance *actor);
 extern void func_00280EAC(void *camera);
 extern void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 /* Tracks the lowest height reached, damps the player's motion and the actor's
  * vertical speed (clamped at -51.2), resets state and plays sound 2000 there. */
-void func_00255A44(Player *player, Actor *actor) {
+void func_00255A44(Player *player, CGameObjectInstance *actor) {
     f32 h;
     PlayerCD0 *s;
 
@@ -48,9 +42,9 @@ void func_00255A44(Player *player, Actor *actor) {
     }
     player->unkA78 *= 0.5f;
     player->unkA7C *= 0.5f;
-    actor->velY *= 0.75f;
-    if (actor->velY < -51.199997f) {
-        actor->velY = -51.199997f;
+    actor->m_vVelocity.y *= 0.75f;
+    if (actor->m_vVelocity.y < -51.199997f) {
+        actor->m_vVelocity.y = -51.199997f;
     }
     player->unkBEC = 0;
     func_00280EAC(player->camera);
@@ -59,5 +53,5 @@ void func_00255A44(Player *player, Actor *actor) {
     s->unk4 = 0;
     s->unk37C = -1;
     s->unk8 = 0;
-    func_00275544(2000, actor->pos, 0, -1);
+    func_00275544(2000, actor->header.m_vPos, 0, -1);
 }

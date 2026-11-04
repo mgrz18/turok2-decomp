@@ -1,11 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8024D018_3.CPP, func_8024D728_de, with Turok 2's layouts (Turok 2 reads the normal from the region). */
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
-typedef struct Actor {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ void *region;
-} Actor;
 
 extern f32 D_800DD78C;
 
@@ -17,14 +13,14 @@ f32 func_002982F0(f32 x);                            /* sin */
 f32 func_002974C0(f32 x);                            /* cos */
 
 /* Tilt of an actor toward the floor normal under it. */
-CQuaternion func_00268F3C(Actor *obj) {
+CQuaternion func_00268F3C(CGameObjectInstance *obj) {
     CVector3 normal;
     CVector3 up;
     CVector3 axis;
     CQuaternion q;
     f32 angle;
 
-    func_0026BD20(&normal, obj->region);
+    func_0026BD20(&normal, obj->header.m_pCurrentRegion);
     up.x = 0.0f;
     up.y = 1.0f;
     up.z = 0.0f;

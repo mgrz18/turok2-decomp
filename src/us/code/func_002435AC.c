@@ -1,28 +1,22 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_2.CPP, func_80214310_de, with Turok 2's layouts. */
 
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
 typedef f32 Mtx4[4][4];
 
-typedef struct Actor {
-    char pad0[4];
-    CVector3 pos;          /* 0x04 */
-    char pad10[0x54 - 0x10];
-    f32 eye;           /* 0x54 */
-} Actor;
 
-f32 func_002671B4(Actor *actor);
+f32 func_002671B4(CGameObjectInstance *actor);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_00298470(f32 x);
-void func_0021AE6C(CQuaternion *q, Actor *actor);
+void func_0021AE6C(CQuaternion *q, CGameObjectInstance *actor);
 void func_00211114(CQuaternion *q, Mtx4 *mtx);
 void func_0020F85C(Mtx4 *mtx, CVector3 *in, CVector3 *out);
 f32 func_0021153C(f32 x);
 void func_0020F040(CVector3 *v);
 
 /* Whether target is within range of viewer and inside its horizontal (across) and vertical (up) view angles. */
-s32 func_002435AC(Actor *viewer, Actor *target, f32 range, f32 across, f32 up) {
+s32 func_002435AC(CGameObjectInstance *viewer, CGameObjectInstance *target, f32 range, f32 across, f32 up) {
     CVector3 from;
     CVector3 to;
     CVector3 dir;
@@ -40,11 +34,11 @@ s32 func_002435AC(Actor *viewer, Actor *target, f32 range, f32 across, f32 up) {
     f32 angle;
     f32 zero;
 
-    from = viewer->pos;
-    from.y += viewer->eye;
+    from = viewer->header.m_vPos;
+    from.y += viewer->m_CollisionYOffset;
     from.y += func_002671B4(viewer) * 0.9f;
-    to = target->pos;
-    to.y += target->eye;
+    to = target->header.m_vPos;
+    to.y += target->m_CollisionYOffset;
     to.y += func_002671B4(target) * 0.9f;
     func_0020EF2C(&dir, &to, &from);
     distance = func_00298470(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);

@@ -1,13 +1,10 @@
 /* Second-module copy of func_0040CFC4 (in src/us/code/func_0040C850.c). */
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Script command: waits until the current player is within 716.8 units of the origin, then steps the
  * script to the next command. */
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x24C];
-    /* 0x24C */ s32 unk24C;
-} Actor;
 
 typedef struct {
     /* 0x00 */ void *proc;
@@ -15,13 +12,13 @@ typedef struct {
 } Timer;
 
 typedef struct {
-    /* 0x000 */ Actor *leader;
+    /* 0x000 */ CGameObjectInstance *leader;
     /* 0x004 */ s32 countA;
-    /* 0x008 */ Actor *groupA[4];
+    /* 0x008 */ CGameObjectInstance *groupA[4];
     /* 0x018 */ s32 countB;
-    /* 0x01C */ Actor *groupB[4];
+    /* 0x01C */ CGameObjectInstance *groupB[4];
     /* 0x02C */ s32 countC;
-    /* 0x030 */ Actor *groupC[(0x4F8 - 0x30) / 4];
+    /* 0x030 */ CGameObjectInstance *groupC[(0x4F8 - 0x30) / 4];
     /* 0x4F8 */ s32 *script;
     /* 0x4FC */ s32 command;
     /* 0x500 */ u8 pad500[0x518 - 0x500];
@@ -55,13 +52,13 @@ static __inline__ void NextCommand(Manager *m) {
     m->timers[1].proc = NULL;
     m->timers[2].proc = NULL;
     for (i = 0; i < m->countA; i++) {
-        m->groupA[i]->unk24C = 0;
+        m->groupA[i]->m_AI.m_VarBuffer[0] = 0;
     }
     for (i = 0; i < m->countB; i++) {
-        m->groupB[i]->unk24C = 0;
+        m->groupB[i]->m_AI.m_VarBuffer[0] = 0;
     }
     for (i = 0; i < m->countC; i++) {
-        m->groupC[i]->unk24C = 0;
+        m->groupC[i]->m_AI.m_VarBuffer[0] = 0;
     }
     m->command = cmd;
     if (D_0043232C[cmd].run != NULL) {

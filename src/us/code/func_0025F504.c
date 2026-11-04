@@ -1,10 +1,6 @@
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-} Actor;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
@@ -21,13 +17,13 @@ typedef struct {
 } AI;
 
 s32 func_00267E74(void);
-f32 func_00268534(Actor *);
+f32 func_00268534(CGameObjectInstance *);
 f32 func_002119FC(f32, f32);
 f32 func_002974C0(f32);
 f32 func_002982F0(f32);
-void func_00239F00(Actor *, CVector3, s32);
+void func_00239F00(CGameObjectInstance *, CVector3, s32);
 
-void func_0025F504(Actor *self, AI *ai) {
+void func_0025F504(CGameObjectInstance *self, AI *ai) {
     f32 radius;
     f32 dist;
     f32 angle;
@@ -44,5 +40,5 @@ void func_0025F504(Actor *self, AI *ai) {
     pos.y = ai->home.y;
     pos.z = ai->home.z + dist * func_002982F0(angle);
     func_00239F00(self, pos, ai->def->id);
-    ai->target = self->pos;
+    ai->target = self->header.m_vPos;
 }

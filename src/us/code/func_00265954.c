@@ -7,22 +7,8 @@
  * func_002651FC, here out of line. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0020486C.c, r01_check, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game_object.h"
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xB8];
-    /* 0x0B8 */ u16 typeId;
-    /* 0x0BA */ s16 unkBA;
-    /* 0x0BC */ u8 padBC[0x18];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ f32 animFrame;
-    /* 0x0DC */ s16 anim;
-    /* 0x0DE */ s16 nextAnim;
-    /* 0x0E0 */ s16 animLength;
-    /* 0x0E2 */ u8 padE2[0x1E];
-    /* 0x100 */ s16 blendLength;
-    /* 0x102 */ u8 pad102[6];
-    /* 0x108 */ f32 blendFrame;
-} Actor;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x2C];
@@ -31,25 +17,25 @@ typedef struct {
     /* 0xC6 */ u8 anim;
     /* 0xC7 */ s8 active;
     /* 0xC8 */ u8 padC8[0x28];
-    /* 0xF0 */ void (*update)(Actor *, void *);
+    /* 0xF0 */ void (*update)(CGameObjectInstance *, void *);
     /* 0xF4 */ u8 padF4[4];
-    /* 0xF8 */ void (*onEvent)(Actor *, void *);
+    /* 0xF8 */ void (*onEvent)(CGameObjectInstance *, void *);
 } ActionState;
 
 /* Has the actor's animation for this state played up to `scale` of its length? */
-s32 func_00265954(Actor *actor, ActionState *state, f32 scale) {
-    if (actor->unkBA == 1) return 1;
-    if (actor->anim != (s8) state->anim || actor->nextAnim != (s8) state->anim) return 0;
-    if (state->active != 0 && !(actor->flags & 0x400)) return 1;
-    if (actor->animLength < 3 && (actor->flags & 0x400)) {
-        return (f32) actor->blendLength * scale <= actor->blendFrame;
+s32 func_00265954(CGameObjectInstance *actor, ActionState *state, f32 scale) {
+    if (actor->m_nAnims == 1) return 1;
+    if (actor->m_CurrentAnimation.m_nAnimIndex != (s8) state->anim || actor->m_CurrentAnimation.m_nRequestedAnimIndex != (s8) state->anim) return 0;
+    if (state->active != 0 && !(actor->m_dwFlags & 0x400)) return 1;
+    if ((s16) actor->m_CurrentAnimation.m_nFrames < 3 && (actor->m_dwFlags & 0x400)) {
+        return (f32) actor->m_BlendLength * scale <= actor->m_BlendPercent;
     } else {
-        return (f32) actor->animLength * scale <= actor->animFrame;
+        return (f32) (s16) actor->m_CurrentAnimation.m_nFrames * scale <= actor->m_CurrentAnimation.m_AnimationFrame;
     }
 }
 
 extern u8 D_800B2330[];
-extern void func_00265AF8(Actor *actor, void *state);
-extern void func_00265EEC(Actor *actor, void *state);
+extern void func_00265AF8(CGameObjectInstance *actor, void *state);
+extern void func_00265EEC(CGameObjectInstance *actor, void *state);
 extern void func_004088B0(void);
 

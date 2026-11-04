@@ -1,6 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_2.CPP, func_80214624_de, with Turok 2's layouts. */
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
 /* The player behind an object (owner 0x1A8 of a player-controlled one). */
 typedef struct {
@@ -11,25 +11,9 @@ typedef struct {
     /* 0xAB0 */ u8 padAB0[0xB2C - 0xAB0];
     /* 0xB2C */ s32 unkB2C;
     /* 0xB30 */ u8 padB30[0xB38 - 0xB30];
-    /* 0xB38 */ struct Actor *unkB38;
+    /* 0xB38 */ CGameObjectInstance *unkB38;
 } OwnerPlayer;
 
-typedef struct Actor {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ s32 region;
-    /* 0x014 */ s32 *def;           /* first word: kind */
-    /* 0x018 */ u8 pad18[0x50 - 0x18];
-    /* 0x050 */ f32 rotY;
-    /* 0x054 */ u8 pad54[0xB8 - 0x54];
-    /* 0x0B8 */ u16 typeId;
-    /* 0x0BA */ u8 padBA[0xD4 - 0xBA];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ OwnerPlayer *owner;
-    /* 0x1AC */ u8 pad1AC[0x27C - 0x1AC];
-    /* 0x27C */ u32 flags27C;
-} Actor;
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
@@ -47,9 +31,9 @@ typedef struct {
     /* 0x08 */ u8 pad8[0x30 - 8];
     /* 0x30 */ PlanInfo *info;
     /* 0x34 */ u8 pad34[0x68 - 0x34];
-    /* 0x68 */ Actor *ignore;
+    /* 0x68 */ CGameObjectInstance *ignore;
     /* 0x6C */ u8 pad6C[0x80 - 0x6C];
-    /* 0x80 */ Actor *approachFrom;
+    /* 0x80 */ CGameObjectInstance *approachFrom;
     /* 0x84 */ s32 unk84;
     /* 0x88 */ u8 pad88[4];
     /* 0x8C */ f32 rotY;
@@ -68,22 +52,22 @@ void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 void func_0020F040(CVector3 *v);                          /* normalise */
 f32 func_0020EAA0(CVector3 *v);                           /* heading */
-f32 func_002672C8(Actor *a);                           /* radius */
-void func_002688C8(Actor *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
-s32 func_00239C28(Actor *a, s32 b, CVector3 pos, s32 region, s32 d, CVector3 *out);
-s32 func_002399F8(Actor *a, CVector3 pos, s32 region, s32 d, CVector3 *hit);
+f32 func_002672C8(CGameObjectInstance *a);                           /* radius */
+void func_002688C8(CGameObjectInstance *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
+s32 func_00239C28(CGameObjectInstance *a, s32 b, CVector3 pos, s32 region, s32 d, CVector3 *out);
+s32 func_002399F8(CGameObjectInstance *a, CVector3 pos, s32 region, s32 d, CVector3 *hit);
 s32 func_0026BB9C(s32 region, f32 x, f32 z);
-f32 func_00246310(Actor *a, CVector3 point);
+f32 func_00246310(CGameObjectInstance *a, CVector3 point);
 
 /* The point beside `target`, on the side away from `from`, where `self`
  * stands touching it. */
-static __inline__ void Approach(Actor *self, Actor *target, Actor *from, CVector3 *outPos, s32 *outRegion) {
+static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *target, CGameObjectInstance *from, CVector3 *outPos, s32 *outRegion) {
     CVector3 dir;
     CVector3 to;
     f32 dist;
 
     if (from != NULL) {
-        func_0020EF2C(&dir, &target->pos, &from->pos);
+        func_0020EF2C(&dir, &target->header.m_vPos, &from->header.m_vPos);
         dir.y = 0.0f;
         func_0020F040(&dir);
     } else {
@@ -93,11 +77,11 @@ static __inline__ void Approach(Actor *self, Actor *target, Actor *from, CVector
     }
     dist = func_002672C8(target) + func_002672C8(self) + 51.199997f;
     func_0020EF60(&dir, &dir, dist);
-    func_0020EEF8(&to, &target->pos, &dir);
+    func_0020EEF8(&to, &target->header.m_vPos, &dir);
     func_002688C8(target, to, outPos, outRegion, 0, 0);
 }
 
-s32 func_002438C0(Actor *self, Plan *plan, Actor *target) {
+s32 func_002438C0(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *target) {
     CVector3 pos;
     CVector3 hit;
     s32 region;
@@ -115,18 +99,18 @@ s32 func_002438C0(Actor *self, Plan *plan, Actor *target) {
     } else {
         mode = 2;
         if (target != plan->ignore) {
-            if (*target->def == 5) {
+            if (*((s32 *)target->header.m_pIntelligence) == 5) {
                 mode = 5;
-            } else if (target->typeId == 0x64F) {
+            } else if (target->m_nTypeFlag == 0x64F) {
                 mode = 7;
             } else {
                 mode = 0;
                 if (D_8011001C == 0) {
-                    if ((!(target->flags & 0x300000)
-                         || (player = target->owner,
-                             (!(player->unkAAC > 0.0f) || (mode = 1, self->typeId == 0xCA && player->weapon == 0x14))
+                    if ((!(target->m_dwFlags & 0x300000)
+                         || (player = ((OwnerPlayer *)target->m_AI.m_pParent),
+                             (!(player->unkAAC > 0.0f) || (mode = 1, self->m_nTypeFlag == 0xCA && player->weapon == 0x14))
                              && (player->unkB38 != self || (mode = 1, player->unkB2C != 2))))
-                        && (!(self->flags27C & 2) || (mode = 1, self->typeId == 0xCA))) {
+                        && (!(self->m_dwHotPointFlags & 2) || (mode = 1, self->m_nTypeFlag == 0xCA))) {
                         mode = 0;
                     }
                 }
@@ -135,8 +119,8 @@ s32 func_002438C0(Actor *self, Plan *plan, Actor *target) {
     }
     switch (mode) {
     case 6:
-        pos = self->pos;
-        region = self->region;
+        pos = self->header.m_vPos;
+        region = ((s32)self->header.m_pCurrentRegion);
         break;
     case 4:
         loc = func_0028479C(&plan->location);
@@ -151,29 +135,29 @@ s32 func_002438C0(Actor *self, Plan *plan, Actor *target) {
         Approach(self, target, plan->approachFrom, &pos, &region);
         break;
     case 1:
-        region = func_00239C28(self, plan->unk84, target->pos, target->region, plan->info->unkC, &pos);
+        region = func_00239C28(self, plan->unk84, target->header.m_vPos, ((s32)target->header.m_pCurrentRegion), plan->info->unkC, &pos);
         if (region == 0) {
             do {
     default:
-                pos = target->pos;
-                region = target->region;
+                pos = target->header.m_vPos;
+                region = ((s32)target->header.m_pCurrentRegion);
             } while (0);
         }
         break;
     }
     if (func_002399F8(self, pos, region, plan->info->unkC, &hit) != 0) {
-        if (func_0026BB9C(self->region, hit.x, hit.z) != 0) {
+        if (func_0026BB9C(((s32)self->header.m_pCurrentRegion), hit.x, hit.z) != 0) {
             plan->height = hit.y;
         } else {
             plan->height = hit.y + 51.199997f;
         }
-        func_0020EF2C(&hit, &hit, &self->pos);
+        func_0020EF2C(&hit, &hit, &self->header.m_vPos);
         plan->rotY = func_0020EAA0(&hit) + 3.1415927f;
         return 1;
     }
     if (mode == 1) {
         plan->height = pos.y;
-        plan->rotY = self->rotY + func_00246310(self, pos);
+        plan->rotY = self->m_RotY + func_00246310(self, pos);
         return 1;
     }
     return 0;

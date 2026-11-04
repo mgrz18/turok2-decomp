@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x000 */ u32 flags;
@@ -10,14 +11,10 @@ typedef struct {
     /* 0x120 */ f32 unk120;
 } AI;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xD4];
-    /* 0xD4 */ u32 flags;
-} Actor;
 
 /* AI callback: in modes 0x11-0x12 sets 0x120 from the intensity (0..255 ->
  * 60..15); clears AI flag 0x4000000. */
-void func_0025F29C(Actor *self, AI *ai) {
+void func_0025F29C(CGameObjectInstance *self, AI *ai) {
     f32 level;
 
     if (ai->mode == 0x11 || ai->mode == 0x12) {

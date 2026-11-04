@@ -1,6 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SYSTEM_2/802661FC_2.CPP, func_80267958_de (inlined here), with Turok 2's layouts. */
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
 /* Applies a hit from an attacker to a target: marks the attacker, shakes the
  * target player's camera for heavy and medium hits, sprays blood from a
@@ -23,24 +23,6 @@ typedef struct {
     /* 0x00 */ s32 type;
 } ActorDef;
 
-typedef struct {
-    /* 0x000 */ u8 kind;
-    /* 0x001 */ u8 pad1[0x3];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x14 - 0x10];
-    /* 0x014 */ ActorDef *def;
-    /* 0x018 */ CVector3 velocity;
-    /* 0x024 */ u8 pad24[0x50 - 0x24];
-    /* 0x050 */ f32 spin;
-    /* 0x054 */ u8 pad54[0xD4 - 0x54];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
-    /* 0x140 */ u32 aiFlags;
-    /* 0x144 */ u8 pad144[0x17C - 0x144];
-    /* 0x17C */ u32 hitFlags;
-    /* 0x180 */ u8 pad180[0x1A8 - 0x180];
-    /* 0x1A8 */ Player *player;
-} Actor;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x66];
@@ -53,16 +35,16 @@ extern u8 D_800F7078[];
 extern void func_002811CC(PlayerCamera *camera, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos);
 extern void func_00253F90(Player *player, CVector3 *v);
 extern void func_0020E810(CQuaternion *out, CVector3 *dir);
-extern void func_002688C8(Actor *actor, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 flagA, s32 flagB);
+extern void func_002688C8(CGameObjectInstance *actor, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 flagA, s32 flagB);
 extern s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
                          CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
 extern void func_00225DB0(void *table, void *owner, s32 id, CVector3 pos, f32 a, f32 b);
-extern void func_0026E110(Actor *actor, s32 mask, Actor *other);
+extern void func_0026E110(CGameObjectInstance *actor, s32 mask, CGameObjectInstance *other);
 extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
-extern f32 func_00246310(Actor *actor, CVector3 point);
+extern f32 func_00246310(CGameObjectInstance *actor, CVector3 point);
 
 /* Its unused target and def parameters still take stack slots when inlined (the frame layout needs them). */
-static __inline__ void sprayBlood(Actor *target, Actor *actor, CVector3 position, CVector3 direction, HitDef *def, s32 kind) {
+static __inline__ void sprayBlood(CGameObjectInstance *target, CGameObjectInstance *actor, CVector3 position, CVector3 direction, HitDef *def, s32 kind) {
     Player *player;
     CVector3 v;
     CVector3 point;
@@ -70,7 +52,7 @@ static __inline__ void sprayBlood(Actor *target, Actor *actor, CVector3 position
     CQuaternion rotation;
     s32 region;
 
-    player = actor->player;
+    player = ((Player *)actor->m_AI.m_pParent);
     v.x = -direction.x;
     v.y = direction.y;
     v.z = direction.z;
@@ -92,17 +74,17 @@ static __inline__ void sprayBlood(Actor *target, Actor *actor, CVector3 position
     func_00225DB0(D_800F7078, player->controller + 0x140, 3, point, 10.24f, 1.0f);
 }
 
-void func_002376F8(Actor *target, Actor *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitDef *def, u32 flags) {
-    Actor *attacker;
+void func_002376F8(CGameObjectInstance *target, CGameObjectInstance *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitDef *def, u32 flags) {
+    CGameObjectInstance *attacker;
     u32 bits;
     Player *player;
 
-    if (source->kind == 1) {
-        source->aiFlags |= 0x4000000;
+    if (source->header.m_Type == 1) {
+        source->m_AI.m_dwFlags |= 0x4000000;
         attacker = source;
-        if (target->flags & 0x300000) {
-            bits = source->hitFlags;
-            player = target->player;
+        if (target->m_dwFlags & 0x300000) {
+            bits = source->m_AI.m_ModeFlags;
+            player = ((Player *)target->m_AI.m_pParent);
             if (bits & 0x4000) {
                 func_002811CC(player->camera, 20.0f, 100.0f, 20.0f, 1.0f, 1, pos);
             } else if (bits & 0x2000) {
@@ -110,21 +92,21 @@ void func_002376F8(Actor *target, Actor *source, s32 hit, CVector3 pos, CVector3
             }
         }
         if (hit) {
-            if (def != 0 && (attacker->flags & 0x300000) && (def->kind == 4 || def->kind == 5)) {
+            if (def != 0 && (attacker->m_dwFlags & 0x300000) && (def->kind == 4 || def->kind == 5)) {
                 sprayBlood(target, source, pos, dir, def, def->kind);
             }
             dir.x = 0;
             dir.y = 0;
             dir.z = 0;
         }
-        if ((attacker->flags & 0x300000) && (flags & 0x400000)) {
+        if ((attacker->m_dwFlags & 0x300000) && (flags & 0x400000)) {
             func_0026E110(target, 0x10, attacker);
         }
     }
-    if (target->def->type == 1 || target->def->type == 11) {
-        func_0020EEF8(&target->velocity, &target->velocity, &dir);
+    if (((ActorDef *)target->header.m_pIntelligence)->type == 1 || ((ActorDef *)target->header.m_pIntelligence)->type == 11) {
+        func_0020EEF8(&target->m_vVelocity, &target->m_vVelocity, &dir);
         if (push) {
-            target->spin += func_00246310(target, source->pos) * 0.5f;
+            target->m_RotY += func_00246310(target, source->header.m_vPos) * 0.5f;
         }
     }
 }

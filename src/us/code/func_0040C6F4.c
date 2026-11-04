@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* End of the fight: when the module object has a target, gives its owner (the player) D_00431D7C, refreshes
  * its view and turns it around; then sends the module object to anim state 0xA. */
@@ -10,16 +11,10 @@ typedef struct {
     /* 0x2D8 */ f32 viewRotY;
 } Player;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ Player *owner;
-} Actor;
 
 typedef struct {
     /* 0x00 */ s32 unk0;
-    /* 0x04 */ Actor *actor;
+    /* 0x04 */ CGameObjectInstance *actor;
     /* 0x08 */ u8 pad8[0x40 - 0x8];
     /* 0x40 */ f32 dist;
 } Target;
@@ -48,14 +43,14 @@ extern void func_0024CF58(Player *player, Player *other);
 extern void func_00243414(Obj *obj, void *ai, s32 state);
 
 /* func_0040BD60 */
-static __inline__ f32 getTargetDist(Obj *obj, Actor **found) {
+static __inline__ f32 getTargetDist(Obj *obj, CGameObjectInstance **found) {
     Targets t;
     f32 dist;
 
     dist = -1.0f;
     *found = NULL;
     func_00246108(obj, obj->ai, &t, 1, 0);
-    if (t.b.actor != NULL && (t.b.actor->flags & 0x300000)) {
+    if (t.b.actor != NULL && (t.b.actor->m_dwFlags & 0x300000)) {
         dist = t.b.dist;
         *found = t.b.actor;
     }
@@ -64,13 +59,13 @@ static __inline__ f32 getTargetDist(Obj *obj, Actor **found) {
 
 void func_0040C6F4(void) {
     Obj *obj = D_8012FB70.obj;
-    Actor *found;
+    CGameObjectInstance *found;
     Player *player;
 
     player = NULL;
     getTargetDist(obj, &found);
     if (found != NULL) {
-        player = found->owner;
+        player = ((Player *)found->m_AI.m_pParent);
     }
     if (player != NULL) {
         func_00253D68(player, D_00431D7C);
