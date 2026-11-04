@@ -70,7 +70,7 @@ s32 func_002451AC(CGameObjectInstance *self, s32 unused, CGameObjectInstance *ta
         }
         goto body;
     }
-    switch (*((s32 *)target->header.m_pIntelligence)) {
+    switch (target->header.m_pIntelligence->m_Type) {
     case 1:
         if (target->m_AI.m_AnimType < 0x10CC) {
             return 0;

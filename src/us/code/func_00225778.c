@@ -27,7 +27,7 @@ CGameObjectInstance *func_00225778(CWorld *world, CGameObjectInstance *self, s32
         if (team != -1 && obj->m_nTypeFlag != team) {
             continue;
         }
-        if (kind != -1 && *((s32 *)obj->header.m_pIntelligence) != kind) {
+        if (kind != -1 && obj->header.m_pIntelligence->m_Type != kind) {
             continue;
         }
         if (activeOnly && obj->m_AI.m_Health == 0) {

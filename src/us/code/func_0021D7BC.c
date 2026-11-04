@@ -3,17 +3,8 @@
 #include "structs/game_object.h"
 
 /* Draw an actor's model (params->model) with the current view's lighting:
- * first pick its two colour sets (params->set0/set1), from the region's
- * per-state table in a region of type 1, then its shadow (func_0021DC84). */
-
-typedef struct {
-    s32 type;               /* 0x00 */
-    u8 pad4[0xA];
-    s8 set0[2];             /* 0x0E (+ params->index) */
-    s8 set1[2];             /* 0x10 (+ params->index) */
-    u8 pad12[0x51];
-    s8 stateSet[6];         /* 0x63: by AI state 0x36..0x3B */
-} Region;
+ * first pick its two colour sets (params->set0/set1), from its intelligence's
+ * death models (by AI mode) for an enemy (type 1), then its shadow (func_0021DC84). */
 
 typedef struct {
     s32 draw;               /* 0x00 */
@@ -33,9 +24,9 @@ void func_0021DC84(CGameObjectInstance *, s32, DrawParams *);
 void func_0020B6A0(s32, s32, s32, void *, s32, s32, s32);
 
 static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
-    Region *region = ((Region *)actor->header.m_pIntelligence);
+    CIntelligence *intel = actor->header.m_pIntelligence;
 
-    if (region->type == 1) {
+    if (intel->m_Type == 1) {
         s32 state;
 
         if (actor->m_AI.m_Mode == 0x3C) {
@@ -45,31 +36,31 @@ static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0
         }
         switch (state) {
             case 0x36:
-                *set0 = *set1 = region->stateSet[0];
+                *set0 = *set1 = intel->m_Enemy.m_DeathModels[0];
                 break;
             case 0x37:
-                *set0 = *set1 = region->stateSet[1];
+                *set0 = *set1 = intel->m_Enemy.m_DeathModels[1];
                 break;
             case 0x38:
-                *set0 = *set1 = region->stateSet[2];
+                *set0 = *set1 = intel->m_Enemy.m_DeathModels[2];
                 break;
             case 0x39:
-                *set0 = *set1 = region->stateSet[3];
+                *set0 = *set1 = intel->m_Enemy.m_DeathModels[3];
                 break;
             case 0x3a:
-                *set0 = *set1 = region->stateSet[4];
+                *set0 = *set1 = intel->m_Enemy.m_DeathModels[4];
                 break;
             case 0x3b:
-                *set0 = *set1 = region->stateSet[5];
+                *set0 = *set1 = intel->m_Enemy.m_DeathModels[5];
                 break;
             default:
-                *set0 = (&region->set0[0])[index];
-                *set1 = (&region->set1[0])[index];
+                *set0 = (&intel->m_nModel)[index];
+                *set1 = (&intel->m_nShadowModel)[index];
                 break;
         }
     } else {
-        *set0 = (&region->set0[0])[index];
-        *set1 = (&region->set1[0])[index];
+        *set0 = (&intel->m_nModel)[index];
+        *set1 = (&intel->m_nShadowModel)[index];
     }
 }
 

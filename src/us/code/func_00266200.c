@@ -7,7 +7,7 @@
 
 
 s32 func_00266200(CGameObjectInstance *actor) {
-    s32 v = actor->header.m_pIntelligence->m_Enemy.unk0C;
+    s32 v = actor->header.m_pIntelligence->m_Action.m_IdleAnim;
     if (v != 0) {
         actor->m_dwFlags |= 0x2000;
     } else {

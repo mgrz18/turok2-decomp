@@ -3,12 +3,6 @@
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-typedef struct ObjDef {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ u8 pad4[0x14];
-    /* 0x18 */ u16 shape;
-} ObjDef;
-
 
 f32 func_0026BE60(void *node, f32 x, f32 z);
 f32 func_002425A4(void *actor, f32 x, f32 z);
@@ -27,12 +21,12 @@ static __inline__ f32 nodeFloor(CGameObjectInstance *actor, f32 x, f32 z) {
 
 /* func_00268688, inlined: floor height under (x, z) for an actor. */
 static __inline__ f32 actorFloor(CGameObjectInstance *actor, f32 x, f32 z) {
-    ObjDef *def;
+    CIntelligence *def;
 
     if (actor->header.m_Type == 1) {
-        def = ((ObjDef *)actor->header.m_pIntelligence);
-        if (def->type == 2) {
-            switch (def->shape) {
+        def = actor->header.m_pIntelligence;
+        if (def->m_Type == 2) {
+            switch (def->m_Platform.m_CollisionType) {
                 case 0:
                     return nodeFloor(actor, x, z);
                 case 1:
