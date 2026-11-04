@@ -30,8 +30,8 @@ typedef struct {
     /* 0x04 */ s16 m_nAnimIndex;
     /* 0x06 */ s16 m_nRequestedAnimIndex;
     /* 0x08 */ s16 m_nFrames;
-    /* 0x0A */ u8 m_bCycleCompleted;
-    /* 0x0B */ u8 m_bAnimActive;
+    /* 0x0A */ s8 m_bCycleCompleted;
+    /* 0x0B */ s8 m_bAnimActive;
     /* 0x0C */ u32 m_nAnimStartFrame;
     /* 0x10 */ struct CMemEntry *pmeAnimData;
 } CAnimationState; /* size 0x14 */
