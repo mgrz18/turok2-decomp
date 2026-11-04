@@ -5,17 +5,17 @@
 
 extern void func_0029A5E0(void);
 extern void func_0029ACE0();
-extern __OSViContext_func_802BA910_de D_800B7A60[2];
-extern __OSViContext_func_802BA910_de *D_800B7AC0;
-extern __OSViContext_func_802BA910_de *D_800B7AC4;
-extern Modep D_800B7AF0;
-extern Modep D_800B7B40;
-extern Modep D_800B7B90;
+extern __OSViContext D_800B7A60[2];
+extern __OSViContext *D_800B7AC0;
+extern __OSViContext *D_800B7AC4;
+extern OSViMode D_800B7AF0;
+extern OSViMode D_800B7B40;
+extern OSViMode D_800B7B90;
 extern s32 D_80000300;
 extern void *func_00266C5C(void *destination, s32 value, u32 size);
 void func_0029A5E0(void)
 {
-    __OSViContext_func_802BA910_de *contexts = D_800B7A60;
+    __OSViContext *contexts = D_800B7A60;
     s32 tv_type;
     func_00266C5C(contexts, 0, sizeof(D_800B7A60));
     tv_type = D_80000300;
