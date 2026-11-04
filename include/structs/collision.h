@@ -178,4 +178,12 @@ typedef struct MapSweep {
     /* 0x84 */ u8 pad84[4];
 } MapSweep; /* size 0x88 */
 
+/* A face of an object's collision box (func_00241960 gives the box's eight
+ * corners, func_0023C9CC and the D_800AD930 face builders take four of them):
+ * its corners in order and its normal. */
+typedef struct CollisionQuad {
+    /* 0x00 */ CVector3 corner[4];
+    /* 0x30 */ CVector3 normal;
+} CollisionQuad; /* size 0x3C */
+
 #endif

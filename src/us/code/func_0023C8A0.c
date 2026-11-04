@@ -1,13 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct Quad {
-    CVector3 corner[4]; /* 0x00 */
-    CVector3 normal;    /* 0x30 */
-} Quad;
+#include "structs/collision.h"
 
 /* Height of the quad's plane at (x, z); a vertical quad gives the mean corner height. */
-f32 func_0023C8A0(Quad *quad, f32 x, f32 z) {
+f32 func_0023C8A0(CollisionQuad *quad, f32 x, f32 z) {
     CVector3 normal;
     CVector3 origin;
 

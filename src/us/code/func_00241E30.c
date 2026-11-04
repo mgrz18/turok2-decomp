@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct Quad {
-    CVector3 corner[4]; /* 0x00 */
-    CVector3 normal;    /* 0x30 */
-} Quad;
+#include "structs/collision.h"
 
 typedef struct Mover {
     char pad0[4];
@@ -29,29 +25,23 @@ typedef struct Collider {
     s32 flags;         /* 0xD4 */
 } Collider;
 
-typedef struct Controller {
-    Collider *collider; /* 0x00 */
-    char pad4[0x4C - 0x4];
-    CVector3 move;          /* 0x4C */
-} Controller;
-
 void func_00241960(Mover *mover, CVector3 *points, Collider *collider);
-void func_0023C9CC(Quad *quad, CVector3 *points);
-s32 func_0023C2B0(Quad *quad, CVector3 *pos, CVector3 *move);
-s32 func_0023C478(Quad *quad, CVector3 *pos, CVector3 *move, CVector3 *hit);
+void func_0023C9CC(CollisionQuad *quad, CVector3 *points);
+s32 func_0023C2B0(CollisionQuad *quad, CVector3 *pos, CVector3 *move);
+s32 func_0023C478(CollisionQuad *quad, CVector3 *pos, CVector3 *move, CVector3 *hit);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-s32 func_0023AB18(Controller *ctrl, CVector3 *normal, Quad *quad, s32 arg3, s32 arg4, f32 scale, s32 arg6);
+s32 func_0023AB18(Sweep *ctrl, CVector3 *normal, CollisionQuad *quad, s32 arg3, s32 arg4, f32 scale, s32 arg6);
 
 /* Collision of the controller's collider against a ground-type (kind 0) mover. */
-s32 func_00241E30(Controller *ctrl, Mover *mover) {
+s32 func_00241E30(Sweep *ctrl, Mover *mover) {
     Collider *collider;
     CVector3 points[8];
-    Quad quad;
+    CollisionQuad quad;
     CVector3 hit;
     f32 scale;
 
-    collider = ctrl->collider;
+    collider = (Collider *)ctrl->obj;
     if (collider->group != NULL && *mover->group != *collider->group) {
         return 0;
     }
@@ -60,8 +50,8 @@ s32 func_00241E30(Controller *ctrl, Mover *mover) {
     if (collider->mover == NULL || mover->pos.y > collider->mover->pos.y) {
         collider->mover = mover;
     }
-    if (func_0023C2B0(&quad, &collider->pos, &ctrl->move)) {
-        if (!func_0023C478(&quad, &collider->pos, &ctrl->move, &hit)) {
+    if (func_0023C2B0(&quad, &collider->pos, &ctrl->end)) {
+        if (!func_0023C478(&quad, &collider->pos, &ctrl->end, &hit)) {
             return 0;
         }
         scale = func_002982F0(mover->angle);
