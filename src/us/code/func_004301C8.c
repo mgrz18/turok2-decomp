@@ -6,12 +6,6 @@
 
 /* Controller / rumble slot, 0x224 bytes (Controller in func_00285AE0). */
 
-/* OSContStatus, 4 bytes per port (errno bit 3 = no controller). */
-typedef struct PortStatus {
-    /* 0 */ u8 b[4];
-} PortStatus;
-
-extern PortStatus D_800F6778[];
 s32 func_0026EB3C(void *dst, void *src, s32 n);
 
 /* Resets a controller slot; returns whether a controller is plugged into its port. */
@@ -42,7 +36,7 @@ s32 func_004301C8(ControllerProfile *c, s32 port) {
         c->buttonHistory[i].repeat = 0x30;
         c->buttonHistory[i].held = 0;
     }
-    c->connected = ((D_800F6778[port].b[3] >> 3) ^ 1) & 1;
+    c->connected = ((D_800F6778[port].errno >> 3) ^ 1) & 1;
     c->rumbleLevel = 0;
     c->rumbleTimer = 0;
     func_0026EB3C(c->rumblePool, c->rumbleNodes, 3);

@@ -4,17 +4,13 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pak.h"
+#include "structs/controller.h"
 
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
-typedef struct O01Pad4 {
-            u8 pad0[3];
-            u8 unk3;
-} O01Pad4;
-extern O01Pad4 D_800F6778[];
 extern OSMesgQueue D_800F6798;
 s32 func_0045FB34(s32 ch) {
     RumblePak *r = &D_80130AA0[ch];
-    if (D_800F6778[ch].unk3 != 0) {
+    if (D_800F6778[ch].errno != 0) {
         r->present = 0;
         return 0;
     }

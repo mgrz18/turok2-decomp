@@ -19,6 +19,7 @@
 
 #ifndef RW_ABU_TYPES_H /* it has the base types too */
 #include "common.h"
+#include "ultra_types.h"
 #endif
 
 /* One button's counters (func_00284EB8). */
@@ -65,5 +66,6 @@ typedef struct ControllerProfile {
 } ControllerProfile; /* size 0x224 */
 
 extern ControllerProfile D_800F5EC0[4];
+extern OSContStatus D_800F6778[4];   /* what osContInit / osContGetQuery report per port (errno bit 3: nothing plugged in) */
 
 #endif

@@ -21,7 +21,6 @@ extern M04Pad D_800F5C60[];
 extern u8 D_800F6750;
 extern OSMesgQueue D_800F6798;
 extern OSMesg D_800F6770;
-extern u8 D_800F6778[];
 void func_00284DAC(ControllerProfile *c);
 void func_00284EB8(ControllerProfile *c, s8 x, s8 y, u16 b);
 void func_002847E0(void) {
@@ -74,13 +73,13 @@ void func_002847E0(void) {
         break;
     case 1:
         osRecvMesg(&D_800F6798, &D_800F6770, 1);
-        func_002986F8((OSContStatus *)D_800F6778);
+        func_002986F8(D_800F6778);
         for (i = 0; i < 4; i++) {
             func_00284DAC(&D_800F5EC0[i]);
         }
         break;
     case 3:
-        func_00298900(&D_800F6798, (OSContStatus *)D_800F6778);
+        func_00298900(&D_800F6798, D_800F6778);
     case 2:
         break;
     }
