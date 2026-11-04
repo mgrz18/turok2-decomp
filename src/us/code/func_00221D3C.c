@@ -64,6 +64,9 @@ typedef struct {
     f32 maxX, maxZ;         /* 0x8 */
 } Cell;
 
+/* D_8011AAD8 (structs/game.h) seen from its difficulty, D_8011AAE0: the
+ * ROM bases the CGame and camera-pool reads below on this symbol, and with
+ * D_8011AAD8 / D_80119870 the code no longer matches. */
 typedef struct {
     s32 mask;               /* 0x00 */
 } ViewState;

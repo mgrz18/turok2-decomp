@@ -1,6 +1,7 @@
 /* The do { } while (0) around the region-loop setup raises the region counter's priority (GCC weights refs by loop depth) so it gets fp and the object-table base is spilled, as in the ROM. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game.h"
 #include "structs/player.h"
 #include "gfx.h"
 #include "structs/world.h"
@@ -74,14 +75,7 @@ typedef struct {
     f32 maxX, maxZ;         /* 0x8 */
 } Cell;
 
-typedef struct {
-    s32 mask;               /* 0x00 */
-    u8 pad4[0xD];
-    u8 unk11;               /* 0x11 */
-} ViewState;
-
-extern ViewState D_8011AAE0;
-extern u8 D_8011AAF1;       /* D_8011AAE0.unk11 */
+extern u8 D_8011AAF1;       /* D_8011AAD8.multiplayer */
 extern s32 D_800B6D20;
 
 void func_00221D3C(CWorld *);
@@ -124,9 +118,9 @@ void func_002222E0(CWorld *w, View *v_) {
     s32 off;
     s32 c;
 
-    mask = D_8011AAE0.mask;
+    mask = D_8011AAD8.difficulty;
     vmask = v->mask;
-    if (D_8011AAE0.unk11 != 0) {
+    if (D_8011AAD8.multiplayer != 0) {
         func_00221D3C(w);
         return;
     }
