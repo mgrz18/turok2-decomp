@@ -644,7 +644,8 @@ rewrite taught about the compiler:
 
 The readability pass left each file with local structs where no header fit;
 the struct consolidation then moved the biggest families into shared
-headers, seven branches merged with every function still matching
+headers, in two passes of seven branches each, merged with every function
+still matching
 (docs/STRUCTS_TODO.md has what stayed local and why, and what is next). A
 file includes the header of the object it touches rather than declaring a
 view of its own. `tools/check_structs.py structs/<name>.h` checks every
@@ -671,9 +672,8 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo (includes libaudio.h) |
 | `structs/libaudio.h` | the libaudio types the sound manager and the imported libaudio code share: ALHeap, ALBank, ALBankFile, ALInstrument, ALFilter, ALMainBus, ALAuxBus, Acmd |
 | `structs/weapon.h` | the weapons: WeaponInfo (the weapon table D_800AF618) and its AmmoInfo, CBarrel (the weapon wheel, CPlayer m_Barrel) with CBarrelItem and CBarrelIcon (included by player.h) |
-| `structs/script.h` | the second boss (the Blind One) and its script VM: BlindOneState (D_80130200), BlindOneStep, BlindOnePhase (the phase tables D_0043240C / D_0043232C), BlindOneMover, BlindOneFader |
 | `structs/cinema.h` | the cinema (cutscene) state Cinema (*D_800C1BB0, 0x100) and CinemaEntry / CinemaTable |
-| `structs/boss.h` | the boss and level-script state of the VM modules: LevelScriptState (D_8012F608, with the BossState / BossMode views at D_8012F9D8 / D_8012F9DC, BossStep and the three script runners), MotherBossState (D_8012F608 + 0x568, D_8012FB70) and BlindOneState (D_80130200), ScriptAnimator |
+| `structs/boss.h` | the boss and level-script state of the VM modules: LevelScriptState (D_8012F608, with the BossState / BossMode views at D_8012F9D8 / D_8012F9DC, BossStep and the three script runners), MotherBossState (D_8012FB70, its BossWeakSpot), BlindOneState (D_80130200) with the Blind One's script VM (BlindOneStep, BlindOnePhase: the phase tables D_0043240C / D_0043232C, BlindOneMover), ScriptAnimator (the 0x64-byte value/colour animator: lights, weak spots, hit flashes) |
 | `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
 | `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs, OSPfsState and the Controller Pak internals, plus the engine's CMutex |
 | `gfx.h` | Gfx (w0/w1) and the display-list pointer the engine appends to |
