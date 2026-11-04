@@ -59,6 +59,12 @@ sized from the gap, so it is the likely place. Fix the header, run
   PlayerList (24): CPlayer once player.h is fixed (above).
 - **Actor** (156 files), ActorDef (94), LevelActor (63), ActorInfo (19),
   ActorDefinitionHeader (18): CGameObjectInstance and its definition.
+  PARTLY DONE: 123 files now use CGameObjectInstance instead of a local
+  Actor/LevelActor (m_nTypeFlag is u16: every reader uses lhu). Still local:
+  ~30 files that also define a local `CAI` (wait for the CAI/CIntelligence
+  merge), 11 files reading a field at 0x28C (a subclass past the 0x288
+  instance), views of other objects named Actor (flags at 0x40, fields at
+  0x52A...), and a few whose views need lvalue casts or did not match.
 - **World** (50 files, 43 layouts), Shared_World (20), WorldSector (15),
   Level (24): `D_800F7078`, the level and its region graph; fields seen from
   0x18FA8 on (warp group, mode, pending, spawn key, warp ID).
@@ -78,6 +84,11 @@ sized from the gap, so it is the likely place. Fix the header, run
   __OSfp, OSPfs (14), Gfx (23): these belong to the libultra/gbi headers.
 - **Vectors**: Vec3f (166 files), Vec3 (104), V3 (22), Quat (18): all
   `CVector3`/`CQuaternion`, which `include/` already has.
+  DONE: `include/structs/vector.h` (CVector3, CQuaternion, CMtxF; included
+  by game_object.h). Vec3f/Vec3/V3/Point3/M04Vec3/B19Vec3/Quat/Quatf/Quat4
+  are gone from src/us/code except in files that take Vec3 from
+  `include/rw/abu_types.h` (imported Rage Wars code, left alone). V3 (s32
+  fields) was only ever copied or passed by value, so CVector3 compiles the same.
 
 ## Globals declared under several local types
 
