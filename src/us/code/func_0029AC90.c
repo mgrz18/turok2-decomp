@@ -1,19 +1,15 @@
 #include "common.h"
+#include "ultra_types.h"
 
 s32 __osDisableInt();                                /* extern */
-s32 __osRestoreInt(s32);                         /* extern */
-typedef struct {
-    /* 0x0 */ u16 flags;
-    /* 0x2 */ u8 pad2[2];
-    /* 0x4 */ s32 value;
-} Unk800B7AC4;
-extern Unk800B7AC4 *D_800B7AC4;
+s32 __osRestoreInt(s32);                         extern __OSViContext *D_800B7AC4; /* __osViNext */
 
-void func_0029AC90(s32 arg0) {
+/* libultra's osViSwapBuffer. */
+void func_0029AC90(void *frameBufPtr) {
     s32 temp_v0;
 
     temp_v0 = __osDisableInt();
-    D_800B7AC4->value = arg0;
-    D_800B7AC4->flags = (u16) (D_800B7AC4->flags | 0x10);
+    D_800B7AC4->framep = frameBufPtr;
+    D_800B7AC4->state = (u16) (D_800B7AC4->state | VI_STATE_BUFFER_UPDATED);
     __osRestoreInt(temp_v0);
 }

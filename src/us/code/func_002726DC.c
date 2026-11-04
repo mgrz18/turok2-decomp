@@ -118,9 +118,9 @@ void func_002726DC(SndVoice *o) {
                         o->stopping = 1;
                         o->vp.follow = 0;
                         if (o->vp.frame != ctx->frame) {
-                            func_00293E60(ctx->player, ctx->handles[o->index]);
-                            if (func_00293580(ctx->player) != 0) {
-                                func_00293EC0(ctx->player);
+                            func_00293E60(&ctx->player, ctx->handles[o->index]);
+                            if (func_00293580(&ctx->player) != 0) {
+                                func_00293EC0(&ctx->player);
                             }
                             o->sound = -1;
                         }
@@ -140,7 +140,7 @@ void func_002726DC(SndVoice *o) {
         vol = (f32)vp->vol * gain;
     }
 
-    sndp = o->mgr->player;
+    sndp = &o->mgr->player;
     slot = o->index;
     /* An empty statement macro (a compiled-out debug check, probably): the
      * scheduling block boundary it makes is what puts the multiply after the

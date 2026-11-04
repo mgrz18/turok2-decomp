@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002936E0(struct ALSndPlayer * arg0, union ALSndpEvent * arg1);
+extern void func_002936E0(ALSndPlayer * arg0, ALSndpEvent * arg1);
 extern s32 func_00293B1C(void *node);
 extern void func_00291034(ALEventQueue *, ALEvent *, ALMicroTime);
 extern s32 func_00290F9C(ALEventQueue *, ALEvent *);

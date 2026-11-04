@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002007D0(IntrusiveList *arg0);
+extern void func_002007D0(CList *arg0);
 extern void func_00203330(s32, s32);
-extern IntrusiveList D_800D81F4;
-extern void CList__Construct(IntrusiveList *list, s32 prevOffset, s32 nextOffset);
-extern s32 CList__AddTail(IntrusiveList *list, void *node);
+extern CList D_800D81F4;
+extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
+extern s32 CList__AddTail(CList *list, void *node);
 extern s32 func_002024E0(void *, s32);
 extern void func_00266B90(u32, u32, s32);
 extern void func_002005D0(void *, s32, s32);
@@ -16,7 +16,7 @@ void func_00203330(s32 unused, s32 arg1) {
     extern void func_002026EC(void *, s32);
     extern s32 D_800D1CC0[3];
     extern s32 D_800D81D8[];
-    IntrusiveList queue;
+    CList queue;
     Node80254C10 *node;
     Node80254C10 *next;
     Node80254C10 *scan;
@@ -52,11 +52,11 @@ void func_00203330(s32 unused, s32 arg1) {
         }
     } while (D_800D81D8[0] != 0);
 drain:
-    node = queue.head;
+    node = queue.m_pHead;
     while (node != 0) {
         next = node->next;
         func_002007D0(&queue);
-        scan = D_800D81F4.head;
+        scan = D_800D81F4.m_pHead;
         while (scan != 0) {
             if (scan->start > node->start) {
                 func_002005D0(&D_800D81F4, (s32)scan, (s32)node);

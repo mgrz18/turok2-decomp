@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern Acmd *func_0029F958(ALLoadFilter_func_802BE514_de *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p);
+extern Acmd *func_0029F958(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p);
 extern s32 D_800B8A20;
 extern s32 func_002A122C();
 extern void osWritebackDCache(s32 buffer, s32 size);
-Acmd *func_0029F958(ALLoadFilter_func_802BE514_de *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p)
+Acmd *func_0029F958(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;
     s32 nbytes;
@@ -15,7 +15,7 @@ Acmd *func_0029F958(ALLoadFilter_func_802BE514_de *filter, s16 *outp, s32 byteCo
     s32 dmemAlign;
     s32 nSam;
     s32 op;
-    ALLoadFilter_func_802BE514_de *f = filter;
+    ALLoadFilter *f = filter;
     s32 *stream;
     op = *outp;
     if (f->table->base == 0) {

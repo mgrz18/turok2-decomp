@@ -15,11 +15,11 @@ extern void func_0029B020(void *arg0, void *arg1, s32 arg2);
 extern void *func_00292640(void *, s32, s32, s32);
 extern void *func_0029247C(void *, u8, u8, u8);
 extern ALVoiceState *func_002925E0(ALSeqPlayer *, u8, u8);
-extern s32 alSynAllocVoice(ALSynth_func_802B3000_de *, ALVoice_s_func_802B3000_de *, ALVoiceConfig_s *);
+extern s32 alSynAllocVoice(ALSynth *, ALVoice *, ALVoiceConfig *);
 extern s32 func_00292804(void *, void *);
 extern s16 func_00292774(ALVoiceState *, ALSeqPlayer *);
 extern s32 func_002927E8(void *, s32);
-extern void func_00294540(ALSynth_func_802B3000_de *, ALVoice_s_func_802B3000_de *, void *, f32, s16, u8, u8, s32);
+extern void func_00294540(ALSynth *, ALVoice *, void *, f32, s16, u8, u8, s32);
 extern void func_00292A74(void *, void *, s32);
 extern void alSynSetVol(void *, void *, s16, s32);
 extern void func_002942B0(void *, void *, u8);
@@ -31,7 +31,7 @@ void func_00290240(void *object, ALEvent *message)
 {
     ALSeqPlayer *seqp = object;
     ALEvent *event = (ALEvent *)message;
-    ALVoice_s *voice;
+    ALVoice *voice;
     ALVoiceState *vs;
     s32 status;
     u8 chan;
@@ -52,8 +52,8 @@ void func_00290240(void *object, ALEvent *message)
     switch (status) {
     case 0x90:
         if (vel != 0) {
-            ALVoiceConfig_s config;
-            ALSound_s *sound;
+            ALVoiceConfig config;
+            ALSound *sound;
             s16 cents;
             f32 pitch, oscValue, initialOscValue;
             u8 fxmix;
@@ -73,7 +73,7 @@ void func_00290240(void *object, ALEvent *message)
             if (!vstate)
                 return;
             voice = &vstate->voice;
-            alSynAllocVoice(seqp->drvr, (ALVoice_s_func_802B3000_de *)voice, &config);
+            alSynAllocVoice(seqp->drvr, (ALVoice *)voice, &config);
             vstate->sound = sound;
             vstate->envPhase = 0;
             if (seqp->chanState[chan].sustain > 63)
@@ -131,7 +131,7 @@ void func_00290240(void *object, ALEvent *message)
             pan = func_00292804(vstate, seqp);
             vol = func_00292774((ALVoiceState *)vstate, (ALSeqPlayer *)seqp);
             deltaTime = sound->envelope->attackTime;
-            func_00294540(seqp->drvr, (ALVoice_s_func_802B3000_de *)voice, sound->wavetable, pitch, vol, pan, fxmix, deltaTime);
+            func_00294540(seqp->drvr, (ALVoice *)voice, sound->wavetable, pitch, vol, pan, fxmix, deltaTime);
             evt.type = 6;
             evt.msg.vol.voice = voice;
             evt.msg.vol.vol = sound->envelope->decayVolume;

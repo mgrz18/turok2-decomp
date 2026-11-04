@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 
 extern Node_func_80239AF4_de *func_00294B58(void);
-extern s32 func_00294C30(ALSynth_func_802B3000_de *, s32);
-void func_00294540(ALSynth_func_802B3000_de *s, ALVoice_s_func_802B3000_de *v, void *w, f32 pitch, s16 vol, u8 pan, s8 fxmix, s32 t)
+extern s32 func_00294C30(ALSynth *, s32);
+void func_00294540(ALSynth *s, ALVoice *v, void *w, f32 pitch, s16 vol, u8 pan, s8 fxmix, s32 t)
 {
     ALStartParamAlt *update;
-    ALFilter_s_func_802B3000_de *f;
+    ALFilter *f;
     if (v->pvoice) {
         update = (ALStartParamAlt *)func_00294B58();
         if (update == 0) { return; };

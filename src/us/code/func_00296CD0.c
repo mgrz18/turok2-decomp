@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_00297260(ALDelay28 *d, s32 count);
+extern f32 func_00297260(ALDelay *d, s32 count);
 extern Acmd *func_0029704C(ALFx *, s16 *, s32, s32, Acmd *);
 extern float D_800AA710;
 extern float D_800AA714;
@@ -11,7 +11,7 @@ extern float D_800AA70C;
 extern const f32 D_800AA70C;
 extern const f32 D_800AA710;
 extern const f32 D_800AA714;
-Acmd *func_00296CD0(ALFx *r, ALDelay28 *d, s32 buff, s32 incount, Acmd *p)
+Acmd *func_00296CD0(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
 {
     extern s32 func_0029BF80(s32);
     Acmd *ptr = p;
@@ -46,4 +46,4 @@ Acmd *func_00296CD0(ALFx *r, ALDelay28 *d, s32 buff, s32 incount, Acmd *p)
     return ptr;
 }
 Acmd *func_0029704C(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p);
-f32 func_00297260(ALDelay28 *d, s32 count);
+f32 func_00297260(ALDelay *d, s32 count);

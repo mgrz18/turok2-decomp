@@ -21,9 +21,9 @@ s32 func_00273C5C(SndVoicePool *p, s16 tag, s16 key) {
             s->stopping = 1;
             s->vp.follow = 0;
             if (s->vp.frame != m->frame) {
-                func_00293E60(m->player, m->handles[s->index]);
-                if (func_00293580(m->player) != 0) {
-                    func_00293EC0(m->player);
+                func_00293E60(&m->player, m->handles[s->index]);
+                if (func_00293580(&m->player) != 0) {
+                    func_00293EC0(&m->player);
                 }
                 s->sound = -1;
             }

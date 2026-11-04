@@ -8,14 +8,14 @@ void *func_002009F0(void *arg0) {
     s32 index;
     s32 offset;
     void *node;
-    node = ((IntrusiveList *)arg0)->head;
+    node = ((CList *)arg0)->m_pHead;
     if (node == 0) {
         return 0;
     }
-    index = func_002113A4() % (u32)((IntrusiveList *)arg0)->count;
+    index = func_002113A4() % (u32)((CList *)arg0)->m_nCount;
     index--;
     if (index != -1) {
-        offset = ((IntrusiveList *)arg0)->nextOffset;
+        offset = ((CList *)arg0)->m_NextOffset;
         do {
             { u8 *cursor = (u8 *)node; cursor += offset; node = *(void **)cursor; }
             index--;

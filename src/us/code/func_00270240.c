@@ -3,19 +3,6 @@
 #include "structs/sound.h"
 
 typedef struct {
-    /* 0x00 */ s32 maxVVoices;
-    /* 0x04 */ s32 maxPVoices;
-    /* 0x08 */ s32 maxUpdates;
-    /* 0x0C */ s32 dmaproc;
-    /* 0x10 */ s32 fxType;
-    /* 0x14 */ void *heap;
-    /* 0x18 */ s32 pad18;
-    /* 0x1C */ s8 v7;
-    /* 0x1D */ u8 pad1D[3];
-    /* 0x20 */ void *tab;
-} SynCfg;
-
-typedef struct {
     s32 rate;
     s32 one;
     s32 size;
@@ -42,7 +29,7 @@ extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
 extern void CMutex__Construct(CMutex *lock);
 extern void func_002912F0(void *heap, s32 base, s32 len);    /* alHeapInit */
-extern void func_0026F760(SynCfg *cfg, s32 a, AiCfg *ai);
+extern void func_0026F760(ALSynConfig *cfg, s32 a, AiCfg *ai);
 extern BankRes *func_0028E60C(s32 a, s32 b, s32 c);
 extern void func_00270550(SndMgr *m);
 extern void func_00274F34(void *seq, SndMgr *m);
@@ -77,7 +64,7 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
 
 /* Sound manager start-up: heap, synthesizer, banks, player and state. */
 void func_00270240(SndMgr *m) {
-    SynCfg cfg;
+    ALSynConfig cfg;
     AiCfg ai;
     BankRes *r;
     ALBankFile *bk;
@@ -96,11 +83,11 @@ void func_00270240(SndMgr *m) {
     cfg.maxVVoices = 0x25;
     cfg.maxPVoices = 0x25;
     cfg.maxUpdates = 0x100;
-    cfg.v7 = 6;
-    cfg.tab = D_800B2684;
+    cfg.fxType = 6; /* AL_FX_CUSTOM */
+    cfg.params = (s32 *) D_800B2684;
     ai.rate = 0x5622;
     ai.one = 1;
-    cfg.fxType = 0;
+    cfg.dmaproc = 0;
     cfg.heap = &m->heap;
     ai.size = 0x800;
     func_0026F760(&cfg, D_800B6E90, &ai);
@@ -125,10 +112,10 @@ void func_00270240(SndMgr *m) {
             }
         }
     }
-    m->playerConfig[0] = 0x11;
-    m->playerConfig[1] = 0xC0;
-    m->playerConfig[2] = (s32)&m->heap;
-    func_002935B0(m->player, m->playerConfig);
+    m->playerConfig.maxSounds = 0x11;
+    m->playerConfig.maxEvents = 0xC0;
+    m->playerConfig.heap = &m->heap;
+    func_002935B0(&m->player, &m->playerConfig);
     for (n = 0; n < 16; n++) {
         m->handles[n] = -1;
     }

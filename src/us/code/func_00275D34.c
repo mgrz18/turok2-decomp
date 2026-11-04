@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern int D_800B2A84;
-extern s32 CList__AddTail(IntrusiveList *list, void *node);
+extern s32 CList__AddTail(CList *list, void *node);
 extern void func_00275864(s32 arg0);
 s32 func_00275D34(void *arg0, void *arg1) {
     extern void CList__Remove(void *, s32);
@@ -12,7 +12,7 @@ s32 func_00275D34(void *arg0, void *arg1) {
     if (arg1 == 0) {
         return 0;
     }
-    var_s0 = ((SoundVoicePool *)arg0)->playing.head;
+    var_s0 = ((SoundVoicePool *)arg0)->playing.m_pHead;
     if (var_s0 != 0) {
         do {
             if (var_s0 == arg1) {

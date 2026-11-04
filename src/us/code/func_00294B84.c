@@ -1,17 +1,13 @@
 #include "common.h"
+#include "structs/libaudio.h"
 
-/* *D_800B7760: keeps a free list of nodes (each starts with its next pointer) at 0x2C. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x2C];
-    /* 0x2C */ s32 *freeList;
-} NodePool;
+extern ALGlobals *D_800B7760; /* alGlobals */
 
-extern NodePool *D_800B7760;
+/* libultra's __freeParam (synthesizer.c): push an ALParam back onto the free
+ * list of alGlobals->drvr. */
+void func_00294B84(ALParam *param) {
+    ALSynth *drvr = &D_800B7760->drvr;
 
-/* Push onto the free list at 0x2C. */
-void func_00294B84(void **arg0) {
-    NodePool *owner = D_800B7760;
-
-    *arg0 = owner->freeList;
-    owner->freeList = (s32 *) arg0;
+    param->next = drvr->paramList;
+    drvr->paramList = param;
 }

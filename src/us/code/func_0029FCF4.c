@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-Acmd *func_0029FCF4(Acmd *ptr, ALLoadFilter48_2 *f, s32 tsam, s32 nbytes, s16 outp, s16 inp, u32 flags)
+Acmd *func_0029FCF4(Acmd *ptr, ALLoadFilter *f, s32 tsam, s32 nbytes, s16 outp, s16 inp, u32 flags)
 {
     s32 dramAlign, dramLoc;
     if (nbytes > 0) {

@@ -8,17 +8,17 @@ extern Acmd *func_0029704C(ALFx *, s16 *, s32, s32, Acmd *);
 extern char D_800AA6C0[];
 extern char D_800AA6C4[];
 extern void func_0029B020(char *, char *, s32);
-extern Acmd *func_00296CD0(struct ALFx *, ALDelay28 *, s32, s32, Acmd *);
-extern Acmd *func_0029704C(struct ALFx *, s16 *, s32, s32, Acmd *);
-extern Acmd *func_00296EC8(struct ALFx *, s16 *, s32, s32, Acmd *);
-Acmd *func_00296750(struct ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
+extern Acmd *func_00296CD0(ALFx *, ALDelay *, s32, s32, Acmd *);
+extern Acmd *func_0029704C(ALFx *, s16 *, s32, s32, Acmd *);
+extern Acmd *func_00296EC8(ALFx *, s16 *, s32, s32, Acmd *);
+Acmd *func_00296750(ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;
-    struct ALFx *r = filter;
-    ALFilter_s14_2 *source = (ALFilter_s14_2 *)r->filter.source;
+    ALFx *r = filter;
+    ALFilter *source = (ALFilter *)r->filter.source;
     s16 i, buff1, buff2, input, output;
     s16 *in_ptr, *out_ptr, gain, *prev_out_ptr = 0;
-    ALDelay28 *d, *pd;
+    ALDelay *d, *pd;
     if (!source)
         func_0029B020(D_800AA6C0, D_800AA6C4, 75);
     ptr = (*source->handler)(source, outp, outCount, sampleOffset, p);

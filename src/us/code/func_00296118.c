@@ -10,11 +10,11 @@ s32 func_00296118(void *filter, s32 paramID, void *param)
     switch (paramID) {
       case (3):
           if (e->ctrlTail) {
-              e->ctrlTail->next = (ALParam_s *)param;
+              e->ctrlTail->next = (ALParam *)param;
           } else {
-              e->ctrlList = (ALParam_s *)param;
+              e->ctrlList = (ALParam *)param;
           }
-          e->ctrlTail = (ALParam_s *)param;
+          e->ctrlTail = (ALParam *)param;
           break;
       case (4):
           e->first = 1;

@@ -144,13 +144,32 @@ matches, `make verify` passes, matched (959,788 bytes) and readable
   OSThread_s/OSTimer_s/ALFilter_s are ultra_types.h's and libaudio.h's, its
   Shared_World users take CWorld (structs/world.h), the pak menu's player is
   a struct CPlayer *, and its float Mtx is renamed RW_Mtx. The dead
-  CVector3_t copies of 31 imported files are gone. Left: junk_types.h and
-  abu_types.h still define different layouts of the same libaudio internals
-  (ALEvent, ALEventQueue, ALVoice, ALVoiceState, ALSound, ALSoundState,
-  ALSynConfig, ALEnvMixer, ALMIDIEvent, ALTempoEvent, ALMicroTime), so they
-  cannot be included together; junk's B12List and abu's IntrusiveList are
-  camera.h's CList under other names. __OSInodeCache is in ultra_types.h;
-  the 11 files that were readable only on paper have struct fields.
+  CVector3_t copies of 31 imported files are gone. __OSInodeCache is in
+  ultra_types.h; the 11 files that were readable only on paper have struct
+  fields. Third pass (u4): `structs/libaudio.h` is libultra 2.0I's libaudio
+  (PR/libaudio.h, abi.h, synthInternals.h, seqp.h, sndp.h) with its own
+  names: the synthesizer (ALSynth, ALGlobals: alGlobals is D_800B7760, an
+  ALGlobals *), the filters (ALFilter, ALLoadFilter, ALResampler,
+  ALEnvMixer, ALSave, ALFx/ALDelay/ALLowPass, ALMainBus/ALAuxBus, PVoice,
+  ALParam and its start/free views), the players (ALSeqPlayer with the loop
+  fields, ALCSPlayer, ALSndPlayer, ALSoundState, ALSndpEvent, ALVoiceState,
+  ALChanState), the events (ALEvent, ALEventListItem, ALEventQueue), the
+  sequences (ALSeq, ALCSeq, markers) and the bank types; tools/check_structs.py
+  checks it. junk_types.h and abu_types.h use it (their ALEventFull /
+  ALSeqPlayerFull / ALPVoice / ALVoice_s / ALSynth4C / ALFilter_s14 /
+  ALDelay28 / *_func_802Bxxxx_de copies are gone, renamed at the uses), and
+  they can be included together (with structs/sound.h too). junk's B12List
+  and abu's IntrusiveList are structs/list.h's CList. The libaudio files
+  that carried private copies (alSynNew, alEnvmixerPull/New, alAdpcmPull,
+  alSavePull, alLoadNew, alSynAllocVoice, alSeqpNew, the CSP/seqp handlers,
+  __lookupVoice, func_002712E8/func_00273EC0) include it; func_00294B58 /
+  func_00294B84 (was NodePool) are __allocParam / __freeParam, func_00293400 /
+  func_00293430 alInit / alClose, func_0028FA10 alCSPNew (abu's InitParams /
+  AudioParamsD844 were ALSeqpConfig, AudioHeapD844 ALHeap). SndMgr's
+  playerConfig / player are an ALSndpConfig / ALSndPlayer. D_800B7AC4 is not
+  audio: it is libultra's __osViNext, an __OSViContext (now in
+  ultra_types.h with OSViMode and __OSViScale; the AudioState /
+  Unk800B7AC4 / __OSViContext_func_802BAxxx_de views are gone).
 - **Game** (`D_80119870`, t3): `structs/game.h` has CGame (the player list,
   now in `structs/player_list.h`, the camera pool as bytes with the menu
   pool at 0x5BC written out, and GameSettings at 0x1268); its ~80 users
@@ -327,16 +346,15 @@ views were replaced in about 230 files. Still local, and why:
   D_8011AAD8 / D_8011ACB0), func_002712E8 (a Rage Wars MenuMatchGlobals whose offsets do not fit).
 - **ControllerProfile** (done, u3): D_800F5C78 is declared in controller.h;
   func_0027BB80 reads D_800F5EC0[i] (it matches).
-- The rw/ header leftovers (above): junk_types.h vs abu_types.h libaudio
-  internals; junk's B12List and abu's IntrusiveList are CList.
 - The top of the census below: Obj (28 files, mostly a view of the
   instance's CAI at 0x140), Player / Owner (CPlayer views: see the
   player.h section), Particle (17), Sweep (20), Quad (19), DamageEvent (16)
   and the VM pak menu items (O01Flags / O01Item / O01Text, O06A).
-- NodePool (func_00294B58/func_00294B84) is libaudio's ALSynth (alGlobals'
-  drvr, D_800B7760): the free list at 0x2C is its paramList, so these are
-  __allocParam/__freeParam; the AL* views of the libaudio files are not in a
-  header yet.
+- Audio leftovers (u4): abu's AudioStateD844 / AudioRootD844
+  (func_00274F34) are sound.h's SndSeq / SndMgr (SndSeq's unk10 / csp are
+  the ALCSeq * and ALCSPlayer *); junk's B12AiCfg and func_00270240's AiCfg
+  are the audio manager config (output rate, frames per field, max ACMD
+  size); junk's NodePool / DLList (func_0026D330) are not libaudio.
 
 ## Globals declared under several local types
 
@@ -375,8 +393,6 @@ their own (top 35 of 35).
 | D_8011AAE8 | 3 | HudGlobals (1), MenuSetting10 (1), Unk8011AAE8 (1) |
 | D_80121290 | 3 | B09List (1), PageMapping (1), Unk80121290 (1) |
 | D_80121378 | 3 | Region80121378 (2), Region (1) |
-| D_800B7760 | 3 | NodePool (2), ALGlobals (1) |
-| D_800B7AC4 | 3 | AudioState (2), Unk800B7AC4 (1) |
 | D_80128130 | 3 | MemoryRange (2), TlbRange (1) |
 | D_00431D20 | 3 | SpawnPoint (3) |
 | D_00431C40 | 3 | SpawnPoint (3) |

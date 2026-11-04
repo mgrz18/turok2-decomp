@@ -13,7 +13,7 @@ void *func_00292640(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     u8 x;
     u8 y;
     ALInstrument *table;
-    ALSound_s *entry;
+    ALSound *entry;
     u8 *bounds;
     table = ((ALSeqPlayer *)arg0)->chanState[arg3 & 0xFF].instrument;
     high = table->soundCount;

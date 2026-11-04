@@ -670,12 +670,12 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/menu.h` | the menu system: Menu (a window), MenuItem, MenuItemDesc, MenuDesc, MenuItemLayout, MenuColor, MenuPool (a window's controller is a ControllerProfile) |
 | `structs/controller.h` | ControllerProfile (D_800F5EC0[4], 0x224, and the merged fifth D_800F5C78): a controller's buttons (held, single, double, repeat...), stick and Rumble Pak state, `CPlayer::m_ContState.m_pContState`; rw/abu_types.h includes it |
 | `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo (includes libaudio.h) |
-| `structs/libaudio.h` | the libaudio types the sound manager and the imported libaudio code share: ALHeap, ALBank, ALBankFile, ALInstrument, ALFilter, ALMainBus, ALAuxBus, Acmd |
+| `structs/libaudio.h` | libultra 2.0I's libaudio with its own names (PR/libaudio.h, abi.h and the synthesizer / sequence player / sound player internals): Acmd, ALHeap, the bank and wave table types, ALSynth and ALGlobals (alGlobals is D_800B7760), ALPlayer, ALVoice, PVoice, ALParam, the filters (ALFilter, ALLoadFilter, ALResampler, ALEnvMixer, ALSave, ALFx, ALDelay, ALLowPass, ALMainBus, ALAuxBus), ALEvent and ALEventQueue, ALSeqPlayer, ALCSPlayer, ALSndPlayer, ALSoundState, ALVoiceState, ALChanState, ALSeq, ALCSeq |
 | `structs/weapon.h` | the weapons: WeaponInfo (the weapon table D_800AF618) and its AmmoInfo, CBarrel (the weapon wheel, CPlayer m_Barrel) with CBarrelItem and CBarrelIcon (included by player.h) |
 | `structs/cinema.h` | the cinema (cutscene) state Cinema (*D_800C1BB0, 0x100) and CinemaEntry / CinemaTable |
 | `structs/boss.h` | the boss and level-script state of the VM modules: LevelScriptState (D_8012F608, with the BossState / BossMode views at D_8012F9D8 / D_8012F9DC, BossStep and the three script runners), MotherBossState (D_8012FB70, its BossWeakSpot), BlindOneState (D_80130200) with the Blind One's script VM (BlindOneStep, BlindOnePhase: the phase tables D_0043240C / D_0043232C, BlindOneMover), ScriptAnimator (the 0x64-byte value/colour animator: lights, weak spots, hit flashes) |
 | `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
-| `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs, OSPfsState and the Controller Pak internals, plus the engine's CMutex |
+| `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs, OSPfsState and the Controller Pak internals, the VI context (__OSViContext: __osViCurr / __osViNext are D_800B7AC0 / D_800B7AC4, OSViMode, __OSViScale), plus the engine's CMutex |
 | `gfx.h` | Gfx (w0/w1) and the display-list pointer the engine appends to |
 
 The imported Rage Wars files still take their own types from `include/rw/`
@@ -683,10 +683,9 @@ The imported Rage Wars files still take their own types from `include/rw/`
 the shared ones above instead of repeating them, so a file can include an
 rw header together with any shared header. Where a Rage Wars type had the
 same name and another layout it was renamed (abu's float matrix is RW_Mtx,
-not gbi.h's Mtx). junk_types.h and abu_types.h still disagree with each
-other on some libaudio internals (ALEvent, ALEventQueue, ALVoice,
-ALVoiceState, ALSound, ALSoundState, ALSynConfig, ALEnvMixer, ALMIDIEvent,
-ALTempoEvent, ALMicroTime), so those two cannot be included together yet.
+not gbi.h's Mtx). Their libaudio types are structs/libaudio.h's, and their
+intrusive lists are structs/list.h's CList, so junk_types.h and abu_types.h
+can be included together.
 
 ## The fast assembler
 

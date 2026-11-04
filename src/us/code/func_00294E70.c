@@ -23,8 +23,8 @@ void func_00294E70(ALFx *r, ALSynConfig *c, ALHeap *hp)
 {
     u16 i, j, k;
     s32 *param = 0;
-    ALFilter_s14 *f = &r->filter;
-    ALDelay28 *d;
+    ALFilter *f = &r->filter;
+    ALDelay *d;
     func_00296340(f, 0, (s32)&func_00297038, 5);
     f->handler = &func_00296750;
     r->paramHdl = &func_00296AF4;
@@ -40,7 +40,7 @@ void func_00294E70(ALFx *r, ALSynConfig *c, ALHeap *hp)
     j = 0;
     r->section_count = param[j++];
     r->length = param[j++];
-    r->delay = (void *)func_002912A0(0, 0, hp, r->section_count, sizeof(ALDelay28));
+    r->delay = (void *)func_002912A0(0, 0, hp, r->section_count, sizeof(ALDelay));
     r->base = (void *)func_002912A0(0, 0, hp, r->length, sizeof(s16));
     r->input = r->base;
     for (k = 0; k < r->length; k++)
@@ -67,35 +67,35 @@ void func_00294E70(ALFx *r, ALSynConfig *c, ALHeap *hp)
             d->rsgain = depth * ((f32)flength * D_800AA510);
             d->rsval = D_800AA514;
             d->rsdelta = 0;
-            d->rs = (void *)func_002912A0(0, 0, hp, 1, sizeof(struct ALResampler_s));
-            ((struct ALResampler_s *)d->rs)->state = (void *)func_002912A0(0, 0, hp, 1, 32);
-            ((struct ALResampler_s *)d->rs)->delta = 0;
-            ((struct ALResampler_s *)d->rs)->first = 1;
+            d->rs = (void *)func_002912A0(0, 0, hp, 1, sizeof(ALResampler));
+            ((ALResampler *)d->rs)->state = (void *)func_002912A0(0, 0, hp, 1, 32);
+            ((ALResampler *)d->rs)->delta = 0;
+            ((ALResampler *)d->rs)->first = 1;
         } else {
             d->rs = 0;
             j++;
             j++;
         }
         if (param[j]) {
-            d->lp = (void *)func_002912A0(0, 0, hp, 1, sizeof(struct AudioLowPassFilter));
-            ((struct AudioLowPassFilter *)d->lp)->state = (void *)func_002912A0(0, 0, hp, 1, sizeof(AudioPoleFilterState));
-            ((struct AudioLowPassFilter *)d->lp)->cutoff = param[j++];
+            d->lp = (void *)func_002912A0(0, 0, hp, 1, sizeof(ALLowPass));
+            ((ALLowPass *)d->lp)->fstate = (void *)func_002912A0(0, 0, hp, 1, sizeof(POLEF_STATE));
+            ((ALLowPass *)d->lp)->fc = param[j++];
             {
-                struct AudioLowPassFilter *lp = d->lp;
+                ALLowPass *lp = d->lp;
                 s32 n, temp;
                 s16 fc;
                 f64 ffc, fcoef;
-                temp = lp->cutoff * 16384;
+                temp = lp->fc * 16384;
                 fc = temp >> 15;
-                lp->gain = 16384 - fc;
+                lp->fgain = 16384 - fc;
                 lp->first = 1;
                 for (n = 0; n < 8; n++)
-                    lp->coefficients.taps[n] = 0;
-                lp->coefficients.taps[n++] = fc;
+                    lp->fcvec.fccoef[n] = 0;
+                lp->fcvec.fccoef[n++] = fc;
                 fcoef = ffc = (f64)fc * D_800AA518;
                 for (; n < 16; n++) {
                     fcoef *= ffc;
-                    lp->coefficients.taps[n] = (s16)(fcoef * 16384.0);
+                    lp->fcvec.fccoef[n] = (s16)(fcoef * 16384.0);
                 }
             }
         } else {
