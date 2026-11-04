@@ -1,13 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ f32 eyeHeight;
-} BobDef;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ BobDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xA10 - 0x18];
     /* 0xA10 */ f32 time;
     /* 0xA14 */ u8 padA14[0xACC - 0xA14];
@@ -61,7 +57,7 @@ void func_0024FC08(BobPlayer *p, BobObject *obj) {
 
     phase = p->time * p->bobSpeed * 0.017453294f;
     if (p->def != NULL) {
-        base = p->def->eyeHeight * 0.9f;
+        base = p->def->m_Player.m_CollisionHeight * 0.9f;
     } else {
         base = 82.94399f;
     }

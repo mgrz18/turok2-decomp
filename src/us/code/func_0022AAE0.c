@@ -1,10 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_2.CPP, func_8027B428_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct ActorDef {
-    /* 0x00 */ s32 type;
-} ActorDef;
+#include "structs/intelligence.h"
 
 typedef struct Owner {
     /* 0x00 */ u8 kind;
@@ -16,7 +13,7 @@ typedef struct Particle {
     /* 0x000 */ u8 pad0[2];
     /* 0x002 */ u16 type;
     /* 0x004 */ u8 pad4[0x14 - 4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x10C - 0x18];
     /* 0x10C */ Owner *owner;
 } Particle;
@@ -85,7 +82,7 @@ void func_0022AAE0(Particle *p) {
             if (isGroupC(p)) {
                 func_0026E19C(D_800F1D7C, 0x20, p);
             }
-        } else if (p->def->type == 1 || p->def->type == 4) {
+        } else if (p->def->m_Type == 1 || p->def->m_Type == 4) {
             if (isGroupC(p)) {
                 func_0026E19C(D_800F1D7C, 0x200, p);
             }
@@ -104,7 +101,7 @@ void func_0022AAE0(Particle *p) {
             if (isGroupC(p)) {
                 func_0026E110(D_800F1CE0, 0x10, p);
             }
-        } else if (p->def->type == 1 || p->def->type == 4) {
+        } else if (p->def->m_Type == 1 || p->def->m_Type == 4) {
             if (isGroupA(p)) {
                 func_0026E110(D_800F1CE0, 0x80, p);
             }

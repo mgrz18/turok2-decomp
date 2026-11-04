@@ -1,24 +1,13 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* AI init for a family of actors: installs the AI callbacks and seeds the
  * timers/flags from the actor definition. Types 0x44E..0x456 (except 0x44F and
  * 0x452) are left alone. */
 
 typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x4C - 0x4];
-    /* 0x4C */ s8 mode[2];
-    /* 0x4E */ u8 mode2;
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xB8 - 0x18];
     /* 0x0B8 */ u16 type;
     /* 0x0BA */ u8 padBA[0xD4 - 0xBA];
@@ -67,14 +56,14 @@ extern void func_00220260(void *mgr, Actor *actor, s32 flag);
 extern f32 func_002119FC(f32 lo, f32 hi);
 
 void func_0025BC70(Actor *actor, CAI *ai) {
-    ActorInfo *info;
+    CEnemyIntelligence *info;
     s32 mode2;
     s32 one; /* the mode indices live in variables: constants do not match */
     s32 two;
 
     actor->flags |= 0x02000000;
     actor->flags |= 0x04000000;
-    info = &actor->def->info;
+    info = &actor->def->m_Enemy;
     if (D_8011AAF1.value == 0) {
         actor->flags |= 0x10000000;
     }
@@ -113,10 +102,10 @@ void func_0025BC70(Actor *actor, CAI *ai) {
     ai->unk12C = func_002119FC(60.0f, 120.0f);
     ai->unk134 = 0;
     ai->unk138 = 150.0f;
-    ai->mode[0] = info->mode[0];
+    ai->mode[0] = info->m_Behaviors[0];
     one = 1;
-    ai->mode[one] = info->mode[one];
-    ai->mode2 = mode2 = info->mode2;
+    ai->mode[one] = info->m_Behaviors[one];
+    ai->mode2 = mode2 = info->m_UnderwaterBehavior;
     if (ai->mode[0]) {
         ai->modeIndex = 0;
     } else if (ai->mode[one]) {
@@ -130,11 +119,11 @@ void func_0025BC70(Actor *actor, CAI *ai) {
         }
     }
     ai->cb108 = func_0025E4B8;
-    if (!(actor->flags & 0x80000) && (info->flags & 0x1000)) {
+    if (!(actor->flags & 0x80000) && (info->m_dwFlags & 0x1000)) {
         actor->flags &= ~0x2000;
         actor->flags &= ~0x100;
     }
-    if (!(info->flags & 0x80000)) {
+    if (!(info->m_dwFlags & 0x80000)) {
         actor->flags |= 0x01000000;
     }
 }

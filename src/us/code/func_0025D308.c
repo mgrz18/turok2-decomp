@@ -1,17 +1,13 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* AI dodge check: if the definition enables dodging for the current mode,
  * dodges with a probability that grows with the AI's skill (0..255), to the
  * side away from the threat (animation 8 or 9). */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x7C];
-    /* 0x7C */ u16 dodgeMask; /* 5 bits per mode */
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
 } Actor;
 
 typedef struct {
@@ -36,8 +32,8 @@ void func_0025D308(Actor *actor, CAI *ai) {
 
     mode = ai->modeIndex;
     mode2 = mode;
-    if ((mode == 0 && (actor->def->dodgeMask & 0x1F)) || (mode == 1 && (actor->def->dodgeMask & 0x3E0))
-        || (mode2 == 2 && (actor->def->dodgeMask & 0x7C00))) {
+    if ((mode == 0 && (actor->def->m_Enemy.m_wEvadeAnimFlags & 0x1F)) || (mode == 1 && (actor->def->m_Enemy.m_wEvadeAnimFlags & 0x3E0))
+        || (mode2 == 2 && (actor->def->m_Enemy.m_wEvadeAnimFlags & 0x7C00))) {
         skill = ai->skill * (1.0f / 255);
         chance = skill * (skill * 600.0f) + 100.0f;
         if (func_002113A4() % 10000 < chance) {

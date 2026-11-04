@@ -3,6 +3,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_4/CODE_8028C490.CPP, func_8028CCDC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "common.h"
+#include "structs/intelligence.h"
 struct LevelActor;
 struct Shared_World;
 struct CVector3_t;
@@ -67,19 +69,6 @@ struct Shield;
 typedef struct Shield Shield;
 struct StridedTable;
 typedef struct StridedTable StridedTable;
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -90,7 +79,7 @@ struct LevelActor {
     u16 pad6;
     CVector3 position0;
     s32 model;
-    ActorDefinitionHeader *definition;
+    CIntelligence *definition;
     CVector3 position1;
     CVector3 motionAngles;
     void *attached;
@@ -171,7 +160,6 @@ struct LevelActor;
 struct StridedTable;
 struct Shared_World;
 struct LevelActor;
-struct ActorDefinitionHeader;
 struct WorldRecAt3C08;
 struct EffectSlot {
     s8 active;
@@ -180,7 +168,7 @@ struct EffectSlot {
     char pad6[2];
     CVector3 position;
     s32 owner;
-    struct ActorDefinitionHeader *definition;
+    struct CIntelligence *definition;
     CVector3 rotation;
     char pad28[0x28];
     s32 resource;

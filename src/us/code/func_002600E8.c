@@ -1,16 +1,12 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 flags;
-} ActorDef;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xD4 - 0x18];
     /* 0x0D4 */ union {
         u32 word;
@@ -36,13 +32,13 @@ void func_00246918(Actor *self, void *ai);
 void func_002280B0(Actor *self);
 
 void func_002600E8(Actor *self, void *ai) {
-    ActorDef *def;
+    CIntelligence *def;
 
     func_00246690(self, 0x17, self->pos, 0);
     func_004089C8();
     def = self->def;
     if (!(self->flags.word & 0x80000)) {
-        if (!(def->flags & 0x20)) {
+        if (!(def->m_dwTypeFlags & 0x20)) {
             func_00220260(D_800F7078, self, 1);
         }
         func_0026E110(self, 1, self);

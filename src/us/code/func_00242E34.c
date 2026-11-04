@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/intelligence.h"
 
 typedef struct Region {
     char pad0[2];
@@ -14,10 +15,6 @@ typedef struct RegionInfo {
     char pad48[0x50 - 0x48];
     u16 damage;        /* 0x50 */
 } RegionInfo;
-
-typedef struct ActorDef {
-    s32 type;          /* 0x00 */
-} ActorDef;
 
 typedef struct Owner {
     char pad0[0x51C];
@@ -104,7 +101,7 @@ void func_00242E34(CGameObjectInstance *actor, Dest *dst) {
     if (info->flags & 0x80000) {
         hurt = 1;
         if (info->flags & 4) {
-            hurt = ((ActorDef *)actor->header.m_pIntelligence)->type != 1;
+            hurt = actor->header.m_pIntelligence->m_Type != 1;
         }
         if (dst->flags & 0xC0000) {
             hurt = 0;

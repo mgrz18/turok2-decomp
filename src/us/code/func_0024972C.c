@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 #include "gfx.h"
 
 typedef struct PlayerOptions {
@@ -6,14 +7,9 @@ typedef struct PlayerOptions {
     /* 0x3E */ u8 tagMode;
 } PlayerOptions;
 
-typedef struct ActorDef {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s16 type;
-} ActorDef;
-
 typedef struct Player {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x518 - 0x18];
     /* 0x518 */ PlayerOptions *options;
     /* 0x51C */ u8 pad51C[0xC04 - 0x51C];
@@ -40,7 +36,7 @@ void func_0024972C(Player *player, s32 arg1) {
     } else if (D_8011ACE4 != 0 && player->options->tagMode != 0) {
         model = D_800ADB5C;
     } else {
-        model = D_800ADB30[player->def->type];
+        model = D_800ADB30[player->def->m_Id];
     }
     func_002241D8(D_800F7078, player, model, player->unkC04);
     g = D_800D8E24++;

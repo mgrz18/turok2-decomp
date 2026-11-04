@@ -1,26 +1,16 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/intelligence.h"
 
 /* AI hit callback: a projectile (or its owner) close enough lengthens the
  * wait and becomes the last-heard position; then the projectile type picks a
  * reaction animation (flinch, burn, freeze, shock...) the definition allows. */
 
 typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x2D - 0x4];
-    /* 0x2D */ u8 flinchDelay;
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x14 - 0x10];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
 } Actor;
 
 typedef struct Projectile {
@@ -99,14 +89,14 @@ static __inline__ void hearNoise(Actor *actor, CAI *ai, CVector3 *pos) {
 /* level and delay are function-wide variables shared by the three reactions
  * (their register choices depend on it). */
 void func_0025CAC8(Actor *actor, CAI *ai, Projectile *proj) {
-    ActorInfo *info;
+    CEnemyIntelligence *info;
     Projectile *owner;
     s32 v;
     f32 t;
     f32 level;
     f32 delay;
 
-    info = &actor->def->info;
+    info = &actor->def->m_Enemy;
     if (ai->unk4 == 0) {
         return;
     }
@@ -118,9 +108,9 @@ void func_0025CAC8(Actor *actor, CAI *ai, Projectile *proj) {
     }
     switch (proj->type) {
     case 3:
-        if ((info->flags & 0x200) && ai->state != 0x3D) {
+        if ((info->m_dwFlags & 0x200) && ai->state != 0x3D) {
             if (--ai->flinchTimer == 0) {
-                ai->flinchTimer += info->flinchDelay;
+                ai->flinchTimer += info->m_TranqHealth;
                 if (ai->state == 0x1D) {
                     v = ai->intensity;
                     v += 10;
@@ -148,7 +138,7 @@ void func_0025CAC8(Actor *actor, CAI *ai, Projectile *proj) {
     case 0x1D0:
     case 0x1D1:
     case 0x1D2:
-        if ((info->flags & 0x100) && ai->state != 0x3D) {
+        if ((info->m_dwFlags & 0x100) && ai->state != 0x3D) {
             if (ai->state == 0x20) {
                 v = ai->intensity;
                 v += 10;
@@ -164,7 +154,7 @@ void func_0025CAC8(Actor *actor, CAI *ai, Projectile *proj) {
         }
         break;
     case 10:
-        if (info->flags & 0x80) {
+        if (info->m_dwFlags & 0x80) {
             if (ai->state == 0x1F) {
                 v = ai->intensity;
                 v += 10;
@@ -184,7 +174,7 @@ void func_0025CAC8(Actor *actor, CAI *ai, Projectile *proj) {
     case 11:
     case 0x129:
         if (D_800F1CE0.hit != 0 && (D_800F1CE0.surface & 3) == 1) {
-            if (info->flags & 0x400) {
+            if (info->m_dwFlags & 0x400) {
                 func_00275544(0x1AB, actor->pos, 0, -1);
                 if (ai->state == 0x21) {
                     v = ai->intensity;
@@ -201,7 +191,7 @@ void func_0025CAC8(Actor *actor, CAI *ai, Projectile *proj) {
                     ai->hitNormal = D_800F1CE0.normal;
                     func_00243414(actor, ai, 0x21);
                 }
-            } else if (info->flags & 0x2000) {
+            } else if (info->m_dwFlags & 0x2000) {
                 func_00275544(0x213, actor->pos, 0, -1);
                 func_00243414(actor, ai, 0x22);
             }

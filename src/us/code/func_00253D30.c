@@ -3,6 +3,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80225D10_10.CPP, func_8022ADF0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "common.h"
+#include "structs/intelligence.h"
 struct LevelActor;
 struct CVector3_t;
 struct Box;
@@ -38,21 +40,7 @@ struct Shared_ParticleLighting {
     u8 reserved13[5];
 } __attribute__((aligned(4)));
 struct LevelActor;
-struct ActorDefinitionHeader;
 struct LevelActor;
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -62,7 +50,7 @@ struct LevelActor {
     s16 modelIndex;
     u16 pad6;
     CVector3 position0;
-    ActorDefinitionHeader *definition; /* 0x14 in Turok 2 */
+    CIntelligence *definition; /* 0x14 in Turok 2 */
     s32 model;
     CVector3 position1;
     CVector3 motionAngles;

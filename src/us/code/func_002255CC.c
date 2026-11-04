@@ -1,9 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct {
-    /* 0x0 */ s32 type;
-} ActorDef;
+#include "structs/intelligence.h"
 
 
 /* The per-kind actor lists of the world (layout as in func_00221210). */
@@ -67,7 +64,7 @@ void func_002255CC(World *arg0, CGameObjectInstance *arg1) {
         arg0->n2 = (s32) (temp_v1_3 + 1);
     }
     temp_a0 = arg0->n3;
-    if ((temp_a0 < 0x40) && (((ActorDef *)arg1->header.m_pIntelligence)->type == 1)) {
+    if ((temp_a0 < 0x40) && (arg1->header.m_pIntelligence->m_Type == 1)) {
         arg0->l3[temp_a0] = arg1;
         temp_v0 = arg0->n3;
         arg1->m_AI.m_PathFindCount = (s8) temp_v0;
@@ -79,7 +76,7 @@ void func_002255CC(World *arg0, CGameObjectInstance *arg1) {
         arg0->n4 = (s32) (temp_v1_4 + 1);
     }
     temp_a0_2 = arg0->n5;
-    if ((temp_a0_2 < 0x10) && (((ActorDef *)arg1->header.m_pIntelligence)->type == 5)) {
+    if ((temp_a0_2 < 0x10) && (arg1->header.m_pIntelligence->m_Type == 5)) {
         arg0->l5[temp_a0_2] = arg1;
         arg0->n5 = (s32) (temp_a0_2 + 1);
     }

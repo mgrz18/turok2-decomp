@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 typedef struct {
     f32 m[4][4];
@@ -16,14 +17,10 @@ extern s32 D_8010FF20;
 extern s32 D_800B6D1C; /* current buffer index */
 
 typedef struct {
-    /* 0x00 */ s32 type;
-} Func00215884Def;
-
-typedef struct {
     /* 0x000 */ u8 pad000[4];
     /* 0x004 */ f32 pos[3];
     /* 0x010 */ u8 pad010[4];
-    /* 0x014 */ Func00215884Def *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad018[0x20];
     /* 0x038 */ Mtx44f mtx[2];
     /* 0x0B8 */ u8 pad0B8[0x8C];
@@ -37,7 +34,7 @@ typedef struct {
 void func_00215884(Func00215884Obj *obj) {
     Mtx44f mtx;
 
-    if (obj->def->type == 8) {
+    if (obj->def->m_Type == 8) {
         func_00211114(&D_8010FF20, &mtx);
     } else {
         func_002105A4(&mtx, obj->angle);

@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/intelligence.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -27,17 +28,13 @@ typedef struct ParticleDef {
     /* 0x18 */ ParticleEvents *events;
 } ParticleDef;
 
-typedef struct ActorDef {
-    /* 0x00 */ s32 type;
-} ActorDef;
-
 typedef struct Target Target;
 struct Target {
     /* 0x0000 */ u8 kind;
     /* 0x0001 */ u8 pad1[3];
     /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ s32 unk10;
-    /* 0x0014 */ ActorDef *def;
+    /* 0x0014 */ CIntelligence *def;
     /* 0x0018 */ u8 pad18[0x98 - 0x18];
     /* 0x0098 */ Bone *bones;
     /* 0x009C */ u8 pad9C[0xD4 - 0x9C];
@@ -146,7 +143,7 @@ static __inline__ void attachParticle(Particle *p, f32 *transform, s32 action) {
     p->flags |= 0x10000;
     p->target = attached;
     p->shake = D_800F1CE0.frame;
-    if (attached->def->type == 1) {
+    if (attached->def->m_Type == 1) {
         if (p->owner != NULL) {
             func_0025E52C(attached, &attached->aiFlags, &p->owner->pos, 3);
         } else {
@@ -209,7 +206,7 @@ void func_0022C488(Particle *p) {
             if (owner->flags & 0x2000000) {
                 type = p->type;
                 if (type == 0x12A || type == 0x132) {
-                    if (owner->def->type == 11) {
+                    if (owner->def->m_Type == 11) {
                         special = owner->extraUses < 1;
                         if (special) {
                             owner->extraUses++;
@@ -271,7 +268,7 @@ void func_0022C488(Particle *p) {
     if (action != 4) {
         draw = 1;
         if (D_8011AAF1) {
-            draw = source->def->type != 11;
+            draw = source->def->m_Type != 11;
             if (mode == p->hitSurface) {
                 draw = 0;
             }

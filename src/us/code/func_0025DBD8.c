@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* AI combat update: turns toward the target, then picks a reaction (taunt,
  * the 0x11F4-range anims, a dodge or a special melee for type 0x259). */
@@ -16,18 +17,8 @@ typedef struct {
 } Targets;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x74];
-    /* 0x74 */ u16 tauntMask; /* 5 bits per mode */
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xB8 - 0x18];
     /* 0x0B8 */ u16 type;
 } Actor;
@@ -61,14 +52,14 @@ extern void func_0025D474(Actor *actor, CAI *ai);
 extern s32 func_0025D030(Actor *actor, CAI *ai, Targets *t);
 extern void func_0025D308(Actor *actor, CAI *ai);
 
-static __inline__ s8 canTaunt(CAI *ai, ActorInfo *info) {
-    if (ai->mode[0] && (info->tauntMask & 0x1F)) {
+static __inline__ s8 canTaunt(CAI *ai, CEnemyIntelligence *info) {
+    if (ai->mode[0] && (info->m_wComboEndAnimFlags & 0x1F)) {
         return 1;
     }
-    if (ai->mode[1] && (info->tauntMask & 0x3E0)) {
+    if (ai->mode[1] && (info->m_wComboEndAnimFlags & 0x3E0)) {
         return 1;
     }
-    if (ai->mode[2] && (info->tauntMask & 0x7C00)) {
+    if (ai->mode[2] && (info->m_wComboEndAnimFlags & 0x7C00)) {
         return 1;
     }
     return 0;
@@ -85,7 +76,7 @@ void func_0025DBD8(Actor *actor, CAI *ai) {
         angle = 1.0471977f;
     }
     func_00245BAC(actor, ai, angle, t.a.unk8);
-    if ((ai->flags & 0x4000000) && canTaunt(ai, &actor->def->info)) {
+    if ((ai->flags & 0x4000000) && canTaunt(ai, &actor->def->m_Enemy)) {
         func_00243414(actor, ai, 0x13);
         ai->flags |= 0x4000000;
         ai->prevState = ai->state;

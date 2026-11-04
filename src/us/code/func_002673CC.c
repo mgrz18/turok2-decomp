@@ -3,6 +3,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/8024D018_3.CPP, func_8024D4AC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "common.h"
+#include "structs/intelligence.h"
 struct LevelActor;
 extern f32 func_0021153C(f32 arg0);
 struct CVector3_t;
@@ -49,19 +51,6 @@ struct Actor_func_80214310_de {
     char pad10[0x54 - 0x10];
     f32 eye;
 };
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -72,7 +61,7 @@ struct LevelActor {
     u16 pad6;
     CVector3 position0;
     s32 model;
-    ActorDefinitionHeader *definition;
+    CIntelligence *definition;
     CVector3 position1;
     CVector3 motionAngles;
     void *attached;
@@ -151,7 +140,6 @@ struct LevelActor {
 };
 struct LevelActor;
 struct LevelActor;
-struct ActorDefinitionHeader;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;

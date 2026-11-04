@@ -1,9 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct {
-    /* 0x00 */ s32 type;
-} ActorDef;
+#include "structs/intelligence.h"
 
 
 typedef struct {
@@ -46,7 +43,7 @@ s32 func_0024ED54(Player *player, Body *body) {
     if ((player->buttons & 0x8000) && aim != NULL) {
         mount = player->mount;
         if (aim != mount && aim->header.m_Type == 1) {
-            type = ((ActorDef *)aim->header.m_pIntelligence)->type;
+            type = aim->header.m_pIntelligence->m_Type;
             if (type == 1 && mount != NULL) {
                 target = aim;
                 if (target->m_AI.m_Health != 0) {

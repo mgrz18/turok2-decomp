@@ -4,12 +4,8 @@
  * Its switch reads jtbl_800A7D30, which still lives in the asm .rodata. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/intelligence.h"
 
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ u8 pad4[0x10];
-    /* 0x14 */ u32 flags;
-} ActorDef;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
@@ -30,7 +26,7 @@ s32 func_00267090(CGameObjectInstance *actor) {
     u32 flags;
     u32 mask;
 
-    switch ((u32) ((ActorDef *)actor->header.m_pIntelligence)->kind) {
+    switch ((u32) actor->header.m_pIntelligence->m_Type) {
         case 11:
             if (actor->header.m_Type != 1) {
                 return 1;
@@ -45,7 +41,7 @@ s32 func_00267090(CGameObjectInstance *actor) {
         case 8:
             return 1;
         case 0:
-            return ((ActorDef *)actor->header.m_pIntelligence)->flags & 2;
+            return actor->header.m_pIntelligence->m_dwTypeFlags & 2;
         case 2:
             if (actor->header.m_Type == 1) {
                 return actor->m_dwFlags & 0x10000;
@@ -70,7 +66,7 @@ s32 func_00267090(CGameObjectInstance *actor) {
             }
             return 0;
         case 12:
-            return ((ActorDef *)actor->header.m_pIntelligence)->flags & 1;
+            return actor->header.m_pIntelligence->m_dwTypeFlags & 1;
         case 3:
         case 6:
         case 9:

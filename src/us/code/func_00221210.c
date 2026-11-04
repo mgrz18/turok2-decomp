@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00287EE8.c, func_00287EE8, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* Builds the frame's actor lists: every live level actor (flag 0x100) whose
  * type is shown in the current view is tested against the view's bounding
@@ -9,13 +10,8 @@
  * 0x64D); the others lose their "visible" flag 0x200. */
 
 typedef struct {
-    s32 kind;               /* 0x00 */
-    s32 flags;              /* 0x04: views it shows in, 0x100, 0x200 */
-} ActorInfo;
-
-typedef struct {
     u8 pad0[0x14];
-    ActorInfo *info;        /* 0x014 */
+    CIntelligence *info;        /* 0x014 */
     u8 pad18[0xA0];
     u16 type;               /* 0x0B8 */
     u8 padBA[2];
@@ -82,7 +78,7 @@ void func_00221210(World *w) {
     u8 *view;
     LevelActor *actors;
     LevelActor *o;
-    ActorInfo *info;
+    CIntelligence *info;
     s32 fl;
     f32 *bB;
     f32 *bA;
@@ -112,8 +108,8 @@ void func_00221210(World *w) {
             if (fl & 0x100) {
                 info = o->info;
                 s2 = 0;
-                if (info->flags & mask) {
-                    if (sflag != 0 && !(fl & 2) && o->unkE3 == 0 && !(fl & 0x400) && info->kind != 3
+                if (info->m_dwFlags & mask) {
+                    if (sflag != 0 && !(fl & 2) && o->unkE3 == 0 && !(fl & 0x400) && info->m_Type != 3
                         && func_00267090(o) == 0) {
                         if (bB[0] > o->boxMin[0] && bB[-3] < o->boxMax[0] && bB[2] > o->boxMin[2]
                             && bB[-1] < o->boxMax[2] && bB[1] > o->boxMin[1] && bB[-2] < o->boxMax[1]) {
@@ -133,10 +129,10 @@ void func_00221210(World *w) {
                     }
                 }
                 if (Cinema_PathPlaying() != 0 && D_800ACDE4 != 0) {
-                    if (!(info->flags & 0x200)) {
+                    if (!(info->m_dwFlags & 0x200)) {
                         s2 = 0;
                     }
-                } else if (!(info->flags & 0x100) && info->kind != 0xB) {
+                } else if (!(info->m_dwFlags & 0x100) && info->m_Type != 0xB) {
                     s2 = 0;
                 }
                 if (s2 != 0) {
@@ -161,7 +157,7 @@ void func_00221210(World *w) {
                         w->n2 = t2 + 1;
                     }
                     t3 = w->n3;
-                    if (t3 < 0x40 && o->info->kind == 1) {
+                    if (t3 < 0x40 && o->info->m_Type == 1) {
                         w->l3[t3] = o;
                         {
                             s32 u = w->n3;
@@ -175,7 +171,7 @@ void func_00221210(World *w) {
                         w->n4 = t4 + 1;
                     }
                     t5 = w->n5;
-                    if (t5 < 0x10 && o->info->kind == 5) {
+                    if (t5 < 0x10 && o->info->m_Type == 5) {
                         w->l5[t5] = o;
                         w->n5 = t5 + 1;
                     }

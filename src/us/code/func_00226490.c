@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ s32 type;
-} ActorDef;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorDef *def;
+    /* 0x14 */ CIntelligence *def;
     /* 0x18 */ u8 pad18[0xD4 - 0x18];
     /* 0xD4 */ s32 flags;
 } DrawActor;
@@ -55,7 +52,7 @@ void func_00226490(DrawWorld *world) {
     DrawActor **actors = world->actors;
 
     while (i < count) {
-        if (actors[i]->def->type != 2) {
+        if (actors[i]->def->m_Type != 2) {
             break;
         }
         actor = actors[i++];

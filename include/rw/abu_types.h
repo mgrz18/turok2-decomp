@@ -543,19 +543,6 @@ struct StridedTable {
 };
 typedef struct StridedTable StridedTable;
 struct InputRecAt27;
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 struct Def;
 struct Def {
     s32 type;
@@ -575,7 +562,7 @@ struct Shared_World;
 typedef struct Actor_func_8028E284_de Actor_func_8028E284_de;
 struct SceneEffect;
 typedef struct SceneEffect SceneEffect;
-struct ActorDefinitionHeader;
+struct CIntelligence;
 struct SceneEffect {
     s8 active;
     char pad1[3];
@@ -583,7 +570,7 @@ struct SceneEffect {
     char pad6[2];
     Vec3 position;
     s32 owner;
-    struct ActorDefinitionHeader *definition;
+    struct CIntelligence *definition;   /* structs/intelligence.h */
     Vec3 rotation;
     char pad28[0x28];
     s32 resource;

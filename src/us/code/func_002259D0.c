@@ -1,9 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct ActorDef {
-    /* 0x00 */ s32 kind;
-} ActorDef;
+#include "structs/intelligence.h"
 
 
 typedef struct World {
@@ -32,7 +29,7 @@ CGameObjectInstance *func_002259D0(World *world, CGameObjectInstance *target) {
     actors = world->actors;
     for (; i < count; i++) {
         actor = actors[i];
-        if (((ActorDef *)actor->header.m_pIntelligence)->kind != 5) {
+        if (actor->header.m_pIntelligence->m_Type != 5) {
             continue;
         }
         if (func_00264C80(actor, ((u8 *)&actor->m_AI)) != 0) {

@@ -1,14 +1,10 @@
 /* Second VM module copy of func_0042DA60 (same source, linked 0x0042D980). */
 #include "common.h"
-
-typedef struct ActorDef {
-    /* 0x00 */ u8 pad0[0x38];
-    /* 0x38 */ f32 pos[3];
-} ActorDef;
+#include "structs/intelligence.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x34 - 0x18];
     /* 0x034 */ f32 scale[3];
     /* 0x040 */ u8 pad40[0xD4 - 0x40];
@@ -95,7 +91,7 @@ void func_00466980(Player *p, void *rec, s32 mode) {
     func_00258668(&p->shadow, p->shadow.ai);
     func_0024CF58(p, p);
     func_00284254(p->unk51C);
-    p->actor.scale[0] = p->actor.def->pos[0];
-    p->actor.scale[1] = p->actor.def->pos[1];
-    p->actor.scale[2] = p->actor.def->pos[2];
+    p->actor.scale[0] = p->actor.def->m_Player.m_ScaleX;
+    p->actor.scale[1] = p->actor.def->m_Player.m_ScaleY;
+    p->actor.scale[2] = p->actor.def->m_Player.m_ScaleZ;
 }

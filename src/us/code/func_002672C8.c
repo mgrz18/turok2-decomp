@@ -1,14 +1,5 @@
 #include "common.h"
-
-typedef struct ObjDef {
-    /* 0x00 */ u32 type;
-    /* 0x04 */ u8 pad4[0x14];
-    /* 0x18 */ f32 unk18;       /* u16 shape for type 2 */
-    /* 0x1C */ f32 unk1C;
-    /* 0x20 */ f32 unk20;
-    /* 0x24 */ u8 pad24[4];
-    /* 0x28 */ f32 unk28;
-} ObjDef;
+#include "structs/intelligence.h"
 
 typedef struct Owner {
     /* 0x000 */ u8 pad0[0xBB0];
@@ -18,7 +9,7 @@ typedef struct Owner {
 typedef struct Obj {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[0x13];
-    /* 0x014 */ ObjDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xD4 - 0x18];
     /* 0x0D4 */ s32 flags;
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
@@ -27,11 +18,11 @@ typedef struct Obj {
 
 /* Radius of an object, by the kind of its definition. */
 f32 func_002672C8(Obj *obj) {
-    ObjDef *def;
+    CIntelligence *def;
     f32 r;
     f32 m;
 
-    switch (obj->def->type) {
+    switch (obj->def->m_Type) {
     case 11:
         if (obj->kind == 1 && (obj->flags & 0x300000) && obj->owner->unkBB0 != 0) {
             return 122.88f;
@@ -39,29 +30,29 @@ f32 func_002672C8(Obj *obj) {
         /* fallthrough */
     case 1:
     case 4:
-        return obj->def->unk28;
+        return obj->def->m_Enemy.m_CollisionRadius;
     case 0:
     case 5:
     case 8:
     case 10:
     case 12:
-        return obj->def->unk18;
+        return obj->def->m_Static.m_CollisionRadius;
     case 2:
         def = obj->def;
-        if (*(u16 *)&def->unk18 == 2) {
-            m = def->unk20;
-            if (!(def->unk1C <= m)) {
-                m = def->unk1C;
+        if (def->m_Platform.m_CollisionType == 2) {
+            m = def->m_Platform.m_CollisionWidth;
+            if (!(def->m_Platform.m_CollisionRadius <= m)) {
+                m = def->m_Platform.m_CollisionRadius;
             }
-            r = def->unk28;
+            r = def->m_Platform.m_CollisionLength;
             if (!(m <= r)) {
                 r = m;
             }
             return r * 1.42f;
         }
-        return def->unk1C;
+        return def->m_Platform.m_CollisionRadius;
     case 7:
-        return obj->def->unk1C;
+        return obj->def->m_Destructible.m_CollisionRadius;
     default:
         return 0.0f;
     }

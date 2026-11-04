@@ -172,7 +172,6 @@ struct Shared_Placed {
     s16 kind;
     s16 pad12;
 };
-struct ActorDefinitionHeader;
 struct WorldRecAt3C08;
 struct EffectSlot {
     s8 active;
@@ -181,7 +180,7 @@ struct EffectSlot {
     char pad6[2];
     CVector3 position;
     s32 owner;
-    struct ActorDefinitionHeader *definition;
+    struct CIntelligence *definition;
     CVector3 rotation;
     char pad28[0x28];
     s32 resource;

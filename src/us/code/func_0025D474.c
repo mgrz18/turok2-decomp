@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/intelligence.h"
 
 /* AI chase update: turns toward the target and runs or walks at it; flying
  * modes (1, 2) also climb toward its height and bank into the turn. In range,
@@ -32,18 +33,8 @@ typedef struct {
 } Dir;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x86];
-    /* 0x86 */ u16 canRun;
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x1C - 0x18];
     /* 0x01C */ f32 velY;
     /* 0x020 */ u8 pad20[0xB8 - 0x20];
@@ -110,7 +101,7 @@ void func_0025D474(Actor *actor, CAI *ai) {
     actor->flags |= 0x20000000;
     func_00246108(actor, ai, &t, 1, 1);
     runAnim = 4;
-    if (t.b.kind == 1 && actor->def->info.canRun) {
+    if (t.b.kind == 1 && actor->def->m_Enemy.m_wFleeAnimFlags) {
         dodge = 0;
         runAnim = 6;
     } else {

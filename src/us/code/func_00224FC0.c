@@ -3,23 +3,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028C1B0.c, func_0028C1B0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct ActorInfo {
-               u32 flags;
-               s32 unk4;
-               u8 pad8[4];
-               s16 unkC;
-               u8 padE[6];
-               f32 unk14;
-               u8 pad18[0xC];
-               u32 flags24;
-               u8 pad28[0x28];
-               f32 unk50;
-} ActorInfo;
-typedef struct ActorDef {
-               s32 type;
-               u8 pad4[0x10];
-               ActorInfo info;
-} ActorDef;
+#include "common.h"
+#include "structs/intelligence.h"
 typedef struct ActorStats {
                u8 pad0[0x80];
                s8 unk80;
@@ -50,7 +35,7 @@ typedef struct Brain {
 typedef struct Actor Actor;
 struct Actor {
                  u8 pad0[0x18];
-                 ActorDef *def;
+                 CIntelligence *def;
                  u8 pad1C[0x1C];
                  u32 flags38;
                  u8 pad3C[0xA8];
@@ -96,7 +81,7 @@ typedef struct Entity {
                  u8 pad6[0x2];
                  CVector3 pos;
                  s32 unk14;
-                 ActorDef *def;
+                 CIntelligence *def;
                  CVector3 vel;
                  u8 pad28[0xBC];
                  u16 unkE4;

@@ -13,6 +13,9 @@
 #include "common.h"
 #include "structs/vector.h"
 
+/* The definition m_pIntelligence points at. */
+#include "structs/intelligence.h"
+
 typedef struct {
     /* 0x00 */ u8 m_Type;
     /* 0x01 */ u8 _pad;

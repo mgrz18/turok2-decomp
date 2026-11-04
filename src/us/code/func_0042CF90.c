@@ -1,5 +1,6 @@
 /* WRONG CUT: REAL func_0042CF90 size 0x110 (splat cut it into func_0042CF90 + func_0042CFC0 + func_0042D040). */
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* A scene actor (0x1B0 bytes). */
 typedef struct SceneActor {
@@ -15,22 +16,10 @@ typedef struct ScenePool {
     /* 0x3608 */ s32 count;
 } ScenePool;
 
-/* The two default actor definitions. */
-typedef struct ActorDef {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ s32 flags;
-    /* 0x08 */ u8 pad8[0xA];
-    /* 0x12 */ u8 unk12;
-    /* 0x13 */ u8 pad13;
-    /* 0x14 */ s32 unk14;
-    /* 0x18 */ f32 unk18;
-    /* 0x1C */ f32 unk1C;
-} ActorDef;
+extern CIntelligence D_800F1360;
+extern CIntelligence D_800F12C0;
 
-extern ActorDef D_800F1360;
-extern ActorDef D_800F12C0;
-
-extern void func_0027BD10(ActorDef *def);
+extern void func_0027BD10(CIntelligence *def);
 extern void func_00227664(SceneActor *actor);
 
 /* Links the 32 actors of the pool into its free list and sets up the two default definitions. */
@@ -48,17 +37,17 @@ void func_0042CF90(ScenePool *pool) {
     pool->actors[31].next = NULL;
 
     func_0027BD10(&D_800F1360);
-    D_800F1360.type = 8;
-    D_800F1360.unk14 = 1;
-    D_800F1360.unk12 = 0;
-    D_800F1360.flags |= 4;
+    D_800F1360.m_Type = 8;
+    D_800F1360.m_dwTypeFlags = 1;
+    D_800F1360.m_nTexture = 0;
+    D_800F1360.m_dwFlags |= 4;
 
     func_0027BD10(&D_800F12C0);
-    D_800F12C0.type = 8;
-    D_800F12C0.unk14 = 0;
-    D_800F12C0.unk12 = 0;
-    D_800F12C0.flags |= 4;
-    D_800F12C0.unk1C = D_800F12C0.unk18 = 122.88f;
+    D_800F12C0.m_Type = 8;
+    D_800F12C0.m_dwTypeFlags = 0;
+    D_800F12C0.m_nTexture = 0;
+    D_800F12C0.m_dwFlags |= 4;
+    D_800F12C0.m_Pickup.m_CollisionHeight = D_800F12C0.m_Pickup.m_CollisionRadius = 122.88f;
 
     for (i = 0; i < 32; i++) {
         func_00227664(&pool->actors[i]);
