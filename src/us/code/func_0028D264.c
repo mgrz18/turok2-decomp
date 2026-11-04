@@ -1,7 +1,7 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
-typedef struct { s32 data[0x4E8 / 4]; } PlayerState;
 
 /* A player (0x1328 bytes) as this reads it. */
 typedef struct {
@@ -11,7 +11,7 @@ typedef struct {
     /* 0x014 */ u8 pad14[0x3C];
     /* 0x050 */ f32 rotY;
     /* 0x054 */ u8 pad54[0x4CC];
-    /* 0x520 */ PlayerState state;
+    /* 0x520 */ CPlayerLoadSaveData state;
     /* 0xA08 */ u8 padA08[0x920];
 } Player;
 
@@ -25,7 +25,7 @@ typedef struct {
 /* D_8011F290: the saved copy of the players (0x1400 bytes). */
 typedef struct {
     /* 0x0000 */ s32 unk0[4];
-    /* 0x0010 */ PlayerState state[4];
+    /* 0x0010 */ CPlayerLoadSaveData state[4];
     /* 0x13B0 */ Vec3f pos[4];
     /* 0x13E0 */ f32 rotY[4];
     /* 0x13F0 */ s32 region[4];

@@ -1,6 +1,7 @@
 /* First-module twin of src/us/code/func_004590BC.c. WRONG CUT: REAL func_0042019C size 0x2B8 (0x0042019C-0x00420454); splat cut its tail into func_004203B0. Matches whole (checked with the size overridden). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004085E0.c, func_004085E0, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
@@ -14,13 +15,6 @@ typedef struct {
     s32 player;   /* 0x1C */
     MenuPad *pad; /* 0x20 */
 } MenuArg;
-
-typedef struct {
-    u8 pad0[0x51C];
-    u8 *hud;          /* 0x51C */
-    u8 pad520[0xA50 - 0x520];
-    s32 controller;   /* 0xA50 */
-} Player;
 
 extern s32 D_800C2010;
 extern s32 D_800C2014;
@@ -49,7 +43,7 @@ extern u8 D_0043ACEC[];
 extern u8 D_0043BEF4[];
 void func_002053A8(s32 a);
 void func_002052D8(s32 a, s32 b);
-Player *func_0025342C(void *a, void *b);
+CPlayer *func_0025342C(void *a, void *b);
 void func_00416644(void *a, void *b, s32 c, s32 d, s32 e);
 
 s32 func_0042019C(s32 a0, MenuArg *arg) {
@@ -58,9 +52,9 @@ s32 func_0042019C(s32 a0, MenuArg *arg) {
         s32 pad;
     } mm;
     u8 *tbl;
-    Player *plr;
+    CPlayer *plr;
     s32 sw;
-    Player *u;
+    CPlayer *u;
 
     if (D_800C2010 != 0 || D_800C2014 != 0) {
         func_002053A8(0);
@@ -93,12 +87,12 @@ s32 func_0042019C(s32 a0, MenuArg *arg) {
         if (D_80130994 != 0) {
             D_801309BC = 1;
             plr = func_0025342C(D_80119870, arg->pad);
-            func_00416644(plr->hud + 0x53C, D_00438808, (s32)plr, plr->controller, mm.m);
+            func_00416644(((u8 *)plr->m_pCamera) + 0x53C, D_00438808, (s32)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         if (D_80130984 != 0) {
             D_801309BC = 1;
-            u = (Player *)arg->player;
+            u = (CPlayer *)arg->player;
             sw = arg->pad->pad;
             mm.m = sw;
             plr = u;
@@ -117,7 +111,7 @@ s32 func_0042019C(s32 a0, MenuArg *arg) {
                 tbl = D_0043ACEC;
                 break;
             }
-            func_00416644(plr->hud + 0x53C, tbl, (s32)plr, plr->controller, mm.m);
+            func_00416644(((u8 *)plr->m_pCamera) + 0x53C, tbl, (s32)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         return 0;
@@ -125,14 +119,14 @@ s32 func_0042019C(s32 a0, MenuArg *arg) {
     plr = func_0025342C(D_80119870, arg->pad);
     if (D_80130994 != 0) {
         D_801309BC = 1;
-        func_00416644(D_80119870 + 0x5BC, D_00439190, (s32)plr, plr->controller, mm.m);
+        func_00416644(D_80119870 + 0x5BC, D_00439190, (s32)plr, plr->m_ContState.m_pContState, mm.m);
         return 1;
     }
     if (D_80130984 == 0) {
         return 0;
     } else {
         D_801309BC = 1;
-        func_00416644(plr->hud + 0x53C, D_0043BEF4, (s32)plr, plr->controller, mm.m);
+        func_00416644(((u8 *)plr->m_pCamera) + 0x53C, D_0043BEF4, (s32)plr, plr->m_ContState.m_pContState, mm.m);
         D_80130940 = 0;
         return 1;
     }

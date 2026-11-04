@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x000 */ s32 data[0x4E8 / 4];
-} PlayerBlob;
+#include "structs/player.h"
 
 typedef struct {
     /* 0x000 */ s32 data[0x184 / 4];
@@ -16,15 +13,10 @@ typedef struct {
     /* 0x000 */ s32 size;
     /* 0x004 */ s32 extra;
     /* 0x008 */ f32 match[4];
-    /* 0x018 */ PlayerBlob player;
+    /* 0x018 */ CPlayerLoadSaveData player;
     /* 0x500 */ SetupBlob setup;
     /* 0x684 */ char text[4];
 } SaveBuffer;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x520];
-    /* 0x520 */ PlayerBlob blob;
-} Player;
 
 typedef struct {
     /* 0x0 */ s32 size;
@@ -48,7 +40,7 @@ static __inline__ s32 SaveFileSize(void) {
 }
 
 /* Snapshots the player and the multiplayer setup into a freshly allocated buffer. */
-void func_0041D890(Player *p) {
+void func_0041D890(CPlayer *p) {
     s32 size = SaveFileSize();
     SaveBuffer *save;
     s32 allocSize;
@@ -65,7 +57,7 @@ void func_0041D890(Player *p) {
     D_800C2010 = handle;
     D_800C2018 = buf;
     func_00266C5C(D_800C2018, 0, allocSize);
-    D_800C2018->player = p->blob;
+    D_800C2018->player = p->m_Data;
     D_800C2018->setup = D_8011AAD8;
     save = D_800C2018;
     save->match[0] = D_8011ACB0.f[0];

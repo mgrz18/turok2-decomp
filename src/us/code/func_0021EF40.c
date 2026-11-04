@@ -1,13 +1,9 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct Vec3 {
     f32 x, y, z;
 } Vec3;
-
-typedef struct Player {
-    u8 pad0[0x51C];
-    u8 *unk51C;         /* 0x51C */
-} Player;
 
 typedef struct Actor {
     u8 pad0[4];
@@ -15,7 +11,7 @@ typedef struct Actor {
     u8 pad10[0xD4 - 0x10];
     s32 flags;          /* 0xD4 */
     u8 padD8[0x1A8 - 0xD8];
-    Player *owner;      /* 0x1A8 */
+    CPlayer *owner;      /* 0x1A8 */
 } Actor;
 
 extern void func_0020F85C(void *matrix, Vec3 *in, Vec3 *out);
@@ -30,7 +26,7 @@ void func_0021EF40(Actor *actor, Vec3 v, s32 arg4, s32 arg5) {
     if (actor->flags & 0x300000) {
         v.x = -v.x;
         v.z = -v.z;
-        func_0020F85C(actor->owner->unk51C + 0x14C, &v, &out);
+        func_0020F85C(((u8 *)actor->owner->m_pCamera) + 0x14C, &v, &out);
     } else {
         func_0021F00C(&local, actor, v);
         func_0020EEF8(&out, &actor->pos, &local);

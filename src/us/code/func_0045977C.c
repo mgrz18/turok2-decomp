@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408E1C.c, func_00408E1C, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
@@ -9,15 +10,8 @@ typedef struct {
 } MenuPad;
 
 typedef struct {
-    u8 pad0[0x51C];
-    u8 *hud;           /* 0x51C */
-    u8 pad520[0x92C - 0x520];
-    s32 unk92C;        /* 0x92C */
-} Player;
-
-typedef struct {
     u8 pad0[0x1C];
-    Player *player; /* 0x1C */
+    CPlayer *player; /* 0x1C */
     MenuPad *pad;   /* 0x20 */
     void *msg;      /* 0x24 */
 } MenuBox;
@@ -49,7 +43,7 @@ void func_004263A0(s32 a);
 s32 func_0042647C(s32 a);
 void func_0042C620(u8 *a, s32 b, s32 c);
 void func_004302CC(u8 *a);
-void func_00416644(u8 *a, void *b, Player *c, MenuPad *d, s32 e);
+void func_00416644(u8 *a, void *b, CPlayer *c, MenuPad *d, s32 e);
 
 s32 func_0045977C(s32 a0, MenuBox *o) {
     s32 s0, s1, v;
@@ -73,7 +67,7 @@ s32 func_0045977C(s32 a0, MenuBox *o) {
                 s1 = o->pad->pad;
             }
             func_00285A80(s1);
-            func_0042C620(D_800F7078, o->player->unk92C, 2);
+            func_0042C620(D_800F7078, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
         func_004302CC(D_800F6CB0);
@@ -110,7 +104,7 @@ s32 func_0045977C(s32 a0, MenuBox *o) {
             func_00416644(D_80119E2C, D_0043B634, o->player, o->pad, 0);
         } else {
             if (o->player != NULL) {
-                p = o->player->hud + 0x53C;
+                p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
                 p = D_80119E2C;
             }
@@ -123,7 +117,7 @@ s32 func_0045977C(s32 a0, MenuBox *o) {
         }
         if (o->msg != NULL) {
             if (o->msg != D_0043B5EC && o->player != NULL) {
-                p = o->player->hud + 0x53C;
+                p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
                 p = D_80119E2C;
             }
