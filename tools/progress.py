@@ -124,12 +124,17 @@ def main():
     done = {"engine": 0, "virtual": 0, "libultra": 0}
     count = {"engine": 0, "virtual": 0, "libultra": 0}
     readable = 0
+    # A name counts once: a file may carry a static copy of a function another
+    # file defines (func_00465B04.c's engine half), or the same out-of-line
+    # helper as its neighbours (func_0027BC34).
+    seen = set()
     for path in linked_c_files():
         src = path.read_text()
         src = re.sub(r"/\*.*?\*/", "", src, flags=re.S)
         plain = "M2C_" not in src.replace('#include "m2c_macros.h"', "")
         for name in DEF.findall(src):
-            if name in sizes:
+            if name in sizes and name not in seen:
+                seen.add(name)
                 size, reg = sizes[name]
                 done[reg] += size
                 count[reg] += 1
