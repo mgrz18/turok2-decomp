@@ -2,6 +2,7 @@
  * it (src/us/asm/stray_00408FF8.s); func_00409340 installs func_00408FF8 + 8,
  * this function, as the AI hit callback. */
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Boss hit callback: finds which weak spot the hit part covers, takes the
  * damage off the matching live spot for the current phase, and when a spot
@@ -38,11 +39,6 @@ typedef struct {
     /* 0x08 */ u8 pad8[0x10 - 0x8];
     /* 0x10 */ HitPart *part;
 } Hit;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 flags;
-} CAI;
 
 extern State D_8012FB70;
 extern u8 D_00431E54[];
@@ -158,7 +154,7 @@ void func_00409000(void *obj, CAI *ai, Hit *hit) {
     }
     bit = 1 << target;
     if (s->phase != 2) {
-        ai->flags &= ~bit;
+        ai->m_VisBits &= ~bit;
     }
     s->liveMask &= ~bit;
     if (s->liveMask != 0) {

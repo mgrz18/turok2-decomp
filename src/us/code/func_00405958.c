@@ -1,12 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ s32 visible;
-    /* 0x08 */ u8 pad08[0x88 - 0x08];
-} Targets;
-
 /* Boss module state at 0x8012F608. */
 typedef struct {
     /* 0x000 */ s32 stage;
@@ -20,7 +14,7 @@ typedef struct {
     /* 0x3E8 */ f32 partTimer;      /* 0x8012F9F0 */
 } BossModule;
 
-extern void func_00246108(CGameObjectInstance *obj, CAI *ai, Targets *t, s32 f1, s32 f2);
+extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void func_00246918(CGameObjectInstance *obj, CAI *ai);
 extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
@@ -31,7 +25,7 @@ extern s32 D_8012F988[];
 extern s32 D_8012F9A8[];
 
 void func_00405958(CGameObjectInstance *obj, CAI *ai) {
-    Targets t;
+    CAITargets t;
     s32 limit;
     u32 bit;
 

@@ -1,29 +1,14 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x40];
-    /* 0x040 */ f32 unk40;
-    /* 0x044 */ u8 pad44[0xFC - 0x44];
-    /* 0x0FC */ void (*update)(CGameObjectInstance *, void *);
-    /* 0x100 */ u8 pad100[0x10C - 0x100];
-    /* 0x10C */ f32 unk10C;
-    /* 0x110 */ u8 pad110[0x118 - 0x110];
-    /* 0x118 */ f32 unk118;
-    /* 0x11C */ f32 unk11C;
-    /* 0x120 */ u8 pad120[0x128 - 0x120];
-    /* 0x128 */ f32 unk128;
-} AI;
-
 f32 func_002119FC(f32 lo, f32 hi);
-void func_00261B78(CGameObjectInstance *self, AI *ai);
+void func_00261B78(CGameObjectInstance *self, CAI *ai);
 
-void func_00261C38(CGameObjectInstance *self, AI *ai) {
-    ai->update = (void (*)(CGameObjectInstance *, void *)) func_00261B78;
-    ai->unk40 = func_002119FC(0.0f, 62.83186f);
-    ai->unk10C = 0.0f;
-    ai->unk118 = 0.017453294f;
-    ai->unk11C = self->m_vScale.x;
-    ai->unk128 = 0.0f;
+void func_00261C38(CGameObjectInstance *self, CAI *ai) {
+    ai->m_pfCollision = (void (*)(CGameObjectInstance *, void *)) func_00261B78;
+    ai->m_ModeTime = func_002119FC(0.0f, 62.83186f);
+    ai->m_VarF32[0] = 0.0f;
+    ai->m_VarF32[3] = 0.017453294f;
+    ai->m_VarF32[4] = self->m_vScale.x;
+    ai->m_VarF32[7] = 0.0f;
 }

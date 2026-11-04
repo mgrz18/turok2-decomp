@@ -27,10 +27,10 @@ s32 func_00265954(CGameObjectInstance *actor, ActionState *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;
     if (actor->m_CurrentAnimation.m_nAnimIndex != (s8) state->anim || actor->m_CurrentAnimation.m_nRequestedAnimIndex != (s8) state->anim) return 0;
     if (state->active != 0 && !(actor->m_dwFlags & 0x400)) return 1;
-    if ((s16) actor->m_CurrentAnimation.m_nFrames < 3 && (actor->m_dwFlags & 0x400)) {
+    if (actor->m_CurrentAnimation.m_nFrames < 3 && (actor->m_dwFlags & 0x400)) {
         return (f32) actor->m_BlendLength * scale <= actor->m_BlendPercent;
     } else {
-        return (f32) (s16) actor->m_CurrentAnimation.m_nFrames * scale <= actor->m_CurrentAnimation.m_AnimationFrame;
+        return (f32) actor->m_CurrentAnimation.m_nFrames * scale <= actor->m_CurrentAnimation.m_AnimationFrame;
     }
 }
 

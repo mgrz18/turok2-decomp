@@ -3,17 +3,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ CGameObjectInstance *obj;
-    /* 0x08 */ f32 angle;
-    /* 0x0C */ CVector3 a;
-    /* 0x18 */ CVector3 b;
-    /* 0x24 */ f32 dist;
-    /* 0x28 */ u8 pad28[0x88 - 0x28];
-} Targets;
-
-extern void func_00246108(CGameObjectInstance *obj, CAI *ai, Targets *t, s32 f1, s32 f2);
+extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern f32 func_00246310(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
 extern void func_00245BAC(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
@@ -27,7 +17,7 @@ extern s32 D_800F1F50[];
 extern s32 D_8012FA04[];        /* boss script index; an array so the store stays after the obj store */
 
 void func_0043EAC8(CGameObjectInstance *obj, CAI *ai) {
-    Targets t;
+    CAITargets t;
     CVector3 pos;
     CVector3 dir;
     f32 speed;
@@ -42,16 +32,16 @@ void func_0043EAC8(CGameObjectInstance *obj, CAI *ai) {
     D_800F1F50[0] |= 0x8000;
     func_00246108(obj, ai, &t, 1, 1);
     D_800F1F50[0] &= ~0x8000;
-    if (t.obj == NULL) {
+    if (t.m_Sight.m_pTarget == NULL) {
         return;
     }
-    pos = t.obj->header.m_vPos;
+    pos = t.m_Sight.m_pTarget->header.m_vPos;
     speed = 0.0f;
     func_00245BAC(obj, ai, 0.261799425f, func_00246310(obj, pos));
     func_0020EF2C(&dir, &obj->header.m_vPos, &pos);
     heading = func_0020EAA0(&dir);
     if (obj->m_CurrentAnimation.m_AnimationFrame <= 9.0f) {
-        target = t.dist * 0.229568392f;
+        target = t.m_Sight.m_Dist * 0.229568392f;
     } else {
         target = speed;
     }

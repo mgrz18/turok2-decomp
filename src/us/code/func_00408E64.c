@@ -1,22 +1,14 @@
 #include "common.h"
+#include "structs/game_object.h"
 
-typedef struct LevelActor {
-    /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ s32 *def;
-    /* 0x018 */ u8 pad18[0x144 - 0x18];
-    /* 0x144 */ s32 health;
-    /* 0x148 */ u8 pad148[0x28C - 0x148];
-    /* 0x28C */ struct LevelActor *next;
-} LevelActor;
-
-extern LevelActor *D_8010FEB4;
+extern CListedInstance *D_8010FEB4;
 
 /* Is any actor whose definition kind is 1 still alive? */
 s32 func_00408E64(void) {
-    LevelActor *actor;
+    CListedInstance *actor;
 
-    for (actor = D_8010FEB4; actor != NULL; actor = actor->next) {
-        if (*actor->def == 1 && actor->health != 0) {
+    for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {
+        if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {
             return 1;
         }
     }

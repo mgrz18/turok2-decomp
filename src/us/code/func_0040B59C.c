@@ -9,13 +9,8 @@ typedef struct {
     /* 0x4 */ s8 state;
 } ModeAnim;
 
-typedef struct {
-    /* 0x0 */ u8 pad0[0xC];
-    /* 0xC */ ModeAnim *anim;
-} ModeInfo;
-
 void func_0040B59C(s32 arg0, CAI *arg1) {
-    ((ModeInfo *) arg1->m_pModeCurrent)->anim->state = 7;
+    ((ModeAnim *) arg1->m_pModeCurrent->m_pData)->state = 7;
     if (arg1->m_AnimRepeatedCount != 0) {
         func_00243414(arg0, (s32) arg1, 0xB);
     }

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Module hit callback (the level's onHit, func_00408FF8 + 8 at the link address): finds the first active part the
  * hit touched; parts 10-14 are three groups, each draining the health of one still-alive slot of the current phase.
@@ -36,11 +37,6 @@ typedef struct {
     /* 0x08 */ u8 pad8[0x10 - 0x8];
     /* 0x10 */ Part *part;
 } Hit;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 flags;
-} CAI;
 
 extern State D_8012FB70;
 extern u8 D_00431D74[];
@@ -157,7 +153,7 @@ void func_00442000(void *obj, CAI *ai, Hit *hit) {
     }
     bit = 1 << slot;
     if (state->phase != 2) {
-        ai->flags &= ~bit;
+        ai->m_VisBits &= ~bit;
     }
     state->aliveMask &= ~bit;
     if (state->aliveMask == 0) {

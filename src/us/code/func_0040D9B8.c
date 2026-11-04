@@ -1,14 +1,8 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Damage callback of the second boss: outside phase 9 it only flinches (anim state 6); in phase 9 the damage
  * is taken, a hit effect plays at most every 2.25 s, and at zero health it dies (anim state 9). */
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 padD8[0x24C - 0xD8];
-    /* 0x24C */ s32 unk24C;
-} LevelActor;
 
 typedef struct {
     /* 0x00 */ s32 id;
@@ -40,11 +34,11 @@ typedef struct Obj2 {
 typedef struct State2 {
     /* 0x000 */ Obj2 *obj;
     /* 0x004 */ s32 count1;
-    /* 0x008 */ LevelActor *actors1[4];
+    /* 0x008 */ CGameObjectInstance *actors1[4];
     /* 0x018 */ s32 count2;
-    /* 0x01C */ LevelActor *actors2[4];
+    /* 0x01C */ CGameObjectInstance *actors2[4];
     /* 0x02C */ s32 count3;
-    /* 0x030 */ LevelActor *actors3[3];
+    /* 0x030 */ CGameObjectInstance *actors3[3];
     /* 0x03C */ Slot2 slots[12];
     /* 0x4EC */ s32 slotCount;
     /* 0x4F0 */ u8 pad4F0[0x4F8 - 0x4F0];
@@ -53,17 +47,6 @@ typedef struct State2 {
     /* 0x500 */ u8 pad500[0x518 - 0x500];
     /* 0x518 */ Mover movers[3];
 } State2;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ s32 health;
-    /* 0x008 */ u8 pad8[0x34 - 0x8];
-    /* 0x034 */ s8 state;
-    /* 0x035 */ u8 pad35[0xC7 - 0x35];
-    /* 0x0C7 */ s8 animDone;
-    /* 0x0C8 */ u8 padC8[0x118 - 0xC8];
-    /* 0x118 */ f32 hitTimer;
-} CAI;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
@@ -80,22 +63,22 @@ void func_0040D9B8(void *obj, CAI *ai, DamageEvent *event) {
     State2 *state;
     s32 health;
 
-    if (ai->health != 0 && ai->state != 1) {
+    if (ai->m_Health != 0 && ai->m_Mode != 1) {
         state = &D_80130200;
         if (state->phase != 9) {
-            ai->animDone = 0;
+            ai->m_AnimRepeatedCount = 0;
             func_00243414(obj, ai, 6);
         } else {
-            health = ai->health - event->damage;
+            health = ai->m_Health - event->damage;
             if (health < 0) {
                 health = 0;
             }
-            ai->health = health;
-            if (ai->hitTimer == 0.0f) {
-                ai->hitTimer = 2.25f;
+            ai->m_Health = health;
+            if (ai->m_VarF32[3] == 0.0f) {
+                ai->m_VarF32[3] = 2.25f;
                 func_00236314(&state->slots[0], D_00432464);
             }
-            if (ai->health == 0) {
+            if (ai->m_Health == 0) {
                 func_00243414(obj, ai, 9);
                 func_00206068(8);
             }

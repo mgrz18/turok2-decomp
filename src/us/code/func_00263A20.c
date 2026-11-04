@@ -3,6 +3,7 @@
  * function is func_00263A20 (called from func_00264378); this file matches it from
  * 0x263A20 to the end of splat's func_00263A14. */
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x24];
@@ -25,41 +26,28 @@ typedef struct {
     /* 0xD4 */ s32 flags;
 } Self;
 
-typedef struct {
-    /* 0x000 */ s32 flags;
-    /* 0x004 */ u8 pad4[0x35 - 0x4];
-    /* 0x035 */ s8 unk35;
-    /* 0x036 */ u8 pad36;
-    /* 0x037 */ s8 state;
-    /* 0x038 */ u8 pad38[0x44 - 0x38];
-    /* 0x044 */ f32 timer;
-    /* 0x048 */ u8 pad48[0x10C - 0x48];
-    /* 0x10C */ f32 triggerTime;
-    /* 0x110 */ f32 shake[3];
-} AI;
-
 extern f32 D_800B6D28; /* frame time */
 
 f32 func_002119FC(f32 lo, f32 hi);
 f32 func_00266F50(f32 x);
 
-static __inline__ s32 canClose(Params *params, AI *ai) {
-    if ((params->flags & 0x8000000) && !(ai->flags & 0x20000)) {
+static __inline__ s32 canClose(Params *params, CAI *ai) {
+    if ((params->flags & 0x8000000) && !(ai->m_dwFlags & 0x20000)) {
         return 0;
     }
-    if ((params->flags & 0x10000000) && (ai->flags & 0x20000)) {
+    if ((params->flags & 0x10000000) && (ai->m_dwFlags & 0x20000)) {
         return 0;
     }
     return 1;
 }
 
-void func_00263A20(Self *self, AI *ai) {
+void func_00263A20(Self *self, CAI *ai) {
     Params *params;
     s32 oldState;
     s32 flags;
 
     params = &self->def->params;
-    oldState = ai->state;
+    oldState = ai->m_Action;
     switch (oldState) {
         case 0:
             flags = params->flags;
@@ -67,87 +55,87 @@ void func_00263A20(Self *self, AI *ai) {
                 break;
             }
             if (flags & 0x4000000) {
-                if (ai->flags & 0x20000) {
-                    ai->triggerTime += D_800B6D28;
+                if (ai->m_dwFlags & 0x20000) {
+                    ai->m_VarF32[0] += D_800B6D28;
                 } else {
-                    ai->triggerTime = 0.0f;
+                    ai->m_VarF32[0] = 0.0f;
                     break;
                 }
-            } else if (ai->triggerTime > 0.0f || (ai->flags & 0x10000)) {
-                ai->triggerTime += D_800B6D28;
+            } else if (ai->m_VarF32[0] > 0.0f || (ai->m_dwFlags & 0x10000)) {
+                ai->m_VarF32[0] += D_800B6D28;
             }
-            if (ai->triggerTime >= params->triggerDelay) {
-                ai->timer = 0.0f;
+            if (ai->m_VarF32[0] >= params->triggerDelay) {
+                ai->m_ActionTime = 0.0f;
                 flags = params->flags;
                 if (flags & 0x1000000) {
-                    ai->state = 3;
+                    ai->m_Action = 3;
                 } else if (flags & 0x400000) {
-                    ai->state = 1;
+                    ai->m_Action = 1;
                 } else if (flags & 0x800000) {
-                    ai->state = 4;
+                    ai->m_Action = 4;
                 }
             }
             break;
         case 3:
-            ai->shake[0] = func_002119FC(-0.512f, 0.512f);
-            ai->shake[1] = func_002119FC(-0.512f, 0.512f);
-            ai->shake[2] = func_002119FC(-0.512f, 0.512f);
-            ai->timer += D_800B6D28;
-            if (ai->timer > 45.0f) {
-                ai->timer = 0.0f;
+            ai->m_VarF32[1] = func_002119FC(-0.512f, 0.512f);
+            ai->m_VarF32[2] = func_002119FC(-0.512f, 0.512f);
+            ai->m_VarF32[3] = func_002119FC(-0.512f, 0.512f);
+            ai->m_ActionTime += D_800B6D28;
+            if (ai->m_ActionTime > 45.0f) {
+                ai->m_ActionTime = 0.0f;
                 flags = params->flags;
                 if (flags & 0x400000) {
-                    ai->state = 1;
+                    ai->m_Action = 1;
                 } else if (flags & 0x800000) {
-                    ai->state = 4;
+                    ai->m_Action = 4;
                 }
             }
             break;
         case 1:
-            if (ai->timer < params->duration) {
-                ai->timer += D_800B6D28;
+            if (ai->m_ActionTime < params->duration) {
+                ai->m_ActionTime += D_800B6D28;
             } else if (params->flags & 0x2000000) {
                 self->flags &= ~0x2000;
             } else {
-                ai->timer = params->duration;
+                ai->m_ActionTime = params->duration;
                 if (canClose(params, ai)) {
-                    ai->state = 2;
+                    ai->m_Action = 2;
                 }
             }
             if (params->duration > 0.0f) {
-                ai->shake[1] = -params->speed * func_00266F50(ai->timer / params->duration);
+                ai->m_VarF32[2] = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
             } else {
-                ai->shake[1] = -params->speed;
+                ai->m_VarF32[2] = -params->speed;
             }
             break;
         case 2:
-            if (ai->timer > 0.0f) {
-                ai->timer -= D_800B6D28;
+            if (ai->m_ActionTime > 0.0f) {
+                ai->m_ActionTime -= D_800B6D28;
             } else {
-                ai->state = 0;
-                ai->triggerTime = 0.0f;
+                ai->m_Action = 0;
+                ai->m_VarF32[0] = 0.0f;
             }
             if (params->duration > 0.0f) {
-                ai->shake[1] = -params->speed * func_00266F50(ai->timer / params->duration);
+                ai->m_VarF32[2] = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
             } else {
-                ai->shake[1] = -params->speed;
+                ai->m_VarF32[2] = -params->speed;
             }
             break;
         case 4:
-            if (ai->timer < params->duration) {
-                ai->timer += D_800B6D28;
+            if (ai->m_ActionTime < params->duration) {
+                ai->m_ActionTime += D_800B6D28;
             }
             if (params->duration > 0.0f) {
-                ai->shake[1] = -params->speed * func_00266F50(ai->timer / params->duration);
+                ai->m_VarF32[2] = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
             } else {
-                ai->shake[1] = -params->speed;
+                ai->m_VarF32[2] = -params->speed;
             }
             if (params->flags & 0x2000000) {
                 self->flags &= ~0x2000;
             }
             break;
     }
-    if (oldState != ai->state) {
-        ai->unk35 = -1;
+    if (oldState != ai->m_Action) {
+        ai->m_ModeLastFrame = -1;
     }
 }

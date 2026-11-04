@@ -36,14 +36,34 @@ holds are listed in docs/MATCHING.md, "Shared headers".
   `include/rw/abu_types.h` (imported Rage Wars code, left alone). V3 (s32
   fields) was only ever copied or passed by value, so CVector3 compiles the
   same.
-- **Actor** (CGameObjectInstance, `structs/game_object.h`): PARTLY DONE. 123
+- **Actor** (CGameObjectInstance, `structs/game_object.h`): about 200
   files use CGameObjectInstance instead of a local Actor/LevelActor
-  (m_nTypeFlag is u16: every reader uses lhu). Still local: ~30 files that
-  also define a local `CAI` (wait for the CAI merge), 11 files reading a
-  field at 0x28C (a subclass past the 0x288 instance), views of other
-  objects named Actor (flags at 0x40, fields at 0x52A...), and a few whose
-  views need lvalue casts or did not match. 62 files still define an Actor,
-  34 a LevelActor (census below).
+  (m_nTypeFlag is u16: every reader uses lhu; CAnimationState's m_nFrames,
+  m_bCycleCompleted and m_bAnimActive are signed: every reader uses lh/lb).
+  The views 0x290 bytes long (the list link at 0x28C) are CListedInstance:
+  the instance, its CList links at 0x288/0x28C and the owner counter at
+  0x290, as the world's object lists (D_8010FEB4 active, D_8010FEA0 free)
+  hold them. 20 files still define an Actor and 2 a LevelActor, all views
+  of something else or kept on purpose: the 0x198 static object (flags u16
+  at 0x16C, bounds at 0x14C: func_00220D00, func_00221A24, func_00221D3C,
+  func_002222E0, and func_0022D2FC's), particles (a pointer at 0x10C:
+  func_002318D4..func_00232934, func_00247C10), func_00231E94 and
+  func_00232044 (fields at 0x118/0x150 the instance does not have there),
+  func_00246918 (an imported Rage Wars menu object),
+  func_00243C90 (0xA0C bytes), the 0x34-byte header copies of
+  func_0026961C/func_00269780, func_0040F240/func_00448240 (cinema
+  actors), and func_002600E8/func_00260554 (they test m_dwFlags through a
+  bitfield union, which is not the code the masks give).
+- **CAI** (`structs/game_object.h`): done. The local CAI (69 files), AI
+  (51), Targets (56), VecDst (14) and the mode-row views are gone. The
+  per-type state at 0x10C (m_VarBuffer) is an anonymous union of typed
+  views (m_VarS32/m_VarF32/m_VarPtr/m_VarObj/m_VarVec3/m_VarS16/m_VarS8...)
+  plus CEnemyAIVars m_Enemy (the enemy AI's behaviours and timers); what
+  each other AI type keeps there is read through the typed arrays until
+  its own view is written. CAITarget / CAITargets are what
+  func_002449E0 / func_00244338 fill from m_pSightTarget / m_pPathTarget
+  (func_00246108 fills both), CAIModeInfo the 0x20-byte rows of a mode
+  table (m_pModeTable / m_pModeCurrent).
 - **CIntelligence** (`structs/intelligence.h`, the definition
   `header.m_pIntelligence` points at; included by game_object.h, so the
   member is typed). Names from Rage Wars' debug type records, a common
@@ -147,13 +167,14 @@ views were replaced in about 230 files. Still local, and why:
 
 ## The families to merge next
 
-- **CAI** (69 files, 30 layouts), AI (51), Targets (56), VecDst (14): the
-  per-actor AI state at CGameObjectInstance+0x140 and what the AI callbacks
-  hand each other. game_object.h has it (`CAI m_AI`, 0x13C bytes), but these
-  files define a local CAI of the same name, so they cannot include the
-  header; the ~30 Actor views that are left are in them.
-- **Actor** (62 files) and LevelActor (34): the rest of CGameObjectInstance
-  (see above).
+- **CAI var-buffer views**: name the per-type state at CAI+0x10C for the
+  flying AI (func_00260730, func_00260D60, func_00261490), the swimming
+  turn rate at 0x118 (func_002616B8, func_00261CAC, func_00261FB0) and the
+  boss modules (0x114 slot, 0x118 hit timer: func_0040D5C4..func_0040DDB4,
+  func_004465C4..func_00446DB4), as CEnemyAIVars does for the enemy AI.
+- **CListedInstance**: the Effect (func_002280B0, func_00228484,
+  func_0022D2FC), Enemy (func_00401E30, func_004021C8, func_00402404) and
+  Enemy0040457C views are the same 0x294-byte object.
 - **State** (43 files, all `D_8012FB70`), BossModule / ModeState* (20,
   `D_8012F608`), BossState / BossMode (`D_8012F9D8`, `D_8012F9DC`): the boss
   and level-script state of the VM modules.

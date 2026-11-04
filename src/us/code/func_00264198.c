@@ -11,7 +11,7 @@ void func_00264198(CGameObjectInstance *arg0, CAI *arg1) {
     CIntelligence *temp_v1;
 
     temp_v1 = arg0->header.m_pIntelligence;
-    arg1->m_pModeTable = (struct CAIModeInfo *) &D_800B20B0;
+    arg1->m_pModeTable = (CAIModeInfo *) &D_800B20B0;
     arg1->m_pfStep = func_00264378;
     arg1->m_pfCalculateOrientationMatrix = func_0026426C;
     arg1->m_VarBuffer[4] = 0;

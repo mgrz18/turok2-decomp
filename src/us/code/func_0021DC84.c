@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0024AA08.c, func_0024AA08, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 
 /* Draw an actor's shadow. Without flag 0x10000000 it gets the blob shadow
@@ -25,22 +26,6 @@ typedef struct {
     s32 blobType;           /* 0x10 */
 } ShadowParams;
 
-typedef struct {
-    u8 pad0[0x4];
-    CVector3 pos;               /* 0x004 */
-    s32 model;              /* 0x010 */
-    u8 pad14[0x2C];
-    u8 rot[0x10];           /* 0x040 */
-    u8 pad50[0x50];
-    void *shadow;           /* 0x0A0 */
-    u8 padA4[0x30];
-    u32 flags;              /* 0x0D4 */
-    u8 padD8[0x36];
-    u8 shadowAlpha;         /* 0x10E */
-    u8 pad10F;
-    Light lights[2];        /* 0x110 */
-} Actor;
-
 extern s32 D_800AB8B0;      /* fade mode */
 extern f32 D_800AB8C0;      /* fade level */
 extern s32 D_800B6D1C;      /* current view */
@@ -48,7 +33,7 @@ extern u8 D_800F7148[];
 extern u8 D_8010FF34[];
 
 s32 func_00268160(void);
-f32 func_0026872C(Actor *, s32);
+f32 func_0026872C(CGameObjectInstance *, s32);
 void *func_00206950(void *, s32);
 f32 func_00298470(f32);     /* sqrtf */
 void func_00228910(void *, f32, f32, f32, CVector3 *, f32 *);
@@ -58,10 +43,10 @@ void func_00210318(void *, f32, f32, f32);
 void func_00210478(void *, f32, f32, f32);
 void func_00211114(void *, void *);
 void func_0020C618(void *, void *, void *);
-void func_0021ED04(Actor *, ShadowParams *, void *, u8);
-void func_0021E03C(Actor *, s32, s32);
+void func_0021ED04(CGameObjectInstance *, ShadowParams *, void *, u8);
+void func_0021E03C(CGameObjectInstance *, s32, s32);
 
-void func_0021DC84(Actor *a, s32 unused, ShadowParams *s) {
+void func_0021DC84(CGameObjectInstance *a, s32 unused, ShadowParams *s) {
     CVector3 dir;
     f32 r;
     u8 m[0x40];
@@ -75,11 +60,11 @@ void func_0021DC84(Actor *a, s32 unused, ShadowParams *s) {
     Light *light;
     register f32 py __asm__("$f1");
 
-    if (a->model != 0 && func_00268160() != 0 && !(a->flags & 0x200000)) {
-        if (a->flags & 0x10000000) {
-            if (a->shadow == NULL) {
+    if (a->header.m_pCurrentRegion != 0 && func_00268160() != 0 && !(a->m_dwFlags & 0x200000)) {
+        if (a->m_dwFlags & 0x10000000) {
+            if (a->m_pmfShadow == NULL) {
                 h = func_0026872C(a, 0);
-                py = a->pos.y;
+                py = a->header.m_vPos.y;
                 if (py < h) {
                     goto end;
                 }
@@ -88,11 +73,11 @@ void func_0021DC84(Actor *a, s32 unused, ShadowParams *s) {
                 if (512.0f < t) {
                     dy = 512.0f;
                 }
-                a->shadow = func_00206950(D_800F7148, 1);
-                if (a->shadow == NULL) {
+                a->m_pmfShadow = func_00206950(D_800F7148, 1);
+                if (a->m_pmfShadow == NULL) {
                     goto end;
                 }
-                light = &a->lights[D_800B6D1C];
+                light = (Light *) a->m_Lights[D_800B6D1C];
                 dir.x = light->dir[0] * 0.007874016f;
                 dir.y = light->dir[1] * 0.007874016f;
                 dir.z = light->dir[2] * 0.007874016f;
@@ -100,7 +85,7 @@ void func_0021DC84(Actor *a, s32 unused, ShadowParams *s) {
                 u2 = (f32) light->colour[1] * (f32) light->colour[1];
                 t = t + u2;
                 r = func_00298470(t + u2) * -0.00090497744f;
-                func_00228910(D_8010FF34, a->pos.x, a->pos.y, a->pos.z, &dir, &r);
+                func_00228910(D_8010FF34, a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, &dir, &r);
                 if (r < -1.0f) {
                     r = -1.0f;
                 }
@@ -108,7 +93,7 @@ void func_0021DC84(Actor *a, s32 unused, ShadowParams *s) {
                 if (D_800AB8B0 == 1) {
                     v = (s32) ((f32) v * D_800AB8C0 * 0.003921569f);
                 }
-                a->shadowAlpha = v;
+                a->m_ShadowAlpha = v;
                 dir.y = 1.0f;
                 func_0020F040(&dir);
                 if (dir.y < 0.0f) {
@@ -126,17 +111,17 @@ clampy:
                 }
                 ty = h + dy * 0.9f;
                 func_00210004(m, &dir, ty);
-                func_00210318(m, -a->pos.x, -ty, -a->pos.z);
+                func_00210318(m, -a->header.m_vPos.x, -ty, -a->header.m_vPos.z);
                 t = dy * 0.003f + 1.0f;
                 func_00210478(m, t, t, t);
-                func_00211114(a->rot, q);
-                func_0020C618(a->shadow, m, q);
-                func_00210318(a->shadow, a->pos.x, h, a->pos.z);
-                if (a->shadow == NULL) {
+                func_00211114(&a->m_qGround, q);
+                func_0020C618(a->m_pmfShadow, m, q);
+                func_00210318(a->m_pmfShadow, a->header.m_vPos.x, h, a->header.m_vPos.z);
+                if (a->m_pmfShadow == NULL) {
                     goto end;
                 }
             }
-            func_0021ED04(a, s, a->shadow, a->shadowAlpha);
+            func_0021ED04(a, s, a->m_pmfShadow, a->m_ShadowAlpha);
         } else {
             func_0021E03C(a, s->blobType, 0);
         }

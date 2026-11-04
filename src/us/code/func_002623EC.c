@@ -1,18 +1,6 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
-
-typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ void *obj;
-    /* 0x08 */ f32 angle;
-    /* 0x0C */ u8 padC[0x40 - 0xC];
-    /* 0x40 */ f32 dist;
-} VecDst; /* 0x44 */
-
-typedef struct {
-    /* 0x00 */ VecDst a;
-    /* 0x44 */ VecDst b;
-} Targets;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x40];
@@ -46,26 +34,17 @@ typedef struct {
     /* 0x04 */ CVector3 pos;
 } TargetActor;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x80];
-    /* 0x080 */ TargetActor *target;
-    /* 0x084 */ u8 pad84[0x98 - 0x84];
-    /* 0x098 */ f32 baseRotY;
-    /* 0x09C */ u8 pad9C[0x10C - 0x9C];
-    /* 0x10C */ f32 pitch;
-} AI;
-
 void func_00210EF0(f32 *angle);
-void func_00246108(Turret *self, AI *ai, Targets *out, s32 f1, s32 f2);
+void func_00246108(Turret *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 f32 func_002671B4(void *actor);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_0020F5C0(CVector3 *v);
-void func_00262150(Turret *self, AI *ai, s32 mode, TargetActor *target);
-void func_00245BAC(Turret *self, AI *ai, f32 turnRate, f32 angle);
+void func_00262150(Turret *self, CAI *ai, s32 mode, TargetActor *target);
+void func_00245BAC(Turret *self, CAI *ai, f32 turnRate, f32 angle);
 f32 func_00211774(f32 cur, f32 target, f32 rate);
 
-s32 func_002623EC(Turret *self, AI *ai) {
-    Targets t;
+s32 func_002623EC(Turret *self, CAI *ai) {
+    CAITargets t;
     CVector3 from;
     CVector3 to;
     CVector3 delta;
@@ -78,16 +57,16 @@ s32 func_002623EC(Turret *self, AI *ai) {
     f32 sum;
     f32 limit;
 
-    yaw = self->rotY - ai->baseRotY;
+    yaw = self->rotY - ai->m_InitialRotY;
     params = &self->def->params;
     func_00210EF0(&yaw);
     func_00246108(self, ai, &t, 0, 1);
-    target = ai->target;
+    target = ai->m_pSightTarget;
     fire = 0;
-    if (target != NULL && t.a.dist <= params->aimRange
-        && (t.a.angle < 0.0f ? -t.a.angle : t.a.angle) < params->aimFov * 0.5f) {
-        if (t.a.dist <= params->fireRange
-            && (t.a.angle < 0.0f ? -t.a.angle : t.a.angle) < params->fireFov * 0.5f) {
+    if (target != NULL && t.m_Sight.m_FlatDist <= params->aimRange
+        && (t.m_Sight.m_Angle < 0.0f ? -t.m_Sight.m_Angle : t.m_Sight.m_Angle) < params->aimFov * 0.5f) {
+        if (t.m_Sight.m_FlatDist <= params->fireRange
+            && (t.m_Sight.m_Angle < 0.0f ? -t.m_Sight.m_Angle : t.m_Sight.m_Angle) < params->fireFov * 0.5f) {
             fire = 1;
         }
         from = self->pos;
@@ -96,7 +75,7 @@ s32 func_002623EC(Turret *self, AI *ai) {
         to.y += func_002671B4(target) * 0.5f;
         func_0020EF2C(&delta, &to, &from);
         pitch = func_0020F5C0(&delta);
-        turn = t.a.angle;
+        turn = t.m_Sight.m_Angle;
         if (params->turnArc < 6.283186f) {
             limit = params->turnArc * 0.5f;
             sum = yaw + turn;
@@ -113,6 +92,6 @@ s32 func_002623EC(Turret *self, AI *ai) {
         func_00262150(self, ai, params->idleMode, target);
     }
     func_00245BAC(self, ai, params->turnRate, turn);
-    ai->pitch = func_00211774(ai->pitch, pitch, params->turnRate);
+    ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], pitch, params->turnRate);
     return fire;
 }

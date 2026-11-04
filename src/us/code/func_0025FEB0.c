@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 
 /* Places a projectile at its owner's muzzle: inherits the shooter's rotation,
@@ -40,11 +41,6 @@ typedef struct {
     /* 0x1A8 */ Owner *owner;
 } Shooter;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Shooter *shooter;
-} AI;
-
 extern CVector3 D_800B17B0;
 extern f32 D_800DD78C;
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
@@ -55,12 +51,12 @@ void func_0020F85C(Mtx4 *m, CVector3 *in, CVector3 *out);
 f32 func_002982F0(f32 x); /* sinf */
 f32 func_002974C0(f32 x); /* cosf */
 
-void func_0025FEB0(Projectile *self, AI *ai) {
+void func_0025FEB0(Projectile *self, CAI *ai) {
     Mtx4 m;
     CVector3 dir;
     CQuaternion yaw;
     CQuaternion rot;
-    Shooter *shooter = ai->shooter;
+    Shooter *shooter = ai->m_VarPtr[2];
     Owner *owner = shooter->owner;
     f32 s;
 

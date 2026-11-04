@@ -1,17 +1,8 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* AI update for the module's actor: runs the AI step and the current anim's callback; in phase 0, a target
  * closer than 1228.8 makes the D_8010FEB4 actors drop their health; then updates the module (func_00409784). */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ void (*callback)(void *obj, void *ai);
-} Anim;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ Anim *anim;
-} CAI;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x65C];
@@ -30,8 +21,8 @@ void func_0040BC64(void *obj, CAI *ai) {
     f32 dist;
 
     func_0025AD90(obj, ai, 0.0f);
-    if (ai->anim != NULL && ai->anim->callback != NULL) {
-        ai->anim->callback(obj, ai);
+    if (ai->m_pModeCurrent != NULL && ai->m_pModeCurrent->m_pfCallback != NULL) {
+        ai->m_pModeCurrent->m_pfCallback(obj, ai);
     }
     if (state->phase == 0) {
         dist = func_0040BD60(obj, &found);

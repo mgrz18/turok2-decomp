@@ -1,15 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x64];
-    /* 0x64 */ f32 timer;
-} AI;
-
 f32 func_002119FC(f32 lo, f32 hi);
 
-void func_00261ECC(CGameObjectInstance *self, AI *ai) {
+void func_00261ECC(CGameObjectInstance *self, CAI *ai) {
     self->m_dwFlags &= ~0x20000;
-    ai->timer = func_002119FC(30.0f, 60.0f);
+    ai->m_ConditionTimer = func_002119FC(30.0f, 60.0f);
 }

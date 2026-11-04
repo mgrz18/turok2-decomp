@@ -3,7 +3,6 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 
-
 typedef struct {
     /* 0x00 */ CVector3 pos;
     /* 0x0C */ s32 region;
@@ -11,45 +10,10 @@ typedef struct {
     /* 0x14 */ u16 flags;
 } Location;
 
-typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ s32 active;
-    /* 0x08 */ u8 pad8[0x34 - 8];
-    /* 0x34 */ s8 state;
-    /* 0x35 */ u8 pad35[0x68 - 0x35];
-    /* 0x68 */ CGameObjectInstance *ignore;
-    /* 0x6C */ u8 pad6C[0x78 - 0x6C];
-    /* 0x78 */ CGameObjectInstance *forced;
-    /* 0x7C */ u8 pad7C[4];
-    /* 0x80 */ CGameObjectInstance *target;
-    /* 0x84 */ u8 pad84[0x88 - 0x84];
-    /* 0x88 */ CGameObjectInstance *altTarget;
-    /* 0x8C */ u8 pad8C[0x94 - 0x8C];
-    /* 0x94 */ s8 location;
-    /* 0x95 */ u8 pad95[0x98 - 0x95];
-    /* 0x98 */ f32 homeRotY;
-    /* 0x9C */ u8 pad9C[0xAC - 0x9C];
-    /* 0xAC */ CVector3 pos;
-    /* 0xB8 */ u8 padB8[0xCA - 0xB8];
-    /* 0xCA */ s8 team;
-} Plan;
-
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ CGameObjectInstance *target;
-    /* 0x08 */ f32 angle;
-    /* 0x0C */ CVector3 pos;
-    /* 0x18 */ CVector3 delta;
-    /* 0x24 */ f32 dist;
-    /* 0x28 */ CVector3 flatPos;
-    /* 0x34 */ CVector3 flatDelta;
-    /* 0x40 */ f32 flatDist;
-} TrackResult;
-
 extern s32 D_800F7F78;
 extern s32 D_8011001C;
 
-CGameObjectInstance *func_00243C90(CGameObjectInstance *self, Plan *plan, s32 arg2, s32 arg3);
+CGameObjectInstance *func_00243C90(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
 Location *func_0028479C(s8 *location);
 f32 func_00246310(CGameObjectInstance *a, CVector3 point);              /* angle to a point */
 void func_00210EF0(f32 *angle);                        /* wrap an angle */
@@ -57,19 +21,19 @@ void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 f32 func_00298470(f32 x);                              /* sqrt */
 
 /* What the plan aims at (the same classes as func_002438C0). */
-static __inline__ s32 Kind(CGameObjectInstance *self, Plan *plan, CGameObjectInstance *target) {
+static __inline__ s32 Kind(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target) {
     CPlayer *player;
 
-    if (plan->active == 0) {
+    if (plan->m_Health == 0) {
         return 6;
     }
     if (target == NULL) {
-        if (plan->location != 0) {
+        if (plan->m_PathTrack.m_Mode != 0) {
             return 4;
         }
         return 3;
     }
-    if (target == plan->ignore) {
+    if (target == plan->m_pParent) {
         return 2;
     }
     if (*((s32 *)target->header.m_pIntelligence) == 5) {
@@ -97,7 +61,7 @@ static __inline__ s32 Kind(CGameObjectInstance *self, Plan *plan, CGameObjectIns
 
 /* Picks the plan's target and fills `out` with its kind, the turn to face
  * it, its position, offset and distance, in 3D and flattened. */
-void func_002449E0(CGameObjectInstance *self, Plan *plan, s32 unused, TrackResult *out) {
+void func_002449E0(CGameObjectInstance *self, CAI *plan, s32 unused, CAITarget *out) {
     CVector3 pos;
     CVector3 delta;
     f32 angle;
@@ -105,14 +69,14 @@ void func_002449E0(CGameObjectInstance *self, Plan *plan, s32 unused, TrackResul
     CGameObjectInstance *target;
     Location *loc;
 
-    if (plan->team == D_800F7F78 && (!(plan->flags & 0x40000000) || plan->forced != NULL)) {
-        plan->target = func_00243C90(self, plan, 1, 0);
+    if (plan->m_PathFindCount == D_800F7F78 && (!(plan->m_dwFlags & 0x40000000) || plan->m_pTargetOverride != NULL)) {
+        plan->m_pSightTarget = func_00243C90(self, plan, 1, 0);
     }
-    if (*((s32 *)self->header.m_pIntelligence) == 1 && plan->state == 0xB && Kind(self, plan, plan->altTarget) == 4) {
-        target = plan->altTarget;
+    if (*((s32 *)self->header.m_pIntelligence) == 1 && plan->m_Mode == 0xB && Kind(self, plan, plan->m_pPathTarget) == 4) {
+        target = plan->m_pPathTarget;
         kind = 4;
     } else {
-        target = plan->target;
+        target = plan->m_pSightTarget;
         kind = Kind(self, plan, target);
     }
     if (target != NULL) {
@@ -121,7 +85,7 @@ void func_002449E0(CGameObjectInstance *self, Plan *plan, s32 unused, TrackResul
     } else {
         switch (kind) {
         case 4:
-            loc = func_0028479C(&plan->location);
+            loc = func_0028479C(&plan->m_PathTrack.m_Mode);
             pos = loc->pos;
             if (loc->flags & 1) {
                 angle = loc->rotY - self->m_RotY;
@@ -130,8 +94,8 @@ void func_002449E0(CGameObjectInstance *self, Plan *plan, s32 unused, TrackResul
             }
             break;
         case 3:
-            pos = plan->pos;
-            angle = plan->homeRotY - self->m_RotY;
+            pos = plan->m_vLeashPos;
+            angle = plan->m_InitialRotY - self->m_RotY;
             break;
         case 6:
             pos = self->header.m_vPos;
@@ -141,15 +105,15 @@ void func_002449E0(CGameObjectInstance *self, Plan *plan, s32 unused, TrackResul
     }
     func_00210EF0(&angle);
     func_0020EF2C(&delta, &pos, &self->header.m_vPos);
-    out->kind = kind;
-    out->target = target;
-    out->angle = angle;
-    out->pos = pos;
-    out->delta = delta;
-    out->dist = func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
+    out->m_Kind = kind;
+    out->m_pTarget = target;
+    out->m_Angle = angle;
+    out->m_vPos = pos;
+    out->m_vDelta = delta;
+    out->m_Dist = func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
     delta.y = 0.0f;
     pos.y = 0;
-    out->flatPos = pos;
-    out->flatDelta = delta;
-    out->flatDist = func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
+    out->m_vFlatPos = pos;
+    out->m_vFlatDelta = delta;
+    out->m_FlatDist = func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
 }

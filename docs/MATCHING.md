@@ -654,7 +654,7 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | Header | Holds |
 |---|---|
 | `structs/vector.h` | CVector3, CQuaternion, CMtxF: the engine math types (included by game_object.h) |
-| `structs/game_object.h` | CGameObjectInstance (0x288, an "actor") and its parts: CInstanceHeader, CAnimationState, CPathTrack, CAI (the AI state at 0x140) |
+| `structs/game_object.h` | CGameObjectInstance (0x288, an "actor") and its parts: CInstanceHeader, CAnimationState, CPathTrack, CAI (the AI state at 0x140, with typed views of its per-type m_VarBuffer and CEnemyAIVars), CAIModeInfo (a mode-table row), CAITarget / CAITargets (what the AI aims at), CListedInstance (an instance with its world-list links, 0x294) |
 | `structs/intelligence.h` | CIntelligence, the definition `header.m_pIntelligence` points at: a common header and a union of per-type bodies (CEnemyIntelligence, CTurretIntelligence, CDoorIntelligence, CPlatformIntelligence, CGeneratorIntelligence, CActionIntelligence, CPlayerIntelligence...), Rage Wars' names (included by game_object.h) |
 | `structs/player.h` | CPlayer (0x1328) and the HUD: COverlay, COnScreen, CPlayerOverlay, CPlayerContState, CBarrel (the weapon wheel), CPlayerLoadSaveData (the save blob), CPlayerList / CPlayerCList (D_80119890) |
 | `structs/player_options.h` | CPlayerOptions (0x40): a player's options and per-opponent counts, `CPlayer::m_pOptions`; GameSettings holds five (included by player.h and game.h) |
