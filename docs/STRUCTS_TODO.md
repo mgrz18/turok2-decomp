@@ -163,8 +163,15 @@ views were replaced in about 230 files. Still local, and why:
   ControllerProfile: the controller state (structs/menu.h has the menus'
   MenuController view).
 - **WeaponDef** / WeaponInfo (`D_800AF618`, 44 files): the weapon table.
-- **Command** / PhaseFuncs (`D_0043232C`, `D_0043240C`), Timer, Manager: the
-  VM's script commands and timers.
+- **Command** / PhaseFuncs (`D_0043232C`, `D_0043240C`), Timer, Manager: done
+  (structs/script.h, BlindOneState = D_80130200); D_800C1BB0: done
+  (structs/cinema.h); BootState / BigState / Context: done (game.h, the
+  mode block of GameSettings inside CEngineApp D_800F6CB0). Left local:
+  func_0040EDB0 (D_8013023C), the Rage Wars imports func_00284080,
+  func_002841D0, func_002844F0 (rw/ types), and the engine views that use
+  other parts of D_800F6CB0 (func_00286440, func_00286674, func_00287248,
+  func_00287ABC, func_00288B1C, func_0028932C, func_00289910, func_00289F30,
+  func_002718D0, func_002718E0).
 - **PfsPak** / PakDirectory / PakNote (`D_80130C80`, `D_800C2224`): the
   Controller Pak menus (ultra_types.h has the libultra side).
 - The player-options leftovers and the rw/ header copies (above).

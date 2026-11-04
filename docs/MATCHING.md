@@ -658,11 +658,13 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/intelligence.h` | CIntelligence, the definition `header.m_pIntelligence` points at: a common header and a union of per-type bodies (CEnemyIntelligence, CTurretIntelligence, CDoorIntelligence, CPlatformIntelligence, CGeneratorIntelligence, CActionIntelligence, CPlayerIntelligence...), Rage Wars' names (included by game_object.h) |
 | `structs/player.h` | CPlayer (0x1328) and the HUD: COverlay, COnScreen, CPlayerOverlay, CPlayerContState, CBarrel (the weapon wheel), CPlayerLoadSaveData (the save blob), CPlayerList / CPlayerCList (D_80119890) |
 | `structs/player_options.h` | CPlayerOptions (0x40): a player's options and per-opponent counts, `CPlayer::m_pOptions`; GameSettings holds five (included by player.h and game.h) |
-| `structs/game.h` | GameSettings (D_8011AAD8, the game settings and the multiplayer setup) and GameMatch (D_8011ACB0, the play clock and the running match's rules) |
+| `structs/game.h` | GameSettings (D_8011AAD8, the game settings and the multiplayer setup, with the engine's mode block at 0x1A8), GameMatch (D_8011ACB0, the play clock and the running match's rules) and CEngineApp (D_800F6CB0, which holds GameSettings at 0x23E28) |
 | `structs/world.h` | CWorld (D_800F7078, 0x19078): the resource files, the loaded level, its actor lists and pools, the warp state; CWarpPoint, CWorldSector, CWorldRecord, CLevelHeader, CGeomHeader |
 | `structs/region.h` | CGameRegion (the floor triangles an object's `m_pCurrentRegion` points to, linked to their neighbours) and CRegionInfo (the attributes they share by index) |
 | `structs/camera.h` | CCamera and CCameraPool, with CCameraViewParams, CCameraViewport, CShake, CCameraText, CList, CPlane |
 | `structs/menu.h` | the menu system: Menu (a window), MenuItem, MenuItemDesc, MenuDesc, MenuItemLayout, MenuController, MenuColor, MenuPool |
+| `structs/script.h` | the second boss (the Blind One) and its script VM: BlindOneState (D_80130200), BlindOneStep, BlindOnePhase (the phase tables D_0043240C / D_0043232C), BlindOneMover, BlindOneFader |
+| `structs/cinema.h` | the cinema (cutscene) state Cinema (*D_800C1BB0, 0x100) and CinemaEntry / CinemaTable |
 | `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo, and the libaudio types it uses (ALHeap, ALBank, ALInstrument, ALFilter, ALMainBus, ALAuxBus, Acmd) |
 | `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
 | `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs and the Controller Pak internals, plus the engine's CMutex |
