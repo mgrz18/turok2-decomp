@@ -1,25 +1,9 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Player-name menu: highlights the row of the player the menu belongs to
  * and copies that player's name (trailing spaces trimmed, nothing when it is
  * still the default "player" name) into the edit buffer. */
-
-typedef struct {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ u8 pad4[0x28 - 0x4];
-} MenuRow;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ MenuRow rows[4];
-} MenuWindow;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ MenuWindow *win;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ void *player;
-} Menu;
 
 typedef struct {
     /* 0x00 */ s32 length;
@@ -63,28 +47,28 @@ void func_0041D050(Menu *menu) {
     switch (index) {
     case 0:
     default:
-        menu->win->rows[0].flags |= ROW_SELECTED;
-        menu->win->rows[1].flags &= ~ROW_SELECTED;
-        menu->win->rows[2].flags &= ~ROW_SELECTED;
-        menu->win->rows[3].flags &= ~ROW_SELECTED;
+        menu->items[1].flags |= ROW_SELECTED;
+        menu->items[2].flags &= ~ROW_SELECTED;
+        menu->items[3].flags &= ~ROW_SELECTED;
+        menu->items[4].flags &= ~ROW_SELECTED;
         break;
     case 1:
-        menu->win->rows[1].flags |= ROW_SELECTED;
-        menu->win->rows[0].flags &= ~ROW_SELECTED;
-        menu->win->rows[2].flags &= ~ROW_SELECTED;
-        menu->win->rows[3].flags &= ~ROW_SELECTED;
+        menu->items[2].flags |= ROW_SELECTED;
+        menu->items[1].flags &= ~ROW_SELECTED;
+        menu->items[3].flags &= ~ROW_SELECTED;
+        menu->items[4].flags &= ~ROW_SELECTED;
         break;
     case 2:
-        menu->win->rows[2].flags |= ROW_SELECTED;
-        menu->win->rows[0].flags &= ~ROW_SELECTED;
-        menu->win->rows[1].flags &= ~ROW_SELECTED;
-        menu->win->rows[3].flags &= ~ROW_SELECTED;
+        menu->items[3].flags |= ROW_SELECTED;
+        menu->items[1].flags &= ~ROW_SELECTED;
+        menu->items[2].flags &= ~ROW_SELECTED;
+        menu->items[4].flags &= ~ROW_SELECTED;
         break;
     case 3:
-        menu->win->rows[3].flags |= ROW_SELECTED;
-        menu->win->rows[0].flags &= ~ROW_SELECTED;
-        menu->win->rows[1].flags &= ~ROW_SELECTED;
-        menu->win->rows[2].flags &= ~ROW_SELECTED;
+        menu->items[4].flags |= ROW_SELECTED;
+        menu->items[1].flags &= ~ROW_SELECTED;
+        menu->items[2].flags &= ~ROW_SELECTED;
+        menu->items[3].flags &= ~ROW_SELECTED;
         break;
     }
     D_800C1FB0[index].cursor = 0;
