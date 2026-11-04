@@ -104,27 +104,27 @@ void func_00407F20(BossFight *fight) {
     case 0x1BBC:
         player->bossKilled[0] = 1;
         flags = &D_8011AAD8;
-        flags->unk4 |= 0x8000;
+        flags->unlockedCheats |= 0x8000;
         break;
     case 0x1C20:
         player->bossKilled[1] = 1;
         flags = &D_8011AAD8;
-        flags->unk4 |= 0x200;
+        flags->unlockedCheats |= 0x200;
         break;
     case 0x1C84:
         player->bossKilled[2] = 1;
         flags = &D_8011AAD8;
-        flags->unk4 |= 0x400;
+        flags->unlockedCheats |= 0x400;
         break;
     case 0x1CE8:
         player->bossKilled[3] = 1;
         flags = &D_8011AAD8;
-        flags->unk4 |= 0x80;
+        flags->unlockedCheats |= 0x80;
         break;
     case 0x1D4C:
         player->bossKilled[4] = 1;
         flags = &D_8011AAD8;
-        flags->unk4 |= 0x40;
+        flags->unlockedCheats |= 0x40;
         break;
     }
 }

@@ -39,10 +39,10 @@ s32 func_0041AD64(void)
             }
         }
         if (match) {
-            D_8011AAD8.unk4 |= D_00439770[i].flags;
+            D_8011AAD8.unlockedCheats |= D_00439770[i].flags;
             settings = &D_8011AAD8;
             do {
-                D_80110060 = settings->unk4;
+                D_80110060 = settings->unlockedCheats;
             } while (0);
             hasSound = D_00439770[i].sound != 0;
             D_80130920 = i;

@@ -52,7 +52,7 @@ void func_0045A448(Player *p) {
     D_8011AAD8.match.seconds = D_800C201C->match[1];
     D_8011AAD8.match.minutes = D_800C201C->match[2];
     D_8011AAD8.match.hours = D_800C201C->match[3];
-    D_80110060[0] = D_8011AAD8.unk4;
+    D_80110060[0] = D_8011AAD8.unlockedCheats;
     D_8011AAD8.unk180 = keep;
     src = D_800C201C->text;
     dst = D_800EBAC0;

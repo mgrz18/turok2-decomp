@@ -9,10 +9,13 @@
  * same place in its game state) is the same block with 4 more bytes before
  * 0x08, so its `local` at 0x1D is `multiplayer` here at 0x19.
  *
- * Several bytes of the block also have symbols of their own, which some
- * files still use: D_8011AAE0 (difficulty), D_8011AAF1 (multiplayer), D_8011AB08 (weaponEnabled),
- * D_8011AB18 (defaultSlot), D_8011AB58 (slots), D_8011AC88 (mode),
- * D_8011ACA8 (matchMode) and D_8011ACB0 (match). */
+ * Several fields also have symbols of their own, which some files still
+ * use: D_8011AAE0 (difficulty), D_8011AAF1 (multiplayer), D_8011AB08
+ * (weaponEnabled), D_8011AB18 (defaultSlot), D_8011AB58 (slots), D_8011AC88
+ * (mode), D_8011ACA8 (matchMode) and D_8011ACB0 (match). Three files keep a
+ * local array view of D_8011AAD8 / D_8011ACB0 (func_00222A9C, func_00286440,
+ * func_00450D78): through an array the compiler bases the accesses on the
+ * accessed field's address, as the ROM does there. */
 
 /* One player's multiplayer options (0x40 bytes): defaultSlot and slots[]
  * below; CPlayer::m_pOptions points at one of them. */
@@ -55,8 +58,8 @@ typedef struct GameMatch {
  * of five, one per kind of match (func_0041760C, func_00417490 and
  * func_0041778C start them): deathmatch, tag and team. */
 typedef struct GameSettings {
-    /* 0x000 */ u32 cheatFlags;        /* 0x100, 0x400, 0x800, 0x1000, 0x4000 (black fog), 0x8000... */
-    /* 0x004 */ u32 unk4;              /* bits set by func_00407F20 */
+    /* 0x000 */ u32 cheatFlags;        /* the cheats on: 0x4000 black fog, 0x800/0x1000 big heads... */
+    /* 0x004 */ u32 unlockedCheats;    /* set by the cheat codes (func_0041AD64) and bosses (func_00407F20) */
     /* 0x008 */ s32 difficulty;         /* D_8011AAE0: 8, 16 or 32 (func_002427E0) */
     /* 0x00C */ u32 unkC;              /* shown in sixteenths */
     /* 0x010 */ u16 unk10;

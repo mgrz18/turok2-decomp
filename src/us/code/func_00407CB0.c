@@ -1,4 +1,4 @@
-/* (&D_80119870.flags)->unk4 instead of D_80119870.flags.unk4 gives the ROM's register choice (found
+/* (&D_80119870.flags)->unlockedCheats instead of D_80119870.flags.unlockedCheats gives the ROM's register choice (found
  * with the permuter). */
 #include "common.h"
 #include "structs/game_object.h"
@@ -40,10 +40,10 @@ void func_00407CB0(s32 arg0, Holder *obj) {
     player->unk9F0 = 1;
     if (player->pieces[0] && player->pieces[1] && player->pieces[2] && player->pieces[3] && player->pieces[4]) {
         func_00412438(0x172);
-        (&D_80119870.flags)->unk4 |= 0x7FF0019;
+        (&D_80119870.flags)->unlockedCheats |= 0x7FF0019;
     } else {
         func_00412438(0x173);
         flags = &D_8011AAD8;
-        flags->unk4 |= 2;
+        flags->unlockedCheats |= 2;
     }
 }
