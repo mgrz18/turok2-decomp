@@ -2,6 +2,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_7.CPP, func_80404DDC_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/pak.h"
+
 extern void **D_800C2228;
 extern s32 D_800C2220;
 extern u8 D_800F6750;

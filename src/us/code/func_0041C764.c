@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+
 extern CPlayerOptions D_8011AB18;
 s32 func_0041C764(void *unused, Menu *menu) {
     CPlayerOptions *settings = &D_8011AB18;

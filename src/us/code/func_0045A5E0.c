@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+
 extern s32 D_80130990;
 extern s32 D_800C2028;
 extern s32 func_0041DCB0(Menu *action, s32 channel, s32 arg2);

@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+
 extern CPlayerOptions D_8011AB18;
 extern char D_800B3F78[];
 extern char D_800B3F60[];

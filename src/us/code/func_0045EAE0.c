@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC.CPP, func_804042F0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/pak.h"
+
 extern u8 D_800C222C[];  /* pak font code -> character */
 extern u8 D_800F6750;
 

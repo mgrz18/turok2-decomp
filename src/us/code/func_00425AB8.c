@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pak.h"
+
 extern s32 func_00285878(s32 arg0);
 extern u8 D_800F677B[];
 extern void func_002858A4();

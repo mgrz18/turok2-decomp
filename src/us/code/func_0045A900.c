@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+
 extern void func_004263A0(s32);
 void func_004263A0(s32);
 extern s32 D_800C2028;

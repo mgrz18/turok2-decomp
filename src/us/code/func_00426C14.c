@@ -1,6 +1,7 @@
 /* WRONG CUT: REAL func_00426C14 size 0x74 (splat cut it into func_00426C14 + func_00426C74). */
 #include "common.h"
 #include "structs/pak.h"
+
 extern void **D_800C2228;
 extern s32 D_800C2220;
 extern u8 D_800F6750;

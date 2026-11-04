@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/pak.h"
+
 extern s32 func_0045F940(s32 index, s32 entry, s32 *out);
 extern s32 func_00426D8C(s32);
 s32 func_0045F940(s32 index, s32 entry, s32 *out) {

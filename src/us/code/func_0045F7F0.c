@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/pak.h"
+
 extern s32 func_00285878(s32 arg0);
 extern s8 D_800F6750;
 extern void func_002847E0(void);

@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pak.h"
+
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
 typedef struct O01Pad4 {
             u8 pad0[3];

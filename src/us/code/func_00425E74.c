@@ -4,6 +4,7 @@
  * First-module copy of src/us/code/func_0045ED94.c. */
 #include "common.h"
 #include "structs/pak.h"
+
 extern u8 D_800C222C[];       /* pak font code -> character */
 
 extern void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
