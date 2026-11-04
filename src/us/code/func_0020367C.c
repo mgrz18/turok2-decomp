@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCENE/802508E0_4.CPP, func_8025193C_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/list.h"
+#include "structs/cache.h"
 
 typedef struct Manager {
     char queue[0x92C];
@@ -12,30 +13,9 @@ typedef struct Manager {
     s32 mask;               /* 0x99C */
 } Manager;
 
-typedef struct CachedResource {
-    void *data;    /* 0x00 */
-    u32 size;      /* 0x04 */
-    s32 count;     /* 0x08 */
-    s32 flags;     /* 0x0C */
-    s32 stamp;     /* 0x10 */
-} CachedResource;
-
-typedef struct ResourceLoadRequest {
-    CachedResource *node;             /* 0x00 */
-    CachedResource *extra;            /* 0x04 */
-    u32 key;                          /* 0x08 */
-    u32 priority;                     /* 0x0C */
-    s32 flags;                        /* 0x10 */
-    void *tag;                        /* 0x14 */
-    s32 owner;                        /* 0x18 */
-    u32 mode;                         /* 0x1C */
-    void *replyQueue;                 /* 0x20 */
-    struct ResourceLoadRequest *next; /* 0x24 */
-} ResourceLoadRequest;
-
 typedef struct ResourceHashEntry {
     u32 key;
-    ResourceLoadRequest *value;
+    CCacheEntry *value;
     s32 unk08;
     struct ResourceHashEntry *next;
 } ResourceHashEntry;
@@ -53,17 +33,17 @@ extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 extern s32 osRecvMesg(void *mq, void **msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
-extern void func_00200818(void *, CachedResource *);
-extern ResourceLoadRequest *func_002066F8(s32, u32);
-extern CachedResource *func_002031E8(s32, u32);
-extern void func_002062F8(s32, CachedResource *);
-extern void func_00206498(s32, CachedResource *);
+extern void func_00200818(void *, CMemEntry *);
+extern CCacheEntry *func_002066F8(s32, u32);
+extern CMemEntry *func_002031E8(s32, u32);
+extern void func_002062F8(s32, CMemEntry *);
+extern void func_00206498(s32, CMemEntry *);
 extern void *func_002063B4(s32, u32, u32, u32);
-extern void func_00201B50(s32 *, ResourceLoadRequest *);
-extern ResourceLoadRequest *func_002044A8(s32, ResourceLoadRequest *, s32);
+extern void func_00201B50(s32 *, CCacheEntry *);
+extern CCacheEntry *func_002044A8(s32, CCacheEntry *, s32);
 extern void func_00201DBC(s32 *, u32, u32, void *);
-extern void func_00201E94(s32 *, u32, u32, void *, void *, ResourceLoadRequest *, s32);
-extern void func_002066B0(s32, ResourceLoadRequest *);
+extern void func_00201E94(s32 *, u32, u32, void *, void *, CCacheEntry *, s32);
+extern void func_002066B0(s32, CCacheEntry *);
 extern void CList__Remove(void *list, void *node);
 extern s32 CList__AddTail(void *list, void *node);
 
@@ -91,7 +71,7 @@ static __inline__ void release(void) {
     }
 }
 
-static __inline__ void find(u32 key, ResourceLoadRequest **out) {
+static __inline__ void find(u32 key, CCacheEntry **out) {
     ResourceHashEntry *node = D_800D81C4 + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & D_800D81C0);
     if (node->key != key) goto not_initial;
     *out = node->value;
@@ -109,18 +89,18 @@ loop:
 done:;
 }
 
-static __inline__ void addref(CachedResource *node) {
-    node->count++;
+static __inline__ void addref(CMemEntry *node) {
+    node->lockCount++;
     node->flags |= 0x100;
 }
 
-static __inline__ void stamp(CachedResource *node) {
-    node->stamp = D_800D8DF0;
+static __inline__ void stamp(CMemEntry *node) {
+    node->age = D_800D8DF0;
     func_00200818(&D_800D81E0, node);
 }
 
-static __inline__ CachedResource *allocate(u32 size, u32 flags) {
-    CachedResource *node = func_002031E8(0, flags);
+static __inline__ CMemEntry *allocate(u32 size, u32 flags) {
+    CMemEntry *node = func_002031E8(0, flags);
     if (node != 0) {
         addref(node);
         node->data = func_002063B4(0, size, (flags >> 5) & 1, flags);
@@ -129,7 +109,7 @@ static __inline__ CachedResource *allocate(u32 size, u32 flags) {
             node->flags |= flags;
             func_00206498(0, node);
         } else {
-            if (--node->count == 0) node->flags &= ~0x100;
+            if (--node->lockCount == 0) node->flags &= ~0x100;
             func_002062F8(0, node);
             node = 0;
         }
@@ -140,23 +120,23 @@ static __inline__ CachedResource *allocate(u32 size, u32 flags) {
 /* Returns the cached resource for `key` (loading `size` bytes from ROM offset
  * `key` when absent): synchronously when `direct` (or the manager mask) is set,
  * otherwise queues the read and returns 0. */
-CachedResource *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner, void *tag, s32 spare, u32 direct) {
-    ResourceLoadRequest *request;
-    ResourceLoadRequest *scan;
-    ResourceLoadRequest *resolved;
-    CachedResource *node;
+CMemEntry *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner, void *tag, s32 spare, u32 direct) {
+    CCacheEntry *request;
+    CCacheEntry *scan;
+    CCacheEntry *resolved;
+    CMemEntry *node;
     u32 flags;
     u32 oldFlags;
     s32 busy;
-    ResourceLoadRequest *allocated;
+    CCacheEntry *allocated;
 
     acquire();
     find(key, &request);
-    if (request != 0 && request->priority <= size) {
-        addref(request->node);
-        stamp(request->node);
+    if (request != 0 && request->requestLength <= size) {
+        addref(request->memEntry);
+        stamp(request->memEntry);
         release();
-        return request->node;
+        return request->memEntry;
     }
     direct |= D_800D8450.mask;
     busy = 0;
@@ -165,7 +145,7 @@ CachedResource *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner
     } else {
         scan = D_800D8450.active.m_pHead;
         while (scan != 0) {
-            if (scan->key == key && size <= scan->priority) {
+            if (scan->requestId == key && size <= scan->requestLength) {
                 busy = 1;
                 break;
             }
@@ -178,36 +158,36 @@ CachedResource *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner
     if (request != 0) {
         if (tag != 0) flags = (mode & 0x1C) | 0x22;
         else flags = mode;
-        request->extra = 0;
+        request->referencedMemEntry = 0;
         node = allocate(size, flags);
-        request->node = node;
-        if (request->node != 0) {
+        request->memEntry = node;
+        if (request->memEntry != 0) {
             if (size & 1) size++;
-            request->key = key;
-            request->priority = size;
-            request->owner = owner;
-            request->tag = tag;
-            request->mode = mode;
+            request->requestId = key;
+            request->requestLength = size;
+            request->notifyId = owner;
+            request->decompressCallback = tag;
+            request->memFlags = mode;
             CList__Remove(&D_800D8450.pending, request);
             CList__AddTail(&D_800D8450.active, request);
             if (direct != 0) {
                 if (tag != 0) request->flags |= 4;
                 release();
-                func_00201DBC(&D_800D1CD8, key, size, request->node->data);
+                func_00201DBC(&D_800D1CD8, key, size, request->memEntry->data);
                 if (tag != 0) func_00201B50(&D_800D6D68, request);
                 acquire();
                 if (tag != 0) request->flags &= ~4;
                 resolved = func_002044A8(0, request, 0);
-                if (resolved != 0 && resolved != request) addref(resolved->node);
+                if (resolved != 0 && resolved != request) addref(resolved->memEntry);
                 release();
-                if (resolved != 0) return resolved->node;
+                if (resolved != 0) return resolved->memEntry;
                 return 0;
             } else {
                 oldFlags = request->flags;
                 request->flags = oldFlags | 2;
                 if (tag != 0) request->flags = oldFlags | 0xE;
                 release();
-                func_00201E94(&D_800D1CD8, key, size, request->node->data, &D_800D8450, request, 0);
+                func_00201E94(&D_800D1CD8, key, size, request->memEntry->data, &D_800D8450, request, 0);
                 return 0;
             }
         }

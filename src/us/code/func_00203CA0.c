@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/list.h"
+#include "structs/cache.h"
 
 extern int D_800D8DCC;
 struct Manager;
@@ -16,49 +17,20 @@ struct Manager {
     char unk978[0x24];
     s32 mask;
 };
-struct CachedResource;
-typedef struct CachedResource CachedResource;
 struct Manager;
-struct CachedResource;
-struct ResourceLoadRequest;
-struct CachedResource {
-    void *data;
-    s32 unk04;
-    s32 count;
-    s32 flags;
-    s32 stamp;
-    struct ResourceLoadRequest *owner;
-};
-struct ResourceLoadRequest {
-    struct CachedResource *node;
-    struct CachedResource *extra;
-    s32 key;
-    s32 priority;
-    s32 flags;
-    void *tag;
-    s32 owner;
-    s32 mode;
-    void *replyQueue;
-    struct ResourceLoadRequest *next;
-};
 struct ResourceHashEntry;
-struct ResourceLoadRequest;
 struct ResourceHashEntry {
     s32 key;
-    struct ResourceLoadRequest *value;
+    CCacheEntry *value;
     s32 unk08;
     struct ResourceHashEntry *next;
 };
 struct Manager;
 typedef struct Manager Manager;
 struct Manager;
-struct CachedResource;
 struct ResourceHashEntry;
 typedef struct ResourceHashEntry ResourceHashEntry;
 struct ResourceHashEntry;
-struct ResourceLoadRequest;
-typedef struct ResourceLoadRequest ResourceLoadRequest;
-struct ResourceLoadRequest;
 extern s32 CList__AddTail(CList *list, void *node);
 typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
@@ -73,20 +45,20 @@ extern s32 D_800D8DF0;
 extern s32 D_800D81C0;
 extern s32 D_800D81C4;
 extern u32 __osDisableInt(void);
-extern ResourceLoadRequest *func_002066F8(s32, s32);
-extern void func_00201B50(s32 *, ResourceLoadRequest *);
-extern void func_00200818(void *, CachedResource *);
-extern ResourceLoadRequest *func_002044A8(s32 unused, ResourceLoadRequest *request, s32 dropReference);
-static __inline__ void addref(CachedResource *node) {
-    node->count += 1;
+extern CCacheEntry *func_002066F8(s32, s32);
+extern void func_00201B50(s32 *, CCacheEntry *);
+extern void func_00200818(void *, CMemEntry *);
+extern CCacheEntry *func_002044A8(s32 unused, CCacheEntry *request, s32 dropReference);
+static __inline__ void addref(CMemEntry *node) {
+    node->lockCount += 1;
     node->flags |= 0x100;
 }
-static __inline__ void stamp(CachedResource *node) {
-    node->stamp = D_800D8DF0;
+static __inline__ void stamp(CMemEntry *node) {
+    node->age = D_800D8DF0;
     func_00200818(&D_800D81E0, node);
 }
-static __inline__ void unref(CachedResource *node) {
-    if (--node->count == 0) {
+static __inline__ void unref(CMemEntry *node) {
+    if (--node->lockCount == 0) {
         node->flags &= ~0x100;
     }
 }
@@ -128,13 +100,13 @@ static __inline__ void lock(void) {
         __osRestoreInt(token);
     }
 }
-CachedResource *func_00203CA0(s32 unused, s32 key, CachedResource *first, CachedResource *second, s32 mode, void *owner,
+CMemEntry *func_00203CA0(s32 unused, s32 key, CMemEntry *first, CMemEntry *second, s32 mode, void *owner,
                     void *tag, void *spare, s32 async) {
     extern Manager D_800D8450;
     ResourceHashEntry *node;
-    ResourceLoadRequest *found;
-    ResourceLoadRequest **out;
-    ResourceLoadRequest *scan;
+    CCacheEntry *found;
+    CCacheEntry **out;
+    CCacheEntry *scan;
     s32 busy;
     acquire();
     out = &found;
@@ -165,15 +137,15 @@ loop:
 done:
     busy = 0;
     if (found != 0) {
-        addref(found->node);
-        stamp(found->node);
+        addref(found->memEntry);
+        stamp(found->memEntry);
         release();
-        return found->node;
+        return found->memEntry;
     }
     async |= D_800D8450.mask;
     scan = D_800D8450.active.m_pHead;
     while (scan != 0) {
-        if (scan->key == key) {
+        if (scan->requestId == key) {
             busy = 1;
             break;
         }
@@ -182,13 +154,13 @@ done:
     if (busy == 0) {
         found = func_002066F8(0, mode);
         if (found != 0) {
-            found->key = key;
-            found->priority = 0;
-            found->owner = (s32)owner;
-            found->tag = tag;
-            found->mode = mode;
-            found->node = first;
-            found->extra = second;
+            found->requestId = key;
+            found->requestLength = 0;
+            found->notifyId = (s32)owner;
+            found->decompressCallback = tag;
+            found->memFlags = mode;
+            found->memEntry = first;
+            found->referencedMemEntry = second;
             if (first != 0) {
                 addref(first);
             }
@@ -205,7 +177,7 @@ done:
                 found = func_002044A8(0, found, 0);
                 release();
                 if (found != 0) {
-                    return found->node;
+                    return found->memEntry;
                 }
                 return 0;
             }
