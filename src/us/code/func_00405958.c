@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x00 */ s32 kind;
@@ -7,26 +8,12 @@ typedef struct {
     /* 0x08 */ u8 pad08[0x88 - 0x08];
 } Targets;
 
-/* Boss module state at 0x8012F608. */
-typedef struct {
-    /* 0x000 */ s32 stage;
-    /* 0x004 */ u8 pad004[0x3BC];
-    /* 0x3C0 */ s32 part;           /* 0x8012F9C8 */
-    /* 0x3C4 */ u32 partsDone;      /* 0x8012F9CC */
-    /* 0x3C8 */ u8 pad3C8;
-    /* 0x3C9 */ u8 partActive;      /* 0x8012F9D1 */
-    /* 0x3CA */ u8 pad3CA[0x1A];
-    /* 0x3E4 */ s32 damage;         /* 0x8012F9EC */
-    /* 0x3E8 */ f32 partTimer;      /* 0x8012F9F0 */
-} BossModule;
-
 extern void func_00246108(CGameObjectInstance *obj, CAI *ai, Targets *t, s32 f1, s32 f2);
 extern void func_00246918(CGameObjectInstance *obj, CAI *ai);
 extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1F50[];
 extern f32 D_800B6D28;          /* per-frame scale */
-extern BossModule D_8012F608;
 extern s32 D_8012F988[];
 extern s32 D_8012F9A8[];
 

@@ -1,13 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-/* Boss module state at 0x8012F9D8. */
-typedef struct {
-    /* 0x0 */ s32 state;
-    /* 0x4 */ s32 mode;
-} BossState;
-
-extern BossState D_8012F9D8;
+#include "structs/boss.h"
 
 void func_00407284(CGameObjectInstance *obj) {
     if (D_8012F9D8.mode == 5) {
