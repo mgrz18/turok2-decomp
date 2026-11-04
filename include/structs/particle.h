@@ -62,7 +62,7 @@ typedef struct CROMParticleParams {
     /* 0x08 */ s8 m_nList;            /* CParticleSystem.m_ActiveList index */
     /* 0x09 */ u8 unk_09[0x0B - 0x09];
     /* 0x0B */ s8 unk_0B;
-    /* 0x0C */ u8 unk_0C;
+    /* 0x0C */ s8 m_nTrailCount;     /* copies spawned along its path each frame (func_00232934) */
     /* 0x0D */ s8 m_Spread;
     /* 0x0E */ s8 m_Mode;
     /* 0x0F */ u8 m_Event;
