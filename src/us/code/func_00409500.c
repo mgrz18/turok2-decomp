@@ -1,6 +1,7 @@
 /* First-module copy of func_00442500 (src/us/code/func_00442500.c). */
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Spawns one actor near each of the four spawn points, scattered by up to +-15 units, skipping a point
  * closer than 460.8 to the target of the module object. */
@@ -11,11 +12,6 @@ typedef struct {
 } SpawnPoint;
 
 
-typedef struct {
-    /* 0x000 */ void *obj;
-} State;
-
-extern State D_8012FB70;
 extern SpawnPoint D_00431D20[4];
 extern u8 D_800F7078[];
 extern u8 D_80107590[];

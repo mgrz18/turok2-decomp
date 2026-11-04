@@ -10,6 +10,7 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
@@ -28,16 +29,6 @@ typedef struct {
     u8 c[4];
 } __attribute__((aligned(4))) Part;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x630];
-    /* 0x630 */ CListedInstance *actors[7];
-    /* 0x64C */ s32 count;
-    /* 0x650 */ u8 pad650[0x658 - 0x650];
-    /* 0x658 */ s32 coreCount;
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ u8 pad660[0x670 - 0x660];
-    /* 0x670 */ s32 alive;
-} State;
 
 extern SpawnPoint D_00431D20[4];
 extern void func_00246108(CListedInstance *actor, void *ai, CAITargets *t, s32 f1, s32 f2);
@@ -136,7 +127,6 @@ void func_00409A64(CListedInstance *obj, s32 nearSelf) {
     func_00246690(target, 0x112, p, 0);
 }
 
-extern State D_8012FB70;
 extern CListedInstance *D_8010FEB4;
 extern u8 D_8010ABA0[];
 
@@ -185,7 +175,7 @@ static __inline__ f32 getTargetDist(CListedInstance *obj, CListedInstance **foun
  * live minions around the target, or knocks the target back. 1228.7999f: the
  * ROM's pool word is 0x44999999, one ulp under 1228.8f. */
 void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
-    State *s = &D_8012FB70;
+    MotherBossState *s = &D_8012FB70;
     CListedInstance *obj = self;
     CListedInstance *found;
     CPlayer *owner;
@@ -213,7 +203,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             scale.x = 0.5f;
             scale.y = 0.5f;
             scale.z = 0.5f;
-            func_00228108(D_8010ABA0, -1, 0x458, s->coreCount, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
+            func_00228108(D_8010ABA0, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
         }
         break;
     case 1:
@@ -228,8 +218,8 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
         break;
     case 2:
         if (found != NULL && owner != NULL) {
-            for (i = 0; i < s->alive; i++) {
-                actor = s->actors[i];
+            for (i = 0; i < s->partsLeft; i++) {
+                actor = (CGameObjectInstance *)s->parts[i];
                 r = func_002119FC(153.59999f, 256.0f);
                 angle = found->m_Instance.m_RotY + 3.1415927f + func_002119FC(-0.5235988f, 0.5235988f);
                 x = owner->m_CharacterActor.header.m_vPos.x;

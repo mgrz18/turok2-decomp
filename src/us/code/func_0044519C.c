@@ -1,6 +1,7 @@
 /* Second-module twin of func_0040C19C (VM module 2 is linked over module 1; same source, its own strings and pool). */
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Picks one of the four spawn points at random, at least 460.8 away from the module object's target (when
  * it has one), and stores it in out. */
@@ -11,11 +12,6 @@ typedef struct {
 } SpawnPoint;
 
 
-typedef struct {
-    /* 0x000 */ void *obj;
-} State;
-
-extern State D_8012FB70;
 extern SpawnPoint D_00431C40[4];
 extern f32 func_0040BD60(void *obj, CGameObjectInstance **found);
 extern f32 func_002119FC(f32 min, f32 max);

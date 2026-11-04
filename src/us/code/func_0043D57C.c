@@ -22,6 +22,10 @@ typedef struct {
     /* 0x140 */ u8 ai[1];
 } Actor0040457C;
 
+/* D_8012F608 is LevelScriptState (structs/boss.h); this file keeps its own
+ * view because the wave spawner reads script2 as its own wave table (steps
+ * laid out as Wave0040457C, not BossStep2: steps = waves, current = wave,
+ * script2On = wavesDone) and found[] as its own actor type. */
 typedef struct {
     /* 0x000 */ s32 mode;
     /* 0x004 */ u8 pad004[0x344 - 0x4];

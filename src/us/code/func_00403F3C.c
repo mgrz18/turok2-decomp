@@ -1,44 +1,9 @@
 #include "common.h"
+#include "structs/boss.h"
 
 typedef struct {
     f32 x, y, z;
 } Vec3_00403F3C;
-
-typedef struct {
-    u8 data[0x64];
-} Light00403F3C;
-
-typedef struct {
-    /* 0x000 */ s32 mode;
-    /* 0x004 */ s32 total;
-    /* 0x008 */ s32 bonus;
-    /* 0x00C */ u8 pad00C[0x1C - 0xC];
-    /* 0x01C */ s32 stage;
-    /* 0x020 */ u8 pad020[0x24 - 0x20];
-    /* 0x024 */ Light00403F3C lights[8];
-    /* 0x344 */ u8 pad344[0x354 - 0x344];
-    /* 0x354 */ f32 timer354;
-    /* 0x358 */ u8 pad358[0x360 - 0x358];
-    /* 0x360 */ f32 timer360;
-    /* 0x364 */ f32 timer364;
-    /* 0x368 */ u8 pad368[0x380 - 0x368];
-    /* 0x380 */ s32 values[2][8];
-    /* 0x3C0 */ u8 pad3C0[0x3D0 - 0x3C0];
-    /* 0x3D0 */ s32 unk3D0;
-    /* 0x3D4 */ s32 unk3D4;
-    /* 0x3D8 */ u8 pad3D8[0x3E0 - 0x3D8];
-    /* 0x3E0 */ f32 timer3E0;
-    /* 0x3E4 */ u8 pad3E4[0x3EC - 0x3E4];
-    /* 0x3EC */ f32 timer3EC;
-    /* 0x3F0 */ f32 timer3F0;
-    /* 0x3F4 */ u8 pad3F4[0x400 - 0x3F4];
-    /* 0x400 */ f32 timer400;
-    /* 0x404 */ u8 pad404[0x414 - 0x404];
-    /* 0x414 */ f32 timer414;
-    /* 0x418 */ u8 pad418[0x428 - 0x418];
-    /* 0x428 */ Vec3_00403F3C pos;
-    /* 0x434 */ Vec3_00403F3C startPos;
-} ModeState00403F3C;
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -57,7 +22,6 @@ typedef struct {
     /* 0x54 */ Vec3_00403F3C spawn;
 } Level00403F3C;
 
-extern ModeState00403F3C D_8012F608;
 extern f32 D_800B6D28;
 extern u8 D_00431CD4[];
 extern u8 D_00431CF0[];
@@ -88,37 +52,37 @@ void func_00403F3C(Actor00403F3C *actor, Level00403F3C *level) {
         level->def->onReset(actor, level);
     }
     for (i = 0; i < 8; i++) {
-        func_00235510(&D_8012F608.lights[i]);
+        func_00235510(&D_8012F608.anims[i]);
     }
-    if (D_8012F608.unk3D0 == 1) {
-        level->spawn.x = D_8012F608.startPos.x;
-        level->spawn.y = D_8012F608.startPos.y;
-        level->spawn.z = D_8012F608.startPos.z;
+    if (D_8012F608.bossState == 1) {
+        level->spawn.x = D_8012F608.home.x;
+        level->spawn.y = D_8012F608.home.y;
+        level->spawn.z = D_8012F608.home.z;
     }
-    COUNT_DOWN(D_8012F608.timer360);
-    COUNT_DOWN(D_8012F608.timer3F0);
-    COUNT_DOWN(D_8012F608.timer400);
-    COUNT_DOWN(D_8012F608.timer414);
-    COUNT_DOWN(D_8012F608.timer354);
-    COUNT_DOWN(D_8012F608.timer3E0);
-    COUNT_DOWN(D_8012F608.timer364);
+    COUNT_DOWN(D_8012F608.waveTimer);
+    COUNT_DOWN(D_8012F608.script.timer);
+    COUNT_DOWN(D_8012F608.script2.timer);
+    COUNT_DOWN(D_8012F608.script3.timer);
+    COUNT_DOWN(D_8012F608.spawnTimer);
+    COUNT_DOWN(D_8012F608.swayTimer);
+    COUNT_DOWN(D_8012F608.nextTimer);
     COUNT_DOWN(D_8012F608.timer3EC);
-    if (D_8012F608.mode == 3) {
-        if (D_8012F608.values[0][1] <= 0x95FF && D_8012F608.stage == 0) {
-            D_8012F608.stage = 1;
+    if (D_8012F608.stage == 3) {
+        if (D_8012F608.values[0][1] <= 0x95FF && D_8012F608.subStage == 0) {
+            D_8012F608.subStage = 1;
         }
-        if (D_8012F608.values[0][1] < 0x6400 && D_8012F608.stage == 1) {
-            D_8012F608.stage = 2;
+        if (D_8012F608.values[0][1] < 0x6400 && D_8012F608.subStage == 1) {
+            D_8012F608.subStage = 2;
         }
-        if (D_8012F608.values[0][1] < 0x3200 && D_8012F608.stage == 2) {
-            D_8012F608.stage = 3;
+        if (D_8012F608.values[0][1] < 0x3200 && D_8012F608.subStage == 2) {
+            D_8012F608.subStage = 3;
         }
     }
     if (D_8012F608.timer3EC <= 0.0f) {
         offset.x = -2385.92f;
         offset.y = 0.0f;
         offset.z = 0.0f;
-        if (D_8012F608.mode == 3) {
+        if (D_8012F608.stage == 3) {
             type = func_0026D518(D_00431CF0);
         } else {
             type = func_0026D518(D_00431CD4);
@@ -127,7 +91,7 @@ void func_00403F3C(Actor00403F3C *actor, Level00403F3C *level) {
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = -2324.48f;
-        if (D_8012F608.mode == 3) {
+        if (D_8012F608.stage == 3) {
             type = func_0026D518(D_00431CF0);
         } else {
             type = func_0026D518(D_00431CD4);
@@ -136,7 +100,7 @@ void func_00403F3C(Actor00403F3C *actor, Level00403F3C *level) {
         offset.x = 2314.24f;
         offset.y = 0.0f;
         offset.z = 0.0f;
-        if (D_8012F608.mode == 3) {
+        if (D_8012F608.stage == 3) {
             type = func_0026D518(D_00431D14);
         } else {
             type = func_0026D518(D_00431D0C);
@@ -160,10 +124,10 @@ void func_00403F3C(Actor00403F3C *actor, Level00403F3C *level) {
     func_0040457C(actor, level);
     func_0027AD88(D_801100F0, D_8012F608.total * 100 / D_8012F608.bonus);
     if (actor->pos.y < -204.79999f) {
-        D_8012F608.unk3D4 = 11;
-        D_8012F608.pos.x = 0.0f;
-        D_8012F608.pos.y = 0.0f;
-        D_8012F608.pos.z = 0.0f;
+        D_8012F608.bossMode = 11;
+        D_8012F608.dest.x = 0.0f;
+        D_8012F608.dest.y = 0.0f;
+        D_8012F608.dest.z = 0.0f;
         func_00243414(actor, level, 0x19);
     }
 }

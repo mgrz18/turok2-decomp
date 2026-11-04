@@ -1,38 +1,16 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Module phase 1 setup: timers, the anim for the phase, slot values; unless ai->m_Mode is 9, resets the
  * phase's active slots and runs func_00409500 three times. */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ s32 count;
-    /* 0x008 */ CGameObjectInstance *actors[4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ u8 pad630[0x65C - 0x630];
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ s32 activeMask;
-    /* 0x664 */ s32 unk664;
-    /* 0x668 */ u8 pad668[0x674 - 0x668];
-    /* 0x674 */ s32 unk674;
-    /* 0x678 */ s32 unk678;
-    /* 0x67C */ s32 counter;
-    /* 0x680 */ u8 pad680[0x688 - 0x680];
-    /* 0x688 */ s32 unk688;
-    /* 0x68C */ s32 unk68C;
-} State;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x27C];
     /* 0x27C */ s32 flags;
 } Obj;
 
-extern State D_8012FB70;
 extern s32 D_00431DE4[];
 extern s32 D_00431DF0[]; /* active slot mask per phase */
 extern s32 D_00431DFC[];
@@ -42,31 +20,31 @@ extern void func_00236314(void *dst, void *src);
 extern void func_00409500(s32 arg0, void *arg1);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
-    State *state = &D_8012FB70;
+    MotherBossState *state = &D_8012FB70;
     s32 i;
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(state->slots[i].data, src);
+            func_00236314(state->slots[i].anim, src);
         }
     }
 }
 
 void func_0040A5B4(Obj *obj, CAI *ai) {
-    State *state = &D_8012FB70;
+    MotherBossState *state = &D_8012FB70;
     s32 mask;
     s32 i;
 
-    state->unk688 = 0x600;
-    state->unk68C = 0x900;
+    state->minRadius = 0x600;
+    state->maxRadius = 0x900;
     state->phase = 1;
     state->counter = 0;
     obj->flags &= ~0x18000000;
     ai->m_VisBits = D_00431DE4[state->phase];
-    state->unk664 = D_00431DFC[state->phase];
+    state->liveMask = D_00431DFC[state->phase];
     mask = D_00431DF0[state->phase];
-    state->slots[1].unk0 = state->slots[5].unk0 = 0x9600;
-    state->unk674 = state->unk678 = 0x12C00;
+    state->slots[1].health = state->slots[5].health = 0x9600;
+    state->totalHealth = state->health = 0x12C00;
     state->activeMask = mask;
     if (ai->m_Mode != 9) {
         resetSlots(state->activeMask, D_00431E08);

@@ -3,30 +3,12 @@
  * this function, as the AI hit callback. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Boss hit callback: finds which weak spot the hit part covers, takes the
  * damage off the matching live spot for the current phase, and when a spot
  * dies plays the stagger animation and clears its bit; when all spots of the
  * phase are gone, moves the boss to its next state. */
-
-typedef struct {
-    /* 0x00 */ s32 health;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ u8 pad4[0x18 - 0x4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ u8 pad630[0x65C - 0x630];
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ s32 activeMask;
-    /* 0x664 */ s32 liveMask;
-    /* 0x668 */ u8 pad668[0x670 - 0x668];
-    /* 0x670 */ s32 alive;
-    /* 0x674 */ s32 totalHealth;
-    /* 0x678 */ s32 health;
-} State;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x6C];
@@ -40,14 +22,13 @@ typedef struct {
     /* 0x10 */ HitPart *part;
 } Hit;
 
-extern State D_8012FB70;
 extern u8 D_00431E54[];
 
 extern void func_0040BDD0(void *obj, void *sounds, s32 flags);
 extern void func_00243414(void *obj, CAI *ai, s32 state);
 
 void func_00409000(void *obj, CAI *ai, Hit *hit) {
-    State *s;
+    MotherBossState *s;
     s32 mask;
     s32 spot;
     s32 i;
@@ -142,7 +123,7 @@ void func_00409000(void *obj, CAI *ai, Hit *hit) {
         return;
     }
     if (s->phase == 0) {
-        s->alive--;
+        s->partsLeft--;
         switch (kind) {
         case 0:
             func_00243414(obj, ai, 7);

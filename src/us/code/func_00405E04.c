@@ -1,26 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-/* One step of a boss attack script (0x14 bytes). */
-typedef struct {
-    /* 0x00 */ u8 type;
-    /* 0x04 */ s32 arg;
-    /* 0x08 */ f32 animSpeed;
-    /* 0x0C */ s32 chance;
-    /* 0x10 */ f32 delay;
-} BossStep;
-
-/* Boss module state at 0x8012F9D8. */
-typedef struct {
-    /* 0x00 */ s32 state;
-    /* 0x04 */ s32 mode;
-    /* 0x08 */ u8 pad08;
-    /* 0x09 */ u8 scriptOn;
-    /* 0x0A */ u8 pad0A[0x2];
-    /* 0x0C */ f32 timer;
-    /* 0x10 */ u8 pad10[0x1C];
-    /* 0x2C */ s32 index;
-} BossState;
+#include "structs/boss.h"
 
 extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
@@ -29,7 +9,6 @@ extern f32 func_002119FC(f32 lo, f32 hi);
 extern s32 func_00404C44(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
-extern BossState D_8012F9D8;
 extern f32 D_8012F9F8;         /* cooldown */
 extern BossStep *D_8012F9FC;   /* script */
 extern s32 D_8012FA00;         /* cursor */
@@ -51,7 +30,7 @@ void func_00405E04(CGameObjectInstance *obj, CAI *ai) {
     if (!D_8012F9D8.scriptOn) {
         return;
     }
-    if (D_8012F9D8.index == -1) {
+    if (D_8012F9D8.script.current == -1) {
         if (D_8012FA00 != -1) {
             D_8012F9F8 = D_8012F9FC[D_8012FA00].delay;
         } else {
@@ -62,7 +41,7 @@ void func_00405E04(CGameObjectInstance *obj, CAI *ai) {
             if (D_8012F9FC[D_8012FA00].type == 5) {
                 D_8012FA00 = 0;
             }
-            D_8012F9D8.index = D_8012FA00;
+            D_8012F9D8.script.current = D_8012FA00;
         } while ((f32) D_8012F9FC[D_8012FA00].chance <= func_002119FC(0.0f, 100.0f));
     }
     if (func_00404C44(obj, ai, t.m_Sight.m_Dist)) {

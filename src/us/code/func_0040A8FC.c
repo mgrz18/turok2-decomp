@@ -2,35 +2,12 @@
  * loop shifts its registers by one. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target (or while anim 0x17 runs its first
  * 100 steps) 0x1A/0x1B; otherwise 0x18 after a long 0x17, and from afar 0x19 (when fewer than 2 actors are
  * in the D_8010FEB4 list), 0x1D and 0x17 weighted by the module's timer ratio. */
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ s32 count;
-    /* 0x008 */ CGameObjectInstance *actors[4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ u8 pad630[0x65C - 0x630];
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ s32 activeMask;
-    /* 0x664 */ s32 unk664;
-    /* 0x668 */ u8 pad668[0x66C - 0x668];
-    /* 0x66C */ s32 lastAnim;
-    /* 0x670 */ u8 pad670[0x674 - 0x670];
-    /* 0x674 */ s32 unk674;
-    /* 0x678 */ s32 unk678;
-    /* 0x67C */ s32 counter;
-    /* 0x680 */ u8 pad680[0x688 - 0x680];
-    /* 0x688 */ s32 unk688;
-    /* 0x68C */ s32 unk68C;
-} State;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x140];
@@ -42,7 +19,6 @@ typedef struct {
     s16 weight;
 } Pick;
 
-extern State D_8012FB70;
 extern CListedInstance *D_8010FEB4;
 extern void func_00246108(Obj *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern s16 func_0026D518(Pick *table);
@@ -82,7 +58,7 @@ static __inline__ s32 fewerActorsThan(s32 max) {
 void func_0040A8FC(Obj *obj, CAI *ai) {
     Pick picks[8];
     CListedInstance *found;
-    State *state = &D_8012FB70;
+    MotherBossState *state = &D_8012FB70;
     s32 n;
     s32 close;
     s32 far;
@@ -94,8 +70,8 @@ void func_0040A8FC(Obj *obj, CAI *ai) {
 
     n = veryLow = low = mid = far = close = 0;
     dist = getTargetDist(obj, &found);
-    if (state->unk674 != 0) {
-        ratio = (f32)state->unk678 / (f32)state->unk674;
+    if (state->totalHealth != 0) {
+        ratio = (f32)state->health / (f32)state->totalHealth;
     } else {
         ratio = 1.0f;
     }

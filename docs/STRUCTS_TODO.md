@@ -76,6 +76,18 @@ holds are listed in docs/MATCHING.md, "Shared headers".
   BreakableDefinition, B01Def, DeathAnims...) or read its first word as
   `*(s32 *)`: they were not in either branch that converted the rest.
 - **Player** (`structs/player.h`): see the next section.
+- **Boss and level script** (`structs/boss.h`): D_8012FB70 is
+  MotherBossState (the Mother fight, 49 files), D_80130200 BlindOneState
+  (21 files), D_8012F608 LevelScriptState (the running level script and
+  the boss AI, 27 files) with BossState / BossMode, the views anchored at
+  D_8012F9D8 / D_8012F9DC. Fields that have symbols of their own keep
+  them: files that reach the block through D_8012F604, D_8012F618,
+  D_8012F950, D_8012F978, D_8012F9D0, D_8012F9D4, D_8012F9E0, D_8012FA10
+  or by raw offsets (func_0040B488, func_004075F8, func_0043EC68) keep a
+  local view named after the symbol (LevelScriptF9D0...). func_00404C44,
+  func_0043DC44, func_00406000 and func_0043F000 read the stage as a plain
+  word (BOSS_STAGE_AS_WORD); func_0040457C / func_0043D57C (the wave
+  spawner) and func_004407AC keep their own view of the block.
 - **World and regions** (`structs/world.h`: CWorld, D_800F7078, 0x19078
   bytes with its warp, sector, record and level-header types;
   `structs/region.h`: CGameRegion and CRegionInfo, the floor triangles and
@@ -213,9 +225,6 @@ views were replaced in about 230 files. Still local, and why:
 - **CListedInstance**: the Effect (func_002280B0, func_00228484,
   func_0022D2FC), Enemy (func_00401E30, func_004021C8, func_00402404) and
   Enemy0040457C views are the same 0x294-byte object.
-- **State** (43 files, all `D_8012FB70`), BossModule / ModeState* (20,
-  `D_8012F608`), BossState / BossMode (`D_8012F9D8`, `D_8012F9DC`): the boss
-  and level-script state of the VM modules.
 - **Game** (`D_80119870`): DONE. `structs/game.h` has CGame (the player
   list, now in `structs/player_list.h`, the camera pool as bytes with the
   menu pool at 0x5BC written out, and GameSettings at 0x1268); its ~80 users

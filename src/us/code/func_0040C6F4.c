@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x50];
@@ -9,11 +10,6 @@ typedef struct {
     /* 0x140 */ u8 ai[1];
 } Obj;
 
-typedef struct {
-    /* 0x000 */ Obj *obj;
-} State;
-
-extern State D_8012FB70;
 extern u8 D_00431D7C[];
 extern void func_00246108(Obj *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern void func_00253D68(CPlayer *player, void *arg1);
