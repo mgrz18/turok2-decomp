@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "structs/save.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 D_80130990;
@@ -23,8 +24,6 @@ s32 func_00426164(s32 pad, s32 size, u8 *buf, char *n1, u8 *ext, char *n2);
 void func_00416644(u8 *a, void *b, void *c, void *d, void *e);
 extern s32 D_800C2010;
 extern s32 D_800C2014;
-extern s32 D_800C2018;
-extern s32 D_800C201C;
 extern u8 D_0043AC80[];
 extern u8 D_0043ACA4[];
 extern u8 D_0043ACC8[];

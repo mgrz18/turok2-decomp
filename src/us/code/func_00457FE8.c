@@ -5,6 +5,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
+#include "structs/save.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
@@ -15,8 +16,6 @@ extern s32 D_800F70A8;
 extern s32 D_80130984;
 extern s32 D_800C2010;
 extern s32 D_800C2014;
-extern s32 D_800C2018;
-extern s32 D_800C201C;
 extern char D_800B45CC[];
 extern char D_800B45D8[];
 extern u8 D_80119E2C[];
