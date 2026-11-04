@@ -1,24 +1,12 @@
 #include "common.h"
 #include "structs/player.h"
 
-typedef struct { f32 x, y, z; } Vec3f;
-
-/* A player (0x1328 bytes) as this reads it. */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
-    /* 0x010 */ s32 region;
-    /* 0x014 */ u8 pad14[0x3C];
-    /* 0x050 */ f32 rotY;
-    /* 0x054 */ u8 pad54[0x4CC];
-    /* 0x520 */ CPlayerLoadSaveData state;
-    /* 0xA08 */ u8 padA08[0x920];
-} Player;
+typedef CVector3 Vec3f;
 
 /* D_80119870: the player list. */
 typedef struct {
     /* 0x0 */ s32 unk0;
-    /* 0x4 */ Player *players;
+    /* 0x4 */ CPlayer *players;
     /* 0x8 */ s32 count;
 } PlayerList;
 
@@ -47,13 +35,13 @@ void func_0028D100(void) {
     s32 i;
 
     for (i = 0; list = &D_80119870, i < list->count; i++) {
-        Player *player = &list->players[i];
+        CPlayer *player = &list->players[i];
 
-        player->state = save->state[i];
+        player->m_Data = save->state[i];
         if (save->mode == 1) {
-            player->pos = save->pos[i];
-            player->rotY = save->rotY[i];
-            player->region = func_002242F8(D_800F7078, save->region[i]);
+            player->m_CharacterActor.header.m_vPos = save->pos[i];
+            player->m_CharacterActor.m_RotY = save->rotY[i];
+            player->m_CharacterActor.header.m_pCurrentRegion = func_002242F8(D_800F7078, save->region[i]);
         }
     }
 }

@@ -13,26 +13,9 @@ typedef struct Controller {
     u8 pad[0x224];
 } Controller;
 
-typedef struct Player {
-    /* 0x0000 */ u8 pad0[0x510];
-    /* 0x0510 */ s32 unk510;
-    /* 0x0514 */ s32 index;
-    /* 0x0518 */ CPlayerOptions *options;
-    /* 0x051C */ u8 pad51C[0x92C - 0x51C];
-    /* 0x092C */ s32 unk92C;
-    /* 0x0930 */ s32 unk930;
-    /* 0x0934 */ u8 pad934[0xA40 - 0x934];
-    /* 0x0A40 */ u8 unkA40[0xC00 - 0xA40];
-    /* 0x0C00 */ s32 unkC00;
-    /* 0x0C04 */ u8 padC04[0x1288 - 0xC04];
-    /* 0x1288 */ s32 sound0;
-    /* 0x128C */ s32 sound1;
-    /* 0x1290 */ u8 pad1290[0x1328 - 0x1290];
-} Player;
-
 typedef struct PlayerList {
-    /* 0x00 */ Player **handle;
-    /* 0x04 */ Player *players;
+    /* 0x00 */ CPlayer **handle;
+    /* 0x04 */ CPlayer *players;
     /* 0x08 */ s32 count;
     /* 0x0C */ u8 list0[0x14];
     /* 0x20 */ u8 list1[0x14];
@@ -44,36 +27,36 @@ extern Controller D_800F5EC0[];
 extern char D_800A7080[]; /* in the engine's .rodata */
 
 extern void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
-extern void CList__AddHead(void *list, Player *p);
-extern void CList__AddTail(void *list, Player *p);
-extern void CList__Remove(void *list, Player *p);
-extern Player **func_00204EDC(s32 heap, s32 size, s32 tag, char *name);
-extern void func_002052D8(s32 heap, Player **handle);
+extern void CList__AddHead(void *list, CPlayer *p);
+extern void CList__AddTail(void *list, CPlayer *p);
+extern void CList__Remove(void *list, CPlayer *p);
+extern CPlayer **func_00204EDC(s32 heap, s32 size, s32 tag, char *name);
+extern void func_002052D8(s32 heap, CPlayer **handle);
 extern void func_002053A8(s32);
 extern void func_00285410(s32);
 extern void func_00266C5C(void *p, s32 c, s32 n); /* memset */
 extern void func_002470E8(void *, Controller *);
-extern void func_00248340(Player *p);
-extern void func_0042DB38(Player *p, s32 character, s32 arg2);
+extern void func_00248340(CPlayer *p);
+extern void func_0042DB38(CPlayer *p, s32 character, s32 arg2);
 
 /* func_0042E91C, inlined. */
-static __inline__ void initPlayer(Player *p, s32 index, CPlayerOptions *options) {
-    p->unk510 = 0;
-    func_002470E8(p->unkA40, &D_800F5EC0[index]);
-    p->index = index;
-    p->options = options;
-    p->sound0 = 0;
-    p->sound1 = 0;
-    p->unk92C = 0;
-    p->unk930 = 0;
-    p->unkC00 = 0;
+static __inline__ void initPlayer(CPlayer *p, s32 index, CPlayerOptions *options) {
+    p->m_bActive = 0;
+    func_002470E8(&p->m_ContState, &D_800F5EC0[index]);
+    p->m_nController = index;
+    p->m_pOptions = options;
+    p->m_pLoopingSound_WeaponBackground = 0;
+    p->m_pLoopingSound_WeaponFiring = 0;
+    p->m_Data.m_CheckPointWarpID = 0;
+    p->m_Data.m_SavePointWarpID = 0;
+    p->m_bLevelNotCompleteExit = 0;
     func_00248340(p);
 }
 
 void func_004674CC(PlayerList *list, s32 count, s32 arg2) {
     GameFlags *flags;
     CPlayerOptions *options;
-    Player *p;
+    CPlayer *p;
     s32 i;
 
     CList__Construct(list->list0, 0x131C, 0x1320);
@@ -91,9 +74,9 @@ void func_004674CC(PlayerList *list, s32 count, s32 arg2) {
         return;
     }
     list->count = count;
-    list->handle = func_00204EDC(0, count * sizeof(Player), 0x23, D_800A7080);
+    list->handle = func_00204EDC(0, count * sizeof(CPlayer), 0x23, D_800A7080);
     list->players = *list->handle;
-    func_00266C5C(list->players, 0, count * sizeof(Player));
+    func_00266C5C(list->players, 0, count * sizeof(CPlayer));
     for (i = 0; i < list->count; i++) {
         CList__AddTail(list->list0, &list->players[i]);
     }

@@ -293,6 +293,7 @@ typedef struct CPlayer {
     /* 0x12B8 */ char m_DeathMatchString[4][25];
     /* 0x131C */ struct CPlayer *m_pLast;
     /* 0x1320 */ struct CPlayer *m_pNext;
-} CPlayer; /* size 0x1324 */
+    /* 0x1324 */ s32 _pad3;                      /* sizeof is a multiple of 8 (Mtx) */
+} CPlayer; /* size 0x1328 */
 
 #endif
