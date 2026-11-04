@@ -1,14 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
     /* 0x0C */ CVector3 max;
 } Box;
-
-typedef struct SweepDef {
-    /* 0x00 */ s32 flags;
-} SweepDef;
 
 /* A joint of an animated model: its box at 0x18 in model units. */
 typedef struct Joint {
@@ -47,11 +44,6 @@ typedef struct HitInst {
     /* 0x0D4 */ u8 padD4[0x78];
     /* 0x14C */ s32 hitMask;
 } HitInst;
-
-typedef struct Sweep {
-    /* 0x00 */ HitInst *inst;
-    /* 0x04 */ SweepDef *def;
-} Sweep;
 
 void *func_002017D4(void *table, s32 index);
 void *func_0021F358(HitInst *inst);
@@ -103,7 +95,7 @@ void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, Box *box) {
     Box *animBox;
 
     enlarge = 0;
-    if (sweep->def->flags < 0 && (other->def->m_Type == 1 || other->def->m_Type == 4)) {
+    if ((s32)sweep->def->m_dwFlags < 0 && (other->def->m_Type == 1 || other->def->m_Type == 4)) {
         enlarge = 1;
     }
     big = 0;

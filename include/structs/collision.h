@@ -42,6 +42,16 @@ typedef struct CCollisionInfo {
     /* 0x18 */ f32 m_WaterFriction;
 } CCollisionInfo; /* size 0x1C */
 
+/* What a hit on an instance's node copies into the results (0x70 bytes). */
+typedef struct HitFrame {
+    /* 0x00 */ s32 unk_00[0x19];
+    /* 0x64 */ u8 unk_64;
+    /* 0x65 */ u8 m_Surface;
+    /* 0x66 */ u8 m_Team;
+    /* 0x67 */ u8 unk_67;
+    /* 0x68 */ s32 unk_68[2];
+} HitFrame; /* size 0x70 */
+
 /* What the last collision test hit (D_800F1CE0, 0xF0), one record per kind
  * of thing: each has the region the object was in, where it was, and a kind
  * or the thing hit. func_00241894 clears it (the instance's node to -1). */
@@ -50,11 +60,7 @@ typedef struct CCollisionResults {
     /* 0x04 */ CGameRegion *m_pInstanceRegion;
     /* 0x08 */ CVector3 m_vInstancePos;            /* the collision point */
     /* 0x14 */ s32 m_nInstanceNode;                /* the node (bone) hit, -1 none */
-    /* 0x18 */ u8 unk_18[0x65];
-    /* 0x7D */ u8 m_Surface;
-    /* 0x7E */ u8 m_Team;
-    /* 0x7F */ u8 unk_7F;
-    /* 0x80 */ u8 unk_80[0x8];
+    /* 0x18 */ HitFrame m_Frame;                    /* what the hit node gave (func_0023F880) */
     /* 0x88 */ CGameObjectInstance *m_pShape;      /* an instance hit by its collision shape (func_00242604) */
     /* 0x8C */ CGameRegion *m_pShapeRegion;
     /* 0x90 */ CVector3 m_vShapePos;
@@ -125,5 +131,51 @@ typedef struct ModelSweep {
     /* 0xD4 */ void *meshes;
     /* 0xD8 */ s32 special;                    /* kind 9: every polygon counts */
 } ModelSweep; /* size 0xDC */
+
+/* The volume a sweep moves, against instances' cylinders (func_0024032C
+ * builds it): the mover's radius and height, its top and bottom at the start
+ * and the end, and the ground rectangle the move covers. */
+typedef struct SweepBox {
+    /* 0x00 */ f32 radius;
+    /* 0x04 */ f32 bottom;                     /* below the position */
+    /* 0x08 */ f32 top;                        /* above it */
+    /* 0x0C */ f32 startTop;
+    /* 0x10 */ f32 startBottom;
+    /* 0x14 */ f32 endTop;
+    /* 0x18 */ f32 endBottom;
+    /* 0x1C */ f32 minX;
+    /* 0x20 */ f32 minZ;
+    /* 0x24 */ f32 maxX;
+    /* 0x28 */ f32 maxZ;
+    /* 0x2C */ s32 flag;                       /* the move goes up or down: test the discs */
+} SweepBox; /* size 0x30 */
+
+/* A sweep's circle against the map's wall edges (func_00240E90 builds it on
+ * its stack and D_800F1AB0 points at it while func_00240800 walks the
+ * regions). */
+typedef struct MapSweep {
+    /* 0x00 */ Sweep *sweep;
+    /* 0x04 */ CVector3 *a;                    /* the edge's corners */
+    /* 0x08 */ CVector3 *b;
+    /* 0x0C */ CVector3 side;                  /* the sweep's direction turned a right angle */
+    /* 0x18 */ CVector3 edge;                  /* b - a */
+    /* 0x24 */ CVector3 toEnd;
+    /* 0x30 */ CVector3 wallPoint;             /* a pushed out by the radius */
+    /* 0x3C */ CVector3 normal;                /* the edge's normal */
+    /* 0x48 */ CVector3 toStart;
+    /* 0x54 */ f32 radius;
+    /* 0x58 */ f32 len;
+    /* 0x5C */ f32 startSide;
+    /* 0x60 */ f32 across;
+    /* 0x64 */ f32 endSide;
+    /* 0x68 */ f32 t;
+    /* 0x6C */ CGameRegion *next;
+    /* 0x70 */ s32 hit;
+    /* 0x74 */ f32 minX;                       /* the ground rectangle the move covers */
+    /* 0x78 */ f32 minZ;
+    /* 0x7C */ f32 maxX;
+    /* 0x80 */ f32 maxZ;
+    /* 0x84 */ u8 pad84[4];
+} MapSweep; /* size 0x88 */
 
 #endif
