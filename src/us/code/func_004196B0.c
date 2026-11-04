@@ -406,7 +406,7 @@ void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
     globals->multiplayer = 0;
     globals->playerCount = 1;
     for (i = 3; i >= 0; i--) {
-        globals->slots[i].active = 0;
+        globals->slots[i].m_bActive = 0;
     }
     i = 0;
     settings = &D_8011AB18;

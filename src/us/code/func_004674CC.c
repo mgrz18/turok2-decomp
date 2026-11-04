@@ -1,13 +1,7 @@
 /* Second VM module copy of func_0042E5AC (same source, linked 0x0042E4CC). */
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct GameFlags {
-    /* 0x000 */ u8 pad0[0x19];
-    /* 0x019 */ u8 multiplayer;     /* D_8011AAF1 */
-    /* 0x01A */ u8 pad1A[0x40 - 0x1A];
-    /* 0x040 */ CPlayerOptions options[5];
-} GameFlags;
+#include "structs/game.h"
 
 typedef struct Controller {
     u8 pad[0x224];
@@ -21,7 +15,6 @@ typedef struct PlayerList {
     /* 0x20 */ u8 list1[0x14];
 } PlayerList;
 
-extern GameFlags D_8011AAD8;
 extern s32 D_8011ACF0;
 extern Controller D_800F5EC0[];
 extern char D_800A7080[]; /* in the engine's .rodata */
@@ -54,7 +47,7 @@ static __inline__ void initPlayer(CPlayer *p, s32 index, CPlayerOptions *options
 }
 
 void func_004674CC(PlayerList *list, s32 count, s32 arg2) {
-    GameFlags *flags;
+    GameSettings *flags;
     CPlayerOptions *options;
     CPlayer *p;
     s32 i;
@@ -80,11 +73,11 @@ void func_004674CC(PlayerList *list, s32 count, s32 arg2) {
     for (i = 0; i < list->count; i++) {
         CList__AddTail(list->list0, &list->players[i]);
     }
-    options = flags->options;
+    options = &flags->defaultSlot;
     if (flags->multiplayer) {
         for (i = 0; i < list->count; i++) {
             p = &list->players[i];
-            options = &flags->options[i + 1];
+            options = &flags->slots[i];
             initPlayer(p, i, options);
             if (options->m_bActive) {
                 func_0042DB38(p, options->m_nCharacter, 1);

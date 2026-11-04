@@ -56,7 +56,7 @@ s32 func_0045977C(s32 a0, Menu *o) {
                 s1 = o->controller->port;
             }
             func_00285A80(s1);
-            func_0042C620(D_800F7078, ((CPlayer *) o->player)->m_Data.m_CheckPointWarpID, 2);
+            func_0042C620(D_800F7078, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
         func_004302CC(D_800F6CB0);
@@ -93,7 +93,7 @@ s32 func_0045977C(s32 a0, Menu *o) {
             func_00416644(D_80119E2C, D_0043B634, o->player, o->controller, 0);
         } else {
             if (o->player != NULL) {
-                p = ((u8 *)((CPlayer *) o->player)->m_pCamera) + 0x53C;
+                p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
                 p = D_80119E2C;
             }
@@ -106,7 +106,7 @@ s32 func_0045977C(s32 a0, Menu *o) {
         }
         if (o->context != NULL) {
             if (o->context != D_0043B5EC && o->player != NULL) {
-                p = ((u8 *)((CPlayer *) o->player)->m_pCamera) + 0x53C;
+                p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
                 p = D_80119E2C;
             }

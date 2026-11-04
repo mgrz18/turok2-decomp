@@ -12,7 +12,7 @@ s32 func_0045275C(void *first, void *second, void *third) {
     options->multiplayer = 1;
     options->playerCount = 4;
     for (i = 0; i < 4; i++) {
-        options->slots[i].active = 0;
+        options->slots[i].m_bActive = 0;
     }
     func_00416894(third, second, D_00438FB4);
     return 1;

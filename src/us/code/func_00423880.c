@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 #include "structs/menu.h"
 
 void func_00416644(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
@@ -20,7 +21,7 @@ s32 func_00423880(s32 unused, Menu *event) {
         D_8011F148 = 1;
     } else {
         if (event->player != NULL) {
-            dst = *(char **)(event->player + 0x51C) + 0x53C;
+            dst = (char *)event->player->m_pCamera + 0x53C;
         } else {
             dst = D_80119E2C;
         }

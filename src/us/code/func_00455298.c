@@ -4,7 +4,7 @@
 
 typedef struct MenuPlayer {
     /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ GameSlot *options;
+    /* 0x518 */ CPlayerOptions *options;
 } MenuPlayer;
 
 s32 func_004160F0(MenuItem *item); /* length of the item's text line */

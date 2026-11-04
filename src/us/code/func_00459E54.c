@@ -1,10 +1,11 @@
 /* Second-module copy of func_00420F34 (first module). NOTE: the ROM code reads jtbl_800C1450, whose entries are the first module copy's case addresses (link base 0x420F34, 0xE0 above this copy's 0x420E54): the switch here builds its own table, which will not equal the ROM's. */
 #include "common.h"
+#include "structs/player.h"
 #include "structs/menu.h"
 
 s32 func_0041DCB0(void *event, s32 port, s32 arg2);
 char *func_0041DB7C(void *event);
-void func_00416644(char *dst, char *fmt, u8 *player, s32 arg3, char *arg4);
+void func_00416644(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
 extern char D_0043BDF0[];
 extern char D_0043BE14[];
@@ -62,7 +63,7 @@ s32 func_00459E54(s32 unused, Menu *event) {
                 D_80130940 = 0;
             }
             if (event->player != NULL) {
-                dst = *(char **) (event->player + 0x51C) + 0x53C;
+                dst = (char *)event->player->m_pCamera + 0x53C;
             } else {
                 dst = D_80119E2C;
             }

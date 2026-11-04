@@ -1,6 +1,7 @@
 /* WRONG CUT: the real function starts at 0x0045C688 (size 0x118 = 280): splat
  * cut its first two words (lui/lw D_80130990) as func_0045C688. */
 #include "common.h"
+#include "structs/player.h"
 #include "structs/menu.h"
 
 /* Start the selected level, then open the next menu page (on the player's own
@@ -35,7 +36,7 @@ s32 func_0045C688(void *arg0, Menu *event) {
     D_801309BC = 1;
     if (func_0041DCB0(event, mode, 1) != 0) {
         if (event->player != NULL) {
-            menu = *(u8 **)(event->player + 0x51C) + 0x53C;
+            menu = (u8 *)event->player->m_pCamera + 0x53C;
         } else {
             menu = D_80119E2C;
         }

@@ -1,28 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
-
-typedef struct MenuPlayer {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ CPlayerOptions *options;
-} MenuPlayer;
-
-/* What these read around the multiplayer settings, D_8011AAD8. */
-typedef struct MenuSettings {
-    /* 0x000 */ u8 pad0[0xC];
-    /* 0x00C */ u32 unkC;
-    /* 0x010 */ u16 unk10;
-    /* 0x012 */ u8 pad12[0x19 - 0x12];
-    /* 0x019 */ u8 multiplayer;
-    /* 0x01A */ u8 pad1A;
-    /* 0x01B */ u8 unk1B;
-    /* 0x01C */ u8 pad1C[0x40 - 0x1C];
-    /* 0x040 */ CPlayerOptions defaultOptions;
-    /* 0x06B */ u8 pad6B[0x1B0 - 0x6B];
-    /* 0x1B0 */ s32 mode;
-} MenuSettings;
-
-extern MenuSettings D_8011AAD8;
+#include "structs/game.h"
 
 s32 func_004160F0(MenuItem *item); /* length of the item's text line */
 s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
@@ -33,11 +12,11 @@ extern char D_800B4098[];
 /* Shows the player's option unk2A (0-255, centred on 0x80) in steps of 8, falling back to the
  * default options when there is no player. */
 s32 func_004555B0(MenuItem *item, Menu *menu) {
-    CPlayerOptions *options = &D_8011AAD8.defaultOptions;
+    CPlayerOptions *options = &D_8011AAD8.defaultSlot;
     s32 value;
 
-    if (menu->player != NULL && ((MenuPlayer *) menu->player)->options != NULL) {
-        options = ((MenuPlayer *) menu->player)->options;
+    if (menu->player != NULL && menu->player->m_pOptions != NULL) {
+        options = menu->player->m_pOptions;
     }
     value = (options->m_SettingY - 0x80) / 8;
     if (value == 0) {

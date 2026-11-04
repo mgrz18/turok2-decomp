@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/game.h"
 
-extern GameSlot D_8011AB58[4]; /* D_8011AAD8.slots */
+extern CPlayerOptions D_8011AB58[4]; /* D_8011AAD8.slots */
 extern u8 D_800F5EC0[];         /* controllers, 0x224 bytes each */
 extern u8 D_800F6CB0[];
 
@@ -38,14 +38,14 @@ s32 func_0045078C(void) {
     level = setup->teamArena;
     StartMatch(setup->teamTimeLimit, setup->teamScoreLimit, 0, 1);
     for (i = 3; i >= 0; i--) {
-        setup->slots[i].character = 0;
+        setup->slots[i].m_nCharacter = 0;
     }
     for (i = 0, ctl = D_800F5EC0; i < 4; i++, ctl += 0x224) {
         if (func_002855E8(ctl)) {
-            GameSlot *slot = &D_8011AB58[i];
+            CPlayerOptions *slot = &D_8011AB58[i];
 
-            slot->active = 1;
-            slot->controller = i;
+            slot->m_bActive = 1;
+            slot->m_nController = i;
             break;
         }
     }

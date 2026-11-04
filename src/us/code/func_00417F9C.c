@@ -14,7 +14,7 @@ extern void func_0029E3E0(char *dst, char *fmt, s32 value);
 
 /* Label of the handicap item, with the handicap value printed into it. */
 s32 func_00417F9C(MenuItem *a, Menu *c) {
-    s32 handicap = ((CPlayer *) c->player)->m_pOptions->m_Handicap;
+    s32 handicap = c->player->m_pOptions->m_Handicap;
 
     if (handicap == 0) {
         a->text = D_800B41F0;

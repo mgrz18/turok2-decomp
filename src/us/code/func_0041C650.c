@@ -16,8 +16,8 @@ s32 func_0041C650(MenuItem *a, Menu *c) {
     CPlayerOptions *options = &D_8011AB18;
     s32 v;
 
-    if (c->player != NULL && ((CPlayer *) c->player)->m_pOptions != NULL) {
-        options = ((CPlayer *) c->player)->m_pOptions;
+    if (c->player != NULL && c->player->m_pOptions != NULL) {
+        options = c->player->m_pOptions;
     }
     v = (options->m_SettingY - 0x80) / 8;
     if (v == 0) {

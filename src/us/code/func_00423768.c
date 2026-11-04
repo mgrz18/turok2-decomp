@@ -1,10 +1,11 @@
 /* WRONG CUT: one function 0x00423768-0x00423880 (size 0x118); splat cut its second half into
  * func_004237FC (which starts in the delay slot of a bnel). */
 #include "common.h"
+#include "structs/player.h"
 #include "structs/menu.h"
 
 s32 func_0041DD90(void *event, s32 port, s32 arg2);
-void func_00416644(char *dst, char *fmt, u8 *player, s32 arg3, char *arg4);
+void func_00416644(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
 extern char D_0043BED0[];
 extern char D_0043BEF4[];
@@ -29,7 +30,7 @@ s32 func_00423768(s32 unused, Menu *event) {
     D_801309BC = 1;
     if (func_0041DD90(event, port, 1) != 0) {
         if (event->player != NULL) {
-            dst = *(char **)(event->player + 0x51C) + 0x53C;
+            dst = (char *)event->player->m_pCamera + 0x53C;
         } else {
             dst = D_80119E2C;
         }

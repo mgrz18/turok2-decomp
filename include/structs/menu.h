@@ -134,7 +134,7 @@ typedef struct Menu {
     /* 0x010 */ s32 count;
     /* 0x014 */ MenuDesc *desc;
     /* 0x018 */ s32 param;
-    /* 0x01C */ void *player;       /* the CPlayer (structs/player.h) it is for */
+    /* 0x01C */ struct CPlayer *player; /* structs/player.h */
     /* 0x020 */ MenuController *controller;
     union {
     /* 0x024 */ void *context;      /* the opener's argument */

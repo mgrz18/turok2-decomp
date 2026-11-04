@@ -17,18 +17,7 @@
  * func_00450D78): through an array the compiler bases the accesses on the
  * accessed field's address, as the ROM does there. */
 
-/* One player's multiplayer options (0x40 bytes): defaultSlot and slots[]
- * below; CPlayer::m_pOptions points at one of them. */
-typedef struct GameSlot {
-    /* 0x00 */ u8 unk0[0x28];
-    /* 0x28 */ u8 active;
-    /* 0x29 */ u8 unk29;               /* 0x80-centred */
-    /* 0x2A */ u8 unk2A;               /* 0x80-centred */
-    /* 0x2B */ u8 unk2B[0x2F - 0x2B];
-    /* 0x2F */ s8 controller;
-    /* 0x30 */ s8 character;           /* func_0042DC18; the team in func_0042EF2C */
-    /* 0x31 */ u8 unk31[0x40 - 0x31];
-} GameSlot; /* size 0x40 */
+#include "structs/player_options.h"
 
 /* The match state, D_8011ACB0: the play clock, then the rules of the
  * running match (Rage Wars' RenderCounters / GameRules at D_801468A0). */
@@ -91,8 +80,8 @@ typedef struct GameSettings {
     /* 0x02F */ u8 unk2F;
     /* 0x030 */ u8 weaponEnabled[10];  /* D_8011AB08 */
     /* 0x03A */ u8 unk3A[0x40 - 0x3A];
-    /* 0x040 */ GameSlot defaultSlot;  /* D_8011AB18 */
-    /* 0x080 */ GameSlot slots[4];     /* D_8011AB58 */
+    /* 0x040 */ CPlayerOptions defaultSlot;  /* D_8011AB18 */
+    /* 0x080 */ CPlayerOptions slots[4];     /* D_8011AB58 */
     /* 0x180 */ u8 unk180;
     /* 0x181 */ u8 unk181[0x1B0 - 0x181];
     /* 0x1B0 */ s32 mode;              /* D_8011AC88: the game mode */

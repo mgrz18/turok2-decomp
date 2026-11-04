@@ -40,7 +40,7 @@ void func_0041E1D8(Menu *m) {
     kind = m->controller->port;
     if (D_800C2020) {
         D_801309BC = 1;
-        func_00416644(((u8 *)((CPlayer *) m->player)->m_pCamera) + 0x53C, D_0043882C, m->player, m->controller, NULL);
+        func_00416644(((u8 *)m->player->m_pCamera) + 0x53C, D_0043882C, m->player, m->controller, NULL);
         return;
     }
     func_00426480(kind);

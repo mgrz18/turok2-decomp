@@ -88,8 +88,8 @@ void func_00467E4C(MatchConfig *arg) {
     {
         GameSettings *g = &D_8011AAD8;
         for (i = 0; i < 4; i++) {
-            g->defaultSlot.active = 0;
-            g->slots[i].active = 0;
+            g->defaultSlot.m_bActive = 0;
+            g->slots[i].m_bActive = 0;
             initSetting(&s->a[i], owner, i, func_0042EC10, config->a[i]);
             initSetting(&s->b[i], owner, i, func_0042F67C, config->b[i]);
             initSetting(&s->c[i], owner, i, func_0042F67C, config->c[i]);
@@ -107,13 +107,13 @@ void func_00467E4C(MatchConfig *arg) {
     if (s->playerCount >= 2) {
         do {
             for (i = 0; i < s->playerCount; i++) {
-                setup->slots[i].active = 1;
-                setup->slots[i].character = config->teams[i];
+                setup->slots[i].m_bActive = 1;
+                setup->slots[i].m_nCharacter = config->teams[i];
             }
             D_8011AAD8.multiplayer = 1;
         } while (0);
     } else {
-        setup->defaultSlot.active = 1;
+        setup->defaultSlot.m_bActive = 1;
         setup->multiplayer = 0;
     }
     setup = &D_8011AAD8;
