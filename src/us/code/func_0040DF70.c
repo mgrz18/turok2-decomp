@@ -1,39 +1,20 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 extern f32 D_800B6D28; /* frame time scale */
 extern s32 D_80119890; /* current player */
 
-typedef struct AIState40DF70 AIState40DF70;
-
-typedef struct {
-    /* 0x00 */ char pad0[0x8];
-    /* 0x08 */ void (*update)(void *obj, AIState40DF70 *ai);
-} AIProcs40DF70;
-
-struct AIState40DF70 {
-    /* 0x000 */ char pad0[0x4];
-    /* 0x004 */ s32 active;
-    /* 0x008 */ char pad8[0x28];
-    /* 0x030 */ AIProcs40DF70 *procs;
-    /* 0x034 */ char pad34[0x44];
-    /* 0x078 */ s32 target;
-    /* 0x07C */ f32 targetDist;
-    /* 0x080 */ s32 target80;
-    /* 0x084 */ char pad84[0x4];
-    /* 0x088 */ s32 target88;
-    /* 0x08C */ char pad8C[0x8C];
-    /* 0x118 */ f32 timer;
-};
-
-void func_0040DF70(void *obj, AIState40DF70 *ai) {
-    if (ai->active != 0 && D_80119890 != 0) {
-        ai->target80 = D_80119890;
-        ai->target88 = D_80119890;
-        ai->target = D_80119890;
-        ai->targetDist = 150.0f;
+/* Step callback of the Blind One's actors: while alive they target the
+ * current player, run their mode's callback and count the hit flash down. */
+void func_0040DF70(void *obj, CAI *ai) {
+    if (ai->m_Health != 0 && D_80119890 != 0) {
+        ai->m_pSightTarget = (struct CGameObjectInstance *) D_80119890;
+        ai->m_pPathTarget = (struct CGameObjectInstance *) D_80119890;
+        ai->m_pTargetOverride = (struct CGameObjectInstance *) D_80119890;
+        ai->m_TargetOverrideTime = 150.0f;
     }
-    if (ai->procs != NULL && ai->procs->update != NULL) {
-        ai->procs->update(obj, ai);
+    if (ai->m_pModeCurrent != NULL && ai->m_pModeCurrent->m_pfCallback != NULL) {
+        ai->m_pModeCurrent->m_pfCallback(obj, ai);
     }
-    ai->timer = (ai->timer - D_800B6D28 < 0.0f) ? 0.0f : ai->timer - D_800B6D28;
+    ai->m_BlindOne.m_HitTimer = (ai->m_BlindOne.m_HitTimer - D_800B6D28 < 0.0f) ? 0.0f : ai->m_BlindOne.m_HitTimer - D_800B6D28;
 }

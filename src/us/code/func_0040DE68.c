@@ -25,7 +25,7 @@ void func_0040DE68(CGameObjectInstance *obj, CAI *ai) {
     } else {
         ai->m_pfDraw = func_0040EDB0;
     }
-    ai->m_BlindOne.m_PhaseState = 0;
+    ai->m_BlindOne.m_nPhaseHits = 0;
     ai->m_BlindOne.m_HitTimer = 0;
     ai->m_BlindOne.m_SightDist = 0;
     ai->m_Health = 0;

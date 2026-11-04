@@ -13,8 +13,9 @@
  * func_0040D6A0 / func_0040D7A8 / func_0040D8B0 / func_0040DE68 the actors
  * (second copies func_004465C4...). */
 typedef struct {
-    /* 0x00 */ s32 m_PhaseState;  /* cleared by every script step (func_0040E46C...);
-                                   * func_0040E30C wakes the next 0x456 actor only while it is 0 */
+    /* 0x00 */ s32 m_nPhaseHits;  /* times it went down in this phase (func_0040E30C, which wakes
+                                   * the next 0x456 actor only while that one's is 0); cleared by
+                                   * every script step (func_0040E46C...) */
     /* 0x04 */ s32 m_nGroupIndex; /* the actor's index in its group (func_0040CCC0) */
     /* 0x08 */ s32 m_nFader;      /* its hit-flash animator, BlindOneState.faders[m_nFader] */
     /* 0x0C */ f32 m_HitTimer;    /* frames left of the hit flash (2.25 on a hit, counted down) */

@@ -138,7 +138,7 @@ extern void *func_00225EBC(void *level, s32 arg1, s32 id);
 extern void func_0027AD24(void *hud, CGameObjectInstance *obj, char *name);
 extern void func_00225D0C(void *level);
 
-/* Steps the script: clears the movers and the actors' m_BlindOne.m_PhaseState, enters the next phase and runs its init. */
+/* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase_40CCC0(BlindOneState *state) {
     s32 phase;
     s32 i;
@@ -148,13 +148,13 @@ static __inline__ void nextPhase_40CCC0(BlindOneState *state) {
     state->movers[1].seq = NULL;
     state->movers[2].seq = NULL;
     for (i = 0; i < state->count1; i++) {
-        state->actors1[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors1[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count2; i++) {
-        state->actors2[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors2[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count3; i++) {
-        state->actors3[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
     if (D_0043240C[phase].init != NULL) {
@@ -227,7 +227,7 @@ typedef struct {
 extern Player_40CFC4 *D_80119890; /* current player */
 extern f32 func_00298470(f32 x); /* sqrt */
 
-/* Steps the script: clears the movers and the actors' m_BlindOne.m_PhaseState, enters the next phase and runs its init. */
+/* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
     s32 phase;
     s32 i;
@@ -237,13 +237,13 @@ static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
     state->movers[1].seq = 0;
     state->movers[2].seq = 0;
     for (i = 0; i < state->count1; i++) {
-        state->actors1[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors1[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count2; i++) {
-        state->actors2[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors2[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count3; i++) {
-        state->actors3[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
     if (D_0043240C[phase].init != NULL) {

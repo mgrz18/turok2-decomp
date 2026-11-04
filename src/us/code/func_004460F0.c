@@ -20,7 +20,7 @@ extern void func_002688C8(CGameObjectInstance *obj, CVector3 pos, CVector3 *outP
 extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
 
-/* Steps the script: clears the movers and the actors' m_BlindOne.m_PhaseState, enters the next phase and runs its init. */
+/* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase(BlindOneState *state) {
     s32 phase;
     s32 i;
@@ -30,13 +30,13 @@ static __inline__ void nextPhase(BlindOneState *state) {
     state->movers[1].seq = NULL;
     state->movers[2].seq = NULL;
     for (i = 0; i < state->count1; i++) {
-        state->actors1[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors1[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count2; i++) {
-        state->actors2[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors2[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     for (i = 0; i < state->count3; i++) {
-        state->actors3[i]->m_AI.m_BlindOne.m_PhaseState = 0;
+        state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
     if (D_0043232C[phase].init != NULL) {

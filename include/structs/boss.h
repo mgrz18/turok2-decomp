@@ -77,7 +77,7 @@ extern MotherBossState D_8012FB70;
  * each has its own phase table (D_0043240C and D_0043232C). The script is a
  * list of BlindOneStep: stepping it (the nextPhase inlines and
  * func_0040E46C...) stops the three movers, clears every actor's
- * m_AI.m_BlindOne.m_PhaseState, stores the step's id in `phase` and calls that
+ * m_AI.m_BlindOne.m_nPhaseHits, stores the step's id in `phase` and calls that
  * phase's init; the phase's update then runs every frame. The boss's three
  * groups of actors (types 0x454, 0x455 and 0x456) keep their group index in
  * m_AI.m_BlindOne.m_nGroupIndex and their fader in m_AI.m_BlindOne.m_nFader
