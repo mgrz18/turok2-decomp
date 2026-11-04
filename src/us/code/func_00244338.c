@@ -1,19 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_3.CPP, func_80214DD4_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
-
-/* The player behind an object (owner 0x1A8 of a player-controlled one). */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xAAC - 0x998];
-    /* 0xAAC */ f32 unkAAC;
-    /* 0xAB0 */ u8 padAB0[0xB2C - 0xAB0];
-    /* 0xB2C */ s32 unkB2C;
-    /* 0xB30 */ u8 padB30[0xB38 - 0xB30];
-    /* 0xB38 */ struct Actor *unkB38;
-} OwnerPlayer;
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
@@ -28,7 +17,7 @@ typedef struct Actor {
     /* 0x0BA */ u8 padBA[0xD4 - 0xBA];
     /* 0x0D4 */ u32 flags;
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ OwnerPlayer *owner;
+    /* 0x1A8 */ CPlayer *owner;
     /* 0x1AC */ u8 pad1AC[0x27C - 0x1AC];
     /* 0x27C */ u32 flags27C;
 } Actor;
@@ -132,7 +121,7 @@ void func_00244338(Actor *self, Plan *plan, s32 boost, TrackResult *out) {
     f32 gap;
     f32 angle;
     f32 reach;
-    OwnerPlayer *player;
+    CPlayer *player;
     Location *loc;
 
     boost = 0; /* FAKEMATCH: the unused third parameter doubles as the boost flag (as in Rage Wars' func_80214DD4_de); a separate local gives the same code but swaps $s5/$s6 in the prologue. */
@@ -170,8 +159,8 @@ void func_00244338(Actor *self, Plan *plan, s32 boost, TrackResult *out) {
                 if (D_8011001C == 0) {
                     if ((!(target->flags & 0x300000)
                          || (player = target->owner,
-                             (!(player->unkAAC > 0.0f) || (kind = 1, self->typeId == 0xCA && player->weapon == 0x14))
-                             && (player->unkB38 != self || (kind = 1, player->unkB2C != 2))))
+                             (!(player->m_FleeTime > 0.0f) || (kind = 1, self->typeId == 0xCA && player->m_Data.m_CurrentWeapon == 0x14))
+                             && (((Actor *)player->m_pCrossHairTarget) != self || (kind = 1, player->m_CrossHairMode != 2))))
                         && (!(self->flags27C & 2) || (kind = 1, self->typeId == 0xCA))) {
                         kind = 0;
                     }

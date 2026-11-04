@@ -2,8 +2,9 @@
 /* A player travelling to a target: turn toward it and follow a parabola. */
 
 #include "common.h"
+#include "structs/player.h"
 
-typedef struct { f32 x, y, z; } Position;
+typedef CVector3 Position;
 
 typedef struct TravelTarget {
     /* 0x00 */ u8 pad0[0x34];
@@ -13,34 +14,20 @@ typedef struct TravelTarget {
     /* 0x5E */ u8 duration;
 } TravelTarget;
 
-typedef struct TravelPlayer {
-    /* 0x000 */ u8 pad0[0x50];
-    /* 0x050 */ f32 yaw;
-    /* 0x054 */ u8 pad54[0x2D8 - 0x54];
-    /* 0x2D8 */ f32 bodyYaw;
-    /* 0x2DC */ u8 pad2DC[0xAA0 - 0x2DC];
-    /* 0xAA0 */ Position pos;
-    /* 0xAAC */ u8 padAAC[0xB98 - 0xAAC];
-    /* 0xB98 */ f32 elapsed;
-    /* 0xB9C */ f32 targetYaw;
-    /* 0xBA0 */ TravelTarget *target;
-    /* 0xBA4 */ Position start;
-} TravelPlayer;
-
 extern f32 D_800B6D28;      /* frame time */
 extern char D_800ADE70;
 extern void func_0024EF70(void *, void *, void *);
 extern s32 func_0024E5F0(void *, void *, s32);
 extern void func_00210EF0(f32 *value);
 
-void func_00251828(TravelPlayer *player, void *body) {
+void func_00251828(CPlayer *player, void *body) {
     f32 yaw, targetYaw, alternate, duration, t;
     Position pos;
 
     func_0024EF70(player, body, &D_800ADE70);
-    player->elapsed += D_800B6D28;
-    yaw = player->yaw;
-    targetYaw = player->targetYaw;
+    player->m_JumpPadCurrentTime += D_800B6D28;
+    yaw = player->m_CharacterActor.m_RotY;
+    targetYaw = player->m_JumpPadAngleDirection;
     if (targetYaw != yaw) {
         func_00210EF0(&yaw);
         func_00210EF0(&targetYaw);
@@ -68,16 +55,16 @@ void func_00251828(TravelPlayer *player, void *body) {
         }
         func_00210EF0(&yaw);
     }
-    player->bodyYaw = yaw;
-    player->yaw = yaw;
-    duration = (f32)(player->target->duration * 15);
-    if (player->elapsed < duration) {
-        t = player->elapsed / duration;
-        pos.x = player->start.x + (player->target->pos.x - player->start.x) * t;
-        pos.z = player->start.z + (player->target->pos.z - player->start.z) * t;
-        pos.y = player->start.y + (player->target->pos.y - player->start.y) * t
-              + player->target->height * ((t - t * t) * 4.0f);
-        player->pos = pos;
+    player->m_WeaponActor.m_RotY = yaw;
+    player->m_CharacterActor.m_RotY = yaw;
+    duration = (f32)(((TravelTarget *)player->m_pJumpPadRegionSet)->duration * 15);
+    if (player->m_JumpPadCurrentTime < duration) {
+        t = player->m_JumpPadCurrentTime / duration;
+        pos.x = player->m_vJumpPadStart.x + (((TravelTarget *)player->m_pJumpPadRegionSet)->pos.x - player->m_vJumpPadStart.x) * t;
+        pos.z = player->m_vJumpPadStart.z + (((TravelTarget *)player->m_pJumpPadRegionSet)->pos.z - player->m_vJumpPadStart.z) * t;
+        pos.y = player->m_vJumpPadStart.y + (((TravelTarget *)player->m_pJumpPadRegionSet)->pos.y - player->m_vJumpPadStart.y) * t
+              + ((TravelTarget *)player->m_pJumpPadRegionSet)->height * ((t - t * t) * 4.0f);
+        player->m_vDesiredPos = pos;
         return;
     }
     func_0024E5F0(player, body, 2);

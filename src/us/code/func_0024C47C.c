@@ -7,7 +7,7 @@
  * boundary too, so neither can open the file.
  *
  * The parts were written apart: each keeps its own view of the player
- * (WheelPlayer, HudPlayer, SwitchPlayer, Player), and they share one
+ * (CPlayer, HudPlayer, CPlayer, Player), and they share one
  * WeaponInfo. func_0024D344 is after Rage Wars (func_80220ED4_de). */
 #include "common.h"
 #include "structs/player.h"
@@ -26,23 +26,16 @@ typedef struct WeaponInfo {
     /* 0x20 */ struct AmmoDef *ammo[3];
 } WeaponInfo;
 
-typedef struct WheelPlayer {
-    /* 0x000 */ u8 pad0[0x3C8];
-    /* 0x3C8 */ u32 aiFlags;
-    /* 0x3CC */ u8 pad3CC[0x972 - 0x3CC];
-    /* 0x972 */ s8 owned[0x23];
-} WheelPlayer;
-
 extern WeaponInfo *D_800AF618[];
 extern s32 D_80110058;
 extern s32 D_8011005C;
 
-void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, WheelPlayer *player);
+void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
 /* Opens the weapon wheel: picks the weapons to show (owned, allowed here,
  * not superseded by an owned upgrade) and how many times round to repeat
  * them so that the slots are at most 20 degrees apart. */
-void func_0024C47C(WeaponMenu *menu, WheelPlayer *player) {
+void func_0024C47C(WeaponMenu *menu, CPlayer *player) {
     s32 shown[0x23];
     s32 count = 0;
     s32 range = D_8011005C - D_80110058 + 1;
@@ -54,15 +47,15 @@ void func_0024C47C(WeaponMenu *menu, WheelPlayer *player) {
         WeaponInfo *info = D_800AF618[i];
         s32 show;
 
-        if (!player->owned[i]) {
+        if (!player->m_Data.m_WeaponList[i]) {
             show = 0;
-        } else if (!((player->aiFlags & 0x80) ? (info->flags & 2) : (info->flags & 1))) {
+        } else if (!((player->m_WeaponActor.m_AI.m_dwFlags & 0x80) ? (info->flags & 2) : (info->flags & 1))) {
             show = 0;
         } else {
             s16 upgrade = info->upgrade;
 
             show = 1;
-            if (player->owned[upgrade]) {
+            if (player->m_Data.m_WeaponList[upgrade]) {
                 show = !(i < upgrade);
             }
         }
@@ -101,14 +94,6 @@ typedef struct {
 } HudItem;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u16 score;
-    /* 0x06 */ u16 frags;
-    /* 0x08 */ u8 pad8[0x3E - 0x8];
-    /* 0x3E */ u8 tagMode;
-} HudOptions;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x380];
     /* 0x380 */ s32 underwater;
 } Strokes;
@@ -117,7 +102,7 @@ typedef struct {
     /* 0x0000 */ u8 pad0[0x4F8];
     /* 0x04F8 */ f32 charge;
     /* 0x04FC */ u8 pad4FC[0x518 - 0x4FC];
-    /* 0x0518 */ HudOptions *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 pad51C[0x524 - 0x51C];
     /* 0x0524 */ s32 health;        /* 8.8 */
     /* 0x0528 */ s16 lives;
@@ -292,7 +277,7 @@ void func_0024C648(HudPlayer *player, View *view) {
         }
     }
     if (D_8011AAF1.multiplayer) {
-        value = player->options->score;
+        value = player->options->m_Kills;
         if (player->scoreItem.value != value) {
             func_0027AD00(&player->scoreItem, D_800ADC40);
             player->scoreItem.value = value;
@@ -301,10 +286,10 @@ void func_0024C648(HudPlayer *player, View *view) {
             x = player->scoreItem.x * sx + view->x + view->width;
             y = player->scoreItem.y * sy + view->y;
             func_0027B320(0x1FA, 0, x, y + sy * 8.0f, sx, sy, 1);
-            func_00277CF0(player->options->score, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
+            func_00277CF0(player->options->m_Kills, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
         }
         if (D_8011ACE4) {
-            value = player->options->frags;
+            value = player->options->m_Tags;
             if (player->fragsItem.value != value) {
                 func_0027AD00(&player->fragsItem, D_800ADC80);
                 player->fragsItem.value = value;
@@ -313,11 +298,11 @@ void func_0024C648(HudPlayer *player, View *view) {
                 x = player->fragsItem.x * sx + view->x + view->width;
                 y = player->fragsItem.y * sy + view->y;
                 func_0027B320(0x1FD, 0, x, y + sy * 8.0f, sx, sy, 1);
-                func_00277CF0(player->options->frags, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
+                func_00277CF0(player->options->m_Tags, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
             }
         }
     }
-    if (player->options->tagMode == 1) {
+    if (player->options->m_TagMode == 1) {
         func_00254768(player, view);
     }
 }
@@ -406,23 +391,6 @@ void func_0024CF58(ViewState *view, Target *target) {
     }
 }
 
-typedef struct SwitchPlayer {
-    /* 0x0000 */ u8 pad0[0x288];
-    /* 0x0288 */ u8 unk288[0x3C8 - 0x288];
-    /* 0x03C8 */ u8 unk3C8[0x996 - 0x3C8];
-    /* 0x0996 */ s16 weapon;
-    /* 0x0998 */ s16 savedWeapon[3];
-    /* 0x099E */ u8 pad99E[0xA08 - 0x99E];
-    /* 0x0A08 */ u16 state;
-    /* 0x0A0A */ u8 padA0A[0xA1C - 0xA0A];
-    /* 0x0A1C */ u32 flags;
-    /* 0x0A20 */ u8 padA20[0xB14 - 0xA20];
-    /* 0x0B14 */ s16 nextWeapon;
-    /* 0x0B16 */ u8 padB16[0x129C - 0xB16];
-    /* 0x129C */ s32 lastWeaponSet;
-    /* 0x12A0 */ s32 weaponSet;
-} SwitchPlayer;
-
 extern WeaponInfo *D_800AF618[];
 
 void func_00258668(void *a, void *b);
@@ -430,23 +398,23 @@ void func_00258668(void *a, void *b);
 /* Picks the player's weapon set (0 on foot, 1 in states 10-11, 2 with
  * flag 0x8000); when it changes, remembers the weapon held in the old set
  * if it belongs there and queues the new set's weapon. */
-void func_0024D1F8(SwitchPlayer *player) {
+void func_0024D1F8(CPlayer *player) {
     s32 keep;
     s16 weapon;
 
-    player->lastWeaponSet = player->weaponSet;
-    if ((u32) (player->state - 10) < 2) {
-        player->weaponSet = 1;
-    } else if (player->flags & 0x8000) {
-        player->weaponSet = 2;
+    player->m_LastFrameAllowedWeaponType = player->m_CurrentAllowedWeaponType;
+    if ((u32) ((u16)player->m_Mode - 10) < 2) {
+        player->m_CurrentAllowedWeaponType = 1;
+    } else if (player->m_ModeFlags & 0x8000) {
+        player->m_CurrentAllowedWeaponType = 2;
     } else {
-        player->weaponSet = 0;
+        player->m_CurrentAllowedWeaponType = 0;
     }
-    if (player->lastWeaponSet == player->weaponSet) {
+    if (player->m_LastFrameAllowedWeaponType == player->m_CurrentAllowedWeaponType) {
         return;
     }
-    weapon = player->weapon;
-    switch (player->lastWeaponSet) {
+    weapon = player->m_Data.m_CurrentWeapon;
+    switch (player->m_LastFrameAllowedWeaponType) {
     case 0:
         if (!(D_800AF618[weapon]->flags & 1)) {
             goto no;
@@ -471,11 +439,11 @@ void func_0024D1F8(SwitchPlayer *player) {
         break;
     }
     if (keep) {
-        player->savedWeapon[player->lastWeaponSet] = player->weapon;
+        player->m_Data.m_LastWeapon[player->m_LastFrameAllowedWeaponType] = player->m_Data.m_CurrentWeapon;
     }
-    player->nextWeapon = player->savedWeapon[player->weaponSet];
-    if (player->nextWeapon == 19) {
-        func_00258668(player->unk288, player->unk3C8);
+    player->m_RequestedWeapon = player->m_Data.m_LastWeapon[player->m_CurrentAllowedWeaponType];
+    if (player->m_RequestedWeapon == 19) {
+        func_00258668(&player->m_WeaponActor, &player->m_WeaponActor.m_AI);
     }
 }
 
@@ -1172,7 +1140,7 @@ void func_0024D344(Player *p) {
             }
         }
     }
-    func_0024D1F8((SwitchPlayer *) p);
+    func_0024D1F8((CPlayer *) p);
     func_0024BD18(&p->unkCD0, p, p->unk3C8);
     if (p->shake > 0.0f) {
         p->shake -= D_800B6D28;

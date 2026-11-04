@@ -1,19 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_2.CPP, func_80214624_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
-
-/* The player behind an object (owner 0x1A8 of a player-controlled one). */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xAAC - 0x998];
-    /* 0xAAC */ f32 unkAAC;
-    /* 0xAB0 */ u8 padAB0[0xB2C - 0xAB0];
-    /* 0xB2C */ s32 unkB2C;
-    /* 0xB30 */ u8 padB30[0xB38 - 0xB30];
-    /* 0xB38 */ struct Actor *unkB38;
-} OwnerPlayer;
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
@@ -27,7 +16,7 @@ typedef struct Actor {
     /* 0x0BA */ u8 padBA[0xD4 - 0xBA];
     /* 0x0D4 */ u32 flags;
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ OwnerPlayer *owner;
+    /* 0x1A8 */ CPlayer *owner;
     /* 0x1AC */ u8 pad1AC[0x27C - 0x1AC];
     /* 0x27C */ u32 flags27C;
 } Actor;
@@ -103,7 +92,7 @@ s32 func_002438C0(Actor *self, Plan *plan, Actor *target) {
     Vec3f hit;
     s32 region;
     s32 mode;
-    OwnerPlayer *player;
+    CPlayer *player;
     Location *loc;
 
     if (plan->active == 0) {
@@ -125,8 +114,8 @@ s32 func_002438C0(Actor *self, Plan *plan, Actor *target) {
                 if (D_8011001C == 0) {
                     if ((!(target->flags & 0x300000)
                          || (player = target->owner,
-                             (!(player->unkAAC > 0.0f) || (mode = 1, self->typeId == 0xCA && player->weapon == 0x14))
-                             && (player->unkB38 != self || (mode = 1, player->unkB2C != 2))))
+                             (!(player->m_FleeTime > 0.0f) || (mode = 1, self->typeId == 0xCA && player->m_Data.m_CurrentWeapon == 0x14))
+                             && (((Actor *)player->m_pCrossHairTarget) != self || (mode = 1, player->m_CrossHairMode != 2))))
                         && (!(self->flags27C & 2) || (mode = 1, self->typeId == 0xCA))) {
                         mode = 0;
                     }

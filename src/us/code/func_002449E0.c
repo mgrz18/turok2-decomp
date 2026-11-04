@@ -1,19 +1,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215410.c, func_80215410_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
-
-/* The player behind an object (owner 0x1A8 of a player-controlled one). */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xAAC - 0x998];
-    /* 0xAAC */ f32 unkAAC;
-    /* 0xAB0 */ u8 padAB0[0xB2C - 0xAB0];
-    /* 0xB2C */ s32 unkB2C;
-    /* 0xB30 */ u8 padB30[0xB38 - 0xB30];
-    /* 0xB38 */ struct Actor *unkB38;
-} OwnerPlayer;
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
@@ -27,7 +16,7 @@ typedef struct Actor {
     /* 0x0BA */ u8 padBA[0xD4 - 0xBA];
     /* 0x0D4 */ u32 flags;
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ OwnerPlayer *owner;
+    /* 0x1A8 */ CPlayer *owner;
     /* 0x1AC */ u8 pad1AC[0x27C - 0x1AC];
     /* 0x27C */ u32 flags27C;
 } Actor;
@@ -86,7 +75,7 @@ f32 func_00298470(f32 x);                              /* sqrt */
 
 /* What the plan aims at (the same classes as func_002438C0). */
 static __inline__ s32 Kind(Actor *self, Plan *plan, Actor *target) {
-    OwnerPlayer *player;
+    CPlayer *player;
 
     if (plan->active == 0) {
         return 6;
@@ -109,10 +98,10 @@ static __inline__ s32 Kind(Actor *self, Plan *plan, Actor *target) {
     if (D_8011001C == 0) {
         if (target->flags & 0x300000) {
             player = target->owner;
-            if (player->unkAAC > 0.0f && (self->typeId != 0xCA || player->weapon != 0x14)) {
+            if (player->m_FleeTime > 0.0f && (self->typeId != 0xCA || player->m_Data.m_CurrentWeapon != 0x14)) {
                 return 1;
             }
-            if (player->unkB38 == self && player->unkB2C == 2) {
+            if (((Actor *)player->m_pCrossHairTarget) == self && player->m_CrossHairMode == 2) {
                 return 1;
             }
         }

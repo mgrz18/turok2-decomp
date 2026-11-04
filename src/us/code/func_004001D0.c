@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -18,17 +19,6 @@ typedef struct {
     /* 0x1C */ s32 locked;
 } Cinema004001D0;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ u8 *options;
-    /* 0x520 */ u8 pad1[0xA64 - 0x520];
-    /* 0xA64 */ s32 held;
-    /* 0xA68 */ s32 pressed;
-    /* 0xA6C */ s32 released;
-    /* 0xA70 */ u8 pad2[0xB8C - 0xA70];
-    /* 0xB8C */ s32 unkB8C;
-} Player004001D0;
-
 /* Free-look camera driven by the C buttons. */
 typedef struct {
     /* 0x00 */ s32 mode;
@@ -46,12 +36,12 @@ typedef struct {
 extern Game004001D0 D_80119870;
 extern Cinema004001D0 D_8011AC88;
 extern f32 D_800B6D28;
-Player004001D0 *func_002532A8(Game004001D0 *game);
+CPlayer *func_002532A8(Game004001D0 *game);
 s32 func_00416AF8(u8 *a0);
 void func_002117DC(f32 *value, f32 target, f32 rate);
 
 void func_004001D0(Look004001D0 *look) {
-    Player004001D0 *player;
+    CPlayer *player;
     s32 held;
     GameSub004001D0 *sub = &D_80119870.sub;
 
@@ -63,16 +53,16 @@ void func_004001D0(Look004001D0 *look) {
         return;
     }
     if (look->mode == 0) {
-        if (!func_00416AF8(player->options + 0x53C) && (player->pressed & 0x20) && player->unkB8C == 0) {
+        if (!func_00416AF8(((u8 *)player->m_pCamera) + 0x53C) && (player->m_ContState.m_dwButtonsSingle & 0x20) && player->m_SniperMode == 0) {
             look->mode = 1;
         }
-    } else if (player->unkB8C != 0) {
+    } else if (player->m_SniperMode != 0) {
         look->mode = 0;
     } else if (look->mode == 1) {
-        if ((player->released & 0x20) || !(player->held & 0x20)) {
+        if ((player->m_ContState.m_dwButtonsSingleNoHold & 0x20) || !(player->m_ContState.m_dwButtons & 0x20)) {
             look->mode = 2;
         }
-    } else if (player->released & 0x20) {
+    } else if (player->m_ContState.m_dwButtonsSingleNoHold & 0x20) {
         look->mode = 0;
     }
     if (look->mode != 0 && D_8011AC88.state == 13 && D_8011AC88.locked == 0) {
@@ -83,14 +73,14 @@ void func_004001D0(Look004001D0 *look) {
         look->state = 3;
     }
     if (look->state != 0) {
-        held = player->held;
+        held = player->m_ContState.m_dwButtons;
         if (held & 0x20) {
             if (held & 0x200) {
                 look->yawTarget += D_800B6D28 * 153.59999f;
             } else if (held & 0x100) {
                 look->yawTarget -= D_800B6D28 * 153.59999f;
             }
-            held = player->held;
+            held = player->m_ContState.m_dwButtons;
             if (held & 0x800) {
                 look->pitchTarget += D_800B6D28 * 153.59999f;
             } else if (held & 0x400) {

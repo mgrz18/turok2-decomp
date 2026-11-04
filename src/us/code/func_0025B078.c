@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 /* Picks an actor's death animation from what killed it (weapon, projectile, hit direction). */
 
@@ -15,18 +16,13 @@ typedef struct {
 } DeathAnims; /* at actor def + 0x14 */
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0x996];
-    /* 0x996 */ s16 weapon;
-} WeaponPlayer;
-
-typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1;
     /* 0x002 */ u16 type;
     /* 0x004 */ u8 pad4[0xD4 - 0x4];
     /* 0x0D4 */ s32 flags;
     /* 0x0D8 */ u8 padD8[0x1A8 - 0xD8];
-    /* 0x1A8 */ WeaponPlayer *owner;
+    /* 0x1A8 */ CPlayer *owner;
 } Source;
 
 typedef struct {
@@ -85,7 +81,7 @@ s32 func_0025B078(Actor *actor, s32 unused, HitInfo *hit) {
                 }
                 break;
             case 1:
-                if ((src->flags & 0x300000) && src->owner->weapon == 1) {
+                if ((src->flags & 0x300000) && src->owner->m_Data.m_CurrentWeapon == 1) {
                     back = side = front = 1;
                 }
                 break;
