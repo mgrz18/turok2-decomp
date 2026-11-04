@@ -1,13 +1,20 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00401CC4(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 8) = 0;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, s32 *, 0x20) = 0;
-    M2C_FIELD(arg0, s32 *, 0x24) = 0;
-    M2C_FIELD(arg0, s32 *, 0x28) = 0;
-    M2C_FIELD(arg0, s32 *, 0x2C) = 0;
-    M2C_FIELD(arg0, s32 *, 0x30) = 0;
-    M2C_FIELD(arg0, s32 *, 0x34) = 0;
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ u8 padC[0x20 - 0xC];
+    /* 0x20 */ s32 unk20[6];
+} Module;
+
+void func_00401CC4(Module *arg0) {
+    arg0->unk8 = 0;
+    arg0->unk4 = 0;
+    arg0->unk20[0] = 0;
+    arg0->unk20[1] = 0;
+    arg0->unk20[2] = 0;
+    arg0->unk20[3] = 0;
+    arg0->unk20[4] = 0;
+    arg0->unk20[5] = 0;
 }

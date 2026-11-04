@@ -1,12 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-extern void *D_800B7760;
+/* *D_800B7760: keeps a free list of nodes (each starts with its next pointer) at 0x2C. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x2C];
+    /* 0x2C */ s32 *freeList;
+} NodePool;
+
+extern NodePool *D_800B7760;
 
 /* Push onto the free list at 0x2C. */
 void func_00294B84(void **arg0) {
-    void *owner = D_800B7760;
+    NodePool *owner = D_800B7760;
 
-    *arg0 = M2C_FIELD(owner, void **, 0x2C);
-    M2C_FIELD(owner, void **, 0x2C) = arg0;
+    *arg0 = owner->freeList;
+    owner->freeList = (s32 *) arg0;
 }

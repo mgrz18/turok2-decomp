@@ -1,18 +1,27 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/player.h"
+#include "structs/camera.h"
 
-M2C_UNK func_00249898(void *, void *);              /* extern */
+/* The players: the ones not in the game and the ones in it (as in
+ * func_00251FC4.c). */
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ CList m_IdleList;
+    /* 0x20 */ CList m_ActiveList;
+} CPlayerList;
 
-void func_002531D0(void *arg0, void *arg1) {
-    void *var_s0;
+void func_00249898(void *, void *);                 /* extern */
 
-    var_s0 = M2C_FIELD(arg0, void **, 0x20);
+void func_002531D0(CPlayerList *arg0, CCamera *arg1) {
+    CPlayer *var_s0;
+
+    var_s0 = arg0->m_ActiveList.m_pHead;
     if (var_s0 != NULL) {
         do {
-            if ((M2C_FIELD(var_s0, s32 *, 0x51C) == arg1) && (M2C_FIELD(arg1, s32 *, 0x24) == 0)) {
+            if ((var_s0->m_pCamera == arg1) && (arg1->m_ViewParams.m_nType == 0)) {
                 func_00249898(var_s0, arg1);
             }
-            var_s0 = M2C_FIELD(var_s0, void **, 0x1320);
+            var_s0 = var_s0->m_pNext;
         } while (var_s0 != NULL);
     }
 }

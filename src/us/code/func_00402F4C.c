@@ -1,8 +1,7 @@
 #include "common.h"
-#include "m2c_macros.h"
 #include "structs/game_object.h"
 
-M2C_UNK func_002666B0(s32, s32, M2C_UNK);           /* extern */
+s32 func_002666B0(s32, s32, s32);           /* extern */
 extern s32 D_8012F5C0;
 
 void func_00402F4C(CGameObjectInstance *arg0) {

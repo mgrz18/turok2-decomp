@@ -1,8 +1,8 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-M2C_UNK func_0042EB04(s32);                         /* extern */
+s32 func_0042EB04(s32);                         /* extern */
 
-void func_00258D6C(void *arg0) {
-    func_0042EB04(M2C_FIELD(arg0, s32 *, 0x1A8));
+void func_00258D6C(CGameObjectInstance *arg0) {
+    func_0042EB04((s32) arg0->m_AI.m_pParent);
 }

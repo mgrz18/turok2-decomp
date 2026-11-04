@@ -1,6 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_002943D0(s32 arg0, void *arg1, s16 arg2) {
-    M2C_FIELD(arg1, s16 *, 0x16) = arg2;
+/* Only the field written here. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x16];
+    /* 0x16 */ s16 unk16;
+} Voice16;
+
+void func_002943D0(s32 arg0, Voice16 *arg1, s16 arg2) {
+    arg1->unk16 = arg2;
 }

@@ -1,23 +1,29 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/camera.h"
 
-M2C_UNK CList__AddHead(s32, M2C_UNK *);              /* extern */
-M2C_UNK CList__Remove(void *, M2C_UNK *);           /* extern */
+/* The block at arg0 + 0x40 of func_002819E0: a list at 0xE28 whose elements go back to the list at arg0 + 0xF0C. */
+typedef struct {
+    /* 0x000 */ u8 pad0[0xE28];
+    /* 0xE28 */ CList m_List;
+} ListOwner;
 
-void func_00281974(s32 arg0, void *arg1) {
-    M2C_UNK *temp_s0;
-    M2C_UNK *var_s1;
+s32 CList__AddHead(s32, s32 *);              /* extern */
+s32 CList__Remove(void *, s32 *);           /* extern */
+
+void func_00281974(s32 arg0, ListOwner *arg1) {
+    s32 *temp_s0;
+    s32 *var_s1;
     void *var_a0;
 
-    var_s1 = M2C_FIELD(arg1, M2C_UNK **, 0xE2C);
+    var_s1 = arg1->m_List.m_pTail;
     if (var_s1 != NULL) {
-        var_a0 = arg1 + 0xE28;
+        var_a0 = &arg1->m_List;
         do {
             temp_s0 = *var_s1;
             CList__Remove(var_a0, var_s1);
             CList__AddHead(arg0 + 0xF0C, var_s1);
             var_s1 = temp_s0;
-            var_a0 = arg1 + 0xE28;
+            var_a0 = &arg1->m_List;
         } while (var_s1 != NULL);
     }
 }

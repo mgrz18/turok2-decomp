@@ -1,17 +1,23 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/player.h"
 
-extern M2C_UNK D_8011AB18;
+/* A menu item (MenuItem in func_00450F4C): the player whose options it shows. */
+typedef struct MenuItem {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ CPlayer *player;
+} MenuItem;
 
-M2C_UNK *func_0041BD3C(void *arg0) {
-    M2C_UNK *temp_v1_2;
-    M2C_UNK *var_v0;
-    void *temp_v1;
+extern s32 D_8011AB18;
 
-    temp_v1 = M2C_FIELD(arg0, void **, 0x1C);
+s32 *func_0041BD3C(MenuItem *arg0) {
+    s32 *temp_v1_2;
+    s32 *var_v0;
+    CPlayer *temp_v1;
+
+    temp_v1 = arg0->player;
     var_v0 = &D_8011AB18;
     if (temp_v1 != NULL) {
-        temp_v1_2 = M2C_FIELD(temp_v1, M2C_UNK **, 0x518);
+        temp_v1_2 = (s32 *) temp_v1->m_pOptions;
         if (temp_v1_2 != NULL) {
             var_v0 = temp_v1_2;
         }

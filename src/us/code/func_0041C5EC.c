@@ -1,23 +1,37 @@
 #include "common.h"
-#include "m2c_macros.h"
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x2A];
+    /* 0x2A */ u8 opt2A;
+    /* 0x2B */ s8 opt2B;
+} PlayerOptions;
+
+typedef struct {
+    /* 0x000 */ u8 pad0[0x518];
+    /* 0x518 */ PlayerOptions *options;
+} Player;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ Player *player;
+} MenuItem;
 
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
+extern PlayerOptions D_8011AB18;
 
-extern M2C_UNK D_8011AB18;
+s32 func_0041C5EC(s32 arg0, MenuItem *arg1) {
+    PlayerOptions *temp_v0_2;
+    PlayerOptions *var_s0;
+    Player *temp_v0;
 
-s32 func_0041C5EC(s32 arg0, void *arg1) {
-    M2C_UNK *temp_v0_2;
-    M2C_UNK *var_s0;
-    void *temp_v0;
-
-    temp_v0 = M2C_FIELD(arg1, void **, 0x1C);
+    temp_v0 = arg1->player;
     var_s0 = &D_8011AB18;
     if (temp_v0 != NULL) {
-        temp_v0_2 = M2C_FIELD(temp_v0, M2C_UNK **, 0x518);
+        temp_v0_2 = temp_v0->options;
         if (temp_v0_2 != NULL) {
             var_s0 = temp_v0_2;
         }
     }
-    M2C_FIELD(var_s0, u8 *, 0x2A) = func_0041648C((s32) arg1, (s32) M2C_FIELD(var_s0, u8 *, 0x2A), 8, 8, 0xF8, 0);
+    var_s0->opt2A = func_0041648C((s32) arg1, (s32) var_s0->opt2A, 8, 8, 0xF8, 0);
     return 0;
 }

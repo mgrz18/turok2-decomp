@@ -1,17 +1,27 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_0028E9E0(void *arg0, M2C_UNK *arg1) {
-    M2C_UNK *temp_v0;
+typedef struct Link {
+    /* 0x0 */ struct Link *next;
+    /* 0x4 */ struct Link *prev;
+} Link;
 
-    M2C_FIELD(arg1, M2C_UNK **, 0) = NULL;
-    M2C_FIELD(arg1, M2C_UNK **, 4) = (M2C_UNK *) M2C_FIELD(arg0, M2C_UNK **, 4);
-    temp_v0 = M2C_FIELD(arg0, M2C_UNK **, 4);
+typedef struct {
+    /* 0x0 */ Link *head;
+    /* 0x4 */ Link *tail;
+} LinkList;
+
+/* Appends arg1 to the list. */
+void func_0028E9E0(LinkList *arg0, Link *arg1) {
+    Link *temp_v0;
+
+    arg1->next = NULL;
+    arg1->prev = arg0->tail;
+    temp_v0 = arg0->tail;
     if (temp_v0 != NULL) {
-        *temp_v0 = arg1;
+        temp_v0->next = arg1;
     }
-    M2C_FIELD(arg0, M2C_UNK **, 4) = arg1;
-    if (M2C_FIELD(arg0, M2C_UNK **, 0) == NULL) {
-        M2C_FIELD(arg0, M2C_UNK **, 0) = arg1;
+    arg0->tail = arg1;
+    if (arg0->head == NULL) {
+        arg0->head = arg1;
     }
 }

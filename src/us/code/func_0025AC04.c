@@ -1,10 +1,15 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
 s32 func_00245A98(s32, s32, s32, s32);
 
-extern M2C_UNK D_800B0540;
+extern s32 D_800B0540;
 
-void func_0025AC04(void *arg0, s32 arg1) {
-    func_00245A98((s32) arg0, arg1, (s32) &D_800B0540, (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), u16 *, 0x78));
+typedef struct {
+    /* 0x00 */ u8 pad0[0x78];
+    /* 0x78 */ u16 animMask78; /* 5 bits per mode */
+} ActorDef;
+
+void func_0025AC04(CGameObjectInstance *obj, s32 arg1) {
+    func_00245A98((s32) obj, arg1, (s32) &D_800B0540, ((ActorDef *) obj->header.m_pIntelligence)->animMask78);
 }

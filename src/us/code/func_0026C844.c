@@ -1,14 +1,19 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void *func_0022425C(M2C_UNK *, s32);                /* extern */
-extern M2C_UNK D_800F7078;
+/* The region info func_0022425C returns (as in func_0023B664.c). */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x44];
+    /* 0x44 */ s32 flags;
+} RegionInfo;
+
+RegionInfo *func_0022425C(void *, s32);             /* extern */
+extern u8 D_800F7078[];
 
 void func_0026C844(s32 arg0) {
-    void *temp_v0;
+    RegionInfo *temp_v0;
 
-    temp_v0 = func_0022425C(&D_800F7078, arg0);
+    temp_v0 = func_0022425C(D_800F7078, arg0);
     if (temp_v0 != NULL) {
-        M2C_FIELD(temp_v0, s32 *, 0x44) = (s32) (M2C_FIELD(temp_v0, s32 *, 0x44) & 0xFFFBFFFF);
+        temp_v0->flags = (s32) (temp_v0->flags & 0xFFFBFFFF);
     }
 }

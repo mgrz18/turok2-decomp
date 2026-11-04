@@ -1,9 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_002245BC(M2C_UNK *, u16, u16, M2C_UNK); /* extern */
-extern M2C_UNK D_800F7078;
+/* Where an actor was placed: func_002245BC(world, level, index, 1) sets its bit
+ * in the per-level bit sections of the world. */
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ u16 actorIndex;
+    /* 0x06 */ u8 pad6[4];
+    /* 0x0A */ u16 level;
+} ActorPlacement;
 
-void func_0026488C(void *arg0) {
-    func_002245BC(&D_800F7078, M2C_FIELD(arg0, u16 *, 0xA), M2C_FIELD(arg0, u16 *, 4), 1);
+s32 func_002245BC(s32 *, u16, u16, s32); /* extern */
+extern s32 D_800F7078;
+
+void func_0026488C(ActorPlacement *arg0) {
+    func_002245BC(&D_800F7078, arg0->level, arg0->actorIndex, 1);
 }

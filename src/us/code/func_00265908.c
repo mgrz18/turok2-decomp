@@ -1,11 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_00265908(s32 arg0, void *arg1, f32 arg2) {
-    if ((arg2 == 0.0f) || (M2C_FIELD(arg1, f32 *, 0x64) < arg2)) {
-        if (M2C_FIELD(arg1, f32 *, 0x64) == 0.0f) {
-            M2C_FIELD(arg1, f32 *, 0x40) = 0.0f;
+/* Sets the condition timer to arg2 (0 always; otherwise only to raise it),
+ * restarting the mode time when the timer was 0. */
+void func_00265908(s32 arg0, CAI *arg1, f32 arg2) {
+    if ((arg2 == 0.0f) || (arg1->m_ConditionTimer < arg2)) {
+        if (arg1->m_ConditionTimer == 0.0f) {
+            arg1->m_ModeTime = 0.0f;
         }
-        M2C_FIELD(arg1, f32 *, 0x64) = arg2;
+        arg1->m_ConditionTimer = arg2;
     }
 }

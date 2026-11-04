@@ -1,12 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00271748(void *arg0, s32 arg1) {
-    f64 var_f1;
+/* The sound manager (see func_00270240): the field this sets. */
+typedef struct {
+    /* 0x0000 */ u8 pad0[0x2BA4];
+    /* 0x2BA4 */ f32 unk2BA4;
+} SndMgr;
 
-    var_f1 = (f64) arg1;
-    if (arg1 < 0) {
-        var_f1 += 4294967296.0;
-    }
-    M2C_FIELD(arg0, f32 *, 0x2BA4) = (f32) var_f1;
+void func_00271748(SndMgr *arg0, u32 arg1) {
+    arg0->unk2BA4 = arg1;
 }

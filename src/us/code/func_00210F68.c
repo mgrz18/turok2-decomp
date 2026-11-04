@@ -1,9 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_00210F68(void *arg0, void *arg1, void *arg2) {
-    M2C_FIELD(arg0, f32 *, 0) = (f32) (((M2C_FIELD(arg2, f32 *, 0xC) * M2C_FIELD(arg1, f32 *, 0)) - (M2C_FIELD(arg2, f32 *, 8) * M2C_FIELD(arg1, f32 *, 4))) + (M2C_FIELD(arg2, f32 *, 4) * M2C_FIELD(arg1, f32 *, 8)) + (M2C_FIELD(arg2, f32 *, 0) * M2C_FIELD(arg1, f32 *, 0xC)));
-    M2C_FIELD(arg0, f32 *, 4) = (f32) ((((M2C_FIELD(arg2, f32 *, 8) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg2, f32 *, 0xC) * M2C_FIELD(arg1, f32 *, 4))) - (M2C_FIELD(arg2, f32 *, 0) * M2C_FIELD(arg1, f32 *, 8))) + (M2C_FIELD(arg2, f32 *, 4) * M2C_FIELD(arg1, f32 *, 0xC)));
-    M2C_FIELD(arg0, f32 *, 8) = (f32) ((-M2C_FIELD(arg2, f32 *, 4) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg2, f32 *, 0) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg2, f32 *, 0xC) * M2C_FIELD(arg1, f32 *, 8)) + (M2C_FIELD(arg2, f32 *, 8) * M2C_FIELD(arg1, f32 *, 0xC)));
-    M2C_FIELD(arg0, f32 *, 0xC) = (f32) ((((-M2C_FIELD(arg2, f32 *, 0) * M2C_FIELD(arg1, f32 *, 0)) - (M2C_FIELD(arg2, f32 *, 4) * M2C_FIELD(arg1, f32 *, 4))) - (M2C_FIELD(arg2, f32 *, 8) * M2C_FIELD(arg1, f32 *, 8))) + (M2C_FIELD(arg2, f32 *, 0xC) * M2C_FIELD(arg1, f32 *, 0xC)));
+/* out = b * a (quaternions, x y z w). */
+void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b) {
+    out->x = (((b->w * a->x) - (b->z * a->y)) + (b->y * a->z) + (b->x * a->w));
+    out->y = ((((b->z * a->x) + (b->w * a->y)) - (b->x * a->z)) + (b->y * a->w));
+    out->z = ((-b->y * a->x) + (b->x * a->y) + (b->w * a->z) + (b->z * a->w));
+    out->w = ((((-b->x * a->x) - (b->y * a->y)) - (b->z * a->z)) + (b->w * a->w));
 }

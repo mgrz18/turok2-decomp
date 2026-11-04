@@ -1,11 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-extern M2C_UNK D_8012F9E0;
+/* Two flags at D_8012F9E0; the word 8 bytes before it is D_8012F9D8. */
+typedef struct {
+    /* 0x0 */ s8 unk0;
+    /* 0x1 */ s8 unk1;
+} BossFlags;
 
-void func_0040734C(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0xD4) = (s32) (M2C_FIELD(arg0, s32 *, 0xD4) | 0x2000);
-    M2C_FIELD(&D_8012F9E0, s8 *, 0) = 0;
-    M2C_FIELD(&D_8012F9E0, s8 *, 1) = 0;
-    M2C_FIELD(&D_8012F9E0, s32 *, -8) = 1;
+extern BossFlags D_8012F9E0;
+
+void func_0040734C(CGameObjectInstance *arg0) {
+    arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2000);
+    D_8012F9E0.unk0 = 0;
+    D_8012F9E0.unk1 = 0;
+    ((s32 *) &D_8012F9E0)[-2] = 1;
 }

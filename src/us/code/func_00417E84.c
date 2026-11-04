@@ -1,11 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-extern M2C_UNK D_8011ACB0;
+extern s32 D_8011ACB0;
 
 s32 func_00417E84(void)
 {
-  M2C_UNK *new_var;
+  s32 *new_var;
   s32 var_a0;
   var_a0 = 0;
   new_var = &D_8011ACB0;

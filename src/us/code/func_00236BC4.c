@@ -1,20 +1,29 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00233FCC(void *, M2C_UNK);             /* extern */
-M2C_UNK func_0023417C(void *);                      /* extern */
-M2C_UNK func_00234348(s32, void *, M2C_UNK);        /* extern */
-M2C_UNK func_00234928(s32, void *, M2C_UNK);        /* extern */
+/* A swoosh trail (see func_00234348 / func_0023417C). */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x34];
+    /* 0x34 */ s32 texture;            /* < 0: drawn untextured (func_00234928) */
+    /* 0x38 */ u8 pad38[0x3C - 0x38];
+    /* 0x3C */ s32 flags;
+    /* 0x40 */ u8 pad40[0x48 - 0x40];
+    /* 0x48 */ s32 nodeCount;
+} Trail;
 
-void func_00236BC4(s32 arg0, void *arg1, M2C_UNK arg2) {
-    if (M2C_FIELD(arg1, s32 *, 0x3C) & 8) {
+s32 func_00233FCC(Trail *, s32);             /* extern */
+s32 func_0023417C(Trail *);                  /* extern */
+s32 func_00234348(s32, Trail *, s32);        /* extern */
+s32 func_00234928(s32, Trail *, s32);        /* extern */
+
+void func_00236BC4(s32 arg0, Trail *arg1, s32 arg2) {
+    if (arg1->flags & 8) {
         func_0023417C(arg1);
     }
-    if (M2C_FIELD(arg1, s32 *, 0x3C) & 4) {
+    if (arg1->flags & 4) {
         func_00233FCC(arg1, arg2);
     }
-    if (M2C_FIELD(arg1, s32 *, 0x48) >= 2) {
-        if (M2C_FIELD(arg1, s32 *, 0x34) >= 0) {
+    if (arg1->nodeCount >= 2) {
+        if (arg1->texture >= 0) {
             func_00234348(arg0, arg1, arg2);
             return;
         }

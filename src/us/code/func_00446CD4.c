@@ -1,10 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s32 func_00243414(s32, s32, s32);
+s32 func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
-void func_00446CD4(s32 arg0, void *arg1) {
-    if (M2C_FIELD(arg1, s8 *, 0xC7) != 0) {
-        func_00243414(arg0, (s32) arg1, 3);
+void func_00446CD4(CGameObjectInstance *obj, CAI *ai) {
+    if (ai->m_AnimRepeatedCount != 0) {
+        func_00243414(obj, ai, 3);
     }
 }

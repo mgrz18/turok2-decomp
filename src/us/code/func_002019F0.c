@@ -1,21 +1,26 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK osRecvMesg(void *, M2C_UNK, M2C_UNK);    /* extern */
-M2C_UNK osSendMesg(void *, M2C_UNK, M2C_UNK);    /* extern */
+/* A message queue used as a recursive lock: count of holders after it. */
+typedef struct {
+    /* 0x00 */ u8 queue[0x1C];
+    /* 0x1C */ s32 count;
+} MesgLock;
+
+s32 osRecvMesg(void *, s32, s32);    /* extern */
+s32 osSendMesg(void *, s32, s32);    /* extern */
 s32 __osDisableInt();                                /* extern */
-M2C_UNK __osRestoreInt(s32);                         /* extern */
+s32 __osRestoreInt(s32);                         /* extern */
 
-void func_002019F0(void *arg0) {
+void func_002019F0(MesgLock *arg0) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v1;
     s32 temp_v1_2;
 
-    if (M2C_FIELD(arg0, s32 *, 0x1C) != 0) {
+    if (arg0->count != 0) {
         temp_a0 = __osDisableInt();
-        temp_v1 = M2C_FIELD(arg0, s32 *, 0x1C) + 1;
-        M2C_FIELD(arg0, s32 *, 0x1C) = temp_v1;
+        temp_v1 = arg0->count + 1;
+        arg0->count = temp_v1;
         if (temp_v1 != 1) {
             __osRestoreInt(temp_a0);
             osRecvMesg(arg0, 0, 1);
@@ -23,8 +28,8 @@ void func_002019F0(void *arg0) {
             __osRestoreInt(temp_a0);
         }
         temp_v0 = __osDisableInt();
-        temp_v1_2 = M2C_FIELD(arg0, s32 *, 0x1C) - 1;
-        M2C_FIELD(arg0, s32 *, 0x1C) = temp_v1_2;
+        temp_v1_2 = arg0->count - 1;
+        arg0->count = temp_v1_2;
         if (temp_v1_2 != 0) {
             __osRestoreInt(temp_v0);
             osSendMesg(arg0, 0, 1);

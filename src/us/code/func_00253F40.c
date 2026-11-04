@@ -1,17 +1,24 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/player.h"
 
-M2C_UNK func_0027588C(s32);                         /* extern */
-M2C_UNK func_00275D34(s32, void *);                 /* extern */
+/* A looping sound: only its sound handle here. */
+struct CLoopingSoundData {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ s32 m_nHandle;
+};
+
+void func_0027588C(s32);                            /* extern */
+void func_00275D34(s32, struct CLoopingSoundData *); /* extern */
 s32 func_00275F7C();                                /* extern */
 
-void func_00253F40(void *arg0) {
-    void *temp_v0;
+/* Stops the player's weapon firing looping sound. */
+void func_00253F40(CPlayer *arg0) {
+    struct CLoopingSoundData *temp_v0;
 
-    temp_v0 = M2C_FIELD(arg0, void **, 0x128C);
+    temp_v0 = arg0->m_pLoopingSound_WeaponFiring;
     if (temp_v0 != NULL) {
-        func_0027588C(M2C_FIELD(temp_v0, s32 *, 0xC));
+        func_0027588C(temp_v0->m_nHandle);
     }
-    func_00275D34(func_00275F7C(), M2C_FIELD(arg0, void **, 0x128C));
-    M2C_FIELD(arg0, void **, 0x128C) = NULL;
+    func_00275D34(func_00275F7C(), arg0->m_pLoopingSound_WeaponFiring);
+    arg0->m_pLoopingSound_WeaponFiring = NULL;
 }

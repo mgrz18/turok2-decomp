@@ -1,10 +1,15 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-/* Insert at the head of a doubly linked list: next at 0, prev at 4. */
-void func_002767F8(void **arg0, void *arg1) {
-    M2C_FIELD(arg1, void **, 0) = *arg0;
-    M2C_FIELD(arg1, void ***, 4) = arg0;
-    M2C_FIELD(*arg0, void **, 4) = arg1;
+/* A node of a doubly linked list: next at 0, prev at 4. */
+typedef struct DLNode {
+    /* 0x0 */ struct DLNode *next;
+    /* 0x4 */ void *prev;
+} DLNode;
+
+/* Insert at the head of the list *arg0. */
+void func_002767F8(DLNode **arg0, DLNode *arg1) {
+    arg1->next = *arg0;
+    arg1->prev = arg0;
+    (*arg0)->prev = arg1;
     *arg0 = arg1;
 }

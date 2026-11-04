@@ -1,11 +1,15 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00401CA8(void *arg0) {
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 state;
+} Phase;
+
+void func_00401CA8(Phase *arg0) {
     s32 temp_v0;
 
-    temp_v0 = M2C_FIELD(arg0, s32 *, 4);
+    temp_v0 = arg0->state;
     if ((temp_v0 != 0) && (temp_v0 != 3)) {
-        M2C_FIELD(arg0, s32 *, 4) = 3;
+        arg0->state = 3;
     }
 }

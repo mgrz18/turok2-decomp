@@ -1,11 +1,22 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
 s32 func_00243414(s32, s32, s32);
 
-void func_0040B59C(s32 arg0, void *arg1) {
-    M2C_FIELD(M2C_FIELD(M2C_FIELD(arg1, void **, 0x30), void **, 0xC), s8 *, 4) = 7;
-    if (M2C_FIELD(arg1, s8 *, 0xC7) != 0) {
+/* What this reads of the current mode entry (CAI::m_pModeCurrent). */
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ s8 state;
+} ModeAnim;
+
+typedef struct {
+    /* 0x0 */ u8 pad0[0xC];
+    /* 0xC */ ModeAnim *anim;
+} ModeInfo;
+
+void func_0040B59C(s32 arg0, CAI *arg1) {
+    ((ModeInfo *) arg1->m_pModeCurrent)->anim->state = 7;
+    if (arg1->m_AnimRepeatedCount != 0) {
         func_00243414(arg0, (s32) arg1, 0xB);
     }
 }

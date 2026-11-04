@@ -1,21 +1,22 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0020FF80(void *arg0, void *arg1) {
-    M2C_FIELD(arg0, f32 *, 0) = (f32) M2C_FIELD(arg1, f32 *, 0);
-    M2C_FIELD(arg0, f32 *, 4) = (f32) M2C_FIELD(arg1, f32 *, 4);
-    M2C_FIELD(arg0, f32 *, 8) = (f32) M2C_FIELD(arg1, f32 *, 8);
-    M2C_FIELD(arg0, f32 *, 0xC) = (f32) M2C_FIELD(arg1, f32 *, 0xC);
-    M2C_FIELD(arg0, f32 *, 0x10) = (f32) M2C_FIELD(arg1, f32 *, 0x10);
-    M2C_FIELD(arg0, f32 *, 0x14) = (f32) M2C_FIELD(arg1, f32 *, 0x14);
-    M2C_FIELD(arg0, f32 *, 0x18) = (f32) M2C_FIELD(arg1, f32 *, 0x18);
-    M2C_FIELD(arg0, f32 *, 0x1C) = (f32) M2C_FIELD(arg1, f32 *, 0x1C);
-    M2C_FIELD(arg0, f32 *, 0x20) = (f32) M2C_FIELD(arg1, f32 *, 0x20);
-    M2C_FIELD(arg0, f32 *, 0x24) = (f32) M2C_FIELD(arg1, f32 *, 0x24);
-    M2C_FIELD(arg0, f32 *, 0x28) = (f32) M2C_FIELD(arg1, f32 *, 0x28);
-    M2C_FIELD(arg0, f32 *, 0x2C) = (f32) M2C_FIELD(arg1, f32 *, 0x2C);
-    M2C_FIELD(arg0, f32 *, 0x30) = (f32) M2C_FIELD(arg1, f32 *, 0x30);
-    M2C_FIELD(arg0, f32 *, 0x34) = (f32) M2C_FIELD(arg1, f32 *, 0x34);
-    M2C_FIELD(arg0, f32 *, 0x38) = (f32) M2C_FIELD(arg1, f32 *, 0x38);
-    M2C_FIELD(arg0, f32 *, 0x3C) = (f32) M2C_FIELD(arg1, f32 *, 0x3C);
+/* Copies a matrix element by element. */
+void func_0020FF80(CMtxF dst, CMtxF src) {
+    dst[0][0] = (f32) src[0][0];
+    dst[0][1] = (f32) src[0][1];
+    dst[0][2] = (f32) src[0][2];
+    dst[0][3] = (f32) src[0][3];
+    dst[1][0] = (f32) src[1][0];
+    dst[1][1] = (f32) src[1][1];
+    dst[1][2] = (f32) src[1][2];
+    dst[1][3] = (f32) src[1][3];
+    dst[2][0] = (f32) src[2][0];
+    dst[2][1] = (f32) src[2][1];
+    dst[2][2] = (f32) src[2][2];
+    dst[2][3] = (f32) src[2][3];
+    dst[3][0] = (f32) src[3][0];
+    dst[3][1] = (f32) src[3][1];
+    dst[3][2] = (f32) src[3][2];
+    dst[3][3] = (f32) src[3][3];
 }

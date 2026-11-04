@@ -1,9 +1,8 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_00416454(s32, s32, s32);
 
-M2C_UNK func_00275A74();                            /* extern */
+s32 func_00275A74();                            /* extern */
 
 void func_00424A10(s32 arg0, s32 arg1, s32 arg2) {
     func_00275A74();

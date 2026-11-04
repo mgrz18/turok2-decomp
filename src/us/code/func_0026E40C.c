@@ -1,8 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_002759C4(u16);                         /* extern */
+s32 func_002759C4(u16);
 
-void func_0026E40C(void *arg0) {
-    func_002759C4(M2C_FIELD(arg0, u16 *, 6));
+/* The mode parameter this AI callback is handed: only the field it reads. */
+typedef struct AIModeParam {
+    /* 0x0 */ u8 pad0[6];
+    /* 0x6 */ u16 value;
+} AIModeParam;                         /* extern */
+
+void func_0026E40C(AIModeParam *arg0) {
+    func_002759C4(arg0->value);
 }

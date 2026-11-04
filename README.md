@@ -2,10 +2,10 @@
 
 [![status](https://img.shields.io/badge/status-matching%20decomp-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
 [![ROM](https://img.shields.io/badge/ROM-rebuilds%20byte--exact-brightgreen)](docs/MATCHING.md)
-[![total matched](https://img.shields.io/badge/total%20matched-98.74%25-brightgreen)](tools/progress.py)
-[![engine matched](https://img.shields.io/badge/engine%20matched-98.24%25-brightgreen)](tools/progress.py)
+[![total matched](https://img.shields.io/badge/total%20matched-98.96%25-brightgreen)](tools/progress.py)
+[![engine matched](https://img.shields.io/badge/engine%20matched-98.56%25-brightgreen)](tools/progress.py)
 [![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-99.97%25-brightgreen)](tools/progress.py)
-[![readable](https://img.shields.io/badge/readable%20C-88.00%25-blue)](tools/progress.py)
+[![readable](https://img.shields.io/badge/readable%20C-98.80%25-blue)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
 [![RSP ucode](https://img.shields.io/badge/RSP%20ucode-stock%20F3DEX-success)](docs/MICROCODE.md)
@@ -14,7 +14,7 @@
 
 Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0): C source that compiles back to the exact original ROM.
 
-> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 2,530 engine functions (98.24% of engine code) and 1,316 functions of the paged VM modules (99.97%), which build with the same toolchain, are matched and linked into the ROM as C so far: 98.74% of all the game's code. The VM modules' second copy (81 KB, the first copy's bytes again, which cannot be C of its own) is left out of both sides of that figure. 88.00% of the code is also *readable* C, with named fields rather than m2c's offset macros ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
+> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 2,532 engine functions (98.56% of engine code) and 1,316 functions of the paged VM modules (99.97%), which build with the same toolchain, are matched and linked into the ROM as C so far: 98.96% of all the game's code. The VM modules' second copy (81 KB, the first copy's bytes again, which cannot be C of its own) is left out of both sides of that figure. 98.80% of the code is also *readable* C, with named fields rather than m2c's offset macros ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
 >
 > A parallel native-port track recompiles the same ELF with N64Recomp; it runs clean, and the TLB is its open question.
 
@@ -122,7 +122,7 @@ decomp.
 - [x] Matched C linked into the ROM (`make verify` still passes), with a progress metric
 - [x] Fast C path: GNU as reproducing asn64 (`tools/sn_as.sh`), a full build in seconds
 - [x] Bulk matching from m2c drafts (`tools/auto_match.py`): 840 functions over three passes
-- [ ] Readability pass: name the structs behind `M2C_FIELD` accesses — started: `CGameObjectInstance`, `CPlayer`, `COverlay`, `CCamera` in `include/structs/`, offsets checked with the game's compiler (`tools/check_structs.py`)
+- [ ] Readability pass: name the structs behind `M2C_FIELD` accesses — 1,140 files named, 10 left in m2c form; `CGameObjectInstance`, `CPlayer`, `COverlay`, `CCamera` in `include/structs/` (offsets checked with `tools/check_structs.py`); next: hoist the repeated local structs ([docs/STRUCTS_TODO.md](docs/STRUCTS_TODO.md))
 - [x] Ghidra in the loop: structs, names and prototypes loaded into a Ghidra project (`tools/ghidra/`) to read systems before matching them
 - [x] Function names from the ROM's LNK records and from Turok 3's decomp (`versions/names.us.txt`, `tools/xmatch_t3.py`)
 - [ ] Hand-match the functions m2c gets close to but not exact — started with the HUD: overlay script interpreter matched ([docs/HUD.md](docs/HUD.md))

@@ -1,16 +1,35 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
+
+/* The block at 0x14 of the object definition (func_0025EFF8 hands it to func_00259E60). */
+typedef struct {
+    /* 0x00 */ s32 flags;
+    /* 0x04 */ u8 pad4[4];
+    /* 0x08 */ s32 id;
+} CIntelligenceSub;
+
+/* The object definition at header.m_pIntelligence (0x14), as the
+ * func_00245A98 callers (func_0025AC5C...), func_0025EFF8 and func_0025E888 see it. */
+struct CIntelligence {
+    /* 0x00 */ s32 type;
+    /* 0x04 */ u8 pad4[0x14 - 4];
+    /* 0x14 */ CIntelligenceSub sub;
+    /* 0x20 */ u8 pad20[0x74 - 0x20];
+    /* 0x74 */ s16 unk74;
+    /* 0x76 */ u8 pad76[2];
+    /* 0x78 */ u16 m_AnimMasks[18];
+};
 
 extern s32 func_00259E60(void *, s32, void *);
 
-s32 func_0025EFF8(void *arg0, s32 arg1) {
+s32 func_0025EFF8(CGameObjectInstance *arg0, s32 arg1) {
     u16 kind;
-    void *sub;
+    CIntelligenceSub *sub;
 
-    kind = M2C_FIELD(arg0, u16 *, 0xB8);
-    sub = M2C_FIELD(arg0, s32 *, 0x14) + 0x14;
+    kind = arg0->m_nTypeFlag;
+    sub = &arg0->header.m_pIntelligence->sub;
     if (kind == 0x1F9 || kind == 0x385) {
-        switch (M2C_FIELD(sub, s32 *, 8)) {
+        switch (sub->id) {
             case 0x2B16:
             case 0x2B20:
             case 0x2B2A:
@@ -21,5 +40,5 @@ s32 func_0025EFF8(void *arg0, s32 arg1) {
                 return func_00259E60(arg0, arg1, sub);
         }
     }
-    return M2C_FIELD(sub, s32 *, 8);
+    return sub->id;
 }

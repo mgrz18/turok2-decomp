@@ -1,27 +1,27 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/camera.h"
 
-void CList__Remove(void *arg0, s32 arg1) {
+void CList__Remove(CList *arg0, s32 arg1) {
     s32 temp_a2;
     s32 temp_a2_2;
     s32 temp_v0;
     s32 temp_v0_2;
 
-    temp_a2 = *(s32 *)(arg1 + M2C_FIELD(arg0, s32 *, 8));
+    temp_a2 = *(s32 *)(arg1 + arg0->m_LastOffset);
     if (temp_a2 != 0) {
-        temp_v0 = M2C_FIELD(arg0, s32 *, 0xC);
+        temp_v0 = arg0->m_NextOffset;
         *(s32 *)(temp_a2 + temp_v0) = *(s32 *)(arg1 + temp_v0);
     }
-    temp_a2_2 = *(s32 *)(arg1 + M2C_FIELD(arg0, s32 *, 0xC));
+    temp_a2_2 = *(s32 *)(arg1 + arg0->m_NextOffset);
     if (temp_a2_2 != 0) {
-        temp_v0_2 = M2C_FIELD(arg0, s32 *, 8);
+        temp_v0_2 = arg0->m_LastOffset;
         *(s32 *)(temp_a2_2 + temp_v0_2) = *(s32 *)(arg1 + temp_v0_2);
     }
-    if (M2C_FIELD(arg0, s32 *, 0) == arg1) {
-        M2C_FIELD(arg0, s32 *, 0) = (s32) *(s32 *)(arg1 + M2C_FIELD(arg0, s32 *, 0xC));
+    if ((s32) arg0->m_pHead == arg1) {
+        arg0->m_pHead = (void *) *(s32 *)(arg1 + arg0->m_NextOffset);
     }
-    if (M2C_FIELD(arg0, s32 *, 4) == arg1) {
-        M2C_FIELD(arg0, s32 *, 4) = (s32) *(s32 *)(arg1 + M2C_FIELD(arg0, s32 *, 8));
+    if ((s32) arg0->m_pTail == arg1) {
+        arg0->m_pTail = (void *) *(s32 *)(arg1 + arg0->m_LastOffset);
     }
-    M2C_FIELD(arg0, s32 *, 0x10) = (s32) (M2C_FIELD(arg0, s32 *, 0x10) - 1);
+    arg0->m_nCount = arg0->m_nCount - 1;
 }

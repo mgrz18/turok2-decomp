@@ -1,8 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0020FAFC(void *arg0, void *arg1, void *arg2) {
-    M2C_FIELD(arg2, f32 *, 0) = (f32) ((M2C_FIELD(arg0, f32 *, 0) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x10) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x20) * M2C_FIELD(arg1, f32 *, 8)));
-    M2C_FIELD(arg2, f32 *, 4) = (f32) ((M2C_FIELD(arg0, f32 *, 4) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x14) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x24) * M2C_FIELD(arg1, f32 *, 8)));
-    M2C_FIELD(arg2, f32 *, 8) = (f32) ((M2C_FIELD(arg0, f32 *, 8) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x18) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x28) * M2C_FIELD(arg1, f32 *, 8)));
+/* arg2 = arg1 rotated by the transpose of arg0's 3x3 part. */
+void func_0020FAFC(CMtxF arg0, CVector3 *arg1, CVector3 *arg2) {
+    arg2->x = (f32) ((arg0[0][0] * arg1->x) + (arg0[1][0] * arg1->y) + (arg0[2][0] * arg1->z));
+    arg2->y = (f32) ((arg0[0][1] * arg1->x) + (arg0[1][1] * arg1->y) + (arg0[2][1] * arg1->z));
+    arg2->z = (f32) ((arg0[0][2] * arg1->x) + (arg0[1][2] * arg1->y) + (arg0[2][2] * arg1->z));
 }

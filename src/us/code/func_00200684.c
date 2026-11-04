@@ -1,32 +1,33 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/camera.h"
 
-void func_00200684(void *arg0, s32 arg1, s32 arg2) {
+/* CList: insert arg2 after arg1, or at the tail when arg1 has no next. */
+void func_00200684(CList *arg0, s32 arg1, s32 arg2) {
     s32 temp_v0;
     s32 temp_v1;
     s32 temp_v1_2;
     s32 var_v0;
 
-    temp_v1 = *(s32 *)(arg1 + M2C_FIELD(arg0, s32 *, 0xC));
+    temp_v1 = *(s32 *)(arg1 + arg0->m_NextOffset);
     if (temp_v1 != 0) {
-        *(s32 *)(temp_v1 + M2C_FIELD(arg0, s32 *, 8)) = arg2;
-        temp_v0 = M2C_FIELD(arg0, s32 *, 0xC);
+        *(s32 *)(temp_v1 + arg0->m_LastOffset) = arg2;
+        temp_v0 = arg0->m_NextOffset;
         *(s32 *)(arg2 + temp_v0) = *(s32 *)(arg1 + temp_v0);
-        *(s32 *)(arg1 + M2C_FIELD(arg0, s32 *, 0xC)) = arg2;
-        *(s32 *)(arg2 + M2C_FIELD(arg0, s32 *, 8)) = arg1;
-        var_v0 = M2C_FIELD(arg0, s32 *, 0x10) + 1;
+        *(s32 *)(arg1 + arg0->m_NextOffset) = arg2;
+        *(s32 *)(arg2 + arg0->m_LastOffset) = arg1;
+        var_v0 = arg0->m_nCount + 1;
     } else {
-        temp_v1_2 = M2C_FIELD(arg0, s32 *, 4);
+        temp_v1_2 = (s32) arg0->m_pTail;
         if (temp_v1_2 != 0) {
-            *(s32 *)(arg2 + M2C_FIELD(arg0, s32 *, 8)) = temp_v1_2;
-            *(s32 *)(M2C_FIELD(arg0, s32 *, 4) + M2C_FIELD(arg0, s32 *, 0xC)) = arg2;
+            *(s32 *)(arg2 + arg0->m_LastOffset) = temp_v1_2;
+            *(s32 *)((s32) arg0->m_pTail + arg0->m_NextOffset) = arg2;
         } else {
-            *(s32 *)(arg2 + M2C_FIELD(arg0, s32 *, 8)) = 0;
-            M2C_FIELD(arg0, s32 *, 0) = arg2;
+            *(s32 *)(arg2 + arg0->m_LastOffset) = 0;
+            arg0->m_pHead = (void *) arg2;
         }
-        *(s32 *)(arg2 + M2C_FIELD(arg0, s32 *, 0xC)) = 0;
-        M2C_FIELD(arg0, s32 *, 4) = arg2;
-        var_v0 = M2C_FIELD(arg0, s32 *, 0x10) + 1;
+        *(s32 *)(arg2 + arg0->m_NextOffset) = 0;
+        arg0->m_pTail = (void *) arg2;
+        var_v0 = arg0->m_nCount + 1;
     }
-    M2C_FIELD(arg0, s32 *, 0x10) = var_v0;
+    arg0->m_nCount = var_v0;
 }

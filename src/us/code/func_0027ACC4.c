@@ -1,10 +1,20 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_0027ACC4(void *arg0, s16 arg1, s16 arg2) {
-    M2C_FIELD(arg0, s32 *, 0x38) = -1;
-    M2C_FIELD(arg0, f32 *, 0x10) = arg1;
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    M2C_FIELD(arg0, s32 *, 8) = 0;
-    M2C_FIELD(arg0, f32 *, 0x14) = arg2;
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ u8 pad4[4];
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ u8 padC[4];
+    /* 0x10 */ f32 x;
+    /* 0x14 */ f32 y;
+    /* 0x18 */ u8 pad18[0x38 - 0x18];
+    /* 0x38 */ s32 index;
+} Cursor;
+
+void func_0027ACC4(Cursor *arg0, s16 arg1, s16 arg2) {
+    arg0->index = -1;
+    arg0->x = arg1;
+    arg0->unk0 = 0;
+    arg0->unk8 = 0;
+    arg0->y = arg2;
 }

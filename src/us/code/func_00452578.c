@@ -1,14 +1,18 @@
 #include "common.h"
-#include "m2c_macros.h"
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ s32 unk1C;
+    /* 0x20 */ s32 unk20;
+} MenuCaller;
 
 s32 func_00416644(s32, s32, s32, s32, s32);
+s32 func_00421170();                            /* extern */
+extern s32 D_0043B610;
+extern s32 D_80119E2C;
 
-M2C_UNK func_00421170();                            /* extern */
-extern M2C_UNK D_0043B610;
-extern M2C_UNK D_80119E2C;
-
-s32 func_00452578(s32 arg0, void *arg1) {
+s32 func_00452578(s32 arg0, MenuCaller *arg1) {
     func_00421170();
-    func_00416644((s32) &D_80119E2C, (s32) &D_0043B610, M2C_FIELD(arg1, s32 *, 0x1C), M2C_FIELD(arg1, s32 *, 0x20), 0);
+    func_00416644((s32) &D_80119E2C, (s32) &D_0043B610, arg1->unk1C, arg1->unk20, 0);
     return 1;
 }

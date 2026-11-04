@@ -1,11 +1,22 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/camera.h"
 
-M2C_UNK CList__AddHead(s32, void *);                 /* extern */
-M2C_UNK CList__Remove();                            /* extern */
+/* An element going back on its owner's list at 0x14. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x16];
+    /* 0x16 */ s16 unk16;
+} ListNode;
 
-void func_00228B4C(s32 arg0, void *arg1) {
-    M2C_FIELD(arg1, s16 *, 0x16) = 0;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x14];
+    /* 0x14 */ CList m_List;
+} ListOwner;
+
+void CList__AddHead(CList *, void *);               /* extern */
+void CList__Remove();                               /* extern */
+
+void func_00228B4C(ListOwner *arg0, ListNode *arg1) {
+    arg1->unk16 = 0;
     CList__Remove();
-    CList__AddHead(arg0 + 0x14, arg1);
+    CList__AddHead(&arg0->m_List, arg1);
 }

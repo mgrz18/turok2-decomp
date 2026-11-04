@@ -1,12 +1,20 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00205A2C(M2C_UNK, s32);                /* extern */
+/* What this reads. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x80];
+    /* 0x80 */ s32 unk80;
+    /* 0x84 */ u8 pad84[4];
+    /* 0x88 */ u16 flags;
+    /* 0x8A */ u8 frame;            /* compared with D_800B6D1B */
+} Drawable;
+
+void func_00205A2C(s32, s32);                       /* extern */
 extern s32 D_800ACAD8;
 extern u8 D_800B6D1B;
 
-void func_00214E88(void *arg0) {
-    if (!(M2C_FIELD(arg0, u16 *, 0x88) & 0x40) && (M2C_FIELD(arg0, u8 *, 0x8A) != D_800B6D1B)) {
-        func_00205A2C(0, M2C_FIELD(arg0, s32 *, 0x80) | D_800ACAD8);
+void func_00214E88(Drawable *arg0) {
+    if (!(arg0->flags & 0x40) && (arg0->frame != D_800B6D1B)) {
+        func_00205A2C(0, arg0->unk80 | D_800ACAD8);
     }
 }

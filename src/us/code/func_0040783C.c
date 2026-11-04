@@ -1,9 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0040783C(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x18) = 0;
-    M2C_FIELD(arg0, s32 *, 0x1C) = 0;
-    M2C_FIELD(arg0, s32 *, 0x20) = 0;
-    M2C_FIELD(arg0, s32 *, 0xD4) = (s32) (M2C_FIELD(arg0, s32 *, 0xD4) | 0x2000);
+void func_0040783C(CGameObjectInstance *obj) {
+    obj->m_vVelocity.x = 0.0f;
+    obj->m_vVelocity.y = 0.0f;
+    obj->m_vVelocity.z = 0.0f;
+    obj->m_dwFlags = (s32) (obj->m_dwFlags | 0x2000);
 }

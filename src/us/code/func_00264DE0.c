@@ -1,8 +1,8 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_00264DE0(void *arg0, void *arg1) {
-    M2C_FIELD(arg1, s32 *, 0x64) = 0;
-    M2C_FIELD(arg0, s32 *, 0x18) = 0;
-    M2C_FIELD(arg0, s32 *, 0x20) = 0;
+void func_00264DE0(CGameObjectInstance *obj, CAI *ai) {
+    ai->m_ConditionTimer = 0.0f;
+    obj->m_vVelocity.x = 0.0f;
+    obj->m_vVelocity.z = 0.0f;
 }

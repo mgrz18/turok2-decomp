@@ -385,8 +385,8 @@ From the sixth hand-matching batch:
   `versions/cuts.us.txt` (and, at a segment's end, the next subsegment
   moved: func_00469374 ran 0x1C bytes into what the yaml called
   virtual_rodata_1). match_func also masks the targets of local `j`s, so
-  a `j` that lands on the wrong block (func_0026C148, where GCC did not
-  thread an inline's NULL return to the epilogue) shows only at
+  a `j` that lands on the wrong block (func_0026C148's first draft, where
+  GCC did not thread an inline's NULL return to the epilogue) shows only at
   `make verify`.
 
 ### One file with its neighbour
@@ -575,10 +575,11 @@ func_0024ED54, func_00255D70, func_00424008):
   arguments as doubles, so it declares them with the later parts' `Mtx44 *`
   prototypes, and its own types are `Mtx`-prefixed.
 
-Still not matching: func_0027E000 (54 of 476 words, a sched1 tie: ulx's HI
-move, with no birth boost since the clamp assigns ulx twice, and the
+Left after the F pass: func_0027E000 (54 of 476 words, a sched1 tie: ulx's
+HI move, with no birth boost since the clamp assigns ulx twice, and the
 m_PixelXScale store are both priority 3, and the store wins on potential
-hazard), func_00246BC0 (6 of 330) and func_0026C148 (1 of 62).
+hazard), func_00246BC0 (6 of 330) and func_0026C148 (1 of 62). The first and
+the last matched in the G pass (below).
 
 **Where the FAKEMATCH functions are.** Matches that rely on something the
 original source surely did not have (a `register ... asm` pin, an
@@ -588,6 +589,56 @@ on the first line or at the trick. 22 files in `src/` have one
 doubled code, always-true tests), func_00409A64.c for func_00409D4C, and this pass's
 func_00204778, func_0022D2FC, func_002429BC and func_00424008. They match
 byte for byte; the marker is for whoever looks for the original source.
+
+### The G pass (the last drafts)
+
+Two of the three drafts left in `nonmatching/` matched:
+
+- **An inline setter, then re-read the field.** func_0027E000 (CCamera
+  DisplayListSetup) stood at 54 of 476 words on a sched1 tie. Written as
+  the source likely had it, a `SetPixelScale(cam, cam->m_WarpXScale,
+  cam->m_WarpYScale)` inline that stores both scales, with the function then
+  reading `cam->m_PixelXScale`/`m_PixelYScale` back, reload_cse turns the
+  read into the ROM's `mov.s` and the tie goes away. Its `.rodata` starts at
+  0x800A99E4, 4 past an 8-byte boundary, after a 5.0f that is
+  func_0027D160's: it went into func_0027D160's file (one object, one pool;
+  "One file with its neighbour").
+- **One shared `fail:` label instead of several `return 0`.** func_0026C148
+  had its failure returns cross-jumped after reload into the last one, so a
+  `j` landed on the wrong block. With the first `return 0` under a label
+  and the later failures `goto fail`, the ROM's single `v0 = 0; j epilogue`
+  block sits right after the region test. match_func masks `j` targets, so
+  the target (0x8026C224, the epilogue) was checked in the linked ROM.
+
+Only func_00246BC0 (6 of 330 words) is left in `nonmatching/`.
+
+### The readability pass
+
+1,140 matched files of `src/us/code/` still reached fields through m2c's
+offset macros (`M2C_FIELD`, `M2C_UNK`, `M2C_BITWISE`...). They were
+rewritten with named struct fields, each checked with `tools/match_func.py`
+(every function MATCH, no `M2C_` outside comments) and then all linked at
+once: the clean build verified on the first try, func_0044C230 (the second
+VM module copy, which match_func cannot check) included. Readable C went
+from 88.2% to 98.8% of the code; matched bytes did not move. Where no header
+fit, files got local structs: docs/STRUCTS_TODO.md lists them, and the
+player.h offsets that need fixing before they can be hoisted. What the
+rewrite taught about the compiler:
+
+- **A struct store can move past a global load.** GCC 2.8's alias
+  heuristic (MEM_IN_STRUCT against a scalar) lets the scheduler reorder a
+  store through a struct field against a load of a global, where the
+  m2c macro's store stayed in place. Storing through a local pointer to the
+  field (`s32 *f = &p->field; *f = v;`) restores the ROM's order.
+- **An extern's type is part of the address computation.** Declaring a
+  global under another type (a struct instead of an array, or the reverse)
+  can change how its address and offsets are computed, so keep the
+  declaration the matched file had and name the fields around it.
+- **Negative offsets stay as they are.** A field read below a symbol keeps
+  `(&sym)[-1]` or a documented macro on the symbol the matched file used,
+  rather than switching to the neighbouring symbol.
+- **A `CVector3` passed by value** gives the same three `lw a1-a3` as the
+  three floats m2c passed as words, so the by-value prototype can be used.
 
 ## The fast assembler
 

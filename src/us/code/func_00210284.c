@@ -1,8 +1,8 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00210284(void *arg0, f32 arg1, f32 arg2, f32 arg3) {
-    M2C_FIELD(arg0, f32 *, 0x30) = (f32) (M2C_FIELD(arg0, f32 *, 0x30) + ((arg1 * M2C_FIELD(arg0, f32 *, 0)) + (arg2 * M2C_FIELD(arg0, f32 *, 0x10)) + (arg3 * M2C_FIELD(arg0, f32 *, 0x20))));
-    M2C_FIELD(arg0, f32 *, 0x34) = (f32) (M2C_FIELD(arg0, f32 *, 0x34) + ((arg1 * M2C_FIELD(arg0, f32 *, 4)) + (arg2 * M2C_FIELD(arg0, f32 *, 0x14)) + (arg3 * M2C_FIELD(arg0, f32 *, 0x24))));
-    M2C_FIELD(arg0, f32 *, 0x38) = (f32) (M2C_FIELD(arg0, f32 *, 0x38) + ((arg1 * M2C_FIELD(arg0, f32 *, 8)) + (arg2 * M2C_FIELD(arg0, f32 *, 0x18)) + (arg3 * M2C_FIELD(arg0, f32 *, 0x28))));
+/* Translates the matrix by (arg1, arg2, arg3) in its own axes. */
+void func_00210284(f32 (*arg0)[4], f32 arg1, f32 arg2, f32 arg3) {
+    arg0[3][0] = (arg0[3][0] + ((arg1 * arg0[0][0]) + (arg2 * arg0[1][0]) + (arg3 * arg0[2][0])));
+    arg0[3][1] = (arg0[3][1] + ((arg1 * arg0[0][1]) + (arg2 * arg0[1][1]) + (arg3 * arg0[2][1])));
+    arg0[3][2] = (arg0[3][2] + ((arg1 * arg0[0][2]) + (arg2 * arg0[1][2]) + (arg3 * arg0[2][2])));
 }

@@ -9,20 +9,15 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-typedef s32 M2C_UNK;
-typedef s8 M2C_UNK8;
-typedef s16 M2C_UNK16;
-typedef s32 M2C_UNK32;
-typedef s64 M2C_UNK64;
 s32 func_002031E8(s32, s32);
 s32 func_002063B4(s32, s32, s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
-M2C_UNK func_002062F8(M2C_UNK, s32);
-M2C_UNK func_00206498(M2C_UNK, s32);
-extern M2C_UNK D_800D8DB0;
+s32 func_002062F8(s32, s32);
+s32 func_00206498(s32, s32);
+extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 s32 func_00205D7C(s32 arg0, void *arg1, s32 arg2)
 {

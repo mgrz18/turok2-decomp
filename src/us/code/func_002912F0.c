@@ -1,16 +1,23 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_002912F0(void *arg0, s32 arg1, s32 arg2) {
+/* A bump allocator over a buffer. */
+typedef struct {
+    /* 0x0 */ s32 base;             /* 16-byte aligned */
+    /* 0x4 */ s32 cur;
+    /* 0x8 */ s32 size;
+    /* 0xC */ s32 count;
+} Arena;
+
+void func_002912F0(Arena *arg0, s32 arg1, s32 arg2) {
     s32 temp_v1;
 
     temp_v1 = 0x10 - (arg1 & 0xF);
     if (temp_v1 != 0x10) {
-        M2C_FIELD(arg0, s32 *, 0) = (s32) (arg1 + temp_v1);
+        arg0->base = (s32) (arg1 + temp_v1);
     } else {
-        M2C_FIELD(arg0, s32 *, 0) = arg1;
+        arg0->base = arg1;
     }
-    M2C_FIELD(arg0, s32 *, 8) = arg2;
-    M2C_FIELD(arg0, s32 *, 0xC) = 0;
-    M2C_FIELD(arg0, s32 *, 4) = (s32) M2C_FIELD(arg0, s32 *, 0);
+    arg0->size = arg2;
+    arg0->count = 0;
+    arg0->cur = (s32) arg0->base;
 }

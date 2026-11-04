@@ -1,11 +1,16 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-s32 func_00226D0C(void *arg0, void *arg1) {
+typedef struct {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ f32 key;
+} SortEntry;
+
+/* Sort callback: -1 when arg0's key is the lower, else 1. */
+s32 func_00226D0C(SortEntry *arg0, SortEntry *arg1) {
     s32 var_v0;
 
     var_v0 = 1;
-    if (M2C_FIELD(arg0, f32 *, 4) < M2C_FIELD(arg1, f32 *, 4)) {
+    if (arg0->key < arg1->key) {
         var_v0 = -1;
     }
     return var_v0;

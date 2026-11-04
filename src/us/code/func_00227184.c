@@ -9,12 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-typedef s32 M2C_UNK;
-typedef s8 M2C_UNK8;
-typedef s16 M2C_UNK16;
-typedef s32 M2C_UNK32;
-typedef s64 M2C_UNK64;
-void func_00227184(u32 arg0, u32 arg1, s32 arg2, s32 (*arg3)(u32, u32), M2C_UNK (*arg4)(u32, u32))
+void func_00227184(u32 arg0, u32 arg1, s32 arg2, s32 (*arg3)(u32, u32), s32 (*arg4)(u32, u32))
 {
   u32 var_a0;
   u32 var_s0;

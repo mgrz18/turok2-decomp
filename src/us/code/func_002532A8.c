@@ -1,6 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/player.h"
 
-s32 func_002532A8(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0x20);
+typedef struct {
+    /* 0x00 */ u8 pad0[0x20];
+    /* 0x20 */ CPlayer *head;
+} PlayerList;
+
+s32 func_002532A8(PlayerList *arg0) {
+    return (s32) arg0->head;
 }

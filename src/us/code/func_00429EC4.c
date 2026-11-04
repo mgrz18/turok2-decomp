@@ -1,4 +1,3 @@
-
 typedef signed char s8;
 typedef unsigned char u8;
 typedef signed short s16;
@@ -9,13 +8,19 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-typedef s32 M2C_UNK;
-typedef s8 M2C_UNK8;
-typedef s16 M2C_UNK16;
-typedef s32 M2C_UNK32;
-typedef s64 M2C_UNK64;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ u8 padC[0x65 - 0xC];
+    /* 0x65 */ u8 fill;
+} Arg0;
+
 s32 func_00299A40(s32, s32, s32, s32, s32);
-void func_00429EC4(void *arg0)
+
+/* Writes 0x20 bytes of the fill value at offset 0x400. */
+void func_00429EC4(Arg0 *arg0)
 {
   u8 sp18[0x20];
   s32 var_a0;
@@ -26,8 +31,8 @@ void func_00429EC4(void *arg0)
   {
     var_v1 = &sp18[var_a0];
     var_a0 += 1;
-    *var_v1 = *((u8 *) (((s8 *) arg0) + 0x65));
+    *var_v1 = arg0->fill;
   }
   while (var_a0 < 0x20);
-  func_00299A40(*((s32 *) (((s8 *) arg0) + 4)), *((s32 *) (((s8 *) arg0) + 8)), 0x400, (s32) sp18, 0);
+  func_00299A40(arg0->unk4, arg0->unk8, 0x400, (s32) sp18, 0);
 }

@@ -1,8 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00275950(u16);                         /* extern */
+/* A key event fired by an animation or a script: its handler gets (object, AI, event). */
+typedef struct CKeyEvent {
+    /* 0x00 */ u8 pad0[6];
+    /* 0x06 */ u16 param; /* sound id, ... */
+} CKeyEvent;
 
-void func_0026E46C(void *arg0) {
-    func_00275950(M2C_FIELD(arg0, u16 *, 6));
+s32 func_00275950(u16);                         /* extern */
+
+void func_0026E46C(CKeyEvent *arg0) {
+    func_00275950(arg0->param);
 }

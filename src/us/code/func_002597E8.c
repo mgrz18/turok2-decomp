@@ -1,20 +1,26 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-M2C_UNK func_00253DE0(void *, M2C_UNK);             /* extern */
-M2C_UNK func_0027588C(M2C_UNK);                     /* extern */
+/* The parent of the object: a player, with a word at 0x1288 (0 lets func_00253DE0 run). */
+typedef struct {
+    /* 0x0000 */ u8 pad0[0x1288];
+    /* 0x1288 */ s32 unk1288;
+} Player;
+
+s32 func_00253DE0(void *, s32);             /* extern */
+s32 func_0027588C(s32);                     /* extern */
 extern s32 D_800B6D20;
 
-void func_002597E8(void *arg0, void *arg1) {
-    void *temp_a0;
+void func_002597E8(CGameObjectInstance *arg0, CAI *arg1) {
+    Player *temp_a0;
 
-    temp_a0 = M2C_FIELD(arg0, void **, 0x1A8);
-    if (M2C_FIELD(temp_a0, s32 *, 0x1288) == 0) {
-        if (M2C_FIELD(arg1, s8 *, 0x34) != 1) {
+    temp_a0 = (Player *) arg0->m_AI.m_pParent;
+    if (temp_a0->unk1288 == 0) {
+        if (arg1->m_Mode != 1) {
             func_00253DE0(temp_a0, 0x1A8);
         }
     }
-    if ((M2C_FIELD(arg1, s8 *, 0x34) != 4) && (D_800B6D20 & 1)) {
+    if ((arg1->m_Mode != 4) && (D_800B6D20 & 1)) {
         func_0027588C(0x1A9);
     }
 }

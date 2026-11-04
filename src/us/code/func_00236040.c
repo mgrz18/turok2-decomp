@@ -1,11 +1,23 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_0026D288(s32, void *);                 /* extern */
-M2C_UNK func_0026D2D0(void *, void *);              /* extern */
+/* Only what this reads and writes of its two arguments. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x40];
+    /* 0x40 */ u8 list[0xC];        /* handed to func_0026D2D0 */
+    /* 0x4C */ f32 total;
+} Group;
 
-void func_00236040(s32 arg0, void *arg1, void *arg2) {
-    M2C_FIELD(arg1, f32 *, 0x4C) = (f32) (M2C_FIELD(arg1, f32 *, 0x4C) - M2C_FIELD(arg2, f32 *, 0xAC));
-    func_0026D2D0(arg1 + 0x40, arg2);
+typedef struct {
+    /* 0x00 */ u8 pad0[0xAC];
+    /* 0xAC */ f32 amount;
+} Member;
+
+void func_0026D288(s32, Member *);                  /* extern */
+void func_0026D2D0(void *, Member *);               /* extern */
+
+/* Takes arg2 out of group arg1 (and its amount out of the group's total). */
+void func_00236040(s32 arg0, Group *arg1, Member *arg2) {
+    arg1->total = (f32) (arg1->total - arg2->amount);
+    func_0026D2D0(arg1->list, arg2);
     func_0026D288(arg0 + 0x6A88, arg2);
 }

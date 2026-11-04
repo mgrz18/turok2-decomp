@@ -1,14 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00202EEC(M2C_UNK);                     /* extern */
-M2C_UNK func_00203330(M2C_UNK, M2C_UNK);            /* extern */
-s32 func_00206380(M2C_UNK, M2C_UNK, M2C_UNK);       /* extern */
-M2C_UNK osRecvMesg(M2C_UNK *, M2C_UNK, M2C_UNK); /* extern */
-M2C_UNK osSendMesg(M2C_UNK *, M2C_UNK, M2C_UNK); /* extern */
+s32 func_00202EEC(s32);                     /* extern */
+s32 func_00203330(s32, s32);            /* extern */
+s32 func_00206380(s32, s32, s32);       /* extern */
+s32 osRecvMesg(s32 *, s32, s32); /* extern */
+s32 osSendMesg(s32 *, s32, s32); /* extern */
 s32 __osDisableInt();                                /* extern */
-M2C_UNK __osRestoreInt(s32);                         /* extern */
-extern M2C_UNK D_800D8DB0;
+s32 __osRestoreInt(s32);                         /* extern */
+extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
 void func_002053A8(void) {

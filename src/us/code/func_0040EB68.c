@@ -1,11 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_00248BA8(s32, s32, s32, s32);
 
-void *func_002532A8(M2C_UNK *);                     /* extern */
+void *func_002532A8(s32 *);                     /* extern */
 extern f32 D_800C093C;
-extern M2C_UNK D_80119870;
+extern s32 D_80119870;
 
 void func_0040EB68(void **arg0)
 {

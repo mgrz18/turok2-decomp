@@ -1,7 +1,6 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-extern M2C_UNK D_8011AB8B;
+extern s32 D_8011AB8B;
 
 s32 func_00418108(void *arg0, void *arg1)
 {

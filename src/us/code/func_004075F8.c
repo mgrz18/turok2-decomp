@@ -1,11 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 extern f32 D_800C051C;
 extern f32 D_800C0520;
 extern f32 D_800C0524;
 extern f32 D_800C0528;
-extern M2C_UNK D_8012F9DC;
+extern s32 D_8012F9DC;
 
 void func_004075F8(void *arg0)
 {

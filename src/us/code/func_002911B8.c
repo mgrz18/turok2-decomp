@@ -1,10 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_002933E0(s32, s32);
 s32 osSetIntMask(s32);
 
-M2C_UNK func_002933B0(void *);                      /* extern */
+s32 func_002933B0(void *);                      /* extern */
 
 void func_002911B8(void *arg0, s16 arg1)
 {

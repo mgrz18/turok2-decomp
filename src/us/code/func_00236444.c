@@ -1,17 +1,26 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-s32 func_0026D3BC(s32);
+/* What this fills in on the element func_0026D3BC hands out. */
+typedef struct {
+    /* 0x00 */ u8 pad0[8];
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ f32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ s32 unk18;
+} Slot;
+
+Slot *func_0026D3BC(s32);
 
 void func_00236444(s32 arg0, s32 arg1, s32 arg2, s32 arg3, f32 arg4) {
-    s32 temp_v0;
+    Slot *temp_v0;
 
     temp_v0 = func_0026D3BC(arg0 + 0x7580);
     if (temp_v0 != 0) {
-        M2C_FIELD(temp_v0, s32 *, 0x18) = arg1;
-        M2C_FIELD(temp_v0, s32 *, 0x14) = arg2;
-        M2C_FIELD(temp_v0, s32 *, 8) = 0;
-        M2C_FIELD(temp_v0, f32 *, 0xC) = arg4;
-        M2C_FIELD(temp_v0, s32 *, 0x10) = arg3;
+        temp_v0->unk18 = arg1;
+        temp_v0->unk14 = arg2;
+        temp_v0->unk8 = 0;
+        temp_v0->unkC = arg4;
+        temp_v0->unk10 = arg3;
     }
 }

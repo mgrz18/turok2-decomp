@@ -1,6 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s16 func_0025FDE8(void *arg0) {
-    return M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), s16 *, 0x70);
+typedef struct {
+    /* 0x00 */ u8 pad0[0x70];
+    /* 0x70 */ s16 unk70;
+} ActorDef;
+
+s16 func_0025FDE8(CGameObjectInstance *obj) {
+    return ((ActorDef *) obj->header.m_pIntelligence)->unk70;
 }

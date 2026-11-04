@@ -1,18 +1,18 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0020F9D4(void *arg0, void *arg1, void *arg2) {
+void func_0020F9D4(CMtxF mf, CVector3 *in, CVector3 *out) {
     f32 temp_f1;
     f32 temp_f2;
 
-    M2C_FIELD(arg2, f32 *, 0) = (f32) ((M2C_FIELD(arg0, f32 *, 0) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x10) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x20) * M2C_FIELD(arg1, f32 *, 8)) + M2C_FIELD(arg0, f32 *, 0x30));
-    M2C_FIELD(arg2, f32 *, 4) = (f32) ((M2C_FIELD(arg0, f32 *, 4) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x14) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x24) * M2C_FIELD(arg1, f32 *, 8)) + M2C_FIELD(arg0, f32 *, 0x34));
-    M2C_FIELD(arg2, f32 *, 8) = (f32) ((M2C_FIELD(arg0, f32 *, 8) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x18) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x28) * M2C_FIELD(arg1, f32 *, 8)) + M2C_FIELD(arg0, f32 *, 0x38));
-    temp_f2 = (M2C_FIELD(arg0, f32 *, 0xC) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x1C) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x2C) * M2C_FIELD(arg1, f32 *, 8)) + M2C_FIELD(arg0, f32 *, 0x3C);
+    out->x = (f32) ((mf[0][0] * in->x) + (mf[1][0] * in->y) + (mf[2][0] * in->z) + mf[3][0]);
+    out->y = (f32) ((mf[0][1] * in->x) + (mf[1][1] * in->y) + (mf[2][1] * in->z) + mf[3][1]);
+    out->z = (f32) ((mf[0][2] * in->x) + (mf[1][2] * in->y) + (mf[2][2] * in->z) + mf[3][2]);
+    temp_f2 = (mf[0][3] * in->x) + (mf[1][3] * in->y) + (mf[2][3] * in->z) + mf[3][3];
     if (temp_f2 != 0.0f) {
         temp_f1 = 1.0f / temp_f2;
-        M2C_FIELD(arg2, f32 *, 0) = (f32) (M2C_FIELD(arg2, f32 *, 0) * temp_f1);
-        M2C_FIELD(arg2, f32 *, 4) = (f32) (M2C_FIELD(arg2, f32 *, 4) * temp_f1);
-        M2C_FIELD(arg2, f32 *, 8) = (f32) (M2C_FIELD(arg2, f32 *, 8) * temp_f1);
+        out->x = (f32) (out->x * temp_f1);
+        out->y = (f32) (out->y * temp_f1);
+        out->z = (f32) (out->z * temp_f1);
     }
 }

@@ -1,12 +1,20 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-extern M2C_UNK D_00431620;
-extern M2C_UNK D_8012F9D0;
+/* The state at D_8012F9D0. */
+typedef struct {
+    /* 0x00 */ s8 active;
+    /* 0x01 */ u8 pad1[0x50 - 0x1];
+    /* 0x50 */ u8 *data;
+    /* 0x54 */ s32 unk54;
+    /* 0x58 */ s32 unk58;
+} BossState;
+
+extern u8 D_00431620[];
+extern BossState D_8012F9D0;
 
 void func_00440BBC(void) {
-    M2C_FIELD(&D_8012F9D0, s8 *, 0) = 1;
-    M2C_FIELD(&D_8012F9D0, s32 *, 0x54) = -1;
-    M2C_FIELD(&D_8012F9D0, s32 *, 0x58) = -1;
-    M2C_FIELD(&D_8012F9D0, M2C_UNK **, 0x50) = &D_00431620;
+    D_8012F9D0.active = 1;
+    D_8012F9D0.unk54 = -1;
+    D_8012F9D0.unk58 = -1;
+    D_8012F9D0.data = D_00431620;
 }

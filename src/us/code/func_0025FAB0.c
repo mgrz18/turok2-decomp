@@ -1,13 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0025FAB0(s32 arg0, void *arg1) {
-    s32 v = M2C_FIELD(arg1, u8 *, 0xC8);
-
+/* Raises the aggression by 10, up to 255, and clears the condition timer. */
+void func_0025FAB0(s32 arg0, CAI *arg1) {
+    s32 v = arg1->m_Aggression;
     v += 0xA;
     if (v >= 0x100) {
         v = 0xFF;
     }
-    M2C_FIELD(arg1, u8 *, 0xC8) = v;
-    M2C_FIELD(arg1, s32 *, 0x64) = 0;
+    arg1->m_Aggression = v;
+    arg1->m_ConditionTimer = 0;
 }

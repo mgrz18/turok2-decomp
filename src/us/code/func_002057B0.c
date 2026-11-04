@@ -1,5 +1,4 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_002026EC(s32, s32);
 s32 func_002062F8(s32, s32);
@@ -9,17 +8,28 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern M2C_UNK D_800D1CC0;
-extern M2C_UNK D_800D8DB0;
+extern s32 D_800D1CC0;
+extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
-void func_002057B0(s32 arg0, void **arg1, void *arg2) {
+/* A queued request on the D_800D81F4 list (protected by the D_800D8DB0
+ * message queue): sorted by key, with a busy count and state flags. */
+typedef struct CRequest {
+    /* 0x00 */ u32 key;
+    /* 0x04 */ u8 pad4[4];
+    /* 0x08 */ s32 count;
+    /* 0x0C */ s32 flags;
+    /* 0x10 */ u8 pad10[0x24 - 0x10];
+    /* 0x24 */ struct CRequest *next;
+} CRequest;
+
+void func_002057B0(s32 arg0, CRequest **arg1, CRequest *arg2) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v0_2;
     s32 temp_v1;
     s32 temp_v1_2;
-    void *temp_s0;
+    CRequest *temp_s0;
 
     temp_a0 = __osDisableInt();
     temp_v1 = D_800D8DCC + 1;
@@ -31,21 +41,21 @@ void func_002057B0(s32 arg0, void **arg1, void *arg2) {
         __osRestoreInt(temp_a0);
     }
     temp_s0 = *arg1;
-    M2C_FIELD(temp_s0, s32 *, 0xC) = (s32) (M2C_FIELD(temp_s0, s32 *, 0xC) & ~2);
-    if (M2C_FIELD(temp_s0, s32 *, 8) != 0) {
+    temp_s0->flags = (temp_s0->flags & ~2);
+    if (temp_s0->count != 0) {
 loop_4:
         do {
-            temp_v0 = M2C_FIELD(temp_s0, s32 *, 8) - 1;
-            M2C_FIELD(temp_s0, s32 *, 8) = temp_v0;
+            temp_v0 = temp_s0->count - 1;
+            temp_s0->count = temp_v0;
             if (temp_v0 != 0) {
                 goto loop_4;
             }
-            M2C_FIELD(temp_s0, s32 *, 0xC) = (s32) (M2C_FIELD(temp_s0, s32 *, 0xC) & ~0x100);
-        } while (M2C_FIELD(temp_s0, s32 *, 8) != 0);
+            temp_s0->flags = (temp_s0->flags & ~0x100);
+        } while (temp_s0->count != 0);
     }
-    if (!(M2C_FIELD(temp_s0, s32 *, 0xC) & 0x702)) {
+    if (!(temp_s0->flags & 0x702)) {
         func_002065F8(0, (s32) temp_s0);
-        func_002026EC((s32) &D_800D1CC0, M2C_FIELD(temp_s0, s32 *, 0));
+        func_002026EC((s32) &D_800D1CC0, temp_s0->key);
         func_002062F8(0, (s32) temp_s0);
     }
     *arg1 = arg2;

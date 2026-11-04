@@ -1,6 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_0042F650(void *arg0) {
-    M2C_FIELD(arg0, M2C_UNK (**)(), 0x1C)();
+typedef struct {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ s32 (*callback)();
+} Unk0042F650;
+
+void func_0042F650(Unk0042F650 *arg0) {
+    arg0->callback();
 }

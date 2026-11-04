@@ -1,5 +1,4 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_002031E8(s32, s32);
 s32 func_002062F8(s32, s32);
@@ -10,7 +9,7 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern M2C_UNK D_800D8DB0;
+extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
 s32 func_00205EFC(s32 arg0, s32 arg1, s32 arg2)

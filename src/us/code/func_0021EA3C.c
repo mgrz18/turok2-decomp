@@ -1,11 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_00219F74(s32, s32, s32);
 s32 func_0026D5E4(s32, s32, s32);
 s32 func_0026D628(s32);
 
-M2C_UNK func_0026D5DC(void *);                   /* extern */
+s32 func_0026D5DC(void *);                   /* extern */
 
 s16 func_0021EA3C(s32 arg0, s16 *arg1, s32 arg2)
 {

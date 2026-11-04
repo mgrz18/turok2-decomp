@@ -1,10 +1,14 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_0020367C(M2C_UNK, s32, s32, M2C_UNK, s32, M2C_UNK *, M2C_UNK *, s32); /* extern */
-extern M2C_UNK func_00206990;
-extern M2C_UNK D_800A51F0;
+s32 func_0020367C(s32, s32, s32, s32, s32, s32 *, s32 *, s32); /* extern */
+extern s32 func_00206990;
+extern s32 D_800A51F0;
 
-void func_0020798C(void *arg0) {
-    func_0020367C(0, M2C_FIELD(arg0, s32 *, 0), M2C_FIELD(arg0, s32 *, 4), 0, 0, &func_00206990, &D_800A51F0, 0);
+typedef struct {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+} Unk0020798C;
+
+void func_0020798C(Unk0020798C *arg0) {
+    func_0020367C(0, arg0->unk0, arg0->unk4, 0, 0, &func_00206990, &D_800A51F0, 0);
 }

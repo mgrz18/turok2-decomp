@@ -1,10 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
 #include "structs/game_object.h"
 
-M2C_UNK func_00225058(M2C_UNK *, void *, s32 *, s32 *); /* extern */
-M2C_UNK func_0026E4B8(s32, s32, M2C_UNK, s32, s32, s32, s32); /* extern */
-extern M2C_UNK D_800F7078;
+s32 func_00225058(s32 *, void *, s32 *, s32 *); /* extern */
+s32 func_0026E4B8(s32, s32, s32, s32, s32, s32, s32); /* extern */
+extern s32 D_800F7078;
 
 void func_0026E110(CGameObjectInstance *arg0, s32 arg1, s32 arg2) {
     s32 sp20;

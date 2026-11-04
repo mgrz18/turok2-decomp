@@ -1,22 +1,29 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00228B4C(M2C_UNK *, s32);              /* extern */
-M2C_UNK func_002327F4();                            /* extern */
-M2C_UNK func_00234E48(M2C_UNK *, void *);           /* extern */
-extern M2C_UNK D_8010FF34;
-extern M2C_UNK D_801102B8;
+typedef struct {
+    /* 0x000 */ u8 pad0[0x118];
+    /* 0x118 */ s32 sound;
+    /* 0x11C */ u8 pad11C[0x1B5 - 0x11C];
+    /* 0x1B5 */ u8 registered;
+} Actor;
 
-void func_00231E94(void *arg0) {
+s32 func_00228B4C(s32 *, s32);              /* extern */
+s32 func_002327F4();                            /* extern */
+s32 func_00234E48(s32 *, void *);           /* extern */
+
+extern s32 D_8010FF34;
+extern s32 D_801102B8;
+
+void func_00231E94(Actor *arg0) {
     s32 temp_a1;
 
-    if (M2C_FIELD(arg0, u8 *, 0x1B5) != 0) {
+    if (arg0->registered != 0) {
         func_002327F4();
         func_00234E48(&D_801102B8, arg0);
     }
-    temp_a1 = M2C_FIELD(arg0, s32 *, 0x118);
+    temp_a1 = arg0->sound;
     if (temp_a1 != 0) {
         func_00228B4C(&D_8010FF34, temp_a1);
-        M2C_FIELD(arg0, s32 *, 0x118) = 0;
+        arg0->sound = 0;
     }
 }

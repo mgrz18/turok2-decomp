@@ -1,12 +1,12 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-extern M2C_UNK D_800F1850;
+extern s32 D_800F1850;
 
-void func_002317C0(void *arg0) {
-    M2C_FIELD(arg0, M2C_UNK **, 0x14) = &D_800F1850;
-    M2C_FIELD(arg0, s8 *, 0) = 2;
-    M2C_FIELD(arg0, s32 *, 0x40) = 0;
-    M2C_FIELD(arg0, s32 *, 0x1B8) = 0;
-    M2C_FIELD(arg0, s32 *, 0x1C0) = 0;
+void func_002317C0(CGameObjectInstance *arg0) {
+    arg0->header.m_pIntelligence = (struct CIntelligence *) &D_800F1850;
+    arg0->header.m_Type = 2;
+    arg0->m_qGround.x = 0.0f;
+    arg0->m_AI.m_pTargetOverride = 0;
+    arg0->m_AI.m_pSightTarget = 0;
 }

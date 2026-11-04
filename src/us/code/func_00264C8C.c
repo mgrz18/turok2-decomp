@@ -1,6 +1,6 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_00264C8C(s32 arg0, void *arg1, s32 arg2) {
-    M2C_FIELD(arg1, s32 *, 0x10C) = arg2;
+void func_00264C8C(s32 arg0, CAI *arg1, s32 arg2) {
+    arg1->m_VarBuffer[0] = arg2;
 }

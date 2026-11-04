@@ -1,14 +1,14 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
 s32 func_00243414(s32, s32, s32);
 
 extern u8 D_8012F9D2;
 
-void func_00440B80(s32 arg0, void *arg1) {
+void func_00440B80(s32 arg0, CAI *arg1) {
     s32 var_a2;
 
-    if (M2C_FIELD(arg1, s8 *, 0xC7) != 0) {
+    if (arg1->m_AnimRepeatedCount != 0) {
         var_a2 = 0x13;
         if (D_8012F9D2 == 0) {
             var_a2 = 7;

@@ -1,19 +1,34 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00236B7C(void *arg0) {
+typedef struct Segment {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ struct Segment *next;
+    /* 0x08 */ u8 pad8[0xA8 - 0x8];
+    /* 0xA8 */ f32 start;
+    /* 0xAC */ f32 length;
+} Segment;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x40];
+    /* 0x40 */ Segment *segments;
+    /* 0x44 */ u8 pad44[0x4C - 0x44];
+    /* 0x4C */ f32 totalLength;
+} Path;
+
+/* Stores where each segment starts, as a fraction of the whole path. */
+void func_00236B7C(Path *arg0) {
     f32 temp_f0;
     f32 var_f1;
-    void *var_v0;
+    Segment *var_v0;
 
-    if (M2C_FIELD(arg0, f32 *, 0x4C) > 0.0f) {
+    if (arg0->totalLength > 0.0f) {
         var_f1 = 0.0f;
-        var_v0 = M2C_FIELD(arg0, void **, 0x40);
+        var_v0 = arg0->segments;
         if (var_v0 != NULL) {
             do {
-                M2C_FIELD(var_v0, f32 *, 0xA8) = (f32) (var_f1 / M2C_FIELD(arg0, f32 *, 0x4C));
-                temp_f0 = M2C_FIELD(var_v0, f32 *, 0xAC);
-                var_v0 = M2C_FIELD(var_v0, void **, 4);
+                var_v0->start = (f32) (var_f1 / arg0->totalLength);
+                temp_f0 = var_v0->length;
+                var_v0 = var_v0->next;
                 var_f1 += temp_f0;
             } while (var_v0 != NULL);
         }

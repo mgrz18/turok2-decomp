@@ -1,14 +1,18 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-extern void *D_800B8920;
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ s32 unk4;
+} Unk0029B150;
 
-s32 func_0029B150(void *arg0) {
-    void *var_a0;
+extern Unk0029B150 *D_800B8920;   /* the default when arg0 is NULL */
+
+s32 func_0029B150(Unk0029B150 *arg0) {
+    Unk0029B150 *var_a0;
 
     var_a0 = arg0;
     if (var_a0 == NULL) {
         var_a0 = D_800B8920;
     }
-    return M2C_FIELD(var_a0, s32 *, 4);
+    return var_a0->unk4;
 }

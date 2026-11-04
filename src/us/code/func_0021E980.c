@@ -1,9 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0021E980(void *arg0) {
-    M2C_FIELD(arg0, s8 *, 0xE3) = 1;
-    M2C_FIELD(arg0, s32 *, 0xD8) = 0;
-    M2C_FIELD(arg0, s8 *, 0xE2) = 0;
-    M2C_FIELD(arg0, s32 *, 0xD4) = (s32) (M2C_FIELD(arg0, s32 *, 0xD4) & ~0x400);
+/* Restarts the current animation. */
+void func_0021E980(CGameObjectInstance *arg0) {
+    arg0->m_CurrentAnimation.m_bAnimActive = 1;
+    arg0->m_CurrentAnimation.m_AnimationFrame = 0;
+    arg0->m_CurrentAnimation.m_bCycleCompleted = 0;
+    arg0->m_dwFlags = (s32) (arg0->m_dwFlags & ~0x400);
 }

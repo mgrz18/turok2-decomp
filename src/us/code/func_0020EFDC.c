@@ -1,8 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0020EFDC(void *arg0, void *arg1, void *arg2) {
-    M2C_FIELD(arg0, f32 *, 0) = (f32) ((M2C_FIELD(arg1, f32 *, 4) * M2C_FIELD(arg2, f32 *, 8)) - (M2C_FIELD(arg1, f32 *, 8) * M2C_FIELD(arg2, f32 *, 4)));
-    M2C_FIELD(arg0, f32 *, 4) = (f32) ((M2C_FIELD(arg1, f32 *, 8) * M2C_FIELD(arg2, f32 *, 0)) - (M2C_FIELD(arg1, f32 *, 0) * M2C_FIELD(arg2, f32 *, 8)));
-    M2C_FIELD(arg0, f32 *, 8) = (f32) ((M2C_FIELD(arg1, f32 *, 0) * M2C_FIELD(arg2, f32 *, 4)) - (M2C_FIELD(arg1, f32 *, 4) * M2C_FIELD(arg2, f32 *, 0)));
+/* arg0 = arg1 x arg2 (cross product). */
+void func_0020EFDC(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2) {
+    arg0->x = ((arg1->y * arg2->z) - (arg1->z * arg2->y));
+    arg0->y = ((arg1->z * arg2->x) - (arg1->x * arg2->z));
+    arg0->z = ((arg1->x * arg2->y) - (arg1->y * arg2->x));
 }

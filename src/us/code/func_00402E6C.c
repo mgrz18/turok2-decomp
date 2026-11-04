@@ -1,19 +1,18 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_00243414(s32, s32, s32);
 f32 func_00246310(s32, s32, s32, s32);
 
-M2C_UNK func_00236314(void *, M2C_UNK *);           /* extern */
-void *func_002532A8(M2C_UNK *);                     /* extern */
-M2C_UNK func_002666B0(s32, s32, M2C_UNK);           /* extern */
-extern M2C_UNK D_00430954;
-extern M2C_UNK D_80119870;
+s32 func_00236314(void *, s32 *);           /* extern */
+void *func_002532A8(s32 *);                     /* extern */
+s32 func_002666B0(s32, s32, s32);           /* extern */
+extern s32 D_00430954;
+extern s32 D_80119870;
 extern u8 D_8012F3A0[];
 
 void func_00402E6C(s32 arg0, void *arg1)
 {
-  M2C_UNK *var_s1;
+  s32 *var_s1;
   s32 var_s0;
   void *temp_v0;
   void *var_s2;

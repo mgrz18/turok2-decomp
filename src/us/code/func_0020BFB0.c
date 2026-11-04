@@ -1,7 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_0020BFB0(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0) = -1;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
+typedef struct {
+    /* 0x00 */ s32 id;
+    /* 0x04 */ s32 count;
+} Handle;
+
+void func_0020BFB0(Handle *arg0) {
+    arg0->id = -1;
+    arg0->count = 0;
 }

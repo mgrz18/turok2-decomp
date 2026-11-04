@@ -1,13 +1,12 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_002685F0(s32);
 
-extern M2C_UNK D_8011AAD8;
+extern s32 D_8011AAD8;
 
 void func_00254640(void *arg0, void *arg1, void *arg2)
 {
-  M2C_UNK *new_var;
+  s32 *new_var;
   f32 temp_f1;
   if (((u16) (*((u16 *) (((s8 *) arg0) + 0xA08)))) < 2U)
   {
