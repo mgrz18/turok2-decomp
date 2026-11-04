@@ -15,8 +15,8 @@ Acmd *func_0029F5D4(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
     s32 startZero;
     s32 nSam;
     s32 op;
-    ALLoadFilter_func_802BE514_de *f = (ALLoadFilter_func_802BE514_de *)filter;
-    ALFilter_s14 *a = (ALFilter_s14 *)filter;
+    ALLoadFilter *f = (ALLoadFilter *)filter;
+    ALFilter *a = (ALFilter *)filter;
     if (outCount == 0)
         return ptr;
     if ((outCount + f->sample > f->loop.end) && (f->loop.count != 0)) {

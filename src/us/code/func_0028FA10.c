@@ -52,7 +52,7 @@ void func_0028FA10(void *arg0, InitParams *arg1) {
     allocation = func_002912A0(0, 0, (void *)context, params->count1C, 0x1C);
     func_00290F20(&obj->evtq, (void *)allocation, params->count1C);
     {
-        ALPlayer_s *node = &obj->node;
+        ALPlayer *node = &obj->node;
         node->next = 0;
         node->handler = &func_0028FB80;
         node->clientData = node;

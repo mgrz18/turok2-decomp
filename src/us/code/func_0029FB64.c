@@ -7,10 +7,10 @@ extern void func_00291270(unsigned char *source, unsigned char *destination, int
 extern void func_0029F190(void);
 extern char func_0029F5D4;
 extern char func_0029F958;
-s32 func_0029FB64(void *filter, s32 paramID, struct ALWaveTable_s *param)
+s32 func_0029FB64(void *filter, s32 paramID, ALWaveTable *param)
 {
-    ALLoadFilter48 *a = (ALLoadFilter48 *)filter;
-    ALFilter_s14 *f = (ALFilter_s14 *)filter;
+    ALLoadFilter *a = (ALLoadFilter *)filter;
+    ALFilter *f = (ALFilter *)filter;
     switch (paramID) {
         case 5:
             a->table = param;

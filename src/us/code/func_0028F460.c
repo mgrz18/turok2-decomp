@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-u8 func_0028F460(ALCSeq_s *seq, u32 track)
+u8 func_0028F460(ALCSeq *seq, u32 track)
 {
     u8 theByte;
     if (seq->curBULen[track]) {

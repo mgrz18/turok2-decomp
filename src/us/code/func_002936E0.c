@@ -5,22 +5,22 @@
 
 s32 func_00293C50(s32 val, f32 div);
 extern const f32 D_800AA484;
-extern void func_002936E0(struct ALSndPlayer * arg0, union ALSndpEvent * arg1);
+extern void func_002936E0(ALSndPlayer * arg0, ALSndpEvent * arg1);
 extern void func_00291034(ALEventQueue *, ALEvent *, s32);
-extern s32 alSynAllocVoice(ALSynth_func_802B3000_de *, ALVoice_s *, ALVoiceConfig_s *);
-extern void func_002944A0(ALSynth_func_802B3000_de *, ALVoice_s *, void *);
-extern void func_002942B0(ALSynth_func_802B3000_de *, ALVoice_s *, u8);
-extern void alSynSetVol(ALSynth_func_802B3000_de *, ALVoice_s *, s16, s32);
-extern void func_00294340(ALSynth_func_802B3000_de *, ALVoice_s *, f32);
-extern void func_00294200(ALSynth_func_802B3000_de *, ALVoice_s *, u8);
-extern void alSynStopVoice(ALSynth_func_802B3000_de *, ALVoice_s *);
-extern void func_00294160(ALSynth_func_802B3000_de *, ALVoice_s *);
+extern s32 alSynAllocVoice(ALSynth *, ALVoice *, ALVoiceConfig *);
+extern void func_002944A0(ALSynth *, ALVoice *, void *);
+extern void func_002942B0(ALSynth *, ALVoice *, u8);
+extern void alSynSetVol(ALSynth *, ALVoice *, s16, s32);
+extern void func_00294340(ALSynth *, ALVoice *, f32);
+extern void func_00294200(ALSynth *, ALVoice *, u8);
+extern void alSynStopVoice(ALSynth *, ALVoice *);
+extern void func_00294160(ALSynth *, ALVoice *);
 extern void func_00293BA8(ALEventQueue *, ALSoundState *);
 void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
 {
-    ALVoiceConfig_s vc;
-    ALSound_s *snd;
-    ALVoice_s *voice;
+    ALVoiceConfig vc;
+    ALSound *snd;
+    ALVoice *voice;
     u8 pan;
     f32 pitch;
     ALSndpEvent evt;
@@ -29,8 +29,8 @@ void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
     s16 tmp;
     s32 vtmp;
     ALSoundState *state;
-    const ALSndpEvent_func_802B2780_de *event_view =
-        (const ALSndpEvent_func_802B2780_de *)event;
+    const ALSndpEvent *event_view =
+        (const ALSndpEvent *)event;
     state = event->common.state;
     snd = state->sound;
     switch (event->msg.type) {
@@ -43,7 +43,7 @@ void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
             voice = &state->voice;
             alSynAllocVoice(sndp->drvr, voice, &vc);
             vol = (s16)((s32)snd->envelope->attackVolume * state->vol / 127);
-            tmp = state->pan - 64 + ((const ALSound_s_func_802B2780_de *)snd)->samplePan;
+            tmp = state->pan - 64 + ((const ALSound *)snd)->samplePan;
             tmp = ((tmp) > (0) ? (tmp) : (0));
             pan = (u8)((tmp) < (127) ? (tmp) : (127));
             pitch = state->pitch;
@@ -79,7 +79,7 @@ void func_002936E0(ALSndPlayer *sndp, ALSndpEvent *event)
         case 2:
             state->pan = event_view->pan.pan;
             if (state->state == 1 && snd) {
-                tmp = state->pan - 64 + ((const ALSound_s_func_802B2780_de *)snd)->samplePan;
+                tmp = state->pan - 64 + ((const ALSound *)snd)->samplePan;
                 tmp = ((tmp) > (0) ? (tmp) : (0));
                 pan = (u8)((tmp) < (127) ? (tmp) : (127));
                 func_002942B0(sndp->drvr, &state->voice, pan);

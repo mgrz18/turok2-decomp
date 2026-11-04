@@ -5,12 +5,12 @@
 
 extern const double D_800AA700;
 extern const float D_800AA708;
-extern void func_002955EC(AudioLowPassFilter *lp);
+extern void func_002955EC(ALLowPass *lp);
 extern float D_800AA6F8;
-extern ALGlobals_func_802B5B94_de *D_800B7760;
-s32 func_00296AF4(ALFxCode802BAC64 *filter, s32 paramID, void *param)
+extern ALGlobals *D_800B7760;
+s32 func_00296AF4(ALFx *filter, s32 paramID, void *param)
 {
-    ALFxCode802BAC64 *f = filter;
+    ALFx *f = filter;
     s32 p = (paramID - 2) % 8;
     s32 s = (paramID - 2) / 8;
     s32 val = *(s32 *)param;
@@ -31,7 +31,7 @@ s32 func_00296AF4(ALFxCode802BAC64 *filter, s32 paramID, void *param)
             f->delay[s].gain = (s16)val;
             break;
         case 5:
-            f->delay[s].rsinc = (((f32)val * D_800AA6F8) * 2.0f) / D_800B7760->drvr.unk44;
+            f->delay[s].rsinc = (((f32)val * D_800AA6F8) * 2.0f) / D_800B7760->drvr.outputRate;
             break;
         case 6: {
             f32 fval = (f32)val;
@@ -44,7 +44,7 @@ s32 func_00296AF4(ALFxCode802BAC64 *filter, s32 paramID, void *param)
         }
         case 7:
             if (f->delay[s].lp) {
-                f->delay[s].lp->mode = (s16)val;
+                f->delay[s].lp->fc = (s16)val;
                 func_002955EC(f->delay[s].lp);
             }
             break;

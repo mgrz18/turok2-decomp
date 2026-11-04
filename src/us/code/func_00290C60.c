@@ -7,7 +7,7 @@ extern void func_00290C60(void *arg0);
 extern s32 func_0028F910(s32 arg0, s32 *arg1);
 extern void func_00291034(ALEventQueue *, ALEvent *, s32);
 void func_00290C60(void *arg0) {
-    struct ALSeqPlayer *player = arg0;
+    ALSeqPlayer *player = arg0;
     ALEvent sp10;
     s32 sp20;
     s32 field18;

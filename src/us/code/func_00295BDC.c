@@ -12,8 +12,8 @@ extern unsigned int func_0029BF80(void *);
 Acmd *func_00295BDC(void *filter, s16 *inp, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;
-    struct ALEnvMixer_s *e = (struct ALEnvMixer_s *)filter;
-    ALFilter_s14_2 *source = e->filter.source;
+    ALEnvMixer *e = (ALEnvMixer *)filter;
+    ALFilter *source = e->filter.source;
     if (e->motion != 1 || !outCount)
         return ptr;
     ((source) ? ((void)0) : func_0029B020(D_800AA540, D_800AA544, 366));

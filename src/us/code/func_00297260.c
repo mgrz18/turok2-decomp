@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_00297260(ALDelay28 *d, s32 count);
+extern f32 func_00297260(ALDelay *d, s32 count);
 extern const float D_800AA718;
 extern const float D_800AA720;
-f32 func_00297260(ALDelay28 *d, s32 count)
+f32 func_00297260(ALDelay *d, s32 count)
 {
     f32 val;
     d->rsval += d->rsinc * count;

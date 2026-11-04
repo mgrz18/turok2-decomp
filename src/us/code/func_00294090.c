@@ -11,14 +11,14 @@ s32 func_00294090(void *arg0, void **arg1, s16 arg2) {
     s32 var_v0;
     void *var_s0;
     var_a2 = arg2;
-    var_s0 = ((ALSynth_func_802B3000_de *)arg0)->pLameList.next;
+    var_s0 = ((ALSynth *)arg0)->pLameList.next;
     var_s2 = 0;
-    if ((var_s0 != 0) || (var_s0 = ((ALSynth_func_802B3000_de *)arg0)->pFreeList.next, (var_s0 != 0))) {
+    if ((var_s0 != 0) || (var_s0 = ((ALSynth *)arg0)->pFreeList.next, (var_s0 != 0))) {
         *arg1 = var_s0;
         func_002933B0(var_s0);
-        func_002933E0(var_s0, &((ALSynth_func_802B3000_de *)arg0)->pAllocList.next);
+        func_002933E0(var_s0, &((ALSynth *)arg0)->pAllocList.next);
     } else {
-        var_s0 = ((ALSynth_func_802B3000_de *)arg0)->pAllocList.next;
+        var_s0 = ((ALSynth *)arg0)->pAllocList.next;
         var_v0 = var_s2;
         if (var_s0 != 0) {
             do {
