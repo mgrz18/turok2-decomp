@@ -1,22 +1,10 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/cinema.h"
 
 
-/* The state at *D_800C1BB0 (cleared by func_002837E0, see func_002838A4). */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4C];
-    /* 0x4C */ s32 restored;
-    /* 0x50 */ u8 pad50[0x68];
-    /* 0xB8 */ s32 saveStart;
-    /* 0xBC */ s32 startLevel;
-    /* 0xC0 */ s32 startWarp;
-    /* 0xC4 */ CVector3 startPos;
-    /* 0xD0 */ f32 startRotY;
-    /* 0xD4 */ s32 startRegion;
-} State;
-
-extern State *D_800C1BB0;
+extern Cinema *D_800C1BB0;
 extern CPlayer *D_80119890;          /* current player */
 extern s32 D_8011AC88;
 extern u8 D_800F7078[];             /* the world */

@@ -2,67 +2,44 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "structs/script.h"
 
 /* Script command: waits until the current player is within 716.8 units of the origin, then steps the
  * script to the next command. */
 
 
-typedef struct {
-    /* 0x00 */ void *proc;
-    /* 0x04 */ u8 pad4[0x18 - 0x4];
-} Timer;
-
-typedef struct {
-    /* 0x000 */ CGameObjectInstance *leader;
-    /* 0x004 */ s32 countA;
-    /* 0x008 */ CGameObjectInstance *groupA[4];
-    /* 0x018 */ s32 countB;
-    /* 0x01C */ CGameObjectInstance *groupB[4];
-    /* 0x02C */ s32 countC;
-    /* 0x030 */ CGameObjectInstance *groupC[(0x4F8 - 0x30) / 4];
-    /* 0x4F8 */ s32 *script;
-    /* 0x4FC */ s32 command;
-    /* 0x500 */ u8 pad500[0x518 - 0x500];
-    /* 0x518 */ Timer timers[3];
-} Manager;
-
-typedef struct {
-    /* 0x0 */ void (*run)(Manager *m);
-    /* 0x4 */ s32 unk4;
-} Command;
-
-extern Command D_0043232C[];
+extern BlindOnePhase D_0043232C[];
 extern CPlayer *D_80119890;
 extern f32 func_00298470(f32);
 
-/* Advances the script by one command, stops the timers and runs the new command. */
-static __inline__ void NextCommand(Manager *m) {
-    s32 *script;
+/* Advances the script by one command, stops the movers and runs the new command. */
+static __inline__ void NextCommand(BlindOneState *m) {
+    BlindOneStep *script;
     s32 cmd;
     s32 i;
 
     script = m->script;
-    m->script = script + 3;
-    cmd = script[3];
-    m->timers[0].proc = NULL;
-    m->timers[1].proc = NULL;
-    m->timers[2].proc = NULL;
-    for (i = 0; i < m->countA; i++) {
-        m->groupA[i]->m_AI.m_VarBuffer[0] = 0;
+    m->script = script + 1;
+    cmd = script[1].id;
+    m->movers[0].seq = NULL;
+    m->movers[1].seq = NULL;
+    m->movers[2].seq = NULL;
+    for (i = 0; i < m->count1; i++) {
+        m->actors1[i]->m_AI.m_VarBuffer[0] = 0;
     }
-    for (i = 0; i < m->countB; i++) {
-        m->groupB[i]->m_AI.m_VarBuffer[0] = 0;
+    for (i = 0; i < m->count2; i++) {
+        m->actors2[i]->m_AI.m_VarBuffer[0] = 0;
     }
-    for (i = 0; i < m->countC; i++) {
-        m->groupC[i]->m_AI.m_VarBuffer[0] = 0;
+    for (i = 0; i < m->count3; i++) {
+        m->actors3[i]->m_AI.m_VarBuffer[0] = 0;
     }
-    m->command = cmd;
-    if (D_0043232C[cmd].run != NULL) {
-        D_0043232C[cmd].run(m);
+    m->phase = cmd;
+    if (D_0043232C[cmd].init != NULL) {
+        D_0043232C[cmd].init(m);
     }
 }
 
-void func_00445FC4(Manager *m) {
+void func_00445FC4(BlindOneState *m) {
     CPlayer *player = D_80119890;
 
     if (player != NULL) {

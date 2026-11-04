@@ -1,29 +1,10 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/cinema.h"
 
 
-/* The state at *D_800C1BB0 (cleared by func_002837E0). */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x40];
-    /* 0x40 */ s32 started;
-    /* 0x44 */ u8 pad44[0x8];
-    /* 0x4C */ s32 unk4C;
-    /* 0x50 */ s32 unk50;
-    /* 0x54 */ s32 resetPlayer;
-    /* 0x58 */ u8 pad58[0x4];
-    /* 0x5C */ s32 unk5C;
-    /* 0x60 */ u8 pad60[0x58];
-    /* 0xB8 */ s32 saveStart;
-    /* 0xBC */ s32 startLevel;
-    /* 0xC0 */ s32 startWarp;
-    /* 0xC4 */ CVector3 startPos;
-    /* 0xD0 */ f32 startRotY;
-    /* 0xD4 */ s32 startRegion;
-    /* 0xD8 */ s32 warpId;
-} State;
-
-extern State *D_800C1BB0;
+extern Cinema *D_800C1BB0;
 extern CPlayer *D_80119890;          /* current player */
 extern u8 D_801198B0[];
 extern u8 D_800F5A50[];
@@ -65,7 +46,7 @@ void func_002838A4(void) {
                 && D_800C1BB0->startWarp == D_800C1BB0->startLevel) {
                 D_800C1BB0->startLevel = D_80110048[0];
                 D_800C1BB0->startWarp = D_80110020[0];
-                D_800C1BB0->unk4C = 0;
+                D_800C1BB0->restored = 0;
                 D_800C1BB0->startPos = player->m_CharacterActor.header.m_vPos;
                 D_800C1BB0->startRotY = player->m_CharacterActor.m_RotY;
                 D_800C1BB0->startRegion = func_002242B4(D_800F7078, player->m_CharacterActor.header.m_pCurrentRegion);
@@ -88,7 +69,7 @@ void func_002838A4(void) {
             func_0042AC0C(world, warp, D_80110030);
         }
     }
-    D_800C1BB0->unk5C = func_0041266C();
+    D_800C1BB0->restoreAtEnd = func_0041266C();
     D_800C1BB0->unk50 = 1;
     D_800C1BB0->warpId = -1;
     D_800C1BB0->started = 1;

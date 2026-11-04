@@ -83,14 +83,31 @@ typedef struct GameSettings {
     /* 0x040 */ CPlayerOptions defaultSlot;  /* D_8011AB18 */
     /* 0x080 */ CPlayerOptions slots[4];     /* D_8011AB58 */
     /* 0x180 */ u8 unk180;
-    /* 0x181 */ u8 unk181[0x1B0 - 0x181];
-    /* 0x1B0 */ s32 mode;              /* D_8011AC88: the game mode */
-    /* 0x1B4 */ u8 unk1B4[0x1CC - 0x1B4];
-    /* 0x1CC */ s32 unk1CC;
-    /* 0x1D0 */ u32 matchMode;         /* D_8011ACA8 */
-    /* 0x1D4 */ u8 unk1D4[0x1D8 - 0x1D4];
+    /* 0x181 */ u8 unk181[0x1A8 - 0x181];
+    /* 0x1A8 */ f32 modeTimer;         /* the mode's clock: a spin in degrees, a fade threshold (func_00288D3C, func_00289700) */
+    /* 0x1AC */ s32 prevMode;
+    /* 0x1B0 */ s32 mode;              /* D_8011AC88: the game mode (17: switching) */
+    /* 0x1B4 */ s32 nextMode;          /* the mode to switch to (func_00288BC8, func_00288C5C) */
+    /* 0x1B8 */ u8 fastFade;
+    /* 0x1B9 */ u8 fadeMode;           /* 1 fading in, 2 fading out (switch mode) */
+    /* 0x1BA */ u8 unk1BA[0x1BC - 0x1BA];
+    /* 0x1BC */ f32 fade;
+    /* 0x1C0 */ s32 ready;             /* func_00288284 */
+    /* 0x1C4 */ s32 unk1C4;
+    /* 0x1C8 */ s32 unk1C8;            /* set at a retrace while switching (func_00286674) */
+    /* 0x1CC */ s32 paused;
+    /* 0x1D0 */ u32 matchMode;         /* D_8011ACA8; also the warp the mode switch goes to (func_00430454) */
+    /* 0x1D4 */ s32 warpFlags;
     /* 0x1D8 */ GameMatch match;       /* D_8011ACB0 */
 } GameSettings; /* size 0x228 */
+
+/* The engine, D_800F6CB0 (CEngineApp__Boot's object): GameSettings
+ * D_8011AAD8 is inside it at 0x23E28, so its mode block (0x23FD0-0x23FFC)
+ * is GameSettings 0x1A8-0x1D4. Only that part is described here. */
+typedef struct CEngineApp {
+    /* 0x00000 */ u8 pad0[0x23E28];
+    /* 0x23E28 */ GameSettings m_Settings; /* D_8011AAD8 */
+} CEngineApp; /* size 0x24050 */
 
 extern GameSettings D_8011AAD8;
 extern GameMatch D_8011ACB0;

@@ -7,21 +7,11 @@
 /* Start a level: check that the warp target exists, reset the multiplayer
  * options and switch the game state. */
 
-typedef struct {
-    u8 pad0[0x23FDC];
-    s32 nextState;  /* 0x23FDC */
-    u8 pad23FE0;
-    u8 mode;        /* 0x23FE1 */
-    u8 pad23FE2[0x16];
-    s32 warpId;     /* 0x23FF8 */
-    s32 warpFlags;  /* 0x23FFC */
-} Game;
-
 extern u8 D_800F7078[];
 
 s32 func_0042C0B4(void *level, s32 a, s32 id, void *out, s32 flags);
 
-void func_00469374(Game *game, s32 warpId) {
+void func_00469374(CEngineApp *game, s32 warpId) {
     u8 sp18[0x18];
     s32 id;
 
@@ -36,11 +26,11 @@ void func_00469374(Game *game, s32 warpId) {
     D_8011ACB0.hours = 0;
     D_8011ACB0.unk44 = 0;
     do {
-        game->warpFlags = 0;
-        game->warpId = id;
+        game->m_Settings.warpFlags = 0;
+        game->m_Settings.matchMode = id;
     } while (0);
     do {
-        game->mode = 2;
-        game->nextState = 13;
+        game->m_Settings.fadeMode = 2;
+        game->m_Settings.nextMode = 13;
     } while (0);
 }

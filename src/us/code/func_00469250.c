@@ -8,16 +8,10 @@ s32 func_0025359C(CPlayerList *);                   /* extern */
 /* The multiplayer match state at D_8011ACB0: the fields this resets. */
 
 /* The game/menu context this runs on. */
-typedef struct {
-    /* 0x00000 */ u8 pad0[0x23FDC];
-    /* 0x23FDC */ s32 unk23FDC;
-    /* 0x23FE0 */ u8 pad23FE0;
-    /* 0x23FE1 */ s8 unk23FE1;
-} Context;
 
 extern s32 D_800F5A50;
 
-void func_00469250(Context *arg0)
+void func_00469250(CEngineApp *arg0)
 {
   GameMatch *new_var;
   func_00285410(0);
@@ -27,6 +21,6 @@ void func_00469250(Context *arg0)
   new_var->teams = 0;
   D_8011ACB0.tag = 0;
   D_8011ACB0.unk44 = 0;
-  arg0->unk23FE1 = 2;
-  arg0->unk23FDC = 1;
+  arg0->m_Settings.fadeMode = 2;
+  arg0->m_Settings.nextMode = 1;
 }

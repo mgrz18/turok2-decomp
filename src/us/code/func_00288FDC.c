@@ -4,20 +4,16 @@
 /* A play-time clock: frames, seconds, minutes, hours. */
 
 /* Only the field read here. */
-typedef struct {
-    /* 0x00000 */ u8 pad0[0x23FF4];
-    /* 0x23FF4 */ s32 paused;
-} BigState;
 
 extern f32 D_800A9DF4;                              /* units per next unit (presumably 60) */
 extern f32 D_800B6D28;                              /* frame delta */
 
-void func_00288FDC(BigState *arg0) {
+void func_00288FDC(CEngineApp *arg0) {
     f32 temp_f0;
     f32 temp_f0_2;
     f32 temp_f1;
 
-    if (arg0->paused == 0) {
+    if (arg0->m_Settings.paused == 0) {
         temp_f1 = D_8011ACB0.frames + D_800B6D28;
         D_8011ACB0.frames = temp_f1;
         if (temp_f1 >= 15.0f) {
