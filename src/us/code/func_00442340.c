@@ -17,11 +17,6 @@ typedef struct {
     /* 0x108 */ void *onDraw;
 } Level;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xD4];
-    /* 0xD4 */ s32 flags;
-} Obj;
-
 extern s32 D_80110048;
 extern s32 D_800F1F10[];
 extern u8 D_800F7078[];
@@ -36,7 +31,7 @@ extern void func_0040BC64();
 extern void func_0040BEE4();
 extern void func_0040BFF0();
 
-void func_00442340(Obj *obj, Level *level) {
+void func_00442340(CGameObjectInstance *obj, Level *level) {
     MotherBossState *state = &D_8012FB70;
     s32 i;
 
@@ -60,7 +55,7 @@ void func_00442340(Obj *obj, Level *level) {
     func_00243414(obj, level, 0);
     D_8012FB70.obj = obj;
     D_800F1F10[0] &= ~0x300;
-    obj->flags |= 0x04000000;
+    obj->m_dwFlags |= 0x04000000;
     for (i = 0; i < 15; i++) {
         func_002362E4(D_8012FB70.slots[i].anim, obj);
     }

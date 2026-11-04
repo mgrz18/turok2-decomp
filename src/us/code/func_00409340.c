@@ -5,11 +5,6 @@
 /* Boss fight setup: finds the six level actors with id 0x1DB1 and the one
  * with 0x1DB2, installs the AI callbacks and resets the 15 attack slots. */
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-} Obj;
-
 extern s32 D_80110048;
 extern u8 D_800F7078[];
 extern u32 D_800F1F10[];
@@ -17,15 +12,15 @@ extern u8 D_00431F00[];
 
 s32 func_00225F6C(void *, s32, s32, s32, CGameObjectInstance **, s32);
 s32 func_00225EBC(void *, s32, s32);
-void func_00243414(Obj *, CAI *, s32);
-void func_002362E4(void *, Obj *);
+void func_00243414(CGameObjectInstance *, CAI *, s32);
+void func_002362E4(void *, CGameObjectInstance *);
 void func_0040BC64();
 void func_0040BEE4();
 void func_0040BFF0();
 void func_0025E4B8();
 extern u8 func_00408FF8[];
 
-void func_00409340(Obj *obj, CAI *ai) {
+void func_00409340(CGameObjectInstance *obj, CAI *ai) {
     MotherBossState *s = &D_8012FB70;
     s32 i;
 
@@ -49,7 +44,7 @@ void func_00409340(Obj *obj, CAI *ai) {
     func_00243414(obj, ai, 0);
     D_8012FB70.obj = obj;
     D_800F1F10[0] &= ~0x300;
-    obj->flags |= 0x04000000;
+    obj->m_dwFlags |= 0x04000000;
     for (i = 0; i < 15; i++) {
         func_002362E4(D_8012FB70.slots[i].anim, obj);
     }

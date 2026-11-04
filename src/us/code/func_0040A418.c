@@ -6,30 +6,24 @@
 /* Picks the next attack anim from a weighted table: close to the target 4 (then 3 after a 4), otherwise 5
  * when fewer than 3 actors are in the D_8010FEB4 list, else 6. */
 
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x140];
-    /* 0x140 */ CAI ai;
-} Obj;
-
 typedef struct {
     s16 id;
     s16 weight;
 } Pick;
 
 extern CListedInstance *D_8010FEB4;
-extern void func_00246108(Obj *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern s16 func_0026D518(Pick *table);
-extern void func_00243414(Obj *obj, CAI *ai, s32 state);
+extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 state);
 
 /* func_0040BD60 */
-static __inline__ f32 getTargetDist(Obj *obj, CListedInstance **found) {
+static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CListedInstance **found) {
     CAITargets t;
     f32 dist;
 
     dist = -1.0f;
     *found = NULL;
-    func_00246108(obj, &obj->ai, &t, 1, 0);
+    func_00246108(obj, &obj->m_AI, &t, 1, 0);
     if (t.m_Path.m_pTarget != NULL && (t.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
         dist = t.m_Path.m_FlatDist;
         *found = (CListedInstance *) t.m_Path.m_pTarget;
@@ -53,7 +47,7 @@ static __inline__ s32 fewerActorsThan(s32 max) {
     return count < max;
 }
 
-void func_0040A418(Obj *obj, CAI *ai) {
+void func_0040A418(CGameObjectInstance *obj, CAI *ai) {
     Pick picks[8];
     CListedInstance *found;
     MotherBossState *state = &D_8012FB70;
