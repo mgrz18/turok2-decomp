@@ -1,5 +1,5 @@
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/game_object.h"
 
 /* Spawns one actor near each of the four spawn points, scattered by up to +-15 units, skipping a point
  * closer than 460.8 to the target of the module object. */
@@ -9,10 +9,6 @@ typedef struct {
     /* 0x0C */ u8 padC[0x14 - 0xC];
 } SpawnPoint;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-} Actor;
 
 typedef struct {
     /* 0x000 */ void *obj;
@@ -22,7 +18,7 @@ extern State D_8012FB70;
 extern SpawnPoint D_00431C40[4];
 extern u8 D_800F7078[];
 extern u8 D_80107590[];
-extern f32 func_0040BD60(void *obj, Actor **found);
+extern f32 func_0040BD60(void *obj, CGameObjectInstance **found);
 extern s32 func_0026D518(void *a);
 extern f32 func_002119FC(f32 min, f32 max);
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
@@ -48,7 +44,7 @@ static __inline__ void SpawnAt(s32 arg0, s16 type, CVector3 pos, f32 speed) {
 
 void func_00442500(s32 arg0, void *arg1) {
     CVector3 v;
-    Actor *found;
+    CGameObjectInstance *found;
     s32 i;
     s32 type;
     s32 dx;
@@ -62,7 +58,7 @@ void func_00442500(s32 arg0, void *arg1) {
         dx = dx * 10.24f;
         dz = dz * 10.24f;
         if (found != NULL) {
-            func_0020EF2C(&v, &found->pos, &D_00431C40[i].pos);
+            func_0020EF2C(&v, &found->header.m_vPos, &D_00431C40[i].pos);
             if (func_00298470(v.x * v.x + v.y * v.y + v.z * v.z) > 460.8f) {
                 v = D_00431C40[i].pos;
                 v.y = 30.72f;

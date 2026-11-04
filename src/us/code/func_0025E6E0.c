@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x8];
@@ -10,12 +11,6 @@ typedef struct {
     /* 0x14 */ AnimOverride override;
 } ActorDef;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorDef *def;
-    /* 0x18 */ u8 pad18[0xB8 - 0x18];
-    /* 0xB8 */ u16 type;
-} Actor;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x130];
@@ -23,15 +18,15 @@ typedef struct {
     /* 0x131 */ s8 unk131;
 } State;
 
-s32 func_00259E60(Actor *actor, State *state);
-s32 func_00259E8C(Actor *actor, State *state);
-s32 func_00259EB8(Actor *actor, State *state);
+s32 func_00259E60(CGameObjectInstance *actor, State *state);
+s32 func_00259E8C(CGameObjectInstance *actor, State *state);
+s32 func_00259EB8(CGameObjectInstance *actor, State *state);
 
-s32 func_0025E6E0(Actor *actor, State *state) {
-    AnimOverride *ov = &actor->def->override;
+s32 func_0025E6E0(CGameObjectInstance *actor, State *state) {
+    AnimOverride *ov = &((ActorDef *)actor->header.m_pIntelligence)->override;
 
     if (ov->anim != 0) {
-        if (actor->type == 0x1F9 || actor->type == 0x385) {
+        if (actor->m_nTypeFlag == 0x1F9 || actor->m_nTypeFlag == 0x385) {
             switch (ov->anim) {
                 case 0x2B16:
                 case 0x2B20:

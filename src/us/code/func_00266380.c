@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x3E];
@@ -25,14 +26,6 @@ typedef struct {
     /* 0x14 */ ActionInfo info;
 } ActorDef;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
-    /* 0x018 */ u8 pad18[0xA0];
-    /* 0x0B8 */ u16 typeId;
-    /* 0x0BA */ u8 padBA[0x1A];
-    /* 0x0D4 */ u32 flags;
-} Actor;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x34];
@@ -48,15 +41,15 @@ typedef struct {
 
 extern Game D_80119870;
 extern Player *func_002532B4(Game *game);
-extern void func_00243414(Actor *actor, ActionState *state, s32 mode);
+extern void func_00243414(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
-void func_00266380(Actor *actor, ActionState *state) {
-    ActionInfo *info = &actor->def->info;
+void func_00266380(CGameObjectInstance *actor, ActionState *state) {
+    ActionInfo *info = &((ActorDef *)actor->header.m_pIntelligence)->info;
     Game *game;
     Player *player;
     s32 mode;
 
-    if (actor->typeId == 0x64E && state->unk36 != state->unk34) {
+    if (actor->m_nTypeFlag == 0x64E && state->unk36 != state->unk34) {
         game = &D_80119870;
         player = func_002532B4(game);
         if (player != NULL && state->tagCleared == 0) {
@@ -71,13 +64,13 @@ void func_00266380(Actor *actor, ActionState *state) {
     }
     if (state->active != 0) {
         if (info->flags & 2) {
-            actor->flags &= ~0x2000;
-            actor->flags &= ~0x100;
+            actor->m_dwFlags &= ~0x2000;
+            actor->m_dwFlags &= ~0x100;
         }
         if (state->done != 0) {
             func_00243414(actor, state, 0);
         }
-        if (actor->typeId == 0x64C) {
+        if (actor->m_nTypeFlag == 0x64C) {
             func_00243414(actor, state, 2);
         }
     }
