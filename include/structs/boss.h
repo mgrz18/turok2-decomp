@@ -34,7 +34,7 @@ typedef struct ScriptAnimator {
 /* One weak spot of the boss: its health and its hit-flash animator. */
 typedef struct BossWeakSpot {
     /* 0x00 */ s32 health;
-    /* 0x04 */ u8 anim[0x68 - 0x4];   /* a ScriptAnimator */
+    /* 0x04 */ ScriptAnimator anim;
 } BossWeakSpot; /* size 0x68 */
 
 /* D_8012FB70: the Mother boss fight, func_00409000-func_0040C7DC (second

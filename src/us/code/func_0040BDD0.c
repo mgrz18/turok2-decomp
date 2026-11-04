@@ -12,7 +12,7 @@ void func_0040BDD0(void *obj, void *src, s32 mask) {
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(state->slots[i].anim, src);
+            func_00236314(&state->slots[i].anim, src);
         }
     }
 }

@@ -62,6 +62,6 @@ void func_00442340(Obj *obj, Level *level) {
     D_800F1F10[0] &= ~0x300;
     obj->flags |= 0x04000000;
     for (i = 0; i < 15; i++) {
-        func_002362E4(D_8012FB70.slots[i].anim, obj);
+        func_002362E4(&D_8012FB70.slots[i].anim, obj);
     }
 }
