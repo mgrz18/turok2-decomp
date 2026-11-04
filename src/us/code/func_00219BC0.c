@@ -3,10 +3,6 @@
 #include "structs/game_object.h"
 
 typedef struct {
-    /* 0x0 */ u32 type;
-} CIntelligence;
-
-typedef struct {
     s32 words[6];
 } Lights1; /* libultra Lights1, copied as words */
 
@@ -43,7 +39,7 @@ static __inline__ void *body_setup(CGameObjectInstance *obj) {
     s32 i;
     u8 *player;
 
-    type = ((CIntelligence *) obj->header.m_pIntelligence)->type;
+    type = obj->header.m_pIntelligence->m_Type;
     if (type >= 13) {
         return 0;
     }
@@ -119,7 +115,7 @@ void func_00219BC0(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, vo
     }
     obj->m_dwFlags |= 0x10000;
     obj->m_dwFlags |= 0x20000;
-    if (((CIntelligence *) obj->header.m_pIntelligence)->type == 0 || (obj->m_dwFlags & 1)) {
+    if (obj->header.m_pIntelligence->m_Type == 0 || (obj->m_dwFlags & 1)) {
         obj->m_dwFlags &= ~0x20000;
     }
     animIndex = 0;

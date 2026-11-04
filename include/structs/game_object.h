@@ -27,6 +27,9 @@ typedef struct {
 
 typedef f32 CMtxF[4][4];
 
+/* The definition m_pIntelligence points at (needs CVector3 above). */
+#include "structs/intelligence.h"
+
 typedef struct {
     /* 0x00 */ u8 m_Type;
     /* 0x01 */ u8 _pad;

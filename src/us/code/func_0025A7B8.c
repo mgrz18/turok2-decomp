@@ -5,11 +5,6 @@ s32 func_00245A98(s32, s32, s32, s32);
 
 extern s32 D_800B0068;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x86];
-    /* 0x86 */ u16 animMask86; /* 5 bits per mode */
-} ActorDef;
-
 void func_0025A7B8(CGameObjectInstance *obj, s32 arg1) {
-    func_00245A98((s32) obj, arg1, (s32) &D_800B0068, ((ActorDef *) obj->header.m_pIntelligence)->animMask86);
+    func_00245A98((s32) obj, arg1, (s32) &D_800B0068, obj->header.m_pIntelligence->m_Enemy.m_wWeaponAnimFlags);
 }
