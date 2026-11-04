@@ -1,5 +1,5 @@
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/particle.h"
 
 /* Spawn parameters next to each other in .data. */
 typedef struct {
@@ -8,36 +8,23 @@ typedef struct {
     /* 0x10 */ s32 b;
 } SpawnParams;
 
-typedef struct {
-    u8 pad0[0x18];
-    /* 0x018 */ CVector3 origin;
-    u8 pad24[0x1C];
-    /* 0x040 */ u32 flags;
-    u8 pad44[0xB4];
-    /* 0x0F8 */ u32 *parentFlags;
-    u8 padFC[0x10];
-    /* 0x10C */ void *parent;
-    /* 0x110 */ void *slot;
-    /* 0x114 */ s32 a;
-} Actor;
-
 extern u8 D_800F8928[];
 extern SpawnParams D_800F1D7C;
 extern CVector3 D_800F1DB8;
 void func_0020E810(CQuaternion *out, CVector3 *dir);
-s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+s32 func_0022F350(void *table, void *actor, void *owner, s32 *ownerCount, void *target, s32 kind, CVector3 origin,
                   CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
 
-void func_002318D4(Actor *actor, s32 kind) {
+void func_002318D4(CParticle *actor, s32 kind) {
     CQuaternion rot;
     CVector3 origin;
 
-    if (*actor->parentFlags & 0x10) {
+    if (actor->m_pEffect->m_dwFlags & 0x10) {
         origin = D_800F1DB8;
     } else {
-        origin = actor->origin;
+        origin = actor->m_vVelocity;
     }
     func_0020E810(&rot, &origin);
-    func_0022F350(D_800F8928, actor, actor->parent, actor->slot, actor->a, kind, origin, rot,
-                  D_800F1D7C.pos, D_800F1D7C.arg, D_800F1D7C.b, (actor->flags & 0x200006) | 1);
+    func_0022F350(D_800F8928, actor, actor->m_pOwner, actor->m_pOwnerCount, actor->m_pTarget, kind, origin, rot,
+                  D_800F1D7C.pos, D_800F1D7C.arg, D_800F1D7C.b, (actor->m_dwFlags & 0x200006) | 1);
 }

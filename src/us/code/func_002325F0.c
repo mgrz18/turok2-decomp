@@ -1,46 +1,27 @@
-#include "common.h"
-
-typedef struct Target {
-    u8 pad0[0x20];
-    f32 unk20;      /* 0x20 */
-    u8 pad24[0x44 - 0x24];
-    s32 flags;      /* 0x44 */
-} Target;
-
-typedef struct Def {
-    u16 unk0;
-    u16 flags;      /* 0x2 */
-} Def;
-
-typedef struct Obj {
-    u8 pad0[8];
-    f32 unk8;       /* 0x8 */
-    u8 padC[4];
-    Def *def;       /* 0x10 */
-    u8 pad14[0x40 - 0x14];
-    u32 flags;      /* 0x40 */
-} Obj;
+#include "structs/region.h"
+#include "structs/particle.h"
 
 extern u8 D_800F7078[];
-extern Target *func_0022425C(void *arg0, Def *def);
+extern CRegionInfo *func_0022425C(void *arg0, CGameRegion *region);
 
-s32 func_002325F0(Obj *obj) {
-    Target *target;
+/* Whether the particle is under water: below its region's water height (flag 4 when it has no region). */
+s32 func_002325F0(CParticle *obj) {
+    CRegionInfo *target;
 
-    if (obj->def != NULL) {
-        if (!(obj->def->flags & 1)) {
+    if (obj->header.m_pCurrentRegion != NULL) {
+        if (!(obj->header.m_pCurrentRegion->m_wFlags & REGION_FLAG_WATER)) {
             return 0;
         }
-        target = func_0022425C(D_800F7078, obj->def);
+        target = func_0022425C(D_800F7078, obj->header.m_pCurrentRegion);
         if (target != NULL) {
             goto found;
         }
     }
-    return (obj->flags >> 2) & 1;
+    return (obj->m_dwFlags >> 2) & 1;
 
 found:
-    if (target->flags & 0x1000000) {
+    if (target->m_dwFlags & 0x1000000) {
         return 0;
     }
-    return obj->unk8 < target->unk20;
+    return obj->header.m_vPos.y < target->m_WaterHeight;
 }

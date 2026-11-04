@@ -1,27 +1,6 @@
 /* WRONG CUT: REAL func_0042D220 size 0x1E8 (splat cut it into func_0042D220 + func_0042D330). */
 #include "common.h"
-#include "structs/list.h"
-
-typedef struct Particle {
-    /* 0x000 */ u8 kind;
-    /* 0x001 */ u8 pad1[0x13];
-    /* 0x014 */ void *def;
-    /* 0x018 */ u8 pad18[0x28];
-    /* 0x040 */ s32 unk40;
-    /* 0x044 */ u8 pad44[0x174];
-    /* 0x1B8 */ s32 unk1B8;
-    /* 0x1BC */ u8 pad1BC[4];
-    /* 0x1C0 */ s32 unk1C0;
-    /* 0x1C4 */ u8 pad1C4[0x14];
-} Particle; /* 0x1D8 */
-
-typedef struct ParticleSystem {
-    /* 0x0000 */ Particle particles[128];
-    /* 0xEC00 */ CList free;
-    /* 0xEC14 */ CList active;
-    /* 0xEC28 */ CList lists[3];
-    /* 0xEC64 */ s32 unkEC64;
-} ParticleSystem;
+#include "structs/particle.h"
 
 /* One of the four default light directions. */
 typedef struct DirLight {
@@ -43,25 +22,25 @@ extern s32 CList__AddTail(CList *list, void *node);
 extern void func_0027BD10(void *def);
 extern void func_00210518(void *, f32);
 
-void func_0042D220(ParticleSystem *sys, s32 arg1) {
+void func_0042D220(CParticleSystem *sys, s32 arg1) {
     s32 i;
     s32 j;
     DirLight *light;
 
     for (i = 0; i < 128; i++) {
-        sys->particles[i].def = D_800F1850;
-        sys->particles[i].kind = 2;
-        sys->particles[i].unk40 = 0;
-        sys->particles[i].unk1B8 = 0;
-        sys->particles[i].unk1C0 = 0;
+        sys->m_ParticleVars[i].header.m_pIntelligence = (CIntelligence *)D_800F1850;
+        sys->m_ParticleVars[i].header.m_Type = 2;
+        sys->m_ParticleVars[i].m_dwFlags = 0;
+        sys->m_ParticleVars[i].unk_1B8 = 0;
+        sys->m_ParticleVars[i].m_pActiveList = NULL;
     }
-    CList__Construct(&sys->free, 0x1C4, 0x1C8);
+    CList__Construct(&sys->m_FreeList, 0x1C4, 0x1C8);
     for (i = 0; i < 128; i++) {
-        CList__AddTail(&sys->free, &sys->particles[i]);
+        CList__AddTail(&sys->m_FreeList, &sys->m_ParticleVars[i]);
     }
-    CList__Construct(&sys->active, 0x1CC, 0x1D0);
+    CList__Construct(&sys->m_DrawList, 0x1CC, 0x1D0);
     for (i = 0; i < 3; i++) {
-        CList__Construct(&sys->lists[i], 0x1C4, 0x1C8);
+        CList__Construct(&sys->m_ActiveList[i], 0x1C4, 0x1C8);
     }
     func_0027BD10(D_800F1850);
     for (j = 0; j < 4; j++) {
@@ -100,5 +79,5 @@ void func_0042D220(ParticleSystem *sys, s32 arg1) {
         light->color[3] = 0xFF;
     }
     func_00210518(D_800F18F0, 1.5707964f);
-    sys->unkEC64 = arg1;
+    sys->m_pParticleData = (void *)arg1;
 }

@@ -16,11 +16,6 @@ typedef struct {
 } Player;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-} Obj;
-
-typedef struct {
     u8 data[0x18];
 } DamageEvent;
 
@@ -32,7 +27,7 @@ extern void func_0020F040(CVector3 *v); /* normalise */
 extern void func_00245828(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
 extern void func_002465C8(Player *target, void *ai, DamageEvent *event);
 
-void func_0040BFF0(Obj *obj, CAI *ai) {
+void func_0040BFF0(CGameObjectInstance *obj, CAI *ai) {
     DamageEvent event;
     CVector3 dir;
     Player *player = D_800F1CE0;
@@ -42,7 +37,7 @@ void func_0040BFF0(Obj *obj, CAI *ai) {
         dir.x = 0.0f;
         dir.y = 0.0f;
         dir.z = 512.0f;
-        func_0020EF2C(&dir, &obj->pos, &dir);
+        func_0020EF2C(&dir, &obj->header.m_vPos, &dir);
         func_0020F040(&dir);
         func_0020EF60(&dir, &dir, 1536.0f);
         dir.y = 409.59998f;

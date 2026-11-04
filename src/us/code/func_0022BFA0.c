@@ -1,108 +1,69 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, func_8027C758_de, with Turok 2's layouts. */
 #include "common.h"
-#include "structs/vector.h"
-
-typedef struct { s32 a, b; } IntPair;
-
-typedef struct {
-    /* 0x00 */ IntPair parameters[14];
-    /* 0x70 */ u16 particles[14];
-    /* 0x8C */ u16 effects[14];
-    /* 0xA8 */ u16 sounds[14];
-} ParticleEvents;
-
-typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x18 - 0x4];
-    /* 0x18 */ ParticleEvents *events;
-} ParticleDesc;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x10];
-    /* 0x010 */ void *region;
-    /* 0x014 */ u8 pad14[0x18 - 0x14];
-    /* 0x018 */ CVector3 velocity;
-    /* 0x024 */ u8 pad24[0x40 - 0x24];
-    /* 0x040 */ s32 flags;
-    /* 0x044 */ u8 pad44[0xF8 - 0x44];
-    /* 0x0F8 */ ParticleDesc *desc;
-    /* 0x0FC */ u8 padFC[0x10C - 0xFC];
-    /* 0x10C */ void *owner;
-    /* 0x110 */ s32 ownerId;
-    /* 0x114 */ s32 target;
-    /* 0x118 */ u8 pad118[0x168 - 0x118];
-    /* 0x168 */ CVector3 rotSpeed;
-    /* 0x174 */ u8 pad174[0x190 - 0x174];
-    /* 0x190 */ u32 hitFlags;
-    /* 0x194 */ u8 pad194;
-    /* 0x195 */ s8 dieOnImpact;
-    /* 0x196 */ s8 dieOnBounce;
-    /* 0x197 */ u8 pad197[0x1A0 - 0x197];
-    /* 0x1A0 */ f32 rotationScale;
-} Particle;
+#include "structs/particle.h"
 
 extern s32 func_0026AFC0(void *region);
 extern s32 func_0026C114(void *region);
 extern s32 func_0026C0E0(void *region);
 extern s32 D_800F1D94;
 extern CVector3 D_800F1D98;
-extern void func_00236EA0(Particle *, Particle *, s32 effect, s32, CVector3 pos, IntPair params);
+extern void func_00236EA0(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
 extern void func_0020E810(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
-extern void func_0022F350(void *sys, Particle *p, void *owner, s32 ownerId, s32 target, s32 type, CVector3 dir,
+extern void func_0022F350(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 type, CVector3 dir,
                           CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
 extern void func_00275544(s16 sound, CVector3 pos, s32, s32);
 extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
-extern void func_0022F1C8(void *sys, Particle *p);
-extern void func_00232B40(Particle *p);
+extern void func_0022F1C8(void *sys, CParticle *p);
+extern void func_00232B40(CParticle *p);
 extern CVector3 D_800F1DB8;
 extern u8 D_800F8928[];
 
-void func_0022BFA0(Particle *arg0) {
-    IntPair pair;
+void func_0022BFA0(CParticle *arg0) {
+    CEventValue pair;
     CQuaternion rotation;
     CVector3 position;
     s32 surface;
     s32 index;
-    ParticleEvents *events;
+    CROMParticleImpact *events;
     s32 particle;
     s32 effect;
     s32 sound;
-    ParticleDesc *desc;
+    CROMParticleEffect *desc;
 
-    if (func_0026AFC0(arg0->region) != 0) {
-        surface = func_0026C114(arg0->region);
+    if (func_0026AFC0(arg0->header.m_pCurrentRegion) != 0) {
+        surface = func_0026C114(arg0->header.m_pCurrentRegion);
     } else {
-        surface = func_0026C0E0(arg0->region);
+        surface = func_0026C0E0(arg0->header.m_pCurrentRegion);
     }
     if (surface == 10) {
         surface = 0;
     }
-    desc = arg0->desc;
+    desc = arg0->m_pEffect;
     index = surface;
-    events = desc->events;
-    particle = events->particles[index];
-    effect = events->effects[index];
-    pair = events->parameters[surface];
-    sound = desc->events->sounds[index];
+    events = desc->m_pImpact;
+    particle = events->m_ImpactParticleType[index];
+    effect = events->m_ImpactEventType[index];
+    pair = events->m_ImpactEventValue[surface];
+    sound = desc->m_pImpact->m_ImpactSoundType[index];
     if (effect != 0xFFFF) {
         func_00236EA0(arg0, arg0, effect, -1, D_800F1D98, pair);
     }
     if (particle != 0xFFFF) {
-        if ((arg0->desc->flags & 0x10) != 0) {
+        if ((arg0->m_pEffect->m_dwFlags & 0x10) != 0) {
             position = D_800F1DB8;
         } else {
-            position = arg0->velocity;
+            position = arg0->m_vVelocity;
         }
         func_0020E810(&rotation, &position);
-        func_0022F350(D_800F8928, arg0, arg0->owner, arg0->ownerId, arg0->target, particle, position,
-                      rotation, D_800F1D98, D_800F1D94, -3, (arg0->flags & 0x200006) | 1);
+        func_0022F350(D_800F8928, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
+                      rotation, D_800F1D98, D_800F1D94, -3, (arg0->m_dwFlags & 0x200006) | 1);
     }
     if (sound != 0xFFFF) {
         func_00275544((s16)sound, D_800F1D98, 0, -1);
     }
-    func_0020EF60(&arg0->rotSpeed, &arg0->rotSpeed, arg0->rotationScale);
-    arg0->flags |= 0x200;
-    if (arg0->dieOnBounce == 1) {
+    func_0020EF60(&arg0->m_vRotSpeed, &arg0->m_vRotSpeed, arg0->m_RotationScale);
+    arg0->m_dwFlags |= 0x200;
+    if (arg0->m_bDieOnBounce == 1) {
         func_0022F1C8(D_800F8928, arg0);
         func_00232B40(arg0);
     }

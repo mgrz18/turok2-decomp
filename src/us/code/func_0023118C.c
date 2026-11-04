@@ -1,7 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/CODE_80281A70.CPP, Particle_DrawRenderList, with Turok 2's layouts. */
 #include "common.h"
-#include "structs/vector.h"
 #include "structs/region.h"
+#include "structs/particle.h"
 #include "gfx.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
@@ -19,35 +19,6 @@ typedef struct {
     /* 0x00 */ CVector3 min;
     /* 0x0C */ CVector3 max;
 } Box;
-
-typedef struct {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x14 - 0x4];
-    /* 0x14 */ void *renderModel;
-} ParticleDesc;
-
-typedef struct DrawParticle {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ CGameRegion *region;
-    /* 0x014 */ u8 pad14[0x40 - 0x14];
-    /* 0x040 */ u32 flags;
-    /* 0x044 */ u8 pad44[0x48 - 0x44];
-    /* 0x048 */ u8 mtx[2][0x40];
-    /* 0x0C8 */ u8 mtx2[2][0x18];
-    /* 0x0F8 */ ParticleDesc *desc;
-    /* 0x0FC */ u8 padFC[0x12C - 0xFC];
-    /* 0x12C */ CVector3 size;
-    /* 0x138 */ u8 pad138[0x1B5 - 0x138];
-    /* 0x1B5 */ u8 drawWhenHidden;
-    /* 0x1B6 */ u8 pad1B6[0x1D0 - 0x1B6];
-    /* 0x1D0 */ struct DrawParticle *next;
-} DrawParticle;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0xEC14];
-    /* 0xEC14 */ DrawParticle *renderHead;
-} ParticleDrawWorld;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x64];
@@ -72,17 +43,17 @@ extern u8 D_801102B8[];
 
 extern s32 func_0026F60C(void *planes, Box *box);
 extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);   /* transform point */
-extern void func_0022D2FC(DrawParticle *particle, void *mtx, Camera *camera, f32 depth);
+extern void func_0022D2FC(CParticle *particle, void *mtx, Camera *camera, f32 depth);
 extern void func_002254C0(void *list, CVector3 *pos, void *out);
 extern void func_0020B9F4(void *model, void *mtx, void *mtx2, s32 a, s32 b);
-extern void func_0022E094(DrawParticle *particle, ParticleView *view);
-extern void func_0022DCBC(DrawParticle *particle, ParticleView *view);
-extern void func_00236170(void *list, DrawParticle *particle, void *mtx);
+extern void func_0022E094(CParticle *particle, ParticleView *view);
+extern void func_0022DCBC(CParticle *particle, ParticleView *view);
+extern void func_00236170(void *list, CParticle *particle, void *mtx);
 
-void func_0023118C(ParticleDrawWorld *world, ParticleView *view) {
+void func_0023118C(CParticleSystem *world, ParticleView *view) {
     Box box;
     CVector3 transformed;
-    DrawParticle *node;
+    CParticle *node;
     Camera *camera;
     s32 visible, built;
     f32 zScale, xyScale, xScale, maximum, height, radius;
@@ -91,40 +62,40 @@ void func_0023118C(ParticleDrawWorld *world, ParticleView *view) {
     s32 mask;
     u32 builtFlag;
 
-    if (world->renderHead != 0) {
+    if (world->m_DrawList.m_pHead != 0) {
         GFX_CMD(0xE7000000, 0)
         GFX_CMD(0xE3001A01, 0x20)
         GFX_CMD(0xE3001801, 0x80)
         GFX_CMD(0xE3000A01, 0)
         GFX_CMD(0xD9F9FBFF, 0)
-        node = world->renderHead;
+        node = world->m_DrawList.m_pHead;
         mask = view->mask;
         builtFlag = 0x100000;
         if (node != 0) {
         next:
             visible = 0;
-            built = node->flags & builtFlag;
-            if (node->region == 0 || (mask & node->region->m_VisBits)) {
-                if (!(node->flags & 0x400000) && node->desc->renderModel == 0) {
-                    zScale = node->size.z;
-                    xyScale = node->size.y * zScale;
-                    xScale = node->size.x * zScale;
+            built = node->m_dwFlags & builtFlag;
+            if (node->header.m_pCurrentRegion == 0 || (mask & node->header.m_pCurrentRegion->m_VisBits)) {
+                if (!(node->m_dwFlags & 0x400000) && node->m_pEffect->m_pModel == 0) {
+                    zScale = node->m_vSize.z;
+                    xyScale = node->m_vSize.y * zScale;
+                    xScale = node->m_vSize.x * zScale;
                     if (!(xScale <= xyScale)) xyScale = xScale;
                     maximum = zScale;
                     if (!(xyScale <= maximum)) maximum = xyScale;
                     height = maximum * 1.4142135f;
                     radius = height * 0.5f;
-                    minX = node->pos.x - radius;
+                    minX = node->header.m_vPos.x - radius;
                     box.min.x = minX;
-                    maxX = node->pos.x + radius;
+                    maxX = node->header.m_vPos.x + radius;
                     box.max.x = maxX;
-                    minY = node->pos.y - radius;
+                    minY = node->header.m_vPos.y - radius;
                     box.min.y = minY;
-                    maxY = node->pos.y + height;
+                    maxY = node->header.m_vPos.y + height;
                     box.max.y = maxY;
-                    minZ = node->pos.z - radius;
+                    minZ = node->header.m_vPos.z - radius;
                     box.min.z = minZ;
-                    maxZ = node->pos.z + radius;
+                    maxZ = node->header.m_vPos.z + radius;
                     box.max.z = maxZ;
                     if (minX < view->clipMax.x && view->clipMin.x < maxX &&
                         minZ < view->clipMax.z && view->clipMin.z < maxZ &&
@@ -139,46 +110,46 @@ void func_0023118C(ParticleDrawWorld *world, ParticleView *view) {
                     if (!built) {
                         if (D_801198E0 == 1) {
                             camera = D_801198D0;
-                            func_0020F85C(camera->viewMatrix, &node->pos, &transformed);
+                            func_0020F85C(camera->viewMatrix, &node->header.m_vPos, &transformed);
                             depth = transformed.z;
                             if (depth < 0.0f) depth = -depth;
-                            func_0022D2FC(node, node->mtx[D_800B6D1C], camera, depth);
+                            func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
                         } else {
-                            func_0022D2FC(node, node->mtx[D_800B6D1C], 0, 0.0f);
+                            func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], 0, 0.0f);
                         }
-                        node->flags |= builtFlag;
+                        node->m_dwFlags |= builtFlag;
                     }
-                    if (node->desc->renderModel != 0) {
-                        func_002254C0(D_800F7078, &node->pos, node->mtx2[D_800B6D1C]);
-                        func_0020B9F4(node->desc->renderModel, node->mtx[D_800B6D1C], node->mtx2[D_800B6D1C], 0, -1);
+                    if (node->m_pEffect->m_pModel != 0) {
+                        func_002254C0(D_800F7078, &node->header.m_vPos, node->m_Lights[D_800B6D1C]);
+                        func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[D_800B6D1C], node->m_Lights[D_800B6D1C], 0, -1);
                     } else {
                         func_0022E094(node, view);
                     }
-                    if (node->desc->flags & builtFlag) {
+                    if (node->m_pEffect->m_dwFlags & builtFlag) {
                         func_0022DCBC(node, view);
                     }
-                    if (!node->drawWhenHidden || built) break;
-                    if (!(node->desc->flags & 0x10000)) {
-                        func_00236170(D_801102B8, node, node->mtx[D_800B6D1C]);
+                    if (!node->m_ActiveSwooshes || built) break;
+                    if (!(node->m_pEffect->m_dwFlags & 0x10000)) {
+                        func_00236170(D_801102B8, node, node->m_mtxDraw[D_800B6D1C]);
                     }
                 } else {
-                    if (!node->drawWhenHidden || built) break;
+                    if (!node->m_ActiveSwooshes || built) break;
                     if (D_801198E0 == 1) {
                         camera = D_801198D0;
-                        func_0020F85C(camera->viewMatrix, &node->pos, &transformed);
+                        func_0020F85C(camera->viewMatrix, &node->header.m_vPos, &transformed);
                         depth = transformed.z;
                         if (depth < 0.0f) depth = -depth;
-                        func_0022D2FC(node, node->mtx[D_800B6D1C], camera, depth);
+                        func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
                     } else {
-                        func_0022D2FC(node, node->mtx[D_800B6D1C], 0, 0.0f);
+                        func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], 0, 0.0f);
                     }
-                    node->flags |= builtFlag;
-                    if (!(node->desc->flags & 0x10000)) {
-                        func_00236170(D_801102B8, node, node->mtx[D_800B6D1C]);
+                    node->m_dwFlags |= builtFlag;
+                    if (!(node->m_pEffect->m_dwFlags & 0x10000)) {
+                        func_00236170(D_801102B8, node, node->m_mtxDraw[D_800B6D1C]);
                     }
                 }
             } while (0);
-            node = node->next;
+            node = node->m_pDrawNext;
             if (node != 0) goto next;
         }
         GFX_CMD(0xE7000000, 0)

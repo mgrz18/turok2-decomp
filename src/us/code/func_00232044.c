@@ -1,5 +1,5 @@
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/particle.h"
 
 /* The view the spawn is placed from (0x800F1CE8). */
 typedef struct {
@@ -8,39 +8,25 @@ typedef struct {
     /* 0xD0 */ CVector3 dir;
 } SpawnView;
 
-typedef struct {
-    u8 pad0[0x2];
-    /* 0x002 */ u16 typeId;
-    /* 0x004 */ CVector3 pos;
-    u8 pad10[0x8];
-    /* 0x018 */ CVector3 dir;
-    u8 pad24[0x1C];
-    /* 0x040 */ u32 flags;
-    u8 pad44[0x10C];
-    /* 0x150 */ CVector3 heading;
-    u8 pad15C[0x51];
-    /* 0x1AD */ u8 b1AD;
-} Actor;
-
 extern SpawnView D_800F1CE8;
 void func_0020F040(CVector3 *v);
 f32 func_002119FC(f32 a, f32 b);
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
-void func_00232044(Actor *actor, s32 kind) {
+void func_00232044(CParticle *actor, s32 kind) {
     CVector3 dir;
 
-    actor->flags |= 0x20000;
-    actor->pos = D_800F1CE8.pos;
-    actor->dir = D_800F1CE8.dir;
+    actor->m_dwFlags |= 0x20000;
+    actor->header.m_vPos = D_800F1CE8.pos;
+    actor->m_vVelocity = D_800F1CE8.dir;
     dir = D_800F1CE8.dir;
     func_0020F040(&dir);
-    actor->heading = dir;
+    actor->m_vDirection = dir;
     func_0020EF60(&dir, &dir, func_002119FC(-49.92f, 0.0f));
-    func_0020EEF8(&actor->pos, &actor->pos, &dir);
-    actor->b1AD = 0x7F;
-    if (actor->typeId == 0x56 && kind == 2) {
-        actor->flags |= 0x04000000;
+    func_0020EEF8(&actor->header.m_vPos, &actor->header.m_vPos, &dir);
+    actor->m_Shake = 0x7F;
+    if (actor->header.m_nObjType == 0x56 && kind == 2) {
+        actor->m_dwFlags |= 0x04000000;
     }
 }
