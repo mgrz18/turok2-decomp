@@ -3,6 +3,7 @@
  * with __CSPPostNextSeqEvent inlined. */
 
 #include "common.h"
+#include "structs/libaudio.h"
 
 #define AL_SEQ_REF_EVT 0
 #define AL_SEQ_MIDI_EVT 1
@@ -15,26 +16,7 @@
 #define AL_PLAYING 1
 #define AL_STOPPED 2
 
-typedef struct {
-    s16 type;
-    u8 msg[0xE];
-} ALEvent;
-
-typedef struct {
-    u8 data[0x1C];
-} ALEventQueue;
-
 /* An ALCSPlayer, as this reads it. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ void *target;            /* ALCSeq */
-    /* 0x1C */ u8 pad1C[0x8];
-    /* 0x24 */ s32 uspt;
-    /* 0x28 */ s32 nextDelta;
-    /* 0x2C */ s32 state;
-    /* 0x30 */ u8 pad30[0x18];
-    /* 0x48 */ ALEventQueue evtq;
-} ALCSPlayer;
 
 extern char D_800AA290[];
 extern char D_800AA294[];

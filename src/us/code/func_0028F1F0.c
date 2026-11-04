@@ -3,54 +3,10 @@
  * alCSeqNextEvent inlined. */
 
 #include "common.h"
+#include "structs/libaudio.h"
 
 #define AL_SEQ_END_EVT 4
 #define AL_TRACK_END 0x12
-
-typedef struct {
-    s32 ticks;
-    u8 status;
-    u8 byte1;
-    u8 byte2;
-    u32 duration;
-} ALMIDIEvent;
-
-typedef struct {
-    s16 type;
-    union {
-        ALMIDIEvent midi;
-    } msg;
-} ALEvent;
-
-typedef struct {
-    u32 trackOffset[16];
-    u32 division;
-} ALCMidiHdr;
-
-typedef struct {
-    ALCMidiHdr *base;
-    u32 validTracks;
-    f32 qnpt;
-    u32 lastTicks;
-    u32 lastDeltaTicks;
-    u32 deltaFlag;
-    u8 *curLoc[16];
-    u8 *curBUPtr[16];
-    u8 curBULen[16];
-    u8 lastStatus[16];
-    u32 evtDeltaTicks[16];
-} ALCSeq;
-
-typedef struct {
-    u32 validTracks;
-    s32 lastTicks;
-    u32 lastDeltaTicks;
-    u8 *curLoc[16];
-    u8 *curBUPtr[16];
-    u8 curBULen[16];
-    u8 lastStatus[16];
-    u32 evtDeltaTicks[16];
-} ALCSeqMarker;
 
 u32 func_0028F98C(ALCSeq *seq, u32 track);     /* __alCSeqNextDelta */
 u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 track, ALEvent *event);

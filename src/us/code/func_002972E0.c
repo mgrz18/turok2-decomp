@@ -1,32 +1,8 @@
 /* Boundary fixed in versions/cuts.us.txt: splat starts func_002972D8 two words early; the function starts
  * at 0x2972E0 (D_002972E0). */
 /* From decompals/ultralib (libultra 2.0I): src/audio/save.c, alSavePull. */
-
-typedef unsigned int u32;
-typedef short s16;
-typedef long s32;
-
-typedef union {
-    struct { u32 w0; u32 w1; } words;
-    long long force_align;
-} Acmd;
-
-typedef Acmd *(*ALCmdHandler)(void *, s16 *, s32, s32, Acmd *);
-
-typedef struct ALFilter_s {
-    /* 0x00 */ struct ALFilter_s *source;
-    /* 0x04 */ ALCmdHandler handler;
-    /* 0x08 */ void *setParam;
-    /* 0x0C */ s16 inp;
-    /* 0x0E */ s16 outp;
-    /* 0x10 */ s32 type;
-} ALFilter;
-
-typedef struct {
-    /* 0x00 */ ALFilter filter;
-    /* 0x14 */ s32 dramout;
-    /* 0x18 */ s32 first;
-} ALSave;
+#include "common.h"
+#include "structs/libaudio.h"
 
 #define _SHIFTL(v, s, w) ((u32)(((u32)(v) & ((0x01 << (w)) - 1)) << (s)))
 
