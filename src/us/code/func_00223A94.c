@@ -5,6 +5,7 @@
 #include "structs/world.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "structs/game_object.h"
 
 typedef struct Entity Entity;
 struct Entity {
@@ -28,7 +29,7 @@ typedef struct DamageEvent {
     /* 0x00 */ u8 pad0[0x18];
 } DamageEvent;
 
-extern Entity *D_8010FEB4;
+extern CListedInstance *D_8010FEB4;
 
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_00245828(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
@@ -90,7 +91,7 @@ void func_00223A94(CWorld *world, CVector3 *target) {
     DamageEvent event;
     CVector3 d;
     Entity *e;
-    Entity *node;
+    CListedInstance *node;
     Entity *actor;
     Entity *player;
     s32 count;
@@ -109,8 +110,8 @@ void func_00223A94(CWorld *world, CVector3 *target) {
             func_00243414(e, e->ai, 0x3D);
         }
     }
-    for (node = D_8010FEB4; node != NULL; node = node->next) {
-        actor = node;
+    for (node = D_8010FEB4; node != NULL; node = node->m_pNext) {
+        actor = (Entity *)&node->m_Instance;
         strength = blastStrength(actor, target);
         if (strength != 0) {
             func_00245828(&event, 0, strength << 8, 102.399994f, 0x400000, 0);

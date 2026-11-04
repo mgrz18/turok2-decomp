@@ -8,21 +8,15 @@ typedef struct {
     /* 0x5314 */ CList activeEffects;
 } World;
 
-typedef struct {
-    /* 0x000 */ CGameObjectInstance obj;
-    /* 0x288 */ u8 links[8];
-    /* 0x290 */ s32 *ownerCount;
-} Effect;
-
 s32 CList__AddTail(s32, void *);                 /* extern */
 s32 CList__Remove(s32, void *);                 /* extern */
 
 /* Retires an effect: drops the owner count and moves it back to the free list. */
-void func_00228484(World *world, Effect *arg1) {
+void func_00228484(World *world, CListedInstance *arg1) {
     s32 *temp_v1;
 
-    temp_v1 = arg1->ownerCount;
-    arg1->obj.m_AI.m_Health = 0;
+    temp_v1 = arg1->m_pOwnerCount;
+    arg1->m_Instance.m_AI.m_Health = 0;
     if (temp_v1 != NULL) {
         *temp_v1 -= 1;
     }
