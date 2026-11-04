@@ -19,7 +19,6 @@ typedef struct Particle {
     /* 0x10C */ Owner *owner;
 } Particle;
 
-extern s32 D_800F1D7C;
 extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 
 void func_0026E19C(s32 state, s32 bits, Particle *p);
@@ -66,22 +65,22 @@ static __inline__ s32 isGroupC(Particle *p) {
  * one set of bits when its owner is a kind 1 object flagged 0x300000, otherwise with
  * another when its descriptor is of kind 1 or 4. */
 void func_0022AAE0(Particle *p) {
-    if (D_800F1D7C != 0) {
+    if (D_800F1CE0.m_pWallRegion != 0) {
         Owner *owner = p->owner;
 
         if (owner != NULL && owner->kind == 1 && (owner->flags & 0x300000)) {
             if (isGroupA(p)) {
-                func_0026E19C(D_800F1D7C, 0x10, p);
+                func_0026E19C((s32)D_800F1CE0.m_pWallRegion, 0x10, p);
             }
             if (isGroupB(p)) {
-                func_0026E19C(D_800F1D7C, 8, p);
+                func_0026E19C((s32)D_800F1CE0.m_pWallRegion, 8, p);
             }
             if (isGroupC(p)) {
-                func_0026E19C(D_800F1D7C, 0x20, p);
+                func_0026E19C((s32)D_800F1CE0.m_pWallRegion, 0x20, p);
             }
         } else if (p->def->m_Type == 1 || p->def->m_Type == 4) {
             if (isGroupC(p)) {
-                func_0026E19C(D_800F1D7C, 0x200, p);
+                func_0026E19C((s32)D_800F1CE0.m_pWallRegion, 0x200, p);
             }
         }
     }

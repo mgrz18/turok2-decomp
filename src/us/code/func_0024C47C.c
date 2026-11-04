@@ -596,7 +596,6 @@ extern PlayerStateInfo D_800ADF54[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
 extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
-extern void *D_800F1D7C;
 extern s32 D_800F1D90;
 extern u8 D_800F7078;
 extern s32 D_80110054;
@@ -957,8 +956,8 @@ void func_0024D344(Player *p) {
             if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
                 func_0026E110((u8 *)D_800F1CE0.m_pInstance, soundFlags | 2, actor);
             }
-            if (D_800F1D7C != NULL) {
-                func_0026E19C(D_800F1D7C, linkFlags | 4, actor);
+            if (D_800F1CE0.m_pWallRegion != NULL) {
+                func_0026E19C((Model *)D_800F1CE0.m_pWallRegion, linkFlags | 4, actor);
             }
             func_0024ED54(p, actor, stateFlags);
             landed = func_0024EAF8(p, actor, stateFlags);

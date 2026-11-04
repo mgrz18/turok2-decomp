@@ -1,11 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-/* Spawn parameters next to each other in .data. */
-typedef struct {
-    /* 0x0 */ s32 arg;
-    /* 0x4 */ CVector3 pos;
-} SpawnParams;
+#include "structs/collision.h"
 
 typedef struct {
     u8 pad0[0x18];
@@ -23,7 +18,7 @@ typedef struct {
 } Actor;
 
 extern u8 D_800F8928[];
-extern SpawnParams D_800F1DA4;
+extern CCollisionResults D_800F1CE0;  /* the last collision test: the spawn lands on its water hit */
 extern CVector3 D_800F1DB8;
 void func_0020E810(CQuaternion *out, CVector3 *dir);
 s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
@@ -40,5 +35,5 @@ void func_00231C58(Actor *actor, s32 kind) {
     }
     func_0020E810(&rot, &origin);
     func_0022F350(D_800F8928, actor, actor->parent, actor->slot, actor->a, kind, origin, rot,
-                  D_800F1DA4.pos, (actor->flags190 & 0x1000000) ? 0 : D_800F1DA4.arg, -5, (actor->flags & 0x200006) | 1);
+                  D_800F1CE0.m_vWaterPos, (actor->flags190 & 0x1000000) ? 0 : (s32)D_800F1CE0.m_pWaterRegion, -5, (actor->flags & 0x200006) | 1);
 }
