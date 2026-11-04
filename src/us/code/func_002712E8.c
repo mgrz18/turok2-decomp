@@ -14,14 +14,6 @@ struct IntrusiveList {
     s32 count;
 };
 struct IntrusiveList;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Shared_Quad;
 struct Shared_Quad {
     union { s32 w[4]; f32 f[4]; };

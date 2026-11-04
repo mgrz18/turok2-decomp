@@ -12,15 +12,7 @@ struct IntrusiveList {
     s32 count;
 };
 struct IntrusiveList;
-struct CVector3_t;
 struct Triple;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Triple;
 struct Triple {
     s32 x;

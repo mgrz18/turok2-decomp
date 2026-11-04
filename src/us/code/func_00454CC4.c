@@ -17,14 +17,6 @@ struct IntrusiveList {
 struct IntrusiveList;
 extern int func_00285628(struct ControllerProfile *object);
 extern int func_00285670(struct ControllerProfile *object);
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Clip;
 struct Clip {
     s16 mode;

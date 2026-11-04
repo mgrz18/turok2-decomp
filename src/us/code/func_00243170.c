@@ -4,14 +4,6 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 extern s32 func_0021E9F8(void *arg0, s32 arg1, s32 arg2);
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct SoundSourceNode;
 struct SoundSourceNode {
     s32 unk0;
