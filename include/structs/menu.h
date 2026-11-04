@@ -14,6 +14,7 @@
 
 struct Menu;
 struct MenuItem;
+struct MenuItemLayout;
 struct MenuPool;
 struct CCamera;
 
@@ -30,11 +31,11 @@ typedef struct MenuItemDesc {
     /* 0x0E */ u8 b;
     /* 0x0F */ u8 a;
     /* 0x10 */ s32 data;            /* the item's starting data (its text...) */
-    /* 0x14 */ void (*draw)(struct MenuItem *item, struct Menu *menu, void *arg, void *arg2);
+    /* 0x14 */ void (*draw)(struct MenuItem *item, struct MenuItemLayout *layout, s32 arg, struct Menu *menu);
     /* 0x18 */ void (*update)(struct MenuItem *item, struct Menu *menu, void *arg);
     /* 0x1C */ s32 (*select)(struct MenuItem *item, struct Menu *menu, void *arg);
-    /* 0x20 */ s16 param;           /* free for the item's callbacks (an item type) */
-    /* 0x22 */ s16 index;
+    /* 0x20 */ s16 param;           /* free for the item's callbacks (the inventory menus: an item type) */
+    /* 0x22 */ s16 index;           /* (the inventory menus: which one of that type) */
 } MenuItemDesc; /* size 0x24 */
 
 /* A window's item (Rage Wars' CMenuItem_t), made from a MenuItemDesc; a
@@ -60,6 +61,20 @@ typedef struct MenuItem {
     /* 0x20 */ void *extra;         /* the 0x330-byte model of a type-3 item */
     /* 0x24 */ struct Menu *menu;   /* the window it belongs to */
 } MenuItem; /* size 0x28 */
+
+/* Where an item is drawn: func_0041363C lays an item out into one, the
+ * draw callbacks get it (Rage Wars' MenuOptionBox). */
+typedef struct MenuItemLayout {
+    /* 0x00 */ s32 mode;
+    /* 0x04 */ s32 width;
+    /* 0x08 */ s32 height;
+    /* 0x0C */ f32 scaleX;
+    /* 0x10 */ f32 scaleY;
+    /* 0x14 */ s32 left;
+    /* 0x18 */ s32 right;
+    /* 0x1C */ s32 top;
+    /* 0x20 */ s32 bottom;
+} MenuItemLayout; /* size 0x24 */
 
 /* What describes a menu window: its item table and callbacks. */
 typedef struct MenuDesc {
