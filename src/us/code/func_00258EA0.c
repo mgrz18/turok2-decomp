@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 extern f32 func_0021170C(f32 value, f32 rate);  /* moves value toward zero */
 extern void func_0027588C(s32 sound);
@@ -17,10 +18,6 @@ typedef struct {
     /* 0xA50 */ Sound *sound;
 } Owner;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ Owner *owner;
-} Actor;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x34];
@@ -32,11 +29,11 @@ typedef struct {
 
 /* Spins down unless held (state 4), turns the angle and drives the spin sound
  * from the spin speed. */
-void func_00258EA0(Actor *actor, Spinner *sp) {
+void func_00258EA0(CGameObjectInstance *actor, Spinner *sp) {
     Owner *owner;
     Sound *snd;
 
-    owner = actor->owner;
+    owner = ((Owner *)actor->m_AI.m_pParent);
     if (sp->state != 4) {
         sp->spin = func_0021170C(sp->spin, 0.0065449853f);
     }

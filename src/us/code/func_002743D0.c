@@ -1,25 +1,10 @@
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
-
-typedef struct {
-    /* 0x0 */ f32 x;
-    /* 0x4 */ f32 y;
-    /* 0x8 */ f32 z;
-} Vec3;
+#include "structs/vector.h"
 
 extern s32 D_800A8178;          /* f32 constants; [1] used here */
 extern f32 D_800B2A30;          /* falloff distance squared */
 
 /* Distance falloff: 1 - d^2 / D_800B2A30 inside, 0 outside. */
-f32 func_002743D0(Vec3 *arg0, Vec3 *arg1)
+f32 func_002743D0(CVector3 *arg0, CVector3 *arg1)
 {
   f32 temp_f0;
   f32 temp_f0_2;

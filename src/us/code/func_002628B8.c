@@ -12,9 +12,6 @@ typedef struct ActorLink {
                u8 pad0[8];
                void (*cb)();
 } ActorLink;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef union B01IF { s32 i; f32 f; } B01IF;
 typedef union B01FH { f32 f; s32 i; s16 h; } B01FH;
 typedef struct B01Vec4 { f32 x, y, z, w; } B01Vec4;

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -38,21 +39,14 @@ typedef struct {
     /* 0x1418 */ s32 mode;
 } Game;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ void *camera;
-    /* 0x520 */ u8 pad520[0xA28 - 0x520];
-    /* 0xA28 */ f32 unkA28;
-} Player;
-
 extern Game D_80119870;
-extern Player *D_80119890;     /* the current player */
+extern CPlayer *D_80119890;     /* the current player */
 extern u8 D_800F7078[];
 extern u8 D_800B6674[];
 extern u8 D_801100F0[];
 extern Actor *D_8010FEB4[]; /* the actor list head */
 
-Player *func_002532A8(Game *);
+CPlayer *func_002532A8(Game *);
 void func_0027FC2C(void *hud, void *camera, u8 *msg);
 void func_0027580C(s32 sound);
 s8 func_00219F74(Actor *actor, s32 id, s32);
@@ -76,13 +70,13 @@ static __inline__ void setAnim(Actor *actor, s32 id) {
  * the current player. */
 void func_0040813C(BossFight *fight) {
     Game *game = &D_80119870;
-    Player *player;
+    CPlayer *player;
     Actor *a;
-    Player *current;
+    CPlayer *current;
 
     player = func_002532A8(game);
-    func_0027FC2C(game->hud, player->camera, D_800B6674);
-    player->unkA28 = 900.0f;
+    func_0027FC2C(game->hud, player->m_pCamera, D_800B6674);
+    player->m_InvincibilityTime = 900.0f;
     fight->state = 2;
     fight->warned = 2;
     setAnim(fight->obj, 0x5336);

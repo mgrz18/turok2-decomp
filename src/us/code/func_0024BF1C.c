@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct WeaponInfo WeaponInfo;
 
@@ -21,19 +22,14 @@ typedef struct WeaponMenu {
     /* 0x37C */ s32 cursor;
 } WeaponMenu;
 
-typedef struct Player {
-    /* 0x000 */ u8 pad0[0xB14];
-    /* 0xB14 */ s16 nextWeapon;
-} Player;
-
 extern f32 D_800AE2D8;              /* slot scale */
 extern WeaponInfo *D_800AF618[];
 
-s32 func_0024E700(Player *player, s32 weapon);
+s32 func_0024E700(CPlayer *player, s32 weapon);
 
 /* Fills the weapon menu with the weapons flagged in `owned` (35 entries,
  * `rows` times over), spreading the slots evenly around the wheel. */
-void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, Player *player) {
+void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player) {
     s32 i;
     s32 n;
     s32 w;
@@ -55,7 +51,7 @@ void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, Player *p
                 menu->slots[n].weapon = w;
                 menu->slots[n].available = ok;
                 menu->slots[n].info = info;
-                if (menu->cursor == -1 && w == player->nextWeapon) {
+                if (menu->cursor == -1 && w == player->m_RequestedWeapon) {
                     menu->cursor = n;
                     menu->spin = menu->slots[n].angle;
                 }

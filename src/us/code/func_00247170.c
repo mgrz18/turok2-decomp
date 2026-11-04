@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 /* The scope model raised to the view. */
 typedef struct {
@@ -19,11 +20,6 @@ typedef struct {
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xB90];
-    /* 0xB90 */ f32 zoom;
-} ZoomPlayer;
-
 extern u8 D_8011AAF1;           /* multiplayer */
 extern f32 D_800B6D28;          /* the frame's time step */
 extern u8 D_800F7078[];         /* the level */
@@ -34,7 +30,7 @@ void *func_00224F84(void *level, s32 index);
 /* Places the scope model and animates it up (state 1) or down (state 3)
  * over 3.75 frames: the sniper scope (0xC83) swings in from the side, the
  * others tip up from below. */
-void func_00247170(HudModel *m, ZoomPlayer *owner) {
+void func_00247170(HudModel *m, CPlayer *owner) {
     s32 index;
 
     if (m->current == 0xC83) {
@@ -87,7 +83,7 @@ void func_00247170(HudModel *m, ZoomPlayer *owner) {
         case 2:
             break;
         case 3:
-            if (owner->zoom == 0.0f) {
+            if (owner->m_ZoomBlend == 0.0f) {
                 m->time -= D_800B6D28;
                 if (m->time <= 0.0f) {
                     m->state = 0;

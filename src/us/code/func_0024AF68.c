@@ -1,4 +1,6 @@
 #include "common.h"
+#include "structs/vector.h"
+#include "gfx.h"
 
 /* Draws the weapon menu's icons: sorts the listed items, places each one in
  * the player's viewport (on the wheel, or in a vertical strip that fades out
@@ -8,14 +10,6 @@
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct Gfx {
-    u32 w0;
-    u32 w1;
-} Gfx;
 
 typedef struct MenuSlot {
     /* 0x00 */ s32 weapon;
@@ -38,7 +32,7 @@ typedef struct WeaponMenu {
 
 typedef struct MenuItem {
     /* 0x00 */ s32 slot;
-    /* 0x04 */ Vec3f position;
+    /* 0x04 */ CVector3 position;
     /* 0x10 */ s32 icon;
     /* 0x14 */ f32 alpha;
     /* 0x18 */ f32 size;

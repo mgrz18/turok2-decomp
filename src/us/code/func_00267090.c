@@ -3,51 +3,33 @@
  * jal), and the rest into func_00267094. Written whole under its real name.
  * Its switch reads jtbl_800A7D30, which still lives in the asm .rodata. */
 #include "common.h"
+#include "structs/game_object.h"
+#include "structs/intelligence.h"
+#include "structs/player.h"
 
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ u8 pad4[0x10];
-    /* 0x14 */ u32 flags;
-} ActorDef;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
     /* 0x1C */ u32 flags;
 } Attachment;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xBF8];
-    /* 0xBF8 */ s32 unkBF8;
-} Player;
-
-typedef struct {
-    /* 0x000 */ u8 type; /* 1: player */
-    /* 0x001 */ u8 pad1[0x13];
-    /* 0x014 */ ActorDef *def;
-    /* 0x018 */ u8 pad18[0xBC];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x98];
-    /* 0x170 */ Attachment *attachment;
-    /* 0x174 */ u8 pad174[0x34];
-    /* 0x1A8 */ Player *owner;
-} Actor;
 
 extern u8 D_8011AAF1;
 
-s32 func_00267090(Actor *actor) {
-    Player *owner;
+s32 func_00267090(CGameObjectInstance *actor) {
+    CPlayer *owner;
     Attachment *attachment;
     u32 flags;
     u32 mask;
 
-    switch ((u32) actor->def->kind) {
+    switch ((u32) actor->header.m_pIntelligence->m_Type) {
         case 11:
-            if (actor->type != 1) {
+            if (actor->header.m_Type != 1) {
                 return 1;
             }
-            if (actor->flags & 0x300000) {
-                owner = actor->owner;
-                if (D_8011AAF1 != 0 && owner->unkBF8 != 0) {
+            if (actor->m_dwFlags & 0x300000) {
+                owner = ((CPlayer *)actor->m_AI.m_pParent);
+                if (D_8011AAF1 != 0 && owner->m_bEnteringDeathmatch != 0) {
                     return 0;
                 }
             }
@@ -55,14 +37,14 @@ s32 func_00267090(Actor *actor) {
         case 8:
             return 1;
         case 0:
-            return actor->def->flags & 2;
+            return actor->header.m_pIntelligence->m_dwTypeFlags & 2;
         case 2:
-            if (actor->type == 1) {
-                return actor->flags & 0x10000;
+            if (actor->header.m_Type == 1) {
+                return actor->m_dwFlags & 0x10000;
             }
             return 0;
         case 1:
-            if (actor->type == 1 && (actor->flags & 0x2000) && (attachment = actor->attachment) != NULL) {
+            if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x2000) && (attachment = ((Attachment *)actor->m_AI.m_pModeCurrent)) != NULL) {
                 mask = 0x10000;
                 return (attachment->flags & mask) == 0;
             }
@@ -71,8 +53,8 @@ s32 func_00267090(Actor *actor) {
         case 5:
         case 7:
         case 10:
-            if (actor->type == 1) {
-                flags = actor->flags;
+            if (actor->header.m_Type == 1) {
+                flags = actor->m_dwFlags;
                 if (!(flags & 0x2000)) {
                     return 0;
                 }
@@ -80,7 +62,7 @@ s32 func_00267090(Actor *actor) {
             }
             return 0;
         case 12:
-            return actor->def->flags & 1;
+            return actor->header.m_pIntelligence->m_dwTypeFlags & 1;
         case 3:
         case 6:
         case 9:

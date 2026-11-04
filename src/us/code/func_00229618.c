@@ -1,10 +1,9 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Projectile wobble: swings the velocity sideways (and then up/down) along
  * sine waves whose amplitude scales with how close the projectile is to its
  * top speed. */
-
-typedef struct { f32 x, y, z; } Vec3f;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -18,13 +17,13 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x18];
-    /* 0x018 */ Vec3f vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0xF8 - 0x24];
     /* 0x0F8 */ ProjectileDef *def;
     /* 0x0FC */ u8 padFC[0x11C - 0xFC];
     /* 0x11C */ f32 speed;
     /* 0x120 */ u8 pad120[0x150 - 0x120];
-    /* 0x150 */ Vec3f dir;
+    /* 0x150 */ CVector3 dir;
     /* 0x15C */ u8 pad15C[0x178 - 0x15C];
     /* 0x178 */ f32 phaseX;
     /* 0x17C */ f32 phaseY;
@@ -35,19 +34,19 @@ typedef struct {
 } Projectile;
 
 extern f32 func_002982F0(f32);                              /* sinf */
-extern void func_0020EFDC(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a x b */
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 s);    /* out = in * s */
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a - b */
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a + b */
+extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a x b */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern f32 D_800B6D28;                                      /* frame time scale */
 
 void func_00229618(Projectile *p, f32 scale) {
-    Vec3f up;
-    Vec3f axis;
-    Vec3f dir;
-    Vec3f before;
-    Vec3f after;
-    Vec3f side;
+    CVector3 up;
+    CVector3 axis;
+    CVector3 dir;
+    CVector3 before;
+    CVector3 after;
+    CVector3 side;
     f32 maxSpeed;
     f32 k;
 

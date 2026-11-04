@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* The player options (CPlayer.m_pOptions; D_8011AB18 holds the defaults). */
 struct CPlayerOptions {
@@ -25,17 +26,11 @@ typedef struct {
     /* 0xBF4 */ s32 unkBF4;
 } Player;
 
-/* A menu item (MenuItem in func_00450F4C): the player whose options it shows. */
-typedef struct MenuItem {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ Player *player;
-} MenuItem;
-
 s32 func_00416644(s32, s32, s32, s32, s32);
 
 extern s32 D_00438728;
 
-s32 func_00451368(s32 arg0, MenuItem *arg1) {
+s32 func_00451368(s32 arg0, Menu *arg1) {
     Player *temp_a2;
 
     temp_a2 = arg1->player;

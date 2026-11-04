@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Boss fight tick: updates the 15 attack slots, then (outside cinematics)
  * counts up the two timers: by phase, drops a random pickup somewhere in the
@@ -6,12 +7,8 @@
  * (func_00409500). */
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
 } PoolActor;
 
 typedef struct {
@@ -44,14 +41,14 @@ extern s32 func_0026D518(void *table);
 extern f32 func_002119FC(f32 lo, f32 hi);
 extern f32 func_002982F0(f32);
 extern f32 func_002974C0(f32);
-extern s32 func_00220A1C(void *level, Vec3f *pos);
-extern PoolActor *func_00227240(void *pool, s32 *refCount, s32 id, Vec3f vel, Vec3f pos, s32 region, f32 lifetime);
-extern void func_00246690(PoolActor *actor, s32 sound, Vec3f pos, s32 arg);
+extern s32 func_00220A1C(void *level, CVector3 *pos);
+extern PoolActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern void func_00246690(PoolActor *actor, s32 sound, CVector3 pos, s32 arg);
 extern void func_00409500(s32 lifetime, void *table);
 
 /* func_0040C2C4 */
-static __inline__ void spawnPickup(s32 id, s32 lifetime, Vec3f pos) {
-    Vec3f vel;
+static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
+    CVector3 vel;
     s32 region;
     PoolActor *pickup;
 
@@ -66,7 +63,7 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, Vec3f pos) {
 }
 
 void func_00409784(State *s) {
-    Vec3f pos;
+    CVector3 pos;
     s32 i;
     s32 spawn;
     s32 lifetime;

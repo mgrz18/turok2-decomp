@@ -1,14 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-/* A navigation region: a triangle with its three corners and the regions
- * across each edge. */
-typedef struct Region {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 flags;               /* 0x8000: visited; 0x20: edges need a common neighbour */
-    /* 0x04 */ CVector3 *corner[3];
-    /* 0x10 */ struct Region *neighbour[3];
-} Region;
+#include "structs/region.h"
 
 typedef struct SweepDef {
     /* 0x00 */ s32 flags;
@@ -59,7 +51,7 @@ typedef struct MapSweep {
     /* 0x60 */ f32 across;
     /* 0x64 */ f32 endSide;
     /* 0x68 */ f32 t;
-    /* 0x6C */ Region *next;
+    /* 0x6C */ CGameRegion *next;
     /* 0x70 */ s32 hit;
     /* 0x74 */ f32 minX;
     /* 0x78 */ f32 minZ;
@@ -82,11 +74,11 @@ f32 func_00298470(f32 x);               /* sqrtf */
 s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
 s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
                   s32 frontOnly, s32 arg7, f32 arg8, s32 fromInside);
-Region *func_0023B664(Sweep *mover, Region *region, s32 edge, CVector3 *pos);
+CGameRegion *func_0023B664(Sweep *mover, CGameRegion *region, s32 edge, CVector3 *pos);
 
 /* Walk the regions the sweep's box overlaps, from region, sweeping the
  * sweep's circle against each wall edge (and the corners at its ends). */
-void func_00240800(Region *region) {
+void func_00240800(CGameRegion *region) {
     u8 cornerDone[3];
     s32 i;
 
@@ -94,27 +86,27 @@ void func_00240800(Region *region) {
         return;
     }
     i = 0;
-    region->flags |= 0x8000;
+    region->m_wFlags |= 0x8000;
     cornerDone[2] = 0;
     cornerDone[1] = 0;
     cornerDone[0] = 0;
     do {
-        D_800F1AB0->next = region->neighbour[i];
+        D_800F1AB0->next = region->m_pNeighbours[i];
         if (D_800F1AB0->next != NULL) {
-            if (D_800F1AB0->next->flags & 0x8000) {
+            if (D_800F1AB0->next->m_wFlags & 0x8000) {
                 continue;
             }
-            if (region->flags & 0x20) {
-                if (D_800F1AB0->next->neighbour[0] != region && D_800F1AB0->next->neighbour[1] != region &&
-                    D_800F1AB0->next->neighbour[2] != region) {
+            if (region->m_wFlags & 0x20) {
+                if (D_800F1AB0->next->m_pNeighbours[0] != region && D_800F1AB0->next->m_pNeighbours[1] != region &&
+                    D_800F1AB0->next->m_pNeighbours[2] != region) {
                     continue;
                 }
             } else {
                 D_800F1AB0->next = func_0023B664(D_800F1AB0->sweep, region, i, &D_800F1AB0->sweep->inst->pos);
             }
         }
-        D_800F1AB0->a = region->corner[i];
-        D_800F1AB0->b = region->corner[i == 2 ? 0 : i + 1];
+        D_800F1AB0->a = region->m_pVertices[i];
+        D_800F1AB0->b = region->m_pVertices[i == 2 ? 0 : i + 1];
         if (D_800F1AB0->a->x <= D_800F1AB0->minX && D_800F1AB0->b->x <= D_800F1AB0->minX) {
             continue;
         }

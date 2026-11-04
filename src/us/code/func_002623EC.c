@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ s32 type;
@@ -37,7 +34,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x14 - 0x10];
     /* 0x14 */ TurretDef *def;
     /* 0x18 */ u8 pad18[0x50 - 0x18];
@@ -46,7 +43,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
 } TargetActor;
 
 typedef struct {
@@ -61,17 +58,17 @@ typedef struct {
 void func_00210EF0(f32 *angle);
 void func_00246108(Turret *self, AI *ai, Targets *out, s32 f1, s32 f2);
 f32 func_002671B4(void *actor);
-void func_0020EF2C(Vec3 *out, Vec3 *a, Vec3 *b);
-f32 func_0020F5C0(Vec3 *v);
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+f32 func_0020F5C0(CVector3 *v);
 void func_00262150(Turret *self, AI *ai, s32 mode, TargetActor *target);
 void func_00245BAC(Turret *self, AI *ai, f32 turnRate, f32 angle);
 f32 func_00211774(f32 cur, f32 target, f32 rate);
 
 s32 func_002623EC(Turret *self, AI *ai) {
     Targets t;
-    Vec3 from;
-    Vec3 to;
-    Vec3 delta;
+    CVector3 from;
+    CVector3 to;
+    CVector3 delta;
     f32 yaw;
     TurretParams *params;
     TargetActor *target;

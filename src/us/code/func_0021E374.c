@@ -1,11 +1,8 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/game_object.h"
 
 typedef struct Box {
-    Vec3 corners[8];            /* 0x00 */
+    CVector3 corners[8];            /* 0x00 */
     u8 pad60[0x68 - 0x60];
     f32 unk68;                  /* 0x68 */
     s32 mask;                   /* 0x6C: parts it belongs to */
@@ -15,31 +12,22 @@ typedef struct Mtx44 {
     f32 m[4][4];
 } Mtx44;                        /* 0x40 bytes */
 
-typedef struct Actor {
-    u8 pad0[0x98];
-    Mtx44 *matrices;            /* 0x98 */
-    Mtx44 *prevMatrices;        /* 0x9C */
-    u8 padA0[0xD4 - 0xA0];
-    s32 flags;                  /* 0xD4 */
-    u8 padD8[0x14C - 0xD8];
-    s32 partMask;               /* 0x14C */
-} Actor;
 
 extern u8 D_8011AAF1;
 
-void **func_0021F358(Actor *actor);
+void **func_0021F358(CGameObjectInstance *actor);
 void *func_002017D4(void *table, s32 index);
-void func_0020EEF8(Vec3 *dst, Vec3 *a, Vec3 *b);    /* add */
-void func_0020EF60(Vec3 *dst, Vec3 *src, f32 scale);
+void func_0020EEF8(CVector3 *dst, CVector3 *a, CVector3 *b);    /* add */
+void func_0020EF60(CVector3 *dst, CVector3 *src, f32 scale);
 void func_0020D908(Mtx44 *dst, Mtx44 *src);
-void func_0020F85C(Mtx44 *m, Vec3 *in, Vec3 *out);
-void func_0020EF2C(Vec3 *dst, Vec3 *a, Vec3 *b);    /* subtract */
+void func_0020F85C(Mtx44 *m, CVector3 *in, CVector3 *out);
+void func_0020EF2C(CVector3 *dst, CVector3 *a, CVector3 *b);    /* subtract */
 void func_002051F4(s32 arg0, void **handle);
 
 /* Copies the actor's bounding box whose center is nearest to pos into out. */
-s32 func_0021E374(Actor *actor, Vec3 pos, Box *out) {
-    Vec3 center;
-    Vec3 d;
+s32 func_0021E374(CGameObjectInstance *actor, CVector3 pos, Box *out) {
+    CVector3 center;
+    CVector3 d;
     Mtx44 mtx;
     void **handle;
     void *boxes;
@@ -52,9 +40,9 @@ s32 func_0021E374(Actor *actor, Vec3 pos, Box *out) {
     f32 dist;
     f32 bestDist;
 
-    matrices = actor->matrices;
+    matrices = ((Mtx44 *)actor->m_pmtDrawMtxs);
     if (matrices == NULL) {
-        matrices = actor->prevMatrices;
+        matrices = ((Mtx44 *)actor->m_pmtLastFrameDrawMtxs);
         if (matrices == NULL) {
             return 0;
         }
@@ -69,7 +57,7 @@ s32 func_0021E374(Actor *actor, Vec3 pos, Box *out) {
     bestDist = 3.4028235e38f;
     for (i = 0; i < count; i++) {
         box = func_002017D4(func_002017D4(boxes, i), 1);
-        if (!(box->mask & actor->partMask)) {
+        if (!(box->mask & actor->m_AI.m_VisBits)) {
             continue;
         }
         center = box->corners[0];
@@ -88,7 +76,7 @@ s32 func_0021E374(Actor *actor, Vec3 pos, Box *out) {
     }
     if (best != NULL) {
         *out = *best;
-        if ((actor->flags & 0x300000) && D_8011AAF1 == 0) {
+        if ((actor->m_dwFlags & 0x300000) && D_8011AAF1 == 0) {
             out->unk68 = 1.0f;
         }
     }

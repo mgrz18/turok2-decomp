@@ -1,24 +1,11 @@
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 /* From decompals/ultralib (libultra 2.0I): src/io/leointerrupt.c, __osLeoResume (static there), with Turok 2's symbols. */
 
-typedef long s32;
-typedef void *OSMesg;
-
+#include "common.h"
+#include "ultra_types.h"
 #define NULL 0
 
-typedef struct OSThread_s {
-    /* 0x00 */ struct OSThread_s *next;
-    /* 0x04 */ s32 priority;
-} OSThread;
 
-typedef struct {
-    /* 0x00 */ OSThread *mtqueue;
-    /* 0x04 */ OSThread *fullqueue;
-    /* 0x08 */ s32 validCount;
-    /* 0x0C */ s32 first;
-    /* 0x10 */ s32 msgCount;
-    /* 0x14 */ OSMesg *msg;
-} OSMesgQueue;
 
 typedef struct {
     /* 0x00 */ OSMesgQueue *messageQueue;

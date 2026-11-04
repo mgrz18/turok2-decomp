@@ -1,22 +1,19 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Bounds {
-    Vec3 min;                   /* 0x00 */
-    Vec3 max;                   /* 0x0C */
+    CVector3 min;                   /* 0x00 */
+    CVector3 max;                   /* 0x0C */
 } Bounds;
 
 /* A level actor spawned at run time (a pickup), kept in the world's pool. */
 typedef struct PoolActor {
     /* 0x000 */ u8 pad0[0x2];
     /* 0x002 */ s16 index;              /* in the level's id table */
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 unk10;
     /* 0x014 */ void *def;
-    /* 0x018 */ Vec3 vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ s32 unk24[4];
     /* 0x034 */ s32 resource;
     /* 0x038 */ u8 pad38[0x138 - 0x38];
@@ -60,7 +57,7 @@ s32 func_00224180(void *world, s32 id);
 s32 func_00224F84(void *world, s32 index);
 void func_00227B7C(ActorPool *pool, PoolActor *actor);
 f32 func_002671B4(PoolActor *actor);
-void func_002254C0(void *world, Vec3 *pos, void *out);
+void func_002254C0(void *world, CVector3 *pos, void *out);
 
 /* Takes a free slot, or releases the oldest actor for one, links it at the head and clears it. */
 static __inline__ PoolActor *allocActor(ActorPool *pool) {
@@ -94,9 +91,9 @@ static __inline__ PoolActor *allocActor(ActorPool *pool) {
 
 /* Spawns a pool actor of the given level id at pos with velocity vel, taking a free slot (or
  * the oldest one, released first) and linking it at the head; counts it in *refCount. */
-PoolActor *func_00227240(ActorPool *pool, s32 *refCount, s32 id, Vec3 vel, Vec3 pos, s32 arg9, f32 lifetime) {
+PoolActor *func_00227240(ActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 arg9, f32 lifetime) {
     PoolActor *actor;
-    Vec3 p;
+    CVector3 p;
     s32 index;
     s32 resource;
 

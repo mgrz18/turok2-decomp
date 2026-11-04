@@ -6,20 +6,10 @@
  * func_0027D160: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80233920_6.CPP, func_80234FEC_de, with Turok 2's layouts.
  * func_0027E000: after the same file's Camera_SetupViewportAndFog. */
 #include "common.h"
+#include "structs/player.h"
 #include "gfx.h"
 #include "structs/camera.h"
-
-/* What this reads of a player. */
-typedef struct CameraPlayer {
-    /* 0x0000 */ u8 _pad0[0x51C];
-    /* 0x051C */ CCamera *m_pCamera;
-    /* 0x0520 */ u8 _pad520[0x4FC];
-    /* 0x0A1C */ u32 m_Flags;               /* 0x40: under water */
-    /* 0x0A20 */ u8 _padA20[0x60];
-    /* 0x0A80 */ f32 m_SwimSpeed;
-    /* 0x0A84 */ u8 _padA84[0x89C];
-    /* 0x1320 */ struct CameraPlayer *m_pNext;
-} CameraPlayer;
+#include "structs/game.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -40,7 +30,7 @@ typedef struct {
     /* 0x1C */ u32 m_VisBits;
 } CFloor;
 
-extern CameraPlayer *D_80119890;
+extern CPlayer *D_80119890;
 extern f32 D_800B6D28;          /* the frame's time step */
 extern CCameraMode D_800B6CB4[];
 extern s32 D_800B6D1C;          /* which of the two frame buffers is drawn */
@@ -103,8 +93,8 @@ void func_0027D160(CCamera *cam) {
     CVector3 corners[5];
     CVector3 tremor, shake, shakeOffset;
     CQuaternion qGround;
-    CameraPlayer *node;
-    CameraPlayer *player;
+    CPlayer *node;
+    CPlayer *player;
     LookAt *lookAt;
     void (*update)(CCamera *);
     CShake *s;
@@ -243,12 +233,12 @@ found:
     func_0020C208(mInv, m);
     func_0020C618(mView, mInv, mLookAt);
     func_0020FF80(cam->m_mfView, mView);
-    if (player != NULL && (player->m_Flags & 0x40) && cam->m_ViewParams.m_nType == 0 && Cinema_PathPlaying() == 0) {
+    if (player != NULL && (player->m_ModeFlags & 0x40) && cam->m_ViewParams.m_nType == 0 && Cinema_PathPlaying() == 0) {
         cam->m_XScale = MIN1(cam->m_WaterWobbleXScale * 0.5f * (func_002982F0(cam->m_WaterWobbleXAngle) + 1.0f) + 0.8f);
         cam->m_YScale = MIN1(cam->m_WaterWobbleYScale * 0.5f * (func_002982F0(cam->m_WaterWobbleYAngle) + 1.0f) + 0.9f);
         cam->m_WaterWobbleXAngle += D_800B6D28 * cam->m_WaterWobbleXSpeed;
         cam->m_WaterWobbleYAngle += D_800B6D28 * cam->m_WaterWobbleYSpeed;
-        swim = player->m_SwimSpeed * 2.5f;
+        swim = player->m_TotalSpeed * 2.5f;
         if (swim < 0.0f) {
             swim = 0.0f;
         } else if (1.0f < swim) {
@@ -427,10 +417,6 @@ found:
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 extern s32 D_800B6D1C;          /* which of the two frame buffers is drawn */
-typedef struct {
-    /* 0x00 */ s32 m_Flags;
-} GameFlags;
-extern GameFlags D_8011AAD8;    /* game flags */
 extern Gfx D_800AB100[];        /* RDP setup display lists */
 extern Gfx D_800AB130[];
 extern CCamera D_801198F0;      /* the main camera (camera pool + 0x40) */
@@ -541,7 +527,7 @@ void func_0027E000(CCamera *cam) {
                 (ulx & 0x3FF) << 14 | (uly & 0x3FF) << 2);  /* gDPFillRectangle */
             *clearDl = cmd;
         }
-        if (D_8011AAD8.m_Flags & 0x4000) {
+        if (D_8011AAD8.cheatFlags & 0x4000) {
             rgb.red = 0;
             rgb.green = 0;
             rgb.blue = 0;

@@ -1,25 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-/* A navigation region: a triangle with its three corners and the regions
- * across each edge. */
-typedef struct Region {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 flags;
-    /* 0x04 */ CVector3 *corner[3];
-    /* 0x10 */ struct Region *neighbour[3];
-} Region;
+#include "structs/region.h"
 
 typedef struct SweepDef {
     /* 0x00 */ s32 flags;
     /* 0x04 */ s16 unk4;
     /* 0x06 */ s8 onGround;
 } SweepDef;
-
-typedef struct RegionInfo {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ s32 flags;
-} RegionInfo;
 
 /* A segment swept from an instance's position to end. */
 typedef struct Sweep {
@@ -34,12 +21,12 @@ typedef struct Sweep {
 
 extern s32 D_800F7078[];
 
-RegionInfo *func_0022425C(s32 *list, Region *region);
-void func_0026BC54(CVector3 *normal, Region *region);
-s32 func_0026AFC0(Region *region);
+CRegionInfo *func_0022425C(s32 *list, CGameRegion *region);
+void func_0026BC54(CVector3 *normal, CGameRegion *region);
+s32 func_0026AFC0(CGameRegion *region);
 s32 func_00267EA8(CGameObjectInstance *obj);
 s32 func_00267EE8(CGameObjectInstance *obj);
-f32 func_0026BE60(Region *region, f32 x, f32 z);
+f32 func_0026BE60(CGameRegion *region, f32 x, f32 z);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_002982F0(f32);   /* sinf */
 f32 func_002974C0(f32);   /* cosf */
@@ -49,7 +36,7 @@ f32 func_00298470(f32);   /* sqrtf */
  * on the region's surface at the same distance along the slope. */
 void func_0023BE24(Sweep *sweep) {
     CGameObjectInstance *obj;
-    RegionInfo *info;
+    CRegionInfo *info;
     CVector3 normal;
     CVector3 toEnd;
     s32 allowed;
@@ -71,8 +58,8 @@ void func_0023BE24(Sweep *sweep) {
     }
     obj = sweep->obj;
     if (sweep->checkRegionInfo) {
-        info = func_0022425C(D_800F7078, (Region *)obj->header.m_pCurrentRegion);
-        if (info != NULL && (info->flags & 0x4000)) {
+        info = func_0022425C(D_800F7078, (CGameRegion *)obj->header.m_pCurrentRegion);
+        if (info != NULL && (info->m_dwFlags & 0x4000)) {
             flag = 0;
         } else {
             flag = sweep->def->onGround;
@@ -88,10 +75,10 @@ void func_0023BE24(Sweep *sweep) {
         sweep->onGround = 0;
         return;
     }
-    func_0026BC54(&normal, (Region *)obj->header.m_pCurrentRegion);
-    if (func_0026AFC0((Region *)obj->header.m_pCurrentRegion)) {
+    func_0026BC54(&normal, (CGameRegion *)obj->header.m_pCurrentRegion);
+    if (func_0026AFC0((CGameRegion *)obj->header.m_pCurrentRegion)) {
         if (func_00267EA8(obj)) {
-            if (!(((Region *)obj->header.m_pCurrentRegion)->flags & 0x10)) {
+            if (!(((CGameRegion *)obj->header.m_pCurrentRegion)->m_wFlags & 0x10)) {
                 sweep->onGround = 0;
                 return;
             }
@@ -111,10 +98,10 @@ void func_0023BE24(Sweep *sweep) {
             }
         }
     }
-    startY = func_0026BE60((Region *)obj->header.m_pCurrentRegion, obj->header.m_vPos.x, obj->header.m_vPos.z);
-    endY = func_0026BE60((Region *)obj->header.m_pCurrentRegion, sweep->end.x, sweep->end.z);
+    startY = func_0026BE60((CGameRegion *)obj->header.m_pCurrentRegion, obj->header.m_vPos.x, obj->header.m_vPos.z);
+    endY = func_0026BE60((CGameRegion *)obj->header.m_pCurrentRegion, sweep->end.x, sweep->end.z);
     if (obj->header.m_pCurrentRegion != NULL) {
-        func_0020EF2C(&toEnd, &sweep->end, ((Region *)obj->header.m_pCurrentRegion)->corner[0]);
+        func_0020EF2C(&toEnd, &sweep->end, ((CGameRegion *)obj->header.m_pCurrentRegion)->m_pVertices[0]);
     } else {
         toEnd = sweep->end;
     }

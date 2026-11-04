@@ -12,6 +12,7 @@
  * func_00219ACC names the same "animation" literal as func_00218B10.
  * func_00218DCC and func_00219328 are Rage Wars imports. */
 #include "common.h"
+#include "structs/vector.h"
 
 /* Switches an animation player to its queued animation. With `blend` set and a
  * different animation queued, it loads that one and, if `previous` is given,
@@ -130,17 +131,12 @@ void func_00218B10(AnimPlayer *player, s32 file, s32 base, s32 blend, s32 *chang
  * the root yaw change since the last frame, wrapping to the clip's loop
  * start when time runs past the last frame. */
 
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
-
 typedef struct RootClip {
     /* 0x0 */ u16 count;
     /* 0x2 */ u16 loopStart; /* 0xFFFF: none */
     /* 0x4 */ u8 pad4[4];
     /* 0x8 */ f32 rate;
 } RootClip;
-
 
 typedef struct RootActor {
     /* 0x00 */ u8 pad0[0xD4];
@@ -150,18 +146,18 @@ typedef struct RootActor {
 extern f32 D_800B6D28;
 
 void func_0021ABC8(RootActor *actor, AnimPlayer *anim, f32 from, f32 to);
-void func_00215AE0(AnimPlayer *anim, s32 bone, f32 time, Vec3f *out);
+void func_00215AE0(AnimPlayer *anim, s32 bone, f32 time, CVector3 *out);
 f32 func_00210DB4(f32 frac, f32 a, f32 b);
 f32 func_00210E64(f32 a, f32 b);
-void func_0020EEF8(Vec3f *d, Vec3f *a, Vec3f *b);
-void func_0020EF2C(Vec3f *d, Vec3f *a, Vec3f *b);
+void func_0020EEF8(CVector3 *d, CVector3 *a, CVector3 *b);
+void func_0020EF2C(CVector3 *d, CVector3 *a, CVector3 *b);
 s32 func_002199F4(AnimPlayer *anim);
 
-void func_00218DCC(AnimPlayer *anim, Vec3f *delta, f32 *turn, RootActor *actor) {
+void func_00218DCC(AnimPlayer *anim, CVector3 *delta, f32 *turn, RootActor *actor) {
     void *header;
     register RootClip *clip asm("$18");
-    Vec3f from;
-    Vec3f to;
+    CVector3 from;
+    CVector3 to;
     f32 prevAngle;
     f32 t;
     f32 t1;

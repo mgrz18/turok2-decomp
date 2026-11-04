@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/80246E34_6.CPP, func_8024A7A0_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game_object.h"
 
 /* As func_0021D7BC, for a model drawn from its cached "lit vertices"
  * resource (built by func_00220208, fixed up once by func_00214F68). */
@@ -24,45 +25,27 @@ typedef struct {
     s32 set1;               /* 0x1C */
 } DrawParams;
 
-typedef struct {
-    u8 pad0[0x14];
-    Region *region;         /* 0x014 */
-    u8 pad18[0x80];
-    s32 unk98;              /* 0x098 */
-    u8 pad9C[0x74];
-    u8 lights[2][0x18];     /* 0x110 */
-    u8 pad140[0xC];
-    s32 mask;               /* 0x14C (AI +0x0C) */
-    u8 pad150;
-    s8 unk151;              /* 0x151 (AI +0x11) */
-    u8 pad152[0x22];
-    s8 state;               /* 0x174 (AI +0x34) */
-    u8 pad175;
-    s8 nextState;           /* 0x176 (AI +0x36) */
-    u8 pad177[0x109];
-    s32 unk280;             /* 0x280 */
-} Actor;
 
 extern s32 D_800ACAD8;
 
-void func_0021DC84(Actor *, s32, DrawParams *);
+void func_0021DC84(CGameObjectInstance *, s32, DrawParams *);
 void func_0020B6A0(s32, s32, s32, void *, char *, s32, s32);
-s32 **func_00203CA0(s32, s32, s32, s32, s32, Actor *, void *, char *, s32);
+s32 **func_00203CA0(s32, s32, s32, s32, s32, CGameObjectInstance *, void *, char *, s32);
 void func_0020565C(s32, s32 **);
 void func_00214F68(char *, char *);
 void func_002051F4(s32, s32 **);
 void func_00220208();
 
-static __inline__ void pickSets(Actor *actor, s32 index, s32 *set0, s32 *set1) {
-    Region *region = actor->region;
+static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0, s32 *set1) {
+    Region *region = ((Region *)actor->header.m_pIntelligence);
 
     if (region->type == 1) {
         s32 state;
 
-        if (actor->state == 0x3C) {
-            state = actor->nextState;
+        if (actor->m_AI.m_Mode == 0x3C) {
+            state = actor->m_AI.m_ModeBefore;
         } else {
-            state = actor->state;
+            state = actor->m_AI.m_Mode;
         }
         switch (state) {
             case 0x36:
@@ -94,21 +77,21 @@ static __inline__ void pickSets(Actor *actor, s32 index, s32 *set0, s32 *set1) {
     }
 }
 
-void func_0021DA8C(Actor *actor, s32 arg1, DrawParams *params) {
+void func_0021DA8C(CGameObjectInstance *actor, s32 arg1, DrawParams *params) {
     s32 **resource;
     s32 *header;
     char *object;
     char *data;
 
     pickSets(actor, params->index, &params->set0, &params->set1);
-    actor->mask = 1 << params->set0;
+    actor->m_AI.m_VisBits = 1 << params->set0;
     if (params->shadow != 0) {
         func_0021DC84(actor, arg1, params);
     }
     if (params->draw == 0) {
         return;
     }
-    resource = func_00203CA0(0, actor->unk280 | D_800ACAD8, params->model, 0, 0, actor,
+    resource = func_00203CA0(0, actor->m_dwUniqueID | D_800ACAD8, params->model, 0, 0, actor,
                              func_00220208, "lit vertices", 1);
     if (resource == NULL) {
         return;
@@ -122,6 +105,6 @@ void func_0021DA8C(Actor *actor, s32 arg1, DrawParams *params) {
     } else {
         data = (char *) (header + 2);
     }
-    func_0020B6A0(params->model, actor->unk98, 1, 0, data, params->set0, actor->unk151);
+    func_0020B6A0(params->model, ((s32)actor->m_pmtDrawMtxs), 1, 0, data, params->set0, actor->m_AI.m_nTexture);
     func_002051F4(0, resource);
 }

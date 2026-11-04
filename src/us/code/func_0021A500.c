@@ -9,9 +9,6 @@ typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
 typedef double f64;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct B10X B10X;
 typedef struct B10Q4 B10Q4;
 typedef struct B10Pq B10Pq;

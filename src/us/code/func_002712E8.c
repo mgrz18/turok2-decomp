@@ -1,13 +1,10 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/TEXTURE/80256220_16.CPP, func_8025842C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
+#include "common.h"
+#include "ultra_types.h"
 typedef struct IntrusiveList IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -18,19 +15,7 @@ struct IntrusiveList {
 };
 struct IntrusiveList;
 struct CVector3_t;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
-struct OSMesgQueue;
 struct CVector3_t;
-typedef struct CVector3_t CVector3;
 struct CVector3_t;
 struct CVector3_t {
     f32 x;
@@ -113,7 +98,6 @@ struct ALMIDIEvent;
 typedef struct ALMIDIEvent ALMIDIEvent;
 struct ALHeap;
 typedef struct ALHeap ALHeap;
-struct OSMesgQueue;
 struct InventorySlot;
 struct InventorySlot {
     u8 available;
@@ -149,7 +133,6 @@ struct ALPlayer_s {
     s32 callTime;
     s32 samplesLeft;
 };
-struct OSMesgQueue;
 struct MenuRules;
 struct MenuRules {
     char pad0[0x1C];
@@ -378,7 +361,6 @@ struct Voice {
     s32 fieldBC, fieldC0, fieldC4;
     f32 volumeScale;
 };
-typedef void *OSMesg;
 typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
@@ -446,8 +428,6 @@ struct ContextRecAt2BC0 {
 struct ALEndEvent;
 struct ALTempoEvent;
 struct ALEvent;
-struct OSMesgQueue;
-struct OSMesgQueue;
 struct CMenu_t;
 typedef struct CMenu_t CMenu;
 struct StateRecAtBCV1;

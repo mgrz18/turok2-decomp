@@ -1,37 +1,23 @@
 #include "common.h"
+#include "structs/player.h"
 #include "structs/game_object.h"
-
-/* The player: its body (a game object) first; past 0xA00 include/structs/player.h does
- * not line up with the code, so those fields stay unnamed here. */
-typedef struct {
-    /* 0x0000 */ CGameObjectInstance actor;
-    /* 0x0288 */ u8 pad288[0x996 - 0x288];
-    /* 0x0996 */ s16 unk996;
-    /* 0x0998 */ u8 pad998[0xA64 - 0x998];
-    /* 0x0A64 */ u32 unkA64;
-    /* 0x0A68 */ u32 unkA68;
-    /* 0x0A6C */ u8 padA6C[0xC04 - 0xA6C];
-    /* 0x0C04 */ s32 unkC04;
-    /* 0x0C08 */ u8 padC08[0x1298 - 0xC08];
-    /* 0x1298 */ s32 unk1298;
-} Player;
 
 s32 func_00243414(void *, void *, s32);     /* extern */
 s32 func_0024E700(void *, s16);                     /* extern */
 
 void func_00259584(CGameObjectInstance *arg0, CAI *arg1) {
-    Player *temp_s0;
+    CPlayer *temp_s0;
 
-    temp_s0 = (Player *) arg0->m_AI.m_pParent;
-    if (func_0024E700(temp_s0, temp_s0->unk996) == 0) {
+    temp_s0 = (CPlayer *) arg0->m_AI.m_pParent;
+    if (func_0024E700(temp_s0, temp_s0->m_Data.m_CurrentWeapon) == 0) {
         func_00243414(arg0, arg1, 2);
         return;
     }
-    if (temp_s0->unkA68 & 0x10) {
+    if (temp_s0->m_ContState.m_dwButtonsSingle & 0x10) {
         func_00243414(arg0, arg1, 5);
         return;
     }
-    if (!(temp_s0->unkA64 & 0x2000)) {
+    if (!(temp_s0->m_ContState.m_dwButtons & 0x2000)) {
         func_00243414(arg0, arg1, 2);
     }
     if (arg1->m_AnimRepeatedCount != 0) {

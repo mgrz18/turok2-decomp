@@ -1,19 +1,10 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00206DD4.c, func_00206DD4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef double f64;
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef union M1IF { s32 i; f32 f; } M1IF;
 typedef union M1W4 { s32 i; f32 f; s16 h[2]; u16 hu[2]; u8 b[4]; u32 u; } M1W4;
 typedef union M1B1 { s8 s; u8 u; } M1B1;
@@ -65,7 +56,7 @@ struct M1Def {
 /* Turok 2 LevelActor / state: only the fields used here. */
 struct M1Actor {
     u8 pad0[0x4];
-    Vec3f pos;      /* 0x4 */
+    CVector3 pos;      /* 0x4 */
     s32 unk10;      /* 0x10 */
     M1Def *def;     /* 0x14 */
     u8 pad18[0x38];
@@ -75,16 +66,16 @@ struct M1State {
     u8 pad0[0x3C];
     u32 flags3C;    /* 0x3C */
     u8 pad40[0x14];
-    Vec3f v54;      /* 0x54 */
+    CVector3 v54;      /* 0x54 */
     f32 f60;
     f32 f64;        /* 0x64 */
     u8 pad68[0x30];
     f32 f98;        /* 0x98 */
-    Vec3f v9C;      /* 0x9C */
+    CVector3 v9C;      /* 0x9C */
     u8 padA8[0x68];
     M1IF unk110;    /* 0x110 */
     M1IF unk114;
-    Vec3f vec118;
+    CVector3 vec118;
     f32 f124;       /* 0x124 */
 };
 struct M1Ref {
@@ -106,7 +97,7 @@ struct M1Pad {
                 M1B1 stickY;
 };
 f32 func_00266F50(f32 x);
-void func_0020EF8C(Vec3f *dst, f32 t, Vec3f *src, Vec3f *v);
+void func_0020EF8C(CVector3 *dst, f32 t, CVector3 *src, CVector3 *v);
 f32 func_0026BE60(s32 id, f32 x, f32 z);
 void func_0026C888(s32 id, f32 y);
 void func_00263DD8(M1Actor *actor, M1State *state) {
@@ -116,7 +107,7 @@ void func_00263DD8(M1Actor *actor, M1State *state) {
     f32 x;
     f32 fs0;
     f32 c;
-    Vec3f v;
+    CVector3 v;
     t = state->f64;
     lo = 0.0f;
     info = &actor->def->info;

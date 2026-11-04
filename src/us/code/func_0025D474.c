@@ -1,19 +1,17 @@
 #include "common.h"
+#include "structs/vector.h"
+#include "structs/intelligence.h"
 
 /* AI chase update: turns toward the target and runs or walks at it; flying
  * modes (1, 2) also climb toward its height and bank into the turn. In range,
  * it attacks (path node 4 / special 7) or lets func_0025D030 pick a melee. */
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
     /* 0x00 */ s32 kind;
     /* 0x04 */ s32 visible;
     /* 0x08 */ f32 angle;
-    /* 0x0C */ Vec3f a;
-    /* 0x18 */ Vec3f b;
+    /* 0x0C */ CVector3 a;
+    /* 0x18 */ CVector3 b;
     /* 0x24 */ f32 dist;
     /* 0x28 */ u8 pad28[0x44 - 0x28];
 } Target;
@@ -24,29 +22,19 @@ typedef struct {
 } Targets;
 
 typedef struct {
-    /* 0x00 */ Vec3f d;
-    /* 0x0C */ Vec3f n;
+    /* 0x00 */ CVector3 d;
+    /* 0x0C */ CVector3 n;
     /* 0x18 */ f32 len;
-    /* 0x1C */ Vec3f e;
-    /* 0x28 */ Vec3f e2;
+    /* 0x1C */ CVector3 e;
+    /* 0x28 */ CVector3 e2;
     /* 0x34 */ f32 elen;
     /* 0x38 */ f32 dy;
     /* 0x3C */ u8 pad3C[0x40 - 0x3C];
 } Dir;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x86];
-    /* 0x86 */ u16 canRun;
-} ActorInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActorInfo info;
-} ActorDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x1C - 0x18];
     /* 0x01C */ f32 velY;
     /* 0x020 */ u8 pad20[0xB8 - 0x20];
@@ -113,7 +101,7 @@ void func_0025D474(Actor *actor, CAI *ai) {
     actor->flags |= 0x20000000;
     func_00246108(actor, ai, &t, 1, 1);
     runAnim = 4;
-    if (t.b.kind == 1 && actor->def->info.canRun) {
+    if (t.b.kind == 1 && actor->def->m_Enemy.m_wFleeAnimFlags) {
         dodge = 0;
         runAnim = 6;
     } else {

@@ -1,23 +1,10 @@
 /* Second-module copy of func_0040CCC0 (in src/us/code/func_0040C850.c), with its data addresses 0xE0 lower. */
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Second boss setup: collects its three groups of actors (types 0x454-0x456), sets their health and slots,
  * finds its two level objects, shows its health bar ("Blind") and enters the first phase of its script. */
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
-    /* 0x140 */ u8 ai[4];
-    /* 0x144 */ s32 health;
-    /* 0x148 */ s32 maxHealth;
-    /* 0x14C */ u8 pad14C[0x24C - 0x14C];
-    /* 0x24C */ s32 unk24C;
-    /* 0x250 */ s32 index;
-    /* 0x254 */ s32 slot;
-    /* 0x258 */ u8 pad258[0x25C - 0x258];
-    /* 0x25C */ f32 unk25C;
-} LevelActor;
 
 typedef struct {
     /* 0x00 */ s32 id;
@@ -59,11 +46,11 @@ typedef struct Obj2 {
 typedef struct State2 {
     /* 0x000 */ Obj2 *obj;
     /* 0x004 */ s32 count1;
-    /* 0x008 */ LevelActor *actors1[4];
+    /* 0x008 */ CGameObjectInstance *actors1[4];
     /* 0x018 */ s32 count2;
-    /* 0x01C */ LevelActor *actors2[4];
+    /* 0x01C */ CGameObjectInstance *actors2[4];
     /* 0x02C */ s32 count3;
-    /* 0x030 */ LevelActor *actors3[3];
+    /* 0x030 */ CGameObjectInstance *actors3[3];
     /* 0x03C */ Slot2 slots[12];
     /* 0x4EC */ s32 slotCount;
     /* 0x4F0 */ void *unk4F0;
@@ -82,7 +69,7 @@ typedef struct State2 {
 extern PhaseFuncs D_0043232C[];
 extern u8 D_800F7078[];
 extern u8 D_801100F0[];
-extern s32 func_00225F6C(void *container, s32 key0, s32 key1, s32 key2, LevelActor **out, s32 max);
+extern s32 func_00225F6C(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void func_002362E4(void *slot, s32 arg1);
 extern void *func_00225EBC(void *level, s32 arg1, s32 id);
 extern void func_0027AD24(void *hud, Obj2 *obj, char *name);
@@ -98,13 +85,13 @@ static __inline__ void nextPhase(State2 *state) {
     state->movers[1].seq = NULL;
     state->movers[2].seq = NULL;
     for (i = 0; i < state->count1; i++) {
-        state->actors1[i]->unk24C = 0;
+        state->actors1[i]->m_AI.m_VarBuffer[0] = 0;
     }
     for (i = 0; i < state->count2; i++) {
-        state->actors2[i]->unk24C = 0;
+        state->actors2[i]->m_AI.m_VarBuffer[0] = 0;
     }
     for (i = 0; i < state->count3; i++) {
-        state->actors3[i]->unk24C = 0;
+        state->actors3[i]->m_AI.m_VarBuffer[0] = 0;
     }
     state->phase = phase;
     if (D_0043232C[phase].init != NULL) {
@@ -114,7 +101,7 @@ static __inline__ void nextPhase(State2 *state) {
 
 void func_00445CC0(State2 *state) {
     Obj2 *obj;
-    LevelActor *actor;
+    CGameObjectInstance *actor;
     s32 i;
 
     state->count1 = func_00225F6C(D_800F7078, 0x454, 1, -1, state->actors1, 4);
@@ -126,24 +113,24 @@ void func_00445CC0(State2 *state) {
     obj->slot = state->slotCount++;
     for (i = 0; i < state->count1; i++) {
         actor = state->actors1[i];
-        actor->health = 0;
-        actor->maxHealth = 0x6400;
-        actor->index = i;
-        actor->slot = state->slotCount++;
+        actor->m_AI.m_Health = 0;
+        actor->m_AI.m_InitialHealth = 0x6400;
+        actor->m_AI.m_VarBuffer[1] = i;
+        actor->m_AI.m_VarBuffer[2] = state->slotCount++;
     }
     for (i = 0; i < state->count2; i++) {
         actor = state->actors2[i];
-        actor->health = 0;
-        actor->maxHealth = 0x5000;
-        actor->index = i;
-        actor->slot = state->slotCount++;
+        actor->m_AI.m_Health = 0;
+        actor->m_AI.m_InitialHealth = 0x5000;
+        actor->m_AI.m_VarBuffer[1] = i;
+        actor->m_AI.m_VarBuffer[2] = state->slotCount++;
     }
     for (i = 0; i < state->count3; i++) {
         actor = state->actors3[i];
-        actor->health = 0;
-        actor->maxHealth = 0x6400;
-        actor->index = i;
-        actor->slot = state->slotCount++;
+        actor->m_AI.m_Health = 0;
+        actor->m_AI.m_InitialHealth = 0x6400;
+        actor->m_AI.m_VarBuffer[1] = i;
+        actor->m_AI.m_VarBuffer[2] = state->slotCount++;
     }
     for (i = 0; i < state->slotCount; i++) {
         func_002362E4(&state->slots[i], 0);

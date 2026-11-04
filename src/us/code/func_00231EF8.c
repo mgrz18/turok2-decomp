@@ -1,10 +1,9 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 extern f32 func_0026D210(s32 half);                        /* half float -> f32 */
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 s);   /* out = in * s */
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b); /* out = a + b */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);   /* out = in * s */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a + b */
 extern f32 func_00298470(f32);                             /* sqrtf */
 
 typedef struct {
@@ -20,19 +19,19 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x18];
-    /* 0x018 */ Vec3f vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0xF8 - 0x24];
     /* 0x0F8 */ ParentDef *parent;
     /* 0x0FC */ u8 padFC[0x150 - 0xFC];
-    /* 0x150 */ Vec3f dir;
+    /* 0x150 */ CVector3 dir;
 } Mover;
 
 /* Accelerates obj->vel along obj->dir, clamping the speed to the parent limit. */
 void func_00231EF8(Mover *obj) {
-    Vec3f delta;
-    Vec3f dir;
-    Vec3f *pdir;
-    Vec3f *vel;
+    CVector3 delta;
+    CVector3 dir;
+    CVector3 *pdir;
+    CVector3 *vel;
     f32 accel;
     f32 speed;
     f32 maxSpeed;

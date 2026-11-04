@@ -1,19 +1,16 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER/80206258.CPP, func_802063EC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
+#include "structs/intelligence.h"
 struct LevelActor;
 struct CVector3_t;
 struct Triple;
 struct Box;
 typedef struct Box Box;
 struct CVector3_t;
-typedef struct CVector3_t CVector3;
 struct CVector3_t;
 struct CVector3_t {
     f32 x;
@@ -101,19 +98,6 @@ typedef struct ActorMotionState {
     s32 unk168;
     s32 unk16C;
 } ActorMotionState;
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -124,7 +108,7 @@ struct LevelActor {
     u16 pad6;
     CVector3 position0;
     s32 model;
-    ActorDefinitionHeader *definition;
+    CIntelligence *definition;
     CVector3 position1;
     CVector3 motionAngles;
     void *attached;
@@ -203,7 +187,6 @@ struct LevelActor {
 };
 struct LevelActor;
 struct LevelActor;
-struct ActorDefinitionHeader;
 struct Triple;
 struct Triple;
 struct Triple;

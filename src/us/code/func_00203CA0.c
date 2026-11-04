@@ -1,8 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SCENE/802508E0_5.CPP, func_80251F6C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
+#include "common.h"
+#include "ultra_types.h"
 typedef struct IntrusiveList IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -12,19 +12,7 @@ struct IntrusiveList {
     s32 count;
 };
 struct IntrusiveList;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
 extern int D_800D8DCC;
-struct OSMesgQueue;
-struct OSMesgQueue;
 struct Manager;
 struct Manager {
     char queue[0x92C];
@@ -79,8 +67,6 @@ struct ResourceLoadRequest;
 typedef struct ResourceLoadRequest ResourceLoadRequest;
 struct ResourceLoadRequest;
 extern s32 CList__AddTail(IntrusiveList *list, void *node);
-struct OSMesgQueue;
-typedef void *OSMesg;
 typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);

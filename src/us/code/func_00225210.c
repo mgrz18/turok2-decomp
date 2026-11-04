@@ -1,26 +1,14 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_4/8028B64C_4.CPP, func_8028C424_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
+#include "common.h"
+#include "structs/intelligence.h"
+#include "structs/world.h"
 struct LevelActor;
-struct Shared_World;
-struct CVector3_t;
 struct Box;
 typedef struct Box Box;
-struct CVector3_t;
-typedef struct CVector3_t CVector3;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Box;
 struct Box {
     CVector3 min;
@@ -52,19 +40,6 @@ struct StridedTable {
 };
 struct StridedTable;
 typedef struct StridedTable StridedTable;
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -75,7 +50,7 @@ struct LevelActor {
     u16 pad6;
     CVector3 position0;
     s32 model;
-    ActorDefinitionHeader *definition;
+    CIntelligence *definition;
     CVector3 position1;
     CVector3 motionAngles;
     void *attached;
@@ -155,7 +130,6 @@ struct LevelActor {
 struct LevelActor;
 struct TableRecAt8;
 typedef struct TableRecAt8 TableRecAt8;
-struct Shared_World;
 struct TableRecAt8;
 struct TableRecAt8 {
     s32 unused;
@@ -170,7 +144,6 @@ struct Shared_Placed {
     s16 kind;
     s16 pad12;
 };
-struct ActorDefinitionHeader;
 struct WorldRecAt3C08;
 struct EffectSlot {
     s8 active;
@@ -179,7 +152,7 @@ struct EffectSlot {
     char pad6[2];
     CVector3 position;
     s32 owner;
-    struct ActorDefinitionHeader *definition;
+    struct CIntelligence *definition;
     CVector3 rotation;
     char pad28[0x28];
     s32 resource;
@@ -219,61 +192,33 @@ struct WorldRecAt3C08 {
 struct WorldRecAt3C08;
 typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
-struct Record14;
 struct LevelActor;
-typedef struct WorldSector {
-    void *resource;
-    f32 *bounds;
-    u16 ids[2];
-} WorldSector;
-typedef struct Shared_World {
-    u8 unknown0[0x1168];
-    s32 recordCount;                       /* 0x1168 */
-    s32 alternateRecordCount;              /* 0x116C */
-    s32 * recordIndex;                     /* 0x1170 */
-    s32 * alternateRecordIndex;            /* 0x1174 */
-    struct Record14 * recordArray;         /* 0x1178 */
-    struct Record14 * alternateRecordArray; /* 0x117C */
-} Shared_World;
-struct Record14;
-typedef struct Record14 Record14;
-struct Record14;
-struct Record14 {
-    u32 coordinates[3];
-    u16 lifetime;
-    u8 flags;
-    u8 kind;
-    u8 state;
-    u8 active;
-    u8 mode;
-    u8 reserved13;
-};
 struct LevelActor;
 s32 func_00225210(char *object, s32 type) {
     s32 index;
-    Record14 *record;
+    CWorldRecord *record;
     u8 *flags;
-    index = ((Shared_World *)object)->recordCount;
-    record = ((Shared_World *)object)->recordArray;
+    index = ((CWorld *)object)->m_nRecords;
+    record = ((CWorld *)object)->m_pRecords;
     index--;
     if (index != -1) {
-        flags = &record->flags;
+        flags = &record->m_Flags;
         do {
             if (flags[1] == type &&
                 (*flags & 0x40) == 0) {
                 return 0;
             }
             index--;
-            flags += sizeof(Record14);
+            flags += sizeof(CWorldRecord);
         } while (index != -1);
     }
-    index = ((Shared_World *)object)->alternateRecordCount;
-    record = ((Shared_World *)object)->alternateRecordArray;
+    index = ((CWorld *)object)->m_nAltRecords;
+    record = ((CWorld *)object)->m_pAltRecords;
     index--;
     if (index != -1) {
         do {
-            if (record->kind == type &&
-                (record->flags & 0x40) == 0) {
+            if (record->m_Key == type &&
+                (record->m_Flags & 0x40) == 0) {
                 return 0;
             }
             index--;

@@ -24,6 +24,8 @@ typedef struct {
     /* 0x23FF4 */ s32 unk23FF4;
 } GameState;
 
+/* D_8011ACB0 (GameMatch in structs/game.h). Kept as a local array view: through
+ * it the compiler bases both stores on D_8011ACB0 + 0x44, as the ROM does. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
     /* 0x44 */ s32 unk44;

@@ -1,13 +1,7 @@
+#include "structs/vector.h"
+
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AUDIO/8025A3EC_4.CPP, func_8025C368_de, with Turok 2's layouts. */
 
-typedef signed char s8;
-typedef float f32;
-
-typedef struct {
-    f32 x;
-    f32 y;
-    f32 z;
-} CVector3;
 
 typedef struct {
     char pad0[0x34];

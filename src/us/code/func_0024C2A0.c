@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/TEAM/80217388_6.CPP, func_802181FC_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct WeaponInfo {
     /* 0x00 */ u8 pad0[0xC];
@@ -26,14 +27,6 @@ typedef struct WeaponMenu {
     /* 0x38C */ s32 altLayout;
 } WeaponMenu;
 
-typedef struct Player {
-    /* 0x000 */ u8 pad0[0x140];
-    /* 0x140 */ u32 flags;
-    /* 0x144 */ u8 pad144[0x972 - 0x144];
-    /* 0x972 */ s8 hasWeapon[0x996 - 0x972];
-    /* 0x996 */ s16 weapon;
-} Player;
-
 extern s32 D_800ADCC8[8];   /* layouts: group 1, group 0, flag 0x80; then the same for D_8011AAF1 */
 extern s32 D_800ADCE8[8];
 extern s32 D_800ADD08[8];
@@ -44,13 +37,13 @@ extern f32 D_800AE2D8;              /* slot scale */
 extern WeaponInfo *D_800AF618[];
 extern u8 D_8011AAF1;
 
-s32 func_0024E700(Player *player, s32 weapon);
+s32 func_0024E700(CPlayer *player, s32 weapon);
 
 /* Lays out the eight-slot weapon wheel from the layout table for :
  * each weapon becomes its alternate when the player owns that (and is not
  * holding it), the held weapon gets the cursor, and the slots are set
  * 45 degrees apart. */
-void func_0024C2A0(WeaponMenu *menu, s32 group, Player *player) {
+void func_0024C2A0(WeaponMenu *menu, s32 group, CPlayer *player) {
     s32 *layout;
     s32 i;
     s32 w;
@@ -70,7 +63,7 @@ void func_0024C2A0(WeaponMenu *menu, s32 group, Player *player) {
             layout = D_800ADD48;
         }
     }
-    if (player->flags & 0x80) {
+    if (player->m_CharacterActor.m_AI.m_dwFlags & 0x80) {
         layout = D_800ADD08;
         if (D_8011AAF1 != 0) {
             layout = D_800ADD68;
@@ -85,18 +78,18 @@ void func_0024C2A0(WeaponMenu *menu, s32 group, Player *player) {
             menu->slots[i].weapon = w;
             menu->slots[i].available = 0;
         } else {
-            if (!(player->flags & 0x80)) {
+            if (!(player->m_CharacterActor.m_AI.m_dwFlags & 0x80)) {
                 alt = D_800AF618[w]->alternate;
-                if (alt != -1 && player->hasWeapon[alt] != 0 && player->weapon != alt) {
+                if (alt != -1 && player->m_Data.m_WeaponList[alt] != 0 && player->m_Data.m_CurrentWeapon != alt) {
                     w = alt;
                 }
             }
             menu->slots[i].weapon = w;
-            if (player->weapon == w) {
+            if (player->m_Data.m_CurrentWeapon == w) {
                 menu->cursor = i;
             }
             menu->slots[i].info = D_800AF618[w];
-            if (func_0024E700(player, w) == 0 || player->hasWeapon[w] == 0) {
+            if (func_0024E700(player, w) == 0 || player->m_Data.m_WeaponList[w] == 0) {
                 ok = 0;
             } else {
                 ok = 1;

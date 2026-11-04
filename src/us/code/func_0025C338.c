@@ -1,13 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* The actor definition (header.m_pIntelligence): its flags. */
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ u8 pad4[0x14 - 0x4];
-    /* 0x14 */ s32 flags;
-} ActorDef;
-
 /* The AI fields this touches; 0x10C-0x13B is CAI::m_VarBuffer, the per-mode
  * scratch. */
 typedef struct {
@@ -28,7 +21,7 @@ s32 func_0025C338(CGameObjectInstance *arg0, AI *arg1) {
     f32 temp_f0_2;
     s8 temp_v1;
 
-    if (((ActorDef *) arg0->header.m_pIntelligence)->flags & 0x100000) {
+    if (arg0->header.m_pIntelligence->m_dwTypeFlags & 0x100000) {
         temp_f0 = arg1->timer - D_800B6D28;
         arg1->timer = temp_f0;
         if (temp_f0 < 0.0f) {

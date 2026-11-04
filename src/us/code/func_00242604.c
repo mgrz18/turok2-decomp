@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct DefInfo {
     char pad0[4];
@@ -10,10 +11,6 @@ typedef struct Def {
     DefInfo info;      /* 0x14 */
 } Def;
 
-typedef struct Actor {
-    char pad0[0x14];
-    Def *def;          /* 0x14 */
-} Actor;
 
 typedef struct Target {
     char pad0[4];
@@ -29,22 +26,22 @@ typedef struct Controller {
     s32 unk3C;         /* 0x3C */
     s32 unk40;         /* 0x40 */
     void *c;           /* 0x44 */
-    Actor *actor;      /* 0x48 */
+    CGameObjectInstance *actor;      /* 0x48 */
 } Controller;
 
 extern Target D_800F1E10;
 extern char *D_800F1ADC;
 
-s32 func_00241E30(Controller *ctrl, Actor *actor);
-s32 func_00242284(Controller *ctrl, Actor *actor);
-s32 func_00241FC8(Controller *ctrl, Actor *actor);
+s32 func_00241E30(Controller *ctrl, CGameObjectInstance *actor);
+s32 func_00242284(Controller *ctrl, CGameObjectInstance *actor);
+s32 func_00241FC8(Controller *ctrl, CGameObjectInstance *actor);
 
-void func_00242604(Controller *ctrl, Actor *actor) {
+void func_00242604(Controller *ctrl, CGameObjectInstance *actor) {
     DefInfo *info;
     Target *target;
     s32 ok;
 
-    info = &actor->def->info;
+    info = &((Def *)actor->header.m_pIntelligence)->info;
     target = ctrl->target;
     if (target != &D_800F1E10 && target->active != 0) {
         switch (info->kind) {

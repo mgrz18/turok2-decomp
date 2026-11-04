@@ -5,15 +5,8 @@
  * func_8023CA14_de and func_8023CB0C_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "ultra_types.h"
 
-typedef struct OSMesgQueue {
-    void *mtqueue;
-    void *fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-} OSMesgQueue;
 
 typedef struct PageMapping {
     /* 0x0 */ struct PageMapping *next;

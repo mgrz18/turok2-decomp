@@ -4,16 +4,22 @@
 /* The player and the HUD. Layouts and names from LibTEngine's Turok 2 types
  * (Drahsid/LibTEngine, lib/libtengine/lib/types: CPlayer.h, COverlay.h,
  * COnScreen.h...), with these departures:
- *   - CBarrel (the weapon wheel) is kept opaque: LibTEngine's offsets jump
- *     from 0x00C to 0x100 and its 36-entry list does not fit the space, while
- *     its size, 0x394, is what CPlayer leaves for it;
- *   - LibTEngine skips 0xA2C in CPlayer; it is unk_0xA2C here;
+ *   - CBarrel (the weapon wheel) has only the fields the code reads:
+ *     LibTEngine's offsets jump from 0x00C to 0x100 and its 36-entry list
+ *     does not fit the space, while its size, 0x394, is what CPlayer leaves;
+ *   - checked against the code (the local Player views of ~180 files):
+ *     CPlayerLoadSaveData is 0x4E8 (no m_dwLevelMissionObjFlags: the level
+ *     intro and first-time masks are followed by the nuke parts at 0x4DC),
+ *     CPlayer has nothing at 0xA2C nor an m_bLevelStarting, and
+ *     CPlayerOverlay's matrices are 8-byte aligned (libultra's Mtx holds a
+ *     long long), which pads it to 0xC0 and puts it at 0xC10;
  *   - CAmmo and CWeapon are 2 and 1 bytes there, as the gaps they fill say.
  * tools/check_structs.py checks every /\* 0xNN *\/ offset below with the game's
  * own compiler. Fields named unk_ are not yet known. */
 
 #include "structs/game_object.h"
 #include "structs/gbi.h"
+#include "structs/player_options.h"
 
 /* A HUD element: health, ammo, lives, air... slide in, fade, show a value. */
 typedef struct {
@@ -66,13 +72,15 @@ typedef struct {
     /* 0x00 */ s32 m_ObjectType;
     /* 0x04 */ s32 m_DesiredObjectType;
     /* 0x08 */ void *m_rpObject;
-    /* 0x0C */ Mtx m_mOrient[2];
-    /* 0x8C */ CVector3 m_vScale;
-    /* 0x98 */ CVector3 m_vRot;
-    /* 0xA4 */ CVector3 m_vPos;
-    /* 0xB0 */ s32 m_Mode;
-    /* 0xB4 */ f32 m_ModeTime;
-} CPlayerOverlay; /* size 0xB8 */
+    /* 0x0C */ s32 _pad0;                  /* Mtx is 8-byte aligned */
+    /* 0x10 */ Mtx m_mOrient[2];
+    /* 0x90 */ CVector3 m_vScale;
+    /* 0x9C */ CVector3 m_vRot;
+    /* 0xA8 */ CVector3 m_vPos;
+    /* 0xB4 */ s32 m_Mode;                 /* 0 hidden, 1 raising, 2 up, 3 lowering */
+    /* 0xB8 */ f32 m_ModeTime;
+    /* 0xBC */ s32 _pad1;
+} CPlayerOverlay; /* size 0xC0 */
 
 typedef struct {
     /* 0x00 */ f32 m_LookX;
@@ -91,6 +99,17 @@ typedef struct {
     /* 0x34 */ u32 m_dwButtonsRepeat;
 } CPlayerContState; /* size 0x38 */
 
+/* The weapon wheel (the "barrel"), reset to 0 items and no last item. */
+typedef struct {
+    /* 0x000 */ s32 m_nItems;
+    /* 0x004 */ f32 unk_0x4;
+    /* 0x008 */ f32 unk_0x8;
+    /* 0x00C */ u8 unk_0xC[0x37C - 0xC];
+    /* 0x37C */ s32 m_nLastItem;
+    /* 0x380 */ s32 m_bUnderwater;        /* the wheel's underwater variant */
+    /* 0x384 */ u8 unk_0x384[0x394 - 0x384];
+} CBarrel; /* size 0x394 */
+
 /* What a save game keeps of the player. Health is 24.8 fixed point. */
 typedef struct {
     /* 0x000 */ s32 m_nDeathmatchCharacter;
@@ -101,7 +120,7 @@ typedef struct {
     /* 0x40C */ s32 m_CheckPointWarpID;
     /* 0x410 */ s32 m_SavePointWarpID;
     /* 0x414 */ s16 m_AmmoList[31];
-    /* 0x452 */ u8 m_WeaponList[35];
+    /* 0x452 */ s8 m_WeaponList[35];
     /* 0x475 */ u8 _pad0;
     /* 0x476 */ s16 m_CurrentWeapon;
     /* 0x478 */ s16 m_LastWeapon[3];
@@ -118,11 +137,10 @@ typedef struct {
     /* 0x4CC */ s32 m_bMotherBossComplete;
     /* 0x4D0 */ s32 m_bPrimagenBossComplete;
     /* 0x4D4 */ u32 m_LevelIntroPlayedFlags;
-    /* 0x4D8 */ u32 m_dwLevelFirstTimeFlags;
-    /* 0x4DC */ u32 m_dwLevelMissionObjFlags;
-    /* 0x4E0 */ u8 m_NukePartLevelFlags[6];
-    /* 0x4E6 */ u8 m_KeySet6LevelFlags[6];
-} CPlayerLoadSaveData; /* size 0x4EC */
+    /* 0x4D8 */ u32 m_dwLevelFirstTimeFlags;  /* one bit per hub warped into */
+    /* 0x4DC */ u8 m_NukePartLevelFlags[6];
+    /* 0x4E2 */ u8 m_KeySet6LevelFlags[6];
+} CPlayerLoadSaveData; /* size 0x4E8 */
 
 typedef struct CPlayer {
     /* 0x0000 */ CGameObjectInstance m_CharacterActor;
@@ -132,94 +150,93 @@ typedef struct CPlayer {
     /* 0x0518 */ struct CPlayerOptions *m_pOptions;
     /* 0x051C */ struct CCamera *m_pCamera;
     /* 0x0520 */ CPlayerLoadSaveData m_Data;
-    /* 0x0A0C */ s16 m_Mode;
-    /* 0x0A0E */ s16 m_ModeBefore;
-    /* 0x0A10 */ s16 m_ModeLastFrame;
-    /* 0x0A12 */ s16 _pad0;
-    /* 0x0A14 */ f32 m_ModeTime;
-    /* 0x0A18 */ u32 m_ModeLastFrameFlags;
-    /* 0x0A1C */ u32 m_ModeBeforeFlags;
-    /* 0x0A20 */ u32 m_ModeFlags;
-    /* 0x0A24 */ s32 m_InSun;
-    /* 0x0A28 */ f32 m_FrameIncrementScaled;
-    /* 0x0A2C */ s32 unk_0xA2C;
-    /* 0x0A30 */ f32 m_InvincibilityTime;
-    /* 0x0A34 */ f32 m_PlaneWalkerTime;
-    /* 0x0A38 */ f32 m_FlashlightTime;
-    /* 0x0A3C */ struct CDLight *m_pDLFlashlight1;
-    /* 0x0A40 */ struct CDLight *m_pDLFlashlight2;
-    /* 0x0A44 */ struct CDLight *m_pDLDarkCityLight;
-    /* 0x0A48 */ CPlayerContState m_ContState;
-    /* 0x0A80 */ f32 m_Speed;
-    /* 0x0A84 */ f32 m_SideSpeed;
-    /* 0x0A88 */ f32 m_TotalSpeed;
-    /* 0x0A8C */ f32 m_YVelLastFrame;
-    /* 0x0A90 */ s32 m_bOnGround;
-    /* 0x0A94 */ f32 m_BurstSpeed;
-    /* 0x0A98 */ f32 m_BurstSideSpeed;
-    /* 0x0A9C */ f32 m_BurstTimer;
-    /* 0x0AA0 */ f32 m_HandSide;
-    /* 0x0AA4 */ f32 m_TimeOffGround;
-    /* 0x0AA8 */ CVector3 m_vDesiredPos;
-    /* 0x0AB4 */ f32 m_FleeTime;
-    /* 0x0AB8 */ f32 m_JumpAngle;
-    /* 0x0ABC */ f32 m_StartJumpAngle;
-    /* 0x0AC0 */ f32 m_DesiredJumpAngle;
-    /* 0x0AC4 */ f32 m_JumpU;
-    /* 0x0AC8 */ f32 m_DuckOffset;
-    /* 0x0ACC */ s32 m_bDuckMode;
-    /* 0x0AD0 */ CVector3 m_vHeadRotOffset;
-    /* 0x0ADC */ CVector3 m_vHeadWobbleRotOffset;
-    /* 0x0AE8 */ CVector3 m_vEyeOffset;
-    /* 0x0AF4 */ CQuaternion m_qGround;
-    /* 0x0B04 */ f32 m_BreathAmp;
-    /* 0x0B08 */ f32 m_BreathSpeed;
-    /* 0x0B0C */ CQuaternion PreviousCameraQuatern;
-    /* 0x0B1C */ s16 m_RequestedWeapon;
-    /* 0x0B1E */ s16 _pad1;
-    /* 0x0B20 */ CVector3 m_vWeaponFirePos;
-    /* 0x0B2C */ f32 m_ActualCameraVertEyeOffset;
-    /* 0x0B30 */ f32 m_CameraMovementScaler;
-    /* 0x0B34 */ s32 m_CrossHairMode;
-    /* 0x0B38 */ f32 m_CrossHairTimer;
-    /* 0x0B3C */ f32 m_CrossHairAlpha;
-    /* 0x0B40 */ struct CGameObjectInstance *m_pCrossHairTarget;
-    /* 0x0B44 */ s32 m_CrossHairIcon;
-    /* 0x0B48 */ CVector3 m_vCrossHairPos;
-    /* 0x0B54 */ CVector3 m_vCrossHairVel;
-    /* 0x0B60 */ struct CGameObjectInstance *m_pSightTarget;
-    /* 0x0B64 */ s32 m_SightIcon;
-    /* 0x0B68 */ f32 m_SightIconFrame;
-    /* 0x0B6C */ CVector3 m_vSightPos;
-    /* 0x0B78 */ CVector3 m_vSightVel;
-    /* 0x0B84 */ CQuaternion m_qAutoAim;
-    /* 0x0B94 */ s32 m_SniperMode;
-    /* 0x0B98 */ f32 m_ZoomBlend;
-    /* 0x0B9C */ f32 m_TargetZoomBlend;
-    /* 0x0BA0 */ f32 m_JumpPadCurrentTime;
-    /* 0x0BA4 */ f32 m_JumpPadAngleDirection;
-    /* 0x0BA8 */ struct CROMRegionSet *m_pJumpPadRegionSet;
-    /* 0x0BAC */ CVector3 m_vJumpPadStart;
-    /* 0x0BB8 */ struct CGameObjectInstance *m_pOnEnemy;
-    /* 0x0BBC */ s32 m_OnEnemyObjectType;
-    /* 0x0BC0 */ CVector3 m_vOnEnemyScale;
-    /* 0x0BCC */ CVector3 m_vOnEnemyOffset;
-    /* 0x0BD8 */ CVector3 m_vOnEnemyOriginalScale;
-    /* 0x0BE4 */ f32 m_RideEnemyTime;
-    /* 0x0BE8 */ f32 m_OnEnemyStompTime;
-    /* 0x0BEC */ f32 m_Oxygen;
-    /* 0x0BF0 */ f32 m_OutOfAirSfxTimer;
-    /* 0x0BF4 */ s32 m_bOxygenOut;
-    /* 0x0BF8 */ s32 m_DoDeathCin;
-    /* 0x0BFC */ s32 m_nDeathmatchTeamSelected;
-    /* 0x0C00 */ s32 m_bEnteringDeathmatch;
-    /* 0x0C04 */ f32 m_WaitDeathmatchTimer;
-    /* 0x0C08 */ s32 m_bLevelNotCompleteExit;
-    /* 0x0C0C */ s32 m_bLevelStarting;
-    /* 0x0C10 */ s32 m_CharAnim;
-    /* 0x0C14 */ s32 m_LastCharAnim;
-    /* 0x0C18 */ CPlayerOverlay m_Overlay;
-    /* 0x0CD0 */ u8 m_Barrel[0x394];           /* CBarrel, the weapon wheel */
+    /* 0x0A08 */ s16 m_Mode;
+    /* 0x0A0A */ s16 m_ModeBefore;
+    /* 0x0A0C */ s16 m_ModeLastFrame;
+    /* 0x0A0E */ s16 _pad0;
+    /* 0x0A10 */ f32 m_ModeTime;
+    /* 0x0A14 */ u32 m_ModeLastFrameFlags;
+    /* 0x0A18 */ u32 m_ModeBeforeFlags;
+    /* 0x0A1C */ u32 m_ModeFlags;
+    /* 0x0A20 */ s32 m_InSun;
+    /* 0x0A24 */ f32 m_FrameIncrementScaled;
+    /* 0x0A28 */ f32 m_InvincibilityTime;
+    /* 0x0A2C */ f32 m_PlaneWalkerTime;
+    /* 0x0A30 */ f32 m_FlashlightTime;
+    /* 0x0A34 */ struct CDLight *m_pDLFlashlight1;
+    /* 0x0A38 */ struct CDLight *m_pDLFlashlight2;
+    /* 0x0A3C */ struct CDLight *m_pDLDarkCityLight;
+    /* 0x0A40 */ CPlayerContState m_ContState;
+    /* 0x0A78 */ f32 m_Speed;
+    /* 0x0A7C */ f32 m_SideSpeed;
+    /* 0x0A80 */ f32 m_TotalSpeed;
+    /* 0x0A84 */ f32 m_YVelLastFrame;
+    /* 0x0A88 */ s32 m_bOnGround;
+    /* 0x0A8C */ f32 m_BurstSpeed;
+    /* 0x0A90 */ f32 m_BurstSideSpeed;
+    /* 0x0A94 */ f32 m_BurstTimer;
+    /* 0x0A98 */ f32 m_HandSide;
+    /* 0x0A9C */ f32 m_TimeOffGround;
+    /* 0x0AA0 */ CVector3 m_vDesiredPos;
+    /* 0x0AAC */ f32 m_FleeTime;
+    /* 0x0AB0 */ f32 m_JumpAngle;
+    /* 0x0AB4 */ f32 m_StartJumpAngle;
+    /* 0x0AB8 */ f32 m_DesiredJumpAngle;
+    /* 0x0ABC */ f32 m_JumpU;
+    /* 0x0AC0 */ f32 m_DuckOffset;
+    /* 0x0AC4 */ s32 m_bDuckMode;
+    /* 0x0AC8 */ CVector3 m_vHeadRotOffset;
+    /* 0x0AD4 */ CVector3 m_vHeadWobbleRotOffset;
+    /* 0x0AE0 */ CVector3 m_vEyeOffset;
+    /* 0x0AEC */ CQuaternion m_qGround;
+    /* 0x0AFC */ f32 m_BreathAmp;
+    /* 0x0B00 */ f32 m_BreathSpeed;
+    /* 0x0B04 */ CQuaternion PreviousCameraQuatern;
+    /* 0x0B14 */ s16 m_RequestedWeapon;
+    /* 0x0B16 */ s16 _pad1;
+    /* 0x0B18 */ CVector3 m_vWeaponFirePos;
+    /* 0x0B24 */ f32 m_ActualCameraVertEyeOffset;
+    /* 0x0B28 */ f32 m_CameraMovementScaler;
+    /* 0x0B2C */ s32 m_CrossHairMode;
+    /* 0x0B30 */ f32 m_CrossHairTimer;
+    /* 0x0B34 */ f32 m_CrossHairAlpha;
+    /* 0x0B38 */ struct CGameObjectInstance *m_pCrossHairTarget;
+    /* 0x0B3C */ s32 m_CrossHairIcon;
+    /* 0x0B40 */ CVector3 m_vCrossHairPos;
+    /* 0x0B4C */ CVector3 m_vCrossHairVel;
+    /* 0x0B58 */ struct CGameObjectInstance *m_pSightTarget;
+    /* 0x0B5C */ s32 m_SightIcon;
+    /* 0x0B60 */ f32 m_SightIconFrame;
+    /* 0x0B64 */ CVector3 m_vSightPos;
+    /* 0x0B70 */ CVector3 m_vSightVel;
+    /* 0x0B7C */ CQuaternion m_qAutoAim;
+    /* 0x0B8C */ s32 m_SniperMode;
+    /* 0x0B90 */ f32 m_ZoomBlend;
+    /* 0x0B94 */ f32 m_TargetZoomBlend;
+    /* 0x0B98 */ f32 m_JumpPadCurrentTime;
+    /* 0x0B9C */ f32 m_JumpPadAngleDirection;
+    /* 0x0BA0 */ struct CROMRegionSet *m_pJumpPadRegionSet;
+    /* 0x0BA4 */ CVector3 m_vJumpPadStart;
+    /* 0x0BB0 */ struct CGameObjectInstance *m_pOnEnemy;
+    /* 0x0BB4 */ s32 m_OnEnemyObjectType;
+    /* 0x0BB8 */ CVector3 m_vOnEnemyScale;
+    /* 0x0BC4 */ CVector3 m_vOnEnemyOffset;
+    /* 0x0BD0 */ CVector3 m_vOnEnemyOriginalScale;
+    /* 0x0BDC */ f32 m_RideEnemyTime;
+    /* 0x0BE0 */ f32 m_OnEnemyStompTime;
+    /* 0x0BE4 */ f32 m_Oxygen;
+    /* 0x0BE8 */ f32 m_OutOfAirSfxTimer;
+    /* 0x0BEC */ s32 m_bOxygenOut;
+    /* 0x0BF0 */ s32 m_DoDeathCin;
+    /* 0x0BF4 */ s32 m_nDeathmatchTeamSelected;
+    /* 0x0BF8 */ s32 m_bEnteringDeathmatch;
+    /* 0x0BFC */ f32 m_WaitDeathmatchTimer;
+    /* 0x0C00 */ s32 m_bLevelNotCompleteExit;
+    /* 0x0C04 */ s32 m_CharAnim;
+    /* 0x0C08 */ s32 m_LastCharAnim;
+    /* 0x0C0C */ s32 _pad2;                      /* m_Overlay is 8-byte aligned */
+    /* 0x0C10 */ CPlayerOverlay m_Overlay;
+    /* 0x0CD0 */ CBarrel m_Barrel;
     /* 0x1064 */ COverlay m_AmmoOverlay;
     /* 0x10A0 */ COverlay m_HealthOverlay;
     /* 0x10DC */ COverlay m_LivesOverlay;
@@ -246,6 +263,28 @@ typedef struct CPlayer {
     /* 0x12B8 */ char m_DeathMatchString[4][25];
     /* 0x131C */ struct CPlayer *m_pLast;
     /* 0x1320 */ struct CPlayer *m_pNext;
-} CPlayer; /* size 0x1324 */
+    /* 0x1324 */ s32 _pad3;                      /* sizeof is a multiple of 8 (Mtx) */
+} CPlayer; /* size 0x1328 */
+
+/* Acclaim's intrusive list (CList in structs/camera.h) holding players. */
+typedef struct {
+    /* 0x00 */ CPlayer *m_pHead;
+    /* 0x04 */ CPlayer *m_pTail;
+    /* 0x08 */ s32 m_LastOffset;
+    /* 0x0C */ s32 m_NextOffset;
+    /* 0x10 */ s32 m_nCount;
+} CPlayerCList; /* size 0x14 */
+
+/* All players (D_80119870, the start of the engine's globals; its active
+ * list is D_80119890): the idle ones and the ones in the game. */
+typedef struct {
+    /* 0x00 */ struct CMemEntry *m_pmePlayers;
+    /* 0x04 */ CPlayer *m_Players;
+    /* 0x08 */ s32 m_nPlayers;
+    /* 0x0C */ CPlayerCList m_IdleList;
+    /* 0x20 */ CPlayerCList m_ActiveList;
+    /* 0x34 */ s32 m_bCinema;                    /* a cinema runs for the players */
+    /* 0x38 */ s32 m_bCinemaStarted;
+} CPlayerList; /* 0x3C known */
 
 #endif

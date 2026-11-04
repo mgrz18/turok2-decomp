@@ -1,8 +1,6 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
+#include "structs/intelligence.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -56,16 +54,11 @@ struct AI {
     /* 0x133 */ s8 modeIndex;
 };
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ u32 flags;
-} ActorDef;
-
 struct Object {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0xD4 - 0x18];
     /* 0x0D4 */ u32 flags;
     /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
@@ -79,12 +72,12 @@ extern f32 D_800B6D2C;          /* time scale */
 extern u8 D_80119870[];         /* players */
 extern ModeHandler *D_800B1790[];
 
-void *func_002532EC(u8 *players, Vec3f pos);
+void *func_002532EC(u8 *players, CVector3 pos);
 f32 func_002119FC(f32 lo, f32 hi);
 void func_00243414(Object *obj, AI *ai, s32 state);
 void func_0025C338(Object *obj, AI *ai);
 void func_0025AD90(Object *obj, AI *ai, f32);
-void func_00275544(s16 sound, Vec3f pos, s32, s32);
+void func_00275544(s16 sound, CVector3 pos, s32, s32);
 void func_00246860(Object *obj, AI *ai, s32 sound);
 void func_00246918(Object *obj, AI *ai);
 
@@ -151,7 +144,7 @@ void func_0025C5F8(Object *obj, AI *ai) {
         }
     }
     index = ai->modeIndex;
-    if (obj->def->flags & 0x40) {
+    if (obj->def->m_dwTypeFlags & 0x40) {
         ai->idleTime -= D_800B6D28;
         if (ai->idleTime < 0.0f) {
             ai->idleTime = 0.0f;

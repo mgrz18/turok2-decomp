@@ -9,17 +9,13 @@ typedef struct SweepDef {
     /* 0x10 */ f32 hitArg;
 } SweepDef;
 
-typedef struct HitDef {
-    /* 0x00 */ s32 kind;
-} HitDef;
-
 /* An instance that can be hit, or the one sweeping (a particle: type 2). */
 typedef struct HitInst {
     /* 0x000 */ u8 type;
     /* 0x002 */ u16 kind;
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ HitDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ f32 colour[3];
     /* 0x024 */ u8 pad24[0xE8];
     /* 0x10C */ struct HitInst *owner;
@@ -215,7 +211,7 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
         params.b = sweep->inst->colour[2];
         func_00236EA0(other, sweep->inst, 2, -1, pos, params);
         func_00275544(0x1B4, pos.x, pos.y, pos.z, 0, -1);
-        if (other->def->kind == result) {
+        if (other->def->m_Type == result) {
             sweep->inst->owner->player->hitByLaser = result;
         }
     }

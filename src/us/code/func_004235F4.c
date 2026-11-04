@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 s32 func_004160F0(void *item);
 s32 func_0029E3E0(char *dst, const char *fmt, ...); /* sprintf */
@@ -10,29 +11,14 @@ extern s32 D_800C2028;
 extern s32 D_80130964;
 extern s32 D_80130990;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItem;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s8 port;
-} MenuController;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ MenuController *controller;
-} MenuEvent;
-
-static __inline__ s32 GetPort(MenuEvent *event) {
+static __inline__ s32 GetPort(Menu *event) {
     if (D_80130990 != 0) {
         return D_800C2028;
     }
     return event->controller->port;
 }
 
-s32 func_004235F4(MenuItem *item, MenuEvent *event) {
+s32 func_004235F4(MenuItem *item, Menu *event) {
     s32 port = GetPort(event);
 
     if (D_80130964 != 0) {

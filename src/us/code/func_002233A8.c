@@ -1,59 +1,24 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028A258.c, func_0028A258.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef struct ActorInfo {
-               u32 flags;
-               s32 unk4;
-               u8 pad8[4];
-               s16 unkC;
-               u8 padE[6];
-               f32 unk14;
-               u8 pad18[0xC];
-               u32 flags24;
-               u8 pad28[0x28];
-               f32 unk50;
-} ActorInfo;
-typedef struct ActorDef {
-               s32 type;
-               u8 pad4[0x10];
-               ActorInfo info;
-} ActorDef;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "common.h"
+#include "structs/intelligence.h"
+#include "structs/world.h"
+
 /* Turok 2 layouts: only the fields used here (Rage Wars: pos 0x8, def 0x18, list at 0xF5C). */
 typedef struct Entity {
     u8 pad0[0x4];
-    Vec3f pos;          /* 0x4 */
+    CVector3 pos;          /* 0x4 */
     u8 pad10[0x4];
-    ActorDef *def;      /* 0x14 */
+    CIntelligence *def;      /* 0x14 */
 } Entity;
-typedef struct Level {
-    u8 pad0[0xF04];
-    Entity *arrF04[32]; /* 0xF04 */
-    s32 cntF84;         /* 0xF84 */
-} Level;
-typedef struct {
-    s32 type;
-    u8 pad4[0x10];
-    u32 flags14;
-    u8 pad18[8];
-    f32 f20;
-    f32 f24;
-    f32 f28;
-} DefQ;
 f32 func_0026841C(Entity *e);
 f32 func_002671B4(Entity *e);
 s32 func_00265F90(Entity *e, u8 *p, Entity *me);
 void func_00243414(Entity *e, u8 *p, s32 a);
-void func_002233A8(Level *lv, Entity *me, Vec3f *p0, Vec3f *p1) {
+void func_002233A8(CWorld *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
     s32 isB;
     s32 is1;
     f32 myBot;
@@ -84,25 +49,25 @@ void func_002233A8(Level *lv, Entity *me, Vec3f *p0, Vec3f *p1) {
     s32 ok;
     u32 fl;
     if (p0->x != p1->x || p0->y != p1->y || p0->z != p1->z) {
-        kind = me->def->type;
+        kind = me->def->m_Type;
         isB = kind == 0xB;
         is1 = kind == 1;
         myBot = me->pos.y + func_0026841C(me);
         myTop = myBot + func_002671B4(me);
-        for (i = 0; i < lv->cntF84; i++) {
-            e = lv->arrF04[i];
+        for (i = 0; i < lv->m_nFlagged; i++) {
+            e = (Entity *)lv->m_pFlagged[i];
             if (e != me) {
                 s4 = 0;
                 s1 = 0;
                 eBot = e->pos.y + func_0026841C(e);
                 eTop = eBot + func_002671B4(e);
-                switch (((DefQ *)e->def)->type) {
+                switch (e->def->m_Type) {
                 case 6:
                     s2 = 0;
                     s3 = s4 = 1;
-                    fl = ((DefQ *)e->def)->flags14;
-                    r1 = ((DefQ *)e->def)->f20;
-                    r2 = ((DefQ *)e->def)->f24;
+                    fl = e->def->m_dwTypeFlags;
+                    r1 = e->def->m_Door.m_AutoOpenRadius;
+                    r2 = e->def->m_Door.m_AutoCloseRadius;
                     a0 = fl & 4;
                     v1 = fl & 8;
                     a2 = fl & 0x10;
@@ -114,8 +79,8 @@ void func_002233A8(Level *lv, Entity *me, Vec3f *p0, Vec3f *p1) {
                     a2 = s3;
                     a1 = s3;
                     s1 = s2;
-                    fl = ((DefQ *)e->def)->flags14;
-                    r1 = ((DefQ *)e->def)->f24;
+                    fl = e->def->m_dwTypeFlags;
+                    r1 = e->def->m_Action.m_AutoGoRadius;
                     r2 = 0.0f;
                     a0 = fl & 4;
                     v1 = fl & 8;
@@ -126,8 +91,8 @@ void func_002233A8(Level *lv, Entity *me, Vec3f *p0, Vec3f *p1) {
                     a2 = s3;
                     a1 = s3;
                     s1 = s2;
-                    fl = ((DefQ *)e->def)->flags14;
-                    r1 = ((DefQ *)e->def)->f28;
+                    fl = e->def->m_dwTypeFlags;
+                    r1 = e->def->m_Destructible.m_AutoGoRadius;
                     r2 = 0.0f;
                     a0 = fl & 8;
                     v1 = fl & 0x10;
@@ -175,7 +140,7 @@ void func_002233A8(Level *lv, Entity *me, Vec3f *p0, Vec3f *p1) {
                             }
                         }
                         if (ok != 0) {
-                            if (e->def->type == 10 && s2 == 1) {
+                            if (e->def->m_Type == 10 && s2 == 1) {
                                 ok = func_00265F90(e, (u8 *)e + 0x140, me);
                             }
                             if (ok != 0) {

@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Quad {
-    Vec3 corner[4]; /* 0x00 */
-    Vec3 normal;    /* 0x30 */
+    CVector3 corner[4]; /* 0x00 */
+    CVector3 normal;    /* 0x30 */
 } Quad;
 
 typedef struct DefInfo {
@@ -48,8 +45,8 @@ typedef struct Controller {
     f32 height;        /* 0x5C */
 } Controller;
 
-void func_00241960(Mover *mover, Vec3 *points, Collider *collider);
-void func_0023C9CC(Quad *quad, Vec3 *points);
+void func_00241960(Mover *mover, CVector3 *points, Collider *collider);
+void func_0023C9CC(Quad *quad, CVector3 *points);
 s32 func_0023C730(Quad *quad, f32 x, f32 z);
 f32 func_0023C8A0(Quad *quad, f32 x, f32 z);
 
@@ -57,7 +54,7 @@ f32 func_0023C8A0(Quad *quad, f32 x, f32 z);
 void func_00241CB0(Controller *ctrl, Collider *collider) {
     Mover *mover;
     DefInfo *info;
-    Vec3 points[8];
+    CVector3 points[8];
     Quad quad;
     f32 top;
     f32 y;

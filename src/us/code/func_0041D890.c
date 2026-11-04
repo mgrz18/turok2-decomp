@@ -1,30 +1,19 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x000 */ s32 data[0x4E8 / 4];
-} PlayerBlob;
+#include "structs/player.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x000 */ s32 data[0x184 / 4];
 } SetupBlob;
 
 typedef struct {
-    /* 0x00 */ f32 f[4];
-} MatchHead;
-
-typedef struct {
     /* 0x000 */ s32 size;
     /* 0x004 */ s32 extra;
     /* 0x008 */ f32 match[4];
-    /* 0x018 */ PlayerBlob player;
+    /* 0x018 */ CPlayerLoadSaveData player;
     /* 0x500 */ SetupBlob setup;
     /* 0x684 */ char text[4];
 } SaveBuffer;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x520];
-    /* 0x520 */ PlayerBlob blob;
-} Player;
 
 typedef struct {
     /* 0x0 */ s32 size;
@@ -33,8 +22,6 @@ typedef struct {
 extern SaveSize D_800F70A8;
 extern s32 *D_800C2010;        /* buffer handle */
 extern SaveBuffer *D_800C2018;
-extern SetupBlob D_8011AAD8;
-extern MatchHead D_8011ACB0;
 extern char D_800C13F0[];
 extern char D_800EBAC0[];
 extern void func_002053A8(s32);
@@ -48,7 +35,7 @@ static __inline__ s32 SaveFileSize(void) {
 }
 
 /* Snapshots the player and the multiplayer setup into a freshly allocated buffer. */
-void func_0041D890(Player *p) {
+void func_0041D890(CPlayer *p) {
     s32 size = SaveFileSize();
     SaveBuffer *save;
     s32 allocSize;
@@ -65,13 +52,13 @@ void func_0041D890(Player *p) {
     D_800C2010 = handle;
     D_800C2018 = buf;
     func_00266C5C(D_800C2018, 0, allocSize);
-    D_800C2018->player = p->blob;
-    D_800C2018->setup = D_8011AAD8;
+    D_800C2018->player = p->m_Data;
+    D_800C2018->setup = *(SetupBlob *)&D_8011AAD8;
     save = D_800C2018;
-    save->match[0] = D_8011ACB0.f[0];
-    save->match[1] = D_8011ACB0.f[1];
-    save->match[2] = D_8011ACB0.f[2];
-    save->match[3] = D_8011ACB0.f[3];
+    save->match[0] = D_8011ACB0.frames;
+    save->match[1] = D_8011ACB0.seconds;
+    save->match[2] = D_8011ACB0.minutes;
+    save->match[3] = D_8011ACB0.hours;
     /* D_800F70A8 is a struct field here, so it is reloaded after the store into the header. */
     save->size = size;
     save->extra = D_800F70A8.size;

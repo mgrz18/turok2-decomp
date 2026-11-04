@@ -1,23 +1,13 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80243A80_16.CPP, func_802466A0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct {
-    /* 0x0 */ u32 type;
-} CIntelligence;
+#include "structs/world.h"
 
 typedef struct {
     s32 words[6];
 } Lights1; /* libultra Lights1, copied as words */
 
-typedef struct {
-    /* 0x00 */ u8 pad00[0x14];
-    /* 0x14 */ s32 bank;
-    /* 0x18 */ u8 pad18[0x28];
-    /* 0x40 */ s32 directory;
-} World;
-
-s32 func_00224180(World *, s32);
+s32 func_00224180(CWorld *, s32);
 CQuaternion func_00267944(CGameObjectInstance *);
 void func_00219910(CAnimationState *);
 void func_0021E960(CGameObjectInstance *, s32);
@@ -25,11 +15,11 @@ void func_0020F79C(CMtxF *);
 f32 func_0026872C(CGameObjectInstance *, s32);
 void func_002429BC(CGameObjectInstance *, CAI *, void *);
 void func_00284760(void *, s32, CVector3 *);
-void func_0021A150(CGameObjectInstance *, s32, s32, s32);
+void func_0021A150(CGameObjectInstance *, s32 *, s32, s32);
 s32 func_00214ED8(void);
 void func_0021DA8C(void);
 
-extern World D_800F7078;
+extern CWorld D_800F7078;
 extern s32 D_80119878;      /* player count */
 extern u8 *D_80119874;      /* players, 0x1328 bytes each */
 extern u8 D_800AE994[];
@@ -43,7 +33,7 @@ static __inline__ void *body_setup(CGameObjectInstance *obj) {
     s32 i;
     u8 *player;
 
-    type = ((CIntelligence *) obj->header.m_pIntelligence)->type;
+    type = obj->header.m_pIntelligence->m_Type;
     if (type >= 13) {
         return 0;
     }
@@ -75,7 +65,7 @@ void func_00219BC0(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, vo
                    void *region, f32 rotY, CVector3 pos, s32 flags, CVector3 scale, CVector3 velocity) {
     s32 animIndex;
     s32 frame;
-    World *world;
+    CWorld *world;
     f32 ground;
 
     obj->m_dwFlags &= ~0x40000;
@@ -119,7 +109,7 @@ void func_00219BC0(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, vo
     }
     obj->m_dwFlags |= 0x10000;
     obj->m_dwFlags |= 0x20000;
-    if (((CIntelligence *) obj->header.m_pIntelligence)->type == 0 || (obj->m_dwFlags & 1)) {
+    if (obj->header.m_pIntelligence->m_Type == 0 || (obj->m_dwFlags & 1)) {
         obj->m_dwFlags &= ~0x20000;
     }
     animIndex = 0;
@@ -133,7 +123,7 @@ void func_00219BC0(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, vo
         func_00284760((u8 *) obj + 0x1D4, sound, &obj->header.m_vPos);
     }
     world = &D_800F7078;
-    func_0021A150(obj, world->directory, world->bank, animIndex);
+    func_0021A150(obj, world->m_pObjects, world->m_ObjectsKey, animIndex);
     if (frame != 0) {
         obj->m_CurrentAnimation.m_AnimationFrame = frame;
         obj->m_dwFlags &= ~0x400;

@@ -1,20 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SDK/OS_2/802B7B80_28.CPP, func_802B7FD8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
+#include "common.h"
+#include "ultra_types.h"
 typedef struct __OSContRamReadFormat __OSContRamReadFormat;
 struct __OSContRamReadFormat {
     u8 dummy;
@@ -26,30 +14,11 @@ struct __OSContRamReadFormat {
     u8 datacrc;
 };
 struct __OSContRamReadFormat;
-typedef struct OSPfs OSPfs;
-struct OSPfs {
-    int status;
-    struct OSMesgQueue *queue;
-    int channel;
-    u8 id[32];
-    u8 label[32];
-    int version;
-    int dir_size;
-    int inode_table;
-    int minode_table;
-    int dir_table;
-    int inode_start_page;
-    u8 banks;
-    u8 activebank;
-};
-struct OSPfs;
-struct OSMesgQueue;
 struct OSPifRam;
 struct OSPifRam {
     u32 ramarray[15];
     u32 pifstatus;
 };
-struct OSMesgQueue;
 struct OSPifRam;
 typedef struct OSPifRam OSPifRam;
 extern OSPifRam D_80121430[4];

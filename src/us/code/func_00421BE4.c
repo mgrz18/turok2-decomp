@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 s32 func_004160F0(void *item);
 s32 func_0029E3E0(char *dst, const char *fmt, ...); /* sprintf */
@@ -11,11 +12,6 @@ extern char D_800B48F8[];
 extern s32 D_80130984;
 extern s32 D_80130990;
 extern s32 D_801309B4;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItem;
 
 s32 func_00421BE4(MenuItem *item) {
     s32 player;

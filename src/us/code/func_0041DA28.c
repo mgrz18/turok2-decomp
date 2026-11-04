@@ -1,31 +1,9 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Greys out the controller pak notes that cannot be picked: a used note is
  * selectable unless it is this game's save (D_800B45C0 when loading, mode 1,
  * D_800B45CC in mode 2) with Turok 2's game and company codes. */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ s32 flags;
-    /* 0x0C */ u8 padC[0x28 - 0xC];
-} MenuRow;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x78];
-    /* 0x78 */ MenuRow rows[16];
-} MenuWindow;
-
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ s8 slot;
-} MenuCtl;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ MenuWindow *win;
-    /* 0x10 */ u8 pad10[0x20 - 0x10];
-    /* 0x20 */ MenuCtl *ctl;
-} Menu;
 
 extern s32 D_80130990;
 extern s32 D_800C2028;
@@ -48,11 +26,11 @@ static __inline__ s32 k7_chk(char *gc, char *cc) {
     return 0;
 }
 
-static __inline__ void rowEnable(MenuRow *row) {
+static __inline__ void rowEnable(MenuItem *row) {
     row->flags &= ~0x01000000;
 }
 
-static __inline__ void rowDisable(MenuRow *row) {
+static __inline__ void rowDisable(MenuItem *row) {
     row->flags |= 0x01000000;
 }
 
@@ -72,7 +50,7 @@ void func_0041DA28(Menu *menu) {
     if (D_80130990) {
         slot = D_800C2028;
     } else {
-        slot = menu->ctl->slot;
+        slot = menu->controller->port;
     }
     for (i = 0; i < 16; i++) {
         err = func_00425E74(slot, i, &used, name, ext, &size, company, game);
@@ -98,9 +76,9 @@ void func_0041DA28(Menu *menu) {
             }
         }
         if (ok) {
-            rowEnable(&menu->win->rows[i]);
+            rowEnable(&menu->items[i + 3]);
         } else {
-            rowDisable(&menu->win->rows[i]);
+            rowDisable(&menu->items[i + 3]);
         }
     }
 }

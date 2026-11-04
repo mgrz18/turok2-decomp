@@ -1,15 +1,12 @@
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
-
-void func_0020EF2C(Vec3 *out, Vec3 *a, Vec3 *b);
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 
 /* Returns 1 when point lies on the inner side of all four edges of the quad corners. */
-s32 func_0023C594(Vec3 *corners, Vec3 point) {
-    Vec3 edge;
-    Vec3 toPoint;
+s32 func_0023C594(CVector3 *corners, CVector3 point) {
+    CVector3 edge;
+    CVector3 toPoint;
     s32 i;
     s32 next;
 

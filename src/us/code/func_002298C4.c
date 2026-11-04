@@ -1,25 +1,24 @@
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct { f32 x, y, z; } Vec3f;
-typedef struct { f32 x, y, z, w; } Quatf;
 typedef f32 Mtx4f[4][4];
 
 extern s32 func_00275F7C(void);
-extern void *func_00275C6C(s32 bank, s32 sound, Vec3f *pos, Vec3f *pos2, s32 loops);  /* starts a sound */
+extern void *func_00275C6C(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
 extern void func_00275D34(s32 bank, void *handle);                                  /* stops a sound */
 extern void func_00232B40(void *obj);
 
 extern f32 func_0026D210(s32 half);                         /* half float -> f32 */
 extern f32 func_00298470(f32);                              /* sqrtf */
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 s);    /* out = in * s */
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a + b */
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a - b */
-extern void func_0020F040(Vec3f *v);                        /* normalize */
-extern void func_0020E810(Quatf *out, Vec3f *dir);          /* rotation facing dir */
-extern void func_00211074(Quatf *q);                        /* normalize */
-extern void func_0020DCC8(Quatf *out, f32 t, Quatf *a, Quatf *b); /* slerp */
-extern void func_00211114(Quatf *q, Mtx4f m);               /* to matrix */
-extern void func_0020F85C(Mtx4f m, Vec3f *in, Vec3f *out);  /* transform */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
+extern void func_0020F040(CVector3 *v);                        /* normalize */
+extern void func_0020E810(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
+extern void func_00211074(CQuaternion *q);                        /* normalize */
+extern void func_0020DCC8(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b); /* slerp */
+extern void func_00211114(CQuaternion *q, Mtx4f m);               /* to matrix */
+extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);  /* transform */
 extern void func_00229618(void *obj, f32 scale);
 
 typedef struct {
@@ -35,7 +34,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x214];
-    /* 0x214 */ Vec3f pos;
+    /* 0x214 */ CVector3 pos;
 } Target;
 
 typedef struct {
@@ -46,9 +45,9 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x18 - 0x10];
-    /* 0x018 */ Vec3f vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0x40 - 0x24];
     /* 0x040 */ s32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
@@ -58,16 +57,16 @@ typedef struct {
     /* 0x118 */ u8 pad118[0x11C - 0x118];
     /* 0x11C */ f32 speed;
     /* 0x120 */ u8 pad120[0x150 - 0x120];
-    /* 0x150 */ Vec3f dir;
+    /* 0x150 */ CVector3 dir;
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
     /* 0x1B8 */ SoundHandle *loop;
 } Missile;
 
 /* Same as func_00231EF8: accelerate along dir, clamp to the max speed. */
 static __inline__ void Missile_Accelerate(Missile *obj) {
-    Vec3f delta;
-    Vec3f dir;
-    Vec3f *vel;
+    CVector3 delta;
+    CVector3 dir;
+    CVector3 *vel;
     f32 accel;
     f32 speed;
     f32 maxSpeed;
@@ -95,12 +94,12 @@ static __inline__ void Missile_Accelerate(Missile *obj) {
 /* A homing missile: keeps its flight sound 0x1B2 playing, turns toward its
  * target (aiming above it when far), then accelerates. */
 void func_002298C4(Missile *obj) {
-    Vec3f targetPos;
-    Vec3f toTarget;
-    Vec3f forward;
-    Quatf cur;
-    Quatf want;
-    Quatf rot;
+    CVector3 targetPos;
+    CVector3 toTarget;
+    CVector3 forward;
+    CQuaternion cur;
+    CQuaternion want;
+    CQuaternion rot;
     Mtx4f mtx;
     Target *target;
     f32 speed;

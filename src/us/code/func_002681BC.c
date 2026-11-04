@@ -8,9 +8,6 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct B11Obj1A0 {
     u8 pad0[0x1C];
     u32 flags1C;

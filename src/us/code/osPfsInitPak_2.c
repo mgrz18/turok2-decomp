@@ -1,41 +1,7 @@
 /* cc1-flags: -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float -funsigned-char -O3 -mcpu=VR4300 -mgp32 -mfp32 -fforce-addr -fno-builtin */
 /* From decompals/ultralib (libultra 2.0I): src/io/pfsinitpak.c, osPfsInitPak. */
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long long u64;
-typedef signed int s32;
-
-typedef struct OSMesgQueue OSMesgQueue;
-
-typedef struct {
-    /* 0x00 */ s32 status;
-    /* 0x04 */ OSMesgQueue *queue;
-    /* 0x08 */ s32 channel;
-    /* 0x0C */ u8 id[32];
-    /* 0x2C */ u8 label[32];
-    /* 0x4C */ s32 version;
-    /* 0x50 */ s32 dir_size;
-    /* 0x54 */ s32 inode_table;
-    /* 0x58 */ s32 minode_table;
-    /* 0x5C */ s32 dir_table;
-    /* 0x60 */ s32 inode_start_page;
-    /* 0x64 */ u8 banks;
-    /* 0x65 */ u8 activebank;
-} OSPfs;
-
-typedef struct {
-    /* 0x00 */ u32 repaired;
-    /* 0x04 */ u32 random;
-    /* 0x08 */ u64 serial_mid;
-    /* 0x10 */ u64 serial_low;
-    /* 0x18 */ u16 deviceid;
-    /* 0x1A */ u8 banks;
-    /* 0x1B */ u8 version;
-    /* 0x1C */ u16 checksum;
-    /* 0x1E */ u16 inverted_checksum;
-} __OSPackId;
-
+#include "common.h"
+#include "ultra_types.h"
 #define PFS_INITIALIZED 1
 #define PFS_ERR_DEVICE 11
 

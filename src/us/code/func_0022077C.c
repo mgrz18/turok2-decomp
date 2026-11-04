@@ -1,17 +1,14 @@
 #include "common.h"
 #include "gfx.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Drawable {
     u8 type;                    /* 0x00: 0 box, 1 point, 3 ... */
     u8 pad1[3];
-    Vec3 pos;                   /* 0x04 */
+    CVector3 pos;                   /* 0x04 */
     u8 pad10[0x68 - 0x10];
-    Vec3 min;                   /* 0x68 */
-    Vec3 max;                   /* 0x74 */
+    CVector3 min;                   /* 0x68 */
+    CVector3 max;                   /* 0x74 */
 } Drawable;
 
 typedef struct SortEntry {
@@ -25,7 +22,7 @@ typedef struct DrawList {
     Drawable *items[1];         /* 0x1068 */
 } DrawList;
 
-Vec3 func_00280E40(void *cam);  /* camera position */
+CVector3 func_00280E40(void *cam);  /* camera position */
 void func_00226F90(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
 s32 func_00226D30();
 s32 func_00226CD0();

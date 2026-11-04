@@ -2,12 +2,9 @@
  * 0x25AD8C `bnez $v0, .L0025B284`, whose delay slot is this function's first instruction).
  * The real function is func_0025AD90 (0x2E8 bytes); this C matches it from 0x25AD90 on. */
 #include "common.h"
+#include "structs/vector.h"
 
 /* AI head tracking: turns the head bones toward the target (or the player in state 0xC). */
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -18,7 +15,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x54 - 0x10];
     /* 0x054 */ f32 eyeOffset;
     /* 0x058 */ u8 pad58[0xA4 - 0x58];
@@ -41,21 +38,21 @@ typedef struct {
     /* 0x80 */ Actor *target;
 } CAI;
 
-extern Vec3 D_800B06A0; /* player position */
+extern CVector3 D_800B06A0; /* player position */
 
 extern s32 *func_0020367C(s32, s32, s32, s32, s32, s32, const char *, s32);
 extern AnimObjectInfo *func_002017D4(s32 table, s32 index);
 extern void func_002051F4(s32 arg0, s32 *resource);
 extern f32 func_002671B4(Actor *actor); /* height */
-extern f32 func_00246310(Actor *actor, Vec3 point);
-extern void func_0020EF2C(Vec3 *out, Vec3 *a, Vec3 *b);
-extern f32 func_0020F5C0(Vec3 *v);
+extern f32 func_00246310(Actor *actor, CVector3 point);
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+extern f32 func_0020F5C0(CVector3 *v);
 extern void func_002117DC(f32 *value, f32 target, f32 rate);
 
 void func_0025AD90(Actor *actor, CAI *ai, f32 pitchOffset) {
-    Vec3 from;
-    Vec3 to;
-    Vec3 delta;
+    CVector3 from;
+    CVector3 to;
+    CVector3 delta;
     f32 value;
     s32 *res;
     AnimObjectInfo *info;

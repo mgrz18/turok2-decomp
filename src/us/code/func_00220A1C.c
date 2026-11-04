@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/world.h"
 
 typedef struct Floor {
     u8 data[0x20];
@@ -16,11 +17,6 @@ typedef struct FloorGrid {
     FloorCell cells[1];         /* 0x08 */
 } FloorGrid;
 
-typedef struct World {
-    u8 pad0[0x58];
-    void *data;                 /* 0x58 */
-} World;
-
 extern s32 D_800B6D54;
 
 void *func_002017D4(void *table, s32 index);
@@ -28,7 +24,7 @@ s32 func_0026BB9C(Floor *floor, f32 x, f32 z);      /* point over floor */
 f32 func_0026BE60(Floor *floor, f32 x, f32 z);      /* floor height at */
 
 /* The floor under pos whose height is closest to it, or NULL. */
-Floor *func_00220A1C(World *world, f32 *pos) {
+Floor *func_00220A1C(CWorld *world, f32 *pos) {
     Floor *floors;
     Floor *floor;
     Floor *best;
@@ -45,12 +41,12 @@ Floor *func_00220A1C(World *world, f32 *pos) {
     if (D_800B6D54 == 0) {
         return NULL;
     }
-    floors = (Floor *)((u8 *)func_002017D4(world->data, 2) + 8);
+    floors = (Floor *)((u8 *)func_002017D4(world->m_pRegionData, 2) + 8);
     k = 0;
     i = 0;
     bestDist = 0.0f;
     best = NULL;
-    grid = func_002017D4(world->data, 3);
+    grid = func_002017D4(world->m_pRegionData, 3);
     cellCount = grid->count;
     cells = grid->cells;
     for (; i < cellCount; i++) {

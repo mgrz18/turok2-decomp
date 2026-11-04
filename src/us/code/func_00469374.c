@@ -2,6 +2,7 @@
 /* The real function is 0x00469374-0x0046941C (size 0xA8 = 168):
  * splat cut it at the data label D_00469400. */
 #include "common.h"
+#include "structs/game.h"
 
 /* Start a level: check that the warp target exists, reset the multiplayer
  * options and switch the game state. */
@@ -16,14 +17,7 @@ typedef struct {
     s32 warpFlags;  /* 0x23FFC */
 } Game;
 
-typedef struct {
-    s32 values[4]; /* 0x00 */
-    u8 pad10[0x34];
-    s32 value44;   /* 0x44 */
-} Options;
-
 extern u8 D_800F7078[];
-extern Options D_8011ACB0;
 
 s32 func_0042C0B4(void *level, s32 a, s32 id, void *out, s32 flags);
 
@@ -36,11 +30,11 @@ void func_00469374(Game *game, s32 warpId) {
     if (func_0042C0B4(D_800F7078, -1, id, sp18, 1) == 0) {
         id = 0;
     }
-    D_8011ACB0.values[0] = 0;
-    D_8011ACB0.values[1] = 0;
-    D_8011ACB0.values[2] = 0;
-    D_8011ACB0.values[3] = 0;
-    D_8011ACB0.value44 = 0;
+    D_8011ACB0.frames = 0;
+    D_8011ACB0.seconds = 0;
+    D_8011ACB0.minutes = 0;
+    D_8011ACB0.hours = 0;
+    D_8011ACB0.unk44 = 0;
     do {
         game->warpFlags = 0;
         game->warpId = id;

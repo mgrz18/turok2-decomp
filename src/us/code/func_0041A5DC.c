@@ -1,13 +1,9 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Level select (warp) menu input: A warps to the selected level (or, on the
  * last entry, starts the credits/next mode), up and down move the selection
  * to the previous/next level whose key the player owns. */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ s32 pad;
-} MenuCaller;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
@@ -32,7 +28,7 @@ extern u8 D_800F7078[];
 extern s32 func_002855E8(s32 pad);
 extern s32 func_00285628(s32 pad);
 extern s32 func_00285670(s32 pad);
-extern void func_00417ACC(MenuCaller *c);
+extern void func_00417ACC(Menu *c);
 extern void func_00288C5C(void *game, s32 mode);
 extern void func_002886D0(void *game, s32 level);
 extern void func_0042C700(void *level, s32 id, s32 how);
@@ -101,7 +97,7 @@ static __inline__ s32 findLevel(s32 step) {
     return -1;
 }
 
-s32 func_0041A5DC(void *menu, MenuCaller *c) {
+s32 func_0041A5DC(void *menu, Menu *c) {
     s32 id;
     Progress *progress;
 
@@ -141,7 +137,7 @@ s32 func_0041A5DC(void *menu, MenuCaller *c) {
         id = 8000;
         break;
     }
-    if (func_002855E8(c->pad) != 0) {
+    if (func_002855E8(c->controller) != 0) {
         if (id == 8000) {
             D_80119870.progress.warping = 1;
             func_00417ACC(c);
@@ -159,9 +155,9 @@ s32 func_0041A5DC(void *menu, MenuCaller *c) {
         func_002886D0(D_800F6CB0, id);
         return 1;
     }
-    if (func_00285628(c->pad) != 0) {
+    if (func_00285628(c->controller) != 0) {
         D_80130924 = findLevel(-1);
-    } else if (func_00285670(c->pad) != 0) {
+    } else if (func_00285670(c->controller) != 0) {
         D_80130924 = findLevel(1);
     } else {
         return 0;

@@ -1,16 +1,6 @@
 #include "common.h"
+#include "structs/game_object.h"
 
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
-
-typedef struct Actor {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3 pos;
-    /* 0x10 */ void *region;
-    /* 0x14 */ u8 pad14[4];
-    /* 0x18 */ Vec3 velocity;
-} Actor;
 
 typedef struct CollisionInfo {
     /* 0x00 */ s32 flags;
@@ -18,15 +8,15 @@ typedef struct CollisionInfo {
 
 extern CollisionInfo D_800F1BE0;
 
-s32 func_00267F64(Actor *actor);
-s32 func_00267F10(Actor *actor);
+s32 func_00267F64(CGameObjectInstance *actor);
+s32 func_00267F10(CGameObjectInstance *actor);
 f32 func_0026BE60(void *region, f32 x, f32 z);
-void func_00239F00(Actor *actor, Vec3 pos, CollisionInfo *info);
+void func_00239F00(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
 
 /* Slides an actor to (x, z) with collision, keeping its height above the floor. */
-void func_002694A8(Actor *actor, f32 x, f32 z) {
-    Vec3 savedVelocity;
-    Vec3 to;
+void func_002694A8(CGameObjectInstance *actor, f32 x, f32 z) {
+    CVector3 savedVelocity;
+    CVector3 to;
     s32 noA;
     s32 noB;
     s32 oldFlags;
@@ -34,11 +24,11 @@ void func_002694A8(Actor *actor, f32 x, f32 z) {
 
     noA = func_00267F64(actor) == 0;
     noB = func_00267F10(actor) == 0;
-    height = actor->pos.y - func_0026BE60(actor->region, actor->pos.x, actor->pos.z);
-    savedVelocity = actor->velocity;
-    actor->velocity.x = actor->velocity.y = actor->velocity.z = 0.0f;
+    height = actor->header.m_vPos.y - func_0026BE60(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z);
+    savedVelocity = actor->m_vVelocity;
+    actor->m_vVelocity.x = actor->m_vVelocity.y = actor->m_vVelocity.z = 0.0f;
     to.x = x;
-    to.y = actor->pos.y;
+    to.y = actor->header.m_vPos.y;
     to.z = z;
     oldFlags = D_800F1BE0.flags;
     if (noA) {
@@ -53,6 +43,6 @@ void func_002694A8(Actor *actor, f32 x, f32 z) {
     }
     func_00239F00(actor, to, &D_800F1BE0);
     D_800F1BE0.flags = oldFlags;
-    actor->velocity = savedVelocity;
-    actor->pos.y = func_0026BE60(actor->region, actor->pos.x, actor->pos.z) + height;
+    actor->m_vVelocity = savedVelocity;
+    actor->header.m_vPos.y = func_0026BE60(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z) + height;
 }

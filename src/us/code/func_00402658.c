@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -36,7 +33,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0xD4 - 0x10];
     /* 0x0D4 */ u32 flags;
 } Actor;
@@ -56,7 +53,7 @@ extern f32 func_00298470(f32); /* sqrtf */
 void func_00402658(Actor *actor, CAI *ai) {
     Targets t;
     Path path;
-    Vec3f v;
+    CVector3 v;
     Arena *arena;
     Boss *boss = &D_8012F3A0;
     f32 turn;

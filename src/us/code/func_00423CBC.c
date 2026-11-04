@@ -2,6 +2,7 @@
  * into func_00423CF4, func_00423D04, func_00423D14, func_00423D24 (jump table jtbl_800C16D0),
  * and whose shared `return 0` tail is the already-accepted func_00423D30 (8 bytes). */
 #include "common.h"
+#include "structs/menu.h"
 
 extern u8 D_800B5180[];
 extern u8 D_800B51CC[];
@@ -9,11 +10,6 @@ extern u8 D_800B5218[];
 extern u8 D_800B5264[];
 extern u8 D_800B52C4[];
 extern s32 D_801309B0;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ void *text;
-} MenuItem;
 
 s32 func_00423CBC(MenuItem *item) {
     switch (D_801309B0) {

@@ -1,18 +1,17 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* AI matrix callback: builds the actors world matrix from the AIs look
  * angles, its yaw about Y, its rotation, scale and position. */
 
-typedef struct { f32 x, y, z; } Vec3;
-typedef struct { f32 x, y, z, w; } Quat;
 typedef struct { f32 m[4][4]; } Mtx44;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x34 - 0x10];
-    /* 0x34 */ Vec3 scale;
-    /* 0x40 */ Quat rot;
+    /* 0x34 */ CVector3 scale;
+    /* 0x40 */ CQuaternion rot;
     /* 0x50 */ f32 yaw;
     /* 0x54 */ u8 pad54[0x4];
     /* 0x58 */ Mtx44 mtx;
@@ -37,19 +36,19 @@ extern void func_00210630(Mtx44 *m, f32 angle);
 extern void func_00210790(Mtx44 *m, f32 angle);
 extern f32 func_002982F0(f32 x);
 extern f32 func_002974C0(f32 x);
-extern void func_00210F68(Quat *out, Quat *a, Quat *b);
-extern void func_00211114(Quat *rot, Mtx44 *m);
+extern void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+extern void func_00211114(CQuaternion *rot, Mtx44 *m);
 extern void func_0020C618(Mtx44 *out, Mtx44 *a, Mtx44 *b);
 extern void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);
-extern void func_0020F510(Vec3 *v, f32 limit);
+extern void func_0020F510(CVector3 *v, f32 limit);
 extern void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);
 extern void func_00210C3C(Mtx44 *m);
 
 void func_0025C018(Actor *actor, CAI *ai) {
     Mtx44 look;
     Mtx44 rotMtx;
-    Quat spin;
-    Quat rot;
+    CQuaternion spin;
+    CQuaternion rot;
     f32 sin;
 
     if (ai->flags & 0x10000) {

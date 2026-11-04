@@ -1,38 +1,22 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SYSTEM/802BA5F0_22.CPP, func_802BA350_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef unsigned long long u64;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
+#include "common.h"
+#include "ultra_types.h"
 struct OSIoMesgHdr_func_802BA350_de;
-struct OSMesgQueue;
 struct OSIoMesgHdr_func_802BA350_de {
     u16 type;
     u8 pri;
     u8 status;
-    struct OSMesgQueue *retQueue;
+    OSMesgQueue *retQueue;
 };
 struct OSDevMgr_func_802BA350_de;
-struct OSMesgQueue;
-struct OSThread;
 struct OSDevMgr_func_802BA350_de {
     u32 active;
-    struct OSThread *thread;
-    struct OSMesgQueue *cmdQueue;
-    struct OSMesgQueue *evtQueue;
-    struct OSMesgQueue *acsQueue;
+    OSThread *thread;
+    OSMesgQueue *cmdQueue;
+    OSMesgQueue *evtQueue;
+    OSMesgQueue *acsQueue;
     s32 (*dma)(s32, u32, void *, u32);
     s32 (*edma)(void *, s32, u32, void *, u32);
 };
@@ -50,14 +34,10 @@ struct OSIoMesgCode802BA23C {
 };
 struct OSDevMgr_func_802BA350_de;
 typedef struct OSDevMgr_func_802BA350_de OSDevMgr_func_802BA350_de;
-struct OSMesgQueue;
-struct OSMesgQueue;
-typedef void *OSMesg;
 typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
 extern void func_0029B030(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
 extern OSIntMask __osDisableInt(void);
-struct OSMesgQueue;
 extern u64 D_80121910[];
 extern void D_0029A890(void *arg);
 extern OSIoMesgCode802BA23C D_80122970;
@@ -67,7 +47,6 @@ extern u32 __osDisableInt(void);
 extern void func_0029BDB8();
 extern void func_0029A5E0(void);
 extern void osCreateViManager(s32 pri);
-typedef struct OSThread OSThread;
 extern OSDevMgr_func_802BA350_de D_800B7AD0;
 extern OSThread D_801216E0;
 extern u64 D_80121910[];

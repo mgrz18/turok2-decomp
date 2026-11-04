@@ -1,10 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002782E4.c, func_002782E4, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 /* A vertex (0x10 bytes). */
 typedef struct {
@@ -31,10 +28,10 @@ VtxBlk *func_002017D4(s32 *file, s32 index); /* returns chunk `index` of a chunk
 /* Writes the vertex colours of every chunk of file from the light levels in
  * src, brightened toward white by the brightness setting; black with game
  * flag 0x4000. */
-void func_0021375C(s32 *file, Vec3f *src) {
+void func_0021375C(s32 *file, CVector3 *src) {
     s32 i;
     VtxBlk *b;
-    Vec3f t;
+    CVector3 t;
     f32 f, x, a;
     s32 j, v, r;
     s32 k = 0;

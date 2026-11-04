@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Kind {
     s32 value;
@@ -21,13 +18,13 @@ typedef struct EventParams {
     s32 unk4;       /* 0x4 */
 } EventParams;
 
-extern s32 func_002755B0(s32 id, Vec3 pos, s32 arg4, s32 selected, f32 scale);
+extern s32 func_002755B0(s32 id, CVector3 pos, s32 arg4, s32 selected, f32 scale);
 extern f32 D_800A65A4;
 extern f32 D_800A65A8;
 extern f32 D_800A65AC;
 extern s32 D_8011ACA4;
 
-void func_0023801C(s32 arg0, Object *obj, s32 arg2, Vec3 pos, EventParams params) {
+void func_0023801C(s32 arg0, Object *obj, s32 arg2, CVector3 pos, EventParams params) {
     s32 *global = &D_8011ACA4;
     s32 selected;
     f32 scale;

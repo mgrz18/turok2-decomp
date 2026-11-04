@@ -1,26 +1,11 @@
 /* Item availability test (also inlined into func_00424780). The two row tests jump out to their bodies (gotos), which gives the ROM bnez/bnel + j layout. */
 #include "common.h"
+#include "structs/menu.h"
 
 s32 func_00253748(u8 *player, s32 type);
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ s16 type;
-    /* 0x22 */ s16 index;
-} ItemDef;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ ItemDef *def;
-} MenuItem;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ u8 *player;
-} MenuEvent;
-
-s32 func_00424978(MenuItem *item, MenuEvent *event) {
-    s32 type = item->def->type;
+s32 func_00424978(MenuItem *item, Menu *event) {
+    s32 type = item->def->param;
     s32 index = item->def->index;
     u8 *player = event->player;
     s32 result = 0;

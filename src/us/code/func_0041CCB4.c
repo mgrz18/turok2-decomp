@@ -1,26 +1,7 @@
 #include "common.h"
+#include "structs/player.h"
+#include "structs/menu.h"
 
-typedef struct {
-    /* 0x00 */ s32 index;
-    /* 0x04 */ u8 pad4[0x10];
-    /* 0x14 */ char *text;
-} MenuItem;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ u16 matchCounts[8];
-    /* 0x20 */ u16 totalCounts[8];
-} PlayerOptions;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ PlayerOptions *options;
-} Player;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ Player *player;
-} MenuCaller;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x33];
@@ -35,18 +16,18 @@ extern s32 func_004160F0(MenuItem *a);
 extern void func_0029E3E0(char *dst, char *fmt, ...);
 
 /* "<name> <count>" line of the score table, for the slot of item index - 2. */
-s32 func_0041CCB4(MenuItem *a, MenuCaller *c) {
+s32 func_0041CCB4(MenuItem *a, Menu *c) {
     s32 slot = a->index - 2;
-    Player *player = c->player;
+    CPlayer *player = c->player;
     s32 n;
     char *src;
     char *dst;
     s32 i;
 
     if (D_8011ACE4) {
-        n = player->options->matchCounts[slot];
+        n = player->m_pOptions->m_Tagged[slot];
     } else {
-        n = player->options->totalCounts[slot];
+        n = player->m_pOptions->m_Killed[slot];
     }
     dst = a->text;
     src = D_8011AB58[slot].name;

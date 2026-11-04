@@ -1,23 +1,13 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002149C0.c, func_002149C0, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
-
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ u8 pad4[0x14 - 4];
-    /* 0x14 */ u32 flags14;
-    /* 0x18 */ u8 pad18[0x48 - 0x18];
-    /* 0x48 */ u32 flags48;         /* 0x40/0x80/0x100: per side */
-    /* 0x4C */ u8 pad4C[0x94 - 0x4C];
-    /* 0x94 */ u16 flags94;         /* 5 bits per side */
-} ActorDef;
+#include "structs/vector.h"
+#include "structs/intelligence.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 region;
-    /* 0x014 */ ActorDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x54 - 0x18];
     /* 0x054 */ f32 eye;
     /* 0x058 */ u8 pad58[0xD4 - 0x58];
@@ -55,7 +45,7 @@ typedef struct {
     /* 0x7C */ u8 pad7C[4];
     /* 0x80 */ Actor *approachFrom;
     /* 0x84 */ u8 pad84[0xAC - 0x84];
-    /* 0xAC */ Vec3f pos;
+    /* 0xAC */ CVector3 pos;
     /* 0xB8 */ s32 region;
 } Plan;
 
@@ -69,21 +59,21 @@ s32 func_002438C0(Actor *self, Plan *plan, Actor *target);
 s32 func_002435AC(Actor *viewer, Actor *target, f32 range, f32 across, f32 up);
 s32 func_0025E44C(Actor *self, Plan *plan);
 s32 func_0025E428(Actor *self, Plan *plan);
-void func_0025E52C(Actor *self, Plan *plan, Vec3f *pos, s32 arg3);
+void func_0025E52C(Actor *self, Plan *plan, CVector3 *pos, s32 arg3);
 s32 Cinema_PathPlaying(void);
 s32 func_00284408(void);
 Actor *func_00225848(u8 *scene, Actor *self);
 Actor *func_0022594C(u8 *scene, Actor *self);
 Actor *func_002259D0(u8 *scene, Actor *self);
-Actor *func_002532EC(u8 *players, Vec3f pos);
-Actor *func_00253370(u8 *players, Vec3f pos, void *owner);
+Actor *func_002532EC(u8 *players, CVector3 pos);
+Actor *func_00253370(u8 *players, CVector3 pos, void *owner);
 CameraInfo *func_00268A2C(Actor *player);
-f32 func_002465F0(Actor *a, Vec3f pos);
-f32 func_0024665C(Actor *a, Vec3f pos);
+f32 func_002465F0(Actor *a, CVector3 pos);
+f32 func_0024665C(Actor *a, CVector3 pos);
 s32 func_00267E74(Actor *a);
 f32 func_00268534(Actor *a);
 f32 func_002671B4(Actor *a);                           /* height */
-s32 func_00239F00(Actor *a, Vec3f from, u8 *result);
+s32 func_00239F00(Actor *a, CVector3 from, u8 *result);
 
 #define ADD(t) if ((t) != NULL) { list[n] = (t); n++; }
 
@@ -93,7 +83,7 @@ s32 func_00239F00(Actor *a, Vec3f from, u8 *result);
 Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
     Actor *list[128];
     ActorHead saved;
-    Vec3f eye;
+    CVector3 eye;
     f32 range;
     f32 across;
     f32 up;
@@ -116,7 +106,7 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
         }
         return plan->forced;
     }
-    if (self->def->kind == 1 && func_0025E44C(self, plan) != 2) {
+    if (self->def->m_Type == 1 && func_0025E44C(self, plan) != 2) {
         range = 2048.0f;
         across = 2.4434612f;
         up = 0.785398245f;
@@ -136,18 +126,18 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
     }
     if (ok) {
         if (flag) {
-            if (self->def->kind == 1 && plan->approachFrom != NULL) {
+            if (self->def->m_Type == 1 && plan->approachFrom != NULL) {
                 side = func_0025E428(self, plan);
-                if ((side == 0 && (self->def->flags48 & 0x40))
-                    || (side == 1 && (self->def->flags48 & 0x80))
-                    || (side == 2 && (self->def->flags48 & 0x100))) {
+                if ((side == 0 && (self->def->m_Enemy.m_dwEnemyFlags & 0x40))
+                    || (side == 1 && (self->def->m_Enemy.m_dwEnemyFlags & 0x80))
+                    || (side == 2 && (self->def->m_Enemy.m_dwEnemyFlags & 0x100))) {
                     t = func_00225848(D_800F7078, self);
                     ADD(t);
                 }
                 if (plan->approachFrom != NULL
-                    && ((side == 0 && (self->def->flags94 & 0x1F))
-                        || (side == 1 && (self->def->flags94 & 0x3E0))
-                        || (side == 2 && (self->def->flags94 & 0x7C00)))) {
+                    && ((side == 0 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x1F))
+                        || (side == 1 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x3E0))
+                        || (side == 2 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x7C00)))) {
                     t = func_0022594C(D_800F7078, self);
                     ADD(t);
                 }
@@ -167,7 +157,7 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
             if (cam != NULL) {
                 range = cam->height - 102.399994f;
             }
-            if (self->def->kind == 1 && plan->unk37 == 0 && (*D_800ADF5C[t->character].flags & 0x80)) {
+            if (self->def->m_Type == 1 && plan->unk37 == 0 && (*D_800ADF5C[t->character].flags & 0x80)) {
                 across *= 0.75f;
                 up *= 0.75f;
                 range *= 0.5f;
@@ -183,7 +173,7 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                 d = func_002465F0(t, self->pos);
                 if (d < best) {
                     if (flag) {
-                        if (self->def->kind == 1 && plan->unk37 == 0) {
+                        if (self->def->m_Type == 1 && plan->unk37 == 0) {
                             goto next;
                         }
                         if (func_00267E74(self)) {
@@ -212,8 +202,8 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                         if (r) {
                             goto next;
                         }
-                        if (self->def->kind == 1) {
-                            if ((self->def->flags14 & 0x8000) && func_002435AC(self, t, range, across, up) == 0) {
+                        if (self->def->m_Type == 1) {
+                            if ((self->def->m_dwTypeFlags & 0x8000) && func_002435AC(self, t, range, across, up) == 0) {
                                 if (plan->unk37 == 0) {
                                     goto next;
                                 }

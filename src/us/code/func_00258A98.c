@@ -9,11 +9,6 @@ typedef struct {
 } WeaponDef;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 unk_3E;
-} PlayerOptions;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0xC7];
     /* 0x0C7 */ s8 unk_C7;
     /* 0x0C8 */ u8 padC8[0x10C - 0xC8];
@@ -38,7 +33,7 @@ void func_00258A98(CGameObjectInstance *weapon, WeaponState *state) {
     if (state->unk_C7 != 0) {
         if ((D_800AF618[player->m_Data.m_CurrentWeapon]->flags & 4) && func_00257EA0(weapon, state) &&
             func_0024E700(player, player->m_Data.m_CurrentWeapon) && (P_S32(player, 0xA64) & 0x2000) &&
-            ((PlayerOptions *)player->m_pOptions)->unk_3E == 0) {
+            ((CPlayerOptions *)player->m_pOptions)->m_TagMode == 0) {
             func_00243414(weapon, state, 4);
         } else {
             func_00243414(weapon, state, 2);

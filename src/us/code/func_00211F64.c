@@ -1,12 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00276D20.c, func_00276D20, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x;
-    f32 y;
-    f32 z;
-} Vec3f;
+#include "structs/vector.h"
 
 /* A placed volume as the level data stores it: fixed point position, rotation, scale and size. */
 typedef struct VolumeRec {
@@ -29,7 +24,7 @@ typedef struct Volume {
     /* 0x00 */ f32 width;
     /* 0x04 */ f32 height;
     /* 0x08 */ f32 unk8[3];
-    /* 0x14 */ Vec3f dir;
+    /* 0x14 */ CVector3 dir;
     /* 0x20 */ u8 unk20[0x40];
     /* 0x60 */ f32 mtx[16];
     /* 0xA0 */ f32 bounds[6];
@@ -43,28 +38,28 @@ extern s32 D_8011AAD8;
 
 void func_0020C208(void *out, f32 *mtx);
 void func_0020F79C(f32 *mtx);
-void func_0020F9D4(f32 *mtx, Vec3f *in, Vec3f *out);
+void func_0020F9D4(f32 *mtx, CVector3 *in, CVector3 *out);
 void func_00210318(f32 *mtx, f32 x, f32 y, f32 z);
 void func_00210478(f32 *mtx, f32 x, f32 y, f32 z);
 void func_00210790(f32 *mtx, f32 angle);
 void func_00210968(f32 *mtx, f32 angle);
 void func_00210B38(f32 *mtx, f32 angle);
-void func_0026B9E0(f32 *bounds, s32 count, Vec3f *points);
+void func_0026B9E0(f32 *bounds, s32 count, CVector3 *points);
 
 /* Builds a volume from its level record: its matrix (scale, rotations about z, y and x, then the
  * position), its size, whether it is unrotated (each angle within 0.01) and the bounds of its
  * eight transformed corners. In mode 1 the rotation only aims dir, the volume itself stays upright. */
 void func_00211F64(Volume *vol, VolumeRec *rec) {
-    Vec3f pos;
-    Vec3f rot;
-    Vec3f scale;
-    Vec3f corners[8];
-    Vec3f down;
-    Vec3f aim;
-    Vec3f corner;
+    CVector3 pos;
+    CVector3 rot;
+    CVector3 scale;
+    CVector3 corners[8];
+    CVector3 down;
+    CVector3 aim;
+    CVector3 corner;
     s32 i;
     s32 aligned;
-    Vec3f *out;
+    CVector3 *out;
     f32 *mtx;
     f32 x;
     f32 y;

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct WeaponInfo {
     /* 0x00 */ u8 pad0[0xC];
@@ -27,20 +28,11 @@ typedef struct WeaponMenu {
     /* 0x37C */ s32 cursor;
 } WeaponMenu;
 
-typedef struct Player {
-    /* 0x000 */ u8 pad0[0x3C8];
-    /* 0x3C8 */ u32 flags;
-    /* 0x3CC */ u8 pad3CC[0x972 - 0x3CC];
-    /* 0x972 */ s8 hasWeapon[0x996 - 0x972];
-    /* 0x996 */ u8 pad996[0xB14 - 0x996];
-    /* 0xB14 */ s16 nextWeapon;
-} Player;
-
 extern WeaponInfo *D_800AF618[];
 extern s32 D_80110058;
 extern s32 D_8011005C;
 
-void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, Player *player);
+void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
 /* Opens the weapon menu: flags the weapons the player can pick (an owned
  * weapon usable in the current mode, unless it is the lower of a pair the
@@ -49,7 +41,7 @@ void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, Player *p
 Dockerfile	   README.md	   include	src	 us
 Dockerfile.native  baserom.us.z64  nonmatching	test	 versions
 LICENSE		   build	   references	tools until it rests on the queued weapon. */
-void func_0024C0B4(WeaponMenu *menu, s32 dir, Player *player) {
+void func_0024C0B4(WeaponMenu *menu, s32 dir, CPlayer *player) {
     s32 owned[35];
     s32 count;
     s32 i;
@@ -63,14 +55,14 @@ void func_0024C0B4(WeaponMenu *menu, s32 dir, Player *player) {
     range = D_8011005C - D_80110058 + 1;
     for (i = 0; i < 35; i++) {
         info = D_800AF618[i];
-        if (player->hasWeapon[i] == 0) {
+        if (player->m_Data.m_WeaponList[i] == 0) {
             ok = 0;
-        } else if (!((player->flags & 0x80) ? (info->flags & 2) : (info->flags & 1))) {
+        } else if (!((player->m_WeaponActor.m_AI.m_dwFlags & 0x80) ? (info->flags & 2) : (info->flags & 1))) {
             ok = 0;
         } else {
             alt = info->alternate;
             ok = 1;
-            if (player->hasWeapon[alt] != 0) {
+            if (player->m_Data.m_WeaponList[alt] != 0) {
                 ok = !(i < alt);
             }
         }
@@ -93,7 +85,7 @@ void func_0024C0B4(WeaponMenu *menu, s32 dir, Player *player) {
     }
     menu->step = -dir;
     menu->unk14 = 0;
-    while (menu->slots[menu->cursor].weapon != player->nextWeapon) {
+    while (menu->slots[menu->cursor].weapon != player->m_RequestedWeapon) {
         menu->cursor += dir;
         if (menu->cursor < 0) {
             menu->cursor = menu->count - 1;

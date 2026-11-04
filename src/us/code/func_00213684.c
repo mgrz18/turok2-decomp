@@ -1,13 +1,10 @@
 #include "common.h"
+#include "structs/vector.h"
 
 s32 *func_002017D4(s32 *file, s32 index); /* returns chunk `index` of a chunked file */
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
 /* Adds count packed offsets (signed bytes x:16-23, y:8-15, z:0-7, scaled by 2) to points[]. */
-void func_00213684(s32 *file, s32 count, Vec3f *points) {
+void func_00213684(s32 *file, s32 count, CVector3 *points) {
     s32 *chunk;
     s32 *packed;
     s32 word;

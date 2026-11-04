@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
@@ -23,25 +24,18 @@ typedef struct WeaponMenu {
     /* 0x37C */ s32 cursor;
 } WeaponMenu;
 
-typedef struct Player {
-    /* 0x000 */ u8 pad0[0xA68];
-    /* 0xA68 */ u32 buttons;
-    /* 0xA6C */ u8 padA6C[0xB14 - 0xA6C];
-    /* 0xB14 */ s16 weapon;
-} Player;
-
 extern f32 D_800B6D28;      /* frame step */
 
-s32 func_0024E700(Player *player, s32 weapon);
-s32 func_002548FC(Player *player);
-s32 func_00254F88(WeaponMenu *menu, Player *player);
-void func_0024C47C(WeaponMenu *menu, Player *player);
+s32 func_0024E700(CPlayer *player, s32 weapon);
+s32 func_002548FC(CPlayer *player);
+s32 func_00254F88(WeaponMenu *menu, CPlayer *player);
+void func_0024C47C(WeaponMenu *menu, CPlayer *player);
 void func_00210EF0(f32 *angle);
 
 /* Runs the weapon menu: marks the weapons the player can use, steps the
  * cursor with the next/previous weapon buttons and turns the wheel towards
  * the selected slot. */
-void func_0024B5A0(WeaponMenu *menu, Player *player) {
+void func_0024B5A0(WeaponMenu *menu, CPlayer *player) {
     s32 step;
     s32 i;
     s32 dir;
@@ -62,14 +56,14 @@ void func_0024B5A0(WeaponMenu *menu, Player *player) {
     }
     if (func_002548FC(player) != 0) {
         dir = 0;
-    } else if (player->buttons & 0x4000) {
+    } else if (player->m_ContState.m_dwButtonsSingle & 0x4000) {
         dir = 1;
-    } else if (player->buttons & 0x8000) {
+    } else if (player->m_ContState.m_dwButtonsSingle & 0x8000) {
         dir = -1;
     }
     if ((menu->state == 0 && dir != 0)
         || (func_00254F88(menu, player) != 0 && menu->state != 0)
-        || (menu->cursor != -1 && menu->slots[menu->cursor].weapon != player->weapon)) {
+        || (menu->cursor != -1 && menu->slots[menu->cursor].weapon != player->m_RequestedWeapon)) {
         func_0024C47C(menu, player);
     }
     if (dir != 0) {
@@ -81,7 +75,7 @@ void func_0024B5A0(WeaponMenu *menu, Player *player) {
                 menu->cursor = menu->count - 1;
             }
         } while (menu->slots[menu->cursor].available == 0);
-        player->weapon = menu->slots[menu->cursor].weapon;
+        player->m_RequestedWeapon = menu->slots[menu->cursor].weapon;
         menu->direction = -dir;
         menu->timer = 45.0f;
         if (menu->state == 0 || menu->state == 3) {

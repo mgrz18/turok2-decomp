@@ -1,19 +1,8 @@
 #include "common.h"
+#include "structs/game.h"
 
 s32 func_0024E5F0(s32, s32, s32);
 s32 func_00285410(s32);
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s32 unk20;
-    /* 0x24 */ s32 unk24;
-    /* 0x28 */ s32 unk28;
-    /* 0x2C */ u8 pad2C[0x44 - 0x2C];
-    /* 0x44 */ s32 unk44;
-    /* 0x48 */ s32 unk48;
-} Unk8011ACB0;
-extern Unk8011ACB0 D_8011ACB0;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xD0];
@@ -44,11 +33,11 @@ void func_002534E0(List002534E0 *arg0) {
     var_s0 = (Node002534E0 *) &D_8011ACB0;
     var_s0 = (Node002534E0 *) &D_8011ACB0;
     var_s1 = arg0;
-    if ((D_8011ACB0.unk1C == 0) && (D_8011ACB0.unk20 == 0)) {
+    if ((D_8011ACB0.over == 0) && (D_8011ACB0.done == 0)) {
         func_00285410(0);
-        if (D_8011ACB0.unk24 != 0) {
-            if (D_8011ACB0.unk28 == 0) {
-                D_8011ACB0.unk28 = 1;
+        if (D_8011ACB0.teams != 0) {
+            if (D_8011ACB0.teamOver == 0) {
+                D_8011ACB0.teamOver = 1;
                 var_s0 = var_s1->head;
                 var_a0 = var_s0;
                 if (var_s0 != NULL) {
@@ -60,7 +49,7 @@ void func_002534E0(List002534E0 *arg0) {
                 }
             }
         } else {
-            D_8011ACB0.unk1C = 1;
+            D_8011ACB0.over = 1;
             var_s0 = var_s1->head;
             var_a0_2 = var_s0;
             if (var_s0 != NULL) {

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 void func_00285A68(s32 port);
 
@@ -11,23 +12,13 @@ extern s32 D_80130998;
 extern s32 D_801309AC;
 extern s32 D_801309B4;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s8 port;
-} MenuController;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ MenuController *controller;
-} MenuEvent;
-
 /* Takes the port by address: the ROM keeps it in a stack slot (as func_0041DC5C does with its kind). */
 static __inline__ void SelectPort(s32 *port) {
     D_800C2020 = 0;
     func_00285A68(*port);
 }
 
-void func_00422FC0(MenuEvent *event) {
+void func_00422FC0(Menu *event) {
     s32 port;
 
     D_801309AC = 0;

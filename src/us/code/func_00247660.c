@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[8];
@@ -14,27 +15,10 @@ typedef struct {
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
 
-/* A player, as far as the sniper zoom goes. */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x524];
-    /* 0x524 */ s32 alive;
-    /* 0x528 */ u8 pad528[0x996 - 0x528];
-    /* 0x996 */ s16 weapon;
-    /* 0x998 */ u8 pad998[0xA64 - 0x998];
-    /* 0xA64 */ u32 buttons;
-    /* 0xA68 */ u32 pressed;
-    /* 0xA6C */ u8 padA6C[0xB8C - 0xA6C];
-    /* 0xB8C */ s32 sniperMode;     /* 0 off, 1 on, 2 zooming */
-    /* 0xB90 */ f32 zoom;
-    /* 0xB94 */ f32 targetZoom;
-    /* 0xB98 */ u8 padB98[0xC10 - 0xB98];
-    /* 0xC10 */ HudModel scope;
-} ZoomPlayer;
-
 extern WeaponDef *D_800AF618[];
 extern s32 D_8011AAA0;
 
-void func_00247170(HudModel *m, ZoomPlayer *owner);
+void func_00247170(HudModel *m, CPlayer *owner);
 void func_002117DC(f32 *value, f32 target, f32 rate);
 
 /* Starts lowering the scope model if it is up or being raised. */
@@ -54,61 +38,61 @@ static __inline__ void RaiseScope(HudModel *m, s32 model) {
 
 /* Sniper zoom: toggled by button 0x100 on a weapon with a scope, then
  * adjusted by 8 (in) and 4 (out) while 0x10 is held. */
-void func_00247660(ZoomPlayer *p) {
+void func_00247660(CPlayer *p) {
     f32 target;
     f32 t;
     u16 model;
 
     target = 0.0f;
-    if ((s16) D_800AF618[p->weapon]->zoomModel <= 0 || p->sniperMode == 0) {
-        p->sniperMode = 0;
-        LowerScope(&p->scope);
+    if ((s16) D_800AF618[p->m_Data.m_CurrentWeapon]->zoomModel <= 0 || p->m_SniperMode == 0) {
+        p->m_SniperMode = 0;
+        LowerScope(&p->m_Overlay);
     }
-    if (p->alive != 0) {
-        if ((p->pressed & 0x100) && (p->pressed & 0x100) == (p->buttons & 0x100)) {
-            if (p->sniperMode != 0) {
-                p->sniperMode = 0;
-                LowerScope(&p->scope);
-            } else if (D_800AF618[p->weapon]->zoomModel != 0 && (D_8011AAA0 == 0 || !(p->buttons & 0x20))) {
-                p->sniperMode = 1;
-                if (p->weapon == 0x1B) {
-                    p->targetZoom = 0.7f;
+    if (p->m_Data.m_Health != 0) {
+        if ((p->m_ContState.m_dwButtonsSingle & 0x100) && (p->m_ContState.m_dwButtonsSingle & 0x100) == (p->m_ContState.m_dwButtons & 0x100)) {
+            if (p->m_SniperMode != 0) {
+                p->m_SniperMode = 0;
+                LowerScope(&p->m_Overlay);
+            } else if (D_800AF618[p->m_Data.m_CurrentWeapon]->zoomModel != 0 && (D_8011AAA0 == 0 || !(p->m_ContState.m_dwButtons & 0x20))) {
+                p->m_SniperMode = 1;
+                if (p->m_Data.m_CurrentWeapon == 0x1B) {
+                    p->m_TargetZoomBlend = 0.7f;
                 } else {
-                    p->targetZoom = 0.2f;
+                    p->m_TargetZoomBlend = 0.2f;
                 }
-                model = D_800AF618[p->weapon]->zoomModel;
-                RaiseScope(&p->scope, model);
+                model = D_800AF618[p->m_Data.m_CurrentWeapon]->zoomModel;
+                RaiseScope(&p->m_Overlay, model);
             }
         }
-        if (p->sniperMode != 0) {
-            target = p->targetZoom;
-            p->sniperMode = 1;
-            if (p->buttons & 0x10) {
-                if (p->buttons & 8) {
+        if (p->m_SniperMode != 0) {
+            target = p->m_TargetZoomBlend;
+            p->m_SniperMode = 1;
+            if (p->m_ContState.m_dwButtons & 0x10) {
+                if (p->m_ContState.m_dwButtons & 8) {
                     t = target + 0.025f;
                     if (t > 1.0f) {
                         t = 1.0f;
                     }
                     target = t;
-                    p->sniperMode = 2;
+                    p->m_SniperMode = 2;
                 }
-                if (p->buttons & 4) {
+                if (p->m_ContState.m_dwButtons & 4) {
                     t = target - 0.025f;
                     if (t < 0.2f) {
                         t = 0.2f;
                     }
                     target = t;
-                    p->sniperMode = 2;
+                    p->m_SniperMode = 2;
                 }
             }
         }
     }
-    p->targetZoom = target;
-    func_00247170(&p->scope, p);
-    if (p->scope.state != 1) {
-        func_002117DC(&p->zoom, target, 0.5f);
-        if (target == 0.0f && p->zoom < 0.01f) {
-            p->zoom = 0.0f;
+    p->m_TargetZoomBlend = target;
+    func_00247170(&p->m_Overlay, p);
+    if (p->m_Overlay.m_Mode != 1) {
+        func_002117DC(&p->m_ZoomBlend, target, 0.5f);
+        if (target == 0.0f && p->m_ZoomBlend < 0.01f) {
+            p->m_ZoomBlend = 0.0f;
         }
     }
 }

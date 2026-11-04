@@ -1,10 +1,7 @@
 #include "common.h"
+#include "gfx.h"
 #include "structs/camera.h"
 
-typedef struct {
-    u32 w0;
-    u32 w1;
-} Gfx;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x110];

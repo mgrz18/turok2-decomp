@@ -1,21 +1,14 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
-
-typedef struct PlayerOptions {
-    /* 0x00 */ u8 pad0[0x3C];
-    /* 0x3C */ u8 dead;
-} PlayerOptions;
+#include "structs/vector.h"
+#include "structs/player.h"
 
 /* The player fields this resets. */
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x4];
-    /* 0x0004 */ Vec3 pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ u8 pad10[0x514 - 0x10];
     /* 0x0514 */ s32 index;
-    /* 0x0518 */ PlayerOptions *options;
+    /* 0x0518 */ CPlayerOptions *options;
     /* 0x051C */ u8 pad51C[0xA10 - 0x51C];
     /* 0x0A10 */ s32 unkA10;
     /* 0x0A14 */ u8 padA14[0xA20 - 0xA14];
@@ -33,7 +26,7 @@ typedef struct Player {
     /* 0x0A94 */ s32 unkA94;
     /* 0x0A98 */ u8 padA98[0xA9C - 0xA98];
     /* 0x0A9C */ s32 unkA9C;
-    /* 0x0AA0 */ Vec3 unkAA0;
+    /* 0x0AA0 */ CVector3 unkAA0;
     /* 0x0AAC */ f32 unkAAC;
     /* 0x0AB0 */ s32 unkAB0;
     /* 0x0AB4 */ s32 unkAB4;
@@ -50,7 +43,7 @@ typedef struct Player {
     /* 0x0AE0 */ s32 unkAE0;
     /* 0x0AE4 */ f32 unkAE4;
     /* 0x0AE8 */ s32 unkAE8;
-    /* 0x0AEC */ Vec3 unkAEC;
+    /* 0x0AEC */ CVector3 unkAEC;
     /* 0x0AF8 */ f32 unkAF8;
     /* 0x0AFC */ s32 unkAFC;
     /* 0x0B00 */ s32 unkB00;
@@ -77,7 +70,7 @@ typedef struct Player {
     /* 0x0B70 */ f32 unkB70;
     /* 0x0B74 */ f32 unkB74;
     /* 0x0B78 */ f32 unkB78;
-    /* 0x0B7C */ Vec3 unkB7C;
+    /* 0x0B7C */ CVector3 unkB7C;
     /* 0x0B88 */ f32 unkB88;
     /* 0x0B8C */ s32 unkB8C;
     /* 0x0B90 */ s32 unkB90;
@@ -100,7 +93,7 @@ void func_002470E8(void *controls, void *settings);
 f32 func_00253CFC(Player *player);
 void func_0024E5F0(Player *player, Player *arg1, s32 arg2);
 
-static __inline__ void setVec3(Vec3 *v, f32 x, f32 y, f32 z) {
+static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
     v->z = z;
     v->y = y;
     v->x = x;
@@ -177,6 +170,6 @@ void func_00248340(Player *p) {
     p->unkBE0 = zero;
     p->unkBE4 = zero;
     p->unkBEC = 0;
-    p->options->dead = 0;
+    p->options->m_bDead = 0;
     p->unkAAC = zero;
 }

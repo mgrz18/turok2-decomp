@@ -1,23 +1,8 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Save/load menu: fills a pak file line ("NAME.EXT" and its size) for the
  * note of the chosen pak; an empty or unreadable note shows blanks. */
-
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ s8 slot;
-} MenuCtl;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ MenuCtl *ctl;
-} MenuCaller;
-
-typedef struct {
-    /* 0x00 */ s32 index;
-    /* 0x04 */ u8 pad4[0x10];
-    /* 0x14 */ char *text;
-} MenuItem;
 
 extern s32 D_801309BC;
 extern s32 D_80130990;
@@ -31,7 +16,7 @@ extern s32 func_00426E3C(char *s, s32 n);
 extern void func_00426E04(char *dst, char *src);
 extern void func_0029E3E0(char *dst, char *fmt, s32 value);
 
-s32 func_0041FB50(MenuItem *item, MenuCaller *c) {
+s32 func_0041FB50(MenuItem *item, Menu *c) {
     char name[16];
     char ext[8];
     u8 unk38[8];
@@ -52,7 +37,7 @@ s32 func_0041FB50(MenuItem *item, MenuCaller *c) {
     if (D_80130990 != 0) {
         slot = D_800C2028;
     } else {
-        slot = c->ctl->slot;
+        slot = c->controller->port;
     }
     r = func_00425E74(slot, note, &used, name, ext, &size, unk38, unk40);
     if (used != 0 && r == 0) {

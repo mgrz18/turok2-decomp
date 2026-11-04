@@ -1,10 +1,7 @@
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-extern f32 func_0024665C(void *actor, Vec3f point); /* squared XZ distance */
+extern f32 func_0024665C(void *actor, CVector3 point); /* squared XZ distance */
 extern f32 func_002672C8(void *actor);              /* collision radius */
 extern void func_0025E488(void *actor, void *ai, s32 arg2);
 extern void func_00243414(void *obj, void *state, s32 mode);
@@ -14,7 +11,7 @@ extern s8 D_800F1F94[];
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
 } OwnerActor;
 
 typedef struct {
@@ -25,7 +22,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ Vec3f vel;
+    /* 0x18 */ CVector3 vel;
 } Object;
 
 void func_0026508C(Object *obj, OwnedState *state) {

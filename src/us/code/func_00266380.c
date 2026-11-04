@@ -1,38 +1,14 @@
 #include "common.h"
+#include "structs/game_object.h"
+#include "structs/player.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-    /* 0x3F */ u8 tagModeSaved;
-} PlayerOptions;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ PlayerOptions *options;
-} Player;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x0000 */ u8 pad0[0x1480];
     /* 0x1480 */ s32 unk1480;
 } Game;
 
-typedef struct {
-    /* 0x00 */ u32 flags;
-} ActionInfo;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ ActionInfo info;
-} ActorDef;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ ActorDef *def;
-    /* 0x018 */ u8 pad18[0xA0];
-    /* 0x0B8 */ u16 typeId;
-    /* 0x0BA */ u8 padBA[0x1A];
-    /* 0x0D4 */ u32 flags;
-} Actor;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x34];
@@ -47,37 +23,37 @@ typedef struct {
 } ActionState;
 
 extern Game D_80119870;
-extern Player *func_002532B4(Game *game);
-extern void func_00243414(Actor *actor, ActionState *state, s32 mode);
+extern CPlayer *func_002532B4(Game *game);
+extern void func_00243414(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
-void func_00266380(Actor *actor, ActionState *state) {
-    ActionInfo *info = &actor->def->info;
+void func_00266380(CGameObjectInstance *actor, ActionState *state) {
+    CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
     Game *game;
-    Player *player;
+    CPlayer *player;
     s32 mode;
 
-    if (actor->typeId == 0x64E && state->unk36 != state->unk34) {
+    if (actor->m_nTypeFlag == 0x64E && state->unk36 != state->unk34) {
         game = &D_80119870;
         player = func_002532B4(game);
         if (player != NULL && state->tagCleared == 0) {
-            mode = player->options->tagMode;
+            mode = player->m_pOptions->m_TagMode;
             if (mode == 1) {
-                player->options->tagMode = 0;
-                player->options->tagModeSaved = mode;
+                player->m_pOptions->m_TagMode = 0;
+                player->m_pOptions->m_LastTagMode = mode;
                 game->unk1480 = mode;
                 state->tagCleared = mode;
             }
         }
     }
     if (state->active != 0) {
-        if (info->flags & 2) {
-            actor->flags &= ~0x2000;
-            actor->flags &= ~0x100;
+        if (info->m_dwFlags & 2) {
+            actor->m_dwFlags &= ~0x2000;
+            actor->m_dwFlags &= ~0x100;
         }
         if (state->done != 0) {
             func_00243414(actor, state, 0);
         }
-        if (actor->typeId == 0x64C) {
+        if (actor->m_nTypeFlag == 0x64C) {
             func_00243414(actor, state, 2);
         }
     }

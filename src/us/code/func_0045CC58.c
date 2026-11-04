@@ -2,13 +2,9 @@
  * switch's case blocks were cut as func_0045CC90, func_0045CCA0 and
  * func_0045CCB0 (the last one already in src/, it must go). */
 #include "common.h"
+#include "structs/menu.h"
 
 /* Set the menu item's text from the game mode D_801309B0. */
-
-typedef struct {
-    u8 pad0[0x14];
-    char *text; /* 0x14 */
-} MenuItem;
 
 extern s32 D_801309B0;
 extern char D_800B5310[];

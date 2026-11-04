@@ -1,5 +1,6 @@
 /* Second-module copy of func_00424D54 (first module; this one at link address 0x00424C74), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "structs/menu.h"
 
 s32 func_00224C08(void *arg0, s32 arg1);
 s32 func_004160F0(void *item);
@@ -13,11 +14,6 @@ extern char D_800B450C[];
 extern char D_800B4574[];
 extern char D_800B4588[];
 extern s32 D_80130A30;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItem;
 
 s32 func_0045DC74(MenuItem *item) {
     s32 rank = -1;

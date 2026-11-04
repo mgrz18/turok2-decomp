@@ -1,15 +1,11 @@
 /* Second-module copy of func_00422258 (first module): the name, right-aligned in an 8-space field at text+11. */
 #include "common.h"
+#include "structs/menu.h"
 
 extern char D_800B4B04[];
 extern char D_800B4B34[];
 extern u8 D_80130954[8]; /* name, padded with spaces */
 extern s32 D_801309A8;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItem;
 
 s32 func_0045B178(MenuItem *item) {
     s32 len = 8;

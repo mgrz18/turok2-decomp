@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Option values adjusted by the menu (func_0041648C steps a value within
  * [min, max]); the same block as D_8011AAD8. */
@@ -30,34 +31,15 @@ typedef struct {
     /* 0xBF8 */ s32 unkBF8;
 } MenuData;
 
-/* A menu item: its widget at 0xC (flag 0x01000000 in widget->flags hides
- * it) and the player data at 0x1C. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ s32 flags;
-} MenuItem; /* size 0x28 */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x34];
-    /* 0x34 */ MenuItem items[14];
-} MenuWidget;
-
-typedef struct {
-    /* 0x00 */ s16 state;
-    /* 0x02 */ u8 pad2[0xC - 0x2];
-    /* 0x0C */ MenuWidget *widget;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ MenuData *data;
-} MenuPage;
 extern MenuOptions D_8011AB18;
 
 /* The player's options, or the defaults at D_8011AB18. */
-MenuOptions *func_00454C9C(MenuPage *arg0) {
+MenuOptions *func_00454C9C(Menu *arg0) {
     MenuOptions *temp_v1_2;
     MenuOptions *var_v0;
     MenuData *temp_v1;
 
-    temp_v1 = arg0->data;
+    temp_v1 = arg0->player;
     var_v0 = &D_8011AB18;
     if (temp_v1 != NULL) {
         temp_v1_2 = temp_v1->options;

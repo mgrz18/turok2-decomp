@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 /* The part of the object that the probe disturbs and puts back. */
 typedef struct {
@@ -11,19 +8,19 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x54 - 0x10];
     /* 0x54 */ f32 stepHeight;
 } Object;
 
 extern s32 D_800F1B40;   /* collision info */
 extern f32 func_002671B4(Object *obj);   /* the object's height */
-extern s32 func_00239F00(Object *obj, Vec3 to, void *info);
+extern s32 func_00239F00(Object *obj, CVector3 to, void *info);
 
 /* Probes a move of obj, raised by half its height plus its step height, to
  * *to; writes where it ends up back to *to and returns 1 if that differs
  * from the target. The object itself is left as it was. */
-s32 func_00256B84(Object *obj, Vec3 *to) {
+s32 func_00256B84(Object *obj, CVector3 *to) {
     ObjectHead saved;
     s32 blocked;
 

@@ -1,11 +1,7 @@
-typedef float f32;
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 /* Point on segment a-b at height y. */
-void func_0020F0C8(Vec3f *out, Vec3f *a, Vec3f *b, f32 y) {
+void func_0020F0C8(CVector3 *out, CVector3 *a, CVector3 *b, f32 y) {
     f32 dy = b->y - a->y;
     f32 t;
 

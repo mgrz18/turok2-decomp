@@ -1,27 +1,7 @@
 /* From decompals/ultralib (libultra 2.0I): src/os/jammesg.c, osJamMesg. */
 
-typedef unsigned long u32;
-typedef long s32;
-typedef unsigned short u16;
-typedef void *OSMesg;
-
-typedef struct OSThread {
-    /* 0x00 */ struct OSThread *next;
-    /* 0x04 */ s32 priority;
-    /* 0x08 */ struct OSThread **queue;
-    /* 0x0C */ struct OSThread *tlnext;
-    /* 0x10 */ u16 state;
-} OSThread;
-
-typedef struct {
-    /* 0x00 */ OSThread *mtqueue;
-    /* 0x04 */ OSThread *fullqueue;
-    /* 0x08 */ s32 validCount;
-    /* 0x0C */ s32 first;
-    /* 0x10 */ s32 msgCount;
-    /* 0x14 */ OSMesg *msg;
-} OSMesgQueue;
-
+#include "common.h"
+#include "ultra_types.h"
 #define OS_MESG_BLOCK 1
 #define OS_STATE_WAITING 8
 

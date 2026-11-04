@@ -1,18 +1,6 @@
 #include "common.h"
+#include "structs/sound.h"
 
-/* A sound definition record (the halfwords read by func_0027682C,
- * func_0027685C, func_00276868, func_0027688C). */
-typedef struct {
-    /* 0x00 */ s16 unk0;
-    /* 0x02 */ s16 unk2;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ u16 flags6;          /* top two bits: a 0-3 value */
-    /* 0x08 */ s16 unk8;
-    /* 0x0A */ s16 unkA;
-    /* 0x0C */ u8 padC[4];
-    /* 0x10 */ s16 unk10;
-} SoundDef;
-
-u32 func_00276868(SoundDef *arg0) {
-    return (u16) arg0->flags6 >> 0xE;
+u32 func_00276868(SoundEffectInfo *arg0) {
+    return (u16) arg0->flags >> 0xE;
 }

@@ -1,16 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00259F88.c, func_00259F88.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef struct M04Vec3 {
-    f32 x, y, z;
-} M04Vec3;
 typedef union M04IF {
     s32 i;
     f32 f;
@@ -64,7 +56,7 @@ typedef struct M04VP {
                s16 s2A;
                s16 s2C;
                u8 pad2E[6];
-               M04Vec3 pos;
+               CVector3 pos;
                s32 f40;
                s8 mode;
                u8 pad45[3];
@@ -137,8 +129,8 @@ void func_00272278(M04Emitter *o, M04Info *rec) {
     f32 b;
     f32 f;
     f32 fs;
-    M04Vec3 *p;
-    M04Vec3 *q;
+    CVector3 *p;
+    CVector3 *q;
     pp = o->ctx->tab2B88;
     o->unkC8 = D_800A8110;
     if (o->kind < 0x100) {
@@ -169,7 +161,7 @@ void func_00272278(M04Emitter *o, M04Info *rec) {
             vf = a + func_0021149C(b - a);
         }
         p = &vp->pos;
-        q = (M04Vec3 *)&o->ctx->tgt->x;
+        q = (CVector3 *)&o->ctx->tgt->x;
         {
             f32 d2 = (p->x - q->x) * (p->x - q->x) + (p->y - q->y) * (p->y - q->y) + (p->z - q->z) * (p->z - q->z);
             if (D_800B2A30 <= d2) {

@@ -1,15 +1,10 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0024BCF8.c, func_0024BCF8.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct B11Pt {
     f32 x;
     f32 y;
@@ -24,7 +19,7 @@ typedef struct B11Box {
 /* Turok 2 layout: pos at 0x4, yaw at 0x50 (Rage Wars: 0x8 / 0x6C). */
 typedef struct Obj {
     u8 pad0[0x4];
-    Vec3f pos;          /* 0x04 */
+    CVector3 pos;          /* 0x04 */
     B11Box *unk14;      /* 0x10 */
     u8 pad14[0x3C];
     f32 yaw;            /* 0x50 */

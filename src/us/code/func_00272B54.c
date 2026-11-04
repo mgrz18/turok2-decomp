@@ -1,15 +1,7 @@
+#include "structs/vector.h"
+
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0025A864.c, func_0025A864, with Turok 2's layouts. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef struct M04Vec3 {
-    f32 x, y, z;
-} M04Vec3;
 typedef union M04IF {
     s32 i;
     f32 f;
@@ -63,7 +55,7 @@ typedef struct M04VP {
                s16 s2A;
                s16 s2C;
                u8 pad2E[6];
-               M04Vec3 pos;
+               CVector3 pos;
                s32 f40;
                s8 mode;
                u8 pad45[3];

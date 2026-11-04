@@ -1,17 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00285B34.c, func_80285B64_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef signed int s32;
-typedef float f32;
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
+#include "structs/vector.h"
+
 struct Clip;
 struct Clip {
     s16 mode;
@@ -23,7 +14,7 @@ struct Node_func_80285B64_de;
 struct Node_func_80285B64_de {
     char pad0[8];
     Clip *key;
-    Vec3 position;
+    CVector3 position;
     f32 value0;
     f32 value1;
     char pad20[0x18];
@@ -50,7 +41,7 @@ extern void func_0026EE30(void *slot, s32 handle);
 static __inline__ void bind(Node_func_80285B64_de *node, s32 offset, s32 id) {
     func_0026EE30((char *)node + offset, func_00225D94(&D_800F7078, id));
 }
-static __inline__ void init(Node_func_80285B64_de *node, Clip *key, Vec3 position, f32 value0, f32 value1, Node_func_80285B64_de **owner) {
+static __inline__ void init(Node_func_80285B64_de *node, Clip *key, CVector3 position, f32 value0, f32 value1, Node_func_80285B64_de **owner) {
     node->key = key;
     node->position = position;
     node->value0 = value0;
@@ -62,7 +53,7 @@ static __inline__ void init(Node_func_80285B64_de *node, Clip *key, Vec3 positio
     bind(node, 0x20, key->mode);
     bind(node, 0x2C, key->frames);
 }
-Node_func_80285B64_de *func_0026EBDC(Pool_func_80285B64_de *pool, Clip *key, Vec3 position, f32 value0, f32 value1, Node_func_80285B64_de **owner) {
+Node_func_80285B64_de *func_0026EBDC(Pool_func_80285B64_de *pool, Clip *key, CVector3 position, f32 value0, f32 value1, Node_func_80285B64_de **owner) {
     s32 mask;
     Node_func_80285B64_de *node;
     mask = __osDisableInt();

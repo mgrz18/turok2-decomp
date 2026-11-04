@@ -1,8 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SYSTEM_2/802661FC_2.CPP, func_802676EC_de (inlined here), with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 /* A blast: radius, damage, then the push (strength, x, y, z). */
 typedef struct Blast {
@@ -22,7 +21,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x996 - 0x10];
     /* 0x996 */ u16 weapon;
 } BlastOwner;
@@ -30,7 +29,7 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u8 kind;            /* 1: player, 2: object */
     /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x54 - 0x10];
     /* 0x054 */ f32 height;
     /* 0x058 */ u8 pad58[0xD4 - 0x58];
@@ -51,20 +50,20 @@ extern Shield D_800F1CF8;       /* the held shield */
 extern Shield D_800F1970;       /* the shield func_0021E374 finds */
 
 s32 func_0023726C(BlastActor *victim, BlastActor *source);
-void func_0020EF8C(Vec3f *out, f32 t, Vec3f *a, Vec3f *b);
+void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 f32 func_002671B4(void *actor);
 f32 func_0021F268(BlastActor *actor);
-s32 func_0021E374(BlastActor *actor, Vec3f pos, Shield *out);
+s32 func_0021E374(BlastActor *actor, CVector3 pos, Shield *out);
 f32 func_002672C8(BlastActor *actor);
-f32 func_0020F6BC(Vec3f *a, Vec3f *b);
-void func_002374AC(BlastActor *victim, BlastActor *source, Blast blast, Vec3f *out, u32 flags);
+f32 func_0020F6BC(CVector3 *a, CVector3 *b);
+void func_002374AC(BlastActor *victim, BlastActor *source, Blast blast, CVector3 *out, u32 flags);
 void func_00245828(HitInfo *out, BlastActor *source, s32 damage, f32 radius, u32 flags, Shield *shield);
 void func_002465C8(BlastActor *victim, void *ai, HitInfo *hit);
-void func_002376F8(BlastActor *victim, BlastActor *source, s32 hit, Vec3f pos, Vec3f dir, s32 push, Shield *shield, u32 flags);
+void func_002376F8(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, Shield *shield, u32 flags);
 
 /* How strongly the blast reaches the victim: through its shield, and with
  * falloff over the radius plus its width from the nearest point of its body. */
-static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, Vec3f position, f32 radius, s32 falloff, u32 flags, Shield **found) {
+static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector3 position, f32 radius, s32 falloff, u32 flags, Shield **found) {
     s32 shielded;
     s32 scaled;
     Shield *shield;
@@ -73,7 +72,7 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, Vec3f p
     f32 top;
     f32 reach;
     f32 distance;
-    Vec3f body;
+    CVector3 body;
 
     shielded = 1;
     scale = 1.0f;
@@ -117,8 +116,8 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, Vec3f p
 /* Applies a blast from source to victim: a player's own close-range shot
  * (no weapon, or weapon 0x22) is moved most of the way back to the player;
  * then damage, push and the hit report, scaled by blastScale. */
-void func_00237AFC(BlastActor *victim, BlastActor *source, s32 hit, Vec3f pos, Blast blast, s32 falloff, s32 push, u32 flags) {
-    Vec3f dir;
+void func_00237AFC(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, Blast blast, s32 falloff, s32 push, u32 flags) {
+    CVector3 dir;
     HitInfo info;
     BlastOwner *owner;
     Shield *shield;
@@ -134,8 +133,8 @@ void func_00237AFC(BlastActor *victim, BlastActor *source, s32 hit, Vec3f pos, B
     if (source->kind == 1 && (source->flags & 0x300000)) {
         owner = source->owner;
         if (source == (BlastActor *) ((u8 *) owner + 0x288) && (owner->weapon < 2 || (s16) owner->weapon == 0x22)) {
-            Vec3f from;
-            Vec3f to;
+            CVector3 from;
+            CVector3 to;
 
             from = pos;
             to = owner->pos;

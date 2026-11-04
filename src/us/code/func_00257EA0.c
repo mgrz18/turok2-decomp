@@ -1,28 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x3E];
-    /* 0x3E */ u8 tagMode;
-} Options;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x518];
-    /* 0x0518 */ Options *options;
-    /* 0x051C */ u8 pad51C[0x934 - 0x51C];
-    /* 0x0934 */ s16 ammo[0x31];
-    /* 0x0996 */ s16 weapon;
-    /* 0x0998 */ u8 pad998[0xA64 - 0x998];
-    /* 0x0A64 */ s32 heldButtons;
-    /* 0x0A68 */ s32 pressedButtons;
-    /* 0x0A6C */ u8 padA6C[0xB2C - 0xA6C];
-    /* 0x0B2C */ s32 unkB2C;
-    /* 0x0B30 */ u8 padB30[0x1284 - 0xB30];
-    /* 0x1284 */ s32 unk1284;
-} Player;
+#include "structs/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ Player *owner;
+    /* 0x1A8 */ CPlayer *owner;
 } Object;
 
 typedef struct {
@@ -34,15 +15,15 @@ typedef struct {
     /* 0x130 */ f32 timer130;
 } AI;
 
-extern s32 func_0024E700(Player *player, s32 weapon);
-extern s16 *func_0025398C(Player *player, s32 weapon);
+extern s32 func_0024E700(CPlayer *player, s32 weapon);
+extern s16 *func_0025398C(CPlayer *player, s32 weapon);
 extern void func_00243414(Object *obj, AI *ai, s32 mode);
 
 /* Fire check for the first-person weapon: once its cooldown is over and the
  * weapon is usable, fire button 0x2000 starts mode 4 and a tap of 0x10 with
  * weapon 19 starts mode 5. Returns 1 when it fired. */
 s32 func_00257EA0(Object *obj, AI *ai) {
-    Player *player;
+    CPlayer *player;
     s32 tapped;
     s32 mode;
 
@@ -50,32 +31,32 @@ s32 func_00257EA0(Object *obj, AI *ai) {
     if (ai->timer118 > 0.0f) {
         return 0;
     }
-    if (!func_0024E700(player, player->weapon)) {
+    if (!func_0024E700(player, player->m_Data.m_CurrentWeapon)) {
         return 0;
     }
-    if (player->options->tagMode == 1) {
+    if (player->m_pOptions->m_TagMode == 1) {
         return 0;
     }
-    if ((player->weapon == 13 || player->weapon == 29) && player->unkB2C != 2) {
+    if ((player->m_Data.m_CurrentWeapon == 13 || player->m_Data.m_CurrentWeapon == 29) && player->m_CrossHairMode != 2) {
         return 0;
     }
-    if (player->weapon == 23 && ai->timer130 > 0.0f) {
+    if (player->m_Data.m_CurrentWeapon == 23 && ai->timer130 > 0.0f) {
         return 0;
     }
-    if (player->unk1284 != 0) {
+    if (player->m_bHeadMovementDisabled != 0) {
         return 0;
     }
-    if (player->weapon == 21) {
-        Player *owner = obj->owner;
-        if (*(owner->ammo + *func_0025398C(owner, 21)) == 0) {
+    if (player->m_Data.m_CurrentWeapon == 21) {
+        CPlayer *owner = obj->owner;
+        if (*(owner->m_Data.m_AmmoList + *func_0025398C(owner, 21)) == 0) {
             return 0;
         }
     }
     tapped = 0;
-    if (player->pressedButtons & 0x10) {
-        tapped = player->weapon == 19;
+    if (player->m_ContState.m_dwButtonsSingle & 0x10) {
+        tapped = player->m_Data.m_CurrentWeapon == 19;
     }
-    if (player->heldButtons & 0x2000) {
+    if (player->m_ContState.m_dwButtons & 0x2000) {
         mode = 4;
     } else if (tapped) {
         mode = 5;

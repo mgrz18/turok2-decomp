@@ -10,10 +10,6 @@ typedef struct SweepDef {
     /* 0x00 */ s32 flags;
 } SweepDef;
 
-typedef struct HitDef {
-    /* 0x00 */ s32 kind;
-} HitDef;
-
 /* A joint of an animated model: its box at 0x18 in model units. */
 typedef struct Joint {
     /* 0x00 */ u8 pad0[0x18];
@@ -36,7 +32,7 @@ typedef struct HitInst {
     /* 0x000 */ u8 type;
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ HitDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad18[0x1C];
     /* 0x034 */ CVector3 scale;
     /* 0x040 */ u8 pad40[0x18];
@@ -107,7 +103,7 @@ void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, Box *box) {
     Box *animBox;
 
     enlarge = 0;
-    if (sweep->def->flags < 0 && (other->def->kind == 1 || other->def->kind == 4)) {
+    if (sweep->def->flags < 0 && (other->def->m_Type == 1 || other->def->m_Type == 4)) {
         enlarge = 1;
     }
     big = 0;

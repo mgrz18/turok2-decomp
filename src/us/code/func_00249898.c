@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 #include "gfx.h"
 
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
@@ -24,14 +25,6 @@ typedef struct View {
     /* 0x288 */ Viewport vp;
 } View;
 
-typedef struct Player {
-    /* 0x000 */ u8 pad0[0x288];
-    /* 0x288 */ u8 hud[0x52A - 0x288];
-    /* 0x52A */ s16 hudActive;
-    /* 0x52C */ u8 pad52C[0x996 - 0x52C];
-    /* 0x996 */ s16 weapon;
-} Player;
-
 extern WeaponDef *D_800AF618[];
 extern u8 D_800F6CB0[];
 void func_0020B5B8(void);
@@ -41,18 +34,18 @@ void func_0021D39C(void *, View *);
 void func_0028852C(void *, s32, s32, s32, s32);
 
 /* Draws the weapon's HUD overlay, scissored to its screen box. */
-void func_00249898(Player *player, View *view) {
+void func_00249898(CPlayer *player, View *view) {
     WeaponDef *def;
     Viewport *vp;
     f32 sx, sy;
 
-    if (player->weapon == -1 || player->hudActive == 0) {
+    if (player->m_Data.m_CurrentWeapon == -1 || player->m_Data.m_Lives == 0) {
         return;
     }
     GFX_CMD(0xE3001201, 0x2000)
     GFX_CMD(0xE3000C00, 0x80000)
     func_0020B5B8();
-    def = D_800AF618[player->weapon];
+    def = D_800AF618[player->m_Data.m_CurrentWeapon];
     vp = &view->vp;
     sx = vp->scaleX;
     sy = vp->scaleY;
@@ -67,6 +60,6 @@ void func_00249898(Player *player, View *view) {
     GFX_CMD(0xDB040014, 0xFFFF)
     GFX_CMD(0xDB04001C, 0xFFFF)
     func_0020B5D4();
-    func_0021D39C(player->hud, view);
+    func_0021D39C(&player->m_WeaponActor, view);
     func_0020B624();
 }

@@ -2,8 +2,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/IO/80200B14_2.CPP, func_80200E04_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct OSMesgQueue OSMesgQueue;
+#include "ultra_types.h"
 
 extern s32 D_800BC300;          /* PI manager started */
 extern u8 D_80128110[];         /* OSIoMesg used for the DMA */

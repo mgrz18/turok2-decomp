@@ -1,9 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FX/8024F950.CPP, func_8024FD80_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 /* A placed prop's record in the level data. */
 typedef struct {
@@ -24,15 +21,15 @@ typedef struct {
     /* 0x00 */ u8 state;
     /* 0x01 */ u8 pad1;
     /* 0x02 */ u16 id;
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ void *segment;
     /* 0x14 */ void *model;
     /* 0x18 */ s32 owner;
     /* 0x1C */ s32 unk1C;
     /* 0x20 */ u8 pad20[8];
     /* 0x28 */ f32 matrix[16];
-    /* 0x68 */ Vec3f min;
-    /* 0x74 */ Vec3f max;
+    /* 0x68 */ CVector3 min;
+    /* 0x74 */ CVector3 max;
     /* 0x80 */ s32 colorKey;
     /* 0x84 */ s32 value;
     /* 0x88 */ u16 flags;
@@ -67,7 +64,7 @@ static __inline__ s32 nextColorKey(void) {
 
 void func_002141F0(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *segments, f32 scale) {
     f32 matrix[16];
-    Vec3f pos;
+    CVector3 pos;
     f32 angle;
 
     angle = 0.0f;

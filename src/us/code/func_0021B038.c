@@ -1,17 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00247BA4.c, func_00247BA4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef double f64;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct B10Q4 {
     f32 x, y, z, w;
 } B10Q4;
@@ -21,7 +12,7 @@ typedef struct B10Mt {
 /* Turok 2 layout (Rage Wars: pos 0x8, f70 0x70, flags 0x100, f174 0x174). */
 typedef struct B10Obj {
     u8 pad0[0x4];
-    Vec3f pos;              /* 0x004 */
+    CVector3 pos;              /* 0x004 */
     u8 pad10[0x54 - 0x10];
     f32 f54;                /* 0x054 */
     u8 pad58[0xD4 - 0x58];
@@ -43,21 +34,21 @@ f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void func_0021AE6C(B10Q4 *out, B10Obj *o);
 f32 func_002671B4(B10Obj *o);
-void func_0020EF2C(Vec3f *o, Vec3f *a, Vec3f *b);
-void func_0020EFDC(Vec3f *o, Vec3f *a, Vec3f *b);
-void func_0020F040(Vec3f *v);
-void func_0020F85C(B10Mt *m, Vec3f *a, Vec3f *b);
+void func_0020EF2C(CVector3 *o, CVector3 *a, CVector3 *b);
+void func_0020EFDC(CVector3 *o, CVector3 *a, CVector3 *b);
+void func_0020F040(CVector3 *v);
+void func_0020F85C(B10Mt *m, CVector3 *a, CVector3 *b);
 void func_00210F68(B10Q4 *o, B10Q4 *a, B10Q4 *b);
 void func_00211114(B10Q4 *q, B10Mt *m);
 f32 func_0021153C(f32 x);
 f32 func_00298470(f32 x); /* sqrtf */
-B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, Vec3f dir, B10Q4 *outq, f32 angle) {
-    Vec3f v10;
-    Vec3f v20;
-    Vec3f v30;
-    Vec3f v40;
-    Vec3f v50;
-    Vec3f v60;
+B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 angle) {
+    CVector3 v10;
+    CVector3 v20;
+    CVector3 v30;
+    CVector3 v40;
+    CVector3 v50;
+    CVector3 v60;
     B10Q4 q70;
     B10Q4 q80;
     B10Q4 q90;

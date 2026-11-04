@@ -1,5 +1,6 @@
 /* Second-module copy of func_004233E8 (first module). The port comes back through a pointer (a stack slot the ROM stores but never reads). */
 #include "common.h"
+#include "structs/menu.h"
 
 void func_00416644(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
 
@@ -11,18 +12,7 @@ extern s32 D_80130980;
 extern s32 D_80130990;
 extern s32 D_80130998;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s8 port;
-} MenuController;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ u8 *player;
-    /* 0x20 */ MenuController *controller;
-} MenuEvent;
-
-static __inline__ u8 *GetPlayer(MenuEvent *event, s32 *port) {
+static __inline__ u8 *GetPlayer(Menu *event, s32 *port) {
     u8 *player = NULL;
 
     if (D_80130990 != 0) {
@@ -34,7 +24,7 @@ static __inline__ u8 *GetPlayer(MenuEvent *event, s32 *port) {
     return player;
 }
 
-s32 func_0045C308(s32 unused, MenuEvent *event) {
+s32 func_0045C308(s32 unused, Menu *event) {
     u8 *player;
     s32 port;
 

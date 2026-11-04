@@ -1,5 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/world.h"
+#include "structs/game.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
@@ -37,26 +39,14 @@ typedef struct Sweep {
     /* 0x4C */ CVector3 end;
 } Sweep;
 
-typedef struct World {
-    /* 0x000 */ u8 pad0[0x8F0];
-    /* 0x8F0 */ HitInst *actors[0x80];
-    /* 0xAF0 */ s32 actorCount;
-} World;
-
 typedef struct SweepHit {
     /* 0x00 */ HitInst *inst;
     /* 0x04 */ f32 t;
 } SweepHit;
 
-typedef struct MultiState {
-    /* 0x00 */ u8 pad0[0x19];
-    /* 0x19 */ u8 enabled;
-} MultiState;
-
-extern World D_800F7078;
+extern CWorld D_800F7078;
 extern HitInst **D_800F1ADC;
 extern u8 D_8011AAF1;
-extern MultiState D_8011AAD8;
 
 typedef struct SweepBox {
     u8 pad[0x30];
@@ -84,9 +74,9 @@ void func_0024032C(Sweep *sweep) {
     SweepDef *def;
     HitInst *inst;
     HitInst *other;
-    World *world;
+    CWorld *world;
     SweepHit *hit;
-    MultiState *multi;
+    GameSettings *multi;
     s32 count;
     s32 nHits;
     s32 i;
@@ -107,9 +97,9 @@ void func_0024032C(Sweep *sweep) {
     hit = hits;
     nHits = 0;
     world = &D_800F7078;
-    count = world->actorCount;
+    count = world->m_nMovers;
     for (i = 0; i < count && nHits < 0x80; i++) {
-        other = world->actors[i];
+        other = (HitInst *)world->m_pMovers[i];
         if (inst == other) {
             continue;
         }
@@ -153,7 +143,7 @@ void func_0024032C(Sweep *sweep) {
                 break;
             }
             other = hit->inst;
-            if ((other->flags & 0x300000) && !(multi = &D_8011AAD8)->enabled) {
+            if ((other->flags & 0x300000) && !(multi = &D_8011AAD8)->multiplayer) {
                 func_0023E6D8(sweep, &volume);
                 func_0023DF70(sweep, &volume, other);
             } else {

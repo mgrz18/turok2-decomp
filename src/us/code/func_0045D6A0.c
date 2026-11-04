@@ -1,33 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ s16 type;
-    /* 0x22 */ s16 index;
-} ItemDef;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 image;
-    /* 0x18 */ ItemDef *def;
-} MenuItem;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ f32 scaleX;
-    /* 0x10 */ f32 scaleY;
-    /* 0x14 */ s32 x;
-    /* 0x18 */ u8 pad18[0x1C - 0x18];
-    /* 0x1C */ s32 y;
-} MenuBox;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ u8 *player;
-    /* 0x20 */ u8 pad20[0x30 - 0x20];
-    /* 0x30 */ f32 fade;
-    /* 0x34 */ f32 alpha;
-} MenuWindow;
+#include "structs/menu.h"
 
 typedef struct {
     u32 w0;
@@ -42,8 +14,8 @@ void func_00279028(s32 alpha);
 void func_0027B320(s32 image, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 arg6);
 
 /* Draws an inventory item's icon, full colour when the player has it, greyed out otherwise. */
-void func_0045D6A0(MenuItem *item, MenuBox *box, s32 unused, MenuWindow *window) {
-    s32 type = item->def->type;
+void func_0045D6A0(MenuItem *item, MenuItemLayout *box, s32 unused, Menu *window) {
+    s32 type = item->def->param;
     s32 index = item->def->index;
     u8 *player = window->player;
     s32 owned = 0;
@@ -95,5 +67,5 @@ void func_0045D6A0(MenuItem *item, MenuBox *box, s32 unused, MenuWindow *window)
         g->w0 = 0xFB000000;
         g->w1 = ((s32) (window->fade * (window->alpha * 255.0f)) & 0xFF) | 0x32323200;
     }
-    func_0027B320(item->image, 0, (s16) box->x, (s16) box->y, box->scaleX, box->scaleY, 1);
+    func_0027B320(item->image, 0, (s16) box->left, (s16) box->top, box->scaleX, box->scaleY, 1);
 }

@@ -6,8 +6,7 @@
  * and src/game/func_00201A74.c, func_00201A74, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct OSMesgQueue OSMesgQueue;
+#include "ultra_types.h"
 
 /* Request block sent to the I/O thread through D_80128370. */
 typedef struct IoRequest {

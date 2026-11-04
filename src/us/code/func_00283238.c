@@ -1,12 +1,9 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/8023A284_7.CPP, func_8023B3F8_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "gfx.h"
 #include "structs/camera.h"
 
-typedef struct {
-    u32 w0;
-    u32 w1;
-} Gfx;
 
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 

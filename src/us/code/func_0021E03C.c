@@ -1,11 +1,8 @@
 #include "common.h"
+#include "structs/vector.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
 
 typedef struct Mtx44 {
     f32 m[4][4];
@@ -18,7 +15,7 @@ typedef struct ObjDef {
 
 typedef struct ShadowActor {
     u8 pad0[0x4];
-    Vec3 pos;                   /* 0x04 */
+    CVector3 pos;                   /* 0x04 */
     ObjDef *def;                /* 0x10 */
     u8 pad14[0x40 - 0x14];
     u8 rot[0x54 - 0x40];        /* 0x40 */
@@ -33,7 +30,7 @@ s32 func_0026AFC0(ObjDef *def);
 void *func_00206950(void *pool, s32 count);
 f32 func_00267648(ShadowActor *actor, s32 arg1);    /* ground height */
 f32 func_00268304(ShadowActor *actor);              /* radius */
-void func_0020F510(Vec3 *v, f32 arg1);
+void func_0020F510(CVector3 *v, f32 arg1);
 void func_00211114(void *rot, Mtx44 *m);
 void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);  /* scale */
 void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);  /* translate */
@@ -41,9 +38,9 @@ void func_0020D274(Mtx44 *m, void *dst);
 void func_002086BC(void *mtx, s32 arg1, s32 alpha);
 
 /* Draws the blob shadow under an actor. */
-void func_0021E03C(ShadowActor *actor, Vec3 *offset, s32 arg2) {
+void func_0021E03C(ShadowActor *actor, CVector3 *offset, s32 arg2) {
     Mtx44 mtx;
-    Vec3 pos;
+    CVector3 pos;
     void *gmtx;
     s32 visible;
     f32 ground;

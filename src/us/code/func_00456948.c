@@ -1,32 +1,10 @@
 /* WRONG CUT: the real function starts at 0x00456948 (size 0x234 = 564): splat
  * gave its first two words (lui/lw D_80130990) to the function before. */
 #include "common.h"
+#include "structs/menu.h"
 
 /* Level select: grey out the entries (16) that cannot be chosen in the current
  * game mode. */
-
-typedef struct {
-    u8 pad0[8];
-    u32 flags; /* 0x08 */
-    u8 padC[0x1C];
-} MenuEntry; /* 0x28 bytes */
-
-typedef struct {
-    u8 pad0[0x78];
-    MenuEntry entries[16]; /* 0x78 */
-} Menu;
-
-typedef struct {
-    u8 pad0[4];
-    s8 mode; /* 0x04 */
-} MenuArgs;
-
-typedef struct {
-    u8 pad0[0xC];
-    Menu *menu;     /* 0x0C */
-    u8 pad10[0x10];
-    MenuArgs *args; /* 0x20 */
-} MenuEvent;
 
 #define ENTRY_DISABLED 0x01000000
 
@@ -49,15 +27,15 @@ static __inline__ s32 isSpecial(char *a, char *b) {
     return 0;
 }
 
-static __inline__ void enableEntry(MenuEntry *entry) {
+static __inline__ void enableEntry(MenuItem *entry) {
     entry->flags &= ~ENTRY_DISABLED;
 }
 
-static __inline__ void disableEntry(MenuEntry *entry) {
+static __inline__ void disableEntry(MenuItem *entry) {
     entry->flags |= ENTRY_DISABLED;
 }
 
-void func_00456948(MenuEvent *event) {
+void func_00456948(Menu *event) {
     s32 mode;
     s32 i;
     s32 enabled;
@@ -73,7 +51,7 @@ void func_00456948(MenuEvent *event) {
     if (D_80130990 != 0) {
         mode = D_800C2028;
     } else {
-        mode = event->args->mode;
+        mode = event->controller->port;
     }
     for (i = 0; i < 16; i++) {
         failed = func_00425D94(mode, i, &valid, name, sp20, &sp4C, a, b);
@@ -99,9 +77,9 @@ void func_00456948(MenuEvent *event) {
             }
         }
         if (enabled) {
-            enableEntry(&event->menu->entries[i]);
+            enableEntry(&event->items[i + 3]);
         } else {
-            disableEntry(&event->menu->entries[i]);
+            disableEntry(&event->items[i + 3]);
         }
     }
 }

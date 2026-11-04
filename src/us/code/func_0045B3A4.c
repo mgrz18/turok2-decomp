@@ -1,11 +1,7 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Menu item: append the rank title earned for the number of kills (11 chars). */
-
-typedef struct {
-    u8 pad0[0x14];
-    char *text; /* 0x14 */
-} MenuItem;
 
 extern u16 D_8013094C; /* kills */
 extern char D_800B4934[];

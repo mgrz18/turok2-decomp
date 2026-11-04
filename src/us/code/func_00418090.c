@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
 
@@ -32,30 +33,10 @@ typedef struct {
     /* 0xBF8 */ s32 unkBF8;
 } MenuData;
 
-/* A menu item: its widget at 0xC (flag 0x01000000 in widget->flags hides
- * it) and the player data at 0x1C. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ s32 flags;
-} MenuItem; /* size 0x28 */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x34];
-    /* 0x34 */ MenuItem items[14];
-} MenuWidget;
-
-typedef struct {
-    /* 0x00 */ s16 state;
-    /* 0x02 */ u8 pad2[0xC - 0x2];
-    /* 0x0C */ MenuWidget *widget;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ MenuData *data;
-} MenuPage;
-
-s32 func_00418090(s32 arg0, MenuPage *arg1) {
+s32 func_00418090(s32 arg0, Menu *arg1) {
     MenuOptions *temp_s0;
 
-    temp_s0 = arg1->data->options;
+    temp_s0 = ((MenuData *) arg1->player)->options;
     temp_s0->opt2B = func_0041648C((s32) arg1, (s32) temp_s0->opt2B, 1, 0, 1, 1);
     return 0;
 }

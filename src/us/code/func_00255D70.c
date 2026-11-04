@@ -1,20 +1,10 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x53C];
     /* 0x53C */ u8 cinema[1];
 } Camera;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0xD4];
-    /* 0x00D4 */ u32 flags;
-    /* 0x00D8 */ u8 padD8[0x51C - 0xD8];
-    /* 0x051C */ Camera *camera;
-    /* 0x0520 */ u8 pad520[0xA50 - 0x520];
-    /* 0x0A50 */ void *controller;
-    /* 0x0A54 */ u8 padA54[0x1298 - 0xA54];
-    /* 0x1298 */ s32 unk1298;
-} Player;
 
 /* The player lists; the multiplayer flag is at +0x1281. */
 typedef struct {
@@ -28,19 +18,19 @@ extern char D_0043AC14;
 extern char D_0043AC38;
 extern char D_0043AC5C;
 
-void func_0042EB04(Player *);
-s32 func_0025340C(Players *players, Player *player);
-void func_00416644(void *pool, void *screen, Player *p, void *controller, s32);
+void func_0042EB04(CPlayer *);
+s32 func_0025340C(Players *players, CPlayer *player);
+void func_00416644(void *pool, void *screen, CPlayer *p, void *controller, s32);
 
 /* func_0042EB04 takes the player (as in func_00249118): the call keeps it in $a0,
  * which is what lets sched2 keep the mask's lui/ori together. */
 /* Clears the player's flag 0x800000 and, in multiplayer, opens the screen of
  * the player's slot (one of four) on the player's camera. */
-void func_00255D70(Player *player) {
+void func_00255D70(CPlayer *player) {
     char *screen;
 
-    player->unk1298 = 0;
-    player->flags &= ~0x800000;
+    player->m_ShockedTimer = 0;
+    player->m_CharacterActor.m_dwFlags &= ~0x800000;
     func_0042EB04(player);
     if (D_80119870.multiplayer) {
         switch ((u32)func_0025340C(&D_80119870, player)) {
@@ -58,6 +48,6 @@ void func_00255D70(Player *player) {
             screen = &D_0043AC5C;
             break;
         }
-        func_00416644(player->camera->cinema, screen, player, player->controller, 0);
+        func_00416644(((Camera *)player->m_pCamera)->cinema, screen, player, player->m_ContState.m_pContState, 0);
     }
 }

@@ -1,14 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* The object's intelligence (header.m_pIntelligence), as read here. */
-struct CIntelligence {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 m_dwFlags;
-    /* 0x18 */ u8 pad18[0x54 - 0x18];
-    /* 0x54 */ s32 unk54;
-};
-
 /* The state this sets up for its object. */
 typedef struct {
     /* 0x00 */ CGameObjectInstance *obj;
@@ -34,8 +26,8 @@ void func_00441B20(ObjState *arg0, CGameObjectInstance *arg1)
   CGameObjectInstance *temp_s0;
   int new_var;
   arg0->obj = arg1;
-  arg0->info = (s32) &arg1->header.m_pIntelligence->m_dwFlags;
-  new_var = arg1->header.m_pIntelligence->unk54 * 0xF;
+  arg0->info = (s32) &arg1->header.m_pIntelligence->m_Destructible;
+  new_var = arg1->header.m_pIntelligence->m_Destructible.m_TotemMissionDuration * 0xF;
   arg0->unk8 = 0;
   arg0->unk10 = 0;
   arg0->unkC = (f32) new_var;

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 /* D_8011F290: the saved copy of the players (see func_0028D264). */
 typedef struct {
@@ -7,14 +8,6 @@ typedef struct {
     /* 0x8 */ s32 timer;
     /* 0xC */ s32 warp;
 } SavedPlayers;
-
-/* A player as this reads it. */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x92C];
-    /* 0x92C */ s32 warp;
-    /* 0x930 */ u8 pad930[0xD8];
-    /* 0xA08 */ u16 unkA08;
-} Player;
 
 extern SavedPlayers D_8011F290;
 /* The settings at D_8011AAD8 (D_80119870 +0x1268). */
@@ -39,12 +32,12 @@ extern s32 D_80110048;              /* world +0x18FD0 */
 
 s32 func_0027BC34(void);
 void func_0028D264(void);
-Player *func_002532A8(void *list);
+CPlayer *func_002532A8(void *list);
 
 void func_0028CF80(void) {
     SavedPlayers *save = &D_8011F290;
     s32 ok;
-    Player *player;
+    CPlayer *player;
     Settings *settings;
 
     ok = !func_0027BC34();
@@ -77,11 +70,11 @@ void func_0028CF80(void) {
             player = func_002532A8(&D_80119870);
             if (player != NULL) {
                 if (save->state == 1) {
-                    if (D_80110048 != player->warp || (player->unkA08 >= 19 && player->unkA08 < 31)) {
+                    if (D_80110048 != player->m_Data.m_CheckPointWarpID || (player->m_Mode >= 19 && player->m_Mode < 31)) {
                         save->state = 2;
                     }
                 }
-                save->warp = player->warp;
+                save->warp = player->m_Data.m_CheckPointWarpID;
             }
         }
     } else {

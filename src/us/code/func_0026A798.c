@@ -1,8 +1,7 @@
 #include "common.h"
+#include "structs/vector.h"
+#include "structs/region.h"
 
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
 
 /* A vertex of this kind of triangle keeps its height after z. */
 typedef struct Vertex {
@@ -12,29 +11,26 @@ typedef struct Vertex {
     /* 0x0C */ f32 y;
 } Vertex;
 
-typedef struct Triangle {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vertex *v[3];
-} Triangle;
+#define REGION_VERTEX(tri, i) ((Vertex *)(tri)->m_pVertices[i])
 
-extern Triangle *D_800B2600;    /* triangle whose normal is cached */
-extern Vec3 D_800F2000;         /* its normal */
+extern CGameRegion *D_800B2600;    /* triangle whose normal is cached */
+extern CVector3 D_800F2000;         /* its normal */
 
-void func_0020EF2C(Vec3 *out, Vec3 *a, Vec3 *b);    /* a - b */
-void func_0020EFDC(Vec3 *out, Vec3 *a, Vec3 *b);    /* cross product */
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
+void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
 
 /* tri's face normal, cached for the last triangle asked about. */
-static __inline__ Vec3 triNormal(Triangle *tri) {
-    Vec3 edge1;
-    Vec3 edge2;
+static __inline__ CVector3 triNormal(CGameRegion *tri) {
+    CVector3 edge1;
+    CVector3 edge2;
 
     if (tri != D_800B2600) {
-        edge1.x = tri->v[1]->x - tri->v[0]->x;
-        edge1.y = tri->v[1]->y - tri->v[0]->y;
-        edge1.z = tri->v[1]->z - tri->v[0]->z;
-        edge2.x = tri->v[2]->x - tri->v[1]->x;
-        edge2.y = tri->v[2]->y - tri->v[1]->y;
-        edge2.z = tri->v[2]->z - tri->v[1]->z;
+        edge1.x = REGION_VERTEX(tri, 1)->x - REGION_VERTEX(tri, 0)->x;
+        edge1.y = REGION_VERTEX(tri, 1)->y - REGION_VERTEX(tri, 0)->y;
+        edge1.z = REGION_VERTEX(tri, 1)->z - REGION_VERTEX(tri, 0)->z;
+        edge2.x = REGION_VERTEX(tri, 2)->x - REGION_VERTEX(tri, 1)->x;
+        edge2.y = REGION_VERTEX(tri, 2)->y - REGION_VERTEX(tri, 1)->y;
+        edge2.z = REGION_VERTEX(tri, 2)->z - REGION_VERTEX(tri, 1)->z;
         func_0020EFDC(&D_800F2000, &edge2, &edge1);
     }
     D_800B2600 = tri;
@@ -46,11 +42,11 @@ static __inline__ Vec3 triNormal(Triangle *tri) {
  * *t gets the fraction along the segment (1 when moving away from the plane);
  * returns whether the crossing lies strictly between the ends.
  */
-s32 func_0026A798(Triangle *tri, Vec3 *from, Vec3 *to, f32 *t) {
-    Vec3 normal;
-    Vec3 dir;
-    Vec3 v;
-    Vec3 diff;
+s32 func_0026A798(CGameRegion *tri, CVector3 *from, CVector3 *to, f32 *t) {
+    CVector3 normal;
+    CVector3 dir;
+    CVector3 v;
+    CVector3 diff;
     f32 denom;
     f32 frac;
 
@@ -59,9 +55,9 @@ s32 func_0026A798(Triangle *tri, Vec3 *from, Vec3 *to, f32 *t) {
     }
     normal = triNormal(tri);
     func_0020EF2C(&dir, to, from);
-    v.x = tri->v[0]->x;
-    v.y = tri->v[0]->y;
-    v.z = tri->v[0]->z;
+    v.x = REGION_VERTEX(tri, 0)->x;
+    v.y = REGION_VERTEX(tri, 0)->y;
+    v.z = REGION_VERTEX(tri, 0)->z;
     denom = normal.x * dir.x + normal.y * dir.y + normal.z * dir.z;
     if (denom >= 0.0f) {
         *t = 1.0f;

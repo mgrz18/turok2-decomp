@@ -6,6 +6,9 @@ typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
 typedef struct B19bV3f { f32 x, y, z; } B19bV3f;
+/* D_8011AAD8 (GameSettings in structs/game.h: cheatFlags, unkC). Kept as a local
+ * array view: through it the compiler bases both loads on D_8011AAD8 + 0xC, as
+ * the ROM does; through the struct it bases them on D_8011AAD8. */
 typedef struct B19bG8 { u32 flags; u8 pad4[0x8]; u32 fC; } B19bG8;
 extern B19bG8 D_8011AAD8[];
 typedef struct B19bLObj {

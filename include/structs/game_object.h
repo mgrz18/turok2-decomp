@@ -11,21 +11,10 @@
  * Fields named unk_ are not yet known. */
 
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-} CVector3; /* size 0xC */
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 w;
-} CQuaternion; /* size 0x10 */
-
-typedef f32 CMtxF[4][4];
+/* The definition m_pIntelligence points at. */
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 m_Type;
@@ -138,7 +127,7 @@ typedef struct CGameObjectInstance {
     /* 0x0AC */ void *m_rpGeometryHeader;
     /* 0x0B0 */ u32 m_rpObjectHeader;
     /* 0x0B4 */ u32 m_rpGeometryHeaderSize;
-    /* 0x0B8 */ s16 m_nTypeFlag;
+    /* 0x0B8 */ u16 m_nTypeFlag;
     /* 0x0BA */ s16 m_nAnims;
     /* 0x0BC */ CVector3 m_vMin;
     /* 0x0C8 */ CVector3 m_vMax;

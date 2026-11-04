@@ -1,26 +1,14 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80204E78.CPP, func_80204F10_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
+#include "common.h"
+#include "structs/intelligence.h"
+#include "structs/world.h"
 struct LevelActor;
-struct Shared_World;
-struct CVector3_t;
 struct Box;
 typedef struct Box Box;
-struct CVector3_t;
-typedef struct CVector3_t CVector3;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Box;
 struct Box {
     CVector3 min;
@@ -74,21 +62,7 @@ typedef struct ResourceManagerState ResourceManagerState;
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 struct LevelActor;
-struct Shared_World;
-extern void func_00220260(struct Shared_World *, void *, s32);
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
+extern void func_00220260(CWorld *, void *, s32);
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -97,7 +71,7 @@ struct LevelActor {
     s8 field3;
     CVector3 position0; /* 0x4 in Turok 2 (no modelIndex) */
     s32 model;
-    ActorDefinitionHeader *definition;
+    CIntelligence *definition;
     CVector3 position1;
     CVector3 motionAngles;
     void *attached;
@@ -177,7 +151,6 @@ struct LevelActor {
 struct LevelActor;
 struct TableRecAt8;
 typedef struct TableRecAt8 TableRecAt8;
-struct Shared_World;
 struct TableRecAt8;
 struct TableRecAt8 {
     s32 unused;
@@ -192,7 +165,6 @@ struct Shared_Placed {
     s16 kind;
     s16 pad12;
 };
-struct ActorDefinitionHeader;
 struct WorldRecAt3C08;
 struct EffectSlot {
     s8 active;
@@ -201,7 +173,7 @@ struct EffectSlot {
     char pad6[2];
     CVector3 position;
     s32 owner;
-    struct ActorDefinitionHeader *definition;
+    struct CIntelligence *definition;
     CVector3 rotation;
     char pad28[0x28];
     s32 resource;
@@ -243,115 +215,7 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-typedef struct WorldSector {
-    void *resource;
-    f32 *bounds;
-    u16 ids[2];
-} WorldSector;
-typedef struct Shared_World {
-    s32 mode;
-    u8 unknown4[8];
-    s32 challengeFile;
-    s32 challengeFileSize;
-    void **resourceHandle;
-    s32 resourceKey;
-    s32 resourceBank;
-    s32 unk20;
-    s32 indexedBank;
-    s32 lookupBank;
-    s32 resourceKindBank;
-    u8 unknown30[4];
-    s32 trackLookup;
-    u8 unknown38[0xC];
-    s32 noteCount;
-    u8 unknown48[4];
-    s32 *resourceDirectory;
-    s32 unk50;
-    s32 *indexedDirectory;
-    s32 *lookupDirectory;
-    s32 *resourceKindDirectory;
-    u8 unknown60[0xC];
-    s32 *modelSections;
-    s32 *objectSections;
-    s32 *trackBundle;
-    s32 *actorDefinitions;
-    s32 *routeCount;
-    void *bitSections;
-    void *secondaryLevels;
-    u8 unknown88[8];
-    void *placedObjectTable;
-    struct TableRecAt8 *modelIds;
-    StridedTable *lookupTable;
-    struct TableRecAt8 *resourceKindTable;
-    StridedTable *records;
-    StridedTable *stridedRecords;
-    u8 unknownA8[4];
-    StridedTable *actorRecords;
-    u8 unknownB0[0x38];
-    s32 resource;
-    u8 unknownEC[0x34];
-    s32 counter120;
-    s32 counter124;
-    u8 system128[0x10];
-    struct LevelActor *actors;
-    s32 actorCapacity;
-    s32 actorCount;
-    struct LevelActor *interactive[512];
-    s32 interactiveCount;
-    struct LevelActor *movers[128];
-    s32 moverCount;
-    struct LevelActor *queued[64];
-    s32 queuedCount;
-    struct LevelActor *registered[128];
-    s32 registeredCount;
-    struct LevelActor *kind1[64];
-    s32 kind1Count;
-    s32 kind1Cursor;
-    struct LevelActor *flagged[32];
-    s32 flaggedCount;
-    struct LevelActor *kind5[16];
-    s32 kind5Count;
-    struct LevelActor *model64F[32];
-    s32 model64FCount;
-    struct LevelActor *model64D[4];
-    s32 model64DCount;
-    s32 drawableCount;
-    void *drawables[64];
-    s32 recordCount;
-    s32 alternateRecordCount;
-    s32 * recordIndex;
-    s32 * alternateRecordIndex;
-    struct Record14 * recordArray;
-    struct Record14 * alternateRecordArray;
-    u8 unknown11D8[0x328];
-    s32 sectorEntryCount;
-    s32 sectorCount;
-    WorldSector sectors[128];
-    u8 system1B08[0x11778 - 0x1B08];
-    WorldRecAt3C08 system11778;
-    u8 unknown15384[4];
-    u8 effectPool[0x1B308 - 0x15388];
-    f32 elapsed;
-    u8 unknown1B30C[0xFC];
-    s32 visibilityEnabled;
-    s32 level;
-    s32 selectionState;
-    s32 frozen;
-    f32 selectionTimer;
-    s32 selectionFlags;
-    Shared_Placed selectionSpawn;
-    s32 selectionValues[4];
-    s32 previewState;
-    s32 previewTimer;
-    s32 previewStart;
-    u8 unknown1B450[0x1C4];
-    CVector3 offset;
-    struct Shared_Pickup *objects[16];
-    s32 count;
-    struct LevelActor *specialActors[16];
-    s32 specialActorCount;
-} Shared_World;
-extern Shared_World D_800F7078;
+extern CWorld D_800F7078;
 struct LevelActor;
 extern void func_00237EE4(void *, void *, s32, CVector3, ResourceManagerState);
 void func_002658A0(LevelActor *arg0) {
