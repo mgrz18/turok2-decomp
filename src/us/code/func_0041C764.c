@@ -11,10 +11,10 @@ s32 func_0041C764(void *unused, Menu *menu) {
     if (menu->player != 0) {
         settings = menu->player->m_pOptions;
     }
-    if (settings->m_ControlStyle == 1) {
-        settings->m_ControlStyle = 0;
+    if (settings->m_WeaponSelect == 1) {
+        settings->m_WeaponSelect = 0;
     } else {
-        settings->m_ControlStyle = 1;
+        settings->m_WeaponSelect = 1;
     }
     return 0;
 }

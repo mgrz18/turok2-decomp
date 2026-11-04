@@ -29,7 +29,7 @@ typedef struct CPlayerOptions {
     /* 0x2E */ u8 m_bAutoAim;
     /* 0x2F */ s8 m_nController;
     /* 0x30 */ s8 m_nCharacter;            /* also the team in team games */
-    /* 0x31 */ u8 m_ControlStyle;
+    /* 0x31 */ u8 m_WeaponSelect;          /* 0: normal, 1: quick (the stick picks it) */
     /* 0x32 */ u8 m_Handicap;
     /* 0x33 */ u8 m_Name[8];
     /* 0x3B */ u8 _pad0;
