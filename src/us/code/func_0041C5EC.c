@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x2A];
@@ -11,15 +12,10 @@ typedef struct {
     /* 0x518 */ PlayerOptions *options;
 } Player;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ Player *player;
-} MenuItem;
-
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
 extern PlayerOptions D_8011AB18;
 
-s32 func_0041C5EC(s32 arg0, MenuItem *arg1) {
+s32 func_0041C5EC(s32 arg0, Menu *arg1) {
     PlayerOptions *temp_v0_2;
     PlayerOptions *var_s0;
     Player *temp_v0;

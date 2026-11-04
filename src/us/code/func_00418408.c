@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 #include "structs/camera.h"
 
 /* Multiplayer options kept per player (see func_00247C10.c): only 0x30. */
@@ -20,16 +21,10 @@ typedef struct {
     /* 0xBF4 */ s32 team;
 } Player;
 
-/* The menu this handler belongs to: only its player here. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ Player *player;
-} PlayerMenu;
-
 s32 func_00416644(s32, s32, s32, s32, s32);
 extern u8 D_00438808[];
 
-s32 func_00418408(s32 arg0, PlayerMenu *arg1) {
+s32 func_00418408(s32 arg0, Menu *arg1) {
     Player *temp_a2;
 
     temp_a2 = arg1->player;

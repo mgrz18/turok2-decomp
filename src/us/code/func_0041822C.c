@@ -1,10 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ s32 param1C;
-    /* 0x20 */ s32 param20;
-} MenuItem;
+#include "structs/menu.h"
 
 s32 func_00416644(s32, s32, s32, s32, s32);
 s32 func_00275904(s32);                     /* extern */
@@ -13,12 +8,12 @@ s32 func_00421250();                            /* extern */
 extern s32 D_0043B6A8;
 extern s32 D_80119E2C;
 
-s32 func_0041822C(s32 arg0, MenuItem *arg1) {
+s32 func_0041822C(s32 arg0, Menu *arg1) {
     s32 temp_s1;
 
-    temp_s1 = arg1->param1C;
+    temp_s1 = arg1->player;
     func_00421250();
     func_00275904(-1);
-    func_00416644((s32) &D_80119E2C, (s32) &D_0043B6A8, temp_s1, arg1->param20, 0);
+    func_00416644((s32) &D_80119E2C, (s32) &D_0043B6A8, temp_s1, arg1->controller, 0);
     return 1;
 }

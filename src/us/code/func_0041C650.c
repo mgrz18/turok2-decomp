@@ -1,9 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItemTmpl;
+#include "structs/menu.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x29];
@@ -16,26 +12,21 @@ typedef struct {
     /* 0x518 */ PlayerOptions *options;
 } Player;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ Player *player;
-} MenuCaller;
-
 extern PlayerOptions D_8011AB18; /* D_8011AAD8 + 0x40: default options */
 extern char D_800B4080[];
 extern char D_800B4098[];
 extern char D_800C1318[]; /* "  %2d"-style */
 extern char D_800C1320[];
-extern s32 func_004160F0(MenuItemTmpl *a);
+extern s32 func_004160F0(MenuItem *a);
 extern void func_0029E3E0(char *dst, char *fmt, ...);
 
 /* Label of the player's 0x80-centred setting at options+0x2A. */
-s32 func_0041C650(MenuItemTmpl *a, MenuCaller *c) {
+s32 func_0041C650(MenuItem *a, Menu *c) {
     PlayerOptions *options = &D_8011AB18;
     s32 v;
 
-    if (c->player != NULL && c->player->options != NULL) {
-        options = c->player->options;
+    if (c->player != NULL && ((Player *) c->player)->options != NULL) {
+        options = ((Player *) c->player)->options;
     }
     v = (options->unk2A - 0x80) / 8;
     if (v == 0) {

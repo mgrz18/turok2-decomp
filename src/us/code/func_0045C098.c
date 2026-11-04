@@ -1,5 +1,6 @@
 /* Second-module copy of func_00423178 (first module; this one at link address 0x00423098), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "structs/menu.h"
 
 s32 func_00284174(void);
 s32 func_00284240(void);
@@ -9,12 +10,6 @@ extern char D_0043B634[];
 extern char D_80119E2C[];
 extern s32 D_80130980;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ s32 player;
-    /* 0x20 */ s32 arg;
-} MenuEvent;
-
 static __inline__ s32 func_00422EE0_inline(void) {
     if (func_00284174() != 0 && func_00284240() == 0) {
         return 1;
@@ -22,7 +17,7 @@ static __inline__ s32 func_00422EE0_inline(void) {
     return 0;
 }
 
-s32 func_0045C098(s32 unused, MenuEvent *event) {
+s32 func_0045C098(s32 unused, Menu *event) {
     s32 player = event->player;
 
     if (func_00422EE0_inline()) {
@@ -30,7 +25,7 @@ s32 func_0045C098(s32 unused, MenuEvent *event) {
     }
     if (player != 0) {
         D_80130980 = 1;
-        func_00416644(D_80119E2C, D_0043B634, event->player, event->arg, 0);
+        func_00416644(D_80119E2C, D_0043B634, event->player, event->controller, 0);
         return 1;
     }
     return 0;
