@@ -8,7 +8,8 @@
 /* The shared types come from the shared headers: libultra's (OSMesgQueue,
  * OSPfs and the Controller Pak internals) from ultra_types.h, CVector3 (Rage
  * Wars' Vec3) from structs/vector.h, libaudio's ALHeap, ALInstrument and Acmd
- * from structs/libaudio.h. Gfx is gfx.h's: the files that write display lists
+ * from structs/libaudio.h. The world D_800F7078 is structs/world.h's CWorld
+ * (Rage Wars' Shared_World has another layout). Gfx is gfx.h's: the files that write display lists
  * include it. RW_Mtx is Rage Wars' float matrix with named rows (not gbi.h's
  * fixed-point Mtx). */
 #include "common.h"
@@ -506,76 +507,6 @@ struct StridedTable {
 };
 typedef struct StridedTable StridedTable;
 struct InputRecAt27;
-struct Def;
-struct Def {
-    s32 type;
-    s32 flags;
-    char pad8[0x20];
-    s16 id;
-};
-struct Actor_func_8028E284_de;
-struct Actor_func_8028E284_de {
-    char pad0[0x18];
-    struct Def *def;
-    char pad1C[0xC8];
-    u16 id;
-    char padE6[0x202];
-};
-struct Shared_World;
-typedef struct Actor_func_8028E284_de Actor_func_8028E284_de;
-struct SceneEffect;
-typedef struct SceneEffect SceneEffect;
-struct CIntelligence;
-struct SceneEffect {
-    s8 active;
-    char pad1[3];
-    s16 model;
-    char pad6[2];
-    CVector3 position;
-    s32 owner;
-    struct CIntelligence *definition;   /* structs/intelligence.h */
-    CVector3 rotation;
-    char pad28[0x28];
-    s32 resource;
-    s32 animation;
-    s32 frame;
-    s32 frameState;
-    char pad60[0x108];
-    s32 collisionState;
-    f32 collisionScale;
-    s32 collisionFlags;
-    s32 angle;
-    s32 angleState;
-    f32 minX;
-    f32 minY;
-    f32 minZ;
-    f32 maxX;
-    f32 maxY;
-    f32 maxZ;
-    s32 boundsState;
-    char pad198[4];
-    u16 flags;
-    char pad19E[0x26];
-    s32 effectState;
-    f32 lifetime;
-    f32 lifetimeState;
-    s32 state;
-    s32 *counter;
-    struct SceneEffect *prev;
-    struct SceneEffect *next;
-    char pad1E0[0x110];
-    signed int * ref;
-    unsigned char padding2F4[4];
-};
-struct WorldRecAt3C08;
-struct WorldRecAt3C08 {
-    char pad0[0x3C00];
-    struct SceneEffect *free;
-    struct SceneEffect *head;
-    struct SceneEffect *tail;
-};
-typedef struct WorldRecAt3C08 WorldRecAt3C08;
-typedef struct Def Def;
 struct TableRecAt8;
 typedef struct TableRecAt8 TableRecAt8;
 struct TableRecAt8 {
@@ -583,100 +514,7 @@ struct TableRecAt8 {
     s32 count;
     u16 entries[1];
 };
-struct Shared_Pickup;
 struct Record14;
-typedef struct Shared_World {
-    s32 mode;
-    u8 unknown4[0x10];
-    void *resourceHandle;
-    s32 resourceKey;
-    s32 resourceBank;
-    u8 unknown20[4];
-    s32 indexedBank;
-    s32 lookupBank;
-    u8 unknown2C[8];
-    s32 trackLookup;
-    u8 unknown38[0x14];
-    s32 *resourceDirectory;
-    u8 unknown50[4];
-    s32 *indexedDirectory;
-    s32 *lookupDirectory;
-    u8 unknown5C[0x10];
-    s32 *modelSections;
-    s32 *objectSections;
-    s32 *trackBundle;
-    s32 *actorDefinitions;
-    s32 *routeCount;
-    void *bitSections;
-    void *secondaryLevels;
-    u8 unknown88[0xC];
-    struct TableRecAt8 *modelIds;
-    StridedTable *lookupTable;
-    u8 unknown9C[4];
-    StridedTable *records;
-    StridedTable *stridedRecords;
-    u8 unknownA8[4];
-    StridedTable *actorRecords;
-    u8 unknownB0[0x38];
-    s32 resource;
-    u8 unknownEC[0x34];
-    s32 counter120;
-    s32 counter124;
-    u8 system128[0x10];
-    struct Actor_func_8028E284_de *actors;
-    s32 actorCapacity;
-    s32 actorCount;
-    u8 unknown144[0x800];
-    s32 counter944;
-    u8 unknown948[0x200];
-    s32 counterB48;
-    u8 unknownB4C[0x100];
-    s32 counterC4C;
-    u8 unknownC50[0x200];
-    s32 counterE50;
-    u8 unknownE54[0x100];
-    s32 counterF54;
-    u8 unknownF58[0x84];
-    s32 counterFDC;
-    u8 unknownFE0[0x40];
-    s32 counter1020;
-    u8 unknown1024[0x80];
-    s32 counter10A4;
-    u8 unknown10A8[0x10];
-    s32 counter10B8;
-    s32 counter10BC;
-    u8 unknown10C0[0x100];
-    s32 recordCount;
-    s32 alternateRecordCount;
-    s32 * recordIndex;
-    s32 * alternateRecordIndex;
-    struct Record14 * recordArray;
-    struct Record14 * alternateRecordArray;
-    u8 unknown11D8[0x32C];
-    s32 counter1504;
-    u8 unknown1508[0x600];
-    u8 system1B08[0x11778 - 0x1B08];
-    WorldRecAt3C08 system11778;
-    u8 unknown15384[0x1B308 - 0x15384];
-    f32 elapsed;
-    u8 unknown1B30C[0x100];
-    s32 level;
-    s32 selectionState;
-    s32 frozen;
-    f32 selectionTimer;
-    s32 selectionFlags;
-    u8 unknown1B420[0x14];
-    s32 selectionValues[4];
-    s32 previewState;
-    s32 previewTimer;
-    s32 previewStart;
-    u8 unknown1B450[0x1C4];
-    CVector3 offset;
-    struct Shared_Pickup *objects[16];
-    s32 count;
-    struct Actor_func_8028E284_de *specialActors[16];
-    s32 specialActorCount;
-} Shared_World;
 struct IntPair;
 struct IntPair {
     int field_0;

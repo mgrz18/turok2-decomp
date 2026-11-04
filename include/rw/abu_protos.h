@@ -6,6 +6,8 @@
 
 #include "rw/abu_types.h"
 
+struct CWorld; /* structs/world.h */
+
 s32 CList__AddHead(void *, s32);
 s32 CList__AddTail(IntrusiveList *list, void *node);
 void CList__Construct(IntrusiveList *list, s32 prevOffset, s32 nextOffset);
@@ -137,13 +139,13 @@ s32 func_00220408(void *, void *);
 s32 func_00220A1C(void *, void *);
 s32 func_002242F8(void *arg0, s32 arg1);
 s32 func_00224A68(void *arg0, void *arg1, s32 arg2);
-s32 func_00224B58(Shared_World *world, Trigger *trigger);
-void func_00224C98(Shared_World *world, s32 id);
-s32 func_00224CF8(Shared_World *world, s32 id);
+s32 func_00224B58(struct CWorld *world, Trigger *trigger);
+void func_00224C98(struct CWorld *world, s32 id);
+s32 func_00224CF8(struct CWorld *world, s32 id);
 s32 func_00224F84(s32, s32);
-void func_0022515C(Shared_World *world, s32 id);
-s32 func_00225210(Shared_World *world, s32 id);
-void func_002252A0(Shared_World *world, s32 id);
+void func_0022515C(struct CWorld *world, s32 id);
+s32 func_00225210(struct CWorld *world, s32 id);
+void func_002252A0(struct CWorld *world, s32 id);
 s32 func_00225354(struct WorldRecAt1B40C *arg0, Record14 *arg1);
 void *func_00225E88(void *, s32);
 void func_00226CD0(RenderSortRecord *left, RenderSortRecord *right);
