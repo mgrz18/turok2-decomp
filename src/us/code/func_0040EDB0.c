@@ -25,7 +25,7 @@ extern void func_00235898(void);
 extern void func_0020A33C(s32 a, s32 model, s32 c, Matrix18 *mtx, s32 e, s32 f, s32 g);
 
 void func_0040EDB0(CGameObjectInstance *actor, CAI *ai, DrawInfo *info) {
-    func_00236324(&D_8013023C[ai->m_VarS32[2]]);
+    func_00236324(&D_8013023C[ai->m_BlindOne.m_nFader]);
     func_00235898();
     switch (actor->m_nTypeFlag) {
         case 0x450:

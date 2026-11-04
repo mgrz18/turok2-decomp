@@ -73,6 +73,8 @@ typedef struct {
     /* 0x2C */ f32 m_Timer2;
 } CEnemyAIVars; /* size 0x30 */
 
+#include "structs/ai_vars_boss.h"
+
 /* AI state embedded in every game object at 0x140. Health is 24.8 fixed point. */
 typedef struct {
     /* 0x000 */ s32 m_dwFlags;
@@ -150,6 +152,9 @@ typedef struct {
         /* 0x10C */ u16 m_VarU16[24];
         /* 0x10C */ s8 m_VarS8[48];
         /* 0x10C */ u8 m_VarU8[48];
+        /* 0x10C */ CBlindOneAIVars m_BlindOne;
+        /* 0x10C */ CMotherAIVars m_Mother;
+        /* 0x10C */ CWeaponAIVars m_Weapon;
         /* 0x10C */ CEnemyAIVars m_Enemy;
     };
 } CAI; /* size 0x13C */

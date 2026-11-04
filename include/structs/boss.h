@@ -77,10 +77,10 @@ extern MotherBossState D_8012FB70;
  * each has its own phase table (D_0043240C and D_0043232C). The script is a
  * list of BlindOneStep: stepping it (the nextPhase inlines and
  * func_0040E46C...) stops the three movers, clears every actor's
- * m_AI.m_VarBuffer[0], stores the step's id in `phase` and calls that
+ * m_AI.m_BlindOne.m_PhaseState, stores the step's id in `phase` and calls that
  * phase's init; the phase's update then runs every frame. The boss's three
  * groups of actors (types 0x454, 0x455 and 0x456) keep their group index in
- * m_AI.m_VarBuffer[1] and their fader in m_AI.m_VarBuffer[2]
+ * m_AI.m_BlindOne.m_nGroupIndex and their fader in m_AI.m_BlindOne.m_nFader
  * (func_0040CCC0). func_0040EDB0 reaches the faders through their own
  * symbol, D_8013023C (= D_80130200.faders), and func_0040ECDC the update
  * entries of the phase table through D_00432410 (= &D_0043240C[0].update);
@@ -127,7 +127,7 @@ typedef struct BlindOneState {
     /* 0x01C */ struct CGameObjectInstance *actors2[4];
     /* 0x02C */ s32 count3;            /* type 0x456 */
     /* 0x030 */ struct CGameObjectInstance *actors3[3];
-    /* 0x03C */ ScriptAnimator faders[12]; /* the boss's and every actor's (m_AI.m_VarBuffer[2]) */
+    /* 0x03C */ ScriptAnimator faders[12]; /* the boss's and every actor's (m_AI.m_BlindOne.m_nFader) */
     /* 0x4EC */ s32 faderCount;
     /* 0x4F0 */ void *minionDefA;      /* the definitions of its two minion kinds (func_00225EBC 0x1CE9, 0x1CEA) */
     /* 0x4F4 */ void *minionDefB;

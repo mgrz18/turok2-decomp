@@ -33,11 +33,11 @@ void func_0040A25C(void *arg0, PartInfo *info) {
         case 0:
             obj = D_8012FB70.obj;
             if (obj->animState == 9) {
-                v = (*(f32 *)&actor->m_AI.m_VarBuffer[2]) + D_800B6D28 * 0.01f;
+                v = actor->m_AI.m_Mother.m_GrowScale + D_800B6D28 * 0.01f;
                 if (v > 1.0f) {
                     v = 1.0f;
                 }
-                (*(f32 *)&actor->m_AI.m_VarBuffer[2]) = v;
+                actor->m_AI.m_Mother.m_GrowScale = v;
             }
             if (obj->animState == 0x13) {
                 t = D_800C1900;
@@ -45,21 +45,21 @@ void func_0040A25C(void *arg0, PartInfo *info) {
                     D_800C1900 = t + D_800B6D28 * (1.0f / 15);
                 } else if (D_800C1904 == 0) {
                     dt = D_800B6D28;
-                    (*(f32 *)&actor->m_AI.m_VarBuffer[1]) += dt * 0.4f;
-                    if ((*(f32 *)&actor->m_AI.m_VarBuffer[1]) > 3.0f) {
+                    actor->m_AI.m_Mother.m_PulseScale += dt * 0.4f;
+                    if (actor->m_AI.m_Mother.m_PulseScale > 3.0f) {
                         D_800C1904 = 1;
                     }
                     D_800C1900 = t + dt * (1.0f / 15);
                 } else {
-                    v = (*(f32 *)&actor->m_AI.m_VarBuffer[1]) - D_800B6D28 * 0.12f;
+                    v = actor->m_AI.m_Mother.m_PulseScale - D_800B6D28 * 0.12f;
                     if (v < 1.0f) {
                         v = 1.0f;
                     }
-                    (*(f32 *)&actor->m_AI.m_VarBuffer[1]) = v;
+                    actor->m_AI.m_Mother.m_PulseScale = v;
                 }
             }
             if (obj->animState >= 30) {
-                (*(f32 *)&actor->m_AI.m_VarBuffer[1]) = 1.0f;
+                actor->m_AI.m_Mother.m_PulseScale = 1.0f;
             }
             break;
         case 21:
@@ -70,7 +70,7 @@ void func_0040A25C(void *arg0, PartInfo *info) {
         case 51:
         case 56:
         case 61:
-            func_0021034C(arg0, (*(f32 *)&actor->m_AI.m_VarBuffer[2]), (*(f32 *)&actor->m_AI.m_VarBuffer[2]), (*(f32 *)&actor->m_AI.m_VarBuffer[2]));
+            func_0021034C(arg0, actor->m_AI.m_Mother.m_GrowScale, actor->m_AI.m_Mother.m_GrowScale, actor->m_AI.m_Mother.m_GrowScale);
             break;
         case 89:
         case 93:
@@ -78,7 +78,7 @@ void func_0040A25C(void *arg0, PartInfo *info) {
         case 101:
         case 105:
         case 109:
-            func_0021034C(arg0, (*(f32 *)&actor->m_AI.m_VarBuffer[1]), (*(f32 *)&actor->m_AI.m_VarBuffer[1]), (*(f32 *)&actor->m_AI.m_VarBuffer[1]));
+            func_0021034C(arg0, actor->m_AI.m_Mother.m_PulseScale, actor->m_AI.m_Mother.m_PulseScale, actor->m_AI.m_Mother.m_PulseScale);
             break;
     }
 }

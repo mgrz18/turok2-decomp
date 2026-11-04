@@ -6,5 +6,5 @@
 extern f32 D_800A7294;
 
 void func_00258C20(CGameObjectInstance *arg0, CAI *arg1) {
-    *(f32 *) &arg1->m_VarBuffer[3] = (f32) (D_800AF618[((CPlayer *) arg0->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A7294);
+    arg1->m_Weapon.m_FireDelay = (f32) (D_800AF618[((CPlayer *) arg0->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A7294);
 }

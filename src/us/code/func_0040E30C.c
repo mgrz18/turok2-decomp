@@ -30,7 +30,7 @@ void func_0040E30C(CGameObjectInstance *actor, Spawn *spawn) {
         case 0x456:
             counters->alive3--;
             next = counters->actors3[(spawn->index + 1) % counters->count3];
-            if (next->m_AI.m_VarBuffer[0] == 0) {
+            if (next->m_AI.m_BlindOne.m_PhaseState == 0) {
                 func_00243414(next, &next->m_AI, 0);
             }
             break;

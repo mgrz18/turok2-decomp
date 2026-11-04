@@ -25,9 +25,9 @@ void func_0040D7A8(CGameObjectInstance *obj, CAI *ai) {
     } else {
         ai->m_pfDraw = func_0040EDB0;
     }
-    ai->m_VarS32[0] = 0;
-    ai->m_VarS32[3] = 0;
-    ai->m_VarS32[4] = 0;
+    ai->m_BlindOne.m_PhaseState = 0;
+    ai->m_BlindOne.m_HitTimer = 0;
+    ai->m_BlindOne.m_SightDist = 0;
     ai->m_Health = 0;
     obj->m_dwFlags &= ~0x10000000;
     if (obj->m_nTypeFlag == 0x456) {

@@ -20,7 +20,7 @@ s32 func_00257EA0(Object *obj, CAI *ai) {
     s32 mode;
 
     player = obj->owner;
-    if (ai->m_VarF32[3] > 0.0f) {
+    if (ai->m_Weapon.m_FireDelay > 0.0f) {
         return 0;
     }
     if (!func_0024E700(player, player->m_Data.m_CurrentWeapon)) {
@@ -32,7 +32,7 @@ s32 func_00257EA0(Object *obj, CAI *ai) {
     if ((player->m_Data.m_CurrentWeapon == 13 || player->m_Data.m_CurrentWeapon == 29) && player->m_CrossHairMode != 2) {
         return 0;
     }
-    if (player->m_Data.m_CurrentWeapon == 23 && ai->m_VarF32[9] > 0.0f) {
+    if (player->m_Data.m_CurrentWeapon == 23 && ai->m_Weapon.m_RefireDelay > 0.0f) {
         return 0;
     }
     if (player->m_bHeadMovementDisabled != 0) {

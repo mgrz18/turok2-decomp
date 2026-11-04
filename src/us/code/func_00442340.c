@@ -45,11 +45,11 @@ void func_00442340(Obj *obj, Level *level) {
     state->unk684 = 0;
     state->partCount = func_00225F6C(D_800F7078, 0x650, 10, 0x1DB1, state->parts, 6);
     for (i = 0; i < state->partCount; i++) {
-        state->parts[i]->m_AI.m_VarBuffer[1] = 1;
+        state->parts[i]->m_AI.m_Mother.m_bActive = 1;
     }
     state->partsLeft = state->partCount;
     func_00225F6C(D_800F7078, 0x650, 10, 0x1DB2, &state->controller, 1);
-    state->controller->m_AI.m_VarBuffer[1] = 1;
+    state->controller->m_AI.m_Mother.m_bActive = 1;
     state->intel = func_00225EBC(D_800F7078, 1, 0x1DB1);
     level->data = D_00431E20;
     level->onReset = func_0040BC64;

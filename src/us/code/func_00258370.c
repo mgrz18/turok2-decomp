@@ -2,9 +2,6 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 
-/* The weapon AI's own variables, in its m_VarBuffer. */
-#define SPIN(ai) (*(f32 *) &(ai)->m_VarBuffer[1])
-
 /* Weapon state: winding a spun-up weapon (barrel spin) while fire is held, else stopping it. */
 
 
@@ -34,8 +31,8 @@ void func_00258370(void *obj, CAI *state) {
         func_00275544(0x1A6, *pos, pos, -1);
         return;
     }
-    func_002117DC(&SPIN(state), 0.3490659f, 0.2f);
-    if (SPIN(state) < 0.2617994249f) {
+    func_002117DC(&state->m_Weapon.m_BarrelSpeed, 0.3490659f, 0.2f);
+    if (state->m_Weapon.m_BarrelSpeed < 0.2617994249f) {
         return;
     }
     if (player->m_pLoopingSound_WeaponFiring == 0) {

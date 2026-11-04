@@ -22,9 +22,9 @@ void func_00258668(CGameObjectInstance *weapon, CAI *state) {
         if (D_800B6D20 >= 5) {
             func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
         }
-        state->m_VarBuffer[0] = 0;
-        state->m_VarBuffer[1] = 0;
-        state->m_VarBuffer[7] = 0;
-        state->m_VarBuffer[3] = 0;
+        state->m_Weapon.m_BarrelAngle = 0;
+        state->m_Weapon.m_BarrelSpeed = 0;
+        state->m_Weapon.m_nLod = 0;
+        state->m_Weapon.m_FireDelay = 0;
     }
 }

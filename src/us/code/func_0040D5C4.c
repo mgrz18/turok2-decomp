@@ -36,8 +36,8 @@ void func_0040D5C4(CGameObjectInstance *obj, CAI *ai) {
     ai->m_pfDraw = func_0040EDB0;
     StartScript(&D_80130200, D_00432340, obj);
     obj->m_dwFlags &= ~0x10000000;
-    ai->m_VarS32[0] = 0;
-    ai->m_VarF32[3] = 0.0f;
+    ai->m_BlindOne.m_PhaseState = 0;
+    ai->m_BlindOne.m_HitTimer = 0.0f;
     func_00243414(obj, ai, 1);
     func_0027AD24(D_801100F0, obj, "EyeBall");
 }
