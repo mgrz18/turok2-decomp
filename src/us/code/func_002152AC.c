@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/intelligence.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
@@ -11,19 +12,11 @@ typedef struct {
 } Vec3;
 
 typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ u8 pad04[0xA];
-    /* 0x0E */ s8 variant;
-    /* 0x0F */ u8 pad0F[3];
-    /* 0x12 */ s8 field12;
-} SimpleObjectDef;
-
-typedef struct {
     /* 0x000 */ u8 pad000[2];
     /* 0x002 */ u16 id;
     /* 0x004 */ Vec3 position;
     /* 0x010 */ void *link;
-    /* 0x014 */ SimpleObjectDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad018[0x20];
     /* 0x038 */ f32 matrices[4][16];
     /* 0x138 */ u8 pad138[0xC];
@@ -68,7 +61,7 @@ void func_002152AC(SimpleObject *obj) {
         return;
     }
     if (obj->drawnFrame != D_800B6D1B) {
-        if (obj->def->type == 8) {
+        if (obj->def->m_Type == 8) {
             func_00211114(D_8010FF20, matrix);
         } else {
             func_002105A4(matrix, obj->angle);
@@ -79,13 +72,13 @@ void func_002152AC(SimpleObject *obj) {
         func_00210C3C(matrix);
         func_0020D274(matrix, obj->matrices[D_800B6D1C]);
     }
-    if (obj->def->type == 12) {
+    if (obj->def->m_Type == 12) {
         if (obj->drawnFrame != D_800B6D1B) {
             func_0020B4F0(geometry, obj->speed);
         }
-        func_0020B6A0(geometry, obj->matrices[D_800B6D1C], 0, obj->animation, 0, D_800B6D1C, obj->def->field12);
+        func_0020B6A0(geometry, obj->matrices[D_800B6D1C], 0, obj->animation, 0, D_800B6D1C, obj->def->m_nTexture);
     } else {
-        variant = obj->def->variant;
+        variant = obj->def->m_nModel;
         index = func_002241C0(D_800F7078, obj->id);
         if (index < 0x6AB) {
             if (index >= 0x6A9) {
@@ -97,7 +90,7 @@ void func_002152AC(SimpleObject *obj) {
                 }
             }
         }
-        func_0020B6A0(geometry, obj->matrices[D_800B6D1C], 0, obj->animation, 0, variant, obj->def->field12);
+        func_0020B6A0(geometry, obj->matrices[D_800B6D1C], 0, obj->animation, 0, variant, obj->def->m_nTexture);
     }
     func_002051F4(0, geometry);
     obj->drawnFrame = D_800B6D1B;

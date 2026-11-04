@@ -1,10 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ u8 pad04[0x1C];
-    /* 0x20 */ f32 rate;
-} Func002156FCDef;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 pad00[0x1C];
@@ -14,7 +9,7 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u8 pad000[0x10];
     /* 0x010 */ Func002156FCLink *link;
-    /* 0x014 */ Func002156FCDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad018[0x14C];
     /* 0x164 */ f32 scale;
     /* 0x168 */ u8 pad168[4];
@@ -35,15 +30,15 @@ extern s32 D_8011ACA4;
 
 /* Once-per-frame update. */
 void func_002156FC(Func002156FCObj *obj) {
-    Func002156FCDef *def;
+    CIntelligence *def;
     f32 timer;
 
     if (obj->lastFrame == D_800B6D1B || D_8011ACA4 != 0) {
         return;
     }
     def = obj->def;
-    if (def->type == 12) {
-        obj->speed = D_800B6D28 * def->rate;
+    if (def->m_Type == 12) {
+        obj->speed = D_800B6D28 * def->m_Morpher.m_AnimSpeed;
     } else if (obj->flags & 0x10) {
         timer = obj->timer + D_800B6D28 * (1.0f / 15.0f);
         obj->timer = timer;

@@ -47,6 +47,16 @@ enum {
     INTELLIGENCE_MORPHER            /* 12 */
 };
 
+/* Type 0: scenery with collision. Types 0, 5, 8, 10 and 12 keep their
+ * collision radius at 0x04 (func_002672C8). */
+typedef struct CStaticIntelligence {
+    /* 0x00 (0x14) */ u32 m_dwFlags;
+    /* 0x04 (0x18) */ f32 m_CollisionRadius;
+    /* 0x08 (0x1C) */ f32 m_CollisionHeight;
+    /* 0x0C (0x20) */ f32 m_CollisionHeightOffset;
+    /* 0x10 (0x24) */ u32 m_LODDistSquared;
+} CStaticIntelligence; /* size 0x14 */
+
 /* Type 1, the enemies (CCommonEnemyIntelligence + CEnemyIntelligence). The
  * first 0x34 bytes are shared with the turret (type 4). */
 typedef struct CEnemyIntelligence {
@@ -81,7 +91,8 @@ typedef struct CEnemyIntelligence {
         };
     };
     /* 0x4E (0x62) */ u8 m_UnderwaterBehavior;
-    /* 0x4F (0x63) */ u8 pad4F[0x58 - 0x4F];
+    /* 0x4F (0x63) */ s8 m_DeathModels[6];   /* extreme, ..., body hole: func_0021EBE4 */
+    /* 0x55 (0x69) */ u8 pad55[0x58 - 0x55];
     /* 0x58 (0x6C) */ s16 m_DeathAnims[5];
     /* 0x62 (0x76) */ u16 m_wIdleAnimFlags;
     /* 0x64 (0x78) */ u16 m_wMoveAnimFlags;
@@ -163,6 +174,13 @@ typedef struct CTurretIntelligence {
     /* 0x40 (0x54) */ f32 m_RotSpeed;
 } CTurretIntelligence;
 
+/* Type 5: objects that can be picked up and thrown. */
+typedef struct CThrowableIntelligence {
+    /* 0x00 (0x14) */ u32 m_dwFlags;
+    /* 0x04 (0x18) */ f32 m_CollisionRadius;
+    /* 0x08 (0x1C) */ f32 m_CollisionHeight;
+} CThrowableIntelligence; /* size 0xC */
+
 /* Type 6. */
 typedef struct CDoorIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
@@ -227,34 +245,49 @@ typedef struct CActionIntelligence {
 typedef struct CPlayerIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
     /* 0x04 (0x18) */ u32 m_StartHealth;
-    /* 0x08 (0x1C) */ u8 pad08[0x24 - 0x08];
+    /* 0x08 (0x1C) */ u8 pad08[0x14 - 0x08];
+    /* 0x14 (0x28) */ f32 m_CollisionRadius;   /* where the enemy keeps its own */
+    /* 0x18 (0x2C) */ u8 pad18[4];
+    /* 0x1C (0x30) */ f32 m_CollisionHeight;   /* the view bobs from 0.9 of it */
+    /* 0x20 (0x34) */ u8 pad20[4];
     /* 0x24 (0x38) */ f32 m_ScaleX;
     /* 0x28 (0x3C) */ f32 m_ScaleY;
     /* 0x2C (0x40) */ f32 m_ScaleZ;
 } CPlayerIntelligence;
+
+/* Type 12: an object that plays its animation (func_002156FC). */
+typedef struct CMorpherIntelligence {
+    /* 0x00 (0x14) */ u32 m_dwFlags;
+    /* 0x04 (0x18) */ f32 m_CollisionRadius;
+    /* 0x08 (0x1C) */ f32 m_CollisionHeight;
+    /* 0x0C (0x20) */ f32 m_AnimSpeed;
+} CMorpherIntelligence; /* size 0x10 */
 
 typedef struct CIntelligence {
     /* 0x00 */ s32 m_Type;                   /* INTELLIGENCE_* */
     /* 0x04 */ u32 m_dwFlags;                /* 0x4: ..., 0x100, 0x200: the views it shows in */
     /* 0x08 */ f32 m_LODDist2;
     /* 0x0C */ s16 m_Id;
-    /* 0x0E */ s8 m_nModel;
+    /* 0x0E */ s8 m_nModel;                  /* the model variant drawn */
     /* 0x0F */ s8 m_nModel2;
     /* 0x10 */ s8 m_nShadowModel;
     /* 0x11 */ s8 m_nShadowModel2;
-    /* 0x12 */ s8 m_nTexture;
+    /* 0x12 */ s8 m_nTexture;                /* copied to the AI's m_nTexture */
     /* 0x13 */ u8 pad13;
     /* 0x14 */ union {
         u32 m_dwTypeFlags;                   /* every body starts with its flags */
+        CStaticIntelligence m_Static;
         CEnemyIntelligence m_Enemy;
         CPlatformIntelligence m_Platform;
         CGeneratorIntelligence m_Generator;
         CTurretIntelligence m_Turret;
+        CThrowableIntelligence m_Throwable;
         CDoorIntelligence m_Door;
         CDestructibleIntelligence m_Destructible;
         CPickupIntelligence m_Pickup;
         CActionIntelligence m_Action;
         CPlayerIntelligence m_Player;
+        CMorpherIntelligence m_Morpher;
     };
 } CIntelligence; /* size 0x9C */
 

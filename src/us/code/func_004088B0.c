@@ -1,12 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* The definition an actor points to at +0x14 (only +0x54 is read). */
-typedef struct {
-    /* 0x00 */ u8 pad00[0x54];
-    /* 0x54 */ s32 seconds;
-} BossDef;
-
 /* The actor's CAI (at 0x140), with the fields this sets. */
 typedef struct {
     /* 0x00 */ u32 flags;
@@ -19,7 +13,7 @@ typedef struct {
 /* An actor, with the fields this sets (CAI at 0x140). */
 typedef struct {
     /* 0x000 */ u8 pad000[0x14];
-    /* 0x014 */ BossDef *def;
+    /* 0x014 */ CIntelligence *def;
     /* 0x018 */ u8 pad018[0x128];
     /* 0x140 */ BossAI ai;
     /* 0x208 */ u8 pad208[0x2C];
@@ -66,7 +60,7 @@ void func_004088B0(BossActor *obj, BossEvents *events) {
     events->onEvent = func_00408FF0;
     D_8012FB50[0] = obj;
     D_8012FB54[0] = (u8 *) obj->def + 0x14;
-    D_8012FB5C[0] = obj->def->seconds * 15;
+    D_8012FB5C[0] = obj->def->m_Destructible.m_TotemMissionDuration * 15;
     D_8012FB58[0] = 0;
     D_8012FB60[0] = 0;
     obj->onDraw = func_004089E0;
