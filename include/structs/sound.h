@@ -92,7 +92,7 @@ typedef struct {
 } ALMainBus; /* size 0x20 */
 
 /* The aux bus starts like the main bus; its ALFx effect follows at 0x20
- * (func_002946D0 has the full layout). */
+ * (alSynNew has the full layout). */
 typedef struct {
     /* 0x00 */ ALFilter filter;
     /* 0x14 */ s32 sourceCount;
