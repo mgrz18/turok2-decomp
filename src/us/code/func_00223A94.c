@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/world.h"
 #include "structs/intelligence.h"
 
 typedef struct Entity Entity;
@@ -21,12 +22,6 @@ struct Entity {
     /* 0x175 */ u8 pad175[0x28C - 0x175];
     /* 0x28C */ Entity *next;
 };
-
-typedef struct World {
-    /* 0x000 */ u8 pad0[0xDFC];
-    /* 0xDFC */ Entity *entities[0x40];
-    /* 0xEFC */ s32 entityCount;
-} World;
 
 typedef struct DamageEvent {
     /* 0x00 */ u8 pad0[0x18];
@@ -91,7 +86,7 @@ static __inline__ s32 inBlastRange(Entity *e, CVector3 *target) {
 
 /* A blast at `target`: damages every entity of the world and of the actor list, then damages
  * the current player when within 512 units. */
-void func_00223A94(World *world, CVector3 *target) {
+void func_00223A94(CWorld *world, CVector3 *target) {
     DamageEvent event;
     CVector3 d;
     Entity *e;
@@ -102,9 +97,9 @@ void func_00223A94(World *world, CVector3 *target) {
     s32 i;
     s32 strength;
 
-    count = world->entityCount;
+    count = world->m_nKind1;
     for (i = 0; i < count; i++) {
-        e = world->entities[i];
+        e = (Entity *)world->m_pKind1[i];
         strength = blastStrength(e, target);
         if (strength != 0) {
             func_00245828(&event, 0, strength << 8, 102.399994f, 0x400000, 0);

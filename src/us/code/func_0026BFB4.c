@@ -1,6 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AI/NAV/8027451C.CPP, cross_edges, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/region.h"
+
 
 /* A collision vertex with a floor and a ceiling height. */
 typedef struct {
@@ -10,19 +12,16 @@ typedef struct {
     /* 0xC */ f32 ceiling;
 } CeilingVertex;
 
-typedef struct {
-    /* 0x0 */ u8 pad0[2];
-    /* 0x2 */ u16 flags;
-    /* 0x4 */ CeilingVertex *vertices[3];
-} Triangle;
+/* A region's vertex seen with its ceiling height. */
+#define CEILING_VERTEX(tri, i) ((CeilingVertex *)(tri)->m_pVertices[i])
 
 extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
-extern Triangle *D_800B2600;    /* triangle of the cached ceiling normal */
+extern CGameRegion *D_800B2600;    /* triangle of the cached ceiling normal */
 extern CVector3 D_800F2000;        /* cached raw ceiling normal */
 
 /* Raw normal of a triangle's ceiling plane (straight down for none), cached for the last triangle. */
-CVector3 *func_0026BFB4(CVector3 *out, Triangle *tri) {
+CVector3 *func_0026BFB4(CVector3 *out, CGameRegion *tri) {
     CVector3 a;
     CVector3 b;
 
@@ -31,12 +30,12 @@ CVector3 *func_0026BFB4(CVector3 *out, Triangle *tri) {
         D_800F2000.z = 0;
         D_800F2000.y = -1.0f;
     } else if (tri != D_800B2600) {
-        a.x = tri->vertices[1]->x - tri->vertices[0]->x;
-        a.y = tri->vertices[1]->ceiling - tri->vertices[0]->ceiling;
-        a.z = tri->vertices[1]->z - tri->vertices[0]->z;
-        b.x = tri->vertices[2]->x - tri->vertices[1]->x;
-        b.y = tri->vertices[2]->ceiling - tri->vertices[1]->ceiling;
-        b.z = tri->vertices[2]->z - tri->vertices[1]->z;
+        a.x = CEILING_VERTEX(tri, 1)->x - CEILING_VERTEX(tri, 0)->x;
+        a.y = CEILING_VERTEX(tri, 1)->ceiling - CEILING_VERTEX(tri, 0)->ceiling;
+        a.z = CEILING_VERTEX(tri, 1)->z - CEILING_VERTEX(tri, 0)->z;
+        b.x = CEILING_VERTEX(tri, 2)->x - CEILING_VERTEX(tri, 1)->x;
+        b.y = CEILING_VERTEX(tri, 2)->ceiling - CEILING_VERTEX(tri, 1)->ceiling;
+        b.z = CEILING_VERTEX(tri, 2)->z - CEILING_VERTEX(tri, 1)->z;
         func_0020EFDC(&D_800F2000, &b, &a);
     }
     *out = D_800F2000;

@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/world.h"
 typedef struct ActorStats {
                u8 pad0[0x80];
                s8 unk80;
@@ -69,12 +70,6 @@ struct Actor {
 };
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
-typedef struct Rec14 {
-                 u8 pad0[0xE];
-                 u8 flags;
-                 u8 key;
-                 u8 pad10[0x4];
-} Rec14;
 typedef struct Entity {
                  u8 pad0[0x4];
                  s16 unk4s;
@@ -101,32 +96,26 @@ typedef struct Entity {
                  s8 unk23E;
                  u8 pad23F[0xA9];
 } Entity;
-typedef struct Level { /* Turok 2 layout */
-    u8 pad0[0x18FAC];
-    s32 unk18FAC;       /* palette index (Rage Wars: 0x1B410) */
-    s32 unk18FB0;       /* fade state (Rage Wars: 0x1B414) */
-    f32 unk18FB4;       /* fade timer (Rage Wars: 0x1B418) */
-} Level;
 typedef struct { f32 div; u8 r; u8 g; u8 b; u8 pad7; } Pal;
 void func_002883E0(u8 *a, u8 *col, s32 c, s32 d, s32 e, s32 f);
 extern Pal D_800ACDE8[];
 extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern u8 D_800F6CB0[];
-void func_00226024(Level *lv) {
+void func_00226024(CWorld *lv) {
     u8 col[4];
     f32 t;
     Pal *p;
-    s32 a = lv->unk18FB0;
+    s32 a = lv->m_WarpState;
     if (a != 0) {
       if (a >= 0) {
        if (a < 3) {
-        p = &D_800ACDE8[lv->unk18FAC];
+        p = &D_800ACDE8[lv->m_WarpFade];
         if (p->div != 0.0f) {
             col[0] = p->r;
             col[1] = p->g;
             col[2] = p->b;
-            t = lv->unk18FB4 * 255.0f / p->div;
+            t = lv->m_WarpTime * 255.0f / p->div;
             col[3] = (u32)t;
             func_002883E0(D_800F6CB0, col, 0, 0, D_800C2030, D_800C2034);
         }

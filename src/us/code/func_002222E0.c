@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "gfx.h"
+#include "structs/world.h"
 
 /* Draws the level geometry seen by one view: every static object and level
  * actor of the grid regions inside the view's box that is shown in this view
@@ -74,25 +75,6 @@ typedef struct {
 } Cell;
 
 typedef struct {
-    void **data;            /* 0x0 */
-    Cell *cell;             /* 0x4 */
-} Region;
-
-typedef struct {
-    u8 pad0[0x74];
-    IdTable *ids;           /* 0x0074 */
-    u8 pad78[0xAF4 - 0x78];
-    void *listed[0x40];     /* 0x0AF4 */
-    s32 listedCount;        /* 0x0BF4 */
-    u8 padBF8[0x1064 - 0xBF8];
-    s32 sortedCount;        /* 0x1064 */
-    void *sorted[0x40];     /* 0x1068 */
-    u8 pad1168[0x14A8 - 0x1168];
-    s32 regionCount;        /* 0x14A8 */
-    Region regions[128];    /* 0x14AC */
-} World;
-
-typedef struct {
     s32 mask;               /* 0x00 */
     u8 pad4[0xD];
     u8 unk11;               /* 0x11 */
@@ -102,7 +84,7 @@ extern ViewState D_8011AAE0;
 extern u8 D_8011AAF1;       /* D_8011AAE0.unk11 */
 extern s32 D_800B6D20;
 
-void func_00221D3C(World *);
+void func_00221D3C(CWorld *);
 CPlayer *func_00281194(View *);
 s32 func_00253720(CPlayer *, s32);
 void func_0020B5D4(void);
@@ -114,7 +96,7 @@ void func_00214D04(Object *, View *);
 void func_00214844(Object *, View *);
 void func_002152AC(Actor *);
 
-void func_002222E0(World *w, View *v_) {
+void func_002222E0(CWorld *w, View *v_) {
     register View *v asm("$18") = v_;
     u8 *base;
     void *grp;
@@ -130,8 +112,8 @@ void func_002222E0(World *w, View *v_) {
     s32 si;
     u16 *ip;
     Table *t;
-    Region *regions;
-    Region *region;
+    CWorldSector *regions;
+    CWorldSector *region;
     Cell *cell;
     Object *a;
     Actor *p;
@@ -150,7 +132,7 @@ void func_002222E0(World *w, View *v_) {
     }
     player = func_00281194(v);
     si = 0;
-    tbl = w->ids;
+    tbl = (IdTable *)w->m_pObjectTypes;
     cnt = tbl->count;
     ip = tbl->ids;
     if (cnt > 0) {
@@ -180,7 +162,7 @@ found:
         g->w1 = 0x100000;
     }
     func_0020B5D4();
-    w->sortedCount = 0;
+    w->m_nDeferred = 0;
     if (player != NULL && (player->m_ModeFlags & 0x100)) {
         {
             Gfx *g = D_800D8E24++;
@@ -226,18 +208,18 @@ found:
     }
     do {
         i = 0;
-        n = w->regionCount;
-        regions = w->regions;
+        n = w->m_nSectors;
+        regions = w->m_Sectors;
     } while (0);
     if (n > 0) {
         do {
             region = regions + i;
-            cell = region->cell;
+            cell = region->m_pBounds;
             if (cell->maxX > v->boxMin[0] && cell->minX < v->boxMax[0]
                 && cell->maxZ > v->boxMin[2] && cell->minZ < v->boxMax[2]) {
-                func_0020565C(0, region->data);
+                func_0020565C(0, region->m_hData);
                 k = 0;
-                grp = *region->data;
+                grp = *region->m_hData;
                 t = func_002017D4(grp, k);
                 cnt1 = t->count;
                 base = t->entries;
@@ -246,7 +228,7 @@ found:
                     do {
                         a = (Object *)(base + off);
                         if (a->info->flags & mask) {
-                            a->owner = region->data;
+                            a->owner = region->m_hData;
                             if (D_800B6D20 == 0) {
                                 func_00214D04(a, v);
                             }
@@ -256,17 +238,17 @@ found:
                                 && v->boxMax[1] > a->boxMin[1] && v->boxMin[1] < a->boxMax[1]
                                 && func_0026F60C(v->frustum, a->boxMin) != 0) {
                                 if ((a->flags & 8) && (a->id != idx || flag != 0)) {
-                                    c = w->listedCount;
+                                    c = w->m_nListed;
                                     if (c != 0x40) {
-                                        w->listed[c] = a;
-                                        w->listedCount = c + 1;
+                                        w->m_pListed[c] = (CGameObjectInstance *)a;
+                                        w->m_nListed = c + 1;
                                     }
                                 }
                                 if (a->flags & 4) {
-                                    c = w->sortedCount;
+                                    c = w->m_nDeferred;
                                     if (c != 0x40) {
-                                        w->sorted[c] = a;
-                                        w->sortedCount = c + 1;
+                                        w->m_pDeferred[c] = a;
+                                        w->m_nDeferred = c + 1;
                                     }
                                 } else {
                                     func_00214844(a, v);
@@ -293,10 +275,10 @@ found:
                                 && v->boxMax[1] > p->boxMin[1] && v->boxMin[1] < p->boxMax[1]
                                 && (fl & 2) && func_0026F60C(v->frustum, p->boxMin) != 0) {
                                 if (p->flags & 0x20) {
-                                    c = w->sortedCount;
+                                    c = w->m_nDeferred;
                                     if (c != 0x40) {
-                                        w->sorted[c] = p;
-                                        w->sortedCount = c + 1;
+                                        w->m_pDeferred[c] = p;
+                                        w->m_nDeferred = c + 1;
                                     }
                                 } else {
                                     func_002152AC(p);

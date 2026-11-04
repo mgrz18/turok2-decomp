@@ -1,18 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-/* A navigation region: a triangle with its three corners and the regions
- * across each edge. */
-typedef struct Region {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 flags;               /* 0x8000: visited by the search */
-    /* 0x04 */ CVector3 *corner[3];
-    /* 0x10 */ struct Region *neighbour[3];
-} Region;
+#include "structs/region.h"
 
 /* One step of a path, a node in the search's pool. */
 typedef struct PathNode {
-    /* 0x00 */ Region *region;
+    /* 0x00 */ CGameRegion *region;
     /* 0x04 */ struct PathNode *parent;
     /* 0x08 */ s32 count;
     /* 0x0C */ f32 cost;
@@ -21,9 +13,9 @@ typedef struct PathNode {
 /* The path search state (see func_002399F8). */
 typedef struct PathSearch {
     /* 0x000 */ CGameObjectInstance *obj;
-    /* 0x004 */ Region *startRegion;
+    /* 0x004 */ CGameRegion *startRegion;
     /* 0x008 */ CVector3 startPos;
-    /* 0x014 */ Region *goalRegion;
+    /* 0x014 */ CGameRegion *goalRegion;
     /* 0x018 */ CVector3 goalPos;
     /* 0x024 */ f32 bounds[4];          /* min x, min z, max x, max z */
     /* 0x034 */ u8 pool[0x960];
@@ -44,7 +36,7 @@ extern u8 D_800C894C;                   /* bottom of the stack */
 
 /* The search's working variables are globals, to keep the recursion's
  * frames small. */
-extern Region *D_800F19E0;              /* neighbour */
+extern CGameRegion *D_800F19E0;              /* neighbour */
 extern Candidate D_800F19F0[3];         /* candidates */
 extern Candidate *D_800F1A10[3];        /* candidates sorted by distance */
 extern Candidate *D_800F1A1C;           /* swap */
@@ -57,9 +49,9 @@ extern f32 D_800F1A3C;                  /* cost */
 extern s32 D_800F1A40;                  /* found */
 extern s32 D_800F1A44;                  /* passable */
 
-f32 func_0026B858(Region *from, Region *to);
-void func_0026CB2C(Region *region, CVector3 *centre);
-s32 func_0023B664(void *mover, Region *region, s32 edge, CVector3 *centre);
+f32 func_0026B858(CGameRegion *from, CGameRegion *to);
+void func_0026CB2C(CGameRegion *region, CVector3 *centre);
+s32 func_0023B664(void *mover, CGameRegion *region, s32 edge, CVector3 *centre);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 
 #define IN_BOUNDS(p) ((p)->x >= D_800F1A48->bounds[0] && (p)->x <= D_800F1A48->bounds[2] \
@@ -68,7 +60,7 @@ void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 /* Walks the region graph from region, depth first and nearest neighbour
  * first, appending a node for each step and keeping in path the cheapest
  * node that reached the start region. */
-void func_002393D0(PathNode *parent, Region *region) {
+void func_002393D0(PathNode *parent, CGameRegion *region) {
     s8 next[3];
     PathNode *node;
 
@@ -78,7 +70,7 @@ void func_002393D0(PathNode *parent, Region *region) {
     if (D_800F1A48->nodeCount >= 150) {
         return;
     }
-    if (!(IN_BOUNDS(region->corner[0]) || IN_BOUNDS(region->corner[1]) || IN_BOUNDS(region->corner[2]))) {
+    if (!(IN_BOUNDS(region->m_pVertices[0]) || IN_BOUNDS(region->m_pVertices[1]) || IN_BOUNDS(region->m_pVertices[2]))) {
         return;
     }
     if (parent != NULL) {
@@ -106,13 +98,13 @@ void func_002393D0(PathNode *parent, Region *region) {
     }
     D_800F1A20 = 0;
     D_800F1A24 = 0;
-    region->flags |= 0x8000;
+    region->m_wFlags |= 0x8000;
     do {
-        D_800F19E0 = region->neighbour[D_800F1A24];
-        if (D_800F19E0 != NULL && !(D_800F19E0->flags & 0x8000)) {
+        D_800F19E0 = region->m_pNeighbours[D_800F1A24];
+        if (D_800F19E0 != NULL && !(D_800F19E0->m_wFlags & 0x8000)) {
             D_800F1A40 = 0;
             for (D_800F1A2C = 0; D_800F1A2C < 3; D_800F1A2C++) {
-                if (D_800F19E0->neighbour[D_800F1A2C] == region) {
+                if (D_800F19E0->m_pNeighbours[D_800F1A2C] == region) {
                     D_800F1A40 = 1;
                     break;
                 }
@@ -175,12 +167,12 @@ void func_002393D0(PathNode *parent, Region *region) {
             break;
     }
     if (next[0] != -1) {
-        func_002393D0(node, region->neighbour[next[0]]);
+        func_002393D0(node, region->m_pNeighbours[next[0]]);
     }
     if (next[1] != -1) {
-        func_002393D0(node, region->neighbour[next[1]]);
+        func_002393D0(node, region->m_pNeighbours[next[1]]);
     }
     if (next[2] != -1) {
-        func_002393D0(node, region->neighbour[next[2]]);
+        func_002393D0(node, region->m_pNeighbours[next[2]]);
     }
 }

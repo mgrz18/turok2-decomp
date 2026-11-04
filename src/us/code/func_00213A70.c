@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00278530.c, func_00278530, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/world.h"
 
 typedef struct Box3 {
     CVector3 mn;
@@ -23,17 +24,11 @@ typedef struct WTab {
 } WTab;
 
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
-typedef struct M5Ent { s32 **a; M5Cell *cell; } M5Ent;
-typedef struct M5Grid {
-    /* 0x0000 */ u8 pad0[0x14A8];
-    /* 0x14A8 */ s32 n;
-    /* 0x14AC */ M5Ent ent[1];
-} M5Grid;
 
 extern char D_800A57B8[];
 extern s32 D_800ACAE0;
 extern CVector3 D_800DD790[];
-extern M5Grid D_800F7078;
+extern CWorld D_800F7078;
 extern s32 D_8011AAD8;
 
 void *func_002017D4(void *file, s32 index);
@@ -120,7 +115,7 @@ s32 **func_00213A70(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
     s32 magic;
     s32 *copySrc;
     s32 copySize;
-    M5Grid *g;
+    CWorld *g;
 
     colors = NULL;
     ret = findRecords(box, regions, recs, &count);
@@ -175,8 +170,8 @@ s32 **func_00213A70(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
     }
     n = 0;
     g = &D_800F7078;
-    for (k = 0; k < g->n; k++) {
-        n += ((s32 *) func_002017D4(*g->ent[k].a, 2))[1];
+    for (k = 0; k < g->m_nSectors; k++) {
+        n += ((s32 *) func_002017D4(*g->m_Sectors[k].m_hData, 2))[1];
     }
     if (n != 0) {
         goto done;

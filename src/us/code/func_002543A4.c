@@ -1,18 +1,12 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game_object.h"
-
-/* The region the player is in, as read here (flags at 0x52, as in
- * func_0024E9D0.c). */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x52];
-    /* 0x52 */ u16 flags52;
-} RegionInfo;
+#include "structs/region.h"
 
 void func_00254430(void *, void *);                 /* extern */
 void func_00254584(void *, void *);                 /* extern */
 
-void func_002543A4(CPlayer *arg0, CGameObjectInstance *arg1, RegionInfo *arg2)
+void func_002543A4(CPlayer *arg0, CGameObjectInstance *arg1, CRegionInfo *arg2)
 {
   int new_var;
   s32 temp_s0;
@@ -21,7 +15,7 @@ void func_002543A4(CPlayer *arg0, CGameObjectInstance *arg1, RegionInfo *arg2)
   if (arg2 != 0)
   {
     temp_v1 = arg1->m_AI.m_dwFlags;
-    temp_s2 = arg2->flags52 & 2;
+    temp_s2 = arg2->m_wFlags52 & 2;
     new_var = temp_v1 & 0x100;
     temp_s0 = temp_v1 & 0x80;
     if (temp_s0 == 0)

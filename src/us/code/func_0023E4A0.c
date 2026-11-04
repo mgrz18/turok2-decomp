@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/world.h"
 
 typedef struct SweepDef {
     /* 0x00 */ s32 flags;
@@ -40,13 +41,7 @@ typedef struct SweepBox {
     /* 0x2C */ s32 flag;
 } SweepBox;
 
-typedef struct World {
-    /* 0x000 */ u8 pad0[0xEC];
-    /* 0x0EC */ SweepInst *draw[0x200];
-    /* 0x8EC */ s32 drawCount;
-} World;
-
-extern World D_800F7078;
+extern CWorld D_800F7078;
 extern s32 D_800F7964;
 extern SweepDef D_800F1C60;
 
@@ -65,7 +60,7 @@ void func_0023E4A0(Sweep *sweep) {
     SweepInst *inst;
     SweepDef *def;
     SweepInst *other;
-    World *world;
+    CWorld *world;
     s32 count;
     f32 x;
     f32 z;
@@ -94,7 +89,7 @@ void func_0023E4A0(Sweep *sweep) {
     b->maxZ = MAX(sweep->endZ, z) + box.radius;
     world = &D_800F7078;
     for (i = 0; i < count; i++) {
-        other = world->draw[i];
+        other = (SweepInst *)world->m_pDrawActors[i];
         if (other == inst || def->active == 0) {
             continue;
         }

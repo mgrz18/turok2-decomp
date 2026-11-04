@@ -1,12 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct WarpPoint {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ f32 angle;
-    /* 0x10 */ s16 level;
-    /* 0x12 */ s16 room;
-} WarpPoint; /* size 0x14 */
+#include "structs/world.h"
 
 /* Turok 2: the mode block sits at 0x23FD0 (see func_00288E58). */
 typedef struct GameSession {
@@ -31,14 +25,14 @@ typedef struct MatchState {
 extern char D_800F7078[];
 extern MatchState D_8011ACB0;
 
-s32 func_0042C194(void *world, s32 arg1, s32 id, WarpPoint *out, s32 max);
+s32 func_0042C194(void *world, s32 arg1, s32 id, CWarpPoint *out, s32 max);
 
 /* Resets the match state and asks the session for mode 13 at warp `warp` (0 if the
  * world has no such warp point). */
 /* The two do/while(0) blocks (macro-like groups in the original?) give the ROM's register choice
  * and store order. */
 void func_00430454(GameSession *session, s32 warp) {
-    WarpPoint point;
+    CWarpPoint point;
 
     if (func_0042C194(D_800F7078, -1, warp, &point, 1) == 0) {
         warp = 0;

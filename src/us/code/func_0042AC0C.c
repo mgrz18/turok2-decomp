@@ -3,58 +3,10 @@
  * func_002532A8 result and the actor array keeps the last loop's load in $v0, `actor += 0x288` gives the player
  * loop its register order, and the sound switch with one shared call keeps w in $s3. */
 #include "common.h"
+#include "structs/world.h"
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
-
-typedef struct World {
-    /* 0x00000 */ s32 state;
-    /* 0x00004 */ u8 pad4[0x8];
-    /* 0x0000C */ s32 file;
-    /* 0x00010 */ u8 pad10[0x10];
-    /* 0x00020 */ s32 infoKey;
-    /* 0x00024 */ u8 pad24[0x14];
-    /* 0x00038 */ s32 *levelCount;
-    /* 0x0003C */ u8 pad3C[0x10];
-    /* 0x0004C */ void *levelFile;
-    /* 0x00050 */ void *info;
-    /* 0x00054 */ void *collision;
-    /* 0x00058 */ void *matrices;
-    /* 0x0005C */ u8 pad5C[0x38];
-    /* 0x00094 */ s32 *paths;
-    /* 0x00098 */ void **indexBlock;
-    /* 0x0009C */ void **matrixBlock;
-    /* 0x000A0 */ void **collisionBlock;
-    /* 0x000A4 */ void **infoBlock;
-    /* 0x000A8 */ void **boundsBlock;
-    /* 0x000AC */ void **sectionsBlock;
-    /* 0x000B0 */ void **actorBlock;
-    /* 0x000B4 */ void **linksBlock;
-    /* 0x000B8 */ u8 padB8[0x10];
-    /* 0x000C8 */ void **heapBlock;
-    /* 0x000CC */ void **pathsBlock;
-    /* 0x000D0 */ u8 heap[0x10];
-    /* 0x000E0 */ u8 *actors; /* LevelActor[], 0x288 bytes each */
-    /* 0x000E4 */ s32 firstActor;
-    /* 0x000E8 */ s32 actorCount;
-    /* 0x000EC */ u8 padEC[0x18B0 - 0xEC];
-    /* 0x018B0 */ u8 sub18B0[0x10518 - 0x18B0];
-    /* 0x10518 */ u8 actorPool[0x13B28 - 0x10518];
-    /* 0x13B28 */ u8 sub13B28[0x18E50 - 0x13B28];
-    /* 0x18E50 */ u8 *bounds;
-    /* 0x18E54 */ u8 pad18E54[0x8];
-    /* 0x18E5C */ u8 sub18E5C[0x40];
-    /* 0x18E9C */ u8 *sections;
-    /* 0x18EA0 */ s32 sectionCount;
-    /* 0x18EA4 */ u8 pad18EA4[0x18];
-    /* 0x18EBC */ u8 sub18EBC[0xE8];
-    /* 0x18FA4 */ s32 streamAll;
-    /* 0x18FA8 */ s32 level;
-    /* 0x18FAC */ u8 pad18FAC[0xC];
-    /* 0x18FB8 */ s32 announce;
-    /* 0x18FBC */ u8 pad18FBC[0x14];
-    /* 0x18FD0 */ s32 levelId;
-} World;
 
 extern char D_800A5EB4[]; /* "Matrices" */
 extern char D_800A5EC0[]; /* "level index" */
@@ -84,14 +36,14 @@ extern void **func_00204EDC(s32 unused, s32 size, s32 mode, char *name);
 extern void func_002052D8(s32 unused, void **block);
 extern void func_002053A8(s32);
 extern void **func_00205B94(s32 unused, void **out, s32 key, char *name);
-extern void **func_00205D0C(s32 unused, void *file, s32 index, s32 key, World *owner, void *callback, char *name);
+extern void **func_00205D0C(s32 unused, void *file, s32 index, s32 key, CWorld *owner, void *callback, char *name);
 extern void func_00206068(s32);
 extern void func_0021A344(u8 *actor);
 extern void func_0021E5D4(u8 *actor);
 extern void func_0021F1B4(u8 *actor);
-extern void func_0022629C(World *w, s32 level, void *out, s32 mask);
-extern void func_00226390(World *w);
-extern void func_00226724(World *w);
+extern void func_0022629C(CWorld *w, s32 level, void *out, s32 mask);
+extern void func_00226390(CWorld *w);
+extern void func_00226724(CWorld *w);
 extern void *func_002532A8(void *players);
 extern void func_002758DC(s32);
 extern void func_00275B58(void);
@@ -103,13 +55,13 @@ extern void func_0027ECF0(void *);
 extern s32 func_00284174(void);
 extern void func_00412B28(s32 sound);
 extern void func_00429F20(void *heap, void *data, s32 size);
-extern void func_0042AA80(World *w);
+extern void func_0042AA80(CWorld *w);
 extern s32 func_0042B3E4(s32, s32);
 extern s32 func_0042B6B0(s32, s32);
 extern s32 func_0042BA40(s32, s32);
-extern void func_0042BF48(World *w);
-extern void func_0042C79C(World *w);
-extern void func_0042C840(World *w);
+extern void func_0042BF48(CWorld *w);
+extern void func_0042C79C(CWorld *w);
+extern void func_0042C840(CWorld *w);
 extern void func_0042C96C(void);
 extern s32 func_0042CD04(s32, s32);
 extern void func_0042CF90(void *);
@@ -122,7 +74,7 @@ extern void func_0042EB04(void *);
 extern void func_0042EBBC(void *);
 extern void func_0042FEEC(void *);
 
-void func_0042AC0C(World *w, s32 level, s32 announce) {
+void func_0042AC0C(CWorld *w, s32 level, s32 announce) {
     void **block;
     u8 *data;
     u8 *player;
@@ -135,11 +87,11 @@ void func_0042AC0C(World *w, s32 level, s32 announce) {
     s32 count;
     s32 sound;
 
-    if (w->level != -1) {
+    if (w->m_nLevel != -1) {
         func_0042C96C();
     }
-    if (func_00284174() == 0 && func_0027BC34() == 0 && announce != 0 && w->announce != 0) {
-        switch (w->levelId) {
+    if (func_00284174() == 0 && func_0027BC34() == 0 && announce != 0 && w->m_bWarpSpawn != 0) {
+        switch (w->m_LevelID) {
             case 2000:
                 sound = 0x8E;
                 break;
@@ -162,10 +114,10 @@ void func_0042AC0C(World *w, s32 level, s32 announce) {
     }
 loaded:
     func_00226724(w);
-    w->state = 0;
+    w->m_Mode = 0;
     func_00201C08(D_800D6D68);
     func_002053A8(0);
-    if (w->level != -1) {
+    if (w->m_nLevel != -1) {
         ptr = func_002532A8(D_80119870);
         if (ptr != NULL) {
             func_0042EB04(ptr);
@@ -173,39 +125,39 @@ loaded:
         func_00275EFC(func_00275F7C());
         func_00275B58();
         func_002758DC(0x1000);
-        func_002052D8(0, w->indexBlock);
-        func_002052D8(0, w->matrixBlock);
-        func_002052D8(0, w->collisionBlock);
-        func_002052D8(0, w->infoBlock);
-        func_002052D8(0, w->boundsBlock);
-        func_002052D8(0, w->actorBlock);
-        func_002052D8(0, w->linksBlock);
-        func_002052D8(0, w->pathsBlock);
-        func_002052D8(0, w->sectionsBlock);
-        func_002052D8(0, w->heapBlock);
+        func_002052D8(0, w->m_hLevelIndex);
+        func_002052D8(0, w->m_hRegionData);
+        func_002052D8(0, w->m_hCollision);
+        func_002052D8(0, w->m_hLevelInfo);
+        func_002052D8(0, w->m_hLevelHeader);
+        func_002052D8(0, w->m_hActors);
+        func_002052D8(0, w->m_hLinks);
+        func_002052D8(0, w->m_hPaths);
+        func_002052D8(0, w->m_hSections);
+        func_002052D8(0, w->m_hHeap);
     }
     func_002053A8(0);
     D_800B6D20 = 0;
     func_00206068(8);
     func_00226390(w);
-    func_0042D220(w->sub18B0, *w->paths);
-    func_0042CF90(w->actorPool);
-    func_0042D0A0(w->sub13B28);
+    func_0042D220(w->m_ParticleSystem, *w->m_pParticleEffects);
+    func_0042CF90(w->m_ActorPool);
+    func_0042D0A0(w->unk_13B28);
     func_0042D410(D_801102B8);
     CCollisionInfo__Reset();
-    func_0042D120(w->sub18EBC);
+    func_0042D120(w->unk_18EBC);
     func_00275BE8(D_800E6A90, D_800E68B0, 0xF);
     func_0042EBBC(D_801102B8 - 0x1C8);
-    if (*w->levelCount < level) {
-        level = *w->levelCount - 1;
+    if (*w->m_pLevels < level) {
+        level = *w->m_pLevels - 1;
         announce = 0;
     }
-    w->level = level;
+    w->m_nLevel = level;
     if (announce == 0) {
-        w->announce = 0;
+        w->m_bWarpSpawn = 0;
     }
-    func_0022629C(w, level, w->sub18E5C, 0x3F);
-    switch (w->levelId) {
+    func_0022629C(w, level, w->unk_18E5C, 0x3F);
+    switch (w->m_LevelID) {
         case 0x123A:
         case 0x1BBC:
         case 0x1C20:
@@ -216,13 +168,13 @@ loaded:
         case 0x1D4D:
         case 0x1DB1:
         case 0x1DB2:
-            w->streamAll = 1;
+            w->m_bStreamAll = 1;
             break;
         default:
-            w->streamAll = 0;
+            w->m_bStreamAll = 0;
             break;
     }
-    switch (w->levelId) {
+    switch (w->m_LevelID) {
         case 0x123A:
         case 0x1BBC:
         case 0x1C20:
@@ -245,41 +197,41 @@ loaded:
         size += 0x200;
     }
     block = func_00204EDC(0, size << 6, 3, D_800A5EB4);
-    w->heapBlock = block;
-    func_00429F20(w->heap, *block, size);
-    key = func_00201848(w->levelCount, w->file, level);
-    w->indexBlock = func_00205B94(0, &w->levelFile, key, D_800A5EC0);
-    block = func_00205D0C(0, w->levelFile, 1, key, w, func_0042B6B0, D_800A5ECC);
-    w->matrixBlock = block;
-    w->matrices = *block;
-    block = func_00205D0C(0, w->levelFile, 4, key, w, func_00200AE0, D_800A5ED8);
-    w->collisionBlock = block;
-    w->collision = *block;
-    w->infoKey = func_00201848(w->levelFile, key, 5);
-    w->infoBlock = func_00205B94(0, &w->info, w->infoKey, D_800A5EE4);
-    w->linksBlock = func_00205D0C(0, w->levelFile, 7, key, w, func_0042B3E4, D_800A5EF8);
-    w->pathsBlock = func_00205D0C(0, w->levelFile, 2, key, w, func_0042CD04, D_800A5F00);
-    block = func_00205D0C(0, w->levelFile, 0, key, w, NULL, D_800A5F0C);
-    w->boundsBlock = block;
-    w->bounds = *block;
+    w->m_hHeap = block;
+    func_00429F20(w->m_Heap, *block, size);
+    key = func_00201848(w->m_pLevels, w->m_LevelsKey, level);
+    w->m_hLevelIndex = func_00205B94(0, (void **)&w->m_pLevelFile, key, D_800A5EC0);
+    block = func_00205D0C(0, w->m_pLevelFile, 1, key, w, func_0042B6B0, D_800A5ECC);
+    w->m_hRegionData = block;
+    w->m_pRegionData = *block;
+    block = func_00205D0C(0, w->m_pLevelFile, 4, key, w, func_00200AE0, D_800A5ED8);
+    w->m_hCollision = block;
+    w->m_pCollision = *block;
+    w->m_LevelInfoKey = func_00201848(w->m_pLevelFile, key, 5);
+    w->m_hLevelInfo = func_00205B94(0, (void **)&w->m_pLevelInfo, w->m_LevelInfoKey, D_800A5EE4);
+    w->m_hLinks = func_00205D0C(0, w->m_pLevelFile, 7, key, w, func_0042B3E4, D_800A5EF8);
+    w->m_hPaths = func_00205D0C(0, w->m_pLevelFile, 2, key, w, func_0042CD04, D_800A5F00);
+    block = func_00205D0C(0, w->m_pLevelFile, 0, key, w, NULL, D_800A5F0C);
+    w->m_hLevelHeader = block;
+    w->m_pLevelHeader = *block;
     func_0042AA80(w);
-    D_800AB8A0 = (w->bounds[0x10] >> 2) & 1;
-    block = func_00205D0C(0, w->levelFile, 6, key, w, func_00200AE0, D_800A5F18);
-    w->sectionsBlock = block;
+    D_800AB8A0 = (w->m_pLevelHeader->m_Flags >> 2) & 1;
+    block = func_00205D0C(0, w->m_pLevelFile, 6, key, w, func_00200AE0, D_800A5F18);
+    w->m_hSections = block;
     data = *block;
-    w->sections = data + 8;
-    w->sectionCount = *(s32 *)(data + 4);
-    w->state = 1;
-    w->actors = NULL;
-    w->actorCount = 0;
-    w->actorBlock = func_00205D0C(0, w->levelFile, 3, key, w, func_0042BA40, D_800A5F24);
-    w->state = 2;
+    w->m_pSections = data + 8;
+    w->m_nSections = *(s32 *)(data + 4);
+    w->m_Mode = 1;
+    w->m_pActors = NULL;
+    w->m_nActors = 0;
+    w->m_hActors = func_00205D0C(0, w->m_pLevelFile, 3, key, w, func_0042BA40, D_800A5F24);
+    w->m_Mode = 2;
     func_0042C79C(w);
-    count = w->actorCount;
-    i = w->firstActor;
-    w->state = 3;
+    count = w->m_nActors;
+    i = w->m_nFirstActor;
+    w->m_Mode = 3;
     for (; i < count; i++) {
-        func_0021E5D4(w->actors + i * 0x288);
+        func_0021E5D4((u8 *)w->m_pActors + i * 0x288);
     }
     player = D_80119890;
     actor = player;
@@ -291,18 +243,18 @@ loaded:
         actor = player;
     }
     func_0042C840(w);
-    count = w->actorCount;
-    for (i = w->firstActor; i < count; i++) {
-        ptr = w->actors;
+    count = w->m_nActors;
+    for (i = w->m_nFirstActor; i < count; i++) {
+        ptr = (u8 *)w->m_pActors;
         p = ptr + i * 0x288;
         func_0021F1B4(p);
         func_0021A344(p);
     }
-    w->state = 4;
+    w->m_Mode = 4;
     func_0042E894(D_80119870);
     func_0042FEEC(D_80119870 + 0x40);
     func_0027ECF0(D_80119870 + 0x40);
-    if (D_80119870[0x1281] != 0 || w->streamAll != 0) {
+    if (D_80119870[0x1281] != 0 || w->m_bStreamAll != 0) {
         func_0042BF48(w);
     }
 }

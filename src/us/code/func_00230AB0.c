@@ -3,6 +3,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00281A70.c, func_00281A70.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "common.h"
+#include "structs/world.h"
 typedef struct B18Ent B18Ent;
 /* Turok 2 layout (Rage Wars offsets in parentheses). */
 struct B18Ent {
@@ -20,21 +22,16 @@ struct B18Ent {
     u8 pad528[0xDF8];
     B18Ent *next;       /* 0x1320 (0x16E0) */
 };
-typedef struct B18Mgr {
-    u8 pad0[0xDFC];
-    B18Ent *ents[0x40]; /* 0xDFC (0xE54) */
-    s32 count;          /* 0xEFC */
-} B18Mgr;
-extern B18Mgr D_800F7078[];
+extern CWorld D_800F7078[];
 extern B18Ent *D_80119890;
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_00230AB0(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     CVector3 d;
     s32 i;
     s32 cnt;
-    cnt = D_800F7078->count;
+    cnt = D_800F7078->m_nKind1;
     for (i = 0; i < cnt; i++) {
-        B18Ent *e = D_800F7078->ents[i];
+        B18Ent *e = (B18Ent *)D_800F7078->m_pKind1[i];
         if (e->health > 0) {
             func_0020EF2C(&d, &e->pos, &o->pos);
             if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {

@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct Triangle {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 *v[3];
-} Triangle;
+#include "structs/region.h"
 
 extern f32 D_800DD78C;
 
@@ -15,9 +11,9 @@ f32 func_002974C0(f32 x);   /* cosf */
 void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);    /* quaternion product */
 
 /* Heading of tri's edge from vertex i to the next one, seen from above. */
-static __inline__ f32 edgeHeading(Triangle *tri, s32 i) {
-    CVector3 *a = tri->v[i];
-    CVector3 *b = tri->v[(i + 1) % 3];
+static __inline__ f32 edgeHeading(CGameRegion *tri, s32 i) {
+    CVector3 *a = tri->m_pVertices[i];
+    CVector3 *b = tri->m_pVertices[(i + 1) % 3];
     f32 dx = b->x - a->x;
     f32 dz = b->z - a->z;
     f32 len = func_00298470(dx * dx + dz * dz);
@@ -34,7 +30,7 @@ static __inline__ f32 edgeHeading(Triangle *tri, s32 i) {
 }
 
 /* Orientation lying along tri's edge i: turned to its heading, then tipped a quarter turn. */
-CQuaternion func_0026AD94(Triangle *tri, s32 i) {
+CQuaternion func_0026AD94(CGameRegion *tri, s32 i) {
     CQuaternion heading;
     CQuaternion tilt;
     CQuaternion result;

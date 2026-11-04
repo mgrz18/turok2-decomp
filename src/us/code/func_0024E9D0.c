@@ -1,12 +1,5 @@
 #include "common.h"
-
-typedef struct Region {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ u32 flags;
-    /* 0x48 */ u8 pad48[0x52 - 0x48];
-    /* 0x52 */ u16 flags52;
-    /* 0x54 */ u16 flags54;
-} Region;
+#include "structs/region.h"
 
 typedef struct Player {
     /* 0x000 */ u8 pad0[0x6AA];
@@ -19,7 +12,7 @@ typedef struct Player {
 
 extern u32 D_8011AAD8;              /* cheat flags */
 
-Region *func_00268A2C(void *actor);
+CRegionInfo *func_00268A2C(void *actor);
 s32 func_0024E5F0(Player *player, void *actor, s32 state);
 
 static __inline__ s32 func_0024E9D0_isSpecial(Player *player) {
@@ -40,7 +33,7 @@ static __inline__ s32 func_0024E9D0_hasKey(Player *player, s32 i) {
  * key requirements (0x800 on the flags, 0x10 on flags54) the player meets.
  * Returns whether it did. */
 s32 func_0024E9D0(Player *player, void *actor) {
-    Region *region;
+    CRegionInfo *region;
 
     if (player->unkA9C > 0.0f) {
         return 0;
@@ -49,9 +42,9 @@ s32 func_0024E9D0(Player *player, void *actor) {
         return 0;
     }
     region = func_00268A2C(actor);
-    if (region != NULL && (region->flags52 & 0x1000)) {
-        if (!(region->flags & 0x800)) {
-            if (region->flags54 & 0x10) {
+    if (region != NULL && (region->m_wFlags52 & 0x1000)) {
+        if (!(region->m_dwFlags & 0x800)) {
+            if (region->m_wFlags54 & 0x10) {
                 goto second;
             }
             goto enter;
@@ -59,7 +52,7 @@ s32 func_0024E9D0(Player *player, void *actor) {
             if (func_0024E9D0_hasKey(player, 0)) {
                 goto enter;
             }
-            if (!(region->flags54 & 0x10)) {
+            if (!(region->m_wFlags54 & 0x10)) {
                 return 0;
             }
         }

@@ -1,12 +1,6 @@
 #include "common.h"
-#include "structs/vector.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[2];
-    /* 0x02 */ u16 flags;
-    /* 0x04 */ CVector3 *vertices[3];
-    /* 0x10 */ u8 pad10[0x20 - 0x10];
-} Triangle; /* 0x20 bytes */
+#include "structs/region.h"
+#include "structs/world.h"
 
 typedef struct {
     /* 0x00 */ f32 minX;
@@ -22,14 +16,9 @@ typedef struct {
     /* 0x08 */ TriGroup groups[1];
 } TriGroupList;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x58];
-    /* 0x58 */ void *level;
-} World;
-
 extern s32 D_800B6D54;          /* level loaded */
-extern World D_800F7078;
-extern Triangle *D_800B2608;    /* triangle of the cached raw normal */
+extern CWorld D_800F7078;
+extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
 extern CVector3 D_800F2020;        /* cached raw normal */
 
 extern void *func_002017D4(void *file, s32 index); /* a block of a file */
@@ -37,7 +26,7 @@ extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a
 extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
 /* func_0026BB9C, inlined: is (x, z) inside the XZ projection of the triangle? */
-static __inline__ s32 InTriangle(Triangle *tri, f32 x, f32 z) {
+static __inline__ s32 InTriangle(CGameRegion *tri, f32 x, f32 z) {
     s32 i, next;
     CVector3 *a, *b;
 
@@ -46,8 +35,8 @@ static __inline__ s32 InTriangle(Triangle *tri, f32 x, f32 z) {
     }
     for (i = 0; i < 3; i = next) {
         next = i + 1;
-        a = tri->vertices[i];
-        b = tri->vertices[next % 3];
+        a = tri->m_pVertices[i];
+        b = tri->m_pVertices[next % 3];
         if ((b->z - a->z) * (x - a->x) + (a->x - b->x) * (z - a->z) < 0.0f) {
             return 0;
         }
@@ -55,17 +44,17 @@ static __inline__ s32 InTriangle(Triangle *tri, f32 x, f32 z) {
     return 1;
 }
 
-static __inline__ void cross_edges(CVector3 *out, Triangle *tri) {
+static __inline__ void cross_edges(CVector3 *out, CGameRegion *tri) {
     CVector3 edge0;
     CVector3 edge1;
 
-    func_0020EF2C(&edge0, tri->vertices[1], tri->vertices[0]);
-    func_0020EF2C(&edge1, tri->vertices[2], tri->vertices[1]);
+    func_0020EF2C(&edge0, tri->m_pVertices[1], tri->m_pVertices[0]);
+    func_0020EF2C(&edge1, tri->m_pVertices[2], tri->m_pVertices[1]);
     func_0020EFDC(out, &edge0, &edge1);
 }
 
 /* func_0026BE60, inlined: height of a triangle's plane at (x, z). */
-static __inline__ f32 TriHeight(Triangle *tri, f32 x, f32 z) {
+static __inline__ f32 TriHeight(CGameRegion *tri, f32 x, f32 z) {
     CVector3 normal;
     CVector3 point;
 
@@ -78,21 +67,21 @@ static __inline__ f32 TriHeight(Triangle *tri, f32 x, f32 z) {
     normal = D_800F2020;
     D_800B2608 = tri;
     if (normal.y == 0.0f) {
-        return (tri->vertices[0]->y + tri->vertices[1]->y + tri->vertices[2]->y) * (1.0f / 3);
+        return (tri->m_pVertices[0]->y + tri->m_pVertices[1]->y + tri->m_pVertices[2]->y) * (1.0f / 3);
     }
-    point = *tri->vertices[0];
+    point = *tri->m_pVertices[0];
     return ((point.z - z) * normal.z + (point.x - x) * normal.x + point.y * normal.y) / normal.y;
 }
 
 /* The level triangle nearest below pos (other than skip), NULL if none. */
-Triangle *func_0026B4A4(Triangle *skip, CVector3 pos) {
-    World *world;
-    Triangle *tris;
+CGameRegion *func_0026B4A4(CGameRegion *skip, CVector3 pos) {
+    CWorld *world;
+    CGameRegion *tris;
     TriGroupList *list;
     TriGroup *groups;
     TriGroup *group;
-    Triangle *tri;
-    Triangle *best;
+    CGameRegion *tri;
+    CGameRegion *best;
     f32 bestDist;
     f32 h;
     f32 d;
@@ -105,8 +94,8 @@ Triangle *func_0026B4A4(Triangle *skip, CVector3 pos) {
         return NULL;
     }
     world = &D_800F7078;
-    tris = (Triangle *) ((u8 *) func_002017D4(world->level, 2) + 8);
-    list = func_002017D4(world->level, 3);
+    tris = (CGameRegion *) ((u8 *) func_002017D4(world->m_pRegionData, 2) + 8);
+    list = func_002017D4(world->m_pRegionData, 3);
     n = list->count;
     groups = list->groups;
     best = NULL;

@@ -1,11 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/region.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ u32 flags;
-} RegionInfo;
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -31,7 +27,7 @@ extern char D_800B66D0[];
 
 s32 func_00284174(void);
 s32 func_002548FC(CPlayer *p);
-RegionInfo *func_0022425C(void *level, void *region);
+CRegionInfo *func_0022425C(void *level, void *region);
 void func_00249118(CPlayer *p, HitSource *src, s32 arg3, s32 type);
 void func_0027FC2C(Game *game, void *camera, char *text);
 void func_0027580C(s32 sound);
@@ -50,7 +46,7 @@ void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     s32 old;
     f32 f;
     s32 check;
-    RegionInfo *info;
+    CRegionInfo *info;
     s32 prev;
     s32 health;
     s32 dead;
@@ -92,7 +88,7 @@ void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     }
     if (check && p->m_CharacterActor.header.m_pCurrentRegion != NULL) {
         info = func_0022425C(D_800F7078, ((void *)p->m_CharacterActor.header.m_pCurrentRegion));
-        if (info != NULL && (info->flags & 0x400000)) {
+        if (info != NULL && (info->m_dwFlags & 0x400000)) {
             return;
         }
     }

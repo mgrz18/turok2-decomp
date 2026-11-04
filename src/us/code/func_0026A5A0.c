@@ -1,19 +1,14 @@
 #include "common.h"
-#include "structs/vector.h"
+#include "structs/region.h"
 
-typedef struct Triangle {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 *v[3];
-} Triangle;
-
-extern Triangle *D_800B2608;    /* triangle whose normal is cached */
+extern CGameRegion *D_800B2608;    /* triangle whose normal is cached */
 extern CVector3 D_800F2020;         /* its normal */
 
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
 void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
 
 /* tri's face normal, cached for the last triangle asked about; straight up without one. */
-static __inline__ CVector3 triNormal(Triangle *tri) {
+static __inline__ CVector3 triNormal(CGameRegion *tri) {
     CVector3 edge1;
     CVector3 edge2;
 
@@ -22,8 +17,8 @@ static __inline__ CVector3 triNormal(Triangle *tri) {
         D_800F2020.z = 0.0f;
         D_800F2020.y = 1.0f;
     } else if (tri != D_800B2608) {
-        func_0020EF2C(&edge1, tri->v[1], tri->v[0]);
-        func_0020EF2C(&edge2, tri->v[2], tri->v[1]);
+        func_0020EF2C(&edge1, tri->m_pVertices[1], tri->m_pVertices[0]);
+        func_0020EF2C(&edge2, tri->m_pVertices[2], tri->m_pVertices[1]);
         func_0020EFDC(&D_800F2020, &edge1, &edge2);
     }
     D_800B2608 = tri;
@@ -35,7 +30,7 @@ static __inline__ CVector3 triNormal(Triangle *tri) {
  * *t gets the fraction along the segment (1 when moving away from the plane);
  * returns whether the crossing lies strictly between the ends.
  */
-s32 func_0026A5A0(Triangle *tri, CVector3 *from, CVector3 *to, f32 *t) {
+s32 func_0026A5A0(CGameRegion *tri, CVector3 *from, CVector3 *to, f32 *t) {
     CVector3 normal;
     CVector3 dir;
     CVector3 v;
@@ -46,7 +41,7 @@ s32 func_0026A5A0(Triangle *tri, CVector3 *from, CVector3 *to, f32 *t) {
     normal = triNormal(tri);
     func_0020EF2C(&dir, to, from);
     if (tri != NULL) {
-        v = *tri->v[0];
+        v = *tri->m_pVertices[0];
     } else {
         v.x = v.y = v.z = 0.0f;
     }

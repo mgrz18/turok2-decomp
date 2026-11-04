@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/world.h"
 typedef struct ActorStats {
                u8 pad0[0x80];
                s8 unk80;
@@ -71,36 +72,22 @@ typedef struct DlCmd {
 } DlCmd;
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
-typedef struct Rec14 {
-                 u8 pad0[0xE];
-                 u8 flags;
-                 u8 key;
-                 u8 pad10[0x4];
-} Rec14;
 typedef struct Entity { /* Turok 2 layout */
     u8 pad0[0xD4];
     u32 flags;          /* 0xD4 (Rage Wars: 0x100) */
 } Entity;
-typedef struct Level { /* Turok 2 layout: these tables sit 0x58 earlier than in Rage Wars */
-    u8 pad0[0xBF8];
-    Entity *actors[128];    /* 0xBF8 */
-    s32 numActors;          /* 0xDF8 */
-    u8 padDFC[0x268];
-    s32 cnt1064;            /* 0x1064 */
-    Entity *arr1068[64];    /* 0x1068: deferred (flag 4) actors */
-} Level;
 void func_0020B5D4();
 void func_0020B624(void);
 void func_0021D39C(Entity *e, s32 a);
 extern DlCmd *D_800D8E24;
-void func_00223F8C(Level *lv, s32 arg) {
+void func_00223F8C(CWorld *lv, s32 arg) {
     DlCmd *g;
     s32 i;
     s32 n;
     s32 c;
     Entity **arr;
     func_0020B5D4();
-    n = lv->numActors;
+    n = lv->m_nRegistered;
     g = D_800D8E24++;
     g->w0 = 0xDB040004;
     g->w1 = 5;
@@ -113,14 +100,14 @@ void func_00223F8C(Level *lv, s32 arg) {
     g = D_800D8E24++;
     g->w0 = 0xDB04001C;
     g->w1 = 0xFFFB;
-    arr = (Entity **)lv->actors;
+    arr = (Entity **)lv->m_pRegistered;
     for (i = 0; i < n; i++) {
         Entity *e = arr[i];
         if (e->flags & 4) {
-            c = lv->cnt1064;
+            c = lv->m_nDeferred;
             if (c != 0x40) {
-                lv->arr1068[c] = e;
-                lv->cnt1064 = c + 1;
+                lv->m_pDeferred[c] = e;
+                lv->m_nDeferred = c + 1;
             }
         } else {
             func_0021D39C(e, arg);

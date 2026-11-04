@@ -1,17 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-/* A navigation region: a triangle with its three corners and the regions
- * across each edge. */
-typedef struct Region {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ CVector3 *corner[3];
-    /* 0x10 */ struct Region *neighbour[3];
-} Region;
+#include "structs/region.h"
 
 /* One step of the path found, a list node. */
 typedef struct PathNode {
-    /* 0x00 */ Region *region;
+    /* 0x00 */ CGameRegion *region;
     /* 0x04 */ struct PathNode *next;
     /* 0x08 */ s32 count;
 } PathNode;
@@ -19,9 +12,9 @@ typedef struct PathNode {
 /* The path search state, kept on the stack and reached through D_800F1A48. */
 typedef struct PathSearch {
     /* 0x000 */ CGameObjectInstance *obj;
-    /* 0x004 */ Region *startRegion;
+    /* 0x004 */ CGameRegion *startRegion;
     /* 0x008 */ CVector3 startPos;
-    /* 0x014 */ Region *goalRegion;
+    /* 0x014 */ CGameRegion *goalRegion;
     /* 0x018 */ CVector3 goalPos;
     /* 0x024 */ f32 bounds[4];          /* min x, min z, max x, max z */
     /* 0x034 */ u8 pool[0x960];
@@ -41,17 +34,17 @@ typedef struct PathSearch {
 extern u32 D_800B6D20;
 extern PathSearch *D_800F1A48;
 
-void func_0026CB2C(Region *region, CVector3 *centre);
+void func_0026CB2C(CGameRegion *region, CVector3 *centre);
 void func_0026CDAC(f32 *bounds, s32 count, CVector3 *points);
-void func_0026CC0C(Region *region);
-s32 func_002393D0(s32, Region *);
+void func_0026CC0C(CGameRegion *region);
+s32 func_002393D0(s32, CGameRegion *);
 
 /* Searches a path of regions from obj to goalRegion (func_002393D0,
  * func_0026CC0C) and puts in *out the centre of the region to head for.
  * Returns 0 if no path was found. */
-s32 func_002399F8(CGameObjectInstance *obj, CVector3 goal, Region *goalRegion, s32 arg, CVector3 *out) {
+s32 func_002399F8(CGameObjectInstance *obj, CVector3 goal, CGameRegion *goalRegion, s32 arg, CVector3 *out) {
     PathSearch search;
-    Region *region;
+    CGameRegion *region;
     PathNode *node;
     CVector3 pos;
     s32 i;
@@ -84,7 +77,7 @@ s32 func_002399F8(CGameObjectInstance *obj, CVector3 goal, Region *goalRegion, s
     D_800F1A48->bounds[1] = obj->header.m_vPos.z - 5120.0f;
     D_800F1A48->bounds[3] = obj->header.m_vPos.z + 5120.0f;
     do {
-        func_0026CDAC(D_800F1A48->bounds, 1, region->corner[i]);
+        func_0026CDAC(D_800F1A48->bounds, 1, region->m_pVertices[i]);
         i++;
     } while (i < 3);
     D_800F1A48->obj2 = obj;

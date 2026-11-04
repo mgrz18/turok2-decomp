@@ -1,6 +1,7 @@
 #include "common.h"
 #include "rw/abu_types.h"
 #include "structs/vector.h"
+#include "structs/world.h"
 
 /* The second VM module's copy of src/us/code/func_0040F240.c, byte for byte,
  * at the same link address (named 0x448240-0x44C228, linked 0x40F240-0x413228):
@@ -102,17 +103,6 @@ typedef struct {
     /* 0x0FC */ f32 yaw;
 } Cinema;
 
-/* The world block around the cinema's resources. */
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x24];
-    /* 0x0024 */ s32 trackLookup;
-    /* 0x0028 */ u8 pad28[0x60 - 0x28];
-    /* 0x0060 */ s32 *trackBundle;
-    /* 0x0064 */ u8 pad64[0x1178 - 0x64];
-    /* 0x1178 */ u8 *recA;     /* object records (0x11D0 in Rage Wars) */
-    /* 0x117C */ u8 *recB;
-} World;
-
 /* A track header: its stride and record count, the records after it. */
 typedef struct {
     /* 0x00 */ s32 stride;
@@ -140,7 +130,7 @@ extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern Gfx *D_800D8E24;
 /* An array to GCC: a function that reads two of its fields keeps its address in one register. */
-extern World D_800F7078[];
+extern CWorld D_800F7078[];
 extern s32 D_800F709C;  /* D_800F7078.trackLookup */
 extern s32 *D_800F70D8; /* D_800F7078.trackBundle */
 extern Actor *D_80119890; /* current player */
@@ -463,7 +453,7 @@ s32 func_00448D6C(s32 index) {
     s32 pending;
     s32 loaded;
     Actor *captured;
-    World *resources;
+    CWorld *resources;
     s32 **owner;
     s32 **table;
     CueList *cues;
@@ -476,14 +466,14 @@ s32 func_00448D6C(s32 index) {
     captured = D_80119890;
     pending = D_800C1BB0->field58;
     resources = D_800F7078;
-    if (resources->trackLookup == 0 || resources->trackBundle == 0) {
+    if (resources->m_CinemasKey == 0 || resources->m_pCinemas == 0) {
     failed:
         return 0;
     } else {
         if (D_800C1BB0->active != 0) {
             func_0028441C();
         }
-        loaded = func_0020185C(resources->trackBundle, resources->trackLookup, index + 1, &size);
+        loaded = func_0020185C(resources->m_pCinemas, resources->m_CinemasKey, index + 1, &size);
         owner = func_0020367C(0, loaded, size, 0x13, 0, func_004489F4, "Cinema", 1);
         if (owner == NULL) {
             goto failed;
@@ -1245,9 +1235,9 @@ s32 func_0044B66C(void) {
     for (i = 0; i < cnt; i++) {
         e = &ents[i];
         if (e->unk4 == 0) {
-            k = (CueObject *)(D_800F7078->recA + e->unk8 * 20);
+            k = (CueObject *)(D_800F7078->m_pRecords + e->unk8);
         } else {
-            k = (CueObject *)(D_800F7078->recB + e->unk8 * 20);
+            k = (CueObject *)(D_800F7078->m_pAltRecords + e->unk8);
         }
         if (func_0044C1B0(k) != 0) {
             any = 1;
@@ -1264,7 +1254,7 @@ typedef struct {
 
 s32 func_00284174(void);
 void func_0026E210(CueObject *k);
-void func_00224A68(World *g, CueObject *k, s32 z);
+void func_00224A68(CWorld *g, CueObject *k, s32 z);
 
 void func_0044B798(void) {
     f32 now = D_800C1BB0->time;
@@ -1295,9 +1285,9 @@ void func_0044B798(void) {
                         }
                     }
                     if (e->unk4 == 0) {
-                        k = (CueObject *)(D_800F7078->recA + e->unk8 * 20);
+                        k = (CueObject *)(D_800F7078->m_pRecords + e->unk8);
                     } else {
-                        k = (CueObject *)(D_800F7078->recB + e->unk8 * 20);
+                        k = (CueObject *)(D_800F7078->m_pAltRecords + e->unk8);
                     }
                     if (func_0044C1B0(k) != 0) {
                         func_0044B314(0, k);
@@ -1454,7 +1444,6 @@ void *func_0044BE1C(void) {
 s32 func_0044BE44(s32 arg0) {
     return arg0 + 8;
 }
-
 u32 func_0044BE4C(u8 *bits, s32 index) {
     s32 byte = index >> 3;
     u32 mask;
@@ -1516,9 +1505,9 @@ s32 func_0044BF74(void) {
 s32 **func_0044BF88(void) {
     s32 size;
     s32 loaded;
-    World *resources = D_800F7078;
+    CWorld *resources = D_800F7078;
 
-    loaded = func_0020185C(resources->trackBundle, resources->trackLookup, 0, &size);
+    loaded = func_0020185C(resources->m_pCinemas, resources->m_CinemasKey, 0, &size);
     if (loaded == 0) {
         return NULL;
     }

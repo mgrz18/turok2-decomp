@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_13.CPP, func_8044C7B8_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/world.h"
 #include "structs/player.h"
 
 typedef struct LevelRecord {
@@ -39,28 +40,6 @@ typedef struct Handle {
     void *data;
 } Handle;
 
-typedef struct Placed {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ f32 angle;
-    /* 0x10 */ s16 kind;
-    /* 0x12 */ s16 id;
-} Placed; /* 0x14 */
-
-typedef struct World {
-    /* 0x00000 */ u8 pad0[0xE0];
-    /* 0x000E0 */ LevelActor *objects;
-    /* 0x000E4 */ s32 playerCount;
-    /* 0x000E8 */ s32 objectCount;
-    /* 0x000EC */ u8 padEC[0xF00 - 0xEC];
-    /* 0x00F00 */ s32 unkF00;
-    /* 0x00F04 */ u8 padF04[0x18FA8 - 0xF04];
-    /* 0x18FA8 */ s32 group;
-    /* 0x18FAC */ u8 pad18FAC[0x18FB8 - 0x18FAC];
-    /* 0x18FB8 */ s32 spawnsReady;
-    /* 0x18FBC */ u8 spawnInfo[0x18FD0 - 0x18FBC];
-    /* 0x18FD0 */ s32 spawnKey;
-} World;
-
 extern CVector3 D_80119928;
 extern s32 D_80119948;
 
@@ -68,14 +47,14 @@ extern CPlayer *D_80119874;
 extern s32 D_80119878;
 
 extern s32 func_00200B00(Handle **handle, s32);
-extern s32 func_002242F8(World *world, s32);
+extern s32 func_002242F8(CWorld *world, s32);
 extern Handle *func_00205D7C(s32, Handle **handle, s32 size);
 extern void func_0020192C(LevelNode *node, void *data, s32);
-extern s32 func_0042C560(World *world, CVector3 *pos, s32 group, void *info);
-extern s32 func_0042C194(World *world, s32 group, s32 key, Placed *out, s32 max);
-extern s32 *func_00225E88(World *world, u16 id);
+extern s32 func_0042C560(CWorld *world, CVector3 *pos, s32 group, void *info);
+extern s32 func_0042C194(CWorld *world, s32 group, s32 key, CWarpPoint *out, s32 max);
+extern s32 *func_00225E88(CWorld *world, u16 id);
 extern void func_0021E6AC(LevelActor *obj, LevelRecord *rec, s32 mode, s32 index);
-extern s32 func_00220A1C(World *world, CVector3 *pos);
+extern s32 func_00220A1C(CWorld *world, CVector3 *pos);
 extern void func_00210EF0(f32 *angle);
 extern void func_0042DA60(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00267DBC(LevelActor *obj);
@@ -88,8 +67,8 @@ extern void func_002057B0(s32, Handle **handle, Handle *block);
    the same definition. The spawn point is indexed afresh on each use and the position copied with
    memcpy (as in Rage Wars): both set loop.c's insn count and giv benefits, which decide the ROM's
    hoisting of the spawns base and of the angle constants. */
-void func_0042BA40(World *world, Handle **handle) {
-    Placed spawns[4];
+void func_0042BA40(CWorld *world, Handle **handle) {
+    CWarpPoint spawns[4];
     LevelActor *objects;
     s32 mode;
     Handle *block;
@@ -125,19 +104,19 @@ void func_0042BA40(World *world, Handle **handle) {
             hdr->count = n;
             records = node->records;
             objects = hdr->objects;
-            if (world->spawnsReady == 0) {
-                world->spawnKey = func_0042C560(world, &node->records[0].pos, world->group, world->spawnInfo);
-                if (world->spawnKey != 0) {
-                    world->spawnsReady = 1;
+            if (world->m_bWarpSpawn == 0) {
+                world->m_LevelID = func_0042C560(world, &node->records[0].pos, world->m_nLevel, &world->m_WarpSpawn);
+                if (world->m_LevelID != 0) {
+                    world->m_bWarpSpawn = 1;
                 }
             }
             spawnIndex = 0;
             nspawns = 0;
-            if (world->spawnsReady != 0) {
-                nspawns = func_0042C194(world, world->group, world->spawnKey, spawns, 4);
+            if (world->m_bWarpSpawn != 0) {
+                nspawns = func_0042C194(world, world->m_nLevel, world->m_LevelID, spawns, 4);
             }
-            world->objects = objects;
-            world->objectCount = n;
+            world->m_pActors = (CGameObjectInstance *)objects;
+            world->m_nActors = n;
             i = 0;
             if (i < n) {
                 objWalk = objects;
@@ -151,7 +130,7 @@ void func_0042BA40(World *world, Handle **handle) {
                     recWalk = rec + 1;
                 }
             }
-            world->playerCount = 0;
+            world->m_nFirstActor = 0;
             for (i = 0; i < n; i++) {
                 rec = &records[i];
                 obj = &objects[i];
@@ -159,16 +138,16 @@ void func_0042BA40(World *world, Handle **handle) {
                 if (*func_00225E88(world, rec->defId) != 0xB && i != 0) {
                     continue;
                 }
-                world->playerCount++;
+                world->m_nFirstActor++;
                 memcpy(&D_80119928, &rec->pos, sizeof(CVector3));
                 D_80119928.y += 204.79999f;
                 D_80119948 = func_00220A1C(world, &rec->pos);
                 for (playerIndex = 0; playerIndex < D_80119878; playerIndex++) {
                     player = &D_80119874[playerIndex];
                     if (nspawns != 0) {
-                        rec->spawnId = spawns[spawnIndex].id;
-                        func_00210EF0(&spawns[spawnIndex].angle);
-                        angle = spawns[spawnIndex].angle;
+                        rec->spawnId = spawns[spawnIndex].m_nID;
+                        func_00210EF0(&spawns[spawnIndex].m_RotY);
+                        angle = spawns[spawnIndex].m_RotY;
                         if (!(angle > 3.1415927f)) {
                             if (!(angle < -3.1415927f)) {
                                 if (!(angle > 3.1415927f)) {
@@ -183,7 +162,7 @@ void func_0042BA40(World *world, Handle **handle) {
                             value = 0x7FFF;
                         }
                         rec->angle = value;
-                        memcpy(&rec->pos, &spawns[spawnIndex].pos, sizeof(CVector3));
+                        memcpy(&rec->pos, &spawns[spawnIndex].m_vPos, sizeof(CVector3));
                         spawnIndex++;
                         if (spawnIndex >= nspawns) {
                             spawnIndex = 0;
@@ -192,14 +171,14 @@ void func_0042BA40(World *world, Handle **handle) {
                     func_0042DA60(player, rec, mode, i);
                 }
             }
-            for (i = world->playerCount; i < n; i++) {
+            for (i = world->m_nFirstActor; i < n; i++) {
                 obj = &objects[i];
                 best = 3.4028235e38f;
                 obj->owner = NULL;
                 if (func_00267DBC(obj) == 0) {
                     continue;
                 }
-                for (j = world->playerCount; j < n; j++) {
+                for (j = world->m_nFirstActor; j < n; j++) {
                     other = &objects[j];
                     if (*obj->def == *other->def && func_00267D94(other) != 0 && obj != other) {
                         if (obj->owner != NULL) {
@@ -217,6 +196,6 @@ void func_0042BA40(World *world, Handle **handle) {
             }
         }
         func_002057B0(0, handle, block);
-        world->unkF00 = 0;
+        world->m_Kind1Cursor = 0;
     }
 }

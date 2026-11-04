@@ -5,18 +5,10 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/world.h"
 struct LevelActor;
-struct Shared_World;
-struct CVector3_t;
 struct Box;
 typedef struct Box Box;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Box;
 struct Box {
     CVector3 min;
@@ -138,7 +130,6 @@ typedef struct StridedTable StridedTable;
 struct LevelActor;
 struct TableRecAt8;
 typedef struct TableRecAt8 TableRecAt8;
-struct Shared_World;
 struct TableRecAt8;
 struct TableRecAt8 {
     s32 unused;
@@ -203,122 +194,14 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-typedef struct WorldSector {
-    void *resource;
-    f32 *bounds;
-    u16 ids[2];
-} WorldSector;
-typedef struct Shared_World {
-    s32 mode;
-    u8 unknown4[8];
-    s32 challengeFile;
-    s32 challengeFileSize;
-    void **resourceHandle;
-    s32 resourceKey;
-    s32 resourceBank;
-    s32 unk20;
-    s32 indexedBank;
-    s32 lookupBank;
-    s32 resourceKindBank;
-    u8 unknown30[4];
-    s32 trackLookup;
-    u8 unknown38[0xC];
-    s32 noteCount;
-    u8 unknown48[4];
-    s32 *resourceDirectory;
-    s32 unk50;
-    s32 *indexedDirectory;
-    s32 *modelSections; /* 0x58 in Turok 2 */
-    s32 *resourceKindDirectory;
-    u8 unknown60[0xC];
-    s32 *unk6C;
-    s32 *objectSections;
-    s32 *trackBundle;
-    s32 *actorDefinitions;
-    s32 *routeCount;
-    void *bitSections;
-    void *secondaryLevels;
-    u8 unknown88[8];
-    void *placedObjectTable;
-    struct TableRecAt8 *modelIds;
-    StridedTable *lookupTable;
-    struct TableRecAt8 *resourceKindTable;
-    StridedTable *records;
-    StridedTable *stridedRecords;
-    u8 unknownA8[4];
-    StridedTable *actorRecords;
-    u8 unknownB0[0x38];
-    s32 resource;
-    u8 unknownEC[0x34];
-    s32 counter120;
-    s32 counter124;
-    u8 system128[0x10];
-    struct LevelActor *actors;
-    s32 actorCapacity;
-    s32 actorCount;
-    struct LevelActor *interactive[512];
-    s32 interactiveCount;
-    struct LevelActor *movers[128];
-    s32 moverCount;
-    struct LevelActor *queued[64];
-    s32 queuedCount;
-    struct LevelActor *registered[128];
-    s32 registeredCount;
-    struct LevelActor *kind1[64];
-    s32 kind1Count;
-    s32 kind1Cursor;
-    struct LevelActor *flagged[32];
-    s32 flaggedCount;
-    struct LevelActor *kind5[16];
-    s32 kind5Count;
-    struct LevelActor *model64F[32];
-    s32 model64FCount;
-    struct LevelActor *model64D[4];
-    s32 model64DCount;
-    s32 drawableCount;
-    void *drawables[64];
-    s32 recordCount;
-    s32 alternateRecordCount;
-    s32 * recordIndex;
-    s32 * alternateRecordIndex;
-    struct Record14 * recordArray;
-    struct Record14 * alternateRecordArray;
-    u8 unknown11D8[0x328];
-    s32 sectorEntryCount;
-    s32 sectorCount;
-    WorldSector sectors[128];
-    u8 system1B08[0x11778 - 0x1B08];
-    WorldRecAt3C08 system11778;
-    u8 unknown15384[4];
-    u8 effectPool[0x1B308 - 0x15388];
-    f32 elapsed;
-    u8 unknown1B30C[0xFC];
-    s32 visibilityEnabled;
-    s32 level;
-    s32 selectionState;
-    s32 frozen;
-    f32 selectionTimer;
-    s32 selectionFlags;
-    Shared_Placed selectionSpawn;
-    s32 selectionValues[4];
-    s32 previewState;
-    s32 previewTimer;
-    s32 previewStart;
-    u8 unknown1B450[0x1C4];
-    CVector3 offset;
-    struct Shared_Pickup *objects[16];
-    s32 count;
-    struct LevelActor *specialActors[16];
-    s32 specialActorCount;
-} Shared_World;
 void *func_002017D4(void *table, s32 index);
-u32 func_002242B4(Shared_World *arg0, s32 arg1) {
+u32 func_002242B4(CWorld *arg0, s32 arg1) {
     s32 offset;
     s32 result;
     if (arg1 == 0) {
         return -1;
     }
-    offset = ((char *)func_002017D4(arg0->modelSections, 2)) + 8;
+    offset = ((char *)func_002017D4(arg0->m_pRegionData, 2)) + 8;
     result = arg1 - offset;
     return (u32)result >> 5;
 }

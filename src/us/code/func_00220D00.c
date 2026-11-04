@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028795C.c, func_0028795C, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/world.h"
 
 /* Instantiates a level's actor data: from the level file's four tables
  * (two kinds of placed objects, the level actors, and a fourth kind of
@@ -45,25 +46,10 @@ typedef struct {
     u8 links[0x20];         /* 0x178 */
 } Actor;                                                               /* 0x198 */
 
-typedef struct {
-    u8 pad0[0x14];
-    s32 unk14;              /* 0x14 */
-    u8 pad18[0x28];
-    s32 unk40;              /* 0x40 */
-    u8 pad44[0x14];
-    void *unk58;            /* 0x58 */
-    u8 pad5C[0x10];
-    void *levels;           /* 0x6C */
-    u8 pad70[0x18E50 - 0x70];
-    f32 *scale;             /* 0x18E50 */
-    u8 pad18E54[0x18FA8 - 0x18E54];
-    s32 level;              /* 0x18FA8 */
-} World;
-
 s32 func_00200B00(s32 ***, s32);
 void *func_002017D4(void *, s32);
 void func_00201818(void *, s32);
-s32 func_00201848(s32, s32, u16);
+s32 func_00201848(s32 *, s32, u16);
 void **func_00205D7C(s32, s32 ***, s32);
 void func_002057B0(s32, s32 ***, void **);
 void func_0020192C(Table *, void *, s32);
@@ -74,7 +60,7 @@ void func_00211F64(ItemD *, SrcD *);
 f32 func_002671B4(Actor *);
 void func_00222A9C(void **, s32, f32 *, void *);
 
-void func_00220D00(World *world, s32 ***file) {
+void func_00220D00(CWorld *world, s32 ***file) {
     Table *tE;
     void *links[128];
     void **pp;
@@ -157,7 +143,7 @@ void func_00220D00(World *world, s32 ***file) {
             nv = tA->entries;
             ((Section *)sec)->stride = 0x90;
             ((Section *)sec)->count = n;
-            tAux = func_002017D4(world->unk58, 2);
+            tAux = func_002017D4(world->m_pRegionData, 2);
             pB = (SrcB *)tB->entries;
             itemsA = (ItemA *)((u8 *)block + 0x20);
             base = (u8 *)block;
@@ -166,7 +152,7 @@ void func_00220D00(World *world, s32 ***file) {
             i = 0;
             if (nA > 0) {
                 do {
-                    func_002141F0(&itemsA[i], &pA[i], func_00201848(world->unk40, world->unk14, pA[i].type), aux, *world->scale);
+                    func_002141F0(&itemsA[i], &pA[i], func_00201848(world->m_pObjects, world->m_ObjectsKey, pA[i].type), aux, world->m_pLevelHeader->m_Scale);
                     i++;
                 } while (i < nA);
             }
@@ -174,7 +160,7 @@ void func_00220D00(World *world, s32 ***file) {
                 qb = pB;
                 j = 0;
                 do {
-                    func_00214564(&itemsA[j + nA], qb, func_00201848(world->unk40, world->unk14, qb->type), aux);
+                    func_00214564(&itemsA[j + nA], qb, func_00201848(world->m_pObjects, world->m_ObjectsKey, qb->type), aux);
                     qb++;
                     j++;
                 } while (j < nB);
@@ -192,10 +178,10 @@ void func_00220D00(World *world, s32 ***file) {
             k = 0;
             if (nC > 0) {
                 do {
-                    func_002150C0(&actors[k], &pC[k], func_00201848(world->unk40, world->unk14, pC[k].type), aux);
+                    func_002150C0(&actors[k], &pC[k], func_00201848(world->m_pObjects, world->m_ObjectsKey, pC[k].type), aux);
                     index = actors[k].index;
-                    level = world->level;
-                    bits = func_002017D4(func_002017D4(func_002017D4(world->levels, 0), level), 1);
+                    level = world->m_nLevel;
+                    bits = func_002017D4(func_002017D4(func_002017D4(world->m_pBitSections, 0), level), 1);
                     do {
                     } while (0);
                     func_002017D4(bits, 0);

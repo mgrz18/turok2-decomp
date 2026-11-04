@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/world.h"
 
 /* Turok 2 layouts: only the fields used here (Rage Wars: pos 0x8, def 0x18, list at 0xF5C). */
 typedef struct Entity {
@@ -13,16 +14,11 @@ typedef struct Entity {
     u8 pad10[0x4];
     CIntelligence *def;      /* 0x14 */
 } Entity;
-typedef struct Level {
-    u8 pad0[0xF04];
-    Entity *arrF04[32]; /* 0xF04 */
-    s32 cntF84;         /* 0xF84 */
-} Level;
 f32 func_0026841C(Entity *e);
 f32 func_002671B4(Entity *e);
 s32 func_00265F90(Entity *e, u8 *p, Entity *me);
 void func_00243414(Entity *e, u8 *p, s32 a);
-void func_002233A8(Level *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
+void func_002233A8(CWorld *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
     s32 isB;
     s32 is1;
     f32 myBot;
@@ -58,8 +54,8 @@ void func_002233A8(Level *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
         is1 = kind == 1;
         myBot = me->pos.y + func_0026841C(me);
         myTop = myBot + func_002671B4(me);
-        for (i = 0; i < lv->cntF84; i++) {
-            e = lv->arrF04[i];
+        for (i = 0; i < lv->m_nFlagged; i++) {
+            e = (Entity *)lv->m_pFlagged[i];
             if (e != me) {
                 s4 = 0;
                 s1 = 0;

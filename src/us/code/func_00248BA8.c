@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/world.h"
 
 #define FALSE 0
 #define TRUE 1
@@ -7,13 +8,6 @@
 /* Puts the player at a warp point: unlocks/redirects level hub warps, marks
  * visited hubs, then picks the warp record (the one farthest from the other
  * players in multiplayer) and moves the player there. */
-
-typedef struct WarpPoint {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ f32 angle;
-    /* 0x10 */ s16 level;
-    /* 0x12 */ s16 room;
-} WarpPoint; /* size 0x14 */
 
 typedef struct WarpPlayer WarpPlayer;
 struct WarpPlayer {
@@ -56,29 +50,29 @@ extern GameState D_80119890;
 void func_0042EB04(void);
 s32 func_00285BD0(s32, s32);
 s32 func_00424A60(s32);
-s32 func_0042C194(void *, s32, s32, WarpPoint *, s32);
+s32 func_0042C194(void *, s32, s32, CWarpPoint *, s32);
 f32 func_0020F6BC(CVector3 *, CVector3 *);
 s32 func_002242F8(void *, s32);
 void func_0042DE74(WarpPlayer *);
 void func_0042C700(void *, s32, s32);
 
 /* Sum of the distances from a warp record to every active player. */
-static __inline__ f32 sumDistance(WarpPoint *r) {
+static __inline__ f32 sumDistance(CWarpPoint *r) {
     WarpPlayer *other;
     f32 dist;
 
     dist = 0.0f;
     for (other = D_80119890.players; other != NULL; other = other->next) {
         if (other->active) {
-            dist += func_0020F6BC(&r->pos, &other->pos);
+            dist += func_0020F6BC(&r->m_vPos, &other->pos);
         }
     }
     return dist;
 }
 
 void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
-    WarpPoint rec;
-    WarpPoint recs[32];
+    CWarpPoint rec;
+    CWarpPoint recs[32];
     s32 skip;
     s32 count;
     s32 best;
@@ -232,21 +226,21 @@ void func_00248BA8(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
             }
         }
         if (best != -1) {
-            pl->spawnPos = recs[best].pos;
+            pl->spawnPos = recs[best].m_vPos;
             pl->pos = pl->spawnPos;
-            pl->angle = pl->spawnAngle = recs[best].angle;
-            pl->room = pl->spawnRoom = func_002242F8(D_800F7078, recs[best].room);
+            pl->angle = pl->spawnAngle = recs[best].m_RotY;
+            pl->room = pl->spawnRoom = func_002242F8(D_800F7078, recs[best].m_nID);
             func_0042DE74(pl);
             return;
         }
     } else {
         do { /* a block of its own: it decides which of the two addresses gets $s0 */
-            if (func_0042C194(D_800F7078, -1, warp, &rec, 1) && rec.level == D_80110020 &&
+            if (func_0042C194(D_800F7078, -1, warp, &rec, 1) && rec.m_nLevel == D_80110020 &&
                 (D_80119890.multiplayer || D_8011001C)) {
-                pl->spawnPos = rec.pos;
+                pl->spawnPos = rec.m_vPos;
                 pl->pos = pl->spawnPos;
-                pl->angle = pl->spawnAngle = rec.angle;
-                pl->room = pl->spawnRoom = func_002242F8(D_800F7078, rec.room);
+                pl->angle = pl->spawnAngle = rec.m_RotY;
+                pl->room = pl->spawnRoom = func_002242F8(D_800F7078, rec.m_nID);
                 func_0042DE74(pl);
                 return;
             }

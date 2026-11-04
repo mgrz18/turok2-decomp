@@ -3,6 +3,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00277CC4.c, func_00277CC4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "common.h"
+#include "structs/world.h"
 typedef struct Box3 {
                 CVector3 mn;
                 CVector3 mx;
@@ -22,18 +24,12 @@ typedef struct WTab {
                 WRec r[1];
 } WTab;
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
-typedef struct M5Ent { s32 *a; M5Cell *cell; } M5Ent; /* 8 bytes in Turok 2 (12 in Rage Wars) */
-typedef struct M5Grid {
-    u8 pad0[0x14A8];
-    s32 n;          /* 0x14A8 */
-    M5Ent ent[1];   /* 0x14AC */
-} M5Grid;
-extern M5Grid D_800F7078;
+extern CWorld D_800F7078;
 void *func_002017D4();
 s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt)
 {
   s32 hashes[64];
-  M5Ent *list[64];
+  CWorldSector *list[64];
   s32 spare[64];
   s32 n;
   s32 ncell;
@@ -49,20 +45,20 @@ s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt)
   register M5Cell *c asm("$3");
   s32 *wp;
   s32 off;
-  M5Ent *e;
-  M5Grid *g;
+  CWorldSector *e;
+  CWorld *g;
   g = &D_800F7078;
   n = 0;
   ncell = 0;
   i = 0;
   ret = 0;
-  if (g->n > 0)
+  if (g->m_nSectors > 0)
   {
     off = 0x14AC;
     do
     {
-      e = (M5Ent *) (((u8 *) g) + off);
-      c = e->cell;
+      e = (CWorldSector *) (((u8 *) g) + off);
+      c = e->m_pBounds;
       if ((((c->x1 > q->mn.x) && (c->x0 < q->mx.x)) && (c->z1 > q->mn.z)) && (c->z0 < q->mx.z))
       {
         list[ncell] = e;
@@ -71,11 +67,11 @@ s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt)
       off += 8;
       i++;
     }
-    while (i < g->n);
+    while (i < g->m_nSectors);
   }
   if (ncell == 1)
   {
-    tab = func_002017D4(*list[0]->a, 2);
+    tab = func_002017D4(*list[0]->m_hData, 2);
     j = tab->count;
     j--;
     rec = tab->r;
@@ -106,7 +102,7 @@ s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt)
   {
     for (i = 0; i < ncell; i++)
     {
-      tab = func_002017D4(*list[i]->a, 2);
+      tab = func_002017D4(*list[i]->m_hData, 2);
       j = tab->count;
       j--;
       rec = tab->r;

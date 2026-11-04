@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/world.h"
 typedef struct ActorStats {
                u8 pad0[0x80];
                s8 unk80;
@@ -69,12 +70,6 @@ struct Actor {
 };
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
-typedef struct Rec14 {
-                 u8 pad0[0xE];
-                 u8 flags;
-                 u8 key;
-                 u8 pad10[0x4];
-} Rec14;
 typedef struct Entity {
                  u8 pad0[0x4];
                  s16 unk4s;
@@ -101,111 +96,8 @@ typedef struct Entity {
                  s8 unk23E;
                  u8 pad23F[0xA9];
 } Entity;
-typedef struct Level {
-                 s32 unk0;
-                 u8 pad4[0x18];
-                 s32 *unk1C;
-                 u8 *unk20;
-                 s32 *unk24;
-                 u8 *unk28;
-                 u8 *unk2C;
-                 u8 pad30[0x10];
-                 u8 unk40;
-                 u8 pad41[0xB];
-                 s32 *unk4C;
-                 s32 *unk50;
-                 s32 *unk54;
-                 s32 *unk58;
-                 s32 *unk5C;
-                 u8 pad60[0xC];
-                 s32 *unk6C;
-                 s32 *unk70;
-                 u8 pad74[0x4];
-                 s32 *unk78;
-                 s32 *unk7C;
-                 s32 *unk80;
-                 s32 *unk84;
-                 u8 pad88[0xC];
-                 s32 *unk94;
-                 s32 *unk98;
-                 s32 *unk9C;
-                 s32 *unkA0;
-                 s32 *unkA4;
-                 s32 *unkA8;
-                 s32 *unkAC;
-                 s32 *unkB0;
-                 u8 padB4[0x84];
-                 Entity *entities;
-                 u8 pad13C[0x4];
-                 s32 numEntities;
-                 Entity * arr144[512];
-                 s32 cnt944;
-                 Entity * arr948[128];
-                 s32 cntB48;
-                 s32 * arrB4C[64];
-                 s32 cntC4C;
-                 Actor * actors[128];
-                 s32 numActors;
-                 u8 * list4[64];
-                 s32 cntF54;
-                 u8 padF58[0x4];
-                 Entity * arrF5C[32];
-                 s32 cntFDC;
-                 Entity * arrFE0[16];
-                 s32 cnt1020;
-                 Entity * list3[32];
-                 s32 cnt10A4;
-                 Entity * arr10A8[4];
-                 s32 cnt10B8;
-                 s32 cnt10BC;
-                 Entity * arr10C0[64];
-                 s32 cnt11C0;
-                 s32 cnt11C4;
-                 s32 unk11C8;
-                 s32 unk11CC;
-                 Rec14 *recA;
-                 Rec14 *recB;
-                 s32 unk11D8;
-                 Obj2 *unk11DC;
-                 u8 pad11E0[0xC];
-                 Obj2 *unk11EC;
-                 u8 pad11F0[0x310];
-                 s32 cnt1500;
-                 s32 cnt1504;
-                 Ent12 ents[16];
-                 u8 pad15C8[0x19D54];
-                  f32 unk1B31C;
-                  u8 pad1B320[0xEC];
-                  s32 unk1B40C;
-                  s32 unk1B410;
-                  s32 unk1B414;
-                  f32 unk1B418;
-                  s32 unk1B41C;
-                  u8 unk1B420[0x10];
-                  s16 unk1B430;
-                  u8 pad1B432[0x2];
-                  s32 unk1B434;
-                  s32 unk1B438;
-                  u8 pad1B43C[0x10];
-                  s32 unk1B44C;
-                  u8 pad1B450[0x1D0];
-                  Entity * list1[16];
-                  s32 n1;
-                  Entity * list2[16];
-                  s32 n2;
-                  u8 pad1B6A8[0xB6E4];
-                  u8 unk26D8C;
-                  u8 pad26D8D[0x23];
-                  f32 unk26DB0;
-                  s32 unk26DB4;
-                  u8 pad26DB8[0x10];
-                  s32 unk26DC8;
-                  s32 unk26DCC;
-                  s32 unk26DD0;
-                  s32 unk26DD4;
-} Level;
 void func_00227240(u8 *base, s32 zero, s32 a, CVector3 z, CVector3 v, s32 b, f32 f);
-void func_00224ED0(Level *lv, s32 a1, CVector3 v, s32 x, f32 f) {
+void func_00224ED0(CWorld *lv, s32 a1, CVector3 v, s32 x, f32 f) {
     CVector3 z;
     z.x = 0;
     z.y = 0;

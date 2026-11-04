@@ -1,19 +1,14 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "structs/world.h"
 
-
-typedef struct World {
-    /* 0x000 */ u8 pad0[0x1050];
-    /* 0x1050 */ CGameObjectInstance *actors[4];
-    /* 0x1060 */ s32 actorCount;
-} World;
 
 s32 func_00264C80(CGameObjectInstance *actor, void *ai);
 
 /* The actor of kind 5 in the second world list (0x1050) nearest to target (squared distance) for which
  * func_00264C80 returns 0, or NULL. */
-CGameObjectInstance *func_002259D0(World *world, CGameObjectInstance *target) {
+CGameObjectInstance *func_002259D0(CWorld *world, CGameObjectInstance *target) {
     CGameObjectInstance **actors;
     CGameObjectInstance *actor;
     CGameObjectInstance *nearest;
@@ -24,9 +19,9 @@ CGameObjectInstance *func_002259D0(World *world, CGameObjectInstance *target) {
 
     i = 0;
     nearest = NULL;
-    count = world->actorCount;
+    count = world->m_nList7;
     best = 3.4028235e38f;
-    actors = world->actors;
+    actors = (CGameObjectInstance **)world->m_pList7;
     for (; i < count; i++) {
         actor = actors[i];
         if (actor->header.m_pIntelligence->m_Type != 5) {

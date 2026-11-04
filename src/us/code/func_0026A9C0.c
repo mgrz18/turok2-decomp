@@ -3,17 +3,11 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/AI/NAV/8027451C_2.CPP, func_80275410_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "common.h"
+#include "structs/region.h"
 extern f32 func_0021153C(f32 arg0);
-struct CVector3_t;
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct CQuatern_t;
 typedef struct CQuatern_t CQuatern;
 struct CQuatern_t;
@@ -23,17 +17,9 @@ struct CQuatern_t {
     float z;
     float w;
 };
-struct Triangle;
-struct Triangle {
-    char pad0[2];
-    u16 flags;
-    CVector3 *vertices[3];
-};
-struct Triangle;
-typedef struct Triangle Triangle;
 extern void func_0020F040(f32 *arg0);
-extern Triangle *D_800B2608;
-extern Triangle *D_800B260C;
+extern CGameRegion *D_800B2608;
+extern CGameRegion *D_800B260C;
 extern CVector3 D_800F2020;
 extern f32 D_800F2024;
 extern s32 D_800F2028;
@@ -55,7 +41,7 @@ static __inline__ void normalize_copy(CVector3 *out, CVector3 *in) {
 extern float D_800DD78C;
 extern void func_0020EFDC(CVector3 *, CVector3 *, CVector3 *);
 extern void func_0020EF60(CVector3 *, CVector3 *, float);
-CQuatern *func_0026A9C0(CQuatern *out, Triangle *polygon) {
+CQuatern *func_0026A9C0(CQuatern *out, CGameRegion *polygon) {
     CVector3 normal;
     CVector3 up;
     CVector3 axis;
@@ -76,8 +62,8 @@ CQuatern *func_0026A9C0(CQuatern *out, Triangle *polygon) {
             D_800F2028 = 0;
             D_800F2024 = 1.0f;
         } else if (polygon != D_800B2608) {
-            edge(&edge0, polygon->vertices[1], polygon->vertices[0]);
-            edge(&edge1, polygon->vertices[2], polygon->vertices[1]);
+            edge(&edge0, polygon->m_pVertices[1], polygon->m_pVertices[0]);
+            edge(&edge1, polygon->m_pVertices[2], polygon->m_pVertices[1]);
             func_0020EFDC(&D_800F2020, &edge0, &edge1);
         }
         D_800B2608 = polygon;

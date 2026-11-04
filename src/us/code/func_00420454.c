@@ -1,6 +1,7 @@
 /* WRONG CUT: real function 0x00420454, size 0x264 (through 0x004206B8): splat cut it into
  * func_00420454, func_004205B8 and func_004205C4 inside its straight-line code. */
 #include "common.h"
+#include "structs/world.h"
 
 /* Load game menu "select" handler: with the pak checked, either restores the
  * loaded save (player block, game progress, level times, the level's key
@@ -45,13 +46,6 @@ typedef struct {
     /* 0x24 */ void *parent;
 } MenuCaller;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ s32 keyCount;
-} World;
-
-
-
 extern s32 D_80130990;
 extern s32 D_801309B8;
 extern s32 D_801309BC;
@@ -68,7 +62,7 @@ extern f32 D_8011ACB4[];
 extern f32 D_8011ACB8[];
 extern f32 D_8011ACBC[];
 extern s32 D_801198A4[2];
-extern World D_800F7078;
+extern CWorld D_800F7078;
 extern u8 D_800EBAC0[];
 extern u8 D_0043BD20[];
 extern u8 D_0043BDB0[];
@@ -86,7 +80,7 @@ s32 func_00420454(void *menu, MenuCaller *c) {
     s32 i;
     u8 *src;
     u8 *dst;
-    World *world;
+    CWorld *world;
 
     if (D_80130990) {
         slot = D_800C2028;
@@ -111,7 +105,7 @@ s32 func_00420454(void *menu, MenuCaller *c) {
         src = D_800C201C->levelKeys;
         dst = D_800EBAC0;
         D_8011AC58[0] = keep;
-        for (i = 0; i < world->keyCount; i++) {
+        for (i = 0; i < world->unk_30; i++) {
             *dst++ = *src++;
         }
         D_801198A4[0] = 0;

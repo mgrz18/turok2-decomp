@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/world.h"
 typedef struct ActorStats {
                u8 pad0[0x80];
                s8 unk80;
@@ -69,12 +70,6 @@ struct Actor {
 };
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
-typedef struct Rec14 {
-                 u8 pad0[0xE];
-                 u8 flags;
-                 u8 key;
-                 u8 pad10[0x4];
-} Rec14;
 typedef struct Entity {
                  u8 pad0[0x4];
                  s16 unk4s;
@@ -101,23 +96,15 @@ typedef struct Entity {
                  s8 unk23E;
                  u8 pad23F[0xA9];
 } Entity;
-typedef struct Level { /* Turok 2 layout: record tables sit 0x58 earlier than Rage Wars */
-    u8 pad0[0x116C];
-    s32 cnt116C;        /* Rage Wars: 0x11C4 */
-    u8 pad1170[4];
-    s32 unk1174;        /* Rage Wars: 0x11CC */
-    Rec14 *recA;        /* 0x1178 */
-    Rec14 *recB;        /* 0x117C */
-} Level;
 s32 func_00266D8C(s32 a, s32 b, s32 c, s32 *lo, s32 *hi);
-void func_00224FC0(Level *lv, u16 *idp, Rec14 **outRecs, s32 *outCount) {
+void func_00224FC0(CWorld *lv, u16 *idp, CWorldRecord **outRecs, s32 *outCount) {
     s32 hi;
     s32 lo;
     s32 r; s32 a; s32 b; s32 id;
-    id = *idp; a = lv->unk1174; b = lv->cnt116C;
+    id = *idp; a = (s32) lv->m_pAltRecordIndex; b = lv->m_nAltRecords;
     r = func_00266D8C(a, b, id, &lo, &hi);
     if (r != 0) {
-        *outRecs = lv->recB + lo;
+        *outRecs = lv->m_pAltRecords + lo;
         *outCount = hi - lo + 1;
     } else {
         *outRecs = 0;

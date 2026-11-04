@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/region.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 kind;                /* 1 = actor, 2 = particle */
@@ -10,11 +11,6 @@ typedef struct Actor {
     /* 0x110 */ u8 pad110[0x1A8 - 0x110];
     /* 0x1A8 */ struct CPlayer *owner;
 } Actor;
-
-typedef struct RegionInfo {
-    /* 0x00 */ u8 pad0[0x52];
-    /* 0x52 */ u16 flags;
-} RegionInfo;
 
 typedef struct Hit {
     /* 0x00 */ Actor *source;
@@ -36,18 +32,18 @@ extern s32 D_8011ACE0;      /* team 1 score */
 
 s32 Cinema_PathPlaying(void);
 s32 func_00284174(void);
-RegionInfo *func_0022425C(void *world, void *region);
+CRegionInfo *func_0022425C(void *world, void *region);
 void func_00249358(CPlayer *player, Actor *actor, s32 damage, s32 arg3, s32 arg4);
 s32 func_0025340C(void *players, CPlayer *player);
 void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit);
 
 static __inline__ s32 inSpecialRegion(CPlayer *player) {
-    RegionInfo *info;
+    CRegionInfo *info;
 
     if (player->m_CharacterActor.header.m_pCurrentRegion != NULL) {
         info = func_0022425C(D_800F7078, player->m_CharacterActor.header.m_pCurrentRegion);
         if (info != NULL) {
-            if (info->flags & 0x40) {
+            if (info->m_wFlags52 & 0x40) {
                 return 1;
             }
         }
@@ -61,7 +57,7 @@ void func_00247C10(Actor *actor, s32 arg1, Hit *hit) {
     CPlayer *player;
     CPlayer *killer = NULL;
     s32 arg4 = -1;
-    RegionInfo *info;
+    CRegionInfo *info;
     s32 special;
     Actor *source;
     Actor *owner;
