@@ -4,18 +4,7 @@
 #include "structs/vector.h"
 #include "structs/world.h"
 #include "structs/list.h"
-
-typedef struct SceneEffect {
-    /* 0x000 */ u8 pad0[0x290];
-    /* 0x290 */ s32 *ref;
-    /* 0x294 */ u8 pad294[4];
-} SceneEffect;                          /* 0x298 bytes */
-
-typedef struct SceneEffectPool {
-    /* 0x0000 */ SceneEffect effects[0x20];
-    /* 0x5300 */ CList freeEffects;
-    /* 0x5314 */ CList activeEffects;
-} SceneEffectPool;
+#include "structs/game_object.h"
 
 /* The animation header: what this reads of it. */
 typedef struct AnimInfo {
@@ -42,23 +31,23 @@ void func_0020EF60(CVector3 *out, CVector3 *in, f32 angle);
 void func_002051F4(s32 heap, s32 *block);
 void CList__Remove(CList *list, void *node);
 void CList__AddHead(CList *list, void *node);
-void func_00219BC0(SceneEffect *effect, s32 id, s32 variant, s32 unused, s32 count, s32 sound, s32 owner,
+void func_00219BC0(CListedInstance *effect, s32 id, s32 variant, s32 unused, s32 count, s32 sound, s32 owner,
                    f32 scale, CVector3 position, s32 flags, CVector3 color, CVector3 direction, s32 arg12);
-void func_0021E5D4(SceneEffect *effect);
+void func_0021E5D4(CListedInstance *effect);
 
 /* Takes a node from the free list when allowed (always with D_8011001C, otherwise while fewer than
  * three are active), moves it to the active list and attaches the counted reference. */
-static __inline__ SceneEffect *take_effect(SceneEffectPool *scene, s32 *ref) {
-    SceneEffect *effect;
+static __inline__ CListedInstance *take_effect(CInstancePool *scene, s32 *ref) {
+    CListedInstance *effect;
 
-    if (D_8011001C == 0 && (u32)scene->activeEffects.m_nCount >= 3) {
+    if (D_8011001C == 0 && (u32)scene->m_ActiveList.m_nCount >= 3) {
         return NULL;
     }
-    effect = scene->freeEffects.m_pHead;
+    effect = scene->m_FreeList.m_pHead;
     if (effect != NULL) {
-        CList__Remove(&scene->freeEffects, effect);
-        CList__AddHead(&scene->activeEffects, effect);
-        effect->ref = ref;
+        CList__Remove(&scene->m_FreeList, effect);
+        CList__AddHead(&scene->m_ActiveList, effect);
+        effect->m_pOwnerCount = ref;
         if (ref != NULL) {
             *ref += 1;
         }
@@ -66,9 +55,9 @@ static __inline__ SceneEffect *take_effect(SceneEffectPool *scene, s32 *ref) {
     return effect;
 }
 
-static __inline__ SceneEffect *spawn_effect(SceneEffectPool *scene, s32 id, s32 variant, s32 count, s32 owner,
+static __inline__ CListedInstance *spawn_effect(CInstancePool *scene, s32 id, s32 variant, s32 count, s32 owner,
                                             CVector3 position, f32 scale, CVector3 direction, CVector3 color, s32 *ref) {
-    SceneEffect *effect;
+    CListedInstance *effect;
 
     if (D_800B6D54 == 0 || count == 0) {
         return NULL;
@@ -85,9 +74,9 @@ static __inline__ SceneEffect *spawn_effect(SceneEffectPool *scene, s32 id, s32 
 /* Spawns an effect of the given type in a scene: loads the type's animation index and header
  * ("anim object index", "anim object info"), takes its intelligence from the header and turns
  * color by the header's angle, then spawns it (see spawn_effect). Returns the effect or NULL. */
-SceneEffect *func_00227C10(SceneEffectPool *scene, s32 variant, s32 owner, CVector3 position, f32 scale,
+CListedInstance *func_00227C10(CInstancePool *scene, s32 variant, s32 owner, CVector3 position, f32 scale,
                            CVector3 direction, CVector3 color, s32 *ref) {
-    SceneEffect *effect;
+    CListedInstance *effect;
     AnimInfo *info;
     s32 *index;
     s32 *block;

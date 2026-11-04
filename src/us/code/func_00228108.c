@@ -16,32 +16,16 @@ extern s32 D_800B6D54;
 extern u8 D_800F7078[];
 extern s32 D_8011001C;
 
-/* The world's instance pool: free and active lists of actors. */
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x5300];
-    /* 0x5300 */ CGameObjectInstance *freeHead; /* CList of free instances */
-    /* 0x5304 */ u8 pad5304[0x5314 - 0x5304];
-    /* 0x5314 */ u8 activeList[0x5324 - 0x5314];
-    /* 0x5324 */ u32 freeCount;
-} CInstancePool;
-
-/* A pooled instance: the game object plus the counter it was spawned for. */
-typedef struct {
-    /* 0x000 */ CGameObjectInstance obj;
-    /* 0x288 */ u8 pad288[0x290 - 0x288];
-    /* 0x290 */ s32 *owner;
-} CPooledInstance;
-
 /* func_002283FC */
 static __inline__ CGameObjectInstance *take_free_instance(CInstancePool *world, s32 *owner) {
     CGameObjectInstance *node;
 
-    if (D_8011001C != 0 || world->freeCount < 3) {
-        node = world->freeHead;
+    if (D_8011001C != 0 || (u32)world->m_ActiveList.m_nCount < 3) {
+        node = world->m_FreeList.m_pHead;
         if (node != NULL) {
-            CList__Remove(&world->freeHead, node);
-            CList__AddHead(world->activeList, node);
-            ((CPooledInstance *)node)->owner = owner;
+            CList__Remove(&world->m_FreeList, node);
+            CList__AddHead(&world->m_ActiveList, node);
+            ((CListedInstance *)node)->m_pOwnerCount = owner;
             if (owner != NULL) {
                 *owner += 1;
             }

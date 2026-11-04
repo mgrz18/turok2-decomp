@@ -12,6 +12,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/list.h"
 
 /* The definition m_pIntelligence points at. */
 #include "structs/intelligence.h"
@@ -202,8 +203,20 @@ typedef struct CListedInstance {
     /* 0x000 */ CGameObjectInstance m_Instance;
     /* 0x288 */ struct CListedInstance *m_pPrev;
     /* 0x28C */ struct CListedInstance *m_pNext;
-    /* 0x290 */ s32 *m_pOwnerCount;
-} CListedInstance; /* size 0x294 */
+    /* 0x290 */ s32 *m_pOwnerCount;   /* counted up when it is taken (func_002283FC), down when it goes (func_002280B0) */
+    /* 0x294 */ s32 _pad294;
+} CListedInstance; /* size 0x298 */
+
+/* The pool of dynamic objects, D_8010ABA0: 32 of them, the free ones on
+ * m_FreeList (D_8010FEA0) and the live ones on m_ActiveList (D_8010FEB4).
+ * func_002283FC takes one (only while fewer than 3 are live, unless
+ * D_8011001C), func_002280B0 / func_00228484 give it back; func_00227C10,
+ * func_00227EE8 and func_00228108 spawn into it. */
+typedef struct CInstancePool {
+    /* 0x0000 */ CListedInstance m_Instances[32];
+    /* 0x5300 */ CList m_FreeList;     /* D_8010FEA0 */
+    /* 0x5314 */ CList m_ActiveList;   /* D_8010FEB4 */
+} CInstancePool; /* size 0x5328 */
 
 /* What an AI aims at this frame: func_002449E0 fills one from CAI's
  * m_pSightTarget, func_00244338 one from m_pPathTarget (or the home point, a
