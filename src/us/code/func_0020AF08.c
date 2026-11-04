@@ -2,18 +2,13 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "structs/frame.h"
 
-
-typedef struct GfxTask {
-    /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Gfx *commands;
-} GfxTask;
 
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 extern u32 D_800C2214;              /* command buffer length, in commands */
 extern Gfx *D_800D8E24;             /* display list head */
-extern GfxTask *D_800F7070;
 extern s32 D_800AB880;
 extern s32 D_800AB884;
 extern u32 D_800AB8A4;              /* extra geometry mode bits */
@@ -39,7 +34,7 @@ void func_0020AF08(u8 alpha, void **resource, void *matrix, s32 segment, char *l
     u32 geom;
     Gfx *sync;
 
-    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->commands) / sizeof(Gfx) < 3000) {
+    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->dlStart) / sizeof(Gfx) < 3000) {
         return;
     }
     header = *resource;

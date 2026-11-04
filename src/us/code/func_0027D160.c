@@ -420,7 +420,7 @@ typedef struct {
 typedef struct {
     /* 0x00 */ Frame *m_pFrame;
 } FrameRef;
-extern FrameRef D_800F7070;     /* the frame being drawn */
+extern FrameRef D_800F7070; /* GfxFrame * (structs/frame.h); read through a struct here: as a plain pointer the code is scheduled differently */
 extern void *D_80130A78;        /* the z buffer */
 void func_00207A54(void);
 void func_00207FEC(s32 arg0);

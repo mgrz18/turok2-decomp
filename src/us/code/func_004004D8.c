@@ -59,7 +59,7 @@ extern s32 D_800B6D1C;      /* buffer index */
 extern s32 D_800B6D54;
 extern s32 D_800C2030;      /* screen width */
 extern s32 D_800C2034;      /* screen height */
-extern FrameBuffers *D_800F7070[];
+extern FrameBuffers *D_800F7070[]; /* GfxFrame (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently */
 extern CWorld D_800F7078;
 extern s32 D_8011AAD8;
 extern s32 D_8011AC8C;

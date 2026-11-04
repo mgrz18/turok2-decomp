@@ -16,6 +16,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/game_object.h"
+#include "structs/frame.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -519,11 +520,6 @@ void func_0022DCBC(ShadowActor *actor) {
 
 typedef struct { u8 pad0[0x40]; } Mtx;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Gfx *commands;
-} GfxTask;
-
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
 typedef struct {
     /* 0x00 */ u16 pad0;
@@ -611,7 +607,6 @@ struct CollisionInfo;
 
 extern Gfx *D_800D8E24;             /* display list head */
 extern u32 D_800C2214;              /* command buffer length, in commands */
-extern GfxTask *D_800F7070;
 extern f32 D_800B6D28;              /* frame time */
 extern s32 D_800B6D1C;              /* matrix buffer index */
 extern s32 D_801198E0;
@@ -699,7 +694,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     u8 *envFrom;
     u8 *primFrom;
 
-    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->commands) / sizeof(Gfx) < 3000) {
+    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->dlStart) / sizeof(Gfx) < 3000) {
         return;
     }
     if (particle->time < 0.0f) {

@@ -31,7 +31,7 @@ extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 extern s32 D_800C2040;          /* frames left to clear the screen */
 extern s32 D_80130A78;          /* z-buffer */
-extern GfxTask *D_800F7070[];   /* current graphics task */
+extern GfxTask *D_800F7070[]; /* GfxFrame (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently */
 extern GfxTask *D_8011F140;
 extern s32 D_800B6D1C;
 extern f32 D_800B6D28;          /* frame time */
