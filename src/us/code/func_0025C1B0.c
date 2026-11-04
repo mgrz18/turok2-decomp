@@ -16,7 +16,7 @@ extern void func_00243414(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern f32 func_002119FC(f32 lo, f32 hi);
 
 void func_0025C1B0(CGameObjectInstance *actor, CAI *ai, Motion *motion) {
-    s32 modeIndex = ai->m_VarS8[39];
+    s32 modeIndex = ai->m_Enemy.m_BehaviorIndex;
     f32 speed;
 
     if (!(ai->m_ModeFlags & 0x10000) && (actor->m_dwFlags & 0x400)) {
@@ -25,7 +25,7 @@ void func_0025C1B0(CGameObjectInstance *actor, CAI *ai, Motion *motion) {
     speed = motion->speed;
     if (speed < 0.0f ? -speed > 102.399994f : speed > 102.399994f) {
         ai->m_VarF32[8] = 30.0f;
-        if (ai->m_VarS8[37] && modeIndex == 0) {
+        if (ai->m_Enemy.m_Behavior[1] && modeIndex == 0) {
             func_00243414(actor, ai, 0x26);
         }
         return;
@@ -37,11 +37,11 @@ void func_0025C1B0(CGameObjectInstance *actor, CAI *ai, Motion *motion) {
     if (ai->m_Health && ai->m_Mode == 4 && ai->m_VarF32[8] == 0.0f) {
         ai->m_VarF32[8] = func_002119FC(30.0f, 75.0f);
         if (modeIndex == 0) {
-            if (ai->m_VarS8[37]) {
+            if (ai->m_Enemy.m_Behavior[1]) {
                 func_00243414(actor, ai, 0x26);
             }
         } else if (modeIndex == 1) {
-            if (ai->m_VarS8[36]) {
+            if (ai->m_Enemy.m_Behavior[0]) {
                 func_00243414(actor, ai, 0x28);
             }
         }

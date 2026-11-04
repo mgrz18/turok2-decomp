@@ -17,7 +17,7 @@ void func_0025D308(CGameObjectInstance *actor, CAI *ai) {
     s32 mode;
     s32 mode2;
 
-    mode = ai->m_VarS8[39];
+    mode = ai->m_Enemy.m_BehaviorIndex;
     mode2 = mode;
     if ((mode == 0 && (actor->header.m_pIntelligence->m_Enemy.m_wEvadeAnimFlags & 0x1F)) || (mode == 1 && (actor->header.m_pIntelligence->m_Enemy.m_wEvadeAnimFlags & 0x3E0))
         || (mode2 == 2 && (actor->header.m_pIntelligence->m_Enemy.m_wEvadeAnimFlags & 0x7C00))) {

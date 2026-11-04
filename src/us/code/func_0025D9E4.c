@@ -30,7 +30,7 @@ extern s32 func_002113A4(void);
 s32 func_0025D9E4(void *actor, CAI *ai) {
     Location *loc = func_0028479C(&ai->m_PathTrack.m_Mode);
     s32 animA = -1;
-    s32 mode = ai->m_VarS8[39];
+    s32 mode = ai->m_Enemy.m_BehaviorIndex;
     s32 animB = -1;
 
     if (loc->flagsA != 0) {

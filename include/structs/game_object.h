@@ -42,6 +42,15 @@ typedef struct {
     /* 0x02 */ s16 m_nCurrentPointIndex;
 } CPathTrack; /* size 0x4 */
 
+/* CAI::m_VarBuffer as the enemy AI (func_0025BC70 sets it up) uses it: the
+ * definition's behaviour for each mode (CEnemyIntelligence::m_Behaviors[0],
+ * [1], m_UnderwaterBehavior) and which of them is current. */
+typedef struct {
+    /* 0x00 */ u8 _pad[0x24];
+    /* 0x24 */ s8 m_Behavior[3];
+    /* 0x27 */ s8 m_BehaviorIndex;
+} CEnemyAIVars; /* size 0x28 */
+
 /* AI state embedded in every game object at 0x140. Health is 24.8 fixed point. */
 typedef struct {
     /* 0x000 */ s32 m_dwFlags;
@@ -119,6 +128,7 @@ typedef struct {
         /* 0x10C */ u16 m_VarU16[24];
         /* 0x10C */ s8 m_VarS8[48];
         /* 0x10C */ u8 m_VarU8[48];
+        /* 0x10C */ CEnemyAIVars m_Enemy;
     };
 } CAI; /* size 0x13C */
 

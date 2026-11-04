@@ -20,7 +20,7 @@ static __inline__ s32 canAttack(CAI *ai, CEnemyIntelligence *info, s32 state) {
     if (state == 0x20 || state == 0x3D) {
         return 0;
     }
-    switch (ai->m_VarS8[39]) {
+    switch (ai->m_Enemy.m_BehaviorIndex) {
     case 0:
         return (info->m_wAlertAnimFlags & 0x1F) != 0;
     case 1:
