@@ -27,6 +27,21 @@ typedef struct RumblePak {
     /* 0x08 */ OSPfs pfs;
 } RumblePak; /* size 0x70 */
 
+/* The multiplayer profile kept in a "T2 MULTI" note (0x18 bytes): a
+ * player's counts, character and name, copied from and back to his
+ * CPlayerOptions. D_80130968 is the one being saved or loaded, D_80130948
+ * the last one read back with a good checksum. */
+typedef struct PakProfile {
+    /* 0x00 */ u16 suicides;
+    /* 0x02 */ u16 deaths;
+    /* 0x04 */ u16 kills;
+    /* 0x06 */ u16 tags;
+    /* 0x08 */ u8 character;
+    /* 0x09 */ u8 reserved[3];      /* cleared before a save */
+    /* 0x0C */ u8 name[8];
+    /* 0x14 */ u32 checksum;        /* func_00426E78 over the first 0x14 bytes */
+} PakProfile; /* size 0x18 */
+
 /* The free-space query of the pak save menus (func_0041F0C8,
  * func_00457FE8), on the stack. */
 typedef struct PakQuery {
