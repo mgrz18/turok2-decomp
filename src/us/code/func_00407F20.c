@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -45,14 +46,8 @@ typedef struct {
     /* 0xAAC */ f32 unkAAC;
 } Player;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u32 flags;
-} GameFlags;
-
 extern Game D_80119870;
 extern Player *D_80119890;     /* the current player */
-extern GameFlags D_8011AAD8;
 extern u8 D_800F7078[];
 extern u8 D_800B6660[];
 extern u8 D_801100F0[];
@@ -84,7 +79,7 @@ void func_00407F20(BossFight *fight) {
     Game *game = &D_80119870;
     Player *player;
     Actor *a;
-    GameFlags *flags;
+    GameSettings *flags;
 
     fight->state = 1;
     player = func_002532A8(game);
@@ -109,27 +104,27 @@ void func_00407F20(BossFight *fight) {
     case 0x1BBC:
         player->bossKilled[0] = 1;
         flags = &D_8011AAD8;
-        flags->flags |= 0x8000;
+        flags->unk4 |= 0x8000;
         break;
     case 0x1C20:
         player->bossKilled[1] = 1;
         flags = &D_8011AAD8;
-        flags->flags |= 0x200;
+        flags->unk4 |= 0x200;
         break;
     case 0x1C84:
         player->bossKilled[2] = 1;
         flags = &D_8011AAD8;
-        flags->flags |= 0x400;
+        flags->unk4 |= 0x400;
         break;
     case 0x1CE8:
         player->bossKilled[3] = 1;
         flags = &D_8011AAD8;
-        flags->flags |= 0x80;
+        flags->unk4 |= 0x80;
         break;
     case 0x1D4C:
         player->bossKilled[4] = 1;
         flags = &D_8011AAD8;
-        flags->flags |= 0x40;
+        flags->unk4 |= 0x40;
         break;
     }
 }
