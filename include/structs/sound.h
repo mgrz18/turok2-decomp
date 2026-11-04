@@ -123,7 +123,8 @@ typedef struct {
     /* 0x28 */ s16 priority;
     /* 0x2A */ s16 channel;
     /* 0x2C */ s16 s2C;
-    /* 0x2E */ u8 pad2E[6];
+    /* 0x2E */ u8 pad2E[2];
+    /* 0x30 */ s32 unk30;
     /* 0x34 */ CVector3 pos;   /* world position of a 3D sound */
     /* 0x40 */ s32 state;
     /* 0x44 */ s8 distanceMode;
