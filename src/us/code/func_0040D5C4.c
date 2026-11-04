@@ -1,7 +1,7 @@
 /* First-module copy of func_004465C4 (src/us/code/func_004465C4.c). */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 extern BlindOneState D_80130200;
 

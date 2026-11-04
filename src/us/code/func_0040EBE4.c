@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 extern BlindOnePhase D_0043240C[];
 extern BlindOneStep D_00432340[]; /* the script */

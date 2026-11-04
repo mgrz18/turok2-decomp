@@ -1,7 +1,7 @@
 /* Second-module copy of func_0040D5C4 (nonmatching/vm/func_0040D5C4.c), with its data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 extern BlindOneState D_80130200;
 

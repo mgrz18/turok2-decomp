@@ -1,7 +1,7 @@
 /* Second-module copy of func_0040D3A8 (src/us/code/func_0040D3A8.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 /* Second boss module: once none of its third group of actors has flag 0x100 left, steps the script to the
  * next phase. */

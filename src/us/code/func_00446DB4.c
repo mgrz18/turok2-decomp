@@ -1,7 +1,7 @@
 /* Second-module copy of func_0040DDB4 (src/us/code/func_0040DDB4.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 /* Damage callback of the second boss' minions: takes the damage, plays the minion's hit effect at most every
  * 2.25 s, and at zero health goes to anim state 6. */

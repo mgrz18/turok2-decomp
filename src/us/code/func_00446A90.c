@@ -1,7 +1,7 @@
 /* Second-module copy of func_0040DA90 (src/us/code/func_0040DA90.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 extern BlindOneState D_80130200;
 

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];

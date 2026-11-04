@@ -1,5 +1,5 @@
 #include "structs/vector.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x00 */ char pad0[0x4];

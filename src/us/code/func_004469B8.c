@@ -1,7 +1,7 @@
 /* Second-module copy of func_0040D9B8 (src/us/code/func_0040D9B8.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 /* Damage callback of the second boss: outside phase 9 it only flinches (anim state 6); in phase 9 the damage
  * is taken, a hit effect plays at most every 2.25 s, and at zero health it dies (anim state 9). */

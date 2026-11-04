@@ -1,7 +1,7 @@
 /* Second-module copy of func_0040CCC0 (in src/us/code/func_0040C850.c), with its data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 /* Second boss setup: collects its three groups of actors (types 0x454-0x456), sets their health and slots,
  * finds its two level objects, shows its health bar ("Blind") and enters the first phase of its script. */
@@ -82,8 +82,8 @@ void func_00445CC0(BlindOneState *state) {
     state->minionDefA = func_00225EBC(D_800F7078, 1, 0x1CE9);
     state->minionDefB = func_00225EBC(D_800F7078, 1, 0x1CEA);
     state->toSpawn = 0;
-    state->alive = 0;
-    state->maxAlive = 0;
+    state->minionsAlive = 0;
+    state->maxMinions = 0;
     state->alive1 = 0;
     state->alive2 = 0;
     state->alive3 = 0;

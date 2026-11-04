@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 /* Script command: waits until the current player is within 716.8 units of the origin, then steps the
  * script to the next command. */

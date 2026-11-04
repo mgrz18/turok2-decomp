@@ -1,5 +1,5 @@
 #include "common.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 
 /* The update entries of the phase table: D_00432410 is D_0043240C + 4
@@ -34,7 +34,7 @@ void func_0040ECDC(BlindOneState *arg0)
     {
       func_00235510((s32) ((u8 *) arg0 + var_s1));
       var_s0 += 1;
-      var_s1 += sizeof(BlindOneFader);
+      var_s1 += sizeof(ScriptAnimator);
       var_s0++;
       var_s0--;
     }

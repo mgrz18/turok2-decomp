@@ -1,7 +1,7 @@
 /* Second-module copy of func_0040E930 (src/us/code/func_0040E930.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 extern BlindOnePhase D_0043232C[];
 

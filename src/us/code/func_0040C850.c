@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 /* One file: func_0040C850, func_0040CB28, func_0040CCC0 and func_0040CFC4.
  * func_0040CCC0's only literal, the string "Blind", sits at 0x800C08D4, 4 past
@@ -201,8 +201,8 @@ void func_0040CCC0(BlindOneState *state) {
     state->minionDefA = func_00225EBC(D_800F7078, 1, 0x1CE9);
     state->minionDefB = func_00225EBC(D_800F7078, 1, 0x1CEA);
     state->toSpawn = 0;
-    state->alive = 0;
-    state->maxAlive = 0;
+    state->minionsAlive = 0;
+    state->maxMinions = 0;
     state->alive1 = 0;
     state->alive2 = 0;
     state->alive3 = 0;

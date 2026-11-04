@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 

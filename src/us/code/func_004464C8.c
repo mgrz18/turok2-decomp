@@ -1,7 +1,7 @@
 /* Second-module copy of func_0040D4C8 (src/us/code/func_0040D4C8.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 /* Second boss module: plays sound 0x284F, sends the module object to anim state 1 and steps the script to
  * the next phase. */

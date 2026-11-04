@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "structs/script.h"
+#include "structs/boss.h"
 
 /* Second boss phase update: spawns a minion at a random point 1228.8-1536 around the boss while the phase has
  * some left (and fewer than its maximum are alive); once none are left and fewer than 5 are alive, steps the
@@ -69,9 +69,9 @@ static __inline__ void spawnMinion(BlindOneState *state, s32 *toSpawn, s32 *aliv
 }
 
 void func_0040D0F0(BlindOneState *state) {
-    spawnMinion(state, &state->toSpawn, &state->alive, func_002119FC(1228.7999f, 1536.0f), state->maxAlive,
+    spawnMinion(state, &state->toSpawn, &state->minionsAlive, func_002119FC(1228.7999f, 1536.0f), state->maxMinions,
                 state->minionDefA, state->boss, func_002119FC(-3.141593f, 3.141593f));
-    if (state->toSpawn == 0 && state->alive < 5) {
+    if (state->toSpawn == 0 && state->minionsAlive < 5) {
         nextPhase(state);
     }
 }
