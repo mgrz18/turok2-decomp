@@ -2,6 +2,7 @@
  * 0x004567AC is junk between objects (src/us/asm/stray_004567AC.s).
  * Second-module twin of func_0041D890. */
 #include "common.h"
+#include "structs/game.h"
 
 /* Build the save block: the player's profile, the multiplayer settings and the
  * player's options are copied into a freshly allocated buffer. */
@@ -43,8 +44,6 @@ typedef struct {
 
 extern MemHandle *D_800C2010; /* handle of the save block */
 extern SaveBlock *D_800C2018;
-extern SettingsBlob D_8011AAD8;
-extern f32 D_8011ACB0[4];
 extern u8 D_800EBAC0[];
 extern char D_800C13F0[];
 
@@ -68,12 +67,12 @@ void func_004567B0(Player *player) {
     D_800C2018 = D_800C2010->data;
     func_00266C5C(D_800C2018, 0, allocSize);
     D_800C2018->profile = player->profile;
-    D_800C2018->settings = D_8011AAD8;
+    D_800C2018->settings = *(SettingsBlob *)&D_8011AAD8;
     data = D_800C2018;
-    data->options[0] = D_8011ACB0[0];
-    data->options[1] = D_8011ACB0[1];
-    data->options[2] = D_8011ACB0[2];
-    data->options[3] = D_8011ACB0[3];
+    data->options[0] = D_8011ACB0.frames;
+    data->options[1] = D_8011ACB0.seconds;
+    data->options[2] = D_8011ACB0.minutes;
+    data->options[3] = D_8011ACB0.hours;
     data->size = size;
     data->extraSize = ((ExtraInfo *) &D_800F70A8)->size;
     func_0029E460(data->extra, D_800EBAC0, ((ExtraInfo *) &D_800F70A8)->size);
