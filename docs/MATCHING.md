@@ -663,14 +663,21 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/region.h` | CGameRegion (the floor triangles an object's `m_pCurrentRegion` points to, linked to their neighbours) and CRegionInfo (the attributes they share by index) |
 | `structs/camera.h` | CCamera and CCameraPool, with CCameraViewParams, CCameraViewport, CShake, CCameraText, CList, CPlane |
 | `structs/menu.h` | the menu system: Menu (a window), MenuItem, MenuItemDesc, MenuDesc, MenuItemLayout, MenuController, MenuColor, MenuPool |
-| `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo, and the libaudio types it uses (ALHeap, ALBank, ALInstrument, ALFilter, ALMainBus, ALAuxBus, Acmd) |
+| `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo (includes libaudio.h) |
+| `structs/libaudio.h` | the libaudio types the sound manager and the imported libaudio code share: ALHeap, ALBank, ALBankFile, ALInstrument, ALFilter, ALMainBus, ALAuxBus, Acmd |
 | `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
 | `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs and the Controller Pak internals, plus the engine's CMutex |
 | `gfx.h` | Gfx (w0/w1) and the display-list pointer the engine appends to |
 
-The imported Rage Wars files still take their types from `include/rw/`
-(abu_types.h, junk_types.h, ultralib_types.h), which repeat some of these
-under Rage Wars' names and layouts.
+The imported Rage Wars files still take their own types from `include/rw/`
+(abu_types.h, junk_types.h, ultralib_types.h), but those headers include
+the shared ones above instead of repeating them, so a file can include an
+rw header together with any shared header. Where a Rage Wars type had the
+same name and another layout it was renamed (abu's float matrix is RW_Mtx,
+not gbi.h's Mtx). junk_types.h and abu_types.h still disagree with each
+other on some libaudio internals (ALEvent, ALEventQueue, ALVoice,
+ALVoiceState, ALSound, ALSoundState, ALSynConfig, ALEnvMixer, ALMIDIEvent,
+ALTempoEvent, ALMicroTime), so those two cannot be included together yet.
 
 ## The fast assembler
 
