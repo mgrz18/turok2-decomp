@@ -2,6 +2,7 @@
 #include "gfx.h"
 #include "structs/gbi.h"
 #include "structs/region.h"
+#include "structs/world.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
@@ -49,11 +50,6 @@ typedef struct {
 } AreaList;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x58];
-    /* 0x58 */ s32 *data;
-} World;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x110];
     /* 0x110 */ void *colorImage;
 } FrameBuffers;
@@ -63,7 +59,7 @@ extern s32 D_800B6D54;
 extern s32 D_800C2030;      /* screen width */
 extern s32 D_800C2034;      /* screen height */
 extern FrameBuffers *D_800F7070[];
-extern World D_800F7078;
+extern CWorld D_800F7078;
 extern s32 D_8011AAD8;
 extern s32 D_8011AC8C;
 extern Vp D_8011B0A8[];
@@ -141,7 +137,7 @@ void func_004004D8(MapView *view) {
     CVector3 *p1;
     CVector3 *a;
     char *data;
-    World *w;
+    CWorld *w;
     f32 s;
     f32 c;
     f32 cx;
@@ -248,11 +244,11 @@ void func_004004D8(MapView *view) {
 
     vtx = D_80129A40[D_800B6D1C];
     w = &D_800F7078;
-    regions = (CGameRegion *) (func_002017D4(w->data, 2) + 8);
-    data = func_002017D4(w->data, 3);
+    regions = (CGameRegion *) (func_002017D4(w->m_pRegionData, 2) + 8);
+    data = func_002017D4(w->m_pRegionData, 3);
     areas = (Area *) (data + 8);
     areaCount = *(s32 *) (data + 4);
-    infos = (CRegionInfo *) (func_002017D4(w->data, 0) + 8);
+    infos = (CRegionInfo *) (func_002017D4(w->m_pRegionData, 0) + 8);
     nIdx = 0;
     base = 0;
     nVtx = 0;

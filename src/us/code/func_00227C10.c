@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SYSTEM/802624A0_10.CPP, func_80262CE0_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "structs/world.h"
 
 typedef struct Vec3 {
     f32 x, y, z;
@@ -33,27 +34,19 @@ typedef struct AnimInfo {
     /* 0x1E */ u16 angle;
 } AnimInfo;
 
-/* The world: what this reads of it. */
-typedef struct World {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 base;
-    /* 0x18 */ u8 pad18[0x40 - 0x18];
-    /* 0x40 */ s32 *table;
-} World;
-
-extern World D_800F7078;
+extern CWorld D_800F7078;
 extern s32 D_800B6D54;                  /* effects enabled */
 extern s32 D_800B6D00;
 extern s32 D_8011001C;
 extern char D_800A6070[];               /* "anim object index" */
 extern char D_800A6084[];               /* "anim object info" */
 
-s32 func_00224180(World *world, s32 id);
+s32 func_00224180(CWorld *world, s32 id);
 s32 func_00201848(s32 *table, s32 base, s32 index);
 s32 *func_0020367C(s32 heap, s32 src, s32 size, s32 type, s32 arg4, s32 callback, char *name, s32 arg7);
 s32 func_0020185C(s32 table, s32 base, s32 index, s32 *size);
 void *func_002017D4(s32 table, s32 index);
-s32 func_00225E88(World *world, s32 index);
+s32 func_00225E88(CWorld *world, s32 index);
 f32 func_0026D210(s32 angle);
 void func_0020EF60(Vec3 *out, Vec3 *in, f32 angle);
 void func_002051F4(s32 heap, s32 *block);
@@ -117,7 +110,7 @@ SceneEffect *func_00227C10(SceneEffectPool *scene, s32 variant, s32 owner, Vec3 
     effect = NULL;
     id = func_00224180(&D_800F7078, variant);
     if (id != -1) {
-        src = func_00201848(D_800F7078.table, D_800F7078.base, id);
+        src = func_00201848(D_800F7078.m_pObjects, D_800F7078.m_ObjectsKey, id);
         index = func_0020367C(0, src, 0x18, 0, 0, 0, D_800A6070, 1);
         if (index != NULL) {
             block = func_0020367C(0, func_0020185C(*index, src, 0, &size), size, 0, 0, 0, D_800A6084, 1);

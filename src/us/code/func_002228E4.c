@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/world.h"
 
 typedef struct Bounds {
     f32 min[3];             /* 0x00 */
@@ -9,17 +10,6 @@ typedef struct Rect {
     f32 minX, minZ;         /* 0x00 */
     f32 maxX, maxZ;         /* 0x08 */
 } Rect;
-
-typedef struct Region {
-    void **data;            /* 0x00 */
-    Rect *rect;             /* 0x04 */
-} Region;
-
-typedef struct World {
-    u8 pad0[0x14A8];
-    s32 regionCount;        /* 0x14A8 */
-    Region regions[1];      /* 0x14AC */
-} World;
 
 typedef struct Item {
     u8 pad0[0xA0];
@@ -36,8 +26,8 @@ typedef struct ItemList {
 void *func_002017D4(void *table, s32 index);
 
 /* Collects up to 10 items of the region containing pos whose bounds hold it. */
-void func_002228E4(World *world, f32 *pos, Item **out, s32 *outCount) {
-    Region *found;
+void func_002228E4(CWorld *world, f32 *pos, Item **out, s32 *outCount) {
+    CWorldSector *found;
     ItemList *list;
     Item *item;
     Item *items;
@@ -53,20 +43,20 @@ void func_002228E4(World *world, f32 *pos, Item **out, s32 *outCount) {
     count = 0;
     x = pos[0];
     z = pos[2];
-    regionCount = world->regionCount;
+    regionCount = world->m_nSectors;
     for (i = 0; i < regionCount; i++) {
-        r = world->regions[i].rect;
+        r = world->m_Sectors[i].m_pBounds;
         if (r->maxX < x || x < r->minX || r->maxZ < z || z < r->minZ) {
             continue;
         }
-        found = &world->regions[i];
+        found = &world->m_Sectors[i];
         break;
     }
     if (found == NULL) {
         *outCount = 0;
         return;
     }
-    list = func_002017D4(*found->data, 2);
+    list = func_002017D4(*found->m_hData, 2);
     n = list->count;
     items = list->items;
     for (i = 0; i < n; i++) {

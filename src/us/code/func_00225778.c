@@ -1,9 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_4/CODE_8028C490.CPP, func_8028CAE0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
+#include "structs/world.h"
 
 /* Turok 2 LevelActor: 0x288 bytes (Rage Wars 0x2E8). */
 typedef struct LevelActor {
@@ -20,15 +19,8 @@ typedef struct LevelActor {
     char pad148[0x288 - 0x148];
 } LevelActor;
 
-typedef struct World {
-    char pad0[0xE0];
-    LevelActor *objects;       /* 0xE0 (Rage Wars 0x138) */
-    char padE4[0x4];
-    s32 count;                 /* 0xE8 (Rage Wars 0x140) */
-} World;
-
 /* Nearest other actor matching team/kind (-1 = any), optionally alive only. */
-LevelActor *func_00225778(World *world, LevelActor *self, s32 team, s32 kind, s32 activeOnly) {
+LevelActor *func_00225778(CWorld *world, LevelActor *self, s32 team, s32 kind, s32 activeOnly) {
     s32 i;
     LevelActor *obj;
     LevelActor *best;
@@ -37,10 +29,10 @@ LevelActor *func_00225778(World *world, LevelActor *self, s32 team, s32 kind, s3
     s32 count;
     i = 0;
     min = 3.4028235e38f;
-    count = world->count;
+    count = world->m_nActors;
     best = 0;
     for (; i < count; i++) {
-        obj = &world->objects[i];
+        obj = (LevelActor *)world->m_pActors + i;
         if (obj == self) {
             continue;
         }

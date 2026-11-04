@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/world.h"
 
 typedef struct ActorDef {
     /* 0x00 */ s32 kind;
@@ -13,17 +14,11 @@ typedef struct Actor {
     /* 0x140 */ u8 ai[1];
 } Actor;
 
-typedef struct World {
-    /* 0x000 */ u8 pad0[0xF88];
-    /* 0xF88 */ Actor *actors[16];
-    /* 0xFC8 */ s32 actorCount;
-} World;
-
 s32 func_00264C80(Actor *actor, void *ai);
 
 /* The actor of kind 5 in the world list nearest to target (squared distance) for which
  * func_00264C80 returns 0, or NULL. */
-Actor *func_00225848(World *world, Actor *target) {
+Actor *func_00225848(CWorld *world, Actor *target) {
     Actor **actors;
     Actor *actor;
     Actor *nearest;
@@ -34,9 +29,9 @@ Actor *func_00225848(World *world, Actor *target) {
 
     i = 0;
     nearest = NULL;
-    count = world->actorCount;
+    count = world->m_nKind5;
     best = 3.4028235e38f;
-    actors = world->actors;
+    actors = (Actor **)world->m_pKind5;
     for (; i < count; i++) {
         actor = actors[i];
         if (actor->def->kind != 5) {

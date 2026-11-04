@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/region.h"
+#include "structs/world.h"
 
 typedef struct {
     /* 0x00 */ f32 minX;
@@ -15,13 +16,8 @@ typedef struct {
     /* 0x08 */ TriGroup groups[1];
 } TriGroupList;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x58];
-    /* 0x58 */ void *level;
-} World;
-
 extern s32 D_800B6D54;          /* level loaded */
-extern World D_800F7078;
+extern CWorld D_800F7078;
 extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
 extern CVector3 D_800F2020;        /* cached raw normal */
 
@@ -79,7 +75,7 @@ static __inline__ f32 TriHeight(CGameRegion *tri, f32 x, f32 z) {
 
 /* The level triangle nearest below pos (other than skip), NULL if none. */
 CGameRegion *func_0026B4A4(CGameRegion *skip, CVector3 pos) {
-    World *world;
+    CWorld *world;
     CGameRegion *tris;
     TriGroupList *list;
     TriGroup *groups;
@@ -98,8 +94,8 @@ CGameRegion *func_0026B4A4(CGameRegion *skip, CVector3 pos) {
         return NULL;
     }
     world = &D_800F7078;
-    tris = (CGameRegion *) ((u8 *) func_002017D4(world->level, 2) + 8);
-    list = func_002017D4(world->level, 3);
+    tris = (CGameRegion *) ((u8 *) func_002017D4(world->m_pRegionData, 2) + 8);
+    list = func_002017D4(world->m_pRegionData, 3);
     n = list->count;
     groups = list->groups;
     best = NULL;

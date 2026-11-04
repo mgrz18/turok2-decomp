@@ -1,6 +1,7 @@
 /* The two inlined helpers after AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD/8028E6FC.CPP, func_8028E860_de and func_8028E78C_de (func_00226EBC and func_00226DE8 here), with Turok 2's layouts. */
 
 #include "common.h"
+#include "structs/world.h"
 
 typedef struct Vec3f {
     f32 x, y, z;
@@ -27,12 +28,6 @@ struct Entity {
     /* 0x175 */ u8 pad175[0x28C - 0x175];
     /* 0x28C */ Entity *next;
 };
-
-typedef struct World {
-    /* 0x000 */ u8 pad0[0xDFC];
-    /* 0xDFC */ Entity *entities[0x40];
-    /* 0xEFC */ s32 entityCount;
-} World;
 
 typedef struct DamageEvent {
     /* 0x00 */ u8 pad0[0x18];
@@ -97,7 +92,7 @@ static __inline__ s32 inBlastRange(Entity *e, Vec3f *target) {
 
 /* A blast at `target`: damages every entity of the world and of the actor list, then damages
  * the current player when within 512 units. */
-void func_00223A94(World *world, Vec3f *target) {
+void func_00223A94(CWorld *world, Vec3f *target) {
     DamageEvent event;
     Vec3f d;
     Entity *e;
@@ -108,9 +103,9 @@ void func_00223A94(World *world, Vec3f *target) {
     s32 i;
     s32 strength;
 
-    count = world->entityCount;
+    count = world->m_nKind1;
     for (i = 0; i < count; i++) {
-        e = world->entities[i];
+        e = (Entity *)world->m_pKind1[i];
         strength = blastStrength(e, target);
         if (strength != 0) {
             func_00245828(&event, 0, strength << 8, 102.399994f, 0x400000, 0);

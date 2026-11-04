@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/world.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
@@ -37,12 +38,6 @@ typedef struct Sweep {
     /* 0x4C */ CVector3 end;
 } Sweep;
 
-typedef struct World {
-    /* 0x000 */ u8 pad0[0x8F0];
-    /* 0x8F0 */ HitInst *actors[0x80];
-    /* 0xAF0 */ s32 actorCount;
-} World;
-
 typedef struct SweepHit {
     /* 0x00 */ HitInst *inst;
     /* 0x04 */ f32 t;
@@ -53,7 +48,7 @@ typedef struct MultiState {
     /* 0x19 */ u8 enabled;
 } MultiState;
 
-extern World D_800F7078;
+extern CWorld D_800F7078;
 extern HitInst **D_800F1ADC;
 extern u8 D_8011AAF1;
 extern MultiState D_8011AAD8;
@@ -84,7 +79,7 @@ void func_0024032C(Sweep *sweep) {
     SweepDef *def;
     HitInst *inst;
     HitInst *other;
-    World *world;
+    CWorld *world;
     SweepHit *hit;
     MultiState *multi;
     s32 count;
@@ -107,9 +102,9 @@ void func_0024032C(Sweep *sweep) {
     hit = hits;
     nHits = 0;
     world = &D_800F7078;
-    count = world->actorCount;
+    count = world->m_nMovers;
     for (i = 0; i < count && nHits < 0x80; i++) {
-        other = world->actors[i];
+        other = (HitInst *)world->m_pMovers[i];
         if (inst == other) {
             continue;
         }

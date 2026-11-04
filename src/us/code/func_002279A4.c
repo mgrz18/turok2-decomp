@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/world.h"
 
 typedef struct Vec3 {
     f32 x, y, z;
@@ -26,19 +27,13 @@ typedef struct ActorPool {
     /* 0x3608 */ PoolActor *tail;
 } ActorPool;
 
-typedef struct World {
-    /* 0x000 */ u8 pad0[0xEC];
-    /* 0x0EC */ void *draw[0x200];
-    /* 0x8EC */ s32 drawCount;
-} World;
-
 extern Bounds D_800F5A10;               /* visible bounds */
 
 s32 func_00267090(PoolActor *actor);
 
 /* Adds to the world's draw list the pool actors with flags 0x20000 (of 0x30000) that
  * func_00267090 accepts and that are inside the visible bounds. */
-void func_002279A4(ActorPool *pool, World *world) {
+void func_002279A4(ActorPool *pool, CWorld *world) {
     PoolActor *actor;
 
     for (actor = pool->head; actor != NULL; actor = actor->next) {
@@ -46,8 +41,8 @@ void func_002279A4(ActorPool *pool, World *world) {
             && D_800F5A10.max.x > actor->bounds.min.x && D_800F5A10.min.x < actor->bounds.max.x
             && D_800F5A10.max.z > actor->bounds.min.z && D_800F5A10.min.z < actor->bounds.max.z
             && D_800F5A10.max.y > actor->bounds.min.y && D_800F5A10.min.y < actor->bounds.max.y) {
-            if (world->drawCount != 0x200) {
-                world->draw[world->drawCount++] = actor;
+            if (world->m_nDrawActors != 0x200) {
+                world->m_pDrawActors[world->m_nDrawActors++] = (CGameObjectInstance *)actor;
             }
         }
     }

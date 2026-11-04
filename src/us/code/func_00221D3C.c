@@ -2,6 +2,7 @@
 /* Loop shapes after thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
+#include "structs/world.h"
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level
@@ -64,20 +65,6 @@ typedef struct {
 } Cell;
 
 typedef struct {
-    void **data;            /* 0x0 */
-    Cell *cell;             /* 0x4 */
-} Region;
-
-typedef struct {
-    u8 pad0[0x1064];
-    s32 sortedCount;        /* 0x1064 */
-    void *sorted[0x40];     /* 0x1068 */
-    u8 pad1168[0x14A8 - 0x1168];
-    s32 regionCount;        /* 0x14A8 */
-    Region regions[128];    /* 0x14AC */
-} World;
-
-typedef struct {
     s32 mask;               /* 0x00 */
 } ViewState;
 
@@ -93,7 +80,7 @@ s32 func_0026F60C(void *, f32 *);
 void func_00214844(Object *, View *);
 void func_002152AC(Actor *);
 
-void func_00221D3C(World *w) {
+void func_00221D3C(CWorld *w) {
     s32 r;
     s32 n;
     u8 *objs;
@@ -101,8 +88,8 @@ void func_00221D3C(World *w) {
     s32 mask;
     s32 vmask;
     View *v;
-    Region *regions;
-    Region *region;
+    CWorldSector *regions;
+    CWorldSector *region;
     Cell *cell;
     void *grp;
     Table *t;
@@ -140,7 +127,7 @@ void func_00221D3C(World *w) {
             g->w1 = 0x100000;
         }
         func_0020B5D4();
-        w->sortedCount = 0;
+        w->m_nDeferred = 0;
         {
             Gfx *g = D_800D8E24++;
             g->w0 = 0xDB040004;
@@ -163,8 +150,8 @@ void func_00221D3C(World *w) {
         }
         r = 0;
         do {
-            n = w->regionCount;
-            regions = w->regions;
+            n = w->m_nSectors;
+            regions = w->m_Sectors;
         } while (0);
         if (n > 0) {
             do {
@@ -172,7 +159,7 @@ void func_00221D3C(World *w) {
                 v = views;
                 found = 0;
                 while (v != NULL) {
-                    cell = region->cell;
+                    cell = region->m_pBounds;
                     if (cell->maxX > v->boxMin[0] && cell->minX < v->boxMax[0]
                         && cell->maxZ > v->boxMin[2] && cell->minZ < v->boxMax[2]) {
                         found = 1;
@@ -181,9 +168,9 @@ void func_00221D3C(World *w) {
                     v = v->next;
                 }
                 if (found) {
-                    func_0020565C(0, region->data);
+                    func_0020565C(0, region->m_hData);
                     k = 0;
-                    grp = *region->data;
+                    grp = *region->m_hData;
                     t = func_002017D4(grp, k);
                     cnt = t->count;
                     objs = t->entries;
@@ -206,12 +193,12 @@ void func_00221D3C(World *w) {
                                         v = v->next;
                                     }
                                     if (found) {
-                                        o->owner = region->data;
+                                        o->owner = region->m_hData;
                                         if (o->flags & 4) {
-                                            c = w->sortedCount;
+                                            c = w->m_nDeferred;
                                             if (c != 0x40) {
-                                                w->sorted[c] = o;
-                                                w->sortedCount = c + 1;
+                                                w->m_pDeferred[c] = o;
+                                                w->m_nDeferred = c + 1;
                                             }
                                         } else {
                                             func_00214844(o, views);
@@ -256,10 +243,10 @@ void func_00221D3C(World *w) {
                                 }
                                 if (found) {
                                     if (a->flags & 0x20) {
-                                        c = w->sortedCount;
+                                        c = w->m_nDeferred;
                                         if (c != 0x40) {
-                                            w->sorted[c] = a;
-                                            w->sortedCount = c + 1;
+                                            w->m_pDeferred[c] = a;
+                                            w->m_nDeferred = c + 1;
                                         }
                                     } else {
                                         func_002152AC(a);

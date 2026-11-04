@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/world.h"
 
 typedef struct Rect {
     f32 minX, minZ;             /* 0x00 */
@@ -10,27 +11,11 @@ typedef struct GridCell {
     s32 empty;                  /* 0x10 */
 } GridCell;                     /* 0x14 bytes */
 
-typedef struct Region {
-    void **data;                /* 0x00 */
-    GridCell *cell;             /* 0x04 */
-} Region;
-
 typedef struct FloatList {
     s32 pad0;
     s32 count;                  /* 0x04 */
     f32 values[1];              /* 0x08 */
 } FloatList;
-
-typedef struct World {
-    u8 pad0[0x20];
-    s32 unk20;                  /* 0x20 */
-    u8 pad24[0x50 - 0x24];
-    void *file;                 /* 0x50 */
-    void *grid;                 /* 0x54 */
-    u8 pad58[0x14A8 - 0x58];
-    s32 regionCount;            /* 0x14A8 */
-    Region regions[128];        /* 0x14AC */
-} World;
 
 typedef struct Viewer {
     u8 pad0[0x4];
@@ -51,14 +36,14 @@ s32 func_00220D00();
 void func_002051F4(s32 arg0, void **handle);
 
 /* Loads the grid sections inside the visible bounds that some viewer overlaps. */
-void func_002216DC(World *world) {
+void func_002216DC(CWorld *world) {
     s32 size;
     s32 nx;
     s32 x0;
     GridCell *cells;
     Viewer *viewers;
     Viewer *v;
-    Region *region;
+    CWorldSector *region;
     GridCell *cell;
     void **handle;
     f32 *xMax;
@@ -82,16 +67,16 @@ void func_002216DC(World *world) {
     }
     x0 = 0;
     count = 0;
-    list = func_002017D4(world->grid, 0);
+    list = func_002017D4(world->m_pCollision, 0);
     xMax = list->values;
     nx = list->count;
-    xMin = ((FloatList *)func_002017D4(world->grid, 1))->values;
+    xMin = ((FloatList *)func_002017D4(world->m_pCollision, 1))->values;
     x1 = nx - 1;
-    list = func_002017D4(world->grid, 2);
+    list = func_002017D4(world->m_pCollision, 2);
     nz = list->count;
     zMax = list->values;
-    zMin = ((FloatList *)func_002017D4(world->grid, 3))->values;
-    cells = (GridCell *)((u8 *)func_002017D4(world->grid, 4) + 8);
+    zMin = ((FloatList *)func_002017D4(world->m_pCollision, 3))->values;
+    cells = (GridCell *)((u8 *)func_002017D4(world->m_pCollision, 4) + 8);
     z1 = nz - 1;
     z0 = 0;
     while (x0 < nx && xMin[x0] < D_800F5A10[0]) {
@@ -106,7 +91,7 @@ void func_002216DC(World *world) {
     while (z1 >= 0 && D_800F5A10[5] < zMax[z1]) {
         z1--;
     }
-    region = world->regions;
+    region = world->m_Sectors;
     for (z = z0; z <= z1; z++) {
         for (x = x0; x <= x1; x++) {
             idx = x + z * nx;
@@ -125,14 +110,14 @@ void func_002216DC(World *world) {
             if (!found) {
                 continue;
             }
-            handle = func_0020367C(0, func_0020185C(world->file, world->unk20, idx, &size), size, 8, world,
+            handle = func_0020367C(0, func_0020185C(world->m_pLevelInfo, world->m_LevelInfoKey, idx, &size), size, 8, world,
                                    func_00220D00, D_800A5F6C, 0);
             if (handle == NULL) {
                 continue;
             }
             if (*(s32 *)*handle != 0) {
-                region->data = handle;
-                region->cell = cell;
+                region->m_hData = handle;
+                region->m_pBounds = cell;
                 region++;
                 if (++count == 128) {
                     goto done;
@@ -143,5 +128,5 @@ void func_002216DC(World *world) {
         }
     }
 done:
-    world->regionCount = count;
+    world->m_nSectors = count;
 }
