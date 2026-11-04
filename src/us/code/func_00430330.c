@@ -3,12 +3,6 @@
 #include "structs/game.h"
 
 /* Turok 2: the mode block sits at 0x23FD0 (see func_00288E58). */
-typedef struct GameSession {
-    char pad0[0x23FDC];
-    s32 target;                /* 0x23FDC */
-    char pad23FE0;
-    s8 phase;                  /* 0x23FE1 */
-} GameSession;
 
 extern char D_800F5A50[];
 extern char D_80119870[];
@@ -18,7 +12,7 @@ void func_0026EDA8(void *);
 void func_0025359C(void *);
 
 /* Resets the match state and asks the session for mode 1. */
-void func_00430330(GameSession *session) {
+void func_00430330(CEngineApp *session) {
     GameMatch *m;
 
     func_00285410(0);
@@ -28,6 +22,6 @@ void func_00430330(GameSession *session) {
     m->teams = 0;
     m->tag = 0;
     m->unk44 = 0;
-    session->phase = 2;
-    session->target = 1;
+    session->m_Settings.fadeMode = 2;
+    session->m_Settings.nextMode = 1;
 }
