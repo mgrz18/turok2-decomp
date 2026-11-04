@@ -162,21 +162,37 @@ the table at offset 8, and an object there puts the table at 0x800A601C
 0x800A6014 and table at 0x800A6018 fit only a pool that is already 4 bytes
 in at 0x800A6014, that is, one .rodata section holding func_002261A8's
 -1.0f and func_0042CBE4's literal and table: one source file whose
-functions went to two segments, the engine's .text and the VM's. cc1 can do
-that (`-ffunction-sections` names each function's section `.func_X`, and
-splat can link a subsegment's `linker_section`), but nothing else in the
-build works that way, the object's other members are unknown, and the
-second module's copy func_00465B04 would need the same object with its
-engine half thrown away. So func_0042CBE4 and func_00465B04 stay asm (both
-have matching C in build/manual/X), and this is the first evidence that
-some engine and VM functions share a source file.
+functions went to two segments, the engine's .text and the VM's. That is how
+it is built now, and it is the first evidence that some engine and VM
+functions share a source file:
+
+- src/us/code/func_002261A8.c holds both. func_0042CBE4 is declared
+  `__attribute__((section(".text_vm")))`, so cc1 puts its code in a section
+  of its own and nothing else changes (each function compiles to the bytes
+  it has alone). The object's .rodata is the ROM's 0x38 bytes from
+  0x800A6010: -1.0f, 1.0f, then the table at offset 8.
+- The yaml links that one object in three places: .text in `code` at
+  0x26DA8, .rodata in `code_rodata` at 0xA6C10 (the `rodata` hole at 0xA6C14
+  is gone) and .text_vm in `virtual` at 0x176BE4, through a dict subsegment
+  `{start: 0x176BE4, type: c, name: code/func_002261A8, linker_section:
+  .text_vm}`. splat writes `func_002261A8.c.o(.text_vm)` there; the .data and
+  .bss lines it repeats for it are empty.
+- The second module's copy, src/us/code/func_00465B04.c, is the same source
+  with the engine half thrown away: func_002261A8 is a static copy in
+  `.text_engine`, which no output section names, so /DISCARD/ drops it. Its
+  -1.0f still opens the file's .rodata, and versions/shared_rodata.us.txt
+  places that .rodata NOLOAD at 0x800A6010, so `make verify` holds the -1.0f,
+  the 1.0f and the table's distances against the ROM like any other twin.
+
+Another function found to share an object across segments can be built the
+same way: a section attribute in the C, `linker_section` in the yaml.
 
 The X batch moved eight pools from the second module's C to the first
 module's: func_00405AC8, func_00406000, func_00409500, func_00409784,
 func_00409A64, func_0040D5C4, func_0041760C and func_00424780 own them now
 (and func_004088B0 its strings), and their copies go NOLOAD over them.
 Second-module code also names first-module addresses inside functions that
-are still asm (func_0042CAB4 + 0x50, .L0042B960, func_0042CBE4 + 0x40) as
+were asm (func_0042CAB4 + 0x50, .L0042B960, func_0042CBE4 + 0x40) as
 callees or callbacks; those are defined absolutely too. The second module's
 text does not end at 0x469400: func_00469374 runs to 0x46941C, and the
 words after it still decode as code, so virtual_rodata_1 likely starts
