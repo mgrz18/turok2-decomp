@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x3E];
@@ -11,14 +12,6 @@ typedef struct {
     /* 0x0C */ s16 index;
 } Intelligence;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x19];
-    /* 0x019 */ u8 field19;
-    /* 0x01A */ u8 pad1A[0x20C - 0x1A];
-    /* 0x20C */ s32 field20C;
-} State8011AAD8;
-
-extern State8011AAD8 D_8011AAD8;
 extern s32 D_800ADB5C;
 extern s32 D_800ADB30[];
 extern u8 D_800F7078[];
@@ -28,12 +21,12 @@ extern void func_002241D8(void *, CPlayer *, s32, s32);
 #define PLAYER_C04(p) (*(s32 *)&(p)->m_WaitDeathmatchTimer)
 
 void func_002541E4(CPlayer *player) {
-    State8011AAD8 *state = &D_8011AAD8;
+    GameSettings *state = &D_8011AAD8;
     s32 id;
 
-    if (state->field19 == 0) {
+    if (state->multiplayer == 0) {
         id = 0x66;
-    } else if (state->field20C != 0
+    } else if (state->match.tag != 0
                && ((PlayerOptions *)player->m_pOptions)->field3E != 0) {
         id = D_800ADB5C;
     } else {

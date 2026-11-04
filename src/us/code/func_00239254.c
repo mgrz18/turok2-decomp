@@ -1,12 +1,8 @@
+#include "common.h"
+#include "structs/game.h"
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00268768.c, func_00268768.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
 typedef struct Vec3f {
     f32 x, y, z;
 } Vec3f;
@@ -28,14 +24,8 @@ typedef struct B15Src {
                u8 pad18[0x68];
                void *unk80;     /* 0x80 (0xD0 in Rage Wars) */
 } B15Src;
-typedef struct B15Globals {
-                u32 flags0;
-                u8 pad4[0x1C8];
-                s32 unk1CC;
-} B15Globals;
 void func_002755B0(s16 id, Vec3f pos, s32 a, void *src, f32 vol);
 s32 func_00268E60(void *a);
-extern B15Globals D_8011AAD8;
 extern f32 D_800A65F0;
 extern f32 D_800A65F4;
 extern f32 D_800A65F8;
@@ -49,10 +39,10 @@ void func_00239254(B15Src *act, B15Src *src, s32 c, Vec3f pos, B15Blk8 k) {
             break;
         case 1:
             if (act->def->type == 1) {
-                if (D_8011AAD8.flags0 & 0x40) {
+                if (D_8011AAD8.cheatFlags & 0x40) {
                     vol = D_800A65F4;
                 }
-                if (D_8011AAD8.flags0 & 0x20) {
+                if (D_8011AAD8.cheatFlags & 0x20) {
                     vol = D_800A65F8;
                 }
             }

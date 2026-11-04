@@ -1,12 +1,7 @@
 #include "common.h"
+#include "structs/game.h"
 
 /* A play-time clock: frames, seconds, minutes, hours. */
-typedef struct {
-    /* 0x0 */ f32 frames;
-    /* 0x4 */ f32 seconds;
-    /* 0x8 */ f32 minutes;
-    /* 0xC */ f32 hours;
-} PlayClock;
 
 /* Only the field read here. */
 typedef struct {
@@ -16,7 +11,6 @@ typedef struct {
 
 extern f32 D_800A9DF4;                              /* units per next unit (presumably 60) */
 extern f32 D_800B6D28;                              /* frame delta */
-extern PlayClock D_8011ACB0;
 
 void func_00288FDC(BigState *arg0) {
     f32 temp_f0;

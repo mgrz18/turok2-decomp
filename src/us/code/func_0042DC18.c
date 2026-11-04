@@ -1,5 +1,6 @@
 /* Player code: func_0042DC18, 0x0042DC18-0x0042DE74 (splat had it inside the data D_0042D50C). */
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct Options {
     /* 0x00 */ s16 unk0;
@@ -52,14 +53,6 @@ typedef struct Player {
     /* 0x12B4 */ s32 unk12B4;
 } Player;
 
-typedef struct GameFlags {
-    /* 0x000 */ u8 pad0[0x19];
-    /* 0x019 */ u8 multiplayer;     /* D_8011AAF1 */
-    /* 0x01A */ u8 pad1A[0x1FC - 0x1A];
-    /* 0x1FC */ s32 unk1FC;
-} GameFlags;
-
-extern GameFlags D_8011AAD8;
 extern u8 D_8011AAF1;   /* multiplayer */
 extern u8 D_801198B0[];
 
@@ -75,7 +68,7 @@ extern void func_00438808();
 extern void func_0043916C();
 
 void func_0042DC18(Player *p, s32 character, s32 arg2) {
-    GameFlags *flags;
+    GameSettings *flags;
     s32 i;
 
     if (func_0027BC34()) {
@@ -147,7 +140,7 @@ void func_0042DC18(Player *p, s32 character, s32 arg2) {
             p->options->character = 0;
             p->character = 0;
             p->unkBF8 = 1;
-            if (flags->unk1FC) {
+            if (flags->match.teams) {
                 func_00416644(p->camera + 0x53C, func_004388E0, p, p->controller, p->index);
             } else {
                 func_00416644(p->camera + 0x53C, func_00438808, p, p->controller, p->index);

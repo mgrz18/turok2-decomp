@@ -1,10 +1,6 @@
 /* Player code: func_0042EA00, 0x0042EA00-0x0042EB04 (splat had it inside the data D_0042D50C). */
 #include "common.h"
-
-typedef struct GameFlags {
-    /* 0x00 */ u8 pad0[0x19];
-    /* 0x19 */ u8 f19;
-} GameFlags;
+#include "structs/game.h"
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x144];
@@ -34,7 +30,6 @@ typedef struct GameState {
     /* 0x198 */ s32 state;          /* D_8011AC88 */
 } GameState;
 
-extern GameFlags D_8011AAD8;
 extern GameState D_8011AAF0;
 extern u8 D_8011AAF1; /* multiplayer */
 extern u32 D_800B6D20;
@@ -48,9 +43,9 @@ extern void func_0027580C(s32 sound);
 extern void func_00248A8C(Player *p);
 
 void func_0042EA00(Player *p) {
-    GameFlags *flags = &D_8011AAD8;
+    GameSettings *flags = &D_8011AAD8;
 
-    if (flags->f19 != 0 || (func_00285BD0(p->controller, 1), flags->f19 != 0)) {
+    if (flags->multiplayer != 0 || (func_00285BD0(p->controller, 1), flags->multiplayer != 0)) {
         func_002540E4(p);
     } else {
         p->health2 = 0x6400;

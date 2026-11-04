@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x20];
@@ -19,20 +20,12 @@ typedef struct {
     /* 0x20 */ Player *head;
 } PlayerList;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ s32 limit;
-    /* 0x1C */ u8 pad1C[0x24 - 0x1C];
-    /* 0x24 */ s32 teams;
-} GameState;
-
-extern GameState D_8011ACB0;
 extern s32 func_0025340C(PlayerList *list, Player *player);
 
 /* Whether the frag limit is reached: by either team's total in team games,
  * otherwise by one player's frags (the slot func_0025340C names left out). */
 s32 func_0025295C(PlayerList *list) {
-    GameState *state = &D_8011ACB0;
+    GameMatch *state = &D_8011ACB0;
     Player *p;
     s32 i;
 
@@ -55,15 +48,15 @@ s32 func_0025295C(PlayerList *list) {
                     }
                 }
             }
-            if (team0 >= D_8011ACB0.limit) {
+            if (team0 >= D_8011ACB0.scoreLimit) {
                 return 1;
             }
-            if (team1 >= D_8011ACB0.limit) {
+            if (team1 >= D_8011ACB0.scoreLimit) {
                 return 1;
             }
         }
     } else {
-        GameState *gs = state;
+        GameMatch *gs = state;
 
         for (p = list->head; p != NULL; p = p->next) {
             s32 skip;
@@ -76,7 +69,7 @@ s32 func_0025295C(PlayerList *list) {
                     sum += p->options->frags[i];
                 }
             }
-            if (sum >= gs->limit) {
+            if (sum >= gs->scoreLimit) {
                 return 1;
             }
         }

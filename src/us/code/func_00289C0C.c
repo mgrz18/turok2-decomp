@@ -1,11 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 /* The game flags at D_8011AAD8 (0x1268 into the game state at D_80119870). */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x19];
-    /* 0x19 */ s8 unk19;
-} GameFlagsBytes;
 
 s32 func_00412438(s32);
 s32 func_0042C700(s32, s32, s32);
@@ -17,7 +14,6 @@ extern s32 D_800B6D74;
 extern s32 D_800C2034;
 extern s32 D_800F6CA0;
 extern u8 D_800F7078[];
-extern GameFlagsBytes D_8011AAD8;
 extern s32 D_8011AD00;
 extern f32 D_8011F120;
 
@@ -26,7 +22,7 @@ void func_00289C0C(s32 arg0)
   CPlayer *temp_v0;
   s8 *new_var;
   new_var = (s8 *) (&D_8011AAD8);
-  D_8011AAD8.unk19 = 0;
+  D_8011AAD8.multiplayer = 0;
   D_800B6D70 = 0;
   D_800F6CA0 = 0;
   D_8011F120 = (f32) D_800C2034;
