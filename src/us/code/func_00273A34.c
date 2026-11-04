@@ -19,6 +19,6 @@ void func_00273A34(SndVoice *arg0, SndMgr *arg1, s32 arg2) {
     arg0->reset = 0;
     arg0->unkC4 = 1;
     arg0->vp.scale = 1.0f;
-    arg0->vp.f24 = 1.0f;
+    arg0->vp.doppler = 1.0f;
     arg0->pitchScale = 1.0f;
 }

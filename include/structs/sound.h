@@ -119,7 +119,7 @@ typedef struct {
     /* 0x1A */ u8 pad1A[2];
     /* 0x1C */ f32 scale;      /* volume scale */
     /* 0x20 */ f32 f20;
-    /* 0x24 */ f32 f24;
+    /* 0x24 */ f32 doppler;      /* pitch factor of sounds 0x1B2/0x1B3 (func_00272D3C) */
     /* 0x28 */ s16 priority;
     /* 0x2A */ s16 channel;
     /* 0x2C */ s16 s2C;

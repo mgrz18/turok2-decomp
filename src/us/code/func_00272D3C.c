@@ -14,11 +14,11 @@ void func_00272D3C(SndVoice *s) {
     CCamera *t;
 
     if (s->soundId != 0x1B2 && s->soundId != 0x1B3) {
-        s->vp.f24 = 1.0f;
+        s->vp.doppler = 1.0f;
         return;
     }
     if (s->reset != 0) {
-        s->vp.f24 = 1.0f;
+        s->vp.doppler = 1.0f;
     }
     t = s->mgr->listener;
     dx = s->vp.pos.x - t->m_vPos.x;
@@ -27,30 +27,30 @@ void func_00272D3C(SndVoice *s) {
     d = dx * dx + dy * dy + dz * dz;
     s->vp.distSq = d;
     if (s->vp.prevDistSq < d) {
-        s->vp.f24 -= D_800B2848;
+        s->vp.doppler -= D_800B2848;
     } else if (d < s->vp.prevDistSq) {
-        s->vp.f24 += D_800B2848;
+        s->vp.doppler += D_800B2848;
     } else {
-        v = s->vp.f24;
+        v = s->vp.doppler;
         if (v > 1.0f) {
             vol = v - D_800B2848;
             if (vol < 1.0f) {
                 vol = 1.0f;
             }
-            s->vp.f24 = vol;
+            s->vp.doppler = vol;
         } else if (v < 1.0f) {
             vol = v + D_800B2848;
             if (vol > 1.0f) {
                 vol = 1.0f;
             }
-            s->vp.f24 = vol;
+            s->vp.doppler = vol;
         }
         return;
     }
-    if (s->vp.f24 > 1.4f) {
-        s->vp.f24 = 1.4f;
-    } else if (s->vp.f24 < 0.6f) {
-        s->vp.f24 = 0.6f;
+    if (s->vp.doppler > 1.4f) {
+        s->vp.doppler = 1.4f;
+    } else if (s->vp.doppler < 0.6f) {
+        s->vp.doppler = 0.6f;
     }
     s->vp.prevDistSq = s->vp.distSq;
 }
