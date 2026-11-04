@@ -12,7 +12,10 @@
  * Several fields also have symbols of their own, which some files still
  * use: D_8011AAE0 (difficulty), D_8011AAF1 (multiplayer), D_8011AB08
  * (weaponEnabled), D_8011AB18 (defaultSlot), D_8011AB58 (slots), D_8011AC88
- * (mode), D_8011ACA8 (matchMode) and D_8011ACB0 (match). Three files keep a
+ * (mode), D_8011ACA8 (matchMode) and D_8011ACB0 (match). Files that read
+ * a field through one of those symbols now name it from D_8011AAD8 (the
+ * offsets resolve to the same addresses); func_00256E6C keeps a view based at
+ * D_8011AAF1, as the ROM bases its loads there. Three files keep a
  * local array view of D_8011AAD8 / D_8011ACB0 (func_00222A9C, func_00286440,
  * func_00450D78): through an array the compiler bases the accesses on the
  * accessed field's address, as the ROM does there. */
@@ -51,8 +54,12 @@ typedef struct GameSettings {
     /* 0x004 */ u32 unlockedCheats;    /* set by the cheat codes (func_0041AD64) and bosses (func_00407F20) */
     /* 0x008 */ s32 difficulty;         /* D_8011AAE0: 8, 16 or 32 (func_002427E0) */
     /* 0x00C */ u32 unkC;              /* shown in sixteenths */
-    /* 0x010 */ u16 unk10;
-    /* 0x012 */ u8 unk12[0x14 - 0x12];
+    /* 0x010 */ union {
+        u16 value;                 /* 0 to 0x100 in sixteenths (func_0041C458, func_0041C3C4) */
+        u8 bytes[2];
+    } hudAlphaSetting;             /* D_8011AAE8 */
+    /* 0x012 */ u8 hudAlpha;          /* D_8011AAEA: hudAlphaSetting clamped to 0xFF, what the HUD draws with */
+    /* 0x013 */ u8 unk13;
     /* 0x014 */ u8 unk14;              /* 0x80-centred */
     /* 0x015 */ u8 unk15;              /* 0x80-centred */
     /* 0x016 */ u8 unk16;              /* 0x80-centred */
@@ -79,7 +86,11 @@ typedef struct GameSettings {
     /* 0x02E */ u8 teamUnk2E;
     /* 0x02F */ u8 unk2F;
     /* 0x030 */ u8 weaponEnabled[10];  /* D_8011AB08 */
-    /* 0x03A */ u8 unk3A[0x40 - 0x3A];
+    /* 0x03A */ u8 unk3A[0x3C - 0x3A];
+    /* 0x03C */ u8 unk3C;
+    /* 0x03D */ u8 unk3D;              /* 3 by default (func_0041BA50) */
+    /* 0x03E */ u8 unk3E;
+    /* 0x03F */ u8 unk3F;              /* 3 by default */
     /* 0x040 */ CPlayerOptions defaultSlot;  /* D_8011AB18 */
     /* 0x080 */ CPlayerOptions slots[4];     /* D_8011AB58 */
     /* 0x180 */ u8 unk180;

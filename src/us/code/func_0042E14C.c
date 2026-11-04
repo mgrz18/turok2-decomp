@@ -1,14 +1,10 @@
 /* CPlayer code: func_0042E14C, 0x0042E14C-0x0042E29C (splat had it inside the data D_0042D50C). */
 #include "common.h"
+#include "structs/game.h"
 #include "structs/player.h"
 
 extern s32 D_80119878; /* player count */
-extern u8 D_8011AAF1;  /* multiplayer */
-typedef struct GameState {
-    s32 state;
-} GameState;
-
-extern GameState D_8011AC88;
+extern u8 D_8011AAF1;  /* D_8011AAD8.multiplayer; read through D_8011AAD8 the code no longer matches */
 extern u32 D_800B6D20;
 extern s16 D_800AE2B4[];
 extern f32 D_800A6AC4; /* 60.0f, in the engine's .rodata */
@@ -41,7 +37,7 @@ void func_0042E14C(CPlayer *p) {
     p->m_pHitMeWithChargeDart = 0;
     p->m_nNumArrowsStuckInMe = 0;
     p->m_UseLowerAmmo = 0;
-    if (D_8011AC88.state == 13 && D_8011AAF1 == 0 && D_800B6D20 >= 11) {
+    if (D_8011AAD8.mode == 13 && D_8011AAF1 == 0 && D_800B6D20 >= 11) {
         if (p->m_Data.m_Lives < 11) {
             func_0027580C(D_800AE2B4[p->m_Data.m_Lives]);
         }

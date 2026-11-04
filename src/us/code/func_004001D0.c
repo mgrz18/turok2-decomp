@@ -4,12 +4,6 @@
 
 
 
-typedef struct {
-    /* 0x00 */ s32 state;
-    /* 0x04 */ u8 pad04[0x1C - 0x4];
-    /* 0x1C */ s32 locked;
-} Cinema004001D0;
-
 /* Free-look camera driven by the C buttons. */
 typedef struct {
     /* 0x00 */ s32 mode;
@@ -24,7 +18,6 @@ typedef struct {
     /* 0x34 */ f32 pitchTarget;
 } Look004001D0;
 
-extern Cinema004001D0 D_8011AC88;
 extern f32 D_800B6D28;
 CPlayer *func_002532A8(CPlayerList *list);
 s32 func_00416AF8(u8 *a0);
@@ -55,7 +48,7 @@ void func_004001D0(Look004001D0 *look) {
     } else if (player->m_ContState.m_dwButtonsSingleNoHold & 0x20) {
         look->mode = 0;
     }
-    if (look->mode != 0 && D_8011AC88.state == 13 && D_8011AC88.locked == 0) {
+    if (look->mode != 0 && D_8011AAD8.mode == 13 && D_8011AAD8.paused == 0) {
         if (look->state != 1 && look->state != 2) {
             look->state = 1;
         }

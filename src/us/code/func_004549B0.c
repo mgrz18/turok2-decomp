@@ -1,51 +1,6 @@
 /* Module-2 copy of func_0041BA50 (same code; callee at its link address). */
 #include "common.h"
-#include "structs/player_options.h"
-
-/* A view of GameSettings (structs/game.h, D_8011AAD8), left to the game-settings family: it names bytes the header keeps in arrays (0x12, 0x3C-0x3F). */
-typedef struct {
-    /* 0x000 */ u32 options;
-    /* 0x004 */ u32 unlocked;
-    /* 0x008 */ s32 unk8;
-    /* 0x00C */ s32 unkC;
-    /* 0x010 */ s16 unk10;
-    /* 0x012 */ u8 unk12;
-    /* 0x013 */ u8 unk13;
-    /* 0x014 */ u8 unk14;
-    /* 0x015 */ u8 unk15;
-    /* 0x016 */ u8 unk16;
-    /* 0x017 */ u8 unk17;
-    /* 0x018 */ u8 unk18;
-    /* 0x019 */ u8 unk19;
-    /* 0x01A */ u8 unk1A;
-    /* 0x01B */ u8 unk1B;
-    /* 0x01C */ f32 unk1C;
-    /* 0x020 */ u8 unk20;
-    /* 0x021 */ u8 unk21;
-    /* 0x022 */ u8 unk22;
-    /* 0x023 */ u8 unk23;
-    /* 0x024 */ u8 unk24;
-    /* 0x025 */ s8 minutes;
-    /* 0x026 */ s8 unk26;
-    /* 0x027 */ s8 level;
-    /* 0x028 */ u8 unk28;
-    /* 0x029 */ u8 unk29;
-    /* 0x02A */ u8 unk2A;
-    /* 0x02B */ u8 unk2B;
-    /* 0x02C */ u8 unk2C;
-    /* 0x02D */ u8 unk2D;
-    /* 0x02E */ u8 unk2E;
-    /* 0x02F */ u8 pad2F;
-    /* 0x030 */ u8 unk30[10];
-    /* 0x03A */ u8 pad3A[2];
-    /* 0x03C */ u8 unk3C;
-    /* 0x03D */ u8 unk3D;
-    /* 0x03E */ u8 unk3E;
-    /* 0x03F */ u8 unk3F;
-    /* 0x040 */ CPlayerOptions extra;
-    /* 0x080 */ CPlayerOptions slots[4];
-    /* 0x180 */ u8 unk180;
-} GameSetup;
+#include "structs/game.h"
 
 extern void func_0041BBB0(CPlayerOptions *slot);
 
@@ -65,41 +20,41 @@ static __inline__ void InitSlot(CPlayerOptions *slot, u8 index) {
 }
 
 /* Default multiplayer setup. */
-void func_004549B0(GameSetup *s) {
+void func_004549B0(GameSettings *s) {
     s32 i;
 
     s->unk13 = 1;
     s->unk14 = 0x80;
     s->unk15 = 0xFA;
     s->unk16 = 0xFF;
-    s->unk10 = 0x80;
-    s->unk8 = 0x10;
+    s->hudAlphaSetting.value = 0x80;
+    s->difficulty = 0x10;
     s->unkC = 0;
     s->unk17 = 1;
     s->unk18 = 0;
-    s->options = 0;
-    s->unlocked = 0;
+    s->cheatFlags = 0;
+    s->unlockedCheats = 0;
     s->unk1B = 0;
     s->unk180 = 0;
-    s->unk20 = 10;
-    s->unk21 = 0;
-    s->unk22 = 0;
-    s->unk23 = 0;
-    s->unk24 = 1;
-    s->minutes = 0;
-    s->unk26 = 0;
-    s->level = 0;
-    s->unk28 = 0;
-    s->unk29 = 1;
-    s->unk2A = 10;
-    s->unk2B = 0;
-    s->unk2C = 0;
-    s->unk2D = 0;
-    s->unk2E = 1;
-    s->unk12 = s->unk10;
-    s->unk1C = 1.0f;
+    s->dmTimeLimit = 10;
+    s->dmScoreLimit = 0;
+    s->dmArena = 0;
+    s->dmSkill = 0;
+    s->dmUnk24 = 1;
+    s->tagTimeLimit = 0;
+    s->tagScoreLimit = 0;
+    s->tagArena = 0;
+    s->tagSkill = 0;
+    s->tagUnk29 = 1;
+    s->teamTimeLimit = 10;
+    s->teamScoreLimit = 0;
+    s->teamArena = 0;
+    s->teamSkill = 0;
+    s->teamUnk2E = 1;
+    s->hudAlpha = s->hudAlphaSetting.value;
+    s->speed = 1.0f;
     for (i = 0; i < 10; i++) {
-        s->unk30[i] = 1;
+        s->weaponEnabled[i] = 1;
     }
     s->unk3C = 0;
     s->unk3D = 3;
@@ -109,9 +64,9 @@ void func_004549B0(GameSetup *s) {
         InitSlot((CPlayerOptions *) ((u8 *) s + 0x80 + i * 0x40), i);
     }
     InitSlot((CPlayerOptions *) ((u8 *) s + 0x40), 0);
-    s->extra.m_bActive = 1;
-    s->unk19 = 0;
-    s->unk1A = 1;
-    s->options = 0x4000000;
-    s->unlocked = 0x4000000;
+    s->defaultSlot.m_bActive = 1;
+    s->multiplayer = 0;
+    s->playerCount = 1;
+    s->cheatFlags = 0x4000000;
+    s->unlockedCheats = 0x4000000;
 }
