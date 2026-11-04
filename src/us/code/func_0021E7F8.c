@@ -1,9 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
 extern s32 func_0020C0D0(s32, s32, s32);
 
-void func_0021E7F8(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, void (**)(void *, void *), 0x244)(arg0, (s8 *)arg0 + 0x140);
-    func_0020C0D0((s32)((s8 *)arg0 + 0x58), arg1, (s32)((s8 *)arg0 + 0xBC));
+void func_0021E7F8(CGameObjectInstance *obj, s32 arg1) {
+    ((void (*)(void *, void *)) obj->m_AI.m_pfCalculateOrientationMatrix)(obj, &obj->m_AI);
+    func_0020C0D0((s32) obj->m_mfOrient, arg1, (s32) &obj->m_vMin);
 }

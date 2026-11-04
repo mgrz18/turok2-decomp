@@ -1,9 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
 s32 func_0025ED4C(s32, s32);
 
-void func_00260060(s32 arg0, void *arg1) {
-    M2C_FIELD(arg1, s32 (**)(s32, s32), 0xF4) = func_0025ED4C;
-    M2C_FIELD(arg1, f32 *, 0xD0) = 75.0f;
+void func_00260060(CGameObjectInstance *obj, CAI *ai) {
+    ai->m_pfDraw = func_0025ED4C;
+    ai->m_OnFireTimer = 75.0f;
 }

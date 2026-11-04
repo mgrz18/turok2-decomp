@@ -1,10 +1,22 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/player.h"
 
-M2C_UNK func_002241D8(M2C_UNK *, void *, u16, s32); /* extern */
-extern M2C_UNK D_800AF618;
-extern M2C_UNK D_800F7078;
+s32 func_002241D8(s32 *, void *, u16, s32); /* extern */
+/* Per-weapon info rows (pointers indexed by weapon). */
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ u16 unk4;
+} WeaponInfo;
+extern WeaponInfo *D_800AF618[];
 
-void func_0025426C(void *arg0) {
-    func_002241D8(&D_800F7078, arg0 + 0x288, M2C_FIELD(*(((__typeof__(&D_800AF618))((s8 *)&D_800AF618 + (M2C_FIELD(arg0, s16 *, 0x996) * 4)))), u16 *, 4), M2C_FIELD(M2C_FIELD(arg0, void **, 0x3F4), s32 *, 0x10));
+struct CAIModeInfo {
+    /* 0x00 */ u8 pad0[8];
+    /* 0x08 */ s32 (*func)();
+    /* 0x0C */ u8 padC[4];
+    /* 0x10 */ s32 unk10;
+};
+extern s32 D_800F7078;
+
+void func_0025426C(CPlayer *arg0) {
+    func_002241D8(&D_800F7078, &arg0->m_WeaponActor, D_800AF618[arg0->m_Data.m_CurrentWeapon]->unk4, arg0->m_WeaponActor.m_AI.m_pModeTable->unk10);
 }

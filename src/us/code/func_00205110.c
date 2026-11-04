@@ -1,5 +1,4 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_002065CC(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
@@ -7,10 +6,16 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern M2C_UNK D_800D8DB0;
+extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
-void func_00205110(s32 arg0, s32 arg1) {
+typedef struct {
+    /* 0x00 */ u8 pad0[8];
+    /* 0x08 */ s32 count;
+    /* 0x0C */ s32 flags;
+} Request;
+
+void func_00205110(s32 arg0, Request *arg1) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v1;
@@ -25,9 +30,9 @@ void func_00205110(s32 arg0, s32 arg1) {
     } else {
         __osRestoreInt(temp_a0);
     }
-    func_002065CC(0, arg1);
-    M2C_FIELD(arg1, s32 *, 8) = (s32) (M2C_FIELD(arg1, s32 *, 8) + 1);
-    M2C_FIELD(arg1, s32 *, 0xC) = (s32) (M2C_FIELD(arg1, s32 *, 0xC) | 0x100);
+    func_002065CC(0, (s32) arg1);
+    arg1->count = (s32) (arg1->count + 1);
+    arg1->flags = (s32) (arg1->flags | 0x100);
     temp_v0 = __osDisableInt();
     temp_v1_2 = D_800D8DCC - 1;
     D_800D8DCC = temp_v1_2;

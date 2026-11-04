@@ -1,10 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_002465C8(s32 arg0, void *arg1) {
-    M2C_UNK (*temp_v0)();
+/* Calls the AI's hurt callback, if any. */
+void func_002465C8(s32 arg0, CAI *arg1) {
+    s32 (*temp_v0)();
 
-    temp_v0 = M2C_FIELD(arg1, M2C_UNK (**)(), 0xF8);
+    temp_v0 = arg1->m_pfHurt;
     if (temp_v0 != NULL) {
         temp_v0();
     }

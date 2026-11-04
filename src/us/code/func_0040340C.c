@@ -1,11 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-M2C_UNK func_002666B0(s32, s32, M2C_UNK);           /* extern */
+/* The controller of a boss fight (Owner00403430 in func_00403430): it holds the boss at 0x220. */
+typedef struct {
+    /* 0x000 */ u8 pad0[0x220];
+    /* 0x220 */ CGameObjectInstance *boss;
+} BossOwner;
 
-void func_0040340C(void *arg0, M2C_UNK arg1) {
-    s32 temp_a0;
+s32 func_002666B0(s32, s32, s32);           /* extern */
 
-    temp_a0 = M2C_FIELD(arg0, s32 *, 0x220);
-    func_002666B0(temp_a0, temp_a0 + 0x140, arg1);
+void func_0040340C(BossOwner *arg0, s32 arg1) {
+    CGameObjectInstance *temp_a0;
+
+    temp_a0 = arg0->boss;
+    func_002666B0((s32) temp_a0, (s32) &temp_a0->m_AI, arg1);
 }

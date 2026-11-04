@@ -1,16 +1,24 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_0021D928(s32, s32, s32);
 
-extern M2C_UNK D_800A7990;
+typedef struct {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ f32 fadeScale;
+} Unk800A7990;
+extern Unk800A7990 D_800A7990;
 extern s32 D_800AB8B0;
 extern f32 D_800AB8C0;
 
-void func_002605AC(s32 arg0, void *arg1, s32 arg2) {
+typedef struct {
+    /* 0x00 */ u8 pad0[0x40];
+    /* 0x40 */ f32 unk40;
+} Unk002605AC;
+
+void func_002605AC(s32 arg0, Unk002605AC *arg1, s32 arg2) {
     f32 var_f1;
 
-    var_f1 = 255.0f - (M2C_FIELD(arg1, f32 *, 0x40) * M2C_FIELD(&D_800A7990, f32 *, 4));
+    var_f1 = 255.0f - (arg1->unk40 * D_800A7990.fadeScale);
     D_800AB8B0 = 1;
     if (var_f1 < 0.0f) {
         var_f1 = 0.0f;

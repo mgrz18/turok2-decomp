@@ -1,9 +1,14 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00226160(M2C_UNK *, u8, s16);          /* extern */
-extern M2C_UNK D_800F7078;
+typedef struct {
+    /* 0x0 */ u8 unk0;
+    /* 0x1 */ u8 unk1;
+    /* 0x2 */ s16 unk2;
+} Arg0;
 
-void func_0028479C(void *arg0) {
-    func_00226160(&D_800F7078, M2C_FIELD(arg0, u8 *, 1), M2C_FIELD(arg0, s16 *, 2));
+s32 func_00226160(s32 *, u8, s16);          /* extern */
+extern s32 D_800F7078;
+
+void func_0028479C(Arg0 *arg0) {
+    func_00226160(&D_800F7078, arg0->unk1, arg0->unk2);
 }

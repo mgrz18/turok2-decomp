@@ -1,11 +1,20 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-extern M2C_UNK D_800C0530;
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 animSpeed;
+} Tuning;
+
+extern Tuning D_800C0530;
 extern f32 D_8012F9E4;
 
-void func_0040768C(void *arg0) {
-    M2C_FIELD(arg0, f32 *, 0x1FC) = (f32) M2C_FIELD(&D_800C0530, f32 *, 4);
-    D_8012F9E4 = M2C_FIELD(&D_800C0530, f32 *, 4);
-    M2C_FIELD(arg0, s32 *, 0xD4) = (s32) (M2C_FIELD(arg0, s32 *, 0xD4) | 0x2000);
+void func_0040768C(CGameObjectInstance *obj) {
+    f32 *speed = &D_800C0530.animSpeed;
+    f32 *animSpeed = &obj->m_AI.m_AnimSpeed;
+    s32 *flags = &obj->m_dwFlags;
+
+    *animSpeed = *speed;
+    D_8012F9E4 = *speed;
+    *flags = (s32) (*flags | 0x2000);
 }

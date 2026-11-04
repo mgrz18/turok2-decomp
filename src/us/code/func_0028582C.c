@@ -1,16 +1,26 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_0028582C(u8 *arg0) {
-    M2C_FIELD(arg0, u8 *, 0xC6) = M2C_FIELD(arg0, u8 *, 0xC4);
-    M2C_FIELD(arg0, u8 *, 0xC7) = M2C_FIELD(arg0, u8 *, 0xC5);
-    M2C_FIELD(arg0, s32 *, 0xB0) = M2C_FIELD(arg0, s32 *, 0x18);
-    M2C_FIELD(arg0, s32 *, 0xB4) = M2C_FIELD(arg0, s32 *, 0x1C);
-    M2C_FIELD(arg0, s32 *, 0xB8) = M2C_FIELD(arg0, s32 *, 0x20);
-    M2C_FIELD(arg0, s32 *, 0xBC) = M2C_FIELD(arg0, s32 *, 0x24);
-    M2C_FIELD(arg0, s32 *, 0xC0) = M2C_FIELD(arg0, s32 *, 0x28);
-    M2C_FIELD(arg0, s32 *, 0x1C) = 0;
-    M2C_FIELD(arg0, s32 *, 0x20) = 0;
-    M2C_FIELD(arg0, s32 *, 0x24) = 0;
-    M2C_FIELD(arg0, s32 *, 0x28) = 0;
+/* Saves the current values (0x18-0x28, 0xC4-0xC5) into the saved copy
+ * (0xB0-0xC0, 0xC6-0xC7) and clears four of them. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ s32 cur[5];
+    /* 0x2C */ u8 pad2C[0xB0 - 0x2C];
+    /* 0xB0 */ s32 saved[5];
+    /* 0xC4 */ u8 curByte[2];
+    /* 0xC6 */ u8 savedByte[2];
+} SaveState;
+
+void func_0028582C(SaveState *arg0) {
+    arg0->savedByte[0] = arg0->curByte[0];
+    arg0->savedByte[1] = arg0->curByte[1];
+    arg0->saved[0] = arg0->cur[0];
+    arg0->saved[1] = arg0->cur[1];
+    arg0->saved[2] = arg0->cur[2];
+    arg0->saved[3] = arg0->cur[3];
+    arg0->saved[4] = arg0->cur[4];
+    arg0->cur[1] = 0;
+    arg0->cur[2] = 0;
+    arg0->cur[3] = 0;
+    arg0->cur[4] = 0;
 }

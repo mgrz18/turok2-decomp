@@ -1,16 +1,22 @@
 #include "common.h"
-#include "m2c_macros.h"
 #include "rw/abu_protos.h"
 
-extern M2C_UNK D_0043BDF0;
-extern M2C_UNK D_0043BE14;
+/* Something whose current state is a handler address at 0x24. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x24];
+    /* 0x24 */ s32 stateHandler;
+} StateHolder;
+
+extern s32 D_0043BDF0;
+extern s32 D_0043BE14;
 extern s32 D_80130940;
 
-s32 func_0045A574(void *arg0) {
+/* Whether the state handler is one of the two at 0x43BE14 / 0x43BDF0 (and clears D_80130940 then). */
+s32 func_0045A574(StateHolder *arg0) {
     s32 temp_v1;
 
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x24);
-    if ((temp_v1 == &D_0043BE14) || (temp_v1 == &D_0043BDF0)) {
+    temp_v1 = arg0->stateHandler;
+    if ((temp_v1 == (s32) &D_0043BE14) || (temp_v1 == (s32) &D_0043BDF0)) {
         D_80130940 = 0;
         return 1;
     }

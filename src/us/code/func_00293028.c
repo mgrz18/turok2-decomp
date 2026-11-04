@@ -1,6 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-s32 func_00293028(void *arg0) {
-    return M2C_FIELD(arg0, s32 *, 0xC);
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ s32 unkC;
+} Arg;
+
+s32 func_00293028(Arg *arg) {
+    return arg->unkC;
 }

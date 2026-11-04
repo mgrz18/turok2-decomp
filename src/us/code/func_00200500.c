@@ -1,10 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/camera.h"
 
-void CList__Construct(void *arg0, s32 arg1, s32 arg2) {
-    M2C_FIELD(arg0, s32 *, 8) = arg1;
-    M2C_FIELD(arg0, s32 *, 0xC) = arg2;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    M2C_FIELD(arg0, s32 *, 0x10) = 0;
+void CList__Construct(CList *arg0, s32 arg1, s32 arg2) {
+    arg0->m_LastOffset = arg1;
+    arg0->m_NextOffset = arg2;
+    arg0->m_pTail = 0;
+    arg0->m_pHead = 0;
+    arg0->m_nCount = 0;
 }

@@ -1,8 +1,12 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00401C88(void *arg0) {
-    if ((u32) (M2C_FIELD(arg0, s32 *, 4) - 1) >= 2U) {
-        M2C_FIELD(arg0, s32 *, 4) = 1;
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ s32 state;
+} Unk00401C78;
+
+void func_00401C88(Unk00401C78 *arg0) {
+    if ((u32) (arg0->state - 1) >= 2U) {
+        arg0->state = 1;
     }
 }

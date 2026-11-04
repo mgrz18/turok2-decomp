@@ -1,5 +1,4 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 CList__AddHead(s32, s32);
 s32 CList__Remove(s32, s32);
@@ -8,16 +7,16 @@ extern void *D_801198D0;
 
 void func_002819E0(s32 arg0)
 {
-  M2C_UNK *temp_s0;
-  M2C_UNK *temp_s0_2;
-  M2C_UNK *var_s1;
-  M2C_UNK *var_s1_2;
+  s32 *temp_s0;
+  s32 *temp_s0_2;
+  s32 *var_s1;
+  s32 *var_s1_2;
   void *temp_s2;
   void *var_a0;
   void *var_a0_2;
   void *var_s2;
   temp_s2 = arg0 + 0x40;
-  var_s1 = *((M2C_UNK **) (((s8 *) temp_s2) + 0xE2C));
+  var_s1 = *((s32 **) (((s8 *) temp_s2) + 0xE2C));
   var_a0 = temp_s2 + 0xE28;
   if (var_s1 != 0)
   {
@@ -36,7 +35,7 @@ void func_002819E0(s32 arg0)
   {
     do
     {
-      var_s1_2 = *((M2C_UNK **) (((s8 *) var_s2) + 0xE2C));
+      var_s1_2 = *((s32 **) (((s8 *) var_s2) + 0xE2C));
       var_a0_2 = var_s2 + 0xE28;
       if (var_s1_2 != 0)
       {

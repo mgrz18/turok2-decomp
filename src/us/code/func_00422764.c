@@ -1,21 +1,30 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00285CC4(void *, void *);              /* extern */
+typedef struct {
+    /* 0x000 */ u8 pad0[0x120];
+    /* 0x120 */ s32 flags;
+} MenuItem;
+
+typedef struct {
+    /* 0x0 */ u8 pad0[0xC];
+    /* 0xC */ MenuItem *item;
+} Menu;
+
+s32 func_00285CC4(void *, void *);              /* extern */
 extern s32 D_801309C0[];
 
-void func_00422764(void *arg0)
+void func_00422764(Menu *arg0)
 {
   s32 new_var2;
-  void *temp_a0;
-  void *temp_a1;
+  MenuItem *temp_a0;
+  MenuItem *temp_a1;
   int new_var;
-  temp_a1 = *((void **) (((s8 *) arg0) + 0xC));
-  new_var = (*((s32 *) (((s8 *) temp_a1) + 0x120))) & 0xFBFFFFFF;
-  *((s32 *) (((s8 *) temp_a1) + 0x120)) = (s32) new_var;
-  temp_a0 = *((void **) (((s8 *) arg0) + 0xC));
-  new_var2 = *((s32 *) (((s8 *) temp_a0) + 0x120));
+  temp_a1 = arg0->item;
+  new_var = temp_a1->flags & 0xFBFFFFFF;
+  temp_a1->flags = (s32) new_var;
+  temp_a0 = arg0->item;
+  new_var2 = temp_a0->flags;
   D_801309C0[0] = 8;
-  *((s32 *) (((s8 *) temp_a0) + 0x120)) = (s32) (new_var2 | 8);
+  temp_a0->flags = (s32) (new_var2 | 8);
   func_00285CC4(temp_a0, temp_a1);
 }

@@ -1,9 +1,16 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00281B64(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, s32 *, 8) = 0;
-    M2C_FIELD(arg0, s32 *, 0xC) = 0;
-    M2C_FIELD(arg0, s32 *, 0x10) = 0;
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+} Arg0;
+
+void func_00281B64(Arg0 *arg0) {
+    arg0->unk4 = 0;
+    arg0->unk8 = 0;
+    arg0->unkC = 0;
+    arg0->unk10 = 0;
 }

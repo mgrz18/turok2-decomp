@@ -1,15 +1,22 @@
 #include "common.h"
-#include "m2c_macros.h"
+
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ s32 done;
+    /* 0x08 */ u8 pad8[0x28 - 0x8];
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ u8 pad2C[4];
+    /* 0x30 */ s32 unk30;
+} Loader;
 
 s32 func_00201DBC(s32, s32, s32, s32);
-
 s32 func_0028D0E0();                                /* extern */
-extern M2C_UNK D_800D1CD8;
-extern M2C_UNK D_800EBAC0;
+extern s32 D_800D1CD8;
+extern s32 D_800EBAC0;
 
-void func_00465338(void *arg0) {
+void func_00465338(Loader *arg0) {
     if (func_0028D0E0() == 0) {
-        func_00201DBC((s32) &D_800D1CD8, M2C_FIELD(arg0, s32 *, 0x28), M2C_FIELD(arg0, s32 *, 0x30), (s32) &D_800EBAC0);
-        M2C_FIELD(arg0, s32 *, 4) = 1;
+        func_00201DBC((s32) &D_800D1CD8, arg0->unk28, arg0->unk30, (s32) &D_800EBAC0);
+        arg0->done = 1;
     }
 }

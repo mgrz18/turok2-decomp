@@ -1,10 +1,25 @@
 #include "common.h"
-#include "m2c_macros.h"
+
+/* The window's item records are 0x28 bytes apart, item i's flags word at
+ * 0x120 + i * 0x28 of the block. */
+#define ITEM_FLAGS(i) (0x120 + (i) * 0x28)
+
+typedef struct {
+    /* 0x000 */ u8 pad0[0xBF8];
+    /* 0xBF8 */ s32 unkBF8;
+} Player;
+
+typedef struct {
+    u8 pad0[0xC];
+    void *items;
+    u8 pad10[0x1C - 0x10];
+    void *player;
+} Menu;
 #include "rw/abu_protos.h"
 
 extern s32 D_8011ACE4;
 
-void func_00455D10(void *arg0) {
+void func_00455D10(Menu *arg0) {
     void *temp_a0;
     void *temp_v0;
     void *temp_v1;
@@ -14,25 +29,25 @@ void func_00455D10(void *arg0) {
     void *temp_v1_5;
     void *temp_v1_6;
 
-    temp_v1 = M2C_FIELD(arg0, void **, 0x1C);
+    temp_v1 = arg0->player;
     if (temp_v1 != NULL) {
-        M2C_FIELD(temp_v1, s32 *, 0xBF8) = 1;
+        ((Player *) temp_v1)->unkBF8 = 1;
     }
-    temp_v1_2 = M2C_FIELD(arg0, void **, 0xC);
-    M2C_FIELD(temp_v1_2, s32 *, 0x1C0) = (s32) (M2C_FIELD(temp_v1_2, s32 *, 0x1C0) | 0x01800000);
-    temp_v1_3 = M2C_FIELD(arg0, void **, 0xC);
-    M2C_FIELD(temp_v1_3, s32 *, 0x1E8) = (s32) (M2C_FIELD(temp_v1_3, s32 *, 0x1E8) | 0x01800000);
-    temp_v1_4 = M2C_FIELD(arg0, void **, 0xC);
-    M2C_FIELD(temp_v1_4, s32 *, 0x210) = (s32) (M2C_FIELD(temp_v1_4, s32 *, 0x210) | 0x01800000);
-    temp_v1_5 = M2C_FIELD(arg0, void **, 0xC);
-    M2C_FIELD(temp_v1_5, s32 *, 0x238) = (s32) (M2C_FIELD(temp_v1_5, s32 *, 0x238) & 0xFE7FFFFF);
-    temp_v1_6 = M2C_FIELD(arg0, void **, 0xC);
-    M2C_FIELD(temp_v1_6, s32 *, 0x260) = (s32) (M2C_FIELD(temp_v1_6, s32 *, 0x260) & 0xFE7FFFFF);
+    temp_v1_2 = arg0->items;
+    *(s32 *) ((s8 *) temp_v1_2 + ITEM_FLAGS(4)) = (s32) (*(s32 *) ((s8 *) temp_v1_2 + ITEM_FLAGS(4)) | 0x01800000);
+    temp_v1_3 = arg0->items;
+    *(s32 *) ((s8 *) temp_v1_3 + ITEM_FLAGS(5)) = (s32) (*(s32 *) ((s8 *) temp_v1_3 + ITEM_FLAGS(5)) | 0x01800000);
+    temp_v1_4 = arg0->items;
+    *(s32 *) ((s8 *) temp_v1_4 + ITEM_FLAGS(6)) = (s32) (*(s32 *) ((s8 *) temp_v1_4 + ITEM_FLAGS(6)) | 0x01800000);
+    temp_v1_5 = arg0->items;
+    *(s32 *) ((s8 *) temp_v1_5 + ITEM_FLAGS(7)) = (s32) (*(s32 *) ((s8 *) temp_v1_5 + ITEM_FLAGS(7)) & 0xFE7FFFFF);
+    temp_v1_6 = arg0->items;
+    *(s32 *) ((s8 *) temp_v1_6 + ITEM_FLAGS(8)) = (s32) (*(s32 *) ((s8 *) temp_v1_6 + ITEM_FLAGS(8)) & 0xFE7FFFFF);
     if (D_8011ACE4 != 0) {
-        temp_v0 = M2C_FIELD(arg0, void **, 0xC);
-        M2C_FIELD(temp_v0, s32 *, 0x120) = (s32) (M2C_FIELD(temp_v0, s32 *, 0x120) | 0x01000000);
+        temp_v0 = arg0->items;
+        *(s32 *) ((s8 *) temp_v0 + ITEM_FLAGS(0)) = (s32) (*(s32 *) ((s8 *) temp_v0 + ITEM_FLAGS(0)) | 0x01000000);
         return;
     }
-    temp_a0 = M2C_FIELD(arg0, void **, 0xC);
-    M2C_FIELD(temp_a0, s32 *, 0x120) = (s32) (M2C_FIELD(temp_a0, s32 *, 0x120) & 0xFEFFFFFF);
+    temp_a0 = arg0->items;
+    *(s32 *) ((s8 *) temp_a0 + ITEM_FLAGS(0)) = (s32) (*(s32 *) ((s8 *) temp_a0 + ITEM_FLAGS(0)) & 0xFEFFFFFF);
 }

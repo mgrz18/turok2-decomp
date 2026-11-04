@@ -1,11 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s32 func_004035CC(void **arg0, void **arg1) {
+/* qsort comparator over actor pointers, by the float the AI keeps in its first variable (0x24C). */
+typedef struct {
+    /* 0x000 */ u8 pad0[0x24C];
+    /* 0x24C */ f32 sortKey;
+} SortedActor;
+
+s32 func_004035CC(SortedActor **arg0, SortedActor **arg1) {
     s32 var_v0;
 
     var_v0 = 1;
-    if (M2C_FIELD(*arg0, f32 *, 0x24C) < M2C_FIELD(*arg1, f32 *, 0x24C)) {
+    if ((*arg0)->sortKey < (*arg1)->sortKey) {
         var_v0 = -1;
     }
     return var_v0;

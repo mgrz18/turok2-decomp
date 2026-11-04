@@ -1,12 +1,18 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00204DB8(void *arg0) {
+typedef struct {
+    /* 0x0 */ u8 pad0[8];
+    /* 0x8 */ s32 refCount;
+    /* 0xC */ s32 flags;
+} Arg0;
+
+/* Drops a reference; clears flag 0x100 at zero. */
+void func_00204DB8(Arg0 *arg0) {
     s32 temp_v0;
 
-    temp_v0 = M2C_FIELD(arg0, s32 *, 8) - 1;
-    M2C_FIELD(arg0, s32 *, 8) = temp_v0;
+    temp_v0 = arg0->refCount - 1;
+    arg0->refCount = temp_v0;
     if (temp_v0 == 0) {
-        M2C_FIELD(arg0, s32 *, 0xC) = (s32) (M2C_FIELD(arg0, s32 *, 0xC) & ~0x100);
+        arg0->flags = (s32) (arg0->flags & ~0x100);
     }
 }

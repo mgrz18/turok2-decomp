@@ -1,17 +1,27 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_0028EA10(void *arg0, void *arg1) {
-    void *temp_v0;
+typedef struct Link {
+    /* 0x0 */ struct Link *next;
+    /* 0x4 */ struct Link *prev;
+} Link;
 
-    M2C_FIELD(arg1, s32 *, 4) = 0;
-    M2C_FIELD(arg1, void **, 0) = (void *) M2C_FIELD(arg0, void **, 0);
-    temp_v0 = M2C_FIELD(arg0, void **, 0);
+typedef struct {
+    /* 0x0 */ Link *head;
+    /* 0x4 */ Link *tail;
+} LinkList;
+
+/* Pushes the node at the head of the list. */
+void func_0028EA10(LinkList *arg0, Link *arg1) {
+    Link *temp_v0;
+
+    arg1->prev = 0;
+    arg1->next = arg0->head;
+    temp_v0 = arg0->head;
     if (temp_v0 != NULL) {
-        M2C_FIELD(temp_v0, void **, 4) = arg1;
+        temp_v0->prev = arg1;
     }
-    M2C_FIELD(arg0, void **, 0) = arg1;
-    if (M2C_FIELD(arg0, void **, 4) == NULL) {
-        M2C_FIELD(arg0, void **, 4) = arg1;
+    arg0->head = arg1;
+    if (arg0->tail == NULL) {
+        arg0->tail = arg1;
     }
 }

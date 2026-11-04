@@ -1,7 +1,6 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_0028CD68(u32);                         /* extern */
+s32 func_0028CD68(u32);                         /* extern */
 
 void func_0028CCB8(u32 arg0) {
     s32 var_s0;

@@ -1,51 +1,63 @@
+#include "common.h"
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
-typedef s32 M2C_UNK;
-typedef s8 M2C_UNK8;
-typedef s16 M2C_UNK16;
-typedef s32 M2C_UNK32;
-typedef s64 M2C_UNK64;
+/* A 0x64-byte slot with a swoosh trail at 0x3C (see func_0040EEA0, which
+ * reaches the same block as D_80130200). */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x3C];
+    /* 0x3C */ u8 trail[0x64 - 0x3C];
+} TrailSlot;
+
+typedef struct {
+    /* 0x000 */ TrailSlot slots[12];
+    /* 0x4B0 */ u8 pad4B0[0x4EC - 0x4B0];
+    /* 0x4EC */ s32 slotCount;
+    /* 0x4F0 */ u8 pad4F0[0x4FC - 0x4F0];
+    /* 0x4FC */ s32 mode;
+    /* 0x500 */ u8 pad500[0x518 - 0x500];
+    /* 0x518 */ u8 sub0[0x18];
+    /* 0x530 */ u8 sub1[0x18];
+    /* 0x548 */ u8 sub2[0x18];
+} TrailSet;
+
+/* Per-mode handlers, 8 bytes each. */
+typedef struct {
+    /* 0x0 */ void (*fn)(void);
+    /* 0x4 */ s32 unk4;
+} ModeHandler;
+
 s32 func_00235510(s32);
 s32 func_0040C850(s32);
 s32 func_0040CB28(s32);
-M2C_UNK func_0027AD88(M2C_UNK *, s32);
-extern M2C_UNK D_00432410;
-extern M2C_UNK D_801100F0;
-void func_0040ECDC(void *arg0)
+s32 func_0027AD88(s32 *, s32);
+extern ModeHandler D_00432410[];
+extern s32 D_801100F0;
+
+void func_0040ECDC(TrailSet *arg0)
 {
-  M2C_UNK (*temp_v0)();
+  void (*temp_v0)(void);
   s32 var_s0;
   s32 var_s1;
-  temp_v0 = *((typeof(&D_00432410)) (((s8 *) (&D_00432410)) + ((*((s32 *) (((s8 *) arg0) + 0x4FC))) * 8)));
+  temp_v0 = D_00432410[arg0->mode].fn;
   if (temp_v0 != 0)
   {
     temp_v0();
   }
   var_s0 = 0;
-  if ((*((s32 *) (((s8 *) arg0) + 0x4EC))) > 0)
+  if (arg0->slotCount > 0)
   {
-    var_s1 = 0x3C;
+    var_s1 = 0x3C;      /* slots[i].trail */
     do
     {
-      func_00235510((s32) (arg0 + var_s1));
+      func_00235510((s32) ((u8 *) arg0 + var_s1));
       var_s0 += 1;
-      var_s1 += 0x64;
+      var_s1 += sizeof(TrailSlot);
       var_s0++;
       var_s0--;
     }
-    while (var_s0 < (*((s32 *) (((s8 *) arg0) + 0x4EC))));
+    while (var_s0 < arg0->slotCount);
   }
-  func_0040C850((s32) (arg0 + 0x518));
-  func_0040C850((s32) (arg0 + 0x530));
-  func_0040C850((s32) (arg0 + 0x548));
+  func_0040C850((s32) arg0->sub0);
+  func_0040C850((s32) arg0->sub1);
+  func_0040C850((s32) arg0->sub2);
   func_0027AD88(&D_801100F0, func_0040CB28((s32) arg0));
 }

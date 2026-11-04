@@ -1,9 +1,8 @@
 #include "common.h"
-#include "m2c_macros.h"
 #include "structs/camera.h"
 
-M2C_UNK func_002052D8(M2C_UNK, s32);                /* extern */
-M2C_UNK func_002053A8(M2C_UNK);                     /* extern */
+s32 func_002052D8(s32, s32);                /* extern */
+s32 func_002053A8(s32);                     /* extern */
 
 /* Frees the pool's on-screen texts. */
 void func_002820B4(CCameraPool *pool) {

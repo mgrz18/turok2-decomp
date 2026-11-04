@@ -1,13 +1,12 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_0029884C(void);
 s32 func_00299FE4(void);
 s32 func_0029A080(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 
-M2C_UNK func_0029A050();                            /* extern */
-extern M2C_UNK D_801213E0;
+s32 func_0029A050();                            /* extern */
+extern s32 D_801213E0;
 extern u8 D_80121420[];
 
 s32 func_00298720(s32 arg0) {

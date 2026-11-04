@@ -1,14 +1,26 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-s32 osSetIntMask(s32);                             /* extern */
+typedef struct QueueNode {
+    /* 0x00 */ struct QueueNode *next;
+    /* 0x04 */ u8 pad4[0x10 - 0x4];
+    /* 0x10 */ s32 stamp;
+} QueueNode;
 
-void func_00293F10(void *arg0, void *arg1) {
+typedef struct {
+    /* 0x00 */ QueueNode *head;
+    /* 0x04 */ u8 pad4[0x20 - 0x4];
+    /* 0x20 */ s32 stamp;
+} Queue;
+
+s32 osSetIntMask(s32);                              /* extern */
+
+/* Pushes arg1 on arg0, stamped with arg0's current stamp, interrupts masked. */
+void func_00293F10(Queue *arg0, QueueNode *arg1) {
     s32 temp_v0;
 
     temp_v0 = osSetIntMask(1);
-    M2C_FIELD(arg1, s32 *, 0x10) = (s32) M2C_FIELD(arg0, s32 *, 0x20);
-    M2C_FIELD(arg1, void **, 0) = (void *) M2C_FIELD(arg0, void **, 0);
-    M2C_FIELD(arg0, void **, 0) = arg1;
+    arg1->stamp = (s32) arg0->stamp;
+    arg1->next = arg0->head;
+    arg0->head = arg1;
     osSetIntMask(temp_v0);
 }

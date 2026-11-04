@@ -1,5 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x20];
+    /* 0x20 */ s32 active;
+} Unk0027FC2C;
 
 void *func_0027FC2C();                              /* extern */
 
@@ -8,7 +12,7 @@ void *func_002815E0(void) {
 
     temp_v0 = func_0027FC2C();
     if (temp_v0 != NULL) {
-        M2C_FIELD(temp_v0, s32 *, 0x20) = 1;
+        ((Unk0027FC2C *)temp_v0)->active = 1;
     }
     return temp_v0;
 }

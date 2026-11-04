@@ -1,28 +1,34 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-extern M2C_UNK D_00431624;
-extern M2C_UNK D_00431660;
-extern M2C_UNK D_0043169C;
-extern M2C_UNK D_00431700;
-extern M2C_UNK D_8012FA24;
+/* Two words at D_8012FA24; the pointer just before them (D_8012FA20) picks
+ * the data for the given mode. */
+typedef struct {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+} ModePair;
+
+extern u8 D_00431624[];
+extern u8 D_00431660[];
+extern u8 D_0043169C[];
+extern u8 D_00431700[];
+extern ModePair D_8012FA24;
 
 void func_00407158(s32 arg0) {
-    M2C_FIELD(&D_8012FA24, s32 *, 0) = -1;
-    M2C_FIELD(&D_8012FA24, s32 *, 4) = -1;
+    D_8012FA24.unk0 = -1;
+    D_8012FA24.unk4 = -1;
     if (arg0 == 0) {
-        M2C_FIELD(&D_8012FA24, M2C_UNK **, -4) = NULL;
+        ((u8 **) &D_8012FA24)[-1] = NULL;
     }
     if (arg0 == 1) {
-        M2C_FIELD(&D_8012FA24, M2C_UNK **, -4) = &D_00431660;
+        ((u8 **) &D_8012FA24)[-1] = D_00431660;
     }
     if (arg0 == 4) {
-        M2C_FIELD(&D_8012FA24, M2C_UNK **, -4) = &D_00431700;
+        ((u8 **) &D_8012FA24)[-1] = D_00431700;
     }
     if (arg0 == 2) {
-        M2C_FIELD(&D_8012FA24, M2C_UNK **, -4) = &D_00431624;
+        ((u8 **) &D_8012FA24)[-1] = D_00431624;
     }
     if (arg0 == 3) {
-        M2C_FIELD(&D_8012FA24, M2C_UNK **, -4) = &D_0043169C;
+        ((u8 **) &D_8012FA24)[-1] = D_0043169C;
     }
 }

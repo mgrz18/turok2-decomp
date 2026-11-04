@@ -1,21 +1,42 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/camera.h"
+
+typedef struct {
+    /* 0x00 */ s32 resource;
+    /* 0x04 */ u8 pad4[8];
+    /* 0x0C */ s32 flags;
+} Resource;
+
+/* The resource lists (0x800D81E0 on): every resident resource, the locked ones, and
+ * at 0xBCC the free-slot count (D_800D8DAC). The word 8 bytes before is the last
+ * resource handed out (D_800D81D8), addressed through this symbol. */
+typedef struct {
+    /* 0x000 */ CList resident;
+    /* 0x014 */ CList locked;
+    /* 0x028 */ u8 pad28[0xBCC - 0x28];
+    /* 0xBCC */ s32 freeCount;
+} ResourceLists;
 
 s32 CList__Remove(s32, s32);
 
 extern s32 D_800D81D4;
-extern M2C_UNK D_800D81E0;
+extern ResourceLists D_800D81E0;
 extern s32 D_800D8DAC;
 
-void func_002062F8(s32 arg0, s32 arg1) {
-    CList__Remove((s32) &D_800D81E0, arg1);
-    if (M2C_FIELD(arg1, s32 *, 0xC) & 0x1000) {
-        CList__Remove((s32) (((__typeof__(&D_800D81E0))((s8 *)&D_800D81E0 + 0x14))), arg1);
+#define LAST_RESOURCE (((Resource **) &D_800D81E0)[-2])
+
+/* Drops a resource from the lists and returns its slot to the free stack. */
+void func_002062F8(s32 arg0, Resource *arg1) {
+    s32 *flags = &arg1->flags;
+
+    CList__Remove((s32) &D_800D81E0.resident, (s32) arg1);
+    if (arg1->flags & 0x1000) {
+        CList__Remove((s32) &D_800D81E0.locked, (s32) arg1);
     }
-    if (M2C_FIELD(&D_800D81E0, s32 *, -8) == arg1) {
-        M2C_FIELD(&D_800D81E0, s32 *, -8) = 0;
+    if (LAST_RESOURCE == arg1) {
+        LAST_RESOURCE = 0;
     }
-    M2C_FIELD(arg1, s32 *, 0xC) = 0;
-    *(s32 *)((D_800D8DAC * 4) + D_800D81D4) = arg1;
-    M2C_FIELD(&D_800D81E0, s32 *, 0xBCC) = (s32) (M2C_FIELD(&D_800D81E0, s32 *, 0xBCC) + 1);
+    *flags = 0;
+    *(Resource **)((D_800D8DAC * 4) + D_800D81D4) = arg1;
+    D_800D81E0.freeCount = (s32) (D_800D81E0.freeCount + 1);
 }

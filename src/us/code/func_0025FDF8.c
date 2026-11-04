@@ -1,6 +1,12 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s16 func_0025FDF8(void *arg0) {
-    return M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), s16 *, 0x72);
+/* The object's intelligence (header.m_pIntelligence): only 0x72 here. */
+struct CIntelligence {
+    /* 0x00 */ u8 pad0[0x72];
+    /* 0x72 */ s16 unk72;
+};
+
+s16 func_0025FDF8(CGameObjectInstance *arg0) {
+    return arg0->header.m_pIntelligence->unk72;
 }

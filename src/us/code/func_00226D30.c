@@ -1,10 +1,15 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-s32 func_00226D30(void *arg0, void *arg1) {
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ f32 key;
+} SortItem;
+
+/* qsort-style comparator on the f32 key at 0x4. */
+s32 func_00226D30(SortItem *arg0, SortItem *arg1) {
     s32 r = 1;
 
-    if (M2C_FIELD(arg0, f32 *, 4) > M2C_FIELD(arg1, f32 *, 4)) {
+    if (arg0->key > arg1->key) {
         r = -1;
     }
     return r;

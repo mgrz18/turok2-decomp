@@ -1,7 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00207908(void *arg0, s32 arg1, s32 arg2) {
-    M2C_FIELD(arg0, s32 *, 0) = arg1;
-    M2C_FIELD(arg0, s32 *, 4) = arg2;
+typedef struct {
+    /* 0x0 */ s32 a;
+    /* 0x4 */ s32 b;
+} Pair;
+
+void func_00207908(Pair *arg0, s32 arg1, s32 arg2) {
+    arg0->a = arg1;
+    arg0->b = arg2;
 }

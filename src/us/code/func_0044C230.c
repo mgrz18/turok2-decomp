@@ -18,7 +18,6 @@
  * module holds this file byte for byte at the same link address
  * (func_0044C230.c). */
 #include "common.h"
-#include "m2c_macros.h"
 #include "rw/abu_types.h"
 
 /* ---------------- func_0044C230 ---------------- */
@@ -1678,11 +1677,55 @@ s32 func_0044F0F0(MenuItemTmpl_4160F0 *a) {
     return n;
 }
 
+/* ---------------- shared by func_0044F168 to func_00450418 ---------------- */
+/* An open menu as the pool code below sees it (Menu_41531C has the same head). */
+typedef struct {
+    /* 0x00 */ u8 pad0[0xB0];
+    /* 0xB0 */ s32 buttons;
+    /* 0xB4 */ s32 pressed;
+    /* 0xB8 */ u8 padB8[4];
+    /* 0xBC */ s32 held;
+} MenuNodeCtl;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ s32 (*close)();
+    /* 0x10 */ s32 (*draw)();
+    /* 0x14 */ u8 pad14[0x1C - 0x14];
+    /* 0x1C */ s32 value;
+} MenuNodeDef;
+
+typedef struct MenuNode {
+    /* 0x000 */ u8 pad0[8];
+    /* 0x008 */ s32 mem;            /* the allocation the menu lives in */
+    /* 0x00C */ u8 padC[0x14 - 0xC];
+    /* 0x014 */ MenuNodeDef *def;
+    /* 0x018 */ u8 pad18[0x20 - 0x18];
+    /* 0x020 */ MenuNodeCtl *ctl;
+    /* 0x024 */ u8 pad24[0x28 - 0x24];
+    /* 0x028 */ s16 state;
+    /* 0x02A */ u8 pad2A[0x1C8 - 0x2A];
+    /* 0x1C8 */ s32 flashTime;
+    /* 0x1CC */ s32 flashStep;
+    /* 0x1D0 */ struct MenuNode *prev;
+    /* 0x1D4 */ struct MenuNode *next;
+} MenuNode;
+
+/* The open menus: a CList linked through MenuNode.prev/next, and a counter. */
+typedef struct {
+    /* 0x00 */ MenuNode *head;
+    /* 0x04 */ MenuNode *tail;
+    /* 0x08 */ s32 lastOffset;
+    /* 0x0C */ s32 nextOffset;
+    /* 0x10 */ s32 count;
+    /* 0x14 */ s16 opened;
+} MenuNodePool;
+
 /* ---------------- func_0044F168 ---------------- */
 s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("func_0044CF74");
 
-void func_0044F168(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    func_00413F74_416168((s32) arg0, arg1, arg2, arg3, M2C_FIELD(arg0, s32 *, 0x14));
+void func_0044F168(MenuNode *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    func_00413F74_416168((s32) arg0, arg1, arg2, arg3, (s32) arg0->def);
 }
 
 /* ---------------- func_0044F188 ---------------- */
@@ -1766,11 +1809,11 @@ MenuBlob *func_0044F214(MenuItem_416214 *a, s32 id, s32 arg) {
 }
 
 /* ---------------- func_0044F2E4 ---------------- */
-s32 func_0044F2E4(void *arg0) {
+s32 func_0044F2E4(MenuNode *arg0) {
     s32 temp_v1;
     s32 var_v0;
 
-    temp_v1 = M2C_FIELD(arg0, s32 *, 0x20);
+    temp_v1 = (s32) arg0->ctl;
     var_v0 = 0;
     if (temp_v1 != 0) {
         var_v0 = temp_v1 + 0xA0;
@@ -1856,8 +1899,8 @@ s32 func_0044F474(void) {
 }
 
 /* ---------------- func_0044F47C ---------------- */
-s32 func_0044F47C(void *arg0) {
-    return M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), s32 *, 0x1C);
+s32 func_0044F47C(MenuNode *arg0) {
+    return arg0->def->value;
 }
 
 /* ---------------- func_0044F48C ---------------- */
@@ -1937,7 +1980,7 @@ void CList__Construct(s32, s32, s32);
 
 void func_0044F614(s32 arg0) {
     CList__Construct(arg0, 0x1D0, 0x1D4);
-    M2C_FIELD(arg0, s16 *, 0x14) = 0;
+    ((MenuNodePool *) arg0)->opened = 0;
 }
 
 /* ---------------- func_0044F644 ---------------- */
@@ -2091,35 +2134,35 @@ s32 CList__Remove(s32, s32);
 s32 func_002052D8(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("func_0044E31C");
 
-extern M2C_UNK D_80119E2C;
+extern MenuNodePool D_80119E2C;
 
-void func_0044F9C8(void **arg0) {
-    M2C_UNK (*temp_v0)(void *, void **);
-    void *temp_s2;
-    void *temp_v0_2;
-    void *var_s0;
+void func_0044F9C8(MenuNodePool *arg0) {
+    s32 (*temp_v0)();
+    MenuNode *temp_s2;
+    MenuNodeCtl *temp_v0_2;
+    MenuNode *var_s0;
 
-    var_s0 = *arg0;
+    var_s0 = arg0->head;
     if (var_s0 != NULL) {
         do {
-            temp_s2 = M2C_FIELD(var_s0, void **, 0x1D4);
-            if ((M2C_FIELD(var_s0, s16 *, 0x28) == 2) && (arg0 != &D_80119E2C)) {
-                if (M2C_FIELD(&D_80119E2C, s32 *, 0x10) == 0) {
+            temp_s2 = var_s0->next;
+            if ((var_s0->state == 2) && (arg0 != &D_80119E2C)) {
+                if (D_80119E2C.count == 0) {
                     goto block_6;
                 }
             } else {
 block_6:
                 if (func_0041531C_4169C8((s32) var_s0, (s32) arg0) != 0) {
-                    temp_v0 = M2C_FIELD(M2C_FIELD(var_s0, void **, 0x14), M2C_UNK (**)(void *, void **), 0xC);
+                    temp_v0 = var_s0->def->close;
                     if (temp_v0 != NULL) {
                         temp_v0(var_s0, arg0);
                     }
-                    temp_v0_2 = M2C_FIELD(var_s0, void **, 0x20);
-                    M2C_FIELD(temp_v0_2, s32 *, 0xB0) = 0;
-                    M2C_FIELD(temp_v0_2, s32 *, 0xB4) = 0;
-                    M2C_FIELD(temp_v0_2, s32 *, 0xBC) = 0;
+                    temp_v0_2 = var_s0->ctl;
+                    temp_v0_2->buttons = 0;
+                    temp_v0_2->pressed = 0;
+                    temp_v0_2->held = 0;
                     CList__Remove((s32) arg0, (s32) var_s0);
-                    func_002052D8(0, M2C_FIELD(var_s0, s32 *, 8));
+                    func_002052D8(0, var_s0->mem);
                 }
             }
             var_s0 = temp_s2;
@@ -2128,31 +2171,31 @@ block_6:
 }
 
 /* ---------------- func_0044FAA4 ---------------- */
-void func_0044FAA4(void *arg0) {
-    void *var_s0;
+void func_0044FAA4(MenuNodePool *arg0) {
+    MenuNode *var_s0;
 
-    var_s0 = M2C_FIELD(arg0, void **, 4);
+    var_s0 = arg0->tail;
     if (var_s0 != NULL) {
         do {
-            M2C_FIELD(M2C_FIELD(var_s0, void **, 0x14), M2C_UNK (**)(void *, void *), 0x10)(var_s0, arg0);
-            var_s0 = M2C_FIELD(var_s0, void **, 0x1D0);
+            var_s0->def->draw(var_s0, arg0);
+            var_s0 = var_s0->prev;
         } while (var_s0 != NULL);
     }
 }
 
 /* ---------------- func_0044FAF8 ---------------- */
-s32 func_0044FAF8(void **arg0) {
+s32 func_0044FAF8(MenuNodePool *arg0) {
     s32 var_v1;
-    void *var_a0;
+    MenuNode *var_a0;
 
-    var_a0 = *arg0;
+    var_a0 = arg0->head;
     var_v1 = 0;
     if (var_a0 != NULL) {
         do {
-            if (M2C_FIELD(var_a0, s16 *, 0x28) != 4) {
+            if (var_a0->state != 4) {
                 var_v1 += 1;
             }
-            var_a0 = M2C_FIELD(var_a0, void **, 0x1D4);
+            var_a0 = var_a0->next;
         } while (var_a0 != NULL);
     }
     return var_v1;
@@ -2244,28 +2287,28 @@ f32 func_0044FBAC(MenuItemTmpl_416BAC *a, f32 scale) {
 }
 
 /* ---------------- func_0044FC00 ---------------- */
-void func_0044FC00(void *arg0) {
-    M2C_FIELD(arg0, s32 *, 0x1CC) = 0;
-    M2C_FIELD(arg0, s32 *, 0x1C8) = 0;
+void func_0044FC00(MenuNode *arg0) {
+    arg0->flashStep = 0;
+    arg0->flashTime = 0;
 }
 
 /* ---------------- func_0044FC0C ---------------- */
-void func_0044FC0C(void *arg0) {
-    if (M2C_FIELD(arg0, s32 *, 0x1CC) == 0) {
-        M2C_FIELD(arg0, s32 *, 0x1CC) = 1;
-        M2C_FIELD(arg0, s32 *, 0x1C8) = 0;
+void func_0044FC0C(MenuNode *arg0) {
+    if (arg0->flashStep == 0) {
+        arg0->flashStep = 1;
+        arg0->flashTime = 0;
     }
 }
 
 /* ---------------- func_0044FC28 ---------------- */
-void func_0044FC28(void *arg0) {
+void func_0044FC28(MenuNode *arg0) {
     s32 temp_v0;
 
-    temp_v0 = M2C_FIELD(arg0, s32 *, 0x1C8) + M2C_FIELD(arg0, s32 *, 0x1CC);
-    M2C_FIELD(arg0, s32 *, 0x1C8) = temp_v0;
+    temp_v0 = arg0->flashTime + arg0->flashStep;
+    arg0->flashTime = temp_v0;
     if (temp_v0 >= 0x30) {
-        M2C_FIELD(arg0, s32 *, 0x1C8) = 0;
-        M2C_FIELD(arg0, s32 *, 0x1CC) = 0;
+        arg0->flashTime = 0;
+        arg0->flashStep = 0;
     }
 }
 
@@ -2334,9 +2377,9 @@ s32 func_0044FDA4(s16 *record) {
 }
 
 /* ---------------- func_0044FDC0 ---------------- */
-void func_0044FDC0(s16 *arg0, void *arg1) {
+void func_0044FDC0(s16 *arg0, MenuModel_414938 *arg1) {
     if (*arg0 == 3) {
-        M2C_FIELD(arg1, s32 *, 0x328) = 1;
+        arg1->loaded = 1;
     }
 }
 
@@ -2466,7 +2509,7 @@ void func_0045007C(ItemRecAt14 *item,float value) {
 /* ---------------- func_004501D0 ---------------- */
 s32 func_0021ECA0(s32, s32, s32, s32);
 
-extern M2C_UNK D_800AB0E8;
+extern s32 D_800AB0E8;
 
 void func_004501D0(s32 arg0, s32 arg1, s32 arg2) {
     func_0021ECA0(arg0, arg1, arg2, (s32) &D_800AB0E8);
@@ -2501,18 +2544,18 @@ void func_004501F4(O06A_4171F4 *a, s32 b, s32 c) {
 }
 
 /* ---------------- func_004502B0 ---------------- */
-void func_004502B0(void *arg0) {
-    M2C_UNK (*temp_v0)();
-    void *temp_v0_2;
+void func_004502B0(MenuNode *arg0) {
+    s32 (*temp_v0)();
+    MenuNodeCtl *temp_v0_2;
 
-    temp_v0 = M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), M2C_UNK (**)(), 0xC);
+    temp_v0 = arg0->def->close;
     if (temp_v0 != NULL) {
         temp_v0();
     }
-    temp_v0_2 = M2C_FIELD(arg0, void **, 0x20);
-    M2C_FIELD(temp_v0_2, s32 *, 0xB0) = 0;
-    M2C_FIELD(temp_v0_2, s32 *, 0xB4) = 0;
-    M2C_FIELD(temp_v0_2, s32 *, 0xBC) = 0;
+    temp_v0_2 = arg0->ctl;
+    temp_v0_2->buttons = 0;
+    temp_v0_2->pressed = 0;
+    temp_v0_2->held = 0;
 }
 
 /* ---------------- func_004502F8 ---------------- */
@@ -2576,18 +2619,18 @@ void *func_004502F8(struct func_8025E5B0_S1 *owner, struct Dialog *list, s32 a, 
 s32 CList__Remove_417418(s32, s32) __asm__("CList__Remove");
 s32 func_002052D8_417418(s32, s32) __asm__("func_002052D8");
 
-void func_00450418(s32 arg0, void *arg1) {
-    M2C_UNK (*temp_v0)(void *, s32);
-    void *temp_v0_2;
+void func_00450418(s32 arg0, MenuNode *arg1) {
+    s32 (*temp_v0)();
+    MenuNodeCtl *temp_v0_2;
 
-    temp_v0 = M2C_FIELD(M2C_FIELD(arg1, void **, 0x14), M2C_UNK (**)(void *, s32), 0xC);
+    temp_v0 = arg1->def->close;
     if (temp_v0 != NULL) {
         temp_v0(arg1, arg0);
     }
-    temp_v0_2 = M2C_FIELD(arg1, void **, 0x20);
-    M2C_FIELD(temp_v0_2, s32 *, 0xB0) = 0;
-    M2C_FIELD(temp_v0_2, s32 *, 0xB4) = 0;
-    M2C_FIELD(temp_v0_2, s32 *, 0xBC) = 0;
+    temp_v0_2 = arg1->ctl;
+    temp_v0_2->buttons = 0;
+    temp_v0_2->pressed = 0;
+    temp_v0_2->held = 0;
     CList__Remove_417418(arg0, (s32) arg1);
-    func_002052D8_417418(0, M2C_FIELD(arg1, s32 *, 8));
+    func_002052D8_417418(0, arg1->mem);
 }

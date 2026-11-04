@@ -1,14 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_0029B030(M2C_UNK *, M2C_UNK *, M2C_UNK); /* extern */
-M2C_UNK osSendMesg(M2C_UNK *, M2C_UNK, M2C_UNK); /* extern */
+void func_0029B030(void *, void *, s32); /* extern */
+void osSendMesg(void *, s32, s32); /* extern */
 extern s32 D_800B7A50;
-extern M2C_UNK D_80121670;
-extern M2C_UNK D_80121678;
+extern u8 D_80121670[];
+extern u8 D_80121678[];
 
 void func_00299F90(void) {
     D_800B7A50 = 1;
-    func_0029B030(&D_80121678, &D_80121670, 1);
-    osSendMesg(&D_80121678, 0, 0);
+    func_0029B030(D_80121678, D_80121670, 1);
+    osSendMesg(D_80121678, 0, 0);
 }

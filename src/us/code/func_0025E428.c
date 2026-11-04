@@ -1,6 +1,6 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s8 func_0025E428(s32 arg0, void *arg1) {
-    return M2C_FIELD(arg1, s8 *, 0x133);
+s8 func_0025E428(s32 arg0, CAI *ai) {
+    return ((s8 *) &ai->m_VarBuffer[9])[3];
 }

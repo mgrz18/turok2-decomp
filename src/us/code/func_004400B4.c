@@ -1,33 +1,42 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-extern M2C_UNK D_004312D4;
-extern M2C_UNK D_00431344;
-extern M2C_UNK D_004313EC;
-extern M2C_UNK D_00431478;
-extern M2C_UNK D_004314B0;
-extern M2C_UNK D_8012FA10;
+extern s32 D_004312D4;
+extern s32 D_00431344;
+extern s32 D_004313EC;
+extern s32 D_00431478;
+extern s32 D_004314B0;
+/* A second attack script of the boss module (0x8012FA0C on); the ROM addresses it
+ * through D_8012FA10, one word in, so the script pointer is at index -1. */
+typedef struct {
+    /* 0x00 */ s32 scriptPrev;
+    /* 0x04 */ s32 scriptIndex;
+    /* 0x08 */ s8 restart;
+} BossScript;
+
+extern BossScript D_8012FA10;
+
+#define SCRIPT(state) (((s32 **) &(state))[-1])
 
 void func_004400B4(s32 arg0) {
-    M2C_FIELD(&D_8012FA10, s32 *, 0) = -1;
-    M2C_FIELD(&D_8012FA10, s8 *, 8) = 1;
-    M2C_FIELD(&D_8012FA10, s32 *, 4) = -1;
+    D_8012FA10.scriptPrev = -1;
+    D_8012FA10.restart = 1;
+    D_8012FA10.scriptIndex = -1;
     if (arg0 == 0) {
-        M2C_FIELD(&D_8012FA10, M2C_UNK **, -4) = NULL;
+        SCRIPT(D_8012FA10) = NULL;
     }
     if (arg0 == 1) {
-        M2C_FIELD(&D_8012FA10, M2C_UNK **, -4) = &D_004312D4;
+        SCRIPT(D_8012FA10) = &D_004312D4;
     }
     if (arg0 == 2) {
-        M2C_FIELD(&D_8012FA10, M2C_UNK **, -4) = &D_00431344;
+        SCRIPT(D_8012FA10) = &D_00431344;
     }
     if (arg0 == 3) {
-        M2C_FIELD(&D_8012FA10, M2C_UNK **, -4) = &D_004313EC;
+        SCRIPT(D_8012FA10) = &D_004313EC;
     }
     if (arg0 == 4) {
-        M2C_FIELD(&D_8012FA10, M2C_UNK **, -4) = &D_00431478;
+        SCRIPT(D_8012FA10) = &D_00431478;
     }
     if (arg0 == 5) {
-        M2C_FIELD(&D_8012FA10, M2C_UNK **, -4) = &D_004314B0;
+        SCRIPT(D_8012FA10) = &D_004314B0;
     }
 }

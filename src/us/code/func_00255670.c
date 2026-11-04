@@ -1,23 +1,46 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_0024E5F0(s32, s32, s32);
 s32 func_00255714(s32, s32);
 
-extern M2C_UNK D_800A7170;
+typedef struct {
+    /* 0x000 */ u8 pad0[0xA10];
+    /* 0xA10 */ f32 modeTime;
+    /* 0xA14 */ u8 padA14[0xA64 - 0xA14];
+    /* 0xA64 */ u32 buttons;
+} Player;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x20];
+    /* 0x20 */ f32 speed;
+} MoveDef;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x14];
+    /* 0x14 */ MoveDef *def;
+    /* 0x18 */ u8 pad18[4];
+    /* 0x1C */ f32 speed;
+} MoveState;
+
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 scale;
+} Tuning;
+
+extern Tuning D_800A7170;
 extern s32 D_80110048;
 
-void func_00255670(void *arg0, void *arg1) {
+void func_00255670(Player *arg0, MoveState *arg1) {
     f32 var_f2;
 
-    var_f2 = M2C_FIELD(&D_800A7170, f32 *, 4);
+    var_f2 = D_800A7170.scale;
     if (D_80110048 == 0x1DB1) {
         var_f2 = 481.28f;
     }
-    if (!(M2C_FIELD(arg0, s32 *, 0xA64) & 0x10) || (M2C_FIELD(arg0, f32 *, 0xA10) >= 3.0f)) {
+    if (!(arg0->buttons & 0x10) || (arg0->modeTime >= 3.0f)) {
         func_0024E5F0((s32) arg0, (s32) arg1, 5);
     } else {
-        M2C_FIELD(arg1, f32 *, 0x1C) = (f32) (var_f2 * M2C_FIELD(M2C_FIELD(arg1, void **, 0x14), f32 *, 0x20));
+        arg1->speed = (f32) (var_f2 * arg1->def->speed);
     }
     func_00255714((s32) arg0, (s32) arg1);
 }

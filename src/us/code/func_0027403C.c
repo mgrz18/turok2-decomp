@@ -1,10 +1,21 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_0027314C(s32);
 
 extern s32 D_800B2A5C;
 extern s32 D_800B2A60;
+
+/* 0xCC-byte slot; 16 of them follow the owner pointer. */
+typedef struct {
+    /* 0x00 */ u8 pad0[8];
+    /* 0x08 */ s32 id;          /* -1 when the slot is free */
+    /* 0x0C */ u8 padC[0xCC - 0xC];
+} Slot0027403C;
+
+typedef struct {
+    /* 0x000 */ u8 pad0[0x102];
+    /* 0x102 */ s16 skipIndex;
+} Owner0027403C;
 
 void func_0027403C(void **arg0) {
     s32 var_s0;
@@ -15,7 +26,7 @@ void func_0027403C(void **arg0) {
     var_s1 = ((__typeof__(arg0))((s8 *)arg0 + 4));
     var_s0 = 0;
     do {
-        if ((M2C_FIELD(var_s1, s32 *, 8) != -1) && (M2C_FIELD(*arg0, s16 *, 0x102) != var_s0)) {
+        if ((((Slot0027403C *)var_s1)->id != -1) && (((Owner0027403C *)*arg0)->skipIndex != var_s0)) {
             func_0027314C((s32) var_s1);
             var_s2 += 1;
         }

@@ -1,8 +1,7 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 __osSpDeviceBusy();                                /* extern */
-M2C_UNK __osSpSetStatus(M2C_UNK);                     /* extern */
+s32 __osSpSetStatus(s32);                     /* extern */
 
 void func_0029A34C(void) {
     do {

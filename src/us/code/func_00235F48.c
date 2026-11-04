@@ -1,8 +1,7 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_002366C8();                            /* extern */
-M2C_UNK func_002367A0(s32);                         /* extern */
+s32 func_002366C8();                            /* extern */
+s32 func_002367A0(s32);                         /* extern */
 extern s32 D_800ACFC0;
 extern s32 D_8011ACA4;
 

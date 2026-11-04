@@ -1,11 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_0029B030(M2C_UNK *, M2C_UNK *, M2C_UNK); /* extern */
-M2C_UNK osSendMesg(M2C_UNK *, M2C_UNK, M2C_UNK); /* extern */
+s32 func_0029B030(s32 *, s32 *, s32); /* extern */
+s32 osSendMesg(s32 *, s32, s32); /* extern */
 extern s32 D_800B8990;
-extern M2C_UNK D_80124DB0;
-extern M2C_UNK D_80124DB8;
+extern s32 D_80124DB0;
+extern s32 D_80124DB8;
 
 void func_0029DD10(void) {
     D_800B8990 = 1;

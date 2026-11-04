@@ -1,13 +1,12 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_0028F518(s32, s32);
 s32 func_00290E40(s32, s32, s32);
 
-M2C_UNK func_00290E10(s32, s32);                    /* extern */
-M2C_UNK func_00290E90(s32, s32);                    /* extern */
-M2C_UNK func_00290EC0(s32, s16);                    /* extern */
-extern M2C_UNK D_800A8200;
+s32 func_00290E10(s32, s32);                    /* extern */
+s32 func_00290E90(s32, s32);                    /* extern */
+s32 func_00290EC0(s32, s16);                    /* extern */
+extern s32 D_800A8200;
 
 void func_00275450(void *arg0)
 {

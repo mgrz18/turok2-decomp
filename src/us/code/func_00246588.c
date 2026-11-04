@@ -1,7 +1,12 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00246588(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 0) = arg1;
-    M2C_FIELD(arg0, s32 *, 4) = arg1;
+/* Two words set to the same value (a current and an initial value). */
+typedef struct {
+    /* 0x00 */ s32 value;
+    /* 0x04 */ s32 initial;
+} ValuePair;
+
+void func_00246588(ValuePair *arg0, s32 arg1) {
+    arg0->value = arg1;
+    arg0->initial = arg1;
 }

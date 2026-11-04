@@ -1,10 +1,20 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00285A68(s8);                          /* extern */
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ s8 unk4;
+} Setting;
+
+/* Only the field read here. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x20];
+    /* 0x20 */ Setting *setting;
+} MenuItem;
+
+void func_00285A68(s8);                             /* extern */
 extern s32 D_800C2020;
 
-void func_004181C8(void *arg0) {
-    func_00285A68(M2C_FIELD(M2C_FIELD(arg0, void **, 0x20), s8 *, 4));
+void func_004181C8(MenuItem *arg0) {
+    func_00285A68(arg0->setting->unk4);
     D_800C2020 = 0;
 }

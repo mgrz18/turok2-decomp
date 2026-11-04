@@ -9,21 +9,16 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-typedef s32 M2C_UNK;
-typedef s8 M2C_UNK8;
-typedef s16 M2C_UNK16;
-typedef s32 M2C_UNK32;
-typedef s64 M2C_UNK64;
 s32 func_002021F0(s32, s32, s32);
 s32 func_002031E8(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
-M2C_UNK func_002062F8(M2C_UNK, s32);
-M2C_UNK func_00206498(M2C_UNK, s32);
-extern M2C_UNK D_800D1CC0;
-extern M2C_UNK D_800D8DB0;
+void func_002062F8(s32, s32);
+void func_00206498(s32, s32);
+extern u8 D_800D1CC0[];
+extern u8 D_800D8DB0[];
 extern s32 D_800D8DCC;
 s32 func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
 {
@@ -39,7 +34,7 @@ s32 func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
   if (temp_v1 != 1)
   {
     __osRestoreInt(temp_a0);
-    osRecvMesg((s32) (&D_800D8DB0), 0, 1);
+    osRecvMesg((s32) (D_800D8DB0), 0, 1);
   }
   else
   {
@@ -48,7 +43,7 @@ s32 func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
   var_s0 = func_002031E8(0, 0);
   if (var_s0 != 0)
   {
-    temp_v0 = func_002021F0((s32) (&D_800D1CC0), arg1, arg2);
+    temp_v0 = func_002021F0((s32) (D_800D1CC0), arg1, arg2);
     *((s32 *) (((s8 *) var_s0) + 0)) = temp_v0;
     if (temp_v0 != 0)
     {
@@ -70,13 +65,13 @@ s32 func_00204FD0(s32 arg0, s32 arg1, s32 arg2)
     if (D_800D8DCC || var_s0)
     {
       __osRestoreInt(temp_v0_2);
-      osSendMesg((s32) (&D_800D8DB0), 0, 1);
+      osSendMesg((s32) (D_800D8DB0), 0, 1);
       return var_s0;
     }
     else
     {
       __osRestoreInt(temp_v0_2);
-      osSendMesg((s32) (&D_800D8DB0), 0, 1);
+      osSendMesg((s32) (D_800D8DB0), 0, 1);
       return var_s0;
     }
   }

@@ -1,15 +1,24 @@
 #include "common.h"
-#include "m2c_macros.h"
+
+/* A cached resource (as in func_0020367C.c). */
+typedef struct CachedResource {
+    /* 0x00 */ void *data;
+    /* 0x04 */ u32 size;
+    /* 0x08 */ s32 count;           /* users */
+    /* 0x0C */ s32 flags;
+    /* 0x10 */ s32 stamp;
+} CachedResource;
 
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern M2C_UNK D_800D8DB0;
+extern u8 D_800D8DB0[];                             /* the cache lock (OSMesgQueue) */
 extern s32 D_800D8DCC;
 
-void func_002051F4(s32 arg0, void *arg1) {
+/* Releases one use of a resource; the last one clears its 0x100 flag. */
+void func_002051F4(s32 arg0, CachedResource *arg1) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v0_2;
@@ -21,21 +30,21 @@ void func_002051F4(s32 arg0, void *arg1) {
     D_800D8DCC = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg((s32) &D_800D8DB0, 0, 1);
+        osRecvMesg((s32) D_800D8DB0, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
-    temp_v0 = M2C_FIELD(arg1, s32 *, 8) - 1;
-    M2C_FIELD(arg1, s32 *, 8) = temp_v0;
+    temp_v0 = arg1->count - 1;
+    arg1->count = temp_v0;
     if (temp_v0 == 0) {
-        M2C_FIELD(arg1, s32 *, 0xC) = (s32) (M2C_FIELD(arg1, s32 *, 0xC) & ~0x100);
+        arg1->flags = (s32) (arg1->flags & ~0x100);
     }
     temp_v0_2 = __osDisableInt();
     temp_v1_2 = D_800D8DCC - 1;
     D_800D8DCC = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0_2);
-        osSendMesg((s32) &D_800D8DB0, 0, 1);
+        osSendMesg((s32) D_800D8DB0, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0_2);

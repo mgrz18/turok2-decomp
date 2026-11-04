@@ -1,17 +1,21 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_002052D8(s32, s32);
 
-s32 func_002532A8(M2C_UNK *);                       /* extern */
-M2C_UNK func_002758DC(M2C_UNK);                     /* extern */
-M2C_UNK func_00275B58();                            /* extern */
-M2C_UNK func_00275EFC(s32);                         /* extern */
+s32 func_002532A8(s32 *);                       /* extern */
+s32 func_002758DC(s32);                     /* extern */
+s32 func_00275B58();                            /* extern */
+s32 func_00275EFC(s32);                         /* extern */
 s32 func_00275F7C();                                /* extern */
-M2C_UNK func_0042EA24(s32);                         /* extern */
-extern M2C_UNK D_80119870;
+s32 func_0042EA24(s32);                         /* extern */
+extern s32 D_80119870;
 
-void func_004658FC(void *arg0) {
+typedef struct {
+    /* 0x00 */ u8 pad0[0x98];
+    /* 0x98 */ s32 handles[14];  /* resources released on exit */
+} Unk004658FC;
+
+void func_004658FC(Unk004658FC *arg0) {
     s32 temp_v0;
 
     temp_v0 = func_002532A8(&D_80119870);
@@ -21,14 +25,14 @@ void func_004658FC(void *arg0) {
     func_00275EFC(func_00275F7C());
     func_00275B58();
     func_002758DC(0x1000);
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0x98));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0x9C));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0xA0));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0xA4));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0xA8));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0xB0));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0xB4));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0xCC));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0xAC));
-    func_002052D8(0, M2C_FIELD(arg0, s32 *, 0xC8));
+    func_002052D8(0, arg0->handles[0]);
+    func_002052D8(0, arg0->handles[1]);
+    func_002052D8(0, arg0->handles[2]);
+    func_002052D8(0, arg0->handles[3]);
+    func_002052D8(0, arg0->handles[4]);
+    func_002052D8(0, arg0->handles[6]);
+    func_002052D8(0, arg0->handles[7]);
+    func_002052D8(0, arg0->handles[13]);
+    func_002052D8(0, arg0->handles[5]);
+    func_002052D8(0, arg0->handles[12]);
 }

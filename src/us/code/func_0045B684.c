@@ -1,7 +1,6 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00285CC4(void *, void *);              /* extern */
+s32 func_00285CC4(void *, void *);              /* extern */
 extern s32 D_801309C0;
 
 void func_0045B684(void *arg0)

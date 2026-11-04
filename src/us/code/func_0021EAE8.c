@@ -1,5 +1,5 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
 extern char D_800A5AC4[];
 
@@ -9,17 +9,17 @@ void **func_0021F358(void *obj);
 s32 func_002017D4(void *, s32);
 s32 func_0021CDAC(void *, void *, s32);
 
-s32 func_0021EAE8(void *obj, s32 arg1) {
+s32 func_0021EAE8(CGameObjectInstance *obj, s32 arg1) {
     s32 result;
     void **res;
     void **sub;
     void *first;
 
     result = 0;
-    if (!(M2C_FIELD(obj, s32 *, 0xD4) & 0x40000)) {
+    if (!(obj->m_dwFlags & 0x40000)) {
         return result;
     }
-    res = func_0020367C(0, M2C_FIELD(obj, s32 *, 0xA4), M2C_FIELD(obj, s32 *, 0xB0), 0, 0, 0, D_800A5AC4, arg1);
+    res = func_0020367C(0, (s32)obj->m_rpObject, obj->m_rpObjectHeader, 0, 0, 0, D_800A5AC4, arg1);
     if (res != NULL) {
         sub = func_0021F358(obj);
         if (sub != NULL) {

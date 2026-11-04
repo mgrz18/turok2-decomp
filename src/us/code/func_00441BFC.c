@@ -1,6 +1,18 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-s32 func_00441BFC(void *arg0) {
-    return M2C_FIELD(M2C_FIELD(arg0, void **, 4), s16 *, 0x46) - M2C_FIELD(arg0, s32 *, 0x10);
+typedef struct {
+    /* 0x00 */ u8 pad0[0x46];
+    /* 0x46 */ s16 total;
+} Info;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[4];
+    /* 0x04 */ Info *info;
+    /* 0x08 */ u8 pad8[0x10 - 0x8];
+    /* 0x10 */ s32 used;
+} Arg0;
+
+/* What is left: info->total - used. */
+s32 func_00441BFC(Arg0 *arg0) {
+    return arg0->info->total - arg0->used;
 }

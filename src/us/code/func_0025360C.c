@@ -1,9 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_0025360C(void *arg0, s32 arg1) {
-    if (M2C_FIELD(arg0, s32 *, 4) == arg1) {
-        M2C_FIELD(arg0, s32 *, 0xB4) = 1;
+/* Only what this reads and writes. */
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 value;
+    /* 0x08 */ u8 pad8[0xB4 - 0x8];
+    /* 0xB4 */ s32 repeated;
+} Tracker;
+
+/* Sets the value, noting when it is the same as before. */
+void func_0025360C(Tracker *arg0, s32 arg1) {
+    if (arg0->value == arg1) {
+        arg0->repeated = 1;
     }
-    M2C_FIELD(arg0, s32 *, 4) = arg1;
+    arg0->value = arg1;
 }

@@ -1,5 +1,4 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_002017D4(s32, s32);
 s32 func_00205A2C(s32, s32);
@@ -23,7 +22,7 @@ void func_0020BEE8(s32 *arg0) {
             var_s0 = 0;
             if (temp_s2 > 0) {
                 do {
-                    temp_a1 = M2C_FIELD(func_002017D4(func_002017D4((s32) temp_v0_2, var_s0), 0), s32 *, 8);
+                    temp_a1 = ((s32 *) func_002017D4(func_002017D4((s32) temp_v0_2, var_s0), 0))[2];
                     if (temp_a1 != 0) {
                         func_00205A2C(0, temp_a1);
                     }

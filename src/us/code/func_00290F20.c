@@ -1,18 +1,26 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_002933E0(s32, void *);                 /* extern */
+typedef struct {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+} List;
 
-void func_00290F20(void *arg0, s32 arg1, s32 arg2) {
+s32 func_002933E0(s32, List *);                 /* extern */
+
+/* Clears the list and adds arg2 0x1C-byte entries from arg1. */
+void func_00290F20(List *arg0, s32 arg1, s32 arg2) {
     s32 var_s0;
     s32 var_s1;
 
     var_s1 = 0;
-    M2C_FIELD(arg0, s32 *, 0x10) = 0;
-    M2C_FIELD(arg0, s32 *, 8) = 0;
-    M2C_FIELD(arg0, s32 *, 0xC) = 0;
-    M2C_FIELD(arg0, s32 *, 0) = 0;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
+    arg0->unk10 = 0;
+    arg0->unk8 = 0;
+    arg0->unkC = 0;
+    arg0->unk0 = 0;
+    arg0->unk4 = 0;
     if (arg2 > 0) {
         var_s0 = arg1;
         do {

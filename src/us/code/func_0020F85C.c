@@ -1,8 +1,8 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0020F85C(void *arg0, void *arg1, void *arg2) {
-    M2C_FIELD(arg2, f32 *, 0) = (f32) ((M2C_FIELD(arg0, f32 *, 0) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x10) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x20) * M2C_FIELD(arg1, f32 *, 8)) + M2C_FIELD(arg0, f32 *, 0x30));
-    M2C_FIELD(arg2, f32 *, 4) = (f32) ((M2C_FIELD(arg0, f32 *, 4) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x14) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x24) * M2C_FIELD(arg1, f32 *, 8)) + M2C_FIELD(arg0, f32 *, 0x34));
-    M2C_FIELD(arg2, f32 *, 8) = (f32) ((M2C_FIELD(arg0, f32 *, 8) * M2C_FIELD(arg1, f32 *, 0)) + (M2C_FIELD(arg0, f32 *, 0x18) * M2C_FIELD(arg1, f32 *, 4)) + (M2C_FIELD(arg0, f32 *, 0x28) * M2C_FIELD(arg1, f32 *, 8)) + M2C_FIELD(arg0, f32 *, 0x38));
+void func_0020F85C(CMtxF mf, CVector3 *in, CVector3 *out) {
+    out->x = (f32) ((mf[0][0] * in->x) + (mf[1][0] * in->y) + (mf[2][0] * in->z) + mf[3][0]);
+    out->y = (f32) ((mf[0][1] * in->x) + (mf[1][1] * in->y) + (mf[2][1] * in->z) + mf[3][1]);
+    out->z = (f32) ((mf[0][2] * in->x) + (mf[1][2] * in->y) + (mf[2][2] * in->z) + mf[3][2]);
 }

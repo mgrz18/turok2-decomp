@@ -1,11 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s32 func_0023F034(s32 arg0, void *arg1) {
+/* Nonzero for an object (kind 1) with flags 0x300000 set. */
+s32 func_0023F034(s32 arg0, CGameObjectInstance *arg1) {
     s32 r = 0;
-
-    if (M2C_FIELD(arg1, u8 *, 0) == 1) {
-        r = (u32) r < (u32) (M2C_FIELD(arg1, s32 *, 0xD4) & 0x300000);
+    if (arg1->header.m_Type == 1) {
+        r = (u32) r < (u32) (arg1->m_dwFlags & 0x300000);
     }
     return r;
 }

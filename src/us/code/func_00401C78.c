@@ -1,6 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-s32 func_00401C78(void *arg0) {
-    return (u32) (M2C_FIELD(arg0, s32 *, 4) - 1) < 2U;
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ s32 state;
+} Unk00401C78;
+
+s32 func_00401C78(Unk00401C78 *arg0) {
+    return (u32) (arg0->state - 1) < 2U;
 }

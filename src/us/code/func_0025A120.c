@@ -1,10 +1,18 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
+
+/* The actor definition the object points at (header.m_pIntelligence): what
+ * these callbacks read of it. animFlags are per-mode animation-flag masks
+ * handed to func_00245A98 to pick an animation. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x6A];
+    /* 0x6A */ u16 animFlags[25];
+} ActorDef;
 
 s32 func_00245A98(s32, s32, s32, s32);
 
-extern M2C_UNK D_800AFA80;
+extern s32 D_800AFA80;
 
-void func_0025A120(void *arg0, s32 arg1) {
-    func_00245A98((s32) arg0, arg1, (s32) &D_800AFA80, (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), u16 *, 0x7A));
+void func_0025A120(CGameObjectInstance *arg0, s32 arg1) {
+    func_00245A98((s32) arg0, arg1, (s32) &D_800AFA80, (s32) ((ActorDef *) arg0->header.m_pIntelligence)->animFlags[8]);
 }

@@ -1,10 +1,9 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/player.h"
 
 extern s32 D_8011AAD8;
 
-void func_002536E0(s32 arg0, s32 arg1) {
-    void *temp_v1;
+void func_002536E0(CPlayer *arg0, s32 arg1) {
 
     if (!(D_8011AAD8 & 0x10)) {
         if (arg1 < 0x1121) {
@@ -13,8 +12,7 @@ void func_002536E0(s32 arg0, s32 arg1) {
             }
         } else {
 block_3:
-            { s32 i = arg1 - 0xFA0; temp_v1 = (s8 *)arg0 + i; }
-            M2C_FIELD(temp_v1, u8 *, 0x52C) = (u8) (M2C_FIELD(temp_v1, u8 *, 0x52C) - 1);
+            arg0->m_Data.m_SpecialPickupCount[arg1 - 0xFA0]--;
         }
     }
 }

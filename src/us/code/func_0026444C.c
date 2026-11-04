@@ -1,8 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_0026444C(void *arg0, s32 *arg1) {
-    if (!(M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), s32 *, 0x38) & 0x40)) {
+typedef struct {
+    /* 0x00 */ u8 pad0[0x38];
+    /* 0x38 */ s32 flags;
+} ActorDef;
+
+void func_0026444C(CGameObjectInstance *obj, s32 *arg1) {
+    if (!(((ActorDef *) obj->header.m_pIntelligence)->flags & 0x40)) {
         *arg1 &= 0xF7FFFFFF;
     }
 }

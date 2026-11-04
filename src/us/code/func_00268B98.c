@@ -1,21 +1,36 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-f32 func_00268B98(void *arg0) {
+typedef struct {
+    /* 0x0 */ u8 pad0[4];
+    /* 0x4 */ CVector3 *a;
+    /* 0x8 */ CVector3 *b;
+    /* 0xC */ CVector3 *c;
+} Triangle;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[8];
+    /* 0x08 */ f32 y;
+    /* 0x0C */ u8 padC[4];
+    /* 0x10 */ Triangle *tri;
+} Unk00268B98;
+
+/* Height of arg0 above the lowest vertex of its triangle. */
+f32 func_00268B98(Unk00268B98 *arg0) {
     f32 temp_f1;
     f32 var_f0;
     f32 var_f1;
-    void *temp_a1;
+    Triangle *temp_a1;
 
-    temp_a1 = M2C_FIELD(arg0, void **, 0x10);
-    var_f0 = M2C_FIELD(M2C_FIELD(temp_a1, void **, 8), f32 *, 4);
-    temp_f1 = M2C_FIELD(M2C_FIELD(temp_a1, void **, 4), f32 *, 4);
+    temp_a1 = arg0->tri;
+    var_f0 = temp_a1->b->y;
+    temp_f1 = temp_a1->a->y;
     if (!(var_f0 <= temp_f1)) {
         var_f0 = temp_f1;
     }
-    var_f1 = M2C_FIELD(M2C_FIELD(temp_a1, void **, 0xC), f32 *, 4);
+    var_f1 = temp_a1->c->y;
     if (!(var_f1 <= var_f0)) {
         var_f1 = var_f0;
     }
-    return M2C_FIELD(arg0, f32 *, 8) - var_f1;
+    return arg0->y - var_f1;
 }

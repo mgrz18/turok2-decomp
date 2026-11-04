@@ -1,6 +1,10 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s32 func_002682B8(void *arg0) {
-    return *M2C_FIELD(arg0, s32 **, 0x14) == 1;
+typedef struct {
+    /* 0x0 */ s32 type;
+} CIntelligence;
+
+s32 func_002682B8(CGameObjectInstance *obj) {
+    return ((CIntelligence *) obj->header.m_pIntelligence)->type == 1;
 }

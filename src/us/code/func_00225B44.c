@@ -1,18 +1,26 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_00225B44(void *arg0, s32 arg1) {
+/* A table of up to 0x80 actors at 0xBF8 with its count at 0xDF8. */
+typedef struct {
+    /* 0x000 */ u8 pad0[0xBF8];
+    /* 0xBF8 */ CGameObjectInstance *actors[0x80];
+    /* 0xDF8 */ s32 count;
+} ActorTable;
+
+/* Clears m_AI.m_pParent on every actor whose parent is arg1. */
+void func_00225B44(ActorTable *arg0, s32 arg1) {
     s32 i;
     s32 n;
-    void **p;
+    CGameObjectInstance **p;
 
     i = 0;
-    n = M2C_FIELD(arg0, s32 *, 0xDF8);
-    p = (void **)((s8 *)arg0 + 0xBF8);
+    n = arg0->count;
+    p = arg0->actors;
     if (n > 0) {
         do {
-            if (M2C_FIELD(*p, s32 *, 0x1A8) == arg1) {
-                M2C_FIELD(*p, s32 *, 0x1A8) = 0;
+            if ((s32) (*p)->m_AI.m_pParent == arg1) {
+                (*p)->m_AI.m_pParent = NULL;
             }
             i++;
             p++;

@@ -1,14 +1,14 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s32 func_00220408(M2C_UNK *, s32);                  /* extern */
-M2C_UNK func_00243414(s32, void *, M2C_UNK);        /* extern */
-M2C_UNK func_00262960(s32, void *, M2C_UNK);        /* extern */
-extern M2C_UNK D_800F7078;
+s32 func_00220408(s32 *, s32);                  /* extern */
+s32 func_00243414(s32, void *, s32);        /* extern */
+s32 func_00262960(s32, void *, s32);        /* extern */
+extern s32 D_800F7078;
 
-void func_002629A4(s32 arg0, void *arg1, M2C_UNK arg2) {
-    if ((func_00220408(&D_800F7078, arg0) == 0) && (M2C_FIELD(arg1, s8 *, 0x34) == 0)) {
-        func_00262960(arg0, arg1, arg2);
-        func_00243414(arg0, arg1, 1);
+void func_002629A4(s32 arg0, CAI *ai, s32 arg2) {
+    if ((func_00220408(&D_800F7078, arg0) == 0) && (ai->m_Mode == 0)) {
+        func_00262960(arg0, ai, arg2);
+        func_00243414(arg0, ai, 1);
     }
 }

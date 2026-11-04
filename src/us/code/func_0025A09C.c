@@ -1,10 +1,21 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-s32 func_00245A98(s32, s32, s32, s32);
+/* The object's intelligence (header.m_pIntelligence): its flags and its
+ * table of animation ids, one per action (0x76-0x9A). */
+struct CIntelligence {
+    /* 0x00 */ u8 pad0[0x14];
+    /* 0x14 */ s32 m_dwFlags;
+    /* 0x18 */ u8 pad18[0x54 - 0x18];
+    /* 0x54 */ s32 unk54;
+    /* 0x58 */ u8 pad58[0x76 - 0x58];
+    /* 0x76 */ u16 m_AnimIds[19];
+};
 
-extern M2C_UNK D_800AF9F0;
+s32 func_00245A98(CGameObjectInstance *obj, CAI *ai, u8 *table, s32 anim);
 
-void func_0025A09C(void *arg0, s32 arg1) {
-    func_00245A98((s32) arg0, arg1, (s32) &D_800AF9F0, (s32) M2C_FIELD(M2C_FIELD(arg0, void **, 0x14), u16 *, 0x98));
+extern u8 D_800AF9F0[];
+
+void func_0025A09C(CGameObjectInstance *obj, CAI *ai) {
+    func_00245A98(obj, ai, D_800AF9F0, obj->header.m_pIntelligence->m_AnimIds[17]);
 }

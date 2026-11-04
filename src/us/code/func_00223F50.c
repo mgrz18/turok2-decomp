@@ -1,8 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_002017D4(s32);                         /* extern */
+/* Only the field read here: a resource walked with func_002017D4. */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x5C];
+    /* 0x5C */ s32 unk5C;
+} TableOwner;
 
-void func_00223F50(void *arg0) {
-    func_002017D4(M2C_FIELD(arg0, s32 *, 0x5C));
+void func_002017D4(s32);                            /* extern */
+
+void func_00223F50(TableOwner *arg0) {
+    func_002017D4(arg0->unk5C);
 }

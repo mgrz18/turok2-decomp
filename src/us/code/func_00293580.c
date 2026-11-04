@@ -1,6 +1,17 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-s32 func_00293580(void *arg0) {
-    return M2C_FIELD(((M2C_FIELD(arg0, s32 *, 0x3C) * 0x30) + M2C_FIELD(arg0, s32 *, 0x40)), s32 *, 0x28);
+typedef struct {
+    /* 0x00 */ u8 pad0[0x28];
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ u8 pad2C[4];
+} Track00293580; /* size 0x30 */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x3C];
+    /* 0x3C */ s32 current;
+    /* 0x40 */ Track00293580 *tracks;
+} Unk00293580;
+
+s32 func_00293580(Unk00293580 *arg0) {
+    return arg0->tracks[arg0->current].unk28;
 }

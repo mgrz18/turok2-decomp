@@ -1,12 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 
-void func_002602E0(s32 arg0, void *arg1, s32 arg2) {
+/* Lowers the aggression by arg2, down to 0. */
+void func_002602E0(s32 arg0, CAI *arg1, s32 arg2) {
     s32 var_v0;
 
-    var_v0 = M2C_FIELD(arg1, u8 *, 0xC8) - arg2;
+    var_v0 = arg1->m_Aggression - arg2;
     if (var_v0 < 0) {
         var_v0 = 0;
     }
-    M2C_FIELD(arg1, u8 *, 0xC8) = (u8) var_v0;
+    arg1->m_Aggression = (u8) var_v0;
 }

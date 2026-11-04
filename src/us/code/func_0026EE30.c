@@ -1,8 +1,14 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_0026EE30(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 0) = arg1;
-    M2C_FIELD(arg0, s32 *, 4) = 0;
-    M2C_FIELD(arg0, s32 *, 8) = 0;
+/* Three words: a value and two counters this clears. */
+typedef struct {
+    /* 0x00 */ s32 value;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+} Triple;
+
+void func_0026EE30(Triple *arg0, s32 arg1) {
+    arg0->value = arg1;
+    arg0->unk4 = 0;
+    arg0->unk8 = 0;
 }

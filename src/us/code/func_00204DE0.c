@@ -1,5 +1,4 @@
 #include "common.h"
-#include "m2c_macros.h"
 
 s32 func_00203330(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
@@ -7,9 +6,15 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern M2C_UNK D_800D8DB0;
+/* Two counters 0x3C past the message queue at D_800D8DB0. */
+typedef struct {
+    /* 0x0 */ s32 pending;
+    /* 0x4 */ s32 count;
+} Counters;
+
+extern u8 D_800D8DB0[];
 extern s32 D_800D8DCC;
-extern M2C_UNK D_800D8DEC;
+extern Counters D_800D8DEC;
 
 void func_00204DE0(void)
 {
@@ -19,19 +24,19 @@ void func_00204DE0(void)
   s32 temp_v1;
   s32 temp_v1_2;
   s32 var_s0;
-  if ((*((s32 *) (((s8 *) (&D_800D8DEC)) + 0))) != 0)
+  if (D_800D8DEC.pending != 0)
   {
     new_var = (s8 *) (&D_800D8DEC);
-    *((s32 *) (((s8 *) (&D_800D8DEC)) + 0)) = (s32) ((*((s32 *) (((s8 *) (&D_800D8DEC)) + 0))) - 1);
+    D_800D8DEC.pending = D_800D8DEC.pending - 1;
   }
-  *((s32 *) (((s8 *) (&D_800D8DEC)) + 4)) = (s32) ((*((s32 *) (((s8 *) (&D_800D8DEC)) + 4))) + 1);
+  D_800D8DEC.count = D_800D8DEC.count + 1;
   temp_a0 = __osDisableInt();
   temp_v1 = D_800D8DCC + 1;
   D_800D8DCC = temp_v1;
   if (temp_v1 != 1)
   {
     __osRestoreInt(temp_a0);
-    osRecvMesg((s32) ((typeof(&D_800D8DEC)) (((s8 *) (&D_800D8DEC)) - 0x3C)), 0, 1);
+    osRecvMesg((s32) (((s8 *) (&D_800D8DEC)) - 0x3C), 0, 1);
     var_s0 = 0;
   }
   else
@@ -51,7 +56,7 @@ void func_00204DE0(void)
   if (temp_v1_2 != 0)
   {
     __osRestoreInt(temp_v0);
-    osSendMesg((s32) (&D_800D8DB0), 0, 1);
+    osSendMesg((s32) D_800D8DB0, 0, 1);
     return;
   }
   __osRestoreInt(temp_v0);

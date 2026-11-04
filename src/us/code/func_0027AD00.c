@@ -1,10 +1,16 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_00277328();                            /* extern */
+/* What this sets on its first argument: a value and a mode. */
+typedef struct {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 value;
+    /* 0x8 */ s32 mode;
+} ModeState;
 
-void func_0027AD00(void *arg0, s32 arg1) {
-    M2C_FIELD(arg0, s32 *, 4) = arg1;
-    M2C_FIELD(arg0, s32 *, 8) = 2;
+void func_00277328();                               /* extern */
+
+void func_0027AD00(ModeState *arg0, s32 arg1) {
+    arg0->value = arg1;
+    arg0->mode = 2;
     func_00277328();
 }

@@ -1,9 +1,13 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-M2C_UNK func_0042E14C(s32);                         /* extern */
+typedef struct {
+    /* 0x00 */ u8 pad0[0x1C];
+    /* 0x1C */ void *player;
+} MenuCaller;
 
-s32 func_0041C9DC(s32 arg0, void *arg1) {
-    func_0042E14C(M2C_FIELD(arg1, s32 *, 0x1C));
+extern void func_0042E14C(void *player);
+
+s32 func_0041C9DC(s32 menu, MenuCaller *c) {
+    func_0042E14C(c->player);
     return 1;
 }

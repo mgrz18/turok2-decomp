@@ -1,20 +1,30 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/player.h"
 
 s32 func_00248720(s32, s32);
 s32 func_00253DE0(s32, s32);
 s32 func_00253EB8(s32, s32);
 
-extern M2C_UNK D_800A72C8;
-extern M2C_UNK D_800AF618;
+typedef struct {
+    /* 0x00 */ u8 pad0[0x18];
+    /* 0x18 */ f32 unk18;
+} WeaponDef;
 
-void func_00259040(void *arg0, void *arg1) {
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 scale;
+} Tuning;
+
+extern Tuning D_800A72C8;
+extern WeaponDef *D_800AF618[];
+
+void func_00259040(CGameObjectInstance *obj, CAI *ai) {
     s32 temp_s1;
 
-    temp_s1 = M2C_FIELD(arg0, s32 *, 0x1A8);
-    M2C_FIELD(arg1, s32 *, 0x64) = 0;
-    func_00248720(M2C_FIELD(arg0, s32 *, 0x1A8), 0x12B);
+    temp_s1 = (s32) obj->m_AI.m_pParent;
+    ai->m_ConditionTimer = 0.0f;
+    func_00248720((s32) obj->m_AI.m_pParent, 0x12B);
     func_00253DE0(temp_s1, 0x1A5);
     func_00253EB8(temp_s1, 0x1A7);
-    M2C_FIELD(arg1, f32 *, 0x118) = (f32) (M2C_FIELD(*(((__typeof__(&D_800AF618))((s8 *)&D_800AF618 + (M2C_FIELD(M2C_FIELD(arg0, s32 *, 0x1A8), s16 *, 0x996) * 4)))), f32 *, 0x18) * M2C_FIELD(&D_800A72C8, f32 *, 4));
+    *(f32 *) &ai->m_VarBuffer[3] = D_800AF618[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->unk18 * D_800A72C8.scale;
 }

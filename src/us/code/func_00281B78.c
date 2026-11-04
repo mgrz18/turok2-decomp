@@ -1,7 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
 
-void func_00281B78(void *arg0, f32 arg1, s32 arg2) {
-    M2C_FIELD(arg0, s32 *, 0) = arg2;
-    M2C_FIELD(arg0, f32 *, 4) = (f32) (arg1 * 0.1f);
+typedef struct {
+    /* 0x00 */ s32 type;
+    /* 0x04 */ f32 value;
+} Setting;
+
+void func_00281B78(Setting *arg0, f32 arg1, s32 arg2) {
+    arg0->type = arg2;
+    arg0->value = (f32) (arg1 * 0.1f);
 }
