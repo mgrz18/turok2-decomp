@@ -55,7 +55,12 @@ A matched function gets its own `c` subsegment in `versions/turok2.us.yaml`:
 
 then the INCLUDE_ASM line is replaced by the C, and `make verify` must still
 pass. A file may hold a run of contiguous functions, some matched and the rest
-INCLUDE_ASM. `tools/progress.py` counts the bytes defined in C.
+INCLUDE_ASM. `tools/progress.py` counts the bytes defined in C, over the
+C-origin code: the functions that are asm by origin (libultra `.s`, SNMAIN/STVM,
+the RNC unpacker, the exception stubs) or fragments are listed in
+`versions/asm_origin.us.txt`, reported as their own `asm (by origin)` row and
+left out of the percentages ([ASM_ORIGIN.md](ASM_ORIGIN.md)); `all code` keeps
+the figure over every byte.
 
 Asm pulled in with INCLUDE_ASM uses numeric registers (`named_regs_for_c_funcs:
 False`), since asn64 reads `$sp` as a hex literal. Splitting a file can leave
@@ -380,6 +385,18 @@ From the sixth hand-matching batch:
   (func_0040457C), and `register T *p asm("$2")` pins standing for a copy
   the ROM makes (func_0041EA84, func_004579A4). Each says so in its first
   comment.
+- **A dead load before a test comes from a dead branch, not a dead read.**
+  GCC drops a load whose value nobody uses, an empty `if` and an inline
+  call whose result is discarded; it keeps the load of a branch that dbr
+  (the delay-slot pass, after sched2) deletes. func_00246BC0 loads its
+  control mode twice in a row: a `switch` on it whose result the next
+  statement overwrites gives that load, in `$v1` beside the switch's
+  `li $v0, 1` and scheduled right before the deleted `beqz` (an `if (mode <
+  2)` or a second call of the same inline puts it one slot early).
+  `cc1 ... -dS -dR -dd` writes the sched, sched2 and dbr dumps
+  (`f.i.sched2`, `f.i.dbr`), which show what each pass did with such an
+  insn. That match also keeps a `$s1` pin for a pointer
+  the ROM holds in a saved register without a call to cross.
 - **Matching alone is not the whole check for a wrong cut**: a function
   that matches "over its real extent" still needs that extent in
   `versions/cuts.us.txt` (and, at a segment's end, the next subsegment

@@ -2,10 +2,10 @@
 
 [![status](https://img.shields.io/badge/status-matching%20decomp-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
 [![ROM](https://img.shields.io/badge/ROM-rebuilds%20byte--exact-brightgreen)](docs/MATCHING.md)
-[![total matched](https://img.shields.io/badge/total%20matched-98.96%25-brightgreen)](tools/progress.py)
-[![engine matched](https://img.shields.io/badge/engine%20matched-98.56%25-brightgreen)](tools/progress.py)
-[![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-99.97%25-brightgreen)](tools/progress.py)
-[![readable](https://img.shields.io/badge/readable%20C-98.80%25-blue)](tools/progress.py)
+[![total matched](https://img.shields.io/badge/total%20matched-100%25-brightgreen)](tools/progress.py)
+[![engine matched](https://img.shields.io/badge/engine%20matched-100%25-brightgreen)](tools/progress.py)
+[![VM modules matched](https://img.shields.io/badge/VM%20modules%20matched-100%25-brightgreen)](tools/progress.py)
+[![readable](https://img.shields.io/badge/readable%20C-99.83%25-blue)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
 [![RSP ucode](https://img.shields.io/badge/RSP%20ucode-stock%20F3DEX-success)](docs/MICROCODE.md)
@@ -14,7 +14,7 @@
 
 Work-in-progress **matching decompilation** of **Turok 2: Seeds of Evil** (Nintendo 64, US 1.0): C source that compiles back to the exact original ROM.
 
-> **Status: matching begins.** The ROM rebuilds byte-exact from split asm (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. 2,532 engine functions (98.56% of engine code) and 1,316 functions of the paged VM modules (99.97%), which build with the same toolchain, are matched and linked into the ROM as C so far: 98.96% of all the game's code. The VM modules' second copy (81 KB, the first copy's bytes again, which cannot be C of its own) is left out of both sides of that figure. 98.80% of the code is also *readable* C, with named fields rather than m2c's offset macros ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share.
+> **Status: all the C is matched.** The ROM rebuilds byte-exact (`make verify` passes the SHA1), and the compiler is identified: engine code matches through SN64 GCC 2.8.1 `cc1 -O2 -mno-fix4300` + `asn64`. Every function that was C in the original is now matched C linked into the ROM: 2,531 engine functions and 1,311 functions of the paged VM modules, which build with the same toolchain (100% of the C-origin code; 99.07% of all code bytes, the rest being hand-written asm, below). 23 of them are FAKEMATCH, documented in their files and in [docs/MATCHING.md](docs/MATCHING.md). The VM modules' second copy (81 KB, the first copy's bytes again, which cannot be C of its own) is left out of both sides of that figure. 99.83% of the C-origin code is also *readable* C, with named fields rather than m2c's offset macros ([docs/MATCHING.md](docs/MATCHING.md)); `tools/progress.py` tracks the share. The matched badges are over C-origin code: the 9 KB that is hand-written asm by origin (libultra's `.s` files, SN64's boot and TLB code, the RNC unpacker, the exception stubs) and three dead fragments can never be C, so `tools/progress.py` lists them in their own `asm (by origin)` row ([docs/ASM_ORIGIN.md](docs/ASM_ORIGIN.md)) and the badges reach 100% when all the C is matched; its `all code` row (`--badge --raw`) keeps the share of every byte.
 >
 > A parallel native-port track recompiles the same ELF with N64Recomp; it runs clean, and the TLB is its open question.
 
