@@ -59,23 +59,23 @@ extern s16 func_0026D628(PickTable *t);
 static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
     PoolActor *pickup;
 
-    pickup = func_00227240(D_80107590, &ai->m_VarS32[0], id, actor->m_vVelocity, pos, region, 0.0f);
+    pickup = func_00227240(D_80107590, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);
     if (pickup != NULL) {
-        ai->m_VarS32[1]--;
+        ai->m_Generator.m_nRemaining--;
         func_00246690(pickup, 0x11D, pickup->pos, 0);
     }
 }
 
 /* Spawns the object model (an intelligence entry) at pos. */
 static __inline__ void spawnObject(CGameObjectInstance *actor, CAI *ai, CVector3 pos, CVector3 scale, s32 region, s32 type, s32 *model) {
-    if (func_00228108(D_8010ABA0, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_VarS32[0])) {
-        ai->m_VarS32[1]--;
+    if (func_00228108(D_8010ABA0, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_Generator.m_nActive)) {
+        ai->m_Generator.m_nRemaining--;
     }
 }
 
 /* Spawns the effect at pos. */
 static __inline__ void spawnEffect(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 type) {
-    ai->m_VarS32[1] -= func_0022F350(D_800F8928, actor, actor, &ai->m_VarS32[0], 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
+    ai->m_Generator.m_nRemaining -= func_0022F350(D_800F8928, actor, actor, &ai->m_Generator.m_nActive, 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
                                -1, 0);
 }
 

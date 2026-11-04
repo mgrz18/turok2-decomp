@@ -56,15 +56,15 @@ void func_00263A20(Self *self, CAI *ai) {
             }
             if (flags & 0x4000000) {
                 if (ai->m_dwFlags & 0x20000) {
-                    ai->m_VarF32[0] += D_800B6D28;
+                    ai->m_Platform.m_SpecialTimer += D_800B6D28;
                 } else {
-                    ai->m_VarF32[0] = 0.0f;
+                    ai->m_Platform.m_SpecialTimer = 0.0f;
                     break;
                 }
-            } else if (ai->m_VarF32[0] > 0.0f || (ai->m_dwFlags & 0x10000)) {
-                ai->m_VarF32[0] += D_800B6D28;
+            } else if (ai->m_Platform.m_SpecialTimer > 0.0f || (ai->m_dwFlags & 0x10000)) {
+                ai->m_Platform.m_SpecialTimer += D_800B6D28;
             }
-            if (ai->m_VarF32[0] >= params->triggerDelay) {
+            if (ai->m_Platform.m_SpecialTimer >= params->triggerDelay) {
                 ai->m_ActionTime = 0.0f;
                 flags = params->flags;
                 if (flags & 0x1000000) {
@@ -77,9 +77,9 @@ void func_00263A20(Self *self, CAI *ai) {
             }
             break;
         case 3:
-            ai->m_VarF32[1] = func_002119FC(-0.512f, 0.512f);
-            ai->m_VarF32[2] = func_002119FC(-0.512f, 0.512f);
-            ai->m_VarF32[3] = func_002119FC(-0.512f, 0.512f);
+            ai->m_Platform.m_vSpecialOffset.x = func_002119FC(-0.512f, 0.512f);
+            ai->m_Platform.m_vSpecialOffset.y = func_002119FC(-0.512f, 0.512f);
+            ai->m_Platform.m_vSpecialOffset.z = func_002119FC(-0.512f, 0.512f);
             ai->m_ActionTime += D_800B6D28;
             if (ai->m_ActionTime > 45.0f) {
                 ai->m_ActionTime = 0.0f;
@@ -103,9 +103,9 @@ void func_00263A20(Self *self, CAI *ai) {
                 }
             }
             if (params->duration > 0.0f) {
-                ai->m_VarF32[2] = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
+                ai->m_Platform.m_vSpecialOffset.y = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
             } else {
-                ai->m_VarF32[2] = -params->speed;
+                ai->m_Platform.m_vSpecialOffset.y = -params->speed;
             }
             break;
         case 2:
@@ -113,12 +113,12 @@ void func_00263A20(Self *self, CAI *ai) {
                 ai->m_ActionTime -= D_800B6D28;
             } else {
                 ai->m_Action = 0;
-                ai->m_VarF32[0] = 0.0f;
+                ai->m_Platform.m_SpecialTimer = 0.0f;
             }
             if (params->duration > 0.0f) {
-                ai->m_VarF32[2] = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
+                ai->m_Platform.m_vSpecialOffset.y = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
             } else {
-                ai->m_VarF32[2] = -params->speed;
+                ai->m_Platform.m_vSpecialOffset.y = -params->speed;
             }
             break;
         case 4:
@@ -126,9 +126,9 @@ void func_00263A20(Self *self, CAI *ai) {
                 ai->m_ActionTime += D_800B6D28;
             }
             if (params->duration > 0.0f) {
-                ai->m_VarF32[2] = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
+                ai->m_Platform.m_vSpecialOffset.y = -params->speed * func_00266F50(ai->m_ActionTime / params->duration);
             } else {
-                ai->m_VarF32[2] = -params->speed;
+                ai->m_Platform.m_vSpecialOffset.y = -params->speed;
             }
             if (params->flags & 0x2000000) {
                 self->flags &= ~0x2000;

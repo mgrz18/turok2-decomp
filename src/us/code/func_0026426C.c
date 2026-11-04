@@ -22,8 +22,8 @@ void func_0026426C(CGameObjectInstance *self, CAI *ai) {
     CQuaternion rot;
     f32 sinHalf;
 
-    func_00210630(tilt, ai->m_VarF32[5]);
-    func_00210790(tilt, ai->m_VarF32[4]);
+    func_00210630(tilt, ai->m_Platform.m_Roll);
+    func_00210790(tilt, ai->m_Platform.m_Pitch);
     sinHalf = func_002982F0(self->m_RotY * 0.5f);
     q.x = 0.0f;
     q.y = sinHalf;

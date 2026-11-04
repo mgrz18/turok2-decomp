@@ -164,7 +164,7 @@ void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
         points[6].z = minZ;
         points[7].z = minZ;
 
-        func_00210518(&rot, ai->m_VarF32[4]);
+        func_00210518(&rot, ai->m_Platform.m_Pitch);
         sinHalf = func_002982F0(mover->spin * 0.5f);
         q.x = 0.0f;
         q.y = sinHalf;

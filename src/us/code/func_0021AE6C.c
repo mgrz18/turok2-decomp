@@ -42,12 +42,12 @@ CQuaternion func_0021AE6C(CGameObjectInstance *actor) {
         yaw.w = func_002974C0(1.5707964f);
         func_00210F68(&result, &yaw, &player->rot);
     } else if (actor->header.m_pIntelligence->m_Type == 4) {
-        s = func_002982F0(actor->m_AI.m_VarF32[0] * 0.5f);
+        s = func_002982F0(actor->m_AI.m_Turret.m_Pitch * 0.5f);
         pitch.x = s;
         pitch.y = 0.0f;
         pitch.z = 0.0f;
         D_800DD78C = s;
-        pitch.w = func_002974C0(actor->m_AI.m_VarF32[0] * 0.5f);
+        pitch.w = func_002974C0(actor->m_AI.m_Turret.m_Pitch * 0.5f);
         s = func_002982F0((actor->m_RotY + 3.1415927f) * 0.5f);
         yaw.x = 0.0f;
         yaw.y = s;

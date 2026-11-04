@@ -92,6 +92,6 @@ s32 func_002623EC(Turret *self, CAI *ai) {
         func_00262150(self, ai, params->idleMode, target);
     }
     func_00245BAC(self, ai, params->turnRate, turn);
-    ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], pitch, params->turnRate);
+    ai->m_Turret.m_Pitch = func_00211774(ai->m_Turret.m_Pitch, pitch, params->turnRate);
     return fire;
 }
