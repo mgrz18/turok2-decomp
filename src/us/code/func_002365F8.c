@@ -1,29 +1,29 @@
 #include "common.h"
 #include "structs/list.h"
 
-typedef struct Particle {
+typedef struct SwooshNode {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ struct Particle *next;
+    /* 0x04 */ struct SwooshNode *next;
     /* 0x08 */ u8 pad8[0x48 - 0x8];
     /* 0x48 */ s32 owner;
-} Particle;
+} SwooshNode;
 
 typedef struct {
     /* 0x0000 */ u8 pad0[0x94D8];
     /* 0x94D8 */ CList active[10];
     /* 0x95A0 */ CList freeList;
-} ParticlePool;
+} SwooshSet;
 
 s32 CList__AddTail(void *, void *);
 s32 CList__Remove(void *, void *);
 
-/* Frees every active particle that belongs to arg1. */
-void func_002365F8(ParticlePool *arg0, s32 arg1)
+/* Frees every active node of the swoosh/decal set (D_801102B8, not the particle system) that belongs to arg1. */
+void func_002365F8(SwooshSet *arg0, s32 arg1)
 {
   s32 var_s4;
   CList *temp_s2;
-  Particle *temp_s1;
-  Particle *var_s0;
+  SwooshNode *temp_s1;
+  SwooshNode *var_s0;
   if (arg0->freeList.m_nCount != 0x64)
   {
     for (var_s4 = 0; var_s4 < 0xA; var_s4++)
