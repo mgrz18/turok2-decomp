@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/CODE_80281A70.CPP, Particle_DrawRenderList, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/region.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -25,15 +26,10 @@ typedef struct {
     /* 0x14 */ void *renderModel;
 } ParticleDesc;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ s32 mask;
-} Region;
-
 typedef struct DrawParticle {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ Vec3f pos;
-    /* 0x010 */ Region *region;
+    /* 0x010 */ CGameRegion *region;
     /* 0x014 */ u8 pad14[0x40 - 0x14];
     /* 0x040 */ u32 flags;
     /* 0x044 */ u8 pad44[0x48 - 0x44];
@@ -108,7 +104,7 @@ void func_0023118C(ParticleDrawWorld *world, ParticleView *view) {
         next:
             visible = 0;
             built = node->flags & builtFlag;
-            if (node->region == 0 || (mask & node->region->mask)) {
+            if (node->region == 0 || (mask & node->region->m_VisBits)) {
                 if (!(node->flags & 0x400000) && node->desc->renderModel == 0) {
                     zScale = node->size.z;
                     xyScale = node->size.y * zScale;

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "structs/region.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
@@ -48,15 +49,6 @@ typedef struct {
 } EmitterOwner;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ f32 height;
-    /* 0x24 */ u8 pad24[0x20];
-    /* 0x44 */ s32 flags;
-    /* 0x48 */ u8 pad48[0xE];
-    /* 0x56 */ u16 emitterMask;
-} RegionInfo;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x24];
     /* 0x24 */ s32 stalled;
     /* 0x28 */ u8 pad28[0x10];
@@ -77,7 +69,7 @@ extern s32 D_8010FF18;          /* how many */
 extern f32 D_800B6D28;          /* the frame's time step */
 extern f32 D_800B6D34;
 
-RegionInfo *func_0022425C(void *world, s32 region);
+CRegionInfo *func_0022425C(void *world, s32 region);
 f32 func_0026BE60(s32 region, f32 x, f32 z);
 Vec3f func_00280E40(Host *host);
 void func_00207914(s32 *resource, s32 id);
@@ -175,7 +167,7 @@ static __inline__ s32 UpdateEmitter(Emitter *e, s32 mask, f32 fallback, s32 boos
  * those that have wound down. Under a region flagged 1, the emitters get a
  * boost while the camera is below the region's height. */
 void func_00282E4C(EmitterOwner *owner, Host *host) {
-    RegionInfo *info;
+    CRegionInfo *info;
     EmitterDef *def;
     Emitter *e;
     Emitter *next;
@@ -199,13 +191,13 @@ void func_00282E4C(EmitterOwner *owner, Host *host) {
     boost = 0.0f;
     ground = func_0026BE60(region, host->x, host->z);
     below = 0;
-    if (info->flags & 1) {
-        depth = MIN((info->height - func_00280E40(host).y) * 0.5f, 20.48f);
-        below = func_00280E40(host).y < info->height;
-        boost = info->height - depth;
+    if (info->m_dwFlags & 1) {
+        depth = MIN((info->m_WaterHeight - func_00280E40(host).y) * 0.5f, 20.48f);
+        below = func_00280E40(host).y < info->m_WaterHeight;
+        boost = info->m_WaterHeight - depth;
     }
     def = D_8010FF14;
-    mask = info->emitterMask;
+    mask = info->m_EmitterMask;
     bit = 1;
     n = D_8010FF18;
     while (--n != -1) {

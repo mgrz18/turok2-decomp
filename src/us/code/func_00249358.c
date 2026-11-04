@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/region.h"
 
 typedef struct { f32 x, y, z; } Vec3f;
 
@@ -8,11 +9,6 @@ typedef struct {
     /* 0x33 */ u8 pad33[0xB];
     /* 0x3E */ u8 tagMode;
 } PlayerOptions;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ u32 flags;
-} RegionInfo;
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -63,7 +59,7 @@ extern char D_800B66D0[];
 
 s32 func_00284174(void);
 s32 func_002548FC(DamagePlayer *p);
-RegionInfo *func_0022425C(void *level, void *region);
+CRegionInfo *func_0022425C(void *level, void *region);
 void func_00249118(DamagePlayer *p, HitSource *src, s32 arg3, s32 type);
 void func_0027FC2C(Game *game, void *camera, char *text);
 void func_0027580C(s32 sound);
@@ -82,7 +78,7 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
     s32 old;
     f32 f;
     s32 check;
-    RegionInfo *info;
+    CRegionInfo *info;
     s32 prev;
     s32 health;
     s32 dead;
@@ -124,7 +120,7 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
     }
     if (check && p->region != NULL) {
         info = func_0022425C(D_800F7078, p->region);
-        if (info != NULL && (info->flags & 0x400000)) {
+        if (info != NULL && (info->m_dwFlags & 0x400000)) {
             return;
         }
     }

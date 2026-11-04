@@ -1,22 +1,9 @@
 #include "common.h"
+#include "structs/region.h"
 
 typedef struct Vec3 {
     f32 x, y, z;
 } Vec3;
-
-typedef struct Region {
-    char pad0[2];
-    u16 flags;         /* 0x02 */
-} Region;
-
-typedef struct RegionInfo {
-    char pad0[0x28];
-    f32 interval;      /* 0x28 */
-    char pad2C[0x44 - 0x2C];
-    u32 flags;         /* 0x44 */
-    char pad48[0x50 - 0x48];
-    u16 damage;        /* 0x50 */
-} RegionInfo;
 
 typedef struct ActorDef {
     s32 type;          /* 0x00 */
@@ -30,7 +17,7 @@ typedef struct Owner {
 typedef struct Actor {
     char pad0[4];
     Vec3 pos;          /* 0x04 */
-    Region *region;    /* 0x10 */
+    CGameRegion *region;    /* 0x10 */
     ActorDef *def;     /* 0x14 */
     char pad18[0x30 - 0x18];
     void *unk30;       /* 0x30 */
@@ -53,20 +40,20 @@ typedef struct Damage {
 extern char D_800F7078[];
 extern f32 D_800B6D28;  /* frame time scale */
 
-RegionInfo *func_0022425C(void *world, Region *region);
+CRegionInfo *func_0022425C(void *world, CGameRegion *region);
 f32 func_002671B4(Actor *actor);
 f32 func_00268A5C(Actor *actor);
-s32 func_0026AFC0(Region *region);
+s32 func_0026AFC0(CGameRegion *region);
 s32 func_0021F080(Actor *actor);
-f32 func_0026BE60(Region *region, f32 x, f32 z);
+f32 func_0026BE60(CGameRegion *region, f32 x, f32 z);
 s32 func_002685F0(Actor *actor);
 void func_00245828(Damage *damage, s32 arg1, s32 amount, f32 force, s32 kind, s32 arg5);
 void func_002465C8(Actor *actor, Dest *dst, Damage *damage);
 
-/* Region flags for the actor (water, ground...) and periodic damage from the region it stands in. */
+/* CGameRegion flags for the actor (water, ground...) and periodic damage from the region it stands in. */
 void func_00242E34(Actor *actor, Dest *dst) {
-    Region *region;
-    RegionInfo *info;
+    CGameRegion *region;
+    CRegionInfo *info;
     Damage damage;
     f32 y;
     f32 top;
@@ -82,11 +69,11 @@ void func_00242E34(Actor *actor, Dest *dst) {
     if (info == NULL) {
         return;
     }
-    if (info->flags & 0x1000000) {
+    if (info->m_dwFlags & 0x1000000) {
         dst->flags |= 0x800;
     }
-    if (region->flags & 1) {
-        if (info->flags & 0x20000000) {
+    if (region->m_wFlags & 1) {
+        if (info->m_dwFlags & 0x20000000) {
             dst->flags |= 0x400;
         } else {
             if (actor->flags & 0x300000) {
@@ -105,20 +92,20 @@ void func_00242E34(Actor *actor, Dest *dst) {
             }
         }
     }
-    if (func_0026AFC0(region) && (region->flags & 0x10) && func_0021F080(actor)) {
+    if (func_0026AFC0(region) && (region->m_wFlags & 0x10) && func_0021F080(actor)) {
         dst->flags |= 0x1000;
     }
     if (func_0026BE60(region, actor->pos.x, actor->pos.z) - actor->pos.y < 15.36f) {
-        if (region->flags & 0x100) {
+        if (region->m_wFlags & 0x100) {
             dst->flags |= 0x2000;
         }
-        if (region->flags & 0x80) {
+        if (region->m_wFlags & 0x80) {
             dst->flags |= 0x4000;
         }
     }
-    if (info->flags & 0x80000) {
+    if (info->m_dwFlags & 0x80000) {
         hurt = 1;
-        if (info->flags & 4) {
+        if (info->m_dwFlags & 4) {
             hurt = actor->def->type != 1;
         }
         if (dst->flags & 0xC0000) {
@@ -133,18 +120,18 @@ void func_00242E34(Actor *actor, Dest *dst) {
         if (hurt) {
             if (!(dst->flags & 0x8000)) {
                 dst->timer += D_800B6D28 * (1.0f / 15);
-                if (dst->timer >= info->interval) {
+                if (dst->timer >= info->m_DamageInterval) {
                     kind = 0x100000;
-                    if (info->flags & 0x400000) {
+                    if (info->m_dwFlags & 0x400000) {
                         kind = 0x1100000;
                     }
-                    dst->timer -= info->interval;
-                    func_00245828(&damage, 0, info->damage << 8, 25.599998f, kind, 0);
+                    dst->timer -= info->m_DamageInterval;
+                    func_00245828(&damage, 0, info->m_DamageAmount << 8, 25.599998f, kind, 0);
                     func_002465C8(actor, dst, &damage);
                 }
             }
             if (dst->flags & 0x8000) {
-                dst->timer = info->interval;
+                dst->timer = info->m_DamageInterval;
                 dst->flags &= ~0x8000;
             }
         } else {

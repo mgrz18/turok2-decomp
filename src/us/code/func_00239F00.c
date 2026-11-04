@@ -1,27 +1,15 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/region.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
-
-/* A navigation region (see func_002399F8). */
-typedef struct Region {
-    /* 0x00 */ u16 unk0;
-    /* 0x02 */ u16 flags;               /* 1: under water */
-} Region;
-
-typedef struct RegionInfo {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ f32 waterY;
-    /* 0x24 */ u8 pad24[0x20];
-    /* 0x44 */ s32 flags;
-} RegionInfo;
 
 /* What moves: the start of any instance (actor, particle, pickup...). */
 typedef struct Mover {
     /* 0x000 */ u8 type;
     /* 0x001 */ u8 pad1[3];
     /* 0x004 */ CVector3 pos;
-    /* 0x010 */ Region *region;
+    /* 0x010 */ CGameRegion *region;
     /* 0x014 */ u8 pad14[4];
     /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0xC];
@@ -100,7 +88,7 @@ extern CollisionDef D_800F1CC0;
 extern CollisionDef D_800F1AE0;
 extern CollisionDef D_800F1C60;
 
-RegionInfo *func_0022425C(s32 *list, Region *region);
+CRegionInfo *func_0022425C(s32 *list, CGameRegion *region);
 void func_00241894(CollisionDef *def);
 void func_0023BE24(Sweep *sweep);
 void func_0020EF60(CVector3 *out, CVector3 *v, f32 k);
@@ -108,14 +96,14 @@ void func_0023C0FC(Hit *hit);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_0023C120(Hit *hit, Mover *obj);
 f32 func_0026872C(Mover *obj, s32 arg1);
-s32 func_0023C188(Sweep *sweep, Region *region);
+s32 func_0023C188(Sweep *sweep, CGameRegion *region);
 
 /* Moves obj to pos through the collision tests, in up to 100 slides, and
  * returns the number of hits. */
 s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
     Sweep sweep;
     CVector3 accel;
-    RegionInfo *info;
+    CRegionInfo *info;
     s32 iter;
     s32 i;
     s32 hits;
@@ -164,8 +152,8 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
     startY = obj->pos.y;
     if (physics) {
         drag = def->drag;
-        if (def->waterDrag != drag && obj->region != NULL && (obj->region->flags & 1) && info != NULL
-            && startY < info->waterY) {
+        if (def->waterDrag != drag && obj->region != NULL && (obj->region->m_wFlags & 1) && info != NULL
+            && startY < info->m_WaterHeight) {
             drag = def->waterDrag;
         }
         drag *= 15.0f;
@@ -195,7 +183,7 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
         return 0;
     }
     if (info != NULL) {
-        sweep.checkRegionInfo = info->flags & 0x4000;
+        sweep.checkRegionInfo = info->m_dwFlags & 0x4000;
     } else {
         sweep.checkRegionInfo = 0;
     }

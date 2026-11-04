@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/region.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -14,11 +15,6 @@
 typedef struct {
     f32 x, y, z;
 } Vec3;
-
-typedef struct {
-    u8 pad0[0x1C];
-    s32 viewMask;           /* 0x1C */
-} Region;
 
 typedef struct Actor Actor;
 
@@ -36,7 +32,7 @@ typedef struct {
 struct Actor {
     u8 pad0[0x4];
     Vec3 pos;               /* 0x04 */
-    Region *region;         /* 0x10 */
+    CGameRegion *region;         /* 0x10 */
     u8 pad14[0x40];
     f32 height;             /* 0x54 */
     u8 matrix[0x4C];        /* 0x58 */
@@ -115,7 +111,7 @@ void func_0021D39C(Actor *actor, View *view) {
     if (!(actor->flags & 0x300000)) {
         inView = 0;
         near = 0;
-        if (actor->region == NULL || (view->mask & actor->region->viewMask)) {
+        if (actor->region == NULL || (view->mask & actor->region->m_VisBits)) {
             if (view->boxMax[0] > actor->boxMin[0] && view->boxMin[0] < actor->boxMax[0]
                 && view->boxMax[2] > actor->boxMin[2] && view->boxMin[2] < actor->boxMax[2]
                 && view->boxMax[1] > actor->boxMin[1] && view->boxMin[1] < actor->boxMax[1]

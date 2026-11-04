@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/region.h"
 
 /* Multiplayer stats kept per player (player->m_pOptions). */
 typedef struct PlayerOptions {
@@ -37,11 +38,6 @@ typedef struct Player {
     /* 0xBF4 */ s32 team;
 } Player;
 
-typedef struct RegionInfo {
-    /* 0x00 */ u8 pad0[0x52];
-    /* 0x52 */ u16 flags;
-} RegionInfo;
-
 typedef struct Hit {
     /* 0x00 */ Actor *source;
     /* 0x04 */ s32 damage;
@@ -62,18 +58,18 @@ extern s32 D_8011ACE0;      /* team 1 score */
 
 s32 Cinema_PathPlaying(void);
 s32 func_00284174(void);
-RegionInfo *func_0022425C(void *world, void *region);
+CRegionInfo *func_0022425C(void *world, void *region);
 void func_00249358(Player *player, Actor *actor, s32 damage, s32 arg3, s32 arg4);
 s32 func_0025340C(void *players, Player *player);
 void func_002478C8(Player *victim, Player *killer, Hit *hit);
 
 static __inline__ s32 inSpecialRegion(Player *player) {
-    RegionInfo *info;
+    CRegionInfo *info;
 
     if (player->region != NULL) {
         info = func_0022425C(D_800F7078, player->region);
         if (info != NULL) {
-            if (info->flags & 0x40) {
+            if (info->m_wFlags52 & 0x40) {
                 return 1;
             }
         }
@@ -87,7 +83,7 @@ void func_00247C10(Actor *actor, s32 arg1, Hit *hit) {
     Player *player;
     Player *killer = NULL;
     s32 arg4 = -1;
-    RegionInfo *info;
+    CRegionInfo *info;
     s32 special;
     Actor *source;
     Actor *owner;

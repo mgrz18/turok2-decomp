@@ -1,6 +1,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/gbi.h"
+#include "structs/region.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
@@ -17,10 +18,6 @@
 #define VTX_W0(n) (0x01000000 | (((n) & 0xFF) << 12) | (((n) & 0x7F) << 1))
 #define LINE_W0(a, b) (0x08000000 | (((((a) * 2) & 0xFF) << 16) | ((((b) * 2) & 0xFF) << 8)))
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
 typedef struct MapVtx {
     /* 0x0 */ s16 ob[3];
     /* 0x6 */ u16 flag;
@@ -33,26 +30,9 @@ typedef struct {
     /* 0x08 */ f32 fade;
     /* 0x0C */ s32 visible;
     /* 0x10 */ f32 angle;
-    /* 0x14 */ Vec3f pos;
-    /* 0x20 */ Vec3f offset;
+    /* 0x14 */ CVector3 pos;
+    /* 0x20 */ CVector3 offset;
 } MapView;
-
-/* A navigation region (see func_00400000). */
-typedef struct Region {
-    /* 0x00 */ u16 index;
-    /* 0x02 */ u16 flags; /* 0x400: registered */
-    /* 0x04 */ Vec3f *corner[3];
-    /* 0x10 */ struct Region *neighbour[3];
-    /* 0x1C */ u8 pad1C[4];
-} Region; /* 0x20 bytes */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ s32 flags;
-    /* 0x48 */ u8 pad48[0x5C - 0x48];
-    /* 0x5C */ u8 colour;
-    /* 0x5D */ u8 pad5D[0x64 - 0x5D];
-} RegionInfo; /* 0x64 bytes */
 
 typedef struct {
     /* 0x00 */ f32 minX;
@@ -100,7 +80,7 @@ extern u8 D_800AB130[];
 extern char *func_002017D4(s32 *data, s32 index);
 extern void func_0020C208(f32 *out, f32 *m);
 extern void func_0020D274(f32 *m, Mtx *out);
-extern void func_0020F85C(f32 *m, Vec3f *in, Vec3f *out);
+extern void func_0020F85C(f32 *m, CVector3 *in, CVector3 *out);
 extern void func_0020FC24(f32 *m, f32 x, f32 y, f32 z);
 extern void func_0020FC74(f32 *m, f32 x, f32 y, f32 z);
 extern void func_00210318(f32 *m, f32 x, f32 y, f32 z);
@@ -117,9 +97,9 @@ static __inline__ s32 TestFlag(s32 flags, s32 bit) {
     return flags & bit;
 }
 
-static __inline__ s32 EdgeVisible(Vec3f *corners, Vec3f *p0, Vec3f *p1) {
-    Vec3f *a;
-    Vec3f *b;
+static __inline__ s32 EdgeVisible(CVector3 *corners, CVector3 *p0, CVector3 *p1) {
+    CVector3 *a;
+    CVector3 *b;
     f32 dx;
     f32 dz;
     s32 k;
@@ -145,21 +125,21 @@ void func_004004D8(MapView *view) {
     struct {
         f32 minX, minZ, maxX, maxZ;
     } box;
-    Vec3f corners[4];
-    Vec3f viewCorners[4];
-    Region *regions;
+    CVector3 corners[4];
+    CVector3 viewCorners[4];
+    CGameRegion *regions;
     s32 areaCount;
     Vp *vp;
     s32 showAll;
     Area *areas;
     Area *area;
-    Region *region;
-    RegionInfo *infos;
-    RegionInfo *info;
+    CGameRegion *region;
+    CRegionInfo *infos;
+    CRegionInfo *info;
     MapVtx *vtx;
-    Vec3f *p0;
-    Vec3f *p1;
-    Vec3f *a;
+    CVector3 *p0;
+    CVector3 *p1;
+    CVector3 *a;
     char *data;
     World *w;
     f32 s;
@@ -268,11 +248,11 @@ void func_004004D8(MapView *view) {
 
     vtx = D_80129A40[D_800B6D1C];
     w = &D_800F7078;
-    regions = (Region *) (func_002017D4(w->data, 2) + 8);
+    regions = (CGameRegion *) (func_002017D4(w->data, 2) + 8);
     data = func_002017D4(w->data, 3);
     areas = (Area *) (data + 8);
     areaCount = *(s32 *) (data + 4);
-    infos = (RegionInfo *) (func_002017D4(w->data, 0) + 8);
+    infos = (CRegionInfo *) (func_002017D4(w->data, 0) + 8);
     nIdx = 0;
     base = 0;
     nVtx = 0;
@@ -282,14 +262,14 @@ void func_004004D8(MapView *view) {
         if (area->maxX > box.minX && area->minX < box.maxX && area->maxZ > box.minZ && area->minZ < box.maxZ) {
             for (i = 0; i < area->count; i++) {
                 region = &regions[base];
-                info = &infos[region->index];
-                if (info->flags & 0x200) {
+                info = &infos[region->m_nInfo];
+                if (info->m_dwFlags & 0x200) {
                     goto next;
                 }
                 /* Outcodes of the region's corners against the view box. */
                 for (k = 0; k < 3; k++) {
                     code = &codes[k];
-                    p0 = region->corner[k];
+                    p0 = region->m_pVertices[k];
                     if (p0->x < box.minX) {
                         *code = 1;
                     } else if (box.maxX <= p0->x) {
@@ -306,14 +286,14 @@ void func_004004D8(MapView *view) {
                 if (codes[0] & codes[1] & codes[2]) {
                     goto next;
                 }
-                if (!showAll && !(region->flags & 0x400)) {
+                if (!showAll && !(region->m_wFlags & 0x400)) {
                     goto next;
                 }
                 for (e = 0; e < 3; e++) {
                     newVtx = 0;
-                    if (region->neighbour[e] == NULL) {
+                    if (region->m_pNeighbours[e] == NULL) {
                         newVtx = 1;
-                    } else if (region->index < region->neighbour[e]->index) {
+                    } else if (region->m_nInfo < region->m_pNeighbours[e]->m_nInfo) {
                         newVtx = 1;
                     }
                     if (!newVtx) {
@@ -326,8 +306,8 @@ void func_004004D8(MapView *view) {
                     if (codes[e] & codes[next]) {
                         continue;
                     }
-                    p0 = region->corner[e];
-                    p1 = region->corner[next];
+                    p0 = region->m_pVertices[e];
+                    p1 = region->m_pVertices[next];
                     if (!EdgeVisible(viewCorners, p0, p1)) {
                         continue;
                     }
@@ -358,7 +338,7 @@ void func_004004D8(MapView *view) {
                                 fade = 75;
                             }
                         }
-                        switch (info->colour) {
+                        switch (info->m_MapColour) {
                             case 0:
                                 vtx[nVtx].cn[0] = bright;
                                 vtx[nVtx].cn[1] = bright;
@@ -442,7 +422,7 @@ void func_004004D8(MapView *view) {
                             fade = 75;
                         }
                     }
-                    switch (info->colour) {
+                    switch (info->m_MapColour) {
                         case 0:
                             vtx[nVtx].cn[0] = bright;
                             vtx[nVtx].cn[1] = bright;

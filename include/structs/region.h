@@ -30,6 +30,10 @@ typedef struct CGameRegion {
     /* 0x1C */ s32 m_VisBits;                        /* tested against a view's visibility mask */
 } CGameRegion; /* size 0x20 */
 
+/* m_nInfo and m_wFlags read as one word, as some code tests the flags
+ * ((REGION_WORD(r) & 6) == 2: a closed edge region). */
+#define REGION_WORD(r) (*(u32 *)(r))
+
 /* The attributes of a set of regions: water, damage, ceilings, map colour... */
 typedef struct CRegionInfo {
     /* 0x00 */ u8 unk_00[0x20];
