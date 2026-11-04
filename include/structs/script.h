@@ -14,9 +14,10 @@
  *
  * The boss's three groups of actors (types 0x454, 0x455 and 0x456) keep
  * their group index in m_AI.m_VarBuffer[1] and their fader in
- * m_AI.m_VarBuffer[2] (func_0040CCC0). func_0040EDB0 and func_0040EEA0
- * reach the faders through D_8013023C (= &D_80130200.faders) and a
- * 0x64-byte array view of D_80130200. */
+ * m_AI.m_VarBuffer[2] (func_0040CCC0). func_0040EDB0 reaches the faders
+ * through their own symbol, D_8013023C (= D_80130200.faders), and
+ * func_0040ECDC the update entries of the phase table through D_00432410
+ * (= &D_0043240C[0].update). */
 
 struct CGameObjectInstance;
 struct BlindOneState;
