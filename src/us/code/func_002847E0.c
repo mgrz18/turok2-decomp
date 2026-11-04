@@ -16,7 +16,6 @@ typedef struct M04Pad {
     u8 pad;
 } M04Pad;
 extern f32 D_800A9CE0;
-extern ControllerProfile D_800F5C78; /* the four merged */
 extern M04Pad D_800F5C60[];
 extern u8 D_800F6750;
 extern OSMesgQueue D_800F6798;
