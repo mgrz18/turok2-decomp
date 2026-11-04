@@ -192,25 +192,32 @@ typedef struct {
     /* 0x01AC */ SndNode nodes[32];
 } SndQueue; /* size 0x1C2C */
 
-/* The music sequence (initialised by func_00274F34). */
+/* The music sequence (initialised by func_00274F34; faded and slid by
+ * func_00275018). */
 typedef struct {
     /* 0x00 */ SndMgr *owner;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 *data;
     /* 0x0C */ s32 unkC;
     /* 0x10 */ void *unk10;
-    /* 0x14 */ void *csp;      /* compressed sequence player */
+    /* 0x14 */ s32 csp;        /* compressed sequence player (alCSPSetVol) */
     /* 0x18 */ s32 unk18;
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s32 unk20;
+    /* 0x1C */ u32 flags;      /* 0x2 fading out, 0x4 faded out */
+    /* 0x20 */ union {
+        s32 w;
+        struct {
+            s16 hi;
+            s16 lo;
+        } h;
+    } volume;
     /* 0x24 */ s32 unk24;
     /* 0x28 */ s32 unk28;
     /* 0x2C */ f32 vol;
     /* 0x30 */ f32 unk30;
-    /* 0x34 */ f32 unk34;
-    /* 0x38 */ s32 unk38;
-    /* 0x3C */ f32 unk3C;
-    /* 0x40 */ SndIF32 unk40;
+    /* 0x34 */ f32 fadeStep;
+    /* 0x38 */ s32 sliding;
+    /* 0x3C */ f32 current;
+    /* 0x40 */ f32 target;
 } SndSeq; /* size 0x44 */
 
 /* The voices (initialised by func_00273A94). */
