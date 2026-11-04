@@ -44,7 +44,6 @@ extern s32 D_801309C4;
 extern s32 D_800C2028;
 extern SaveGame *D_800C201C;
 extern u32 D_80110060;
-extern u8 D_80119870[];
 extern u32 D_8011AADC[];
 extern u8 D_8011AC58[];
 extern f32 D_8011ACB4[];
@@ -58,7 +57,7 @@ extern u8 D_0043BDB0[];
 extern u8 D_0043BE1C[];
 
 extern s32 func_0041DD90(Menu *c, s32 slot, s32 quiet);
-extern Player *func_0025342C(void *players, MenuController *ctl);
+extern Player *func_0025342C(void *players, ControllerProfile *ctl);
 extern s32 func_00426064(s32 slot, s32 note);
 extern void func_00416644(void *menus, void *tmpl, s32 a, void *b, void *parent);
 
@@ -81,7 +80,7 @@ s32 func_00420454(void *menu, Menu *c) {
         return 1;
     }
     if (D_801309B8 != 0) {
-        player = func_0025342C(D_80119870, c->controller);
+        player = func_0025342C(&D_80119870.m_PlayerList, c->controller);
         world = &D_800F7078;
         keep = D_8011AC58[0];
         player->save = D_800C201C->player;
@@ -103,9 +102,9 @@ s32 func_00420454(void *menu, Menu *c) {
         return 1;
     }
     if (func_00426064(slot, D_801309C4) == 0) {
-        func_00416644(D_80119870 + 0x5BC, D_0043BDB0, c->player, c->controller, c->context);
+        func_00416644(D_80119870.m_MenuPool, D_0043BDB0, c->player, c->controller, c->context);
     } else {
-        func_00416644(D_80119870 + 0x5BC, D_0043BE1C, c->player, c->controller, c->context);
+        func_00416644(D_80119870.m_MenuPool, D_0043BE1C, c->player, c->controller, c->context);
     }
     return 1;
 }

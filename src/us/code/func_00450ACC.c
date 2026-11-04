@@ -1,12 +1,12 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/OVLGAME/8043D54C_4.CPP, func_8043DE50_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef signed int s32;
+#include "common.h"
+#include "structs/controller.h"
 struct func_80250BD4_S1;
 struct func_80250BD4_S1 {
     char pad0[0x20];
-    s32 * unk20;
+    ControllerProfile *unk20; /* Menu::controller */
 };
 struct func_80250BD4_S1;
 typedef struct func_80250BD4_S1 func_80250BD4_S1;
@@ -36,13 +36,12 @@ struct Shared_func_8043DEDC_S3 {
 };
 void func_00275A74(void);
 unsigned int func_002855E8(void *);
-extern s32 D_800F5EC0;
 extern s32 D_8011AB18;
 extern struct SharedRecAt148 D_8011AB98[];
 void func_00450ACC(func_80250BD4_S1 *arg0) {
     Shared_func_8043DEDC_S3 *settings;
     s8 *status;
-    s32 *profile;
+    ControllerProfile *profile;
     s32 on;
     s32 i;
     i = 3;
@@ -54,7 +53,7 @@ void func_00450ACC(func_80250BD4_S1 *arg0) {
     i = 0;
     settings = (Shared_func_8043DEDC_S3 *)&D_8011AB18;
     on = 1;
-    for (profile = &D_800F5EC0; i < 4; i++, profile = &((SharedRecAt224 *)profile)->unk224) {
+    for (profile = D_800F5EC0; i < 4; i++, profile++) {
         if (func_002855E8(profile) != 0) {
             settings->unk28 = on;
             settings->unk2F = i;

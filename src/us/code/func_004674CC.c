@@ -2,10 +2,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "structs/controller.h"
 
-typedef struct Controller {
-    u8 pad[0x224];
-} Controller;
 
 typedef struct PlayerList {
     /* 0x00 */ CPlayer **handle;
@@ -16,7 +14,6 @@ typedef struct PlayerList {
 } PlayerList;
 
 extern s32 D_8011ACF0;
-extern Controller D_800F5EC0[];
 extern char D_800A7080[]; /* in the engine's .rodata */
 
 extern void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
@@ -28,7 +25,7 @@ extern void func_002052D8(s32 heap, CPlayer **handle);
 extern void func_002053A8(s32);
 extern void func_00285410(s32);
 extern void func_00266C5C(void *p, s32 c, s32 n); /* memset */
-extern void func_002470E8(void *, Controller *);
+extern void func_002470E8(void *, ControllerProfile *);
 extern void func_00248340(CPlayer *p);
 extern void func_0042DB38(CPlayer *p, s32 character, s32 arg2);
 

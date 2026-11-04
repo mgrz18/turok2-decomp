@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "structs/game.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
@@ -50,7 +51,6 @@ typedef struct {
 } Plan;
 
 extern u8 D_800F7078[];
-extern u8 D_80119870[];
 extern u8 D_800F1B40[];
 extern Actor *D_800F1CE0;
 extern CharacterInfo D_800ADF5C[];
@@ -65,8 +65,8 @@ s32 func_00284408(void);
 Actor *func_00225848(u8 *scene, Actor *self);
 Actor *func_0022594C(u8 *scene, Actor *self);
 Actor *func_002259D0(u8 *scene, Actor *self);
-Actor *func_002532EC(u8 *players, CVector3 pos);
-Actor *func_00253370(u8 *players, CVector3 pos, void *owner);
+Actor *func_002532EC(CPlayerList *players, CVector3 pos);
+Actor *func_00253370(CPlayerList *players, CVector3 pos, void *owner);
 CameraInfo *func_00268A2C(Actor *player);
 f32 func_002465F0(Actor *a, CVector3 pos);
 f32 func_0024665C(Actor *a, CVector3 pos);
@@ -148,9 +148,9 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
             ADD(t);
         }
         if (self->flags & 0x300000) {
-            t = func_00253370(D_80119870, self->pos, self->owner);
+            t = func_00253370(&D_80119870.m_PlayerList, self->pos, self->owner);
         } else {
-            t = func_002532EC(D_80119870, self->pos);
+            t = func_002532EC(&D_80119870.m_PlayerList, self->pos);
         }
         if (t != NULL && t->alive != 0 && t->character != 1) {
             cam = func_00268A2C(t);

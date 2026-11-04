@@ -1,12 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/MISC/8043DF84.CPP, func_8043DFC8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef signed int s32;
+#include "common.h"
+#include "structs/controller.h"
 
-typedef struct ControllerProfile {
-    char pad0[0x224];
-} ControllerProfile;
 
 /* Turok 2: 4 records of 0x40 bytes (Rage Wars: 8 of 150). */
 typedef struct PlayerSettings {
@@ -26,7 +23,6 @@ typedef struct StatusStep {
     char pad[0x40];
 } StatusStep;
 
-extern ControllerProfile D_800F5EC0[4];
 extern StatusStep D_8011AB98[];
 extern PlayerSettings D_8011AB58[];
 extern s32 func_002855E8(ControllerProfile *slot);

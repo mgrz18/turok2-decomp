@@ -62,7 +62,7 @@ static __inline__ void sprayBlood(CGameObjectInstance *target, CGameObjectInstan
     point.x = 0;
     point.y = 0;
     point.z = 0;
-    func_00225DB0(D_800F7078, ((u8 *)player->m_ContState.m_pContState) + 0x140, 3, point, 10.24f, 1.0f);
+    func_00225DB0(D_800F7078, player->m_ContState.m_pContState->rumblePool, 3, point, 10.24f, 1.0f);
 }
 
 void func_002376F8(CGameObjectInstance *target, CGameObjectInstance *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitDef *def, u32 flags) {

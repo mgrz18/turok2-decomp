@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 typedef struct MenuSlot {
     /* 0x00 */ s32 weapon;
@@ -38,10 +39,6 @@ typedef struct MenuRow {
     /* 0x24 */ s32 available;
 } MenuRow;
 
-typedef struct Controller {
-    /* 0x00 */ u8 pad0[0xB0];
-    /* 0xB0 */ u32 buttons;
-} Controller;
 
 typedef struct WeaponInfo {
     /* 0x0 */ u8 pad0[0xC];
@@ -67,8 +64,8 @@ void func_0024BAD4(WeaponMenu *menu, CPlayer *player, u32 *input) {
     s16 weapon;
     s16 alternate;
 
-    open = ((Controller *)player->m_ContState.m_pContState)->buttons & 0x8000;
-    next = ((Controller *)player->m_ContState.m_pContState)->buttons & 0x4000;
+    open = player->m_ContState.m_pContState->buttons & 0x8000;
+    next = player->m_ContState.m_pContState->buttons & 0x4000;
     if (func_002548FC(player) != 0) {
         open = next = 0;
     }

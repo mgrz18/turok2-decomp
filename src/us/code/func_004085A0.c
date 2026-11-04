@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "structs/game.h"
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
  * random stun of a live helper), and once the boss has waited long enough
@@ -25,7 +26,6 @@ extern BossFight D_8012FB50;
 extern CListedInstance *D_8010FEB4;
 extern f32 D_800B6D28;
 extern s32 D_80110048;
-extern u8 D_80119870[];
 
 extern void func_004089E0();
 extern void func_004082A0(BossFight *fight);
@@ -99,7 +99,7 @@ void func_004085A0(void *obj, CAI *ai) {
     } else if (ai->m_ModeTime < 75.0f) {
         return;
     }
-    player = func_002532A8(D_80119870);
+    player = func_002532A8(&D_80119870.m_PlayerList);
     if (player == NULL) {
         return;
     }

@@ -1,27 +1,10 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00263E1C.c, func_00263E1C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef struct { s8 a; s8 b; s8 c; s8 d; } B14SEnt;
-typedef struct {
-               s32 f0;
-               s32 pad4[4];
-               s32 f14;
-               s32 f18;
-               s32 f1C;
-               s32 f20;
-               s32 f24;
-               s32 f28;
-               B14SEnt ent[32];
-               u8 padAC[0x18];
-               s8 fC4;
-               s8 fC5;
-} B14CtlS;
-void func_00284EB8(B14CtlS *c, s8 x, s8 y, s32 btn) {
+#include "common.h"
+#include "structs/controller.h"
+
+void func_00284EB8(ControllerProfile *c, s8 x, s8 y, s32 btn) {
     u32 b;
     f32 fx;
     register f32 fy asm("$f1");
@@ -30,8 +13,8 @@ void func_00284EB8(B14CtlS *c, s8 x, s8 y, s32 btn) {
     s32 m;
     s32 i;
     u8 old;
-    B14SEnt *e;
-    if (c->f0 != 0) {
+    ControllerButtonHistory *e;
+    if (c->connected != 0) {
         b = btn & 0xFFFF;
         if (x < -30) {
             b |= 0x20000;
@@ -85,52 +68,52 @@ void func_00284EB8(B14CtlS *c, s8 x, s8 y, s32 btn) {
         if (80.0f < fy) {
             fy = 80.0f;
         }
-        prev = c->f18;
-        c->fC4 = (s32)fx;
-        c->fC5 = (s32)fy;
-        c->f18 = b;
-        c->f14 = prev;
+        prev = c->inputButtons;
+        c->inputStickX = (s32)fx;
+        c->inputStickY = (s32)fy;
+        c->inputButtons = b;
+        c->inputPreviousButtons = prev;
         pressed = (prev ^ b) & b;
-        c->f1C |= pressed;
-        c->f28 |= pressed;
+        c->inputButtonsSingle |= pressed;
+        c->inputButtonsRepeat |= pressed;
         m = 1;
-        e = c->ent;
+        e = c->buttonHistory;
         i = 0x13;
         do {
             if (pressed & m) {
-                if (e->b < 0x1E) {
-                    e->b = 0;
-                    e->a++;
-                    if (e->a >= 2) {
-                        c->f24 |= m;
-                        e->a = 0;
+                if (e->age < 0x1E) {
+                    e->age = 0;
+                    e->taps++;
+                    if (e->taps >= 2) {
+                        c->inputButtonsDouble |= m;
+                        e->taps = 0;
                     }
                 } else {
-                    e->a = 1;
-                    e->b = 0;
+                    e->taps = 1;
+                    e->age = 0;
                 }
             }
-            e->b++;
-            if (e->b >= 0x1F) {
-                e->b = 0x1E;
+            e->age++;
+            if (e->age >= 0x1F) {
+                e->age = 0x1E;
             }
             if (b & m) {
-                if ((u8)e->d < 0xFF) {
-                    e->d += 1;
+                if ((u8)e->held < 0xFF) {
+                    e->held += 1;
                 }
-                old = e->c;
-                e->c = old - 1;
-                if (e->c < 0) {
-                    e->c = old + 4;
-                    c->f28 |= m;
+                old = e->repeat;
+                e->repeat = old - 1;
+                if (e->repeat < 0) {
+                    e->repeat = old + 4;
+                    c->inputButtonsRepeat |= m;
                 }
             } else {
-                if ((u8)e->d < 0x11 && (c->f14 & m)) {
-                    c->f20 |= m;
+                if ((u8)e->held < 0x11 && (c->inputPreviousButtons & m)) {
+                    c->inputButtonsSingleNoHold |= m;
                 }
-                e->d = 0;
-                c->f28 &= ~m;
-                e->c = 0x30;
+                e->held = 0;
+                c->inputButtonsRepeat &= ~m;
+                e->repeat = 0x30;
             }
             e++;
             m <<= 1;

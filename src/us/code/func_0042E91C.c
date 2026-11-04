@@ -1,14 +1,11 @@
 /* CPlayer code: func_0042E91C, 0x0042E91C-0x0042E9A4 (splat had it inside the data D_0042D50C). */
 #include "common.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
-typedef struct Controller {
-    u8 pad[0x224];
-} Controller;
 
-extern Controller D_800F5EC0[];
 
-extern void func_002470E8(void *, Controller *);
+extern void func_002470E8(void *, ControllerProfile *);
 extern void func_00248340(CPlayer *p);
 
 void func_0042E91C(CPlayer *p, s32 index, void *options) {

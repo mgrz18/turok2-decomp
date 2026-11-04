@@ -1,6 +1,7 @@
 /* Second VM module twin of func_0040457C (same source, same link address). */
 /* FAKEMATCH: the player lookup is written twice under an always-true test (found by the permuter): GCC merges the copies, but the doubled refs give actor $s2 and nextWave $s3 as in the ROM; with one call the two swap (26 words), and a do{}while(0) instead lets loop.c hoist &D_80119870 above the actor->pos loads (5 words). */
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct {
     f32 x, y, z;
@@ -77,7 +78,6 @@ typedef struct {
 } Info0040457C;
 
 extern ModeState0040457C D_8012F608;
-extern u8 D_80119870[];
 extern u8 D_8010ABA0[];
 extern Enemy0040457C *D_8010FEB4;
 extern s32 D_800F1F50;
@@ -109,9 +109,9 @@ void func_0043D57C(Entity0040457C *actor, void *level) {
     s32 *flags;
 
     if (&D_8012F608) {
-        player = func_002532EC(D_80119870, actor->pos);
+        player = func_002532EC(&D_80119870.m_PlayerList, actor->pos);
     } else {
-        player = func_002532EC(D_80119870, actor->pos);
+        player = func_002532EC(&D_80119870.m_PlayerList, actor->pos);
     }
     if (player == NULL) {
         return;

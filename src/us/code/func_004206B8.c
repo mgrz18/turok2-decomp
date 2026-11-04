@@ -1,10 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00408C78.c, func_00408C78.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "structs/game.h"
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef unsigned short u16;
-typedef signed int s32;
 typedef struct O01Save {         /* player save block (Turok 2 layout) */
                u16 w[4];
                u8 pad8[0x28];
@@ -39,13 +37,12 @@ extern s32 D_800C2028;
 extern s32 D_801309BC;
 extern s32 D_80130960;
 extern s32 D_801309C4;
-extern u8 D_80119870[];
 extern u8 D_80119E2C[];
 extern u8 D_00438748[];
 extern u8 D_0043BDB0[];
 extern u8 D_0043BE1C[];
 s32 func_0041DD90(O01Own8 *o, s32 pad, s32 z);
-O01Actor *func_0025342C(u8 *world, O01Sub8 *s);
+O01Actor *func_0025342C(CPlayerList *world, O01Sub8 *s);
 void func_0042E430(O01Actor *a, s32 b);
 void func_00416894(u8 *a, O01Own8 *o, u8 *c);
 s32 func_00426064(s32 pad, s32 idx);
@@ -77,7 +74,7 @@ s32 func_004206B8(s32 unused, O01Own8 *own) {
         return 1;
     }
     if (D_80130960 != 0) {
-        plr = func_0025342C(D_80119870, own->unk20);
+        plr = func_0025342C(&D_80119870.m_PlayerList, own->unk20);
         own->unk1C = plr;
         O01Restore(plr);
         func_0042E430(plr, D_80130950[0]);

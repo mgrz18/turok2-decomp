@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/game.h"
 
 /* Name entry: draw the item, with a blinking cursor box under the character
  * being edited. */
@@ -11,7 +12,6 @@ typedef struct {
     char name[12]; /* 0x0C */
 } NameEntry; /* 0x18 bytes */
 
-extern u8 D_80119870[];
 extern NameEntry D_800C1FB0[];
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C1BD0;
@@ -22,7 +22,7 @@ void func_002778A8(s32 x0, s32 y0, s32 x1, s32 y1, s32 border, s32 invert, s32 r
 void func_00416168(void *menu, MenuItemLayout *item, void *arg2, Menu *event);
 
 void func_0045646C(void *menu, MenuItemLayout *item, void *arg2, Menu *event) {
-    s32 i = func_0025340C(D_80119870, event->player);
+    s32 i = func_0025340C(&D_80119870.m_PlayerList, event->player);
     f32 charWidth;
     f32 alpha;
     s32 x;

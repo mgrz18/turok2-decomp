@@ -8,6 +8,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "gfx.h"
+#include "structs/controller.h"
 typedef struct IntrusiveList IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -60,7 +61,6 @@ struct ObjRecAt20V2;
 extern void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu);
 extern void func_00275A74();
 extern struct Part D_8011AB18;
-extern char D_800F5EC0[];
 struct OSTask_t;
 struct OSTask_t {
     u32 type;
@@ -391,7 +391,7 @@ extern void func_00430454(char *, s32);
 void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
     GameSettings *globals;
     struct Part *settings;
-    char *profile;
+    ControllerProfile *profile;
     s32 on;
     s32 i;
     globals = &D_8011AAD8;
@@ -410,7 +410,7 @@ void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
             menu->unk20 = profile;
             break;
         }
-        profile += 0x224;
+        profile++;
     }
     func_00275A74();
     func_00430454(&D_800F6CB0, -1);

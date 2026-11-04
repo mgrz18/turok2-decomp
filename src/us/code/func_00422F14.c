@@ -32,7 +32,7 @@ static __inline__ void SelectPort(s32 port) {
 }
 
 void func_00422F14(Menu *event) {
-    MenuController *controller = event->controller;
+    ControllerProfile *controller = event->controller;
 
     D_80130990 = 0;
     D_800C2020 = 0;

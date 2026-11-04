@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/game.h"
 
 /* Name entry: highlight the current player's column and load the player's
  * name (trailing spaces trimmed; the default name D_800C1340 counts as empty)
@@ -14,7 +15,6 @@ typedef struct {
 
 #define ENTRY_SELECTED 0x01800000
 
-extern u8 D_80119870[];
 extern NameEntry D_800C1FB0[];
 extern u8 D_8011AB8B[];
 extern u8 D_800C1340[];
@@ -33,7 +33,7 @@ static __inline__ s32 nameEquals(u8 *a, u8 *b, s32 count) {
 }
 
 void func_00455FA0(Menu *event) {
-    s32 i = func_0025340C(D_80119870, event->player);
+    s32 i = func_0025340C(&D_80119870.m_PlayerList, event->player);
     s32 trailing;
     char *dst;
     u8 *src;

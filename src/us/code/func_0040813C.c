@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -18,20 +19,14 @@ typedef struct {
     /* 0x14 */ s32 warned;
 } BossFight;
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x40];
-    /* 0x0040 */ u8 hud[0x13D8];
-    /* 0x1418 */ s32 mode;
-} Game;
 
-extern Game D_80119870;
 extern CPlayer *D_80119890;     /* the current player */
 extern u8 D_800F7078[];
 extern u8 D_800B6674[];
 extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4[]; /* the actor list head */
 
-CPlayer *func_002532A8(Game *);
+CPlayer *func_002532A8(CPlayerList *);
 void func_0027FC2C(void *hud, void *camera, u8 *msg);
 void func_0027580C(s32 sound);
 s8 func_00219F74(CListedInstance *actor, s32 id, s32);
@@ -54,13 +49,13 @@ static __inline__ void setAnim(CListedInstance *actor, s32 id) {
  * (those not dead and, unless the fight is over, targeting the boss) turn on
  * the current player. */
 void func_0040813C(BossFight *fight) {
-    Game *game = &D_80119870;
+    CGame *game = &D_80119870;
     CPlayer *player;
     CListedInstance *a;
     CPlayer *current;
 
-    player = func_002532A8(game);
-    func_0027FC2C(game->hud, player->m_pCamera, D_800B6674);
+    player = func_002532A8(&game->m_PlayerList);
+    func_0027FC2C(game->m_CameraPool, player->m_pCamera, D_800B6674);
     player->m_InvincibilityTime = 900.0f;
     fight->state = 2;
     fight->warned = 2;

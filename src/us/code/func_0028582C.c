@@ -1,26 +1,18 @@
 #include "common.h"
+#include "structs/controller.h"
 
-/* Saves the current values (0x18-0x28, 0xC4-0xC5) into the saved copy
- * (0xB0-0xC0, 0xC6-0xC7) and clears four of them. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ s32 cur[5];
-    /* 0x2C */ u8 pad2C[0xB0 - 0x2C];
-    /* 0xB0 */ s32 saved[5];
-    /* 0xC4 */ u8 curByte[2];
-    /* 0xC6 */ u8 savedByte[2];
-} SaveState;
-
-void func_0028582C(SaveState *arg0) {
-    arg0->savedByte[0] = arg0->curByte[0];
-    arg0->savedByte[1] = arg0->curByte[1];
-    arg0->saved[0] = arg0->cur[0];
-    arg0->saved[1] = arg0->cur[1];
-    arg0->saved[2] = arg0->cur[2];
-    arg0->saved[3] = arg0->cur[3];
-    arg0->saved[4] = arg0->cur[4];
-    arg0->cur[1] = 0;
-    arg0->cur[2] = 0;
-    arg0->cur[3] = 0;
-    arg0->cur[4] = 0;
+/* Once a frame: copies what the reads gathered (the input* fields) into
+ * the fields the game reads, and clears the gathered presses. */
+void func_0028582C(ControllerProfile *arg0) {
+    arg0->stickX = arg0->inputStickX;
+    arg0->stickY = arg0->inputStickY;
+    arg0->buttons = arg0->inputButtons;
+    arg0->buttonsSingle = arg0->inputButtonsSingle;
+    arg0->buttonsSingleNoHold = arg0->inputButtonsSingleNoHold;
+    arg0->buttonsDouble = arg0->inputButtonsDouble;
+    arg0->buttonsRepeat = arg0->inputButtonsRepeat;
+    arg0->inputButtonsSingle = 0;
+    arg0->inputButtonsSingleNoHold = 0;
+    arg0->inputButtonsDouble = 0;
+    arg0->inputButtonsRepeat = 0;
 }

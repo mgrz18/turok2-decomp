@@ -1,15 +1,12 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define P_F32(p, off) (*(f32 *)((u8 *)(p) + (off)))
 #define P_VEC(p, off) (*(CVector3 *)((u8 *)(p) + (off)))
 
-typedef struct {
-    u8 data[0x224];
-} ControllerProfile;
 
-extern ControllerProfile D_800F5EC0[4];
 
 extern void func_002470E8(void *arg0, ControllerProfile *profile);
 extern f32 func_00253CFC(CPlayer *player);

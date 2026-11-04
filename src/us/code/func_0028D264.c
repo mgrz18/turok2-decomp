@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 
 /* D_8011F290: the saved copy of the players (0x1400 bytes). */
@@ -12,7 +13,6 @@ typedef struct {
     /* 0x13F0 */ s32 region[4];
 } SavedPlayers;
 
-extern CPlayerList D_80119870;
 extern SavedPlayers D_8011F290;
 extern u8 D_800F7078[];             /* the world */
 s32 func_002242B4(void *world, s32 region);
@@ -23,7 +23,7 @@ void func_0028D264(void) {
     SavedPlayers *save = &D_8011F290;
     s32 i;
 
-    for (i = 0; list = &D_80119870, i < list->m_nPlayers; i++) {
+    for (i = 0; list = &D_80119870.m_PlayerList, i < list->m_nPlayers; i++) {
         CPlayer *player = &list->m_Players[i];
 
         save->state[i] = player->m_Data;

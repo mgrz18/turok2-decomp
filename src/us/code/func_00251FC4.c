@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -14,10 +15,6 @@ typedef struct {
     /* 0x54C */ s32 busy;
 } Camera;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xB4];
-    /* 0xB4 */ u32 buttons;
-} Controller;
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -73,14 +70,14 @@ void func_0024D344(CPlayer *p);
 void func_0024CF58(CPlayer *p, CPlayer *other);
 void func_00401B30(void *, s32 region, f32 yaw, CVector3 pos);
 void func_00246BC0(void *input, CPlayer *p);
-s32 func_00285558(Controller *c);
+s32 func_00285558(ControllerProfile *c);
 s32 func_00284174(void);
 void func_002840EC(void);
 s32 func_00416AF8(Globals *g);
 void func_00275A50(void);
 void func_00275904(s32);
 void func_00275A98(void);
-void func_00416644(void *pool, void *screen, CPlayer *p, Controller *c, s32);
+void func_00416644(void *pool, void *screen, CPlayer *p, ControllerProfile *c, s32);
 s32 func_0026EFB8(s32 level);
 s32 Cinema_PathPlaying(void);
 s32 func_00284408(void);
@@ -138,7 +135,7 @@ void func_00251FC4(PlayerList *list) {
     }
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
         func_00246BC0(&p->m_ContState, p);
-        if (func_00285558((Controller *)p->m_ContState.m_pContState)) {
+        if (func_00285558(p->m_ContState.m_pContState)) {
             if (func_00284174()) {
                 func_002840EC();
             } else if (!func_00416AF8(&D_80119E2C) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
@@ -150,13 +147,13 @@ void func_00251FC4(PlayerList *list) {
                 reset_strokes(&p->m_Barrel);
                 p->m_LivesOverlay.m_Value = -1;
                 p->m_TokensOverlay.m_Value = -1;
-                func_00416644(&D_80119E2C, &D_00439640, p, ((Controller *)p->m_ContState.m_pContState), 0);
+                func_00416644(&D_80119E2C, &D_00439640, p, (p->m_ContState.m_pContState), 0);
             }
         }
         if (p->m_bLevelNotCompleteExit) {
             hub = func_0026EFB8(D_80110048) - 1;
             if (hub < 6 && (p->m_Data.m_dwLevelFirstTimeFlags & (1 << hub))) {
-                func_00416644(&D_80119E2C, &D_0043CAB4, p, ((Controller *)p->m_ContState.m_pContState), 0);
+                func_00416644(&D_80119E2C, &D_0043CAB4, p, (p->m_ContState.m_pContState), 0);
             }
             p->m_bLevelNotCompleteExit = 0;
         }
@@ -169,7 +166,7 @@ void func_00251FC4(PlayerList *list) {
         if (list->cinema) {
             if (func_00284240() && !list->cinemaStarted) {
                 list->cinemaStarted = 1;
-                func_00416644(&((Camera *)p->m_pCamera)->cinema, &D_0043BED0, p, ((Controller *)p->m_ContState.m_pContState), 0);
+                func_00416644(&((Camera *)p->m_pCamera)->cinema, &D_0043BED0, p, (p->m_ContState.m_pContState), 0);
             }
         }
     }
@@ -180,7 +177,7 @@ void func_00251FC4(PlayerList *list) {
         next = p->m_pNext;
         match = &D_80119E2C.match;
         if (p != NULL && !match->over && (match->timeLeft >= 900.0f || match->timeLeft < 0.0f || !D_80119E2C.timed)
-            && ((((Controller *)p->m_ContState.m_pContState)->buttons & 0x1000) || p->m_bActive)) {
+            && ((p->m_ContState.m_pContState->buttonsSingle & 0x1000) || p->m_bActive)) {
             p->m_bActive = 1;
             character = D_8011AB88[p->m_nController].character;
             p->m_pOptions->m_bActive = 1;

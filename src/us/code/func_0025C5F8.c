@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "structs/game.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -69,10 +70,9 @@ struct Object {
 
 extern f32 D_800B6D28;          /* frame time */
 extern f32 D_800B6D2C;          /* time scale */
-extern u8 D_80119870[];         /* players */
 extern ModeHandler *D_800B1790[];
 
-void *func_002532EC(u8 *players, CVector3 pos);
+void *func_002532EC(CPlayerList *players, CVector3 pos);
 f32 func_002119FC(f32 lo, f32 hi);
 void func_00243414(Object *obj, AI *ai, s32 state);
 void func_0025C338(Object *obj, AI *ai);
@@ -107,7 +107,7 @@ void func_0025C5F8(Object *obj, AI *ai) {
         ai->age++;
     }
     D_800B6D28 *= D_800B6D2C;
-    func_002532EC(D_80119870, obj->pos);
+    func_002532EC(&D_80119870.m_PlayerList, obj->pos);
     mode = ai->mode[ai->modeIndex];
     index = ai->modeIndex;
     handler = D_800B1790[mode];

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 /* The creature to mount (an AI actor). */
 typedef struct {
@@ -26,7 +27,6 @@ typedef struct {
 
 extern CollisionResult D_800F1CE0;
 extern CVector3 D_800ADCBC;             /* rider seat */
-extern u8 D_800F5EC0[][0x224];      /* controller settings, one per player */
 
 f32 func_00246310(Body *body, CVector3 point);   /* angle to a point */
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);
@@ -59,7 +59,7 @@ s32 func_0024EAF8(CPlayer *p, Body *body) {
                 p->m_vOnEnemyScale = D_800ADCBC;
                 func_0020EF60(&p->m_vOnEnemyScale, &p->m_vOnEnemyScale, 0.03f);
                 body->yaw = mount->yaw;
-                func_002470E8(&p->m_ContState, D_800F5EC0[p->m_nController]);
+                func_002470E8(&p->m_ContState, &D_800F5EC0[p->m_nController]);
                 p->m_Speed = 0;
                 p->m_SideSpeed = 0;
                 p->m_TotalSpeed = 0;

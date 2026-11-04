@@ -26,7 +26,7 @@ extern s32 func_0042655C(s32 slot);
 extern void func_00426978(s32 slot, s32 index, char **out);
 extern void func_00426C88(char *src, char *dst, s32 n);
 extern s32 func_00426D54(char *a, char *b);
-extern void func_00416644(void *menus, void *tmpl, s32 a, MenuController *b, void *parent);
+extern void func_00416644(void *menus, void *tmpl, s32 a, ControllerProfile *b, void *parent);
 
 /* func_00421A54, inlined (the found path sets the result before storing the index) */
 static __inline__ s32 findFile(void *unused, char *file, s32 slot, s32 *index) {

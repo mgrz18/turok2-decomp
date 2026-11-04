@@ -189,11 +189,21 @@ views were replaced in about 230 files. Still local, and why:
 - **State** (43 files, all `D_8012FB70`), BossModule / ModeState* (20,
   `D_8012F608`), BossState / BossMode (`D_8012F9D8`, `D_8012F9DC`): the boss
   and level-script state of the VM modules.
-- **Game** (`D_80119870`, 19 files): the game state that holds the player
-  list (CPlayerList at +0x20, D_80119890) and the settings (+0x1268).
-- **Controller** / PadState / Ctl (`D_800F5EC0`, 16 files) and
-  ControllerProfile: the controller state (structs/menu.h has the menus'
-  MenuController view).
+- **Game** (`D_80119870`): DONE. `structs/game.h` has CGame (the player
+  list, now in `structs/player_list.h`, the camera pool as bytes with the
+  menu pool at 0x5BC written out, and GameSettings at 0x1268); its ~80 users
+  (local Game/Game80119870/Players/World views and `u8 D_80119870[]`
+  address passers) use it, passing `&D_80119870.m_PlayerList` to the list
+  functions. Left: func_00262D74, func_002892D8, func_00289C0C reach it as
+  D_8011AAD8 - 0x1268 (the ROM uses that symbol); the D_801198B0 and
+  D_80119E2C users keep those symbols (Game/MenuMatchGlobals/Globals views).
+- **Controller** (`D_800F5EC0`): DONE. `structs/controller.h` has
+  ControllerProfile (Rage Wars' name; Controller, PadState, PadInput, Ctl,
+  B14Ctl, SaveState, SetupSlot, Obj80264124/ObjectState224 and menu.h's
+  MenuController were views of it); rw/abu_types.h includes it and
+  `CPlayer::m_ContState.m_pContState` points to it. Left: func_0027BB80
+  (reaches the four through D_800F5F6C = D_800F5EC0 + 0xAC) and the
+  differing declarations of D_800F5C78 (the merged fifth profile).
 - **WeaponDef** / WeaponInfo (`D_800AF618`, 44 files): the weapon table.
 - **Command** / PhaseFuncs (`D_0043232C`, `D_0043240C`), Timer, Manager: the
   VM's script commands and timers.

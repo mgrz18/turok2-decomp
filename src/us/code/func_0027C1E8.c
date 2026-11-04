@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "structs/game.h"
 
 extern CPlayer *D_80119890;     /* the players, a list through m_pNext */
 extern u32 D_800B6CB8;          /* the camera player's AI flags this frame, */
@@ -8,19 +9,12 @@ extern u32 D_800B6CBC;          /* the frame before, */
 extern u32 D_800B6CC0;          /* and the one before that */
 extern s32 D_800AE340;          /* a tint forced over the view */
 extern u8 D_800F1FE4[4];        /* its colour */
-extern s32 D_8011AAD8;          /* game flags */
 extern u8 D_800F6CB0[];
 extern f32 D_800B6D28;          /* the frame's time step */
-/* The global at D_80119870: what these read of it. */
-typedef struct {
-    /* 0x0000 */ u8 _pad[0x1418];
-    /* 0x1418 */ s32 m_Mode;           /* D_8011AC88: game mode */
-} Game80119870;
-extern Game80119870 D_80119870;
 void func_002883E0(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 void func_0027C074(CCamera *cam);
 s32 Cinema_PathPlaying(void);
-void func_0025322C(Game80119870 *game, CCamera *cam);
+void func_0025322C(CPlayerList *list, CCamera *cam);
 s32 func_00284284(CCamera *cam);
 
 /* The tints over a camera's view (LibTEngine's CCamera DrawTints): the fog
@@ -58,7 +52,7 @@ found:
                     tint[i] = D_800F1FE4[i];
                 }
             }
-            if (D_8011AAD8 & 0x4000) {
+            if (D_8011AAD8.cheatFlags & 0x4000) {
                 tint[0] >>= 3;
                 tint[1] >>= 3;
                 tint[2] >>= 3;
@@ -89,8 +83,8 @@ found:
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }
-        if (Cinema_PathPlaying() == 0 && D_80119870.m_Mode == 13) {
-            func_0025322C(&D_80119870, cam);
+        if (Cinema_PathPlaying() == 0 && D_80119870.m_Settings.mode == 13) {
+            func_0025322C(&D_80119870.m_PlayerList, cam);
         }
         return func_00284284(cam);
     }

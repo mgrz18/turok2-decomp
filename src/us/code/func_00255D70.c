@@ -1,25 +1,20 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x53C];
     /* 0x53C */ u8 cinema[1];
 } Camera;
 
-/* The player lists; the multiplayer flag is at +0x1281. */
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x1281];
-    /* 0x1281 */ u8 multiplayer;
-} Players;
 
-extern Players D_80119870;
 extern char D_0043ABF0;
 extern char D_0043AC14;
 extern char D_0043AC38;
 extern char D_0043AC5C;
 
 void func_0042EB04(CPlayer *);
-s32 func_0025340C(Players *players, CPlayer *player);
+s32 func_0025340C(CPlayerList *players, CPlayer *player);
 void func_00416644(void *pool, void *screen, CPlayer *p, void *controller, s32);
 
 /* func_0042EB04 takes the player (as in func_00249118): the call keeps it in $a0,
@@ -32,8 +27,8 @@ void func_00255D70(CPlayer *player) {
     player->m_ShockedTimer = 0;
     player->m_CharacterActor.m_dwFlags &= ~0x800000;
     func_0042EB04(player);
-    if (D_80119870.multiplayer) {
-        switch ((u32)func_0025340C(&D_80119870, player)) {
+    if (D_80119870.m_Settings.multiplayer) {
+        switch ((u32)func_0025340C(&D_80119870.m_PlayerList, player)) {
         case 0:
         default:
             screen = &D_0043ABF0;

@@ -17,13 +17,6 @@ typedef struct {
     /* 0x4 */ s32 _pad;
 } CCameraMode;
 
-/* The game global at D_80119870: what this reads of it. */
-typedef struct {
-    /* 0x0000 */ u8 _pad0[0x1281];
-    /* 0x1281 */ u8 m_bWideViewVolume;
-    /* 0x1282 */ u8 _pad1282[0x196];
-    /* 0x1418 */ s32 m_Mode;               /* D_8011AC88: game mode */
-} Game80119870;
 
 typedef struct {
     /* 0x00 */ u8 _pad0[0x1C];
@@ -38,7 +31,6 @@ extern f32 D_800DD78C;          /* the last sine taken */
 extern CCamera D_801198F0;      /* the main camera */
 /* The camera pool, seen from its main camera. */
 #define D_801198B0 (*(CCameraPool *) ((u8 *) &D_801198F0 - 0x40))
-extern Game80119870 D_80119870;
 extern s32 D_801198E8;          /* the pool wants on-screen projections */
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
@@ -286,7 +278,7 @@ found:
     func_0020F7EC(cam->m_mfProjection);
     func_0020CC94(cam->m_mfProjection, &cam->m_mProjection[D_800B6D1C]);
     func_0020FF80(mLight, mView);
-    if (D_80119870.m_Mode == 4) {
+    if (D_80119870.m_Settings.mode == 4) {
         func_00210790(mLight, cam->m_Time * 0.010908309f);
         func_00210968(mLight, cam->m_Time * 0.008726647f);
     }
@@ -325,7 +317,7 @@ found:
     lookAt->l[0x15] = 0x80;
     lookAt->l[0x16] = 0;
     lookAt->l[0x17] = 0;
-    if (!D_80119870.m_bWideViewVolume) {
+    if (!D_80119870.m_Settings.multiplayer) {
         ang = fov * aspect * 0.008726647f;
         radius = cam->m_FarClip / func_002974C0(ang);
         corners[0].x = 0.0f;

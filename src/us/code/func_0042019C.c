@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "structs/game.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
@@ -22,7 +23,6 @@ extern s32 D_8011B108;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
 extern u8 D_80119E2C[];
-extern u8 D_80119870[];
 extern u8 D_0043B738[];
 extern u8 D_00438808[];
 extern u8 D_00439190[];
@@ -76,7 +76,7 @@ s32 func_0042019C(s32 a0, Menu *arg) {
     if (D_801309B4 != 0) {
         if (D_80130994 != 0) {
             D_801309BC = 1;
-            plr = func_0025342C(D_80119870, arg->controller);
+            plr = func_0025342C(&D_80119870.m_PlayerList, arg->controller);
             func_00416644(((u8 *)plr->m_pCamera) + 0x53C, D_00438808, (s32)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
@@ -106,10 +106,10 @@ s32 func_0042019C(s32 a0, Menu *arg) {
         }
         return 0;
     }
-    plr = func_0025342C(D_80119870, arg->controller);
+    plr = func_0025342C(&D_80119870.m_PlayerList, arg->controller);
     if (D_80130994 != 0) {
         D_801309BC = 1;
-        func_00416644(D_80119870 + 0x5BC, D_00439190, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+        func_00416644(D_80119870.m_MenuPool, D_00439190, (s32)plr, plr->m_ContState.m_pContState, mm.m);
         return 1;
     }
     if (D_80130984 == 0) {

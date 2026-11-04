@@ -25,7 +25,7 @@ void func_0041D948(Menu *o);
 s32 func_0041DCB0(Menu *o, s32 a, s32 b);
 void func_0041ED00(s32 a, Menu *o, s32 c);
 void func_0041EFE8(s32 a, Menu *o, s32 c);
-void func_00416644(void *a, void *b, s32 c, MenuController *d, void *e);
+void func_00416644(void *a, void *b, s32 c, ControllerProfile *d, void *e);
 
 s32 func_00458DE4(s32 a0, Menu *o, s32 a2) {
     u8 buf[16];

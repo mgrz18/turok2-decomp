@@ -95,4 +95,28 @@ typedef struct GameSettings {
 extern GameSettings D_8011AAD8;
 extern GameMatch D_8011ACB0;
 
+/* ---- The game state, D_80119870 (CGame) ---- */
+
+#include "structs/player_list.h"
+
+/* The engine's globals at D_80119870: the players, the cameras and the
+ * settings. Some parts have symbols of their own, which the ROM uses where
+ * it reaches them through those: D_80119890 (m_PlayerList.m_ActiveList),
+ * D_801198B0 (m_CameraPool), D_80119E2C (m_MenuPool) and D_8011AAD8
+ * (m_Settings). The camera pool is CCameraPool (structs/camera.h), kept as
+ * bytes here so that this header does not pull in the cameras and the game
+ * objects; the menus' pool is the one of its main camera
+ * (m_MainCamera.m_MenuPool), so it is written out. */
+typedef struct CGame {
+    /* 0x0000 */ CPlayerList m_PlayerList;
+    /* 0x003C */ s32 _pad3C;
+    /* 0x0040 */ u8 m_CameraPool[0x57C];   /* CCameraPool, D_801198B0 (0x11F0 bytes) */
+    /* 0x05BC */ u8 m_MenuPool[0x18];      /* its m_MainCamera.m_MenuPool (MenuPool, structs/menu.h), D_80119E2C */
+    /* 0x05D4 */ u8 m_CameraPoolEnd[0x1230 - 0x5D4];
+    /* 0x1230 */ u8 unk1230[0x1268 - 0x1230];
+    /* 0x1268 */ GameSettings m_Settings;  /* D_8011AAD8 */
+} CGame; /* size 0x1490 */
+
+extern CGame D_80119870;
+
 #endif

@@ -10,7 +10,6 @@ extern s32 D_800ACDE0;
 extern f32 D_800B6D28;      /* frame time scale */
 extern f32 D_800DD78C;
 extern u8 D_801102B8[];
-extern u8 D_80119870[];
 extern u8 D_801198B0[];
 
 void func_00206068(s32, s32);
@@ -62,12 +61,12 @@ void func_00220530(CWorld *world) {
     func_00206920(world->m_Heap);
     func_0020565C(0, world->m_hHeap);
     func_00235FC4(D_801102B8);
-    func_00253018(D_80119870);
+    func_00253018(&D_80119870.m_PlayerList);
     func_00221210(world);
     func_002216DC(world);
     func_00221A24(world);
     if (world->m_WarpState == 0) {
-        func_00252ADC(D_80119870);
+        func_00252ADC(&D_80119870.m_PlayerList);
     }
     func_0027F2C4(D_801198B0, world);
     func_00230CB4(world->m_ParticleSystem);

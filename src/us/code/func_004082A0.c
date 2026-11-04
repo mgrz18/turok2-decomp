@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -22,13 +23,7 @@ typedef struct {
     /* 0x14 */ s32 warned;
 } BossFight;
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x40];
-    /* 0x0040 */ u8 hud[0x13D8];
-    /* 0x1418 */ s32 mode;
-} Game;
 
-extern Game D_80119870;
 extern void *D_80119890;
 extern s32 D_800F7078;
 extern f32 D_800B6D28;
@@ -66,11 +61,11 @@ void func_004082A0(BossFight *fight) {
     u8 *obj;
     u8 *ai;
 
-    if (D_80119870.mode != 13 || D_800F7078 != 4) {
+    if (D_80119870.m_Settings.mode != 13 || D_800F7078 != 4) {
         return;
     }
     if ((f32) (*(s32 *) (fight->obj->def + 0x54) * 15) <= fight->timer) {
-        func_00281610(D_80119870.hud, *(s32 *) ((u8 *) func_002532A8(&D_80119870) + 0x51C), D_800B6684, 4.0f);
+        func_00281610(D_80119870.m_CameraPool, *(s32 *) ((u8 *) func_002532A8(&D_80119870.m_PlayerList) + 0x51C), D_800B6684, 4.0f);
         func_0027580C(0x182);
     }
     bar = D_801100F0;

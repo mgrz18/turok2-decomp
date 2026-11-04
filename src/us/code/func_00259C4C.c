@@ -1,12 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x168];
-    /* 0x168 */ f32 rumble;
-} Controller;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x40];
@@ -34,7 +31,7 @@ void func_00259C4C(Owner *obj, WeaponState *state) {
     f32 t;
     s16 shots;
 
-    ((Controller *)player->m_ContState.m_pContState)->rumble = func_002119FC(base, 0.3f);
+    player->m_ContState.m_pContState->rumbleBase = func_002119FC(base, 0.3f);
     if (player->m_ContState.m_dwButtons & 0x2000) {
         return;
     }
@@ -45,5 +42,5 @@ void func_00259C4C(Owner *obj, WeaponState *state) {
     shots = (n < 1.0f) ? 1 : (s32) n;
     D_800AE9D2 = shots;
     func_00243414(obj, state, 5);
-    ((Controller *)player->m_ContState.m_pContState)->rumble = 0.0f;
+    player->m_ContState.m_pContState->rumbleBase = 0.0f;
 }

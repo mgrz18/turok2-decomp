@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/game.h"
 struct LevelActor;
 extern f32 func_0021153C(f32 arg0);
 extern float func_002974C0(float x);
@@ -138,7 +139,6 @@ struct LevelActor;
 struct LevelActor;
 extern void func_0020F040(f32 *arg0);
 extern void func_0020F85C(void *arg0, void *arg1, void *arg2);
-extern char D_80119870;
 extern f32 D_800DD78C;
 extern CQuatern func_0021AE6C(char *);
 extern void func_00211114(CQuatern *, f32 *);
@@ -177,7 +177,7 @@ CQuatern func_002673CC(char *actor, CVector3 point) {
         forward.z = 1.0f;
     }
     if (target == 0) {
-        found = func_002532EC(&D_80119870, point);
+        found = func_002532EC(&D_80119870.m_PlayerList, point);
         if (found != 0) {
             target = found;
         }

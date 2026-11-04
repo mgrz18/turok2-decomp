@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 /* The player fields this resets. */
 typedef struct Player {
@@ -87,7 +88,6 @@ typedef struct Player {
     /* 0x1284 */ s32 unk1284;
 } Player;
 
-extern u8 D_800F5EC0[][0x224];      /* controller settings, one per player */
 
 void func_002470E8(void *controls, void *settings);
 f32 func_00253CFC(Player *player);
@@ -103,7 +103,7 @@ static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
 void func_00248340(Player *p) {
     f32 zero;
 
-    func_002470E8(p->controls, D_800F5EC0[p->index]);
+    func_002470E8(p->controls, &D_800F5EC0[p->index]);
     p->unkA78 = 0;
     p->unkA7C = 0;
     p->unkA80 = 0;
