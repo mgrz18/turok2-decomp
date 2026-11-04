@@ -5,14 +5,6 @@
 /* Name entry: draw the item, with a blinking cursor box under the character
  * being edited. */
 
-typedef struct {
-    s32 cursor;    /* 0x00 */
-    f32 timer;     /* 0x04 */
-    s32 length;    /* 0x08 */
-    char name[12]; /* 0x0C */
-} NameEntry; /* 0x18 bytes */
-
-extern NameEntry D_800C1FB0[];
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C1BD0;
 

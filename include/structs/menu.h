@@ -156,4 +156,26 @@ typedef struct MenuPool {
     /* 0x16 */ u8 _pad16[2];
 } MenuPool; /* size 0x18 */
 
+/* A line of text being typed in a menu: the letters, where the next one
+ * goes and the blinking cursor (drawn while timer <= 6, func_0041A904).
+ * D_800C1F80 is the cheat code entry (22 letters at most; its text also
+ * has a symbol of its own, D_800C1F8C); D_800C1FB0 holds the four players'
+ * names (8 letters at most), indexed by the player's slot (func_0025340C). */
+typedef struct TextEntry {
+    /* 0x00 */ s32 cursor;          /* the column the next letter goes to */
+    /* 0x04 */ f32 timer;           /* the cursor's blink, reset by each key */
+    /* 0x08 */ s32 length;
+    /* 0x0C */ char text[24];
+} TextEntry; /* size 0x24 */
+
+typedef struct NameEntry {
+    /* 0x00 */ s32 cursor;
+    /* 0x04 */ f32 timer;
+    /* 0x08 */ s32 length;
+    /* 0x0C */ char name[12];
+} NameEntry; /* size 0x18 */
+
+extern TextEntry D_800C1F80;
+extern NameEntry D_800C1FB0[4];
+
 #endif

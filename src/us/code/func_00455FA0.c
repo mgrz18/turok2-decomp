@@ -6,16 +6,8 @@
  * name (trailing spaces trimmed; the default name D_800C1340 counts as empty)
  * into the editing buffer. */
 
-typedef struct {
-    s32 cursor;    /* 0x00 */
-    f32 timer;     /* 0x04 */
-    s32 length;    /* 0x08 */
-    char name[12]; /* 0x0C */
-} NameEntry; /* 0x18 bytes */
-
 #define ENTRY_SELECTED 0x01800000
 
-extern NameEntry D_800C1FB0[];
 extern u8 D_8011AB8B[];
 extern u8 D_800C1340[];
 

@@ -5,12 +5,6 @@
  * highlight box (11 virtual pixels wide, scaled to the screen) at the cursor
  * column, faded by the item's alpha, then draws the item as usual. */
 
-typedef struct {
-    /* 0x0 */ s32 column;
-    /* 0x4 */ f32 timer;
-} Cursor;
-
-extern Cursor D_800C1F80;
 extern s32 D_800C2030;
 extern s32 D_800C1BD0;
 
@@ -25,7 +19,7 @@ void func_0041A904(void *menu, MenuItemLayout *item, s32 arg2, Menu *win) {
 
     if (D_800C1F80.timer <= 6.0f) {
         width = D_800C2030 * 11 / 284;
-        x = item->left + D_800C1F80.column * width;
+        x = item->left + D_800C1F80.cursor * width;
         alpha = win->fade * (win->alpha * 128.0f);
         D_800C1BD0 = -1;
         func_0027AF4C();

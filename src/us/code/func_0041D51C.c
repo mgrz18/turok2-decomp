@@ -7,14 +7,6 @@
  * screen) under the edited column, faded by the window alpha, then draws the
  * item as usual. As func_0041A904. */
 
-typedef struct {
-    /* 0x00 */ s32 column;
-    /* 0x04 */ f32 timer;
-    /* 0x08 */ s32 end;
-    /* 0x0C */ char text[0x18 - 0xC];
-} NameEdit;
-
-extern NameEdit D_800C1FB0[];
 extern s32 D_800C2030;
 extern s32 D_800C1BD0;
 
@@ -32,7 +24,7 @@ void func_0041D51C(void *menu, MenuItemLayout *item, s32 arg2, Menu *win) {
     index = func_0025340C(&D_80119870.m_PlayerList, win->player);
     if (D_800C1FB0[index].timer <= 6.0f) {
         width = D_800C2030 * 9 / 284;
-        x = item->left + D_800C1FB0[index].column * width;
+        x = item->left + D_800C1FB0[index].cursor * width;
         alpha = win->fade * (win->alpha * 64.0f);
         D_800C1BD0 = -1;
         func_0027AF4C();

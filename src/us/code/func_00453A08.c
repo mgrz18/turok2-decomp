@@ -7,23 +7,15 @@
 #include "ultra_types.h"
 #include "structs/controller.h"
 #include "structs/list.h"
+#include "structs/menu.h"
 
 extern int func_00285628(ControllerProfile *object);
 extern int func_00285670(ControllerProfile *object);
-struct Shared_Entry;
-typedef struct Shared_Entry Shared_Entry;
 struct MenuRecAt20V4;
 struct MenuRecAt20V4 {
     s16 state;
     char pad2[0x1E];
     s32 input;
-};
-struct Shared_Entry;
-struct Shared_Entry {
-    s32 value;
-    f32 timer;
-    s32 count;
-    u8 text[24];
 };
 struct MenuRecAt20V4;
 typedef struct MenuRecAt20V4 MenuRecAt20V4;
@@ -56,7 +48,6 @@ struct PoolRecAt28V1 {
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
 extern f32 D_800C1274[];
-extern Shared_Entry D_800C1F80;
 extern f32 D_800B6D28;
 extern f32 D_800C1274[];
 s32 func_00453A08(void *unused, MenuRecAt20V4 *menu) {
@@ -67,12 +58,12 @@ s32 func_00453A08(void *unused, MenuRecAt20V4 *menu) {
         D_800C1F80.timer = t - D_800C1274[1];
     }
     if (menu->state == 2) {
-        if (((s32 (*)(s32))func_00285628)(menu->input) != 0 && D_800C1F80.value > 0) {
-            D_800C1F80.value--;
+        if (((s32 (*)(s32))func_00285628)(menu->input) != 0 && D_800C1F80.cursor > 0) {
+            D_800C1F80.cursor--;
             D_800C1F80.timer = 0.0f;
         } else if (((s32 (*)(s32))func_00285670)(menu->input) != 0) {
-            if (D_800C1F80.value < D_800C1F80.count) {
-                D_800C1F80.value++;
+            if (D_800C1F80.cursor < D_800C1F80.length) {
+                D_800C1F80.cursor++;
                 D_800C1F80.timer = 0.0f;
             }
         }

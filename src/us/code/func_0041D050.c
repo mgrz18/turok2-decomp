@@ -6,15 +6,7 @@
  * and copies that player's name (trailing spaces trimmed, nothing when it is
  * still the default "player" name) into the edit buffer. */
 
-typedef struct {
-    /* 0x00 */ s32 length;
-    /* 0x04 */ s32 cursor;
-    /* 0x08 */ s32 end;
-    /* 0x0C */ char text[0x18 - 0xC];
-} NameEdit;
-
 extern u8 D_8011AB8B[][0x40];   /* player options +0x33: names */
-extern NameEdit D_800C1FB0[];
 extern u8 D_800C1340[];   /* "player" */
 
 extern s32 func_0025340C(void *players, void *player);
@@ -71,8 +63,8 @@ void func_0041D050(Menu *menu) {
         menu->items[3].flags &= ~ROW_SELECTED;
         break;
     }
-    D_800C1FB0[index].cursor = 0;
-    dst = D_800C1FB0[index].text;
+    D_800C1FB0[index].timer = 0;
+    dst = D_800C1FB0[index].name;
     name = D_8011AB8B[index];
     i = 8;
     spaces = 0;
@@ -90,6 +82,6 @@ void func_0041D050(Menu *menu) {
         *dst++ = *name++;
     }
     *dst = 0;
+    D_800C1FB0[index].cursor = 8 - spaces;
     D_800C1FB0[index].length = 8 - spaces;
-    D_800C1FB0[index].end = 8 - spaces;
 }
