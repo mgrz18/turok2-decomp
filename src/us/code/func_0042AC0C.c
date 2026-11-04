@@ -142,7 +142,7 @@ loaded:
     func_00226390(w);
     func_0042D220(w->m_ParticleSystem, *w->m_pParticleEffects);
     func_0042CF90(w->m_ActorPool);
-    func_0042D0A0(w->unk_13B28);
+    func_0042D0A0(&w->m_InstancePool);
     func_0042D410(D_801102B8);
     CCollisionInfo__Reset();
     func_0042D120(w->unk_18EBC);

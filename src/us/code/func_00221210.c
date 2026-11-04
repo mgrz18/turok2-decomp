@@ -157,7 +157,7 @@ void func_00221210(CWorld *w) {
             i++;
         } while (i < lim);
     }
-    func_0022828C(w->unk_13B28, w);
+    func_0022828C(&w->m_InstancePool, w);
     t = w->m_Kind1Cursor + 1;
     w->m_Kind1Cursor = t;
     if (t >= w->m_nKind1) {
