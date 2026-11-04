@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 typedef struct {
     /* 0x00 */ s32 model;
@@ -9,10 +10,6 @@ typedef struct {
     /* 0x4C */ s32 unk4C;
 } WeaponInfo;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x168];
-    /* 0x168 */ s32 unk168;
-} Controller;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x1A8];
@@ -87,7 +84,7 @@ void func_00258000(Object *obj, AI *ai) {
     if (ai->visible && !func_0024E700(player, player->m_Data.m_CurrentWeapon)) {
         player->m_RequestedWeapon = func_00257BA0(player);
     }
-    ((Controller *)player->m_ContState.m_pContState)->unk168 = 0;
+    player->m_ContState.m_pContState->rumbleBase = 0;
     ai->unk120 = 0;
     if (D_8011ACE4.enabled && player->m_pOptions->m_TagMode) {
         if (player->m_ContState.m_dwButtonsSingle & 0x2000) {

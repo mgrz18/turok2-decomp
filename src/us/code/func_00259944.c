@@ -1,12 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
 /* Weapon spin: turns the barrel and makes the controller rumble with the spin speed. */
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x168];
-    /* 0x168 */ f32 rumble;
-} Controller;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x34];
@@ -36,5 +33,5 @@ void func_00259944(void *obj, WeaponState *state) {
     }
     state->time += D_800B6D28;
     t = state->speed * 2.122065783f;
-    ((Controller *)player->m_ContState.m_pContState)->rumble = t * t * (func_002982F0(state->angle * 1.5f) * 0.4f + 0.4f) + t * 0.05f;
+    player->m_ContState.m_pContState->rumbleBase = t * t * (func_002982F0(state->angle * 1.5f) * 0.4f + 0.4f) + t * 0.05f;
 }

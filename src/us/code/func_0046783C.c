@@ -1,14 +1,11 @@
 /* Second VM module copy of func_0042E91C (same source, linked 0x0042E83C). */
 #include "common.h"
 #include "structs/player.h"
+#include "structs/controller.h"
 
-typedef struct Controller {
-    u8 pad[0x224];
-} Controller;
 
-extern Controller D_800F5EC0[];
 
-extern void func_002470E8(void *, Controller *);
+extern void func_002470E8(void *, ControllerProfile *);
 extern void func_00248340(CPlayer *p);
 
 void func_0046783C(CPlayer *p, s32 index, void *options) {

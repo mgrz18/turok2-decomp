@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/controller.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x80];
@@ -13,13 +14,7 @@ typedef struct {
     /* 0x0C */ A254Screen *screen;
 } A254Menu;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xCC];
-    /* 0x0CC */ s32 unkCC;
-    /* 0x0D0 */ u8 padD0[0x224 - 0xD0];
-} Controller;
 
-extern Controller D_800F5EC0[4]; /* controllers */
 extern s32 D_80130910[4];
 extern u8 D_800F5A50[];
 extern u8 D_8011AAF1;   /* D_8011AAD8 + 0x19 */
@@ -33,7 +28,7 @@ void func_0041A254(A254Menu *menu) {
 
     menu->state = 2;
     for (i = 0; i < 4; i++) {
-        D_80130910[i] = D_800F5EC0[i].unkCC;
+        D_80130910[i] = D_800F5EC0[i].rumbleOn;
     }
     func_0026EDA8(D_800F5A50);
     func_00285304();
