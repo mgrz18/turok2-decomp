@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 /* The leading 0x34 bytes of a game object: what the collision test reads. */
 typedef struct {
@@ -11,7 +12,7 @@ typedef struct {
 
 struct CollisionInfo;
 extern struct CollisionInfo D_800F1B40;
-extern CGameObjectInstance *D_800F1CE0; /* the instance the last test hit */
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 f32 func_002671B4(CGameObjectInstance *obj); /* the object's height */
 s32 func_00239F00(void *obj, CVector3 to, struct CollisionInfo *info);
 
@@ -29,7 +30,7 @@ s32 func_00245FC8(CGameObjectInstance *target, s32 unused, CGameObjectInstance *
     to.y += func_002671B4(target);
     to.y += target->m_CollisionYOffset;
     hit = func_00239F00(from, to, &D_800F1B40);
-    if (D_800F1CE0 == target) {
+    if (D_800F1CE0.m_pInstance == target) {
         hit = 0;
     }
     *(ObjectHead *) from = saved;

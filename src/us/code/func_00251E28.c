@@ -1,10 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 data[0x18];
-} DamageEvent;
+#include "structs/collision.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x114];

@@ -1,13 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct SweepDef {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ s8 kind;
-    /* 0x05 */ s8 hitKind;
-    /* 0x06 */ u8 pad6[0xA];
-    /* 0x10 */ f32 hitArg;
-} SweepDef;
+#include "structs/collision.h"
 
 /* An instance that can be hit, or the one sweeping (a particle: type 2). */
 typedef struct HitInst {
@@ -25,34 +18,6 @@ typedef struct HitInst {
     /* 0x1A8 */ struct { u8 pad[0x4F4]; s32 hitByLaser; } *player;
 } HitInst;
 
-typedef struct HitTarget {
-    /* 0x00 */ s32 active;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ CVector3 a;
-    /* 0x14 */ CVector3 b;
-} HitTarget;
-
-/* What a hit on a model's box copies: 0x70 bytes (a matrix and more). */
-typedef struct HitFrame {
-    /* 0x00 */ s32 words[0x1C];
-} HitFrame;
-
-/* A segment swept from an instance's position to end, and what it hit. */
-typedef struct Sweep {
-    /* 0x00 */ HitInst *inst;
-    /* 0x04 */ SweepDef *def;
-    /* 0x08 */ f32 maxT;
-    /* 0x0C */ u8 padC[0x28];
-    /* 0x34 */ void *hitA;
-    /* 0x38 */ void *hitIndex;
-    /* 0x3C */ void *hitB;
-    /* 0x40 */ s32 hitKind;
-    /* 0x44 */ void *hitOwner;
-    /* 0x48 */ void *hitData;
-    /* 0x4C */ CVector3 end;
-    /* 0x58 */ CVector3 dir;
-} Sweep;
-
 typedef struct EffectParams {
     /* 0x0 */ s16 type;
     /* 0x2 */ s16 scale;
@@ -62,7 +27,7 @@ typedef struct EffectParams {
     /* 0x7 */ s8 b;
 } __attribute__((aligned(4))) EffectParams;
 
-extern HitTarget *D_800F1ADC;
+extern CCollisionResults *D_800F1ADC;
 
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
@@ -94,7 +59,7 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
     s32 next;
     CVector3 *cur;
     HitInst *inst;
-    HitTarget *target;
+    CCollisionResults *target;
 
     result = 0;
     for (face = 0; face < 6; face++) {
@@ -142,7 +107,7 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
                 func_0020EF2C(&normal, &corners[3], &corners[7]);
                 break;
         }
-        denom = DOT(normal, sweep->dir);
+        denom = DOT(normal, sweep->delta);
         if (denom == 0.0f) {
             continue;
         }
@@ -152,12 +117,12 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
             continue;
         }
         t = -num / denom;
-        if (!(t < sweep->maxT)) {
+        if (!(t < sweep->hit.fraction)) {
             continue;
         }
-        point.x = start->x + t * sweep->dir.x;
-        point.y = start->y + t * sweep->dir.y;
-        point.z = start->z + t * sweep->dir.z;
+        point.x = start->x + t * sweep->delta.x;
+        point.y = start->y + t * sweep->delta.y;
+        point.z = start->z + t * sweep->delta.z;
         inside = 1;
         for (j = 0; j < 4; j++) {
             next = 0;
@@ -176,21 +141,21 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
             continue;
         }
         if (!func_0023AB18(sweep, &normal, quad[0], 0,
-                           func_002682CC(other) ? sweep->def->hitKind : sweep->def->kind,
-                           sweep->def->hitArg, 0)) {
+                           func_002682CC(other) ? sweep->def->m_WallBehavior : sweep->def->m_InstanceBehavior,
+                           sweep->def->m_GroundFriction, 0)) {
             continue;
         }
         target = D_800F1ADC;
-        sweep->hitKind = hitKind;
-        sweep->hitA = &target->a;
-        sweep->hitIndex = &target->unk4;
-        sweep->hitB = &target->b;
-        sweep->hitOwner = target;
-        sweep->hitData = other;
+        sweep->hit.kind = hitKind;
+        sweep->hit.posOut = &target->m_vInstancePos;
+        sweep->hit.regionOut = &target->m_pInstanceRegion;
+        sweep->hit.kindOut = &target->m_nInstanceNode;
+        sweep->hit.dataOut = (void **)&target->m_pInstance;
+        sweep->hit.data = other;
         if (frame != NULL) {
-            *(HitFrame *) ((u8 *) target + 0x18) = *frame;
+            target->m_Frame = *frame;
         }
-        inst = sweep->inst;
+        inst = (HitInst *)sweep->inst;
         result = 1;
         if (inst->type != 2) {
             continue;
@@ -202,17 +167,17 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
             continue;
         }
         inst->target = other;
-        func_0020EF8C(&pos, sweep->maxT, &sweep->inst->pos, &sweep->end);
+        func_0020EF8C(&pos, sweep->hit.fraction, &sweep->inst->m_vPos, &sweep->end);
         params.type = 5;
         params.scale = 0x6400;
         params.count = 5;
-        params.r = sweep->inst->colour[0];
-        params.g = sweep->inst->colour[1];
-        params.b = sweep->inst->colour[2];
-        func_00236EA0(other, sweep->inst, 2, -1, pos, params);
+        params.r = ((HitInst *)sweep->inst)->colour[0];
+        params.g = ((HitInst *)sweep->inst)->colour[1];
+        params.b = ((HitInst *)sweep->inst)->colour[2];
+        func_00236EA0(other, (HitInst *)sweep->inst, 2, -1, pos, params);
         func_00275544(0x1B4, pos.x, pos.y, pos.z, 0, -1);
         if (other->def->m_Type == result) {
-            sweep->inst->owner->player->hitByLaser = result;
+            ((HitInst *)sweep->inst)->owner->player->hitByLaser = result;
         }
     }
     return result;

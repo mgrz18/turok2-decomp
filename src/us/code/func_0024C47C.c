@@ -69,6 +69,7 @@ void func_0024C47C(CBarrel *menu, CPlayer *player) {
 
 #include "gfx.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 /* An animated HUD item (func_00277328 ticks it, func_0027AD00 restarts it). */
 typedef struct {
@@ -581,10 +582,6 @@ typedef struct PlayerStateInfo {
 } PlayerStateInfo;
 
 
-typedef struct DamageEvent {
-    s32 w[6];
-} DamageEvent;
-
 extern f32 D_800B6D28;              /* frame time */
 extern s32 D_8011AAA0;
 extern s32 D_8011ACE4;
@@ -593,8 +590,7 @@ extern f32 D_800ADD88[];           /* health regeneration per character */
 extern PlayerStateInfo D_800ADF54[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
-extern u8 *D_800F1CE0;
-extern void *D_800F1D7C;
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 extern s32 D_800F1D90;
 extern u8 D_800F7078;
 extern s32 D_80110054;
@@ -952,11 +948,11 @@ void func_0024D344(Player *p) {
         func_002233A8(&D_800F7078, actor, &prev, &actor->pos);
         landed = 0;
         if (hit) {
-            if (D_800F1CE0 != NULL && *D_800F1CE0 == 1) {
-                func_0026E110(D_800F1CE0, soundFlags | 2, actor);
+            if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
+                func_0026E110((u8 *)D_800F1CE0.m_pInstance, soundFlags | 2, actor);
             }
-            if (D_800F1D7C != NULL) {
-                func_0026E19C(D_800F1D7C, linkFlags | 4, actor);
+            if (D_800F1CE0.m_pWallRegion != NULL) {
+                func_0026E19C((Model *)D_800F1CE0.m_pWallRegion, linkFlags | 4, actor);
             }
             func_0024ED54(p, actor, stateFlags);
             landed = func_0024EAF8(p, actor, stateFlags);
@@ -969,8 +965,8 @@ void func_0024D344(Player *p) {
                 p->velX *= 0.1f;
             }
         }
-        if (D_800F1CE0 != NULL && *D_800F1CE0 == 3) {
-            func_0023F05C(p, D_800F1CE0);
+        if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 3) {
+            func_0023F05C(p, (u8 *)D_800F1CE0.m_pInstance);
         }
         if (before != NULL && material != NULL) {
             if ((p->stateFlags & 0x8000) && !landed && !(before->unk54 & 8) && (material->unk54 & 8)) {

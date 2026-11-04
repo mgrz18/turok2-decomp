@@ -1,42 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct SweepDef {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ s8 unk4;
-    /* 0x05 */ s8 hitKind;
-    /* 0x06 */ u8 pad6[0xA];
-    /* 0x10 */ f32 hitArg;
-    /* 0x14 */ u8 pad14[4];
-    /* 0x18 */ f32 specialArg;
-} SweepDef;
-
-/* A segment swept from an instance's position to end, and what it hit. */
-typedef struct Sweep {
-    /* 0x00 */ CInstanceHeader *inst;
-    /* 0x04 */ SweepDef *def;
-    /* 0x08 */ f32 maxT;
-    /* 0x0C */ u8 padC[0x28];
-    /* 0x34 */ void *hitA;
-    /* 0x38 */ s32 hitIndex;
-    /* 0x3C */ void *hitB;
-    /* 0x40 */ s32 hitKind;
-    /* 0x44 */ void *hitOwner;
-    /* 0x48 */ void *hitData;
-    /* 0x4C */ u8 pad4C[0x50];
-    /* 0x9C */ s32 unk9C;
-} Sweep;
-
-typedef struct HitTarget {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ CVector3 a;
-    /* 0x14 */ CVector3 b;
-    /* 0x20 */ u8 pad20[0xA4];
-    /* 0xC4 */ s32 special;
-    /* 0xC8 */ CVector3 specialA;
-    /* 0xD4 */ CVector3 specialB;
-} HitTarget;
+#include "structs/collision.h"
 
 /* A triangle corner projected to the sweep's space, with its model vertex. */
 typedef struct ProjVertex {
@@ -46,17 +10,13 @@ typedef struct ProjVertex {
     /* 0x10 */ s16 *pos;
 } ProjVertex;
 
-typedef struct ModelSweep {
-    /* 0x00 */ Sweep *sweep;
-    /* 0x04 */ u8 pad4[0x40];
-    /* 0x44 */ f32 scale;
-    /* 0x48 */ f32 hitDist;
-    /* 0x4C */ struct { u8 pad[0x10]; void *data; } *model;
-    /* 0x50 */ s32 kind;
-    /* 0x54 */ f32 mtx[4][4];
-} ModelSweep;
+/* The scene model a ModelSweep is against: its data at 0x10. */
+typedef struct SweptModel {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ void *data;
+} SweptModel;
 
-extern HitTarget *D_800F1ADC;
+extern CCollisionResults *D_800F1ADC;
 
 void func_0020F85C(f32 (*mtx)[4], CVector3 *in, CVector3 *out);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -75,7 +35,7 @@ void func_0023D4D4(ModelSweep *ms, ProjVertex **v) {
     ProjVertex *p;
     ProjVertex *q;
     Sweep *sweep;
-    SweepDef *def;
+    CCollisionInfo *def;
     s16 *src;
     s32 i;
     f32 dx1;
@@ -114,27 +74,27 @@ void func_0023D4D4(ModelSweep *ms, ProjVertex **v) {
         case 1:
         case 7:
         case 8:
-            if ((def->flags & 8) && D_800F1ADC->special == 0 &&
-                func_0023AB18(sweep, &normal, &world[0], 1, 7, def->specialArg, 0)) {
-                sweep->hitA = &D_800F1ADC->specialA;
-                sweep->hitIndex = 0;
-                sweep->hitB = &D_800F1ADC->specialB;
-                sweep->hitKind = ms->kind;
-                sweep->hitOwner = &D_800F1ADC->special;
-                sweep->hitData = ms->model->data;
+            if ((def->m_dwFlags & 8) && D_800F1ADC->m_pWaterRegion == 0 &&
+                func_0023AB18(sweep, &normal, &world[0], 1, 7, def->m_WaterFriction, 0)) {
+                sweep->hit.posOut = &D_800F1ADC->m_vWaterPos;
+                sweep->hit.regionOut = NULL;
+                sweep->hit.kindOut = &D_800F1ADC->m_nWaterKind;
+                sweep->hit.kind = ms->kind;
+                sweep->hit.dataOut = (void **)&D_800F1ADC->m_pWaterRegion;
+                sweep->hit.data = ((SweptModel *)ms->model)->data;
             }
             break;
         default:
-            if (func_0023AB18(sweep, &normal, &world[0], 1, def->hitKind, def->hitArg, 0)) {
-                ms->hitDist = ms->scale * sweep->maxT;
-                sweep->hitA = &D_800F1ADC->a;
-                sweep->hitB = &D_800F1ADC->b;
-                sweep->hitIndex = 0;
-                sweep->hitKind = -1;
-                sweep->hitOwner = D_800F1ADC;
-                sweep->hitData = ms->model;
-                if (def->flags & 0x20000000) {
-                    sweep->unk9C = 1;
+            if (func_0023AB18(sweep, &normal, &world[0], 1, def->m_WallBehavior, def->m_GroundFriction, 0)) {
+                ms->hitDist = ms->scale * sweep->hit.fraction;
+                sweep->hit.posOut = &D_800F1ADC->m_vInstancePos;
+                sweep->hit.kindOut = &D_800F1ADC->m_nInstanceNode;
+                sweep->hit.regionOut = NULL;
+                sweep->hit.kind = -1;
+                sweep->hit.dataOut = (void **)&D_800F1ADC->m_pInstance;
+                sweep->hit.data = ms->model;
+                if (def->m_dwFlags & 0x20000000) {
+                    sweep->stop = 1;
                 }
             }
             break;

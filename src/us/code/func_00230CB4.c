@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/CODE_80281A70.CPP, func_80281CA0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/particle.h"
+#include "structs/collision.h"
 
 /* Steps the particle system once: marks every particle on the three active
  * lists, then (outside a pause) advances the ones inside the visible bounds,
@@ -8,16 +9,11 @@
  * collected type 0x22 particle react to the others and each type 0x57
  * particle expire the non-0x57 ones within range. */
 
-typedef struct {
-    /* 0x00 */ CVector3 min;
-    /* 0x0C */ CVector3 max;
-} Bounds;
-
 extern f32 D_800B6D28;          /* frame time scale */
 extern f32 D_800B6D30;
 extern s32 D_8011ACA4;
 extern s32 D_80110028;
-extern Bounds D_800F5A10;       /* visible bounds */
+extern CBox D_800F5A10;       /* visible bounds */
 
 extern void func_0022AFB4(CParticle *p);
 extern s32 func_002325F0(CParticle *p);
@@ -73,8 +69,8 @@ void func_00230CB4(CParticleSystem *world) {
             p->m_pDLight->m_bEnabled = 0;
         }
         if (p->m_cFrame < (f32)p->m_nFrames && p->m_nFrames != 1 && !(p->m_dwFlags & 0x1000)) {
-            if (D_800F5A10.max.x > p->header.m_vPos.x && D_800F5A10.max.y > p->header.m_vPos.y && D_800F5A10.max.z > p->header.m_vPos.z &&
-                D_800F5A10.min.x <= p->header.m_vPos.x && D_800F5A10.min.y <= p->header.m_vPos.y && D_800F5A10.min.z <= p->header.m_vPos.z) {
+            if (D_800F5A10.m_vMax.x > p->header.m_vPos.x && D_800F5A10.m_vMax.y > p->header.m_vPos.y && D_800F5A10.m_vMax.z > p->header.m_vPos.z &&
+                D_800F5A10.m_vMin.x <= p->header.m_vPos.x && D_800F5A10.m_vMin.y <= p->header.m_vPos.y && D_800F5A10.m_vMin.z <= p->header.m_vPos.z) {
                 func_0022AFB4(p);
                 light = p->m_pDLight;
                 if (light) {

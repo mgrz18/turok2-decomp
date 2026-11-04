@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 /* A blast: radius, damage, then the push (strength, x, y, z). */
 typedef struct Blast {
@@ -12,12 +13,6 @@ typedef struct Blast {
     s8 y;
     s8 z;
 } __attribute__((aligned(4))) Blast;
-
-/* A shield record: its damage factor at 0x68. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x68];
-    /* 0x68 */ f32 factor;
-} Shield;
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
@@ -39,34 +34,28 @@ typedef struct {
     /* 0x1A8 */ BlastOwner *owner;
 } BlastActor;
 
-typedef struct {
-    u8 data[0x18];
-} HitInfo;
-
 extern u8 D_8011AAF1;           /* multiplayer */
-extern BlastActor *D_800F1CE0;  /* the carrier of the held shield */
-extern s32 D_800F1CF4;          /* its slot, -1 for none */
-extern Shield D_800F1CF8;       /* the held shield */
-extern Shield D_800F1970;       /* the shield func_0021E374 finds */
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
+extern HitFrame D_800F1970;       /* the shield func_0021E374 finds */
 
 s32 func_0023726C(BlastActor *victim, BlastActor *source);
 void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 f32 func_002671B4(void *actor);
 f32 func_0021F268(BlastActor *actor);
-s32 func_0021E374(BlastActor *actor, CVector3 pos, Shield *out);
+s32 func_0021E374(BlastActor *actor, CVector3 pos, HitFrame *out);
 f32 func_002672C8(BlastActor *actor);
 f32 func_0020F6BC(CVector3 *a, CVector3 *b);
 void func_002374AC(BlastActor *victim, BlastActor *source, Blast blast, CVector3 *out, u32 flags);
-void func_00245828(HitInfo *out, BlastActor *source, s32 damage, f32 radius, u32 flags, Shield *shield);
-void func_002465C8(BlastActor *victim, void *ai, HitInfo *hit);
-void func_002376F8(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, Shield *shield, u32 flags);
+void func_00245828(DamageEvent *out, void *source, s32 damage, f32 radius, u32 flags, HitFrame *shield);
+void func_002465C8(BlastActor *victim, void *ai, DamageEvent *hit);
+void func_002376F8(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitFrame *shield, u32 flags);
 
 /* How strongly the blast reaches the victim: through its shield, and with
  * falloff over the radius plus its width from the nearest point of its body. */
-static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector3 position, f32 radius, s32 falloff, u32 flags, Shield **found) {
+static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector3 position, f32 radius, s32 falloff, u32 flags, HitFrame **found) {
     s32 shielded;
     s32 scaled;
-    Shield *shield;
+    HitFrame *shield;
     f32 scale;
     f32 bottom;
     f32 top;
@@ -80,15 +69,15 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector
     if (D_8011AAF1 != 0 && (flags & 0x400000)) {
         shielded = 0;
     }
-    if (source->kind == 2 && D_800F1CE0 == victim && D_800F1CF4 != -1) {
-        shield = &D_800F1CF8;
+    if (source->kind == 2 && (BlastActor *)D_800F1CE0.m_pInstance == victim && D_800F1CE0.m_nInstanceNode != -1) {
+        shield = &D_800F1CE0.m_Frame;
         falloff = 0;
     } else {
         shield = func_0021E374(victim, position, &D_800F1970) ? &D_800F1970 : NULL;
     }
     *found = shield;
     if (shielded && shield != NULL) {
-        scale *= shield->factor;
+        scale *= shield->damageFactor;
     }
     if (falloff != 0) {
         body = victim->pos;
@@ -118,9 +107,9 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector
  * then damage, push and the hit report, scaled by blastScale. */
 void func_00237AFC(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, Blast blast, s32 falloff, s32 push, u32 flags) {
     CVector3 dir;
-    HitInfo info;
+    DamageEvent info;
     BlastOwner *owner;
-    Shield *shield;
+    HitFrame *shield;
     f32 mult;
     s32 close;
     f32 radius;

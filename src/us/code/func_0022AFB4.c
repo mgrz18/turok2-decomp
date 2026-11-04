@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/particle.h"
+#include "structs/collision.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
@@ -35,25 +36,6 @@ struct Player {
     /* 0x1320 */ Player *next;
 };
 
-/* The result of the last collision test. */
-typedef struct CollisionResult {
-    /* 0x00 */ Target *current;
-    /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ CVector3 origin;
-    /* 0x14 */ u8 pad14[0x88 - 0x14];
-    /* 0x88 */ s32 unk88;
-    /* 0x8C */ u8 pad8C[4];
-    /* 0x90 */ CVector3 unk90;
-    /* 0x9C */ s32 unk9C;
-    /* 0xA0 */ CVector3 unkA0;
-    /* 0xAC */ u8 padAC[4];
-    /* 0xB0 */ s32 unkB0;
-    /* 0xB4 */ s32 unkB4;
-    /* 0xB8 */ CVector3 unkB8;
-    /* 0xC4 */ s32 unkC4;
-    /* 0xC8 */ CVector3 unkC8;
-} CollisionResult;
-
 typedef struct ContactHandler ContactHandler;
 struct ContactHandler {
     /* 0x00 */ u8 pad0[4];
@@ -62,17 +44,12 @@ struct ContactHandler {
     /* 0x10 */ s32 (*func)(Player *player, ContactHandler *handler);
 };
 
-typedef struct Listener {
-    /* 0x00 */ u8 pad0[0xD8];
-    /* 0xD8 */ CVector3 direction;
-} Listener;
-
 extern f32 D_800B6D28;                  /* the frame's time step */
 extern f32 D_800B6D30;
-extern CollisionResult D_800F1CE0;
+extern CCollisionResults D_800F1CE0;
 extern Player *D_80119890;              /* current player */
 extern ContactHandler D_800ACE18[4];
-extern Listener *D_800F1ADC;
+extern CCollisionResults *D_800F1ADC;
 extern u8 D_800F8928[];
 
 s32 func_002113A4(void);
@@ -227,7 +204,7 @@ void func_0022AFB4(CParticle *p) {
             }
         }
     }
-    if ((p->m_dwFlags & 0x40000) && func_00239F00(p, p->header.m_vPos, &p->m_dwHitFlags) && D_800F1CE0.unkB4 != 0) {
+    if ((p->m_dwFlags & 0x40000) && func_00239F00(p, p->header.m_vPos, &p->m_dwHitFlags) && D_800F1CE0.m_pFloorRegion != 0) {
         p->m_Alignment = -3;
     }
     if (p->m_dwFlags & 0x60000) {
@@ -277,7 +254,7 @@ void func_0022AFB4(CParticle *p) {
     p->m_vRot.x += p->m_vRotSpeed.x * D_800B6D28;
     p->m_vRot.y += p->m_vRotSpeed.y * D_800B6D28;
     p->m_vRot.z += p->m_vRotSpeed.z * D_800B6D28;
-    D_800F1ADC->direction = p->m_vVelocity;
+    D_800F1ADC->m_vVelocity = p->m_vVelocity;
     func_002323E0(p);
     func_0022A4C8(p);
     if ((p->m_Gravity == 0.0f || (p->header.m_vPos.y == 0.0f && p->m_Gravity < 0.0f))
@@ -286,32 +263,32 @@ void func_0022AFB4(CParticle *p) {
     }
     if (!(p->m_dwFlags & 0x72000)) {
         die = func_00239F00(p, p->header.m_vPos, &p->m_dwHitFlags);
-        if (p->header.m_nObjType == 0x68 && D_800F1CE0.current != NULL) {
-            p->m_pTarget = (CGameObjectInstance *)D_800F1CE0.current;
+        if (p->header.m_nObjType == 0x68 && D_800F1CE0.m_pInstance != NULL) {
+            p->m_pTarget = (CGameObjectInstance *)D_800F1CE0.m_pInstance;
         }
         if (die) {
-            if (D_800F1CE0.current != NULL) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.origin);
-            } else if (D_800F1CE0.unk88 != 0) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.unk90);
-            } else if (D_800F1CE0.unk9C != 0) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.unkA0);
-            } else if (D_800F1CE0.unkB4 != 0) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.unkB8);
+            if (D_800F1CE0.m_pInstance != NULL) {
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vInstancePos);
+            } else if (D_800F1CE0.m_pShape != 0) {
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vShapePos);
+            } else if (D_800F1CE0.m_pWallRegion != 0) {
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vWallPos);
+            } else if (D_800F1CE0.m_pFloorRegion != 0) {
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vFloorPos);
                 if (p->m_Alignment == -7) {
                     p->m_Alignment = -3;
                 }
-            } else if (D_800F1CE0.unkC4 != 0) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.unkC8);
+            } else if (D_800F1CE0.m_pWaterRegion != 0) {
+                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vWaterPos);
             }
             func_0020F040(&p->m_vDirection);
         }
         func_0022AAE0(p);
-        if (D_800F1CE0.unkC4 != 0) {
+        if (D_800F1CE0.m_pWaterRegion != 0) {
             func_0022BD10(p);
         }
         if (p->m_dwFlags & 0x100) {
-            if (D_800F1CE0.unk9C != 0) {
+            if (D_800F1CE0.m_pWallRegion != 0) {
                 if (!(p->m_pEffect->m_dwFlags & 0x10000000)) {
                     func_0022BA88(p);
                 }
@@ -320,15 +297,15 @@ void func_0022AFB4(CParticle *p) {
                 }
             }
             if (p->m_dwFlags & 0x100) {
-                if (D_800F1CE0.current != NULL) {
-                    if ((p->m_dwHitFlags & 0x1000000) && D_800F1CE0.current->kind == 0) {
+                if (D_800F1CE0.m_pInstance != NULL) {
+                    if ((p->m_dwHitFlags & 0x1000000) && D_800F1CE0.m_pInstance->header.m_Type == 0) {
                         func_0022CA90(p);
                     } else {
                         func_0022C488(p);
                     }
                 }
-                if ((p->m_dwFlags & 0x100) && D_800F1CE0.unkB0 != 0 && !(p->m_pEffect->m_dwFlags & 0x20000000)) {
-                    if (D_800F1CE0.unkB0 == 1) {
+                if ((p->m_dwFlags & 0x100) && D_800F1CE0.m_nFloorKind != 0 && !(p->m_pEffect->m_dwFlags & 0x20000000)) {
+                    if (D_800F1CE0.m_nFloorKind == 1) {
                         func_0022BFA0(p);
                     } else {
                         func_0022C228(p);

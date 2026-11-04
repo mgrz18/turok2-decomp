@@ -2,23 +2,16 @@
 
 #include "common.h"
 #include "structs/particle.h"
+#include "structs/collision.h"
 
 typedef struct Target Target;
-
-/* The point of the last collision test (D_800F1CE0 + 8). */
-typedef struct CollisionPoint {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ u8 padC[0xDC - 0xC];
-    /* 0xDC */ CVector3 normal;
-} CollisionPoint;
 
 typedef struct EffectInfo {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[4];
 } EffectInfo;
 
-extern Target *D_800F1CE0;              /* the target hit */
-extern CollisionPoint D_800F1CE8;
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 extern CVector3 D_800F1DB8;                /* the direction of the hit */
 extern u8 D_8011AAF1;
 extern EffectInfo D_800AD084[];
@@ -47,7 +40,7 @@ void func_00232B40(CParticle *p);
 static __inline__ void placeAtHit(CParticle *p) {
     CVector3 dir;
 
-    p->header.m_vPos = D_800F1CE8.pos;
+    p->header.m_vPos = D_800F1CE0.m_vInstancePos;
     p->m_vVelocity = D_800F1DB8;
     dir = D_800F1DB8;
     func_0020F040(&dir);
@@ -67,7 +60,7 @@ void func_0022CA90(CParticle *p) {
     CROMParticleEffect *definition;
     s32 kind;
 
-    source = D_800F1CE0;
+    source = (Target *)D_800F1CE0.m_pInstance;
     definition = p->m_pEffect;
     kind = func_00245724(source);
     if (kind == 5) {
@@ -103,7 +96,7 @@ void func_0022CA90(CParticle *p) {
         case 2:
         case 3:
             if (definition->m_dwFlags & 0x800000) {
-                func_002364A4(D_801102B8, D_800F1CE8.pos, D_800F1CE8.normal, kind, 0);
+                func_002364A4(D_801102B8, D_800F1CE0.m_vInstancePos, D_800F1CE0.m_vNormal, kind, 0);
             }
             break;
     }
@@ -123,7 +116,7 @@ void func_0022CA90(CParticle *p) {
             p->m_pDLight = NULL;
         }
     }
-    normal = D_800F1CE8.normal;
+    normal = D_800F1CE0.m_vNormal;
     func_0020F040(&normal);
     func_0020EF60(&normal, &normal, 1.024f);
     func_0020EEF8(&p->header.m_vPos, &p->header.m_vPos, &normal);
@@ -140,13 +133,13 @@ void func_0022CA90(CParticle *p) {
             if (D_800AD084[effect].flags & 2) {
                 eventSource = p;
             }
-            func_00236EA0(eventSource, p, effect, -1, D_800F1CE8.pos, params);
+            func_00236EA0(eventSource, p, effect, -1, D_800F1CE0.m_vInstancePos, params);
         }
         if (model != 0xFFFF) {
             func_00229340(p, model, -8, 1);
         }
         if (sound != 0xFFFF) {
-            func_00275544(sound, D_800F1CE8.pos, 0, -1);
+            func_00275544(sound, D_800F1CE0.m_vInstancePos, 0, -1);
         }
     }
     if (!(p->m_dwFlags & 0x30000) && p->m_bDieOnImpact == 1) {

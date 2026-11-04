@@ -1,14 +1,9 @@
 #include "common.h"
 #include "structs/particle.h"
-
-/* Spawn parameters next to each other in .data. */
-typedef struct {
-    /* 0x0 */ s32 arg;
-    /* 0x4 */ CVector3 pos;
-} SpawnParams;
+#include "structs/collision.h"
 
 extern u8 D_800F8928[];
-extern SpawnParams D_800F1D94;
+extern CCollisionResults D_800F1CE0;  /* the last collision test: the spawn lands on its floor hit */
 extern CVector3 D_800F1DB8;
 void func_0020E810(CQuaternion *out, CVector3 *dir);
 s32 func_0022F350(void *table, void *actor, void *owner, s32 *ownerCount, void *target, s32 kind, CVector3 origin,
@@ -25,5 +20,5 @@ void func_00231B2C(CParticle *actor, s32 kind) {
     }
     func_0020E810(&rot, &origin);
     func_0022F350(D_800F8928, actor, actor->m_pOwner, actor->m_pOwnerCount, actor->m_pTarget, kind, origin, rot,
-                  D_800F1D94.pos, D_800F1D94.arg, -2, (actor->m_dwFlags & 0x200006) | 1);
+                  D_800F1CE0.m_vFloorPos, (s32)D_800F1CE0.m_pFloorRegion, -2, (actor->m_dwFlags & 0x200006) | 1);
 }

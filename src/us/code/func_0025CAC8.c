@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "structs/collision.h"
 
 /* AI hit callback: a projectile (or its owner) close enough lengthens the
  * wait and becomes the last-heard position; then the projectile type picks a
@@ -17,18 +18,11 @@ typedef struct Projectile {
     /* 0x1BC */ f32 charge;
 } Projectile;
 
-typedef struct {
-    /* 0x00 */ s32 hit;
-    /* 0x04 */ u8 pad4[0x7D - 0x4];
-    /* 0x7D */ u8 surface;
-    /* 0x7E */ u8 pad7E[0xE4 - 0x7E];
-    /* 0xE4 */ CVector3 normal;
-} CollisionResult;
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 extern CVector3 D_800B06AC;
-extern CollisionResult D_800F1CE0;
+extern CCollisionResults D_800F1CE0;
 
 extern f32 func_0020F6BC(CVector3 *a, CVector3 *b);
 extern void func_00243414(CGameObjectInstance *actor, CAI *ai, s32 anim);
@@ -145,7 +139,7 @@ void func_0025CAC8(CGameObjectInstance *actor, CAI *ai, Projectile *proj) {
         break;
     case 11:
     case 0x129:
-        if (D_800F1CE0.hit != 0 && (D_800F1CE0.surface & 3) == 1) {
+        if (D_800F1CE0.m_pInstance != 0 && (D_800F1CE0.m_Frame.flags & 3) == 1) {
             if (info->m_dwFlags & 0x400) {
                 func_00275544(0x1AB, actor->header.m_vPos, 0, -1);
                 if (ai->m_Mode == 0x21) {
@@ -160,7 +154,7 @@ void func_0025CAC8(CGameObjectInstance *actor, CAI *ai, Projectile *proj) {
                     delay = level * -15.0f + 75.0f;
                     ai->m_ConditionTimer += delay;
                 } else {
-                    ai->m_vBoreCollNormal = D_800F1CE0.normal;
+                    ai->m_vBoreCollNormal = D_800F1CE0.m_vNormal;
                     func_00243414(actor, ai, 0x21);
                 }
             } else if (info->m_dwFlags & 0x2000) {

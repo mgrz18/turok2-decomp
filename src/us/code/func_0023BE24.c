@@ -1,23 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
-
-typedef struct SweepDef {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ s16 unk4;
-    /* 0x06 */ s8 onGround;
-} SweepDef;
-
-/* A segment swept from an instance's position to end. */
-typedef struct Sweep {
-    /* 0x00 */ CGameObjectInstance *obj;
-    /* 0x04 */ SweepDef *def;
-    /* 0x08 */ u8 pad8[0x44];
-    /* 0x4C */ CVector3 end;
-    /* 0x58 */ u8 pad58[0x3C];
-    /* 0x94 */ s32 onGround;
-    /* 0x98 */ s32 checkRegionInfo;
-} Sweep;
+#include "structs/collision.h"
 
 extern s32 D_800F7078[];
 
@@ -52,7 +36,7 @@ void func_0023BE24(Sweep *sweep) {
     f32 x;
     s32 flag;
 
-    if (sweep->def->flags & 0x01000000) {
+    if (sweep->def->m_dwFlags & 0x01000000) {
         sweep->onGround = 0;
         return;
     }
@@ -62,12 +46,12 @@ void func_0023BE24(Sweep *sweep) {
         if (info != NULL && (info->m_dwFlags & 0x4000)) {
             flag = 0;
         } else {
-            flag = sweep->def->onGround;
+            flag = sweep->def->m_GroundBehavior;
         }
     } else {
-        flag = sweep->def->onGround;
+        flag = sweep->def->m_GroundBehavior;
     }
-    if (!(sweep->def->flags & 0x8000)) {
+    if (!(sweep->def->m_dwFlags & 0x8000)) {
         sweep->onGround = 0;
         return;
     }
@@ -89,7 +73,7 @@ void func_0023BE24(Sweep *sweep) {
             }
         } else {
             allowed = 0;
-            if ((sweep->def->flags & 0x10000) || func_00267EE8(obj)) {
+            if ((sweep->def->m_dwFlags & 0x10000) || func_00267EE8(obj)) {
                 allowed = 1;
             }
             if (allowed == 0) {

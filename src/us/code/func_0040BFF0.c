@@ -1,8 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
-/* When the player (D_800F1CE0) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
+/* When the instance the last collision test hit (D_800F1CE0) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
  * away from the point (0, 0, 512) (and upward) and deals it 0x500 damage. */
 
 typedef struct {
@@ -15,11 +16,7 @@ typedef struct {
     /* 0x140 */ u8 ai[1];
 } Player;
 
-typedef struct {
-    u8 data[0x18];
-} DamageEvent;
-
-extern Player *D_800F1CE0;
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a + b */
 extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
@@ -30,7 +27,7 @@ extern void func_002465C8(Player *target, void *ai, DamageEvent *event);
 void func_0040BFF0(CGameObjectInstance *obj, CAI *ai) {
     DamageEvent event;
     CVector3 dir;
-    Player *player = D_800F1CE0;
+    Player *player = (Player *)D_800F1CE0.m_pInstance;
 
     if (player != NULL && player->kind == 1 && (player->flags & 0x300000) && ai->m_Health != 0 &&
         (ai->m_Mode == 0xE || ai->m_Mode == 0xF) && (player == ai->m_pSightTarget || player == ai->m_pPathTarget)) {

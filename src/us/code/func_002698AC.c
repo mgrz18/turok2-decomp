@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
 typedef struct ObjectHead {
@@ -18,14 +19,7 @@ typedef struct CollisionInfo {
     /* 0x06 */ u8 pad6[0x1C - 0x6];
 } CollisionInfo; /* size 0x1C */
 
-/* The result of the last collision test. */
-typedef struct CollisionResult {
-    /* 0x00 */ void *hit;
-    /* 0x04 */ u8 pad4[0x9C - 0x4];
-    /* 0x9C */ void *hit2;
-} CollisionResult;
-
-extern CollisionResult D_800F1CE0;
+extern CCollisionResults D_800F1CE0;
 
 s32 func_00239F00(ObjectHead *obj, CVector3 to, CollisionInfo *info);
 
@@ -42,7 +36,7 @@ s32 func_002698AC(ObjectHead *obj, CVector3 to, CollisionInfo *info) {
     func_00239F00(obj, to, &probe);
     *obj = saved;
     hit = 0;
-    if (D_800F1CE0.hit != NULL || D_800F1CE0.hit2 != NULL) {
+    if (D_800F1CE0.m_pInstance != NULL || D_800F1CE0.m_pWallRegion != NULL) {
         hit = 1;
     }
     return hit ^ 1;

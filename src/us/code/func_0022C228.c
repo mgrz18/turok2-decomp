@@ -3,6 +3,9 @@
 #include "structs/particle.h"
 
 extern s32 func_0026C114(void *region);
+/* D_800F1D94 / D_800F1D98 are CCollisionResults (D_800F1CE0, structs/collision.h)
+ * m_pFloorRegion and m_vFloorPos; kept as their own symbols: reading them
+ * through D_800F1CE0 does not give this code. */
 extern s32 D_800F1D94;
 extern CVector3 D_800F1D98;
 extern void func_00236EA0(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);

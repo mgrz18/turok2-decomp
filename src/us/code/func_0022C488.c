@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/particle.h"
+#include "structs/collision.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -26,24 +27,12 @@ struct Target {
     /* 0x12B0 */ s32 extraUses;
 };
 
-/* The result of the last collision test. */
-typedef struct CollisionResult {
-    /* 0x00 */ Target *current;
-    /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ CVector3 origin;
-    /* 0x14 */ s32 frame;
-    /* 0x18 */ u8 pad18[0x7E - 0x18];
-    /* 0x7E */ u8 mode;
-    /* 0x7F */ u8 pad7F[0xD8 - 0x7F];
-    /* 0xD8 */ CVector3 direction;
-} CollisionResult;
-
 typedef struct EffectInfo {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[4];
 } EffectInfo;
 
-extern CollisionResult D_800F1CE0;
+extern CCollisionResults D_800F1CE0;
 extern u8 D_800F1D5D;
 extern u8 D_8011AAF1;
 extern EffectInfo D_800AD084[];
@@ -77,28 +66,28 @@ static __inline__ void attachParticle(CParticle *p, f32 *transform, s32 action) 
     f32 inverse[16];
     CVector3 direction;
     Target *attached;
-    CollisionResult *scene;
+    CCollisionResults *scene;
 
-    attached = D_800F1CE0.current;
+    attached = (Target *)D_800F1CE0.m_pInstance;
     if (transform) {
         func_0020C208(inverse, transform);
     } else {
-        func_0020D908(localTransform, &attached->bones[D_800F1CE0.frame]);
+        func_0020D908(localTransform, &attached->bones[D_800F1CE0.m_nInstanceNode]);
         func_0020C208(inverse, localTransform);
     }
     scene = &D_800F1CE0;
-    func_0020F85C(inverse, &scene->origin, &p->m_vAttachPos);
-    direction = scene->direction;
+    func_0020F85C(inverse, &scene->m_vInstancePos, &p->m_vAttachPos);
+    direction = scene->m_vVelocity;
     func_0020F040(&direction);
     func_0020FAFC(inverse, &direction, &p->m_vVelocity);
     p->m_dwFlags |= 0x10000;
     p->m_pTarget = (CGameObjectInstance *)attached;
-    p->m_nBone = D_800F1CE0.frame;
+    p->m_nBone = D_800F1CE0.m_nInstanceNode;
     if (attached->def->m_Type == 1) {
         if (p->m_pOwner != NULL) {
             func_0025E52C(attached, &attached->aiFlags, &p->m_pOwner->header.m_vPos, 3);
         } else {
-            func_0025E52C(attached, &attached->aiFlags, &D_800F1CE0.origin, 3);
+            func_0025E52C(attached, &attached->aiFlags, &D_800F1CE0.m_vInstancePos, 3);
         }
     }
     if (p->header.m_nObjType == 0x56 && action == 2) {
@@ -130,7 +119,7 @@ void func_0022C488(CParticle *p) {
     s32 extraEffect;
     u16 type;
 
-    source = D_800F1CE0.current;
+    source = (Target *)D_800F1CE0.m_pInstance;
     enabled = 1;
     special = 0;
     def = p->m_pEffect;
@@ -142,17 +131,17 @@ void func_0022C488(CParticle *p) {
     if (p->header.m_pCurrentRegion == NULL) {
         p->header.m_pCurrentRegion = (struct CGameRegion *)source->unk10;
     }
-    if (D_800F1CE0.frame != -1) {
-        action = D_800F1CE0.mode;
+    if (D_800F1CE0.m_nInstanceNode != -1) {
+        action = D_800F1CE0.m_Frame.action;
         if (p->header.m_nObjType == 13) {
             action = 4;
         }
-        owner = D_800F1CE0.current;
+        owner = (Target *)D_800F1CE0.m_pInstance;
         if (owner->flags & 0x3000000) {
-            func_0020D908(boneMatrix, &owner->bones[D_800F1CE0.frame]);
+            func_0020D908(boneMatrix, &owner->bones[D_800F1CE0.m_nInstanceNode]);
             if (owner->flags & 0x1000000) {
-                func_0021B39C(owner, &owner->aiFlags, boneMatrix, D_800F1CE0.origin, D_800F1CE0.direction,
-                              D_800F1CE0.frame);
+                func_0021B39C(owner, &owner->aiFlags, boneMatrix, D_800F1CE0.m_vInstancePos, D_800F1CE0.m_vVelocity,
+                              D_800F1CE0.m_nInstanceNode);
             }
             if (owner->flags & 0x2000000) {
                 type = p->header.m_nObjType;
@@ -214,7 +203,7 @@ void func_0022C488(CParticle *p) {
         if (D_800AD084[effect].flags & 2) {
             other = p;
         }
-        func_00236EA0(other, p, effect, -1, D_800F1CE0.origin, primary);
+        func_00236EA0(other, p, effect, -1, D_800F1CE0.m_vInstancePos, primary);
     }
     if (action != 4) {
         draw = 1;
@@ -234,7 +223,7 @@ void func_0022C488(CParticle *p) {
                     if (D_800AD084[extraEffect].flags & 2) {
                         other = p;
                     }
-                    func_00236EA0(other, p, extraEffect, -1, D_800F1CE0.origin, secondary);
+                    func_00236EA0(other, p, extraEffect, -1, D_800F1CE0.m_vInstancePos, secondary);
                 }
             }
         }
@@ -243,7 +232,7 @@ void func_0022C488(CParticle *p) {
         func_00229340(p, model, -8, enabled);
     }
     if (sound != 0xFFFF) {
-        func_00275544((s16) sound, D_800F1CE0.origin, 0, -1);
+        func_00275544((s16) sound, D_800F1CE0.m_vInstancePos, 0, -1);
     }
     if (!(p->m_dwFlags & 0x30000)) {
         if (mode == 1 || (effect != 0xFFFF && (D_800AD084[effect].flags & 1))) {

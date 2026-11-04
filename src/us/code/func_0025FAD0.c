@@ -1,13 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct {
-    /* 0x00 */ void *target;
-    /* 0x04 */ s32 damage;
-    /* 0x08 */ f32 radius;
-    /* 0x0C */ s32 flags;
-    /* 0x10 */ void *shield;
-} DamageEvent;
+#include "structs/collision.h"
 
 extern f32 D_800B6D28; /* frame delta */
 

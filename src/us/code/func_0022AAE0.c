@@ -2,16 +2,12 @@
 
 #include "common.h"
 #include "structs/particle.h"
+#include "structs/collision.h"
 
-typedef struct CollisionState {
-    /* 0x00 */ u8 kind;
-} CollisionState;
-
-extern s32 D_800F1D7C;
-extern CollisionState *D_800F1CE0;
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 
 void func_0026E19C(s32 state, s32 bits, CParticle *p);
-void func_0026E110(CollisionState *state, s32 bits, CParticle *p);
+void func_0026E110(CGameObjectInstance *inst, s32 bits, CParticle *p);
 
 static __inline__ s32 isGroupA(CParticle *p) {
     switch (p->header.m_nObjType) {
@@ -54,47 +50,47 @@ static __inline__ s32 isGroupC(CParticle *p) {
  * one set of bits when its owner is a kind 1 object flagged 0x300000, otherwise with
  * another when its descriptor is of kind 1 or 4. */
 void func_0022AAE0(CParticle *p) {
-    if (D_800F1D7C != 0) {
+    if (D_800F1CE0.m_pWallRegion != 0) {
         CGameObjectInstance *owner = p->m_pOwner;
 
         if (owner != NULL && owner->header.m_Type == 1 && (owner->m_dwFlags & 0x300000)) {
             if (isGroupA(p)) {
-                func_0026E19C(D_800F1D7C, 0x10, p);
+                func_0026E19C((s32)D_800F1CE0.m_pWallRegion, 0x10, p);
             }
             if (isGroupB(p)) {
-                func_0026E19C(D_800F1D7C, 8, p);
+                func_0026E19C((s32)D_800F1CE0.m_pWallRegion, 8, p);
             }
             if (isGroupC(p)) {
-                func_0026E19C(D_800F1D7C, 0x20, p);
+                func_0026E19C((s32)D_800F1CE0.m_pWallRegion, 0x20, p);
             }
         } else if (p->header.m_pIntelligence->m_Type == 1 || p->header.m_pIntelligence->m_Type == 4) {
             if (isGroupC(p)) {
-                func_0026E19C(D_800F1D7C, 0x200, p);
+                func_0026E19C((s32)D_800F1CE0.m_pWallRegion, 0x200, p);
             }
         }
     }
-    if (D_800F1CE0 != NULL && D_800F1CE0->kind == 1) {
+    if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
         CGameObjectInstance *owner = p->m_pOwner;
 
         if (owner != NULL && owner->header.m_Type == 1 && (owner->m_dwFlags & 0x300000)) {
             if (isGroupA(p)) {
-                func_0026E110(D_800F1CE0, 8, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 8, p);
             }
             if (isGroupB(p)) {
-                func_0026E110(D_800F1CE0, 4, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 4, p);
             }
             if (isGroupC(p)) {
-                func_0026E110(D_800F1CE0, 0x10, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 0x10, p);
             }
         } else if (p->header.m_pIntelligence->m_Type == 1 || p->header.m_pIntelligence->m_Type == 4) {
             if (isGroupA(p)) {
-                func_0026E110(D_800F1CE0, 0x80, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 0x80, p);
             }
             if (isGroupB(p)) {
-                func_0026E110(D_800F1CE0, 0x40, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 0x40, p);
             }
             if (isGroupC(p)) {
-                func_0026E110(D_800F1CE0, 0x100, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 0x100, p);
             }
         }
     }

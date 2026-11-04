@@ -1,106 +1,32 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
+#include "structs/collision.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-/* What moves: the start of any instance (actor, particle, pickup...). */
-typedef struct Mover {
-    /* 0x000 */ u8 type;
-    /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ CGameRegion *region;
-    /* 0x014 */ u8 pad14[4];
-    /* 0x018 */ CVector3 vel;
-    /* 0x024 */ u8 pad24[0xC];
-    /* 0x030 */ s32 attached;
-    /* 0x034 */ u8 pad34[0x10C];
-    /* 0x140 */ s32 aiFlags;
-} Mover;
-
-/* How an instance collides and moves. */
-typedef struct CollisionDef {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ s8 unk4;
-    /* 0x05 */ s8 unk5;
-    /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ f32 gravity;
-    /* 0x0C */ u8 padC[4];
-    /* 0x10 */ f32 friction;
-    /* 0x14 */ f32 drag;
-    /* 0x18 */ f32 waterDrag;
-} CollisionDef;
-
-/* One collision test's result (cleared by func_0023C0FC, copied out by
- * func_0023C120). */
-typedef struct Hit {
-    /* 0x00 */ f32 fraction;            /* of the move done */
-    /* 0x04 */ s32 type;                /* 0 none, 1 slide, 2 and 3 hit */
-    /* 0x08 */ CVector3 vel;
-    /* 0x14 */ CVector3 slideTo;
-    /* 0x20 */ CVector3 pos;
-    /* 0x2C */ CVector3 *posOut;
-    /* 0x30 */ s32 *unk30;
-    /* 0x34 */ s32 *unk34;
-    /* 0x38 */ s32 unk38;
-    /* 0x3C */ s32 *unk3C;
-    /* 0x40 */ s32 unk40;
-} Hit;
-
-/* A segment swept from an instance's position to end (see func_0023BE24). */
-typedef struct Sweep {
-    /* 0x00 */ Mover *obj;
-    /* 0x04 */ CollisionDef *def;
-    /* 0x08 */ Hit hit;
-    /* 0x4C */ CVector3 end;
-    /* 0x58 */ CVector3 delta;
-    /* 0x64 */ CVector3 unk64;
-    /* 0x70 */ CVector3 unk70;
-    /* 0x7C */ f32 unk7C;
-    /* 0x80 */ f32 unk80;
-    /* 0x84 */ s32 unk84;
-    /* 0x88 */ s32 unk88;
-    /* 0x8C */ s32 more;                /* another pass follows */
-    /* 0x90 */ s32 physics;
-    /* 0x94 */ s32 onGround;
-    /* 0x98 */ s32 checkRegionInfo;
-    /* 0x9C */ s32 stop;
-    /* 0xA0 */ s32 unkA0;
-    /* 0xA4 */ u8 padA4[4];
-} Sweep;
-
-typedef struct CollisionOut {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ CVector3 unk8;
-    /* 0x14 */ u8 pad14[0x88];
-    /* 0x9C */ s32 unk9C;
-    /* 0xA0 */ CVector3 unkA0;
-    /* 0xAC */ u8 padAC[0x2C];
-    /* 0xD8 */ CVector3 vel;
-} CollisionOut;
-
 extern s32 D_800F7078[];
 extern f32 D_800B6D28;                  /* frame time, in 15ths of a second */
-extern CollisionOut *D_800F1ADC;
+extern CCollisionResults *D_800F1ADC;
 extern void (*D_800AD190[])(Sweep *);   /* the collision tests, NULL-ended */
-extern CollisionDef D_800F1E10;
-extern CollisionDef D_800F1CC0;
-extern CollisionDef D_800F1AE0;
-extern CollisionDef D_800F1C60;
+extern CCollisionInfo D_800F1E10;
+extern CCollisionInfo D_800F1CC0;
+extern CCollisionInfo D_800F1AE0;
+extern CCollisionInfo D_800F1C60;
 
 CRegionInfo *func_0022425C(s32 *list, CGameRegion *region);
-void func_00241894(CollisionDef *def);
+void func_00241894(CCollisionInfo *def);
 void func_0023BE24(Sweep *sweep);
 void func_0020EF60(CVector3 *out, CVector3 *v, f32 k);
-void func_0023C0FC(Hit *hit);
+void func_0023C0FC(SweepHit *hit);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_0023C120(Hit *hit, Mover *obj);
-f32 func_0026872C(Mover *obj, s32 arg1);
+void func_0023C120(SweepHit *hit, CGameObjectInstance *obj);
+f32 func_0026872C(CGameObjectInstance *obj, s32 arg1);
 s32 func_0023C188(Sweep *sweep, CGameRegion *region);
 
 /* Moves obj to pos through the collision tests, in up to 100 slides, and
  * returns the number of hits. */
-s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
+s32 func_00239F00(CGameObjectInstance *obj, CVector3 pos, CCollisionInfo *def) {
     Sweep sweep;
     CVector3 accel;
     CRegionInfo *info;
@@ -119,11 +45,11 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
     f32 ground;
     f32 dy;
 
-    info = func_0022425C(D_800F7078, obj->region);
+    info = func_0022425C(D_800F7078, obj->header.m_pCurrentRegion);
     if (def != &D_800F1E10 && def != &D_800F1CC0 && def != &D_800F1AE0 && def != &D_800F1C60) {
-        obj->attached = 0;
-        if (obj->type == 1) {
-            obj->aiFlags &= ~0x30000;
+        obj->m_pInstanceBelow = 0;
+        if (obj->header.m_Type == 1) {
+            obj->m_AI.m_dwFlags &= ~0x30000;
         }
     }
     func_00241894(def);
@@ -135,26 +61,26 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
     sweep.end = pos;
     sweep.stop = 0;
     sweep.unkA0 = 0;
-    sweep.unk84 = 0;
+    sweep.lastKind = 0;
     dt = D_800B6D28 * (1.0f / 15);
-    if (def->flags & 4) {
+    if (def->m_dwFlags & 4) {
         passes = 1;
-    } else if (def->flags & 0x200000) {
+    } else if (def->m_dwFlags & 0x200000) {
         passes = 3;
     } else {
         passes = 2;
     }
     physics = 0;
-    if ((def->flags & 0x4000) && dt != 0.0f) {
+    if ((def->m_dwFlags & 0x4000) && dt != 0.0f) {
         physics = 1;
     }
     sweep.physics = physics;
-    startY = obj->pos.y;
+    startY = obj->header.m_vPos.y;
     if (physics) {
-        drag = def->drag;
-        if (def->waterDrag != drag && obj->region != NULL && (obj->region->m_wFlags & 1) && info != NULL
+        drag = def->m_AirFriction;
+        if (def->m_WaterFriction != drag && obj->header.m_pCurrentRegion != NULL && (obj->header.m_pCurrentRegion->m_wFlags & 1) && info != NULL
             && startY < info->m_WaterHeight) {
-            drag = def->waterDrag;
+            drag = def->m_WaterFriction;
         }
         drag *= 15.0f;
         max = 1.0f / dt;
@@ -163,23 +89,23 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
         }
         if (drag == 0.0f) {
             accel.x = 0.0f;
-            accel.y = def->gravity;
+            accel.y = def->m_GravityAcceleration;
             accel.z = 0.0f;
         } else {
-            accel.x = -obj->vel.x * drag;
-            accel.y = -obj->vel.y * drag + def->gravity;
-            accel.z = -obj->vel.z * drag;
+            accel.x = -obj->m_vVelocity.x * drag;
+            accel.y = -obj->m_vVelocity.y * drag + def->m_GravityAcceleration;
+            accel.z = -obj->m_vVelocity.z * drag;
         }
         half = dt * 0.5f;
-        sweep.end.x += (obj->vel.x + accel.x * half) * dt;
-        sweep.end.y += (obj->vel.y + accel.y * half) * dt;
-        sweep.end.z += (obj->vel.z + accel.z * half) * dt;
-        obj->vel.x += accel.x * dt;
-        obj->vel.y += accel.y * dt;
-        obj->vel.z += accel.z * dt;
-        D_800F1ADC->vel = obj->vel;
+        sweep.end.x += (obj->m_vVelocity.x + accel.x * half) * dt;
+        sweep.end.y += (obj->m_vVelocity.y + accel.y * half) * dt;
+        sweep.end.z += (obj->m_vVelocity.z + accel.z * half) * dt;
+        obj->m_vVelocity.x += accel.x * dt;
+        obj->m_vVelocity.y += accel.y * dt;
+        obj->m_vVelocity.z += accel.z * dt;
+        D_800F1ADC->m_vVelocity = obj->m_vVelocity;
     }
-    if (obj->pos.x == sweep.end.x && obj->pos.y == sweep.end.y && obj->pos.z == sweep.end.z) {
+    if (obj->header.m_vPos.x == sweep.end.x && obj->header.m_vPos.y == sweep.end.y && obj->header.m_vPos.z == sweep.end.z) {
         return 0;
     }
     if (info != NULL) {
@@ -190,13 +116,13 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
     sweep.more = hits + 1 < passes;
     func_0023BE24(&sweep);
     if (sweep.onGround && sweep.physics) {
-        func_0020EF60(&obj->vel, &obj->vel, (def->friction > 1.0f) ? 0.0f : 1.0f - def->friction);
+        func_0020EF60(&obj->m_vVelocity, &obj->m_vVelocity, (def->m_GroundFriction > 1.0f) ? 0.0f : 1.0f - def->m_GroundFriction);
     }
     do {
         func_0023C0FC(&sweep.hit);
-        func_0020EF2C(&sweep.delta, &sweep.end, &obj->pos);
+        func_0020EF2C(&sweep.delta, &sweep.end, &obj->header.m_vPos);
         if (sweep.physics) {
-            sweep.hit.vel = obj->vel;
+            sweep.hit.vel = obj->m_vVelocity;
         }
         if (D_800AD190[0] != NULL && !sweep.stop) {
             i = 0;
@@ -210,26 +136,26 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
             case 3:
                 hits++;
             case 1:
-                obj->pos = sweep.hit.pos;
+                obj->header.m_vPos = sweep.hit.pos;
                 func_0023C120(&sweep.hit, obj);
                 if (sweep.physics) {
-                    obj->vel = sweep.hit.vel;
+                    obj->m_vVelocity = sweep.hit.vel;
                 }
-                sweep.unk84 = sweep.unk88;
-                sweep.unk64 = sweep.unk70;
-                sweep.unk7C = sweep.unk80;
+                sweep.lastKind = sweep.kind;
+                sweep.lastContact = sweep.contact;
+                sweep.lastRadius = sweep.radius;
                 break;
             case 0:
-                obj->pos = sweep.end;
+                obj->header.m_vPos = sweep.end;
                 break;
         }
-        if ((def->flags & 0x800000) && D_800F1ADC->unk9C != 0) {
+        if ((def->m_dwFlags & 0x800000) && D_800F1ADC->m_pWallRegion != 0) {
             return hits;
         }
         remaining -= sweep.hit.fraction * remaining;
         if (sweep.onGround) {
             ground = func_0026872C(obj, 0);
-            obj->pos.y = (obj->pos.y <= ground) ? ground : obj->pos.y;
+            obj->header.m_vPos.y = (obj->header.m_vPos.y <= ground) ? ground : obj->header.m_vPos.y;
         }
         more = 0;
         if (sweep.hit.type == 1 || sweep.hit.type == 3) {
@@ -243,12 +169,12 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
         iter++;
     } while (more && iter < 100 && hits < passes);
 
-    if (def->unk5 != 0 && !(def->flags & 0x01000000) && func_0023C188(&sweep, obj->region)) {
+    if (def->m_WallBehavior != 0 && !(def->m_dwFlags & 0x01000000) && func_0023C188(&sweep, obj->header.m_pCurrentRegion)) {
         if (remaining > 0.01f) {
-            if (sweep.hit.posOut == &D_800F1ADC->unk8) {
-                more = def->unk4 != 1;
-            } else if (sweep.hit.posOut == &D_800F1ADC->unkA0) {
-                more = def->unk5 != 1;
+            if (sweep.hit.posOut == &D_800F1ADC->m_vInstancePos) {
+                more = def->m_InstanceBehavior != 1;
+            } else if (sweep.hit.posOut == &D_800F1ADC->m_vWallPos) {
+                more = def->m_WallBehavior != 1;
             } else {
                 more = 0;
             }
@@ -256,12 +182,12 @@ s32 func_00239F00(Mover *obj, CVector3 pos, CollisionDef *def) {
             more = 0;
         }
         ground = func_0026872C(obj, 0);
-        obj->pos.y = MAX(ground, more ? sweep.end.y : obj->pos.y);
+        obj->header.m_vPos.y = MAX(ground, more ? sweep.end.y : obj->header.m_vPos.y);
     }
-    if (sweep.onGround && sweep.physics && dt != 0.0f && def->gravity != 0.0f) {
-        dy = obj->pos.y - startY;
+    if (sweep.onGround && sweep.physics && dt != 0.0f && def->m_GravityAcceleration != 0.0f) {
+        dy = obj->header.m_vPos.y - startY;
         if (dy < 204.79999f) {
-            obj->vel.y = dy / dt;
+            obj->m_vVelocity.y = dy / dt;
         }
     }
     return hits;

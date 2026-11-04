@@ -1,11 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/world.h"
-
-typedef struct Bounds {
-    CVector3 min;                   /* 0x00 */
-    CVector3 max;                   /* 0x0C */
-} Bounds;
+#include "structs/collision.h"
 
 typedef struct InstDef {
     s32 pad0;
@@ -16,7 +12,7 @@ typedef struct Instance {
     u8 pad0[0x14];
     InstDef *def;               /* 0x14 */
     u8 pad18[0x68 - 0x18];
-    Bounds bounds;              /* 0x68 */
+    CBox bounds;              /* 0x68 */
     u8 pad80[0x90 - 0x80];
 } Instance;                     /* 0x90 bytes */
 
@@ -26,7 +22,7 @@ typedef struct LevelActor {
     u8 pad10[0x14 - 0x10];
     InstDef *def;               /* 0x014 */
     u8 pad18[0x14C - 0x18];
-    Bounds bounds;              /* 0x14C */
+    CBox bounds;              /* 0x14C */
     u8 pad164[0x16C - 0x164];
     u16 flags;                  /* 0x16C */
     u8 pad16E[0x178 - 0x16E];
@@ -41,7 +37,7 @@ typedef struct List {
 
 extern s32 D_8011AAE0;          /* visible layers */
 extern s32 D_800ACADC;
-extern Bounds D_800F5A10;       /* visible bounds */
+extern CBox D_800F5A10;       /* visible bounds */
 
 void *func_002017D4(void *table, s32 index);
 void func_00214E88(Instance *inst);
@@ -83,9 +79,9 @@ void func_00221A24(CWorld *world) {
             if (!(inst->def->mask & layers)) {
                 continue;
             }
-            if (D_800F5A10.max.x > inst->bounds.min.x && D_800F5A10.min.x < inst->bounds.max.x
-                && D_800F5A10.max.z > inst->bounds.min.z && D_800F5A10.min.z < inst->bounds.max.z
-                && D_800F5A10.max.y > inst->bounds.min.y && D_800F5A10.min.y < inst->bounds.max.y) {
+            if (D_800F5A10.m_vMax.x > inst->bounds.m_vMin.x && D_800F5A10.m_vMin.x < inst->bounds.m_vMax.x
+                && D_800F5A10.m_vMax.z > inst->bounds.m_vMin.z && D_800F5A10.m_vMin.z < inst->bounds.m_vMax.z
+                && D_800F5A10.m_vMax.y > inst->bounds.m_vMin.y && D_800F5A10.m_vMin.y < inst->bounds.m_vMax.y) {
                 func_00214E88(inst);
                 if (func_00267090(inst) && world->m_nDrawActors != 0x200) {
                     world->m_pDrawActors[world->m_nDrawActors++] = (CGameObjectInstance *)inst;
@@ -110,9 +106,9 @@ void func_00221A24(CWorld *world) {
                 pos.z = actor->pos.z;
                 func_002254C0(world, &pos, actor->unk178);
             }
-            if (D_800F5A10.max.x > actor->bounds.min.x && D_800F5A10.min.x < actor->bounds.max.x
-                && D_800F5A10.max.z > actor->bounds.min.z && D_800F5A10.min.z < actor->bounds.max.z
-                && D_800F5A10.max.y > actor->bounds.min.y && D_800F5A10.min.y < actor->bounds.max.y) {
+            if (D_800F5A10.m_vMax.x > actor->bounds.m_vMin.x && D_800F5A10.m_vMin.x < actor->bounds.m_vMax.x
+                && D_800F5A10.m_vMax.z > actor->bounds.m_vMin.z && D_800F5A10.m_vMin.z < actor->bounds.m_vMax.z
+                && D_800F5A10.m_vMax.y > actor->bounds.m_vMin.y && D_800F5A10.m_vMin.y < actor->bounds.m_vMax.y) {
                 func_002156FC(actor);
                 if (world->m_nDrawActors != 0x200) {
                     world->m_pDrawActors[world->m_nDrawActors++] = (CGameObjectInstance *)actor;

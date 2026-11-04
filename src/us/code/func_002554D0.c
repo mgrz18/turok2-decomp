@@ -4,6 +4,9 @@
 #include "structs/player.h"
 
 
+/* D_800F1CE0 is the collision results (CCollisionResults, structs/collision.h);
+ * this reads its first word, m_pInstance (what the last test hit), as a
+ * pointer variable: D_800F1CE0.m_pInstance does not give this code. */
 extern CGameObjectInstance *D_800F1CE0;
 
 void func_002540E4(CPlayer *p);

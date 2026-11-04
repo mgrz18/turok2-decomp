@@ -6,6 +6,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 typedef struct Entity Entity;
 struct Entity {
@@ -24,10 +25,6 @@ struct Entity {
     /* 0x175 */ u8 pad175[0x28C - 0x175];
     /* 0x28C */ Entity *next;
 };
-
-typedef struct DamageEvent {
-    /* 0x00 */ u8 pad0[0x18];
-} DamageEvent;
 
 extern CListedInstance *D_8010FEB4;
 

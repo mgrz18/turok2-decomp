@@ -1,43 +1,24 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
-
-/* What moves: the start of any instance. */
-typedef struct Mover {
-    /* 0x000 */ u8 type;
-    /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x40];
-    /* 0x050 */ f32 rotY;
-    /* 0x054 */ u8 pad54[0xEC];
-    /* 0x140 */ s32 aiFlags;
-} Mover;
-
-typedef struct CollisionDef {
-    /* 0x00 */ s32 flags;
-} CollisionDef;
-
-typedef struct Sweep {
-    /* 0x00 */ Mover *obj;
-    /* 0x04 */ CollisionDef *def;
-} Sweep;
+#include "structs/collision.h"
 
 extern s32 D_800F7078[];
 
 CRegionInfo *func_0022425C(s32 *list, CGameRegion *region);
-s32 func_00267EA8(Mover *obj);
-s32 func_00267EE8(Mover *obj);
-s32 func_00267F10(Mover *obj);
-s32 func_00267F64(Mover *obj);
-s32 func_00267FA8(Mover *obj);
-s32 func_00267FD0(Mover *obj);
-s32 func_00268014(Mover *obj);
-s32 func_0026803C(Mover *obj);
-s32 func_00268080(Mover *obj);
-s32 func_002680A8(Mover *obj);
-s32 func_002680D0(Mover *obj);
-s32 func_002680F8(Mover *obj);
-s32 func_00268120(Mover *obj);
+s32 func_00267EA8(CGameObjectInstance *obj);
+s32 func_00267EE8(CGameObjectInstance *obj);
+s32 func_00267F10(CGameObjectInstance *obj);
+s32 func_00267F64(CGameObjectInstance *obj);
+s32 func_00267FA8(CGameObjectInstance *obj);
+s32 func_00267FD0(CGameObjectInstance *obj);
+s32 func_00268014(CGameObjectInstance *obj);
+s32 func_0026803C(CGameObjectInstance *obj);
+s32 func_00268080(CGameObjectInstance *obj);
+s32 func_002680A8(CGameObjectInstance *obj);
+s32 func_002680D0(CGameObjectInstance *obj);
+s32 func_002680F8(CGameObjectInstance *obj);
+s32 func_00268120(CGameObjectInstance *obj);
 s32 func_0026AFC0(CGameRegion *region);
 s32 func_0026BB9C(CGameRegion *region, f32 x, f32 z);
 CGameRegion *func_0026B4A4(CGameRegion *region, CVector3 pos);
@@ -59,8 +40,8 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
     CVector3 p;
     f32 angle;
     CGameRegion *to;
-    Mover *obj;
-    CollisionDef *def;
+    CGameObjectInstance *obj;
+    CCollisionInfo *def;
     CRegionInfo *fromInfo;
     CRegionInfo *toInfo;
     s32 found;
@@ -98,7 +79,7 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
         }
         if (!found) {
             canSwim = 0;
-            if ((def->flags & 0x20000) || func_00267F10(obj)) {
+            if ((def->m_dwFlags & 0x20000) || func_00267F10(obj)) {
                 canSwim = 1;
             }
             if (!canSwim) {
@@ -106,7 +87,7 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
             }
             if (!func_0026BB9C(to, pos->x, pos->z)) {
                 p.x = pos->x;
-                p.y = obj->pos.y;
+                p.y = obj->header.m_vPos.y;
                 p.z = pos->z;
                 to = func_0026B4A4(from, p);
                 if (to == NULL) {
@@ -117,19 +98,19 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
     }
     fromInfo = func_0022425C(D_800F7078, from);
     toInfo = func_0022425C(D_800F7078, to);
-    if (!(def->flags & 0x10) && (REGION_WORD(to) & 6) == 2) {
+    if (!(def->m_dwFlags & 0x10) && (REGION_WORD(to) & 6) == 2) {
         return NULL;
     }
-    if (!(to->m_wFlags & 0x1000) && (from->m_wFlags & 0x1000) && !(def->flags & 0x200) && !func_002680D0(obj)) {
+    if (!(to->m_wFlags & 0x1000) && (from->m_wFlags & 0x1000) && !(def->m_dwFlags & 0x200) && !func_002680D0(obj)) {
         return NULL;
     }
-    if ((to->m_wFlags & 0x1000) && !(from->m_wFlags & 0x1000) && !(def->flags & 0x100) && !func_002680A8(obj)) {
+    if ((to->m_wFlags & 0x1000) && !(from->m_wFlags & 0x1000) && !(def->m_dwFlags & 0x100) && !func_002680A8(obj)) {
         return NULL;
     }
-    if (!(toInfo->m_wFlags54 & 2) && (fromInfo->m_wFlags54 & 2) && !(def->flags & 0x800)) {
+    if (!(toInfo->m_wFlags54 & 2) && (fromInfo->m_wFlags54 & 2) && !(def->m_dwFlags & 0x800)) {
         return NULL;
     }
-    if ((toInfo->m_wFlags54 & 2) && !(fromInfo->m_wFlags54 & 2) && !(def->flags & 0x400)) {
+    if ((toInfo->m_wFlags54 & 2) && !(fromInfo->m_wFlags54 & 2) && !(def->m_dwFlags & 0x400)) {
         return NULL;
     }
     if ((to->m_wFlags & 0x40) && !(from->m_wFlags & 0x40) && func_00269C3C(to, pos->x, pos->z) < pos->y) {
@@ -138,31 +119,31 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
     /* The do/while (0) block (a macro in the original?) keeps reorg's
      * delay-slot choices of the ROM. */
     do {
-        if (obj->type == 1 && (obj->aiFlags & 0xC0000)) {
+        if (obj->header.m_Type == 1 && (obj->m_AI.m_dwFlags & 0xC0000)) {
             return to;
         }
-        if (!(toInfo->m_dwFlags & 0x400000) && (fromInfo->m_dwFlags & 0x400000) && !(def->flags & 0x4000000)
+        if (!(toInfo->m_dwFlags & 0x400000) && (fromInfo->m_dwFlags & 0x400000) && !(def->m_dwFlags & 0x4000000)
             && !func_00268080(obj)) {
             return NULL;
         }
     } while (0);
-    if ((toInfo->m_dwFlags & 0x400000) && !(fromInfo->m_dwFlags & 0x400000) && !(def->flags & 0x2000000)
+    if ((toInfo->m_dwFlags & 0x400000) && !(fromInfo->m_dwFlags & 0x400000) && !(def->m_dwFlags & 0x2000000)
         && !func_0026803C(obj)) {
         return NULL;
     }
-    if (!(toInfo->m_wFlags52 & 0x80) && (fromInfo->m_wFlags52 & 0x80) && !(def->flags & 0x10000000)
+    if (!(toInfo->m_wFlags52 & 0x80) && (fromInfo->m_wFlags52 & 0x80) && !(def->m_dwFlags & 0x10000000)
         && !func_00268014(obj)) {
         return NULL;
     }
-    if ((toInfo->m_wFlags52 & 0x80) && !(fromInfo->m_wFlags52 & 0x80) && !(def->flags & 0x8000000)
+    if ((toInfo->m_wFlags52 & 0x80) && !(fromInfo->m_wFlags52 & 0x80) && !(def->m_dwFlags & 0x8000000)
         && !func_00267FD0(obj)) {
         return NULL;
     }
-    if (!(def->flags & 0x80)) {
-        if (!(to->m_wFlags & 0x80) && (from->m_wFlags & 0x80) && !(def->flags & 0x2000) && !func_00268120(obj)) {
+    if (!(def->m_dwFlags & 0x80)) {
+        if (!(to->m_wFlags & 0x80) && (from->m_wFlags & 0x80) && !(def->m_dwFlags & 0x2000) && !func_00268120(obj)) {
             return NULL;
         }
-        if ((to->m_wFlags & 0x80) && !(from->m_wFlags & 0x80) && !(def->flags & 0x1000) && !func_002680F8(obj)) {
+        if ((to->m_wFlags & 0x80) && !(from->m_wFlags & 0x80) && !(def->m_dwFlags & 0x1000) && !func_002680F8(obj)) {
             return NULL;
         }
     }
@@ -174,10 +155,10 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
     if (to->m_wFlags & 1) {
         toWater = !isShallow(toInfo);
     }
-    if (!toWater && fromWater && !(def->flags & 0x80000) && !func_00267FA8(obj)) {
+    if (!toWater && fromWater && !(def->m_dwFlags & 0x80000) && !func_00267FA8(obj)) {
         return NULL;
     }
-    if (toWater && !fromWater && !(def->flags & 0x40000) && !func_00267F64(obj)) {
+    if (toWater && !fromWater && !(def->m_dwFlags & 0x40000) && !func_00267F64(obj)) {
         return NULL;
     }
     if ((to->m_wFlags & 0x40) && !(from->m_wFlags & 0x40) && func_00269C3C(to, pos->x, pos->z) < pos->y) {
@@ -185,7 +166,7 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
     }
     fromSpecial = func_0026AFC0(from);
     toSpecial = func_0026AFC0(to);
-    if (sweep->def->flags & 0x40) {
+    if (sweep->def->m_dwFlags & 0x40) {
         if (toSpecial) {
             return to;
         }
@@ -193,11 +174,11 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
     }
     climbs = func_00267EA8(obj);
     canClimb = 0;
-    if ((def->flags & 0x10000) || func_00267EE8(obj)) {
+    if ((def->m_dwFlags & 0x10000) || func_00267EE8(obj)) {
         canClimb = 1;
     }
     canSwim = 0;
-    if ((def->flags & 0x20000) || func_00267F10(obj)) {
+    if ((def->m_dwFlags & 0x20000) || func_00267F10(obj)) {
         canSwim = 1;
     }
     if (climbs && fromSpecial) {
@@ -205,7 +186,7 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
             return to;
         }
         if ((from->m_wFlags & 0x10) && !(to->m_wFlags & 0x10)
-            && obj->pos.y < func_0026BE60(from, obj->pos.x, obj->pos.z) + 1.024f) {
+            && obj->header.m_vPos.y < func_0026BE60(from, obj->header.m_vPos.x, obj->header.m_vPos.z) + 1.024f) {
             return NULL;
         }
     }
@@ -215,7 +196,7 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
     if ((to->m_wFlags & 0x10) && climbs) {
         angle = func_0026C240(from, edge) + 3.1415927f;
         func_00210EF0(&angle);
-        d = func_00210E64(angle, obj->rotY);
+        d = func_00210E64(angle, obj->m_RotY);
         if ((d < 0.0f) ? (-d <= 0.6981318f) : (d <= 0.6981318f)) {
             canClimb = 1;
         }
@@ -232,7 +213,7 @@ CGameRegion *func_0023B664(Sweep *sweep, CGameRegion *from, s32 edge, CVector3 *
         if (canClimb) {
             return to;
         }
-        y = obj->pos.y - 0.1f;
+        y = obj->header.m_vPos.y - 0.1f;
         top = c1;
         if (!(c0 <= top)) {
             top = c0;
