@@ -5,20 +5,10 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406F7C.c, func_00406F7C, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/player.h"
+#include "structs/menu.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s8 pad;
-} MenuPad;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ CPlayer *player;
-    /* 0x20 */ MenuPad *pad;
-} MenuOwner;
 
 typedef struct {
     s32 v;
@@ -47,11 +37,11 @@ s32 func_0042647C(s32 ch);
 s32 func_004264B4(s32 ch);
 s32 func_00426AF8(s32 ch);
 void func_0041D7B0(CPlayer *p);
-void func_0041D948(MenuOwner *o);
+void func_0041D948(Menu *o);
 u32 func_00426D98(u8 *data, s32 len, u32 crc);
 void func_00416644(u8 *a, void *b, void *c, s32 d, void *e);
 
-void func_004579A4(MenuOwner *own) {
+void func_004579A4(Menu *own) {
     CPlayer *plr;
     CPlayer *p;
     PadSel sel;
@@ -63,7 +53,7 @@ void func_004579A4(MenuOwner *own) {
     D_800C2024 = 0;
     D_801309BC = 0;
     D_80130990 = 0;
-    sel.v = own->pad->pad;
+    sel.v = own->controller->port;
     {
         register CPlayer *pp asm("$2") = own->player;
 
@@ -75,7 +65,7 @@ void func_004579A4(MenuOwner *own) {
         func_00416644(((u8 *)p->m_pCamera) + 0x53C, D_0043BE14, p, p->m_ContState.m_pContState, NULL);
         D_80130940 = 0;
     } else {
-        func_004263A0(own->pad->pad);
+        func_004263A0(own->controller->port);
         p = plr;
         if (func_0042647C(sel.v) == 0) {
             func_0041D7B0(plr);

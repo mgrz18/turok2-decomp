@@ -1,9 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItemTmpl;
+#include "structs/menu.h"
 
 extern s8 D_8011AAFF; /* D_8011AAD8 + 0x27: level */
 extern char D_800B5F3C[];
@@ -15,7 +11,7 @@ extern char D_800B6238[];
 extern char D_800B6250[];
 
 /* Label of the level item. */
-s32 func_00418660(MenuItemTmpl *a) {
+s32 func_00418660(MenuItem *a) {
     switch (D_8011AAFF) {
     case 0:
         a->text = D_800B5F3C;

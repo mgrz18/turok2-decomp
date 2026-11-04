@@ -1,5 +1,6 @@
 /* Second-module copy of func_00422FC0 (first module). The port comes back through a pointer (a stack slot), which gives the ROM's store-then-reload. */
 #include "common.h"
+#include "structs/menu.h"
 
 void func_00285A68(s32 port);
 
@@ -12,17 +13,7 @@ extern s32 D_80130998;
 extern s32 D_801309AC;
 extern s32 D_801309B4;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s8 port;
-} MenuController;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ MenuController *controller;
-} MenuEvent;
-
-static __inline__ void GetPort(MenuEvent *event, s32 *port) {
+static __inline__ void GetPort(Menu *event, s32 *port) {
     if (D_80130990 != 0) {
         *port = D_800C2028;
     } else {
@@ -30,7 +21,7 @@ static __inline__ void GetPort(MenuEvent *event, s32 *port) {
     }
 }
 
-void func_0045BEE0(MenuEvent *event) {
+void func_0045BEE0(Menu *event) {
     s32 port;
 
     D_801309AC = 0;

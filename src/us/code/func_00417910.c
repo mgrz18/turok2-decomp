@@ -1,10 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ s32 index;
-    /* 0x04 */ u8 pad4[0x10];
-    /* 0x14 */ char *text;
-} MenuItem;
+#include "structs/menu.h"
 
 extern u8 D_8011AB08[10]; /* D_8011AAD8 + 0x30: weapons enabled */
 extern char D_800C0EB0[]; /* "unknown weapon" */

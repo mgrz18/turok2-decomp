@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 s32 func_00224C08(void *arg0, s32 arg1);
 s32 func_004160F0(void *item);
@@ -12,11 +13,6 @@ extern char D_800B44B4[];
 extern char D_800B44E8[];
 extern char D_800B454C[];
 extern s32 D_80130A30;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItem;
 
 s32 func_00424B90(MenuItem *item) {
     s32 rank = -1;

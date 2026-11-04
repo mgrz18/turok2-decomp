@@ -1,23 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
-
-/* A menu item: its text is a format line whose last characters get the value. */
-typedef struct MenuItem {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ u32 flags;
-    /* 0x0C */ u8 padC[0x14 - 0xC];
-    /* 0x14 */ char *text;
-} MenuItem;
+#include "structs/menu.h"
 
 typedef struct MenuPlayer {
     /* 0x000 */ u8 pad0[0x518];
     /* 0x518 */ CPlayerOptions *options;
 } MenuPlayer;
-
-typedef struct MenuContext {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ MenuPlayer *player;
-} MenuContext;
 
 /* What these read around the multiplayer settings, D_8011AAD8. */
 typedef struct MenuSettings {
@@ -44,12 +32,12 @@ extern char D_800B4098[];
 
 /* Shows the player's option unk2A (0-255, centred on 0x80) in steps of 8, falling back to the
  * default options when there is no player. */
-s32 func_004555B0(MenuItem *item, MenuContext *menu) {
+s32 func_004555B0(MenuItem *item, Menu *menu) {
     CPlayerOptions *options = &D_8011AAD8.defaultOptions;
     s32 value;
 
-    if (menu->player != NULL && menu->player->options != NULL) {
-        options = menu->player->options;
+    if (menu->player != NULL && ((MenuPlayer *) menu->player)->options != NULL) {
+        options = ((MenuPlayer *) menu->player)->options;
     }
     value = (options->m_SettingY - 0x80) / 8;
     if (value == 0) {

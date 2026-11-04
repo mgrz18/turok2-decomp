@@ -3,22 +3,10 @@
 /* The result is tested through a copy (err = r): it stops jump threading before cse1, so the second r == 0 test survives as in the ROM. */
 #include "common.h"
 #include "structs/player.h"
+#include "structs/menu.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s8 pad;
-} MenuPad;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 unk14;
-    /* 0x18 */ u8 pad18[4];
-    /* 0x1C */ CPlayer *player;
-    /* 0x20 */ MenuPad *pad;
-} MenuOwner;
 
 typedef struct {
     s32 v;
@@ -68,7 +56,7 @@ static __inline__ void FreeAll(void) {
     D_800C201C = 0;
 }
 
-s32 func_00457FE8(s32 unused, MenuOwner *own) {
+s32 func_00457FE8(s32 unused, Menu *own) {
     u8 ext[8];
     PakInfo pad;
     CPlayer *plr;
@@ -86,7 +74,7 @@ s32 func_00457FE8(s32 unused, MenuOwner *own) {
         pv = D_800C2028;
         pp = NULL;
     } else {
-        pv = own->pad->pad;
+        pv = own->controller->port;
         pp = own->player;
     }
     do {
@@ -111,7 +99,7 @@ s32 func_00457FE8(s32 unused, MenuOwner *own) {
                 }
             }
             if (ok != 0) {
-                func_00416644(D_80119E2C, D_0043C0E4, plr, plr->m_ContState.m_pContState, own->unk14);
+                func_00416644(D_80119E2C, D_0043C0E4, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }

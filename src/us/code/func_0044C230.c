@@ -19,6 +19,7 @@
  * (func_0044C230.c). */
 #include "common.h"
 #include "rw/abu_types.h"
+#include "structs/menu.h"
 
 /* ---------------- func_0044C230 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of func_004131B0 (3 words), a padding nop,
@@ -1238,67 +1239,24 @@ void func_0044E1B4(struct MenuRecAt10 *menu, u8 dir) {
  * func_0044E60C and func_0044E6D8 at branch targets. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00441384.c, func_00441384, with Turok 2's layouts. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xB0];
-    /* 0xB0 */ u32 buttons;
-} MenuController_41531C;
-
-typedef struct MenuItemDef_41531C {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ void (*update)(void *item, void *menu, void *arg);
-    /* 0x1C */ s32 (*select)(void *item, void *menu, void *arg);
-} MenuItemDef_41531C;
-
-typedef struct {
-    /* 0x00 */ s32 index;
-    /* 0x04 */ s16 type;
-    /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ u32 flags;
-    /* 0x0C */ u8 padC[0xC];
-    /* 0x18 */ MenuItemDef_41531C *def;
-    /* 0x1C */ s32 value;
-    /* 0x20 */ u8 pad20[8];
-} MenuItem_41531C; /* 0x28 bytes */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 (*poll)(void);
-} MenuTemplate_41531C;
-
-typedef struct {
-    /* 0x00 */ s16 cursor;
-    /* 0x02 */ u8 pad2[0xA];
-    /* 0x0C */ MenuItem_41531C *items;
-    /* 0x10 */ s32 count;
-    /* 0x14 */ MenuTemplate_41531C *tmpl;
-    /* 0x18 */ u8 pad18[8];
-    /* 0x20 */ MenuController_41531C *ctl;
-    /* 0x24 */ u8 pad24[4];
-    /* 0x28 */ s16 state;
-    /* 0x2A */ u8 pad2A[2];
-    /* 0x2C */ f32 time;
-    /* 0x30 */ f32 fade;
-    /* 0x34 */ f32 open;
-} Menu_41531C;
-
 extern f32 D_800B6D28; /* frame delta */
-extern s32 func_002855E8(MenuController_41531C *ctl);
-extern s32 func_00285628_4143DC(MenuController_41531C *ctl) __asm__("func_00285628");
-extern s32 func_00285670_4143DC(MenuController_41531C *ctl) __asm__("func_00285670");
-extern s32 func_002856B8(MenuController_41531C *ctl);
-extern s32 func_00285700(MenuController_41531C *ctl);
-extern void func_00416C28_4143DC(Menu_41531C *menu) __asm__("func_0044FC28");
+extern s32 func_002855E8(MenuController *ctl);
+extern s32 func_00285628_4143DC(MenuController *ctl) __asm__("func_00285628");
+extern s32 func_00285670_4143DC(MenuController *ctl) __asm__("func_00285670");
+extern s32 func_002856B8(MenuController *ctl);
+extern s32 func_00285700(MenuController *ctl);
+extern void func_00416C28_4143DC(Menu *menu) __asm__("func_0044FC28");
 
-s32 func_0044E31C(Menu_41531C *menu, void *arg) {
-    MenuItem_41531C *item;
+s32 func_0044E31C(Menu *menu, void *arg) {
+    MenuItem *item;
     s32 quit;
     s32 i;
     s32 moveV;
     u32 horizontal;
 
     quit = 0;
-    if (menu->tmpl->poll != NULL) {
-        quit = menu->tmpl->poll();
+    if (menu->desc->poll != NULL) {
+        quit = menu->desc->poll();
     }
     i = menu->count;
     item = menu->items;
@@ -1312,7 +1270,7 @@ s32 func_0044E31C(Menu_41531C *menu, void *arg) {
             item++;
         } while (i != -1);
     }
-    item = (MenuItem_41531C *) ((u8 *) menu->items + menu->cursor * 0x28);
+    item = (MenuItem *) ((u8 *) menu->items + menu->cursor * 0x28);
     menu->time = menu->time + D_800B6D28;
     horizontal = item->flags & 0x400000;
     func_00416C28_4143DC(menu);
@@ -1325,16 +1283,16 @@ s32 func_0044E31C(Menu_41531C *menu, void *arg) {
         }
         break;
     case 1:
-        menu->open = menu->open + D_800B6D28 * 0.4f;
-        if (1.0f <= menu->open) {
-            menu->open = 1.0f;
+        menu->alpha = menu->alpha + D_800B6D28 * 0.4f;
+        if (1.0f <= menu->alpha) {
+            menu->alpha = 1.0f;
             menu->state = 2;
         }
         break;
     case 3:
-        menu->open = menu->open - D_800B6D28 * 0.4f;
-        if (menu->open <= 0.0f) {
-            menu->open = 0.0f;
+        menu->alpha = menu->alpha - D_800B6D28 * 0.4f;
+        if (menu->alpha <= 0.0f) {
+            menu->alpha = 0.0f;
             menu->state = 4;
         }
         break;
@@ -1355,7 +1313,7 @@ s32 func_0044E31C(Menu_41531C *menu, void *arg) {
 
             moveV = 1;
             if (item->type == 2) {
-                buttons = menu->ctl->buttons;
+                buttons = menu->controller->buttons;
                 if (buttons & 0x20202) {
                     moveV = 0;
                     item->value -= 2;
@@ -1371,25 +1329,25 @@ s32 func_0044E31C(Menu_41531C *menu, void *arg) {
                 }
             }
             if (horizontal == 0) {
-                if (func_00285628_4143DC(menu->ctl) != 0) {
+                if (func_00285628_4143DC(menu->controller) != 0) {
                     func_0044E1B4((struct MenuRecAt10 *) menu, 0x10);
                 }
-                if (func_00285670_4143DC(menu->ctl) != 0) {
+                if (func_00285670_4143DC(menu->controller) != 0) {
                     func_0044E1B4((struct MenuRecAt10 *) menu, 0x11);
                 }
-            } else if (menu->ctl->buttons & 0x60303) {
+            } else if (menu->controller->buttons & 0x60303) {
                 moveV = 0;
             }
             if (moveV != 0) {
-                if (func_002856B8(menu->ctl) != 0) {
+                if (func_002856B8(menu->controller) != 0) {
                     func_0044E1B4((struct MenuRecAt10 *) menu, 0x12);
                 }
-                if (func_00285700(menu->ctl) != 0) {
+                if (func_00285700(menu->controller) != 0) {
                     func_0044E1B4((struct MenuRecAt10 *) menu, 0x13);
                 }
             }
-            if (menu->state == 2 && (func_002855E8(menu->ctl) != 0 || (func_00285628_4143DC(menu->ctl) != 0 && horizontal != 0)
-                                     || (func_00285670_4143DC(menu->ctl) != 0 && horizontal != 0))) {
+            if (menu->state == 2 && (func_002855E8(menu->controller) != 0 || (func_00285628_4143DC(menu->controller) != 0 && horizontal != 0)
+                                     || (func_00285670_4143DC(menu->controller) != 0 && horizontal != 0))) {
                 if (item->def->select == NULL || item->def->select(item, menu, arg) != 0) {
                     menu->state = 3;
                 }
@@ -1677,55 +1635,13 @@ s32 func_0044F0F0(MenuItemTmpl_4160F0 *a) {
     return n;
 }
 
-/* ---------------- shared by func_0044F168 to func_00450418 ---------------- */
-/* An open menu as the pool code below sees it (Menu_41531C has the same head). */
-typedef struct {
-    /* 0x00 */ u8 pad0[0xB0];
-    /* 0xB0 */ s32 buttons;
-    /* 0xB4 */ s32 pressed;
-    /* 0xB8 */ u8 padB8[4];
-    /* 0xBC */ s32 held;
-} MenuNodeCtl;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 (*close)();
-    /* 0x10 */ s32 (*draw)();
-    /* 0x14 */ u8 pad14[0x1C - 0x14];
-    /* 0x1C */ s32 value;
-} MenuNodeDef;
-
-typedef struct MenuNode {
-    /* 0x000 */ u8 pad0[8];
-    /* 0x008 */ s32 mem;            /* the allocation the menu lives in */
-    /* 0x00C */ u8 padC[0x14 - 0xC];
-    /* 0x014 */ MenuNodeDef *def;
-    /* 0x018 */ u8 pad18[0x20 - 0x18];
-    /* 0x020 */ MenuNodeCtl *ctl;
-    /* 0x024 */ u8 pad24[0x28 - 0x24];
-    /* 0x028 */ s16 state;
-    /* 0x02A */ u8 pad2A[0x1C8 - 0x2A];
-    /* 0x1C8 */ s32 flashTime;
-    /* 0x1CC */ s32 flashStep;
-    /* 0x1D0 */ struct MenuNode *prev;
-    /* 0x1D4 */ struct MenuNode *next;
-} MenuNode;
-
-/* The open menus: a CList linked through MenuNode.prev/next, and a counter. */
-typedef struct {
-    /* 0x00 */ MenuNode *head;
-    /* 0x04 */ MenuNode *tail;
-    /* 0x08 */ s32 lastOffset;
-    /* 0x0C */ s32 nextOffset;
-    /* 0x10 */ s32 count;
-    /* 0x14 */ s16 opened;
-} MenuNodePool;
+/* ---------------- func_0044F168 to func_00450418 use Menu, MenuDesc, MenuController and MenuPool (structs/menu.h) ---------------- */
 
 /* ---------------- func_0044F168 ---------------- */
 s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("func_0044CF74");
 
-void func_0044F168(MenuNode *arg0, s32 arg1, s32 arg2, s32 arg3) {
-    func_00413F74_416168((s32) arg0, arg1, arg2, arg3, (s32) arg0->def);
+void func_0044F168(Menu *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    func_00413F74_416168((s32) arg0, arg1, arg2, arg3, (s32) arg0->desc);
 }
 
 /* ---------------- func_0044F188 ---------------- */
@@ -1809,11 +1725,11 @@ MenuBlob *func_0044F214(MenuItem_416214 *a, s32 id, s32 arg) {
 }
 
 /* ---------------- func_0044F2E4 ---------------- */
-s32 func_0044F2E4(MenuNode *arg0) {
+s32 func_0044F2E4(Menu *arg0) {
     s32 temp_v1;
     s32 var_v0;
 
-    temp_v1 = (s32) arg0->ctl;
+    temp_v1 = (s32) arg0->controller;
     var_v0 = 0;
     if (temp_v1 != 0) {
         var_v0 = temp_v1 + 0xA0;
@@ -1899,8 +1815,8 @@ s32 func_0044F474(void) {
 }
 
 /* ---------------- func_0044F47C ---------------- */
-s32 func_0044F47C(MenuNode *arg0) {
-    return arg0->def->value;
+s32 func_0044F47C(Menu *arg0) {
+    return arg0->desc->value;
 }
 
 /* ---------------- func_0044F48C ---------------- */
@@ -1980,7 +1896,7 @@ void CList__Construct(s32, s32, s32);
 
 void func_0044F614(s32 arg0) {
     CList__Construct(arg0, 0x1D0, 0x1D4);
-    ((MenuNodePool *) arg0)->opened = 0;
+    ((MenuPool *) arg0)->opened = 0;
 }
 
 /* ---------------- func_0044F644 ---------------- */
@@ -2059,30 +1975,6 @@ s32 func_0044F760(O06A_416760 *a, O06C_416760 *c, O06B_416760 *b) {
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00442020.c, func_00442020, with Turok 2's layouts
  * (the template is passed directly instead of read from the caller). */
 
-typedef struct {
-    /* 0x00 */ s16 type;
-    /* 0x02 */ u8 pad2[0x22];
-} MenuItemTmpl_416894; /* 0x24 bytes */
-
-typedef struct {
-    /* 0x00 */ MenuItemTmpl_416894 *items;
-    /* 0x04 */ s16 count;
-} MenuTmpl_416894;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s16 opened;
-} MenuPool_416894;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 unk14;
-    /* 0x18 */ u8 pad18[4];
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ s32 unk20;
-    /* 0x24 */ s32 unk24;
-} MenuCaller;
-
 /* Each item of type 3 gets a 0x330-byte extension after the item array. */
 static __inline__ s32 ItemExtSize(s16 *type) {
     if (*type == 3) {
@@ -2092,19 +1984,19 @@ static __inline__ s32 ItemExtSize(s16 *type) {
 }
 
 extern s32 *func_00204EDC_416894(s32, s32, s32, void *) __asm__("func_00204EDC");
-extern void func_00414EA8_416894(s32 menu, s32 *mem, MenuTmpl_416894 *t, s32, s32, s32, s32, MenuPool_416894 *pool) __asm__("func_0044DEA8");
-extern void CList__AddHead_416894(MenuPool_416894 *a, s32 b) __asm__("CList__AddHead");
+extern void func_00414EA8_416894(s32 menu, s32 *mem, MenuDesc *t, s32, s32, s32, s32, MenuPool *pool) __asm__("func_0044DEA8");
+extern void CList__AddHead_416894(MenuPool *a, s32 b) __asm__("CList__AddHead");
 
-s32 func_0044F894(MenuPool_416894 *pool, MenuCaller *c, MenuTmpl_416894 *t) {
+s32 func_0044F894(MenuPool *pool, Menu *c, MenuDesc *t) {
     s32 size, i;
     s32 *r;
     s32 s;
     s32 p1, p2, p3, p4;
 
-    p1 = c->unk14;
-    p2 = c->unk1C;
-    p3 = c->unk20;
-    p4 = c->unk24;
+    p1 = c->desc;
+    p2 = c->player;
+    p3 = c->controller;
+    p4 = c->context;
     size = t->count * 40 + 0x1D8;
     for (i = 0; i < t->count; i++) {
         size += ItemExtSize(&t->items[i].type);
@@ -2134,13 +2026,13 @@ s32 CList__Remove(s32, s32);
 s32 func_002052D8(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("func_0044E31C");
 
-extern MenuNodePool D_80119E2C;
+extern MenuPool D_80119E2C;
 
-void func_0044F9C8(MenuNodePool *arg0) {
+void func_0044F9C8(MenuPool *arg0) {
     s32 (*temp_v0)();
-    MenuNode *temp_s2;
-    MenuNodeCtl *temp_v0_2;
-    MenuNode *var_s0;
+    Menu *temp_s2;
+    MenuController *temp_v0_2;
+    Menu *var_s0;
 
     var_s0 = arg0->head;
     if (var_s0 != NULL) {
@@ -2153,16 +2045,16 @@ void func_0044F9C8(MenuNodePool *arg0) {
             } else {
 block_6:
                 if (func_0041531C_4169C8((s32) var_s0, (s32) arg0) != 0) {
-                    temp_v0 = var_s0->def->close;
+                    temp_v0 = var_s0->desc->close;
                     if (temp_v0 != NULL) {
                         temp_v0(var_s0, arg0);
                     }
-                    temp_v0_2 = var_s0->ctl;
+                    temp_v0_2 = var_s0->controller;
                     temp_v0_2->buttons = 0;
-                    temp_v0_2->pressed = 0;
-                    temp_v0_2->held = 0;
+                    temp_v0_2->connection = 0;
+                    temp_v0_2->history = 0;
                     CList__Remove((s32) arg0, (s32) var_s0);
-                    func_002052D8(0, var_s0->mem);
+                    func_002052D8(0, var_s0->block);
                 }
             }
             var_s0 = temp_s2;
@@ -2171,22 +2063,22 @@ block_6:
 }
 
 /* ---------------- func_0044FAA4 ---------------- */
-void func_0044FAA4(MenuNodePool *arg0) {
-    MenuNode *var_s0;
+void func_0044FAA4(MenuPool *arg0) {
+    Menu *var_s0;
 
     var_s0 = arg0->tail;
     if (var_s0 != NULL) {
         do {
-            var_s0->def->draw(var_s0, arg0);
+            var_s0->desc->update(var_s0, arg0);
             var_s0 = var_s0->prev;
         } while (var_s0 != NULL);
     }
 }
 
 /* ---------------- func_0044FAF8 ---------------- */
-s32 func_0044FAF8(MenuNodePool *arg0) {
+s32 func_0044FAF8(MenuPool *arg0) {
     s32 var_v1;
-    MenuNode *var_a0;
+    Menu *var_a0;
 
     var_a0 = arg0->head;
     var_v1 = 0;
@@ -2210,55 +2102,26 @@ s32 func_0044FB28(s32 arg0) {
 /* WRONG CUT: real function 0x00416B30, size 0x7C (through 0x00416BAC): splat cut the loop
  * off as func_0044FB44. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xB0];
-    /* 0xB0 */ s32 unkB0;
-    /* 0xB4 */ s32 unkB4;
-    /* 0xB8 */ u8 padB8[4];
-    /* 0xBC */ s32 unkBC;
-} MenuController;
-
-typedef struct Menu_416B30 Menu_416B30;
-typedef struct MenuPool_416B30 MenuPool_416B30;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ void (*close)(Menu_416B30 *menu, MenuPool_416B30 *pool);
-} MenuTmpl_416B30;
-
-struct Menu_416B30 {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ void *mem;
-    /* 0x0C */ u8 padC[8];
-    /* 0x14 */ MenuTmpl_416B30 *tmpl;
-    /* 0x18 */ u8 pad18[8];
-    /* 0x20 */ MenuController *ctl;
-};
-
-struct MenuPool_416B30 {
-    /* 0x00 */ Menu_416B30 *head;
-};
-
-extern void CList__Remove_416B30(MenuPool_416B30 *list, Menu_416B30 *item) __asm__("CList__Remove");
+extern void CList__Remove_416B30(MenuPool *list, Menu *item) __asm__("CList__Remove");
 extern void func_002052D8_416B30(s32, void *mem) __asm__("func_002052D8");
 
 /* Closes and frees every open menu. */
-void func_0044FB30(MenuPool_416B30 *pool) {
-    Menu_416B30 *menu;
+void func_0044FB30(MenuPool *pool) {
+    Menu *menu;
     MenuController *ctl;
 
 next:
     menu = pool->head;
     if (menu != NULL) {
-        if (menu->tmpl->close != NULL) {
-            menu->tmpl->close(menu, pool);
+        if (menu->desc->close != NULL) {
+            menu->desc->close(menu, pool);
         }
-        ctl = menu->ctl;
-        ctl->unkB0 = 0;
-        ctl->unkB4 = 0;
-        ctl->unkBC = 0;
+        ctl = menu->controller;
+        ctl->buttons = 0;
+        ctl->connection = 0;
+        ctl->history = 0;
         CList__Remove_416B30(pool, menu);
-        func_002052D8_416B30(0, menu->mem);
+        func_002052D8_416B30(0, menu->block);
         goto next;
     }
 }
@@ -2287,27 +2150,27 @@ f32 func_0044FBAC(MenuItemTmpl_416BAC *a, f32 scale) {
 }
 
 /* ---------------- func_0044FC00 ---------------- */
-void func_0044FC00(MenuNode *arg0) {
+void func_0044FC00(Menu *arg0) {
     arg0->flashStep = 0;
-    arg0->flashTime = 0;
+    arg0->flash = 0;
 }
 
 /* ---------------- func_0044FC0C ---------------- */
-void func_0044FC0C(MenuNode *arg0) {
+void func_0044FC0C(Menu *arg0) {
     if (arg0->flashStep == 0) {
         arg0->flashStep = 1;
-        arg0->flashTime = 0;
+        arg0->flash = 0;
     }
 }
 
 /* ---------------- func_0044FC28 ---------------- */
-void func_0044FC28(MenuNode *arg0) {
+void func_0044FC28(Menu *arg0) {
     s32 temp_v0;
 
-    temp_v0 = arg0->flashTime + arg0->flashStep;
-    arg0->flashTime = temp_v0;
+    temp_v0 = arg0->flash + arg0->flashStep;
+    arg0->flash = temp_v0;
     if (temp_v0 >= 0x30) {
-        arg0->flashTime = 0;
+        arg0->flash = 0;
         arg0->flashStep = 0;
     }
 }
@@ -2544,18 +2407,18 @@ void func_004501F4(O06A_4171F4 *a, s32 b, s32 c) {
 }
 
 /* ---------------- func_004502B0 ---------------- */
-void func_004502B0(MenuNode *arg0) {
+void func_004502B0(Menu *arg0) {
     s32 (*temp_v0)();
-    MenuNodeCtl *temp_v0_2;
+    MenuController *temp_v0_2;
 
-    temp_v0 = arg0->def->close;
+    temp_v0 = arg0->desc->close;
     if (temp_v0 != NULL) {
         temp_v0();
     }
-    temp_v0_2 = arg0->ctl;
+    temp_v0_2 = arg0->controller;
     temp_v0_2->buttons = 0;
-    temp_v0_2->pressed = 0;
-    temp_v0_2->held = 0;
+    temp_v0_2->connection = 0;
+    temp_v0_2->history = 0;
 }
 
 /* ---------------- func_004502F8 ---------------- */
@@ -2619,18 +2482,18 @@ void *func_004502F8(struct func_8025E5B0_S1 *owner, struct Dialog *list, s32 a, 
 s32 CList__Remove_417418(s32, s32) __asm__("CList__Remove");
 s32 func_002052D8_417418(s32, s32) __asm__("func_002052D8");
 
-void func_00450418(s32 arg0, MenuNode *arg1) {
+void func_00450418(s32 arg0, Menu *arg1) {
     s32 (*temp_v0)();
-    MenuNodeCtl *temp_v0_2;
+    MenuController *temp_v0_2;
 
-    temp_v0 = arg1->def->close;
+    temp_v0 = arg1->desc->close;
     if (temp_v0 != NULL) {
         temp_v0(arg1, arg0);
     }
-    temp_v0_2 = arg1->ctl;
+    temp_v0_2 = arg1->controller;
     temp_v0_2->buttons = 0;
-    temp_v0_2->pressed = 0;
-    temp_v0_2->held = 0;
+    temp_v0_2->connection = 0;
+    temp_v0_2->history = 0;
     CList__Remove_417418(arg0, (s32) arg1);
-    func_002052D8_417418(0, arg1->mem);
+    func_002052D8_417418(0, arg1->block);
 }

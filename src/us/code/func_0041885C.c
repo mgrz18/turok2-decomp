@@ -1,15 +1,11 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItemTmpl;
+#include "structs/menu.h"
 
 extern u8 D_8011AB01; /* D_8011AAD8 + 0x29 */
 extern char D_800B6164[];
 extern char D_800B617C[];
 
-s32 func_0041885C(MenuItemTmpl *a) {
+s32 func_0041885C(MenuItem *a) {
     switch (D_8011AB01) {
     case 0:
         a->text = D_800B617C;

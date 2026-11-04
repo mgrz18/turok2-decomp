@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Name entry: append the selected character to the current player's name. */
 
@@ -8,11 +9,6 @@ typedef struct {
     s32 length;   /* 0x08 */
     char name[12]; /* 0x0C */
 } NameEntry; /* 0x18 bytes */
-
-typedef struct {
-    u8 pad0[0x14];
-    char *text; /* 0x14 */
-} MenuItem;
 
 typedef struct {
     u8 pad0[0x1C];

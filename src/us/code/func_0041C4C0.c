@@ -1,20 +1,17 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/menu.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x29];
     /* 0x29 */ u8 unk29;
 } Settings;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ CPlayer *player;
-} MenuCaller;
 
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
 extern Settings D_8011AB18;     /* the default settings */
 
-s32 func_0041C4C0(s32 arg0, MenuCaller *arg1) {
+s32 func_0041C4C0(s32 arg0, Menu *arg1) {
     Settings *temp_v0_2;
     Settings *var_s0;
     CPlayer *temp_v0;

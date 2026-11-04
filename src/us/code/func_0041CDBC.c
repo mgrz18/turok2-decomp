@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 #include "rw/abu_protos.h"
 
 extern s32 D_8011ACE4;
@@ -33,60 +34,40 @@ typedef struct {
     /* 0xBF8 */ s32 unkBF8;
 } MenuData;
 
-/* A menu item: its widget at 0xC (flag 0x01000000 in widget->flags hides
- * it) and the player data at 0x1C. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ s32 flags;
-} MenuItem; /* size 0x28 */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x34];
-    /* 0x34 */ MenuItem items[14];
-} MenuWidget;
-
-typedef struct {
-    /* 0x00 */ s16 state;
-    /* 0x02 */ u8 pad2[0xC - 0x2];
-    /* 0x0C */ MenuWidget *widget;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ MenuData *data;
-} MenuPage;
-
 
 /* Byte-offset field access: member references here would let the
  * scheduler move the D_8011ACE4 load and change the register choice. */
 #define FIELD_AT(ptr, type, T, field) (*(type *)((s8 *)(ptr) + (s32) &((T *)0)->field))
 
-void func_0041CDBC(MenuPage *arg0) {
-    MenuWidget *temp_a0;
-    MenuWidget *temp_v0;
+void func_0041CDBC(Menu *arg0) {
+    MenuItem *temp_a0;
+    MenuItem *temp_v0;
     MenuData *temp_v1;
-    MenuWidget *temp_v1_2;
-    MenuWidget *temp_v1_3;
-    MenuWidget *temp_v1_4;
-    MenuWidget *temp_v1_5;
-    MenuWidget *temp_v1_6;
+    MenuItem *temp_v1_2;
+    MenuItem *temp_v1_3;
+    MenuItem *temp_v1_4;
+    MenuItem *temp_v1_5;
+    MenuItem *temp_v1_6;
 
-    temp_v1 = arg0->data;
+    temp_v1 = arg0->player;
     if (temp_v1 != NULL) {
         temp_v1->unkBF8 = 1;
     }
-    temp_v1_2 = arg0->widget;
-    FIELD_AT(temp_v1_2, s32, MenuWidget, items[9].flags) = (s32) (FIELD_AT(temp_v1_2, s32, MenuWidget, items[9].flags) | 0x01800000);
-    temp_v1_3 = arg0->widget;
-    FIELD_AT(temp_v1_3, s32, MenuWidget, items[10].flags) = (s32) (FIELD_AT(temp_v1_3, s32, MenuWidget, items[10].flags) | 0x01800000);
-    temp_v1_4 = arg0->widget;
-    FIELD_AT(temp_v1_4, s32, MenuWidget, items[11].flags) = (s32) (FIELD_AT(temp_v1_4, s32, MenuWidget, items[11].flags) | 0x01800000);
-    temp_v1_5 = arg0->widget;
-    FIELD_AT(temp_v1_5, s32, MenuWidget, items[12].flags) = (s32) (FIELD_AT(temp_v1_5, s32, MenuWidget, items[12].flags) & 0xFE7FFFFF);
-    temp_v1_6 = arg0->widget;
-    FIELD_AT(temp_v1_6, s32, MenuWidget, items[13].flags) = (s32) (FIELD_AT(temp_v1_6, s32, MenuWidget, items[13].flags) & 0xFE7FFFFF);
+    temp_v1_2 = arg0->items;
+    FIELD_AT(&temp_v1_2[11], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_2[11], s32, MenuItem, flags) | 0x01800000);
+    temp_v1_3 = arg0->items;
+    FIELD_AT(&temp_v1_3[12], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_3[12], s32, MenuItem, flags) | 0x01800000);
+    temp_v1_4 = arg0->items;
+    FIELD_AT(&temp_v1_4[13], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_4[13], s32, MenuItem, flags) | 0x01800000);
+    temp_v1_5 = arg0->items;
+    FIELD_AT(&temp_v1_5[14], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_5[14], s32, MenuItem, flags) & 0xFE7FFFFF);
+    temp_v1_6 = arg0->items;
+    FIELD_AT(&temp_v1_6[15], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_6[15], s32, MenuItem, flags) & 0xFE7FFFFF);
     if (D_8011ACE4 != 0) {
-        temp_v0 = arg0->widget;
-        FIELD_AT(temp_v0, s32, MenuWidget, items[5].flags) = (s32) (FIELD_AT(temp_v0, s32, MenuWidget, items[5].flags) | 0x01000000);
+        temp_v0 = arg0->items;
+        FIELD_AT(&temp_v0[7], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v0[7], s32, MenuItem, flags) | 0x01000000);
         return;
     }
-    temp_a0 = arg0->widget;
-    FIELD_AT(temp_a0, s32, MenuWidget, items[5].flags) = (s32) (FIELD_AT(temp_a0, s32, MenuWidget, items[5].flags) & 0xFEFFFFFF);
+    temp_a0 = arg0->items;
+    FIELD_AT(&temp_a0[7], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_a0[7], s32, MenuItem, flags) & 0xFEFFFFFF);
 }

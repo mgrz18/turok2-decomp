@@ -1,16 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/menu.h"
 
-typedef struct {
-    /* 0x00 */ s32 index;
-    /* 0x04 */ u8 pad4[0x10];
-    /* 0x14 */ char *text;
-} MenuItem;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ CPlayer *player;
-} MenuCaller;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x33];
@@ -25,7 +16,7 @@ extern s32 func_004160F0(MenuItem *a);
 extern void func_0029E3E0(char *dst, char *fmt, ...);
 
 /* "<name> <count>" line of the score table, for the slot of item index - 2. */
-s32 func_0041CCB4(MenuItem *a, MenuCaller *c) {
+s32 func_0041CCB4(MenuItem *a, Menu *c) {
     s32 slot = a->index - 2;
     CPlayer *player = c->player;
     s32 n;

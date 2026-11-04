@@ -1,9 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItemTmpl;
+#include "structs/menu.h"
 
 extern u8 D_8011AAED; /* D_8011AAD8 + 0x15: 0x80-centred setting */
 extern char D_800B6570[];
@@ -12,11 +8,11 @@ extern char D_800B6540[];
 extern char D_800B6588[];
 extern char D_800C1030[]; /* "  %2d" */
 extern char D_800C1038[]; /* " %3d" */
-extern s32 func_004160F0(MenuItemTmpl *a);
+extern s32 func_004160F0(MenuItem *a);
 extern void func_0029E3E0(char *dst, char *fmt, ...);
 
 /* Label of a slider setting: its value from -16 to 15, in steps of 8 raw units. */
-s32 func_00419F48(MenuItemTmpl *a) {
+s32 func_00419F48(MenuItem *a) {
     s32 v = (D_8011AAED - 0x80) / 8;
 
     if (v == 0) {

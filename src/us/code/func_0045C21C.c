@@ -1,5 +1,6 @@
 /* Second-module copy of func_004232FC (first module; this one at link address 0x0042321C), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "structs/menu.h"
 
 s32 func_00253640(s32, s32, s32);
 
@@ -33,38 +34,18 @@ typedef struct {
     /* 0xBF8 */ s32 unkBF8;
 } MenuData;
 
-/* A menu item: its widget at 0xC (flag 0x01000000 in widget->flags hides
- * it) and the player data at 0x1C. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ s32 flags;
-} MenuItem; /* size 0x28 */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x34];
-    /* 0x34 */ MenuItem items[14];
-} MenuWidget;
-
-typedef struct {
-    /* 0x00 */ s16 state;
-    /* 0x02 */ u8 pad2[0xC - 0x2];
-    /* 0x0C */ MenuWidget *widget;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ MenuData *data;
-} MenuPage;
-
-s32 func_0045C21C(s32 arg0, MenuPage *arg1) {
+s32 func_0045C21C(s32 arg0, Menu *arg1) {
     MenuData *temp_a0;
-    MenuWidget *temp_a0_2;
-    MenuWidget *temp_v0;
+    MenuItem *temp_a0_2;
+    MenuItem *temp_v0;
 
-    temp_a0 = arg1->data;
+    temp_a0 = arg1->player;
     if (func_00253640((s32) temp_a0, 0, temp_a0->unk92C) != 0) {
-        temp_v0 = arg1->widget;
-        temp_v0->items[0].flags = temp_v0->items[0].flags | 0x01000000;
+        temp_v0 = arg1->items;
+        temp_v0[2].flags = temp_v0[2].flags | 0x01000000;
     } else {
-        temp_a0_2 = arg1->widget;
-        temp_a0_2->items[0].flags = temp_a0_2->items[0].flags & 0xFEFFFFFF;
+        temp_a0_2 = arg1->items;
+        temp_a0_2[2].flags = temp_a0_2[2].flags & 0xFEFFFFFF;
     }
     return 0;
 }

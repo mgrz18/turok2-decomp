@@ -2,6 +2,7 @@
  * (func_0041D76C, func_0041D7B0) in the middle of an index computation. */
 #include "common.h"
 #include "structs/player.h"
+#include "structs/menu.h"
 
 typedef struct {
     /* 0x00 */ s32 cursor;
@@ -10,20 +11,16 @@ typedef struct {
     /* 0x0C */ u8 name[12];
 } NameEntry; /* 0x18 bytes */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ CPlayer *player;
-} MenuCaller;
 
 extern NameEntry D_800C1FB0[];
 extern u8 D_80119870[]; /* player list; setup slot names at +0x131B (D_8011AB8B) */
 extern s32 func_0025340C(void *players, void *player);
 extern void func_0041BC50(void *options);
-extern void func_00416454(s32 menu, MenuCaller *c, s32 pool);
+extern void func_00416454(s32 menu, Menu *c, s32 pool);
 
 /* Name entry: confirm. Copies the name (blanks for unused characters) into the setup slot;
  * an empty name resets the player's options. */
-s32 func_0041D76C(s32 menu, MenuCaller *c, s32 pool) {
+s32 func_0041D76C(s32 menu, Menu *c, s32 pool) {
     CPlayer *player = c->player;
     s32 i = func_0025340C(D_80119870, player);
     u8 *src = D_800C1FB0[i].name;

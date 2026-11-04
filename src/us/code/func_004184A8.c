@@ -1,18 +1,14 @@
 #include "common.h"
 #include "structs/game.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItemTmpl;
+#include "structs/menu.h"
 
 extern char D_800C0E84[]; /* "  %02d" */
 extern char D_800C0E8C[]; /* "none" */
-extern s32 func_004160F0(MenuItemTmpl *a);
+extern s32 func_004160F0(MenuItem *a);
 extern void func_0029E3E0(char *dst, char *fmt, ...);
 
 /* Prints the time limit into the label, or "none". */
-s32 func_004184A8(MenuItemTmpl *a) {
+s32 func_004184A8(MenuItem *a) {
     GameSettings *setup = &D_8011AAD8;
 
     if (setup->tagTimeLimit != 0) {

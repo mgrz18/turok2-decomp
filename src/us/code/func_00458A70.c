@@ -1,24 +1,9 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00407F6C.c, func_00407F6C, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/menu.h"
 
 /* Controller pak note list item: prints a note's name (16 characters), extension (4) and size in blocks
  * into the item's text; an empty slot prints blanks. */
-
-typedef struct {
-    u8 pad0[4];
-    s8 pad; /* 0x04 */
-} MenuPad;
-
-typedef struct {
-    u8 pad0[0x20];
-    MenuPad *pad; /* 0x20 */
-} MenuOwner;
-
-typedef struct {
-    /* 0x00 */ s32 code;
-    /* 0x04 */ u8 pad4[0x10];
-    /* 0x14 */ char *text;
-} MenuItem;
 
 extern s32 D_801309BC;
 extern s32 D_80130990;
@@ -31,7 +16,7 @@ s32 func_00426D5C(u8 *p, s32 n);
 char *func_00426D24(char *dst, char *src);
 void func_0029E3E0(char *dst, u8 *fmt, s32 a);
 
-s32 func_00458A70(MenuItem *item, MenuOwner *own) {
+s32 func_00458A70(MenuItem *item, Menu *own) {
     u8 name[16];
     u8 ext[8];
     u8 company[8];
@@ -46,7 +31,7 @@ s32 func_00458A70(MenuItem *item, MenuOwner *own) {
     s32 i;
     u8 *dst;
 
-    idx = item->code - 3;
+    idx = item->index - 3;
     c = 0x20;
     if (D_801309BC != 0) {
         return 0;
@@ -54,7 +39,7 @@ s32 func_00458A70(MenuItem *item, MenuOwner *own) {
     if (D_80130990 != 0) {
         pad = D_800C2028;
     } else {
-        pad = own->pad->pad;
+        pad = own->controller->port;
     }
     r = func_00425D94(pad, idx, &valid, name, ext, &blocks, company, game);
     if (valid != 0 && r == 0) {

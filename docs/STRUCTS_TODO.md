@@ -85,6 +85,12 @@ views were replaced in about 230 files. Still local, and why:
   region graph and its collision triangles (`D_800B2608`).
 - **MenuItem** (115 files, 26 layouts), MenuItemTmpl (36), MenuEvent (35),
   MenuCaller (32), MenuController (18), MenuPad (16): the menu system.
+  DONE: `include/structs/menu.h` (Menu, MenuItem, MenuItemDesc, MenuDesc,
+  MenuItemLayout, MenuController, MenuPool), used by 216 files. Left local:
+  the per-function item views of the VM (func_00413230.c / func_0044C230.c:
+  sliders, model items, Q04*), the weapon wheel's "MenuItem" (func_0024AF68,
+  func_0024B3E4, func_00254D5C: not a menu) and the CPlayer views named Menu
+  (func_004214C4, func_00451040, func_0045AEA8).
 - **libultra copies**: OSThread (28), OSMesgQueue (32), __OSThreadContext,
   __OSfp, OSPfs (14), Gfx (23): these belong to the libultra/gbi headers.
 - **Vectors**: Vec3f (166 files), Vec3 (104), V3 (22), Quat (18): all

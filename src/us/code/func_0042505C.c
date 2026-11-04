@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 extern char D_800C1768[];
 extern char D_800B43BC[];
@@ -8,11 +9,6 @@ extern char D_800B44C4[];
 extern char D_800B44FC[];
 extern char D_800B4560[];
 extern s32 D_80130A30;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItem;
 
 s32 func_0042505C(MenuItem *item) {
     switch (D_80130A30) {

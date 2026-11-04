@@ -1,21 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ char *text;
-} MenuItemTmpl;
-
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ s8 kind;
-} MenuCtl;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ CPlayer *player;
-    /* 0x20 */ MenuCtl *ctl;
-} MenuCaller;
+#include "structs/menu.h"
 
 extern char D_800B41B0[];
 extern char D_800B41C0[];
@@ -24,19 +9,19 @@ extern char D_800B41E0[];
 extern char D_800B41F0[];
 extern char D_800B4200[];
 extern char D_800C0E7C[]; /* number format */
-extern s32 func_004160F0(MenuItemTmpl *a);
+extern s32 func_004160F0(MenuItem *a);
 extern void func_0029E3E0(char *dst, char *fmt, s32 value);
 
 /* Label of the handicap item, with the handicap value printed into it. */
-s32 func_00417F9C(MenuItemTmpl *a, MenuCaller *c) {
-    s32 handicap = c->player->m_pOptions->m_Handicap;
+s32 func_00417F9C(MenuItem *a, Menu *c) {
+    s32 handicap = ((CPlayer *) c->player)->m_pOptions->m_Handicap;
 
     if (handicap == 0) {
         a->text = D_800B41F0;
     } else if (handicap == 10) {
         a->text = D_800B4200;
     } else {
-        switch (c->ctl->kind) {
+        switch (c->controller->port) {
         case 0:
         default:
             a->text = D_800B41B0;

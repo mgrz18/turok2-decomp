@@ -2,12 +2,7 @@
  * (func_00418294, func_004182E8) in the middle of a call's argument setup. */
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ CPlayer *player;
-    /* 0x20 */ void *controller;
-} MenuCaller;
+#include "structs/menu.h"
 
 typedef struct {
     /* 0x0 */ s16 unk0;
@@ -18,14 +13,14 @@ extern CharacterSound D_800C1E78[];
 extern u8 D_00438748[];  /* menu template */
 
 extern s32 func_002855E8(void *controller);
-extern s32 func_00416558(MenuCaller *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);
+extern s32 func_00416558(Menu *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);
 extern void func_0042E430(CPlayer *player, s32 team);
 extern void func_00416214(s32 menu, s32 id, s32 arg);
 extern void func_00275624(s32 sound);
-extern void func_00416894(s32 pool, MenuCaller *c, void *tmpl);
+extern void func_00416894(s32 pool, Menu *c, void *tmpl);
 
 /* Team selection item: left/right cycles the team, A confirms. */
-s32 func_00418294(s32 menu, MenuCaller *c, s32 pool) {
+s32 func_00418294(s32 menu, Menu *c, s32 pool) {
     CPlayer *player = c->player;
     CPlayerOptions *options = player->m_pOptions;
 

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/menu.h"
 
 /* Name entry: highlight the current player's column and load the player's
  * name (trailing spaces trimmed; the default name D_800C1340 counts as empty)
@@ -10,24 +11,6 @@ typedef struct {
     s32 length;    /* 0x08 */
     char name[12]; /* 0x0C */
 } NameEntry; /* 0x18 bytes */
-
-typedef struct {
-    u8 pad0[8];
-    u32 flags; /* 0x08 */
-    u8 padC[0x1C];
-} MenuEntry; /* 0x28 bytes */
-
-typedef struct {
-    u8 pad0[0x28];
-    MenuEntry entries[4]; /* 0x28 */
-} Menu;
-
-typedef struct {
-    u8 pad0[0xC];
-    Menu *menu;   /* 0x0C */
-    u8 pad10[0xC];
-    void *player; /* 0x1C */
-} MenuEvent;
 
 #define ENTRY_SELECTED 0x01800000
 
@@ -49,7 +32,7 @@ static __inline__ s32 nameEquals(u8 *a, u8 *b, s32 count) {
     return c == d;
 }
 
-void func_00455FA0(MenuEvent *event) {
+void func_00455FA0(Menu *event) {
     s32 i = func_0025340C(D_80119870, event->player);
     s32 trailing;
     char *dst;
@@ -60,28 +43,28 @@ void func_00455FA0(MenuEvent *event) {
     switch (i) {
     case 0:
     default:
-        event->menu->entries[0].flags |= ENTRY_SELECTED;
-        event->menu->entries[1].flags &= ~ENTRY_SELECTED;
-        event->menu->entries[2].flags &= ~ENTRY_SELECTED;
-        event->menu->entries[3].flags &= ~ENTRY_SELECTED;
+        event->items[1].flags |= ENTRY_SELECTED;
+        event->items[2].flags &= ~ENTRY_SELECTED;
+        event->items[3].flags &= ~ENTRY_SELECTED;
+        event->items[4].flags &= ~ENTRY_SELECTED;
         break;
     case 1:
-        event->menu->entries[1].flags |= ENTRY_SELECTED;
-        event->menu->entries[0].flags &= ~ENTRY_SELECTED;
-        event->menu->entries[2].flags &= ~ENTRY_SELECTED;
-        event->menu->entries[3].flags &= ~ENTRY_SELECTED;
+        event->items[2].flags |= ENTRY_SELECTED;
+        event->items[1].flags &= ~ENTRY_SELECTED;
+        event->items[3].flags &= ~ENTRY_SELECTED;
+        event->items[4].flags &= ~ENTRY_SELECTED;
         break;
     case 2:
-        event->menu->entries[2].flags |= ENTRY_SELECTED;
-        event->menu->entries[0].flags &= ~ENTRY_SELECTED;
-        event->menu->entries[1].flags &= ~ENTRY_SELECTED;
-        event->menu->entries[3].flags &= ~ENTRY_SELECTED;
+        event->items[3].flags |= ENTRY_SELECTED;
+        event->items[1].flags &= ~ENTRY_SELECTED;
+        event->items[2].flags &= ~ENTRY_SELECTED;
+        event->items[4].flags &= ~ENTRY_SELECTED;
         break;
     case 3:
-        event->menu->entries[3].flags |= ENTRY_SELECTED;
-        event->menu->entries[0].flags &= ~ENTRY_SELECTED;
-        event->menu->entries[1].flags &= ~ENTRY_SELECTED;
-        event->menu->entries[2].flags &= ~ENTRY_SELECTED;
+        event->items[4].flags |= ENTRY_SELECTED;
+        event->items[1].flags &= ~ENTRY_SELECTED;
+        event->items[2].flags &= ~ENTRY_SELECTED;
+        event->items[3].flags &= ~ENTRY_SELECTED;
         break;
     }
 

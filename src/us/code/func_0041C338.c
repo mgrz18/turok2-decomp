@@ -1,18 +1,12 @@
 #include "common.h"
 #include "structs/game.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ u32 flags;
-    /* 0x0C */ u8 padC[8];
-    /* 0x14 */ char *text;
-} MenuItemTmpl;
+#include "structs/menu.h"
 
 extern u8 D_8011AAF3; /* D_8011AAD8 + 0x1B */
 extern char D_800B3FD8[];
 extern char D_800B3FF0[];
 
-s32 func_0041C338(MenuItemTmpl *a) {
+s32 func_0041C338(MenuItem *a) {
     if (D_8011AAD8.mode == 13 && D_8011AAD8.multiplayer == 0) {
         a->flags &= ~0x1000000;
     } else {

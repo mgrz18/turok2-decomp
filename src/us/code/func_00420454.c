@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "structs/menu.h"
 
 /* Load game menu "select" handler: with the pak checked, either restores the
  * loaded save (player block, game progress, level times, the level's key
@@ -35,17 +36,6 @@ typedef struct {
     /* 0xA50 */ void *controller;
 } Player;
 
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ s8 slot;
-} MenuCtl;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ s32 unk1C;
-    /* 0x20 */ MenuCtl *ctl;
-    /* 0x24 */ void *parent;
-} MenuCaller;
 
 extern s32 D_80130990;
 extern s32 D_801309B8;
@@ -67,12 +57,12 @@ extern u8 D_0043BD20[];
 extern u8 D_0043BDB0[];
 extern u8 D_0043BE1C[];
 
-extern s32 func_0041DD90(MenuCaller *c, s32 slot, s32 quiet);
-extern Player *func_0025342C(void *players, MenuCtl *ctl);
+extern s32 func_0041DD90(Menu *c, s32 slot, s32 quiet);
+extern Player *func_0025342C(void *players, MenuController *ctl);
 extern s32 func_00426064(s32 slot, s32 note);
 extern void func_00416644(void *menus, void *tmpl, s32 a, void *b, void *parent);
 
-s32 func_00420454(void *menu, MenuCaller *c) {
+s32 func_00420454(void *menu, Menu *c) {
     s32 slot;
     Player *player;
     u8 keep;
@@ -84,14 +74,14 @@ s32 func_00420454(void *menu, MenuCaller *c) {
     if (D_80130990) {
         slot = D_800C2028;
     } else {
-        slot = c->ctl->slot;
+        slot = c->controller->port;
     }
     if (func_0041DD90(c, slot, 0) != 0) {
         D_801309BC = 1;
         return 1;
     }
     if (D_801309B8 != 0) {
-        player = func_0025342C(D_80119870, c->ctl);
+        player = func_0025342C(D_80119870, c->controller);
         world = &D_800F7078;
         keep = D_8011AC58[0];
         player->save = D_800C201C->player;
@@ -113,9 +103,9 @@ s32 func_00420454(void *menu, MenuCaller *c) {
         return 1;
     }
     if (func_00426064(slot, D_801309C4) == 0) {
-        func_00416644(D_80119870 + 0x5BC, D_0043BDB0, c->unk1C, c->ctl, c->parent);
+        func_00416644(D_80119870 + 0x5BC, D_0043BDB0, c->player, c->controller, c->context);
     } else {
-        func_00416644(D_80119870 + 0x5BC, D_0043BE1C, c->unk1C, c->ctl, c->parent);
+        func_00416644(D_80119870 + 0x5BC, D_0043BE1C, c->player, c->controller, c->context);
     }
     return 1;
 }

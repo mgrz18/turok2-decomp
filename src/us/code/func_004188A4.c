@@ -1,14 +1,10 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/MISC/8043DF84_2.CPP, func_8043E6A4_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/menu.h"
 
 extern s32 func_0041648C(void *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
 extern s32 func_00285670(s32);
 extern s32 func_002855E8(s32);
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ s32 controller;
-} MenuItem;
 
 extern s32 D_800C1EA8;      /* selected entry, 0..15 */
 typedef struct {
@@ -21,7 +17,7 @@ extern f32 D_8011AAF4;      /* resulting scale */
 
 /* Steps the selection (twice when the controller reports busy) and sets the scale
  * from the table plus one, clamped to [0.5, 2.0]. */
-s32 func_004188A4(void *arg0, MenuItem *item) {
+s32 func_004188A4(void *arg0, Menu *item) {
     f32 scale;
 
     D_800C1EA8 = func_0041648C(item, D_800C1EA8, 1, 0, 15, 0);

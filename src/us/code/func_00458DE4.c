@@ -1,19 +1,9 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004082FC.c, func_004082FC, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/menu.h"
 
 /* Controller pak menu, confirm: checks the pak, then saves (replacing the game's note when one exists, with a
  * message when it is in use) or, without a pak, looks for the next pad that has one. */
-
-typedef struct {
-    u8 pad0[4];
-    s8 pad; /* 0x04 */
-} MenuPad;
-
-typedef struct {
-    u8 pad0[0x1C];
-    s32 player;   /* 0x1C */
-    MenuPad *pad; /* 0x20 */
-} MenuOwner;
 
 extern s32 D_80130984;
 extern s32 D_80130990;
@@ -31,13 +21,13 @@ void func_004263A0(s32 a);
 s32 func_0042647C(s32 a);
 void func_00426898(s32 a, s32 b, s32 *c);
 void func_00426BA8(s32 a, u8 *b, s32 c);
-void func_0041D948(MenuOwner *o);
-s32 func_0041DCB0(MenuOwner *o, s32 a, s32 b);
-void func_0041ED00(s32 a, MenuOwner *o, s32 c);
-void func_0041EFE8(s32 a, MenuOwner *o, s32 c);
-void func_00416644(void *a, void *b, s32 c, MenuPad *d, void *e);
+void func_0041D948(Menu *o);
+s32 func_0041DCB0(Menu *o, s32 a, s32 b);
+void func_0041ED00(s32 a, Menu *o, s32 c);
+void func_0041EFE8(s32 a, Menu *o, s32 c);
+void func_00416644(void *a, void *b, s32 c, MenuController *d, void *e);
 
-s32 func_00458DE4(s32 a0, MenuOwner *o, s32 a2) {
+s32 func_00458DE4(s32 a0, Menu *o, s32 a2) {
     u8 buf[16];
     struct {
         s32 pad;
@@ -50,7 +40,7 @@ s32 func_00458DE4(s32 a0, MenuOwner *o, s32 a2) {
         if (D_80130990 != 0) {
             L.pad = D_800C2028;
         } else {
-            L.pad = o->pad->pad;
+            L.pad = o->controller->port;
         }
     }
     if (D_80130990 != 0) {
@@ -88,7 +78,7 @@ s32 func_00458DE4(s32 a0, MenuOwner *o, s32 a2) {
         found = 0;
     after:
         if (found != 0 && D_801309C4 >= 0 && D_801309C4 < 0x10) {
-            func_00416644(D_80119E2C, D_0043C12C, o->player, o->pad, D_0043B634);
+            func_00416644(D_80119E2C, D_0043C12C, o->player, o->controller, D_0043B634);
             return 1;
         }
         func_0041EFE8(a0, o, a2);
@@ -128,7 +118,7 @@ s32 func_00458DE4(s32 a0, MenuOwner *o, s32 a2) {
             s32 a1 = s0;
 
             if (D_80130990 == 0) {
-                a1 = o->pad->pad;
+                a1 = o->controller->port;
             }
             L.pad = a1;
             if (func_0041DCB0(o, a1, 0) != 0) {
