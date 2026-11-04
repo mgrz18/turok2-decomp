@@ -28,6 +28,40 @@ typedef struct {
     /* 0xC */ s32 count;
 } ALHeap; /* size 0x10 */
 
+/* libaudio's sound bank (PR/libaudio.h); ALSound is left opaque. */
+typedef struct {
+    /* 0x00 */ u8 volume;
+    /* 0x01 */ u8 pan;
+    /* 0x02 */ u8 priority;
+    /* 0x03 */ u8 flags;
+    /* 0x04 */ u8 tremType;
+    /* 0x05 */ u8 tremRate;
+    /* 0x06 */ u8 tremDepth;
+    /* 0x07 */ u8 tremDelay;
+    /* 0x08 */ u8 vibType;
+    /* 0x09 */ u8 vibRate;
+    /* 0x0A */ u8 vibDepth;
+    /* 0x0B */ u8 vibDelay;
+    /* 0x0C */ s16 bendRange;
+    /* 0x0E */ s16 soundCount;
+    /* 0x10 */ struct ALSound_s *soundArray[1];
+} ALInstrument;
+
+typedef struct {
+    /* 0x0 */ s16 instCount;
+    /* 0x2 */ u8 flags;
+    /* 0x3 */ u8 pad;
+    /* 0x4 */ s32 sampleRate;
+    /* 0x8 */ ALInstrument *percussion;
+    /* 0xC */ ALInstrument *instArray[1];
+} ALBank;
+
+typedef struct {
+    /* 0x0 */ s16 revision;
+    /* 0x2 */ s16 bankCount;
+    /* 0x4 */ ALBank *bankArray[1];
+} ALBankFile;
+
 /* The libaudio synthesizer's buses (synthInternals.h), behind ALFilter. */
 typedef struct {
     /* 0x00 */ u8 filter[0x14]; /* ALFilter: source, handler, setParam, inp, outp, type */
@@ -178,8 +212,8 @@ struct SndMgr {
     /* 0x0000 */ u8 pad0[0x24];
     /* 0x0024 */ s32 playerConfig[3];  /* ALSndpConfig: maxSounds, maxEvents, heap */
     /* 0x0030 */ u8 pad30[0x4C];
-    /* 0x007C */ void *bank;           /* ALBank * */
-    /* 0x0080 */ void *bankFile;       /* ALBankFile * */
+    /* 0x007C */ ALBank *bank;         /* bankFile->bankArray[0] */
+    /* 0x0080 */ ALBankFile *bankFile;
     /* 0x0084 */ u8 player[0x54];      /* ALSndPlayer */
     /* 0x00D8 */ s32 soundState;
     /* 0x00DC */ s16 handles[16];
