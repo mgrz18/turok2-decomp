@@ -126,7 +126,7 @@ typedef struct {
     /* 0x2E */ u8 pad2E[2];
     /* 0x30 */ s32 unk30;
     /* 0x34 */ CVector3 pos;   /* world position of a 3D sound */
-    /* 0x40 */ s32 state;
+    /* 0x40 */ CVector3 *follow; /* when set, copied to pos every frame; cleared on stop */
     /* 0x44 */ s8 distanceMode;
     /* 0x45 */ u8 pad45[3];
     /* 0x48 */ f32 distSq;     /* squared distance to the listener */
@@ -161,14 +161,14 @@ typedef struct SndVoice {
     /* 0x8C */ SndEnv env3;
     /* 0x98 */ f32 env3Value;
     /* 0x9C */ f32 env3Step;
-    /* 0xA0 */ s32 pending;
+    /* 0xA0 */ s32 delay;        /* frames before it starts */
     /* 0xA4 */ u32 flags;      /* 0x4 enveloped, 0x8 stop, 0x200 music volume, 0x400 positional */
     /* 0xA8 */ s32 soundId;
     /* 0xAC */ s32 stopping;
     /* 0xB0 */ SndMgr *mgr;
     /* 0xB4 */ s32 unkB4;
     /* 0xB8 */ f32 pitchScale;
-    /* 0xBC */ s32 unkBC;
+    /* 0xBC */ s32 hasTrack;     /* stops when SndMgr.track is no longer soundId */
     /* 0xC0 */ s32 reset;
     /* 0xC4 */ s32 unkC4;
     /* 0xC8 */ f32 volumeScale;

@@ -116,7 +116,7 @@ void func_002726DC(SndVoice *o) {
                     if (o->env2Value == 0.0f) {
                         ctx = o->mgr;
                         o->stopping = 1;
-                        o->vp.state = 0;
+                        o->vp.follow = 0;
                         if (o->vp.frame != ctx->frame) {
                             func_00293E60(ctx->player, ctx->handles[o->index]);
                             if (func_00293580(ctx->player) != 0) {

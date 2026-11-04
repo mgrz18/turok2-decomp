@@ -18,7 +18,7 @@ void func_002742F4(SndVoicePool *set, u32 mask) {
             void *sound;
 
             voice->stopping = 1;
-            voice->vp.state = 0;
+            voice->vp.follow = 0;
             if (voice->vp.frame != owner->frame) {
                 sound = owner->player;
                 func_00293E60(sound, owner->handles[voice->index]);

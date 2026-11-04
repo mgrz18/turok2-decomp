@@ -18,7 +18,7 @@ void func_00273DD8(s32 arg0, s16 arg1) {
     var_s0 = (SndVoice *) &((SndVoicePool *) var_s0)->voices[0];
     temp_a0 = var_s0->mgr;
     var_s0->stopping = 1;
-    var_s0->vp.state = 0;
+    var_s0->vp.follow = 0;
     var_s1 = temp_a0->player;
     if (var_s0->vp.frame != temp_a0->frame) {
         func_00293E60(var_s1, temp_a0->handles[var_s0->index]);
