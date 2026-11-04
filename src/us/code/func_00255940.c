@@ -1,12 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SOUND/8022C894.CPP, func_8022CE78_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
+#include "structs/intelligence.h"
 struct LevelActor;
 struct CVector3_t;
 struct Box;
@@ -44,19 +40,6 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -66,7 +49,7 @@ struct LevelActor {
     s16 modelIndex;
     u16 pad6;
     CVector3 position0;
-    ActorDefinitionHeader *definition; /* 0x14 in Turok 2 (Rage Wars has an extra s32 before it) */
+    CIntelligence *definition; /* 0x14 in Turok 2 (Rage Wars has an extra s32 before it) */
     CVector3 position1;
     CVector3 motionAngles;
     void *attached;
@@ -145,7 +128,6 @@ struct LevelActor {
 };
 struct LevelActor;
 struct LevelActor;
-struct ActorDefinitionHeader;
 struct LevelActor;
 extern char D_800ADE70;
 extern char D_800ADE28;

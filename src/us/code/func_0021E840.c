@@ -1,12 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_9.CPP, func_8024B53C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
+#include "structs/intelligence.h"
 struct LevelActor;
 struct CVector3_t;
 extern float func_002974C0(float x);
@@ -44,19 +40,6 @@ struct CQuatern_t {
     float z;
     float w;
 };
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 typedef struct LevelActor LevelActor;
 struct LevelActor {               /* Turok 2 layout (Rage Wars offsets in comments) */
     u8 kind;
@@ -65,7 +48,7 @@ struct LevelActor {               /* Turok 2 layout (Rage Wars offsets in commen
     s8 field3;
     CVector3 position0;           /* 0x04 (0x08) */
     s32 model;                    /* 0x10 (0x14) */
-    ActorDefinitionHeader *definition; /* 0x14 (0x18) */
+    CIntelligence *definition; /* 0x14 (0x18) */
     CVector3 position1;           /* 0x18 (0x1C) */
     u8 pad24[0x10];
     CVector3 scale;               /* 0x34 (0x50) */
@@ -76,7 +59,6 @@ struct LevelActor {               /* Turok 2 layout (Rage Wars offsets in commen
 };
 struct LevelActor;
 struct LevelActor;
-struct ActorDefinitionHeader;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;

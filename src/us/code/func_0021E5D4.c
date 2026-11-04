@@ -1,13 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_8.CPP, func_8024B2D0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
+#include "common.h"
+#include "structs/intelligence.h"
 struct LevelActor;
 struct CVector3_t;
 struct Box;
@@ -51,23 +46,10 @@ struct TypeEntry {
     void *unk0;
     void (*callback)(void *, void *);
 };
-typedef struct ActorDefinitionHeader {
-    s32 kind;
-    s32 gate;
-    u8 pad8[4];
-    s16 character;
-    s8 first;
-    u8 padF;
-    s8 second;
-    u8 pad11;
-    s8 send;
-    u8 pad13;
-    s32 flags;
-} ActorDefinitionHeader;
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 pad0[0x14];
-    ActorDefinitionHeader *definition; /* 0x14 */
+    CIntelligence *definition; /* 0x14 */
     u8 pad18[0xD4 - 0x18];
     s32 flags;                         /* 0xD4 */
     u8 padD8[0x207 - 0xD8];
@@ -75,7 +57,6 @@ struct LevelActor {
 };
 struct LevelActor;
 struct LevelActor;
-struct ActorDefinitionHeader;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
@@ -93,7 +74,7 @@ void func_0021E5D4(char *arg0)
     s32 limit;
     char *object;
     TypeEntry *entry;
-    type = ((struct LevelActor *)(arg0))->definition->kind;
+    type = ((struct LevelActor *)(arg0))->definition->m_Type;
     if ((u32)type < 13) {
         goto valid_type;
     }
