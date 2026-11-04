@@ -1,5 +1,6 @@
 /* Second VM module copy of func_0042DA60 (same source, linked 0x0042D980). */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct ActorDef {
     /* 0x00 */ u8 pad0[0x38];
@@ -28,15 +29,6 @@ typedef struct Actor {
     /* 0x24C */ u8 pad24C[0x288 - 0x24C];
 } Actor;
 
-typedef struct Player {
-    /* 0x000 */ Actor actor;
-    /* 0x288 */ Actor shadow;
-    /* 0x510 */ u8 pad510[0x51C - 0x510];
-    /* 0x51C */ s32 unk51C;
-    /* 0x520 */ u8 pad520[0x996 - 0x520];
-    /* 0x996 */ s16 weapon;
-} Player;
-
 typedef struct GameMode {
     u8 multiplayer;
 } GameMode;
@@ -53,49 +45,49 @@ extern void func_00247FB0();
 extern void func_00257A40();
 extern void func_00243414(void *, void *, s32);
 extern void func_00258668(void *, void *);
-extern void func_0024CF58(Player *p, Player *q);
+extern void func_0024CF58(CPlayer *p, CPlayer *q);
 extern void func_00284254(s32);
 
-void func_00466980(Player *p, void *rec, s32 mode) {
+void func_00466980(CPlayer *p, void *rec, s32 mode) {
     f32 half;
 
-    p->actor.owner = p;
+    p->m_CharacterActor.m_AI.m_pParent = p;
     func_0021E6AC(p, rec, mode, 0);
-    p->actor.owner = p;
-    p->actor.flags |= 0x100000;
-    p->actor.flags |= 0x10000;
-    p->actor.flags |= 0x1000000;
-    p->actor.flags |= 0x2000000;
+    p->m_CharacterActor.m_AI.m_pParent = p;
+    p->m_CharacterActor.m_dwFlags |= 0x100000;
+    p->m_CharacterActor.m_dwFlags |= 0x10000;
+    p->m_CharacterActor.m_dwFlags |= 0x1000000;
+    p->m_CharacterActor.m_dwFlags |= 0x2000000;
     if (!D_8011AAF1.multiplayer) {
-        p->actor.flags |= 0x10000000;
+        p->m_CharacterActor.m_dwFlags |= 0x10000000;
     }
-    p->actor.onMove = func_0021E840;
-    p->actor.onDraw = func_00256738;
-    p->actor.onDamage = func_00247C10;
-    p->actor.onCollide = func_0025689C;
+    p->m_CharacterActor.m_AI.m_pfCalculateOrientationMatrix = func_0021E840;
+    p->m_CharacterActor.m_AI.m_pfEffects = func_00256738;
+    p->m_CharacterActor.m_AI.m_pfHurt = func_00247C10;
+    p->m_CharacterActor.m_AI.m_pfHit = func_0025689C;
     if (D_8011AAF1.multiplayer) {
-        p->actor.onUpdate = func_00247FB0;
+        p->m_CharacterActor.m_AI.m_pfDraw = func_00247FB0;
     }
 
-    p->shadow.owner = p;
-    func_0021E6AC(&p->shadow, rec, mode, 0);
-    p->shadow.onMove = func_00257A40;
-    p->shadow.unk174 = -1;
-    p->shadow.owner = p;
-    p->shadow.onDamage = func_00247C10;
-    p->shadow.onCollide = func_0025689C;
-    p->shadow.flags |= 0x200000;
-    p->weapon = -1;
+    p->m_WeaponActor.m_AI.m_pParent = p;
+    func_0021E6AC(&p->m_WeaponActor, rec, mode, 0);
+    p->m_WeaponActor.m_AI.m_pfCalculateOrientationMatrix = func_00257A40;
+    p->m_WeaponActor.m_AI.m_Mode = -1;
+    p->m_WeaponActor.m_AI.m_pParent = p;
+    p->m_WeaponActor.m_AI.m_pfHurt = func_00247C10;
+    p->m_WeaponActor.m_AI.m_pfHit = func_0025689C;
+    p->m_WeaponActor.m_dwFlags |= 0x200000;
+    p->m_Data.m_CurrentWeapon = -1;
     half = D_800A6A98;
-    p->shadow.scale[0] = half;
-    p->shadow.scale[1] = half;
-    p->shadow.scale[2] = half;
-    p->shadow.flags &= ~0x10000;
-    func_00243414(&p->shadow, p->shadow.ai, 0);
-    func_00258668(&p->shadow, p->shadow.ai);
+    p->m_WeaponActor.m_vScale.x = half;
+    p->m_WeaponActor.m_vScale.y = half;
+    p->m_WeaponActor.m_vScale.z = half;
+    p->m_WeaponActor.m_dwFlags &= ~0x10000;
+    func_00243414(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 0);
+    func_00258668(&p->m_WeaponActor, &p->m_WeaponActor.m_AI);
     func_0024CF58(p, p);
-    func_00284254(p->unk51C);
-    p->actor.scale[0] = p->actor.def->pos[0];
-    p->actor.scale[1] = p->actor.def->pos[1];
-    p->actor.scale[2] = p->actor.def->pos[2];
+    func_00284254(p->m_pCamera);
+    p->m_CharacterActor.m_vScale.x = ((ActorDef *)p->m_CharacterActor.header.m_pIntelligence)->pos[0];
+    p->m_CharacterActor.m_vScale.y = ((ActorDef *)p->m_CharacterActor.header.m_pIntelligence)->pos[1];
+    p->m_CharacterActor.m_vScale.z = ((ActorDef *)p->m_CharacterActor.header.m_pIntelligence)->pos[2];
 }

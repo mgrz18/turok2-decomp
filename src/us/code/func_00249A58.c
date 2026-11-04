@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct ActorDef {
     /* 0x00 */ s32 kind;
@@ -22,17 +23,11 @@ struct Target {
     /* 0x54C */ s32 unk54C;
 };
 
-typedef struct Player {
-    /* 0x000 */ u8 pad0[0x140];
-    /* 0x140 */ u8 ai[0x996 - 0x140];
-    /* 0x996 */ s16 weapon;
-} Player;
-
-s32 func_00245FC8(Player *, void *, Target *);
+s32 func_00245FC8(CPlayer *, void *, Target *);
 
 /* Whether the player's weapon may lock on to a target. */
-s32 func_00249A58(Player *player, Target *t) {
-    s32 weapon = player->weapon;
+s32 func_00249A58(CPlayer *player, Target *t) {
+    s32 weapon = player->m_Data.m_CurrentWeapon;
     s32 busy;
     s32 ok;
 
@@ -67,7 +62,7 @@ s32 func_00249A58(Player *player, Target *t) {
                 return 0;
             }
             if (t->health != 0) {
-                return func_00245FC8(player, player->ai, t) == 0;
+                return func_00245FC8(player, &player->m_CharacterActor.m_AI, t) == 0;
             }
             return 0;
         }
@@ -84,7 +79,7 @@ s32 func_00249A58(Player *player, Target *t) {
     case 4:
         if (t->health != 0) {
         visible:
-            return func_00245FC8(player, player->ai, t) == 0;
+            return func_00245FC8(player, &player->m_CharacterActor.m_AI, t) == 0;
         }
         return 0;
     case 7:
