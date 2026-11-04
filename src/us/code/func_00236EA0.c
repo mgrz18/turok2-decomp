@@ -4,6 +4,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
+#include "structs/player.h"
 #include "structs/world.h"
 typedef struct M04Part {
     s16 a;
@@ -19,13 +20,9 @@ typedef struct M04WorldB {
                 u8 pad0[0xBF8];
                 void *tab[1];
 } M04WorldB;
-typedef struct M04Node {
-    u8 pad0[0x1320];
-    struct M04Node *next;
-} M04Node;
 extern M04Msg D_800AD080[];
 extern CWorld D_800F7078;
-extern M04Node *D_80119890;
+extern CPlayer *D_80119890;     /* the players, a list through m_pNext */
 /* Dispatch one message through the handler table (inlined). */
 static __inline__ void send_(void *tgt, void *dst, s32 kind, CVector3 p, M04Part q) {
     if (D_800AD080[kind].fn != 0) {
@@ -39,7 +36,7 @@ void func_00236EA0(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04Part
     void **pp;
     void *cur;
     u8 *base;
-    M04Node *o;
+    CPlayer *o;
     if (D_800F7078.m_Mode == 4 || (D_800AD080[kind].flags & 0x10)) {
         if (!(D_800AD080[kind].flags & 2)) {
             send_(src, dst, kind, pos, part);
@@ -59,10 +56,10 @@ void func_00236EA0(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04Part
             o = D_80119890;
             if (o != 0) {
                 do {
-                    if ((void *)o != src && (void *)((u8 *)o + 0x288) != src) {
+                    if ((void *)o != src && (void *)&o->m_WeaponActor != src) {
                         send_(o, dst, kind, pos, part);
                     }
-                    o = o->next;
+                    o = o->m_pNext;
                 } while (o != 0);
             }
         } else {
@@ -76,10 +73,10 @@ void func_00236EA0(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04Part
             o = D_80119890;
             if (o != 0) {
                 do {
-                    if ((void *)o != src && (void *)((u8 *)o + 0x288) != src) {
+                    if ((void *)o != src && (void *)&o->m_WeaponActor != src) {
                         send_(o, dst, kind, pos, part);
                     }
-                    o = o->next;
+                    o = o->m_pNext;
                 } while (o != 0);
             }
         }

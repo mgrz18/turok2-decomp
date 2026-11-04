@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/player.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
@@ -215,16 +216,7 @@ void func_0040CCC0(BlindOneState *state) {
 /* Second boss phase update: steps the script to the next phase once the player comes within 716.8 of the
  * origin. */
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f_40CFC4;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3f_40CFC4 pos;
-} Player_40CFC4;
-
-extern Player_40CFC4 *D_80119890; /* current player */
+extern CPlayer *D_80119890; /* current player */
 extern f32 func_00298470(f32 x); /* sqrt */
 
 /* Steps the script: clears the movers and the actors' 0x24C, enters the next phase and runs its init. */
@@ -252,10 +244,10 @@ static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
 }
 
 void func_0040CFC4(BlindOneState *state) {
-    Player_40CFC4 *player = D_80119890;
+    CPlayer *player = D_80119890;
 
     if (player != NULL &&
-        func_00298470(player->pos.x * player->pos.x + player->pos.y * player->pos.y + player->pos.z * player->pos.z) <
+        func_00298470(player->m_CharacterActor.header.m_vPos.x * player->m_CharacterActor.header.m_vPos.x + player->m_CharacterActor.header.m_vPos.y * player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.header.m_vPos.z * player->m_CharacterActor.header.m_vPos.z) <
             716.8f) {
         nextPhase_40CFC4(state);
     }
