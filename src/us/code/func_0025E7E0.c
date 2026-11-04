@@ -2,48 +2,29 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 unk8;
-    /* 0x0C */ u8 padC[0x44 - 0xC];
-} VecDst;
-
-typedef struct {
-    /* 0x00 */ VecDst a;
-    /* 0x44 */ VecDst b;
-} Targets;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x36];
-    /* 0x36 */ u8 unk36;
-    /* 0x37 */ u8 pad37[0xC7 - 0x37];
-    /* 0xC7 */ s8 unkC7;
-} AI;
-
-void func_00246108(CGameObjectInstance *self, AI *ai, Targets *out, s32 f1, s32 f2);
-void func_00245BAC(CGameObjectInstance *self, AI *ai, f32 angle, f32 arg3);
-void func_00243414(CGameObjectInstance *self, AI *ai, s32 mode);
+void func_00246108(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
+void func_00245BAC(CGameObjectInstance *self, CAI *ai, f32 angle, f32 arg3);
+void func_00243414(CGameObjectInstance *self, CAI *ai, s32 mode);
 
 /* Like func_0025EB24: the turn rate, pi/3 in modes 1-2, else pi/12. */
-static __inline__ f32 TurnRate(CGameObjectInstance *self, AI *ai) {
+static __inline__ f32 TurnRate(CGameObjectInstance *self, CAI *ai) {
     f32 rate = 0.261799425f;
 
-    if (ai->unk36 == 1 || ai->unk36 == 2) {
+    if (ai->m_ModeBefore == 1 || ai->m_ModeBefore == 2) {
         rate = 1.0471977f;
     }
     return rate;
 }
 
-/* AI callback: turns toward the target (pi/3 at a time in modes 1-2, else
+/* CAI callback: turns toward the target (pi/3 at a time in modes 1-2, else
  * pi/12) and goes to mode 4 when done. */
-void func_0025E7E0(CGameObjectInstance *self, AI *ai) {
+void func_0025E7E0(CGameObjectInstance *self, CAI *ai) {
     CEnemyIntelligence *sub = &self->header.m_pIntelligence->m_Enemy;
-    Targets t;
+    CAITargets t;
 
     func_00246108(self, ai, &t, 0, 1);
-    func_00245BAC(self, ai, TurnRate(self, ai), t.a.unk8);
-    if (sub->m_StartAnim == 0 || ai->unkC7 != 0) {
+    func_00245BAC(self, ai, TurnRate(self, ai), t.m_Sight.m_Angle);
+    if (sub->m_StartAnim == 0 || ai->m_AnimRepeatedCount != 0) {
         /* FAKEMATCH: the identical branches are merged by cross-jumping; the
          * extra use of self only gives it the register priority it has in the
          * ROM ($s0 for self, $s1 for ai). */

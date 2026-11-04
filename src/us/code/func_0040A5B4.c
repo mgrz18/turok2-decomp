@@ -1,6 +1,7 @@
 #include "common.h"
+#include "structs/game_object.h"
 
-/* Module phase 1 setup: timers, the anim for the phase, slot values; unless ai->unk34 is 9, resets the
+/* Module phase 1 setup: timers, the anim for the phase, slot values; unless ai->m_Mode is 9, resets the
  * phase's active slots and runs func_00409500 three times. */
 
 typedef struct {
@@ -9,19 +10,9 @@ typedef struct {
 } Slot;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0x234];
-    /* 0x234 */ void *callback234;
-    /* 0x238 */ u8 pad238[0x248 - 0x238];
-    /* 0x248 */ void *callback248;
-    /* 0x24C */ u8 pad24C[0x250 - 0x24C];
-    /* 0x250 */ s32 unk250;
-    /* 0x254 */ s32 unk254;
-} LevelActor;
-
-typedef struct {
     /* 0x000 */ void *obj;
     /* 0x004 */ s32 count;
-    /* 0x008 */ LevelActor *actors[4];
+    /* 0x008 */ CGameObjectInstance *actors[4];
     /* 0x018 */ Slot slots[15];
     /* 0x630 */ u8 pad630[0x65C - 0x630];
     /* 0x65C */ s32 phase;
@@ -35,13 +26,6 @@ typedef struct {
     /* 0x688 */ s32 unk688;
     /* 0x68C */ s32 unk68C;
 } State;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x34 - 0x10];
-    /* 0x34 */ s8 unk34;
-} CAI;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x27C];
@@ -78,13 +62,13 @@ void func_0040A5B4(Obj *obj, CAI *ai) {
     state->phase = 1;
     state->counter = 0;
     obj->flags &= ~0x18000000;
-    ai->unkC = D_00431DE4[state->phase];
+    ai->m_VisBits = D_00431DE4[state->phase];
     state->unk664 = D_00431DFC[state->phase];
     mask = D_00431DF0[state->phase];
     state->slots[1].unk0 = state->slots[5].unk0 = 0x9600;
     state->unk674 = state->unk678 = 0x12C00;
     state->activeMask = mask;
-    if (ai->unk34 != 9) {
+    if (ai->m_Mode != 9) {
         resetSlots(state->activeMask, D_00431E08);
         for (i = 0; i < 3; i++) {
             func_00409500(0, D_00431DDC);

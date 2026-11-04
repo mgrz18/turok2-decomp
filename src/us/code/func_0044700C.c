@@ -1,13 +1,6 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ u8 pad14[0xB8 - 0x14];
-    /* 0xB8 */ u16 typeId;
-} Actor;
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -30,16 +23,16 @@ typedef struct {
 
 extern Counters D_80130200;
 
-void func_0044700C(Actor *actor, Spawn *spawn) {
+void func_0044700C(CGameObjectInstance *actor, Spawn *spawn) {
     Counters *counters;
 
     spawn->unk28 = 0;
     spawn->unk24 = 0;
     spawn->unk4 = spawn->unk8;
-    actor->pos = spawn->pos;
-    actor->unk10 = spawn->unkA8;
+    actor->header.m_vPos = spawn->pos;
+    actor->header.m_pCurrentRegion = spawn->unkA8;
     counters = &D_80130200;
-    switch (actor->typeId) {
+    switch (actor->m_nTypeFlag) {
         case 0x454:
             counters->count454++;
             break;

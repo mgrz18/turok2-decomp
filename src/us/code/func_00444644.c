@@ -1,7 +1,8 @@
 /* Second-module twin of func_0040B644 (VM module 2 is linked over module 1; same source, its own strings and pool). */
 #include "common.h"
+#include "structs/game_object.h"
 
-/* Module phase 2 setup: timers, the anim for the phase, slot values; unless ai->unk34 is 0x13, resets the
+/* Module phase 2 setup: timers, the anim for the phase, slot values; unless ai->m_Mode is 0x13, resets the
  * phase's active slots. */
 
 typedef struct {
@@ -10,19 +11,9 @@ typedef struct {
 } Slot;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0x234];
-    /* 0x234 */ void *callback234;
-    /* 0x238 */ u8 pad238[0x248 - 0x238];
-    /* 0x248 */ void *callback248;
-    /* 0x24C */ u8 pad24C[0x250 - 0x24C];
-    /* 0x250 */ s32 unk250;
-    /* 0x254 */ s32 unk254;
-} LevelActor;
-
-typedef struct {
     /* 0x000 */ void *obj;
     /* 0x004 */ s32 count;
-    /* 0x008 */ LevelActor *actors[4];
+    /* 0x008 */ CGameObjectInstance *actors[4];
     /* 0x018 */ Slot slots[15];
     /* 0x630 */ u8 pad630[0x65C - 0x630];
     /* 0x65C */ s32 phase;
@@ -36,13 +27,6 @@ typedef struct {
     /* 0x688 */ s32 unk688;
     /* 0x68C */ s32 unk68C;
 } State;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x34 - 0x10];
-    /* 0x34 */ s8 unk34;
-} CAI;
 
 extern State D_8012FB70;
 extern s32 D_00431D04[];
@@ -70,12 +54,12 @@ void func_00444644(void *obj, CAI *ai) {
     state->unk68C = 0x600;
     state->phase = 2;
     state->counter = 0;
-    ai->unkC = D_00431D04[state->phase];
+    ai->m_VisBits = D_00431D04[state->phase];
     state->unk664 = D_00431D1C[state->phase];
     mask = D_00431D10[state->phase];
     state->unk674 = state->unk678 = state->slots[13].unk0 = 0x1F400;
     state->activeMask = mask;
-    if (ai->unk34 != 0x13) {
+    if (ai->m_Mode != 0x13) {
         resetSlots(state->activeMask, D_00431D28);
     }
 }

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -14,13 +15,6 @@ typedef struct {
     /* 0x140 */ u8 pad140[0x151 - 0x140];
     /* 0x151 */ s8 unk151;
 } Actor;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x34];
-    /* 0x034 */ s8 anim;
-    /* 0x035 */ u8 pad35[0x114 - 0x35];
-    /* 0x114 */ s32 slot;
-} CAI;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC];
@@ -42,16 +36,16 @@ extern void func_00235898(void);
 extern void func_0020A33C(s32 a, s32 model, s32 c, Matrix18 *mtx, s32 e, s32 f, s32 g);
 
 void func_0040EDB0(Actor *actor, CAI *ai, DrawInfo *info) {
-    func_00236324(&D_8013023C[ai->slot]);
+    func_00236324(&D_8013023C[ai->m_VarS32[2]]);
     func_00235898();
     switch (actor->type) {
         case 0x450:
-            if (ai->anim == 9) {
+            if (ai->m_Mode == 9) {
                 info->flag = 1;
             }
             break;
         case 0x455:
-            if (ai->anim == 6) {
+            if (ai->m_Mode == 6) {
                 info->flag = 1;
             }
             break;

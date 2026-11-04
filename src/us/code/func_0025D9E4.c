@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Picks the animation for the AI's current location: one candidate from the
  * location's primary flags and one from its secondary flags, each from the
@@ -15,13 +16,6 @@ typedef struct {
     /* 0x18 */ u16 flagsB;
 } Location;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x94];
-    /* 0x094 */ s8 location;
-    /* 0x095 */ u8 pad95[0x133 - 0x95];
-    /* 0x133 */ s8 modeIndex;
-} CAI;
-
 extern AnimEntry D_800AF6F0[];
 extern AnimEntry D_800AF720[];
 extern AnimEntry D_800AF750[];
@@ -34,9 +28,9 @@ extern s32 func_00245A98(void *actor, CAI *ai, AnimEntry *table, s32 flags);
 extern s32 func_002113A4(void);
 
 s32 func_0025D9E4(void *actor, CAI *ai) {
-    Location *loc = func_0028479C(&ai->location);
+    Location *loc = func_0028479C(&ai->m_PathTrack.m_Mode);
     s32 animA = -1;
-    s32 mode = ai->modeIndex;
+    s32 mode = ai->m_VarS8[39];
     s32 animB = -1;
 
     if (loc->flagsA != 0) {

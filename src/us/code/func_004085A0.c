@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
@@ -23,13 +24,6 @@ typedef struct {
     /* 0x08 */ s32 state;
     /* 0x0C */ f32 timer;
 } BossFight;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x40];
-    /* 0x40 */ f32 idle;
-    /* 0x44 */ u8 pad44[0xF4 - 0x44];
-    /* 0xF4 */ void *cbF4;
-} CAI;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x9E4];
@@ -88,8 +82,8 @@ void func_004085A0(void *obj, CAI *ai) {
     Player *player;
     s32 track;
 
-    if (ai->cbF4 != func_004089E0) {
-        ai->cbF4 = func_004089E0;
+    if (ai->m_pfDraw != func_004089E0) {
+        ai->m_pfDraw = func_004089E0;
     }
     switch (fight->state) {
     case 0:
@@ -103,18 +97,18 @@ void func_004085A0(void *obj, CAI *ai) {
         break;
     }
     if (fight->state == 0) {
-        ai->idle = 0.0f;
+        ai->m_ModeTime = 0.0f;
         return;
     }
     if (fight->state == 1) {
         if (helperAlive()) {
-            ai->idle = 0.0f;
+            ai->m_ModeTime = 0.0f;
             return;
         }
-        if (ai->idle < 90.0f) {
+        if (ai->m_ModeTime < 90.0f) {
             return;
         }
-    } else if (ai->idle < 75.0f) {
+    } else if (ai->m_ModeTime < 75.0f) {
         return;
     }
     player = func_002532A8(D_80119870);

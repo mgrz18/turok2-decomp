@@ -1,15 +1,9 @@
 /* Second-module copy of func_0040DDB4 (src/us/code/func_0040DDB4.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Damage callback of the second boss' minions: takes the damage, plays the minion's hit effect at most every
  * 2.25 s, and at zero health goes to anim state 6. */
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 padD8[0x24C - 0xD8];
-    /* 0x24C */ s32 unk24C;
-} LevelActor;
 
 typedef struct {
     /* 0x00 */ s32 id;
@@ -41,11 +35,11 @@ typedef struct Obj2 {
 typedef struct State2 {
     /* 0x000 */ Obj2 *obj;
     /* 0x004 */ s32 count1;
-    /* 0x008 */ LevelActor *actors1[4];
+    /* 0x008 */ CGameObjectInstance *actors1[4];
     /* 0x018 */ s32 count2;
-    /* 0x01C */ LevelActor *actors2[4];
+    /* 0x01C */ CGameObjectInstance *actors2[4];
     /* 0x02C */ s32 count3;
-    /* 0x030 */ LevelActor *actors3[3];
+    /* 0x030 */ CGameObjectInstance *actors3[3];
     /* 0x03C */ Slot2 slots[12];
     /* 0x4EC */ s32 slotCount;
     /* 0x4F0 */ u8 pad4F0[0x4F8 - 0x4F0];
@@ -54,14 +48,6 @@ typedef struct State2 {
     /* 0x500 */ u8 pad500[0x518 - 0x500];
     /* 0x518 */ Mover movers[3];
 } State2;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ s32 health;
-    /* 0x008 */ u8 pad8[0x114 - 0x8];
-    /* 0x114 */ s32 slot;
-    /* 0x118 */ f32 hitTimer;
-} CAI;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
@@ -77,17 +63,17 @@ void func_00446DB4(void *obj, CAI *ai, DamageEvent *event) {
     State2 *state = &D_80130200;
     s32 health;
 
-    if (ai->health != 0) {
-        health = ai->health - event->damage;
+    if (ai->m_Health != 0) {
+        health = ai->m_Health - event->damage;
         if (health < 0) {
             health = 0;
         }
-        ai->health = health;
-        if (ai->hitTimer == 0.0f) {
-            ai->hitTimer = 2.25f;
-            func_00236314(&state->slots[ai->slot], D_00432384);
+        ai->m_Health = health;
+        if (ai->m_VarF32[3] == 0.0f) {
+            ai->m_VarF32[3] = 2.25f;
+            func_00236314(&state->slots[ai->m_VarS32[2]], D_00432384);
         }
-        if (ai->health == 0) {
+        if (ai->m_Health == 0) {
             func_00243414(obj, ai, 6);
         }
     }

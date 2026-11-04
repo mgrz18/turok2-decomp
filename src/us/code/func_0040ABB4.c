@@ -1,9 +1,10 @@
 /* D_801301CC/D0/D4/EC are fields of D_8012FB70 (phase, activeMask, unk664, counter) that the ROM addresses
  * through their own symbols (as arrays: their loads are reloaded after the ai store). */
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Module phase 2 entry: resets the actors' blend values and the fade timer, sets up phase 2 (timers, anim,
- * slot values), resets its active slots unless ai->unk34 is 0x13, and queues func_0040C7B4. */
+ * slot values), resets its active slots unless ai->m_Mode is 0x13, and queues func_0040C7B4. */
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -11,19 +12,9 @@ typedef struct {
 } Slot;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0x234];
-    /* 0x234 */ void *callback234;
-    /* 0x238 */ u8 pad238[0x248 - 0x238];
-    /* 0x248 */ void *callback248;
-    /* 0x24C */ u8 pad24C[0x250 - 0x24C];
-    /* 0x250 */ f32 blend2;
-    /* 0x254 */ f32 blend1;
-} LevelActor;
-
-typedef struct {
     /* 0x000 */ void *obj;
     /* 0x004 */ s32 count;
-    /* 0x008 */ LevelActor *actors[4];
+    /* 0x008 */ CGameObjectInstance *actors[4];
     /* 0x018 */ Slot slots[15];
     /* 0x630 */ u8 pad630[0x65C - 0x630];
     /* 0x65C */ s32 phase;
@@ -37,13 +28,6 @@ typedef struct {
     /* 0x688 */ s32 unk688;
     /* 0x68C */ s32 unk68C;
 } State;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x34 - 0x10];
-    /* 0x34 */ s8 unk34;
-} CAI;
 
 extern State D_8012FB70;
 extern s32 D_801301CC[]; /* D_8012FB70.phase */
@@ -78,27 +62,27 @@ static __inline__ void enterPhase2(State *s, CAI *ai) {
     s->phase = 2;
     s->unk68C = 0x600;
     D_801301EC[0] = 0;
-    ai->unkC = D_00431DE4[D_801301CC[0]];
+    ai->m_VisBits = D_00431DE4[D_801301CC[0]];
     D_801301D4[0] = D_00431DFC[D_801301CC[0]];
     mask = D_00431DF0[D_801301CC[0]];
     D_800C1900 = 0.0f;
     D_800C1904 = 0;
     s->unk674 = s->unk678 = s->slots[13].unk0 = 0x1F400;
     D_801301D0[0] = mask;
-    if (ai->unk34 != 0x13) {
+    if (ai->m_Mode != 0x13) {
         resetSlots(D_801301D0[0], D_00431E08);
     }
 }
 
 void func_0040ABB4(void *obj, CAI *ai) {
     State *state = &D_8012FB70;
-    LevelActor *actor;
+    CGameObjectInstance *actor;
     s32 i;
 
     for (i = 0; i < state->count; i++) {
         actor = state->actors[i];
-        actor->blend1 = 1.0f;
-        actor->blend2 = 0.0f;
+        actor->m_AI.m_VarF32[2] = 1.0f;
+        actor->m_AI.m_VarF32[1] = 0.0f;
     }
     enterPhase2(&D_8012FB70, ai);
     func_00283FF8(0xDC, func_0040C7B4, NULL);

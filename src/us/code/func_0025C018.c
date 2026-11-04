@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 
 /* AI matrix callback: builds the actors world matrix from the AIs look
@@ -16,16 +17,6 @@ typedef struct {
     /* 0x54 */ u8 pad54[0x4];
     /* 0x58 */ Mtx44 mtx;
 } Actor;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ s32 unk4;
-    /* 0x008 */ u8 pad8[0x3C - 0x8];
-    /* 0x03C */ u32 flags;
-    /* 0x040 */ u8 pad40[0x10C - 0x40];
-    /* 0x10C */ f32 pitch;
-    /* 0x110 */ f32 roll;
-} CAI;
 
 extern f32 D_800DD78C;
 extern s32 D_8011AAD8;
@@ -51,15 +42,15 @@ void func_0025C018(Actor *actor, CAI *ai) {
     CQuaternion rot;
     f32 sin;
 
-    if (ai->flags & 0x10000) {
+    if (ai->m_ModeFlags & 0x10000) {
         func_0025FEB0(actor, ai);
     }
-    if (ai->unk4 == 0) {
-        ai->pitch = func_0021170C(ai->pitch, 0.0872664749f);
-        ai->roll = func_0021170C(ai->roll, 0.0872664749f);
+    if (ai->m_Health == 0) {
+        ai->m_VarF32[0] = func_0021170C(ai->m_VarF32[0], 0.0872664749f);
+        ai->m_VarF32[1] = func_0021170C(ai->m_VarF32[1], 0.0872664749f);
     }
-    func_00210630(&look, ai->roll);
-    func_00210790(&look, ai->pitch);
+    func_00210630(&look, ai->m_VarF32[1]);
+    func_00210790(&look, ai->m_VarF32[0]);
     sin = func_002982F0(actor->yaw * 0.5f);
     spin.x = 0.0f;
     spin.y = sin;

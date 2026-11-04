@@ -11,20 +11,8 @@ typedef struct {
     /* 0x10 */ f32 maxAngle;
 } SpawnPoint;
 
-
-typedef struct {
-    /* 0x00 */ s32 kind;
-    /* 0x04 */ CGameObjectInstance *actor;
-    /* 0x08 */ u8 pad8[0x44 - 0x8];
-} Target;
-
-typedef struct {
-    /* 0x00 */ Target a;
-    /* 0x44 */ Target b;
-} Targets;
-
 extern SpawnPoint D_00431C40[4];
-extern void func_00246108(CGameObjectInstance *actor, void *ai, Targets *t, s32 f1, s32 f2);
+extern void func_00246108(CGameObjectInstance *actor, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 func_002119FC(f32 min, f32 max);
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
@@ -33,12 +21,12 @@ extern f32 func_002974C0(f32 angle); /* cos */
 extern void func_00246690(CGameObjectInstance *actor, s32 id, CVector3 pos, s32 a5);
 
 static __inline__ void FindTarget(CGameObjectInstance *obj, CGameObjectInstance **target) {
-    Targets targets;
+    CAITargets targets;
 
     *target = NULL;
     func_00246108(obj, (u8 *)obj + 0x140, &targets, 1, 0);
-    if (targets.b.actor != NULL && (targets.b.actor->m_dwFlags & 0x300000)) {
-        *target = targets.b.actor;
+    if (targets.m_Path.m_pTarget != NULL && (targets.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
+        *target = targets.m_Path.m_pTarget;
     }
 }
 

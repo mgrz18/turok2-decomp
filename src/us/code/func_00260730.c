@@ -1,18 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* Flying AI steering: for index 1, ease the vertical speed towards the wanted
+/* Flying CAI steering: for index 1, ease the vertical speed towards the wanted
  * one and bank/pitch with it; then turn. Against a target of another kind,
  * re-roll the attack delay. */
-
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x10C];
-    /* 0x10C */ f32 bank;
-    /* 0x110 */ f32 pitch;
-    /* 0x114 */ u8 pad114[0x18];
-    /* 0x12C */ f32 attackDelay;
-} AI;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
@@ -31,10 +22,10 @@ typedef struct {
 s32 func_0025E428(CGameObjectInstance *self, void *ai);
 f32 func_0021160C(f32 value, f32 target, f32 step);
 f32 func_00211774(f32 cur, f32 target, f32 rate);
-void func_00245BAC(CGameObjectInstance *self, AI *ai, f32 angle, f32 turn);
+void func_00245BAC(CGameObjectInstance *self, CAI *ai, f32 angle, f32 turn);
 f32 func_002119FC(f32 lo, f32 hi);
 
-void func_00260730(CGameObjectInstance *self, AI *ai, Steer *steer, Limits *limits) {
+void func_00260730(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *limits) {
     CGameObjectInstance *target = steer->target;
     f32 v;
     f32 bank;
@@ -54,19 +45,19 @@ void func_00260730(CGameObjectInstance *self, AI *ai, Steer *steer, Limits *limi
         } else if (bank < -0.436332345f) {
             bank = -0.436332345f;
         }
-        ai->bank = func_00211774(ai->bank, bank, 0.087266475f);
+        ai->m_VarF32[0] = func_00211774(ai->m_VarF32[0], bank, 0.087266475f);
         pitch = steer->turn * 0.75f;
         if (pitch > 0.436332345f) {
             pitch = 0.436332345f;
         } else if (pitch < -0.436332345f) {
             pitch = -0.436332345f;
         }
-        ai->pitch = func_00211774(ai->pitch, pitch, 0.17453295f);
+        ai->m_VarF32[1] = func_00211774(ai->m_VarF32[1], pitch, 0.17453295f);
     }
     func_00245BAC(self, ai, 0.13962635f, steer->turn);
-    if (steer->mode == 2 && target != NULL && ai->attackDelay > 15.0f) {
+    if (steer->mode == 2 && target != NULL && ai->m_VarF32[8] > 15.0f) {
         if (func_0025E428(self, ai) != func_0025E428(target, (u8 *)target + 0x140)) {
-            ai->attackDelay = func_002119FC(0.0f, 15.0f);
+            ai->m_VarF32[8] = func_002119FC(0.0f, 15.0f);
         }
     }
 }

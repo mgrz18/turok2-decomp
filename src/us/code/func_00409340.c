@@ -1,12 +1,8 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Boss fight setup: finds the six level actors with id 0x1DB1 and the one
  * with 0x1DB2, installs the AI callbacks and resets the 15 attack slots. */
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x250];
-    /* 0x250 */ s32 active;
-} LevelActor;
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -17,9 +13,9 @@ typedef struct {
     /* 0x000 */ void *obj;
     /* 0x004 */ u8 pad4[0x18 - 0x4];
     /* 0x018 */ Slot slots[15];
-    /* 0x630 */ LevelActor *actors[7];
+    /* 0x630 */ CGameObjectInstance *actors[7];
     /* 0x64C */ s32 count;
-    /* 0x650 */ LevelActor *core[2];
+    /* 0x650 */ CGameObjectInstance *core[2];
     /* 0x658 */ s32 coreCount;
     /* 0x65C */ u8 pad65C[0x670 - 0x65C];
     /* 0x670 */ s32 alive;
@@ -27,18 +23,6 @@ typedef struct {
     /* 0x680 */ s32 unk680;
     /* 0x684 */ s32 unk684;
 } State;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x2C];
-    /* 0x02C */ void *anims;
-    /* 0x030 */ u8 pad30[0xF0 - 0x30];
-    /* 0x0F0 */ void *cbF0;
-    /* 0x0F4 */ void *cbF4;
-    /* 0x0F8 */ void *cbF8;
-    /* 0x0FC */ void *cbFC;
-    /* 0x100 */ u8 pad100[0x108 - 0x100];
-    /* 0x108 */ void *cb108;
-} CAI;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0xD4];
@@ -51,7 +35,7 @@ extern u8 D_800F7078[];
 extern u32 D_800F1F10[];
 extern u8 D_00431F00[];
 
-s32 func_00225F6C(void *, s32, s32, s32, LevelActor **, s32);
+s32 func_00225F6C(void *, s32, s32, s32, CGameObjectInstance **, s32);
 s32 func_00225EBC(void *, s32, s32);
 void func_00243414(Obj *, CAI *, s32);
 void func_002362E4(void *, Obj *);
@@ -70,18 +54,18 @@ void func_00409340(Obj *obj, CAI *ai) {
     s->unk684 = 0;
     s->count = func_00225F6C(D_800F7078, 0x650, 10, 0x1DB1, s->actors, 6);
     for (i = 0; i < s->count; i++) {
-        s->actors[i]->active = 1;
+        s->actors[i]->m_AI.m_VarS32[1] = 1;
     }
     s->alive = s->count;
     func_00225F6C(D_800F7078, 0x650, 10, 0x1DB2, s->core, 1);
-    s->core[0]->active = 1;
+    s->core[0]->m_AI.m_VarS32[1] = 1;
     s->coreCount = func_00225EBC(D_800F7078, 1, 0x1DB1);
-    ai->anims = D_00431F00;
-    ai->cbF0 = func_0040BC64;
-    ai->cbF8 = func_00408FF8 + 8;
-    ai->cb108 = func_0025E4B8;
-    ai->cbFC = func_0040BFF0;
-    ai->cbF4 = func_0040BEE4;
+    ai->m_pModeTable = D_00431F00;
+    ai->m_pfStep = func_0040BC64;
+    ai->m_pfHurt = func_00408FF8 + 8;
+    ai->m_pfEffects = func_0025E4B8;
+    ai->m_pfCollision = func_0040BFF0;
+    ai->m_pfDraw = func_0040BEE4;
     func_00243414(obj, ai, 0);
     D_8012FB70.obj = obj;
     D_800F1F10[0] &= ~0x300;
