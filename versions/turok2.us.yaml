@@ -2954,8 +2954,7 @@ segments:
       - [0xA6C00, .rodata, code/func_002259D0]
       - [0xA6C04, .rodata, code/func_00226024]
       - [0xA6C0C, .rodata, code/func_0042C560]
-      - [0xA6C10, .rodata, code/func_002261A8]
-      - [0xA6C14, rodata]
+      - [0xA6C10, .rodata, code/func_002261A8]   # and func_0042CBE4's 1.0f + jtbl (0xA6C14-0xA6C48): one source file
       - [0xA6C48, .rodata, code/func_00226DE8]
       - [0xA6C4C, .rodata, code/func_00226EBC]
       - [0xA6C50, .rodata, code/func_0042CF90]
@@ -4603,7 +4602,9 @@ segments:
       - [0x17696C, c, code/func_0042C96C]
       - [0x1769DC, c, code/func_0042C9DC]
       - [0x176AB4, c, code/func_0042CAB4]
-      - [0x176BE4, asm]
+      # func_0042CBE4: the .text_vm half of func_002261A8.c (its .rodata is in
+      # code_rodata at 0xA6C10 with func_002261A8's). docs/VMASM.md.
+      - {start: 0x176BE4, type: c, name: code/func_002261A8, linker_section: .text_vm}
       - [0x176D04, c, code/func_0042CD04]
       - [0x176E10, c, code/func_0042CE10]
       - [0x176F84, hasm, ../src/us/asm/stray_0042CF84]
@@ -5366,7 +5367,8 @@ segments:
       - [0x1AF88C, c, code/func_0046588C]
       - [0x1AF8FC, c, code/func_004658FC]
       - [0x1AF9D4, c, code/func_004659D4]
-      - [0x1AFB04, asm]
+      - [0x1AFB04, c, code/func_00465B04]
+      - [0x1AFC24, asm]
       - [0x1AFD30, c, code/func_00465D30]
       - [0x1AFEA4, hasm, ../src/us/asm/stray_00465EA4]
       - [0x1AFEB0, c, code/func_00465EB0]
