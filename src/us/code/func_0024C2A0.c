@@ -2,11 +2,7 @@
 
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct WeaponInfo {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s16 alternate;
-} WeaponInfo;
+#include "structs/weapon.h"
 
 typedef struct MenuSlot {
     /* 0x00 */ s32 weapon;
@@ -34,7 +30,6 @@ extern s32 D_800ADD28[8];
 extern s32 D_800ADD48[8];
 extern s32 D_800ADD68[8];
 extern f32 D_800AE2D8;              /* slot scale */
-extern WeaponInfo *D_800AF618[];
 extern u8 D_8011AAF1;
 
 s32 func_0024E700(CPlayer *player, s32 weapon);

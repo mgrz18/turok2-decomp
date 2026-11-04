@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ u32 flags;
-} WeaponDef;
+#include "structs/weapon.h"
 
 typedef struct {
     /* 0x00 */ s32 weapon;
@@ -17,11 +13,9 @@ typedef struct {
     /* 0x1C */ WeaponEntry entries[1];
 } WeaponEntryList;
 
-extern WeaponDef *D_800AF618[];
-
 /* Whether the player holds a usable weapon that is not in the list. */
 s32 func_00254F88(WeaponEntryList *list, CPlayer *player) {
-    WeaponDef *def;
+    WeaponInfo *def;
     s32 usable;
     s32 found;
     s32 w;

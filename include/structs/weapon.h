@@ -14,7 +14,7 @@
 #include "structs/vector.h"
 
 /* One ammo class of a weapon (WeaponInfo.ammo[]). */
-typedef struct {
+typedef struct AmmoInfo {
     /* 0x0 */ s16 type;             /* index into the player's ammo counts */
     /* 0x2 */ s16 max;              /* the most the player can carry */
     /* 0x4 */ s16 projectile;
@@ -22,7 +22,7 @@ typedef struct {
 } AmmoInfo; /* size 0x8 */
 
 /* A weapon's definition (D_800AF618[weapon]). */
-typedef struct {
+typedef struct WeaponInfo {
     /* 0x00 */ u8 *name;            /* the message shown when it is picked */
     /* 0x04 */ u16 model;           /* the weapon actor's object type */
     /* 0x06 */ u16 icon;            /* in the weapon wheel */

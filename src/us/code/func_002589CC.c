@@ -1,14 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/weapon.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
-
-typedef struct {
-    /* 0x00 */ s32 model;
-    /* 0x04 */ u8 pad4[0x48 - 0x4];
-    /* 0x48 */ s32 unk_48;
-    /* 0x4C */ s32 unk_4C;
-} WeaponDef;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x2C];
@@ -23,7 +17,6 @@ typedef struct {
     /* 0x128 */ s32 unk_128;
 } WeaponState;
 
-extern WeaponDef *D_800AF618[];
 extern u32 D_800B6D20;
 extern s32 D_800F7078;
 extern u8 D_801198B0[];
@@ -37,10 +30,10 @@ void func_002589CC(CGameObjectInstance *weapon, WeaponState *state) {
 
     if (player->m_Data.m_CurrentWeapon != requested || D_800F7078 != 4) {
         player->m_Data.m_CurrentWeapon = *(s16 *)((u8 *)player + 0xB14);
-        state->unk_2C = D_800AF618[requested]->unk_48;
-        state->unk_108 = D_800AF618[player->m_Data.m_CurrentWeapon]->unk_4C;
+        state->unk_2C = D_800AF618[requested]->modeTable;
+        state->unk_108 = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;
         if (D_800B6D20 >= 5) {
-            func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->model);
+            func_0027FC2C(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
         }
         state->unk_10C = 0;
         state->unk_110 = 0;

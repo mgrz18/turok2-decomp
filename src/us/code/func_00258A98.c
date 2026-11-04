@@ -1,12 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/weapon.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 flags;
-} WeaponDef;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0xC7];
@@ -15,8 +11,6 @@ typedef struct {
     /* 0x10C */ s32 unk_10C;
     /* 0x110 */ s32 unk_110;
 } WeaponState;
-
-extern WeaponDef *D_800AF618[];
 
 extern s32 func_00257EA0(CGameObjectInstance *weapon, WeaponState *state);
 extern s32 func_0024E700(CPlayer *player, s32 weapon);

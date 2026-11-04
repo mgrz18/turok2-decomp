@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/weapon.h"
 
 typedef struct MenuSlot {
     /* 0x00 */ s32 weapon;
@@ -28,13 +29,7 @@ typedef struct MenuItem {
     /* 0x18 */ f32 size;
 } MenuItem;
 
-typedef struct WeaponInfo {
-    /* 0x0 */ u8 pad0[6];
-    /* 0x6 */ u16 icon;
-} WeaponInfo;
-
 extern f32 D_800AE2D8;              /* slot scale */
-extern WeaponInfo *D_800AF618[];
 
 f32 func_00211774(f32 value, f32 target, f32 rate);
 void func_0020F79C(f32 *m);

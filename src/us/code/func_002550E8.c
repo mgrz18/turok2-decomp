@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/weapon.h"
 
 typedef struct {
     /* 0x00 */ s32 weapon;
@@ -18,7 +19,6 @@ typedef struct {
     /* 0x37C */ s32 selected;
 } WeaponEntryList;
 
-extern void *D_800AF618[];
 extern s32 func_0024E700(CPlayer *player, s32 weapon);
 
 /* s16 weapon id at 0xB14 (LibTEngine's CPlayer has m_RequestedWeapon at 0xB1C). */

@@ -1,15 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
-
-/* A weapon definition (the table at D_800AF618): the weapon it upgrades at 0xC, its flags at 0x14. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s16 baseWeapon;
-    /* 0x0E */ u8 padE[0x14 - 0xE];
-    /* 0x14 */ s32 flags;
-} WeaponDef;
-
-extern s32 D_800AF618;
+#include "structs/weapon.h"
 
 /* Fills arg1[0..34] with whether each weapon can be selected and returns how many can.
  * The m_WeaponList[i] reads are written as (player + i)->m_WeaponList[0], read signed: the code adds the
@@ -22,14 +13,14 @@ s32 func_00255048(CPlayer *arg0, s32 *arg1) {
     s32 var_t1;
     s32 var_v0;
     s32 var_v1;
-    WeaponDef *temp_v1;
+    WeaponInfo *temp_v1;
 
     var_a1 = arg1;
     var_t1 = 0;
     var_a3 = 0;
     var_t0 = 0;
     do {
-        temp_v1 = *(((__typeof__(&D_800AF618))((s8 *)&D_800AF618 + var_t0)));
+        temp_v1 = *(WeaponInfo **) ((s8 *) D_800AF618 + var_t0);
         if (*(s8 *) ((CPlayer *) ((s8 *) arg0 + var_a3))->m_Data.m_WeaponList == 0) {
             var_v1 = 0;
         } else {
@@ -41,7 +32,7 @@ s32 func_00255048(CPlayer *arg0, s32 *arg1) {
             if (var_v0 == 0) {
                 var_v1 = 0;
             } else {
-                temp_a2 = temp_v1->baseWeapon;
+                temp_a2 = temp_v1->alternate;
                 var_v1 = 1;
                 if (*(s8 *) ((CPlayer *) ((s8 *) arg0 + temp_a2))->m_Data.m_WeaponList != 0) {
                     var_v1 = (var_a3 < temp_a2) ^ 1;

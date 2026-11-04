@@ -13,22 +13,10 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "structs/weapon.h"
 
 typedef struct WeaponMenu WeaponMenu;
 
-/* A weapon's definition (D_800AF618[weapon]). */
-typedef struct WeaponInfo {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u16 sound;
-    /* 0x06 */ u8 pad6[0xC - 0x6];
-    /* 0x0C */ s16 upgrade;         /* the weapon that replaces this one */
-    /* 0x0E */ u8 padE[0x14 - 0xE];
-    /* 0x14 */ u32 flags;           /* 1: in the wheel, 2: in the wheel underwater */
-    /* 0x18 */ u8 pad18[0x20 - 0x18];
-    /* 0x20 */ struct AmmoDef *ammo[3];
-} WeaponInfo;
-
-extern WeaponInfo *D_800AF618[];
 extern s32 D_80110058;
 extern s32 D_8011005C;
 
@@ -54,7 +42,7 @@ void func_0024C47C(WeaponMenu *menu, CPlayer *player) {
         } else if (!((player->m_WeaponActor.m_AI.m_dwFlags & 0x80) ? (info->flags & 2) : (info->flags & 1))) {
             show = 0;
         } else {
-            s16 upgrade = info->upgrade;
+            s16 upgrade = info->alternate;
 
             show = 1;
             if (player->m_Data.m_WeaponList[upgrade]) {
@@ -394,7 +382,6 @@ void func_0024CF58(ViewState *view, Target *target) {
     }
 }
 
-extern WeaponInfo *D_800AF618[];
 
 void func_00258668(void *a, void *b);
 
@@ -593,11 +580,6 @@ typedef struct Player {
     /* 0x12AC */ s32 unk12AC;
 } Player;
 
-typedef struct AmmoDef {
-    /* 0x00 */ s16 type;
-    /* 0x02 */ s16 max;
-} AmmoDef;
-
 typedef struct PlayerStateInfo {
     /* 0x00 */ void (*enter)(Player *, void *);
     /* 0x04 */ void (*update)(Player *, Player *);
@@ -615,7 +597,6 @@ extern s32 D_8011AAA0;
 extern s32 D_8011ACE4;
 extern s32 D_800B6D1C;
 extern f32 D_800ADD88[];           /* health regeneration per character */
-extern WeaponInfo *D_800AF618[];
 extern PlayerStateInfo D_800ADF54[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
@@ -776,10 +757,10 @@ void func_0024D344(Player *p) {
         if (D_8011AAF1.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
             && !(D_8011AAA0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
             WeaponInfo *info = D_800AF618[p->nextWeapon];
-            s16 next = info->upgrade;
+            s16 next = info->alternate;
 
             if (next != -1 && p->owned[next] != 0) {
-                p->nextWeapon = info->upgrade;
+                p->nextWeapon = info->alternate;
             }
         }
     }
@@ -1101,7 +1082,7 @@ void func_0024D344(Player *p) {
             }
             info = D_800AF618[i];
             for (j = 0; j < 3; j++) {
-                AmmoDef *def = info->ammo[j];
+                AmmoInfo *def = info->ammo[j];
                 s16 *slot;
 
                 if (def == NULL) {
@@ -1134,6 +1115,6 @@ void func_0024D344(Player *p) {
     }
     func_0024A0DC(p);
     p->input.controller->pos = p->pos;
-    func_002241D8(&D_800F7078, p->emitter, D_800AF618[p->weapon]->sound, p->voice->bank);
+    func_002241D8(&D_800F7078, p->emitter, D_800AF618[p->weapon]->model, p->voice->bank);
     p->lastAction = p->action;
 }

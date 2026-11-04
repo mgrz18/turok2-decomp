@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/weapon.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -36,15 +37,7 @@ typedef struct {
     /* 0x02 */ u8 pad2[0x16];
 } PoseInfo;   /* 0x18 bytes */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u16 model;
-    /* 0x06 */ u8 pad6[0x50 - 6];
-    /* 0x50 */ void (*update)(Object *obj, AI *ai);
-} WeaponInfo;
-
 extern PoseInfo D_800ADF68[];
-extern WeaponInfo *D_800AF618[];   /* weapon table */
 extern f32 D_800B6D28;             /* frame time scale */
 extern u8 D_800F7078[];
 extern void func_00243414(Object *obj, AI *ai, s32 mode);
