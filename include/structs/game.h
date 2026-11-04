@@ -10,7 +10,7 @@
  * 0x08, so its `local` at 0x1D is `multiplayer` here at 0x19.
  *
  * Several bytes of the block also have symbols of their own, which some
- * files still use: D_8011AAF1 (multiplayer), D_8011AB08 (weaponEnabled),
+ * files still use: D_8011AAE0 (difficulty), D_8011AAF1 (multiplayer), D_8011AB08 (weaponEnabled),
  * D_8011AB18 (defaultSlot), D_8011AB58 (slots), D_8011AC88 (mode),
  * D_8011ACA8 (matchMode) and D_8011ACB0 (match). */
 
@@ -57,7 +57,7 @@ typedef struct GameMatch {
 typedef struct GameSettings {
     /* 0x000 */ u32 cheatFlags;        /* 0x100, 0x400, 0x800, 0x1000, 0x4000 (black fog), 0x8000... */
     /* 0x004 */ u32 unk4;              /* bits set by func_00407F20 */
-    /* 0x008 */ u8 unk8[0xC - 0x8];
+    /* 0x008 */ s32 difficulty;         /* D_8011AAE0: 8, 16 or 32 (func_002427E0) */
     /* 0x00C */ u32 unkC;              /* shown in sixteenths */
     /* 0x010 */ u16 unk10;
     /* 0x012 */ u8 unk12[0x14 - 0x12];

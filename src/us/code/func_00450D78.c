@@ -4,6 +4,10 @@
 typedef unsigned char u8;
 typedef signed int s32;
 typedef float f32;
+/* D_8011ACB0 (GameMatch in structs/game.h; unk24 is teams). Kept as a local
+ * array view: through it the compiler bases the store and the argument on
+ * D_8011ACB0 + 0x24, as the ROM does; through the struct it bases them on
+ * D_8011ACB0. */
 typedef struct S10Game {
                u8 pad0[0x14];
                f32 unk14;
