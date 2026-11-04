@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00257DF4.c, func_00257DF4, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/sound.h"
 
 /* Plays a sound or a music cue at pos: refuses while another cue is pending,
  * when 6 of the 17 voices already play this sound id (or for cue 0x44C while
@@ -12,45 +13,9 @@ typedef struct {
 } Vec3f;
 
 typedef struct {
-    /* 0x00 */ u8 q[0x18];
-    /* 0x18 */ u8 pad18[0x4];
-    /* 0x1C */ s32 count;
-} SndLock;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC8];
-    /* 0xC8 */ s32 sound;
-} SndVoice;
-
-typedef struct {
     /* 0x00 */ s32 stride;
     /* 0x04 */ u32 count;
 } SndLayers;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x102];
-    /* 0x0102 */ s16 pendingCue;
-    /* 0x0104 */ u8 pad104[0x10C - 0x104];
-    /* 0x010C */ s32 handle;
-    /* 0x0110 */ SndLock lock;
-    /* 0x0130 */ s32 lastVariant;
-    /* 0x0134 */ u8 pad134[0x1D9C - 0x134];
-    /* 0x1D9C */ SndVoice voices[17];
-    /* 0x2B28 */ u8 pad2B28[0x2B4C - 0x2B28];
-    /* 0x2B4C */ void *variants;
-    /* 0x2B50 */ u8 pad2B50[0x2B54 - 0x2B50];
-    /* 0x2B54 */ s32 rangeCount;
-    /* 0x2B58 */ void *ranges;
-    /* 0x2B5C */ s32 *weights;
-    /* 0x2B60 */ u8 pad2B60[0x2B88 - 0x2B60];
-    /* 0x2B88 */ void *cue;
-    /* 0x2B8C */ s16 cueId;
-    /* 0x2B8E */ u8 pad2B8E[0x2B90 - 0x2B8E];
-    /* 0x2B90 */ s32 cueArg;
-    /* 0x2B94 */ s8 cueVolume;
-    /* 0x2B95 */ u8 pad2B95[0x2BB8 - 0x2B95];
-    /* 0x2BB8 */ s32 muted;
-} SndMgr;
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
@@ -63,7 +28,7 @@ extern void *func_002017D4(void *list, s32 index);
 extern void func_00270A60(SndMgr *m, void *layer, Vec3f *pos, s32 variant, s32 handle, s32 a5, s32 a6);
 
 static __inline__ void SndMgr_Lock(SndMgr *m) {
-    SndLock *l = &m->lock;
+    CMutex *l = &m->lock;
     u32 mask = __osDisableInt();
 
     if (++l->count != 1) {
@@ -75,7 +40,7 @@ static __inline__ void SndMgr_Lock(SndMgr *m) {
 }
 
 static __inline__ void SndMgr_Unlock(SndMgr *m) {
-    SndLock *l = &m->lock;
+    CMutex *l = &m->lock;
     u32 mask = __osDisableInt();
 
     if (--l->count != 0) {
@@ -117,7 +82,7 @@ s32 func_00270C80(SndMgr *m, s32 id, Vec3f pos, s32 a5, s32 a6) {
     count = 0;
     if (id < 0x100) {
         for (j = 0; j < 17; j++) {
-            if (m->voices[j].sound == id) {
+            if (m->pool.voices[j].soundId == id) {
                 count++;
             }
         }

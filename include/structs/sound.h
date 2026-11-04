@@ -248,7 +248,7 @@ struct SndMgr {
     /* 0x2B8C */ s16 cueId;
     /* 0x2B8E */ u8 pad2B8E[2];
     /* 0x2B90 */ s32 cueArg;
-    /* 0x2B94 */ u8 cueVolume;
+    /* 0x2B94 */ s8 cueVolume;      /* also the default pan */
     /* 0x2B95 */ u8 pad2B95[3];
     /* 0x2B98 */ void *listener;       /* the camera sounds are heard from */
     /* 0x2B9C */ s32 fxMix;            /* added to each voice's FX mix */
