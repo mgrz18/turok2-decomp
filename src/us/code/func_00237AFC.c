@@ -34,10 +34,6 @@ typedef struct {
     /* 0x1A8 */ BlastOwner *owner;
 } BlastActor;
 
-typedef struct {
-    u8 data[0x18];
-} HitInfo;
-
 extern u8 D_8011AAF1;           /* multiplayer */
 extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 extern HitFrame D_800F1970;       /* the shield func_0021E374 finds */
@@ -50,8 +46,8 @@ s32 func_0021E374(BlastActor *actor, CVector3 pos, HitFrame *out);
 f32 func_002672C8(BlastActor *actor);
 f32 func_0020F6BC(CVector3 *a, CVector3 *b);
 void func_002374AC(BlastActor *victim, BlastActor *source, Blast blast, CVector3 *out, u32 flags);
-void func_00245828(HitInfo *out, BlastActor *source, s32 damage, f32 radius, u32 flags, HitFrame *shield);
-void func_002465C8(BlastActor *victim, void *ai, HitInfo *hit);
+void func_00245828(DamageEvent *out, void *source, s32 damage, f32 radius, u32 flags, HitFrame *shield);
+void func_002465C8(BlastActor *victim, void *ai, DamageEvent *hit);
 void func_002376F8(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitFrame *shield, u32 flags);
 
 /* How strongly the blast reaches the victim: through its shield, and with
@@ -111,7 +107,7 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector
  * then damage, push and the hit report, scaled by blastScale. */
 void func_00237AFC(BlastActor *victim, BlastActor *source, s32 hit, CVector3 pos, Blast blast, s32 falloff, s32 push, u32 flags) {
     CVector3 dir;
-    HitInfo info;
+    DamageEvent info;
     BlastOwner *owner;
     HitFrame *shield;
     f32 mult;

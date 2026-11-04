@@ -5,6 +5,7 @@
 #include "structs/world.h"
 #include "structs/game_object.h"
 #include "structs/cinema.h"
+#include "structs/collision.h"
 
 /* The second VM module's copy of src/us/code/func_0040F240.c, byte for byte,
  * at the same link address (named 0x448240-0x44C228, linked 0x40F240-0x413228):
@@ -813,7 +814,7 @@ typedef struct {
 } Camera;
 
 extern u8 D_800F1B40[];   /* collision info */
-extern CVector3 D_800F1CE8;   /* collision point */
+extern CCollisionResults D_800F1CE0;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 func_0044957C(f32 t); /* eye path */
@@ -888,7 +889,7 @@ void func_00449CE8(Camera *cam) {
             func_00226724(D_800F7078);
             player->head = saved;
             if (hit) {
-                eye = D_800F1CE8;
+                eye = D_800F1CE0.m_vInstancePos;
             }
         }
     }

@@ -49,20 +49,12 @@ typedef struct Particle {
     /* 0x1B5 */ u8 drawWhenHidden;
 } Particle;
 
-/* The point of the last collision test (D_800F1CE0 + 8). */
-typedef struct CollisionPoint {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ u8 padC[0xDC - 0xC];
-    /* 0xDC */ CVector3 normal;
-} CollisionPoint;
-
 typedef struct EffectInfo {
     /* 0x00 */ u32 flags;
     /* 0x04 */ u8 pad4[4];
 } EffectInfo;
 
 extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
-extern CollisionPoint D_800F1CE8;
 extern CVector3 D_800F1DB8;                /* the direction of the hit */
 extern u8 D_8011AAF1;
 extern EffectInfo D_800AD084[];
@@ -91,7 +83,7 @@ void func_00232B40(Particle *p);
 static __inline__ void placeAtHit(Particle *p) {
     CVector3 dir;
 
-    p->pos = D_800F1CE8.pos;
+    p->pos = D_800F1CE0.m_vInstancePos;
     p->velocity = D_800F1DB8;
     dir = D_800F1DB8;
     func_0020F040(&dir);
@@ -147,7 +139,7 @@ void func_0022CA90(Particle *p) {
         case 2:
         case 3:
             if (definition->flags & 0x800000) {
-                func_002364A4(D_801102B8, D_800F1CE8.pos, D_800F1CE8.normal, kind, 0);
+                func_002364A4(D_801102B8, D_800F1CE0.m_vInstancePos, D_800F1CE0.m_vNormal, kind, 0);
             }
             break;
     }
@@ -167,7 +159,7 @@ void func_0022CA90(Particle *p) {
             p->handle = 0;
         }
     }
-    normal = D_800F1CE8.normal;
+    normal = D_800F1CE0.m_vNormal;
     func_0020F040(&normal);
     func_0020EF60(&normal, &normal, 1.024f);
     func_0020EEF8(&p->pos, &p->pos, &normal);
@@ -184,13 +176,13 @@ void func_0022CA90(Particle *p) {
             if (D_800AD084[effect].flags & 2) {
                 eventSource = p;
             }
-            func_00236EA0(eventSource, p, effect, -1, D_800F1CE8.pos, params);
+            func_00236EA0(eventSource, p, effect, -1, D_800F1CE0.m_vInstancePos, params);
         }
         if (model != 0xFFFF) {
             func_00229340(p, model, -8, 1);
         }
         if (sound != 0xFFFF) {
-            func_00275544(sound, D_800F1CE8.pos, 0, -1);
+            func_00275544(sound, D_800F1CE0.m_vInstancePos, 0, -1);
         }
     }
     if (!(p->flags & 0x30000) && p->hitSurface == 1) {

@@ -1,12 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-/* The view the spawn is placed from (0x800F1CE8). */
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    u8 padC[0xC4];
-    /* 0xD0 */ CVector3 dir;
-} SpawnView;
+#include "structs/collision.h"
 
 typedef struct {
     u8 pad0[0x2];
@@ -22,7 +16,7 @@ typedef struct {
     /* 0x1AD */ u8 b1AD;
 } Actor;
 
-extern SpawnView D_800F1CE8;
+extern CCollisionResults D_800F1CE0;
 void func_0020F040(CVector3 *v);
 f32 func_002119FC(f32 a, f32 b);
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
@@ -32,9 +26,9 @@ void func_00232044(Actor *actor, s32 kind) {
     CVector3 dir;
 
     actor->flags |= 0x20000;
-    actor->pos = D_800F1CE8.pos;
-    actor->dir = D_800F1CE8.dir;
-    dir = D_800F1CE8.dir;
+    actor->pos = D_800F1CE0.m_vInstancePos;
+    actor->dir = D_800F1CE0.m_vVelocity;
+    dir = D_800F1CE0.m_vVelocity;
     func_0020F040(&dir);
     actor->heading = dir;
     func_0020EF60(&dir, &dir, func_002119FC(-49.92f, 0.0f));
