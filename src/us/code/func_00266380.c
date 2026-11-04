@@ -3,11 +3,8 @@
 #include "structs/player.h"
 
 #include "structs/intelligence.h"
+#include "structs/game.h"
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x1480];
-    /* 0x1480 */ s32 unk1480;
-} Game;
 
 
 typedef struct {
@@ -22,25 +19,24 @@ typedef struct {
     /* 0x114 */ s32 tagCleared;
 } ActionState;
 
-extern Game D_80119870;
-extern CPlayer *func_002532B4(Game *game);
+extern CPlayer *func_002532B4(CPlayerList *list);
 extern void func_00243414(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
 void func_00266380(CGameObjectInstance *actor, ActionState *state) {
     CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
-    Game *game;
+    CGame *game;
     CPlayer *player;
     s32 mode;
 
     if (actor->m_nTypeFlag == 0x64E && state->unk36 != state->unk34) {
         game = &D_80119870;
-        player = func_002532B4(game);
+        player = func_002532B4(&game->m_PlayerList);
         if (player != NULL && state->tagCleared == 0) {
             mode = player->m_pOptions->m_TagMode;
             if (mode == 1) {
                 player->m_pOptions->m_TagMode = 0;
                 player->m_pOptions->m_LastTagMode = mode;
-                game->unk1480 = mode;
+                game->m_Settings.match.tagPhase = mode;
                 state->tagCleared = mode;
             }
         }

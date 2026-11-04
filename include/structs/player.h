@@ -21,6 +21,7 @@
 #include "structs/gbi.h"
 #include "structs/player_options.h"
 #include "structs/controller.h"
+#include "structs/player_list.h"
 
 /* A HUD element: health, ammo, lives, air... slide in, fade, show a value. */
 typedef struct {
@@ -267,25 +268,6 @@ typedef struct CPlayer {
     /* 0x1324 */ s32 _pad3;                      /* sizeof is a multiple of 8 (Mtx) */
 } CPlayer; /* size 0x1328 */
 
-/* Acclaim's intrusive list (CList in structs/camera.h) holding players. */
-typedef struct {
-    /* 0x00 */ CPlayer *m_pHead;
-    /* 0x04 */ CPlayer *m_pTail;
-    /* 0x08 */ s32 m_LastOffset;
-    /* 0x0C */ s32 m_NextOffset;
-    /* 0x10 */ s32 m_nCount;
-} CPlayerCList; /* size 0x14 */
-
-/* All players (D_80119870, the start of the engine's globals; its active
- * list is D_80119890): the idle ones and the ones in the game. */
-typedef struct {
-    /* 0x00 */ struct CMemEntry *m_pmePlayers;
-    /* 0x04 */ CPlayer *m_Players;
-    /* 0x08 */ s32 m_nPlayers;
-    /* 0x0C */ CPlayerCList m_IdleList;
-    /* 0x20 */ CPlayerCList m_ActiveList;
-    /* 0x34 */ s32 m_bCinema;                    /* a cinema runs for the players */
-    /* 0x38 */ s32 m_bCinemaStarted;
-} CPlayerList; /* 0x3C known */
+/* CPlayerCList and CPlayerList (D_80119870) are in structs/player_list.h. */
 
 #endif

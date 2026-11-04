@@ -1,13 +1,13 @@
 #include "common.h"
+#include "structs/game.h"
 
 s32 func_00243414(s32, s32, s32);
 f32 func_00246310(s32, s32, s32, s32);
 
 s32 func_00236314(void *, s32 *);           /* extern */
-void *func_002532A8(s32 *);                     /* extern */
+void *func_002532A8(CPlayerList *);                     /* extern */
 s32 func_002666B0(s32, s32, s32);           /* extern */
 extern s32 D_00430954;
-extern s32 D_80119870;
 extern u8 D_8012F3A0[];
 
 void func_00402E6C(s32 arg0, void *arg1)
@@ -20,7 +20,7 @@ void func_00402E6C(s32 arg0, void *arg1)
   int new_var;
   var_s0 = arg0;
   var_s2 = arg1;
-  temp_v0 = func_002532A8(&D_80119870);
+  temp_v0 = func_002532A8(&D_80119870.m_PlayerList);
   var_s1 = &D_8012F3A0;
   var_s1 = &D_8012F3A0;
   if (temp_v0 != 0)

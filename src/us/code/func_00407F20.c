@@ -31,11 +31,6 @@ typedef struct {
     /* 0x14 */ s32 warned;
 } BossFight;
 
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x40];
-    /* 0x0040 */ u8 hud[0x13D8];
-    /* 0x1418 */ s32 mode;
-} Game;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x51C];
@@ -46,7 +41,6 @@ typedef struct {
     /* 0xAAC */ f32 unkAAC;
 } Player;
 
-extern Game D_80119870;
 extern Player *D_80119890;     /* the current player */
 extern u8 D_800F7078[];
 extern u8 D_800B6660[];
@@ -54,10 +48,10 @@ extern u8 D_801100F0[];
 extern Actor *D_8010FEB4[]; /* the actor list head */
 extern s32 D_80110048;         /* level id */
 
-Player *func_002532A8(Game *);
+Player *func_002532A8(CPlayerList *);
 void func_0027FC2C(void *hud, void *camera, u8 *msg);
 void func_0027580C(s32 sound);
-void func_002535E4(Game *game, f32 value);
+void func_002535E4(CPlayerList *list, f32 value);
 s8 func_00219F74(Actor *actor, s32 id, s32);
 void func_00225D0C(void *world);
 void func_0027AD98(void *);
@@ -76,16 +70,16 @@ static __inline__ void setAnim(Actor *actor, s32 id) {
 
 /* The boss is beaten: message, sound, its death animation, the helpers stop. */
 void func_00407F20(BossFight *fight) {
-    Game *game = &D_80119870;
+    CGame *game = &D_80119870;
     Player *player;
     Actor *a;
     GameSettings *flags;
 
     fight->state = 1;
-    player = func_002532A8(game);
-    func_0027FC2C(game->hud, player->camera, D_800B6660);
+    player = func_002532A8(&game->m_PlayerList);
+    func_0027FC2C(game->m_CameraPool, player->camera, D_800B6660);
     func_0027580C(0x168);
-    func_002535E4(game, 900.0f);
+    func_002535E4(&game->m_PlayerList, 900.0f);
     setAnim(fight->obj, 0x5337);
     func_00225D0C(D_800F7078);
     D_80119890->unkAAC = 450.0f;

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/game.h"
 
 /* Name entry item draw callback: while the cursor blink timer of the menu's
  * player is low, draws the text cursor (9 virtual pixels wide, scaled to the
@@ -13,7 +14,6 @@ typedef struct {
     /* 0x0C */ char text[0x18 - 0xC];
 } NameEdit;
 
-extern u8 D_80119870[];
 extern NameEdit D_800C1FB0[];
 extern s32 D_800C2030;
 extern s32 D_800C1BD0;
@@ -29,7 +29,7 @@ void func_0041D51C(void *menu, MenuItemLayout *item, s32 arg2, Menu *win) {
     f32 alpha;
     s32 x;
 
-    index = func_0025340C(D_80119870, win->player);
+    index = func_0025340C(&D_80119870.m_PlayerList, win->player);
     if (D_800C1FB0[index].timer <= 6.0f) {
         width = D_800C2030 * 9 / 284;
         x = item->left + D_800C1FB0[index].column * width;

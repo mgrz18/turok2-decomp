@@ -1,6 +1,7 @@
 /* Second-module twin of func_00429FA0 (same source; VM callees 0xE0 lower). func_0042CB04/func_0042C9D4 need symbols (the asm has func_0042CAB4 + 0x50 and D_0042C9D4). */
 #include "common.h"
 #include "structs/world.h"
+#include "structs/game.h"
 
 /* Level start: resets the world, opens the cartridge index and the level resource tables (levels, texture
  * sets, object types, objects, intelligence, particle effects, binaries, swooshes, lights, curves, rumbles,
@@ -28,7 +29,6 @@ extern char D_800A5E8C[]; /* "link group types" */
 extern s32 D_800B6D54;
 extern u8 D_800E6AC0[];
 extern u8 D_800EBAC0[];
-extern u8 D_80119870[];
 
 extern s32 func_00200AE0();
 extern s32 func_0020B490();
@@ -49,7 +49,7 @@ extern void func_00226390(void);
 extern void func_0042AB2C(CWorld *w, s32, s32);
 extern void func_0042C2DC(CWorld *w, s32 file);
 extern void func_0042C414(CWorld *w);
-extern void func_0042E7B4(u8 *);
+extern void func_0042E7B4(CPlayerList *);
 
 /* Copies the header of object id's geometry (or clears it when the object is missing). */
 static __inline__ void loadGeomHeader(CWorld *w, CGeomHeader *out, s32 id) {
@@ -90,7 +90,7 @@ void func_00462EC0(CWorld *w, s32 file) {
     w->m_nLevel = -1;
     w->unk_18EB8 = 0;
     w->m_SkyAngle = 0;
-    func_0042E7B4(D_80119870);
+    func_0042E7B4(&D_80119870.m_PlayerList);
     vec = &w->m_qSky.x;
     w->m_qSky.x = vec[1] = vec[2] = 0.0f;
     w->m_qSky.w = 1.0f;

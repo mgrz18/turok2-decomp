@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/game.h"
 
 /* Player-name menu: highlights the row of the player the menu belongs to
  * and copies that player's name (trailing spaces trimmed, nothing when it is
@@ -12,7 +13,6 @@ typedef struct {
     /* 0x0C */ char text[0x18 - 0xC];
 } NameEdit;
 
-extern u8 D_80119870[];
 extern u8 D_8011AB8B[][0x40];   /* player options +0x33: names */
 extern NameEdit D_800C1FB0[];
 extern u8 D_800C1340[];   /* "player" */
@@ -43,7 +43,7 @@ void func_0041D050(Menu *menu) {
     u8 *name;
     u8 *dst;
 
-    index = func_0025340C(D_80119870, menu->player);
+    index = func_0025340C(&D_80119870.m_PlayerList, menu->player);
     switch (index) {
     case 0:
     default:

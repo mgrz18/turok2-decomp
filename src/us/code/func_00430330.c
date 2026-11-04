@@ -11,7 +11,6 @@ typedef struct GameSession {
 } GameSession;
 
 extern char D_800F5A50[];
-extern char D_80119870[];
 
 void func_00285410(s32);
 void func_0026EDA8(void *);
@@ -23,7 +22,7 @@ void func_00430330(GameSession *session) {
 
     func_00285410(0);
     func_0026EDA8(D_800F5A50);
-    func_0025359C(D_80119870);
+    func_0025359C(&D_80119870.m_PlayerList);
     m = &D_8011ACB0;
     m->teams = 0;
     m->tag = 0;

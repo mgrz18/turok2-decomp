@@ -1,9 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00443F40.c, func_00443F40.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "structs/game.h"
 
-typedef unsigned char u8;
-typedef unsigned int u32;
-typedef signed int s32;
 /* Turok 2 layout: the field Rage Wars keeps at 0x58 is at 0x1E8 here. */
 typedef struct {
     u8 pad0[0x120];
@@ -23,13 +22,12 @@ typedef struct { u8 pad[0xC]; O06B *unkC; u8 pad2[0xC]; void *unk1C; } O06A;
 extern s32 func_0025340C(void *a, void *b);
 extern void func_00285A68(s32 a);
 extern s32 D_800C2020;
-extern u8 D_80119870[];
 extern s32 D_8011ACE4[];
 void func_00455EBC(O06A *a) {
     s32 n;
     D_800C2020 = 0;
     n = 0;
-    if (a->unk1C) n = func_0025340C(D_80119870, a->unk1C);
+    if (a->unk1C) n = func_0025340C(&D_80119870.m_PlayerList, a->unk1C);
     func_00285A68(n);
     a->unkC->unk238 |= 0x1800000;
     a->unkC->unk260 |= 0x1800000;

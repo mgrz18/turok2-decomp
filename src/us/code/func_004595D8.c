@@ -2,6 +2,7 @@
  * cut its first two words (lui/lw D_80130990) as func_004595D8. */
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/game.h"
 
 /* Level chosen: load it, or set up the new player from the saved settings, or
  * open the next menu page. */
@@ -26,7 +27,6 @@ extern u16 D_8013096C[];
 extern u16 D_8013096E[];
 extern u8 D_80130974[8];
 extern s8 D_80130950;
-extern u8 D_80119870[];
 extern u8 D_80119E2C[];
 extern u8 D_00438668[];
 extern u8 D_0043BCD0[];
@@ -61,7 +61,7 @@ s32 func_004595D8(void *arg0, Menu *event) {
         return 1;
     }
     if (D_80130960 != 0) {
-        player = func_0025342C(D_80119870, event->controller);
+        player = func_0025342C(&D_80119870.m_PlayerList, event->controller);
         event->player = player;
         options = *(PlayerOptions **)(player + 0x518);
         options->team = D_80130970;

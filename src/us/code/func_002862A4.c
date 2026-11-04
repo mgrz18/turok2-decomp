@@ -1,9 +1,9 @@
 #include "common.h"
+#include "structs/game.h"
 
 extern s32 D_8011AD00;              /* credits finished */
 extern f32 D_8011B11C;              /* time left before leaving the credits */
 extern f32 D_800B6D28;              /* frame time */
-extern u8 D_80119870[];
 extern s32 D_800B6D74;
 extern s32 D_800B6D70;
 extern s32 D_8011ACF8;
@@ -24,7 +24,7 @@ void func_002862A4(s32 arg0) {
     if (D_8011AD00 != 0) {
         D_8011B11C -= D_800B6D28;
         if (D_8011B11C <= 0.0f) {
-            func_002532A8(D_80119870);
+            func_002532A8(&D_80119870.m_PlayerList);
             if (D_800B6D74 != 0) {
                 if (D_800B6D70 == 0) {
                     func_002886D0(arg0, 0x1B57);

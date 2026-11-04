@@ -4,6 +4,7 @@
 #include "structs/vector.h"
 #include "structs/world.h"
 #include "structs/intelligence.h"
+#include "structs/game.h"
 
 typedef struct Entity Entity;
 struct Entity {
@@ -28,7 +29,6 @@ typedef struct DamageEvent {
 } DamageEvent;
 
 extern Entity *D_8010FEB4;
-extern u8 D_80119870[];
 
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_00245828(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
@@ -120,7 +120,7 @@ void func_00223A94(CWorld *world, CVector3 *target) {
             func_00243414(actor, actor->ai, 0x3D);
         }
     }
-    player = func_002532A8(D_80119870);
+    player = func_002532A8(&D_80119870.m_PlayerList);
     func_0020EF2C(&d, &player->pos, target);
     if (d.x * d.x + d.y * d.y + d.z * d.z <= 262144.0f) {
         func_00245828(&event, 0, 0x1900, 102.399994f, 0x400000, 0);

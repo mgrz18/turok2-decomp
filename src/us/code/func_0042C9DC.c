@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct LevelState {
     /* 0x00 */ u8 pad0[0x98];
@@ -15,7 +16,6 @@ typedef struct LevelState {
     /* 0xCC */ void *handleCC;
 } LevelState;
 
-extern u8 D_80119870[];
 
 extern void *func_002532A8(void *);
 extern void func_0042EB04(void *);
@@ -29,7 +29,7 @@ extern void func_002052D8(s32, void *);
 void func_0042C9DC(LevelState *level) {
     void *p;
 
-    p = func_002532A8(D_80119870);
+    p = func_002532A8(&D_80119870.m_PlayerList);
     if (p != NULL) {
         func_0042EB04(p);
     }
