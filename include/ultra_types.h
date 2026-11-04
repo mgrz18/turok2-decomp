@@ -33,7 +33,7 @@ typedef struct {
     u32 fpcsr;
     __OSfp  fp0,  fp2,  fp4,  fp6,  fp8, fp10, fp12, fp14;
     __OSfp fp16, fp18, fp20, fp22, fp24, fp26, fp28, fp30;
-} __OSThreadContext; /* size 0x1A8 */
+} __OSThreadContext; /* size 0x190 */
 
 typedef struct {
     u32 flag;
@@ -136,6 +136,13 @@ typedef struct {
     /* 0x1C */ u16 checksum;
     /* 0x1E */ u16 inverted_checksum;
 } __OSPackId; /* size 0x20 */
+
+/* pfschecker.c's cache of one bank's inode table. */
+typedef struct {
+    /* 0x000 */ __OSInode inode;
+    /* 0x100 */ u8 bank;
+    /* 0x101 */ u8 map[256];
+} __OSInodeCache; /* size 0x202 */
 
 /* Not libultra: the engine's recursive lock (Rage Wars' CMutex, built by
  * CMutex__Construct), a one-message queue and the number of holders. Taken

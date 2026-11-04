@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00270C80(void *, s32, Vec3, s32, s32);
+extern s32 func_00270C80(void *, s32, CVector3, s32, s32);
 extern int D_8011ACA0;
-s32 func_00275544(s16 arg0, Vec3 arg1, s32 arg4, s32 arg5) {
+s32 func_00275544(s16 arg0, CVector3 arg1, s32 arg4, s32 arg5) {
     extern s32 D_800F2A00;
     if (D_8011ACA0 != 0) {
         return -1;

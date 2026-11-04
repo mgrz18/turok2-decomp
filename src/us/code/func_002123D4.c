@@ -13,7 +13,7 @@ extern float D_800AC9D4[];
 extern f32 D_800A5764;
 extern void func_0020F040(f32 *);
 s32 func_002123D4(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 arg3,
-                  Vec3 *arg4, f32 *arg5) {
+                  CVector3 *arg4, f32 *arg5) {
     f32 temp_f0;
     f32 var_f0;
     f32 var_f1;
@@ -83,7 +83,7 @@ shared:
         if (arg0->shape == 1) {
             *arg4 = arg0->axis;
         } else {
-            *arg4 = *(Vec3 *)&arg1;
+            *arg4 = *(CVector3 *)&arg1;
         }
         func_0020F040(arg4);
         *arg5 = var_f20;

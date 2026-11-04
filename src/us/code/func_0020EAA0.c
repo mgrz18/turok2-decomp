@@ -5,7 +5,7 @@
 
 f32 func_00298470(f32 x);
 f32 func_0021153C(f32 x);
-f32 func_0020EAA0(Vec3f *v) {
+f32 func_0020EAA0(CVector3 *v) {
     f32 x = v->x;
     f32 z = v->z;
     f32 len, r, res, t;

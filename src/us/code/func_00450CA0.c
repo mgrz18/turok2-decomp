@@ -15,14 +15,6 @@ struct IntrusiveList {
     s32 count;
 };
 struct IntrusiveList;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Clip;
 struct Clip {
     s16 mode;

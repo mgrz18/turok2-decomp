@@ -6,16 +6,8 @@
 #include "common.h"
 #include "structs/intelligence.h"
 struct LevelActor;
-struct CVector3_t;
 struct Box;
 typedef struct Box Box;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Box;
 struct Box {
     CVector3 min;

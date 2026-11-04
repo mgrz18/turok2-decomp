@@ -2,12 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/world.h"
 
 extern s32 func_00220A1C(void *, void *);
 extern float D_800A9BDC;
 extern float D_800A9BE4;
 extern float D_800A9BE0;
-extern Shared_World D_800F7078;
+extern CWorld D_800F7078;
 extern s32 Cinema_PathPlaying(void);
 extern f32 func_0026BE60(s32 arg0, f32 arg1, f32 arg2);
 extern s32 D_800B6D00;

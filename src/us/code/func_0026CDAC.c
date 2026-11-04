@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0026CDAC(f32 *arg0, s32 arg1, Vec3 *arg2)
+void func_0026CDAC(f32 *arg0, s32 arg1, CVector3 *arg2)
 {
     f32 value;
     f32 bound;

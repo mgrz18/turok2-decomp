@@ -17,15 +17,7 @@ struct IntrusiveList {
 struct IntrusiveList;
 struct LevelActor;
 struct Shared_World;
-struct CVector3_t;
 struct GameSession;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct StridedTable;
 struct StridedTable {
     s32 stride;

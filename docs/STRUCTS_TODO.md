@@ -119,13 +119,24 @@ holds are listed in docs/MATCHING.md, "Shared headers".
   menu) and the CPlayer views named Menu (func_004214C4, func_00451040,
   func_0045AEA8).
 
-Two headers still carry their own copies of shared types, for the imported
-Rage Wars files that include them instead of the shared headers:
-`rw/junk_types.h` (SndMgr, SndVoice, SndSeq... under Rage Wars' layouts,
-OSThread/OSMesgQueue), `rw/abu_types.h` (OSMesgQueue, OSPfs, ALHeap, Gfx,
-Acmd) and `rw/ultralib_types.h` (the libultra types again). No file includes
-one of them together with the shared header, so they compile; merging them
-means checking each imported file's layout against the shared one.
+The rw/ headers no longer carry their own copies of shared types (second
+pass): ultralib_types.h, junk_types.h and abu_types.h include common.h,
+ultra_types.h, structs/vector.h and structs/libaudio.h (new: the libaudio
+types moved out of sound.h). junk's sound manager types (SndMgr, SndVoice,
+SndSeq, SndLock, the M04Emitter/M04VP/M04Ctx views) were sound.h's layouts,
+and their 8 users include structs/sound.h now (func_00273370 and
+func_00274A98 keep the SndCore view of the handles: addressing them through
+SndMgr.handles adds an instruction); B12Mgr's lock is a CMutex;
+Vec3/Vec3f/M04Vec3/B19Vec3/O01Vec3 are CVector3; abu's Gfx is gfx.h's, its
+OSThread_s/OSTimer_s/ALFilter_s are ultra_types.h's and libaudio.h's, its
+Shared_World users take CWorld (structs/world.h), the pak menu's player is
+a struct CPlayer *, and its float Mtx is renamed RW_Mtx. The dead
+CVector3_t copies of 31 imported files are gone. Left: junk_types.h and
+abu_types.h still define different layouts of the same libaudio internals
+(ALEvent, ALEventQueue, ALVoice, ALVoiceState, ALSound, ALSoundState,
+ALSynConfig, ALEnvMixer, ALMIDIEvent, ALTempoEvent, ALMicroTime), so they
+cannot be included together; junk's B12List and abu's IntrusiveList are
+camera.h's CList under other names.
 
 ## include/structs/player.h (fixed and hoisted)
 
@@ -861,16 +872,20 @@ as written.
 
 ## Files that are readable only on paper
 
-`tools/progress.py` counts these as readable (no m2c offset macros), but
-they still reach fields by raw pointer arithmetic (`*(s32 *) ((u8 *) p + 0x1C)`
-and the like), because no struct was found that kept the codegen:
-
-func_00204FD0, func_00271904, func_00293254, func_0041B9DC, func_004533F4,
-func_00268534, func_00268080, func_002680D0, func_002715F0, func_00271570,
-func_004194F8, func_00281B14.
+`tools/progress.py` counted these as readable (no m2c offset macros), but
+they reached fields by raw pointer arithmetic (`*(s32 *) ((u8 *) p + 0x1C)`
+and the like). None are left: the 12 files of this list now use SndMgr/CMutex
+(func_00271904, func_002715F0, func_00271570), GameMatch (func_004194F8,
+func_004533F4), CIntelligence (func_00268534, func_00268080,
+func_002680D0), MenuItem (func_0041B9DC), ALSeq (func_00293254), B12Node
+(func_00204FD0) and CCameraPool/CCamera (func_00281B14). func_00271904
+walks the voices by whole SndVoice steps and reads the sound field at a
+fixed offset (indexing voices[i] changes the loop).
 
 These keep a few casted stores on purpose, for the codegen (the rest of the
-file is named): func_004402C8, func_00455D10, func_002748D0.
+file is named): func_004402C8, func_00455D10, func_002748D0, and
+func_0041B9DC (a member store would let the load of D_8011AAD8 move above
+it).
 
 Still m2c (the M2C_ macros are left in; they are the 10 files
 `tools/progress.py` does not count as readable): func_0044068C,

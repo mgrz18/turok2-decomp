@@ -7,7 +7,7 @@ extern void func_0021FA2C(void *arg0, s32 arg1, void *arg2);
 extern char *func_002017D4(s32 *, s32);
 void func_0021FA2C(void *arg0, s32 arg1, void *arg2) {
     ObjectLinks24 *o = arg0;
-    Vec3 *out = arg2;
+    CVector3 *out = arg2;
     ObjRecAt2V1 *indices = (void *)o->unk_0;
     s16 idx;
     ObjectState14 *recs;

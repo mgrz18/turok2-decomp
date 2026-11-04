@@ -6,9 +6,9 @@
 extern s32 func_00211D40(void *arg0, void *arg1);
 s32 func_00211D40(void *arg0, void *arg1) {
     GeometryEdge *edge = arg0;
-    Vec3 *point = arg1;
-    Vec3 normal;
-    Vec3 delta;
+    CVector3 *point = arg1;
+    CVector3 normal;
+    CVector3 delta;
     s32 result;
     normal = edge->normal;
     delta.x = point->x - edge->start.x;

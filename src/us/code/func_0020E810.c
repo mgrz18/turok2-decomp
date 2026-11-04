@@ -20,11 +20,11 @@ extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern f32 D_800DD78C;
 extern f32 func_00298470(f32);
-Vector4f func_0020E810(Vec3 *input) {
+Vector4f func_0020E810(CVector3 *input) {
     Vector4f result;
-    Vec3 normalized;
-    Vec3 basis;
-    Vec3 axis;
+    CVector3 normalized;
+    CVector3 basis;
+    CVector3 axis;
     f32 magnitude;
     f32 angle;
     f32 axisMagnitude;

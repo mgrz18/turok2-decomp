@@ -2,8 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/world.h"
 
-extern Shared_World D_800F7078;
+extern CWorld D_800F7078;
 extern s32 func_00220408(void *, void *);
 void func_00265560(void *arg0, void *arg1) {
     extern s32 func_00243414(void *, void *, s32);

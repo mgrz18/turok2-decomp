@@ -17,14 +17,6 @@ struct IntrusiveList {
     s32 count;
 };
 struct IntrusiveList;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 /* Turok 2 effect record: 0x298 bytes (Rage Wars 0x2F8), most fields 0x2C-0x60 earlier. */
 typedef struct Effect_func_80262E88_de Effect_func_80262E88_de;
 struct Effect_func_80262E88_de {

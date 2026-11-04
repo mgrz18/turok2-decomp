@@ -2,28 +2,29 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/world.h"
 
-extern Shared_World D_800F7078;
-extern s32 func_00224B58(Shared_World *world, Trigger *trigger);
-extern s32 func_00225210(Shared_World *world, s32 id);
-extern void func_002252A0(Shared_World *world, s32 id);
+extern CWorld D_800F7078;
+extern s32 func_00224B58(CWorld *world, Trigger *trigger);
+extern s32 func_00225210(CWorld *world, s32 id);
+extern void func_002252A0(CWorld *world, s32 id);
 extern void func_0026E294(Trigger *trigger);
 extern s32 func_0026E6D4(Trigger *trigger, s32 arg);
-extern void func_00224A68(Shared_World *world, Trigger *trigger, s32 arg);
-extern void func_00224C98(Shared_World *world, s32 id);
-extern s32 func_00224CF8(Shared_World *world, s32 id);
-extern void func_0022515C(Shared_World *world, s32 id);
+extern void func_00224A68(CWorld *world, Trigger *trigger, s32 arg);
+extern void func_00224C98(CWorld *world, s32 id);
+extern s32 func_00224CF8(CWorld *world, s32 id);
+extern void func_0022515C(CWorld *world, s32 id);
 extern void func_0026E210(Trigger *trigger);
 void func_0026E4B8(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exclude, s32 group, s32 arg) {
     s32 i;
     s32 active;
     s32 usable;
-    Shared_World *world;
+    CWorld *world;
     Trigger *trigger;
     for (trigger = triggers, i = 0; i < count; trigger++, i++) {
         world = &D_800F7078;
         usable = 1;
-        if (world->mode != 4) {
+        if (world->m_Mode != 4) {
             usable = func_00224B58(world, trigger) == 0;
         }
         if (!usable) {

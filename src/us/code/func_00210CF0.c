@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00210CF0(struct Mtx *object);
-void func_00210CF0(struct Mtx *object) {
+extern void func_00210CF0(RW_Mtx *object);
+void func_00210CF0(RW_Mtx *object) {
     float t;
     t = object->right.y;
     object->right.y = object->right.z;

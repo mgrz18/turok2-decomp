@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0026CCA8(f32 *arg0, s32 arg1, Vec3 *arg2);
-void func_0026CCA8(f32 *arg0, s32 arg1, Vec3 *arg2)
+extern void func_0026CCA8(f32 *arg0, s32 arg1, CVector3 *arg2);
+void func_0026CCA8(f32 *arg0, s32 arg1, CVector3 *arg2)
 {
     s32 i;
     i = 0;

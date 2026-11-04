@@ -15,7 +15,7 @@ void func_0020548C(s32 unused, s32 idx) {
     mask = __osDisableInt();
     if (++D_800D8DCC != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(&D_800D7BE0.q11D0, 0, 1);
+        osRecvMesg(&D_800D7BE0.lock.queue, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
@@ -24,7 +24,7 @@ void func_0020548C(s32 unused, s32 idx) {
     m2 = __osDisableInt();
     if (--D_800D8DCC != 0) {
         __osRestoreInt(m2);
-        osSendMesg(&D_800D7BE0.q11D0, 0, 1);
+        osSendMesg(&D_800D7BE0.lock.queue, 0, 1);
     } else {
         __osRestoreInt(m2);
     }

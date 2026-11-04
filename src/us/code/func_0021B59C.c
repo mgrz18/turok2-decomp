@@ -5,17 +5,17 @@
 
 extern SineTable D_800ACBF8;
 extern s32 D_800B6D18;
-extern void func_0020F040(Vec3 *);
+extern void func_0020F040(CVector3 *);
 extern void func_0020FF80(f32 *, f32 *);
-extern void func_0020EF60(Vec3 *, Vec3 *, f32);
+extern void func_0020EF60(CVector3 *, CVector3 *, f32);
 extern void func_00210318(f32 *, f32, f32, f32);
 extern void func_0020FCC4(f32 *, f32, f32, f32, f32);
 extern void func_0020C618(f32 *, f32 *, f32 *);
 void func_0021B59C(s32 time, s32 flags, f32 *matrix) {
     f32 rotation[16];
     f32 inverse[16];
-    Vec3 origin;
-    Vec3 axis;
+    CVector3 origin;
+    CVector3 axis;
     u32 t;
     f32 angle;
     f32 flip;

@@ -3,14 +3,6 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80271B18_3.CPP, func_802723FC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t;
-struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 extern f32 func_00298470(f32);
 static __inline__ CVector3 project(CVector3 *arg0, CVector3 *arg1) {
     CVector3 projected;
