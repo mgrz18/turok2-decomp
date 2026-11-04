@@ -20,7 +20,9 @@
  * 19 animation masks (handed to func_00245A98, one bit per animation of an
  * action table) run from 0x76 to 0x9A in Rage Wars' order (evade, combat
  * and the four attacks paired with the five attack radii, the arm wounds
- * as the hit-region reactions, flee as "can run").
+ * as the hit-region reactions, flee as "can run"); the collision code
+ * (func_002233A8) reads the door's two radii and the destructible's and
+ * the action's "go" radius at their places.
  *
  * Offsets in the bodies are from the body (0x14); the comments give the
  * offset in CIntelligence too. Fields named unk are not yet known. */
@@ -166,6 +168,22 @@ typedef struct CPickupIntelligence {
     /* 0x0C (0x20) */ f32 m_Time;
 } CPickupIntelligence; /* size 0x10 */
 
+/* Type 10: an object the player works (a switch...). */
+typedef struct CActionIntelligence {
+    /* 0x00 (0x14) */ u32 m_dwFlags;
+    /* 0x04 (0x18) */ f32 m_CollisionRadius;
+    /* 0x08 (0x1C) */ f32 m_CollisionHeight;
+    /* 0x0C (0x20) */ s16 m_IdleAnim;
+    /* 0x0E (0x22) */ s8 m_IdleModel;
+    /* 0x0F (0x23) */ s8 m_IdleTexture;
+    /* 0x10 (0x24) */ f32 m_AutoGoRadius;
+    /* 0x14 (0x28) */ s16 m_GoAnim;
+    /* 0x16 (0x2A) */ s16 m_GoPickupNeeded;
+    /* 0x18 (0x2C) */ s16 m_GoPickupNeededText;
+    /* 0x1A (0x2E) */ s8 m_GoModel;
+    /* 0x1B (0x2F) */ s8 m_GoTexture;
+} CActionIntelligence; /* size 0x1C */
+
 /* Type 11: a player character. */
 typedef struct CPlayerIntelligence {
     /* 0x00 (0x14) */ u32 m_dwFlags;
@@ -191,6 +209,7 @@ typedef struct CIntelligence {
         CDoorIntelligence m_Door;
         CDestructibleIntelligence m_Destructible;
         CPickupIntelligence m_Pickup;
+        CActionIntelligence m_Action;
         CPlayerIntelligence m_Player;
     };
 } CIntelligence; /* size 0x9C */
