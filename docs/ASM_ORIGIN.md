@@ -5,8 +5,9 @@ still not defined by any linked C file (`tools/progress.py`). Three of them
 are C still to finish (func_00246BC0 in `nonmatching/engine/`, and
 func_0042CBE4 / func_00465B04, blocked by a shared .rodata pool:
 docs/VMASM.md). The other 47 were reviewed one by one: none is compiled C.
-They are hand-written asm (44) or fragments that are not functions (3), and
-no C can ever be written for them.
+They are hand-written asm (45) or fragments that are not functions (2), and
+no C can ever be written for them. (The third .code-tail fragment,
+func_002C232C, was never among the 50: `progress.py` drops it as a copy.)
 
 `versions/asm_origin.us.txt` lists them, one line each with the reason.
 `tools/progress.py` reads it: the listed functions get their own row,
