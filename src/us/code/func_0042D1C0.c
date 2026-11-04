@@ -3,7 +3,7 @@
 
 #include "rw/junk_types.h"
 
-void func_0020F040(Vec3f *v);
+void func_0020F040(CVector3 *v);
 void func_0042D1C0(S7Light *l) {
     l->dir.x = -0.667424f;
     l->dir.y = 0.953462f;

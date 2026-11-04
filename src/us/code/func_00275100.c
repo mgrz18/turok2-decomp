@@ -1,7 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0025DA30.c, func_0025DA30.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/junk_types.h"
+#include "structs/sound.h"
+#include "rw/junk_types.h" /* SndNodeRec */
 
 extern f32 D_800A81D8;
 s32 func_00266D24(void *tab, s32 n, s32 key);
@@ -12,7 +13,7 @@ s32 func_00275100(SndSeq *s, s32 key) {
     SndNodeRec *r;
     SndNodeRec *n;
     s32 res;
-    i = func_00266D24(s->owner->unk2B60, s->owner->unk2B64, key);
+    i = func_00266D24(s->owner->table2B60, s->owner->count2B64, key);
     if (i != -1) {
         i <<= 1;
         r = func_002017D4(s->owner->node2B50, i | 1);
