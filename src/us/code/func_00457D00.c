@@ -1,25 +1,9 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00407290.c, func_00407290.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "structs/player.h"
+#include "structs/menu.h"
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef struct O01Plr3 {
-                u8 pad0[0xA50];
-                s32 unkA50;     /* 0xA50 (0x698 in Rage Wars) */
-} O01Plr3;
-typedef struct O01Sub9 {
-               u8 pad0[4];
-               s8 unk4;
-} O01Sub9;
-typedef struct O01OwnJ {
-               u8 pad0[0x14];
-               s32 unk14;
-               u8 pad18[4];
-               O01Plr3 *unk1C;
-               O01Sub9 *unk20;
-} O01OwnJ;
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 D_80130990;
 extern s32 D_800C2028;
@@ -44,7 +28,7 @@ s32 func_004266C0(s32 pad, s32 *out);
 s32 func_0042662C(s32 pad, s32 *out);
 s32 func_004269B4(s32 pad, u8 *ext);
 s32 func_00426084(s32 pad, s32 size, char *n1, char *n2, u8 *ext, u8 *buf);
-void func_00416644(u8 *a, void *b, void *c, s32 d, void *e);
+void func_00416644(u8 *a, void *b, void *c, void *d, void *e);
 void func_002053A8(s32 a);
 void func_002052D8(s32 a, void *p);
 /* Controller-pak name for the selected pad (inlined). */
@@ -77,9 +61,9 @@ static __inline__ void O01FreeAll(void) {
     D_800C2018 = 0;
     D_800C201C = 0;
 }
-s32 func_00457D00(s32 unused, O01OwnJ *own, s32 unused3) {
-    O01Plr3 *plr;
-    O01Plr3 *pp;
+s32 func_00457D00(s32 unused, Menu *own, s32 unused3) {
+    CPlayer *plr;
+    CPlayer *pp;
     s32 pv;
     u8 ext[8];
     O01Pad pad;
@@ -92,8 +76,8 @@ s32 func_00457D00(s32 unused, O01OwnJ *own, s32 unused3) {
         pv = D_800C2028;
         pp = 0;
     } else {
-        pv = own->unk20->unk4;
-        pp = own->unk1C;
+        pv = own->controller->port;
+        pp = own->player;
     }
     pad.v = pv;
     plr = pp;
@@ -114,7 +98,7 @@ s32 func_00457D00(s32 unused, O01OwnJ *own, s32 unused3) {
                 }
             }
             if (ok != 0) {
-                func_00416644(D_80119E2C, D_0043BAFC, plr, plr->unkA50, (void *)own->unk14);
+                func_00416644(D_80119E2C, D_0043BAFC, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -122,9 +106,9 @@ s32 func_00457D00(s32 unused, O01OwnJ *own, s32 unused3) {
     O01FreeAll();
     if (flag != 0) {
         if (r == 0) {
-            func_00416644(D_80119E2C, D_0043BC88, plr, plr->unkA50, O01Pick(&pad));
+            func_00416644(D_80119E2C, D_0043BC88, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         } else {
-            func_00416644(D_80119E2C, D_0043BD18, plr, plr->unkA50, O01Pick(&pad));
+            func_00416644(D_80119E2C, D_0043BD18, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         }
     }
     return 1;
