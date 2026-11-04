@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* CAI callback: raises the 0xC8 level by 10 (at most 255) and sets the timer
+/* AI callback: raises the 0xC8 level by 10 (at most 255) and sets the timer
  * from it, 0..255 -> 240..120. The float temporaries (240 passed through two
  * variables) are what gives the ROM its alternating $f0/$f1 allocation. */
 void func_0025F928(void *self, CAI *ai) {

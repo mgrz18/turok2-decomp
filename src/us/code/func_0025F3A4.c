@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* CAI state: turn towards the target with the 10000 animation, the turn rate
+/* AI state: turn towards the target with the 10000 animation, the turn rate
  * depending on the stance; release the grabbed actor near the end of it. */
 
 typedef struct {

@@ -40,7 +40,7 @@ extern void func_00275544(s32 sound, CVector3 pos, CVector3 *source, s32 arg);
 extern void func_0027FC2C(void *buf, s32 camera, s32 model);
 
 /* Switches the weapon model to the player's next weapon (see func_002596B4)
- * and puts the weapon CAI back in mode 0. */
+ * and puts the weapon AI back in mode 0. */
 static __inline__ void switchWeapon(Object *obj, CAI *ai) {
     CPlayer *player = obj->owner;
 

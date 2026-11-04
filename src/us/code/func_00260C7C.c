@@ -10,7 +10,7 @@ void func_002105A4(Mtx44 *mtx, f32 angle);
 void func_0020F85C(Mtx44 *mtx, CVector3 *in, CVector3 *out);
 void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
-/* CAI callback: with a target, pushes the actor sideways (by its yaw) by the
+/* AI callback: with a target, pushes the actor sideways (by its yaw) by the
  * side func_002451AC reports within 20 degrees; else damps its velocity. */
 void func_00260C7C(CGameObjectInstance *self, CAI *ai) {
     CVector3 push;

@@ -16,7 +16,7 @@ static __inline__ f32 TurnRate(CGameObjectInstance *self, CAI *ai) {
     return rate;
 }
 
-/* CAI callback: turns toward the target (pi/3 at a time in modes 1-2, else
+/* AI callback: turns toward the target (pi/3 at a time in modes 1-2, else
  * pi/12) and goes to mode 4 when done. */
 void func_0025E7E0(CGameObjectInstance *self, CAI *ai) {
     CEnemyIntelligence *sub = &self->header.m_pIntelligence->m_Enemy;

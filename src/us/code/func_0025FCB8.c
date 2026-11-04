@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* CAI reaction (like func_0025CAC8 case 11, but setting the delay): raises the
+/* AI reaction (like func_0025CAC8 case 11, but setting the delay): raises the
  * intensity by 20 (at most 255) and sets the reaction delay to 75..60 frames. */
 void func_0025FCB8(void *actor, CAI *ai) {
     s32 v = ai->m_Aggression;

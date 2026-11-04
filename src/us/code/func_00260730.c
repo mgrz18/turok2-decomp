@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* Flying CAI steering: for index 1, ease the vertical speed towards the wanted
+/* Flying AI steering: for index 1, ease the vertical speed towards the wanted
  * one and bank/pitch with it; then turn. Against a target of another kind,
  * re-roll the attack delay. */
 

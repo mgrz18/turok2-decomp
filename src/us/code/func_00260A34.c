@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* Flying CAI state: steer towards the target, attack when possible (resetting
+/* Flying AI state: steer towards the target, attack when possible (resetting
  * the attack delay), and fall back to state 10 once the timer runs out. */
 
 typedef struct {

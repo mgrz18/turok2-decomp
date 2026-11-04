@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* Flying CAI state: keep facing the target; when something is in the way,
+/* Flying AI state: keep facing the target; when something is in the way,
  * side-step away from it, otherwise damp the velocity. Fires state 4 when
  * the timer runs out. */
 

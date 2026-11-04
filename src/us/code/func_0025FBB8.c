@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* CAI callback: raises the intensity by 20 (at most 255) and sets the timer
+/* AI callback: raises the intensity by 20 (at most 255) and sets the timer
  * from it, 0..255 -> 75..60 (same shape as func_0025FCB8). */
 void func_0025FBB8(void *actor, CAI *ai) {
     s32 v = ai->m_Aggression;

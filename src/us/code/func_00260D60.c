@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* Flying CAI steering, scaled by speed: like func_00260730, but the bank and
+/* Flying AI steering, scaled by speed: like func_00260730, but the bank and
  * pitch ease faster when they have to swing to the other side. */
 
 typedef struct {

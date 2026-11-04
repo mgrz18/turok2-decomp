@@ -20,7 +20,7 @@ static __inline__ f32 TurnRate(CGameObjectInstance *self, CAI *ai) {
     return rate;
 }
 
-/* CAI callback: turns toward the point D_800B06A0, then calls func_0025D474
+/* AI callback: turns toward the point D_800B06A0, then calls func_0025D474
  * once 0xC7 reaches 5. */
 void func_0025F114(CGameObjectInstance *self, CAI *ai) {
     func_00245BAC(self, ai, TurnRate(self, ai), func_00246310(self, D_800B06A0, D_800B06A4, D_800B06A8));

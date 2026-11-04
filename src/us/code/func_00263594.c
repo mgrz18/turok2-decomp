@@ -21,7 +21,7 @@ extern Players D_80119870;
 
 extern f32 func_002119FC(f32 lo, f32 hi); /* random in range */
 
-/* CAI init: a random delay from the definition's range, shortened by 25% per
+/* AI init: a random delay from the definition's range, shortened by 25% per
  * player beyond two in multiplayer. */
 void func_00263594(CGameObjectInstance *actor, CAI *ai) {
     CGeneratorIntelligence *trigger = &actor->header.m_pIntelligence->m_Generator;

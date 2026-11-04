@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* CAI state: bob towards the target height on a sine wave, the vertical speed
+/* AI state: bob towards the target height on a sine wave, the vertical speed
  * eased and clamped; once level with it, switch to state 0x3C. */
 
 extern f32 D_800B6D28;
