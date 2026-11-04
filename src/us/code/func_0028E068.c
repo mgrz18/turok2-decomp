@@ -1,38 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/8023A284_15.CPP, func_8023C1F0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "ultra_types.h"
+#include "structs/pager.h"
 
-
-typedef struct PageMapping {
-    /* 0x0 */ struct PageMapping *next;
-    /* 0x4 */ struct PageMapping *prev;
-    /* 0x8 */ u16 id;           /* page mapped here, 0xFFFF if none */
-    /* 0xA */ u8 index;
-    /* 0xB */ u8 slot;          /* TLB slot, 0xFF if none */
-    /* 0xC */ s32 age;
-} PageMapping;
-
-/* A run of virtual pages backed by the cartridge. */
-typedef struct Region {
-    /* 0x00 */ struct Region *next;
-    /* 0x04 */ u16 start;
-    /* 0x06 */ u16 pages;
-    /* 0x08 */ u8 *source;
-    /* 0x0C */ s32 padC;
-    /* 0x10 */ u8 *map;         /* page -> mapping index, 0xFF if not resident */
-    /* 0x14 */ s32 pad14;
-} Region;
-
-/* A request to the resource manager thread. */
-typedef struct PageJob {
-    /* 0x00 */ s16 type;
-    /* 0x04 */ u8 *source;
-    /* 0x08 */ s32 size;
-    /* 0x0C */ u16 page;
-    /* 0x10 */ PageMapping *mapping;
-    /* 0x14 */ void *thread;
-    /* 0x18 */ u8 *slot;
-} PageJob;
 
 typedef struct FaultedThread {
     /* 0x000 */ u8 pad0[0x12];
@@ -44,32 +14,8 @@ typedef struct FaultedThread {
     /* 0x124 */ u32 badVaddr;
 } FaultedThread;
 
-/* The resource pager at D_801206A0. */
-typedef struct Pager {
-    /* 0x000 */ s32 requests;
-    /* 0x004 */ s32 misses;
-    /* 0x008 */ u32 lastAddress;
-    /* 0x00C */ u8 padC[0x920 - 0xC];
-    /* 0x920 */ PageMapping slots[24];
-    /* 0xAA0 */ OSMesgQueue jobs;
-    /* 0xAB8 */ u8 padAB8[0xAD8 - 0xAB8];
-    /* 0xAD8 */ OSMesgQueue pending;    /* D_80121178 */
-    /* 0xAF0 */ u8 padAF0[0xBF0 - 0xAF0];
-    /* 0xBF0 */ PageMapping *head;      /* D_80121290: least recently used */
-    /* 0xBF4 */ PageMapping *tail;      /* D_80121294 */
-    /* 0xBF8 */ u8 padBF8[0xCD8 - 0xBF8];
-    /* 0xCD8 */ Region regions;
-} Pager;
-
-/* D_80121290/D_80121294 seen as the pair they are; the miss path reads the head through it. */
-typedef struct PageList {
-    PageMapping *head;
-    PageMapping *tail;
-} PageList;
-
-extern Pager D_801206A0;
-extern PageMapping *D_80121290;    /* D_801206A0.head */
-extern PageMapping *D_80121294;    /* D_801206A0.tail */
+extern PageMapping *D_80121290;    /* D_801206A0.chain.head */
+extern PageMapping *D_80121294;    /* D_801206A0.chain.tail */
 extern OSMesgQueue D_80121178;
 extern s32 D_800B7658;
 
@@ -77,7 +23,7 @@ extern FaultedThread *func_0029B140(void);     /* __osGetCurrFaultedThread */
 extern u64 func_0029B170(void);                /* osGetTime */
 extern void func_0028DBAC(s16 page, PageMapping *mapping, s32 slot, u8 *map);
 extern void func_0028DEFC(PageMapping *mapping);   /* releases its TLB slot */
-extern Region *func_0028EA40(u16 page);
+extern PageRegion *func_0028EA40(u16 page);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **msg, s32 block);
 extern s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
 extern void osWritebackDCacheAll(void);
@@ -94,20 +40,20 @@ static __inline__ void detachPage(PageMapping *mapping) {
     if (mapping->prev != NULL) {
         mapping->prev->next = mapping->next;
     } else {
-        D_801206A0.head = mapping->next;
+        D_801206A0.chain.head = mapping->next;
         mapping->next->prev = NULL;
     }
     if (mapping->next != NULL) {
         mapping->next->prev = mapping->prev;
     } else {
-        D_801206A0.tail = mapping->prev;
+        D_801206A0.chain.tail = mapping->prev;
         mapping->prev->next = NULL;
     }
 }
 
 /* func_0028EA40, inlined here. */
-static __inline__ Region *findRegion(u32 page) {
-    Region *region;
+static __inline__ PageRegion *findRegion(u32 page) {
+    PageRegion *region;
 
     for (region = &D_801206A0.regions; region != NULL; region = region->next) {
         if (page >= region->start && page < region->start + region->pages) {
@@ -120,8 +66,8 @@ static __inline__ Region *findRegion(u32 page) {
 /* TLB miss handler: maps the faulting page if it is resident, else queues a read of it; any other fault restarts the game. */
 void func_0028E068(void) {
     FaultedThread *thread;
-    Region *region;
-    Region *owner;
+    PageRegion *region;
+    PageRegion *owner;
     PageMapping *mapping;
     PageJob *job;
     u8 *slot;
@@ -144,9 +90,9 @@ void func_0028E068(void) {
                     detachPage(mapping);
                     func_0028DBAC(page, mapping, thread->slot, slot);
                     writeLink(&mapping->next, NULL);
-                    writeLink(&mapping->prev, D_801206A0.tail);
-                    if (D_801206A0.tail != NULL) {
-                        D_801206A0.tail->next = mapping;
+                    writeLink(&mapping->prev, D_801206A0.chain.tail);
+                    if (D_801206A0.chain.tail != NULL) {
+                        D_801206A0.chain.tail->next = mapping;
                     }
                     D_80121294 = mapping;
                     if (D_80121290 == NULL) {
@@ -161,7 +107,7 @@ void func_0028E068(void) {
             D_801206A0.misses++;
             job->source = region->source + ((page - region->start) << 12);
             job->size = 0x1000;
-            mapping = ((PageList *)&D_80121290)->head;
+            mapping = ((PageChain *)&D_80121290)->head;
             detachPage(mapping);
             func_0028DEFC(mapping);
             if (mapping->id != 0xFFFF) {
