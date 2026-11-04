@@ -55,6 +55,7 @@ typedef struct MenuItem {
     /* 0x14 */ char *text;          /* a text item's line (often a sprintf buffer) */
     /* 0x14 */ s32 data;
     /* 0x14 */ s32 image;           /* an image item's image */
+    /* 0x14 */ s32 *table;          /* a list item's table (set by its update callback) */
     };
     /* 0x18 */ MenuItemDesc *def;
     /* 0x1C */ s32 value;           /* -1 when made; a slider's position, 0-0xFF */
