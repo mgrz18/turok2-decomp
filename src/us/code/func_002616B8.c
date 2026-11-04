@@ -60,7 +60,7 @@ void func_002616B8(Self *self, CAI *ai) {
         speed = (func_002974C0(ai->m_ModeTime * 0.052359883f) + 1.0f) * 0.25f + 1.0f;
         turn = (func_002974C0(ai->m_ModeTime * 2.0f * 0.017453294f) + 1.0f) * 0.043633237f + 0.017453294f;
     }
-    ai->m_VarF32[3] = func_00211774(ai->m_VarF32[3], turn, 0.25f);
+    ai->m_Enemy.m_TurnRate = func_00211774(ai->m_Enemy.m_TurnRate, turn, 0.25f);
     ai->m_AnimSpeed = func_00211774(ai->m_AnimSpeed, speed, 0.25f);
 
     lo = func_0026872C(self, 0);
@@ -86,7 +86,7 @@ void func_002616B8(Self *self, CAI *ai) {
     } else if (self->pitch < -81.92f) {
         self->pitch = -81.92f;
     }
-    func_00245BAC(self, ai, ai->m_VarF32[3], tp->m_Path.m_Angle);
+    func_00245BAC(self, ai, ai->m_Enemy.m_TurnRate, tp->m_Path.m_Angle);
 
     if (ai->m_ModeTime > 15.0f) {
         if (params->kind != 5) {

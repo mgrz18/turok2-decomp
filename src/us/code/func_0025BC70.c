@@ -56,14 +56,14 @@ void func_0025BC70(CGameObjectInstance *actor, CAI *ai) {
         ai->m_pfCollision = func_0025EF68;
         ai->m_pfHurt = func_0025B2D4;
     }
-    ai->m_VarS32[0] = 0;
-    ai->m_VarS32[1] = 0;
-    ai->m_VarS32[2] = 0;
-    ai->m_VarS32[3] = 0;
+    ai->m_Enemy.m_Pitch = 0;
+    ai->m_Enemy.m_Roll = 0;
+    ai->m_Enemy.m_pGrabbed = NULL;
+    ai->m_Enemy.m_TurnRate = 0;
     ai->m_Enemy.m_AttackDelay = 0;
-    ai->m_VarS32[6] = 0;
-    ai->m_VarS32[7] = 0;
-    ai->m_VarF32[4] = 1.0f;
+    ai->m_Enemy.unk18 = 0;
+    ai->m_Enemy.m_WanderTimer = 0;
+    ai->m_Enemy.m_BaseScale = 1.0f;
     ai->m_Enemy.m_IdleTimer = func_002119FC(60.0f, 120.0f);
     ai->m_Enemy.m_Timer = 0;
     ai->m_Enemy.m_Timer2 = 150.0f;
