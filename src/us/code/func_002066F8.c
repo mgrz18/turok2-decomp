@@ -1,16 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/TEXTURE/80254CE4.CPP, func_80254ED0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "common.h"
+#include "structs/list.h"
+
 extern s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent);
 struct func_8022BC04_S3;
 typedef struct func_8022BC04_S3 func_8022BC04_S3;
@@ -21,10 +14,10 @@ struct func_8022BC04_S3 {
 };
 extern char D_800D8D7C;
 void CList__AddHead(void *list, void *node);
-extern IntrusiveList D_800D8D68;
+extern CList D_800D8D68;
 extern void CList__Remove(void *list, void *node);
 static __inline__ func_8022BC04_S3 *take(s32 active) {
- func_8022BC04_S3 *node=D_800D8D68.head;
+ func_8022BC04_S3 *node=D_800D8D68.m_pHead;
  if(node) {CList__Remove(&D_800D8D68,node); node->unk10=active;CList__AddHead(&D_800D8D7C,node);}
  return node;
 }

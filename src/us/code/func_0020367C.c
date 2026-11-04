@@ -1,19 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCENE/802508E0_4.CPP, func_8025193C_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-} IntrusiveList;
+#include "structs/list.h"
 
 typedef struct Manager {
     char queue[0x92C];
-    IntrusiveList pending;  /* 0x92C */
-    IntrusiveList active;   /* 0x940 */
-    char padActive[0x20 - sizeof(IntrusiveList)];
+    CList pending;  /* 0x92C */
+    CList active;   /* 0x940 */
+    char padActive[0x20 - sizeof(CList)];
     char lock[0x18];        /* 0x960, OSMesgQueue */
     char unk978[0x24];
     s32 mask;               /* 0x99C */
@@ -170,7 +163,7 @@ CachedResource *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner
     if (direct != 0) {
         allocated = func_002066F8(0, mode);
     } else {
-        scan = D_800D8450.active.head;
+        scan = D_800D8450.active.m_pHead;
         while (scan != 0) {
             if (scan->key == key && size <= scan->priority) {
                 busy = 1;

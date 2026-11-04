@@ -1,17 +1,10 @@
 #include "structs/vector.h"
+#include "common.h"
+#include "structs/list.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/AUDIO/8025A3EC_4.CPP, func_8025BB84_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
 struct CVector3_t;
 struct Triple;
 struct CVector3_t;
@@ -686,7 +679,7 @@ struct GameplayCamera {
     u8 pad56C[4];
     s8 unk570;
     char pad571[0xE40 - 0x571];
-    IntrusiveList objects;
+    CList objects;
     f32 unkE54;
     char padE58[0x3C];
     s8 unkE94;

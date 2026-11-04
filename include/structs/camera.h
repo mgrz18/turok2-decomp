@@ -13,16 +13,7 @@
 
 #include "structs/game_object.h"
 #include "structs/gbi.h"
-
-/* Acclaim's intrusive list (CList__*): the head and tail element, and where
- * in an element its links are (the IntrusiveList of the Rage Wars decomp). */
-typedef struct {
-    /* 0x00 */ void *m_pHead;
-    /* 0x04 */ void *m_pTail;
-    /* 0x08 */ s32 m_LastOffset;
-    /* 0x0C */ s32 m_NextOffset;
-    /* 0x10 */ s32 m_nCount;
-} CList; /* size 0x14 */
+#include "structs/list.h"
 
 typedef struct {
     /* 0x00 */ CVector3 m_vNormal;

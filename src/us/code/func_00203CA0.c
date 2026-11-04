@@ -3,22 +3,15 @@
 
 #include "common.h"
 #include "ultra_types.h"
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "structs/list.h"
+
 extern int D_800D8DCC;
 struct Manager;
 struct Manager {
     char queue[0x92C];
-    IntrusiveList pending;
-    IntrusiveList active;
-    char padActive[0x20 - sizeof(IntrusiveList)];
+    CList pending;
+    CList active;
+    char padActive[0x20 - sizeof(CList)];
     char lock[0x18];
     char unk978[0x24];
     s32 mask;
@@ -66,7 +59,7 @@ struct ResourceHashEntry;
 struct ResourceLoadRequest;
 typedef struct ResourceLoadRequest ResourceLoadRequest;
 struct ResourceLoadRequest;
-extern s32 CList__AddTail(IntrusiveList *list, void *node);
+extern s32 CList__AddTail(CList *list, void *node);
 typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
@@ -178,7 +171,7 @@ done:
         return found->node;
     }
     async |= D_800D8450.mask;
-    scan = D_800D8450.active.head;
+    scan = D_800D8450.active.m_pHead;
     while (scan != 0) {
         if (scan->key == key) {
             busy = 1;

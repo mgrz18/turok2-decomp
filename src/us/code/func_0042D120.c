@@ -1,9 +1,6 @@
 /* WRONG CUT: REAL func_0042D120 size 0x98 (splat cut it into func_0042D120 + func_0042D140). */
 #include "common.h"
-
-typedef struct IntrusiveList {
-    /* 0x00 */ u8 pad0[0x14];
-} IntrusiveList;
+#include "structs/list.h"
 
 typedef struct Slot {
     /* 0x00 */ u8 pad0[8];
@@ -14,13 +11,13 @@ typedef struct Slot {
 } Slot; /* 0x18 */
 
 typedef struct SlotLists {
-    /* 0x00 */ IntrusiveList used;
-    /* 0x14 */ IntrusiveList free;
+    /* 0x00 */ CList used;
+    /* 0x14 */ CList free;
     /* 0x28 */ Slot slots[8];
 } SlotLists;
 
-extern void CList__Construct(IntrusiveList *list, s32 prevOffset, s32 nextOffset);
-extern s32 CList__AddTail(IntrusiveList *list, void *node);
+extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
+extern s32 CList__AddTail(CList *list, void *node);
 
 void func_0042D120(SlotLists *lists) {
     s32 i;

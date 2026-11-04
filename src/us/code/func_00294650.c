@@ -1,17 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/sdk/libgultra/synstopvoice.c, alSynStopVoice.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed short s16;
-typedef signed int s32;
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "common.h"
+#include "structs/list.h"
+
 union ObjectLinks4_3;
 typedef union ObjectLinks4_3 ObjectLinks4_3;
 union ObjectLinks4_3;
@@ -42,7 +34,7 @@ struct Draw {
     s32 allocationMode;
     void **model;
     char reserved10[0x10];
-    IntrusiveList recycled;
+    CList recycled;
 };
 struct ObjectStateC_2;
 typedef struct ObjectStateC_2 ObjectStateC_2;

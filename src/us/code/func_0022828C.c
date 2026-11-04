@@ -1,22 +1,10 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SYSTEM/802624A0_10.CPP, func_80262E88_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "common.h"
+#include "structs/list.h"
+
 struct SceneEffectPool;
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
 struct CVector3_t;
 struct CVector3_t;
 struct CVector3_t;
@@ -41,10 +29,10 @@ struct Effect_func_80262E88_de {
 };
 struct SceneEffectPool {
     Effect_func_80262E88_de effects[0x20];
-    IntrusiveList freeEffects;   /* 0x5300 */
-    IntrusiveList activeEffects; /* 0x5314 */
+    CList freeEffects;   /* 0x5300 */
+    CList activeEffects; /* 0x5314 */
 };
-extern s32 CList__AddTail(IntrusiveList *list, void *node);
+extern s32 CList__AddTail(CList *list, void *node);
 extern void CList__Remove(void *list, void *node);
 extern f32 D_800F5A18;
 extern void func_002255CC(s32, Effect_func_80262E88_de *);
@@ -59,7 +47,7 @@ void func_0022828C(struct SceneEffectPool *scene, s32 arg1) {
     Effect_func_80262E88_de *effect;
     Effect_func_80262E88_de *next;
     f32 *max;
-    effect = scene->activeEffects.head;
+    effect = scene->activeEffects.m_pHead;
     if (effect == 0) {
         return;
     }
