@@ -65,7 +65,7 @@ void func_0027F2C4(CCameraPool *pool, void *world) {
             w = D_800C2030;
             h = D_800C2034;
             GFX_CMD(0xED000000, ((((s32)((f32)(w - 1) * 4.0f)) & 0xFFF) << 12) | (((s32)((f32)(h - 1) * 4.0f)) & 0xFFF))
-            GFX_CMD(0xFF100000 | ((w - 1) & 0xFFF), D_800F7070->colorImage)
+            GFX_CMD(0xFF100000 | ((w - 1) & 0xFFF), D_800F7070->m_pFrameBuffer)
             GFX_CMD(0xE3000A01, 0x300000)
             GFX_CMD(0xFCFFFFFF, 0xFFFE793C)
             GFX_CMD(0xE200001C, 0)

@@ -1,11 +1,11 @@
 #include "common.h"
 #include "gfx.h"
+#include "structs/frame.h"
 
 /* One two-word display list command at the list head. */
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
 extern s32 D_800C2214;          /* display list capacity, in commands */
-extern u8 *D_800F7070;          /* frame state; 0x114 = start of the frame's list */
 
 s32 func_00208810(s32, s32);
 s32 *func_002017D4(s32 *, s32);
@@ -22,7 +22,7 @@ void func_0020BBE4(s32 arg0, s32 renderMode, s32 **model, s32 matrix, s32 projec
     s32 i;
     s32 *seg;
 
-    if ((u32) (D_800C2214 - ((u32) ((u8 *) D_800D8E24 - *(u8 **) (D_800F7070 + 0x114)) >> 3)) < 3000) {
+    if ((u32) (D_800C2214 - ((u32) ((u8 *) D_800D8E24 - (u8 *) D_800F7070->m_pDisplayList) >> 3)) < 3000) {
         return;
     }
     if (func_00208810(arg0, arg8) == 0) {

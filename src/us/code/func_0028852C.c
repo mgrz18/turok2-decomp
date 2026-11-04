@@ -1,14 +1,9 @@
 #include "common.h"
 #include "gfx.h"
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x110];
-    /* 0x110 */ s32 colorImage;
-} GfxTask;
+#include "structs/game.h"
 
 extern s32 D_800C2030;      /* screen width */
 extern s32 D_80130A78;      /* fill target (z-buffer) */
-extern GfxTask *D_800F7070[]; /* GfxFrame (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently */
 
 extern void func_00207FEC(s32 mode);
 
@@ -51,7 +46,7 @@ void func_0028852C(s32 unused, s32 x0, s32 x1, s32 y0, s32 y1) {
     {
         Gfx *g = D_800D8E24++;
         g->w0 = colorImage;     /* gDPSetColorImage(RGBA, 16b, width, frame) */
-        g->w1 = D_800F7070[0]->colorImage;
+        g->w1 = D_800F6CB0.m_pCurrentFrameData->m_pFrameBuffer;
     }
     {
         Gfx *g = D_800D8E24++;

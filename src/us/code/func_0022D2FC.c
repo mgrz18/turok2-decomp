@@ -680,7 +680,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     u8 *envFrom;
     u8 *primFrom;
 
-    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->dlStart) / sizeof(Gfx) < 3000) {
+    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     if (particle->time < 0.0f) {

@@ -37,7 +37,6 @@ extern s32 D_8011F144;
 extern s32 D_8011B114;
 extern f32 D_8011AD40;
 extern u8 D_8011AD28[];         /* the engine message queue */
-extern void *D_8011F140;
 extern u8 D_800B75F0;
 
 extern void func_00202130(void);
@@ -134,11 +133,11 @@ void func_00286674(CEngineApp *e) {
             break;
         case 2:
             if ((u8 *)D_8011F124 == (u8 *)e + 0xF0) {
-                D_8011F140 = e;
+                D_8011F140 = (CFrameData *)e;
             } else if ((u8 *)D_8011F124 == (u8 *)e + 0x230) {
-                D_8011F140 = (u8 *)e + 0x140;
+                D_8011F140 = (CFrameData *)((u8 *)e + 0x140);
             } else if ((u8 *)D_8011F124 == (u8 *)e + 0x370) {
-                D_8011F140 = (u8 *)e + 0x280;
+                D_8011F140 = (CFrameData *)((u8 *)e + 0x280);
             }
             if (e->m_Settings.mode == 17) {
                 D_8011B110++;

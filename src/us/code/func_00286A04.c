@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
+#include "structs/frame.h"
 
 extern DlCmd *D_800D8E24;
-extern B21Hdr *D_800F7070;
 extern u8 D_800AB100[];
 extern u8 D_800AB130[];
 extern s32 D_80130A78;
@@ -24,7 +24,7 @@ void func_00286A04(void)
   DlCmd *d5;
   DlCmd *d6;
   B21Vp *vp;
-  D_800D8E24 = D_800F7070->unk114;
+  D_800D8E24 = D_800F7070->m_pDisplayList;
   d1 = D_800D8E24++;
   d1->w0 = 0xDB060000;
   d1->w1 = 0;

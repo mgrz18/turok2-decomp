@@ -22,6 +22,7 @@
 
 #include "structs/vector.h"
 #include "structs/player_options.h"
+#include "structs/frame.h"
 
 /* The match state, D_8011ACB0: the play clock, then the rules of the
  * running match (Rage Wars' RenderCounters / GameRules at D_801468A0). */
@@ -173,27 +174,7 @@ typedef struct CGameFromCameraPool {
 
 /* ---- The engine, D_800F6CB0 (CEngineApp) ---- */
 
-/* One frame in flight (Turok 3's CFrameData, 8 bytes longer here: the word
- * at 0x128). The three are a ring through m_pPrev / m_pNext
- * (func_00286440); D_800F7070 (CEngineApp.m_pCurrentFrameData) is the one
- * being built. */
-typedef struct CFrameData {
-    /* 0x000 */ u8 m_SunFrame[0x20];     /* CSunFrameData (CSunFrameData__Construct) */
-    /* 0x020 */ u8 m_Task[0x68];         /* OSScTask */
-    /* 0x088 */ u8 m_LineTask[0x68];     /* OSScTask */
-    /* 0x0F0 */ s16 m_MsgType;           /* m_Msg, an OSScMsg: 2 at start (func_00286440) */
-    /* 0x0F2 */ u8 m_Msg[0x110 - 0xF2];
-    /* 0x110 */ void *m_pFrameBuffer;    /* its colour image (D_80130A88[i]) */
-    /* 0x114 */ void *m_pDisplayList;    /* Gfx *: the start of the frame's list */
-    /* 0x118 */ void *m_pLineList;       /* Gfx * */
-    /* 0x11C */ s32 m_DisplayListSize;
-    /* 0x120 */ s32 m_LineListSize;
-    /* 0x124 */ s32 m_nPredictTicks;
-    /* 0x128 */ s32 m_bLines;             /* the line list has lines (func_00401C1C) */
-    /* 0x12C */ struct CFrameData *m_pPrev;
-    /* 0x130 */ struct CFrameData *m_pNext;
-    /* 0x134 */ u8 unk134[0x140 - 0x134];
-} CFrameData; /* size 0x140 */
+/* CFrameData (one frame in flight, D_800F7070) is in structs/frame.h. */
 
 /* The engine, D_800F6CB0 (CEngineApp__Boot's object; the field names after
  * Turok 3's CEngineApp, which has the same parts in the same order): the

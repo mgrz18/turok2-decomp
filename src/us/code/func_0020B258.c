@@ -30,7 +30,7 @@ void func_0020B258(void **resource, void *matrix, s32 segment, char *lights, voi
     s32 count;
     s32 i;
 
-    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->dlStart) / sizeof(Gfx) < 3000) {
+    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     if (func_00208810(D_80110064, pass) == 0) {

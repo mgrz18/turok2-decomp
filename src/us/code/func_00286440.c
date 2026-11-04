@@ -72,8 +72,8 @@ void func_00286440(CEngineApp *state) {
     for (; i < D_800C2210; i++) {
         prev = (i - 1 + D_800C2210) % D_800C2210;
         next = (i + 1 + D_800C2210) % D_800C2210;
-        state->m_FrameData[i].m_MsgType = 2;
-        state->m_FrameData[i].m_pFrameBuffer = (void *)D_80130A88[i];
+        state->m_FrameData[i].m_Msg.m_Type = 2;
+        state->m_FrameData[i].m_pFrameBuffer = D_80130A88[i];
         state->m_FrameData[i].m_pPrev = &state->m_FrameData[prev];
         state->m_FrameData[i].m_pNext = &state->m_FrameData[next];
         CSunFrameData__Construct(&state->m_FrameData[i]);
