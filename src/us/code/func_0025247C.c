@@ -44,10 +44,10 @@ void func_0025247C(CPlayer *p) {
     p->m_pOptions->m_TagMode = 1;
     func_00275624(0x27D8);
     barrel = &p->m_Barrel;
-    barrel->m_nItems = 0;
-    barrel->unk_0x4 = 0;
-    barrel->m_nLastItem = -1;
-    barrel->unk_0x8 = 0;
+    barrel->m_State = 0;
+    barrel->m_Turn = 0;
+    barrel->m_nCursor = -1;
+    barrel->m_Open = 0;
     p->m_bHeadMovementDisabled = 0;
     func_00243414((u8 *)p + 0x288, (u8 *)p + 0x3C8, 1);
     place_at_spawn(p);

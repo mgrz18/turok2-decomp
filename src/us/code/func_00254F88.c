@@ -2,19 +2,8 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-typedef struct {
-    /* 0x00 */ s32 weapon;
-    /* 0x04 */ u8 pad4[0x14];
-} WeaponEntry; /* size 0x18 */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ s32 count;
-    /* 0x1C */ WeaponEntry entries[1];
-} WeaponEntryList;
-
 /* Whether the player holds a usable weapon that is not in the list. */
-s32 func_00254F88(WeaponEntryList *list, CPlayer *player) {
+s32 func_00254F88(CBarrel *list, CPlayer *player) {
     WeaponInfo *def;
     s32 usable;
     s32 found;
@@ -37,8 +26,8 @@ s32 func_00254F88(WeaponEntryList *list, CPlayer *player) {
         }
         if (usable) {
             found = 0;
-            for (i = 0; i < list->count; i++) {
-                if (list->entries[i].weapon == w) {
+            for (i = 0; i < list->m_nCount; i++) {
+                if (list->m_Items[i].m_Weapon == w) {
                     found = 1;
                     break;
                 }

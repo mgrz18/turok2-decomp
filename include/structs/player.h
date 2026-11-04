@@ -4,9 +4,10 @@
 /* The player and the HUD. Layouts and names from LibTEngine's Turok 2 types
  * (Drahsid/LibTEngine, lib/libtengine/lib/types: CPlayer.h, COverlay.h,
  * COnScreen.h...), with these departures:
- *   - CBarrel (the weapon wheel) has only the fields the code reads:
- *     LibTEngine's offsets jump from 0x00C to 0x100 and its 36-entry list
- *     does not fit the space, while its size, 0x394, is what CPlayer leaves;
+ *   - CBarrel (the weapon wheel) is in structs/weapon.h, laid out from the
+ *     code: LibTEngine's offsets jump from 0x00C to 0x100 and its 36-entry
+ *     list does not fit the space, while its size, 0x394, is what CPlayer
+ *     leaves;
  *   - checked against the code (the local Player views of ~180 files):
  *     CPlayerLoadSaveData is 0x4E8 (no m_dwLevelMissionObjFlags: the level
  *     intro and first-time masks are followed by the nuke parts at 0x4DC),
@@ -20,6 +21,7 @@
 #include "structs/game_object.h"
 #include "structs/gbi.h"
 #include "structs/player_options.h"
+#include "structs/weapon.h"
 
 /* A HUD element: health, ammo, lives, air... slide in, fade, show a value. */
 typedef struct {
@@ -98,17 +100,6 @@ typedef struct {
     /* 0x30 */ u32 m_dwButtonsDouble;
     /* 0x34 */ u32 m_dwButtonsRepeat;
 } CPlayerContState; /* size 0x38 */
-
-/* The weapon wheel (the "barrel"), reset to 0 items and no last item. */
-typedef struct {
-    /* 0x000 */ s32 m_nItems;
-    /* 0x004 */ f32 unk_0x4;
-    /* 0x008 */ f32 unk_0x8;
-    /* 0x00C */ u8 unk_0xC[0x37C - 0xC];
-    /* 0x37C */ s32 m_nLastItem;
-    /* 0x380 */ s32 m_bUnderwater;        /* the wheel's underwater variant */
-    /* 0x384 */ u8 unk_0x384[0x394 - 0x384];
-} CBarrel; /* size 0x394 */
 
 /* What a save game keeps of the player. Health is 24.8 fixed point. */
 typedef struct {

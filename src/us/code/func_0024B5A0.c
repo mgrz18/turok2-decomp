@@ -1,41 +1,21 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/weapon.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
-
-typedef struct MenuSlot {
-    /* 0x00 */ s32 weapon;
-    /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ s32 available;
-    /* 0x0C */ f32 angle;
-    /* 0x10 */ f32 lift;
-    /* 0x14 */ f32 scale;
-} MenuSlot;
-
-typedef struct WeaponMenu {
-    /* 0x000 */ s32 state;
-    /* 0x004 */ f32 timer;
-    /* 0x008 */ u8 pad8[4];
-    /* 0x00C */ f32 spin;
-    /* 0x010 */ s32 direction;
-    /* 0x014 */ u8 pad14[4];
-    /* 0x018 */ s32 count;
-    /* 0x01C */ MenuSlot slots[36];
-    /* 0x37C */ s32 cursor;
-} WeaponMenu;
 
 extern f32 D_800B6D28;      /* frame step */
 
 s32 func_0024E700(CPlayer *player, s32 weapon);
 s32 func_002548FC(CPlayer *player);
-s32 func_00254F88(WeaponMenu *menu, CPlayer *player);
-void func_0024C47C(WeaponMenu *menu, CPlayer *player);
+s32 func_00254F88(CBarrel *menu, CPlayer *player);
+void func_0024C47C(CBarrel *menu, CPlayer *player);
 void func_00210EF0(f32 *angle);
 
 /* Runs the weapon menu: marks the weapons the player can use, steps the
  * cursor with the next/previous weapon buttons and turns the wheel towards
  * the selected slot. */
-void func_0024B5A0(WeaponMenu *menu, CPlayer *player) {
+void func_0024B5A0(CBarrel *menu, CPlayer *player) {
     s32 step;
     s32 i;
     s32 dir;
@@ -45,12 +25,12 @@ void func_0024B5A0(WeaponMenu *menu, CPlayer *player) {
     f32 turn;
 
     dir = 0;
-    if (menu->state == 1 || menu->state == 2) {
-        for (i = 0; i < menu->count; i++) {
-            if (func_0024E700(player, menu->slots[i].weapon) != 0) {
-                menu->slots[i].available = 1;
+    if (menu->m_State == 1 || menu->m_State == 2) {
+        for (i = 0; i < menu->m_nCount; i++) {
+            if (func_0024E700(player, menu->m_Items[i].m_Weapon) != 0) {
+                menu->m_Items[i].m_bAvailable = 1;
             } else {
-                menu->slots[i].available = 0;
+                menu->m_Items[i].m_bAvailable = 0;
             }
         }
     }
@@ -61,31 +41,31 @@ void func_0024B5A0(WeaponMenu *menu, CPlayer *player) {
     } else if (player->m_ContState.m_dwButtonsSingle & 0x8000) {
         dir = -1;
     }
-    if ((menu->state == 0 && dir != 0)
-        || (func_00254F88(menu, player) != 0 && menu->state != 0)
-        || (menu->cursor != -1 && menu->slots[menu->cursor].weapon != player->m_RequestedWeapon)) {
+    if ((menu->m_State == 0 && dir != 0)
+        || (func_00254F88(menu, player) != 0 && menu->m_State != 0)
+        || (menu->m_nCursor != -1 && menu->m_Items[menu->m_nCursor].m_Weapon != player->m_RequestedWeapon)) {
         func_0024C47C(menu, player);
     }
     if (dir != 0) {
         do {
-            menu->cursor += dir;
-            if (menu->cursor >= menu->count) {
-                menu->cursor = 0;
-            } else if (menu->cursor < 0) {
-                menu->cursor = menu->count - 1;
+            menu->m_nCursor += dir;
+            if (menu->m_nCursor >= menu->m_nCount) {
+                menu->m_nCursor = 0;
+            } else if (menu->m_nCursor < 0) {
+                menu->m_nCursor = menu->m_nCount - 1;
             }
-        } while (menu->slots[menu->cursor].available == 0);
-        player->m_RequestedWeapon = menu->slots[menu->cursor].weapon;
-        menu->direction = -dir;
-        menu->timer = 45.0f;
-        if (menu->state == 0 || menu->state == 3) {
-            menu->state = 1;
+        } while (menu->m_Items[menu->m_nCursor].m_bAvailable == 0);
+        player->m_RequestedWeapon = menu->m_Items[menu->m_nCursor].m_Weapon;
+        menu->m_Step = -dir;
+        menu->m_Turn = 45.0f;
+        if (menu->m_State == 0 || menu->m_State == 3) {
+            menu->m_State = 1;
         }
     }
-    if (menu->state != 0) {
-        from = menu->spin;
-        to = menu->slots[menu->cursor].angle;
-        step = menu->direction;
+    if (menu->m_State != 0) {
+        from = menu->m_Spin;
+        to = menu->m_Items[menu->m_nCursor].m_Angle;
+        step = menu->m_Step;
         func_00210EF0(&from);
         func_00210EF0(&to);
         if (step > 0) {
@@ -102,6 +82,6 @@ void func_0024B5A0(WeaponMenu *menu, CPlayer *player) {
                 turn = diff;
             }
         } while (0);
-        menu->spin += turn;
+        menu->m_Spin += turn;
     }
 }

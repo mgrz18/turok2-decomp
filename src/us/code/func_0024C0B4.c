@@ -2,30 +2,10 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-typedef struct MenuSlot {
-    /* 0x00 */ s32 weapon;
-    /* 0x04 */ WeaponInfo *info;
-    /* 0x08 */ s32 available;
-    /* 0x0C */ f32 angle;
-    /* 0x10 */ s32 lift;
-    /* 0x14 */ f32 scale;
-} MenuSlot;
-
-typedef struct WeaponMenu {
-    /* 0x000 */ s32 state;
-    /* 0x004 */ f32 radius;
-    /* 0x008 */ u8 pad8[8];
-    /* 0x010 */ s32 step;
-    /* 0x014 */ s32 unk14;
-    /* 0x018 */ s32 count;
-    /* 0x01C */ MenuSlot slots[36];
-    /* 0x37C */ s32 cursor;
-} WeaponMenu;
-
 extern s32 D_80110058;
 extern s32 D_8011005C;
 
-void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
+void func_0024BF1C(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
 /* Opens the weapon menu: flags the weapons the player can pick (an owned
  * weapon usable in the current mode, unless it is the lower of a pair the
@@ -34,7 +14,7 @@ void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *
 Dockerfile	   README.md	   include	src	 us
 Dockerfile.native  baserom.us.z64  nonmatching	test	 versions
 LICENSE		   build	   references	tools until it rests on the queued weapon. */
-void func_0024C0B4(WeaponMenu *menu, s32 dir, CPlayer *player) {
+void func_0024C0B4(CBarrel *menu, s32 dir, CPlayer *player) {
     s32 owned[35];
     s32 count;
     s32 i;
@@ -72,18 +52,18 @@ void func_0024C0B4(WeaponMenu *menu, s32 dir, CPlayer *player) {
         }
     }
     func_0024BF1C(menu, rows, owned, count, player);
-    menu->radius = 45.0f;
-    if (menu->state == 0 || menu->state == 3) {
-        menu->state = 1;
+    menu->m_Turn = 45.0f;
+    if (menu->m_State == 0 || menu->m_State == 3) {
+        menu->m_State = 1;
     }
-    menu->step = -dir;
-    menu->unk14 = 0;
-    while (menu->slots[menu->cursor].weapon != player->m_RequestedWeapon) {
-        menu->cursor += dir;
-        if (menu->cursor < 0) {
-            menu->cursor = menu->count - 1;
-        } else if (menu->cursor >= menu->count) {
-            menu->cursor = 0;
+    menu->m_Step = -dir;
+    menu->m_Glow = 0;
+    while (menu->m_Items[menu->m_nCursor].m_Weapon != player->m_RequestedWeapon) {
+        menu->m_nCursor += dir;
+        if (menu->m_nCursor < 0) {
+            menu->m_nCursor = menu->m_nCount - 1;
+        } else if (menu->m_nCursor >= menu->m_nCount) {
+            menu->m_nCursor = 0;
         }
     }
 }

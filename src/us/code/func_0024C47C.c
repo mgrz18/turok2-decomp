@@ -15,17 +15,15 @@
 #include "structs/game.h"
 #include "structs/weapon.h"
 
-typedef struct WeaponMenu WeaponMenu;
-
 extern s32 D_80110058;
 extern s32 D_8011005C;
 
-void func_0024BF1C(WeaponMenu *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
+void func_0024BF1C(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
 /* Opens the weapon wheel: picks the weapons to show (owned, allowed here,
  * not superseded by an owned upgrade) and how many times round to repeat
  * them so that the slots are at most 20 degrees apart. */
-void func_0024C47C(WeaponMenu *menu, CPlayer *player) {
+void func_0024C47C(CBarrel *menu, CPlayer *player) {
     s32 shown[0x23];
     s32 count = 0;
     s32 range = D_8011005C - D_80110058 + 1;

@@ -46,6 +46,51 @@ typedef struct WeaponInfo {
     /* 0x50 */ void (*update)();    /* called every frame on the weapon actor */
 } WeaponInfo;
 
+/* The weapon wheel (the "barrel", CPlayer m_Barrel at 0xCD0). Two layouts:
+ * a strip of every usable weapon that scrolls by m_Spin (func_0024B5A0,
+ * filled by func_0024C0B4 / func_0024BF1C), and, with control style 1, the
+ * eight-slot stick wheel (func_0024BAD4, laid out by func_0024C2A0 from a
+ * table per button group, another one under water). func_0024BD18 updates
+ * it, func_0024B3E4 / func_00254D5C build the icons and func_0024AF68 draws
+ * them. LibTEngine names the struct CBarrel (m_nItems, m_nLastItem) but its
+ * layout does not fit; the field names here come from the code. */
+
+/* One weapon on the wheel. */
+typedef struct {
+    /* 0x00 */ s32 m_Weapon;        /* -1: an empty slot */
+    /* 0x04 */ WeaponInfo *m_pInfo;
+    /* 0x08 */ s32 m_bAvailable;    /* owned and has ammo */
+    /* 0x0C */ f32 m_Angle;         /* radians round the wheel */
+    /* 0x10 */ f32 m_Lift;
+    /* 0x14 */ f32 m_Scale;
+} CBarrelItem; /* size 0x18 */
+
+/* One icon to draw (func_0024B3E4 / func_00254D5C build them on the stack). */
+typedef struct {
+    /* 0x00 */ s32 m_Item;          /* index into CBarrel.m_Items */
+    /* 0x04 */ CVector3 m_vPos;
+    /* 0x10 */ s32 m_Icon;          /* WeaponInfo.icon */
+    /* 0x14 */ f32 m_Alpha;
+    /* 0x18 */ f32 m_Size;
+} CBarrelIcon; /* size 0x1C */
+
+typedef struct {
+    /* 0x000 */ s32 m_State;        /* 0 closed, 1 opening, 3 closing */
+    /* 0x004 */ f32 m_Turn;         /* degrees of a step still to turn */
+    /* 0x008 */ f32 m_Open;         /* 0..1 */
+    /* 0x00C */ f32 m_Spin;         /* the strip's angle */
+    /* 0x010 */ s32 m_Step;         /* the direction it turns, -1 or 1 */
+    /* 0x014 */ f32 m_Glow;         /* phase of the cursor's pulse */
+    /* 0x018 */ s32 m_nCount;
+    /* 0x01C */ CBarrelItem m_Items[36];
+    /* 0x37C */ s32 m_nCursor;      /* -1: none */
+    /* 0x380 */ s32 m_bStickWheel;  /* the eight-slot wheel, not the strip */
+    /* 0x384 */ s32 m_Group;        /* which button opened the wheel */
+    /* 0x388 */ s32 m_bBothHeld;
+    /* 0x38C */ s32 m_bUnderwater;  /* laid out from the underwater table */
+    /* 0x390 */ s32 m_Hover;
+} CBarrel; /* size 0x394 */
+
 extern WeaponInfo *D_800AF618[]; /* the weapon table */
 
 #endif
