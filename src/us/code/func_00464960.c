@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_13.CPP, func_8044C7B8_de, with Turok 2's layouts. */
 /* Second VM module copy of func_0042BA40 (same source); its calls go to the module's own copies, named by link address. */
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/world.h"
 #include "structs/player.h"
@@ -21,20 +22,10 @@ typedef struct LevelNode {
     /* 0x08 */ LevelRecord records[1];
 } LevelNode;
 
-typedef struct LevelActor {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x4];
-    /* 0x014 */ s32 *def;
-    /* 0x018 */ u8 pad18[0x1A8 - 0x18];
-    /* 0x1A8 */ struct LevelActor *owner;
-    /* 0x1AC */ u8 pad1AC[0x288 - 0x1AC];
-} LevelActor; /* 0x288 */
-
 typedef struct ActorBlock {
     /* 0x00 */ s32 size;
     /* 0x04 */ s32 count;
-    /* 0x08 */ LevelActor objects[1];
+    /* 0x08 */ CGameObjectInstance objects[1];
 } ActorBlock;
 
 typedef struct Handle {
@@ -54,13 +45,13 @@ extern void func_0020192C(LevelNode *node, void *data, s32);
 extern s32 func_0042C480(CWorld *world, CVector3 *pos, s32 group, void *info);
 extern s32 func_0042C0B4(CWorld *world, s32 group, s32 key, CWarpPoint *out, s32 max);
 extern s32 *func_00225E88(CWorld *world, u16 id);
-extern void func_0021E6AC(LevelActor *obj, LevelRecord *rec, s32 mode, s32 index);
+extern void func_0021E6AC(CGameObjectInstance *obj, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00220A1C(CWorld *world, CVector3 *pos);
 extern void func_00210EF0(f32 *angle);
 extern void func_0042D980(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
-extern s32 func_00267DBC(LevelActor *obj);
-extern s32 func_00267D94(LevelActor *obj);
-extern f32 func_002465F0(LevelActor *obj, CVector3 pos);
+extern s32 func_00267DBC(CGameObjectInstance *obj);
+extern s32 func_00267D94(CGameObjectInstance *obj);
+extern f32 func_002465F0(CGameObjectInstance *obj, CVector3 pos);
 extern void func_002057B0(s32, Handle **handle, Handle *block);
 
 /* Builds the level's actor block from its records: places every player on the spawn points found for
@@ -70,7 +61,7 @@ extern void func_002057B0(s32, Handle **handle, Handle *block);
    hoisting of the spawns base and of the angle constants. */
 void func_00464960(CWorld *world, Handle **handle) {
     CWarpPoint spawns[4];
-    LevelActor *objects;
+    CGameObjectInstance *objects;
     s32 mode;
     Handle *block;
     s32 nspawns;
@@ -84,10 +75,10 @@ void func_00464960(CWorld *world, Handle **handle) {
     s32 spawnIndex;
     LevelRecord *rec;
     LevelRecord *recWalk;
-    LevelActor *objWalk;
+    CGameObjectInstance *objWalk;
     CPlayer *player;
-    LevelActor *obj;
-    LevelActor *other;
+    CGameObjectInstance *obj;
+    CGameObjectInstance *other;
     f32 angle;
     f32 best;
     f32 dist;
@@ -97,11 +88,11 @@ void func_00464960(CWorld *world, Handle **handle) {
         mode = func_002242F8(world, 0);
         node = (*handle)->data;
         n = node->count;
-        block = func_00205D7C(0, handle, n * sizeof(LevelActor) + 8);
+        block = func_00205D7C(0, handle, n * sizeof(CGameObjectInstance) + 8);
         if (block != NULL) {
             func_0020192C(node, block->data, 1);
             hdr = block->data;
-            hdr->size = sizeof(LevelActor);
+            hdr->size = sizeof(CGameObjectInstance);
             hdr->count = n;
             records = node->records;
             objects = hdr->objects;
@@ -126,7 +117,7 @@ void func_00464960(CWorld *world, Handle **handle) {
                     rec = recWalk;
                     obj = objWalk;
                     i++;
-                    obj->def = func_00225E88(world, rec->defId);
+                    obj->header.m_pIntelligence = func_00225E88(world, rec->defId);
                     objWalk = obj + 1;
                     recWalk = rec + 1;
                 }
@@ -175,22 +166,22 @@ void func_00464960(CWorld *world, Handle **handle) {
             for (i = world->m_nFirstActor; i < n; i++) {
                 obj = &objects[i];
                 best = 3.4028235e38f;
-                obj->owner = NULL;
+                obj->m_AI.m_pParent = NULL;
                 if (func_00267DBC(obj) == 0) {
                     continue;
                 }
                 for (j = world->m_nFirstActor; j < n; j++) {
                     other = &objects[j];
-                    if (*obj->def == *other->def && func_00267D94(other) != 0 && obj != other) {
-                        if (obj->owner != NULL) {
-                            dist = func_002465F0(obj, other->pos);
+                    if (obj->header.m_pIntelligence->m_Type == other->header.m_pIntelligence->m_Type && func_00267D94(other) != 0 && obj != other) {
+                        if (obj->m_AI.m_pParent != NULL) {
+                            dist = func_002465F0(obj, other->header.m_vPos);
                             if (dist < best) {
-                                obj->owner = other;
+                                obj->m_AI.m_pParent = other;
                                 best = dist;
                             }
                         } else {
-                            obj->owner = other;
-                            best = func_002465F0(obj, other->pos);
+                            obj->m_AI.m_pParent = other;
+                            best = func_002465F0(obj, other->header.m_vPos);
                         }
                     }
                 }
