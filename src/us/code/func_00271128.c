@@ -1,14 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0025828C.c, func_0025828C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long long u64;
-typedef signed int s32;
-typedef float f32;
 typedef void *OSMesg;
 typedef s32 OSPri;
 typedef s32 OSId;
@@ -55,9 +49,6 @@ u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef union { s32 i; f32 f; } IF32;
 typedef struct SndEnv SndEnv;
 typedef struct SndSeq SndSeq;
@@ -103,7 +94,7 @@ struct SndVoice {
                  s16 unk3C;
                  u8 pad3E[0x2];
                  s32 unk40;
-                 Vec3f pos;
+                 CVector3 pos;
                  s32 unk50;
                  u8 unk54;
                  u8 pad55[0x3];
@@ -248,8 +239,8 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
     }
 }
 void *func_002017D4(void *node, s32 idx);
-void func_00270A60(SndMgr *m, void *rec, Vec3f *pos, s32 id, s32 token, s32 a, s32 flags);
-s32 func_00271128(SndMgr *m, s32 id, Vec3f pos, s32 flags) {
+void func_00270A60(SndMgr *m, void *rec, CVector3 *pos, s32 id, s32 token, s32 a, s32 flags);
+s32 func_00271128(SndMgr *m, s32 id, CVector3 pos, s32 flags) {
     u32 *rec;
     u32 count;
     u32 i;

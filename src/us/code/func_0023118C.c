@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/CODE_80281A70.CPP, Particle_DrawRenderList, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -9,14 +10,13 @@
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
 typedef struct { u32 w0, w1; } Gfx;
-typedef struct { f32 x, y, z; } Vec3f;
 typedef f32 Mtx4f[4][4];
 
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct {
-    /* 0x00 */ Vec3f min;
-    /* 0x0C */ Vec3f max;
+    /* 0x00 */ CVector3 min;
+    /* 0x0C */ CVector3 max;
 } Box;
 
 typedef struct {
@@ -32,7 +32,7 @@ typedef struct {
 
 typedef struct DrawParticle {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ Region *region;
     /* 0x014 */ u8 pad14[0x40 - 0x14];
     /* 0x040 */ u32 flags;
@@ -41,7 +41,7 @@ typedef struct DrawParticle {
     /* 0x0C8 */ u8 mtx2[2][0x18];
     /* 0x0F8 */ ParticleDesc *desc;
     /* 0x0FC */ u8 padFC[0x12C - 0xFC];
-    /* 0x12C */ Vec3f size;
+    /* 0x12C */ CVector3 size;
     /* 0x138 */ u8 pad138[0x1B5 - 0x138];
     /* 0x1B5 */ u8 drawWhenHidden;
     /* 0x1B6 */ u8 pad1B6[0x1D0 - 0x1B6];
@@ -58,8 +58,8 @@ typedef struct {
     /* 0x064 */ s32 mask;
     /* 0x068 */ u8 pad68[0x2D8 - 0x68];
     /* 0x2D8 */ u8 clipPlanes[0x338 - 0x2D8];
-    /* 0x338 */ Vec3f clipMin;
-    /* 0x344 */ Vec3f clipMax;
+    /* 0x338 */ CVector3 clipMin;
+    /* 0x344 */ CVector3 clipMax;
 } ParticleView;
 
 typedef struct {
@@ -75,9 +75,9 @@ extern u8 D_800F7078[];
 extern u8 D_801102B8[];
 
 extern s32 func_0026F60C(void *planes, Box *box);
-extern void func_0020F85C(Mtx4f m, Vec3f *in, Vec3f *out);   /* transform point */
+extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);   /* transform point */
 extern void func_0022D2FC(DrawParticle *particle, void *mtx, Camera *camera, f32 depth);
-extern void func_002254C0(void *list, Vec3f *pos, void *out);
+extern void func_002254C0(void *list, CVector3 *pos, void *out);
 extern void func_0020B9F4(void *model, void *mtx, void *mtx2, s32 a, s32 b);
 extern void func_0022E094(DrawParticle *particle, ParticleView *view);
 extern void func_0022DCBC(DrawParticle *particle, ParticleView *view);
@@ -85,7 +85,7 @@ extern void func_00236170(void *list, DrawParticle *particle, void *mtx);
 
 void func_0023118C(ParticleDrawWorld *world, ParticleView *view) {
     Box box;
-    Vec3f transformed;
+    CVector3 transformed;
     DrawParticle *node;
     Camera *camera;
     s32 visible, built;

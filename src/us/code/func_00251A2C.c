@@ -1,9 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00225F20.c, func_00225F20, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     f32 m[4][4];
@@ -18,7 +15,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x50 - 0x10];
     /* 0x50 */ f32 yaw;
 } Body;
@@ -38,13 +35,13 @@ typedef struct {
     /* 0x0AB0 */ u8 padAB0[0xAD0 - 0xAB0];
     /* 0x0AD0 */ f32 tilt;
     /* 0x0AD4 */ u8 padAD4[0xAE0 - 0xAD4];
-    /* 0x0AE0 */ Vec3f viewOffset;
+    /* 0x0AE0 */ CVector3 viewOffset;
     /* 0x0AEC */ u8 padAEC[0xB14 - 0xAEC];
     /* 0x0B14 */ s16 queuedWeapon;
     /* 0x0B16 */ u8 padB16[0xBB0 - 0xB16];
     /* 0x0BB0 */ Mount *mount;
     /* 0x0BB4 */ s32 mountType;
-    /* 0x0BB8 */ Vec3f seat;
+    /* 0x0BB8 */ CVector3 seat;
     /* 0x0BC4 */ u8 padBC4[0xBDC - 0xBC4];
     /* 0x0BDC */ f32 swayTime;
     /* 0x0BE0 */ f32 stepDistance;
@@ -53,8 +50,8 @@ typedef struct {
 extern f32 D_800B6D28;          /* frame time */
 extern f32 D_800ADDE4;          /* charge speed */
 extern f32 D_800AE344;          /* step length */
-extern Vec3f D_800ADCB0;        /* rider view offset */
-extern Vec3f D_800ADCBC;        /* rider seat */
+extern CVector3 D_800ADCB0;        /* rider view offset */
+extern CVector3 D_800ADCBC;        /* rider seat */
 extern char D_800ADEA0;         /* riding look tuning */
 extern char D_800ADDE0;         /* riding forward move tuning */
 extern char D_800ADE04;         /* riding backward move tuning */
@@ -64,17 +61,17 @@ void func_002117DC(f32 *value, f32 target, f32 rate);
 void func_0024EF70(Player *player, Body *body, void *tuning);
 void func_0024F174(Player *player, Body *body, void *tuning);
 void func_00243414(Mount *actor, void *ai, s32 state);
-void func_002811CC(void *ui, f32 a, f32 b, f32 c, f32 d, s32 e, Vec3f pos);
+void func_002811CC(void *ui, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
 void func_002105A4(Mtx4f *m, f32 angle);
-void func_0020F85C(Mtx4f *m, Vec3f *in, Vec3f *out);
-void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
+void func_0020F85C(Mtx4f *m, CVector3 *in, CVector3 *out);
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 
 /* Riding: the mount sways the view as it turns, charges on button 8, shakes
  * the screen at each step and sets the rider's view offset. */
 void func_00251A2C(Player *player, Body *body) {
     Mtx4f m;
     Mount *mount;
-    Vec3f *offset;
+    CVector3 *offset;
     f32 turn;
     f32 yaw;
     f32 fwd;

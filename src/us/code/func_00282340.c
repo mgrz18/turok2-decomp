@@ -1,14 +1,11 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/8023A284_4.CPP, func_8023A4E0_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
 typedef struct {
     u32 w0;
     u32 w1;
 } Gfx;
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 
 /* A vertex as the RSP reads it. */
 typedef struct UnitVtx {
@@ -58,7 +55,7 @@ typedef struct Emitter {
 
 typedef struct EmitterView {
     /* 0x000 */ u8 pad0[0x24C];
-    /* 0x24C */ Vec3f fan[5];       /* centre, then the four corners */
+    /* 0x24C */ CVector3 fan[5];       /* centre, then the four corners */
     /* 0x288 */ u8 pad288[0x2F8 - 0x288];
     /* 0x2F8 */ f32 clipPlane[4];
 } EmitterView;
@@ -77,20 +74,20 @@ extern void *func_0020798C(void *texture);
 extern void func_002079D8(void *resource, AnimationInfo *info);
 extern void func_00206B30(void *texture, void *resource, s32 frame, s32, s32 scaleS, s32 scaleT, s32, s32, s32);
 extern void func_00207A70(s32 mode);
-extern f32 func_0026F400(f32 *plane, Vec3f *from, Vec3f *to);
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
-extern void func_0020EFDC(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a x b */
+extern f32 func_0026F400(f32 *plane, CVector3 *from, CVector3 *to);
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 extern void func_002051F4(s32, void *resource);
 
 /* Clips and draws an emitter as a textured translucent fan at its depth. */
 void func_00282340(Emitter *object, EmitterView *view) {
     AnimationInfo animation;
-    Vec3f points[5];
+    CVector3 points[5];
     f32 red[5], green[5], blue[5], alpha[5];
-    Vec3f triangle[3];
-    Vec3f texcoord[3];
+    CVector3 triangle[3];
+    CVector3 texcoord[3];
     f32 triRed[3], triGreen[3], triBlue[3], triAlpha[3];
-    Vec3f edge0, edge1, normal;
+    CVector3 edge0, edge1, normal;
     u8 center[3], rim[3];
     s32 below;
     void *resource;

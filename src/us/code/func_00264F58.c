@@ -1,11 +1,8 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 extern f32 func_002119FC(f32 min, f32 max); /* random float in [min, max] */
-extern f32 func_002465F0(void *obj, Vec3f v);
+extern f32 func_002465F0(void *obj, CVector3 v);
 extern f32 func_00298470(f32 x); /* sqrtf */
 extern f32 func_002982F0(f32 x); /* sinf */
 extern f32 func_002974C0(f32 x); /* cosf */
@@ -14,7 +11,7 @@ extern f32 D_800F1F98; /* gravity */
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
 } Target;
 
 typedef struct {
@@ -33,7 +30,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ Vec3f vel;
+    /* 0x18 */ CVector3 vel;
 } Object;
 
 /* Launch velocity: thrown away from the owner, aimed at its target. */

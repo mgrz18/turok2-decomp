@@ -1,29 +1,26 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AI/NAV/8027451C.CPP, func_802750B0_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x0 */ u8 pad0[2];
     /* 0x2 */ u16 flags;
-    /* 0x4 */ Vec3f *vertices[3];
+    /* 0x4 */ CVector3 *vertices[3];
 } Triangle;
 
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
-extern void func_0020EFDC(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a x b */
-extern void func_0020F040(Vec3f *v);                         /* normalise */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
+extern void func_0020F040(CVector3 *v);                         /* normalise */
 
 extern Triangle *D_800B2608;    /* triangle of the cached raw normal */
 extern Triangle *D_800B260C;    /* triangle of the cached unit normal */
-extern Vec3f D_800F2020;        /* cached raw normal */
-extern Vec3f D_800F2030;        /* cached unit normal */
+extern CVector3 D_800F2020;        /* cached raw normal */
+extern CVector3 D_800F2030;        /* cached unit normal */
 
 /* Raw (unnormalised) normal of a triangle, cached for the last triangle. */
-static __inline__ Vec3f *raw_normal(Vec3f *out, Triangle *tri) {
-    Vec3f edge0;
-    Vec3f edge1;
+static __inline__ CVector3 *raw_normal(CVector3 *out, Triangle *tri) {
+    CVector3 edge0;
+    CVector3 edge1;
 
     if (tri == NULL) {
         D_800F2020.x = 0;
@@ -40,7 +37,7 @@ static __inline__ Vec3f *raw_normal(Vec3f *out, Triangle *tri) {
 }
 
 /* Unit normal of a triangle (straight up for none), cached for the last triangle. */
-Vec3f *func_0026BD20(Vec3f *out, Triangle *tri) {
+CVector3 *func_0026BD20(CVector3 *out, Triangle *tri) {
     if (tri == NULL) {
         D_800F2030.x = 0;
         D_800F2030.z = 0;

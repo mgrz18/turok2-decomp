@@ -1,11 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_6.CPP, func_8024EF28_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
 #define MIN_LT(a, b) ((a) < (b) ? (a) : (b))
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
 
 typedef struct {
     /* 0x00 */ u8 pad00[4];
@@ -20,7 +17,7 @@ typedef struct {
 f32 func_0026BE60(s32, f32, f32);
 f32 func_00268304(ShadowActor *);
 void func_00267944(f32 *, ShadowActor *);
-void func_0020F510(Vec3 *, f32);
+void func_0020F510(CVector3 *, f32);
 void func_00211114(f32 *, f32 *);
 void func_0021034C(f32 *, f32, f32, f32);
 void func_00210318(f32 *, f32, f32, f32);
@@ -32,7 +29,7 @@ extern s32 D_800B6D1C;
 /* Places the actor's ground shadow: scaled by its radius, shrinking with its height above the ground. */
 void func_002154DC(ShadowActor *actor) {
     f32 matrix[16];
-    Vec3 position;
+    CVector3 position;
     f32 rotation[4];
     f32 ground;
     f32 height;

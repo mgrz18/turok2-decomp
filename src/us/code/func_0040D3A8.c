@@ -1,14 +1,9 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Second boss module: once none of its third group of actors has flag 0x100 left, steps the script to the
  * next phase. */
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 padD8[0x24C - 0xD8];
-    /* 0x24C */ s32 unk24C;
-} LevelActor;
 
 typedef struct {
     /* 0x00 */ s32 id;
@@ -35,11 +30,11 @@ typedef struct {
 typedef struct State2 {
     /* 0x000 */ struct Obj2 *obj;
     /* 0x004 */ s32 count1;
-    /* 0x008 */ LevelActor *actors1[4];
+    /* 0x008 */ CGameObjectInstance *actors1[4];
     /* 0x018 */ s32 count2;
-    /* 0x01C */ LevelActor *actors2[4];
+    /* 0x01C */ CGameObjectInstance *actors2[4];
     /* 0x02C */ s32 count3;
-    /* 0x030 */ LevelActor *actors3[3];
+    /* 0x030 */ CGameObjectInstance *actors3[3];
     /* 0x03C */ Slot2 slots[12];
     /* 0x4EC */ s32 slotCount;
     /* 0x4F0 */ u8 pad4F0[0x4F8 - 0x4F0];
@@ -61,13 +56,13 @@ static __inline__ void nextPhase(State2 *state) {
     state->movers[1].unk0 = 0;
     state->movers[2].unk0 = 0;
     for (i = 0; i < state->count1; i++) {
-        state->actors1[i]->unk24C = 0;
+        state->actors1[i]->m_AI.m_VarBuffer[0] = 0;
     }
     for (i = 0; i < state->count2; i++) {
-        state->actors2[i]->unk24C = 0;
+        state->actors2[i]->m_AI.m_VarBuffer[0] = 0;
     }
     for (i = 0; i < state->count3; i++) {
-        state->actors3[i]->unk24C = 0;
+        state->actors3[i]->m_AI.m_VarBuffer[0] = 0;
     }
     state->phase = phase;
     if (D_0043240C[phase].init != NULL) {
@@ -80,7 +75,7 @@ void func_0040D3A8(State2 *state) {
     s32 i;
 
     for (i = 0; i < state->count3; i++) {
-        if (state->actors3[i]->flags & 0x100) {
+        if (state->actors3[i]->m_dwFlags & 0x100) {
             done = 0;
             break;
         }

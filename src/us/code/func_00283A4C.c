@@ -1,11 +1,10 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 /* The player as this reads it. */
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 region;
     /* 0x014 */ u8 pad14[0x3C];
     /* 0x050 */ f32 rotY;
@@ -19,7 +18,7 @@ typedef struct {
     /* 0xB8 */ s32 saveStart;
     /* 0xBC */ s32 startLevel;
     /* 0xC0 */ s32 startWarp;
-    /* 0xC4 */ Vec3f startPos;
+    /* 0xC4 */ CVector3 startPos;
     /* 0xD0 */ f32 startRotY;
     /* 0xD4 */ s32 startRegion;
 } State;
@@ -45,7 +44,7 @@ void func_0024CF58(Player *player, Player *other);
 void func_00283A4C(void) {
     void *world;
     Player *player;
-    Vec3f pos;
+    CVector3 pos;
     f32 rotY;
     s32 region;
     s32 level;

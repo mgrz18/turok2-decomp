@@ -1,25 +1,22 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Triangle {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 *v[3];
+    /* 0x04 */ CVector3 *v[3];
 } Triangle;
 
 extern Triangle *D_800B2608;    /* triangle whose normal is cached */
-extern Vec3 D_800F2020;         /* its normal */
+extern CVector3 D_800F2020;         /* its normal */
 
-void func_0020EF2C(Vec3 *out, Vec3 *a, Vec3 *b);    /* a - b */
-void func_0020EFDC(Vec3 *out, Vec3 *a, Vec3 *b);    /* cross product */
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
+void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
 f32 func_00298470(f32 x);                           /* sqrtf */
 
 /* tri's face normal, cached for the last triangle asked about. */
-static __inline__ Vec3 triNormal(Triangle *tri) {
-    Vec3 edge1;
-    Vec3 edge2;
+static __inline__ CVector3 triNormal(Triangle *tri) {
+    CVector3 edge1;
+    CVector3 edge2;
 
     if (tri != D_800B2608) {
         func_0020EF2C(&edge1, tri->v[1], tri->v[0]);
@@ -32,8 +29,8 @@ static __inline__ Vec3 triNormal(Triangle *tri) {
 
 /* Height of tri's plane above (x, z). */
 static __inline__ f32 triHeight(Triangle *tri, f32 x, f32 z) {
-    Vec3 normal;
-    Vec3 v;
+    CVector3 normal;
+    CVector3 v;
 
     if (tri == NULL) {
         return -14336.0f;

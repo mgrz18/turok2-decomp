@@ -1,20 +1,15 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/ACTORS/actors_volume_lighting.CPP, Actors_AccumulateVertexLighting, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x;
-    f32 y;
-    f32 z;
-} Vec3f;
+#include "structs/vector.h"
 
 /* A light volume (built by func_00211F64). */
 typedef struct LightVolume {
     /* 0x00 */ u8 pad0[0x20];
     /* 0x20 */ f32 inverse[16];
     /* 0x60 */ f32 mtx[16];
-    /* 0xA0 */ Vec3f min;
-    /* 0xAC */ Vec3f max;
+    /* 0xA0 */ CVector3 min;
+    /* 0xAC */ CVector3 max;
     /* 0xB8 */ u8 padB8[2];
     /* 0xBA */ u8 animatedLight;
     /* 0xBB */ u8 padBB;
@@ -42,23 +37,23 @@ typedef struct VertexList {
 
 void *func_002017D4(void *table, s32 index);
 void func_0020D908(f32 *out, void *packed);
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
-void func_0020F85C(f32 *mtx, Vec3f *in, Vec3f *out);
-void func_0020FAFC(f32 *mtx, Vec3f *in, Vec3f *out);
-s32 func_00212680(LightVolume *light, Vec3f pos, Vec3f normal, f32 *inverse, Vec3f *out, f32 *amount);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
+void func_0020FAFC(f32 *mtx, CVector3 *in, CVector3 *out);
+s32 func_00212680(LightVolume *light, CVector3 pos, CVector3 normal, f32 *inverse, CVector3 *out, f32 *amount);
 
 /* Adds the light of the volumes to each drawn vertex of the vertex lists: the vertex (moved by its
  * own packed matrix when multiple) is lit by each volume holding it. The last animated volume
  * found sets the vertex's animation bits: pattern 4..6 from the volume's seed (mode 1) or from
  * the vertex position (mode 2), and a level from the volume's strength there. */
-void func_0021285C(LightVolume **lights, s32 lightCount, s32 *lists, void *matrices, Vec3f *output, s32 multiple) {
+void func_0021285C(LightVolume **lights, s32 lightCount, s32 *lists, void *matrices, CVector3 *output, s32 multiple) {
     f32 matrix[16];
-    Vec3f sum;
-    Vec3f position;
-    Vec3f normal;
-    Vec3f worldPosition;
-    Vec3f worldNormal;
-    Vec3f contribution;
+    CVector3 sum;
+    CVector3 position;
+    CVector3 normal;
+    CVector3 worldPosition;
+    CVector3 worldNormal;
+    CVector3 contribution;
     f32 amount;
     f32 selectedAmount;
     s32 n;
@@ -68,7 +63,7 @@ void func_0021285C(LightVolume **lights, s32 lightCount, s32 *lists, void *matri
     s32 colour;
     s32 level;
     s32 drawn;
-    Vec3f *dest;
+    CVector3 *dest;
     u32 pattern;
     PackedVertex *vertex;
     PackedVertex *base;

@@ -1,9 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_14.CPP, func_80250624_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     s32 words[2];
@@ -13,14 +10,14 @@ typedef struct {
     /* 0x00 */ u16 field0;
     /* 0x02 */ u16 type;
     /* 0x04 */ s32 field4;
-    /* 0x08 */ Vec3 offset;
+    /* 0x08 */ CVector3 offset;
     /* 0x14 */ AttachmentParams params;
 } Attachment; /* size 0x1C */
 
 typedef struct {
     /* 0x00 */ u8 state;
     /* 0x02 */ u16 id;
-    /* 0x04 */ Vec3 position;
+    /* 0x04 */ CVector3 position;
     /* 0x10 */ void *segment;
     /* 0x14 */ void *model;
     /* 0x18 */ s32 owner;
@@ -40,8 +37,8 @@ void *func_0020367C(s32, s32, s32, s32, s32, void *, void *, s32);
 s32 func_0020185C(s32, s32, s32, s32 *);
 void func_002051F4(s32, void *);
 void func_0020D908(f32 *, f32 *);
-void func_0020F85C(f32 *, Vec3 *, Vec3 *);
-void func_00236EA0(void *, void *, s32, s32, Vec3, AttachmentParams);
+void func_0020F85C(f32 *, CVector3 *, CVector3 *);
+void func_00236EA0(void *, void *, s32, s32, CVector3, AttachmentParams);
 
 extern u8 D_800A5808[];
 extern u8 D_800A581C[];
@@ -53,7 +50,7 @@ void func_00214B58(PlacedProp *prop, s32 all) {
     Attachment *attachment;
     Attachment *entries;
     f32 matrix[16];
-    Vec3 position;
+    CVector3 position;
     s32 size;
     s32 name;
     s32 count;

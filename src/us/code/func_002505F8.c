@@ -1,9 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_16.CPP, func_8022470C_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -12,7 +9,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
     /* 0x014 */ Surface *surface;
     /* 0x018 */ u8 pad18[0x140 - 0x18];
@@ -53,7 +50,7 @@ void func_0024FE10(Player *player, Body *body);
 void func_0024EF70(Player *player, Body *body, void *tuning);
 void func_0024F174(Player *player, Body *body, void *tuning);
 s32 func_0024E5F0(Player *player, Body *body, s32 mode);
-void func_00275544(s16 sound, Vec3f pos, s32, s32);
+void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 static __inline__ s32 try_jump(Player *player, Body *body) {
     if (player->zoomed == 0 && !(11.25f < player->depth) && !(body->flags & 0x6000)

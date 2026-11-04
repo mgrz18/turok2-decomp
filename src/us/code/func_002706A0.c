@@ -1,14 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00257814.c, func_00257814.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef unsigned long long u64;
-typedef signed int s32;
-typedef float f32;
 typedef void *OSMesg;
 typedef s32 OSPri;
 typedef s32 OSId;
@@ -51,9 +45,6 @@ typedef struct OSMesgQueue_s {
                s32 msgCount;
                OSMesg *msg;
 } OSMesgQueue;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef union { s32 i; f32 f; } IF32;
 typedef struct SndEnv SndEnv;
 typedef struct SndSeq SndSeq;
@@ -99,7 +90,7 @@ struct SndVoice {
                  s16 unk3C;
                  u8 pad3E[0x2];
                  s32 unk40;
-                 Vec3f pos;
+                 CVector3 pos;
                  s32 unk50;
                  u8 unk54;
                  u8 pad55[0x3];
@@ -223,9 +214,6 @@ struct SndMgr {
                  u8 pad2BBC[0x4];
                  SndFx obj2BC0;
 };
-typedef struct M04Vec3 {
-    f32 x, y, z;
-} M04Vec3;
 typedef union M04IF {
     s32 i;
     f32 f;
@@ -247,7 +235,7 @@ typedef struct M04VP {
                s16 s2A;
                s16 s2C;
                u8 pad2E[6];
-               M04Vec3 pos;
+               CVector3 pos;
                s32 f40;
                s8 mode;
                u8 pad45[3];

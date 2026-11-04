@@ -1,10 +1,7 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Weapon state: winding a spun-up weapon (barrel spin) while fire is held, else stopping it. */
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x51C];
@@ -30,7 +27,7 @@ extern f32 D_800B6D28; /* frame time scale */
 
 extern s32 func_0024E700(WeaponPlayer *player, s32 weapon);
 extern s32 func_00243414(void *obj, WeaponState *state, s32 mode);
-extern s32 func_00275544(s32 sound, Vec3 position, Vec3 *source, s32 arg5);
+extern s32 func_00275544(s32 sound, CVector3 position, CVector3 *source, s32 arg5);
 extern void func_00253F40(WeaponPlayer *player);
 extern void func_00253E68(WeaponPlayer *player);
 extern s32 func_00253EB8(WeaponPlayer *player, s32 sound);
@@ -39,7 +36,7 @@ extern void func_002117DC(f32 *value, f32 target, f32 rate);
 
 void func_00258370(void *obj, WeaponState *state) {
     WeaponPlayer *player = *(WeaponPlayer **)((u8 *)obj + 0x1A8);
-    Vec3 *pos = (Vec3 *)(player->object + 0x114);
+    CVector3 *pos = (CVector3 *)(player->object + 0x114);
 
     if (!(player->flags & 0x2000) || player->unk_1284 != 0
         || func_0024E700(player, player->weapon) == 0) {

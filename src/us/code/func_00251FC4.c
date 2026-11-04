@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -36,7 +33,7 @@ typedef struct {
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ Vec3f pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ s32 region;
     /* 0x0014 */ u8 pad14[0x50 - 0x14];
     /* 0x0050 */ f32 yaw;
@@ -118,7 +115,7 @@ extern char D_0043CAB4;         /* key screen */
 
 void func_0024D344(Player *p);
 void func_0024CF58(Player *p, Player *other);
-void func_00401B30(void *, s32 region, f32 yaw, Vec3f pos);
+void func_00401B30(void *, s32 region, f32 yaw, CVector3 pos);
 void func_00246BC0(void *input, Player *p);
 s32 func_00285558(Controller *c);
 s32 func_00284174(void);

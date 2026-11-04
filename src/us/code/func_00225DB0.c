@@ -1,11 +1,7 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028CE70.c, func_0028CE70.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-typedef unsigned char u8;
-typedef signed int s32;
-typedef float f32;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 /* Turok 2 level record-table pointers sit earlier than in Rage Wars. */
 typedef struct Level {
     u8 pad0[0x88];
@@ -13,8 +9,8 @@ typedef struct Level {
     s32 *unk8C;     /* 0x8C */
 } Level;
 s32 func_00266D8C(s32 *ents, s32 n, s32 id, s32 *lo, s32 *hi);
-void func_0026EBDC(s32 a, u8 *p, Vec3f v, f32 f, f32 g, s32 h);
-void func_00225DB0(Level *lv, s32 a1, s32 id, Vec3f v, f32 f6, f32 f7) {
+void func_0026EBDC(s32 a, u8 *p, CVector3 v, f32 f, f32 g, s32 h);
+void func_00225DB0(Level *lv, s32 a1, s32 id, CVector3 v, f32 f6, f32 f7) {
     s32 lo;
     s32 hi;
     s32 i;

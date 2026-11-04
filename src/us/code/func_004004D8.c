@@ -1,6 +1,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/gbi.h"
+#include "structs/vector.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
@@ -17,10 +18,6 @@
 #define VTX_W0(n) (0x01000000 | (((n) & 0xFF) << 12) | (((n) & 0x7F) << 1))
 #define LINE_W0(a, b) (0x08000000 | (((((a) * 2) & 0xFF) << 16) | ((((b) * 2) & 0xFF) << 8)))
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
 typedef struct MapVtx {
     /* 0x0 */ s16 ob[3];
     /* 0x6 */ u16 flag;
@@ -33,15 +30,15 @@ typedef struct {
     /* 0x08 */ f32 fade;
     /* 0x0C */ s32 visible;
     /* 0x10 */ f32 angle;
-    /* 0x14 */ Vec3f pos;
-    /* 0x20 */ Vec3f offset;
+    /* 0x14 */ CVector3 pos;
+    /* 0x20 */ CVector3 offset;
 } MapView;
 
 /* A navigation region (see func_00400000). */
 typedef struct Region {
     /* 0x00 */ u16 index;
     /* 0x02 */ u16 flags; /* 0x400: registered */
-    /* 0x04 */ Vec3f *corner[3];
+    /* 0x04 */ CVector3 *corner[3];
     /* 0x10 */ struct Region *neighbour[3];
     /* 0x1C */ u8 pad1C[4];
 } Region; /* 0x20 bytes */
@@ -100,7 +97,7 @@ extern u8 D_800AB130[];
 extern char *func_002017D4(s32 *data, s32 index);
 extern void func_0020C208(f32 *out, f32 *m);
 extern void func_0020D274(f32 *m, Mtx *out);
-extern void func_0020F85C(f32 *m, Vec3f *in, Vec3f *out);
+extern void func_0020F85C(f32 *m, CVector3 *in, CVector3 *out);
 extern void func_0020FC24(f32 *m, f32 x, f32 y, f32 z);
 extern void func_0020FC74(f32 *m, f32 x, f32 y, f32 z);
 extern void func_00210318(f32 *m, f32 x, f32 y, f32 z);
@@ -117,9 +114,9 @@ static __inline__ s32 TestFlag(s32 flags, s32 bit) {
     return flags & bit;
 }
 
-static __inline__ s32 EdgeVisible(Vec3f *corners, Vec3f *p0, Vec3f *p1) {
-    Vec3f *a;
-    Vec3f *b;
+static __inline__ s32 EdgeVisible(CVector3 *corners, CVector3 *p0, CVector3 *p1) {
+    CVector3 *a;
+    CVector3 *b;
     f32 dx;
     f32 dz;
     s32 k;
@@ -145,8 +142,8 @@ void func_004004D8(MapView *view) {
     struct {
         f32 minX, minZ, maxX, maxZ;
     } box;
-    Vec3f corners[4];
-    Vec3f viewCorners[4];
+    CVector3 corners[4];
+    CVector3 viewCorners[4];
     Region *regions;
     s32 areaCount;
     Vp *vp;
@@ -157,9 +154,9 @@ void func_004004D8(MapView *view) {
     RegionInfo *infos;
     RegionInfo *info;
     MapVtx *vtx;
-    Vec3f *p0;
-    Vec3f *p1;
-    Vec3f *a;
+    CVector3 *p0;
+    CVector3 *p1;
+    CVector3 *a;
     char *data;
     World *w;
     f32 s;

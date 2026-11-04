@@ -87,9 +87,6 @@ struct Actor {
                  u8 pad16DA[6];
                  Actor *next;
 };
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct DlCmd {
     u32 w0;
     u32 w1;

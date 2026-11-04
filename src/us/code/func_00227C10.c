@@ -1,10 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SYSTEM/802624A0_10.CPP, func_80262CE0_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct IntrusiveList {
     /* 0x00 */ void *head;
@@ -55,12 +52,12 @@ s32 func_0020185C(s32 table, s32 base, s32 index, s32 *size);
 void *func_002017D4(s32 table, s32 index);
 s32 func_00225E88(World *world, s32 index);
 f32 func_0026D210(s32 angle);
-void func_0020EF60(Vec3 *out, Vec3 *in, f32 angle);
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 angle);
 void func_002051F4(s32 heap, s32 *block);
 void CList__Remove(IntrusiveList *list, void *node);
 void CList__AddHead(IntrusiveList *list, void *node);
 void func_00219BC0(SceneEffect *effect, s32 id, s32 variant, s32 unused, s32 count, s32 sound, s32 owner,
-                   f32 scale, Vec3 position, s32 flags, Vec3 color, Vec3 direction, s32 arg12);
+                   f32 scale, CVector3 position, s32 flags, CVector3 color, CVector3 direction, s32 arg12);
 void func_0021E5D4(SceneEffect *effect);
 
 /* Takes a node from the free list when allowed (always with D_8011001C, otherwise while fewer than
@@ -84,7 +81,7 @@ static __inline__ SceneEffect *take_effect(SceneEffectPool *scene, s32 *ref) {
 }
 
 static __inline__ SceneEffect *spawn_effect(SceneEffectPool *scene, s32 id, s32 variant, s32 count, s32 owner,
-                                            Vec3 position, f32 scale, Vec3 direction, Vec3 color, s32 *ref) {
+                                            CVector3 position, f32 scale, CVector3 direction, CVector3 color, s32 *ref) {
     SceneEffect *effect;
 
     if (D_800B6D54 == 0 || count == 0) {
@@ -102,8 +99,8 @@ static __inline__ SceneEffect *spawn_effect(SceneEffectPool *scene, s32 id, s32 
 /* Spawns an effect of the given type in a scene: loads the type's animation index and header
  * ("anim object index", "anim object info"), takes its intelligence from the header and turns
  * color by the header's angle, then spawns it (see spawn_effect). Returns the effect or NULL. */
-SceneEffect *func_00227C10(SceneEffectPool *scene, s32 variant, s32 owner, Vec3 position, f32 scale,
-                           Vec3 direction, Vec3 color, s32 *ref) {
+SceneEffect *func_00227C10(SceneEffectPool *scene, s32 variant, s32 owner, CVector3 position, f32 scale,
+                           CVector3 direction, CVector3 color, s32 *ref) {
     SceneEffect *effect;
     AnimInfo *info;
     s32 *index;

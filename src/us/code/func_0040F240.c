@@ -1,5 +1,6 @@
 #include "common.h"
 #include "rw/abu_types.h"
+#include "structs/vector.h"
 
 /* The cinema system: one file from func_0040F240 to func_004131B0 (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -11,8 +12,8 @@
  * arc length, the arc length, the weight (time) and the second derivative of the
  * arc length over the weight. */
 typedef struct {
-    /* 0x00 */ Vec3 p;
-    /* 0x0C */ Vec3 d2p;
+    /* 0x00 */ CVector3 p;
+    /* 0x0C */ CVector3 d2p;
     /* 0x18 */ f32 s;
     /* 0x1C */ f32 w;
     /* 0x20 */ f32 d2s;
@@ -26,7 +27,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x34 - 0x10];
 } ActorHead; /* the part of the actor saved around the collision test */
 
@@ -91,7 +92,7 @@ typedef struct {
     /* 0x0E4 */ void (*callbackE4)(void);
     /* 0x0E8 */ void (*callbackE8)(void);
     /* 0x0EC */ u8 padEC[0xF0 - 0xEC];
-    /* 0x0F0 */ Vec3 position;
+    /* 0x0F0 */ CVector3 position;
     /* 0x0FC */ f32 yaw;
 } Cinema;
 
@@ -144,13 +145,13 @@ extern s32 **func_0020367C(s32 a, s32 data, s32 size, s32 tag, s32 e, void *prep
 extern s32 **func_00204EDC(s32 heap, s32 size, s32 tag, const char *name);
 extern void func_002051F4(s32 unused, s32 **handle);
 extern void func_002052D8(s32 heap, s32 *block);
-extern void func_0020EEF8(Vec3 *out, Vec3 *a, Vec3 *b);  /* out = a + b */
-extern void func_0020EF2C(Vec3 *out, Vec3 *a, Vec3 *b);  /* out = b - a */
-extern void func_0020EF60(Vec3 *out, Vec3 *in, f32 scale); /* out = in * scale */
-extern f32 func_0020EAA0(Vec3 *v);                       /* heading */
-extern f32 func_0020F5C0(Vec3 *v);                       /* pitch */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = b - a */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale); /* out = in * scale */
+extern f32 func_0020EAA0(CVector3 *v);                       /* heading */
+extern f32 func_0020F5C0(CVector3 *v);                       /* pitch */
 
-Vec3 func_004101B8(SplineNode *nodes, s32 count, f32 t);
+CVector3 func_004101B8(SplineNode *nodes, s32 count, f32 t);
 void func_00412314(void *owner, CueObject *obj);
 s32 func_00412438(s32 key);
 s32 func_00412DA4(void);
@@ -253,8 +254,8 @@ extern f32 func_00298470(f32 x); /* sqrt */
 
 /* Builds a spline through count points: arc lengths, then second derivatives of x, y and z over the arc length
  * and of the arc length over the weights. */
-void func_0040F5B8(s32 count, Vec3 *points, f32 *weights, Spline *spline) {
-    Vec3 delta;
+void func_0040F5B8(s32 count, CVector3 *points, f32 *weights, Spline *spline) {
+    CVector3 delta;
     f32 *ys;
     f32 *xs;
     f32 *d2;
@@ -332,9 +333,9 @@ void func_0040F5B8(s32 count, Vec3 *points, f32 *weights, Spline *spline) {
 }
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU_2/80400000_4.CPP, func_8040067C_de. */
-typedef struct SplineSource { s32 stride,count; union { char data[0]; Vec3 points[0]; f32 weights[0]; }; } SplineSource;
+typedef struct SplineSource { s32 stride,count; union { char data[0]; CVector3 points[0]; f32 weights[0]; }; } SplineSource;
 typedef struct SplineTable { s32 count; } SplineTable;
-typedef union SplineSourceCursor { SplineSource *header; Vec3 *points; f32 *weights; } SplineSourceCursor;
+typedef union SplineSourceCursor { SplineSource *header; CVector3 *points; f32 *weights; } SplineSourceCursor;
 extern int func_002018D8(int *);
 extern void func_00218548(void *,s32);
 extern char *func_00218590(Pack *,s32,s32);
@@ -581,8 +582,8 @@ s32 func_0040FD6C(s32 index) {
 }
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00400E50.c. */
-Vec3 func_004101B8(SplineNode *rec, s32 n, f32 t) {
-    Vec3 res;
+CVector3 func_004101B8(SplineNode *rec, s32 n, f32 t) {
+    CVector3 res;
     SplineNode *p = 0;
     SplineNode *q = 0;
     s32 i;
@@ -670,7 +671,7 @@ Vec3 func_004101B8(SplineNode *rec, s32 n, f32 t) {
     return res;
 }
 
-Vec3 func_0041057C(f32 t) {
+CVector3 func_0041057C(f32 t) {
     s32 i;
     s32 idx;
     s32 count;
@@ -708,7 +709,7 @@ Vec3 func_0041057C(f32 t) {
     return func_004101B8(keys, count, t - start);
 }
 
-Vec3 func_00410724(f32 t) {
+CVector3 func_00410724(f32 t) {
     s32 i;
     s32 idx;
     s32 count;
@@ -746,14 +747,14 @@ Vec3 func_00410724(f32 t) {
     return func_004101B8(keys, count, t - start);
 }
 
-Vec3 func_004108CC(f32 t) {
+CVector3 func_004108CC(f32 t) {
     s32 *track;
     PositionKey *key;
     s32 count;
     f32 u;
-    Vec3 result;
-    Vec3 a;
-    Vec3 b;
+    CVector3 result;
+    CVector3 a;
+    CVector3 b;
     track = func_002017D4(D_800C1BB0->resource, 1);
     count = track[1];
     key = (PositionKey *)(track + 2);
@@ -868,20 +869,20 @@ typedef struct {
     /* 0x28 */ f32 yaw;
     /* 0x2C */ f32 pitch;
     /* 0x30 */ u8 pad30[0x38 - 0x30];
-    /* 0x38 */ Vec3 eye;
+    /* 0x38 */ CVector3 eye;
 } Camera;
 
 extern u8 D_800F1B40[];   /* collision info */
-extern Vec3 D_800F1CE8;   /* collision point */
+extern CVector3 D_800F1CE8;   /* collision point */
 
 extern s32 Cinema_PathPlaying(void);
-extern Vec3 func_0041057C(f32 t); /* eye path */
-extern Vec3 func_00410724(f32 t); /* target path */
+extern CVector3 func_0041057C(f32 t); /* eye path */
+extern CVector3 func_00410724(f32 t); /* target path */
 extern void func_0020F79C(Mtx4f *m);                         /* identity */
 extern void func_0020FE00(Mtx4f *m, f32 x, f32 y, f32 z);    /* rotation */
-extern void func_0020F85C(Mtx4f *m, Vec3 *in, Vec3 *out);    /* transform */
+extern void func_0020F85C(Mtx4f *m, CVector3 *in, CVector3 *out);    /* transform */
 extern void func_002216DC(void *world);
-extern s32 func_00239F00(Actor *actor, Vec3 to, void *info);
+extern s32 func_00239F00(Actor *actor, CVector3 to, void *info);
 extern void func_00226724(void *world);
 
 /* Places the cinema relative to its target (flag 1) or to the player (flag 2). */
@@ -905,12 +906,12 @@ static __inline__ void Cinema_Anchor(Actor *player) {
 
 /* Drives the camera along the cinema paths. */
 void func_00410CE8(Camera *cam) {
-    Vec3 eye;
-    Vec3 target;
-    Vec3 dir;
+    CVector3 eye;
+    CVector3 target;
+    CVector3 dir;
     ActorHead saved;
     Mtx4f mtx;
-    Vec3 tmp;
+    CVector3 tmp;
     Actor *player;
     s32 hit;
     f32 yaw;
@@ -1041,8 +1042,8 @@ extern void func_002883E0(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32
 
 /* Fills the cinema's screen rectangle with the colour and alpha of the current time. */
 void func_00411EF8(ScreenRectangle *rectangle) {
-    Vec3 color;
-    Vec3 baseColor;
+    CVector3 color;
+    CVector3 baseColor;
     u8 rgba[4];
     u32 width;
     u32 height;
@@ -1307,9 +1308,9 @@ void func_00412798(void) {
     }
 }
 
-static __inline__ Vec3 getA(void) {
-    Vec3 t;
-    Vec3 v;
+static __inline__ CVector3 getA(void) {
+    CVector3 t;
+    CVector3 v;
     Track *n;
     if (D_800C1BB0->active == 0) {
         v.x = 0;
@@ -1321,9 +1322,9 @@ static __inline__ Vec3 getA(void) {
     t = func_004101B8((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
     return t;
 }
-static __inline__ Vec3 getB(void) {
-    Vec3 t;
-    Vec3 v;
+static __inline__ CVector3 getB(void) {
+    CVector3 t;
+    CVector3 v;
     Track *n;
     if (D_800C1BB0->active == 0) {
         v.x = 10.0f;
@@ -1335,20 +1336,20 @@ static __inline__ Vec3 getB(void) {
     t = func_004101B8((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
     return t;
 }
-Vec3 func_00412998(void) {
-    Vec3 a;
-    Vec3 b;
+CVector3 func_00412998(void) {
+    CVector3 a;
+    CVector3 b;
     f32 dir[4];
-    Vec3 res;
+    CVector3 res;
     if (D_800C1BB0->active == 0) {
         res.x = 0;
         res.y = 0;
     } else {
         a = getA();
         b = getB();
-        func_0020EF2C((Vec3 *) dir, &b, &a);
-        res.x = -func_0020F5C0((Vec3 *) dir);
-        res.y = func_0020EAA0((Vec3 *) dir);
+        func_0020EF2C((CVector3 *) dir, &b, &a);
+        res.x = -func_0020F5C0((CVector3 *) dir);
+        res.y = func_0020EAA0((CVector3 *) dir);
     }
     do {
         res.z = 0;
@@ -1383,9 +1384,9 @@ void func_00412B28(s32 a0) {
     }
 }
 
-Vec3 func_00412B9C(void) {
-    Vec3 sp10;
-    Vec3 sp20;
+CVector3 func_00412B9C(void) {
+    CVector3 sp10;
+    CVector3 sp20;
     StridedTable *temp_v0;
     if (D_800C1BB0->active == 0) {
         sp20.x = 0;
@@ -1398,9 +1399,9 @@ Vec3 func_00412B9C(void) {
     return sp10;
 }
 
-Vec3 func_00412C4C(void) {
-    Vec3 sp10;
-    Vec3 sp20;
+CVector3 func_00412C4C(void) {
+    CVector3 sp10;
+    CVector3 sp20;
     StridedTable *temp_v0;
     if (D_800C1BB0->active == 0) {
         sp20.y = 0;
@@ -1447,7 +1448,6 @@ void *func_00412E1C(void) {
 s32 func_00412E44(s32 arg0) {
     return arg0 + 8;
 }
-
 
 u32 func_00412E4C(u8 *bits, s32 index) {
     s32 byte = index >> 3;

@@ -1,11 +1,9 @@
 #include "common.h"
-
-typedef struct Vec3f { f32 x, y, z; } Vec3f;
-typedef struct Quat { f32 x, y, z, w; } Quat;
+#include "structs/vector.h"
 
 typedef struct ViewInfo {
     /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Vec3f eye;
+    /* 0x114 */ CVector3 eye;
 } ViewInfo;
 
 typedef struct ShotPlayer {
@@ -23,19 +21,19 @@ typedef struct ShotActor {
 extern u8 D_800F7078[];
 extern u8 D_800F8928[];
 
-void func_0020E810(Quat *out, Vec3f *dir);
-s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, Vec3f origin,
-                  Quat rot, Vec3f pos, s32 arg, s32 b, s32 c);
-void func_00225DB0(void *table, void *owner, s32 id, Vec3f pos, f32 a, f32 b);
-void func_00253F90(ShotPlayer *pl, Vec3f *v);
-void func_002688C8(ShotActor *a, Vec3f pos, Vec3f *outPos, s32 *outArg, s32 x, s32 y);
+void func_0020E810(CQuaternion *out, CVector3 *dir);
+s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+                  CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
+void func_00225DB0(void *table, void *owner, s32 id, CVector3 pos, f32 a, f32 b);
+void func_00253F90(ShotPlayer *pl, CVector3 *v);
+void func_002688C8(ShotActor *a, CVector3 pos, CVector3 *outPos, s32 *outArg, s32 x, s32 y);
 
 /* Fires the player's shot of kind 0xE9 at `pos`, aimed along `dir` from the eye, and plays its sound. */
-void func_00238500(void *unused, ShotActor *actor, Vec3f pos, Vec3f dir, s32 mode) {
-    Vec3f v;
-    Vec3f p;
-    Vec3f origin;
-    Quat q;
+void func_00238500(void *unused, ShotActor *actor, CVector3 pos, CVector3 dir, s32 mode) {
+    CVector3 v;
+    CVector3 p;
+    CVector3 origin;
+    CQuaternion q;
     s32 arg;
     ShotPlayer *pl;
 

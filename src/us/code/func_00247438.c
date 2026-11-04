@@ -1,7 +1,7 @@
 #include "common.h"
 #include "gfx.h"
+#include "structs/vector.h"
 
-typedef struct { f32 x, y, z; } Vec3f;
 typedef struct { s32 m[4][4]; } Mtx64;   /* a packed N64 Mtx, 0x40 bytes */
 
 /* A model shown in the HUD (the weapon held up to the view). */
@@ -17,7 +17,7 @@ typedef struct HudModel {
     /* 0x9C */ f32 rotX;
     /* 0xA0 */ f32 rotY;
     /* 0xA4 */ u8 padA4[4];
-    /* 0xA8 */ Vec3f pos;
+    /* 0xA8 */ CVector3 pos;
     /* 0xB4 */ s32 state;
     /* 0xB8 */ f32 time;
 } HudModel;
@@ -50,14 +50,13 @@ void func_00210C3C(f32 *mtx);
 void func_0020FF80(f32 *dst, f32 *src);
 void func_00210478(f32 *mtx, f32 x, f32 y, f32 z);
 void func_0020D274(f32 *src, Mtx64 *dst);
-void func_0020F85C(f32 *mtx, Vec3f *in, Vec3f *out);
+void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
 void func_0020B7F8(s32 key, void *matrix, void *lights, s32 lod, s32 pass);
-
 
 void func_00247438(HudModel *m, HudView *view) {
     f32 mf[4][4];
     f32 mfDraw[4][4];
-    Vec3f out;
+    CVector3 out;
 
     func_0020B5B8();
     if (m->object == 0 || m->state == 0) {

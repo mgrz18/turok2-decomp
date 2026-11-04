@@ -1,13 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00207B5C.c, func_00207B5C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
+#include "structs/game_object.h"
+
 typedef struct ActorInfo {
                u32 flags;
                s32 unk4;
@@ -25,13 +20,9 @@ typedef struct ActorDef {
                u8 pad4[0x10];
                ActorInfo info;     /* 0x14 */
 } ActorDef;
-typedef struct Actor { /* Turok 2 layout */
-                 u8 pad0[0x14];
-                 ActorDef *def;    /* 0x14 (Rage Wars: 0x18) */
-} Actor;
-void func_0026E110(Actor *actor, s32 flags, Actor *actor2);
-void func_00264518(Actor *actor, u32 *flags) {
-    ActorInfo *info = &actor->def->info;
+void func_0026E110(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
+void func_00264518(CGameObjectInstance *actor, u32 *flags) {
+    ActorInfo *info = &((ActorDef *)actor->header.m_pIntelligence)->info;
     func_0026E110(actor, 0x10000, actor);
     if (!(info->flags24 & 0x40)) {
         *flags &= 0xF7FFFFFF;

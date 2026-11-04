@@ -1,27 +1,22 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00259B30.c, func_00259B30.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef float f32;
 f32 func_002982F0(f32 x);
-typedef struct M04Vec3 {
-    f32 x, y, z;
-} M04Vec3;
 extern f32 D_800A80F0;
 extern f32 D_800A80F4;
 extern f32 D_800A80F8;
-void func_0020EF2C(M04Vec3 *out, void *src, s32 a);
-void func_0020FB90(void *src, M04Vec3 *a, M04Vec3 *out);
-void func_0020F040(M04Vec3 *v);
+void func_0020EF2C(CVector3 *out, void *src, s32 a);
+void func_0020FB90(void *src, CVector3 *a, CVector3 *out);
+void func_0020F040(CVector3 *v);
 f32 func_0021153C(f32 x);
 f32 func_002982F0(f32 x);
 f32 __builtin_fabsf(f32 x);
 s32 func_00271E20(s32 a0, u8 *obj) {
-    M04Vec3 r;
-    M04Vec3 d;
-    M04Vec3 w;
+    CVector3 r;
+    CVector3 d;
+    CVector3 w;
     f32 s;
     f32 zero;
     if (obj == 0) {

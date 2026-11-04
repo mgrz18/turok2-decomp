@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Picks an actor's death animation from what killed it (weapon, projectile, hit direction). */
 
@@ -41,17 +42,13 @@ typedef struct {
     /* 0x10 */ HitPoint *point;
 } HitInfo;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ u8 *def;
-} Actor;
 
 extern u8 D_8011AAEF;
 
 extern s32 func_002113A4(void); /* rand */
-extern s32 func_00219F74(Actor *actor, s32 model, s32 arg2);
+extern s32 func_00219F74(CGameObjectInstance *actor, s32 model, s32 arg2);
 
-s32 func_0025B078(Actor *actor, s32 unused, HitInfo *hit) {
+s32 func_0025B078(CGameObjectInstance *actor, s32 unused, HitInfo *hit) {
     DeathAnims *anims;
     Source *src;
     s32 front = 0;
@@ -59,7 +56,7 @@ s32 func_0025B078(Actor *actor, s32 unused, HitInfo *hit) {
     s32 back = 0;
     s32 blast = 0;
 
-    anims = (DeathAnims *)(actor->def + 0x14);
+    anims = (DeathAnims *)(((u8 *)actor->header.m_pIntelligence) + 0x14);
     if (D_8011AAEF != 0 && (src = hit->source) != NULL) {
         switch (src->kind) {
             case 2:

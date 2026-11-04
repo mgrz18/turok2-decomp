@@ -1,11 +1,8 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Module update: ticks every slot, then (outside cinematics) counts the two phase timers: the first spawns
  * one actor at a random spot around the origin, the second starts a burst of spawns at the phase points. */
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -39,13 +36,13 @@ extern s32 func_0026D518(void *a);
 extern f32 func_002119FC(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern s32 func_00220A1C(void *world, Vec3f *pos);
-extern void *func_00227240(void *pool, s32 a1, s16 type, Vec3f vel, Vec3f pos, s32 region, f32 arg);
-extern void func_00246690(void *actor, s32 id, Vec3f pos, s32 a5);
+extern s32 func_00220A1C(void *world, CVector3 *pos);
+extern void *func_00227240(void *pool, s32 a1, s16 type, CVector3 vel, CVector3 pos, s32 region, f32 arg);
+extern void func_00246690(void *actor, s32 id, CVector3 pos, s32 a5);
 extern void func_00409500(s32 delay, void *points);
 
-static __inline__ void SpawnAt(s32 delay, s16 type, Vec3f pos, f32 speed) {
-    Vec3f vel;
+static __inline__ void SpawnAt(s32 delay, s16 type, CVector3 pos, f32 speed) {
+    CVector3 vel;
     s32 region;
     void *actor;
 
@@ -60,7 +57,7 @@ static __inline__ void SpawnAt(s32 delay, s16 type, Vec3f pos, f32 speed) {
 }
 
 void func_00442784(State *state) {
-    Vec3f v;
+    CVector3 v;
     s32 i;
     s32 spawn = 0;
     s32 burst = 0;

@@ -1,28 +1,27 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Same family as func_002298C4 (homing missile): here a projectile that flies
  * back to a point beside its owner's player and is caught there. */
 
-typedef struct { f32 x, y, z; } Vec3f;
-typedef struct { f32 x, y, z, w; } Quatf;
 typedef f32 Mtx4f[4][4];
 
 extern s32 func_00275F7C(void);
-extern void *func_00275C6C(s32 bank, s32 sound, Vec3f *pos, Vec3f *pos2, s32 loops);  /* starts a sound */
+extern void *func_00275C6C(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
 extern void func_00232B40(void *obj);
 
 extern f32 func_0026D210(s32 half);                         /* half float -> f32 */
 extern f32 func_00298470(f32);                              /* sqrtf */
 extern f32 func_0021153C(f32);                              /* acosf */
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 s);    /* out = in * s */
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a + b */
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a - b */
-extern void func_0020F040(Vec3f *v);                        /* normalize */
-extern void func_0020E810(Quatf *out, Vec3f *dir);          /* rotation facing dir */
-extern void func_00211074(Quatf *q);                        /* normalize */
-extern void func_0020DCC8(Quatf *out, f32 t, Quatf *a, Quatf *b); /* slerp */
-extern void func_00211114(Quatf *q, Mtx4f m);               /* to matrix */
-extern void func_0020F85C(Mtx4f m, Vec3f *in, Vec3f *out);  /* transform */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
+extern void func_0020F040(CVector3 *v);                        /* normalize */
+extern void func_0020E810(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
+extern void func_00211074(CQuaternion *q);                        /* normalize */
+extern void func_0020DCC8(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b); /* slerp */
+extern void func_00211114(CQuaternion *q, Mtx4f m);               /* to matrix */
+extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);  /* transform */
 extern void func_00229618(void *obj, f32 scale);
 
 typedef struct {
@@ -37,7 +36,7 @@ typedef struct {
     /* 0x1A8 */ Player *player;
 } Owner;
 
-extern void func_00253F90(Player *player, Vec3f *pos);      /* player-relative point to world */
+extern void func_00253F90(Player *player, CVector3 *pos);      /* player-relative point to world */
 extern f32 func_002671B4(Owner *owner);                     /* height */
 
 typedef struct {
@@ -59,9 +58,9 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x18 - 0x10];
-    /* 0x018 */ Vec3f vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0xF8 - 0x24];
     /* 0x0F8 */ ParentDef *parent;
     /* 0x0FC */ u8 padFC[0x10C - 0xFC];
@@ -71,7 +70,7 @@ typedef struct {
     /* 0x120 */ u8 pad120[0x128 - 0x120];
     /* 0x128 */ s16 caught;
     /* 0x12A */ u8 pad12A[0x150 - 0x12A];
-    /* 0x150 */ Vec3f dir;
+    /* 0x150 */ CVector3 dir;
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
     /* 0x1B8 */ SoundHandle *loop;
 } Missile;
@@ -81,9 +80,9 @@ extern f32 D_800ACE6C; /* catch radius (512) */
 
 /* Same as func_00231EF8: accelerate along dir, clamp to the max speed. */
 static __inline__ void Missile_Accelerate(Missile *obj) {
-    Vec3f delta;
-    Vec3f dir;
-    Vec3f *vel;
+    CVector3 delta;
+    CVector3 dir;
+    CVector3 *vel;
     f32 accel;
     f32 speed;
     f32 maxSpeed;
@@ -109,15 +108,15 @@ static __inline__ void Missile_Accelerate(Missile *obj) {
 }
 
 void func_00229D10(Missile *obj) {
-    Vec3f aim;
-    Vec3f toHome;
-    Vec3f facing;
-    Vec3f forward;
-    Vec3f home;
-    Vec3f toCatch;
-    Quatf cur;
-    Quatf want;
-    Quatf rot;
+    CVector3 aim;
+    CVector3 toHome;
+    CVector3 facing;
+    CVector3 forward;
+    CVector3 home;
+    CVector3 toCatch;
+    CQuaternion cur;
+    CQuaternion want;
+    CQuaternion rot;
     Mtx4f mtx;
     Player *player;
     SoundHandle *loop;

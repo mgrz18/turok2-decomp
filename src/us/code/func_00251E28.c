@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 data[0x18];
@@ -10,7 +7,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Vec3f pos;
+    /* 0x114 */ CVector3 pos;
 } Camera;
 
 typedef struct {
@@ -31,7 +28,7 @@ extern char D_801198B0[];
 
 f32 func_0021149C(f32 scale);
 void func_00281060(Camera *cam, s32 maxOpacity, s32 red, s32 green, s32 blue, s32 attack, s32 sustain, s32 decay);
-void func_0028135C(void *pool, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, Vec3f pos);
+void func_0028135C(void *pool, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos);
 s32 func_0024E5F0(Player *player, Player *body, s32 mode);
 void func_00245828(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
 void func_00247C10(Player *actor, void *ai, DamageEvent *hit);

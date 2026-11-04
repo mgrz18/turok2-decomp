@@ -1,9 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER/8028469C_22.CPP, func_80285DB0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef unsigned int u32;
+#include "structs/game_object.h"
+
 
 struct Def {
     s32 type;                  /* 0x00 */
@@ -11,20 +10,13 @@ struct Def {
 };
 
 /* Turok 2 LevelActor: 0x288 bytes (Rage Wars 0x2E8). */
-typedef struct LevelActor {
-    char pad0[0x14];
-    struct Def *definition;    /* 0x14 (0x18) */
-    char pad18[0xD4 - 0x18];
-    s32 flags;                 /* 0xD4 (0x100) */
-    char padD8[0x288 - 0xD8];
-} LevelActor;
 
 typedef struct Shared_World {
     s32 mode;                  /* 0x00 */
     char pad4[0x6C - 0x4];
     void *bitSections;         /* 0x6C (0x80) */
     char pad70[0xE0 - 0x70];
-    LevelActor *actors;        /* 0xE0 (0x138) */
+    CGameObjectInstance *actors;        /* 0xE0 (0x138) */
     s32 actorCapacity;         /* 0xE4 */
     s32 actorCount;            /* 0xE8 (0x140) */
     char padEC[0x18FA8 - 0xEC];
@@ -36,7 +28,7 @@ extern void func_00201818(s32 arg0, s32 arg1);
 
 /* Set or clear the actor's bit in the current level's saved-actor bitmap. */
 void func_00220260(Shared_World *arg0, void *arg1, s32 arg2) {
-    LevelActor *entry;
+    CGameObjectInstance *entry;
     struct Def *cond;
     void *field80;
     void *temp_v0;
@@ -49,7 +41,7 @@ void func_00220260(Shared_World *arg0, void *arg1, s32 arg2) {
     s32 idx2;
     s32 lastOffset;
     u32 first;
-    if (!(((LevelActor *)arg1)->flags & 0x80000)) {
+    if (!(((CGameObjectInstance *)arg1)->m_dwFlags & 0x80000)) {
         first = (u32)arg0->actors;
         index = -1;
         if ((u32) arg1 >= first) {
@@ -70,7 +62,7 @@ void func_00220260(Shared_World *arg0, void *arg1, s32 arg2) {
         return;
     }
     entry = &arg0->actors[index];
-    cond = entry->definition;
+    cond = ((struct Def *)entry->header.m_pIntelligence);
     if ((u32) (cond->type - 9) < 2) {
         if (cond->flags & 0x200) {
             return;

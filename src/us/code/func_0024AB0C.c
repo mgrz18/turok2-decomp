@@ -1,18 +1,12 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0021E5D4.c, func_0021E5D4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 /* Turok 2 layout (Rage Wars: pos 0x8, timer 0x678, fx 0x67C..0x684, flags 0x6B0). */
 typedef struct B05P14 {
     u8 pad0[0x4];
-    Vec3f pos;              /* 0x004 */
+    CVector3 pos;              /* 0x004 */
     u8 pad10[0xA30 - 0x10];
     f32 timer;              /* 0xA30 */
     void *fx1;              /* 0xA34 */
@@ -31,15 +25,15 @@ extern u8 D_800ADB28[];
 void func_00228B4C(u8 *, void *);
 s32 func_002113A4();
 B05Fx *func_00228AEC(u8 *, u8 *);
-void func_0021F00C(Vec3f *out, B05P14 *p, Vec3f off);
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
+void func_0021F00C(CVector3 *out, B05P14 *p, CVector3 off);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_002671B4(B05P14 *p);
 
 /* A separate function in Rage Wars; inlined here in Turok 2. */
 static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 k2) {
     B05Fx *fx = *slot;
-    Vec3f off;
-    Vec3f v;
+    CVector3 off;
+    CVector3 v;
     if (fx == ((void *)0)) {
         fx = func_00228AEC(D_8010FF34, tab);
         if (fx == ((void *)0)) {

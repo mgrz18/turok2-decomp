@@ -1,7 +1,5 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Point3;
-typedef struct { f32 x, y, z, w; } Quat4;
+#include "structs/vector.h"
 
 typedef struct {
     u8 pad0[0xC];
@@ -16,10 +14,10 @@ typedef struct {
 typedef struct {
     u8 pad0[0x2];
     /* 0x002 */ u16 typeId;
-    /* 0x004 */ Point3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 arg;
     u8 pad14[0x4];
-    /* 0x018 */ Point3 dir;
+    /* 0x018 */ CVector3 dir;
     u8 pad24[0xD4];
     /* 0x0F8 */ ActorDef *def;
     u8 padFC[0x10];
@@ -27,23 +25,23 @@ typedef struct {
     /* 0x110 */ void *slot;
     /* 0x114 */ s32 a;
     u8 pad118[0x2C];
-    /* 0x144 */ Point3 prevPos;
+    /* 0x144 */ CVector3 prevPos;
 } Actor;
 
 extern u8 D_800F8928[];
-void func_0020E810(Quat4 *out, Point3 *dir);
-void func_0020EF2C(Point3 *out, Point3 *a, Point3 *b);
-void func_0020EF60(Point3 *out, Point3 *in, f32 scale);
-void func_0020EEF8(Point3 *out, Point3 *a, Point3 *b);
-s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, Point3 origin,
-                  Quat4 rot, Point3 pos, s32 arg, s32 b, s32 c);
+void func_0020E810(CQuaternion *out, CVector3 *dir);
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+                  CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
 
 /* Spawns `count` copies along the segment the actor covered this frame. */
 void func_00232934(Actor *actor) {
-    Quat4 rot;
-    Point3 delta;
-    Point3 pos;
-    Point3 dir;
+    CQuaternion rot;
+    CVector3 delta;
+    CVector3 pos;
+    CVector3 dir;
     s32 count;
     s32 kind;
     s32 i;

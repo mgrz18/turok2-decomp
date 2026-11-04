@@ -1,14 +1,11 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, func_8027B720_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct Box {
-    /* 0x00 */ Vec3f min;
-    /* 0x0C */ Vec3f max;
+    /* 0x00 */ CVector3 min;
+    /* 0x0C */ CVector3 max;
 } Box;
 
 typedef struct ParticleDef {
@@ -31,7 +28,7 @@ typedef struct Target {
 typedef struct Player Player;
 struct Player {
     /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ Vec3f pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ u8 pad10[0x54 - 0x10];
     /* 0x0054 */ f32 height;
     /* 0x0058 */ u8 pad58[0x524 - 0x58];
@@ -45,10 +42,10 @@ struct Player {
 typedef struct Particle {
     /* 0x000 */ u8 pad0[2];
     /* 0x002 */ u16 type;
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 unk10;
     /* 0x014 */ u8 pad14[4];
-    /* 0x018 */ Vec3f velocity;
+    /* 0x018 */ CVector3 velocity;
     /* 0x024 */ u8 pad24[0x40 - 0x24];
     /* 0x040 */ u32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
@@ -61,12 +58,12 @@ typedef struct Particle {
     /* 0x124 */ f32 rate;
     /* 0x128 */ s16 life;
     /* 0x12A */ u8 pad12A[2];
-    /* 0x12C */ Vec3f size;
-    /* 0x138 */ Vec3f growth;
-    /* 0x144 */ Vec3f prevPos;
-    /* 0x150 */ Vec3f direction;
-    /* 0x15C */ Vec3f rot;
-    /* 0x168 */ Vec3f rotSpeed;
+    /* 0x12C */ CVector3 size;
+    /* 0x138 */ CVector3 growth;
+    /* 0x144 */ CVector3 prevPos;
+    /* 0x150 */ CVector3 direction;
+    /* 0x15C */ CVector3 rot;
+    /* 0x168 */ CVector3 rotSpeed;
     /* 0x174 */ u8 pad174[0x190 - 0x174];
     /* 0x190 */ s32 hitFlags;
     /* 0x194 */ u8 pad194;
@@ -82,19 +79,19 @@ typedef struct Particle {
 typedef struct CollisionResult {
     /* 0x00 */ Target *current;
     /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ Vec3f origin;
+    /* 0x08 */ CVector3 origin;
     /* 0x14 */ u8 pad14[0x88 - 0x14];
     /* 0x88 */ s32 unk88;
     /* 0x8C */ u8 pad8C[4];
-    /* 0x90 */ Vec3f unk90;
+    /* 0x90 */ CVector3 unk90;
     /* 0x9C */ s32 unk9C;
-    /* 0xA0 */ Vec3f unkA0;
+    /* 0xA0 */ CVector3 unkA0;
     /* 0xAC */ u8 padAC[4];
     /* 0xB0 */ s32 unkB0;
     /* 0xB4 */ s32 unkB4;
-    /* 0xB8 */ Vec3f unkB8;
+    /* 0xB8 */ CVector3 unkB8;
     /* 0xC4 */ s32 unkC4;
-    /* 0xC8 */ Vec3f unkC8;
+    /* 0xC8 */ CVector3 unkC8;
 } CollisionResult;
 
 typedef struct ContactHandler ContactHandler;
@@ -107,7 +104,7 @@ struct ContactHandler {
 
 typedef struct Listener {
     /* 0x00 */ u8 pad0[0xD8];
-    /* 0xD8 */ Vec3f direction;
+    /* 0xD8 */ CVector3 direction;
 } Listener;
 
 extern f32 D_800B6D28;                  /* the frame's time step */
@@ -119,7 +116,7 @@ extern Listener *D_800F1ADC;
 extern u8 D_800F8928[];
 
 s32 func_002113A4(void);
-s32 func_00239F00(Particle *p, Vec3f pos, s32 *flags);
+s32 func_00239F00(Particle *p, CVector3 pos, s32 *flags);
 f32 func_002671B4(Player *player);
 f32 func_002672C8(Player *player);
 f32 func_00298470(f32 x);
@@ -128,8 +125,8 @@ void func_0022F1C8(void *list, Particle *p);
 void func_00232B40(Particle *p);
 void func_002323E0(Particle *p);
 void func_0022A4C8(Particle *p);
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);
-void func_0020F040(Vec3f *v);
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+void func_0020F040(CVector3 *v);
 void func_0022AAE0(Particle *p);
 void func_0022BD10(Particle *p);
 void func_0022BA88(Particle *p);

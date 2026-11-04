@@ -1,13 +1,10 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00278530.c, func_00278530, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct Box3 {
-    Vec3f mn;
-    Vec3f mx;
+    CVector3 mn;
+    CVector3 mx;
 } Box3;
 
 /* A world region record (0xC0 bytes). */
@@ -35,20 +32,20 @@ typedef struct M5Grid {
 
 extern char D_800A57B8[];
 extern s32 D_800ACAE0;
-extern Vec3f D_800DD790[];
+extern CVector3 D_800DD790[];
 extern M5Grid D_800F7078;
 extern s32 D_8011AAD8;
 
 void *func_002017D4(void *file, s32 index);
 s32 *func_002017E8(s32 file, s32 index, s32 *size);
 s32 **func_00204EDC(s32, s32 size, s32, char *name);
-void func_0021285C(WRec **recs, s32 count, void *verts, s32 arg3, Vec3f *points, s32 arg5);
-void func_00212DA4(void *verts, s32 arg3, Vec3f *points, s32 arg5);
+void func_0021285C(WRec **recs, s32 count, void *verts, s32 arg3, CVector3 *points, s32 arg5);
+void func_00212DA4(void *verts, s32 arg3, CVector3 *points, s32 arg5);
 void func_00212F98(void *verts, void *colors);
-void func_002130A8(void *verts, s32 arg3, Vec3f *points, s32 arg5);
+void func_002130A8(void *verts, s32 arg3, CVector3 *points, s32 arg5);
 s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt);
-void func_00213684(s32 file, s32 count, Vec3f *points);
-void func_0021375C(void *verts, Vec3f *points);
+void func_00213684(s32 file, s32 count, CVector3 *points);
+void func_0021375C(void *verts, CVector3 *points);
 void func_0029E460(void *dst, void *src, s32 size);
 
 /* Collects the region records whose box overlaps q (at most 64); returns whether one is flagged. */

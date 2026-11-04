@@ -1,14 +1,8 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/CODE_8028414C.CPP, func_80284178_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-
-typedef struct CVector3_t {
-    f32 x;
-    f32 y;
-    f32 z;
-} CVector3;
 
 typedef struct Matrix {
     f32 m[4][4];

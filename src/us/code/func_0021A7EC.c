@@ -1,10 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/80246E34_2.CPP, func_802472F0_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     f32 m[16];
@@ -30,7 +27,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f position;
+    /* 0x004 */ CVector3 position;
     /* 0x010 */ u8 pad10[0x24];
     /* 0x034 */ f32 scaleX;
     /* 0x038 */ f32 scaleY;
@@ -63,21 +60,21 @@ void func_00218B10(AnimTrack *track, s32 data, s32 key, s32 primary, s32 *active
 s32 func_00219968(AnimTrack *track);
 AnimBlendEntry *func_00219994(AnimTrack *track);
 void func_00219938(AnimTrack *track);
-void func_00218DCC(AnimTrack *track, Vec3f *delta, f32 *turn, AnimActor *actor);
-void func_0020EF8C(Vec3f *out, f32 t, Vec3f *a, Vec3f *b);
+void func_00218DCC(AnimTrack *track, CVector3 *delta, f32 *turn, AnimActor *actor);
+void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 f32 func_00210DB4(f32 t, f32 a, f32 b);
 void func_00210EF0(f32 *angle);
 void func_002105A4(MatrixF *m, f32 angle);
-void func_0020F85C(MatrixF *m, Vec3f *in, Vec3f *out);
+void func_0020F85C(MatrixF *m, CVector3 *in, CVector3 *out);
 
 /* Advances an actor's animation and applies its root motion: the turn and,
  * with flag 0x20000, the move, blended over the transition from the previous
  * track while flag 0x400 is set. */
 void func_0021A7EC(AnimActor *actor) {
-    Vec3f first;
-    Vec3f second;
-    Vec3f saved;
-    Vec3f moved;
+    CVector3 first;
+    CVector3 second;
+    CVector3 saved;
+    CVector3 moved;
     MatrixF matrix;
     s32 active;
     f32 first_value;

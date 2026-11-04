@@ -1,13 +1,10 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[2];
     /* 0x02 */ u16 flags;
-    /* 0x04 */ Vec3f *vertices[3];
+    /* 0x04 */ CVector3 *vertices[3];
     /* 0x10 */ u8 pad10[0x20 - 0x10];
 } Triangle; /* 0x20 bytes */
 
@@ -33,16 +30,16 @@ typedef struct {
 extern s32 D_800B6D54;          /* level loaded */
 extern World D_800F7078;
 extern Triangle *D_800B2608;    /* triangle of the cached raw normal */
-extern Vec3f D_800F2020;        /* cached raw normal */
+extern CVector3 D_800F2020;        /* cached raw normal */
 
 extern void *func_002017D4(void *file, s32 index); /* a block of a file */
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
-extern void func_0020EFDC(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a x b */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
 /* func_0026BB9C, inlined: is (x, z) inside the XZ projection of the triangle? */
 static __inline__ s32 InTriangle(Triangle *tri, f32 x, f32 z) {
     s32 i, next;
-    Vec3f *a, *b;
+    CVector3 *a, *b;
 
     if (tri == NULL) {
         return 1;
@@ -58,9 +55,9 @@ static __inline__ s32 InTriangle(Triangle *tri, f32 x, f32 z) {
     return 1;
 }
 
-static __inline__ void cross_edges(Vec3f *out, Triangle *tri) {
-    Vec3f edge0;
-    Vec3f edge1;
+static __inline__ void cross_edges(CVector3 *out, Triangle *tri) {
+    CVector3 edge0;
+    CVector3 edge1;
 
     func_0020EF2C(&edge0, tri->vertices[1], tri->vertices[0]);
     func_0020EF2C(&edge1, tri->vertices[2], tri->vertices[1]);
@@ -69,8 +66,8 @@ static __inline__ void cross_edges(Vec3f *out, Triangle *tri) {
 
 /* func_0026BE60, inlined: height of a triangle's plane at (x, z). */
 static __inline__ f32 TriHeight(Triangle *tri, f32 x, f32 z) {
-    Vec3f normal;
-    Vec3f point;
+    CVector3 normal;
+    CVector3 point;
 
     if (tri == NULL) {
         return -14336.0f;
@@ -88,7 +85,7 @@ static __inline__ f32 TriHeight(Triangle *tri, f32 x, f32 z) {
 }
 
 /* The level triangle nearest below pos (other than skip), NULL if none. */
-Triangle *func_0026B4A4(Triangle *skip, Vec3f pos) {
+Triangle *func_0026B4A4(Triangle *skip, CVector3 pos) {
     World *world;
     Triangle *tris;
     TriGroupList *list;

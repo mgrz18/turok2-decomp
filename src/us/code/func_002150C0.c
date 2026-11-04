@@ -5,10 +5,7 @@
  * model, segment, angle (s8 in 1/254 turns), flags (always with bit 1), default 24-byte state. */
 
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     s32 data[6];
@@ -17,7 +14,7 @@ typedef struct {
 /* A placed actor's record in the level data. */
 typedef struct {
     /* 0x00 */ s32 value;
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ f32 radius;
     /* 0x14 */ u16 id;
     /* 0x16 */ u16 segment; /* 0xFFFF = none */
@@ -31,7 +28,7 @@ typedef struct {
     /* 0x000 */ u8 state;
     /* 0x001 */ u8 pad1;
     /* 0x002 */ u16 id;
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ void *segment;
     /* 0x014 */ void *model;
     /* 0x018 */ u8 pad18[0x1C];
@@ -39,8 +36,8 @@ typedef struct {
     /* 0x038 */ u8 pad38[0x10C];
     /* 0x144 */ f32 angle;
     /* 0x148 */ u8 pad148[4];
-    /* 0x14C */ Vec3f min;
-    /* 0x158 */ Vec3f max;
+    /* 0x14C */ CVector3 min;
+    /* 0x158 */ CVector3 max;
     /* 0x164 */ f32 unk164;
     /* 0x168 */ s32 unk168;
     /* 0x16C */ u16 flags;
@@ -62,7 +59,7 @@ void *func_00225E88(void *cache, s32 model);
 f32 func_002671B4(PlacedActor *actor);
 
 void func_002150C0(PlacedActor *actor, PlacedActorRecord *record, s32 owner, u8 *segments) {
-    Vec3f top;
+    CVector3 top;
 
     actor->state = 3;
     actor->id = record->id;

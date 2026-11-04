@@ -1,21 +1,18 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Plane {
     u8 pad0[0x30];
-    Vec3 normal;        /* 0x30 */
+    CVector3 normal;        /* 0x30 */
 } Plane;
 
-void func_0020EF2C(Vec3 *out, Vec3 *a, void *b);
-void func_0020EF8C(Vec3 *out, f32 t, Vec3 *a, Vec3 *b);
+void func_0020EF2C(CVector3 *out, CVector3 *a, void *b);
+void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 
 /* func_0023C390, inlined. */
-static __inline__ s32 PlaneSegmentT(Plane *plane, Vec3 *start, Vec3 *end, f32 *t) {
-    Vec3 dir;
-    Vec3 diff;
+static __inline__ s32 PlaneSegmentT(Plane *plane, CVector3 *start, CVector3 *end, f32 *t) {
+    CVector3 dir;
+    CVector3 diff;
     f32 denom;
 
     func_0020EF2C(&dir, end, start);
@@ -30,7 +27,7 @@ static __inline__ s32 PlaneSegmentT(Plane *plane, Vec3 *start, Vec3 *end, f32 *t
 }
 
 /* Where the segment from start to end crosses plane (from its front), in *hit. */
-s32 func_0023C478(Plane *plane, Vec3 *start, Vec3 *end, Vec3 *hit) {
+s32 func_0023C478(Plane *plane, CVector3 *start, CVector3 *end, CVector3 *hit) {
     f32 t;
 
     if (PlaneSegmentT(plane, start, end, &t)) {

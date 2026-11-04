@@ -1,7 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215B90.c, func_00215B90, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x996];
@@ -10,36 +9,19 @@ typedef struct {
     /* 0xA64 */ u32 flagsA64;
 } Player;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
-    /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ s32 *def;           /* first word: kind */
-    /* 0x018 */ u8 pad18[0x50 - 0x18];
-    /* 0x050 */ f32 rotY;
-    /* 0x054 */ f32 eye;
-    /* 0x058 */ u8 pad58[0xD4 - 0x58];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x174 - 0xD8];
-    /* 0x174 */ s8 state;
-    /* 0x175 */ u8 pad175[0x1A8 - 0x175];
-    /* 0x1A8 */ Player *owner;
-    /* 0x1AC */ u8 pad1AC[0x204 - 0x1AC];
-    /* 0x204 */ s16 anim;
-} Actor;
 
 s32 func_0024E700(Player *player, s32 weapon);   /* ammo for a weapon */
-f32 func_002671B4(Actor *a);                     /* height */
+f32 func_002671B4(CGameObjectInstance *a);                     /* height */
 f32 func_0021153C(f32 x);                        /* acos */
 f32 func_002982F0(f32 x);                        /* sin */
 f32 func_002974C0(f32 x);                        /* cos */
 f32 func_00298470(f32 x);                        /* sqrt */
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
-void func_0020F040(Vec3f *v);                          /* normalise */
-void func_0021F00C(Vec3f *out, Actor *a, Vec3f v);    /* v in a's frame */
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+void func_0020F040(CVector3 *v);                          /* normalise */
+void func_0021F00C(CVector3 *out, CGameObjectInstance *a, CVector3 v);    /* v in a's frame */
 
 /* func_00246310: the signed angle from the actor's heading to a point. */
-static __inline__ f32 AngleTo(Actor *actor, Vec3f point) {
+static __inline__ f32 AngleTo(CGameObjectInstance *actor, CVector3 point) {
     f32 dx;
     f32 dz;
     f32 dist;
@@ -48,16 +30,16 @@ static __inline__ f32 AngleTo(Actor *actor, Vec3f point) {
     f32 dot;
     f32 angle;
 
-    dx = point.x - actor->pos.x;
-    dz = point.z - actor->pos.z;
+    dx = point.x - actor->header.m_vPos.x;
+    dz = point.z - actor->header.m_vPos.z;
     dist = func_00298470(dx * dx + dz * dz);
     if (dist == 0.0f) {
         return 0.0f;
     }
     do {
-        s = func_002982F0(actor->rotY);
+        s = func_002982F0(actor->m_RotY);
     } while (0);
-    c = -func_002974C0(actor->rotY);
+    c = -func_002974C0(actor->m_RotY);
     dot = (dx * -s + dz * c) / dist;
     dot = ((((dot) > (1.0f) ? (1.0f) : (dot))) < ((-1.0f)) ? ((-1.0f)) : (((dot) > (1.0f) ? (1.0f) : (dot))));
     angle = func_0021153C(dot);
@@ -69,12 +51,12 @@ static __inline__ f32 AngleTo(Actor *actor, Vec3f point) {
 
 /* Whether `self` sees `target` (a player holding a ready weapon, or a
  * creature in an attack pose) aiming at it: 0 if not, else the side (-1/1). */
-s32 func_002451AC(Actor *self, s32 unused, Actor *target, f32 cone) {
-    Vec3f dir;
-    Vec3f facing;
-    Vec3f fwd;
-    Vec3f from;
-    Vec3f to;
+s32 func_002451AC(CGameObjectInstance *self, s32 unused, CGameObjectInstance *target, f32 cone) {
+    CVector3 dir;
+    CVector3 facing;
+    CVector3 fwd;
+    CVector3 from;
+    CVector3 to;
     f32 lo;
     f32 hi;
     f32 y;
@@ -84,8 +66,8 @@ s32 func_002451AC(Actor *self, s32 unused, Actor *target, f32 cone) {
     if (target == NULL) {
         return 0;
     }
-    if (target->flags & 0x300000) {
-        player = target->owner;
+    if (target->m_dwFlags & 0x300000) {
+        player = ((Player *)target->m_AI.m_pParent);
         if (func_0024E700(player, player->weapon) <= 0) {
             return 0;
         }
@@ -94,14 +76,14 @@ s32 func_002451AC(Actor *self, s32 unused, Actor *target, f32 cone) {
         }
         goto body;
     }
-    switch (*target->def) {
+    switch (*((s32 *)target->header.m_pIntelligence)) {
     case 1:
-        if (target->anim < 0x10CC) {
+        if (target->m_AI.m_AnimType < 0x10CC) {
             return 0;
         }
         goto body;
     case 4:
-        if (target->state != 0x3F) {
+        if (target->m_AI.m_Mode != 0x3F) {
             return 0;
         }
         goto body;
@@ -109,14 +91,14 @@ s32 func_002451AC(Actor *self, s32 unused, Actor *target, f32 cone) {
         return 0;
     }
 body:
-    lo = self->pos.y + self->eye;
+    lo = self->header.m_vPos.y + self->m_CollisionYOffset;
     hi = lo + func_002671B4(self);
-    to.x = target->pos.x;
-    y = target->pos.y + target->eye + func_002671B4(target) * 0.9f;
+    to.x = target->header.m_vPos.x;
+    y = target->header.m_vPos.y + target->m_CollisionYOffset + func_002671B4(target) * 0.9f;
     to.y = y;
-    to.z = target->pos.z;
-    from.x = self->pos.x;
-    from.z = self->pos.z;
+    to.z = target->header.m_vPos.z;
+    from.x = self->header.m_vPos.x;
+    from.z = self->header.m_vPos.z;
     if (hi < y) {
         from.y = hi;
     } else if (y < lo) {

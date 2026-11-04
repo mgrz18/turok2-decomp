@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/vector.h"
 
 typedef struct Sweep {
     /* 0x00 */ u8 pad0[0x9C];
@@ -25,10 +26,6 @@ typedef struct ProjVertex {
     /* 0x0C */ s32 flags;
     /* 0x10 */ s16 *pos;
 } ProjVertex;
-
-typedef struct CVector3 {
-    f32 x, y, z;
-} CVector3;
 
 typedef union DLCmd {
     struct { u32 w0; u32 w1; };

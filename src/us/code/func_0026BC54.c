@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} CVector3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[2];

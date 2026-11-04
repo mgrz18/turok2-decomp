@@ -1,14 +1,11 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 /* The creature to mount (an AI actor). */
 typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x50 - 0x10];
     /* 0x050 */ f32 yaw;
     /* 0x054 */ u8 pad54[0xB8 - 0x54];
@@ -24,7 +21,7 @@ typedef struct {
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x4];
-    /* 0x0004 */ Vec3 pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ u8 pad10[0x514 - 0x10];
     /* 0x0514 */ s32 index;
     /* 0x0518 */ u8 pad518[0xA18 - 0x518];
@@ -41,7 +38,7 @@ typedef struct Player {
     /* 0x0A94 */ s32 unkA94;
     /* 0x0A98 */ u8 padA98[0xA9C - 0xA98];
     /* 0x0A9C */ s32 unkA9C;
-    /* 0x0AA0 */ Vec3 unkAA0;
+    /* 0x0AA0 */ CVector3 unkAA0;
     /* 0x0AAC */ f32 unkAAC;
     /* 0x0AB0 */ s32 unkAB0;
     /* 0x0AB4 */ s32 unkAB4;
@@ -58,7 +55,7 @@ typedef struct Player {
     /* 0x0AE0 */ s32 unkAE0;
     /* 0x0AE4 */ f32 unkAE4;
     /* 0x0AE8 */ s32 unkAE8;
-    /* 0x0AEC */ Vec3 unkAEC;
+    /* 0x0AEC */ CVector3 unkAEC;
     /* 0x0AF8 */ f32 unkAF8;
     /* 0x0AFC */ s32 unkAFC;
     /* 0x0B00 */ s32 unkB00;
@@ -68,7 +65,7 @@ typedef struct Player {
     /* 0x0B2C */ u8 padB2C[0xBB0 - 0xB2C];
     /* 0x0BB0 */ Mount *mount;
     /* 0x0BB4 */ s32 mountType;
-    /* 0x0BB8 */ Vec3 seat;
+    /* 0x0BB8 */ CVector3 seat;
     /* 0x0BC4 */ u8 padBC4[0x1284 - 0xBC4];
     /* 0x1284 */ s32 unk1284;
 } Player;
@@ -78,11 +75,11 @@ typedef struct {
 } CollisionResult;
 
 extern CollisionResult D_800F1CE0;
-extern Vec3 D_800ADCBC;             /* rider seat */
+extern CVector3 D_800ADCBC;             /* rider seat */
 extern u8 D_800F5EC0[][0x224];      /* controller settings, one per player */
 
-f32 func_00246310(Body *body, Vec3 point);   /* angle to a point */
-void func_0020EF60(Vec3 *out, Vec3 *in, f32 s);
+f32 func_00246310(Body *body, CVector3 point);   /* angle to a point */
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);
 void func_002470E8(void *controls, void *settings);
 f32 func_00253CFC(Player *player);
 void func_00206068(s32);
@@ -91,7 +88,7 @@ s32 func_0024E5F0(Player *player, Body *body, s32 arg2);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-static __inline__ void setVec3(Vec3 *v, f32 x, f32 y, f32 z) {
+static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
     v->z = z;
     v->y = y;
     v->x = x;

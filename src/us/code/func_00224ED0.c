@@ -1,13 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028BFB4.c, func_0028BFB4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
 typedef struct ActorInfo {
                u32 flags;
                s32 unk4;
@@ -87,9 +82,6 @@ struct Actor {
                  u8 pad16DA[6];
                  Actor *next;
 };
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
 typedef struct Rec14 {
@@ -102,10 +94,10 @@ typedef struct Entity {
                  u8 pad0[0x4];
                  s16 unk4s;
                  u8 pad6[0x2];
-                 Vec3f pos;
+                 CVector3 pos;
                  s32 unk14;
                  ActorDef *def;
-                 Vec3f vel;
+                 CVector3 vel;
                  u8 pad28[0xBC];
                  u16 unkE4;
                  u8 padE6[0x1A];
@@ -227,9 +219,9 @@ typedef struct Level {
                   s32 unk26DD0;
                   s32 unk26DD4;
 } Level;
-void func_00227240(u8 *base, s32 zero, s32 a, Vec3f z, Vec3f v, s32 b, f32 f);
-void func_00224ED0(Level *lv, s32 a1, Vec3f v, s32 x, f32 f) {
-    Vec3f z;
+void func_00227240(u8 *base, s32 zero, s32 a, CVector3 z, CVector3 v, s32 b, f32 f);
+void func_00224ED0(Level *lv, s32 a1, CVector3 v, s32 x, f32 f) {
+    CVector3 z;
     z.x = 0;
     z.y = 0;
     z.z = 0;

@@ -3,14 +3,7 @@
  * scratch values in file statics (D_800E67B0-D_800E6878). */
 
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct Quatf {
-    f32 x, y, z, w;
-} Quatf;
+#include "structs/vector.h"
 
 /* A bone's track references: -1 means "use the default frame". */
 typedef struct JointRef {
@@ -19,7 +12,7 @@ typedef struct JointRef {
 } JointRef;
 
 typedef struct DefaultFrame {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ s16 rot[4];
 } DefaultFrame;
 
@@ -40,7 +33,7 @@ typedef struct TwistPart {
     /* 0x12 */ s8 count;
     /* 0x13 */ u8 pad13;
     /* 0x14 */ s8 bones[4];
-    /* 0x18 */ Vec3f axis;
+    /* 0x18 */ CVector3 axis;
 } TwistPart;
 
 typedef struct Surface {
@@ -61,7 +54,7 @@ typedef void (*PoseCallback)(f32 (*)[4], PoseContext *);
 
 struct PoseObject {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ Surface *surface;
     /* 0x014 */ s32 *def; /* type id first */
     /* 0x018 */ u8 pad18[0x3C];
@@ -103,12 +96,12 @@ struct PoseContext {
 /* Scratch shared by every level of the recursion. */
 extern BoneList *D_800E67B0;   /* children list */
 extern f32 D_800E67C0[4][4];   /* local matrix */
-extern Vec3f D_800E6800;       /* translation */
-extern Vec3f D_800E6810;       /* position, channel A */
-extern Vec3f D_800E6820;       /* position, channel B */
-extern Quatf D_800E6830;       /* rotation */
-extern Quatf D_800E6840;       /* rotation, channel A */
-extern Quatf D_800E6850;       /* rotation, channel B */
+extern CVector3 D_800E6800;       /* translation */
+extern CVector3 D_800E6810;       /* position, channel A */
+extern CVector3 D_800E6820;       /* position, channel B */
+extern CQuaternion D_800E6830;       /* rotation */
+extern CQuaternion D_800E6840;       /* rotation, channel A */
+extern CQuaternion D_800E6850;       /* rotation, channel B */
 extern s32 D_800E6860;         /* object type */
 extern u8 *D_800E6864;         /* bone data */
 extern u8 D_800E6868;          /* bone flags */
@@ -120,8 +113,8 @@ extern f32 D_800ACB98[];
 
 void *func_002017D4(void *file, s32 index);
 void func_0020C618(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);
-void func_0020DAA4(Quatf *out, f32 amount, Quatf *a, Quatf *b);
-void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
+void func_0020DAA4(CQuaternion *out, f32 amount, CQuaternion *a, CQuaternion *b);
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 void func_0020FCC4(f32 (*m)[4], f32 angle, f32 x, f32 y, f32 z);
 void func_0020FF80(f32 (*dst)[4], f32 (*src)[4]);
 void func_00210318(f32 (*m)[4], f32 x, f32 y, f32 z);
@@ -130,7 +123,7 @@ void func_0021B59C(PoseObject *obj, s32 flags, f32 (*m)[4]);
 f32 func_002671B4(PoseObject *obj);
 f32 func_00269C3C(Surface *surface, f32 x, f32 z);
 
-static __inline__ void trackPos(KeyLookup *t, s32 i, Vec3f *out) {
+static __inline__ void trackPos(KeyLookup *t, s32 i, CVector3 *out) {
     if (t->joints[i].pos == -1) {
         *out = t->frames[i].pos;
     } else {
@@ -145,7 +138,7 @@ static __inline__ void trackPos(KeyLookup *t, s32 i, Vec3f *out) {
     }
 }
 
-static __inline__ void defaultRot(KeyLookup *t, s32 i, Quatf *out) {
+static __inline__ void defaultRot(KeyLookup *t, s32 i, CQuaternion *out) {
     DefaultFrame *frame = &t->frames[i];
 
     out->x = frame->rot[0] * (1.0f / 32767.0f);
@@ -155,18 +148,18 @@ static __inline__ void defaultRot(KeyLookup *t, s32 i, Quatf *out) {
 }
 
 /* Spherical interpolation between the two keys. */
-static __inline__ void slerpRot(KeyLookup *t, s32 i, Quatf *out) {
+static __inline__ void slerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
     if (t->joints[i].rot != -1) {
         f32 *data = func_002017D4(t->rotTable, t->joints[i].rot);
 
-        func_0020DAA4(out, t->blend, (Quatf *) &data[t->rotFrame0], (Quatf *) &data[t->rotFrame1]);
+        func_0020DAA4(out, t->blend, (CQuaternion *) &data[t->rotFrame0], (CQuaternion *) &data[t->rotFrame1]);
     } else {
         defaultRot(t, i, out);
     }
 }
 
 /* Linear interpolation between the two keys. */
-static __inline__ void lerpRot(KeyLookup *t, s32 i, Quatf *out) {
+static __inline__ void lerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
     if (t->joints[i].rot == -1) {
         defaultRot(t, i, out);
     } else {
@@ -182,13 +175,13 @@ static __inline__ void lerpRot(KeyLookup *t, s32 i, Quatf *out) {
     }
 }
 
-static __inline__ void lerpVec(Vec3f *out, f32 t, Vec3f *a, Vec3f *b) {
+static __inline__ void lerpVec(CVector3 *out, f32 t, CVector3 *a, CVector3 *b) {
     out->x = a->x + t * (b->x - a->x);
     out->y = a->y + t * (b->y - a->y);
     out->z = a->z + t * (b->z - a->z);
 }
 
-static __inline__ void quatToMtx(f32 (*m)[4], Quatf *q, Vec3f *t) {
+static __inline__ void quatToMtx(f32 (*m)[4], CQuaternion *q, CVector3 *t) {
     f32 xx = q->x * q->x;
     f32 yy = q->y * q->y;
     f32 zz = q->z * q->z;
@@ -219,8 +212,8 @@ static __inline__ void quatToMtx(f32 (*m)[4], Quatf *q, Vec3f *t) {
 }
 
 static __inline__ void twistPart(TwistPart *part, f32 (*cur)[4], s32 n, s32 i) {
-    Vec3f turn;
-    Vec3f axis;
+    CVector3 turn;
+    CVector3 axis;
     f32 rotm[4][4];
     f32 inv[4][4];
     f32 angle;

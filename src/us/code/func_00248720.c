@@ -1,7 +1,5 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
-typedef struct { f32 x, y, z, w; } Quat;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x0 */ s16 index;            /* into the player's ammo */
@@ -17,14 +15,14 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Vec3f pos;
+    /* 0x114 */ CVector3 pos;
 } Camera;
 
 typedef struct {
     /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ Vec3f pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ u8 pad10[8];
-    /* 0x0018 */ Vec3f vel;
+    /* 0x0018 */ CVector3 vel;
     /* 0x0024 */ u8 pad24[0xD8 - 0x24];
     /* 0x00D8 */ f32 charge;
     /* 0x00DC */ u8 padDC[0xE2 - 0xDC];
@@ -45,7 +43,7 @@ typedef struct {
     /* 0x0B30 */ u8 padB30[8];
     /* 0x0B38 */ s32 lockTarget;
     /* 0x0B3C */ u8 padB3C[0xB7C - 0xB3C];
-    /* 0x0B7C */ Quat aim;
+    /* 0x0B7C */ CQuaternion aim;
     /* 0x0B8C */ s32 sniperMode;
     /* 0x0B90 */ u8 padB90[0xC04 - 0xB90];
     /* 0x0C04 */ s32 anim;
@@ -59,10 +57,10 @@ extern f32 D_800ACE10;          /* projectile speed scale */
 extern f32 D_800ACE14;          /* projectile power */
 extern u8 D_800F8928[];
 
-Quat func_0021AE6C(FirePlayer *p);
+CQuaternion func_0021AE6C(FirePlayer *p);
 AmmoInfo *func_0025398C(FirePlayer *p, s32 weapon);
 void func_0022F350(void *list, FirePlayer *src, FirePlayer *owner, s32 a3, s32 target, s32 type,
-                   Vec3f vel, Quat aim, Vec3f pos, s32 a40, s32 a44, s32 a48);
+                   CVector3 vel, CQuaternion aim, CVector3 pos, s32 a40, s32 a44, s32 a48);
 
 /* A debug print compiled out of the release build. Its empty loop notes stop
  * loop.c (find_and_verify_loops) from moving the found block out of the
@@ -91,9 +89,9 @@ static __inline__ s32 usesProjectile(s32 weapon, s32 type) {
  * animation, picks the projectile (sniper and charge variants) and
  * launches it from the camera. */
 void func_00248720(FirePlayer *p, s32 type) {
-    Vec3f pos;
-    Vec3f vel;
-    Quat aim;
+    CVector3 pos;
+    CVector3 vel;
+    CQuaternion aim;
     Camera *camera = p->camera;
     AmmoInfo *info;
     s16 *ammo;

@@ -3,17 +3,14 @@
  * (func_002851C0 calls it there). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER/8028469C_17.CPP, func_802856E0_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 /* A sound/effect emitter attenuated by distance. */
 typedef struct Emitter {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ struct Emitter *next;
     /* 0x08 */ u8 pad8[4];
-    /* 0x0C */ Vec3f pos;
+    /* 0x0C */ CVector3 pos;
     /* 0x18 */ f32 radius;
     /* 0x1C */ f32 gain;
     /* 0x20 */ u8 curveA[0xC];
@@ -37,13 +34,13 @@ extern f32 func_0026EF30(void *curve);
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-static __inline__ f32 distance(Emitter *e, Vec3f a) {
+static __inline__ f32 distance(Emitter *e, CVector3 a) {
     return func_00298470((a.x - e->pos.x) * (a.x - e->pos.x) + (a.y - e->pos.y) * (a.y - e->pos.y)
                          + (a.z - e->pos.z) * (a.z - e->pos.z));
 }
 
 /* Summed gain of a list's emitters heard from a point, clamped to [0, 1]. */
-f32 func_0026E760(EmitterList *list, Vec3f pos) {
+f32 func_0026E760(EmitterList *list, CVector3 pos) {
     Emitter *e;
     s32 mask;
     f32 total;

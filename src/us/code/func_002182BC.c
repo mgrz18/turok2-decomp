@@ -1,11 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "structs/vector.h"
 
-typedef struct { s32 x, y, z; } V3;
+typedef struct { s32 a; CVector3 v; s32 d; } S;
 
-typedef struct { s32 a; V3 v; s32 d; } S;
-
-void func_002182BC(S *arg0, s32 arg1, V3 arg2, s32 arg3) {
+void func_002182BC(S *arg0, s32 arg1, CVector3 arg2, s32 arg3) {
     arg0->a = arg1;
     arg0->v = arg2;
     arg0->d = arg3;

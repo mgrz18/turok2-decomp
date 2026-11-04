@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0024AA08.c, func_0024AA08, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
 /* Draw an actor's shadow. Without flag 0x10000000 it gets the blob shadow
  * (func_0021E03C). Otherwise its projected shadow model is built once, while
@@ -10,10 +11,6 @@
  * along it onto a plane just under the actor (0.9 of its height, up to 512),
  * grown by 0.003 per unit of height, turned like the actor and set on the
  * ground; then it is submitted (func_0021ED04). */
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
 
 typedef struct {
     u8 pad0[0x8];
@@ -30,7 +27,7 @@ typedef struct {
 
 typedef struct {
     u8 pad0[0x4];
-    Vec3 pos;               /* 0x004 */
+    CVector3 pos;               /* 0x004 */
     s32 model;              /* 0x010 */
     u8 pad14[0x2C];
     u8 rot[0x10];           /* 0x040 */
@@ -54,9 +51,9 @@ s32 func_00268160(void);
 f32 func_0026872C(Actor *, s32);
 void *func_00206950(void *, s32);
 f32 func_00298470(f32);     /* sqrtf */
-void func_00228910(void *, f32, f32, f32, Vec3 *, f32 *);
-void func_0020F040(Vec3 *);
-void func_00210004(void *, Vec3 *, f32);
+void func_00228910(void *, f32, f32, f32, CVector3 *, f32 *);
+void func_0020F040(CVector3 *);
+void func_00210004(void *, CVector3 *, f32);
 void func_00210318(void *, f32, f32, f32);
 void func_00210478(void *, f32, f32, f32);
 void func_00211114(void *, void *);
@@ -65,7 +62,7 @@ void func_0021ED04(Actor *, ShadowParams *, void *, u8);
 void func_0021E03C(Actor *, s32, s32);
 
 void func_0021DC84(Actor *a, s32 unused, ShadowParams *s) {
-    Vec3 dir;
+    CVector3 dir;
     f32 r;
     u8 m[0x40];
     u8 q[0x40];

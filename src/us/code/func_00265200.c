@@ -3,10 +3,7 @@
  * stray word ahead of the prologue, never executed. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0020486C.c, func_0020486C, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     s32 a;
@@ -26,7 +23,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
     /* 0x014 */ ActorDef *def;
     /* 0x018 */ u8 pad18[0xA2];
@@ -54,7 +51,7 @@ typedef struct {
 } ActionState;
 
 extern u8 D_800F7078[];
-extern void func_00237EE4(Actor *a, Actor *b, s32 kind, Vec3f pos, EventArg extra);
+extern void func_00237EE4(Actor *a, Actor *b, s32 kind, CVector3 pos, EventArg extra);
 extern void func_00220260(void *mgr, Actor *actor, s32 flag);
 extern void func_00243414(Actor *actor, ActionState *state, s32 mode);
 

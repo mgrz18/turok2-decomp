@@ -1,16 +1,9 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
-
-typedef struct Quat {
-    f32 x, y, z, w;
-} Quat;
+#include "structs/vector.h"
 
 typedef struct Triangle {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 *v[3];
+    /* 0x04 */ CVector3 *v[3];
 } Triangle;
 
 extern f32 D_800DD78C;
@@ -19,12 +12,12 @@ f32 func_00298470(f32 x);   /* sqrtf */
 f32 func_0021153C(f32 x);   /* acosf */
 f32 func_002982F0(f32 x);   /* sinf */
 f32 func_002974C0(f32 x);   /* cosf */
-void func_00210F68(Quat *out, Quat *a, Quat *b);    /* quaternion product */
+void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);    /* quaternion product */
 
 /* Heading of tri's edge from vertex i to the next one, seen from above. */
 static __inline__ f32 edgeHeading(Triangle *tri, s32 i) {
-    Vec3 *a = tri->v[i];
-    Vec3 *b = tri->v[(i + 1) % 3];
+    CVector3 *a = tri->v[i];
+    CVector3 *b = tri->v[(i + 1) % 3];
     f32 dx = b->x - a->x;
     f32 dz = b->z - a->z;
     f32 len = func_00298470(dx * dx + dz * dz);
@@ -41,10 +34,10 @@ static __inline__ f32 edgeHeading(Triangle *tri, s32 i) {
 }
 
 /* Orientation lying along tri's edge i: turned to its heading, then tipped a quarter turn. */
-Quat func_0026AD94(Triangle *tri, s32 i) {
-    Quat heading;
-    Quat tilt;
-    Quat result;
+CQuaternion func_0026AD94(Triangle *tri, s32 i) {
+    CQuaternion heading;
+    CQuaternion tilt;
+    CQuaternion result;
     f32 s;
     f32 half;
 

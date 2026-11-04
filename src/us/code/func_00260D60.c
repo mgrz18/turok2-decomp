@@ -1,12 +1,9 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Flying AI steering, scaled by speed: like func_00260730, but the bank and
  * pitch ease faster when they have to swing to the other side. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ f32 velY;
-} Actor;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x10C];
@@ -26,12 +23,12 @@ typedef struct {
     /* 0x18 */ f32 accel;
 } Limits;
 
-s32 func_0025E428(Actor *self, void *ai);
+s32 func_0025E428(CGameObjectInstance *self, void *ai);
 f32 func_0021160C(f32 value, f32 target, f32 step);
 f32 func_00211774(f32 cur, f32 target, f32 rate);
-void func_00245BAC(Actor *self, AI *ai, f32 angle, f32 turn);
+void func_00245BAC(CGameObjectInstance *self, AI *ai, f32 angle, f32 turn);
 
-void func_00260D60(Actor *self, AI *ai, Steer *steer, Limits *limits, f32 speed, f32 turnRate) {
+void func_00260D60(CGameObjectInstance *self, AI *ai, Steer *steer, Limits *limits, f32 speed, f32 turnRate) {
     f32 v;
     f32 max;
     f32 bank;
@@ -41,15 +38,15 @@ void func_00260D60(Actor *self, AI *ai, Steer *steer, Limits *limits, f32 speed,
 
     func_00245BAC(self, ai, turnRate * 0.13962635f, steer->turn);
     if (func_0025E428(self, ai) == 1) {
-        v = func_0021160C(self->velY, steer->wantVelY, limits->accel * (speed * 8.0f));
-        self->velY = v;
+        v = func_0021160C(self->m_vVelocity.y, steer->wantVelY, limits->accel * (speed * 8.0f));
+        self->m_vVelocity.y = v;
         max = speed * 102.399994f;
         if (v > max) {
-            self->velY = max;
+            self->m_vVelocity.y = max;
         } else if (v < -max) {
-            self->velY = -max;
+            self->m_vVelocity.y = -max;
         }
-        bank = self->velY * 0.008726647f;
+        bank = self->m_vVelocity.y * 0.008726647f;
         if (bank > 0.436332345f) {
             bank = 0.436332345f;
         } else if (bank < -0.436332345f) {

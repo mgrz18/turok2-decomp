@@ -1,11 +1,8 @@
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct WarpPoint {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ f32 angle;
     /* 0x10 */ s16 level;
     /* 0x12 */ s16 room;

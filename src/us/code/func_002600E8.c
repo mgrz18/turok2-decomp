@@ -1,6 +1,5 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -9,7 +8,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x4];
     /* 0x014 */ ActorDef *def;
     /* 0x018 */ u8 pad18[0xD4 - 0x18];
@@ -29,7 +28,7 @@ typedef struct {
 
 extern s32 D_800F7078[];
 
-void func_00246690(Actor *self, s32 type, Vec3 pos, s32 arg4);
+void func_00246690(Actor *self, s32 type, CVector3 pos, s32 arg4);
 void func_004089C8(void);
 void func_00220260(void *mgr, Actor *actor, s32 flag);
 void func_0026E110(Actor *actor, s32 flags, Actor *actor2);

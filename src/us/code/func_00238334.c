@@ -1,6 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3f { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 typedef struct BlastSrc {
     /* 0x00 */ u8 pad0[0x68];
@@ -10,7 +9,7 @@ typedef struct BlastSrc {
 typedef struct BlastActor {
     /* 0x000 */ u8 kind;            /* 1: player, 2: object */
     /* 0x001 */ u8 pad1[0x3];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x54 - 0x10];
     /* 0x054 */ f32 footY;
 } BlastActor;
@@ -27,15 +26,15 @@ extern BlastOverride D_800F1CE0;
 extern BlastSrc D_800F1970;
 extern u8 D_8011AAF1;
 
-f32 func_0020F6BC(Vec3f *a, Vec3f *b);
-s32 func_0021E374(BlastActor *a, Vec3f pos, BlastSrc *out);
+f32 func_0020F6BC(CVector3 *a, CVector3 *b);
+s32 func_0021E374(BlastActor *a, CVector3 pos, BlastSrc *out);
 f32 func_002671B4(BlastActor *a);
 f32 func_002672C8(BlastActor *a);
 
 /* How much of a blast at `p` reaches `a`: its armour, then (with falloff) a linear drop over
  * the distance to the nearest point of its body, out to `reach` plus its own size. */
-f32 func_00238334(BlastActor *a, BlastActor *t, Vec3f p, f32 reach, s32 falloff, u32 flags, BlastSrc **psrc) {
-    Vec3f c;
+f32 func_00238334(BlastActor *a, BlastActor *t, CVector3 p, f32 reach, s32 falloff, u32 flags, BlastSrc **psrc) {
+    CVector3 c;
     BlastOverride *o;
     BlastSrc *sv;
     s32 armored;

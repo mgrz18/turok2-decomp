@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -10,10 +11,6 @@
  * The do { } while (0) blocks (macro bodies in the original, most likely)
  * count as loops for GCC's register priorities (refs weighted by loop
  * depth): they put anim before inView and model before view, as in the ROM. */
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
 
 typedef struct {
     u8 pad0[0x1C];
@@ -35,7 +32,7 @@ typedef struct {
 
 struct Actor {
     u8 pad0[0x4];
-    Vec3 pos;               /* 0x04 */
+    CVector3 pos;               /* 0x04 */
     Region *region;         /* 0x10 */
     u8 pad14[0x40];
     f32 height;             /* 0x54 */
@@ -78,12 +75,12 @@ f32 func_0026872C(Actor *, s32);
 void **func_0021F358(Actor *);
 s32 func_0021CDAC(Actor *, void *, s32);
 f32 func_002671B4(Actor *);
-void func_002254C0(void *, Vec3 *, void *);
+void func_002254C0(void *, CVector3 *, void *);
 
 void func_0021D39C(Actor *actor, View *view) {
     f32 offset[3];
     f32 box[6];
-    Vec3 pos;
+    CVector3 pos;
     DrawArgs args;
     s32 flags;
     void **anim;

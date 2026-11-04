@@ -1,6 +1,5 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 /* A region corner: its floor point and the ceiling height above it. */
 typedef struct {
@@ -28,7 +27,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ Region *region;
 } SweepInst;
 
@@ -53,9 +52,9 @@ typedef struct {
     /* 0x40 */ s32 hitKind;
     /* 0x44 */ s32 hitOwner;
     /* 0x48 */ s32 hitData;
-    /* 0x4C */ Vec3f move;
-    /* 0x58 */ Vec3f dir;
-    /* 0x64 */ Vec3f lastNormal;
+    /* 0x4C */ CVector3 move;
+    /* 0x58 */ CVector3 dir;
+    /* 0x64 */ CVector3 lastNormal;
     /* 0x70 */ u8 pad70[0x84 - 0x70];
     /* 0x84 */ s32 lastKind;
     /* 0x88 */ u8 pad88[0x94 - 0x88];
@@ -75,8 +74,8 @@ typedef struct {
     /* 0xB8 */ s32 floorA;
     /* 0xBC */ u8 padBC[0xC4 - 0xBC];
     /* 0xC4 */ s32 waterIndex;
-    /* 0xC8 */ Vec3f waterA;
-    /* 0xD4 */ Vec3f waterB;
+    /* 0xC8 */ CVector3 waterA;
+    /* 0xD4 */ CVector3 waterB;
 } HitTarget;
 
 extern HitTarget *D_800F1ADC;
@@ -84,17 +83,17 @@ extern u8 D_800F7078[];
 
 void func_00266C5C(void *p, s32 c, s32 n);                 /* memset */
 s32 func_0023C188(Sweep *sweep, Region *region);
-void func_0026BC54(Vec3f *normal, Region *region);        /* floor plane */
-void func_0026BFB4(Vec3f *normal, Region *region);        /* ceiling plane */
+void func_0026BC54(CVector3 *normal, Region *region);        /* floor plane */
+void func_0026BFB4(CVector3 *normal, Region *region);        /* ceiling plane */
 s32 func_0026AFC0(Region *region);
 Water *func_0022425C(u8 *scene, Region *region);
 f32 func_002671B4(SweepInst *inst);                       /* height */
-void func_0020EF2C(Vec3f *out, void *a, Vec3f *b);        /* out = a - b */
-void func_0020EF8C(Vec3f *out, f32 t, Vec3f *base, Vec3f *dir);   /* out = base + t * dir */
-Region *func_0023B664(Sweep *sweep, Region *region, s32 edge, Vec3f *point);
-s32 func_0023AB18(Sweep *sweep, Vec3f *normal, void *point, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
+void func_0020EF2C(CVector3 *out, void *a, CVector3 *b);        /* out = a - b */
+void func_0020EF8C(CVector3 *out, f32 t, CVector3 *base, CVector3 *dir);   /* out = base + t * dir */
+Region *func_0023B664(Sweep *sweep, Region *region, s32 edge, CVector3 *point);
+s32 func_0023AB18(Sweep *sweep, CVector3 *normal, void *point, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
 
-static __inline__ f32 Dot(Vec3f *a, Vec3f *b) {
+static __inline__ f32 Dot(CVector3 *a, CVector3 *b) {
     return a->x * b->x + a->y * b->y + a->z * b->z;
 }
 
@@ -102,17 +101,17 @@ static __inline__ f32 Dot(Vec3f *a, Vec3f *b) {
  * through the floor, the ceiling, the water surface or an edge, record the
  * nearest hit, or cross the edge into the next region (100 at most). */
 void func_00241010(Sweep *sweep) {
-    Vec3f edgeN;
-    Vec3f floorN;
-    Vec3f ceilN;
-    Vec3f up = { 0.0f, 1.0f, 0.0f };
-    Vec3f down = { 0.0f, -1.0f, 0.0f };
-    Vec3f surface;
-    Vec3f rel;
-    Vec3f ceilPt;
-    Vec3f at;
+    CVector3 edgeN;
+    CVector3 floorN;
+    CVector3 ceilN;
+    CVector3 up = { 0.0f, 1.0f, 0.0f };
+    CVector3 down = { 0.0f, -1.0f, 0.0f };
+    CVector3 surface;
+    CVector3 rel;
+    CVector3 ceilPt;
+    CVector3 at;
     SweepDef *def;
-    Vec3f *pos;
+    CVector3 *pos;
     Region **regionp;
     Region *next;
     Water *water;

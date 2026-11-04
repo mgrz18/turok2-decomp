@@ -1,16 +1,13 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* When the player (D_800F1CE0) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
  * away from the point (0, 0, 512) (and upward) and deals it 0x500 damage. */
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[0x18 - 0x1];
-    /* 0x018 */ Vec3f vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0xD4 - 0x24];
     /* 0x0D4 */ s32 flags;
     /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
@@ -19,7 +16,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
 } Obj;
 
 typedef struct {
@@ -38,16 +35,16 @@ typedef struct {
 } DamageEvent;
 
 extern Player *D_800F1CE0;
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b); /* out = a - b */
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b); /* out = a + b */
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
-extern void func_0020F040(Vec3f *v); /* normalise */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a + b */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+extern void func_0020F040(CVector3 *v); /* normalise */
 extern void func_00245828(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);
 extern void func_002465C8(Player *target, void *ai, DamageEvent *event);
 
 void func_0040BFF0(Obj *obj, CAI *ai) {
     DamageEvent event;
-    Vec3f dir;
+    CVector3 dir;
     Player *player = D_800F1CE0;
 
     if (player != NULL && player->kind == 1 && (player->flags & 0x300000) && ai->unk4 != 0 &&

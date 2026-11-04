@@ -69,8 +69,6 @@ typedef struct {
     /* 0x118 */ f32 speed;
 } Host;
 
-typedef struct { f32 x, y, z; } Vec3f;
-
 extern u8 D_800F7078[];
 extern EmitterDef *D_8010FF14;  /* emitter definitions */
 extern s32 D_8010FF18;          /* how many */
@@ -79,7 +77,7 @@ extern f32 D_800B6D34;
 
 RegionInfo *func_0022425C(void *world, s32 region);
 f32 func_0026BE60(s32 region, f32 x, f32 z);
-Vec3f func_00280E40(Host *host);
+CVector3 func_00280E40(Host *host);
 void func_00207914(s32 *resource, s32 id);
 void CList__Remove(CList *list, void *element);
 void CList__AddHead(CList *list, void *element);

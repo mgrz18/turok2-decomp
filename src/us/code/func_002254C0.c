@@ -1,12 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028C6B0.c, func_0028C6B0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef float f32;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct Ent8 {
     s32 **tblp;
     s32 b;
@@ -18,9 +14,9 @@ typedef struct Level {
     s32 numTbls;            /* 0x14A8 */
     Ent8 tbls[16];          /* 0x14AC */
 } Level;
-typedef struct { Vec3f a; Vec3f b; } Pair;
-void func_002228E4(Level *lv, Vec3f *a, u8 *buf, s32 *out);
-void func_00222A9C(u8 *buf, s32 n, Vec3f *a, Pair *out);
+typedef struct { CVector3 a; CVector3 b; } Pair;
+void func_002228E4(Level *lv, CVector3 *a, u8 *buf, s32 *out);
+void func_00222A9C(u8 *buf, s32 n, CVector3 *a, Pair *out);
 extern Pair D_800AB0D0;
 extern s32 D_800ACAE0;
 s32 *func_002017D4(s32 *tbl, s32 idx);
@@ -35,7 +31,7 @@ static inline s32 hasTbl(Level *lv) {
     }
     return 0;
 }
-void func_002254C0(Level *lv, Vec3f *a1, Pair *out) {
+void func_002254C0(Level *lv, CVector3 *a1, Pair *out) {
     u8 buf[0x28];
     s32 n;
     if (hasTbl(lv) == 0 || D_800ACAE0 == 0) {

@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct ActorPos {
     /* 0x00 */ s32 unk0;
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ void *region;
     /* 0x14 */ s32 unk14;
 } ActorPos; /* size 0x18 */
@@ -18,12 +15,12 @@ typedef struct HitBuffer {
 extern HitBuffer *D_800F1ADC;     /* current hit buffer */
 extern s8 D_800F1CC6[];           /* collision info D_800F1CC0 + 6 */
 
-void func_00239F00(ActorPos *actor, Vec3 pos, void *info);
+void func_00239F00(ActorPos *actor, CVector3 pos, void *info);
 
 /* Moves an actor to pos with collision, without moving it: returns where it would end up and in which region. */
-void func_002688C8(ActorPos *actor, Vec3 pos, Vec3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
+void func_002688C8(ActorPos *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
     ActorPos saved;
-    Vec3 end;
+    CVector3 end;
     HitBuffer hits;
     HitBuffer *oldHits;
     s32 oldA;

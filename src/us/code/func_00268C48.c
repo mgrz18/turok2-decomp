@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct ActorPos {
     /* 0x00 */ s32 unk0;
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ void *region;
     /* 0x14 */ s32 unk14;
 } ActorPos; /* size 0x18 */
@@ -26,16 +23,16 @@ typedef struct CollisionInfo {
 extern CollisionInfo D_800F1CC0;
 extern u8 D_80107590[];
 
-void func_00239F00(ActorPos *actor, Vec3 pos, void *info);
-Vec3 func_0020DFE0(Vec3 *in, f32 amount);
-void func_0020F040(Vec3 *v);
-void func_0020EF60(Vec3 *out, Vec3 *in, f32 scale);
-u8 *func_00227240(void *table, void *slot, s32 kind, Vec3 velocity, Vec3 pos, void *region, f32 arg);
+void func_00239F00(ActorPos *actor, CVector3 pos, void *info);
+CVector3 func_0020DFE0(CVector3 *in, f32 amount);
+void func_0020F040(CVector3 *v);
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+u8 *func_00227240(void *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos, void *region, f32 arg);
 
 /* func_002688C8's logic, inlined with the collision flags addressed directly. */
-static __inline__ void tracePos(ActorPos *actor, Vec3 pos, Vec3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
+static __inline__ void tracePos(ActorPos *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
     ActorPos saved;
-    Vec3 end;
+    CVector3 end;
     HitBuffer hits;
     HitBuffer *oldHits;
     s32 oldA;
@@ -64,11 +61,11 @@ static __inline__ void tracePos(ActorPos *actor, Vec3 pos, Vec3 *outPos, void **
 }
 
 /* Spawns a particle of the given kind where an actor would end up at pos. */
-void func_00268C48(ActorPos *actor, Vec3 pos, s32 kind, f32 arg) {
-    Vec3 up;
-    Vec3 dir;
-    Vec3 velocity;
-    Vec3 at;
+void func_00268C48(ActorPos *actor, CVector3 pos, s32 kind, f32 arg) {
+    CVector3 up;
+    CVector3 dir;
+    CVector3 velocity;
+    CVector3 at;
     void *region;
 
     tracePos(actor, pos, &at, &region, 0, 0);

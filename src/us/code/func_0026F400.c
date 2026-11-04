@@ -1,11 +1,4 @@
-typedef signed char s8;
-typedef float f32;
-
-typedef struct {
-    /* 0x0 */ f32 x;
-    /* 0x4 */ f32 y;
-    /* 0x8 */ f32 z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x0 */ f32 nx;
@@ -17,7 +10,7 @@ typedef struct {
 extern f32 D_800A8090;
 
 /* Where the segment a->b crosses the plane, as a fraction of the way. */
-f32 func_0026F400(Plane *arg0, Vec3 *arg1, Vec3 *arg2)
+f32 func_0026F400(Plane *arg0, CVector3 *arg1, CVector3 *arg2)
 {
   f32 temp_f1;
   f32 new_var;

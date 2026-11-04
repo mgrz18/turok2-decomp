@@ -1,18 +1,16 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Point3;
-typedef struct { f32 x, y, z, w; } Quat4;
+#include "structs/vector.h"
 
 /* Spawn parameters next to each other in .data. */
 typedef struct {
     /* 0x0 */ s32 arg;
-    /* 0x4 */ Point3 pos;
+    /* 0x4 */ CVector3 pos;
     /* 0x10 */ s32 b;
 } SpawnParams;
 
 typedef struct {
     u8 pad0[0x18];
-    /* 0x018 */ Point3 origin;
+    /* 0x018 */ CVector3 origin;
     u8 pad24[0x1C];
     /* 0x040 */ u32 flags;
     u8 pad44[0xB4];
@@ -25,14 +23,14 @@ typedef struct {
 
 extern u8 D_800F8928[];
 extern SpawnParams D_800F1D7C;
-extern Point3 D_800F1DB8;
-void func_0020E810(Quat4 *out, Point3 *dir);
-s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, Point3 origin,
-                  Quat4 rot, Point3 pos, s32 arg, s32 b, s32 c);
+extern CVector3 D_800F1DB8;
+void func_0020E810(CQuaternion *out, CVector3 *dir);
+s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+                  CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
 
 void func_002318D4(Actor *actor, s32 kind) {
-    Quat4 rot;
-    Point3 origin;
+    CQuaternion rot;
+    CVector3 origin;
 
     if (*actor->parentFlags & 0x10) {
         origin = D_800F1DB8;

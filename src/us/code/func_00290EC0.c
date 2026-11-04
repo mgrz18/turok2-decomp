@@ -1,8 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-typedef struct { s32 x, y, z; } V3;
-
 typedef struct { s16 type; s16 pad; s16 val; s16 pad2; s32 pad3[2]; } Msg;
 extern void func_00291034(void *, Msg *, s32);
 

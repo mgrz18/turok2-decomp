@@ -1,19 +1,10 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 /* Pick, at random, one entry of the actor's animation set (0xBA) whose action
  * is `action`: among the run of equal entries around the one found, leaving
  * out index `skip` (-1: none). */
 
-typedef struct {
-    u8 pad0[0xA4];
-    s32 unkA4;      /* 0xA4 */
-    u8 padA8[0x8];
-    s32 unkB0;      /* 0xB0 */
-    u8 padB4[0x6];
-    s16 setId;      /* 0xBA */
-    u8 padBC[0x18];
-    u32 flags;      /* 0xD4 */
-} Actor;
 
 typedef struct {
     s16 count;      /* 0x00 */
@@ -30,7 +21,7 @@ void func_0026D5DC(RandList *);
 void func_0026D5E4(RandList *, s16, s32);
 s32 func_0026D628(RandList *);
 
-s32 func_00219F74(Actor *actor, s32 action, s32 skip) {
+s32 func_00219F74(CGameObjectInstance *actor, s32 action, s32 skip) {
     RandList list;
     s32 *res;
     s32 *data;
@@ -39,13 +30,13 @@ s32 func_00219F74(Actor *actor, s32 action, s32 skip) {
     s32 i;
     s32 found;
 
-    if (actor->flags & 0x40000) {
-        res = func_0020367C(0, actor->unkA4, actor->unkB0, 0, 0, 0, (s32) D_800A5AC4, 1);
+    if (actor->m_dwFlags & 0x40000) {
+        res = func_0020367C(0, ((s32)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, (s32) D_800A5AC4, 1);
         if (res != NULL) {
             data = func_002017D4(*res, 1);
             entries = data + 2;
             count = data[1];
-            i = func_00266D24(entries, actor->setId, action);
+            i = func_00266D24(entries, actor->m_nAnims, action);
             if (i != -1) {
                 found = i;
                 while (i > 0 && entries[i - 1] == action) {

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -12,10 +13,6 @@ typedef struct {
     /* 0x1288 */ s32 unk1288;
 } Player;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ Player *owner;
-} Actor;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x110];
@@ -27,10 +24,10 @@ typedef struct {
 extern WeaponInfo *D_800AF618[];
 void func_00253DE0(Player *player, s32 id);
 void func_00253E68(Player *player);
-void func_00243414(Actor *actor, State *state, s32 mode);
+void func_00243414(CGameObjectInstance *actor, State *state, s32 mode);
 
-void func_00259878(Actor *actor, State *state) {
-    Player *player = actor->owner;
+void func_00259878(CGameObjectInstance *actor, State *state) {
+    Player *player = ((Player *)actor->m_AI.m_pParent);
 
     if (player->unk1288 == 0) {
         func_00253DE0(player, 0x464);

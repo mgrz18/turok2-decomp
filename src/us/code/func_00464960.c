@@ -1,14 +1,11 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_13.CPP, func_8044C7B8_de, with Turok 2's layouts. */
 /* Second VM module copy of func_0042BA40 (same source); its calls go to the module's own copies, named by link address. */
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct LevelRecord {
     /* 0x00 */ s32 unk0;
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x10];
     /* 0x20 */ u16 spawnId;
     /* 0x22 */ u16 defId;
@@ -24,7 +21,7 @@ typedef struct LevelNode {
 
 typedef struct LevelActor {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x4];
     /* 0x014 */ s32 *def;
     /* 0x018 */ u8 pad18[0x1A8 - 0x18];
@@ -43,7 +40,7 @@ typedef struct Handle {
 } Handle;
 
 typedef struct Placed {
-    /* 0x00 */ Vec3 pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ f32 angle;
     /* 0x10 */ s16 kind;
     /* 0x12 */ s16 id;
@@ -64,7 +61,7 @@ typedef struct World {
     /* 0x18FD0 */ s32 spawnKey;
 } World;
 
-extern Vec3 D_80119928;
+extern CVector3 D_80119928;
 extern s32 D_80119948;
 typedef struct Player {
     u8 pad0[0x1328];
@@ -77,16 +74,16 @@ extern s32 func_00200B00(Handle **handle, s32);
 extern s32 func_002242F8(World *world, s32);
 extern Handle *func_00205D7C(s32, Handle **handle, s32 size);
 extern void func_0020192C(LevelNode *node, void *data, s32);
-extern s32 func_0042C480(World *world, Vec3 *pos, s32 group, void *info);
+extern s32 func_0042C480(World *world, CVector3 *pos, s32 group, void *info);
 extern s32 func_0042C0B4(World *world, s32 group, s32 key, Placed *out, s32 max);
 extern s32 *func_00225E88(World *world, u16 id);
 extern void func_0021E6AC(LevelActor *obj, LevelRecord *rec, s32 mode, s32 index);
-extern s32 func_00220A1C(World *world, Vec3 *pos);
+extern s32 func_00220A1C(World *world, CVector3 *pos);
 extern void func_00210EF0(f32 *angle);
 extern void func_0042D980(Player *player, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00267DBC(LevelActor *obj);
 extern s32 func_00267D94(LevelActor *obj);
-extern f32 func_002465F0(LevelActor *obj, Vec3 pos);
+extern f32 func_002465F0(LevelActor *obj, CVector3 pos);
 extern void func_002057B0(s32, Handle **handle, Handle *block);
 
 /* Builds the level's actor block from its records: places every player on the spawn points found for
@@ -166,7 +163,7 @@ void func_00464960(World *world, Handle **handle) {
                     continue;
                 }
                 world->playerCount++;
-                memcpy(&D_80119928, &rec->pos, sizeof(Vec3));
+                memcpy(&D_80119928, &rec->pos, sizeof(CVector3));
                 D_80119928.y += 204.79999f;
                 D_80119948 = func_00220A1C(world, &rec->pos);
                 for (playerIndex = 0; playerIndex < D_80119878; playerIndex++) {
@@ -189,7 +186,7 @@ void func_00464960(World *world, Handle **handle) {
                             value = 0x7FFF;
                         }
                         rec->angle = value;
-                        memcpy(&rec->pos, &spawns[spawnIndex].pos, sizeof(Vec3));
+                        memcpy(&rec->pos, &spawns[spawnIndex].pos, sizeof(CVector3));
                         spawnIndex++;
                         if (spawnIndex >= nspawns) {
                             spawnIndex = 0;
