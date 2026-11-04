@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 typedef struct ActorPos {
     /* 0x00 */ s32 unk0;
@@ -8,11 +9,7 @@ typedef struct ActorPos {
     /* 0x14 */ s32 unk14;
 } ActorPos; /* size 0x18 */
 
-typedef struct HitBuffer {
-    u8 data[0xF0];
-} HitBuffer;
-
-extern HitBuffer *D_800F1ADC;     /* current hit buffer */
+extern CCollisionResults *D_800F1ADC;     /* current hit buffer */
 extern s8 D_800F1CC6[];           /* collision info D_800F1CC0 + 6 */
 
 void func_00239F00(ActorPos *actor, CVector3 pos, void *info);
@@ -21,8 +18,8 @@ void func_00239F00(ActorPos *actor, CVector3 pos, void *info);
 void func_002688C8(ActorPos *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
     ActorPos saved;
     CVector3 end;
-    HitBuffer hits;
-    HitBuffer *oldHits;
+    CCollisionResults hits;
+    CCollisionResults *oldHits;
     s32 oldA;
     s32 oldB;
     void *region;

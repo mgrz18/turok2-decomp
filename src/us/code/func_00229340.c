@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/80279208_11.CPP, func_80279B40_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 typedef f32 Mtx4f[4][4];
 
@@ -39,8 +40,8 @@ extern void func_002688C8(Particle *p, CVector3 to, CVector3 *outPos, void **out
 extern void func_0022F350(void *sys, Particle *p, void *owner, s32 ownerId, s32 target, s32 model, CVector3 dir,
                           CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
 extern CVector3 D_800F1DB8;
-extern void *D_800F1ADC;
-extern u8 D_800F1CE0[];
+extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults D_800F1CE0;
 extern u8 D_800F8928[];
 
 static __inline__ f32 offset_x(Particle *p) {
@@ -66,7 +67,7 @@ void func_00229340(Particle *p, s32 model, s32 arg2, s32 flags) {
     CVector3 point;
     CVector3 moved;
     Mtx4f matrix;
-    u8 scratch[0xF0];
+    CCollisionResults scratch;
     void *region;
     Mtx4f *parent;
 
@@ -92,14 +93,14 @@ void func_00229340(Particle *p, s32 model, s32 arg2, s32 flags) {
             carried = turned;
         }
         func_0020EEF8(&moved, &carried, &p->pos);
-        D_800F1ADC = scratch;
+        D_800F1ADC = &scratch;
         if (p->region != NULL) {
             func_002688C8(p, moved, &point, &region, 0, 0);
         } else {
             point = moved;
             region = NULL;
         }
-        D_800F1ADC = D_800F1CE0;
+        D_800F1ADC = &D_800F1CE0;
     }
     func_0022F350(D_800F8928, p, p->owner, p->ownerId, p->target, model, direction, rotation, point, region,
                   arg2, flags | (p->flags & 0x200006));
