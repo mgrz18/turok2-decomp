@@ -121,15 +121,10 @@ typedef struct {
     /* 0x294 */ f32 y;
 } View;
 
-typedef struct {
-    u8 multiplayer;
-} GameMode;
-
 extern s32 D_8011AC8C;          /* game state */
 extern u8 D_8011AAEA;           /* HUD alpha */
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
-extern GameMode D_8011AAF1;
 extern s32 D_8011ACE4;
 extern u8 D_800ADB84[];
 extern u8 D_800ADBC0[];
@@ -251,7 +246,7 @@ void func_0024C648(HudPlayer *player, View *view) {
         func_00277CF0(player->lives, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
     }
 
-    if (!D_8011AAF1.multiplayer) {
+    if (!D_8011AAD8.multiplayer) {
         value = player->keys;
         if (player->keysItem.value != value) {
             func_0027AD00(&player->keysItem, D_800ADBC0);
@@ -265,7 +260,7 @@ void func_0024C648(HudPlayer *player, View *view) {
             func_00277CF0(player->keys, x + sx * 30.0f, y + sy * 24.0f, sx, sy, 1, 0, 0);
         }
     }
-    if (D_8011AAF1.multiplayer) {
+    if (D_8011AAD8.multiplayer) {
         value = player->options->m_Kills;
         if (player->scoreItem.value != value) {
             func_0027AD00(&player->scoreItem, D_800ADC40);
@@ -744,7 +739,7 @@ void func_0024D344(Player *p) {
         enable = *(u32 *) ((u8 *) game - 0xCAC) == 0; /* D_80119E2C, the block before */
     }
     func_00275B08(enable);
-    if (D_8011AAF1.multiplayer == 0) {
+    if (D_8011AAD8.multiplayer == 0) {
         if (!(D_8011AAA0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
             if (p->unk12A4 != 0) {
                 p->unk12A4 = 0;
@@ -752,7 +747,7 @@ void func_0024D344(Player *p) {
                 p->unk12A4 = 1;
             }
         }
-        if (D_8011AAF1.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
+        if (D_8011AAD8.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
             && !(D_8011AAA0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
             WeaponInfo *info = D_800AF618[p->nextWeapon];
             s16 next = info->alternate;
@@ -763,7 +758,7 @@ void func_0024D344(Player *p) {
         }
     }
     regen = 0.0f;   /* also serves the comparisons with 0 (f2 in the ROM) */
-    if (D_8011AAF1.multiplayer != 0 && (rate = D_800ADD88[p->character]) != 0.0f) {
+    if (D_8011AAD8.multiplayer != 0 && (rate = D_800ADD88[p->character]) != 0.0f) {
         f32 health = p->health;
 
         if (health != 0.0f && p->options->m_TagMode == 0) {
@@ -821,7 +816,7 @@ void func_0024D344(Player *p) {
         model = actor->model;
         material = func_00268A2C(actor);
         func_00254640(p, actor, material);
-        if (D_8011AAF1.multiplayer == 0) {
+        if (D_8011AAD8.multiplayer == 0) {
             CVector3 *pos = &p->pos;
 
             if (model != NULL && pos != NULL && (model->flags & 0x40)) {
@@ -905,7 +900,7 @@ void func_0024D344(Player *p) {
         if (actor->aiFlags & 0x6000) {
             flag = 1;
         } else if ((u32) ((u16) p->state - 2) < 2) {
-            if ((p->input.pressed & 0x400) && D_8011AAF1.multiplayer == 0 && !(D_8011AAA0 != 0 && (p->input.held & 0x20))) {
+            if ((p->input.pressed & 0x400) && D_8011AAD8.multiplayer == 0 && !(D_8011AAA0 != 0 && (p->input.held & 0x20))) {
                 p->crouchToggle ^= 1;
             }
         } else {
@@ -1023,7 +1018,7 @@ void func_0024D344(Player *p) {
     }
     if (human) {
         sound = 102;
-        if (D_8011AAF1.multiplayer != 0) {
+        if (D_8011AAD8.multiplayer != 0) {
             if (D_8011ACE4 != 0 && p->options->m_TagMode != 0) {
                 sound = D_800ADB5C;
             } else {

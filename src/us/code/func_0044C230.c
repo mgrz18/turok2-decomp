@@ -18,6 +18,7 @@
  * module holds this file byte for byte at the same link address
  * (func_0044C230.c). */
 #include "common.h"
+#include "structs/game.h"
 #include "rw/abu_types.h"
 #include "structs/menu.h"
 
@@ -223,15 +224,6 @@ typedef struct {
     /* 0x28 */ s32 height;
 } MenuImage;
 
-/* The game state block around the multiplayer flag. */
-typedef struct {
-    /* 0x000 */ u8 pad0;
-    /* 0x001 */ u8 multiplayer; /* D_8011AAF1 */
-    /* 0x002 */ u8 pad2[0x198 - 0x2];
-    /* 0x198 */ s32 mode;       /* D_8011AC88 */
-} GameState_41363C;
-
-extern GameState_41363C D_8011AAF0;
 extern MenuStyle_41363C D_800C1BD4[];
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C2034; /* screen height */
@@ -331,8 +323,8 @@ void func_0044C63C(MenuItem_41363C *it, MenuInfo *o) {
             o->height = (E->lineHeight * D_800C2034) / 222;
             break;
         case 1:
-            if ((D_8011AAF0.mode == 13 && (it->flags & 0x40000000)) ||
-                (D_8011AAF0.multiplayer != 0 && (s32) it->flags < 0 && func_00266B80() == 0x400000)) {
+            if ((D_8011AAD8.mode == 13 && (it->flags & 0x40000000)) ||
+                (D_8011AAD8.multiplayer != 0 && (s32) it->flags < 0 && func_00266B80() == 0x400000)) {
                 o->width = 0x11C;
                 o->height = 0xDE;
             } else {
@@ -439,15 +431,6 @@ typedef struct {
     /* 0x3C */ s32 highlighted;
 } MenuWindow;
 
-/* The game state block around the multiplayer flag. */
-typedef struct {
-    /* 0x000 */ u8 pad0;
-    /* 0x001 */ u8 multiplayer; /* D_8011AAF1 */
-    /* 0x002 */ u8 pad2[0x198 - 0x2];
-    /* 0x198 */ s32 mode;       /* D_8011AC88 */
-} GameState_413F74;
-
-extern GameState_413F74 D_8011AAF0_413F74 __asm__("D_8011AAF0");
 extern MenuStyle_413F74 D_800C1BD4_413F74[] __asm__("D_800C1BD4");
 extern s32 D_800C1BD0; /* current draw mode */
 extern s32 D_801101B0[];
@@ -510,8 +493,8 @@ void func_0044CF74(MenuItem_413F74 *it, MenuBox *b, void *c, MenuWindow *w, char
     s32 r, g, bl, a, t, t2;
 
     en = 1;
-    if ((D_8011AAF0_413F74.mode == 13 && (it->flags & 0x40000000)) ||
-        (D_8011AAF0_413F74.multiplayer != 0 && (s32) it->flags < 0 && func_00266B80() == 0x400000)) {
+    if ((D_8011AAD8.mode == 13 && (it->flags & 0x40000000)) ||
+        (D_8011AAD8.multiplayer != 0 && (s32) it->flags < 0 && func_00266B80() == 0x400000)) {
         w->visible = 0;
     }
     if (it->flags & 0x08000000) {
@@ -610,17 +593,6 @@ typedef struct {
     /* 0x3C */ s32 highlighted;
 } MenuWindow_4143DC;
 
-/* The game state block around the multiplayer flag. */
-typedef struct {
-    /* 0x000 */ u8 pad0;
-    /* 0x001 */ u8 multiplayer; /* D_8011AAF1 */
-    /* 0x002 */ u8 pad2[0x198 - 0x2];
-    /* 0x198 */ s32 mode;       /* D_8011AC88 */
-    /* 0x19C */ u8 pad19C[0x1B4 - 0x19C];
-    /* 0x1B4 */ s32 paused;     /* D_8011ACA4 */
-} GameState_4143DC;
-
-extern GameState_4143DC D_8011AAF0_4143DC __asm__("D_8011AAF0");
 extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0"); /* current draw mode */
 
 extern s32 func_00266B80(void);
@@ -637,8 +609,8 @@ void func_0044D3DC(MenuItem_4143DC *item, MenuBox_4143DC *box, s32 unused, MenuW
     f32 t1;
     f32 t2;
 
-    if ((D_8011AAF0_4143DC.mode == 13 && (item->flags & 0x40000000)) ||
-        (D_8011AAF0_4143DC.multiplayer != 0 && (s32) item->flags < 0 && func_00266B80() == 0x400000)) {
+    if ((D_8011AAD8.mode == 13 && (item->flags & 0x40000000)) ||
+        (D_8011AAD8.multiplayer != 0 && (s32) item->flags < 0 && func_00266B80() == 0x400000)) {
         window->highlighted = 1;
         if (D_800C1BD0_4143DC != 3) {
             D_800C1BD0_4143DC = 3;
@@ -650,8 +622,8 @@ void func_0044D3DC(MenuItem_4143DC *item, MenuBox_4143DC *box, s32 unused, MenuW
         fx = (f32) box->x;
         fx = fx + t1;
         fy = fy + t2;
-        if (D_8011AAF0_4143DC.paused != 0) {
-            if (D_8011AAF0_4143DC.multiplayer != 0) {
+        if (D_8011AAD8.paused != 0) {
+            if (D_8011AAD8.multiplayer != 0) {
                 if ((s32) item->flags < 0) {
                     alpha = 0xFF;
                 } else {
