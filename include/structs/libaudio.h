@@ -66,7 +66,7 @@ typedef Acmd *(*ALCmdHandler)(void *, s16 *, s32, s32, Acmd *);
 typedef struct ALFilter_s {
     /* 0x00 */ struct ALFilter_s *source;
     /* 0x04 */ ALCmdHandler handler;
-    /* 0x08 */ void *setParam;
+    /* 0x08 */ s32 (*setParam)(void *, s32, void *);
     /* 0x0C */ s16 inp;
     /* 0x0E */ s16 outp;
     /* 0x10 */ s32 type;

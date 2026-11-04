@@ -5,7 +5,7 @@
 
 extern void *D_800B8930;
 extern void func_0029BE0C(u64 tim);
-extern u64 func_0029BE6C(OSTimer_s *t);
+extern u64 func_0029BE6C(OSTimer *t);
 int func_0029BA80(Node802C07B0 *node, u64 arg1, u64 arg2, void *arg3, void *arg4) {
     u64 value;
     node->field10 = arg1;

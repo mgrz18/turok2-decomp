@@ -9,7 +9,7 @@ extern float D_800A7234;
 extern float D_800A7230;
 extern f32 func_00269C3C(void *arg0, f32 arg1, f32 arg2);
 extern f32 func_0026BE60(s32, f32, f32);
-void func_0025756C(void *arg0, Vec3 *arg1) {
+void func_0025756C(void *arg0, CVector3 *arg1) {
     f32 first;
     f32 amount;
     if (arg0 != 0 && arg1 != 0 &&

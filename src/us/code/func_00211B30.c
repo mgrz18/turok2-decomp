@@ -6,8 +6,8 @@
 extern void func_00211B30(void *arg0, void *arg1, void *arg2);
 void func_00211B30(void *arg0, void *arg1, void *arg2) {
     GeometryEdge *dst = arg0;
-    Vec3 *a = arg1;
-    Vec3 *b = arg2;
+    CVector3 *a = arg1;
+    CVector3 *b = arg2;
     f32 zdiff;
     dst->start = *a;
     dst->end = *b;

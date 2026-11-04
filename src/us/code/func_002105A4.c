@@ -9,7 +9,7 @@ extern void func_002105A4(void *matrix, f32 angle);
 void func_002105A4(void *arg0, f32 arg1)
 {
     extern f32 D_800A561C[];
-  struct Mtx *m = (char *) arg0;
+  RW_Mtx *m = (char *) arg0;
   f32 sin_v;
   f32 cos_v;
   f32 zero;

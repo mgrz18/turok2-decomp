@@ -5,9 +5,17 @@
 #ifndef RW_ABU_TYPES_H
 #define RW_ABU_TYPES_H
 
-#ifndef COMMON_H
-typedef signed int s32;
-#endif
+/* The shared types come from the shared headers: libultra's (OSMesgQueue,
+ * OSPfs and the Controller Pak internals) from ultra_types.h, CVector3 (Rage
+ * Wars' Vec3) from structs/vector.h, libaudio's ALHeap, ALInstrument and Acmd
+ * from structs/libaudio.h. Gfx is gfx.h's: the files that write display lists
+ * include it. RW_Mtx is Rage Wars' float matrix with named rows (not gbi.h's
+ * fixed-point Mtx). */
+#include "common.h"
+#include "ultra_types.h"
+#include "structs/vector.h"
+#include "structs/libaudio.h"
+
 struct IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -17,15 +25,6 @@ struct IntrusiveList {
     s32 count;
 };
 typedef struct IntrusiveList IntrusiveList;
-#ifndef COMMON_H
-typedef unsigned char u8;
-#endif
-#ifndef COMMON_H
-typedef unsigned int u32;
-#endif
-#ifndef COMMON_H
-typedef signed char s8;
-#endif
 struct Access_u8_3;
 struct Access_u8_3 {
     char pad[0x3];
@@ -46,16 +45,6 @@ struct ObjRecAt12 {
     s32 unk8;
     char pad8[0x6];
     s8 unk12;
-};
-struct OSMesgQueue;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
 };
 struct Chunk;
 struct CartridgeReadWorker;
@@ -237,13 +226,6 @@ struct EntryList {
 };
 typedef struct EntryList EntryList;
 typedef struct EntryRecAt18V3 EntryRecAt18V3;
-#ifndef COMMON_H
-typedef unsigned long long u64;
-#endif
-typedef union Gfx {
-    struct { u32 w0; u32 w1; } words;
-    u64 force_structure_alignment;
-} Gfx;
 struct Node8026E4F8;
 typedef struct Node8026E4F8 Node8026E4F8;
 struct Node8026E4F8 {
@@ -262,9 +244,6 @@ struct TreeNode {
     struct TreeNode *link1c;
 };
 typedef struct TreeNode TreeNode;
-#ifndef COMMON_H
-typedef float f32;
-#endif
 struct BoxRecAtC;
 typedef struct BoxRecAtC BoxRecAtC;
 struct BoxRecAtC {
@@ -285,38 +264,31 @@ struct Vector4f {
     float z;
     float w;
 };
-struct Vec3;
-typedef struct Vec3 Vec3;
-struct Vec3 {
-    f32 x;
-    f32 y;
-    f32 z;
-};
 struct Matrix;
 typedef struct Matrix Matrix;
 struct Matrix {
     f32 m[16];
 };
-struct Mtx;
-struct Mtx {
-    Vec3 right;
+struct RW_Mtx;
+struct RW_Mtx {
+    CVector3 right;
     f32 m03;
-    Vec3 up;
+    CVector3 up;
     f32 m13;
-    Vec3 forward;
+    CVector3 forward;
     f32 m23;
     f32 m30;
     f32 m31;
     f32 m32;
     f32 m33;
 };
-typedef struct Mtx Mtx;
+typedef struct RW_Mtx RW_Mtx;
 typedef struct GeometryEdge {
-    Vec3 start;
-    Vec3 end;
-    Vec3 direction;
-    Vec3 unitDirection;
-    Vec3 normal;
+    CVector3 start;
+    CVector3 end;
+    CVector3 direction;
+    CVector3 unitDirection;
+    CVector3 normal;
 } GeometryEdge;
 struct ObjRecAt2CV1;
 struct ObjRecAt2CV1 {
@@ -338,8 +310,8 @@ struct ObjectRecAtBC;
 struct ObjectRecAtBC {
     f32 falloff;
     f32 value;
-    Vec3 direction;
-    Vec3 axis;
+    CVector3 direction;
+    CVector3 axis;
     char pad20[0xB8-0x20];
     u8 flagB8;
     u8 flagB9;
@@ -348,9 +320,6 @@ struct ObjectRecAtBC {
     u8 animationSeed;
 };
 typedef struct ObjectRecAtBC ObjectRecAtBC;
-#ifndef COMMON_H
-typedef double f64;
-#endif
 struct Output8025EF54;
 typedef struct Output8025EF54 Output8025EF54;
 struct Output8025EF54 {
@@ -397,9 +366,6 @@ struct Segment8025FFD0 {
     s32 unk28;
     s32 unk2C;
 };
-#ifndef COMMON_H
-typedef signed short s16;
-#endif
 struct Triple;
 struct Triple {
     s32 x;
@@ -440,7 +406,7 @@ struct ObjectLinks24_2 {
 };
 struct ObjectState14;
 struct ObjectState14 {
-    Vec3 position;
+    CVector3 position;
     s16 unk_C;
     char padC[0xE - 0xC - sizeof(s16)];
     s16 unk_E;
@@ -499,9 +465,6 @@ struct Stream {
     u32 unk24;
     s32 unk28;
 };
-#ifndef COMMON_H
-typedef unsigned short u16;
-#endif
 typedef struct AnimRef {
                char pad0[4];
                u16 id;
@@ -568,10 +531,10 @@ struct SceneEffect {
     char pad1[3];
     s16 model;
     char pad6[2];
-    Vec3 position;
+    CVector3 position;
     s32 owner;
     struct CIntelligence *definition;   /* structs/intelligence.h */
-    Vec3 rotation;
+    CVector3 rotation;
     char pad28[0x28];
     s32 resource;
     s32 animation;
@@ -708,7 +671,7 @@ typedef struct Shared_World {
     s32 previewTimer;
     s32 previewStart;
     u8 unknown1B450[0x1C4];
-    Vec3 offset;
+    CVector3 offset;
     struct Shared_Pickup *objects[16];
     s32 count;
     struct Actor_func_8028E284_de *specialActors[16];
@@ -755,7 +718,7 @@ union func_8020E674_S1_U8;
 typedef union func_8020E674_S1_U8 func_8020E674_S1_U8;
 union func_8020E674_S1_U8 {
     f32 v0;
-    Vec3 v1;
+    CVector3 v1;
 };
 union func_8022E280_S1_U744;
 typedef union func_8022E280_S1_U744 func_8022E280_S1_U744;
@@ -782,8 +745,8 @@ typedef struct ObjectLinks54 ObjectLinks54;
 struct ObjectStateB0;
 struct ObjectStateB0 {
     char pad0[0x10];
-    Vec3 unk_10;
-    char pad10[0xAC - 0x10 - sizeof(Vec3)];
+    CVector3 unk_10;
+    char pad10[0xAC - 0x10 - sizeof(CVector3)];
     f32 unk_AC;
 };
 struct ObjectLinksB4;
@@ -849,7 +812,7 @@ struct Node438C {
     u8 pad0[4];
     struct Node438C *next;
     u8 pad8[8];
-    Vec3 position;
+    CVector3 position;
     f32 a;
     f32 b;
     f32 c;
@@ -1018,7 +981,7 @@ struct ResourceManagerState {
     s32 count;
 };
 typedef struct ResourceManagerState ResourceManagerState;
-typedef void ( *func_80267198_de_Callback)(void *, void *, signed int, Vec3, struct ResourceManagerState);
+typedef void ( *func_80267198_de_Callback)(void *, void *, signed int, CVector3, struct ResourceManagerState);
 struct CallbackEntryRecAt4V1;
 struct CallbackEntryRecAt4V1 {
     func_80267198_de_Callback callback;
@@ -1173,7 +1136,7 @@ struct GameplayCamera {
     char padFC[0x28];
     u16 unk124;
     char pad126[0x2];
-    Vec3 position;
+    CVector3 position;
     char pad134[0x4];
     f32 unk138;
     char pad13C[4];
@@ -1188,15 +1151,15 @@ struct GameplayCamera {
     char pad1E1[0x3F];
     f32 unk220;
     char pad224[0x3C];
-    Vec3 corners[5];
+    CVector3 corners[5];
     f32 unk29C;
     f32 unk2A0;
     f32 unk2A4;
     f32 unk2A8;
     char pad2AC[0x44];
     Vector4f clipPlanes[6];
-    Vec3 clipBounds[2];
-    Vec3 volumeBounds[2];
+    CVector3 clipBounds[2];
+    CVector3 volumeBounds[2];
     char unk380[2][64];
     Lights lights[2];
     u16 unk440;
@@ -1334,9 +1297,9 @@ struct Node75;
 typedef struct Node75 Node75;
 struct Node75 {
     s32 pad0;
-    Vec3 *prev;
-    Vec3 *cur;
-    Vec3 *next;
+    CVector3 *prev;
+    CVector3 *cur;
+    CVector3 *next;
 };
 struct TripleRecAt8;
 typedef struct TripleRecAt8 TripleRecAt8;
@@ -1373,7 +1336,7 @@ struct Triangle;
 struct Triangle {
     char pad0[2];
     u16 flags;
-    Vec3 *vertices[3];
+    CVector3 *vertices[3];
 };
 typedef struct Triangle Triangle;
 struct Shape_typemap_3;
@@ -1443,7 +1406,7 @@ struct NodeCode8028469C {
     struct NodeCode8028469C *previous;
     struct NodeCode8028469C *next;
     Clip *key;
-    Vec3 position;
+    CVector3 position;
     f32 value0;
     f32 value1;
     u32 amplitudeHandle;
@@ -1462,7 +1425,7 @@ struct PoolRecAt28V1 {
 typedef struct PoolRecAt28V1 PoolRecAt28V1;
 struct PlaneEquation;
 struct PlaneEquation {
-    Vec3 normal;
+    CVector3 normal;
     f32 distance;
 };
 typedef struct PlaneEquation PlaneEquation;
@@ -1859,7 +1822,7 @@ struct SoundSourceNode {
     struct SoundSourceNode *next;
     s32 value;
     s32 state;
-    Vec3 position;
+    CVector3 position;
     void *owner;
 };
 typedef struct SoundSourceNode SoundSourceNode;
@@ -1928,7 +1891,7 @@ struct NodeRecAt4C {
     s16 priority;
     char pad42[6];
     s32 owner;
-    Vec3 position;
+    CVector3 position;
 };
 struct Link_func_80259784_de {
     struct NodeRecAt4C *prev;
@@ -2083,7 +2046,7 @@ typedef struct Effect33920 Effect33920;
 struct Effect33920 {
     s32 unk00;
     Effect33920 *next;
-    Vec3 origin;
+    CVector3 origin;
     f32 radius;
     AxisWave x;
     AxisWave y;
@@ -2181,7 +2144,7 @@ struct Shared_MenuContext {
     Shared_ContextCallback callbackE4;
     Shared_MenuVoidCallback callbackE8;
     u32 unknownEC;
-    Vec3 position;
+    CVector3 position;
     f32 yaw;
     f32 response;
     u32 unknown104[5];
@@ -2201,7 +2164,7 @@ struct func_802457D0_S1 {
 typedef void (*FuncPtr)(void);
 typedef struct SharedTrackObjectPrefix {
     u32 unknown0[2];
-    Vec3 position;
+    CVector3 position;
     u8 unknown14[0x3C];
 } SharedTrackObjectPrefix;
 typedef struct SharedTrackObject {
@@ -2278,9 +2241,6 @@ struct Obj80264124 {
     char object[1];
 };
 typedef struct Obj80264124 Obj80264124;
-#ifndef COMMON_H
-typedef signed long long s64;
-#endif
 struct OSSched;
 struct View_func_8028FA60_de;
 typedef struct View_func_8028FA60_de View_func_8028FA60_de;
@@ -2302,7 +2262,7 @@ struct OSScClientWork {
 };
 struct View_func_8028FA60_de {
     char pad0[0x78];
-    struct OSMesgQueue messages;
+    OSMesgQueue messages;
     char pad90[0x2F4 - 0x90];
     struct Scene_func_8028FA60_de *current;
     struct Scene_func_8028FA60_de *next;
@@ -2706,8 +2666,6 @@ struct ALKeyMap {
     s8 detune;
 };
 struct ALVoiceState;
-struct ALInstrument;
-typedef struct ALInstrument ALInstrument;
 struct ALSound_s;
 typedef struct ALSound_s ALSound_s;
 typedef struct ALKeyMap ALKeyMap;
@@ -2727,23 +2685,6 @@ struct ALSound_s {
     u8 samplePan;
     u8 sampleVolume;
     u8 flags;
-};
-struct ALInstrument {
-    u8 volume;
-    u8 pan;
-    u8 priority;
-    u8 flags;
-    u8 tremType;
-    u8 tremRate;
-    u8 tremDepth;
-    u8 tremDelay;
-    u8 vibType;
-    u8 vibRate;
-    u8 vibDepth;
-    u8 vibDelay;
-    s16 bendRange;
-    s16 soundCount;
-    ALSound_s *soundArray[1];
 };
 struct ALChanState10;
 struct ALChanState10 {
@@ -2985,14 +2926,6 @@ struct ALPlayer_s14 {
     s32 samplesLeft;
 };
 typedef struct ALPlayer_s14 ALPlayer_s14;
-struct ALHeap;
-typedef struct ALHeap ALHeap;
-struct ALHeap {
-    u8 *base;
-    u8 *cur;
-    s32 len;
-    s32 count;
-};
 struct ALSynth_func_802B2650_de;
 struct ALSynth_func_802B2650_de {
     ALPlayer_s14 *head;
@@ -3268,11 +3201,6 @@ typedef struct {
     unsigned int w0;
     unsigned int w1;
 } Awords;
-typedef union {
-    Awords words;
-    long long int force_union_align;
-} Acmd;
-typedef Acmd *(*ALCmdHandler)(void *, short *, int, int, Acmd *);
 struct ALFilter_sC;
 struct ALFilter_sC {
     struct ALFilter_sC *source;
@@ -3440,16 +3368,6 @@ struct LogTab {
 };
 struct ALParam_s;
 typedef struct ALParam_s ALParam_s;
-struct ALFilter_s;
-typedef struct ALFilter_s ALFilter_s;
-struct ALFilter_s {
-    struct ALFilter_s *source;
-    void *handler;
-    s32 (*setParam)(void *, s32, void *);
-    s16 inp;
-    s16 outp;
-    s32 type;
-};
 struct ALParam_s {
     struct ALParam_s *next;
     s32 delta;
@@ -3462,7 +3380,7 @@ struct ALParam_s {
 };
 struct ALEnvMixer;
 struct ALEnvMixer {
-    ALFilter_s filter;
+    ALFilter filter;
     void *state;
     s16 pan;
     s16 volume;
@@ -3481,7 +3399,7 @@ struct ALEnvMixer {
     s32 first;
     struct ALParam_s *ctrlList;
     struct ALParam_s *ctrlTail;
-    struct ALFilter_s **sources;
+    ALFilter **sources;
     s32 motion;
 };
 typedef struct ALEnvMixer ALEnvMixer;
@@ -3683,60 +3601,6 @@ struct State_func_802BA700_de {
     Awords *inner;
     u32 flags;
 };
-struct OSThread_s;
-typedef struct OSThread_s OSThread_s;
-struct OSThreadContext;
-typedef struct OSThreadContext OSThreadContext;
-struct OSThreadContext {
-    u64 at;
-    u64 v0;
-    u64 v1;
-    u64 a0;
-    u64 a1;
-    u64 a2;
-    u64 a3;
-    u64 t0;
-    u64 t1;
-    u64 t2;
-    u64 t3;
-    u64 t4;
-    u64 t5;
-    u64 t6;
-    u64 t7;
-    u64 s0;
-    u64 s1;
-    u64 s2;
-    u64 s3;
-    u64 s4;
-    u64 s5;
-    u64 s6;
-    u64 s7;
-    u64 t8;
-    u64 t9;
-    u64 gp;
-    u64 sp;
-    u64 s8;
-    u64 ra;
-    u64 lo;
-    u64 hi;
-    u32 sr;
-    u32 pc;
-    u32 cause;
-    u32 badvaddr;
-    u32 rcp;
-    u32 fpcsr;
-};
-struct OSThread_s {
-    struct OSThread_s *next;
-    s32 priority;
-    struct OSThread_s **queue;
-    struct OSThread_s *tlnext;
-    u16 state;
-    u16 flags;
-    s32 id;
-    int fp;
-    OSThreadContext context;
-};
 struct Quad_func_802A1BE0_de;
 typedef struct Quad_func_802A1BE0_de Quad_func_802A1BE0_de;
 struct Quad_func_802A1BE0_de {
@@ -3745,18 +3609,8 @@ struct Quad_func_802A1BE0_de {
     u32 z;
     u32 w;
 };
-struct OSTimer_s;
-typedef struct OSTimer_s OSTimer_s;
 struct Opaque_OSMesgQueue;
 typedef struct Opaque_OSMesgQueue Opaque_OSMesgQueue;
-struct OSTimer_s {
-    struct OSTimer_s *next;
-    struct OSTimer_s *prev;
-    u64 interval;
-    u64 value;
-    Opaque_OSMesgQueue *mq;
-    void * msg;
-};
 struct Node802C07B0;
 typedef struct Node802C07B0 Node802C07B0;
 struct Node802C07B0 {
@@ -4313,49 +4167,6 @@ struct RecordRecAt4V2 {
     s32 header;
     struct Entry_func_804053E0_de entries[16];
 };
-struct OSPfs;
-struct OSPfs {
-    int status;
-    struct OSMesgQueue *queue;
-    int channel;
-    u8 id[32];
-    u8 label[32];
-    int version;
-    int dir_size;
-    int inode_table;
-    int minode_table;
-    int dir_table;
-    int inode_start_page;
-    u8 banks;
-    u8 activebank;
-};
-typedef struct OSPfs OSPfs;
-struct __OSInode;
-typedef struct __OSInode __OSInode;
-union __OSInodeUnit;
-union __OSInodeUnit {
-    struct {
-        u8 bank;
-        u8 page;
-    } inode_t;
-    u16 ipage;
-};
-typedef union __OSInodeUnit __OSInodeUnit;
-struct __OSInode {
-    __OSInodeUnit inode_page[128];
-};
-struct __OSDir;
-typedef struct __OSDir __OSDir;
-struct __OSDir {
-    u32 game_code;
-    u16 company_code;
-    __OSInodeUnit start_page;
-    u8 status;
-    s8 reserved;
-    u16 data_sum;
-    u8 ext_name[4];
-    u8 game_name[16];
-};
 struct NoteState;
 struct NoteState {
     u32 file_size;
@@ -4376,13 +4187,6 @@ struct __OSContRequesFormatShort {
     u8 typel;
     u8 status;
 };
-struct __OSInodeCache;
-struct __OSInodeCache {
-    __OSInode inode;
-    u8 bank;
-    u8 map[256];
-};
-typedef struct __OSInodeCache __OSInodeCache;
 struct GroupCode8044E2B8;
 typedef struct GroupCode8044E2B8 GroupCode8044E2B8;
 struct Piece;

@@ -10,11 +10,11 @@ extern void func_0020F040(f32 *);
 extern s32 func_002123D4(ObjectRecAtBC *arg0, f32 arg1, f32 arg2, f32 arg3,
                         f32 *arg4, f32 *arg5);
 extern void func_0020EF60(void *, void *, f32);
-s32 func_00212680(ObjectRecAtBC *arg0, Vec3 arg1, Vec3 arg4, Matrix *arg7,
-                  Vec3 *arg8, f32 *arg9) {
-    Vec3 second;
-    Vec3 first;
-    Vec3 normal;
+s32 func_00212680(ObjectRecAtBC *arg0, CVector3 arg1, CVector3 arg4, Matrix *arg7,
+                  CVector3 *arg8, f32 *arg9) {
+    CVector3 second;
+    CVector3 first;
+    CVector3 normal;
     f32 amount;
     f32 dot;
     f32 value;

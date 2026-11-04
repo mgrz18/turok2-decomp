@@ -7,8 +7,8 @@ extern f32 func_0021153C(f32 arg0);
 extern f32 func_00298470(f32);
 f32 func_0026C240(void *arg0, s32 arg1) {
     Triangle *polygon = arg0;
-    Vec3 *v0;
-    Vec3 *v1;
+    CVector3 *v0;
+    CVector3 *v1;
     f32 dx, dz;
     f32 mag;
     f32 result;

@@ -7,10 +7,10 @@ extern float D_800A60B0;
 extern float D_800A60B4;
 extern void func_0020F040(f32 *);
 extern void func_0020EF60(void *, void *, f32);
-extern void func_0020EEF8(Vec3 *, Vec3 *, Vec3 *);
+extern void func_0020EEF8(CVector3 *, CVector3 *, CVector3 *);
 void func_00228910(RangeNode **arg0, u32 arg1, u32 arg2, u32 arg3,
-                   Vec3 *arg4, f32 *arg5) {
-    Vec3 delta;
+                   CVector3 *arg4, f32 *arg5) {
+    CVector3 delta;
     f32 temp_f0;
     f32 temp_f1;
     f32 temp_f20;

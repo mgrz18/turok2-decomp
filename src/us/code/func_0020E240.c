@@ -11,10 +11,10 @@ extern s32 func_002113A4(void);
 extern f32 func_00298470(f32);
 extern s32 func_002113A4(void);
 extern f32 func_00298470(f32);
-Vec3 func_0020E240(Vec3 *in, f32 amount) {
-    Vec3 random;
-    Vec3 result;
-    Vec3 *randomPtr;
+CVector3 func_0020E240(CVector3 *in, f32 amount) {
+    CVector3 random;
+    CVector3 result;
+    CVector3 *randomPtr;
     f32 randomMagnitude;
     f32 randomScale;
     f32 inputMagnitude;

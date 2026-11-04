@@ -8,10 +8,10 @@ extern void *func_00235FF4(void *arg0, s32 arg1);
 extern void func_002101A0(char *object, f32 *output);
 extern void func_002101BC(void *arg0, f32 *arg1);
 extern void func_0020D274(void *arg0, f32 *arg1);
-extern void func_0020EF2C(Vec3 *arg0, Vec3 *arg1, Vec3 *arg2);
+extern void func_0020EF2C(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2);
 extern f32 func_00298470(f32);
 void *func_002333C0(void *arg0, void *arg1, void *arg2) {
-    Vec3 sp10;
+    CVector3 sp10;
     f32 temp_f0;
     f32 temp_f0_2;
     f32 var_f1;

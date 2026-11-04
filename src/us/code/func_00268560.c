@@ -6,8 +6,8 @@
 extern void func_002688C8(void *arg0, TripleRecAt8 t, void *arg4, s32 *arg5, s32 arg6, s32 arg7);
 extern f32 func_0026BE60(struct Node75 *node, f32 x, f32 z);
 void func_00268560(void *arg0, void *arg1, void *arg2) {
-    Vec3 *source = arg1;
-    Vec3 *output = arg2;
+    CVector3 *source = arg1;
+    CVector3 *output = arg2;
     TripleRecAt8 t;
     s32 sp30;
     t.a = source->x;

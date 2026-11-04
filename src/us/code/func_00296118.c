@@ -5,7 +5,7 @@
 
 s32 func_00296118(void *filter, s32 paramID, void *param)
 {
-    ALFilter_s *f = (ALFilter_s *)filter;
+    ALFilter *f = (ALFilter *)filter;
     ALEnvMixer *e = (ALEnvMixer *)filter;
     switch (paramID) {
       case (3):
@@ -29,7 +29,7 @@ s32 func_00296118(void *filter, s32 paramID, void *param)
               (*f->source->setParam)(f->source, 9, param);
           break;
       case (1):
-          f->source = (ALFilter_s *)param;
+          f->source = (ALFilter *)param;
           break;
       default:
           if (f->source)

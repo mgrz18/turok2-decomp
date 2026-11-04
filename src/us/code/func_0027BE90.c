@@ -6,14 +6,14 @@
 extern f32 func_002119FC(f32 arg0, f32 arg1);
 extern float func_002982F0(float x);
 extern float D_800A97E0;
-extern void func_0027BE90(Effect33920 *arg0, Vec3 position, Vec3 *out);
+extern void func_0027BE90(Effect33920 *arg0, CVector3 position, CVector3 *out);
 extern float D_800A97E8;
 extern float D_800A97E4;
 extern float D_800A97EC;
 extern f32 func_00266F50(f32 arg0);
-extern void func_0020EF2C(Vec3 *, Vec3 *, Vec3 *);
+extern void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
 extern f32 func_00298470(f32);
-void func_0027BE90(Effect33920 *arg0, Vec3 position, Vec3 *out) {
+void func_0027BE90(Effect33920 *arg0, CVector3 position, CVector3 *out) {
     f32 distance;
     f32 value;
     AxisWave *wave;

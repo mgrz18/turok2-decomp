@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern OSThread_s *D_800B8918;
-extern OSThread_s *D_800B8920;
+extern OSThread *D_800B8918;
+extern OSThread *D_800B8920;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
-extern void __osDequeueThread(OSThread_s **queue, OSThread_s *t);
-extern void __osEnqueueThread(OSThread_s **queue, OSThread_s *t);
-extern void __osEnqueueAndYield(OSThread_s **queue);
-void func_0029B9B0(OSThread_s *t, s32 pri)
+extern void __osDequeueThread(OSThread **queue, OSThread *t);
+extern void __osEnqueueThread(OSThread **queue, OSThread *t);
+extern void __osEnqueueAndYield(OSThread **queue);
+void func_0029B9B0(OSThread *t, s32 pri)
 {
     register u32 saveMask;
-    OSThread_s **runQueue;
+    OSThread **runQueue;
     saveMask = __osDisableInt();
     if (t == 0) {
         t = D_800B8920;

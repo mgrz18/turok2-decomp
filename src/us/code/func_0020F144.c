@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void *func_0020F144(Vec3 *arg0, Vec3 *arg1, Vec3 *arg2, f32 arg3);
-void *func_0020F144(Vec3 *arg0, Vec3 *arg1, Vec3 *arg2, f32 arg3) {
-    Vec3 tmp;
+extern void *func_0020F144(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2, f32 arg3);
+void *func_0020F144(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2, f32 arg3) {
+    CVector3 tmp;
     f32 temp_f2;
     f32 temp_f3;
     f32 temp_f4;

@@ -8,12 +8,12 @@ extern int D_800F2000;
 extern int D_800B2600;
 extern int D_800F2000;
 extern int D_800B2600;
-extern void func_0020EFDC(Vec3 *, Vec3 *, Vec3 *);
+extern void func_0020EFDC(CVector3 *, CVector3 *, CVector3 *);
 f32 func_00269C3C(Node75 *node, f32 x, f32 z) {
-    Vec3 normal;
-    Vec3 point;
-    Vec3 a;
-    Vec3 b;
+    CVector3 normal;
+    CVector3 point;
+    CVector3 a;
+    CVector3 b;
     char *p;
     char *q;
     if (node == 0) {
@@ -38,9 +38,9 @@ f32 func_00269C3C(Node75 *node, f32 x, f32 z) {
         p = node->next;
         q = node->cur;
         b.z = ((CollisionBuildVertex *)p)->z - ((CollisionBuildVertex *)q)->z;
-        func_0020EFDC((Vec3 *)&D_800F2000, &b, &a);
+        func_0020EFDC((CVector3 *)&D_800F2000, &b, &a);
     }
-    normal = *(Vec3 *)&D_800F2000;
+    normal = *(CVector3 *)&D_800F2000;
     D_800B2600 = (int)node;
     if (normal.y == 0.0f) {
         return (((CollisionBuildVertex *)node->prev)->ceiling +
