@@ -3940,25 +3940,12 @@ typedef struct Shared_PakMenu {
 } Shared_PakMenu;
 struct MenuRecAt24;
 typedef struct MenuRecAt24 MenuRecAt24;
-struct Messages;
-struct Messages {
-    char pad0[0x554];
-    char text[1];
-};
-struct PlayerRecAt5EC;
-struct PlayerRecAt5EC {
-    char pad0[0x5DC];
-    struct Messages *messages;
-    char pad5E0[0xC];
-    s32 menu;
-};
 struct MenuRecAt24 {
     char pad0[0x1C];
-    struct PlayerRecAt5EC *player;
+    struct CPlayer *player;   /* structs/player.h */
     PakMenuSlot *slot;
     char *prompt;
 };
-typedef struct PlayerRecAt5EC PlayerRecAt5EC;
 struct PakNotesMenuItem;
 typedef struct PakNotesMenuItem PakNotesMenuItem;
 struct RecordRecAt24;
