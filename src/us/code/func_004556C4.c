@@ -1,24 +1,18 @@
+/* The same code as func_0041C764 (the other module). */
 #include "common.h"
+#include "structs/player.h"
+#include "structs/menu.h"
 
-extern s32 D_8011AB18;
-
-s32 func_004556C4(s32 arg0, void *arg1)
-{
-  s32 *var_v1;
-  void *temp_v0;
-  temp_v0 = *((void **) (((s8 *) arg1) + 0x1C));
-  var_v1 = &D_8011AB18;
-  if (temp_v0 != 0)
-  {
-    var_v1 = *((s32 **) (((s8 *) temp_v0) + 0x518));
-  }
-  if (*((u8 *) (((s8 *) var_v1) + 0x31)) == 1)
-  {
-    *((u8 *) (((s8 *) var_v1) + 0x31)) = 0;
-  }
-  else
-  {
-    *((u8 *) (((s8 *) var_v1) + 0x31)) = 1;
-  }
-  return 0;
+extern CPlayerOptions D_8011AB18;
+s32 func_004556C4(void *unused, Menu *menu) {
+    CPlayerOptions *settings = &D_8011AB18;
+    if (menu->player != 0) {
+        settings = menu->player->m_pOptions;
+    }
+    if (settings->m_WeaponSelect == 1) {
+        settings->m_WeaponSelect = 0;
+    } else {
+        settings->m_WeaponSelect = 1;
+    }
+    return 0;
 }

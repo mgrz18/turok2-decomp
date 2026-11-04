@@ -38,7 +38,7 @@ void func_0024BD18(WeaponMenu *menu, CPlayer *player, u32 *input) {
         return;
     }
     do {
-        menu->stickMode = player->m_pOptions->m_ControlStyle == 1;
+        menu->stickMode = player->m_pOptions->m_WeaponSelect == 1;
     } while (0);
     if (D_80119E2C != 0 && menu->state != 0) {
         func_002551A0(menu);

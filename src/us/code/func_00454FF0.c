@@ -19,6 +19,6 @@ s32 func_00454FF0(s32 arg0, Menu *arg1) {
             var_s0 = temp_v0_2;
         }
     }
-    var_s0->unk_0x2D = func_0041648C((s32) arg1, var_s0->unk_0x2D, 1, 0, 1, 1);
+    var_s0->m_bLookSpring = func_0041648C((s32) arg1, var_s0->m_bLookSpring, 1, 0, 1, 1);
     return 0;
 }

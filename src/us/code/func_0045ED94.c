@@ -1,23 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_8040458C_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/pak.h"
 
-/* One note of the cached Controller Pak directory (an OSPfsState). */
-typedef struct PakNote {
-    /* 0x00 */ u32 file_size;
-    /* 0x04 */ u32 game_code;
-    /* 0x08 */ u16 company_code;
-    /* 0x0A */ u8 ext_name[4];
-    /* 0x0E */ u8 game_name[16];
-    /* 0x1E */ u8 pad1E[2];
-} PakNote;
-
-typedef struct PakDirectory {
-    /* 0x000 */ s32 free;
-    /* 0x004 */ PakNote notes[16];
-} PakDirectory; /* 0x204 */
-
-extern s32 D_80130C60[];      /* pak state per channel */
-extern PakDirectory *D_800C2224;
 extern u8 D_800C222C[];       /* pak font code -> character */
 
 extern void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */

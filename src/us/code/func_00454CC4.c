@@ -6,15 +6,8 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/controller.h"
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "structs/list.h"
+
 extern int func_00285628(ControllerProfile *object);
 extern int func_00285670(ControllerProfile *object);
 struct Clip;
@@ -39,8 +32,8 @@ struct NodeCode8028469C {
     struct NodeCode8028469C **owner;
 };
 struct PoolRecAt28V1 {
-    IntrusiveList free;
-    IntrusiveList active;
+    CList free;
+    CList active;
     s32 baseLevel;
 };
 struct NodeCode8028469C;

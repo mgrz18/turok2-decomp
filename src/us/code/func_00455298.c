@@ -2,11 +2,6 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-typedef struct MenuPlayer {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ CPlayerOptions *options;
-} MenuPlayer;
-
 s32 func_004160F0(MenuItem *item); /* length of the item's text line */
 s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
 

@@ -119,6 +119,33 @@ holds are listed in docs/MATCHING.md, "Shared headers".
   menu) and the CPlayer views named Menu (func_004214C4, func_00451040,
   func_0045AEA8).
 
+- **Controller Pak, player options leftovers, lists and the cache** (second
+  pass). `structs/pak.h`: PakDirectory (D_800C2224; its notes are libultra's
+  OSPfsState, now in ultra_types.h), RumblePak (D_80130AA0), PakProfile (the
+  "T2 MULTI" note D_80130968: counts, character, name, checksum), PakQuery;
+  D_80130C80 is `OSPfs[4]`. The PfsPak/PfsHandle/Device, PakNote/PfsNote/
+  NoteState, PakDirectory/PakCache/Bank/Block/SlotBank/O01PadTab, PakRecord/
+  O01Rumble, O01Save/O01SaveSrc/K7Blk and PakInfo copies are gone; the pak menu
+  callbacks (Shared_PakMenu, O01Own*, PlayerRecAt1C, ActorRecAt1C, O06A...)
+  use Menu/MenuItem/MenuController/CPlayer. CPlayerOptions now names
+  0x2B-0x2E and 0x31 from their menu strings (m_ControlType, m_ControlSide,
+  m_bLookSpring, m_bAutoAim, m_WeaponSelect, was m_ControlStyle); the local
+  PlayerOptions, MenuOptions/MenuData, SetupSlot (the options ones),
+  PlayerSettings, O06B/O06C, O01Options, Settings and Part views use it.
+  `structs/list.h`: CList on its own (camera.h includes it), replacing 28
+  local IntrusiveList copies. `structs/cache.h`: CMemEntry/CCacheEntry with
+  Turok 3's names (CacheEntry, CRequest, Request, CachedResource,
+  ResourceLoadRequest, Resource, the RW node views). Left: the files that
+  include `rw/abu_types.h` or `rw/junk_types.h` (their own OSPfs,
+  IntrusiveList, ResourceLoadRequest, CacheEntry: func_002007D0..func_00200A9C,
+  func_00203330, func_002034F4, func_00205A2C, func_00206250, func_00206658,
+  func_0026FFA0, func_004258E8, func_0045E808, func_0041EC44, func_004219E0,
+  func_004263DC, func_004267A0, func_00426814, func_004268D0, func_00426A20,
+  func_004524C0, func_0045F6C0); func_0041CDBC's CPlayer view (rw/abu_protos.h
+  has a Mtx that clashes with structs/player.h); the GameSettings view
+  GameSetup of func_0041BA50/func_004549B0 (it names bytes game.h keeps in
+  arrays); D_800C2224 typed `s32` in func_004263DC.
+
 The rw/ headers no longer carry their own copies of shared types (second
 pass): ultralib_types.h, junk_types.h and abu_types.h include common.h,
 ultra_types.h, structs/vector.h and structs/libaudio.h (new: the libaudio
@@ -207,9 +234,11 @@ views were replaced in about 230 files. Still local, and why:
 - **WeaponDef** / WeaponInfo (`D_800AF618`, 44 files): the weapon table.
 - **Command** / PhaseFuncs (`D_0043232C`, `D_0043240C`), Timer, Manager: the
   VM's script commands and timers.
-- **PfsPak** / PakDirectory / PakNote (`D_80130C80`, `D_800C2224`): the
-  Controller Pak menus (ultra_types.h has the libultra side).
-- The player-options leftovers and the rw/ header copies (above).
+- The rw/ header copies (above).
+- NodePool (func_00294B58/func_00294B84) is libaudio's ALSynth (alGlobals'
+  drvr, D_800B7760): the free list at 0x2C is its paramList, so these are
+  __allocParam/__freeParam; the AL* views of the libaudio files are not in a
+  header yet.
 
 ## Globals declared under several local types
 

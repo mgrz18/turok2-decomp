@@ -5,15 +5,8 @@
 
 #include "common.h"
 #include "ultra_types.h"
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "structs/list.h"
+
 struct Shared_Quad;
 struct Shared_Quad {
     union { s32 w[4]; f32 f[4]; };
@@ -596,7 +589,7 @@ struct GameplayCamera {
     u8 pad56C[4];
     s8 unk570;
     char pad571[0xE40 - 0x571];
-    IntrusiveList objects;
+    CList objects;
     f32 unkE54;
     char padE58[0x3C];
     s8 unkE94;

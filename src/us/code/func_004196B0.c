@@ -9,15 +9,8 @@
 #include "ultra_types.h"
 #include "gfx.h"
 #include "structs/controller.h"
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "structs/list.h"
+
 struct LevelActor;
 struct Shared_World;
 struct GameSession;
@@ -41,11 +34,6 @@ struct StridedTable {
     s32 count;
     char data[1];
 };
-struct Part;
-struct Part {
-    char pad[0x28];
-    u8 active;
-};
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 struct ObjRecAt20V2;
@@ -60,7 +48,7 @@ struct ObjRecAt20V2;
 /* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
 extern void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu);
 extern void func_00275A74();
-extern struct Part D_8011AB18;
+extern CPlayerOptions D_8011AB18;
 struct OSTask_t;
 struct OSTask_t {
     u32 type;
@@ -323,12 +311,11 @@ struct ObjectPool {
     void *allocation;
     char *objects;
     s32 count;
-    IntrusiveList active_queue;
-    IntrusiveList object_queue;
+    CList active_queue;
+    CList object_queue;
     s32 field34, field38, field3C, field40;
 };
 struct ObjectPool;
-struct Part;
 struct ScreenMessageOwner;
 typedef struct MessageBuffer {
     s32 *allocation;
@@ -343,7 +330,7 @@ struct ScreenMessageOwner {
     u8 rendering;
     u8 padding041[0xF18 - 0x41];
     MessageBuffer storage;
-    IntrusiveList activeMessages;
+    CList activeMessages;
     u8 paddingF38[0x1200 - 0xF38];
     s32 state;
     s32 field1204;
@@ -390,7 +377,7 @@ extern void func_00275A74(void);
 extern void func_00430454(char *, s32);
 void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
     GameSettings *globals;
-    struct Part *settings;
+    CPlayerOptions *settings;
     ControllerProfile *profile;
     s32 on;
     s32 i;
@@ -405,7 +392,7 @@ void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
     on = 1;
     for (profile = D_800F5EC0; i < 4; i++) {
         if (func_002855E8(profile) != 0) {
-            settings->active = on;
+            settings->m_bActive = on;
             D_8011AB47 = i;
             menu->unk20 = profile;
             break;

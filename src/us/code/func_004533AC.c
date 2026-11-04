@@ -6,15 +6,8 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "gfx.h"
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "structs/list.h"
+
 struct LevelActor;
 struct Shared_World;
 struct GameSession;
@@ -290,8 +283,8 @@ struct ObjectPool {
     void *allocation;
     char *objects;
     s32 count;
-    IntrusiveList active_queue;
-    IntrusiveList object_queue;
+    CList active_queue;
+    CList object_queue;
     s32 field34, field38, field3C, field40;
 };
 struct ObjectPool;
@@ -309,7 +302,7 @@ struct ScreenMessageOwner {
     u8 rendering;
     u8 padding041[0xF18 - 0x41];
     MessageBuffer storage;
-    IntrusiveList activeMessages;
+    CList activeMessages;
     u8 paddingF38[0x1200 - 0xF38];
     s32 state;
     s32 field1204;

@@ -1,23 +1,15 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80225D10_9.CPP, func_8022A170_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-
-typedef struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-} IntrusiveList;
+#include "common.h"
+#include "structs/list.h"
 
 struct ObjectPool {
     void *allocation;
     char *objects;
     s32 count;
-    IntrusiveList active_queue; /* 0x0C */
-    IntrusiveList object_queue; /* 0x20 */
+    CList active_queue; /* 0x0C */
+    CList object_queue; /* 0x20 */
 };
 
 /* Minimal Turok 2 view of a pooled actor (offsets differ from Rage Wars). */
@@ -39,7 +31,7 @@ void func_00253018(struct ObjectPool *arg0) {
     if (*(void **)arg0 != 0) {
         func_0020565C(0, *(void **)arg0);
     }
-    node = arg0->object_queue.head;
+    node = arg0->object_queue.m_pHead;
     if (node != 0) {
         u8 *base = D_8011AAD8;
         do {

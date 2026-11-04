@@ -1,13 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC.CPP, func_804042F0_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/pak.h"
 
-typedef struct PfsPak {
-    u8 pad[0x68];
-} PfsPak;
-
-extern s32 D_80130C60[]; /* pak state per channel */
-extern s32 D_80130C70[]; /* pak error per channel */
-extern PfsPak D_80130C80[];
 extern u8 D_800C222C[];  /* pak font code -> character */
 extern u8 D_800F6750;
 
@@ -16,9 +10,9 @@ extern void func_002847E0(void);
 extern void func_002858A4(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 /* osPfsAllocateFile, osPfsReadWriteFile, osPfsDeleteFile and the directory refresh, at this module's link addresses */
-extern s32 func_004270A0(PfsPak *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 size, s32 *file_no);
-extern s32 func_00428C10(PfsPak *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
-extern s32 func_004276A0(PfsPak *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name);
+extern s32 func_004270A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 size, s32 *file_no);
+extern s32 func_00428C10(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+extern s32 func_004276A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name);
 extern s32 func_00425808(s32 ch);
 
 static __inline__ s32 ToUpper(s32 c) {
@@ -54,7 +48,7 @@ s32 func_0045EAE0(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u8 
     u8 ext[4];
     u16 company_code;
     u32 game_code;
-    PfsPak *pfs;
+    OSPfs *pfs;
     s32 offset;
 
     if (D_80130C60[ch] != 3) {

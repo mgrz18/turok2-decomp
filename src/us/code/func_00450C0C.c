@@ -6,15 +6,9 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/controller.h"
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "structs/player_options.h"
+#include "structs/list.h"
+
 struct Clip;
 struct Clip {
     s16 mode;
@@ -37,27 +31,17 @@ struct NodeCode8028469C {
     struct NodeCode8028469C **owner;
 };
 struct PoolRecAt28V1 {
-    IntrusiveList free;
-    IntrusiveList active;
+    CList free;
+    CList active;
     s32 baseLevel;
 };
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
-struct PlayerSettings;
-struct PlayerSettings {      /* 0x40 bytes in Turok 2 (0x96 in Rage Wars) */
-    char pad0[0x28];
-    s8 active;                 /* 0x28 (0x78) */
-    char pad29[6];
-    s8 selected;               /* 0x2F (0x7F) */
-    char pad30[0x40 - 0x30];
-};
 struct StatusView;
 struct StatusView {
     char pad[0xB0];
     s8 active;                 /* 0xB0 (0x150) */
 };
-struct PlayerSettings;
-typedef struct PlayerSettings PlayerSettings;
 struct StatusView;
 typedef struct StatusView StatusView;
 struct StatusStep;
@@ -68,12 +52,12 @@ struct StatusStep {
 };
 extern void func_00450C0C(void);
 extern StatusStep D_8011AB98[];
-extern PlayerSettings D_8011AB58[];
+extern CPlayerOptions D_8011AB58[];
 extern s32 func_002855E8(ControllerProfile *);
 extern s32 func_002855E8(ControllerProfile *slot);
 void func_00450C0C(void) {
     StatusStep *status;
-    PlayerSettings *settings;
+    CPlayerOptions *settings;
     s32 i;
     s32 active;
     i = 3; /* 4 entries in Turok 2 (8 in Rage Wars) */
@@ -87,8 +71,8 @@ void func_00450C0C(void) {
     settings = D_8011AB58;
     for (; i < 4; i++) {
         if (func_002855E8(&D_800F5EC0[i]) != 0) {
-            settings[i].active = active;
-            settings[i].selected = i;
+            settings[i].m_bActive = active;
+            settings[i].m_nController = i;
             break;
         }
     }

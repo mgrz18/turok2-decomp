@@ -3,17 +3,10 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "structs/player.h"
 
 /* Level chosen: load it, or set up the new player from the saved settings, or
  * open the next menu page. */
-
-typedef struct {
-    u16 counts[4]; /* 0x00 */
-    u8 pad8[0x28];
-    u8 team;       /* 0x30 */
-    u8 pad31[2];
-    u8 name[8];    /* 0x33 */
-} PlayerOptions;
 
 extern s32 D_80130990;
 extern s32 D_800C2028;
@@ -33,8 +26,8 @@ extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
 
 s32 func_0041DCB0(Menu *event, s32 mode, s32 arg2);
-u8 *func_0025342C(void *state, ControllerProfile *args);
-void func_0042E350(u8 *player, s32 arg1);
+CPlayer *func_0025342C(void *state, ControllerProfile *args);
+void func_0042E350(CPlayer *player, s32 arg1);
 void func_00416894(void *menu, Menu *event, void *page);
 s32 func_00425F84(s32 mode, s32 arg1);
 void func_00416644(void *menu, void *page, void *player, void *args, void *prev);
@@ -52,8 +45,8 @@ static __inline__ s32 currentMode(Menu *event) {
 
 s32 func_004595D8(void *arg0, Menu *event) {
     s32 mode = currentMode(event);
-    u8 *player;
-    PlayerOptions *options;
+    CPlayer *player;
+    CPlayerOptions *options;
     s32 i;
 
     if (func_0041DCB0(event, mode, 0) != 0) {
@@ -63,17 +56,17 @@ s32 func_004595D8(void *arg0, Menu *event) {
     if (D_80130960 != 0) {
         player = func_0025342C(&D_80119870.m_PlayerList, event->controller);
         event->player = player;
-        options = *(PlayerOptions **)(player + 0x518);
-        options->team = D_80130970;
-        options->counts[0] = D_80130968[0];
-        options->counts[1] = D_8013096A[0];
-        options->counts[2] = D_8013096C[0];
-        options->counts[3] = D_8013096E[0];
+        options = player->m_pOptions;
+        options->m_nCharacter = D_80130970;
+        options->m_Suicides = D_80130968[0];
+        options->m_Deaths = D_8013096A[0];
+        options->m_Kills = D_8013096C[0];
+        options->m_Tags = D_8013096E[0];
         for (i = 0; i < 8; i++) {
-            options->name[i] = D_80130974[i];
+            options->m_Name[i] = D_80130974[i];
         }
         func_0042E350(player, D_80130950);
-        func_00416894(*(u8 **)(player + 0x51C) + 0x53C, event, D_00438668);
+        func_00416894((u8 *)player->m_pCamera + 0x53C, event, D_00438668);
         return 1;
     }
     if (func_00425F84(mode, D_801309C4) == 0) {

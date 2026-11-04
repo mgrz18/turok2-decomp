@@ -6,11 +6,6 @@
 s32 func_004160F0(MenuItem *item); /* length of the item's text line */
 s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
 
-typedef struct MenuPlayer {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ CPlayerOptions *options;
-} MenuPlayer;
-
 extern char D_800B41B0[];
 extern char D_800B41C0[];
 extern char D_800B41D0[];
@@ -20,7 +15,7 @@ extern char D_800B4200[];
 
 /* Shows the player's handicap: two special values, otherwise a per-port line with the number. */
 s32 func_00450F4C(MenuItem *item, Menu *ctx) {
-    s32 handicap = ((MenuPlayer *) ctx->player)->options->m_Handicap;
+    s32 handicap = ctx->player->m_pOptions->m_Handicap;
 
     if (handicap == 0) {
         item->text = D_800B41F0;

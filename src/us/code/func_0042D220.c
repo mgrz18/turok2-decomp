@@ -1,9 +1,6 @@
 /* WRONG CUT: REAL func_0042D220 size 0x1E8 (splat cut it into func_0042D220 + func_0042D330). */
 #include "common.h"
-
-typedef struct IntrusiveList {
-    /* 0x00 */ u8 pad0[0x14];
-} IntrusiveList;
+#include "structs/list.h"
 
 typedef struct Particle {
     /* 0x000 */ u8 kind;
@@ -20,9 +17,9 @@ typedef struct Particle {
 
 typedef struct ParticleSystem {
     /* 0x0000 */ Particle particles[128];
-    /* 0xEC00 */ IntrusiveList free;
-    /* 0xEC14 */ IntrusiveList active;
-    /* 0xEC28 */ IntrusiveList lists[3];
+    /* 0xEC00 */ CList free;
+    /* 0xEC14 */ CList active;
+    /* 0xEC28 */ CList lists[3];
     /* 0xEC64 */ s32 unkEC64;
 } ParticleSystem;
 
@@ -41,8 +38,8 @@ extern u8 D_800F1850[];
 extern u8 D_800F18F0[];
 extern DirLight D_800F1930[4];
 
-extern void CList__Construct(IntrusiveList *list, s32 prevOffset, s32 nextOffset);
-extern s32 CList__AddTail(IntrusiveList *list, void *node);
+extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
+extern s32 CList__AddTail(CList *list, void *node);
 extern void func_0027BD10(void *def);
 extern void func_00210518(void *, f32);
 

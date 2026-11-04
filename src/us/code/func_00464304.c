@@ -1,18 +1,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/8044ACCC_26.CPP, func_8044C108_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef float f32;
-typedef struct IntrusiveList IntrusiveList;
-struct IntrusiveList {
-    void *head;
-    void *tail;
-    s32 prevOffset;
-    s32 nextOffset;
-    s32 count;
-};
-struct IntrusiveList;
+#include "common.h"
+#include "structs/list.h"
+
 struct IntPair;
 struct IntPair {
     int field_0;
@@ -50,16 +41,16 @@ struct WorldRecAt1B40C {
     void *edgeData;
     struct Face *faces;
     struct Face *edges;
-    IntrusiveList listA;       /* 0x1180 */
-    IntrusiveList listB;       /* 0x1194 */
+    CList listA;       /* 0x1180 */
+    CList listB;       /* 0x1194 */
     Bucket buckets[0x30];      /* 0x11A8 */
     char pad14A8[0x18FA8 - 0x14A8];
     s32 group;                 /* 0x18FA8 (Rage Wars 0x1B40C) */
 };
 struct WorldRecAt1B40C;
 typedef struct WorldRecAt1B40C WorldRecAt1B40C;
-extern void CList__Construct(IntrusiveList *list, s32 prevOffset, s32 nextOffset);
-extern s32 CList__AddTail(IntrusiveList *list, void *node);
+extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
+extern s32 CList__AddTail(CList *list, void *node);
 typedef struct ResidentDataChunk {
     s32 width;
     s32 count;
