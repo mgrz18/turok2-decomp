@@ -1,13 +1,5 @@
 #include "common.h"
-
-/* What this reads of the state at D_800F56B0. */
-typedef struct {
-    /* 0x000 */ s32 _unk0;
-    /* 0x004 */ s32 m_bA;
-    /* 0x008 */ s32 m_bB;
-    /* 0x00C */ u8 _pad[0x1A8];
-    /* 0x1B4 */ s32 m_Value;
-} State800F56B0;
+#include "structs/demo.h"
 
 /* ControllerProfile (structs/controller.h) seen from its previousButtons:
  * the ROM addresses the four through D_800F5F6C = D_800F5EC0 + 0xAC, so this
@@ -22,16 +14,15 @@ typedef struct {
     /* 0x18 */ u8 _pad[0x224 - 0x18];
 } PadState;
 
-extern State800F56B0 D_800F56B0;
 extern PadState D_800F5F6C[4];
 
 void func_0042F344(void);
 
 static __inline__ s32 func_0027BC34(void) {
-    State800F56B0 *state = &D_800F56B0;
+    DemoPlayer *state = &D_800F56B0;
 
-    if (state->m_bA != 0 || state->m_bB != 0) {
-        return state->m_Value;
+    if (state->unk4 != 0 || state->playing != 0) {
+        return state->playerCount;
     }
     return 0;
 }
