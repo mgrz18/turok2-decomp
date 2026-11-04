@@ -1,9 +1,11 @@
 #include "common.h"
+#include "structs/camera.h"
 
-void CList__AddHead(s32, s32);                /* extern */
-void CList__Remove(s32, s32);                /* extern */
+void CList__AddHead(CList *list, void *node);                /* extern */
+void CList__Remove(CList *list, void *node);                 /* extern */
 
-void func_00281B14(s32 arg0, s32 arg1, s32 arg2) {
-    CList__Remove(arg1 + 0xE28, arg2);
-    CList__AddHead(arg0 + 0xF0C, arg2);
+/* A camera's fading text goes back to the pool's free list. */
+void func_00281B14(CCameraPool *pool, CCamera *camera, struct CCameraText *text) {
+    CList__Remove(&camera->m_ActiveTextList, text);
+    CList__AddHead(&pool->m_FreeTextList, text);
 }
