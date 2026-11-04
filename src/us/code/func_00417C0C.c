@@ -1,21 +1,12 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/MISC/8043DF84.CPP, func_8043DFC8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef signed int s32;
+#include "common.h"
+#include "structs/player_options.h"
 
 typedef struct ControllerProfile {
     char pad0[0x224];
 } ControllerProfile;
-
-/* Turok 2: 4 records of 0x40 bytes (Rage Wars: 8 of 150). */
-typedef struct PlayerSettings {
-    char pad0[0x28];
-    s8 active;                 /* 0x28 (Rage Wars 0x78) */
-    char pad29[6];
-    s8 selected;               /* 0x2F (Rage Wars 0x7F) */
-    char pad30[0x40 - 0x30];
-} PlayerSettings;
 
 typedef struct StatusView {
     char pad[0xB0];
@@ -28,12 +19,12 @@ typedef struct StatusStep {
 
 extern ControllerProfile D_800F5EC0[4];
 extern StatusStep D_8011AB98[];
-extern PlayerSettings D_8011AB58[];
+extern CPlayerOptions D_8011AB58[];
 extern s32 func_002855E8(ControllerProfile *slot);
 
 void func_00417C0C(void) {
     StatusStep *status;
-    PlayerSettings *settings;
+    CPlayerOptions *settings;
     s32 i;
     s32 active;
     i = 3;
@@ -47,8 +38,8 @@ void func_00417C0C(void) {
     settings = D_8011AB58;
     for (; i < 4; i++) {
         if (func_002855E8(&D_800F5EC0[i]) != 0) {
-            settings[i].active = active;
-            settings[i].selected = i;
+            settings[i].m_bActive = active;
+            settings[i].m_nController = i;
             break;
         }
     }
