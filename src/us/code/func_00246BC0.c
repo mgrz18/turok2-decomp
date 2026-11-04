@@ -1,14 +1,18 @@
-/* NON-MATCHING: 6 of 330 words differ: the ROM loads opt->controlMode twice in
- * a row before the `< 2` test (`lb $3, 0x2B($17)` x2, the first one dead) and
- * keeps opt in $s1 although nothing after the calls reads it. Both look like
- * leftovers of an inlined helper; with the helper below and opt pinned to $s1
- * this C differs only there (a copy `a0 = s1` for the helper parameter instead
- * of the dead load, plus the schedule around it). Without the pin opt lands in
- * a temporary register and nearly every word differs.
- *
- * Builds the per-frame player input from the controller: optional button
+/* FAKEMATCH: a dead per-mode switch before the remap test, and opt pinned to $s1 (see below). */
+/* Builds the per-frame player input from the controller: optional button
  * remapping, then turn/look/strafe/move axes per control mode (Rage Wars has the
- * same code: func_802631B0_de in AbuN64/ragewars-decomp src/FX/802631D0.CPP). */
+ * same code: func_802631B0_de in AbuN64/ragewars-decomp src/FX/802631D0.CPP).
+ *
+ * The ROM loads opt->controlMode once more than the remap test needs
+ * (`lb $3, 0x2B($17)`, dead, before the live one). A switch on the mode whose
+ * result the remap test overwrites leaves that load: its branches only go in
+ * the delay-slot pass, after scheduling. It has to be a switch (beqz/beq on
+ * the loaded value, so the load sits in $v1 beside `li $v0, 1` and right
+ * before the deleted branch); a dead `if (mode < 2)` or a second call of the
+ * remap test puts it in the wrong slot, and an empty if or a discarded call
+ * leaves nothing. The ROM also keeps opt in a saved register though nothing
+ * after the calls reads it; unpinned, opt lands in a temporary and every
+ * access to it differs. */
 #include "common.h"
 
 typedef struct {
@@ -62,17 +66,6 @@ f32 func_0021170C(f32 value, f32 rate);
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 /* The remap table applies to control modes 0 and 1 with remapping on. */
-static __inline__ ButtonMap *GetButtonMap(s32 mode, PlayerOptions *o) {
-    if (mode < 2) {
-        if (mode >= 0) {
-            if (o->remap == 1) {
-                return D_800ADA70;
-            }
-        }
-    }
-    return NULL;
-}
-
 void func_00246BC0(PlayerInput *in, Player *pl) {
     register PlayerOptions *opt asm("$17");
     Controller *ctrl;
@@ -91,7 +84,21 @@ void func_00246BC0(PlayerInput *in, Player *pl) {
     rate = rate * 0.75f + 1.0f;
     rate = rate * (D_800B6D28 * (damp * 0.1f));
     ctrl = in->ctrl;
-    map = GetButtonMap(opt->controlMode, opt);
+    switch (opt->controlMode) {
+    case 0:
+        break;
+    case 1:
+        map = NULL;
+        break;
+    }
+    map = NULL;
+    if (opt->controlMode < 2) {
+        if (opt->controlMode >= 0) {
+            if (opt->remap == 1) {
+                map = D_800ADA70;
+            }
+        }
+    }
     if (map != NULL) {
         in->buttons[0] = 0;
         in->buttons[1] = 0;
