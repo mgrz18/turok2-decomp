@@ -1,12 +1,12 @@
 /* Second-module copy of func_0041760C (build/manual/W/func_0041760C.c), with its first-module addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game.h"
+#include "structs/controller.h"
 
 extern CPlayerOptions D_8011AB58[4]; /* D_8011AAD8.slots */
-extern u8 D_800F5EC0[];         /* controllers, 0x224 bytes each */
 extern u8 D_800F6CB0[];
 
-extern s32 func_002855E8(void *ctl);
+extern s32 func_002855E8(ControllerProfile *ctl);
 extern s32 func_002113A4(void);
 extern void func_00430374(void *a, s32 level);
 
@@ -32,14 +32,14 @@ s32 func_0045060C(void) {
     s32 level;
     s32 arg;
     s32 i;
-    u8 *ctl;
+    ControllerProfile *ctl;
 
     level = setup->dmArena;
     StartMatch(setup->dmTimeLimit, setup->dmScoreLimit, 0, 0);
     for (i = 3; i >= 0; i--) {
         setup->slots[i].m_nCharacter = 0;
     }
-    for (i = 0, ctl = D_800F5EC0; i < 4; i++, ctl += 0x224) {
+    for (i = 0, ctl = D_800F5EC0; i < 4; i++, ctl++) {
         if (func_002855E8(ctl)) {
             CPlayerOptions *slot = &D_8011AB58[i];
 

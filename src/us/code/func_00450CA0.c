@@ -3,9 +3,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/MISC/8043DF84.CPP, func_8043E05C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct ControllerProfile;
 #include "common.h"
 #include "ultra_types.h"
+#include "structs/controller.h"
 typedef struct IntrusiveList IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -49,49 +49,8 @@ struct PoolRecAt28V1 {
     IntrusiveList active;
     s32 baseLevel;
 };
-typedef struct ControllerButtonHistory {
-    s8 taps;
-    s8 age;
-    s8 repeat;
-    s8 held;
-} ControllerButtonHistory;
-struct ControllerProfile;
-struct ControllerProfile {
-    s32 connected;
-    s8 port;
-    u8 padding005[3];
-    s32 unk8;
-    s32 unkC;
-    s32 unk10;
-    s32 inputPreviousButtons;
-    s32 inputButtons;
-    u32 inputPressedButtons;
-    s32 inputHistory[3];
-    ControllerButtonHistory buttonHistory[32];
-    s32 previousButtons;
-    s32 buttons;
-    u32 pressedButtons;
-    s32 history[2];
-    u32 buttonState;
-    s8 stickX;
-    s8 stickY;
-    s8 previousStickX;
-    s8 previousStickY;
-    s32 pakActive;
-    s32 mode;
-    f32 pakAmount;
-    f32 pakTimer;
-    OSPfs pak;
-    struct PoolRecAt28V1 effectPool;
-    struct NodeCode8028469C effectNodes[3];
-    s32 reset;
-};
-struct ControllerProfile;
-typedef struct ControllerProfile ControllerProfile;
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
-struct ControllerProfile;
-extern struct ControllerProfile D_800F5EC0[4];
 extern ControllerProfile *func_00450CA0(s32 *out);
 extern s32 func_002855E8(ControllerProfile *);
 extern s32 func_002855E8(ControllerProfile *slot);
