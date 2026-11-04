@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/game.h"
 
 typedef struct {
@@ -8,22 +9,8 @@ typedef struct {
     /* 0xC7 */ s8 unkC7;
 } BossAI;
 
-typedef struct Actor {
-    /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ s32 *type;
-    /* 0x018 */ u8 pad18[0x140 - 0x18];
-    /* 0x140 */ s32 flags;         /* the AI's flags, ai at 0x140 */
-    /* 0x144 */ s32 health;
-    /* 0x148 */ u8 pad148[0x1C0 - 0x148];
-    /* 0x1C0 */ void *target;
-    /* 0x1C4 */ u8 pad1C4[4];
-    /* 0x1C8 */ void *lookAt;
-    /* 0x1CC */ u8 pad1CC[0x28C - 0x1CC];
-    /* 0x28C */ struct Actor *next;
-} Actor;
-
 typedef struct {
-    /* 0x00 */ Actor *obj;
+    /* 0x00 */ CListedInstance *obj;
     /* 0x04 */ void *def;
     /* 0x08 */ s32 state;
     /* 0x0C */ f32 timer;
@@ -51,26 +38,26 @@ extern Player *D_80119890;     /* the current player */
 extern u8 D_800F7078[];
 extern u8 D_800B6660[];
 extern u8 D_801100F0[];
-extern Actor *D_8010FEB4[]; /* the actor list head */
+extern CListedInstance *D_8010FEB4[]; /* the actor list head */
 extern s32 D_80110048;         /* level id */
 
 Player *func_002532A8(Game *);
 void func_0027FC2C(void *hud, void *camera, u8 *msg);
 void func_0027580C(s32 sound);
 void func_002535E4(Game *game, f32 value);
-s8 func_00219F74(Actor *actor, s32 id, s32);
+s8 func_00219F74(CListedInstance *actor, s32 id, s32);
 void func_00225D0C(void *world);
 void func_0027AD98(void *);
 void func_0027ADA0(void *);
 
-static __inline__ void setAnim(Actor *actor, s32 id) {
+static __inline__ void setAnim(CListedInstance *actor, s32 id) {
     BossAI *ai;
     s8 anim = func_00219F74(actor, id, -1);
 
-    ai = (BossAI *) &actor->flags;
+    ai = (BossAI *) &actor->m_Instance.m_AI.m_dwFlags;
     ai->anim = anim;
     ai->animId = id;
-    actor->flags &= ~1;
+    actor->m_Instance.m_AI.m_dwFlags &= ~1;
     ai->unkC7 = 0;
 }
 
@@ -78,7 +65,7 @@ static __inline__ void setAnim(Actor *actor, s32 id) {
 void func_00407F20(BossFight *fight) {
     Game *game = &D_80119870;
     Player *player;
-    Actor *a;
+    CListedInstance *a;
     GameSettings *flags;
 
     fight->state = 1;
@@ -89,12 +76,12 @@ void func_00407F20(BossFight *fight) {
     setAnim(fight->obj, 0x5337);
     func_00225D0C(D_800F7078);
     D_80119890->unkAAC = 450.0f;
-    for (a = D_8010FEB4[0]; a != NULL; a = a->next) {
-        if (*a->type == 1 && a->health != 0) {
-            a->lookAt = NULL;
-            a->target = NULL;
-            a->flags |= 0x20000000;
-            a->flags |= 0x40000000;
+    for (a = D_8010FEB4[0]; a != NULL; a = a->m_pNext) {
+        if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {
+            a->m_Instance.m_AI.m_pPathTarget = NULL;
+            a->m_Instance.m_AI.m_pSightTarget = NULL;
+            a->m_Instance.m_AI.m_dwFlags |= 0x20000000;
+            a->m_Instance.m_AI.m_dwFlags |= 0x40000000;
         }
     }
     fight->timer = 60.0f;

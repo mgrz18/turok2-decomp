@@ -186,6 +186,17 @@ typedef struct CGameObjectInstance {
     /* 0x284 */ s32 _pad2;
 } CGameObjectInstance; /* size 0x288 */
 
+/* A dynamic object (an actor spawned at run time, an effect...): the
+ * instance followed by its links in the world's object lists (CList, links
+ * at m_LastOffset 0x288 / m_NextOffset 0x28C: the active list D_8010FEB4,
+ * the free list D_8010FEA0) and the counter it decrements when it goes. */
+typedef struct CListedInstance {
+    /* 0x000 */ CGameObjectInstance m_Instance;
+    /* 0x288 */ struct CListedInstance *m_pPrev;
+    /* 0x28C */ struct CListedInstance *m_pNext;
+    /* 0x290 */ s32 *m_pOwnerCount;
+} CListedInstance; /* size 0x294 */
+
 /* What an AI aims at this frame: func_002449E0 fills one from CAI's
  * m_pSightTarget, func_00244338 one from m_pPathTarget (or the home point, a
  * location, the actor itself when there is none; m_Kind says which). The

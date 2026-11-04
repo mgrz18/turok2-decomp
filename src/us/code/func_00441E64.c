@@ -1,21 +1,13 @@
-typedef int s32;
+#include "common.h"
+#include "structs/game_object.h"
 
-typedef struct Actor {
-    char pad0[0x14];
-    s32 *def;                   /* 0x14: first word is the kind */
-    char pad18[0x144 - 0x18];
-    s32 health;                 /* 0x144 */
-    char pad148[0x28C - 0x148];
-    struct Actor *next;         /* 0x28C */
-} Actor;
-
-extern Actor *D_8010FEB4;
+extern CListedInstance *D_8010FEB4;
 
 s32 func_00441E64(void) {
-    Actor *actor;
+    CListedInstance *actor;
 
-    for (actor = D_8010FEB4; actor != 0; actor = actor->next) {
-        if (*actor->def == 1 && actor->health != 0) {
+    for (actor = D_8010FEB4; actor != 0; actor = actor->m_pNext) {
+        if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {
             return 1;
         }
     }

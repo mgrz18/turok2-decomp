@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -27,28 +28,13 @@ typedef struct {
     /* 0x1418 */ s32 mode;
 } Game;
 
-typedef struct Actor {
-    /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ s32 *type;
-    /* 0x018 */ u8 pad18[0x140 - 0x18];
-    /* 0x140 */ s32 flags;
-    /* 0x144 */ u8 pad144[0x1B8 - 0x144];
-    /* 0x1B8 */ s32 dead;
-    /* 0x1BC */ u8 pad1BC[4];
-    /* 0x1C0 */ void *target;
-    /* 0x1C4 */ u8 pad1C4[4];
-    /* 0x1C8 */ void *lookAt;
-    /* 0x1CC */ u8 pad1CC[0x28C - 0x1CC];
-    /* 0x28C */ struct Actor *next;
-} Actor;
-
 extern Game D_80119870;
 extern void *D_80119890;
 extern s32 D_800F7078;
 extern f32 D_800B6D28;
 extern u8 D_800B6684[];
 extern u8 D_801100F0[];
-extern Actor *D_8010FEB4;
+extern CListedInstance *D_8010FEB4;
 
 void *func_002532A8(void *);
 void func_00281610(void *, s32, void *, f32);
@@ -76,7 +62,7 @@ void func_004082A0(BossFight *fight) {
     s32 left;
     s32 left2;
     s32 n;
-    Actor *actor;
+    CListedInstance *actor;
     u8 *obj;
     u8 *ai;
 
@@ -120,27 +106,27 @@ void func_004082A0(BossFight *fight) {
         actor = D_8010FEB4;
         player = D_80119890;
         n = 0;
-        for (; actor != NULL; actor = actor->next) {
-            if (*actor->type == 1 && actor->dead == 0) {
+        for (; actor != NULL; actor = actor->m_pNext) {
+            if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_pTargetOverride == 0) {
                 if (fight->state == 0) {
                     if (n < fight->def->maxHelpers) {
                         /* the first helpers keep chasing the player */
                         n++;
-                        actor->lookAt = player;
-                        actor->target = player;
-                        actor->flags |= 0x20000000;
-                        actor->flags |= 0x40000000;
+                        actor->m_Instance.m_AI.m_pPathTarget = player;
+                        actor->m_Instance.m_AI.m_pSightTarget = player;
+                        actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;
+                        actor->m_Instance.m_AI.m_dwFlags |= 0x40000000;
                     } else {
-                        actor->target = fight->obj;
-                        actor->lookAt = fight->obj;
-                        actor->flags |= 0x20000000;
-                        actor->flags |= 0x40000000;
+                        actor->m_Instance.m_AI.m_pSightTarget = fight->obj;
+                        actor->m_Instance.m_AI.m_pPathTarget = fight->obj;
+                        actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;
+                        actor->m_Instance.m_AI.m_dwFlags |= 0x40000000;
                     }
-                } else if (actor->target == fight->obj) {
-                    actor->lookAt = player;
-                    actor->target = player;
-                    actor->flags |= 0x20000000;
-                    actor->flags |= 0x40000000;
+                } else if (actor->m_Instance.m_AI.m_pSightTarget == fight->obj) {
+                    actor->m_Instance.m_AI.m_pPathTarget = player;
+                    actor->m_Instance.m_AI.m_pSightTarget = player;
+                    actor->m_Instance.m_AI.m_dwFlags |= 0x20000000;
+                    actor->m_Instance.m_AI.m_dwFlags |= 0x40000000;
                 }
             }
         }
