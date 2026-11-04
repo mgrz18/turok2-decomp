@@ -135,7 +135,7 @@ void func_00251FC4(PlayerList *list) {
     }
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
         func_00246BC0(&p->m_ContState, p);
-        if (func_00285558((ControllerProfile *)p->m_ContState.m_pContState)) {
+        if (func_00285558(p->m_ContState.m_pContState)) {
             if (func_00284174()) {
                 func_002840EC();
             } else if (!func_00416AF8(&D_80119E2C) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
@@ -147,13 +147,13 @@ void func_00251FC4(PlayerList *list) {
                 reset_strokes(&p->m_Barrel);
                 p->m_LivesOverlay.m_Value = -1;
                 p->m_TokensOverlay.m_Value = -1;
-                func_00416644(&D_80119E2C, &D_00439640, p, ((ControllerProfile *)p->m_ContState.m_pContState), 0);
+                func_00416644(&D_80119E2C, &D_00439640, p, (p->m_ContState.m_pContState), 0);
             }
         }
         if (p->m_bLevelNotCompleteExit) {
             hub = func_0026EFB8(D_80110048) - 1;
             if (hub < 6 && (p->m_Data.m_dwLevelFirstTimeFlags & (1 << hub))) {
-                func_00416644(&D_80119E2C, &D_0043CAB4, p, ((ControllerProfile *)p->m_ContState.m_pContState), 0);
+                func_00416644(&D_80119E2C, &D_0043CAB4, p, (p->m_ContState.m_pContState), 0);
             }
             p->m_bLevelNotCompleteExit = 0;
         }
@@ -166,7 +166,7 @@ void func_00251FC4(PlayerList *list) {
         if (list->cinema) {
             if (func_00284240() && !list->cinemaStarted) {
                 list->cinemaStarted = 1;
-                func_00416644(&((Camera *)p->m_pCamera)->cinema, &D_0043BED0, p, ((ControllerProfile *)p->m_ContState.m_pContState), 0);
+                func_00416644(&((Camera *)p->m_pCamera)->cinema, &D_0043BED0, p, (p->m_ContState.m_pContState), 0);
             }
         }
     }
@@ -177,7 +177,7 @@ void func_00251FC4(PlayerList *list) {
         next = p->m_pNext;
         match = &D_80119E2C.match;
         if (p != NULL && !match->over && (match->timeLeft >= 900.0f || match->timeLeft < 0.0f || !D_80119E2C.timed)
-            && ((((ControllerProfile *)p->m_ContState.m_pContState)->buttonsSingle & 0x1000) || p->m_bActive)) {
+            && ((p->m_ContState.m_pContState->buttonsSingle & 0x1000) || p->m_bActive)) {
             p->m_bActive = 1;
             character = D_8011AB88[p->m_nController].character;
             p->m_pOptions->m_bActive = 1;

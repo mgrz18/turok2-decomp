@@ -20,6 +20,7 @@
 #include "structs/game_object.h"
 #include "structs/gbi.h"
 #include "structs/player_options.h"
+#include "structs/controller.h"
 
 /* A HUD element: health, ammo, lives, air... slide in, fade, show a value. */
 typedef struct {

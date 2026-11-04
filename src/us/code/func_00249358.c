@@ -124,7 +124,7 @@ void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
             zero.x = 0;
             zero.y = 0;
             zero.z = 0;
-            func_00225DB0(D_800F7078, ((u8 *)p->m_ContState.m_pContState) + 0x140, 0x11, zero, 51.199997f, f);
+            func_00225DB0(D_800F7078, p->m_ContState.m_pContState->rumblePool, 0x11, zero, 51.199997f, f);
         }
     }
     if (!dead && (s16) (u16)p->m_Mode != 0xF) {
