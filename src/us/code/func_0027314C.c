@@ -1,10 +1,7 @@
 /* Update one sound: refresh its volume, notice when it stopped or must stop, then slide its volume, pan and pitch. */
 
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct SoundBank {
     /* 0x000 */ u8 pad0[0x84];
@@ -37,8 +34,8 @@ typedef struct Sound {
     /* 0x38 */ s16 unk38;
     /* 0x3A */ s16 unk3A;
     /* 0x3C */ u8 pad3C[8];
-    /* 0x44 */ Vec3 pos;
-    /* 0x50 */ Vec3 *follow;
+    /* 0x44 */ CVector3 pos;
+    /* 0x50 */ CVector3 *follow;
     /* 0x54 */ u8 pad54[0xA0 - 0x54];
     /* 0xA0 */ s32 delay;
     /* 0xA4 */ s32 flags;
@@ -52,7 +49,7 @@ typedef struct Sound {
 
 extern u8 D_801198B0[];
 
-extern s32 func_00281444(void *game, Vec3 *pos);
+extern s32 func_00281444(void *game, CVector3 *pos);
 extern void func_00293E60(void *player, s32 id);    /* alSndpSetSound */
 extern s32 func_00293580(void *player);             /* alSndpGetState */
 extern void func_00293EC0(void *player);            /* alSndpStop */

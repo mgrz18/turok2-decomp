@@ -1,10 +1,9 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 typedef struct Actor {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x40];
     /* 0x50 */ f32 yaw;
     /* 0x54 */ u8 pad54[0x80];
@@ -18,11 +17,11 @@ f32 func_002982F0(f32);         /* sinf */
 f32 func_002974C0(f32);         /* cosf */
 f32 func_0021153C(f32);         /* acosf */
 f32 func_002672C8(Actor *a);    /* radius */
-s32 func_0026961C(Actor *self, Vec3f pos, s32 *out); /* blocked at pos */
+s32 func_0026961C(Actor *self, CVector3 pos, s32 *out); /* blocked at pos */
 void func_00210EF0(f32 *angle); /* wrap */
 
 /* func_00246310: the angle from the actor's heading to a point. */
-static __inline__ f32 angleTo(Actor *actor, Vec3f point) {
+static __inline__ f32 angleTo(Actor *actor, CVector3 point) {
     f32 dx;
     f32 dz;
     f32 dist;
@@ -53,8 +52,8 @@ static __inline__ f32 angleTo(Actor *actor, Vec3f point) {
 /* The heading for self toward pos: straight at it, or when pos is blocked,
  * the first free direction 30, 60, ... 150 degrees to either side (the side
  * tried first alternating between actors), turned 15 degrees further. */
-f32 func_00244E84(Actor *self, Vec3f pos, Actor *target, f32 scale) {
-    Vec3f probe;
+f32 func_00244E84(Actor *self, CVector3 pos, Actor *target, f32 scale) {
+    CVector3 probe;
     s32 out;
     f32 heading;
     f32 angle;

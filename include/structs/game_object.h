@@ -11,21 +11,7 @@
  * Fields named unk_ are not yet known. */
 
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-} CVector3; /* size 0xC */
-
-typedef struct {
-    /* 0x00 */ f32 x;
-    /* 0x04 */ f32 y;
-    /* 0x08 */ f32 z;
-    /* 0x0C */ f32 w;
-} CQuaternion; /* size 0x10 */
-
-typedef f32 CMtxF[4][4];
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 m_Type;

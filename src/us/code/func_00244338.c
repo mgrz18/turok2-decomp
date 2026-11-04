@@ -1,7 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_3.CPP, func_80214DD4_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 /* The player behind an object (owner 0x1A8 of a player-controlled one). */
 typedef struct {
@@ -17,7 +16,7 @@ typedef struct {
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 region;
     /* 0x014 */ s32 *def;           /* first word: kind */
     /* 0x018 */ u8 pad18[0x50 - 0x18];
@@ -34,7 +33,7 @@ typedef struct Actor {
 } Actor;
 
 typedef struct {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ s32 region;
 } Location;
 
@@ -43,7 +42,7 @@ typedef struct {
     /* 0x04 */ s32 active;
     /* 0x08 */ u8 pad8[0x68 - 8];
     /* 0x68 */ Actor *ignore;
-    /* 0x6C */ Vec3f offset;
+    /* 0x6C */ CVector3 offset;
     /* 0x78 */ Actor *forced;
     /* 0x7C */ u8 pad7C[4];
     /* 0x80 */ Actor *approachFrom;
@@ -53,7 +52,7 @@ typedef struct {
     /* 0x90 */ f32 height;
     /* 0x94 */ s8 location;
     /* 0x95 */ u8 pad95[0xAC - 0x95];
-    /* 0xAC */ Vec3f pos;
+    /* 0xAC */ CVector3 pos;
     /* 0xB8 */ s32 region;
     /* 0xBC */ u8 padBC[0xCA - 0xBC];
     /* 0xCA */ s8 team;
@@ -63,11 +62,11 @@ typedef struct {
     /* 0x00 */ s32 kind;
     /* 0x04 */ Actor *target;
     /* 0x08 */ f32 range;
-    /* 0x0C */ Vec3f pos;
-    /* 0x18 */ Vec3f delta;
+    /* 0x0C */ CVector3 pos;
+    /* 0x18 */ CVector3 delta;
     /* 0x24 */ f32 dist;
-    /* 0x28 */ Vec3f flatPos;
-    /* 0x34 */ Vec3f flatDelta;
+    /* 0x28 */ CVector3 flatPos;
+    /* 0x34 */ CVector3 flatDelta;
     /* 0x40 */ f32 flatDist;
 } TrackResult;
 
@@ -77,28 +76,28 @@ extern s32 D_8011001C;
 s32 func_0025E428(Actor *self, Plan *plan);
 s32 func_002438C0(Actor *self, Plan *plan, Actor *target);
 Actor *func_00243C90(Actor *self, Plan *plan, s32 arg2, s32 arg3);
-f32 func_00244E84(Actor *self, Vec3f pos, Actor *target, f32 scale);
-f32 func_00246310(Actor *a, Vec3f point);              /* angle to a point */
+f32 func_00244E84(Actor *self, CVector3 pos, Actor *target, f32 scale);
+f32 func_00246310(Actor *a, CVector3 point);              /* angle to a point */
 Location *func_0028479C(s8 *location);
 f32 func_002671B4(Actor *a);                           /* height */
 f32 func_002672C8(Actor *a);                           /* radius */
 f32 func_00268460(Actor *a);                           /* reach */
 f32 func_00268A5C(Actor *a);                           /* ceiling */
-void func_002688C8(Actor *a, Vec3f pos, Vec3f *outPos, s32 *outRegion, s32 x, s32 y);
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a + b */
-void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
-void func_0020F040(Vec3f *v);                          /* normalise */
-f32 func_0020EAA0(Vec3f *v);                           /* heading */
+void func_002688C8(Actor *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+void func_0020F040(CVector3 *v);                          /* normalise */
+f32 func_0020EAA0(CVector3 *v);                           /* heading */
 f32 func_002982F0(f32 x);                              /* sin */
 f32 func_002974C0(f32 x);                              /* cos */
 f32 func_00298470(f32 x);                              /* sqrt */
 
 /* The point beside `target`, on the side away from `from`, where `self`
  * stands touching it. */
-static __inline__ void Approach(Actor *self, Actor *target, Actor *from, Vec3f *outPos, s32 *outRegion) {
-    Vec3f dir;
-    Vec3f to;
+static __inline__ void Approach(Actor *self, Actor *target, Actor *from, CVector3 *outPos, s32 *outRegion) {
+    CVector3 dir;
+    CVector3 to;
     f32 dist;
 
     if (from != NULL) {
@@ -120,10 +119,10 @@ static __inline__ void Approach(Actor *self, Actor *target, Actor *from, Vec3f *
  * point, or the actor) and fills `out` with the kind, target, range, goal
  * position and its offset from the actor, in 3D and flattened. */
 void func_00244338(Actor *self, Plan *plan, s32 boost, TrackResult *out) {
-    Vec3f pos;
-    Vec3f probe;
-    Vec3f away;
-    Vec3f delta;
+    CVector3 pos;
+    CVector3 probe;
+    CVector3 away;
+    CVector3 delta;
     s32 region;
     Actor *target;
     s32 kind;

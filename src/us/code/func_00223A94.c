@@ -1,10 +1,7 @@
 /* The two inlined helpers after AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD/8028E6FC.CPP, func_8028E860_de and func_8028E78C_de (func_00226EBC and func_00226DE8 here), with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct ActorDef {
     /* 0x00 */ s32 type;
@@ -14,7 +11,7 @@ typedef struct Entity Entity;
 struct Entity {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
     /* 0x014 */ ActorDef *def;
     /* 0x018 */ u8 pad18[0xB8 - 0x18];
@@ -41,15 +38,15 @@ typedef struct DamageEvent {
 extern Entity *D_8010FEB4;
 extern u8 D_80119870[];
 
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_00245828(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
 void func_002465C8(Entity *e, void *ai, DamageEvent *event);
 s32 func_00243414(Entity *e, void *ai, s32 state);
 Entity *func_002532A8(void *list);
 
 /* func_00226EBC inlined: the strength (0 or 0xFF) a blast at `target` hits `e` with. */
-static __inline__ s32 blastStrength(Entity *e, Vec3f *target) {
-    Vec3f d;
+static __inline__ s32 blastStrength(Entity *e, CVector3 *target) {
+    CVector3 d;
     f32 dist;
     u32 t;
 
@@ -72,8 +69,8 @@ static __inline__ s32 blastStrength(Entity *e, Vec3f *target) {
 }
 
 /* func_00226DE8 inlined: a living enemy within 2560 units of `target`. */
-static __inline__ s32 inBlastRange(Entity *e, Vec3f *target) {
-    Vec3f d;
+static __inline__ s32 inBlastRange(Entity *e, CVector3 *target) {
+    CVector3 d;
     f32 dist;
     u32 t;
 
@@ -97,9 +94,9 @@ static __inline__ s32 inBlastRange(Entity *e, Vec3f *target) {
 
 /* A blast at `target`: damages every entity of the world and of the actor list, then damages
  * the current player when within 512 units. */
-void func_00223A94(World *world, Vec3f *target) {
+void func_00223A94(World *world, CVector3 *target) {
     DamageEvent event;
-    Vec3f d;
+    CVector3 d;
     Entity *e;
     Entity *node;
     Entity *actor;

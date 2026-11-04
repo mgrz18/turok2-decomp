@@ -1,7 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_2.CPP, func_80214624_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 /* The player behind an object (owner 0x1A8 of a player-controlled one). */
 typedef struct {
@@ -17,7 +16,7 @@ typedef struct {
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 region;
     /* 0x014 */ s32 *def;           /* first word: kind */
     /* 0x018 */ u8 pad18[0x50 - 0x18];
@@ -33,7 +32,7 @@ typedef struct Actor {
 } Actor;
 
 typedef struct {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ s32 region;
 } Location;
 
@@ -57,30 +56,30 @@ typedef struct {
     /* 0x90 */ f32 height;
     /* 0x94 */ s8 location;
     /* 0x95 */ u8 pad95[0xAC - 0x95];
-    /* 0xAC */ Vec3f pos;
+    /* 0xAC */ CVector3 pos;
     /* 0xB8 */ s32 region;
 } Plan;
 
 extern s32 D_8011001C;
 
 Location *func_0028479C(s8 *location);
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a + b */
-void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
-void func_0020F040(Vec3f *v);                          /* normalise */
-f32 func_0020EAA0(Vec3f *v);                           /* heading */
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a + b */
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+void func_0020F040(CVector3 *v);                          /* normalise */
+f32 func_0020EAA0(CVector3 *v);                           /* heading */
 f32 func_002672C8(Actor *a);                           /* radius */
-void func_002688C8(Actor *a, Vec3f pos, Vec3f *outPos, s32 *outRegion, s32 x, s32 y);
-s32 func_00239C28(Actor *a, s32 b, Vec3f pos, s32 region, s32 d, Vec3f *out);
-s32 func_002399F8(Actor *a, Vec3f pos, s32 region, s32 d, Vec3f *hit);
+void func_002688C8(Actor *a, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
+s32 func_00239C28(Actor *a, s32 b, CVector3 pos, s32 region, s32 d, CVector3 *out);
+s32 func_002399F8(Actor *a, CVector3 pos, s32 region, s32 d, CVector3 *hit);
 s32 func_0026BB9C(s32 region, f32 x, f32 z);
-f32 func_00246310(Actor *a, Vec3f point);
+f32 func_00246310(Actor *a, CVector3 point);
 
 /* The point beside `target`, on the side away from `from`, where `self`
  * stands touching it. */
-static __inline__ void Approach(Actor *self, Actor *target, Actor *from, Vec3f *outPos, s32 *outRegion) {
-    Vec3f dir;
-    Vec3f to;
+static __inline__ void Approach(Actor *self, Actor *target, Actor *from, CVector3 *outPos, s32 *outRegion) {
+    CVector3 dir;
+    CVector3 to;
     f32 dist;
 
     if (from != NULL) {
@@ -99,8 +98,8 @@ static __inline__ void Approach(Actor *self, Actor *target, Actor *from, Vec3f *
 }
 
 s32 func_002438C0(Actor *self, Plan *plan, Actor *target) {
-    Vec3f pos;
-    Vec3f hit;
+    CVector3 pos;
+    CVector3 hit;
     s32 region;
     s32 mode;
     OwnerPlayer *player;

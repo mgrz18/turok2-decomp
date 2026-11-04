@@ -1,8 +1,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002A7164.c, func_002A7164, with Turok 2's layouts. */
 
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct Vec3f { f32 x, y, z; } Vec3f;
 typedef struct Mtx44 { s32 w[16]; } Mtx44;
 
 typedef struct EmitCfg { u8 pad0[0x14]; s32 unk14; } EmitCfg;
@@ -21,7 +21,7 @@ struct EmitNode {
     /* 0x04 */ EmitNode *next;
     /* 0x08 */ f32 unk8;
     /* 0x0C */ u8 padC[4];
-    /* 0x10 */ Vec3f pos;
+    /* 0x10 */ CVector3 pos;
     /* 0x1C */ u8 rot[0xC];
     /* 0x28 */ Mtx44 mtx[2];
     /* 0xA8 */ f32 fraction;
@@ -44,7 +44,7 @@ typedef struct Emitter {
 extern s32 D_800B6D1C;
 void func_0020D274(void *, void *);
 void func_0020D908(void *, void *);
-void func_0020EF2C(Vec3f *, Vec3f *, Vec3f *);
+void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
 void func_0020F7EC(void *);
 void func_002101A0(void *, void *);
 void func_002101BC(void *, void *);
@@ -78,7 +78,7 @@ static __inline__ void placeNode(Emitter *e, EmitNode *n, EmitActor *o) {
 
 /* Places every node of the emitter on its owner and sums the distances between consecutive nodes. */
 void func_0023417C(Emitter *e) {
-    Vec3f d;
+    CVector3 d;
     EmitNode *n;
     EmitActor *o;
     EmitNode *prev;

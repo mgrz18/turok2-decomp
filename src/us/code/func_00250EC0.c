@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -11,7 +8,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ void *region;
     /* 0x014 */ Surface *surface;
     /* 0x018 */ f32 pushX;
@@ -50,7 +47,7 @@ typedef struct {
     /* 0x0A80 */ u8 padA80[0xA98 - 0xA80];
     /* 0x0A98 */ f32 bobSign;
     /* 0x0A9C */ f32 depth;
-    /* 0x0AA0 */ Vec3f velocity;
+    /* 0x0AA0 */ CVector3 velocity;
     /* 0x0AAC */ u8 padAAC[0xAC8 - 0xAAC];
     /* 0x0AC8 */ f32 pitch;
     /* 0x0ACC */ f32 turn;
@@ -83,7 +80,7 @@ f32 func_0021170C(f32 value, f32 rate);
 f32 func_0021160C(f32 value, f32 delta, f32 limit);
 void func_0024FC08(Player *player, Body *body);
 void func_00275624(s32 sound);
-void func_00275544(s16 sound, Vec3f pos, s32, s32);
+void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 

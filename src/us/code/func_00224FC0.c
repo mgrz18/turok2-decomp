@@ -1,13 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028C1B0.c, func_0028C1B0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
 typedef struct ActorInfo {
                u32 flags;
                s32 unk4;
@@ -87,9 +82,6 @@ struct Actor {
                  u8 pad16DA[6];
                  Actor *next;
 };
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
 typedef struct Rec14 {
@@ -102,10 +94,10 @@ typedef struct Entity {
                  u8 pad0[0x4];
                  s16 unk4s;
                  u8 pad6[0x2];
-                 Vec3f pos;
+                 CVector3 pos;
                  s32 unk14;
                  ActorDef *def;
-                 Vec3f vel;
+                 CVector3 vel;
                  u8 pad28[0xBC];
                  u16 unkE4;
                  u8 padE6[0x1A];

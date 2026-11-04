@@ -1,7 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_8.CPP, func_802164A8_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     u8 pad0[0xC];
@@ -10,7 +9,7 @@ typedef struct {
 
 typedef struct {
     u8 pad0[4];
-    Vec3 position;              /* 0x04 */
+    CVector3 position;              /* 0x04 */
     u8 pad10[4];
     s32 *kind;                  /* 0x14: the definition; its first word is the kind */
     u8 pad18[0x50 - 0x18];
@@ -26,8 +25,8 @@ struct Dest {
     u8 pad0[0x40];
     f32 value;                  /* 0x40 */
     u8 pad44[4];
-    Vec3 old_position;          /* 0x48 */
-    Vec3 position;              /* 0x54 */
+    CVector3 old_position;          /* 0x48 */
+    CVector3 position;              /* 0x54 */
     f32 height;                 /* 0x60 */
     u8 pad64[0xC9 - 0x64];
     u8 timer;                   /* 0xC9 */

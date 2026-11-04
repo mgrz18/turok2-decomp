@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Bounds {
-    Vec3 min;                   /* 0x00 */
-    Vec3 max;                   /* 0x0C */
+    CVector3 min;                   /* 0x00 */
+    CVector3 max;                   /* 0x0C */
 } Bounds;
 
 typedef struct InstDef {
@@ -24,7 +21,7 @@ typedef struct Instance {
 
 typedef struct LevelActor {
     u8 pad0[0x4];
-    Vec3 pos;                   /* 0x004 */
+    CVector3 pos;                   /* 0x004 */
     u8 pad10[0x14 - 0x10];
     InstDef *def;               /* 0x014 */
     u8 pad18[0x14C - 0x18];
@@ -65,13 +62,13 @@ void *func_002017D4(void *table, s32 index);
 void func_00214E88(Instance *inst);
 s32 func_00267090(Instance *inst);
 f32 func_002671B4(LevelActor *actor);
-void func_002254C0(World *world, Vec3 *pos, void *out);
+void func_002254C0(World *world, CVector3 *pos, void *out);
 void func_002156FC(LevelActor *actor);
 void func_002279A4(void *arg0, World *world);
 
 /* Collects the instances and actors of the loaded sections inside the visible bounds. */
 void func_00221A24(World *world) {
-    Vec3 pos;
+    CVector3 pos;
     s32 regionCount;
     void *data;
     Region *regions;

@@ -1,12 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A6BD4.c, func_002A6BD4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef float f32;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef struct Node6BD4 {
     u8 pad0[8];
     u8 sub[0x40];
@@ -19,18 +15,18 @@ typedef struct Pool6BD4 {
 } Pool6BD4;
 extern f32 D_800A6524;
 extern s32 D_800ACFC0;
-void func_0020E810(void *a, Vec3f *b);
+void func_0020E810(void *a, CVector3 *b);
 void CList__Remove(void *list, Node6BD4 *n);
 void CList__AddTail(void *list, Node6BD4 *n);
 void func_00211114(void *a, void *b);
 void func_002106C0(void *a, f32 f);
-void func_0020F040(Vec3f *v);
-void func_0020EF60(Vec3f *a, Vec3f *b, f32 s);
-void func_0020EEF8(Vec3f *a, Vec3f *b, Vec3f *c);
+void func_0020F040(CVector3 *v);
+void func_0020EF60(CVector3 *a, CVector3 *b, f32 s);
+void func_0020EEF8(CVector3 *a, CVector3 *b, CVector3 *c);
 void func_00210318(void *m, f32 x, f32 y, f32 z);
 void func_0021034C(void *m, f32 a, f32 b, f32 c);
 void func_0020D274(void *a, void *b);
-Node6BD4 *func_002364A4(Pool6BD4 *o, Vec3f pos, Vec3f dir, s32 idx, s32 val) {
+Node6BD4 *func_002364A4(Pool6BD4 *o, CVector3 pos, CVector3 dir, s32 idx, s32 val) {
     u8 m10[0x40];
     u8 m50[0x10];
     Node6BD4 *n;

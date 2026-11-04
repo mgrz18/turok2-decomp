@@ -1,8 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/80279208_11.CPP, func_80279B40_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct { f32 x, y, z; } Vec3f;
-typedef struct { f32 x, y, z, w; } Quatf;
 typedef f32 Mtx4f[4][4];
 
 typedef struct {
@@ -13,10 +12,10 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ void *region;
     /* 0x014 */ u8 pad14[0x18 - 0x14];
-    /* 0x018 */ Vec3f dir;
+    /* 0x018 */ CVector3 dir;
     /* 0x024 */ u8 pad24[0x40 - 0x24];
     /* 0x040 */ s32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
@@ -31,15 +30,15 @@ typedef struct {
     /* 0x164 */ s32 angle;
 } Particle;
 
-extern void func_0020E810(Quatf *out, Vec3f *dir);          /* rotation facing dir */
+extern void func_0020E810(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
 extern void func_00210630(Mtx4f m, s32 angle);              /* rotation about Y */
-extern void func_0020F85C(Mtx4f m, Vec3f *in, Vec3f *out);  /* transform */
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a + b */
+extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);  /* transform */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern Mtx4f *func_0022CF40(Particle *p, s32 arg1);         /* parent transform */
-extern void func_002688C8(Particle *p, Vec3f to, Vec3f *outPos, void **outRegion, s32, s32);
-extern void func_0022F350(void *sys, Particle *p, void *owner, s32 ownerId, s32 target, s32 model, Vec3f dir,
-                          Quatf rot, Vec3f pos, void *region, s32 arg2, s32 flags);
-extern Vec3f D_800F1DB8;
+extern void func_002688C8(Particle *p, CVector3 to, CVector3 *outPos, void **outRegion, s32, s32);
+extern void func_0022F350(void *sys, Particle *p, void *owner, s32 ownerId, s32 target, s32 model, CVector3 dir,
+                          CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
+extern CVector3 D_800F1DB8;
 extern void *D_800F1ADC;
 extern u8 D_800F1CE0[];
 extern u8 D_800F8928[];
@@ -59,13 +58,13 @@ static __inline__ f32 offset_y(Particle *p) {
 }
 
 void func_00229340(Particle *p, s32 model, s32 arg2, s32 flags) {
-    Quatf rotation;
-    Vec3f direction;
-    Vec3f offset;
-    Vec3f turned;
-    Vec3f carried;
-    Vec3f point;
-    Vec3f moved;
+    CQuaternion rotation;
+    CVector3 direction;
+    CVector3 offset;
+    CVector3 turned;
+    CVector3 carried;
+    CVector3 point;
+    CVector3 moved;
     Mtx4f matrix;
     u8 scratch[0xF0];
     void *region;

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Second boss phase update: spawns a minion at a random point 1228.8-1536 around the boss while the phase has
  * some left (and fewer than its maximum are alive); once none are left and fewer than 5 are alive, steps the
@@ -47,13 +48,9 @@ typedef struct {
     /* 0x04 */ void (*update)(struct State2 *state);
 } PhaseFuncs;
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
 typedef struct Obj2 {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x140 - 0x10];
     /* 0x140 */ u8 ai[4];
     /* 0x144 */ s32 health;
@@ -90,9 +87,9 @@ extern u8 D_8010ABA0[];
 extern f32 func_002119FC(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern void func_002688C8(Obj2 *obj, Vec3f pos, Vec3f *outPos, s32 *outRegion, s32 x, s32 y);
-extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, Vec3f pos, f32 rotY,
-                           Vec3f vel, Vec3f scale, s32 *owner);
+extern void func_002688C8(Obj2 *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
+extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
+                           CVector3 vel, CVector3 scale, s32 *owner);
 
 /* Steps the script: clears the movers and the actors' 0x24C, enters the next phase and runs its init. */
 static __inline__ void nextPhase(State2 *state) {
@@ -121,9 +118,9 @@ static __inline__ void nextPhase(State2 *state) {
 /* Spawns one minion around the boss when *toSpawn allows it and fewer than maxAlive are alive. */
 static __inline__ void spawnMinion(State2 *state, s32 *toSpawn, s32 *alive, f32 dist, s32 maxAlive,
                                    void *intelligence, Obj2 *obj, f32 angle) {
-    Vec3f pos;
-    Vec3f vel;
-    Vec3f scale;
+    CVector3 pos;
+    CVector3 vel;
+    CVector3 scale;
     s32 region;
 
     if (toSpawn != NULL && *toSpawn == 0) {

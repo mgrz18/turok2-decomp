@@ -1,13 +1,9 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/MISC/8043DF84.CPP, func_8043E05C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 struct ControllerProfile;
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
 typedef struct IntrusiveList IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -46,7 +42,6 @@ struct OSPfs {
 };
 struct OSPfs;
 struct CVector3_t;
-typedef struct CVector3_t CVector3;
 struct CVector3_t;
 struct CVector3_t {
     f32 x;

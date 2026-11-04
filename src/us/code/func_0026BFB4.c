@@ -1,9 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AI/NAV/8027451C.CPP, cross_edges, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 /* A collision vertex with a floor and a ceiling height. */
 typedef struct {
@@ -19,15 +16,15 @@ typedef struct {
     /* 0x4 */ CeilingVertex *vertices[3];
 } Triangle;
 
-extern void func_0020EFDC(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a x b */
+extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
 extern Triangle *D_800B2600;    /* triangle of the cached ceiling normal */
-extern Vec3f D_800F2000;        /* cached raw ceiling normal */
+extern CVector3 D_800F2000;        /* cached raw ceiling normal */
 
 /* Raw normal of a triangle's ceiling plane (straight down for none), cached for the last triangle. */
-Vec3f *func_0026BFB4(Vec3f *out, Triangle *tri) {
-    Vec3f a;
-    Vec3f b;
+CVector3 *func_0026BFB4(CVector3 *out, Triangle *tri) {
+    CVector3 a;
+    CVector3 b;
 
     if (tri == NULL) {
         D_800F2000.x = 0;

@@ -1,12 +1,8 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SYSTEM_2/802661FC_2.CPP, func_80267D70_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-
-typedef struct CVector3 {
-    f32 x, y, z;
-} CVector3;
 
 typedef struct Player {
     char pad0[0xB18];

@@ -1,23 +1,19 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0021740C.c, func_0021740C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef float f32;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 f32 func_002672C8(void *);
 void func_002688C8(void *, f32, f32, f32, s32, s32, s32, s32);
-void func_0020EEF8(Vec3f *, Vec3f *, Vec3f *);
-void func_0020EF2C(Vec3f *, Vec3f *, Vec3f *);
-void func_0020EF60(Vec3f *, Vec3f *, f32);
-void func_0020F040(Vec3f *);
+void func_0020EEF8(CVector3 *, CVector3 *, CVector3 *);
+void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
+void func_0020EF60(CVector3 *, CVector3 *, f32);
+void func_0020F040(CVector3 *);
 extern f32 D_800A6990;
-typedef struct { u8 pad0[4]; Vec3f pos; } B04Ob; /* pos at 0x4 in Turok 2 */
+typedef struct { u8 pad0[4]; CVector3 pos; } B04Ob; /* pos at 0x4 in Turok 2 */
 void func_0024699C(B04Ob *a, s32 unused, B04Ob *b, B04Ob *c, s32 e, s32 f) {
-    Vec3f d;
-    Vec3f r;
+    CVector3 d;
+    CVector3 r;
     if (c != ((void *)0)) {
         func_0020EF2C(&d, &b->pos, &c->pos);
         d.y = 0;

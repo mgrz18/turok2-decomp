@@ -7,19 +7,16 @@
  * src/us/code/func_0040C4F4.c, func_0040A418.c and func_0040A8FC.c); the plain
  * loop puts the counter in $v0 instead of $v1. */
 #include "common.h"
+#include "structs/vector.h"
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ f32 minAngle;
     /* 0x10 */ f32 maxAngle;
 } SpawnPoint;
 
 typedef struct {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ s32 type;
 } AnimEvent;
 
@@ -31,9 +28,9 @@ typedef struct {
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x18 - 0x10];
-    /* 0x018 */ Vec3f vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0x50 - 0x24];
     /* 0x050 */ f32 yaw;
     /* 0x054 */ u8 pad54[0xD4 - 0x54];
@@ -47,7 +44,7 @@ typedef struct Actor {
 
 typedef struct Player {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0xA08 - 0x10];
     /* 0xA08 */ s16 state;
 } Player;
@@ -78,11 +75,11 @@ typedef struct {
 extern SpawnPoint D_00431D20[4];
 extern void func_00246108(Actor *actor, void *ai, Targets *t, s32 f1, s32 f2);
 extern f32 func_002119FC(f32 min, f32 max);
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b); /* out = a - b */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern void func_00246690(Actor *actor, s32 id, Vec3f pos, s32 a5);
+extern void func_00246690(Actor *actor, s32 id, CVector3 pos, s32 a5);
 
 static __inline__ void FindTarget(Actor *obj, Actor **target) {
     Targets targets;
@@ -94,8 +91,8 @@ static __inline__ void FindTarget(Actor *obj, Actor **target) {
     }
 }
 
-static __inline__ f32 DistXZ(Vec3f a, Vec3f *b) {
-    Vec3f d;
+static __inline__ f32 DistXZ(CVector3 a, CVector3 *b) {
+    CVector3 d;
 
     a.y = 0.0f;
     func_0020EF2C(&d, &a, b);
@@ -106,7 +103,7 @@ static __inline__ f32 DistXZ(Vec3f a, Vec3f *b) {
  * nearest to it (within 460.8) inside that point's angle range, else around itself; retried until the spot
  * is at least 460.8 away from every spawn point. */
 void func_00409A64(Actor *obj, s32 nearSelf) {
-    Vec3f p;
+    CVector3 p;
     Actor *target;
     s32 retry;
     s32 idx;
@@ -176,14 +173,14 @@ extern State D_8012FB70;
 extern Actor *D_8010FEB4;
 extern u8 D_8010ABA0[];
 
-extern void func_002688C8(void *obj, Vec3f in, Vec3f *out, s32 *region, s32 a, s32 b);
-extern void *func_00228108(void *world, s32 model, s32 type, s32 intelligence, s32 region, Vec3f pos, f32 rotY,
-                           Vec3f vel, Vec3f scale, s32 *owner);
-extern void func_00236EA0(void *src, void *dst, s32 kind, s32 id, Vec3f pos, Part part);
+extern void func_002688C8(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
+extern void *func_00228108(void *world, s32 model, s32 type, s32 intelligence, s32 region, CVector3 pos, f32 rotY,
+                           CVector3 vel, CVector3 scale, s32 *owner);
+extern void func_00236EA0(void *src, void *dst, s32 kind, s32 id, CVector3 pos, Part part);
 extern void func_00243414(Actor *obj, void *ai, s32 state);
-extern void func_0020F040(Vec3f *v);
-extern void func_0020EF60(Vec3f *out, Vec3f *a, f32 s);
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
+extern void func_0020F040(CVector3 *v);
+extern void func_0020EF60(CVector3 *out, CVector3 *a, f32 s);
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
 /* func_0040C4F4 */
 static __inline__ s32 fewerActorsThan(s32 max) {
@@ -229,7 +226,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
     f32 dist;
     s32 i;
     s32 region;
-    Vec3f scale;
+    CVector3 scale;
     f32 r;
     f32 angle;
     f32 dx;
@@ -303,7 +300,7 @@ void func_00409D4C(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
         break;
     case 5:
         if (found != NULL) {
-            Vec3f push;
+            CVector3 push;
 
             func_0020EF2C(&push, &obj->pos, &found->pos);
             func_0020F040(&push);

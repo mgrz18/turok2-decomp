@@ -1,7 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215410.c, func_80215410_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 /* The player behind an object (owner 0x1A8 of a player-controlled one). */
 typedef struct {
@@ -17,7 +16,7 @@ typedef struct {
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 region;
     /* 0x014 */ s32 *def;           /* first word: kind */
     /* 0x018 */ u8 pad18[0x50 - 0x18];
@@ -33,7 +32,7 @@ typedef struct Actor {
 } Actor;
 
 typedef struct {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ s32 region;
     /* 0x10 */ f32 rotY;
     /* 0x14 */ u16 flags;
@@ -57,7 +56,7 @@ typedef struct {
     /* 0x95 */ u8 pad95[0x98 - 0x95];
     /* 0x98 */ f32 homeRotY;
     /* 0x9C */ u8 pad9C[0xAC - 0x9C];
-    /* 0xAC */ Vec3f pos;
+    /* 0xAC */ CVector3 pos;
     /* 0xB8 */ u8 padB8[0xCA - 0xB8];
     /* 0xCA */ s8 team;
 } Plan;
@@ -66,11 +65,11 @@ typedef struct {
     /* 0x00 */ s32 kind;
     /* 0x04 */ Actor *target;
     /* 0x08 */ f32 angle;
-    /* 0x0C */ Vec3f pos;
-    /* 0x18 */ Vec3f delta;
+    /* 0x0C */ CVector3 pos;
+    /* 0x18 */ CVector3 delta;
     /* 0x24 */ f32 dist;
-    /* 0x28 */ Vec3f flatPos;
-    /* 0x34 */ Vec3f flatDelta;
+    /* 0x28 */ CVector3 flatPos;
+    /* 0x34 */ CVector3 flatDelta;
     /* 0x40 */ f32 flatDist;
 } TrackResult;
 
@@ -79,9 +78,9 @@ extern s32 D_8011001C;
 
 Actor *func_00243C90(Actor *self, Plan *plan, s32 arg2, s32 arg3);
 Location *func_0028479C(s8 *location);
-f32 func_00246310(Actor *a, Vec3f point);              /* angle to a point */
+f32 func_00246310(Actor *a, CVector3 point);              /* angle to a point */
 void func_00210EF0(f32 *angle);                        /* wrap an angle */
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 f32 func_00298470(f32 x);                              /* sqrt */
 
 /* What the plan aims at (the same classes as func_002438C0). */
@@ -126,8 +125,8 @@ static __inline__ s32 Kind(Actor *self, Plan *plan, Actor *target) {
 /* Picks the plan's target and fills `out` with its kind, the turn to face
  * it, its position, offset and distance, in 3D and flattened. */
 void func_002449E0(Actor *self, Plan *plan, s32 unused, TrackResult *out) {
-    Vec3f pos;
-    Vec3f delta;
+    CVector3 pos;
+    CVector3 delta;
     f32 angle;
     s32 kind;
     Actor *target;

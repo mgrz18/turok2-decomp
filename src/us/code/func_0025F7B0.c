@@ -1,18 +1,15 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* AI state: bob towards the target height on a sine wave, the vertical speed
  * eased and clamped; once level with it, switch to state 0x3C. */
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ f32 unk8;
-    /* 0x0C */ Vec3f a;
-    /* 0x18 */ Vec3f b;
+    /* 0x0C */ CVector3 a;
+    /* 0x18 */ CVector3 b;
     /* 0x24 */ u8 pad24[0x44 - 0x24];
 } VecDst;
 
@@ -30,7 +27,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0xC];
     /* 0x1C */ f32 velY;
 } Actor;

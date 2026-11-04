@@ -1,12 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
-
-typedef struct {
-    f32 x, y, z, w;
-} Quat;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x50];
@@ -15,12 +8,12 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x14 - 0x10];
     /* 0x14 */ Def *def;
     /* 0x18 */ u8 pad18[0x34 - 0x18];
-    /* 0x34 */ Vec3 scale;
-    /* 0x40 */ Quat rotation;
+    /* 0x34 */ CVector3 scale;
+    /* 0x40 */ CQuaternion rotation;
     /* 0x50 */ f32 rotY;
     /* 0x54 */ u8 pad54[0x58 - 0x54];
     /* 0x58 */ f32 mtx[4][4];
@@ -35,16 +28,16 @@ extern f32 D_800DD78C;
 
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-void func_00210F68(Quat *out, Quat *a, Quat *b);
-void func_00211114(Quat *q, f32 mtx[4][4]);
+void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+void func_00211114(CQuaternion *q, f32 mtx[4][4]);
 void func_0021034C(f32 mtx[4][4], f32 x, f32 y, f32 z);
-void func_0020F510(Vec3 *v, f32 limit);
+void func_0020F510(CVector3 *v, f32 limit);
 void func_00210318(f32 mtx[4][4], f32 x, f32 y, f32 z);
 void func_00210C3C(f32 mtx[4][4]);
 
 void func_00262A1C(Actor *self, AI *ai) {
-    Quat q;
-    Quat rot;
+    CQuaternion q;
+    CQuaternion rot;
     f32 sinHalf;
 
     if (self->def->spinMode == -1) {

@@ -2,14 +2,13 @@
 /* A projectile's per-frame steering: by type, then homing, thrust and movement. */
 
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct { f32 x, y, z; } Vec3;
-typedef struct { f32 x, y, z, w; } Quat;
 typedef struct { f32 m[4][4]; } Mtx44;
 
 typedef struct ProjNode {
     /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ Vec3 pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ u8 pad10[0x54 - 0x10];
     /* 0x0054 */ f32 height;
     /* 0x0058 */ u8 pad58[0x1320 - 0x58];
@@ -39,9 +38,9 @@ typedef struct ProjSound {
 typedef struct Projectile {
     /* 0x000 */ u8 pad0[2];
     /* 0x002 */ u16 type;
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[8];
-    /* 0x018 */ Vec3 velocity;
+    /* 0x018 */ CVector3 velocity;
     /* 0x024 */ u8 pad24[0x40 - 0x24];
     /* 0x040 */ u32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
@@ -49,7 +48,7 @@ typedef struct Projectile {
     /* 0x0FC */ u8 padFC[0x114 - 0xFC];
     /* 0x114 */ ProjNode *target;
     /* 0x118 */ u8 pad118[0x150 - 0x118];
-    /* 0x150 */ Vec3 heading;
+    /* 0x150 */ CVector3 heading;
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
     /* 0x1B8 */ ProjSound *sound;
 } Projectile;
@@ -62,17 +61,17 @@ extern f32 func_002671B4(ProjNode *node);
 extern f32 func_0026841C(ProjNode *node);
 extern f32 func_002119FC(f32 lo, f32 hi);   /* random in range */
 extern f32 func_0021153C(f32);             /* acosf */
-extern void func_0020EF2C(Vec3 *out, Vec3 *a, Vec3 *b);
-extern void func_0020EEF8(Vec3 *out, Vec3 *a, Vec3 *b);
-extern void func_0020EF60(Vec3 *out, Vec3 *in, f32 scale);
-extern void func_0020F70C(Vec3 *v, f32 max);
-extern void func_0020F040(Vec3 *v);
-extern void func_0020E810(Quat *out, Vec3 *dir);
-extern void func_0020DCC8(Quat *out, f32 t, Quat *a, Quat *b);
-extern void func_00211114(Quat *q, Mtx44 *out);
-extern void func_0020F85C(Mtx44 *m, Vec3 *in, Vec3 *out);
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+extern void func_0020F70C(CVector3 *v, f32 max);
+extern void func_0020F040(CVector3 *v);
+extern void func_0020E810(CQuaternion *out, CVector3 *dir);
+extern void func_0020DCC8(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
+extern void func_00211114(CQuaternion *q, Mtx44 *out);
+extern void func_0020F85C(Mtx44 *m, CVector3 *in, CVector3 *out);
 extern void *func_00275F7C(void);
-extern ProjSound *func_00275C6C(void *pool, s32 id, Vec3 *pos, Vec3 *pos2, s32 arg4);
+extern ProjSound *func_00275C6C(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, s32 arg4);
 extern void func_00232B40(Projectile *p);
 extern void func_00229618(Projectile *p, f32 scale);
 extern void func_002298C4(Projectile *p);
@@ -91,8 +90,8 @@ static __inline__ void PlayLoopingSound(Projectile *o, s32 id) {
 }
 
 static __inline__ void Steer(Projectile *o, f32 a) {
-    Vec3 push;
-    Vec3 vel;
+    CVector3 push;
+    CVector3 vel;
     f32 len, lim;
 
     if (a != 0.0f) {
@@ -111,17 +110,17 @@ static __inline__ void Steer(Projectile *o, f32 a) {
 }
 
 void func_0022A4C8(Projectile *o) {
-    Vec3 d;
-    Vec3 tp;
-    Vec3 vv;
-    Vec3 dir;
-    Vec3 ax;
-    Quat q0, q1, q2;
+    CVector3 d;
+    CVector3 tp;
+    CVector3 vv;
+    CVector3 dir;
+    CVector3 ax;
+    CQuaternion q0, q1, q2;
     Mtx44 mt;
     ProjNode *p;
     ProjNode *p2;
-    Vec3 *tpp;
-    Vec3 *velp;
+    CVector3 *tpp;
+    CVector3 *velp;
     ProjNode *t;
     ProjDef *def;
     f32 h, fa, fb, fc, fd, k, speed, ang, w, tt;

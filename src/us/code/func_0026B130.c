@@ -1,9 +1,10 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Smallest and largest of a coordinate over a triangle's corners. */
 #define TRI_MIN(t, c) ({                        \
-    Vec3 *_p0 = (t)->v[0];                      \
-    Vec3 *_p1 = (t)->v[1];                      \
+    CVector3 *_p0 = (t)->v[0];                      \
+    CVector3 *_p1 = (t)->v[1];                      \
     f32 _m = _p1->c;                            \
     f32 _n;                                     \
     if (!(_m <= _p0->c)) _m = _p0->c;           \
@@ -12,8 +13,8 @@
     _n;                                         \
 })
 #define TRI_MAX(t, c) ({                        \
-    Vec3 *_p0 = (t)->v[0];                      \
-    Vec3 *_p1 = (t)->v[1];                      \
+    CVector3 *_p0 = (t)->v[0];                      \
+    CVector3 *_p1 = (t)->v[1];                      \
     f32 _m = _p1->c;                            \
     f32 _n;                                     \
     if (!(_p0->c <= _m)) _m = _p0->c;           \
@@ -22,13 +23,9 @@
     _n;                                         \
 })
 
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
-
 typedef struct Triangle {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 *v[3];
+    /* 0x04 */ CVector3 *v[3];
     /* 0x10 */ struct Triangle *adj[3];    /* across each edge */
 } Triangle;
 

@@ -1,14 +1,11 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FX/8024F950.CPP, func_8024FD80_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 /* A placed prop as the level file stores it. */
 typedef struct {
     /* 0x00 */ s32 value;
-    /* 0x04 */ Vec3 position;
+    /* 0x04 */ CVector3 position;
     /* 0x10 */ f32 scale[3];
     /* 0x1C */ u16 extents[6];
     /* 0x28 */ u16 id;
@@ -21,7 +18,7 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u8 state;
     /* 0x02 */ u16 id;
-    /* 0x04 */ Vec3 position;
+    /* 0x04 */ CVector3 position;
     /* 0x10 */ void *segment;
     /* 0x14 */ void *model;
     /* 0x18 */ s32 owner;

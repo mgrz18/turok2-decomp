@@ -2,24 +2,21 @@
  * (`addiu $a0,$s1,0x6A88; jal func_0026D288`); the real function is
  * func_0026F080 (versions/undefined_funcs_auto.us.txt). */
 #include "common.h"
+#include "structs/vector.h"
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
-    /* 0x0 */ Vec3f n;
+    /* 0x0 */ CVector3 n;
     /* 0xC */ f32 d;
 } Plane;
 
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
-extern void func_0020EFDC(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a x b */
-extern void func_0020F040(Vec3f *v);                         /* normalise */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
+extern void func_0020F040(CVector3 *v);                         /* normalise */
 
 /* The plane through a, b and c, facing by the winding a -> b -> c. */
-static __inline__ void make_plane(Plane *p, Vec3f *a, Vec3f *b, Vec3f *c) {
-    Vec3f e0;
-    Vec3f e1;
+static __inline__ void make_plane(Plane *p, CVector3 *a, CVector3 *b, CVector3 *c) {
+    CVector3 e0;
+    CVector3 e1;
 
     func_0020EF2C(&e0, b, a);
     func_0020EF2C(&e1, c, b);
@@ -29,7 +26,7 @@ static __inline__ void make_plane(Plane *p, Vec3f *a, Vec3f *b, Vec3f *c) {
 }
 
 /* The six planes of a view volume from the eye and the four corners of its far rectangle. */
-void func_0026F080(Plane *planes, Vec3f *eye, Vec3f *c0, Vec3f *c1, Vec3f *c2, Vec3f *c3) {
+void func_0026F080(Plane *planes, CVector3 *eye, CVector3 *c0, CVector3 *c1, CVector3 *c2, CVector3 *c3) {
     make_plane(&planes[2], c0, c1, c3);
     make_plane(&planes[0], eye, c0, c2);
     make_plane(&planes[1], eye, c3, c1);

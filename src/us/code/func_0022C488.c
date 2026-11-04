@@ -1,10 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, Particle_HitTarget, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -38,7 +35,7 @@ typedef struct Target Target;
 struct Target {
     /* 0x0000 */ u8 kind;
     /* 0x0001 */ u8 pad1[3];
-    /* 0x0004 */ Vec3f pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ s32 unk10;
     /* 0x0014 */ ActorDef *def;
     /* 0x0018 */ u8 pad18[0x98 - 0x18];
@@ -56,12 +53,12 @@ struct Target {
 typedef struct Particle {
     /* 0x000 */ u8 pad0[2];
     /* 0x002 */ u16 type;
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 unk10;
     /* 0x014 */ u8 pad14[4];
-    /* 0x018 */ Vec3f velocity;
+    /* 0x018 */ CVector3 velocity;
     /* 0x024 */ u8 pad24[0x34 - 0x24];
-    /* 0x034 */ Vec3f attachPos;
+    /* 0x034 */ CVector3 attachPos;
     /* 0x040 */ u32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
     /* 0x0F8 */ ParticleDef *def;
@@ -85,12 +82,12 @@ typedef struct Particle {
 typedef struct CollisionResult {
     /* 0x00 */ Target *current;
     /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ Vec3f origin;
+    /* 0x08 */ CVector3 origin;
     /* 0x14 */ s32 frame;
     /* 0x18 */ u8 pad18[0x7E - 0x18];
     /* 0x7E */ u8 mode;
     /* 0x7F */ u8 pad7F[0xD8 - 0x7F];
-    /* 0xD8 */ Vec3f direction;
+    /* 0xD8 */ CVector3 direction;
 } CollisionResult;
 
 typedef struct EffectInfo {
@@ -109,20 +106,20 @@ extern u8 D_8010FF34[];
 s32 func_002682CC(Target *target);
 s32 func_00245724(Target *target);
 void func_0020D908(f32 *out, Bone *bone);
-void func_0021B39C(Target *target, s32 *ai, f32 *matrix, Vec3f origin, Vec3f direction, s32 frame);
+void func_0021B39C(Target *target, s32 *ai, f32 *matrix, CVector3 origin, CVector3 direction, s32 frame);
 void func_0020C208(f32 *out, f32 *in);
-void func_0020F85C(f32 *matrix, Vec3f *in, Vec3f *out);
-void func_0020F040(Vec3f *v);
-void func_0020FAFC(f32 *matrix, Vec3f *in, Vec3f *out);
-void func_0025E52C(Target *target, s32 *ai, Vec3f *from, s32 arg3);
+void func_0020F85C(f32 *matrix, CVector3 *in, CVector3 *out);
+void func_0020F040(CVector3 *v);
+void func_0020FAFC(f32 *matrix, CVector3 *in, CVector3 *out);
+void func_0025E52C(Target *target, s32 *ai, CVector3 *from, s32 arg3);
 void func_002327F4(Particle *p);
 void func_00234E48(void *list, Particle *p);
 void func_00228B4C(void *list, s32 handle);
 s32 func_002325F0(Particle *p);
 s32 func_00268148(Target *target);
-void func_00236EA0(void *source, Particle *p, s32 effect, s32 arg3, Vec3f pos, ActionParams params);
+void func_00236EA0(void *source, Particle *p, s32 effect, s32 arg3, CVector3 pos, ActionParams params);
 void func_00229340(Particle *p, s32 model, s32 arg2, s32 enabled);
-void func_00275544(s16 sound, Vec3f pos, s32 arg2, s32 arg3);
+void func_00275544(s16 sound, CVector3 pos, s32 arg2, s32 arg3);
 void func_0022F1C8(void *list, Particle *p);
 void func_00232B40(Particle *p);
 
@@ -130,7 +127,7 @@ void func_00232B40(Particle *p);
 static __inline__ void attachParticle(Particle *p, f32 *transform, s32 action) {
     f32 localTransform[16];
     f32 inverse[16];
-    Vec3f direction;
+    CVector3 direction;
     Target *attached;
     CollisionResult *scene;
 

@@ -1,15 +1,13 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/AI/NAV/8027451C_2.CPP, func_80275410_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
 extern f32 func_0021153C(f32 arg0);
 struct CVector3_t;
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 struct CVector3_t;
-typedef struct CVector3_t CVector3;
 struct CVector3_t;
 struct CVector3_t {
     f32 x;

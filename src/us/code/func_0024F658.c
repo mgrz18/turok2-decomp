@@ -1,17 +1,10 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_12.CPP, func_802238E0_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
-    f32 x, y, z, w;
-} Quat;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x1C - 0x10];
     /* 0x1C */ f32 climb;
 } Body;
@@ -63,7 +56,7 @@ typedef struct {
     /* 0x0A90 */ f32 strafeImpulse;
     /* 0x0A94 */ f32 impulseTime;
     /* 0x0A98 */ u8 padA98[0xAA0 - 0xA98];
-    /* 0x0AA0 */ Vec3f velocity;
+    /* 0x0AA0 */ CVector3 velocity;
     /* 0x0AAC */ u8 padAAC[0xAD0 - 0xAAC];
     /* 0x0AD0 */ f32 tilt;
 } Player;
@@ -75,23 +68,23 @@ f32 func_0021170C(f32 value, f32 rate);
 f32 func_0021160C(f32 value, f32 delta, f32 limit);
 f32 func_00298470(f32 x);
 void func_002117DC(f32 *value, f32 target, f32 rate);
-Quat func_0021AE6C(Body *body);
-void func_00211114(Quat *q, f32 *mtx);
-void func_0020F85C(f32 *mtx, Vec3f *in, Vec3f *out);
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
-void func_00275544(s16 sound, Vec3f pos, s32, s32);
+CQuaternion func_0021AE6C(Body *body);
+void func_00211114(CQuaternion *q, f32 *mtx);
+void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 /* Swimming movement: forward and strafe speeds, the dodge impulses and the
  * climb, turned by the body's facing and added to the velocity, with drag
  * on the way down and a roll from the strafe. */
 void func_0024F658(Player *player, Body *body, Tuning *tuning) {
-    Vec3f forward;
-    Vec3f strafe;
-    Vec3f forwardOut;
-    Vec3f strafeOut;
-    Vec3f sum;
+    CVector3 forward;
+    CVector3 strafe;
+    CVector3 forwardOut;
+    CVector3 strafeOut;
+    CVector3 sum;
     f32 mtx[16];
-    Quat rot;
+    CQuaternion rot;
     f32 value;
     f32 max;
     f32 speed;

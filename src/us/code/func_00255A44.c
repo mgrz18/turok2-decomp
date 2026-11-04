@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0xC];
     /* 0x1C */ f32 velY;
 } Actor;
@@ -37,7 +34,7 @@ typedef struct {
 
 extern f32 func_00268A5C(Actor *actor);
 extern void func_00280EAC(void *camera);
-extern void func_00275544(s16 sound, Vec3f pos, s32, s32);
+extern void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 /* Tracks the lowest height reached, damps the player's motion and the actor's
  * vertical speed (clamped at -51.2), resets state and plays sound 2000 there. */

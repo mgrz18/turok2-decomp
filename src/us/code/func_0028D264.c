@@ -1,12 +1,12 @@
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct { f32 x, y, z; } Vec3f;
 typedef struct { s32 data[0x4E8 / 4]; } PlayerState;
 
 /* A player (0x1328 bytes) as this reads it. */
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 region;
     /* 0x014 */ u8 pad14[0x3C];
     /* 0x050 */ f32 rotY;
@@ -26,7 +26,7 @@ typedef struct {
 typedef struct {
     /* 0x0000 */ s32 unk0[4];
     /* 0x0010 */ PlayerState state[4];
-    /* 0x13B0 */ Vec3f pos[4];
+    /* 0x13B0 */ CVector3 pos[4];
     /* 0x13E0 */ f32 rotY[4];
     /* 0x13F0 */ s32 region[4];
 } SavedPlayers;

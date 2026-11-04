@@ -1,7 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002149C0.c, func_002149C0, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ s32 kind;
@@ -15,7 +14,7 @@ typedef struct {
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ s32 region;
     /* 0x014 */ ActorDef *def;
     /* 0x018 */ u8 pad18[0x54 - 0x18];
@@ -55,7 +54,7 @@ typedef struct {
     /* 0x7C */ u8 pad7C[4];
     /* 0x80 */ Actor *approachFrom;
     /* 0x84 */ u8 pad84[0xAC - 0x84];
-    /* 0xAC */ Vec3f pos;
+    /* 0xAC */ CVector3 pos;
     /* 0xB8 */ s32 region;
 } Plan;
 
@@ -69,21 +68,21 @@ s32 func_002438C0(Actor *self, Plan *plan, Actor *target);
 s32 func_002435AC(Actor *viewer, Actor *target, f32 range, f32 across, f32 up);
 s32 func_0025E44C(Actor *self, Plan *plan);
 s32 func_0025E428(Actor *self, Plan *plan);
-void func_0025E52C(Actor *self, Plan *plan, Vec3f *pos, s32 arg3);
+void func_0025E52C(Actor *self, Plan *plan, CVector3 *pos, s32 arg3);
 s32 Cinema_PathPlaying(void);
 s32 func_00284408(void);
 Actor *func_00225848(u8 *scene, Actor *self);
 Actor *func_0022594C(u8 *scene, Actor *self);
 Actor *func_002259D0(u8 *scene, Actor *self);
-Actor *func_002532EC(u8 *players, Vec3f pos);
-Actor *func_00253370(u8 *players, Vec3f pos, void *owner);
+Actor *func_002532EC(u8 *players, CVector3 pos);
+Actor *func_00253370(u8 *players, CVector3 pos, void *owner);
 CameraInfo *func_00268A2C(Actor *player);
-f32 func_002465F0(Actor *a, Vec3f pos);
-f32 func_0024665C(Actor *a, Vec3f pos);
+f32 func_002465F0(Actor *a, CVector3 pos);
+f32 func_0024665C(Actor *a, CVector3 pos);
 s32 func_00267E74(Actor *a);
 f32 func_00268534(Actor *a);
 f32 func_002671B4(Actor *a);                           /* height */
-s32 func_00239F00(Actor *a, Vec3f from, u8 *result);
+s32 func_00239F00(Actor *a, CVector3 from, u8 *result);
 
 #define ADD(t) if ((t) != NULL) { list[n] = (t); n++; }
 
@@ -93,7 +92,7 @@ s32 func_00239F00(Actor *a, Vec3f from, u8 *result);
 Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
     Actor *list[128];
     ActorHead saved;
-    Vec3f eye;
+    CVector3 eye;
     f32 range;
     f32 across;
     f32 up;

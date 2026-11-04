@@ -1,12 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00283D24.c, func_00283D24.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
 typedef struct B19Rec8 {
     s32 a;
     s32 b;
@@ -17,9 +13,6 @@ typedef struct B19Tbl {
     u16 w8C[14];
     u16 wA8[14];
 } B19Tbl;
-typedef struct B19Vec3 {
-    f32 x, y, z;
-} B19Vec3;
 typedef struct B19Parent {
     u8 pad0[0x18];
     B19Tbl *tbl;            /* 0x18 */
@@ -28,14 +21,14 @@ typedef struct B19Parent {
 typedef struct B19Obj {
     s8 kind;
     u8 pad1[3];
-    B19Vec3 pos;            /* 0x004 */
+    CVector3 pos;            /* 0x004 */
     u8 pad10[0xF8 - 0x10];
     B19Parent *parent;      /* 0x0F8 */
     u8 padFC[0x1AC - 0xFC];
     s8 unk1AC;              /* 0x1AC */
 } B19Obj;
 s32 func_002325F0(B19Obj *);
-void func_00236EA0(B19Obj *, B19Obj *, s32, s32, B19Vec3, B19Rec8);
+void func_00236EA0(B19Obj *, B19Obj *, s32, s32, CVector3, B19Rec8);
 void func_00229340(B19Obj *, s32, s32, s32);
 void func_00275544(s16, f32, f32, f32, s32, s32);
 void func_002324E8(B19Obj *o) {

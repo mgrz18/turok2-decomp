@@ -1,16 +1,13 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct ActorMotion {
     /* 0x00 */ u8 kind;
     /* 0x01 */ u8 pad1[3];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ void *region;
     /* 0x14 */ u8 pad14[4];
-    /* 0x18 */ Vec3 velocity;
+    /* 0x18 */ CVector3 velocity;
     /* 0x24 */ u8 pad24[0x34 - 0x24];
 } ActorMotion; /* size 0x34 */
 
@@ -32,10 +29,10 @@ extern CollisionInfo D_800F1BE0;
 s32 func_00267EE8(Actor *actor);
 s32 func_00267F64(Actor *actor);
 s32 func_00267FA8(Actor *actor);
-s32 func_00239F00(Actor *actor, Vec3 pos, CollisionInfo *info);
+s32 func_00239F00(Actor *actor, CVector3 pos, CollisionInfo *info);
 
 /* Tests moving an actor to pos with the collision settings that suit it, leaving it where it was; returns the collision result. */
-s32 func_0026961C(Actor *actor, Vec3 pos, CollisionInfo **outInfo) {
+s32 func_0026961C(Actor *actor, CVector3 pos, CollisionInfo **outInfo) {
     ActorMotion saved;
     CollisionInfo *info;
     s32 alt;

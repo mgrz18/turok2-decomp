@@ -1,18 +1,15 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Advance an actor's animation (func_0021A7EC) and move it by the root motion
  * that produced: the new position is taken back out, turned by the actor's
  * rotation, collided along (func_0021A658), then the animation is applied. */
 
-typedef struct {
-    f32 x, y, z;
-} Vec3;
-
 typedef struct Actor Actor;
 
 struct Actor {
     u8 pad0[0x4];
-    Vec3 pos;               /* 0x004 */
+    CVector3 pos;               /* 0x004 */
     u8 pad10[0x4];
     s32 *region;            /* 0x014 */
     u8 pad18[0x40];
@@ -36,16 +33,16 @@ s32 *func_0020367C(s32, s32, s32, s32, s32, s32, s32, s32);
 void *func_002017D4(s32, s32);
 void func_002051F4(s32, s32 *);
 void func_0020C0D0(void *, void *, void *);
-void func_0020EEF8(Vec3 *, Vec3 *, void *);
-void func_0020EF2C(Vec3 *, Vec3 *, Vec3 *);
+void func_0020EEF8(CVector3 *, CVector3 *, void *);
+void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
 void func_0021A500(Actor *);
-void func_0021A658(Actor *, Vec3 *);
+void func_0021A658(Actor *, CVector3 *);
 void func_0021A7EC(Actor *);
-void func_002233A8(s32 *, Actor *, Vec3 *, Vec3 *);
+void func_002233A8(s32 *, Actor *, CVector3 *, CVector3 *);
 
 void func_0021A344(Actor *actor) {
-    Vec3 oldPos;
-    Vec3 newPos;
+    CVector3 oldPos;
+    CVector3 newPos;
     s32 *set;
     void *data;
     s32 *game;

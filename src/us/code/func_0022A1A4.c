@@ -1,6 +1,6 @@
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct { f32 x, y, z; } Vec3f;
 typedef struct { f32 x, y, z, w; } Vector4f;
 typedef struct { f32 m[16]; } MatrixF;
 
@@ -17,14 +17,14 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
 } TargetActor;
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[8];
-    /* 0x018 */ Vec3f vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0xF8 - 0x24];
     /* 0x0F8 */ ProjectileDef *def;
     /* 0x0FC */ u8 padFC[0x114 - 0xFC];
@@ -32,28 +32,28 @@ typedef struct {
     /* 0x118 */ u8 pad118[4];
     /* 0x11C */ f32 speed;
     /* 0x120 */ u8 pad120[0x150 - 0x120];
-    /* 0x150 */ Vec3f dir;
+    /* 0x150 */ CVector3 dir;
 } Projectile;
 
 extern f32 func_00298470(f32);                              /* sqrtf */
 extern f32 func_0026841C(TargetActor *actor);               /* its height */
 extern f32 func_002671B4(TargetActor *actor);
 extern f32 func_0026D210(s32 value);
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a - b */
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);  /* out = a + b */
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 s);    /* out = in * s */
-extern void func_0020F040(Vec3f *v);                        /* normalize */
-extern Vector4f func_0020E810(Vec3f *dir);                  /* quaternion facing dir */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
+extern void func_0020F040(CVector3 *v);                        /* normalize */
+extern Vector4f func_0020E810(CVector3 *dir);                  /* quaternion facing dir */
 extern void func_0020DCC8(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b);
 extern void func_00211114(Vector4f *q, MatrixF *m);
-extern void func_0020F85C(MatrixF *m, Vec3f *in, Vec3f *out);
+extern void func_0020F85C(MatrixF *m, CVector3 *in, CVector3 *out);
 extern void func_00229618(Projectile *p, f32 scale);
 
 /* Speeds up along the heading, stopping at the definition's limit. */
 static __inline__ void accelerate(Projectile *p, f32 accel) {
-    Vec3f step;
-    Vec3f dir;
-    Vec3f *vel;
+    CVector3 step;
+    CVector3 dir;
+    CVector3 *vel;
     f32 speed;
     f32 limit;
 
@@ -78,9 +78,9 @@ static __inline__ void accelerate(Projectile *p, f32 accel) {
  * closer it is, then accelerates along its heading up to (or down to) the
  * definition's speed limit, then wobbles. */
 void func_0022A1A4(Projectile *p) {
-    Vec3f aim;
-    Vec3f delta;
-    Vec3f forward;
+    CVector3 aim;
+    CVector3 delta;
+    CVector3 forward;
     Vector4f from;
     Vector4f to;
     Vector4f turn;

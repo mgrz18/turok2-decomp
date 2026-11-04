@@ -1,17 +1,8 @@
+#include "structs/vector.h"
+
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00205324.c, func_00205324.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef double f64;
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
 typedef union M1IF { s32 i; f32 f; } M1IF;
 typedef union M1W4 { s32 i; f32 f; s16 h[2]; u16 hu[2]; u8 b[4]; u32 u; } M1W4;
 typedef union M1B1 { s8 s; u8 u; } M1B1;
@@ -62,7 +53,7 @@ struct M1Def {
 };
 struct M1Actor { /* Turok 2 layout */
                 u8 pad0[0x4];
-                Vec3f pos;          /* 0x04 */
+                CVector3 pos;          /* 0x04 */
                 u8 pad10[0x4];
                 M1Def *def;         /* 0x14 */
                 u8 pad18[0xBC];
@@ -81,15 +72,15 @@ struct M1State {
                 u32 flags3C;
                 f32 f40;
                 f32 f44;
-                Vec3f v48;
-                Vec3f v54;
+                CVector3 v48;
+                CVector3 v54;
                 f32 f60;
                 f32 f64;
                 u8 pad68[0x18];
                 M1Actor *unk80;
                 u8 pad84[0x18];
                 f32 f9C;
-                Vec3f vA0;
+                CVector3 vA0;
                 u8 padAC[0x1E];
                 u8 unkCA;
                 s8 unkCB;
@@ -103,7 +94,7 @@ struct M1State {
                 M1IF unk124;
                 M1IF unk128;
                 M1IF unk12C;
-                Vec3f vec130;
+                CVector3 vec130;
                 f32 f13C;
 };
 struct M1Ref {
@@ -128,8 +119,8 @@ extern s32 D_800F7078[];
 extern u8 D_801102B8[];
 void func_00220260(s32 *p, M1Actor *a, s32 n);
 void func_0026E110(M1Actor *a, s32 b, M1Actor *c);
-void func_00275544(s16 id, Vec3f pos, s32 a, s32 b);
-void func_00246690(M1Actor *a, s32 id, Vec3f pos, s32 n);
+void func_00275544(s16 id, CVector3 pos, s32 a, s32 b);
+void func_00246690(M1Actor *a, s32 id, CVector3 pos, s32 n);
 void func_0024646C(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);
 void func_002365F8(u8 *p, M1Actor *a);
 void func_00265B58(M1Actor *actor, M1State *state) {

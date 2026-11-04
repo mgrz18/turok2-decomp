@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Region {
     char pad0[2];
@@ -29,7 +26,7 @@ typedef struct Owner {
 
 typedef struct Actor {
     char pad0[4];
-    Vec3 pos;          /* 0x04 */
+    CVector3 pos;          /* 0x04 */
     Region *region;    /* 0x10 */
     ActorDef *def;     /* 0x14 */
     char pad18[0x30 - 0x18];

@@ -1,12 +1,8 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_4/8028FD2C_12.CPP, func_802905F4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-
-typedef struct CVector3 {
-    f32 x, y, z;
-} CVector3;
 
 /* Turok 2 layout (Rage Wars offsets in parentheses). */
 typedef struct SceneEffect {

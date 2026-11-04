@@ -1,15 +1,15 @@
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct { f32 x, y, z; } Point3;
 typedef struct { f32 m[4][4]; } Mtx4;
 
 /* The view the spawn is placed from (0x800F1CE8). */
 typedef struct {
-    /* 0x00 */ Point3 pos;
+    /* 0x00 */ CVector3 pos;
     u8 padC[0x3];
     /* 0x0F */ u8 b0F;
     u8 pad10[0xC0];
-    /* 0xD0 */ Point3 dir;
+    /* 0xD0 */ CVector3 dir;
 } SpawnView;
 
 typedef struct {
@@ -20,9 +20,9 @@ typedef struct {
 
 typedef struct {
     u8 pad0[0x18];
-    /* 0x018 */ Point3 dir;
+    /* 0x018 */ CVector3 dir;
     u8 pad24[0x10];
-    /* 0x034 */ Point3 pos;
+    /* 0x034 */ CVector3 pos;
     /* 0x040 */ u32 flags;
     u8 pad44[0xC8];
     /* 0x10C */ u8 *parent;
@@ -36,15 +36,15 @@ extern SpawnSource D_800F1CE0;
 extern SpawnView D_800F1CE8;
 void func_0020D908(Mtx4 *out, void *src);
 void func_0020C208(Mtx4 *out, Mtx4 *in);
-void func_0020F85C(Mtx4 *m, Point3 *in, Point3 *out);
-void func_0020F040(Point3 *v);
-void func_0020FAFC(Mtx4 *m, Point3 *in, Point3 *out);
+void func_0020F85C(Mtx4 *m, CVector3 *in, CVector3 *out);
+void func_0020F040(CVector3 *v);
+void func_0020FAFC(Mtx4 *m, CVector3 *in, CVector3 *out);
 void func_0025E52C(u8 *owner, u8 *ai, void *pos, s32 n);
 
 void func_00232168(Actor *actor, Mtx4 *mtx, s32 kind) {
     Mtx4 tmp;
     Mtx4 m;
-    Point3 dir;
+    CVector3 dir;
     u8 *owner;
 
     owner = D_800F1CE0.owner;

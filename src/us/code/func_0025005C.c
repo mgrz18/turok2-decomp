@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f *corners[3];
+    /* 0x04 */ CVector3 *corners[3];
 } Floor;
 
 typedef struct {
@@ -17,7 +14,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ Floor *floor;
     /* 0x014 */ u8 pad14[0x1C - 0x14];
     /* 0x01C */ f32 velY;
@@ -41,7 +38,7 @@ typedef struct {
     /* 0x0A78 */ f32 forward;
     /* 0x0A7C */ f32 strafe;
     /* 0x0A80 */ u8 padA80[0xAA0 - 0xA80];
-    /* 0x0AA0 */ Vec3f velocity;
+    /* 0x0AA0 */ CVector3 velocity;
     /* 0x0AAC */ u8 padAAC[0xAC8 - 0xAAC];
     /* 0x0AC8 */ f32 pitch;
     /* 0x0ACC */ u8 padACC[0xAD0 - 0xACC];
@@ -58,9 +55,9 @@ f32 func_0021160C(f32 value, f32 target, f32 rate);
 f32 func_0021170C(f32 value, f32 rate);
 f32 func_002982F0(f32 x); /* sin */
 f32 func_002974C0(f32 x); /* cos */
-void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
-Floor *func_00220A1C(void *world, Vec3f *pos);
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+Floor *func_00220A1C(void *world, CVector3 *pos);
 s32 func_0024E5F0(Player *player, Body *body, s32 mode);
 void func_0027FC2C(u8 *game, void *hud, char *msg);
 
@@ -70,7 +67,7 @@ void func_0027FC2C(u8 *game, void *hud, char *msg);
  * up/down with the buttons; holding all three 0xE000 buttons and pressing one
  * again leaves it, dropping onto the middle of the floor under the player. */
 void func_0025005C(Player *player, Body *body) {
-    Vec3f move;
+    CVector3 move;
     Floor *floor;
     u32 held;
 

@@ -1,6 +1,5 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Point3;
+#include "structs/vector.h"
 
 typedef struct PlayerOptions {
     /* 0x00 */ u8 pad0[0x3E];
@@ -14,7 +13,7 @@ typedef struct WeaponDef {
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[0x4];
-    /* 0x0004 */ Point3 pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ u8 pad10[0xD4 - 0x10];
     /* 0x00D4 */ s32 flags;
     /* 0x00D8 */ u8 padD8[0x518 - 0xD8];
@@ -38,7 +37,7 @@ void func_00285BD0(s32 arg0, s32 arg1);
 void func_002553BC(Player *player, s32 arg1);
 void func_0026E110(s32 arg0, s32 arg1, s32 arg2);
 void func_0042EB04(Player *player);
-void func_00268C48(Player *player, Point3 pos, s32 id, f32 arg);
+void func_00268C48(Player *player, CVector3 pos, s32 id, f32 arg);
 void func_00275624(s32 sound);
 void func_0024E5F0(Player *player, s32 arg1, s32 anim);
 

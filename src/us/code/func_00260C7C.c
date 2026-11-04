@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     f32 m[4][4];
@@ -10,7 +7,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ Vec3f vel;
+    /* 0x18 */ CVector3 vel;
     /* 0x24 */ u8 pad24[0x50 - 0x24];
     /* 0x50 */ f32 yaw;
 } Actor;
@@ -22,14 +19,14 @@ typedef struct {
 
 s32 func_002451AC(Actor *self, AI *ai, void *target, f32 angle);
 void func_002105A4(Mtx44 *mtx, f32 angle);
-void func_0020F85C(Mtx44 *mtx, Vec3f *in, Vec3f *out);
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
+void func_0020F85C(Mtx44 *mtx, CVector3 *in, CVector3 *out);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
 /* AI callback: with a target, pushes the actor sideways (by its yaw) by the
  * side func_002451AC reports within 20 degrees; else damps its velocity. */
 void func_00260C7C(Actor *self, AI *ai) {
-    Vec3f push;
-    Vec3f dir;
+    CVector3 push;
+    CVector3 dir;
     Mtx44 mtx;
     s32 side;
 

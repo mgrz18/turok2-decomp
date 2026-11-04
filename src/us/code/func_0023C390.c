@@ -1,20 +1,17 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Plane {
     u8 pad0[0x30];
-    Vec3 normal;        /* 0x30 */
+    CVector3 normal;        /* 0x30 */
 } Plane;
 
-extern void func_0020EF2C(Vec3 *out, Vec3 *a, void *b);
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, void *b);
 extern f32 D_800A66A4;
 
-s32 func_0023C390(Plane *plane, Vec3 *start, Vec3 *end, f32 *t) {
-    Vec3 dir;
-    Vec3 diff;
+s32 func_0023C390(Plane *plane, CVector3 *start, CVector3 *end, f32 *t) {
+    CVector3 dir;
+    CVector3 diff;
     f32 denom;
 
     func_0020EF2C(&dir, end, start);

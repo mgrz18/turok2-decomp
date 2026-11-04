@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/CODE_80281A70.CPP, func_80281CA0_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
 /* Steps the particle system once: marks every particle on the three active
  * lists, then (outside a pause) advances the ones inside the visible bounds,
@@ -7,12 +8,11 @@
  * collected type 0x22 particle react to the others and each type 0x57
  * particle expire the non-0x57 ones within range. */
 
-typedef struct { f32 x, y, z; } Vec3f;
 typedef struct { s32 a, b; } IntPair;
 
 typedef struct {
-    /* 0x00 */ Vec3f min;
-    /* 0x0C */ Vec3f max;
+    /* 0x00 */ CVector3 min;
+    /* 0x0C */ CVector3 max;
 } Bounds;
 
 typedef struct {
@@ -40,7 +40,7 @@ typedef struct {
 typedef struct Particle {
     /* 0x000 */ u8 pad0[0x2];
     /* 0x002 */ u16 type;
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x40 - 0x10];
     /* 0x040 */ u32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
@@ -76,18 +76,18 @@ extern Bounds D_800F5A10;       /* visible bounds */
 
 extern void func_0022AFB4(Particle *p);
 extern s32 func_002325F0(Particle *p);
-extern void func_00236EA0(Particle *p, Particle *source, s32 type, s32 id, Vec3f pos, IntPair value);
+extern void func_00236EA0(Particle *p, Particle *source, s32 type, s32 id, CVector3 pos, IntPair value);
 extern void func_00229340(Particle *p, s32 type, s32 alignment, s32 count);
-extern void func_00275544(s16 sound, Vec3f pos, s32 a, s32 b);
+extern void func_00275544(s16 sound, CVector3 pos, s32 a, s32 b);
 extern void func_0022F1C8(ParticleSystem *world, Particle *p);
 extern void func_00230AB0(ParticleSystem *world, Particle *p, Particle **others, s32 count);
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);    /* out = a - b */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);    /* out = a - b */
 
 void func_00230CB4(ParticleSystem *world) {
     Particle *colliders[128];
     Particle *stepped[128];
     IntPair value;
-    Vec3f delta;
+    CVector3 delta;
     Particle *p;
     Particle *node;
     Particle *focus;

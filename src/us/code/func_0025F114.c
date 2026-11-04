@@ -1,5 +1,5 @@
 #include "common.h"
-
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -13,12 +13,12 @@ typedef struct {
     /* 0xC7 */ s8 unkC7;
 } AI;
 
-/* The point turned to, as three globals (D_800B06A0 is a Vec3f elsewhere). */
+/* The point turned to, as three globals (D_800B06A0 is a CVector3 elsewhere). */
 extern f32 D_800B06A0;
 extern f32 D_800B06A4;
 extern f32 D_800B06A8;
 
-f32 func_00246310(Actor *self, f32 x, f32 y, f32 z); /* angle to a point (a Vec3f by value) */
+f32 func_00246310(Actor *self, f32 x, f32 y, f32 z); /* angle to a point (a CVector3 by value) */
 void func_00245BAC(Actor *self, AI *ai, f32 rate, f32 angle);
 void func_0025D474(Actor *self, AI *ai);
 

@@ -1,8 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, func_8027C274_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
-typedef struct { f32 x, y, z; } Vec3f;
-typedef struct { f32 x, y, z, w; } Quatf;
 typedef struct { s32 a, b; } IntPair;
 
 typedef struct {
@@ -22,7 +21,7 @@ typedef struct {
     /* 0x000 */ u8 pad0[0x10];
     /* 0x010 */ void *region;
     /* 0x014 */ u8 pad14[0x18 - 0x14];
-    /* 0x018 */ Vec3f velocity;
+    /* 0x018 */ CVector3 velocity;
     /* 0x024 */ u8 pad24[0x40 - 0x24];
     /* 0x040 */ s32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
@@ -32,7 +31,7 @@ typedef struct {
     /* 0x110 */ s32 ownerId;
     /* 0x114 */ s32 target;
     /* 0x118 */ u8 pad118[0x168 - 0x118];
-    /* 0x168 */ Vec3f rotSpeed;
+    /* 0x168 */ CVector3 rotSpeed;
     /* 0x174 */ u8 pad174[0x195 - 0x174];
     /* 0x195 */ s8 dieOnImpact;
     /* 0x196 */ u8 pad196[0x1A0 - 0x196];
@@ -40,24 +39,24 @@ typedef struct {
 } Particle;
 
 extern s32 func_0026C114(void *region);                     /* region's surface type */
-extern void func_00236EA0(Particle *, Particle *, s32 effect, s32, Vec3f pos, IntPair params);
-extern void func_0020E810(Quatf *out, Vec3f *dir);          /* rotation facing dir */
-extern void func_0022F350(void *sys, Particle *p, void *owner, s32 ownerId, s32 target, s32 type, Vec3f dir,
-                          Quatf rot, Vec3f pos, s32 region, s32 arg10, s32 flags);
-extern void func_00275544(s16 sound, Vec3f pos, s32, s32);
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 s);    /* out = in * s */
+extern void func_00236EA0(Particle *, Particle *, s32 effect, s32, CVector3 pos, IntPair params);
+extern void func_0020E810(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
+extern void func_0022F350(void *sys, Particle *p, void *owner, s32 ownerId, s32 target, s32 type, CVector3 dir,
+                          CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
+extern void func_00275544(s16 sound, CVector3 pos, s32, s32);
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void func_0022F1C8(void *sys, Particle *p);
 extern void func_00232B40(Particle *p);
 extern s32 D_800F1D7C;
-extern Vec3f D_800F1D80;
+extern CVector3 D_800F1D80;
 extern s32 D_800F1D8C;
-extern Vec3f D_800F1DB8;
+extern CVector3 D_800F1DB8;
 extern u8 D_800F8928[];
 
 void func_0022BA88(Particle *arg0) {
     IntPair pair;
-    Quatf rotation;
-    Vec3f position;
+    CQuaternion rotation;
+    CVector3 position;
     s32 surface;
     s32 index;
     ParticleEvents *events;

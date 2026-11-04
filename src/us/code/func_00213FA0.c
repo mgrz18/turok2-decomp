@@ -1,12 +1,9 @@
 #include "common.h"
+#include "structs/vector.h"
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
-    /* 0x0 */ Vec3f mn;
-    /* 0xC */ Vec3f mx;
+    /* 0x0 */ CVector3 mn;
+    /* 0xC */ CVector3 mx;
 } Box3;
 
 typedef struct {

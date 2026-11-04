@@ -1,6 +1,5 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x32];
@@ -16,7 +15,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
 } HitSource;
 
 typedef struct {
@@ -67,10 +66,10 @@ RegionInfo *func_0022425C(void *level, void *region);
 void func_00249118(DamagePlayer *p, HitSource *src, s32 arg3, s32 type);
 void func_0027FC2C(Game *game, void *camera, char *text);
 void func_0027580C(s32 sound);
-void func_00225DB0(void *level, u8 *rumble, s32 id, Vec3f v, f32 f6, f32 f7);
+void func_00225DB0(void *level, u8 *rumble, s32 id, CVector3 v, f32 f6, f32 f7);
 void func_00281054(void *camera, s32 alpha, s32 time);
 void func_00275624(s32 sound);
-void func_00275544(s16 sound, Vec3f pos, s32, s32);
+void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -90,7 +89,7 @@ void func_00249358(DamagePlayer *p, HitSource *src, s32 damage, s32 arg3, s32 ty
     s32 alpha;
     s32 time;
     s32 amount;
-    Vec3f zero;
+    CVector3 zero;
 
     f = 1.0f;
     old = p->health;

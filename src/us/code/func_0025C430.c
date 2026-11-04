@@ -1,11 +1,10 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* AI attack-wait callback: state 0 counts the delay down; once it has run out
  * (more than 30 frames left means an attack is due) it plays the attack
  * animation for the current mode if the definition allows it. State 1 counts
  * the cool-down and re-picks a region. */
-
-typedef struct { f32 x, y, z; } Vec3;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x7E];
@@ -19,7 +18,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x14 - 0x10];
     /* 0x014 */ ActorDef *def;
 } Actor;
@@ -44,12 +43,12 @@ typedef struct {
 } CAI;
 
 extern f32 D_800B6D28; /* frame delta */
-extern Vec3 D_800B06A0;
-extern Vec3 D_800B06AC;
+extern CVector3 D_800B06A0;
+extern CVector3 D_800B06AC;
 extern u8 D_800F7078[];
 
 extern void func_00243414(Actor *actor, CAI *ai, s32 anim);
-extern s16 func_002261A8(void *level, s32 id, Vec3 *pos);
+extern s16 func_002261A8(void *level, s32 id, CVector3 *pos);
 
 static __inline__ s32 canAttack(CAI *ai, ActorInfo *info, s32 state) {
     if (state == 0x20 || state == 0x3D) {

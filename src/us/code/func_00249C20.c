@@ -3,6 +3,7 @@
  * jump table at 0x800A6B28 is 8-aligned from there (from its own start,
  * 0x800A6B0C, it would not be). */
 #include "common.h"
+#include "structs/vector.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -10,14 +11,6 @@
 /* Weapon auto-aim: finds the target closest to the player's aim direction
  * within the weapon's cone and returns the rotation that turns the aim
  * toward it (identity when there is none). */
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct Quat {
-    f32 x, y, z, w;
-} Quat;
 
 typedef struct WeaponDef {
     /* 0x00 */ u8 pad0[0xE];
@@ -40,11 +33,11 @@ typedef struct AimView {
 typedef struct AimActor AimActor;
 struct AimActor {
     /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ Vec3f pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ u8 pad10[0x54 - 0x10];
     /* 0x0054 */ f32 height;
     /* 0x0058 */ u8 pad58[0x214 - 0x58];
-    /* 0x0214 */ Vec3f aimPos;
+    /* 0x0214 */ CVector3 aimPos;
     /* 0x0220 */ u8 pad220[0x518 - 0x220];
     /* 0x0518 */ AimOptions *options;
     /* 0x051C */ AimView *view;
@@ -56,14 +49,14 @@ struct AimActor {
     /* 0x0B34 */ u8 padB34[4];
     /* 0x0B38 */ AimActor *lockTarget;
     /* 0x0B3C */ s32 hold;
-    /* 0x0B40 */ Vec3f aimPoint;
-    /* 0x0B4C */ Vec3f aimVel;
+    /* 0x0B40 */ CVector3 aimPoint;
+    /* 0x0B4C */ CVector3 aimVel;
     /* 0x0B58 */ AimActor *seenTarget;
     /* 0x0B5C */ s32 range;
     /* 0x0B60 */ u8 padB60[4];
-    /* 0x0B64 */ Vec3f viewPoint;
-    /* 0x0B70 */ Vec3f viewVel;
-    /* 0x0B7C */ Quat aimRot;
+    /* 0x0B64 */ CVector3 viewPoint;
+    /* 0x0B70 */ CVector3 viewVel;
+    /* 0x0B7C */ CQuaternion aimRot;
     /* 0x0B8C */ s32 unkB8C;
     /* 0x0B90 */ u8 padB90[0xCC4 - 0xB90];
     /* 0x0CC4 */ s32 unkCC4;
@@ -84,7 +77,7 @@ extern s32 D_800F7E70;
 extern AimActor *D_800F7C70[];
 extern f32 D_800DD78C;
 
-void func_0021F00C(Vec3f *out, AimActor *actor, Vec3f off);
+void func_0021F00C(CVector3 *out, AimActor *actor, CVector3 off);
 f32 func_00253CFC(AimActor *);
 f32 func_002974C0(f32);
 f32 func_002982F0(f32);
@@ -92,28 +85,28 @@ f32 func_00298470(f32);
 f32 func_0021153C(f32);
 s32 func_00249A58(AimActor *, AimActor *);
 f32 func_002671B4(AimActor *);
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);
-void func_0020EFDC(Vec3f *out, Vec3f *a, Vec3f *b);
-f32 func_0020F040(Vec3f *);
-Quat func_0021AE6C(AimActor *);
-void func_00210F68(Quat *out, Quat *a, Quat *b);
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);
+f32 func_0020F040(CVector3 *);
+CQuaternion func_0021AE6C(AimActor *);
+void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
 extern f32 D_800B6D28;
-void func_0020F85C(f32 mtx[4][4], Vec3f *in, Vec3f *out);
-void func_0020EF60(Vec3f *out, Vec3f *a, f32 s);
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
+void func_0020F85C(f32 mtx[4][4], CVector3 *in, CVector3 *out);
+void func_0020EF60(CVector3 *out, CVector3 *a, f32 s);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
-Quat func_00249C20(AimActor *pl, AimActor **outTarget, Vec3f *outPos) {
-    Vec3f tpos;
-    Vec3f dir;
-    Vec3f eye;
-    Vec3f bestPos;
-    Vec3f fwd;
-    Vec3f off;
-    Vec3f bestDir;
-    Vec3f axis;
-    Quat turn;
-    Quat rot;
-    Quat result;
+CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) {
+    CVector3 tpos;
+    CVector3 dir;
+    CVector3 eye;
+    CVector3 bestPos;
+    CVector3 fwd;
+    CVector3 off;
+    CVector3 bestDir;
+    CVector3 axis;
+    CQuaternion turn;
+    CQuaternion rot;
+    CQuaternion result;
     AimActor *best;
     AimActor *t;
     f32 cone;
@@ -213,10 +206,10 @@ Quat func_00249C20(AimActor *pl, AimActor **outTarget, Vec3f *outPos) {
 /* Per-frame weapon aiming: the aim rotation, the auto-aim target lock
  * (acquire, hold, switch target) and the two spring-damped aim points. */
 void func_0024A0DC(AimActor *pl) {
-    Vec3f tpos;
-    Vec3f off;
-    Vec3f delta;
-    Vec3f aimDir;
+    CVector3 tpos;
+    CVector3 off;
+    CVector3 delta;
+    CVector3 aimDir;
     AimActor *target;
     AimView *view;
     s32 canLock;
@@ -288,8 +281,8 @@ void func_0024A0DC(AimActor *pl) {
     if (target == NULL) {
         tpos = aimDir;
         if (pl->options->autoAim && canLock) {
-            Vec3f tpos2;
-            Quat rot2;
+            CVector3 tpos2;
+            CQuaternion rot2;
             AimActor *target2;
 
             rot2 = func_00249C20(pl, &target2, &tpos2);

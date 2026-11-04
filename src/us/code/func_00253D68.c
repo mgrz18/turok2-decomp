@@ -1,9 +1,8 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80225D10_10.CPP, func_8022AE28_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef float f32;
-typedef struct CVector3 { f32 x, y, z; } CVector3;
 /* Turok 2: position 0x4 and region 0x10 (Rage Wars 0x8 / 0x14). */
 typedef struct LevelActor {
     char pad0[4];

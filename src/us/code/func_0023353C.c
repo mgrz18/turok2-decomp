@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct MorphVtx {
     /* 0x00 */ s16 ob[3];
@@ -12,7 +9,7 @@ typedef struct MorphVtx {
 } MorphVtx;
 
 typedef struct MorphPoint {         /* 0x14 bytes */
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ u8 pad0C[0x8];
 } MorphPoint;
 
@@ -51,15 +48,15 @@ typedef struct MorphClock {
 } MorphClock;
 
 extern f32 func_002974C0(f32 x);        /* cosf */
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 
 #define LERP_COLOR(a, b) ((f32)(a) + t * (f32)((b) - (a)))
 
 /* Blends a vertex buffer between two point sets with a cosine ease: in over the
  * duration, out over the last fadeTime. */
 void func_0023353C(MorphOwner *owner, MorphClock *clock, MorphVtx *dst, Morph *morph) {
-    Vec3f a;
-    Vec3f b;
+    CVector3 a;
+    CVector3 b;
     f32 t;
     s32 n;
     MorphItem *item;

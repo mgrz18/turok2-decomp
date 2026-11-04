@@ -1,9 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/802ABDBC_11.CPP, func_802ACB18_de (the pickup feedback), with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 /* Pickup effect descriptor. */
 typedef struct PickupEntry {
@@ -18,7 +15,7 @@ typedef struct PickupEntry {
 
 typedef struct Player {
     char pad0[4];
-    Vec3 position;  /* 0x004 */
+    CVector3 position;  /* 0x004 */
     char pad10[0x51C - 0x10];
     void *ui;       /* 0x51C */
     char pad520[0xA28 - 0x520];
@@ -47,7 +44,7 @@ extern char D_801198B0[];
 void func_00248644(Player *player, s32 id);
 void func_00281060(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
 void func_0027FC2C(void *arg0, void *ui, void *resource);
-s32 func_00275544(s32 sound, Vec3 position, s32 arg4, s32 arg5);
+s32 func_00275544(s32 sound, CVector3 position, s32 arg4, s32 arg5);
 void func_0027580C(s32 callback);
 
 /* Flashes the screen and plays the descriptor's optional resource, sound and callback. */

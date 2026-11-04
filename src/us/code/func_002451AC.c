@@ -1,7 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00215B90.c, func_00215B90, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x996];
@@ -12,7 +11,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
     /* 0x014 */ s32 *def;           /* first word: kind */
     /* 0x018 */ u8 pad18[0x50 - 0x18];
@@ -34,12 +33,12 @@ f32 func_0021153C(f32 x);                        /* acos */
 f32 func_002982F0(f32 x);                        /* sin */
 f32 func_002974C0(f32 x);                        /* cos */
 f32 func_00298470(f32 x);                        /* sqrt */
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);   /* out = a - b */
-void func_0020F040(Vec3f *v);                          /* normalise */
-void func_0021F00C(Vec3f *out, Actor *a, Vec3f v);    /* v in a's frame */
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+void func_0020F040(CVector3 *v);                          /* normalise */
+void func_0021F00C(CVector3 *out, Actor *a, CVector3 v);    /* v in a's frame */
 
 /* func_00246310: the signed angle from the actor's heading to a point. */
-static __inline__ f32 AngleTo(Actor *actor, Vec3f point) {
+static __inline__ f32 AngleTo(Actor *actor, CVector3 point) {
     f32 dx;
     f32 dz;
     f32 dist;
@@ -70,11 +69,11 @@ static __inline__ f32 AngleTo(Actor *actor, Vec3f point) {
 /* Whether `self` sees `target` (a player holding a ready weapon, or a
  * creature in an attack pose) aiming at it: 0 if not, else the side (-1/1). */
 s32 func_002451AC(Actor *self, s32 unused, Actor *target, f32 cone) {
-    Vec3f dir;
-    Vec3f facing;
-    Vec3f fwd;
-    Vec3f from;
-    Vec3f to;
+    CVector3 dir;
+    CVector3 facing;
+    CVector3 fwd;
+    CVector3 from;
+    CVector3 to;
     f32 lo;
     f32 hi;
     f32 y;

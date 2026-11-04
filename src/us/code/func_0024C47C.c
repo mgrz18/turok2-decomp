@@ -86,6 +86,7 @@ void func_0024C47C(WeaponMenu *menu, WheelPlayer *player) {
 }
 
 #include "gfx.h"
+#include "structs/vector.h"
 
 /* An animated HUD item (func_00277328 ticks it, func_0027AD00 restarts it). */
 typedef struct {
@@ -321,7 +322,6 @@ void func_0024C648(HudPlayer *player, View *view) {
     }
 }
 
-
 typedef struct Quad {
     s32 w[4];
 } Quad;
@@ -406,7 +406,6 @@ void func_0024CF58(ViewState *view, Target *target) {
     }
 }
 
-
 typedef struct SwitchPlayer {
     /* 0x0000 */ u8 pad0[0x288];
     /* 0x0288 */ u8 unk288[0x3C8 - 0x288];
@@ -482,12 +481,6 @@ void func_0024D1F8(SwitchPlayer *player) {
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_8.CPP, func_80220ED4_de, with Turok 2's layouts. */
 
-typedef struct Vec3f {
-    f32 x;
-    f32 y;
-    f32 z;
-} Vec3f;
-
 typedef struct Model {
     /* 0x00 */ u16 unk0;
     /* 0x02 */ u16 flags;
@@ -518,7 +511,7 @@ typedef struct Options {
 
 typedef struct Controller {
     /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ Vec3f pos;
+    /* 0x08 */ CVector3 pos;
 } Controller;
 
 typedef struct Input {
@@ -539,7 +532,7 @@ typedef struct Voice {
 
 typedef struct Player {
     /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ Vec3f pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ Model *model;
     /* 0x0014 */ ActorDef *def;
     /* 0x0018 */ u8 pad18[4];
@@ -559,7 +552,7 @@ typedef struct Player {
     /* 0x01A8 */ struct Player *owner;
     /* 0x01AC */ u8 pad1AC[0x288 - 0x1AC];
     /* 0x0288 */ u8 emitter[4];
-    /* 0x028C */ Vec3f emitterPos;
+    /* 0x028C */ CVector3 emitterPos;
     /* 0x0298 */ Model *emitterModel;
     /* 0x029C */ u8 pad29C[0x2C8 - 0x29C];
     /* 0x02C8 */ Quad emitter40;
@@ -611,7 +604,7 @@ typedef struct Player {
     /* 0x0A88 */ s32 onGround;
     /* 0x0A8C */ u8 padA8C[0xA9C - 0xA8C];
     /* 0x0A9C */ f32 airTime;
-    /* 0x0AA0 */ Vec3f goal;
+    /* 0x0AA0 */ CVector3 goal;
     /* 0x0AAC */ f32 unkAAC;
     /* 0x0AB0 */ u8 padAB0[0xAC0 - 0xAB0];
     /* 0x0AC0 */ f32 crouch;
@@ -623,7 +616,7 @@ typedef struct Player {
     /* 0x0B04 */ u8 padB04[0xB14 - 0xB04];
     /* 0x0B14 */ s16 nextWeapon;
     /* 0x0B16 */ u8 padB16[2];
-    /* 0x0B18 */ Vec3f lastPos;
+    /* 0x0B18 */ CVector3 lastPos;
     /* 0x0B24 */ u8 padB24[4];
     /* 0x0B28 */ f32 unkB28;
     /* 0x0B2C */ u8 padB2C[0xC04 - 0xB2C];
@@ -700,7 +693,7 @@ s32 func_002548FC(Player *);
 f32 func_0021149C(f32);
 void func_00245828(DamageEvent *, s32, s32, f32, s32, s32);
 void func_00247C10(Player *, u32 *ai, DamageEvent *);
-void func_00275544(s32 sound, Vec3f pos, s32, s32);
+void func_00275544(s32 sound, CVector3 pos, s32, s32);
 s32 func_002685F0(Player *);
 void func_002699E4(Player *);
 void func_0024E9D0(Player *, Player *);
@@ -708,13 +701,13 @@ void func_0024E88C(Player *, Player *);
 void func_00255220(Player *, Player *);
 void func_00255298(Player *, Player *);
 void func_00247660(Player *);
-void func_00269050(Player *, Surface *, Vec3f *, s32);
+void func_00269050(Player *, Surface *, CVector3 *, s32);
 void func_00249358(Player *, Player *, s32, s32, s32);
 void func_002543A4(Player *, Player *, Surface *);
 void func_0024AB0C(Player *, Player *);
-s32 func_00239F00(Player *, Vec3f, u32 *);
+s32 func_00239F00(Player *, CVector3, u32 *);
 void func_0026E19C(Model *, s32, Player *);
-void func_002233A8(void *, Player *, Vec3f *, Vec3f *);
+void func_002233A8(void *, Player *, CVector3 *, CVector3 *);
 void func_0026E110(u8 *, s32, Player *);
 void func_0024ED54(Player *, Player *, u32 *);
 s32 func_0024EAF8(Player *, Player *, u32 *);
@@ -771,7 +764,7 @@ static __inline__ void enter_surface(Player *p, Player *actor, Surface *before, 
  * time, the landscape ceiling, the animation for the current action, the
  * cheats (all weapons / ammo) and the weapon sounds. */
 void func_0024D344(Player *p) {
-    Vec3f prev;
+    CVector3 prev;
     Input saved;
     DamageEvent damage;
     s32 soundFlags;
@@ -899,7 +892,7 @@ void func_0024D344(Player *p) {
         material = func_00268A2C(actor);
         func_00254640(p, actor, material);
         if (D_8011AAF1.multiplayer == 0) {
-            Vec3f *pos = &p->pos;
+            CVector3 *pos = &p->pos;
 
             if (model != NULL && pos != NULL && (model->flags & 0x40)) {
                 f32 amount = (s32) (func_00269C3C(model, p->pos.x, pos->z) - func_0026BE60(model, p->pos.x, pos->z));

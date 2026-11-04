@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct ObjDef {
     /* 0x00 */ s32 type;
@@ -24,7 +21,7 @@ typedef struct Actor {
 
 f32 func_0026BE60(void *node, f32 x, f32 z);
 f32 func_002425A4(void *actor, f32 x, f32 z);
-void func_00268798(Actor *actor, Vec3 *velocity);
+void func_00268798(Actor *actor, CVector3 *velocity);
 
 /* func_00268688, inlined: floor height under (x, z) for an actor. */
 static __inline__ f32 actorFloor(Actor *actor, f32 x, f32 z) {
@@ -51,7 +48,7 @@ static __inline__ f32 actorFloor(Actor *actor, f32 x, f32 z) {
 /* The platform an actor stands on, if it is still touching it. */
 Actor *func_00267800(Actor *actor) {
     Actor *platform;
-    Vec3 velocity;
+    CVector3 velocity;
     f32 floor;
     f32 gap;
 

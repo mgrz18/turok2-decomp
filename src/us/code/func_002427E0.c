@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 /* Game settings (D_8011AAD8); the difficulty at +8 is read as D_8011AAE0. */
 typedef struct Settings {
@@ -45,7 +42,7 @@ extern Settings D_8011AAD8;
 extern s32 D_8011AAE0;  /* difficulty: 8, 16 or 32 */
 
 /* Initial health and level of an actor from its definition, scaled by difficulty. */
-void func_002427E0(Dest *dst, ActorDef *def, Vec3 pos, void *actor) {
+void func_002427E0(Dest *dst, ActorDef *def, CVector3 pos, void *actor) {
     Settings *settings;
     s32 level;
     f32 health;

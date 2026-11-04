@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ s32 unk10;
     /* 0x14 */ u8 pad14[0xB8 - 0x14];
     /* 0xB8 */ u16 typeId;
@@ -20,7 +17,7 @@ typedef struct {
     /* 0x24 */ s32 unk24;
     /* 0x28 */ s32 unk28;
     /* 0x2C */ u8 pad2C[0x9C - 0x2C];
-    /* 0x9C */ Vec3 pos;
+    /* 0x9C */ CVector3 pos;
     /* 0xA8 */ s32 unkA8;
 } Spawn;
 

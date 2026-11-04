@@ -1,16 +1,13 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
  * random stun of a live helper), and once the boss has waited long enough
  * outside the fight starts the level's boss music. */
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
 typedef struct Actor {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x14 - 0x10];
     /* 0x014 */ s32 *type;
     /* 0x018 */ u8 pad18[0x140 - 0x18];
@@ -51,7 +48,7 @@ extern u8 D_80119870[];
 extern void func_004089E0();
 extern void func_004082A0(BossFight *fight);
 extern f32 func_0021149C(f32 range);
-extern void func_00246690(Actor *actor, s32 sound, Vec3f pos, s32 arg);
+extern void func_00246690(Actor *actor, s32 sound, CVector3 pos, s32 arg);
 extern void func_00245828(void *out, s32 a, s32 b, f32 c, s32 d, s32 e);
 extern void func_0025B2D4(Actor *actor, void *ai, void *anim);
 extern Player *func_002532A8(void *players);

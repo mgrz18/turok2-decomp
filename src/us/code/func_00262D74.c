@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
@@ -6,20 +7,12 @@
  * random from the weapon/ammo/item tables the definition enables. */
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
-    f32 x, y, z, w;
-} Quatf;
-
-typedef struct {
     /* 0x00 */ u32 flags;
     /* 0x04 */ s32 dropKind;
     /* 0x08 */ u8 pad8[0x14 - 0x8];
     /* 0x14 */ s16 dropId;
     /* 0x16 */ s16 dropModel;
-    /* 0x18 */ Vec3f dropScale;
+    /* 0x18 */ CVector3 dropScale;
     /* 0x24 */ s16 dropEffect;
 } ActorInfo;
 
@@ -30,12 +23,12 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ s32 region;
     /* 0x14 */ ActorDef *def;
-    /* 0x18 */ Vec3f vel;
+    /* 0x18 */ CVector3 vel;
     /* 0x24 */ u8 pad24[0x40 - 0x24];
-    /* 0x40 */ Quatf rot;
+    /* 0x40 */ CQuaternion rot;
     /* 0x50 */ f32 rotY;
 } Actor;
 
@@ -47,7 +40,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
 } PoolActor;
 
 typedef struct {
@@ -83,12 +76,12 @@ extern f32 func_0026BE60(s32 region, f32 x, f32 z);
 extern s32 *func_00225E88(void *level, s32 model);
 extern s32 func_002241C0(void *level, s32 id);
 extern s32 func_00262C20(s32 id);
-extern PoolActor *func_00227240(void *pool, s32 *refCount, s32 id, Vec3f vel, Vec3f pos, s32 region, f32 lifetime);
-extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, Vec3f pos, f32 rotY,
-                           Vec3f vel, Vec3f scale, s32 *owner);
-extern s32 func_0022F350(void *sys, Actor *p, Actor *owner, s32 *ownerId, s32 target, s32 type, Vec3f dir,
-                         Quatf rot, Vec3f pos, s32 region, s32 arg10, s32 flags);
-extern void func_00246690(PoolActor *actor, s32 sound, Vec3f pos, s32 arg);
+extern PoolActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
+                           CVector3 vel, CVector3 scale, s32 *owner);
+extern s32 func_0022F350(void *sys, Actor *p, Actor *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
+                         CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
+extern void func_00246690(PoolActor *actor, s32 sound, CVector3 pos, s32 arg);
 extern void *func_002532A8(void *players);
 extern s32 func_00253C14(void *player, s32 id);
 extern s32 func_00253CF0(void *player, s32 id);
@@ -98,7 +91,7 @@ extern s32 func_0026D5E4(PickTable *t, s16 id, s16 weight);
 extern s16 func_0026D628(PickTable *t);
 
 /* Spawns pool pickup id at pos. */
-static __inline__ void spawnPickup(Actor *actor, CAI *ai, Vec3f pos, s32 region, s32 id) {
+static __inline__ void spawnPickup(Actor *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
     PoolActor *pickup;
 
     pickup = func_00227240(D_80107590, &ai->spawned, id, actor->vel, pos, region, 0.0f);
@@ -109,21 +102,21 @@ static __inline__ void spawnPickup(Actor *actor, CAI *ai, Vec3f pos, s32 region,
 }
 
 /* Spawns the object model (an intelligence entry) at pos. */
-static __inline__ void spawnObject(Actor *actor, CAI *ai, Vec3f pos, Vec3f scale, s32 region, s32 type, s32 *model) {
+static __inline__ void spawnObject(Actor *actor, CAI *ai, CVector3 pos, CVector3 scale, s32 region, s32 type, s32 *model) {
     if (func_00228108(D_8010ABA0, type, 0, model, region, pos, actor->rotY, actor->vel, scale, &ai->spawned)) {
         ai->drops--;
     }
 }
 
 /* Spawns the effect at pos. */
-static __inline__ void spawnEffect(Actor *actor, CAI *ai, Vec3f pos, s32 region, s32 type) {
+static __inline__ void spawnEffect(Actor *actor, CAI *ai, CVector3 pos, s32 region, s32 type) {
     ai->drops -= func_0022F350(D_800F8928, actor, actor, &ai->spawned, 0, type, actor->vel, actor->rot, pos, region,
                                -1, 0);
 }
 
 void func_00262D74(Actor *actor, CAI *ai) {
-    Vec3f pos;
-    Vec3f scale;
+    CVector3 pos;
+    CVector3 scale;
     PickTable picks;
     PickTable unlocked;
     ActorInfo *info;

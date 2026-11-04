@@ -1,12 +1,11 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/CODE_80245D20.CPP, func_80245D30_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 extern s32 func_002685F0(void *actor);
-extern f32 func_0020EAA0(Vec3f *v);                                 /* yaw of v */
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 s);            /* out = in * s */
-extern void func_0020EF8C(Vec3f *out, f32 t, Vec3f *a, Vec3f *b);   /* out = lerp(a, b, t) */
+extern f32 func_0020EAA0(CVector3 *v);                                 /* yaw of v */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);            /* out = in * s */
+extern void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);   /* out = lerp(a, b, t) */
 extern void func_00210EF0(f32 *angle);                              /* wraps an angle */
 
 extern f32 D_800B25F0[2];   /* current: blend rate, turn rate */
@@ -29,7 +28,7 @@ typedef struct {
     /* 0x001 */ u8 pad1[0x1C - 0x1];
     /* 0x01C */ f32 vertical;
     /* 0x020 */ u8 pad20[0x24 - 0x20];
-    /* 0x024 */ Vec3f current;
+    /* 0x024 */ CVector3 current;
     /* 0x030 */ u8 pad30[0x50 - 0x30];
     /* 0x050 */ f32 yaw;
     /* 0x054 */ u8 pad54[0x140 - 0x54];
@@ -44,10 +43,10 @@ static __inline__ s32 currentEnabled(Actor *actor) {
 
 /* Applies a surface current to an actor: pushes pos, turns the actor with it
  * (flags 0x600 spin, 0x2000 face the flow) and handles the vertical part. */
-void func_00269050(Actor *actor, Material *mat, Vec3f *pos, s32 active) {
+void func_00269050(Actor *actor, Material *mat, CVector3 *pos, s32 active) {
     Actor *rider;
-    Vec3f flow;
-    Vec3f flat;
+    CVector3 flow;
+    CVector3 flat;
     f32 cur;
     f32 want;
     f32 spin;
@@ -59,7 +58,7 @@ void func_00269050(Actor *actor, Material *mat, Vec3f *pos, s32 active) {
     s32 enabled;
     s32 blocked;
     u16 flags;
-    Vec3f *current;
+    CVector3 *current;
 
     if (actor->kind == 1) {
         rider = actor;

@@ -1,13 +1,10 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_11.CPP, func_802233F0_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x50 - 0x10];
     /* 0x50 */ f32 yaw;
 } Body;
@@ -43,7 +40,7 @@ typedef struct {
     /* 0x0A90 */ f32 strafeImpulse;
     /* 0x0A94 */ f32 impulseTime;
     /* 0x0A98 */ u8 padA98[0xAA0 - 0xA98];
-    /* 0x0AA0 */ Vec3f velocity;
+    /* 0x0AA0 */ CVector3 velocity;
     /* 0x0AAC */ u8 padAAC[0xB8C - 0xAAC];
     /* 0x0B8C */ s32 zoomed;
 } Player;
@@ -55,15 +52,15 @@ f32 func_0021170C(f32 value, f32 rate);
 f32 func_0021160C(f32 value, f32 delta, f32 limit);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-void func_0020F70C(Vec3f *v, f32 max);
-void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
-void func_00275544(s16 sound, Vec3f pos, s32, s32);
+void func_0020F70C(CVector3 *v, f32 max);
+void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 /* Walking movement: forward and strafe speeds towards the stick, the dodge
  * impulses, turned into world space and added to the velocity. */
 void func_0024F174(Player *player, Body *body, Tuning *tuning) {
-    Vec3f motion;
+    CVector3 motion;
     f32 forward;
     f32 strafe;
     f32 max;

@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Player {
     u8 pad0[0x51C];
@@ -32,7 +29,7 @@ extern SoundPair D_800B69D8[];
 extern void func_0027FC2C(void *arg0, void *arg1, s32 arg2);
 extern void func_0027580C(s32 arg0);
 
-void func_00238A7C(s32 arg0, Actor *actor, s32 arg2, Vec3 pos, EventParams params) {
+void func_00238A7C(s32 arg0, Actor *actor, s32 arg2, CVector3 pos, EventParams params) {
     if (actor->type == 1 && (actor->flags & 0x300000)) {
         func_0027FC2C(D_801198B0, actor->owner->unk51C, D_800B69D8[params.index].sound);
     } else {

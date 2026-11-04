@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     f32 r, g, b;
@@ -22,18 +19,18 @@ typedef struct {
 
 void *func_002017D4(s32 *, s32);
 void func_0020D908(f32 *mtx, void *packed);
-void func_0020F040(Vec3 *v);
-void func_0020F85C(f32 *mtx, Vec3 *in, Vec3 *out);
+void func_0020F040(CVector3 *v);
+void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
 ColorF func_00211DB0(f32 h, f32 s, f32 v);
 
 /* Debug coloring: each vertex gets a hue from its transformed position along
  * the (1,1,1) diagonal. */
-void func_00212DA4(s32 *model, u8 *matrices, Vec3 *colors, s32 skinned) {
+void func_00212DA4(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
     f32 mtx[16];
-    Vec3 axis;
+    CVector3 axis;
     ColorF c;
-    Vec3 in;
-    Vec3 out;
+    CVector3 in;
+    CVector3 out;
     VertexGroup *group;
     ModelVertex *verts;
     s32 n;

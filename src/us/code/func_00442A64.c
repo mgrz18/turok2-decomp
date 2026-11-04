@@ -1,22 +1,19 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Teleports the current target (when it is a flagged actor) to a random spot: around the spawn point
  * nearest to it (within 460.8) inside that point's angle range, else around itself; retried until the spot
  * is at least 460.8 away from every spawn point. */
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ f32 minAngle;
     /* 0x10 */ f32 maxAngle;
 } SpawnPoint;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0xD4 - 0x10];
     /* 0x0D4 */ u32 flags;
 } Actor;
@@ -35,11 +32,11 @@ typedef struct {
 extern SpawnPoint D_00431C40[4];
 extern void func_00246108(Actor *actor, void *ai, Targets *t, s32 f1, s32 f2);
 extern f32 func_002119FC(f32 min, f32 max);
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b); /* out = a - b */
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern void func_00246690(Actor *actor, s32 id, Vec3f pos, s32 a5);
+extern void func_00246690(Actor *actor, s32 id, CVector3 pos, s32 a5);
 
 static __inline__ void FindTarget(Actor *obj, Actor **target) {
     Targets targets;
@@ -51,8 +48,8 @@ static __inline__ void FindTarget(Actor *obj, Actor **target) {
     }
 }
 
-static __inline__ f32 DistXZ(Vec3f a, Vec3f *b) {
-    Vec3f d;
+static __inline__ f32 DistXZ(CVector3 a, CVector3 *b) {
+    CVector3 d;
 
     a.y = 0.0f;
     func_0020EF2C(&d, &a, b);
@@ -60,7 +57,7 @@ static __inline__ f32 DistXZ(Vec3f a, Vec3f *b) {
 }
 
 void func_00442A64(Actor *obj, s32 nearSelf) {
-    Vec3f p;
+    CVector3 p;
     Actor *target;
     s32 retry;
     s32 idx;

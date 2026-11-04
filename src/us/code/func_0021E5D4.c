@@ -1,19 +1,13 @@
+#include "structs/vector.h"
+
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_8.CPP, func_8024B2D0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
 struct LevelActor;
 struct CVector3_t;
 struct Box;
 typedef struct Box Box;
 struct CVector3_t;
-typedef struct CVector3_t CVector3;
 struct CVector3_t;
 struct CVector3_t {
     f32 x;

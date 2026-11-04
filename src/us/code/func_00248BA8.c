@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/vector.h"
 
 #define FALSE 0
 #define TRUE 1
@@ -7,12 +8,8 @@
  * visited hubs, then picks the warp record (the one farthest from the other
  * players in multiplayer) and moves the player there. */
 
-typedef struct Vec3f {
-    f32 x, y, z;
-} Vec3f;
-
 typedef struct WarpPoint {
-    /* 0x00 */ Vec3f pos;
+    /* 0x00 */ CVector3 pos;
     /* 0x0C */ f32 angle;
     /* 0x10 */ s16 level;
     /* 0x12 */ s16 room;
@@ -21,12 +18,12 @@ typedef struct WarpPoint {
 typedef struct WarpPlayer WarpPlayer;
 struct WarpPlayer {
     /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ Vec3f pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ s32 room;
     /* 0x0014 */ u8 pad14[0x50 - 0x14];
     /* 0x0050 */ f32 angle;
     /* 0x0054 */ u8 pad54[0x28C - 0x54];
-    /* 0x028C */ Vec3f spawnPos;
+    /* 0x028C */ CVector3 spawnPos;
     /* 0x0298 */ s32 spawnRoom;
     /* 0x029C */ u8 pad29C[0x2D8 - 0x29C];
     /* 0x02D8 */ f32 spawnAngle;
@@ -60,7 +57,7 @@ void func_0042EB04(void);
 s32 func_00285BD0(s32, s32);
 s32 func_00424A60(s32);
 s32 func_0042C194(void *, s32, s32, WarpPoint *, s32);
-f32 func_0020F6BC(Vec3f *, Vec3f *);
+f32 func_0020F6BC(CVector3 *, CVector3 *);
 s32 func_002242F8(void *, s32);
 void func_0042DE74(WarpPlayer *);
 void func_0042C700(void *, s32, s32);

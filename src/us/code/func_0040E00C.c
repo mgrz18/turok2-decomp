@@ -1,14 +1,8 @@
-typedef signed int s32;
-typedef unsigned short u16;
-typedef float f32;
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ char pad0[0x4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ s32 region;
     /* 0x14 */ char pad14[0xA4];
     /* 0xB8 */ u16 type;
@@ -22,7 +16,7 @@ typedef struct {
     /* 0x24 */ s32 unk24;
     /* 0x28 */ s32 unk28;
     /* 0x2C */ char pad2C[0x70];
-    /* 0x9C */ Vec3f pos;
+    /* 0x9C */ CVector3 pos;
     /* 0xA8 */ s32 region;
 } Spawn40E00C;
 

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Picks a random point on the ground around the origin: a distance in the phase's range
  * [unk688, unk68C] and a random angle in [-pi, pi]. */
@@ -36,16 +37,12 @@ typedef struct {
     /* 0x68C */ s32 unk68C;
 } State;
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
 extern State D_8012FB70;
 extern f32 func_002119FC(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
 
-void func_0040C110(Vec3f *out) {
+void func_0040C110(CVector3 *out) {
     State *state = &D_8012FB70;
     f32 dist;
     f32 angle;

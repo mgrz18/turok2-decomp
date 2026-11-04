@@ -1,15 +1,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0024D860.c, func_8024D870_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
-
-typedef struct Quat {
-    f32 x, y, z, w;
-} Quat;
 
 typedef struct Actor {
     /* 0x000 */ u8 kind;
@@ -29,25 +22,25 @@ typedef struct Actor {
 extern f32 D_800DD78C;
 
 s32 func_0026AFC0(void *region);
-void func_0026BD20(Vec3 *normal, void *region);
-void func_0020EFDC(Vec3 *out, Vec3 *a, Vec3 *b);     /* cross product */
-void func_0020F040(Vec3 *v);                         /* normalize */
+void func_0026BD20(CVector3 *normal, void *region);
+void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);     /* cross product */
+void func_0020F040(CVector3 *v);                         /* normalize */
 f32 func_0021153C(f32 x);                            /* acos */
 f32 func_002982F0(f32 x);                            /* sin */
 f32 func_002974C0(f32 x);                            /* cos */
 f32 func_0026A268(void *region, f32 x, f32 z, f32 toX, f32 toZ);  /* ground slope */
-void func_0020DCC8(Quat *out, f32 t, Quat *a, Quat *b);           /* slerp */
+void func_0020DCC8(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);           /* slerp */
 
 static __inline__ s32 isHeld(Actor *obj) {
     return (obj->kind != 1) ? 0 : (obj->flags & 1);
 }
 
 /* Tilt of an actor toward the floor normal under it. */
-static __inline__ Quat floorTilt(Actor *obj) {
-    Vec3 normal;
-    Vec3 up;
-    Vec3 axis;
-    Quat q;
+static __inline__ CQuaternion floorTilt(Actor *obj) {
+    CVector3 normal;
+    CVector3 up;
+    CVector3 axis;
+    CQuaternion q;
     f32 angle;
 
     func_0026BD20(&normal, obj->region);
@@ -66,13 +59,13 @@ static __inline__ Quat floorTilt(Actor *obj) {
 }
 
 /* An actor's body lean on the ground: players blend the floor tilt with a lean along their heading. */
-Quat func_00267944(Actor *obj) {
-    Vec3 normal;
-    Vec3 up;
-    Vec3 axis;
-    Quat tilt;
-    Quat lean;
-    Quat result;
+CQuaternion func_00267944(Actor *obj) {
+    CVector3 normal;
+    CVector3 up;
+    CVector3 axis;
+    CQuaternion tilt;
+    CQuaternion lean;
+    CQuaternion result;
     f32 slope;
     f32 sine;
     f32 cosine;

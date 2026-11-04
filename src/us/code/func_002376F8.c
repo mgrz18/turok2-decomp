@@ -1,17 +1,15 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SYSTEM_2/802661FC_2.CPP, func_80267958_de (inlined here), with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
 /* Applies a hit from an attacker to a target: marks the attacker, shakes the
  * target player's camera for heavy and medium hits, sprays blood from a
  * player attacker for blade kinds 4 and 5, reports it, and pushes the target
  * along the hit direction. */
 
-typedef struct { f32 x, y, z; } Vec3f;
-typedef struct { f32 x, y, z, w; } Quat4;
-
 typedef struct {
     /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Vec3f offset;
+    /* 0x114 */ CVector3 offset;
 } PlayerCamera;
 
 typedef struct {
@@ -28,10 +26,10 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[0x3];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x14 - 0x10];
     /* 0x014 */ ActorDef *def;
-    /* 0x018 */ Vec3f velocity;
+    /* 0x018 */ CVector3 velocity;
     /* 0x024 */ u8 pad24[0x50 - 0x24];
     /* 0x050 */ f32 spin;
     /* 0x054 */ u8 pad54[0xD4 - 0x54];
@@ -52,24 +50,24 @@ typedef struct {
 extern u8 D_800F8928[];
 extern u8 D_800F7078[];
 
-extern void func_002811CC(PlayerCamera *camera, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, Vec3f pos);
-extern void func_00253F90(Player *player, Vec3f *v);
-extern void func_0020E810(Quat4 *out, Vec3f *dir);
-extern void func_002688C8(Actor *actor, Vec3f pos, Vec3f *outPos, s32 *outRegion, s32 flagA, s32 flagB);
-extern s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, Vec3f origin,
-                         Quat4 rot, Vec3f pos, s32 arg, s32 b, s32 c);
-extern void func_00225DB0(void *table, void *owner, s32 id, Vec3f pos, f32 a, f32 b);
+extern void func_002811CC(PlayerCamera *camera, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos);
+extern void func_00253F90(Player *player, CVector3 *v);
+extern void func_0020E810(CQuaternion *out, CVector3 *dir);
+extern void func_002688C8(Actor *actor, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 flagA, s32 flagB);
+extern s32 func_0022F350(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+                         CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
+extern void func_00225DB0(void *table, void *owner, s32 id, CVector3 pos, f32 a, f32 b);
 extern void func_0026E110(Actor *actor, s32 mask, Actor *other);
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);       /* out = a + b */
-extern f32 func_00246310(Actor *actor, Vec3f point);
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
+extern f32 func_00246310(Actor *actor, CVector3 point);
 
 /* Its unused target and def parameters still take stack slots when inlined (the frame layout needs them). */
-static __inline__ void sprayBlood(Actor *target, Actor *actor, Vec3f position, Vec3f direction, HitDef *def, s32 kind) {
+static __inline__ void sprayBlood(Actor *target, Actor *actor, CVector3 position, CVector3 direction, HitDef *def, s32 kind) {
     Player *player;
-    Vec3f v;
-    Vec3f point;
-    Vec3f zero;
-    Quat4 rotation;
+    CVector3 v;
+    CVector3 point;
+    CVector3 zero;
+    CQuaternion rotation;
     s32 region;
 
     player = actor->player;
@@ -94,7 +92,7 @@ static __inline__ void sprayBlood(Actor *target, Actor *actor, Vec3f position, V
     func_00225DB0(D_800F7078, player->controller + 0x140, 3, point, 10.24f, 1.0f);
 }
 
-void func_002376F8(Actor *target, Actor *source, s32 hit, Vec3f pos, Vec3f dir, s32 push, HitDef *def, u32 flags) {
+void func_002376F8(Actor *target, Actor *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitDef *def, u32 flags) {
     Actor *attacker;
     u32 bits;
     Player *player;

@@ -1,16 +1,13 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Actor {
     u8 type;            /* 0x0 */
     u8 pad1[3];
-    Vec3 pos;           /* 0x4 */
+    CVector3 pos;           /* 0x4 */
     s32 unk10;          /* 0x10 */
     u8 pad14[4];
-    Vec3 unk18;         /* 0x18 */
+    CVector3 unk18;         /* 0x18 */
 } Actor;
 
 typedef struct EventParams {
@@ -19,11 +16,11 @@ typedef struct EventParams {
 } EventParams;
 
 extern u8 D_8010ABA0[];
-extern void func_00227C10(void *arg0, s32 arg1, s32 arg2, Vec3 pos, s32 arg6, Vec3 rot, Vec3 scale, s32 arg13);
+extern void func_00227C10(void *arg0, s32 arg1, s32 arg2, CVector3 pos, s32 arg6, CVector3 rot, CVector3 scale, s32 arg13);
 
-void func_00239194(Actor *actor, s32 arg1, s32 arg2, Vec3 arg3, EventParams params) {
-    Vec3 scale;
-    Vec3 rot;
+void func_00239194(Actor *actor, s32 arg1, s32 arg2, CVector3 arg3, EventParams params) {
+    CVector3 scale;
+    CVector3 rot;
 
     if (actor->type == 0) {
         rot.x = 0.0f;

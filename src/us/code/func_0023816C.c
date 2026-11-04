@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Actor {
     u8 type;            /* 0x0 */
@@ -14,23 +11,23 @@ typedef struct Actor {
 
 typedef struct Player {
     u8 pad0[4];
-    Vec3 pos;           /* 0x4 */
+    CVector3 pos;           /* 0x4 */
     u8 pad10[0x288 - 0x10];
     Actor actor;        /* 0x288 */
     u8 pad[0x996 - 0x288 - sizeof(Actor)];
     u16 state;          /* 0x996 */
 } Player;
 
-extern void func_0020EF8C(Vec3 *out, f32 t, Vec3 *a, Vec3 *b);
+extern void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 extern f32 func_002671B4(Player *player);
 extern f32 D_800A65B0;
 
-s32 func_0023816C(Actor *actor, Vec3 *pos) {
+s32 func_0023816C(Actor *actor, CVector3 *pos) {
     s32 ret = 0;
     Player *player;
     u16 state;
-    Vec3 a;
-    Vec3 b;
+    CVector3 a;
+    CVector3 b;
 
     if (actor->type == 1 && (actor->flags & 0x300000)) {
         player = actor->owner;

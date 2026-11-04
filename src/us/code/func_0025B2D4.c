@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct Object Object;
 
@@ -50,7 +47,7 @@ struct Object {
     /* 0x000 */ u8 kind;            /* 1: object, 2: particle */
     /* 0x001 */ u8 pad1;
     /* 0x002 */ u16 particleType;
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
     /* 0x014 */ ActorDef *def;
     /* 0x018 */ u8 pad18[0xB8 - 0x18];
@@ -85,18 +82,18 @@ extern u8 D_800B06A0[];         /* origin */
 
 void func_002600E8(Object *obj, AI *ai);
 void func_002460FC(Object *obj, AI *ai, Object *owner, f32 time);
-void func_0025E52C(Object *obj, AI *ai, Vec3f *from, s32);
+void func_0025E52C(Object *obj, AI *ai, CVector3 *from, s32);
 void func_00243414(Object *obj, AI *ai, s32 state);
-void func_002755B0(s16 sound, Vec3f pos, s32, s32, f32 volume);
+void func_002755B0(s16 sound, CVector3 pos, s32, s32, f32 volume);
 s32 func_002113A4(void);
 void func_00246918(Object *obj, AI *ai);
 s32 func_0025B078(Object *obj, AI *ai, Damage *dmg);
 void func_004089C8(void);
 s32 func_0025DF04(Object *obj, AI *ai);
 s32 func_00219F74(Object *obj, s32 node, s32);
-void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);
+void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_00298470(f32 x);
-f32 func_0020EAA0(Vec3f *v);
+f32 func_0020EAA0(CVector3 *v);
 
 /* An object's owner (0x1A8) lies inside its AI block. */
 #define OWNER(o) (*(Object **)((u8 *)(o) + 0x1A8))
@@ -105,7 +102,7 @@ f32 func_0020EAA0(Vec3f *v);
  * pick the death, fall or flinch reaction; a knock back turns the actor to
  * face the push when the source was near enough. */
 void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
-    Vec3f delta;
+    CVector3 delta;
     s32 pushed;
     Object *attacker;
     Object *source;
@@ -189,7 +186,7 @@ void func_0025B2D4(Object *obj, AI *ai, Damage *dmg) {
             }
         }
     } else {
-        func_0025E52C(obj, ai, (Vec3f *)D_800B06A0, 3);
+        func_0025E52C(obj, ai, (CVector3 *)D_800B06A0, 3);
     }
     health = ai->health;
     left = health - dmg->amount;

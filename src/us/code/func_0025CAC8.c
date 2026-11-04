@@ -1,10 +1,9 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* AI hit callback: a projectile (or its owner) close enough lengthens the
  * wait and becomes the last-heard position; then the projectile type picks a
  * reaction animation (flinch, burn, freeze, shock...) the definition allows. */
-
-typedef struct { f32 x, y, z; } Vec3;
 
 typedef struct {
     /* 0x00 */ u32 flags;
@@ -19,7 +18,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x14 - 0x10];
     /* 0x014 */ ActorDef *def;
 } Actor;
@@ -27,7 +26,7 @@ typedef struct {
 typedef struct Projectile {
     /* 0x000 */ u8 pad0[0x2];
     /* 0x002 */ u16 type;
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x10C - 0x10];
     /* 0x10C */ struct Projectile *owner;
     /* 0x110 */ u8 pad110[0x1BC - 0x110];
@@ -50,7 +49,7 @@ typedef struct {
     /* 0x0C9 */ u8 padC9[0xD0 - 0xC9];
     /* 0x0D0 */ f32 unkD0;
     /* 0x0D4 */ u8 padD4[0xE0 - 0xD4];
-    /* 0x0E0 */ Vec3 hitNormal;
+    /* 0x0E0 */ CVector3 hitNormal;
     /* 0x0EC */ u8 padEC[0x130 - 0xEC];
     /* 0x130 */ s8 mode[3];
     /* 0x133 */ s8 modeIndex;
@@ -61,20 +60,20 @@ typedef struct {
     /* 0x04 */ u8 pad4[0x7D - 0x4];
     /* 0x7D */ u8 surface;
     /* 0x7E */ u8 pad7E[0xE4 - 0x7E];
-    /* 0xE4 */ Vec3 normal;
+    /* 0xE4 */ CVector3 normal;
 } CollisionResult;
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-extern Vec3 D_800B06AC;
+extern CVector3 D_800B06AC;
 extern CollisionResult D_800F1CE0;
 
-extern f32 func_0020F6BC(Vec3 *a, Vec3 *b);
+extern f32 func_0020F6BC(CVector3 *a, CVector3 *b);
 extern void func_00243414(Actor *actor, CAI *ai, s32 anim);
-extern void func_00275544(s16 sound, Vec3 pos, s32, s32);
+extern void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 /* A noise at pos within 3072 units lengthens the wait and is remembered. */
-static __inline__ void hearNoise(Actor *actor, CAI *ai, Vec3 *pos) {
+static __inline__ void hearNoise(Actor *actor, CAI *ai, CVector3 *pos) {
     s32 mode;
     f32 dist;
     f32 add;

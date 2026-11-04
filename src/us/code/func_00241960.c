@@ -1,12 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
-
-typedef struct Quat {
-    f32 x, y, z, w;
-} Quat;
+#include "structs/vector.h"
 
 typedef f32 Mtx4[4][4];
 
@@ -18,7 +11,7 @@ typedef struct BoxInfo {
     f32 width;         /* 0x0C */
     f32 height;        /* 0x10 */
     f32 depth;         /* 0x14 */
-    Vec3 center;       /* 0x18 */
+    CVector3 center;       /* 0x18 */
 } BoxInfo;
 
 typedef struct Def {
@@ -33,11 +26,11 @@ typedef struct AI {
 
 typedef struct Mover {
     char pad0[4];
-    Vec3 pos;          /* 0x04 */
+    CVector3 pos;          /* 0x04 */
     void *region;      /* 0x10 */
     Def *def;          /* 0x14 */
     char pad18[0x40 - 0x18];
-    Quat rotation;     /* 0x40 */
+    CQuaternion rotation;     /* 0x40 */
     f32 spin;          /* 0x50 */
     char pad54[0x140 - 0x54];
     AI ai;             /* 0x140 */
@@ -57,19 +50,19 @@ f32 func_0026872C(Mover *mover, s32 arg1);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void func_00210518(Mtx4 *mtx, f32 angle);
-void func_00210F68(Quat *out, Quat *a, Quat *b);
-void func_00211114(Quat *q, Mtx4 *mtx);
+void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+void func_00211114(CQuaternion *q, Mtx4 *mtx);
 void func_0020C618(Mtx4 *out, Mtx4 *a, Mtx4 *b);
 void func_00210318(Mtx4 *mtx, f32 x, f32 y, f32 z);
-void func_0020F908(Mtx4 *mtx, Vec3 *in, Vec3 *out, s32 count);
+void func_0020F908(Mtx4 *mtx, CVector3 *in, CVector3 *out, s32 count);
 
 /* The eight corners of the mover's collision box (top face first), in world space. */
-void func_00241960(Mover *mover, Vec3 *points, Collider *collider) {
+void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
     Mtx4 mtx;
     Mtx4 rot;
     Mtx4 spinMtx;
-    Quat q;
-    Quat spin;
+    CQuaternion q;
+    CQuaternion spin;
     BoxInfo *info;
     AI *ai;
     f32 halfX;

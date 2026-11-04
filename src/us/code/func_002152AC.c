@@ -1,14 +1,11 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
  * geometry. Type 12 animates by its speed; the others pick a variant, which
  * models 0x6A9..0x6AA override from the game flags (cf. Rage Wars'
  * func_8024F634_de and func_8024F858_de). */
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
 
 typedef struct {
     /* 0x00 */ s32 type;
@@ -21,7 +18,7 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u8 pad000[2];
     /* 0x002 */ u16 id;
-    /* 0x004 */ Vec3 position;
+    /* 0x004 */ CVector3 position;
     /* 0x010 */ void *link;
     /* 0x014 */ SimpleObjectDef *def;
     /* 0x018 */ u8 pad018[0x20];
@@ -41,7 +38,7 @@ s32 *func_00215944(SimpleObject *);
 void func_00211114(void *, f32 *);
 void func_002105A4(f32 *, f32);
 void func_0021034C(f32 *, f32, f32, f32);
-void func_0020F510(Vec3 *, f32);
+void func_0020F510(CVector3 *, f32);
 void func_00210318(f32 *, f32, f32, f32);
 void func_00210C3C(f32 *);
 void func_0020D274(f32 *, f32 *);

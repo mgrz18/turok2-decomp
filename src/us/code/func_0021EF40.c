@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Player {
     u8 pad0[0x51C];
@@ -11,21 +8,21 @@ typedef struct Player {
 
 typedef struct Actor {
     u8 pad0[4];
-    Vec3 pos;           /* 0x4 */
+    CVector3 pos;           /* 0x4 */
     u8 pad10[0xD4 - 0x10];
     s32 flags;          /* 0xD4 */
     u8 padD8[0x1A8 - 0xD8];
     Player *owner;      /* 0x1A8 */
 } Actor;
 
-extern void func_0020F85C(void *matrix, Vec3 *in, Vec3 *out);
-extern void func_0021F00C(Vec3 *out, Actor *actor, Vec3 v);
-extern void func_0020EEF8(Vec3 *out, Vec3 *a, Vec3 *b);
-extern void func_002688C8(Actor *actor, Vec3 pos, s32 arg4, s32 arg5, s32 arg6, s32 arg7);
+extern void func_0020F85C(void *matrix, CVector3 *in, CVector3 *out);
+extern void func_0021F00C(CVector3 *out, Actor *actor, CVector3 v);
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void func_002688C8(Actor *actor, CVector3 pos, s32 arg4, s32 arg5, s32 arg6, s32 arg7);
 
-void func_0021EF40(Actor *actor, Vec3 v, s32 arg4, s32 arg5) {
-    Vec3 local;
-    Vec3 out;
+void func_0021EF40(Actor *actor, CVector3 v, s32 arg4, s32 arg5) {
+    CVector3 local;
+    CVector3 out;
 
     if (actor->flags & 0x300000) {
         v.x = -v.x;

@@ -2,15 +2,11 @@
 #include "structs/game_object.h"
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
     /* 0x00 */ s32 kind;
     /* 0x04 */ s32 visible;
     /* 0x08 */ f32 angle;
-    /* 0x0C */ Vec3f a;
-    /* 0x18 */ Vec3f b;
+    /* 0x0C */ CVector3 a;
+    /* 0x18 */ CVector3 b;
     /* 0x24 */ f32 dist;
     /* 0x28 */ u8 pad28[0x44 - 0x28];
 } Target;

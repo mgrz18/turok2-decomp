@@ -1,7 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-typedef struct { s32 x, y, z; } V3;
 typedef struct { f32 x, y, z; } V3f;
 
 extern f32 D_800A77FC;

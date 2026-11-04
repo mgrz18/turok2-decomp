@@ -1,15 +1,12 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00257DF4.c, func_00257DF4, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/vector.h"
 
 /* Plays a sound or a music cue at pos: refuses while another cue is pending,
  * when 6 of the 17 voices already play this sound id (or for cue 0x44C while
  * it is muted). Picks one of the id's variants at random by weight (a sound
  * id avoids repeating its last variant), then starts each of its layers under
  * a new play handle, which it returns (-1 when nothing plays). */
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
 
 typedef struct {
     /* 0x00 */ u8 q[0x18];
@@ -60,7 +57,7 @@ extern s32 func_002113A4(void);
 extern f32 func_0021149C(f32 range);
 extern s32 func_00266D8C(void *ranges, s32 count, s16 id, s32 *lo, s32 *hi);
 extern void *func_002017D4(void *list, s32 index);
-extern void func_00270A60(SndMgr *m, void *layer, Vec3f *pos, s32 variant, s32 handle, s32 a5, s32 a6);
+extern void func_00270A60(SndMgr *m, void *layer, CVector3 *pos, s32 variant, s32 handle, s32 a5, s32 a6);
 
 static __inline__ void SndMgr_Lock(SndMgr *m) {
     SndLock *l = &m->lock;
@@ -86,7 +83,7 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
     }
 }
 
-s32 func_00270C80(SndMgr *m, s32 id, Vec3f pos, s32 a5, s32 a6) {
+s32 func_00270C80(SndMgr *m, s32 id, CVector3 pos, s32 a5, s32 a6) {
     s32 i;
     s32 j;
     s32 busy;

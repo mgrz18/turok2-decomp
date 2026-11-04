@@ -25,8 +25,6 @@ typedef union {
     struct { u32 w0, w1; } words;
 } Gfx;
 
-typedef struct { f32 x, y, z; } Vec3;
-typedef struct { f32 x, y, z, w; } Quat;
 typedef struct { f32 m[4][4]; } Mtx44;
 
 /* Matches with four register pins (the `register ... asm` lines in the inlined
@@ -91,10 +89,10 @@ typedef struct {
     /* 0x0FC */ u8 padFC[0x11C - 0xFC];
     /* 0x11C */ f32 time;
     /* 0x120 */ u8 pad120[0x12C - 0x120];
-    /* 0x12C */ Vec3 size;
+    /* 0x12C */ CVector3 size;
     /* 0x138 */ u8 pad138[0x150 - 0x138];
-    /* 0x150 */ Vec3 direction;
-    /* 0x15C */ Vec3 rot;
+    /* 0x150 */ CVector3 direction;
+    /* 0x15C */ CVector3 rot;
     /* 0x168 */ u8 pad168[0x178 - 0x168];
     /* 0x178 */ f32 phaseA;
     /* 0x17C */ f32 phaseB;
@@ -109,12 +107,12 @@ typedef struct {
 } MtxParticle;
 
 /* func_0022D09C under this part's view (the effect code below declares it as (Effect *, s32, s32)). */
-extern void MtxParticle_Place(MtxParticle *p, Vec3 *outPosition, Vec3 *outHeading) asm("func_0022D09C");
+extern void MtxParticle_Place(MtxParticle *p, CVector3 *outPosition, CVector3 *outHeading) asm("func_0022D09C");
 extern Mtx4f *func_0022CF40(MtxParticle *p, MtxCamera *camera);
-extern void func_0020EFDC(Vec3 *out, Vec3 *a, Vec3 *b);       /* cross product */
-extern void func_0020EF60(Vec3 *out, Vec3 *in, f32 s);         /* out = in * s */
-extern void func_0020EEF8(Vec3 *out, Vec3 *a, Vec3 *b);       /* out = a + b */
-extern void func_0020F040(Vec3 *v);                             /* normalize */
+extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);       /* cross product */
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);         /* out = in * s */
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
+extern void func_0020F040(CVector3 *v);                             /* normalize */
 extern f32 func_002982F0(f32 angle);                             /* sin */
 extern void func_0020FE00(Mtx4f m, f32 x, f32 y, f32 z);         /* rotation */
 extern void func_0020F79C(Mtx44 *m);                              /* identity */
@@ -124,7 +122,7 @@ extern void func_00210284(Mtx4f m, f32 x, f32 y, f32 z);
 extern void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);         /* translate */
 extern f32 func_0026BE60(void *region, f32 x, f32 z);            /* ground height */
 extern f32 func_00269C3C(void *region, f32 x, f32 z);            /* ceiling height */
-extern void func_0020F510(Vec3 *v, f32 limit);
+extern void func_0020F510(CVector3 *v, f32 limit);
 extern void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);         /* scale */
 extern void func_00210C3C(Mtx4f m);
 extern void func_0020FF80(Mtx4f dst, Mtx4f src);                 /* copy */
@@ -169,16 +167,16 @@ static __inline__ f32 rampFade(f32 time, s32 ramp) {
 
 void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 depth) {
     Mtx4f rotation, basis, local, world, shakeMtx;
-    Vec3 position;
-    Vec3 up;
-    Vec3 heading;
-    Vec3 axisX;
-    Vec3 axisY;
-    Vec3 axisZ;
-    Vec3 across;
-    Vec3 side;
-    Vec3 direction;
-    Vec3 offset;
+    CVector3 position;
+    CVector3 up;
+    CVector3 heading;
+    CVector3 axisX;
+    CVector3 axisY;
+    CVector3 axisZ;
+    CVector3 across;
+    CVector3 side;
+    CVector3 direction;
+    CVector3 offset;
     MtxParticleDesc *desc;
     f32 *final;
     f32 scale;
@@ -370,10 +368,10 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
 /* The leading 0x34 bytes of a game object, as the collision test reads them. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ void *region;
     /* 0x14 */ u8 pad14[0x4];
-    /* 0x18 */ Vec3 velocity;
+    /* 0x18 */ CVector3 velocity;
     /* 0x24 */ u8 pad24[0x10];
 } ObjectHead; /* size 0x34 */
 
@@ -392,7 +390,7 @@ typedef struct {
 
 typedef struct {
     u8 pad0[0x4];
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ void *region;
     u8 pad14[0xE4];
     /* 0x0F8 */ ShadowDef *def;
@@ -408,13 +406,13 @@ typedef struct {
 typedef struct {
     /* 0x00 */ struct Actor *hit;
     u8 pad4[0x4];
-    /* 0x08 */ Vec3 pos;
+    /* 0x08 */ CVector3 pos;
     /* 0x14 */ s32 frame;
     u8 pad18[0x7E - 0x18];
     /* 0x7E */ u8 team;
     u8 pad7F[0xD8 - 0x7F];
-    /* 0xD8 */ Vec3 direction;
-    /* 0xE4 */ Vec3 normal;
+    /* 0xD8 */ CVector3 direction;
+    /* 0xE4 */ CVector3 normal;
 } CollisionResult;
 
 struct CollisionInfo;
@@ -425,15 +423,15 @@ extern f32 D_800DD78C;
 extern Gfx *D_800D8E24;
 
 void *func_00206950(void *pool, s32 count);
-void func_0026A9C0(Quat *out, void *region);
+void func_0026A9C0(CQuaternion *out, void *region);
 f32 func_00267648(ShadowActor *actor, s32 arg1);    /* ground height */
-s32 func_00239F00(void *obj, Vec3 to, struct CollisionInfo *info);
-void func_0020E810(Quat *out, Vec3 *dir);
+s32 func_00239F00(void *obj, CVector3 to, struct CollisionInfo *info);
+void func_0020E810(CQuaternion *out, CVector3 *dir);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-void func_00210F68(Quat *out, Quat *a, Quat *b);
-void func_0020F510(Vec3 *v, f32 arg1);
-void func_00211114(Quat *rot, Mtx44 *m);
+void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+void func_0020F510(CVector3 *v, f32 arg1);
+void func_00211114(CQuaternion *rot, Mtx44 *m);
 void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);  /* scale */
 void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);  /* translate */
 void func_0020D274(Mtx44 *m, void *dst);
@@ -443,10 +441,10 @@ void func_002086BC(void *mtx, s32 arg1, u32 alpha);
  * where a ray cast straight down from it lands, tilted to the surface. */
 void func_0022DCBC(ShadowActor *actor) {
     Mtx44 mtx;
-    Vec3 pos;
-    Quat rot;
-    Quat tilt;
-    Quat spin;
+    CVector3 pos;
+    CQuaternion rot;
+    CQuaternion tilt;
+    CQuaternion spin;
     ObjectHead probe;
     void *gmtx;
     f32 ground;
@@ -519,7 +517,6 @@ void func_0022DCBC(ShadowActor *actor) {
  * its alpha from life, fade-in, fade-out and distance from the view, and
  * emits the colour and draw commands. */
 
-
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->words.w0 = (a); _g->words.w1 = (b); }
 
 typedef struct { u8 pad0[0x40]; } Mtx;
@@ -533,7 +530,7 @@ typedef struct {
 typedef struct {
     /* 0x00 */ u16 pad0;
     /* 0x02 */ u16 type;
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x24];
 } ParticleHead; /* size 0x34 */
 
@@ -605,7 +602,7 @@ typedef struct {
     /* 0x00C */ u8 padC[0x24 - 0xC];
     /* 0x024 */ s32 unk24;
     /* 0x028 */ u8 pad28[0x114 - 0x28];
-    /* 0x114 */ Vec3 eye;
+    /* 0x114 */ CVector3 eye;
     /* 0x120 */ u8 pad120[0x20C - 0x120];
     /* 0x20C */ f32 viewMtx[4][4];
     /* 0x24C */ u8 pad24C[0x510 - 0x24C];
@@ -631,7 +628,7 @@ extern void *func_0020798C(s32 *ref);
 extern void func_002079D8(void *model, AnimInfo *info);
 extern void func_00206B30(s32 *ref, void *model, s32 frame, s32 a3, s32 shiftS, s32 shiftT, s32 a6, s32 a7, s32 a8);
 extern ParticleHead *func_00281194(ParticleView *view);
-extern s32 func_00239F00(void *obj, Vec3 to, struct CollisionInfo *info);
+extern s32 func_00239F00(void *obj, CVector3 to, struct CollisionInfo *info);
 extern void func_0020F85C(void *m, void *in, void *out);
 extern void *func_00206950(void *pool, s32 count);
 extern void func_00207A70(s32 mode);
@@ -683,7 +680,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     AnimInfo info;
     u8 env[3];
     u8 prim[3];
-    Vec3 viewPos;
+    CVector3 viewPos;
     void *model;
     ParticleDesc *desc;
     void *mtx;
@@ -792,7 +789,7 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     if (!(particle->flags & 0x100000)) {
         if (D_801198E0 == 1) {
             ParticleView *camera = D_801198D0;
-            Vec3 local;
+            CVector3 local;
             f32 depth;
             func_0020F85C(camera->viewMtx, &particle->inst.pos, &local);
             depth = local.z;
@@ -916,7 +913,6 @@ void func_0022E094(Particle *particle, ParticleView *view) {
     func_002051F4(0, model);
 }
 
-
 /* Engine actor instance (only the fields used here). */
 typedef struct EffectActor {
     /* 0x000 */ u8 kind;
@@ -1002,7 +998,6 @@ void func_0022F1C8(u8 *mgr, EffectActor *actor) {
  * last collision target for kinds 0x2D and 0x4F, and plays their sound.
  * Returns the number spawned. */
 
-typedef Vec3 Vec3f;
 
 /* Two half-floats: base and random range (see func_0026D128). */
 typedef struct {
@@ -1103,7 +1098,7 @@ typedef struct {
 typedef struct Actor {
     /* 0x000 */ u8 type;
     /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
     /* 0x014 */ ActorDef *def;
     /* 0x018 */ u8 pad18[0x40 - 0x18];
@@ -1130,15 +1125,15 @@ typedef struct Owner {
 typedef struct Effect {
     /* 0x000 */ u8 pad0[2];
     /* 0x002 */ u16 kind;
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ void *region;
     /* 0x014 */ u8 pad14[4];
-    /* 0x018 */ Vec3f velocity;
+    /* 0x018 */ CVector3 velocity;
     /* 0x024 */ s32 unk24;
     /* 0x028 */ s32 unk28;
     /* 0x02C */ s32 unk2C;
     /* 0x030 */ s32 unk30;
-    /* 0x034 */ Vec3f attachPos;
+    /* 0x034 */ CVector3 attachPos;
     /* 0x040 */ u32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
     /* 0x0F8 */ Entry *entry;
@@ -1157,8 +1152,8 @@ typedef struct Effect {
     /* 0x12A */ u8 unk12A;
     /* 0x12B */ s8 unk12B;
     /* 0x12C */ f32 unk12C[6];
-    /* 0x144 */ Vec3f startPos;
-    /* 0x150 */ Vec3f direction;
+    /* 0x144 */ CVector3 startPos;
+    /* 0x150 */ CVector3 direction;
     /* 0x15C */ f32 unk15C[6];
     /* 0x174 */ f32 alpha;
     /* 0x178 */ f32 rot[6];
@@ -1213,14 +1208,14 @@ extern u32 D_800AD084[];
 
 extern void *func_002017D4(s32 resource, s32 index);
 extern s32 func_00266D8C(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
-extern void func_00223A94(void *, Vec3f *);
-extern void func_00225C08(void *, s32, Vec3f *);
+extern void func_00223A94(void *, CVector3 *);
+extern void func_00225C08(void *, s32, CVector3 *);
 extern s32 func_002113A4(void);
-extern void func_0020EF2C(Vec3f *out, Vec3f *a, Vec3f *b);
-extern void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
-extern void func_0020EF60(Vec3f *out, Vec3f *in, f32 scale);
-extern void func_0020F040(Vec3f *v);
-extern void func_0020FAFC(Mtx44 *m, Vec3f *in, Vec3f *out);
+extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+extern void func_0020F040(CVector3 *v);
+extern void func_0020FAFC(Mtx44 *m, CVector3 *in, CVector3 *out);
 extern void func_0020D908(Mtx44 *out, Mtx44 *in);
 extern void func_0020C208(Mtx44 *out, Mtx44 *in);
 extern void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);
@@ -1228,23 +1223,23 @@ extern void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);
 extern void func_0020FC74(Mtx44 *m, f32 x, f32 y, f32 z);
 extern void func_0020FC24(Mtx44 *m, f32 x, f32 y, f32 z);
 extern void func_0020F79C(Mtx44 *m);
-extern void func_002673CC(Quat *q, Owner *owner, Vec3f pos);
-extern void func_00211114(Quat *q, Mtx44 *m);
+extern void func_002673CC(CQuaternion *q, Owner *owner, CVector3 pos);
+extern void func_00211114(CQuaternion *q, Mtx44 *m);
 extern void CList__AddTail(EffectList *list, Effect *effect);
 extern void func_002005D0(EffectList *list, Effect *after, Effect *effect);
 extern void func_00207914(u32 *bits, s32 value);
 extern f32 func_0026D128(PackedRange r);
 extern f32 func_0026D210(u16 h);
-extern void func_002688C8(Effect *effect, Vec3f pos, Vec3f *outPos, void **outRegion, s32 a, s32 b);
+extern void func_002688C8(Effect *effect, CVector3 pos, CVector3 *outPos, void **outRegion, s32 a, s32 b);
 extern void func_00228C40(s8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void func_00228FF8(u8, u8, u8, u8, u8 *, u8 *, u8 *);
 extern void func_002291D4(u8, u8, u8, u8, u8 *, u8 *, u8 *);
-extern void func_0025E52C(Actor *actor, s32 *ai, Vec3f *from, s32 arg3);
+extern void func_0025E52C(Actor *actor, s32 *ai, CVector3 *from, s32 arg3);
 extern void func_0022D09C(Effect *effect, s32, s32);
 extern void func_002350EC(void *, Effect *, s32);
 extern s32 func_00228AB0(void *, s32);
 extern void func_00232AC4(Effect *effect, s32 sound);
-extern void func_00275544(s16 sound, Vec3f pos, s32 a, s32 b);
+extern void func_00275544(s16 sound, CVector3 pos, s32 a, s32 b);
 
 static __inline__ s32 randomCount(s32 range) {
     return range != 0 ? func_002113A4() % (range + 1) : 0;
@@ -1297,10 +1292,10 @@ static __inline__ Effect *allocateEffect(EffectSystem *sys, u8 index) {
     return effect;
 }
 
-static __inline__ void aimEffect(Effect *effect, Vec3f *vel) {
+static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     Mtx44 targetMtx;
     Mtx44 targetInv;
-    Vec3f up;
+    CVector3 up;
     Actor *targetActor;
     s32 targetTeam;
     CollisionResult *scene;
@@ -1333,16 +1328,16 @@ static __inline__ void aimEffect(Effect *effect, Vec3f *vel) {
 }
 
 s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, s32 arg4, s32 kind,
-                  Vec3f arg6, Quat rotation, Vec3f pos, void *region, s32 arg10, s32 arg11) {
+                  CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
     Mtx44 mtx;
-    Vec3f dir;
-    Vec3f dirOut;
-    Vec3f offset;
-    Vec3f offsetOut;
-    Vec3f delta;
-    Quat quat;
+    CVector3 dir;
+    CVector3 dirOut;
+    CVector3 offset;
+    CVector3 offsetOut;
+    CVector3 delta;
+    CQuaternion quat;
     CollisionResult target;
-    Vec3f aimDelta;
+    CVector3 aimDelta;
     s32 first;
     s32 last;
     u8 h, sv, v;
@@ -1374,7 +1369,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
     Entry *entry;
     Effect *effect;
     Render *render;
-    Vec3f *vel;
+    CVector3 *vel;
     Camera *camera;
     f32 distSq;
     f32 scale;

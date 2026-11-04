@@ -1,12 +1,9 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* Flying AI state: keep facing the target; when something is in the way,
  * side-step away from it, otherwise damp the velocity. Fires state 4 when
  * the timer runs out. */
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
 
 typedef struct {
     f32 m[4][4];
@@ -26,7 +23,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ Vec3f vel;
+    /* 0x18 */ CVector3 vel;
     /* 0x24 */ u8 pad24[0x2C];
     /* 0x50 */ f32 yaw;
 } Actor;
@@ -44,12 +41,12 @@ f32 func_0025EB50(Actor *self, AI *ai, f32 lo, f32 hi);
 void func_00243414(Actor *self, AI *ai, s32 mode);
 s32 func_002451AC(Actor *self, AI *ai, Actor *target, f32 angle);
 void func_002105A4(f32 m[4][4], f32 angle);
-void func_0020F85C(f32 m[4][4], Vec3f *in, Vec3f *out);
-void func_0020EEF8(Vec3f *out, Vec3f *a, Vec3f *b);
+void func_0020F85C(f32 m[4][4], CVector3 *in, CVector3 *out);
+void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
 static __inline__ void sidestep(Actor *self, s32 side) {
-    Vec3f push;
-    Vec3f dir;
+    CVector3 push;
+    CVector3 dir;
     f32 m[4][4];
 
     push.x = -(f32)side * 204.79999f;

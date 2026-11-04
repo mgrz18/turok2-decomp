@@ -1,19 +1,16 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* AI chase update: turns toward the target and runs or walks at it; flying
  * modes (1, 2) also climb toward its height and bank into the turn. In range,
  * it attacks (path node 4 / special 7) or lets func_0025D030 pick a melee. */
 
 typedef struct {
-    f32 x, y, z;
-} Vec3f;
-
-typedef struct {
     /* 0x00 */ s32 kind;
     /* 0x04 */ s32 visible;
     /* 0x08 */ f32 angle;
-    /* 0x0C */ Vec3f a;
-    /* 0x18 */ Vec3f b;
+    /* 0x0C */ CVector3 a;
+    /* 0x18 */ CVector3 b;
     /* 0x24 */ f32 dist;
     /* 0x28 */ u8 pad28[0x44 - 0x28];
 } Target;
@@ -24,11 +21,11 @@ typedef struct {
 } Targets;
 
 typedef struct {
-    /* 0x00 */ Vec3f d;
-    /* 0x0C */ Vec3f n;
+    /* 0x00 */ CVector3 d;
+    /* 0x0C */ CVector3 n;
     /* 0x18 */ f32 len;
-    /* 0x1C */ Vec3f e;
-    /* 0x28 */ Vec3f e2;
+    /* 0x1C */ CVector3 e;
+    /* 0x28 */ CVector3 e2;
     /* 0x34 */ f32 elen;
     /* 0x38 */ f32 dy;
     /* 0x3C */ u8 pad3C[0x40 - 0x3C];

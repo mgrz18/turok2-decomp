@@ -1,15 +1,12 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Actor {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ void *region;
     /* 0x14 */ u8 pad14[4];
-    /* 0x18 */ Vec3 velocity;
+    /* 0x18 */ CVector3 velocity;
 } Actor;
 
 typedef struct CollisionInfo {
@@ -21,12 +18,12 @@ extern CollisionInfo D_800F1BE0;
 s32 func_00267F64(Actor *actor);
 s32 func_00267F10(Actor *actor);
 f32 func_0026BE60(void *region, f32 x, f32 z);
-void func_00239F00(Actor *actor, Vec3 pos, CollisionInfo *info);
+void func_00239F00(Actor *actor, CVector3 pos, CollisionInfo *info);
 
 /* Slides an actor to (x, z) with collision, keeping its height above the floor. */
 void func_002694A8(Actor *actor, f32 x, f32 z) {
-    Vec3 savedVelocity;
-    Vec3 to;
+    CVector3 savedVelocity;
+    CVector3 to;
     s32 noA;
     s32 noB;
     s32 oldFlags;

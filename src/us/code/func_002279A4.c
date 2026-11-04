@@ -1,12 +1,9 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct Bounds {
-    Vec3 min;                   /* 0x00 */
-    Vec3 max;                   /* 0x0C */
+    CVector3 min;                   /* 0x00 */
+    CVector3 max;                   /* 0x0C */
 } Bounds;
 
 /* A level actor spawned at run time (a pickup), kept in the world's pool. */

@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x0 */ s16 x, y, z;
@@ -27,16 +24,16 @@ extern LightInfo *D_8010FEC8;
 
 void *func_002017D4(s32 *, s32);
 void func_0020D908(f32 *mtx, void *packed);
-void func_0020F040(Vec3 *v);
-void func_0020FAFC(f32 *mtx, Vec3 *in, Vec3 *out);
+void func_0020F040(CVector3 *v);
+void func_0020FAFC(f32 *mtx, CVector3 *in, CVector3 *out);
 
 /* Adds directional light to the model's vertex colors: each lit vertex's
  * rotated normal against the light direction, plus an ambient term. */
-void func_002130A8(s32 *model, u8 *matrices, Vec3 *colors, s32 skinned) {
-    Vec3 light;
+void func_002130A8(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
+    CVector3 light;
     f32 mtx[16];
-    Vec3 in;
-    Vec3 out;
+    CVector3 in;
+    CVector3 out;
     VertexGroup *group;
     ModelVertex *verts;
     f32 level;

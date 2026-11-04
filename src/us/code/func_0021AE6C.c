@@ -1,16 +1,13 @@
 #include "common.h"
+#include "structs/vector.h"
 
 /* An actor's facing as a quaternion: turned half a circle from its owner's
  * player (flags 0x300000), its heading plus pitch (0x24C) in a region of
  * type 4, or else its heading applied to its own rotation (0x40). */
 
 typedef struct {
-    f32 x, y, z, w;
-} Quat;
-
-typedef struct {
     u8 pad0[0x12C];
-    Quat rot;               /* 0x12C */
+    CQuaternion rot;               /* 0x12C */
 } Player;
 
 typedef struct {
@@ -22,7 +19,7 @@ typedef struct {
     u8 pad0[0x14];
     s32 *region;            /* 0x014 */
     u8 pad18[0x28];
-    Quat rot;               /* 0x040 */
+    CQuaternion rot;               /* 0x040 */
     f32 heading;            /* 0x050 */
     u8 pad54[0x80];
     u32 flags;              /* 0x0D4 */
@@ -36,12 +33,12 @@ extern f32 D_800DD78C;
 
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */
-void func_00210F68(Quat *, Quat *, Quat *);
+void func_00210F68(CQuaternion *, CQuaternion *, CQuaternion *);
 
-Quat func_0021AE6C(Actor *actor) {
-    Quat result;
-    Quat pitch;
-    Quat yaw;
+CQuaternion func_0021AE6C(Actor *actor) {
+    CQuaternion result;
+    CQuaternion pitch;
+    CQuaternion yaw;
     Player *player;
     f32 s;
 

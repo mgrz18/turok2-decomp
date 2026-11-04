@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x22];
@@ -19,12 +16,12 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ Vec3f pos;
+    /* 0x114 */ CVector3 pos;
 } Ui;
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x1C - 0x10];
     /* 0x01C */ f32 climb;
     /* 0x020 */ u8 pad20[0x140 - 0x20];
@@ -33,7 +30,7 @@ typedef struct {
 
 typedef struct {
     /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ Vec3f pos;
+    /* 0x0004 */ CVector3 pos;
     /* 0x0010 */ u8 pad10[0xE2 - 0x10];
     /* 0x00E2 */ s8 idle;
     /* 0x00E3 */ u8 padE3[0x51C - 0xE3];
@@ -74,7 +71,7 @@ void func_0024F658(Player *player, Body *body, void *tuning);
 s32 func_0024E5F0(Player *player, Body *body, s32 mode);
 f32 func_002982F0(f32 x);
 f32 func_0021149C(f32 scale);
-void func_00275544(s16 sound, Vec3f pos, void *source, s32);
+void func_00275544(s16 sound, CVector3 pos, void *source, s32);
 
 static __inline__ void reset_strokes(Strokes *s) {
     s->count = 0;

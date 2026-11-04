@@ -1,8 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ s32 model;
@@ -23,7 +20,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ Vec3 pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x518 - 0x10];
     /* 0x518 */ Options *options;
     /* 0x51C */ s32 camera;
@@ -77,7 +74,7 @@ extern struct {
 extern s32 func_0024E700(Player *player, s32 weapon);
 extern s32 func_00257BA0(Player *player);
 extern void func_00243414(Object *obj, AI *ai, s32 mode);
-extern void func_00275544(s32 sound, Vec3 pos, Vec3 *source, s32 arg);
+extern void func_00275544(s32 sound, CVector3 pos, CVector3 *source, s32 arg);
 extern void func_0027FC2C(void *buf, s32 camera, s32 model);
 
 /* Switches the weapon model to the player's next weapon (see func_002596B4)

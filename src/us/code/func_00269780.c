@@ -1,16 +1,13 @@
 #include "common.h"
-
-typedef struct Vec3 {
-    f32 x, y, z;
-} Vec3;
+#include "structs/vector.h"
 
 typedef struct ActorMotion {
     /* 0x00 */ u8 kind;
     /* 0x01 */ u8 pad1[3];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ void *region;
     /* 0x14 */ u8 pad14[4];
-    /* 0x18 */ Vec3 velocity;
+    /* 0x18 */ CVector3 velocity;
     /* 0x24 */ u8 pad24[0x34 - 0x24];
 } ActorMotion; /* size 0x34 */
 
@@ -25,12 +22,12 @@ typedef struct CollisionInfo {
 extern CollisionInfo D_800F1AE0;
 
 f32 func_002671B4(Actor *actor);    /* height */
-s32 func_00239F00(Actor *actor, Vec3 pos, CollisionInfo *info);
+s32 func_00239F00(Actor *actor, CVector3 pos, CollisionInfo *info);
 
 /* Whether actor can see target: a clear line from 80% of one's height to 80% of the other's. */
 s32 func_00269780(Actor *actor, Actor *target) {
     ActorMotion saved;
-    Vec3 to;
+    CVector3 to;
     s32 hit;
 
     saved = actor->motion;

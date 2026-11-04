@@ -1,10 +1,9 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ Vec3 pos;
+    /* 0x04 */ CVector3 pos;
 } Actor;
 
 typedef struct {
@@ -24,7 +23,7 @@ extern f32 D_800B6D28; /* frame delta */
 
 void func_00245828(DamageEvent *event, void *target, s32 damage, f32 radius, s32 flags, void *shield);
 void func_002465C8(Actor *self, AI *ai, DamageEvent *event);
-void func_00275544(s16 sound, Vec3 pos, s32 arg4, s32 arg5);
+void func_00275544(s16 sound, CVector3 pos, s32 arg4, s32 arg5);
 void func_00243414(Actor *self, AI *ai, s32 mode);
 
 void func_0025FAD0(Actor *self, AI *ai) {

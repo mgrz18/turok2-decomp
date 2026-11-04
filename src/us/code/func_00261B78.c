@@ -1,6 +1,5 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ void *target;
@@ -27,9 +26,9 @@ typedef struct {
     /* 0x35 */ u8 pad35[0x88 - 0x35];
     /* 0x88 */ Actor *target;
     /* 0x8C */ u8 pad8C[0x9C - 0x8C];
-    /* 0x9C */ Vec3 dest;
+    /* 0x9C */ CVector3 dest;
     /* 0xA8 */ u8 padA8[0x4];
-    /* 0xAC */ Vec3 home;
+    /* 0xAC */ CVector3 home;
 } AI;
 
 extern PlayerState D_800F1CE0;

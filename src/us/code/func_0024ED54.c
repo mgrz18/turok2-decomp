@@ -1,6 +1,5 @@
 #include "common.h"
-
-typedef struct { f32 x, y, z; } Vec3f;
+#include "structs/vector.h"
 
 typedef struct {
     /* 0x00 */ s32 type;
@@ -9,10 +8,10 @@ typedef struct {
 typedef struct {
     /* 0x000 */ u8 kind;
     /* 0x001 */ u8 pad1[3];
-    /* 0x004 */ Vec3f pos;
+    /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
     /* 0x014 */ ActorDef *def;
-    /* 0x018 */ Vec3f vel;
+    /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0x140 - 0x24];
     /* 0x140 */ u32 aiFlags;
     /* 0x144 */ s32 health;
@@ -23,7 +22,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ Vec3f pos;
+    /* 0x04 */ CVector3 pos;
     /* 0x10 */ u8 pad10[0x50 - 0x10];
     /* 0x50 */ f32 yaw;
 } Body;
@@ -43,8 +42,8 @@ extern Actor *D_800F1CE0;       /* what the player is aiming at */
 
 f32 func_002982F0(f32);         /* sinf */
 f32 func_002974C0(f32);         /* cosf */
-void func_002811CC(void *camera, f32 a, f32 b, f32 c, f32 d, s32 e, Vec3f pos);
-void func_00275544(s16 sound, Vec3f pos, s32, s32);
+void func_002811CC(void *camera, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
+void func_00275544(s16 sound, CVector3 pos, s32, s32);
 void func_00243414(Actor *actor, void *ai, s32 state);
 
 /* While riding, button 0x8000 rams the creature in front: a live one is
