@@ -1,16 +1,10 @@
 #include "common.h"
+#include "structs/game_object.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 /* Update callback of the second boss: runs the anim callback, counts the hit timer down, runs the phase's
  * update, then updates the slots, the three movers and the boss' health bar. */
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0xD4];
-    /* 0x0D4 */ s32 flags;
-    /* 0x0D8 */ u8 padD8[0x24C - 0xD8];
-    /* 0x24C */ s32 unk24C;
-} LevelActor;
 
 typedef struct {
     /* 0x00 */ s32 id;
@@ -42,11 +36,11 @@ typedef struct Obj2 {
 typedef struct State2 {
     /* 0x000 */ Obj2 *obj;
     /* 0x004 */ s32 count1;
-    /* 0x008 */ LevelActor *actors1[4];
+    /* 0x008 */ CGameObjectInstance *actors1[4];
     /* 0x018 */ s32 count2;
-    /* 0x01C */ LevelActor *actors2[4];
+    /* 0x01C */ CGameObjectInstance *actors2[4];
     /* 0x02C */ s32 count3;
-    /* 0x030 */ LevelActor *actors3[3];
+    /* 0x030 */ CGameObjectInstance *actors3[3];
     /* 0x03C */ Slot2 slots[12];
     /* 0x4EC */ s32 slotCount;
     /* 0x4F0 */ u8 pad4F0[0x4F8 - 0x4F0];
@@ -55,18 +49,6 @@ typedef struct State2 {
     /* 0x500 */ u8 pad500[0x518 - 0x500];
     /* 0x518 */ Mover movers[3];
 } State2;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ void (*callback)(void *obj, void *ai);
-} Anim;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x30];
-    /* 0x030 */ Anim *anim;
-    /* 0x034 */ u8 pad34[0x118 - 0x34];
-    /* 0x118 */ f32 hitTimer;
-} CAI;
 
 extern State2 D_80130200;
 extern f32 D_800B6D28; /* frame time */
@@ -81,10 +63,10 @@ void func_0040DA90(void *obj, CAI *ai) {
     State2 *state = &D_80130200;
     s32 i;
 
-    if (ai->anim != NULL && ai->anim->callback != NULL) {
-        ai->anim->callback(obj, ai);
+    if (ai->m_pModeCurrent != NULL && ai->m_pModeCurrent->m_pfCallback != NULL) {
+        ai->m_pModeCurrent->m_pfCallback(obj, ai);
     }
-    ai->hitTimer = MAX(ai->hitTimer - D_800B6D28, 0.0f);
+    ai->m_VarF32[3] = MAX(ai->m_VarF32[3] - D_800B6D28, 0.0f);
     if (D_0043240C[state->phase].update != NULL) {
         D_0043240C[state->phase].update(state);
     }

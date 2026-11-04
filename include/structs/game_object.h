@@ -51,7 +51,7 @@ typedef struct CAIModeInfo {
     /* 0x08 */ s32 (*m_pfCallback)();
     /* 0x0C */ void *m_pData;   /* D_800F1C20 in the enemy table */
     /* 0x10 */ s32 unk_10;   /* a function in the mode rows */
-    /* 0x14 */ f32 unk_14;   /* 1.0f in the enemy table */
+    /* 0x14 */ f32 m_AnimSpeed;   /* copied to CAI::m_AnimModeSpeed */
     /* 0x18 */ s32 unk_18;
     /* 0x1C */ u32 unk_1C;
 } CAIModeInfo; /* size 0x20 */
