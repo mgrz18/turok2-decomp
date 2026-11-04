@@ -118,7 +118,7 @@ at 0xC10 after a pad, and CPlayer is 0x1328 (arrays of players step 0x1328).
 m_WeaponList is s8, as every reader loads it.
 
 player.h now also has CBarrel (the weapon wheel
-at 0xCD0, the fields the code reads), CPlayerList / CPlayerCList (the player
+at 0xCD0, now laid out in structs/weapon.h), CPlayerList / CPlayerCList (the player
 list D_80119870; D_80119890 is its active list). The local Player,
 PlayerRaw, PlayerOptions, PlayerList, PlayerState/PlayerBlob (the save blob,
 now CPlayerLoadSaveData) and the Weapon/Owner/Zoom/Bob/Camera... player
@@ -162,7 +162,13 @@ views were replaced in about 230 files. Still local, and why:
 - **Controller** / PadState / Ctl (`D_800F5EC0`, 16 files) and
   ControllerProfile: the controller state (structs/menu.h has the menus'
   MenuController view).
-- **WeaponDef** / WeaponInfo (`D_800AF618`, 44 files): the weapon table.
+- ~~WeaponDef / WeaponInfo (`D_800AF618`, 44 files)~~: done, structs/weapon.h
+  (WeaponInfo, AmmoInfo; CBarrel with CBarrelItem / CBarrelIcon replaced the
+  WeaponMenu / MenuSlot / MenuItem / WeaponEntryList wheel views; the
+  WeaponState views are the weapon actor's CAI, its m_VarBuffer slots named
+  per file). Left: the Tuning views are .rodata pool pairs (the scale a
+  function reads at sym+4), not a struct; the Projectile views (5 files) are
+  the projectile actor, for the CGameObjectInstance family.
 - **Command** / PhaseFuncs (`D_0043232C`, `D_0043240C`), Timer, Manager: the
   VM's script commands and timers.
 - **PfsPak** / PakDirectory / PakNote (`D_80130C80`, `D_800C2224`): the
