@@ -1,22 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct Sweep {
-    /* 0x00 */ u8 pad0[0x9C];
-    /* 0x9C */ s32 done;
-} Sweep;
-
-typedef struct ModelSweep {
-    /* 0x00 */ Sweep *sweep;
-    /* 0x04 */ u8 pad4[0x44];
-    /* 0x48 */ f32 hitDist;
-    /* 0x4C */ void *model;
-    /* 0x50 */ s32 kind;
-    /* 0x54 */ f32 mtx[0x10];
-    /* 0x94 */ f32 inverse[0x10];
-    /* 0xD4 */ char *meshes;
-    /* 0xD8 */ s32 allPolys;
-} ModelSweep;
+#include "structs/collision.h"
 
 /* A vertex of the display list, put in the sweep's space and classified. */
 typedef struct ProjVertex {
@@ -33,7 +17,7 @@ typedef union DLCmd {
 } DLCmd;
 
 char *func_002017D4(s32 *list, s32 index);
-void func_0020F85C(f32 *mtx, CVector3 *in, ProjVertex *out);
+void func_0020F85C(f32 (*mtx)[4], CVector3 *in, ProjVertex *out);
 void func_0023D4D4(ModelSweep *ms, ProjVertex **tri);
 
 #define G_VTX 0x01
@@ -60,14 +44,14 @@ void func_0023D7CC(ModelSweep *ms, s32 *group) {
     f32 z;
 
     header = (u32 *)func_002017D4(group, 0);
-    if (ms->allPolys == 0 && (*header & 0x280)) {
+    if (ms->special == 0 && (*header & 0x280)) {
         return;
     }
     doubleSided = *header & 4;
     sweep = ms->sweep;
     cmd = (DLCmd *)func_002017D4(group, 1);
     do {
-        if (sweep->done != 0) {
+        if (sweep->stop != 0) {
             return;
         }
         op = cmd->b[0];

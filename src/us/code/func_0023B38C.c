@@ -1,21 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-/* A segment swept from an instance's position to end, and what it last hit. */
-typedef struct Sweep {
-    /* 0x00 */ CInstanceHeader *inst;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 maxT;
-    /* 0x0C */ u8 padC[0x40];
-    /* 0x4C */ CVector3 end;
-    /* 0x58 */ CVector3 dir;
-    /* 0x64 */ CVector3 missCentre;     /* last cylinder found not hit */
-    /* 0x70 */ CVector3 hitCentre;      /* cylinder hit */
-    /* 0x7C */ f32 missRadius;
-    /* 0x80 */ f32 hitRadius;
-    /* 0x84 */ s32 missKind;
-    /* 0x88 */ s32 hitKind;
-} Sweep;
+#include "structs/collision.h"
 
 f32 func_00298470(f32);   /* sqrtf */
 void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
@@ -37,22 +22,22 @@ s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f
     f32 disc;
     f32 t;
 
-    if (sweep->missKind == 2 && sweep->missRadius == radius && sweep->missCentre.x == centre->x &&
-        sweep->missCentre.y == centre->y && sweep->missCentre.z == centre->z) {
+    if (sweep->lastKind == 2 && sweep->lastRadius == radius && sweep->lastContact.x == centre->x &&
+        sweep->lastContact.y == centre->y && sweep->lastContact.z == centre->z) {
         return 0;
     }
     delta.x = centre->x - sweep->inst->m_vPos.x;
     delta.z = centre->z - sweep->inst->m_vPos.z;
-    if (frontOnly && delta.x * sweep->dir.x + delta.z * sweep->dir.z < 0.0f) {
+    if (frontOnly && delta.x * sweep->delta.x + delta.z * sweep->delta.z < 0.0f) {
         return 0;
     }
-    len = func_00298470(sweep->dir.x * sweep->dir.x + sweep->dir.z * sweep->dir.z);
+    len = func_00298470(sweep->delta.x * sweep->delta.x + sweep->delta.z * sweep->delta.z);
     if (len == 0.0f) {
         return 0;
     }
     invLen = 1.0f / len;
-    dir.x = sweep->dir.x * invLen;
-    dir.z = sweep->dir.z * invLen;
+    dir.x = sweep->delta.x * invLen;
+    dir.z = sweep->delta.z * invLen;
     along = delta.x * dir.x + delta.z * dir.z;
     perp.x = delta.x - dir.x * along;
     perp.z = delta.z - dir.z * along;
@@ -64,7 +49,7 @@ s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f
     if (t < 0.0f && !fromInside) {
         return 0;
     }
-    if (!(t < sweep->maxT)) {
+    if (!(t < sweep->hit.fraction)) {
         return 0;
     }
     func_0020EF8C(&hit, t, &sweep->inst->m_vPos, &sweep->end);
@@ -82,8 +67,8 @@ s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f
     if (func_0023AB18(sweep, &normal, &hit, 0, arg7, arg8, 1) == 0) {
         return 0;
     }
-    sweep->hitKind = 2;
-    sweep->hitCentre = *centre;
-    sweep->hitRadius = radius;
+    sweep->kind = 2;
+    sweep->contact = *centre;
+    sweep->radius = radius;
     return 1;
 }

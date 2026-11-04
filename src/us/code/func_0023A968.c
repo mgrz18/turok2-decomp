@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 /* A rectangle on the ground plane. */
 typedef struct Rect {
@@ -8,16 +9,6 @@ typedef struct Rect {
     /* 0x08 */ f32 maxX;
     /* 0x0C */ f32 maxZ;
 } Rect;
-
-/* A segment swept from an instance's position to end. */
-typedef struct Sweep {
-    /* 0x00 */ CInstanceHeader *inst;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ f32 maxT;
-    /* 0x0C */ u8 padC[0x40];
-    /* 0x4C */ CVector3 end;
-    /* 0x58 */ CVector3 dir;
-} Sweep;
 
 /* func_0023A640 on the ground plane: where the segment from sweep->inst's
  * position to sweep->end first enters rect (x and z only). */
@@ -39,8 +30,8 @@ s32 func_0023A968(Sweep *sweep, Rect *rect, f32 *t) {
         } else {
             d = (start->x - rect->maxX) / (start->x - end->x);
         }
-        if (d < sweep->maxT) {
-            hit.z = start->z + d * sweep->dir.z;
+        if (d < sweep->hit.fraction) {
+            hit.z = start->z + d * sweep->delta.z;
             if (rect->minZ <= hit.z && hit.z <= rect->maxZ) {
                 *t = d;
                 return 1;
@@ -55,8 +46,8 @@ s32 func_0023A968(Sweep *sweep, Rect *rect, f32 *t) {
     } else {
         d = (start->z - rect->maxZ) / (start->z - end->z);
     }
-    if (d < sweep->maxT) {
-        hit.x = start->x + d * sweep->dir.x;
+    if (d < sweep->hit.fraction) {
+        hit.x = start->x + d * sweep->delta.x;
         if (rect->minX <= hit.x && hit.x <= rect->maxX) {
             *t = d;
             return 1;
