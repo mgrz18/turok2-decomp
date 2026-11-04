@@ -654,7 +654,6 @@ typedef struct PlayerStateInfo {
     /* 0x0C */ u8 padC[0x18 - 0xC];
 } PlayerStateInfo;
 
-/* D_8011AAD8; the block before it (0xCAC bytes back) is D_80119E2C. */
 
 typedef struct DamageEvent {
     s32 w[6];

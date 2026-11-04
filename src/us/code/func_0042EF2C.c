@@ -1,5 +1,6 @@
 /* REAL func_0042EF2C size 0x298 (0x0042EF2C-0x0042F1C4; splat cut it into func_0042EF2C + func_0042F0E4). Matches whole (checked with the size overridden). The settings loop is written out in the function (not an inline) so both loops share the counter i ($a2), as in the ROM. */
 #include "common.h"
+#include "structs/game.h"
 
 /* The match configuration handed in by the menu. */
 typedef struct MatchConfig {
@@ -23,34 +24,6 @@ typedef struct Setting {
     /* 0x18 */ s32 unk18;
     /* 0x1C */ s32 unk1C;
 } Setting; /* 0x20 */
-
-typedef struct GameSetupPlayer {
-    /* 0x00 */ u8 active;
-    /* 0x01 */ u8 pad1[7];
-    /* 0x08 */ u8 team;
-    /* 0x09 */ u8 pad9[0x37];
-} GameSetupPlayer; /* 0x40 */
-
-typedef struct GameSetup {
-    /* 0x000 */ s32 mode;
-    /* 0x004 */ u8 pad4[0x13];
-    /* 0x017 */ u8 unk17;
-    /* 0x018 */ u8 pad18;
-    /* 0x019 */ u8 multiplayer;
-    /* 0x01A */ u8 playerCount;
-    /* 0x01B */ u8 pad1B[8];
-    /* 0x023 */ u8 unk23;
-    /* 0x024 */ u8 pad24[4];
-    /* 0x028 */ u8 unk28;
-    /* 0x029 */ u8 pad29[4];
-    /* 0x02D */ u8 unk2D;
-    /* 0x02E */ u8 pad2E[0x3A];
-    /* 0x068 */ u8 singlePlayer;
-    /* 0x069 */ u8 pad69[0x3F];
-    /* 0x0A8 */ GameSetupPlayer players[4];
-    /* 0x1A8 */ u8 pad1A8[0x28];
-    /* 0x1D0 */ u32 matchMode; /* D_8011ACA8 */
-} GameSetup;
 
 typedef struct GameSetupCopy {
     s32 data[0x184 / 4];
@@ -77,12 +50,11 @@ typedef struct MatchState {
 
 extern MatchState D_800F56B0;
 extern s32 D_800B6D60;
-extern GameSetup D_8011AAD8;
 
 extern void func_0042ECF0();
 extern void func_0042F75C();
 extern void func_0042F7C8();
-extern void func_0041BA50(GameSetup *setup);
+extern void func_0041BA50(GameSettings *setup);
 extern s32 func_002113A4(void);
 static __inline__ void initSetting(Setting *t, MatchConfig *config, s32 index, void (*handler)(), s32 value) {
     t->config = config;
@@ -97,7 +69,7 @@ static __inline__ void initSetting(Setting *t, MatchConfig *config, s32 index, v
 /* Starts a match from config: sets up the per-player settings and the game setup. */
 void func_0042EF2C(MatchConfig *arg) {
     MatchState *s = &D_800F56B0;
-    GameSetup *setup;
+    GameSettings *setup;
     s32 i;
     s32 r;
 
@@ -114,10 +86,10 @@ void func_0042EF2C(MatchConfig *arg) {
         s->savedSetup = *(GameSetupCopy *)&D_8011AAD8;
     }
     {
-        GameSetup *g = &D_8011AAD8;
+        GameSettings *g = &D_8011AAD8;
         for (i = 0; i < 4; i++) {
-            g->singlePlayer = 0;
-            g->players[i].active = 0;
+            g->defaultSlot.active = 0;
+            g->slots[i].active = 0;
             initSetting(&s->a[i], owner, i, func_0042ECF0, config->a[i]);
             initSetting(&s->b[i], owner, i, func_0042F75C, config->b[i]);
             initSetting(&s->c[i], owner, i, func_0042F75C, config->c[i]);
@@ -135,21 +107,21 @@ void func_0042EF2C(MatchConfig *arg) {
     if (s->playerCount >= 2) {
         do {
             for (i = 0; i < s->playerCount; i++) {
-                setup->players[i].active = 1;
-                setup->players[i].team = config->teams[i];
+                setup->slots[i].active = 1;
+                setup->slots[i].character = config->teams[i];
             }
             D_8011AAD8.multiplayer = 1;
         } while (0);
     } else {
-        setup->singlePlayer = 1;
+        setup->defaultSlot.active = 1;
         setup->multiplayer = 0;
     }
     setup = &D_8011AAD8;
     setup->unk17 = 0;
     setup->playerCount = s->playerCount;
-    setup->mode = 12;
+    setup->cheatFlags = 12;
     r = func_002113A4() % 9;
-    setup->unk23 = r;
-    setup->unk28 = r;
-    setup->unk2D = r;
+    setup->dmSkill = r;
+    setup->tagSkill = r;
+    setup->teamSkill = r;
 }

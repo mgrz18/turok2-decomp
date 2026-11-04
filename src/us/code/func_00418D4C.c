@@ -3,9 +3,6 @@
 
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
 
-/* The multiplayer settings, D_8011AAD8 (0x184 bytes, see func_0042F514). */
-
-
 s32 func_00418D4C(s32 arg0, s32 arg1) {
     GameSettings *var_s0;
 

@@ -1,9 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
 
-/* The game options at D_8011AAD8 (the game state at D_80119870 + 0x1268):
- * the bytes the option menus step. */
-
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
 
 s32 func_0045165C(s32 arg0, s32 arg1) {

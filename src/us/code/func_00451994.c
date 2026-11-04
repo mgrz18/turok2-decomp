@@ -3,9 +3,6 @@
 
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
 
-/* Game options block (D_8011AAD8); the menu handlers below step one setting each. */
-
-
 s32 func_00451994(s32 arg0, s32 arg1) {
     GameSettings *var_s0;
 

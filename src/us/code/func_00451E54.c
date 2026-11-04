@@ -5,7 +5,6 @@
 
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
 
-
 s32 func_00451E54(s32 arg0, s32 arg1) {
     GameSettings *settings = &D_8011AAD8;
 

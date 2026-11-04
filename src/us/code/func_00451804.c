@@ -6,8 +6,6 @@ typedef struct MenuContext {
     /* 0x20 */ s32 controller;
 } MenuContext;
 
-/* The multiplayer settings, D_8011AAD8 (0x184 bytes, see func_0042F514). */
-
 extern s32 D_800C1EA8;     /* the speed setting, 0-15 */
 extern f32 D_00438824[];   /* speed per setting */
 

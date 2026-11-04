@@ -2,8 +2,6 @@
 #include "structs/player.h"
 #include "structs/game.h"
 
-/* The game flags at D_8011AAD8 (0x1268 into the game state at D_80119870). */
-
 s32 func_00412438(s32);
 s32 func_0042C700(s32, s32, s32);
 

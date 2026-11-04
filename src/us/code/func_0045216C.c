@@ -3,9 +3,6 @@
 
 s32 func_0041648C(s32, s32, s32, s32, s32, s32);
 
-/* Option values at D_8011AAD8 adjusted by the menu (func_0041648C steps a
- * value within [min, max]). */
-
 s32 func_0045216C(s32 arg0, s32 arg1) {
     GameSettings *var_s0;
 

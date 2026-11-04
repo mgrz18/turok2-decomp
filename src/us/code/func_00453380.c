@@ -13,7 +13,6 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-
 void func_00453380(Screen *screen) {
     D_8011ACB0.countdown = 120.0f;
     screen->layer->flags &= ~0x4000000;

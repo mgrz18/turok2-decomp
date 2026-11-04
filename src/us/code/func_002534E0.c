@@ -4,7 +4,6 @@
 s32 func_0024E5F0(s32, s32, s32);
 s32 func_00285410(s32);
 
-
 typedef struct {
     /* 0x00 */ u8 pad0[0xD0];
     /* 0xD0 */ s32 unkD0;

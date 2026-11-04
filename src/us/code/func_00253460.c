@@ -14,7 +14,6 @@ typedef struct {
     /* 0x30 */ s32 count;
 } PlayerList;
 
-
 /* Once every player has options byte 0x3D set to 1, turns the pending flag
  * into the done flag and returns 1. */
 s32 func_00253460(PlayerList *list) {

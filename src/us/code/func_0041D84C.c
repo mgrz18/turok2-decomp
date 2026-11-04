@@ -1,9 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
 
-/* The multiplayer match state at D_8011ACB0: the fields this reads. */
-
-
 s32 func_0041D84C(void)
 {
   s32 var_a0;

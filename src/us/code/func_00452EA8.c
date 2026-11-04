@@ -14,9 +14,6 @@ typedef struct MenuItem {
     /* 0x20 */ void *options;
 } MenuItem;
 
-/* The multiplayer settings, D_8011AAD8 (0x184 bytes, see func_0042F514). */
-
-
 s32 func_004160F0(MenuItem *item); /* length of the item's text line */
 s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
 

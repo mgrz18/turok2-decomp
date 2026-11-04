@@ -3,11 +3,6 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_4.CPP, func_8043EA98_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-
-/* Turok 2 per-player settings record (0x40 bytes; Rage Wars' is larger). */
-
-/* Minimal Turok 2 layout of the shared game globals. */
-
 struct Part {
     char pad[0x28];
     u8 active;         /* 0x28 */
