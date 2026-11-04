@@ -20,6 +20,7 @@ struct CCacheEntry;
 #define MEMENTRY_FLAG_LOCKED        0x100   /* lockCount > 0 */
 #define MEMENTRY_FLAG_DLISTA_LOCKED 0x200
 #define MEMENTRY_FLAG_DLISTB_LOCKED 0x400
+#define MEMENTRY_FLAG_ALLOCATED     0x800
 #define MEMENTRY_FLAG_ON_LOCKED     0x1000  /* on the locked list D_800D81F4 */
 
 typedef struct CMemEntry {

@@ -1,52 +1,42 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002512C8.c, func_80251328_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
+#include "common.h"
+#include "structs/cache.h"
+
 extern s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent);
-struct Node_func_80251328_de;
-struct Node_func_80251328_de {
-    s32 resource;
-    char pad4[8];
-    s32 flags;
-    s32 lastUsed;
-    char pad14[4];
-    struct Node_func_80251328_de *next;
-};
-struct Node_func_80251328_de;
-typedef struct Node_func_80251328_de Node_func_80251328_de;
-extern Node_func_80251328_de *D_800D81E4;
-extern Node_func_80251328_de *D_800D81D8;
-extern Node_func_80251328_de **D_800D81D4;
+extern CMemEntry *D_800D81E4;
+extern CMemEntry *D_800D81D8;
+extern CMemEntry **D_800D81D4;
 extern s32 D_800D8DAC;
 extern s32 D_800D8DF0;
 extern char D_800D1CC0;
 extern char D_800D81E0;
 extern char D_800D81F4;
-extern void func_002065F8(void *, Node_func_80251328_de *);
+extern void func_002065F8(void *, CMemEntry *);
 extern s32 func_002026EC(void *, s32);
-extern void CList__Remove(void *, Node_func_80251328_de *);
-static __inline__ Node_func_80251328_de *find_stale(Node_func_80251328_de **recent) {
-    Node_func_80251328_de *node;
-    for (node = D_800D81E4; node != 0; node = node->next) {
+extern void CList__Remove(void *, CMemEntry *);
+static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
+    CMemEntry *node;
+    for (node = D_800D81E4; node != 0; node = node->last) {
         if (!(node->flags & 0x702)) {
-            if ((u32)(D_800D8DF0 - node->lastUsed) >= 5) {
+            if ((u32)(D_800D8DF0 - node->age) >= 5) {
                 return node;
             }
             *recent = node;
             break;
         }
     }
-    for (; node != 0; node = node->next) {
-        if (!(node->flags & 0x702) && (u32)(D_800D8DF0 - node->lastUsed) >= 5) {
+    for (; node != 0; node = node->last) {
+        if (!(node->flags & 0x702) && (u32)(D_800D8DF0 - node->age) >= 5) {
             return node;
         }
     }
     return 0;
 }
 s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent) {
-    Node_func_80251328_de *recent;
-    Node_func_80251328_de *node;
+    CMemEntry *recent;
+    CMemEntry *node;
     s32 result;
     recent = 0;
     node = find_stale(&recent);
@@ -57,7 +47,7 @@ s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent) {
     }
     if (node != 0) {
         func_002065F8(0, node);
-        result = func_002026EC(&D_800D1CC0, node->resource);
+        result = func_002026EC(&D_800D1CC0, node->data);
         CList__Remove(&D_800D81E0, node);
         if (node->flags & 0x1000) {
             CList__Remove(&D_800D81F4, node);
@@ -68,7 +58,7 @@ s32 func_00203068(s32 unused0, s32 unused1, s32 keep_recent) {
         } else {
             node->flags = 0;
         }
-        *(Node_func_80251328_de **)(D_800D8DAC * 4 + (char *)D_800D81D4) = node;
+        *(CMemEntry **)(D_800D8DAC * 4 + (char *)D_800D81D4) = node;
         D_800D8DAC++;
         return result;
     }
