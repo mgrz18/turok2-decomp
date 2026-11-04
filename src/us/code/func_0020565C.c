@@ -18,7 +18,7 @@ void func_0020565C(s32 unused, B12Node *n) {
     mask = __osDisableInt();
     if (++D_800D8DCC != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(&D_800D7BE0.q11D0, 0, 1);
+        osRecvMesg(&D_800D7BE0.lock.queue, 0, 1);
     } else {
         __osRestoreInt(mask);
     }

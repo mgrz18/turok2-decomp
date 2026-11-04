@@ -63,9 +63,7 @@ typedef struct B12Mgr {
                  B12List lists3[3];
                  s32 tbl11C4[2];
                  s32 cnt;
-                 OSMesgQueue q11D0;
-                 OSMesg buf11D0;
-                 s32 lockCnt;
+                 CMutex lock;          /* 0x11D0 (ultra_types.h) */
                  OSMesgQueue q11F0;
                  OSMesg buf11F0;
                  s32 f120C;

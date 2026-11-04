@@ -16,7 +16,7 @@ s32 func_00205574(void) {
     mask = __osDisableInt();
     if (++D_800D8DCC != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(&D_800D7BE0.q11D0, 0, 1);
+        osRecvMesg(&D_800D7BE0.lock.queue, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
@@ -25,7 +25,7 @@ s32 func_00205574(void) {
     m2 = __osDisableInt();
     if (--D_800D8DCC != 0) {
         __osRestoreInt(m2);
-        osSendMesg(&D_800D7BE0.q11D0, 0, 1);
+        osSendMesg(&D_800D7BE0.lock.queue, 0, 1);
     } else {
         __osRestoreInt(m2);
     }
