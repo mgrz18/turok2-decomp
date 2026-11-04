@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 
 typedef struct Player {
@@ -32,14 +33,6 @@ typedef struct WeaponDef {
     /* 0x04 */ u16 id;
 } WeaponDef;
 
-typedef struct MatchSettings {
-    /* 0x000 */ u8 pad0[0x19];
-    /* 0x019 */ u8 messages;
-    /* 0x01A */ u8 pad1A[0x1FC - 0x1A];
-    /* 0x1FC */ s32 tagFlash;
-} MatchSettings;
-
-extern MatchSettings D_8011AAD8;
 extern s32 D_800AB8B0;       /* screen flash mode */
 extern f32 D_800AB8B4[3];    /* screen flash color */
 extern f32 D_800AB8C0[2];    /* screen flash range */
@@ -67,7 +60,7 @@ void func_00247FB0(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
     if (hit->amount >= HIT_LIMIT(hit)) {
         return;
     }
-    flags = &D_8011AAD8.messages;
+    flags = &D_8011AAD8.multiplayer;
     if (*flags != 0) {
         if (player->options->m_TagMode != 0 && player->unk524 == 0) {
             return;

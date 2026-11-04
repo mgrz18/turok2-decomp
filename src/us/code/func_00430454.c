@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/game.h"
 #include "structs/world.h"
 
 /* Turok 2: the mode block sits at 0x23FD0 (see func_00288E58). */
@@ -13,17 +14,7 @@ typedef struct GameSession {
     s32 unk23FFC;              /* 0x23FFC */
 } GameSession;
 
-typedef struct MatchState {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ u8 pad10[0x44 - 0x10];
-    /* 0x44 */ s32 unk44;
-} MatchState;
-
 extern char D_800F7078[];
-extern MatchState D_8011ACB0;
 
 s32 func_0042C194(void *world, s32 arg1, s32 id, CWarpPoint *out, s32 max);
 
@@ -37,10 +28,10 @@ void func_00430454(GameSession *session, s32 warp) {
     if (func_0042C194(D_800F7078, -1, warp, &point, 1) == 0) {
         warp = 0;
     }
-    D_8011ACB0.unk0 = 0;
-    D_8011ACB0.unk4 = 0;
-    D_8011ACB0.unk8 = 0;
-    D_8011ACB0.unkC = 0;
+    D_8011ACB0.frames = 0;
+    D_8011ACB0.seconds = 0;
+    D_8011ACB0.minutes = 0;
+    D_8011ACB0.hours = 0;
     D_8011ACB0.unk44 = 0;
     do {
         session->unk23FFC = 0;

@@ -9,6 +9,7 @@
 #include "structs/player.h"
 #include "gfx.h"
 #include "structs/camera.h"
+#include "structs/game.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -416,10 +417,6 @@ found:
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 extern s32 D_800B6D1C;          /* which of the two frame buffers is drawn */
-typedef struct {
-    /* 0x00 */ s32 m_Flags;
-} GameFlags;
-extern GameFlags D_8011AAD8;    /* game flags */
 extern Gfx D_800AB100[];        /* RDP setup display lists */
 extern Gfx D_800AB130[];
 extern CCamera D_801198F0;      /* the main camera (camera pool + 0x40) */
@@ -530,7 +527,7 @@ void func_0027E000(CCamera *cam) {
                 (ulx & 0x3FF) << 14 | (uly & 0x3FF) << 2);  /* gDPFillRectangle */
             *clearDl = cmd;
         }
-        if (D_8011AAD8.m_Flags & 0x4000) {
+        if (D_8011AAD8.cheatFlags & 0x4000) {
             rgb.red = 0;
             rgb.green = 0;
             rgb.blue = 0;

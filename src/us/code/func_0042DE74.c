@@ -1,5 +1,6 @@
 /* Player code: func_0042DE74, 0x0042DE74-0x0042E14C (splat had it inside the data D_0042D50C). */
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct Crosshair {
     /* 0x00 */ s32 unk0;
@@ -73,12 +74,6 @@ typedef struct Player {
     /* 0x1290 */ s32 unk1290;
 } Player;
 
-typedef struct GameFlags {
-    /* 0x00 */ u8 pad0[0x19];
-    /* 0x19 */ u8 multiplayer;  /* D_8011AAF1 */
-} GameFlags;
-
-extern GameFlags D_8011AAD8;
 extern s32 D_8011001C;
 extern s32 D_80110048;
 extern s32 D_800C2034;          /* screen height */
@@ -108,7 +103,7 @@ extern void func_002842B4(void);
 extern void func_0026E19C(s32, s32, Player *p);
 
 void func_0042DE74(Player *p) {
-    GameFlags *flags = &D_8011AAD8;
+    GameSettings *flags = &D_8011AAD8;
     Crosshair *c;
     s32 warp;
 

@@ -1,14 +1,7 @@
 #include "common.h"
+#include "structs/game.h"
 
 /* The play-time clock (see func_00288FDC.c) and a word at 0x44. */
-typedef struct {
-    /* 0x00 */ f32 frames;
-    /* 0x04 */ f32 seconds;
-    /* 0x08 */ f32 minutes;
-    /* 0x0C */ f32 hours;
-    /* 0x10 */ u8 pad10[0x44 - 0x10];
-    /* 0x44 */ s32 unk44;
-} PlayClock;
 
 /* The fields this sets, far into this (large) state. */
 typedef struct {
@@ -23,7 +16,6 @@ typedef struct {
 
 s32 func_0042C0B4(void *, s32, s32, void *, s32);   /* extern */
 extern u8 D_800F7078[];
-extern PlayClock D_8011ACB0;
 
 void func_004692CC(BigState *arg0) {
     u8 sp18[0x18];

@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_14.CPP, func_802504B0_de (with func_8027892C_de of src/GAMECORE/CODE_80278900.CPP inlined), with Turok 2's layouts. */
 
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
@@ -37,13 +38,8 @@ typedef struct {
 } VtxChunk;
 
 /* What this reads around D_8011ACB0. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x34];
-    /* 0x34 */ s32 split;
-} GameState;
 
 extern u8 D_8011AAF1;           /* multiplayer */
-extern GameState D_8011ACB0;
 extern s32 D_800ACAD8;
 extern char D_800A57F8[];
 extern s8 D_800ACAF4[];         /* the colour pulse, 64 steps */
@@ -146,8 +142,8 @@ void func_00214844(PlacedProp *prop) {
                 lod = prop->descriptor->lod;
                 break;
             default: {
-                GameState *game = &D_8011ACB0;
-                if (game->split) {
+                GameMatch *game = &D_8011ACB0;
+                if (game->tag) {
                     lod = ((s8 *) game)[-0x1B0];
                 } else {
                     lod = ((s8 *) game)[-0x1B5];

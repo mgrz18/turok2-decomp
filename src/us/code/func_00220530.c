@@ -1,19 +1,14 @@
 #include "common.h"
 #include "structs/world.h"
+#include "structs/game.h"
 
 /* The input state the controller reader fills (D_8011AAD8, 0x184 bytes). */
-typedef struct InputState {
-    s32 buttons;            /* 0x00 */
-    s32 pad4[2];
-    s32 held;               /* 0x0C */
-} InputState;
 
 extern s32 D_800ACAD8;      /* buttons this frame */
 extern s32 D_800ACADC;      /* buttons changed */
 extern s32 D_800ACDE0;
 extern f32 D_800B6D28;      /* frame time scale */
 extern f32 D_800DD78C;
-extern InputState D_8011AAD8;
 extern u8 D_801102B8[];
 extern u8 D_80119870[];
 extern u8 D_801198B0[];
@@ -42,18 +37,18 @@ void func_00226724(CWorld *);
 void func_00226024(CWorld *);
 
 void func_00220530(CWorld *world) {
-    InputState *input;
+    GameSettings *input;
     s32 old;
     f32 s;
 
     old = D_800ACAD8;
     input = &D_8011AAD8;
     D_800ACDE0 = 0;
-    D_800ACAD8 = input->held;
-    if (input->buttons & 0x4000) {
+    D_800ACAD8 = input->unkC;
+    if (input->cheatFlags & 0x4000) {
         D_800ACAD8 |= 0x100;
     }
-    if (input->buttons & 0x8000) {
+    if (input->cheatFlags & 0x8000) {
         D_800ACAD8 |= 0x200;
     }
     if (old != D_800ACAD8) {

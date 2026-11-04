@@ -2,6 +2,7 @@
  * func_00420454, func_004205B8 and func_004205C4 inside its straight-line code. */
 #include "common.h"
 #include "structs/world.h"
+#include "structs/game.h"
 
 /* Load game menu "select" handler: with the pak checked, either restores the
  * loaded save (player block, game progress, level times, the level's key
@@ -54,10 +55,8 @@ extern s32 D_800C2028;
 extern SaveGame *D_800C201C;
 extern u32 D_80110060;
 extern u8 D_80119870[];
-extern ProgressSave D_8011AAD8;
 extern u32 D_8011AADC[];
 extern u8 D_8011AC58[];
-extern f32 D_8011ACB0[];
 extern f32 D_8011ACB4[];
 extern f32 D_8011ACB8[];
 extern f32 D_8011ACBC[];
@@ -96,8 +95,8 @@ s32 func_00420454(void *menu, MenuCaller *c) {
         world = &D_800F7078;
         keep = D_8011AC58[0];
         player->save = D_800C201C->player;
-        D_8011AAD8 = D_800C201C->progress;
-        D_8011ACB0[0] = D_800C201C->time0;
+        *(ProgressSave *)&D_8011AAD8 = D_800C201C->progress;
+        D_8011ACB0.frames = D_800C201C->time0;
         D_8011ACB4[0] = D_800C201C->time1;
         D_8011ACB8[0] = D_800C201C->time2;
         D_80110060 = D_8011AADC[0];

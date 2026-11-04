@@ -1,18 +1,13 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ s32 limit;
-} GameState;
-
-extern GameState D_8011ACB0;
 extern s32 func_0025340C(CPlayerList *list, CPlayer *player);
 
 /* Whether some player sums, over the slots other than func_0025340C's, at
- * least D_8011ACB0.limit in options field 0x10. */
+ * least D_8011ACB0.scoreLimit in options field 0x10. */
 s32 func_00254A5C(CPlayerList *list) {
-    GameState *state;
+    GameMatch *state;
     CPlayer *p;
     s32 skip;
     s32 sum;
@@ -27,7 +22,7 @@ s32 func_00254A5C(CPlayerList *list) {
                 sum += ((CPlayerOptions *)p->m_pOptions)->m_Tagged[i];
             }
         }
-        if (sum >= state->limit) {
+        if (sum >= state->scoreLimit) {
             return 1;
         }
     }

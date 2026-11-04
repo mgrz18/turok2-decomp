@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 typedef struct HitTarget {
     /* 0x00 */ u8 pad0[0x65];
@@ -11,19 +12,13 @@ typedef struct Hit {
     /* 0x10 */ HitTarget *target;
 } Hit;
 
-typedef struct MatchSettings {
-    /* 0x00 */ u8 pad0[0x19];
-    /* 0x19 */ u8 messages;         /* show kill messages */
-} MatchSettings;
-
 /* The global at D_801198B0: what this reads of it. */
 typedef struct Game {
     /* 0x0000 */ u8 pad0[0x1228];
-    /* 0x1228 */ MatchSettings settings;    /* D_8011AAD8 */
+    /* 0x1228 */ GameSettings settings;    /* D_8011AAD8 */
 } Game;
 
 extern Game D_801198B0;
-extern MatchSettings D_8011AAD8;    /* the multiplayer settings, D_801198B0 + 0x1228 */
 
 /* The game the settings belong to, recovered from the settings pointer. Its address is
    D_8011AAD8 - 0x1228 for the compiler, not D_801198B0: that is what keeps the tagged and
@@ -51,10 +46,10 @@ void func_00281610(Game *game, struct CCamera *camera, char *text, f32 time);
 /* Deathmatch messages for a kill: "killed by" or "tagged by" on the victim's
    screen, "you killed", "you tagged" or "head shot!" on the killer's. */
 void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit) {
-    MatchSettings *settings = &D_8011AAD8;
+    GameSettings *settings = &D_8011AAD8;
     HitTarget *target;
 
-    if (settings->messages != 0) {
+    if (settings->multiplayer != 0) {
         if (victim == killer) {
             func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B542C);
             SHOW_MESSAGE(&D_801198B0, killer, 1.5f);

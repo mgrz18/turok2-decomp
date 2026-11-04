@@ -1,19 +1,13 @@
 /* Second VM module copy of func_0042E29C (same source, linked 0x0042E1BC). */
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct GameFlags {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ u8 pad4[0x19 - 0x4];
-    /* 0x19 */ u8 multiplayer;  /* D_8011AAF1 */
-} GameFlags;
+#include "structs/game.h"
 
 typedef struct GameState {
     s32 state;
 } GameState;
 
 extern s32 D_80119878; /* player count */
-extern GameFlags D_8011AAD8;
 extern u8 D_8011AAF1;  /* multiplayer */
 extern GameState D_8011AC88;
 extern u32 D_800B6D20;
@@ -30,9 +24,9 @@ extern void func_00248BA8(CPlayer *p, s32 warp, s32 arg2, s32 respawn);
 
 void func_004671BC(CPlayer *p) {
     s32 mode = (D_80119878 >= 2) * 2;
-    GameFlags *flags = &D_8011AAD8;
+    GameSettings *flags = &D_8011AAD8;
 
-    if (!(flags->flags & 2) || flags->multiplayer != 0) {
+    if (!(flags->cheatFlags & 2) || flags->multiplayer != 0) {
         p->m_Data.m_Lives--;
     }
     if (p->m_Data.m_Lives <= 0) {

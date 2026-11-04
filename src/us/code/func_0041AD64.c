@@ -2,11 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "structs/game.h"
 
 extern int D_80110060;
 extern CheatCode D_00439770[];
 extern u8 D_800C1F8C[];
-extern struct IntPair D_8011AAD8;
 extern s32 D_80130920;
 extern s32 func_0029E4C0(u8 *);
 extern void func_00275624(s32);
@@ -16,7 +16,7 @@ s32 func_0041AD64(void)
     s32 j;
     s32 match;
     s32 hasSound;
-    struct IntPair *settings;
+    GameSettings *settings;
     u8 *code;
     D_80130920 = -1;
     for (i = 0; i < 12; i++) {
@@ -39,10 +39,10 @@ s32 func_0041AD64(void)
             }
         }
         if (match) {
-            D_8011AAD8.field_4 |= D_00439770[i].flags;
+            D_8011AAD8.unlockedCheats |= D_00439770[i].flags;
             settings = &D_8011AAD8;
             do {
-                D_80110060 = settings->field_4;
+                D_80110060 = settings->unlockedCheats;
             } while (0);
             hasSound = D_00439770[i].sound != 0;
             D_80130920 = i;

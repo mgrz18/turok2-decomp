@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/world.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x000 */ s32 data[0x184 / 4];
@@ -16,18 +17,8 @@ typedef struct {
     /* 0x684 */ u8 text[4];
 } SaveBuffer;
 
-typedef struct {
-    /* 0x000 */ s32 unk0;
-    /* 0x004 */ s32 warpId;
-    /* 0x008 */ u8 pad8[0x180 - 0x8];
-    /* 0x180 */ u8 unk180;
-    /* 0x181 */ u8 pad181[0x1D8 - 0x181];
-    /* 0x1D8 */ f32 match[4];
-} Game;
-
 extern SaveBuffer *D_800C201C;
 extern CWorld D_800F7078;
-extern Game D_8011AAD8;
 extern s32 D_80110060[];
 extern u8 D_800EBAC0[];
 
@@ -41,11 +32,11 @@ void func_00421528(CPlayer *p) {
     keep = D_8011AAD8.unk180;
     p->m_Data = D_800C201C->player;
     *(SetupBlob *)&D_8011AAD8 = D_800C201C->setup;
-    D_8011AAD8.match[0] = D_800C201C->match[0];
-    D_8011AAD8.match[1] = D_800C201C->match[1];
-    D_8011AAD8.match[2] = D_800C201C->match[2];
-    D_8011AAD8.match[3] = D_800C201C->match[3];
-    D_80110060[0] = D_8011AAD8.warpId;
+    D_8011AAD8.match.frames = D_800C201C->match[0];
+    D_8011AAD8.match.seconds = D_800C201C->match[1];
+    D_8011AAD8.match.minutes = D_800C201C->match[2];
+    D_8011AAD8.match.hours = D_800C201C->match[3];
+    D_80110060[0] = D_8011AAD8.unlockedCheats;
     D_8011AAD8.unk180 = keep;
     src = D_800C201C->text;
     dst = D_800EBAC0;

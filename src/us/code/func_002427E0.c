@@ -1,18 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/game.h"
 #include "structs/intelligence.h"
-
-/* Game settings (D_8011AAD8); the difficulty at +8 is read as D_8011AAE0. */
-typedef struct Settings {
-    char pad0[0x19];
-    u8 multiplayer;    /* 0x19 */
-    char pad1A[0x23 - 0x1A];
-    s8 levelA;         /* 0x23 */
-    char pad24[0x28 - 0x24];
-    s8 levelB;         /* 0x28 */
-    char pad29[0x20C - 0x29];
-    s32 useLevelB;     /* 0x20C */
-} Settings;
 
 typedef struct Dest {
     char pad0[4];
@@ -25,12 +14,11 @@ typedef struct Dest {
     u8 unkC8;          /* 0xC8 */
 } Dest;
 
-extern Settings D_8011AAD8;
 extern s32 D_8011AAE0;  /* difficulty: 8, 16 or 32 */
 
 /* Initial health and level of an actor from its definition, scaled by difficulty. */
 void func_002427E0(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
-    Settings *settings;
+    GameSettings *settings;
     s32 level;
     f32 health;
     f32 a;
@@ -46,10 +34,10 @@ void func_002427E0(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
         settings = &D_8011AAD8;
         level = def->m_nTexture;
         if (settings->multiplayer != 0 && def->m_Type != 1 && def->m_Type != 11) {
-            if (settings->useLevelB != 0) {
-                level = settings->levelB;
+            if (settings->match.tag != 0) {
+                level = settings->tagSkill;
             } else {
-                level = settings->levelA;
+                level = settings->dmSkill;
             }
         }
         switch (def->m_Type) {

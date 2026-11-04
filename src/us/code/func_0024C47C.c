@@ -12,6 +12,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
+#include "structs/game.h"
 
 typedef struct WeaponMenu WeaponMenu;
 
@@ -604,20 +605,12 @@ typedef struct PlayerStateInfo {
     /* 0x0C */ u8 padC[0x18 - 0xC];
 } PlayerStateInfo;
 
-/* D_8011AAD8; the block before it (0xCAC bytes back) is D_80119E2C. */
-typedef struct Settings {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x19 - 4];
-    /* 0x19 */ u8 multiplayer;
-    /* 0x1A */ u8 pad1A[0xCAC - 0x1A];
-} Settings;
 
 typedef struct DamageEvent {
     s32 w[6];
 } DamageEvent;
 
 extern f32 D_800B6D28;              /* frame time */
-extern Settings D_8011AAD8;
 extern s32 D_8011AAA0;
 extern s32 D_8011ACE4;
 extern s32 D_800B6D1C;
@@ -683,7 +676,7 @@ void func_0024BD18(s32 *, Player *, u8 *);
 void func_0024A0DC(Player *);
 
 static __inline__ s32 link_enabled(u8 *bits) {
-    if (D_8011AAD8.flags & 0x10) {
+    if (D_8011AAD8.cheatFlags & 0x10) {
         return 1;
     }
     return *bits & 0xF;
@@ -733,7 +726,7 @@ void func_0024D344(Player *p) {
     f32 rate;
     f32 regen;
     Player *actor;
-    Settings *game;
+    GameSettings *game;
     s32 enable;
     Model *oldModel;
     Model *model;
@@ -769,7 +762,7 @@ void func_0024D344(Player *p) {
     p->owner = p;
     p->unk430 = p;
     if ((p->aiFlags & 0x80) && game->multiplayer == 0) {
-        enable = (game - 1)->flags == 0;
+        enable = *(u32 *) ((u8 *) game - 0xCAC) == 0; /* D_80119E2C, the block before */
     }
     func_00275B08(enable);
     if (D_8011AAF1.multiplayer == 0) {
@@ -1094,7 +1087,7 @@ void func_0024D344(Player *p) {
     p->emitterModel = p->model;
     p->emitter40 = p->unk40;
     p->lastPos = p->pos;
-    if (D_8011AAD8.flags & 8) {
+    if (D_8011AAD8.cheatFlags & 8) {
         for (i = 0; i < 31; i++) {
             if (i != 21) {
                 p->ammo[i] = 0;
@@ -1119,7 +1112,7 @@ void func_0024D344(Player *p) {
             }
         }
     }
-    if (D_8011AAD8.flags & 4) {
+    if (D_8011AAD8.cheatFlags & 4) {
         if (D_8011AAD8.multiplayer == 0 && p->owned[21] == 0) {
             *(p->ammo + *func_0025398C(p, 21)) = 1;
         }

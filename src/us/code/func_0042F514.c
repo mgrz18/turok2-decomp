@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game.h"
 
 /* Settings block, 0x184 bytes: a copy lives in the timer state and is
  * committed to D_8011AAD8. */
@@ -17,14 +18,13 @@ typedef struct TimerState {
 } TimerState;
 
 extern TimerState D_800F56B0;
-extern Settings D_8011AAD8;
 
 void func_0042F514(void) {
     TimerState *s = &D_800F56B0;
 
     if (s->pending != 0) {
         s->pending = 0;
-        D_8011AAD8 = s->settings;
+        *(Settings *)&D_8011AAD8 = s->settings;
     }
     s->active = 0;
     s->unk4 = 0;

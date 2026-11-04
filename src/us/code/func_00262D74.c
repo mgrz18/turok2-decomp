@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "structs/game.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
@@ -40,12 +41,6 @@ typedef struct {
     Pick entries[0x18];
 } PickTable;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x19];
-    /* 0x19 */ u8 multiplayer;
-} GameFlags;
-
-extern GameFlags D_8011AAD8;
 extern s32 D_8011001C;
 extern Pick D_800B1EE0[];
 extern Pick D_800B1F38[];
@@ -115,7 +110,7 @@ void func_00262D74(Actor *actor, CAI *ai) {
     s32 ammo;
     s32 item;
     u16 pickId; /* loaded as u16, passed as s16: the ROM's lhu/sll/sra */
-    GameFlags *flags;
+    GameSettings *flags;
     Pick *e;
     void *player;
 

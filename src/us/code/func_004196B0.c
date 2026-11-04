@@ -1,4 +1,6 @@
 #include "structs/vector.h"
+#include "common.h"
+#include "structs/game.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_4.CPP, func_8043EA98_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -76,21 +78,6 @@ typedef struct ObjRecAt20V2 ObjRecAt20V2;
 extern signed char D_8011AB47;
 struct ObjRecAt20V2;
 /* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
-typedef struct Shared_PlayerSettingsRecord Shared_PlayerSettingsRecord;
-struct Shared_PlayerSettingsRecord {
-    char pad0[0x28];
-    u8 enabled;
-    char pad29[0x40 - 0x29];
-};
-typedef struct Shared_Game Shared_Game;
-struct Shared_Game {
-    u8 unknown00[0x19];
-    u8 local;
-    u8 mode1A;
-    u8 unknown1B[0x80 - 0x1B];
-    Shared_PlayerSettingsRecord playerSettings[4];
-};
-extern Shared_Game D_8011AAD8;
 extern void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu);
 extern void func_00275A74();
 extern struct Part D_8011AB18;
@@ -422,18 +409,17 @@ extern s32 D_801308F8;
 extern s32 func_002855E8(char *);
 extern void func_00275A74(void);
 extern void func_00430454(char *, s32);
-extern Shared_Game D_8011AAD8;
 void func_004196B0(void *arg0, struct ObjRecAt20V2 *menu) {
-    Shared_Game *globals;
+    GameSettings *globals;
     struct Part *settings;
     char *profile;
     s32 on;
     s32 i;
     globals = &D_8011AAD8;
-    globals->local = 0;
-    globals->mode1A = 1;
+    globals->multiplayer = 0;
+    globals->playerCount = 1;
     for (i = 3; i >= 0; i--) {
-        globals->playerSettings[i].enabled = 0;
+        globals->slots[i].active = 0;
     }
     i = 0;
     settings = &D_8011AB18;
