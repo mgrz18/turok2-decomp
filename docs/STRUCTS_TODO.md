@@ -324,12 +324,12 @@ views were replaced in about 230 files. Still local, and why:
 
 ## Obj and the particles (third pass)
 
-- **Obj** (28 files): 24 were CGameObjectInstance views (the Mother boss
+- **Obj** (28 files): 23 were CGameObjectInstance views (the Mother boss
   module files, the imported Rage Wars helpers func_0021F080 /
   func_0021F4E8 / func_0021F668, the 0026x collision-size accessors, whose
   ObjDef views are now the CIntelligence bodies: m_Player / m_Enemy /
   m_Pickup / m_Destructible / m_Static / m_Platform / m_Throwable, and
-  their owner the CPlayer) and 4 were particles (func_002325F0 /
+  their owner the CPlayer) and 3 were particles (func_002325F0 /
   func_00232684, under water by their region's CRegionInfo; func_00232FBC).
   Left: func_00409340 (the Mother boss setup, in the CAI var-buffer pass)
   and func_0023C188 (its Obj is the head of a collision Sweep, not an
