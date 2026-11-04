@@ -1,54 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SDK/PFS/80447BB0_15.CPP, func_80447F30_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef unsigned long long u64;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
-typedef struct OSPfs OSPfs;
-struct OSPfs {
-    int status;
-    struct OSMesgQueue *queue;
-    int channel;
-    u8 id[32];
-    u8 label[32];
-    int version;
-    int dir_size;
-    int inode_table;
-    int minode_table;
-    int dir_table;
-    int inode_start_page;
-    u8 banks;
-    u8 activebank;
-};
-struct OSPfs;
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct __OSPackId;
-struct __OSPackId {
-    u32 repaired;
-    u32 random;
-    u64 serial_mid;
-    u64 serial_low;
-    u16 deviceid;
-    u8 banks;
-    u8 version;
-    u16 checksum;
-    u16 inverted_checksum;
-};
-struct __OSPackId;
-typedef struct __OSPackId __OSPackId;
+#include "common.h"
+#include "ultra_types.h"
 extern s32 __osIdCheckSum(u16 *ptr, u16 *csum, u16 *icsum);
 extern s32 func_00429EC4(OSPfs *pfs);
 extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);

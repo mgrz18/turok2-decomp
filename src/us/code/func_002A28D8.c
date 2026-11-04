@@ -2,8 +2,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00201B50.c, func_00201B50, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef struct OSMesgQueue OSMesgQueue;
+#include "ultra_types.h"
 
 /* Request block sent to the I/O thread (func_002A2650) through D_80128370. */
 typedef struct IoRequest {

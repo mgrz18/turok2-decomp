@@ -1,14 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/8023A284_15.CPP, func_8023C1F0_de, with Turok 2's layouts. */
 #include "common.h"
+#include "ultra_types.h"
 
-typedef struct OSMesgQueue {
-    void *mtqueue;
-    void *fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-} OSMesgQueue;
 
 typedef struct PageMapping {
     /* 0x0 */ struct PageMapping *next;

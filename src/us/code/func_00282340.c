@@ -1,11 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/8023A284_4.CPP, func_8023A4E0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "gfx.h"
 
-typedef struct {
-    u32 w0;
-    u32 w1;
-} Gfx;
 
 /* A vertex as the RSP reads it. */
 typedef struct UnitVtx {

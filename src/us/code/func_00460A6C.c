@@ -1,38 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SDK/PFS/80446BD0_4.CPP, func_8044694C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
-typedef struct OSPfs OSPfs;
-struct OSPfs {
-    int status;
-    struct OSMesgQueue *queue;
-    int channel;
-    u8 id[32];
-    u8 label[32];
-    int version;
-    int dir_size;
-    int inode_table;
-    int minode_table;
-    int dir_table;
-    int inode_start_page;
-    u8 banks;
-    u8 activebank;
-};
-struct OSPfs;
-struct OSMesgQueue;
-struct OSMesgQueue;
+#include "common.h"
+#include "ultra_types.h"
 extern u16 func_00429CA4(u8 *bytes, s32 count);
 extern s32 __osBlockSum(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank);
 extern s32 func_00429DE4(OSPfs *pfs);

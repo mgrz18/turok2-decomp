@@ -1,13 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SYSTEM_3/80265370.CPP, func_802659E0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef unsigned long long u64;
-typedef float f32;
+#include "common.h"
+#include "gfx.h"
 struct LightData;
 struct LightData {
     u16 falloff;
@@ -36,10 +31,6 @@ struct UnitLight {
 };
 struct LightNode;
 typedef struct LightNode LightNode;
-typedef union Gfx {
-    struct { u32 w0; u32 w1; } words;
-    u64 force_structure_alignment;
-} Gfx;
 extern void func_0020F85C(void *arg0, void *arg1, void *arg2);
 extern Gfx *D_800D8E24;
 extern s32 D_800F1800;
@@ -57,11 +48,11 @@ void func_002284E0(char *view) {
     node = func_00228B8C(&D_8010FF34);
     if (node == 0) {
         Gfx *g = D_800D8E24++;
-        { Gfx *_gbi = (Gfx *)(g); _gbi->words.w0 = ((((unsigned int)(0xD9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(~(0x80)) & (0xFFFFFFFFU >> (32 - (24)))) << (0))); _gbi->words.w1 = ((unsigned int)(0)); };
+        { Gfx *_gbi = (Gfx *)(g); _gbi->w0 = ((((unsigned int)(0xD9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(~(0x80)) & (0xFFFFFFFFU >> (32 - (24)))) << (0))); _gbi->w1 = ((unsigned int)(0)); };
         D_800F1800 += 8;
         return;
     }
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->words.w0 = ((((unsigned int)(0xD9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(~(0)) & (0xFFFFFFFFU >> (32 - (24)))) << (0))); _gbi->words.w1 = ((unsigned int)(0x80)); };
+    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xD9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(~(0)) & (0xFFFFFFFFU >> (32 - (24)))) << (0))); _gbi->w1 = ((unsigned int)(0x80)); };
     for (i = 0; i < 8; i++) {
         if (node != 0 && node->active != 0) {
             data = node->data;
@@ -88,7 +79,7 @@ void func_002284E0(char *view) {
         }
         {
             Gfx *g = D_800D8E24++;
-            { Gfx *_gbi = (Gfx *)(g); _gbi->words.w0 = ((((unsigned int)(0xDC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((16) - 1) / 8) & (0xFFFFFFFFU >> (32 - (5)))) << (19)) | (((unsigned int)((((i + 1) * 2 + 10) * 8) / 8) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(10) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->words.w1 = ((unsigned int)(&D_800F1400[i + D_800F1800])); };
+            { Gfx *_gbi = (Gfx *)(g); _gbi->w0 = ((((unsigned int)(0xDC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((16) - 1) / 8) & (0xFFFFFFFFU >> (32 - (5)))) << (19)) | (((unsigned int)((((i + 1) * 2 + 10) * 8) / 8) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(10) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)(&D_800F1400[i + D_800F1800])); };
         }
     }
     D_800F1800 += 8;

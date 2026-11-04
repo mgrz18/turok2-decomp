@@ -3,11 +3,8 @@
  * position (x, y): the rectangle is clipped at the screen's top-left edge, the texture start shifted to
  * match, and the texture steps divided by the scales. */
 #include "common.h"
+#include "gfx.h"
 
-typedef union Gfx {
-    struct { u32 w0; u32 w1; } words;
-    u64 force_structure_alignment;
-} Gfx;
 
 extern Gfx *D_800D8E24;
 
@@ -27,30 +24,30 @@ extern Gfx *D_800D8E24;
 #define G_IM_SIZ_16b 2
 
 #define gDPNoParam(cmd) \
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->words.w0 = _SHIFTL(cmd, 24, 8); _g->words.w1 = 0; }
+    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = _SHIFTL(cmd, 24, 8); _g->w1 = 0; }
 #define gDPPipeSync() gDPNoParam(0xE7)
 #define gDPLoadSync() gDPNoParam(0xE6)
 #define gDPSetTextureImage(fmt, siz, width, i)                                                  \
     { Gfx *_g = (Gfx *) (D_800D8E24++);                                                         \
-      _g->words.w0 = _SHIFTL(0xFD, 24, 8) | _SHIFTL(fmt, 21, 3) | _SHIFTL(siz, 19, 2) |         \
+      _g->w0 = _SHIFTL(0xFD, 24, 8) | _SHIFTL(fmt, 21, 3) | _SHIFTL(siz, 19, 2) |         \
                      _SHIFTL((width) - 1, 0, 12);                                               \
-      _g->words.w1 = (unsigned int) (i); }
+      _g->w1 = (unsigned int) (i); }
 #define gDPSetTile(fmt, siz, line, tmem, tile)                                                  \
     { Gfx *_g = (Gfx *) (D_800D8E24++);                                                         \
-      _g->words.w0 = _SHIFTL(0xF5, 24, 8) | _SHIFTL(fmt, 21, 3) | _SHIFTL(siz, 19, 2) |         \
+      _g->w0 = _SHIFTL(0xF5, 24, 8) | _SHIFTL(fmt, 21, 3) | _SHIFTL(siz, 19, 2) |         \
                      _SHIFTL(line, 9, 9) | _SHIFTL(tmem, 0, 9);                                 \
-      _g->words.w1 = _SHIFTL(tile, 24, 3); }
+      _g->w1 = _SHIFTL(tile, 24, 3); }
 #define gDPLoadBlock(tile, uls, ult, lrs, dxt)                                                  \
     { Gfx *_g = (Gfx *) (D_800D8E24++);                                                         \
-      _g->words.w0 = (_SHIFTL(0xF3, 24, 8) | _SHIFTL(uls, 12, 12) | _SHIFTL(ult, 0, 12));       \
-      _g->words.w1 = (_SHIFTL(tile, 24, 3) | _SHIFTL((MIN(lrs, G_TX_LDBLK_MAX_TXL)), 12, 12) |  \
+      _g->w0 = (_SHIFTL(0xF3, 24, 8) | _SHIFTL(uls, 12, 12) | _SHIFTL(ult, 0, 12));       \
+      _g->w1 = (_SHIFTL(tile, 24, 3) | _SHIFTL((MIN(lrs, G_TX_LDBLK_MAX_TXL)), 12, 12) |  \
                       _SHIFTL(dxt, 0, 12)); }
 #define gDPSetTileSize(t, uls, ult, lrs, lrt)                                                   \
     { Gfx *_g = (Gfx *) (D_800D8E24++);                                                         \
-      _g->words.w0 = _SHIFTL(0xF2, 24, 8) | _SHIFTL(uls, 12, 12) | _SHIFTL(ult, 0, 12);         \
-      _g->words.w1 = _SHIFTL(t, 24, 3) | _SHIFTL(lrs, 12, 12) | _SHIFTL(lrt, 0, 12); }
+      _g->w0 = _SHIFTL(0xF2, 24, 8) | _SHIFTL(uls, 12, 12) | _SHIFTL(ult, 0, 12);         \
+      _g->w1 = _SHIFTL(t, 24, 3) | _SHIFTL(lrs, 12, 12) | _SHIFTL(lrt, 0, 12); }
 #define gImmp1(c, p0) \
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->words.w0 = _SHIFTL((c), 24, 8); _g->words.w1 = (unsigned int) (p0); }
+    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = _SHIFTL((c), 24, 8); _g->w1 = (unsigned int) (p0); }
 /* gDPLoadMultiBlock_4b(timg, tmem, rtile, fmt, width, height, 0, ...) */
 #define gDPLoadMultiBlock_4b(timg, tmem, rtile, fmt, width, height)                             \
     {                                                                                           \
@@ -80,9 +77,9 @@ extern Gfx *D_800D8E24;
 #define gSPScisTextureRectangle(xl, yl, xh, yh, tile, s, t, dsdx, dtdy)                         \
     {                                                                                           \
         Gfx *_g = (Gfx *) (D_800D8E24++);                                                       \
-        _g->words.w0 = (_SHIFTL(0xE4, 24, 8) | _SHIFTL(MAX((s16)(xh), 0), 12, 12) |             \
+        _g->w0 = (_SHIFTL(0xE4, 24, 8) | _SHIFTL(MAX((s16)(xh), 0), 12, 12) |             \
                         _SHIFTL(MAX((s16)(yh), 0), 0, 12));                                     \
-        _g->words.w1 = (_SHIFTL((tile), 24, 3) | _SHIFTL(MAX((s16)(xl), 0), 12, 12) |           \
+        _g->w1 = (_SHIFTL((tile), 24, 3) | _SHIFTL(MAX((s16)(xl), 0), 12, 12) |           \
                         _SHIFTL(MAX((s16)(yl), 0), 0, 12));                                     \
         gImmp1(0xE1, (_SHIFTL(((s) - (((s16)(xl) < 0) ? (((s16)(dsdx) < 0)                     \
                                        ? (MAX((((s16)(xl) * (s16)(dsdx)) >> 7), 0))             \

@@ -3,6 +3,9 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_6.CPP, func_8043EDDC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
+#include "common.h"
+#include "ultra_types.h"
+#include "gfx.h"
 typedef struct IntrusiveList IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -16,16 +19,6 @@ struct LevelActor;
 struct Shared_World;
 struct CVector3_t;
 struct GameSession;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
 struct CVector3_t;
 struct CVector3_t;
 struct CVector3_t {
@@ -39,14 +32,8 @@ struct StridedTable {
     s32 count;
     char data[1];
 };
-struct OSMesgQueue;
-struct OSMesgQueue;
 struct StridedTable;
 typedef struct StridedTable StridedTable;
-typedef union Gfx {
-    struct { u32 w0; u32 w1; } words;
-    u64 force_structure_alignment;
-} Gfx;
 extern s32 func_004533AC(void);
 extern f32 D_8011ACC0;
 struct OSTask_t;

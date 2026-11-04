@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "gfx.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -10,7 +11,6 @@
  * The list walk is a goto loop and the built flag a local, as in the ROM: the
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
-typedef struct { u32 w0, w1; } Gfx;
 typedef f32 Mtx4f[4][4];
 
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }

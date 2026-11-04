@@ -4,6 +4,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 struct ControllerProfile;
+#include "common.h"
+#include "ultra_types.h"
 typedef struct IntrusiveList IntrusiveList;
 struct IntrusiveList {
     void *head;
@@ -16,33 +18,6 @@ struct IntrusiveList;
 extern int func_00285628(struct ControllerProfile *object);
 extern int func_00285670(struct ControllerProfile *object);
 struct CVector3_t;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
-typedef struct OSPfs OSPfs;
-struct OSPfs {
-    int status;
-    struct OSMesgQueue *queue;
-    int channel;
-    u8 id[32];
-    u8 label[32];
-    int version;
-    int dir_size;
-    int inode_table;
-    int minode_table;
-    int dir_table;
-    int inode_start_page;
-    u8 banks;
-    u8 activebank;
-};
-struct OSPfs;
 struct CVector3_t;
 struct CVector3_t;
 struct CVector3_t {
@@ -76,8 +51,6 @@ struct PoolRecAt28V1 {
     IntrusiveList active;
     s32 baseLevel;
 };
-struct OSMesgQueue;
-struct OSMesgQueue;
 typedef struct ControllerButtonHistory {
     s8 taps;
     s8 age;
@@ -119,9 +92,6 @@ struct ControllerProfile;
 typedef struct ControllerProfile ControllerProfile;
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct OSMesgQueue;
 s32 func_002855E8(char *);
 extern char D_800F5C78;
 extern u32 D_8011AAE0[];
