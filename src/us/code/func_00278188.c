@@ -1,6 +1,6 @@
 #include "common.h"
+#include "gfx.h"
 
-typedef struct { u32 w0; u32 w1; } Gfx;
 
 extern Gfx *D_800D8E24;
 extern s32 D_800F56A8;

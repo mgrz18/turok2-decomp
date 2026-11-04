@@ -1,10 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/8023A284_4.CPP, func_8023A4E0_de, with Turok 2's layouts. */
 #include "common.h"
+#include "gfx.h"
 
-typedef struct {
-    u32 w0;
-    u32 w1;
-} Gfx;
 
 typedef struct Vec3f {
     f32 x, y, z;

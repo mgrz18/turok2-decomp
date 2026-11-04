@@ -1,17 +1,12 @@
 #include "common.h"
-
-/* A message queue used as a recursive lock: count of holders after it. */
-typedef struct {
-    /* 0x00 */ u8 queue[0x1C];
-    /* 0x1C */ s32 count;
-} MesgLock;
+#include "ultra_types.h"
 
 s32 osRecvMesg(void *, s32, s32);    /* extern */
 s32 osSendMesg(void *, s32, s32);    /* extern */
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 
-void func_002019F0(MesgLock *arg0) {
+void func_002019F0(CMutex *arg0) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v1;

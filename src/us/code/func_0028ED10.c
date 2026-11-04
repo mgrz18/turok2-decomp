@@ -1,21 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SCHED/CODE_8023CBF8.CPP, Sched_FinishPageJob.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef struct OSMesgQueue OSMesgQueue;
-struct OSMesgQueue {
-    void **mtqueue;
-    void **fullqueue;
-    s32 validCount;
-    s32 first;
-    s32 msgCount;
-    void **msg;
-};
-struct OSMesgQueue;
+#include "common.h"
+#include "ultra_types.h"
 struct EntryRecAt3;
 struct EntryRecAt3 {
     u16 id;
@@ -24,8 +11,6 @@ struct EntryRecAt3 {
 };
 struct EntryRecAt3;
 typedef struct EntryRecAt3 EntryRecAt3;
-struct OSMesgQueue;
-struct OSMesgQueue;
 struct Channels;
 typedef struct Channels Channels;
 struct ResourcePageMapping;
@@ -97,11 +82,7 @@ struct Region;
 typedef struct Region Region;
 struct PagerState;
 typedef struct PagerState PagerState;
-typedef void *OSMesg;
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-struct OSMesgQueue;
-struct OSMesgQueue;
-struct OSMesgQueue;
 extern ResourcePageMapping *D_80121294;
 extern void func_0028DBAC(s16 flags, ResourcePageMapping *item, s32 unused, u8 *out);
 extern ResourcePageMapping *D_80121290;

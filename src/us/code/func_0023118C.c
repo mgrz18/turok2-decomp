@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/CODE_80281A70.CPP, Particle_DrawRenderList, with Turok 2's layouts. */
 #include "common.h"
+#include "gfx.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -8,7 +9,6 @@
  * The list walk is a goto loop and the built flag a local, as in the ROM: the
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
-typedef struct { u32 w0, w1; } Gfx;
 typedef struct { f32 x, y, z; } Vec3f;
 typedef f32 Mtx4f[4][4];
 

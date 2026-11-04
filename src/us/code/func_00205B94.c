@@ -1,9 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCENE/802508E0_11.CPP, func_80254284_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-typedef void *OSMesg;
-typedef struct OSMesgQueue OSMesgQueue;
+#include "ultra_types.h"
 
 extern OSMesgQueue D_800D8DB0;      /* resource lock queue */
 extern s32 D_800D8DCC;              /* resource lock depth */

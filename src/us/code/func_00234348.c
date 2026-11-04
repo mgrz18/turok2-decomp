@@ -1,11 +1,11 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/CODE_802A35C0.CPP, func_802A3718_de, with Turok 2's layouts. */
 #include "common.h"
+#include "gfx.h"
 
 /* Draws a textured trail: spaces the texture along the tail by length, picks
  * the animation frame, sets the combiner and colours, then emits two vertex
  * rows per node and the triangle strip between them. */
 
-typedef struct { u32 w0, w1; } Gfx;
 
 typedef struct TrailNode TrailNode;
 struct TrailNode {

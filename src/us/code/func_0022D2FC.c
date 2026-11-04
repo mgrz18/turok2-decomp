@@ -14,6 +14,7 @@
  * func_0022D2FC, func_0022E094 and func_0022F350 are after Rage Wars
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
+#include "gfx.h"
 #include "structs/game_object.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
@@ -21,9 +22,6 @@
 /* MIN as a statement expression: its value lives in its own temporary. */
 #define MINF(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 
-typedef union {
-    struct { u32 w0, w1; } words;
-} Gfx;
 
 typedef struct { f32 x, y, z; } Vec3;
 typedef struct { f32 x, y, z, w; } Quat;
@@ -503,11 +501,11 @@ void func_0022DCBC(ShadowActor *actor) {
     func_0021034C(&mtx, size, 1.0f, size);
     func_00210318(&mtx, pos.x, pos.y, pos.z);
     func_0020D274(&mtx, gmtx);
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->words.w0 = 0xE7000000; _g->words.w1 = 0; }
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->words.w0 = 0xE3000A01; _g->words.w1 = 0x100000; }
+    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE7000000; _g->w1 = 0; }
+    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE3000A01; _g->w1 = 0x100000; }
     func_002086BC(gmtx, 1, (u8) alpha);
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->words.w0 = 0xE7000000; _g->words.w1 = 0; }
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->words.w0 = 0xE3000A01; _g->words.w1 = 0; }
+    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE7000000; _g->w1 = 0; }
+    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE3000A01; _g->w1 = 0; }
 }
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_6.CPP, Particle_DrawSprite, with Turok 2's layouts. */
@@ -520,7 +518,7 @@ void func_0022DCBC(ShadowActor *actor) {
  * emits the colour and draw commands. */
 
 
-#define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->words.w0 = (a); _g->words.w1 = (b); }
+#define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct { u8 pad0[0x40]; } Mtx;
 
