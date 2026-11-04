@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/boss.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -21,17 +22,8 @@ typedef struct {
     /* 0xA8 */ s32 unkA8;
 } Spawn;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x50C];
-    /* 0x50C */ s32 count454;
-    /* 0x510 */ s32 count455;
-    /* 0x514 */ s32 count456;
-} Counters;
-
-extern Counters D_80130200;
-
 void func_0044700C(Actor *actor, Spawn *spawn) {
-    Counters *counters;
+    BlindOneState *counters;
 
     spawn->unk28 = 0;
     spawn->unk24 = 0;
@@ -41,13 +33,13 @@ void func_0044700C(Actor *actor, Spawn *spawn) {
     counters = &D_80130200;
     switch (actor->typeId) {
         case 0x454:
-            counters->count454++;
+            counters->alive1++;
             break;
         case 0x455:
-            counters->count455++;
+            counters->alive2++;
             break;
         case 0x456:
-            counters->count456++;
+            counters->alive3++;
             break;
     }
 }

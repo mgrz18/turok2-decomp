@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/boss.h"
 
 typedef struct Actor Actor;
 
@@ -18,38 +19,26 @@ typedef struct {
     /* 0x110 */ s32 index;
 } Spawn;
 
-typedef struct {
-    /* 0x000 */ Actor *leader;
-    /* 0x004 */ u8 pad4[0x2C - 0x4];
-    /* 0x02C */ s32 memberCount;
-    /* 0x030 */ Actor *members[(0x50C - 0x30) / 4];
-    /* 0x50C */ s32 count454;
-    /* 0x510 */ s32 count455;
-    /* 0x514 */ s32 count456;
-} Counters;
-
-extern Counters D_80130200;
-
 extern s32 func_00243414(Actor *actor, void *ai, s32 state);
 
 void func_0040E30C(Actor *actor, Spawn *spawn) {
-    Counters *counters = &D_80130200;
+    BlindOneState *counters = &D_80130200;
     Actor *next;
 
-    if (counters->leader->state != 1) {
-        func_00243414(counters->leader, counters->leader->ai, 8);
+    if (((Actor *)counters->obj)->state != 1) {
+        func_00243414((Actor *)counters->obj, ((Actor *)counters->obj)->ai, 8);
     }
     spawn->hits++;
     switch (actor->type) {
         case 0x454:
-            counters->count454--;
+            counters->alive1--;
             break;
         case 0x455:
-            counters->count455--;
+            counters->alive2--;
             break;
         case 0x456:
-            counters->count456--;
-            next = counters->members[(spawn->index + 1) % counters->memberCount];
+            counters->alive3--;
+            next = (Actor *)counters->actors3[(spawn->index + 1) % counters->count3];
             if (next->unk24C == 0) {
                 func_00243414(next, next->ai, 0);
             }

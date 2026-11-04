@@ -7,7 +7,7 @@
  *
  *   D_8012F608  LevelScriptState  the running script/boss mode (0x568)
  *   D_8012FB70  MotherBossState   the Mother boss fight (0x690)
- *   D_80130200  BossFight2State   a boss with three actor groups
+ *   D_80130200  BlindOneState     the Blind One boss fight (0x560)
  *
  * Several fields also have symbols of their own, which some files still
  * use, and some files reach a block through a neighbouring symbol at a
@@ -33,9 +33,10 @@ typedef struct BossWeakSpot {
 
 /* D_8012FB70: the Mother boss fight, func_00409000-func_0040C7DC (second
  * copy func_00442000-func_004457DC; func_0040C7DC sets
- * m_bMotherBossComplete). Fifteen weak spots in three phases. Fields with
- * symbols of their own: D_801301CC (phase), D_801301D0 (activeMask), D_801301D4 (liveMask),
- * D_801301EC (counter), D_801301F8 / D_801301FC (minRadius / maxRadius). */
+ * m_bMotherBossComplete). Fifteen weak spots in three phases. Fields
+ * with symbols of their own: D_801301CC (phase), D_801301D0 (activeMask),
+ * D_801301D4 (liveMask), D_801301EC (counter), D_801301F8 / D_801301FC
+ * (minRadius / maxRadius). */
 typedef struct MotherBossState {
     /* 0x000 */ struct CGameObjectInstance *obj;     /* the boss */
     /* 0x004 */ s32 count;                           /* entries in actors */
@@ -62,5 +63,56 @@ typedef struct MotherBossState {
 } MotherBossState; /* size 0x690 */
 
 extern MotherBossState D_8012FB70;
+
+/* A step of the Blind One's phase script (D_00432340): the phase to enter. */
+typedef struct BlindOneStep {
+    /* 0x0 */ s32 id;
+    /* 0x4 */ s32 unk4;
+    /* 0x8 */ s32 unk8;
+} BlindOneStep; /* size 0xC */
+
+/* Plays a sequence of bit masks: every interval seconds, each set bit sends
+ * the matching actor (bits 0-3: group 1, 4-7: group 2, 8-11: group 3,
+ * rotated by offset) to an attack state (func_0040C850). */
+typedef struct BlindOneMover {
+    /* 0x00 */ s32 *seq;
+    /* 0x04 */ s32 pos;
+    /* 0x08 */ f32 interval;
+    /* 0x0C */ f32 timer;
+    /* 0x10 */ s32 step;
+    /* 0x14 */ s32 offset;
+} BlindOneMover; /* size 0x18 */
+
+/* D_80130200: the Blind One boss fight, func_0040C850-func_0040EEA0 (second
+ * copy func_00445CC0-func_0044700C); its health bars read "Blind" and
+ * "EyeBall". Three groups of level actors (types 0x454, 0x455, 0x456),
+ * each with the count of its live ones (func_0040E00C counts them up,
+ * func_0040E30C down), twelve animators, the phase script and the minions
+ * the phases spawn (func_0040D0F0). func_0040ECDC and func_0040EEA0 reach
+ * the animators from the block base by raw offsets, as the ROM does. */
+typedef struct BlindOneState {
+    /* 0x000 */ struct CGameObjectInstance *obj;     /* the boss */
+    /* 0x004 */ s32 count1;
+    /* 0x008 */ struct CGameObjectInstance *actors1[4];
+    /* 0x018 */ s32 count2;
+    /* 0x01C */ struct CGameObjectInstance *actors2[4];
+    /* 0x02C */ s32 count3;
+    /* 0x030 */ struct CGameObjectInstance *actors3[3];
+    /* 0x03C */ ScriptAnimator slots[12];
+    /* 0x4EC */ s32 slotCount;
+    /* 0x4F0 */ void *minionIntel;                   /* func_00225EBC(world, 1, 0x1CE9) */
+    /* 0x4F4 */ void *minionIntel2;                  /* func_00225EBC(world, 1, 0x1CEA) */
+    /* 0x4F8 */ BlindOneStep *script;
+    /* 0x4FC */ s32 phase;
+    /* 0x500 */ s32 toSpawn;                         /* minions the phase still spawns */
+    /* 0x504 */ s32 minionsAlive;
+    /* 0x508 */ s32 maxMinions;
+    /* 0x50C */ s32 alive1;                          /* live actors of type 0x454 */
+    /* 0x510 */ s32 alive2;                          /* 0x455 */
+    /* 0x514 */ s32 alive3;                          /* 0x456 */
+    /* 0x518 */ BlindOneMover movers[3];
+} BlindOneState; /* size 0x560 */
+
+extern BlindOneState D_80130200;
 
 #endif

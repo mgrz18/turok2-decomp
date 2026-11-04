@@ -1,37 +1,16 @@
 /* Second-module copy of func_0040CCC0 (in src/us/code/func_0040C850.c), with its data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 
 /* Second boss setup: collects its three groups of actors (types 0x454-0x456), sets their health and slots,
  * finds its two level objects, shows its health bar ("Blind") and enters the first phase of its script. */
 
+struct BlindOneState;
 
 typedef struct {
-    /* 0x00 */ s32 id;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-} ScriptStep;
-
-/* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
- * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
-typedef struct {
-    /* 0x00 */ s32 *seq;
-    /* 0x04 */ s32 pos;
-    /* 0x08 */ f32 interval;
-    /* 0x0C */ f32 timer;
-    /* 0x10 */ s32 step;
-    /* 0x14 */ s32 offset;
-} Mover;
-
-typedef struct {
-    /* 0x00 */ u8 data[0x64];
-} Slot2;
-
-struct State2;
-
-typedef struct {
-    /* 0x00 */ void (*init)(struct State2 *state);
-    /* 0x04 */ void (*update)(struct State2 *state);
+    /* 0x00 */ void (*init)(struct BlindOneState *state);
+    /* 0x04 */ void (*update)(struct BlindOneState *state);
 } PhaseFuncs;
 
 typedef struct Obj2 {
@@ -43,29 +22,6 @@ typedef struct Obj2 {
     /* 0x254 */ s32 slot;
 } Obj2;
 
-typedef struct State2 {
-    /* 0x000 */ Obj2 *obj;
-    /* 0x004 */ s32 count1;
-    /* 0x008 */ CGameObjectInstance *actors1[4];
-    /* 0x018 */ s32 count2;
-    /* 0x01C */ CGameObjectInstance *actors2[4];
-    /* 0x02C */ s32 count3;
-    /* 0x030 */ CGameObjectInstance *actors3[3];
-    /* 0x03C */ Slot2 slots[12];
-    /* 0x4EC */ s32 slotCount;
-    /* 0x4F0 */ void *unk4F0;
-    /* 0x4F4 */ void *unk4F4;
-    /* 0x4F8 */ ScriptStep *script;
-    /* 0x4FC */ s32 phase;
-    /* 0x500 */ s32 unk500;
-    /* 0x504 */ s32 unk504;
-    /* 0x508 */ s32 unk508;
-    /* 0x50C */ s32 enabled1;
-    /* 0x510 */ s32 enabled2;
-    /* 0x514 */ s32 enabled3;
-    /* 0x518 */ Mover movers[3];
-} State2;
-
 extern PhaseFuncs D_0043232C[];
 extern u8 D_800F7078[];
 extern u8 D_801100F0[];
@@ -76,7 +32,7 @@ extern void func_0027AD24(void *hud, Obj2 *obj, char *name);
 extern void func_00225D0C(void *level);
 
 /* Steps the script: clears the movers and the actors' 0x24C, enters the next phase and runs its init. */
-static __inline__ void nextPhase(State2 *state) {
+static __inline__ void nextPhase(BlindOneState *state) {
     s32 phase;
     s32 i;
 
@@ -99,7 +55,7 @@ static __inline__ void nextPhase(State2 *state) {
     }
 }
 
-void func_00445CC0(State2 *state) {
+void func_00445CC0(BlindOneState *state) {
     Obj2 *obj;
     CGameObjectInstance *actor;
     s32 i;
@@ -135,17 +91,16 @@ void func_00445CC0(State2 *state) {
     for (i = 0; i < state->slotCount; i++) {
         func_002362E4(&state->slots[i], 0);
     }
-    state->unk4F0 = func_00225EBC(D_800F7078, 1, 0x1CE9);
-    state->unk4F4 = func_00225EBC(D_800F7078, 1, 0x1CEA);
-    state->unk500 = 0;
-    state->unk504 = 0;
-    state->unk508 = 0;
-    state->enabled1 = 0;
-    state->enabled2 = 0;
-    state->enabled3 = 0;
+    state->minionIntel = func_00225EBC(D_800F7078, 1, 0x1CE9);
+    state->minionIntel2 = func_00225EBC(D_800F7078, 1, 0x1CEA);
+    state->toSpawn = 0;
+    state->minionsAlive = 0;
+    state->maxMinions = 0;
+    state->alive1 = 0;
+    state->alive2 = 0;
+    state->alive3 = 0;
     func_0027AD24(D_801100F0, state->obj, "Blind");
     func_00225D0C(D_800F7078);
     nextPhase(state);
 }
-
 
