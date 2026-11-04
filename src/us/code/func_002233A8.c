@@ -1,13 +1,9 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028A258.c, func_0028A258.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
+#include "structs/world.h"
+
 typedef struct ActorInfo {
                u32 flags;
                s32 unk4;
@@ -35,11 +31,6 @@ typedef struct Entity {
     u8 pad10[0x4];
     ActorDef *def;      /* 0x14 */
 } Entity;
-typedef struct Level {
-    u8 pad0[0xF04];
-    Entity *arrF04[32]; /* 0xF04 */
-    s32 cntF84;         /* 0xF84 */
-} Level;
 typedef struct {
     s32 type;
     u8 pad4[0x10];
@@ -53,7 +44,7 @@ f32 func_0026841C(Entity *e);
 f32 func_002671B4(Entity *e);
 s32 func_00265F90(Entity *e, u8 *p, Entity *me);
 void func_00243414(Entity *e, u8 *p, s32 a);
-void func_002233A8(Level *lv, Entity *me, Vec3f *p0, Vec3f *p1) {
+void func_002233A8(CWorld *lv, Entity *me, Vec3f *p0, Vec3f *p1) {
     s32 isB;
     s32 is1;
     f32 myBot;
@@ -89,8 +80,8 @@ void func_002233A8(Level *lv, Entity *me, Vec3f *p0, Vec3f *p1) {
         is1 = kind == 1;
         myBot = me->pos.y + func_0026841C(me);
         myTop = myBot + func_002671B4(me);
-        for (i = 0; i < lv->cntF84; i++) {
-            e = lv->arrF04[i];
+        for (i = 0; i < lv->m_nFlagged; i++) {
+            e = (Entity *)lv->m_pFlagged[i];
             if (e != me) {
                 s4 = 0;
                 s1 = 0;

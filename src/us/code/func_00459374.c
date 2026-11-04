@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408870.c, func_00408870, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/world.h"
 
 /* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
  * and shows the "loaded" message; otherwise reports whether the note could be read. */
@@ -22,11 +23,6 @@ typedef struct {
     /* 0x500 */ SaveBlock500 blk500;
     /* 0x684 */ u8 unk684[1];
 } SaveData;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ s32 unk30;
-} Level;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x520];
@@ -59,7 +55,7 @@ extern s32 D_801309BC;
 extern s32 D_801309B8;
 extern s32 D_801309C4;
 extern World D_80119870;
-extern Level D_800F7078[];
+extern CWorld D_800F7078[];
 extern SaveData *D_800C201C;
 extern u8 D_8011AC58;
 extern SaveBlock500 D_8011AAD8;
@@ -83,7 +79,7 @@ s32 func_00459374(s32 unused, MenuOwner *own) {
     f32 *new_var;
     s32 pad;
     Player *plr;
-    Level *g;
+    CWorld *g;
     u8 save;
     s32 i;
     SaveData *c;
@@ -117,7 +113,7 @@ s32 func_00459374(s32 unused, MenuOwner *own) {
         D_8011ACBC[0] = c->unk14;
         src = c->unk684;
         dp = D_800EBAC0;
-        for (i = 0; i < g->unk30; i++) {
+        for (i = 0; i < g->unk_30; i++) {
             *dp++ = *src++;
         }
         D_80119870.unk34 = 0;
