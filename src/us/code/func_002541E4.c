@@ -24,9 +24,6 @@ extern s32 D_800ADB30[];
 extern u8 D_800F7078[];
 extern void func_002241D8(void *, CPlayer *, s32, s32);
 
-/* 0xC04 is an s32 id, not LibTEngine's f32 m_WaitDeathmatchTimer. */
-#define PLAYER_C04(p) (*(s32 *)&(p)->m_WaitDeathmatchTimer)
-
 void func_002541E4(CPlayer *player) {
     State8011AAD8 *state = &D_8011AAD8;
     s32 id;
@@ -39,5 +36,5 @@ void func_002541E4(CPlayer *player) {
     } else {
         id = D_800ADB30[((Intelligence *)player->m_CharacterActor.header.m_pIntelligence)->index];
     }
-    func_002241D8(D_800F7078, player, id, PLAYER_C04(player));
+    func_002241D8(D_800F7078, player, id, player->m_CharAnim);
 }
