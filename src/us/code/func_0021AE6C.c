@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/game_object.h"
 #include "structs/vector.h"
 
 /* An actor's facing as a quaternion: turned half a circle from its owner's
@@ -15,35 +16,21 @@ typedef struct {
     Player *player;         /* 0x51C */
 } Owner;
 
-typedef struct {
-    u8 pad0[0x14];
-    s32 *region;            /* 0x014 */
-    u8 pad18[0x28];
-    CQuaternion rot;               /* 0x040 */
-    f32 heading;            /* 0x050 */
-    u8 pad54[0x80];
-    u32 flags;              /* 0x0D4 */
-    u8 padD8[0xD0];
-    Owner *owner;           /* 0x1A8 */
-    u8 pad1AC[0xA0];
-    f32 pitch;              /* 0x24C */
-} Actor;
-
 extern f32 D_800DD78C;
 
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */
 void func_00210F68(CQuaternion *, CQuaternion *, CQuaternion *);
 
-CQuaternion func_0021AE6C(Actor *actor) {
+CQuaternion func_0021AE6C(CGameObjectInstance *actor) {
     CQuaternion result;
     CQuaternion pitch;
     CQuaternion yaw;
     Player *player;
     f32 s;
 
-    if (actor->flags & 0x300000) {
-        player = actor->owner->player;
+    if (actor->m_dwFlags & 0x300000) {
+        player = ((Owner *) actor->m_AI.m_pParent)->player;
         if (player == NULL) {
             goto own;
         }
@@ -54,29 +41,29 @@ CQuaternion func_0021AE6C(Actor *actor) {
         yaw.z = 0.0f;
         yaw.w = func_002974C0(1.5707964f);
         func_00210F68(&result, &yaw, &player->rot);
-    } else if (*actor->region == 4) {
-        s = func_002982F0(actor->pitch * 0.5f);
+    } else if (actor->header.m_pIntelligence->m_Type == 4) {
+        s = func_002982F0(actor->m_AI.m_VarF32[0] * 0.5f);
         pitch.x = s;
         pitch.y = 0.0f;
         pitch.z = 0.0f;
         D_800DD78C = s;
-        pitch.w = func_002974C0(actor->pitch * 0.5f);
-        s = func_002982F0((actor->heading + 3.1415927f) * 0.5f);
+        pitch.w = func_002974C0(actor->m_AI.m_VarF32[0] * 0.5f);
+        s = func_002982F0((actor->m_RotY + 3.1415927f) * 0.5f);
         yaw.x = 0.0f;
         yaw.y = s;
         yaw.z = 0.0f;
         D_800DD78C = s;
-        yaw.w = func_002974C0((actor->heading + 3.1415927f) * 0.5f);
+        yaw.w = func_002974C0((actor->m_RotY + 3.1415927f) * 0.5f);
         func_00210F68(&result, &pitch, &yaw);
     } else {
     own:
-        s = func_002982F0((actor->heading + 3.1415927f) * 0.5f);
+        s = func_002982F0((actor->m_RotY + 3.1415927f) * 0.5f);
         yaw.x = 0.0f;
         yaw.y = s;
         yaw.z = 0.0f;
         D_800DD78C = s;
-        yaw.w = func_002974C0((actor->heading + 3.1415927f) * 0.5f);
-        func_00210F68(&result, &yaw, &actor->rot);
+        yaw.w = func_002974C0((actor->m_RotY + 3.1415927f) * 0.5f);
+        func_00210F68(&result, &yaw, &actor->m_qGround);
     }
     return result;
 }
