@@ -33,7 +33,7 @@ typedef struct {
     u32 fpcsr;
     __OSfp  fp0,  fp2,  fp4,  fp6,  fp8, fp10, fp12, fp14;
     __OSfp fp16, fp18, fp20, fp22, fp24, fp26, fp28, fp30;
-} __OSThreadContext; /* size 0x1A8 */
+} __OSThreadContext; /* size 0x190 */
 
 typedef struct {
     u32 flag;
