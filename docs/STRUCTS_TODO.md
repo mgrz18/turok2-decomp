@@ -313,14 +313,49 @@ views were replaced in about 230 files. Still local, and why:
   D_800F5C78 (the merged fifth profile).
 - The rw/ header leftovers (above): junk_types.h vs abu_types.h libaudio
   internals; junk's B12List and abu's IntrusiveList are CList.
-- The top of the census below: Obj (28 files, mostly a view of the
-  instance's CAI at 0x140), Player / Owner (CPlayer views: see the
-  player.h section), Particle (17), Sweep (20), Quad (19), DamageEvent (16)
-  and the VM pak menu items (O01Flags / O01Item / O01Text, O06A).
+- The top of the census below: Player / Owner (CPlayer views: see the
+  player.h section), Sweep (20), Quad (19), DamageEvent (16) and the VM pak
+  menu items (O01Flags / O01Item / O01Text, O06A). Obj and the particle
+  views are done (see "Obj and the particles" below).
 - NodePool (func_00294B58/func_00294B84) is libaudio's ALSynth (alGlobals'
   drvr, D_800B7760): the free list at 0x2C is its paramList, so these are
   __allocParam/__freeParam; the AL* views of the libaudio files are not in a
   header yet.
+
+## Obj and the particles (third pass)
+
+- **Obj** (28 files): 24 were CGameObjectInstance views (the Mother boss
+  module files, the imported Rage Wars helpers func_0021F080 /
+  func_0021F4E8 / func_0021F668, the 0026x collision-size accessors, whose
+  ObjDef views are now the CIntelligence bodies: m_Player / m_Enemy /
+  m_Pickup / m_Destructible / m_Static / m_Platform / m_Throwable, and
+  their owner the CPlayer) and 4 were particles (func_002325F0 /
+  func_00232684, under water by their region's CRegionInfo; func_00232FBC).
+  Left: func_00409340 (the Mother boss setup, in the CAI var-buffer pass)
+  and func_0023C188 (its Obj is the head of a collision Sweep, not an
+  object).
+- **Particles** (`structs/particle.h`): CParticle (0x1D8, a CInstanceHeader
+  of m_Type 2, then velocity, flags, two draw matrices and lights, the
+  template m_pEffect at 0xF8, owner/owner count/target at 0x10C-0x114, the
+  dynamic light at 0x118, age and lifetime, size/growth/rotation, alpha,
+  the impact settings at 0x190, m_Alignment, colours, the swoosh flag and
+  the free/active/draw list links at 0x1C4-0x1D0), CParticleSystem
+  (D_800F8928, 0xEC68: 128 particles, free list, draw list, three active
+  lists, the particle data), the templates CROMParticleEffect (0x3C) with
+  CROMParticleImpact (the 14 impact events), CROMParticleParams and
+  CROMParticleDistance, CEventValue (an impact event's value) and CDLight
+  (the dynamic light set D_8010FF34). Rage Wars' debug names where it has
+  them (CParticle_t...: references/rw_abu/src/particle/CODE_80281A70.CPP).
+  The Particle/ParticleDesc/ParticleDef/ParticleEvents/ParticleSystem/
+  ParticleEffect views, the particle Actor views (func_002318D4..
+  func_00232934), B19Obj, EmitActor and DrawParticle are gone (39 files
+  include particle.h). func_002365F8's "Particle" was a node of the swoosh
+  set D_801102B8 (renamed SwooshNode). Left: func_0022D2FC, the merged
+  four-part particle source (func_0022D2FC..func_0022F350), keeps its
+  views (MtxParticle, Particle, EffectActor, Effect, Entry...): its sprite
+  part copies the particle's leading 0x34 bytes as one struct, and it is
+  FAKEMATCH-pinned; func_00247C10's Actor is either an instance or a
+  particle (the damage source).
 
 ## Globals declared under several local types
 

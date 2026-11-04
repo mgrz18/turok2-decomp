@@ -674,6 +674,7 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/weapon.h` | the weapons: WeaponInfo (the weapon table D_800AF618) and its AmmoInfo, CBarrel (the weapon wheel, CPlayer m_Barrel) with CBarrelItem and CBarrelIcon (included by player.h) |
 | `structs/cinema.h` | the cinema (cutscene) state Cinema (*D_800C1BB0, 0x100) and CinemaEntry / CinemaTable |
 | `structs/boss.h` | the boss and level-script state of the VM modules: LevelScriptState (D_8012F608, with the BossState / BossMode views at D_8012F9D8 / D_8012F9DC, BossStep and the three script runners), MotherBossState (D_8012FB70, its BossWeakSpot), BlindOneState (D_80130200) with the Blind One's script VM (BlindOneStep, BlindOnePhase: the phase tables D_0043240C / D_0043232C, BlindOneMover), ScriptAnimator (the 0x64-byte value/colour animator: lights, weak spots, hit flashes) |
+| `structs/particle.h` | the particle system: CParticle (0x1D8), CParticleSystem (D_800F8928: 128 particles and their free, draw and active lists), the templates CROMParticleEffect / CROMParticleImpact / CROMParticleParams / CROMParticleDistance, CEventValue (an impact event's value), CDLight (a dynamic light, D_8010FF34) |
 | `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
 | `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs, OSPfsState and the Controller Pak internals, plus the engine's CMutex |
 | `gfx.h` | Gfx (w0/w1) and the display-list pointer the engine appends to |
