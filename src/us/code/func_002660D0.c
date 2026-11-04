@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 s32 func_00266570(s32, s32, s32);
-extern struct CAIModeInfo D_800B2410[];
+extern CAIModeInfo D_800B2410[];
 extern void func_0026609C(void);
 
 /* AI init: mode table, step/draw callbacks, cleared mode scratch. */

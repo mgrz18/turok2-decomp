@@ -42,6 +42,20 @@ typedef struct {
     /* 0x02 */ s16 m_nCurrentPointIndex;
 } CPathTrack; /* size 0x4 */
 
+/* One row of an AI's mode table (CAI::m_pModeTable, e.g. D_800B0A60: a
+ * 0x20-byte header row, then one row per mode; m_pModeCurrent points at the
+ * current one). The AI step calls m_pfCallback while the mode runs. */
+typedef struct CAIModeInfo {
+    /* 0x00 */ s32 m_Mode;
+    /* 0x04 */ s32 unk_04;
+    /* 0x08 */ s32 (*m_pfCallback)();
+    /* 0x0C */ void *m_pData;   /* D_800F1C20 in the enemy table */
+    /* 0x10 */ s32 unk_10;   /* a function in the mode rows */
+    /* 0x14 */ f32 unk_14;   /* 1.0f in the enemy table */
+    /* 0x18 */ s32 unk_18;
+    /* 0x1C */ u32 unk_1C;
+} CAIModeInfo; /* size 0x20 */
+
 /* CAI::m_VarBuffer as the enemy AI (func_0025BC70 sets it up) uses it: the
  * definition's behaviour for each mode (CEnemyIntelligence::m_Behaviors[0],
  * [1], m_UnderwaterBehavior) and which of them is current. */

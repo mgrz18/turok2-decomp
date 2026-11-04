@@ -12,7 +12,7 @@ extern s32 func_0025E4B8;
 
 void func_00402888(s32 arg0, CAI *arg1) {
     D_80110048 = 0x1D4D;
-    arg1->m_pModeTable = (struct CAIModeInfo *) &D_00430CA4;
+    arg1->m_pModeTable = (CAIModeInfo *) &D_00430CA4;
     arg1->m_pfStep = func_00402A10;
     arg1->m_pfHurt = func_00402404;
     arg1->m_pfEffects = &func_0025E4B8;
