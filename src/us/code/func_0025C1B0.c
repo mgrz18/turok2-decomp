@@ -24,18 +24,18 @@ void func_0025C1B0(CGameObjectInstance *actor, CAI *ai, Motion *motion) {
     }
     speed = motion->speed;
     if (speed < 0.0f ? -speed > 102.399994f : speed > 102.399994f) {
-        ai->m_VarF32[8] = 30.0f;
+        ai->m_Enemy.m_IdleTimer = 30.0f;
         if (ai->m_Enemy.m_Behavior[1] && modeIndex == 0) {
             func_00243414(actor, ai, 0x26);
         }
         return;
     }
-    ai->m_VarF32[8] -= D_800B6D28;
-    if (ai->m_VarF32[8] < 0.0f) {
-        ai->m_VarF32[8] = 0.0f;
+    ai->m_Enemy.m_IdleTimer -= D_800B6D28;
+    if (ai->m_Enemy.m_IdleTimer < 0.0f) {
+        ai->m_Enemy.m_IdleTimer = 0.0f;
     }
-    if (ai->m_Health && ai->m_Mode == 4 && ai->m_VarF32[8] == 0.0f) {
-        ai->m_VarF32[8] = func_002119FC(30.0f, 75.0f);
+    if (ai->m_Health && ai->m_Mode == 4 && ai->m_Enemy.m_IdleTimer == 0.0f) {
+        ai->m_Enemy.m_IdleTimer = func_002119FC(30.0f, 75.0f);
         if (modeIndex == 0) {
             if (ai->m_Enemy.m_Behavior[1]) {
                 func_00243414(actor, ai, 0x26);

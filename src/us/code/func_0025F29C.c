@@ -10,7 +10,7 @@ void func_0025F29C(CGameObjectInstance *self, CAI *ai) {
         level = ai->m_Aggression;
         level *= (1.0f / 255);
         level = level * -45.0f + 60.0f;
-        ai->m_VarF32[5] = level;
+        ai->m_Enemy.m_AttackDelay = level;
     }
     ai->m_dwFlags &= ~0x4000000;
 }

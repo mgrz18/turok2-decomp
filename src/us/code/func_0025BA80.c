@@ -29,13 +29,13 @@ void func_0025BA80(CGameObjectInstance *actor, CAI *ai, DrawParams *params) {
         func_0020B258(params->model, actor->m_pmtDrawMtxs, 1, actor->m_Lights[D_800B6D1C], 0, ((s8 *)params)[0x1B], -1);
         return;
     }
-    if (ai->m_VarF32[10] > 0.0f) {
+    if (ai->m_Enemy.m_Timer > 0.0f) {
         if (ai->m_Mode == 0x19) {
             alpha = ai->m_AnimRepeatedCount * 255 / 4;
         } else {
             alpha = 255;
-            if (ai->m_VarF32[10] < 30.0f) {
-                alpha = ai->m_VarF32[10] * 8.5f;
+            if (ai->m_Enemy.m_Timer < 30.0f) {
+                alpha = ai->m_Enemy.m_Timer * 8.5f;
             }
         }
         if (alpha != 255) {

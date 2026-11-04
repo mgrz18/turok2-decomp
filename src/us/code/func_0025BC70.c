@@ -60,13 +60,13 @@ void func_0025BC70(CGameObjectInstance *actor, CAI *ai) {
     ai->m_VarS32[1] = 0;
     ai->m_VarS32[2] = 0;
     ai->m_VarS32[3] = 0;
-    ai->m_VarS32[5] = 0;
+    ai->m_Enemy.m_AttackDelay = 0;
     ai->m_VarS32[6] = 0;
     ai->m_VarS32[7] = 0;
     ai->m_VarF32[4] = 1.0f;
-    ai->m_VarF32[8] = func_002119FC(60.0f, 120.0f);
-    ai->m_VarS32[10] = 0;
-    ai->m_VarF32[11] = 150.0f;
+    ai->m_Enemy.m_IdleTimer = func_002119FC(60.0f, 120.0f);
+    ai->m_Enemy.m_Timer = 0;
+    ai->m_Enemy.m_Timer2 = 150.0f;
     ai->m_Enemy.m_Behavior[0] = info->m_Behaviors[0];
     one = 1;
     ai->m_Enemy.m_Behavior[one] = info->m_Behaviors[one];

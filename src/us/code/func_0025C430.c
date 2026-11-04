@@ -55,7 +55,7 @@ void func_0025C430(CGameObjectInstance *actor, CAI *ai) {
                 ai->m_ActionTime = 0.0f;
             }
         }
-        ai->m_VarS32[5] = 0;
+        ai->m_Enemy.m_AttackDelay = 0;
         break;
     case 1:
         ai->m_ActionTime -= D_800B6D28;

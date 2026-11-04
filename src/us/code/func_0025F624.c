@@ -13,6 +13,6 @@ void func_0025F624(s32 arg0, CAI *arg1) {
 
     temp_f20 = D_800A790C;
     temp_f21 = D_800A7910;
-    arg1->m_VarF32[10] = func_002119FC(temp_f20, temp_f21);
-    arg1->m_VarF32[11] = func_002119FC(temp_f20, temp_f21);
+    arg1->m_Enemy.m_Timer = func_002119FC(temp_f20, temp_f21);
+    arg1->m_Enemy.m_Timer2 = func_002119FC(temp_f20, temp_f21);
 }

@@ -65,10 +65,10 @@ s16 func_0025D030(CGameObjectInstance *actor, CAI *ai, CAITargets *t) {
             func_0026D5E4(&chooser, 0x10, 100);
         }
     }
-    if (c && ai->m_VarF32[5] <= 0.0f && t->m_Sight.m_Dist <= info->m_AttackProjectileRadius) {
+    if (c && ai->m_Enemy.m_AttackDelay <= 0.0f && t->m_Sight.m_Dist <= info->m_AttackProjectileRadius) {
         func_0026D5E4(&chooser, 0x12, 100);
     }
-    if (d && ai->m_VarF32[5] <= 0.0f && t->m_Sight.m_Dist <= info->m_AttackWeaponRadius) {
+    if (d && ai->m_Enemy.m_AttackDelay <= 0.0f && t->m_Sight.m_Dist <= info->m_AttackWeaponRadius) {
         func_0026D5E4(&chooser, 0x11, 100);
     }
     if (chooser.count != 0) {
