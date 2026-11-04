@@ -3,12 +3,6 @@
 #include "common.h"
 #include "ultra_types.h"
 
-typedef struct {
-    /* 0x000 */ __OSInode inode;
-    /* 0x100 */ u8 bank;
-    /* 0x101 */ u8 map[256];
-} __OSInodeCache;
-
 #define PFS_READ 0
 #define PFS_WRITE 1
 #define PFS_ERR_NEW_PACK 2

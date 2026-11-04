@@ -137,6 +137,13 @@ typedef struct {
     /* 0x1E */ u16 inverted_checksum;
 } __OSPackId; /* size 0x20 */
 
+/* pfschecker.c's cache of one bank's inode table. */
+typedef struct {
+    /* 0x000 */ __OSInode inode;
+    /* 0x100 */ u8 bank;
+    /* 0x101 */ u8 map[256];
+} __OSInodeCache; /* size 0x202 */
+
 /* Not libultra: the engine's recursive lock (Rage Wars' CMutex, built by
  * CMutex__Construct), a one-message queue and the number of holders. Taken
  * with __osDisableInt, ++count and osRecvMesg when count was not 0; released
