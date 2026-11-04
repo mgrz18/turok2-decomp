@@ -1,15 +1,21 @@
 #include "common.h"
+#include "structs/player.h"
+#include "structs/weapon.h"
 
 s32 func_00253DE0(s32, s32);
 
-extern s32 D_800A72A0;
-extern s32 D_800AF618;
+typedef struct {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 scale;
+} Tuning;
 
-void func_00258E38(void *arg0, void *arg1)
-{
-  s32 new_var;
-  new_var = *((s32 *) (((s8 *) arg0) + 0x1A8));
-  *((s32 *) (((s8 *) arg1) + 0x64)) = 0;
-  func_00253DE0(new_var, 0x1A5);
-  *((f32 *) (((s8 *) arg1) + 0x118)) = (f32) ((*((f32 *) (((s8 *) (*((typeof(&D_800AF618)) ((0, ((s8 *) (&D_800AF618)) + ((*((s16 *) (((s8 *) (*((s32 *) (((s8 *) arg0) + 0x1A8)))) + 0x996))) * 4)))))) + 0x18))) * (*((f32 *) (((s8 *) (&D_800A72A0)) + 4))));
+extern Tuning D_800A72A0;
+
+void func_00258E38(CGameObjectInstance *obj, CAI *ai) {
+    s32 player;
+
+    player = (s32) obj->m_AI.m_pParent;
+    ai->m_ConditionTimer = 0.0f;
+    func_00253DE0(player, 0x1A5);
+    *(f32 *) &ai->m_VarBuffer[3] = D_800AF618[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A72A0.scale;
 }
