@@ -1,0 +1,74 @@
+# Functions that are not C by origin, so no C can ever be written for them.
+# tools/progress.py counts them in their own row, `asm (by origin)`, and keeps
+# them out of the C percentages (the all-code numbers still include them).
+# Reviewed by hand; the evidence per function is in docs/ASM_ORIGIN.md.
+#
+# <name> <kind> <reason>
+#   kind asm:      hand-written asm (cop0/cache/eret/TLB ops, non-ABI registers,
+#                  a libultra .s file, SN64 SNMAIN/STVM, the RNC unpacker)
+#   kind fragment: not a whole function (a stale copy left in the .code tail)
+
+# boot: SN64 SNMAIN.s (references/turok3/src/common/asm/SNMAIN.s, bit-identical)
+boot_main            asm       SNMAIN.s romMain: sets $sp, clears the TLB (tlbwi), maps 0x200000, jalr main
+STVM_MapTLB          asm       SNMAIN.s: mtc0 Index/PageMask/EntryHi/EntryLo, tlbwi
+
+# RNC ProPack method-2 unpacker (us/asm/1840.s; versions/cuts.us.txt)
+func_00200C40        asm       RNC unpack entry: addi $sp, saves s0-s7, args in s0-s3, jal into the unpacker
+func_00200CB0        asm       RNC unpack main loop: bit buffer in $14/$15, return address parked in $24
+func_00200E1C        asm       RNC huffman decode: reads $16 table, $14/$15 bit buffer (no ABI)
+func_00200EC0        asm       RNC getbits: and/srlv on the $14/$15 bit buffer, $25 holds $ra
+func_00200EE8        asm       RNC refill: falls through register state $9/$14/$15/$19, no frame
+func_00200F20        asm       RNC build huffman table: $24 holds $ra, $sp scratch below the frame
+func_00201074        asm       __osSetWatchLo-style: mtc0 WatchLo ($18), mfc0 WatchHi ($19)
+func_002010C0        asm       RNC decompressor body: addi $sp, saves t0-t7, jalr into itself (func + 0xA8)
+
+# SN64 STVM TLB helpers (us/asm/8FA40.s): the engines copy of SNMAINs STVM_MapTLB
+func_0028EE40        asm       first word (lw $t8, 0x10($sp)) of STVM_MapTLB, cut off from func_0028EE44
+func_0028EE44        asm       STVM_MapTLB body: mtc0 Index/PageMask/EntryHi/EntryLo, tlbwi; branches into func_0028EEC0
+func_0028EEC0        asm       STVM unmap: mtc0 Index/EntryHi/EntryLo, tlbwi
+func_0028EEFC        asm       TLB dump loop: mtc0 Index, tlbr, mfc0 PageMask/EntryHi/EntryLo
+
+# libultra exceptasm.s (us/asm/9CBE0.s)
+__osException        asm       exceptasm.s __osException: jr k0, sd GPRs through k0, mfc0 SR/Cause, mtc0 SR
+send_mesg            asm       exceptasm.s send_mesg (static): $ra parked in $s2, t-registers only, no frame
+__osEnqueueAndYield  asm       exceptasm.s __osEnqueueAndYield: saves the context with sd, mfc0 SR
+__osEnqueueThread    asm       exceptasm.s __osEnqueueThread: t8/t9/t6/t7 only, no frame
+__osPopThread        asm       exceptasm.s __osPopThread: t9 scratch, no frame
+func_0029C8E0        asm       exceptasm.s __osDispatchThread: ld all GPRs from k0, mtc0 SR/EPC, ctc1, eret
+func_0029CADC        asm       exceptasm.s __osCleanupThread: jal osDestroyThread with a0=0, no return
+
+# libultra os/*.s leaves (us/asm/9EBD0.s .. 9EFB0.s)
+func_0029DFD0        asm       getfpccsr.s __osGetFpcCsr: cfc1 $31
+func_0029DFE0        asm       getsr.s __osGetSR: mfc0 SR
+func_0029DFF0        asm       interrupt.s __osDisableInt: mfc0/mtc0 SR
+__osRestoreInt       asm       interrupt.s __osRestoreInt: mfc0/mtc0 SR
+func_0029E030        asm       invaldcache.s osInvalDCache: cache 0x15/0x11/0x01
+func_0029E0D0        asm       invalicache.s osInvalICache: cache 0x10/0x00
+func_0029E140        asm       probetlb.s __osProbeTLB: tlbp, tlbr, mfc0 PageMask/EntryLo
+func_0029E220        asm       setfpccsr.s __osSetFpcCsr: cfc1/ctc1 $31
+osSetIntMask         asm       setintmask.s osSetIntMask: mfc0/mtc0 SR, MI_INTR_MASK
+func_0029E2E0        asm       setsr.s __osSetSR: mtc0 SR
+__osUnmapTLBAll      asm       unmaptlball.s __osUnmapTLBAll: tlbwi loop
+func_0029E340        asm       writebackdcache.s osWritebackDCache: cache 0x19/0x01
+func_0029E3B0        asm       writebackdcacheall.s osWritebackDCacheAll: cache 0x01
+
+# exception-vector / debug stub (us/asm/A3C88.s): k0-based, eret, addi $sp
+func_002A3088        asm       exception vector stubs (mtc0 ErrorEPC, jr k0) copied to 0x80000000/0x80000180
+func_002A3100        asm       installs the vector stubs (swaps words at 0x80000180/0x80000000), addi $sp
+func_002A31AC        asm       icache invalidate-all loop: cache 0x01
+func_002A31C8        asm       dcache invalidate-all loop: cache 0x00
+func_002A31E4        asm       mfc0 SR
+func_002A31F0        asm       mtc0 SR
+func_002A31FC        asm       TLB dump: tlbr loop into D_80128A90, addi $sp
+func_002A3708        asm       re-installs the vector stubs, then the cache loops
+func_002A3774        asm       exception return paths: k0-based ld, mtc0 EPC, eret
+func_002A37CC        asm       context save: sd of every GPR and cop0 register through k0
+
+# VM module (us/asm/16F710.s)
+func_00425710        asm       __osSetWatchLo-style: mtc0 WatchLo ($18), mfc0 WatchHi ($19) (= func_00201074)
+
+# the .code tail (code_tail_funcs, ROM 0xC2ED8): stale copies of code 0x39000 lower,
+# nothing jumps or points into 0x002C22D8-0x002C2474
+func_002C22D8        fragment  func_002892D8 again but for one jal (0x42AB2C vs 0x42AC0C): a stale copy, dead
+func_002C232C        fragment  func_0028932C byte for byte (its j goes to 0x2893B0, inside it), dead; already left out as a copy
+func_002C23E0        fragment  func_002893D8 from +8 (stray_002C23D8 holds the first 8 bytes), j into 0x289428, dead

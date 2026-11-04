@@ -55,7 +55,12 @@ A matched function gets its own `c` subsegment in `versions/turok2.us.yaml`:
 
 then the INCLUDE_ASM line is replaced by the C, and `make verify` must still
 pass. A file may hold a run of contiguous functions, some matched and the rest
-INCLUDE_ASM. `tools/progress.py` counts the bytes defined in C.
+INCLUDE_ASM. `tools/progress.py` counts the bytes defined in C, over the
+C-origin code: the functions that are asm by origin (libultra `.s`, SNMAIN/STVM,
+the RNC unpacker, the exception stubs) or fragments are listed in
+`versions/asm_origin.us.txt`, reported as their own `asm (by origin)` row and
+left out of the percentages ([ASM_ORIGIN.md](ASM_ORIGIN.md)); `all code` keeps
+the figure over every byte.
 
 Asm pulled in with INCLUDE_ASM uses numeric registers (`named_regs_for_c_funcs:
 False`), since asn64 reads `$sp` as a hex literal. Splitting a file can leave
