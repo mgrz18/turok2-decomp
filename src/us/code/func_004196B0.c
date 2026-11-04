@@ -13,7 +13,6 @@
 
 struct LevelActor;
 struct Shared_World;
-struct GameSession;
 struct Record14;
 typedef struct Record14 Record14;
 struct Record14;
@@ -340,37 +339,6 @@ typedef struct RenderSettings {
     CVector3 direction;
     s32 ready;
 } RenderSettings;
-typedef struct GameSession GameSession;
-struct GameSession {
-    Display ring;
-    s32 resource;
-    Shared_World world;
-    u8 reservedWorld[0x1BCF8 - 0x3C8 - sizeof(Shared_World)];
-    Hud hud;
-    u8 reservedHud[0x25580 - 0x1BCF8 - sizeof(Hud)];
-    ObjectPool menu[1];
-    u8 reserved255C4[4];
-    struct ScreenMessageOwner players[1];
-    u8 reservedPlayers[0x26826 - 0x255C8 - sizeof(struct ScreenMessageOwner)];
-    u8 arena;
-    u8 reserved26827[0x26D8C - 0x26827];
-    RenderSettings settings;
-    f32 transitionTime;
-    s32 previousMode;
-    s32 mode;
-    s32 target;
-    u8 pad26DC0;
-    s8 phase;
-    u8 reserved26DC2[2];
-    f32 timer;
-    s32 enabled;
-    s32 field26DCC;
-    s32 transitionBlocked;
-    s32 clockPaused;
-    s32 selector;
-    s32 selectionActive;
-};
-extern GameSession D_800F6CB0;
 extern s32 D_801308F8;
 extern s32 func_002855E8(char *);
 extern void func_00275A74(void);

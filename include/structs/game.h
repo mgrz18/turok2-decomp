@@ -20,6 +20,7 @@
  * func_00450D78): through an array the compiler bases the accesses on the
  * accessed field's address, as the ROM does there. */
 
+#include "structs/vector.h"
 #include "structs/player_options.h"
 
 /* The match state, D_8011ACB0: the play clock, then the rules of the
@@ -45,6 +46,17 @@ typedef struct GameMatch {
     /* 0x48 */ s32 unk48;
     /* 0x4C */ s32 unk4C;
 } GameMatch; /* size 0x50 */
+
+/* The sun (Turok 3's CSun, same size; func_0042D1C0 is CSun__Construct). */
+typedef struct CSun {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ f32 m_ScreenX;
+    /* 0x0C */ f32 m_ScreenY;
+    /* 0x10 */ f32 m_Opacity;
+    /* 0x14 */ CVector3 m_vDir;
+    /* 0x20 */ s32 m_bVisible;
+} CSun; /* size 0x24 */
 
 /* The game settings, D_8011AAD8. The options at 0x20 come in three groups
  * of five, one per kind of match (func_0041760C, func_00417490 and
@@ -94,7 +106,8 @@ typedef struct GameSettings {
     /* 0x040 */ CPlayerOptions defaultSlot;  /* D_8011AB18 */
     /* 0x080 */ CPlayerOptions slots[4];     /* D_8011AB58 */
     /* 0x180 */ u8 unk180;
-    /* 0x181 */ u8 unk181[0x1A8 - 0x181];
+    /* 0x181 */ u8 unk181[0x184 - 0x181];
+    /* 0x184 */ CSun m_Sun;            /* CSun__Construct: func_0042D1C0 */
     /* 0x1A8 */ f32 modeTimer;         /* the mode's clock: a spin in degrees, a fade threshold (func_00288D3C, func_00289700) */
     /* 0x1AC */ s32 prevMode;
     /* 0x1B0 */ s32 mode;              /* D_8011AC88: the game mode (17: switching) */
@@ -112,20 +125,21 @@ typedef struct GameSettings {
     /* 0x1D8 */ GameMatch match;       /* D_8011ACB0 */
 } GameSettings; /* size 0x228 */
 
-/* The engine, D_800F6CB0 (CEngineApp__Boot's object): GameSettings
- * D_8011AAD8 is inside it at 0x23E28, so its mode block (0x23FD0-0x23FFC)
- * is GameSettings 0x1A8-0x1D4. Only that part is described here. */
-typedef struct CEngineApp {
-    /* 0x00000 */ u8 pad0[0x23E28];
-    /* 0x23E28 */ GameSettings m_Settings; /* D_8011AAD8 */
-} CEngineApp; /* size 0x24050 */
-
 extern GameSettings D_8011AAD8;
 extern GameMatch D_8011ACB0;
 
 /* ---- The game state, D_80119870 (CGame) ---- */
 
 #include "structs/player_list.h"
+
+/* The debug line counts (func_00430500 resets them and fills the coloured
+ * vertex buffers D_80129A40, D_8012DA40, D_8012DB40, D_8012F340). */
+typedef struct CDebugLines {
+    /* 0x00 */ s32 unk0;
+    /* 0x04 */ s32 unk4;
+    /* 0x08 */ s32 unk8;
+    /* 0x0C */ s32 m_Counts[11];
+} CDebugLines; /* size 0x38 */
 
 /* The engine's globals at D_80119870: the players, the cameras and the
  * settings. Some parts have symbols of their own, which the ROM uses where
@@ -141,10 +155,58 @@ typedef struct CGame {
     /* 0x0040 */ u8 m_CameraPool[0x57C];   /* CCameraPool, D_801198B0 (0x11F0 bytes) */
     /* 0x05BC */ u8 m_MenuPool[0x18];      /* its m_MainCamera.m_MenuPool (MenuPool, structs/menu.h), D_80119E2C */
     /* 0x05D4 */ u8 m_CameraPoolEnd[0x1230 - 0x5D4];
-    /* 0x1230 */ u8 unk1230[0x1268 - 0x1230];
+    /* 0x1230 */ CDebugLines m_DebugLines;   /* reset by func_00430500 */
     /* 0x1268 */ GameSettings m_Settings;  /* D_8011AAD8 */
 } CGame; /* size 0x1490 */
 
 extern CGame D_80119870;
+
+/* ---- The engine, D_800F6CB0 (CEngineApp) ---- */
+
+/* One frame in flight (Turok 3's CFrameData, 8 bytes longer here: the word
+ * at 0x128). The three are a ring through m_pPrev / m_pNext
+ * (func_00286440); D_800F7070 (CEngineApp.m_pCurrentFrameData) is the one
+ * being built. */
+typedef struct CFrameData {
+    /* 0x000 */ u8 m_SunFrame[0x20];     /* CSunFrameData (CSunFrameData__Construct) */
+    /* 0x020 */ u8 m_Task[0x68];         /* OSScTask */
+    /* 0x088 */ u8 m_LineTask[0x68];     /* OSScTask */
+    /* 0x0F0 */ s16 m_MsgType;           /* m_Msg, an OSScMsg: 2 at start (func_00286440) */
+    /* 0x0F2 */ u8 m_Msg[0x110 - 0xF2];
+    /* 0x110 */ void *m_pFrameBuffer;    /* its colour image (D_80130A88[i]) */
+    /* 0x114 */ void *m_pDisplayList;    /* Gfx *: the start of the frame's list */
+    /* 0x118 */ void *m_pLineList;       /* Gfx * */
+    /* 0x11C */ s32 m_DisplayListSize;
+    /* 0x120 */ s32 m_LineListSize;
+    /* 0x124 */ s32 m_nPredictTicks;
+    /* 0x128 */ s32 m_bLines;             /* the line list has lines (func_00401C1C) */
+    /* 0x12C */ struct CFrameData *m_pPrev;
+    /* 0x130 */ struct CFrameData *m_pNext;
+    /* 0x134 */ u8 unk134[0x140 - 0x134];
+} CFrameData; /* size 0x140 */
+
+/* The engine, D_800F6CB0 (CEngineApp__Boot's object; the field names after
+ * Turok 3's CEngineApp, which has the same parts in the same order): the
+ * frames, the world (CWorld D_800F7078, structs/world.h, kept as bytes so
+ * that this header does not pull in the world), then CGame D_80119870, whose
+ * settings (D_8011AAD8, also reachable as m_Settings) end with the engine's
+ * mode block (0x23FD0-0x23FFC is GameSettings 0x1A8-0x1D4: Turok 3's
+ * m_ModeTime, m_LastMode, m_Mode...). */
+typedef struct CEngineApp {
+    /* 0x00000 */ CFrameData m_FrameData[3];
+    /* 0x003C0 */ CFrameData *m_pCurrentFrameData;   /* D_800F7070 */
+    /* 0x003C4 */ s32 m_CartridgeIndex;              /* the ROM address of the cartridge index (0xFCBFB4: func_00286674, func_00429FA0) */
+    /* 0x003C8 */ u8 m_Scene[0x19440 - 0x3C8];       /* CWorld D_800F7078 (0x19078 bytes) */
+    /* 0x19440 */ u8 unk19440[0x22BC0 - 0x19440];
+    union {
+        /* 0x22BC0 */ CGame m_Game;                  /* D_80119870 */
+        struct {
+            u8 _pad22BC0[0x23E28 - 0x22BC0];
+            /* 0x23E28 */ GameSettings m_Settings;   /* D_8011AAD8, m_Game.m_Settings */
+        };
+    };
+} CEngineApp; /* size 0x24050 */
+
+extern CEngineApp D_800F6CB0;
 
 #endif

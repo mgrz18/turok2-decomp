@@ -3,21 +3,11 @@
  * Same role as Turok: Rage Wars' func_00291404 (thejunkman9000/Turok-Rage-Wars-Decomp, src/game/func_00291404.c). */
 
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
 } EngineMsg;
-
-typedef struct {
-    /* 0x00000 */ u8 pad0[0x3C4];
-    /* 0x003C4 */ s32 unk3C4;
-    /* 0x003C8 */ u8 pad3C8[0x23FD8 - 0x3C8];
-    /* 0x23FD8 */ s32 unk23FD8;
-    /* 0x23FDC */ u8 pad23FDC[4];
-    /* 0x23FE0 */ u8 unk23FE0;
-    /* 0x23FE1 */ u8 pad23FE1[0x23FF0 - 0x23FE1];
-    /* 0x23FF0 */ s32 unk23FF0;
-} Engine;
 
 extern s32 D_80000300;          /* osTvType */
 extern u8 D_80130A58[];
@@ -57,7 +47,7 @@ extern void func_00425604(void *p);
 extern void func_00425220(void *p);
 extern void func_0029AC90(void *frameBuffer);   /* osViSwapBuffer */
 extern void func_0042F4F0(void);
-extern void func_00286440(Engine *e);
+extern void func_00286440(CEngineApp *e);
 extern void func_00266C5C(void *p, s32 c, s32 n);   /* memset */
 extern void func_0042FE4C(void *p);
 extern void func_0042E834(void *p);
@@ -70,15 +60,15 @@ extern void func_0042EB50(void *p);
 extern void func_004263DC(void);
 extern void func_00285A94(void);
 extern s32 func_0028D0E0(void);
-extern void func_00288BC8(Engine *e, s32 mode);
+extern void func_00288BC8(CEngineApp *e, s32 mode);
 extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
-extern void func_00288C80(Engine *e);
-extern void func_00287ABC(Engine *e);
+extern void func_00288C80(CEngineApp *e);
+extern void func_00287ABC(CEngineApp *e);
 extern void func_00285304(void);
 extern void func_00285410(s32 a);
-extern void func_00288C5C(Engine *e, s32 mode);
+extern void func_00288C5C(CEngineApp *e, s32 mode);
 
-void func_00286674(Engine *e) {
+void func_00286674(CEngineApp *e) {
     u32 i;
 
     func_00202130();
@@ -114,10 +104,10 @@ void func_00286674(Engine *e) {
     func_0042FE4C((u8 *)e + 0x22C00);
     func_0042E834((u8 *)e + 0x22BC0);
     CCollisionInfo__Reset();
-    e->unk3C4 = 0xFCBFB4;
+    e->m_CartridgeIndex = 0xFCBFB4;
     func_0042FBA4((u8 *)e + 0x22C00, 0);
     func_0042E5AC((u8 *)e + 0x22BC0, 0, 0);
-    func_00429FA0(D_800F7078, e->unk3C4);
+    func_00429FA0(D_800F7078, e->m_CartridgeIndex);
     if (D_800B6CF1 == 0) {
         func_00430070();
     }
@@ -150,7 +140,7 @@ void func_00286674(Engine *e) {
             } else if ((u8 *)D_8011F124 == (u8 *)e + 0x370) {
                 D_8011F140 = (u8 *)e + 0x280;
             }
-            if (e->unk23FD8 == 17) {
+            if (e->m_Settings.mode == 17) {
                 D_8011B110++;
             } else {
                 func_00287ABC(e);
@@ -164,17 +154,17 @@ void func_00286674(Engine *e) {
                 D_800B75F0 = 0;
                 func_00285304();
                 func_00285410(0);
-                e->unk23FE0 = 1;
+                e->m_Settings.fastFade = 1;
                 func_00288C5C(e, 17);
-                e->unk23FF0 = 1;
+                e->m_Settings.unk1C8 = 1;
                 break;
             } else {
                 D_800B75F0 = 0;
                 func_00285304();
                 func_00285410(0);
-                e->unk23FE0 = 1;
+                e->m_Settings.fastFade = 1;
                 func_00288C5C(e, 17);
-                e->unk23FF0 = 1;
+                e->m_Settings.unk1C8 = 1;
                 break;
             }
         }

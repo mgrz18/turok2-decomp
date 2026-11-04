@@ -11,7 +11,6 @@
 
 #define PROGRESS (&D_80119870.m_Settings)
 extern s32 D_80130924;
-extern u8 D_800F6CB0[];
 extern u8 D_800F7078[];
 
 extern s32 func_002855E8(s32 pad);
@@ -130,7 +129,7 @@ s32 func_0045353C(void *menu, Menu *c) {
             PROGRESS->multiplayer = 0;
             PROGRESS->playerCount = 1;
             func_00417ACC(c);
-            func_00288C5C(D_800F6CB0, 16);
+            func_00288C5C(&D_800F6CB0, 16);
             return 1;
         }
         if (D_80119870.m_Settings.mode == 13) {
@@ -140,7 +139,7 @@ s32 func_0045353C(void *menu, Menu *c) {
         PROGRESS->multiplayer = 0;
         PROGRESS->playerCount = 1;
         func_00417ACC(c);
-        func_002886D0(D_800F6CB0, id);
+        func_002886D0(&D_800F6CB0, id);
         return 1;
     }
     if (func_00285628(c->controller) != 0) {

@@ -18,7 +18,6 @@ typedef struct {
 
 /* The global at D_80119870: what this reads of it. */
 extern f32 D_800B6D28;          /* the frame time step */
-extern u8 D_800F6CB0[];
 
 void func_0021F1B4(DrawActor *actor);
 void func_0021A344(DrawActor *actor);
@@ -58,7 +57,7 @@ void func_00226490(DrawWorld *world) {
         func_00251FC4(&D_80119870.m_PlayerList);
     }
     if (func_00253460(&D_80119870.m_PlayerList)) {
-        func_00430330(D_800F6CB0);
+        func_00430330(&D_800F6CB0);
     }
     while (i < count) {
         actor = actors[i++];
