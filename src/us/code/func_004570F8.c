@@ -24,7 +24,7 @@ extern void func_004263A0(s32 ch);
 extern s32 func_0042647C(s32 ch);
 extern s32 func_004264B4(s32 ch);
 extern s32 func_00426AF8(s32 ch);
-extern void func_00416644(char *, char *, CPlayer *, MenuController *, char *);
+extern void func_00416644(char *, char *, CPlayer *, ControllerProfile *, char *);
 void func_004570F8(Menu *menu) {
     s32 ch;
     D_80130984 = 0;

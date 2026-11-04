@@ -1,13 +1,11 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00408C78.c, func_00408C78.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-#include "common.h"
-#include "structs/game.h"
 
 #include "common.h"
+#include "structs/game.h"
 #include "structs/player.h"
 #include "structs/menu.h"
-#include "structs
-/pak.h"
+#include "structs/pak.h"
 
 extern s8 D_80130950[];
 extern s32 D_80130990;
@@ -20,7 +18,7 @@ extern u8 D_00438748[];
 extern u8 D_0043BDB0[];
 extern u8 D_0043BE1C[];
 s32 func_0041DD90(Menu *o, s32 pad, s32 z);
-CPlayer *func_0025342C(CPlayerList *world, MenuController *s);
+CPlayer *func_0025342C(CPlayerList *world, ControllerProfile *s);
 void func_0042E430(CPlayer *a, s32 b);
 void func_00416894(u8 *a, Menu *o, u8 *c);
 s32 func_00426064(s32 pad, s32 idx);
