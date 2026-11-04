@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/collision.h"
 
 typedef struct Owner {
     /* 0x00 */ u8 kind;
@@ -18,15 +19,11 @@ typedef struct Particle {
     /* 0x10C */ Owner *owner;
 } Particle;
 
-typedef struct CollisionState {
-    /* 0x00 */ u8 kind;
-} CollisionState;
-
 extern s32 D_800F1D7C;
-extern CollisionState *D_800F1CE0;
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 
 void func_0026E19C(s32 state, s32 bits, Particle *p);
-void func_0026E110(CollisionState *state, s32 bits, Particle *p);
+void func_0026E110(CGameObjectInstance *inst, s32 bits, Particle *p);
 
 static __inline__ s32 isGroupA(Particle *p) {
     switch (p->type) {
@@ -88,28 +85,28 @@ void func_0022AAE0(Particle *p) {
             }
         }
     }
-    if (D_800F1CE0 != NULL && D_800F1CE0->kind == 1) {
+    if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
         Owner *owner = p->owner;
 
         if (owner != NULL && owner->kind == 1 && (owner->flags & 0x300000)) {
             if (isGroupA(p)) {
-                func_0026E110(D_800F1CE0, 8, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 8, p);
             }
             if (isGroupB(p)) {
-                func_0026E110(D_800F1CE0, 4, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 4, p);
             }
             if (isGroupC(p)) {
-                func_0026E110(D_800F1CE0, 0x10, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 0x10, p);
             }
         } else if (p->def->m_Type == 1 || p->def->m_Type == 4) {
             if (isGroupA(p)) {
-                func_0026E110(D_800F1CE0, 0x80, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 0x80, p);
             }
             if (isGroupB(p)) {
-                func_0026E110(D_800F1CE0, 0x40, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 0x40, p);
             }
             if (isGroupC(p)) {
-                func_0026E110(D_800F1CE0, 0x100, p);
+                func_0026E110(D_800F1CE0.m_pInstance, 0x100, p);
             }
         }
     }

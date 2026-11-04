@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/collision.h"
 
 /* Two halfwords of an effect's parameters, or the pair as one word. */
 typedef struct ActionParams {
@@ -60,7 +61,7 @@ typedef struct EffectInfo {
     /* 0x04 */ u8 pad4[4];
 } EffectInfo;
 
-extern Target *D_800F1CE0;              /* the target hit */
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 extern CollisionPoint D_800F1CE8;
 extern CVector3 D_800F1DB8;                /* the direction of the hit */
 extern u8 D_8011AAF1;
@@ -110,7 +111,7 @@ void func_0022CA90(Particle *p) {
     ParticleDef *definition;
     s32 kind;
 
-    source = D_800F1CE0;
+    source = (Target *)D_800F1CE0.m_pInstance;
     definition = p->def;
     kind = func_00245724(source);
     if (kind == 5) {

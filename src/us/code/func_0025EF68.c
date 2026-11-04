@@ -4,7 +4,10 @@
 s32 func_00243414(s32, s32, s32);
 s32 func_00264C8C(void *, void *, s32);         /* extern */
 
-extern CGameObjectInstance *D_800F1CE0;        /* the player */
+/* D_800F1CE0 is the collision results (CCollisionResults, structs/collision.h);
+ * this reads its first word, m_pInstance (what the last test hit), as a
+ * pointer variable: D_800F1CE0.m_pInstance does not give this code. */
+extern CGameObjectInstance *D_800F1CE0;
 
 void func_0025EF68(s32 arg0, CAI *arg1) {
     void *owner;

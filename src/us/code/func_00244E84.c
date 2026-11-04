@@ -1,8 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/collision.h"
 
 
-extern CGameObjectInstance *D_800F1CE0;       /* the carrier of the held shield */
+extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 
 f32 func_00298470(f32);         /* sqrtf */
 f32 func_002982F0(f32);         /* sinf */
@@ -57,7 +58,7 @@ f32 func_00244E84(CGameObjectInstance *self, CVector3 pos, CGameObjectInstance *
 
     angle = angleTo(self, pos);
     if ((self->m_dwFlags & 0x200) && func_0026961C(self, pos, &out)) {
-        if (target != NULL && D_800F1CE0 == target) {
+        if (target != NULL && D_800F1CE0.m_pInstance == target) {
             return angle;
         }
         probe.y = self->header.m_vPos.y;

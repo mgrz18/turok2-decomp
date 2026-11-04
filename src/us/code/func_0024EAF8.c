@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/controller.h"
+#include "structs/collision.h"
 
 /* The creature to mount (an AI actor). */
 typedef struct {
@@ -21,11 +22,7 @@ typedef struct {
     /* 0x50 */ f32 yaw;
 } Body;
 
-typedef struct {
-    /* 0x00 */ Mount *current; /* what the player is aiming at */
-} CollisionResult;
-
-extern CollisionResult D_800F1CE0;
+extern CCollisionResults D_800F1CE0;  /* m_pInstance: what the player is aiming at */
 extern CVector3 D_800ADCBC;             /* rider seat */
 
 f32 func_00246310(Body *body, CVector3 point);   /* angle to a point */
@@ -51,8 +48,8 @@ s32 func_0024EAF8(CPlayer *p, Body *body) {
     Mount *mount;
 
     if (p->m_pOnEnemy == NULL && !(p->m_ModeBeforeFlags & 0x8000)) {
-        if (D_800F1CE0.current != NULL && D_800F1CE0.current->kind == 1) {
-            mount = D_800F1CE0.current;
+        if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
+            mount = (Mount *)D_800F1CE0.m_pInstance;
             if (mount->type == 0x136 && ABS(func_00246310(body, mount->pos)) < 0.785398245f) {
                 p->m_pOnEnemy = mount;
                 p->m_OnEnemyObjectType = 0x136;
