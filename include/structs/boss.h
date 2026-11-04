@@ -118,7 +118,8 @@ typedef struct BlindOneState {
 extern BlindOneState D_80130200;
 
 /* A step of a boss script: what to do (type), its argument, and the odds
- * (chance, out of 100) that the runner takes it; type 4 ends the script.
+ * (chance, out of 100) that the runner takes it; a type marks the end
+ * (4: stop, 5: wrap around, func_00406E0C).
  * Script A (LevelScriptState.script) runs these. */
 typedef struct BossStep {
     /* 0x00 */ u8 type;
@@ -245,7 +246,8 @@ typedef struct LevelScriptState {
 /* A few files read only the stage, as a plain word: the ROM reloads its
  * address before every read there, which the struct does not give (gcc
  * keeps &D_8012F608 in a register). They define BOSS_STAGE_AS_WORD and
- * declare it as an s32 themselves (func_00404C44, func_0043DC44). */
+ * declare it as an s32 themselves (func_00404C44, func_0043DC44,
+ * func_00406000, func_0043F000). */
 #ifndef BOSS_STAGE_AS_WORD
 extern LevelScriptState D_8012F608;
 #endif
@@ -281,5 +283,6 @@ typedef struct BossMode {
 
 extern BossState D_8012F9D8;
 extern BossMode D_8012F9DC;
+extern BossScript3 D_8012FA1C;  /* LevelScriptState.script3 */
 
 #endif

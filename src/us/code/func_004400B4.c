@@ -5,15 +5,15 @@ extern s32 D_00431344;
 extern s32 D_004313EC;
 extern s32 D_00431478;
 extern s32 D_004314B0;
-/* A second attack script of the boss module (0x8012FA0C on); the ROM addresses it
+/* LevelScriptState.script2 (structs/boss.h, 0x8012FA08 on); the ROM addresses it
  * through D_8012FA10, one word in, so the script pointer is at index -1. */
 typedef struct {
     /* 0x00 */ s32 scriptPrev;
     /* 0x04 */ s32 scriptIndex;
     /* 0x08 */ s8 restart;
-} BossScript;
+} LevelScriptFA10;
 
-extern BossScript D_8012FA10;
+extern LevelScriptFA10 D_8012FA10;
 
 #define SCRIPT(state) (((s32 **) &(state))[-1])
 
