@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
 /* Same family as func_002298C4 (homing missile): here a projectile that flies
  * back to a point beside its owner's player and is caught there. */
@@ -24,20 +25,8 @@ extern void func_00211114(CQuaternion *q, Mtx4f m);               /* to matrix *
 extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);  /* transform */
 extern void func_00229618(void *obj, f32 scale);
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4D8];
-    /* 0x4D8 */ f32 f4D8;
-    /* 0x4DC */ u8 pad4DC[0x996 - 0x4DC];
-    /* 0x996 */ s16 weapon;
-} Player;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ Player *player;
-} Owner;
-
-extern void func_00253F90(Player *player, CVector3 *pos);      /* player-relative point to world */
-extern f32 func_002671B4(Owner *owner);                     /* height */
+extern void func_00253F90(CPlayer *player, CVector3 *pos);      /* player-relative point to world */
+extern f32 func_002671B4(CGameObjectInstance *owner);                     /* height */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
@@ -64,7 +53,7 @@ typedef struct {
     /* 0x024 */ u8 pad24[0xF8 - 0x24];
     /* 0x0F8 */ ParentDef *parent;
     /* 0x0FC */ u8 padFC[0x10C - 0xFC];
-    /* 0x10C */ Owner *owner;
+    /* 0x10C */ CGameObjectInstance *owner;
     /* 0x110 */ u8 pad110[0x11C - 0x110];
     /* 0x11C */ f32 speed;
     /* 0x120 */ u8 pad120[0x128 - 0x120];
@@ -118,7 +107,7 @@ void func_00229D10(Missile *obj) {
     CQuaternion want;
     CQuaternion rot;
     Mtx4f mtx;
-    Player *player;
+    CPlayer *player;
     SoundHandle *loop;
     f32 speed;
     f32 dist;
@@ -129,7 +118,7 @@ void func_00229D10(Missile *obj) {
     if (obj->speed > D_800ACE68) {
         func_0020E810(&cur, &obj->dir);
         speed = func_00298470(obj->vel.x * obj->vel.x + obj->vel.y * obj->vel.y + obj->vel.z * obj->vel.z);
-        player = obj->owner->player;
+        player = (CPlayer *) obj->owner->m_AI.m_pParent;
         home.x = -26.623999f;
         home.y = -20.48f;
         home.z = -143.36f;
@@ -140,8 +129,8 @@ void func_00229D10(Missile *obj) {
             if (dist < D_800ACE6C * (1.0f / 3) || obj->speed >= 65.0f) {
                 obj->pos = home;
                 obj->caught = 1;
-                if (player->weapon == 0x15) {
-                    player->f4D8 = 0.73303837f;
+                if (player->m_Data.m_CurrentWeapon == 0x15) {
+                    player->m_WeaponActor.m_AI.m_Weapon.m_BarrelSpeed = 0.73303837f;
                 }
                 return;
             }

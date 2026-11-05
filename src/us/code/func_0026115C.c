@@ -5,25 +5,20 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x40];
 } Steer;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ f32 y;
-} Self;
+void func_00246108(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
+void func_0024599C(CGameObjectInstance *self, CAI *ai, Steer *out);
+void func_00260D60(CGameObjectInstance *self, CAI *ai, CAITargets *t, Steer *steer, f32 speed, f32 arg5);
+s32 func_0025D030(CGameObjectInstance *self, CAI *ai, CAITargets *t);
+void func_00243414(CGameObjectInstance *self, CAI *ai, s32 mode);
 
-void func_00246108(Self *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
-void func_0024599C(Self *self, CAI *ai, Steer *out);
-void func_00260D60(Self *self, CAI *ai, CAITargets *t, Steer *steer, f32 speed, f32 arg5);
-s32 func_0025D030(Self *self, CAI *ai, CAITargets *t);
-void func_00243414(Self *self, CAI *ai, s32 mode);
-
-void func_0026115C(Self *self, CAI *ai) {
+void func_0026115C(CGameObjectInstance *self, CAI *ai) {
     CAITargets t;
     Steer steer;
     s32 next;
 
     func_00246108(self, ai, &t, 1, 1);
     func_0024599C(self, ai, &steer);
-    t.m_Path.m_vDelta.y = t.m_Sight.m_vDelta.y = ai->m_vLeashPos.y - self->y;
+    t.m_Path.m_vDelta.y = t.m_Sight.m_vDelta.y = ai->m_vLeashPos.y - self->header.m_vPos.y;
     if (ai->m_Action == 1) {
         func_00260D60(self, ai, &t, &steer, 2.0f, 2.0f);
     } else {

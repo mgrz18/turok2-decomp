@@ -120,6 +120,10 @@ typedef struct {
     /* 0x47E */ u8 _pad1[2];
     /* 0x480 */ s32 m_AdonAmmoFlagHelped[6];
     /* 0x498 */ s32 m_AdonHealthFlagHelped[6];
+    /* The level 1..5 totem fights won (levels 7100..7500: func_00407F20
+     * sets the one of the level, func_00407CB0 checks all five for the
+     * ending); the boss flags after them are what func_004085A0 picks the
+     * level 4 / 5 totem music by (Blind One, Queen). */
     /* 0x4B0 */ s32 m_bLevel1TotemFlags;
     /* 0x4B4 */ s32 m_bLevel2TotemFlags;
     /* 0x4B8 */ s32 m_bLevel3TotemFlags;

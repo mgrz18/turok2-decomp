@@ -6,6 +6,7 @@
 #include "structs/game_object.h"
 #include "structs/cinema.h"
 #include "structs/collision.h"
+#include "structs/camera.h"
 
 /* The second VM module's copy of src/us/code/func_0040F240.c, byte for byte,
  * at the same link address (named 0x448240-0x44C228, linked 0x40F240-0x413228):
@@ -805,14 +806,6 @@ typedef struct {
     f32 m[4][4];
 } Mtx4f;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x28];
-    /* 0x28 */ f32 yaw;
-    /* 0x2C */ f32 pitch;
-    /* 0x30 */ u8 pad30[0x38 - 0x30];
-    /* 0x38 */ CVector3 eye;
-} Camera;
-
 extern u8 D_800F1B40[];   /* collision info */
 extern CCollisionResults D_800F1CE0;  /* the last collision test */
 
@@ -846,7 +839,7 @@ static __inline__ void Cinema_Anchor(Actor *player) {
 }
 
 /* Drives the camera along the cinema paths. */
-void func_00449CE8(Camera *cam) {
+void func_00449CE8(CCamera *cam) {
     CVector3 eye;
     CVector3 target;
     CVector3 dir;
@@ -867,7 +860,7 @@ void func_00449CE8(Camera *cam) {
     target = func_00449724(D_800C1BB0->time);
     func_0020EF60(&eye, &eye, 10.24f);
     func_0020EF60(&target, &target, 10.24f);
-    cam->yaw = 0.0f;
+    cam->m_ViewParams.m_RotY = 0.0f;
     func_0020EF2C(&dir, &target, &eye);
     if (((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) || (D_800C1BB0->spec.flags & 2)) {
         player = D_80119890;
@@ -894,9 +887,9 @@ void func_00449CE8(Camera *cam) {
         }
     }
     yaw = func_0020EAA0(&dir);
-    cam->pitch = -func_0020F5C0(&dir);
-    cam->yaw += yaw;
-    cam->eye = eye;
+    cam->m_ViewParams.m_vRotOffset.x = -func_0020F5C0(&dir);
+    cam->m_ViewParams.m_RotY += yaw;
+    cam->m_ViewParams.m_vPos = eye;
 }
 
 extern void func_0020B5B8(void);

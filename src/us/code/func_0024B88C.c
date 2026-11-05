@@ -1,26 +1,14 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/TEAM/80217388_4.CPP, func_80217B3C_de, with Turok 2's layouts. */
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed int s32;
+#include "common.h"
+#include "structs/player.h"
 
 #define ABS(a) (((a) < 0.0f) ? -(a) : (a))
-
-typedef struct {
-    /* 0x00 */ char pad0[0xC6];
-    /* 0xC6 */ s8 stickX;
-    /* 0xC7 */ s8 stickY;
-} Pad;
-
-typedef struct {
-    /* 0x000 */ char pad0[0xA50];
-    /* 0xA50 */ Pad *pad;
-} Player;
 
 extern u8 D_8011AAF1;
 
 /* Returns the 8-way stick direction (0 = up, clockwise) or -1 inside the dead zone. */
-s32 func_0024B88C(s32 unused, Player *player) {
-    Pad *pad = player->pad;
+s32 func_0024B88C(s32 unused, CPlayer *player) {
+    ControllerProfile *pad = player->m_ContState.m_pContState;
     s8 x = pad->stickX;
     s8 y = pad->stickY;
 

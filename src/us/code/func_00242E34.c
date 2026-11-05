@@ -3,11 +3,8 @@
 #include "structs/region.h"
 #include "structs/intelligence.h"
 #include "structs/collision.h"
-
-typedef struct Owner {
-    char pad0[0x51C];
-    char *player;      /* 0x51C */
-} Owner;
+#include "structs/player.h"
+#include "structs/camera.h"
 
 
 typedef struct Dest {
@@ -57,7 +54,7 @@ void func_00242E34(CGameObjectInstance *actor, Dest *dst) {
         } else {
             if (actor->m_dwFlags & 0x300000) {
                 y = actor->header.m_vPos.y;
-                top = *(f32 *)(((Owner *)actor->m_AI.m_pParent)->player + 0x250);
+                top = ((CPlayer *) actor->m_AI.m_pParent)->m_pCamera->m_vTCorners[0].y;
             } else {
                 top = func_002671B4(actor) + actor->header.m_vPos.y;
                 y = actor->header.m_vPos.y;

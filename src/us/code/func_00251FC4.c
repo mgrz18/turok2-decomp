@@ -2,19 +2,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/controller.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ void *script;
-} Cinema;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x53C];
-    /* 0x53C */ Cinema *cinema;
-    /* 0x540 */ u8 pad540[0x54C - 0x540];
-    /* 0x54C */ s32 busy;
-} Camera;
-
+#include "structs/camera.h"
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -87,7 +75,7 @@ void func_00243414(void *actor, void *ai, s32 mode);
 void func_00248BA8(CPlayer *p, s32, s32, s32);
 void CList__Remove(void *list, void *node);
 void CList__AddHead(void *list, void *node);
-void func_0042FFB0(void *pool, Camera *cam);
+void func_0042FFB0(void *pool, CCamera *cam);
 void func_0025492C(PlayerList *list);
 void func_002525BC(PlayerList *list);
 
@@ -98,21 +86,23 @@ static __inline__ void reset_strokes(CBarrel *s) {
     s->m_Open = 0.0f;
 }
 
-static __inline__ s32 in_cinema(CPlayer *p) {
+/* func_00253FFC: paused, or a menu other than the death screen open on the
+ * player's camera. */
+static __inline__ s32 in_menu(CPlayer *p) {
     s32 result;
 
     if (D_8011ACA4) {
         return 1;
     }
     result = 0;
-    if (p->m_pCamera != NULL && ((Camera *)p->m_pCamera)->cinema != NULL) {
-        result = ((Camera *)p->m_pCamera)->cinema->script != &D_00439640;
+    if (p->m_pCamera != NULL && p->m_pCamera->m_Menus.head != NULL) {
+        result = p->m_pCamera->m_Menus.head->desc != (MenuDesc *) &D_00439640;
     }
     return result;
 }
 
-/* Update the players: move each one in the game (unless a cinema holds the
- * view), handle pause (the death screen), the hub key screen and the level-end
+/* Update the players: move each one in the game (unless paused or in a menu:
+ * func_00253FFC), handle pause (the death screen), the hub key screen and the level-end
  * cinema; let idle players join while the match allows it and send players
  * who left back to the idle list; then run the match clock and tag. */
 void func_00251FC4(PlayerList *list) {
@@ -127,7 +117,7 @@ void func_00251FC4(PlayerList *list) {
     }
     frameTime = D_800B6D28;
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
-        if (!in_cinema(p)) {
+        if (!in_menu(p)) {
             func_0024D344(p);
         }
         func_0024CF58(p, p);
@@ -139,7 +129,7 @@ void func_00251FC4(PlayerList *list) {
             if (func_00284174()) {
                 func_002840EC();
             } else if (!func_00416AF8(&D_80119E2C) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
-                       && ((Camera *)p->m_pCamera)->busy == 0 && (D_80119E2C.match.over == 0 || D_80119E2C.timed == 0)) {
+                       && p->m_pCamera->m_Menus.count == 0 && (D_80119E2C.match.over == 0 || D_80119E2C.timed == 0)) {
                 D_80119E2C.paused = 1;
                 func_00275A50();
                 func_00275904(300);
@@ -158,7 +148,7 @@ void func_00251FC4(PlayerList *list) {
             p->m_bLevelNotCompleteExit = 0;
         }
         if (!func_00416AF8(&D_80119E2C) && Cinema_PathPlaying() && func_00284408() == 400 && !list->cinema) {
-            if (p->m_pCamera != NULL && ((Camera *)p->m_pCamera)->busy == 0) {
+            if (p->m_pCamera != NULL && p->m_pCamera->m_Menus.count == 0) {
                 list->cinema = 1;
                 list->cinemaStarted = 0;
             }
@@ -166,7 +156,7 @@ void func_00251FC4(PlayerList *list) {
         if (list->cinema) {
             if (func_00284240() && !list->cinemaStarted) {
                 list->cinemaStarted = 1;
-                func_00416644(&((Camera *)p->m_pCamera)->cinema, &D_0043BED0, p, (p->m_ContState.m_pContState), 0);
+                func_00416644(p->m_pCamera->m_MenuPool, &D_0043BED0, p, (p->m_ContState.m_pContState), 0);
             }
         }
     }
@@ -192,7 +182,7 @@ void func_00251FC4(PlayerList *list) {
         next = p->m_pNext;
         if (p != NULL && !p->m_bActive && list->active.count >= 2) {
             if (p->m_pCamera != NULL) {
-                func_0042FFB0(&D_801198B0, ((Camera *)p->m_pCamera));
+                func_0042FFB0(&D_801198B0, p->m_pCamera);
                 p->m_pCamera = NULL;
             }
             CList__Remove(&list->active, p);

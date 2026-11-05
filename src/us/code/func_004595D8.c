@@ -4,6 +4,7 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "structs/player.h"
+#include "structs/camera.h"
 
 /* Level chosen: load it, or set up the new player from the saved settings, or
  * open the next menu page. */
@@ -66,7 +67,7 @@ s32 func_004595D8(void *arg0, Menu *event) {
             options->m_Name[i] = D_80130974[i];
         }
         func_0042E350(player, D_80130950);
-        func_00416894((u8 *)player->m_pCamera + 0x53C, event, D_00438668);
+        func_00416894(player->m_pCamera->m_MenuPool, event, D_00438668);
         return 1;
     }
     if (func_00425F84(mode, D_801309C4) == 0) {

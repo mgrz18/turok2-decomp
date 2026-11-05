@@ -1,12 +1,9 @@
 #include "common.h"
+#include "structs/player.h"
+#include "structs/camera.h"
 
 /* Menu item handler: depending on the menu state, checks the item (func_0041DD90) and prints its text, or (states 1
- * and 2) resets the menu flags and prints the item text at its owner's text position. */
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ u8 *text;
-} Owner;
+ * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x4];
@@ -15,7 +12,7 @@ typedef struct {
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ Owner *owner;
+    /* 0x1C */ CPlayer *owner;
     /* 0x20 */ ItemData *data;
     /* 0x24 */ void *string;
 } Item;
@@ -31,7 +28,7 @@ extern u8 D_0043BED0[];
 extern u8 D_0043BEF4[];
 extern s32 func_0041DD90(Item *item, s32 id, s32 a2);
 extern void *func_0041DC5C(Item *item);
-extern void func_00416644(void *dst, void *string, Owner *owner, ItemData *data, s32 a4);
+extern void func_00416644(void *dst, void *string, CPlayer *owner, ItemData *data, s32 a4);
 
 static __inline__ s32 ItemId(Item *item) {
     s32 id;
@@ -87,7 +84,7 @@ s32 func_00420F34(s32 arg0, Item *item) {
             if (item->string == D_0043BEF4 || item->string == D_0043BED0) {
                 D_80130940 = 0;
             }
-            func_00416644(item->owner != NULL ? item->owner->text + 0x53C : D_80119E2C, string, item->owner,
+            func_00416644(item->owner != NULL ? item->owner->m_pCamera->m_MenuPool : D_80119E2C, string, item->owner,
                           item->data, 0);
             break;
     }

@@ -3,7 +3,7 @@
  * remapping, then turn/look/strafe/move axes per control mode (Rage Wars has the
  * same code: func_802631B0_de in AbuN64/ragewars-decomp src/FX/802631D0.CPP).
  *
- * The ROM loads opt->controlMode once more than the remap test needs
+ * The ROM loads opt->m_ControlType once more than the remap test needs
  * (`lb $3, 0x2B($17)`, dead, before the live one). A switch on the mode whose
  * result the remap test overwrites leaves that load: its branches only go in
  * the delay-slot pass, after scheduling. It has to be a switch (beqz/beq on
@@ -14,6 +14,7 @@
  * after the calls reads it; unpinned, opt lands in a temporary and every
  * access to it differs. */
 #include "common.h"
+#include "structs/player.h"
 
 typedef struct {
     /* 0x00 */ u32 mask;
@@ -27,24 +28,6 @@ typedef struct {
     /* 0xC6 */ s8 stickX;
     /* 0xC7 */ s8 stickY;
 } Controller;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x2A];
-    /* 0x2A */ u8 sensitivity;
-    /* 0x2B */ s8 controlMode;
-    /* 0x2C */ u8 remap;
-    /* 0x2D */ u8 stickLook;
-} PlayerOptions;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x518];
-    /* 0x518 */ PlayerOptions *options;
-    /* 0x51C */ u8 pad51C[0xB8C - 0x51C];
-    /* 0xB8C */ s32 unkB8C;
-    /* 0xB90 */ f32 unkB90;
-    /* 0xB94 */ u8 padB94[0x1284 - 0xB94];
-    /* 0x1284 */ s32 unk1284;
-} Player;
 
 typedef struct {
     /* 0x00 */ f32 turn;
@@ -66,8 +49,8 @@ f32 func_0021170C(f32 value, f32 rate);
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
 /* The remap table applies to control modes 0 and 1 with remapping on. */
-void func_00246BC0(PlayerInput *in, Player *pl) {
-    register PlayerOptions *opt asm("$17");
+void func_00246BC0(PlayerInput *in, CPlayer *pl) {
+    register CPlayerOptions *opt asm("$17");
     Controller *ctrl;
     ButtonMap *map;
     f32 damp;
@@ -78,13 +61,13 @@ void func_00246BC0(PlayerInput *in, Player *pl) {
     u32 mask;
     u32 bits;
 
-    opt = pl->options;
-    damp = 1.0f - pl->unkB90 * 0.99f;
-    rate = opt->sensitivity * (1.0f / 128) - 1.0f;
+    opt = pl->m_pOptions;
+    damp = 1.0f - pl->m_ZoomBlend * 0.99f;
+    rate = opt->m_SettingY * (1.0f / 128) - 1.0f;
     rate = rate * 0.75f + 1.0f;
     rate = rate * (D_800B6D28 * (damp * 0.1f));
     ctrl = in->ctrl;
-    switch (opt->controlMode) {
+    switch (opt->m_ControlType) {
     case 0:
         break;
     case 1:
@@ -92,9 +75,9 @@ void func_00246BC0(PlayerInput *in, Player *pl) {
         break;
     }
     map = NULL;
-    if (opt->controlMode < 2) {
-        if (opt->controlMode >= 0) {
-            if (opt->remap == 1) {
+    if (opt->m_ControlType < 2) {
+        if (opt->m_ControlType >= 0) {
+            if (opt->m_ControlSide == 1) {
                 map = D_800ADA70;
             }
         }
@@ -123,7 +106,7 @@ void func_00246BC0(PlayerInput *in, Player *pl) {
         in->buttons[4] = ctrl->buttons[4];
     }
 
-    switch (opt->controlMode) {
+    switch (opt->m_ControlType) {
     case 0:
         b = in->buttons[0];
         if (b & 1) {
@@ -142,16 +125,16 @@ void func_00246BC0(PlayerInput *in, Player *pl) {
         } else {
             in->move = 0.0f;
         }
-        if (opt->stickLook) {
+        if (opt->m_bLookSpring) {
             in->look = ctrl->stickY * 0.0125f;
             break;
         }
-        if (pl->unk1284 != 0) {
+        if (pl->m_bHeadMovementDisabled != 0) {
             break;
         }
         if (ctrl->stickY != 0) {
             in->look += rate * 0.0125f * ctrl->stickY;
-        } else if (in->move != 0.0f && pl->unkB8C == 0) {
+        } else if (in->move != 0.0f && pl->m_SniperMode == 0) {
             d = in->move * (damp * 0.1f);
             if (d < 0.0f) {
                 d = -d;
@@ -174,7 +157,7 @@ void func_00246BC0(PlayerInput *in, Player *pl) {
         } else {
             in->strafe = 0.0f;
         }
-        if (pl->unk1284 == 0) {
+        if (pl->m_bHeadMovementDisabled == 0) {
             in->move = ctrl->stickY * 0.0125f;
         } else {
             in->move = 0.0f;
@@ -195,7 +178,7 @@ void func_00246BC0(PlayerInput *in, Player *pl) {
                 x = -1.0f;
             }
             in->look = x;
-        } else if (opt->stickLook && in->move != 0.0f && pl->unkB8C == 0) {
+        } else if (opt->m_bLookSpring && in->move != 0.0f && pl->m_SniperMode == 0) {
             d = in->move * (damp * 0.1f);
             if (d < 0.0f) {
                 d = -d;

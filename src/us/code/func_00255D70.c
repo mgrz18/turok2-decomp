@@ -1,12 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x53C];
-    /* 0x53C */ u8 cinema[1];
-} Camera;
-
+#include "structs/camera.h"
 
 extern char D_0043ABF0;
 extern char D_0043AC14;
@@ -43,6 +38,6 @@ void func_00255D70(CPlayer *player) {
             screen = &D_0043AC5C;
             break;
         }
-        func_00416644(((Camera *)player->m_pCamera)->cinema, screen, player, player->m_ContState.m_pContState, 0);
+        func_00416644(player->m_pCamera->m_MenuPool, screen, player, player->m_ContState.m_pContState, 0);
     }
 }

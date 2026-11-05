@@ -365,6 +365,57 @@ were converted by u5 (CParticle) and u6 (CCollisionResults), func_00242604
 by u2 and u6, func_00223A94 by u3 and u6, func_0027BB80 by u3 and u7, and
 controller.h got both externs.
 
+## The fourth pass: Player, Owner, Camera, Self, Target (z4)
+
+The local `Player` / `Owner` / `Camera` / `Self` / `Target` views are gone
+from about 60 files; what they were:
+
+- **Player**: CPlayer (structs/player.h) almost everywhere, also in the files
+  the player.h section below lists as left (func_00229D10, func_00248340,
+  func_00250430, func_0024C47C's HUD and camera parts, func_0042DC18 /
+  func_00466B38, func_0042DE74 / func_00466D94, func_004085A0,
+  func_00407CB0, func_00407F20, func_00238914, func_0024B88C,
+  func_00256738, func_00455D10, func_00451320, func_00451368,
+  func_00255B20, func_002584DC, func_002532B4...): the 0xA00-0xC10 offsets
+  agree with the header now. func_00248340 clears its float fields with
+  integer stores, through a CLEAR_WORD macro. func_0021AE6C's "Player" is
+  the player's CCamera, func_0040BFF0's a CGameObjectInstance.
+- **0x9D0**: player.h is right. m_Data.m_bLevel1..5TotemFlags are the five
+  totem fights won (func_00407F20 sets the one of the level 7100..7500,
+  func_00407CB0 reads all five for the ending and sets
+  m_bPrimagenBossComplete); func_004085A0 picks the level 4 / 5 totem music
+  by m_bBlindBossComplete / m_bQueenBossComplete. "bossKilled" was wrong.
+- **Owner**: CPlayer (0x51C its camera), CCamera (0x54C: the menu pool's
+  count), CGameObjectInstance (0x1A8 m_AI.m_pParent, 0x24C the weapon
+  actor's m_AI.m_Weapon.m_BarrelAngle, m_Lights), CAI, a Menu
+  (func_00455CD0). camera.h: CCamera.m_MenuPool is a union with menu.h's
+  MenuPool, `m_Menus` (camera.h includes menu.h): the "Cinema" of
+  func_00251FC4 / func_00253FFC / func_00255D70 was the menu pool (head =
+  the open Menu, count = how many).
+- **Camera**: CCamera everywhere (func_0023118C's particle view too: m_VisBits,
+  m_ViewVolume, m_ViewMin/Max); func_0042FBA4 / func_00468AC4 are the
+  CCameraPool init (CShake, CCameraText, CList).
+- **Self**: CGameObjectInstance (0x1C is m_vVelocity.y), its definition
+  CEnemyIntelligence / CPlatformIntelligence.
+- **Target**: CGameObjectInstance, CAI (func_00245D50), CRegionInfo
+  (func_0023C188).
+
+Still local, and why:
+
+- func_0021ECA0: the slot array over m_Lights; the header's u8[2][0x18]
+  adds the index the other way round (one addu).
+- func_0024C47C's func_0024D344 part (Player): the player used as itself and
+  as its actor, and several words typed against the header (0x10 as a
+  Model, the controller's 0x08 as a position, 0x3F4 as a voice).
+- func_0022C488 (particle Target, calls the instance's m_pfHit),
+  func_0022D2FC (the merged particle file, Camera / Owner), func_002298C4
+  (its target's 0x214 is not a CGameObjectInstance field it fits),
+  func_002460FC, func_00224DF4, func_00273EB8 (owners of other types),
+  func_00265D14 (an unused Rage Wars `struct Player`), func_00271DB4 (its
+  "Player" is not a CPlayer: slots at 0x1E64).
+- func_0025FEB0 uses CPlayer's 0xBB8 (LibTEngine's m_vOnEnemyScale) as a
+  velocity: the name may be wrong.
+
 ## include/structs/player.h (fixed and hoisted)
 
 The header was 4 and then 8 bytes high between 0xA08 and the HUD. Fixed
@@ -442,9 +493,7 @@ views were replaced in about 230 files. Still local, and why:
   bytes (`m_VarBuffer[0..6]`): it is the m_Platform view (ai_vars.h);
   func_002662BC reaches its fields by raw offsets (7 casts);
   func_00409340 (the Mother boss setup) keeps a local Obj.
-- **player.h 0x9D0**: func_00407F20 writes `bossKilled[5]` at 0x9D0, which
-  player.h names m_Data.m_bLevel1TotemFlags..m_bLevel5TotemFlags: one of
-  the two names is wrong (see what reads them back).
+- **player.h 0x9D0**: resolved (the totem flags; see the fourth pass).
 - **CPlayer views of the player list head** (D_80119890): func_0022A4C8
   (ProjNode, also the projectile's target), func_0022AFB4, func_00230AB0,
   func_0040F240 / func_00448240 (Actor).
