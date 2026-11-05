@@ -616,6 +616,12 @@ in the file's first comment:
   starting from a variable, not the constant 0, keeps its entry test as
   `slt` (Rage Wars' decomp has the same function with a lone `first` local
   that it marks FAKEMATCH, so that was no precedent).
+- func_00422F14 / func_0045BE34: the port goes through a two-word
+  selection struct (`PadSel sel; sel.v = controller->port;
+  func_00285A68(sel.v);`, the struct func_0041EA84 uses), not an inline
+  taking its parameter's address: GCC 2.8 keeps the 8-byte struct on the
+  stack, which gives the ROM's store in the jal's delay slot and its
+  0x20-byte frame.
 
 ### The G pass (the last drafts)
 
