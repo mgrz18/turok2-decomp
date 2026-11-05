@@ -3,27 +3,9 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/camera.h"
-
+#include "structs/emitter.h"
 
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
-
-/* A running emitter (see func_00282E4C), as the sort reads it. */
-typedef struct Emitter {
-    /* 0x000 */ struct Emitter *last;
-    /* 0x004 */ struct Emitter *next;
-    /* 0x008 */ u8 pad8[0x208];
-    /* 0x210 */ f32 depth;
-} Emitter;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x8B4];
-    /* 0x8B4 */ CList activeList;
-} EmitterOwner;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x118];
-    /* 0x118 */ f32 depth;
-} EmitterView;
 
 extern Gfx *D_800D8E24;             /* display list head */
 extern u8 D_8011B0C8[];             /* the matrix loaded for them */
@@ -33,20 +15,20 @@ void func_00226F90(void *items, s32 count, s32 size, void *compare, void *swap);
 s32 func_00283784(void *a, void *b);
 s32 func_002837B0(void *a, void *b);
 void func_00283770(void *a, void *b);
-void func_00282340(Emitter *e, EmitterView *view);
+void func_00282340(CEmitter *e, CCamera *view);
 
 /* Draws the running emitters: sets up the display list, splits them into
  * those deeper than the view and the others (four of each at most), sorts
  * each group and draws the deeper group first. */
-void func_00283238(EmitterOwner *owner, EmitterView *view) {
-    Emitter *near[4];
-    Emitter *far[4];
-    Emitter *e;
+void func_00283238(CEmitterPool *owner, CCamera *view) {
+    CEmitter *near[4];
+    CEmitter *far[4];
+    CEmitter *e;
     s32 nearCount;
     s32 farCount;
     s32 i;
 
-    if (owner->activeList.m_nCount == 0) {
+    if (owner->m_ActiveList.m_nCount == 0) {
         return;
     }
     GFX_CMD(0xE7000000, 0)
@@ -64,8 +46,8 @@ void func_00283238(EmitterOwner *owner, EmitterView *view) {
     GFX_CMD(0xE3001201, 0x2000)
     nearCount = 0;
     farCount = 0;
-    for (e = owner->activeList.m_pHead; e != NULL; e = e->next) {
-        if (e->depth > view->depth) {
+    for (e = owner->m_ActiveList.m_pHead; e != NULL; e = e->m_pNext) {
+        if (e->m_Height > view->m_vPos.y) {
             near[nearCount++] = e;
         } else {
             far[farCount++] = e;
