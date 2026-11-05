@@ -1,14 +1,10 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/player.h"
 
 /* The window's item records are 0x28 bytes apart, item i's flags word at
  * 0x120 + i * 0x28 of the block. */
 #define ITEM_FLAGS(i) (0x120 + (i) * 0x28)
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0xBF8];
-    /* 0xBF8 */ s32 unkBF8;
-} Player;
 
 #include "rw/abu_protos.h"
 
@@ -26,7 +22,7 @@ void func_00455D10(Menu *arg0) {
 
     temp_v1 = arg0->player;
     if (temp_v1 != NULL) {
-        ((Player *) temp_v1)->unkBF8 = 1;
+        ((CPlayer *) temp_v1)->m_bEnteringDeathmatch = 1;
     }
     temp_v1_2 = arg0->items;
     *(s32 *) ((s8 *) temp_v1_2 + ITEM_FLAGS(4)) = (s32) (*(s32 *) ((s8 *) temp_v1_2 + ITEM_FLAGS(4)) | 0x01800000);
