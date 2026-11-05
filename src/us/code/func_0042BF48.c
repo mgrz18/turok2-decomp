@@ -35,7 +35,10 @@ extern void *func_00215944(ObjB *b);
 extern void func_0020BE08(void *handle);
 extern void func_002051F4(s32, void *);
 
-/* Streams in every grid cell of the level that is not loaded yet and spawns its objects. */
+/* Streams in every grid cell of the level that is not loaded yet and spawns its objects. The loops run over
+ * a rectangle of cells (firstRow..lastRow, firstCol..lastCol), here the whole grid: the column loop starting
+ * from the variable firstCol, not the constant 0, is what keeps its entry test as the ROM's slt (Rage Wars'
+ * decomp matches the same function with a `first` local it marks FAKEMATCH). */
 void func_0042BF48(CWorld *level) {
     s32 size;
     s32 width;
@@ -46,7 +49,8 @@ void func_0042BF48(CWorld *level) {
     StreamCell *cells;
     StreamCell *cell;
     s32 col;
-    s32 first;
+    s32 firstCol;
+    s32 firstRow;
     s32 key;
     void **block;
     void *node;
@@ -62,15 +66,14 @@ void func_0042BF48(CWorld *level) {
     void *handle;
 
     width = ((Counted *)func_002017D4(level->m_pCollision, 0))->count;
-    row = 0;
     rows = ((Counted *)func_002017D4(level->m_pCollision, 2))->count;
     cells = (StreamCell *)((Counted *)func_002017D4(level->m_pCollision, 4) + 1);
+    firstRow = 0;
     lastRow = rows - 1;
+    firstCol = 0;
     lastCol = width - 1;
-    /* FAKEMATCH (as in Rage Wars): a local holding the constant keeps the column loop's entry test as slt */
-    first = 0;
-    for (; row <= lastRow; row++) {
-        for (col = first; col <= lastCol; col++) {
+    for (row = firstRow; row <= lastRow; row++) {
+        for (col = firstCol; col <= lastCol; col++) {
             cell = &cells[col + row * width];
             if (cell->occupied != 0) {
                 continue;

@@ -607,6 +607,16 @@ doubled code, always-true tests), func_00409A64.c for func_00409D4C, and this pa
 func_00204778, func_0022D2FC, func_002429BC and func_00424008. They match
 byte for byte; the marker is for whoever looks for the original source.
 
+De-faked in the Z pass (z2), each in its own commit with the natural form
+in the file's first comment:
+
+- func_0042BF48: the stream loops run over a rectangle of cells,
+  `firstRow = 0; lastRow = rows - 1; firstCol = 0; lastCol = width - 1;`
+  and `for (row = firstRow ...) for (col = firstCol ...)`. The column loop
+  starting from a variable, not the constant 0, keeps its entry test as
+  `slt` (Rage Wars' decomp has the same function with a lone `first` local
+  that it marks FAKEMATCH, so that was no precedent).
+
 ### The G pass (the last drafts)
 
 Two of the three drafts left in `nonmatching/` matched:
