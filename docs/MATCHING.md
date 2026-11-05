@@ -580,8 +580,9 @@ func_0024ED54, func_00255D70, func_00424008):
   a register gives the ROM's and/or inserts (func_00424008).
 - **CSE's canonical register is the one used last.** Of two pseudos with the
   same value, cse makes canonical the one whose last use comes later:
-  func_00424008's `h` must die before `oldH`, or the centre is computed
-  from the load instead of `oldH`'s copy.
+  func_00424008's centre is computed from the load instead of `oldH`'s copy
+  unless that copy goes through a variable set twice (see the Z pass
+  below), which cse does not propagate.
 - func_00248720's pool opens at 0x800A6AB4, 4 past a boundary, after a
   1.5707964f only the VM's func_0042DE74 reads; it holds floats only, so its
   own file links and no merge was needed. func_0022D2FC took its place at the
@@ -606,7 +607,8 @@ func_00204778, func_0022D2FC, func_002429BC and func_00424008. They match
 byte for byte; the marker is for whoever looks for the original source.
 
 De-faked in the Z pass (z2), each in its own commit with the natural form
-in the file's first comment:
+in the file's first comment (func_0040C4F4 and its three inline copies,
+func_0041EA84 / func_004579A4 and func_0022D2FC keep their marker):
 
 - func_0042BF48: the stream loops run over a rectangle of cells,
   `firstRow = 0; lastRow = rows - 1; firstCol = 0; lastCol = width - 1;`
