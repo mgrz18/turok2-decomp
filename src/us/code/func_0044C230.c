@@ -13,13 +13,13 @@
  * "menu" (0x800C0C54) is one constant for func_0044EFB8, func_0044F644,
  * func_0044F760, func_0044F894 and func_004502F8.
  *
- * Each part was matched alone first and keeps its own types; names two
- * parts both define carry the part's address as a suffix. The second
- * module holds this file byte for byte at the same link address
+ * Each part was matched alone first; the types are the shared ones now
+ * (structs/menu.h, structs/menu_model.h, structs/camera.h), and the extern
+ * aliases the parts declared still carry the part's address as a suffix.
+ * The second module holds this file byte for byte at the same link address
  * (func_0044C230.c). */
 #include "common.h"
 #include "structs/game.h"
-#include "rw/abu_types.h"
 #include "structs/menu.h"
 #include "structs/menu_model.h"
 #include "structs/camera.h"
@@ -1236,13 +1236,6 @@ s32 func_0044EFB8(MenuPool *a, Menu *c) {
 /* ---------------- func_0044F0F0 ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00442158.c, func_00442158, with Turok 2's layouts. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s16 type;
-    /* 0x06 */ u8 pad6[0xE];
-    /* 0x14 */ u8 *text;
-} MenuItemTmpl_4160F0;
-
 extern u8 *func_00413230_4160F0(void) __asm__("func_0044C230");
 
 /* Length of the item's text up to the end or the first newline. */
@@ -1272,11 +1265,6 @@ void func_0044F168(Menu *arg0, s32 arg1, s32 arg2, s32 arg3) {
 
 /* ---------------- func_0044F188 ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00442224.c, func_00442224, with Turok 2's layouts. */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x17];
-    /* 0x17 */ u8 ch;
-} MenuItemTmpl_416188;
 
 extern void func_00413F74_416188(MenuItem *a, s32 b, s32 c, s32 d, u8 *text) __asm__("func_0044CF74");
 
@@ -1442,7 +1430,8 @@ s32 func_0044F48C(Menu *menu,s32 value,s32 step,s32 minimum,s32 maximum,s32 wrap
 /* ---------------- func_0044F558 ---------------- */
 s32 func_00285628_416558(s32) __asm__("func_00285628");
 s32 func_00285670_416558(s32) __asm__("func_00285670");
-s32 func_0044F558(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
+/* func_0044F48C with its own left/right reading (Menu controller). */
+s32 func_0044F558(Menu *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
 {
   s32 var_s0;
   s32 var_s1;
@@ -1458,7 +1447,7 @@ s32 func_0044F558(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
   var_s1 = arg4;
   var_s5 = arg5;
   var_s2 = arg3;
-  if (func_00285628_416558(*((s32 *) (0x20 + ((s8 *) arg0)))) != 0)
+  if (func_00285628_416558((s32) arg0->controller) != 0)
   {
     var_s0 -= var_s4;
     if (var_s0 < var_s2)
@@ -1478,7 +1467,7 @@ s32 func_0044F558(void *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5)
     }
   }
   var_v0 = var_s0;
- new_var = 0x20; if (func_00285670_416558(*((s32 *) (((s8 *) arg0) + new_var))) != 0) { var_s0 += var_s4;
+ new_var = 0x20; /* the controller, read at its offset to match */ if (func_00285670_416558(*((s32 *) (((s8 *) arg0) + new_var))) != 0) { var_s0 += var_s4;
     var_v0 = var_s0;
     if (var_s1 < var_s0)
     {
@@ -1725,13 +1714,6 @@ next:
 }
 
 /* ---------------- func_0044FBAC ---------------- */
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s16 type;
-    /* 0x06 */ u8 pad6[0xE];
-    /* 0x14 */ u8 *text;
-} MenuItemTmpl_416BAC;
-
 extern u8 *func_00413230_416BAC(void) __asm__("func_0044C230");
 extern f32 func_004163C0_416BAC(u8 *text, f32 sx, f32 sy) __asm__("func_0044F3C0");
 
@@ -1774,11 +1756,6 @@ void func_0044FC28(Menu *arg0) {
 }
 
 /* ---------------- func_0044FC54 ---------------- */
-typedef struct {
-    char pad0[0x1C8];
-    s32 unk_1C8; /* 0x1C8 */
-} Obj1C8;
-
 /* The window's flash, up 0..0x17 then down again. */
 s32 func_0044FC54(Menu *obj) {
     s32 v = obj->flash;
@@ -1836,11 +1813,6 @@ s32 func_0044FDA4(s16 *record) {
 }
 
 /* ---------------- func_0044FDC0 ---------------- */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x328];
-    /* 0x328 */ s32 unk328;
-} MenuExtra_416DC0;
-
 void func_0044FDC0(s16 *arg0, MenuModel *arg1) {
     if (*arg0 == 3) {
         arg1->loaded = 1;
