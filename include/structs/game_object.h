@@ -189,6 +189,18 @@ typedef struct CGameObjectInstance {
     /* 0x284 */ s32 _pad2;
 } CGameObjectInstance; /* size 0x288 */
 
+/* The first 0x34 bytes of an instance (and of a CParticle, which starts the
+ * same way): the header, the velocity, the water displacement and what it
+ * stands on. The collision probes save and restore them as one struct
+ * around a trial move (func_00233000, func_00245E48, func_00245FC8,
+ * func_00256B84, func_002698AC). */
+typedef struct CObjectHead {
+    /* 0x00 */ CInstanceHeader header;
+    /* 0x18 */ CVector3 m_vVelocity;
+    /* 0x24 */ CVector3 m_vWaterDisplacement;
+    /* 0x30 */ struct CGameObjectInstance *m_pInstanceBelow;
+} CObjectHead; /* size 0x34 */
+
 /* A dynamic object (an actor spawned at run time, an effect...): the
  * instance followed by its links in the world's object lists (CList, links
  * at m_LastOffset 0x288 / m_NextOffset 0x28C: the active list D_8010FEB4,

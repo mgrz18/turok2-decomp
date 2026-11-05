@@ -1,10 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-/* The part of the object that the probe disturbs and puts back. */
-typedef struct {
-    s32 w[13];
-} ObjectHead;   /* 0x34 bytes */
+#include "structs/game_object.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -21,10 +17,10 @@ extern s32 func_00239F00(Object *obj, CVector3 to, void *info);
  * *to; writes where it ends up back to *to and returns 1 if that differs
  * from the target. The object itself is left as it was. */
 s32 func_00256B84(Object *obj, CVector3 *to) {
-    ObjectHead saved;
+    CObjectHead saved;
     s32 blocked;
 
-    saved = *(ObjectHead *)obj;
+    saved = *(CObjectHead *)obj;
     obj->pos.y += func_002671B4(obj) * 0.5f;
     obj->pos.y += obj->stepHeight;
     func_00239F00(obj, *to, &D_800F1B40);
@@ -33,6 +29,6 @@ s32 func_00256B84(Object *obj, CVector3 *to) {
         blocked = 1;
     }
     *to = obj->pos;
-    *(ObjectHead *)obj = saved;
+    *(CObjectHead *)obj = saved;
     return blocked;
 }

@@ -365,16 +365,6 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
     func_0020D274((Mtx44 *) final, out);
 }
 
-/* The leading 0x34 bytes of a game object, as the collision test reads them. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ void *region;
-    /* 0x14 */ u8 pad14[0x4];
-    /* 0x18 */ CVector3 velocity;
-    /* 0x24 */ u8 pad24[0x10];
-} ObjectHead; /* size 0x34 */
-
 typedef struct {
     u8 pad0[0x18];
     /* 0x18 */ f32 shadowScale;
@@ -431,7 +421,7 @@ void func_0022DCBC(ShadowActor *actor) {
     CQuaternion rot;
     CQuaternion tilt;
     CQuaternion spin;
-    ObjectHead probe;
+    CObjectHead probe;
     void *gmtx;
     f32 ground;
     f32 height;
@@ -447,14 +437,14 @@ void func_0022DCBC(ShadowActor *actor) {
         func_0026A9C0(&rot, actor->region);
         ground = func_00267648(actor, 0);
     } else {
-        probe = *(ObjectHead *) actor;
-        probe.pos.y += 10.24f;
-        pos.x = probe.pos.x;
-        pos.y = probe.pos.y - 102400.0f;
-        pos.z = probe.pos.z;
-        probe.velocity.x = 0;
-        probe.velocity.y = 0;
-        probe.velocity.z = 0;
+        probe = *(CObjectHead *) actor;
+        probe.header.m_vPos.y += 10.24f;
+        pos.x = probe.header.m_vPos.x;
+        pos.y = probe.header.m_vPos.y - 102400.0f;
+        pos.z = probe.header.m_vPos.z;
+        probe.m_vVelocity.x = 0;
+        probe.m_vVelocity.y = 0;
+        probe.m_vVelocity.z = 0;
         func_00239F00(&probe, pos, &D_800F1B40);
         if (D_800F1CE0.m_pInstance == NULL) {
             return;

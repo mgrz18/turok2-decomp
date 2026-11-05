@@ -2,14 +2,6 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 
-/* The leading 0x34 bytes of a game object: what the collision test reads. */
-typedef struct {
-    /* 0x00 */ CInstanceHeader header;
-    /* 0x18 */ CVector3 m_vVelocity;
-    /* 0x24 */ CVector3 m_vWaterDisplacement;
-    /* 0x30 */ struct CGameObjectInstance *m_pInstanceBelow;
-} ObjectHead; /* size 0x34 */
-
 struct CollisionInfo;
 extern struct CollisionInfo D_800F1B40;
 extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
@@ -19,11 +11,11 @@ s32 func_00239F00(void *obj, CVector3 to, struct CollisionInfo *info);
 /* Whether the line from the top of `from` to the top of `target` is blocked,
  * by something other than `target` itself. */
 s32 func_00245FC8(CGameObjectInstance *target, s32 unused, CGameObjectInstance *from) {
-    ObjectHead saved;
+    CObjectHead saved;
     CVector3 to;
     s32 hit;
 
-    saved = *(ObjectHead *) from;
+    saved = *(CObjectHead *) from;
     from->header.m_vPos.y += func_002671B4(from);
     from->header.m_vPos.y += from->m_CollisionYOffset;
     to = target->header.m_vPos;
@@ -33,6 +25,6 @@ s32 func_00245FC8(CGameObjectInstance *target, s32 unused, CGameObjectInstance *
     if (D_800F1CE0.m_pInstance == target) {
         hit = 0;
     }
-    *(ObjectHead *) from = saved;
+    *(CObjectHead *) from = saved;
     return hit;
 }
