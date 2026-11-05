@@ -1,21 +1,9 @@
 #include "common.h"
-
-/* An event record that fires an actor callback. */
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ u16 actor;       /* index into the level actors */
-    /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ u16 music;       /* track to start (>= 2) */
-    /* 0x0A */ u16 level;       /* level the actor lives in */
-    /* 0x0C */ u8 padC[4];
-    /* 0x10 */ u8 message;      /* index into the {text, sound} table */
-    /* 0x11 */ u8 kind;         /* callback table */
-    /* 0x12 */ u8 handler;      /* entry in that table */
-} Event;
+#include "structs/event.h"
 
 typedef struct {
-    void (*onActor)(void *actor, void *ai, Event *event);
-    void (*onEvent)(Event *event);
+    void (*onActor)(void *actor, void *ai, LevelEvent *event);
+    void (*onEvent)(LevelEvent *event);
 } EventHandler;
 
 extern EventHandler *D_800B2628[];  /* handler tables by kind */
@@ -32,7 +20,7 @@ extern void func_002817A0(void *game, void *camera, char *text, s32 arg3, f32 ti
 extern void func_0027580C(s32 sound);
 extern void func_00412438(s32 track);
 
-void func_0026DFB0(Event *event) {
+void func_0026DFB0(LevelEvent *event) {
     EventHandler *entry;
     u8 *game;
     void *camera;
