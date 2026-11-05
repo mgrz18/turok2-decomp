@@ -1,4 +1,4 @@
-/* FAKEMATCH: the player lookup is written twice under an always-true test (found by the permuter): GCC merges the copies, but the doubled refs give actor $s2 and nextWave $s3 as in the ROM; with one call the two swap (26 words), and a do{}while(0) instead lets loop.c hoist &D_80119870 above the actor->pos loads (5 words). */
+/* Each spawn sets nextWave in one place (`if (spawnsLeft == 0 && CurrentWave()->type != 1) {...} else nextWave = 1;`): written as an else-if with two `nextWave = 1`, the extra refs give nextWave $s2 and actor $s3, the ROM's two swapped. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/game.h"
@@ -100,11 +100,7 @@ void func_0040457C(Entity0040457C *actor, void *level) {
     f32 delay;
     s32 *flags;
 
-    if (&D_8012F608) {
-        player = func_002532EC(&D_80119870.m_PlayerList, actor->pos);
-    } else {
-        player = func_002532EC(&D_80119870.m_PlayerList, actor->pos);
-    }
+    player = func_002532EC(&D_80119870.m_PlayerList, actor->pos);
     if (player == NULL) {
         return;
     }
@@ -152,9 +148,7 @@ void func_0040457C(Entity0040457C *actor, void *level) {
                           scale, 0)) {
             D_8012F608.spawnsLeft--;
             if (D_8012F608.waves != NULL) {
-                if (D_8012F608.spawnsLeft != 0) {
-                    nextWave = 1;
-                } else if (CurrentWave()->type != 1) {
+                if (D_8012F608.spawnsLeft == 0 && CurrentWave()->type != 1) {
                     D_8012F608.wavesDone = 1;
                     D_8012F608.wave = -1;
                 } else {
@@ -175,9 +169,7 @@ void func_0040457C(Entity0040457C *actor, void *level) {
                           scale, 0)) {
             D_8012F608.spawnsLeft--;
             if (D_8012F608.waves != NULL) {
-                if (D_8012F608.spawnsLeft != 0) {
-                    nextWave = 1;
-                } else if (CurrentWave()->type != 1) {
+                if (D_8012F608.spawnsLeft == 0 && CurrentWave()->type != 1) {
                     D_8012F608.wavesDone = 1;
                     D_8012F608.wave = -1;
                 } else {

@@ -380,9 +380,7 @@ From the sixth hand-matching batch:
 - **A loop written out in the function, not as an inline,** let two loops
   share one counter register (func_0042EF2C).
 - **FAKEMATCH, accepted where the permuter or a register pin is the only
-  way found**: a lookup written twice under an always-true test that GCC
-  merges but whose doubled references move the `$s` registers
-  (func_0040457C), and `register T *p asm("$2")` pins standing for a copy
+  way found**: `register T *p asm("$2")` pins standing for a copy
   the ROM makes (func_0041EA84, func_004579A4). Each says so in its first
   comment.
 - **A dead load before a test comes from a dead branch, not a dead read.**
@@ -582,8 +580,9 @@ func_0024ED54, func_00255D70, func_00424008):
   a register gives the ROM's and/or inserts (func_00424008).
 - **CSE's canonical register is the one used last.** Of two pseudos with the
   same value, cse makes canonical the one whose last use comes later:
-  func_00424008's `h` must die before `oldH`, or the centre is computed
-  from the load instead of `oldH`'s copy.
+  func_00424008's centre is computed from the load instead of `oldH`'s copy
+  unless that copy goes through a variable set twice (see the Z pass
+  below), which cse does not propagate.
 - func_00248720's pool opens at 0x800A6AB4, 4 past a boundary, after a
   1.5707964f only the VM's func_0042DE74 reads; it holds floats only, so its
   own file links and no merge was needed. func_0022D2FC took its place at the
@@ -615,6 +614,35 @@ natural form:
   target too); the function refreshes it from the plan after the path update
   and keeps it in the parameter, and `boost` is a local. Written so, the
   `$s5`/`$s6` order of the prologue is the ROM's, with no reused flag.
+
+**De-faked in the Z pass (z2).** Each in its own commit, with the natural form
+in the file's first comment (func_0040C4F4 and its three inline copies,
+func_0041EA84 / func_004579A4 and func_0022D2FC keep their marker):
+
+- func_0042BF48: the stream loops run over a rectangle of cells,
+  `firstRow = 0; lastRow = rows - 1; firstCol = 0; lastCol = width - 1;`
+  and `for (row = firstRow ...) for (col = firstCol ...)`. The column loop
+  starting from a variable, not the constant 0, keeps its entry test as
+  `slt` (Rage Wars' decomp has the same function with a lone `first` local
+  that it marks FAKEMATCH, so that was no precedent).
+- func_00422F14 / func_0045BE34: the port goes through a two-word
+  selection struct (`PadSel sel; sel.v = controller->port;
+  func_00285A68(sel.v);`, the struct func_0041EA84 uses), not an inline
+  taking its parameter's address: GCC 2.8 keeps the 8-byte struct on the
+  stack, which gives the ROM's store in the jal's delay slot and its
+  0x20-byte frame.
+- func_0040457C / func_0043D57C: each spawn sets `nextWave` in one place,
+  `if (spawnsLeft == 0 && CurrentWave()->type != 1) { done } else
+  nextWave = 1;`. The else-if with a `nextWave = 1` in two arms (reorg
+  makes the ROM's `bnel` copy of the one set either way) gave nextWave two
+  more refs, so global-alloc ranked it above `actor` and swapped their
+  `$s` registers; the player lookup written twice under an always-true test
+  had only made up for those refs.
+- func_00424008: no `register Span hs asm("$13")`; the clamp works on `h`
+  itself and `xScale` does two jobs, first holding the new horizontal
+  centre (`xScale = cx;` then both edges from it), then the scale. The
+  second set keeps that copy from being propagated, which is what made
+  CSE compute the centre from oldH's copy, as the ROM does.
 
 ### The G pass (the last drafts)
 
