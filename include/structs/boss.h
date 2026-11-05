@@ -22,13 +22,36 @@
 #include "structs/vector.h"
 
 /* The 0x64-byte value/colour animator func_002362E4 sets up,
- * func_00236314 restarts (fires) and func_00235510 steps; func_00236324
- * applies it when the owner is drawn. The level script keeps eight
- * (lights), each Mother boss weak spot one, and the Blind One a hit flash
- * for itself and each of its actors. Rage Wars' Animator (rw/abu_types.h)
- * is the same object without the last word. */
+ * func_00236314 starts on a script (fires) and func_00235510 steps;
+ * func_00236324 applies it when the owner is drawn (rgb and alpha to the
+ * draw colour D_800AB8B0, alpha and value to D_800AB8C0) and func_00236390
+ * adds it to the fade. The script is a list of floats: an op (the mode),
+ * then its operands; mode 0 ends it (and restarts it from loop when that
+ * is set), 1 waits, 4 fades value, 6 fades rgb and alpha. The level
+ * script keeps eight (lights), each Mother boss weak spot one, and the
+ * Blind One a hit flash for itself and each of its actors. Rage Wars'
+ * Animator (rw/abu_types.h, names from there) is the same object without
+ * the last word. */
 typedef struct ScriptAnimator {
-    /* 0x00 */ u8 data[0x64];
+    /* 0x00 */ void *owner;                /* func_002362E4's second argument */
+    /* 0x04 */ s32 mode;
+    /* 0x08 */ f32 time;
+    /* 0x0C */ f32 *loop;
+    /* 0x10 */ f32 *script;
+    /* 0x14 */ f32 value;                  /* 255 at the start */
+    /* 0x18 */ f32 valueFrom;
+    /* 0x1C */ f32 valueTo;
+    /* 0x20 */ f32 valueDuration;
+    /* 0x24 */ f32 alpha;
+    /* 0x28 */ f32 alphaFrom;
+    /* 0x2C */ f32 alphaTo;
+    /* 0x30 */ f32 colourDuration;
+    /* 0x34 */ f32 rgb[3];
+    /* 0x40 */ u8 pad40[4];
+    /* 0x44 */ f32 rgbFrom[3];
+    /* 0x50 */ u8 pad50[4];
+    /* 0x54 */ f32 rgbTo[3];
+    /* 0x60 */ u8 pad60[4];
 } ScriptAnimator; /* size 0x64 */
 
 /* One weak spot of the boss: its health and its hit-flash animator. */
