@@ -6,9 +6,9 @@
  * func_0024C648's (0x800A6C74) and func_0024CF58's (0x800A6CDC) are 4 past a
  * boundary too, so neither can open the file.
  *
- * The parts were written apart: each keeps its own view of the player
- * (CPlayer, CPlayer, CPlayer, Player), and they share one
- * WeaponInfo. func_0024D344 is after Rage Wars (func_80220ED4_de). */
+ * The parts were written apart; the first three use structs/player.h's
+ * CPlayer, func_0024D344 keeps its own Player view (see there), and they
+ * share one WeaponInfo. func_0024D344 is after Rage Wars (func_80220ED4_de). */
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
@@ -389,6 +389,11 @@ typedef struct Voice {
     /* 0x10 */ s32 bank;
 } Voice;
 
+/* CPlayer (structs/player.h) as func_0024D344 reads it, kept local: it uses
+ * the player both as itself and as its m_CharacterActor (actor = p), and
+ * several words are typed against the header (0x10 the region as a Model,
+ * the controller's 0x08 as a position, the weapon actor's 0x3F4 as a voice,
+ * u32 flags), which would take a cast at most uses. */
 typedef struct Player {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;
