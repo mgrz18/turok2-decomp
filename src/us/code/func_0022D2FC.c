@@ -18,6 +18,7 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "structs/frame.h"
+#include "structs/event.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -1175,7 +1176,6 @@ extern u8 D_800F7078[];
 extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
 extern f32 D_800ACE10[2];
-extern u32 D_800AD084[];
 
 extern void *func_002017D4(s32 resource, s32 index);
 extern s32 func_00266D8C(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
@@ -1706,7 +1706,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                     }
                     effect->flags |= 0x1000000;
                 }
-                if ((D_800AD084[entry->model->type * 2] & 1) || kind == 0x68) {
+                if ((D_800AD084[entry->model->type].m_Flags & 1) || kind == 0x68) {
                     render->flags |= 0x80000000;
                 }
                 vel = &effect->velocity;
