@@ -2,24 +2,19 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ CPlayer *owner;
-} Object;
-
 extern s32 func_0024E700(CPlayer *player, s32 weapon);
 extern s16 *func_0025398C(CPlayer *player, s32 weapon);
-extern void func_00243414(Object *obj, CAI *ai, s32 mode);
+extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 /* Fire check for the first-person weapon: once its cooldown is over and the
  * weapon is usable, fire button 0x2000 starts mode 4 and a tap of 0x10 with
  * weapon 19 starts mode 5. Returns 1 when it fired. */
-s32 func_00257EA0(Object *obj, CAI *ai) {
+s32 func_00257EA0(CGameObjectInstance *obj, CAI *ai) {
     CPlayer *player;
     s32 tapped;
     s32 mode;
 
-    player = obj->owner;
+    player = (CPlayer *) obj->m_AI.m_pParent;
     if (ai->m_Weapon.m_FireDelay > 0.0f) {
         return 0;
     }
@@ -39,7 +34,7 @@ s32 func_00257EA0(Object *obj, CAI *ai) {
         return 0;
     }
     if (player->m_Data.m_CurrentWeapon == 21) {
-        CPlayer *owner = obj->owner;
+        CPlayer *owner = (CPlayer *) obj->m_AI.m_pParent;
         if (*(owner->m_Data.m_AmmoList + *func_0025398C(owner, 21)) == 0) {
             return 0;
         }

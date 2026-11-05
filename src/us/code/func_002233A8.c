@@ -6,25 +6,19 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "structs/game_object.h"
 
-/* Turok 2 layouts: only the fields used here (Rage Wars: pos 0x8, def 0x18, list at 0xF5C). */
-typedef struct Entity {
-    u8 pad0[0x4];
-    CVector3 pos;          /* 0x4 */
-    u8 pad10[0x4];
-    CIntelligence *def;      /* 0x14 */
-} Entity;
-f32 func_0026841C(Entity *e);
-f32 func_002671B4(Entity *e);
-s32 func_00265F90(Entity *e, u8 *p, Entity *me);
-void func_00243414(Entity *e, u8 *p, s32 a);
-void func_002233A8(CWorld *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
+f32 func_0026841C(CGameObjectInstance *e);
+f32 func_002671B4(CGameObjectInstance *e);
+s32 func_00265F90(CGameObjectInstance *e, u8 *p, CGameObjectInstance *me);
+void func_00243414(CGameObjectInstance *e, u8 *p, s32 a);
+void func_002233A8(CWorld *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *p1) {
     s32 isB;
     s32 is1;
     f32 myBot;
     f32 myTop;
     s32 i;
-    Entity *e;
+    CGameObjectInstance *e;
     f32 eBot;
     f32 eTop;
     s32 kind;
@@ -49,25 +43,25 @@ void func_002233A8(CWorld *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
     s32 ok;
     u32 fl;
     if (p0->x != p1->x || p0->y != p1->y || p0->z != p1->z) {
-        kind = me->def->m_Type;
+        kind = me->header.m_pIntelligence->m_Type;
         isB = kind == 0xB;
         is1 = kind == 1;
-        myBot = me->pos.y + func_0026841C(me);
+        myBot = me->header.m_vPos.y + func_0026841C(me);
         myTop = myBot + func_002671B4(me);
         for (i = 0; i < lv->m_nFlagged; i++) {
-            e = (Entity *)lv->m_pFlagged[i];
+            e = (CGameObjectInstance *)lv->m_pFlagged[i];
             if (e != me) {
                 s4 = 0;
                 s1 = 0;
-                eBot = e->pos.y + func_0026841C(e);
+                eBot = e->header.m_vPos.y + func_0026841C(e);
                 eTop = eBot + func_002671B4(e);
-                switch (e->def->m_Type) {
+                switch (e->header.m_pIntelligence->m_Type) {
                 case 6:
                     s2 = 0;
                     s3 = s4 = 1;
-                    fl = e->def->m_dwTypeFlags;
-                    r1 = e->def->m_Door.m_AutoOpenRadius;
-                    r2 = e->def->m_Door.m_AutoCloseRadius;
+                    fl = e->header.m_pIntelligence->m_dwTypeFlags;
+                    r1 = e->header.m_pIntelligence->m_Door.m_AutoOpenRadius;
+                    r2 = e->header.m_pIntelligence->m_Door.m_AutoCloseRadius;
                     a0 = fl & 4;
                     v1 = fl & 8;
                     a2 = fl & 0x10;
@@ -79,8 +73,8 @@ void func_002233A8(CWorld *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
                     a2 = s3;
                     a1 = s3;
                     s1 = s2;
-                    fl = e->def->m_dwTypeFlags;
-                    r1 = e->def->m_Action.m_AutoGoRadius;
+                    fl = e->header.m_pIntelligence->m_dwTypeFlags;
+                    r1 = e->header.m_pIntelligence->m_Action.m_AutoGoRadius;
                     r2 = 0.0f;
                     a0 = fl & 4;
                     v1 = fl & 8;
@@ -91,8 +85,8 @@ void func_002233A8(CWorld *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
                     a2 = s3;
                     a1 = s3;
                     s1 = s2;
-                    fl = e->def->m_dwTypeFlags;
-                    r1 = e->def->m_Destructible.m_AutoGoRadius;
+                    fl = e->header.m_pIntelligence->m_dwTypeFlags;
+                    r1 = e->header.m_pIntelligence->m_Destructible.m_AutoGoRadius;
                     r2 = 0.0f;
                     a0 = fl & 8;
                     v1 = fl & 0x10;
@@ -123,8 +117,8 @@ void func_002233A8(CWorld *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
                     }
                 }
                 if (hit != 0 || hit2 != 0) {
-                    d0 = (p0->x - e->pos.x) * (p0->x - e->pos.x) + (p0->z - e->pos.z) * (p0->z - e->pos.z);
-                    d1 = (p1->x - e->pos.x) * (p1->x - e->pos.x) + (p1->z - e->pos.z) * (p1->z - e->pos.z);
+                    d0 = (p0->x - e->header.m_vPos.x) * (p0->x - e->header.m_vPos.x) + (p0->z - e->header.m_vPos.z) * (p0->z - e->header.m_vPos.z);
+                    d1 = (p1->x - e->header.m_vPos.x) * (p1->x - e->header.m_vPos.x) + (p1->z - e->header.m_vPos.z) * (p1->z - e->header.m_vPos.z);
                     if (hit != 0) {
                         if (s4 != 0) {
                             ok = 0;
@@ -140,7 +134,7 @@ void func_002233A8(CWorld *lv, Entity *me, CVector3 *p0, CVector3 *p1) {
                             }
                         }
                         if (ok != 0) {
-                            if (e->def->m_Type == 10 && s2 == 1) {
+                            if (e->header.m_pIntelligence->m_Type == 10 && s2 == 1) {
                                 ok = func_00265F90(e, (u8 *)e + 0x140, me);
                             }
                             if (ok != 0) {

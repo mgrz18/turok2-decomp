@@ -1,16 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
-
-typedef struct HitTarget {
-    /* 0x00 */ u8 pad0[0x65];
-    /* 0x65 */ u8 region;           /* low two bits: 1 = head */
-} HitTarget;
-
-typedef struct Hit {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ HitTarget *target;
-} Hit;
+#include "structs/collision.h"
 
 extern CGameFromCameraPool D_801198B0;
 
@@ -39,9 +30,9 @@ void func_00281610(CGameFromCameraPool *game, struct CCamera *camera, char *text
 
 /* Deathmatch messages for a kill: "killed by" or "tagged by" on the victim's
    screen, "you killed", "you tagged" or "head shot!" on the killer's. */
-void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit) {
+void func_002478C8(CPlayer *victim, CPlayer *killer, DamageEvent *hit) {
     GameSettings *settings = &D_8011AAD8;
-    HitTarget *target;
+    HitFrame *target;
 
     if (settings->multiplayer != 0) {
         if (victim == killer) {
@@ -66,8 +57,8 @@ void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit) {
             func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
             game = GAME_OF(settings);
             SHOW_MESSAGE(game, victim, time);
-            target = hit->target;
-            if (target != NULL && (target->region & 3) == 1) {
+            target = hit->frame;
+            if (target != NULL && (target->flags & 3) == 1) {
                 func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B53D0);
                 SHOW_MESSAGE(game, killer, 1.5f);
             } else {

@@ -3,16 +3,12 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "structs/level_actor.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
  * if it is unlocked), kind 1 a particle effect, kind 2 a pickup picked at
  * random from the weapon/ammo/item tables the definition enables. */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-} PoolActor;
 
 typedef struct {
     s16 id;
@@ -41,12 +37,12 @@ extern f32 func_0026BE60(s32 region, f32 x, f32 z);
 extern s32 *func_00225E88(void *level, s32 model);
 extern s32 func_002241C0(void *level, s32 id);
 extern s32 func_00262C20(s32 id);
-extern PoolActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern CPooledLevelActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
 extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
 extern s32 func_0022F350(void *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
                          CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
-extern void func_00246690(PoolActor *actor, s32 sound, CVector3 pos, s32 arg);
+extern void func_00246690(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
 extern void *func_002532A8(void *players);
 extern s32 func_00253C14(void *player, s32 id);
 extern s32 func_00253CF0(void *player, s32 id);
@@ -57,12 +53,12 @@ extern s16 func_0026D628(PickTable *t);
 
 /* Spawns pool pickup id at pos. */
 static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
-    PoolActor *pickup;
+    CPooledLevelActor *pickup;
 
     pickup = func_00227240(D_80107590, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);
     if (pickup != NULL) {
         ai->m_Generator.m_nRemaining--;
-        func_00246690(pickup, 0x11D, pickup->pos, 0);
+        func_00246690(pickup, 0x11D, pickup->m_Actor.header.m_vPos, 0);
     }
 }
 

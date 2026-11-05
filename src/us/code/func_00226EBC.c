@@ -5,24 +5,15 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/game_object.h"
 
-/* Turok 2 layout (Rage Wars: pos 0x8, def 0x18, typeId 0xE4). */
-typedef struct Entity {
-    u8 kind;                /* 0x00 */
-    u8 pad1[3];
-    CVector3 pos;              /* 0x04 */
-    s32 unk10;
-    CIntelligence *def;          /* 0x14 */
-    u8 pad18[0xB8 - 0x18];
-    u16 typeId;             /* 0xB8 */
-} Entity;
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-s32 func_00226EBC(Entity *e, CVector3 *target) {
+s32 func_00226EBC(CGameObjectInstance *e, CVector3 *target) {
     CVector3 d;
     f32 dist;
     u32 t;
-    if (*(u8 *)e == 1 && e->def->m_Type == 7) {
-        func_0020EF2C(&d, &e->pos, target);
+    if (*(u8 *)e == 1 && e->header.m_pIntelligence->m_Type == 7) {
+        func_0020EF2C(&d, &e->header.m_vPos, target);
         dist = d.x * d.x + d.z * d.z;
         d.y = 0;
         if (262144.0f < dist) {
@@ -30,8 +21,8 @@ s32 func_00226EBC(Entity *e, CVector3 *target) {
         }
         return 0xFF;
     }
-    if (e->def->m_Type == 1) {
-        t = e->typeId;
+    if (e->header.m_pIntelligence->m_Type == 1) {
+        t = e->m_nTypeFlag;
         if (t == 0x44E || t == 0x453 || t == 0x451 || t == 0x450 || t == 0x454 || t == 0x455 || t == 0x456) {
             return 0xFF;
         }

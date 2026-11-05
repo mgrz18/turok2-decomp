@@ -189,6 +189,18 @@ typedef struct CGameObjectInstance {
     /* 0x284 */ s32 _pad2;
 } CGameObjectInstance; /* size 0x288 */
 
+/* The first 0x34 bytes of an instance (and of a CParticle, which starts the
+ * same way): the header, the velocity, the water displacement and what it
+ * stands on. The collision probes save and restore them as one struct
+ * around a trial move (func_00233000, func_00245E48, func_00245FC8,
+ * func_00256B84, func_002698AC). */
+typedef struct CObjectHead {
+    /* 0x00 */ CInstanceHeader header;
+    /* 0x18 */ CVector3 m_vVelocity;
+    /* 0x24 */ CVector3 m_vWaterDisplacement;
+    /* 0x30 */ struct CGameObjectInstance *m_pInstanceBelow;
+} CObjectHead; /* size 0x34 */
+
 /* A dynamic object (an actor spawned at run time, an effect...): the
  * instance followed by its links in the world's object lists (CList, links
  * at m_LastOffset 0x288 / m_NextOffset 0x28C: the active list D_8010FEB4,
@@ -233,5 +245,22 @@ typedef struct {
     /* 0x00 */ CAITarget m_Sight;
     /* 0x44 */ CAITarget m_Path;
 } CAITargets; /* size 0x88 */
+
+/* How far an AI's actor moved since the last frame (func_0024599C: the
+ * position against CAI's m_vPosLastFrame, the facing against
+ * m_RotYLastFrame): the offset, its direction and length, in 3D and
+ * flattened, and the turn. The steering callbacks (func_00260634...
+ * func_00261FB0) fill one on the stack and hand it to func_00260730 /
+ * func_00260D60 with the CAITargets. */
+typedef struct {
+    /* 0x00 */ CVector3 m_vDelta;
+    /* 0x0C */ CVector3 m_vDir;
+    /* 0x18 */ f32 m_Dist;
+    /* 0x1C */ CVector3 m_vFlatDelta;
+    /* 0x28 */ CVector3 m_vFlatDir;
+    /* 0x34 */ f32 m_FlatDist;
+    /* 0x38 */ f32 m_Turn;
+    /* 0x3C */ u8 pad3C[4];
+} CAIFrameMotion; /* size 0x40 */
 
 #endif

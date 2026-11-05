@@ -11,37 +11,23 @@ extern f32 func_002974C0(f32 x); /* cosf */
 extern f32 D_800F1F98; /* gravity */
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0x50];
-    /* 0x050 */ f32 angle;
-    /* 0x054 */ u8 pad54[0x120];
-    /* 0x174 */ s8 mode;
-    /* 0x175 */ u8 pad175[0x4B];
-    /* 0x1C0 */ CGameObjectInstance *target;
-} OwnerActor;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x10C];
-    /* 0x10C */ OwnerActor *owner;
+    /* 0x10C */ CGameObjectInstance *owner;
 } OwnedState;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ CVector3 vel;
-} Object;
-
 /* Launch velocity: thrown away from the owner, aimed at its target. */
-void func_00264F58(Object *obj, OwnedState *state) {
-    OwnerActor *owner = state->owner;
+void func_00264F58(CGameObjectInstance *obj, OwnedState *state) {
+    CGameObjectInstance *owner = state->owner;
     CGameObjectInstance *target;
     f32 speed;
     f32 lift;
     f32 r;
     f32 x;
 
-    if (owner->mode != 0x15) {
+    if (owner->m_AI.m_Mode != 0x15) {
         speed = 51.199997f;
         lift = 204.79999f;
-    } else if ((target = owner->target) != NULL) {
+    } else if ((target = owner->m_AI.m_pSightTarget) != NULL) {
         r = func_002119FC(1.5f, 2.5f);
         speed = r * func_00298470(func_002465F0(obj, target->header.m_vPos));
         lift = -D_800F1F98 / (r * 3.8f);
@@ -50,8 +36,8 @@ void func_00264F58(Object *obj, OwnedState *state) {
         lift = 358.4f;
     }
     lift += func_002119FC(0.0f, 2.56f);
-    x = speed * func_002982F0(owner->angle + 3.1415927f);
-    obj->vel.y = lift;
-    obj->vel.x = x;
-    obj->vel.z = speed * func_002974C0(owner->angle + 3.1415927f);
+    x = speed * func_002982F0(owner->m_RotY + 3.1415927f);
+    obj->m_vVelocity.y = lift;
+    obj->m_vVelocity.x = x;
+    obj->m_vVelocity.z = speed * func_002974C0(owner->m_RotY + 3.1415927f);
 }

@@ -4,45 +4,12 @@
 
 typedef f32 Mtx4[4][4];
 
-typedef struct BoxInfo {
-    s32 flags;         /* 0x00 */
-    u16 kind;          /* 0x04: 0 ground, 1 cylinder, 2 box */
-    char pad6[2];
-    f32 radius;        /* 0x08 */
-    f32 width;         /* 0x0C */
-    f32 height;        /* 0x10 */
-    f32 depth;         /* 0x14 */
-    CVector3 center;       /* 0x18 */
-} BoxInfo;
-
-typedef struct Def {
-    char pad0[0x14];
-    BoxInfo info;      /* 0x14 */
-} Def;
-
-typedef struct Mover {
-    char pad0[4];
-    CVector3 pos;          /* 0x04 */
-    void *region;      /* 0x10 */
-    Def *def;          /* 0x14 */
-    char pad18[0x40 - 0x18];
-    CQuaternion rotation;     /* 0x40 */
-    f32 spin;          /* 0x50 */
-    char pad54[0x140 - 0x54];
-    CAI ai;             /* 0x140 */
-} Mover;
-
-typedef struct Collider {
-    char pad0[0xD4];
-    s32 flags;         /* 0xD4 */
-} Collider;
-
 extern f32 D_800DD78C;
 
 f32 func_0026BE60(void *region, f32 x, f32 z);
-f32 func_002672C8(Collider *collider);
-f32 func_002671B4(Collider *collider);
-f32 func_0026872C(Mover *mover, s32 arg1);
+f32 func_002672C8(CGameObjectInstance *collider);
+f32 func_002671B4(CGameObjectInstance *collider);
+f32 func_0026872C(CGameObjectInstance *mover, s32 arg1);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void func_00210518(Mtx4 *mtx, f32 angle);
@@ -53,13 +20,13 @@ void func_00210318(Mtx4 *mtx, f32 x, f32 y, f32 z);
 void func_0020F908(Mtx4 *mtx, CVector3 *in, CVector3 *out, s32 count);
 
 /* The eight corners of the mover's collision box (top face first), in world space. */
-void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
+void func_00241960(CGameObjectInstance *mover, CVector3 *points, CGameObjectInstance *collider) {
     Mtx4 mtx;
     Mtx4 rot;
     Mtx4 spinMtx;
     CQuaternion q;
     CQuaternion spin;
-    BoxInfo *info;
+    CPlatformIntelligence *info;
     CAI *ai;
     f32 halfX;
     f32 halfZ;
@@ -71,14 +38,14 @@ void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
     f32 z;
     f32 sinHalf;
 
-    info = &mover->def->info;
-    ai = &mover->ai;
-    if (info->kind == 0) {
-        x = mover->pos.x;
+    info = &mover->header.m_pIntelligence->m_Platform;
+    ai = &mover->m_AI;
+    if (info->m_CollisionType == 0) {
+        x = mover->header.m_vPos.x;
         minX = x + -10240.0f;
         maxX = x + 10240.0f;
-        top = func_0026BE60(mover->region, x, mover->pos.z) + 0.001f;
-        z = mover->pos.z;
+        top = func_0026BE60(mover->header.m_pCurrentRegion, x, mover->header.m_vPos.z) + 0.001f;
+        z = mover->header.m_vPos.z;
         minZ = z + -10240.0f;
         maxZ = z + 10240.0f;
         bottom = top - 10240.0f;
@@ -103,14 +70,14 @@ void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
         points[6].z = minZ;
         points[7].z = minZ;
     } else {
-        switch (info->kind) {
+        switch (info->m_CollisionType) {
         default:
-            halfX = info->width * 0.5f;
-            height = info->height;
+            halfX = info->m_CollisionWidth * 0.5f;
+            height = info->m_CollisionHeight;
             bottomOff = 0.0f;
-            halfZ = info->depth * 0.5f;
+            halfZ = info->m_CollisionLength * 0.5f;
             if (collider != NULL) {
-                if (collider->flags & 0x300000) {
+                if (collider->m_dwFlags & 0x300000) {
                     halfX += func_002672C8(collider) * 0.5f;
                     bottomOff = -func_002671B4(collider);
                     halfZ += func_002672C8(collider) * 0.5f;
@@ -123,22 +90,22 @@ void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
             break;
         case 1:
             if (collider != NULL) {
-                halfZ = info->radius + func_002672C8(collider);
+                halfZ = info->m_CollisionRadius + func_002672C8(collider);
             } else {
-                halfZ = info->radius;
+                halfZ = info->m_CollisionRadius;
             }
-            height = info->height;
+            height = info->m_CollisionHeight;
             bottomOff = 0.0f;
             do { /* block boundary keeps the copy last */
                 halfX = halfZ;
             } while (0);
         }
-        minX = info->center.x - halfX;
-        maxX = info->center.x + halfX;
-        bottom = info->center.y + bottomOff;
-        top = info->center.y + height;
-        minZ = info->center.z - halfZ;
-        maxZ = info->center.z + halfZ;
+        minX = info->m_CollisionXOffset - halfX;
+        maxX = info->m_CollisionXOffset + halfX;
+        bottom = info->m_CollisionYOffset + bottomOff;
+        top = info->m_CollisionYOffset + height;
+        minZ = info->m_CollisionZOffset - halfZ;
+        maxZ = info->m_CollisionZOffset + halfZ;
         points[0].x = minX;
         points[1].x = maxX;
         points[2].x = maxX;
@@ -165,18 +132,18 @@ void func_00241960(Mover *mover, CVector3 *points, Collider *collider) {
         points[7].z = minZ;
 
         func_00210518(&rot, ai->m_Platform.m_Pitch);
-        sinHalf = func_002982F0(mover->spin * 0.5f);
+        sinHalf = func_002982F0(mover->m_RotY * 0.5f);
         q.x = 0.0f;
         q.y = sinHalf;
         q.z = 0.0f;
         D_800DD78C = sinHalf;
-        q.w = func_002974C0(mover->spin * 0.5f);
-        func_00210F68(&spin, &q, &mover->rotation);
+        q.w = func_002974C0(mover->m_RotY * 0.5f);
+        func_00210F68(&spin, &q, &mover->m_qGround);
         func_00211114(&spin, &spinMtx);
         func_0020C618(&mtx, &rot, &spinMtx);
-        func_00210318(&mtx, mover->pos.x, mover->pos.y, mover->pos.z);
+        func_00210318(&mtx, mover->header.m_vPos.x, mover->header.m_vPos.y, mover->header.m_vPos.z);
         func_0020F908(&mtx, points, points, 8);
-        if (!(info->flags & 1)) {
+        if (!(info->m_dwFlags & 1)) {
             return;
         }
         bottom = func_0026872C(mover, 0);

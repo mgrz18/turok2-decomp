@@ -2,11 +2,6 @@
 #include "common.h"
 #include "structs/player.h"
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x140];
-    /* 0x140 */ s32 motionState;
-} Body;
-
 extern char D_800ADF18;
 extern char D_800ADF30;
 extern void func_0024EF70(void *, void *, void *);
@@ -16,7 +11,7 @@ extern s32 func_0024E5F0(void *, void *, s32);
 /* Landing state: pose 0xC or 0xD, movement tables, animation 0x8A2, 0x8A7
  * or 0x14 by the stick (unless animation 0x1144 is still running), then
  * state 3 once the pose timer passes 2 without body bit 0x800. */
-void func_00255B50(CPlayer *player, Body *body) {
+void func_00255B50(CPlayer *player, CGameObjectInstance *body) {
     s32 busy;
     f32 x;
 
@@ -41,7 +36,7 @@ void func_00255B50(CPlayer *player, Body *body) {
             player->m_CharAnim = 0x14;
         }
     }
-    if (!(body->motionState & 0x800) && player->m_ModeTime > 2.0f) {
+    if (!(body->m_AI.m_dwFlags & 0x800) && player->m_ModeTime > 2.0f) {
         func_0024E5F0(player, body, 3);
     }
 }

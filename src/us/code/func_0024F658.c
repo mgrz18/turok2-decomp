@@ -4,13 +4,6 @@
 #include "structs/player.h"
 
 typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ f32 climb;
-} Body;
-
-typedef struct {
     /* 0x00 */ f32 accel;
     /* 0x04 */ f32 max;
     /* 0x08 */ f32 decel;
@@ -40,7 +33,7 @@ f32 func_0021170C(f32 value, f32 rate);
 f32 func_0021160C(f32 value, f32 delta, f32 limit);
 f32 func_00298470(f32 x);
 void func_002117DC(f32 *value, f32 target, f32 rate);
-CQuaternion func_0021AE6C(Body *body);
+CQuaternion func_0021AE6C(CGameObjectInstance *body);
 void func_00211114(CQuaternion *q, f32 *mtx);
 void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
 void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -49,7 +42,7 @@ void func_00275544(s16 sound, CVector3 pos, s32, s32);
 /* Swimming movement: forward and strafe speeds, the dodge impulses and the
  * climb, turned by the body's facing and added to the velocity, with drag
  * on the way down and a roll from the strafe. */
-void func_0024F658(CPlayer *player, Body *body, Tuning *tuning) {
+void func_0024F658(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
     CVector3 forward;
     CVector3 strafe;
     CVector3 forwardOut;
@@ -126,13 +119,13 @@ void func_0024F658(CPlayer *player, Body *body, Tuning *tuning) {
     }
     if (ready && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
         impulse = 1;
-        body->climb += tuning->climbImpulse;
+        body->m_vVelocity.y += tuning->climbImpulse;
     }
     if (player->m_ContState.m_dwButtons & 0x10) {
-        climb = body->climb;
+        climb = body->m_vVelocity.y;
         climbMax = tuning->climbMax;
         if (climb < climbMax) {
-            body->climb = func_0021160C(climb, tuning->climbAccel, climbMax);
+            body->m_vVelocity.y = func_0021160C(climb, tuning->climbAccel, climbMax);
         }
     }
     forward.x = 0.0f;
@@ -148,15 +141,15 @@ void func_0024F658(CPlayer *player, Body *body, Tuning *tuning) {
     player->m_vDesiredPos.x += (forwardOut.x + strafeOut.x) * player->m_FrameIncrementScaled;
     player->m_vDesiredPos.y += (forwardOut.y + strafeOut.y) * player->m_FrameIncrementScaled;
     player->m_vDesiredPos.z += (forwardOut.z + strafeOut.z) * player->m_FrameIncrementScaled;
-    if (body->climb < 0.0f) {
+    if (body->m_vVelocity.y < 0.0f) {
         func_0020EEF8(&sum, &forwardOut, &strafeOut);
-        body->climb -= D_800ADF5C[player->m_Mode].physics->drag
+        body->m_vVelocity.y -= D_800ADF5C[player->m_Mode].physics->drag
             * (func_00298470(sum.x * sum.x + sum.y * sum.y + sum.z * sum.z) / (tuning->max * 4.0f))
             * player->m_FrameIncrementScaled;
     }
     func_002117DC(&player->m_vHeadRotOffset.z, (player->m_SideSpeed * 1.8f + player->m_ContState.m_FinalLookX * 16.0f) * 0.017453294f, 0.04f);
     if (impulse) {
         player->m_BurstTimer += 7.5f;
-        func_00275544(tuning->impulseSound, body->pos, 0, -1);
+        func_00275544(tuning->impulseSound, body->header.m_vPos, 0, -1);
     }
 }

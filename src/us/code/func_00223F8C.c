@@ -5,83 +5,18 @@
 #include "gfx.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
-typedef struct ActorStats {
-               u8 pad0[0x80];
-               s8 unk80;
-               u8 pad81[0xD];
-               u8 unk8E;
-               u8 unk8F;
-               u8 pad90[2];
-               u8 unk92;
-               u8 unk93;
-               u8 unk94;
-} ActorStats;
-typedef struct Brain {
-                u8 pad0[0xC];
-                s32 unkC;
-                u8 pad10[0x210];
-                s32 unk220;
-                u8 pad224[0x18];
-                s32 unk23C;
-                s32 unk240;
-                u8 pad244[0x94];
-                s32 unk2D8;
-                s32 unk2DC;
-                u8 pad2E0[0xC];
-                s32 unk2EC;
-                u8 pad2F0[0xC];
-                s32 unk2FC;
-} Brain;
-typedef struct Actor Actor;
-struct Actor {
-                 u8 pad0[0x18];
-                 CIntelligence *def;
-                 u8 pad1C[0x1C];
-                 u32 flags38;
-                 u8 pad3C[0xA8];
-                 u16 unkE4;
-                 u8 padE6[0x1A];
-                 u32 flags;
-                 u8 pad104[0xD4];
-                 Actor *owner;
-                 u8 pad1DC[0x110];
-                 Actor *next2EC;
-                 u8 pad2F0[0x2E4];
-                 s32 unk5D4;
-                 ActorStats *stats;
-                 u8 pad5DC[8];
-                 s32 unk5E4;
-                 u8 pad5E8[0x88];
-                 f32 unk670;
-                 u8 pad674[0x1CC];
-                 f32 unk840;
-                 u8 pad844[4];
-                 s32 unk848;
-                 u8 pad84C[0x974];
-                 s32 unk11C0;
-                 u8 pad11C4[0x28C];
-                 s32 unk1450;
-                 Brain *brain;
-                 u8 pad1458[0x280];
-                 u16 unk16D8;
-                 u8 pad16DA[6];
-                 Actor *next;
-};
+#include "structs/game_object.h"
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
-typedef struct Entity { /* Turok 2 layout */
-    u8 pad0[0xD4];
-    u32 flags;          /* 0xD4 (Rage Wars: 0x100) */
-} Entity;
 void func_0020B5D4();
 void func_0020B624(void);
-void func_0021D39C(Entity *e, s32 a);
+void func_0021D39C(CGameObjectInstance *e, s32 a);
 void func_00223F8C(CWorld *lv, s32 arg) {
     Gfx *g;
     s32 i;
     s32 n;
     s32 c;
-    Entity **arr;
+    CGameObjectInstance **arr;
     func_0020B5D4();
     n = lv->m_nRegistered;
     g = D_800D8E24++;
@@ -96,10 +31,10 @@ void func_00223F8C(CWorld *lv, s32 arg) {
     g = D_800D8E24++;
     g->w0 = 0xDB04001C;
     g->w1 = 0xFFFB;
-    arr = (Entity **)lv->m_pRegistered;
+    arr = (CGameObjectInstance **)lv->m_pRegistered;
     for (i = 0; i < n; i++) {
-        Entity *e = arr[i];
-        if (e->flags & 4) {
+        CGameObjectInstance *e = arr[i];
+        if (e->m_dwFlags & 4) {
             c = lv->m_nDeferred;
             if (c != 0x40) {
                 lv->m_pDeferred[c] = e;

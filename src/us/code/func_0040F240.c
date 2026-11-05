@@ -31,18 +31,6 @@ typedef struct {
     /* 0x08 */ SplineNode nodes[1];
 } Spline;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ u8 pad10[0x34 - 0x10];
-} ActorHead; /* the part of the actor saved around the collision test */
-
-typedef struct {
-    /* 0x00 */ ActorHead head;
-    /* 0x34 */ u8 pad34[0x50 - 0x34];
-    /* 0x50 */ f32 yaw;
-} Actor;
-
 /* A track header: its stride and record count, the records after it. */
 typedef struct {
     /* 0x00 */ s32 stride;
@@ -73,7 +61,7 @@ extern Gfx *D_800D8E24;
 extern CWorld D_800F7078[];
 extern s32 D_800F709C;  /* D_800F7078.trackLookup */
 extern s32 *D_800F70D8; /* D_800F7078.trackBundle */
-extern Actor *D_80119890; /* current player */
+extern CGameObjectInstance *D_80119890; /* current player */
 
 extern void *func_002017D4(void *node, s32 index); /* child `index` of a resource node */
 extern s32 func_0020185C(s32 *bundle, s32 lookup, s32 index, s32 *size);
@@ -392,7 +380,7 @@ s32 func_0040FD6C(s32 index) {
     s32 previous;
     s32 pending;
     s32 loaded;
-    Actor *captured;
+    CGameObjectInstance *captured;
     CWorld *resources;
     s32 **owner;
     s32 **table;
@@ -474,8 +462,8 @@ s32 func_0040FD6C(s32 index) {
         }
         if (D_800C1BB0->spec.flags & 2) {
             if (captured != NULL) {
-                D_800C1BB0->position = captured->head.pos;
-                D_800C1BB0->yaw = captured->yaw;
+                D_800C1BB0->position = captured->header.m_vPos;
+                D_800C1BB0->yaw = captured->m_RotY;
             } else {
                 D_800C1BB0->position.x = 0.0f;
                 D_800C1BB0->position.y = 0.0f;
@@ -810,19 +798,19 @@ extern void func_0020F79C(Mtx4f *m);                         /* identity */
 extern void func_0020FE00(Mtx4f *m, f32 x, f32 y, f32 z);    /* rotation */
 extern void func_0020F85C(Mtx4f *m, CVector3 *in, CVector3 *out);    /* transform */
 extern void func_002216DC(void *world);
-extern s32 func_00239F00(Actor *actor, CVector3 to, void *info);
+extern s32 func_00239F00(CGameObjectInstance *actor, CVector3 to, void *info);
 extern void func_00226724(void *world);
 
 /* Places the cinema relative to its target (flag 1) or to the player (flag 2). */
-static __inline__ void Cinema_Anchor(Actor *player) {
+static __inline__ void Cinema_Anchor(CGameObjectInstance *player) {
     if ((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) {
         D_800C1BB0->position = D_800C1BB0->target->header.m_vPos;
         D_800C1BB0->yaw = D_800C1BB0->target->m_RotY + 1.5707964f;
     }
     if (D_800C1BB0->spec.flags & 2) {
         if (player != NULL) {
-            D_800C1BB0->position = player->head.pos;
-            D_800C1BB0->yaw = player->yaw;
+            D_800C1BB0->position = player->header.m_vPos;
+            D_800C1BB0->yaw = player->m_RotY;
         } else {
             D_800C1BB0->position.x = 0.0f;
             D_800C1BB0->position.y = 0.0f;
@@ -837,10 +825,10 @@ void func_00410CE8(CCamera *cam) {
     CVector3 eye;
     CVector3 target;
     CVector3 dir;
-    ActorHead saved;
+    CObjectHead saved;
     Mtx4f mtx;
     CVector3 tmp;
-    Actor *player;
+    CGameObjectInstance *player;
     s32 hit;
     f32 yaw;
 
@@ -869,12 +857,12 @@ void func_00410CE8(CCamera *cam) {
         func_0020EEF8(&eye, &eye, &D_800C1BB0->position);
         func_0020EF2C(&dir, &target, &eye);
         if (player != NULL) {
-            saved = player->head;
-            player->head.pos = target;
+            saved = *(CObjectHead *) player;
+            player->header.m_vPos = target;
             func_002216DC(D_800F7078);
             hit = func_00239F00(player, eye, D_800F1B40);
             func_00226724(D_800F7078);
-            player->head = saved;
+            *(CObjectHead *) player = saved;
             if (hit) {
                 eye = D_800F1CE0.m_vInstancePos;
             }
