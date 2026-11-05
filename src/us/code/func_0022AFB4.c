@@ -3,59 +3,33 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
+#include "structs/player.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
     /* 0x0C */ CVector3 max;
 } Box;
 
-typedef struct Target {
-    /* 0x000 */ u8 kind;
-    /* 0x001 */ u8 pad1[0x10 - 1];
-    /* 0x010 */ s32 unk10;
-    /* 0x014 */ u8 pad14[0xD4 - 0x14];
-    /* 0x0D4 */ u32 flags;
-    /* 0x0D8 */ u8 padD8[0x140 - 0xD8];
-    /* 0x140 */ s32 unk140;
-    /* 0x144 */ s32 health;
-    /* 0x148 */ u8 pad148[0x174 - 0x148];
-    /* 0x174 */ s8 state;
-} Target;
-
-typedef struct Player Player;
-struct Player {
-    /* 0x0000 */ u8 pad0[4];
-    /* 0x0004 */ CVector3 pos;
-    /* 0x0010 */ u8 pad10[0x54 - 0x10];
-    /* 0x0054 */ f32 height;
-    /* 0x0058 */ u8 pad58[0x524 - 0x58];
-    /* 0x0524 */ s32 health;
-    /* 0x0528 */ u8 pad528[0xA08 - 0x528];
-    /* 0x0A08 */ s16 mode;
-    /* 0x0A0A */ u8 padA0A[0x1320 - 0xA0A];
-    /* 0x1320 */ Player *next;
-};
-
 typedef struct ContactHandler ContactHandler;
 struct ContactHandler {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ s16 type;
     /* 0x06 */ u8 pad6[0x10 - 6];
-    /* 0x10 */ s32 (*func)(Player *player, ContactHandler *handler);
+    /* 0x10 */ s32 (*func)(CPlayer *player, ContactHandler *handler);
 };
 
 extern f32 D_800B6D28;                  /* the frame's time step */
 extern f32 D_800B6D30;
 extern CCollisionResults D_800F1CE0;
-extern Player *D_80119890;              /* current player */
+extern CPlayer *D_80119890;              /* current player */
 extern ContactHandler D_800ACE18[4];
 extern CCollisionResults *D_800F1ADC;
 extern u8 D_800F8928[];
 
 s32 func_002113A4(void);
 s32 func_00239F00(CParticle *p, CVector3 pos, u32 *flags);
-f32 func_002671B4(Player *player);
-f32 func_002672C8(Player *player);
+f32 func_002671B4(CPlayer *player);
+f32 func_002672C8(CPlayer *player);
 f32 func_00298470(f32 x);
 void func_002324E8(CParticle *p);
 void func_0022F1C8(void *list, CParticle *p);
@@ -82,8 +56,8 @@ void func_00232934(CParticle *p);
  * descriptor allows. */
 void func_0022AFB4(CParticle *p) {
     Box bounds;
-    Target *target;
-    Player *player;
+    CGameObjectInstance *target;
+    CPlayer *player;
     ContactHandler *handler;
     f32 extent;
     f32 scaled;
@@ -130,7 +104,7 @@ void func_0022AFB4(CParticle *p) {
         p->m_Shake = fade;
     }
     if (p->m_dwFlags & 0x10000) {
-        target = (Target *)p->m_pTarget;
+        target = p->m_pTarget;
         switch (p->header.m_nObjType) {
             default:
                 p->m_cFrame = 0.0f;
@@ -148,7 +122,7 @@ void func_0022AFB4(CParticle *p) {
             case 0x12A:
             case 0x132:
                 die = 0;
-                if (target->health == 0) {
+                if (target->m_AI.m_Health == 0) {
                     bounce = 1;
                 }
                 break;
@@ -158,30 +132,30 @@ void func_0022AFB4(CParticle *p) {
             case 0x126:
                 if (p->m_dwFlags & 0x4000000) {
                     die = 1;
-                } else if (!(target->flags & 0x100)) {
+                } else if (!(target->m_dwFlags & 0x100)) {
                     die = 1;
-                } else if (target->flags & 0x300000) {
-                    die = (f32) target->health <= 0.0f;
+                } else if (target->m_dwFlags & 0x300000) {
+                    die = (f32) target->m_AI.m_Health <= 0.0f;
                 } else {
-                    die = target->unk140 & 0x20;
+                    die = target->m_AI.m_dwFlags & 0x20;
                 }
                 bounce = 0;
                 break;
             case 0xB:
                 die = 0;
-                if (target->state != 0x21 || !(target->flags & 0x100)) {
+                if (target->m_AI.m_Mode != 0x21 || !(target->m_dwFlags & 0x100)) {
                     bounce = 1;
                 }
                 break;
             case 4:
                 die = 0;
-                if (target->state != 0x20 || !(target->flags & 0x100)) {
+                if (target->m_AI.m_Mode != 0x20 || !(target->m_dwFlags & 0x100)) {
                     bounce = 1;
                 }
                 break;
             case 0x2D:
             case 0x4F:
-                bounce = !(target->flags & 0x100);
+                bounce = !(target->m_dwFlags & 0x100);
                 break;
         }
         if (die || bounce) {
@@ -197,7 +171,7 @@ void func_0022AFB4(CParticle *p) {
                 p->m_vVelocity.x = 0.0f;
                 p->m_vVelocity.z = 0.0f;
             }
-            p->header.m_pCurrentRegion = (struct CGameRegion *)target->unk10;
+            p->header.m_pCurrentRegion = target->header.m_pCurrentRegion;
             p->m_dwHitFlags &= ~0x1000000;
             if (bounce) {
                 p->m_nFrames = 1;
@@ -208,12 +182,12 @@ void func_0022AFB4(CParticle *p) {
         p->m_Alignment = -3;
     }
     if (p->m_dwFlags & 0x60000) {
-        for (player = D_80119890; player != NULL; player = player->next) {
-            if (player->health != 0 && player->mode != 2) {
-                top = player->pos.y + player->height;
+        for (player = D_80119890; player != NULL; player = player->m_pNext) {
+            if (player->m_Data.m_Health != 0 && player->m_Mode != 2) {
+                top = player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.m_CollisionYOffset;
                 if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + func_002671B4(player) + 20.479999f) {
-                    dist = func_00298470((player->pos.x - p->header.m_vPos.x) * (player->pos.x - p->header.m_vPos.x)
-                                         + (player->pos.z - p->header.m_vPos.z) * (player->pos.z - p->header.m_vPos.z));
+                    dist = func_00298470((player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x) * (player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x)
+                                         + (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z) * (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z));
                     if (dist < func_002672C8(player) + 51.199997f) {
                         handler = D_800ACE18;
                         for (i = 3; i != -1; handler++, i--) {
