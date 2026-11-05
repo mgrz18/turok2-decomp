@@ -3,6 +3,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/world.h"
+#include "structs/level_actor.h"
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level
@@ -22,42 +23,10 @@ struct View {
 };
 
 typedef struct {
-    s32 kind;               /* 0x00 */
-    s32 flags;              /* 0x04: views it shows in */
-} Info;
-
-typedef struct {
     s32 stride;             /* 0x00 */
     s32 count;              /* 0x04 */
     u8 entries[1];          /* 0x08 */
 } Table;
-
-typedef struct {
-    u8 pad0[0x14];
-    Info *info;             /* 0x14 */
-    u8 pad18[0xC];
-    void **owner;           /* 0x24 */
-    u8 pad28[0x40];
-    f32 boxMin[3];          /* 0x68 */
-    f32 boxMax[3];          /* 0x74 */
-    u8 pad80[4];
-    s32 viewMask;           /* 0x84 */
-    u16 flags;              /* 0x88: 4 translucent */
-    u8 pad8A[6];
-} Object;                   /* 0x90 */
-
-typedef struct {
-    u8 pad0[0x14];
-    Info *info;             /* 0x014 */
-    u8 pad18[0x134];
-    f32 boxMin[3];          /* 0x14C */
-    f32 boxMax[3];          /* 0x158 */
-    u8 pad164[8];
-    u16 flags;              /* 0x16C: 1 dead, 2 shown, 0x20 translucent */
-    u8 pad16E[0x22];
-    s32 viewMask;           /* 0x190 */
-    u8 pad194[4];
-} Actor;                    /* 0x198 */
 
 typedef struct {
     f32 minX, minZ;         /* 0x0 */
@@ -79,9 +48,9 @@ void func_0020B5D4(void);
 void func_0020B624(void);
 void func_0020565C(s32, void **);
 void *func_002017D4(void *, s32);
-s32 func_0026F60C(void *, f32 *);
-void func_00214844(Object *, View *);
-void func_002152AC(Actor *);
+s32 func_0026F60C(void *, CBox *);
+void func_00214844(CStaticObject *, View *);
+void func_002152AC(CLevelActor *);
 
 void func_00221D3C(CWorld *w) {
     s32 r;
@@ -96,9 +65,9 @@ void func_00221D3C(CWorld *w) {
     Cell *cell;
     void *grp;
     Table *t;
-    Object *o;
-    Actor *actors;
-    Actor *a;
+    CStaticObject *o;
+    CLevelActor *actors;
+    CLevelActor *a;
     s32 k;
     s32 off;
     s32 cnt;
@@ -180,24 +149,24 @@ void func_00221D3C(CWorld *w) {
                     if (cnt > 0) {
                         off = k;
                         do {
-                            o = (Object *)(objs + off);
-                            if (o->info->flags & mask) {
-                                if (vmask & o->viewMask) {
+                            o = (CStaticObject *)(objs + off);
+                            if (o->header.m_pIntelligence->m_dwFlags & mask) {
+                                if (vmask & o->m_ViewMask) {
                                     v = views;
                                     found = 0;
                                     while (v != NULL) {
-                                        if (v->boxMax[0] > o->boxMin[0] && v->boxMin[0] < o->boxMax[0]
-                                            && v->boxMax[2] > o->boxMin[2] && v->boxMin[2] < o->boxMax[2]
-                                            && v->boxMax[1] > o->boxMin[1] && v->boxMin[1] < o->boxMax[1]
-                                            && func_0026F60C(v->frustum, o->boxMin)) {
+                                        if (v->boxMax[0] > o->m_Bounds.m_vMin.x && v->boxMin[0] < o->m_Bounds.m_vMax.x
+                                            && v->boxMax[2] > o->m_Bounds.m_vMin.z && v->boxMin[2] < o->m_Bounds.m_vMax.z
+                                            && v->boxMax[1] > o->m_Bounds.m_vMin.y && v->boxMin[1] < o->m_Bounds.m_vMax.y
+                                            && func_0026F60C(v->frustum, &o->m_Bounds)) {
                                             found = 1;
                                             break;
                                         }
                                         v = v->next;
                                     }
                                     if (found) {
-                                        o->owner = region->m_hData;
-                                        if (o->flags & 4) {
+                                        o->m_pOwner = region->m_hData;
+                                        if (o->m_wFlags & 4) {
                                             c = w->m_nDeferred;
                                             if (c != 0x40) {
                                                 w->m_pDeferred[c] = o;
@@ -210,7 +179,7 @@ void func_00221D3C(CWorld *w) {
                                 }
                             }
                             k++;
-                            off += sizeof(Object);
+                            off += sizeof(CStaticObject);
                         } while (k < cnt);
                     }
                     do {
@@ -218,34 +187,34 @@ void func_00221D3C(CWorld *w) {
                     } while (0);
                     k = 0;
                     cnt2 = t->count;
-                    actors = (Actor *)t->entries;
+                    actors = (CLevelActor *)t->entries;
                     if (cnt2 > 0) {
                         do {
                             a = &actors[k];
-                            if (!(a->info->flags & mask)) {
+                            if (!(a->header.m_pIntelligence->m_dwFlags & mask)) {
                                 goto next;
                             }
-                            if (a->flags & 1) {
+                            if (a->m_wFlags & 1) {
                                 goto next;
                             }
-                            if (!(a->flags & 2)) {
+                            if (!(a->m_wFlags & 2)) {
                                 goto next;
                             }
-                            if (vmask & a->viewMask) {
+                            if (vmask & a->m_ViewMask) {
                                 v = views;
                                 found = 0;
                                 while (v != NULL) {
-                                    if (v->boxMax[0] > a->boxMin[0] && v->boxMin[0] < a->boxMax[0]
-                                        && v->boxMax[2] > a->boxMin[2] && v->boxMin[2] < a->boxMax[2]
-                                        && v->boxMax[1] > a->boxMin[1] && v->boxMin[1] < a->boxMax[1]
-                                        && func_0026F60C(v->frustum, a->boxMin)) {
+                                    if (v->boxMax[0] > a->m_Bounds.m_vMin.x && v->boxMin[0] < a->m_Bounds.m_vMax.x
+                                        && v->boxMax[2] > a->m_Bounds.m_vMin.z && v->boxMin[2] < a->m_Bounds.m_vMax.z
+                                        && v->boxMax[1] > a->m_Bounds.m_vMin.y && v->boxMin[1] < a->m_Bounds.m_vMax.y
+                                        && func_0026F60C(v->frustum, &a->m_Bounds)) {
                                         found = 1;
                                         break;
                                     }
                                     v = v->next;
                                 }
                                 if (found) {
-                                    if (a->flags & 0x20) {
+                                    if (a->m_wFlags & 0x20) {
                                         c = w->m_nDeferred;
                                         if (c != 0x40) {
                                             w->m_pDeferred[c] = a;

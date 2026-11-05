@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028795C.c, func_0028795C, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/world.h"
+#include "structs/level_actor.h"
 
 /* Instantiates a level's actor data: from the level file's four tables
  * (two kinds of placed objects, the level actors, and a fourth kind of
@@ -36,16 +37,6 @@ typedef struct { u8 pad0[0x48]; } SrcD;                                /* 0x48 *
 typedef struct { u8 pad0[0x90]; } ItemA;                               /* 0x90 */
 typedef struct { u8 pad0[0xC0]; } ItemD;                               /* 0xC0 */
 
-typedef struct {
-    u8 pad0[4];
-    f32 pos[3];             /* 0x004 */
-    u8 pad10[0x15C];
-    u16 flags;              /* 0x16C */
-    u16 index;              /* 0x16E: bit in the level's killed array */
-    u8 pad170[8];
-    u8 links[0x20];         /* 0x178 */
-} Actor;                                                               /* 0x198 */
-
 s32 func_00200B00(s32 ***, s32);
 void *func_002017D4(void *, s32);
 void func_00201818(void *, s32);
@@ -55,9 +46,9 @@ void func_002057B0(s32, s32 ***, void **);
 void func_0020192C(Table *, void *, s32);
 void func_002141F0(ItemA *, SrcA *, s32, void *, f32);
 void func_00214564(ItemA *, SrcB *, s32, void *);
-void func_002150C0(Actor *, SrcC *, s32, void *);
+void func_002150C0(CLevelActor *, SrcC *, s32, void *);
 void func_00211F64(ItemD *, SrcD *);
-f32 func_002671B4(Actor *);
+f32 func_002671B4(CLevelActor *);
 void func_00222A9C(void **, s32, f32 *, void *);
 
 void func_00220D00(CWorld *world, s32 ***file) {
@@ -109,7 +100,7 @@ void func_00220D00(CWorld *world, s32 ***file) {
     SrcD *qpd;
     s32 index;
     SrcB *pB;
-    Actor *actors;
+    CLevelActor *actors;
     void *aux;
     void **handle;
 
@@ -173,13 +164,13 @@ void func_00220D00(CWorld *world, s32 ***file) {
             func_0020192C(tC, secC, 1);
             ((Section *)secC)->stride = 0x198;
             ((Section *)secC)->count = nC;
-            actors = (Actor *)(secC + 8);
+            actors = (CLevelActor *)(secC + 8);
             pC = (SrcC *)tC->entries;
             k = 0;
             if (nC > 0) {
                 do {
                     func_002150C0(&actors[k], &pC[k], func_00201848(world->m_pObjects, world->m_ObjectsKey, pC[k].type), aux);
-                    index = actors[k].index;
+                    index = actors[k].m_nKilledIndex;
                     level = world->m_nLevel;
                     bits = func_002017D4(func_002017D4(func_002017D4(world->m_pBitSections, 0), level), 1);
                     do {
@@ -189,7 +180,7 @@ void func_00220D00(CWorld *world, s32 ***file) {
                     killed = func_002017D4(bits, 1);
                     mask = 1 << (index & 7);
                     if (killed[index / 8] & mask) {
-                        actors[k].flags |= 1;
+                        actors[k].m_wFlags |= 1;
                     }
                     k++;
                 } while (k < nC);
@@ -238,10 +229,10 @@ void func_00220D00(CWorld *world, s32 ***file) {
             } while (0);
             if (nC > 0) {
                 do {
-                    pos[0] = actors[k].pos[0];
-                    pos[1] = actors[k].pos[1] + func_002671B4(&actors[k]) * 0.5f;
-                    pos[2] = actors[k].pos[2];
-                    func_00222A9C(links, nD, pos, actors[k].links);
+                    pos[0] = actors[k].header.m_vPos.x;
+                    pos[1] = actors[k].header.m_vPos.y + func_002671B4(&actors[k]) * 0.5f;
+                    pos[2] = actors[k].header.m_vPos.z;
+                    func_00222A9C(links, nD, pos, actors[k].m_RegionLinks);
                     k++;
                 } while (k < nC);
             }
