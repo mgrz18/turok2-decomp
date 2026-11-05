@@ -1,21 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x40];
-    /* 0x40 */ f32 biteRange;
-    /* 0x44 */ u8 pad44[0x4E - 0x44];
-    /* 0x4E */ u8 kind;
-} Params;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ Params params;
-} Def;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ Def *def;
+    /* 0x14 */ CIntelligence *def;
     /* 0x18 */ u8 pad18[0x1C - 0x18];
     /* 0x1C */ f32 pitch;
 } Self;
@@ -33,7 +22,7 @@ void func_00243414(Self *self, CAI *ai, s32 mode);
 void func_002616B8(Self *self, CAI *ai) {
     CAITargets t;
     CAIFrameMotion steer;
-    Params *params;
+    CEnemyIntelligence *params;
     CAITargets *tp;
     f32 speed;
     f32 turn;
@@ -41,7 +30,7 @@ void func_002616B8(Self *self, CAI *ai) {
     f32 lo;
     f32 hi;
 
-    params = &self->def->params;
+    params = &self->def->m_Enemy;
     func_00246108(self, ai, &t, 1, 1);
     func_0024599C(self, ai, &steer);
     if (t.m_Path.m_Kind == 2 && t.m_Path.m_pTarget->m_AI.m_Mode == 6) {
@@ -83,13 +72,13 @@ void func_002616B8(Self *self, CAI *ai) {
     func_00245BAC(self, ai, ai->m_Enemy.m_TurnRate, tp->m_Path.m_Angle);
 
     if (ai->m_ModeTime > 15.0f) {
-        if (params->kind != 5) {
+        if (params->m_UnderwaterBehavior != 5) {
             if (t.m_Path.m_Kind == 0 && t.m_Path.m_Dist < 81.92f
                 && (t.m_Path.m_Angle < 0.0f ? -t.m_Path.m_Angle : t.m_Path.m_Angle) < 0.26179942f) {
                 func_00243414(self, ai, 6);
             }
         } else {
-            if (t.m_Path.m_Kind == 0 && t.m_Path.m_Dist < params->biteRange) {
+            if (t.m_Path.m_Kind == 0 && t.m_Path.m_Dist < params->m_AttackDartRadius) {
                 func_00243414(self, ai, 16);
             }
         }
