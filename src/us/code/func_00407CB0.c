@@ -3,15 +3,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/game.h"
-
-/* The parts of the player this reads (from func_002532A8). */
-typedef struct {
-    /* 0x000 */ u8 pad000[0x9D0];
-    /* 0x9D0 */ s32 pieces[5];
-    /* 0x9E4 */ u8 pad9E4[0xC];
-    /* 0x9F0 */ s32 unk9F0;
-} PlayerPieces;
-
+#include "structs/player.h"
 
 /* The object this callback gets (only +0xF8 is used). */
 typedef struct {
@@ -20,19 +12,20 @@ typedef struct {
 } Holder;
 
 extern void func_002535E4(CPlayerList *list, f32 arg1);
-extern PlayerPieces *func_002532A8(CPlayerList *list);
+extern CPlayer *func_002532A8(CPlayerList *list);
 extern void func_00412438(s32 id);
 
 
 void func_00407CB0(s32 arg0, Holder *obj) {
-    PlayerPieces *player;
+    CPlayer *player;
     GameSettings *flags;
 
     obj->held = NULL;
     func_002535E4(&D_80119870.m_PlayerList, 900.0f);
     player = func_002532A8(&D_80119870.m_PlayerList);
-    player->unk9F0 = 1;
-    if (player->pieces[0] && player->pieces[1] && player->pieces[2] && player->pieces[3] && player->pieces[4]) {
+    player->m_Data.m_bPrimagenBossComplete = 1;
+    if (player->m_Data.m_bLevel1TotemFlags && player->m_Data.m_bLevel2TotemFlags && player->m_Data.m_bLevel3TotemFlags
+        && player->m_Data.m_bLevel4TotemFlags && player->m_Data.m_bLevel5TotemFlags) {
         func_00412438(0x172);
         (&D_80119870.m_Settings)->unlockedCheats |= 0x7FF0019;
     } else {
