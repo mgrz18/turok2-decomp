@@ -21,36 +21,22 @@
 #include "structs/game.h"
 #include "rw/abu_types.h"
 #include "structs/menu.h"
+#include "structs/menu_model.h"
+#include "structs/camera.h"
+#include "gfx.h"
 
 /* ---------------- func_0044C230 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of func_004131B0 (3 words), a padding nop,
  * one junk word (0x41322C) and this function, which really starts at 0x413230 (0x174 bytes). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F290.c, func_0043F290, with Turok 2's layouts. */
 
-struct MenuItem_413230;
-
-typedef struct MenuBinding_413230 {
-    /* 0x00 */ char *name;
-    /* 0x04 */ s32 type; /* 0 f32, 1/2/5 s32, 3 s8, 4 s16, 6 u8, 7 u16, 8 u32 */
-    /* 0x08 */ f32 min;
-    /* 0x0C */ f32 max;
-    /* 0x10 */ f32 step;
-    /* 0x14 */ f32 scale;
-    /* 0x18 */ void *(*storage)(struct MenuItem_413230 *item);
-} MenuBinding_413230;
-
-typedef struct MenuItem_413230 {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ MenuBinding_413230 *binding;
-} MenuItem_413230;
-
 extern s32 func_0029E3E0(char *buf, const char *fmt, ...); /* sprintf */
 extern char D_801308A0[];
 extern char D_80130860[];
 
 /* Reads the item's bound variable as a float, whatever its type. */
-static __inline__ f32 MenuItem_GetValue(MenuItem_413230 *item) {
-    MenuBinding_413230 *binding = item->binding;
+static __inline__ f32 MenuItem_GetValue(MenuItem *item) {
+    MenuBinding *binding = item->binding;
     void *p = binding->storage(item);
 
     switch (binding->type) {
@@ -76,8 +62,8 @@ static __inline__ f32 MenuItem_GetValue(MenuItem_413230 *item) {
 }
 
 /* Formats the item's value (scaled) after its name. */
-char *func_0044C230(MenuItem_413230 *item) {
-    MenuBinding_413230 *binding = item->binding;
+char *func_0044C230(MenuItem *item) {
+    MenuBinding *binding = item->binding;
     f32 value = MenuItem_GetValue(item);
 
     value = value / binding->scale;
@@ -94,33 +80,11 @@ char *func_0044C230(MenuItem_413230 *item) {
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F404.c, func_0043F404, with Turok 2's layouts. */
 /* A menu slider: step its bound variable (any numeric type) with left/right. */
 
-struct MenuItem_4133A4;
+extern s32 func_00285628(ControllerProfile *controller);   /* left pressed */
+extern s32 func_00285670(ControllerProfile *controller);   /* right pressed */
 
-typedef struct MenuBinding_4133A4 {
-    /* 0x00 */ char *name;
-    /* 0x04 */ s32 type;            /* 0 f32, 1/2/5 s32, 3 s8, 4 s16, 6 u8, 7 u16, 8 u32 */
-    /* 0x08 */ f32 min;
-    /* 0x0C */ f32 max;
-    /* 0x10 */ f32 step;
-    /* 0x14 */ f32 unk14;
-    /* 0x18 */ void *(*storage)(struct MenuItem_4133A4 *item);
-} MenuBinding_4133A4;
-
-typedef struct MenuItem_4133A4 {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ MenuBinding_4133A4 *binding;
-} MenuItem_4133A4;
-
-typedef struct Menu_4133A4 {
-    /* 0x00 */ u8 pad0[0x20];
-    /* 0x20 */ s32 controller;
-} Menu_4133A4;
-
-extern s32 func_00285628(s32 controller);   /* left pressed */
-extern s32 func_00285670(s32 controller);   /* right pressed */
-
-static __inline__ f32 bindingGet(MenuItem_4133A4 *item) {
-    MenuBinding_4133A4 *b = item->binding;
+static __inline__ f32 bindingGet(MenuItem *item) {
+    MenuBinding *b = item->binding;
     void *p = b->storage(item);
 
     switch (b->type) {
@@ -135,8 +99,8 @@ static __inline__ f32 bindingGet(MenuItem_4133A4 *item) {
     }
 }
 
-static __inline__ void bindingSet(MenuItem_4133A4 *item, f32 value) {
-    MenuBinding_4133A4 *b = item->binding;
+static __inline__ void bindingSet(MenuItem *item, f32 value) {
+    MenuBinding *b = item->binding;
     void *p = b->storage(item);
 
     switch (b->type) {
@@ -150,8 +114,8 @@ static __inline__ void bindingSet(MenuItem_4133A4 *item, f32 value) {
     }
 }
 
-s32 func_0044C3A4(MenuItem_4133A4 *item, Menu_4133A4 *menu) {
-    MenuBinding_4133A4 *b = item->binding;
+s32 func_0044C3A4(MenuItem *item, Menu *menu) {
+    MenuBinding *b = item->binding;
     f32 value;
 
     value = bindingGet(item);
@@ -173,68 +137,16 @@ s32 func_0044C3A4(MenuItem_4133A4 *item, Menu_4133A4 *menu) {
 /* ---------------- func_0044C63C ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F69C.c, func_0043F69C, with Turok 2's layouts. */
 
-/* 0x28-byte menu item, also copied by value to lay out its parts. */
-typedef struct MenuItem_41363C {
-    /* 0x00 */ s32 idx;
-    /* 0x04 */ s16 kind;
-    /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ u32 flags;
-    /* 0x0C */ s16 x;
-    /* 0x0E */ s16 y;
-    /* 0x10 */ u8 b10, b11, b12, b13;
-    /* 0x14 */ s32 data;
-    /* 0x18 */ void *def;
-    /* 0x1C */ s32 value;
-    /* 0x20 */ void *p20;
-    /* 0x24 */ void *owner;
-} MenuItem_41363C;
-
-/* Layout of an item. */
-typedef struct {
-    /* 0x00 */ s32 f0;
-    /* 0x04 */ s32 width;
-    /* 0x08 */ s32 height;
-    /* 0x0C */ f32 scaleX;
-    /* 0x10 */ f32 scaleY;
-    /* 0x14 */ s32 x0, x1, y0, y1;
-} MenuInfo;
-
-/* Text style of an item class. */
-typedef struct {
-    /* 0x00 */ s32 mode;
-    /* 0x04 */ s32 charWidth;
-    /* 0x08 */ s32 lineHeight;
-    /* 0x0C */ u8 padC[0x1C - 0xC];
-} MenuStyle_41363C;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ void *ctx;
-} MenuPanel;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x288];
-    /* 0x288 */ f32 width;
-    /* 0x28C */ f32 height;
-} MenuCamera;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x24];
-    /* 0x24 */ s32 width;
-    /* 0x28 */ s32 height;
-} MenuImage;
-
-extern MenuStyle_41363C D_800C1BD4[];
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C2034; /* screen height */
 
 extern s32 func_00266B80(void);
-extern MenuCamera *func_00416B28_41363C(void *ctx) __asm__("func_0044FB28");
-extern u8 *func_00413230_41363C(MenuItem_41363C *item) __asm__("func_0044C230");
+extern CCamera *func_00416B28_41363C(void *pool) __asm__("func_0044FB28");
+extern u8 *func_00413230_41363C(MenuItem *item) __asm__("func_0044C230");
 extern f32 func_004163C0_41363C(u8 *text, f32 a, f32 b) __asm__("func_0044F3C0");
 extern void func_0027AEA8(s32 image, s32 b, s32 *width, s32 *height);
 
-static __inline__ MenuStyle_41363C *MenuItem_Style_41363C(MenuItem_41363C *it) {
+static __inline__ MenuTextStyle *MenuItem_Style_41363C(MenuItem *it) {
     s32 i;
 
     i = 0;
@@ -274,26 +186,26 @@ static __inline__ MenuStyle_41363C *MenuItem_Style_41363C(MenuItem_41363C *it) {
 }
 
 /* Measures a menu item and places it on screen. */
-void func_0044C63C(MenuItem_41363C *it, MenuInfo *o) {
-    MenuCamera *cam;
-    MenuStyle_41363C *E;
-    MenuItem_41363C cp;
-    MenuInfo a, b, c;
+void func_0044C63C(MenuItem *it, MenuItemLayout *o) {
+    CCamera *cam;
+    MenuTextStyle *E;
+    MenuItem cp;
+    MenuItemLayout a, b, c;
     u8 *p;
-    MenuImage *sub;
+    MenuModelPart *sub;
     s32 n, n2;
     f32 fs, v, fa, fb, vt, vt2;
 
-    cam = func_00416B28_41363C(((MenuPanel *) it->owner)->ctx);
+    cam = func_00416B28_41363C(it->menu->pool);
     o->scaleY = 1.0f;
     o->scaleX = 1.0f;
-    switch (it->kind) {
+    switch (it->type) {
         case 0:
         case 5:
             E = MenuItem_Style_41363C(it);
-            if (E->mode == 0) {
+            if (E->font == 0) {
                 fs = E->charWidth;
-                if (it->kind == 5) {
+                if (it->type == 5) {
                     p = func_00413230_41363C(it);
                 } else {
                     p = (u8 *) it->data;
@@ -302,7 +214,7 @@ void func_0044C63C(MenuItem_41363C *it, MenuInfo *o) {
                 o->width = v;
             } else {
                 n = 0;
-                p = (it->kind == 5 ? func_00413230_41363C(it) : (u8 *) it->data);
+                p = (it->type == 5 ? func_00413230_41363C(it) : (u8 *) it->data);
                 for (; p != NULL && *p != 0 && *p != 10; p++) {
                     n++;
                 }
@@ -310,7 +222,7 @@ void func_0044C63C(MenuItem_41363C *it, MenuInfo *o) {
             }
             if (it->flags & 0x08000000) {
                 o->height = (f32) D_800C2034 * 0.10810811f;
-            } else if (E->mode == 2 && D_800C2034 >= 0xDF) {
+            } else if (E->font == 2 && D_800C2034 >= 0xDF) {
                 o->height = ((f32) E->lineHeight + 0.5f) * (f32) D_800C2034 * 0.0045045046f;
             } else {
                 o->height = (E->lineHeight * D_800C2034) / 222;
@@ -331,8 +243,8 @@ void func_0044C63C(MenuItem_41363C *it, MenuInfo *o) {
                 func_0027AEA8(it->data, 0, &o->width, &o->height);
             }
             if ((it->flags & 0x10000000) && (f32) o->width != 0.0f && (f32) o->height != 0.0f) {
-                fa = cam->width / (f32) o->width;
-                fb = cam->height / (f32) o->height;
+                fa = cam->m_Viewport.m_Width / (f32) o->width;
+                fb = cam->m_Viewport.m_Height / (f32) o->height;
             } else {
                 fa = (f32) D_800C2030 * 0.0035211267f;
                 fb = (f32) D_800C2034 * 0.0045045046f;
@@ -343,16 +255,16 @@ void func_0044C63C(MenuItem_41363C *it, MenuInfo *o) {
         case 2:
             a = *o;
             cp = *it;
-            cp.kind = 0;
+            cp.type = 0;
             func_0044C63C(&cp, &a);
             b = *o;
             cp = *it;
-            cp.kind = 1;
+            cp.type = 1;
             cp.data = 0;
             func_0044C63C(&cp, &b);
             c = *o;
             cp = *it;
-            cp.kind = 1;
+            cp.type = 1;
             cp.data = 0;
             func_0044C63C(&cp, &c);
             n2 = b.width + c.width;
@@ -363,9 +275,9 @@ void func_0044C63C(MenuItem_41363C *it, MenuInfo *o) {
             o->height = a.height + b.height + ((c.height - b.height) / 2);
             break;
         case 3:
-            sub = (MenuImage *) it->data;
-            o->width = ((f32) sub->width * cam->width) / (f32) D_800C2030;
-            o->height = ((f32) sub->height * cam->height) / (f32) D_800C2034;
+            sub = it->part;
+            o->width = ((f32) sub->width * cam->m_Viewport.m_Width) / (f32) D_800C2030;
+            o->height = ((f32) sub->height * cam->m_Viewport.m_Height) / (f32) D_800C2034;
             break;
         default:
             o->width = 1;
@@ -375,70 +287,33 @@ void func_0044C63C(MenuItem_41363C *it, MenuInfo *o) {
     vt = (f32) ((it->x * D_800C2030) / 284);
     if (!(it->flags & 0x8000)) {
         if (it->flags & 0x4000) {
-            o->x0 = (f32) o->x1 + vt;
+            o->left = (f32) o->right + vt;
         } else {
-            o->x0 = vt;
+            o->left = vt;
         }
     }
-    o->x1 = (f32) o->x0 + (f32) o->width * o->scaleX;
+    o->right = (f32) o->left + (f32) o->width * o->scaleX;
     vt2 = (f32) ((it->y * D_800C2034) / 222);
     if (!(it->flags & 0x20000)) {
         if (it->flags & 0x10000) {
-            o->y0 = (f32) o->y1 + vt2;
+            o->top = (f32) o->bottom + vt2;
         } else {
-            o->y0 = vt2;
+            o->top = vt2;
         }
     }
-    o->y1 = (f32) o->y0 + (f32) o->height * o->scaleY;
+    o->bottom = (f32) o->top + (f32) o->height * o->scaleY;
 }
 
 /* ---------------- func_0044CF74 ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043FFAC.c, func_0043FFAC, with Turok 2's layouts. */
 
-typedef struct {
-    /* 0x00 */ s32 idx;
-    /* 0x04 */ s16 kind;
-    /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ u32 flags;
-} MenuItem_413F74;
-
-/* Text style of an item class. */
-typedef struct {
-    /* 0x00 */ s32 mode;
-    /* 0x04 */ f32 f4;
-    /* 0x08 */ f32 f8;
-    /* 0x0C */ f32 scaleX;
-    /* 0x10 */ f32 scaleY;
-    /* 0x14 */ u8 shadow;
-    /* 0x15 */ u8 r0, g0, b0, r1, g1, b1;
-    /* 0x1B */ u8 pad1B;
-} MenuStyle_413F74;
-
-typedef struct {
-    /* 0x00 */ s32 selected;
-    /* 0x04 */ u8 pad4[0x14 - 0x4];
-    /* 0x14 */ s32 x;
-    /* 0x18 */ u8 pad18[0x1C - 0x18];
-    /* 0x1C */ s32 y;
-} MenuBox;
-
-typedef struct {
-    /* 0x00 */ u16 id;
-    /* 0x02 */ u8 pad2[0x30 - 0x2];
-    /* 0x30 */ f32 fade;
-    /* 0x34 */ f32 alpha;
-    /* 0x38 */ s32 visible;
-    /* 0x3C */ s32 highlighted;
-} MenuWindow;
-
-extern MenuStyle_413F74 D_800C1BD4_413F74[] __asm__("D_800C1BD4");
 extern s32 D_800C1BD0; /* current draw mode */
 extern s32 D_801101B0[];
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C2034; /* screen height */
 
 extern s32 func_00266B80(void);
-extern void func_00415CE8_413F74(MenuWindow *w, MenuItem_413F74 *it, s32 c) __asm__("func_0044ECE8");
+extern void func_00415CE8_413F74(Menu *w, MenuItem *it, s32 c) __asm__("func_0044ECE8");
 extern void func_00277F6C(void);
 extern void func_0027836C(void);
 extern void func_0027845C(void);
@@ -446,7 +321,7 @@ extern void COnScreen__SetFontColor(s32 r0, s32 g0, s32 b0, s32 r1, s32 g1, s32 
 extern void COnScreen__SetFontScale(f32 x, f32 y);
 extern void func_00278CDC(char *text, s32 x, s32 y, s32 alpha, s32 centred, s32 shadow, f32 scaleX, f32 scaleY);
 
-static __inline__ MenuStyle_413F74 *MenuItem_Style_413F74(MenuItem_413F74 *it) {
+static __inline__ MenuTextStyle *MenuItem_Style_413F74(MenuItem *it) {
     s32 i;
 
     i = 0;
@@ -482,13 +357,13 @@ static __inline__ MenuStyle_413F74 *MenuItem_Style_413F74(MenuItem_413F74 *it) {
             i = 0;
             break;
     }
-    return &D_800C1BD4_413F74[i];
+    return &D_800C1BD4[i];
 }
 
 /* Draws a menu item's text in its class's style, brighter when it is the selected one. */
-void func_0044CF74(MenuItem_413F74 *it, MenuBox *b, void *c, MenuWindow *w, char *text) {
+void func_0044CF74(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, Menu *w, char *text) {
     u8 en;
-    MenuStyle_413F74 *E;
+    MenuTextStyle *E;
     f32 k;
     s32 r, g, bl, a, t, t2;
 
@@ -509,8 +384,8 @@ void func_0044CF74(MenuItem_413F74 *it, MenuBox *b, void *c, MenuWindow *w, char
         en = 0;
     }
     E = MenuItem_Style_413F74(it);
-    if (D_800C1BD0 != E->mode) {
-        switch (E->mode) {
+    if (D_800C1BD0 != E->font) {
+        switch (E->font) {
             case 0:
                 func_00277F6C();
                 break;
@@ -523,9 +398,9 @@ void func_0044CF74(MenuItem_413F74 *it, MenuBox *b, void *c, MenuWindow *w, char
                 func_0027845C();
                 break;
         }
-        D_800C1BD0 = E->mode;
+        D_800C1BD0 = E->font;
     }
-    if (b->selected == (s16) w->id) {
+    if (b->index == w->cursor) {
         k = 1.25f;
     } else {
         k = !(it->flags & 0x01000000) ? 0.25f : 0.9f;
@@ -558,7 +433,7 @@ void func_0044CF74(MenuItem_413F74 *it, MenuBox *b, void *c, MenuWindow *w, char
     if (en != 0) {
         en = E->shadow;
     }
-    func_00278CDC(text, b->x, b->y, (s32) (w->fade * (w->alpha * 255.0f)), 0, en, 1.0f, 1.0f);
+    func_00278CDC(text, b->left, b->top, (s32) (w->fade * (w->alpha * 255.0f)), 0, en, 1.0f, 1.0f);
 }
 
 /* ---------------- func_0044D3DC ---------------- */
@@ -566,32 +441,6 @@ void func_0044CF74(MenuItem_413F74 *it, MenuBox *b, void *c, MenuWindow *w, char
  * own (0x4143DC-0x415CE8, .rodata from 0x800C0BE8); their types carry the
  * address of the part that matched them. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0044044C.c, func_0044044C, with Turok 2's layouts. */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ u32 flags;
-    /* 0x0C */ u8 padC[0x14 - 0xC];
-    /* 0x14 */ s32 image;
-} MenuItem_4143DC;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s32 width;
-    /* 0x08 */ s32 height;
-    /* 0x0C */ f32 scaleX;
-    /* 0x10 */ f32 scaleY;
-    /* 0x14 */ s32 x;
-    /* 0x18 */ u8 pad18[0x1C - 0x18];
-    /* 0x1C */ s32 y;
-} MenuBox_4143DC;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ f32 fade;
-    /* 0x34 */ f32 alpha;
-    /* 0x38 */ u8 pad38[0x3C - 0x38];
-    /* 0x3C */ s32 highlighted;
-} MenuWindow_4143DC;
 
 extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0"); /* current draw mode */
 
@@ -602,7 +451,7 @@ extern void func_00279028(s32 alpha);
 extern void func_0027B320(s32 image, s32 b, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 g);
 
 /* Draws a menu image: a filled box when it is the focused item, the image otherwise. */
-void func_0044D3DC(MenuItem_4143DC *item, MenuBox_4143DC *box, s32 unused, MenuWindow_4143DC *window) {
+void func_0044D3DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *area, Menu *window) {
     s32 alpha;
     f32 fx;
     f32 fy;
@@ -618,8 +467,8 @@ void func_0044D3DC(MenuItem_4143DC *item, MenuBox_4143DC *box, s32 unused, MenuW
         func_0027AF4C();
         t1 = (f32) box->width * box->scaleX;
         t2 = (f32) box->height * box->scaleY;
-        fy = (f32) box->y;
-        fx = (f32) box->x;
+        fy = (f32) box->top;
+        fx = (f32) box->left;
         fx = fx + t1;
         fy = fy + t2;
         if (D_8011AAD8.paused != 0) {
@@ -635,104 +484,64 @@ void func_0044D3DC(MenuItem_4143DC *item, MenuBox_4143DC *box, s32 unused, MenuW
         } else {
             alpha = 0x80;
         }
-        func_002778A8(box->x, box->y, (s32) fx, (s32) fy, 1, 0, 0, 0, 0, alpha);
+        func_002778A8(box->left, box->top, (s32) fx, (s32) fy, 1, 0, 0, 0, 0, alpha);
     } else {
         if (D_800C1BD0_4143DC != 3) {
             D_800C1BD0_4143DC = 3;
             func_00279028((s32) (window->fade * (window->alpha * 255.0f)));
         }
-        func_0027B320(item->image, 0, (s16) box->x, (s16) box->y, box->scaleX, box->scaleY, 1);
+        func_0027B320(item->image, 0, (s16) box->left, (s16) box->top, box->scaleX, box->scaleY, 1);
     }
 }
 
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00440618.c, func_00440618, with Turok 2's layouts. */
 
-/* 0x28-byte menu item, also copied by value to lay out its parts. */
-typedef struct MenuItem_4145B0 {
-    /* 0x00 */ s32 idx;
-    /* 0x04 */ s16 kind;
-    /* 0x06 */ u8 pad6[2];
-    /* 0x08 */ u32 flags;
-    /* 0x0C */ u16 x;
-    /* 0x0E */ u16 y;
-    /* 0x10 */ u8 b10, b11, b12, b13;
-    /* 0x14 */ s32 data;
-    /* 0x18 */ void *def;
-    /* 0x1C */ s32 value; /* slider position, 0-256 */
-    /* 0x20 */ void *p20;
-    /* 0x24 */ void *owner;
-} MenuItem_4145B0;
+extern void func_0041363C_4143DC(MenuItem *item, MenuItemLayout *info) __asm__("func_0044C63C");
+extern void func_00413F74_4143DC(MenuItem *item, MenuItemLayout *box, MenuItemLayout *column, Menu *window, s32 data) __asm__("func_0044CF74");
 
-/* Layout of an item (func_0041363C_4143DC). */
-typedef struct {
-    /* 0x00 */ s32 f0;
-    /* 0x04 */ s32 width;
-    /* 0x08 */ s32 height;
-    /* 0x0C */ f32 scaleX;
-    /* 0x10 */ f32 scaleY;
-    /* 0x14 */ s32 x0, x1, y0, y1;
-    /* 0x24 */ s32 pad24;
-} MenuInfo_4145B0;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 x;
-    /* 0x18 */ u8 pad18[0x1C - 0x18];
-    /* 0x1C */ s32 y;
-} MenuBox_4145B0;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 left;
-    /* 0x18 */ s32 right;
-} MenuColumn_4145B0;
-
-extern void func_0041363C_4143DC(MenuItem_4145B0 *item, MenuInfo_4145B0 *info) __asm__("func_0044C63C");
-extern void func_00413F74_4143DC(MenuItem_4145B0 *item, MenuBox_4145B0 *box, MenuColumn_4145B0 *column, s32 window, s32 data) __asm__("func_0044CF74");
-
-static __inline__ void fin_4145B0(MenuItem_4145B0 *item, MenuBox_4145B0 *box, MenuColumn_4145B0 *column, s32 window) {
+static __inline__ void fin_4145B0(MenuItem *item, MenuItemLayout *box, MenuItemLayout *column, Menu *window) {
     func_00413F74_4143DC(item, box, column, window, item->data);
 }
 
 /* Draws a slider: its label, its bar and its knob at the item's value. */
-void func_0044D5B0(MenuItem_4145B0 *it, MenuBox_4145B0 *box, MenuColumn_4145B0 *column, s32 window) {
-    MenuItem_4145B0 cp;
-    MenuInfo_4145B0 o1;
-    MenuInfo_4145B0 o2;
-    MenuInfo_4145B0 o3;
+void func_0044D5B0(MenuItem *it, MenuItemLayout *box, MenuItemLayout *column, Menu *window) {
+    MenuItem cp;
+    MenuItemLayout o1;
+    MenuItemLayout o2;
+    MenuItemLayout o3;
     s32 mid;
     s32 t;
 
     mid = (column->left + column->right) / 2;
     cp = *it;
-    cp.kind = 0;
+    cp.type = 0;
     func_0041363C_4143DC(&cp, &o1);
     cp = *it;
-    cp.kind = 1;
+    cp.type = 1;
     cp.data = 0;
     func_0041363C_4143DC(&cp, &o2);
     cp = *it;
-    cp.kind = 1;
+    cp.type = 1;
     cp.data = 0;
     func_0041363C_4143DC(&cp, &o3);
     cp = *it;
     cp.data = 0;
-    box->y = box->y + o1.height;
+    box->top = box->top + o1.height;
     if (it->flags & 1) {
-        box->x = mid - ((o2.width + o3.width) / 2);
+        box->left = mid - ((o2.width + o3.width) / 2);
     }
-    box->x = box->x + o3.width / 2;
-    func_0044D3DC((void *) &cp, (void *) box, (s32) column, (void *) window);
+    box->left = box->left + o3.width / 2;
+    func_0044D3DC(&cp, box, column, window);
     cp = *it;
     cp.data = 0;
     t = it->value * o2.width;
-    box->x = box->x + (t / 256 - o3.width / 2);
-    box->y = box->y + (o2.height / 2 - o3.height / 2);
-    func_0044D3DC((void *) &cp, (void *) box, (s32) column, (void *) window);
+    box->left = box->left + (t / 256 - o3.width / 2);
+    box->top = box->top + (o2.height / 2 - o3.height / 2);
+    func_0044D3DC(&cp, box, column, window);
     cp = *it;
     if (it->flags & 1) {
-        box->x = mid - o1.width / 2;
+        box->left = mid - o1.width / 2;
     }
     fin_4145B0(&cp, box, column, window);
 }
@@ -740,106 +549,6 @@ void func_0044D5B0(MenuItem_4145B0 *it, MenuBox_4145B0 *box, MenuColumn_4145B0 *
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004409A8.c, func_004409A8, with Turok 2's layouts. */
 
-typedef struct {
-    f32 x, y, z;
-} Vec3f_414938;
-
-typedef struct {
-    u32 w0, w1;
-} GfxWords_414938;
-
-typedef struct {
-    f32 m[16];
-} Mtx4f_414938;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x28];
-    /* 0x028 */ f32 yaw;
-    /* 0x02C */ u8 pad2C[0x14C - 0x2C];
-    /* 0x14C */ u8 view[0x288 - 0x14C];
-    /* 0x288 */ f32 width;
-    /* 0x28C */ f32 height;
-    /* 0x290 */ u8 pad290[0x368 - 0x290];
-    /* 0x368 */ Mtx4f_414938 mtx[2];
-} MenuCamera_414938;
-
-typedef struct {
-    /* 0x00 */ s16 id;
-    /* 0x02 */ u8 pad2[0x30 - 0x2];
-    /* 0x30 */ f32 fade;
-    /* 0x34 */ f32 alpha;
-    /* 0x38 */ u8 pad38[0x40 - 0x38];
-    /* 0x40 */ MenuCamera_414938 *cam;
-} MenuWindow_414938;
-
-/* Where and what to show in a model item. */
-typedef struct {
-    /* 0x00 */ s32 type;
-    /* 0x04 */ s32 model;
-    /* 0x08 */ s32 variant;
-    /* 0x0C */ Vec3f_414938 pos;
-    /* 0x18 */ Vec3f_414938 scale;
-    /* 0x24 */ u8 pad24[0x2C - 0x24];
-    /* 0x2C */ f32 spin;
-} MenuModelPart_414938;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ s16 h0C;
-} ModelSub_414938;
-
-/* The scene object a model item draws. */
-typedef struct {
-    /* 0x000 */ u8 pad0[0x4];
-    /* 0x004 */ Vec3f_414938 pos;
-    /* 0x010 */ u8 pad10[0x14 - 0x10];
-    /* 0x014 */ ModelSub_414938 *sub;
-    /* 0x018 */ u8 pad18[0x34 - 0x18];
-    /* 0x034 */ Vec3f_414938 scale;
-    /* 0x040 */ u8 pad40[0x50 - 0x40];
-    /* 0x050 */ f32 rotY;
-    /* 0x054 */ u8 pad54[0x194 - 0x54];
-    /* 0x194 */ Vec3f_414938 pos194;
-    /* 0x1A0 */ u8 pad1A0[0x234 - 0x1A0];
-    /* 0x234 */ void *draw;
-} MenuFx_414938;
-
-typedef struct {
-    s32 w[0x27];
-} ModelInfo_414938; /* 0x9C bytes */
-
-typedef struct {
-    /* 0x000 */ s32 id;
-    /* 0x004 */ s32 f4;
-    /* 0x008 */ s32 f8;
-    /* 0x00C */ f32 fC;
-    /* 0x010 */ u8 pad10[0x18 - 0x10];
-    /* 0x018 */ s32 f18;
-    /* 0x01C */ s32 f1C;
-    /* 0x020 */ s32 f20;
-    /* 0x024 */ u8 pad24[0x34 - 0x24];
-    /* 0x034 */ f32 height;
-    /* 0x038 */ u8 pad38[0xA0 - 0x38];
-    /* 0x0A0 */ MenuFx_414938 fx;
-    /* 0x2D4 */ u8 pad2D4[0x328 - 0xA0 - sizeof(MenuFx_414938)];
-    /* 0x328 */ s32 loaded;
-    /* 0x32C */ f32 drawHeight;
-} MenuModel_414938;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ u32 flags;
-    /* 0x0C */ u8 padC[0x14 - 0xC];
-    /* 0x14 */ MenuModelPart_414938 *part;
-    /* 0x18 */ u8 pad18[0x20 - 0x18];
-    /* 0x20 */ MenuModel_414938 *model;
-} MenuItem_414938;
-
-typedef struct {
-    s32 id;
-} MenuSelection_414938;
-
-extern GfxWords_414938 *D_800D8E24;
 extern s32 D_800B6D1C;
 extern s32 D_800B6D20; /* frame counter */
 extern s32 D_800B6D00;
@@ -853,37 +562,37 @@ extern s32 D_800ADB30[];
 
 extern void func_00266C5C(void *p, s32 c, s32 n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
-extern ModelInfo_414938 *func_00225EBC(void *world, s32 model, s32 variant);
-extern void func_0020F85C(void *m, Vec3f_414938 *in, Vec3f_414938 *out);
-extern void func_00219BC0(MenuFx_414938 *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, Vec3f_414938 h, s32 i, Vec3f_414938 j,
-                          Vec3f_414938 k, s32 l);
-extern void func_0021E5D4(MenuFx_414938 *fx);
-extern void func_0021EBC0(MenuFx_414938 *fx);
-extern void func_0021A344(MenuFx_414938 *fx);
+extern CIntelligence *func_00225EBC(void *world, s32 type, s32 id);
+extern void func_0020F85C(void *m, CVector3 *in, CVector3 *out);
+extern void func_00219BC0(CGameObjectInstance *fx, s32 a, s32 b, s32 c, void *d, s32 e, s32 f, f32 g, CVector3 h, s32 i, CVector3 j,
+                          CVector3 k, s32 l);
+extern void func_0021E5D4(CGameObjectInstance *fx);
+extern void func_0021EBC0(CGameObjectInstance *fx);
+extern void func_0021A344(CGameObjectInstance *fx);
 extern s32 func_00206078(void);
 extern void func_00206068(s32 a);
-extern void func_002241D8(void *world, MenuFx_414938 *fx, s32 c, s32 d);
+extern void func_002241D8(void *world, CGameObjectInstance *fx, s32 c, s32 d);
 extern void func_0020B5D4(void);
 extern void func_0020B624(void);
-extern void func_0021D39C(MenuFx_414938 *fx, MenuCamera_414938 *cam);
+extern void func_0021D39C(CGameObjectInstance *fx, CCamera *cam);
 extern void func_004171D0_4143DC(void) __asm__("func_004501D0");
 extern void func_004171F4_4143DC(void) __asm__("func_004501F4");
 
 /* Draws a menu item's 3D model, loading it the first time. */
-void func_0044D938(MenuItem_414938 *o, MenuSelection_414938 *idp, s32 unused, MenuWindow_414938 *w) {
-    Vec3f_414938 v50;
-    Vec3f_414938 v60;
-    Vec3f_414938 v70;
-    Vec3f_414938 v80;
-    MenuModel_414938 *x;
-    MenuModel_414938 *x2;
-    MenuCamera_414938 *c;
-    MenuModelPart_414938 *p;
-    MenuFx_414938 *fx;
-    ModelInfo_414938 *src;
+void func_0044D938(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Menu *w) {
+    CVector3 v50;
+    CVector3 v60;
+    CVector3 v70;
+    CVector3 v80;
+    MenuModel *x;
+    MenuModel *x2;
+    CCamera *c;
+    MenuModelPart *p;
+    CGameObjectInstance *fx;
+    CIntelligence *src;
     void *s3;
     s32 s2;
-    GfxWords_414938 *d;
+    Gfx *d;
     f32 k;
     f32 k2;
     f32 tt;
@@ -893,47 +602,47 @@ void func_0044D938(MenuItem_414938 *o, MenuSelection_414938 *idp, s32 unused, Me
     if (o->model != NULL) {
         x = o->model;
         p = o->part;
-        fx = &x->fx;
+        fx = &x->instance;
         if (x->loaded != 0) {
             {
-                GfxWords_414938 **pp = &D_800D8E24;
+                Gfx **pp = &D_800D8E24;
                 d = (*pp)++;
                 d->w0 = 0xDA380007;
-                d->w1 = (u32) &w->cam->mtx[D_800B6D1C];
+                d->w1 = (u32) &w->camera->m_mProjection[D_800B6D1C];
             }
-            c = w->cam;
-            k = c->width / (f32) D_800C2030;
-            k2 = c->height / (f32) D_800C2034;
+            c = w->camera;
+            k = c->m_Viewport.m_Width / (f32) D_800C2030;
+            k2 = c->m_Viewport.m_Height / (f32) D_800C2034;
             v80.x = p->scale.x * k;
             v80.z = p->scale.z * k;
             v80.y = p->scale.y * k2;
-            x->drawHeight = x->height;
+            x->height = x->intel.m_Enemy.m_CollisionHeight;
             s3 = NULL;
             if (!(o->flags & 0x2000000)) {
-                s2 = p->model;
+                s2 = p->intelType;
                 x2 = o->model;
-                src = func_00225EBC(D_800F7078, s2, p->variant);
+                src = func_00225EBC(D_800F7078, s2, p->intelId);
                 if (src == NULL) {
                     x2->loaded = 0;
                 } else {
-                    x2->id = s2;
+                    x2->intelType = s2;
                     x2->loaded = 1;
-                    *(ModelInfo_414938 *) &x2->f4 = *src;
-                    s3 = &x2->f4;
-                    x2->f4 = 0;
-                    x2->f8 = 0;
-                    x2->f18 = 0;
-                    x2->f1C = 0;
-                    x2->f20 = 0;
-                    x2->fC = 10240.0f;
-                    x2->drawHeight = x2->height;
+                    x2->intel = *src;
+                    s3 = &x2->intel;
+                    x2->intel.m_Type = INTELLIGENCE_STATIC;
+                    x2->intel.m_dwFlags = 0;
+                    x2->intel.m_Enemy.m_dwFlags = 0;
+                    x2->intel.m_Enemy.m_Health = 0;
+                    x2->intel.m_Enemy.m_StartAnim = 0;
+                    x2->intel.m_LODDist2 = 10240.0f;
+                    x2->height = x2->intel.m_Enemy.m_CollisionHeight;
                 }
             }
             v60 = p->pos;
-            v60.y = v60.y - x->drawHeight * v80.y * 0.8f;
-            func_0020F85C(w->cam->view, &v60, &v70);
+            v60.y = v60.y - x->height * v80.y * 0.8f;
+            func_0020F85C(&w->camera->m_mfViewOrient, &v60, &v70);
             if (s3 != NULL && !(o->flags & 0x2000000)) {
-                func_00219BC0(fx, -1, p->type, D_800B6D00, s3, -1, 0, w->cam->yaw + 3.141593f, v70, 0, p->scale, v50,
+                func_00219BC0(fx, -1, p->objType, D_800B6D00, s3, -1, 0, w->camera->m_ViewParams.m_RotY + 3.141593f, v70, 0, p->scale, v50,
                               0);
                 func_0021E5D4(fx);
                 o->flags = o->flags | 0x2000000;
@@ -942,56 +651,56 @@ void func_0044D938(MenuItem_414938 *o, MenuSelection_414938 *idp, s32 unused, Me
             ta = w->fade;
             tb = w->alpha;
             D_801308E0 = (s32) (ta * tb * ((tt + 1.0f) * 50.0f + 50.0f));
-            if (w->id == idp->id) {
-                fx->draw = (void *) func_004171F4_4143DC;
+            if (w->cursor == idp->index) {
+                fx->m_AI.m_pfDraw = (void *) func_004171F4_4143DC;
             } else {
-                fx->draw = (void *) func_004171D0_4143DC;
+                fx->m_AI.m_pfDraw = (void *) func_004171D0_4143DC;
             }
             if (func_00206078() == 0) {
                 func_00206068(1);
             }
-            if (x->id == 0xB) {
-                func_002241D8(D_800F7078, fx, D_800ADB30[fx->sub->h0C], 1);
+            if (x->intelType == INTELLIGENCE_PLAYER) {
+                func_002241D8(D_800F7078, fx, D_800ADB30[fx->header.m_pIntelligence->m_Id], 1);
             }
             if (D_800C1BD0_4143DC != 4) {
                 D_800C1BD0_4143DC = 4;
                 {
-                    GfxWords_414938 **pp = &D_800D8E24;
-                    GfxWords_414938 *q = (*pp)++;
+                    Gfx **pp = &D_800D8E24;
+                    Gfx *q = (*pp)++;
                     q->w0 = 0xE7000000;
                     q->w1 = 0;
                 }
                 {
-                    GfxWords_414938 **pp = &D_800D8E24;
-                    GfxWords_414938 *q = (*pp)++;
+                    Gfx **pp = &D_800D8E24;
+                    Gfx *q = (*pp)++;
                     q->w0 = 0xE3000A01;
                     q->w1 = 0x100000;
                 }
                 {
-                    GfxWords_414938 **pp = &D_800D8E24;
-                    GfxWords_414938 *q = (*pp)++;
+                    Gfx **pp = &D_800D8E24;
+                    Gfx *q = (*pp)++;
                     q->w0 = 0xE3000C00;
                     q->w1 = 0x80000;
                 }
                 {
-                    GfxWords_414938 **pp = &D_800D8E24;
-                    GfxWords_414938 *q = (*pp)++;
+                    Gfx **pp = &D_800D8E24;
+                    Gfx *q = (*pp)++;
                     q->w0 = 0xE3001201;
                     q->w1 = 0x2000;
                 }
             }
-            fx->scale = v80;
-            fx->pos = v70;
-            fx->pos194 = v70;
+            fx->m_vScale = v80;
+            fx->header.m_vPos = v70;
+            fx->m_AI.m_vDesiredPos = v70;
             func_0021EBC0(fx);
-            fx->pos = v70;
-            fx->pos194 = v70;
+            fx->header.m_vPos = v70;
+            fx->m_AI.m_vDesiredPos = v70;
             func_0021A344(fx);
-            fx->rotY = fx->rotY + p->spin * D_800B6D28;
-            fx->pos = v70;
-            fx->pos194 = v70;
+            fx->m_RotY = fx->m_RotY + p->spin * D_800B6D28;
+            fx->header.m_vPos = v70;
+            fx->m_AI.m_vDesiredPos = v70;
             func_0020B5D4();
-            func_0021D39C(fx, w->cam);
+            func_0021D39C(fx, w->camera);
             func_0020B624();
         }
     }
@@ -1381,7 +1090,7 @@ void func_0044E6FC(Q04Pn *p, void *a1) {
                 info.x0 = 0x400; info.x1 = -0x400; info.y0 = 0x400; info.y1 = -0x400;
                 info.f4 = 0; info.f8 = 0;
             } else {
-                func_0041363C_4143DC((MenuItem_4145B0 *) it, (MenuInfo_4145B0 *) &info);
+                func_0041363C_4143DC((MenuItem *) it, (MenuItemLayout *) &info);
             }
             v = info.x0; if (r.x0 < v) v = r.x0; r.x0 = v;
             v2 = info.x1; if (v2 < r.x1) v2 = r.x1; r.x1 = v2;
@@ -1408,14 +1117,14 @@ void func_0044E6FC(Q04Pn *p, void *a1) {
             if (it->flags & 0x800000) {
                 info.f0 = i;
                 if (it->flags & 0x20000000) {
-                    func_0041363C_4143DC((MenuItem_4145B0 *) it, (MenuInfo_4145B0 *) &info);
+                    func_0041363C_4143DC((MenuItem *) it, (MenuItemLayout *) &info);
                     info.f4 = 0; info.f8 = 0;
                     info.x0 = (s32)cam->f290;
                     info.x1 = 0;
                     info.y0 = (s32)cam->f294;
                     info.y1 = 0;
                 } else {
-                    func_0041363C_4143DC((MenuItem_4145B0 *) it, (MenuInfo_4145B0 *) &info);
+                    func_0041363C_4143DC((MenuItem *) it, (MenuItemLayout *) &info);
                 }
                 cp = info;
                 if (!(it->flags & 0x20000000)) {
@@ -1607,7 +1316,7 @@ s32 func_0044F0F0(MenuItemTmpl_4160F0 *a) {
     return n;
 }
 
-/* ---------------- func_0044F168 to func_00450418 use Menu, MenuDesc, ControllerProfile and MenuPool (structs/menu.h) ---------------- */
+/* ---- The window functions below use Menu, MenuDesc, ControllerProfile and MenuPool (structs/menu.h) ---- */
 
 /* ---------------- func_0044F168 ---------------- */
 s32 func_00413F74_416168(s32, s32, s32, s32, s32) __asm__("func_0044CF74");
@@ -1698,13 +1407,13 @@ MenuBlob *func_0044F214(MenuItem_416214 *a, s32 id, s32 arg) {
 
 /* ---------------- func_0044F2E4 ---------------- */
 s32 func_0044F2E4(Menu *arg0) {
-    s32 temp_v1;
+    ControllerProfile *temp_v1;
     s32 var_v0;
 
-    temp_v1 = (s32) arg0->controller;
+    temp_v1 = arg0->controller;
     var_v0 = 0;
     if (temp_v1 != 0) {
-        var_v0 = temp_v1 + 0xA0;
+        var_v0 = (s32) &temp_v1->buttonHistory[29]; /* 0xA0 */
     }
     return var_v0;
 }
@@ -2001,7 +1710,7 @@ s32 func_0041531C_4169C8(s32, s32) __asm__("func_0044E31C");
 extern MenuPool D_80119E2C;
 
 void func_0044F9C8(MenuPool *arg0) {
-    s32 (*temp_v0)();
+    s32 (*temp_v0)(Menu *, MenuPool *);
     Menu *temp_s2;
     ControllerProfile *temp_v0_2;
     Menu *var_s0;
@@ -2212,9 +1921,14 @@ s32 func_0044FDA4(s16 *record) {
 }
 
 /* ---------------- func_0044FDC0 ---------------- */
-void func_0044FDC0(s16 *arg0, MenuModel_414938 *arg1) {
+typedef struct {
+    /* 0x000 */ u8 pad0[0x328];
+    /* 0x328 */ s32 unk328;
+} MenuExtra_416DC0;
+
+void func_0044FDC0(s16 *arg0, MenuExtra_416DC0 *arg1) {
     if (*arg0 == 3) {
-        arg1->loaded = 1;
+        arg1->unk328 = 1;
     }
 }
 
@@ -2455,7 +2169,7 @@ s32 CList__Remove_417418(s32, s32) __asm__("CList__Remove");
 s32 func_002052D8_417418(s32, s32) __asm__("func_002052D8");
 
 void func_00450418(s32 arg0, Menu *arg1) {
-    s32 (*temp_v0)();
+    s32 (*temp_v0)(Menu *, s32);
     ControllerProfile *temp_v0_2;
 
     temp_v0 = arg1->desc->close;
