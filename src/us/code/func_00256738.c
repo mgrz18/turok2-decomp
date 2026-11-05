@@ -2,14 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/game_object.h"
+#include "structs/player.h"
 
-
-typedef struct Player {
-    char pad0[0xA08];
-    s16 state;                 /* 0xA08 (Rage Wars 0x650) */
-    char padA0A[0xAC8 - 0xA0A];
-    f32 unkAC8;                /* 0xAC8 (Rage Wars 0x724) */
-} Player;
 
 
 typedef struct SoundRange {
@@ -32,7 +26,7 @@ extern float D_800A71FC;
 
 void func_00256738(void *arg0, void *arg1) {
     SoundRange *range;
-    Player *actor;
+    CPlayer *actor;
     s32 value;
     f32 amount;
     SoundEvent *event = arg1;
@@ -46,9 +40,9 @@ void func_00256738(void *arg0, void *arg1) {
         return;
     }
     object = event->object;
-    actor = ((Player *)object->m_AI.m_pParent);
-    amount = -actor->unkAC8;
-    if (actor->state == 0xE) {
+    actor = ((CPlayer *)object->m_AI.m_pParent);
+    amount = -actor->m_vHeadRotOffset.x;
+    if (actor->m_Mode == 0xE) {
         amount += D_800A71FC;
     }
     func_00210790(arg0, amount / (f32)range->divisor);
