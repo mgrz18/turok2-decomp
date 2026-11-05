@@ -6,7 +6,8 @@ typedef struct {
     /* 0x4 */ f32 alphaMax;
 } FillAlpha;
 
-/* Draw override: fill mode, then the fill colour right after it. */
+/* Draw override: fill mode, then the fill colour right after it (D_800AB8B0,
+ * CBlendState in structs/light.h: through the struct this does not match). */
 extern s32 D_800AB8B0;
 #define sFillColor ((CVector3 *) (&D_800AB8B0 + 1))
 extern FillAlpha D_800AB8C0;

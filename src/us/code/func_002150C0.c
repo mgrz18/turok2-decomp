@@ -6,10 +6,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct {
-    s32 data[6];
-} ActorState;
+#include "structs/light.h"
 
 /* A placed actor's record in the level data. */
 typedef struct {
@@ -44,7 +41,7 @@ typedef struct {
     /* 0x16E */ u16 unk16E;
     /* 0x170 */ s32 unk170;
     /* 0x174 */ s32 unk174;
-    /* 0x178 */ ActorState initial;
+    /* 0x178 */ CLights1 initial;
     /* 0x190 */ s32 value;
     /* 0x194 */ u8 colorFrame;
     /* 0x195 */ u8 colorFrame2;
@@ -53,7 +50,6 @@ typedef struct {
 extern u8 D_800F1360[];         /* the empty model */
 extern u8 D_800F7078[];         /* the model cache */
 extern u8 D_800B6D1B;
-extern ActorState D_800AB0D0;   /* default state */
 
 void *func_00225E88(void *cache, s32 model);
 f32 func_002671B4(PlacedActor *actor);
