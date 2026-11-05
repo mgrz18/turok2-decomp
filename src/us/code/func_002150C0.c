@@ -61,12 +61,12 @@ void func_002150C0(CLevelActor *actor, PlacedActorRecord *record, s32 owner, u8 
         actor->header.m_pCurrentRegion = (struct CGameRegion *) (segments + record->segment * 32);
     }
     actor->m_wFlags = record->flags | 2;
-    actor->unk170 = 0;
+    actor->m_Timer = 0;
     actor->m_AnimSpeed = 0;
     actor->m_nKilledIndex = record->unk1A;
     top.x = actor->header.m_vPos.x;
     top.y = actor->header.m_vPos.y + func_002671B4(actor) * 0.5f;
     top.z = actor->header.m_vPos.z;
     *(ActorState *) actor->m_Lights = D_800AB0D0;
-    actor->m_DrawnFrame = actor->unk195 = D_800B6D1B - 1;
+    actor->m_DrawnFrame = actor->m_UpdatedFrame = D_800B6D1B - 1;
 }

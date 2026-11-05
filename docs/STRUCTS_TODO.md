@@ -365,6 +365,34 @@ were converted by u5 (CParticle) and u6 (CCollisionResults), func_00242604
 by u2 and u6, func_00223A94 by u3 and u6, func_0027BB80 by u3 and u7, and
 controller.h got both externs.
 
+## The fourth pass: instance-like views (z6)
+
+- **CLevelActor** (new `structs/level_actor.h`): "the 0x198 static object"
+  is the level actor (placed by func_002150C0, drawn by func_002152AC,
+  updated by func_002156FC / func_002157F0, the 0xC0 records of the loader
+  being lights: 0x178 is the actor's lighting, the 4th argument of the
+  model draw). Its pool slot (CPooledLevelActor, 0x1B0, links at
+  0x1A0..0x1AC) and the pool (CLevelActorPool, CWorld.m_ActorPool; its
+  free/head/tail are also D_8010AB90/94/98) replace the PoolActor,
+  ActorPool, Node, Pool, PoolItem views; CStaticObject (0x90) the scenery
+  Object/Instance views of the level display list. world.h still types
+  m_ActorPool as bytes.
+- **CGameObjectInstance**: the Body (player movement, 14 files), Mover /
+  Collider (platform collision; Def is CIntelligence.m_Platform), Object,
+  OwnerActor, Entity, B01Actor (CAI for B01State) and Target views.
+  CObjectHead (game_object.h) is the 0x34-byte head the collision probes
+  copy (ObjectHead, ActorHead, ActorMotion). CAIFrameMotion
+  (game_object.h) is func_0024599C's output (the Steer views; Steer in
+  func_00260730 / func_00260D60 is CAITargets). Hit is DamageEvent /
+  HitFrame (collision.h). The unused Rage Wars ActorStats / Brain / Actor /
+  Entity blocks of five imported level files are gone.
+- Left local on purpose: Actor in func_0022D2FC (FAKEMATCH particle
+  source), func_00243C90 (0xA0C, instance or player), func_002600E8 /
+  func_00260554 (bitfield union); Object in func_0023801C (any of the three
+  header kinds, a word at 0x80 for type 0); Hit in func_00247FB0 (not a
+  DamageEvent); Item, Node in func_002316F4 / func_0028AFF0 /
+  func_0042C194 (other objects with generic names).
+
 ## include/structs/player.h (fixed and hoisted)
 
 The header was 4 and then 8 bytes high between 0xA08 and the HUD. Fixed

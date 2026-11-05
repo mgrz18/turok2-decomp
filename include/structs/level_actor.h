@@ -24,6 +24,7 @@
 /* CStaticObject.m_wFlags / CLevelActor.m_wFlags */
 #define LEVEL_ACTOR_FLAG_DEAD        0x0001 /* killed (the level's killed bit is set) */
 #define LEVEL_ACTOR_FLAG_SHOWN       0x0002
+#define LEVEL_ACTOR_FLAG_GROWING     0x0010 /* scaling in to 0.35 (func_002157F0) */
 
 /* A static scenery object of the level, 0x90 bytes. */
 typedef struct CStaticObject {
@@ -57,12 +58,12 @@ typedef struct CLevelActor {
     /* 0x168 */ f32 m_Height;
     /* 0x16C */ u16 m_wFlags;               /* LEVEL_ACTOR_FLAG_*: 1 dead, 2 shown, 0x20 translucent */
     /* 0x16E */ u16 m_nKilledIndex;         /* its bit in the level's killed array */
-    /* 0x170 */ s32 unk170;
+    /* 0x170 */ f32 m_Timer;                /* the grow-in time (flag 0x10, func_002157F0), the morpher's animation clock (func_002156FC) */
     /* 0x174 */ f32 m_AnimSpeed;            /* type 12 (morpher): the frame rate times its m_AnimSpeed (func_00215868) */
     /* 0x178 */ u8 m_Lights[0x18];          /* the lighting at its position (func_002254C0, func_00222A9C; D_800AB0D0 when placed) */
-    /* 0x190 */ s32 m_ViewMask;             /* the views it shows in (from the placement record) */
+    /* 0x190 */ s32 m_ViewMask;             /* the views it shows in: the placement record's, then its region's m_VisBits (func_002156FC) */
     /* 0x194 */ u8 m_DrawnFrame;            /* the frame (D_800B6D1B) its matrix was last built for */
-    /* 0x195 */ u8 unk195;                 /* set with m_DrawnFrame */
+    /* 0x195 */ u8 m_UpdatedFrame;          /* the frame its once-per-frame update (func_002156FC) last ran */
     /* 0x196 */ u8 pad196[0x198 - 0x196];
 } CLevelActor; /* size 0x198 */
 

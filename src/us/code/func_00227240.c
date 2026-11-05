@@ -87,7 +87,7 @@ CPooledLevelActor *func_00227240(CLevelActorPool *pool, s32 *refCount, s32 id, C
     actor->m_Actor.m_wFlags = 0x1A;
     actor->m_Actor.m_ModelScale = 0;
     actor->m_Actor.m_vVelocity = vel;
-    actor->m_Actor.m_DrawnFrame = actor->m_Actor.unk195 = D_800B6D1B - 1;
+    actor->m_Actor.m_DrawnFrame = actor->m_Actor.m_UpdatedFrame = D_800B6D1B - 1;
     p.x = actor->m_Actor.header.m_vPos.x;
     p.y = actor->m_Actor.header.m_vPos.y + func_002671B4(actor) * 0.5f;
     p.z = actor->m_Actor.header.m_vPos.z;
