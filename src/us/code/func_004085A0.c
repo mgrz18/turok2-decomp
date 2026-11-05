@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/game.h"
+#include "structs/player.h"
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
  * random stun of a live helper), and once the boss has waited long enough
@@ -14,14 +15,6 @@ typedef struct {
     /* 0x0C */ f32 timer;
 } BossFight;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x9E4];
-    /* 0x9E4 */ s32 metBoss1;
-    /* 0x9E8 */ s32 metBoss2;
-    /* 0x9EC */ u8 pad9EC[0xA28 - 0x9EC];
-    /* 0xA28 */ s32 unkA28;
-} Player;
-
 extern BossFight D_8012FB50;
 extern CListedInstance *D_8010FEB4;
 extern f32 D_800B6D28;
@@ -33,8 +26,8 @@ extern f32 func_0021149C(f32 range);
 extern void func_00246690(CListedInstance *actor, s32 sound, CVector3 pos, s32 arg);
 extern void func_00245828(void *out, s32 a, s32 b, f32 c, s32 d, s32 e);
 extern void func_0025B2D4(CListedInstance *actor, void *ai, void *anim);
-extern Player *func_002532A8(void *players);
-extern void func_00248BA8(Player *player, s32 track, s32 a, s32 b);
+extern CPlayer *func_002532A8(void *players);
+extern void func_00248BA8(CPlayer *player, s32 track, s32 a, s32 b);
 
 static __inline__ s32 helperAlive(void) {
     CListedInstance *actor;
@@ -67,7 +60,7 @@ static __inline__ void stunHelper(void) {
 
 void func_004085A0(void *obj, CAI *ai) {
     BossFight *fight = &D_8012FB50;
-    Player *player;
+    CPlayer *player;
     s32 track;
 
     if (ai->m_pfDraw != func_004089E0) {
@@ -115,13 +108,13 @@ void func_004085A0(void *obj, CAI *ai) {
         break;
     case 0x1CE8:
         track = 0x1CE9;
-        if (player->metBoss1) {
+        if (player->m_Data.m_bBlindBossComplete) {
             track = 0x1387;
         }
         break;
     case 0x1D4C:
         track = 0x1D4D;
-        if (player->metBoss2) {
+        if (player->m_Data.m_bQueenBossComplete) {
             track = 0x176F;
         }
         break;
@@ -129,6 +122,6 @@ void func_004085A0(void *obj, CAI *ai) {
         track = D_80110048;
         break;
     }
-    player->unkA28 = 0;
+    player->m_InvincibilityTime = 0.0f;
     func_00248BA8(player, track, 2, 0);
 }
