@@ -1,10 +1,5 @@
 #include "common.h"
-
-typedef struct Table {
-    u8 pad0[4];
-    s32 count;      /* 0x4 */
-    u8 entries[1];  /* 0x8 */
-} Table;
+#include "structs/table.h"
 
 typedef struct Owner {
     u8 pad0[0x1C];
@@ -12,7 +7,7 @@ typedef struct Owner {
     u8 pad20[0x48 - 0x20];
     s32 unk48;      /* 0x48 */
     u8 pad4C[0x7C - 0x4C];
-    Table *table;   /* 0x7C */
+    StrideTable *table;   /* 0x7C */
 } Owner;
 
 extern s32 func_00266D24(void *entries, s32 count, s32 id);

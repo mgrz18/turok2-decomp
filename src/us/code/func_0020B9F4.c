@@ -1,11 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x0 */ s32 a;
-    /* 0x4 */ s32 b;
-    /* 0x8 */ s32 c;
-    /* 0xC */ s32 d;
-} QueueEntry; /* size 0x10 */
+#include "structs/model.h"
 
 s32 func_0020367C(s32, s32, s32, s32, s32, s32, s32, s32);
 s32 func_0020185C(s32, s32, s32, s32 *);
@@ -22,13 +16,12 @@ extern s32 D_800D8E28;
 extern s32 D_800D8E34;
 extern s32 D_800DD170;
 extern s32 D_800DD178[];
-extern QueueEntry D_800DD578[];
 
 void func_0020B9F4(s32 res, s32 arg1, s32 arg2, s32 index, s32 arg4) {
     s32 size;
     s32 file;
     s32 handle;
-    QueueEntry *e;
+    CModelInstance *e;
     s32 *count;
     s32 n;
 
@@ -54,10 +47,10 @@ void func_0020B9F4(s32 res, s32 arg1, s32 arg2, s32 index, s32 arg4) {
                 D_800D8E10 = arg4;
                 e = &D_800DD578[n++];
                 D_800D8E34 = n;
-                e->a = arg1;
-                e->d = 0;
-                e->b = arg2;
-                e->c = 0;
+                e->m_pMatrix = (void *)arg1;
+                e->m_Segment = 0;
+                e->m_pLights = (void *)arg2;
+                e->m_pTextures = 0;
             }
         done:
             func_002051F4(0, handle);

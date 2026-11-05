@@ -1,18 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "structs/rect.h"
 
 /* A rectangle on the ground plane. */
-typedef struct Rect {
-    /* 0x00 */ f32 minX;
-    /* 0x04 */ f32 minZ;
-    /* 0x08 */ f32 maxX;
-    /* 0x0C */ f32 maxZ;
-} Rect;
-
 /* func_0023A640 on the ground plane: where the segment from sweep->inst's
  * position to sweep->end first enters rect (x and z only). */
-s32 func_0023A968(Sweep *sweep, Rect *rect, f32 *t) {
+s32 func_0023A968(Sweep *sweep, CRect *rect, f32 *t) {
     CVector3 hit;
     CVector3 *start;
     CVector3 *end;

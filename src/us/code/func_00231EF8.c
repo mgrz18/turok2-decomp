@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/particle.h"
 
 extern f32 func_0026D210(s32 half);                        /* half float -> f32 */
 extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);   /* out = in * s */
@@ -12,22 +13,8 @@ typedef struct {
     /* 0x12 */ u16 maxSpeed;
 } MoveParams;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ MoveParams *move;
-} ParentDef;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x18];
-    /* 0x018 */ CVector3 vel;
-    /* 0x024 */ u8 pad24[0xF8 - 0x24];
-    /* 0x0F8 */ ParentDef *parent;
-    /* 0x0FC */ u8 padFC[0x150 - 0xFC];
-    /* 0x150 */ CVector3 dir;
-} Mover;
-
-/* Accelerates obj->vel along obj->dir, clamping the speed to the parent limit. */
-void func_00231EF8(Mover *obj) {
+/* Accelerates obj->m_vVelocity along obj->m_vDirection, clamping the speed to the parent limit. */
+void func_00231EF8(CParticle *obj) {
     CVector3 delta;
     CVector3 dir;
     CVector3 *pdir;
@@ -36,15 +23,15 @@ void func_00231EF8(Mover *obj) {
     f32 speed;
     f32 maxSpeed;
 
-    accel = func_0026D210(obj->parent->move->accel);
+    accel = func_0026D210(((MoveParams *) obj->m_pEffect->m_pMotion)->accel);
     if (accel != 0.0f) {
         pdir = &dir;
-        *pdir = obj->dir;
+        *pdir = obj->m_vDirection;
         func_0020EF60(&delta, pdir, accel);
-        vel = &obj->vel;
+        vel = &obj->m_vVelocity;
         func_0020EEF8(vel, vel, &delta);
-        speed = func_00298470(obj->vel.x * obj->vel.x + obj->vel.y * obj->vel.y + obj->vel.z * obj->vel.z);
-        maxSpeed = func_0026D210(obj->parent->move->maxSpeed);
+        speed = func_00298470(obj->m_vVelocity.x * obj->m_vVelocity.x + obj->m_vVelocity.y * obj->m_vVelocity.y + obj->m_vVelocity.z * obj->m_vVelocity.z);
+        maxSpeed = func_0026D210(((MoveParams *) obj->m_pEffect->m_pMotion)->maxSpeed);
         if (accel > 0.0f) {
             if (maxSpeed < speed) {
                 func_0020EF60(vel, pdir, maxSpeed);

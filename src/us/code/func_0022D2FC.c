@@ -10,7 +10,7 @@
  *
  * The four C parts were written apart: each keeps its own view of the shared
  * globals and structs (func_0022D2FC's types are Mtx-prefixed here, and it
- * passes its matrices to the Mtx44 prototypes the later parts declare).
+ * passes its matrices to the CMtxF * prototypes the later parts declare).
  * func_0022D2FC, func_0022E094 and func_0022F350 are after Rage Wars
  * (Particle_BuildMatrix, Particle_DrawSprite and func_802800C0_de). */
 #include "common.h"
@@ -18,14 +18,13 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "structs/frame.h"
+#include "structs/particle_event.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 /* MIN as a statement expression: its value lives in its own temporary. */
 #define MINF(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 
-
-typedef struct { f32 m[4][4]; } Mtx44;
 
 /* Matches with four register pins (the `register ... asm` lines in the inlined
  * depth scale and at its call), no other trick. Why pins: in the ROM the depth
@@ -43,8 +42,6 @@ typedef struct { f32 m[4][4]; } Mtx44;
  * (sprites), its placement for the space it lives in, and an optional
  * decaying shake, then packs the result into the fixed-point matrix the
  * display list loads. */
-
-typedef f32 Mtx4f[4][4];
 
 #define MIN_LT(a, b) ((a) < (b) ? (a) : (b))
 #define MAX_GT(a, b) ((a) > (b) ? (a) : (b))
@@ -108,28 +105,28 @@ typedef struct {
 
 /* func_0022D09C under this part's view (the effect code below declares it as (Effect *, s32, s32)). */
 extern void MtxParticle_Place(MtxParticle *p, CVector3 *outPosition, CVector3 *outHeading) asm("func_0022D09C");
-extern Mtx4f *func_0022CF40(MtxParticle *p, MtxCamera *camera);
+extern CMtxF *func_0022CF40(MtxParticle *p, MtxCamera *camera);
 extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);       /* cross product */
 extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);         /* out = in * s */
 extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a + b */
 extern void func_0020F040(CVector3 *v);                             /* normalize */
 extern f32 func_002982F0(f32 angle);                             /* sin */
-extern void func_0020FE00(Mtx4f m, f32 x, f32 y, f32 z);         /* rotation */
-extern void func_0020F79C(Mtx44 *m);                              /* identity */
-extern void func_0020C618(Mtx4f out, Mtx4f a, Mtx4f b);          /* out = a * b */
-extern void func_00210630(Mtx4f m, f32 angle);                   /* roll */
-extern void func_00210284(Mtx4f m, f32 x, f32 y, f32 z);
-extern void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);         /* translate */
+extern void func_0020FE00(CMtxF m, f32 x, f32 y, f32 z);         /* rotation */
+extern void func_0020F79C(CMtxF *m);                              /* identity */
+extern void func_0020C618(CMtxF out, CMtxF a, CMtxF b);          /* out = a * b */
+extern void func_00210630(CMtxF m, f32 angle);                   /* roll */
+extern void func_00210284(CMtxF m, f32 x, f32 y, f32 z);
+extern void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);         /* translate */
 extern f32 func_0026BE60(void *region, f32 x, f32 z);            /* ground height */
 extern f32 func_00269C3C(void *region, f32 x, f32 z);            /* ceiling height */
 extern void func_0020F510(CVector3 *v, f32 limit);
-extern void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);         /* scale */
-extern void func_00210C3C(Mtx4f m);
-extern void func_0020FF80(Mtx4f dst, Mtx4f src);                 /* copy */
-extern void func_0020FC24(Mtx44 *m, f32 x, f32 y, f32 z);         /* translation */
-extern void func_00210968(Mtx4f m, f32 angle);
-extern void func_00210790(Mtx4f m, f32 angle);
-extern void func_0020D274(Mtx44 *m, void *out);                   /* pack */
+extern void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);         /* scale */
+extern void func_00210C3C(CMtxF m);
+extern void func_0020FF80(CMtxF dst, CMtxF src);                 /* copy */
+extern void func_0020FC24(CMtxF *m, f32 x, f32 y, f32 z);         /* translation */
+extern void func_00210968(CMtxF m, f32 angle);
+extern void func_00210790(CMtxF m, f32 angle);
+extern void func_0020D274(CMtxF *m, void *out);                   /* pack */
 
 static __inline__ f32 particleDepthScale(MtxParticleDesc *desc, f32 depth) {
     f32 farness;
@@ -166,7 +163,7 @@ static __inline__ f32 rampFade(f32 time, s32 ramp) {
 }
 
 void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 depth) {
-    Mtx4f rotation, basis, local, world, shakeMtx;
+    CMtxF rotation, basis, local, world, shakeMtx;
     CVector3 position;
     CVector3 up;
     CVector3 heading;
@@ -251,7 +248,7 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
             up.y = 1.0f;
             func_0020EFDC(&axisX, &up, &axisZ);
             func_0020EFDC(&axisY, &axisX, &axisZ);
-            func_0020F79C((Mtx44 *) basis);
+            func_0020F79C((CMtxF *) basis);
             func_0020F040(&axisX);
             func_0020F040(&axisY);
             func_0020F040(&axisZ);
@@ -286,7 +283,7 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
     }
     if (lift != 0.0f) {
         func_00210284(local, 0.0f, lift, 0.0f);
-        func_00210318((Mtx44 *) local, 0.0f, -lift, 0.0f);
+        func_00210318((CMtxF *) local, 0.0f, -lift, 0.0f);
     }
     particle->flags &= ~0x800000;
     switch (particle->space) {
@@ -334,46 +331,36 @@ void func_0022D2FC(MtxParticle *particle, void *out, MtxCamera *camera, f32 dept
     }
     if (particle->desc->renderModel != 0) {
         extent = scale * particle->size.z * (35.0f / 1024.0f);
-        func_0021034C((Mtx44 *) local, particle->size.x * extent, particle->size.y * extent, extent * 10.24f);
+        func_0021034C((CMtxF *) local, particle->size.x * extent, particle->size.y * extent, extent * 10.24f);
         func_00210C3C(local);
     } else {
         extent = scale * particle->size.z;
-        func_0021034C((Mtx44 *) local, particle->size.x * extent, particle->size.y * extent, extent * 10.24f);
+        func_0021034C((CMtxF *) local, particle->size.x * extent, particle->size.y * extent, extent * 10.24f);
     }
     {
-        Mtx4f *parent = func_0022CF40(particle, camera);
+        CMtxF *parent = func_0022CF40(particle, camera);
         if (parent != 0) {
             func_0020C618(world, local, *parent);
         } else {
             func_0020FF80(world, local);
         }
     }
-    func_00210318((Mtx44 *) world, position.x, position.y, position.z);
+    func_00210318((CMtxF *) world, position.x, position.y, position.z);
     if ((particle->flags & 0x20000) && (shake = particle->shake) != 0) {
         jolt = (f32)shake * (1.0f / 127.0f);
         joltSq = jolt * jolt;
         angle = joltSq * (3.141593f * 5 / 180);
-        func_0020FC24((Mtx44 *) shakeMtx, 0.0f, 0.0f, -66.56f);
+        func_0020FC24((CMtxF *) shakeMtx, 0.0f, 0.0f, -66.56f);
         func_00210968(shakeMtx, angle * (func_002982F0(joltSq * (6 * 3.141593f)) * 0.25f));
         func_00210790(shakeMtx, angle * func_002982F0(joltSq * (14 * 3.141593f)));
-        func_00210318((Mtx44 *) shakeMtx, 0.0f, 0.0f, 66.56f);
+        func_00210318((CMtxF *) shakeMtx, 0.0f, 0.0f, 66.56f);
         func_0020C618(rotation, shakeMtx, world);
         final = rotation[0];
     } else {
         final = world[0];
     }
-    func_0020D274((Mtx44 *) final, out);
+    func_0020D274((CMtxF *) final, out);
 }
-
-/* The leading 0x34 bytes of a game object, as the collision test reads them. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ void *region;
-    /* 0x14 */ u8 pad14[0x4];
-    /* 0x18 */ CVector3 velocity;
-    /* 0x24 */ u8 pad24[0x10];
-} ObjectHead; /* size 0x34 */
 
 typedef struct {
     u8 pad0[0x18];
@@ -417,21 +404,21 @@ f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
 void func_0020F510(CVector3 *v, f32 arg1);
-void func_00211114(CQuaternion *rot, Mtx44 *m);
-void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);  /* scale */
-void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);  /* translate */
-void func_0020D274(Mtx44 *m, void *dst);
+void func_00211114(CQuaternion *rot, CMtxF *m);
+void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);  /* scale */
+void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);  /* translate */
+void func_0020D274(CMtxF *m, void *dst);
 void func_002086BC(void *mtx, s32 arg1, u32 alpha);
 
 /* Draws the blob shadow under an actor: on the ground of its region, or
  * where a ray cast straight down from it lands, tilted to the surface. */
 void func_0022DCBC(ShadowActor *actor) {
-    Mtx44 mtx;
+    CMtxF mtx;
     CVector3 pos;
     CQuaternion rot;
     CQuaternion tilt;
     CQuaternion spin;
-    ObjectHead probe;
+    CObjectHead probe;
     void *gmtx;
     f32 ground;
     f32 height;
@@ -447,14 +434,14 @@ void func_0022DCBC(ShadowActor *actor) {
         func_0026A9C0(&rot, actor->region);
         ground = func_00267648(actor, 0);
     } else {
-        probe = *(ObjectHead *) actor;
-        probe.pos.y += 10.24f;
-        pos.x = probe.pos.x;
-        pos.y = probe.pos.y - 102400.0f;
-        pos.z = probe.pos.z;
-        probe.velocity.x = 0;
-        probe.velocity.y = 0;
-        probe.velocity.z = 0;
+        probe = *(CObjectHead *) actor;
+        probe.header.m_vPos.y += 10.24f;
+        pos.x = probe.header.m_vPos.x;
+        pos.y = probe.header.m_vPos.y - 102400.0f;
+        pos.z = probe.header.m_vPos.z;
+        probe.m_vVelocity.x = 0;
+        probe.m_vVelocity.y = 0;
+        probe.m_vVelocity.z = 0;
         func_00239F00(&probe, pos, &D_800F1B40);
         if (D_800F1CE0.m_pInstance == NULL) {
             return;
@@ -1079,9 +1066,9 @@ typedef struct Actor {
     /* 0x018 */ u8 pad18[0x40 - 0x18];
     /* 0x040 */ u32 flags;
     /* 0x044 */ u8 pad44[4];
-    /* 0x048 */ Mtx44 matrices[1];
+    /* 0x048 */ CMtxF matrices[1];
     /* 0x088 */ u8 pad88[0x98 - 0x88];
-    /* 0x098 */ Mtx44 *bones;
+    /* 0x098 */ CMtxF *bones;
     /* 0x09C */ u8 pad9C[0xF8 - 0x9C];
     /* 0x0F8 */ SourceModel *model;
     /* 0x0FC */ u8 padFC[0x130 - 0xFC];
@@ -1164,7 +1151,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x20C];
-    /* 0x20C */ Mtx44 view;
+    /* 0x20C */ CMtxF view;
 } Camera;
 
 extern s32 D_8011ACA4;              /* frozen; the current player list is 0x1414 bytes before */
@@ -1179,7 +1166,6 @@ extern u8 D_800F7078[];
 extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
 extern f32 D_800ACE10[2];
-extern u32 D_800AD084[];
 
 extern void *func_002017D4(s32 resource, s32 index);
 extern s32 func_00266D8C(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
@@ -1190,16 +1176,16 @@ extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 extern void func_0020F040(CVector3 *v);
-extern void func_0020FAFC(Mtx44 *m, CVector3 *in, CVector3 *out);
-extern void func_0020D908(Mtx44 *out, Mtx44 *in);
-extern void func_0020C208(Mtx44 *out, Mtx44 *in);
-extern void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);
-extern void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);
-extern void func_0020FC74(Mtx44 *m, f32 x, f32 y, f32 z);
-extern void func_0020FC24(Mtx44 *m, f32 x, f32 y, f32 z);
-extern void func_0020F79C(Mtx44 *m);
+extern void func_0020FAFC(CMtxF *m, CVector3 *in, CVector3 *out);
+extern void func_0020D908(CMtxF *out, CMtxF *in);
+extern void func_0020C208(CMtxF *out, CMtxF *in);
+extern void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);
+extern void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);
+extern void func_0020FC74(CMtxF *m, f32 x, f32 y, f32 z);
+extern void func_0020FC24(CMtxF *m, f32 x, f32 y, f32 z);
+extern void func_0020F79C(CMtxF *m);
 extern void func_002673CC(CQuaternion *q, Owner *owner, CVector3 pos);
-extern void func_00211114(CQuaternion *q, Mtx44 *m);
+extern void func_00211114(CQuaternion *q, CMtxF *m);
 extern void CList__AddTail(EffectList *list, Effect *effect);
 extern void func_002005D0(EffectList *list, Effect *after, Effect *effect);
 extern void func_00207914(u32 *bits, s32 value);
@@ -1268,8 +1254,8 @@ static __inline__ Effect *allocateEffect(EffectSystem *sys, u8 index) {
 }
 
 static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
-    Mtx44 targetMtx;
-    Mtx44 targetInv;
+    CMtxF targetMtx;
+    CMtxF targetInv;
     CVector3 up;
     Actor *targetActor;
     s32 targetTeam;
@@ -1304,7 +1290,7 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
 
 s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount, s32 arg4, s32 kind,
                   CVector3 arg6, CQuaternion rotation, CVector3 pos, void *region, s32 arg10, s32 arg11) {
-    Mtx44 mtx;
+    CMtxF mtx;
     CVector3 dir;
     CVector3 dirOut;
     CVector3 offset;
@@ -1710,7 +1696,7 @@ s32 func_0022F350(EffectSystem *sys, Actor *source, Owner *owner, s32 *refCount,
                     }
                     effect->flags |= 0x1000000;
                 }
-                if ((D_800AD084[entry->model->type * 2] & 1) || kind == 0x68) {
+                if ((D_800AD084[entry->model->type].m_Flags & 1) || kind == 0x68) {
                     render->flags |= 0x80000000;
                 }
                 vel = &effect->velocity;

@@ -4,15 +4,8 @@
  * steer register allocation. */
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -msplit-addresses */
 #include "common.h"
+#include "structs/memory.h"
 
-/* One mapped TLB range: the virtual addresses start..end, flags 3 when valid. */
-typedef struct {
-    /* 0x0 */ u32 start;
-    /* 0x4 */ u32 end;
-    /* 0x8 */ s32 flags;
-} TlbRange;
-
-extern TlbRange D_80128130[48]; /* 16 memory ranges, then the 32 TLB ranges */
 extern u32 D_801288A0[32][4];     /* saved TLB entries: PageMask, EntryHi, EntryLo0, EntryLo1 */
 extern u32 D_800BC308[];          /* page masks 4K, 16K, ... 16M; 0x80000000 ends the table */
 
@@ -36,8 +29,8 @@ void func_002A13F0(void) {
     asid = func_002A31FC() & 0xFF;
     e = D_801288A0[0];
     for (i = 16; i < 48; i++) {
-        D_80128130[i].start = -1;
-        D_80128130[i].flags = 0;
+        D_80128130[i].m_First = -1;
+        D_80128130[i].m_Flags = 0;
         do { pageMask = *e++; } while (0);
         hi = *e++;
         lo0 = *e++;
@@ -74,9 +67,9 @@ void func_002A13F0(void) {
                 } else if (lo1 & 2) {
                     start += size;
                 }
-                D_80128130[i].start = start;
-                D_80128130[i].end = start + size - 1;
-                D_80128130[i].flags = 3;
+                D_80128130[i].m_First = start;
+                D_80128130[i].m_Last = start + size - 1;
+                D_80128130[i].m_Flags = 3;
             }
         }
     }

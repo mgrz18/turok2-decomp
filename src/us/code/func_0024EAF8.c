@@ -17,21 +17,16 @@ typedef struct {
     /* 0x140 */ u8 ai[4];
 } Mount;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x50];
-    /* 0x50 */ f32 yaw;
-} Body;
-
 extern CCollisionResults D_800F1CE0;  /* m_pInstance: what the player is aiming at */
 extern CVector3 D_800ADCBC;             /* rider seat */
 
-f32 func_00246310(Body *body, CVector3 point);   /* angle to a point */
+f32 func_00246310(CGameObjectInstance *body, CVector3 point);   /* angle to a point */
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);
 void func_002470E8(void *controls, void *settings);
 f32 func_00253CFC(CPlayer *player);
 void func_00206068(s32);
 void func_0025EB80(Mount *mount, void *ai, CPlayer *player);
-s32 func_0024E5F0(CPlayer *player, Body *body, s32 arg2);
+s32 func_0024E5F0(CPlayer *player, CGameObjectInstance *body, s32 arg2);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
@@ -44,7 +39,7 @@ static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
 /* Mounts the creature of type 0x136 in front, if within 45 degrees of the
  * heading and the player is not holding 0x8000: the player takes its seat
  * and heading, and the movement state is reset. */
-s32 func_0024EAF8(CPlayer *p, Body *body) {
+s32 func_0024EAF8(CPlayer *p, CGameObjectInstance *body) {
     Mount *mount;
 
     if (p->m_pOnEnemy == NULL && !(p->m_ModeBeforeFlags & 0x8000)) {
@@ -55,7 +50,7 @@ s32 func_0024EAF8(CPlayer *p, Body *body) {
                 p->m_OnEnemyObjectType = 0x136;
                 p->m_vOnEnemyScale = D_800ADCBC;
                 func_0020EF60(&p->m_vOnEnemyScale, &p->m_vOnEnemyScale, 0.03f);
-                body->yaw = mount->yaw;
+                body->m_RotY = mount->yaw;
                 func_002470E8(&p->m_ContState, &D_800F5EC0[p->m_nController]);
                 p->m_Speed = 0;
                 p->m_SideSpeed = 0;

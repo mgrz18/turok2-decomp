@@ -57,7 +57,7 @@ void func_002525BC(CPlayerList *list) {
         case 2:
             p = func_00254B04(list, s->tagPick % count);
             cam = p->m_pCamera;
-            if (cam != NULL && *(s32 *)((u8 *)cam + 0x54C) == 0   /* inside m_MenuPool: menu open */) {
+            if (cam != NULL && cam->m_Menus.count == 0) {
                 func_00279028(D_8011AAEA);
                 w = cam->m_Viewport.m_Width;
                 h = cam->m_Viewport.m_Height;

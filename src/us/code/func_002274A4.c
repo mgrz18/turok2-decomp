@@ -1,78 +1,59 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
-
-/* A level actor spawned at run time (a pickup), kept in the world's pool. */
-typedef struct PoolActor {
-    /* 0x000 */ u8 pad0[0x14C];
-    /* 0x14C */ CBox bounds;
-    /* 0x164 */ u8 pad164[0x198 - 0x164];
-    /* 0x198 */ f32 lifetime;
-    /* 0x19C */ f32 timer;
-    /* 0x1A0 */ s32 poolFlags;          /* 1: in use */
-    /* 0x1A4 */ s32 *refCount;
-    /* 0x1A8 */ struct PoolActor *prev;
-    /* 0x1AC */ struct PoolActor *next;
-} PoolActor;                            /* 0x1B0 bytes */
-
-typedef struct ActorPool {
-    /* 0x0000 */ PoolActor items[32];
-    /* 0x3600 */ PoolActor *free;
-    /* 0x3604 */ PoolActor *head;       /* newest */
-    /* 0x3608 */ PoolActor *tail;       /* oldest */
-} ActorPool;
+#include "structs/level_actor.h"
 
 extern f32 D_800B6D28;                  /* the frame's time step */
 extern CBox D_800F5A10;               /* visible bounds */
 
-void func_00227680(PoolActor *actor);
+void func_00227680(CPooledLevelActor *actor);
 
 /* Releases an actor in use: uncounts it, unlinks it and puts it on the free list. */
-static __inline__ void releaseActor(ActorPool *pool, PoolActor *actor) {
-    if (actor->poolFlags & 1) {
-        actor->poolFlags &= ~1;
-        if (actor->refCount != NULL) {
-            (*actor->refCount)--;
+static __inline__ void releaseActor(CLevelActorPool *pool, CPooledLevelActor *actor) {
+    if (actor->m_PoolFlags & 1) {
+        actor->m_PoolFlags &= ~1;
+        if (actor->m_pOwnerCount != NULL) {
+            (*actor->m_pOwnerCount)--;
         }
-        if (actor->prev != NULL) {
-            actor->prev->next = actor->next;
+        if (actor->m_pPrev != NULL) {
+            actor->m_pPrev->m_pNext = actor->m_pNext;
         }
-        if (actor->next != NULL) {
-            actor->next->prev = actor->prev;
+        if (actor->m_pNext != NULL) {
+            actor->m_pNext->m_pPrev = actor->m_pPrev;
         }
-        if (pool->head == actor) {
-            pool->head = actor->next;
+        if (pool->m_pHead == actor) {
+            pool->m_pHead = actor->m_pNext;
         }
-        if (pool->tail == actor) {
-            pool->tail = actor->prev;
+        if (pool->m_pTail == actor) {
+            pool->m_pTail = actor->m_pPrev;
         }
-        actor->next = pool->free;
-        actor->prev = NULL;
-        pool->free = actor;
+        actor->m_pNext = pool->m_pFree;
+        actor->m_pPrev = NULL;
+        pool->m_pFree = actor;
     }
 }
 
 /* Updates the pool actors (func_00227680); releases those whose lifetime ran out this frame
  * or that left the visible bounds. */
-void func_002274A4(ActorPool *pool) {
-    PoolActor *actor;
-    PoolActor *next;
+void func_002274A4(CLevelActorPool *pool) {
+    CPooledLevelActor *actor;
+    CPooledLevelActor *next;
     s32 expired;
 
-    next = pool->head;
+    next = pool->m_pHead;
     while (next != NULL) {
         actor = next;
-        next = next->next;
+        next = next->m_pNext;
         expired = 0;
-        if (actor->lifetime > 0.0f) {
-            actor->lifetime -= D_800B6D28;
-            if (actor->lifetime <= 0.0f) {
+        if (actor->m_Lifetime > 0.0f) {
+            actor->m_Lifetime -= D_800B6D28;
+            if (actor->m_Lifetime <= 0.0f) {
                 expired = 1;
             }
         }
-        if (!(D_800F5A10.m_vMax.x > actor->bounds.m_vMin.x && D_800F5A10.m_vMin.x < actor->bounds.m_vMax.x
-              && D_800F5A10.m_vMax.z > actor->bounds.m_vMin.z && D_800F5A10.m_vMin.z < actor->bounds.m_vMax.z
-              && D_800F5A10.m_vMax.y > actor->bounds.m_vMin.y && D_800F5A10.m_vMin.y < actor->bounds.m_vMax.y)) {
+        if (!(D_800F5A10.m_vMax.x > actor->m_Actor.m_Bounds.m_vMin.x && D_800F5A10.m_vMin.x < actor->m_Actor.m_Bounds.m_vMax.x
+              && D_800F5A10.m_vMax.z > actor->m_Actor.m_Bounds.m_vMin.z && D_800F5A10.m_vMin.z < actor->m_Actor.m_Bounds.m_vMax.z
+              && D_800F5A10.m_vMax.y > actor->m_Actor.m_Bounds.m_vMin.y && D_800F5A10.m_vMin.y < actor->m_Actor.m_Bounds.m_vMax.y)) {
             expired = 1;
         }
         if (expired) {

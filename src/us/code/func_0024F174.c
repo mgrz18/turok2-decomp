@@ -4,13 +4,6 @@
 #include "structs/player.h"
 
 typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ u8 pad10[0x50 - 0x10];
-    /* 0x50 */ f32 yaw;
-} Body;
-
-typedef struct {
     /* 0x00 */ f32 forwardAccel;
     /* 0x04 */ f32 forwardMax;
     /* 0x08 */ f32 forwardDecel;
@@ -37,7 +30,7 @@ void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 /* Walking movement: forward and strafe speeds towards the stick, the dodge
  * impulses, turned into world space and added to the velocity. */
-void func_0024F174(CPlayer *player, Body *body, Tuning *tuning) {
+void func_0024F174(CPlayer *player, CGameObjectInstance *body, Tuning *tuning) {
     CVector3 motion;
     f32 forward;
     f32 strafe;
@@ -64,9 +57,9 @@ void func_0024F174(CPlayer *player, Body *body, Tuning *tuning) {
         } else {
             player->m_Speed = func_0021170C(player->m_Speed, tuning->forwardDecel);
         }
-        motion.x = player->m_Speed * func_002982F0(body->yaw + 3.1415927f);
+        motion.x = player->m_Speed * func_002982F0(body->m_RotY + 3.1415927f);
         motion.y = 0;
-        motion.z = player->m_Speed * func_002974C0(body->yaw + 3.1415927f);
+        motion.z = player->m_Speed * func_002974C0(body->m_RotY + 3.1415927f);
         strafe = player->m_SideSpeed;
         max = tuning->strafeMax;
         if (strafe < 0.0f ? max < -strafe : max < strafe) {
@@ -77,8 +70,8 @@ void func_0024F174(CPlayer *player, Body *body, Tuning *tuning) {
         } else {
             player->m_SideSpeed = func_0021170C(player->m_SideSpeed, tuning->strafeDecel);
         }
-        motion.x += player->m_SideSpeed * func_002982F0(body->yaw - 1.5707964f);
-        motion.z += player->m_SideSpeed * func_002974C0(body->yaw - 1.5707964f);
+        motion.x += player->m_SideSpeed * func_002982F0(body->m_RotY - 1.5707964f);
+        motion.z += player->m_SideSpeed * func_002974C0(body->m_RotY - 1.5707964f);
         strafe = player->m_SideSpeed;
         if (strafe < 0.0f) {
             strafe = -strafe;
@@ -98,8 +91,8 @@ void func_0024F174(CPlayer *player, Body *body, Tuning *tuning) {
         } else {
             player->m_BurstSpeed = func_0021170C(player->m_BurstSpeed, tuning->impulseDecel);
         }
-        motion.x += player->m_BurstSpeed * func_002982F0(body->yaw + 3.1415927f);
-        motion.z += player->m_BurstSpeed * func_002974C0(body->yaw + 3.1415927f);
+        motion.x += player->m_BurstSpeed * func_002982F0(body->m_RotY + 3.1415927f);
+        motion.z += player->m_BurstSpeed * func_002974C0(body->m_RotY + 3.1415927f);
         if (ready && (player->m_ContState.m_dwButtonsDouble & 1)) {
             player->m_BurstSideSpeed = tuning->impulse * 0.75f;
             impulse = 1;
@@ -109,13 +102,13 @@ void func_0024F174(CPlayer *player, Body *body, Tuning *tuning) {
         } else {
             player->m_BurstSideSpeed = func_0021170C(player->m_BurstSideSpeed, tuning->impulseDecel * 0.75f);
         }
-        motion.x += player->m_BurstSideSpeed * func_002982F0(body->yaw - 1.5707964f);
-        motion.z += player->m_BurstSideSpeed * func_002974C0(body->yaw - 1.5707964f);
+        motion.x += player->m_BurstSideSpeed * func_002982F0(body->m_RotY - 1.5707964f);
+        motion.z += player->m_BurstSideSpeed * func_002974C0(body->m_RotY - 1.5707964f);
         func_0020EF60(&motion, &motion, player->m_FrameIncrementScaled);
         func_0020EEF8(&player->m_vDesiredPos, &player->m_vDesiredPos, &motion);
         if (impulse) {
             player->m_BurstTimer += 7.5f;
-            func_00275544(tuning->impulseSound, body->pos, 0, -1);
+            func_00275544(tuning->impulseSound, body->header.m_vPos, 0, -1);
         }
     }
 }

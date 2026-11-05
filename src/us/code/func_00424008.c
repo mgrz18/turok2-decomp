@@ -1,4 +1,4 @@
-/* FAKEMATCH: the clamped copy of h is pinned to $t5 (register Span hs asm("$13")): unpinned, global-alloc gives it a register of its own. */
+/* xScale is a scratch first: it holds the new horizontal centre the edges are built from, then the scale. That second job is what keeps oldH canonical for CSE (a single-use copy is propagated away, and without one the centre is read from h's load). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BDB8_de, with Turok 2's layouts. */
 #include "common.h"
 
@@ -57,10 +57,6 @@ void func_00424008(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY
     u32 xScale;
     s32 oldRight;
     s32 cx;
-    /* Pinned to the register that holds h: the clamped copy is a separate variable (h's last use must come before
-     * oldH's, or CSE makes h canonical and the centre is computed from the load instead of oldH's copy), and
-     * global-alloc gives it a register of its own unless pinned. */
-    register Span hs asm("$13");
 
     func_0029E460(mode, &D_800B7BE0[D_801309D0], 0x50);
     old[0] = v[0] = mode->fldRegs[0].vStart;
@@ -74,8 +70,9 @@ void func_00424008(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY
     oldRight = oldH.h.end;
     cx = (oldRight - oldH.h.start) / 2 + oldH.h.start;
     cx -= x;
-    h.h.start = cx - width / 2 + borderX / 2;
-    h.h.end = cx + width / 2 - borderX * 2;
+    xScale = cx;
+    h.h.start = xScale - width / 2 + borderX / 2;
+    h.h.end = xScale + width / 2 - borderX * 2;
     v[0].h.start = center[0] - height / 2 + borderY / 2;
     v[0].h.end = center[0] + height / 2 - borderY * 2;
     v[1].h.start = center[1] - height / 2 + borderY / 2;
@@ -91,9 +88,8 @@ void func_00424008(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY
     if (old[1].h.end < v[1].h.end) {
         v[1].h.end = old[1].h.end;
     }
-    hs = h;
-    if (oldRight < hs.h.end) {
-        hs.h.end = oldH.h.end;
+    if (oldRight < h.h.end) {
+        h.h.end = oldH.h.end;
     }
     mode->fldRegs[0].yScale = yScale;
     mode->fldRegs[1].yScale = yScale;
@@ -101,7 +97,7 @@ void func_00424008(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY
     mode->fldRegs[1].origin = width * 2;
     mode->comRegs.width = width;
     mode->comRegs.xScale = xScale;
-    mode->comRegs.hStart = hs;
+    mode->comRegs.hStart = h;
     mode->fldRegs[0].vStart = v[0];
     mode->fldRegs[1].vStart = v[1];
     func_0029AA80(mode);

@@ -2,16 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
-
-/* Pickup effect descriptor. */
-typedef struct PickupEntry {
-    void *resource; /* 0x00 */
-    char pad4[2];
-    s16 sound;      /* 0x06 */
-    s16 callback;   /* 0x08 */
-    char padA[2];
-    s16 amount;     /* 0x0C */
-} PickupEntry;
+#include "structs/pickup.h"
 
 extern char D_801198B0[];
 
@@ -36,12 +27,12 @@ static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 soun
 }
 
 /* Life force pickup: every 100 gives an extra life, up to 9. */
-s32 func_0023F524(CPlayer *player, PickupEntry *entry) {
+s32 func_0023F524(CPlayer *player, CPickupEntry *entry) {
     void *resource;
     s32 sound;
     s32 callback;
 
-    player->m_Data.m_LifeForce += entry->amount;
+    player->m_Data.m_LifeForce += entry->m_Params.m_Amount;
     if (player->m_Data.m_LifeForce >= 100) {
         player->m_Data.m_LifeForce -= 100;
         if (player->m_Data.m_Lives < 9) {
@@ -49,9 +40,9 @@ s32 func_0023F524(CPlayer *player, PickupEntry *entry) {
             func_00275624(0x3A9D);
         }
     }
-    sound = entry->sound;
-    callback = entry->callback;
-    resource = entry->resource;
+    sound = entry->m_Sound;
+    callback = entry->m_Callback;
+    resource = entry->m_pMessage;
     pickup_feedback(player, resource, sound, callback);
     return 1;
 }

@@ -3,95 +3,14 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 
-/* The player fields this resets. */
-typedef struct Player {
-    /* 0x0000 */ u8 pad0[0x4];
-    /* 0x0004 */ CVector3 pos;
-    /* 0x0010 */ u8 pad10[0x514 - 0x10];
-    /* 0x0514 */ s32 index;
-    /* 0x0518 */ CPlayerOptions *options;
-    /* 0x051C */ u8 pad51C[0xA10 - 0x51C];
-    /* 0x0A10 */ s32 unkA10;
-    /* 0x0A14 */ u8 padA14[0xA20 - 0xA14];
-    /* 0x0A20 */ s32 unkA20;
-    /* 0x0A24 */ s32 unkA24;
-    /* 0x0A28 */ u8 padA28[0xA40 - 0xA28];
-    /* 0x0A40 */ u8 controls[0x38];       /* set up by func_002470E8 */
-    /* 0x0A78 */ s32 unkA78;
-    /* 0x0A7C */ s32 unkA7C;
-    /* 0x0A80 */ s32 unkA80;
-    /* 0x0A84 */ s32 unkA84;
-    /* 0x0A88 */ s32 unkA88;
-    /* 0x0A8C */ s32 unkA8C;
-    /* 0x0A90 */ s32 unkA90;
-    /* 0x0A94 */ s32 unkA94;
-    /* 0x0A98 */ u8 padA98[0xA9C - 0xA98];
-    /* 0x0A9C */ s32 unkA9C;
-    /* 0x0AA0 */ CVector3 unkAA0;
-    /* 0x0AAC */ f32 unkAAC;
-    /* 0x0AB0 */ s32 unkAB0;
-    /* 0x0AB4 */ s32 unkAB4;
-    /* 0x0AB8 */ s32 unkAB8;
-    /* 0x0ABC */ s32 unkABC;
-    /* 0x0AC0 */ s32 unkAC0;
-    /* 0x0AC4 */ s32 unkAC4;
-    /* 0x0AC8 */ s32 unkAC8;
-    /* 0x0ACC */ s32 unkACC;
-    /* 0x0AD0 */ s32 unkAD0;
-    /* 0x0AD4 */ s32 unkAD4;
-    /* 0x0AD8 */ s32 unkAD8;
-    /* 0x0ADC */ s32 unkADC;
-    /* 0x0AE0 */ s32 unkAE0;
-    /* 0x0AE4 */ f32 unkAE4;
-    /* 0x0AE8 */ s32 unkAE8;
-    /* 0x0AEC */ CVector3 unkAEC;
-    /* 0x0AF8 */ f32 unkAF8;
-    /* 0x0AFC */ s32 unkAFC;
-    /* 0x0B00 */ s32 unkB00;
-    /* 0x0B04 */ u8 padB04[0xB24 - 0xB04];
-    /* 0x0B24 */ s32 unkB24;
-    /* 0x0B28 */ f32 unkB28;
-    /* 0x0B2C */ s32 unkB2C;
-    /* 0x0B30 */ s32 unkB30;
-    /* 0x0B34 */ s32 unkB34;
-    /* 0x0B38 */ s32 unkB38;
-    /* 0x0B3C */ s32 unkB3C;
-    /* 0x0B40 */ s32 unkB40;
-    /* 0x0B44 */ s32 unkB44;
-    /* 0x0B48 */ s32 unkB48;
-    /* 0x0B4C */ s32 unkB4C;
-    /* 0x0B50 */ s32 unkB50;
-    /* 0x0B54 */ s32 unkB54;
-    /* 0x0B58 */ s32 unkB58;
-    /* 0x0B5C */ s32 unkB5C;
-    /* 0x0B60 */ u8 padB60[0xB64 - 0xB60];
-    /* 0x0B64 */ f32 unkB64;
-    /* 0x0B68 */ f32 unkB68;
-    /* 0x0B6C */ f32 unkB6C;
-    /* 0x0B70 */ f32 unkB70;
-    /* 0x0B74 */ f32 unkB74;
-    /* 0x0B78 */ f32 unkB78;
-    /* 0x0B7C */ CVector3 unkB7C;
-    /* 0x0B88 */ f32 unkB88;
-    /* 0x0B8C */ s32 unkB8C;
-    /* 0x0B90 */ s32 unkB90;
-    /* 0x0B94 */ s32 unkB94;
-    /* 0x0B98 */ u8 padB98[0xBB0 - 0xB98];
-    /* 0x0BB0 */ s32 unkBB0;
-    /* 0x0BB4 */ u8 padBB4[0xBDC - 0xBB4];
-    /* 0x0BDC */ f32 unkBDC;
-    /* 0x0BE0 */ f32 unkBE0;
-    /* 0x0BE4 */ f32 unkBE4;
-    /* 0x0BE8 */ u8 padBE8[0xBEC - 0xBE8];
-    /* 0x0BEC */ s32 unkBEC;
-    /* 0x0BF0 */ u8 padBF0[0x1284 - 0xBF0];
-    /* 0x1284 */ s32 unk1284;
-} Player;
-
 
 void func_002470E8(void *controls, void *settings);
-f32 func_00253CFC(Player *player);
-void func_0024E5F0(Player *player, Player *arg1, s32 arg2);
+f32 func_00253CFC(CPlayer *player);
+void func_0024E5F0(CPlayer *player, CPlayer *arg1, s32 arg2);
+
+/* The ROM clears the float fields with integer stores (sw $zero): a 0.0f
+ * store keeps the constant in a register instead. */
+#define CLEAR_WORD(field) (*(s32 *) &(field) = 0)
 
 static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
     v->z = z;
@@ -100,76 +19,76 @@ static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
 }
 
 /* Resets a player's movement, camera and crosshair state. */
-void func_00248340(Player *p) {
+void func_00248340(CPlayer *p) {
     f32 zero;
 
-    func_002470E8(p->controls, &D_800F5EC0[p->index]);
-    p->unkA78 = 0;
-    p->unkA7C = 0;
-    p->unkA80 = 0;
-    p->unkA84 = 0;
-    p->unkA88 = 1;
-    p->unkA8C = 0;
-    p->unkA90 = 0;
-    p->unkA94 = 0;
-    p->unkA9C = 0;
-    p->unkAFC = 0;
-    p->unkB00 = 0;
-    p->unk1284 = 0;
-    p->unkAB0 = 0;
-    p->unkAB4 = 0;
-    p->unkAB8 = 0;
-    p->unkABC = 0;
-    p->unkAC8 = 0;
-    p->unkACC = 0;
-    p->unkAD0 = 0;
-    p->unkAD4 = 0;
-    p->unkAD8 = 0;
-    p->unkADC = 0;
-    p->unkAE0 = 0;
-    p->unkAE4 = func_00253CFC(p);
-    p->unkAE8 = 0;
-    setVec3(&p->unkAEC, 0.0f, 0.0f, 0.0f);
-    p->unkB24 = 0;
-    p->unkAF8 = 1.0f;
-    p->unkB28 = 1.0f;
-    p->unkAA0 = p->pos;
-    p->unkB54 = 0;
-    zero = *(f32 *) &p->unkB54;   /* read back as a float: the ROM reloads it */
-    p->unkA10 = 0;
-    p->unkA20 = 0;
-    p->unkA24 = 0;
-    p->unkAC0 = 0;
-    p->unkAC4 = 0;
-    p->unkB90 = 0;
-    p->unkB94 = 0;
-    p->unkB8C = 0;
-    p->unkB2C = 0;
-    p->unkB30 = 0;
-    p->unkB34 = 0;
-    p->unkB38 = 0;
-    p->unkB3C = -1;
-    p->unkB40 = 0;
-    p->unkB44 = 0;
-    p->unkB48 = 0;
-    p->unkB4C = 0;
-    p->unkB50 = 0;
-    setVec3(&p->unkB7C, zero, zero, zero);
-    p->unkB88 = 1.0f;
-    p->unkB58 = 0;
-    p->unkB5C = -1;
-    p->unkB64 = zero;
-    p->unkB68 = zero;
-    p->unkB6C = zero;
-    p->unkB70 = zero;
-    p->unkB74 = zero;
-    p->unkB78 = zero;
+    func_002470E8(&p->m_ContState, &D_800F5EC0[p->m_nController]);
+    CLEAR_WORD(p->m_Speed);
+    CLEAR_WORD(p->m_SideSpeed);
+    CLEAR_WORD(p->m_TotalSpeed);
+    CLEAR_WORD(p->m_YVelLastFrame);
+    p->m_bOnGround = 1;
+    CLEAR_WORD(p->m_BurstSpeed);
+    CLEAR_WORD(p->m_BurstSideSpeed);
+    CLEAR_WORD(p->m_BurstTimer);
+    CLEAR_WORD(p->m_TimeOffGround);
+    CLEAR_WORD(p->m_BreathAmp);
+    CLEAR_WORD(p->m_BreathSpeed);
+    p->m_bHeadMovementDisabled = 0;
+    CLEAR_WORD(p->m_JumpAngle);
+    CLEAR_WORD(p->m_StartJumpAngle);
+    CLEAR_WORD(p->m_DesiredJumpAngle);
+    CLEAR_WORD(p->m_JumpU);
+    CLEAR_WORD(p->m_vHeadRotOffset.x);
+    CLEAR_WORD(p->m_vHeadRotOffset.y);
+    CLEAR_WORD(p->m_vHeadRotOffset.z);
+    CLEAR_WORD(p->m_vHeadWobbleRotOffset.x);
+    CLEAR_WORD(p->m_vHeadWobbleRotOffset.y);
+    CLEAR_WORD(p->m_vHeadWobbleRotOffset.z);
+    CLEAR_WORD(p->m_vEyeOffset.x);
+    p->m_vEyeOffset.y = func_00253CFC(p);
+    CLEAR_WORD(p->m_vEyeOffset.z);
+    setVec3((CVector3 *) &p->m_qGround, 0.0f, 0.0f, 0.0f);
+    CLEAR_WORD(p->m_ActualCameraVertEyeOffset);
+    p->m_qGround.w = 1.0f;
+    p->m_CameraMovementScaler = 1.0f;
+    p->m_vDesiredPos = p->m_CharacterActor.header.m_vPos;
+    CLEAR_WORD(p->m_vCrossHairVel.z);
+    zero = p->m_vCrossHairVel.z;   /* read back as a float: the ROM reloads it */
+    CLEAR_WORD(p->m_ModeTime);
+    p->m_InSun = 0;
+    CLEAR_WORD(p->m_FrameIncrementScaled);
+    CLEAR_WORD(p->m_DuckOffset);
+    p->m_bDuckMode = 0;
+    CLEAR_WORD(p->m_ZoomBlend);
+    CLEAR_WORD(p->m_TargetZoomBlend);
+    p->m_SniperMode = 0;
+    p->m_CrossHairMode = 0;
+    CLEAR_WORD(p->m_CrossHairTimer);
+    CLEAR_WORD(p->m_CrossHairAlpha);
+    p->m_pCrossHairTarget = NULL;
+    p->m_CrossHairIcon = -1;
+    CLEAR_WORD(p->m_vCrossHairPos.x);
+    CLEAR_WORD(p->m_vCrossHairPos.y);
+    CLEAR_WORD(p->m_vCrossHairPos.z);
+    CLEAR_WORD(p->m_vCrossHairVel.x);
+    CLEAR_WORD(p->m_vCrossHairVel.y);
+    setVec3((CVector3 *) &p->m_qAutoAim, zero, zero, zero);
+    p->m_qAutoAim.w = 1.0f;
+    p->m_pSightTarget = NULL;
+    p->m_SightIcon = -1;
+    p->m_vSightPos.x = zero;
+    p->m_vSightPos.y = zero;
+    p->m_vSightPos.z = zero;
+    p->m_vSightVel.x = zero;
+    p->m_vSightVel.y = zero;
+    p->m_vSightVel.z = zero;
     func_0024E5F0(p, p, 2);
-    p->unkBB0 = 0;
-    p->unkBDC = zero;
-    p->unkBE0 = zero;
-    p->unkBE4 = zero;
-    p->unkBEC = 0;
-    p->options->m_bDead = 0;
-    p->unkAAC = zero;
+    p->m_pOnEnemy = NULL;
+    p->m_RideEnemyTime = zero;
+    p->m_OnEnemyStompTime = zero;
+    p->m_Oxygen = zero;
+    p->m_bOxygenOut = 0;
+    p->m_pOptions->m_bDead = 0;
+    p->m_FleeTime = zero;
 }

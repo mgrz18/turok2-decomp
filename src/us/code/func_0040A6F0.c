@@ -3,16 +3,12 @@
 /* WRONG CUT: real function 0x0040A6F0-0x0040A8FC (size 0x20C); splat split it at its tail jumps into
  * func_0040A6F0, func_0040A7AC, func_0040A8A0 and func_0040A8A4. */
 #include "common.h"
+#include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target only 0x10/0xD, otherwise 0xF
  * (when flagged and not just used), 0x10 and 0x12 weighted by the module's timer ratio. */
-
-typedef struct {
-    s16 id;
-    s16 weight;
-} Pick;
 
 extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern s16 func_0026D518(Pick *table);

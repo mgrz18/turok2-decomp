@@ -2,16 +2,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x250];
-    /* 0x250 */ f32 height;
-} OwnerData;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ OwnerData *data;
-} Owner;
+#include "structs/player.h"
+#include "structs/camera.h"
 
 extern CRegionInfo *func_0022425C(void *table, CGameRegion *region);
 extern u8 D_800F7078[];
@@ -30,7 +22,7 @@ f32 func_00268AB4(CGameObjectInstance *actor) {
     }
     h = info->m_WaterHeight;
     if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x300000)) {
-        h -= ((Owner *)actor->m_AI.m_pParent)->data->height;
+        h -= ((CPlayer *)actor->m_AI.m_pParent)->m_pCamera->m_vTCorners[0].y;
     }
     return h;
 }

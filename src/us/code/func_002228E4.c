@@ -1,15 +1,11 @@
 #include "common.h"
 #include "structs/world.h"
+#include "structs/rect.h"
 
 typedef struct Bounds {
     f32 min[3];             /* 0x00 */
     f32 max[3];             /* 0x0C */
 } Bounds;
-
-typedef struct Rect {
-    f32 minX, minZ;         /* 0x00 */
-    f32 maxX, maxZ;         /* 0x08 */
-} Rect;
 
 typedef struct Item {
     u8 pad0[0xA0];
@@ -36,7 +32,7 @@ void func_002228E4(CWorld *world, f32 *pos, Item **out, s32 *outCount) {
     s32 n;
     s32 regionCount;
     Bounds *b;
-    Rect *r;
+    CRect *r;
     f32 x, z;
 
     found = NULL;

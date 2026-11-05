@@ -6,6 +6,7 @@
 #include "structs/game_object.h"
 #include "structs/cinema.h"
 #include "structs/collision.h"
+#include "structs/camera.h"
 
 /* The cinema system: one file from func_0040F240 to func_004131B0 (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -29,18 +30,6 @@ typedef struct {
     /* 0x04 */ s32 count;
     /* 0x08 */ SplineNode nodes[1];
 } Spline;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ u8 pad10[0x34 - 0x10];
-} ActorHead; /* the part of the actor saved around the collision test */
-
-typedef struct {
-    /* 0x00 */ ActorHead head;
-    /* 0x34 */ u8 pad34[0x50 - 0x34];
-    /* 0x50 */ f32 yaw;
-} Actor;
 
 /* A track header: its stride and record count, the records after it. */
 typedef struct {
@@ -72,7 +61,7 @@ extern Gfx *D_800D8E24;
 extern CWorld D_800F7078[];
 extern s32 D_800F709C;  /* D_800F7078.trackLookup */
 extern s32 *D_800F70D8; /* D_800F7078.trackBundle */
-extern Actor *D_80119890; /* current player */
+extern CGameObjectInstance *D_80119890; /* current player */
 
 extern void *func_002017D4(void *node, s32 index); /* child `index` of a resource node */
 extern s32 func_0020185C(s32 *bundle, s32 lookup, s32 index, s32 *size);
@@ -391,7 +380,7 @@ s32 func_0040FD6C(s32 index) {
     s32 previous;
     s32 pending;
     s32 loaded;
-    Actor *captured;
+    CGameObjectInstance *captured;
     CWorld *resources;
     s32 **owner;
     s32 **table;
@@ -473,8 +462,8 @@ s32 func_0040FD6C(s32 index) {
         }
         if (D_800C1BB0->spec.flags & 2) {
             if (captured != NULL) {
-                D_800C1BB0->position = captured->head.pos;
-                D_800C1BB0->yaw = captured->yaw;
+                D_800C1BB0->position = captured->header.m_vPos;
+                D_800C1BB0->yaw = captured->m_RotY;
             } else {
                 D_800C1BB0->position.x = 0.0f;
                 D_800C1BB0->position.y = 0.0f;
@@ -795,41 +784,29 @@ f32 func_00410BB4(f32 t) {
     return key[-1].first * (1.0f - u) + key->first * u;
 }
 
-typedef struct {
-    f32 m[4][4];
-} Mtx4f;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x28];
-    /* 0x28 */ f32 yaw;
-    /* 0x2C */ f32 pitch;
-    /* 0x30 */ u8 pad30[0x38 - 0x30];
-    /* 0x38 */ CVector3 eye;
-} Camera;
-
 extern u8 D_800F1B40[];   /* collision info */
 extern CCollisionResults D_800F1CE0;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 func_0041057C(f32 t); /* eye path */
 extern CVector3 func_00410724(f32 t); /* target path */
-extern void func_0020F79C(Mtx4f *m);                         /* identity */
-extern void func_0020FE00(Mtx4f *m, f32 x, f32 y, f32 z);    /* rotation */
-extern void func_0020F85C(Mtx4f *m, CVector3 *in, CVector3 *out);    /* transform */
+extern void func_0020F79C(CMtxF *m);                         /* identity */
+extern void func_0020FE00(CMtxF *m, f32 x, f32 y, f32 z);    /* rotation */
+extern void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);    /* transform */
 extern void func_002216DC(void *world);
-extern s32 func_00239F00(Actor *actor, CVector3 to, void *info);
+extern s32 func_00239F00(CGameObjectInstance *actor, CVector3 to, void *info);
 extern void func_00226724(void *world);
 
 /* Places the cinema relative to its target (flag 1) or to the player (flag 2). */
-static __inline__ void Cinema_Anchor(Actor *player) {
+static __inline__ void Cinema_Anchor(CGameObjectInstance *player) {
     if ((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) {
         D_800C1BB0->position = D_800C1BB0->target->header.m_vPos;
         D_800C1BB0->yaw = D_800C1BB0->target->m_RotY + 1.5707964f;
     }
     if (D_800C1BB0->spec.flags & 2) {
         if (player != NULL) {
-            D_800C1BB0->position = player->head.pos;
-            D_800C1BB0->yaw = player->yaw;
+            D_800C1BB0->position = player->header.m_vPos;
+            D_800C1BB0->yaw = player->m_RotY;
         } else {
             D_800C1BB0->position.x = 0.0f;
             D_800C1BB0->position.y = 0.0f;
@@ -840,14 +817,14 @@ static __inline__ void Cinema_Anchor(Actor *player) {
 }
 
 /* Drives the camera along the cinema paths. */
-void func_00410CE8(Camera *cam) {
+void func_00410CE8(CCamera *cam) {
     CVector3 eye;
     CVector3 target;
     CVector3 dir;
-    ActorHead saved;
-    Mtx4f mtx;
+    CObjectHead saved;
+    CMtxF mtx;
     CVector3 tmp;
-    Actor *player;
+    CGameObjectInstance *player;
     s32 hit;
     f32 yaw;
 
@@ -861,7 +838,7 @@ void func_00410CE8(Camera *cam) {
     target = func_00410724(D_800C1BB0->time);
     func_0020EF60(&eye, &eye, 10.24f);
     func_0020EF60(&target, &target, 10.24f);
-    cam->yaw = 0.0f;
+    cam->m_ViewParams.m_RotY = 0.0f;
     func_0020EF2C(&dir, &target, &eye);
     if (((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) || (D_800C1BB0->spec.flags & 2)) {
         player = D_80119890;
@@ -876,21 +853,21 @@ void func_00410CE8(Camera *cam) {
         func_0020EEF8(&eye, &eye, &D_800C1BB0->position);
         func_0020EF2C(&dir, &target, &eye);
         if (player != NULL) {
-            saved = player->head;
-            player->head.pos = target;
+            saved = *(CObjectHead *) player;
+            player->header.m_vPos = target;
             func_002216DC(D_800F7078);
             hit = func_00239F00(player, eye, D_800F1B40);
             func_00226724(D_800F7078);
-            player->head = saved;
+            *(CObjectHead *) player = saved;
             if (hit) {
                 eye = D_800F1CE0.m_vInstancePos;
             }
         }
     }
     yaw = func_0020EAA0(&dir);
-    cam->pitch = -func_0020F5C0(&dir);
-    cam->yaw += yaw;
-    cam->eye = eye;
+    cam->m_ViewParams.m_vRotOffset.x = -func_0020F5C0(&dir);
+    cam->m_ViewParams.m_RotY += yaw;
+    cam->m_ViewParams.m_vPos = eye;
 }
 
 extern void func_0020B5B8(void);

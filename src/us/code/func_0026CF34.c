@@ -1,16 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
-
-typedef struct {
-    /* 0x0 */ f32 minX;
-    /* 0x4 */ f32 minZ;
-    /* 0x8 */ f32 maxX;
-    /* 0xC */ f32 maxZ;
-} Rect;
+#include "structs/rect.h"
 
 /* The XZ bounding rectangle of the triangle. */
-void func_0026CF34(CGameRegion *arg0, Rect *arg1) {
+void func_0026CF34(CGameRegion *arg0, CRect *arg1) {
     f32 temp_f0;
     f32 temp_f0_2;
     f32 temp_f0_3;

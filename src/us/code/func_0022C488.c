@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
+#include "structs/particle_event.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -27,15 +28,9 @@ struct Target {
     /* 0x12B0 */ s32 extraUses;
 };
 
-typedef struct EffectInfo {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[4];
-} EffectInfo;
-
 extern CCollisionResults D_800F1CE0;
 extern u8 D_800F1D5D;
 extern u8 D_8011AAF1;
-extern EffectInfo D_800AD084[];
 extern u8 D_800F8928[];
 extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
@@ -194,13 +189,13 @@ void func_0022C488(CParticle *p) {
         }
     }
     if (effect != 0xFFFF) {
-        if (D_800AD084[effect].flags & 4) {
+        if (D_800AD084[effect].m_Flags & 4) {
             if (p->header.m_nObjType == 0x56) {
                 primary.lower = primary.lower * p->m_Scale;
             }
         }
         other = source;
-        if (D_800AD084[effect].flags & 2) {
+        if (D_800AD084[effect].m_Flags & 2) {
             other = p;
         }
         func_00236EA0(other, p, effect, -1, D_800F1CE0.m_vInstancePos, primary);
@@ -218,9 +213,9 @@ void func_0022C488(CParticle *p) {
             extraEffect = extraActions->m_ImpactEventType[4];
             if (extraEffect != 0xFFFF) {
                 secondary = extraActions->m_ImpactEventValue[4];
-                if (D_800AD084[extraEffect].flags & 4) {
+                if (D_800AD084[extraEffect].m_Flags & 4) {
                     other = source;
-                    if (D_800AD084[extraEffect].flags & 2) {
+                    if (D_800AD084[extraEffect].m_Flags & 2) {
                         other = p;
                     }
                     func_00236EA0(other, p, extraEffect, -1, D_800F1CE0.m_vInstancePos, secondary);
@@ -235,7 +230,7 @@ void func_0022C488(CParticle *p) {
         func_00275544((s16) sound, D_800F1CE0.m_vInstancePos, 0, -1);
     }
     if (!(p->m_dwFlags & 0x30000)) {
-        if (mode == 1 || (effect != 0xFFFF && (D_800AD084[effect].flags & 1))) {
+        if (mode == 1 || (effect != 0xFFFF && (D_800AD084[effect].m_Flags & 1))) {
             func_0022F1C8(D_800F8928, p);
             func_00232B40(p);
         }

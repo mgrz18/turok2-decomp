@@ -2,16 +2,6 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 
-/* The leading 0x34 bytes of a game object, as the collision test reads them. */
-typedef struct ObjectHead {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ void *region;
-    /* 0x14 */ u8 pad14[0x4];
-    /* 0x18 */ CVector3 velocity;
-    /* 0x24 */ u8 pad24[0x10];
-} ObjectHead; /* size 0x34 */
-
 typedef struct CollisionInfo {
     /* 0x00 */ s32 flags;
     /* 0x04 */ u8 unk4;
@@ -21,11 +11,11 @@ typedef struct CollisionInfo {
 
 extern CCollisionResults D_800F1CE0;
 
-s32 func_00239F00(ObjectHead *obj, CVector3 to, CollisionInfo *info);
+s32 func_00239F00(CObjectHead *obj, CVector3 to, CollisionInfo *info);
 
 /* Whether obj can move to `to` without hitting anything; obj is left where it was. */
-s32 func_002698AC(ObjectHead *obj, CVector3 to, CollisionInfo *info) {
-    ObjectHead saved;
+s32 func_002698AC(CObjectHead *obj, CVector3 to, CollisionInfo *info) {
+    CObjectHead saved;
     CollisionInfo probe;
     s32 hit;
 

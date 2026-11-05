@@ -1,18 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "structs/rect.h"
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
 
 /* A rectangle on the ground plane. */
-typedef struct Rect {
-    /* 0x00 */ f32 minX;
-    /* 0x04 */ f32 minZ;
-    /* 0x08 */ f32 maxX;
-    /* 0x0C */ f32 maxZ;
-} Rect;
-
 /* A scene model's bounds (what func_0023A640 tests). */
 typedef struct ModelBounds {
     /* 0x00 */ CBox box;
@@ -36,7 +30,7 @@ typedef struct SceneModels {
 /* A cell of the scene grid: its models and their bounds. */
 typedef struct SceneCell {
     /* 0x00 */ s32 **data;
-    /* 0x04 */ Rect *bounds;
+    /* 0x04 */ CRect *bounds;
 } SceneCell;
 
 typedef struct SceneCells {
@@ -55,7 +49,7 @@ extern SceneCells D_800F8520;
 void func_0023DCBC(f32 mf[4][4], f32 xEye, f32 yEye, f32 zEye, f32 xAt, f32 yAt, f32 zAt, f32 xUp, f32 yUp,
                    f32 zUp);
 f32 func_00298470(f32);                 /* sqrtf */
-s32 func_0023A968(Sweep *sweep, Rect *rect, f32 *t);
+s32 func_0023A968(Sweep *sweep, CRect *rect, f32 *t);
 s32 func_0023A640(Sweep *sweep, CBox *box, f32 *t);
 SceneModels *func_002017D4(s32 *list, s32 index);
 void func_00226F90(void *base, s32 count, s32 size, s32 (*cmp)(), void (*swap)());
@@ -69,7 +63,7 @@ void func_0023DBBC(ModelSweep *ms);
  * hit nearer than the next one. */
 void func_0023D050(Sweep *sweep) {
     CBox box;
-    Rect rect;
+    CRect rect;
     ModelSweep ms;
     ModelHit hits[128];
     f32 t;

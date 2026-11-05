@@ -3,6 +3,7 @@
 #include "structs/region.h"
 #include "structs/particle.h"
 #include "gfx.h"
+#include "structs/camera.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -11,8 +12,6 @@
  * The list walk is a goto loop and the built flag a local, as in the ROM: the
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
-typedef f32 Mtx4f[4][4];
-
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct {
@@ -20,41 +19,27 @@ typedef struct {
     /* 0x0C */ CVector3 max;
 } Box;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x64];
-    /* 0x064 */ s32 mask;
-    /* 0x068 */ u8 pad68[0x2D8 - 0x68];
-    /* 0x2D8 */ u8 clipPlanes[0x338 - 0x2D8];
-    /* 0x338 */ CVector3 clipMin;
-    /* 0x344 */ CVector3 clipMax;
-} ParticleView;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x20C];
-    /* 0x20C */ Mtx4f viewMatrix;
-} Camera;
-
 extern Gfx *D_800D8E24;             /* display list head */
 extern s32 D_800B6D1C;              /* matrix buffer index */
 extern s32 D_801198E0;
-extern Camera *D_801198D0;
+extern CCamera *D_801198D0;
 extern u8 D_800F7078[];
 extern u8 D_801102B8[];
 
 extern s32 func_0026F60C(void *planes, Box *box);
-extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);   /* transform point */
-extern void func_0022D2FC(CParticle *particle, void *mtx, Camera *camera, f32 depth);
+extern void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
+extern void func_0022D2FC(CParticle *particle, void *mtx, CCamera *camera, f32 depth);
 extern void func_002254C0(void *list, CVector3 *pos, void *out);
 extern void func_0020B9F4(void *model, void *mtx, void *mtx2, s32 a, s32 b);
-extern void func_0022E094(CParticle *particle, ParticleView *view);
-extern void func_0022DCBC(CParticle *particle, ParticleView *view);
+extern void func_0022E094(CParticle *particle, CCamera *view);
+extern void func_0022DCBC(CParticle *particle, CCamera *view);
 extern void func_00236170(void *list, CParticle *particle, void *mtx);
 
-void func_0023118C(CParticleSystem *world, ParticleView *view) {
+void func_0023118C(CParticleSystem *world, CCamera *view) {
     Box box;
     CVector3 transformed;
     CParticle *node;
-    Camera *camera;
+    CCamera *camera;
     s32 visible, built;
     f32 zScale, xyScale, xScale, maximum, height, radius;
     f32 minX, maxX, minY, maxY, minZ, maxZ;
@@ -69,7 +54,7 @@ void func_0023118C(CParticleSystem *world, ParticleView *view) {
         GFX_CMD(0xE3000A01, 0)
         GFX_CMD(0xD9F9FBFF, 0)
         node = world->m_DrawList.m_pHead;
-        mask = view->mask;
+        mask = view->m_ViewParams.m_VisBits;
         builtFlag = 0x100000;
         if (node != 0) {
         next:
@@ -97,10 +82,10 @@ void func_0023118C(CParticleSystem *world, ParticleView *view) {
                     box.min.z = minZ;
                     maxZ = node->header.m_vPos.z + radius;
                     box.max.z = maxZ;
-                    if (minX < view->clipMax.x && view->clipMin.x < maxX &&
-                        minZ < view->clipMax.z && view->clipMin.z < maxZ &&
-                        minY < view->clipMax.y && view->clipMin.y < maxY &&
-                        func_0026F60C(view->clipPlanes, &box)) {
+                    if (minX < view->m_ViewMax.x && view->m_ViewMin.x < maxX &&
+                        minZ < view->m_ViewMax.z && view->m_ViewMin.z < maxZ &&
+                        minY < view->m_ViewMax.y && view->m_ViewMin.y < maxY &&
+                        func_0026F60C(view->m_ViewVolume, &box)) {
                         visible = 1;
                     }
                 } else visible = 1;
@@ -110,7 +95,7 @@ void func_0023118C(CParticleSystem *world, ParticleView *view) {
                     if (!built) {
                         if (D_801198E0 == 1) {
                             camera = D_801198D0;
-                            func_0020F85C(camera->viewMatrix, &node->header.m_vPos, &transformed);
+                            func_0020F85C(camera->m_mfView, &node->header.m_vPos, &transformed);
                             depth = transformed.z;
                             if (depth < 0.0f) depth = -depth;
                             func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
@@ -136,7 +121,7 @@ void func_0023118C(CParticleSystem *world, ParticleView *view) {
                     if (!node->m_ActiveSwooshes || built) break;
                     if (D_801198E0 == 1) {
                         camera = D_801198D0;
-                        func_0020F85C(camera->viewMatrix, &node->header.m_vPos, &transformed);
+                        func_0020F85C(camera->m_mfView, &node->header.m_vPos, &transformed);
                         depth = transformed.z;
                         if (depth < 0.0f) depth = -depth;
                         func_0022D2FC(node, node->m_mtxDraw[D_800B6D1C], camera, depth);

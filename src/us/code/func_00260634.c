@@ -1,12 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x40];
-} Steer;
-
 void func_00246108(void *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
-void func_0024599C(void *self, CAI *ai, Steer *out);
+void func_0024599C(void *self, CAI *ai, CAIFrameMotion *out);
 f32 func_0025EB24(void *self, CAI *ai);
 void func_00245BAC(void *self, CAI *ai, f32 angle, f32 arg3);
 f32 func_0025EAFC(void *self, CAI *ai);
@@ -15,7 +11,7 @@ void func_00243414(void *self, CAI *ai, s32 mode);
 
 void func_00260634(void *self, CAI *ai) {
     CAITargets t;
-    Steer steer;
+    CAIFrameMotion steer;
     f32 range;
     s32 mode;
 

@@ -1,20 +1,8 @@
 #include "common.h"
+#include "structs/level_actor.h"
 
 /* Reset the world's pool of run-time actors (all on the free list) and the two
  * pickup effect emitters. */
-
-typedef struct PoolActor {
-    /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ struct PoolActor *prev;
-    /* 0x1AC */ struct PoolActor *next;
-} PoolActor; /* 0x1B0 bytes */
-
-typedef struct ActorPool {
-    /* 0x0000 */ PoolActor items[32];
-    /* 0x3600 */ PoolActor *free;
-    /* 0x3604 */ PoolActor *head; /* newest */
-    /* 0x3608 */ PoolActor *tail; /* oldest */
-} ActorPool;
 
 typedef struct {
     /* 0x00 */ s32 kind;
@@ -31,20 +19,20 @@ extern Emitter D_800F1360;
 extern Emitter D_800F12C0;
 
 void func_0027BD10(Emitter *emitter);
-void func_00227664(PoolActor *actor);
+void func_00227664(CPooledLevelActor *actor);
 
-void func_00465EB0(ActorPool *pool) {
+void func_00465EB0(CLevelActorPool *pool) {
     s32 i;
 
-    pool->free = pool->items;
-    pool->tail = NULL;
-    pool->head = NULL;
+    pool->m_pFree = pool->m_Actors;
+    pool->m_pTail = NULL;
+    pool->m_pHead = NULL;
     for (i = 0; i < 31; i++) {
-        pool->items[i].next = &pool->items[i + 1];
-        pool->items[i].prev = &pool->items[i - 1];
+        pool->m_Actors[i].m_pNext = &pool->m_Actors[i + 1];
+        pool->m_Actors[i].m_pPrev = &pool->m_Actors[i - 1];
     }
-    pool->items[0].prev = NULL;
-    pool->items[31].next = NULL;
+    pool->m_Actors[0].m_pPrev = NULL;
+    pool->m_Actors[31].m_pNext = NULL;
 
     func_0027BD10(&D_800F1360);
     D_800F1360.kind = 8;
@@ -60,6 +48,6 @@ void func_00465EB0(ActorPool *pool) {
     D_800F12C0.height = 122.88f;
 
     for (i = 0; i < 32; i++) {
-        func_00227664(&pool->items[i]);
+        func_00227664(&pool->m_Actors[i]);
     }
 }

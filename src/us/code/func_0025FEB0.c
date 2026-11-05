@@ -1,6 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "structs/player.h"
+#include "structs/camera.h"
 
 /* Places a projectile at its owner's muzzle: inherits the shooter's rotation,
  * yaws it by its own angle and pushes it 10.24 units along the result. */
@@ -8,18 +10,6 @@
 typedef struct {
     f32 m[4][4];
 } Mtx4;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x114];
-    /* 0x114 */ CVector3 muzzle;
-} Weapon;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x51C];
-    /* 0x51C */ Weapon *weapon;
-    /* 0x520 */ u8 pad520[0xBB8 - 0x520];
-    /* 0xBB8 */ CVector3 vel;
-} Owner;
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -30,16 +20,6 @@ typedef struct {
     /* 0x40 */ CQuaternion rot;
     /* 0x50 */ f32 yaw;
 } Projectile;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x10];
-    /* 0x010 */ s32 unk10;
-    /* 0x014 */ u8 pad14[0x2C];
-    /* 0x040 */ CQuaternion rot;
-    /* 0x050 */ f32 yaw;
-    /* 0x054 */ u8 pad54[0x1A8 - 0x54];
-    /* 0x1A8 */ Owner *owner;
-} Shooter;
 
 extern CVector3 D_800B17B0;
 extern f32 D_800DD78C;
@@ -56,15 +36,15 @@ void func_0025FEB0(Projectile *self, CAI *ai) {
     CVector3 dir;
     CQuaternion yaw;
     CQuaternion rot;
-    Shooter *shooter = (Shooter *) ai->m_Enemy.m_pGrabbed;
-    Owner *owner = shooter->owner;
+    CGameObjectInstance *shooter = (CGameObjectInstance *) ai->m_Enemy.m_pGrabbed;
+    CPlayer *owner = (CPlayer *) shooter->m_AI.m_pParent;
     f32 s;
 
-    func_0020EF60(&self->vel, &owner->vel, 0.30719998f);
-    self->yaw = shooter->yaw;
-    self->rot = shooter->rot;
-    self->pos = owner->weapon->muzzle;
-    self->unk10 = shooter->unk10;
+    func_0020EF60(&self->vel, &owner->m_vOnEnemyScale, 0.30719998f);   /* LibTEngine's name; a velocity here */
+    self->yaw = shooter->m_RotY;
+    self->rot = shooter->m_qGround;
+    self->pos = owner->m_pCamera->m_vPos;
+    self->unk10 = (s32) shooter->header.m_pCurrentRegion;
     s = func_002982F0(self->yaw * 0.5f);
     yaw.x = 0.0f;
     yaw.y = s;

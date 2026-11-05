@@ -1,19 +1,10 @@
 #include "common.h"
+#include "structs/boss.h"
+#include "structs/light.h"
+#include "structs/model.h"
 
-typedef struct {
-    s32 animate;  /* 0x0 */
-    s32 hasEvent; /* 0x4 */
-    u8 pad8[0x4];
-    s32 *anim;    /* 0xC */
-    u8 pad10[0x8];
-    s32 first;    /* 0x18 */
-    s32 current;  /* 0x1C */
-} AnimRequest;
-
-typedef struct {
-    u8 data[0x18];
-} AnimSlot;
-
+/* A weak spot seen from its animator: walking BossWeakSpot pointers and
+ * taking &slot->anim moves the +4 into the loop and breaks the match. */
 typedef struct {
     u8 data[0x68];
 } Slot00403660;
@@ -27,26 +18,18 @@ typedef struct {
     /* 0x174 */ s8 unk174;
 } Boss00403660;
 
-typedef struct {
-    /* 0x000 */ Boss00403660 *boss;
-    /* 0x004 */ u8 pad0[0xC - 0x4];
-    /* 0x00C */ Slot00403660 slots[5];
-} State00403660;
-
-extern State00403660 D_8012F3A0;
 extern s32 D_800B6D1C;
-extern s32 D_800AB8B0;
-void func_0021DC84(void *actor, void *state, AnimRequest *req);
+void func_0021DC84(void *actor, void *state, CDrawArgs *req);
 void func_00236324(Slot00403660 *slot);
 void func_00235898(void);
-void func_0020A33C(s32 *anim, s32 model, s32 one, AnimSlot *slot, s32 zero, s32 index, s32 second);
+void func_0020A33C(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
 
 static __inline__ s32 hasBit(s32 mask, s32 bit) {
     return mask & bit;
 }
 
-void func_00403660(u8 *actor, u8 *state, AnimRequest *req) {
-    State00403660 *s;
+void func_00403660(u8 *actor, u8 *state, CDrawArgs *req) {
+    WaveBossState *s;
     Boss00403660 *boss;
     s32 mask;
     Slot00403660 *slot;
@@ -56,19 +39,19 @@ void func_00403660(u8 *actor, u8 *state, AnimRequest *req) {
     i = 0;
     bit = 1;
     s = &D_8012F3A0;
-    boss = s->boss;
+    boss = (Boss00403660 *) s->actor;
     mask = boss->slotMask;
-    slot = s->slots;
+    slot = (Slot00403660 *) &s->spots[0].anim;
     do {
         if (hasBit(mask, bit << i)) {
-            req->first = i;
-            req->current = i;
+            req->m_nModel = i;
+            req->m_nShadowModel = i;
             func_0021DC84(actor, state, req);
             func_00236324(slot);
             func_00235898();
-            func_0020A33C(req->anim, *(s32 *) (actor + 0x98), 1, &((AnimSlot *) (actor + 0x110))[D_800B6D1C], 0, i,
+            func_0020A33C(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[D_800B6D1C], 0, i,
                           *(s8 *) (actor + 0x151));
-            D_800AB8B0 = 0;
+            D_800AB8B0.m_Mode = 0;
         }
         i++;
         slot++;

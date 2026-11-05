@@ -5,11 +5,6 @@
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ CPlayer *player;
-} Owner;
-
 extern s16 D_800AE9D2;
 
 extern f32 func_002119FC(f32 lo, f32 hi); /* random in range */
@@ -18,9 +13,9 @@ extern s32 func_00243414(void *obj, CAI *state, s32 mode);
 /* Weapon state: on release, charges by the time held (0.1 + t/45, at most 1)
  * and sets the shot count D_800AE9D2 (charge * 3, at least 1), then goes to
  * state 5. */
-void func_00259C4C(Owner *obj, CAI *state) {
+void func_00259C4C(CGameObjectInstance *obj, CAI *state) {
     f32 base = 0.1f;
-    CPlayer *player = obj->player;
+    CPlayer *player = (CPlayer *) obj->m_AI.m_pParent;
     f32 charge;
     f32 n;
     f32 t;

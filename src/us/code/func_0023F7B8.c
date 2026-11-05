@@ -3,17 +3,6 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 
-/* Pickup effect descriptor. */
-typedef struct PickupEntry {
-    void *resource; /* 0x00 */
-    char pad4[2];
-    s16 sound;      /* 0x06 */
-    s16 callback;   /* 0x08 */
-    char padA[2];
-    s16 index;      /* 0x0C */
-    s16 argument;   /* 0x0E */
-} PickupEntry;
-
 extern char D_801198B0[];
 
 s32 func_00253B54(CPlayer *player, s32 index, s32 argument);

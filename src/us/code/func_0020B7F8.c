@@ -1,20 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_4/8026AC38_3.CPP, func_8026C484_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-/* One queued draw of the batched model. */
-typedef struct ModelInstance {
-    /* 0x00 */ void *matrix;
-    /* 0x04 */ void *lights;
-    /* 0x08 */ void *textures;
-    /* 0x0C */ s32 segment;
-} ModelInstance;
+#include "structs/model.h"
 
 extern void **D_800D8E28;           /* batched model */
 extern s32 D_800D8E14;              /* its level of detail */
 extern s32 D_800D8E10;              /* its pass */
 extern s32 D_800D8E34;              /* queued instance count */
-extern ModelInstance D_800DD578[32];
 extern s32 D_800DD170;              /* registered model count */
 extern void **D_800DD178[0x100];
 extern char D_800A53D8[];
@@ -37,7 +29,7 @@ void func_0020B7F8(s32 key, void *matrix, void *lights, s32 lod, s32 pass) {
     s32 *parts;
     s32 size;
     s32 dataKey;
-    ModelInstance *inst;
+    CModelInstance *inst;
     s32 n;
 
     header = func_0020367C(0, key, 0x18, 0, 0, 0, D_800A53D8, 1);
@@ -64,10 +56,10 @@ void func_0020B7F8(s32 key, void *matrix, void *lights, s32 lod, s32 pass) {
             n = D_800D8E34;
             inst = &D_800DD578[n++];
             D_800D8E34 = n;
-            inst->matrix = matrix;
-            inst->segment = 0;
-            inst->lights = lights;
-            inst->textures = 0;
+            inst->m_pMatrix = matrix;
+            inst->m_Segment = 0;
+            inst->m_pLights = lights;
+            inst->m_pTextures = 0;
         }
     done:
         func_002051F4(0, resource);

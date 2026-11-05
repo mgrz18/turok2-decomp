@@ -1,14 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_4/8026AC38_2.CPP, func_8026BC60_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-/* One queued draw of the batched model (func_0020B6A0). */
-typedef struct ModelInstance {
-    /* 0x00 */ void *matrix;
-    /* 0x04 */ void *lights;
-    /* 0x08 */ void *textures;
-    /* 0x0C */ s32 segment;
-} ModelInstance;
+#include "structs/model.h"
 
 /* A part's material. */
 typedef struct Material {
@@ -55,7 +48,6 @@ extern s32 D_800D8E34;              /* queued instance count */
 extern SortNode *D_800D8E38;        /* its first node */
 extern DrawItem D_800D8E40[500];
 extern SortNode D_800DC4F0[100];
-extern ModelInstance D_800DD578[32];
 
 void *func_002017D4(void *resource, s32 index);
 
@@ -93,14 +85,14 @@ void func_0020A568(void) {
     SortNode *node;
     void *list;
     DrawItem *item;
-    ModelInstance *inst;
+    CModelInstance *inst;
 
     if (D_800D8E34 != 0) {
         header = *D_800D8E28;
         for (j = 0; j < D_800D8E34; j++) {
             inst = &D_800DD578[j];
-            if (inst->textures == NULL) {
-                inst->textures = func_002017D4(header, 0);
+            if (inst->m_pTextures == NULL) {
+                inst->m_pTextures = func_002017D4(header, 0);
             }
         }
         parts = func_002017D4(func_002017D4(header, 2), D_800D8E14);
@@ -201,12 +193,12 @@ void func_0020A568(void) {
                 if (D_800D8E20 != 500) {
                     item = &D_800D8E40[D_800D8E20++];
                     item->list = list;
-                    item->matrix = inst->matrix;
-                    item->lights = inst->lights;
-                    item->textures = inst->textures;
+                    item->matrix = inst->m_pMatrix;
+                    item->lights = inst->m_pLights;
+                    item->textures = inst->m_pTextures;
                     item->unk10 = material->unk18;
                     item->unk12 = material->unk1A;
-                    item->segment = inst->segment;
+                    item->segment = inst->m_Segment;
                     item->next = NULL;
                     if (node->tail != NULL) {
                         node->tail->next = item;

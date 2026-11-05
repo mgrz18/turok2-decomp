@@ -2,11 +2,6 @@
 #include "common.h"
 #include "structs/player.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x1C];
-    /* 0x1C */ f32 vy;
-} Body;
-
 extern char D_800ADE70;
 extern char D_800ADDBC;
 extern void func_002117DC(f32 *value, f32 target, f32 rate);
@@ -18,18 +13,18 @@ extern f32 func_00267648(void *body, s32 arg);
 
 /* Eases the lean back to zero, runs the movement tables, and on the ground
  * (falling) picks animation 0x7F8 when the slope speed is under 61.44. */
-void func_00255714(CPlayer *player, Body *body) {
+void func_00255714(CPlayer *player, CGameObjectInstance *body) {
     func_002117DC(&player->m_vHeadRotOffset.z, 0.0f, 0.25f);
     func_0024EF70(player, body, &D_800ADE70);
     if (!(player->m_ModeBeforeFlags & 0x8000)) {
         func_0024F174(player, body, &D_800ADDBC);
     }
-    if (body->vy <= 0.0f) {
+    if (body->m_vVelocity.y <= 0.0f) {
         if (func_002685F0(body) != 0) {
             func_0024E5F0(player, body, 2);
         }
     }
-    if (body->vy <= 0.0f) {
+    if (body->m_vVelocity.y <= 0.0f) {
         if (func_00267648(body, 0) < 0.0f) {
             if (-func_00267648(body, 0) < 61.44f) {
                 goto set_value;

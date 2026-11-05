@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/region.h"
 
 /* A bone's track references: -1 means "use the default frame". */
 typedef struct JointRef {
@@ -36,11 +37,6 @@ typedef struct TwistPart {
     /* 0x18 */ CVector3 axis;
 } TwistPart;
 
-typedef struct Surface {
-    /* 0x0 */ u16 pad0;
-    /* 0x2 */ u16 flags;
-} Surface;
-
 /* A bone's children. */
 typedef struct BoneList {
     /* 0x0 */ s32 pad0;
@@ -55,7 +51,7 @@ typedef void (*PoseCallback)(f32 (*)[4], PoseContext *);
 struct PoseObject {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 pos;
-    /* 0x010 */ Surface *surface;
+    /* 0x010 */ CGameRegion *region;
     /* 0x014 */ s32 *def; /* type id first */
     /* 0x018 */ u8 pad18[0x3C];
     /* 0x054 */ f32 height;
@@ -105,7 +101,7 @@ extern CQuaternion D_800E6850;       /* rotation, channel B */
 extern s32 D_800E6860;         /* object type */
 extern u8 *D_800E6864;         /* bone data */
 extern u8 D_800E6868;          /* bone flags */
-extern Surface *D_800E686C;    /* surface */
+extern CGameRegion *D_800E686C;
 extern f32 D_800E6870;         /* ground height */
 extern f32 D_800E6874;         /* object height */
 extern f32 D_800E6878;         /* depth below the ground */
@@ -121,7 +117,7 @@ void func_00210318(f32 (*m)[4], f32 x, f32 y, f32 z);
 void func_0021034C(f32 (*m)[4], f32 x, f32 y, f32 z);
 void func_0021B59C(PoseObject *obj, s32 flags, f32 (*m)[4]);
 f32 func_002671B4(PoseObject *obj);
-f32 func_00269C3C(Surface *surface, f32 x, f32 z);
+f32 func_00269C3C(CGameRegion *region, f32 x, f32 z); /* the ceiling height */
 
 static __inline__ void trackPos(KeyLookup *t, s32 i, CVector3 *out) {
     if (t->joints[i].pos == -1) {
@@ -340,8 +336,8 @@ void func_0021B95C(PoseObject *obj, PoseContext *ctx, s32 bone, f32 (*parent)[4]
                 if (obj->height < 0.0f) {
                     obj->height = 0.0f;
                 }
-                if ((obj->flags & 0x20000000) && (D_800E686C = obj->surface) != NULL
-                    && (D_800E686C->flags & 0x40)) {
+                if ((obj->flags & 0x20000000) && (D_800E686C = obj->region) != NULL
+                    && (D_800E686C->m_wFlags & REGION_FLAG_CEILING)) {
                     D_800E6870 = func_00269C3C(D_800E686C, obj->pos.x, obj->pos.z);
                     D_800E6878 = obj->pos.y + obj->height + D_800E6874 - D_800E6870;
                     if (D_800E6878 > 0.0f) {

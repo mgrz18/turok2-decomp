@@ -22,17 +22,16 @@ static __inline__ s32 GetPort(Menu *event) {
     return event->controller->port;
 }
 
-/* FAKEMATCH: the ROM keeps this inlined helper's parameter in a stack slot (stored, the
- * call still reads the register); taking its address reproduces that. The original helper
- * probably took the address for another purpose. */
-static __inline__ void SelectPort(s32 port) {
-    s32 *p = &port;
-
-    func_00285A68(*p);
-}
+/* The pak selection (as in func_0041EA84): a two-word struct, so GCC keeps it in a stack slot; the store of
+ * the port and the frame's extra 8 bytes come from it, while the call reads the register. */
+typedef struct {
+    s32 v;
+    s32 w;
+} PadSel;
 
 void func_00422F14(Menu *event) {
     ControllerProfile *controller = event->controller;
+    PadSel sel;
 
     D_80130990 = 0;
     D_800C2020 = 0;
@@ -43,6 +42,7 @@ void func_00422F14(Menu *event) {
     D_80130994 = 0;
     D_801309B4 = 0;
     D_80130980 = 0;
-    SelectPort(controller->port);
+    sel.v = controller->port;
+    func_00285A68(sel.v);
     func_00426480(GetPort(event));
 }

@@ -1,10 +1,14 @@
 /* The do { } while (0) around the region-loop setup raises the region counter's priority (GCC weights refs by loop depth) so it gets fp and the object-table base is spilled, as in the ROM. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/table.h"
 #include "structs/game.h"
 #include "structs/player.h"
 #include "gfx.h"
 #include "structs/world.h"
+#include "structs/level_actor.h"
+#include "structs/camera.h"
+#include "structs/rect.h"
 
 /* Draws the level geometry seen by one view: every static object and level
  * actor of the grid regions inside the view's box that is shown in this view
@@ -14,84 +18,29 @@
  * unless the view's player passes the func_00253720(0x111F) test. With the
  * shared flag set, the cached list of func_00221D3C is used instead. */
 
-typedef struct View View;
-struct View {
-    u8 pad0[0x64];
-    s32 mask;               /* 0x064 */
-    u8 pad68[0x270];
-    u8 frustum[0x60];       /* 0x2D8 */
-    f32 boxMin[3];          /* 0x338 */
-    f32 boxMax[3];          /* 0x344 */
-};
-
-typedef struct {
-    s32 kind;               /* 0x00 */
-    s32 flags;              /* 0x04: views it shows in */
-} Info;
-
-typedef struct {
-    s32 stride;             /* 0x00 */
-    s32 count;              /* 0x04 */
-    u8 entries[1];          /* 0x08 */
-} Table;
-
 typedef struct {
     s32 stride;             /* 0x00 */
     s32 count;              /* 0x04 */
     u16 ids[1];             /* 0x08 */
 } IdTable;
 
-typedef struct {
-    u8 pad0[2];
-    u16 id;                 /* 0x02 */
-    u8 pad4[0x10];
-    Info *info;             /* 0x14 */
-    u8 pad18[0xC];
-    void **owner;           /* 0x24 */
-    u8 pad28[0x40];
-    f32 boxMin[3];          /* 0x68 */
-    f32 boxMax[3];          /* 0x74 */
-    u8 pad80[4];
-    s32 viewMask;           /* 0x84 */
-    u16 flags;              /* 0x88: 4 translucent, 8 listed */
-    u8 pad8A[6];
-} Object;                   /* 0x90 */
-
-typedef struct {
-    u8 pad0[0x14];
-    Info *info;             /* 0x014 */
-    u8 pad18[0x134];
-    f32 boxMin[3];          /* 0x14C */
-    f32 boxMax[3];          /* 0x158 */
-    u8 pad164[8];
-    u16 flags;              /* 0x16C: 1 dead, 2 shown, 0x20 translucent */
-    u8 pad16E[0x22];
-    s32 viewMask;           /* 0x190 */
-    u8 pad194[4];
-} Actor;                    /* 0x198 */
-
-typedef struct {
-    f32 minX, minZ;         /* 0x0 */
-    f32 maxX, maxZ;         /* 0x8 */
-} Cell;
-
 extern u8 D_8011AAF1;       /* D_8011AAD8.multiplayer */
 extern s32 D_800B6D20;
 
 void func_00221D3C(CWorld *);
-CPlayer *func_00281194(View *);
+CPlayer *func_00281194(CCamera *);
 s32 func_00253720(CPlayer *, s32);
 void func_0020B5D4(void);
 void func_0020B624(void);
 void func_0020565C(s32, void **);
 void *func_002017D4(void *, s32);
-s32 func_0026F60C(void *, f32 *);
-void func_00214D04(Object *, View *);
-void func_00214844(Object *, View *);
-void func_002152AC(Actor *);
+s32 func_0026F60C(void *, CBox *);
+void func_00214D04(CStaticObject *, CCamera *);
+void func_00214844(CStaticObject *, CCamera *);
+void func_002152AC(CLevelActor *);
 
-void func_002222E0(CWorld *w, View *v_) {
-    register View *v asm("$18") = v_;
+void func_002222E0(CWorld *w, CCamera *v_) {
+    register CCamera *v asm("$18") = v_;
     u8 *base;
     void *grp;
     s32 i;
@@ -105,13 +54,13 @@ void func_002222E0(CWorld *w, View *v_) {
     s32 cnt;
     s32 si;
     u16 *ip;
-    Table *t;
+    StrideTable *t;
     CWorldSector *regions;
     CWorldSector *region;
-    Cell *cell;
-    Object *a;
-    Actor *p;
-    Actor *actors;
+    CRect *cell;
+    CStaticObject *a;
+    CLevelActor *p;
+    CLevelActor *actors;
     s32 k;
     s32 cnt1;
     s32 cnt2;
@@ -119,7 +68,7 @@ void func_002222E0(CWorld *w, View *v_) {
     s32 c;
 
     mask = D_8011AAD8.difficulty;
-    vmask = v->mask;
+    vmask = v->m_ViewParams.m_VisBits;
     if (D_8011AAD8.multiplayer != 0) {
         func_00221D3C(w);
         return;
@@ -209,8 +158,8 @@ found:
         do {
             region = regions + i;
             cell = region->m_pBounds;
-            if (cell->maxX > v->boxMin[0] && cell->minX < v->boxMax[0]
-                && cell->maxZ > v->boxMin[2] && cell->minZ < v->boxMax[2]) {
+            if (cell->maxX > v->m_ViewMin.x && cell->minX < v->m_ViewMax.x
+                && cell->maxZ > v->m_ViewMin.z && cell->minZ < v->m_ViewMax.z) {
                 func_0020565C(0, region->m_hData);
                 k = 0;
                 grp = *region->m_hData;
@@ -220,25 +169,25 @@ found:
                 if (cnt1 > 0) {
                     off = k;
                     do {
-                        a = (Object *)(base + off);
-                        if (a->info->flags & mask) {
-                            a->owner = region->m_hData;
+                        a = (CStaticObject *)(base + off);
+                        if (a->header.m_pIntelligence->m_dwFlags & mask) {
+                            a->m_pOwner = region->m_hData;
                             if (D_800B6D20 == 0) {
                                 func_00214D04(a, v);
                             }
-                            if ((vmask & a->viewMask)
-                                && v->boxMax[0] > a->boxMin[0] && v->boxMin[0] < a->boxMax[0]
-                                && v->boxMax[2] > a->boxMin[2] && v->boxMin[2] < a->boxMax[2]
-                                && v->boxMax[1] > a->boxMin[1] && v->boxMin[1] < a->boxMax[1]
-                                && func_0026F60C(v->frustum, a->boxMin) != 0) {
-                                if ((a->flags & 8) && (a->id != idx || flag != 0)) {
+                            if ((vmask & a->m_ViewMask)
+                                && v->m_ViewMax.x > a->m_Bounds.m_vMin.x && v->m_ViewMin.x < a->m_Bounds.m_vMax.x
+                                && v->m_ViewMax.z > a->m_Bounds.m_vMin.z && v->m_ViewMin.z < a->m_Bounds.m_vMax.z
+                                && v->m_ViewMax.y > a->m_Bounds.m_vMin.y && v->m_ViewMin.y < a->m_Bounds.m_vMax.y
+                                && func_0026F60C(v->m_ViewVolume, &a->m_Bounds) != 0) {
+                                if ((a->m_wFlags & 8) && (a->header.m_nObjType != idx || flag != 0)) {
                                     c = w->m_nListed;
                                     if (c != 0x40) {
                                         w->m_pListed[c] = (CGameObjectInstance *)a;
                                         w->m_nListed = c + 1;
                                     }
                                 }
-                                if (a->flags & 4) {
+                                if (a->m_wFlags & 4) {
                                     c = w->m_nDeferred;
                                     if (c != 0x40) {
                                         w->m_pDeferred[c] = a;
@@ -250,25 +199,25 @@ found:
                             }
                         }
                         k++;
-                        off += sizeof(Object);
+                        off += sizeof(CStaticObject);
                     } while (k < cnt1);
                 }
                 t = func_002017D4(grp, 1);
                 k = 0;
                 cnt2 = t->count;
-                actors = (Actor *)t->entries;
+                actors = (CLevelActor *)t->entries;
                 if (cnt2 > 0) {
                     do {
                         p = actors + k;
-                        if (p->info->flags & mask) {
-                            u16 fl = p->flags;
+                        if (p->header.m_pIntelligence->m_dwFlags & mask) {
+                            u16 fl = p->m_wFlags;
 
-                            if (!(fl & 1) && (vmask & p->viewMask)
-                                && v->boxMax[0] > p->boxMin[0] && v->boxMin[0] < p->boxMax[0]
-                                && v->boxMax[2] > p->boxMin[2] && v->boxMin[2] < p->boxMax[2]
-                                && v->boxMax[1] > p->boxMin[1] && v->boxMin[1] < p->boxMax[1]
-                                && (fl & 2) && func_0026F60C(v->frustum, p->boxMin) != 0) {
-                                if (p->flags & 0x20) {
+                            if (!(fl & 1) && (vmask & p->m_ViewMask)
+                                && v->m_ViewMax.x > p->m_Bounds.m_vMin.x && v->m_ViewMin.x < p->m_Bounds.m_vMax.x
+                                && v->m_ViewMax.z > p->m_Bounds.m_vMin.z && v->m_ViewMin.z < p->m_Bounds.m_vMax.z
+                                && v->m_ViewMax.y > p->m_Bounds.m_vMin.y && v->m_ViewMin.y < p->m_Bounds.m_vMax.y
+                                && (fl & 2) && func_0026F60C(v->m_ViewVolume, &p->m_Bounds) != 0) {
+                                if (p->m_wFlags & 0x20) {
                                     c = w->m_nDeferred;
                                     if (c != 0x40) {
                                         w->m_pDeferred[c] = p;

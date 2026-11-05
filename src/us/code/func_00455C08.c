@@ -5,11 +5,6 @@
 /* Menu text item: copy a player's 8-character name into the item's text and
  * print one of the current player's u16 counters (per opponent) after it. */
 
-typedef struct {
-    u8 pad0[0x1C];
-    u8 *player; /* 0x1C */
-} PlayerEvent;
-
 extern s32 D_8011ACE4;
 extern char D_8011AB8B[];
 extern char D_800C1338[];
@@ -17,9 +12,9 @@ extern char D_800C1338[];
 s32 func_004160F0(MenuItem *item);
 void func_0029E3E0(char *dst, char *fmt, s32 value);
 
-s32 func_00455C08(MenuItem *item, PlayerEvent *event) {
+s32 func_00455C08(MenuItem *item, Menu *event) {
     s32 other = item->index - 2;
-    u8 *player = event->player;
+    u8 *player = (u8 *) event->player;
     s32 value;
     char *dst;
     char *src;

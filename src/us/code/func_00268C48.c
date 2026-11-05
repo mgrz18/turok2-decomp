@@ -2,13 +2,6 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 
-typedef struct ActorPos {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ void *region;
-    /* 0x14 */ s32 unk14;
-} ActorPos; /* size 0x18 */
-
 extern CCollisionResults *D_800F1ADC;     /* current hit buffer */
 typedef struct CollisionInfo {
     /* 0x00 */ s32 unk0;
@@ -20,15 +13,15 @@ typedef struct CollisionInfo {
 extern CollisionInfo D_800F1CC0;
 extern u8 D_80107590[];
 
-void func_00239F00(ActorPos *actor, CVector3 pos, void *info);
+void func_00239F00(CInstanceHeader *actor, CVector3 pos, void *info);
 CVector3 func_0020DFE0(CVector3 *in, f32 amount);
 void func_0020F040(CVector3 *v);
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 u8 *func_00227240(void *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos, void *region, f32 arg);
 
 /* func_002688C8's logic, inlined with the collision flags addressed directly. */
-static __inline__ void tracePos(ActorPos *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
-    ActorPos saved;
+static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
+    CInstanceHeader saved;
     CVector3 end;
     CCollisionResults hits;
     CCollisionResults *oldHits;
@@ -44,11 +37,11 @@ static __inline__ void tracePos(ActorPos *actor, CVector3 pos, CVector3 *outPos,
     D_800F1CC0.flagB = flagB;
     D_800F1ADC = &hits;
     func_00239F00(actor, pos, &D_800F1CC0);
-    actor->pos.y = pos.y;
-    end.x = actor->pos.x;
+    actor->m_vPos.y = pos.y;
+    end.x = actor->m_vPos.x;
     end.y = pos.y;
-    end.z = actor->pos.z;
-    region = actor->region;
+    end.z = actor->m_vPos.z;
+    region = actor->m_pCurrentRegion;
     D_800F1ADC = oldHits;
     *actor = saved;
     *outPos = end;
@@ -58,7 +51,7 @@ static __inline__ void tracePos(ActorPos *actor, CVector3 pos, CVector3 *outPos,
 }
 
 /* Spawns a particle of the given kind where an actor would end up at pos. */
-void func_00268C48(ActorPos *actor, CVector3 pos, s32 kind, f32 arg) {
+void func_00268C48(CInstanceHeader *actor, CVector3 pos, s32 kind, f32 arg) {
     CVector3 up;
     CVector3 dir;
     CVector3 velocity;

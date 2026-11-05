@@ -1,8 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
 
-typedef struct Mtx44f { f32 m[4][4]; } Mtx44f;
-
 /* A blast: radius, damage, then the push (strength, x, y, z). */
 typedef struct Blast {
     u16 radius;
@@ -45,17 +43,17 @@ extern s32 D_8011001C;
 void func_0020E810(CQuaternion *out, CVector3 *dir);
 void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020F79C(Mtx44f *m);
-void func_0020FAFC(Mtx44f *m, CVector3 *in, CVector3 *out);
-void func_002105A4(Mtx44f *m, f32 angle);
-void func_00211114(CQuaternion *q, Mtx44f *m);
+void func_0020F79C(CMtxF *m);
+void func_0020FAFC(CMtxF *m, CVector3 *in, CVector3 *out);
+void func_002105A4(CMtxF *m, f32 angle);
+void func_00211114(CQuaternion *q, CMtxF *m);
 
 /* The blast's push from `src` turned into a world vector, in the frame of `target`. */
 void func_002374AC(PushSource *src, PushTarget *target, Blast blast, CVector3 *out, u32 flags) {
     CVector3 v;
     CVector3 dir;
     CQuaternion q;
-    Mtx44f m;
+    CMtxF m;
     PushTarget *obj;
 
     if (D_8011001C != 0) {

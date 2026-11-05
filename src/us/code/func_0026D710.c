@@ -1,15 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FX/8026E5E0.CPP, func_8026E5E0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
 /* Animation attachment events: for each attachment whose event bit is enabled
  * on the object, moves its offset through the bone matrix to world space and
  * plays the event: a footstep/impact sound (louder when the bone's surface is
  * water), the splash effects, or a dust puff of 5/10/15/20 units. */
-
-typedef struct {
-    f32 m[4][4];
-} Mtx44;
 
 typedef struct {
     /* 0x00 */ CVector3 offset;
@@ -27,41 +24,20 @@ typedef struct {
     s8 countRange;
 } __attribute__((aligned(4))) PuffArgs;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0xA08];
-    /* 0xA08 */ s16 vehicle;
-} Owner;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ s32 *def;
-    /* 0x018 */ u8 pad18[0x174 - 0x18];
-    /* 0x174 */ s8 state;
-    /* 0x175 */ u8 pad175[0x180 - 0x175];
-    /* 0x180 */ f32 depth;
-    /* 0x184 */ u8 pad184[0x1A8 - 0x184];
-    /* 0x1A8 */ Owner *owner;
-    /* 0x1AC */ u8 pad1AC[0x214 - 0x1AC];
-    /* 0x214 */ CVector3 splashPos;
-    /* 0x220 */ CVector3 facing;
-    /* 0x22C */ u8 pad22C[0x27C - 0x22C];
-    /* 0x27C */ u32 events;
-} Object;
-
 extern u8 D_800F8928[];
 
 extern u8 *func_002017D4(void *list, s32 index);
-extern void func_0020F85C(Mtx44 *mtx, CVector3 *in, CVector3 *out);
+extern void func_0020F85C(CMtxF *mtx, CVector3 *in, CVector3 *out);
 extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 extern void func_0020E810(CQuaternion *out, CVector3 *dir);
-extern void func_00246690(Object *obj, s32 sound, CVector3 pos, s32 flags);
-extern void func_002688C8(Object *obj, CVector3 pos, CVector3 *out, s32 *region, s32 a, s32 b);
-extern void func_0022F350(void *sys, Object *p, Object *owner, s32 ownerId, s32 target, s32 type, CVector3 dir,
+extern void func_00246690(CGameObjectInstance *obj, s32 sound, CVector3 pos, s32 flags);
+extern void func_002688C8(CGameObjectInstance *obj, CVector3 pos, CVector3 *out, s32 *region, s32 a, s32 b);
+extern void func_0022F350(void *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 ownerId, s32 target, s32 type, CVector3 dir,
                           CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
-extern f32 func_0021F2B0(Object *obj);
-extern void func_00236EA0(Object *obj, Object *owner, s32 type, s32 id, CVector3 pos, PuffArgs args);
+extern f32 func_0021F2B0(CGameObjectInstance *obj);
+extern void func_00236EA0(CGameObjectInstance *obj, CGameObjectInstance *owner, s32 type, s32 id, CVector3 pos, PuffArgs args);
 
-void func_0026D710(Attachment *ents, s32 n, Mtx44 *mtxs, Object *obj, void *bones) {
+void func_0026D710(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectInstance *obj, void *bones) {
     CVector3 pos;
     CVector3 mapped;
     CVector3 zero;
@@ -74,7 +50,7 @@ void func_0026D710(Attachment *ents, s32 n, Mtx44 *mtxs, Object *obj, void *bone
     s32 size;
 
     for (n = n - 1; n != -1; n--) {
-        if (ents->event & obj->events) {
+        if (ents->event & obj->m_dwHotPointFlags) {
             flag = (func_002017D4(func_002017D4(bones, ents->bone), 1)[0x66] == 5) * 2;
             size = 0;
             func_0020F85C(&mtxs[ents->bone], &ents->offset, &pos);
@@ -92,15 +68,15 @@ void func_0026D710(Attachment *ents, s32 n, Mtx44 *mtxs, Object *obj, void *bone
             case 0x20:
                 break;
             case 0x40:
-                obj->splashPos = pos;
-                kind = *obj->def;
-                if ((kind == 1 && obj->state == 0x21) || (kind == 0xB && obj->owner->vehicle == 0x23)) {
+                obj->m_AI.m_vBoreTarget = pos;
+                kind = obj->header.m_pIntelligence->m_Type;
+                if ((kind == 1 && obj->m_AI.m_Mode == 0x21) || (kind == 0xB && ((CPlayer *) obj->m_AI.m_pParent)->m_Mode == 0x23)) {
                     func_002688C8(obj, pos, &mapped, &region, 0, 1);
-                    func_0020E810(&rot, &obj->facing);
+                    func_0020E810(&rot, &obj->m_AI.m_vBoreCollNormal);
                     zero.x = 0;
                     zero.y = 0;
                     zero.z = 0;
-                    if (obj->depth < 15.0f) {
+                    if (obj->m_AI.m_ModeTime < 15.0f) {
                         func_0022F350(D_800F8928, obj, obj, 0, 0, 0xE6, zero, rot, mapped, region, -1, flag | 1);
                     }
                     func_0022F350(D_800F8928, obj, obj, 0, 0, 0x8A, zero, rot, mapped, region, -1, flag | 1);

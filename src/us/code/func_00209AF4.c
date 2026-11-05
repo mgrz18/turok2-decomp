@@ -1,5 +1,6 @@
 /* Close in structure to thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0026AD8C.c, with Turok 2's extra level-of-detail table. */
 #include "common.h"
+#include "structs/table.h"
 #include "gfx.h"
 
 /* An F3DEX2 vertex (libultra's Vtx), 16 bytes. */
@@ -27,15 +28,9 @@ void func_002057B0(s32 heap, void ***handle, void **block);
 void func_0026D070(void *dst, void *material);
 void *func_0029E460(void *dst, const void *src, u32 n); /* memcpy */
 
-/* An offset table: a count, then the offset of each entry and the offset after the last one. */
-typedef struct Table {
-    /* 0x0 */ s32 count;
-    /* 0x4 */ s32 offsets[1];
-} Table;
-
 /* Sets an offset table's entry count and the offset where the next entry starts. */
 static __inline__ void TableSet(s32 *tbl, s32 count, s32 end) {
-    Table *t = (Table *)tbl;
+    OffsetTable *t = (OffsetTable *)tbl;
     t->count = count;
     t->offsets[count] = end;
 }

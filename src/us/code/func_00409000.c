@@ -4,30 +4,19 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "structs/collision.h"
 
 /* Boss hit callback: finds which weak spot the hit part covers, takes the
  * damage off the matching live spot for the current phase, and when a spot
  * dies plays the stagger animation and clears its bit; when all spots of the
  * phase are gone, moves the boss to its next state. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x6C];
-    /* 0x6C */ s32 mask;
-} HitPart;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s32 damage;
-    /* 0x08 */ u8 pad8[0x10 - 0x8];
-    /* 0x10 */ HitPart *part;
-} Hit;
-
 extern u8 D_00431E54[];
 
 extern void func_0040BDD0(void *obj, void *sounds, s32 flags);
 extern void func_00243414(void *obj, CAI *ai, s32 state);
 
-void func_00409000(void *obj, CAI *ai, Hit *hit) {
+void func_00409000(void *obj, CAI *ai, DamageEvent *hit) {
     MotherBossState *s;
     s32 mask;
     s32 spot;
@@ -38,13 +27,13 @@ void func_00409000(void *obj, CAI *ai, Hit *hit) {
     s32 damage;
     s32 bit;
 
-    if (hit->part == NULL) {
+    if (hit->frame == NULL) {
         return;
     }
     i = 0;
     spot = -1;
     s = &D_8012FB70;
-    mask = s->activeMask & hit->part->mask;
+    mask = s->activeMask & hit->frame->unk_6C;
     for (; i < 15; i++) {
         if (spot >= 0) {
             break;

@@ -22,13 +22,36 @@
 #include "structs/vector.h"
 
 /* The 0x64-byte value/colour animator func_002362E4 sets up,
- * func_00236314 restarts (fires) and func_00235510 steps; func_00236324
- * applies it when the owner is drawn. The level script keeps eight
- * (lights), each Mother boss weak spot one, and the Blind One a hit flash
- * for itself and each of its actors. Rage Wars' Animator (rw/abu_types.h)
- * is the same object without the last word. */
+ * func_00236314 starts on a script (fires) and func_00235510 steps;
+ * func_00236324 applies it when the owner is drawn (rgb and alpha to the
+ * draw colour D_800AB8B0, alpha and value to D_800AB8C0) and func_00236390
+ * adds it to the fade. The script is a list of floats: an op (the mode),
+ * then its operands; mode 0 ends it (and restarts it from loop when that
+ * is set), 1 waits, 4 fades value, 6 fades rgb and alpha. The level
+ * script keeps eight (lights), each Mother boss weak spot one, and the
+ * Blind One a hit flash for itself and each of its actors. Rage Wars'
+ * Animator (rw/abu_types.h, names from there) is the same object without
+ * the last word. */
 typedef struct ScriptAnimator {
-    /* 0x00 */ u8 data[0x64];
+    /* 0x00 */ void *owner;                /* func_002362E4's second argument */
+    /* 0x04 */ s32 mode;
+    /* 0x08 */ f32 time;
+    /* 0x0C */ f32 *loop;
+    /* 0x10 */ f32 *script;
+    /* 0x14 */ f32 value;                  /* 255 at the start */
+    /* 0x18 */ f32 valueFrom;
+    /* 0x1C */ f32 valueTo;
+    /* 0x20 */ f32 valueDuration;
+    /* 0x24 */ f32 alpha;
+    /* 0x28 */ f32 alphaFrom;
+    /* 0x2C */ f32 alphaTo;
+    /* 0x30 */ f32 colourDuration;
+    /* 0x34 */ f32 rgb[3];
+    /* 0x40 */ u8 pad40[4];
+    /* 0x44 */ f32 rgbFrom[3];
+    /* 0x50 */ u8 pad50[4];
+    /* 0x54 */ f32 rgbTo[3];
+    /* 0x60 */ u8 pad60[4];
 } ScriptAnimator; /* size 0x64 */
 
 /* One weak spot of the boss: its health and its hit-flash animator. */
@@ -62,8 +85,8 @@ typedef struct MotherBossState {
     /* 0x674 */ s32 totalHealth;
     /* 0x678 */ s32 health;
     /* 0x67C */ s32 counter;
-    /* 0x680 */ s32 unk680;
-    /* 0x684 */ s32 unk684;
+    /* 0x680 */ s32 pickupTimer;                     /* frames since the last random pickup (func_00409784) */
+    /* 0x684 */ s32 dropTimer;                       /* frames since the last drop at the spawn points */
     /* 0x688 */ s32 minRadius;
     /* 0x68C */ s32 maxRadius;
 } MotherBossState; /* size 0x690 */
@@ -311,5 +334,60 @@ typedef struct BossMode {
 extern BossState D_8012F9D8;
 extern BossMode D_8012F9DC;
 extern BossScript3 D_8012FA1C;  /* LevelScriptState.script3 */
+
+/* A spawn point of the Mother fight (D_00431D20, and D_00431C40 in the
+ * second copy of the module): where its pickups drop (func_00409500) and
+ * around which it throws its target, inside the angle range
+ * (func_00409A64). */
+typedef struct SpawnPoint {
+    /* 0x00 */ CVector3 pos;
+    /* 0x0C */ f32 minAngle;
+    /* 0x10 */ f32 maxAngle;
+} SpawnPoint; /* size 0x14 */
+
+extern SpawnPoint D_00431D20[4];  /* the first copy of the module */
+extern SpawnPoint D_00431C40[4];  /* the second copy */
+
+/* One step of the wave boss's script (D_00430824...): the minions of the
+ * wave, how many may fight at once, and the weak spot it opens. Stepping it
+ * (func_00403520) adds spawnCount to the minions still to come; the wave
+ * runs (waveActive) when both partPicks and spawnCount are set. */
+typedef struct WaveBossStep {
+    /* 0x00 */ struct Pick *partPicks;   /* weighted pick of the part a hit spawns (func_004028F4) */
+    /* 0x04 */ s32 spawnCount;
+    /* 0x08 */ s32 maxActive;            /* minions sent in at once (func_00401FCC) */
+    /* 0x0C */ s32 unkC;                 /* allows the long-range attack (func_00402658) */
+    /* 0x10 */ struct Pick *picks10;     /* func_004030A4 */
+    /* 0x14 */ s32 weakSpot;             /* the spot open to hits, -1: none */
+    /* 0x18 */ f32 onTime;               /* the blink of the open spot */
+    /* 0x1C */ f32 offTime;
+} WaveBossStep; /* size 0x20 */
+
+/* D_8012F3A0: the boss of the first VM module (func_00401E30 sets it up,
+ * func_004021C8 runs it; boss id 0x1D4D in D_80110048, between the Blind
+ * One's and the Mother's: likely the Lord of the Dead). Five weak spots,
+ * opened one at a time by the script, and waves of minions (type 0x651) in
+ * between: while a wave runs the spots cannot be hit. Fields with symbols
+ * of their own: D_8012F3A4 (pushed), D_8012F5B4 (step), D_8012F5C0 (boss),
+ * D_8012F5F0 (waveActive), D_8012F5F4 (blink). */
+typedef struct WaveBossState {
+    /* 0x000 */ struct CGameObjectInstance *actor;   /* the script owner (func_00402ADC) */
+    /* 0x004 */ s32 pushed;                          /* the push attack hit (func_00402FA0) */
+    /* 0x008 */ BossWeakSpot spots[5];
+    /* 0x210 */ s32 stepIndex;
+    /* 0x214 */ WaveBossStep *step;
+    /* 0x218 */ s32 toSpawn;                         /* minions of the wave still to come */
+    /* 0x21C */ s32 timer;
+    /* 0x220 */ struct CGameObjectInstance *boss;    /* the 0x457 actor */
+    /* 0x224 */ struct CGameObjectInstance *members[8]; /* the 0x651 minions */
+    /* 0x244 */ s32 memberCount;
+    /* 0x248 */ void *intel[2];                      /* func_00225EBC(world, 1, D_004307B0[i].id) */
+    /* 0x250 */ s32 waveActive;
+    /* 0x254 */ s32 blink;
+    /* 0x258 */ f32 blinkTimer;
+} WaveBossState; /* size 0x25C */
+
+extern WaveBossState D_8012F3A0;
+extern WaveBossStep *D_8012F5B4;  /* WaveBossState.step */
 
 #endif

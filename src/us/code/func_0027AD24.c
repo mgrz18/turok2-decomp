@@ -12,8 +12,6 @@ typedef struct {
     /* 0x00 */ HudMeter meters[2];
 } HudMeters;
 
-typedef struct { f32 x, y, z; } V3f;
-
 extern u8 D_800B2C50[];
 extern void func_0027AD00(void *, void *);
 

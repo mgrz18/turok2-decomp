@@ -30,8 +30,8 @@ void func_00409340(Obj *obj, CAI *ai) {
     s32 i;
 
     D_80110048 = 0x1DB1;
-    s->unk680 = 0;
-    s->unk684 = 0;
+    s->pickupTimer = 0;
+    s->dropTimer = 0;
     s->partCount = func_00225F6C(D_800F7078, 0x650, 10, 0x1DB1, (CGameObjectInstance **)s->parts, 6);
     for (i = 0; i < s->partCount; i++) {
         ((CGameObjectInstance *)s->parts[i])->m_AI.m_Mother.m_bActive = 1;

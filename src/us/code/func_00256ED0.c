@@ -5,74 +5,13 @@
 
 #include "common.h"
 #include "structs/intelligence.h"
-typedef struct ActorStats {
-               u8 pad0[0x80];
-               s8 unk80;
-               u8 pad81[0xD];
-               u8 unk8E;
-               u8 unk8F;
-               u8 pad90[2];
-               u8 unk92;
-               u8 unk93;
-               u8 unk94;
-} ActorStats;
-typedef struct Brain {
-                u8 pad0[0xC];
-                s32 unkC;
-                u8 pad10[0x210];
-                s32 unk220;
-                u8 pad224[0x18];
-                s32 unk23C;
-                s32 unk240;
-                u8 pad244[0x94];
-                s32 unk2D8;
-                s32 unk2DC;
-                u8 pad2E0[0xC];
-                s32 unk2EC;
-                u8 pad2F0[0xC];
-                s32 unk2FC;
-} Brain;
-typedef struct Actor Actor;
-struct Actor {
-                 u8 pad0[0x18];
-                 CIntelligence *def;
-                 u8 pad1C[0x1C];
-                 u32 flags38;
-                 u8 pad3C[0xA8];
-                 u16 unkE4;
-                 u8 padE6[0x1A];
-                 u32 flags;
-                 u8 pad104[0xD4];
-                 Actor *owner;
-                 u8 pad1DC[0x110];
-                 Actor *next2EC;
-                 u8 pad2F0[0x2E4];
-                 s32 unk5D4;
-                 ActorStats *stats;
-                 u8 pad5DC[8];
-                 s32 unk5E4;
-                 u8 pad5E8[0x88];
-                 f32 unk670;
-                 u8 pad674[0x1CC];
-                 f32 unk840;
-                 u8 pad844[4];
-                 s32 unk848;
-                 u8 pad84C[0x974];
-                 s32 unk11C0;
-                 u8 pad11C4[0x28C];
-                 s32 unk1450;
-                 Brain *brain;
-                 u8 pad1458[0x280];
-                 u16 unk16D8;
-                 u8 pad16DA[6];
-                 Actor *next;
-};
+#include "structs/game_object.h"
 extern u8 D_8010FF34[];
 void *func_00228AEC(void *tbl, s32 id);
-void func_0021F00C(CVector3 *out, Actor *actor, CVector3 dir);
+void func_0021F00C(CVector3 *out, CGameObjectInstance *actor, CVector3 dir);
 void func_0020EEF8(CVector3 *out, CVector3 *a, void *b);
-f32 func_002671B4(Actor *actor);
-void func_00256ED0(Actor *actor, void **slot, s32 id, f32 z)
+f32 func_002671B4(CGameObjectInstance *actor);
+void func_00256ED0(CGameObjectInstance *actor, void **slot, s32 id, f32 z)
 {
     void *p;
     CVector3 dir;
@@ -89,7 +28,7 @@ void func_00256ED0(Actor *actor, void **slot, s32 id, f32 z)
     dir.y = 0;
     dir.z = z;
     func_0021F00C(&out, actor, dir);
-    func_0020EEF8(&out, &out, (u8 *)actor + 4);
+    func_0020EEF8(&out, &out, &actor->header.m_vPos);
     (*(s16 *)((u8 *)(p) + (0x16))) = 1;
     (*(s16 *)((u8 *)(p) + (0x10))) = out.x;
     (*(s16 *)((u8 *)(p) + (0x12))) = out.y + func_002671B4(actor) * 0.5f;

@@ -13,22 +13,13 @@ typedef struct {
     /* 0x114 */ CVector3 pos;
 } Ui;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[0x1C - 0x10];
-    /* 0x01C */ f32 climb;
-    /* 0x020 */ u8 pad20[0x140 - 0x20];
-    /* 0x140 */ s32 flags;
-} Body;
-
 extern f32 D_800B6D28;      /* frame time */
 extern char D_800ADF00;     /* swimming look tuning */
 extern Tuning D_800ADEDC;   /* swimming move tuning */
 
-void func_0024EF70(CPlayer *player, Body *body, void *tuning);
-void func_0024F658(CPlayer *player, Body *body, void *tuning);
-s32 func_0024E5F0(CPlayer *player, Body *body, s32 mode);
+void func_0024EF70(CPlayer *player, CGameObjectInstance *body, void *tuning);
+void func_0024F658(CPlayer *player, CGameObjectInstance *body, void *tuning);
+s32 func_0024E5F0(CPlayer *player, CGameObjectInstance *body, s32 mode);
 f32 func_002982F0(f32 x);
 f32 func_0021149C(f32 scale);
 void func_00275544(s16 sound, CVector3 pos, void *source, s32);
@@ -43,7 +34,7 @@ static __inline__ void reset_strokes(CBarrel *s) {
 /* Swimming: sway, move with the swimming tuning, and on surfacing (after two
  * time units) gasp for air and leave the state for falling, wading or
  * walking; then pick the animation from the climb and play strokes. */
-void func_00250BF0(CPlayer *player, Body *body) {
+void func_00250BF0(CPlayer *player, CGameObjectInstance *body) {
     s32 idle;
 
     if (player->m_TotalSpeed == 0.0f) {
@@ -56,9 +47,9 @@ void func_00250BF0(CPlayer *player, Body *body) {
     player->m_vHeadWobbleRotOffset.y = func_002982F0(player->m_ModeTime * 0.087266475f) * 2 * 0.017453294f;
     player->m_vHeadWobbleRotOffset.z = func_002982F0(player->m_ModeTime * 0.104719765f) * 2 * 0.017453294f;
     func_0024F658(player, body, &D_800ADEDC);
-    if (!(body->flags & 0x80) && 2.0f < player->m_ModeTime) {
+    if (!(body->m_AI.m_dwFlags & 0x80) && 2.0f < player->m_ModeTime) {
         reset_strokes(&player->m_Barrel);
-        body->climb = 0.0f;
+        body->m_vVelocity.y = 0.0f;
         if (!D_8011AAD8.multiplayer) {
             if (player->m_bOxygenOut) {
                 func_00275544(0x3AC3, player->m_CharacterActor.header.m_vPos, &player->m_CharacterActor.header.m_vPos, -1);
@@ -66,9 +57,9 @@ void func_00250BF0(CPlayer *player, Body *body) {
                 func_00275544(0x3AC2, ((Ui *)player->m_pCamera)->pos, &((Ui *)player->m_pCamera)->pos, -1);
             }
         }
-        if (body->flags & 0xC0000) {
+        if (body->m_AI.m_dwFlags & 0xC0000) {
             func_0024E5F0(player, body, 2);
-        } else if (body->flags & 0x200) {
+        } else if (body->m_AI.m_dwFlags & 0x200) {
             func_0024E5F0(player, body, 9);
         } else {
             func_0024E5F0(player, body, 3);
@@ -90,6 +81,6 @@ void func_00250BF0(CPlayer *player, Body *body) {
     player->m_SfxTimer += D_800B6D28;
     if (5.12f < player->m_TotalSpeed && 45.0f < player->m_SfxTimer) {
         player->m_SfxTimer = func_0021149C(15.0f);
-        func_00275544(D_800ADEDC.strokeSound, body->pos, NULL, -1);
+        func_00275544(D_800ADEDC.strokeSound, body->header.m_vPos, NULL, -1);
     }
 }

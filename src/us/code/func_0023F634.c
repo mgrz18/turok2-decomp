@@ -2,17 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
-
-/* Pickup effect descriptor. */
-typedef struct PickupEntry {
-    void *resource; /* 0x00 */
-    s16 id;         /* 0x04 */
-    s16 sound;      /* 0x06 */
-    s16 callback;   /* 0x08 */
-    char padA[2];
-    s16 index;      /* 0x0C */
-    s16 argument;   /* 0x0E */
-} PickupEntry;
+#include "structs/pickup.h"
 
 typedef struct PickupParams {
     char pad0[0xC];
@@ -52,14 +42,14 @@ static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 soun
 }
 
 /* Item pickups selected by the entry's id. */
-s32 func_0023F634(CPlayer *player, PickupEntry *entry, PickupObject *obj) {
+s32 func_0023F634(CPlayer *player, CPickupEntry *entry, PickupObject *obj) {
     void *resource;
     s32 sound;
     s32 callback;
     PickupParams *params;
 
     params = &obj->def->params;
-    switch (entry->id) {
+    switch (entry->m_Id) {
         case 0x708:
             player->m_InvincibilityTime = 120.0f;
             break;
@@ -81,12 +71,12 @@ s32 func_0023F634(CPlayer *player, PickupEntry *entry, PickupObject *obj) {
         case 0x1133:
         case 0x1134:
         case 0x1194:
-            func_00248644(player, entry->id);
+            func_00248644(player, entry->m_Id);
             break;
     }
-    sound = entry->sound;
-    callback = entry->callback;
-    resource = entry->resource;
+    sound = entry->m_Sound;
+    callback = entry->m_Callback;
+    resource = entry->m_pMessage;
     pickup_feedback(player, resource, sound, callback);
     return 1;
 }

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "structs/level_actor.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
@@ -9,26 +10,7 @@
  * func_8024F634_de and func_8024F858_de). */
 
 
-typedef struct {
-    /* 0x000 */ u8 pad000[2];
-    /* 0x002 */ u16 id;
-    /* 0x004 */ CVector3 position;
-    /* 0x010 */ void *link;
-    /* 0x014 */ CIntelligence *def;
-    /* 0x018 */ u8 pad018[0x20];
-    /* 0x038 */ f32 matrices[4][16];
-    /* 0x138 */ u8 pad138[0xC];
-    /* 0x144 */ f32 angle;
-    /* 0x148 */ u8 pad148[0x1C];
-    /* 0x164 */ f32 scale;
-    /* 0x168 */ f32 height;
-    /* 0x16C */ u8 pad16C[8];
-    /* 0x174 */ f32 speed;
-    /* 0x178 */ u8 animation[0x1C];
-    /* 0x194 */ u8 drawnFrame;
-} SimpleObject;
-
-s32 *func_00215944(SimpleObject *);
+s32 *func_00215944(CLevelActor *);
 void func_00211114(void *, f32 *);
 void func_002105A4(f32 *, f32);
 void func_0021034C(f32 *, f32, f32, f32);
@@ -48,7 +30,7 @@ extern u8 D_8010FF20[];
 extern u8 D_800F7078[];
 extern s32 D_8011AAD8;
 
-void func_002152AC(SimpleObject *obj) {
+void func_002152AC(CLevelActor *obj) {
     s32 *geometry;
     f32 matrix[16];
     s32 variant;
@@ -58,26 +40,26 @@ void func_002152AC(SimpleObject *obj) {
     if (geometry == NULL) {
         return;
     }
-    if (obj->drawnFrame != D_800B6D1B) {
-        if (obj->def->m_Type == 8) {
+    if (obj->m_DrawnFrame != D_800B6D1B) {
+        if (obj->header.m_pIntelligence->m_Type == 8) {
             func_00211114(D_8010FF20, matrix);
         } else {
-            func_002105A4(matrix, obj->angle);
+            func_002105A4(matrix, obj->m_RotY);
         }
-        func_0021034C(matrix, obj->scale, obj->scale, obj->scale);
-        func_0020F510(&obj->position, 20000.0f);
-        func_00210318(matrix, obj->position.x, obj->position.y + obj->height, obj->position.z);
+        func_0021034C(matrix, obj->m_ModelScale, obj->m_ModelScale, obj->m_ModelScale);
+        func_0020F510(&obj->header.m_vPos, 20000.0f);
+        func_00210318(matrix, obj->header.m_vPos.x, obj->header.m_vPos.y + obj->m_Height, obj->header.m_vPos.z);
         func_00210C3C(matrix);
-        func_0020D274(matrix, obj->matrices[D_800B6D1C]);
+        func_0020D274(matrix, obj->m_Matrices[D_800B6D1C]);
     }
-    if (obj->def->m_Type == 12) {
-        if (obj->drawnFrame != D_800B6D1B) {
-            func_0020B4F0(geometry, obj->speed);
+    if (obj->header.m_pIntelligence->m_Type == 12) {
+        if (obj->m_DrawnFrame != D_800B6D1B) {
+            func_0020B4F0(geometry, obj->m_AnimSpeed);
         }
-        func_0020B6A0(geometry, obj->matrices[D_800B6D1C], 0, obj->animation, 0, D_800B6D1C, obj->def->m_nTexture);
+        func_0020B6A0(geometry, obj->m_Matrices[D_800B6D1C], 0, obj->m_Lights, 0, D_800B6D1C, obj->header.m_pIntelligence->m_nTexture);
     } else {
-        variant = obj->def->m_nModel;
-        index = func_002241C0(D_800F7078, obj->id);
+        variant = obj->header.m_pIntelligence->m_nModel;
+        index = func_002241C0(D_800F7078, obj->header.m_nObjType);
         if (index < 0x6AB) {
             if (index >= 0x6A9) {
                 if ((D_8011AAD8 & 0x800) && *func_002017D4(*geometry, 2) >= 2) {
@@ -88,8 +70,8 @@ void func_002152AC(SimpleObject *obj) {
                 }
             }
         }
-        func_0020B6A0(geometry, obj->matrices[D_800B6D1C], 0, obj->animation, 0, variant, obj->def->m_nTexture);
+        func_0020B6A0(geometry, obj->m_Matrices[D_800B6D1C], 0, obj->m_Lights, 0, variant, obj->header.m_pIntelligence->m_nTexture);
     }
     func_002051F4(0, geometry);
-    obj->drawnFrame = D_800B6D1B;
+    obj->m_DrawnFrame = D_800B6D1B;
 }

@@ -4,24 +4,12 @@
 /* Flying AI steering, scaled by speed: like func_00260730, but the pitch and
  * roll ease faster when they have to swing to the other side. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4C];
-    /* 0x4C */ f32 turn;
-    /* 0x50 */ u8 pad50[0x10];
-    /* 0x60 */ f32 wantVelY;
-} Steer;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ f32 accel;
-} Limits;
-
 s32 func_0025E428(CGameObjectInstance *self, void *ai);
 f32 func_0021160C(f32 value, f32 target, f32 step);
 f32 func_00211774(f32 cur, f32 target, f32 rate);
 void func_00245BAC(CGameObjectInstance *self, CAI *ai, f32 angle, f32 turn);
 
-void func_00260D60(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *limits, f32 speed, f32 turnRate) {
+void func_00260D60(CGameObjectInstance *self, CAI *ai, CAITargets *steer, CAIFrameMotion *limits, f32 speed, f32 turnRate) {
     f32 v;
     f32 max;
     f32 pitch;
@@ -29,9 +17,9 @@ void func_00260D60(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *lim
     f32 pitchSide;
     f32 rollSide;
 
-    func_00245BAC(self, ai, turnRate * 0.13962635f, steer->turn);
+    func_00245BAC(self, ai, turnRate * 0.13962635f, steer->m_Path.m_Angle);
     if (func_0025E428(self, ai) == 1) {
-        v = func_0021160C(self->m_vVelocity.y, steer->wantVelY, limits->accel * (speed * 8.0f));
+        v = func_0021160C(self->m_vVelocity.y, steer->m_Path.m_vDelta.y, limits->m_Dist * (speed * 8.0f));
         self->m_vVelocity.y = v;
         max = speed * 102.399994f;
         if (v > max) {
@@ -54,7 +42,7 @@ void func_00260D60(CGameObjectInstance *self, CAI *ai, Steer *steer, Limits *lim
         } else {
             ai->m_Enemy.m_Pitch = func_00211774(ai->m_Enemy.m_Pitch, pitch, 0.087266475f);
         }
-        roll = steer->turn * 0.75f;
+        roll = steer->m_Path.m_Angle * 0.75f;
         if (roll > 0.436332345f) {
             roll = 0.436332345f;
         } else if (roll < -0.436332345f) {

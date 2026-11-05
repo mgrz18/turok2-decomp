@@ -6,12 +6,13 @@
  * func_0024C648's (0x800A6C74) and func_0024CF58's (0x800A6CDC) are 4 past a
  * boundary too, so neither can open the file.
  *
- * The parts were written apart: each keeps its own view of the player
- * (CPlayer, HudPlayer, CPlayer, Player), and they share one
- * WeaponInfo. func_0024D344 is after Rage Wars (func_80220ED4_de). */
+ * The parts were written apart; the first three use structs/player.h's
+ * CPlayer, func_0024D344 keeps its own Player view (see there), and they
+ * share one WeaponInfo. func_0024D344 is after Rage Wars (func_80220ED4_de). */
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
+#include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/weapon.h"
 
@@ -70,58 +71,9 @@ void func_0024C47C(CBarrel *menu, CPlayer *player) {
 #include "gfx.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "structs/camera.h"
 
 /* An animated HUD item (func_00277328 ticks it, func_0027AD00 restarts it). */
-typedef struct {
-    /* 0x00 */ s32 anim;
-    /* 0x04 */ u8 pad4[4];
-    /* 0x08 */ s32 visible;
-    /* 0x0C */ u8 padC[4];
-    /* 0x10 */ f32 x;
-    /* 0x14 */ f32 y;
-    /* 0x18 */ u8 pad18[0x38 - 0x18];
-    /* 0x38 */ s32 value;           /* the value shown, to restart on change */
-} HudItem;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x380];
-    /* 0x380 */ s32 underwater;
-} Strokes;
-
-typedef struct {
-    /* 0x0000 */ u8 pad0[0x4F8];
-    /* 0x04F8 */ f32 charge;
-    /* 0x04FC */ u8 pad4FC[0x518 - 0x4FC];
-    /* 0x0518 */ CPlayerOptions *options;
-    /* 0x051C */ u8 pad51C[0x524 - 0x51C];
-    /* 0x0524 */ s32 health;        /* 8.8 */
-    /* 0x0528 */ s16 lives;
-    /* 0x052A */ s16 keys;
-    /* 0x052C */ u8 pad52C[0x996 - 0x52C];
-    /* 0x0996 */ s16 weapon;
-    /* 0x0998 */ u8 pad998[0xC10 - 0x998];
-    /* 0x0C10 */ u8 crosshair[0xCD0 - 0xC10];
-    /* 0x0CD0 */ Strokes strokes;
-    /* 0x1054 */ u8 pad1054[0x1064 - 0x1054];
-    /* 0x1064 */ HudItem ammo;
-    /* 0x10A0 */ HudItem healthItem;
-    /* 0x10DC */ HudItem keysItem;
-    /* 0x1118 */ HudItem livesItem;
-    /* 0x1154 */ u8 pad1154[0x1208 - 0x1154];
-    /* 0x1208 */ HudItem scoreItem;
-    /* 0x1244 */ HudItem fragsItem;
-} HudPlayer;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x24];
-    /* 0x024 */ s32 noCrosshair;
-    /* 0x028 */ u8 pad28[0x288 - 0x28];
-    /* 0x288 */ f32 width;
-    /* 0x28C */ f32 height;
-    /* 0x290 */ f32 x;
-    /* 0x294 */ f32 y;
-} View;
-
 extern s32 D_8011AC8C;          /* game state */
 extern u8 D_8011AAEA;           /* HUD alpha */
 extern s32 D_800C2030;          /* screen width */
@@ -133,18 +85,18 @@ extern u8 D_800ADC00[];
 extern u8 D_800ADC40[];
 extern u8 D_800ADC80[];
 
-void func_00277328(HudItem *item);
-void func_0027AD00(HudItem *item, u8 *anim);
-void func_0024A86C(HudPlayer *player, View *view);
-void func_00247438(void *crosshair, View *view);
+void func_00277328(COverlay *item);
+void func_0027AD00(COverlay *item, u8 *anim);
+void func_0024A86C(CPlayer *player, CCamera *view);
+void func_00247438(void *crosshair, CCamera *view);
 void func_00279028(s32 alpha);
-void func_00254D5C(Strokes *strokes, View *view, HudPlayer *player);
-void func_0024B3E4(Strokes *strokes, View *view, HudPlayer *player);
-s32 func_0024E700(HudPlayer *player, s32 weapon);
-s32 func_0024E7D0(HudPlayer *player);
+void func_00254D5C(CBarrel *strokes, CCamera *view, CPlayer *player);
+void func_0024B3E4(CBarrel *strokes, CCamera *view, CPlayer *player);
+s32 func_0024E700(CPlayer *player, s32 weapon);
+s32 func_0024E7D0(CPlayer *player);
 void func_0027B320(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32);
 void func_00277CF0(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32, s32 rightAlign, s32 minDigits);
-void func_00254768(HudPlayer *player, View *view);
+void func_00254768(CPlayer *player, CCamera *view);
 
 /* The next display list command. Through this helper, as in the ROM, the
  * head is loaded and stored by symbol; a post-increment written in place
@@ -156,7 +108,7 @@ static __inline__ Gfx *dl_next(void) {
 /* Draw a player's HUD: tick the item animations, the crosshair and strokes,
  * then the ammo (with the charge gauge of weapon 0xDD), the health, the
  * lives, the keys in single player, and the score and frags in multiplayer. */
-void func_0024C648(HudPlayer *player, View *view) {
+void func_0024C648(CPlayer *player, CCamera *view) {
     f32 sx;
     f32 sy;
     f32 shift;
@@ -168,23 +120,23 @@ void func_0024C648(HudPlayer *player, View *view) {
     s32 lives;
     s32 showAmmo;
     s32 value;
-    Strokes *strokes;
+    CBarrel *strokes;
 
     showAmmo = 1;
     if (D_8011AC8C == 0xB || D_8011AC8C == 8) {
         return;
     }
-    func_00277328(&player->ammo);
-    func_00277328(&player->healthItem);
-    func_00277328(&player->keysItem);
-    func_00277328(&player->livesItem);
-    func_00277328(&player->scoreItem);
-    func_00277328(&player->fragsItem);
+    func_00277328(&player->m_AmmoOverlay);
+    func_00277328(&player->m_HealthOverlay);
+    func_00277328(&player->m_LivesOverlay);
+    func_00277328(&player->m_TokensOverlay);
+    func_00277328(&player->m_TotalKillsOverlay);
+    func_00277328(&player->m_TotalTagsOverlay);
     func_0024A86C(player, view);
-    if (view->noCrosshair == 0) {
-        func_00247438(player->crosshair, view);
+    if (view->m_ViewParams.m_nType == 0) {
+        func_00247438(&player->m_Overlay, view);
     }
-    strokes = &player->strokes;
+    strokes = &player->m_Barrel;
     func_00279028(0xFF);
     {   /* gDPSetTextureFilter(G_TF_BILERP) */
         Gfx *g = dl_next();
@@ -192,102 +144,102 @@ void func_0024C648(HudPlayer *player, View *view) {
         g->w0 = 0xE3001201;
         g->w1 = 0x2000;
     }
-    if (strokes->underwater) {
+    if (strokes->m_bStickWheel) {
         func_00254D5C(strokes, view, player);
     } else {
         func_0024B3E4(strokes, view, player);
     }
     func_00279028(D_8011AAEA);
-    sx = view->width / (f32)D_800C2030;
+    sx = view->m_Viewport.m_Width / (f32)D_800C2030;
     shift = sx * 32.0f;
-    sy = view->height / (f32)D_800C2034;
+    sy = view->m_Viewport.m_Height / (f32)D_800C2034;
 
-    ammo = func_0024E700(player, player->weapon);
-    if (player->ammo.value != ammo) {
-        func_0027AD00(&player->ammo, D_800ADB84);
-        player->ammo.value = ammo;
+    ammo = func_0024E700(player, player->m_Data.m_CurrentWeapon);
+    if (player->m_AmmoOverlay.m_Value != ammo) {
+        func_0027AD00(&player->m_AmmoOverlay, D_800ADB84);
+        player->m_AmmoOverlay.m_Value = ammo;
     }
     icon = func_0024E7D0(player);
-    if (player->ammo.anim && player->ammo.visible && icon != -1) {
-        x = player->ammo.x * sx + view->x;
-        y = player->ammo.y * sy + view->y + view->height;
+    if (player->m_AmmoOverlay.m_bOnScreen && player->m_AmmoOverlay.m_Mode && icon != -1) {
+        x = player->m_AmmoOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX;
+        y = player->m_AmmoOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY + view->m_Viewport.m_Height;
         func_0027B320(0x12C, 0, x - shift + sx * 18.0f, y + sy, sx, sy, 1);
         frame = 0;
         if (icon == 0xDD) {
             frame = 8;
-            if (!(player->charge <= 0.0f)) {
-                frame = (90.0f - player->charge) * 0.08888889f;
+            if (!(player->m_WeaponActor.m_AI.m_Weapon.m_RefireDelay <= 0.0f)) {
+                frame = (90.0f - player->m_WeaponActor.m_AI.m_Weapon.m_RefireDelay) * 0.08888889f;
             }
             showAmmo = 0;
-        } else if (player->weapon == 0x15) {
+        } else if (player->m_Data.m_CurrentWeapon == 0x15) {
             showAmmo = 0;
         }
         func_0027B320(icon, frame, x - shift, y - sy * 8.0f, sx, sy, 1);
         if (showAmmo) {
-            func_00277CF0(player->ammo.value, x - sx * 6.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
+            func_00277CF0(player->m_AmmoOverlay.m_Value, x - sx * 6.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
         }
     }
 
-    x = player->healthItem.x * sx + view->x;
-    y = player->healthItem.y * sy + view->y + view->height;
+    x = player->m_HealthOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX;
+    y = player->m_HealthOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY + view->m_Viewport.m_Height;
     func_0027B320(0x12C, 0, x - shift + sx * 21.0f, y + sy, sx, sy, 1);
     func_0027B320(0x1F7, 0, x - shift + sx, y - sy * 9.0f, sx, sy, 1);
-    func_00277CF0((player->health + 0xFF) >> 8, x - sx * 3.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
+    func_00277CF0((player->m_Data.m_Health + 0xFF) >> 8, x - sx * 3.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
 
-    lives = player->lives;
-    if (player->livesItem.value != lives) {
-        func_0027AD00(&player->livesItem, D_800ADC00);
-        player->livesItem.value = lives;
+    lives = player->m_Data.m_LifeForce;
+    if (player->m_TokensOverlay.m_Value != lives) {
+        func_0027AD00(&player->m_TokensOverlay, D_800ADC00);
+        player->m_TokensOverlay.m_Value = lives;
     }
-    if (player->livesItem.anim && player->livesItem.visible) {
-        x = player->livesItem.x * sx + view->x + view->width;
-        y = player->livesItem.y * sy + view->y;
+    if (player->m_TokensOverlay.m_bOnScreen && player->m_TokensOverlay.m_Mode) {
+        x = player->m_TokensOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
+        y = player->m_TokensOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY;
         func_0027B320(0x12C, 1, x + sx * -42.0f, y + sy * 24.0f, sx, sy, 1);
         func_0027B320(0x1F5, 0, x, y + sy * 8.0f, sx, sy, 1);
-        func_00277CF0(player->lives, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
+        func_00277CF0(player->m_Data.m_LifeForce, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
     }
 
     if (!D_8011AAD8.multiplayer) {
-        value = player->keys;
-        if (player->keysItem.value != value) {
-            func_0027AD00(&player->keysItem, D_800ADBC0);
-            player->keysItem.value = value;
+        value = player->m_Data.m_Lives;
+        if (player->m_LivesOverlay.m_Value != value) {
+            func_0027AD00(&player->m_LivesOverlay, D_800ADBC0);
+            player->m_LivesOverlay.m_Value = value;
         }
-        if (player->keysItem.anim && player->keysItem.visible) {
-            x = player->keysItem.x * sx + view->x;
-            y = player->keysItem.y * sy + view->y;
+        if (player->m_LivesOverlay.m_bOnScreen && player->m_LivesOverlay.m_Mode) {
+            x = player->m_LivesOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX;
+            y = player->m_LivesOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY;
             func_0027B320(0x12C, 0, x + sx * 18.0f, y + sy * 28.0f, sx, sy, 1);
             func_0027B320(0x1F6, 0, x, y, sx, sy, 1);
-            func_00277CF0(player->keys, x + sx * 30.0f, y + sy * 24.0f, sx, sy, 1, 0, 0);
+            func_00277CF0(player->m_Data.m_Lives, x + sx * 30.0f, y + sy * 24.0f, sx, sy, 1, 0, 0);
         }
     }
     if (D_8011AAD8.multiplayer) {
-        value = player->options->m_Kills;
-        if (player->scoreItem.value != value) {
-            func_0027AD00(&player->scoreItem, D_800ADC40);
-            player->scoreItem.value = value;
+        value = player->m_pOptions->m_Kills;
+        if (player->m_TotalKillsOverlay.m_Value != value) {
+            func_0027AD00(&player->m_TotalKillsOverlay, D_800ADC40);
+            player->m_TotalKillsOverlay.m_Value = value;
         }
-        if (player->scoreItem.anim && player->scoreItem.visible) {
-            x = player->scoreItem.x * sx + view->x + view->width;
-            y = player->scoreItem.y * sy + view->y;
+        if (player->m_TotalKillsOverlay.m_bOnScreen && player->m_TotalKillsOverlay.m_Mode) {
+            x = player->m_TotalKillsOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
+            y = player->m_TotalKillsOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY;
             func_0027B320(0x1FA, 0, x, y + sy * 8.0f, sx, sy, 1);
-            func_00277CF0(player->options->m_Kills, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
+            func_00277CF0(player->m_pOptions->m_Kills, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
         }
         if (D_8011ACE4) {
-            value = player->options->m_Tags;
-            if (player->fragsItem.value != value) {
-                func_0027AD00(&player->fragsItem, D_800ADC80);
-                player->fragsItem.value = value;
+            value = player->m_pOptions->m_Tags;
+            if (player->m_TotalTagsOverlay.m_Value != value) {
+                func_0027AD00(&player->m_TotalTagsOverlay, D_800ADC80);
+                player->m_TotalTagsOverlay.m_Value = value;
             }
-            if (player->fragsItem.anim && player->fragsItem.visible) {
-                x = player->fragsItem.x * sx + view->x + view->width;
-                y = player->fragsItem.y * sy + view->y;
+            if (player->m_TotalTagsOverlay.m_bOnScreen && player->m_TotalTagsOverlay.m_Mode) {
+                x = player->m_TotalTagsOverlay.m_PositionX * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
+                y = player->m_TotalTagsOverlay.m_PositionY * sy + view->m_Viewport.m_ScreenPosY;
                 func_0027B320(0x1FD, 0, x, y + sy * 8.0f, sx, sy, 1);
-                func_00277CF0(player->options->m_Tags, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
+                func_00277CF0(player->m_pOptions->m_Tags, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
             }
         }
     }
-    if (player->options->m_TagMode == 1) {
+    if (player->m_pOptions->m_TagMode == 1) {
         func_00254768(player, view);
     }
 }
@@ -295,38 +247,6 @@ void func_0024C648(HudPlayer *player, View *view) {
 typedef struct Quad {
     s32 w[4];
 } Quad;
-
-typedef struct Target {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ f32 x;
-    /* 0x08 */ f32 y;
-    /* 0x0C */ f32 z;
-    /* 0x10 */ s32 region;
-    /* 0x14 */ u8 pad14[0x40 - 0x14];
-    /* 0x40 */ Quad quad;
-    /* 0x50 */ f32 angle;
-} Target;
-
-typedef struct ViewState {
-    /* 0x000 */ u8 pad0[0x510];
-    /* 0x510 */ s32 mode;
-    /* 0x514 */ u8 pad514[8];
-    /* 0x51C */ void *camera;
-    /* 0x520 */ u8 pad520[0xA64 - 0x520];
-    /* 0xA64 */ u32 buttons;
-    /* 0xA68 */ u8 padA68[0xAB0 - 0xA68];
-    /* 0xAB0 */ f32 unkAB0;
-    /* 0xAB4 */ u8 padAB4[0xAC0 - 0xAB4];
-    /* 0xAC0 */ f32 unkAC0;
-    /* 0xAC4 */ u8 padAC4[4];
-    /* 0xAC8 */ f32 eye[3];
-    /* 0xAD4 */ f32 eyeOffset[3];
-    /* 0xAE0 */ f32 lookOffset[3];
-    /* 0xAEC */ u8 padAEC[0xB24 - 0xAEC];
-    /* 0xB24 */ f32 unkB24;
-    /* 0xB28 */ u8 padB28[0xB90 - 0xB28];
-    /* 0xB90 */ f32 unkB90;
-} ViewState;
 
 typedef struct Orbit {
     /* 0x0 */ f32 angle;
@@ -341,38 +261,38 @@ extern f32 D_800AE30C;
 f32 func_002982F0(f32);             /* sin */
 f32 func_002974C0(f32);             /* cos */
 void func_00280C94(void *camera, s32 type, f32 a, f32 b, f32 x0, f32 y0, f32 x1, f32 y1, f32 z1,
-                   f32 h, Quad quad, s32 region, f32 c, f32 d);
+                   f32 h, CQuaternion quad, struct CGameRegion *region, f32 c, f32 d);
 
 /* Points the camera at : in mode 1 from the view's offsets, in
  * mode 2 orbiting it, the buttons turning the orbit and moving it in or out. */
-void func_0024CF58(ViewState *view, Target *target) {
+void func_0024CF58(CPlayer *player, CGameObjectInstance *target) {
     void *camera;
     f32 angle;
     f32 x;
 
-    camera = view->camera;
+    camera = player->m_pCamera;
     if (camera == NULL) {
         return;
     }
-    if (view->mode == 1) {
-        func_00280C94(camera, 0, target->angle, view->eye[0] + view->eyeOffset[0] - view->unkAB0,
-                      view->eye[1] + view->eyeOffset[1], view->eye[2] + view->eyeOffset[2],
-                      target->x + view->lookOffset[0], target->y, target->z + view->lookOffset[2],
-                      MAX(view->lookOffset[1] + view->unkB24 - view->unkAC0, 40.96f), target->quad, target->region, view->unkB90, 3.0f);
-    } else if (view->mode == 2) {
-        if (view->buttons & 0x200) {
+    if (player->m_bActive == 1) {
+        func_00280C94(camera, 0, target->m_RotY, player->m_vHeadRotOffset.x + player->m_vHeadWobbleRotOffset.x - player->m_JumpAngle,
+                      player->m_vHeadRotOffset.y + player->m_vHeadWobbleRotOffset.y, player->m_vHeadRotOffset.z + player->m_vHeadWobbleRotOffset.z,
+                      target->header.m_vPos.x + player->m_vEyeOffset.x, target->header.m_vPos.y, target->header.m_vPos.z + player->m_vEyeOffset.z,
+                      MAX(player->m_vEyeOffset.y + player->m_ActualCameraVertEyeOffset - player->m_DuckOffset, 40.96f), target->m_qGround, target->header.m_pCurrentRegion, player->m_ZoomBlend, 3.0f);
+    } else if (player->m_bActive == 2) {
+        if (player->m_ContState.m_dwButtons & 0x200) {
             D_800AE308 += 0.069813177f;
-        } else if (view->buttons & 0x100) {
+        } else if (player->m_ContState.m_dwButtons & 0x100) {
             D_800AE308 -= 0.069813177f;
-        } else if (view->buttons & 0x800) {
+        } else if (player->m_ContState.m_dwButtons & 0x800) {
             D_800AE30C -= 4.096f;
-        } else if (view->buttons & 0x400) {
+        } else if (player->m_ContState.m_dwButtons & 0x400) {
             D_800AE30C += 4.096f;
         }
-        angle = target->angle + D_800AE308;
-        x = target->x + D_800AE30C * func_002982F0(angle);
-        func_00280C94(camera, 1, angle, 0.0f, 0.0f, 0.0f, x, target->y + 81.92f,
-                      target->z + D_800AE30C * func_002974C0(angle), 0.0f, target->quad, target->region, 0.0f, 3.0f);
+        angle = target->m_RotY + D_800AE308;
+        x = target->header.m_vPos.x + D_800AE30C * func_002982F0(angle);
+        func_00280C94(camera, 1, angle, 0.0f, 0.0f, 0.0f, x, target->header.m_vPos.y + 81.92f,
+                      target->header.m_vPos.z + D_800AE30C * func_002974C0(angle), 0.0f, target->m_qGround, target->header.m_pCurrentRegion, 0.0f, 3.0f);
     }
 }
 
@@ -470,6 +390,11 @@ typedef struct Voice {
     /* 0x10 */ s32 bank;
 } Voice;
 
+/* CPlayer (structs/player.h) as func_0024D344 reads it, kept local: it uses
+ * the player both as itself and as its m_CharacterActor (actor = p), and
+ * several words are typed against the header (0x10 the region as a Model,
+ * the controller's 0x08 as a position, the weapon actor's 0x3F4 as a voice,
+ * u32 flags), which would take a cast at most uses. */
 typedef struct Player {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;

@@ -5,10 +5,9 @@
 
 #include "common.h"
 #include "structs/world.h"
-typedef struct { CVector3 a; CVector3 b; } Pair;
+#include "structs/light.h"
 void func_002228E4(CWorld *lv, CVector3 *a, u8 *buf, s32 *out);
-void func_00222A9C(u8 *buf, s32 n, CVector3 *a, Pair *out);
-extern Pair D_800AB0D0;
+void func_00222A9C(u8 *buf, s32 n, CVector3 *a, CLights1 *out);
 extern s32 D_800ACAE0;
 s32 *func_002017D4(s32 *tbl, s32 idx);
 
@@ -22,7 +21,7 @@ static inline s32 hasTbl(CWorld *lv) {
     }
     return 0;
 }
-void func_002254C0(CWorld *lv, CVector3 *a1, Pair *out) {
+void func_002254C0(CWorld *lv, CVector3 *a1, CLights1 *out) {
     u8 buf[0x28];
     s32 n;
     if (hasTbl(lv) == 0 || D_800ACAE0 == 0) {

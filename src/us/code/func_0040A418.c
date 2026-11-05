@@ -1,15 +1,11 @@
 /* FAKEMATCH: identical if/else arms in fewerActorsThan's counting loop (as in func_0040C4F4). */
 #include "common.h"
+#include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target 4 (then 3 after a 4), otherwise 5
  * when fewer than 3 actors are in the D_8010FEB4 list, else 6. */
-
-typedef struct {
-    s16 id;
-    s16 weight;
-} Pick;
 
 extern CListedInstance *D_8010FEB4;
 extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);

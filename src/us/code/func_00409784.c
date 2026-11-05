@@ -1,31 +1,12 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/level_actor.h"
+#include "structs/boss.h"
 
 /* Boss fight tick: updates the 15 attack slots, then (outside cinematics)
  * counts up the two timers: by phase, drops a random pickup somewhere in the
  * arena (inlined func_0040C2C4) and, later, a pickup at every spawn point
  * (func_00409500). */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ CVector3 pos;
-} PoolActor;
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ u8 pad4[0x18 - 0x4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ u8 pad630[0x65C - 0x630];
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ u8 pad660[0x680 - 0x660];
-    /* 0x680 */ s32 spawnTimer;
-    /* 0x684 */ s32 dropTimer;
-} State;
 
 extern s32 D_801301F8;      /* arena radius range */
 extern s32 D_801301FC;
@@ -42,15 +23,15 @@ extern f32 func_002119FC(f32 lo, f32 hi);
 extern f32 func_002982F0(f32);
 extern f32 func_002974C0(f32);
 extern s32 func_00220A1C(void *level, CVector3 *pos);
-extern PoolActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
-extern void func_00246690(PoolActor *actor, s32 sound, CVector3 pos, s32 arg);
+extern CPooledLevelActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern void func_00246690(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
 extern void func_00409500(s32 lifetime, void *table);
 
 /* func_0040C2C4 */
 static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     CVector3 vel;
     s32 region;
-    PoolActor *pickup;
+    CPooledLevelActor *pickup;
 
     region = func_00220A1C(D_800F7078, &pos);
     vel.x = 0.0f;
@@ -62,7 +43,7 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     }
 }
 
-void func_00409784(State *s) {
+void func_00409784(MotherBossState *s) {
     CVector3 pos;
     s32 i;
     s32 spawn;
@@ -80,16 +61,16 @@ void func_00409784(State *s) {
     dropLifetime = 0;
     table = NULL;
     for (i = 0; i < 15; i++) {
-        func_00235510(s->slots[i].data);
+        func_00235510(&s->slots[i].anim);
     }
     if (Cinema_PathPlaying()) {
         return;
     }
-    s->spawnTimer++;
+    s->pickupTimer++;
     s->dropTimer++;
     switch (s->phase) {
     case 1:
-        if (s->spawnTimer >= 76) {
+        if (s->pickupTimer >= 76) {
             spawn = 1;
             lifetime = 600;
         }
@@ -100,7 +81,7 @@ void func_00409784(State *s) {
         }
         break;
     case 2:
-        if (s->spawnTimer >= 151) {
+        if (s->pickupTimer >= 151) {
             spawn = 1;
             lifetime = 450;
         }
@@ -111,7 +92,7 @@ void func_00409784(State *s) {
         }
         break;
     case 0:
-        if (s->spawnTimer >= 151) {
+        if (s->pickupTimer >= 151) {
             spawn = 1;
             lifetime = 450;
         }
@@ -121,7 +102,7 @@ void func_00409784(State *s) {
         return;
     }
     if (spawn) {
-        s->spawnTimer = 0;
+        s->pickupTimer = 0;
         id = (s16) func_0026D518(D_00431D94);
         dist = func_002119FC(D_801301F8, D_801301FC);
         angle = func_002119FC(-3.1415927f, 3.1415927f);

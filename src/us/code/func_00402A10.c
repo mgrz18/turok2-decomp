@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/boss.h"
 
 typedef struct {
     f32 x, y, z;
@@ -24,7 +25,6 @@ typedef struct {
 } Obj00402A10;
 
 extern s32 D_8012F5F0[];
-extern u8 D_8012F3A0[];
 void func_0025AD90(s32 a0, Obj00402A10 *obj, s32 a2);
 void func_004021C8(void *state);
 
@@ -41,5 +41,5 @@ void func_00402A10(s32 a0, Obj00402A10 *obj) {
     if (obj->def != NULL && obj->def->onReset != NULL) {
         obj->def->onReset(a0, obj);
     }
-    func_004021C8(D_8012F3A0);
+    func_004021C8(&D_8012F3A0);
 }
