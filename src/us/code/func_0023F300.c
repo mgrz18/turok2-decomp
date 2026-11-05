@@ -2,17 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
-
-/* Pickup effect descriptor. */
-typedef struct PickupEntry {
-    void *resource; /* 0x00 */
-    char pad4[2];
-    s16 sound;      /* 0x06 */
-    s16 callback;   /* 0x08 */
-    char padA[2];
-    s16 index;      /* 0x0C */
-    s16 argument;   /* 0x0E */
-} PickupEntry;
+#include "structs/pickup.h"
 
 extern char D_801198B0[];
 
@@ -36,17 +26,17 @@ static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 soun
     }
 }
 
-s32 func_0023F300(CPlayer *player, PickupEntry *entry) {
+s32 func_0023F300(CPlayer *player, CPickupEntry *entry) {
     void *resource;
     s32 sound;
     s32 callback;
     s32 result;
 
-    result = func_00253B54(player, 2, entry->index);
+    result = func_00253B54(player, 2, entry->m_Params.m_Amount);
     if (result != 0) {
-        sound = entry->sound;
-        callback = entry->callback;
-        resource = entry->resource;
+        sound = entry->m_Sound;
+        callback = entry->m_Callback;
+        resource = entry->m_pMessage;
         pickup_feedback(player, resource, sound, callback);
     }
     return result;
