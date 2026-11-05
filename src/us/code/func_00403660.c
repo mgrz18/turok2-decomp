@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/boss.h"
 
 typedef struct {
     s32 animate;  /* 0x0 */
@@ -14,6 +15,8 @@ typedef struct {
     u8 data[0x18];
 } AnimSlot;
 
+/* A weak spot seen from its animator: walking BossWeakSpot pointers and
+ * taking &slot->anim moves the +4 into the loop and breaks the match. */
 typedef struct {
     u8 data[0x68];
 } Slot00403660;
@@ -27,13 +30,6 @@ typedef struct {
     /* 0x174 */ s8 unk174;
 } Boss00403660;
 
-typedef struct {
-    /* 0x000 */ Boss00403660 *boss;
-    /* 0x004 */ u8 pad0[0xC - 0x4];
-    /* 0x00C */ Slot00403660 slots[5];
-} State00403660;
-
-extern State00403660 D_8012F3A0;
 extern s32 D_800B6D1C;
 extern s32 D_800AB8B0;
 void func_0021DC84(void *actor, void *state, AnimRequest *req);
@@ -46,7 +42,7 @@ static __inline__ s32 hasBit(s32 mask, s32 bit) {
 }
 
 void func_00403660(u8 *actor, u8 *state, AnimRequest *req) {
-    State00403660 *s;
+    WaveBossState *s;
     Boss00403660 *boss;
     s32 mask;
     Slot00403660 *slot;
@@ -56,9 +52,9 @@ void func_00403660(u8 *actor, u8 *state, AnimRequest *req) {
     i = 0;
     bit = 1;
     s = &D_8012F3A0;
-    boss = s->boss;
+    boss = (Boss00403660 *) s->actor;
     mask = boss->slotMask;
-    slot = s->slots;
+    slot = (Slot00403660 *) &s->spots[0].anim;
     do {
         if (hasBit(mask, bit << i)) {
             req->first = i;

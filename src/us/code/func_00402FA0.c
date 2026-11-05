@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/boss.h"
 
 typedef struct {
     f32 x, y, z;
@@ -26,12 +27,6 @@ typedef struct {
     /* 0xC7 */ s8 count;
 } Item00402FA0;
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 pushed;
-} State00402FA0;
-
-extern State00402FA0 D_8012F3A0;
 s32 func_00219F74(Obj00402FA0 *obj, s32 a1, s32 a2);
 void func_0020EF2C(Vec3_00402FA0 *out, Vec3_00402FA0 *from, Vec3_00402FA0 *to);
 void func_00243414(Obj00402FA0 *obj, Item00402FA0 *item, s32 a2);
@@ -39,7 +34,7 @@ void func_00243414(Obj00402FA0 *obj, Item00402FA0 *item, s32 a2);
 void func_00402FA0(Obj00402FA0 *obj, Item00402FA0 *item) {
     Vec3_00402FA0 dir;
     s32 anim;
-    State00402FA0 *s = &D_8012F3A0;
+    WaveBossState *s = &D_8012F3A0;
 
     anim = func_00219F74(obj, 0x1004, -1);
     if (obj->anim == anim) {
