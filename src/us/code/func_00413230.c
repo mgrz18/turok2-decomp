@@ -706,35 +706,18 @@ void func_00414938(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused, Men
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00440F10.c, func_00440F10.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct { s16 type; u8 pad2[2]; u32 flags; u16 w8; u16 wA; u8 bC, bD, bE, bF; s32 f10; u8 pad14[0x24 - 0x14]; } Q04Tpl;
-typedef struct { void *unk0; s16 n; u8 pad6[2]; void (*unk8)(void *, void *); u8 pad0C[0x18 - 0xC]; u16 w18; u16 w1A; u16 w1C; } Q04Hdr;
-typedef struct { u8 pad[4]; u32 flags; u8 pad8[0x1C - 8]; void (*unk1C)(void *, void *, void *); } Q04ItemDef;
-typedef struct { s32 idx; u16 w4; u8 pad6[2]; u32 flags; u16 wC; u16 wE; u8 b10, b11, b12, b13; s32 f14; Q04ItemDef *def; s32 f1C; void *p20; void *owner; } Q04Itm;
-typedef struct { u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0E[3]; u8 e; u8 pad12[3]; u8 f; u8 pad16[2]; } Q04Tab;
-typedef struct { u16 w0, w2, w4, w6, w8, wA; u8 bC, bD, bE, bF; } Q04Rec;
-typedef struct {
-    u16 w0, w2, w4;
-    u8 pad6[2];
-    void *p8;
-    Q04Itm *items;
-    s32 n;
-    void *hdr;
-    s32 f18;
-    s32 f1C;
-    void *f20;
-    s32 f24;
-    u16 w28;
-    u16 w2A;
-    s32 f2C, f30, f34, f38, f3C;
-    s32 f40;
-    void *f44;
-    Q04Rec rec[2][8];
-} Q04Panel_414EA8;
 extern void *func_00416B28_4143DC() __asm__("func_00416B28");
 extern void func_00416C00_4143DC() __asm__("func_00416C00");
 extern void func_00416C0C_4143DC(void *p) __asm__("func_00416C0C");
-extern Q04Tab D_800C1CD2[];
-void func_00414EA8(Q04Panel_414EA8 *p, void *a1, Q04Hdr *t, s32 a3, s32 a4, void *a5, s32 a6, void *a7)
+/* The colour records a window starts with (Menu colors): 8 records of
+ * 0x18 bytes, read as halfwords at 0, 4, 8 and bytes at 0xD, 0x11, 0x15 (the
+ * low parts of six words: the symbol sits 2 bytes into the table). */
+typedef struct { u16 a; u8 pad2[2]; u16 b; u8 pad6[2]; u16 c; u8 padA[3]; u8 d; u8 pad0E[3]; u8 e; u8 pad12[3]; u8 f; u8 pad16[2]; } MenuColorInit;
+extern MenuColorInit D_800C1CD2[];
+/* Builds a window in its block: the items from the desc's table, the
+ * extras after them, the colours, then the desc's init and the items' select
+ * callbacks flagged 0x04000000. */
+void func_00414EA8(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, ControllerProfile *a5, void *a6, MenuPool *a7)
 {
   s32 i;
   s32 j;
@@ -744,39 +727,39 @@ void func_00414EA8(Q04Panel_414EA8 *p, void *a1, Q04Hdr *t, s32 a3, s32 a4, void
   s32 off;
   u8 *e;
   s32 new_var2;
-  Q04Itm *ib;
+  MenuItem *ib;
   u8 *ext;
   u8 **pc;
-  p->w0 = t->w18;
-  p->w2 = t->w1A;
-  p->w4 = t->w1C;
-  p->p8 = a1;
-  ib = (Q04Itm *) (((u8 *) p) + 0x1D8);
+  p->cursor = t->cursor;
+  p->offsetX = t->offsetX;
+  p->offsetY = t->offsetY;
+  p->block = a1;
+  ib = (MenuItem *) (((u8 *) p) + 0x1D8);
   p->items = ib;
-  p->n = t->n;
+  p->count = t->count;
   ext = (u8 *) ib;
-  ext = ((u8 *) ib) + (t->n * 0x28);
-  for (i = 0; i < t->n; i++)
+  ext = ((u8 *) ib) + (t->count * 0x28);
+  for (i = 0; i < t->count; i++)
   {
-    Q04Itm *it = (Q04Itm *) ((i * 0x28) + ((s32) p->items));
-    Q04Tpl *tp = (Q04Tpl *) ((i * 0x24) + ((s32) t->unk0));
-    it->idx = i;
+    MenuItem *it = (MenuItem *) ((i * 0x28) + ((s32) p->items));
+    MenuItemDesc *tp = (MenuItemDesc *) ((i * 0x24) + ((s32) t->items));
+    it->index = i;
     pc = &ext;
     {
-      it->w4 = tp->type;
+      it->type = tp->type;
       it->flags = tp->flags | 0x01800000;
-      it->wC = tp->w8;
-      it->wE = tp->wA;
-      it->b10 = tp->bC;
+      it->x = tp->x;
+      it->y = tp->y;
+      it->link[0] = tp->link[0];
     }
-    it->b11 = tp->bD;
-    it->b12 = tp->bE;
-    it->b13 = tp->bF;
-    new_var2 = tp->f10;
-    it->def = (Q04ItemDef *) tp;
-    it->f1C = -1;
-    it->owner = p;
-    it->f14 = new_var2;
+    it->link[1] = tp->link[1];
+    it->link[2] = tp->link[2];
+    it->link[3] = tp->link[3];
+    new_var2 = tp->data;
+    it->def = tp;
+    it->value = -1;
+    it->menu = p;
+    it->data = new_var2;
     k = 0;
     if (tp->type == 3)
     {
@@ -785,10 +768,10 @@ void func_00414EA8(Q04Panel_414EA8 *p, void *a1, Q04Hdr *t, s32 a3, s32 a4, void
     if (k != 0)
     {
       e = *pc;
-      it->p20 = e;
+      it->extra = e;
       if (tp->type == 3)
       {
-        *((s32 *) (e + 0x328)) = 1;
+        ((MenuModel *) e)->loaded = 1;
       }
       k2 = 0;
       if (tp->type == 3)
@@ -798,24 +781,26 @@ void func_00414EA8(Q04Panel_414EA8 *p, void *a1, Q04Hdr *t, s32 a3, s32 a4, void
       *pc += k2;
     }
   }
-  p->hdr = t;
-  p->f18 = a3;
-  p->f1C = a4;
-  p->f20 = a5;
-  p->f24 = a6;
-  p->w28 = 0;
-  p->w2A = *((u16 *) (((u8 *) a7) + 0x14));
-  p->f2C = 0;
-  p->f30 = 0;
-  p->f34 = 0;
-  p->f38 = 1;
-  p->f3C = 0;
-  p->f40 = (s32) func_00416B28_4143DC(a7);
-  p->f44 = a7;
+  p->desc = t;
+  p->param = a3;
+  p->player = a4;
+  p->controller = a5;
+  p->context = a6;
+  p->state = 0;
+  p->slot = a7->opened;
+  p->time = 0;
+  p->fade = 0;
+  p->alpha = 0;
+  p->visible = 1;
+  p->highlighted = 0;
+  p->camera = func_00416B28_4143DC(a7);
+  p->pool = a7;
   for (j = 0; j < 2; j++)
   {
     for (i = 0; i < 8; i++)
     {
+      /* rb + 0x48 is p->colors[j][i] (MenuColor w0..bF); written through
+       * the byte offsets, as the struct's fields schedule differently */
       u8 *rb = ((u8 *)p) + ((j << 7) + i * 16);
       *((u16 *) (rb + 0x48)) = D_800C1CD2[i].a;
       *((u16 *) (rb + 0x4A)) = D_800C1CD2[i].b;
@@ -829,30 +814,30 @@ void func_00414EA8(Q04Panel_414EA8 *p, void *a1, Q04Hdr *t, s32 a3, s32 a4, void
       *((u8 *) (rb + 0x56)) = new_var;
     }
   }
-  *((s32 *) (((u8 *) a5) + 0xB0)) = 0;
-  *((s32 *) (((u8 *) a5) + 0xB4)) = 0;
-  *((s32 *) (((u8 *) a5) + 0xBC)) = 0;
+  a5->buttons = 0;
+  a5->buttonsSingle = 0;
+  a5->buttonsDouble = 0;
   func_00416C00_4143DC(p);
   func_00416C0C_4143DC(p);
-  if (t->unk8 != 0)
+  if (t->init != 0)
   {
-    t->unk8(p, a7);
+    t->init(p, a7);
   }
   {
-    Q04Itm *it;
-    i = p->n;
+    MenuItem *it;
+    i = p->count;
     it = p->items;
     i--;
     if (i != (-1))
     {
       do
       {
-        Q04ItemDef *d = it->def;
+        MenuItemDesc *d = it->def;
         if (d->flags & 0x04000000)
         {
-          if (d->unk1C != (off = 0))
+          if (d->select != (off = 0))
           {
-            d->unk1C(it, p, a7);
+            d->select(it, p, a7);
           }
         }
         i--;
@@ -869,10 +854,13 @@ void func_00414EA8(Q04Panel_414EA8 *p, void *a1, Q04Hdr *t, s32 a3, s32 a4, void
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 
-void func_004151B4(struct MenuRecAt10 *menu, u8 dir) {
-    struct EntryRecAt18V2 *entry;
+/* Moves the window's cursor by the selected item's link for dir (0x10 +
+ * MENU_LINK_*: the byte at that offset), on until an item that is shown,
+ * enabled (0x1800000) and selectable; the item reached links back. */
+void func_004151B4(Menu *menu, u8 dir) {
+    MenuItem *entry;
     s32 old;
-    entry = &menu->entries[menu->cursor];
+    entry = &menu->items[menu->cursor];
     do {
         old = menu->cursor;
         menu->cursor += ((s8 *)entry)[dir];
@@ -881,31 +869,31 @@ void func_004151B4(struct MenuRecAt10 *menu, u8 dir) {
         } else if (menu->cursor >= menu->count) {
             menu->cursor = 0;
         }
-        entry = &menu->entries[menu->cursor];
+        entry = &menu->items[menu->cursor];
         old -= menu->cursor;
         switch (dir) {
         case 16:
             if (entry->flags & 0x80000) {
-                entry->back[1] = old;
+                entry->link[MENU_LINK_RIGHT] = old;
             }
             break;
         case 17:
             if (entry->flags & 0x40000) {
-                entry->back[0] = old;
+                entry->link[MENU_LINK_LEFT] = old;
             }
             break;
         case 18:
             if (entry->flags & 0x200000) {
-                entry->back[3] = old;
+                entry->link[MENU_LINK_DOWN] = old;
             }
             break;
         case 19:
             if (entry->flags & 0x100000) {
-                entry->back[2] = old;
+                entry->link[MENU_LINK_UP] = old;
             }
             break;
         }
-    } while ((entry->flags & 0x1800000) != 0x1800000 || entry->target->locked == 0);
+    } while ((entry->flags & 0x1800000) != 0x1800000 || entry->def->select == NULL);
 }
 
 
@@ -1006,20 +994,20 @@ s32 func_0041531C(Menu *menu, void *arg) {
             }
             if (horizontal == 0) {
                 if (func_00285628_4143DC(menu->controller) != 0) {
-                    func_004151B4((struct MenuRecAt10 *) menu, 0x10);
+                    func_004151B4(menu, 0x10);
                 }
                 if (func_00285670_4143DC(menu->controller) != 0) {
-                    func_004151B4((struct MenuRecAt10 *) menu, 0x11);
+                    func_004151B4(menu, 0x11);
                 }
             } else if (menu->controller->buttons & 0x60303) {
                 moveV = 0;
             }
             if (moveV != 0) {
                 if (func_002856B8(menu->controller) != 0) {
-                    func_004151B4((struct MenuRecAt10 *) menu, 0x12);
+                    func_004151B4(menu, 0x12);
                 }
                 if (func_00285700(menu->controller) != 0) {
-                    func_004151B4((struct MenuRecAt10 *) menu, 0x13);
+                    func_004151B4(menu, 0x13);
                 }
             }
             if (menu->state == 2 && (func_002855E8(menu->controller) != 0 || (func_00285628_4143DC(menu->controller) != 0 && horizontal != 0)
@@ -1039,125 +1027,106 @@ s32 func_0041531C(Menu *menu, void *arg) {
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 func_002982F0(f32 x);
-typedef struct Q04Item_4156FC {
-    s32 idx;
-    s16 w4;
-    u8 pad6[2];
-    u32 flags;
-    u16 wC;
-    u16 wE;
-    u8 b10, b11, b12, b13;
-    s32 f14;
-    void *def;
-    s32 f1C;
-    void *p20;
-    void *owner;
-} Q04Item_4156FC;
-typedef struct Q04Info_4156FC {
-    s32 f0, f4, f8;
-    f32 fC, f10;
-    s32 x0, x1, y0, y1;
-} Q04Info_4156FC;
-typedef struct { u8 pad[0x14]; void (*f14)(void *, void *, void *, void *); } Q04DefB;
-typedef struct { s16 cur; s16 w2; s16 w4; u8 pad6[6]; Q04Item_4156FC *items; s32 n; u8 pad14[0x30 - 0x14]; f32 f30; f32 f34; } Q04Pn;
-typedef struct { u8 pad[0x288]; f32 f288; f32 f28C; f32 f290; f32 f294; } Q04Cm; /* Turok 2: viewport at 0x288 (Rage Wars: 0x29C) */
 extern void func_002778A8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
 extern f32 func_002982F0(f32 x);
 extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0");
-void func_004156FC(Q04Pn *p, void *a1) {
+/* Draws a window's items: lays them all out, centres the box around them
+ * (the area) on the camera's viewport and the window's offset, highlights
+ * the cursor's and calls each item's draw callback. */
+void func_004156FC(Menu *p, void *a1) {
     struct { s32 f, w, h, g; } sz;
     struct { s32 f, x0, x1, y0, y1; } r;
-    Q04Info_4156FC info;
-    Q04Info_4156FC cp;
-    Q04Cm *cam;
-    Q04Item_4156FC *it;
+    MenuItemLayout info;
+    MenuItemLayout cp;
+    CCamera *cam;
+    MenuItem *it;
     s32 i, v, v2, v3, v4;
     f32 cx, cy, hw, hh, fa, fb, sv, tt;
     u32 al;
     i = 0;
     cam = func_00416B28_4143DC(a1);
     r.x0 = 0x400; r.x1 = -0x400; r.y0 = 0x400; r.y1 = -0x400;
-    info.f4 = 0; info.f8 = 0; info.x0 = 0; info.x1 = 0; info.y0 = 0; info.y1 = 0;
-    for (; i < p->n; i++) {
+    info.width = 0; info.height = 0; info.left = 0; info.right = 0; info.top = 0; info.bottom = 0;
+    for (; i < p->count; i++) {
         it = &p->items[i];
         if (it->flags & 0x800000) {
             if (it->flags & 0x20000000) {
-                info.x0 = 0x400; info.x1 = -0x400; info.y0 = 0x400; info.y1 = -0x400;
-                info.f4 = 0; info.f8 = 0;
+                info.left = 0x400; info.right = -0x400; info.top = 0x400; info.bottom = -0x400;
+                info.width = 0; info.height = 0;
             } else {
-                func_0041363C_4143DC((MenuItem *) it, (MenuItemLayout *) &info);
+                func_0041363C_4143DC(it, &info);
             }
-            v = info.x0; if (r.x0 < v) v = r.x0; r.x0 = v;
-            v2 = info.x1; if (v2 < r.x1) v2 = r.x1; r.x1 = v2;
-            v3 = info.y0; if (r.y0 < v3) v3 = r.y0; r.y0 = v3;
-            v4 = info.y1; if (v4 < r.y1) v4 = r.y1; r.y1 = v4;
+            v = info.left; if (r.x0 < v) v = r.x0; r.x0 = v;
+            v2 = info.right; if (v2 < r.x1) v2 = r.x1; r.x1 = v2;
+            v3 = info.top; if (r.y0 < v3) v3 = r.y0; r.y0 = v3;
+            v4 = info.bottom; if (v4 < r.y1) v4 = r.y1; r.y1 = v4;
         }
     }
     sz.w = r.x1 - r.x0;
     sz.h = r.y1 - r.y0;
     if (sz.w >= 0 && sz.h >= 0) {
-        cx = cam->f290 + cam->f288 * 0.5f + (f32)p->w2;
-        cy = cam->f294 + cam->f28C * 0.5f + (f32)p->w4;
-        info.f4 = 0; info.f8 = 0; info.x0 = 0; info.x1 = 0;
+        cx = cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width * 0.5f + (f32)p->offsetX;
+        cy = cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height * 0.5f + (f32)p->offsetY;
+        info.width = 0; info.height = 0; info.left = 0; info.right = 0;
         hw = (f32)(sz.w / 2);
         hh = (f32)(sz.h / 2);
-        info.y0 = 0; info.y1 = 0;
+        info.top = 0; info.bottom = 0;
         r.x0 = (s32)(cx - hw);
         r.x1 = (s32)(cx + hw);
         r.y0 = (s32)(cy - hh);
         r.y1 = (s32)(cy + hh);
         D_800C1BD0_4143DC = -1;
-        for (i = 0; i < p->n; i++) {
+        for (i = 0; i < p->count; i++) {
             it = &p->items[i];
             if (it->flags & 0x800000) {
-                info.f0 = i;
+                info.index = i;
                 if (it->flags & 0x20000000) {
-                    func_0041363C_4143DC((MenuItem *) it, (MenuItemLayout *) &info);
-                    info.f4 = 0; info.f8 = 0;
-                    info.x0 = (s32)cam->f290;
-                    info.x1 = 0;
-                    info.y0 = (s32)cam->f294;
-                    info.y1 = 0;
+                    func_0041363C_4143DC(it, &info);
+                    info.width = 0; info.height = 0;
+                    info.left = (s32)cam->m_Viewport.m_ScreenPosX;
+                    info.right = 0;
+                    info.top = (s32)cam->m_Viewport.m_ScreenPosY;
+                    info.bottom = 0;
                 } else {
-                    func_0041363C_4143DC((MenuItem *) it, (MenuItemLayout *) &info);
+                    func_0041363C_4143DC(it, &info);
                 }
                 cp = info;
                 if (!(it->flags & 0x20000000)) {
-                    cp.x0 += r.x0;
-                    cp.x1 += r.x0;
-                    cp.y0 += r.y0;
-                    cp.y1 += r.y0;
+                    cp.left += r.x0;
+                    cp.right += r.x0;
+                    cp.top += r.y0;
+                    cp.bottom += r.y0;
                 }
                 if (it->flags & 1) {
-                    cp.x0 = (s32)(cx - (f32)(info.f4 / 2));
-                    cp.x1 = cp.x0 + info.f4;
+                    cp.left = (s32)(cx - (f32)(info.width / 2));
+                    cp.right = cp.left + info.width;
                 }
                 if (it->flags & 2) {
-                    cp.x0 = r.x0;
-                    cp.x1 = r.x0 + info.f4;
+                    cp.left = r.x0;
+                    cp.right = r.x0 + info.width;
                 }
                 if (it->flags & 4) {
-                    cp.x1 = r.x1;
-                    cp.x0 = r.x1 - info.f4;
+                    cp.right = r.x1;
+                    cp.left = r.x1 - info.width;
                 }
                 if (it->flags & 0x800000) {
-                    if (p->cur == i && it->w4 != 3) {
+                    if (p->cursor == i && it->type != 3) {
                         if (!(it->flags & 8)) {
-                            fb = (f32)cp.y0;
-                            fa = (f32)cp.y1;
+                            fb = (f32)cp.top;
+                            fa = (f32)cp.bottom;
                             fa = fb + (fa - fb);
                             func_0027AF4C(it);
                             tt = func_002982F0((f32)((u32) D_800B6D20 * 10) * 0.017453294f);
-                            sv = p->f30 * p->f34 * ((tt + 1.0f) * 50.0f + 50.0f);
+                            sv = p->fade * p->alpha * ((tt + 1.0f) * 50.0f + 50.0f);
                             if (it->flags & 0x10) {
-                                func_002778A8(cp.x0 - 4, (s32)fb, cp.x1 + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
+                                func_002778A8(cp.left - 4, (s32)fb, cp.right + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
                             } else {
-                                func_002778A8(cp.x0 - 4, (s32)fb, cp.x1 + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
+                                func_002778A8(cp.left - 4, (s32)fb, cp.right + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
                             }
                             D_800C1BD0_4143DC = -1;
                         }
                     }
-                    ((Q04DefB *)it->def)->f14(it, &cp, &sz, p);
+                    it->def->draw(it, &cp, (MenuItemLayout *) &sz, p); /* sz and r: the area, one MenuItemLayout */
                 }
             }
         }
@@ -1173,60 +1142,40 @@ void func_004156FC(Q04Pn *p, void *a1) {
 
 
 
-typedef struct Q04Item {
-    s32 idx;
-    s16 w4;
-    u8 pad6[2];
-    u32 flags;
-    u16 wC;
-    u16 wE;
-    u8 b10, b11, b12, b13;
-    s32 f14;
-    void *def;
-    s32 f1C;
-    void *p20;
-    void *owner;
-} Q04Item;
-typedef struct Q04Info {
-    s32 f0, f4, f8;
-    f32 fC, f10;
-    s32 x0, x1, y0, y1;
-} Q04Info;
-typedef struct { u8 pad0[2]; s16 unk2; s16 unk4; u8 pad6[6]; Q04Item *unkC; s32 unk10; u8 pad14[0x30 - 0x14]; f32 unk30; u8 pad34[0x40 - 0x34]; void *unk40; } Q04W;
-typedef struct { u8 pad[0x288]; f32 unk288; f32 unk28C; f32 unk290; f32 unk294; } Q04V; /* fields at 0x288 in Turok 2 (0x29C in Rage Wars) */
-typedef struct { u8 pad[8]; u32 unk8; } Q04B;
-extern void func_0041363C_415CE8(Q04Item *it, void *info) __asm__("func_0041363C");
+extern void func_0041363C_415CE8(MenuItem *it, void *info) __asm__("func_0041363C");
 extern void func_0027AF4C_415CE8(void) __asm__("func_0027AF4C");
 extern void func_002778A8_415CE8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j) __asm__("func_002778A8");
 extern s32 D_800C2030;
 extern s32 D_800C2034;
-void func_00415CE8(Q04W *a, Q04B *b, s32 c) {
+/* Draws the bar behind a window's line of items (flag 0x08000000 text):
+ * the screen's width, at the window's offset (c: from the bottom). */
+void func_00415CE8(Menu *a, MenuItem *b, s32 c) {
     struct { s32 f, w, h, g; } sz;
     struct { s32 f, x0, x1, y0, y1; } r;
-    Q04Info info;
-    Q04V *cam;
+    MenuItemLayout info;
+    CCamera *cam;
     s32 i, v, v2, v3, v4;
     f32 fu; register f32 base asm("$f1"); f32 half, t, y0, k;
     u32 al;
-    cam = a->unk40;
-    switch (b->unk8 & 0x3FE0) {
+    cam = a->camera;
+    switch (b->flags & 0x3FE0) {
     case 0x20: { register s32 hi asm("$2"); s32 lo; hi = 0x400; lo = -0x400; r.x0 = hi; r.x1 = lo; r.y0 = hi; r.y1 = lo; } break;
     case 0x40: { register s32 hi asm("$2"); s32 lo; hi = 0x400; lo = -0x400; r.x0 = hi; r.x1 = lo; r.y0 = hi; r.y1 = lo; } break;
     case 0x200: { register s32 hi asm("$2"); s32 lo; hi = 0x400; lo = -0x400; r.x0 = hi; r.x1 = lo; r.y0 = hi; r.y1 = lo; } break;
     default: { register s32 hi asm("$2"); s32 lo; hi = 0x400; lo = -0x400; r.x0 = hi; r.x1 = lo; r.y0 = hi; r.y1 = lo; } break;
     }
-    info.f4 = 0; info.f8 = 0; info.x0 = 0; info.x1 = 0; info.y0 = 0; info.y1 = 0;
-    for (i = 0; i < a->unk10; i++) {
-        func_0041363C_415CE8(a->unkC + i, &info);
-        v = info.x0; if (r.x0 < v) v = r.x0; r.x0 = v;
-        v2 = info.x1; if (v2 < r.x1) v2 = r.x1; r.x1 = v2;
-        v3 = info.y0; if (r.y0 < v3) v3 = r.y0; r.y0 = v3;
-        v4 = info.y1; if (v4 < r.y1) v4 = r.y1; r.y1 = v4;
+    info.width = 0; info.height = 0; info.left = 0; info.right = 0; info.top = 0; info.bottom = 0;
+    for (i = 0; i < a->count; i++) {
+        func_0041363C_415CE8(a->items + i, &info);
+        v = info.left; if (r.x0 < v) v = r.x0; r.x0 = v;
+        v2 = info.right; if (v2 < r.x1) v2 = r.x1; r.x1 = v2;
+        v3 = info.top; if (r.y0 < v3) v3 = r.y0; r.y0 = v3;
+        v4 = info.bottom; if (v4 < r.y1) v4 = r.y1; r.y1 = v4;
     }
     sz.w = r.x1 - r.x0;
     sz.h = r.y1 - r.y0;
     if (sz.w >= 0 && sz.h >= 0) {
-        base = cam->unk290 + cam->unk288 * 0.5f + (f32)a->unk2;
+        base = cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width * 0.5f + (f32)a->offsetX;
         sz.w = D_800C2030;
         half = (f32)(D_800C2030 / 2);
         r.x0 = (s32)(base - half);
@@ -1234,13 +1183,13 @@ void func_00415CE8(Q04W *a, Q04B *b, s32 c) {
         y0 = (f32)D_800C2034;
         t = y0 * 0.21621622f;
         t -= (D_800C2034 >= 0xDF) ? 13.0f : 9.0f;
-        if (c != 0) y0 = (cam->unk294 + (f32)D_800C2034 + (f32)a->unk4) - t;
-        else { register f32 pa asm("$f0"); f32 pb; pa = cam->unk294; pb = (f32)a->unk4; y0 = pa + pb; }
+        if (c != 0) y0 = (cam->m_Viewport.m_ScreenPosY + (f32)D_800C2034 + (f32)a->offsetY) - t;
+        else { register f32 pa asm("$f0"); f32 pb; pa = cam->m_Viewport.m_ScreenPosY; pb = (f32)a->offsetY; y0 = pa + pb; }
         r.y0 = (s32)y0;
         r.y1 = (s32)((f32)r.y0 + t);
         sz.h = r.y1 - r.y0;
         func_0027AF4C_415CE8();
-        func_002778A8_415CE8(r.x0, r.y0, r.x1, r.y1, 1, 0, 0, 0, 0, (u32)(a->unk30 * 192.0f) & 0xFF);
+        func_002778A8_415CE8(r.x0, r.y0, r.x1, r.y1, 1, 0, 0, 0, 0, (u32)(a->fade * 192.0f) & 0xFF);
     }
 }
 
