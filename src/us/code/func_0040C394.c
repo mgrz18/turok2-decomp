@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
@@ -9,11 +10,6 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x4];
     /* 0x04 */ CVector3 pos;
 } PoolActor;
-
-typedef struct {
-    s16 id;
-    s16 weight;
-} Pick;
 
 extern u8 D_800F7078[];
 extern u8 D_80107590[];
