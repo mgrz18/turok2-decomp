@@ -2,13 +2,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/IO/802013D8.CPP, func_802013D8_de, with Turok 2's layouts. */
 
 #include "common.h"
-
-/* One entry of the debugger's memory permission map. */
-typedef struct MemoryRange {
-    /* 0x0 */ u32 first;
-    /* 0x4 */ u32 last;
-    /* 0x8 */ u32 flags;
-} MemoryRange; /* i 0xC */
+#include "structs/memory.h"
 
 /* The built-in map: pairs of {last address, flags}, ranges follow each other. */
 typedef struct MemoryBoundaryInit {
@@ -18,7 +12,6 @@ typedef struct MemoryBoundaryInit {
 
 #define osMemSize (*(u32 *) 0x80000318)
 extern MemoryBoundaryInit D_800B7600[];
-extern MemoryRange D_80128130[];
 extern u8 D_80128880;
 extern u8 D_80128882;
 extern s32 func_002A12F0(void);
@@ -53,15 +46,15 @@ void func_002A2104(void) {
     }
     i = 0;
     do {
-        D_80128130[i].first = first;
-        D_80128130[i].last = *src++;
-        D_80128130[i].flags = *src++;
-        first = D_80128130[i].last + 1;
+        D_80128130[i].m_First = first;
+        D_80128130[i].m_Last = *src++;
+        D_80128130[i].m_Flags = *src++;
+        first = D_80128130[i].m_Last + 1;
         i++;
     } while (first != 0);
     for (; i < 16; i++) {
-        D_80128130[i].first = -1;
-        D_80128130[i].flags = 0;
+        D_80128130[i].m_First = -1;
+        D_80128130[i].m_Flags = 0;
     }
     func_002A1324(saved);
 }

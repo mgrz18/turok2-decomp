@@ -2,15 +2,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/IO/io_hostmemory.CPP, func_802010D8_de, with Turok 2's layouts. */
 
 #include "common.h"
+#include "structs/memory.h"
 
-/* One entry of the debugger's memory permission map. */
-typedef struct MemoryRange {
-    /* 0x0 */ u32 first;
-    /* 0x4 */ u32 last;
-    /* 0x8 */ u32 flags;
-} MemoryRange; /* size 0xC */
-
-extern MemoryRange D_80128130[48];
 extern u8 D_8F128560[];
 extern u32 func_002A1384(u32 address);
 extern void func_002A13F0(void);
@@ -36,15 +29,15 @@ void func_002A1DEC(u32 mode) {
     }
     while (remaining != 0) {
         i = 0;
-        while (address < D_80128130[i].first || address > D_80128130[i].last) {
+        while (address < D_80128130[i].m_First || address > D_80128130[i].m_Last) {
             i++;
         }
         if (i >= 48) {
             flags = 0;
             chunk = 0x1000 - (address & 0xFFF);
         } else {
-            flags = D_80128130[i].flags;
-            chunk = (D_80128130[i].last + 1) - address;
+            flags = D_80128130[i].m_Flags;
+            chunk = (D_80128130[i].m_Last + 1) - address;
         }
         if (remaining < chunk) {
             chunk = remaining;
