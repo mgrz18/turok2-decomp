@@ -22,11 +22,6 @@ typedef struct Actor {
     /* 0xA08 */ s16 character;      /* players */
 } Actor;
 
-/* The first 0x34 bytes of an actor, saved around a line-of-sight test. */
-typedef struct {
-    s32 w[13];
-} ActorHead;
-
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
     /* 0x10 */ f32 height;
@@ -83,7 +78,7 @@ s32 func_00239F00(Actor *a, CVector3 from, u8 *result);
  * attack and, with `checkSight`, can see. */
 Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
     Actor *list[128];
-    ActorHead saved;
+    CObjectHead saved;
     CVector3 eye;
     f32 range;
     f32 across;
@@ -189,7 +184,7 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                         }
                     }
                     if (checkSight) {
-                        saved = *(ActorHead *)t;
+                        saved = *(CObjectHead *)t;
                         t->pos.y = t->pos.y + func_002671B4(t);
                         t->pos.y = t->pos.y + t->eye;
                         eye = self->pos;
@@ -199,7 +194,7 @@ Actor *func_00243C90(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                         if ((Actor *)D_800F1CE0.m_pInstance == self) {
                             r = 0;
                         }
-                        *(ActorHead *)t = saved;
+                        *(CObjectHead *)t = saved;
                         if (r) {
                             goto next;
                         }
