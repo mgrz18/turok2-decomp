@@ -7,13 +7,15 @@
  *     both are libultra's Mtx (8-byte aligned in PR/gbi.h) lining up, so
  *     they are written out as _pad6 and _pad7 here (this Mtx is a plain
  *     byte array, which LibTEngine's CPlayerOverlay at 0x0C needs);
- *   - CMenuPool and CSkySystem are kept opaque at the sizes CCamera and
- *     CCameraPool leave for them.
+ *   - CSkySystem is kept opaque at the size CCamera leaves for it; CMenuPool
+ *     is structs/menu.h's MenuPool (m_Menus), also kept as bytes
+ *     (m_MenuPool) for the files that pass its address.
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
 #include "structs/game_object.h"
 #include "structs/gbi.h"
 #include "structs/list.h"
+#include "structs/menu.h"
 
 typedef struct {
     /* 0x00 */ CVector3 m_vNormal;
@@ -163,7 +165,10 @@ typedef struct CCamera {
     /* 0x536 */ u8 m_FlashColor[4];
     /* 0x53A */ u8 m_UnderWater;
     /* 0x53B */ u8 _pad5;
-    /* 0x53C */ u8 m_MenuPool[0x18];             /* CMenuPool */
+    /* 0x53C */ union {
+        u8 m_MenuPool[0x18];                   /* CMenuPool: passed by address to the menu code */
+        MenuPool m_Menus;                      /* the same, as structs/menu.h lays it out */
+    };
     /* 0x554 */ s32 _pad4;
     /* 0x558 */ u8 m_SkySystem[0x8D0];           /* CSkySystem */
     /* 0xE28 */ CList m_ActiveTextList;

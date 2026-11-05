@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FX/8026E5E0.CPP, func_8026E5E0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/player.h"
 
 /* Animation attachment events: for each attachment whose event bit is enabled
  * on the object, moves its offset through the bone matrix to world space and
@@ -28,11 +29,6 @@ typedef struct {
 } __attribute__((aligned(4))) PuffArgs;
 
 typedef struct {
-    /* 0x000 */ u8 pad0[0xA08];
-    /* 0xA08 */ s16 vehicle;
-} Owner;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x14];
     /* 0x014 */ s32 *def;
     /* 0x018 */ u8 pad18[0x174 - 0x18];
@@ -40,7 +36,7 @@ typedef struct {
     /* 0x175 */ u8 pad175[0x180 - 0x175];
     /* 0x180 */ f32 depth;
     /* 0x184 */ u8 pad184[0x1A8 - 0x184];
-    /* 0x1A8 */ Owner *owner;
+    /* 0x1A8 */ CPlayer *owner;
     /* 0x1AC */ u8 pad1AC[0x214 - 0x1AC];
     /* 0x214 */ CVector3 splashPos;
     /* 0x220 */ CVector3 facing;
@@ -94,7 +90,7 @@ void func_0026D710(Attachment *ents, s32 n, Mtx44 *mtxs, Object *obj, void *bone
             case 0x40:
                 obj->splashPos = pos;
                 kind = *obj->def;
-                if ((kind == 1 && obj->state == 0x21) || (kind == 0xB && obj->owner->vehicle == 0x23)) {
+                if ((kind == 1 && obj->state == 0x21) || (kind == 0xB && obj->owner->m_Mode == 0x23)) {
                     func_002688C8(obj, pos, &mapped, &region, 0, 1);
                     func_0020E810(&rot, &obj->facing);
                     zero.x = 0;

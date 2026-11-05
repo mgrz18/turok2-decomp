@@ -4,11 +4,6 @@
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x1A8];
-    /* 0x1A8 */ CPlayer *player;
-} Owner;
-
 extern f32 D_800AE350;
 
 extern s32 func_0024E700(CPlayer *player, s32 weapon);
@@ -16,8 +11,8 @@ extern s32 func_00243414(void *obj, CAI *state, s32 mode);
 
 /* Weapon state: sets the fire-rate scale D_800AE350 from the time held for
  * weapons 2-3 (and their 0x1294 ramp) and 12, then goes to state 7 or 5. */
-void func_002581C4(Owner *obj, CAI *state) {
-    CPlayer *player = obj->player;
+void func_002581C4(CGameObjectInstance *obj, CAI *state) {
+    CPlayer *player = (CPlayer *) obj->m_AI.m_pParent;
     f32 t;
     f32 scale;
 
