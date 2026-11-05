@@ -4,10 +4,6 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-typedef struct Mtx44 {
-    f32 m[4][4];
-} Mtx44;
-
 typedef struct ObjDef {
     u16 pad0;
     u16 flags;                  /* 0x02 */
@@ -31,15 +27,15 @@ void *func_00206950(void *pool, s32 count);
 f32 func_00267648(ShadowActor *actor, s32 arg1);    /* ground height */
 f32 func_00268304(ShadowActor *actor);              /* radius */
 void func_0020F510(CVector3 *v, f32 arg1);
-void func_00211114(void *rot, Mtx44 *m);
-void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);  /* scale */
-void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);  /* translate */
-void func_0020D274(Mtx44 *m, void *dst);
+void func_00211114(void *rot, CMtxF *m);
+void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);  /* scale */
+void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);  /* translate */
+void func_0020D274(CMtxF *m, void *dst);
 void func_002086BC(void *mtx, s32 arg1, s32 alpha);
 
 /* Draws the blob shadow under an actor. */
 void func_0021E03C(ShadowActor *actor, CVector3 *offset, s32 arg2) {
-    Mtx44 mtx;
+    CMtxF mtx;
     CVector3 pos;
     void *gmtx;
     s32 visible;

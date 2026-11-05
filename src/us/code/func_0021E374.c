@@ -8,10 +8,6 @@ typedef struct Box {
     s32 mask;                   /* 0x6C: parts it belongs to */
 } Box;                          /* 0x70 bytes */
 
-typedef struct Mtx44 {
-    f32 m[4][4];
-} Mtx44;                        /* 0x40 bytes */
-
 
 extern u8 D_8011AAF1;
 
@@ -19,8 +15,8 @@ void **func_0021F358(CGameObjectInstance *actor);
 void *func_002017D4(void *table, s32 index);
 void func_0020EEF8(CVector3 *dst, CVector3 *a, CVector3 *b);    /* add */
 void func_0020EF60(CVector3 *dst, CVector3 *src, f32 scale);
-void func_0020D908(Mtx44 *dst, Mtx44 *src);
-void func_0020F85C(Mtx44 *m, CVector3 *in, CVector3 *out);
+void func_0020D908(CMtxF *dst, CMtxF *src);
+void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);
 void func_0020EF2C(CVector3 *dst, CVector3 *a, CVector3 *b);    /* subtract */
 void func_002051F4(s32 arg0, void **handle);
 
@@ -28,10 +24,10 @@ void func_002051F4(s32 arg0, void **handle);
 s32 func_0021E374(CGameObjectInstance *actor, CVector3 pos, Box *out) {
     CVector3 center;
     CVector3 d;
-    Mtx44 mtx;
+    CMtxF mtx;
     void **handle;
     void *boxes;
-    Mtx44 *matrices;
+    CMtxF *matrices;
     Box *box;
     Box *best;
     s32 count;
@@ -40,9 +36,9 @@ s32 func_0021E374(CGameObjectInstance *actor, CVector3 pos, Box *out) {
     f32 dist;
     f32 bestDist;
 
-    matrices = ((Mtx44 *)actor->m_pmtDrawMtxs);
+    matrices = ((CMtxF *)actor->m_pmtDrawMtxs);
     if (matrices == NULL) {
-        matrices = ((Mtx44 *)actor->m_pmtLastFrameDrawMtxs);
+        matrices = ((CMtxF *)actor->m_pmtLastFrameDrawMtxs);
         if (matrices == NULL) {
             return 0;
         }

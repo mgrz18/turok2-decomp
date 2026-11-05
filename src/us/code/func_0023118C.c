@@ -11,8 +11,6 @@
  * The list walk is a goto loop and the built flag a local, as in the ROM: the
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
-typedef f32 Mtx4f[4][4];
-
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct {
@@ -31,7 +29,7 @@ typedef struct {
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x20C];
-    /* 0x20C */ Mtx4f viewMatrix;
+    /* 0x20C */ CMtxF viewMatrix;
 } Camera;
 
 extern Gfx *D_800D8E24;             /* display list head */
@@ -42,7 +40,7 @@ extern u8 D_800F7078[];
 extern u8 D_801102B8[];
 
 extern s32 func_0026F60C(void *planes, Box *box);
-extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);   /* transform point */
+extern void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
 extern void func_0022D2FC(CParticle *particle, void *mtx, Camera *camera, f32 depth);
 extern void func_002254C0(void *list, CVector3 *pos, void *out);
 extern void func_0020B9F4(void *model, void *mtx, void *mtx2, s32 a, s32 b);

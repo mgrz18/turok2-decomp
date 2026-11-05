@@ -802,10 +802,6 @@ f32 func_00449BB4(f32 t) {
 }
 
 typedef struct {
-    f32 m[4][4];
-} Mtx4f;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x28];
     /* 0x28 */ f32 yaw;
     /* 0x2C */ f32 pitch;
@@ -819,9 +815,9 @@ extern CCollisionResults D_800F1CE0;  /* the last collision test */
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 func_0044957C(f32 t); /* eye path */
 extern CVector3 func_00449724(f32 t); /* target path */
-extern void func_0020F79C(Mtx4f *m);                         /* identity */
-extern void func_0020FE00(Mtx4f *m, f32 x, f32 y, f32 z);    /* rotation */
-extern void func_0020F85C(Mtx4f *m, CVector3 *in, CVector3 *out);    /* transform */
+extern void func_0020F79C(CMtxF *m);                         /* identity */
+extern void func_0020FE00(CMtxF *m, f32 x, f32 y, f32 z);    /* rotation */
+extern void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);    /* transform */
 extern void func_002216DC(void *world);
 extern s32 func_00239F00(Actor *actor, CVector3 to, void *info);
 extern void func_00226724(void *world);
@@ -851,7 +847,7 @@ void func_00449CE8(Camera *cam) {
     CVector3 target;
     CVector3 dir;
     ActorHead saved;
-    Mtx4f mtx;
+    CMtxF mtx;
     CVector3 tmp;
     Actor *player;
     s32 hit;

@@ -4,8 +4,6 @@
 #include "common.h"
 #include "structs/vector.h"
 
-typedef struct { f32 m[4][4]; } Mtx44;
-
 typedef struct ProjNode {
     /* 0x0000 */ u8 pad0[4];
     /* 0x0004 */ CVector3 pos;
@@ -68,8 +66,8 @@ extern void func_0020F70C(CVector3 *v, f32 max);
 extern void func_0020F040(CVector3 *v);
 extern void func_0020E810(CQuaternion *out, CVector3 *dir);
 extern void func_0020DCC8(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b);
-extern void func_00211114(CQuaternion *q, Mtx44 *out);
-extern void func_0020F85C(Mtx44 *m, CVector3 *in, CVector3 *out);
+extern void func_00211114(CQuaternion *q, CMtxF *out);
+extern void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);
 extern void *func_00275F7C(void);
 extern ProjSound *func_00275C6C(void *pool, s32 id, CVector3 *pos, CVector3 *pos2, s32 arg4);
 extern void func_00232B40(Projectile *p);
@@ -116,7 +114,7 @@ void func_0022A4C8(Projectile *o) {
     CVector3 dir;
     CVector3 ax;
     CQuaternion q0, q1, q2;
-    Mtx44 mt;
+    CMtxF mt;
     ProjNode *p;
     ProjNode *p2;
     CVector3 *tpp;
