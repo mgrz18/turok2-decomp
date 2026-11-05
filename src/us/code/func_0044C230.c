@@ -1851,58 +1851,17 @@ void func_0044FDC0(s16 *arg0, MenuModel *arg1) {
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/80442BC8.CPP, func_80442D10_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-struct WidgetDescriptor;
-struct WidgetDescriptor {
-    short type;
-    short pad;
-    int flags;
-    unsigned short x;
-    unsigned short y;
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
-    int value;
-};
-struct ObjectRecAt478;
-struct ObjectRecAt478 {
-    char pad[0x328];
-    s32 flag;
-};
-struct ObjectRecAt478;
-struct WidgetDescriptor;
-struct CMenuItem_t;
-struct CMenuItem_t {
-    int id;
-    unsigned short type;
-    unsigned short pad;
-    int flags;
-    unsigned short x;
-    unsigned short y;
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-    unsigned char a;
-    int value;
-    struct WidgetDescriptor *desc;
-    int index;
-    void *extra;
-    int m_pMenu;
-};
-struct WidgetDescriptor;
-typedef struct WidgetDescriptor WidgetDescriptor;
-struct CMenuItem_t;
-typedef struct CMenuItem_t CMenuItem;
-extern void func_0044FDDC(CMenuItem *w, WidgetDescriptor *d, char **arena, int id, int arg);
-void func_0044FDDC(CMenuItem *w, WidgetDescriptor *d, char **arena, int id, int arg) {
+/* Makes item id of a window from its desc entry (what func_0044DEA8 does inline). */
+extern void func_0044FDDC(MenuItem *w, MenuItemDesc *d, char **arena, int id, int arg);
+void func_0044FDDC(MenuItem *w, MenuItemDesc *d, char **arena, int id, int arg) {
  int size; char *extra;
- w->id=id; w->type=d->type; w->flags=d->flags|0x1800000;
- w->x=d->x; w->y=d->y; w->r=d->r; w->g=d->g; w->b=d->b; w->a=d->a;
- w->value=d->value; w->desc=d; w->index=-1; w->m_pMenu=arg;
+ w->index=id; w->type=d->type; w->flags=d->flags|0x1800000;
+ w->x=d->x; w->y=d->y; w->link[0]=d->link[0]; w->link[1]=d->link[1]; w->link[2]=d->link[2]; w->link[3]=d->link[3];
+ w->data=d->data; w->def=d; w->value=-1; w->menu=(Menu *)arg;
  size=0; if(d->type==3) size=0x330;
  if(size) {
  w->extra=*arena;
- extra=*arena; if(d->type==3) ((struct ObjectRecAt478 *)(extra))->flag=1;
+ extra=*arena; if(d->type==3) ((MenuModel *)(extra))->loaded=1;
  { int step=0; if(d->type==3) step=0x330;
  *arena+=step; }
  }
@@ -1912,8 +1871,8 @@ void func_0044FDDC(CMenuItem *w, WidgetDescriptor *d, char **arena, int id, int 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80442A58_de.c, func_80442DDC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern char D_800C1BD4_416EA8[] __asm__("D_800C1BD4");
-void *func_0044FEA8(ObjRecAt8V4 *arg0) {
+/* The item's text style (MenuTextStyle). */
+void *func_0044FEA8(MenuItem *arg0) {
  s32 index=0;
  switch(arg0->flags & 0x3fe0) {
  case 0x20: break;
@@ -1927,15 +1886,16 @@ void *func_0044FEA8(ObjRecAt8V4 *arg0) {
  case 0x2000: index=8; break;
  default: index=0; break;
  }
- return D_800C1BD4_416EA8+index*28;
+ return &D_800C1BD4[index];
 }
 
 /* ---------------- func_0044FF8C ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80442EC0_de.c, func_80442EC0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-f32 func_0044FF8C(ItemRecAt14 *arg0) {
- Binding *v = arg0->binding;
+/* A type-5 item's value, as a float (MenuItem_GetValue). */
+f32 func_0044FF8C(MenuItem *arg0) {
+ MenuBinding *v = arg0->binding;
  void *p = v->storage();
  switch(v->type) {
  default: return 0.0f;
@@ -1953,9 +1913,10 @@ f32 func_0044FF8C(ItemRecAt14 *arg0) {
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80442FB0_de.c, func_80442FB0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-void func_0045007C(ItemRecAt14 *item,float value) {
+/* Sets a type-5 item's value (func_0044C3A4's bindingSet). */
+void func_0045007C(MenuItem *item,float value) {
  float *storage;
- struct Binding *binding;
+ MenuBinding *binding;
  unsigned int *word;
  binding=item->binding;
  storage=binding->storage();
@@ -1986,8 +1947,12 @@ void func_004501D0(s32 arg0, s32 arg1, s32 arg2) {
 
 
 
+/* The instance's lights (CGameObjectInstance m_Lights, a Lights1 per frame
+ * buffer), copied as words. */
 typedef struct { u32 w[6]; } O06Seg;
-typedef struct { u8 pad[0x110]; O06Seg seg[1]; } O06A_4171F4; /* seg at 0x110 in Turok 2 (0x140 in Rage Wars) */
+/* The instance seen with its m_Lights as words: indexing m_Lights itself
+ * swaps an addu's operands. */
+typedef struct { u8 pad[0x110]; O06Seg seg[2]; } O06A_4171F4; /* seg at 0x110 in Turok 2 (0x140 in Rage Wars) */
 typedef struct { f32 f0; s32 unk4; s32 unk8; f32 fC; s32 unk10; } O06Cam;
 extern s32 D_800AB8B0;
 extern O06Cam D_800AB8B4[];
@@ -1995,9 +1960,11 @@ extern O06Seg D_800AB0E8_4171F4 __asm__("D_800AB0E8");
 extern s32 D_800B6D1C;
 extern s32 D_801308E0;
 extern void func_0021D928(void *a, s32 b, s32 c);
-void func_004501F4(O06A_4171F4 *a, s32 b, s32 c) {
+/* The selected model item's draw callback (func_0044D938): drawn with the
+ * lights of D_800AB0E8 and a fade by D_801308E0. */
+void func_004501F4(CGameObjectInstance *a, s32 b, s32 c) {
  D_800AB8B0 = 3;
- a->seg[D_800B6D1C] = D_800AB0E8_4171F4;
+ ((O06A_4171F4 *) a)->seg[D_800B6D1C] = D_800AB0E8_4171F4;
  D_800AB8B4->f0 = 255.0f;
  D_800AB8B4->unk4 = 0;
  D_800AB8B4->unk8 = 0;
@@ -2027,38 +1994,18 @@ void func_004502B0(Menu *arg0) {
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 
-struct func_8025E5B0_S1;
-struct func_8025E5B0_S1 {
-    char pad0[0x14];
-    short unk14;
-};
-struct Entry_func_80441EB0_de;
-struct Entry_func_80441EB0_de {
-    s16 type;
-    char pad[0x22];
-};
-struct Entry_func_80441EB0_de;
-struct Dialog;
-struct Dialog {
-    struct Entry_func_80441EB0_de *entries;
-    s16 count;
-    char pad6[0x1A];
-    signed int value;
-};
-struct func_8025E5B0_S1;
-typedef struct func_8025E5B0_S1 func_8025E5B0_S1;
-struct Entry_func_80441EB0_de;
-extern void func_00414EA8_4172F8(void *, void **, struct Dialog *, s32, s32, s32, s32, struct func_8025E5B0_S1 *) __asm__("func_0044DEA8");
+extern void func_00414EA8_4172F8(void *, void **, MenuDesc *, s32, s32, s32, s32, MenuPool *) __asm__("func_0044DEA8");
 void CList__AddHead_4172F8(void *list, void *node) __asm__("CList__AddHead");
 extern void **func_00204EDC_4172F8(s32, s32, s32, char *) __asm__("func_00204EDC");
-void *func_004502F8(struct func_8025E5B0_S1 *owner, struct Dialog *list, s32 a, s32 b, s32 c, s32 d) {
+/* Opens the window described by list in the pool owner. */
+void *func_004502F8(MenuPool *owner, MenuDesc *list, s32 a, s32 b, s32 c, s32 d) {
     s32 size = list->count * 40 + 0x1D8;
     s32 i;
     void **block;
     void *first;
     for (i = 0; i < list->count; i++) {
         s32 extra = 0;
-        if (list->entries[i].type == 3) {
+        if (list->items[i].type == 3) {
             extra = 0x330; /* 0x480 in Rage Wars */
         }
         size += extra;
@@ -2073,8 +2020,8 @@ void *func_004502F8(struct func_8025E5B0_S1 *owner, struct Dialog *list, s32 a, 
     }
     func_00414EA8_4172F8(first, block, list, a, b, c, d, owner);
     CList__AddHead_4172F8(owner, first);
-    if (++owner->unk14 >= 4) {
-        owner->unk14 = 0;
+    if (++owner->opened >= 4) {
+        owner->opened = 0;
     }
     return first;
 }
