@@ -246,4 +246,21 @@ typedef struct {
     /* 0x44 */ CAITarget m_Path;
 } CAITargets; /* size 0x88 */
 
+/* How far an AI's actor moved since the last frame (func_0024599C: the
+ * position against CAI's m_vPosLastFrame, the facing against
+ * m_RotYLastFrame): the offset, its direction and length, in 3D and
+ * flattened, and the turn. The steering callbacks (func_00260634...
+ * func_00261FB0) fill one on the stack and hand it to func_00260730 /
+ * func_00260D60 with the CAITargets. */
+typedef struct {
+    /* 0x00 */ CVector3 m_vDelta;
+    /* 0x0C */ CVector3 m_vDir;
+    /* 0x18 */ f32 m_Dist;
+    /* 0x1C */ CVector3 m_vFlatDelta;
+    /* 0x28 */ CVector3 m_vFlatDir;
+    /* 0x34 */ f32 m_FlatDist;
+    /* 0x38 */ f32 m_Turn;
+    /* 0x3C */ u8 pad3C[4];
+} CAIFrameMotion; /* size 0x40 */
+
 #endif

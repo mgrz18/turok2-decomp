@@ -2,12 +2,6 @@
 #include "structs/game_object.h"
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x18];
-    /* 0x18 */ f32 pitchRate;
-    /* 0x1C */ u8 pad1C[0x40 - 0x1C];
-} Steer;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x40];
     /* 0x40 */ f32 biteRange;
     /* 0x44 */ u8 pad44[0x4E - 0x44];
@@ -27,7 +21,7 @@ typedef struct {
 } Self;
 
 void func_00246108(Self *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
-void func_0024599C(Self *self, CAI *ai, Steer *out);
+void func_0024599C(Self *self, CAI *ai, CAIFrameMotion *out);
 f32 func_002974C0(f32 x);
 f32 func_00211774(f32 cur, f32 target, f32 rate);
 f32 func_0026872C(Self *self, s32 arg1);
@@ -38,7 +32,7 @@ void func_00243414(Self *self, CAI *ai, s32 mode);
 
 void func_002616B8(Self *self, CAI *ai) {
     CAITargets t;
-    Steer steer;
+    CAIFrameMotion steer;
     Params *params;
     CAITargets *tp;
     f32 speed;
@@ -80,7 +74,7 @@ void func_002616B8(Self *self, CAI *ai) {
     ai->m_vLeashPos.y = func_00211774(ai->m_vLeashPos.y, y, 5.12f);
 
     tp = &t;
-    self->pitch = func_0021160C(self->pitch, tp->m_Path.m_vDelta.y, steer.pitchRate * 2.0f);
+    self->pitch = func_0021160C(self->pitch, tp->m_Path.m_vDelta.y, steer.m_Dist * 2.0f);
     if (self->pitch > 81.92f) {
         self->pitch = 81.92f;
     } else if (self->pitch < -81.92f) {
