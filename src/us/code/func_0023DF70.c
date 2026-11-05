@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "structs/rect.h"
 
 typedef struct HitDef {
     /* 0x00 */ s32 kind;
@@ -19,13 +20,6 @@ typedef struct HitInst {
     /* 0x30 */ struct HitInst *standingOn;
 } HitInst;
 
-typedef struct Rect {
-    /* 0x0 */ f32 minX;
-    /* 0x4 */ f32 minZ;
-    /* 0x8 */ f32 maxX;
-    /* 0xC */ f32 maxZ;
-} Rect;
-
 extern CCollisionResults *D_800F1ADC;
 
 f32 func_002671B4(HitInst *inst);
@@ -43,7 +37,7 @@ void func_00242604(Sweep *sweep, HitInst *other);
 /* Sweep an instance's volume (box) against another instance's cylinder:
  * its top and bottom discs when the box asks for it, then its side. */
 void func_0023DF70(Sweep *sweep, SweepBox *box, HitInst *other) {
-    Rect rect;
+    CRect rect;
     CVector3 hit;
     CVector3 normal;
     f32 x;

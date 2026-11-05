@@ -6,6 +6,7 @@
 #include "gfx.h"
 #include "structs/world.h"
 #include "structs/camera.h"
+#include "structs/rect.h"
 
 /* Draws the level geometry seen by one view: every static object and level
  * actor of the grid regions inside the view's box that is shown in this view
@@ -61,11 +62,6 @@ typedef struct {
     u8 pad194[4];
 } Actor;                    /* 0x198 */
 
-typedef struct {
-    f32 minX, minZ;         /* 0x0 */
-    f32 maxX, maxZ;         /* 0x8 */
-} Cell;
-
 extern u8 D_8011AAF1;       /* D_8011AAD8.multiplayer */
 extern s32 D_800B6D20;
 
@@ -99,7 +95,7 @@ void func_002222E0(CWorld *w, CCamera *v_) {
     Table *t;
     CWorldSector *regions;
     CWorldSector *region;
-    Cell *cell;
+    CRect *cell;
     Object *a;
     Actor *p;
     Actor *actors;

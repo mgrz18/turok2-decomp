@@ -4,6 +4,7 @@
 #include "gfx.h"
 #include "structs/world.h"
 #include "structs/camera.h"
+#include "structs/rect.h"
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level
@@ -50,11 +51,6 @@ typedef struct {
     u8 pad194[4];
 } Actor;                    /* 0x198 */
 
-typedef struct {
-    f32 minX, minZ;         /* 0x0 */
-    f32 maxX, maxZ;         /* 0x8 */
-} Cell;
-
 /* D_8011AAD8 (structs/game.h) seen from its difficulty, D_8011AAE0: the
  * ROM bases the CGame and camera-pool reads below on this symbol, and with
  * D_8011AAD8 / D_80119870 the code no longer matches. */
@@ -84,7 +80,7 @@ void func_00221D3C(CWorld *w) {
     CCamera *v;
     CWorldSector *regions;
     CWorldSector *region;
-    Cell *cell;
+    CRect *cell;
     void *grp;
     Table *t;
     Object *o;
