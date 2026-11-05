@@ -1,6 +1,7 @@
 /* do { } while (0) blocks around the region setup and the second table lookup raise those pseudos' priority (GCC weights refs by loop depth) without a scheduling barrier at the call's argument moves; RW-shaped object loop (off = k), do/while loops with explicit k = 0 before the count load. */
 /* Loop shapes after thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/table.h"
 #include "gfx.h"
 #include "structs/world.h"
 #include "structs/level_actor.h"
@@ -13,12 +14,6 @@
  * translucent, queued on the world's sorted list (0x1064, drawn later by
  * func_0022077C). The list is built in place behind a branch command that
  * jumps over it, and later views just call it (0xDE000000). */
-
-typedef struct {
-    s32 stride;             /* 0x00 */
-    s32 count;              /* 0x04 */
-    u8 entries[1];          /* 0x08 */
-} Table;
 
 /* D_8011AAD8 (structs/game.h) seen from its difficulty, D_8011AAE0: the
  * ROM bases the CGame and camera-pool reads below on this symbol, and with
@@ -51,7 +46,7 @@ void func_00221D3C(CWorld *w) {
     CWorldSector *region;
     CRect *cell;
     void *grp;
-    Table *t;
+    StrideTable *t;
     CStaticObject *o;
     CLevelActor *actors;
     CLevelActor *a;

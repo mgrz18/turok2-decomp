@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028795C.c, func_0028795C, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/table.h"
 #include "structs/world.h"
 #include "structs/level_actor.h"
 
@@ -15,20 +16,9 @@
  * counters and record pointers get $s0-$s2 (m before qpd, as in the ROM). */
 
 typedef struct {
-    s32 unk0;               /* 0x00 */
-    s32 count;              /* 0x04 */
-    u8 entries[1];          /* 0x08 */
-} Table;
-
-typedef struct {
     s32 count;              /* 0x00: sections so far */
     s32 offsets[5];         /* 0x04 */
 } Block;
-
-typedef struct {
-    s32 stride;             /* 0x00 */
-    s32 count;              /* 0x04 */
-} Section;
 
 typedef struct { u8 pad0[8]; u16 type; u8 padA[0x12]; } SrcA;          /* 0x1C */
 typedef struct { u8 pad0[0x28]; u16 type; u8 pad2A[0xA]; } SrcB;       /* 0x34 */
@@ -43,7 +33,7 @@ void func_00201818(void *, s32);
 s32 func_00201848(s32 *, s32, u16);
 void **func_00205D7C(s32, s32 ***, s32);
 void func_002057B0(s32, s32 ***, void **);
-void func_0020192C(Table *, void *, s32);
+void func_0020192C(StrideTable *, void *, s32);
 void func_002141F0(ItemA *, SrcA *, s32, void *, f32);
 void func_00214564(ItemA *, SrcB *, s32, void *);
 void func_002150C0(CLevelActor *, SrcC *, s32, void *);
@@ -52,17 +42,17 @@ f32 func_002671B4(CLevelActor *);
 void func_00222A9C(void **, s32, f32 *, void *);
 
 void func_00220D00(CWorld *world, s32 ***file) {
-    Table *tE;
+    StrideTable *tE;
     void *links[128];
     void **pp;
     f32 pos[3];
-    Table *tA;
-    Table *tB;
-    Table *tC;
-    Table *tD;
+    StrideTable *tA;
+    StrideTable *tB;
+    StrideTable *tC;
+    StrideTable *tD;
     u8 *base;
-    Table *tAux;
-    Table *bits;
+    StrideTable *tAux;
+    StrideTable *bits;
     s32 nA;
     s32 nB;
     s32 nC;
@@ -132,8 +122,8 @@ void func_00220D00(CWorld *world, s32 ***file) {
             func_0020192C(tA, sec, 1);
             func_0020192C(tB, sec, 1);
             nv = tA->entries;
-            ((Section *)sec)->stride = 0x90;
-            ((Section *)sec)->count = n;
+            ((StrideTable *)sec)->stride = 0x90;
+            ((StrideTable *)sec)->count = n;
             tAux = func_002017D4(world->m_pRegionData, 2);
             pB = (SrcB *)tB->entries;
             itemsA = (ItemA *)((u8 *)block + 0x20);
@@ -162,8 +152,8 @@ void func_00220D00(CWorld *world, s32 ***file) {
             secC = base + off;
             block->offsets[block->count] = off;
             func_0020192C(tC, secC, 1);
-            ((Section *)secC)->stride = 0x198;
-            ((Section *)secC)->count = nC;
+            ((StrideTable *)secC)->stride = 0x198;
+            ((StrideTable *)secC)->count = nC;
             actors = (CLevelActor *)(secC + 8);
             pC = (SrcC *)tC->entries;
             k = 0;
@@ -191,9 +181,9 @@ void func_00220D00(CWorld *world, s32 ***file) {
             secD = base + off;
             block->offsets[block->count] = off;
             func_0020192C(tD, secD, 1);
-            ((Section *)secD)->stride = 0xC0;
+            ((StrideTable *)secD)->stride = 0xC0;
             m = 0;
-            ((Section *)secD)->count = nD;
+            ((StrideTable *)secD)->count = nD;
             pD = (SrcD *)tD->entries;
             itemsD = (ItemD *)(secD + 8);
             if (nD > 0) {

@@ -1,27 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/boss.h"
 
 /* Module update: ticks every slot, then (outside cinematics) counts the two phase timers: the first spawns
  * one actor at a random spot around the origin, the second starts a burst of spawns at the phase points. */
-
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ u8 data[0x68 - 0x4];
-} Slot;
-
-typedef struct {
-    /* 0x000 */ void *obj;
-    /* 0x004 */ s32 count;
-    /* 0x008 */ void *actors[4];
-    /* 0x018 */ Slot slots[15];
-    /* 0x630 */ u8 pad630[0x65C - 0x630];
-    /* 0x65C */ s32 phase;
-    /* 0x660 */ u8 pad660[0x680 - 0x660];
-    /* 0x680 */ s32 spawnTimer;
-    /* 0x684 */ s32 burstTimer;
-    /* 0x688 */ s32 minRadius;
-    /* 0x68C */ s32 maxRadius;
-} State;
 
 extern s32 D_801301F8; /* D_8012FB70.minRadius */
 extern s32 D_801301FC; /* D_8012FB70.maxRadius */
@@ -56,7 +38,7 @@ static __inline__ void SpawnAt(s32 delay, s16 type, CVector3 pos, f32 speed) {
     }
 }
 
-void func_00442784(State *state) {
+void func_00442784(MotherBossState *state) {
     CVector3 v;
     s32 i;
     s32 spawn = 0;
@@ -69,38 +51,38 @@ void func_00442784(State *state) {
     f32 angle;
 
     for (i = 0; i < 15; i++) {
-        func_00235510(state->slots[i].data);
+        func_00235510(&state->slots[i].anim);
     }
     if (Cinema_PathPlaying()) {
         return;
     }
-    state->spawnTimer++;
-    state->burstTimer++;
+    state->pickupTimer++;
+    state->dropTimer++;
     switch (state->phase) {
         case 1:
-            if (state->spawnTimer >= 76) {
+            if (state->pickupTimer >= 76) {
                 spawn = 1;
                 delay = 600;
             }
-            if (state->burstTimer >= 526) {
+            if (state->dropTimer >= 526) {
                 burst = 1;
                 points = D_00431CE4;
                 count = 330;
             }
             break;
         case 2:
-            if (state->spawnTimer >= 151) {
+            if (state->pickupTimer >= 151) {
                 spawn = 1;
                 delay = 450;
             }
-            if (state->burstTimer >= 526) {
+            if (state->dropTimer >= 526) {
                 burst = 1;
                 points = D_00431CF0;
                 count = 330;
             }
             break;
         case 0:
-            if (state->spawnTimer >= 151) {
+            if (state->pickupTimer >= 151) {
                 spawn = 1;
                 delay = 450;
             }
@@ -110,7 +92,7 @@ void func_00442784(State *state) {
         return;
     }
     if (spawn) {
-        state->spawnTimer = 0;
+        state->pickupTimer = 0;
         type = (s16)func_0026D518(D_00431CB4);
         r = func_002119FC(D_801301F8, D_801301FC);
         angle = func_002119FC(-3.1415927f, 3.1415927f);
@@ -120,7 +102,7 @@ void func_00442784(State *state) {
         SpawnAt(delay, type, v, 512.0f);
     }
     if (points != NULL && burst) {
-        state->burstTimer = 0;
+        state->dropTimer = 0;
         func_00409500(count, points);
     }
 }

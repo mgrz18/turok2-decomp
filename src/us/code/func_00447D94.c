@@ -1,19 +1,12 @@
 #include "common.h"
+#include "structs/boss.h"
 
-typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 unk4;
-    /* 0x08 */ s32 unk8;
-    /* 0x0C */ s32 unkC;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ s32 unk14;
-} Slot;
-
-void func_00447D94(Slot *arg0, s32 arg1, s32 arg2) {
-    arg0->unk0 = arg1;
-    arg0->unk4 = 0;
-    arg0->unk8 = arg2;
-    arg0->unkC = 0;
-    arg0->unk10 = 0;
-    arg0->unk14 = 0;
+/* Starts a Blind One mover on a sequence of masks, one every interval frames. */
+void func_00447D94(BlindOneMover *mover, s32 *seq, f32 interval) {
+    mover->seq = seq;
+    mover->pos = 0;
+    mover->interval = interval;
+    mover->timer = 0;
+    mover->step = 0;
+    mover->offset = 0;
 }

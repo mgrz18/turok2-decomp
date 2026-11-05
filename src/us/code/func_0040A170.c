@@ -1,12 +1,8 @@
 #include "common.h"
+#include "structs/pick.h"
 #include "structs/game_object.h"
 
 /* Picks the module object's idle anim for the current phase (0, 1; none in phase 2) from the AI's flags. */
-
-typedef struct {
-    s16 id;
-    s16 weight;
-} Pick;
 
 extern s32 D_801301CC; /* module state +0x65C: phase */
 extern s16 func_0026D518(Pick *table);

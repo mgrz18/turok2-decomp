@@ -1,11 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ u16 id;
-    /* 0x0E */ u8 flags;
-} SoundDef;
+#include "structs/event.h"
 
 typedef struct {
     /* 0x00 */ u8 links[8];
@@ -25,7 +20,7 @@ s32 func_0026DFB0(s32);
 
 f32 func_0026D210(u16);                             /* extern */
 
-void func_00225354(VoiceOwner *arg0, SoundDef *arg1) {
+void func_00225354(VoiceOwner *arg0, LevelEvent *arg1) {
     f32 temp_f0;
     Voice *var_s0;
 
@@ -39,7 +34,7 @@ void func_00225354(VoiceOwner *arg0, SoundDef *arg1) {
         func_0026DFB0(var_s0->def);
         var_s0->def = (s32) arg1;
     }
-    temp_f0 = func_0026D210(arg1->id);
+    temp_f0 = func_0026D210(arg1->delay);
     var_s0->length = temp_f0;
     if (arg1->flags & 2) {
         var_s0->length = (f32) (temp_f0 * 15.0f);

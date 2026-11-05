@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
@@ -9,16 +10,6 @@
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
  * if it is unlocked), kind 1 a particle effect, kind 2 a pickup picked at
  * random from the weapon/ammo/item tables the definition enables. */
-
-typedef struct {
-    s16 id;
-    s16 weight;
-} Pick;
-
-typedef struct {
-    s16 count;
-    Pick entries[0x18];
-} PickTable;
 
 extern s32 D_8011001C;
 extern Pick D_800B1EE0[];

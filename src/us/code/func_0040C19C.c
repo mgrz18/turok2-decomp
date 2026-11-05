@@ -5,13 +5,7 @@
 /* Picks one of the four spawn points at random, at least 460.8 away from the module object's target (when
  * it has one), and stores it in out. */
 
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ u8 padC[0x14 - 0xC];
-} SpawnPoint;
 
-
-extern SpawnPoint D_00431D20[4];
 extern f32 func_0040BD60(void *obj, CGameObjectInstance **found);
 extern f32 func_002119FC(f32 min, f32 max);
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */

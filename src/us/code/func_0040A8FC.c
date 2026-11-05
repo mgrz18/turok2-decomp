@@ -1,17 +1,13 @@
 /* FAKEMATCH: identical if/else arms in fewerActorsThan's counting loop (as in func_0040C4F4); the plain
  * loop shifts its registers by one. */
 #include "common.h"
+#include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target (or while anim 0x17 runs its first
  * 100 steps) 0x1A/0x1B; otherwise 0x18 after a long 0x17, and from afar 0x19 (when fewer than 2 actors are
  * in the D_8010FEB4 list), 0x1D and 0x17 weighted by the module's timer ratio. */
-
-typedef struct {
-    s16 id;
-    s16 weight;
-} Pick;
 
 extern CListedInstance *D_8010FEB4;
 extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);

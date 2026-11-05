@@ -1,15 +1,11 @@
 #include "common.h"
+#include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/level_actor.h"
 
 /* Spawns a pickup picked from a weighted table at a random point around the origin (func_0040C110 and
  * func_0040C2C4 inlined). */
-
-typedef struct {
-    s16 id;
-    s16 weight;
-} Pick;
 
 extern u8 D_800F7078[];
 extern u8 D_80107590[];
