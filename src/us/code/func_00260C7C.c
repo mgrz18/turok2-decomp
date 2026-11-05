@@ -1,13 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-typedef struct {
-    f32 m[4][4];
-} Mtx44;
-
 s32 func_002451AC(CGameObjectInstance *self, CAI *ai, void *target, f32 angle);
-void func_002105A4(Mtx44 *mtx, f32 angle);
-void func_0020F85C(Mtx44 *mtx, CVector3 *in, CVector3 *out);
+void func_002105A4(CMtxF *mtx, f32 angle);
+void func_0020F85C(CMtxF *mtx, CVector3 *in, CVector3 *out);
 void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 
 /* AI callback: with a target, pushes the actor sideways (by its yaw) by the
@@ -15,7 +11,7 @@ void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
 void func_00260C7C(CGameObjectInstance *self, CAI *ai) {
     CVector3 push;
     CVector3 dir;
-    Mtx44 mtx;
+    CMtxF mtx;
     s32 side;
 
     if (ai->m_pSightTarget == NULL) {

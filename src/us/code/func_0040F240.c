@@ -784,19 +784,15 @@ f32 func_00410BB4(f32 t) {
     return key[-1].first * (1.0f - u) + key->first * u;
 }
 
-typedef struct {
-    f32 m[4][4];
-} Mtx4f;
-
 extern u8 D_800F1B40[];   /* collision info */
 extern CCollisionResults D_800F1CE0;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 func_0041057C(f32 t); /* eye path */
 extern CVector3 func_00410724(f32 t); /* target path */
-extern void func_0020F79C(Mtx4f *m);                         /* identity */
-extern void func_0020FE00(Mtx4f *m, f32 x, f32 y, f32 z);    /* rotation */
-extern void func_0020F85C(Mtx4f *m, CVector3 *in, CVector3 *out);    /* transform */
+extern void func_0020F79C(CMtxF *m);                         /* identity */
+extern void func_0020FE00(CMtxF *m, f32 x, f32 y, f32 z);    /* rotation */
+extern void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);    /* transform */
 extern void func_002216DC(void *world);
 extern s32 func_00239F00(CGameObjectInstance *actor, CVector3 to, void *info);
 extern void func_00226724(void *world);
@@ -826,7 +822,7 @@ void func_00410CE8(CCamera *cam) {
     CVector3 target;
     CVector3 dir;
     CObjectHead saved;
-    Mtx4f mtx;
+    CMtxF mtx;
     CVector3 tmp;
     CGameObjectInstance *player;
     s32 hit;

@@ -2,17 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
-
-/* Pickup effect descriptor. */
-typedef struct PickupEntry {
-    void *resource; /* 0x00 */
-    char pad4[2];
-    s16 sound;      /* 0x06 */
-    s16 callback;   /* 0x08 */
-    char padA[2];
-    s32 amount;     /* 0x0C */
-    s32 max;        /* 0x10 */
-} PickupEntry;
+#include "structs/pickup.h"
 
 extern u8 D_8011AAF1;
 
@@ -39,7 +29,7 @@ static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 soun
 
 /* Health pickup: add the entry's amount, up to its cap (in multiplayer, up
  * to the player's own maximum). */
-s32 func_0023F3E4(CPlayer *player, PickupEntry *entry) {
+s32 func_0023F3E4(CPlayer *player, CPickupEntry *entry) {
     void *resource;
     s32 sound;
     s32 callback;
@@ -47,10 +37,10 @@ s32 func_0023F3E4(CPlayer *player, PickupEntry *entry) {
     s32 max;
     u32 limit;
 
-    max = entry->max << 8;
+    max = entry->m_Params.m_Health.m_Max << 8;
     result = 0;
     if (player->m_Data.m_Health < max) {
-        player->m_Data.m_Health += entry->amount << 8;
+        player->m_Data.m_Health += entry->m_Params.m_Health.m_Amount << 8;
         do { /* a block boundary keeps the flag load after the store */
             if (D_8011AAF1) {
                 limit = player->m_CharacterActor.header.m_pIntelligence->m_Player.m_StartHealth << 8;
@@ -62,9 +52,9 @@ s32 func_0023F3E4(CPlayer *player, PickupEntry *entry) {
         result = 1;
     }
     if (result != 0) {
-        sound = entry->sound;
-        callback = entry->callback;
-        resource = entry->resource;
+        sound = entry->m_Sound;
+        callback = entry->m_Callback;
+        resource = entry->m_pMessage;
         pickup_feedback(player, resource, sound, callback);
     }
     return result;

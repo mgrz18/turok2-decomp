@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "structs/model.h"
 
 /* Draws a weapon actor: its muzzle child (copying the parent's render block), then the model. */
 
@@ -20,22 +21,16 @@ typedef struct {
     /* 0x234 */ void *drawHook;
 } WeaponActor;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ s32 camera;
-    /* 0x0C */ s32 *hit;
-} DrawArgs;
-
 extern u8 D_8011AAF1; /* multiplayer */
 extern s32 D_800B6D1C;
 
 extern s32 func_00416AF8(void *arg0);
 extern void func_0025C018(WeaponActor *actor, void *ai);
 extern s32 func_0021D7BC(s32, s32, s32);
-extern void func_0021D39C(WeaponActor *actor, s32 camera);
-extern void func_0020B6A0(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
+extern void func_0021D39C(WeaponActor *actor, struct CCamera *camera);
+extern void func_0020B6A0(s32 arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 
-void func_0025883C(WeaponActor *obj, CAI *state, DrawArgs *args) {
+void func_0025883C(WeaponActor *obj, CAI *state, CDrawArgs *args) {
     CPlayer *player = obj->owner;
     WeaponActor *muzzle;
     s32 arg6 = -1;
@@ -48,11 +43,11 @@ void func_0025883C(WeaponActor *obj, CAI *state, DrawArgs *args) {
         func_0025C018(muzzle, (u8 *)muzzle + 0x140);
         muzzle->render = obj->render;
         muzzle->drawHook = func_0021D7BC;
-        func_0021D39C(muzzle, args->camera);
+        func_0021D39C(muzzle, args->m_pCamera);
         muzzle->drawHook = NULL;
     }
     if (player->m_Data.m_CurrentWeapon == 0x15) {
         arg6 = state->m_Weapon.m_nPass;
     }
-    func_0020B6A0(args->hit, obj->model, 1, obj->slots[D_800B6D1C], 0, state->m_Weapon.m_nLod, arg6);
+    func_0020B6A0(args->m_hModel, obj->model, 1, obj->slots[D_800B6D1C], 0, state->m_Weapon.m_nLod, arg6);
 }

@@ -7,19 +7,17 @@
  * parent's skeleton (or the parent's position) and/or through its owner's
  * transform; returns the resulting position and heading. */
 
-typedef f32 Mtx4f[4][4];
-
 typedef struct {
     /* 0x000 */ u8 pad0[0x14C];
-    /* 0x14C */ Mtx4f transform;
+    /* 0x14C */ CMtxF transform;
 } PlayerView;
 
-extern void func_0020D908(Mtx4f out, void *in);              /* unpack a bone matrix */
-extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);   /* transform point */
-extern void func_0020FAFC(Mtx4f m, CVector3 *in, CVector3 *out);   /* transform direction */
+extern void func_0020D908(CMtxF out, void *in);              /* unpack a bone matrix */
+extern void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
+extern void func_0020FAFC(CMtxF m, CVector3 *in, CVector3 *out);   /* transform direction */
 
 void func_0022D09C(CParticle *actor, CVector3 *outPosition, CVector3 *outHeading) {
-    Mtx4f matrix;
+    CMtxF matrix;
     CVector3 position;
     CVector3 heading;
     CGameObjectInstance *link;

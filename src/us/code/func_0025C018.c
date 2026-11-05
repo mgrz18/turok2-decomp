@@ -5,28 +5,26 @@
 /* AI matrix callback: builds the actors world matrix from the AIs look
  * angles, its yaw about Y, its rotation, scale and position. */
 
-typedef struct { f32 m[4][4]; } Mtx44;
-
 extern f32 D_800DD78C;
 extern s32 D_8011AAD8;
 
 extern void func_0025FEB0(CGameObjectInstance *actor, CAI *ai);
 extern f32 func_0021170C(f32 angle, f32 step);
-extern void func_00210630(Mtx44 *m, f32 angle);
-extern void func_00210790(Mtx44 *m, f32 angle);
+extern void func_00210630(CMtxF *m, f32 angle);
+extern void func_00210790(CMtxF *m, f32 angle);
 extern f32 func_002982F0(f32 x);
 extern f32 func_002974C0(f32 x);
 extern void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-extern void func_00211114(CQuaternion *rot, Mtx44 *m);
-extern void func_0020C618(Mtx44 *out, Mtx44 *a, Mtx44 *b);
-extern void func_0021034C(Mtx44 *m, f32 x, f32 y, f32 z);
+extern void func_00211114(CQuaternion *rot, CMtxF *m);
+extern void func_0020C618(CMtxF *out, CMtxF *a, CMtxF *b);
+extern void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);
 extern void func_0020F510(CVector3 *v, f32 limit);
-extern void func_00210318(Mtx44 *m, f32 x, f32 y, f32 z);
-extern void func_00210C3C(Mtx44 *m);
+extern void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);
+extern void func_00210C3C(CMtxF *m);
 
 void func_0025C018(CGameObjectInstance *actor, CAI *ai) {
-    Mtx44 look;
-    Mtx44 rotMtx;
+    CMtxF look;
+    CMtxF rotMtx;
     CQuaternion spin;
     CQuaternion rot;
     f32 sin;
@@ -48,13 +46,13 @@ void func_0025C018(CGameObjectInstance *actor, CAI *ai) {
     spin.w = func_002974C0(actor->m_RotY * 0.5f);
     func_00210F68(&rot, &spin, &actor->m_qGround);
     func_00211114(&rot, &rotMtx);
-    func_0020C618((Mtx44 *) &actor->m_mfOrient, &look, &rotMtx);
+    func_0020C618((CMtxF *) &actor->m_mfOrient, &look, &rotMtx);
     if (D_8011AAD8 & 0x40) {
-        func_0021034C((Mtx44 *) &actor->m_mfOrient, actor->m_vScale.x * 0.5f, actor->m_vScale.y * 0.5f, actor->m_vScale.z * 0.5f);
+        func_0021034C((CMtxF *) &actor->m_mfOrient, actor->m_vScale.x * 0.5f, actor->m_vScale.y * 0.5f, actor->m_vScale.z * 0.5f);
     } else {
-        func_0021034C((Mtx44 *) &actor->m_mfOrient, actor->m_vScale.x, actor->m_vScale.y, actor->m_vScale.z);
+        func_0021034C((CMtxF *) &actor->m_mfOrient, actor->m_vScale.x, actor->m_vScale.y, actor->m_vScale.z);
     }
     func_0020F510(&actor->header.m_vPos, 20000.0f);
-    func_00210318((Mtx44 *) &actor->m_mfOrient, actor->header.m_vPos.x, actor->header.m_vPos.y, actor->header.m_vPos.z);
-    func_00210C3C((Mtx44 *) &actor->m_mfOrient);
+    func_00210318((CMtxF *) &actor->m_mfOrient, actor->header.m_vPos.x, actor->header.m_vPos.y, actor->header.m_vPos.z);
+    func_00210C3C((CMtxF *) &actor->m_mfOrient);
 }

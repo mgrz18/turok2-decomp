@@ -3,18 +3,13 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
+#include "structs/event.h"
 
 typedef struct Target Target;
-
-typedef struct EffectInfo {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[4];
-} EffectInfo;
 
 extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
 extern CVector3 D_800F1DB8;                /* the direction of the hit */
 extern u8 D_8011AAF1;
-extern EffectInfo D_800AD084[];
 extern u8 D_800F8928[];
 extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
@@ -130,7 +125,7 @@ void func_0022CA90(CParticle *p) {
         if (effect != 0xFFFF) {
             void *eventSource = source;
 
-            if (D_800AD084[effect].flags & 2) {
+            if (D_800AD084[effect].m_Flags & 2) {
                 eventSource = p;
             }
             func_00236EA0(eventSource, p, effect, -1, D_800F1CE0.m_vInstancePos, params);

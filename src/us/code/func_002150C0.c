@@ -7,10 +7,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/level_actor.h"
-
-typedef struct {
-    s32 data[6];
-} ActorState;
+#include "structs/light.h"
 
 /* A placed actor's record in the level data. */
 typedef struct {
@@ -28,7 +25,6 @@ typedef struct {
 extern u8 D_800F1360[];         /* the empty model */
 extern u8 D_800F7078[];         /* the model cache */
 extern u8 D_800B6D1B;
-extern ActorState D_800AB0D0;   /* default state */
 
 void *func_00225E88(void *cache, s32 model);
 f32 func_002671B4(CLevelActor *actor);
@@ -67,6 +63,6 @@ void func_002150C0(CLevelActor *actor, PlacedActorRecord *record, s32 owner, u8 
     top.x = actor->header.m_vPos.x;
     top.y = actor->header.m_vPos.y + func_002671B4(actor) * 0.5f;
     top.z = actor->header.m_vPos.z;
-    *(ActorState *) actor->m_Lights = D_800AB0D0;
+    *(CLights1 *) actor->m_Lights = D_800AB0D0;
     actor->m_DrawnFrame = actor->m_UpdatedFrame = D_800B6D1B - 1;
 }

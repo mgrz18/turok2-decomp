@@ -1,6 +1,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "structs/camera.h"
+#include "structs/model.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -14,17 +16,6 @@
  * depth): they put anim before inView and model before view, as in the ROM. */
 
 typedef struct Actor Actor;
-
-typedef struct {
-    s32 inView;             /* 0x00 */
-    s32 near;               /* 0x04 */
-    struct View *view;      /* 0x08 */
-    void **model;           /* 0x0C */
-    f32 *offset;            /* 0x10 */
-    s32 unk14;              /* 0x14 */
-    s32 unk18;              /* 0x18 */
-    s32 unk1C;              /* 0x1C */
-} DrawArgs;
 
 struct Actor {
     u8 pad0[0x4];
@@ -43,19 +34,10 @@ struct Actor {
     u8 padD8[0x38];
     u8 lights[2][0x18];     /* 0x110 */
     u8 ai[0xF4];            /* 0x140 */
-    void (*draw)(Actor *, void *, DrawArgs *);  /* 0x234 */
+    void (*draw)(Actor *, void *, CDrawArgs *);  /* 0x234 */
     u8 pad238[0xC];
     void (*update)(Actor *, void *);            /* 0x244 */
 };
-
-typedef struct View {
-    u8 pad0[0x64];
-    s32 mask;               /* 0x064 */
-    u8 pad68[0x270];
-    u8 frustum[0x60];       /* 0x2D8 */
-    f32 boxMin[3];          /* 0x338 */
-    f32 boxMax[3];          /* 0x344 */
-} View;
 
 extern char D_800A5AC4[];   /* "anim object info" */
 extern s32 D_8011ACA4;
@@ -73,11 +55,11 @@ s32 func_0021CDAC(Actor *, void *, s32);
 f32 func_002671B4(Actor *);
 void func_002254C0(void *, CVector3 *, void *);
 
-void func_0021D39C(Actor *actor, View *view) {
+void func_0021D39C(Actor *actor, CCamera *view) {
     f32 offset[3];
     f32 box[6];
     CVector3 pos;
-    DrawArgs args;
+    CDrawArgs args;
     s32 flags;
     void **anim;
     void **model;
@@ -108,11 +90,11 @@ void func_0021D39C(Actor *actor, View *view) {
     if (!(actor->flags & 0x300000)) {
         inView = 0;
         near = 0;
-        if (actor->region == NULL || (view->mask & actor->region->m_VisBits)) {
-            if (view->boxMax[0] > actor->boxMin[0] && view->boxMin[0] < actor->boxMax[0]
-                && view->boxMax[2] > actor->boxMin[2] && view->boxMin[2] < actor->boxMax[2]
-                && view->boxMax[1] > actor->boxMin[1] && view->boxMin[1] < actor->boxMax[1]
-                && func_0026F60C(view->frustum, actor->boxMin)) {
+        if (actor->region == NULL || (view->m_ViewParams.m_VisBits & actor->region->m_VisBits)) {
+            if (view->m_ViewMax.x > actor->boxMin[0] && view->m_ViewMin.x < actor->boxMax[0]
+                && view->m_ViewMax.z > actor->boxMin[2] && view->m_ViewMin.z < actor->boxMax[2]
+                && view->m_ViewMax.y > actor->boxMin[1] && view->m_ViewMin.y < actor->boxMax[1]
+                && func_0026F60C(view->m_ViewVolume, actor->boxMin)) {
                 inView = 1;
                 if (actor->region != NULL) {
                     near = 1;
@@ -126,10 +108,10 @@ void func_0021D39C(Actor *actor, View *view) {
                 box[3] = actor->boxMax[0] + 512.0f;
                 box[5] = actor->boxMax[2] + 512.0f;
                 box[4] = y + 0.5f;
-                if (box[0] < view->boxMax[0] && view->boxMin[0] < box[3]
-                    && box[2] < view->boxMax[2] && view->boxMin[2] < box[5]
-                    && box[1] < view->boxMax[1] && view->boxMin[1] < box[4]
-                    && func_0026F60C(view->frustum, box)) {
+                if (box[0] < view->m_ViewMax.x && view->m_ViewMin.x < box[3]
+                    && box[2] < view->m_ViewMax.z && view->m_ViewMin.z < box[5]
+                    && box[1] < view->m_ViewMax.y && view->m_ViewMin.y < box[4]
+                    && func_0026F60C(view->m_ViewVolume, box)) {
                 set_near:
                     near = 1;
                 }
@@ -156,14 +138,14 @@ void func_0021D39C(Actor *actor, View *view) {
                 }
                 actor->flags |= 0x200;
             }
-            args.inView = inView;
-            args.near = near;
-            args.view = view;
-            args.model = model;
-            args.offset = offset;
-            args.unk14 = 0;
-            args.unk18 = 0;
-            args.unk1C = 0;
+            args.m_bDraw = inView;
+            args.m_bShadow = near;
+            args.m_pCamera = view;
+            args.m_hModel = (s32)model;
+            args.m_pOffset = offset;
+            args.m_nVariant = 0;
+            args.m_nModel = 0;
+            args.m_nShadowModel = 0;
             offset[0] = offset[1] = offset[2] = 0.0f;
             actor->draw(actor, actor->ai, &args);
         free_model:

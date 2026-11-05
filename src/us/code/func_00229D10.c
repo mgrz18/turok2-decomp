@@ -5,8 +5,6 @@
 /* Same family as func_002298C4 (homing missile): here a projectile that flies
  * back to a point beside its owner's player and is caught there. */
 
-typedef f32 Mtx4f[4][4];
-
 extern s32 func_00275F7C(void);
 extern void *func_00275C6C(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
 extern void func_00232B40(void *obj);
@@ -21,8 +19,8 @@ extern void func_0020F040(CVector3 *v);                        /* normalize */
 extern void func_0020E810(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
 extern void func_00211074(CQuaternion *q);                        /* normalize */
 extern void func_0020DCC8(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b); /* slerp */
-extern void func_00211114(CQuaternion *q, Mtx4f m);               /* to matrix */
-extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);  /* transform */
+extern void func_00211114(CQuaternion *q, CMtxF m);               /* to matrix */
+extern void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);  /* transform */
 extern void func_00229618(void *obj, f32 scale);
 
 extern void func_00253F90(CPlayer *player, CVector3 *pos);      /* player-relative point to world */
@@ -106,7 +104,7 @@ void func_00229D10(Missile *obj) {
     CQuaternion cur;
     CQuaternion want;
     CQuaternion rot;
-    Mtx4f mtx;
+    CMtxF mtx;
     CPlayer *player;
     SoundHandle *loop;
     f32 speed;

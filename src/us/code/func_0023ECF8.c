@@ -3,18 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
-
-/* Pickup effect descriptor. */
-typedef struct PickupEntry {
-    void *resource; /* 0x00 */
-    char pad4[2];
-    s16 sound;      /* 0x06 */
-    s16 callback;   /* 0x08 */
-    char padA[2];
-    s16 index;      /* 0x0C */
-    s16 argument;   /* 0x0E */
-    s16 argument2;  /* 0x10 */
-} PickupEntry;
+#include "structs/pickup.h"
 
 extern char D_801198B0[];
 extern u8 D_8011AAF1;
@@ -27,7 +16,7 @@ void func_0027580C(s32 callback);
 
 /* Weapon pickup: gives the weapon, selects it when it is better than the
  * current one, and plays the descriptor's feedback. */
-s32 func_0023ECF8(CPlayer *player, PickupEntry *entry) {
+s32 func_0023ECF8(CPlayer *player, CPickupEntry *entry) {
     WeaponInfo *info;
     void *resource;
     s32 sound;
@@ -37,34 +26,34 @@ s32 func_0023ECF8(CPlayer *player, PickupEntry *entry) {
     CPlayer *p;
 
     result = 0;
-    if (entry->argument != -1 && player->m_Data.m_WeaponList[entry->index] != 0 &&
-        (result = func_00253B54(player, entry->argument, entry->argument2)) == 0 &&
+    if (entry->m_Params.m_Weapon.m_AmmoType != -1 && player->m_Data.m_WeaponList[entry->m_Params.m_Weapon.m_Weapon] != 0 &&
+        (result = func_00253B54(player, entry->m_Params.m_Weapon.m_AmmoType, entry->m_Params.m_Weapon.m_AmmoAmount)) == 0 &&
         (!D_8011AAF1 || !player->m_pOptions->m_TagMode)) {
         return 0;
     }
     if (D_8011AAF1) {
-        if (!(D_800AF618[entry->index]->flags & 8)) {
+        if (!(D_800AF618[entry->m_Params.m_Weapon.m_Weapon]->flags & 8)) {
             return 0;
         }
     } else {
-        if (D_800AF618[entry->index]->flags & 8) {
+        if (D_800AF618[entry->m_Params.m_Weapon.m_Weapon]->flags & 8) {
             return 0;
         }
     }
-    had = player->m_Data.m_WeaponList[entry->index];
+    had = player->m_Data.m_WeaponList[entry->m_Params.m_Weapon.m_Weapon];
     p = player; /* a second name for the player: needed for register allocation */
-    p->m_Data.m_WeaponList[entry->index] = 1;
-    info = D_800AF618[entry->index];
-    if (p->m_Data.m_CurrentWeapon < entry->index) {
+    p->m_Data.m_WeaponList[entry->m_Params.m_Weapon.m_Weapon] = 1;
+    info = D_800AF618[entry->m_Params.m_Weapon.m_Weapon];
+    if (p->m_Data.m_CurrentWeapon < entry->m_Params.m_Weapon.m_Weapon) {
         if ((p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? (info->flags & 2) : (info->flags & 1)) {
             if (!D_8011AAF1 && had == 0) {
-                p->m_RequestedWeapon = entry->index;
+                p->m_RequestedWeapon = entry->m_Params.m_Weapon.m_Weapon;
             }
         }
     }
-    sound = entry->sound;
-    callback = entry->callback;
-    resource = entry->resource;
+    sound = entry->m_Sound;
+    callback = entry->m_Callback;
+    resource = entry->m_pMessage;
     func_00281060(((void *)p->m_pCamera), 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
     if (resource != NULL) {
         func_0027FC2C(D_801198B0, ((void *)p->m_pCamera), resource);
@@ -76,7 +65,7 @@ s32 func_0023ECF8(CPlayer *player, PickupEntry *entry) {
         func_0027580C(callback);
     }
     if (result == 0) {
-        func_00253B54(p, entry->argument, entry->argument2);
+        func_00253B54(p, entry->m_Params.m_Weapon.m_AmmoType, entry->m_Params.m_Weapon.m_AmmoAmount);
     }
     return 1;
 }

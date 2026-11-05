@@ -9,10 +9,6 @@
  * water), the splash effects, or a dust puff of 5/10/15/20 units. */
 
 typedef struct {
-    f32 m[4][4];
-} Mtx44;
-
-typedef struct {
     /* 0x00 */ CVector3 offset;
     /* 0x0C */ u32 event;
     /* 0x10 */ u16 bone;
@@ -31,7 +27,7 @@ typedef struct {
 extern u8 D_800F8928[];
 
 extern u8 *func_002017D4(void *list, s32 index);
-extern void func_0020F85C(Mtx44 *mtx, CVector3 *in, CVector3 *out);
+extern void func_0020F85C(CMtxF *mtx, CVector3 *in, CVector3 *out);
 extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 extern void func_0020E810(CQuaternion *out, CVector3 *dir);
 extern void func_00246690(CGameObjectInstance *obj, s32 sound, CVector3 pos, s32 flags);
@@ -41,7 +37,7 @@ extern void func_0022F350(void *sys, CGameObjectInstance *p, CGameObjectInstance
 extern f32 func_0021F2B0(CGameObjectInstance *obj);
 extern void func_00236EA0(CGameObjectInstance *obj, CGameObjectInstance *owner, s32 type, s32 id, CVector3 pos, PuffArgs args);
 
-void func_0026D710(Attachment *ents, s32 n, Mtx44 *mtxs, CGameObjectInstance *obj, void *bones) {
+void func_0026D710(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectInstance *obj, void *bones) {
     CVector3 pos;
     CVector3 mapped;
     CVector3 zero;

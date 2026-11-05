@@ -2,60 +2,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "gfx.h"
-
-
-/* A vertex as the RSP reads it. */
-typedef struct UnitVtx {
-    /* 0x0 */ s16 x, y, z;
-    /* 0x6 */ s16 flag;
-    /* 0x8 */ s16 s, t;
-    /* 0xC */ u8 r, g, b, a;
-} UnitVtx;
-
-typedef struct EmitterDef {
-    /* 0x00 */ s16 texture;
-    /* 0x02 */ u8 red, green, blue;
-    /* 0x05 */ u8 envRed, envGreen, envBlue;
-    /* 0x08 */ f32 spinRate;
-    /* 0x0C */ f32 textureScale;
-    /* 0x10 */ f32 phaseRate;
-    /* 0x14 */ f32 baseSpeed;
-    /* 0x18 */ f32 fadeDepth;
-    /* 0x1C */ f32 hostScale;
-    /* 0x20 */ f32 throttleRate;
-    /* 0x24 */ u8 pad24[4];
-    /* 0x28 */ u8 alpha;
-    /* 0x29 */ u8 flags;
-} EmitterDef;
-
-/* A running emitter (see func_00282E4C): a textured fan drawn flat at its depth. */
-typedef struct Emitter {
-    /* 0x000 */ struct Emitter *last;
-    /* 0x004 */ struct Emitter *next;
-    /* 0x008 */ u8 pad8[4];
-    /* 0x00C */ EmitterDef *def;
-    /* 0x010 */ u16 mask;
-    /* 0x012 */ u8 pad12[2];
-    /* 0x014 */ s32 texture[2];
-    /* 0x01C */ f32 offsetS;
-    /* 0x020 */ f32 offsetT;
-    /* 0x024 */ u8 pad24[4];
-    /* 0x028 */ UnitVtx vertices[2][15];
-    /* 0x208 */ f32 throttle;
-    /* 0x20C */ f32 phase;
-    /* 0x210 */ f32 depth;
-    /* 0x214 */ f32 phaseScale;
-    /* 0x218 */ f32 textureScale;
-    /* 0x21C */ f32 trim;
-    /* 0x220 */ f32 opacity;
-} Emitter;
-
-typedef struct EmitterView {
-    /* 0x000 */ u8 pad0[0x24C];
-    /* 0x24C */ CVector3 fan[5];       /* centre, then the four corners */
-    /* 0x288 */ u8 pad288[0x2F8 - 0x288];
-    /* 0x2F8 */ f32 clipPlane[4];
-} EmitterView;
+#include "structs/camera.h"
+#include "structs/emitter.h"
 
 typedef struct AnimationInfo {
     /* 0x0 */ s32 frameCount;
@@ -77,7 +25,7 @@ extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a
 extern void func_002051F4(s32, void *resource);
 
 /* Clips and draws an emitter as a textured translucent fan at its depth. */
-void func_00282340(Emitter *object, EmitterView *view) {
+void func_00282340(CEmitter *object, CCamera *view) {
     AnimationInfo animation;
     CVector3 points[5];
     f32 red[5], green[5], blue[5], alpha[5];
@@ -88,7 +36,7 @@ void func_00282340(Emitter *object, EmitterView *view) {
     u8 center[3], rim[3];
     s32 below;
     void *resource;
-    EmitterDef *descriptor;
+    CEmitterDef *descriptor;
     s32 frameIndex, scaleS, scaleT;
     u8 *frame;
     f32 phase, fadeRange, fadeOffset;
@@ -98,14 +46,14 @@ void func_00282340(Emitter *object, EmitterView *view) {
     f32 maxS, minS, maxT, minT, shiftS, shiftT, factor;
     UnitVtx *vertex;
 
-    resource = func_0020798C(object->texture);
+    resource = func_0020798C(object->m_Texture);
     if (resource != NULL) {
         func_002079D8(resource, &animation);
         if (animation.frameCount != 0) {
-            descriptor = object->def;
+            descriptor = object->m_pDef;
             frame = animation.frame;
-            phase = object->phase / frame[1];
-            scale = descriptor->textureScale * (object->textureScale * 768.0f);
+            phase = object->m_Phase / frame[1];
+            scale = descriptor->m_TextureScale * (object->m_TextureScale * 768.0f);
             scaleS = (s32)((1 << frame[2]) * scale);
             scaleT = (s32)((1 << frame[3]) * scale);
             {
@@ -114,7 +62,7 @@ void func_00282340(Emitter *object, EmitterView *view) {
                 g->w1 = 0;
             }
             frameIndex = (s32)phase % animation.frameCount;
-            func_00206B30(object->texture, resource, frameIndex, 0, scaleS, scaleT, 0, 0, 15);
+            func_00206B30(object->m_Texture, resource, frameIndex, 0, scaleS, scaleT, 0, 0, 15);
             texturePeriod = 5120.0f;
             wrapPeriod = 10240.0f;
             frame = animation.frame;
@@ -126,14 +74,14 @@ void func_00282340(Emitter *object, EmitterView *view) {
                 {
                     Gfx *g = D_800D8E24++;
                     g->w0 = 0xFB000000;     /* gDPSetEnvColor */
-                    g->w1 = (descriptor->envRed << 24) | (descriptor->envGreen << 16) | (descriptor->envBlue << 8) | 0xFF;
+                    g->w1 = (descriptor->m_EnvRed << 24) | (descriptor->m_EnvGreen << 16) | (descriptor->m_EnvBlue << 8) | 0xFF;
                 }
-                center[0] = descriptor->red;
-                center[1] = descriptor->green;
-                center[2] = descriptor->blue;
-                rim[0] = descriptor->red;
-                rim[1] = descriptor->green;
-                rim[2] = descriptor->blue;
+                center[0] = descriptor->m_Red;
+                center[1] = descriptor->m_Green;
+                center[2] = descriptor->m_Blue;
+                rim[0] = descriptor->m_Red;
+                rim[1] = descriptor->m_Green;
+                rim[2] = descriptor->m_Blue;
                 break;
             case 0:
             case 1:
@@ -147,36 +95,36 @@ void func_00282340(Emitter *object, EmitterView *view) {
                 break;
             }
             below = 1;
-            depth = object->depth;
-            if (!(view->fan[0].y < (view->fan[1].y + view->fan[2].y + view->fan[3].y + view->fan[4].y) * 0.25f)) {
+            depth = object->m_Height;
+            if (!(view->m_vTCorners[0].y < (view->m_vTCorners[1].y + view->m_vTCorners[2].y + view->m_vTCorners[3].y + view->m_vTCorners[4].y) * 0.25f)) {
                 below = 0;
             }
-            distance = view->fan[0].y - depth;
-            fade = descriptor->alpha;
+            distance = view->m_vTCorners[0].y - depth;
+            fade = descriptor->m_Alpha;
             if (distance < 0.0f) {
                 distance = -distance;
             }
-            if (distance < descriptor->fadeDepth) {
-                fadeOffset = distance - descriptor->fadeDepth * 0.25f;
-                fadeRange = descriptor->fadeDepth * 0.75f;
+            if (distance < descriptor->m_FadeDepth) {
+                fadeOffset = distance - descriptor->m_FadeDepth * 0.25f;
+                fadeRange = descriptor->m_FadeDepth * 0.75f;
                 if (fadeOffset < 0.0f) {
                     fade = 0.0f;
                 } else {
                     fade = fadeOffset * fade / fadeRange;
                 }
             }
-            fade *= object->throttle * object->opacity;
+            fade *= object->m_Throttle * object->m_Opacity;
             for (i = 0; i < 5; i++) {
-                points[i].x = view->fan[i].x;
+                points[i].x = view->m_vTCorners[i].x;
                 points[i].y = depth;
-                points[i].z = view->fan[i].z;
+                points[i].z = view->m_vTCorners[i].z;
                 red[i] = i == 0 ? center[0] : rim[0];
                 green[i] = i == 0 ? center[1] : rim[1];
                 blue[i] = i == 0 ? center[2] : rim[2];
                 alpha[i] = i == 0 ? fade : 0.0f;
             }
             for (i = 1; i < 5; i++) {
-                t = func_0026F400(view->clipPlane, &points[0], &points[i]);
+                t = func_0026F400((f32 *)&view->m_ViewVolume[2], &points[0], &points[i]);
                 if (t >= 0.0f && t < 1.0f) {
                     points[i].x = points[0].x + t * (points[i].x - points[0].x);
                     points[i].z = points[0].z + t * (points[i].z - points[0].z);
@@ -237,8 +185,8 @@ void func_00282340(Emitter *object, EmitterView *view) {
                         for (i = 0; i < 3; i++) {
                             texcoord[i].x -= triangle[0].x * 0.5f;
                             texcoord[i].z -= triangle[0].z * 0.5f;
-                            texcoord[i].x += object->offsetS;
-                            texcoord[i].z += object->offsetT;
+                            texcoord[i].x += object->m_ScrollS;
+                            texcoord[i].z += object->m_ScrollT;
                         }
                         maxS = texcoord[2].x;
                         if (!(texcoord[1].x <= maxS)) maxS = texcoord[1].x;
@@ -267,7 +215,7 @@ void func_00282340(Emitter *object, EmitterView *view) {
                             shiftT = 0.0f;
                         }
                         for (i = 0; i < 3; i++) {
-                            vertex = i + &object->vertices[D_800B6D1C][face * 3];
+                            vertex = i + &object->m_Vertices[D_800B6D1C][face * 3];
                             vertex->flag = 0;
                             vertex->x = (s32)triangle[i].x;
                             vertex->y = (s32)triangle[i].y;
@@ -283,7 +231,7 @@ void func_00282340(Emitter *object, EmitterView *view) {
                         {
                             Gfx *g = D_800D8E24++;
                             g->w0 = 0x01003006;     /* gSPVertex(v, 3, 0) */
-                            g->w1 = (u32)&object->vertices[D_800B6D1C][face * 3];
+                            g->w1 = (u32)&object->m_Vertices[D_800B6D1C][face * 3];
                         }
                         {
                             Gfx *g = D_800D8E24++;

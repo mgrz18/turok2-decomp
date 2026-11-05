@@ -1,12 +1,9 @@
 #include "structs/vector.h"
+#include "structs/event.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_2.CPP, func_802476C8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct Entry802AB8DC {
-    s32 offset;
-    u8 pad4[4];
-} Entry802AB8DC;
 struct IntPair {
     int field_0;
     int field_4;
@@ -40,7 +37,6 @@ typedef struct BoneInfo {
     char pad0[0x6C];
     s32 mask;
 } BoneInfo;
-extern Entry802AB8DC D_800AD084[];
 extern int D_800ACB94;
 extern void func_0020F85C(void *arg0, void *arg1, void *arg2);
 extern void *func_002017D4(void *, s32);
@@ -88,7 +84,7 @@ void func_0021ABC8(ObjectLinks *obj, void *anim, f32 from, f32 to) {
                 local.z = events[i].local.y;
                 func_0020F85C(obj->transform, &local, &pos);
             } else {
-                if (checkMask && (D_800AD084[events[i].effect].offset & 4)) {
+                if (checkMask && (D_800AD084[events[i].effect].m_Flags & 4)) {
                     if (resource == 0) {
                         resource = func_0021F358(obj);
                         if (resource == 0) {

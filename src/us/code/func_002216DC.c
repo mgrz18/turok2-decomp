@@ -1,14 +1,10 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/collision.h"
-
-typedef struct Rect {
-    f32 minX, minZ;             /* 0x00 */
-    f32 maxX, maxZ;             /* 0x08 */
-} Rect;
+#include "structs/rect.h"
 
 typedef struct GridCell {
-    Rect rect;                  /* 0x00 */
+    CRect rect;                  /* 0x00 */
     s32 empty;                  /* 0x10 */
 } GridCell;                     /* 0x14 bytes */
 

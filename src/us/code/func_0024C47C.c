@@ -71,6 +71,7 @@ void func_0024C47C(CBarrel *menu, CPlayer *player) {
 #include "gfx.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "structs/camera.h"
 
 /* An animated HUD item (func_00277328 ticks it, func_0027AD00 restarts it). */
 extern s32 D_8011AC8C;          /* game state */

@@ -1,5 +1,6 @@
 /* WRONG CUT: REAL func_0042AA80 size 0x18C (splat cut it into func_0042AA80 + func_0042AB2C). */
 #include "common.h"
+#include "structs/light.h"
 
 /* The level's light settings (colours as bytes, direction as signed bytes). */
 typedef struct LevelLights {
@@ -16,17 +17,6 @@ typedef struct MenuState {
     /* 0x18E54 */ s16 dir[3];
 } MenuState;
 
-/* A Lights1 display-list block. */
-typedef struct SceneLight {
-    /* 0x00 */ u8 ambCol[4];
-    /* 0x04 */ u8 ambColc[4];
-    /* 0x08 */ u8 col[4];
-    /* 0x0C */ u8 colc[4];
-    /* 0x10 */ s8 dir[4];
-} SceneLight;
-
-extern SceneLight D_800AB0D0;
-
 extern f32 func_00298470(f32);
 extern void func_0020EF60(f32 *out, f32 *in, f32 scale);
 
@@ -37,9 +27,9 @@ void func_0042AA80(MenuState *menu) {
     f32 len;
 
     for (i = 0; i < 3; i++) {
-        D_800AB0D0.ambColc[i] = D_800AB0D0.ambCol[i] = menu->lights->ambient[i];
-        D_800AB0D0.colc[i] = D_800AB0D0.col[i] = menu->lights->color[i];
-        D_800AB0D0.dir[i] = menu->lights->dir[i];
+        D_800AB0D0.m_AmbColCopy[i] = D_800AB0D0.m_AmbCol[i] = menu->lights->ambient[i];
+        D_800AB0D0.m_ColCopy[i] = D_800AB0D0.m_Col[i] = menu->lights->color[i];
+        D_800AB0D0.m_Dir[i] = menu->lights->dir[i];
     }
     dir[0] = menu->lights->dir[0];
     dir[1] = menu->lights->dir[1];

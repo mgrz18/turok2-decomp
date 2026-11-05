@@ -1,8 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-typedef struct { f32 x, y, z; } V3f;
-
 typedef struct { s16 *base; s16 *p; } S;
 
 s16 func_00246594(S *arg0) {

@@ -2,17 +2,8 @@
  * func_80233DFC_de, with Turok 2's CCamera. */
 #include "common.h"
 #include "structs/camera.h"
+#include "structs/light.h"
 
-typedef struct {
-    u8 ambient[3], pad3;
-    u8 ambientCopy[3], pad7;
-    u8 diffuse[3], padB;
-    u8 diffuseCopy[3], padF;
-    s8 direction[3];
-    u8 pad13[5];
-} __attribute__((aligned(4))) CLights;
-
-extern CLights D_800AB0D0[];    /* a light of the display lists */
 extern u32 D_800B6D20;          /* frame counter */
 f32 func_002974C0(f32 x);       /* cosine */
 f32 func_002982F0(f32 x);       /* sine */
@@ -42,11 +33,11 @@ void func_0027C4E4(CCamera *cam) {
         ambient = (ambientScale * (func_002982F0(
             phaseScale * (f32) D_800B6D20 * ((f32) (channel + 2) * 4.0f) *
             0.01745329424738884f) * 16.0f)) + 16.0f + 48.0f;
-        D_800AB0D0[0].ambientCopy[channel] = D_800AB0D0[0].ambient[channel] = (u32) ambient;
+        D_800AB0D0.m_AmbColCopy[channel] = D_800AB0D0.m_AmbCol[channel] = (u32) ambient;
         diffuse = (((func_002982F0(
             phaseScale * (f32) D_800B6D20 * ((f32) (channel + 2) * 4.0f) *
             0.01745329424738884f) * 64.0f) + 255.0f) - 64.0f) - 1.0f;
-        D_800AB0D0[0].diffuseCopy[channel] = D_800AB0D0[0].diffuse[channel] = (u32) diffuse;
+        D_800AB0D0.m_ColCopy[channel] = D_800AB0D0.m_Col[channel] = (u32) diffuse;
         channel += 1;
     } while (channel < 3);
     direction.x = func_002982F0((f32) (D_800B6D20 * 6) * 0.01745329424738884f);
@@ -56,9 +47,9 @@ void func_0027C4E4(CCamera *cam) {
     direction.x *= 120.0f;
     direction.y *= 120.0f;
     direction.z *= 120.0f;
-    D_800AB0D0[0].direction[0] = (u32) direction.x;
-    D_800AB0D0[0].direction[1] = (u32) direction.y;
-    D_800AB0D0[0].direction[2] = (u32) direction.z;
+    D_800AB0D0.m_Dir[0] = (u32) direction.x;
+    D_800AB0D0.m_Dir[1] = (u32) direction.y;
+    D_800AB0D0.m_Dir[2] = (u32) direction.z;
     red = (func_002982F0(2.0f * (phaseScale * (f32) D_800B6D20) * 0.06981317698955536f) * 64.0f) + 128.0f;
     redByte = (u32) red & 0xF8;
     cam->m_FogColor[0] = redByte;

@@ -6,6 +6,8 @@
 #include "gfx.h"
 #include "structs/world.h"
 #include "structs/level_actor.h"
+#include "structs/camera.h"
+#include "structs/rect.h"
 
 /* Draws the level geometry seen by one view: every static object and level
  * actor of the grid regions inside the view's box that is shown in this view
@@ -14,16 +16,6 @@
  * go on a second list, except the type found at 0x33 in the world's id table
  * unless the view's player passes the func_00253720(0x111F) test. With the
  * shared flag set, the cached list of func_00221D3C is used instead. */
-
-typedef struct View View;
-struct View {
-    u8 pad0[0x64];
-    s32 mask;               /* 0x064 */
-    u8 pad68[0x270];
-    u8 frustum[0x60];       /* 0x2D8 */
-    f32 boxMin[3];          /* 0x338 */
-    f32 boxMax[3];          /* 0x344 */
-};
 
 typedef struct {
     s32 stride;             /* 0x00 */
@@ -37,28 +29,23 @@ typedef struct {
     u16 ids[1];             /* 0x08 */
 } IdTable;
 
-typedef struct {
-    f32 minX, minZ;         /* 0x0 */
-    f32 maxX, maxZ;         /* 0x8 */
-} Cell;
-
 extern u8 D_8011AAF1;       /* D_8011AAD8.multiplayer */
 extern s32 D_800B6D20;
 
 void func_00221D3C(CWorld *);
-CPlayer *func_00281194(View *);
+CPlayer *func_00281194(CCamera *);
 s32 func_00253720(CPlayer *, s32);
 void func_0020B5D4(void);
 void func_0020B624(void);
 void func_0020565C(s32, void **);
 void *func_002017D4(void *, s32);
 s32 func_0026F60C(void *, CBox *);
-void func_00214D04(CStaticObject *, View *);
-void func_00214844(CStaticObject *, View *);
+void func_00214D04(CStaticObject *, CCamera *);
+void func_00214844(CStaticObject *, CCamera *);
 void func_002152AC(CLevelActor *);
 
-void func_002222E0(CWorld *w, View *v_) {
-    register View *v asm("$18") = v_;
+void func_002222E0(CWorld *w, CCamera *v_) {
+    register CCamera *v asm("$18") = v_;
     u8 *base;
     void *grp;
     s32 i;
@@ -75,7 +62,7 @@ void func_002222E0(CWorld *w, View *v_) {
     Table *t;
     CWorldSector *regions;
     CWorldSector *region;
-    Cell *cell;
+    CRect *cell;
     CStaticObject *a;
     CLevelActor *p;
     CLevelActor *actors;
@@ -86,7 +73,7 @@ void func_002222E0(CWorld *w, View *v_) {
     s32 c;
 
     mask = D_8011AAD8.difficulty;
-    vmask = v->mask;
+    vmask = v->m_ViewParams.m_VisBits;
     if (D_8011AAD8.multiplayer != 0) {
         func_00221D3C(w);
         return;
@@ -176,8 +163,8 @@ found:
         do {
             region = regions + i;
             cell = region->m_pBounds;
-            if (cell->maxX > v->boxMin[0] && cell->minX < v->boxMax[0]
-                && cell->maxZ > v->boxMin[2] && cell->minZ < v->boxMax[2]) {
+            if (cell->maxX > v->m_ViewMin.x && cell->minX < v->m_ViewMax.x
+                && cell->maxZ > v->m_ViewMin.z && cell->minZ < v->m_ViewMax.z) {
                 func_0020565C(0, region->m_hData);
                 k = 0;
                 grp = *region->m_hData;
@@ -194,10 +181,10 @@ found:
                                 func_00214D04(a, v);
                             }
                             if ((vmask & a->m_ViewMask)
-                                && v->boxMax[0] > a->m_Bounds.m_vMin.x && v->boxMin[0] < a->m_Bounds.m_vMax.x
-                                && v->boxMax[2] > a->m_Bounds.m_vMin.z && v->boxMin[2] < a->m_Bounds.m_vMax.z
-                                && v->boxMax[1] > a->m_Bounds.m_vMin.y && v->boxMin[1] < a->m_Bounds.m_vMax.y
-                                && func_0026F60C(v->frustum, &a->m_Bounds) != 0) {
+                                && v->m_ViewMax.x > a->m_Bounds.m_vMin.x && v->m_ViewMin.x < a->m_Bounds.m_vMax.x
+                                && v->m_ViewMax.z > a->m_Bounds.m_vMin.z && v->m_ViewMin.z < a->m_Bounds.m_vMax.z
+                                && v->m_ViewMax.y > a->m_Bounds.m_vMin.y && v->m_ViewMin.y < a->m_Bounds.m_vMax.y
+                                && func_0026F60C(v->m_ViewVolume, &a->m_Bounds) != 0) {
                                 if ((a->m_wFlags & 8) && (a->header.m_nObjType != idx || flag != 0)) {
                                     c = w->m_nListed;
                                     if (c != 0x40) {
@@ -231,10 +218,10 @@ found:
                             u16 fl = p->m_wFlags;
 
                             if (!(fl & 1) && (vmask & p->m_ViewMask)
-                                && v->boxMax[0] > p->m_Bounds.m_vMin.x && v->boxMin[0] < p->m_Bounds.m_vMax.x
-                                && v->boxMax[2] > p->m_Bounds.m_vMin.z && v->boxMin[2] < p->m_Bounds.m_vMax.z
-                                && v->boxMax[1] > p->m_Bounds.m_vMin.y && v->boxMin[1] < p->m_Bounds.m_vMax.y
-                                && (fl & 2) && func_0026F60C(v->frustum, &p->m_Bounds) != 0) {
+                                && v->m_ViewMax.x > p->m_Bounds.m_vMin.x && v->m_ViewMin.x < p->m_Bounds.m_vMax.x
+                                && v->m_ViewMax.z > p->m_Bounds.m_vMin.z && v->m_ViewMin.z < p->m_Bounds.m_vMax.z
+                                && v->m_ViewMax.y > p->m_Bounds.m_vMin.y && v->m_ViewMin.y < p->m_Bounds.m_vMax.y
+                                && (fl & 2) && func_0026F60C(v->m_ViewVolume, &p->m_Bounds) != 0) {
                                 if (p->m_wFlags & 0x20) {
                                     c = w->m_nDeferred;
                                     if (c != 0x40) {

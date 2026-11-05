@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "structs/rect.h"
 
 /* Smallest and largest of a coordinate over a triangle's corners. */
 #define TRI_MIN(t, c) ({                        \
@@ -25,17 +26,10 @@
 })
 
 /* Extent on the ground plane. */
-typedef struct Rect {
-    /* 0x00 */ f32 minX;
-    /* 0x04 */ f32 minZ;
-    /* 0x08 */ f32 maxX;
-    /* 0x0C */ f32 maxZ;
-} Rect;
-
 s32 func_0026AFC0(CGameRegion *tri);   /* too steep to stand on */
 
 /* tri's extent on the ground plane. */
-static __inline__ void triRect(Rect *r, CGameRegion *tri) {
+static __inline__ void triRect(CRect *r, CGameRegion *tri) {
     r->minX = TRI_MIN(tri, x);
     r->maxX = TRI_MAX(tri, x);
     r->minZ = TRI_MIN(tri, z);
@@ -44,8 +38,8 @@ static __inline__ void triRect(Rect *r, CGameRegion *tri) {
 
 /* Top of tri, raised to that of any steep neighbour lying within its slightly grown footprint. */
 f32 func_0026B130(CGameRegion *tri) {
-    Rect box;
-    Rect adjBox;
+    CRect box;
+    CRect adjBox;
     CGameRegion *adj;
     f32 top;
     f32 margin;

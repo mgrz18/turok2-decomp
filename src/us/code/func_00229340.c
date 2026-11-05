@@ -3,13 +3,11 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 
-typedef f32 Mtx4f[4][4];
-
 extern void func_0020E810(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
-extern void func_00210630(Mtx4f m, s32 angle);              /* rotation about Y */
-extern void func_0020F85C(Mtx4f m, CVector3 *in, CVector3 *out);  /* transform */
+extern void func_00210630(CMtxF m, s32 angle);              /* rotation about Y */
+extern void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);  /* transform */
 extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
-extern Mtx4f *func_0022CF40(CParticle *p, s32 arg1);         /* parent transform */
+extern CMtxF *func_0022CF40(CParticle *p, s32 arg1);         /* parent transform */
 extern void func_002688C8(CParticle *p, CVector3 to, CVector3 *outPos, void **outRegion, s32, s32);
 extern void func_0022F350(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 model, CVector3 dir,
                           CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
@@ -40,10 +38,10 @@ void func_00229340(CParticle *p, s32 model, s32 arg2, s32 flags) {
     CVector3 carried;
     CVector3 point;
     CVector3 moved;
-    Mtx4f matrix;
+    CMtxF matrix;
     CCollisionResults scratch;
     void *region;
-    Mtx4f *parent;
+    CMtxF *parent;
 
     if (p->m_pEffect->m_dwFlags & 0x10) {
         direction = D_800F1DB8;

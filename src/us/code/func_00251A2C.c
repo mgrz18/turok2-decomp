@@ -3,10 +3,6 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 
-typedef struct {
-    f32 m[4][4];
-} Mtx4f;
-
 /* The ridden creature (an AI actor). */
 typedef struct {
     /* 0x000 */ u8 pad0[0x140];
@@ -29,14 +25,14 @@ void func_0024EF70(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void func_0024F174(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void func_00243414(Mount *actor, void *ai, s32 state);
 void func_002811CC(void *ui, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
-void func_002105A4(Mtx4f *m, f32 angle);
-void func_0020F85C(Mtx4f *m, CVector3 *in, CVector3 *out);
+void func_002105A4(CMtxF *m, f32 angle);
+void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);
 void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 
 /* Riding: the mount sways the view as it turns, charges on button 8, shakes
  * the screen at each step and sets the rider's view offset. */
 void func_00251A2C(CPlayer *player, CGameObjectInstance *body) {
-    Mtx4f m;
+    CMtxF m;
     Mount *mount;
     CVector3 *offset;
     f32 turn;
