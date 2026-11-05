@@ -14,12 +14,6 @@
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
-    /* 0x0C */ f32 minAngle;
-    /* 0x10 */ f32 maxAngle;
-} SpawnPoint;
-
-typedef struct {
-    /* 0x00 */ CVector3 pos;
     /* 0x0C */ s32 type;
 } AnimEvent;
 
@@ -30,7 +24,6 @@ typedef struct {
 } __attribute__((aligned(4))) Part;
 
 
-extern SpawnPoint D_00431D20[4];
 extern void func_00246108(CListedInstance *actor, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 func_002119FC(f32 min, f32 max);
 extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */

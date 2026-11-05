@@ -5,13 +5,7 @@
 /* Spawns one actor near each of the four spawn points, scattered by up to +-15 units, skipping a point
  * closer than 460.8 to the target of the module object. */
 
-typedef struct {
-    /* 0x00 */ CVector3 pos;
-    /* 0x0C */ u8 padC[0x14 - 0xC];
-} SpawnPoint;
 
-
-extern SpawnPoint D_00431C40[4];
 extern u8 D_800F7078[];
 extern u8 D_80107590[];
 extern f32 func_0040BD60(void *obj, CGameObjectInstance **found);
