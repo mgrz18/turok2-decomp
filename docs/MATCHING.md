@@ -627,6 +627,11 @@ in the file's first comment:
   more refs, so global-alloc ranked it above `actor` and swapped their
   `$s` registers; the player lookup written twice under an always-true test
   had only made up for those refs.
+- func_00424008: no `register Span hs asm("$13")`; the clamp works on `h`
+  itself and `xScale` does two jobs, first holding the new horizontal
+  centre (`xScale = cx;` then both edges from it), then the scale. The
+  second set keeps that copy from being propagated, which is what made
+  CSE compute the centre from oldH's copy, as the ROM does.
 
 ### The G pass (the last drafts)
 
