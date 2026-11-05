@@ -232,7 +232,7 @@ void func_00220D00(CWorld *world, s32 ***file) {
                     pos[0] = actors[k].header.m_vPos.x;
                     pos[1] = actors[k].header.m_vPos.y + func_002671B4(&actors[k]) * 0.5f;
                     pos[2] = actors[k].header.m_vPos.z;
-                    func_00222A9C(links, nD, pos, actors[k].m_RegionLinks);
+                    func_00222A9C(links, nD, pos, actors[k].m_Lights);
                     k++;
                 } while (k < nC);
             }

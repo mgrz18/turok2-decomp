@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/level_actor.h"
 
 typedef struct {
     s32 data[6];
@@ -24,74 +25,48 @@ typedef struct {
     /* 0x1E */ s8 angle;
 } PlacedActorRecord;
 
-typedef struct {
-    /* 0x000 */ u8 state;
-    /* 0x001 */ u8 pad1;
-    /* 0x002 */ u16 id;
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ void *segment;
-    /* 0x014 */ void *model;
-    /* 0x018 */ u8 pad18[0x1C];
-    /* 0x034 */ s32 owner;
-    /* 0x038 */ u8 pad38[0x10C];
-    /* 0x144 */ f32 angle;
-    /* 0x148 */ u8 pad148[4];
-    /* 0x14C */ CVector3 min;
-    /* 0x158 */ CVector3 max;
-    /* 0x164 */ f32 unk164;
-    /* 0x168 */ s32 unk168;
-    /* 0x16C */ u16 flags;
-    /* 0x16E */ u16 unk16E;
-    /* 0x170 */ s32 unk170;
-    /* 0x174 */ s32 unk174;
-    /* 0x178 */ ActorState initial;
-    /* 0x190 */ s32 value;
-    /* 0x194 */ u8 colorFrame;
-    /* 0x195 */ u8 colorFrame2;
-} PlacedActor;
-
 extern u8 D_800F1360[];         /* the empty model */
 extern u8 D_800F7078[];         /* the model cache */
 extern u8 D_800B6D1B;
 extern ActorState D_800AB0D0;   /* default state */
 
 void *func_00225E88(void *cache, s32 model);
-f32 func_002671B4(PlacedActor *actor);
+f32 func_002671B4(CLevelActor *actor);
 
-void func_002150C0(PlacedActor *actor, PlacedActorRecord *record, s32 owner, u8 *segments) {
+void func_002150C0(CLevelActor *actor, PlacedActorRecord *record, s32 owner, u8 *segments) {
     CVector3 top;
 
-    actor->state = 3;
-    actor->id = record->id;
-    actor->value = record->value;
-    actor->pos = record->pos;
-    actor->angle = record->angle * 0.02473695f;
-    actor->unk164 = 0.35f;
-    actor->unk168 = 0;
-    actor->min.x = record->pos.x - record->radius;
-    actor->min.y = record->pos.y - record->radius;
-    actor->min.z = record->pos.z - record->radius;
-    actor->max.x = record->pos.x + record->radius;
-    actor->max.y = record->pos.y + record->radius;
-    actor->max.z = record->pos.z + record->radius;
-    actor->owner = owner;
+    actor->header.m_Type = 3;
+    actor->header.m_nObjType = record->id;
+    actor->m_ViewMask = record->value;
+    actor->header.m_vPos = record->pos;
+    actor->m_RotY = record->angle * 0.02473695f;
+    actor->m_ModelScale = 0.35f;
+    actor->m_Height = 0;
+    actor->m_Bounds.m_vMin.x = record->pos.x - record->radius;
+    actor->m_Bounds.m_vMin.y = record->pos.y - record->radius;
+    actor->m_Bounds.m_vMin.z = record->pos.z - record->radius;
+    actor->m_Bounds.m_vMax.x = record->pos.x + record->radius;
+    actor->m_Bounds.m_vMax.y = record->pos.y + record->radius;
+    actor->m_Bounds.m_vMax.z = record->pos.z + record->radius;
+    actor->m_Resource = owner;
     if (record->model == 0xFFFF) {
-        actor->model = D_800F1360;
+        actor->header.m_pIntelligence = (CIntelligence *) D_800F1360;
     } else {
-        actor->model = func_00225E88(D_800F7078, record->model);
+        actor->header.m_pIntelligence = func_00225E88(D_800F7078, record->model);
     }
     if (record->segment == 0xFFFF) {
-        actor->segment = NULL;
+        actor->header.m_pCurrentRegion = NULL;
     } else {
-        actor->segment = segments + record->segment * 32;
+        actor->header.m_pCurrentRegion = (struct CGameRegion *) (segments + record->segment * 32);
     }
-    actor->flags = record->flags | 2;
+    actor->m_wFlags = record->flags | 2;
     actor->unk170 = 0;
-    actor->unk174 = 0;
-    actor->unk16E = record->unk1A;
-    top.x = actor->pos.x;
-    top.y = actor->pos.y + func_002671B4(actor) * 0.5f;
-    top.z = actor->pos.z;
-    actor->initial = D_800AB0D0;
-    actor->colorFrame = actor->colorFrame2 = D_800B6D1B - 1;
+    actor->m_AnimSpeed = 0;
+    actor->m_nKilledIndex = record->unk1A;
+    top.x = actor->header.m_vPos.x;
+    top.y = actor->header.m_vPos.y + func_002671B4(actor) * 0.5f;
+    top.z = actor->header.m_vPos.z;
+    *(ActorState *) actor->m_Lights = D_800AB0D0;
+    actor->m_DrawnFrame = actor->unk195 = D_800B6D1B - 1;
 }

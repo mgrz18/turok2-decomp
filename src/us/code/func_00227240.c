@@ -71,7 +71,7 @@ CPooledLevelActor *func_00227240(CLevelActorPool *pool, s32 *refCount, s32 id, C
     actor->m_Timer = 0.0f;
     actor->m_Actor.header.m_nObjType = index;
     actor->m_Actor.header.m_vPos = pos;
-    actor->m_Actor.unk144 = 0;
+    actor->m_Actor.m_RotY = 0;
     actor->m_Actor.unk148 = 0;
     actor->m_Actor.unk138 = 0;
     actor->m_Actor.unk140 = 0;
@@ -85,12 +85,12 @@ CPooledLevelActor *func_00227240(CLevelActorPool *pool, s32 *refCount, s32 id, C
     actor->m_Actor.m_Resource = resource;
     actor->m_Actor.header.m_pCurrentRegion = (struct CGameRegion *) arg9;
     actor->m_Actor.m_wFlags = 0x1A;
-    actor->m_Actor.unk164 = 0;
+    actor->m_Actor.m_ModelScale = 0;
     actor->m_Actor.m_vVelocity = vel;
-    actor->m_Actor.m_LastFrame = actor->m_Actor.m_LastFrame2 = D_800B6D1B - 1;
+    actor->m_Actor.m_DrawnFrame = actor->m_Actor.unk195 = D_800B6D1B - 1;
     p.x = actor->m_Actor.header.m_vPos.x;
     p.y = actor->m_Actor.header.m_vPos.y + func_002671B4(actor) * 0.5f;
     p.z = actor->m_Actor.header.m_vPos.z;
-    func_002254C0(D_800F7078, &p, actor->m_Actor.m_RegionLinks);
+    func_002254C0(D_800F7078, &p, actor->m_Actor.m_Lights);
     return actor;
 }

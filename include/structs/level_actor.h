@@ -11,7 +11,7 @@
  * region, intelligence), which is why the collision and drawing code can
  * take any of them. The level geometry's display list (func_00221D3C,
  * func_002222E0) draws both kinds; the level loader (func_00220D00) sets
- * the actors' killed bit and their region links; the pool functions
+ * the actors' killed bit and their lights; the pool functions
  * (func_00227240, func_002274A4, func_00227780, func_00227AE0,
  * func_00465EB0) spawn and release the pooled ones. Fields named unk are not
  * known yet. */
@@ -38,28 +38,31 @@ typedef struct CStaticObject {
     /* 0x8A */ u8 pad8A[0x90 - 0x8A];
 } CStaticObject; /* size 0x90 */
 
-/* A level actor, 0x198 bytes. The first 0x34 bytes are a CObjectHead. */
+/* A level actor, 0x198 bytes: set up from its placement record by
+ * func_002150C0, drawn by func_002152AC. The first 0x34 bytes are a
+ * CObjectHead. */
 typedef struct CLevelActor {
-    /* 0x000 */ CInstanceHeader header;     /* header.m_nObjType: the index in the level's id table */
+    /* 0x000 */ CInstanceHeader header;     /* m_Type 3; m_nObjType: the index in the level's id table */
     /* 0x018 */ CVector3 m_vVelocity;
     /* 0x024 */ s32 unk24[4];               /* CObjectHead's water displacement and m_pInstanceBelow, cleared on a spawn */
     /* 0x034 */ s32 m_Resource;             /* func_00224F84 (the model) */
-    /* 0x038 */ u8 pad38[0x138 - 0x38];
+    /* 0x038 */ f32 m_Matrices[4][16];      /* its matrix, one per frame slot (D_800B6D1C), rebuilt once per frame */
     /* 0x138 */ s32 unk138;
     /* 0x13C */ f32 m_Scale;
     /* 0x140 */ s32 unk140;
-    /* 0x144 */ s32 unk144;
+    /* 0x144 */ f32 m_RotY;
     /* 0x148 */ s32 unk148;
     /* 0x14C */ CBox m_Bounds;
-    /* 0x164 */ s32 unk164;
-    /* 0x168 */ u8 pad168[0x16C - 0x168];
+    /* 0x164 */ f32 m_ModelScale;           /* 0.35 when placed */
+    /* 0x168 */ f32 m_Height;
     /* 0x16C */ u16 m_wFlags;               /* LEVEL_ACTOR_FLAG_*: 1 dead, 2 shown, 0x20 translucent */
     /* 0x16E */ u16 m_nKilledIndex;         /* its bit in the level's killed array */
-    /* 0x170 */ u8 pad170[0x178 - 0x170];
-    /* 0x178 */ u8 m_RegionLinks[0x18];     /* filled by func_002254C0 / func_00222A9C */
-    /* 0x190 */ s32 m_ViewMask;             /* the views it shows in */
-    /* 0x194 */ u8 m_LastFrame;             /* frame counter (D_800B6D1B) stamps */
-    /* 0x195 */ u8 m_LastFrame2;
+    /* 0x170 */ s32 unk170;
+    /* 0x174 */ f32 m_AnimSpeed;            /* type 12 (morpher): the frame rate times its m_AnimSpeed (func_00215868) */
+    /* 0x178 */ u8 m_Lights[0x18];          /* the lighting at its position (func_002254C0, func_00222A9C; D_800AB0D0 when placed) */
+    /* 0x190 */ s32 m_ViewMask;             /* the views it shows in (from the placement record) */
+    /* 0x194 */ u8 m_DrawnFrame;            /* the frame (D_800B6D1B) its matrix was last built for */
+    /* 0x195 */ u8 unk195;                 /* set with m_DrawnFrame */
     /* 0x196 */ u8 pad196[0x198 - 0x196];
 } CLevelActor; /* size 0x198 */
 

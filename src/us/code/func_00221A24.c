@@ -79,7 +79,7 @@ void func_00221A24(CWorld *world) {
                 pos.x = actor->header.m_vPos.x;
                 pos.y = actor->header.m_vPos.y + func_002671B4(actor) * 0.5f;
                 pos.z = actor->header.m_vPos.z;
-                func_002254C0(world, &pos, actor->m_RegionLinks);
+                func_002254C0(world, &pos, actor->m_Lights);
             }
             if (D_800F5A10.m_vMax.x > actor->m_Bounds.m_vMin.x && D_800F5A10.m_vMin.x < actor->m_Bounds.m_vMax.x
                 && D_800F5A10.m_vMax.z > actor->m_Bounds.m_vMin.z && D_800F5A10.m_vMin.z < actor->m_Bounds.m_vMax.z
