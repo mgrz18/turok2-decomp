@@ -38,7 +38,7 @@ extern void func_002051F4(s32, void *);
 /* Streams in every grid cell of the level that is not loaded yet and spawns its objects. The loops run over
  * a rectangle of cells (firstRow..lastRow, firstCol..lastCol), here the whole grid: the column loop starting
  * from the variable firstCol, not the constant 0, is what keeps its entry test as the ROM's slt (Rage Wars'
- * decomp matches the same function with a `first` local it marks FAKEMATCH). */
+ * decomp matches the same function with a lone `first` local it flags as a fake match). */
 void func_0042BF48(CWorld *level) {
     s32 size;
     s32 width;
