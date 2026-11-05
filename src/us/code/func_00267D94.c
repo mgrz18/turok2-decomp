@@ -1,16 +1,12 @@
 #include "common.h"
 #include "structs/intelligence.h"
+#include "structs/game_object.h"
 
-typedef struct {
-    /* 0x00 */ s8 pad0[0x14];
-    /* 0x14 */ CIntelligence *def;
-} Instance;
-
-s32 func_00267D94(Instance *arg0)
+s32 func_00267D94(CInstanceHeader *arg0)
 {
   int new_var;
   CIntelligence *temp_a0;
-  temp_a0 = arg0->def;
+  temp_a0 = arg0->m_pIntelligence;
   new_var = 1;
   if (temp_a0->m_Type != new_var)
   {
