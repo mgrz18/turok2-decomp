@@ -3,6 +3,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/world.h"
+#include "structs/camera.h"
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level
@@ -10,16 +11,6 @@
  * translucent, queued on the world's sorted list (0x1064, drawn later by
  * func_0022077C). The list is built in place behind a branch command that
  * jumps over it, and later views just call it (0xDE000000). */
-
-typedef struct View View;
-struct View {
-    u8 pad0[4];
-    View *next;             /* 0x004 */
-    u8 pad8[0x2D0];
-    u8 frustum[0x60];       /* 0x2D8 */
-    f32 boxMin[3];          /* 0x338 */
-    f32 boxMax[3];          /* 0x344 */
-};
 
 typedef struct {
     s32 kind;               /* 0x00 */
@@ -80,17 +71,17 @@ void func_0020B624(void);
 void func_0020565C(s32, void **);
 void *func_002017D4(void *, s32);
 s32 func_0026F60C(void *, f32 *);
-void func_00214844(Object *, View *);
+void func_00214844(Object *, CCamera *);
 void func_002152AC(Actor *);
 
 void func_00221D3C(CWorld *w) {
     s32 r;
     s32 n;
     u8 *objs;
-    View *views;
+    CCamera *views;
     s32 mask;
     s32 vmask;
-    View *v;
+    CCamera *v;
     CWorldSector *regions;
     CWorldSector *region;
     Cell *cell;
@@ -109,7 +100,7 @@ void func_00221D3C(CWorld *w) {
     mask = D_8011AAE0.mask;
     vmask = D_800F5A40;
     if (D_800ACDE0 == NULL) {
-        views = *(View **)((u8 *)&D_8011AAE0 - 0x1210);
+        views = *(CCamera **)((u8 *)&D_8011AAE0 - 0x1210);
         if (views == NULL) {
             return;
         }
@@ -163,12 +154,12 @@ void func_00221D3C(CWorld *w) {
                 found = 0;
                 while (v != NULL) {
                     cell = region->m_pBounds;
-                    if (cell->maxX > v->boxMin[0] && cell->minX < v->boxMax[0]
-                        && cell->maxZ > v->boxMin[2] && cell->minZ < v->boxMax[2]) {
+                    if (cell->maxX > v->m_ViewMin.x && cell->minX < v->m_ViewMax.x
+                        && cell->maxZ > v->m_ViewMin.z && cell->minZ < v->m_ViewMax.z) {
                         found = 1;
                         break;
                     }
-                    v = v->next;
+                    v = v->m_pNext;
                 }
                 if (found) {
                     func_0020565C(0, region->m_hData);
@@ -186,14 +177,14 @@ void func_00221D3C(CWorld *w) {
                                     v = views;
                                     found = 0;
                                     while (v != NULL) {
-                                        if (v->boxMax[0] > o->boxMin[0] && v->boxMin[0] < o->boxMax[0]
-                                            && v->boxMax[2] > o->boxMin[2] && v->boxMin[2] < o->boxMax[2]
-                                            && v->boxMax[1] > o->boxMin[1] && v->boxMin[1] < o->boxMax[1]
-                                            && func_0026F60C(v->frustum, o->boxMin)) {
+                                        if (v->m_ViewMax.x > o->boxMin[0] && v->m_ViewMin.x < o->boxMax[0]
+                                            && v->m_ViewMax.z > o->boxMin[2] && v->m_ViewMin.z < o->boxMax[2]
+                                            && v->m_ViewMax.y > o->boxMin[1] && v->m_ViewMin.y < o->boxMax[1]
+                                            && func_0026F60C(v->m_ViewVolume, o->boxMin)) {
                                             found = 1;
                                             break;
                                         }
-                                        v = v->next;
+                                        v = v->m_pNext;
                                     }
                                     if (found) {
                                         o->owner = region->m_hData;
@@ -235,14 +226,14 @@ void func_00221D3C(CWorld *w) {
                                 v = views;
                                 found = 0;
                                 while (v != NULL) {
-                                    if (v->boxMax[0] > a->boxMin[0] && v->boxMin[0] < a->boxMax[0]
-                                        && v->boxMax[2] > a->boxMin[2] && v->boxMin[2] < a->boxMax[2]
-                                        && v->boxMax[1] > a->boxMin[1] && v->boxMin[1] < a->boxMax[1]
-                                        && func_0026F60C(v->frustum, a->boxMin)) {
+                                    if (v->m_ViewMax.x > a->boxMin[0] && v->m_ViewMin.x < a->boxMax[0]
+                                        && v->m_ViewMax.z > a->boxMin[2] && v->m_ViewMin.z < a->boxMax[2]
+                                        && v->m_ViewMax.y > a->boxMin[1] && v->m_ViewMin.y < a->boxMax[1]
+                                        && func_0026F60C(v->m_ViewVolume, a->boxMin)) {
                                         found = 1;
                                         break;
                                     }
-                                    v = v->next;
+                                    v = v->m_pNext;
                                 }
                                 if (found) {
                                     if (a->flags & 0x20) {

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "structs/camera.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -18,7 +19,7 @@ typedef struct Actor Actor;
 typedef struct {
     s32 inView;             /* 0x00 */
     s32 near;               /* 0x04 */
-    struct View *view;      /* 0x08 */
+    CCamera *view;      /* 0x08 */
     void **model;           /* 0x0C */
     f32 *offset;            /* 0x10 */
     s32 unk14;              /* 0x14 */
@@ -48,15 +49,6 @@ struct Actor {
     void (*update)(Actor *, void *);            /* 0x244 */
 };
 
-typedef struct View {
-    u8 pad0[0x64];
-    s32 mask;               /* 0x064 */
-    u8 pad68[0x270];
-    u8 frustum[0x60];       /* 0x2D8 */
-    f32 boxMin[3];          /* 0x338 */
-    f32 boxMax[3];          /* 0x344 */
-} View;
-
 extern char D_800A5AC4[];   /* "anim object info" */
 extern s32 D_8011ACA4;
 extern s32 D_800B6D1C;      /* current view */
@@ -73,7 +65,7 @@ s32 func_0021CDAC(Actor *, void *, s32);
 f32 func_002671B4(Actor *);
 void func_002254C0(void *, CVector3 *, void *);
 
-void func_0021D39C(Actor *actor, View *view) {
+void func_0021D39C(Actor *actor, CCamera *view) {
     f32 offset[3];
     f32 box[6];
     CVector3 pos;
@@ -108,11 +100,11 @@ void func_0021D39C(Actor *actor, View *view) {
     if (!(actor->flags & 0x300000)) {
         inView = 0;
         near = 0;
-        if (actor->region == NULL || (view->mask & actor->region->m_VisBits)) {
-            if (view->boxMax[0] > actor->boxMin[0] && view->boxMin[0] < actor->boxMax[0]
-                && view->boxMax[2] > actor->boxMin[2] && view->boxMin[2] < actor->boxMax[2]
-                && view->boxMax[1] > actor->boxMin[1] && view->boxMin[1] < actor->boxMax[1]
-                && func_0026F60C(view->frustum, actor->boxMin)) {
+        if (actor->region == NULL || (view->m_ViewParams.m_VisBits & actor->region->m_VisBits)) {
+            if (view->m_ViewMax.x > actor->boxMin[0] && view->m_ViewMin.x < actor->boxMax[0]
+                && view->m_ViewMax.z > actor->boxMin[2] && view->m_ViewMin.z < actor->boxMax[2]
+                && view->m_ViewMax.y > actor->boxMin[1] && view->m_ViewMin.y < actor->boxMax[1]
+                && func_0026F60C(view->m_ViewVolume, actor->boxMin)) {
                 inView = 1;
                 if (actor->region != NULL) {
                     near = 1;
@@ -126,10 +118,10 @@ void func_0021D39C(Actor *actor, View *view) {
                 box[3] = actor->boxMax[0] + 512.0f;
                 box[5] = actor->boxMax[2] + 512.0f;
                 box[4] = y + 0.5f;
-                if (box[0] < view->boxMax[0] && view->boxMin[0] < box[3]
-                    && box[2] < view->boxMax[2] && view->boxMin[2] < box[5]
-                    && box[1] < view->boxMax[1] && view->boxMin[1] < box[4]
-                    && func_0026F60C(view->frustum, box)) {
+                if (box[0] < view->m_ViewMax.x && view->m_ViewMin.x < box[3]
+                    && box[2] < view->m_ViewMax.z && view->m_ViewMin.z < box[5]
+                    && box[1] < view->m_ViewMax.y && view->m_ViewMin.y < box[4]
+                    && func_0026F60C(view->m_ViewVolume, box)) {
                 set_near:
                     near = 1;
                 }

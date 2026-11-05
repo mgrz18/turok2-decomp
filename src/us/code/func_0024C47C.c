@@ -70,6 +70,7 @@ void func_0024C47C(CBarrel *menu, CPlayer *player) {
 #include "gfx.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "structs/camera.h"
 
 /* An animated HUD item (func_00277328 ticks it, func_0027AD00 restarts it). */
 typedef struct {
@@ -112,16 +113,6 @@ typedef struct {
     /* 0x1244 */ HudItem fragsItem;
 } HudPlayer;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x24];
-    /* 0x024 */ s32 noCrosshair;
-    /* 0x028 */ u8 pad28[0x288 - 0x28];
-    /* 0x288 */ f32 width;
-    /* 0x28C */ f32 height;
-    /* 0x290 */ f32 x;
-    /* 0x294 */ f32 y;
-} View;
-
 extern s32 D_8011AC8C;          /* game state */
 extern u8 D_8011AAEA;           /* HUD alpha */
 extern s32 D_800C2030;          /* screen width */
@@ -135,16 +126,16 @@ extern u8 D_800ADC80[];
 
 void func_00277328(HudItem *item);
 void func_0027AD00(HudItem *item, u8 *anim);
-void func_0024A86C(HudPlayer *player, View *view);
-void func_00247438(void *crosshair, View *view);
+void func_0024A86C(HudPlayer *player, CCamera *view);
+void func_00247438(void *crosshair, CCamera *view);
 void func_00279028(s32 alpha);
-void func_00254D5C(Strokes *strokes, View *view, HudPlayer *player);
-void func_0024B3E4(Strokes *strokes, View *view, HudPlayer *player);
+void func_00254D5C(Strokes *strokes, CCamera *view, HudPlayer *player);
+void func_0024B3E4(Strokes *strokes, CCamera *view, HudPlayer *player);
 s32 func_0024E700(HudPlayer *player, s32 weapon);
 s32 func_0024E7D0(HudPlayer *player);
 void func_0027B320(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32);
 void func_00277CF0(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32, s32 rightAlign, s32 minDigits);
-void func_00254768(HudPlayer *player, View *view);
+void func_00254768(HudPlayer *player, CCamera *view);
 
 /* The next display list command. Through this helper, as in the ROM, the
  * head is loaded and stored by symbol; a post-increment written in place
@@ -156,7 +147,7 @@ static __inline__ Gfx *dl_next(void) {
 /* Draw a player's HUD: tick the item animations, the crosshair and strokes,
  * then the ammo (with the charge gauge of weapon 0xDD), the health, the
  * lives, the keys in single player, and the score and frags in multiplayer. */
-void func_0024C648(HudPlayer *player, View *view) {
+void func_0024C648(HudPlayer *player, CCamera *view) {
     f32 sx;
     f32 sy;
     f32 shift;
@@ -181,7 +172,7 @@ void func_0024C648(HudPlayer *player, View *view) {
     func_00277328(&player->scoreItem);
     func_00277328(&player->fragsItem);
     func_0024A86C(player, view);
-    if (view->noCrosshair == 0) {
+    if (view->m_ViewParams.m_nType == 0) {
         func_00247438(player->crosshair, view);
     }
     strokes = &player->strokes;
@@ -198,9 +189,9 @@ void func_0024C648(HudPlayer *player, View *view) {
         func_0024B3E4(strokes, view, player);
     }
     func_00279028(D_8011AAEA);
-    sx = view->width / (f32)D_800C2030;
+    sx = view->m_Viewport.m_Width / (f32)D_800C2030;
     shift = sx * 32.0f;
-    sy = view->height / (f32)D_800C2034;
+    sy = view->m_Viewport.m_Height / (f32)D_800C2034;
 
     ammo = func_0024E700(player, player->weapon);
     if (player->ammo.value != ammo) {
@@ -209,8 +200,8 @@ void func_0024C648(HudPlayer *player, View *view) {
     }
     icon = func_0024E7D0(player);
     if (player->ammo.anim && player->ammo.visible && icon != -1) {
-        x = player->ammo.x * sx + view->x;
-        y = player->ammo.y * sy + view->y + view->height;
+        x = player->ammo.x * sx + view->m_Viewport.m_ScreenPosX;
+        y = player->ammo.y * sy + view->m_Viewport.m_ScreenPosY + view->m_Viewport.m_Height;
         func_0027B320(0x12C, 0, x - shift + sx * 18.0f, y + sy, sx, sy, 1);
         frame = 0;
         if (icon == 0xDD) {
@@ -228,8 +219,8 @@ void func_0024C648(HudPlayer *player, View *view) {
         }
     }
 
-    x = player->healthItem.x * sx + view->x;
-    y = player->healthItem.y * sy + view->y + view->height;
+    x = player->healthItem.x * sx + view->m_Viewport.m_ScreenPosX;
+    y = player->healthItem.y * sy + view->m_Viewport.m_ScreenPosY + view->m_Viewport.m_Height;
     func_0027B320(0x12C, 0, x - shift + sx * 21.0f, y + sy, sx, sy, 1);
     func_0027B320(0x1F7, 0, x - shift + sx, y - sy * 9.0f, sx, sy, 1);
     func_00277CF0((player->health + 0xFF) >> 8, x - sx * 3.0f, y - sy * 4.0f, sx, sy, 1, 0, 0);
@@ -240,8 +231,8 @@ void func_0024C648(HudPlayer *player, View *view) {
         player->livesItem.value = lives;
     }
     if (player->livesItem.anim && player->livesItem.visible) {
-        x = player->livesItem.x * sx + view->x + view->width;
-        y = player->livesItem.y * sy + view->y;
+        x = player->livesItem.x * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
+        y = player->livesItem.y * sy + view->m_Viewport.m_ScreenPosY;
         func_0027B320(0x12C, 1, x + sx * -42.0f, y + sy * 24.0f, sx, sy, 1);
         func_0027B320(0x1F5, 0, x, y + sy * 8.0f, sx, sy, 1);
         func_00277CF0(player->lives, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
@@ -254,8 +245,8 @@ void func_0024C648(HudPlayer *player, View *view) {
             player->keysItem.value = value;
         }
         if (player->keysItem.anim && player->keysItem.visible) {
-            x = player->keysItem.x * sx + view->x;
-            y = player->keysItem.y * sy + view->y;
+            x = player->keysItem.x * sx + view->m_Viewport.m_ScreenPosX;
+            y = player->keysItem.y * sy + view->m_Viewport.m_ScreenPosY;
             func_0027B320(0x12C, 0, x + sx * 18.0f, y + sy * 28.0f, sx, sy, 1);
             func_0027B320(0x1F6, 0, x, y, sx, sy, 1);
             func_00277CF0(player->keys, x + sx * 30.0f, y + sy * 24.0f, sx, sy, 1, 0, 0);
@@ -268,8 +259,8 @@ void func_0024C648(HudPlayer *player, View *view) {
             player->scoreItem.value = value;
         }
         if (player->scoreItem.anim && player->scoreItem.visible) {
-            x = player->scoreItem.x * sx + view->x + view->width;
-            y = player->scoreItem.y * sy + view->y;
+            x = player->scoreItem.x * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
+            y = player->scoreItem.y * sy + view->m_Viewport.m_ScreenPosY;
             func_0027B320(0x1FA, 0, x, y + sy * 8.0f, sx, sy, 1);
             func_00277CF0(player->options->m_Kills, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
         }
@@ -280,8 +271,8 @@ void func_0024C648(HudPlayer *player, View *view) {
                 player->fragsItem.value = value;
             }
             if (player->fragsItem.anim && player->fragsItem.visible) {
-                x = player->fragsItem.x * sx + view->x + view->width;
-                y = player->fragsItem.y * sy + view->y;
+                x = player->fragsItem.x * sx + view->m_Viewport.m_ScreenPosX + view->m_Viewport.m_Width;
+                y = player->fragsItem.y * sy + view->m_Viewport.m_ScreenPosY;
                 func_0027B320(0x1FD, 0, x, y + sy * 8.0f, sx, sy, 1);
                 func_00277CF0(player->options->m_Tags, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
             }
