@@ -1,5 +1,5 @@
 #include "structs/vector.h"
-#include "structs/event.h"
+#include "structs/particle_event.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_2.CPP, func_802476C8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */

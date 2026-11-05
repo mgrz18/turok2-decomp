@@ -1,5 +1,5 @@
-#ifndef STRUCTS_EVENT_H
-#define STRUCTS_EVENT_H
+#ifndef STRUCTS_PARTICLE_EVENT_H
+#define STRUCTS_PARTICLE_EVENT_H
 
 /* The particle event table: D_800AD080 holds, per event kind, a handler and
  * its flags (8 bytes a kind; func_00236EA0 / func_00237EE4 call the

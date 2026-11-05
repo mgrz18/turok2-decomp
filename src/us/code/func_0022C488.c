@@ -3,7 +3,7 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
-#include "structs/event.h"
+#include "structs/particle_event.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];

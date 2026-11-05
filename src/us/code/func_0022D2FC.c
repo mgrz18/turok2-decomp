@@ -18,7 +18,7 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "structs/frame.h"
-#include "structs/event.h"
+#include "structs/particle_event.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
