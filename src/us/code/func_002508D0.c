@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x22];
@@ -9,15 +10,10 @@ typedef struct {
 } Tuning;
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 flags;
-} Surface;
-
-typedef struct {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ Surface *surface;
+    /* 0x014 */ CIntelligence *intelligence;
     /* 0x018 */ u8 pad18[4];
     /* 0x01C */ f32 climb;
     /* 0x020 */ u8 pad20[0x140 - 0x20];
@@ -45,7 +41,7 @@ static __inline__ void reset_strokes(CBarrel *s) {
 
 static __inline__ s32 try_jump(CPlayer *player, Body *body) {
     if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->flags & 0x6000)
-        && (body->surface->flags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
+        && (body->intelligence->m_dwTypeFlags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
         func_0024E5F0(player, body, 4);
         return 1;
     }

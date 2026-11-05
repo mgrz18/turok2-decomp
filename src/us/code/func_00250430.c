@@ -1,14 +1,10 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_15.CPP, func_80224408_de, with Turok 2's layouts. */
 #include "common.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 flags;
-} Surface;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x14];
-    /* 0x014 */ Surface *surface;
+    /* 0x014 */ CIntelligence *intelligence;
     /* 0x018 */ u8 pad18[0x50 - 0x18];
     /* 0x050 */ f32 heading;
     /* 0x054 */ u8 pad54[0x140 - 0x54];
@@ -42,7 +38,7 @@ s32 func_0024E5F0(Player *player, Body *body, s32 mode);
 
 static __inline__ s32 try_jump(Player *player, Body *body) {
     if (player->zoomed == 0 && !(11.25f < player->depth) && !(body->flags & 0x6000)
-        && (body->surface->flags & 2) && (player->pressed & 0x10)) {
+        && (body->intelligence->m_dwTypeFlags & 2) && (player->pressed & 0x10)) {
         func_0024E5F0(player, body, 4);
         return 1;
     }

@@ -2,17 +2,13 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 flags;
-} Surface;
+#include "structs/intelligence.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[4];
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ void *region;
-    /* 0x014 */ Surface *surface;
+    /* 0x014 */ CIntelligence *intelligence;
     /* 0x018 */ f32 pushX;
     /* 0x01C */ f32 pushY;
     /* 0x020 */ f32 pushZ;
@@ -45,7 +41,7 @@ void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
 static __inline__ s32 try_jump(CPlayer *player, Body *body) {
     if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->flags & 0x6000)
-        && (body->surface->flags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
+        && (body->intelligence->m_dwTypeFlags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
         func_0024E5F0(player, body, 4);
         return 1;
     }
