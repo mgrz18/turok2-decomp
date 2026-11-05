@@ -1,25 +1,14 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/80246E34_6.CPP, func_8024A7A0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/model.h"
 
 /* As func_0021D7BC, for a model drawn from its cached "lit vertices"
  * resource (built by func_00220208, fixed up once by func_00214F68). */
 
-typedef struct {
-    s32 draw;               /* 0x00 */
-    s32 shadow;             /* 0x04 */
-    u8 pad8[0x4];
-    s32 model;              /* 0x0C */
-    u8 pad10[0x4];
-    s32 index;              /* 0x14 */
-    s32 set0;               /* 0x18 */
-    s32 set1;               /* 0x1C */
-} DrawParams;
-
-
 extern s32 D_800ACAD8;
 
-void func_0021DC84(CGameObjectInstance *, s32, DrawParams *);
+void func_0021DC84(CGameObjectInstance *, s32, CDrawArgs *);
 void func_0020B6A0(s32, s32, s32, void *, char *, s32, s32);
 s32 **func_00203CA0(s32, s32, s32, s32, s32, CGameObjectInstance *, void *, char *, s32);
 void func_0020565C(s32, s32 **);
@@ -68,21 +57,21 @@ static __inline__ void pickSets(CGameObjectInstance *actor, s32 index, s32 *set0
     }
 }
 
-void func_0021DA8C(CGameObjectInstance *actor, s32 arg1, DrawParams *params) {
+void func_0021DA8C(CGameObjectInstance *actor, s32 arg1, CDrawArgs *params) {
     s32 **resource;
     s32 *header;
     char *object;
     char *data;
 
-    pickSets(actor, params->index, &params->set0, &params->set1);
-    actor->m_AI.m_VisBits = 1 << params->set0;
-    if (params->shadow != 0) {
+    pickSets(actor, params->m_nVariant, &params->m_nModel, &params->m_nShadowModel);
+    actor->m_AI.m_VisBits = 1 << params->m_nModel;
+    if (params->m_bShadow != 0) {
         func_0021DC84(actor, arg1, params);
     }
-    if (params->draw == 0) {
+    if (params->m_bDraw == 0) {
         return;
     }
-    resource = func_00203CA0(0, actor->m_dwUniqueID | D_800ACAD8, params->model, 0, 0, actor,
+    resource = func_00203CA0(0, actor->m_dwUniqueID | D_800ACAD8, params->m_hModel, 0, 0, actor,
                              func_00220208, "lit vertices", 1);
     if (resource == NULL) {
         return;
@@ -96,6 +85,6 @@ void func_0021DA8C(CGameObjectInstance *actor, s32 arg1, DrawParams *params) {
     } else {
         data = (char *) (header + 2);
     }
-    func_0020B6A0(params->model, ((s32)actor->m_pmtDrawMtxs), 1, 0, data, params->set0, actor->m_AI.m_nTexture);
+    func_0020B6A0(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, 0, data, params->m_nModel, actor->m_AI.m_nTexture);
     func_002051F4(0, resource);
 }

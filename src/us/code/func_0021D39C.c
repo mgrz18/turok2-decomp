@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "structs/camera.h"
+#include "structs/model.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -15,17 +16,6 @@
  * depth): they put anim before inView and model before view, as in the ROM. */
 
 typedef struct Actor Actor;
-
-typedef struct {
-    s32 inView;             /* 0x00 */
-    s32 near;               /* 0x04 */
-    CCamera *view;      /* 0x08 */
-    void **model;           /* 0x0C */
-    f32 *offset;            /* 0x10 */
-    s32 unk14;              /* 0x14 */
-    s32 unk18;              /* 0x18 */
-    s32 unk1C;              /* 0x1C */
-} DrawArgs;
 
 struct Actor {
     u8 pad0[0x4];
@@ -44,7 +34,7 @@ struct Actor {
     u8 padD8[0x38];
     u8 lights[2][0x18];     /* 0x110 */
     u8 ai[0xF4];            /* 0x140 */
-    void (*draw)(Actor *, void *, DrawArgs *);  /* 0x234 */
+    void (*draw)(Actor *, void *, CDrawArgs *);  /* 0x234 */
     u8 pad238[0xC];
     void (*update)(Actor *, void *);            /* 0x244 */
 };
@@ -69,7 +59,7 @@ void func_0021D39C(Actor *actor, CCamera *view) {
     f32 offset[3];
     f32 box[6];
     CVector3 pos;
-    DrawArgs args;
+    CDrawArgs args;
     s32 flags;
     void **anim;
     void **model;
@@ -148,14 +138,14 @@ void func_0021D39C(Actor *actor, CCamera *view) {
                 }
                 actor->flags |= 0x200;
             }
-            args.inView = inView;
-            args.near = near;
-            args.view = view;
-            args.model = model;
-            args.offset = offset;
-            args.unk14 = 0;
-            args.unk18 = 0;
-            args.unk1C = 0;
+            args.m_bDraw = inView;
+            args.m_bShadow = near;
+            args.m_pCamera = view;
+            args.m_hModel = (s32)model;
+            args.m_pOffset = offset;
+            args.m_nVariant = 0;
+            args.m_nModel = 0;
+            args.m_nShadowModel = 0;
             offset[0] = offset[1] = offset[2] = 0.0f;
             actor->draw(actor, actor->ai, &args);
         free_model:
