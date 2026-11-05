@@ -600,10 +600,19 @@ the last matched in the G pass (below).
 **Where the FAKEMATCH functions are.** Matches that rely on something the
 original source surely did not have (a `register ... asm` pin, an
 always-true test, a dead store) say so in a `/* FAKEMATCH: ... */` comment,
-on the first line or at the trick. 22 files in `src/` have one
-(`grep -rl FAKEMATCH src`): seventeen from earlier passes (register pins,
-doubled code, always-true tests), func_00409A64.c for func_00409D4C, and this pass's
-func_00204778, func_0022D2FC, func_002429BC and func_00424008. They match
+on the first line or at the trick. 16 files in `src/` have one
+(`grep -rl FAKEMATCH src`), after the Z pass de-faked seven (below). The
+engine's nine: func_00204778 (a dead store in the highlight),
+func_0022AFB4 (an always-true test), func_002429BC (the shared -1 pinned
+to `$v1`), func_00246BC0 (a dead per-mode switch and a `$s1` pin),
+func_0025E7E0, func_0025F114 and func_002603F0 (identical branches merged
+by cross-jumping, for a register's priority), func_002626A8 (a dead
+argument built early) and func_00286674 (a case body doubled under an
+always-true test). The VM modules' and the particle source's seven:
+func_0040C4F4 and its three inline copies (func_00409A64.c for
+func_00409D4C, func_0040A418, func_0040A8FC: identical if/else arms in the
+counting loop), func_0041EA84 / func_004579A4 (two register pins and a
+second player pointer) and func_0022D2FC (four `$f2`-`$f5` pins). They match
 byte for byte; the marker is for whoever looks for the original source.
 
 **De-faked in the Z pass (z1).** Files whose FAKEMATCH gave way to a
@@ -698,8 +707,8 @@ rewrite taught about the compiler:
 
 The readability pass left each file with local structs where no header fit;
 the struct consolidation then moved the biggest families into shared
-headers, in three passes of seven branches each, merged with every function
-still matching
+headers, in four passes of five to seven branches each, merged with every
+function still matching
 (docs/STRUCTS_TODO.md has what stayed local and why, and what is next). A
 file includes the header of the object it touches rather than declaring a
 view of its own. `tools/check_structs.py structs/<name>.h` checks every
@@ -719,10 +728,15 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/player_options.h` | CPlayerOptions (0x40): a player's options and per-opponent counts, `CPlayer::m_pOptions`; GameSettings holds five (included by player.h and game.h) |
 | `structs/game.h` | GameSettings (D_8011AAD8, the game settings and the multiplayer setup: the HUD alpha, CSun m_Sun at 0x184, the engine's mode block at 0x1A8) and GameSettingsBlock (its first 0x184 bytes, the block the save and the demo player copy), GameMatch (D_8011ACB0, the play clock and the running match's rules); CGame (D_80119870: the player list, the camera pool D_801198B0 and its menu pool D_80119E2C, CDebugLines, the settings) and CGameFromCameraPool (CGame seen from D_801198B0); CEngineApp (D_800F6CB0, Turok 3's names: CFrameData m_FrameData[3], m_pCurrentFrameData D_800F7070, the world D_800F7078 as bytes, CGame m_Game at 0x22BC0 with its settings also as m_Settings); includes frame.h |
 | `structs/frame.h` | CFrameData (0x140, a frame in flight: its tasks, CFrameMsg for the task queue, frame buffer, display and line lists, the ring links; D_800F7070 is the one being built, D_8011F140 the one being finished) and VideoMode (the screen modes D_800C2054[2][5], D_800C20E0) (included by game.h) |
+| `structs/emitter.h` | the region emitters (the textured layers a region turns on by CRegionInfo.m_EmitterMask): UnitVtx (an RSP vertex), CEmitterDef (the definition table D_8010FF14), CEmitter, CEmitterPool (a camera's four, CCamera.m_SkySystem) |
 | `structs/world.h` | CWorld (D_800F7078, 0x19078): the resource files, the loaded level, its actor lists and pools, the warp state; CWarpPoint, CWorldSector, CWorldRecord, CLevelHeader, CGeomHeader |
+| `structs/table.h` | the resource and level table headers: StrideTable (a record size and count, then the records: the level file's tables), OffsetTable (a sectioned block, func_002017D4), ArrayTable (count and element size, func_002018F0) |
+| `structs/rect.h` | CRect: a rectangle on the ground plane (a sector's, a floor triangle's or a sweep's bounds) |
 | `structs/region.h` | CGameRegion (the floor triangles an object's `m_pCurrentRegion` points to, linked to their neighbours) and CRegionInfo (the attributes they share by index) |
 | `structs/collision.h` | the collision code: CCollisionInfo (an object's collision response, Rage Wars' CCollisionInfo2_t), CCollisionResults (D_800F1CE0, what the last test hit; D_800F1ADC points at the one being filled) and its HitFrame node record, Sweep / SweepHit (a move as func_00239F00 tests it) with ModelSweep, MapSweep, SweepBox, CollisionQuad (a box face), DamageEvent (func_00245828), CBox (D_800F5A10) |
-| `structs/camera.h` | CCamera and CCameraPool, with CCameraViewParams, CCameraViewport, CShake, CCameraText, CPlane |
+| `structs/camera.h` | CCamera and CCameraPool, with CCameraViewParams, CCameraViewport, CShake, CCameraText, CPlane; CCamera.m_MenuPool (0x53C) is a union with menu.h's MenuPool `m_Menus`, so camera.h includes menu.h |
+| `structs/model.h` | drawing models: CDrawArgs (what an actor's draw callback gets from func_0021D39C: draw / shadow flags, the camera, the model handle and the model numbers) and CModelInstance (D_800DD578, the model batch) |
+| `structs/light.h` | CLights1 (libultra's Lights1, the light block of an actor's m_Lights), the scene light D_800AB0D0, CBlendState (D_800AB8B0, the draw colour override) and D_800AB8C0[2] (the fade and alpha) |
 | `structs/list.h` | CList, Acclaim's intrusive list (the IntrusiveList of the Rage Wars decomp; included by camera.h) |
 | `structs/cache.h` | the resource cache: CMemEntry (a loaded block: data, size, lock count, flags, age) and CCacheEntry (a load request), Turok 3's names |
 | `structs/pak.h` | the Controller Pak menus: PakDirectory (D_800C2224, the cached note directory per channel), RumblePak (D_80130AA0), PakProfile (the 0x18-byte "T2 MULTI" note, D_80130968), PakQuery; the OSPfs per channel is D_80130C80 |
@@ -732,12 +746,17 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/sound.h` | the sound manager: SndMgr, SndVoice (0xCC) and SndVoiceParams, SndEnv, SndSeq, SndVoicePool, SndFx, SndSource, SoundEffectInfo (includes libaudio.h) |
 | `structs/libaudio.h` | libultra 2.0I's libaudio with its own names (PR/libaudio.h, abi.h and the synthesizer / sequence player / sound player internals): Acmd, ALHeap, the bank and wave table types, ALSynth and ALGlobals (alGlobals is D_800B7760), ALPlayer, ALVoice, PVoice, ALParam, the filters (ALFilter, ALLoadFilter, ALResampler, ALEnvMixer, ALSave, ALFx, ALDelay, ALLowPass, ALMainBus, ALAuxBus), ALEvent and ALEventQueue, ALSeqPlayer, ALCSPlayer, ALSndPlayer, ALSoundState, ALVoiceState, ALChanState, ALSeq, ALCSeq |
 | `structs/weapon.h` | the weapons: WeaponInfo (the weapon table D_800AF618) and its AmmoInfo, CBarrel (the weapon wheel, CPlayer m_Barrel) with CBarrelItem and CBarrelIcon (included by player.h) |
+| `structs/pickup.h` | the pickup effect descriptor of the eight pickup handlers: CPickupEntry with CPickupParams (CPickupWeapon, CPickupAmmo, CPickupHealth) |
+| `structs/pick.h` | the weighted pick tables: Pick ({id, weight}, ending at -1; func_0026D518) and PickTable (one built at run time, func_0026D5DC..func_0026D628) |
+| `structs/event.h` | LevelEvent: the level event record func_0026DFB0 fires (a message, a music track, a handler called on a level actor; delayed through the world's voice queue) |
 | `structs/cinema.h` | the cinema (cutscene) state Cinema (*D_800C1BB0, 0x100) and CinemaEntry / CinemaTable |
-| `structs/boss.h` | the boss and level-script state of the VM modules: LevelScriptState (D_8012F608, with the BossState / BossMode views at D_8012F9D8 / D_8012F9DC, BossStep and the three script runners), MotherBossState (D_8012FB70, its BossWeakSpot), BlindOneState (D_80130200) with the Blind One's script VM (BlindOneStep, BlindOnePhase: the phase tables D_0043240C / D_0043232C, BlindOneMover), ScriptAnimator (the 0x64-byte value/colour animator: lights, weak spots, hit flashes) |
+| `structs/boss.h` | the boss and level-script state of the VM modules: LevelScriptState (D_8012F608, with the BossState / BossMode views at D_8012F9D8 / D_8012F9DC, BossStep and the three script runners), MotherBossState (D_8012FB70, its BossWeakSpot), BlindOneState (D_80130200) with the Blind One's script VM (BlindOneStep, BlindOnePhase: the phase tables D_0043240C / D_0043232C, BlindOneMover), ScriptAnimator (the 0x64-byte value/colour animator: lights, weak spots, hit flashes), WaveBossState (D_8012F3A0, the first module boss: five weak spots and minion waves) and WaveBossStep, SpawnPoint (D_00431D20 / D_00431C40) |
 | `structs/particle.h` | the particle system: CParticle (0x1D8), CParticleSystem (D_800F8928: 128 particles and their free, draw and active lists), the templates CROMParticleEffect / CROMParticleImpact / CROMParticleParams / CROMParticleDistance, CEventValue (an impact event's value), CDLight (a dynamic light, D_8010FF34) |
+| `structs/particle_event.h` | CEventFlags: the per-kind flags of the particle event table D_800AD080, seen from D_800AD084 as the code reads them |
 | `structs/save.h` | SaveGame: the save as it goes to and from the Controller Pak (D_800C2018 written, D_800C201C read: the play clock, the CPlayerLoadSaveData, the GameSettingsBlock, the level flags and checksum) |
 | `structs/demo.h` | the attract-mode demo player DemoPlayer (D_800F56B0, with the saved GameSettingsBlock), DemoStream (an input's bit stream), DemoHeader |
 | `structs/pager.h` | the resource pager (D_801206A0, Pager: code and data mapped through 24 TLB slots): PageMapping, PageChain (D_80121290 / D_80121294), PageRegion (D_80121378), PageJob |
+| `structs/memory.h` | CMemoryRange: the debugger's memory map D_80128130 (16 RAM ranges, then the 32 mapped TLB ranges) |
 | `structs/gbi.h` | libultra graphics types at the size the structs embed them (Mtx, Vp) |
 | `ultra_types.h` | libultra's OSThread, OSMesgQueue, OSTimer, OSContPad, OSPfs, OSPfsState and the Controller Pak internals, the VI context (__OSViContext: __osViCurr / __osViNext are D_800B7AC0 / D_800B7AC4, OSViMode, __OSViScale), plus the engine's CMutex |
 | `gfx.h` | Gfx (w0/w1) and the display-list pointer the engine appends to |
