@@ -380,9 +380,7 @@ From the sixth hand-matching batch:
 - **A loop written out in the function, not as an inline,** let two loops
   share one counter register (func_0042EF2C).
 - **FAKEMATCH, accepted where the permuter or a register pin is the only
-  way found**: a lookup written twice under an always-true test that GCC
-  merges but whose doubled references move the `$s` registers
-  (func_0040457C), and `register T *p asm("$2")` pins standing for a copy
+  way found**: `register T *p asm("$2")` pins standing for a copy
   the ROM makes (func_0041EA84, func_004579A4). Each says so in its first
   comment.
 - **A dead load before a test comes from a dead branch, not a dead read.**
@@ -622,6 +620,13 @@ in the file's first comment:
   taking its parameter's address: GCC 2.8 keeps the 8-byte struct on the
   stack, which gives the ROM's store in the jal's delay slot and its
   0x20-byte frame.
+- func_0040457C / func_0043D57C: each spawn sets `nextWave` in one place,
+  `if (spawnsLeft == 0 && CurrentWave()->type != 1) { done } else
+  nextWave = 1;`. The else-if with a `nextWave = 1` in two arms (reorg
+  makes the ROM's `bnel` copy of the one set either way) gave nextWave two
+  more refs, so global-alloc ranked it above `actor` and swapped their
+  `$s` registers; the player lookup written twice under an always-true test
+  had only made up for those refs.
 
 ### The G pass (the last drafts)
 
