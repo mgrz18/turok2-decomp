@@ -3,20 +3,6 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 flags;
-} Surface;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[4];
-    /* 0x004 */ CVector3 pos;
-    /* 0x010 */ u8 pad10[4];
-    /* 0x014 */ Surface *surface;
-    /* 0x018 */ u8 pad18[0x140 - 0x18];
-    /* 0x140 */ s32 flags;
-} Body;
-
 extern f32 D_800B6D28;      /* frame time */
 extern char D_800ADE70;     /* standing look tuning */
 extern char D_800ADE88;     /* crouching look tuning */
@@ -24,15 +10,15 @@ extern char D_800ADDBC;     /* standing move tuning */
 extern char D_800ADE4C;     /* crouching move tuning */
 
 void func_002117DC(f32 *value, f32 target, f32 rate);
-void func_0024FE10(CPlayer *player, Body *body);
-void func_0024EF70(CPlayer *player, Body *body, void *tuning);
-void func_0024F174(CPlayer *player, Body *body, void *tuning);
-s32 func_0024E5F0(CPlayer *player, Body *body, s32 mode);
+void func_0024FE10(CPlayer *player, CGameObjectInstance *body);
+void func_0024EF70(CPlayer *player, CGameObjectInstance *body, void *tuning);
+void func_0024F174(CPlayer *player, CGameObjectInstance *body, void *tuning);
+s32 func_0024E5F0(CPlayer *player, CGameObjectInstance *body, s32 mode);
 void func_00275544(s16 sound, CVector3 pos, s32, s32);
 
-static __inline__ s32 try_jump(CPlayer *player, Body *body) {
-    if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->flags & 0x6000)
-        && (body->surface->flags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
+static __inline__ s32 try_jump(CPlayer *player, CGameObjectInstance *body) {
+    if (player->m_SniperMode == 0 && !(11.25f < player->m_TimeOffGround) && !(body->m_AI.m_dwFlags & 0x6000)
+        && (body->header.m_pIntelligence->m_dwTypeFlags & 2) && (player->m_ContState.m_dwButtonsSingle & 0x10)) {
         func_0024E5F0(player, body, 4);
         return 1;
     }
@@ -42,7 +28,7 @@ static __inline__ s32 try_jump(CPlayer *player, Body *body) {
 /* Walking: bob the view, turn and move with the crouching or standing
  * tunings, hand off to a jump or to standing, play the wading sound in water,
  * then pick the walking animation from the direction. */
-void func_002505F8(CPlayer *player, Body *body) {
+void func_002505F8(CPlayer *player, CGameObjectInstance *body) {
     f32 forward;
     f32 strafe;
     f32 time;
@@ -68,15 +54,15 @@ void func_002505F8(CPlayer *player, Body *body) {
     if (player->m_Speed == 0.0f && player->m_SideSpeed == 0.0f) {
         func_0024E5F0(player, body, 2);
     }
-    if ((body->flags & 0x400) && player->m_bOnGround != 0) {
+    if ((body->m_AI.m_dwFlags & 0x400) && player->m_bOnGround != 0) {
         time = player->m_SfxTimer + D_800B6D28;
         player->m_SfxTimer = time;
         if (player->m_TotalSpeed > 5.12f && time >= 6.0f) {
             player->m_SfxTimer = time - 6.0f;
-            func_00275544(0x3AB, body->pos, 0, -1);
+            func_00275544(0x3AB, body->header.m_vPos, 0, -1);
         }
     }
-    if (body->flags & 0x6000) {
+    if (body->m_AI.m_dwFlags & 0x6000) {
         if (player->m_Speed >= 0.0f) {
             player->m_CharAnim = 0xA32;
         } else {

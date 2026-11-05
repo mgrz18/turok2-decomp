@@ -14,13 +14,6 @@ typedef struct {
     /* 0x174 */ s8 aiState;
 } Mount;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ u8 pad10[0x50 - 0x10];
-    /* 0x50 */ f32 yaw;
-} Body;
-
 extern f32 D_800B6D28;          /* frame time */
 extern f32 D_800ADDE4;          /* charge speed */
 extern f32 D_800AE344;          /* step length */
@@ -32,8 +25,8 @@ extern char D_800ADE04;         /* riding backward move tuning */
 
 f32 func_002974C0(f32 x);
 void func_002117DC(f32 *value, f32 target, f32 rate);
-void func_0024EF70(CPlayer *player, Body *body, void *tuning);
-void func_0024F174(CPlayer *player, Body *body, void *tuning);
+void func_0024EF70(CPlayer *player, CGameObjectInstance *body, void *tuning);
+void func_0024F174(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void func_00243414(Mount *actor, void *ai, s32 state);
 void func_002811CC(void *ui, f32 a, f32 b, f32 c, f32 d, s32 e, CVector3 pos);
 void func_002105A4(Mtx4f *m, f32 angle);
@@ -42,7 +35,7 @@ void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
 
 /* Riding: the mount sways the view as it turns, charges on button 8, shakes
  * the screen at each step and sets the rider's view offset. */
-void func_00251A2C(CPlayer *player, Body *body) {
+void func_00251A2C(CPlayer *player, CGameObjectInstance *body) {
     Mtx4f m;
     Mount *mount;
     CVector3 *offset;
@@ -59,9 +52,9 @@ void func_00251A2C(CPlayer *player, Body *body) {
     turn = player->m_ContState.m_FinalLookX * (((func_002974C0(player->m_RideEnemyTime * 0.2792527f) + 1.0f) * 0.01f + 0.06f) * 80.0f);
     player->m_RideEnemyTime += D_800B6D28;
     turn *= 0.017453294f;
-    yaw = body->yaw;
-    func_002117DC(&body->yaw, yaw + turn, 0.9f);
-    func_002117DC(&player->m_vHeadRotOffset.z, ((yaw - body->yaw) + player->m_ContState.m_FinalLookX * 8.0f) * 0.017453294f, 0.1f);
+    yaw = body->m_RotY;
+    func_002117DC(&body->m_RotY, yaw + turn, 0.9f);
+    func_002117DC(&player->m_vHeadRotOffset.z, ((yaw - body->m_RotY) + player->m_ContState.m_FinalLookX * 8.0f) * 0.017453294f, 0.1f);
     func_0024EF70(player, body, &D_800ADEA0);
 
     offset = NULL;
@@ -107,7 +100,7 @@ void func_00251A2C(CPlayer *player, Body *body) {
         if (50.0f < shake) {
             shake = 50.0f;
         }
-        func_002811CC(player->m_pCamera, 0.0f, shake, 0.0f, 1.0f, 1, body->pos);
+        func_002811CC(player->m_pCamera, 0.0f, shake, 0.0f, 1.0f, 1, body->header.m_vPos);
     }
 
     if (player->m_Speed > 0.0f) {
@@ -125,7 +118,7 @@ void func_00251A2C(CPlayer *player, Body *body) {
         player->m_vOnEnemyScale = D_800ADCBC;
     }
     if (offset != NULL) {
-        func_002105A4(&m, body->yaw);
+        func_002105A4(&m, body->m_RotY);
         func_0020F85C(&m, offset, &player->m_vEyeOffset);
         func_0020EF60(&player->m_vEyeOffset, &player->m_vEyeOffset, 10.24f);
     }

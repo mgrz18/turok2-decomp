@@ -24,17 +24,12 @@ typedef struct {
     /* 0x50 */ u32 flags;
 } Floor;
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x50];
-    /* 0x50 */ f32 yaw;
-} Body;
-
-Floor *func_00268A2C(Body *body);
+Floor *func_00268A2C(CGameObjectInstance *body);
 void func_002117DC(f32 *value, f32 target, f32 rate);
 
 /* Turns the body and tilts the view from the stick, at the rates of the
  * tuning scaled by the player's speed settings and slowed while zoomed. */
-void func_0024EF70(CPlayer *player, Body *body, LookTuning *tuning) {
+void func_0024EF70(CPlayer *player, CGameObjectInstance *body, LookTuning *tuning) {
     LookOptions *options;
     Floor *floor;
     f32 zoomScale;
@@ -67,7 +62,7 @@ void func_0024EF70(CPlayer *player, Body *body, LookTuning *tuning) {
     floor = func_00268A2C(body);
     if (floor == NULL || (floor->flags & 0x6000) != 0x2000) {
         if (tuning->turn != 0.0f) {
-            func_002117DC(&body->yaw, body->yaw + player->m_ContState.m_FinalLookX * 80.0f * tuning->turn * 0.017453294f, turnRate);
+            func_002117DC(&body->m_RotY, body->m_RotY + player->m_ContState.m_FinalLookX * 80.0f * tuning->turn * 0.017453294f, turnRate);
         }
     }
     tilt = -player->m_ContState.m_FinalLookY * 80.0f;
