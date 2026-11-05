@@ -407,13 +407,21 @@ views were replaced in about 230 files. Still local, and why:
 
 ## The families to merge next
 
-- **The VM menu item views** (func_00413230.c / func_0044C230.c, the two
-  copies of the VM menu module): about 50 local types each (Q04* sliders and
-  model items, O06* / O06A_* callback views, O06V, O06Seg, GfxWords_414938,
-  Vec3f_414938...). Most are Menu / MenuItem / CPlayer views; the module
-  is two big files whose functions do not all match yet (the baseline
-  match_func differences of func_00448240 / func_0044C230), so check each
-  view against both copies.
+- **The VM menu item views: done (z3).** func_00413230.c / func_0044C230.c
+  (kept in sync: the second is the first with its function names moved by
+  0x39000) define no item views now: Menu, MenuItem, MenuItemDesc, MenuDesc,
+  MenuItemLayout, MenuPool, MenuBinding (the type-5 slider binding) and
+  MenuTextStyle (D_800C1BD4) from structs/menu.h, MenuModelPart / MenuModel
+  (a type-3 item's data and its 0x330-byte extra: a CIntelligence copy and
+  a CGameObjectInstance) from structs/menu_model.h, CCamera (the viewport
+  at 0x288) from structs/camera.h, Gfx from gfx.h. Only three byte-level
+  views stay, each with its reason: MenuColorInit (D_800C1CD2, 2 bytes into
+  its table), O06Seg / O06A_4171F4 (the lights copied as words) and O06Cam
+  (D_800AB8B4, the D_800AB8B0 family). The item bytes 0x10-0x13 (Rage Wars'
+  r, g, b, a) are the cursor links (MENU_LINK_*, func_004151B4), the
+  layout's word 0 is the item index, and Menu param can hold the submenu.
+  The Selection / SelectionOwner (func_00419560 +5) and PlayerEvent
+  (func_004558C0 +5) views were Menu too (its controller and player).
 - **Globals still declared under local types** (census below): D_800AB0D0
   (ActorState, Pair, CLights, SceneLight: the scene lights), D_800AB8B0
   (BlendState, LightColor, FadeState), D_800AD084 (EffectInfo,
