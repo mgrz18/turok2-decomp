@@ -1,20 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "structs/player.h"
+#include "structs/camera.h"
 
 /* An actor's facing as a quaternion: turned half a circle from its owner's
  * player (flags 0x300000), its heading plus pitch (0x24C) in a region of
  * type 4, or else its heading applied to its own rotation (0x40). */
-
-typedef struct {
-    u8 pad0[0x12C];
-    CQuaternion rot;               /* 0x12C */
-} Player;
-
-typedef struct {
-    u8 pad0[0x51C];
-    Player *player;         /* 0x51C */
-} Owner;
 
 extern f32 D_800DD78C;
 
@@ -26,12 +18,12 @@ CQuaternion func_0021AE6C(CGameObjectInstance *actor) {
     CQuaternion result;
     CQuaternion pitch;
     CQuaternion yaw;
-    Player *player;
+    CCamera *camera;
     f32 s;
 
     if (actor->m_dwFlags & 0x300000) {
-        player = ((Owner *) actor->m_AI.m_pParent)->player;
-        if (player == NULL) {
+        camera = ((CPlayer *) actor->m_AI.m_pParent)->m_pCamera;
+        if (camera == NULL) {
             goto own;
         }
         s = func_002982F0(1.5707964f);
@@ -40,7 +32,7 @@ CQuaternion func_0021AE6C(CGameObjectInstance *actor) {
         yaw.y = s;
         yaw.z = 0.0f;
         yaw.w = func_002974C0(1.5707964f);
-        func_00210F68(&result, &yaw, &player->rot);
+        func_00210F68(&result, &yaw, &camera->m_qViewAlign);
     } else if (actor->header.m_pIntelligence->m_Type == 4) {
         s = func_002982F0(actor->m_AI.m_Turret.m_Pitch * 0.5f);
         pitch.x = s;
