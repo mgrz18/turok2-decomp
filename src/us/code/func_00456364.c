@@ -4,15 +4,10 @@
 
 /* Name entry: append the selected character to the current player's name. */
 
-typedef struct {
-    u8 pad0[0x1C];
-    void *player; /* 0x1C */
-} PlayerEvent;
-
 
 s32 func_0025340C(void *state, void *player);
 
-s32 func_00456364(MenuItem *item, PlayerEvent *event) {
+s32 func_00456364(MenuItem *item, Menu *event) {
     s32 i = func_0025340C(&D_80119870.m_PlayerList, event->player);
 
     D_800C1FB0[i].timer = 0.0f;
