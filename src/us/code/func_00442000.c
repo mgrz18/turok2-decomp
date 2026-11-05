@@ -1,31 +1,20 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "structs/collision.h"
 
 /* Module hit callback (the level's onHit, func_00408FF8 + 8 at the link address): finds the first active part the
  * hit touched; parts 10-14 are three groups, each draining the health of one still-alive slot of the current phase.
  * A slot that dies changes the anim state and clears its bit; when no slot of the phase is left, the next phase
  * state starts. */
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x6C];
-    /* 0x6C */ s32 mask;
-} Part;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s32 damage;
-    /* 0x08 */ u8 pad8[0x10 - 0x8];
-    /* 0x10 */ Part *part;
-} Hit;
-
 extern u8 D_00431D74[];
 extern void func_0040BDD0(void *obj, void *sound, s32 a2);
 extern void func_00243414(void *obj, CAI *ai, s32 state);
 
-void func_00442000(void *obj, CAI *ai, Hit *hit) {
+void func_00442000(void *obj, CAI *ai, DamageEvent *hit) {
     MotherBossState *state;
-    Part *part;
+    HitFrame *part;
     s32 mask;
     s32 idx;
     s32 i;
@@ -34,14 +23,14 @@ void func_00442000(void *obj, CAI *ai, Hit *hit) {
     s32 slot;
     s32 bit;
 
-    part = hit->part;
+    part = hit->frame;
     if (part == NULL) {
         return;
     }
     state = &D_8012FB70;
     i = 0;
     idx = -1;
-    mask = state->activeMask & part->mask;
+    mask = state->activeMask & part->unk_6C;
     for (; i < 15; i++) {
         if (idx >= 0) {
             break;

@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/region.h"
 #include "structs/game.h"
+#include "structs/collision.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 kind;                /* 1 = actor, 2 = particle */
@@ -12,13 +13,6 @@ typedef struct Actor {
     /* 0x110 */ u8 pad110[0x1A8 - 0x110];
     /* 0x1A8 */ struct CPlayer *owner;
 } Actor;
-
-typedef struct Hit {
-    /* 0x00 */ Actor *source;
-    /* 0x04 */ s32 damage;
-    /* 0x08 */ s32 pad8;
-    /* 0x0C */ s32 unkC;
-} Hit;
 
 extern u8 D_800F7078[];
 typedef struct TeamGame {
@@ -34,7 +28,7 @@ s32 func_00284174(void);
 CRegionInfo *func_0022425C(void *world, void *region);
 void func_00249358(CPlayer *player, Actor *actor, s32 damage, s32 arg3, s32 arg4);
 s32 func_0025340C(void *players, CPlayer *player);
-void func_002478C8(CPlayer *victim, CPlayer *killer, Hit *hit);
+void func_002478C8(CPlayer *victim, CPlayer *killer, DamageEvent *hit);
 
 static __inline__ s32 inSpecialRegion(CPlayer *player) {
     CRegionInfo *info;
@@ -52,7 +46,7 @@ static __inline__ s32 inSpecialRegion(CPlayer *player) {
 
 /* A player's actor took a lethal hit in multiplayer: works out the killer and
    updates the kill, death, tag and team counts. */
-void func_00247C10(Actor *actor, s32 arg1, Hit *hit) {
+void func_00247C10(Actor *actor, s32 arg1, DamageEvent *hit) {
     CPlayer *player;
     CPlayer *killer = NULL;
     s32 arg4 = -1;
@@ -84,7 +78,7 @@ void func_00247C10(Actor *actor, s32 arg1, Hit *hit) {
     if (source != NULL && source->kind == 2 && source->particleOwner == (Actor *) player) {
         hit->damage = hit->damage * 0.25f;
     }
-    func_00249358(player, actor, hit->damage, hit->unkC, arg4);
+    func_00249358(player, actor, hit->damage, hit->flags, arg4);
 
     source = hit->source;
     if (source != NULL) {

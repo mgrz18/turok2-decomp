@@ -1,17 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
-
-/* The hit being applied. */
-typedef struct {
-    /* 0x0 */ u8 pad0[4];
-    /* 0x4 */ s32 damage;
-    /* 0x8 */ u8 pad8[4];
-    /* 0xC */ u32 flags;
-} Hit;
+#include "structs/collision.h"
 
 s32 func_00243414(s32, s32, s32);
 
-void func_00265EEC(CGameObjectInstance *arg0, CAI *arg1, Hit *arg2) {
+void func_00265EEC(CGameObjectInstance *arg0, CAI *arg1, DamageEvent *arg2) {
     s32 temp_v1;
     s32 var_a2;
     s32 var_a3;
