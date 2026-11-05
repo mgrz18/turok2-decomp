@@ -1,6 +1,7 @@
 /* do { } while (0) blocks around the region setup and the second table lookup raise those pseudos' priority (GCC weights refs by loop depth) without a scheduling barrier at the call's argument moves; RW-shaped object loop (off = k), do/while loops with explicit k = 0 before the count load. */
 /* Loop shapes after thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/table.h"
 #include "gfx.h"
 #include "structs/world.h"
 
@@ -25,12 +26,6 @@ typedef struct {
     s32 kind;               /* 0x00 */
     s32 flags;              /* 0x04: views it shows in */
 } Info;
-
-typedef struct {
-    s32 stride;             /* 0x00 */
-    s32 count;              /* 0x04 */
-    u8 entries[1];          /* 0x08 */
-} Table;
 
 typedef struct {
     u8 pad0[0x14];
@@ -95,7 +90,7 @@ void func_00221D3C(CWorld *w) {
     CWorldSector *region;
     Cell *cell;
     void *grp;
-    Table *t;
+    StrideTable *t;
     Object *o;
     Actor *actors;
     Actor *a;

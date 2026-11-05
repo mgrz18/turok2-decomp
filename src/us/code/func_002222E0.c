@@ -1,6 +1,7 @@
 /* The do { } while (0) around the region-loop setup raises the region counter's priority (GCC weights refs by loop depth) so it gets fp and the object-table base is spilled, as in the ROM. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00289054.c, func_00289054, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/table.h"
 #include "structs/game.h"
 #include "structs/player.h"
 #include "gfx.h"
@@ -28,12 +29,6 @@ typedef struct {
     s32 kind;               /* 0x00 */
     s32 flags;              /* 0x04: views it shows in */
 } Info;
-
-typedef struct {
-    s32 stride;             /* 0x00 */
-    s32 count;              /* 0x04 */
-    u8 entries[1];          /* 0x08 */
-} Table;
 
 typedef struct {
     s32 stride;             /* 0x00 */
@@ -105,7 +100,7 @@ void func_002222E0(CWorld *w, View *v_) {
     s32 cnt;
     s32 si;
     u16 *ip;
-    Table *t;
+    StrideTable *t;
     CWorldSector *regions;
     CWorldSector *region;
     Cell *cell;
