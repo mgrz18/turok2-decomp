@@ -607,6 +607,15 @@ doubled code, always-true tests), func_00409A64.c for func_00409D4C, and this pa
 func_00204778, func_0022D2FC, func_002429BC and func_00424008. They match
 byte for byte; the marker is for whoever looks for the original source.
 
+**De-faked in the Z pass (z1).** Files whose FAKEMATCH gave way to a
+natural form:
+
+- **func_00244338: the third parameter is the target.** The caller passes
+  the plan's m_pPathTarget there (Rage Wars' caller passes the tracker's
+  target too); the function refreshes it from the plan after the path update
+  and keeps it in the parameter, and `boost` is a local. Written so, the
+  `$s5`/`$s6` order of the prologue is the ROM's, with no reused flag.
+
 ### The G pass (the last drafts)
 
 Two of the three drafts left in `nonmatching/` matched:

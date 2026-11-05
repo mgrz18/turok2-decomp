@@ -55,14 +55,18 @@ static __inline__ void Approach(CGameObjectInstance *self, CGameObjectInstance *
 
 /* Picks what the plan aims at (its target, itself, a location or home
  * point, or the actor) and fills `out` with the kind, target, range, goal
- * position and its offset from the actor, in 3D and flattened. */
-void func_00244338(CGameObjectInstance *self, CAI *plan, s32 boost, CAITarget *out) {
+ * position and its offset from the actor, in 3D and flattened. The caller
+ * (func_00246108) passes the plan's m_pPathTarget as `target`; the path
+ * update below may change it, so it is read again from the plan into the
+ * parameter. With the parameter reused that way and boost a local of its
+ * own, the $s registers come out as in the ROM. */
+void func_00244338(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target, CAITarget *out) {
     CVector3 pos;
     CVector3 probe;
     CVector3 away;
     CVector3 delta;
     s32 region;
-    CGameObjectInstance *target;
+    s32 boost;
     s32 kind;
     s32 mode;
     f32 range;
@@ -72,7 +76,7 @@ void func_00244338(CGameObjectInstance *self, CAI *plan, s32 boost, CAITarget *o
     CPlayer *player;
     Location *loc;
 
-    boost = 0; /* FAKEMATCH: the unused third parameter doubles as the boost flag (as in Rage Wars' func_80214DD4_de); a separate local gives the same code but swaps $s5/$s6 in the prologue. */
+    boost = 0;
     if (self->header.m_pIntelligence->m_Type == 1) {
         mode = func_0025E428(self, plan);
     } else {
