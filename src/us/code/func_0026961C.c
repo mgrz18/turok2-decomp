@@ -1,21 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
-
-typedef struct ActorMotion {
-    /* 0x00 */ u8 kind;
-    /* 0x01 */ u8 pad1[3];
-    /* 0x04 */ CVector3 pos;
-    /* 0x10 */ void *region;
-    /* 0x14 */ u8 pad14[4];
-    /* 0x18 */ CVector3 velocity;
-    /* 0x24 */ u8 pad24[0x34 - 0x24];
-} ActorMotion; /* size 0x34 */
-
-typedef struct Actor {
-    /* 0x00 */ ActorMotion motion;
-    /* 0x34 */ u8 pad34[0xD4 - 0x34];
-    /* 0xD4 */ s32 flags;
-} Actor;
+#include "structs/game_object.h"
 
 typedef struct CollisionInfo {
     /* 0x00 */ s32 flags;
@@ -26,19 +11,19 @@ extern CollisionInfo D_800F1B60;
 extern CollisionInfo D_800F1B80;
 extern CollisionInfo D_800F1BE0;
 
-s32 func_00267EE8(Actor *actor);
-s32 func_00267F64(Actor *actor);
-s32 func_00267FA8(Actor *actor);
-s32 func_00239F00(Actor *actor, CVector3 pos, CollisionInfo *info);
+s32 func_00267EE8(CGameObjectInstance *actor);
+s32 func_00267F64(CGameObjectInstance *actor);
+s32 func_00267FA8(CGameObjectInstance *actor);
+s32 func_00239F00(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
 
 /* Tests moving an actor to pos with the collision settings that suit it, leaving it where it was; returns the collision result. */
-s32 func_0026961C(Actor *actor, CVector3 pos, CollisionInfo **outInfo) {
-    ActorMotion saved;
+s32 func_0026961C(CGameObjectInstance *actor, CVector3 pos, CollisionInfo **outInfo) {
+    CObjectHead saved;
     CollisionInfo *info;
     s32 alt;
     s32 hit;
 
-    if (actor->motion.kind == 1 && (actor->flags & 0x300000)) {
+    if (actor->header.m_Type == 1 && (actor->m_dwFlags & 0x300000)) {
         info = &D_800F1BE0;
     } else {
         alt = func_00267EE8(actor);
@@ -51,8 +36,8 @@ s32 func_0026961C(Actor *actor, CVector3 pos, CollisionInfo **outInfo) {
     if (outInfo != NULL) {
         *outInfo = info;
     }
-    saved = actor->motion;
+    saved = *(CObjectHead *) actor;
     hit = func_00239F00(actor, pos, info);
-    actor->motion = saved;
+    *(CObjectHead *) actor = saved;
     return hit;
 }
