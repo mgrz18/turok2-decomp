@@ -1,30 +1,20 @@
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ void *script;
-} Cinema;
-
-typedef struct {
-    /* 0x000 */ u8 pad0[0x53C];
-    /* 0x53C */ Cinema *cinema;
-} Camera;
+#include "structs/camera.h"
 
 extern s32 D_8011ACA4;
 extern char D_00439640; /* death screen */
 
-/* Whether a cinema holds the player's view (the death screen does not count). */
-
-/* Whether a cinema holds the player's view (the death screen does not count). */
+/* Whether the game is paused (D_8011ACA4) or a menu other than the death
+ * screen is open on the player's camera. */
 s32 func_00253FFC(CPlayer *p) {
-    Cinema *c;
+    Menu *menu;
 
     if (D_8011ACA4) {
         return 1;
     }
-    if (p->m_pCamera != NULL && (c = ((Camera *)p->m_pCamera)->cinema) != NULL) {
-        if (c->script != &D_00439640) {
+    if (p->m_pCamera != NULL && (menu = p->m_pCamera->m_Menus.head) != NULL) {
+        if (menu->desc != (MenuDesc *) &D_00439640) {
             return 1;
         }
     }
