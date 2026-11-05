@@ -18,6 +18,6 @@ typedef struct LevelEvent {
     /* 0x10 */ u8 message;      /* index into the {text, sound} table */
     /* 0x11 */ u8 kind;         /* callback table */
     /* 0x12 */ u8 handler;      /* entry in that table */
-} LevelEvent;
+} LevelEvent; /* size 0x14 */
 
 #endif
