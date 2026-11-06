@@ -4,6 +4,7 @@
 #include "structs/world.h"
 #include "globals/render.h"
 #include "globals/player.h"
+#include "globals/object.h"
 
 s32 CScene__FindObjectType(CScene *, s32);
 CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *);
@@ -20,7 +21,6 @@ void CGameObjectInstance__DrawModelLitVertices(void);
 extern CScene gScene;
 extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;      /* player count */
 extern u8 *gEngineApp_m_Game_m_PlayerList_m_Players;      /* players, 0x1328 bytes each */
-extern void *gIntelligenceTypeInfo[];
 
 /* The body (collision) setup for the object's intelligence type; a player's
  * second object (its body at +0x288) gets its own. */

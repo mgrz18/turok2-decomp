@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/model.h"
+#include "globals/scene.h"
 
 /* As CGameObjectInstance__DrawModelLitVertices (engine), for a model drawn from its cached "lit vertices"
  * resource: the region sets come from CGameObjectInstance__GetDeathModels and the colour from the
  * module global D_8012FB64. */
 
-extern s32 gLitVerticesKey;
 extern s32 D_8012FB64;
 extern char D_800C0570[];   /* "lit vertices" */
 

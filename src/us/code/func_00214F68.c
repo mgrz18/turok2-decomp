@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/GAMECORE/CODE_80278900.CPP, func_8027892C_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/scene.h"
 
 /* Pulses the vertex colours of a model whose vertices carry a pulse phase
  * (flag bits 0x70) and amplitude shift (bits 0xC), from their saved base colours. */
@@ -20,7 +21,6 @@ typedef struct {
 VertexGroup *CISet__GetBlock(s32 *, s32);
 
 extern s32 gFrameCount;
-extern s8 gColorPulseTable[];
 
 void Model_PulseVertexColors(s32 *object, u8 *colors) {
     s32 state = gFrameCount;

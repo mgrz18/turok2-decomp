@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 /* What this reads. */
 typedef struct {
@@ -10,7 +11,6 @@ typedef struct {
 } Drawable;
 
 void CCache__Touch(s32, s32);                       /* extern */
-extern s32 gLitVerticesKey;
 extern u8 D_800B6D1B;
 
 void CStaticObject__TouchLitVertices(Drawable *arg0) {

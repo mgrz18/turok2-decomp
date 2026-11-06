@@ -1,8 +1,7 @@
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
+#include "globals/math.h"
 
 /* acos lookup: 1024 samples of acos over [0, 1]. */
-extern f32 gAcosTable[];
 
 f32 Math_AcosLookup(f32 x) {
     s32 neg;

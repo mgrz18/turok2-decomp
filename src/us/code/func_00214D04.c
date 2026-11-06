@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 /* The record this spawns from: an id at 0x24, extra spawn flags at 0x80 and its own flags at 0x88 (0x40: disabled). */
 typedef struct {
@@ -15,7 +16,6 @@ s32 CCache__Unlock(s32, s32);                /* extern */
 s32 Model_RequestTextures(s32);                         /* extern */
 s32 CStaticObject__LoadGeometry();                                /* extern */
 extern s32 D_800A57F8;
-extern s32 gLitVerticesKey;
 extern s32 CStaticObject__BuildLitVerticesCallback;
 
 void CStaticObject__RequestLitVertices(SpawnSource *arg0) {

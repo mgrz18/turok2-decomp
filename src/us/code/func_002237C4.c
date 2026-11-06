@@ -3,18 +3,13 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
-
-typedef struct ColorEntry {
-    /* 0x00 */ f32 value;               /* the fade's length */
-    /* 0x04 */ u8 pad4[4];
-} ColorEntry;
+#include "globals/scene.h"
 
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
-extern ColorEntry gWarpFadeColors[];
 extern f32 gFrameIncrement;                  /* the frame's time step */
 extern u8 D_800B54E0[];
 
-void Cinema_Reset(ColorEntry *entry);
+void Cinema_Reset(CWarpFadeColor *entry);
 void Cinema_StopAtEnd(void);
 void Cinema_RequestById(s32 arg0);
 s32 CScene__FindWarpDests(CScene *world, s32 arg1, s32 id, CWarpPoint *spawn, s32 arg4);
@@ -32,7 +27,7 @@ static __inline__ s32 transitionId(CScene *scene) {
 /* Runs the fade of a level transition: state 1 fades in to the entry length and then warps
  * (CScene__FindWarpDests, or straight to ~id for a negative id), state 2 fades back out. */
 void CScene__UpdateWarp(CScene *scene) {
-    ColorEntry *entry = &gWarpFadeColors[scene->m_WarpFade];
+    CWarpFadeColor *entry = &gWarpFadeColors[scene->m_WarpFade];
     s32 id;
     GameSettings *settings;
 
@@ -40,7 +35,7 @@ void CScene__UpdateWarp(CScene *scene) {
         case 0:
             break;
         case 1:
-            if (scene->m_WarpTime == entry->value) {
+            if (scene->m_WarpTime == entry->length) {
                 Cinema_Reset(entry);
                 if (scene->m_WarpID == 999) {
                     Cinema_StopAtEnd();
@@ -69,8 +64,8 @@ void CScene__UpdateWarp(CScene *scene) {
                 }
             } else {
                 scene->m_WarpTime += gFrameIncrement;
-                if (entry->value < scene->m_WarpTime) {
-                    scene->m_WarpTime = entry->value;
+                if (entry->length < scene->m_WarpTime) {
+                    scene->m_WarpTime = entry->length;
                 }
             }
             break;

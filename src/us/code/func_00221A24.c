@@ -3,6 +3,7 @@
 #include "structs/world.h"
 #include "structs/collision.h"
 #include "structs/level_actor.h"
+#include "globals/scene.h"
 
 typedef struct List {
     s32 pad0;
@@ -11,7 +12,6 @@ typedef struct List {
 } List;
 
 extern s32 gEngineApp_m_Settings_difficulty;          /* visible layers */
-extern s32 gLitVerticesKeyChanged;
 extern CBox gCameraVisibleBox;       /* visible bounds */
 
 void *CISet__GetBlock(void *table, s32 index);

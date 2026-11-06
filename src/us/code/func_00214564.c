@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FX/8024F950.CPP, func_8024FD80_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* A placed prop as the level file stores it. */
 typedef struct {
@@ -45,7 +46,6 @@ void CMtxF__ToMtxAffine(void *, f32 *);
 f32 HalfToFloat(s32);
 
 extern u8 gScene[];
-extern s32 gNextUniqueId;
 extern s32 gDefaultVisBits;
 extern u8 D_800B6D1B;
 

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/scene.h"
 
-extern s32 gDLightBufferOffset;
 extern s32 gDLightBufferIndex;
 
 void DLights_SwapBuffers(void) {

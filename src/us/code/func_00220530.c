@@ -1,12 +1,10 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 /* The input state the controller reader fills (gEngineApp_m_Settings, 0x184 bytes). */
 
-extern s32 gLitVerticesKey;      /* lit-vertices cache key (GameSettings+0xC, cheat bits 0x100/0x200) */
-extern s32 gLitVerticesKeyChanged;      /* buttons changed */
-extern s32 gSceneGeometryDL;
 extern f32 gFrameIncrement;      /* frame time scale */
 extern f32 gQuaternionSin;
 extern u8 gEngineApp_m_SwooshSystem[];
