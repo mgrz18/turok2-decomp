@@ -11,10 +11,8 @@ typedef struct {
     f32 unk_5C;                 /* 0x5C */
 } State;
 
-extern f32 D_800C0540;          /* 1.0f */
-
 void Primagen_EnterMode24(CGameObjectInstance *actor) {
-    f32 one = D_800C0540;
+    f32 one = 1.0f;
     State *state;
 
     actor->m_AI.m_AnimSpeed = one;

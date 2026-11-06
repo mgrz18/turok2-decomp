@@ -27,12 +27,7 @@ extern void CCache__Deallocate(s32 heap, MemHandle *handle);                    
 extern u32 GetMemSize(void);                                             /* osGetMemSize */
 extern void memset(void *dst, s32 value, u32 size);                  /* memset */
 
-extern char D_800C1810[];
-extern char D_800C181C[];
-extern char D_800C182C[];
-extern char D_800C184C[];
-extern char D_800C185C[];
-extern char D_800C1864[];
+extern char D_800C1864[]; /* "audio heap": the byte after it is the linker's fill (0x0B), not a zero the C could give */
 
 void GfxPool_Alloc(GfxPool *pool) {
     u32 mb = 0x100000;
@@ -75,8 +70,8 @@ void GfxPool_Alloc(GfxPool *pool) {
     if (GetMemSize() >= mb * 6) {
         size = 0x54600;
         base = GetMemSize() | 0x80000000;
-        depth = CCache__AllocateAt(0, base - mb, size, D_800C1810);
-        fb = CCache__AllocateAt(0, base - mb * 2, 0xFD200, D_800C181C);
+        depth = CCache__AllocateAt(0, base - mb, size, "Z-Buffer");
+        fb = CCache__AllocateAt(0, base - mb * 2, 0xFD200, "Display Buffer");
         memset((void *) fb->addr, 0, 0xFD200);
         memset((void *) depth->addr, 0, 0x54600);
         pool->depth = depth;
@@ -88,7 +83,7 @@ void GfxPool_Alloc(GfxPool *pool) {
     } else {
         size = 0x1ECC0;
         base = 0x80400000;
-        block = CCache__AllocateAt(0, base - (gTotalFramebuffers + 1) * size, (gTotalFramebuffers + 1) * size, D_800C182C);
+        block = CCache__AllocateAt(0, base - (gTotalFramebuffers + 1) * size, (gTotalFramebuffers + 1) * size, "color frame buffers + z buffer");
         pool->fb[0] = block;
         for (i = 0; i < gTotalFramebuffers; i++) {
             gCFB[i] = block->addr + i * size;
@@ -99,8 +94,8 @@ void GfxPool_Alloc(GfxPool *pool) {
         memset((void *) gCFB[i], 0, size);
     }
     memset((void *) gDepthBuffer, 0, size);
-    pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * 16, 0x23, D_800C184C);
-    pool->dynamic = CCache__Allocate(0, 0x8000, 0x23, D_800C185C);
+    pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * 16, 0x23, "display lists");
+    pool->dynamic = CCache__Allocate(0, 0x8000, 0x23, "fifo");
     pool->vtx = CCache__Allocate(0, 0x22000, 0x23, D_800C1864);
     gDisplayList1 = pool->gfx->addr;
     gLineList0 = gDisplayList1 + gDisplayListSize * 8;

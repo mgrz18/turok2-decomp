@@ -6,8 +6,6 @@
 #include "globals/engine.h"
 #include "globals/player.h"
 
-extern f32 D_800A6AC8; /* 60.0f, in the engine's .rodata */
-
 extern void CPlayer__SetState(CPlayer *p, CPlayer *q, s32);
 extern void Controller_SetRumbleOption(s32 controller, s32 state);
 extern void CPlayer__Respawn(CPlayer *p);
@@ -36,7 +34,7 @@ void CPlayer__LoseLife(CPlayer *p) {
         p->m_Data.m_Health = 0x6400;
         p->m_CharacterActor.m_AI.m_Health = 0x6400;
     }
-    p->m_InvincibilityTime = D_800A6AC8;
+    p->m_InvincibilityTime = 60.0f;
     CPlayer__Reset(p);
     p->m_ShockedTimer = 0;
     p->m_pHitMeWithCBore = 0;

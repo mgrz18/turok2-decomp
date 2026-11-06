@@ -5,12 +5,10 @@
 s32 AI_StartSound(s32, s32, s32);
 s32 Sound__Play(s32, s32, s32, s32, s32, s32);
 
-extern f32 D_800C0508;
-
 /* The (s8 *) casts keep these stores char-based, as the original code had
  * them; plain member stores schedule differently. */
 void Primagen_EnterMode2_2(CGameObjectInstance *arg0, s32 arg1) {
-    *(f32 *) (s8 *) &arg0->m_AI.m_AnimSpeed = (f32) D_800C0508;
+    *(f32 *) (s8 *) &arg0->m_AI.m_AnimSpeed = 1.0f;
     *(s8 *) &gLevelScript.unk3CA = 0;
     *(s32 *) ((s8 *) &gLevelScript.unk3CA + 0x1A) = 0;
     *(s32 *) ((s8 *) &arg0->m_dwFlags) |= 0x2000;

@@ -4,9 +4,6 @@
 
 M2C_UNK ScriptAnimator_SetScript(void *, M2C_UNK *);           /* extern */
 extern M2C_UNK sPrimagenMode7PartScript_2; /* local type: f32[] in globals/boss.h, whose structs/boss.h clashes with this file's M2C_UNK gLevelScript */
-extern f32 D_800C0488;
-extern f32 D_800C048C;
-extern f32 D_800C0490;
 extern M2C_UNK gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
 extern M2C_UNK gLevelScript_bossMode;
 
@@ -20,13 +17,13 @@ void Primagen_EnterMode7_2(CGameObjectInstance *arg0) {
     }
     temp_s2 = ((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x3D4));
     if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 1) {
-        arg0->m_AI.m_AnimSpeed = (f32) D_800C0488;
+        arg0->m_AI.m_AnimSpeed = 1.0f;
     }
     if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 2) {
-        arg0->m_AI.m_AnimSpeed = (f32) D_800C048C;
+        arg0->m_AI.m_AnimSpeed = 1.2f;
     }
     if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 3) {
-        arg0->m_AI.m_AnimSpeed = (f32) D_800C0490;
+        arg0->m_AI.m_AnimSpeed = 1.3f;
     }
     if ((M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 1) && (M2C_FIELD(temp_s2, s32 *, 0x18) == 0)) {
         ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x284)), &sPrimagenMode7PartScript_2);

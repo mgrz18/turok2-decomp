@@ -2,19 +2,10 @@
 #include "structs/game_object.h"
 #include "globals/boss.h"
 
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 animSpeed;
-} Tuning;
-
-extern Tuning D_800C0530;
-
 void Primagen_EnterMode23(CGameObjectInstance *obj) {
-    f32 *speed = &D_800C0530.animSpeed;
-    f32 *animSpeed = &obj->m_AI.m_AnimSpeed;
-    s32 *flags = &obj->m_dwFlags;
+    f32 speed = 1.0f;
 
-    *animSpeed = *speed;
-    gLevelScript.timer = *speed;
-    *flags = (s32) (*flags | 0x2000);
+    obj->m_AI.m_AnimSpeed = speed;
+    gLevelScript.timer = speed;
+    obj->m_dwFlags |= 0x2000;
 }

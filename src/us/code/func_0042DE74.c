@@ -8,13 +8,6 @@
 #include "globals/render.h"
 #include "globals/player.h"
 
-/* In the engine's .rodata, the pool shared with CPlayer__FireWeapon. */
-extern f32 D_800A6AA0;          /* 437.5f */
-extern f32 D_800A6AA4;          /* -675.0f */
-extern f32 D_800A6AA8;          /* 0.25f */
-extern f32 D_800A6AAC;          /* 0.1875f */
-extern f32 D_800A6AB0;          /* 1.5707964f */
-
 extern void CPlayer__PickSpawnPoint(void);
 extern void CPlayer__LoadCharacterModel(CPlayer *p);
 extern void Controller_SetRumbleOption(s32 controller, s32 state);
@@ -45,12 +38,12 @@ void CPlayer__LevelStart(CPlayer *p) {
     c->m_vPos.x = 0.0f;
     c->m_vRot.x = 0.0f;
     c->m_vRot.z = 0.0f;
-    c->m_vPos.y = D_800A6AA0;
-    c->m_vPos.z = D_800A6AA4;
-    c->m_vScale.x = D_800A6AA8;
-    c->m_vScale.y = D_800A6AAC;
-    c->m_vScale.z = D_800A6AA8;
-    c->m_vRot.y = D_800A6AB0;
+    c->m_vPos.y = 437.5f;
+    c->m_vPos.z = -675.0f;
+    c->m_vScale.x = 0.25f;
+    c->m_vScale.y = 0.1875f;
+    c->m_vScale.z = 0.25f;
+    c->m_vRot.y = 1.5707965f;
     p->m_pRumble = NULL;
     if (!flags->multiplayer) {
         Controller_SetRumbleOption((s32) p->m_ContState.m_pContState, 1);

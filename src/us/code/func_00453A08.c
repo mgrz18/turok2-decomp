@@ -20,14 +20,12 @@ struct MenuRecAt20V4 {
 };
 struct MenuRecAt20V4;
 typedef struct MenuRecAt20V4 MenuRecAt20V4;
-extern f32 D_800C1274[];
-extern f32 D_800C1274[];
 s32 EnterCheatMenu_UpdateTextField_2(void *unused, MenuRecAt20V4 *menu) {
     f32 t;
     t = gCheatEntry.timer + gFrameIncrement;
     gCheatEntry.timer = t;
-    if (t >= D_800C1274[1]) {
-        gCheatEntry.timer = t - D_800C1274[1];
+    if (t >= 15.0f) {
+        gCheatEntry.timer = t - 15.0f;
     }
     if (menu->state == 2) {
         if (((s32 (*)(s32))Controller_MenuLeft)(menu->input) != 0 && gCheatEntry.cursor > 0) {

@@ -14,8 +14,6 @@ typedef struct PlayerList {
     /* 0x20 */ u8 list1[0x14];
 } PlayerList;
 
-extern char D_800A7080[]; /* in the engine's .rodata */
-
 extern void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
 extern void CList__AddHead(void *list, CPlayer *p);
 extern void CList__AddTail(void *list, CPlayer *p);
@@ -64,7 +62,7 @@ void CPlayerPool__NewGame(PlayerList *list, s32 count, s32 arg2) {
         return;
     }
     list->count = count;
-    list->handle = CCache__Allocate(0, count * sizeof(CPlayer), 0x23, D_800A7080);
+    list->handle = CCache__Allocate(0, count * sizeof(CPlayer), 0x23, "Players");
     list->players = *list->handle;
     memset(list->players, 0, count * sizeof(CPlayer));
     for (i = 0; i < list->count; i++) {

@@ -6,8 +6,6 @@
 #include "structs/player.h"
 #include "globals/game.h"
 
-extern f32 D_800A6A98; /* 0.5f, in the engine's .rodata */
-
 extern void CGameObjectInstance__ConstructFromRecord(void *obj, void *rec, s32 mode, s32 index);
 extern void CGameObjectInstance__CalculateOrientationMatrix();
 extern void Actor_PlayRangedSound();
@@ -50,7 +48,7 @@ void CPlayer__SetupActors(CPlayer *p, void *rec, s32 mode) {
     p->m_WeaponActor.m_AI.m_pfHit = CPlayer__OnParticleHitCallback;
     p->m_WeaponActor.m_dwFlags |= 0x200000;
     p->m_Data.m_CurrentWeapon = -1;
-    half = D_800A6A98;
+    half = 0.5f;
     p->m_WeaponActor.m_vScale.x = half;
     p->m_WeaponActor.m_vScale.y = half;
     p->m_WeaponActor.m_vScale.z = half;

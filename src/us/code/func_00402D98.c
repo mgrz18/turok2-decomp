@@ -4,12 +4,10 @@
 f32 Math_DecayToZero(f32, f32);
 s32 CAI__SetMode(s32, s32, s32);
 
-extern f32 D_800C0354;
-
 void MantidQueen_UpdateMode4(s32 arg0, CAI *arg1) {
     f32 temp_f20;
 
-    temp_f20 = D_800C0354;
+    temp_f20 = 51.199997f;
     arg1->m_vDesiredPos.x = Math_DecayToZero(arg1->m_vDesiredPos.x, temp_f20);
     arg1->m_vDesiredPos.z = Math_DecayToZero(arg1->m_vDesiredPos.z, temp_f20);
     if (arg1->m_AnimRepeatedCount != 0) {

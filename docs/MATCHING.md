@@ -755,6 +755,70 @@ rewrite taught about the compiler:
 - **A `CVector3` passed by value** gives the same three `lw a1-a3` as the
   three floats m2c passed as words, so the by-value prototype can be used.
 
+### Literals in the VM modules (the L pass)
+
+The VM files (module 1 at 0x400000 and its module-2 copies) read their
+floats and strings through anonymous `D_` externs in the KSEG0 pools: the
+engine's .rdata (0x800A51F8-0x800AB0A8) for the scene, player and camera
+files, the tail pool after the microcode (0x800BFD50-) for the bosses,
+menus and pak code, and the data area after .rodata (0x800AB0A8-) for the
+menu tables. Of the 1,054 such extern declarations (273 into the pools,
+781 into the data area), 165 became C literals (108 into the pools are
+left), each file then owning its slice (`[rom, .rodata, code/<file>]`
+in the yaml) and each module-2 copy written like its original and placed
+over it in `versions/shared_rodata.us.txt` (docs/VMASM.md). Where the yaml had given
+the pool to the copy (func_0045302C), the original takes it back.
+
+- **`tools/rodata_check.py` checks a conversion without a build.**
+  asm_diff reports every converted file as different by design (the load
+  now goes through `$LC0` or the pool `sn_li.py` writes). rodata_check
+  compiles the file as the Makefile does, places its .rodata where the yaml
+  or shared_rodata.us.txt puts it (or `--at`, for a draft), and compares
+  the .rodata and every word of .text, with all relocations resolved,
+  against the ROM; a shared copy's jump-table entries by their distances,
+  as `shared_rodata.py --check` does.
+- **The object's pad is zeros, the linker's is not.** Inside a file's
+  .rodata the assembler pads strings to 4 with zeros; between objects the
+  SN linker left garbage (`"%02d"` at 0x800C1338 is followed by `00 07 00
+  0d`, "audio heap" at 0x800C1864 by `0b`; the code-like words at
+  0x800C0E64 and 0x800C1028 are such fill). A string whose tail is fill
+  cannot come from C: it stays an extern, with a comment.
+- **Strings shared across files.** GCC shares a string only within a file,
+  so a string several current C files read is one file's literal in the
+  original. The first function that uses it now emits it and owns the
+  slice; the other files still read it by address, defined in
+  `versions/symbols_manual.us.txt` (the label leaves the asm with the
+  slice). Merging those functions into one file would make them literals
+  too (`"  %02d"`/`"none"` of func_004184A8 are read by five more FragTag
+  functions). The engine reads some of these strings the same way
+  (`"level index"`, `"Players"`, `"Cameras"`): CScene, CPlayerPool and
+  CCameraPool are split between the engine and the first module.
+- **One pool per function, in order of use, strings before floats and
+  jump tables.** CScene__Construct's 19 cache-block names come out as the
+  ROM has them, then its 1.0f; WeaponsMenu_ToggleLabel's "unknown weapon"
+  precedes its jump table. A float used twice in a function is one pool
+  entry (CPlayer__LevelStart's 0.25f), so the literal can be written at
+  each use.
+- **Copies come out cleaner.** Written from the original's source, the
+  permuter shapes of some copies went away (Primagen_EnterMode20_2,
+  Primagen_EnterMode23_2, Primagen_EnterMode18_2's empty `if` on a float
+  extern).
+
+What is left, and why:
+
+- the data area after .rodata (781 externs, both modules): fixed-width
+  menu text tables (`"difficulty   :     easy"` and its neighbours 0x18
+  apart, the debug menu at 0x800C1EE0) and the pak messages, whose lines
+  interleave across the functions that print them. They are initialised
+  data of tables, not literals of the functions that read them;
+- strings followed by linker fill (above), and pools a file cannot own
+  because its own pool is elsewhere (func_004189AC's `"%3d"`: its 1.0f is
+  at 0x800C0F40) or another file owns the slice (`"Enemies"`/`"Time"` of
+  TotemDefense_Init, read by TotemDefense_InitFight; 0x800C1064, owned by
+  func_00453380);
+- data the code reads in the pools (the cheat table at 0x800C1144, which
+  the data also points at; the cinema words at 0x800C1BC4).
+
 ## Shared headers
 
 The readability pass left each file with local structs where no header fit;

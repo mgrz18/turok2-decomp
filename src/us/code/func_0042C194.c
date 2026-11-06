@@ -22,7 +22,6 @@ typedef struct Placed {
 } Placed; /* 0x14 */
 
 extern char D_800A5D8C[];
-extern char D_800A5FC4[];
 
 extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
 extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, void *, s32, char *);
@@ -56,7 +55,7 @@ s32 CScene__FindWarpDests(void *world, s32 kind, s32 key, Placed *out, s32 max) 
     found = 0;
     pool = gEngineApp.m_CartridgeIndex;
     CCache__LoadPersistantIndex(found, &resource, pool, D_800A5D8C);
-    handle = CCache__LoadPersistantSubBlock(found, resource, 8, pool, world, 0, D_800A5FC4);
+    handle = CCache__LoadPersistantSubBlock(found, resource, 8, pool, world, 0, "warp dests");
     table = *handle;
     count = (keys = CISet__GetBlock(table, 0))[1];
     keys += 2;
