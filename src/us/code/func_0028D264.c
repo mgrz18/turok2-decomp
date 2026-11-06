@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern u8 gScene[];             /* the world */
 s32 CScene__GetRegionIndex(void *world, s32 region);

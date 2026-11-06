@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* gEngineApp_m_Settings_match (GameMatch in structs/game.h) as a local array view, under an
  * alias of the symbol: through it the compiler bases both stores on

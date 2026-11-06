@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/game.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
  * random stun of a live helper), and once the boss has waited long enough

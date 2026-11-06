@@ -6,6 +6,7 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
 
 #define TRUE 1
 #define FALSE 0

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Level select (warp) menu input: A warps to the selected level (or, on the
  * last entry, starts the credits/next mode), up and down move the selection

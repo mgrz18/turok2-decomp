@@ -3,6 +3,7 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
 extern s32 gScene_m_bStreamAll;
 extern s32 gScene_m_LevelID;

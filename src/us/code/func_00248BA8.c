@@ -2,6 +2,7 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/world.h"
+#include "globals/game.h"
 
 #define FALSE 0
 #define TRUE 1

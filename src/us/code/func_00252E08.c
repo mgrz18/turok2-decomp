@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
 extern u32 gFrameCountGameplay;          /* frame counter */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;

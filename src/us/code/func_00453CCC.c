@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU_2/80408AC4_41.CPP, func_8043CDF8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 

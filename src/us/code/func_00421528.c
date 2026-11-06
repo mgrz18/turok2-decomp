@@ -4,6 +4,7 @@
 #include "structs/world.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/game.h"
 
 extern CScene gScene;
 extern s32 gScene_m_PreviewOptions[];

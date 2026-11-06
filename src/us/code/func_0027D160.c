@@ -10,6 +10,7 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {

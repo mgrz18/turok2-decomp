@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 struct ObjRecAt18V2;
 typedef struct ObjRecAt18V2 ObjRecAt18V2;
 struct ObjRecAt18V2;

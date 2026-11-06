@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Name entry item draw callback: while the cursor blink timer of the menu's
  * player is low, draws the text cursor (9 virtual pixels wide, scaled to the

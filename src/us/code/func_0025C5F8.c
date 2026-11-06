@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 typedef struct Object Object;
 typedef struct AI AI;

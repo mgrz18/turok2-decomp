@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
 extern char gStatsSaveDoneMenuDesc1;
 extern char gStatsSaveDoneMenuDesc2;

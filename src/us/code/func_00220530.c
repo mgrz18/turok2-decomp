@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* The input state the controller reader fills (gEngineApp_m_Settings, 0x184 bytes). */
 

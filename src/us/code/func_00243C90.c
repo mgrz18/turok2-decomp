@@ -4,6 +4,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 #include "structs/collision.h"
+#include "globals/game.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];

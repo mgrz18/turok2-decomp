@@ -5,6 +5,7 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/game.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 

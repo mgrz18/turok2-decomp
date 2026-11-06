@@ -2,6 +2,7 @@
 #include "structs/game.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 
 /* gCollisionResults is the collision results (CCollisionResults, structs/collision.h);

@@ -5,6 +5,7 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
 /* Level chosen: load it, or set up the new player from the saved settings, or
  * open the next menu page. */

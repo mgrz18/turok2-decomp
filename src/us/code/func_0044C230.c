@@ -24,6 +24,7 @@
 #include "structs/menu_model.h"
 #include "structs/camera.h"
 #include "gfx.h"
+#include "globals/game.h"
 
 /* ---------------- MenuItem_FormatBinding_2 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,

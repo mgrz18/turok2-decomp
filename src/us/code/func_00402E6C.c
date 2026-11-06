@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 s32 CAI__SetMode(s32, s32, s32);
 f32 AI_AngleToPoint(s32, s32, s32, s32);

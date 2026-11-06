@@ -6,6 +6,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
+#include "globals/game.h"
 
 extern s8 gPakProfileRead_character[];
 extern s32 gPakMenuAnyPak;

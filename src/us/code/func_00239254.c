@@ -1,6 +1,7 @@
 #include "structs/vector.h"
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00268768.c, func_00268768.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */

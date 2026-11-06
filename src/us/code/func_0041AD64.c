@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern int gScene_m_PreviewOptions;
 extern CheatCode sCheatCodes[];

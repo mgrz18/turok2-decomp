@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Player-name menu: highlights the row of the player the menu belongs to
  * and copies that player's name (trailing spaces trimmed, nothing when it is

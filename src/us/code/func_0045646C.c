@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Name entry: draw the item, with a blinking cursor box under the character
  * being edited. */

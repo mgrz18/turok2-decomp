@@ -5,6 +5,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 #include "structs/level_actor.h"
+#include "globals/game.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup

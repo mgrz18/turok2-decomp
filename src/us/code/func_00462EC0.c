@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Level start: resets the world, opens the cartridge index and the level resource tables (levels, texture
  * sets, object types, objects, intelligence, particle effects, binaries, swooshes, lights, curves, rumbles,

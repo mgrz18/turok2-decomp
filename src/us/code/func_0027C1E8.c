@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the players, a list through m_pNext */
 extern u32 sTintFlags;          /* the camera player's AI flags this frame, */

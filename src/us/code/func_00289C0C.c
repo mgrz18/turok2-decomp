@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 s32 Cinema_RequestById(s32);
 s32 CScene__RequestWarp(s32, s32, s32);

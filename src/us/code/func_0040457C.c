@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 typedef struct {
     f32 x, y, z;

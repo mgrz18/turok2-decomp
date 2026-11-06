@@ -2,6 +2,7 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x22];
