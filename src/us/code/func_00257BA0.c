@@ -2,9 +2,8 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
-extern s32 gScene_m_PreviewState;             /* first weapon - 1 */
-extern s32 gScene_m_PreviewTimer;             /* weapon count */
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
 /* The next weapon the player can switch to: the first usable one after the

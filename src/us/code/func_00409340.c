@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/scene.h"
 
 /* Boss fight setup: finds the six level actors with id 0x1DB1 and the one
  * with 0x1DB2, installs the AI callbacks and resets the 15 attack slots. */
@@ -11,7 +12,6 @@ typedef struct {
     /* 0x0D4 */ s32 flags;
 } Obj;
 
-extern s32 gScene_m_LevelID;
 extern u8 gScene[];
 extern u32 D_800F1F10[];
 extern u8 sMotherBossModeTable[];

@@ -5,6 +5,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/scene.h"
 
 /* local: globals/game.h declares these, but its gEngineApp_m_Settings_unk180 (u8) clashes with the array view below, which the ROM needs here */
 extern GameSettings gEngineApp_m_Settings;
@@ -21,7 +22,6 @@ extern s32 sGameNoteLoad;
 extern s32 gPakMenuLeaving;
 extern s32 gPakNoteIndex;
 extern s32 gPakMenuPort;
-extern u32 gScene_m_PreviewOptions;
 extern u32 gEngineApp_m_Settings_unlockedCheats[];
 extern u8 gEngineApp_m_Settings_unk180[]; /* local type: GameSettings.unk180 read as an array (other registers otherwise) */
 extern f32 gEngineApp_m_Settings_match_seconds[];

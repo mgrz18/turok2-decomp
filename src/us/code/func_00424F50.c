@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/menu.h"
+#include "globals/scene.h"
 
-extern s32 gScene_m_LevelID;
 extern s32 Level_GetHub(s32);
 void MissionMenu_InitFailed(void) {
     sMissionHub = Level_GetHub(gScene_m_LevelID);

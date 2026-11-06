@@ -4,6 +4,7 @@
 #include "structs/intelligence.h"
 #include "structs/collision.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 typedef struct Object Object;
 
@@ -26,7 +27,6 @@ struct Object {
     /* 0x27C */ u32 fxFlags;
 };
 
-extern s32 gScene_m_LevelID;          /* level */
 extern s32 gScene_m_bStreamAll;
 extern u8 gEnemyAlertPoint[];         /* origin */
 

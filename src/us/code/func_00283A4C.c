@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/cinema.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 
 extern Cinema *gCinemaPlayerP;
@@ -10,9 +11,6 @@ extern u8 gScene[];             /* the world */
 extern s32 gScene_m_nLevel;              /* world +0x18FA8: the current warp id */
 extern s32 gScene_m_WarpFade;
 extern s32 gScene_m_WarpState;
-extern s32 gScene_m_WarpTime;
-extern s32 gScene_m_LevelID;              /* world +0x18FD0: selectionValues */
-extern s32 gScene_m_WarpID;
 
 void CScene__LoadLevel(void *world, s32 id, s32 flags);
 s32 CScene__GetRegion(void *world, s32 region);

@@ -5,8 +5,8 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+#include "globals/scene.h"
 
-extern int gScene_m_PreviewOptions;
 extern CheatCode sCheatCodes[];
 extern u8 gCheatEntryText[];
 extern s32 strlen(u8 *);

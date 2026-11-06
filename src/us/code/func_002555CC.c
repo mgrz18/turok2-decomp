@@ -1,6 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 s32 GameObject_GetPlatformBelow(s32);
 s32 GameObject_GetFrameDelta(s32, s32);
@@ -9,7 +10,6 @@ s32 Sound__Play(s32, s32, s32, s32, s32, s32);
 M2C_UNK CVector3__Add(void *, void *, M2C_UNK *);   /* extern */
 extern M2C_UNK D_800A7168;
 extern f32 D_800A7170;
-extern s32 gScene_m_LevelID;
 
 void PlayerJump_Enter(s32 arg0, void *arg1) {
     u8 sp18[0x10];

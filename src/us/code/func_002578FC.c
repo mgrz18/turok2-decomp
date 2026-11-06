@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/menu.h"
+#include "globals/scene.h"
 
 s32 Level_GetHub(s32);
 s32 MenuPool_OpenMenu(s32, s32, s32, s32, s32);
 extern s32 gMissionFailedMenuDesc;
-extern s32 gScene_m_LevelID;
 
 void CPlayer__ShowLevelNotCompleteScreen(s32 arg0, CPlayer *arg1)
 {

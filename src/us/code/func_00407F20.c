@@ -3,6 +3,7 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -25,7 +26,6 @@ extern u8 gScene[];
 extern u8 D_800B6660[];
 extern u8 gEngineApp_m_OnScreen[];
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
-extern s32 gScene_m_LevelID;         /* level id */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);

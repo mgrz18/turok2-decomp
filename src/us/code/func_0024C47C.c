@@ -16,9 +16,8 @@
 #include "structs/game.h"
 #include "structs/weapon.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
-extern s32 gScene_m_PreviewState;
-extern s32 gScene_m_PreviewTimer;
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
@@ -514,7 +513,6 @@ extern u32 D_800F1F10;
 extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern s32 gCollisionResults_m_nFloorKind;
 extern u8 gScene;
-extern s32 gScene_m_PendingWarpID;
 extern s32 gCharacterModels[];
 extern s32 gTagModeModel;
 

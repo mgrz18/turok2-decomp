@@ -89,9 +89,4 @@ typedef struct Pager {
     /* 0xCF4 */ u8 _padCF4[4];
 } Pager; /* size 0xCF8 */
 
-extern Pager gPager;
-extern PageMapping *gPager_chain_head;    /* gPager.chain.head */
-extern PageMapping *gPager_chain_tail;    /* gPager.chain.tail */
-extern PageRegion gPager_regions;     /* gPager.regions, the head of the region list */
-
 #endif

@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/scene.h"
 
 typedef struct {
     f32 x, y, z;
@@ -27,7 +28,6 @@ typedef struct {
     /* 0x108 */ void *onDraw;
 } Level00403CF8;
 
-extern s32 gScene_m_LevelID;
 extern s32 gLevelScript_path;
 extern u8 gScene[];
 extern u8 sPrimagenModeTable_2[];

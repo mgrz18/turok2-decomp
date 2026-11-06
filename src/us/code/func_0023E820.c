@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/camera.h"
+#include "globals/scene.h"
 
 typedef struct Picker {
     /* 0x000 */ u8 pad0[4];
@@ -39,7 +40,6 @@ extern PickupRow14 sAmmoPickups[];
 extern PickupRow18 sHealthPickups[];
 extern PickupRow14 sLifeForcePickups[];
 extern PickupRow10 sItemPickups[];
-extern s32 gScene_m_LevelID;
 extern u8 D_800B37BC[];
 extern u8 D_800B37CC[];
 extern u8 D_800B37D8[];

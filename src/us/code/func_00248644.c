@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/weapon.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
-extern s32 gScene_m_LevelID;
 extern WeaponInfo *gWeaponInfoTable_22; /* gWeaponInfoTable[22] */
 
 s32 Level_GetHub(s32 arg0);
