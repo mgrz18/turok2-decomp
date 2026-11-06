@@ -2,12 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pickup.h"
 
-extern char sLifeForcePickups;
 void *func_0023EFCC(s32 arg0) {
     char *v1;
     s32 i;
-    v1 = &sLifeForcePickups;
+    v1 = (char *) sLifeForcePickups;
     i = 1;
     do {
         i -= 1;

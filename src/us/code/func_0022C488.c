@@ -4,6 +4,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/particle_event.h"
+#include "globals/particle.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -189,13 +190,13 @@ void CParticle__HitTarget(CParticle *p) {
         }
     }
     if (effect != 0xFFFF) {
-        if (gImpactEventHandlers_m_Flags[effect].m_Flags & 4) {
+        if (gImpactEventHandlers[effect].flags & 4) {
             if (p->header.m_nObjType == 0x56) {
                 primary.lower = primary.lower * p->m_Scale;
             }
         }
         other = source;
-        if (gImpactEventHandlers_m_Flags[effect].m_Flags & 2) {
+        if (gImpactEventHandlers[effect].flags & 2) {
             other = p;
         }
         ImpactEvent_Send(other, p, effect, -1, gCollisionResults.m_vInstancePos, primary);
@@ -213,9 +214,9 @@ void CParticle__HitTarget(CParticle *p) {
             extraEffect = extraActions->m_ImpactEventType[4];
             if (extraEffect != 0xFFFF) {
                 secondary = extraActions->m_ImpactEventValue[4];
-                if (gImpactEventHandlers_m_Flags[extraEffect].m_Flags & 4) {
+                if (gImpactEventHandlers[extraEffect].flags & 4) {
                     other = source;
-                    if (gImpactEventHandlers_m_Flags[extraEffect].m_Flags & 2) {
+                    if (gImpactEventHandlers[extraEffect].flags & 2) {
                         other = p;
                     }
                     ImpactEvent_Send(other, p, extraEffect, -1, gCollisionResults.m_vInstancePos, secondary);
@@ -230,7 +231,7 @@ void CParticle__HitTarget(CParticle *p) {
         Sound__Play((s16) sound, gCollisionResults.m_vInstancePos, 0, -1);
     }
     if (!(p->m_dwFlags & 0x30000)) {
-        if (mode == 1 || (effect != 0xFFFF && (gImpactEventHandlers_m_Flags[effect].m_Flags & 1))) {
+        if (mode == 1 || (effect != 0xFFFF && (gImpactEventHandlers[effect].flags & 1))) {
             CParticleSystem__Free(gScene_m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
         }

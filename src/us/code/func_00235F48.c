@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/particle.h"
 
 s32 SwooshSystem_UpdateSwooshes();                            /* extern */
 s32 SwooshSystem_UpdateTimers(s32);                         /* extern */
-extern s32 sSwooshSpawned;
 extern s32 gEngineApp_m_Settings_paused;
 
 void SwooshSystem_Update(s32 arg0) {

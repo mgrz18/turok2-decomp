@@ -19,6 +19,7 @@
 #include "structs/collision.h"
 #include "structs/frame.h"
 #include "structs/particle_event.h"
+#include "globals/particle.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -1165,7 +1166,6 @@ extern s32 gEvenOdd;
 extern u8 gScene[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
-extern f32 gProjectileSpeedScale[2];
 
 extern void *CISet__GetBlock(s32 resource, s32 index);
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
@@ -1696,17 +1696,17 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     }
                     effect->flags |= 0x1000000;
                 }
-                if ((gImpactEventHandlers_m_Flags[entry->model->type].m_Flags & 1) || kind == 0x68) {
+                if ((gImpactEventHandlers[entry->model->type].flags & 1) || kind == 0x68) {
                     render->flags |= 0x80000000;
                 }
                 vel = &effect->velocity;
-                CVector3__Scale(vel, vel, gProjectileSpeedScale[0]);
+                CVector3__Scale(vel, vel, gProjectileSpeedScale);
                 if ((kind == 0x2D || kind == 0x4F) && source->type == 2) {
                     if (gCollisionResults.m_pInstance != 0) {
                         aimEffect(effect, vel);
                     }
                 }
-                effect->unk1BC = gProjectileSpeedScale[1];
+                effect->unk1BC = gProjectilePower;
                 CParticle__Attach(effect, 0, 0);
                 if (entry->unk6 != -1) {
                     Trail_AddNode(gEngineApp_m_SwooshSystem, effect, entry->unk6);

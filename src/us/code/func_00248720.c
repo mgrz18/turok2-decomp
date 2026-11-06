@@ -4,9 +4,8 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "globals/player.h"
+#include "globals/particle.h"
 
-extern f32 gProjectileSpeedScale;          /* projectile speed scale */
-extern f32 gProjectilePower;          /* projectile power */
 extern u8 gScene_m_ParticleSystem[];
 
 CQuaternion CGameObjectInstance__GetRotation(CPlayer *p);

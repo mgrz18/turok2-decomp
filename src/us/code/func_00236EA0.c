@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/particle.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00265E30.c, func_00265E30.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -12,21 +13,16 @@ typedef struct M04Part {
     u8 c[4];
 } __attribute__((aligned(4))) M04Part;
 typedef void (*M04Handler)(void *, void *, s32, CVector3, M04Part);
-typedef struct M04Msg {
-    M04Handler fn;
-    u32 flags;
-} M04Msg;
 typedef struct M04WorldB {
                 u8 pad0[0xBF8];
                 void *tab[1];
 } M04WorldB;
-extern M04Msg gImpactEventHandlers[];
 extern CScene gScene;
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the players, a list through m_pNext */
 /* Dispatch one message through the handler table (inlined). */
 static __inline__ void send_(void *tgt, void *dst, s32 kind, CVector3 p, M04Part q) {
-    if (gImpactEventHandlers[kind].fn != 0) {
-        gImpactEventHandlers[kind].fn(tgt, dst, kind, p, q);
+    if (gImpactEventHandlers[kind].handler != 0) {
+        ((M04Handler) gImpactEventHandlers[kind].handler)(tgt, dst, kind, p, q);
     }
 }
 void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04Part part) {
