@@ -43,8 +43,6 @@ extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
-extern CVector3 *gPrimagenPaths[];  /* boss paths, ended by a point with y < 0 */
-extern s32 gLevelScript_path; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* path */
 extern LevelScriptF604 D_8012F604;
 typedef struct {
     /* 0x00 */ s32 unk0;   /* 0x8012F9D4 */
@@ -52,11 +50,8 @@ typedef struct {
     /* 0x08 */ u8 pad8[0x5C - 0x8];
     /* 0x5C */ CVector3 dest; /* 0x8012FA30 */
 } BossCtl;
-extern BossCtl gLevelScript_unk3CC; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 sPrimagenPathPoint; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* point on the path */
 extern f32 gLevelScript_script; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* cooldown */
-extern BossStep *gLevelScript_script_steps; /* local type: the field's real type (or the member path) changes the ROM's code here */    /* script */
-extern s32 gLevelScript_script_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* cursor */
 extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* stage, as the script selection reads it */
 
 void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
@@ -67,7 +62,7 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
     f32 angle;
     f32 speed;
     f32 heading;
-    BossCtl *ctl = &gLevelScript_unk3CC;
+    BossCtl *ctl = (BossCtl *) &gLevelScript_unk3CC;  /* unk3CC on */
 
     D_800F1F50[0] |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 0, 1);

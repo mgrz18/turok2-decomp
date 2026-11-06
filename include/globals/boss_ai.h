@@ -15,4 +15,8 @@ extern CAIModeInfo sMotherBossModeTable[];
 extern CAIModeInfo sPrimagenModeTable_2[];
 extern CAIModeInfo sMotherBossModeTable_2[];
 
+/* The Blind One's (module 1 and the module-2 code share them) */
+extern CAIModeInfo gBlindOneBossModeTable[];
+extern CAIModeInfo gBlindOneMinionModeTable[];
+
 #endif

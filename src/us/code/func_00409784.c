@@ -10,7 +10,6 @@
  * arena (inlined MotherBoss_SpawnPickup) and, later, a pickup at every spawn point
  * (MotherBoss_DropPickupsAtSpawnPoints). */
 
-extern s32 gMotherBoss_maxRadius; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);

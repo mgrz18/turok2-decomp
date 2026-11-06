@@ -4,12 +4,12 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/onscreen.h"
+#include "globals/boss_ai.h"
 
 /* AI init of the second boss: sets the level's warp id, the anim table and callbacks, starts the phase script
  * and shows its health bar ("EyeBall"). */
 
 extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */ /* warp id */
-extern u8 gBlindOneBossModeTable[];
 extern void BlindOne_BossUpdate_2(void);
 extern void BlindOne_BossHurt_2(void);
 extern void BlindOne_Draw_2(void);
