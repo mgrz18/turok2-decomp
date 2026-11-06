@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/frame.h"
+#include "globals/game.h"
 
 typedef struct VideoRate {
     /* 0x0 */ s32 unk0;
@@ -22,7 +23,6 @@ extern f32 gFrameIncrement;          /* frame time */
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinemaStarted;
 extern s32 gCameraPoolHideViews;
 extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern s32 gEngineApp_m_Settings_match_unk44;
 
 extern u64 osGetTime(void);     /* osGetTime */
 extern s32 MenuPool_CountOpen(void *);

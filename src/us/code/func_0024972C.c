@@ -5,7 +5,6 @@
 #include "globals/game.h"
 
 
-extern s32 gEngineApp_m_Settings_match_tag;
 extern s32 gTagModeModel;
 extern s32 gCharacterModels[];
 extern u8 gScene[];

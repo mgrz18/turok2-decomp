@@ -3,8 +3,6 @@
 #include "globals/game.h"
 
 extern f32 gFrameIncrement;      /* frame step */
-extern s32 gEngineApp_m_Settings_match_teams;
-extern s32 gEngineApp_m_Settings_match_tag;
 
 void Hud_SetupTextureMode(s32);
 void Hud_DrawWorldSprite(void *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f32 size);

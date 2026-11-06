@@ -27,5 +27,14 @@ extern s32 gEngineApp_m_Settings_mode;            /* .mode */
 extern s32 gEngineApp_m_Settings_nextMode;        /* .nextMode */
 extern s32 gEngineApp_m_Settings_unk1C8;          /* .unk1C8 */
 extern s32 gEngineApp_m_Settings_paused;          /* .paused */
+extern GameMatch gEngineApp_m_Settings_match;     /* .match */
+extern f32 gEngineApp_m_Settings_match_seconds;   /* .match.seconds */
+extern f32 gEngineApp_m_Settings_match_minutes;   /* .match.minutes */
+extern f32 gEngineApp_m_Settings_match_hours;     /* .match.hours */
+extern f32 gEngineApp_m_Settings_match_countdown; /* .match.countdown */
+extern s32 gEngineApp_m_Settings_match_teams;     /* .match.teams */
+extern s32 gEngineApp_m_Settings_match_teamScore[2]; /* .match.teamScore */
+extern s32 gEngineApp_m_Settings_match_tag;       /* .match.tag */
+extern s32 gEngineApp_m_Settings_match_unk44;     /* .match.unk44 */
 
 #endif

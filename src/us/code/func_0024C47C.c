@@ -77,7 +77,6 @@ void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player) {
 /* An animated HUD item (COverlay__Update ticks it, COverlay__StartScript restarts it). */
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
-extern s32 gEngineApp_m_Settings_match_tag;
 extern u8 gAmmoOverlayChangeScript[];
 extern u8 gLivesOverlayChangeScript[];
 extern u8 gTokensOverlayChangeScript[];
@@ -508,7 +507,6 @@ typedef struct PlayerStateInfo {
 
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEngineApp_m_Game_m_DebugLines;
-extern s32 gEngineApp_m_Settings_match_tag;
 extern s32 gEvenOdd;
 extern f32 gCharacterHealthRegen[];           /* health regeneration per character */
 extern PlayerStateInfo gPlayerStateTable[];
