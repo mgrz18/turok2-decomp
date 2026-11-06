@@ -24,8 +24,6 @@ ModelRecord *CScene__GetRegionInfo(s32, s32);
 Found0xC45 *CScene__FindIntelligence(s32, s32, s32);
 
 s32 Cinema_SetNextCallbacks(s32, s32, s32 *);     /* extern */
-extern void *sDeathCinemaPlayer;
-extern u8 gDeathTintColor[];
 extern s32 PlayerDeath_CinemaDone;
 
 void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {

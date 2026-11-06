@@ -5,8 +5,6 @@
 #include "globals/region.h"
 
 extern float D_800A7F68;
-extern int sRegionCeilingNormal;
-extern int sRegionCeilingNormal;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
     CVector3 normal;

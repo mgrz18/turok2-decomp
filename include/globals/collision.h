@@ -37,5 +37,6 @@ extern void (*sBoxSideFaceBuilders[8])(CollisionQuad *quad, CVector3 *points);
 
 extern CCollisionSetup gCollisionSetupTable[34];
 extern CCollisionSetup gCollisionSetupTable_2[34];
+extern MapSweep *sMapSweep;
 
 #endif

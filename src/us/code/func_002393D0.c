@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
+#include "globals/ai.h"
 
 /* One step of a path, a node in the search's pool. */
 typedef struct PathNode {
@@ -31,7 +32,6 @@ typedef struct Candidate {
     /* 0x4 */ f32 dist;
 } Candidate;
 
-extern PathSearch *sPathSearch;
 extern u8 D_800C894C;                   /* bottom of the stack */
 
 /* The search's working variables are globals, to keep the recursion's

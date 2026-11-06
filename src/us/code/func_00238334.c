@@ -3,6 +3,7 @@
 #include "structs/collision.h"
 #include "globals/game.h"
 #include "globals/collision.h"
+#include "globals/player.h"
 
 typedef struct BlastActor {
     /* 0x000 */ u8 kind;            /* 1: player, 2: object */
@@ -12,7 +13,6 @@ typedef struct BlastActor {
     /* 0x054 */ f32 footY;
 } BlastActor;
 
-extern HitFrame sBlastShieldFrame;
 
 f32 CVector3__Distance(CVector3 *a, CVector3 *b);
 s32 CGameObjectInstance__GetNearestBox(BlastActor *a, CVector3 pos, HitFrame *out);

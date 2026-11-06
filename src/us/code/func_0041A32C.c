@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/menu.h"
 
 
-extern s32 sPauseRumbleOn[4];   /* saved per-controller words */
 extern u8 gRumblePool[];
 extern void Controller_ResetAllRumble(void);
 extern void RumblePool_FreeAll(void *);

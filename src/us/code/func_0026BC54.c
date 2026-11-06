@@ -2,7 +2,6 @@
 #include "structs/region.h"
 #include "globals/region.h"
 
-extern CVector3 sRegionNormal;  /* cached (unnormalized) normal */
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);

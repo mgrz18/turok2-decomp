@@ -11,4 +11,10 @@ extern s32 gAnimEventCount;         /* events fired by CGameObjectInstance__Fire
 extern f32 gSwingAmplitudes[25];    /* swing amplitude per remaining step */
 extern struct SineTable sWobbleSineTable;   /* the time-based wobble (rw/abu_types.h SineTable) */
 
+/* The animation decoder's statics: frame and track counts, the remap range */
+extern s32 sAnimFrameCount;
+extern s32 sAnimTrackCount;
+extern f32 sAnimRemapMin;
+extern f32 sAnimRemapMax;
+
 #endif

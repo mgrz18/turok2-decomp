@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern MapSweep *sMapSweep;
 
 f32 func_00268460(CGameObjectInstance *inst);
 void Collision_SweepRegionWalls(void *region);

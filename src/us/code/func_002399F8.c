@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/region.h"
 #include "globals/engine.h"
+#include "globals/ai.h"
 
 /* One step of the path found, a list node. */
 typedef struct PathNode {
@@ -32,7 +33,6 @@ typedef struct PathSearch {
     /* 0xA44 */ s32 unkA44;
 } PathSearch; /* size 0xA48 */
 
-extern PathSearch *sPathSearch;
 
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
 void BoundingRect_AddPoints(f32 *bounds, s32 count, CVector3 *points);

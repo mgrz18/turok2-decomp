@@ -4,6 +4,7 @@
 #include "structs/world.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/render.h"
 
 typedef struct Box3 {
     CVector3 mn;
@@ -28,7 +29,6 @@ typedef struct WTab {
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
 
 extern char D_800A57B8[];
-extern CVector3 sLitVertexOffsets[];
 
 void *CISet__GetBlock(void *file, s32 index);
 s32 *CISet__GetBlockAndSize(s32 file, s32 index, s32 *size);

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/object.h"
 
 /* Expands a packed animation resource in place: rebuilds the six-chunk file
  * with chunks 0-4 copied unchanged and chunk 5 (the compressed animation)
@@ -30,10 +31,6 @@ typedef struct Resource {
 extern f32 D_800E6790;
 extern s32 D_800E6794;
 extern s32 D_800E6798;
-extern f32 sAnimRemapMin;
-extern f32 sAnimRemapMax;
-extern s32 sAnimTrackCount;
-extern s32 sAnimFrameCount;
 
 s32 ProPackDecompress(Resource **res, s32 arg1);
 void *CISet__GetBlock(void *file, s32 index);

@@ -18,7 +18,6 @@ typedef struct {
 
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
-extern CVector3 sRegionCeilingNormal;        /* cached raw ceiling normal */
 
 /* Raw normal of a triangle's ceiling plane (straight down for none), cached for the last triangle. */
 CVector3 *CGameRegion__GetCeilingNormalRaw(CVector3 *out, CGameRegion *tri) {

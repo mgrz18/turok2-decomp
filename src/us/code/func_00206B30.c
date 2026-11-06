@@ -80,10 +80,6 @@
 
 extern void CCache__LockForDisplayList(s32 unused, void **resource);
 extern s32 *CISet__GetBlock(void *table, s32 index);
-extern s32 sTexLastFrame;
-extern s32 sTexLastPalette;
-extern s32 sTexLastWrapS;
-extern s32 sTexLastWrapT;
 
 /* Loads frame `frame` of the texture `resource` (and its palette `secondary`)
  * into TMEM, skipping what the last call already loaded, then turns texturing on. */

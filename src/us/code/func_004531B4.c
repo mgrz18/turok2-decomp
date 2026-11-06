@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 /* Controller / rumble slot, 0x224 bytes (see Cont_ResetSlot). */
 
@@ -17,7 +18,6 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-extern s32 sPauseRumbleOn[4];
 extern char gRumblePool[];
 
 void RumblePool_FreeAll(void *);

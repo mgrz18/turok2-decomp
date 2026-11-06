@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_4.CPP, Particle_ParentTransform, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/particle.h"
+#include "globals/particle.h"
 
 /* The transform a particle's position is relative to, picked by its
  * attachment mode: the particle's own facing, the owner's effect transforms,
@@ -14,7 +15,6 @@ extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF m);                /* to
 extern void CMtxF__MultiplyAffine(CMtxF out, CMtxF a, CMtxF b);      /* out = a * b */
 extern f32 CGameRegion__GetEdgeYaw(void *region, s32 attach);
 extern void CMtxF__SetRotateY(CMtxF m, f32 angle);
-extern CMtxF sParticleParentMtx;
 extern CMtxF sParticleRotXMtx;
 
 CMtxF *CParticle__GetParentTransform(CParticle *p, u8 *view) {

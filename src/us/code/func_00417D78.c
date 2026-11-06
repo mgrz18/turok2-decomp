@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "globals/engine.h"
+#include "globals/menu.h"
 
 typedef struct Shared_PlayerSettingsRecord Shared_PlayerSettingsRecord;
 struct Shared_PlayerSettingsRecord {
@@ -118,7 +119,6 @@ struct Shared_Game {
     u8 reserved688[0xCAC - 0x688];
 };
 extern Shared_Game D_8011A6D8;
-extern f32 sFinalScoreTimer;
 extern s32 FinalScoreMenu_Poll(void);
 void CPlayerPool__EndMatch(void *arg0);
 s32 FinalScoreMenu_Poll(void) {

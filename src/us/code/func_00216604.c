@@ -1,5 +1,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0025F0F4.c, func_0025F0F4, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/object.h"
 
 /* Decodes a packed animation: lays out one track per bone in the table (each
  * slot's offset found from the 0xDEADBEEF end marker), decodes every channel
@@ -25,8 +26,6 @@ u32 Bits_Read(u32 *, u32);
 f32 *CISet__GetBlock(TrackTable *, s32);
 void CQuaternion__Normalize(Quaternion *);
 
-extern s32 sAnimTrackCount;
-extern s32 sAnimFrameCount;
 
 s32 Anim_DecodeTracks(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 radius, s32 encoding) {
     TrackDecoder decode;

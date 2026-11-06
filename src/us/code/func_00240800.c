@@ -4,7 +4,6 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 
-extern MapSweep *sMapSweep;
 extern u8 D_800C894C;                   /* bottom of the stack */
 
 f32 func_00298470(f32 x);               /* sqrtf */

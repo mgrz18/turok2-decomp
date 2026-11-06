@@ -1,11 +1,11 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/engine.h"
+#include "globals/menu.h"
 
 s32 Video_GetResolutionText(void);
 
 s32 GetMemSize();                                /* extern */
-extern f32 sResolutionToggleDelay;
 
 s32 OptionsMenu_ResolutionText(void *arg0)
 {

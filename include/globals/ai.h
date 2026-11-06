@@ -43,4 +43,7 @@ extern Pick sGeneratorMultiItemPicks[9];
 extern JointPoint sThrowableCarryJointA;
 extern JointPoint sThrowableCarryJointB;
 
+/* The region path search */
+extern struct PathSearch *sPathSearch;
+
 #endif

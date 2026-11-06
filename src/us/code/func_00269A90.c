@@ -23,12 +23,8 @@ typedef struct CollisionBuildVertex {
     f32 z;
     f32 ceiling;
 } CollisionBuildVertex;
-extern int sRegionCeilingNormal;
-extern int sRegionCeilingUnitNormal;
 extern void CVector3__Normalize(f32 *arg0);
 struct Node75;
-extern int sRegionCeilingNormal;
-extern int sRegionCeilingUnitNormal;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
     CVector3 a;
