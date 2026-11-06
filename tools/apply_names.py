@@ -215,8 +215,9 @@ def known_identifiers():
 def check(funcs, data, by_name):
     """Collisions with identifiers in use; addresses nothing refers to."""
     applied = set()
-    if SYMS.exists():
-        applied = {m.group(1) for m in map(LINE.match, SYMS.read_text().splitlines()) if m}
+    for f in (SYMS, SYMS_LD):
+        if f.exists():
+            applied |= {m.group(1) for m in map(LINE.match, f.read_text().splitlines()) if m}
     known = known_identifiers()
     errs, warns = [], []
     for name, (kind, addr, where) in sorted(by_name.items()):
