@@ -36,11 +36,11 @@ extern void TotemDefense_OnEvent();
 extern void TotemDefense_DrawTotem();
 
 /* Boss fight state (0x8012FB50 on). */
-extern BossActor *gTotemDefense[];   /* the boss */
-extern void *gTotemDefense_def[];        /* its definition + 0x14 */
-extern s32 gTotemDefense_state[];
-extern f32 gTotemDefense_timer[];          /* time left */
-extern s32 gTotemDefense_kills[];
+extern BossActor *gTotemDefense[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */  /* the boss */
+extern void *gTotemDefense_def[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */  /* its definition + 0x14 */
+extern s32 gTotemDefense_state[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */
+extern f32 gTotemDefense_timer[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */  /* time left */
+extern s32 gTotemDefense_kills[]; /* local type: TotemDefenseState field; one-element arrays here keep the ROM's code */
 extern s32 D_8012FB64[];
 
 static __inline__ void startBossAnim(BossActor *obj) {

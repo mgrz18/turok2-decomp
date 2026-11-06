@@ -143,5 +143,11 @@ extern s32 gMotherBoss_maxRadius;        /* gMotherBoss.maxRadius */
 extern f32 sMotherBossFadeTimer;         /* the Mother's defeat fade */
 extern s32 sMotherBossCinemaStarted;     /* its defeat cinema has started */
 extern CVector3 *gPrimagenPaths[];         /* the Primagen's paths, each ended by a point with y < 0 */
+/* The totem defense missions (structs/boss.h), and its fields with symbols of their own */
+extern TotemDefenseState gTotemDefense;
+extern void *gTotemDefense_def;           /* gTotemDefense.def */
+extern s32 gTotemDefense_state;          /* gTotemDefense.state */
+extern f32 gTotemDefense_timer;          /* gTotemDefense.timer */
+extern s32 gTotemDefense_kills;          /* gTotemDefense.kills */
 
 #endif
