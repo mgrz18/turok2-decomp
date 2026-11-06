@@ -3,13 +3,12 @@
 #include "structs/controller.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
+#include "globals/rumble.h"
 
 /* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
 
-extern char gRumblePool[];
-extern char gRumbleEntries[];
 
-s32 RumblePool_Init(void *dst, void *src, s32 n);
+s32 RumblePool_Init(RumblePool *pool, RumbleEffect *effects, s32 count);
 void osCreateMesgQueue(void *mq, void *msgBuf, s32 count); /* osCreateMesgQueue */
 void osSetEventMesg(s32 event, void *mq, s32 msg);     /* osSetEventMesg */
 s32 osContInit(void *mq, u8 *bitpattern, OSContStatus *status); /* osContInit */
@@ -21,7 +20,7 @@ s32 Cont_ResetSlot(ControllerProfile *, s32);
 s16 Cont_InitAll(void) {
     s32 i;
 
-    RumblePool_Init(gRumblePool, gRumbleEntries, 8);
+    RumblePool_Init(&gRumblePool, gRumbleEntries, 8);
     gPakQueueState = 2;
     osCreateMesgQueue(&gSiMessageQueue, &gSiMesgBuf, 1);
     osCreateMesgQueue(&gPakAccessQueue, gPakMesgBuf, 1);

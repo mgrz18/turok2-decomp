@@ -1,8 +1,9 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/rumble.h"
 
-void RumblePool_FreeAll(s32);
+void RumblePool_FreeAll(RumblePool *pool);
 s32 Controller_SetRumbleOptionAll(s32);
 s32 func_0025359C(CPlayerPool *);                   /* extern */
 
@@ -10,13 +11,12 @@ s32 func_0025359C(CPlayerPool *);                   /* extern */
 
 /* The game/menu context this runs on. */
 
-extern s32 gRumblePool;
 
 void func_00469250(CEngineApp *arg0)
 {
   GameMatch *new_var;
   Controller_SetRumbleOptionAll(0);
-  RumblePool_FreeAll((s32) (&gRumblePool));
+  RumblePool_FreeAll(&gRumblePool);
   func_0025359C(&gEngineApp_m_Game.m_PlayerList);
   new_var = &gEngineApp_m_Settings.match;
   new_var->teams = 0;

@@ -2,32 +2,8 @@
 #include "common.h"
 #include "structs/list.h"
 #include "structs/cache.h"
-
-typedef struct Manager {
-    char queue[0x92C];
-    CList pending;  /* 0x92C */
-    CList active;   /* 0x940 */
-    char padActive[0x20 - sizeof(CList)];
-    char lock[0x18];        /* 0x960, OSMesgQueue */
-    char unk978[0x24];
-    s32 mask;               /* 0x99C */
-} Manager;
-
-typedef struct ResourceHashEntry {
-    u32 key;
-    CCacheEntry *value;
-    s32 unk08;
-    struct ResourceHashEntry *next;
-} ResourceHashEntry;
-
-extern s32 gCache_mutex_count;
-extern Manager gCache_queue;
-extern s32 gCache_memAgeList;
-extern u32 gHashMask;
-extern ResourceHashEntry *gHashTable;
-extern s32 gLoader;
-extern s32 gCache_ageCount;
-extern s32 gDecompressor;
+#include "globals/cache.h"
+#include "globals/sysrc.h"
 
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
@@ -39,10 +15,10 @@ extern CMemEntry *CCache__AllocMemEntry(s32, u32);
 extern void CCache__FreeMemEntry(s32, CMemEntry *);
 extern void CCache__AddToAddressList(s32, CMemEntry *);
 extern void *CCache__HeapAlloc(s32, u32, u32, u32);
-extern void CDecompressor__DecompressSync(s32 *, CCacheEntry *);
+extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
 extern CCacheEntry *CCache__CompleteRequest(s32, CCacheEntry *, s32);
-extern void CLoader__LoadSync(s32 *, u32, u32, void *);
-extern void CLoader__LoadAsync(s32 *, u32, u32, void *, void *, CCacheEntry *, s32);
+extern void CLoader__LoadSync(CLoader *, u32, u32, void *);
+extern void CLoader__LoadAsync(CLoader *, u32, u32, void *, void *, CCacheEntry *, s32);
 extern void CCache__FreeCacheEntry(s32, CCacheEntry *);
 extern void CList__Remove(void *list, void *node);
 extern s32 CList__AddTail(void *list, void *node);
@@ -53,7 +29,7 @@ static __inline__ void acquire(void) {
     gCache_mutex_count = count;
     if (count != 1) {
         __osRestoreInt(token);
-        osRecvMesg(gCache_queue.lock, 0, 1);
+        osRecvMesg(&gCache.mutex.queue, 0, 1);
     } else {
         __osRestoreInt(token);
     }
@@ -65,14 +41,14 @@ static __inline__ void release(void) {
     gCache_mutex_count = count;
     if (count != 0) {
         __osRestoreInt(token);
-        osSendMesg(gCache_queue.lock, 0, 1);
+        osSendMesg(&gCache.mutex.queue, 0, 1);
     } else {
         __osRestoreInt(token);
     }
 }
 
 static __inline__ void find(u32 key, CCacheEntry **out) {
-    ResourceHashEntry *node = gHashTable + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & gHashMask);
+    HashEntry *node = gHashTable + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & gHashMask);
     if (node->key != key) goto not_initial;
     *out = node->value;
     goto done;
@@ -138,12 +114,12 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, v
         release();
         return request->memEntry;
     }
-    direct |= gCache_queue.mask;
+    direct |= gCache.frameDelay;
     busy = 0;
     if (direct != 0) {
         allocated = CCache__AllocCacheEntry(0, mode);
     } else {
-        scan = gCache_queue.active.m_pHead;
+        scan = gCache.cachePendingList.m_pHead;
         while (scan != 0) {
             if (scan->requestId == key && size <= scan->requestLength) {
                 busy = 1;
@@ -168,8 +144,8 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, v
             request->notifyId = owner;
             request->decompressCallback = tag;
             request->memFlags = mode;
-            CList__Remove(&gCache_queue.pending, request);
-            CList__AddTail(&gCache_queue.active, request);
+            CList__Remove(&gCache.cacheUsedList, request);
+            CList__AddTail(&gCache.cachePendingList, request);
             if (direct != 0) {
                 if (tag != 0) request->flags |= 4;
                 release();
@@ -187,7 +163,7 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, v
                 request->flags = oldFlags | 2;
                 if (tag != 0) request->flags = oldFlags | 0xE;
                 release();
-                CLoader__LoadAsync(&gLoader, key, size, request->memEntry->data, &gCache_queue, request, 0);
+                CLoader__LoadAsync(&gLoader, key, size, request->memEntry->data, &gCache.queue, request, 0);
                 return 0;
             }
         }

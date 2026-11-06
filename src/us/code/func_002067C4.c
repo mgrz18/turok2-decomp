@@ -1,37 +1,32 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80254D44_de.c, func_80254F9C_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2. */
 
-#include "rw/abu_types.h"
+#include "common.h"
 #include "globals/cache.h"
 
-extern s32 gCache;
-extern s32 gCache_blocker;
-extern void osSendMesg(void *arg0, s32 arg1, s32 arg2);
-void CCache__ReleaseDisplayList(s32 unused, s32 arg1) {
+extern void osSendMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
+
+/* Display list dlist is done: wakes CCache__WaitForDisplayLists if it waits
+ * for it and clears the list's lock bit on every CMemEntry. */
+void CCache__ReleaseDisplayList(s32 unused, s32 dlist) {
     s32 mask;
+    u32 i;
     u32 count;
-    s32 new_var;
-    u32 new_var2;
-    s32 offset;
-    u32 limit;
-    if (gCache_dlistBlocking[arg1] != 0) {
-        gCache_dlistBlocking[arg1] = 0;
-        osSendMesg(&gCache_blocker, 0, 1);
+
+    if (gCache_dlistBlocking[dlist] != 0) {
+        gCache_dlistBlocking[dlist] = 0;
+        osSendMesg(&gCache.blocker.queue, NULL, 1);
     }
-    mask = -0x201;
-    if (arg1 != 0) {
-        mask = -0x401;
+    mask = ~MEMENTRY_FLAG_DLISTA_LOCKED;
+    if (dlist != 0) {
+        mask = ~MEMENTRY_FLAG_DLISTB_LOCKED;
     }
-    do { count = 0; limit = gCacheEntryCount; } while (0);
-    new_var2 = limit;
-    if (limit != 0) {
-        offset = count;
+    do { i = 0; count = gCacheEntryCount; } while (0);   /* changes only the asm label numbers */
+    if (count != 0) {
         do {
-            new_var = offset + gCache;
-            count += 1;
-            *(s32 *)&((Node80254C10 *)new_var)->flags &= mask;
-            offset += 0x28;
-        } while (count < new_var2);
+            gCache.memEntries[i].flags &= mask;
+            i++;
+        } while (i < count);
     }
-    do { gCache_dlistCount[arg1] = 0; } while (0);
+    do { gCache_dlistCount[dlist] = 0; } while (0);     /* the same */
 }

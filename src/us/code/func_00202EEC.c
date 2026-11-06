@@ -6,8 +6,6 @@
 
 extern void CCache__ClearDisplayListLocks(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern s32 gCache_blocker;
-extern s32 gCache_blocker;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 void CCache__WaitForDisplayLists(void) {
@@ -50,7 +48,7 @@ block_7:
         }
         if (var_s1 > 0) {
             do {
-                osRecvMesg(&gCache_blocker, 0, 1);
+                osRecvMesg(&gCache.blocker.queue, 0, 1);
                 var_s0_2 += 1;
             } while (var_s0_2 < var_s1);
         }

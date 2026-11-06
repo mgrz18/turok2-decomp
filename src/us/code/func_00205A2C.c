@@ -8,7 +8,6 @@ extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 arg0);
 extern void __osRestoreInt(u32);
-extern s32 gHashTable;
 extern void CList__MoveToHead(void *, s32);
 void CCache__Touch(s32 arg0, s32 arg1) {
     extern s32 osSendMesg(OSMesgQueue *, s32, s32);
@@ -29,7 +28,7 @@ void CCache__Touch(s32 arg0, s32 arg1) {
         __osRestoreInt(temp_a0);
     }
     out = &value;
-    node = (HashNode *)((s32)gHashTable +
+    node = (HashNode *)((u8 *)gHashTable +
         ((((arg1 << 5) ^ ((u32)arg1 >> 1) ^ ((u32)arg1 >> 9) ^
            ((u32)arg1 >> 17)) & gHashMask) * 0x10));
     if (node->key != arg1) {

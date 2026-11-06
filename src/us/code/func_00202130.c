@@ -5,19 +5,17 @@
  * (minus 512 KB when the expansion pak is present), hand it to the heap, then start the subsystems. */
 
 #include "common.h"
+#include "globals/sysrc.h"
 
 s32 GetMemSize(void);                                  /* osGetMemSize */
 void *memset(void *dst, s32 value, u32 size);      /* memset */
-void CHeap__Construct(void *heap, void *base, u32 size);
-void CDecompressor__Construct(void *p, s32 n);
-void CLoader__Construct(void *p, s32 n);
+void CHeap__Construct(CHeap *heap, void *base, u32 size);
+void CDecompressor__Construct(CDecompressor *p, s32 n);
+void CLoader__Construct(CLoader *p, s32 n);
 void VM_Initialize(s32 a, s32 b);
 void CCache__Construct(s32 a, s32 b);
 
 extern u8 D_8014A000[];   /* end of the loaded image */
-extern u8 gHeap[];   /* the main heap */
-extern u8 gDecompressor[];
-extern u8 gLoader[];
 
 void InitializeSystemResources(void) {
     u8 *base;
@@ -31,9 +29,9 @@ void InitializeSystemResources(void) {
     }
     size = top - (u32) base;
     memset(base, 0, size);
-    CHeap__Construct(gHeap, base, size);
-    CDecompressor__Construct(gDecompressor, 3);
-    CLoader__Construct(gLoader, 4);
+    CHeap__Construct(&gHeap, base, size);
+    CDecompressor__Construct(&gDecompressor, 3);
+    CLoader__Construct(&gLoader, 4);
     VM_Initialize(0, 0);
     CCache__Construct(0, 5);
 }

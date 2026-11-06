@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/cache.h"
 
-extern s32 gCache_cacheFreeList_m_nCount;
 
 s32 CCache__GetFreeCacheEntryCount(void) {
-    return gCache_cacheFreeList_m_nCount;
+    return gCache.cacheFreeList.m_nCount;
 }

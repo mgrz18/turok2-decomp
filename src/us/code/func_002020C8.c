@@ -1,21 +1,18 @@
 #include "common.h"
+#include "structs/loader.h"
 
-s32 CList__AddHead(s32, s32);
-s32 CList__Remove(s32, s32);
-s32 __osDisableInt(void);
-void __osRestoreInt(s32);
+void CList__AddHead(CList *list, void *element);
+void CList__Remove(CList *list, void *element);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x14];
-    /* 0x14 */ s32 inUse;
-} CLoaderEntry;
+/* Turok 3's loader.c CLoader__DeallocLoaderEntry: the used list back to the
+ * free list, with interrupts off (CLoader__AllocLoaderEntry's mirror). */
+void CLoader__DeallocLoaderEntry(CLoader *thisx, CLoaderEntry *entry) {
+    u32 mask = __osDisableInt();
 
-void CLoader__DeallocLoaderEntry(s32 arg0, s32 arg1) {
-    s32 temp_s2;
-
-    temp_s2 = __osDisableInt();
-    CList__Remove(arg0 + 0x507C, arg1);
-    ((CLoaderEntry *)arg1)->inUse = 0;
-    CList__AddHead(arg0 + 0x5068, arg1);
-    __osRestoreInt(temp_s2);
+    CList__Remove(&thisx->usedList, entry);
+    entry->flags = LOADERFLAGS_UNALLOCATED;
+    CList__AddHead(&thisx->freeList, entry);
+    __osRestoreInt(mask);
 }

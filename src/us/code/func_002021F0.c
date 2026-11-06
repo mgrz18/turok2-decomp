@@ -1,92 +1,76 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002555D0.c, func_002555D0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef struct B12HBlk B12HBlk;
-struct B12HBlk {
-               B12HBlk *next;
-               B12HBlk *prev;
-               s32 unk8;
-               s32 unkC;
-               u32 hdr;
-               u32 size;
-};
-typedef struct B12Heap {
-               u32 start;
-               u32 end;
-               B12HBlk *first;
-               B12HBlk *last;
-               B12HBlk *cur;
-} B12Heap;
-u8 *CHeap__AllocAt(B12Heap *h, u8 *ptr, u32 size) {
-    B12HBlk *f;
-    B12HBlk *b;
-    B12HBlk *p;
-    B12HBlk *nx;
-    B12HBlk *q;
+#include "common.h"
+#include "structs/heap.h"
+
+u8 *CHeap__AllocAt(CHeap *h, u8 *ptr, u32 size) {
+    CHeapBlock *f;
+    CHeapBlock *b;
+    CHeapBlock *p;
+    CHeapBlock *nx;
+    CHeapBlock *q;
     u32 need = (size + 0x2F) & ~0xF;
     u32 lo;
     u32 end;
     u32 bend;
-    q = h->first;
+    q = h->freeHead;
     if (q) {
         f = q;
-        while (f->prev && f->prev < (B12HBlk *)ptr) {
-            f = f->prev;
+        while (f->freeNext && f->freeNext < (CHeapBlock *)ptr) {
+            f = f->freeNext;
         }
-        lo = (u32)f + f->hdr;
-        end = lo + f->size;
-        b = (B12HBlk *)(ptr - 0x20);
+        lo = (u32)f + f->used;
+        end = lo + f->free;
+        b = (CHeapBlock *)(ptr - sizeof(CHeapBlock));
         if (!((u32)b < lo)) {
             bend = (u32)b + need;
             if (!(end < bend)) {
-                b->hdr = need;
-                b->size = end - bend;
-                if (b->size != 0) {
-                    b->next = f;
-                    p = f->prev;
-                    b->prev = p;
-                    if (f->prev) {
-                        p->next = b;
+                b->used = need;
+                b->free = end - bend;
+                if (b->free != 0) {
+                    b->freeLast = f;
+                    p = f->freeNext;
+                    b->freeNext = p;
+                    if (f->freeNext) {
+                        p->freeLast = b;
                     }
-                    f->prev = b;
-                    if (h->last == f) {
-                        h->last = b;
+                    f->freeNext = b;
+                    if (h->freeTail == f) {
+                        h->freeTail = b;
                     }
                 } else {
-                    b->next = 0;
-                    b->prev = 0;
+                    b->freeLast = 0;
+                    b->freeNext = 0;
                 }
-                f->size = (u32)b - ((u32)f + f->hdr);
-                if (f->size == 0) {
-                    if (f->next) {
-                        f->next->prev = f->prev;
+                f->free = (u32)b - ((u32)f + f->used);
+                if (f->free == 0) {
+                    if (f->freeLast) {
+                        f->freeLast->freeNext = f->freeNext;
                     }
-                    if (f->prev) {
-                        f->prev->next = f->next;
+                    if (f->freeNext) {
+                        f->freeNext->freeLast = f->freeLast;
                     }
-                    if (h->first == f) {
-                        h->first = f->prev;
+                    if (h->freeHead == f) {
+                        h->freeHead = f->freeNext;
                     }
-                    if (h->last == f) {
-                        if (f->prev) {
-                            h->last = f->prev;
+                    if (h->freeTail == f) {
+                        if (f->freeNext) {
+                            h->freeTail = f->freeNext;
                         } else {
-                            h->last = f->next;
+                            h->freeTail = f->freeLast;
                         }
                     }
-                    f->next = 0;
-                    f->prev = 0;
+                    f->freeLast = 0;
+                    f->freeNext = 0;
                 }
-                b->unk8 = (s32)f;
-                nx = (B12HBlk *)f->unkC;
-                b->unkC = (s32)nx;
-                if (f->unkC) {
-                    nx->unk8 = (s32)b;
+                b->usedLast = f;
+                nx = f->usedNext;
+                b->usedNext = nx;
+                if (f->usedNext) {
+                    nx->usedLast = b;
                 }
-                f->unkC = (s32)b;
+                f->usedNext = b;
                 return ptr;
             }
         }

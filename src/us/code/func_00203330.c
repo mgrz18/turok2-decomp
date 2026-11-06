@@ -1,73 +1,71 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80250938_de_3.c, func_802515F0_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/cache.h"
+#include "globals/cache.h"
+#include "globals/sysrc.h"
 
-extern void CList__RemoveHead(CList *arg0);
-extern void CCache__Compact(s32, s32);
-extern CList gCache_memLockedList;
-extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
-extern s32 CList__AddTail(CList *list, void *node);
-extern s32 CHeap__Alloc(void *, s32);
-extern void memmove(u32, u32, s32);
-extern void CList__InsertBefore(void *, s32, s32);
-void CCache__Compact(s32 unused, s32 arg1) {
-    extern void CList__Remove(void *, s32);
-    extern void CHeap__Free(void *, s32);
-    extern s32 gHeap[3];
-    extern s32 gCache_currentCompressPos[];
-    CList queue;
-    Node80254C10 *node;
-    Node80254C10 *next;
-    Node80254C10 *scan;
-    u32 split;
-    s32 *arena_end;
-    s32 *arena;
-    s32 *pool;
-    CList__Construct(&queue, 0x20, 0x24);
-    if (arg1 != 0 || gCache_currentCompressPos[0] == 0) {
-        gCache_currentCompressPos[0] = gCache_currentCompressPos[7];
-        if (gCache_currentCompressPos[7] == 0) {
+extern void CList__RemoveHead(CList *list);
+extern void CList__Construct(CList *list, s32 lastOffset, s32 nextOffset);
+extern void CList__AddTail(CList *list, void *element);
+extern void CList__InsertBefore(CList *list, void *before, void *element);
+extern void CList__Remove(CList *list, void *element);
+extern u8 *CHeap__Alloc(CHeap *heap, s32 size);
+extern void CHeap__Free(CHeap *heap, u8 *data);
+extern void memmove(void *dst, void *src, s32 size);
+
+/* Moves unlocked blocks down the heap (free, then allocate again lower) and
+ * files the moved ones back in the address-sorted locked list; one block per
+ * call, or all of them. */
+void CCache__Compact(s32 unused, s32 all) {
+    CList moved;
+    CMemEntry *entry;
+    CMemEntry *next;
+    CMemEntry *scan;
+    u8 *newData;
+
+    CList__Construct(&moved, 0x20, 0x24);
+    if (all != 0 || gCache.currentCompressPos == NULL) {
+        gCache.currentCompressPos = gCache.memLockedList.m_pHead;
+        if (gCache.memLockedList.m_pHead == NULL) {
             goto drain;
         }
     }
-    pool = gCache_currentCompressPos;
-    arena_end = &gHeap[2];
-    arena = arena_end - 2;
     do {
-        node = (Node80254C10 *)pool[0];
-        pool[0] = *(s32 *)&node->next;
-        if (!(*(s32 *)&node->flags & 0x701) && (u32)(*arena_end + 0x20) < node->start) {
-            CHeap__Free(arena, node->start);
-            split = CHeap__Alloc(arena, node->end);
-            if (split < node->start) {
-                memmove(split, node->start, node->end);
-                node->start = split;
-                CList__Remove(&pool[7], (s32)node);
-                CList__AddTail(&queue, node);
+        entry = gCache.currentCompressPos;
+        gCache.currentCompressPos = entry->lockedNext;
+        if (!(entry->flags & 0x701) && (u32)gHeap.freeHead + sizeof(CHeapBlock) < (u32)entry->data) {
+            CHeap__Free(&gHeap, entry->data);
+            newData = CHeap__Alloc(&gHeap, entry->size);
+            if (newData < (u8 *)entry->data) {
+                memmove(newData, entry->data, entry->size);
+                entry->data = newData;
+                CList__Remove(&gCache.memLockedList, entry);
+                CList__AddTail(&moved, entry);
             }
-            if (arg1 == 0) {
+            if (all == 0) {
                 break;
             }
         }
-    } while (gCache_currentCompressPos[0] != 0);
+    } while (gCache.currentCompressPos != NULL);
 drain:
-    node = queue.m_pHead;
-    while (node != 0) {
-        next = node->next;
-        CList__RemoveHead(&queue);
+    entry = moved.m_pHead;
+    while (entry != NULL) {
+        next = entry->lockedNext;
+        CList__RemoveHead(&moved);
         scan = gCache_memLockedList.m_pHead;
-        while (scan != 0) {
-            if (scan->start > node->start) {
-                CList__InsertBefore(&gCache_memLockedList, (s32)scan, (s32)node);
+        while (scan != NULL) {
+            if ((u32)scan->data > (u32)entry->data) {
+                CList__InsertBefore(&gCache_memLockedList, scan, entry);
                 break;
             }
-            scan = scan->next;
+            scan = scan->lockedNext;
         }
-        if (scan == 0) {
-            CList__AddTail(&gCache_memLockedList, node);
+        if (scan == NULL) {
+            CList__AddTail(&gCache_memLockedList, entry);
         }
-        node->flags |= 0x1000;
-        node = next;
+        entry->flags |= MEMENTRY_FLAG_ON_LOCKED;
+        entry = next;
     }
 }

@@ -1,9 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/crash.h"
-
-extern s32 gCFB;
+#include "globals/framebuffer.h"
 
 void Crash_ResetFrameBuffer(void) {
-    sCrashFrameBuffer = (u16 *) gCFB;
+    sCrashFrameBuffer = gCFB[0];
 }

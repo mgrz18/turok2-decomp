@@ -1,10 +1,10 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "globals/sysrc.h"
 
-s32 CLoader__LoadSync(s32, s32, s32, s32);
+s32 CLoader__LoadSync(CLoader *reader, s32, s32, s32);
 
 s32 SavedPlayers_IsActive();                                /* extern */
-extern s32 gLoader;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x2C];
@@ -15,6 +15,6 @@ typedef struct {
 
 void CScene__LoadBitSections2_2(Unk0046538C *arg0) {
     if (SavedPlayers_IsActive() == 0) {
-        CLoader__LoadSync((s32) &gLoader, arg0->unk2C, arg0->unk34, (s32) &gGamePersistentData);
+        CLoader__LoadSync(&gLoader, arg0->unk2C, arg0->unk34, (s32) &gGamePersistentData);
     }
 }

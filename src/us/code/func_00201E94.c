@@ -1,50 +1,55 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80256280_de.c, func_80256454_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/loader.h"
 
-extern Chunk *CLoader__AllocLoaderEntry(CartridgeReadWorker *arg0);
-extern s32 osJamMesg(void *arg0, void *arg1, s32 arg2);
-extern s32 osJamMesg(void *, void *, s32);
-extern s32 osSendMesg(void *, s32, s32);
-void CLoader__LoadAsync(struct CartridgeReadWorker *arg0, u32 source, s32 length, void *destination,
-                   Queue *queue, s32 value, s32 direct) {
+s32 osJamMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
+s32 osSendMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
+CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx);
+
+/* Queues a read of length bytes of ROM at address into dest; the last
+ * entry sends replyMessage to replyQueue. A direct read is one entry,
+ * jammed at the front of the queue. */
+void CLoader__LoadAsync(CLoader *thisx, u32 address, s32 length, void *dest,
+                        OSMesgQueue *replyQueue, OSMesg replyMessage, s32 direct) {
     s32 remaining;
-    s32 chunk_length;
-    Chunk *chunk;
+    s32 chunkLength;
+    CLoaderEntry *entry;
+
     if (direct != 0) {
-        chunk = CLoader__AllocLoaderEntry(arg0);
-        if (chunk != 0) {
-            chunk->source = source;
-            chunk->destination = destination;
-            chunk->length = length;
-            chunk->queue = queue;
-            chunk->value = value;
-            osJamMesg(&arg0->requestQueueStorage, chunk, 1);
+        entry = CLoader__AllocLoaderEntry(thisx);
+        if (entry != NULL) {
+            entry->address = address;
+            entry->dest = dest;
+            entry->length = length;
+            entry->replyQueue = replyQueue;
+            entry->replyMessage = replyMessage;
+            osJamMesg(&thisx->queue, entry, 1);
         }
     } else {
         remaining = length;
         do {
-            chunk = CLoader__AllocLoaderEntry(arg0);
-            chunk_length = 0x2000;
-            if (chunk == 0) {
+            entry = CLoader__AllocLoaderEntry(thisx);
+            chunkLength = LOADER_CHUNK_SIZE;
+            if (entry == NULL) {
                 break;
             }
-            chunk->source = source + (length - remaining);
-            chunk->destination = (char *)destination + (length - remaining);
-            if ((u32)remaining < 0x2001U) {
-                chunk_length = remaining;
+            entry->address = address + (length - remaining);
+            entry->dest = (u8 *)dest + (length - remaining);
+            if ((u32)remaining < LOADER_CHUNK_SIZE + 1) {
+                chunkLength = remaining;
             }
-            remaining -= chunk_length;
-            chunk->length = chunk_length;
+            remaining -= chunkLength;
+            entry->length = chunkLength;
             if (remaining != 0) {
-                chunk->queue = 0;
-                chunk->value = 0;
+                entry->replyQueue = NULL;
+                entry->replyMessage = NULL;
             } else {
-                chunk->queue = queue;
-                chunk->value = value;
+                entry->replyQueue = replyQueue;
+                entry->replyMessage = replyMessage;
             }
-            osSendMesg(&arg0->requestQueueStorage, (s32)chunk, 1);
-        } while ((chunk != 0) && (remaining != 0));
+            osSendMesg(&thisx->queue, entry, 1);
+        } while (entry != NULL && remaining != 0);
     }
 }

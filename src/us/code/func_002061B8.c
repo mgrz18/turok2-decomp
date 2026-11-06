@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/sysrc.h"
 
-s32 CHeap__Free(s32, s32);
+s32 CHeap__Free(CHeap *, s32);
 s32 CCache__FreeMemEntry(s32, s32);
 s32 CCache__DetachCacheEntry(s32, s32);
 
-extern s32 gHeap;
 
 void CCache__DeallocateInternal(s32 arg0, CAI *ai) {
     s32 temp_v0;
@@ -24,7 +24,7 @@ loop_1:
     }
     if (!(ai->m_VisBits & 0x702)) {
         CCache__DetachCacheEntry(0, (s32) ai);
-        CHeap__Free((s32) &gHeap, ai->m_dwFlags);
+        CHeap__Free(&gHeap, ai->m_dwFlags);
         CCache__FreeMemEntry(0, (s32) ai);
     }
 }

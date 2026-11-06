@@ -1,11 +1,11 @@
 /* WRONG CUT: REAL CScene__LoadBitSections2 size 0x4C (splat cut it into CScene__LoadBitSections2 + func_0042C480). */
 #include "common.h"
 #include "globals/scene.h"
+#include "globals/sysrc.h"
 
-extern u8 gLoader[];
 
 extern s32 SavedPlayers_IsActive(void);
-extern void CLoader__LoadSync(void *, s32, s32, void *);
+extern void CLoader__LoadSync(CLoader *reader, s32, s32, void *);
 
 typedef struct MenuState {
     /* 0x00 */ u8 pad0[0x2C];
@@ -16,6 +16,6 @@ typedef struct MenuState {
 
 void CScene__LoadBitSections2(MenuState *menu) {
     if (SavedPlayers_IsActive() == 0) {
-        CLoader__LoadSync(gLoader, menu->unk2C, menu->unk34, gGamePersistentData);
+        CLoader__LoadSync(&gLoader, menu->unk2C, menu->unk34, gGamePersistentData);
     }
 }

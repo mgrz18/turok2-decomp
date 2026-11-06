@@ -6,6 +6,7 @@
 #include "gfx.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "globals/framebuffer.h"
 
 /* gEngineApp_m_Settings_match (GameMatch in structs/game.h) as a local array view, under an
  * alias of the symbol: through it the compiler bases both stores on
@@ -18,7 +19,6 @@ typedef struct {
 
 extern u8 gScheduler[];
 extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("gEngineApp_m_Settings_match");
-extern s32 gCFB[];
 
 extern void osCreateMesgQueue(void *, void *, s32);
 extern void memset(void *, s32, s32);

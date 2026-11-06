@@ -11,10 +11,9 @@
 #include "globals/engine.h"
 #include "globals/controller.h"
 #include "globals/libultra.h"
+#include "globals/framebuffer.h"
 
 extern u8 gPoolBuffers[];
-extern void *gCFB[];      /* frame buffers */
-extern f32 gCurrentFB[];
 extern s32 D_800F6CA8;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
@@ -58,9 +57,9 @@ void CEngineApp__Main(CEngineApp *e) {
     osViSwapBuffer(gCFB[0]);
     osViBlack(0);
     if (osTvType == 0) {
-        gCurrentFB[1] = 50.0f;
+        gRefreshRate = 50.0f;
     } else {
-        gCurrentFB[1] = 60.0f;
+        gRefreshRate = 60.0f;
     }
     gGfxMsg = NULL;
     Demo_Reset();
@@ -74,8 +73,8 @@ void CEngineApp__Main(CEngineApp *e) {
     gCurrentTickWaiting = 0;
     gNumTicksWaiting = 0;
     gNextFrameToShow = 0;
-    gCurrentFB[0] = 0;
-    gPendingFB = 0;
+    gCurrentFB = NULL;
+    gPendingFB = NULL;
     CEngineApp__Construct(e);
     for (i = 0; i < gTotalFramebuffers; i++) {
         memset(gCFB[i], 0, gScreenWidth * gScreenHeight * 2);

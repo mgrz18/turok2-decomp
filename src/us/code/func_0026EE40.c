@@ -38,7 +38,7 @@ typedef struct SampledCurve SampledCurve;
 extern func_8020CA10_G1 D_800A8074;
 extern func_8020CA10_G1 D_800A8070;
 extern func_8020CA10_G1 D_800A8078;
-extern f32 gCurrentFB[2];
+extern f32 gCurrentFB[2];   /* local type: [1] is gRefreshRate (globals/framebuffer.h); this file has its own typedefs instead of common.h */
 s32 RumbleCurve_Advance(void *arg0) {
     PlayerRecAt8 *player = arg0;
     f32 temp_f1;

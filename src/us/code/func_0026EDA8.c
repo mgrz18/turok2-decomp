@@ -1,26 +1,30 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802846C8_de_17.c, func_80285D30_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/rumble.h"
 
-extern s32 CList__AddTail(CList *list, void *node);
-void RumblePool_FreeAll(void *arg0) {
-    extern void __osRestoreInt(s32 arg0);
-    extern s32 __osDisableInt(void);
-    extern void CList__Remove(void *, s32);
-    void *node;
-    void *next;
-    s32 saved;
-    saved = __osDisableInt();
-    node = ((PoolRecAt28V1 *)arg0)->active.m_pHead;
-    if (node != 0) {
+void CList__AddTail(CList *list, void *element);
+void CList__Remove(CList *list, void *element);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
+
+/* Returns every active effect to the free list. */
+void RumblePool_FreeAll(RumblePool *pool) {
+    RumbleEffect *effect;
+    RumbleEffect *next;
+    u32 mask;
+
+    mask = __osDisableInt();
+    effect = pool->active.m_pHead;
+    if (effect != NULL) {
         do {
-            next = ((NodeCode8028469C *)node)->next;
-            CList__Remove(&((PoolRecAt28V1 *)arg0)->active, node);
-            CList__AddTail(arg0, node);
-            node = next;
-        } while (node != 0);
+            next = effect->next;
+            CList__Remove(&pool->active, effect);
+            CList__AddTail(&pool->free, effect);
+            effect = next;
+        } while (effect != NULL);
     }
-    ((PoolRecAt28V1 *)arg0)->baseLevel = 0;
-    __osRestoreInt(saved);
+    pool->baseLevel = 0;
+    __osRestoreInt(mask);
 }

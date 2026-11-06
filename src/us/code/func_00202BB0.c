@@ -6,6 +6,7 @@
 #include "structs/list.h"
 #include "globals/cache.h"
 #include "globals/engine.h"
+#include "globals/sysrc.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 void osStartThread(OSThread *thread);
@@ -65,10 +66,9 @@ typedef struct B12Mgr {
                  B12Bucket * buckets;
 } B12Mgr;
 extern B12Mgr D_800D7BE0;
-extern u8 gHeap[];
 void CMutex__Construct(void *lock);
 u32 GetMemSize(void);
-u8 *CHeap__Alloc(void *heap, u32 size);
+u8 *CHeap__Alloc(CHeap *heap, u32 size);
 void CList__Construct(CList *l, s32 prevOff, s32 nextOff);
 void CList__AddTail(CList *l, void *n);
 void CHashTable__Construct(u32 n);
@@ -93,9 +93,9 @@ void CCache__Construct(s32 unused, s32 id) {
     if (GetMemSize() > 0x400000) {
         gCacheEntryCount *= 2;
     }
-    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(gHeap, gCacheEntryCount * 0x28);
-    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(gHeap, gCacheEntryCount * 4);
-    D_800D7BE0.pool2 = CHeap__Alloc(gHeap, gCacheEntryCount * 0x2C);
+    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(&gHeap, gCacheEntryCount * 0x28);
+    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(&gHeap, gCacheEntryCount * 4);
+    D_800D7BE0.pool2 = CHeap__Alloc(&gHeap, gCacheEntryCount * 0x2C);
     osCreateMesgQueue(&D_800D7BE0.q11F0, &D_800D7BE0.buf11F0, 1);
     D_800D7BE0.tbl630[1] = 0;
     D_800D7BE0.tbl630[0] = 0;
