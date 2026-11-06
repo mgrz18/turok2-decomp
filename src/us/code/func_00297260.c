@@ -4,12 +4,11 @@
 #include "rw/abu_types.h"
 
 extern f32 _doModFunc(ALDelay *d, s32 count);
-extern const float D_800AA718;
 f32 _doModFunc(ALDelay *d, s32 count)
 {
     f32 val;
     d->rsval += d->rsinc * count;
-    d->rsval = (d->rsval > D_800AA718) ? d->rsval - (*(&D_800AA718 + 1)) : d->rsval;
+    d->rsval = (d->rsval > 2.0f) ? d->rsval - (4.0f) : d->rsval;
     val = d->rsval;
     val = (val < 0) ? -val : val;
     val -= 1.0f;

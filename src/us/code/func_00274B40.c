@@ -56,9 +56,6 @@ struct Track {
     f32 unk3C;
     f32 unk40;
 };
-extern f32 D_800A81A0;
-extern f32 D_800A81A8;
-extern f32 D_800A81C0;
 extern void alCSPPlay(s32);
 extern int alCSPGetState(void *object);
 struct Track;
@@ -129,7 +126,7 @@ void SndSeq_Update(Track *arg0) {
                 temp_f0 = HalfToFloat(temp_v0_4->unk4);
                 arg0->unk30 = temp_f0;
                 if (temp_f0 <= 0.0f) {
-                    arg0->unk30 = D_800A81A0;
+                    arg0->unk30 = 0.1f;
                 }
                 var_v0_2 = temp_s0_2;
             } else {
@@ -153,8 +150,8 @@ void SndSeq_Update(Track *arg0) {
                 alCSPSetChlFXMix(arg0->unk14, var_s0 & 0xFF, 0);
                 var_s0 += 1;
             } while (var_s0 < 0x14);
-            temp_f20 = (f32) arg0->unk24 * (arg0->unk0->unk2BA4 * *(&D_800A81A0+1));
-            alCSPSetVol(arg0->unk14, (s16) (s32) (temp_f20 * D_800A81A8));
+            temp_f20 = (f32) arg0->unk24 * (arg0->unk0->unk2BA4 * 0.01f);
+            alCSPSetVol(arg0->unk14, (s16) (s32) (temp_f20 * 32767.0f));
             arg0->unk2C = temp_f20;
             alCSPPlay(arg0->unk14);
             arg0->unk1C = 0;
@@ -171,7 +168,7 @@ void SndSeq_Update(Track *arg0) {
         } else {
             if (arg0->unk38 != 0) {
                 var_f20 = (f32) arg0->unk24;
-                var_f20 *= arg0->unk0->unk2BA4 * *(&D_800A81A8+1);
+                var_f20 *= arg0->unk0->unk2BA4 * 0.01f;
                 var_f20 *= arg0->unk3C;
                 goto block_37;
             }
@@ -192,10 +189,10 @@ block_37:
                 arg0->unk1C = 2;
                 arg0->unk18 = 0x20;
                 arg0->unk20 = (s32) (arg0->unk2C * 32767.0f);
-                if (!(var_f2 >= D_800A81C0)) {
-                    var_f2 = D_800A81C0;
+                if (!(var_f2 >= 0.1f)) {
+                    var_f2 = 0.1f;
                 }
-                arg0->unk34 = fade_rate(arg0,var_f2,*(&D_800A81C0+1));
+                arg0->unk34 = fade_rate(arg0,var_f2,6.0e1f);
                 return;
             }
             var_v0 = 0x40;

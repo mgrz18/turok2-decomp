@@ -5,8 +5,6 @@
 
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002982F0(float x);
-extern float D_800A5504;
-extern float D_800A550C;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b) {
@@ -32,7 +30,7 @@ void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b)
         dot = negativeDot;
         other = &negative;
     }
-    if (D_800A5504 < dot) {
+    if (0.70710677f < dot) {
         f32 magnitude;
         f32 scale;
         out->x = a->x + amount * (other->x - a->x);
@@ -42,7 +40,7 @@ void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b)
         magnitude = func_00298470((out->x * out->x) + (out->y * out->y) +
                                   (out->z * out->z) + (out->w * out->w));
         if (magnitude != 0.0f) {
-            scale = *(&D_800A5504 + 1) / magnitude;
+            scale = 1.0f / magnitude;
             out->x *= scale;
             out->y *= scale;
             out->z *= scale;
@@ -55,8 +53,8 @@ void CQuaternion__SlerpFast(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b)
             *out = *a;
             return;
         }
-        inverseSine = D_800A550C / sine;
-        scaleA = func_002982F0((D_800A550C - amount) * angle) * inverseSine;
+        inverseSine = 1.0f / sine;
+        scaleA = func_002982F0((1.0f - amount) * angle) * inverseSine;
         scaleB = func_002982F0(amount * angle) * inverseSine;
         if (dot < negativeDot) {
             other = &negative;

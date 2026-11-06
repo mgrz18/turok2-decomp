@@ -7,7 +7,6 @@
 #include "structs/region.h"
 #include "globals/region.h"
 
-extern float D_800A7FD0;
 extern void CVector3__Normalize(f32 *arg0);
 extern CVector3 sRegionNormal;
 extern f32 sRegionNormal_y;
@@ -34,12 +33,12 @@ s32 CGameRegion__IsSteep(CGameRegion *polygon) {
         return polygon->m_wFlags & 8;
     }
     up.x = 0.0f;
-    up.y = *(&D_800A7FD0 + 1);
+    up.y = 1.0f;
     up.z = 0.0f;
     if (polygon != sCachedNormalRegion) {
         if (polygon == 0) {
             *(s32 *)&sRegionNormal = 0;
-            sRegionNormal_y = *(&D_800A7FD0 + 1);
+            sRegionNormal_y = 1.0f;
             sRegionNormal_z = 0;
         } else if (polygon != sCachedRawNormalRegion) {
             edge(&edge0, polygon->m_pVertices[1], polygon->m_pVertices[0]);

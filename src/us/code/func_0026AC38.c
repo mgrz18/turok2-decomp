@@ -10,7 +10,6 @@ extern float func_002982F0(float x);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern f32 func_00298470(f32);
-extern float D_800A7FBC[];
 extern void CGameRegion__GetCeilingNormal(CVector3 *);
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, float);
@@ -24,7 +23,7 @@ Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out) {
     float scale;
     float one;
     CGameRegion__GetCeilingNormal(&a);
-    one = D_800A7FBC[1];
+    one = 1.0f;
     up.x = 0;
     up.y = one;
     up.z = 0;

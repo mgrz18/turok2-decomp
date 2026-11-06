@@ -5,12 +5,6 @@
 
 extern f32 _doModFunc(ALDelay *d, s32 count);
 extern Acmd *_loadBuffer(ALFx *, s16 *, s32, s32, Acmd *);
-extern float D_800AA710;
-extern float D_800AA714;
-extern float D_800AA70C;
-extern const f32 D_800AA70C;
-extern const f32 D_800AA710;
-extern const f32 D_800AA714;
 Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
 {
     extern s32 osVirtualToPhysical(s32);
@@ -24,10 +18,10 @@ Acmd *_loadOutputBuffer(ALFx *r, ALDelay *d, s32 buff, s32 incount, Acmd *p)
         length = d->output - d->input;
         delta = _doModFunc(d, incount);
         delta /= length;
-        unity = D_800AA70C;
+        unity = 32768.0f;
         delta = (s32)(delta * unity);
-        delta = delta * D_800AA710;
-        fratio = D_800AA714 - delta;
+        delta = delta * 3.0517578e-5f;
+        fratio = 1.0f - delta;
         fincount = d->rs->delta + (fratio * (f32)incount);
         count = (s32)fincount;
         d->rs->delta = fincount - (f32)count;

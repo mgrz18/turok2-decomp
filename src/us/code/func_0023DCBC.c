@@ -4,12 +4,8 @@
 #include "rw/abu_types.h"
 
 extern void Collision_LookAtF(float mf[4][4], float xEye, float yEye, float zEye, float xAt, float yAt, float zAt, float xUp, float yUp, float zUp);
-extern const float D_800A66CC;
-extern const float D_800A66C4;
 f32 func_00298470(f32);
 extern f32 func_00298470(f32);
-extern const float D_800A66C4;
-extern const float D_800A66CC;
 extern void guMtxIdentF(float mf[4][4]);
 extern float func_00298470(float);
 void Collision_LookAtF(float mf[4][4], float xEye, float yEye, float zEye,
@@ -21,7 +17,7 @@ void Collision_LookAtF(float mf[4][4], float xEye, float yEye, float zEye,
     xLook = xAt - xEye;
     yLook = yAt - yEye;
     zLook = zAt - zEye;
-    len = D_800A66C4 / func_00298470(xLook * xLook + yLook * yLook + zLook * zLook);
+    len = -1.0f / func_00298470(xLook * xLook + yLook * yLook + zLook * zLook);
     xLook *= len;
     yLook *= len;
     zLook *= len;
@@ -29,9 +25,9 @@ void Collision_LookAtF(float mf[4][4], float xEye, float yEye, float zEye,
     yRight = zUp * xLook - xUp * zLook;
     zRight = xUp * yLook - yUp * xLook;
     if (xRight == 0.0f && yRight == 0.0f && zRight == 0.0f) {
-        xRight = (&D_800A66C4)[1];
+        xRight = 1.0f;
     }
-    one = D_800A66CC;
+    one = 1.0f;
     len = one / func_00298470(xRight * xRight + yRight * yRight + zRight * zRight);
     xRight *= len;
     yRight *= len;

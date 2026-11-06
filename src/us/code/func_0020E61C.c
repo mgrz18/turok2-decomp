@@ -3,9 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5534;
 extern CVector3 *CVector3__RandomPerturbZ(CVector3 *out, CVector3 *in, f32 amount);
-extern float D_800A553C;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern s32 Random_Next(void);
@@ -22,8 +20,8 @@ CVector3 *CVector3__RandomPerturbZ(CVector3 *out, CVector3 *in, f32 amount) {
     CVector3 *randomPtr;
     random.x = in->x;
     random.y = in->y;
-    random.z = ((f32)(Random_Next() % 20000) - D_800A5534) *
-               *(&D_800A5534 + 1);
+    random.z = ((f32)(Random_Next() % 20000) - 1.0e4f) *
+               0.0001f;
     randomPtr = &random;
     {
         f32 magnitude;
@@ -32,7 +30,7 @@ CVector3 *CVector3__RandomPerturbZ(CVector3 *out, CVector3 *in, f32 amount) {
                                   (randomPtr->y * randomPtr->y) +
                                   (randomPtr->z * randomPtr->z));
         if (magnitude != 0.0f) {
-            scale = D_800A553C / magnitude;
+            scale = 1.0f / magnitude;
             randomPtr->x *= scale;
             randomPtr->y *= scale;
             randomPtr->z *= scale;
@@ -45,7 +43,7 @@ CVector3 *CVector3__RandomPerturbZ(CVector3 *out, CVector3 *in, f32 amount) {
                                   (in->y * in->y) +
                                   (in->z * in->z));
         if (magnitude != 0.0f) {
-            scale = *(&D_800A553C + 1) / magnitude;
+            scale = 1.0f / magnitude;
             in->x *= scale;
             in->y *= scale;
             in->z *= scale;
