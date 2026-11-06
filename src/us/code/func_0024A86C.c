@@ -4,7 +4,6 @@
 
 extern f32 gFrameIncrement;      /* frame step */
 extern u8 gEngineApp_m_Settings_multiplayer;
-extern u8 gEngineApp_m_Settings_dmCrosshairs;
 extern s32 gEngineApp_m_Settings_match_teams;
 extern s32 gEngineApp_m_Settings_match_tag;
 
@@ -29,7 +28,7 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
             if (gEngineApp_m_Settings_match_teams != 0) {
                 show = gEngineApp_m_Settings.teamCrosshairs;
             } else {
-                show = gEngineApp_m_Settings_dmCrosshairs;
+                show = gEngineApp_m_Settings.dmCrosshairs;
             }
         } else {
             show = gEngineApp_m_Settings.tagCrosshairs;
@@ -64,7 +63,7 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
             if (gEngineApp_m_Settings_match_teams != 0) {
                 show = gEngineApp_m_Settings.teamCrosshairs;
             } else {
-                show = gEngineApp_m_Settings_dmCrosshairs;
+                show = gEngineApp_m_Settings.dmCrosshairs;
             }
         } else {
             show = gEngineApp_m_Settings.tagCrosshairs;
