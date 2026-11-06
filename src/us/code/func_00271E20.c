@@ -4,7 +4,6 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 func_002982F0(f32 x);
-extern f32 D_800A80F8;
 void CVector3__Subtract(CVector3 *out, void *src, s32 a);
 void CMtxF__InverseRotateVector(void *src, CVector3 *a, CVector3 *out);
 void CVector3__Normalize(CVector3 *v);
@@ -42,5 +41,5 @@ s32 Sound_CalcPan(s32 a0, u8 *obj) {
     } else {
         s = -__builtin_fabsf(s);
     }
-    return (s16)(s32)(s * D_800A80F8 + D_800A80F8);
+    return (s16)(s32)(s * 64.0f + 64.0f);
 }

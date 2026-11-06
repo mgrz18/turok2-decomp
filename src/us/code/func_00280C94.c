@@ -7,7 +7,6 @@
 #include "globals/camera.h"
 
 extern s32 CScene__FindRegionAt(void *, void *);
-extern float D_800A9BE4;
 extern s32 Cinema_PathPlaying(void);
 extern f32 CGameRegion__GetHeight(s32 arg0, f32 arg1, f32 arg2);
 void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6,
@@ -43,7 +42,7 @@ void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, 
     arg0->unk64 = gDefaultVisBits;
     if (object != 0 && Cinema_PathPlaying() == 0) {
         value = ((y + w) - CGameRegion__GetHeight(object, x, z)) * 0.09765625f;
-        if (value < 11.0f && D_800A9BE4 < value) {
+        if (value < 11.0f && 5.0f < value) {
             arg0->unk64 = ((MenuRules *)(object))->locked;
         }
     }
