@@ -27,7 +27,7 @@ void CParticleSystem__Update(void *);
 void SwooshSystem_Update(void *);
 void CScene__AdvanceInstances(CScene *);
 void CScene__AdvanceListedInstances(CScene *);
-void CLevelActorPool__Update(void *);
+void CLevelActorPool__Update(CLevelActorPool *);
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */
 void CScene__UpdateDelayedEvents(CScene *);
@@ -73,7 +73,7 @@ void CScene__Update(CScene *world) {
         SwooshSystem_Update(gEngineApp_m_SwooshSystem);
         CScene__AdvanceInstances(world);
         CScene__AdvanceListedInstances(world);
-        CLevelActorPool__Update(world->m_ActorPool);
+        CLevelActorPool__Update(&world->m_ActorPool);
         world->m_SkyAngle += gFrameIncrement * 0.087266475f;
         s = func_002982F0(world->m_SkyAngle * 0.5f);
         gQuaternionSin = s;

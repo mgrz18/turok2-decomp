@@ -63,7 +63,7 @@ extern void func_0042C79C(CScene *w);
 extern void func_0042C840(CScene *w);
 extern void func_0042C96C(void);
 extern s32 CScene__DecompressPaths(s32, s32);
-extern void SceneActorPool_Construct(void *);
+extern void SceneActorPool_Construct(CLevelActorPool *);
 extern void CInstancePool__Construct(void *);
 extern void func_0042D120(void *);
 extern void CParticleSystem__Construct(void *, s32);
@@ -140,7 +140,7 @@ loaded:
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
     CParticleSystem__Construct(w->m_ParticleSystem, *w->m_pParticleEffects);
-    SceneActorPool_Construct(w->m_ActorPool);
+    SceneActorPool_Construct(&w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
     func_0042D410(gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();

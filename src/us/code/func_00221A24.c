@@ -19,7 +19,7 @@ s32 GameObject_IsSolid(CStaticObject *inst);
 f32 GameObject_GetCollisionHeight(CLevelActor *actor);
 void CScene__GetLightsAt(CScene *world, CVector3 *pos, void *out);
 void CLevelActor__Update(CLevelActor *actor);
-void CLevelActorPool__CollectVisible(void *arg0, CScene *world);
+void CLevelActorPool__CollectVisible(CLevelActorPool *arg0, CScene *world);
 
 /* Collects the instances and actors of the loaded sections inside the visible bounds. */
 void CScene__CollectSectorObjects(CScene *world) {
@@ -90,5 +90,5 @@ void CScene__CollectSectorObjects(CScene *world) {
             }
         }
     }
-    CLevelActorPool__CollectVisible(world->m_ActorPool, world);
+    CLevelActorPool__CollectVisible(&world->m_ActorPool, world);
 }
