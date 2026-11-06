@@ -33,6 +33,7 @@ Python API (import romfs):
     fs.count("objects") etc.  (objects, texture_sets, levels, graphicsets, cinemas)
     fs.find_rom(addr)                             # deepest ROM-level node containing addr
     fs.load_unit(n) -> (key, size); fs.load_units() -> (key, size, node)  # cache keys for an archive
+    fs.readers(n) -> [(description, callback, callers)]                    # who requests this unit
 
 Paths: "<region>/<i>/<j>/...". Inside a compressed block the path simply goes on
 (the children are entries of the unpacked blob); such nodes have rom=None and
@@ -124,6 +125,69 @@ SCHEMA = [
     ("audioctl", "audio control block", "raw"),
     ("audiotbl", "audio wave table", "raw"),
 ]
+# Who reads each unit type: (CCache description string, decompress callback, caller).
+# From tools/assets/cache_calls.py; every callback listed here calls ProPackDecompress
+# (Model_Decompress, Anim_Decompress, Texture_DecompressCallback, CScene__Decompress*,
+# Cinema_PrepareResource, ProPack__Decompress), so every RNC unit is unpacked on load.
+PP = "ProPack__Decompress"
+READERS = {
+    "cartridge index": [("cartridge index", None, "CScene__Construct, CScene__FindWarpDests")],
+    "objects index": [("objects index", None, "CScene__Construct")],
+    "object index": [("object index", None, "CScene__ConstructMap, loadGeomHeader"),
+                     ("stat object index", None, "CStaticObject__LoadGeometry, CStaticObject__SpawnEvents"),
+                     ("simp object index", None, "CLevelActor__LoadGeometry, Render_QueueModelByKey"),
+                     ("anim object index", None, "CInstancePool__SpawnAnimInstance, CGameObjectInstance__SetupAnimation")],
+    "anim object info": [("anim object info", None, "CGameObjectInstance__*, CInstancePool__SpawnAnimInstance"),
+                         ("player anim object info", None, "CPlayerPool__ReloadAnimInfo")],
+    "geometry": [("geometry", "Model_DecompressCallback", "CScene__ConstructMap, loadGeomHeader"),
+                 ("geometry", "Model_DecompressCallbackTerminated", "Render_QueueModelByKey"),
+                 ("stat geometry", "Model_DecompressCallback", "CStaticObject__LoadGeometry"),
+                 ("simp geometry", "Model_DecompressCallbackTerminated", "CLevelActor__LoadGeometry"),
+                 ("anim geometry", "Model_DecompressCallbackExtra", "CGameObjectInstance__LoadGeometry")],
+    "animations index": [("animations index", None, "CGameObjectInstance__BuildBoneMatrices")],
+    "animation": [("animation", "Anim_Decompress", "CAnimationState__Load")],
+    "static events": [("static events", None, "CStaticObject__SpawnEvents")],
+    "intelligence": [("intelligence", "CScene__DecompressIntelligence", "CScene__Construct")],
+    "object types": [("object types", None, "CScene__Construct")],
+    "object types 2": [("object types", None, "CScene__Construct")],
+    "texture sets index": [("texture sets index", None, "CScene__Construct")],
+    "texture": [("texture", "Texture_DecompressCallback", "Texture_Request")],
+    "particle effects": [("particle effects", "CScene__DecompressParticles", "CScene__Construct")],
+    "levels index": [("levels index", None, "CScene__Construct")],
+    "level index": [("level index", None, "CScene__LoadLevel, CScene__GetLevelName")],
+    "level info": [("level info", None, "CScene__LoadLevel")],
+    "collision": [("collision", "CScene__DecompressCollision", "CScene__LoadLevel")],
+    "level paths": [("level paths", "CScene__DecompressPaths", "CScene__LoadLevel")],
+    "animated instances": [("animated instances", "CScene__DecompressAnimatedInstances", "CScene__LoadLevel")],
+    "grid bounds": [("grid bounds", PP, "CScene__LoadLevel")],
+    "grid sections index": [("grid sections index", None, "CScene__LoadLevel")],
+    "grid section": [("grid section", "CScene__DecompressGridSection", "CScene__LoadVisibleGridSections")],
+    "sky layers": [("sky layers", PP, "CScene__LoadLevel")],
+    "links": [("links", "CScene__DecompressLinks", "CScene__LoadLevel")],
+    "level name": [("level name", None, "CScene__GetLevelName")],
+    "load/save persistent bit sections": [(None, None, "ROM address kept in CScene unk_28/unk_30 (CLoader__LoadSync)")],
+    "game persistent bit sections": [(None, None, "ROM address kept in CScene unk_2C/unk_34 (CLoader__LoadSync)")],
+    "warp dests": [("warp dests", None, "CScene__FindWarpDests")],
+    "binaries index": [("binaries index", None, "CScene__Construct")],
+    "binary block": [("binary block", PP, "CScene__LoadBinaryBlock")],
+    "particle swooshes": [("particle swooshes", None, "CScene__Construct")],
+    "dynamic lights": [("dynamic lights", None, "CScene__Construct")],
+    "curves": [("curves", PP, "CScene__Construct")],
+    "rumbles": [("rumbles", PP, "CScene__Construct")],
+    "rumble types": [("rumble types", PP, "CScene__Construct")],
+    "graphicset index": [("graphicset index", None, "CScene__Construct")],
+    "graphicset": [("graphicset", PP, "CScene__LoadGraphicSet")],
+    "graphicset type": [("graphicset type", None, "CScene__Construct")],
+    "Cinemas index": [("Cinemas index", None, "CScene__Construct")],
+    "cinema table": [("Cinema", None, "Cinema_LoadTable, Cinema_RequestByName/ById")],
+    "Cinema": [("Cinema", "Cinema_PrepareResource", "Cinema_Load")],
+    "link group types": [("link group types", None, "CScene__Construct")],
+    "end marker": [],
+    "audio control block": [(None, None, "VM_Alloc(0x2F194, 0, 0x1E0000) in CAudioWorld__Initialize")],
+    "audio wave table": [(None, None, "CLoader__LoadAsync of ALWaveTable ranges (gAudioRomBase)")],
+    "sound data file": [(None, None, "VM_Alloc(0x3EA7A0, 0, 0xBE1814) in CAudioWorld__LoadSfxDataFile")],
+}
+
 for _k, _v in CART_NAMES.items():
     if not any(p == "cart/%d" % _k for p, _, _ in SCHEMA):
         SCHEMA.append(("cart/%d" % _k, _v, "auto"))
@@ -339,30 +403,46 @@ class RomFS:
         return n
 
     # -------- load units (what one CCache request / VM_Alloc reads)
+    def _is_index(self, n):
+        """Schema index sets: loaded as a header (LoadPersistantIndex / "... object index")."""
+        return n.rom is not None and n.kind in ("iset", "empty") and n._offs is not None \
+            and _schema(n.path)[1] == "iset"
+
     def load_unit(self, n):
-        """(key, size) the engine passes to CCache__Request for node n, or None when n
-        lives inside a compressed blob. An ISet is loaded as its header only
-        (LoadPersistantIndex: count*4 + 15 & ~7 bytes; the 0x18-byte "object index"
-        requests are the same rule for count 4); any other node as its whole slot."""
+        """(key, size) the engine passes to CCache__Request for node n. An index set is
+        loaded as its header only (count*4 + 15 & ~7 bytes, LoadPersistantIndex; the
+        0x18-byte "object index" requests are the same rule for count 4); any other unit
+        as its whole slot. None for nodes inside a loaded block (not read on their own)."""
         if n.rom is None:
             return None
-        if n.kind in ("iset", "empty") and n._offs is not None:
+        if self._is_index(n):
             return n.rom, (n.count * 4 + 15) & ~7
         return n.rom, n.size
 
     def load_units(self):
-        """Every ROM-level load unit: yields (key, size, node). The audio control block
-        and the sound data file are each one VM_Alloc unit (whole region); the wave table
-        is read piecemeal (CLoader__LoadAsync, key = 0x20F194 + ALWaveTable.base)."""
+        """Every ROM load unit: yields (key, size, node) for each index header and each
+        entry of an index (whole block: RNC stream or raw container). Sub-entries of a
+        raw container are not units (they arrive with it). The audio control block and
+        the sound data file are one VM_Alloc unit each; the wave table is read piecemeal
+        (CLoader__LoadAsync, key = 0x20F194 + ALWaveTable.base) and yielded whole."""
+        def rec(n):
+            yield n.rom, self.load_unit(n)[1], n
+            if self._is_index(n):
+                for c in self.children(n):
+                    for x in rec(c):
+                        yield x
         for r in self.regions:
-            if r.name in ("audioctl", "audiotbl", "sound"):
-                n = self._region_node(r)
+            n = self._region_node(r)
+            if r.name != "cart":
                 yield r.start, r.end - r.start, n
                 continue
-            for n in self.walk(r.name):
-                u = self.load_unit(n)
-                if u is not None:
-                    yield u[0], u[1], n
+            for x in rec(n):
+                yield x
+
+    def readers(self, n):
+        """[(description, decompress callback, callers)] that read node n's unit
+        (empty for nodes not read on their own: sub-entries of a loaded block)."""
+        return READERS.get(n.type, [])
 
     # -------- convenience
     _COLL = {"objects": "cart/0", "texture_sets": "cart/3", "levels": "cart/5",
@@ -448,7 +528,8 @@ def main(argv=None):
                        ("0x%X" % n.rom) if n.rom is not None else "in:0x%X+0x%X" % (n.container.rom, n.offset),
                        "0x%X" % n.size, "1" if n.compressed else "0", str(n.method or ""),
                        ("0x%X" % n.unpacked_size) if n.compressed else "",
-                       "" if n.count is None else str(n.count), "1" if n.heuristic else ""]
+                       "" if n.count is None else str(n.count), "1" if n.heuristic else "",
+                       "; ".join("%s/%s" % (d or "-", c or "-") for d, c, _ in fs.readers(n))]
                 f.write("\t".join(row) + "\n")
                 rows.append(row)
                 if a.extract and n.kind != "iset" and n.rom is not None:
@@ -459,7 +540,7 @@ def main(argv=None):
                         open(p[:-4] + ".unp.bin", "wb").write(fs.blob(n))
     with open(os.path.join(a.out, "romfs_tree.json"), "w") as f:
         json.dump([dict(zip(["path", "type", "kind", "rom", "size", "compressed", "method",
-                             "unpacked", "count", "heuristic"], r)) for r in rows], f, indent=0)
+                             "unpacked", "count", "heuristic", "readers"], r)) for r in rows], f, indent=0)
     print("%d nodes -> %s" % (len(rows), a.out))
     if a.coverage:
         by_type, hdr = coverage(fs)

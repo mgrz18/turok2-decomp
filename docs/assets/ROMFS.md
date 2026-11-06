@@ -271,6 +271,31 @@ ROM; `_2` functions are the copies in the VM modules). 47 distinct descriptions.
 | "texture" | Request | Texture_DecompressCallback | Texture_Request, Texture_RequestSync |
 | "warp dests" | LoadPersistantSubBlock | - | CScene__FindNearestWarpDest, CScene__FindWarpDests |
 
+## Load units and their readers (for the port archive)
+
+`fs.load_units()` yields every unit the engine reads on its own: each index set's
+header (`count*4 + 15 & ~7` bytes) plus each entry of an index as a whole slot (an RNC
+stream or a raw container; the sub-entries of a raw container are not units), and the
+three audio regions as one unit each. The US ROM has **26,124 units**: 14,426 RNC,
+6,438 raw ISet containers (e.g. anim object info, Cinema), 4,885 empty slots, 334 raw,
+41 USets. `fs.readers(node)` gives `(description, decompress callback, callers)` from
+the `READERS` table in romfs.py (built from the call-site table above); the TSV has a
+`readers` column.
+
+Check: **every RNC unit has a reader whose callback unpacks it**. Each callback calls
+`ProPackDecompress` (func_00200B00.c): Model_Decompress (func_00209AF4.c, behind
+Model_DecompressCallback/Terminated/Extra), Anim_Decompress (func_00216A9C.c),
+Texture_DecompressCallback (func_00206990.c), CScene__DecompressIntelligence
+(func_002261A8.c), CScene__DecompressParticles (func_0042CAB4.c),
+CScene__DecompressCollision (func_0042B6B0.c), CScene__DecompressPaths (func_0042CD04.c),
+CScene__DecompressAnimatedInstances (func_0042BA40.c), CScene__DecompressLinks
+(func_0042B3E4.c), CScene__DecompressGridSection (func_00220D00.c),
+Cinema_PrepareResource (func_0040F240.c), ProPack__Decompress. Raw units are read
+without a callback, or with one whose ProPackDecompress takes the non-RNC path, which
+copies the data or leaves it alone. The only unit with no reader is cartridge entry 20
+(the 8-byte end marker). The persistent bit sections (entries 6/7) are kept as ROM
+address+size and read by CLoader__LoadSync, not through CCache.
+
 ## romfs.py API (for the other areas)
 
 ```python
@@ -289,6 +314,7 @@ fs.count("objects" | "texture_sets" | "levels" | "graphicsets" | "cinemas")
 fs.find_rom(addr)               # deepest ROM node containing a ROM address
 fs.load_unit(n) -> (key, size)  # the exact CCache key/size (ISet: header only)
 fs.load_units()                 # all (key, size, node) ROM load units (for a port archive)
+fs.readers(n)                   # [(description, callback, callers)] that request the unit
 fs.audio_ptr(vaddr)             # 0x48xxxx pointer of the audio control block -> ROM
 propack.decompress(buf, off) / propack.maybe_decompress(buf, off, size) / propack.is_rnc
 ```
