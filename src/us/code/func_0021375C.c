@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/game.h"
 
 /* A vertex (0x10 bytes). */
 typedef struct {
@@ -18,7 +19,6 @@ typedef struct {
     /* 0x8 */ LitVtx v[1];
 } VtxBlk;
 
-extern u32 gEngineApp_m_Settings;          /* game flags */
 extern u32 gEngineApp_m_Settings_unkC;          /* brightness, 0-255 */
 
 VtxBlk *CISet__GetBlock(s32 *file, s32 index); /* returns chunk `index` of a chunked file */
@@ -37,7 +37,7 @@ void Lighting_WriteVertexColors(s32 *file, CVector3 *src) {
     s32 k = 0;
 
     f = MN(1.0f, (f32) gEngineApp_m_Settings_unkC * 0.003921568859f);
-    if (gEngineApp_m_Settings & 0x4000) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
         for (j = 0; j < *file; j++) {
             s32 n;
             LitVtx *vp;

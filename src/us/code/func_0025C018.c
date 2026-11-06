@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "globals/game.h"
 
 /* AI matrix callback: builds the actors world matrix from the AIs look
  * angles, its yaw about Y, its rotation, scale and position. */
 
 extern f32 gQuaternionSin;
-extern s32 gEngineApp_m_Settings;
 
 extern void Projectile_PlaceAtMuzzle(CGameObjectInstance *actor, CAI *ai);
 extern f32 Math_DecayToZero(f32 angle, f32 step);
@@ -47,7 +47,7 @@ void EnemyAI_CalcOrientationMatrix(CGameObjectInstance *actor, CAI *ai) {
     CQuaternion__Multiply(&rot, &spin, &actor->m_qGround);
     CQuaternion__ToMatrix(&rot, &rotMtx);
     CMtxF__MultiplyAffine((CMtxF *) &actor->m_mfOrient, &look, &rotMtx);
-    if (gEngineApp_m_Settings & 0x40) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x40) {
         CMtxF__ScaleAxes((CMtxF *) &actor->m_mfOrient, actor->m_vScale.x * 0.5f, actor->m_vScale.y * 0.5f, actor->m_vScale.z * 0.5f);
     } else {
         CMtxF__ScaleAxes((CMtxF *) &actor->m_mfOrient, actor->m_vScale.x, actor->m_vScale.y, actor->m_vScale.z);

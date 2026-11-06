@@ -19,6 +19,7 @@
 #include "structs/collision.h"
 #include "structs/frame.h"
 #include "structs/particle_event.h"
+#include "globals/game.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -585,7 +586,6 @@ extern s32 gEvenOdd;              /* matrix buffer index */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* the current view */
 extern u8 gEngineApp_m_Settings_unk17;
-extern s32 gEngineApp_m_Settings;
 extern CCollisionInfo gCollisionInfoLineOfSight;
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 extern u8 gScene_m_Heap[];             /* matrix pool */
@@ -805,9 +805,9 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     } else if ((desc->flags & 0x400) && desc->fade->unkE != 4) {
         Render_SetRenderMode(0xF);
     } else if (desc->flags & 0x4000) {
-        Render_SetRenderMode(!(gEngineApp_m_Settings & 0x200) ? 0xD : 0x11);
+        Render_SetRenderMode(!(gEngineApp_m_Settings.cheatFlags & 0x200) ? 0xD : 0x11);
     } else {
-        Render_SetRenderMode((gEngineApp_m_Settings & 0x200) ? 0x12 : 0x13);
+        Render_SetRenderMode((gEngineApp_m_Settings.cheatFlags & 0x200) ? 0x12 : 0x13);
     }
 
     alpha = 0xFF;

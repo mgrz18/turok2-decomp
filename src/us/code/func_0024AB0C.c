@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/game.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0021E5D4.c, func_0021E5D4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -16,7 +17,6 @@ typedef struct B05P14 {
     u32 flagsA68;           /* 0xA68 */
 } B05P14;
 typedef struct B05Fx { u8 pad0[8]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s16 unk14; s16 unk16; } B05Fx;
-extern s32 gEngineApp_m_Settings;
 extern u8 D_8010FF34[];
 extern u8 sFlashlightLight1[];
 extern u8 sFlashlightLight2[];
@@ -54,7 +54,7 @@ static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 
 }
 void CPlayer__UpdateFlashlight(B05P14 *p) {
     s32 vis;
-    if (gEngineApp_m_Settings & 0x4000) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
         p->timer = 0.0f;
     } else {
         if (p->fx3 != ((void *)0)) {
@@ -89,7 +89,7 @@ void CPlayer__UpdateFlashlight(B05P14 *p) {
             p->fx2 = ((void *)0);
         }
     }
-    if (gEngineApp_m_Settings & 0x4000) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
         fxupd(p, &p->fx3, sDarkCityLight, 0.0f, 0.5f, 1.0f);
         if ((p->flagsA68 & 0x20) && p->fx3 != ((void *)0)) {
             if (((B05Fx *)p->fx3)->unk8 == sDarkCityLight) {
