@@ -7,13 +7,12 @@
 #include "globals/sysrc.h"
 
 extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
-extern CMemEntry *gCache_memAgeList_m_pTail;
 extern void CCache__DetachCacheEntry(void *, CMemEntry *);
 extern s32 CHeap__Free(CHeap *, s32);
 extern void CList__Remove(void *, CMemEntry *);
 static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
     CMemEntry *node;
-    for (node = gCache_memAgeList_m_pTail; node != 0; node = node->last) {
+    for (node = gCache.memAgeList.m_pTail; node != 0; node = node->last) {
         if (!(node->flags & 0x702)) {
             if ((u32)(gCache_ageCount - node->age) >= 5) {
                 return node;

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/cache.h"
 
-extern s32 gCache_memAgeList_m_nCount;
 
 s32 func_002060B8(void) {
-    return gCache_memAgeList_m_nCount;
+    return gCache.memAgeList.m_nCount;
 }
