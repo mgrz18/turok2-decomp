@@ -1,0 +1,158 @@
+// Data names for D_800B5118-D_800C15FF (part g4). Not applied yet.
+// Skipped: menu/HUD/pak string literals (one function + its module-2 copy each), float pools
+// (bosses, menus), aliases into a named object (listed at the end as comments).
+
+// Camera module (CCamera__ / CCameraPool__)
+gCameraModeTable = 0x800B6CB0; // CameraModeEntry[] rows {enter, update}: CCamera__SetMode calls [mode].enter, CCamera__Advance [mode].update via D_800B6CB4 (= +4)
+sTintFlags = 0x800B6CB8; // u32: the camera player's AI flags this frame; CCamera__DrawTints only (shifts into the next two)
+sTintFlagsPrev = 0x800B6CBC; // u32: the frame before; CCamera__DrawTints only
+sTintFlagsPrev2 = 0x800B6CC0; // u32: the frame before that; CCamera__DrawTints only
+gSplitScreenMarginBottom = 0x800B6CC4; // f32 3.0: split-screen view margin, bottom; CCameraPool__Advance
+gSplitScreenMarginTop = 0x800B6CC8; // f32: top margin; CCameraPool__Advance
+gSplitScreenMarginLeft = 0x800B6CCC; // f32: left margin (asm reads it as D_800B6CC8 + 4); CCameraPool__Advance
+gSplitScreenMarginRight = 0x800B6CD0; // f32: right margin; CCameraPool__Advance
+
+// Cinema
+sCinemaLastFrame = 0x800B6CE0; // s32 -1: gFrameCount when Cinema_Update last ran (runs once per frame); Cinema_Update only
+
+// Controllers (Controller_ / Cont_)
+gControllersInitialised = 0x800B6CF0; // u8: set by Cont_InitAll, tested by Controller_Service/LatchAll/rumble functions
+gValidControllerBits = 0x800B6CF1; // u8: osContInit bit pattern (Cont_InitAll), tested by CEngineApp__Main; Turok 3's gValidControllerBits ("ValidControllers")
+gNumControllers = 0x800B6CF2; // u8: controllers found by Cont_InitAll
+sControllerRescanTimer = 0x800B6CF4; // s32: Controller_Service counts it down from 60, then requests a rescan
+gMenuSoundsEnabled = 0x800B6CF8; // s32 1: Controller_EnableMenuSounds/DisableMenuSounds; Controller_Menu* play the menu sounds only when set
+
+// Visibility
+gDefaultVisBits = 0x800B6D00; // s32 -1: region visibility bits for things outside any region; CCamera__UpdateVisBits, CScene__DecompressCollision, CGameObjectInstance__Construct callers, CCameraViewParams__Construct
+
+// Engine timing (Turok 3 tengine.c names, same code: CEngineApp__Retrace/AdvanceFrameData/Update)
+gFirstFrame = 0x800B6D14; // s32 1: cleared by CEngineApp__Retrace; Turok 3 gFirstFrame ("firstFrame")
+gFrameCount = 0x800B6D18; // u32: ++ in CEngineApp__AdvanceFrameData, frame buffer = [gFrameCount % count]; Turok 3 gFrameCount ("frame_number"); D_800B6D1B is its low byte
+gEvenOdd = 0x800B6D1C; // s32: ^= 1 in CEngineApp__AdvanceFrameData, picks display list/frame buffer; Turok 3 gEvenOdd ("even_odd")
+gFrameCountGameplay = 0x800B6D20; // u32: ++ in CEngineApp__AdvanceFrameData; Random_Next, Demo_Update; Turok 3 gFrameCountGameplay ("game_frame_number")
+gRetraceCount = 0x800B6D24; // s32: ++ at the end of CEngineApp__Retrace; Turok 3 gRetraceCount ("retrace_count")
+gFrameIncrement = 0x800B6D28; // f32: the frame's time step, set by CEngineApp__Update (retraces * 15 / refresh rate); Turok 3 gFrameIncrement ("frame_increment"); 397 uses
+gEnemyTimeScale = 0x800B6D2C; // f32 1.0: EnemyAI_Update and Swoosh_Update (owner flag 1) multiply gFrameIncrement by it; reset to 1 by EngineMode13_Game_Init
+gParticleTimeScale = 0x800B6D30; // f32 1.0: CParticle__Update, CParticleSystem__Update, Swoosh_Update scale gFrameIncrement by it; reset by EngineMode13_Game_Init
+gEmitterTimeScale = 0x800B6D34; // f32 1.0: CEmitter__Advance/CEmitterPool__Advance scale the spin step by it; reset by EngineMode13_Game_Init
+gSchedRspTime = 0x800B6D3C; // f32 seconds: gfx task start to RSP done, written by __scHandleRSP (profiling)
+gSchedRspTotalTime = 0x800B6D40; // f32 seconds: RSP gfx time summed over yields, written by __scHandleRSP (profiling)
+gSchedRdpTime = 0x800B6D44; // f32 seconds: RDP time of the gfx task, written by __scHandleRDP (profiling)
+gRenderTime = 0x800B6D48; // f32 seconds: time CEngineApp__Draw took to build the display list
+
+// Engine state / engine modes
+gPersistentDataLoaded = 0x800B6D54; // s32: set to 1 after CScene__LoadLevel/CScene__Construct load the persistent data (CScene__InitPersistentData); spawn/region/HUD functions do nothing until then
+gAttractRunCount = 0x800B6D60; // s32: ++ by EngineMode09_Cinema_Init and Demo_Start (attract runs); never read in C
+gPakCheckStarted = 0x800B6D64; // s32: set by EngineMode00_PakCheck_Init; its Retrace/Draw do nothing until then
+gShowExpansionPakScreen = 0x800B6D68; // s32 1: EngineMode01_Legal_Retrace goes to mode 3 (expansion pak screen) if > 4MB and set; cleared by EngineMode03_ExpansionPak_Retrace
+gLegalScreenNoSkip = 0x800B6D6C; // s32 1: EngineMode01_Legal_Retrace passes -1 (no button skip) to CEngineApp__TimedModeSwitch while set; cleared after a time
+gFinalEnding = 0x800B6D70; // s32: 0 in EngineMode15_Ending_Init, 1 in EngineMode16_Ending_Init; Credits_Update and the ending retraces branch on it
+gEndingPrimagenDefeated = 0x800B6D74; // s32: copy of the first player's m_bPrimagenBossComplete, taken by EngineMode15/16_Ending_Init; Credits_Update
+
+// Scheduler (__sc*)
+sSchedGfxWatchdog = 0x800B6E50; // s32: retraces since the last gfx task finished, ++ in __scHandleRetrace (crashes at 1200), 0 in __scHandleRSP
+gDecompressorBoostRetraces = 0x800B6E54; // s32: set to 2 by CDecompressor__DecompressSync/Sched_HandleCmdMsg with the decompressor raised to gThreadPriorityDecompressorHigh; __scHandleRetrace restores gThreadPriorityDecompressorLow at 0
+sSchedResetPressed = 0x800B6E58; // s32: set on the pre-NMI message in __scMain
+sSchedResetBlankRetraces = 0x800B6E5C; // s32 20: retraces after reset before __scMain blanks the screen (osViBlack)
+
+// Thread priorities (Turok 3 data_symbols.h names, values 0, 10, ..., 18)
+gThreadPriorityIdle = 0x800B6E70; // 0: CEngineApp__Idle lowers itself to it; Turok 3 "PRIORITY_IDLE"
+gThreadPriorityIdleInit = 0x800B6E74; // 10: CEngineApp__Boot creates the idle thread with it; Turok 3 "PRIORITY_IDLEINIT"
+gThreadPriorityDecompressorLow = 0x800B6E7C; // 11: CDecompressor__Construct/Flush, __scHandleRetrace; Turok 3 "PRIORITY_DECOMPRESSOR_LOW"
+gThreadPriorityMain = 0x800B6E84; // 13: CEngineApp__Idle creates mainproc with it; Turok 3 "PRIORITY_MAIN"
+gThreadPriorityDecompressorHigh = 0x800B6E88; // 14: decompressor raised for a sync decompress (CDecompressor__DecompressSync, Sched_HandleCmdMsg); counterpart of _Low
+gThreadPriorityCache = 0x800B6E8C; // 15: CCache__Construct's thread; Turok 3 "PRIORITY_CACHE"
+gThreadPriorityAudio = 0x800B6E90; // 16: CAudioWorld__Initialize passes it to amCreateAudioMgr
+gThreadPriorityLoader = 0x800B6E94; // 17: CLoader__Construct's thread; Turok 3 "PRIORITY_LOADER"
+gThreadPriorityScheduler = 0x800B6E98; // 18: CEngineApp__Construct's osCreateScheduler; Turok 3 "PRIORITY_SCHEDULER"
+
+// Crash screen (Crash_)
+gCrashFont = 0x800B6EA0; // u8[0x60][16]: 8x16 font for ASCII 0x20-0x7F; Crash_PutChar
+sCrashCursorX = 0x800B7490; // u32 2: debug console column; Crash_PutChar
+sCrashCursorY = 0x800B7494; // u32: debug console row; Crash_PutChar
+sCrashBgColor = 0x800B7498; // u16: background colour; Crash_SetBackgroundColor/ClearScreen/PutChar/ShowScreen
+gCrashCauseDesc = 0x800B749C; // {mask, value, string} rows for the cause register (as Nintendo's fault example's causeDesc); Crash_ShowScreen -> Crash_PrintFlags
+sCrashCanExit = 0x800B75EC; // volatile s32: set when the crash screen may be left; Crash_ShowScreen
+gBootSignature = 0x800B75F0; // char[0x10] "sexysteve": warm-boot marker, CEngineApp__Main/Boot_CanOverwrite; Turok 3 gBootSignature ("signature")
+gHostIoMemoryBounds = 0x800B7600; // MemoryBoundaryInit[]: KSEG ranges, HostIo_Init patches the RAM ends
+
+// Credits / messages
+gCreditsLines = 0x800B66DC; // char *[] NULL-terminated: Credits_Draw, Credits_Update
+gLevelMessages = 0x800B69D8; // {char *text, s32 speech} pairs indexed by message number: LevelEvent_Fire, Action_CheckRequiredItem, ImpactEvent_PlaySoundAndEffect (D_800B69DC is .speech of row 0)
+
+// libaudio (ultralib names)
+alGlobals = 0x800B7760; // ALGlobals *: alInit, alSeqpNew, alSndpNew, __allocParam... (ultralib reverb.c "extern ALGlobals *alGlobals")
+SMALLROOM_PARAMS = 0x800B7770; // s32[26], alFxNew (ultralib drvrnew.c static)
+BIGROOM_PARAMS = 0x800B77D8; // s32[34], alFxNew (drvrnew.c)
+ECHO_PARAMS = 0x800B7860; // s32[10], alFxNew (drvrnew.c)
+CHORUS_PARAMS = 0x800B7888; // s32[10], alFxNew (drvrnew.c)
+FLANGE_PARAMS = 0x800B78B0; // s32[10], alFxNew (drvrnew.c)
+NULL_PARAMS = 0x800B78D8; // s32[10] zeros, alFxNew (drvrnew.c)
+eqpower = 0x800B7900; // s16[128]: alEnvmixerPull, _pullSubFrame (ultralib env.c static)
+
+// libultra (ultralib / Rage Wars rw_junk/symbol_addrs.txt names; same layout as Rage Wars)
+hdwrBugFlag = 0x800B7A20; // u8: osAiSetNextBuffer's static (aisetnextbuf.c)
+__osContinitialized = 0x800B7A30; // osContInit (controller.c)
+__osMotorinitialized = 0x800B7A40; // u32[4]: osMotorInit/Start/Stop (motor.c spelling; Rage Wars spells it __osMotorInitialized)
+__osSiAccessQueueEnabled = 0x800B7A50; // __osSiGetAccess, __osSiCreateAccessQueue (siacs.c)
+__osViContexts = 0x800B7A60; // __OSViContext[2]: vi.c's static `vi`, Rage Wars' name; __osViInit
+__osViCurr = 0x800B7AC0; // __OSViContext * (vi.c)
+__osViNext = 0x800B7AC4; // __OSViContext * (vi.c); 42 uses
+__osViDevMgr = 0x800B7AD0; // OSDevMgr: osCreateViManager (vimgr.c)
+osViModeNtscLan1 = 0x800B7AF0; // OSViMode type 2: __osViInit
+osViModePalLan1 = 0x800B7B40; // OSViMode type 16: __osViInit
+osViModeMpalLan1 = 0x800B7B90; // OSViMode type 30: __osViInit
+osViModeTable = 0x800B7BE0; // OSViMode[42], types 0..41: Video_ResizeViMode, EngineMode17_Switch_Init (D_800B7E60 = [8], NTSC HPN1)
+osViClock = 0x800B8900; // 0x02E6D354: osInitialize, osAiSetFrequency
+__OSGlobalIntMask = 0x800B8908; // 0x003FFF01: __osSetGlobalIntMask, __osLeoInterrupt
+__osThreadTail = 0x800B8910; // {NULL, -1}: osCreateMesgQueue
+__osRunQueue = 0x800B8918; // OSThread *: osStartThread, osSetThreadPri, osYieldThread
+__osActiveQueue = 0x800B891C; // OSThread *: osCreateThread, osDestroyThread
+__osRunningThread = 0x800B8920; // OSThread *
+__osFaultedThread = 0x800B8924; // __osGetCurrFaultedThread
+__osTimerList = 0x800B8930; // OSTimer *: __osTimerInterrupt, __osInsertTimer, osSetTimer
+__osPiDevMgr = 0x800B8960; // OSDevMgr: osCreatePiManager, osPiGetCmdQueue
+__osPiTable = 0x800B897C; // OSPiHandle *: osCartRomInit, osLeoDiskInit
+__osCurrentHandle = 0x800B8980; // OSPiHandle *[2]: osEPiRawStartDma/ReadIo/WriteIo
+__osPiAccessQueueEnabled = 0x800B8990; // __osPiGetAccess, __osPiCreateAccessQueue
+
+// libc (ultralib statics)
+spaces = 0x800B89A0; // 32 blanks: _Printf (xprintf.c)
+zeroes = 0x800B89C4; // 32 '0's: _Printf (xprintf.c)
+ldigs = 0x800B89F0; // "0123456789abcdef": _Litob (xlitob.c)
+udigs = 0x800B8A04; // "0123456789ABCDEF": _Litob (xlitob.c)
+
+// Acclaim's audio decoder (adec*, mdct*)
+sAdecFrame = 0x800B8A20; // s32: the frame adecNextFrame returned; alAdecPull only
+gMdctFftTables = 0x800B8A30; // FftTables: mdctFftInit
+gAdecBitMasks = 0x800B8A40; // u16[17] (1 << n) - 1: adecReadBits
+gAdecSignBits = 0x800B8A64; // u16[17] 1 << (n - 1): adecReadBits
+gAdecBandEnds = 0x800B8A88; // u16[16] band ends (4 ... 0x100): adecDequantize (D_800B8AA6 = [15])
+gAdecStepSizes = 0x800B8AA8; // f32[64] quantiser steps: adecDequantize
+sAdecBitsLeft = 0x800B8BA8; // u16: bits still unread in the current word; adecReadBits, reset by adecStreamOpen
+sAdecHuffBits = 0x800B8BAA; // u16: adecHuffDecode's bit buffer; reset by adecStreamOpen
+sAdecHuffBitsAvail = 0x800B8BAC; // u16: bits left in it; adecHuffDecode, adecStreamOpen
+sAdecHeaderDone = 0x800B8BAE; // s16: first frame (raw header) done; adecDecodeFrame, adecStreamOpen
+sAdecImdctReady = 0x800B8BB0; // u16: IMDCT tables built; adecImdctFrame, adecStreamOpen
+sAdecFrameCounter = 0x800B8BB2; // u16: adecNextFrame's counter (wraps at 6)
+gAdecHuffSegments = 0x800B8C54; // AdecHuffSeg[]: segment table, adecDecodeFrame
+
+// SN host I/O (HostIo_ / PC*)
+sHostIoPiReady = 0x800BC300; // s32: PI manager started, DMA allowed; HostIo_ThreadMain/StartThread/Read|WriteBlockDma, PCinit
+sHostIoState = 0x800BC304; // s32: 2 = the I/O thread is running; PCinit/PCopen/PCread/PCwrite...
+sHostIoTlbPageMasks = 0x800BC308; // u32[]: TLB page masks 4K..16M, 0x80000000 ends it; HostIo_ScanTlb
+
+// RSP microcode (libultra/SDK names; ucode ID strings in the data segments)
+rspbootTextStart = 0x800BC330; // CEngineApp__SubmitGfxTask, amCreateAudioMgr
+gspF3DEX_NoN_fifoTextStart = 0x800BC400; // also rspbootTextEnd; CEngineApp__SubmitGfxTask, amCreateAudioMgr (task.ucode_boot_size)
+gspL3DEX_fifoTextStart = 0x800BD790; // CEngineApp__SubmitGfxTask (line list task)
+aspMainTextStart = 0x800BE920; // amCreateAudioMgr
+gspF3DEX_NoN_fifoDataStart = 0x800BF740; // "RSP Gfx ucode F3DEX.NoN fifo 2.05"; CEngineApp__SubmitGfxTask
+gspL3DEX_fifoDataStart = 0x800BFB60; // "RSP Gfx ucode L3DEX fifo 2.05"; CEngineApp__SubmitGfxTask
+aspMainDataStart = 0x800BFF50; // amCreateAudioMgr
+
+// Aliases, not named (fields/rows of a named object; for the later pass):
+//   D_800B6CB4 = gCameraModeTable[0].update   D_800B6D1B = low byte of gFrameCount
+//   D_800B6D7C = gEngineModeTable[0].Retrace  D_800B6D80 = gEngineModeTable[0].Draw
+//   D_800B69DC = gLevelMessages[0].speech     D_800B8AA6 = gAdecBandEnds[15]
+//   D_800B7E60 = osViModeTable[8]
