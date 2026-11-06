@@ -121,3 +121,4 @@ func_0046706C 0x800A6AC4  # copy of func_0042E06C, which now owns the pool
 func_004671BC 0x800A6AC8  # copy of func_0042E1BC, which now owns the pool
 func_00467920 0x800A70D8  # copy of func_0042E920, which now owns the pool
 func_00466D94 0x800A6AA0  # copy of func_0042DD94, which now owns the pool
+func_00463B2C 0x800A5EB4  # copy of func_0042AB2C, which now owns the pool

@@ -119,3 +119,5 @@ gEngineApp_m_Settings_cheatFlags = 0x8011AAD8;
 D_800A5D70 = 0x800A5D70; /* "object index", CScene__Construct (func_00429FA0); read by func_0042CE10 (and its copy) */
 D_800A5D80 = 0x800A5D80; /* "geometry", CScene__Construct; read by func_0042CE10 (and its copy) */
 D_800A5D8C = 0x800A5D8C; /* "cartridge index", CScene__Construct; read by func_0042C194, func_0042C560 (and copies) */
+D_800A5EC0 = 0x800A5EC0; /* "level index", CScene__LoadLevel (func_0042AC0C); read by CScene__GetLevelName (func_0022629C) */
+D_800A5F6C = 0x800A5F6C; /* "grid section", CScene__StreamAllSections (func_0042BF48); read by CScene__LoadVisibleGridSections (func_002216DC) */

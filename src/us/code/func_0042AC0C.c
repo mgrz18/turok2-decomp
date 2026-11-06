@@ -12,16 +12,6 @@
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
 
-extern char D_800A5EB4[]; /* "Matrices" */
-extern char D_800A5EC0[]; /* "level index" */
-extern char D_800A5ECC[]; /* "collision" */
-extern char D_800A5ED8[]; /* "grid bounds" */
-extern char D_800A5EE4[]; /* "grid sections index" */
-extern char D_800A5EF8[]; /* "links" */
-extern char D_800A5F00[]; /* "level paths" */
-extern char D_800A5F0C[]; /* "level info" */
-extern char D_800A5F18[]; /* "sky layers" */
-extern char D_800A5F24[];
 extern u8 gDecompressor[];
 extern u8 gLoopSoundEntries[];
 extern u8 gLoopSounds[];
@@ -195,27 +185,27 @@ loaded:
     if (gEngineApp_m_Settings.multiplayer != 0) {
         size += 0x200;
     }
-    block = CCache__Allocate(0, size << 6, 3, D_800A5EB4);
+    block = CCache__Allocate(0, size << 6, 3, "Matrices");
     w->m_hHeap = block;
     MatrixHeap_Construct(w->m_Heap, *block, size);
     key = CISet__GetROMAddress(w->m_pLevels, w->m_LevelsKey, level);
-    w->m_hLevelIndex = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelFile, key, D_800A5EC0);
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 1, key, w, CScene__DecompressCollision, D_800A5ECC);
+    w->m_hLevelIndex = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelFile, key, "level index");
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 1, key, w, CScene__DecompressCollision, "collision");
     w->m_hRegionData = block;
     w->m_pRegionData = *block;
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 4, key, w, ProPack__Decompress, D_800A5ED8);
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 4, key, w, ProPack__Decompress, "grid bounds");
     w->m_hCollision = block;
     w->m_pCollision = *block;
     w->m_LevelInfoKey = CISet__GetROMAddress(w->m_pLevelFile, key, 5);
-    w->m_hLevelInfo = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelInfo, w->m_LevelInfoKey, D_800A5EE4);
-    w->m_hLinks = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 7, key, w, CScene__DecompressLinks, D_800A5EF8);
-    w->m_hPaths = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 2, key, w, CScene__DecompressPaths, D_800A5F00);
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 0, key, w, NULL, D_800A5F0C);
+    w->m_hLevelInfo = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelInfo, w->m_LevelInfoKey, "grid sections index");
+    w->m_hLinks = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 7, key, w, CScene__DecompressLinks, "links");
+    w->m_hPaths = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 2, key, w, CScene__DecompressPaths, "level paths");
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 0, key, w, NULL, "level info");
     w->m_hLevelHeader = block;
     w->m_pLevelHeader = *block;
     CScene__LoadLightSettings(w);
     gFogEnabled = (w->m_pLevelHeader->m_Flags >> 2) & 1;
-    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, D_800A5F18);
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, "sky layers");
     w->m_hSections = block;
     data = *block;
     w->m_pSections = data + 8;
@@ -223,7 +213,7 @@ loaded:
     w->m_Mode = 1;
     w->m_pActors = NULL;
     w->m_nActors = 0;
-    w->m_hActors = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 3, key, w, CScene__DecompressAnimatedInstances, D_800A5F24);
+    w->m_hActors = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 3, key, w, CScene__DecompressAnimatedInstances, "animated instances");
     w->m_Mode = 2;
     func_0042C79C(w);
     count = w->m_nActors;

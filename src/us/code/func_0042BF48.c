@@ -23,7 +23,6 @@ typedef struct ObjB {
     /* 0x000 */ u8 pad0[0x198];
 } ObjB; /* 0x198 */
 
-extern char D_800A5F6C[];
 extern void CScene__DecompressGridSection(void);
 
 extern void *CISet__GetBlock(void *table, s32 index);
@@ -79,7 +78,7 @@ void CScene__StreamAllSections(CScene *level) {
                 continue;
             }
             key = CISet__GetROMAddressAndSize(level->m_pLevelInfo, level->m_LevelInfoKey, col + row * width, &size);
-            block = CCache__Request(0, key, size, 4, level, CScene__DecompressGridSection, D_800A5F6C, 1);
+            block = CCache__Request(0, key, size, 4, level, CScene__DecompressGridSection, "grid section", 1);
             if (block == 0) {
                 continue;
             }
