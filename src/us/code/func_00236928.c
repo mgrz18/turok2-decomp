@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 
 extern float D_800A652C;
-extern float D_800A6524;
 extern void func_00236928(struct Image * image, struct Image * texture, Sprite * sprite);
 void func_00236928(Image *image, Image *texture, Sprite *sprite) {
     f32 scale;
@@ -19,7 +18,7 @@ void func_00236928(Image *image, Image *texture, Sprite *sprite) {
         sprite->field8 = image->fieldC;
         sprite->fieldC = image->fieldC;
     }
-    scale = *(&D_800A6524 + 1);
+    scale = 3.125f;
     sprite->width = image->header->width * scale;
     sprite->height = image->header->height * scale;
     if (texture != 0) {

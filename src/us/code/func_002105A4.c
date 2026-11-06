@@ -8,7 +8,6 @@ extern float func_002982F0(float x);
 extern void CMtxF__SetRotateY(void *matrix, f32 angle);
 void CMtxF__SetRotateY(void *arg0, f32 arg1)
 {
-    extern f32 D_800A561C[];
   RW_Mtx *m = (char *) arg0;
   f32 sin_v;
   f32 cos_v;
@@ -16,7 +15,7 @@ void CMtxF__SetRotateY(void *arg0, f32 arg1)
   f32 identity;
   zero = 0;
   sin_v = func_002982F0(arg1);
-  identity = D_800A561C[1];
+  identity = 1.0f;
   m->forward.x = sin_v;
   m->right.y = zero;
   m->right.z = -sin_v;

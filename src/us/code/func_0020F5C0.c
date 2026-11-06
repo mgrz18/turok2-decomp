@@ -5,7 +5,6 @@
 
 extern f32 Math_AcosLookup(f32 arg0);
 extern f32 CVector3__GetPitch(f32 *arg0);
-extern float D_800A55D4;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32 arg0);
 f32 CVector3__GetPitch(f32 *arg0) {
@@ -27,7 +26,7 @@ f32 CVector3__GetPitch(f32 *arg0) {
         return zero;
     }
     ratio = y / func_00298470(magnitude_squared);
-    if (ratio < *(&D_800A55D4 + 1)) {
+    if (ratio < -1.0f) {
         return zero;
     }
     if (1.0f < ratio) {

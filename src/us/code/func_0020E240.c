@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5514;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern s32 Random_Next(void);
@@ -19,7 +18,7 @@ CVector3 CVector3__RandomPerturbX(CVector3 *in, f32 amount) {
     f32 inputMagnitude;
     f32 inputScale;
     random.x = (f32)((Random_Next() % 20000) - 0x2710) *
-               *(&D_800A5514 + 1);
+               0.0001f;
     random.y = in->y;
     random.z = in->z;
     randomPtr = &random;

@@ -6,13 +6,12 @@
 extern void Angle_Wrap(f32 *value);
 void Angle_Wrap(f32 *value)
 {
-    extern f32 D_800A563C;
     {
         f32 val;
         f32 limit;
         f32 step;
         val = *value;
-        limit = *(&D_800A563C + 1);
+        limit = -3.1415927f;
         if (val < limit) {
             step = 6.2831855f;
             do {

@@ -56,7 +56,6 @@ struct StridedTable {
     s32 count;
     char data[1];
 };
-extern float D_800A65D0;
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 typedef struct LevelActor LevelActor;
@@ -267,5 +266,5 @@ void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, 
         resource = &gRumblePool;
     }
     CScene__StartRumbles(&gScene, resource, arg6.value, arg3,
-                  arg6.angle * *(&D_800A65D0 + 1), arg6.scale * D_800A65D8);
+                  arg6.angle * 10.24f, arg6.scale * D_800A65D8);
 }
