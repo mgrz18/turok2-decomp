@@ -1,7 +1,10 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/hud.h"
 
-extern u8 *sCinemaTextFadeOut; /* local type: the symbol is the string itself (char[0x24], globals/hud.h), but the ROM loads its first word (lw) and compares the text pointer to that */
+/* sCinemaTextFadeOut is the marker string itself, but the ROM compares the text
+ * pointer with its first word (lw), as if it were a char *: kept as is. */
+
 extern u8 *D_800B2CD0;
 extern s32 gScreenWidth;      /* screen width */
 extern s32 gScreenHeight;      /* screen height */
@@ -32,7 +35,7 @@ CCameraText *CCameraPool__AddTextEx(CCameraPool *pool, CCamera *cam, u8 *string,
     u8 *c;
 
     text = NULL;
-    if (string == sCinemaTextFadeOut) {
+    if (string == *(u8 **) sCinemaTextFadeOut) {
         string = D_800B2CD0;
     }
     c = string;
