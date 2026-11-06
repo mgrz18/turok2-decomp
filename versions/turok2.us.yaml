@@ -3583,7 +3583,7 @@ segments:
       - [0xC1118, .rodata, code/func_004074D0]
       - [0xC111C, .rodata, code/func_004075F8]
       - [0xC112C, .rodata, code/func_0040765C]
-      - [0xC1134, rodata]
+      - [0xC1134, .rodata, code/func_0040768C]
       - [0xC1138, .rodata, code/func_004076B0]
       - [0xC1140, .rodata, code/func_004077AC]
       - [0xC1144, .rodata, code/func_00407800]

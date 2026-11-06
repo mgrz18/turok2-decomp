@@ -1,11 +1,11 @@
 #include "common.h"
-#include "m2c_macros.h"
+#include "structs/game_object.h"
 #include "globals/boss.h"
 
-extern M2C_UNK D_800C0530;
+void Primagen_EnterMode23_2(CGameObjectInstance *obj) {
+    f32 speed = 1.0f;
 
-void Primagen_EnterMode23_2(void *arg0) {
-    M2C_FIELD(arg0, f32 *, 0x1FC) = (f32) M2C_FIELD(&D_800C0530, f32 *, 4);
-    gLevelScript.timer = M2C_FIELD(&D_800C0530, f32 *, 4);
-    M2C_FIELD(arg0, s32 *, 0xD4) = (s32) (M2C_FIELD(arg0, s32 *, 0xD4) | 0x2000);
+    obj->m_AI.m_AnimSpeed = speed;
+    gLevelScript.timer = speed;
+    obj->m_dwFlags |= 0x2000;
 }

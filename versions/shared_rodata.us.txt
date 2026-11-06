@@ -111,3 +111,5 @@ func_004405F8 0x800C051C  # copy of func_004075F8, which now owns the pool
 func_00446C00 0x800C0900  # copy of func_0040DC00, which now owns the pool
 func_00447B68 0x800C093C  # copy of func_0040EB68, which now owns the pool
 func_00440C20 0x800C046C  # copy of func_00407C20, which now owns the pool
+func_0044068C 0x800C0534  # copy of func_0040768C, which now owns the pool
+func_0044065C 0x800C052C  # copy of func_0040765C
