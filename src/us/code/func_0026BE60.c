@@ -6,8 +6,6 @@
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
-extern CVector3 sRegionNormal;        /* cached raw normal */
-
 static __inline__ void cross_edges(CVector3 *out, CGameRegion *tri) {
     CVector3 edge0;
     CVector3 edge1;

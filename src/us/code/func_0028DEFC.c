@@ -2,10 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pager.h"
 
 extern void func_0028EEC0(int arg0);
-extern char gVMPages;
-extern EntryRecAt3 gPager_entries[];
 void VM_UnmapTLBEntry(Mapping *mapping) {
     extern void func_0028EE40(s32, s32, s32, s32, s32, s32);
     s32 slot;

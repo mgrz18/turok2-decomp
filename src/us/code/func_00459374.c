@@ -12,10 +12,6 @@
 /* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
  * and shows the "loaded" message; otherwise reports whether the note could be read. */
 
-extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakMenuLeaving; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 sGameNoteLoad; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakNoteIndex; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern f32 gEngineApp_m_Settings_match_seconds[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_minutes[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_hours[]; /* local type: the field's real type (or the member path) changes the ROM's code here */

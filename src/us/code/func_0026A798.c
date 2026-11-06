@@ -14,8 +14,6 @@ typedef struct Vertex {
 
 #define REGION_VERTEX(tri, i) ((Vertex *)(tri)->m_pVertices[i])
 
-extern CVector3 sRegionCeilingNormal;         /* its normal */
-
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
 

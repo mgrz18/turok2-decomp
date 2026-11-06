@@ -388,4 +388,16 @@ typedef struct WaveBossState {
 } WaveBossState; /* size 0x25C */
 
 
+/* gTotemDefense: the totem defense missions (TotemDefense_Init-TotemDefense_Fail).
+ * It lies in LevelScriptState pad544 (0x8012FB50). Fields with symbols of
+ * their own: gTotemDefense_def, _state, _timer, _kills. */
+typedef struct TotemDefenseState {
+    /* 0x00 */ struct CGameObjectInstance *obj;  /* the totem */
+    /* 0x04 */ void *def;                        /* its definition + 0x14 */
+    /* 0x08 */ s32 state;
+    /* 0x0C */ f32 timer;                        /* the time left */
+    /* 0x10 */ s32 kills;                        /* TotemDefense_AddKill */
+    /* 0x14 */ s32 warned;                       /* also the totem's draw colour (TotemDefense_DrawTotem) */
+} TotemDefenseState; /* size 0x18 */
+
 #endif

@@ -19,8 +19,6 @@ typedef struct {
     /* 0x90 */ u32 part;
 } PartInfo;
 
-extern f32 sMotherBossFadeTimer; /* fade timer */
-extern s32 sMotherBossCinemaStarted; /* second value reached its peak */
 extern void CMtxF__ScaleAxes(void *arg0, f32 r, f32 g, f32 b);
 
 void MotherBoss_PartEffects(void *arg0, PartInfo *info) {

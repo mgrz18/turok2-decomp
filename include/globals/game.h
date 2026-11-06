@@ -30,4 +30,16 @@ extern struct CPlayer *gEngineApp_m_Game_m_PlayerList_m_Players;            /* .
 extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;                       /* .m_PlayerList.m_nPlayers */
 extern CAutomap gEngineApp_m_Game_m_DebugLines;                             /* .m_Automap */
 
+/* More fields of gEngineApp_m_Settings with symbols of their own */
+extern u32 gEngineApp_m_Settings_unlockedCheats;  /* .unlockedCheats */
+extern u8 gEngineApp_m_Settings_unk14;            /* .unk14 */
+extern u8 gEngineApp_m_Settings_unk15;            /* .unk15 */
+extern u8 gEngineApp_m_Settings_unk16;            /* .unk16 */
+extern u8 gEngineApp_m_Settings_unk17;            /* .unk17 */
+extern u8 gEngineApp_m_Settings_unk18;            /* .unk18 */
+extern u8 gEngineApp_m_Settings_unk1B;            /* .unk1B */
+extern s32 gEngineApp_m_Settings_unk1C8;          /* .unk1C8 */
+extern f32 gEngineApp_m_Settings_match_countdown; /* .match.countdown */
+extern s32 gEngineApp_m_Settings_match_teamScore[2]; /* .match.teamScore */
+
 #endif

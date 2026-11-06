@@ -8,7 +8,7 @@ extern void EnemyAI_SetGrabbed(void *actor, void *ai, s32 arg2);
 extern void CAI__SetMode(void *obj, void *state, s32 mode);
 extern f32 func_00298470(f32 x); /* sqrtf */
 
-extern s8 gThrowableCollisionInfo_m_InstanceBehavior[];
+extern s8 gThrowableCollisionInfo_m_InstanceBehavior[]; /* local type: globals/collision.h declares it; this view (its type here) is what keeps the ROM's code */
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x10C];

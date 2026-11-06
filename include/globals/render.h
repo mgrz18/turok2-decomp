@@ -7,6 +7,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/light.h"
+#include "structs/vector.h"
 
 extern s32 gScreenWidth;            /* Turok 3's screen_width */
 extern s32 gScreenHeight;           /* Turok 3's screen_height */
@@ -66,5 +67,18 @@ extern u8 gPrimColorOverrideG;
 extern u8 gPrimColorOverrideB;
 extern u8 gPrimAlphaOverride;
 extern u8 gPrimAlphaOverrideValue;
+
+/* Texture_Load's last loaded state: frame, palette and wrap modes (reloads only on a change) */
+extern s32 sTexLastFrame;
+extern s32 sTexLastPalette;
+extern s32 sTexLastWrapS;
+extern s32 sTexLastWrapT;
+
+/* Lit vertices and the expansion-pak screen */
+extern CVector3 sLitVertexOffsets[];
+extern f32 sExpansionPakMtx[2][16];   /* per-frame matrices (Mtx) */
+
+/* The VI mode: the selected mode index */
+extern s16 sViModeIndex;            /* the selected VI mode (osViModeTable index) */
 
 #endif

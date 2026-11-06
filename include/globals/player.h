@@ -10,6 +10,7 @@
 #include "structs/game_object.h"
 #include "structs/player_state.h"
 #include "structs/ai_type.h"
+#include "structs/collision.h"
 
 extern ButtonMap sControlSide1ButtonMap[20];   /* CPlayerOptions m_ControlSide 1 */
 
@@ -80,5 +81,11 @@ extern CAIModeInfo sWeaponActorModeTable[48];   /* installed by WeaponActor_Init
 extern CIntelligenceTypeInfo gWeaponActorTypeInfo;  /* the type block of a player's second object */
 
 extern s16 gAmmoIcons[];            /* HUD icon by ammo type, -1 none */
+
+/* The blast shield's hit box, the cinema players and the death tint */
+extern HitFrame sBlastShieldFrame;       /* the shield CGameObjectInstance__GetNearestBox finds */
+extern struct CPlayer *sCinema50Player;
+extern struct CPlayer *sDeathCinemaPlayer;
+extern u8 gDeathTintColor[4];
 
 #endif

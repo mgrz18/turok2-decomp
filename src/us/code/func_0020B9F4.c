@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/model.h"
+#include "globals/batch.h"
 
 s32 CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
 s32 CISet__GetROMAddressAndSize(s32, s32, s32, s32 *);
@@ -10,12 +11,6 @@ void CCache__Unlock(s32, s32);
 extern u8 D_800A53D8[];
 extern u8 D_800A53EC[];
 extern void Model_DecompressCallbackTerminated();
-extern s32 sBatchPass;
-extern s32 sBatchLod;
-extern s32 sBatchResource;
-extern s32 sBatchInstanceCount;
-extern s32 sBatchResourceCount;
-extern s32 sBatchResources[];
 
 void func_0020B9F4(s32 res, s32 arg1, s32 arg2, s32 index, s32 arg4) {
     s32 size;
@@ -32,17 +27,17 @@ void func_0020B9F4(s32 res, s32 arg1, s32 arg2, s32 index, s32 arg4) {
         if (handle != 0) {
             count = CISet__GetBlock(*(s32 *) handle, 2);
             if (index >= 0 && index < *count) {
-                if (sBatchResource != handle || sBatchLod != index || sBatchPass != arg4 || sBatchInstanceCount == 32) {
+                if (sBatchResource != (void **) handle || sBatchLod != index || sBatchPass != arg4 || sBatchInstanceCount == 32) {
                     Render_FlushModelBatch();
                     if (sBatchResourceCount == 256) {
                         goto done;
                     }
                     CCache__TouchAndLock(0, handle);
-                    sBatchResources[sBatchResourceCount] = handle;
+                    sBatchResources[sBatchResourceCount] = (void **) handle;
                     sBatchResourceCount++;
                 }
                 n = sBatchInstanceCount;
-                sBatchResource = handle;
+                sBatchResource = (void **) handle;
                 sBatchLod = index;
                 sBatchPass = arg4;
                 e = &sBatchInstances[n++];

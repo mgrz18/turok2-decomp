@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pager.h"
 
 extern void VM_Free(s32 arg0);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern s32 gPager_completion;
 extern void CCache__Deallocate(void *arg0, void *arg1);
 void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
 void osSendMesg(void *arg0, void *arg1, s32 arg2);

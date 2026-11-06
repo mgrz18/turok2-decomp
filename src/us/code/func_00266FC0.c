@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/cache.h"
+#include "globals/boss.h"
 
 extern char D_11059;
-extern char gPrimagenPaths;
 extern char D_94F;
 int IsDataPointer(u32 arg0) {
     if (arg0 >= (u32)&gHashSize &&

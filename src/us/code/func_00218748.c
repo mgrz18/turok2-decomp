@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
+#include "globals/object.h"
 
 B14Hdr *CISet__GetBlock(void *tree, s32 id);
 s32 Anim_DecodeTracks(void *a, void *b, s32 c, s32 d, s32 e, s32 f);
@@ -12,8 +13,6 @@ extern f32 D_800A5A04;
 extern f32 D_800E6790;
 extern s32 D_800E6794;
 extern s32 D_800E6798;
-extern f32 sAnimRemapMin;
-extern f32 sAnimRemapMax;
 s32 Anim_DecodeAnimation(void *a, void *b) {
     s32 r;
     B14Hdr *h = CISet__GetBlock(a, 0);

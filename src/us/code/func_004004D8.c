@@ -7,6 +7,7 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "globals/automap.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
@@ -22,13 +23,6 @@
 /* gSPVertex(pkt, v, n, 0) and gSPLine3D(pkt, v0, v1, 0) (F3DEX2). */
 #define VTX_W0(n) (0x01000000 | (((n) & 0xFF) << 12) | (((n) & 0x7F) << 1))
 #define LINE_W0(a, b) (0x08000000 | (((((a) * 2) & 0xFF) << 16) | ((((b) * 2) & 0xFF) << 8)))
-
-typedef struct MapVtx {
-    /* 0x0 */ s16 ob[3];
-    /* 0x6 */ u16 flag;
-    /* 0x8 */ s16 tc[2];
-    /* 0xC */ u8 cn[4];
-} MapVtx; /* 0x10 bytes */
 
 typedef struct {
     /* 0x00 */ u8 pad0[8];
@@ -62,13 +56,6 @@ extern s32 gEngineApp_m_Settings; /* local type: GameSettings.cheatFlags; global
 extern s32 gEngineApp_m_Settings_nextMode; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
 extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* local type: CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose gEngineApp_m_Settings is not this file's s32) */
 extern Vp gScreenViewport[];
-extern Mtx sAutomapWorldMtx[2];
-extern Mtx sAutomapScreenMtx[2];
-extern u16 sAutomapLineIndices[];    /* line vertex indices */
-extern Mtx sAutomapOrthoMtx;
-extern MapVtx sAutomapLineVtx[2][0x200];
-extern MapVtx sAutomapMagentaVtx[2][8];
-extern MapVtx sAutomapYellowVtx[2][3];
 
 extern char *CISet__GetBlock(s32 *data, s32 index);
 extern void CMtxF__InvertAffine(f32 *out, f32 *m);
@@ -129,7 +116,7 @@ void Automap_Draw(MapView *view) {
     CGameRegion *region;
     CRegionInfo *infos;
     CRegionInfo *info;
-    MapVtx *vtx;
+    Vtx_t *vtx;
     CVector3 *p0;
     CVector3 *p1;
     CVector3 *a;

@@ -68,5 +68,11 @@ extern char gPakCharacterNoteName[12];    /* "T2 MULTI" */
 extern char gPakGameNoteName[8];          /* "TUROK 2" */
 extern char gPakCompanyCode[4];           /* "51" */
 extern char gPakGameCode[8];              /* "NT2E" */
+/* Fields of gPakProfile with symbols of their own (func_004595D8 reads them through its own views) */
+extern u16 gPakProfile_deaths;          /* gPakProfile.deaths */
+extern u16 gPakProfile_kills;           /* gPakProfile.kills */
+extern u16 gPakProfile_tags;            /* gPakProfile.tags */
+extern u8 gPakProfile_character;        /* gPakProfile.character */
+extern u8 gPakProfile_name[8];          /* gPakProfile.name */
 
 #endif

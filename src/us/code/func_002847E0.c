@@ -10,15 +10,7 @@ void osContGetReadData(OSContPad *pad);
 s32 osContReset(OSMesgQueue *mq, OSContStatus *data);
 void osContGetQuery(OSContStatus *data);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-typedef struct M04Pad {
-    u16 button;
-    s8 x;
-    s8 y;
-    u8 err;
-    u8 pad;
-} M04Pad;
 extern f32 D_800A9CE0;
-extern M04Pad gContPadData[];
 void Controller_UpdateConnection(ControllerProfile *c);
 void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, u16 b);
 void Controller_ReadAll(void) {
@@ -26,7 +18,7 @@ void Controller_ReadAll(void) {
     switch ((u8)gPakQueueState) {
     case 0:
         osRecvMesg(&gSiMessageQueue, &gSiMesgBuf, 1);
-        osContGetReadData((OSContPad *)gContPadData);
+        osContGetReadData(gContPadData);
         gMergedController.port = -1;
         gMergedController.connected = 0;
         gMergedController.inputStickX = 0;
@@ -46,7 +38,7 @@ void Controller_ReadAll(void) {
         gMergedController.inputButtonsDouble = 0;
         gMergedController.inputButtonsRepeat = 0;
         for (i = 0; i < 4; i++) {
-            Controller_ProcessInput(&gControllers[i], gContPadData[i].x, gContPadData[i].y, gContPadData[i].button);
+            Controller_ProcessInput(&gControllers[i], gContPadData[i].stick_x, gContPadData[i].stick_y, gContPadData[i].button);
             gMergedController.connected |= gControllers[i].connected;
             gMergedController.inputStickX += gControllers[i].inputStickX;
             gMergedController.inputStickY += gControllers[i].inputStickY;

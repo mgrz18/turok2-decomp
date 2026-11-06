@@ -2,42 +2,10 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "globals/batch.h"
 
 
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
-
-/* A part's material. */
-typedef struct Material {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u8 pad4[0x13];
-    /* 0x17 */ u8 alpha;
-} Material;
-
-/* One draw of a part with one instance's state (built by Render_FlushModelBatch). */
-typedef struct DrawItem {
-    /* 0x00 */ void *list;
-    /* 0x04 */ void *matrix;
-    /* 0x08 */ char *lights;
-    /* 0x0C */ void *textures;
-    /* 0x10 */ u16 scaleS;
-    /* 0x12 */ u16 scaleT;
-    /* 0x14 */ s32 segment;
-    /* 0x18 */ struct DrawItem *next;
-} DrawItem;
-
-/* A material key in a sort tree, threaded in key order through next. */
-typedef struct SortNode {
-    /* 0x00 */ u8 key[3];
-    /* 0x03 */ s8 pass;
-    /* 0x04 */ Material *material;
-    /* 0x08 */ DrawItem *head;
-    /* 0x0C */ DrawItem *tail;
-    /* 0x10 */ struct SortNode *prev;
-    /* 0x14 */ struct SortNode *next;
-} SortNode;
-
-extern SortNode *sOpaqueSortFirst;        /* first opaque node */
-extern SortNode *sTranslucentSortFirst;        /* first translucent node */
 
 s32 Render_SetupMaterial(Material *material, s32 pass);
 void func_00209658(void);

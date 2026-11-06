@@ -90,23 +90,6 @@ struct PoseContext {
     /* 0x90 */ s32 bone;
 };
 
-/* Scratch shared by every level of the recursion. */
-extern BoneList *sPoseChildren;   /* children list */
-extern f32 sPoseMtx[4][4];   /* local matrix */
-extern CVector3 sPosePos;       /* translation */
-extern CVector3 sPosePosA;       /* position, channel A */
-extern CVector3 sPosePosB;       /* position, channel B */
-extern CQuaternion sPoseRot;       /* rotation */
-extern CQuaternion sPoseRotA;       /* rotation, channel A */
-extern CQuaternion sPoseRotB;       /* rotation, channel B */
-extern s32 sPoseBoneType;         /* object type */
-extern u8 *sPoseBoneData;         /* bone data */
-extern u8 sPoseFlags;          /* bone flags */
-extern CGameRegion *sPoseRegion;
-extern f32 sPoseCeilingHeight;         /* ground height */
-extern f32 sPoseCollisionHeight;         /* object height */
-extern f32 sPoseCeilingOverlap;         /* depth below the ground */
-
 void *CISet__GetBlock(void *file, s32 index);
 void CMtxF__MultiplyAffine(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);
 void CQuaternion__Slerp(CQuaternion *out, f32 amount, CQuaternion *a, CQuaternion *b);

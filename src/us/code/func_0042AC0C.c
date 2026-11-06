@@ -9,6 +9,8 @@
 #include "globals/engine.h"
 #include "globals/render.h"
 #include "globals/sysrc.h"
+#include "globals/audio.h"
+
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
@@ -23,8 +25,6 @@ extern char D_800A5F00[]; /* "level paths" */
 extern char D_800A5F0C[]; /* "level info" */
 extern char D_800A5F18[]; /* "sky layers" */
 extern char D_800A5F24[];
-extern u8 gLoopSoundEntries[];
-extern u8 gLoopSounds[];
 extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 ProPack__Decompress(s32, s32);
@@ -145,7 +145,7 @@ loaded:
     func_0042D410(gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
     func_0042D120(w->unk_18EBC);
-    LoopSounds_Construct(gLoopSounds, gLoopSoundEntries, 0xF);
+    LoopSounds_Construct(&gLoopSounds, gLoopSoundEntries, 0xF);
     func_0042EBBC(gEngineApp_m_SwooshSystem - 0x1C8);
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;

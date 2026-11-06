@@ -2,6 +2,8 @@
 #include "structs/controller.h"
 #include "globals/game.h"
 #include "globals/rumble.h"
+#include "globals/menu.h"
+
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x80];
@@ -17,7 +19,6 @@ typedef struct {
 } A254Menu;
 
 
-extern s32 sPauseRumbleOn[4];
 extern void Controller_ResetAllRumble(void);
 extern void RumblePool_FreeAll(RumblePool *pool);
 extern s32 LoopSounds_Get(void);

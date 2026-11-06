@@ -36,4 +36,10 @@ extern u8 gCheatEntryText[0x64];    /* the typed cheat code */
 extern s32 gLoadedFont;             /* which font texture COnScreen has loaded */
 extern s32 sCreditsLine;            /* the first credits line on screen */
 
+/* Menu statics: the final score screen timer, the resolution toggle delay, the paused rumble state */
+extern f32 sFinalScoreTimer;
+extern f32 sResolutionToggleDelay;
+extern s32 sPauseRumbleOn[4];   /* the controllers' rumble state, saved while paused */
+extern CharacterSound gCharacterSelectSounds[];   /* by character */
+
 #endif
