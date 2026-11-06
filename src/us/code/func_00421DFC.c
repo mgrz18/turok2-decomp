@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern s32 D_800B490C;
-extern s32 gPakMenuAnyPak;
 
 s32 PakMenu_UpdateCancel(MenuItem *arg0) {
     if (gPakMenuAnyPak != 0) {

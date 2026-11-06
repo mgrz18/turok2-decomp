@@ -4,6 +4,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028E910.c, func_0028E910, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/engine.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -19,8 +20,6 @@ typedef struct {
     /* 0x2E0 */ Client *clients;
 } Sched;
 
-extern s32 sSchedResetPressed;  /* reset pressed */
-extern s32 sSchedResetBlankRetraces;  /* retraces left before blanking */
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);

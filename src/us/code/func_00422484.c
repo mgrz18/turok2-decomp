@@ -2,6 +2,7 @@
  * tests and the copy loop) into func_00422574. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern char D_800B4934[];
 extern char D_800B4940[];
@@ -15,10 +16,9 @@ extern char D_800B4994[];
 extern char D_800B49A0[];
 extern char D_800B49AC[];
 extern char D_800B49B8[];
-extern u16 gPakProfileRead_kills; /* score */
 
 s32 CharNoteMenu_UpdateRank(MenuItem *item) {
-    s32 score = gPakProfileRead_kills;
+    s32 score = gPakProfileRead.kills;
     char *src = NULL;
     char *dst;
     s32 i;

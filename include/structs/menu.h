@@ -231,4 +231,11 @@ typedef struct NameEntry {
 extern TextEntry gCheatEntry;
 extern NameEntry gNameEntries[4];
 
+/* The multiplayer speed choices (sPlayerSpeedTable): MpMenu_StepPlayerSpeed sets
+ * the speed to scale[choice] + 1. */
+typedef struct PlayerSpeedTable {
+    /* 0x00 */ f32 unk0;
+    /* 0x04 */ f32 scale[16];       /* -0.5 .. 1.0 */
+} PlayerSpeedTable; /* size 0x44 */
+
 #endif

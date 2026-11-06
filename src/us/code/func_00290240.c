@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/audio.h"
 
 extern f32 alCents2Ratio(s32 arg0);
-extern char sCSPlayerFile[];
 extern char D_800AA290[];
 void __CSPHandleMIDIMsg(void *object, ALEvent *message);
 extern float D_800AA360;

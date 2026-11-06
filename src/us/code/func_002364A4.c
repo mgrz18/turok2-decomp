@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/particle.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A6BD4.c, func_002A6BD4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -14,7 +15,6 @@ typedef struct Pool6BD4 {
     Node6BD4 *unk95A0;
 } Pool6BD4;
 extern f32 D_800A6524;
-extern s32 sSwooshSpawned;
 void CQuaternion__FromDirection(void *a, CVector3 *b);
 void CList__Remove(void *list, Node6BD4 *n);
 void CList__AddTail(void *list, Node6BD4 *n);

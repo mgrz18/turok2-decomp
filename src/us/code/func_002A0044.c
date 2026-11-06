@@ -2,9 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/adec.h"
 
-extern unsigned short sAdecHuffBits;
-extern unsigned short sAdecHuffBitsAvail;
 extern u16 adecReadBits(u16 *, u16, s32, s32, void *);
 s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                     u16 *arg3, void *arg4) {

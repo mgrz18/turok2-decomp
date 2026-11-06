@@ -2,17 +2,16 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern u32 osMotorStop(struct Triple *);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern void *__osMotorinitialized[];
 extern u8 __osPfsPifRam[];
 extern void __osSiGetAccess(void);
 extern s32 __osSiRawStartDma(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
 extern u32 __osContDataCrc(void *arg0);
 extern void __osSiRelAccess(void);
-extern void *__osMotorinitialized[];
 extern u8 __osContLastCmd;
 extern u8 __osMotorStopData[];
 extern u8 __osMotorStopBuf;

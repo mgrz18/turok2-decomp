@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern s32 osEPiRawReadIo(struct OSPiHandle_s *handle, u32 address, u32 *value);
-extern OSPiHandle_s *__osCurrentHandle[];
 extern s32 D_800AA9B0;
 extern s32 D_800AA9B4;
 extern void __assert(void *arg0, void *arg1, s32 arg2);

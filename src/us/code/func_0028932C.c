@@ -3,9 +3,8 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
-extern s32 gShowExpansionPakScreen;
-extern s32 gLegalScreenNoSkip;
 extern f32 D_800A9DFC;
 u32 GetMemSize();
 s32 CEngineApp__TimedModeSwitch(CEngineApp *g, f32 x, s32 a, s32 b);

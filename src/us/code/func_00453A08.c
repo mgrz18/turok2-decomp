@@ -8,6 +8,7 @@
 #include "structs/controller.h"
 #include "structs/list.h"
 #include "structs/menu.h"
+#include "globals/engine.h"
 
 extern int Controller_MenuLeft(ControllerProfile *object);
 extern int Controller_MenuRight(ControllerProfile *object);
@@ -48,7 +49,6 @@ struct PoolRecAt28V1 {
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
 extern f32 D_800C1274[];
-extern f32 gFrameIncrement;
 extern f32 D_800C1274[];
 s32 EnterCheatMenu_UpdateTextField_2(void *unused, MenuRecAt20V4 *menu) {
     f32 t;

@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/enemy.h"
 
 s32 CGameObjectInstance__AdvanceAnimation(CGameObjectInstance *);
 s32 CGameObjectInstance__SetAnimByAction(CGameObjectInstance *, s32, s32);
 s32 AI_PickAnimFromTable(CGameObjectInstance *, CAI *, s32, s32);
 
-extern u8 sEnemyAnimIdle_AF6F0[];
 
 void InteractiveAnim_Update(CGameObjectInstance *obj, CAI *ai) {
     s32 temp_a1;

@@ -45,7 +45,6 @@ typedef struct CFrameData {
  * CEngineApp__ClearDepthRect read it as gEngineApp.m_pCurrentFrameData (structs/game.h,
  * the same address), Automap_Draw keeps a local array declaration. */
 extern CFrameData *gEngineApp_m_pCurrentFrameData;    /* the frame being built */
-extern CFrameData *gFrameData;    /* the frame being finished */
 
 /* A screen mode, as Video_SetMode / func_0042456C start it: gVideoModes holds
  * the NTSC modes, then the PAL/MPAL ones (gVideoModesPAL, a symbol of its own

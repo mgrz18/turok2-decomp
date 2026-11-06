@@ -1,6 +1,7 @@
 /* Second-module copy of MissionMenu_UpdateObjective1 (first module; this one at link address 0x00424F7C), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 extern char D_800C1768[];
 extern char D_800B43BC[];
@@ -9,7 +10,6 @@ extern char D_800B4464[];
 extern char D_800B44C4[];
 extern char D_800B44FC[];
 extern char D_800B4560[];
-extern s32 sMissionHub;
 
 s32 MissionMenu_UpdateObjective1_2(MenuItem *item) {
     switch (sMissionHub) {

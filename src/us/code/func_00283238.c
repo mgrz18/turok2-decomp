@@ -7,7 +7,6 @@
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern Gfx *gDList;             /* display list head */
 extern u8 gIdentityMtx[];             /* the matrix loaded for them */
 
 void Render_SetRenderMode(s32 mode);

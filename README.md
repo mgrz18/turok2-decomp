@@ -130,6 +130,7 @@ What a source port needs: code a person can read and change without breaking it.
 - [ ] Hoist the remaining repeated local structs (291 names; [docs/STRUCTS_TODO.md](docs/STRUCTS_TODO.md))
 - [ ] Name the functions: 3,823 of the 4,146 C functions named (92%; 3,932 names with the asm ones), from Turok 3's and Rage Wars' decomps, libultra, the ROM's strings and SN64 debug records (`versions/names.us.txt`, `versions/names/`, `tools/apply_names.py`; [docs/NAMES.md](docs/NAMES.md))
 - [ ] Name the globals: 1,204 data names (1,179 of the 2,266 `D_` symbols the C used, 105 of them module-2 `_2`), from Turok 3's and Rage Wars' names, libultra and the code that uses them (`versions/names/data_*.us.txt`); the 1,087 left are mostly literals one C file owns (539 strings, 445 float pools) that should become C literals ([docs/NAMES.md](docs/NAMES.md#round-g2-the-globals))
+- [ ] One declaration with the real type for every global: 40 headers in `include/globals/` (837 declarations); local `extern`s of named globals 5,269 -> 911 (238 of them commented local types, 699 lines still without a header); checked with `tools/asm_diff.py` ([docs/GLOBALS.md](docs/GLOBALS.md))
 - [ ] De-fake the 16 FAKEMATCH functions ([docs/MATCHING.md](docs/MATCHING.md))
 - [ ] Recover the original source-file boundaries and group functions into real modules
 - [ ] libultra from [decompals/ultralib](https://github.com/decompals/ultralib) (`libgultra`)

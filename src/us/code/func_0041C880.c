@@ -2,6 +2,7 @@
  * (OptionsMenu_StepBrightness, func_0041C89C) in the middle of a call's argument setup. */
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern s32 Menu_StepValue(void *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);
 

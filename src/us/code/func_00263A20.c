@@ -4,8 +4,8 @@
  * 0x263A20 to the end of splat's func_00263A14. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame time */
 
 f32 Random_Blend(f32 lo, f32 hi);
 f32 SmoothStep(f32 x);

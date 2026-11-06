@@ -2,6 +2,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/engine.h"
+#include "globals/player.h"
 
 typedef struct {
     /* 0x00 */ f32 accel;
@@ -15,19 +17,6 @@ typedef struct {
     /* 0x20 */ s16 pad20;
     /* 0x22 */ s16 impulseSound;
 } Tuning;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[8];
-    /* 0x08 */ f32 drag;
-} Physics;
-
-typedef struct {
-    /* 0x00 */ Physics *physics;
-    /* 0x04 */ u8 pad4[0x18 - 4];
-} Mode;
-
-extern f32 gFrameIncrement;      /* frame time */
-extern Mode gPlayerStateTable_tuning[];
 
 f32 Math_DecayToZero(f32 value, f32 rate);
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
@@ -143,7 +132,7 @@ void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, Tuning *tu
     player->m_vDesiredPos.z += (forwardOut.z + strafeOut.z) * player->m_FrameIncrementScaled;
     if (body->m_vVelocity.y < 0.0f) {
         CVector3__Add(&sum, &forwardOut, &strafeOut);
-        body->m_vVelocity.y -= gPlayerStateTable_tuning[player->m_Mode].physics->drag
+        body->m_vVelocity.y -= gPlayerStateTable[player->m_Mode].physics->drag
             * (func_00298470(sum.x * sum.x + sum.y * sum.y + sum.z * sum.z) / (tuning->max * 4.0f))
             * player->m_FrameIncrementScaled;
     }

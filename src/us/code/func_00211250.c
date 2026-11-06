@@ -1,7 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/GAME/CODE_8027302C.CPP, func_80274380_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/engine.h"
 
-typedef float f32;
 extern f32 Math_AcosLookup(f32 arg0);
 struct CQuatern_t;
 typedef struct CQuatern_t CQuatern;
@@ -13,7 +14,6 @@ struct CQuatern_t {
     float w;
 };
 extern void CQuaternion__TurnToward(CQuatern *rotation, CQuatern *target);
-extern f32 gFrameIncrement;
 void CQuaternion__SlerpFast(void *, f32, void *, void *);
 void CQuaternion__TurnToward(CQuatern *rotation, CQuatern *target) {
     CQuatern result;

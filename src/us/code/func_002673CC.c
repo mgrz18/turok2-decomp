@@ -1,4 +1,6 @@
 #include "structs/vector.h"
+#include "globals/game.h"
+#include "globals/math.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/8024D018_3.CPP, func_8024D4AC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -139,7 +141,6 @@ struct LevelActor;
 struct LevelActor;
 extern void CVector3__Normalize(f32 *arg0);
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern f32 gQuaternionSin;
 extern CQuatern CGameObjectInstance__GetRotation(char *);
 extern void CQuaternion__ToMatrix(CQuatern *, f32 *);
 extern char *CPlayerPool__FindNearest(void *, CVector3);

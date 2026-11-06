@@ -1,13 +1,13 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU_2/80408AC4_7.CPP, func_8043CC10_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 typedef struct {
     /* 0x00 */ char pad0[0x14];
     /* 0x14 */ u8 *chr;
 } ObjRecAt14;
 
-extern s32 sEnterCheatResult;
 
 /* Inserts the selected character at the cursor of the name entry. */
 s32 EnterCheatMenu_InsertLetter_2(ObjRecAt14 *arg0) {

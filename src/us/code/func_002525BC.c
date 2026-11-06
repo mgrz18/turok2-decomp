@@ -2,12 +2,11 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/render.h"
 
 /* Tag game state. */
 
-extern u8 gEngineApp_m_Settings_hudAlpha;
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 
 extern s32 Random_Next(void);
 extern void CPlayer__BecomeIt(CPlayer *p);
@@ -58,7 +57,7 @@ void CPlayerPool__PickTagIt(CPlayerPool *list) {
             p = CPlayerPool__GetViewPlayer(list, s->tagPick % count);
             cam = p->m_pCamera;
             if (cam != NULL && cam->m_Menus.count == 0) {
-                Hud_SetupTextureMode(gEngineApp_m_Settings_hudAlpha);
+                Hud_SetupTextureMode(gEngineApp_m_Settings.hudAlpha);
                 w = cam->m_Viewport.m_Width;
                 h = cam->m_Viewport.m_Height;
                 cx = cam->m_Viewport.m_ScreenPosX + w * 0.5f;

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings;          /* settings; per-player 0x40-byte blocks, flag at +0xA8 */
 
 /* Counts the connected controllers; 0 if one of their players is not ready. */
 s32 Mp_CountJoinedControllers(void) {

@@ -1,12 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SDK/AUDIO/802C3EA4_3.CPP, func_802C00B0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/adec.h"
 
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
 typedef struct DecodeState {
     s32 first;
     s32 third;
@@ -16,11 +12,6 @@ typedef struct DecodeState {
     void *cursor;
     u16 frame[336];
 } DecodeState;
-extern unsigned short sAdecBitsLeft;
-extern unsigned short sAdecHuffBits;
-extern unsigned short sAdecHuffBitsAvail;
-extern s16 sAdecHeaderDone;
-extern unsigned short sAdecImdctReady;
 extern char sAdecState;
 u32 adecStreamOpen(s32 *source, u32 divisor, s32 *first)
 {

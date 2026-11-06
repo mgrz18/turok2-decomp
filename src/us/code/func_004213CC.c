@@ -1,10 +1,9 @@
 #include "common.h"
 #include "structs/save.h"
+#include "globals/pak.h"
 
 s32 CCache__Deallocate(s32, s32);                /* extern */
 s32 CCache__Flush(s32);                     /* extern */
-extern s32 gSaveBufferHandle;
-extern s32 gLoadBufferHandle;
 
 void Pak_FreeSaveBuffers(void) {
     if ((gSaveBufferHandle != 0) || (gLoadBufferHandle != 0)) {

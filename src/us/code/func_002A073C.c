@@ -2,12 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/adec.h"
 
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern FftTables *mdctFftInit(s32 n);
 extern float D_800AAC30;
-extern FftTables gMdctFftTables;
 FftTables *mdctFftInit(s32 n) {
     FftTables *tables;
     s32 half;

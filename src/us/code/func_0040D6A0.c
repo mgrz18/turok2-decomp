@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/game.h"
 
 /* AI init for the module's minions (types 0x456 and others): sets the anim table and callbacks, targets the
  * current player and starts anim state 1. */
 
 extern u8 gBlindOneMinionModeTable[];
-extern void *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 extern void BlindOne_ActorUpdate(void);
 extern void BlindOne_ActorHurt(void);
 extern void EnemyAI_HeadNodeCallback(void);
@@ -35,7 +35,7 @@ void BlindOne_Group1Init(CGameObjectInstance *obj, CAI *ai) {
     } else {
         obj->m_dwFlags &= ~0x20000;
     }
-    player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+    player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     if (player != NULL) {
         ai->m_pSightTarget = player;
         ai->m_pPathTarget = player;

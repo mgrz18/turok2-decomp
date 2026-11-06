@@ -1,8 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/pak.h"
 
-extern s32 sPakConfirmDone;
-extern s32 gPakConfirmKind;
 
 void PakConfirmMenu_InitCorruptNote_2(void) {
     gPakConfirmKind = 4;

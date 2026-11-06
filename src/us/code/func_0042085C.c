@@ -5,28 +5,14 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
+#include "globals/pak.h"
+#include "globals/scene.h"
+#include "structs/game.h"
+#include "globals/menu_desc.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
-extern s32 gPakMessageKind; /* menu state */
-extern s32 gCameraPoolHideViews;
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuIsProfile;
-extern s32 sPakMessageRumbleB;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort; /* pad */
-extern s32 gScene_m_PendingWarpID;
-extern s32 gPakCheckDone;
-extern s32 gSavePortalActive;
-extern u8 gScene[];
-extern u8 gEngineApp[];
-extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern u8 gSavePortalMenuDescB[];
-extern u8 gSavePortalMenuDesc[];
-extern u8 gPakLoadGameMenuDesc[];
-extern u8 gSingleMenuAfterPakDesc[];
-extern u8 gPakSaveGameMenuDesc[];
-extern u8 gPakSaveProfileMenuDesc[];
 void Controller_ResetRumble(ControllerProfile *a);
 void Controller_SetRumbleOption(ControllerProfile *a, s32 b);
 void Controller_UnwatchPak(s32 a);
@@ -44,7 +30,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
     if (gPakMessageKind == 8) {
         return 0;
     }
-    if (o->context == gSavePortalMenuDescB || o->context == gSavePortalMenuDesc) {
+    if (o->context == &gSavePortalMenuDescB || o->context == &gSavePortalMenuDesc) {
         gCameraPoolHideViews = 0;
     }
     if (gPakMessageKind == 9 || gPakMessageKind == 5) {
@@ -59,10 +45,10 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
                 s1 = o->controller->port;
             }
             Controller_UnwatchPak(s1);
-            CScene__RequestWarp(gScene, o->player->m_Data.m_CheckPointWarpID, 2);
+            CScene__RequestWarp(&gScene, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
-        func_004303AC(gEngineApp);
+        func_004303AC(&gEngineApp);
         return 1;
     }
     if (gPakMenuAnyPak != 0) {
@@ -72,7 +58,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
     }
     if (gPakMessageKind == 5) {
         Controller_UnwatchPak(s1);
-        CScene__RequestWarp(gScene, gScene_m_PendingWarpID, 2);
+        CScene__RequestWarp(&gScene, gScene_m_PendingWarpID, 2);
     }
     if (gPakMenuAnyPak != 0) {
         if (gPakMessageKind == 6) {
@@ -84,23 +70,23 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
         s0 = Pak_GetStatus(s1);
         v = Controller_TakePakChanged(s1);
         if ((s0 == 0 || v != 0) && s0 != -2 && o->context == (void *)1) {
-            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakLoadGameMenuDesc, o->player, o->controller, 0);
+            MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakLoadGameMenuDesc, o->player, o->controller, 0);
         } else {
-            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gSingleMenuAfterPakDesc, o->player, o->controller, 0);
+            MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gSingleMenuAfterPakDesc, o->player, o->controller, 0);
         }
     } else if (gPakMessageKind == 3 && gSavePortalActive != 0) {
         Pak_ProbeSlot(s1);
         s0 = Pak_GetStatus(s1);
         v = Controller_TakePakChanged(s1);
         if ((s0 == 0 || v != 0) && s0 != -2 && o->context == (void *)1) {
-            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakSaveGameMenuDesc, o->player, o->controller, 0);
+            MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakSaveGameMenuDesc, o->player, o->controller, 0);
         } else {
             if (o->player != NULL) {
                 p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
-                p = gEngineApp_m_Game_m_MenuPool;
+                p = &gEngineApp_m_Game_m_MenuPool;
             }
-            MenuPool_OpenMenu(p, gSavePortalMenuDescB, o->player, o->controller, 0);
+            MenuPool_OpenMenu(p, &gSavePortalMenuDescB, o->player, o->controller, 0);
             gCameraPoolHideViews = 0;
         }
     } else {
@@ -108,10 +94,10 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
             o->context = NULL;
         }
         if (o->context != NULL) {
-            if (o->context != gPakSaveProfileMenuDesc && o->player != NULL) {
+            if (o->context != &gPakSaveProfileMenuDesc && o->player != NULL) {
                 p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
-                p = gEngineApp_m_Game_m_MenuPool;
+                p = &gEngineApp_m_Game_m_MenuPool;
             }
             MenuPool_OpenMenu(p, o->context, o->player, o->controller, s1);
         }

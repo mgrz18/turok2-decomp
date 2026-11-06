@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AI/NAV/8027451C.CPP, cross_edges, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/region.h"
+#include "globals/region.h"
 
 extern s32 CGameRegion__IsSteep(CGameRegion *tri);                      /* is the triangle a slope? */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
@@ -8,7 +9,6 @@ extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out =
 extern f32 func_00298470(f32);                                /* sqrtf */
 extern f32 Math_AcosLookup(f32);                                /* acosf */
 
-extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
 extern CVector3 sRegionNormal;        /* cached raw normal */
 
 /* Raw (unnormalised) normal of a triangle, cached for the last triangle. */

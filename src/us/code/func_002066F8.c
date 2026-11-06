@@ -4,11 +4,10 @@
 #include "common.h"
 #include "structs/list.h"
 #include "structs/cache.h"
+#include "globals/cache.h"
 
 extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
-extern char gCache_cacheUsedList;
 void CList__AddHead(void *list, void *node);
-extern CList gCache_cacheFreeList;
 extern void CList__Remove(void *list, void *node);
 static __inline__ CCacheEntry *take(s32 active) {
  CCacheEntry *node=gCache_cacheFreeList.m_pHead;

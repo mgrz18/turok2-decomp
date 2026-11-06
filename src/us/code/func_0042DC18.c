@@ -3,9 +3,9 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/camera.h"
+#include "globals/game.h"
+#include "globals/camera.h"
 
-extern u8 gEngineApp_m_Settings_multiplayer;   /* multiplayer */
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 
 extern s32 Demo_GetPlayerCount(void);
 extern s32 SavedPlayers_IsActive(void);
@@ -30,7 +30,7 @@ void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2) {
     }
     p->m_bActive = 1;
     p->m_Data.m_nDeathmatchCharacter = character;
-    p->m_pCamera = (struct CCamera *) CCameraPool__AllocCamera(gEngineApp_m_Game_m_CameraPool);
+    p->m_pCamera = (struct CCamera *) CCameraPool__AllocCamera(&gEngineApp_m_Game_m_CameraPool);
     CBarrel__Reset(&p->m_Barrel);
     for (i = 0; i < 0x400; i++) {
         p->m_Data.m_SpecialPickupCount[i] = 0;
@@ -42,7 +42,7 @@ void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2) {
     for (i = 0; i < 6; i++) {
         p->m_Data.m_KeySet6LevelFlags[i] = 0;
     }
-    if (!gEngineApp_m_Settings_multiplayer) {
+    if (!gEngineApp_m_Settings.multiplayer) {
         p->m_Data.m_Lives = 3;
     } else {
         p->m_Data.m_Lives = 1;

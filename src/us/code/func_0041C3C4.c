@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
 extern char D_800B4008[];
 extern char D_800B4020[];

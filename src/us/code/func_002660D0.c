@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/ai.h"
 
 s32 Action_Draw(s32, s32, s32);
-extern CAIModeInfo gActionModeTable[];
 extern void Action_Step(void);
 
 /* AI init: mode table, step/draw callbacks, cleared mode scratch. */

@@ -3,6 +3,9 @@
 #include "structs/world.h"
 #include "structs/game.h"
 #include "structs/collision.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/collision.h"
 
 /* An instance that can be hit: an actor (or the instance sweeping). */
 typedef struct HitInst {
@@ -26,9 +29,6 @@ typedef struct InstanceHit {
     /* 0x04 */ f32 t;
 } InstanceHit;
 
-extern CScene gScene;
-extern CCollisionResults *gCollisionResultsP;
-extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
@@ -91,7 +91,7 @@ void Collision_SweepActors(Sweep *sweep) {
             if (*inst->particleDef & 0x40) {
                 continue;
             }
-            if (gEngineApp_m_Settings_multiplayer) {
+            if (gEngineApp_m_Settings.multiplayer) {
                 continue;
             }
             switch (*other->def) {

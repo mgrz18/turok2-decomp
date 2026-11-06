@@ -1,8 +1,8 @@
 /* Acclaim debugger I/O: copy from cartridge space (see HostIo_ReadBlock, its no-DMA twin). */
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -msplit-addresses */
 #include "common.h"
+#include "globals/hostio.h"
 
-extern volatile s32 sHostIoPiReady;     /* PI manager started */
 extern u8 sHostIoDmaMsg[];             /* OSIoMesg for the DMA */
 extern u8 sHostIoDmaQueue[];             /* OSMesgQueue the DMA completes on */
 

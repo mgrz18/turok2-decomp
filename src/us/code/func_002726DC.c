@@ -3,8 +3,7 @@
 #include "common.h"
 #include "structs/sound.h"
 #include "structs/camera.h"
-
-extern f32 sSoundHearingRangeSq; /* hearing range squared */
+#include "globals/audio.h"
 
 f32 HalfToFloat(s32 x);
 s32 Cinema_IsActive(void);

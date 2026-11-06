@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/region.h"
+#include "globals/region.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-extern CGameRegion *sCachedRawNormalRegion;    /* triangle whose normal is cached */
 extern CVector3 sRegionNormal;         /* its normal */
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */

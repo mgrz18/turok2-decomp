@@ -1,9 +1,9 @@
 #include "common.h"
+#include "globals/boss.h"
 
 s32 CAI__SetMode(s32, s32, s32);
 s32 MotherBoss_TeleportTarget(s32, s32);
 
-extern s32 gMotherBoss;
 
 void MotherBoss_Mode16_TeleportTarget(s32 arg0, void *arg1)
 {

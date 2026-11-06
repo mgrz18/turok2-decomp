@@ -2,15 +2,16 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/game.h"
+#include "globals/pak.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x0 */ s32 size;
 } SaveSize;
 
 extern SaveSize D_800F70A8;
-extern s32 *gSaveBufferHandle;        /* buffer handle */
 extern char D_800C13F0[];
-extern char gLoadSavePersistentData[];
 extern void CCache__Flush(s32);
 extern void CCache__Deallocate(s32, void *);
 extern s32 *CCache__Allocate(s32, s32, s32, void *);
@@ -42,10 +43,10 @@ void SaveGame_Build(CPlayer *p) {
     gSaveBuffer->player = p->m_Data;
     gSaveBuffer->settings = *(GameSettingsBlock *)&gEngineApp_m_Settings;
     save = gSaveBuffer;
-    save->frames = gEngineApp_m_Settings_match.frames;
-    save->seconds = gEngineApp_m_Settings_match.seconds;
-    save->minutes = gEngineApp_m_Settings_match.minutes;
-    save->hours = gEngineApp_m_Settings_match.hours;
+    save->frames = gEngineApp_m_Settings.match.frames;
+    save->seconds = gEngineApp_m_Settings.match.seconds;
+    save->minutes = gEngineApp_m_Settings.match.minutes;
+    save->hours = gEngineApp_m_Settings.match.hours;
     /* D_800F70A8 is a struct field here, so it is reloaded after the store into the header. */
     save->size = size;
     save->levelFlagsSize = D_800F70A8.size;

@@ -4,27 +4,16 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/player.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/collision.h"
+#include "globals/engine.h"
+#include "globals/pickup.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
     /* 0x0C */ CVector3 max;
 } Box;
-
-typedef struct ContactHandler ContactHandler;
-struct ContactHandler {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s16 type;
-    /* 0x06 */ u8 pad6[0x10 - 6];
-    /* 0x10 */ s32 (*func)(CPlayer *player, ContactHandler *handler);
-};
-
-extern f32 gFrameIncrement;                  /* the frame's time step */
-extern f32 gParticleTimeScale;
-extern CCollisionResults gCollisionResults;
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;              /* current player */
-extern ContactHandler sParticleAmmoPickups[4];
-extern CCollisionResults *gCollisionResultsP;
-extern u8 gScene_m_ParticleSystem[];
 
 s32 Random_Next(void);
 s32 Collision_MoveInstance(CParticle *p, CVector3 pos, u32 *flags);
@@ -58,7 +47,7 @@ void CParticle__Update(CParticle *p) {
     Box bounds;
     CGameObjectInstance *target;
     CPlayer *player;
-    ContactHandler *handler;
+    CPickupRow14 *handler;
     f32 extent;
     f32 scaled;
     f32 half;
@@ -182,7 +171,7 @@ void CParticle__Update(CParticle *p) {
         p->m_Alignment = -3;
     }
     if (p->m_dwFlags & 0x60000) {
-        for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
+        for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; player != NULL; player = player->m_pNext) {
             if (player->m_Data.m_Health != 0 && player->m_Mode != 2) {
                 top = player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.m_CollisionYOffset;
                 if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + GameObject_GetCollisionHeight(player) + 20.479999f) {
@@ -191,7 +180,7 @@ void CParticle__Update(CParticle *p) {
                     if (dist < GameObject_GetCollisionRadius(player) + 51.199997f) {
                         handler = sParticleAmmoPickups;
                         for (i = 3; i != -1; handler++, i--) {
-                            if (handler->type == p->header.m_nObjType && handler->func(player, handler)) {
+                            if (handler->m_Id == p->header.m_nObjType && handler->m_pHandler(player, handler)) {
                                 p->m_dwFlags |= 0x1000;
                                 return;
                             }
@@ -220,7 +209,7 @@ void CParticle__Update(CParticle *p) {
         p->m_vSize.z += (grow - p->m_vSize.z) * gFrameIncrement;
         if (p->m_vSize.x < 0.0f || p->m_vSize.y < 0.0f || p->m_vSize.z < 0.0f) {
             CParticle__FireExpireEvent(p);
-            CParticleSystem__Free(gScene_m_ParticleSystem, p);
+            CParticleSystem__Free(gScene.m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
             return;
         }

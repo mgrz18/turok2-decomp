@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/pak.h"
 
 s32 Controller_DisableMenuSounds(void *, void *);              /* extern */
-extern s32 gPakMessageKind;
 
 void PakMessage_InitNoController_2(void *arg0)
 {

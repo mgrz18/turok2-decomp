@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
-extern s32 sEnterCheatResult;
 s32 EnterCheatMenu_Backspace(void) {
     s32 index;
     s32 next;

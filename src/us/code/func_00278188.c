@@ -1,9 +1,8 @@
 #include "common.h"
 #include "gfx.h"
+#include "globals/menu.h"
 
 
-extern Gfx *gDList;
-extern s32 gLoadedFont;
 s32 COnScreen__GetFontTexture(void);
 
 /* Loads the texture COnScreen__GetFontTexture returns into TMEM, as gDPLoadTextureBlock

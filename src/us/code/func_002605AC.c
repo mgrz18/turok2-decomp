@@ -1,4 +1,5 @@
 #include "common.h"
+#include "structs/light.h"
 
 s32 CGameObjectInstance__DrawModelImmediate(s32, s32, s32);
 
@@ -7,8 +8,6 @@ typedef struct {
     /* 0x4 */ f32 fadeScale;
 } Unk800A7990;
 extern Unk800A7990 D_800A7990;
-extern s32 gBlendState;
-extern f32 gBlendFade;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x40];
@@ -23,6 +22,6 @@ void EnemyAI_DrawFadeOut(s32 arg0, Unk002605AC *arg1, s32 arg2) {
     if (var_f1 < 0.0f) {
         var_f1 = 0.0f;
     }
-    gBlendFade = var_f1;
+    gBlendState_m_Color[3] = var_f1;
     CGameObjectInstance__DrawModelImmediate(arg0, (s32) arg1, arg2);
 }

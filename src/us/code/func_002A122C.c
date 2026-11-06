@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/adec.h"
 
 extern void adecDecodeFrame(void *arg0);
 extern void adecImdctFrame(void *arg0, void *arg1);
-extern unsigned short sAdecFrameCounter;
 extern DecodeState sAdecState;
 extern char D_80125EF0;
 void *adecNextFrame(void) {

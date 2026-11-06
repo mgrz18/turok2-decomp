@@ -1,14 +1,14 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "globals/scene.h"
+#include "globals/ai.h"
 
 /* AI init for a family of actors: installs the AI callbacks and seeds the
  * timers/flags from the actor definition. Types 0x44E..0x456 (except 0x44F and
  * 0x452) are left alone. */
 
 extern struct { u8 value; } gEngineApp_m_Settings_multiplayer;
-extern u8 gEnemyGroundModeTable[];
-extern u8 gScene[];
 
 extern void EnemyAI_Update();
 extern void EnemyAI_CalcOrientationMatrix();
@@ -50,7 +50,7 @@ void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {
         ai->m_pfHit = NULL;
         ai->m_pfCollision = NULL;
         ai->m_pfHurt = NULL;
-        CScene__SetInstanceSavedBit(gScene, actor, 0);
+        CScene__SetInstanceSavedBit(&gScene, actor, 0);
     } else {
         ai->m_pfHit = EnemyAI_OnHit;
         ai->m_pfCollision = EnemyAI_CheckGrab;

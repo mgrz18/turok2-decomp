@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/engine.h"
 
 s32 NodePool_Free(void *, void *);              /* extern */
-extern f32 gFrameIncrement;
 
 /* A repeating timer: counts down by the frame time, fires its callback,
  * and is removed after its last repeat. */

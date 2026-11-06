@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* AI state: once the anim is done, reset every active slot of the module state, then go to anim state 0x16. */
 
-extern s32 gMotherBoss_activeMask; /* active slot mask */
-extern u8 sMotherBossSpotFlashScript[];
+extern s32 gMotherBoss_activeMask; /* local type: the field's real type (or the member path) changes the ROM's code here */ /* active slot mask */
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 

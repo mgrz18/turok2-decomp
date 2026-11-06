@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/engine.h"
 
 s32 CList__AddHead(s32, s32);
 s32 CList__Remove(s32, s32);
 s32 LevelEvent_Fire(s32);
 
-extern f32 gFrameIncrement;
 
 /* A timed list entry: counts down and is freed at zero. */
 typedef struct TimedNode {

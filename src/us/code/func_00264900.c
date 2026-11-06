@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/scene.h"
 
 s32 CScene__SetInstanceSavedBitInLevel(s32 *, u16, u16, s32); /* extern */
-extern s32 gScene;
 
 typedef struct {
     /* 0x0 */ u8 pad0[4];

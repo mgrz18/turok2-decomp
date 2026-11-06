@@ -1,7 +1,6 @@
-typedef signed int s32;
-typedef float f32;
+#include "common.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;
 
 s32 Timer_Countdown(f32 *timer) {
     f32 t = *timer - gFrameIncrement;

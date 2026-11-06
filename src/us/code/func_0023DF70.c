@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "structs/rect.h"
+#include "globals/collision.h"
 
 typedef struct HitDef {
     /* 0x00 */ s32 kind;
@@ -20,7 +21,6 @@ typedef struct HitInst {
     /* 0x30 */ struct HitInst *standingOn;
 } HitInst;
 
-extern CCollisionResults *gCollisionResultsP;
 
 f32 GameObject_GetCollisionHeight(HitInst *inst);
 f32 GameObject_GetCollisionRadius(HitInst *inst);

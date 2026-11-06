@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
+#include "globals/menu_desc.h"
 
 s32 MenuPool_OpenMenu(s32, s32, s32, s32, s32);
 
 s32 Controller_WatchPak(s8);                          /* extern */
-extern s32 gPakMsgRumblePakBDesc;
-extern s32 gEngineApp_m_Game_m_MenuPool;
 
 s32 SingleMenu_NewGame(s32 arg0, Menu *arg1) {
     Controller_WatchPak(arg1->controller->port);

@@ -2,20 +2,16 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/cache.h"
 
-extern int gCache_mutex_count;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 arg0);
 extern void __osRestoreInt(u32);
-extern s32 gCache_memAgeList;
-extern s32 gCache_ageCount;
-extern s32 gHashMask;
 extern s32 gHashTable;
 extern void CList__MoveToHead(void *, s32);
 void CCache__Touch(s32 arg0, s32 arg1) {
     extern s32 osSendMesg(OSMesgQueue *, s32, s32);
-    extern OSMesgQueue gCache_mutex;
     s32 temp_v1;
     s32 temp_v1_2;
     u32 temp_a0;

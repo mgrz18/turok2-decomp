@@ -3,16 +3,12 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/audio.h"
 OSTime osGetTime(void);
 u32 osAiGetStatus(void);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern u32 audFrameCt;
-extern s32 sAmFramesHandled;
-extern u32 sAmBusyTime;
 extern u8 gScheduler[];
-extern OSMesgQueue gAudioFrameMsgQ;
 extern s32 gAudioInfo[];
-extern u8 gAudioGlobals[];
 typedef struct B12Timer2 {
     struct B12Timer2 *next;
     u8 pad4[4];
@@ -60,5 +56,5 @@ void __amMain(void) {
             break;
         }
     } while (done == 0);
-    alClose(gAudioGlobals);
+    alClose(&gAudioGlobals);
 }

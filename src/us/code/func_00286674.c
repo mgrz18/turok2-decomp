@@ -4,40 +4,32 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/pak.h"
+#include "globals/frame.h"
+#include "globals/scene.h"
+#include "globals/render.h"
+#include "globals/engine.h"
+#include "globals/controller.h"
+#include "globals/libultra.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
 } EngineMsg;
 
-extern s32 osTvType;          /* osTvType */
 extern u8 gPoolBuffers[];
 extern void *gCFB[];      /* frame buffers */
 extern f32 gCurrentFB[];
 extern EngineMsg *gGfxMsg;
-extern s32 gDisplayListCount;
 extern s32 gCurrentTick;
 extern s32 gNumTicks0;
 extern s32 D_800F6CA8;
 extern s32 gNumTicks2;
 extern s32 gNumTicks3;
-extern s32 gNumTicksPending;
 extern s32 gCurrentTickWaiting;
-extern s32 gNumTicksWaiting;
-extern s32 gNextFrameToShow;
-extern s32 gPendingFB;
-extern u32 gTotalFramebuffers;          /* frame buffer count */
-extern s32 gScreenWidth;          /* width */
-extern s32 gScreenHeight;          /* height */
-extern u8 gScene[];
-extern u8 gValidControllerBits;
-extern s32 gPakCheckHasPak;
-extern s32 gPakCheckDone;
-extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
 extern f32 gPakCheckTimer;
 extern u8 gGfxFrameMessageQueue[];         /* the engine message queue */
-extern u8 gBootSignature;
 
 extern void InitializeSystemResources(void);
 extern void osCreateViManager(s32 pri);
@@ -106,7 +98,7 @@ void CEngineApp__Main(CEngineApp *e) {
     e->m_CartridgeIndex = 0xFCBFB4;
     CCameraPool__NewGame((u8 *)e + 0x22C00, 0);
     CPlayerPool__NewGame((u8 *)e + 0x22BC0, 0, 0);
-    CScene__Construct(gScene, e->m_CartridgeIndex);
+    CScene__Construct(&gScene, e->m_CartridgeIndex);
     if (gValidControllerBits == 0) {
         Cont_InitAll();
     }
@@ -150,7 +142,7 @@ void CEngineApp__Main(CEngineApp *e) {
              * merges them); without it GCC also keeps the case constant 2 in $s1 across the loop
              * (12 words differ). Found by the permuter; no natural form found. */
             if (gGfxMsg != NULL) {
-                gBootSignature = 0;
+                gBootSignature[0] = 0;
                 Controller_ResetAllRumble();
                 Controller_SetRumbleOptionAll(0);
                 e->m_Settings.fastFade = 1;
@@ -158,7 +150,7 @@ void CEngineApp__Main(CEngineApp *e) {
                 e->m_Settings.unk1C8 = 1;
                 break;
             } else {
-                gBootSignature = 0;
+                gBootSignature[0] = 0;
                 Controller_ResetAllRumble();
                 Controller_SetRumbleOptionAll(0);
                 e->m_Settings.fastFade = 1;

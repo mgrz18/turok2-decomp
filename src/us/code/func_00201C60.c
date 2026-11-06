@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/cache.h"
+#include "globals/engine.h"
 
 /* CDecompressor__Main, after Turok 3's (Drahsid/turok3, src/us/decompressor.c),
  * which also calls func_241BD8() each round; Turok 2 does not. The offsets
@@ -11,7 +12,6 @@ typedef struct {
     /* 0x1448 */ s32 lastDecompression;
 } CDecompressor;
 
-extern s32 gFrameCount;                          /* gFrameCount */
 s32 osRecvMesg(void *queue, void *msg, s32 flags);
 s32 osSendMesg(void *queue, void *msg, s32 flags);
 

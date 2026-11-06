@@ -2,10 +2,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
-extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 s32 OptionsMenu_ToggleWeaponSelect_2(void *unused, Menu *menu) {
-    CPlayerOptions *settings = &gEngineApp_m_Settings_defaultSlot;
+    CPlayerOptions *settings = &gEngineApp_m_Settings.defaultSlot;
     if (menu->player != 0) {
         settings = menu->player->m_pOptions;
     }

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 /* A CPathTrack (callers pass &ai->m_PathTrack): steps the current point along
  * its path, ping-pong or looping as the path says. Not a sprite animation
@@ -15,14 +16,13 @@ typedef struct AnimDef {
     s16 frameCount; /* 0x2: its points */
 } AnimDef;
 
-extern u8 gScene[];
 extern AnimDef *func_00226134(void *table, u8 id);
 
 void CPathTrack__Advance(AnimPlayer *player) {
     AnimDef *anim;
     s32 count;
 
-    anim = func_00226134(gScene, player->animId);
+    anim = func_00226134(&gScene, player->animId);
     count = anim->frameCount;
     switch (player->state) {
     case 1:

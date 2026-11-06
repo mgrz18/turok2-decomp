@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "globals/math.h"
 
-extern f32 gQuaternionSin;
 
 f32 func_00298470(f32 x);   /* sqrtf */
 f32 Math_AcosLookup(f32 x);   /* acosf */

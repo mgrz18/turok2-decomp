@@ -44,4 +44,45 @@ typedef struct CPickupEntry {
     /* 0x0C */ CPickupParams m_Params;
 } CPickupEntry; /* size 0x14 */
 
+/* The pickup tables' rows (globals/pickup.h), keyed by the pickup's id: a
+ * descriptor's head, what the row gives, then the handler that takes it
+ * (CPlayer__CollectPickup; the row is the handler's descriptor). */
+typedef struct CPickupRow18 {               /* weapons (m_Weapon), health (m_Health) */
+    /* 0x00 */ void *m_pMessage;
+    /* 0x04 */ s16 m_Id;
+    /* 0x06 */ s16 m_Sound;
+    /* 0x08 */ s16 m_Callback;
+    /* 0x0A */ u8 _padA[2];
+    /* 0x0C */ CPickupParams m_Params;
+    /* 0x14 */ s32 (*m_pHandler)(void *player, struct CPickupRow18 *row);
+} CPickupRow18; /* size 0x18 */
+
+typedef struct CPickupRow14 {               /* ammo (m_Ammo), life force (m_Amount) */
+    /* 0x00 */ void *m_pMessage;
+    /* 0x04 */ s16 m_Id;
+    /* 0x06 */ s16 m_Sound;
+    /* 0x08 */ s16 m_Callback;
+    /* 0x0A */ u8 _padA[2];
+    /* 0x0C */ union {
+        CPickupAmmo m_Ammo;
+        s16 m_Amount;
+    } m_Params;
+    /* 0x10 */ s32 (*m_pHandler)(void *player, struct CPickupRow14 *row);
+} CPickupRow14; /* size 0x14 */
+
+typedef struct CPickupRow10 {               /* items, by m_Id */
+    /* 0x00 */ void *m_pMessage;
+    /* 0x04 */ s16 m_Id;
+    /* 0x06 */ s16 m_Sound;
+    /* 0x08 */ s16 m_Callback;
+    /* 0x0A */ u8 _padA[2];
+    /* 0x0C */ s32 (*m_pHandler)(void *player, struct CPickupRow10 *row, void *pickup);
+} CPickupRow10; /* size 0x10 */
+
+/* {mask, pickup id}: AI_DropPickupsOnce drops the pickup for each mask bit set; 0-ended. */
+typedef struct CDropPickup {
+    /* 0x0 */ u32 m_Mask;
+    /* 0x4 */ s32 m_Id;
+} CDropPickup; /* size 0x8 */
+
 #endif

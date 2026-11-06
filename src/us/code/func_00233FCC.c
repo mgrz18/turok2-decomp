@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/engine.h"
 
-extern s32 gEvenOdd;
 extern void CMtxF__SetScale(void *, f32, f32, f32);
 extern void CMtxF__Identity(void *);
 extern void Trail_ComputeNodeFrame(Node438C *, Node438C *, struct GameplayCamera *, void *);

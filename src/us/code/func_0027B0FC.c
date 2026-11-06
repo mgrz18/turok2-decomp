@@ -3,8 +3,7 @@
 
 #include "common.h"
 #include "gfx.h"
-
-extern Gfx sHudGlyph16x16LoadDL[];        /* loads the 16x16 texture */
+#include "globals/hud.h"
 
 void Hud_DrawGlyph16x16(s32 texture, f32 x, f32 y, f32 sx, f32 sy) {
     Gfx *g;

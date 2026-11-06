@@ -1,14 +1,5 @@
+#include "globals/cache.h"
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
 s32 CCache__AllocMemEntry(s32, s32);
 s32 CCache__HeapAlloc(s32, s32, s32, s32);
 s32 osRecvMesg(s32, s32, s32);
@@ -17,8 +8,6 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 s32 CCache__FreeMemEntry(s32, s32);
 s32 CCache__AddToAddressList(s32, s32);
-extern s32 gCache_mutex;
-extern s32 gCache_mutex_count;
 s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
 {
   s32 temp_a0;

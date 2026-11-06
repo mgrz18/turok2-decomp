@@ -1,14 +1,15 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
+#include "globals/engine.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_StopSound(CGameObjectInstance *obj, CAI *ai);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1F50[];
-extern f32 gFrameIncrement;          /* per-frame scale */
-extern s32 gLevelScript_values[];
+extern s32 gLevelScript_values[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 D_8012F9A8[];
 
 void Primagen_UpdateMode2(CGameObjectInstance *obj, CAI *ai) {

@@ -5,13 +5,13 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/collision.h"
+#include "globals/boss.h"
 
 /* Boss hit callback: finds which weak spot the hit part covers, takes the
  * damage off the matching live spot for the current phase, and when a spot
  * dies plays the stagger animation and clears its bit; when all spots of the
  * phase are gone, moves the boss to its next state. */
 
-extern u8 sMotherBossHurtScript[];
 
 extern void MotherBoss_StartSpotAnims(void *obj, void *sounds, s32 flags);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);

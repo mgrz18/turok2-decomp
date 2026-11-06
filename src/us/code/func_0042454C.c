@@ -1,11 +1,9 @@
 #include "common.h"
+#include "globals/render.h"
 
 s32 GetMemSize(void); /* osGetMemSize */
 void Video_ApplyResolution(void);
 
-extern s32 gResolution; /* current video mode */
-extern s32 gAppliedResolution; /* applied video mode */
-extern s32 gVideoClearFrames;
 
 void Video_UpdateResolution(void) {
     if (gResolution == -1) {

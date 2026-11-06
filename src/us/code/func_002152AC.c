@@ -2,13 +2,15 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/level_actor.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
  * geometry. Type 12 animates by its speed; the others pick a variant, which
  * models 0x6A9..0x6AA override from the game flags (cf. Rage Wars'
  * func_8024F634_de and func_8024F858_de). */
-
 
 s32 *CLevelActor__LoadGeometry(CLevelActor *);
 void CQuaternion__ToMatrix(void *, f32 *);
@@ -24,12 +26,6 @@ void CCache__Unlock(s32, void *);
 s32 CScene__GetObjectTypeID(void *, s32);
 s32 *CISet__GetBlock(s32, s32);
 
-extern u8 D_800B6D1B;
-extern s32 gEvenOdd;
-extern u8 gScene_m_qSky[];
-extern u8 gScene[];
-extern s32 gEngineApp_m_Settings;
-
 void CLevelActor__Draw(CLevelActor *obj) {
     s32 *geometry;
     f32 matrix[16];
@@ -40,9 +36,9 @@ void CLevelActor__Draw(CLevelActor *obj) {
     if (geometry == NULL) {
         return;
     }
-    if (obj->m_DrawnFrame != D_800B6D1B) {
+    if (obj->m_DrawnFrame != (u8)gFrameCount) {
         if (obj->header.m_pIntelligence->m_Type == 8) {
-            CQuaternion__ToMatrix(gScene_m_qSky, matrix);
+            CQuaternion__ToMatrix(&gScene.m_qSky, matrix);
         } else {
             CMtxF__SetRotateY(matrix, obj->m_RotY);
         }
@@ -53,19 +49,19 @@ void CLevelActor__Draw(CLevelActor *obj) {
         CMtxF__ToMtxAffine(matrix, obj->m_Matrices[gEvenOdd]);
     }
     if (obj->header.m_pIntelligence->m_Type == 12) {
-        if (obj->m_DrawnFrame != D_800B6D1B) {
+        if (obj->m_DrawnFrame != (u8)gFrameCount) {
             Model_AdvanceMorph(geometry, obj->m_AnimSpeed);
         }
         Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, gEvenOdd, obj->header.m_pIntelligence->m_nTexture);
     } else {
         variant = obj->header.m_pIntelligence->m_nModel;
-        index = CScene__GetObjectTypeID(gScene, obj->header.m_nObjType);
+        index = CScene__GetObjectTypeID(&gScene, obj->header.m_nObjType);
         if (index < 0x6AB) {
             if (index >= 0x6A9) {
-                if ((gEngineApp_m_Settings & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {
+                if ((gEngineApp_m_Settings.cheatFlags & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {
                     variant = 1;
                 }
-                if ((gEngineApp_m_Settings & 0x1000) && *CISet__GetBlock(*geometry, 2) >= 3) {
+                if ((gEngineApp_m_Settings.cheatFlags & 0x1000) && *CISet__GetBlock(*geometry, 2) >= 3) {
                     variant = 2;
                 }
             }
@@ -73,5 +69,5 @@ void CLevelActor__Draw(CLevelActor *obj) {
         Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, variant, obj->header.m_pIntelligence->m_nTexture);
     }
     CCache__Unlock(0, geometry);
-    obj->m_DrawnFrame = D_800B6D1B;
+    obj->m_DrawnFrame = (u8)gFrameCount;
 }

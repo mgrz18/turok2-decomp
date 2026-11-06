@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libaudio.h"
 
 extern s16 _getRate(f64 vol, f64 tgt, s32 count, u16 *ratel);
-extern s16 eqpower[128];
 extern char D_800AA540[];
 extern char D_800AA544[];
 extern void __assert(const char *, const char *, s32);

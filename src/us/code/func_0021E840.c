@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/math.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_9.CPP, func_8024B53C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -64,7 +65,6 @@ extern void CMtxF__ScaleAxes(void *arg0, f32 sx, f32 sy, f32 sz);
 extern s32 CVector3__ClampLength(f32 *arg0, f32 arg1);
 extern void CMtxF__Translate(char *, f32, f32, f32);
 extern void CMtxF__SwapYZRows(void *);
-extern f32 gQuaternionSin;
 void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
     CQuatern trig;
     CQuatern product;

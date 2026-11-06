@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pager.h"
+#include "globals/pager.h"
 
 
 extern u8 D_14A000[];               /* the paged data in the ROM */

@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 /* Applies a hit from an attacker to a target: marks the attacker, shakes the
  * target player's camera for heavy and medium hits, sprays blood from a
@@ -20,8 +21,6 @@ typedef struct {
     /* 0x66 */ u8 kind;
 } HitDef;
 
-extern u8 gScene_m_ParticleSystem[];
-extern u8 gScene[];
 
 extern void CCamera__SetShake(PlayerCamera *camera, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos);
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *v);
@@ -58,11 +57,11 @@ static __inline__ void sprayBlood(CGameObjectInstance *target, CGameObjectInstan
     zero.x = 0;
     zero.y = 0;
     zero.z = 0;
-    CParticleSystem__Spawn(gScene_m_ParticleSystem, actor, actor, 0, 0, 0xE9, zero, rotation, point, region, -1, kind == 5 ? 3 : 1);
+    CParticleSystem__Spawn(gScene.m_ParticleSystem, actor, actor, 0, 0, 0xE9, zero, rotation, point, region, -1, kind == 5 ? 3 : 1);
     point.x = 0;
     point.y = 0;
     point.z = 0;
-    CScene__StartRumbles(gScene, player->m_ContState.m_pContState->rumblePool, 3, point, 10.24f, 1.0f);
+    CScene__StartRumbles(&gScene, player->m_ContState.m_pContState->rumblePool, 3, point, 10.24f, 1.0f);
 }
 
 void Blast_ApplyHit(CGameObjectInstance *target, CGameObjectInstance *source, s32 hit, CVector3 pos, CVector3 dir, s32 push, HitDef *def, u32 flags) {

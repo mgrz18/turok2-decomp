@@ -2,6 +2,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pager.h"
+#include "globals/pager.h"
 
 
 typedef struct FaultedThread {

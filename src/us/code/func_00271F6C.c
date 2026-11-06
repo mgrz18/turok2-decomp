@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/audio.h"
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern f32 HalfToFloat(s32);
@@ -10,7 +11,6 @@ extern float D_800A8100;
 extern float D_800A8104;
 extern float D_800A8108;
 extern float D_800A810C;
-extern float sPitchRatioTable[];
 extern struct Bytes12 *CAudioWorld__GetPitchEnvelope(ContextRecAt2BC0 *, s32);
 extern s16 FloatToHalf(f32);
 extern s32 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *);

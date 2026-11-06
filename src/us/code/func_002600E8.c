@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x4];
@@ -22,7 +23,6 @@ typedef struct {
     } flags;
 } Actor;
 
-extern s32 gScene[];
 
 void Actor_SpawnParticle(Actor *self, s32 type, CVector3 pos, s32 arg4);
 void TotemDefense_AddKill(void);
@@ -39,7 +39,7 @@ void EnemyAI_NukedFrozenRemove(Actor *self, void *ai) {
     def = self->def;
     if (!(self->flags.word & 0x80000)) {
         if (!(def->m_dwTypeFlags & 0x20)) {
-            CScene__SetInstanceSavedBit(gScene, self, 1);
+            CScene__SetInstanceSavedBit(&gScene, self, 1);
         }
         GameObject_FireTriggers(self, 1, self);
     }

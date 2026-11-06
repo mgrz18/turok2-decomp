@@ -1,13 +1,14 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern s32 CPlayerPool__GetIndex(CPlayerPool *list, CPlayer *player);
 
 /* Whether the frag limit is reached: by either team's total in team games,
  * otherwise by one player's frags (the slot CPlayerPool__GetIndex names left out). */
 s32 CPlayerPool__IsFragLimitReached(CPlayerPool *list) {
-    GameMatch *state = &gEngineApp_m_Settings_match;
+    GameMatch *state = &gEngineApp_m_Settings.match;
     CPlayer *p;
     s32 i;
 
@@ -30,10 +31,10 @@ s32 CPlayerPool__IsFragLimitReached(CPlayerPool *list) {
                     }
                 }
             }
-            if (team0 >= gEngineApp_m_Settings_match.scoreLimit) {
+            if (team0 >= gEngineApp_m_Settings.match.scoreLimit) {
                 return 1;
             }
-            if (team1 >= gEngineApp_m_Settings_match.scoreLimit) {
+            if (team1 >= gEngineApp_m_Settings.match.scoreLimit) {
                 return 1;
             }
         }

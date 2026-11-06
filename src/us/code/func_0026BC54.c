@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/region.h"
+#include "globals/region.h"
 
-extern CGameRegion *sCachedRawNormalRegion; /* triangle whose normal is cached */
 extern CVector3 sRegionNormal;  /* cached (unnormalized) normal */
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);

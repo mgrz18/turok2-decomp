@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -8,7 +9,6 @@ typedef struct {
 } TriggerData;
 
 s32 CScene__SetInstanceSavedBitInLevel(s32 *, u16, u16, s32); /* extern */
-extern s32 gScene;
 
 void InteractiveAnim_EventShowRemote(TriggerData *arg0) {
     CScene__SetInstanceSavedBitInLevel(&gScene, arg0->unkA, arg0->unk4, 0);

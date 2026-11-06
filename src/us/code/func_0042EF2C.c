@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/demo.h"
 #include "structs/game.h"
-
-extern s32 gAttractRunCount;
+#include "globals/game.h"
+#include "globals/engine.h"
 
 extern void Demo_DecodeButtons();
 extern void Demo_DecodeStick();

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/onscreen.h"
 
 s32 CGameObjectInstance__PickRandomAnim(s32, s32, s32);
 s32 COnScreen__SetBoss(s32, s32, s32);
@@ -7,7 +8,6 @@ s32 TotemDefense_DrawTotem(s32, s32, s32);
 s32 COnScreen__SetBoss2(s32 *, void *, s32 *); /* extern */
 extern s32 D_800C0560;
 extern s32 D_800C0568;
-extern s32 gEngineApp_m_OnScreen;
 
 void TotemDefense_InitFight(void *arg0, void *arg1)
 {

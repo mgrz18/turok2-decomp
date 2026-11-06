@@ -7,7 +7,7 @@ typedef struct {
     /* 0x01 */ s8 unk1;
 } Flags9E0;
 
-extern Flags9E0 gLevelScript_armed;
+extern Flags9E0 gLevelScript_armed; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_EnterMode5_2(CGameObjectInstance *arg0) {
     s32 *flags = &arg0->m_dwFlags;

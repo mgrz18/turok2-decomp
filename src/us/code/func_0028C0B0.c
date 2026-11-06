@@ -1,5 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/game.h"
+#include "globals/frame.h"
+#include "globals/scene.h"
+#include "globals/render.h"
+#include "globals/crash.h"
+#include "globals/engine.h"
 
 /* libultra __OSThreadContext: 64-bit registers, read here as their low words. */
 typedef struct ThreadContext {
@@ -27,33 +33,23 @@ typedef struct Thread {
 
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
 extern u8 D_800AA0F0[];
-extern s32 gScreenWidth;              /* screen width */
-extern s32 gScreenHeight;              /* screen height */
 extern u16 *gCFB;             /* frame buffer */
 extern u16 *sCrashFrameBuffer;             /* crash screen frame buffer */
-extern u16 sCrashTextColor;              /* text colour */
-extern u16 sCrashBgColor;              /* background colour */
 extern char gEngineTimestamp[];           /* build string */
 extern char D_8010FED4[];
-extern s32 gScene_m_bWarpSpawn;              /* warping */
-extern s32 gScene_m_LevelID;              /* warp id */
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* players */
-extern char *gAssertFile;            /* failed assertion: file */
 extern s32 D_800F1FF0;              /* failed assertion: line */
 extern char *D_800F1FF4;            /* failed assertion: expression */
-extern u8 gCrashCauseDesc[];             /* cause descriptions */
 extern u8 gThreadStackIdle[];             /* thread stacks */
 extern u8 gThreadStackMain[];
 extern u8 gThreadStackAudio[];
 extern u8 gSchedulerStack[];
-extern volatile s32 sCrashCanExit;  /* set when the crash screen may be left */
 
 extern u64 osGetTime(void);                 /* osGetTime */
 extern void Video_SetResolution(s32);
 extern void osViSwapBuffer(u16 *frameBuffer);    /* osViSwapBuffer */
 extern void Crash_PutChar(u8 c);                /* draws one character */
 extern void Crash_PrintString(char *s);             /* draws a string */
-extern void Crash_PrintFlags(u32 value, char *name, u8 *descriptions);
+extern void Crash_PrintFlags(u32 value, char *name, FlagDesc *descriptions);
 extern void Crash_PrintRegPair(char *name1, u32 value1, char *name2, u32 value2);
 extern void Crash_PrintStack(u8 *stack, s32 size, ThreadContext *context, u8 id);
 extern void osWritebackDCacheAll(void);
@@ -123,7 +119,7 @@ void Crash_ShowScreen(Thread *thread) {
         printString((u8 *)"NO WARP ID");
     }
     printString(D_800AA0F0);
-    for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead, i = 0; player != NULL; player = player->m_pNext, i++) {
+    for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead, i = 0; player != NULL; player = player->m_pNext, i++) {
         printString((u8 *)"PLAYER");
         printInt(i);
         printString((u8 *)" XYZ ");

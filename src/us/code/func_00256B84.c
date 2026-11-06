@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/game_object.h"
+#include "globals/collision.h"
 
-extern s32 gCollisionInfoLineOfSight;   /* collision info */
 extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *obj);   /* the object's height */
 extern s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 to, void *info);
 

@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/game.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_3/80268160.CPP, func_8026826C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -37,10 +38,9 @@ struct ObjectRecAt17C {
 extern s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5,
                          f32 arg6);
 extern f32 D_800A65D8;
-extern s32 gEngineApp_m_Settings_paused;
 void func_00238EE4(ObjectRecAt17C *arg0, ObjectRecAt17C *arg1, s32 arg2, CVector3 arg3,
                    ParamsRecAt4 arg6) {
-    s32 *global = &gEngineApp_m_Settings_paused;
+    s32 *global = &gEngineApp_m_Settings.paused;
     s32 selected;
     f32 scale;
     scale = (&D_800A65D8)[1];

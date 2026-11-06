@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/game.h"
 
 typedef struct Box {
     CVector3 corners[8];            /* 0x00 */
@@ -9,7 +10,6 @@ typedef struct Box {
 } Box;                          /* 0x70 bytes */
 
 
-extern u8 gEngineApp_m_Settings_multiplayer;
 
 void **CGameObjectInstance__LoadGeometry(CGameObjectInstance *actor);
 void *CISet__GetBlock(void *table, s32 index);
@@ -72,7 +72,7 @@ s32 CGameObjectInstance__GetNearestBox(CGameObjectInstance *actor, CVector3 pos,
     }
     if (best != NULL) {
         *out = *best;
-        if ((actor->m_dwFlags & 0x300000) && gEngineApp_m_Settings_multiplayer == 0) {
+        if ((actor->m_dwFlags & 0x300000) && gEngineApp_m_Settings.multiplayer == 0) {
             out->unk68 = 1.0f;
         }
     }

@@ -1,4 +1,6 @@
 #include "common.h"
+#include "globals/scene.h"
+#include "globals/hud.h"
 
 typedef struct {
     /* 0x00 */ s32 offset;
@@ -21,9 +23,7 @@ typedef struct {
     /* 0x04 */ u8 flag;
 } Chunk;
 
-extern u8 gScene[];
 extern u8 D_800F5618[0x90];
-extern u8 *sOnScreenFontTexture;
 
 Resource *CScene__LoadGraphicSet(void *cache, s32 id, s32, s32);
 void CCache__Unlock(s32, Resource *res);
@@ -40,7 +40,7 @@ void COnScreen__LoadFontTexture(void) {
     s32 index;
 
     sOnScreenFontTexture = NULL;
-    res = CScene__LoadGraphicSet(gScene, 2, 0, 1);
+    res = CScene__LoadGraphicSet(&gScene, 2, 0, 1);
     if (res != NULL) {
         table = res->table;
         index = 42 % table->count;

@@ -4,30 +4,24 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/menu.h"
+#include "globals/menu_desc.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
-extern s32 gPakMenuIsSave;
-extern u8 gPakProfile[];
-extern char gPakCharacterNoteName[];
-extern char gPakGameCode[];
-extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern u8 gPakMsgPakFullDesc[];
-extern u8 gPakMsgSaveDoneDesc[];
-extern u8 gPakMsgSaveFailedDesc[];
+extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern s32 gPakMenuPort; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
+extern s32 gPakMenuIsSave; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern u8 gPakProfile[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern char gPakCharacterNoteName[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
+extern char gPakGameCode[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 s32 Pak_BytesToPages(s32 n);
 s32 Pak_GetFreePages(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
 s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
 s32 Pak_SaveNoteVerified(s32 pad, s32 size, u8 *buf, char *n1, u8 *ext, char *n2);
 void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
-extern s32 gSaveBufferHandle;
-extern s32 gLoadBufferHandle;
-extern u8 gStatsAfterPakMenuDesc1[];
-extern u8 gStatsAfterPakMenuDesc2[];
-extern u8 gStatsAfterPakMenuDesc3[];
-extern u8 gStatsAfterPakMenuDesc4[];
+extern s32 gSaveBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
+extern s32 gLoadBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, s32 b);
 /* Static inlines in the Rage Wars source file (dropped by the importer). */
@@ -36,16 +30,16 @@ static inline u8 *O01Pick(O01Pad *sel) {
     switch (sel->v) {
     default:
     case 0:
-        p = gStatsAfterPakMenuDesc1;
+        p = (u8 *)&gStatsAfterPakMenuDesc1;
         break;
     case 1:
-        p = gStatsAfterPakMenuDesc2;
+        p = (u8 *)&gStatsAfterPakMenuDesc2;
         break;
     case 2:
-        p = gStatsAfterPakMenuDesc3;
+        p = (u8 *)&gStatsAfterPakMenuDesc3;
         break;
     case 3:
-        p = gStatsAfterPakMenuDesc4;
+        p = (u8 *)&gStatsAfterPakMenuDesc4;
         break;
     }
     return p;
@@ -102,7 +96,7 @@ s32 PakMenu_WriteProfile(s32 unused, Menu *own, s32 unused3) {
                 }
             }
             if (ok != 0) {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakFullDesc, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgPakFullDesc, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -110,9 +104,9 @@ s32 PakMenu_WriteProfile(s32 unused, Menu *own, s32 unused3) {
     O01FreeAll();
     if (flag != 0) {
         if (r == 0) {
-            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgSaveDoneDesc, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         } else {
-            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgSaveFailedDesc, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         }
     }
     return 1;

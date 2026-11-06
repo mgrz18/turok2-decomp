@@ -2,6 +2,11 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/game.h"
+#include "globals/boss.h"
+#include "globals/onscreen.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 /* One file: BlindOne_UpdateMover, BlindOne_GetHealthPercent, BlindOne_Setup and BlindOne_PhaseWaitPlayerUpdate.
  * BlindOne_Setup's only literal, the string "Blind", sits at 0x800C08D4, 4 past
@@ -17,8 +22,6 @@
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern BlindOneState gBlindOne;
-extern f32 gFrameIncrement; /* frame time */
 extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
 void BlindOne_UpdateMover(BlindOneMover *mover) {
@@ -93,7 +96,6 @@ void BlindOne_UpdateMover(BlindOneMover *mover) {
     }
 }
 
-
 /* Returns the second boss' remaining health in percent, summed over its three groups of actors (an actor
  * counts while it has health and flag 0x100). */
 
@@ -123,16 +125,12 @@ s32 BlindOne_GetHealthPercent(BlindOneState *state) {
     return alive * 100 / total;
 }
 
-
 /* Second boss setup: collects its three groups of actors (types 0x454-0x456), sets their health and slots,
  * finds its two level objects, shows its health bar ("Blind") and enters the first phase of its script. */
 
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern BlindOnePhase sBlindOnePhases[];
-extern u8 gScene[];
-extern u8 gEngineApp_m_OnScreen[];
 extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void ScriptAnimator_Start(void *slot, s32 arg1);
 extern void *CScene__FindIntelligence(void *level, s32 arg1, s32 id);
@@ -168,9 +166,9 @@ void BlindOne_Setup(BlindOneState *state) {
     CGameObjectInstance *actor;
     s32 i;
 
-    state->count1 = CScene__FindInstances(gScene, 0x454, 1, -1, state->actors1, 4);
-    state->count2 = CScene__FindInstances(gScene, 0x455, 1, -1, state->actors2, 4);
-    state->count3 = CScene__FindInstances(gScene, 0x456, 1, -1, state->actors3, 3);
+    state->count1 = CScene__FindInstances(&gScene, 0x454, 1, -1, state->actors1, 4);
+    state->count2 = CScene__FindInstances(&gScene, 0x455, 1, -1, state->actors2, 4);
+    state->count3 = CScene__FindInstances(&gScene, 0x456, 1, -1, state->actors3, 3);
     obj = state->boss;
     state->faderCount = 0;
     obj->m_AI.m_Health = obj->m_AI.m_InitialHealth = 0x3200;
@@ -199,24 +197,22 @@ void BlindOne_Setup(BlindOneState *state) {
     for (i = 0; i < state->faderCount; i++) {
         ScriptAnimator_Start(&state->faders[i], 0);
     }
-    state->minionDefA = CScene__FindIntelligence(gScene, 1, 0x1CE9);
-    state->minionDefB = CScene__FindIntelligence(gScene, 1, 0x1CEA);
+    state->minionDefA = CScene__FindIntelligence(&gScene, 1, 0x1CE9);
+    state->minionDefB = CScene__FindIntelligence(&gScene, 1, 0x1CEA);
     state->toSpawn = 0;
     state->minionsAlive = 0;
     state->maxMinions = 0;
     state->alive1 = 0;
     state->alive2 = 0;
     state->alive3 = 0;
-    COnScreen__SetBoss(gEngineApp_m_OnScreen, state->boss, "Blind");
-    CScene__UnmarkGeneratorsSaved(gScene);
+    COnScreen__SetBoss(&gEngineApp_m_OnScreen, state->boss, "Blind");
+    CScene__UnmarkGeneratorsSaved(&gScene);
     nextPhase_40CCC0(state);
 }
-
 
 /* Second boss phase update: steps the script to the next phase once the player comes within 716.8 of the
  * origin. */
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 extern f32 func_00298470(f32 x); /* sqrt */
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
@@ -244,7 +240,7 @@ static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
 }
 
 void BlindOne_PhaseWaitPlayerUpdate(BlindOneState *state) {
-    CPlayer *player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+    CPlayer *player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
 
     if (player != NULL &&
         func_00298470(player->m_CharacterActor.header.m_vPos.x * player->m_CharacterActor.header.m_vPos.x + player->m_CharacterActor.header.m_vPos.y * player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.header.m_vPos.z * player->m_CharacterActor.header.m_vPos.z) <

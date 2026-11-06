@@ -4,6 +4,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 
 extern s32 CPlayerPool__GetIndex(void *players, void *player);

@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 
 extern s32 D_800F1F50[];
 extern CVector3 *gPrimagenPaths[];  /* boss paths */
-extern s32 sPrimagenPathPoint;          /* point on the path */
-extern s32 gLevelScript_path;          /* path */
+extern s32 gLevelScript_path; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* path */
 
 void Primagen_EnterMode19(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;

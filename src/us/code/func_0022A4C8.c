@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/game.h"
 
 typedef struct ProjNode {
     /* 0x0000 */ u8 pad0[4];
@@ -51,7 +52,6 @@ typedef struct Projectile {
     /* 0x1B8 */ ProjSound *sound;
 } Projectile;
 
-extern ProjNode *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;               /* current player */
 
 extern f32 HalfToFloat(s32 halfFloat);
 extern f32 func_00298470(f32);             /* sqrtf */
@@ -125,7 +125,7 @@ void CParticle__Steer(Projectile *o) {
 
     switch (o->type) {
         case 0x2E:
-            p2 = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+            p2 = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
             if (p2 != NULL) {
                 tpp = &tp;
                 velp = &o->velocity;

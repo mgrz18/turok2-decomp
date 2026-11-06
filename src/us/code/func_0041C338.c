@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
-extern u8 gEngineApp_m_Settings_unk1B; /* gEngineApp_m_Settings + 0x1B */
 extern char D_800B3FD8[];
 extern char D_800B3FF0[];
 
@@ -12,7 +12,7 @@ s32 OptionsMenu_TwoPlayerLayoutText(MenuItem *a) {
     } else {
         a->flags |= 0x1000000;
     }
-    switch (gEngineApp_m_Settings_unk1B) {
+    switch (gEngineApp_m_Settings.unk1B) {
     case 0:
         a->text = D_800B3FD8;
         break;

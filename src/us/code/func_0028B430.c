@@ -1,16 +1,9 @@
-typedef int s32;
-typedef unsigned int u32;
-typedef unsigned short u16;
-typedef unsigned char u8;
+#include "globals/render.h"
+#include "common.h"
+#include "globals/crash.h"
 
-extern u32 sCrashCursorX;          /* debug console cursor column */
-extern u32 sCrashCursorY;          /* debug console cursor row */
-extern u16 sCrashBgColor;          /* background colour */
-extern u8 gCrashFont[0x60][16]; /* 8x16 font, ASCII 0x20-0x7F */
-extern s32 gScreenWidth;          /* framebuffer width */
-extern s32 gScreenHeight;          /* framebuffer height */
 extern u16 *sCrashFrameBuffer;         /* framebuffer */
-extern u16 sCrashTextColor;          /* foreground colour */
+extern u16 sCrashTextColor; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */          /* foreground colour */
 
 static __inline__ void newline(void) {
     sCrashCursorX = 2;

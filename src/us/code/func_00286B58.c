@@ -1,4 +1,8 @@
 #include "common.h"
+#include "globals/frame.h"
+#include "globals/render.h"
+#include "globals/engine.h"
+#include "globals/ucode.h"
 
 typedef struct {
     /* 0x00 */ u32 type;
@@ -49,25 +53,12 @@ typedef struct {
     /* 0x3C0 */ GfxTask *cur;
 } GfxState;
 
-extern u64 rspbootTextStart[]; /* rspboot */
-extern u64 gspF3DEX_NoN_fifoTextStart[]; /* gfx ucode text */
 extern u64 rspbootTextEnd[]; /* = 0x800BC400, same address as gspF3DEX_NoN_fifoTextStart: needs a linker symbol */
-extern u64 gspL3DEX_fifoTextStart[]; /* second gfx ucode text */
-extern u64 gspF3DEX_NoN_fifoDataStart[]; /* gfx ucode data */
-extern u64 gspL3DEX_fifoDataStart[]; /* second gfx ucode data */
 extern u64 gGfxYieldBuffer[]; /* yield buffer */
 extern u8 gGfxFrameMessageQueue[];  /* message queue */
 extern u8 gScheduler[];
 extern u32 gRspFifoSize;   /* fifo size */
 extern u64 *gRspFifoBuffer;  /* fifo buffer */
-extern u32 gFrameCount;   /* frame counter */
-extern s32 gEvenOdd;   /* double-buffer index */
-extern s32 gFrameCountGameplay;
-extern u32 gTotalFramebuffers;   /* task count */
-extern s32 gLineList0;
-extern s32 gLineList1;
-extern s32 gDisplayList1;
-extern s32 gDisplayList0;
 
 extern void osWritebackDCacheAll(void);
 extern void Sched_SubmitTask(void *, ScTask *);

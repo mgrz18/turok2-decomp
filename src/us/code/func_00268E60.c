@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
@@ -11,7 +12,6 @@ typedef struct {
 
 void *CScene__GetRegionInfo(void *table, void *key);
 s32 func_0021F1F8(void *arg);
-extern u8 gScene[];
 
 s32 GameObject_GetFloorKind(u8 *obj) {
     void *key = *(void **) (obj + 0x10);
@@ -20,7 +20,7 @@ s32 GameObject_GetFloorKind(u8 *obj) {
     u32 objFlags;
     u8 *other;
 
-    if (key != NULL && (info = CScene__GetRegionInfo(gScene, key)) != NULL) {
+    if (key != NULL && (info = CScene__GetRegionInfo(&gScene, key)) != NULL) {
         if (info->flags & 0x4000) {
             result = -1;
         } else if (info->flags & 0x400000) {

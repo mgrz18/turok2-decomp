@@ -4,17 +4,11 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/weapon.h"
+#include "globals/camera.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
+#include "globals/player.h"
 
-
-typedef struct {
-    /* 0x00 */ s16 mode;
-    /* 0x02 */ u8 pad2[0x16];
-} PoseInfo;   /* 0x18 bytes */
-
-extern PoseInfo gPlayerStateTable_anim[];
-extern u32 gFrameCountGameplay;
-extern s32 gScene;
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern struct {
     s32 enabled;
 } gEngineApp_m_Settings_match_tag;
@@ -29,12 +23,12 @@ extern void CCameraPool__AddText(void *buf, s32 camera, s32 model);
 static __inline__ void switchWeapon(CGameObjectInstance *obj, CAI *ai) {
     CPlayer *player = (CPlayer *) obj->m_AI.m_pParent;
 
-    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || gScene != 4) {
+    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || gScene.m_Mode != 4) {
         player->m_Data.m_CurrentWeapon = player->m_RequestedWeapon;
         ai->m_pModeTable = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->modeTable;
         ai->m_pfEffects = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->effects;
         if (gFrameCountGameplay >= 5) {
-            CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
+            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
         }
         ai->m_Weapon.m_BarrelAngle = 0;
         ai->m_Weapon.m_BarrelSpeed = 0;
@@ -52,7 +46,7 @@ void WeaponMode_Idle_Update(CGameObjectInstance *obj, CAI *ai) {
     s32 mode;
 
     player = (CPlayer *) obj->m_AI.m_pParent;
-    mode = gPlayerStateTable_anim[player->m_Mode].mode;
+    mode = gPlayerStateTable[player->m_Mode].pose;
     if (ai->m_AnimRepeatedCount && !CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon)) {
         player->m_RequestedWeapon = CPlayer__GetNextUsableWeapon(player);
     }

@@ -1,4 +1,5 @@
 #include "structs/game_object.h"
+#include "globals/boss.h"
 
 
 /* Fields addressed relative to gLevelScript_timer; the mode word sits 0xC before it. */
@@ -10,7 +11,6 @@ typedef struct {
     f32 unk_5C;                 /* 0x5C */
 } State;
 
-extern State gLevelScript_timer;
 extern f32 D_800C0540;          /* 1.0f */
 
 void Primagen_EnterMode24(CGameObjectInstance *actor) {
@@ -19,7 +19,7 @@ void Primagen_EnterMode24(CGameObjectInstance *actor) {
 
     actor->m_AI.m_AnimSpeed = one;
     actor->m_dwFlags |= 0x2000;
-    state = &gLevelScript_timer;
+    state = &gLevelScript.timer;
     state->unk_0 = one;
     if (((s32 *)state)[-3] == 3) {
         state->unk_50 = state->unk_5C;

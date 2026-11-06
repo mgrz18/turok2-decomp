@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "structs/game.h"
 
 typedef struct RenderCounters {
     char pad0[0x34];
@@ -18,8 +19,7 @@ typedef struct Shared_Game {
 } Shared_Game;
 
 extern Shared_Game D_8011A6D8;
-extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount;
-extern char gEngineApp[];
+extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern void func_00430330(char *);
 
 int StatsMenu_ContinueNo(int unused, Menu *menu) {
@@ -32,7 +32,7 @@ int StatsMenu_ContinueNo(int unused, Menu *menu) {
         }
     }
     if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount == 1) {
-        func_00430330(gEngineApp);
+        func_00430330(&gEngineApp);
     } else {
         menu->player->m_bActive = 0;
     }

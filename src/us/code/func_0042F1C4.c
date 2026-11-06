@@ -1,9 +1,7 @@
 #include "common.h"
 #include "structs/demo.h"
-
-extern s32 gFrameCountGameplay;
-extern f32 gFrameIncrement;
-extern s32 gMergedController_buttonsSingle;
+#include "structs/controller.h"
+#include "globals/engine.h"
 
 void func_00430330(void *);
 void CEngineApp__SetupFadeTo(void *, s32);
@@ -27,10 +25,10 @@ void Demo_Update(void) {
     s->fastForward = 0;
     s->time += gFrameIncrement;
     if (s->done == 0) {
-        if (--s->countdown <= 0 || gMergedController_buttonsSingle != 0) {
+        if (--s->countdown <= 0 || gMergedController.buttonsSingle != 0) {
             s->done = 1;
             func_00430330(&gEngineApp);
-            if (gMergedController_buttonsSingle != 0) {
+            if (gMergedController.buttonsSingle != 0) {
                 CEngineApp__SetupFadeTo(&gEngineApp, 8);
             }
         }

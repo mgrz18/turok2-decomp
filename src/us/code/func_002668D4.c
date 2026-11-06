@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 CGameObjectInstance__AdvanceAnimation(s32);
 s32 CScene__SetInstanceSavedBit(s32, s32, s32);
@@ -11,7 +12,6 @@ typedef struct AIModeParam {
     /* 0x6 */ u16 value;
 } AIModeParam;
 
-extern s32 gScene;
 
 void InteractiveAnim_EventPlay(CGameObjectInstance *arg0, s32 arg1, AIModeParam *arg2) {
     AI_PlayAnim(arg0, arg1, (s32) arg2->value);

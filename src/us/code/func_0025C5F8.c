@@ -2,16 +2,12 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/engine.h"
+#include "globals/ai.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
-
-/* A mode's callbacks and its animations for the three mode slots. */
-typedef struct {
-    /* 0x00 */ void (*enter)(Object *obj, AI *ai);
-    /* 0x04 */ void (*update)(Object *obj, AI *ai);
-    /* 0x08 */ s32 anim[3];
-} ModeHandler;
 
 typedef struct {
     /* 0x00 */ u8 pad0[8];
@@ -68,10 +64,6 @@ struct Object {
     /* 0x27C */ u32 fxFlags;
 };
 
-extern f32 gFrameIncrement;          /* frame time */
-extern f32 gEnemyTimeScale;          /* time scale */
-extern ModeHandler *gEnemyBehaviorInfo[];
-
 void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
 void CAI__SetMode(Object *obj, AI *ai, s32 state);
@@ -87,7 +79,7 @@ void AI_StopSound(Object *obj, AI *ai);
  * the burning effect and its sound going while burnTime lasts. */
 void EnemyAI_Update(Object *obj, AI *ai) {
     Object *target;
-    ModeHandler *handler;
+    CEnemyBehaviorInfo *handler;
     s32 index;
     s32 mode;
     s32 anim;
@@ -115,13 +107,13 @@ void EnemyAI_Update(Object *obj, AI *ai) {
     if (handler != NULL) {
         switch (index) {
             case 0:
-                anim = handler->anim[0];
+                anim = (s32) handler->m_pGroundModeTable;
                 break;
             case 1:
-                anim = handler->anim[1];
+                anim = (s32) handler->m_pAirModeTable;
                 break;
             case 2:
-                anim = handler->anim[2];
+                anim = (s32) handler->m_pUnderwaterModeTable;
                 break;
             default:
                 anim = 0;
@@ -129,12 +121,12 @@ void EnemyAI_Update(Object *obj, AI *ai) {
         }
         if (ai->anim != anim) {
             ai->anim = anim;
-            if (handler->enter != NULL) {
-                handler->enter(obj, ai);
+            if (handler->m_pfSetup != NULL) {
+                handler->m_pfSetup(obj, ai);
             }
         }
-        if (handler->update != NULL) {
-            handler->update(obj, ai);
+        if (handler->m_pfUpdate != NULL) {
+            handler->m_pfUpdate(obj, ai);
         }
     }
     if (!(ai->state == 0x11 || ai->state == 0x12)) {

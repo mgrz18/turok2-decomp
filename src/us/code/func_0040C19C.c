@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Picks one of the four spawn points at random, at least 460.8 away from the module object's target (when
  * it has one), and stores it in out. */

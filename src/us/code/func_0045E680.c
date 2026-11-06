@@ -1,6 +1,7 @@
 /* WRONG CUT: real function Pak_RefreshNotes_2, size 0x188: splat's func_0045E674 starts with 3 junk words (0x45E674-0x45E680, linker fill after the hand-written func_0045E630). */
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 extern s32 osPfsFileState_2(OSPfs *pfs, s32 file_no, OSPfsState *state); /* osPfsFileState */
 extern s32 osPfsFreeBlocks_2(OSPfs *pfs, s32 *bytes);                  /* osPfsFreeBlocks */

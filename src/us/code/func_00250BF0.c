@@ -2,20 +2,14 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x22];
-    /* 0x22 */ s16 strokeSound;
-} Tuning;
+#include "globals/game.h"
+#include "globals/engine.h"
+#include "globals/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x114];
     /* 0x114 */ CVector3 pos;
 } Ui;
-
-extern f32 gFrameIncrement;      /* frame time */
-extern char gSwimLookTuning;     /* swimming look tuning */
-extern Tuning gSwimMoveTuning;   /* swimming move tuning */
 
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, void *tuning);
@@ -81,6 +75,6 @@ void PlayerSwim_Update(CPlayer *player, CGameObjectInstance *body) {
     player->m_SfxTimer += gFrameIncrement;
     if (5.12f < player->m_TotalSpeed && 45.0f < player->m_SfxTimer) {
         player->m_SfxTimer = Random_Float(15.0f);
-        Sound__Play(gSwimMoveTuning.strokeSound, body->header.m_vPos, NULL, -1);
+        Sound__Play(gSwimMoveTuning.impulseSound, body->header.m_vPos, NULL, -1);
     }
 }

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x0 */ s16 x, y, z;
@@ -20,7 +21,6 @@ typedef struct {
     /* 0x11 */ s8 lightX, lightY, lightZ;
 } LightInfo;
 
-extern LightInfo *gScene_m_pLevelHeader;
 
 void *CISet__GetBlock(s32 *, s32);
 void CMtxF__FromMtxAffine(f32 *mtx, void *packed);
@@ -43,10 +43,10 @@ void Lighting_ApplyDirectional(s32 *model, u8 *matrices, CVector3 *colors, s32 s
     s32 count;
 
     CMtxF__FromMtxAffine(mtx, matrices);
-    light.x = gScene_m_pLevelHeader->lightX;
+    light.x = ((LightInfo *)gScene.m_pLevelHeader)->lightX;
     n = 0;
-    light.y = gScene_m_pLevelHeader->lightY;
-    light.z = gScene_m_pLevelHeader->lightZ;
+    light.y = ((LightInfo *)gScene.m_pLevelHeader)->lightY;
+    light.z = ((LightInfo *)gScene.m_pLevelHeader)->lightZ;
     CVector3__Normalize(&light);
     for (i = 0; i < *model; i++) {
         group = CISet__GetBlock(model, i);

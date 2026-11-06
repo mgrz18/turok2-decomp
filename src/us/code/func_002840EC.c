@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/cinema.h"
 
 s32 Cinema_IsSkippable();                                /* extern */
 s32 Cinema_IsActive();                                /* extern */
-extern Cinema *gCinemaPlayerP;
 
 void Cinema_TrySkip(void) {
     if ((Cinema_IsActive() != 0) && (Cinema_IsSkippable() != 0) && (gCinemaPlayerP->fading == 0)) {

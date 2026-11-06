@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 CScene__SetInstanceSavedBit(s32, s32, s32);
 s32 Cinema_RequestForObject(s32, s32);
 
-extern s32 gScene;
 
 void InteractiveAnim_EventPlayCinema(CGameObjectInstance *arg0, s32 arg1, s32 arg2) {
     Cinema_RequestForObject(arg0, arg2);

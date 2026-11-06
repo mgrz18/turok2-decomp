@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -22,8 +23,7 @@ typedef struct {
 
 typedef struct PlayerList PlayerList;
 
-extern Globals gEngineApp_m_Game_m_MenuPool;
-extern f32 gFrameIncrement;          /* frame time scale */
+extern Globals gEngineApp_m_Game_m_MenuPool; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 
 extern s32 MenuPool_CountOpen(void *menuPool);
 extern s32 CPlayerPool__CountIdleMenus(PlayerList *list);

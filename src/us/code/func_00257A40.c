@@ -5,6 +5,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/player.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x34];
@@ -15,9 +16,6 @@ typedef struct {
     /* 0x1A8 */ CPlayer *owner;
 } WeaponModel;
 
-extern s32 sWeaponFlipX;             /* flip x */
-extern s32 sWeaponFlipY;             /* flip y */
-extern s32 sWeaponFlipZ;             /* flip z */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CMtxF__SetScale(f32 *mtx, f32 x, f32 y, f32 z);
 extern void CMtxF__GetTranslation(void *src, CVector3 *out);

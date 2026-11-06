@@ -3,7 +3,7 @@
 
 s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
 
-extern u8 gEngineApp_m_Settings_unk16[];
+extern u8 gEngineApp_m_Settings_unk16[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 s32 SoundMenu_StepSpeechVolume_2(s32 arg0, s32 arg1)
 {

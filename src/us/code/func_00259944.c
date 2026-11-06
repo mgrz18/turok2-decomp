@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/controller.h"
+#include "globals/engine.h"
 
 /* Weapon spin: turns the barrel and makes the controller rumble with the spin speed. */
 
 
-extern f32 gFrameIncrement; /* frame time scale */
 
 extern f32 Math_Approach(f32 value, f32 target, f32 rate);
 extern void Math_EaseToward(f32 *value, f32 target, f32 rate);

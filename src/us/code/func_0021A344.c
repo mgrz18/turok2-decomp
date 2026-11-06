@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* Advance an actor's animation (CGameObjectInstance__AdvanceAnimation) and move it by the root motion
  * that produced: the new position is taken back out, turned by the actor's
@@ -27,7 +28,6 @@ struct Actor {
 };
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
-extern s32 gScene;
 
 s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
 void *CISet__GetBlock(s32, s32);

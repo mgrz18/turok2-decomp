@@ -1,10 +1,7 @@
 #include "common.h"
-
-extern s32 gScreenWidth;              /* screen width */
-extern s32 gScreenHeight;              /* screen height */
-extern s32 sCreditsLine;              /* first credits line on screen */
-extern f32 gCreditsScroll;              /* scroll position of that line */
-extern char *gCreditsLines[];          /* credits lines */
+#include "globals/menu.h"
+#include "globals/render.h"
+#include "globals/text.h"
 
 extern void COnScreen__BeginText(void);
 extern void COnScreen__SelectTinyFont(void);

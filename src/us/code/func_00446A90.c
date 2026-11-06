@@ -2,18 +2,15 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
-
-extern BlindOneState gBlindOne;
+#include "globals/boss.h"
+#include "globals/onscreen.h"
+#include "globals/engine.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 /* Update callback of the second boss: runs the anim callback, counts the hit timer down, runs the phase's
  * update, then updates the slots, the three movers and the boss' health bar. */
 
-
-extern f32 gFrameIncrement; /* frame time */
-extern BlindOnePhase sBlindOnePhases_2[];
-extern u8 gEngineApp_m_OnScreen[];
 extern void Animator_Update(void *slot);
 extern void BlindOne_UpdateMover_2(BlindOneMover *mover);
 extern s32 BlindOne_GetHealthPercent_2(BlindOneState *state);
@@ -36,5 +33,5 @@ void BlindOne_BossUpdate_2(void *obj, CAI *ai) {
     BlindOne_UpdateMover_2(&state->movers[0]);
     BlindOne_UpdateMover_2(&state->movers[1]);
     BlindOne_UpdateMover_2(&state->movers[2]);
-    COnScreen__SetBossPercent(gEngineApp_m_OnScreen, BlindOne_GetHealthPercent_2(state));
+    COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent_2(state));
 }

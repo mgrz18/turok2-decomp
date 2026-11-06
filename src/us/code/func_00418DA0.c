@@ -2,8 +2,8 @@
  * case and the return off as func_00418E4C. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
-extern s8 gEngineApp_m_Settings_dmTextureSet; /* gEngineApp_m_Settings + 0x23 */
 extern char D_800B608C[];
 extern char D_800B60A4[];
 extern char D_800B60BC[];
@@ -15,7 +15,7 @@ extern char D_800B6134[];
 extern char D_800B614C[];
 
 s32 BloodLustMenu_TextureSetLabel(MenuItem *a) {
-    switch (gEngineApp_m_Settings_dmTextureSet) {
+    switch (gEngineApp_m_Settings.dmTextureSet) {
     case 0:
         a->text = D_800B608C;
         break;

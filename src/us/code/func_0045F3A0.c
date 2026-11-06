@@ -3,13 +3,13 @@
 
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
+#include "globals/controller.h"
 
 extern s32 Controller_Lock(s32 arg0);
 extern u8 D_800F677B[];
 extern void Controller_ReadAll(void);
-extern u8 gPakQueueState;
 extern u8 D_800F677B[];
-extern u8 gSiMessageQueue[];
 extern s32 osMotorInit(u8 *a0, OSPfs *a1, s32 a2);
 extern s32 Pak_Mount_2(s32 a0);
 extern void Controller_Unlock(void);
@@ -25,7 +25,7 @@ void Pak_ProbeSlot_2(s32 kind)
         cur->present = 0;
         ready = 0;
     } else {
-        cur->present = osMotorInit(gSiMessageQueue, &cur->pfs, kind) == 0;
+        cur->present = osMotorInit(&gSiMessageQueue, &cur->pfs, kind) == 0;
         ready = cur->present;
     }
     if (ready != 0) {

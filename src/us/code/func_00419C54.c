@@ -10,7 +10,7 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
-extern u8 gEngineApp_m_Settings_unk16[];
+extern u8 gEngineApp_m_Settings_unk16[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 s32 SoundMenu_StepSpeechVolume(s32 arg0, s32 arg1)
 {
   s32 var_v1;

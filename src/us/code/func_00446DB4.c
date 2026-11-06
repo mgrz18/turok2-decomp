@@ -3,13 +3,11 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/collision.h"
+#include "globals/boss.h"
 
 /* Damage callback of the second boss' minions: takes the damage, plays the minion's hit effect at most every
  * 2.25 s, and at zero health goes to anim state 6. */
 
-
-extern BlindOneState gBlindOne;
-extern u8 sBlindOneHitScript_2[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 

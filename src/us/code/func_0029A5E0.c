@@ -2,16 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern void __osViInit(void);
 extern void __osViSwapContext();
-extern __OSViContext __osViContexts[2];
-extern __OSViContext *__osViCurr;
-extern __OSViContext *__osViNext;
-extern OSViMode osViModeNtscLan1;
-extern OSViMode osViModePalLan1;
-extern OSViMode osViModeMpalLan1;
-extern s32 osTvType;
 extern void *memset(void *destination, s32 value, u32 size);
 void __osViInit(void)
 {

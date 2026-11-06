@@ -2,6 +2,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/game.h"
+#include "globals/camera.h"
+#include "globals/menu.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 /* What a region set gives a camera (the record CScene__GetRegionInfo finds). */
 typedef struct {
@@ -20,15 +25,6 @@ typedef struct {
     /* 0x5B */ u8 m_Music1;
 } CRegionSetAttributes;
 
-extern s32 gScene[];
-extern s32 gEngineApp_m_Settings_paused;
-extern CCamera *gEngineApp_m_Game_m_CameraPool_m_Cameras;     /* the camera pool's first camera */
-extern s32 gEngineApp_m_Settings_mode;          /* game mode */
-extern s32 gEngineApp_m_Settings_nextMode;
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* the players */
-extern s32 gCameraPoolHideViews;
-extern s32 gFrameCountGameplay;
-extern f32 gFrameIncrement;          /* the frame's time step */
 CRegionSetAttributes *CScene__GetRegionInfo(s32 *list, u16 *key);
 s32 Cinema_OverridesMusic1(void);
 s32 Cinema_OverridesMusic2(void);
@@ -41,7 +37,7 @@ static __inline__ CPlayer *GetPlayer(CCamera *cam) {
     CPlayer *player;
     CPlayer *node;
 
-    for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
+    for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; player != NULL; player = player->m_pNext) {
         if (player->m_pCamera == cam) {
             return player;
         }
@@ -74,11 +70,11 @@ void CCamera__AdvanceAttributes(CCamera *cam) {
     if (key == NULL) {
         return;
     }
-    rec = CScene__GetRegionInfo(gScene, key);
+    rec = CScene__GetRegionInfo(&gScene, key);
     if (rec == NULL) {
         return;
     }
-    if (gEngineApp_m_Settings_paused == 0 && cam == gEngineApp_m_Game_m_CameraPool_m_Cameras && gEngineApp_m_Settings_mode == 13 && gEngineApp_m_Settings_nextMode == gEngineApp_m_Settings_mode) {
+    if (gEngineApp_m_Settings.paused == 0 && cam == gEngineApp_m_Game_m_CameraPool.m_Cameras && gEngineApp_m_Settings_mode == 13 && gEngineApp_m_Settings_nextMode == gEngineApp_m_Settings_mode) {
         if (Cinema_OverridesMusic1() == 0) {
             Sound__SetAmbientTrack(rec->m_Music1);
         }

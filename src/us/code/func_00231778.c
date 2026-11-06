@@ -1,6 +1,6 @@
 #include "structs/particle.h"
+#include "globals/game.h"
 
-extern u8 gEngineApp_m_Settings_unk17;
 
 s32 func_00231778(CParticle *arg0) {
     s32 var_a1;
@@ -9,7 +9,7 @@ s32 func_00231778(CParticle *arg0) {
     if (arg0->m_pEffect->m_dwFlags & 0x02000000) {
         if (arg0->m_dwFlags & 2) {
             var_a1 = 2;
-        } else if (gEngineApp_m_Settings_unk17 == 2) {
+        } else if (gEngineApp_m_Settings.unk17 == 2) {
             var_a1 = 1;
         }
     }

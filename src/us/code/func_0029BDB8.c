@@ -2,11 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern u64 __osCurrentTime;
 extern s32 __osBaseCounter;
 extern s32 __osViIntrCount;
-extern void *__osTimerList;
 extern void __osTimerServicesInit();
 void __osTimerServicesInit(void) {
     NodeRecAt1C *node = (NodeRecAt1C *)__osTimerList;

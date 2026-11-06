@@ -1,6 +1,7 @@
 /* WRONG CUT: REAL SceneActorPool_Construct size 0x110 (splat cut it into SceneActorPool_Construct + func_0042CFC0 + func_0042D040). */
 #include "common.h"
 #include "structs/intelligence.h"
+#include "globals/scene.h"
 
 /* A scene actor (0x1B0 bytes). */
 typedef struct SceneActor {
@@ -16,8 +17,6 @@ typedef struct ScenePool {
     /* 0x3608 */ s32 count;
 } ScenePool;
 
-extern CIntelligence gLevelActorIntelligence;
-extern CIntelligence gLevelActorIntelligenceMP;
 
 extern void func_0027BD10(CIntelligence *def);
 extern void func_00227664(SceneActor *actor);

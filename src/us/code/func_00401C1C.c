@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/game.h"
+#include "globals/engine.h"
 
 s32 Cinema_PathPlaying();                                /* extern */
-extern s32 gPersistentDataLoaded;
-extern s32 gEngineApp_m_Settings_nextMode;
 
 s32 Automap_IsShown(void *arg0)
 {
@@ -18,7 +18,7 @@ s32 Automap_IsShown(void *arg0)
       var_v0 = 0;
       if (Cinema_PathPlaying() == 0)
       {
-        var_v0 = gEngineApp_m_Settings_nextMode ^ 1;
+        var_v0 = gEngineApp_m_Settings.nextMode ^ 1;
         if (1)
         {
           var_s0 = ((u32) var_v0) > 0U;

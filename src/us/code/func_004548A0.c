@@ -1,9 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
-
-extern s32 gEngineApp_m_Settings;
+#include "globals/game.h"
 
 s32 CheatMenu_ToggleBlackout_2(void) {
-    gEngineApp_m_Settings ^= 0x4000;
+    gEngineApp_m_Settings_cheatFlags ^= 0x4000;
     return 0;
 }

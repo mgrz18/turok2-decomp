@@ -7,6 +7,8 @@
 #include "structs/level_actor.h"
 #include "structs/camera.h"
 #include "structs/rect.h"
+#include "globals/camera.h"
+#include "globals/scene.h"
 
 /* Builds (once per frame) the display list of the level geometry: for every
  * grid region seen by one of the views, every static object and every level
@@ -22,9 +24,7 @@ typedef struct {
     s32 mask;               /* 0x00 */
 } ViewState;
 
-extern ViewState gEngineApp_m_Settings_difficulty;
-extern s32 gCameraVisBits;
-extern Gfx *gSceneGeometryDL;     /* the level's display list, once built this frame */
+extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);

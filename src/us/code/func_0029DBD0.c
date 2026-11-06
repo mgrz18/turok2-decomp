@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern OSPiHandle_s *__osCurrentHandle[];
 s32 osEPiRawWriteIo(OSPiHandle_s *arg0, u32 arg1, u32 arg2) {
     OSPiHandle_s *previous;
     s32 index;

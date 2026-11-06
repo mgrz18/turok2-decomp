@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/boss.h"
 
-extern s32 gMantidQueen_pushed;
 
 void MantidQueen_EnterPush(void) {
-    gMantidQueen_pushed = 0;
+    gMantidQueen.pushed = 0;
 }

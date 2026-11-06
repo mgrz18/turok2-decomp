@@ -3,21 +3,8 @@
  * (checked with the symbol size overridden to 0x134). */
 #include "common.h"
 #include "structs/menu.h"
-
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsLoad;
-extern s32 gSavePortalActive;
-extern s32 gPakMenuIsProfile;
-extern s32 gPakMenuPort;
-extern u8 gCharacterMenuAfterPakDesc[];
-extern u8 gSingleMenuAfterPakDesc[];
-extern u8 gStatsAfterPakMenuDesc1[];
-extern u8 gStatsAfterPakMenuDesc2[];
-extern u8 gStatsAfterPakMenuDesc3[];
-extern u8 gStatsAfterPakMenuDesc4[];
-extern u8 gPakSaveGameAnyPakMenuDesc[];
-extern u8 gSavePortalMenuDescB[];
+#include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 static __inline__ void *TmplForKind(s32 *kindp) {
     /* by address: kind stays in its stack slot, as in the ROM */
@@ -26,16 +13,16 @@ static __inline__ void *TmplForKind(s32 *kindp) {
     switch (*kindp) {
     case 0:
     default:
-        t = gStatsAfterPakMenuDesc1;
+        t = &gStatsAfterPakMenuDesc1;
         break;
     case 1:
-        t = gStatsAfterPakMenuDesc2;
+        t = &gStatsAfterPakMenuDesc2;
         break;
     case 2:
-        t = gStatsAfterPakMenuDesc3;
+        t = &gStatsAfterPakMenuDesc3;
         break;
     case 3:
-        t = gStatsAfterPakMenuDesc4;
+        t = &gStatsAfterPakMenuDesc4;
         break;
     }
     return t;
@@ -55,18 +42,18 @@ void *PakMenu_GetReturnMenu(Menu *c) {
             }
             tmpl = TmplForKind(&kind);
         } else {
-            tmpl = gSavePortalMenuDescB;
+            tmpl = &gSavePortalMenuDescB;
         }
     } else if (gPakMenuIsLoad) {
         if (gPakMenuIsProfile) {
-            tmpl = gCharacterMenuAfterPakDesc;
+            tmpl = &gCharacterMenuAfterPakDesc;
         } else if (gSavePortalActive) {
-            tmpl = gSavePortalMenuDescB;
+            tmpl = &gSavePortalMenuDescB;
         } else {
-            tmpl = gSingleMenuAfterPakDesc;
+            tmpl = &gSingleMenuAfterPakDesc;
         }
     } else if (gPakMenuAnyPak) {
-        tmpl = gPakSaveGameAnyPakMenuDesc;
+        tmpl = &gPakSaveGameAnyPakMenuDesc;
     }
     return tmpl;
 }

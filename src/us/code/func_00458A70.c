@@ -1,13 +1,11 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00407F6C.c, func_00407F6C, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Controller pak note list item: prints a note's name (16 characters), extension (4) and size in blocks
  * into the item's text; an empty slot prints blanks. */
 
-extern s32 gPakMenuLeaving;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort; /* pad */
 extern char D_800B48D4[];
 extern char D_800B48E0[];
 extern u8 D_800C1404[];

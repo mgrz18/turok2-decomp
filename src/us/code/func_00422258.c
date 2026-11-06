@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern char D_800B4B04[];
 extern char D_800B4B34[];
-extern u8 gPakProfileRead_name[8]; /* name, padded with spaces */
 extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdateName(MenuItem *item) {
@@ -18,7 +18,7 @@ s32 CharNoteMenu_UpdateName(MenuItem *item) {
         item->text = D_800B4B04;
     } else {
         item->text = D_800B4B34;
-        src = &gPakProfileRead_name[7];
+        src = &gPakProfileRead.name[7];
         while (*src-- == ' ' && len != 0) {
             len--;
         }
@@ -31,7 +31,7 @@ s32 CharNoteMenu_UpdateName(MenuItem *item) {
         }
         field = &field[8 - len];
         for (i = 0; i < len; i++) {
-            *field++ = gPakProfileRead_name[i];
+            *field++ = gPakProfileRead.name[i];
         }
     }
     return 0;

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
-extern u8 gScene[];
 extern CIntelligence *CScene__FindIntelligence(void *spawns, s32 kind, s32 character);
 extern s32 Random_Next(void);
 
@@ -13,11 +13,11 @@ static __inline__ void place_at_spawn(CPlayer *p) {
     if (p->m_pOptions->m_TagMode == 1) {
         character = 11;
     }
-    sp = CScene__FindIntelligence(gScene, 11, character);
+    sp = CScene__FindIntelligence(&gScene, 11, character);
     if (sp == NULL) {
-        sp = CScene__FindIntelligence(gScene, 11, -1);
+        sp = CScene__FindIntelligence(&gScene, 11, -1);
         if (sp == NULL) {
-            sp = CScene__FindIntelligence(gScene, -1, -1);
+            sp = CScene__FindIntelligence(&gScene, -1, -1);
         }
     }
     p->m_CharacterActor.header.m_pIntelligence = sp;

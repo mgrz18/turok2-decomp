@@ -1,17 +1,17 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/boss.h"
 
 s32 CAI__SetMode(s32, s32, s32);
 
 extern f32 D_800C0548;
-extern s32 gLevelScript_script_current;
 
 void Primagen_UpdateMode22_2(CGameObjectInstance *arg0, CAI *arg1) {
     f32 *speed = &arg0->m_AI.m_AnimSpeed;
 
     if (arg1->m_AnimRepeatedCount != 0) {
         *speed = (f32) D_800C0548;
-        gLevelScript_script_current = -1;
+        gLevelScript.script.current = -1;
         CAI__SetMode((s32) arg0, (s32) arg1, 0x13);
     }
 }

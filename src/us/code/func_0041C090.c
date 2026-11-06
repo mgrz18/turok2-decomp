@@ -4,11 +4,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
-extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 OptionsMenu_StepLookSpring(void *first, Menu *menu) {
-    CPlayerOptions *settings = &gEngineApp_m_Settings_defaultSlot;
+    CPlayerOptions *settings = &gEngineApp_m_Settings.defaultSlot;
     if (menu->player != 0 && menu->player->m_pOptions != 0) {
         settings = menu->player->m_pOptions;
     }

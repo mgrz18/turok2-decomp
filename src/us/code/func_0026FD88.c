@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/audio.h"
 
 /* A frame task: a buffer at 0, its size at 4, a message block at 8, and the result range at 0x48 / 0x4C. */
 typedef struct {
@@ -21,9 +22,7 @@ s32 Sound__Update();                            /* extern */
 s32 Sound__Lock();                            /* extern */
 s32 Sound__Unlock();                            /* extern */
 s32 Sched_SubmitTask(s32 *, void *);           /* extern */
-extern s32 curAcmdList;
 extern s32 gAudioCmdLists;
-extern s32 gAudioReplyMsgQ;
 extern u16 D_800F283A;
 extern s32 gScheduler;
 

@@ -2,12 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/cache.h"
 
 extern s32 gCache;
-extern int gCache_dlistBlocking[];
-extern s32 gCache_dlistCount[];
 extern s32 gCache_blocker;
-extern int gCacheEntryCount;
 extern void osSendMesg(void *arg0, s32 arg1, s32 arg2);
 void CCache__ReleaseDisplayList(s32 unused, s32 arg1) {
     s32 mask;

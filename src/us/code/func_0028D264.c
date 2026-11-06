@@ -2,8 +2,10 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/save.h"
+#include "globals/scene.h"
 
-extern u8 gScene[];             /* the world */
 s32 CScene__GetRegionIndex(void *world, s32 region);
 
 /* Save every player's state, position, facing and region. */
@@ -18,6 +20,6 @@ void SavedPlayers_Save(void) {
         save->m_Data[i] = player->m_Data;
         save->m_vPos[i] = player->m_CharacterActor.header.m_vPos;
         save->m_RotY[i] = player->m_CharacterActor.m_RotY;
-        save->m_Region[i] = CScene__GetRegionIndex(gScene, player->m_CharacterActor.header.m_pCurrentRegion);
+        save->m_Region[i] = CScene__GetRegionIndex(&gScene, player->m_CharacterActor.header.m_pCurrentRegion);
     }
 }

@@ -1,4 +1,6 @@
 #include "structs/vector.h"
+#include "globals/game.h"
+#include "globals/scene.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00281A70.c, func_00281A70.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -22,16 +24,15 @@ struct B18Ent {
     u8 pad528[0xDF8];
     B18Ent *next;       /* 0x1320 (0x16E0) */
 };
-extern CScene gScene[];
-extern B18Ent *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CParticle__CheckProximity(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     CVector3 d;
     s32 i;
     s32 cnt;
-    cnt = gScene->m_nKind1;
+    CScene *scene = &gScene;
+    cnt = scene->m_nKind1;
     for (i = 0; i < cnt; i++) {
-        B18Ent *e = (B18Ent *)gScene->m_pKind1[i];
+        B18Ent *e = (B18Ent *)scene->m_pKind1[i];
         if (e->health > 0) {
             CVector3__Subtract(&d, &e->pos, &o->pos);
             if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {
@@ -42,7 +43,7 @@ void CParticle__CheckProximity(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     }
     {
         B18Ent *p;
-        for (p = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; p != ((void *)0); p = p->next) {
+        for (p = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; p != ((void *)0); p = p->next) {
             if (o->owner != p && p->unk524 > 0) {
                 CVector3__Subtract(&d, &p->pos, &o->pos);
                 if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {

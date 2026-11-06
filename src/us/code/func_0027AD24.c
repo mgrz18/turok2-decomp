@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/hud.h"
 
 /* COnScreen's two boss bars (COnScreen__SetBoss / COnScreen__SetBoss2 start
  * them): m_pBoss, m_pBossName and m_BossPercent, and the second boss's
@@ -15,7 +16,6 @@ typedef struct {
     /* 0x00 */ HudMeter meters[2];
 } HudMeters;
 
-extern u8 sBossBarOverlayScript[];
 extern void COverlay__StartScript(void *, void *);
 
 void COnScreen__SetBoss(HudMeters *arg0, s32 arg1, s32 arg2) {

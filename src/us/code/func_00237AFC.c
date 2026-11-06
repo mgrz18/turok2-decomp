@@ -3,6 +3,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "globals/game.h"
+#include "globals/collision.h"
 
 /* A blast: radius, damage, then the push (strength, x, y, z). */
 typedef struct Blast {
@@ -34,8 +36,6 @@ typedef struct {
     /* 0x1A8 */ BlastOwner *owner;
 } BlastActor;
 
-extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern HitFrame sBlastShieldFrame;       /* the shield CGameObjectInstance__GetNearestBox finds */
 
 s32 Blast_CanHit(BlastActor *victim, BlastActor *source);
@@ -66,7 +66,7 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector
     shielded = 1;
     scale = 1.0f;
     scaled = 1;
-    if (gEngineApp_m_Settings_multiplayer != 0 && (flags & 0x400000)) {
+    if (gEngineApp_m_Settings.multiplayer != 0 && (flags & 0x400000)) {
         shielded = 0;
     }
     if (source->kind == 2 && (BlastActor *)gCollisionResults.m_pInstance == victim && gCollisionResults.m_nInstanceNode != -1) {

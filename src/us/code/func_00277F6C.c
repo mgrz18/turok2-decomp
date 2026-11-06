@@ -5,9 +5,9 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "globals/menu.h"
 
-extern s32 gLoadedFont;          /* which font texture is loaded */
-extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[2];       /* font spacing */
+extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */       /* font spacing */
 
 extern s32 COnScreen__GetFontTexture(void);
 extern void Render_SetCombineMode(s32 mode);

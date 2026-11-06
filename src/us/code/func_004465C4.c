@@ -2,17 +2,14 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
-
-extern BlindOneState gBlindOne;
+#include "globals/boss.h"
+#include "globals/onscreen.h"
 
 /* AI init of the second boss: sets the level's warp id, the anim table and callbacks, starts the phase script
  * and shows its health bar ("EyeBall"). */
 
-
-extern s32 gScene_m_LevelID[]; /* warp id */
+extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */ /* warp id */
 extern u8 gBlindOneBossModeTable[];
-extern BlindOneStep sBlindOneScript_2[];
-extern u8 gEngineApp_m_OnScreen[];
 extern void BlindOne_BossUpdate_2(void);
 extern void BlindOne_BossHurt_2(void);
 extern void BlindOne_Draw_2(void);
@@ -39,5 +36,5 @@ void BlindOne_BossInit_2(CGameObjectInstance *obj, CAI *ai) {
     ai->m_BlindOne.m_nPhaseHits = 0;
     ai->m_BlindOne.m_HitTimer = 0.0f;
     CAI__SetMode(obj, ai, 1);
-    COnScreen__SetBoss(gEngineApp_m_OnScreen, obj, "EyeBall");
+    COnScreen__SetBoss(&gEngineApp_m_OnScreen, obj, "EyeBall");
 }

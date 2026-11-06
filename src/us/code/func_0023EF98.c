@@ -1,20 +1,12 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002AD90C.c, func_002AD90C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/pickup.h"
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef struct Row18 {
-    s32 pad0;
-    s16 id;
-    u8 pad6[18];
-} Row18;
-extern Row18 sHealthPickups[];
-Row18 *Pickup_FindHealthEntry(s32 id) {
+CPickupRow18 *Pickup_FindHealthEntry(s32 id) {
     s32 i;
-    Row18 *p = sHealthPickups;
+    CPickupRow18 *p = sHealthPickups;
     for (i = 6; i != -1; i--) {
-        if (p->id == id) {
+        if (p->m_Id == id) {
             return p;
         }
         p++;

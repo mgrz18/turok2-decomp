@@ -1,14 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/enemy.h"
 
 /* Picks the animation for the AI's current location: one candidate from the
  * location's primary flags and one from its secondary flags, each from the
  * table for the current mode; with both, a coin toss decides. */
-
-typedef struct {
-    /* 0x00 */ s32 flags;
-    /* 0x04 */ s32 anim;
-} AnimEntry;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x16];
@@ -16,15 +12,9 @@ typedef struct {
     /* 0x18 */ u16 flagsB;
 } Location;
 
-extern AnimEntry sEnemyAnimIdle_AF6F0[];
-extern AnimEntry sEnemyAnimIdle_AF720[];
-extern AnimEntry sEnemyAnimIdle_AF750[];
-extern AnimEntry sEnemyAnimIdle_AF780[];
-extern AnimEntry sEnemyAnimIdle_AF7B0[];
-extern AnimEntry sEnemyAnimIdle_AF7E0[];
 
 extern Location *CPathTrack__GetCurrentPoint(s8 *location);
-extern s32 AI_PickAnimFromTable(void *actor, CAI *ai, AnimEntry *table, s32 flags);
+extern s32 AI_PickAnimFromTable(void *actor, CAI *ai, CEnemyAnimPick *table, s32 flags);
 extern s32 Random_Next(void);
 
 s32 EnemyAnim_InteractiveIdle(void *actor, CAI *ai) {

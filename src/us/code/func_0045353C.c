@@ -2,6 +2,9 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/menu.h"
+#include "globals/scene.h"
 
 /* Level select (warp) menu input: A warps to the selected level (or, on the
  * last entry, starts the credits/next mode), up and down move the selection
@@ -10,8 +13,6 @@
 
 
 #define PROGRESS (&gEngineApp_m_Game.m_Settings)
-extern s32 sCheatsMenuSelection;
-extern u8 gScene[];
 
 extern s32 Controller_ConfirmPressed(s32 pad);
 extern s32 Controller_MenuLeft(s32 pad);
@@ -133,7 +134,7 @@ s32 CheatsMenu_WarpSelect_2(void *menu, Menu *c) {
             return 1;
         }
         if (gEngineApp_m_Game.m_Settings.mode == 13) {
-            CScene__RequestWarp_2(gScene, id, 2);
+            CScene__RequestWarp_2(&gScene, id, 2);
             return 0;
         }
         PROGRESS->multiplayer = 0;

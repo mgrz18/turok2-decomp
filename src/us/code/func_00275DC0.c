@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/audio.h"
 
 s32 Sound__Stop(s32);                         /* extern */
-extern s32 sLoopSoundsLastPaused;
 
 typedef struct Node00275DC0 {
     /* 0x0 */ u8 pad0[4];

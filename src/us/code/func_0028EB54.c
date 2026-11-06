@@ -2,13 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pager.h"
 
 extern void VM_FreeRegion(OwnerRecAt8V2 *arg0);
 extern Slot_func_8023CCD4_de gPager_slots[];
 void VM_FreeRegion(OwnerRecAt8V2 *arg0) {
     extern s32 osSendMesg(s32, Node_func_8023CCD4_de *, s32);
     extern void VM_UnmapTLBEntry(Slot_func_8023CCD4_de *);
-    extern Node_func_8023CCD4_de gPager_regions;
     Node_func_8023CCD4_de *node;
     Node_func_8023CCD4_de *prev;
     u8 *slot;

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/engine.h"
 
 extern void CEngineApp__StartWarp(s32, s32);
-extern s32 gAttractRunCount;
 
 void EngineMode09_Cinema_Init(s32 arg0) {
     gAttractRunCount += 1;

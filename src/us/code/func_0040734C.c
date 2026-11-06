@@ -7,7 +7,7 @@ typedef struct {
     /* 0x1 */ s8 unk1;
 } BossFlags;
 
-extern BossFlags gLevelScript_armed;
+extern BossFlags gLevelScript_armed; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_EnterMode5(CGameObjectInstance *arg0) {
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2000);

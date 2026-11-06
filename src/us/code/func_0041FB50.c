@@ -1,12 +1,10 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Save/load menu: fills a pak file line ("NAME.EXT" and its size) for the
  * note of the chosen pak; an empty or unreadable note shows blanks. */
 
-extern s32 gPakMenuLeaving;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 extern char D_800B48D4[];
 extern char D_800B48E0[];
 extern char D_800C1404[];

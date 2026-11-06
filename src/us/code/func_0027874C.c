@@ -7,6 +7,10 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "globals/onscreen.h"
+#include "globals/scene.h"
+#include "globals/render.h"
+#include "globals/menu.h"
 
 typedef struct FontStyle {
     /* 0x00 */ u8 pad0[0xA0];
@@ -22,12 +26,6 @@ typedef struct FontStyle {
     /* 0xC4 */ s32 shadowY;
 } FontStyle;
 
-extern FontStyle gEngineApp_m_OnScreen;
-extern u32 gLoadedFont;          /* the loaded font */
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
-extern u8 gScene[];         /* the resource cache */
-extern u8 gEngineApp_m_OnScreen_m_CharacterSmallLookUpPos[];         /* glyph lookup */
 extern u8 D_80110238[];         /* glyph lookup, language 0 */
 
 extern void *CScene__LoadGraphicSet(void *cache, s32 id, s32 kind, s32 flag);
@@ -114,18 +112,18 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
         special = 1;
         break;
     }
-    font = CScene__LoadGraphicSet(gScene, resource, 0x10, 1);
+    font = CScene__LoadGraphicSet(&gScene, resource, 0x10, 1);
     if (font) {
         while (text && (ch = *text) && ch != 10) {
             next = text[1];
             switch (language) {
             case 2:
             default:
-                glyph = gEngineApp_m_OnScreen_m_CharacterSmallLookUpPos[ch];
+                glyph = gEngineApp_m_OnScreen.m_CharacterSmallLookUpPos[ch];
                 advance = fontGlyphWidth();
                 break;
             case 1:
-                glyph = gEngineApp_m_OnScreen_m_CharacterSmallLookUpPos[ch];
+                glyph = gEngineApp_m_OnScreen.m_CharacterSmallLookUpPos[ch];
                 advance = fontGlyphWidth();
                 break;
             case 0:

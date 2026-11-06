@@ -1,20 +1,10 @@
+#include "common.h"
+#include "globals/engine.h"
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed long long s64;
-typedef unsigned long long u64;
-typedef float f32;
-typedef double f64;
 s32 osJamMesg(s32, s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSetThreadPri(s32, s32);
 s32 osCreateMesgQueue(s32 *, s32 *, s32);
-extern s32 gDecompressorBoostRetraces;
-extern s32 gThreadPriorityDecompressorHigh;
 s32 CDecompressor__DecompressSync(s32 arg0, void *arg1)
 {
   s32 new_var3;

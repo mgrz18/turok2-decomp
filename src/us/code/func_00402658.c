@@ -2,12 +2,13 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x40];
 } Path;
 
-extern s32 gMantidQueen_blink;
+extern s32 gMantidQueen_blink; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Path *path);

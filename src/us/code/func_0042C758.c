@@ -2,6 +2,7 @@
  * the prologue addiu sp,-24 / sw s0, a stray; the body at 0x42C760 saves ra at 20(sp) and pops 24).
  * REAL CScene__SetupLighting size 0x44 at CScene__RequestWarp+0x58 */
 #include "common.h"
+#include "globals/render.h"
 
 typedef struct LevelLights {
     /* 0x00 */ u8 pad0[0x10];
@@ -13,7 +14,6 @@ typedef struct MenuState {
     /* 0x18E50 */ LevelLights *lights;
 } MenuState;
 
-extern s32 gFogEnabled;
 
 extern void CScene__LoadLightSettings(MenuState *menu);
 

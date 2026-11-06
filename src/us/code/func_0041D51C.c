@@ -1,14 +1,15 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/render.h"
+#include "globals/menu.h"
 
 /* Name entry item draw callback: while the cursor blink timer of the menu's
  * player is low, draws the text cursor (9 virtual pixels wide, scaled to the
  * screen) under the edited column, faded by the window alpha, then draws the
  * item as usual. As EnterCheatMenu_DrawTextField. */
 
-extern s32 gScreenWidth;
-extern s32 gMenuCurrentFont;
 
 extern s32 CPlayerPool__GetIndex(void *players, void *player);
 extern void Hud_SetupFillMode(void);

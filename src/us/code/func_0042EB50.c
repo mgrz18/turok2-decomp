@@ -1,5 +1,6 @@
 /* COnScreen__Construct (the HUD's lookups and font texture), 0x0042EB50-0x0042EBB4 (splat had it inside the data D_0042D50C). */
 #include "common.h"
+#include "globals/hud.h"
 
 typedef struct Hud {
     /* 0x000 */ u8 pad0[0x90];
@@ -11,9 +12,6 @@ typedef struct Hud {
     /* 0x0C8 */ u8 unkC8[0x148 - 0xC8];
     /* 0x148 */ u8 unk148[0x80];
 } Hud;
-
-extern u8 sCharacterSmallLookUpPairs[];
-extern u8 sCharacterLookUpPairs[];
 
 extern void func_0042EBB4(void);
 extern void COnScreen__LoadFontTexture(void);

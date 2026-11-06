@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 s32 MenuItem_TextLength(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
@@ -7,7 +8,6 @@ s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 extern char D_800C140C[];
 extern char D_800C1410[];
 extern char D_800B45E0[];
-extern s32 gPakMenuAnyPak;
 
 s32 PakMenu_UpdateTitle(MenuItem *item, Menu *event) {
     s32 port;

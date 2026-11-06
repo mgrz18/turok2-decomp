@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/frame.h"
 
 extern u8 D_800AA0F0[];           /* "\n" */
 extern u8 D_800AA0F4[];           /* "Call stack " */
@@ -6,7 +7,6 @@ extern u8 D_800AA100[];           /* "(top:" */
 extern u8 D_800AA108[];           /* " bot:" */
 extern u8 D_800AA110[];           /* " low:" */
 extern u8 D_800AA118[];           /* ")\n" */
-extern u16 sCrashTextColor;            /* debug console foreground colour */
 
 void Crash_PutChar(s32 c);          /* debug console: draws one character */
 void Crash_PrintHex8(s32 byte);       /* debug console: draws a byte in hex */

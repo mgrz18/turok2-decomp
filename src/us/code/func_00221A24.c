@@ -3,16 +3,15 @@
 #include "structs/world.h"
 #include "structs/collision.h"
 #include "structs/level_actor.h"
+#include "globals/game.h"
+#include "globals/camera.h"
+#include "globals/scene.h"
 
 typedef struct List {
     s32 pad0;
     s32 count;                  /* 0x04 */
     u8 items[1];                /* 0x08 */
 } List;
-
-extern s32 gEngineApp_m_Settings_difficulty;          /* visible layers */
-extern s32 gLitVerticesKeyChanged;
-extern CBox gCameraVisibleBox;       /* visible bounds */
 
 void *CISet__GetBlock(void *table, s32 index);
 void CStaticObject__TouchLitVertices(CStaticObject *inst);
@@ -41,7 +40,7 @@ void CScene__CollectSectorObjects(CScene *world) {
 
     i = 0;
     regionCount = world->m_nSectors;
-    layers = gEngineApp_m_Settings_difficulty;
+    layers = gEngineApp_m_Settings.difficulty;
     regions = world->m_Sectors;
     for (; i < regionCount; i++) {
         data = *regions[i].m_hData;

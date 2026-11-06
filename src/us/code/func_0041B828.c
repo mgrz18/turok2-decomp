@@ -1,9 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
-
-extern s32 gEngineApp_m_Settings;
+#include "globals/game.h"
 
 s32 CheatMenu_ToggleZachAttack(void) {
-    gEngineApp_m_Settings ^= 0x1000;
+    gEngineApp_m_Settings_cheatFlags ^= 0x1000;
     return 0;
 }

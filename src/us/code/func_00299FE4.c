@@ -16,14 +16,14 @@ extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 static __inline__ void create_access_queue(void) {
     extern Slot __osSiAccessQueue;
     extern OSMesg __osSiAccessBuf;
-    extern s32 __osSiAccessQueueEnabled[];
+    extern s32 __osSiAccessQueueEnabled[]; /* local type: an array, not the u32 of globals/libultra.h; as a scalar GCC 2 orders the code differently */
     __osSiAccessQueueEnabled[0] = 1;
     osCreateMesgQueue(&__osSiAccessQueue, &__osSiAccessBuf, 1);
     osSendMesg(&__osSiAccessQueue, 0, 0);
 }
 void __osSiGetAccess(void) {
     extern Slot __osSiAccessQueue;
-    extern s32 __osSiAccessQueueEnabled[];
+    extern s32 __osSiAccessQueueEnabled[]; /* local type: an array, not the u32 of globals/libultra.h; as a scalar GCC 2 orders the code differently */
     OSMesg token;
     if (!__osSiAccessQueueEnabled[0]) {
         create_access_queue();

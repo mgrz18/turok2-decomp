@@ -4,6 +4,9 @@
 #include "structs/particle.h"
 #include "gfx.h"
 #include "structs/camera.h"
+#include "globals/camera.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -19,11 +22,6 @@ typedef struct {
     /* 0x0C */ CVector3 max;
 } Box;
 
-extern Gfx *gDList;             /* display list head */
-extern s32 gEvenOdd;              /* matrix buffer index */
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
-extern CCamera *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
-extern u8 gScene[];
 extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 Frustum_TestBox(void *planes, Box *box);
@@ -94,7 +92,7 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                 if (visible) {
                     if (!built) {
                         if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
-                            camera = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
+                            camera = gEngineApp_m_Game_m_CameraPool.m_ActiveList.m_pHead;
                             CMtxF__TransformPoint(camera->m_mfView, &node->header.m_vPos, &transformed);
                             depth = transformed.z;
                             if (depth < 0.0f) depth = -depth;
@@ -105,7 +103,7 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                         node->m_dwFlags |= builtFlag;
                     }
                     if (node->m_pEffect->m_pModel != 0) {
-                        CScene__GetLightsAt(gScene, &node->header.m_vPos, node->m_Lights[gEvenOdd]);
+                        CScene__GetLightsAt(&gScene, &node->header.m_vPos, node->m_Lights[gEvenOdd]);
                         func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[gEvenOdd], node->m_Lights[gEvenOdd], 0, -1);
                     } else {
                         CParticle__DrawSprite(node, view);
@@ -120,7 +118,7 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                 } else {
                     if (!node->m_ActiveSwooshes || built) break;
                     if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
-                        camera = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
+                        camera = gEngineApp_m_Game_m_CameraPool.m_ActiveList.m_pHead;
                         CMtxF__TransformPoint(camera->m_mfView, &node->header.m_vPos, &transformed);
                         depth = transformed.z;
                         if (depth < 0.0f) depth = -depth;

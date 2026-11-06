@@ -1,6 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
+#include "globals/player.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -32,14 +35,6 @@ struct Object {
     /* 0x1A8 */ CPlayer *owner;
 };
 
-typedef struct {
-    /* 0x00 */ s16 mode;
-    /* 0x02 */ u8 pad2[0x16];
-} PoseInfo;   /* 0x18 bytes */
-
-extern PoseInfo gPlayerStateTable_anim[];
-extern f32 gFrameIncrement;             /* frame time scale */
-extern u8 gScene[];
 extern void CAI__SetMode(Object *obj, AI *ai, s32 mode);
 extern void CScene__SetInstanceObjectType(void *level, Object *obj, s32 model, s32 animType);
 
@@ -51,7 +46,7 @@ void WeaponActor_Update(Object *obj, AI *ai) {
     s32 mode;
 
     player = obj->owner;
-    mode = gPlayerStateTable_anim[player->m_Mode].mode;
+    mode = gPlayerStateTable[player->m_Mode].pose;
     if (ai->timer130 > 0.0f) {
         ai->timer130 -= gFrameIncrement;
     }
@@ -74,5 +69,5 @@ void WeaponActor_Update(Object *obj, AI *ai) {
     if (gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->update != NULL) {
         gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->update(obj, ai);
     }
-    CScene__SetInstanceObjectType(gScene, obj, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
+    CScene__SetInstanceObjectType(&gScene, obj, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
 }

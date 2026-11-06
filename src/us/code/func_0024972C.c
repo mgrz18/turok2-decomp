@@ -2,13 +2,9 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 #include "gfx.h"
-
-
-extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
-extern s32 gEngineApp_m_Settings_match_tag;
-extern s32 gTagModeModel;
-extern s32 gCharacterModels[];
-extern u8 gScene[];
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/player.h"
 
 void CScene__SetInstanceObjectType(void *world, CPlayer *player, s32 model, s32 arg3);
 void CGameObjectInstance__Draw(CPlayer *player, s32 arg1);
@@ -19,14 +15,14 @@ void CPlayer__DrawCharacter(CPlayer *player, s32 arg1) {
     s32 model;
     Gfx *g;
 
-    if (gEngineApp_m_Settings_multiplayer == 0) {
+    if (gEngineApp_m_Settings.multiplayer == 0) {
         model = 0x66;
     } else if (gEngineApp_m_Settings_match_tag != 0 && player->m_pOptions->m_TagMode != 0) {
         model = gTagModeModel;
     } else {
         model = gCharacterModels[player->m_CharacterActor.header.m_pIntelligence->m_Id];
     }
-    CScene__SetInstanceObjectType(gScene, player, model, player->m_CharAnim);
+    CScene__SetInstanceObjectType(&gScene, player, model, player->m_CharAnim);
     g = gDList++;
     g->w0 = 0xE7000000;
     g->w1 = 0;

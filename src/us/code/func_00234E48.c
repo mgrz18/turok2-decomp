@@ -1,10 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A52E4.c, func_002A52E4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/engine.h"
 
-typedef unsigned char u8;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
 typedef struct R8Mtx { s32 w[16]; } R8Mtx;
 typedef struct R8Info {
                u8 pad0[4];
@@ -45,7 +43,6 @@ typedef struct R8Cfg { u8 pad0[0x14]; s32 unk14; } R8Cfg;
 /* Turok 2 actor: matrices at 0x48, cfg at 0xF8 (Rage Wars 0x60 / 0x118). */
 typedef struct R8Actor { u8 pad0[0x48]; R8Mtx mtx[2]; u8 padC8[0x30]; R8Cfg *cfg; } R8Actor;
 typedef struct R8Mgr { u8 pad0[0x7520]; R8Emit *list; } R8Mgr;
-extern s32 gEvenOdd;
 extern u8 gEngineApp_m_SwooshSystem[];
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);

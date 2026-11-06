@@ -1,6 +1,6 @@
 #include "common.h"
+#include "globals/menu.h"
 
-extern s32 gLoadedFont;
 
 f32 COnScreen__GetFontAdvance(void) {
     switch (gLoadedFont) {

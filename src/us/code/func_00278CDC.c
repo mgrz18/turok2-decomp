@@ -6,6 +6,9 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "globals/onscreen.h"
+#include "globals/render.h"
+#include "globals/menu.h"
 
 typedef struct FontStyle {
     /* 0x00 */ u8 pad0[0xA0];
@@ -19,9 +22,6 @@ typedef struct FontStyle {
     /* 0xBC */ f32 height;
 } FontStyle;
 
-extern FontStyle gEngineApp_m_OnScreen;
-extern s32 gLoadedFont;          /* the loaded font */
-extern s32 gScreenWidth;          /* screen width */
 
 extern f32 Menu_TextWidth(u8 *text, f32 size, f32 spacing);   /* the string's width */
 extern void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shadow, s32 alpha, s32 language);

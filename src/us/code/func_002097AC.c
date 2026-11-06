@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 /* A vertex as the morph frames store it. */
 typedef struct MorphVtx {
@@ -16,8 +17,6 @@ typedef struct MorphFrame {
     /* 0x08 */ MorphVtx verts[1];
 } MorphFrame;
 
-extern s32 gFrameCount;
-extern s32 gEvenOdd;
 
 void *CISet__GetBlock(void *resource, s32 index);
 

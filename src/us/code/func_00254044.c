@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 /* A spawn point record (from CScene__FindIntelligence). */
 typedef struct {
@@ -8,7 +9,6 @@ typedef struct {
 } Spawn;
 
 Spawn *CScene__FindIntelligence(s32, s32, s32);
-extern s32 gScene;
 
 /* Picks a spawn point for the player and copies its position. */
 void CPlayer__PickSpawnPoint(CPlayer *arg0) {

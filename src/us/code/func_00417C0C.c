@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "structs/player_options.h"
+#include "globals/game.h"
 
 
 typedef struct StatusView {
@@ -16,7 +17,6 @@ typedef struct StatusStep {
 } StatusStep;
 
 extern StatusStep D_8011AB98[];
-extern CPlayerOptions gEngineApp_m_Settings_slots[];
 extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
 
 void Mp_JoinPressingController(void) {
@@ -32,7 +32,7 @@ void Mp_JoinPressingController(void) {
     }
     i = 0;
     active = 1;
-    settings = gEngineApp_m_Settings_slots;
+    settings = gEngineApp_m_Settings.slots;
     for (; i < 4; i++) {
         if (Controller_ConfirmPressed(&gControllers[i]) != 0) {
             settings[i].m_bActive = active;

@@ -1,14 +1,14 @@
 #include "common.h"
+#include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_match;
 
 s32 TeamMenu_Poll(void)
 {
   s32 var_a0;
   s8 *new_var;
   var_a0 = 0;
-  new_var = (s8 *) (&gEngineApp_m_Settings_match);
-  if ((((*((s32 *) (new_var + 0x28))) != 0) || ((*((s32 *) (((s8 *) (&gEngineApp_m_Settings_match)) + 0x1C))) != 0)) || ((*((s32 *) (((s8 *) (&gEngineApp_m_Settings_match)) + 0x20))) != 0))
+  new_var = (s8 *) (&gEngineApp_m_Settings.match);
+  if ((((*((s32 *) (new_var + 0x28))) != 0) || ((*((s32 *) (((s8 *) (&gEngineApp_m_Settings.match)) + 0x1C))) != 0)) || ((*((s32 *) (((s8 *) (&gEngineApp_m_Settings.match)) + 0x20))) != 0))
   {
     var_a0 = 1;
   }

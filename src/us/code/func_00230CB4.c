@@ -2,18 +2,16 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/camera.h"
+#include "globals/engine.h"
 
 /* Steps the particle system once: marks every particle on the three active
  * lists, then (outside a pause) advances the ones inside the visible bounds,
  * fires the impact events of the expired ones and frees them, and lets each
  * collected type 0x22 particle react to the others and each type 0x57
  * particle expire the non-0x57 ones within range. */
-
-extern f32 gFrameIncrement;          /* frame time scale */
-extern f32 gParticleTimeScale;
-extern s32 gEngineApp_m_Settings_paused;
-extern s32 gScene_m_WarpState;
-extern CBox gCameraVisibleBox;       /* visible bounds */
 
 extern void CParticle__Update(CParticle *p);
 extern s32 CParticle__IsUnderWater(CParticle *p);
@@ -53,7 +51,7 @@ void CParticleSystem__Update(CParticleSystem *world) {
             stepped[count++] = node;
         }
     }
-    if (gEngineApp_m_Settings_paused != 0 || gScene_m_WarpState != 0) {
+    if (gEngineApp_m_Settings.paused != 0 || gScene.m_WarpState != 0) {
         return;
     }
     savedStep = gFrameIncrement;

@@ -2,8 +2,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_80404858_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
-extern u8 gPakQueueState;
 
 extern void Controller_Lock(s32);
 extern void Controller_ReadAll(void);

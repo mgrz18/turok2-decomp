@@ -1,5 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
+#include "globals/camera.h"
 
 /* Spawns an actor from loose parameters: takes a free instance off the
  * world's free list (counted in *owner) and initialises it. */
@@ -11,16 +14,12 @@ extern s32 CScene__FindObjectType(void *level, s32 type);
 extern void func_0021E5D4(CGameObjectInstance *obj);
 extern void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
-extern s32 gDefaultVisBits;
-extern s32 gPersistentDataLoaded;
-extern u8 gScene[];
-extern s32 gScene_m_bStreamAll;
 
 /* CInstancePool__Alloc */
 static __inline__ CGameObjectInstance *take_free_instance(CInstancePool *world, s32 *owner) {
     CGameObjectInstance *node;
 
-    if (gScene_m_bStreamAll != 0 || (u32)world->m_ActiveList.m_nCount < 3) {
+    if (gScene.m_bStreamAll != 0 || (u32)world->m_ActiveList.m_nCount < 3) {
         node = world->m_FreeList.m_pHead;
         if (node != NULL) {
             CList__Remove(&world->m_FreeList, node);
@@ -46,7 +45,7 @@ CGameObjectInstance *CInstancePool__Spawn(void *world, s32 model, s32 type, void
         return NULL;
     }
     if (model == -1) {
-        model = CScene__FindObjectType(gScene, type);
+        model = CScene__FindObjectType(&gScene, type);
         if (model == -1) {
             return NULL;
         }

@@ -2,12 +2,13 @@
 #include "structs/game.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 
 /* gCollisionResults is the collision results (CCollisionResults, structs/collision.h);
  * this reads its first word, m_pInstance (what the last test hit), as a
  * pointer variable: gCollisionResults.m_pInstance does not give this code. */
-extern CGameObjectInstance *gCollisionResults;
+extern CGameObjectInstance *gCollisionResults; /* local type: the code reads m_pInstance through this pointer view (see above) */
 
 void CPlayer__Respawn(CPlayer *p);
 

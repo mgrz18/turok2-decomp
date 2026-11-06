@@ -4,31 +4,15 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/game.h"
+#include "globals/menu.h"
+#include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
-extern s32 gSaveBufferHandle;
-extern s32 gLoadBufferHandle;
-extern s32 gCameraPoolHideViews;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsProfile;
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuLeaving;
-extern s32 gPakMenuPort; /* pad */
-extern s32 gPakCheckDone;
-extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern u8 gPakSaveGameAnyPakMenuDesc_2[];
-extern u8 gCharacterMenuDesc_2[];
-extern u8 gSingleMenuAfterPakDesc_2[];
-extern u8 gStatsAfterPakMenuDesc1_2[];
-extern u8 gStatsAfterPakMenuDesc2_2[];
-extern u8 gStatsAfterPakMenuDesc3_2[];
-extern u8 gStatsAfterPakMenuDesc4_2[];
-extern u8 gSavePortalMenuDescB_2[];
 void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, s32 b);
 CPlayer *CPlayerPool__FindByController(void *a, void *b);
@@ -68,14 +52,14 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
         gPakMenuStartPressed = 0;
         D_8011F144 = 1;
         D_8011B114 = 0;
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakSaveGameAnyPakMenuDesc_2, 0, (s32)arg->controller, 0);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakSaveGameAnyPakMenuDesc_2, 0, (s32)arg->controller, 0);
         return 1;
     }
     if (gPakMenuIsProfile != 0) {
         if (gPakMenuIsLoad != 0) {
             gPakMenuLeaving = 1;
             plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
-            MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, gCharacterMenuDesc_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, (u8 *)&gCharacterMenuDesc_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         if (gPakMenuIsSave != 0) {
@@ -87,16 +71,16 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
             switch (sw) {
             case 0:
             default:
-                tbl = gStatsAfterPakMenuDesc1_2;
+                tbl = (u8 *)&gStatsAfterPakMenuDesc1_2;
                 break;
             case 1:
-                tbl = gStatsAfterPakMenuDesc2_2;
+                tbl = (u8 *)&gStatsAfterPakMenuDesc2_2;
                 break;
             case 2:
-                tbl = gStatsAfterPakMenuDesc3_2;
+                tbl = (u8 *)&gStatsAfterPakMenuDesc3_2;
                 break;
             case 3:
-                tbl = gStatsAfterPakMenuDesc4_2;
+                tbl = (u8 *)&gStatsAfterPakMenuDesc4_2;
                 break;
             }
             MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, tbl, (s32)plr, plr->m_ContState.m_pContState, mm.m);
@@ -107,14 +91,14 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
     plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, arg->controller);
     if (gPakMenuIsLoad != 0) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, gSingleMenuAfterPakDesc_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, (u8 *)&gSingleMenuAfterPakDesc_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
         return 1;
     }
     if (gPakMenuIsSave == 0) {
         return 0;
     } else {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, gSavePortalMenuDescB_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+        MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, (u8 *)&gSavePortalMenuDescB_2, (s32)plr, plr->m_ContState.m_pContState, mm.m);
         gCameraPoolHideViews = 0;
         return 1;
     }

@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_9.CPP, func_8044A170_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/render.h"
 
 typedef struct Floats {
     f32 unk0, unk4, unk8, unkC, unk10, unk14;
@@ -11,9 +12,7 @@ typedef struct IntPair {
     s32 field_4;
 } IntPair;
 
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
-extern IntPair gCameraVisBits;
+extern IntPair gCameraVisBits; /* local type: one load pair over gCameraVisBits and gScreenClearTime */
 
 void CCameraViewParams__Construct(void *);
 void CMtxF__Identity(void *);

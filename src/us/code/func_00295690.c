@@ -3,9 +3,8 @@
  * HACK `register ALParam *pp asm("$2")` in the type 11 arm (ROM keeps the pointer in v0). */
 #include "common.h"
 #include "structs/libaudio.h"
+#include "globals/libaudio.h"
 
-extern ALGlobals *alGlobals;
-extern s16 eqpower[]; /* eqpower */
 void __assert(const char *exp, const char *file, s32 line); /* __assert */
 #define assert_ln(EX, ln) ((EX) ? ((void)0) : __assert("EX", "audio/env.c", ln))
 void _freePVoice(ALSynth *drvr, PVoice *pvoice); /* _freePVoice */

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 s32 CPlayer__StartWeaponBackgroundSound(void *, s32);             /* extern */
 s32 Sound__StopSoundId(s32);                     /* extern */
-extern s32 gFrameCountGameplay;
 
 void WeaponSound_Update_AF12C(CGameObjectInstance *arg0, CAI *arg1) {
     CPlayer *temp_a0;

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     f32 x, y, z;
@@ -24,7 +25,7 @@ typedef struct {
     /* 0xB8 */ s32 prevAngle;
 } Obj00402A10;
 
-extern s32 gMantidQueen_waveActive[];
+extern s32 gMantidQueen_waveActive[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 void AI_TurnHeadToTarget(s32 a0, Obj00402A10 *obj, s32 a2);
 void MantidQueen_Update(void *state);
 

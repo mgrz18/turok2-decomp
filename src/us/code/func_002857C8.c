@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/controller.h"
 
 void Controller_Latch(ControllerProfile *ctl);
 
-extern u8 gControllersInitialised;
 
 void Controller_LatchAll(void) {
     ControllerProfile *var_s0;

@@ -107,3 +107,7 @@ D_800C0984 = 0x800C0984;
 D_800D7BE0 = 0x800D7BE0;
 rspbootTextEnd = 0x800BC400; /* end of rspboot, the same address as the gfx ucode gspF3DEX_NoN_fifoTextStart */
 gSplitScreenMarginLeft = 0x800B6CCC; /* f32 after gSplitScreenMarginTop, read on its own by the camera pool */
+/* GameSettings.cheatFlags is its first field: the cheat toggles (CheatMenu_Toggle*) xor it as a
+ * scalar, which GCC compiles from a symbol of its own but not from gEngineApp_m_Settings.cheatFlags
+ * (it bases the load/store on a register). Declared in include/globals/game.h. */
+gEngineApp_m_Settings_cheatFlags = 0x8011AAD8;

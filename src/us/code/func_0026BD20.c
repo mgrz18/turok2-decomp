@@ -1,13 +1,12 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AI/NAV/8027451C.CPP, func_802750B0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/region.h"
+#include "globals/region.h"
 
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 extern void CVector3__Normalize(CVector3 *v);                         /* normalise */
 
-extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
-extern CGameRegion *sCachedNormalRegion;    /* triangle of the cached unit normal */
 extern CVector3 sRegionNormal;        /* cached raw normal */
 extern CVector3 sRegionUnitNormal;        /* cached unit normal */
 

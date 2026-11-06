@@ -4,7 +4,7 @@
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 __OSGlobalIntMask[];
+extern s32 __OSGlobalIntMask[]; /* local type: an array, not the u32 of globals/libultra.h; as a scalar GCC 2 orders the code differently */
 
 void __osResetGlobalIntMask(s32 arg0) {
     s32 temp_v0;

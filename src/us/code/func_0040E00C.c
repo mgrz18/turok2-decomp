@@ -1,5 +1,6 @@
 #include "structs/vector.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ char pad0[0x4];
@@ -21,7 +22,6 @@ typedef struct {
     /* 0xA8 */ s32 region;
 } Spawn40E00C;
 
-extern BlindOneState gBlindOne;
 
 void BlindOne_ActorAppearEnter(Actor40E00C *actor, Spawn40E00C *spawn) {
     BlindOneState *stats;

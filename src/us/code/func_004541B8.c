@@ -1,9 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
-
-extern s32 gEngineApp_m_Settings;
+#include "globals/game.h"
 
 s32 CheatMenu_ToggleInfiniteLives_2(void) {
-    gEngineApp_m_Settings ^= 2;
+    gEngineApp_m_Settings_cheatFlags ^= 2;
     return 0;
 }

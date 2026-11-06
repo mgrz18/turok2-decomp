@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "gfx.h"
+#include "globals/render.h"
 
 /* An object that can shine a glare (only the fields read here). */
 typedef struct CGlareSource {
@@ -20,8 +21,6 @@ typedef struct CGlareSource {
 
 extern CGlareSource *D_8010753C;
 extern f32 D_800A9BD0;
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 void Hud_SetupTextureMode(s32 a);
 void Render_SetRenderMode(s32 a);
 void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);

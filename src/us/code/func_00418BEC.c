@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 

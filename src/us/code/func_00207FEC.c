@@ -9,6 +9,10 @@
 /* Render_SetupMaterial: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/80268160_12.CPP, func_80269A80_de, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
+#include "globals/game.h"
+#include "globals/engine.h"
+#include "structs/light.h"
+#include "globals/render.h"
 
 /* The libultra GBI (F3DEX2) commands this function writes, as in PR/gbi.h. */
 #define _SHIFTL(v, s, w) (((unsigned int) (v) & (0xFFFFFFFFU >> (32 - (w)))) << (s))
@@ -60,7 +64,6 @@ typedef struct TextureInfo {
     /* 0x8 */ TextureFrame *frame;
 } TextureInfo;
 
-
 #define gDPSetRenderMode(pkt, mode) _GBI_CMD(pkt, 0xE200001C, mode) /* G_SETOTHERMODE_L, G_MDSFT_RENDERMODE */
 #define gDPLoadSync(pkt) _GBI_CMD(pkt, _SHIFTL(0xE6, 24, 8), 0)
 #define gDPSetTextureImage(pkt, fmt, siz, width, img) \
@@ -85,14 +88,6 @@ typedef struct TextureInfo {
 #define G_TX_RENDERTILE 0
 #define G_TX_NOMASK 0
 #define G_TX_NOLOD 0
-
-extern u32 gCurrentRenderMode;          /* current render mode index (Render_SetRenderMode) */
-extern s32 gRenderAntiAlias;          /* anti-aliasing enabled */
-extern u32 gFogRenderModeFogA;          /* extra blender flags */
-extern u32 gFogRenderModeShadeA;          /* extra blender flags (z-buffered modes) */
-extern u32 gCurrentCombineMode;
-extern u8 gShadowTexture[];         /* 16x16 I8 texture */
-extern Gfx sShadowQuadDL[], sShadowQuadDL2[];
 
 void Texture_InvalidateCache(void);
 
@@ -273,20 +268,7 @@ void Render_DrawShadowQuad(void *matrix, s32 pass, u32 alpha) {
     Texture_InvalidateCache();
 }
 
-extern s32 gEngineApp_m_Settings;
-extern u32 gFrameCountGameplay;
 /* Scene colour mode: 0 none; otherwise an environment colour (and, for 6, a prim alpha). */
-extern s32 gBlendState;
-extern f32 gBlendState_m_Color[5];
-extern s32 gRenderZModeInter;
-extern s32 gRenderImageRead;
-extern s32 gFogGeometryMode;
-extern u8 gPrimColorOverride;
-extern u8 gPrimColorOverrideR;
-extern u8 gPrimColorOverrideG;
-extern u8 gPrimColorOverrideB;
-extern u8 gPrimAlphaOverride;
-extern u8 gPrimAlphaOverrideValue;
 
 extern void *Texture_Request(s32 *texture);
 extern void Texture_GetInfo(void *node, TextureInfo *info);
@@ -313,7 +295,7 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
         return 0;
     }
     tailEnum = -1;
-    if (mat->texture != 0 && !(gEngineApp_m_Settings & 0x400)) {
+    if (mat->texture != 0 && !(gEngineApp_m_Settings.cheatFlags & 0x400)) {
         node = Texture_Request(&mat->texture);
         if (node == 0) {
             return 0;

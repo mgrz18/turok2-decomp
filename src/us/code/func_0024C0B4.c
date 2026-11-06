@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/scene.h"
 
-extern s32 gScene_m_PreviewState;
-extern s32 gScene_m_PreviewTimer;
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
