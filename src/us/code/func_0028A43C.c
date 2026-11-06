@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "structs/game.h"
 typedef struct {
                u32 type;
                u32 flags;
@@ -78,7 +79,6 @@ extern f32 sGfxRspTime;
 extern f32 gSchedRspTotalTime;
 extern f32 gSchedRspTime;
 extern s32 sSchedGfxWatchdog;
-extern View gEngineApp[];
 extern u32 gDisplayList0;
 void __scHandleRSP(Vid *o) {
     Job *j;
@@ -114,7 +114,7 @@ void __scHandleRSP(Vid *o) {
             sGfxRspTime = sGfxRspTime + (f32)(((osGetTime() - sGfxRspResumeTime) * 64) / 3) * 0.000001f;
             gSchedRspTotalTime = sGfxRspTime;
             gSchedRspTime = (f32)(((osGetTime() - sAudioTaskStartTime) * 64) / 3) * 0.000001f;
-            base = gEngineApp;
+            base = (View *)gEngineApp.m_FrameData;
             fb = (u32)j->unkC;
             if (fb == base[0].fb) {
                 s = base;

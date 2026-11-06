@@ -2,6 +2,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004069F4.c, func_004069F4, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
+#include "structs/game.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
@@ -23,7 +24,6 @@ extern char gPakCharacterNoteName[];
 extern char gPakGameNoteName[];
 extern s32 D_800F70A8;
 extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern u8 gEngineApp[];
 extern u8 gPakMsgNoControllerDesc[];
 extern u8 gPakMsgCannotSaveDesc[];
 extern u8 gDamagedPakAtBootMenuDesc[];
@@ -98,7 +98,7 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     if (Pak_NeedsRepair(gPakMenuPort) != 0) {
         goto blk59;
     }
-    CEngineApp__UpdateControllers(gEngineApp);
+    CEngineApp__UpdateControllers(&gEngineApp);
     if ((arg0->controller->buttons & 0x1000) && sPakMenuStartLatched == 0) {
         gPakMenuStartPressed = 1;
         sPakMenuStartLatched = 1;

@@ -8,6 +8,7 @@
 #include "structs/collision.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
+#include "structs/game.h"
 
 /* The cinema system: one file from Cinema_SplineSecondDerivs to Cinema_IsWaitCue (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -947,7 +948,6 @@ typedef struct {
     /* 0x294 */ f32 height;
 } ScreenRectangle;
 
-extern u8 gEngineApp[];
 extern void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 
 /* Fills the cinema's screen rectangle with the colour and alpha of the current time. */
@@ -1017,7 +1017,7 @@ void Cinema_DrawFade(ScreenRectangle *rectangle) {
             value = 0.0f;
         }
         rgba[3] = (u32) value;
-        CEngineApp__DrawFilledRect(gEngineApp, rgba, width, height, right, bottom);
+        CEngineApp__DrawFilledRect(&gEngineApp, rgba, width, height, right, bottom);
     }
     Cinema_DrawLetterbox();
 }
