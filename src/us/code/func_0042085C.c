@@ -6,19 +6,13 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
-extern s32 gPakMessageKind; /* menu state */
 extern s32 gCameraPoolHideViews;
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuIsProfile;
-extern s32 sPakMessageRumbleB;
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort; /* pad */
 extern s32 gScene_m_PendingWarpID;
-extern s32 gPakCheckDone;
-extern s32 gSavePortalActive;
 extern u8 gScene[];
 extern u8 gEngineApp[];
 extern u8 gSavePortalMenuDescB[];

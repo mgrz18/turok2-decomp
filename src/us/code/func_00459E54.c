@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
 char *PakMenu_GetReturnMenu_2(void *event);
@@ -14,8 +15,6 @@ extern s32 gPakMenuPort;
 extern s32 gPakCheckDone;
 extern s32 gCameraPoolHideViews;
 extern s32 gPakMenuAnyPak;
-extern u32 gPakConfirmKind; /* menu state */
-extern s32 gPakMenuLeaving;
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

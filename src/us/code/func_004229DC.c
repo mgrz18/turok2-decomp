@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 extern char D_800B5024[];
 extern char D_800B4FE8[];
@@ -19,7 +20,6 @@ extern char D_800B4E00[];
 extern char D_800B4BD0[];
 extern char D_800B4E74[];
 extern char D_800B4C60[];
-extern u32 gPakMessageKind;
 s32 PakMessage_UpdateLine2(struct FieldRecAt14 *field) {
     u32 state = gPakMessageKind;
     if (state >= 16) {

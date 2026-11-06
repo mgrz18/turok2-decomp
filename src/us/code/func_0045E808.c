@@ -3,11 +3,9 @@
 
 #include "rw/junk_types.h"
 #include "structs/controller.h"
+#include "globals/pak.h"
 
 extern OSMesgQueue gSiMessageQueue;
-extern OSPfs gPakFileSystems[];
-extern s32 gPakError[];
-extern s32 gPakState[];
 s32 osPfsInitPak_2(OSMesgQueue *queue, OSPfs *pfs, int channel); /* osPfsInitPak_2 (link address) */
 s32 Pak_RefreshNotes_2(s32 pad); /* Pak_RefreshNotes_2 (link address) */
 s32 Pak_Mount_2(s32 pad) {

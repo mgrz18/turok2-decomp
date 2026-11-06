@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 extern s32 GameNoteMenu_SelectNo(void *unused, struct RecordRecAt24 *record);
-extern s32 sGameNoteLoad;
 extern char gPakLoadGameMenuDesc[];
 extern void MenuPool_OpenMenu(void *, void *, s32, s32, s32);
 s32 GameNoteMenu_SelectNo(void *unused, struct RecordRecAt24 *record) {

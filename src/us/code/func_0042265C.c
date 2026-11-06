@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 extern int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item);
-extern int sCharNoteLoad;
 extern char gPakLoadProfileMenuDesc[];
 extern void MenuPool_OpenMenu(char *, char *, int, int, int);
 int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item) {

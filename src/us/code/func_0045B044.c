@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 struct RecordRecAt24;
 struct RecordRecAt24 {
     char pad[0x1C];
@@ -11,7 +12,6 @@ struct RecordRecAt24 {
     void *resource;
 };
 struct RecordRecAt24;
-extern s32 sGameNoteLoad;
 extern s32 GameNoteMenu_SelectNo_2(void *unused, struct RecordRecAt24 *record);
 extern char gPakLoadGameMenuDesc_2[];
 extern void MenuPool_OpenMenu_2(void *, void *, s32, s32, s32);

@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/pak.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 void *memset(void *s, int c, u32 n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
@@ -17,16 +18,7 @@ typedef struct K7Obj {
 } K7Obj;
 typedef struct K7Mem { s32 addr; } K7Mem;
 extern s32 D_800F70A8;
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
-extern s32 gPakMenuLeaving;
-extern s32 gPakMenuWrites;
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuIsProfile;
-extern s32 gPakNoteIndex;
-extern s32 gPakOverwriteNote;
-extern PakProfile gPakProfile;
-extern PakProfile gPakProfileRead;
 extern u8 gPakCharacterNoteName[];
 extern u8 gPakGameNoteName[];
 extern u8 gPakCompanyCode[];

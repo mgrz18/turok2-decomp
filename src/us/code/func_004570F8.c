@@ -5,18 +5,13 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 void PakMenu_UpdateNoteRows_2(Menu *menu);
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuLeaving;
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuIsProfile;
-extern s32 gPakMenuWrites;
 extern s32 gPakMenuMode;
 extern char gPakMsgInsertToLoadDesc_2[];
 extern char gPakMsgPakNotFoundDesc_2[];
 extern char gCharacterMenuAfterPakDesc_2[];
-extern s32 gPakMenuAnyPak;
 extern s32 gDamagedPakContinued;
 extern char gDamagedPakAtBootMenuDesc_2[];
 extern char gPakLoadProfileMenuDesc_2[];

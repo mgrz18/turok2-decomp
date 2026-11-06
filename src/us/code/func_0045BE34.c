@@ -1,20 +1,14 @@
 /* Second-module copy of SavePortalMenu_Init (first module; this one at link address 0x00422E34), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 void Controller_WatchPak(s32 port);
 void Pak_ProbeSlot_2(s32 port);
 
 extern s32 gDamagedPakContinued;
 extern s32 gPakMenuPort;
-extern s32 sSavePortalChosen;
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsLoad;
-extern s32 gSavePortalActive;
-extern s32 gPakMenuWrites;
 extern s32 D_801309AC;
-extern s32 gPakMenuIsProfile;
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

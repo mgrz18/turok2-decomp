@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 s32 MenuItem_TextLength(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
@@ -9,9 +10,6 @@ extern s32 gPakMenuPort;
 extern char D_800B47F4[];
 extern char D_800B4804[];
 extern char D_800B48F8[];
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsProfile;
 
 s32 PakMenu_UpdateModeText(MenuItem *item) {
     s32 player;

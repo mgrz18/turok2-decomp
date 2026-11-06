@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/pak.h"
 
 /* Only the field read here. */
 typedef struct {
@@ -7,7 +8,6 @@ typedef struct {
 } CallbackArg;
 
 extern s32 gCameraPoolHideViews;
-extern s32 gSavePortalActive;
 extern s32 D_801309AC;
 
 void SavePortalMenu_Close(s32 arg0, CallbackArg *arg1) {

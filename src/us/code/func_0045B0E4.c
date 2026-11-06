@@ -2,11 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 extern void func_0045B0E4(struct RecordRecAtCV1 *record);
-extern int sCharNoteLoad;
 extern s32 D_801309A8;
-extern s32 sCharNoteLoad;
 void func_0045B0E4(struct RecordRecAtCV1 *record) {
     record->target->first &= ~0x01800000;
     sCharNoteLoad = 0;

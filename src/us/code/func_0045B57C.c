@@ -3,8 +3,8 @@
 
 #include "common.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
-extern int sCharNoteLoad;
 struct ItemRecAt24;
 typedef struct ItemRecAt24 ItemRecAt24;
 struct ItemRecAt24;

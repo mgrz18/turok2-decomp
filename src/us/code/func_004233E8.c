@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
@@ -7,9 +8,6 @@ extern char gPakMsgInsertRumblePakDesc[];
 extern s32 gPakMenuPort;
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2];
 extern s32 gCameraPoolHideViews;
-extern s32 sSavePortalChosen;
-extern s32 gPakMenuAnyPak;
-extern s32 gSavePortalActive;
 
 static __inline__ void ShowPlayerMessage(u8 *player, char *fmt) {
     MenuPool_OpenMenu(*(char **)(player + 0x51C) + 0x53C, fmt, player, *(s32 *)(player + 0xA50), 0);

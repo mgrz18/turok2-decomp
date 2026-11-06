@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/pak.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
@@ -30,9 +31,6 @@ extern s32 gScreenWidth;          /* width */
 extern s32 gScreenHeight;          /* height */
 extern u8 gScene[];
 extern u8 gValidControllerBits;
-extern s32 gPakCheckHasPak;
-extern s32 gPakCheckDone;
-extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
 extern f32 gPakCheckTimer;

@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 /* Checks the controller pak in the given slot before a save/load menu:
  * returns the pak status, or -1 after opening the "pak full" dialog; opens the
@@ -14,9 +15,6 @@ extern u8 gPakMsgInsertToSaveDesc_2[];
 extern u8 gPakMsgInsertToLoadDesc_2[];
 extern u8 gPakMsgPakChangedDesc_2[];
 extern u8 gDamagedPakAtBootMenuDesc_2[];
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuLeaving;
 
 extern void Pak_ProbeSlot_2(s32 slot);
 extern s32 Pak_GetStatus_2(s32 slot);

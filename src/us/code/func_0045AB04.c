@@ -1,6 +1,7 @@
 /* Second-module copy of PakMenu_UpdateModeText (first module; this one at link address 0x00421B04), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 s32 MenuItem_TextLength_2(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
@@ -10,9 +11,6 @@ extern s32 gPakMenuPort;
 extern char D_800B47F4[];
 extern char D_800B4804[];
 extern char D_800B48F8[];
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsProfile;
 
 s32 PakMenu_UpdateModeText_2(MenuItem *item) {
     s32 player;

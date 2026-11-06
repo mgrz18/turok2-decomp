@@ -4,13 +4,9 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
-extern s32 gPakConfirmKind;
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
-extern s32 gPakMenuLeaving;
-extern s32 gPakOverwriteNote;
-extern s32 gPakNoteIndex;
 extern s32 D_8011B114;
 extern u8 gPakMsgDeleteDoneDesc_2[];
 extern u8 gPakMsgDeleteFailedDesc_2[];

@@ -8,13 +8,10 @@
 #include "structs/pak.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 extern s8 gPakProfileRead_character[];
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
-extern s32 gPakMenuLeaving;
-extern s32 sCharNoteLoad;
-extern s32 gPakNoteIndex;
 extern u8 gPlayerSetupMenuDesc[];
 extern u8 gPakMsgDeleteDoneDesc[];
 extern u8 gPakMsgDeleteFailedDesc[];
@@ -24,7 +21,6 @@ void CPlayer__SetCharacter(CPlayer *a, s32 b);
 void MenuPool_OpenChildMenu(u8 *a, Menu *o, u8 *c);
 s32 Pak_DeleteNote(s32 pad, s32 idx);
 void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
-extern PakProfile gPakProfile;
 /* Turok 2 inlines this (Rage Wars calls it) */
 static inline void O01Restore(CPlayer *a) {
     CPlayerOptions *s = a->m_pOptions;

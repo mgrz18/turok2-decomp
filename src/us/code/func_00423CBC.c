@@ -3,13 +3,13 @@
  * and whose shared `return 0` tail is the already-accepted func_00423D30 (8 bytes). */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern u8 D_800B5180[];
 extern u8 D_800B51CC[];
 extern u8 D_800B5218[];
 extern u8 D_800B5264[];
 extern u8 D_800B52C4[];
-extern s32 gPakConfirmKind;
 
 s32 PakConfirmMenu_UpdateLine5(MenuItem *item) {
     switch (gPakConfirmKind) {

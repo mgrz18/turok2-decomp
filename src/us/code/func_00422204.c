@@ -2,11 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 extern char D_800B4AF8[];
 extern char D_800B4AE0[];
 extern char D_800B4AEC[];
-extern int sCharNoteLoad;
 extern s32 D_801309A8;
 s32 CharNoteMenu_UpdateTitle(struct FieldRecAt14 *field) {
     if (sCharNoteLoad != 0) {

@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 /* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak) and prints its text, or (states 1
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
@@ -18,12 +19,8 @@ typedef struct {
     /* 0x24 */ void *string;
 } Item;
 
-extern s32 gPakConfirmKind; /* menu state */
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
-extern s32 gPakMenuLeaving;
 extern s32 gCameraPoolHideViews;
-extern s32 gPakCheckDone;
 extern u8 gSavePortalMenuDesc[];
 extern u8 gSavePortalMenuDescB[];
 extern s32 PakMenu_CheckPak(Item *item, s32 id, s32 a2);

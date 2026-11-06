@@ -2,13 +2,13 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/menu.h"
+#include "globals/pak.h"
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
 void MenuPool_OpenMenu_2(char *dst, char *fmt, s32 arg2, s32 arg3, s32 arg4);
 
 extern char gPakSaveGameMenuDesc_2[];
-extern s32 sSavePortalChosen;
 
 static __inline__ s32 func_00422EE0_inline(void) {
     if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0) {
