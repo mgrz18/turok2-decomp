@@ -4,14 +4,10 @@
 #include "globals/pak.h"
 #include "globals/controller.h"
 
-
 /* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
 
 extern char gRumblePool[];
 extern char gRumbleEntries[];
-extern u8 gValidControllerBits;     /* controller bit pattern */
-extern u8 gNumControllers;     /* number of controllers */
-extern u8 gControllersInitialised;     /* controllers initialised */
 
 s32 RumblePool_Init(void *dst, void *src, s32 n);
 void osCreateMesgQueue(void *mq, void *msgBuf, s32 count); /* osCreateMesgQueue */

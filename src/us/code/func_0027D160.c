@@ -16,25 +16,15 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/math.h"
-
-/* A camera mode: its update, then a word. */
-typedef struct {
-    /* 0x0 */ void (*m_Update)(CCamera *cam);
-    /* 0x4 */ s32 _pad;
-} CCameraMode;
-
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 _pad0[0x1C];
     /* 0x1C */ u32 m_VisBits;
 } CFloor;
 
-extern f32 gFrameIncrement;          /* the frame's time step */
-extern CCameraMode D_800B6CB4[];
-extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 /* The camera pool, seen from its main camera. */
 #define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool.m_MainCamera - 0x40))
-extern s32 gDefaultVisBits;
 void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
 void guLookAtF(CMtxF m, f32 eyeX, f32 eyeY, f32 eyeZ, f32 atX, f32 atY, f32 atZ, f32 upX, f32 upY, f32 upZ);
@@ -110,7 +100,7 @@ found:
     cam->m_Time += gFrameIncrement;
     CCamera__AdvanceAttributes(cam);
     if (Cinema_PathPlaying() == 0) {
-        update = D_800B6CB4[cam->m_Mode].m_Update;
+        update = gCameraModeTable[cam->m_Mode].update;
         if (update != NULL) {
             update(cam);
         }
@@ -405,7 +395,6 @@ found:
     }
 }
 
-extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern Gfx gRspInitDL[];        /* RDP setup display lists */
 extern Gfx gRdpInitDL[];
 void Texture_InvalidateCache(void);

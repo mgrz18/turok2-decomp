@@ -1,10 +1,5 @@
 #include "common.h"
-
-typedef struct {
-    /* 0x0 */ u32 mask;
-    /* 0x4 */ u32 value;
-    /* 0x8 */ u8 *name;
-} FlagDesc;
+#include "globals/crash.h"
 
 extern u8 D_800AA0DC[];   /* ": " */
 extern u8 D_800AA0E0[];   /* "<" */

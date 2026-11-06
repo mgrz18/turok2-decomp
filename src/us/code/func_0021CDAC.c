@@ -1,6 +1,7 @@
 #include "common.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 /* Builds an animated object's bone matrices: binds its animation index,
  * loads the current (and, when blending, the next) animation into the two
@@ -94,7 +95,6 @@ typedef struct Profile {
 } Profile;
 
 extern char D_800A5AF8[];
-extern s32 gFrameCount;
 extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
 extern u8 gEngineApp_m_SwooshSystem[];

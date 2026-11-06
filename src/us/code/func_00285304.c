@@ -5,8 +5,6 @@
 
 /* Per-controller rumble pak state. */
 
-extern u8 gControllersInitialised;           /* service enabled */
-
 extern s32 osRecvMesg(void *queue, void *msg, s32 flags);
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 extern s32 osMotorInit(void *queue, void *pfs, s32 channel);

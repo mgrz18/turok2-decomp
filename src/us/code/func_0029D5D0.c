@@ -2,6 +2,7 @@
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 
 #include "common.h"
+#include "globals/libultra.h"
 
 typedef struct PiHandle {
     /* 0x00 */ struct PiHandle *next;
@@ -17,7 +18,6 @@ typedef struct PiHandle {
 } PiHandle;
 
 extern PiHandle CartRomHandle;     /* CartRomHandle */
-extern PiHandle *__osPiTable;    /* __osPiTable */
 extern s32 osPiRawReadIo(u32 devAddr, u32 *data);   /* osPiRawReadIo */
 extern void memset(void *p, s32 c, s32 n);   /* memset */
 extern u32 __osDisableInt(void);

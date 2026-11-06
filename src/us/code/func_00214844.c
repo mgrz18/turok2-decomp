@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
@@ -43,8 +44,6 @@ typedef struct {
 extern s32 gLitVerticesKey;
 extern char D_800A57F8[];
 extern s8 gColorPulseTable[];         /* the colour pulse, 64 steps */
-extern s32 gFrameCount;          /* frame count */
-extern u8 D_800B6D1B;           /* its low byte */
 
 s32 Actor_GetTypeClass(void);
 void **CStaticObject__LoadGeometry(PlacedProp *prop);
@@ -166,7 +165,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
             data = (u8 *) header + header[1];
             object = (s32 *) data;
             colors = (u8 *) header + header[2];
-            if (prop->colorFrame != D_800B6D1B) {
+            if (prop->colorFrame != (u8)gFrameCount) {
                 pulseColors(object, colors);
             }
             Render_QueueModelInstance(instance, prop->matrix, 0, 0, data, argument, lod);
@@ -176,5 +175,5 @@ void CStaticObject__Draw(PlacedProp *prop) {
         CCache__Unlock(0, resource);
     }
     CCache__Unlock(0, instance);
-    prop->colorFrame = D_800B6D1B;
+    prop->colorFrame = (u8)gFrameCount;
 }

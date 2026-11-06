@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern int __osContinitialized;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern s32 __osSiRawStartDma(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);

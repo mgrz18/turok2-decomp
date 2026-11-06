@@ -1,5 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_27.CPP, func_8044C3D4_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/camera.h"
 
 typedef struct CollisionBuildVertex {
     f32 x;
@@ -52,7 +53,6 @@ typedef struct CollisionBuildWorld {
     /* 0x18FA8 */ s32 group;
 } CollisionBuildWorld;
 
-extern s32 gDefaultVisBits;
 
 extern s32 ProPackDecompress(CollisionBuildMeshHandle **handle, s32);
 extern void *CISet__GetBlockAndSize(void *node, s32 index, s32 *size);

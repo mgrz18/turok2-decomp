@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern float D_800AA8D8;
 extern double D_800AA8D0;
 extern void __osViSwapContext();
-extern __OSViContext *__osViCurr;
-extern __OSViContext *__osViNext;
 extern u32 osVirtualToPhysical(void *addr);
 void __osViSwapContext(void)
 {

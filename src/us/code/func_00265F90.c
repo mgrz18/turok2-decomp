@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/text.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x16];
@@ -32,8 +33,6 @@ typedef struct {
 
 extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* game */
 extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* game + 0x40: fallback camera */
-extern char *gLevelMessages[]; /* {text, sound} pairs */
-extern s32 D_800B69DC[];  /* gLevelMessages + 4 */
 
 extern s32 CPlayer__GetPickupCountLow(CPlayer *player, s32 item); /* can take it? */
 extern void CPlayer__UseSpecialPickup(CPlayer *player, s32 item);
@@ -62,9 +61,9 @@ s32 Action_CheckRequiredItem(Pickup *obj, PickupState *state, Toucher *toucher) 
         camera = player->m_pCamera;
     }
     CCameraPool__AddMultiLineText(gEngineApp_m_Game_m_CameraPool, camera,
-                  gLevelMessages[info->message * 2], obj, 4.0f);
-    if (D_800B69DC[info->message * 2] != 0) {
-        Sound__PlaySpeech(D_800B69DC[info->message * 2]);
+                  gLevelMessages[info->message].text, obj, 4.0f);
+    if (gLevelMessages[info->message].speech != 0) {
+        Sound__PlaySpeech(gLevelMessages[info->message].speech);
     }
     return 0;
 }

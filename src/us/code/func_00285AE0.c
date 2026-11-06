@@ -13,8 +13,6 @@ void Controller_ReadAll(void);
 s32 RumblePool_Init(void *dst, void *src, s32 n);
 u32 osMotorStop(void *pfs);
 
-extern u8 gControllersInitialised;  /* controllers initialised */
-
 void Controller_ResetRumble(ControllerProfile *ctrl) {
     if (gControllersInitialised != 0 && ctrl->connected != 0) {
         osRecvMesg(&gPakAccessQueue, 0, 1);

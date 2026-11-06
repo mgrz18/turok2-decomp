@@ -5,9 +5,9 @@
 #include "structs/region.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 extern char D_800A6EA8[]; /* "Fly Mode Off" */
-extern f32 gFrameIncrement;    /* frame time */
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 f32 Math_StepClamped(f32 value, f32 target, f32 rate);

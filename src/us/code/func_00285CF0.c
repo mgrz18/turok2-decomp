@@ -5,10 +5,10 @@
 #include "structs/game.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "globals/engine.h"
 
 extern s32 gFogEnabled;
 extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gEvenOdd;              /* frame buffer index */
 extern f32 sExpansionPakMtx[][16];        /* per-frame matrices */
 extern u8 gDefaultLights[];
 extern u8 sExpansionPakText[];

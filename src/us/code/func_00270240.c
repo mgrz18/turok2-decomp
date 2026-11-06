@@ -3,6 +3,7 @@
 #include "structs/sound.h"
 #include "globals/frame.h"
 #include "globals/audio.h"
+#include "globals/engine.h"
 
 typedef struct {
     s32 rate;
@@ -19,7 +20,6 @@ typedef struct {
 
 extern s32 gAudioWorldReady;      /* sound manager ready */
 extern u8 sAudioWorldReverbParams[];
-extern s32 gThreadPriorityAudio;
 extern u8 gEngineApp_m_Settings_unk15[]; /* local type: the field's real type (or the member path) changes the ROM's code here */     /* volume settings (bytes from -2) */
 
 extern s32 __osDisableInt(void);         /* disable interrupts */

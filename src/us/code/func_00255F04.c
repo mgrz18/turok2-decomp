@@ -2,11 +2,10 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define P_F32(p, off) (*(f32 *)((u8 *)(p) + (off)))
-
-extern f32 gFrameIncrement; /* the frame's time step */
 
 extern void CPlayer__SetState(void *player, void *other, s32 mode);
 

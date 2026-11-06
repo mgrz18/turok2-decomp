@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/CODE_80245D20.CPP, func_80245D30_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 extern s32 GameObject_IsOnGround(void *actor);
 extern f32 CVector3__GetYaw(CVector3 *v);                                 /* yaw of v */
@@ -9,7 +10,6 @@ extern void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);   /*
 extern void Angle_Wrap(f32 *angle);                              /* wraps an angle */
 
 extern f32 sSurfaceCurrentRates[2];   /* current: blend rate, turn rate */
-extern f32 gFrameIncrement;      /* frame time scale */
 
 /* A surface that carries what stands on it (water current, conveyor). */
 typedef struct {

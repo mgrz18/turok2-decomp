@@ -5,15 +5,13 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/camera.h"
+#include "globals/engine.h"
 
 /* Steps the particle system once: marks every particle on the three active
  * lists, then (outside a pause) advances the ones inside the visible bounds,
  * fires the impact events of the expired ones and frees them, and lets each
  * collected type 0x22 particle react to the others and each type 0x57
  * particle expire the non-0x57 ones within range. */
-
-extern f32 gFrameIncrement;          /* frame time scale */
-extern f32 gParticleTimeScale;
 
 extern void CParticle__Update(CParticle *p);
 extern s32 CParticle__IsUnderWater(CParticle *p);

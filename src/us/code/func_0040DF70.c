@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/game.h"
-
-extern f32 gFrameIncrement; /* frame time scale */
+#include "globals/engine.h"
 
 /* Step callback of the Blind One's actors: while alive they target the
  * current player, run their mode's callback and count the hit flash down. */

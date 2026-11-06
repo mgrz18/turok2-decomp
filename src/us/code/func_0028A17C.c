@@ -3,6 +3,7 @@
 #include "common.h"
 #include "globals/frame.h"
 #include "globals/render.h"
+#include "globals/engine.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -38,13 +39,10 @@ typedef struct {
     /* 0x124 */ u32 minRetraces;
 } GfxTask;
 
-extern s32 gDecompressorBoostRetraces;          /* retraces before the thread priority is restored */
 extern u8 gDecompressor[];         /* OSThread */
-extern s32 gThreadPriorityDecompressorLow;          /* its priority */
 extern s32 gCurrentTick;          /* retraces since the last swap */
 extern s32 gCurrentFB;          /* framebuffer on screen */
 extern GfxTask *gWaitingFrames[];
-extern s32 sSchedGfxWatchdog;          /* retrace counter */
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);

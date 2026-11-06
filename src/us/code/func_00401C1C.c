@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
 s32 Cinema_PathPlaying();                                /* extern */
-extern s32 gPersistentDataLoaded;
 
 s32 Automap_IsShown(void *arg0)
 {

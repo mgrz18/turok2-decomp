@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern int __OSGlobalIntMask;
 extern void __osLeoAbnormalResume();
 extern void __osLeoResume();
 extern char *__osDiskHandle;

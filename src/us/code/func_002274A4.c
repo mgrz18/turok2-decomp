@@ -3,8 +3,7 @@
 #include "structs/collision.h"
 #include "structs/level_actor.h"
 #include "globals/camera.h"
-
-extern f32 gFrameIncrement;                  /* the frame's time step */
+#include "globals/engine.h"
 
 void CPooledLevelActor__Update(CPooledLevelActor *actor);
 

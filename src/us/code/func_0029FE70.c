@@ -2,6 +2,7 @@
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 
 #include "common.h"
+#include "globals/adec.h"
 
 /* Acclaim compressed-audio stream decoder state (one instance) */
 typedef struct {
@@ -13,9 +14,6 @@ typedef struct {
     /* 0x14 */ u16 *rd;       /* bitstream read pointer */
 } AdecStream;
 
-extern u16 gAdecBitMasks[];   /* mask (1 << n) - 1 */
-extern u16 gAdecSignBits[];   /* sign bit 1 << (n - 1) */
-extern u16 sAdecBitsLeft;     /* bits still unread in the current word */
 extern u16 sAdecBitWord;     /* current stream word */
 
 /* Bit reader: fetches `count` fields of `nbits` bits (MSB first) from the stream of 16-bit words at st->rd into dst[],

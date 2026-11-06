@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 /* The scope model raised to the view. */
 typedef struct {
@@ -21,8 +22,6 @@ typedef struct {
     /* 0xB4 */ s32 state;           /* 0 hidden, 1 raising, 2 up, 3 lowering */
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
-
-extern f32 gFrameIncrement;          /* the frame's time step */
 
 s32 CScene__FindObjectType(void *level, s32 id);
 void *CScene__GetObject(void *level, s32 index);

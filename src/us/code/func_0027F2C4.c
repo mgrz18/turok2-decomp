@@ -7,12 +7,10 @@
 #include "globals/menu.h"
 #include "globals/render.h"
 #include "globals/camera.h"
-
+#include "globals/engine.h"
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern f32 gFrameIncrement;              /* frame time */
-extern s32 gEvenOdd;              /* frame buffer index */
 extern Gfx gRspInitDL[];
 extern Gfx gRdpInitDL[];
 

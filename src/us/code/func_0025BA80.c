@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/model.h"
+#include "globals/engine.h"
 
 /* AI draw callback: draws the actor faded in or out (dying / teleporting states). */
 
 extern s32 gBlendState; /* fade mode */
 extern f32 gBlendFade[2]; /* fade level, alpha */
-extern s32 gEvenOdd; /* current view */
 extern u8 D_801100D4[];
 
 extern void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);

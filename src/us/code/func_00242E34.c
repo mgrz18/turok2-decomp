@@ -6,15 +6,13 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
-
+#include "globals/engine.h"
 
 typedef struct Dest {
     u32 flags;         /* 0x00 */
     char pad4[0xCC - 0x4];
     f32 timer;         /* 0xCC */
 } Dest;
-
-extern f32 gFrameIncrement;  /* frame time scale */
 
 CRegionInfo *CScene__GetRegionInfo(void *world, CGameRegion *region);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);

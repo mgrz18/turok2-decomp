@@ -1,8 +1,7 @@
 #include "common.h"
 #include "globals/menu.h"
 #include "globals/render.h"
-
-extern char *gCreditsLines[];          /* credits lines */
+#include "globals/text.h"
 
 extern void COnScreen__BeginText(void);
 extern void COnScreen__SelectTinyFont(void);

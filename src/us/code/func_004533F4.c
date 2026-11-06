@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
-
-extern f32 gFrameIncrement;
+#include "globals/engine.h"
 
 s32 GameOverMenu_TickCountdown_2(void)
 {

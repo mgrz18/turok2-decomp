@@ -6,6 +6,7 @@
 #include "globals/boss.h"
 #include "globals/onscreen.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 /* One file: BlindOne_UpdateMover, BlindOne_GetHealthPercent, BlindOne_Setup and BlindOne_PhaseWaitPlayerUpdate.
  * BlindOne_Setup's only literal, the string "Blind", sits at 0x800C08D4, 4 past
@@ -21,7 +22,6 @@
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern f32 gFrameIncrement; /* frame time */
 extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
 void BlindOne_UpdateMover(BlindOneMover *mover) {
@@ -96,7 +96,6 @@ void BlindOne_UpdateMover(BlindOneMover *mover) {
     }
 }
 
-
 /* Returns the second boss' remaining health in percent, summed over its three groups of actors (an actor
  * counts while it has health and flag 0x100). */
 
@@ -125,7 +124,6 @@ s32 BlindOne_GetHealthPercent(BlindOneState *state) {
     }
     return alive * 100 / total;
 }
-
 
 /* Second boss setup: collects its three groups of actors (types 0x454-0x456), sets their health and slots,
  * finds its two level objects, shows its health bar ("Blind") and enters the first phase of its script. */
@@ -212,7 +210,6 @@ void BlindOne_Setup(BlindOneState *state) {
     CScene__UnmarkGeneratorsSaved(&gScene);
     nextPhase_40CCC0(state);
 }
-
 
 /* Second boss phase update: steps the script to the next phase once the player comes within 716.8 of the
  * origin. */

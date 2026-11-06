@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
@@ -29,8 +30,6 @@ typedef struct {
 f32 Math_DecayToZero(f32 value, f32 rate);
 void Sound__StopSoundId(s32 sound);
 
-extern u32 gFrameCountGameplay;
-extern f32 gFrameIncrement;
 
 void WeaponBarrel_Spin_AF324(SpinObj *obj, SpinState *s) {
     SpinOwner *owner = obj->owner;

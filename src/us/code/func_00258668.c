@@ -3,10 +3,9 @@
 #include "structs/weapon.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
-
-extern u32 gFrameCountGameplay;
 
 extern void CCameraPool__AddText(void *arg0, void *camera, s32 model);
 

@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
 s32 CPlayer__Hurt(s32, s32, s32, s32, s32);
 
 s32 Sound__PlaySpeech(s32);                     /* extern */
-extern f32 gFrameIncrement;
 
 void CPlayer__UpdateOxygen(CPlayer *arg0, s32 arg1) {
     f32 temp_f0;

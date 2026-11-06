@@ -3,8 +3,8 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/hostio.h"
 
-extern s32 sHostIoPiReady;          /* PI manager started */
 extern u8 sHostIoDmaMsg[];         /* OSIoMesg used for the DMA */
 extern OSMesgQueue sHostIoDmaQueue;  /* its reply queue */
 extern void HostIo_WriteByteDma(s32 address, u8 value);

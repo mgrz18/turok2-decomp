@@ -4,6 +4,7 @@
 #include "globals/game.h"
 #include "globals/onscreen.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -26,8 +27,6 @@ typedef struct {
     /* 0x14 */ s32 warned;
 } BossFight;
 
-
-extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
 
 void *CPlayerPool__GetFirstActive(void *);

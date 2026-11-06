@@ -17,7 +17,6 @@ typedef struct IoReq {
                s32 a2;
                OSMesgQueue *reply;
 } IoReq;
-extern s32 sHostIoState;
 s32 HostIo_DisableInt();
 void HostIo_RestoreInt(s32 mask);
 s32 HostIo_Call(s32 a, s32 b, s32 c, s32 d);

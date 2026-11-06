@@ -3,13 +3,11 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/engine.h"
+#include "globals/camera.h"
 
-extern u32 sTintFlags;          /* the camera player's AI flags this frame, */
-extern u32 sTintFlagsPrev;          /* the frame before, */
-extern u32 sTintFlagsPrev2;          /* and the one before that */
 extern s32 gDeathTint;          /* a tint forced over the view */
 extern u8 gDeathTintColor[4];        /* its colour */
-extern f32 gFrameIncrement;          /* the frame's time step */
 void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 void CCamera__UpdateFlash(CCamera *cam);
 s32 Cinema_PathPlaying(void);

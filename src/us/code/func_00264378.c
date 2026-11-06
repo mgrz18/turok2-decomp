@@ -1,12 +1,12 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 typedef struct {
     u8 pad0[0x8];
     void (*onEnter)(void *actor, void *state); /* 0x8 */
 } StateHooks;
 
-extern f32 gFrameIncrement; /* frame delta */
 s32 CScene__GetInstanceSavedBit(void *table, void *actor);
 void Platform_UpdateSpecial(void *actor, void *state);
 void Platform_UpdatePosition(void *actor, void *state);

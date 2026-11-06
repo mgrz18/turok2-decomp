@@ -4,6 +4,7 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 #include "globals/scene.h"
+#include "globals/camera.h"
 
 extern s32 CScene__FindRegionAt(void *, void *);
 extern float D_800A9BDC;
@@ -11,7 +12,6 @@ extern float D_800A9BE4;
 extern float D_800A9BE0;
 extern s32 Cinema_PathPlaying(void);
 extern f32 CGameRegion__GetHeight(s32 arg0, f32 arg1, f32 arg2);
-extern s32 gDefaultVisBits;
 void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6,
                    f32 arg7, f32 arg8, f32 arg9, Shared_Quad arg10, s32 arg11, f32 arg12,
                    f32 arg13) {

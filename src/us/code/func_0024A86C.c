@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/game.h"
-
-extern f32 gFrameIncrement;      /* frame step */
+#include "globals/engine.h"
 
 void Hud_SetupTextureMode(s32);
 void Hud_DrawWorldSprite(void *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f32 size);

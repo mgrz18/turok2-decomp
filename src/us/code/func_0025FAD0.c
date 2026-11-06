@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame delta */
 
 void DamageEvent_Set(DamageEvent *event, void *target, s32 damage, f32 radius, s32 flags, void *shield);
 void CAI__CallHurt(CGameObjectInstance *self, CAI *ai, DamageEvent *event);

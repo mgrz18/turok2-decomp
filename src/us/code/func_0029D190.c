@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern OSPiHandle_s *__osCurrentHandle[2];
 extern u32 osVirtualToPhysical(void *addr);
 s32 osEPiRawStartDma(OSPiHandle_s *pihandle, s32 direction, u32 devAddr, void *dramAddr, u32 size)
 {

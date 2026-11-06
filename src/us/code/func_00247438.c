@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/game.h"
 #include "globals/render.h"
+#include "globals/engine.h"
 
 typedef struct { s32 m[4][4]; } Mtx64;   /* a packed N64 Mtx, 0x40 bytes */
 
@@ -35,7 +36,6 @@ typedef struct {
 extern u8 gPrimAlphaOverride;
 extern u8 gPrimAlphaOverrideValue;
 extern u8 gSceneLights[];     /* lights */
-extern s32 gEvenOdd;      /* frame buffer index */
 extern f32 D_800ADDB8;
 
 void Render_InvalidateModeCache(void);

@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/particle.h"
+#include "globals/engine.h"
 
 typedef struct Mtx44 { s32 w[16]; } Mtx44;
 
@@ -37,7 +38,6 @@ typedef struct Emitter {
     /* 0x4C */ f32 totalLength;
 } Emitter;
 
-extern s32 gEvenOdd;
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);

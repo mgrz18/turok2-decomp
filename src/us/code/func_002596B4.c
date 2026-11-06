@@ -4,7 +4,7 @@
 #include "structs/weapon.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
-
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x2C];
@@ -19,7 +19,6 @@ typedef struct {
     /* 0x128 */ s32 unk128;
 } State;
 
-extern u32 gFrameCountGameplay;
 void CCameraPool__AddText(void *buf, s32 a, s32 b);
 void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 

@@ -27,8 +27,6 @@ typedef struct IoRequest {
     /* 0x1C */ OSMesgQueue *reply;
 } IoRequest; /* size 0x20 */
 
-extern s32 sHostIoPiReady;  /* DMA allowed */
-extern s32 sHostIoState;
 extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern u32 HostIo_ReadWord(u32 address);

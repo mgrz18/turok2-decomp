@@ -24,12 +24,12 @@
 #include "globals/render.h"
 #include "globals/collision.h"
 #include "globals/math.h"
+#include "globals/engine.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 /* MIN as a statement expression: its value lives in its own temporary. */
 #define MINF(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
-
 
 /* Matches with four register pins (the `register ... asm` lines in the inlined
  * depth scale and at its call), no other trick. Why pins: in the ROM the depth
@@ -394,7 +394,6 @@ typedef struct {
     /* 0x134 */ f32 radius;
 } ShadowActor;
 
-
 void *MtxPool_Alloc(void *pool, s32 count);
 void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);
 f32 GameObject_GetGroundHeight(ShadowActor *actor, s32 arg1);    /* ground height */
@@ -577,9 +576,6 @@ typedef struct {
     /* 0x510 */ f32 fadeRange;
 } ParticleView;
 
-
-extern f32 gFrameIncrement;              /* frame time */
-extern s32 gEvenOdd;              /* matrix buffer index */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* the current view */
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
@@ -957,7 +953,6 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
  * last collision target for kinds 0x2D and 0x4F, and plays their sound.
  * Returns the number spawned. */
 
-
 /* Two half-floats: base and random range (see RandomInPackedRange). */
 typedef struct {
     /* 0x0 */ u16 base;
@@ -1149,7 +1144,6 @@ typedef struct {
 
 extern Render D_800F1BA0;
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gEvenOdd;
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 extern f32 gProjectileSpeedScale[2];

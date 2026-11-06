@@ -1,8 +1,8 @@
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/CODE_8028414C.CPP, func_80284178_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
 
 typedef struct Matrix {
     f32 m[4][4];
@@ -25,7 +25,6 @@ struct Shared_ParticleView {
 
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gEvenOdd;
 extern void CParticle__BuildMatrix(void *, s32, s32, f32);
 
 void CParticle__BuildCameraMatrix(void *arg0) {

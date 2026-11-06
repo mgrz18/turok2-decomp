@@ -18,7 +18,6 @@ typedef struct B01IoReq {
                s32 w18;
                OSMesgQueue *reply;
 } B01IoReq;
-extern s32 sHostIoState;
 s32 HostIo_DisableInt(void);
 void HostIo_RestoreInt(s32 mask);
 void HostIo_WriteBlock(u32 dst, u8 *src, u32 n);

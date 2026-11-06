@@ -3,11 +3,8 @@
 #include "globals/game.h"
 #include "globals/menu.h"
 #include "globals/render.h"
-
-extern f32 gFrameIncrement;              /* frame time */
-extern s32 gEndingPrimagenDefeated;
-extern s32 gFinalEnding;
-extern char *gCreditsLines[];          /* credits lines */
+#include "globals/engine.h"
+#include "globals/text.h"
 
 extern void CPlayerPool__GetFirstActive(void *);
 extern void CEngineApp__StartGameAtWarp(s32, s32);

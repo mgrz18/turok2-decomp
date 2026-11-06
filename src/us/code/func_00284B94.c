@@ -6,8 +6,6 @@
 
 /* Controller pak / rumble service, run once per frame while enabled. */
 
-extern u8 gControllersInitialised;           /* service enabled */
-extern s32 sControllerRescanTimer;          /* rescan countdown */
 extern u8 gRumblePool[];
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flags);

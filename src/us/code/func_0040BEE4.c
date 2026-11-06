@@ -4,6 +4,7 @@
 #include "structs/light.h"
 #include "structs/model.h"
 #include "globals/boss.h"
+#include "globals/engine.h"
 
 /* Draw callback of the module's actors: draws each body part (anim group) whose slot is active in the
  * module object's mask, refreshing the slot's state first unless a cinema path is playing. */
@@ -13,7 +14,6 @@ typedef struct {
     /* 0x14C */ s32 partMask;
 } ModuleObj;
 
-extern s32 gEvenOdd; /* current view */
 extern void CGameObjectInstance__DrawShadow(CGameObjectInstance *actor, void *ai, CDrawArgs *req);
 extern s32 Cinema_PathPlaying(void);
 extern void ScriptAnimator_Apply(void *slotData);

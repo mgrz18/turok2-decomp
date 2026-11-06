@@ -10,7 +10,6 @@ void osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg msg);
 void osStartThread(OSThread *thread);
 void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
 void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
-extern volatile s32 sHostIoPiReady;
 extern OSMesg sHostIoEventBuf[];
 extern OSMesg sHostIoRequestBuf[];
 extern OSMesg sHostIoDmaBuf[];

@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/engine.h"
 
 /* Per-part callback of the module's actors: in part 0, fades the actor's two blend values in with the module
  * object's anim state (9: first value up to 1; 0x13: after a delay, second value up to 3 then back down to 1;
@@ -18,7 +19,6 @@ typedef struct {
     /* 0x90 */ u32 part;
 } PartInfo;
 
-extern f32 gFrameIncrement; /* frame time */
 extern f32 sMotherBossFadeTimer; /* fade timer */
 extern s32 sMotherBossCinemaStarted; /* second value reached its peak */
 extern void CMtxF__ScaleAxes(void *arg0, f32 r, f32 g, f32 b);

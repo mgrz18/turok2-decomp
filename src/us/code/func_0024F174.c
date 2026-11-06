@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ f32 forwardAccel;
@@ -16,7 +17,6 @@ typedef struct {
     /* 0x22 */ s16 impulseSound;
 } Tuning;
 
-extern f32 gFrameIncrement;      /* frame time */
 
 s32 Cinema_IsActive(void);
 f32 Math_DecayToZero(f32 value, f32 rate);

@@ -2,6 +2,7 @@
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 
 #include "common.h"
+#include "globals/adec.h"
 
 /* Acclaim compressed-audio stream decoder state (one instance) */
 typedef struct {
@@ -27,7 +28,6 @@ typedef struct {
     /* 0x0C */ s32 n;
 } MdctCtx;
 
-extern s16 sAdecImdctReady;          /* IMDCT tables built */
 extern MdctCtx *sMdctFft;     /* FFT context */
 extern f32 sMdctPreCos[128];     /* pre-twiddle cos */
 extern f32 sMdctPreSin[128];     /* pre-twiddle sin */

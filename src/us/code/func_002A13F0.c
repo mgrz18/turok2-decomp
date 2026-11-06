@@ -5,9 +5,9 @@
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -msplit-addresses */
 #include "common.h"
 #include "structs/memory.h"
+#include "globals/hostio.h"
 
 extern u32 sHostIoSavedTlb[32][4];     /* saved TLB entries: PageMask, EntryHi, EntryLo0, EntryLo1 */
-extern u32 sHostIoTlbPageMasks[];          /* page masks 4K, 16K, ... 16M; 0x80000000 ends the table */
 
 extern u32 func_002A31FC(void);   /* reads the TLB, returns EntryHi */
 

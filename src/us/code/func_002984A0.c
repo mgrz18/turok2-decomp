@@ -1,7 +1,5 @@
-typedef int s32;
-typedef unsigned int u32;
-typedef unsigned char u8;
-typedef float f32;
+#include "common.h"
+#include "globals/libultra.h"
 
 #define IO_WRITE(addr, data) (*(volatile u32 *)(0xA0000000 | (addr)) = (u32)(data))
 #define AI_DACRATE_REG 0x04500010
@@ -10,7 +8,6 @@ typedef float f32;
 #define AI_MIN_DAC_RATE 132
 #define AI_MAX_BIT_RATE 16
 
-extern s32 osViClock;          /* osViClock */
 
 /* libultra osAiSetFrequency(). */
 s32 osAiSetFrequency(u32 frequency) {

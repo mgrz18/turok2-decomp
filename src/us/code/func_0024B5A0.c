@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/engine.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-extern f32 gFrameIncrement;      /* frame step */
 
 s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 s32 CPlayer__IsInMatchEndState(CPlayer *player);

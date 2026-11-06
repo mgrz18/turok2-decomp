@@ -10,6 +10,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
 /* The libultra GBI (F3DEX2) commands this function writes, as in PR/gbi.h. */
 #define _SHIFTL(v, s, w) (((unsigned int) (v) & (0xFFFFFFFFU >> (32 - (w)))) << (s))
@@ -60,7 +61,6 @@ typedef struct TextureInfo {
     /* 0x4 */ s32 palettes;
     /* 0x8 */ TextureFrame *frame;
 } TextureInfo;
-
 
 #define gDPSetRenderMode(pkt, mode) _GBI_CMD(pkt, 0xE200001C, mode) /* G_SETOTHERMODE_L, G_MDSFT_RENDERMODE */
 #define gDPLoadSync(pkt) _GBI_CMD(pkt, _SHIFTL(0xE6, 24, 8), 0)
@@ -274,7 +274,6 @@ void Render_DrawShadowQuad(void *matrix, s32 pass, u32 alpha) {
     Texture_InvalidateCache();
 }
 
-extern u32 gFrameCountGameplay;
 /* Scene colour mode: 0 none; otherwise an environment colour (and, for 6, a prim alpha). */
 extern s32 gBlendState;
 extern f32 gBlendState_m_Color[5];

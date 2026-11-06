@@ -1,7 +1,7 @@
-typedef float f32;
+#include "common.h"
+#include "globals/engine.h"
 
 extern f32 D_800A5688;          /* braking factor when reversing */
-extern f32 gFrameIncrement;          /* per-frame scale */
 
 /* Moves value by delta, clamped to [-limit, limit]; reversing direction is damped. */
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit) {

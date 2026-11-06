@@ -3,11 +3,9 @@
 #include "structs/region.h"
 #include "structs/emitter.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
-
-extern f32 gFrameIncrement;          /* the frame's time step */
-extern f32 gEmitterTimeScale;
 
 CRegionInfo *CScene__GetRegionInfo(void *world, s32 region);
 f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);

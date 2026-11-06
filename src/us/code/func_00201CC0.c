@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 s32 CList__Construct(s32, s32, s32);       /* extern */
 s32 CList__AddTail(s32, void *);                 /* extern */
@@ -7,7 +8,6 @@ s32 osCreateMesgQueue(s32, s32, s32);           /* extern */
 s32 osCreateThread(s32, s32, s32 *, s32, s32, s32); /* extern */
 s32 osSetEventMesg(s32, s32, s32);       /* extern */
 s32 osStartThread(s32);                         /* extern */
-extern s32 gThreadPriorityLoader;
 extern s32 CLoader__Main;
 
 typedef struct {

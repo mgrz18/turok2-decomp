@@ -19,7 +19,7 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/collision.h"
-
+#include "globals/engine.h"
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
@@ -293,7 +293,6 @@ void CPlayer__UpdateOrbitCamera(CPlayer *player, CGameObjectInstance *target) {
     }
 }
 
-
 void WeaponActor_SwitchToRequested(void *a, void *b);
 
 /* Picks the player's weapon set (0 on foot, 1 in states 10-11, 2 with
@@ -503,9 +502,6 @@ typedef struct PlayerStateInfo {
     /* 0x0C */ u8 padC[0x18 - 0xC];
 } PlayerStateInfo;
 
-
-extern f32 gFrameIncrement;              /* frame time */
-extern s32 gEvenOdd;
 extern f32 gCharacterHealthRegen[];           /* health regeneration per character */
 extern PlayerStateInfo gPlayerStateTable[];
 extern u32 D_800F1E30;

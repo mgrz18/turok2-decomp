@@ -4,6 +4,7 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "structs/emitter.h"
+#include "globals/engine.h"
 
 typedef struct AnimationInfo {
     /* 0x0 */ s32 frameCount;
@@ -11,8 +12,6 @@ typedef struct AnimationInfo {
     /* 0x8 */ u8 *frame;            /* format, rate, log2 width, log2 height */
     /* 0xC */ u8 padC[4];
 } AnimationInfo;
-
-extern s32 gEvenOdd;              /* frame buffer index */
 
 extern void *Texture_Request(void *texture);
 extern void Texture_GetInfo(void *resource, AnimationInfo *info);

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 typedef struct {
     f32 m[16];
@@ -51,8 +52,6 @@ typedef struct {
     /* 0x10C */ u8 blendStart;
     /* 0x10D */ u8 blendEnd;
 } AnimActor;
-
-extern f32 gFrameIncrement;          /* the frame's time step */
 
 void **CCache__Request(s32, s32, s32, s32, s32, s32, char *, s32);
 void CCache__Unlock(s32, void **);

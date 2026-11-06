@@ -3,13 +3,13 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 /* AI attack-wait callback: state 0 counts the delay down; once it has run out
  * (more than 30 frames left means an attack is due) it plays the attack
  * animation for the current mode if the definition allows it. State 1 counts
  * the cool-down and re-picks a region. */
 
-extern f32 gFrameIncrement; /* frame delta */
 extern CVector3 gEnemyAlertPoint;
 extern CVector3 gEnemyLastNoisePos;
 

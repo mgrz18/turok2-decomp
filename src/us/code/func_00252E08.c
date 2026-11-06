@@ -4,8 +4,7 @@
 #include "globals/game.h"
 #include "globals/camera.h"
 #include "globals/render.h"
-
-extern u32 gFrameCountGameplay;          /* frame counter */
+#include "globals/engine.h"
 
 extern void Hud_SetupTextureMode(s32 color);
 extern void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32 arg5, s32 arg6, s32 arg7);

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x238];
@@ -7,8 +8,6 @@ typedef struct {
 
 s32 osSetThreadPri(void *, s32);                 /* extern */
 
-extern s32 gThreadPriorityDecompressorLow;
-extern s32 gThreadPriorityDecompressorHigh;
 
 void CDecompressor__Flush(Task *arg0) {
     if (arg0->pending != 0) {

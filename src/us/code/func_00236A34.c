@@ -1,10 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A7164.c, func_002A7164.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/engine.h"
 
-typedef unsigned char u8;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
 typedef struct Emit Emit;
 typedef struct EmitDef {
                u8 pad0[2];
@@ -63,7 +61,6 @@ struct Emit {
 };
 extern f32 D_800A6534;
 extern f32 D_800A6538;
-extern s32 gEvenOdd;
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
 void CMtxF__ClampEntries(void *);

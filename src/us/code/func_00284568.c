@@ -2,8 +2,7 @@
 #include "structs/cinema.h"
 #include "globals/game.h"
 #include "globals/cinema.h"
-
-extern f32 gFrameIncrement;          /* frame time scale */
+#include "globals/engine.h"
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);

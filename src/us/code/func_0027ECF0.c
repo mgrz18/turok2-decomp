@@ -3,14 +3,18 @@
 #include "structs/camera.h"
 #include "structs/collision.h"
 #include "globals/game.h"
-#include "globals/camera.h"
 #include "globals/render.h"
 
+/* local types: this file cannot include globals/camera.h (gDefaultVisBits below) */
 extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, */
 extern f32 gSplitScreenMarginTop;          /* top, */
 extern f32 gSplitScreenMarginLeft;          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
 extern f32 gSplitScreenMarginRight;          /* right */
-extern s32 gDefaultVisBits[];        /* the visibility bits outside any region */
+extern CCameraPool gEngineApp_m_Game_m_CameraPool;  /* the camera pool */
+extern CBox gCameraViewBox;         /* the view boxes of all the active cameras together */
+extern CBox gCameraVisibleBox;         /* and their widened (animation) boxes */
+extern u32 gCameraVisBits;          /* and their visibility bits */
+extern s32 gDefaultVisBits[];        /* local type: the u32 of globals/camera.h loads it before the box copies (GCC 2 alias order) */
 
 /* gCameraVisBits seen as a structure: the loop ORs into it through one. */
 typedef struct {

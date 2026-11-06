@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ char pad[0x64];
@@ -6,7 +7,6 @@ typedef struct {
 } Obj64;
 
 extern f32 D_800A7948;
-extern f32 gFrameIncrement;
 extern void CAI__SetMode(void *, void *, s32);
 
 /* Has the shape of an AI step function, stepFunc(pThis, pAI) in LibTEngine:

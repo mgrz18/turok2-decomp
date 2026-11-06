@@ -3,13 +3,13 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/intelligence.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x22];
     /* 0x22 */ s16 strokeSound;
 } Tuning;
 
-extern f32 gFrameIncrement;      /* frame time */
 extern char gStandLookTuning;     /* standing look tuning */
 extern Tuning gWadeMoveTuning;   /* wading move tuning */
 

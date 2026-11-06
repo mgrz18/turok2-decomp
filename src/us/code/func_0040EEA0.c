@@ -3,13 +3,13 @@
 #include "structs/boss.h"
 #include "structs/model.h"
 #include "globals/boss.h"
+#include "globals/engine.h"
 
 s32 Render_DrawModel(s32, s32, s32, s32, s32, s32, s32);
 s32 CGameObjectInstance__DrawModel(s32, s32, s32);
 s32 ScreenTint_UpdateMode(void);
 s32 ScriptAnimator_Apply(void *);
 extern s32 gBlendState;
-extern s32 gEvenOdd;
 
 void BlindOne_Group3Draw(CGameObjectInstance *arg0, CAI *arg1, CDrawArgs *arg2)
 {

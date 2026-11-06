@@ -2,8 +2,7 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 #include "globals/game.h"
-
-extern f32 gFrameIncrement;          /* frame time scale */
+#include "globals/engine.h"
 
 extern s32 Cinema_PathPlaying(void);
 extern void *LoopSounds_Get(void);

@@ -1,13 +1,6 @@
-typedef signed char s8;
-typedef signed int s32;
+#include "common.h"
+#include "globals/libultra.h"
 
-typedef struct {
-    /* 0x0 */ s32 active;
-    /* 0x4 */ s32 unk4;
-    /* 0x8 */ s32 value;
-} State;
-
-extern State __osPiDevMgr;
 
 s32 osPiGetCmdQueue(void)
 {
@@ -17,13 +10,13 @@ s32 osPiGetCmdQueue(void)
   {
     if (new_var)
     {
-      new_var = &__osPiDevMgr.value;
+      new_var = (s32 *)&__osPiDevMgr.cmdQueue;
       ;
       return *new_var;
     }
     else
     {
-      new_var = &__osPiDevMgr.value;
+      new_var = (s32 *)&__osPiDevMgr.cmdQueue;
       ;
       return *new_var;
     }

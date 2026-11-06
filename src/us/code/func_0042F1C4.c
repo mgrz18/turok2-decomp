@@ -1,9 +1,7 @@
 #include "common.h"
 #include "structs/demo.h"
 #include "structs/controller.h"
-
-extern s32 gFrameCountGameplay;
-extern f32 gFrameIncrement;
+#include "globals/engine.h"
 
 void func_00430330(void *);
 void CEngineApp__SetupFadeTo(void *, s32);

@@ -3,6 +3,7 @@
 #include "structs/cinema.h"
 #include "globals/game.h"
 #include "globals/cinema.h"
+#include "globals/engine.h"
 
 typedef struct GameState {
     s32 busy;               /* 0x0000 */
@@ -10,9 +11,6 @@ typedef struct GameState {
     s32 paused;             /* 0x1450 */
 } GameState;
 
-extern s32 sCinemaLastFrame;      /* last frame handled */
-extern s32 gFrameCount;      /* frame counter */
-extern f32 gFrameIncrement;      /* frame time */
 extern GameState gEngineApp_m_Game_m_PlayerList_m_bCinema; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 extern s32 Cinema_StartPending(void);

@@ -2,6 +2,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/onscreen.h"
+#include "globals/engine.h"
 
 typedef struct {
     f32 x, y, z;
@@ -24,7 +25,6 @@ typedef struct {
     /* 0x54 */ Vec3_00403F3C spawn;
 } Level00403F3C;
 
-extern f32 gFrameIncrement;
 extern u8 sPrimagenTossTable[];
 extern u8 sPrimagenTossTableStage3[];
 extern u8 sPrimagenTossTable2[];

@@ -7,6 +7,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#include "globals/engine.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
@@ -21,8 +22,6 @@ struct ContactHandler {
     /* 0x10 */ s32 (*func)(CPlayer *player, ContactHandler *handler);
 };
 
-extern f32 gFrameIncrement;                  /* the frame's time step */
-extern f32 gParticleTimeScale;
 extern ContactHandler sParticleAmmoPickups[4];
 
 s32 Random_Next(void);

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame delta */
 
 void TotemDefense_AddKill(void);
 void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);

@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/engine.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
@@ -9,7 +10,6 @@ extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
-extern f32 gFrameIncrement;          /* per-frame scale */
 extern f32 gLevelScript_script; /* local type: the field's real type (or the member path) changes the ROM's code here */         /* cooldown */
 extern s32 gLevelScript_script_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */         /* cursor */
 

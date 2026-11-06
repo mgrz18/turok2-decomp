@@ -6,6 +6,7 @@
 #include "globals/game.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -45,7 +46,6 @@ typedef struct {
 } PortSetup;
 
 extern Globals gEngineApp_m_Game_m_MenuPool; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
-extern f32 gFrameIncrement;          /* frame time */
 extern PortSetup D_8011AB88[];
 extern char gPauseMenuDesc;         /* death screen */
 extern char gSavePortalMenuDesc;

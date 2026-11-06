@@ -2,10 +2,10 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/libultra.h"
 #define OS_MESG_BLOCK 1
 #define OS_STATE_WAITING 8
 
-extern OSThread *__osRunningThread; /* __osRunningThread */
 u32 __osDisableInt(void);
 void __osRestoreInt(u32);
 void __osEnqueueAndYield(OSThread **);

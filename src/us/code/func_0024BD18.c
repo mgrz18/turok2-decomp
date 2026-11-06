@@ -2,8 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 #include "globals/menu.h"
-
-extern f32 gFrameIncrement;      /* frame step */
+#include "globals/engine.h"
 
 s32 Cinema_IsActive(void);
 void CBarrel__Close(CBarrel *menu);

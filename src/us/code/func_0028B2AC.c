@@ -2,15 +2,14 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/engine.h"
 
 extern void __scAppendList(struct OSSched *arg0, void *arg1);
 extern void __scYield(void *arg0);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern int gThreadPriorityDecompressorHigh;
 extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
 extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
 extern void osSetThreadPri(void *arg0, s32 arg1);
-extern s32 gDecompressorBoostRetraces;
 extern s32 gDecompressor;
 s32 __scSchedule(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node_func_8028F544_de **arg2, s32 arg3);
 void __scAppendList(OSSched *arg0, void *arg1);

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "globals/render.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;          /* the frame's time step */
 s32 Cinema_PathPlaying(void);
 void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam);
 void COnScreen__BeginText(void);

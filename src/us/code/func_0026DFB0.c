@@ -3,6 +3,8 @@
 #include "globals/game.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
+#include "globals/text.h"
 
 typedef struct {
     void (*onActor)(void *actor, void *ai, LevelEvent *event);
@@ -10,9 +12,6 @@ typedef struct {
 } EventHandler;
 
 extern EventHandler *gLevelEventHandlers[];  /* handler tables by kind */
-extern char *gLevelMessages[];          /* {text, sound} pairs */
-extern s32 D_800B69DC[];            /* gLevelMessages + 4 */
-extern s32 gFrameCountGameplay;
 
 extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, s32 arg3, f32 time);
 extern void Sound__PlaySpeech(s32 sound);
@@ -38,9 +37,9 @@ void LevelEvent_Fire(LevelEvent *event) {
     }
     if (gScene.m_Mode == 4) {
         if (event->message != 0) {
-            CCameraPool__AddMultiLineText(&gEngineApp_m_Game_m_CameraPool, camera, gLevelMessages[event->message * 2], gFrameCountGameplay, 4.0f);
-            if (D_800B69DC[event->message * 2] != 0) {
-                Sound__PlaySpeech(D_800B69DC[event->message * 2]);
+            CCameraPool__AddMultiLineText(&gEngineApp_m_Game_m_CameraPool, camera, gLevelMessages[event->message].text, gFrameCountGameplay, 4.0f);
+            if (gLevelMessages[event->message].speech != 0) {
+                Sound__PlaySpeech(gLevelMessages[event->message].speech);
             }
         }
         if (event->music >= 2) {

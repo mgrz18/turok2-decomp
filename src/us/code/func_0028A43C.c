@@ -5,6 +5,7 @@
 #include "ultra_types.h"
 #include "globals/frame.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 typedef struct {
                u32 type;
                u32 flags;
@@ -77,9 +78,6 @@ void __scExec(Vid *o, Job *a, Job *b);
 extern u64 sGfxRspResumeTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u64 sAudioTaskStartTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
 extern f32 sGfxRspTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
-extern f32 gSchedRspTotalTime;
-extern f32 gSchedRspTime;
-extern s32 sSchedGfxWatchdog;
 void __scHandleRSP(Vid *o) {
     Job *j;
     Job *a;

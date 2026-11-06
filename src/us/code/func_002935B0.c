@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libaudio.h"
 
 extern int _sndpVoiceHandler(void * arg0);
-extern ALGlobals *alGlobals;
 extern void *alHeapDBAlloc(u8 *, s32, ALHeap *, s32, s32);
 extern void alEvtqNew(ALEventQueue *, ALEventListItem *, s32);
 extern void alSynAddPlayer(ALSynth *, ALPlayer *);

@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/libultra.h"
 typedef struct __OSContRamReadFormat __OSContRamReadFormat;
 struct __OSContRamReadFormat {
     u8 dummy;
@@ -25,7 +26,6 @@ extern OSPifRam __osMotorStartData[4];
 extern u8 __osMotorStartBuf[32];
 extern OSPifRam __osMotorStopData[4];
 extern u8 __osMotorStopBuf[32];
-extern s32 __osMotorinitialized[4];
 extern s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
 extern s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
 extern u8 __osContAddressCrc(u16 address);

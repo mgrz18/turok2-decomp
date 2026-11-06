@@ -6,7 +6,7 @@
 #include "structs/weapon.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
-
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ s16 mode;
@@ -14,7 +14,6 @@ typedef struct {
 } PoseInfo;   /* 0x18 bytes */
 
 extern PoseInfo gPlayerStateTable_anim[];
-extern u32 gFrameCountGameplay;
 extern struct {
     s32 enabled;
 } gEngineApp_m_Settings_match_tag;

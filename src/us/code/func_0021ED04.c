@@ -3,6 +3,7 @@
 #include "structs/gbi.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 typedef struct Slot24 {
     s32 w[6];
@@ -21,8 +22,6 @@ typedef struct ModelRef {
     u8 pad10[0x1C - 0x10];
     s32 unk1C;                  /* 0x1C */
 } ModelRef;
-
-extern s32 gEvenOdd;          /* frame buffer index */
 
 Mtx *MtxPool_Alloc(void *pool, s32 count);
 void CMtxF__Multiply(f32 (*mf)[4], void *arg1, void *arg2);

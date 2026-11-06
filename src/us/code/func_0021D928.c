@@ -2,11 +2,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/model.h"
+#include "globals/engine.h"
 
 /* As CGameObjectInstance__DrawModel, drawing through Render_DrawModel and without setting the
  * actor's mask; clears gBlendState afterwards. */
 
-extern s32 gEvenOdd;      /* current view */
 extern s32 gBlendState;
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);

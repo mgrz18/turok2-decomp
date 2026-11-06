@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x22];
@@ -14,7 +15,6 @@ typedef struct {
     /* 0x114 */ CVector3 pos;
 } Ui;
 
-extern f32 gFrameIncrement;      /* frame time */
 extern char gSwimLookTuning;     /* swimming look tuning */
 extern Tuning gSwimMoveTuning;   /* swimming move tuning */
 

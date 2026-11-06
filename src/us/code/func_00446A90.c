@@ -4,15 +4,13 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/onscreen.h"
-
+#include "globals/engine.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 /* Update callback of the second boss: runs the anim callback, counts the hit timer down, runs the phase's
  * update, then updates the slots, the three movers and the boss' health bar. */
 
-
-extern f32 gFrameIncrement; /* frame time */
 extern BlindOnePhase sBlindOnePhases_2[];
 extern void Animator_Update(void *slot);
 extern void BlindOne_UpdateMover_2(BlindOneMover *mover);

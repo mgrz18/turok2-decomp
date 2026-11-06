@@ -6,11 +6,11 @@
 #include "globals/frame.h"
 #include "gfx.h"
 #include "globals/render.h"
+#include "globals/engine.h"
 
 extern u8 gRspInitDL[];
 extern u8 gRdpInitDL[];
 extern B21Vp gScreenViewport[];
-extern s32 gEvenOdd;
 void CEngineApp__BeginDisplayList(void)
 {
   f32 new_var;

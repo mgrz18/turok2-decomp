@@ -5,6 +5,7 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
  * random stun of a live helper), and once the boss has waited long enough
@@ -18,7 +19,6 @@ typedef struct {
 } BossFight;
 
 extern BossFight gTotemDefense;
-extern f32 gFrameIncrement;
 
 extern void TotemDefense_DrawTotem();
 extern void TotemDefense_UpdateFight(BossFight *fight);

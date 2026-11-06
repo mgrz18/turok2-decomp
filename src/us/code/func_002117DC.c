@@ -1,6 +1,6 @@
 #include "common.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame time scale */
 
 /* Eases *value toward target by (target - *value) * rate * gFrameIncrement; snaps when rate is 1. */
 void Math_EaseToward(f32 *value, f32 target, f32 rate) {

@@ -6,6 +6,7 @@
 #include "structs/camera.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
+#include "globals/engine.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -21,7 +22,6 @@ typedef struct {
     /* 0x0C */ CVector3 max;
 } Box;
 
-extern s32 gEvenOdd;              /* matrix buffer index */
 extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 Frustum_TestBox(void *planes, Box *box);

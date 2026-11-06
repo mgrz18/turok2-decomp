@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/model.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
 /* Draws a weapon actor: its muzzle child (copying the parent's render block), then the model. */
 
@@ -21,8 +22,6 @@ typedef struct {
     /* 0x1AC */ u8 pad1AC[0x234 - 0x1AC];
     /* 0x234 */ void *drawHook;
 } WeaponActor;
-
-extern s32 gEvenOdd;
 
 extern s32 MenuPool_CountOpen(void *arg0);
 extern void EnemyAI_CalcOrientationMatrix(WeaponActor *actor, void *ai);

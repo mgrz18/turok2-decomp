@@ -23,6 +23,8 @@
 #include "globals/menu.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "globals/engine.h"
+#include "globals/camera.h"
 
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -133,7 +135,6 @@ s32 MenuItem_UpdateBinding(MenuItem *item, Menu *menu) {
 
 /* ---------------- MenuItem_Layout ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F69C.c, func_0043F69C, with Turok 2's layouts. */
-
 
 extern s32 GetMemSize(void);
 extern CCamera *func_00416B28_41363C(void *pool) __asm__("MenuPool_GetCamera");
@@ -486,7 +487,6 @@ void MenuItem_DrawImage(MenuItem *item, MenuItemLayout *box, MenuItemLayout *are
     }
 }
 
-
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00440618.c, func_00440618, with Turok 2's layouts. */
 
 extern void func_0041363C_4143DC(MenuItem *item, MenuItemLayout *info) __asm__("MenuItem_Layout");
@@ -538,13 +538,8 @@ void MenuItem_DrawSlider(MenuItem *it, MenuItemLayout *box, MenuItemLayout *colu
     fin_4145B0(&cp, box, column, window);
 }
 
-
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004409A8.c, func_004409A8, with Turok 2's layouts. */
 
-extern s32 gEvenOdd;
-extern s32 gFrameCountGameplay; /* frame counter */
-extern s32 gDefaultVisBits;
-extern f32 gFrameIncrement; /* frame time scale */
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
 extern s32 gCharacterModels[];
 
@@ -694,7 +689,6 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
     }
 }
 
-
 /* ---- Menu_Construct ---- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00440F10.c, func_00440F10.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -841,11 +835,9 @@ void Menu_Construct(Menu *p, void *a1, MenuDesc *t, s32 a3, struct CPlayer *a4, 
   }
 }
 
-
 /* ---- Menu_MoveCursor ---- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_8043F52C_de_4.c, func_804410AC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
 
 /* Moves the window's cursor by the selected item's link for dir (0x10 +
  * MENU_LINK_*: the byte at that offset), on until an item that is shown,
@@ -889,14 +881,12 @@ void Menu_MoveCursor(Menu *menu, u8 dir) {
     } while ((entry->flags & 0x1800000) != 0x1800000 || entry->def->select == NULL);
 }
 
-
 /* ---- Menu_Update ---- */
 /* WRONG CUT: real function 0x0041531C, size 0x3E0 (through 0x004156FC): splat cut it into
  * Menu_Update, func_004154C4, func_00415500, func_00415508, func_004155AC,
  * func_0041560C and func_004156D8 at branch targets. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00441384.c, func_00441384, with Turok 2's layouts. */
 
-extern f32 gFrameIncrement; /* frame delta */
 extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 extern s32 func_00285628_4143DC(ControllerProfile *ctl) __asm__("Controller_MenuLeft");
 extern s32 func_00285670_4143DC(ControllerProfile *ctl) __asm__("Controller_MenuRight");
@@ -1014,7 +1004,6 @@ s32 Menu_Update(Menu *menu, void *arg) {
     return 0;
 }
 
-
 /* ---- Menu_Draw ---- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00441764.c, func_00441764.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -1129,11 +1118,6 @@ void Menu_Draw(Menu *p, void *a1) {
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00441D50.c, func_00441D50.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-
-
-
-
-
 extern void func_0041363C_415CE8(MenuItem *it, void *info) __asm__("MenuItem_Layout");
 extern void func_0027AF4C_415CE8(void) __asm__("Hud_SetupFillMode");
 extern void func_002778A8_415CE8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j) __asm__("Hud_DrawBevelBox");
@@ -1185,8 +1169,6 @@ void Menu_DrawBar(Menu *a, MenuItem *b, s32 c) {
 /* ---------------- MenuPool_OpenSubmenu ---------------- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00442020.c, func_00442020.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
-
 
 /* Static inline in the Rage Wars source file (dropped by the importer); 0x330 in Turok 2, 0x480 in Rage Wars. */
 static inline s32 O06_ItemSize_415FB8(s16 *a) { if (*a == 3) return 0x330; return 0; }
@@ -1479,8 +1461,6 @@ void MenuPool_Construct(s32 arg0) {
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_004426E4.c, func_004426E4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-
-
 /* Extra allocation per item: kind 3 items carry a 0x330-byte block (0x480 in Rage Wars). */
 static __inline__ s32 O06_ItemSize_416644(s16 *a) {
     s32 n = 0;
@@ -1510,8 +1490,6 @@ s32 MenuPool_OpenMenu(MenuPool *a, MenuDesc *b, s32 c, s32 d, s32 e) {
 /* ---------------- MenuPool_OpenMenuFrom ---------------- */
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00442800.c, func_00442800.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
-
 
 /* Turok 2 inlines the per-item size (Rage Wars calls it): kind 3 adds 0x330 */
 static inline s32 O06_ItemSize_416760(s16 *a) {
@@ -1597,7 +1575,6 @@ s32 MenuPool_OpenChildMenu(MenuPool *pool, Menu *c, MenuDesc *t) {
 s32 CList__Remove(s32, s32);
 s32 CCache__Deallocate(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update");
-
 
 void MenuPool_Update(MenuPool *arg0) {
     s32 (*temp_v0)(Menu *, MenuPool *);
@@ -1753,10 +1730,6 @@ s32 Menu_GetFlashLevel(Menu *obj) {
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00442D18.c, func_00442D18.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-
-
-
-
 extern void COnScreen__BeginText(void);
 extern void Render_SetRenderMode(s32 a);
 extern void func_0027B320_416C74(s32 a, s32 b, s16 c, s16 d, f32 e, f32 f, s32 g) __asm__("Hud_DrawSprite");
@@ -1784,7 +1757,6 @@ void Menu_DrawFlash(Menu *a) {
 /* ---------------- MenuItemDesc_ExtraSize ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/80442BC8.CPP, func_80442CD8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
 
 extern s32 MenuItemDesc_ExtraSize(s16 *record);
 s32 MenuItemDesc_ExtraSize(s16 *record) {
@@ -1898,9 +1870,6 @@ void MenuModel_DrawUnselected(s32 arg0, s32 arg1, s32 arg2) {
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00443298.c, func_00443298.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-
-
-
 /* The instance's lights (CGameObjectInstance m_Lights, a Lights1 per frame
  * buffer), copied as words. */
 typedef struct { u32 w[6]; } O06Seg;
@@ -1911,7 +1880,6 @@ typedef struct { f32 f0; s32 unk4; s32 unk8; f32 fC; s32 unk10; } O06Cam;
 extern s32 gBlendState;
 extern O06Cam gBlendState_m_Color[];
 extern O06Seg D_800AB0E8_4171F4 __asm__("gDefaultLights");
-extern s32 gEvenOdd;
 extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
 /* The selected model item's draw callback (MenuItem_DrawModel): drawn with the
  * lights of gDefaultLights and a fade by sMenuModelFade. */
@@ -1945,7 +1913,6 @@ void Menu_Close(Menu *arg0) {
 /* ---------------- MenuPool_OpenMenuParam ---------------- */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/ITEMS/80442BC8_11.CPP, func_8044322C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
 
 extern void func_00414EA8_4172F8(void *, void **, MenuDesc *, s32, s32, s32, s32, MenuPool *) __asm__("Menu_Construct");
 void CList__AddHead_4172F8(void *list, void *node) __asm__("CList__AddHead");

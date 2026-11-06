@@ -3,8 +3,8 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
-extern u32 gFrameCountGameplay;
 extern s16 gLivesSpeech[];
 extern f32 D_800A6AC4; /* 60.0f, in the engine's .rodata */
 

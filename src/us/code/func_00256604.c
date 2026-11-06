@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/game.h"
-
-extern f32 gFrameIncrement;    /* frame time scale */
+#include "globals/engine.h"
 
 /* Crouch: toggled by button 0x400 while standing or walking (poses 2 and 3),
  * forced by flags 0x6000; eases the crouch height toward 40.96 or 0 and sets

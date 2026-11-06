@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;      /* frame time */
 extern char gStandLookTuning;     /* standing look tuning */
 extern char gCrouchLookTuning;     /* crouching look tuning */
 extern char gStandMoveTuning;     /* standing move tuning */

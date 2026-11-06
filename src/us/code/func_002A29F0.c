@@ -17,7 +17,6 @@ typedef struct IoRequest {
     /* 0x1C */ OSMesgQueue *reply;
 } IoRequest; /* size 0x20 */
 
-extern s32 sHostIoState; /* 2: the I/O thread is running */
 extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 HostIo_StrSize(u8 *s);

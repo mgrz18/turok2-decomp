@@ -1,6 +1,7 @@
 #include "common.h"
 #include "globals/frame.h"
 #include "globals/render.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x000 */ char pad0[0x114];
@@ -13,10 +14,6 @@ typedef struct {
     /* 0x000 */ GfxTask288318 tasks[3];
     /* 0x3C0 */ GfxTask288318 *cur;
 } GfxState288318;
-
-extern u32 gFrameCount; /* frame counter */
-extern s32 gEvenOdd; /* double-buffer index */
-extern s32 gFrameCountGameplay;
 
 void CEngineApp__AdvanceFrameData(GfxState288318 *gfx) {
     gFrameCount++;

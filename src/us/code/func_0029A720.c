@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/libultra.h"
 struct OSIoMesgHdr_func_802BA350_de;
 struct OSIoMesgHdr_func_802BA350_de {
     u16 type;
@@ -42,12 +43,10 @@ extern u64 __osViThreadStack[];
 extern void viMgrMain(void *arg);
 extern OSIoMesgCode802BA23C __osViCounterMsg;
 extern OSIoMesgCode802BA23C __osViRetraceMsg;
-extern OSDevMgr_func_802BA350_de __osViDevMgr;
 extern u32 __osDisableInt(void);
 extern void __osTimerServicesInit();
 extern void __osViInit(void);
 extern void osCreateViManager(s32 pri);
-extern OSDevMgr_func_802BA350_de __osViDevMgr;
 extern OSThread __osViThread;
 extern u64 __osViThreadStack[];
 extern OSMesgQueue __osViEventQueue;

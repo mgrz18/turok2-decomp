@@ -3,11 +3,7 @@
 #include "globals/game.h"
 #include "globals/menu.h"
 #include "globals/scene.h"
-
-extern s32 gFrameCountGameplay;
-extern f32 gFrameIncrement[2];   /* frame time scales */
-extern f32 gParticleTimeScale;
-extern f32 gEmitterTimeScale;
+#include "globals/engine.h"
 
 extern void CEngineApp__UpdateControllers(void);
 extern void Demo_PlayNext(void);
@@ -46,7 +42,7 @@ void EngineMode13_Game_Init(CEngineApp *state) {
     }
     CCollisionInfo__Reset();
     gEmitterTimeScale = 1.0f;
-    gFrameIncrement[1] = 1.0f;
+    gEnemyTimeScale = 1.0f;
     gParticleTimeScale = 1.0f;
     func_00430500(&state->m_Game.m_Automap);
     CScene__InitPersistentData(&gScene, state->m_CartridgeIndex);

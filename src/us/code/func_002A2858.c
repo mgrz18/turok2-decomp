@@ -18,7 +18,6 @@ typedef struct B01IoReq {
                s32 w18;
                OSMesgQueue *reply;
 } B01IoReq;
-extern s32 sHostIoState;
 void HostIo_StartThread(s32 arg);
 s32 PCinitThreaded(void) {
     B01IoReq req;

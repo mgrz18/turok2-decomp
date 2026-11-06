@@ -2,8 +2,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
-
-
+#include "globals/engine.h"
 
 /* Free-look camera driven by the C buttons. */
 typedef struct {
@@ -19,7 +18,6 @@ typedef struct {
     /* 0x34 */ f32 pitchTarget;
 } Look004001D0;
 
-extern f32 gFrameIncrement;
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *list);
 s32 MenuPool_CountOpen(u8 *a0);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);

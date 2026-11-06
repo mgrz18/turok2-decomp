@@ -4,10 +4,10 @@
 #include "structs/collision.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#include "globals/engine.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-extern f32 gFrameIncrement;                  /* frame time, in 15ths of a second */
 extern void (*sCollisionTests[])(Sweep *);   /* the collision tests, NULL-ended */
 extern CCollisionInfo D_800F1E10;
 extern CCollisionInfo D_800F1CC0;

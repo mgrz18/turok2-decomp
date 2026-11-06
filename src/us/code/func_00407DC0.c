@@ -2,6 +2,7 @@
 #include "structs/light.h"
 #include "structs/model.h"
 #include "globals/boss.h"
+#include "globals/engine.h"
 
 typedef struct {
     u8 data[0x64];
@@ -14,7 +15,6 @@ typedef struct {
     /* 0x174 */ s8 unk174;
 } Boss00407DC0;
 
-extern s32 gEvenOdd;
 s32 Cinema_PathPlaying(void);
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 void ScriptAnimator_Apply(Slot00407DC0 *slot);

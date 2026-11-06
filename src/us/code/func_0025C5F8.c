@@ -3,6 +3,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/engine.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -69,8 +70,6 @@ struct Object {
     /* 0x27C */ u32 fxFlags;
 };
 
-extern f32 gFrameIncrement;          /* frame time */
-extern f32 gEnemyTimeScale;          /* time scale */
 extern ModeHandler *gEnemyBehaviorInfo[];
 
 void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);

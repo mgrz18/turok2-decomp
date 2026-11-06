@@ -4,8 +4,7 @@
 #include "structs/collision.h"
 #include "structs/camera.h"
 #include "globals/camera.h"
-
-extern f32 gFrameIncrement;      /* frame time */
+#include "globals/engine.h"
 
 f32 Random_Float(f32 scale);
 void CCamera__StartFlash(CCamera *cam, s32 maxOpacity, s32 red, s32 green, s32 blue, s32 attack, s32 sustain, s32 decay);

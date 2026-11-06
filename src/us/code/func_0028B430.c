@@ -1,9 +1,7 @@
 #include "globals/render.h"
+#include "common.h"
+#include "globals/crash.h"
 
-extern u32 sCrashCursorX;          /* debug console cursor column */
-extern u32 sCrashCursorY;          /* debug console cursor row */
-extern u16 sCrashBgColor;          /* background colour */
-extern u8 gCrashFont[0x60][16]; /* 8x16 font, ASCII 0x20-0x7F */
 extern u16 *sCrashFrameBuffer;         /* framebuffer */
 extern u16 sCrashTextColor; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */          /* foreground colour */
 
