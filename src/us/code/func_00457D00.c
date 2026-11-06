@@ -4,14 +4,13 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/pak.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
 extern s32 gPakMenuIsSave;
 extern char gPakProfile[];
-extern char gPakCharacterNoteName[];
-extern u8 gPakGameCode[];
 extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPakMsgPakFullDesc_2[];
 extern u8 gPakMsgSaveDoneDesc_2[];

@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 void *memset(void *s, int c, u32 n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
@@ -26,10 +27,6 @@ extern s32 gPakNoteIndex;
 extern s32 gPakOverwriteNote;
 extern PakProfile gPakProfile;
 extern PakProfile gPakProfileRead;
-extern u8 gPakCharacterNoteName[];
-extern u8 gPakGameNoteName[];
-extern u8 gPakCompanyCode[];
-extern u8 gPakGameCode[];
 extern u8 D_800B48D4[];
 extern u8 D_800B4B1C[];
 extern s32 gSaveBufferHandle;

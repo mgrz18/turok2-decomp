@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 void *memset(void *s, int c, u32 n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
@@ -26,8 +27,6 @@ extern s32 gPakNoteIndex;
 extern s32 gPakOverwriteNote;
 extern PakProfile gPakProfile;
 extern PakProfile gPakProfileRead;
-extern u8 gPakCharacterNoteName[];
-extern u8 gPakGameNoteName[];
 extern u8 D_800B48D4[];
 extern u8 D_800B4B1C[];
 extern s32 gSaveBufferHandle;
@@ -58,8 +57,6 @@ K7Mem *CCache__Allocate();
 void *memset();
 void MenuPool_OpenMenu_2();
 s32 Str_Length_2();
-extern u8 gPakGameCode[];
-extern u8 gPakCompanyCode[];
 /* Turok 2 inlines this game/company-code check (Rage Wars calls it) */
 static inline s32 k7_chk(u8 *gc, u8 *cc) {
     if (Str_Length_2(gc) == 4 && Str_Length_2(cc) == 2) {

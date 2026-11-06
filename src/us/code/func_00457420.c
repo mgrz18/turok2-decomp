@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004069F4.c, func_004069F4, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
@@ -18,8 +19,6 @@ extern s32 gPakCheckHasPak;
 extern s32 gPakMenuPort; /* pad */
 extern s32 gPakMenuStartPressed;
 extern s32 D_8011B114;
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
 extern s32 D_800F70A8;
 extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gEngineApp[];

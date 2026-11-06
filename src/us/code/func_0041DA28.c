@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Greys out the controller pak notes that cannot be picked: a used note is
  * selectable unless it is this game's save (gPakCharacterNoteName when loading, mode 1,
@@ -8,10 +9,6 @@
 extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
 extern s32 gPakMenuMode;
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
-extern char gPakCompanyCode[];
-extern char gPakGameCode[];
 
 extern s32 Pak_FindNote(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, char *company, char *game);
 extern s32 Str_Length(char *s);

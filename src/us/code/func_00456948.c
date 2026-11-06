@@ -2,6 +2,7 @@
  * gave its first two words (lui/lw gPakMenuAnyPak) to the function before. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Level select: grey out the entries (16) that cannot be chosen in the current
  * game mode. */
@@ -11,10 +12,6 @@
 extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
 extern s32 gPakMenuMode;
-extern char gPakGameCode[];
-extern char gPakCompanyCode[];
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
 
 s32 Pak_FindNote_2(s32 mode, s32 index, s32 *valid, char *name, void *arg4, s32 *arg5, char *arg6, char *arg7);
 s32 Str_Length_2(char *s);
