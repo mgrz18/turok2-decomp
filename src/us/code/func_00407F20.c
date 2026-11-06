@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 #include "structs/game.h"
 #include "structs/player.h"
 #include "globals/game.h"
@@ -12,15 +13,6 @@ typedef struct {
     /* 0xC6 */ s8 anim;
     /* 0xC7 */ s8 unkC7;
 } BossAI;
-
-typedef struct {
-    /* 0x00 */ CListedInstance *obj;
-    /* 0x04 */ void *def;
-    /* 0x08 */ s32 state;
-    /* 0x0C */ f32 timer;
-    /* 0x10 */ s32 count;
-    /* 0x14 */ s32 warned;
-} BossFight;
 
 
 extern u8 D_800B6660[];
@@ -46,7 +38,7 @@ static __inline__ void setAnim(CListedInstance *actor, s32 id) {
 }
 
 /* The boss is beaten: message, sound, its death animation, the helpers stop. */
-void TotemDefense_Complete(BossFight *fight) {
+void TotemDefense_Complete(TotemDefenseState *fight) {
     CGame *game = &gEngineApp_m_Game;
     CPlayer *player;
     CListedInstance *a;
@@ -57,7 +49,7 @@ void TotemDefense_Complete(BossFight *fight) {
     CCameraPool__AddText(game->m_CameraPool, player->m_pCamera, D_800B6660);
     Sound__PlaySpeech(0x168);
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
-    setAnim(fight->obj, 0x5337);
+    setAnim((CListedInstance *) fight->obj, 0x5337);
     CScene__UnmarkGeneratorsSaved(&gScene);
     gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead->m_FleeTime = 450.0f;
     for (a = gScene.m_InstancePool.m_ActiveList.m_pHead; a != NULL; a = a->m_pNext) {
