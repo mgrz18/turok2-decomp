@@ -199,6 +199,69 @@ Decisions taken during the merge:
   (`gRspInitDL`/`gRdpInitDL` as `Gfx[]`) and `func_00440C20` (the Primagen
   `BossStep` scripts).
 
+## Round L, globals without a header (part B)
+
+Part B covered every named global still declared only by local `extern`s,
+except the SDK/scheduler/frame ones (part A) and the engine objects that
+needed new structs (`gHeap`, `gLoader`, ..., the `CCache` files). Counted with
+the method above, against `b4bb727f`:
+
+| | before | after |
+|---|---:|---:|
+| part-B names with no header declaration | 175 (372 lines) | 38 (91 lines) |
+| local lines of names a header declares | 213 | 241 (the field symbols' kept views now count here) |
+| ... of them without a `local` comment | 59 | 54 (`gCache_*` in the `CCache` files, and older views listed under "Left") |
+
+New headers:
+
+| header | declares |
+|---|---|
+| `globals/automap.h` | the automap matrices, line indices and double-buffered line vertices (`Vtx_t`, now in `structs/gbi.h`) |
+| `globals/batch.h` | the render batcher: `sBatch*`, `sDrawItems`, `sSortNodes`, the opaque and translucent sort trees (`structs/batch.h`: `Material`, `DrawItem`, `SortNode`) |
+| `globals/path.h` | the region path search: `sPathSearch` and the recursion's working variables (`structs/path.h`: `PathNode`, `PathSearch`, whose mover is a `Sweep`, `PathCandidate`) |
+
+Added to existing headers: texture-load state, lit-vertex offsets, the
+expansion-pak matrices and `sViModeIndex` (`render.h`); the region normal
+caches (`region.h`); the animation decoder and skeleton poser statics
+(`object.h`); the blast shield, cinema players and death tint (`player.h`);
+menu statics, `gCharacterSelectSounds` (`menu.h`, `CharacterSound` in
+`structs/menu.h`); `gLoopSounds` (`LoopSounds`, `structs/sound.h`) and its
+entries (`audio.h`); `gContPadData` (`OSContPad[4]`) and `gControllers_buttons`
+(`controller.h`); demo player and throwable collision field symbols; the
+boss field symbols, `gTotemDefense` (`TotemDefenseState`, `structs/boss.h`),
+the Mother's statics, `gPrimagenPaths`, the Blind One's mode tables
+(`boss.h`, `boss_ai.h`); the pager's field symbols and `gVMPages` (`pager.h`);
+the profile field symbols (`pak.h`); `gEngineApp_m_Settings_*`,
+`gEngineApp_m_OnScreen_*` field symbols (`game.h`, `onscreen.h`).
+
+A field symbol is declared with the field's type even where every user keeps
+an array or struct view (`/* local type */`): the header documents it, and a
+file that drops its view gets the right type. 13 older local redeclarations
+were dropped because the header type compiles the same.
+
+Left in part B (each needs a code rewrite, not a declaration):
+
+- Field symbols whose files read them as arrays or through a struct view and
+  also include the header, so the header type would clash:
+  `gEngineApp_m_Settings_difficulty`, `_match_seconds/_minutes/_hours`,
+  `gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount`, `_m_bCinema`,
+  `gLevelScript_script`, `_script2_cursor`, `_script3_cursor`, `_scriptCOn`,
+  `_swayPhase`, `_values`, `gMantidQueen_waveActive`, `gMotherBoss_phase`,
+  `_activeMask`, `_liveMask`, `_counter`, `gPakProfileRead_character`.
+- The audio manager's DMA state (`gAudioDmaState`, `_firstUsed`, `_firstFree`,
+  `gAudioDmaBuffers`, `gAudioDmaCache`, `gAudioCmdLists`, `gAudioInfo`): the SDK
+  `AMDMAState`/`AMDMABuffer`, read through four different local views
+  (`Window`, `DMAState`, `B12DbEnt2`...); `__amDMA` and `__CSPVoiceHandler`
+  are functions.
+- Struct views still local to two files: `gVideoModeFlags` (`ScreenExtra` /
+  `VideoFlags`), `gParticleSpriteVtx` (`DirLight`, and `func_0022D2FC`),
+  `gDLightBuffer` (`UnitLight`), `sResizedViMode` (an `OSViMode` with packed
+  register halves), `gScreenViewport` (`Vp`: `globals/render.h` cannot include
+  `structs/gbi.h`, several files define their own `Mtx`).
+- Next to other tasks' files: `sBoneMatrixProfile`/`sBoneMatrixCount`
+  (`func_0021CDAC`, next to `gEngineApp_m_SwooshSystem`), `gRumbleEntries`
+  (`RumblePool`), `gCache` and the `gCache_*` field symbols.
+
 ## Left
 
 - **Globals without a header (699 lines, 308 names).** The largest groups:
