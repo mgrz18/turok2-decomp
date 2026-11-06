@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/camera.h"
+#include "globals/collision.h"
 
 struct CollisionInfo;
-extern struct CollisionInfo gCollisionInfoLineOfSight;
 CGameObjectInstance *CCamera__GetPlayer(CCamera *cam);
 s32 Collision_MoveInstance(void *obj, CVector3 to, struct CollisionInfo *info);
 

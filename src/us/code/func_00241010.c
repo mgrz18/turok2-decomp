@@ -3,6 +3,7 @@
 #include "structs/region.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
 
 /* A region corner: its floor point and the ceiling height above it. */
@@ -24,7 +25,6 @@ typedef struct {
     /* 0x52 */ u16 flags52;
 } Water;
 
-extern CCollisionResults *gCollisionResultsP;
 
 void memset(void *p, s32 c, s32 n);                 /* memset */
 s32 Sweep_GetGroundBehavior(Sweep *sweep, CGameRegion *region);

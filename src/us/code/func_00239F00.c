@@ -3,15 +3,14 @@
 #include "structs/region.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 extern f32 gFrameIncrement;                  /* frame time, in 15ths of a second */
-extern CCollisionResults *gCollisionResultsP;
 extern void (*sCollisionTests[])(Sweep *);   /* the collision tests, NULL-ended */
 extern CCollisionInfo D_800F1E10;
 extern CCollisionInfo D_800F1CC0;
-extern CCollisionInfo gCollisionInfoSight;
 extern CCollisionInfo D_800F1C60;
 
 CRegionInfo *CScene__GetRegionInfo(s32 *list, CGameRegion *region);

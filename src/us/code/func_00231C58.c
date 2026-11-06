@@ -2,8 +2,8 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
-extern CCollisionResults gCollisionResults;  /* the last collision test: the spawn lands on its water hit */
 extern CVector3 gCollisionResults_m_vVelocity;
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 s32 CParticleSystem__Spawn(void *table, void *actor, void *owner, s32 *ownerCount, void *target, s32 kind, CVector3 origin,

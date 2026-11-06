@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 typedef struct BlastActor {
     /* 0x000 */ u8 kind;            /* 1: player, 2: object */
@@ -10,7 +11,6 @@ typedef struct BlastActor {
     /* 0x054 */ f32 footY;
 } BlastActor;
 
-extern CCollisionResults gCollisionResults;  /* the last collision test: the node it hit (m_Frame) is the armour to use */
 extern HitFrame sBlastShieldFrame;
 extern u8 gEngineApp_m_Settings_multiplayer;
 

@@ -11,6 +11,7 @@
 #include "structs/game.h"
 #include "globals/render.h"
 #include "globals/cinema.h"
+#include "globals/collision.h"
 
 /* The cinema system: one file from Cinema_SplineSecondDerivs to Cinema_IsWaitCue (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -780,8 +781,6 @@ f32 Cinema_GetFOV(f32 t) {
     return key[-1].first * (1.0f - u) + key->first * u;
 }
 
-extern u8 gCollisionInfoLineOfSight[];   /* collision info */
-extern CCollisionResults gCollisionResults;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 Cinema_GetEyePos(f32 t); /* eye path */
@@ -852,7 +851,7 @@ void Cinema_UpdateCamera(CCamera *cam) {
             saved = *(CObjectHead *) player;
             player->header.m_vPos = target;
             CScene__LoadVisibleGridSections(&gScene);
-            hit = Collision_MoveInstance(player, eye, gCollisionInfoLineOfSight);
+            hit = Collision_MoveInstance(player, eye, &gCollisionInfoLineOfSight);
             CScene__ReleaseSectors(&gScene);
             *(CObjectHead *) player = saved;
             if (hit) {

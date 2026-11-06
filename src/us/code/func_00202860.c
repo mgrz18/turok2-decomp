@@ -3,6 +3,7 @@
 
 #include "structs/cache.h"
 #include "common.h"
+#include "globals/cache.h"
 
 extern s32 gHashSize;
 extern u32 gHashTableSize;
@@ -15,10 +16,8 @@ struct EntryRecAtCV1 {
     s32 index;
     struct EntryRecAtCV1 *next;
 };
-extern s32 gHashTableMask;
 extern EntryRecAtCV1 *gHashTable;
 extern void CHashTable__Construct(s32 capacity);
-extern s32 gHashMask;
 extern char gHeap;
 extern EntryRecAtCV1 *CHeap__Alloc(void *, s32);
 void CHashTable__Construct(s32 capacity)

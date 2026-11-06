@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/cache.h"
+#include "globals/cache.h"
 
 s32 CHeap__Free(s32, s32);
 s32 CCache__FreeMemEntry(s32, s32);
@@ -10,7 +11,6 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
 extern s32 gHeap;
-extern s32 gCache_mutex;
 extern s32 gCache_mutex_count;
 
 void CCache__DeallocAndReplaceCompressedData(s32 arg0, CMemEntry **arg1, CMemEntry *arg2) {

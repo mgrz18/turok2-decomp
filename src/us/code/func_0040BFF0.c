@@ -2,11 +2,11 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 /* When the instance the last collision test hit (gCollisionResults) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
  * away from the point (0, 0, 512) (and upward) and deals it 0x500 damage. */
 
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a + b */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);

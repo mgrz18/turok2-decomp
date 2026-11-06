@@ -21,6 +21,8 @@
 #include "structs/particle_event.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "globals/collision.h"
+#include "globals/math.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -391,9 +393,6 @@ typedef struct {
     /* 0x134 */ f32 radius;
 } ShadowActor;
 
-extern CCollisionInfo gCollisionInfoLineOfSight;
-extern CCollisionResults gCollisionResults;
-extern f32 gQuaternionSin;
 
 void *MtxPool_Alloc(void *pool, s32 count);
 void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);
@@ -584,7 +583,6 @@ extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* the current view */
 extern u8 gEngineApp_m_Settings_unk17;
 extern s32 gEngineApp_m_Settings;
-extern CCollisionInfo gCollisionInfoLineOfSight;
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 
 extern void *Texture_Request(s32 *ref);
@@ -1153,8 +1151,6 @@ typedef struct {
 extern s32 gEngineApp_m_Settings_paused;              /* frozen; the current player list is 0x1414 bytes before */
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gEngineApp_m_Settings_unk17;
-extern CCollisionResults *gCollisionResultsP;
-extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern s32 gEvenOdd;

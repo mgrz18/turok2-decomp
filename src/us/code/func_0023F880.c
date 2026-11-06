@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 /* An instance that can be hit, or the one sweeping (a particle: type 2). */
 typedef struct HitInst {
@@ -27,7 +28,6 @@ typedef struct EffectParams {
     /* 0x7 */ s8 b;
 } __attribute__((aligned(4))) EffectParams;
 
-extern CCollisionResults *gCollisionResultsP;
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);

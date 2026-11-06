@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern CCollisionResults *gCollisionResultsP;     /* current hit buffer */
 extern s8 D_800F1CC6[];           /* collision info D_800F1CC0 + 6 */
 
 void Collision_MoveInstance(CInstanceHeader *actor, CVector3 pos, void *info);

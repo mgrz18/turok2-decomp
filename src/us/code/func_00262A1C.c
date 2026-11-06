@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/math.h"
 
-extern f32 gQuaternionSin;
 
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);

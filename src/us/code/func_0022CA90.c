@@ -5,10 +5,10 @@
 #include "structs/collision.h"
 #include "structs/particle_event.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
 typedef struct Target Target;
 
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern CVector3 gCollisionResults_m_vVelocity;                /* the direction of the hit */
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gEngineApp_m_SwooshSystem[];

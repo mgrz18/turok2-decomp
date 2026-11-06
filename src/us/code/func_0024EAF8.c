@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 /* The creature to mount (an AI actor). */
 typedef struct {
@@ -17,7 +18,6 @@ typedef struct {
     /* 0x140 */ u8 ai[4];
 } Mount;
 
-extern CCollisionResults gCollisionResults;  /* m_pInstance: what the player is aiming at */
 extern CVector3 gRidingScale;             /* rider seat */
 
 f32 AI_AngleToPoint(CGameObjectInstance *body, CVector3 point);   /* angle to a point */

@@ -5,6 +5,7 @@
 #include "structs/collision.h"
 #include "structs/particle_event.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -29,7 +30,6 @@ struct Target {
     /* 0x12B0 */ s32 extraUses;
 };
 
-extern CCollisionResults gCollisionResults;
 extern u8 gCollisionResults_m_Frame_flags;
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gEngineApp_m_SwooshSystem[];

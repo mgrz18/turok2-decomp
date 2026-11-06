@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern CCollisionResults gCollisionResults;
 void CVector3__Normalize(CVector3 *v);
 f32 Random_Blend(f32 a, f32 b);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);

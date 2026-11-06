@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/math.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/AI/NAV/8027451C_2.CPP, func_80275410_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -26,7 +27,6 @@ extern s32 sRegionNormal_z;
 extern CVector3 sRegionUnitNormal;
 extern f32 sRegionUnitNormal_y;
 extern s32 sRegionUnitNormal_z;
-extern f32 gQuaternionSin;
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
@@ -38,7 +38,6 @@ static __inline__ void normalize_copy(CVector3 *out, CVector3 *in) {
     *out = *in;
     CVector3__Normalize(out);
 }
-extern float gQuaternionSin;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, float);
 CQuatern *CGameRegion__GetTiltRotation(CQuatern *out, CGameRegion *polygon) {

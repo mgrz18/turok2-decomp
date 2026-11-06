@@ -3,6 +3,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
 extern void CMtxF__SetRotateZ(CMtxF m, s32 angle);              /* rotation about Y */
@@ -13,8 +14,6 @@ extern void GameObject_TraceMove(CParticle *p, CVector3 to, CVector3 *outPos, vo
 extern void CParticleSystem__Spawn(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 model, CVector3 dir,
                           CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
 extern CVector3 gCollisionResults_m_vVelocity;
-extern CCollisionResults *gCollisionResultsP;
-extern CCollisionResults gCollisionResults;
 
 static __inline__ f32 offset_x(CParticle *p) {
     if (p->m_pEffect->m_pModel != NULL) {

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern CCollisionResults *gCollisionResultsP;
 
 /* Clears the collision results: nothing hit yet. */
 void CCollisionResults__Clear(void) {

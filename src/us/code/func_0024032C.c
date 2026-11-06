@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
 /* An instance that can be hit: an actor (or the instance sweeping). */
 typedef struct HitInst {
@@ -27,7 +28,6 @@ typedef struct InstanceHit {
     /* 0x04 */ f32 t;
 } InstanceHit;
 
-extern CCollisionResults *gCollisionResultsP;
 extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);

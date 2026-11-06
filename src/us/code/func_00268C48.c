@@ -2,8 +2,8 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
-extern CCollisionResults *gCollisionResultsP;     /* current hit buffer */
 typedef struct CollisionInfo {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s8 flagB;

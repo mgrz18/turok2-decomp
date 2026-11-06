@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/cache.h"
 
 s32 CCache__DeallocateInternal(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
@@ -6,7 +7,6 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 gCache_mutex;
 extern s32 gCache_mutex_count;
 
 void CCache__Deallocate(s32 arg0, s32 arg1) {

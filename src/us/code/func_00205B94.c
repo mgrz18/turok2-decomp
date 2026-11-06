@@ -2,8 +2,8 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/cache.h"
 
-extern OSMesgQueue gCache_mutex;      /* resource lock queue */
 extern s32 gCache_mutex_count;              /* resource lock depth */
 extern char D_800A51E0[];
 

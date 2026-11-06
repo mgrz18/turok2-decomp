@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 
 void CGameRegion__FireTriggers(s32 state, s32 bits, CParticle *p);
 void GameObject_FireTriggers(CGameObjectInstance *inst, s32 bits, CParticle *p);

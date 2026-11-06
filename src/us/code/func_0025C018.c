@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "globals/math.h"
 
 /* AI matrix callback: builds the actors world matrix from the AIs look
  * angles, its yaw about Y, its rotation, scale and position. */
 
-extern f32 gQuaternionSin;
 extern s32 gEngineApp_m_Settings;
 
 extern void Projectile_PlaceAtMuzzle(CGameObjectInstance *actor, CAI *ai);

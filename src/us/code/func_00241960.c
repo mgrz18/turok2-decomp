@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "globals/math.h"
 
 typedef f32 Mtx4[4][4];
 
-extern f32 gQuaternionSin;
 
 f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *collider);

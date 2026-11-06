@@ -12,6 +12,7 @@
 #include "structs/game.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "globals/math.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -29,7 +30,6 @@ extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern f32 gFrameIncrement;          /* the frame's time step */
 extern CCameraMode D_800B6CB4[];
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
-extern f32 gQuaternionSin;          /* the last sine taken */
 extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera */
 /* The camera pool, seen from its main camera. */
 #define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool_m_MainCamera - 0x40))

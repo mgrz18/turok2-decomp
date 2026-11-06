@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/cache.h"
+#include "globals/cache.h"
 
 s32 CCache__TouchMemEntry(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
@@ -7,7 +8,6 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 gCache_mutex;
 extern s32 gCache_mutex_count;
 
 void CCache__TouchAndLock(s32 arg0, CMemEntry *arg1) {

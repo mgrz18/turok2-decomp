@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/math.h"
 
-extern f32 gQuaternionSin;
 
 void CMtxF__SetRotateZ(f32 mtx[4][4], f32 angle);
 void CMtxF__RotateX(f32 mtx[4][4], f32 angle);

@@ -7,6 +7,7 @@
 #include "structs/vector.h"
 #include "structs/weapon.h"
 #include "globals/scene.h"
+#include "globals/math.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -59,7 +60,6 @@ struct AimActor {
     /* 0x1320 */ AimActor *next;
 };
 
-extern f32 gQuaternionSin;
 
 void CGameObjectInstance__LocalToWorld(CVector3 *out, AimActor *actor, CVector3 off);
 f32 Actor_GetEyeHeight(AimActor *);

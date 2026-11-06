@@ -17,6 +17,7 @@
 #include "structs/weapon.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "globals/collision.h"
 
 extern s32 gScene_m_PreviewState;
 extern s32 gScene_m_PreviewTimer;
@@ -515,7 +516,6 @@ extern f32 gCharacterHealthRegen[];           /* health regeneration per charact
 extern PlayerStateInfo gPlayerStateTable[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern s32 gCollisionResults_m_nFloorKind;
 extern s32 gScene_m_PendingWarpID;
 extern s32 gCharacterModels[];

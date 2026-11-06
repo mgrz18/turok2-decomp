@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 
 extern CCollisionInfo D_800F1E10;
-extern CCollisionResults *gCollisionResultsP;
 
 s32 Platform_CollideGround(Sweep *ctrl, CGameObjectInstance *actor);
 s32 Platform_CollideCylinder(Sweep *ctrl, CGameObjectInstance *actor);

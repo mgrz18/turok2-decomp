@@ -2,6 +2,7 @@
  * 0x00264994 (lw $2, 0x1CE0($2); beqz; lui $3, 0x100) are stray bytes, never
  * executed: the only reference, Throwable_Setup, stores func_00264994 + 0xC. */
 #include "common.h"
+#include "globals/math.h"
 
 extern f32 GameObject_GetCollisionHeight(void *obj);
 extern void CMtxF__SetTranslate(f32 *mtx, f32 x, f32 y, f32 z);
@@ -17,7 +18,6 @@ extern void CMtxF__ScaleAxes(f32 *mtx, f32 x, f32 y, f32 z);
 extern void CVector3__ClampLength(f32 *vec, f32 limit);
 extern void CMtxF__SwapYZRows(f32 *mtx);
 
-extern f32 gQuaternionSin;
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];

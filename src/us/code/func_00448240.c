@@ -11,6 +11,7 @@
 #include "structs/game.h"
 #include "globals/render.h"
 #include "globals/cinema.h"
+#include "globals/collision.h"
 
 /* The second VM module's copy of src/us/code/Cinema_SplineSecondDerivs.c, byte for byte,
  * at the same link address (named 0x448240-0x44C228, linked 0x40F240-0x413228):
@@ -786,8 +787,6 @@ f32 Cinema_GetFOV_2(f32 t) {
     return key[-1].first * (1.0f - u) + key->first * u;
 }
 
-extern u8 gCollisionInfoLineOfSight[];   /* collision info */
-extern CCollisionResults gCollisionResults;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 Cinema_GetEyePos_2(f32 t); /* eye path */
@@ -858,7 +857,7 @@ void Cinema_UpdateCamera_2(CCamera *cam) {
             saved = *(CObjectHead *) player;
             player->header.m_vPos = target;
             CScene__LoadVisibleGridSections(&gScene);
-            hit = Collision_MoveInstance(player, eye, gCollisionInfoLineOfSight);
+            hit = Collision_MoveInstance(player, eye, &gCollisionInfoLineOfSight);
             CScene__ReleaseSectors(&gScene);
             *(CObjectHead *) player = saved;
             if (hit) {
