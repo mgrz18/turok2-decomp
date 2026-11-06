@@ -81,7 +81,7 @@ func_0044C230 0x800C0AF0  # copy of the file from func_00413230 (to 0x417484)
 func_00452314 0x800C1008  # X batch: jtbl of func_004193B4
 func_00453E58 0x800C1280  # X batch: jtbl of func_0041AEF0
 func_0045E808 0x800C1870  # X batch: jtbl of func_004258E8
-func_00468AC4 0x800A9A18  # X batch: 1.0f of func_0042FBA4, in the engine .rodata
+func_00468AC4 0x800A9A00  # copy of func_0042FBA4: its strings and 1.0f, in the engine .rodata
 func_0043F000 0x800C04A4  # twin of func_00406000 (X), which now owns the pool
 func_0045060C 0x800C0EA0  # copy of func_0041760C (X), which now owns the pool
 func_0045D6A0 0x800C1720  # copy of func_00424780 (X), which now owns the pool
@@ -125,3 +125,6 @@ func_00463B2C 0x800A5EB4  # copy of func_0042AC0C, which now owns the pool
 func_0045C514 0x800C1430  # copy of func_004235F4, which now owns the pool
 func_0045F084 0x800C18B0  # copy of func_00426164, which now owns the pool
 func_0045F2FC 0x800C18A0  # copy of func_004263DC, which now owns the pool
+func_004674CC 0x800A7080  # copy of func_0042E4CC, which now owns the pool
+func_0045302C 0x800C1040  # copy of func_0041A0CC, which now owns the pool
+func_00455788 0x800C132C  # copy of func_0041C788, which now owns the pool

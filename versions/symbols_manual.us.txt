@@ -132,3 +132,7 @@ D_800C1330 = 0x800C1330; /* "%04d", StatsMenu_TagsText (func_0041CAE4); read by 
 D_800C13F0 = 0x800C13F0; /* "Single Save Block", SaveGame_Build (func_0041D890); read by func_0041F32C, func_00421334 (and copies) */
 D_800C1404 = 0x800C1404; /* "%3d", PakMenu_NoteText (func_0041FB50); read by func_0041FCF4, func_00421ED4 (and copies) */
 D_800C1410 = 0x800C1410; /* "%1d", PakMenu_UpdateModeText (func_00421BE4); read by func_00421CA0 (and copies) */
+D_800A5FC4 = 0x800A5FC4; /* "warp dests", CScene__FindWarpDests (func_0042C194); read by func_0042C560 */
+D_800A7080 = 0x800A7080; /* "Players", CPlayerPool__NewGame (func_0042E5AC); read by CPlayerPool__AllocPlayers (func_00257830) */
+D_800A9A00 = 0x800A9A00; /* "Cameras", CCameraPool__NewGame (func_0042FBA4); read by CCameraPool__AllocCameras (func_00281F84) */
+D_800A9A08 = 0x800A9A08; /* "Camera Texts", CCameraPool__NewGame (func_0042FBA4); read by CCameraPool__AllocTexts (func_00281FF8) */
