@@ -46,7 +46,7 @@ the struct headers its types need, so any file that uses `common.h` can include 
 
 | header | subsystem | declares |
 |---|---|---|
-| `adec.h` | Acclaim's compressed-audio decoder | Huffman segments (`AdecHuffSeg`), band ends, IMDCT state (13) |
+| `adec.h` | Acclaim's compressed-audio decoder | Huffman segments (`AdecHuffSeg`), band ends, IMDCT state, the decoder BSS: `sAdecState` (`DecodeState`), the MDCT twiddles and overlap (`f32[128]`), `sMdctFft` (`FftTables *`); the types are `structs/adec.h`'s (23) |
 | `ai.h` | enemy AI | alert point and last noise (`CVector3`), AI mode tables (`CAIModeInfo` rows), `gEnemyBehaviorInfo` (`CEnemyBehaviorInfo *[8]`), generator picks, throwable carry joints (`JointPoint`) (27) |
 | `audio.h` | sound world and audio manager | `gAudioWorld` (`CAudioWorld`), SDK audio-manager statics, voice and sequence state, `sPitchRatioTable`, `sSoundKindVolumeTable` (`SoundKindVolume`), `sSpeechSound` (`ALSound`), `sCSPlayerFile` (36) |
 | `boss.h` | boss fights | `gMantidQueen` (`WaveBossState`), `gLevelScript` (`LevelScriptState`) and their kept field symbols; the VM modules' boss scripts and tables (`BossStep*`, `BossAttack`, `WaveBossMinion`, `gMotherSpawnPoints`) (95) |
@@ -57,18 +57,18 @@ the struct headers its types need, so any file that uses `common.h` can include 
 | `cinema.h` | cinemas | `gCinemaPlayerP`, `gCinemaEnabled`, `sCinemaLastFrame` (3) |
 | `collision.h` | collision | `gCollisionResults` (`CCollisionResults`) and nine kept field symbols, probes, collision test tables, `gCollisionSetupTable` (`CCollisionSetup`) (19) |
 | `controller.h` | controllers | SI queue, first port, controller-driver statics (9) |
-| `crash.h` | crash screen | `gCrashCauseDesc` (`FlagDesc[28]`), font, cursor, colour (6) |
+| `crash.h` | crash screen | `gCrashCauseDesc` (`FlagDesc[28]`), `sCrashFrameBuffer` (`u16 *`), font, cursor, colour (7) |
 | `demo.h` | attract demos | `gDemoTable` (2) |
 | `enemy.h` | enemy animation | every enemy animation pick table, from `sEnemyAnim<Kind>_<addr>` at 0x800AF6F0 to 0x800B0600, plus `sJoypadTestAnimTable`, all as `CEnemyAnimPick` arrays (74) |
-| `engine.h` | engine loop | frame timing (`gFrameIncrement`, `gFrameCount`...), `gEngineModeTable` (`EngineMode`), engine state flags, scheduler statics, thread priorities, `gBootSignature`, `gAssertFile`, mode text tables (40) |
+| `engine.h` | engine loop | frame timing (`gFrameIncrement`, `gFrameCount`...), `gEngineModeTable` (`EngineMode`), engine state flags, scheduler statics, thread priorities, `gBootSignature`, `gEngineTimestamp`, `gAssertFile`, the pak check timer, mode text tables (43) |
 | `event.h` | level events | `gLevelEventHandlers` (`LevelEventHandler *[14]`) (1) |
-| `frame.h` | frame loop and scheduler | `gFrameData`, frame and scheduler timing, pool buffers (21) |
+| `frame.h` | frame loop and scheduler | `gFrameData`, frame and scheduler timing (`gCurrentTick`, `gNumTicks*`, `gWaitingFrames` as `CFrameData *[3]`), the engine queue `gGfxFrameMessageQueue`, `gGfxClient` (`OSScClient`, `structs/sched.h`), `gGfxMsg`, the thread stacks and threads, the RDP fifo, `gIdentityMtx` (`Mtx`), pool buffers (41) |
 | `game.h` | game state | `gEngineApp_m_Game` (`CGame`), `gEngineApp_m_Settings` (`GameSettings`), their kept field symbols, `gEngineApp_m_Settings_cheatFlags` (15) |
-| `hostio.h` | SN host I/O | the I/O thread and its queues, `gHostIoMemoryBounds` (`MemoryBoundaryInit`), PI and state flags, TLB page masks (12) |
+| `hostio.h` | SN host I/O | the I/O thread and its queues, `gHostIoMemoryBounds` (`MemoryBoundaryInit`), PI and state flags, TLB page masks, the DMA message (`OSIoMesg`) and the queue buffers (18) |
 | `hud.h` | `COnScreen` | font, lookup, boss-bar and glyph display-list data, `sCinemaTextFadeOut` (7) |
 | `libaudio.h` | SDK libaudio | `alGlobals`, reverb presets, eqpower (8) |
 | `libc.h` | SDK libc | printf digit and pad tables (4) |
-| `libultra.h` | SDK libultra | `osTvType`, `osRomBase`, `osResetType`, `osMemSize`, `osAppNMIBuffer`, `__osPiDevMgr` (`OSDevMgr`), thread queues (`__OSThreadTail`), VI contexts and modes, PI handles, timers (30) |
+| `libultra.h` | SDK libultra | `osTvType`, `osRomBase`, `osResetType`, `osMemSize`, `osAppNMIBuffer`, `__osPiDevMgr` (`OSDevMgr`), thread queues (`__OSThreadTail`), VI contexts and modes, PI handles, timers; the BSS of the controller, VI, PI, timer and 64DD code with ultralib's types (`OSPifRam`, `OSIoMesg`, `OSPiHandle`, `__OSEventState`, now in `ultra_types.h`); the cosf/sinf constants (`du`/`fu`) (77) |
 | `math.h` | math | random seeds, acos table, light falloffs (4) |
 | `menu.h` | menus | `gEngineApp_m_Game_m_MenuPool` (`MenuPool`), statics for the menu screens, sound menu and credits, fonts (21) |
 | `menu_data.h` | menu module (VM) | `sPlayerSpeedTable` (`PlayerSpeedTable`) (2) |
@@ -85,7 +85,7 @@ the struct headers its types need, so any file that uses `common.h` can include 
 | `save.h` | saves | `gSavedPlayers` (`CSavedPlayers`) (1) |
 | `scene.h` | the level | `gScene` (`CScene`) and its kept field symbols, the bit-section buffers, the `CIntelligence` objects for level actors and particles (36) |
 | `text.h` | text | `gCreditsLines`, `gLevelMessages` (`LevelMessage`) (2) |
-| `ucode.h` | RSP microcode | the text and data starts of rspboot, F3DEX, L3DEX and aspMain (`u64[]`) (7) |
+| `ucode.h` | RSP microcode | the text and data starts of rspboot, F3DEX, L3DEX and aspMain (`u64[]`), `rspbootTextEnd` (8) |
 
 These are declared in `include/structs/`, next to the struct they are an
 instance of, and are not repeated in `globals/`:
@@ -205,10 +205,18 @@ Decisions taken during the merge:
   - Objects that still need a real struct type: `gHeap` (`CHeap`), `gLoader`
     (`CLoader`), `gDecompressor` (`CDecompressor`), `gHashTable`, `gRumblePool`
     (`RumblePool`), `gEngineApp_m_SwooshSystem` (`CSwooshSystem`), `gScheduler`.
-  - libultra BSS: `__osContLastCmd`, `__osContNumControllers`, `__osContBuffer`,
-    `__osPfsPifRam`, `__osPiAccessQueue`, `__osSiAccessQueue`, `__osDiskHandle`.
-  - Frame buffers and the scheduler: `gCFB`, `gCurrentFB`, `gGfxFrameMessageQueue`,
-    `gCurrentTick`, `gNumTicks*`, `sCrashFrameBuffer`, `gVMPages`, the thread stacks.
+  - Frame buffers and the scheduler: `gCFB`, `gCurrentFB`, `gScheduler` (its
+    `OSSched` with Acclaim's 0x80 extra bytes, and `OSScTask`, are still local
+    views in the scheduler files and `rw/abu_types.h`), `gPoolBuffers` (its
+    `GfxPool` is a local struct in two files), `sBootMarker` (.rodata),
+    `gVMPages`.
+  - libultra, libaudio, the adec decoder, HostIo, the crash screen and the frame
+    statics are all in their headers. Six SDK controller files keep a
+    `local type` array view of `__osContLastCmd` or `__osContNumControllers`
+    (`osContStartQuery`, `osContStartReadData`, `osContReset`,
+    `__osContGetInitData` and its two module copies): as a scalar, a pointer
+    local or a cast, GCC 2 no longer keeps the address in a register the way
+    the ROM does.
   - Field symbols not declared yet: `gEngineApp_m_Settings_difficulty`,
     `gEngineApp_m_Game_m_PlayerList_m_*`, `gEngineApp_m_OnScreen_m_*`,
     `gLevelScript_path/_script*`, `gMantidQueen_boss`, `gMotherBoss_*`,
@@ -216,7 +224,7 @@ Decisions taken during the merge:
   - Other subsystems: the automap, the render batcher (`sBatch*`,
     `s*SortFirst/Root`), the region normals (`sRegionNormal`...), the animation
     and pose statics (`sAnimRemap*`, `sPose*`), the audio DMA buffers, and the
-    remaining adec tables.
+    adec frame slots (`D_80125EF0`).
 - **Local views of header globals without a `local type` comment (86 lines):**
   - The `CCache` files read the cache through their own struct views and do not
     include `globals/cache.h`: `func_002031E8`, `func_00203330`,
