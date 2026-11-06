@@ -12,12 +12,6 @@ typedef struct {
     /* 0x08 */ f32 value;
 } CurveState;
 
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 scale;
-} Tuning;
-
-extern Tuning D_800A8078;
 
 f32 RumbleCurve_GetValue(CurveState *arg0) {
     s32 temp_a1;
@@ -27,7 +21,7 @@ f32 RumbleCurve_GetValue(CurveState *arg0) {
     temp_a1 = temp_v1->type;
     switch (temp_a1) {                              /* irregular */
     case 0:
-        return (f32) temp_v1->samples[(s32) ((arg0->time * D_800A8078.scale) / temp_v1->length)] * 0.003921569f;
+        return (f32) temp_v1->samples[(s32) ((arg0->time * 16.0f) / temp_v1->length)] * 0.003921569f;
     case 1:
         return arg0->value;
     default:

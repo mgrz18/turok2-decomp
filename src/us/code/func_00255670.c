@@ -17,17 +17,11 @@ typedef struct {
     /* 0x1C */ f32 speed;
 } MoveState;
 
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 scale;
-} Tuning;
-
-extern Tuning D_800A7170;
 
 void PlayerJump_Update(CPlayer *arg0, MoveState *arg1) {
     f32 var_f2;
 
-    var_f2 = D_800A7170.scale;
+    var_f2 = 389.12f;
     if (gScene_m_LevelID == 0x1DB1) {
         var_f2 = 481.28f;
     }
