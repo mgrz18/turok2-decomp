@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/cache.h"
 
 extern s32 D_800AB0B8;
-extern s32 gHashSize;
 void CHashTable__GetLongestChain(void) {
     extern s32 gHashTable;
     s32 var_a1;

@@ -3,9 +3,8 @@
 
 #include "structs/cache.h"
 #include "common.h"
+#include "globals/cache.h"
 
-extern s32 gHashSize;
-extern u32 gHashTableSize;
 struct EntryRecAtCV1;
 typedef struct EntryRecAtCV1 EntryRecAtCV1;
 struct EntryRecAtCV1;
