@@ -199,6 +199,34 @@ Decisions taken during the merge:
   (`gRspInitDL`/`gRdpInitDL` as `Gfx[]`) and `func_00440C20` (the Primagen
   `BossStep` scripts).
 
+## Round L, k1: engine objects
+
+The system resources and the cache now have their real structs, and their users read them
+through those structs: `gHeap` (CHeap), `gLoader` (CLoader), `gDecompressor` (CDecompressor)
+in `globals/sysrc.h`; `gHashTable` (HashEntry *) and `gCache` (CCache, Turok 2's layout: one
+more CList, memLockedList, than Turok 3's) in `globals/cache.h`; `gRumblePool` / `gRumbleEntries`
+in `globals/rumble.h`; `gCFB` / `gCurrentFB` (u16 *) in `globals/framebuffer.h`, with
+`gRefreshRate` for the word after `gCurrentFB`; `gPendingFB` is `u16 *` in `globals/frame.h`.
+Local externs of these objects (and of the `gCache_*` field symbols): 141 -> 31.
+
+- The CCache functions that kept views of the cache (a `Manager` at gCache_queue, `Pool` at
+  gCache_freeEntryCount, `Counters`, `ResourceLists`, `(&gCache_memAgeList)[-2]`) read
+  `gCache.<member>`. GCC 2 treats a struct member and a scalar global as two different kinds
+  of memory, so where a view kept a load behind a store, `gCache.<member>` keeps it too, and the
+  field symbols (`gCache_ageCount`...) do not. `gCache_memAgeList_m_pTail`,
+  `gCache_memAgeList_m_nCount` and `gCache_cacheFreeList_m_nCount` have no user left.
+- The CHeap__*, CLoader__* and CDecompressor__* functions take the structs (the Rage Wars
+  imports' HeapRecAtC/BlockRecAt20/Pool80255720/CartridgeReadWorker views are gone from them);
+  CDecompressor__DecompressSync lost its permuter temporaries.
+- `CCache__ClearDisplayListLocks` / `CCache__ReleaseDisplayList` keep one `do { } while (0)`
+  each: it only changes the assembler's label numbers (`tools/asm_diff.py` compares them).
+- Left: `gScheduler` (OSSched, 4 files) waits for `structs/sched.h` (k2 has OSTask in
+  ultra_types.h); `gEngineApp_m_SwooshSystem` (17 files) needs a CSwooshSystem layout (the
+  ribbon vertex pool at 0, the swoosh list at 0x7514, the timers at 0x7580, the swoosh set
+  lists at 0x94D8/0x95A0) that is not worked out yet; `func_00204778` and `func_00286674`
+  (FAKEMATCH files, k4) still declare gCache/gHeap_usedHead/gCFB/gCurrentFB locally;
+  `func_0028CEBC` (gCFB as a word), `func_0028C0B0` and `func_0026EE40` keep a `local type`.
+
 ## Left
 
 - **Globals without a header (699 lines, 308 names).** The largest groups:

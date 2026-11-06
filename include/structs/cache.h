@@ -88,7 +88,7 @@ typedef struct CCache {
     /* 0xBDC */ s32 freeEntryCount;
     /* 0xBE0 */ CMutex mutex;                   /* the cache lock */
     /* 0xC00 */ CBlocker blocker;
-    /* 0xC1C */ s32 frameDelay;                 /* counted down by CCache__Advance */
+    /* 0xC1C */ s32 frameDelay;                 /* Turok 3's "synchronous": loads are synchronous while it is not 0 (CCache__Request); counted down by CCache__Advance */
     /* 0xC20 */ u32 ageCount;                   /* the frame stamp CMemEntry.age is compared with */
 } CCache; /* size 0xC28 */
 
