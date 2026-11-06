@@ -15,7 +15,6 @@ typedef struct FaultedThread {
     /* 0x124 */ u32 badVaddr;
 } FaultedThread;
 
-extern OSMesgQueue gPager_pending;
 extern s32 D_800B7658;
 
 extern FaultedThread *__osGetCurrFaultedThread(void);     /* __osGetCurrFaultedThread */
