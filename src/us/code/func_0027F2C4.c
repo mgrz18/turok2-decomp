@@ -3,11 +3,11 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/frame.h"
+#include "globals/game.h"
 
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern s32 gEngineApp_m_Settings_paused;
 extern f32 gScreenClearTime;              /* seconds the screen is cleared for (splat: gCameraVisBits + 4) */
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* frame buffer index */
@@ -42,7 +42,7 @@ void CCameraPool__Draw(CCameraPool *pool, void *world) {
     if (pool->m_pmeCameras != NULL) {
         CCache__LockForDisplayList(0, pool->m_pmeCameras);
     }
-    if (gEngineApp_m_Settings_paused != 0 || pool->m_ActiveList.m_nCount == 3) {
+    if (gEngineApp_m_Settings.paused != 0 || pool->m_ActiveList.m_nCount == 3) {
         gScreenClearTime = 30.0f;
     }
     if (gScreenClearTime != 0.0f) {

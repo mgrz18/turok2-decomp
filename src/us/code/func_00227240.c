@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/level_actor.h"
+#include "globals/game.h"
 
 extern s32 gPersistentDataLoaded;
 extern u8 gScene[];                 /* the world */
-extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gLevelActorIntelligenceMP[];
 extern u8 gLevelActorIntelligence[];
 extern u8 D_800B6D1B;                   /* frame counter */
@@ -62,7 +62,7 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
     if (refCount != NULL) {
         (*refCount)++;
     }
-    if (gEngineApp_m_Settings_multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         actor->m_Actor.header.m_pIntelligence = gLevelActorIntelligenceMP;
     } else {
         actor->m_Actor.header.m_pIntelligence = gLevelActorIntelligence;

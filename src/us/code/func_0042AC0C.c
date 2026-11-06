@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
@@ -26,7 +27,6 @@ extern u8 gLoopSoundEntries[];
 extern u8 gLoopSounds[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* player list */
-extern u8 gEngineApp_m_Settings_multiplayer;  /* multiplayer */
 
 extern s32 ProPack__Decompress(s32, s32);
 extern void CCollisionInfo__Reset(void);
@@ -193,7 +193,7 @@ loaded:
             size = 0x320;
             break;
     }
-    if (gEngineApp_m_Settings_multiplayer != 0) {
+    if (gEngineApp_m_Settings.multiplayer != 0) {
         size += 0x200;
     }
     block = CCache__Allocate(0, size << 6, 3, D_800A5EB4);

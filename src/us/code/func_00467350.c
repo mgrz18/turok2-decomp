@@ -2,9 +2,9 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 extern u8 gScene[];  /* the world */
-extern u8 gEngineApp_m_Settings_multiplayer;    /* multiplayer */
 extern s32 gEngineApp_m_Settings_match_tag;
 extern s32 gTagModeModel;
 extern s32 gCharacterModels[];
@@ -46,7 +46,7 @@ void CPlayer__SetCharacter_2(CPlayer *p, s32 character) {
     }
     CPlayer__GiveStartingWeapons(p);
     modelId = 0x66;
-    if (gEngineApp_m_Settings_multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         if (gEngineApp_m_Settings_match_tag != 0 && p->m_pOptions->m_TagMode != 0) {
             modelId = gTagModeModel;
         } else {

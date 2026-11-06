@@ -3,6 +3,7 @@
 #include "structs/region.h"
 #include "structs/camera.h"
 #include "structs/model.h"
+#include "globals/game.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -40,7 +41,6 @@ struct Actor {
 };
 
 extern char D_800A5AC4[];   /* "anim object info" */
-extern s32 gEngineApp_m_Settings_paused;
 extern s32 gEvenOdd;      /* current view */
 extern u8 gScene[];
 
@@ -83,7 +83,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
         }
     } while (0);
     info = CISet__GetBlock(*anim, 0);
-    if (gEngineApp_m_Settings_paused != 0) {
+    if (gEngineApp_m_Settings.paused != 0) {
         actor->update(actor, actor->ai);
         CMtxF__TransformBox(actor->matrix, info, actor->boxMin);
     }

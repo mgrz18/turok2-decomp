@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -42,9 +43,6 @@ typedef struct {
 } PortSetup;
 
 extern Globals gEngineApp_m_Game_m_MenuPool;
-extern s32 gEngineApp_m_Settings_paused;
-extern s32 gEngineApp_m_Settings_nextMode;          /* game state */
-extern s32 gEngineApp_m_Settings_matchMode;
 extern s32 gScene_m_LevelID;          /* level */
 extern f32 gFrameIncrement;          /* frame time */
 extern PortSetup D_8011AB88[];
@@ -91,7 +89,7 @@ static __inline__ void reset_strokes(CBarrel *s) {
 static __inline__ s32 in_menu(CPlayer *p) {
     s32 result;
 
-    if (gEngineApp_m_Settings_paused) {
+    if (gEngineApp_m_Settings.paused) {
         return 1;
     }
     result = 0;
@@ -112,7 +110,7 @@ void CPlayerPool__Update(PlayerList *list) {
     u32 hub;
     s32 character;
 
-    if (gEngineApp_m_Settings_nextMode == 0xB || gEngineApp_m_Settings_nextMode == 8) {
+    if (gEngineApp_m_Settings.nextMode == 0xB || gEngineApp_m_Settings.nextMode == 8) {
         return;
     }
     frameTime = gFrameIncrement;
@@ -173,7 +171,7 @@ void CPlayerPool__Update(PlayerList *list) {
             p->m_pOptions->m_bActive = 1;
             CPlayer__NewGame(p, character, 1);
             CAI__SetMode(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 2);
-            CPlayer__Warp(p, gEngineApp_m_Settings_matchMode, 0, 1);
+            CPlayer__Warp(p, gEngineApp_m_Settings.matchMode, 0, 1);
             CList__Remove(&list->idle, p);
             CList__AddHead(&list->active, p);
         }

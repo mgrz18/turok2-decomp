@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
-extern s8 gEngineApp_m_Settings_teamArena; /* gEngineApp_m_Settings + 0x2C */
 extern char D_800B5F3C[];
 extern char D_800B5F54[];
 extern char D_800B5F6C[];
@@ -18,7 +18,7 @@ extern char D_800B605C[];
 extern char D_800B6074[];
 
 s32 TeamBloodMenu_LevelLabel(MenuItem *a) {
-    switch (gEngineApp_m_Settings_teamArena) {
+    switch (gEngineApp_m_Settings.teamArena) {
     case 0:
         a->text = D_800B5F3C;
         break;

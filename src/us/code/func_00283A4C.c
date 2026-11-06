@@ -2,11 +2,11 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/cinema.h"
+#include "globals/game.h"
 
 
 extern Cinema *gCinemaPlayerP;
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
-extern s32 gEngineApp_m_Settings_mode;
 extern u8 gScene[];             /* the world */
 extern s32 gScene_m_nLevel;              /* world +0x18FA8: the current warp id */
 extern s32 gScene_m_WarpFade;
@@ -34,7 +34,7 @@ void Cinema_RestorePlayer(void) {
     world = gScene;
     level = gCinemaPlayerP->startLevel;
     warp = gCinemaPlayerP->startWarp;
-    if (gEngineApp_m_Settings_mode != 13) {
+    if (gEngineApp_m_Settings.mode != 13) {
         gCinemaPlayerP->restored = 1;
         gCinemaPlayerP->saveStart = 0;
         gCinemaPlayerP->startLevel = -1;

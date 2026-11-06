@@ -585,7 +585,6 @@ extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* matrix buffer index */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* the current view */
-extern u8 gEngineApp_m_Settings_unk17;
 extern CCollisionInfo gCollisionInfoLineOfSight;
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 extern u8 gScene_m_Heap[];             /* matrix pool */
@@ -628,7 +627,7 @@ static __inline__ s32 Particle_ColorMode(Particle *particle) {
     if (particle->desc->flags & 0x2000000) {
         if (particle->flags & 2) {
             mode = 2;
-        } else if (gEngineApp_m_Settings_unk17 == 2) {
+        } else if (gEngineApp_m_Settings.unk17 == 2) {
             mode = 1;
         }
     }
@@ -1154,9 +1153,6 @@ typedef struct {
     /* 0x20C */ CMtxF view;
 } Camera;
 
-extern s32 gEngineApp_m_Settings_paused;              /* frozen; the current player list is 0x1414 bytes before */
-extern u8 gEngineApp_m_Settings_multiplayer;
-extern u8 gEngineApp_m_Settings_unk17;
 extern CCollisionResults *gCollisionResultsP;
 extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
@@ -1336,7 +1332,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     f32 scale;
     f32 depth;
     s32 sound;
-    s32 *global = &gEngineApp_m_Settings_paused;
+    s32 *global = &gEngineApp_m_Settings.paused;
 
     if (global[0] != 0) {
         return 0;
@@ -1371,7 +1367,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
             }
         }
         mask = 1;
-        if (gEngineApp_m_Settings_multiplayer != 0) {
+        if (gEngineApp_m_Settings.multiplayer != 0) {
             mask = 2;
         }
         for (i = first; i <= last; i++) {
@@ -1435,12 +1431,12 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     break;
             }
             if (entry->flags & 0x2000000) {
-                if (gEngineApp_m_Settings_unk17 == 0 || !(arg11 & 1)) {
+                if (gEngineApp_m_Settings.unk17 == 0 || !(arg11 & 1)) {
                     ok = 0;
                 }
             }
             if (entry->flags & 0x4000000) {
-                if (gEngineApp_m_Settings_unk17 != 0) {
+                if (gEngineApp_m_Settings.unk17 != 0) {
                     ok = 0;
                 }
             }
@@ -1541,7 +1537,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 if (effect->entry->flags & 0x2000000) {
                     if (effect->flags & 2) {
                         layer = 2;
-                    } else if (gEngineApp_m_Settings_unk17 == 2) {
+                    } else if (gEngineApp_m_Settings.unk17 == 2) {
                         layer = 1;
                     }
                 }

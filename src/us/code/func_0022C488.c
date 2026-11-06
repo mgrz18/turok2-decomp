@@ -4,6 +4,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/particle_event.h"
+#include "globals/game.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -30,7 +31,6 @@ struct Target {
 
 extern CCollisionResults gCollisionResults;
 extern u8 gCollisionResults_m_Frame_flags;
-extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gScene_m_ParticleSystem[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
@@ -202,7 +202,7 @@ void CParticle__HitTarget(CParticle *p) {
     }
     if (action != 4) {
         draw = 1;
-        if (gEngineApp_m_Settings_multiplayer) {
+        if (gEngineApp_m_Settings.multiplayer) {
             draw = source->def->m_Type != 11;
             if (mode == p->m_bDieOnImpact) {
                 draw = 0;

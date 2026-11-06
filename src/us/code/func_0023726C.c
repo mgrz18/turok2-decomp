@@ -1,11 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002661FC.c, func_002661FC.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
+#include "common.h"
+#include "globals/game.h"
 typedef struct B15Def {
                s32 type;
                u8 pad4[0xA];
@@ -29,10 +26,9 @@ struct B15Obj {               /* Turok 2 layout (Rage Wars offsets in comments) 
 };
 s32 GameObject_IsSolid(B15Obj *a);
 extern s32 gScene_m_bStreamAll;
-extern u8 gEngineApp_m_Settings_multiplayer;
 static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
     u32 f;
-    if (gEngineApp_m_Settings_multiplayer != 0) {
+    if (gEngineApp_m_Settings.multiplayer != 0) {
         return 1;
     }
     if (t->unkE4 == a->unkE4) {
@@ -57,7 +53,7 @@ static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
 static __inline__ s32 chk3(B15Obj *a, B15Obj *t) {
     u32 f;
     register s32 res asm("$3");
-    if (gEngineApp_m_Settings_multiplayer != 0) {
+    if (gEngineApp_m_Settings.multiplayer != 0) {
         res = 1;
         goto done;
     }

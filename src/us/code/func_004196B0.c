@@ -1,6 +1,7 @@
 #include "structs/vector.h"
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_4.CPP, func_8043EA98_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -42,12 +43,10 @@ struct ObjRecAt20V2 {
 };
 struct ObjRecAt20V2;
 typedef struct ObjRecAt20V2 ObjRecAt20V2;
-extern signed char gEngineApp_m_Settings_defaultSlot_m_nController;
 struct ObjRecAt20V2;
 /* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
 extern void TitleMenu_Single(void *arg0, struct ObjRecAt20V2 *menu);
 extern void Music_RestoreVolume();
-extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 struct OSTask_t;
 struct OSTask_t {
     u32 type;
@@ -356,12 +355,12 @@ void TitleMenu_Single(void *arg0, struct ObjRecAt20V2 *menu) {
         globals->slots[i].m_bActive = 0;
     }
     i = 0;
-    settings = &gEngineApp_m_Settings_defaultSlot;
+    settings = &gEngineApp_m_Settings.defaultSlot;
     on = 1;
     for (profile = gControllers; i < 4; i++) {
         if (Controller_ConfirmPressed(profile) != 0) {
             settings->m_bActive = on;
-            gEngineApp_m_Settings_defaultSlot_m_nController = i;
+            gEngineApp_m_Settings.defaultSlot.m_nController = i;
             menu->unk20 = profile;
             break;
         }

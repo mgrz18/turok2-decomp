@@ -2,9 +2,9 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 #include "gfx.h"
+#include "globals/game.h"
 
 
-extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
 extern s32 gEngineApp_m_Settings_match_tag;
 extern s32 gTagModeModel;
 extern s32 gCharacterModels[];
@@ -19,7 +19,7 @@ void CPlayer__DrawCharacter(CPlayer *player, s32 arg1) {
     s32 model;
     Gfx *g;
 
-    if (gEngineApp_m_Settings_multiplayer == 0) {
+    if (gEngineApp_m_Settings.multiplayer == 0) {
         model = 0x66;
     } else if (gEngineApp_m_Settings_match_tag != 0 && player->m_pOptions->m_TagMode != 0) {
         model = gTagModeModel;

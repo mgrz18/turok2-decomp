@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/game.h"
 
 /* Controller pak / rumble service, run once per frame while enabled. */
 
@@ -9,7 +10,6 @@ extern u8 gRumblePool[];
 extern u8 gPakQueueState;           /* rescan request */
 extern u8 gPakAccessQueue[];        /* OSMesgQueue: pak access lock */
 extern u8 gSiMessageQueue[];
-extern s32 gEngineApp_m_Settings_mode;
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flags);
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
@@ -51,7 +51,7 @@ void Controller_Service(void) {
         }
         osSendMesg(gPakAccessQueue, NULL, 0);
     }
-    if (gEngineApp_m_Settings_mode == 8) {
+    if (gEngineApp_m_Settings.mode == 8) {
         if (--sControllerRescanTimer <= 0) {
             sControllerRescanTimer = 60;
             gPakQueueState = 1;

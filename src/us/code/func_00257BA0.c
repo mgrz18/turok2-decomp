@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
 
 extern s32 gScene_m_PreviewState;             /* first weapon - 1 */
 extern s32 gScene_m_PreviewTimer;             /* weapon count */
-extern u8 gEngineApp_m_Settings_multiplayer;
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
 /* The next weapon the player can switch to: the first usable one after the
@@ -40,7 +40,7 @@ s32 CPlayer__GetNextUsableWeapon(CPlayer *player) {
             }
         }
     }
-    if (gEngineApp_m_Settings_multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         return 0x18;
     }
     return 0;

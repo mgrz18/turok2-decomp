@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "structs/player_options.h"
+#include "globals/game.h"
 struct func_80250BD4_S1;
 struct func_80250BD4_S1 {
     char pad0[0x20];
@@ -28,7 +29,6 @@ struct SharedRecAtA8 {
 };
 void Music_RestoreVolume(void);
 unsigned int Controller_ConfirmPressed(void *);
-extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 extern struct SharedRecAtA8 D_8011AB98[];
 void Menu_ClaimPressingController(func_80250BD4_S1 *arg0) {
     CPlayerOptions *settings;
@@ -43,7 +43,7 @@ void Menu_ClaimPressingController(func_80250BD4_S1 *arg0) {
         status -= 0x40;
     }
     i = 0;
-    settings = &gEngineApp_m_Settings_defaultSlot;
+    settings = &gEngineApp_m_Settings.defaultSlot;
     on = 1;
     for (profile = gControllers; i < 4; i++, profile++) {
         if (Controller_ConfirmPressed(profile) != 0) {

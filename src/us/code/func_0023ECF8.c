@@ -4,9 +4,9 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 #include "structs/pickup.h"
+#include "globals/game.h"
 
 extern char gEngineApp_m_Game_m_CameraPool[];
-extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 CPlayer__AddAmmo(CPlayer *player, s32 index, s32 argument);
 void CCamera__StartFlash(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
@@ -28,10 +28,10 @@ s32 Pickup_GiveWeapon(CPlayer *player, CPickupEntry *entry) {
     result = 0;
     if (entry->m_Params.m_Weapon.m_AmmoType != -1 && player->m_Data.m_WeaponList[entry->m_Params.m_Weapon.m_Weapon] != 0 &&
         (result = CPlayer__AddAmmo(player, entry->m_Params.m_Weapon.m_AmmoType, entry->m_Params.m_Weapon.m_AmmoAmount)) == 0 &&
-        (!gEngineApp_m_Settings_multiplayer || !player->m_pOptions->m_TagMode)) {
+        (!gEngineApp_m_Settings.multiplayer || !player->m_pOptions->m_TagMode)) {
         return 0;
     }
-    if (gEngineApp_m_Settings_multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         if (!(gWeaponInfoTable[entry->m_Params.m_Weapon.m_Weapon]->flags & 8)) {
             return 0;
         }
@@ -46,7 +46,7 @@ s32 Pickup_GiveWeapon(CPlayer *player, CPickupEntry *entry) {
     info = gWeaponInfoTable[entry->m_Params.m_Weapon.m_Weapon];
     if (p->m_Data.m_CurrentWeapon < entry->m_Params.m_Weapon.m_Weapon) {
         if ((p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? (info->flags & 2) : (info->flags & 1)) {
-            if (!gEngineApp_m_Settings_multiplayer && had == 0) {
+            if (!gEngineApp_m_Settings.multiplayer && had == 0) {
                 p->m_RequestedWeapon = entry->m_Params.m_Weapon.m_Weapon;
             }
         }

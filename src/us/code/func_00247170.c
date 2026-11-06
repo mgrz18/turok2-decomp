@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 /* The scope model raised to the view. */
 typedef struct {
@@ -20,7 +21,6 @@ typedef struct {
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
 
-extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
 extern f32 gFrameIncrement;          /* the frame's time step */
 extern u8 gScene[];         /* the level */
 
@@ -69,7 +69,7 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
                 m->time = 3.75f;
             }
             if (m->current == 0xC83) {
-                if (gEngineApp_m_Settings_multiplayer) {
+                if (gEngineApp_m_Settings.multiplayer) {
                     m->roll = 0.0f;
                     m->pitch = 0.0f;
                 } else {
@@ -91,7 +91,7 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
                 }
             }
             if (m->current == 0xC83) {
-                if (gEngineApp_m_Settings_multiplayer) {
+                if (gEngineApp_m_Settings.multiplayer) {
                     m->roll = 0.0f;
                 } else {
                     m->roll = ((1.0f - m->time * 0.26666668f) * 180.0f + 180.0f) * 0.017453294f;

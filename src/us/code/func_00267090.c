@@ -6,6 +6,7 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 
 typedef struct {
@@ -14,7 +15,6 @@ typedef struct {
 } Attachment;
 
 
-extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 GameObject_IsSolid(CGameObjectInstance *actor) {
     CPlayer *owner;
@@ -29,7 +29,7 @@ s32 GameObject_IsSolid(CGameObjectInstance *actor) {
             }
             if (actor->m_dwFlags & 0x300000) {
                 owner = ((CPlayer *)actor->m_AI.m_pParent);
-                if (gEngineApp_m_Settings_multiplayer != 0 && owner->m_bEnteringDeathmatch != 0) {
+                if (gEngineApp_m_Settings.multiplayer != 0 && owner->m_bEnteringDeathmatch != 0) {
                     return 0;
                 }
             }

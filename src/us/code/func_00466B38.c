@@ -3,8 +3,8 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
-extern u8 gEngineApp_m_Settings_multiplayer;   /* multiplayer */
 extern u8 gEngineApp_m_Game_m_CameraPool[];
 
 extern s32 Demo_GetPlayerCount(void);
@@ -42,7 +42,7 @@ void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
     for (i = 0; i < 6; i++) {
         p->m_Data.m_KeySet6LevelFlags[i] = 0;
     }
-    if (!gEngineApp_m_Settings_multiplayer) {
+    if (!gEngineApp_m_Settings.multiplayer) {
         p->m_Data.m_Lives = 3;
     } else {
         p->m_Data.m_Lives = 1;

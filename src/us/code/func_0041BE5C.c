@@ -2,14 +2,14 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/game.h"
 
 extern u8 D_800B3E88[];
 extern u8 D_800B3EA0[];
-extern s32 gEngineApp_m_Settings_mode;
 extern u8 D_800B3E70[];
 s32 OptionsMenu_DifficultyText(MenuItemRecAt14 *item) {
     extern u32 gEngineApp_m_Settings_difficulty;
-    if (gEngineApp_m_Settings_mode == 8) {
+    if (gEngineApp_m_Settings.mode == 8) {
         item->flags |= 0x01000000;
     } else {
         item->flags &= ~0x01000000;

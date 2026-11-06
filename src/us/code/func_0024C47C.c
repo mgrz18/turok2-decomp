@@ -15,6 +15,7 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
 
 extern s32 gScene_m_PreviewState;
 extern s32 gScene_m_PreviewTimer;
@@ -74,8 +75,6 @@ void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player) {
 #include "structs/camera.h"
 
 /* An animated HUD item (COverlay__Update ticks it, COverlay__StartScript restarts it). */
-extern s32 gEngineApp_m_Settings_nextMode;          /* game state */
-extern u8 gEngineApp_m_Settings_hudAlpha;           /* HUD alpha */
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
 extern s32 gEngineApp_m_Settings_match_tag;
@@ -123,7 +122,7 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     CBarrel *strokes;
 
     showAmmo = 1;
-    if (gEngineApp_m_Settings_nextMode == 0xB || gEngineApp_m_Settings_nextMode == 8) {
+    if (gEngineApp_m_Settings.nextMode == 0xB || gEngineApp_m_Settings.nextMode == 8) {
         return;
     }
     COverlay__Update(&player->m_AmmoOverlay);
@@ -149,7 +148,7 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     } else {
         CBarrel__DrawRing(strokes, view, player);
     }
-    Hud_SetupTextureMode(gEngineApp_m_Settings_hudAlpha);
+    Hud_SetupTextureMode(gEngineApp_m_Settings.hudAlpha);
     sx = view->m_Viewport.m_Width / (f32)gScreenWidth;
     shift = sx * 32.0f;
     sy = view->m_Viewport.m_Height / (f32)gScreenHeight;

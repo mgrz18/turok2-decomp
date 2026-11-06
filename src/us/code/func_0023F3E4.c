@@ -3,8 +3,8 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/pickup.h"
+#include "globals/game.h"
 
-extern u8 gEngineApp_m_Settings_multiplayer;
 
 extern char gEngineApp_m_Game_m_CameraPool[];
 
@@ -42,7 +42,7 @@ s32 Pickup_GiveHealth(CPlayer *player, CPickupEntry *entry) {
     if (player->m_Data.m_Health < max) {
         player->m_Data.m_Health += entry->m_Params.m_Health.m_Amount << 8;
         do { /* a block boundary keeps the flag load after the store */
-            if (gEngineApp_m_Settings_multiplayer) {
+            if (gEngineApp_m_Settings.multiplayer) {
                 limit = player->m_CharacterActor.header.m_pIntelligence->m_Player.m_StartHealth << 8;
                 player->m_CharacterActor.m_AI.m_Health = player->m_Data.m_Health = (u32)player->m_Data.m_Health < limit ? (u32)player->m_Data.m_Health : limit;
             } else if (player->m_Data.m_Health > max) {

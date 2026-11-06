@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
 extern s32 gScreenWidth;      /* screen width */
 extern s32 gScreenHeight;      /* screen height */
-extern u8 gEngineApp_m_Settings_multiplayer;
 
 void CCamera__WorldToScreen(CCamera *, f32 *, f32 *, f32 *);
 void Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
@@ -27,7 +27,7 @@ void Hud_DrawWorldSprite(CCamera *view, f32 *pos, s32 sprite, f32 frame, f32 sca
         if (x < -64.0f || (f32) (gScreenWidth + 64) < x || y < -64.0f || (f32) (gScreenHeight + 64) < y) {
             return;
         }
-        if (gEngineApp_m_Settings_multiplayer != 0) {
+        if (gEngineApp_m_Settings.multiplayer != 0) {
             x = view->m_Viewport.m_ScreenPosX + x / gScreenWidth * view->m_Viewport.m_Width;
             y = view->m_Viewport.m_ScreenPosY + y / gScreenHeight * view->m_Viewport.m_Height;
         }

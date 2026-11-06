@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "gfx.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
 
 /* Draws the weapon menu's icons: sorts the listed items, places each one in
  * the player's viewport (on the wheel, or in a vertical strip that fades out
@@ -24,7 +25,6 @@ typedef struct MenuPlayer {
     /* 0x972 */ s8 owned[1];
 } MenuPlayer;
 
-extern u8 gEngineApp_m_Settings_hudAlpha;
 extern Gfx *gDList;
 
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
@@ -54,7 +54,7 @@ void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer
     s32 blue;
 
     Sort_Quick(items, count, sizeof(CBarrelIcon), CBarrel__CompareIcons, CBarrel__SwapIcons);
-    level = gEngineApp_m_Settings_hudAlpha + 0x40;
+    level = gEngineApp_m_Settings.hudAlpha + 0x40;
     fade = menu->m_Open * (level < 0x100 ? level : 255.0f);
     item = items;
     while (--count != -1) {

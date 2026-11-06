@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
 /* What a region set gives a camera (the record CScene__GetRegionInfo finds). */
 typedef struct {
@@ -21,7 +22,6 @@ typedef struct {
 } CRegionSetAttributes;
 
 extern s32 gScene[];
-extern s32 gEngineApp_m_Settings_paused;
 extern CCamera *gEngineApp_m_Game_m_CameraPool_m_Cameras;     /* the camera pool's first camera */
 extern s32 gEngineApp_m_Settings_mode;          /* game mode */
 extern s32 gEngineApp_m_Settings_nextMode;
@@ -78,7 +78,7 @@ void CCamera__AdvanceAttributes(CCamera *cam) {
     if (rec == NULL) {
         return;
     }
-    if (gEngineApp_m_Settings_paused == 0 && cam == gEngineApp_m_Game_m_CameraPool_m_Cameras && gEngineApp_m_Settings_mode == 13 && gEngineApp_m_Settings_nextMode == gEngineApp_m_Settings_mode) {
+    if (gEngineApp_m_Settings.paused == 0 && cam == gEngineApp_m_Game_m_CameraPool_m_Cameras && gEngineApp_m_Settings_mode == 13 && gEngineApp_m_Settings_nextMode == gEngineApp_m_Settings_mode) {
         if (Cinema_OverridesMusic1() == 0) {
             Sound__SetAmbientTrack(rec->m_Music1);
         }
