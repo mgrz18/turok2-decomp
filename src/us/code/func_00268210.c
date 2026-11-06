@@ -2,12 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed int s32;
-typedef float f32;
 typedef struct ObjDef { s32 type; } ObjDef;
 typedef struct Obj Obj;
 typedef struct B11Own { /* Turok 2: player */

@@ -3,18 +3,17 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 
-typedef struct { f32 m[4][4]; } Mtx4;
 
-void CMtxF__FromMtxAffine(Mtx4 *out, void *src);
-void CMtxF__InvertAffine(Mtx4 *out, Mtx4 *in);
-void CMtxF__TransformPoint(Mtx4 *m, CVector3 *in, CVector3 *out);
+void CMtxF__FromMtxAffine(CMtxF *out, void *src);
+void CMtxF__InvertAffine(CMtxF *out, CMtxF *in);
+void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
 void CVector3__Normalize(CVector3 *v);
-void CMtxF__RotateVector(Mtx4 *m, CVector3 *in, CVector3 *out);
+void CMtxF__RotateVector(CMtxF *m, CVector3 *in, CVector3 *out);
 void AI_HearNoise(u8 *owner, u8 *ai, void *pos, s32 n);
 
-void CParticle__AttachToHitNode(CParticle *actor, Mtx4 *mtx, s32 kind) {
-    Mtx4 tmp;
-    Mtx4 m;
+void CParticle__AttachToHitNode(CParticle *actor, CMtxF *mtx, s32 kind) {
+    CMtxF tmp;
+    CMtxF m;
     CVector3 dir;
     u8 *owner;
 

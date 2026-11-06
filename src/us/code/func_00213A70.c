@@ -25,8 +25,6 @@ typedef struct WTab {
     /* 0x8 */ WRec r[1];
 } WTab;
 
-typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
-
 extern char D_800A57B8[];
 extern CVector3 sLitVertexOffsets[];
 

@@ -17,14 +17,6 @@
  * ground; then it is submitted (CGameObjectInstance__SubmitShadowModel). */
 
 typedef struct {
-    u8 pad0[0x8];
-    u8 colour[2];           /* 0x08 */
-    u8 padA[0x6];
-    s8 dir[3];              /* 0x10 */
-    u8 pad13[0x5];
-} Light;                    /* 0x18 */
-
-typedef struct {
     u8 pad0[0x10];
     s32 blobType;           /* 0x10 */
 } ShadowParams;
@@ -56,7 +48,7 @@ void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, s32 unused, ShadowP
     f32 t;
     f32 u2;
     s32 v;
-    Light *light;
+    CLights1 *light;
     register f32 py __asm__("$f1");
 
     if (a->header.m_pCurrentRegion != 0 && func_00268160() != 0 && !(a->m_dwFlags & 0x200000)) {
@@ -76,12 +68,12 @@ void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, s32 unused, ShadowP
                 if (a->m_pmfShadow == NULL) {
                     goto end;
                 }
-                light = (Light *) a->m_Lights[gEvenOdd];
-                dir.x = light->dir[0] * 0.007874016f;
-                dir.y = light->dir[1] * 0.007874016f;
-                dir.z = light->dir[2] * 0.007874016f;
-                t = (f32) light->colour[0] * (f32) light->colour[0];
-                u2 = (f32) light->colour[1] * (f32) light->colour[1];
+                light = &a->m_Lights[gEvenOdd];
+                dir.x = light->m_Dir[0] * 0.007874016f;
+                dir.y = light->m_Dir[1] * 0.007874016f;
+                dir.z = light->m_Dir[2] * 0.007874016f;
+                t = (f32) light->m_Col[0] * (f32) light->m_Col[0];
+                u2 = (f32) light->m_Col[1] * (f32) light->m_Col[1];
                 t = t + u2;
                 r = func_00298470(t + u2) * -0.00090497744f;
                 DLights_GetAtPoint(D_8010FF34, a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, &dir, &r);

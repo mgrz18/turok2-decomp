@@ -52,7 +52,7 @@ s32 func_00268148(Target *target);
 void ImpactEvent_Send(void *source, CParticle *p, s32 effect, s32 arg3, CVector3 pos, CEventValue params);
 void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 enabled);
 void Sound__Play(s16 sound, CVector3 pos, s32 arg2, s32 arg3);
-void CParticleSystem__Free(void *list, CParticle *p);
+void CParticleSystem__Free(CParticleSystem *list, CParticle *p);
 void CParticle__StopLoopSound(CParticle *p);
 
 /* Sticks the particle to the bone it hit: its position and velocity in the bone's frame. */
@@ -231,7 +231,7 @@ void CParticle__HitTarget(CParticle *p) {
     }
     if (!(p->m_dwFlags & 0x30000)) {
         if (mode == 1 || (effect != 0xFFFF && (gImpactEventHandlers[effect].flags & 1))) {
-            CParticleSystem__Free(gScene.m_ParticleSystem, p);
+            CParticleSystem__Free(&gScene.m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
         }
     }

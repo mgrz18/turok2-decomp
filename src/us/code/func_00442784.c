@@ -15,7 +15,7 @@ extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
 extern s32 CScene__FindRegionAt(void *world, CVector3 *pos);
-extern void *CLevelActorPool__Spawn(void *pool, s32 a1, s16 type, CVector3 vel, CVector3 pos, s32 region, f32 arg);
+extern void *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 a1, s16 type, CVector3 vel, CVector3 pos, s32 region, f32 arg);
 extern void Actor_SpawnParticle(void *actor, s32 id, CVector3 pos, s32 a5);
 extern void MotherBoss_DropPickupsAtSpawnPoints_2(s32 delay, void *points);
 
@@ -28,7 +28,7 @@ static __inline__ void SpawnAt(s32 delay, s16 type, CVector3 pos, f32 speed) {
     vel.x = 0.0f;
     vel.y = speed;
     vel.z = 0.0f;
-    actor = CLevelActorPool__Spawn(gScene.m_ActorPool, 0, type, vel, pos, region, delay);
+    actor = CLevelActorPool__Spawn(&gScene.m_ActorPool, 0, type, vel, pos, region, delay);
     if (actor != NULL) {
         Actor_SpawnParticle(actor, 0x11D, pos, 0);
     }

@@ -9,22 +9,6 @@
 #include "common.h"
 #include "structs/intelligence.h"
 struct LevelActor;
-struct Box;
-typedef struct Box Box;
-struct Box;
-struct Box {
-    CVector3 min;
-    CVector3 max;
-};
-struct CQuatern_t;
-typedef struct CQuatern_t CQuatern;
-struct CQuatern_t;
-struct CQuatern_t {
-    float x;
-    float y;
-    float z;
-    float w;
-};
 typedef struct Shared_ParticleLighting Shared_ParticleLighting;
 struct Shared_ParticleLighting {
     u8 ambient[3], reserved3;

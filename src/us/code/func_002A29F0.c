@@ -4,18 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/hostio.h"
-
-/* Request block sent to the I/O thread (HostIo_ThreadMain) through sHostIoRequestQueue. */
-typedef struct IoRequest {
-    /* 0x00 */ u8 *buffer;
-    /* 0x04 */ s32 size;
-    /* 0x08 */ s32 write;
-    /* 0x0C */ s32 flags;
-    /* 0x10 */ s32 arg0;
-    /* 0x14 */ s32 arg1;
-    /* 0x18 */ s32 arg2;
-    /* 0x1C */ OSMesgQueue *reply;
-} IoRequest; /* size 0x20 */
+#include "structs/hostio.h"
 
 extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);
@@ -27,7 +16,7 @@ extern s32 HostIo_Call(s32 cmd, s32 arg0, s32 arg1, s32 arg2);
 
 /* Send a string to the debugger host (command 0x303), through the I/O thread when it runs. */
 s32 PCcreat(u8 *src, s32 arg) {
-    IoRequest req;
+    HostIoRequest req;
     s32 reply;
     s32 len;
     s32 saved;
@@ -37,7 +26,7 @@ s32 PCcreat(u8 *src, s32 arg) {
         req.buffer = src;
         req.size = len;
         req.write = 1;
-        req.flags = 0x80000000 | 0x303;
+        req.wC.flags = 0x80000000 | 0x303;
         req.arg0 = len;
         req.arg1 = arg;
         req.arg2 = 0;

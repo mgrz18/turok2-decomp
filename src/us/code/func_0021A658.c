@@ -52,12 +52,6 @@ struct ObjectStateC {
     char pad0[0x8];
     func_80203908_S3_U124 unk_8;
 };
-struct func_80237E70_G1;
-struct func_80237E70_G1 {
-    u8 * unk0;
-};
-struct func_80237E70_G1;
-typedef struct func_80237E70_G1 func_80237E70_G1;
 extern void CGameObjectInstance__MoveWithCollision(char *, CVector3 *);
 typedef struct CollisionInfo CollisionInfo;
 extern CollisionInfo D_800F1EB0;

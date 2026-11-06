@@ -5,10 +5,6 @@
  * side-step away from it, otherwise damp the velocity. Fires state 4 when
  * the timer runs out. */
 
-typedef struct {
-    f32 m[4][4];
-} Mtx4;
-
 void AI_UpdateTargets(CGameObjectInstance *self, CAI *ai, CAITargets *out, s32 f1, s32 f2);
 void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 angle, f32 arg3);
 f32 AI_LerpByAggression(CGameObjectInstance *self, CAI *ai, f32 lo, f32 hi);

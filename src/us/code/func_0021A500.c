@@ -2,55 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "globals/engine.h"
-
-typedef struct B10X B10X;
-typedef struct B10Q4 B10Q4;
-typedef struct B10Pq B10Pq;
-typedef struct B10Ow B10Ow;
-typedef struct B10Mt B10Mt;
-typedef struct B10B24 B10B24;
-typedef struct B10An B10An;
 typedef struct B10Obj B10Obj;
 typedef struct B10H B10H;
-typedef struct B10Pt B10Pt;
-typedef struct B10Tri B10Tri;
-typedef struct B10Fl B10Fl;
-typedef struct B10Z B10Z;
-typedef struct B10C B10C;
-struct B10X {
-    u8 pad0[0x68];
-                f32 m68[16];
-    u8 padA8[0xC];
-                s32** pB4;
-};
-struct B10Q4 {
-                f32 x;
-                f32 y;
-                f32 z;
-                f32 w;
-};
-struct B10Pq {
-    u8 pad0[0x140];
-                B10Q4 q140;
-};
-struct B10Ow {
-    u8 pad0[0x5DC];
-                B10Pq* p5DC;
-};
-struct B10Mt {
-                f32 m[16];
-};
-struct B10B24 {
-                s32 w[6];
-};
-struct B10An {
-    u8 pad0[0x4];
-                s16 h4;
-    u8 pad6[0x4];
-                s8 b122;
-                s8 b123;
-    u8 padC[0x8];
-};
 struct B10Obj { /* Turok 2 layout (Rage Wars: p14, f5C, flags100) */
     u8 pad0[0x10];
     B10H* p14;          /* 0x10 */
@@ -62,32 +15,6 @@ struct B10Obj { /* Turok 2 layout (Rage Wars: p14, f5C, flags100) */
 struct B10H {
     u8 pad0[0x2];
                 u16 h2;
-};
-struct B10Pt {
-                f32 x;
-    u8 pad4[0x4];
-                f32 z;
-                f32 y;
-};
-struct B10Tri {
-    u8 pad0[0x4];
-                B10Pt* pt[3];
-};
-struct B10Fl {
-                u32 flags;
-                s8 b4;
-    u8 pad5[0x1];
-                s8 b6;
-    u8 pad7[0x11];
-                f32 f18;
-};
-struct B10Z {
-    u8 pad0[0xC];
-                B10C* pC;
-};
-struct B10C {
-    u8 pad0[0x8];
-                f32 f8;
 };
 extern f32 D_800A5AEC;
 extern f32 D_800A5AF0;

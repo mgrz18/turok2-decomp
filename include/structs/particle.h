@@ -76,6 +76,15 @@ typedef struct CROMParticleParams {
     /* 0x0F */ u8 m_Event;
 } CROMParticleParams; /* size 0x10 */
 
+/* How a template's particles speed up (CParticle__Accelerate): the
+ * acceleration along m_vDirection and the speed it stops at, half floats
+ * (HalfToFloat). */
+typedef struct CROMParticleMotion {
+    /* 0x00 */ u8 unk_00[0x10];
+    /* 0x10 */ u16 m_Accel;
+    /* 0x12 */ u16 m_MaxSpeed;
+} CROMParticleMotion;
+
 /* A particle template (block 2 of the particle data; CParticle.m_pEffect). */
 typedef struct CROMParticleEffect {
     /* 0x00 */ u32 m_dwFlags;
@@ -97,7 +106,7 @@ typedef struct CROMParticleEffect {
     /* 0x24 */ CROMParticleDistance *m_pDistanceRange;
     /* 0x28 */ void *m_pDirection;
     /* 0x2C */ void *m_pOscillation;
-    /* 0x30 */ void *m_pMotion;
+    /* 0x30 */ CROMParticleMotion *m_pMotion;
     /* 0x34 */ void *m_pColors;
     /* 0x38 */ CROMParticleParams *m_pParams;
 } CROMParticleEffect; /* size 0x3C */
@@ -110,7 +119,7 @@ typedef struct CParticle {
     /* 0x040 */ u32 m_dwFlags;
     /* 0x044 */ u8 unk_044[0x48 - 0x44];
     /* 0x048 */ u8 m_mtxDraw[2][0x40];    /* Mtx, one per frame buffer (gEvenOdd) */
-    /* 0x0C8 */ u8 m_Lights[2][0x18];     /* Lights1, one per frame buffer */
+    /* 0x0C8 */ CLights1 m_Lights[2];     /* one per frame buffer */
     /* 0x0F8 */ CROMParticleEffect *m_pEffect;
     /* 0x0FC */ u32 unk_0FC;
     /* 0x100 */ u8 unk_100[0x104 - 0x100];
@@ -155,7 +164,7 @@ typedef struct CParticle {
     /* 0x1B4 */ u8 m_Opacity;
     /* 0x1B5 */ u8 m_ActiveSwooshes;      /* its trail is in the swoosh set gEngineApp_m_SwooshSystem */
     /* 0x1B6 */ u8 unk_1B6[0x1B8 - 0x1B6];
-    /* 0x1B8 */ s32 unk_1B8;
+    /* 0x1B8 */ struct SndSource *m_pLoopSound;  /* its looping sound (CParticle__StartLoopSound) */
     /* 0x1BC */ f32 m_Scale;
     /* 0x1C0 */ CList *m_pActiveList;
     /* 0x1C4 */ struct CParticle *m_pLast;      /* free list / active list links */

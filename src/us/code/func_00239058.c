@@ -7,11 +7,6 @@ typedef struct B15Blk8 {
     s16 a, b;
     s32 c;
 } B15Blk8;
-typedef struct B15Def {
-               s32 type;
-               u8 pad4[0xA];
-               s8 unkE;
-} B15Def;
 /* Turok 2: pos at 0x4 (Rage Wars 0x8). */
 typedef struct B15Src {
     u8 type;

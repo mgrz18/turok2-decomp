@@ -20,6 +20,7 @@
 #include "structs/vector.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "structs/light.h"
 
 /* CStaticObject.m_wFlags / CLevelActor.m_wFlags */
 #define LEVEL_ACTOR_FLAG_DEAD        0x0001 /* killed (the level's killed bit is set) */
@@ -60,7 +61,7 @@ typedef struct CLevelActor {
     /* 0x16E */ u16 m_nKilledIndex;         /* its bit in the level's killed array */
     /* 0x170 */ f32 m_Timer;                /* the grow-in time (flag 0x10, CLevelActor__UpdateGrowIn), the morpher's animation clock (CLevelActor__Update) */
     /* 0x174 */ f32 m_AnimSpeed;            /* type 12 (morpher): the frame rate times its m_AnimSpeed (CLevelActor__UpdateAnimSpeed) */
-    /* 0x178 */ u8 m_Lights[0x18];          /* the lighting at its position (CScene__GetLightsAt, CScene__ComputeLights; gSceneLights when placed) */
+    /* 0x178 */ CLights1 m_Lights;           /* the lighting at its position (CScene__GetLightsAt, CScene__ComputeLights; gSceneLights when placed) */
     /* 0x190 */ s32 m_ViewMask;             /* the views it shows in: the placement record's, then its region's m_VisBits (CLevelActor__Update) */
     /* 0x194 */ u8 m_DrawnFrame;            /* the frame (D_800B6D1B) its matrix was last built for */
     /* 0x195 */ u8 m_UpdatedFrame;          /* the frame its once-per-frame update (CLevelActor__Update) last ran */

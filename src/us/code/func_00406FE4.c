@@ -3,7 +3,7 @@
 #include "globals/scene.h"
 
 extern void *CScene__FindRegionAt(void *world, CVector3 *pos);                  /* region at a point */
-extern void *CLevelActorPool__Spawn(void *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos,
+extern void *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos,
                            void *region, f32 arg);
 extern void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 arg);
 
@@ -18,7 +18,7 @@ void Primagen_SpawnTossedObject(s32 kind, s32 count, CVector3 pos) {
     velocity.x = 0.0f;
     velocity.y = 512.0f;
     velocity.z = 0.0f;
-    spawned = CLevelActorPool__Spawn(gScene.m_ActorPool, NULL, kind, velocity, pos, region, count);
+    spawned = CLevelActorPool__Spawn(&gScene.m_ActorPool, NULL, kind, velocity, pos, region, count);
     if (spawned != NULL) {
         Actor_SpawnParticle(spawned, 0x11D, pos, 0);
     }

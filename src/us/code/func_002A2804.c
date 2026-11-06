@@ -8,24 +8,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/hostio.h"
-
-/* Request block sent to the I/O thread through sHostIoRequestQueue. */
-typedef struct IoRequest {
-    /* 0x00 */ u8 *buffer;
-    /* 0x04 */ s32 size;
-    /* 0x08 */ s32 write; /* 1: send the buffer before the command, 0: read the reply into it */
-    /* 0x0C */ union {
-        s32 flags; /* 0x80000000: disable DMA while copying */
-        struct {
-            u16 hi;
-            u16 cmd;
-        } h;
-    } wC;
-    /* 0x10 */ s32 arg0;
-    /* 0x14 */ s32 arg1;
-    /* 0x18 */ s32 arg2;
-    /* 0x1C */ OSMesgQueue *reply;
-} IoRequest; /* size 0x20 */
+#include "structs/hostio.h"
 
 extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);

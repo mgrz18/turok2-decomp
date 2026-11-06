@@ -20,6 +20,9 @@
 
 #include "structs/game_object.h"
 #include "structs/region.h"
+#include "structs/table.h"
+#include "structs/level_actor.h"
+#include "structs/particle.h"
 
 /* Where a warp puts the player: a spawn point of a level. */
 typedef struct CWarpPoint {
@@ -89,7 +92,7 @@ typedef struct CScene {
     /* 0x00068 */ s32 *unk_68;
     /* 0x0006C */ void *m_pBitSections;             /* gScene_m_pBitSections: per-level bits (gLoadSavePersistentData) */
     /* 0x00070 */ void *m_pBitSections2;            /* (gGamePersistentData) */
-    /* 0x00074 */ s32 *m_pObjectTypes;
+    /* 0x00074 */ IdTable *m_pObjectTypes;
     /* 0x00078 */ s32 *m_pObjectTypes2;
     /* 0x0007C */ s32 *m_pGraphicSetTypes;
     /* 0x00080 */ s32 *m_pLights;
@@ -144,8 +147,9 @@ typedef struct CScene {
     /* 0x014A8 */ s32 m_nSectors;
     /* 0x014AC */ CSceneSector m_Sectors[128];
     /* 0x018AC */ u8 unk_18AC[0x4];
-    /* 0x018B0 */ u8 m_ParticleSystem[0x10518 - 0x18B0];
-    /* 0x10518 */ u8 m_ActorPool[0x13B28 - 0x10518];
+    /* 0x018B0 */ CParticleSystem m_ParticleSystem;
+    /* 0x10518 */ CLevelActorPool m_ActorPool;
+    /* 0x13B24 */ u8 unk_13B24[0x4];
     /* 0x13B28 */ CInstancePool m_InstancePool;     /* gScene_m_InstancePool (structs/game_object.h) */
     /* 0x18E50 */ CLevelHeader *m_pLevelHeader;
     /* 0x18E54 */ u8 unk_18E54[0x8];

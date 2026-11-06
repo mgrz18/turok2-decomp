@@ -13,6 +13,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/list.h"
+#include "structs/light.h"
 
 /* The definition m_pIntelligence points at. */
 #include "structs/intelligence.h"
@@ -182,7 +183,7 @@ typedef struct CGameObjectInstance {
     /* 0x10D */ u8 m_BlendFinish;
     /* 0x10E */ u8 m_ShadowAlpha;
     /* 0x10F */ u8 m_ActiveSwooshes;
-    /* 0x110 */ u8 m_Lights[2][0x18];   /* Lights1[2] (libultra gbi.h) */
+    /* 0x110 */ CLights1 m_Lights[2];     /* one per frame buffer */
     /* 0x140 */ CAI m_AI;
     /* 0x27C */ s32 m_dwHotPointFlags;
     /* 0x280 */ s32 m_dwUniqueID;

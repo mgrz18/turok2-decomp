@@ -46,7 +46,7 @@ void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *owner, ModelRef
                 g->w0 = 0xDA380007;
                 g->w1 = (u32)m;
             }
-            Render_DrawModelFlat((u8)arg3, ref->unkC, (s32) owner->m_pmtDrawMtxs, 1, (Slot24 *) owner->m_Lights[gEvenOdd], 0, ref->unk1C,
+            Render_DrawModelFlat((u8)arg3, ref->unkC, (s32) owner->m_pmtDrawMtxs, 1, &owner->m_Lights[gEvenOdd], 0, ref->unk1C,
                           owner->m_AI.m_nTexture);
             {
                 Gfx *g = gDList++;

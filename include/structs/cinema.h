@@ -80,4 +80,53 @@ typedef struct Cinema {
     /* 0x0FC */ f32 yaw;
 } Cinema; /* size 0x100 */
 
+/* The cinema track's data (Cinema_SplineSecondDerivs's module): the camera
+ * splines (eye and target), the cues it fires and the scalar keys (fade, FOV). */
+
+/* A spline record: a point, the second derivatives of its coordinates over the
+ * arc length, the arc length, the weight (time) and the second derivative of the
+ * arc length over the weight. */
+typedef struct {
+    /* 0x00 */ CVector3 p;
+    /* 0x0C */ CVector3 d2p;
+    /* 0x18 */ f32 s;
+    /* 0x1C */ f32 w;
+    /* 0x20 */ f32 d2s;
+} SplineNode; /* 0x24 bytes */
+
+typedef struct {
+    /* 0x00 */ s32 nodeSize;
+    /* 0x04 */ s32 count;
+    /* 0x08 */ SplineNode nodes[1];
+} Spline;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x10];
+    /* 0x10 */ f32 time;
+} Cue; /* 0x14 bytes */
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0x4];
+    /* 0x04 */ s32 count;
+    /* 0x08 */ Cue cues[1];
+} CueList;
+
+typedef struct {
+    /* 0x00 */ u8 pad0[0xC];
+    /* 0x0C */ f32 value;
+    /* 0x10 */ f32 time;
+} ScalarKey; /* 0x14 bytes */
+
+typedef struct {
+    s32 unk0;
+    s32 unk4;
+    s32 unk8;
+} CueRef;
+
+typedef struct {
+    f32 time;
+    s32 unk4;
+    s32 unk8;
+} TimedCueRef;
+
 #endif

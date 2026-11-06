@@ -27,7 +27,7 @@ void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 void CParticle__BuildCameraMatrix(CParticle *p);
 void Trail_DetachOwner(void *list, CParticle *p);
 void CDLightSet__Free(void *list, CDLight *light);
-void CParticleSystem__Free(void *list, CParticle *p);
+void CParticleSystem__Free(CParticleSystem *list, CParticle *p);
 void CParticle__StopLoopSound(CParticle *p);
 
 /* Puts the particle at the hit point, flying along the hit direction, and pulls it back
@@ -139,7 +139,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
     }
     if (!(p->m_dwFlags & 0x30000) && p->m_bDieOnImpact == 1) {
 remove:
-        CParticleSystem__Free(gScene.m_ParticleSystem, p);
+        CParticleSystem__Free(&gScene.m_ParticleSystem, p);
         CParticle__StopLoopSound(p);
     }
 }

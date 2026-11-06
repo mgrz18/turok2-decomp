@@ -19,7 +19,7 @@ void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
 
     if (ai->m_Mode == 0x20) {
         CGameObjectInstance__DrawModelImmediate(actor, ai, params);
-        Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[gEvenOdd], 0, ((s8 *)params)[0x1B], -1);
+        Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0, ((s8 *)params)[0x1B], -1);
         return;
     }
     if (ai->m_Enemy.m_Timer > 0.0f) {
@@ -39,7 +39,7 @@ void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
         if (alpha != 0) {
             gBlendState_m_Color[3] = alpha;
             gBlendState = 1;
-            func_0020BBE4(D_801100D4, -1, params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[gEvenOdd], 0,
+            func_0020BBE4(D_801100D4, -1, params->m_hModel, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0,
                           params->m_nModel, actor->m_AI.m_nTexture);
         }
         gBlendState = 0;

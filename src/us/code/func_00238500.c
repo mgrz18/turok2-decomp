@@ -15,7 +15,7 @@ typedef struct ShotActor {
 
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
-s32 CParticleSystem__Spawn(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
                   CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
 void CScene__StartRumbles(void *table, void *owner, s32 id, CVector3 pos, f32 a, f32 b);
 void CPlayer__TransformByView(CPlayer *pl, CVector3 *v);
@@ -45,7 +45,7 @@ void func_00238500(void *unused, ShotActor *actor, CVector3 pos, CVector3 dir, s
     origin.x = 0.0f;
     origin.y = 0.0f;
     origin.z = 0.0f;
-    CParticleSystem__Spawn(gScene.m_ParticleSystem, actor, actor, NULL, 0, 0xE9, origin, q, p, arg, -1, mode == 5 ? 3 : 1);
+    CParticleSystem__Spawn(&gScene.m_ParticleSystem, actor, actor, NULL, 0, 0xE9, origin, q, p, arg, -1, mode == 5 ? 3 : 1);
     p.x = 0.0f;
     p.y = 0.0f;
     p.z = 0.0f;

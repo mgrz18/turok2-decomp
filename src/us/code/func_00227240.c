@@ -87,6 +87,6 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
     p.x = actor->m_Actor.header.m_vPos.x;
     p.y = actor->m_Actor.header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
     p.z = actor->m_Actor.header.m_vPos.z;
-    CScene__GetLightsAt(&gScene, &p, actor->m_Actor.m_Lights);
+    CScene__GetLightsAt(&gScene, &p, &actor->m_Actor.m_Lights);
     return actor;
 }

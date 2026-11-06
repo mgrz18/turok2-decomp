@@ -12,6 +12,14 @@ typedef struct StrideTable {
     /* 0x8 */ u8 entries[1];
 } StrideTable;
 
+/* A StrideTable of halfword ids (a stride of 2): the level's object type
+ * table (CScene's m_pObjectTypes; Rage Wars' TableRecAt8). */
+typedef struct IdTable {
+    /* 0x0 */ s32 stride;
+    /* 0x4 */ s32 count;
+    /* 0x8 */ u16 ids[1];
+} IdTable;
+
 /* A sectioned resource block: the count of its sections, then the offset
  * of each one from the start of the block and the offset after the last
  * (CISet__GetBlock returns a section, CISet__GetBlockAndSize a section and its size). */
