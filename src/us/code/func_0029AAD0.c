@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern void osViSetSpecialFeatures(s32 arg0);
-extern __OSViContext *__osViNext;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 arg0);
 void osViSetSpecialFeatures(s32 arg0) {

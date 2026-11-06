@@ -1,12 +1,10 @@
 /* WRONG CUT: splat cut __osDispatchThread (0x720 bytes) = __osDispatchThread (hand-written asm, exceptasm.s, 0x29C8E0-0x29CADC)
  * + __osCleanupThread (0x29CADC) + 3 junk words; the C function __osLeoInterrupt really starts at 0x29CAF0 (16-aligned, size 0x510). */
+#include "common.h"
+#include "globals/libultra.h"
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/libultra/__osLeoInterrupt.c, __osLeoInterrupt, with Turok 2's layouts. */
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
 struct OSPiHandle_s;
 typedef struct {
     u32 errStatus;
@@ -83,7 +81,6 @@ typedef struct OSPiHandle_s {
 
 extern OSPiHandle *__osDiskHandle;
 
-extern u32 __OSGlobalIntMask;          /* __OSGlobalIntMask */
 void __osLeoAbnormalResume(void);
 void __osLeoResume(void);
 s32 osEPiRawStartDma(OSPiHandle *pihandle, s32 dir, u32 cart_addr, void *dram_addr, u32 size); /* osEPiRawStartDma */

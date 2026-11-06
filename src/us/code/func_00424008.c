@@ -1,6 +1,7 @@
 /* xScale is a scratch first: it holds the new horizontal centre the edges are built from, then the scale. That second job is what keeps oldH canonical for CSE (a single-use copy is propagated away, and without one the centre is read from h's load). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BDB8_de, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/libultra.h"
 
 /* Resizes the selected VI mode around its original horizontal and field centres, keeping the original lower
  * screen limits, then applies it. */
@@ -43,7 +44,6 @@ typedef struct {
 
 extern s16 sViModeIndex; /* selected VI mode */
 extern ViMode sResizedViMode;
-extern ViMode osViModeTable[]; /* osViModeTable */
 extern void *func_0029E460(void *dst, const void *src, s32 count);
 extern void osViSetMode(ViMode *mode); /* osViSetMode */
 

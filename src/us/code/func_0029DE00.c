@@ -2,10 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern void __osDispatchThread();
-extern Func802C1F10Node *__osActiveQueue;
-extern void *__osRunningThread;
 extern u32 __osDisableInt(void);
 extern void __osDequeueThread(void *arg0, Func802C1F10Node *arg1);
 extern void __osRestoreInt(u32);

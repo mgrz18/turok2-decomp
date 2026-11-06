@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/libultra.h"
 
 /* The game state (CEngineApp in CEngineApp__Construct). */
 
@@ -8,7 +9,6 @@ s32 osViSetSpecialFeatures(s32);
 
 s32 osViSetYScale(f32);                         /* extern */
 extern f32 D_800A9E24;
-extern s32 osViModeTable;
 extern s32 D_800B7E60;
 extern s32 gResolution;
 

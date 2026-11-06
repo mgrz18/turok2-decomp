@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern int osResetType;
 extern void osInitialize();
@@ -12,7 +13,6 @@ extern void osMapTLBRdb();
 extern u32 __osInitialized;
 extern Quad_func_802A1BE0_de __osException[];
 extern u64 osClockRate;
-extern s32 osViClock;
 extern unsigned char osAppNMIBuffer[];
 extern void __osSetSR(unsigned int sr);
 extern unsigned int __osSetFpcCsr(unsigned int csr);

@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern void *__osTimerList;
 extern void __osSetTimerIntr(u64 tim);
 extern u64 __osInsertTimer(OSTimer *t);
 int osSetTimer(Node802C07B0 *node, u64 arg1, u64 arg2, void *arg3, void *arg4) {

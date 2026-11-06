@@ -4,19 +4,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/libultra/osCreatePiManager.c, osCreatePiManager, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/libultra.h"
 
-typedef struct {
-    /* 0x00 */ s32 initialized;
-    /* 0x04 */ void *thread;
-    /* 0x08 */ void *cmdQueue;
-    /* 0x0C */ void *evtQueue;
-    /* 0x10 */ void *acsQueue;
-    /* 0x14 */ void *dma_func;
-    /* 0x18 */ void *edma_func;
-} OSDevMgr; /* __osPiDevMgr */
-
-extern OSDevMgr __osPiDevMgr;     /* __osPiDevMgr */
-extern s32 __osPiAccessQueueEnabled;          /* __osPiAccessQueueEnabled */
 extern u8 __osPiThread[];         /* __osPiThread */
 extern u8 __osPiEventQueue[];         /* __osPiEventQueue */
 extern u8 __osPiEventBuf[];         /* __osPiEventBuf */
@@ -41,7 +30,7 @@ void osCreatePiManager(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
     s32 oldPri;
     s32 myPri;
 
-    if (!__osPiDevMgr.initialized) {
+    if (!__osPiDevMgr.active) {
         osCreateMesgQueue(cmdQ, cmdBuf, cmdMsgCnt);
         osCreateMesgQueue(__osPiEventQueue, __osPiEventBuf, 1);
 
@@ -60,13 +49,13 @@ void osCreatePiManager(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
 
         savedMask = __osDisableInt();
 
-        __osPiDevMgr.initialized = 1;
-        __osPiDevMgr.acsQueue = __osPiAccessQueue;
-        __osPiDevMgr.dma_func = osPiRawStartDma;
-        __osPiDevMgr.edma_func = osEPiRawStartDma;
-        __osPiDevMgr.evtQueue = __osPiEventQueue;
-        __osPiDevMgr.thread = __osPiThread;
-        __osPiDevMgr.cmdQueue = cmdQ;
+        __osPiDevMgr.active = 1;
+        __osPiDevMgr.acsQueue = (OSMesgQueue *)__osPiAccessQueue;
+        __osPiDevMgr.dma = osPiRawStartDma;
+        __osPiDevMgr.edma = osEPiRawStartDma;
+        __osPiDevMgr.evtQueue = (OSMesgQueue *)__osPiEventQueue;
+        __osPiDevMgr.thread = (OSThread *)__osPiThread;
+        __osPiDevMgr.cmdQueue = (OSMesgQueue *)cmdQ;
 
         osCreateThread(__osPiThread, 0, __osDevMgrMain, &__osPiDevMgr, &__osPiThreadStack[0x1000], pri);
         osStartThread(__osPiThread);

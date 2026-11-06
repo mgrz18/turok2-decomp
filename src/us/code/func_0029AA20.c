@@ -1,9 +1,9 @@
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/libultra.h"
 
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
-extern __OSViContext *__osViNext; /* __osViNext */
 
 /* libultra's osViSetEvent. */
 void osViSetEvent(OSMesgQueue *mq, OSMesg m, u32 retraceCount) {
