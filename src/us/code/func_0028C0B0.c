@@ -33,7 +33,7 @@ typedef struct Thread {
 
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
 extern u8 D_800AA0F0[];
-extern u16 *gCFB;             /* frame buffer */
+extern u16 *gCFB;             /* local type: gCFB[0] (globals/framebuffer.h) read as a scalar; the array form shares a base register */
 extern u16 *sCrashFrameBuffer;             /* crash screen frame buffer */
 extern char gEngineTimestamp[];           /* build string */
 extern char D_8010FED4[];

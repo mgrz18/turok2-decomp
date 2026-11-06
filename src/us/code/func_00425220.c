@@ -2,6 +2,7 @@
 #include "common.h"
 #include "globals/frame.h"
 #include "globals/render.h"
+#include "globals/framebuffer.h"
 
 /* Frees and reallocates the frame buffers, the depth buffer and the
  * display-list memory. A handle points at a struct whose first word is the
@@ -32,7 +33,6 @@ extern char D_800C182C[];
 extern char D_800C184C[];
 extern char D_800C185C[];
 extern char D_800C1864[];
-extern s32 gCFB[]; /* frame buffers */
 extern s32 gRspFifoSize;
 extern s32 gRspFifoBuffer;
 

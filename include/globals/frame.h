@@ -12,7 +12,7 @@ extern s32 gNextTicks;
 extern s32 gDisplayListCount;
 extern s32 gNumTicksPending;
 extern s32 gNumTicksWaiting;
-extern s32 gPendingFB;
+extern u16 *gPendingFB;                  /* the frame buffer just swapped in (globals/framebuffer.h) */
 extern s32 gWarmBoot;                    /* set on an NMI reset */
 
 /* Task timing (the profiler). */

@@ -5,6 +5,7 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 #include "globals/sysrc.h"
+#include "globals/framebuffer.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -41,7 +42,6 @@ typedef struct {
 } GfxTask;
 
 extern s32 gCurrentTick;          /* retraces since the last swap */
-extern s32 gCurrentFB;          /* framebuffer on screen */
 extern GfxTask *gWaitingFrames[];
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
