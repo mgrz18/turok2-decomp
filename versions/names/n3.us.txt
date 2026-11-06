@@ -74,7 +74,7 @@ AI_SpawnParticlesByMask = 0x00246B24; // spawns the particles of a mask table wh
 // The player (CPlayer, structs/player.h): input, scope, kills, ammo,
 // damage, death, drawing and the auto-aim.
 CPlayer__ReadInput = 0x00246BC0; // controller buttons through the remap table D_800ADA70 (m_ControlSide 1), then move/strafe/turn/look from m_ControlType, scaled by m_SettingY and the zoom
-PlayerMotion_Clear = 0x002470E8; // clears a fourteen-word movement record but the word at 0x10; called from CPlayer__Reset and the mount code
+CPlayerContState__Init = 0x002470E8; // clears a CPlayerContState (CPlayer.m_ContState at 0xA40: look/move axes, buttons) and sets m_pContState (0x10) to the controller D_800F5EC0[n] (see CPlayer__ResetControlState)
 Player_SwapStrafeTurnBits = 0x00247124; // swaps button bits 8<->0x10000 and 4<->0x80000 of a mask, leaves the rest
 CPlayer__AnimateScope = 0x00247170; // places the scope model and swings it up (state 1) or down (state 3) over 3.75 frames; sniper scope 0xC83 from the side
 CPlayer__DrawScope = 0x00247438; // draws the scope model (render state, its matrix from the view) when it has an object and a state
@@ -159,8 +159,8 @@ PlayerDodge_Update = 0x00255884; // state 6 update: hop sideways until the stick
 PlayerDodgeFall_Update = 0x00255940; // state 7 update: turn and move with the standing tunings, back to standing (2) on the ground
 PlayerWade_Enter = 0x002559E0; // states 8-9 enter: stop the fall and ease the height to the surface
 PlayerSwim_Enter = 0x00255A44; // states 10-11 enter: lowest height reached, damp the motion, splash sound 2000
-PlayerLanding_Enter = 0x00255B20; // states 12-13 enter: damps the speeds and the vertical velocity
-PlayerLanding_Update = 0x00255B50; // states 12-13 update: pose 0xC/0xD, animations 0x8A2/0x8A7/0x14, then walking (3)
+PlayerState12_Enter = 0x00255B20; // (entered by CPlayer__CheckState12Hit) states 12-13 enter: damps the speeds and the vertical velocity
+PlayerState12_Update = 0x00255B50; // the file calls it a landing state; states 12-13 update: pose 0xC/0xD, animations 0x8A2/0x8A7/0x14, then walking (3)
 PlayerClimb_Enter = 0x00255C5C; // state 14 enter: stops, hand side, clears the actor's motion
 PlayerState15_Enter = 0x00255C80; // state 15 enter: stops and opens a menu screen (per multiplayer slot D_0043AB60.., else D_00439748/D_004396DC) on the camera's menu pool
 PlayerState15_Update = 0x00255D68; // state 15 update: empty
@@ -201,3 +201,263 @@ PlayerRideIdle_Update = 0x002563FC; // state 33 update: CPlayer__UpdateRiding, t
 PlayerRideMove_Enter = 0x00256450; // state 34 enter: same as 33's
 PlayerRideMove_Update = 0x00256470; // state 34 update: CPlayer__UpdateRiding, to 33 when stopped
 PlayerShock_Enter = 0x002564C4; // state 35 enter: flag 0x800000, shock time; on a mount (14) pushes it
+
+// The player pool: our CPlayerList (structs/player_list.h, D_80119870.m_PlayerList)
+// is Turok 3's CPlayerPool (turok3 include/playerai.h: m_FreeList/m_ActiveList,
+// gEngineApp.playerPool), so its methods are CPlayerPool__.
+CPlayerPool__Update = 0x00251FC4; // moves each player in the game (unless CPlayer__IsPausedOrInMenu), pause/death screen, hub key screen, level-end cinema, joins and leaves, match clock and tag
+CPlayer__BecomeIt = 0x0025247C; // tag: the player becomes "it": sound, weapon wheel and weapon reset, respawn with full health
+CPlayerPool__PickTagIt = 0x002525BC; // tag: picks who is "it" at the start of a round, flashing over the viewports
+CPlayerPool__RespawnAll = 0x00252840; // every player respawned at a spawn point with full health, out of tag mode
+CPlayerPool__IsFragLimitReached = 0x0025295C; // either team's total in team games, else one player's frags
+CPlayerPool__AnimateWeapons = 0x00252ADC; // each living player's weapon model animated on its own, put back on the player; stops weapon sounds otherwise (called from the scene update func_00220530)
+CPlayerPool__ReloadAnimInfo = 0x00252C70; // reloads the animation object info of every player's actor, the weapon for the viewing player
+Hud_DrawMatchClock = 0x00252E08; // the match clock (D_8011AAD8.match.timeLeft, 1/15 s ticks) at the top of the view, blinking in the last 30 seconds
+CPlayerPool__PreUpdate = 0x00253018; // from the scene update (func_00220530) before the actors: resets each player's character and weapon actor (func_0021EBC0) and their animation info (RW func_8022A170_de)
+CPlayerPool__RegisterActors = 0x002530A4; // adds the active players' actors to the scene's actor list (+0xEC, count at 0x8EC, at most 0x200)
+CPlayerPool__DrawCharacters = 0x00253148; // CPlayer__DrawCharacter for each player not seen through its own first-person camera
+CPlayerPool__DrawWeaponOverlays = 0x002531D0; // CPlayer__DrawWeaponOverlay for the player of a first-person camera
+CPlayerPool__DrawHuds = 0x0025322C; // CPlayer__DrawHud for the player of the camera
+CPlayerPool__DrawMatchClock = 0x0025328C; // wrapper of Hud_DrawMatchClock
+CPlayerPool__GetFirstActive = 0x002532A8; // m_ActiveList.m_pHead; 24 callers
+CPlayerPool__FindTagged = 0x002532B4; // the first player whose options tag mode (0x3E) is 1
+CPlayerPool__FindNearest = 0x002532EC; // the active player nearest a point (RW func_0022A470)
+CPlayerPool__FindNearestOther = 0x00253370; // the nearest player with 0x524 set, skipping one (RW func_0022A4F4)
+CPlayerPool__GetIndex = 0x0025340C; // (player - m_Players) / 0x1328; 31 callers
+CPlayerPool__FindByController = 0x0025342C; // the player record driven by controller n (RW func_8022A5C0_de)
+CPlayerPool__CheckAllReady = 0x00253460; // once every player's options byte 0x3D is 1, the match's over flag becomes done
+CPlayerPool__EndMatch = 0x002534E0; // sets the match (or team) over flag and puts every player in state 18
+CPlayerPool__SetInvincibility = 0x002535E4; // sets m_InvincibilityTime of every active player
+ValueTracker_Set = 0x0025360C; // sets a value, flagging when it repeats the old one
+CPlayer__IsSpecialPickup = 0x002536B4; // single player only: whether a pickup id is in 4000..5024 (m_SpecialPickupCount range)
+CPlayer__GetSpecialPickupIndex = 0x002536D8; // id - 4000
+CPlayer__UseSpecialPickup = 0x002536E0; // decrements m_SpecialPickupCount[id - 4000] (except 0x111C..0x1120)
+CPlayer__GetPickupCountLow = 0x00253720; // low nibble of a packed pickup counter byte (0xA74 back from the index), 1 in multiplayer
+CPlayer__GetPickupCountHigh = 0x00253748; // high nibble of the same byte
+CPlayer__OnParticleHit = 0x00253770; // a projectile hit on the player: charge dart 0x128 adds shock time (60..150) and records m_pHitMeWithChargeDart, ...
+CPlayer__GetFiringAmmo = 0x0025398C; // the AmmoInfo a weapon fires now (lower ammo when selected and stocked, else the first stocked)
+CPlayer__GetFiringAmmoType = 0x00253A1C; // the ammo type a weapon fires now, -1 if none
+CPlayer__GetMaxAmmo = 0x00253AC0; // most rounds of an ammo type any (held) weapon carries
+CPlayer__AddAmmo = 0x00253B54; // adds rounds up to the maximum; whether there was room
+CPlayer__HasRoomForAmmo = 0x00253C14; // whether a pickup's ammo still fits, held weapons only
+CPlayer__IsBelowFullHealth = 0x00253CF0; // m_Health < 100 (24.8)
+Actor_GetEyeHeight = 0x00253CFC; // the intelligence's m_CollisionHeight * 0.9, a default without one
+Actor_GetHeightOrDefault = 0x00253D30; // func_002671B4 (height) with a definition, else a constant
+CPlayer__SetPosition = 0x00253D68; // puts the character and weapon actors at a point and in its region (func_00220A1C); whether it has one
+CPlayer__StartWeaponBackgroundSound = 0x00253DE0; // restarts m_pLoopingSound_WeaponBackground with a sound id
+CPlayer__StopWeaponBackgroundSound = 0x00253E68; // stops and clears m_pLoopingSound_WeaponBackground
+CPlayer__StartWeaponFiringSound = 0x00253EB8; // restarts the firing looping sound with a sound id
+CPlayer__StopWeaponFiringSound = 0x00253F40; // stops the firing looping sound
+CPlayer__TransformByView = 0x00253F90; // a point through the player camera's view orientation, in place
+PlayerPool_GetNumPlayers = 0x00253FD0; // returns D_80119878, the pool's m_nPlayers (CPlayerList at 0x80119870 + 8); compared >= 2 in CPlayer__StartDeathCinema
+CPlayer__HasMenuOpen = 0x00253FE0; // whether the player's camera has a menu (m_Menus.count)
+CPlayer__IsPausedOrInMenu = 0x00253FFC; // paused (D_8011ACA4) or a menu other than the death screen on the player's camera
+CPlayer__PickSpawnPoint = 0x00254044; // picks a spawn point for the player and copies its position
+CPlayer__Respawn = 0x002540E4; // respawn at a spawn point with full health; 7 callers
+CPlayer__LoadCharacterModel = 0x002541E4; // the character model id (0x66 single player, tag model, or per character D_800ADB30) set on the actor (func_002241D8)
+CPlayer__LoadWeaponModel = 0x0025426C; // the current weapon's model (D_800AF618[weapon]->model) set on the weapon actor
+Actor_ReloadAnimInfo = 0x002542B4; // for actors flagged 0x40000: reloads the animation object info, optionally turned toward the owner's camera
+CPlayer__UpdateWaterRegion = 0x002543A4; // oxygen reset out of water, CPlayer__UpdateSubmerged when entering a 0x2 (flags52) region...
+CPlayer__UpdateOxygen = 0x00254430; // m_Oxygen counts up: warning sound 0x163 at 300, drowning damage after 600
+CPlayer__HasScope = 0x00254564; // whether the current weapon has a zoom model
+CPlayer__UpdateSubmerged = 0x00254584; // with the 380th special pickup (or in multiplayer) runs the oxygen while submerged, else 10 damage of type 0x1C
+CPlayer__EaseEyeOffset = 0x002545F0; // eases m_ActualCameraVertEyeOffset toward the region's eye offset
+CPlayer__TickFlashlight = 0x00254704; // m_FlashlightTime counts down to 0
+CPlayer__ResetLives = 0x00254744; // m_Lives 3, 1 in D_8011AAF1's mode
+CPlayer__IsInMatchEndState = 0x002548FC; // m_Mode 16, 17 or 18; 7 callers
+CPlayerPool__UpdateMatchClock = 0x0025492C; // runs the match clock and ends the match on time or (outside tag) the frag limit
+CPlayerPool__IsScoreLimitReached = 0x00254A5C; // some player sums at least D_8011ACB0.scoreLimit
+CPlayerPool__GetViewPlayer = 0x00254B04; // the index-th player with a camera whose 0x54C and options 0x3F are clear
+CPlayerPool__ClearLastTagMode = 0x00254B6C; // m_LastTagMode 1 -> 0 for every active player
+CPlayerPool__CountPlaying = 0x00254B9C; // players with no menu open and m_LastTagMode clear
+CPlayerPool__CountIdleMenus = 0x00254BE4; // active players whose camera's menu pool is idle
+
+// More player helpers (0x255220-0x257A40).
+CPlayer__CheckState12Hit = 0x00255220; // into state 12 when hit by an actor with AI flag 0x800, unless already in 12, 13 or 16-18
+CPlayer__CheckClimb = 0x00255298; // into state 14 (climbing) touching an actor whose intelligence has flag 1 and AI flag 0x1000
+CPlayer__CheckJumpOn = 0x00255340; // into state 4 touching an actor with intelligence flag 2 (and AI 0x6000 clear) when player flag 0x10 is set
+CPlayer__Dismount = 0x002553BC; // leaves the mount (m_pOnEnemy, func_0025EC28), state 5, thrown ahead 102.4 and up 163.84 with velocity 358.4
+CPlayer__CheckTagHit = 0x002554D0; // multiplayer: the last collision (D_800F1CE0) is actor 0x64E changing mode: ends the player's tag mode 1
+Ease_CubicOut = 0x00256584; // c - (c - t)^3 with c = D_800A71D8
+CPlayer__ResetHeadSway = 0x002565A4; // 0xABC = 0, 0xAB4 = 0xAB0, 0xAB8 = 23 degrees
+CPlayer__ResetJumpAngle = 0x002565C0; // m_DesiredJumpAngle 0, m_JumpU 0, m_StartJumpAngle = m_JumpAngle
+CPlayer__IsCrouched = 0x002565DC; // m_DuckOffset > 5.12
+CPlayer__UpdateCrouch = 0x00256604; // button 0x400 toggles the crouch in poses 2 and 3, eases the crouch height toward 40.96
+Actor_PlayRangedSound = 0x00256738; // sound event callback: plays only when the value is inside the event's range (RW func_8022E0B0_de)
+Actor_IsInRegionFlag40 = 0x002567B8; // whether the actor's region info has flags52 bit 0x40 (RW func_0022E120)
+CPlayerPool__AddTeamScore = 0x00256804; // team games: counts a kill event on the player's team's score
+CPlayer__OnParticleHitCallback = 0x0025689C; // actor callback: CPlayer__OnParticleHit on the actor's parent player
+CPlayer__ResetControlState = 0x002568CC; // CPlayerContState__Init with the player's controller, then clears the movement/look fields 0xA78-0xB28 and the eye height
+CPlayer__FillAllAmmo = 0x002569C8; // every held weapon's ammo to its maximum; whether any was added
+CPlayer__TopUpHealth = 0x00256A68; // health (0x524) to 100 if lower; whether it changed
+PickupCounter_Get = 0x00256A8C; // one nibble (low or high) of a packed counter byte
+PickupCounter_Inc = 0x00256AAC; // bumps one nibble of a packed counter byte and returns it
+PickupCounter_Dec = 0x00256AF0; // drops one nibble of a packed counter byte and returns it
+Weapon_FiresProjectile = 0x00256B34; // whether weapon arg1 fires projectile arg2 (its NULL-ended ammo list)
+Actor_ProbeMove = 0x00256B84; // probes a move raised by half the height plus the step height; writes where it ends, 1 if blocked
+CPlayerPool__SumViewWeights = 0x00256CE0; // sum of func_0020F6BC(arg, pos) over the players with a camera
+CPlayer__IsWalkAnim7DF = 0x00256D44; // state 3 with 0xC04 in 0x7DF..0x7E3
+CPlayer__IsClimbing = 0x00256D6C; // m_Mode == 14
+CPlayer__KeepInSphere = 0x00256D7C; // keeps an actor inside a sphere of radius 20000 in regions flagged 0x4000
+Hud_GetSpriteValue = 0x00256E6C; // for HUD sprite 0x2DA in D_8011AAF1's mode, a settings value by sub-mode; else 0
+Particle_AttachToActor = 0x00256ED0; // creates the particle id in a slot if empty (func_00228AEC) and moves it to the actor at an offset (RW func_0022E77C)
+Particle_FreeSlot = 0x00256FD4; // frees a slot's particle (func_00228B4C) and clears it
+Angle_StepToward = 0x00257014; // wraps both angles and steps the first toward the second in the given direction
+CBarrel__SwapIcons = 0x00257124; // swap callback of CBarrel__DrawIcons' sort (0x1C-byte records)
+CBarrel__CompareIcons = 0x002571D8; // compare callback of the same sort, on the depth at 0xC
+CBarrel__MarkUsable = 0x002571FC; // marks each entry enabled when CPlayer__GetWeaponAmmo accepts its id
+CPlayer__CanSelectWeapon = 0x00257280; // owned, allowed underwater or on land (D_800AF618 flags 2/1), and not the lower of an owned pair
+Weapon_IsAllowedInMode = 0x002572FC; // mode 0: flags 1, mode 1: flags 2, mode 2: weapon 0x13 only
+CPlayer__ToggleLowerAmmo = 0x0025739C; // toggles m_UseLowerAmmo on the ammo-switch button
+CPlayer__PreferAlternateWeapon = 0x002573FC; // m_RequestedWeapon becomes its owned alternate
+CPlayer__RegenerateHealth = 0x0025748C; // D_8011AAF1's mode: health regains D_800ADD88[character] per second up to m_StartHealth
+Sound_SetUnderwaterFilter = 0x0025756C; // filter (func_00275B30) by the depth under the water surface of a region flagged 0x40 (RW func_8022EA3C_de)
+CPlayer__CheckLanded = 0x00257644; // falling and on the ground: back to standing (2)
+CPlayer__PickLandingAnim = 0x002576AC; // m_CharAnim 0x8A2/0x8A7/... by speed unless 0x1144 is still running
+PlayerWade_EnterAlt = 0x00257720; // same body as PlayerWade_Enter
+PlayerDeath_CinemaDone = 0x00257784; // callback of the death cinema: last life -> func_0042E29C, else state 31; clears D_800AE340
+PlayerCinema50_Done = 0x002577DC; // callback of cinema 0x50: func_0042E29C(D_800F1FD8)
+CPlayer__ClearShock = 0x00257800; // velocity 0, m_ShockedTimer 0, m_CharAnim 1, actor flag 0x800000 off
+CPlayerPool__AllocPlayers = 0x00257830; // allocates and clears count 0x1328-byte player records (m_pmePlayers/m_Players/m_nPlayers), like turok3's CPlayerPool__NewGame(pool, maxPlayerCount)
+CPlayerPool__FreePlayers = 0x002578AC; // frees m_pmePlayers and clears the three fields
+CPlayer__ShowLevelNotCompleteScreen = 0x002578FC; // m_bLevelNotCompleteExit: opens D_0043CAB4 when the hub level's first-time flag is set
+Cinema_CheckPlayerStart = 0x00257980; // starts a cinema state once no menu is open and cinema 0x190 plays
+String_CountTrailingSpaces = 0x00257A10; // counts the spaces at the end of a string of length n (RW func_8022EF04_de)
+
+// Enemy animation pickers: each is AI_PickAnimFromTable over one anim table
+// (D_800AF6F0..D_800B0600) filtered by one CIntelligence m_Enemy.m_w*AnimFlags
+// word. They are the anim callbacks of the generic enemy mode tables
+// D_800B0A60 / D_800B0E80 / D_800B1200 (three variants of each kind, one per
+// table). Named <kind>_<low bits of the anim table>.
+EnemyAnim_Idle_AF6F0 = 0x00259E60; // AI_PickAnimFromTable(D_800AF6F0, m_Enemy.m_wIdleAnimFlags)
+EnemyAnim_Idle_AF720 = 0x00259E8C; // AI_PickAnimFromTable(D_800AF720, m_Enemy.m_wIdleAnimFlags)
+EnemyAnim_Idle_AF750 = 0x00259EB8; // AI_PickAnimFromTable(D_800AF750, m_Enemy.m_wIdleAnimFlags)
+EnemyAnim_Alert_AF810 = 0x00259EE4; // AI_PickAnimFromTable(D_800AF810, m_Enemy.m_wAlertAnimFlags)
+EnemyAnim_Alert_AF840 = 0x00259F10; // AI_PickAnimFromTable(D_800AF840, m_Enemy.m_wAlertAnimFlags)
+EnemyAnim_Alert_AF870 = 0x00259F3C; // AI_PickAnimFromTable(D_800AF870, m_Enemy.m_wAlertAnimFlags)
+EnemyAnim_TakeCover_AF8A0 = 0x00259F68; // AI_PickAnimFromTable(D_800AF8A0, m_Enemy.m_wTakeCoverAnimFlags)
+EnemyAnim_TakeCover_AF8D0 = 0x00259F94; // AI_PickAnimFromTable(D_800AF8D0, m_Enemy.m_wTakeCoverAnimFlags)
+EnemyAnim_TakeCover_AF900 = 0x00259FC0; // AI_PickAnimFromTable(D_800AF900, m_Enemy.m_wTakeCoverAnimFlags)
+EnemyAnim_LeftArmWound_AF930 = 0x00259FEC; // AI_PickAnimFromTable(D_800AF930, m_Enemy.m_wLeftArmWoundAnimFlags)
+EnemyAnim_LeftArmWound_AF960 = 0x0025A018; // AI_PickAnimFromTable(D_800AF960, m_Enemy.m_wLeftArmWoundAnimFlags)
+EnemyAnim_LeftArmWound_AF990 = 0x0025A044; // AI_PickAnimFromTable(D_800AF990, m_Enemy.m_wLeftArmWoundAnimFlags)
+EnemyAnim_RightArmWound_AF9C0 = 0x0025A070; // AI_PickAnimFromTable(D_800AF9C0, m_Enemy.m_wRightArmWoundAnimFlags)
+EnemyAnim_RightArmWound_AF9F0 = 0x0025A09C; // AI_PickAnimFromTable(D_800AF9F0, m_Enemy.m_wRightArmWoundAnimFlags)
+EnemyAnim_RightArmWound_AFA20 = 0x0025A0C8; // AI_PickAnimFromTable(D_800AFA20, m_Enemy.m_wRightArmWoundAnimFlags)
+EnemyAnim_Patrol_AFA50 = 0x0025A0F4; // AI_PickAnimFromTable(D_800AFA50, m_Enemy.m_wPatrolAnimFlags)
+EnemyAnim_Patrol_AFA80 = 0x0025A120; // AI_PickAnimFromTable(D_800AFA80, m_Enemy.m_wPatrolAnimFlags)
+EnemyAnim_Patrol_AFAB0 = 0x0025A14C; // AI_PickAnimFromTable(D_800AFAB0, m_Enemy.m_wPatrolAnimFlags)
+EnemyAnim_Move_AFAE0 = 0x0025A178; // AI_PickAnimFromTable(D_800AFAE0, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFB68 = 0x0025A1A4; // AI_PickAnimFromTable(D_800AFB68, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFBF0 = 0x0025A1D0; // AI_PickAnimFromTable(D_800AFBF0, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFC78 = 0x0025A1FC; // AI_PickAnimFromTable(D_800AFC78, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFCA8 = 0x0025A228; // AI_PickAnimFromTable(D_800AFCA8, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_AFCD8 = 0x0025A254; // AI_PickAnimFromTable(D_800AFCD8, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Flee_AFD08 = 0x0025A280; // AI_PickAnimFromTable(D_800AFD08, m_Enemy.m_wFleeAnimFlags)
+EnemyAnim_Flee_AFD38 = 0x0025A2AC; // AI_PickAnimFromTable(D_800AFD38, m_Enemy.m_wFleeAnimFlags)
+EnemyAnim_Flee_AFD68 = 0x0025A2D8; // AI_PickAnimFromTable(D_800AFD68, m_Enemy.m_wFleeAnimFlags)
+EnemyAnim_ComboEnd_AFD98 = 0x0025A524; // AI_PickAnimFromTable(D_800AFD98, m_Enemy.m_wComboEndAnimFlags)
+EnemyAnim_ComboEnd_AFDC8 = 0x0025A550; // AI_PickAnimFromTable(D_800AFDC8, m_Enemy.m_wComboEndAnimFlags)
+EnemyAnim_ComboEnd_AFDF8 = 0x0025A57C; // AI_PickAnimFromTable(D_800AFDF8, m_Enemy.m_wComboEndAnimFlags)
+EnemyAnim_Combat_AFE28 = 0x0025A5A8; // AI_PickAnimFromTable(D_800AFE28, m_Enemy.m_wCombatAnimFlags)
+EnemyAnim_Combat_AFE58 = 0x0025A5D4; // AI_PickAnimFromTable(D_800AFE58, m_Enemy.m_wCombatAnimFlags)
+EnemyAnim_Combat_AFE88 = 0x0025A600; // AI_PickAnimFromTable(D_800AFE88, m_Enemy.m_wCombatAnimFlags)
+EnemyAnim_Leap_AFEB8 = 0x0025A62C; // AI_PickAnimFromTable(D_800AFEB8, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Leap_AFEE8 = 0x0025A658; // AI_PickAnimFromTable(D_800AFEE8, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Leap_AFF18 = 0x0025A684; // AI_PickAnimFromTable(D_800AFF18, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Dart_AFF48 = 0x0025A6B0; // AI_PickAnimFromTable(D_800AFF48, m_Enemy.m_wDartAnimFlags)
+EnemyAnim_Dart_AFF78 = 0x0025A6DC; // AI_PickAnimFromTable(D_800AFF78, m_Enemy.m_wDartAnimFlags)
+EnemyAnim_DartFallback_AFF18 = 0x0025A708; // third variant of the dart pickers (after 0x25A6B0, 0x25A6DC), uses the leap table: AI_PickAnimFromTable(D_800AFF18, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Projectile_AFFD8 = 0x0025A734; // AI_PickAnimFromTable(D_800AFFD8, m_Enemy.m_wProjectileAnimFlags)
+EnemyAnim_Projectile_B0008 = 0x0025A760; // AI_PickAnimFromTable(D_800B0008, m_Enemy.m_wProjectileAnimFlags)
+EnemyAnim_ProjectileFallback_AFF18 = 0x0025A78C; // third variant of the projectile pickers (after 0x25A734, 0x25A760), uses the leap table: AI_PickAnimFromTable(D_800AFF18, m_Enemy.m_wLeapAnimFlags)
+EnemyAnim_Weapon_B0068 = 0x0025A7B8; // AI_PickAnimFromTable(D_800B0068, m_Enemy.m_wWeaponAnimFlags)
+EnemyAnim_Weapon_B00C0 = 0x0025A7E4; // AI_PickAnimFromTable(D_800B00C0, m_Enemy.m_wWeaponAnimFlags)
+EnemyAnim_Weapon_B00F0 = 0x0025A810; // AI_PickAnimFromTable(D_800B00F0, m_Enemy.m_wWeaponAnimFlags)
+EnemyAnim_NormalDeath_B0120 = 0x0025A83C; // AI_PickAnimFromTable(D_800B0120, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_NormalDeath_B0150 = 0x0025A868; // AI_PickAnimFromTable(D_800B0150, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_NormalDeath_B0180 = 0x0025A894; // AI_PickAnimFromTable(D_800B0180, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_MovingDeath_B01B0 = 0x0025A8C0; // AI_PickAnimFromTable(D_800B01B0, m_Enemy.m_wMovingDeathAnimFlags)
+EnemyAnim_MovingDeath_B01E0 = 0x0025A8EC; // AI_PickAnimFromTable(D_800B01E0, m_Enemy.m_wMovingDeathAnimFlags)
+EnemyAnim_MovingDeath_B0210 = 0x0025A918; // AI_PickAnimFromTable(D_800B0210, m_Enemy.m_wMovingDeathAnimFlags)
+EnemyAnim_ViolentDeath_B0240 = 0x0025A944; // AI_PickAnimFromTable(D_800B0240, m_Enemy.m_wViolentDeathAnimFlags)
+EnemyAnim_ViolentDeath_B0270 = 0x0025A970; // AI_PickAnimFromTable(D_800B0270, m_Enemy.m_wViolentDeathAnimFlags)
+EnemyAnim_ViolentDeath_B02A0 = 0x0025A99C; // AI_PickAnimFromTable(D_800B02A0, m_Enemy.m_wViolentDeathAnimFlags)
+EnemyAnim_ExplosiveDeath_B02D0 = 0x0025A9C8; // AI_PickAnimFromTable(D_800B02D0, m_Enemy.m_wExplosiveDeathAnimFlags)
+EnemyAnim_ExplosiveDeath_B0300 = 0x0025A9F4; // AI_PickAnimFromTable(D_800B0300, m_Enemy.m_wExplosiveDeathAnimFlags)
+EnemyAnim_ExplosiveDeath_B0330 = 0x0025AA20; // AI_PickAnimFromTable(D_800B0330, m_Enemy.m_wExplosiveDeathAnimFlags)
+EnemyAnim_NormalDeath_B0360 = 0x0025AA4C; // AI_PickAnimFromTable(D_800B0360, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_NormalDeath_B0390 = 0x0025AA78; // AI_PickAnimFromTable(D_800B0390, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_NormalDeath_B03C0 = 0x0025AAA4; // AI_PickAnimFromTable(D_800B03C0, m_Enemy.m_wNormalDeathAnimFlags)
+EnemyAnim_Evade_B03F0 = 0x0025AAD0; // AI_PickAnimFromTable(D_800B03F0, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B0420 = 0x0025AAFC; // AI_PickAnimFromTable(D_800B0420, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B0450 = 0x0025AB28; // AI_PickAnimFromTable(D_800B0450, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B0480 = 0x0025AB54; // AI_PickAnimFromTable(D_800B0480, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B04B0 = 0x0025AB80; // AI_PickAnimFromTable(D_800B04B0, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Evade_B04E0 = 0x0025ABAC; // AI_PickAnimFromTable(D_800B04E0, m_Enemy.m_wEvadeAnimFlags)
+EnemyAnim_Move_B0510 = 0x0025ABD8; // AI_PickAnimFromTable(D_800B0510, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B0540 = 0x0025AC04; // AI_PickAnimFromTable(D_800B0540, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B0570 = 0x0025AC30; // AI_PickAnimFromTable(D_800B0570, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B05A0 = 0x0025AC5C; // AI_PickAnimFromTable(D_800B05A0, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B05D0 = 0x0025AD30; // AI_PickAnimFromTable(D_800B05D0, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_Move_B0600 = 0x0025AD5C; // AI_PickAnimFromTable(D_800B0600, m_Enemy.m_wMoveAnimFlags)
+EnemyAnim_PickAttack_B0A60 = 0x0025A304; // weighted pick among the combat (0x25A5A8), leap (0x25A62C) and weapon (0x25A7B8) pickers allowed by the intelligence's flags; anim callback in table D_800B0A60
+EnemyAnim_PickAttack_B0E80 = 0x0025A3DC; // same over the D_800B0E80 variants (0x25A5D4, 0x25A658, ...)
+EnemyAnim_PickAttack_B1200 = 0x0025A480; // same over the D_800B1200 variants (0x25A600, 0x25A684, ...)
+EnemyAnim_IdleOverride = 0x0025AC88; // the idle pick from three override slots D_800F5C66 (+0, +100, +200) or the plain idle table D_800AF6F0
+
+// The first-person weapon actor (CPlayer.m_WeaponActor, CAI m_Weapon vars):
+// WeaponActor_InitAI installs mode table D_800AE394, m_pfStep and m_pfDraw;
+// per-weapon mode tables D_800AE494..D_800AE934 (0x20-byte entries: id,
+// enter at +4, update at +8, anim callback at +0x10) and per-weapon node
+// callbacks in the WeaponInfo records (+0x4C node matrix, +0x50 update).
+// Mode tables are named by address where the weapon is not pinned down.
+WeaponActor_BuildMatrix = 0x00257A40; // the weapon model's matrix from the owner's camera: offsets scaled 0.1 and -10.24, camera rotation and position
+CPlayer__GetNextUsableWeapon = 0x00257BA0; // the first usable weapon after the current, else the last before it; 0x18 or 0 when none
+WeaponActor_Update = 0x00257D48; // m_pfStep of the weapon actor: timers, mode 1 on a pose or queued change, the mode's and weapon's updates, the model animation
+WeaponActor_CheckFire = 0x00257EA0; // after the cooldown, fire button 0x2000 starts mode 4, a tap of 0x10 with weapon 19 mode 5; 1 when it fired
+WeaponMode_Idle_Update = 0x00258000; // picks another weapon when out of ammo, tag-mode sound 0x27D8, else switches to the queued weapon
+WeaponMode_WindUp_Update = 0x002581C4; // sets the fire-rate scale D_800AE350 from the time held (weapons 2-3, 12), then mode 7 or 5
+WeaponMode_SpinFire_Update = 0x00258370; // spun-up firing while fire is held; on release mode 2 and the stop sounds 0x1B5/0x1A6
+WeaponMode_StreamFire_Update = 0x002584DC; // weapon 0x14: drains ammo every third tick while fire is held, else mode 2
+WeaponActor_SetModeWrapper = 0x0025864C; // tail call to CAI__SetMode
+WeaponActor_SwitchToRequested = 0x00258668; // switches the weapon actor to its owner's requested weapon
+WeaponActor_FireCallback = 0x00258734; // CPlayer__FireWeapon on the owner (m_AI.m_pParent) with the event's projectile type
+WeaponActor_SwitchToRequestedInline = 0x00258754; // inlined copy of WeaponActor_SwitchToRequested
+WeaponActor_Draw = 0x0025883C; // m_pfDraw: the muzzle child (copying the parent's render block), then the model
+WeaponActor_InitAI = 0x00258964; // m_pModeTable = D_800AE394, m_pfStep = WeaponActor_Update, m_pfDraw = WeaponActor_Draw, clears the vars, switches to the requested weapon
+WeaponMode_Switch_Enter = 0x002589CC; // D_800AE394 entry 1 enter: same body as WeaponActor_SwitchToRequested
+WeaponMode_Switch_Update = 0x00258A98; // D_800AE394 entry 1 update: resets the barrel, then fire (4) if still held and allowed, else 2
+WeaponMode_Ready_Update = 0x00258B74; // picks the next weapon when out of ammo; without a shot goes to the mode the player's state table asks for
+WeaponMode_Fire_Enter = 0x00258C20; // m_FireDelay from the weapon's fireDelay
+WeaponMode_Fire_Update = 0x00258C50; // refires (mode 4) while fire is held after the delay, else back; used by most weapon tables
+WeaponMode_Idle_Enter = 0x00258D6C; // D_800AE394 entry 2 enter: func_0042EB04 on the owner
+WeaponAnim_4EF2 = 0x00258D8C; // anim callback: returns animation 0x4EF2 (table D_800AE514)
+WeaponAnim_4E84 = 0x00258D94; // anim callback: returns animation 0x4E84
+WeaponBarrel_NodeMatrix_AEE38 = 0x00258D9C; // node callback of weapon info D_800AEE38: rotates the barrel nodes by m_BarrelAngle per node
+WeaponMode_SpinUp_Enter = 0x00258E38; // condition timer 0, background sound 0x1A5, fire delay
+WeaponBarrel_Spin_AEE38 = 0x00258EA0; // update of weapon info D_800AEE38: spins down unless held, turns the barrel, rumble and spin sound
+WeaponNode_Rotate_AF324 = 0x00258FF8; // node callback of D_800AF324: node 2 rotated by -1.5x the angle
+WeaponMode_AE634_Enter = 0x00259040; // fires projectile 0x12B and starts the background (0x1A5) and firing (0x1A7) sounds
+WeaponMode_SpinUpFire_Update = 0x002590CC; // spins the barrel up while fire is held, else stops it
+WeaponBarrel_Spin_AF324 = 0x002591F4; // update of D_800AF324: spin decay, angle, sound rates 0x1A7/0x1A5
+WeaponActor_PlayChargeAnim = 0x0025934C; // update of D_800AF5C4: holding fire sets the character animation 0x1130
+WeaponNode_Rotate_AF084 = 0x002593A4; // node callback of D_800AF084: node 2 rotated by m_BarrelAngle
+WeaponActor_Sway_AF084 = 0x002593D8; // update of D_800AF084: tilts the weapon with the movement
+WeaponAnim_Alternate4F1A = 0x00259558; // anim callback of D_800AE694: alternates 0x4F1A / 0x4F24
+WeaponMode_AE694_Update = 0x00259584; // out of ammo -> 2, tap 0x10 -> 5, release -> ...
+WeaponMode_AE694_Hold = 0x00259630; // fire held and ammo -> 4, else back to 2 when 0x10 is released
+WeaponActor_EquipRequested = 0x002596B4; // makes m_RequestedWeapon current: its mode table and effects, its name on the HUD (func_0027FC2C)
+WeaponMode_AE714_Enter = 0x00259794; // fire delay and firing sound 0x1A9
+WeaponSound_Update_AF12C = 0x002597E8; // update of D_800AF12C: background sound 0x1A8, sound rate 0x1A9
+WeaponMode_AE794_Enter = 0x00259858; // background sound 0x464
+WeaponMode_AE794_Update = 0x00259878; // spin sound 0x464 while held; on release mode 2 or, spun past 16 degrees, mode 5
+WeaponBarrel_Spin_AF1D4 = 0x00259944; // update of D_800AF1D4: turns the barrel and makes the controller rumble with the spin speed
+WeaponNode_Rotate_AF1D4 = 0x00259A4C; // node callback of D_800AF1D4: nodes 1 and 12
+WeaponNode_Rotate_AF180 = 0x00259A98; // node callback of D_800AF180: node 2
+WeaponBarrel_Spin_AF180 = 0x00259AE0; // update of D_800AF180: spins up toward 10 degrees a frame, frame-7 flag in mode 4
+WeaponMode_AE7F4_Enter = 0x00259BC4; // sound 0x1BB and fire delay
+WeaponMode_Charge_Update = 0x00259C4C; // on release charges by the time held (at most 1), shot count D_800AE9D2, then mode 5
+WeaponMode_Weapon10Fire_Enter = 0x00259D38; // spends one round of weapon 0x10; mode 7 when empty else 4
+WeaponMode_Weapon1FFire_Enter = 0x00259DD0; // weapon 0x1F with one round left -> mode 7, else 4
+WeaponMode_AE934_Enter = 0x00259E30; // m_RefireDelay = D_800A7364, mode 4
