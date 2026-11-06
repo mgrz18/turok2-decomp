@@ -124,7 +124,7 @@ decomp.
 - [x] Bulk matching from m2c drafts (`tools/auto_match.py`): 840 functions over three passes
 - [ ] Readability pass: name the structs behind `M2C_FIELD` accesses — 1,140 files named, 10 left in m2c form; `CGameObjectInstance`, `CPlayer`, `COverlay`, `CCamera` in `include/structs/` (offsets checked with `tools/check_structs.py`); next: hoist the repeated local structs ([docs/STRUCTS_TODO.md](docs/STRUCTS_TODO.md))
 - [x] Ghidra in the loop: structs, names and prototypes loaded into a Ghidra project (`tools/ghidra/`) to read systems before matching them
-- [x] Function names from the ROM's LNK records and from Turok 3's decomp (`versions/names.us.txt`, `tools/xmatch_t3.py`)
+- [ ] Name the functions: 3,823 of the 4,146 C functions named (3,932 names with the asm ones), from Turok 3's and Rage Wars' decomps, libultra, the ROM's strings and SN64 debug records (`versions/names.us.txt`, `versions/names/`, `tools/apply_names.py`; [docs/NAMES.md](docs/NAMES.md))
 - [ ] Hand-match the functions m2c gets close to but not exact — started with the HUD: overlay script interpreter matched ([docs/HUD.md](docs/HUD.md))
 - [x] decomp-permuter batches for near-matches (`tools/permuter/`)
 - [x] Functions own their `.rdata` slice from C: switch tables and float pools (`--switch`, `--rdata`)
