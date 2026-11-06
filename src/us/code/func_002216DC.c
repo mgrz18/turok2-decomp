@@ -2,6 +2,7 @@
 #include "structs/world.h"
 #include "structs/collision.h"
 #include "structs/rect.h"
+#include "globals/camera.h"
 
 typedef struct GridCell {
     CRect rect;                  /* 0x00 */
@@ -23,7 +24,6 @@ typedef struct Viewer {
 } Viewer;
 
 extern Viewer *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;      /* viewers */
-extern CBox gCameraVisibleBox;       /* visible bounds: min xyz, max xyz */
 extern char D_800A5F6C[];       /* "grid section" */
 
 void *CISet__GetBlock(void *table, s32 index);

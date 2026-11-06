@@ -9,6 +9,7 @@
 #include "gfx.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "globals/menu.h"
 
 typedef struct FontStyle {
     /* 0x00 */ u8 pad0[0xA0];
@@ -25,7 +26,6 @@ typedef struct FontStyle {
 } FontStyle;
 
 extern FontStyle gEngineApp_m_OnScreen;
-extern u32 gLoadedFont;          /* the loaded font */
 extern u8 gEngineApp_m_OnScreen_m_CharacterSmallLookUpPos[];         /* glyph lookup */
 extern u8 D_80110238[];         /* glyph lookup, language 0 */
 

@@ -3,6 +3,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "globals/scene.h"
+#include "globals/camera.h"
 
 /* Steps the particle system once: marks every particle on the three active
  * lists, then (outside a pause) advances the ones inside the visible bounds,
@@ -13,7 +14,6 @@
 extern f32 gFrameIncrement;          /* frame time scale */
 extern f32 gParticleTimeScale;
 extern s32 gEngineApp_m_Settings_paused;
-extern CBox gCameraVisibleBox;       /* visible bounds */
 
 extern void CParticle__Update(CParticle *p);
 extern s32 CParticle__IsUnderWater(CParticle *p);

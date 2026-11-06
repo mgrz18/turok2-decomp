@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/render.h"
+#include "globals/menu.h"
 
 /* Menu item draw callback: while the cursor blink timer is low, draws the
  * highlight box (11 virtual pixels wide, scaled to the screen) at the cursor
  * column, faded by the item's alpha, then draws the item as usual. */
 
-extern s32 gMenuCurrentFont;
 
 extern void Hud_SetupFillMode(void);
 extern void Hud_DrawBevelBox(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);

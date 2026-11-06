@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "gfx.h"
+#include "globals/menu.h"
 
 extern void COnScreen__SelectSmallFont();
-extern s32 gLoadedFont;
 extern s32 COnScreen__GetFontTexture(void);
 extern s32 COnScreen__GetFontTexture(void);
 void COnScreen__SelectSmallFont(void) {

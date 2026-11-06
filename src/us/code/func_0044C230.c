@@ -26,6 +26,7 @@
 #include "gfx.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "globals/menu.h"
 
 /* ---------------- MenuItem_FormatBinding_2 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -307,7 +308,6 @@ void MenuItem_Layout_2(MenuItem *it, MenuItemLayout *o) {
 /* ---------------- MenuItem_DrawString_2 ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043FFAC.c, func_0043FFAC, with Turok 2's layouts. */
 
-extern s32 gMenuCurrentFont; /* current draw mode */
 extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[];
 
 extern s32 GetMemSize(void);

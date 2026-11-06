@@ -1,8 +1,8 @@
 #include "common.h"
 #include "gfx.h"
+#include "globals/menu.h"
 
 
-extern s32 gLoadedFont;
 
 void *COnScreen__GetFontTexture(void);
 

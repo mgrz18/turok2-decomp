@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
-extern s32 gMpPlayerSpeed;     /* the speed setting, 0-15 */
 extern f32 sPlayerSpeedTable_scale_2[];   /* speed per setting */
 
 s32 Menu_StepValue_2(Menu *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);

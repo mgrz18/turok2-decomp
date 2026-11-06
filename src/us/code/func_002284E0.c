@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "globals/render.h"
 struct LightData;
 struct LightData {
     u16 falloff;
@@ -32,7 +33,6 @@ struct UnitLight {
 struct LightNode;
 typedef struct LightNode LightNode;
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern s32 gDLightBufferIndex;
 extern UnitLight gDLightBuffer[];
 extern char D_8010FF34;
 extern LightNode *CDLightSet__GetFirst(void *);

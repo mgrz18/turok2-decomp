@@ -4,12 +4,12 @@
 #include "structs/game.h"
 #include "structs/frame.h"
 #include "globals/render.h"
+#include "globals/camera.h"
 
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 extern s32 gEngineApp_m_Settings_paused;
-extern f32 gScreenClearTime;              /* seconds the screen is cleared for (splat: gCameraVisBits + 4) */
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* frame buffer index */
 extern s32 gCameraPoolHideViews;

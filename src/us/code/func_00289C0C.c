@@ -3,6 +3,7 @@
 #include "structs/game.h"
 #include "globals/scene.h"
 #include "globals/render.h"
+#include "globals/menu.h"
 
 s32 Cinema_RequestById(s32);
 s32 CScene__RequestWarp(s32, s32, s32);
@@ -11,7 +12,6 @@ CPlayer *CPlayerPool__GetFirstActive(void *);                     /* extern */
 void CEngineApp__StartWarp(s32, s32);                       /* extern */
 extern s32 gFinalEnding;
 extern s32 gEndingPrimagenDefeated;
-extern s32 sCreditsLine;
 extern s32 gCreditsDone;
 extern f32 gCreditsScroll;
 

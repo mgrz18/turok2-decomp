@@ -2,9 +2,9 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 #include "structs/level_actor.h"
+#include "globals/camera.h"
 
 extern f32 gFrameIncrement;                  /* the frame's time step */
-extern CBox gCameraVisibleBox;               /* visible bounds */
 
 void CPooledLevelActor__Update(CPooledLevelActor *actor);
 

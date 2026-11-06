@@ -1,10 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU_2/80408AC4_7.CPP, func_8043CD64_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/menu.h"
 
-typedef unsigned char u8;
-typedef signed int s32;
 s32 strlen(u8 *);
-extern u8 gCheatEntryText[0x64];
 s32 EnterCheatMenu_MatchesCode_2(u8 *arg0) {
     u8 *input = arg0;
     s32 index = 0;

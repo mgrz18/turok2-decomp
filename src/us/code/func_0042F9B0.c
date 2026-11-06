@@ -12,7 +12,7 @@ typedef struct IntPair {
     s32 field_4;
 } IntPair;
 
-extern IntPair gCameraVisBits;
+extern IntPair gCameraVisBits; /* local type: one load pair over gCameraVisBits and gScreenClearTime */
 
 void CCameraViewParams__Construct(void *);
 void CMtxF__Identity(void *);

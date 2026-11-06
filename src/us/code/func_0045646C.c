@@ -2,11 +2,11 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "globals/render.h"
+#include "globals/menu.h"
 
 /* Name entry: draw the item, with a blinking cursor box under the character
  * being edited. */
 
-extern s32 gMenuCurrentFont;
 
 s32 CPlayerPool__GetIndex(void *state, void *player);
 void Hud_SetupFillMode(void);

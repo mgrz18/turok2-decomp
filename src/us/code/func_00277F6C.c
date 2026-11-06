@@ -5,8 +5,8 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "globals/menu.h"
 
-extern s32 gLoadedFont;          /* which font texture is loaded */
 extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[2];       /* font spacing */
 
 extern s32 COnScreen__GetFontTexture(void);

@@ -16,5 +16,6 @@ extern u32 gTotalFramebuffers;      /* 3 */
 extern u32 gDisplayListSize;        /* in commands */
 extern u32 gLineListSize;           /* in commands */
 extern u32 gNextFrameToShow;        /* wraps at gTotalFramebuffers */
+extern s32 gDLightBufferIndex;       /* the half of gDLightBuffer in use (DLights_SwapBuffers) */
 
 #endif

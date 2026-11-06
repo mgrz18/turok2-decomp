@@ -3,6 +3,7 @@
 #include "structs/camera.h"
 #include "structs/collision.h"
 #include "globals/render.h"
+#include "globals/camera.h"
 
 extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, */
 extern f32 gSplitScreenMarginTop;          /* top, */
@@ -11,9 +12,6 @@ extern f32 gSplitScreenMarginRight;          /* right */
 extern u8 gEngineApp_m_Settings_unk1B;           /* two players split side by side, not one above the other */
 extern s32 gDefaultVisBits[];        /* the visibility bits outside any region */
 extern CCameraPool gEngineApp_m_Game_m_CameraPool;  /* the camera pool */
-extern CBox gCameraViewBox;         /* the view boxes of all the active cameras together */
-extern CBox gCameraVisibleBox;         /* and their widened (animation) boxes */
-extern u32 gCameraVisBits;          /* and their visibility bits */
 
 /* gCameraVisBits seen as a structure: the loop ORs into it through one. */
 typedef struct {

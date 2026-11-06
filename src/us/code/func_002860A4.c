@@ -1,7 +1,7 @@
 #include "common.h"
 #include "globals/render.h"
+#include "globals/menu.h"
 
-extern s32 sCreditsLine;              /* first credits line on screen */
 extern f32 gCreditsScroll;              /* scroll position of that line */
 extern char *gCreditsLines[];          /* credits lines */
 
