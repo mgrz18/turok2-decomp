@@ -5,8 +5,6 @@
 #include "ultra_types.h"
 #include "globals/hostio.h"
 
-extern u8 sHostIoDmaMsg[];         /* OSIoMesg used for the DMA */
-extern OSMesgQueue sHostIoDmaQueue;  /* its reply queue */
 extern void HostIo_WriteByteDma(s32 address, u8 value);
 extern void HostIo_WriteWord(s32 address, s32 value);
 extern s32 osPiStartDma(void *entry, s32 pri, s32 direction, u32 devAddr, void *dramAddr, u32 size,
@@ -27,7 +25,7 @@ void HostIo_WriteBlockDma(u32 address, u8 *source, u32 remaining) {
     }
     while (remaining >= 4) {
         if (remaining >= 16 && ((u32) source & 15) == 0 && dmaResult != -1) {
-            dmaResult = osPiStartDma(sHostIoDmaMsg, 1, 1, address, source, remaining, &sHostIoDmaQueue);
+            dmaResult = osPiStartDma(&sHostIoDmaMsg, 1, 1, address, source, remaining, &sHostIoDmaQueue);
             if (dmaResult != -1) {
                 osRecvMesg(&sHostIoDmaQueue, NULL, 1);
                 remaining = 0;
