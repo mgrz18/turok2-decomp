@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/game_object.h"
+#include "globals/collision.h"
 
 extern f32 Random_Blend(f32 min, f32 max); /* random float in [min, max] */
 extern f32 AI_DistSqToPointAtHeight(void *obj, CVector3 v);
@@ -8,7 +9,6 @@ extern f32 func_00298470(f32 x); /* sqrtf */
 extern f32 func_002982F0(f32 x); /* sinf */
 extern f32 func_002974C0(f32 x); /* cosf */
 
-extern f32 gThrowableCollisionInfo_m_GravityAcceleration; /* gravity */
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x10C];

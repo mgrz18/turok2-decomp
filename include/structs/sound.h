@@ -18,6 +18,7 @@
 #include "ultra_types.h"
 #include "structs/libaudio.h" /* ALHeap, ALBank, ALSndPlayer, ALSndpConfig, Acmd... */
 #include "structs/game_object.h" /* CVector3 */
+#include "structs/list.h"
 
 /* Turok 3's CAudioWorld (audioworld.c), gAudioWorld; called SndMgr here
  * until round N3. */
@@ -235,6 +236,13 @@ typedef struct SndSource {
     /* 0x10 */ CVector3 pos;
     /* 0x1C */ s32 flags;
 } SndSource; /* size 0x20 */
+
+/* The level's looping sounds (LoopSounds_*): the free sources and the
+ * playing ones, both lists of SndSource (gLoopSoundEntries). */
+typedef struct LoopSounds {
+    /* 0x00 */ CList m_FreeList;
+    /* 0x14 */ CList m_UsedList;
+} LoopSounds;
 
 /* A sound effect descriptor (SndInfo in rw/junk_types.h), read through the
  * accessors at 0x276820..0x2768BC. */

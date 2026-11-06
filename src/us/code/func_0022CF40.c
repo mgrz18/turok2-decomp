@@ -15,7 +15,6 @@ extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF m);                /* to
 extern void CMtxF__MultiplyAffine(CMtxF out, CMtxF a, CMtxF b);      /* out = a * b */
 extern f32 CGameRegion__GetEdgeYaw(void *region, s32 attach);
 extern void CMtxF__SetRotateY(CMtxF m, f32 angle);
-extern CMtxF sParticleRotXMtx;
 
 CMtxF *CParticle__GetParentTransform(CParticle *p, u8 *view) {
     CMtxF output;

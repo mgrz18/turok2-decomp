@@ -238,4 +238,10 @@ typedef struct PlayerSpeedTable {
     /* 0x04 */ f32 scale[16];       /* -0.5 .. 1.0 */
 } PlayerSpeedTable; /* size 0x44 */
 
+/* A row of gCharacterSelectSounds: the sound the character select plays. */
+typedef struct CharacterSound {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ s16 sound;
+} CharacterSound;
+
 #endif

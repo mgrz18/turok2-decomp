@@ -39,4 +39,8 @@ extern CCollisionSetup gCollisionSetupTable[34];
 extern CCollisionSetup gCollisionSetupTable_2[34];
 extern MapSweep *sMapSweep;
 
+/* The throwables' CCollisionInfo (0x800F1F90): fields with symbols of their own */
+extern s8 gThrowableCollisionInfo_m_InstanceBehavior;
+extern f32 gThrowableCollisionInfo_m_GravityAcceleration;
+
 #endif

@@ -15,5 +15,6 @@ extern s32 sSwooshSpawned;          /* cleared each frame by SwooshSystem_Update
 
 /* The particle drawer's matrices */
 extern CMtxF sParticleParentMtx;
+extern CMtxF sParticleRotXMtx;
 
 #endif

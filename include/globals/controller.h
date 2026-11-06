@@ -21,5 +21,7 @@ extern u8 gValidControllerBits;     /* osContInit's bit pattern ("ValidControlle
 extern u8 gNumControllers;          /* controllers Cont_InitAll found */
 extern s32 sControllerRescanTimer;  /* Controller_Service counts it down from 60, then rescans */
 extern s32 gMenuSoundsEnabled;      /* the Controller_Menu* functions play the menu sounds (1) */
+extern OSContPad gContPadData[4];     /* osContGetReadData's buffer */
+extern u32 gControllers_buttons;     /* gControllers[0].buttons */
 
 #endif

@@ -40,5 +40,6 @@ extern s32 sCreditsLine;            /* the first credits line on screen */
 extern f32 sFinalScoreTimer;
 extern f32 sResolutionToggleDelay;
 extern s32 sPauseRumbleOn[4];   /* the controllers' rumble state, saved while paused */
+extern CharacterSound gCharacterSelectSounds[];   /* by character */
 
 #endif
