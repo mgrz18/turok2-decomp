@@ -451,18 +451,22 @@ deleted when the archive path works.
 
 Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AUDIO.
 
-1. **Load-unit census** (a1): `RomFS(rom).load_units()` in `tools/assets/romfs.py`
-   already yields `(key, size, node)` per unit (an ISet's unit is its header,
-   `(count*4+15)&~7` or 0x18 for object-index headers; any other node is its whole
-   slot; a raw container's RNC children are their own units; the audio window and
-   sound data are one `VM_Alloc` unit each; the audio sample data is read piecemeal).
-   Still to add: a `--units` listing with every unit's (address,
-   ROM size, unpacked size, RNC or raw, type from the call-site table, which
-   call sites read it). Coverage goal: every byte of 0x20F178-0x1FF7AEC in
-   exactly one unit or explicitly marked padding. Overlaps (one address read
-   at two sizes) are reported, and the largest size wins.
-2. **Unpack rule check:** for each unit stored unpacked, confirm that all call
-   sites pass a ProPack-family callback. List the exceptions as `KEEP_PACKED`.
+1. **Load-unit census** (a1, done): `RomFS(rom).load_units()` in
+   `tools/assets/romfs.py` yields `(key, size, node)` for every unit the engine
+   reads on its own (index headers, `(count*4+15)&~7` or 0x18 for object-index
+   headers, plus whole index entries; RNC children inside raw containers are not
+   separate units). US ROM: 26,124 units = 14,426 RNC, 6,438 raw ISet containers,
+   4,885 empty, 334 raw, 41 USet, plus the 3 audio regions (audio window and sound
+   data as `VM_Alloc` units, the sample data read piecemeal). `fs.readers(node)`
+   gives `[(description, callback, callers)]` (column "readers" in romfs_tree.tsv;
+   ROMFS.md "Load units and their readers"). Still to add for the archive: a
+   `--manifest` writer with (address, ROM size, unpacked size, type, flags).
+2. **Unpack rule check** (a1, done): every RNC unit has a reader with a callback,
+   and every such callback calls `ProPackDecompress` (`Model_Decompress*`,
+   `Anim_Decompress`, `Texture_DecompressCallback`, `CScene__Decompress*`,
+   `CScene__DecompressGridSection`, `Cinema_PrepareResource`, `ProPack__Decompress`),
+   so all 14,426 RNC units can be stored unpacked. The only unit without a reader
+   is cart/20 (8-byte end marker). Re-run the check whenever the reader table grows.
 3. **Swap tables** (a2-a6): each area document gets a field-width table per
    type, e.g. `grid section: CISet; child 0: CUSet stride 0x1C {f32 x3, u16, u16, ...}`.
    `tools/assets/swapgen.py` turns them into `port/t2swap.c`. Until a type has
@@ -517,9 +521,11 @@ Dependencies: a1 = ROMFS, a2 TEXTURES, a3 MODELS, a4 LEVELS, a5 ANIMATION, a6 AU
 
 ## 9. Open questions
 
-- Do any call sites read the *first bytes of an RNC unit* as data (the
-  header's unpacked size, for instance) outside `ProPackDecompress`? That
-  would forbid storing that unit unpacked (step 2 finds out).
+- Storing RNC units unpacked: a1's reader table shows every RNC unit goes
+  through a callback that calls `ProPackDecompress` (step 2). Still worth a
+  look: whether any callback touches the block *before* that call, and whether
+  the raw containers whose RNC children are unpacked from memory need
+  `KEEP_PACKED` or an offset-table rewrite (5.2).
 - Units read at more than one size where the larger read crosses into what
   another call site treats as a separate unit: does the tree walker see any?
 - `Bits_Read`: byte or word fetches? (Decides the swap rule for animation
