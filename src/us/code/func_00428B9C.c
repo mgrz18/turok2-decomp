@@ -2,11 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern u8 __osContLastCmd;
 void __osPfsRequestData(u8 cmd) {
-    extern OSPifRam __osPfsPifRam;
-    extern u8 __osContNumControllers;
     u8 *ptr;
     __OSContRequesFormat requestformat;
     s32 i;

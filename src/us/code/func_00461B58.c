@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 void __osPfsGetInitData_2(u8 *valid, EntryRecAt3 *data) {
-    extern char __osPfsPifRam;
-    extern u8 __osContNumControllers[];
+    extern char __osPfsPifRam; /* local type: globals/libultra.h declares it (OSPifRam); this file keeps its own view with the __osContNumControllers array below */
+    extern u8 __osContNumControllers[]; /* local type: globals/libultra.h declares it (u8); as an array GCC 2 keeps its address in a register, as the ROM does */
     u8 *ptr;
     __OSContRequesFormat readformat;
     s32 i;

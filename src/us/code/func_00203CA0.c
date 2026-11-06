@@ -32,7 +32,6 @@ struct ResourceHashEntry;
 typedef struct ResourceHashEntry ResourceHashEntry;
 struct ResourceHashEntry;
 extern s32 CList__AddTail(CList *list, void *node);
-typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);

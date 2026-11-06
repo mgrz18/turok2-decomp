@@ -2,16 +2,14 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern u8 __osPfsPifRam[];
 extern void __osSiGetAccess(void);
 extern s32 __osSiRawStartDma(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
 extern u32 __osContDataCrc(void *arg0);
 extern void __osSiRelAccess(void);
-extern u8 __osContLastCmd;
-extern u8 __osPfsPifRam[];
 extern void __osPackRamWriteData(s32 arg0, s32 arg1, u8 *arg2);
 extern s32 __osSiRawStartDma(s32, s32);
 extern u32 __osContDataCrc(void *arg0);
@@ -29,12 +27,12 @@ u32 __osContRamWrite(s32 arg0, s32 arg1, u16 arg2, u8 *arg3, s32 arg4) {
     __osSiGetAccess();
     __osContLastCmd = 3;
     __osPackRamWriteData(arg1, arg2 & 0xFFFF, arg3);
-    result = __osSiRawStartDma(1, __osPfsPifRam);
+    result = __osSiRawStartDma(1, &__osPfsPifRam);
     osRecvMesg(arg0, 0, 1);
     do {
-        result = __osSiRawStartDma(0, __osPfsPifRam);
+        result = __osSiRawStartDma(0, &__osPfsPifRam);
         osRecvMesg(arg0, 0, 1);
-        source = __osPfsPifRam;
+        source = (u8 *)&__osPfsPifRam;
         if (arg1 != 0) {
             i = 0;
             if (arg1 > 0) {

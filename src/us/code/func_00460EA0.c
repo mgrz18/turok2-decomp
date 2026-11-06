@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/libultra.h"
 
 /* Probe the controller pak in a port: 2 = no pak/error, 1 = not a usable pak,
  * 4 = pak changed, otherwise the timer result. */
@@ -14,8 +15,6 @@ typedef struct {
     } s;
 } PakStatus;
 
-extern u8 __osPfsPifRam[];
-
 void __osPfsRequestOneChannel_2(s32 channel);
 s32 __osSiRawStartDma(s32 enable, void *timer);
 s32 osRecvMesg(void *mq, void *msg, s32 flag);
@@ -27,9 +26,9 @@ s32 __osPfsGetStatus_2(void *mq, s32 channel) {
     s32 ret;
 
     __osPfsRequestOneChannel_2(channel);
-    __osSiRawStartDma(1, __osPfsPifRam);
+    __osSiRawStartDma(1, &__osPfsPifRam);
     osRecvMesg(mq, &msg, 1);
-    ret = __osSiRawStartDma(0, __osPfsPifRam);
+    ret = __osSiRawStartDma(0, &__osPfsPifRam);
     osRecvMesg(mq, &msg, 1);
     __osPfsGetOneChannelData_2(channel, &status);
     if ((status.s.b.status & 1) && (status.s.b.status & 2)) {

@@ -4,6 +4,7 @@
 #include "rw/junk_types.h"
 #include "globals/audio.h"
 #include "globals/ucode.h"
+#include "globals/frame.h"
 
 void osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg msg);
 void osStartThread(OSThread *thread);
@@ -17,7 +18,6 @@ extern s32 gAudioDmaCache;
 extern B12DbEnt2 gAudioDmaBuffers[];
 extern void *gAudioCmdLists[];
 extern B12AiTask *gAudioInfo[];
-extern u8 gThreadStackAudio[];
 void __amDmaNew(void);
 void __amMain(void *arg);
 void alInit(void *g, ALSynConfig *c);

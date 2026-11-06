@@ -3,9 +3,6 @@
 #include "common.h"
 #include "globals/hostio.h"
 
-extern u8 sHostIoDmaMsg[];             /* OSIoMesg for the DMA */
-extern u8 sHostIoDmaQueue[];             /* OSMesgQueue the DMA completes on */
-
 extern u32 HostIo_ReadWord(u32 addr);           /* waits for the PI, reads a word of cartridge space */
 extern s32 HostIo_ReadByteDma(u32 addr);           /* reads a byte of cartridge space */
 extern s32 osPiStartDma(void *mb, s32 pri, s32 direction, u32 devAddr, void *vAddr, u32 nbytes, void *mq); /* osPiStartDma */
@@ -27,9 +24,9 @@ void HostIo_ReadBlockDma(u32 source, u8 *destination, u32 count) {
     }
     while (count >= 4) {
         if (count >= 16 && !((u32)destination & 0xF) && dma != -1) {
-            dma = osPiStartDma(sHostIoDmaMsg, 1, 0, source, destination, count, sHostIoDmaQueue);
+            dma = osPiStartDma(&sHostIoDmaMsg, 1, 0, source, destination, count, &sHostIoDmaQueue);
             if (dma != -1) {
-                osRecvMesg(sHostIoDmaQueue, NULL, 1);
+                osRecvMesg(&sHostIoDmaQueue, NULL, 1);
                 count = 0;
             }
         } else {

@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern u32 __osDisableInt(void);
 extern u32 osGetCount(void);
 extern void __osRestoreInt(u32);
-extern s32 __osBaseCounter;
-extern u64 __osCurrentTime;
 u64 osGetTime(void) {
     u32 saved;
     u32 count;

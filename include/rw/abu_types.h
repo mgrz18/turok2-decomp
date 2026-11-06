@@ -6,7 +6,7 @@
 #define RW_ABU_TYPES_H
 
 /* The shared types come from the shared headers: libultra's (OSMesgQueue,
- * OSPfs and the Controller Pak internals) from ultra_types.h, CVector3 (Rage
+ * OSPfs, OSPifRam, OSTask, OSPiHandle, OSIoMesg and the Controller Pak internals) from ultra_types.h, CVector3 (Rage
  * Wars' Vec3) from structs/vector.h, libaudio's ALHeap, ALInstrument and Acmd
  * from structs/libaudio.h. The world gScene is structs/world.h's CScene
  * (Rage Wars' Shared_World has another layout). Gfx is gfx.h's: the files that write display lists
@@ -17,6 +17,7 @@
 #include "structs/vector.h"
 #include "structs/libaudio.h"
 #include "structs/list.h" /* CList (Rage Wars' IntrusiveList) */
+#include "structs/adec.h" /* DecodeState, FftTables */
 
 struct Access_u8_3;
 struct Access_u8_3 {
@@ -2634,12 +2635,6 @@ struct ContPad {
     u8 error;
 };
 typedef struct ContPad ContPad;
-struct OSPifRam;
-struct OSPifRam {
-    u32 ramarray[15];
-    u32 pifstatus;
-};
-typedef struct OSPifRam OSPifRam;
 struct __OSContRequesFormat;
 struct __OSContRequesFormat {
     u8 dummy;
@@ -2657,40 +2652,6 @@ struct Block40 {
     u8 bytes[0x28];
 };
 typedef struct Block40 Block40;
-struct OSTask_t;
-struct OSTask_t {
-    u32 type;
-    u32 flags;
-    u64 *ucode_boot;
-    u32 ucode_boot_size;
-    u64 *ucode;
-    u32 ucode_size;
-    u64 *ucode_data;
-    u32 ucode_data_size;
-    u64 *dram_stack;
-    u32 dram_stack_size;
-    u64 *output_buff;
-    u64 *output_buff_size;
-    u64 *data_ptr;
-    u32 data_size;
-    u64 *yield_data_ptr;
-    u32 yield_data_size;
-};
-typedef struct OSTask_t OSTask_t;
-union OSTask;
-union OSTask {
-    OSTask_t t;
-    long long force_structure_alignment;
-};
-typedef union OSTask OSTask;
-struct Quad_func_802A1BE0_de;
-typedef struct Quad_func_802A1BE0_de Quad_func_802A1BE0_de;
-struct Quad_func_802A1BE0_de {
-    u32 x;
-    u32 y;
-    u32 z;
-    u32 w;
-};
 struct Opaque_OSMesgQueue;
 typedef struct Opaque_OSMesgQueue Opaque_OSMesgQueue;
 struct Node802C07B0;
@@ -2730,20 +2691,7 @@ typedef struct DiskTransferInfo {
     u32 deviceAddress;
     u32 bmControl;
 } DiskTransferInfo;
-struct OSPiHandle_s;
-typedef struct OSPiHandle_s OSPiHandle_s;
-struct OSPiHandle_s {
-    struct OSPiHandle_s *next;
-    u8 type;
-    u8 latency;
-    u8 pageSize;
-    u8 relDuration;
-    u8 pulse;
-    u8 domain;
-    u32 baseAddress;
-    u32 speed;
-    u8 transferInfo[0x60];
-};
+typedef struct OSPiHandle_s OSPiHandle_s; /* ultra_types.h's OSPiHandle */
 struct Func802C1F10Node;
 struct Func802C1F10Node {
     s32 field0;
@@ -2781,39 +2729,6 @@ typedef struct DecodeBlock {
     s32 offset;
     DecodeTable *table;
 } DecodeBlock;
-struct FftTables;
-typedef struct FftTables FftTables;
-struct FftTables {
-    f32 *sines;
-    f32 *cosines;
-    s32 *order;
-    s32 size;
-};
-typedef struct DecodeState {
-    s32 first;
-    s32 third;
-    void *source;
-    s32 second;
-    s32 count;
-    void *cursor;
-} DecodeState;
-struct OSIoMesg;
-typedef struct OSIoMesg OSIoMesg;
-struct OSIoMesgHdr;
-typedef struct OSIoMesgHdr OSIoMesgHdr;
-struct OSIoMesgHdr {
-    u16 type;
-    u8 pri;
-    u8 status;
-    Opaque_OSMesgQueue *retQueue;
-};
-struct OSIoMesg {
-    OSIoMesgHdr hdr;
-    void *dramAddr;
-    u32 devAddr;
-    u32 size;
-    void *piHandle;
-};
 struct KeyRecAt1C;
 typedef struct KeyRecAt1C KeyRecAt1C;
 struct KeyRecAt1C {

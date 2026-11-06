@@ -12,21 +12,12 @@
 #include "globals/controller.h"
 #include "globals/libultra.h"
 
-
 extern u8 gPoolBuffers[];
 extern void *gCFB[];      /* frame buffers */
 extern f32 gCurrentFB[];
-extern CFrameMsg *gGfxMsg;
-extern s32 gCurrentTick;
-extern s32 gNumTicks0;
 extern s32 D_800F6CA8;
-extern s32 gNumTicks2;
-extern s32 gNumTicks3;
-extern s32 gCurrentTickWaiting;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
-extern f32 gPakCheckTimer;
-extern u8 gGfxFrameMessageQueue[];         /* the engine message queue */
 
 extern void InitializeSystemResources(void);
 extern void osCreateViManager(s32 pri);
@@ -115,17 +106,17 @@ void CEngineApp__Main(CEngineApp *e) {
     }
 
     for (;;) {
-        osRecvMesg(gGfxFrameMessageQueue, &gGfxMsg, 1);
-        switch (gGfxMsg->m_Type) {
+        osRecvMesg(&gGfxFrameMessageQueue, &gGfxMsg, 1);
+        switch (gGfxMsg->type) {
         case 1:
             CEngineApp__Retrace(e);
             break;
         case 2:
-            if (gGfxMsg == &e->m_FrameData[0].m_Msg) {
+            if (gGfxMsg == (OSScMsg *) &e->m_FrameData[0].m_Msg) {
                 gFrameData = &e->m_FrameData[0];
-            } else if (gGfxMsg == &e->m_FrameData[1].m_Msg) {
+            } else if (gGfxMsg == (OSScMsg *) &e->m_FrameData[1].m_Msg) {
                 gFrameData = &e->m_FrameData[1];
-            } else if (gGfxMsg == &e->m_FrameData[2].m_Msg) {
+            } else if (gGfxMsg == (OSScMsg *) &e->m_FrameData[2].m_Msg) {
                 gFrameData = &e->m_FrameData[2];
             }
             if (e->m_Settings.mode == 17) {

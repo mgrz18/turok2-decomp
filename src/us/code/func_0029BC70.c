@@ -5,7 +5,6 @@
 #include "ultra_types.h"
 #include "globals/libultra.h"
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern u32 __osTimerCounter;
 extern u32 osGetCount(void);
 extern void __osSetTimerIntr(u64 tim);
 extern u64 __osInsertTimer(OSTimer *t);

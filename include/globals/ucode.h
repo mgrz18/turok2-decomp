@@ -7,6 +7,7 @@
 #include "common.h"
 
 extern u64 rspbootTextStart[];
+extern u64 rspbootTextEnd[];            /* the address of gspF3DEX_NoN_fifoTextStart, a linker symbol */
 extern u64 gspF3DEX_NoN_fifoTextStart[]; /* also where rspboot's text ends */
 extern u64 gspL3DEX_fifoTextStart[];
 extern u64 aspMainTextStart[];

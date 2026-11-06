@@ -6,7 +6,6 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 
-extern u8 gGfxFrameMessageQueue[];       /* the RSP task queue */
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 
 extern u64 osGetTime(void);     /* osGetTime */
@@ -208,7 +207,7 @@ void CEngineApp__Draw(CEngineApp *level) {
         CEngineApp__SubmitGfxTask(level, gFrameData);
     } else {
         CCache__GetFrameDelay();
-        osSendMesg(gGfxFrameMessageQueue, &gFrameData->m_Msg, 1);
+        osSendMesg(&gGfxFrameMessageQueue, &gFrameData->m_Msg, 1);
     }
     if (level->m_Settings.fadeMode != 0) {
         if (level->m_Settings.fastFade != 0) {

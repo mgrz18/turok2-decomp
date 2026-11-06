@@ -2,7 +2,6 @@
 #include "common.h"
 #include "globals/crash.h"
 
-extern u16 *sCrashFrameBuffer;         /* framebuffer */
 extern u16 sCrashTextColor; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */          /* foreground colour */
 
 static __inline__ void newline(void) {

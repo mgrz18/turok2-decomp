@@ -4,9 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
 
-extern u64 __osCurrentTime;
-extern s32 __osBaseCounter;
-extern s32 __osViIntrCount;
 extern void __osTimerServicesInit();
 void __osTimerServicesInit(void) {
     NodeRecAt1C *node = (NodeRecAt1C *)__osTimerList;

@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern OSTask __osTmpTask;
 extern void *func_0029E460(void *destination, const void *source, int count);
 extern u32 osVirtualToPhysical(void *addr);
 extern OSTask *_VirtualToPhysicalTask(OSTask *arg0);

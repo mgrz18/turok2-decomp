@@ -217,4 +217,117 @@ typedef struct __OSViContext {
     /* 0x24 */ __OSViScale y;
 } __OSViContext; /* size 0x30 */
 
+/* Interrupt masks (PR/os_internal.h). */
+typedef u32 OSIntMask;
+
+/* The PIF RAM image the SI DMAs (PR/os_internal.h, PRinternal/controller.h):
+ * __osContBuffer (ultralib's __osContPifRam), __osPfsPifRam. */
+typedef struct OSPifRam {
+    /* 0x00 */ u32 ramarray[15];
+    /* 0x3C */ u32 pifstatus;
+} OSPifRam; /* size 0x40 */
+
+/* An RSP task (PR/sptask.h). */
+typedef struct OSTask_t {
+    /* 0x00 */ u32 type;
+    /* 0x04 */ u32 flags;
+    /* 0x08 */ u64 *ucode_boot;
+    /* 0x0C */ u32 ucode_boot_size;
+    /* 0x10 */ u64 *ucode;
+    /* 0x14 */ u32 ucode_size;
+    /* 0x18 */ u64 *ucode_data;
+    /* 0x1C */ u32 ucode_data_size;
+    /* 0x20 */ u64 *dram_stack;
+    /* 0x24 */ u32 dram_stack_size;
+    /* 0x28 */ u64 *output_buff;
+    /* 0x2C */ u64 *output_buff_size;
+    /* 0x30 */ u64 *data_ptr;
+    /* 0x34 */ u32 data_size;
+    /* 0x38 */ u64 *yield_data_ptr;
+    /* 0x3C */ u32 yield_data_size;
+} OSTask_t; /* size 0x40 */
+
+typedef union OSTask {
+    OSTask_t t;
+    long long force_structure_alignment;
+} OSTask;
+
+/* A PI device and its 64DD transfer state (PR/os_pi.h). */
+typedef struct {
+    /* 0x00 */ u32 errStatus;
+    /* 0x04 */ void *dramAddr;
+    /* 0x08 */ void *C2Addr;
+    /* 0x0C */ u32 sectorSize;
+    /* 0x10 */ u32 C1ErrNum;
+    /* 0x14 */ u32 C1ErrSector[4];
+} __OSBlockInfo; /* size 0x24 */
+
+typedef struct {
+    /* 0x00 */ u32 cmdType;
+    /* 0x04 */ u16 transferMode;
+    /* 0x06 */ u16 blockNum;
+    /* 0x08 */ s32 sectorNum;
+    /* 0x0C */ u32 devAddr;
+    /* 0x10 */ u32 bmCtlShadow;
+    /* 0x14 */ u32 seqCtlShadow;
+    /* 0x18 */ __OSBlockInfo block[2];
+} __OSTranxInfo; /* size 0x60 */
+
+typedef struct OSPiHandle_s {
+    /* 0x00 */ struct OSPiHandle_s *next;
+    /* 0x04 */ u8 type;
+    /* 0x05 */ u8 latency;
+    /* 0x06 */ u8 pageSize;
+    /* 0x07 */ u8 relDuration;
+    /* 0x08 */ u8 pulse;
+    /* 0x09 */ u8 domain;
+    /* 0x0C */ u32 baseAddress;
+    /* 0x10 */ u32 speed;
+    /* 0x14 */ __OSTranxInfo transferInfo;
+} OSPiHandle; /* size 0x74 */
+
+/* An I/O request (PR/os_pi.h): PI DMA, VI retrace and counter messages. */
+typedef struct OSIoMesgHdr {
+    /* 0x0 */ u16 type;
+    /* 0x2 */ u8 pri;
+    /* 0x3 */ u8 status;
+    /* 0x4 */ OSMesgQueue *retQueue;
+} OSIoMesgHdr; /* size 0x8 */
+
+typedef struct OSIoMesg {
+    /* 0x00 */ OSIoMesgHdr hdr;
+    /* 0x08 */ void *dramAddr;
+    /* 0x0C */ u32 devAddr;
+    /* 0x10 */ u32 size;
+    /* 0x14 */ OSPiHandle *piHandle;
+} OSIoMesg; /* size 0x18 */
+
+/* The message an OS event posts (PRinternal/osint.h). */
+typedef struct __OSEventState {
+    /* 0x0 */ OSMesgQueue *messageQueue;
+    /* 0x4 */ OSMesg message;
+} __OSEventState; /* size 0x8 */
+
+/* A double or a float as its bits (PRinternal/guint.h): the libm constants. */
+typedef union {
+    struct {
+        u32 hi;
+        u32 lo;
+    } w;
+    f64 d;
+} du;
+
+typedef union {
+    u32 w;
+    f32 f;
+} fu;
+
+/* Four instructions copied to an exception vector (PRinternal/osint.h). */
+typedef struct {
+    /* 0x0 */ u32 inst1;
+    /* 0x4 */ u32 inst2;
+    /* 0x8 */ u32 inst3;
+    /* 0xC */ u32 inst4;
+} __osExceptionVector; /* size 0x10 */
+
 #endif

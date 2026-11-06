@@ -29,12 +29,12 @@ FftTables *mdctFftInit(s32 n) {
         count = n;
         do {
             angle = i * scale / count;
-            tables->sines[i] = func_002974C0(angle);
-            tables->cosines[i] = -func_002982F0(angle);
+            tables->cos[i] = func_002974C0(angle);
+            tables->sin[i] = -func_002982F0(angle);
             i++;
         } while (i < half);
     }
-    order = tables->order;
+    order = tables->bitrev;
     limit = n * 2;
     for (k = 0; k < n; k++) {
         order[k] = k;
@@ -53,6 +53,6 @@ FftTables *mdctFftInit(s32 n) {
         }
         j += m;
     }
-    tables->size = n;
+    tables->n = n;
     return tables;
 }

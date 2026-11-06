@@ -6,11 +6,6 @@
 #include "common.h"
 #include "globals/libultra.h"
 
-extern u8 __osPiThread[];         /* __osPiThread */
-extern u8 __osPiEventQueue[];         /* __osPiEventQueue */
-extern u8 __osPiEventBuf[];         /* __osPiEventBuf */
-extern u8 __osPiAccessQueue[];         /* __osPiAccessQueue */
-extern u8 __osPiThreadStack[];         /* __osPiThreadStack (its end is __osPiEventQueue) */
 extern s32 osPiRawStartDma();
 extern s32 osEPiRawStartDma();     /* osEPiRawStartDma */
 extern void __osDevMgrMain(void *arg); /* __osDevMgrMain */
@@ -32,13 +27,13 @@ void osCreatePiManager(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
 
     if (!__osPiDevMgr.active) {
         osCreateMesgQueue(cmdQ, cmdBuf, cmdMsgCnt);
-        osCreateMesgQueue(__osPiEventQueue, __osPiEventBuf, 1);
+        osCreateMesgQueue(&__osPiEventQueue, __osPiEventBuf, 1);
 
         if (!__osPiAccessQueueEnabled) {
             __osPiCreateAccessQueue();
         }
 
-        osSetEventMesg(8, __osPiEventQueue, (void *)0x22222222);
+        osSetEventMesg(8, &__osPiEventQueue, (void *)0x22222222);
 
         oldPri = -1;
         myPri = osGetThreadPri(NULL);
@@ -50,15 +45,15 @@ void osCreatePiManager(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
         savedMask = __osDisableInt();
 
         __osPiDevMgr.active = 1;
-        __osPiDevMgr.acsQueue = (OSMesgQueue *)__osPiAccessQueue;
+        __osPiDevMgr.acsQueue = &__osPiAccessQueue;
         __osPiDevMgr.dma = osPiRawStartDma;
         __osPiDevMgr.edma = osEPiRawStartDma;
-        __osPiDevMgr.evtQueue = (OSMesgQueue *)__osPiEventQueue;
-        __osPiDevMgr.thread = (OSThread *)__osPiThread;
+        __osPiDevMgr.evtQueue = &__osPiEventQueue;
+        __osPiDevMgr.thread = &__osPiThread;
         __osPiDevMgr.cmdQueue = (OSMesgQueue *)cmdQ;
 
-        osCreateThread(__osPiThread, 0, __osDevMgrMain, &__osPiDevMgr, &__osPiThreadStack[0x1000], pri);
-        osStartThread(__osPiThread);
+        osCreateThread(&__osPiThread, 0, __osDevMgrMain, &__osPiDevMgr, __osPiThreadStack + 0x1000 / sizeof(u64), pri);
+        osStartThread(&__osPiThread);
 
         __osRestoreInt(savedMask);
 

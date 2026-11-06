@@ -4,25 +4,7 @@
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 
 #include "common.h"
-
-typedef union {
-    struct {
-        u32 hi;
-        u32 lo;
-    } w;
-    f64 d;
-} du;
-
-typedef union {
-    u32 w;
-    f32 f;
-} fu;
-
-extern const du sSinfP[]; /* P: polynomial coefficients */
-extern const du sSinfRpi;   /* 1/pi */
-extern const du sSinfPiHi;   /* pi, high part */
-extern const du sSinfPiLo;   /* pi, low part */
-extern const fu sSinfZero;   /* 0.0f */
+#include "globals/libultra.h"
 
 f32 func_002982F0(f32 x) {
     f32 dx;

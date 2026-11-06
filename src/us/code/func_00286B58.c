@@ -53,12 +53,7 @@ typedef struct {
     /* 0x3C0 */ GfxTask *cur;
 } GfxState;
 
-extern u64 rspbootTextEnd[]; /* = 0x800BC400, same address as gspF3DEX_NoN_fifoTextStart: needs a linker symbol */
-extern u64 gGfxYieldBuffer[]; /* yield buffer */
-extern u8 gGfxFrameMessageQueue[];  /* message queue */
 extern u8 gScheduler[];
-extern u32 gRspFifoSize;   /* fifo size */
-extern u64 *gRspFifoBuffer;  /* fifo buffer */
 
 extern void osWritebackDCacheAll(void);
 extern void Sched_SubmitTask(void *, ScTask *);
@@ -90,7 +85,7 @@ void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
     t->list.output_buff_size = (u64 *)((u8 *)gRspFifoBuffer + gRspFifoSize);
     t->list.data_size = dataSize;
     task->sc[0].next = NULL;
-    t->msgQ = gGfxFrameMessageQueue;
+    t->msgQ = &gGfxFrameMessageQueue;
     t->msg = &task->msg;
     t->framebuffer = task->framebuffer;
     if (task->twoTasks) {
@@ -119,7 +114,7 @@ void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
         t->list.data_size = dataSize2;
         task->sc[1].next = NULL;
         t->flags = 0x23;
-        t->msgQ = gGfxFrameMessageQueue;
+        t->msgQ = &gGfxFrameMessageQueue;
         t->msg = &task->msg;
         t->framebuffer = task->framebuffer;
     }

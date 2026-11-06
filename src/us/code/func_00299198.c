@@ -15,17 +15,6 @@ struct __OSContRamReadFormat {
     u8 datacrc;
 };
 struct __OSContRamReadFormat;
-struct OSPifRam;
-struct OSPifRam {
-    u32 ramarray[15];
-    u32 pifstatus;
-};
-struct OSPifRam;
-typedef struct OSPifRam OSPifRam;
-extern OSPifRam __osMotorStartData[4];
-extern u8 __osMotorStartBuf[32];
-extern OSPifRam __osMotorStopData[4];
-extern u8 __osMotorStopBuf[32];
 extern s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
 extern s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
 extern u8 __osContAddressCrc(u16 address);

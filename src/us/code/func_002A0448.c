@@ -17,8 +17,6 @@ typedef struct {
     /* 0xB8 */ s16 coef[256];   /* quantized coefficients of the current frame */
 } AdecStream;
 
-extern u16 sAdecPrevScale[16];      /* previous scale indices */
-
 extern s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st);          /* adecReadBits */
 extern s16 adecHuffDecode(AdecHuffSeg *segs, s16 *out, s16 n, s16 *cnt, AdecStream *st);    /* adecHuffDecode */
 
