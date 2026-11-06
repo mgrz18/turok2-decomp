@@ -1,10 +1,9 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/controller.h"
 
 /* Controller pak / rumble service, run once per frame while enabled. */
 
-extern u8 gControllersInitialised;           /* service enabled */
-extern s32 sControllerRescanTimer;          /* rescan countdown */
 extern u8 gRumblePool[];
 extern u8 gPakQueueState;           /* rescan request */
 extern u8 gPakAccessQueue[];        /* OSMesgQueue: pak access lock */

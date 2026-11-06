@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/controller.h"
 
 /* What this reads of the controller state. */
 
-extern s32 gMenuSoundsEnabled;
 
 s32 Cinema_IsActive(void);
 void Sound__Play2D(s32);

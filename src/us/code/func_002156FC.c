@@ -3,8 +3,8 @@
 #include "structs/level_actor.h"
 #include "structs/region.h"
 #include "globals/engine.h"
+#include "globals/camera.h"
 
-extern s32 gDefaultVisBits;
 extern u8 D_800B6D1B; /* frame counter */
 extern s32 gEngineApp_m_Settings_paused;
 

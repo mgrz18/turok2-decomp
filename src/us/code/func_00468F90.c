@@ -2,6 +2,7 @@
 /* Second VM module copy of Cont_InitAll (same source, linked 0xE0 lower). */
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/controller.h"
 
 
 /* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
@@ -13,10 +14,7 @@ extern char gPakAccessQueue[]; /* pak OSMesgQueue */
 extern char gSiMessageQueue[]; /* SI OSMesgQueue */
 extern char gSiMesgBuf[];
 extern char gPakMesgBuf[];
-extern u8 gValidControllerBits;     /* controller bit pattern */
 extern s16 gFirstControllerPort;    /* lowest port with a controller */
-extern u8 gNumControllers;     /* number of controllers */
-extern u8 gControllersInitialised;     /* controllers initialised */
 extern s32 gPakChanged[];
 extern s32 gPakRemoved[];
 extern s32 gPakInserted[];

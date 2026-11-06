@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER/80263760_7.CPP, func_80264248_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/controller.h"
 
 /* ControllerProfile profile, stride 0x224. */
 
@@ -11,7 +12,6 @@ void Controller_ReadAll(void);
 s32 RumblePool_Init(void *dst, void *src, s32 n);
 u32 osMotorStop(void *pfs);
 
-extern u8 gControllersInitialised;  /* controllers initialised */
 extern s8 gPakQueueState;  /* pak queue state */
 extern u8 gPakAccessQueue;  /* pak OSMesgQueue */
 extern u8 gSiMessageQueue;  /* SI OSMesgQueue */

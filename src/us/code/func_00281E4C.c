@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/camera.h"
 
 /* The region (floor triangle) the camera is in: its three corners at 4, 8, 0xC
  * (see GameObject_GetRegionTopAbove) and the visibility bits the camera takes from it. */
@@ -13,7 +14,6 @@ struct CGameRegion {
 struct CGameRegion *CScene__FindRegionAt(s32, CVector3 *);
 f32 CGameRegion__GetHeight(struct CGameRegion *, f32, f32);  /* extern */
 s32 Cinema_PathPlaying();                                /* extern */
-extern u32 gDefaultVisBits;
 extern s32 gScene;
 
 /* Picks the visibility bits of the camera: those of its region when it is 5 to 11 units

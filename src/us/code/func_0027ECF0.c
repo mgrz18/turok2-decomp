@@ -5,12 +5,13 @@
 
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
+/* local types: this file cannot include globals/camera.h (gDefaultVisBits below) */
 extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, */
 extern f32 gSplitScreenMarginTop;          /* top, */
 extern f32 gSplitScreenMarginLeft;          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
 extern f32 gSplitScreenMarginRight;          /* right */
 extern u8 gEngineApp_m_Settings_unk1B;           /* two players split side by side, not one above the other */
-extern s32 gDefaultVisBits[];        /* the visibility bits outside any region */
+extern s32 gDefaultVisBits[];        /* local type: the u32 of globals/camera.h loads it before the box copies (GCC 2 alias order) */
 extern CCameraPool gEngineApp_m_Game_m_CameraPool;  /* the camera pool */
 extern CBox gCameraViewBox;         /* the view boxes of all the active cameras together */
 extern CBox gCameraVisibleBox;         /* and their widened (animation) boxes */

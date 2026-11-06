@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/engine.h"
+#include "globals/controller.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
@@ -30,7 +31,6 @@ extern u32 gTotalFramebuffers;          /* frame buffer count */
 extern s32 gScreenWidth;          /* width */
 extern s32 gScreenHeight;          /* height */
 extern u8 gScene[];
-extern u8 gValidControllerBits;
 extern s32 gPakCheckHasPak;
 extern s32 gPakCheckDone;
 extern s32 gPakMenuStartPressed;

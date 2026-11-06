@@ -5,7 +5,7 @@
 
 extern f32 D_800A9BD4;
 extern f32 D_800A9BD8;
-extern s32 gDefaultVisBits[];
+extern s32 gDefaultVisBits[]; /* local type: the u32 of globals/camera.h loads it first (GCC 2 alias order) */
 void CCameraViewParams__Construct(ObjInit *o) {
     CVector3 *p;
     f32 z;

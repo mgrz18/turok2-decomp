@@ -11,12 +11,7 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "globals/engine.h"
-
-/* A camera mode: its update, then a word. */
-typedef struct {
-    /* 0x0 */ void (*m_Update)(CCamera *cam);
-    /* 0x4 */ s32 _pad;
-} CCameraMode;
+#include "globals/camera.h"
 
 
 typedef struct {
@@ -25,7 +20,6 @@ typedef struct {
 } CFloor;
 
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
-extern CCameraMode D_800B6CB4[];
 extern f32 gQuaternionSin;          /* the last sine taken */
 extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera */
 /* The camera pool, seen from its main camera. */
@@ -34,7 +28,6 @@ extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;          /* the pool
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
 extern s32 gScene[];
-extern s32 gDefaultVisBits;
 void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
 void guLookAtF(CMtxF m, f32 eyeX, f32 eyeY, f32 eyeZ, f32 atX, f32 atY, f32 atZ, f32 upX, f32 upY, f32 upZ);
@@ -110,7 +103,7 @@ found:
     cam->m_Time += gFrameIncrement;
     CCamera__AdvanceAttributes(cam);
     if (Cinema_PathPlaying() == 0) {
-        update = D_800B6CB4[cam->m_Mode].m_Update;
+        update = gCameraModeTable[cam->m_Mode].update;
         if (update != NULL) {
             update(cam);
         }

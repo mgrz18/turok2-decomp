@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/list.h"
 #include "globals/engine.h"
+#include "globals/camera.h"
 
 /* Spawns a copy of an actor: takes a free instance off the world's free list
  * and initialises it from src. */
@@ -13,7 +14,6 @@ extern s32 CScene__FindObjectType(void *level, s32 type);
 extern void func_0021E5D4(CGameObjectInstance *obj);
 extern void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
-extern s32 gDefaultVisBits;
 extern u8 gScene[];
 extern s32 gScene_m_bStreamAll;
 

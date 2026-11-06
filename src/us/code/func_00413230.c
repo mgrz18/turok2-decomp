@@ -20,6 +20,7 @@
 #include "structs/camera.h"
 #include "gfx.h"
 #include "globals/engine.h"
+#include "globals/camera.h"
 
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -545,7 +546,6 @@ void MenuItem_DrawSlider(MenuItem *it, MenuItemLayout *box, MenuItemLayout *colu
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004409A8.c, func_004409A8, with Turok 2's layouts. */
 
-extern s32 gDefaultVisBits;
 extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */

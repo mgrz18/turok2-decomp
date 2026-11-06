@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/controller.h"
 
 /* Per-controller rumble pak state. */
 
-extern u8 gControllersInitialised;           /* service enabled */
 extern u8 gPakQueueState;           /* rescan request */
 extern u8 gPakAccessQueue[];         /* OSMesgQueue: pak access lock */
 extern u8 gSiMessageQueue[];         /* OSMesgQueue for the SI */
