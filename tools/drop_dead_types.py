@@ -1,7 +1,7 @@
 """Drop the top-level type declarations of C files that nothing else in the file
 uses (with their forward declarations and typedef aliases), keeping a removal
-only if the file still compiles to the same code as at the base revision b4bb727f
-(tools/asm_diff.py compile/normalize). Usage: TMPDIR=... python3 tools/drop_dead_types.py src/us/code/X.c ...
+only if the file still compiles to the same code as at the base revision (DDT_BASE,
+default HEAD; tools/asm_diff.py compile/normalize). Usage: TMPDIR=... [DDT_BASE=rev] python3 tools/drop_dead_types.py src/us/code/X.c ...
 A comment right above a dropped type goes with it unless a blank line or a
 "From ..." provenance line separates it."""
 import re,sys,os,subprocess
@@ -10,10 +10,11 @@ sys.path.insert(0,"tools")
 import asm_diff as AD
 ROOT=AD.ROOT
 syms=AD.symbols(str(ROOT/"build"/"ref.elf"))
-BASE=Path(os.environ["TMPDIR"])/"base_b4bb727f"
+REV=subprocess.run(["git","-C",str(ROOT),"rev-parse","--short",os.environ.get("DDT_BASE","HEAD")],capture_output=True,text=True,check=True).stdout.strip()
+BASE=Path(os.environ["TMPDIR"])/("base_"+REV)
 if not (BASE/"src").exists():
     BASE.mkdir(parents=True,exist_ok=True)
-    a=subprocess.run(["git","-C",str(ROOT),"archive","b4bb727f","src","include"],capture_output=True,check=True).stdout
+    a=subprocess.run(["git","-C",str(ROOT),"archive",REV,"src","include"],capture_output=True,check=True).stdout
     subprocess.run(["tar","-x","-C",str(BASE)],input=a,check=True)
 WORK=Path(os.environ["TMPDIR"])/("dt_%d"%os.getpid())
 def compiled(tree,rel,tag):
