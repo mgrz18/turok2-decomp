@@ -4,9 +4,9 @@
 #include "structs/player.h"
 #include "structs/pickup.h"
 #include "globals/game.h"
+#include "globals/camera.h"
 
 
-extern char gEngineApp_m_Game_m_CameraPool[];
 
 void CCamera__StartFlash(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
 void CCameraPool__AddText(void *arg0, void *ui, void *resource);
@@ -17,7 +17,7 @@ void Sound__PlaySpeech(s32 callback);
 static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 sound, s32 callback) {
     CCamera__StartFlash(player->m_pCamera, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
     if (resource != NULL) {
-        CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, resource);
+        CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, resource);
     }
     if (sound != 0) {
         Sound__Play(sound, player->m_CharacterActor.header.m_vPos, 0, -1);

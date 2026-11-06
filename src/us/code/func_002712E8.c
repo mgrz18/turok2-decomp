@@ -1,5 +1,6 @@
 #include "structs/vector.h"
 #include "globals/game.h"
+#include "globals/camera.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/TEXTURE/80256220_16.CPP, func_8025842C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -361,7 +362,6 @@ typedef struct MenuMatchGlobals {
     u8 unobserved1810[0x186C - 0x1810];
     s32 regenPaused;
 } MenuMatchGlobals;
-extern MenuMatchGlobals gEngineApp_m_Game_m_CameraPool;
 extern void SndVoicePool_Update(void **arg0);
 extern void SndSeq_UpdateFade(void *arg0);
 extern u32 __osDisableInt(void);

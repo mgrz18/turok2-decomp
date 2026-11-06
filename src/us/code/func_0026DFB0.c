@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/event.h"
 #include "globals/game.h"
+#include "globals/camera.h"
 
 typedef struct {
     void (*onActor)(void *actor, void *ai, LevelEvent *event);
@@ -14,7 +15,6 @@ extern s32 gFrameCountGameplay;
 extern s32 gScene;              /* world: game state */
 extern u8 *gScene_m_pActors;              /* world + 0xE0: level actors (0x288 bytes each) */
 extern s32 gScene_m_nLevel;              /* current level */
-extern u8 gEngineApp_m_Game_m_CameraPool[];             /* game */
 
 extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, s32 arg3, f32 time);
 extern void Sound__PlaySpeech(s32 sound);
@@ -40,7 +40,7 @@ void LevelEvent_Fire(LevelEvent *event) {
     }
     if (gScene == 4) {
         if (event->message != 0) {
-            CCameraPool__AddMultiLineText(gEngineApp_m_Game_m_CameraPool, camera, gLevelMessages[event->message * 2], gFrameCountGameplay, 4.0f);
+            CCameraPool__AddMultiLineText(&gEngineApp_m_Game_m_CameraPool, camera, gLevelMessages[event->message * 2], gFrameCountGameplay, 4.0f);
             if (D_800B69DC[event->message * 2] != 0) {
                 Sound__PlaySpeech(D_800B69DC[event->message * 2]);
             }

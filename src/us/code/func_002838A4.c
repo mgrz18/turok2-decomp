@@ -3,10 +3,10 @@
 #include "structs/player.h"
 #include "structs/cinema.h"
 #include "globals/game.h"
+#include "globals/camera.h"
 
 
 extern Cinema *gCinemaPlayerP;
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern u8 gRumblePool[];
 /* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
  * gScene_m_LevelID are arrays because the ROM accesses them as struct members: a
@@ -55,7 +55,7 @@ void Cinema_Start(void) {
             player->m_WeaponActor.m_AI.m_VarBuffer[1] = 0;
             player->m_WeaponActor.m_AI.m_VarBuffer[5] = 0;
         }
-        CCameraPool__ReleaseAllTexts(gEngineApp_m_Game_m_CameraPool);
+        CCameraPool__ReleaseAllTexts(&gEngineApp_m_Game_m_CameraPool);
         RumblePool_FreeAll(gRumblePool);
     }
     if (warp != -1) {

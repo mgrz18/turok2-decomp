@@ -3,6 +3,7 @@
 #include "structs/camera.h"
 #include "structs/collision.h"
 #include "globals/game.h"
+#include "globals/camera.h"
 
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
@@ -11,7 +12,6 @@ extern f32 gSplitScreenMarginTop;          /* top, */
 extern f32 gSplitScreenMarginLeft;          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
 extern f32 gSplitScreenMarginRight;          /* right */
 extern s32 gDefaultVisBits[];        /* the visibility bits outside any region */
-extern CCameraPool gEngineApp_m_Game_m_CameraPool;  /* the camera pool */
 extern CBox gCameraViewBox;         /* the view boxes of all the active cameras together */
 extern CBox gCameraVisibleBox;         /* and their widened (animation) boxes */
 extern u32 gCameraVisBits;          /* and their visibility bits */

@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/camera.h"
 
 
 typedef struct {
@@ -19,7 +20,6 @@ typedef struct {
 
 extern u32 gFrameCountGameplay;
 extern s32 gScene;
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 void CCameraPool__AddText(void *buf, s32 a, s32 b);
 void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 
@@ -31,7 +31,7 @@ void WeaponActor_EquipRequested(CGameObjectInstance *actor, State *state) {
         state->unk2C = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->modeTable;
         state->unk108 = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->effects;
         if (gFrameCountGameplay >= 5) {
-            CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
+            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
         }
         state->unk10C = 0;
         state->unk110 = 0;

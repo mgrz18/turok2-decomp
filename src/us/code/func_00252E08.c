@@ -2,9 +2,9 @@
 #include "structs/game.h"
 #include "structs/camera.h"
 #include "globals/game.h"
+#include "globals/camera.h"
 
 extern u32 gFrameCountGameplay;          /* frame counter */
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
 
@@ -31,7 +31,7 @@ void Hud_DrawMatchClock(s32 arg0, CCamera *cam) {
     if (mins < 1.0f && secs < 30.0f && gFrameCountGameplay % 15 < 5) {
         return;
     }
-    if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
+    if (gEngineApp_m_Game_m_CameraPool.m_ActiveList.m_nCount == 1) {
         x = gScreenWidth * 0.5f;
         y = 20.0f;
     } else {

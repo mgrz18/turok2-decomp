@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/camera.h"
 
 typedef struct Picker {
     /* 0x000 */ u8 pad0[4];
@@ -39,7 +40,6 @@ extern PickupRow18 sHealthPickups[];
 extern PickupRow14 sLifeForcePickups[];
 extern PickupRow10 sItemPickups[];
 extern s32 gScene_m_LevelID;
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern u8 D_800B37BC[];
 extern u8 D_800B37CC[];
 extern u8 D_800B37D8[];
@@ -284,7 +284,7 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
         }
         CCamera__StartFlash(picker->hud, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
         if (msg != NULL) {
-            CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, picker->hud, msg);
+            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, picker->hud, msg);
         }
         if (sound != 0) {
             Sound__Play(sound, picker->x, picker->y, picker->z, 0, -1);

@@ -4,6 +4,7 @@
 #include "structs/controller.h"
 #include "structs/camera.h"
 #include "globals/game.h"
+#include "globals/camera.h"
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -46,7 +47,6 @@ extern Globals gEngineApp_m_Game_m_MenuPool;
 extern s32 gScene_m_LevelID;          /* level */
 extern f32 gFrameIncrement;          /* frame time */
 extern PortSetup D_8011AB88[];
-extern char gEngineApp_m_Game_m_CameraPool;
 extern char gPauseMenuDesc;         /* death screen */
 extern char gSavePortalMenuDesc;
 extern char gMissionFailedMenuDesc;         /* key screen */
