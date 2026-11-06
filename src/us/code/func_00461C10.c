@@ -6,15 +6,15 @@
 #include "ultra_types.h"
 s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
 s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
-s32 func_00429D1C(OSPfs *pfs);
-s32 func_00429DE4(OSPfs *pfs);
-s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+s32 __osCheckId_2(OSPfs *pfs);
+s32 __osPfsSelectBank_2(OSPfs *pfs);
+s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 static __inline__ s32 next_page(OSPfs *pfs, u8 *cbank, __OSInode *inode, __OSInodeUnit *curr) {
     s32 ret;
     u8 b;
     if (curr->inode_t.bank != *cbank) {
         *cbank = curr->inode_t.bank;
-        ret = func_004299C4(pfs, inode, 0, *cbank);
+        ret = __osPfsRWInode_2(pfs, inode, 0, *cbank);
         if (ret != 0) {
             return ret;
         }
@@ -50,12 +50,12 @@ s32 osPfsReadWriteFile_2(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_
     if ((pfs->status & 0x1) == 0) {
         return 5;
     }
-    if (func_00429D1C(pfs) == 2) {
+    if (__osCheckId_2(pfs) == 2) {
         return 2;
     }
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429DE4(pfs);
+        ret = __osPfsSelectBank_2(pfs);
         if (ret != 0) {
             return ret;
         }
@@ -98,7 +98,7 @@ s32 osPfsReadWriteFile_2(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_
         }
         if (pfs->activebank != curr_page.inode_t.bank) {
             pfs->activebank = curr_page.inode_t.bank;
-            ret = func_00429DE4(pfs);
+            ret = __osPfsSelectBank_2(pfs);
             if (ret != 0) {
                 return ret;
             }
@@ -119,7 +119,7 @@ s32 osPfsReadWriteFile_2(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_
     if (flag == 1 && (dir.status & 2) == 0) {
         dir.status |= 2;
         pfs->activebank = 0;
-        ret = func_00429DE4(pfs);
+        ret = __osPfsSelectBank_2(pfs);
         if (ret != 0) {
             return ret;
         }

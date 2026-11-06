@@ -2,7 +2,7 @@
 #include "structs/menu.h"
 #include "structs/player.h"
 
-s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
+s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
 extern struct CPlayerOptions D_8011AB18;
 
 s32 OptionsMenu_StepStickHorz_2(s32 arg0, Menu *arg1) {
@@ -18,6 +18,6 @@ s32 OptionsMenu_StepStickHorz_2(s32 arg0, Menu *arg1) {
             var_s0 = temp_v0_2;
         }
     }
-    var_s0->m_SettingX = Menu_StepValue((s32) arg1, (s32) var_s0->m_SettingX, 8, 8, 0xF8, 0);
+    var_s0->m_SettingX = Menu_StepValue_2((s32) arg1, (s32) var_s0->m_SettingX, 8, 8, 0xF8, 0);
     return 0;
 }

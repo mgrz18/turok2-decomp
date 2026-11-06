@@ -4,8 +4,8 @@
 
 #include "common.h"
 #include "ultra_types.h"
-s32 func_00429D1C(OSPfs *pfs);
-s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+s32 __osCheckId_2(OSPfs *pfs);
+s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 s32 osPfsFreeBlocks_2(OSPfs *pfs, s32 *leo_bytes) {
     __OSInode inode;
     s32 j;
@@ -16,11 +16,11 @@ s32 osPfsFreeBlocks_2(OSPfs *pfs, s32 *leo_bytes) {
     if ((pfs->status & 0x1) == 0) {
         return 5;
     }
-    if (func_00429D1C(pfs) == 2) {
+    if (__osCheckId_2(pfs) == 2) {
         return 2;
     }
     for (bank = 0; bank < pfs->banks; bank++) {
-        ret = func_004299C4(pfs, &inode, 0, bank);
+        ret = __osPfsRWInode_2(pfs, &inode, 0, bank);
         if (ret != 0) {
             return ret;
         }

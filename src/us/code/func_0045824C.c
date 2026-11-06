@@ -44,26 +44,26 @@ extern u8 D_0043B7E4[];
 extern u8 D_0043C150[];
 extern u8 D_0043B610[];
 extern u8 D_0043B5C8[];
-s32 func_0041DCB0();
-s32 func_00425D94();
-s32 func_004264D0();
-s32 func_00426D98();
-s32 func_00426D5C();
-void func_0041D948();
-s32 func_00426C74();
-void func_00426D24();
+s32 PakMenu_CheckPak_2();
+s32 Pak_FindNote_2();
+s32 Pak_ReadNote_2();
+s32 Crc32_Compute_2();
+s32 Pak_TextHasInvalidChar_2();
+void PakMenu_UpdateNoteRows_2();
+s32 Str_Compare_2();
+void Str_Copy_2();
 void CCache__Flush();
 void CCache__Deallocate();
 K7Mem *CCache__Allocate();
 void *memset();
-void MenuPool_OpenMenu();
-s32 func_00426CAC();
+void MenuPool_OpenMenu_2();
+s32 Str_Length_2();
 extern u8 D_800B45D8[];
 extern u8 D_800B45D4[];
 /* Turok 2 inlines this game/company-code check (Rage Wars calls it) */
 static inline s32 k7_chk(u8 *gc, u8 *cc) {
-    if (func_00426CAC(gc) == 4 && func_00426CAC(cc) == 2) {
-        if (func_00426C74(gc, D_800B45D8) == 0 && func_00426C74(cc, D_800B45D4) == 0) return 1;
+    if (Str_Length_2(gc) == 4 && Str_Length_2(cc) == 2) {
+        if (Str_Compare_2(gc, D_800B45D8) == 0 && Str_Compare_2(cc, D_800B45D4) == 0) return 1;
     }
     return 0;
 }
@@ -87,22 +87,22 @@ s32 PakMenu_SelectNote_2(s32 *arg0, K7Obj *arg1) {
     } else {
         s4 = arg1->f20->b4;
     }
-    if (func_0041DCB0(arg1, s4, 0) != 0) {
+    if (PakMenu_CheckPak_2(arg1, s4, 0) != 0) {
         D_801309BC = 1;
         return 1;
     }
     if (D_801309A0 == 0) goto L00407BBC;
-    s1 = func_00425D94(s4, s5, &sp48, sp38, sp20, &sp4C, sp28, sp30);
+    s1 = Pak_FindNote_2(s4, s5, &sp48, sp38, sp20, &sp4C, sp28, sp30);
     __asm__("" : : "r"(s1));
     if (s1 == 0 && sp48 == 0) {
         arg1->state = 0x14;
-        func_0041D948(arg1);
+        PakMenu_UpdateNoteRows_2(arg1);
         return 0;
     }
     v1 = k7_chk(sp30, sp28);
     if (v1 != 0) {
-        s3 = func_00426C74(sp38, D_800B45C0) == 0;
-        s0 = func_00426C74(sp38, D_800B45CC) == 0;
+        s3 = Str_Compare_2(sp38, D_800B45C0) == 0;
+        s0 = Str_Compare_2(sp38, D_800B45CC) == 0;
     } else {
         s3 = 0;
         s0 = 0;
@@ -111,12 +111,12 @@ s32 PakMenu_SelectNote_2(s32 *arg0, K7Obj *arg1) {
     if (sp48 == 0) goto L00407EE8;
     __asm__("" : : "r"(s3));
     if (s3 == 0) goto L004079A0;
-    if (func_004264D0(s4, s5, &D_80130968, 0x18) != 0) goto L0040799B;
-    if (func_00426D98(&D_80130968, 0x14, 4) != D_80130968.checksum) goto L0040799B;
+    if (Pak_ReadNote_2(s4, s5, &D_80130968, 0x18) != 0) goto L0040799B;
+    if (Crc32_Compute_2(&D_80130968, 0x14, 4) != D_80130968.checksum) goto L0040799B;
     s3 = 0;
     D_80130948 = D_80130968;
     D_801309C4 = s5;
-    MenuPool_OpenMenu(D_80119E2C, D_0043B994, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043B994, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L0040799B:
     s3 = 0;
@@ -139,14 +139,14 @@ L004079A0:
     D_800C2014 = (s32)m;
     D_800C201C = m->addr;
     memset((void *)D_800C201C, 0, s0);
-    if (func_004264D0(s4, s5, D_800C201C, sp4C << 8) != 0) goto L00407ACC;
+    if (Pak_ReadNote_2(s4, s5, D_800C201C, sp4C << 8) != 0) goto L00407ACC;
     hs = *(s32 *)D_800C201C;
     if (hs != s7) goto L00407ACC;
-    if (func_00426D98(D_800C201C, hs - 4, 0xB) != *(s32 *)(*(s32 *)D_800C201C + D_800C201C - 4)) goto L00407ACC;
+    if (Crc32_Compute_2(D_800C201C, hs - 4, 0xB) != *(s32 *)(*(s32 *)D_800C201C + D_800C201C - 4)) goto L00407ACC;
     s0 = 0;
     if (D_800F70A8 != *(s32 *)(D_800C201C + 4)) { s2 = 1; goto L00407AD0; }
     D_801309C4 = s5;
-    MenuPool_OpenMenu(D_80119E2C, D_0043B808, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043B808, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L00407ACC:
     s0 = 0;
@@ -157,8 +157,8 @@ L00407AD0:
     ch = 0;
     D_801309C4 = s5;
     d = D_800B4B1C;
-    if (func_00426D5C(sp38, 0x10) != 0) {
-        func_00426D24(sp38, D_800B48D4);
+    if (Pak_TextHasInvalidChar_2(sp38, 0x10) != 0) {
+        Str_Copy_2(sp38, D_800B48D4);
     }
     i = 1;
     v1 = 0;
@@ -179,19 +179,19 @@ L00407AD0:
         v1 += 1;
         d += 1;
     } while (v1 < 4);
-    MenuPool_OpenMenu(D_80119E2C, D_0043B9B8, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043B9B8, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L00407BBC:
     if (D_80130994 == 0) goto L00407EE8;
     if (D_801309B4 == 0) goto L00407CDC;
     if (s2 != 0) goto L00407CDC;
-    if (func_00425D94(s4, s5, &sp48, sp38, sp20, &sp4C, sp28, sp30) != 0) goto L00407EE8;
+    if (Pak_FindNote_2(s4, s5, &sp48, sp38, sp20, &sp4C, sp28, sp30) != 0) goto L00407EE8;
     if (sp48 == 0) goto L00407EE8;
-    if (func_00426C74(sp38, D_800B45C0) != 0) goto L00407EE8;
-    if (func_004264D0(s4, s5, &D_80130968, 0x18) != 0) goto L00407CD0;
-    if (func_00426D98(&D_80130968, 0x14, 4) != D_80130968.checksum) goto L00407CD0;
+    if (Str_Compare_2(sp38, D_800B45C0) != 0) goto L00407EE8;
+    if (Pak_ReadNote_2(s4, s5, &D_80130968, 0x18) != 0) goto L00407CD0;
+    if (Crc32_Compute_2(&D_80130968, 0x14, 4) != D_80130968.checksum) goto L00407CD0;
     D_80130948 = D_80130968;
-    MenuPool_OpenMenu(D_80119E2C, D_0043B970, arg1->f1C, arg1->f20, 0);
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043B970, arg1->f1C, arg1->f20, 0);
     return 1;
 L00407CD0:
     s2 = 1;
@@ -201,9 +201,9 @@ L00407CDC:
     v0 = D_801309B4;
     if (v0 != 0) goto L00407EE8;
     if (s2 != 0) goto L00407EF8;
-    if (func_00425D94(s4, s5, &sp48, sp38, sp20, &sp4C, sp28, sp30) != 0) goto L00407EE8;
+    if (Pak_FindNote_2(s4, s5, &sp48, sp38, sp20, &sp4C, sp28, sp30) != 0) goto L00407EE8;
     if (sp48 == 0) goto L00407EE8;
-    if (func_00426C74(sp38, D_800B45CC) != 0) goto L00407EE8;
+    if (Str_Compare_2(sp38, D_800B45CC) != 0) goto L00407EE8;
     s0 = sp4C;
     if (D_800C2014 != 0) {
         CCache__Flush(0);
@@ -218,12 +218,12 @@ L00407CDC:
     D_800C2014 = (s32)m;
     D_800C201C = m->addr;
     memset((void *)D_800C201C, 0, s0);
-    if (func_004264D0(s4, s5, D_800C201C, sp4C << 8) != 0) goto L00407E70;
+    if (Pak_ReadNote_2(s4, s5, D_800C201C, sp4C << 8) != 0) goto L00407E70;
     hs = *(s32 *)D_800C201C;
     if (hs != s7) goto L00407E70;
-    if (func_00426D98(D_800C201C, hs - 4, 0xB) != *(s32 *)(*(s32 *)D_800C201C + D_800C201C - 4)) goto L00407E70;
+    if (Crc32_Compute_2(D_800C201C, hs - 4, 0xB) != *(s32 *)(*(s32 *)D_800C201C + D_800C201C - 4)) goto L00407E70;
     if (D_800F70A8 != *(s32 *)(D_800C201C + 4)) goto L00407E70;
-    MenuPool_OpenMenu(D_80119E2C, D_0043B7E4, arg1->f1C, arg1->f20, 0);
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043B7E4, arg1->f1C, arg1->f20, 0);
     return 1;
 L00407E70:
     s2 = 1;
@@ -247,6 +247,6 @@ L00407EF8:
     a1p = D_0043B610;
     if (v0 != 0) a1p = D_0043B5C8;
     D_80130988 = s5;
-    MenuPool_OpenMenu(D_80119E2C, D_0043C150, arg1->f1C, arg1->f20, a1p);
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043C150, arg1->f1C, arg1->f20, a1p);
     return 1;
 }

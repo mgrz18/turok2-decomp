@@ -15,8 +15,8 @@ extern f32 gFrameIncrement; /* frame time */
 extern BlindOnePhase D_0043232C[];
 extern u8 D_801100F0[];
 extern void Animator_Update(void *slot);
-extern void BlindOne_UpdateMover(BlindOneMover *mover);
-extern s32 BlindOne_GetHealthPercent(BlindOneState *state);
+extern void BlindOne_UpdateMover_2(BlindOneMover *mover);
+extern s32 BlindOne_GetHealthPercent_2(BlindOneState *state);
 extern void COnScreen__SetBossPercent(void *hud, s32 value);
 
 void BlindOne_BossUpdate_2(void *obj, CAI *ai) {
@@ -33,8 +33,8 @@ void BlindOne_BossUpdate_2(void *obj, CAI *ai) {
     for (i = 0; i < state->faderCount; i++) {
         Animator_Update(&state->faders[i]);
     }
-    BlindOne_UpdateMover(&state->movers[0]);
-    BlindOne_UpdateMover(&state->movers[1]);
-    BlindOne_UpdateMover(&state->movers[2]);
-    COnScreen__SetBossPercent(D_801100F0, BlindOne_GetHealthPercent(state));
+    BlindOne_UpdateMover_2(&state->movers[0]);
+    BlindOne_UpdateMover_2(&state->movers[1]);
+    BlindOne_UpdateMover_2(&state->movers[2]);
+    COnScreen__SetBossPercent(D_801100F0, BlindOne_GetHealthPercent_2(state));
 }

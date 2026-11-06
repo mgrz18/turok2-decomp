@@ -31,9 +31,9 @@ extern u8 D_801100F0[];
 void AI_TurnHeadToTarget(Actor0043CF3C *actor, Level0043CF3C *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
-void Primagen_SpawnTossedObject(s16 type, s32 a1, Vec3_0043CF3C offset);
-void Primagen_UpdateHealth(Actor0043CF3C *actor, Level0043CF3C *level);
-void Primagen_UpdateSpawner(Actor0043CF3C *actor, Level0043CF3C *level);
+void Primagen_SpawnTossedObject_2(s16 type, s32 a1, Vec3_0043CF3C offset);
+void Primagen_UpdateHealth_2(Actor0043CF3C *actor, Level0043CF3C *level);
+void Primagen_UpdateSpawner_2(Actor0043CF3C *actor, Level0043CF3C *level);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
 void CAI__SetMode(Actor0043CF3C *actor, Level0043CF3C *level, s32 event);
 
@@ -87,7 +87,7 @@ void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {
         } else {
             type = WeightedTable_PickStatic(D_00431BF4);
         }
-        Primagen_SpawnTossedObject(type, 0x11D, offset);
+        Primagen_SpawnTossedObject_2(type, 0x11D, offset);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = -2324.48f;
@@ -96,7 +96,7 @@ void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {
         } else {
             type = WeightedTable_PickStatic(D_00431BF4);
         }
-        Primagen_SpawnTossedObject(type, 0x11D, offset);
+        Primagen_SpawnTossedObject_2(type, 0x11D, offset);
         offset.x = 2314.24f;
         offset.y = 0.0f;
         offset.z = 0.0f;
@@ -105,23 +105,23 @@ void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {
         } else {
             type = WeightedTable_PickStatic(D_00431C2C);
         }
-        Primagen_SpawnTossedObject(type, 0x11D, offset);
+        Primagen_SpawnTossedObject_2(type, 0x11D, offset);
         offset.x = -460.8f;
         offset.y = 0.0f;
         offset.z = -460.8f;
-        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
+        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
         offset.x = 460.8f;
         offset.y = 0.0f;
         offset.z = -460.8f;
-        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
+        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = 614.39996f;
-        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
+        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
         D_8012F608.timer3EC = 300.0f;
     }
-    Primagen_UpdateHealth(actor, level);
-    Primagen_UpdateSpawner(actor, level);
+    Primagen_UpdateHealth_2(actor, level);
+    Primagen_UpdateSpawner_2(actor, level);
     COnScreen__SetBossPercent(D_801100F0, D_8012F608.total * 100 / D_8012F608.bonus);
     if (actor->pos.y < -204.79999f) {
         D_8012F608.bossMode = 11;

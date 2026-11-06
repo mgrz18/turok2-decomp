@@ -6,7 +6,7 @@ extern s32 D_800B6D20;
 extern f32 gFrameIncrement;
 extern s32 D_800F5D2C;
 
-void func_00430250(void *);
+void func_00469250(void *);
 void CEngineApp__SetupFadeTo(void *, s32);
 
 /* Demo_UpdateChecksum (here inlined) */
@@ -30,7 +30,7 @@ void Demo_Update_2(void) {
     if (s->done == 0) {
         if (--s->countdown <= 0 || D_800F5D2C != 0) {
             s->done = 1;
-            func_00430250(&gEngineApp);
+            func_00469250(&gEngineApp);
             if (D_800F5D2C != 0) {
                 CEngineApp__SetupFadeTo(&gEngineApp, 8);
             }

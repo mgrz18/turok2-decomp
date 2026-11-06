@@ -10,10 +10,10 @@ extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 /* osPfsAllocateFile, osPfsReadWriteFile, osPfsDeleteFile and the directory refresh, at this module's link addresses */
-extern s32 func_004270A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 size, s32 *file_no);
-extern s32 func_00428C10(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
-extern s32 func_004276A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name);
-extern s32 func_00425808(s32 ch);
+extern s32 osPfsAllocateFile_2(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 size, s32 *file_no);
+extern s32 osPfsReadWriteFile_2(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+extern s32 osPfsDeleteFile_2(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name);
+extern s32 Pak_Mount_2(s32 ch);
 
 static __inline__ s32 ToUpper(s32 c) {
     if (c - 'a' < 26U) {
@@ -66,19 +66,19 @@ s32 Pak_WriteNote_2(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u
         pfs = &D_80130C80[ch];
         company_code = (company[0] << 8) | company[1];
         game_code = (code[0] << 24) | (code[1] << 16) | (code[2] << 8) | code[3];
-        result = func_004270A0(pfs, company_code, game_code, name, ext, size, file_no);
+        result = osPfsAllocateFile_2(pfs, company_code, game_code, name, ext, size, file_no);
         if (result != 0) {
             result = -1;
         }
         offset = 0;
         if (result == 0) {
-            result = func_00428C10(pfs, *file_no, 1, offset, size, data);
+            result = osPfsReadWriteFile_2(pfs, *file_no, 1, offset, size, data);
             if (result != 0) {
-                func_004276A0(pfs, company_code, game_code, name, ext);
+                osPfsDeleteFile_2(pfs, company_code, game_code, name, ext);
                 result = -1;
             }
         }
-        func_00425808(ch);
+        Pak_Mount_2(ch);
     }
     Controller_Unlock();
     return result;

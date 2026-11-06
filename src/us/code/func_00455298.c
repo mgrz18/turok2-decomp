@@ -2,7 +2,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B3FD8[];

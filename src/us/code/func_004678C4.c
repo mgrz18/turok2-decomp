@@ -4,13 +4,13 @@
 
 extern s32 D_8011ACA8;
 
-extern void func_0042DB38(CPlayer *p, s32 arg1, s32 arg2);
+extern void CPlayer__NewGame_2(CPlayer *p, s32 arg1, s32 arg2);
 extern void CAI__SetMode(void *, void *, s32);
 extern void CPlayer__Warp(CPlayer *p, s32 warp, s32 arg2, s32 respawn);
 
 void CPlayer__Activate_2(CPlayer *p, s32 arg1) {
     p->m_pOptions->m_bActive = 1;
-    func_0042DB38(p, arg1, 1);
+    CPlayer__NewGame_2(p, arg1, 1);
     CAI__SetMode(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 2);
     CPlayer__Warp(p, D_8011ACA8, 0, 1);
 }

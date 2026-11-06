@@ -9,11 +9,11 @@ extern u8 D_801198B0[];
 
 extern s32 Demo_GetPlayerCount(void);
 extern s32 SavedPlayers_IsActive(void);
-extern u8 *func_0042FE78(void *);
+extern u8 *CCameraPool__AllocCamera_2(void *);
 extern void CBarrel__Reset(void *strokes);
 extern void CPlayer__GiveStartingWeapons(CPlayer *p);
-extern void func_0042E920(CPlayer *p);
-extern void MenuPool_OpenMenu(void *, void *callback, CPlayer *p, s32 controller, s32 index);
+extern void CPlayer__ResetHealth_2(CPlayer *p);
+extern void MenuPool_OpenMenu_2(void *, void *callback, CPlayer *p, s32 controller, s32 index);
 extern void func_00438800();
 extern void func_00438728();
 extern void func_0043908C();
@@ -30,7 +30,7 @@ void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
     }
     p->m_bActive = 1;
     p->m_Data.m_nDeathmatchCharacter = character;
-    p->m_pCamera = (struct CCamera *) func_0042FE78(D_801198B0);
+    p->m_pCamera = (struct CCamera *) CCameraPool__AllocCamera_2(D_801198B0);
     CBarrel__Reset(&p->m_Barrel);
     for (i = 0; i < 0x400; i++) {
         p->m_Data.m_SpecialPickupCount[i] = 0;
@@ -81,7 +81,7 @@ void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
     p->m_Data.m_bPrimagenBossComplete = 0;
     p->m_Data.m_LevelIntroPlayedFlags = 0;
     p->m_Data.m_dwLevelFirstTimeFlags |= 1;
-    func_0042E920(p);
+    CPlayer__ResetHealth_2(p);
     flags = &D_8011AAD8;
     if (flags->multiplayer) {
         p->m_nDeathmatchString = 0;
@@ -92,12 +92,12 @@ void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
             p->m_Data.m_nDeathmatchCharacter = 0;
             p->m_bEnteringDeathmatch = 1;
             if (flags->match.teams) {
-                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_00438800, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+                MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_00438800, p, (s32) p->m_ContState.m_pContState, p->m_nController);
             } else {
-                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_00438728, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+                MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_00438728, p, (s32) p->m_ContState.m_pContState, p->m_nController);
             }
         } else {
-            MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_0043908C, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+            MenuPool_OpenMenu_2(p->m_pCamera->m_MenuPool, func_0043908C, p, (s32) p->m_ContState.m_pContState, p->m_nController);
         }
     }
 }

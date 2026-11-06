@@ -5,10 +5,10 @@
 
 extern s32 D_800B6D60;
 
-extern void func_0042EC10();
-extern void func_0042F67C();
-extern void func_0042F6E8();
-extern void func_0041B9B0(GameSettings *setup);
+extern void Demo_DecodeButtons_2();
+extern void Demo_DecodeStick_2();
+extern void Demo_DecodeMatch_2();
+extern void GameSettings_SetDefaults_2(GameSettings *setup);
 extern s32 Random_Next(void);
 static __inline__ void initSetting(DemoStream *t, DemoHeader *config, s32 index, void (*handler)(), s32 value) {
     t->bits = (u8 *)config;
@@ -44,12 +44,12 @@ void Demo_Start_2(DemoHeader *arg) {
         for (i = 0; i < 4; i++) {
             g->defaultSlot.m_bActive = 0;
             g->slots[i].m_bActive = 0;
-            initSetting(&s->buttons[i], owner, i, func_0042EC10, config->buttonsStart[i]);
-            initSetting(&s->stickX[i], owner, i, func_0042F67C, config->stickXStart[i]);
-            initSetting(&s->stickY[i], owner, i, func_0042F67C, config->stickYStart[i]);
+            initSetting(&s->buttons[i], owner, i, Demo_DecodeButtons_2, config->buttonsStart[i]);
+            initSetting(&s->stickX[i], owner, i, Demo_DecodeStick_2, config->stickXStart[i]);
+            initSetting(&s->stickY[i], owner, i, Demo_DecodeStick_2, config->stickYStart[i]);
         }
     }
-    initSetting(&s->match, owner, 0, func_0042F6E8, config->matchStart);
+    initSetting(&s->match, owner, 0, Demo_DecodeMatch_2, config->matchStart);
     s->playerCount = config->playerCount;
     s->unk1B8 = 0;
     s->countdown = config->frames;
@@ -57,7 +57,7 @@ void Demo_Start_2(DemoHeader *arg) {
     s->checksum = 0;
     D_8011AAD8.matchMode = config->matchMode;
     setup = &D_8011AAD8;
-    func_0041B9B0(setup);
+    GameSettings_SetDefaults_2(setup);
     if (s->playerCount >= 2) {
         do {
             for (i = 0; i < s->playerCount; i++) {

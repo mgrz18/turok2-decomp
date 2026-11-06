@@ -2,7 +2,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern s32 D_800C1F78;
@@ -15,7 +15,7 @@ s32 SoundMenu_MusicTrackLabel_2(MenuItem *item) {
         item->text = D_800B6600;
     } else {
         item->text = D_800B6618;
-        sprintf(&item->text[MenuItem_TextLength(item) - 2], "%2d", D_800C1F78);
+        sprintf(&item->text[MenuItem_TextLength_2(item) - 2], "%2d", D_800C1F78);
     }
     return 0;
 }

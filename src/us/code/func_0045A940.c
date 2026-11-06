@@ -6,9 +6,9 @@
 
 extern CScene gScene;
 extern s32 D_80110054;
-extern void func_0042C620(void *, int, int);
+extern void CScene__RequestWarp_2(void *, int, int);
 extern void Controller_UnwatchPak(void *);
 void func_0045A940(void *unused, void *object) {
     Controller_UnwatchPak(object);
-    func_0042C620(&gScene, D_80110054, 2);
+    CScene__RequestWarp_2(&gScene, D_80110054, 2);
 }

@@ -14,7 +14,7 @@ extern s32 D_800C2028;
 extern s32 gEngineApp;
 extern void CEngineApp__UpdateControllers(void *arg0);
 s32 PakMenu_PollBootPak_2(s32 arg0) {
-    extern s32 func_0041DCB0(s32, s32, s32);
+    extern s32 PakMenu_CheckPak_2(s32, s32, s32);
     if (D_8011B108 == 0) {
         CEngineApp__UpdateControllers(&gEngineApp);
         Controller_UpdatePakInsertion();
@@ -27,7 +27,7 @@ s32 PakMenu_PollBootPak_2(s32 arg0) {
         }
     }
     if (D_801309BC == 0) {
-        if ((D_800C2028 != -1) && (Controller_PakChanged(D_800C2028) != 0) && (func_0041DCB0(arg0, D_800C2028, 0) != 0)) {
+        if ((D_800C2028 != -1) && (Controller_PakChanged(D_800C2028) != 0) && (PakMenu_CheckPak_2(arg0, D_800C2028, 0) != 0)) {
             D_8011F13C = 0;
             D_801309BC = 1;
         }

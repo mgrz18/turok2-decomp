@@ -8,7 +8,7 @@
 
 extern u8 gScene[];
 extern u8 D_80107590[];
-extern f32 MotherBoss_GetTargetDist(void *obj, CGameObjectInstance **found);
+extern f32 MotherBoss_GetTargetDist_2(void *obj, CGameObjectInstance **found);
 extern s32 WeightedTable_PickStatic(void *a);
 extern f32 Random_Blend(f32 min, f32 max);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
@@ -40,7 +40,7 @@ void MotherBoss_DropPickupsAtSpawnPoints_2(s32 arg0, void *arg1) {
     s32 dx;
     s32 dz;
 
-    MotherBoss_GetTargetDist(D_8012FB70.obj, &found);
+    MotherBoss_GetTargetDist_2(D_8012FB70.obj, &found);
     for (i = 0; i < 4; i++) {
         type = (s16)WeightedTable_PickStatic(arg1);
         dx = Random_Blend(-15.0f, 15.0f);

@@ -5,7 +5,7 @@
 
 /* The fields this sets, far into this (large) state. */
 
-s32 func_0042C0B4(void *, s32, s32, void *, s32);   /* extern */
+s32 func_004650B4(void *, s32, s32, void *, s32);   /* extern */
 extern u8 gScene[];
 
 void func_004692CC(CEngineApp *arg0) {
@@ -13,7 +13,7 @@ void func_004692CC(CEngineApp *arg0) {
     s32 var_s1;
 
     var_s1 = -1;
-    if (func_0042C0B4(gScene, -1, -1, sp18, 1) == 0) {
+    if (func_004650B4(gScene, -1, -1, sp18, 1) == 0) {
         var_s1 = 0;
     }
     D_8011ACB0.frames = 0;

@@ -15,7 +15,7 @@ typedef struct Hud {
 extern u8 D_800B2B78[];
 extern u8 D_800B2AC4[];
 
-extern void func_0042EAD4(void);
+extern void func_00467AD4(void);
 extern void COnScreen__LoadFontTexture(void);
 extern void COnScreen__BuildCharacterLookUp(Hud *hud, u8 *anim, void *item);
 
@@ -24,7 +24,7 @@ void COnScreen__Construct_2(Hud *hud) {
     hud->unk94 = 0;
     hud->unk98 = 0;
     hud->unk9C = 0;
-    func_0042EAD4();
+    func_00467AD4();
     COnScreen__LoadFontTexture();
     COnScreen__BuildCharacterLookUp(hud, D_800B2B78, hud->unkC8);
     COnScreen__BuildCharacterLookUp(hud, D_800B2AC4, hud->unk148);

@@ -27,7 +27,7 @@ extern void Controller_SetRumbleOptionAll(s32);
 extern void memset(void *p, s32 c, s32 n); /* memset */
 extern void CPlayerContState__Init(void *, ControllerProfile *);
 extern void CPlayer__Reset(CPlayer *p);
-extern void func_0042DB38(CPlayer *p, s32 character, s32 arg2);
+extern void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2);
 
 /* CPlayer__Construct, inlined. */
 static __inline__ void initPlayer(CPlayer *p, s32 index, CPlayerOptions *options) {
@@ -77,7 +77,7 @@ void CPlayerPool__NewGame_2(PlayerList *list, s32 count, s32 arg2) {
             options = &flags->slots[i];
             initPlayer(p, i, options);
             if (options->m_bActive) {
-                func_0042DB38(p, options->m_nCharacter, 1);
+                CPlayer__NewGame_2(p, options->m_nCharacter, 1);
                 CList__Remove(list->list0, p);
                 CList__AddHead(list->list1, p);
             }
@@ -85,7 +85,7 @@ void CPlayerPool__NewGame_2(PlayerList *list, s32 count, s32 arg2) {
     } else {
         p = list->players;
         initPlayer(p, options->m_nController, options);
-        func_0042DB38(p, options->m_nCharacter, arg2);
+        CPlayer__NewGame_2(p, options->m_nCharacter, arg2);
         CList__Remove(list->list0, p);
         CList__AddHead(list->list1, p);
     }

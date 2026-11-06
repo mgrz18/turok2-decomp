@@ -12,7 +12,7 @@ typedef struct Slot {
     /* 0x18 */ u8 pad18[0x224 - 0x18];
 } Slot;
 
-void func_0042F0E4(void);
+void Demo_Update_2(void);
 extern Slot D_800F5F70[];
 static __inline__ void fire(DemoStream *t) { t->decode(t); }
 static __inline__ void tick(DemoStream *t) { if (--t->frames <= 0) t->decode(t); }
@@ -44,5 +44,5 @@ void Demo_UpdateStreams_2(void) {
             D_800F5F70[i].c = s->stickY[i].value;
         }
     }
-    func_0042F0E4();
+    Demo_Update_2();
 }

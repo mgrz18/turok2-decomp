@@ -10,13 +10,13 @@ struct RecordRecAt14 {
     s32 value;
 };
 extern s32 GetMemSize(struct RecordRecAt14 *);
-extern s32 func_00424500();
+extern s32 Video_GetResolutionText_2();
 s32 func_00453138(struct RecordRecAt14 *record) {
     if (GetMemSize(record) != 0x400000) {
         record->flags |= 0x800000;
     } else {
         record->flags &= ~0x800000;
     }
-    record->value = func_00424500();
+    record->value = Video_GetResolutionText_2();
     return 0;
 }

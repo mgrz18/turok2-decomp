@@ -3,9 +3,9 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-s32 func_0041DCB0(void *event, s32 port, s32 arg2);
-char *func_0041DB7C(void *event);
-void MenuPool_OpenMenu(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
+s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
+char *PakMenu_GetReturnMenu_2(void *event);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
 extern char D_0043BDF0[];
 extern char D_0043BE14[];
@@ -25,11 +25,11 @@ static __inline__ s32 GetPort(Menu *event) {
 }
 
 static __inline__ void ShowEvent(Menu *event) {
-    if (func_0041DCB0(event, GetPort(event), 1) != 0) {
+    if (PakMenu_CheckPak_2(event, GetPort(event), 1) != 0) {
         D_801309BC = 1;
-        MenuPool_OpenMenu(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
     } else {
-        MenuPool_OpenMenu(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
     }
 }
 
@@ -55,7 +55,7 @@ s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
                 D_8011F148 = 1;
                 return 1;
             }
-            text = func_0041DB7C(event);
+            text = PakMenu_GetReturnMenu_2(event);
             if (text == NULL) {
                 text = event->context;
             }
@@ -67,7 +67,7 @@ s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
             } else {
                 dst = D_80119E2C;
             }
-            MenuPool_OpenMenu(dst, text, event->player, (s32) event->controller, NULL);
+            MenuPool_OpenMenu_2(dst, text, event->player, (s32) event->controller, NULL);
             break;
     }
     return 1;

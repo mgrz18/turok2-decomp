@@ -32,7 +32,7 @@ extern u8 D_0043BE14[];
 void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, s32 b);
 CPlayer *CPlayerPool__FindByController(void *a, void *b);
-void MenuPool_OpenMenu(void *a, void *b, s32 c, s32 d, s32 e);
+void MenuPool_OpenMenu_2(void *a, void *b, s32 c, s32 d, s32 e);
 
 s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
     struct {
@@ -68,14 +68,14 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
         D_8011B108 = 0;
         D_8011F144 = 1;
         D_8011B114 = 0;
-        MenuPool_OpenMenu(D_80119E2C, D_0043B658, 0, (s32)arg->controller, 0);
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043B658, 0, (s32)arg->controller, 0);
         return 1;
     }
     if (D_801309B4 != 0) {
         if (D_80130994 != 0) {
             D_801309BC = 1;
             plr = CPlayerPool__FindByController(&D_80119870.m_PlayerList, arg->controller);
-            MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + 0x53C, D_00438728, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, D_00438728, (s32)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         if (D_80130984 != 0) {
@@ -99,7 +99,7 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
                 tbl = D_0043AC0C;
                 break;
             }
-            MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + 0x53C, tbl, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+            MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, tbl, (s32)plr, plr->m_ContState.m_pContState, mm.m);
             return 1;
         }
         return 0;
@@ -107,14 +107,14 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
     plr = CPlayerPool__FindByController(&D_80119870.m_PlayerList, arg->controller);
     if (D_80130994 != 0) {
         D_801309BC = 1;
-        MenuPool_OpenMenu(D_80119870.m_MenuPool, D_004390B0, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+        MenuPool_OpenMenu_2(D_80119870.m_MenuPool, D_004390B0, (s32)plr, plr->m_ContState.m_pContState, mm.m);
         return 1;
     }
     if (D_80130984 == 0) {
         return 0;
     } else {
         D_801309BC = 1;
-        MenuPool_OpenMenu(((u8 *)plr->m_pCamera) + 0x53C, D_0043BE14, (s32)plr, plr->m_ContState.m_pContState, mm.m);
+        MenuPool_OpenMenu_2(((u8 *)plr->m_pCamera) + 0x53C, D_0043BE14, (s32)plr, plr->m_ContState.m_pContState, mm.m);
         D_80130940 = 0;
         return 1;
     }

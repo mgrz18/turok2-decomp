@@ -22,13 +22,13 @@ extern u8 D_0043BB68[];
 extern u8 D_0043BF7C[];
 extern u8 D_0043BB20[];
 extern u8 D_0043B5EC[];
-void func_004263A0(s32 ch);
-s32 func_0042647C(s32 ch);
-s32 func_004264B4(s32 ch);
-s32 func_00426AF8(s32 ch);
-void func_0041D948(Menu *o);
-u32 func_00426D98(u8 *data, s32 len, u32 crc);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
+void Pak_ProbeSlot_2(s32 ch);
+s32 Pak_GetStatus_2(s32 ch);
+s32 Pak_IsRumblePak_2(s32 ch);
+s32 Pak_NeedsRepair_2(s32 ch);
+void PakMenu_UpdateNoteRows_2(Menu *o);
+u32 Crc32_Compute_2(u8 *data, s32 len, u32 crc);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, s32 d, void *e);
 extern u8 D_80130974[8];
 extern u8 D_0043ABA0[];
 extern u8 D_0043ABC4[];
@@ -90,26 +90,26 @@ void PakMenu_InitSaveProfile_2(Menu *own) {
     msg = O01Pick(&sel);
     if (D_800C2020 != 0) {
         D_801309BC = 1;
-        MenuPool_OpenMenu((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu_2((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
     } else {
         if (D_80130990 != 0) {
             pad = D_800C2028;
         } else {
             pad = own->controller->port;
         }
-        func_004263A0(pad);
-        if (func_0042647C(sel.v) == 0) {
+        Pak_ProbeSlot_2(pad);
+        if (Pak_GetStatus_2(sel.v) == 0) {
             O01Capture(plr);
-            D_80130968.checksum = func_00426D98((u8 *)&D_80130968, 0x14, 4);
-            func_0041D948(own);
+            D_80130968.checksum = Crc32_Compute_2((u8 *)&D_80130968, 0x14, 4);
+            PakMenu_UpdateNoteRows_2(own);
         } else {
             D_801309BC = 1;
-            if (func_004264B4(sel.v) != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BB68, plr, plr->m_ContState.m_pContState, msg);
-            } else if (func_00426AF8(sel.v) != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, plr, plr->m_ContState.m_pContState, D_0043B5EC);
+            if (Pak_IsRumblePak_2(sel.v) != 0) {
+                MenuPool_OpenMenu_2(D_80119E2C, D_0043BB68, plr, plr->m_ContState.m_pContState, msg);
+            } else if (Pak_NeedsRepair_2(sel.v) != 0) {
+                MenuPool_OpenMenu_2(D_80119E2C, D_0043BF7C, plr, plr->m_ContState.m_pContState, D_0043B5EC);
             } else {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BB20, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu_2(D_80119E2C, D_0043BB20, plr, plr->m_ContState.m_pContState, msg);
             }
         }
     }

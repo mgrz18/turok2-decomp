@@ -2,13 +2,13 @@
 #include "structs/demo.h"
 
 extern void *D_00438408[]; /* NULL-terminated list */
-extern void func_0042EE4C(void *entry);
+extern void Demo_Start_2(void *entry);
 
 void Demo_PlayNext_2(void) {
     DemoPlayer *s = &D_800F56B0;
 
     if (s->active) {
-        func_0042EE4C(D_00438408[s->index]);
+        Demo_Start_2(D_00438408[s->index]);
         s->index++;
         if (D_00438408[s->index] == NULL) {
             s->index = 0;

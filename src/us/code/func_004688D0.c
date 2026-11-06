@@ -20,8 +20,8 @@ void CCameraViewParams__Construct(void *);
 void CMtxF__Identity(void *);
 void CCamera__ResetWarp(CCamera *);
 void CCamera__SetMode(CCamera *, s32);
-void MenuPool_Construct(void *);
-void func_0042FF10(void *);
+void MenuPool_Construct_2(void *);
+void CEmitterPool__Construct_2(void *);
 void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
 void CCamera__ConstructSkySystem(CCamera *);
 
@@ -105,8 +105,8 @@ void CCamera__Construct_2(CCamera *view) {
         view->m_vp[i].vtrans[2] = 0;
         view->m_vp[i].vtrans[3] = 0;
     }
-    MenuPool_Construct(view->m_MenuPool);
-    func_0042FF10(view->m_SkySystem);
+    MenuPool_Construct_2(view->m_MenuPool);
+    CEmitterPool__Construct_2(view->m_SkySystem);
     CMtxF__Identity(view->m_mfFaceScreen);
     CMtxF__Identity(view->m_mfFaceScreenYAxisUp);
     view->m_FlashMode = 0;

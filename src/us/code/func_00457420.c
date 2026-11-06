@@ -31,23 +31,23 @@ extern u8 D_0043C108[];
 extern u8 D_0043C0E4[];
 s32 Controller_AnyConnected(void);
 void CEngineApp__UpdateControllers(u8 *a);
-s32 func_00426C74(u8 *a, char *b);
-void func_004263A0(s32 a);
-s32 func_0042647C(s32 a);
-s32 func_0042662C(s32 a, s32 *b);
-s32 func_004266C0(s32 a, s32 *b);
-void func_00426898(s32 a, s32 b, s32 *c);
-s32 func_00426AF8(s32 a);
-void func_00426BA8(s32 a, u8 *b, s32 c);
+s32 Str_Compare_2(u8 *a, char *b);
+void Pak_ProbeSlot_2(s32 a);
+s32 Pak_GetStatus_2(s32 a);
+s32 Pak_CountEmptyNotes_2(s32 a, s32 *b);
+s32 Pak_GetFreePages_2(s32 a, s32 *b);
+void Pak_GetNoteGameName_2(s32 a, s32 b, s32 *c);
+s32 Pak_NeedsRepair_2(s32 a);
+void func_0045FBA8(s32 a, u8 *b, s32 c);
 s32 Pak_BytesToPages_2(s32 a);
-void func_0041D948(Menu *o);
-s32 func_0041E294(Menu *o, s32 a, s32 *b, s32 *c);
-void MenuPool_OpenMenu(u8 *a, u8 *b, s32 c, ControllerProfile *d, void *e);
+void PakMenu_UpdateNoteRows_2(Menu *o);
+s32 PakMenu_CheckSlotForSave_2(Menu *o, s32 a, s32 *b, s32 *c);
+void MenuPool_OpenMenu_2(u8 *a, u8 *b, s32 c, ControllerProfile *d, void *e);
 
 #define PAK_ERROR()                                                        \
     D_801309BC = 1;                                                        \
     D_8011F144 = 0;                                                        \
-    MenuPool_OpenMenu(D_80119E2C, D_0043BBD4, arg0->player, arg0->controller, NULL); \
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043BBD4, arg0->player, arg0->controller, NULL); \
     D_8011F13C = 0;                                                        \
     D_800C202C = 1;
 
@@ -66,7 +66,7 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
     if (Controller_AnyConnected() == 0) {
         D_801309BC = 1;
         D_8011F144 = 0;
-        MenuPool_OpenMenu(D_80119E2C, D_0043BC1C, arg0->player, arg0->controller, NULL);
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043BC1C, arg0->player, arg0->controller, NULL);
         D_800C202C = 1;
         D_8011F13C = 0;
         return;
@@ -75,8 +75,8 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
     if (D_800C2028 == -1) {
         s1 = 0;
         do {
-            func_004263A0(s0);
-            if (func_0042647C(s0) != -2) {
+            Pak_ProbeSlot_2(s0);
+            if (Pak_GetStatus_2(s0) != -2) {
                 break;
             }
             s0++;
@@ -94,7 +94,7 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
             return;
         }
     }
-    if (func_00426AF8(D_800C2028) != 0) {
+    if (Pak_NeedsRepair_2(D_800C2028) != 0) {
         goto blk59;
     }
     CEngineApp__UpdateControllers(gEngineApp);
@@ -104,8 +104,8 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
     }
     D_800C202C = 1;
     if (D_8011B114 != 0 || D_8011B108 != 0) {
-        func_004263A0(D_800C2028);
-        if (func_0042647C(D_800C2028) != -2) {
+        Pak_ProbeSlot_2(D_800C2028);
+        if (Pak_GetStatus_2(D_800C2028) != -2) {
             goto fin;
         }
         PAK_ERROR()
@@ -117,7 +117,7 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
     sp28 = D_800C2028;
     do {
         if (D_800C2028 != -1) {
-            s3 = func_0041E294(arg0, D_800C2028, &sp28, &sp2C);
+            s3 = PakMenu_CheckSlotForSave_2(arg0, D_800C2028, &sp28, &sp2C);
             if (s3 != 0) {
                 goto found;
             }
@@ -131,8 +131,8 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
         }
         s1 = 0;
         do {
-            func_004263A0(s0);
-            if (func_0042647C(s0) != -2) {
+            Pak_ProbeSlot_2(s0);
+            if (Pak_GetStatus_2(s0) != -2) {
                 break;
             }
             s0++;
@@ -149,8 +149,8 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
     } while (s2 < 4);
     if (s3 == 0) {
         D_800C2028 = sp28;
-        func_004263A0(sp28);
-        if (func_0042647C(D_800C2028) == -2) {
+        Pak_ProbeSlot_2(sp28);
+        if (Pak_GetStatus_2(D_800C2028) == -2) {
             PAK_ERROR()
             return;
         }
@@ -159,9 +159,9 @@ found:
     s1 = D_800C2028;
     s0 = 0;
     do {
-        func_00426898(s1, s0, &sp30);
-        func_00426BA8(sp30, buf, 0x10);
-        if (func_00426C74(buf, D_800B45C0) == 0) {
+        Pak_GetNoteGameName_2(s1, s0, &sp30);
+        func_0045FBA8(sp30, buf, 0x10);
+        if (Str_Compare_2(buf, D_800B45C0) == 0) {
             f1 = 1;
             goto L2;
         }
@@ -172,9 +172,9 @@ L2:
     s1 = D_800C2028;
     s0 = 0;
     do {
-        func_00426898(s1, s0, &sp34);
-        func_00426BA8(sp34, buf, 0x10);
-        if (func_00426C74(buf, D_800B45CC) == 0) {
+        Pak_GetNoteGameName_2(s1, s0, &sp34);
+        func_0045FBA8(sp34, buf, 0x10);
+        if (Str_Compare_2(buf, D_800B45CC) == 0) {
             v0 = 1;
             goto L3;
         }
@@ -188,10 +188,10 @@ L3:
     if (v0 != 0) {
         goto fin;
     }
-    if (func_004266C0(D_800C2028, &sp38) != 0) {
+    if (Pak_GetFreePages_2(D_800C2028, &sp38) != 0) {
         goto blk59;
     }
-    s0 = func_0042662C(D_800C2028, &sp3C);
+    s0 = Pak_CountEmptyNotes_2(D_800C2028, &sp3C);
     if (s0 != 0) {
         goto blk59;
     }
@@ -203,7 +203,7 @@ L3:
     if (sp38 < m1) {
         D_801309BC = 1;
         D_8011B108 = 1;
-        MenuPool_OpenMenu(D_80119E2C, D_0043C108, arg0->player, arg0->controller, D_0043B658);
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043C108, arg0->player, arg0->controller, D_0043B658);
         goto after;
     }
     if (sp38 < r2) {
@@ -213,7 +213,7 @@ L3:
 L56:
     D_801309BC = 1;
     D_8011B108 = 1;
-    MenuPool_OpenMenu(D_80119E2C, D_0043C0E4, arg0->player, arg0->controller, D_0043B658);
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043C0E4, arg0->player, arg0->controller, D_0043B658);
 after:
     if (s0 == 0) {
         goto fin;
@@ -221,10 +221,10 @@ after:
 blk59:
     D_801309BC = 1;
     D_8011B108 = 1;
-    MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, arg0->player, arg0->controller, D_0043B658);
+    MenuPool_OpenMenu_2(D_80119E2C, D_0043BF7C, arg0->player, arg0->controller, D_0043B658);
 fin:
     if (D_801309BC == 0) {
-        func_0041D948(arg0);
+        PakMenu_UpdateNoteRows_2(arg0);
     }
     D_8011F13C = 0;
     D_800C202C = 1;

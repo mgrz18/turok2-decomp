@@ -6,7 +6,7 @@
 extern char D_800A9A00[]; /* "Cameras" */
 extern char D_800A9A08[]; /* "Camera Texts" */
 
-void func_0042F8D0(void *);
+void CCamera__Construct_2(void *);
 void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 s32 CList__AddTail(CList *list, void *node);
 void Sound__SetListener(void *);
@@ -39,7 +39,7 @@ void CCameraPool__NewGame_2(CCameraPool *owner, s32 count) {
     owner->m_ActiveLastFrame = 0;
     owner->m_bActiveChanged = 0;
     owner->m_MainCamera.m_Index = 0;
-    func_0042F8D0(&owner->m_MainCamera);
+    CCamera__Construct_2(&owner->m_MainCamera);
     owner->m_bActiveChanged = 2;
     CList__Construct(&owner->m_ShakeFreeList, 0, 4);
     CList__Construct(&owner->m_ShakeActiveList, 0, 4);

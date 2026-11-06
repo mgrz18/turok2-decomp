@@ -5,7 +5,7 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef signed int s32;
 extern s32 D_80130C60[];
-s32 func_00425D94(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
+s32 Pak_FindNote_2(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
 s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext) {
     s32 mask = 0;
     s32 i;
@@ -19,7 +19,7 @@ s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext) {
         return -2;
     }
     for (i = 0; i < 16; i++) {
-        if (func_00425D94(pad, i, &valid, name, ext, &blocks, company, game) != 0) {
+        if (Pak_FindNote_2(pad, i, &valid, name, ext, &blocks, company, game) != 0) {
             return -1;
         }
         if (valid != 0) {

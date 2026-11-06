@@ -9,7 +9,7 @@
 
 extern u8 gScene[];
 
-s32 func_0042C0B4(void *level, s32 a, s32 id, void *out, s32 flags);
+s32 func_004650B4(void *level, s32 a, s32 id, void *out, s32 flags);
 
 void func_00469374(CEngineApp *game, s32 warpId) {
     u8 sp18[0x18];
@@ -17,7 +17,7 @@ void func_00469374(CEngineApp *game, s32 warpId) {
 
     id = warpId;
 
-    if (func_0042C0B4(gScene, -1, id, sp18, 1) == 0) {
+    if (func_004650B4(gScene, -1, id, sp18, 1) == 0) {
         id = 0;
     }
     D_8011ACB0.frames = 0;

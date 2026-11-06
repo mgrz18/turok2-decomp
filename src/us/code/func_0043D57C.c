@@ -80,10 +80,10 @@ f32 Random_Blend(f32 lo, f32 hi);
 s32 CInstancePool__Spawn(void *a0, s32 a1, s32 model, s32 handle, s32 region, Vec3_0040457C pos, f32 a6,
                   Vec3_0040457C rot, Vec3_0040457C scale, s32 a9);
 void AI_UpdateTargets(Entity0040457C *actor, void *level, Info0040457C *info, s32 a3, s32 a4);
-void Primagen_NextSpawnStep(void);
-void Primagen_RunSpawnStep(Entity0040457C *actor, void *level, s32 a2);
-void Primagen_NextSoundStep(void);
-void Primagen_RunSoundStep(Entity0040457C *actor, void *level, s32 a2);
+void Primagen_NextSpawnStep_2(void);
+void Primagen_RunSpawnStep_2(Entity0040457C *actor, void *level, s32 a2);
+void Primagen_NextSoundStep_2(void);
+void Primagen_RunSoundStep_2(Entity0040457C *actor, void *level, s32 a2);
 
 static __inline__ Wave0040457C *CurrentWave(void) {
     return (Wave0040457C *)(D_8012F608.wave * sizeof(Wave0040457C) + (s32)D_8012F608.waves);
@@ -206,13 +206,13 @@ void Primagen_UpdateSpawner_2(Entity0040457C *actor, void *level) {
     AI_UpdateTargets(actor, level, &info, 0, 1);
     *flags &= ~0x8000;
     if (D_8012F608.wave == -1) {
-        Primagen_NextSpawnStep();
+        Primagen_NextSpawnStep_2();
     }
-    Primagen_RunSpawnStep(actor, level, info.unk24);
+    Primagen_RunSpawnStep_2(actor, level, info.unk24);
     if (D_8012F608.unk420 == -1) {
-        Primagen_NextSoundStep();
+        Primagen_NextSoundStep_2();
     }
-    Primagen_RunSoundStep(actor, level, info.unk24);
+    Primagen_RunSoundStep_2(actor, level, info.unk24);
     if (D_8012F608.waves != NULL) {
         if (D_8012F608.enemiesAlive == 0) {
             wave = CurrentWave();

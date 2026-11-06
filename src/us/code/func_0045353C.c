@@ -16,10 +16,10 @@ extern u8 gScene[];
 extern s32 Controller_ConfirmPressed(s32 pad);
 extern s32 Controller_MenuLeft(s32 pad);
 extern s32 Controller_MenuRight(s32 pad);
-extern void Menu_ClaimPressingController(Menu *c);
+extern void Menu_ClaimPressingController_2(Menu *c);
 extern void CEngineApp__SetupFadeTo(void *game, s32 mode);
 extern void CEngineApp__StartGameAtWarp(void *game, s32 level);
-extern void func_0042C620(void *level, s32 id, s32 how);
+extern void CScene__RequestWarp_2(void *level, s32 id, s32 how);
 
 static __inline__ u32 levelKey(s32 level) {
     u32 bit;
@@ -128,17 +128,17 @@ s32 CheatsMenu_WarpSelect_2(void *menu, Menu *c) {
         if (id == 8000) {
             PROGRESS->multiplayer = 0;
             PROGRESS->playerCount = 1;
-            Menu_ClaimPressingController(c);
+            Menu_ClaimPressingController_2(c);
             CEngineApp__SetupFadeTo(&gEngineApp, 16);
             return 1;
         }
         if (D_80119870.m_Settings.mode == 13) {
-            func_0042C620(gScene, id, 2);
+            CScene__RequestWarp_2(gScene, id, 2);
             return 0;
         }
         PROGRESS->multiplayer = 0;
         PROGRESS->playerCount = 1;
-        Menu_ClaimPressingController(c);
+        Menu_ClaimPressingController_2(c);
         CEngineApp__StartGameAtWarp(&gEngineApp, id);
         return 1;
     }

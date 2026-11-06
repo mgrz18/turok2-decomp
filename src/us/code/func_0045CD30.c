@@ -22,7 +22,7 @@ extern s32 D_801198E8;
 
 s32 GetMemSize(void); /* osGetMemSize */
 void osViSetSpecialFeatures(u32 features); /* osViSetSpecialFeatures */
-void func_0042456C(s32 width, s32 height, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+void Video_SetMode_2(s32 width, s32 height, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 
 void Video_ApplyResolution_2(void) {
     s32 *mode = NULL;
@@ -54,7 +54,7 @@ void Video_ApplyResolution_2(void) {
         D_800AB89C = extra.v[3];
         D_800C2030 = mode[0];
         D_800C2034 = mode[1];
-        func_0042456C(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
+        Video_SetMode_2(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
         osViSetSpecialFeatures(D_800C2044 ? 0x40 : 0x80);
         osViSetSpecialFeatures(0x20);
         osViSetSpecialFeatures(2);

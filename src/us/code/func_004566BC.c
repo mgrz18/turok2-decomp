@@ -7,8 +7,8 @@
 
 
 s32 CPlayerPool__GetIndex(void *state, void *player);
-void func_0041BBB0(void *options);
-void MenuItem_SelectSubmenu(void *menu, Menu *event, void *arg2);
+void PlayerOptions_SetDefaultName_2(void *options);
+void MenuItem_SelectSubmenu_2(void *menu, Menu *event, void *arg2);
 
 s32 NameEntryMenu_Confirm_2(void *menu, Menu *event, void *arg2) {
     u8 *player = event->player;
@@ -30,8 +30,8 @@ s32 NameEntryMenu_Confirm_2(void *menu, Menu *event, void *arg2) {
     }
     *dst = '\0';
     if (count == 0) {
-        func_0041BBB0(*(void **)(player + 0x518));
+        PlayerOptions_SetDefaultName_2(*(void **)(player + 0x518));
     }
-    MenuItem_SelectSubmenu(menu, event, arg2);
+    MenuItem_SelectSubmenu_2(menu, event, arg2);
     return 1;
 }

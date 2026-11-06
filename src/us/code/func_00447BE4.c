@@ -5,10 +5,10 @@
 
 extern BlindOnePhase D_0043232C[];
 extern BlindOneStep D_00432260[]; /* the script */
-extern void BlindOne_EnterPhase(BlindOneState *m, s32 cmd);
+extern void BlindOne_EnterPhase_2(BlindOneState *m, s32 cmd);
 
 void BlindOne_StartScript_2(BlindOneState *m, CGameObjectInstance *leader) {
     m->boss = leader;
     m->script = D_00432260;
-    BlindOne_EnterPhase(m, D_00432260[0].id);
+    BlindOne_EnterPhase_2(m, D_00432260[0].id);
 }

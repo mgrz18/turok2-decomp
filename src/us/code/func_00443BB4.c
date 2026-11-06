@@ -20,7 +20,7 @@ extern s32 D_00431D10[]; /* active slot mask per phase */
 extern s32 D_00431D1C[];
 extern u8 D_00431D28[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
-extern void MotherBoss_OnPhase2CinemaDone(void);
+extern void MotherBoss_OnPhase2CinemaDone_2(void);
 extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
@@ -64,5 +64,5 @@ void MotherBoss_StartPhase2Cinema_2(void *obj, CAI *ai) {
         actor->m_AI.m_Mother.m_PulseScale = 0.0f;
     }
     enterPhase2(&D_8012FB70, ai);
-    Cinema_SetNextCallbacks(0xDC, MotherBoss_OnPhase2CinemaDone, NULL);
+    Cinema_SetNextCallbacks(0xDC, MotherBoss_OnPhase2CinemaDone_2, NULL);
 }

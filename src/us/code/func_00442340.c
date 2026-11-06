@@ -14,10 +14,10 @@ extern void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
 extern void ScriptAnimator_Start(void *slot, void *obj);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 event);
 extern void EnemyAI_HeadNodeCallback();
-extern void func_00408FF8();
-extern void MotherBoss_Step();
-extern void MotherBoss_Draw();
-extern void MotherBoss_Collision();
+extern void func_00441FF8();
+extern void MotherBoss_Step_2();
+extern void MotherBoss_Draw_2();
+extern void MotherBoss_Collision_2();
 
 void MotherBoss_Init_2(CGameObjectInstance *obj, CAI *ai) {
     MotherBossState *state = &D_8012FB70;
@@ -35,11 +35,11 @@ void MotherBoss_Init_2(CGameObjectInstance *obj, CAI *ai) {
     state->controller->m_AI.m_Mother.m_bActive = 1;
     state->intel = CScene__FindIntelligence(gScene, 1, 0x1DB1);
     ai->m_pModeTable = (struct CAIModeInfo *) D_00431E20;
-    ai->m_pfStep = MotherBoss_Step;
-    ai->m_pfHurt = (u8 *)func_00408FF8 + 8;
+    ai->m_pfStep = MotherBoss_Step_2;
+    ai->m_pfHurt = (u8 *)func_00441FF8 + 8;
     ai->m_pfEffects = EnemyAI_HeadNodeCallback;
-    ai->m_pfCollision = MotherBoss_Collision;
-    ai->m_pfDraw = MotherBoss_Draw;
+    ai->m_pfCollision = MotherBoss_Collision_2;
+    ai->m_pfDraw = MotherBoss_Draw_2;
     CAI__SetMode(obj, ai, 0);
     D_8012FB70.obj = obj;
     D_800F1F10[0] &= ~0x300;

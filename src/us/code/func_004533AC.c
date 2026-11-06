@@ -343,10 +343,10 @@ struct GameSession {
     s32 selectionActive;
 };
 extern GameSession gEngineApp;
-extern void func_00430250(void *);
+extern void func_00469250(void *);
 s32 GameOverMenu_Poll_2(void) {
     if (D_8011ACC0 <= 0.0f) {
-        func_00430250(&gEngineApp);
+        func_00469250(&gEngineApp);
         return 1;
     }
     return 0;

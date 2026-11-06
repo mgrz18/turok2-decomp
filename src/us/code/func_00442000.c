@@ -9,7 +9,7 @@
  * state starts. */
 
 extern u8 D_00431D74[];
-extern void MotherBoss_StartSpotAnims(void *obj, void *sound, s32 a2);
+extern void MotherBoss_StartSpotAnims_2(void *obj, void *sound, s32 a2);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
 void MotherBoss_Hurt_2(void *obj, CAI *ai, DamageEvent *hit) {
@@ -105,7 +105,7 @@ void MotherBoss_Hurt_2(void *obj, CAI *ai, DamageEvent *hit) {
     idx = state->slots[slot].health >= hit->damage ? hit->damage : state->slots[slot].health;
     state->slots[slot].health -= idx;
     state->health -= idx;
-    MotherBoss_StartSpotAnims(obj, D_00431D74, sound);
+    MotherBoss_StartSpotAnims_2(obj, D_00431D74, sound);
     if (state->slots[slot].health > 0) {
         return;
     }

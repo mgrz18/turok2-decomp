@@ -16,12 +16,12 @@ extern char D_800B45D4[];
 extern char D_800B45C0[];
 extern char D_800B45CC[];
 
-s32 func_00425D94(s32 mode, s32 index, s32 *valid, char *name, void *arg4, s32 *arg5, char *arg6, char *arg7);
-s32 func_00426CAC(char *s);
-s32 func_00426C74(char *a, char *b);
+s32 Pak_FindNote_2(s32 mode, s32 index, s32 *valid, char *name, void *arg4, s32 *arg5, char *arg6, char *arg7);
+s32 Str_Length_2(char *s);
+s32 Str_Compare_2(char *a, char *b);
 
 static __inline__ s32 isSpecial(char *a, char *b) {
-    if (func_00426CAC(b) == 4 && func_00426CAC(a) == 2 && func_00426C74(b, D_800B45D8) == 0 && func_00426C74(a, D_800B45D4) == 0) {
+    if (Str_Length_2(b) == 4 && Str_Length_2(a) == 2 && Str_Compare_2(b, D_800B45D8) == 0 && Str_Compare_2(a, D_800B45D4) == 0) {
         return 1;
     }
     return 0;
@@ -54,19 +54,19 @@ void PakMenu_UpdateNoteRows_2(Menu *event) {
         mode = event->controller->port;
     }
     for (i = 0; i < 16; i++) {
-        failed = func_00425D94(mode, i, &valid, name, sp20, &sp4C, a, b);
+        failed = Pak_FindNote_2(mode, i, &valid, name, sp20, &sp4C, a, b);
         enabled = 1;
         if (failed == 0 && valid != 0) {
             switch (D_800C2024) {
             case 1:
                 special = isSpecial(a, b);
-                if (func_00426C74(name, D_800B45C0) == 0 && special) {
+                if (Str_Compare_2(name, D_800B45C0) == 0 && special) {
                     enabled = 0;
                 }
                 break;
             case 2:
                 special = isSpecial(a, b);
-                if (func_00426C74(name, D_800B45CC) == 0 && special) {
+                if (Str_Compare_2(name, D_800B45CC) == 0 && special) {
                     enabled = 0;
                 }
                 break;

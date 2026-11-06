@@ -11,8 +11,8 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 s32 Animator_Update(s32);
-s32 BlindOne_UpdateMover(s32);
-s32 BlindOne_GetHealthPercent(s32);
+s32 BlindOne_UpdateMover_2(s32);
+s32 BlindOne_GetHealthPercent_2(s32);
 s32 COnScreen__SetBossPercent(s32 *, s32);
 extern s32 D_00432330;
 extern s32 D_801100F0;
@@ -40,8 +40,8 @@ void BlindOne_UpdateFight_2(void *arg0)
     }
     while (var_s0 < (*((s32 *) (((s8 *) arg0) + 0x4EC))));
   }
-  BlindOne_UpdateMover((s32) (arg0 + 0x518));
-  BlindOne_UpdateMover((s32) (arg0 + 0x530));
-  BlindOne_UpdateMover((s32) (arg0 + 0x548));
-  COnScreen__SetBossPercent(&D_801100F0, BlindOne_GetHealthPercent((s32) arg0));
+  BlindOne_UpdateMover_2((s32) (arg0 + 0x518));
+  BlindOne_UpdateMover_2((s32) (arg0 + 0x530));
+  BlindOne_UpdateMover_2((s32) (arg0 + 0x548));
+  COnScreen__SetBossPercent(&D_801100F0, BlindOne_GetHealthPercent_2((s32) arg0));
 }

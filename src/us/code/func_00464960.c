@@ -42,13 +42,13 @@ extern s32 ProPackDecompress(Handle **handle, s32);
 extern s32 CScene__GetRegion(CScene *world, s32);
 extern Handle *CCache__AllocateMemoryForDecompression(s32, Handle **handle, s32 size);
 extern void CUSet__Transpose(LevelNode *node, void *data, s32);
-extern s32 func_0042C480(CScene *world, CVector3 *pos, s32 group, void *info);
-extern s32 func_0042C0B4(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
+extern s32 func_00465480(CScene *world, CVector3 *pos, s32 group, void *info);
+extern s32 func_004650B4(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
 extern s32 *CScene__GetIntelligence(CScene *world, u16 id);
 extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, LevelRecord *rec, s32 mode, s32 index);
 extern s32 CScene__FindRegionAt(CScene *world, CVector3 *pos);
 extern void Angle_Wrap(f32 *angle);
-extern void func_0042D980(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
+extern void CPlayer__SetupActors_2(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00267DBC(CGameObjectInstance *obj);
 extern s32 func_00267D94(CGameObjectInstance *obj);
 extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
@@ -97,7 +97,7 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
             records = node->records;
             objects = hdr->objects;
             if (world->m_bWarpSpawn == 0) {
-                world->m_LevelID = func_0042C480(world, &node->records[0].pos, world->m_nLevel, &world->m_WarpSpawn);
+                world->m_LevelID = func_00465480(world, &node->records[0].pos, world->m_nLevel, &world->m_WarpSpawn);
                 if (world->m_LevelID != 0) {
                     world->m_bWarpSpawn = 1;
                 }
@@ -105,7 +105,7 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
             spawnIndex = 0;
             nspawns = 0;
             if (world->m_bWarpSpawn != 0) {
-                nspawns = func_0042C0B4(world, world->m_nLevel, world->m_LevelID, spawns, 4);
+                nspawns = func_004650B4(world, world->m_nLevel, world->m_LevelID, spawns, 4);
             }
             world->m_pActors = (CGameObjectInstance *)objects;
             world->m_nActors = n;
@@ -160,7 +160,7 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
                             spawnIndex = 0;
                         }
                     }
-                    func_0042D980(player, rec, mode, i);
+                    CPlayer__SetupActors_2(player, rec, mode, i);
                 }
             }
             for (i = world->m_nFirstActor; i < n; i++) {

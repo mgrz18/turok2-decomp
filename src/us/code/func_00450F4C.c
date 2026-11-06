@@ -3,7 +3,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B41B0[];
@@ -37,7 +37,7 @@ s32 PlayerSetupMenu_HandicapLabel_2(MenuItem *item, Menu *ctx) {
             item->text = D_800B41E0;
             break;
         }
-        sprintf(&item->text[MenuItem_TextLength(item) - 2], "%02d", handicap);
+        sprintf(&item->text[MenuItem_TextLength_2(item) - 2], "%02d", handicap);
     }
     return 0;
 }

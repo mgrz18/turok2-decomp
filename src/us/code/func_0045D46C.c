@@ -2,7 +2,7 @@
 #include "common.h"
 
 s32 GetMemSize(void); /* osGetMemSize */
-void func_00423D30(void);
+void Video_ApplyResolution_2(void);
 
 extern s32 D_800C2038; /* current video mode */
 extern s32 D_800C203C; /* applied video mode */
@@ -17,7 +17,7 @@ void Video_UpdateResolution_2(void) {
         }
     }
     if (D_800C2040 < 5 && D_800C203C != D_800C2038) {
-        func_00423D30();
+        Video_ApplyResolution_2();
         D_800C203C = D_800C2038;
     }
 }

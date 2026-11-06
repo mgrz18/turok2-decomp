@@ -27,7 +27,7 @@ void osSetEventMesg(s32 event, void *mq, s32 msg);     /* osSetEventMesg */
 s32 osContInit(void *mq, u8 *bitpattern, OSContStatus *status); /* osContInit */
 s32 osSendMesg(void *mq, void *msg, s32 flag);
 void Controller_UnwatchPak(s32);
-s32 func_004300E8(ControllerProfile *, s32);
+s32 Cont_ResetSlot_2(ControllerProfile *, s32);
 
 /* Initialises the controllers; returns the lowest port with one plugged in, or -1. */
 s16 Cont_InitAll_2(void) {
@@ -47,7 +47,7 @@ s16 Cont_InitAll_2(void) {
         D_800F67B0[i] = 0;
         D_800F5EA8[i] = 0;
         Controller_UnwatchPak(i);
-        if (func_004300E8(&D_800F5EC0[i], i) != 0) {
+        if (Cont_ResetSlot_2(&D_800F5EC0[i], i) != 0) {
             D_800F5EB8 = i;
             D_800B6CF2++;
         }

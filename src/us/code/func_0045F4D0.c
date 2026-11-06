@@ -12,7 +12,7 @@ extern void Controller_Lock(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size);
-extern s32 func_00428C10(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+extern s32 osPfsReadWriteFile_2(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
 
 extern char D_800C18B0[];
 
@@ -34,7 +34,7 @@ s32 Pak_ReadNote_2(s32 ch, s32 file_no, void *dst, s32 size) {
     result = D_80130C70[ch];
     D_800F6750 = 2;
     if (result == 0) {
-        if ((result = func_00428C10(&D_80130C80[ch], file_no, 0, 0, blocks, buf)) != 0) {
+        if ((result = osPfsReadWriteFile_2(&D_80130C80[ch], file_no, 0, 0, blocks, buf)) != 0) {
             result = -1;
         }
         if (result == 0) {

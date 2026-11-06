@@ -8,8 +8,8 @@ extern OSMesgQueue D_800F6798;
 extern OSPfs D_80130C80[];
 extern s32 D_80130C70[];
 extern s32 D_80130C60[];
-s32 func_00428080(OSMesgQueue *queue, OSPfs *pfs, int channel); /* osPfsInitPak_2 (link address) */
-s32 func_00425680(s32 pad); /* Pak_RefreshNotes_2 (link address) */
+s32 osPfsInitPak_2(OSMesgQueue *queue, OSPfs *pfs, int channel); /* osPfsInitPak_2 (link address) */
+s32 Pak_RefreshNotes_2(s32 pad); /* Pak_RefreshNotes_2 (link address) */
 s32 Pak_Mount_2(s32 pad) {
     s32 i;
     s32 r;
@@ -23,7 +23,7 @@ s32 Pak_Mount_2(s32 pad) {
     } else {
         i = 0;
         do {
-            r = func_00428080(&D_800F6798, &D_80130C80[pad], pad);
+            r = osPfsInitPak_2(&D_800F6798, &D_80130C80[pad], pad);
             switch (r) {
             case 0:
             case 2:
@@ -53,7 +53,7 @@ s32 Pak_Mount_2(s32 pad) {
         goto fin2;
     got5:
         D_80130C60[pad] = 3;
-        if (func_00425680(pad) != 0) {
+        if (Pak_RefreshNotes_2(pad) != 0) {
             D_80130C70[pad] = -4;
             goto fin2;
         }

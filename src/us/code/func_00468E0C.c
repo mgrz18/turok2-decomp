@@ -11,11 +11,11 @@ struct Triple {
 };
 struct Triple;
 typedef struct Triple Triple;
-extern void func_0042FF10(char *);
+extern void CEmitterPool__Construct_2(char *);
 void CCameraPool__ResetEmitterPools_2(Triple *group) {
     int i;
     for (i = 0; i < group->z; i++) {
-        func_0042FF10((char *)(i * 0xEC0 + group->y + 0x558));
+        CEmitterPool__Construct_2((char *)(i * 0xEC0 + group->y + 0x558));
     }
-    func_0042FF10((char *)group + 0x598);
+    CEmitterPool__Construct_2((char *)group + 0x598);
 }

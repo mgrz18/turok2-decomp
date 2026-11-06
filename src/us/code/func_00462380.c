@@ -5,7 +5,7 @@
 u32 osGetCount(void);
 s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
 s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
-s32 func_00429DE4(OSPfs *pfs);
+s32 __osPfsSelectBank_2(OSPfs *pfs);
 static __inline__ s32 __osIdCheckSum(u16 *ptr, u16 *csum, u16 *icsum) {
     u16 data;
     u32 j;
@@ -27,7 +27,7 @@ s32 __osRepairPackId_2(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
     s32 dev;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429DE4(pfs);
+        ret = __osPfsSelectBank_2(pfs);
         if (ret != 0) {
             return ret;
         }
@@ -38,7 +38,7 @@ s32 __osRepairPackId_2(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
     newid->serial_low = badid->serial_low;
     for (i = 0; i < 62; i++) {
         pfs->activebank = i;
-        ret = func_00429DE4(pfs);
+        ret = __osPfsSelectBank_2(pfs);
         if (ret != 0) {
             return ret;
         }
@@ -68,7 +68,7 @@ s32 __osRepairPackId_2(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
         }
         if (i > 0) {
             pfs->activebank = 0;
-            ret = func_00429DE4(pfs);
+            ret = __osPfsSelectBank_2(pfs);
             if (ret != 0) {
                 return ret;
             }
@@ -82,7 +82,7 @@ s32 __osRepairPackId_2(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
         }
     }
     pfs->activebank = 0;
-    ret = func_00429DE4(pfs);
+    ret = __osPfsSelectBank_2(pfs);
     if (ret != 0) {
         return ret;
     }

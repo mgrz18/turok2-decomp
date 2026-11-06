@@ -25,6 +25,9 @@ is linked 0x39000 lower, and code and C reach it there: D_<link address>
 becomes the `_2` name when the link address has no name of its own, and, in a
 module-2 file that declares the symbol itself, even when it has one (a header
 declaration is shared with the first module and keeps the first's name).
+Module-2 C files call module-2 functions at their link address too:
+func_<link> or the first module's name at the link address becomes the name
+at link + 0x39000 when there is one.
 
 Then make setup and make verify.
 
@@ -48,10 +51,12 @@ YAML = VERSIONS / "turok2.us.yaml"
 VM2_NAMED = 0x0043CC14   # virtual_1's vram in the yaml (Makefile VIRTUAL_1_NAMED)
 VM2_END = 0x00475A00     # ROM 0x1BFA00 (vm_dup_engine) in virtual_1's naming
 VM2_SHIFT = 0x39000      # named - linked (Makefile VIRTUAL_1_NAMED - VIRTUAL_1_LINKED)
+VM2_LINK_LO = VM2_NAMED - VM2_SHIFT
 BEGIN, END = "// --- names.us.txt (tools/apply_names.py) ---", "// --- end names ---"
 
 LINE = re.compile(r"^\s*(\w+)\s*=\s*0x([0-9A-Fa-f]+)\s*;")
 IDENT = re.compile(r"^[A-Za-z_]\w*$")
+NOT_CODE = re.compile(r'(/\*.*?\*/|//[^\n]*|"(?:\\.|[^"\\\n])*")', re.S)
 # Tracked files that spell data symbols by name, besides src/ and include/.
 DATA_TEXT_FILES = [
     VERSIONS / "function_sizes.us.txt",
@@ -351,6 +356,8 @@ def main():
     for tok, n in vm2_link.items():
         ren.setdefault(tok, n)
     vm2 = vm2_sources()
+    func_at = {a: n for n, a in funcs.values()}
+    func_addr = {n: a for n, a in funcs.values()}
     changed = 0
     for path in source_files():
         src = path.read_text()
@@ -363,6 +370,22 @@ def main():
         # labels (its strays sit inside functions splat cut wrong).
         sub = dpat if path.suffix == ".s" else both
         new = sub.sub(lambda m: local.get(m.group(1)) or ren.get(m.group(1), m.group(1)), src)
+        # Module-2 C calls a module-2 function at its link address, where the
+        # first module has its own function (or, from 0x459000 up, another
+        # one): func_<link> or the first module's name there becomes the name
+        # at link + 0x39000.
+        if path.suffix == ".c" and path.resolve() in vm2:
+            calls = {}
+            code = "".join(NOT_CODE.split(new)[0::2])
+            for t in set(re.findall(r"\b[A-Za-z_]\w*\b", code)):
+                a = int(t[5:], 16) if re.match(r"^func_[0-9A-F]{8}$", t) else func_addr.get(t)
+                if a is not None and VM2_LINK_LO <= a < VM2_END - VM2_SHIFT and a + VM2_SHIFT in func_at:
+                    calls[t] = func_at[a + VM2_SHIFT]
+            if calls:
+                # Code only: a comment's "twin of Foo" means the first module's.
+                cp = re.compile(r"\b(" + "|".join(map(re.escape, calls)) + r")\b")
+                new = "".join(part if i % 2 else cp.sub(lambda m: calls[m.group(1)], part)
+                              for i, part in enumerate(NOT_CODE.split(new)))
         if new != src:
             path.write_text(new)
             changed += 1

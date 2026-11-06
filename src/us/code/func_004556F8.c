@@ -13,7 +13,7 @@ struct RecordRecAt14 {
 extern f32 D_80130930;
 extern f32 gFrameIncrement;
 extern s32 GetMemSize(void);
-extern s32 func_00424500();
+extern s32 Video_GetResolutionText_2();
 s32 OptionsMenu_ResolutionText_2(struct RecordRecAt14 *record) {
     D_80130930 -= gFrameIncrement;
     if (D_80130930 <= 0.0f) {
@@ -24,6 +24,6 @@ s32 OptionsMenu_ResolutionText_2(struct RecordRecAt14 *record) {
     } else {
         record->flags &= ~0x1000000;
     }
-    record->value = func_00424500();
+    record->value = Video_GetResolutionText_2();
     return 0;
 }

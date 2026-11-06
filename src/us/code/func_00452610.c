@@ -14,7 +14,7 @@ extern signed char D_8011AB47;
 extern s32 D_801308F8;
 extern s32 Controller_ConfirmPressed(char *);
 extern void Music_RestoreVolume(void);
-extern void func_00430374(void *, s32);
+extern void func_00469374(void *, s32);
 
 void TitleMenu_Single_2(void *arg0, struct ObjRecAt20V2 *menu) {
     GameSettings *globals;
@@ -41,6 +41,6 @@ void TitleMenu_Single_2(void *arg0, struct ObjRecAt20V2 *menu) {
         profile++;
     }
     Music_RestoreVolume();
-    func_00430374(&gEngineApp, -1);
+    func_00469374(&gEngineApp, -1);
     D_801308F8 = 1;
 }

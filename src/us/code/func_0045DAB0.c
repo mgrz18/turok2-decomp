@@ -3,7 +3,7 @@
 #include "structs/menu.h"
 
 s32 CScene__GetLinkGroupCount(void *arg0, s32 arg1);
-s32 MenuItem_TextLength(void *item);
+s32 MenuItem_TextLength_2(void *item);
 
 extern u8 gScene[];
 extern char D_800B438C[];
@@ -68,7 +68,7 @@ s32 MissionMenu_UpdateObjective1Count_2(MenuItem *item) {
             break;
     }
     if (rank != -1) {
-        item->text[MenuItem_TextLength(item) - 6] = rank + '0';
+        item->text[MenuItem_TextLength_2(item) - 6] = rank + '0';
     }
     return 0;
 }

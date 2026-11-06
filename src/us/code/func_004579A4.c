@@ -32,14 +32,14 @@ extern u8 D_0043BB68[];
 extern u8 D_0043BF7C[];
 extern u8 D_0043B634[];
 extern u8 D_0043BB20[];
-void func_004263A0(s32 ch);
-s32 func_0042647C(s32 ch);
-s32 func_004264B4(s32 ch);
-s32 func_00426AF8(s32 ch);
-void func_0041D7B0(CPlayer *p);
-void func_0041D948(Menu *o);
-u32 func_00426D98(u8 *data, s32 len, u32 crc);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
+void Pak_ProbeSlot_2(s32 ch);
+s32 Pak_GetStatus_2(s32 ch);
+s32 Pak_IsRumblePak_2(s32 ch);
+s32 Pak_NeedsRepair_2(s32 ch);
+void SaveGame_Build_2(CPlayer *p);
+void PakMenu_UpdateNoteRows_2(Menu *o);
+u32 Crc32_Compute_2(u8 *data, s32 len, u32 crc);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, s32 d, void *e);
 
 void PakMenu_InitSaveGame_2(Menu *own) {
     CPlayer *plr;
@@ -62,31 +62,31 @@ void PakMenu_InitSaveGame_2(Menu *own) {
     if (D_800C2020 != 0) {
         p = plr;
         D_801309BC = 1;
-        MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BE14, p, p->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, D_0043BE14, p, p->m_ContState.m_pContState, NULL);
         D_80130940 = 0;
     } else {
-        func_004263A0(own->controller->port);
+        Pak_ProbeSlot_2(own->controller->port);
         p = plr;
-        if (func_0042647C(sel.v) == 0) {
-            func_0041D7B0(plr);
+        if (Pak_GetStatus_2(sel.v) == 0) {
+            SaveGame_Build_2(plr);
             {
-                u32 crc = func_00426D98(D_800C2018, D_800F70A8 + 0x684, 0xB);
+                u32 crc = Crc32_Compute_2(D_800C2018, D_800F70A8 + 0x684, 0xB);
                 s32 buf = (s32)D_800C2018;
                 s32 size = D_800F70A8;
 
                 *(u32 *)(size + buf + 0x684) = crc;
             }
-            func_0041D948(own);
+            PakMenu_UpdateNoteRows_2(own);
         } else {
             register s32 one asm("$17") = 1;
 
             D_801309BC = one;
-            if (func_004264B4(sel.v) != 0) {
-                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BB68, p, p->m_ContState.m_pContState, (void *)one);
-            } else if (func_00426AF8(sel.v) != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, p, p->m_ContState.m_pContState, D_0043B634);
+            if (Pak_IsRumblePak_2(sel.v) != 0) {
+                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, D_0043BB68, p, p->m_ContState.m_pContState, (void *)one);
+            } else if (Pak_NeedsRepair_2(sel.v) != 0) {
+                MenuPool_OpenMenu_2(D_80119E2C, D_0043BF7C, p, p->m_ContState.m_pContState, D_0043B634);
             } else {
-                MenuPool_OpenMenu(((u8 *)p->m_pCamera) + 0x53C, D_0043BB20, p, p->m_ContState.m_pContState, D_0043BE14);
+                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, D_0043BB20, p, p->m_ContState.m_pContState, D_0043BE14);
             }
         }
     }

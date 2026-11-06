@@ -2,7 +2,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B6510[];
@@ -22,10 +22,10 @@ s32 func_00452D64(MenuItem *item) {
         item->text = D_800B64E0;
     } else if (value > 0) {
         item->text = D_800B6528;
-        sprintf(&item->text[MenuItem_TextLength(item) - 4], "  %2d", value);
+        sprintf(&item->text[MenuItem_TextLength_2(item) - 4], "  %2d", value);
     } else {
         item->text = D_800B6528;
-        sprintf(&item->text[MenuItem_TextLength(item) - 4], " %3d", value);
+        sprintf(&item->text[MenuItem_TextLength_2(item) - 4], " %3d", value);
     }
     return 0;
 }

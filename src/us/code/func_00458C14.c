@@ -20,7 +20,7 @@ extern u8 D_800C1404[];
 extern char D_800B48B4[];
 extern char D_800B4914[];
 extern char D_800C140C[];
-s32 func_004266C0(s32 pad, s32 *out);
+s32 Pak_GetFreePages_2(s32 pad, s32 *out);
 u32 Pak_BytesToPages_2(u32 n);
 void sprintf(char *dst, u8 *fmt, s32 a);
 
@@ -44,7 +44,7 @@ s32 PakMenu_FreePagesText_2(MenuItem *item, Menu *own) {
     bp = buf.c;
     if (D_80130984 != 0) {
         item->text = D_800B48B4;
-        if (func_004266C0(pad, &freeb) == 0) {
+        if (Pak_GetFreePages_2(pad, &freeb) == 0) {
             if (D_801309B4 != 0) {
                 need = Pak_BytesToPages_2(0x18);
             } else {
@@ -75,7 +75,7 @@ s32 PakMenu_FreePagesText_2(MenuItem *item, Menu *own) {
             goto none;
         }
         item->text = t;
-        r = func_004266C0(pad, &freeb);
+        r = Pak_GetFreePages_2(pad, &freeb);
         need = Pak_BytesToPages_2(D_800F70A8 + 0x688);
         dst = item->text;
         if (r == 0) {

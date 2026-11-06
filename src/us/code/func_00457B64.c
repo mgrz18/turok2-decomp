@@ -18,12 +18,12 @@ extern u8 D_0043BB8C[];
 extern u8 D_0043BF7C[];
 extern u8 D_0043B610[];
 extern u8 D_0043BB20[];
-void func_004263A0(s32 ch);
-s32 func_0042647C(s32 ch);
-s32 func_004264B4(s32 ch);
-s32 func_00426AF8(s32 ch);
-void func_0041D948(Menu *o);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
+void Pak_ProbeSlot_2(s32 ch);
+s32 Pak_GetStatus_2(s32 ch);
+s32 Pak_IsRumblePak_2(s32 ch);
+s32 Pak_NeedsRepair_2(s32 ch);
+void PakMenu_UpdateNoteRows_2(Menu *o);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, void *d, void *e);
 void PakMenu_InitLoadGame_2(Menu *own) {
     s32 pad;
     register s32 o1 asm("$8");
@@ -39,21 +39,21 @@ void PakMenu_InitLoadGame_2(Menu *own) {
     pad = own->controller->port;
     if (D_800C2020 != 0) {
         D_801309BC = o1;
-        MenuPool_OpenMenu(D_80119E2C, D_004390B0, own->player, own->controller, 0);
+        MenuPool_OpenMenu_2(D_80119E2C, D_004390B0, own->player, own->controller, 0);
     } else {
         own->items[20].flags &= 0xFEFFFFFF;
-        func_004263A0(own->controller->port);
-        if (func_0042647C(pad) == 0) {
-            func_0041D948(own);
+        Pak_ProbeSlot_2(own->controller->port);
+        if (Pak_GetStatus_2(pad) == 0) {
+            PakMenu_UpdateNoteRows_2(own);
         } else {
             o2 = 1;
             D_801309BC = o2;
-            if (func_004264B4(pad) != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BB8C, own->player, own->controller, (void *)o2);
-            } else if (func_00426AF8(pad) != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, own->player, own->controller, D_0043B610);
+            if (Pak_IsRumblePak_2(pad) != 0) {
+                MenuPool_OpenMenu_2(D_80119E2C, D_0043BB8C, own->player, own->controller, (void *)o2);
+            } else if (Pak_NeedsRepair_2(pad) != 0) {
+                MenuPool_OpenMenu_2(D_80119E2C, D_0043BF7C, own->player, own->controller, D_0043B610);
             } else {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BB20, own->player, own->controller, D_004390B0);
+                MenuPool_OpenMenu_2(D_80119E2C, D_0043BB20, own->player, own->controller, D_004390B0);
             }
         }
     }

@@ -6,7 +6,7 @@
 
 extern s32 CPlayerPool__GetIndex(void *a, void *b);
 extern void Controller_WatchPak(s32 a);
-extern void func_004263A0(s32 a);
+extern void Pak_ProbeSlot_2(s32 a);
 extern s32 D_800C2020;
 extern s32 D_80130990;
 extern s32 D_8011ACE4[];
@@ -23,5 +23,5 @@ void StatsMenu_InitSaveDone_2(Menu *a) {
     if (D_8011ACE4[0]) a->items[7].flags |= 0x1000000; else a->items[7].flags &= ~0x1000000;
     if (a->player) n = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, a->player);
     Controller_WatchPak(n);
-    func_004263A0(n);
+    Pak_ProbeSlot_2(n);
 }

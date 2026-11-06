@@ -3,7 +3,7 @@
 #include "structs/menu.h"
 
 void Controller_WatchPak(s32 port);
-void func_004263A0(s32 port);
+void Pak_ProbeSlot_2(s32 port);
 
 extern s32 D_800C2020;
 extern s32 D_800C2028;
@@ -45,5 +45,5 @@ void SavePortalMenu_Init_2(Menu *event) {
     D_80130980 = 0;
     sel.v = controller->port;
     Controller_WatchPak(sel.v);
-    func_004263A0(GetPort(event));
+    Pak_ProbeSlot_2(GetPort(event));
 }

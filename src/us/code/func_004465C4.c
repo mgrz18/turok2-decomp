@@ -13,10 +13,10 @@ extern s32 D_80110048[]; /* warp id */
 extern u8 D_800C1910[];
 extern BlindOneStep D_00432260[];
 extern u8 D_801100F0[];
-extern void BlindOne_BossUpdate(void);
-extern void BlindOne_BossHurt(void);
-extern void BlindOne_Draw(void);
-extern void BlindOne_EnterPhase(BlindOneState *state, s32 id);
+extern void BlindOne_BossUpdate_2(void);
+extern void BlindOne_BossHurt_2(void);
+extern void BlindOne_Draw_2(void);
+extern void BlindOne_EnterPhase_2(BlindOneState *state, s32 id);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
 extern void COnScreen__SetBoss(void *hud, CGameObjectInstance *obj, char *name);
 
@@ -25,15 +25,15 @@ static __inline__ void StartScript(BlindOneState *state, BlindOneStep *script, C
 
     state->script = script;
     D_80130200.boss = (struct CGameObjectInstance *) obj;
-    BlindOne_EnterPhase(state, D_80130200.script->id);
+    BlindOne_EnterPhase_2(state, D_80130200.script->id);
 }
 
 void BlindOne_BossInit_2(CGameObjectInstance *obj, CAI *ai) {
     D_80110048[0] = 0x1CE9;
     ai->m_pModeTable = D_800C1910;
-    ai->m_pfStep = BlindOne_BossUpdate;
-    ai->m_pfHurt = BlindOne_BossHurt;
-    ai->m_pfDraw = BlindOne_Draw;
+    ai->m_pfStep = BlindOne_BossUpdate_2;
+    ai->m_pfHurt = BlindOne_BossHurt_2;
+    ai->m_pfDraw = BlindOne_Draw_2;
     StartScript(&D_80130200, D_00432260, obj);
     obj->m_dwFlags &= ~0x10000000;
     ai->m_BlindOne.m_nPhaseHits = 0;

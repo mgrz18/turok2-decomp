@@ -20,21 +20,21 @@
 #define SET_ACTIVEBANK_TO_ZERO()                 \
     if (pfs->activebank != 0) {                  \
         pfs->activebank = 0;                     \
-        ERRCK(func_00429DE4(pfs));               \
+        ERRCK(__osPfsSelectBank_2(pfs));               \
     }
 
 #define CHECK_IPAGE(p)                                                                                        \
     (((p).ipage >= pfs->inode_start_page) && ((p).inode_t.bank < pfs->banks) && ((p).inode_t.page >= 0x01) && \
      ((p).inode_t.page < 0x80))
 
-extern s32 func_00429D1C(OSPfs *pfs); /* __osCheckId */
-extern s32 func_004297D8(OSPfs *pfs); /* __osGetId */
-extern s32 func_00429DE4(OSPfs *pfs); /* __osPfsSelectBank */
-extern s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank); /* __osPfsRWInode */
+extern s32 __osCheckId_2(OSPfs *pfs); /* __osCheckId */
+extern s32 __osGetId_2(OSPfs *pfs); /* __osGetId */
+extern s32 __osPfsSelectBank_2(OSPfs *pfs); /* __osPfsSelectBank */
+extern s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank); /* __osPfsRWInode */
 extern s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer); /* __osContRamRead */
 extern s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force); /* __osContRamWrite */
-extern s32 func_0042868C(OSPfs *pfs, __OSInodeCache *cache); /* corrupted_init */
-extern s32 func_004287D8(OSPfs *pfs, __OSInodeUnit fpage, __OSInodeCache *cache); /* corrupted */
+extern s32 corrupted_init_2(OSPfs *pfs, __OSInodeCache *cache); /* corrupted_init */
+extern s32 corrupted_2(OSPfs *pfs, __OSInodeUnit fpage, __OSInodeCache *cache); /* corrupted */
 
 s32 osPfsChecker_2(OSPfs *pfs) {
     int j;
@@ -51,17 +51,17 @@ s32 osPfsChecker_2(OSPfs *pfs) {
     s32 cl;
     int offset;
 
-    ret = func_00429D1C(pfs);
+    ret = __osCheckId_2(pfs);
 
     if (ret == PFS_ERR_NEW_PACK) {
-        ret = func_004297D8(pfs);
+        ret = __osGetId_2(pfs);
     }
 
     if (ret != 0) {
         return ret;
     }
 
-    ERRCK(func_0042868C(pfs, &cache));
+    ERRCK(corrupted_init_2(pfs, &cache));
 
     for (j = 0; j < pfs->dir_size; j++) {
         ERRCK(__osContRamRead(pfs->queue, pfs->channel, pfs->dir_table + j, (u8 *)&tmp_dir));
@@ -74,13 +74,13 @@ s32 osPfsChecker_2(OSPfs *pfs) {
             while (CHECK_IPAGE(next_page)) {
                 if (bank != next_page.inode_t.bank) {
                     bank = next_page.inode_t.bank;
-                    ret = func_004299C4(pfs, &tmp_inode, PFS_READ, bank);
+                    ret = __osPfsRWInode_2(pfs, &tmp_inode, PFS_READ, bank);
                     if (ret != 0 && ret != PFS_ERR_INCONSISTENT) {
                         return ret;
                     }
                 }
 
-                if ((cc = func_004287D8(pfs, next_page, &cache) - cl) != 0) {
+                if ((cc = corrupted_2(pfs, next_page, &cache) - cl) != 0) {
                     break;
                 }
 
@@ -126,7 +126,7 @@ s32 osPfsChecker_2(OSPfs *pfs) {
     }
 
     for (bank = 0; bank < pfs->banks; bank++) {
-        ret = func_004299C4(pfs, &tmp_inode, PFS_READ, bank);
+        ret = __osPfsRWInode_2(pfs, &tmp_inode, PFS_READ, bank);
 
         if (ret != 0 && ret != PFS_ERR_INCONSISTENT) {
             return ret;
@@ -149,7 +149,7 @@ s32 osPfsChecker_2(OSPfs *pfs) {
                 file_next_node[j] = checked_inode.inode_page[pp] = tmp_inode.inode_page[pp];
             }
         }
-        ERRCK(func_004299C4(pfs, &checked_inode, PFS_WRITE, bank));
+        ERRCK(__osPfsRWInode_2(pfs, &checked_inode, PFS_WRITE, bank));
     }
 
     if (fixed) {

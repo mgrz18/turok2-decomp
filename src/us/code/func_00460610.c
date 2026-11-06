@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern s32 __osClearPage_2(OSPfs *pfs, int page_no, u8 *data, u8 bank);
-extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00429DE4(OSPfs *pfs);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
 extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
 extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
 s32 __osClearPage_2(OSPfs *pfs, int page_no, u8 *data, u8 bank)
@@ -15,7 +15,7 @@ s32 __osClearPage_2(OSPfs *pfs, int page_no, u8 *data, u8 bank)
     s32 ret;
     ret = 0;
     pfs->activebank = bank;
-    ret = func_00429DE4(pfs);
+    ret = __osPfsSelectBank_2(pfs);
     if (ret != 0)
         return ret;
     for (i = 0; i < 8; i++) {
@@ -25,7 +25,7 @@ s32 __osClearPage_2(OSPfs *pfs, int page_no, u8 *data, u8 bank)
         }
     }
     pfs->activebank = 0;
-    ret = func_00429DE4(pfs);
+    ret = __osPfsSelectBank_2(pfs);
     return ret;
 }
 extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);

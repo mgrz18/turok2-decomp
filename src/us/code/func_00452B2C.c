@@ -1,7 +1,7 @@
 #include "common.h"
 
 s32 Music_SetTrack(s32);
-s32 MenuItem_SelectSubmenu(s32, s32, s32);
+s32 MenuItem_SelectSubmenu_2(s32, s32, s32);
 
 s32 Sound__StopAllExcept(s32);                     /* extern */
 s32 Sound__SetForce2D(s32);                     /* extern */
@@ -18,5 +18,5 @@ void SoundMenu_GoBack_2(s32 arg0, s32 arg1, s32 arg2) {
     }
     Music_SetTrack(D_800C1F70);
     Controller_EnableMenuSounds();
-    MenuItem_SelectSubmenu(arg0, arg1, arg2);
+    MenuItem_SelectSubmenu_2(arg0, arg1, arg2);
 }

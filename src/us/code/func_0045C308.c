@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-void MenuPool_OpenMenu(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
 
 extern char D_0043BBB0[];
 extern s32 D_800C2028;
@@ -33,7 +33,7 @@ s32 SavePortalMenu_SelectGoBack_2(s32 unused, Menu *event) {
     D_801198A4[1] = 0;
     D_80130940 = 0;
     player = GetPlayer(event, &port);
-    MenuPool_OpenMenu(*(char **)(player + 0x51C) + 0x53C, D_0043BBB0, player, *(s32 *)(player + 0xA50), 0);
+    MenuPool_OpenMenu_2(*(char **)(player + 0x51C) + 0x53C, D_0043BBB0, player, *(s32 *)(player + 0xA50), 0);
     D_80130998 = 0;
     return 1;
 }

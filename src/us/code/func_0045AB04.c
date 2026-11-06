@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-s32 MenuItem_TextLength(void *item);
+s32 MenuItem_TextLength_2(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 
 extern char D_800C1410[];
@@ -24,7 +24,7 @@ s32 PakMenu_UpdateModeText_2(MenuItem *item) {
     } else if (D_80130990 != 0) {
         player = D_800C2028;
         item->text = D_800B48F8;
-        sprintf(item->text + (MenuItem_TextLength(item) - 1), D_800C1410, player + 1);
+        sprintf(item->text + (MenuItem_TextLength_2(item) - 1), D_800C1410, player + 1);
     }
     return 0;
 }

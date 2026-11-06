@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-s32 MenuItem_TextLength(void *item);
+s32 MenuItem_TextLength_2(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 
 extern char D_800B50B4[];
@@ -26,7 +26,7 @@ s32 DamagedPakMenu_UpdateLine3_2(MenuItem *item, Menu *event) {
         item->text = D_800B50B4;
     } else {
         item->text = D_800B50E4;
-        sprintf(item->text + (MenuItem_TextLength(item) - 2), D_800C1430, port + 1);
+        sprintf(item->text + (MenuItem_TextLength_2(item) - 2), D_800C1430, port + 1);
     }
     return 0;
 }

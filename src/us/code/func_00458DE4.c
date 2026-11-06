@@ -16,16 +16,16 @@ extern s32 D_8011F148;
 extern u8 D_80119E2C[];
 extern u8 D_0043C12C[];
 extern u8 D_0043B634[];
-s32 func_00426C74(u8 *a, char *b);
-void func_004263A0(s32 a);
-s32 func_0042647C(s32 a);
-void func_00426898(s32 a, s32 b, s32 *c);
-void func_00426BA8(s32 a, u8 *b, s32 c);
-void func_0041D948(Menu *o);
-s32 func_0041DCB0(Menu *o, s32 a, s32 b);
-void func_0041ED00(s32 a, Menu *o, s32 c);
-void func_0041EFE8(s32 a, Menu *o, s32 c);
-void MenuPool_OpenMenu(void *a, void *b, s32 c, ControllerProfile *d, void *e);
+s32 Str_Compare_2(u8 *a, char *b);
+void Pak_ProbeSlot_2(s32 a);
+s32 Pak_GetStatus_2(s32 a);
+void Pak_GetNoteGameName_2(s32 a, s32 b, s32 *c);
+void func_0045FBA8(s32 a, u8 *b, s32 c);
+void PakMenu_UpdateNoteRows_2(Menu *o);
+s32 PakMenu_CheckPak_2(Menu *o, s32 a, s32 b);
+void PakMenu_WriteProfile_2(s32 a, Menu *o, s32 c);
+void PakMenu_WriteSaveGame_2(s32 a, Menu *o, s32 c);
+void MenuPool_OpenMenu_2(void *a, void *b, s32 c, ControllerProfile *d, void *e);
 
 s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
     u8 buf[16];
@@ -48,12 +48,12 @@ s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
     } else {
         s1 = L.pad;
     }
-    if (func_0041DCB0(o, s1, 0) != 0) {
+    if (PakMenu_CheckPak_2(o, s1, 0) != 0) {
         goto done;
     }
     if (D_801309B4 != 0) {
         if (D_80130984 != 0) {
-            func_0041ED00(a0, o, a2);
+            PakMenu_WriteProfile_2(a0, o, a2);
             return 1;
         }
     } else if (D_80130984 != 0) {
@@ -64,9 +64,9 @@ s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
         index = &D_801309C4;
         s0 = 0;
         do {
-            func_00426898(s1, s0, &L.v);
-            func_00426BA8(L.v, buf, 0x10);
-            if (func_00426C74(buf, D_800B45CC) == 0) {
+            Pak_GetNoteGameName_2(s1, s0, &L.v);
+            func_0045FBA8(L.v, buf, 0x10);
+            if (Str_Compare_2(buf, D_800B45CC) == 0) {
                 found = 1;
                 if (index != NULL) {
                     D_801309C4 = s0;
@@ -78,10 +78,10 @@ s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
         found = 0;
     after:
         if (found != 0 && D_801309C4 >= 0 && D_801309C4 < 0x10) {
-            MenuPool_OpenMenu(D_80119E2C, D_0043C12C, o->player, o->controller, D_0043B634);
+            MenuPool_OpenMenu_2(D_80119E2C, D_0043C12C, o->player, o->controller, D_0043B634);
             return 1;
         }
-        func_0041EFE8(a0, o, a2);
+        PakMenu_WriteSaveGame_2(a0, o, a2);
         return 1;
     }
     if (D_80130990 != 0) {
@@ -96,8 +96,8 @@ s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
         }
         s1 = 0;
         do {
-            func_004263A0(s0);
-            if (func_0042647C(s0) != -2) {
+            Pak_ProbeSlot_2(s0);
+            if (Pak_GetStatus_2(s0) != -2) {
                 break;
             }
             s0++;
@@ -121,12 +121,12 @@ s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
                 a1 = o->controller->port;
             }
             L.pad = a1;
-            if (func_0041DCB0(o, a1, 0) != 0) {
+            if (PakMenu_CheckPak_2(o, a1, 0) != 0) {
             done:
                 D_801309BC = 1;
                 return 1;
             }
-            func_0041D948(o);
+            PakMenu_UpdateNoteRows_2(o);
         }
     }
     return 0;

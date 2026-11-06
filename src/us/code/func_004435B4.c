@@ -12,7 +12,7 @@ extern s32 D_00431D1C[];
 extern u8 D_00431D28[];
 extern u8 D_00431CFC[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
-extern void MotherBoss_DropPickupsAtSpawnPoints(s32 arg0, void *arg1);
+extern void MotherBoss_DropPickupsAtSpawnPoints_2(s32 arg0, void *arg1);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
     MotherBossState *state = &D_8012FB70;
@@ -44,7 +44,7 @@ void MotherBoss_SetupPhase1_2(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_Mode != 9) {
         resetSlots(state->activeMask, D_00431D28);
         for (i = 0; i < 3; i++) {
-            MotherBoss_DropPickupsAtSpawnPoints(0, D_00431CFC);
+            MotherBoss_DropPickupsAtSpawnPoints_2(0, D_00431CFC);
         }
     }
 }

@@ -5,7 +5,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-void func_0041D948(Menu *menu);
+void PakMenu_UpdateNoteRows_2(Menu *menu);
 extern s32 D_80130994;
 extern s32 D_801309BC;
 extern s32 D_80130984;
@@ -20,11 +20,11 @@ extern s32 D_800C2020;
 extern char D_80119E2C[];
 extern char D_0043BF7C[];
 extern char D_0043B5C8[];
-extern void func_004263A0(s32 ch);
-extern s32 func_0042647C(s32 ch);
-extern s32 func_004264B4(s32 ch);
-extern s32 func_00426AF8(s32 ch);
-extern void MenuPool_OpenMenu(char *, char *, CPlayer *, ControllerProfile *, char *);
+extern void Pak_ProbeSlot_2(s32 ch);
+extern s32 Pak_GetStatus_2(s32 ch);
+extern s32 Pak_IsRumblePak_2(s32 ch);
+extern s32 Pak_NeedsRepair_2(s32 ch);
+extern void MenuPool_OpenMenu_2(char *, char *, CPlayer *, ControllerProfile *, char *);
 void PakMenu_InitLoadProfile_2(Menu *menu) {
     s32 ch;
     D_80130984 = 0;
@@ -38,20 +38,20 @@ void PakMenu_InitLoadProfile_2(Menu *menu) {
     ch = menu->controller->port;
     if (D_800C2020 != 0) {
         D_801309BC = 1;
-        MenuPool_OpenMenu(((char *)menu->player->m_pCamera) + 0x53C, D_0043874C, menu->player, menu->controller, 0);
+        MenuPool_OpenMenu_2(((char *)menu->player->m_pCamera) + 0x53C, D_0043874C, menu->player, menu->controller, 0);
         return;
     }
-    func_004263A0(ch);
-    if (func_0042647C(ch) == 0) {
-        func_0041D948(menu);
+    Pak_ProbeSlot_2(ch);
+    if (Pak_GetStatus_2(ch) == 0) {
+        PakMenu_UpdateNoteRows_2(menu);
         return;
     }
     D_801309BC = 1;
-    if (func_004264B4(ch) != 0) {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BB8C, menu->player, menu->controller, D_0043874C);
-    } else if (func_00426AF8(ch) != 0) {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, menu->player, menu->controller, D_0043B5C8);
+    if (Pak_IsRumblePak_2(ch) != 0) {
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043BB8C, menu->player, menu->controller, D_0043874C);
+    } else if (Pak_NeedsRepair_2(ch) != 0) {
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043BF7C, menu->player, menu->controller, D_0043B5C8);
     } else {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BB20, menu->player, menu->controller, D_0043874C);
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043BB20, menu->player, menu->controller, D_0043874C);
     }
 }

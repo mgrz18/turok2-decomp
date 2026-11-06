@@ -11,10 +11,10 @@ extern void Controller_Unlock();
 extern void Controller_ReadAll(void);
 extern u8 D_800F6750;
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
-extern s32 func_00425808(s32);
+extern s32 Pak_Mount_2(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
-s32 func_00425808(s32 ch);
+s32 Pak_Mount_2(s32 ch);
 void Pak_ProbeAll_2(void) {
     extern u8 D_800F6798[];
     s32 channel;
@@ -33,7 +33,7 @@ void Pak_ProbeAll_2(void) {
             present = record->present;
         }
         if (present) D_80130C60[channel] = 2;
-        else if (func_00425808(channel) != 0) D_80130C60[channel] = 3;
+        else if (Pak_Mount_2(channel) != 0) D_80130C60[channel] = 3;
         else D_80130C60[channel] = 1;
     }
     Controller_Unlock();

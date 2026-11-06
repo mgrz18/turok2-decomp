@@ -26,12 +26,12 @@ extern u8 D_00438668[];
 extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
 
-s32 func_0041DCB0(Menu *event, s32 mode, s32 arg2);
+s32 PakMenu_CheckPak_2(Menu *event, s32 mode, s32 arg2);
 CPlayer *CPlayerPool__FindByController(void *state, ControllerProfile *args);
-void func_0042E350(CPlayer *player, s32 arg1);
-void MenuPool_OpenChildMenu(void *menu, Menu *event, void *page);
-s32 func_00425F84(s32 mode, s32 arg1);
-void MenuPool_OpenMenu(void *menu, void *page, void *player, void *args, void *prev);
+void CPlayer__SetCharacter_2(CPlayer *player, s32 arg1);
+void MenuPool_OpenChildMenu_2(void *menu, Menu *event, void *page);
+s32 Pak_DeleteNote_2(s32 mode, s32 arg1);
+void MenuPool_OpenMenu_2(void *menu, void *page, void *player, void *args, void *prev);
 
 static __inline__ s32 currentMode(Menu *event) {
     s32 mode;
@@ -50,7 +50,7 @@ s32 CharNoteMenu_SelectYes_2(void *arg0, Menu *event) {
     CPlayerOptions *options;
     s32 i;
 
-    if (func_0041DCB0(event, mode, 0) != 0) {
+    if (PakMenu_CheckPak_2(event, mode, 0) != 0) {
         D_801309BC = 1;
         return 1;
     }
@@ -66,14 +66,14 @@ s32 CharNoteMenu_SelectYes_2(void *arg0, Menu *event) {
         for (i = 0; i < 8; i++) {
             options->m_Name[i] = D_80130974[i];
         }
-        func_0042E350(player, D_80130950);
-        MenuPool_OpenChildMenu(player->m_pCamera->m_MenuPool, event, D_00438668);
+        CPlayer__SetCharacter_2(player, D_80130950);
+        MenuPool_OpenChildMenu_2(player->m_pCamera->m_MenuPool, event, D_00438668);
         return 1;
     }
-    if (func_00425F84(mode, D_801309C4) == 0) {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BCD0, event->player, event->controller, event->context);
+    if (Pak_DeleteNote_2(mode, D_801309C4) == 0) {
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043BCD0, event->player, event->controller, event->context);
     } else {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BD3C, event->player, event->controller, event->context);
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043BD3C, event->player, event->controller, event->context);
     }
     return 1;
 }

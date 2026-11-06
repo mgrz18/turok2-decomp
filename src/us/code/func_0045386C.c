@@ -9,7 +9,7 @@ extern s32 D_800C1BD0;
 
 void Hud_SetupFillMode(void);
 void Hud_DrawBevelBox(s32 x0, s32 y0, s32 x1, s32 y1, s32 border, s32 invert, s32 red, s32 green, s32 blue, s32 alpha);
-void MenuItem_DrawText(void *menu, MenuItemLayout *item, void *arg2, Menu *event);
+void MenuItem_DrawText_2(void *menu, MenuItemLayout *item, void *arg2, Menu *event);
 
 void EnterCheatMenu_DrawTextField_2(void *menu, MenuItemLayout *item, void *arg2, Menu *event) {
     f32 charWidth;
@@ -24,5 +24,5 @@ void EnterCheatMenu_DrawTextField_2(void *menu, MenuItemLayout *item, void *arg2
         Hud_SetupFillMode();
         Hud_DrawBevelBox(x, item->bottom, x + charWidth, item->bottom + 2, 0, 0, 255, 255, 255, (u32)alpha & 0xFF);
     }
-    MenuItem_DrawText(menu, item, arg2, event);
+    MenuItem_DrawText_2(menu, item, arg2, event);
 }

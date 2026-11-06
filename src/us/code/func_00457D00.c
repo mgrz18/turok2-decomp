@@ -23,11 +23,11 @@ extern char D_0043AC0C[];
 extern void *D_800C2010;
 extern void *D_800C2014;
 s32 Pak_BytesToPages_2(s32 n);
-s32 func_004266C0(s32 pad, s32 *out);
-s32 func_0042662C(s32 pad, s32 *out);
-s32 func_004269B4(s32 pad, u8 *ext);
-s32 func_00426084(s32 pad, s32 size, char *n1, char *n2, u8 *ext, u8 *buf);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
+s32 Pak_GetFreePages_2(s32 pad, s32 *out);
+s32 Pak_CountEmptyNotes_2(s32 pad, s32 *out);
+s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext);
+s32 Pak_SaveNoteVerified_2(s32 pad, s32 size, char *n1, char *n2, u8 *ext, u8 *buf);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, void *d, void *e);
 void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, void *p);
 /* Controller-pak name for the selected pad (inlined). */
@@ -82,22 +82,22 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     plr = pp;
     if (D_80130984 != 0) {
         need = Pak_BytesToPages_2(0x18);
-        r = func_004266C0(pad.v, &pad.freeb);
+        r = Pak_GetFreePages_2(pad.v, &pad.freeb);
         if (r == 0) {
             if (pad.freeb >= need) {
-                r = func_0042662C(pad.v, &pad.cnt);
+                r = Pak_CountEmptyNotes_2(pad.v, &pad.cnt);
                 if (r == 0 && pad.cnt != 0) {
                     ok = 0;
-                    r = func_004269B4(pad.v, ext);
+                    r = Pak_FindFreeExtLetter_2(pad.v, ext);
                     if (r == 0) {
                         flag = 1;
                         nv = pad.v;
-                        r = func_00426084(nv, 0x18, D_80130968, D_800B45C0, ext, D_800B45D8);
+                        r = Pak_SaveNoteVerified_2(nv, 0x18, D_80130968, D_800B45C0, ext, D_800B45D8);
                     }
                 }
             }
             if (ok != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BAFC, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu_2(D_80119E2C, D_0043BAFC, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -105,9 +105,9 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     O01FreeAll();
     if (flag != 0) {
         if (r == 0) {
-            MenuPool_OpenMenu(D_80119E2C, D_0043BC88, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu_2(D_80119E2C, D_0043BC88, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         } else {
-            MenuPool_OpenMenu(D_80119E2C, D_0043BD18, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu_2(D_80119E2C, D_0043BD18, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         }
     }
     return 1;

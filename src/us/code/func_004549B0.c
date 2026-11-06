@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/game.h"
 
-extern void func_0041BBB0(CPlayerOptions *slot);
+extern void PlayerOptions_SetDefaultName_2(CPlayerOptions *slot);
 
 static __inline__ void InitSlot(CPlayerOptions *slot, u8 index) {
     slot->m_bActive = 0;
@@ -16,7 +16,7 @@ static __inline__ void InitSlot(CPlayerOptions *slot, u8 index) {
     slot->m_nCharacter = 0;
     slot->m_WeaponSelect = 1;
     slot->m_Handicap = 0;
-    func_0041BBB0(slot);
+    PlayerOptions_SetDefaultName_2(slot);
 }
 
 /* Default multiplayer setup. */

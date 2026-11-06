@@ -3,7 +3,7 @@
 /* __osPfsDeclearPage_2 (libultra pfsallocatefile.c). */
 #include "rw/abu_types.h"
 
-extern s32 func_00427610(OSPfs *pfs, int page_no, u8 *data, u8 bank);
+extern s32 __osClearPage_2(OSPfs *pfs, int page_no, u8 *data, u8 bank);
 
 s32 __osPfsDeclearPage_2(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
                   int *decleared, int *last_page)
@@ -40,7 +40,7 @@ s32 __osPfsDeclearPage_2(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, i
         if (inode->inode_page[j].ipage == 3) {
             inode->inode_page[old_page].inode_t.bank = bank;
             inode->inode_page[old_page].inode_t.page = j;
-            ret = func_00427610(pfs, old_page, tmp_data, bank);
+            ret = __osClearPage_2(pfs, old_page, tmp_data, bank);
             if (ret != 0)
                 return ret;
             old_page = j;
@@ -56,7 +56,7 @@ s32 __osPfsDeclearPage_2(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, i
         return ret;
     } else {
         inode->inode_page[old_page].ipage = 1;
-        ret = func_00427610(pfs, old_page, tmp_data, bank);
+        ret = __osClearPage_2(pfs, old_page, tmp_data, bank);
         *last_page = 0;
         return ret;
     }

@@ -7,7 +7,7 @@
  * it has one), and stores it in out. */
 
 
-extern f32 MotherBoss_GetTargetDist(void *obj, CGameObjectInstance **found);
+extern f32 MotherBoss_GetTargetDist_2(void *obj, CGameObjectInstance **found);
 extern f32 Random_Blend(f32 min, f32 max);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
@@ -17,7 +17,7 @@ void MotherBoss_RandomSpawnPoint_2(CVector3 *out) {
     s32 ok;
     s32 i;
 
-    MotherBoss_GetTargetDist(D_8012FB70.obj, &found);
+    MotherBoss_GetTargetDist_2(D_8012FB70.obj, &found);
     do {
         ok = 1;
         i = Random_Blend(0.0f, 0.99999f) * 4.0f;

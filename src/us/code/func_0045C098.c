@@ -4,7 +4,7 @@
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
-void MenuPool_OpenMenu(char *dst, char *fmt, s32 arg2, s32 arg3, s32 arg4);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, s32 arg2, s32 arg3, s32 arg4);
 
 extern char D_0043B634[];
 extern char D_80119E2C[];
@@ -25,7 +25,7 @@ s32 SavePortalMenu_SelectSave_2(s32 unused, Menu *event) {
     }
     if (player != 0) {
         D_80130980 = 1;
-        MenuPool_OpenMenu(D_80119E2C, D_0043B634, event->player, event->controller, 0);
+        MenuPool_OpenMenu_2(D_80119E2C, D_0043B634, event->player, event->controller, 0);
         return 1;
     }
     return 0;

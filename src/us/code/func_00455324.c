@@ -3,7 +3,7 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 
-s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B4008[];
@@ -20,7 +20,7 @@ s32 OptionsMenu_OpacityText_2(MenuItem *item) {
         item->text = D_800B4020;
     } else {
         item->text = D_800B4038;
-        sprintf(&item->text[MenuItem_TextLength(item) - 2], "%02d", value);
+        sprintf(&item->text[MenuItem_TextLength_2(item) - 2], "%02d", value);
     }
     return 0;
 }

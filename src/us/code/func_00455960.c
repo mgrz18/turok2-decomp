@@ -22,7 +22,7 @@ typedef struct GameSession GameSession;
 extern Shared_Game D_8011A6D8;
 extern int D_801198A0;
 extern GameSession gEngineApp;
-extern void func_00430250(GameSession *);
+extern void func_00469250(GameSession *);
 
 int StatsMenu_ContinueNo_2(int unused, Menu *menu) {
     RenderCounters *sync = &D_8011A6D8.counters;
@@ -34,7 +34,7 @@ int StatsMenu_ContinueNo_2(int unused, Menu *menu) {
         }
     }
     if (D_801198A0 == 1) {
-        func_00430250(&gEngineApp);
+        func_00469250(&gEngineApp);
     } else {
         menu->player->m_bActive = 0;
     }

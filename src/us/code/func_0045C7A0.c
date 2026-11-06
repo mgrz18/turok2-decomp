@@ -3,7 +3,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
 extern char D_0043BDF0[];
 extern char D_0043BE14[];
@@ -29,7 +29,7 @@ s32 DamagedPakMenu_SelectContinue_2(s32 unused, Menu *event) {
         if (event->text == D_0043BE14 || event->text == D_0043BDF0) {
             D_80130940 = 0;
         }
-        MenuPool_OpenMenu(dst, event->text, event->player, event->controller, 0);
+        MenuPool_OpenMenu_2(dst, event->text, event->player, event->controller, 0);
     }
     return 1;
 }

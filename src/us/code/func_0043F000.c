@@ -40,7 +40,7 @@ extern f32 func_00298470(f32 x);                                          /* sqr
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 extern f32 Random_Blend(f32 lo, f32 hi);
-extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
+extern s32 Primagen_RunAttackStep_2(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
 extern CVector3 *D_800C18F0[];  /* boss paths, ended by a point with y < 0 */
@@ -173,6 +173,6 @@ void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
                 D_8012F604.index = D_8012FA00;
             } while ((f32) D_8012F9FC[D_8012FA00].chance <= Random_Blend(0.0f, 100.0f));
         }
-        Primagen_RunAttackStep(obj, ai, t.m_Sight.m_Dist);
+        Primagen_RunAttackStep_2(obj, ai, t.m_Sight.m_Dist);
     }
 }
