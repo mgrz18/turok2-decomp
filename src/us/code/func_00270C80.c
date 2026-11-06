@@ -2,17 +2,13 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/sound.h"
+#include "structs/table.h"
 
 /* Plays a sound or a music cue at pos: refuses while another cue is pending,
  * when 6 of the 17 voices already play this sound id (or for cue 0x44C while
  * it is muted). Picks one of the id's variants at random by weight (a sound
  * id avoids repeating its last variant), then starts each of its layers under
  * a new play handle, which it returns (-1 when nothing plays). */
-
-typedef struct {
-    /* 0x00 */ s32 stride;
-    /* 0x04 */ u32 count;
-} SndLayers;
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
@@ -66,7 +62,7 @@ s32 CAudioWorld__PlaySound(CAudioWorld *m, s32 id, CVector3 pos, s32 a5, s32 a6)
     s32 n;
     u32 layers;
     s16 last;
-    SndLayers *nd;
+    StrideTable *nd;
 
     if (m->muted != 0 && id == 0x44C) {
         busy = 1;
@@ -163,7 +159,7 @@ chk:
     m->cue = CISet__GetBlock(CISet__GetBlock(m->variants, sh), 0);
     m->cueId = id;
     m->cueArg = a6;
-    nd = (SndLayers *)CISet__GetBlock(CISet__GetBlock(m->variants, sh), 1);
+    nd = CISet__GetBlock(CISet__GetBlock(m->variants, sh), 1);
     layers = nd->count;
     if (layers != 0) {
         CAudioWorld_Lock(m);
@@ -178,7 +174,7 @@ chk:
     n = 0;
     if (layers != 0) {
         do {
-            CAudioWorld__PlayLayer(m, (u8 *)nd + (n * nd->stride + 8), &pos, idx, ret, 0, a5);
+            CAudioWorld__PlayLayer(m, nd->entries + n * nd->stride, &pos, idx, ret, 0, a5);
             n++;
         } while ((u32)n < layers);
     }
