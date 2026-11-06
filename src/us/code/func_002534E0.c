@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 s32 CPlayer__SetState(s32, s32, s32);
 s32 Controller_SetRumbleOptionAll(s32);
@@ -30,14 +31,14 @@ void CPlayerPool__EndMatch(List002534E0 *arg0) {
     Node002534E0 *var_s0;
     List002534E0 *var_s1;
 
-    var_s0 = (Node002534E0 *) &gEngineApp_m_Settings_match;
-    var_s0 = (Node002534E0 *) &gEngineApp_m_Settings_match;
+    var_s0 = (Node002534E0 *) &gEngineApp_m_Settings.match;
+    var_s0 = (Node002534E0 *) &gEngineApp_m_Settings.match;
     var_s1 = arg0;
-    if ((gEngineApp_m_Settings_match.over == 0) && (gEngineApp_m_Settings_match.done == 0)) {
+    if ((gEngineApp_m_Settings.match.over == 0) && (gEngineApp_m_Settings.match.done == 0)) {
         Controller_SetRumbleOptionAll(0);
-        if (gEngineApp_m_Settings_match.teams != 0) {
-            if (gEngineApp_m_Settings_match.teamOver == 0) {
-                gEngineApp_m_Settings_match.teamOver = 1;
+        if (gEngineApp_m_Settings.match.teams != 0) {
+            if (gEngineApp_m_Settings.match.teamOver == 0) {
+                gEngineApp_m_Settings.match.teamOver = 1;
                 var_s0 = var_s1->head;
                 var_a0 = var_s0;
                 if (var_s0 != NULL) {
@@ -49,7 +50,7 @@ void CPlayerPool__EndMatch(List002534E0 *arg0) {
                 }
             }
         } else {
-            gEngineApp_m_Settings_match.over = 1;
+            gEngineApp_m_Settings.match.over = 1;
             var_s0 = var_s1->head;
             var_a0_2 = var_s0;
             if (var_s0 != NULL) {

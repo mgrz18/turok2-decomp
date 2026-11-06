@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern u8 gScene[];
 
@@ -9,7 +10,7 @@ s32 CScene__LoadLevel(void *, s32, s32);
 /* The ROM bases every store on gEngineApp_m_Settings_match (the match), the settings at
  * -0x1D8 from it. */
 void EngineMode01_Legal_Init(s32 arg0) {
-    GameMatch *match = &gEngineApp_m_Settings_match;
+    GameMatch *match = &gEngineApp_m_Settings.match;
     GameSettings *settings;
 
     match->unk44 = 0;

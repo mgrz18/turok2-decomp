@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/game.h"
 
 typedef struct {
     /* 0x0 */ s32 size;
@@ -42,10 +43,10 @@ void SaveGame_Build(CPlayer *p) {
     gSaveBuffer->player = p->m_Data;
     gSaveBuffer->settings = *(GameSettingsBlock *)&gEngineApp_m_Settings;
     save = gSaveBuffer;
-    save->frames = gEngineApp_m_Settings_match.frames;
-    save->seconds = gEngineApp_m_Settings_match.seconds;
-    save->minutes = gEngineApp_m_Settings_match.minutes;
-    save->hours = gEngineApp_m_Settings_match.hours;
+    save->frames = gEngineApp_m_Settings.match.frames;
+    save->seconds = gEngineApp_m_Settings.match.seconds;
+    save->minutes = gEngineApp_m_Settings.match.minutes;
+    save->hours = gEngineApp_m_Settings.match.hours;
     /* D_800F70A8 is a struct field here, so it is reloaded after the store into the header. */
     save->size = size;
     save->levelFlagsSize = D_800F70A8.size;

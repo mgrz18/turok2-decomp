@@ -1,10 +1,11 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 #define TEAM(p) (*(s32 *) ((char *) (p) + 0xBF4))
 
 void CPlayerPool__AddTeamScore(char *player, char *other, s32 event) {
-    GameMatch *score = &gEngineApp_m_Settings_match;
+    GameMatch *score = &gEngineApp_m_Settings.match;
     s32 *count;
 
     if (score->teams == 0) {

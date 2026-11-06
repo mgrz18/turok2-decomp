@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/game.h"
 
 /* Build the save block: the player's profile, the multiplayer settings and the
  * player's options are copied into a freshly allocated buffer. */
@@ -47,10 +48,10 @@ void SaveGame_Build_2(CPlayer *player) {
     gSaveBuffer->player = player->m_Data;
     gSaveBuffer->settings = *(GameSettingsBlock *)&gEngineApp_m_Settings;
     data = gSaveBuffer;
-    data->frames = gEngineApp_m_Settings_match.frames;
-    data->seconds = gEngineApp_m_Settings_match.seconds;
-    data->minutes = gEngineApp_m_Settings_match.minutes;
-    data->hours = gEngineApp_m_Settings_match.hours;
+    data->frames = gEngineApp_m_Settings.match.frames;
+    data->seconds = gEngineApp_m_Settings.match.seconds;
+    data->minutes = gEngineApp_m_Settings.match.minutes;
+    data->hours = gEngineApp_m_Settings.match.hours;
     data->size = size;
     data->levelFlagsSize = ((ExtraInfo *) &D_800F70A8)->size;
     func_0029E460(data->levelFlags, gLoadSavePersistentData, ((ExtraInfo *) &D_800F70A8)->size);

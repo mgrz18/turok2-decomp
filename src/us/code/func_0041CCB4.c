@@ -4,7 +4,6 @@
 #include "structs/player_options.h"
 #include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_match_tag;         /* match started */
 extern char D_800C1338[];      /* number format */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
@@ -18,7 +17,7 @@ s32 StatsMenu_PlayerRowText(MenuItem *a, Menu *c) {
     char *dst;
     s32 i;
 
-    if (gEngineApp_m_Settings_match_tag) {
+    if (gEngineApp_m_Settings.match.tag) {
         n = player->m_pOptions->m_Tagged[slot];
     } else {
         n = player->m_pOptions->m_Killed[slot];

@@ -142,7 +142,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
                 lod = prop->descriptor->lod;
                 break;
             default: {
-                GameMatch *game = &gEngineApp_m_Settings_match;
+                GameMatch *game = &gEngineApp_m_Settings.match;
                 if (game->tag) {
                     lod = ((s8 *) game)[-0x1B0];
                 } else {

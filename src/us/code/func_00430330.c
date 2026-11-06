@@ -1,6 +1,7 @@
 /* WRONG CUT: the real function is func_00430330, size 0x7C (splat split it at func_00430374). */
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Turok 2: the mode block sits at 0x23FD0 (see CEngineApp__UpdateCinemaMode). */
 
@@ -17,7 +18,7 @@ void func_00430330(CEngineApp *session) {
     Controller_SetRumbleOptionAll(0);
     RumblePool_FreeAll(gRumblePool);
     func_0025359C(&gEngineApp_m_Game.m_PlayerList);
-    m = &gEngineApp_m_Settings_match;
+    m = &gEngineApp_m_Settings.match;
     m->teams = 0;
     m->tag = 0;
     m->unk44 = 0;

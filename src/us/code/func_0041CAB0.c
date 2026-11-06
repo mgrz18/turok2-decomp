@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/game.h"
 
 /* Only the field written here. */
 typedef struct {
@@ -8,10 +9,9 @@ typedef struct {
 
 extern u8 D_800B5C60[];
 extern u8 D_800B5C6C[];
-extern s32 gEngineApp_m_Settings_match_tag;
 
 s32 StatsMenu_HeaderText(MenuData *arg0) {
-    if (gEngineApp_m_Settings_match_tag != 0) {
+    if (gEngineApp_m_Settings.match.tag != 0) {
         arg0->data = D_800B5C6C;
     } else {
         arg0->data = D_800B5C60;
