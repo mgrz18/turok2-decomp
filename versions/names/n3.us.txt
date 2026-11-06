@@ -407,7 +407,7 @@ EnemyAnim_Move_B0600 = 0x0025AD5C; // AI_PickAnimFromTable(D_800B0600, m_Enemy.m
 EnemyAnim_PickAttack_B0A60 = 0x0025A304; // weighted pick among the combat (0x25A5A8), leap (0x25A62C) and weapon (0x25A7B8) pickers allowed by the intelligence's flags; anim callback in table D_800B0A60
 EnemyAnim_PickAttack_B0E80 = 0x0025A3DC; // same over the D_800B0E80 variants (0x25A5D4, 0x25A658, ...)
 EnemyAnim_PickAttack_B1200 = 0x0025A480; // same over the D_800B1200 variants (0x25A600, 0x25A684, ...)
-EnemyAnim_IdleOverride = 0x0025AC88; // the idle pick from three override slots D_800F5C66 (+0, +100, +200) or the plain idle table D_800AF6F0
+EnemyAnim_JoypadTestPlayAnim = 0x0025AC88; // anim of mode 0x32 ENEMY_JOYPAD_TEST_PLAY_ANIM_MODE: the idle pick from three override slots D_800F5C66 (+0, +100, +200) or the plain idle table D_800AF6F0
 
 // The first-person weapon actor (CPlayer.m_WeaponActor, CAI m_Weapon vars):
 // WeaponActor_InitAI installs mode table D_800AE394, m_pfStep and m_pfDraw;
@@ -471,7 +471,13 @@ WeaponMode_AE934_Enter = 0x00259E30; // m_RefireDelay = D_800A7364, mode 4
 // D_800B0EA0 / D_800B1220 (idle 0xA, location 0xB, alert 0xC, take cover
 // 0xD, patrol/move/flee 3-6, evade 8-9, attacks 0xE-0x12, recoil 0x13,
 // combo end 0x14, grab 0x15, reactions 0x1C-0x22, arm wounds 0x24-0x25,
-// ridden 0x2C-0x2E). Mode numbers below are those table ids.
+// ridden 0x2C-0x2E). Mode numbers below are those table ids; the mode
+// names are the ROM's own EnemyModes enum (SN64 debug type records at ROM
+// 0x12F2xx, values in order from 0 ENEMY_WAIT_FOR_TRIGGER_MODE: 2 START,
+// 4 MOVE, 0xA IDLE, 0xB INTERACTIVE_IDLE, 0x13 COMBO, 0x15
+// PICKUP_THROW_OBJECT, 0x17 TELEPORT_OUT, 0x1C-0x22 REACTION_EXPLOSION ..
+// REACTION_BORE_CLUNK, 0x26-0x2B the ground/air/underwater transitions,
+// 0x2C PLAYER_RIDE_IDLE, 0x33 FEIGN_DEATH, 0x34 DEATH .. 0x3C DEATH_MELT).
 AI_TurnHeadToTarget = 0x0025AD90; // loads the "anim object info" and turns the head yaw/pitch toward the target (with a pitch offset); 6 callers
 EnemyAI_PickDeathMode = 0x0025B078; // picks the death from what killed the actor (weapon, projectile, hit direction)
 EnemyAI_OnDamage = 0x0025B2D4; // retargets the attacker, takes the health, hurt sound, death/fall/flinch reaction, knock back
@@ -486,10 +492,10 @@ EnemyAI_Update = 0x0025C5F8; // the enemy step: age, frame time, current mode ha
 EnemyAI_OnHit = 0x0025CAC8; // m_pfHit: a near projectile lengthens the wait and is heard; its type picks a reaction
 EnemyAI_PickAttack = 0x0025D030; // weighted random among the attacks the definition enables for the mode whose range test passes
 EnemyAI_TryDodge = 0x0025D308; // dodges, with a probability growing with the skill, to the side away from the attack
-EnemyMode_Chase_Update = 0x0025D474; // update of idle/patrol/move/flee (0xA, 3-6): turn to the target, run or walk, bank in flight, attack in range
-EnemyAnim_PickLocation = 0x0025D9E4; // mode 0xB anim: one candidate from the location's primary and one from its secondary flags
-EnemyMode_Combat_Update = 0x0025DBD8; // modes 0xE-0x12: turn to the target, taunt, the 0x11F4 anims, dodge, type 0x259's melee
-EnemyMode_Recoil_Update = 0x0025DDBC; // mode 0x13: turn at double speed, recoil timer, react to hits (0xA/0x14)
+EnemyMode_Move_Update = 0x0025D474; // update of idle/patrol/move/flee (0xA, 3-6): turn to the target, run or walk, bank in flight, attack in range
+EnemyAnim_InteractiveIdle = 0x0025D9E4; // mode 0xB anim: one candidate from the location's primary and one from its secondary flags
+EnemyMode_Attack_Update = 0x0025DBD8; // modes 0xE-0x12: turn to the target, taunt, the 0x11F4 anims, dodge, type 0x259's melee
+EnemyMode_Combo_Update = 0x0025DDBC; // mode 0x13: turn at double speed, recoil timer, react to hits (0xA/0x14)
 EnemyAnim_PickDeath = 0x0025DF04; // anim of modes 0x33/0x34: the explosive, violent, moving or normal death picker by flags and index (the file's "attack" comment is off: the pickers are the m_w*DeathAnimFlags ones)
 EnemyMode_Death_Update = 0x0025E248; // deaths 0x34-0x3B: in the 7020-7041 band chains to the next anim (landing), else finishes
 EnemyAI_GetBehaviorIndex = 0x0025E428; // CEnemyAIVars.m_BehaviorIndex
@@ -502,19 +508,19 @@ EnemyAI_GetGrabbed = 0x0025E47C; // CEnemyAIVars.m_pGrabbed
 EnemyAI_SetGrabbed = 0x0025E488; // sets m_pGrabbed and tells it (func_00264C8C)
 EnemyAI_HeadNodeCallback = 0x0025E4B8; // node callback: turns the node by the owner's m_HeadTurn/m_HeadTilt (0x164/0x168) when the value is in range
 AI_HearNoise = 0x0025E52C; // raises the alert level on a noise of a kind within 3072 units and remembers where it came from; 7 callers
-EnemyMode_Start_Enter = 0x0025E650; // mode 0 enter: empty
-EnemyMode_Start_Update = 0x0025E658; // mode 0 update: enemies (type 1 without 0x800) go to mode 2
-EnemyMode_Wait_Enter = 0x0025E698; // mode 1 enter: empty
-EnemyMode_Wait_Update = 0x0025E6A0; // mode 1 update: m_ConditionTimer down, then mode 2
+EnemyMode_WaitForTrigger_Enter = 0x0025E650; // mode 0 enter: empty
+EnemyMode_WaitForTrigger_Update = 0x0025E658; // mode 0 update: enemies (type 1 without 0x800) go to mode 2
+EnemyMode_StartDelay_Enter = 0x0025E698; // mode 1 enter: empty
+EnemyMode_StartDelay_Update = 0x0025E6A0; // mode 1 update: m_ConditionTimer down, then mode 2
 EnemyAnim_PickStart = 0x0025E6E0; // anim of modes 1-2: m_StartAnim (+1 for types 0x1F9/0x385 in the 0x2B16 band)
-EnemyMode_Wake_Enter = 0x0025E798; // mode 2 enter: plays m_StartSound
-EnemyMode_Wake_Update = 0x0025E7E0; // mode 2 update: turns toward the target (pi/3 or pi/12 a step), then mode 4
+EnemyMode_Start_Enter = 0x0025E798; // mode 2 enter: plays m_StartSound
+EnemyMode_Start_Update = 0x0025E7E0; // mode 2 update: turns toward the target (pi/3 or pi/12 a step), then mode 4
 EnemyMode_Death_Enter = 0x0025E888; // deaths 0x34-0x3B enter: health 0, flags, death setup from the definition
-EnemyMode_Gone_Enter = 0x0025E94C; // mode 0x3C enter: draw callback func_002605AC, sound off, region event 0x80
-EnemyMode_Gone_Update = 0x0025E9BC; // mode 0x3C update: squash and remove after 30
+EnemyMode_DeathMelt_Enter = 0x0025E94C; // mode 0x3C enter: draw callback func_002605AC, sound off, region event 0x80
+EnemyMode_DeathMelt_Update = 0x0025E9BC; // mode 0x3C update: squash and remove after 30
 EnemyAI_UsesRideTables = 0x0025EAB0; // 0 for mode tables D_800B17C0/1840/18C0 or type 0x259, else 1
 EnemyAI_GetTypeTurnRate = 0x0025EAFC; // a turn rate, another for type 0x259
-EnemyAI_GetModeTurnRate = 0x0025EB24; // pi/3 after modes 1-2, else pi/12 (see EnemyMode_Wake_Update)
+EnemyAI_GetModeTurnRate = 0x0025EB24; // pi/3 after modes 1-2, else pi/12 (see EnemyMode_Start_Update)
 AI_LerpByAggression = 0x0025EB50; // a + m_Aggression/255 * (b - a)
 EnemyAI_Mount = 0x0025EB80; // the player mounts the creature: m_pGrabbed = player, keeps its scale, model +1, mode 0x2C
 EnemyAI_Dismount = 0x0025EC28; // back from riding: draw and orientation callbacks, scale and model restored, mode 0xA (called by CPlayer__Dismount)
@@ -523,52 +529,52 @@ EnemyAI_DrawWithBlend = 0x0025ED4C; // draw override: blend fill mode and colour
 EnemyAI_CheckOffscreen = 0x0025EE38; // not in view (func_00220408): flags 0x2100; while a cinema plays sets 0x200
 EnemyAI_SleepIfOffscreen = 0x0025EEA4; // out of view in mode 0: EnemyAI_CheckOffscreen and mode 2
 EnemyAI_CheckGrab = 0x0025EF68; // alive and the last collision hit its path target: grabs it (m_pGrabbed) and goes to mode 0x15
-EnemyAnim_PickStartMode0 = 0x0025EFF8; // mode 0 anim: start anim for types 0x1F9/0x385
-EnemyMode_Location_Update = 0x0025F068; // mode 0xB: turns (15 or 60 degrees) toward the target, then mode 0xA
-EnemyMode_Alert_Update = 0x0025F114; // mode 0xC: turns toward D_800B06A0, then EnemyMode_Chase_Update
+EnemyAnim_WaitForTrigger = 0x0025EFF8; // mode 0 anim: start anim for types 0x1F9/0x385
+EnemyMode_InteractiveIdle_Update = 0x0025F068; // mode 0xB: turns (15 or 60 degrees) toward the target, then mode 0xA
+EnemyMode_Alert_Update = 0x0025F114; // mode 0xC: turns toward D_800B06A0, then EnemyMode_Move_Update
 EnemyMode_TakeCover_Update = 0x0025F1B4; // mode 0xD: empty
 EnemyMode_Evade_Update = 0x0025F1D0; // modes 8-9: holds the evade anims while aimed at (AI_IsAimedAt), else back to 0xA
 EnemyMode_Attack_Enter = 0x0025F29C; // modes 0xE-0x12 enter: attack delay from the intensity, clears AI flag 0x4000000
-EnemyMode_Recoil_Enter = 0x0025F2F8; // mode 0x13 enter: timer from the intensity (15..45)
+EnemyMode_Combo_Enter = 0x0025F2F8; // mode 0x13 enter: timer from the intensity (15..45)
 EnemyMode_ComboEnd_Update = 0x0025F358; // mode 0x14: back to 0xA when the anim ends
-EnemyMode_Grab_Enter = 0x0025F380; // mode 0x15 enter: puts the grabbed actor in mode 1
-EnemyMode_Grab_Update = 0x0025F3A4; // mode 0x15: turns toward the target with anim 10000, releases the grabbed actor near its end
-EnemyMode16_Enter = 0x0025F4AC; // mode 0x16 enter: empty
-EnemyMode16_Update = 0x0025F4B4; // mode 0x16: back to 0xA when the anim ends
-EnemyMode17_Update = 0x0025F4DC; // mode 0x17: to 0x18 when the anim ends
-EnemyMode18_Enter = 0x0025F504; // mode 0x18 enter: a random point within the leash radius (or 2048)
-EnemyMode18_Update = 0x0025F5FC; // mode 0x18: back to 0xA when the anim ends
-EnemyMode19_Enter = 0x0025F624; // mode 0x19 enter: random m_Timer and m_Timer2
-EnemyMode19_Update = 0x0025F684; // mode 0x19: back to 0xA after four loops
-EnemyMode26_Update = 0x0025F6B0; // mode 0x26: sets var byte 0x27, mode 4 when the anim ends
-EnemyMode27_Update = 0x0025F6DC; // mode 0x27: m_BehaviorIndex 2, then mode 4
-EnemyMode28_Update = 0x0025F708; // mode 0x28: behaviour index 0, then mode 4
-EnemyMode29_Update = 0x0025F730; // mode 0x29: m_BehaviorIndex 2, then mode 4
-EnemyMode2A_Update = 0x0025F75C; // mode 0x2A: var byte 0x27 cleared, then mode 4
-EnemyMode2B_Update = 0x0025F784; // mode 0x2B: behaviour index 1, then mode 4
+EnemyMode_PickupThrowObject_Enter = 0x0025F380; // mode 0x15 enter: puts the grabbed actor in mode 1
+EnemyMode_PickupThrowObject_Update = 0x0025F3A4; // mode 0x15: turns toward the target with anim 10000, releases the grabbed actor near its end
+EnemyMode_DropObject_Enter = 0x0025F4AC; // mode 0x16 enter: empty
+EnemyMode_DropObject_Update = 0x0025F4B4; // mode 0x16: back to 0xA when the anim ends
+EnemyMode_TeleportOut_Update = 0x0025F4DC; // mode 0x17: to 0x18 when the anim ends
+EnemyMode_TeleportIn_Enter = 0x0025F504; // mode 0x18 enter: a random point within the leash radius (or 2048)
+EnemyMode_TeleportIn_Update = 0x0025F5FC; // mode 0x18: back to 0xA when the anim ends
+EnemyMode_CloakActivate_Enter = 0x0025F624; // mode 0x19 enter: random m_Timer and m_Timer2
+EnemyMode_CloakActivate_Update = 0x0025F684; // mode 0x19: back to 0xA after four loops
+EnemyMode_GroundToAir_Update = 0x0025F6B0; // mode 0x26: sets var byte 0x27, mode 4 when the anim ends
+EnemyMode_GroundToUnderwater_Update = 0x0025F6DC; // mode 0x27: m_BehaviorIndex 2, then mode 4
+EnemyMode_AirToGround_Update = 0x0025F708; // mode 0x28: behaviour index 0, then mode 4
+EnemyMode_AirToUnderwater_Update = 0x0025F730; // mode 0x29: m_BehaviorIndex 2, then mode 4
+EnemyMode_UnderwaterToGround_Update = 0x0025F75C; // mode 0x2A: var byte 0x27 cleared, then mode 4
+EnemyMode_UnderwaterToAir_Update = 0x0025F784; // mode 0x2B: behaviour index 1, then mode 4
 EnemyAI_BobToTargetHeight = 0x0025F7B0; // bobs toward the target height on a sine wave, then mode 0x3C
-EnemyReact1C_Enter = 0x0025F8E4; // mode 0x1C enter: m_Aggression += 25
-EnemyReact1C_Update = 0x0025F900; // mode 0x1C: to 0x1E when the anim ends
-EnemyReact1D_Enter = 0x0025F928; // mode 0x1D enter: m_Aggression += 10, timer 240..120
-EnemyReact1D_Update = 0x0025F978; // mode 0x1D: timer (at most 240) down, then 0x1E
-EnemyReact1E_Update = 0x0025F9D4; // mode 0x1E: back to 0xA when the anim ends
-EnemyReact1F_Enter = 0x0025F9FC; // mode 0x1F enter: intensity +10, reaction delay 105..60
-EnemyReact1F_Update = 0x0025FA54; // mode 0x1F: timer down, then 0xA
-EnemyReact20_Enter = 0x0025FAB0; // mode 0x20 enter: m_Aggression += 10, condition timer cleared
-EnemyReact20_Update = 0x0025FAD0; // mode 0x20: damage over time (34/s, flag 0x100000) through CAI__CallHurt, sound 0x227, then 0xA
-EnemyReact21_Enter = 0x0025FBB8; // mode 0x21 enter: intensity +20, timer 75..60
-EnemyReact21_Update = 0x0025FC08; // mode 0x21: when the timer runs out the actor dies (mode 0x38 or 0x34)
-EnemyReact22_Enter = 0x0025FCB8; // mode 0x22 enter: intensity +20, delay 75..60
-EnemyReact22_Update = 0x0025FD08; // mode 0x22: back to 0xA when the anim ends
-EnemyMode_ArmWound_Update = 0x0025FD30; // modes 0x24-0x25: EnemyMode_Chase_Update once the anim ends
-EnemyMode33_Enter = 0x0025FD58; // mode 0x33 enter: empty
-EnemyMode33_Update = 0x0025FD60; // mode 0x33: when the anim ends, 0x3C if dead else 0x1E
-EnemyAnim_DeathPick35 = 0x0025FD98; // anim of modes 0x35/0x36: a death anim of the definition (+1 in mode 0x35)
-EnemyAnim_DeathAnim0 = 0x0025FDC8; // anim of mode 0x37: m_DeathAnims[0]
-EnemyAnim_DeathAnim1 = 0x0025FDD8; // anim of mode 0x38: m_DeathAnims[1]
-EnemyAnim_DeathAnim2 = 0x0025FDE8; // anim of mode 0x39: m_DeathAnims[2]
-EnemyAnim_DeathAnim3 = 0x0025FDF8; // anim of mode 0x3A: m_DeathAnims[3]
-EnemyAnim_DeathAnim4 = 0x0025FE08; // anim of mode 0x3B: m_DeathAnims[4]
-EnemyMode_Ridden_Update = 0x0025FE18; // modes 0x2C-0x2E: follows the rider's ride states (33 -> 0x2C, 34 -> 0x2D)
+EnemyMode_ReactionExplosion_Enter = 0x0025F8E4; // mode 0x1C enter: m_Aggression += 25
+EnemyMode_ReactionExplosion_Update = 0x0025F900; // mode 0x1C: to 0x1E when the anim ends
+EnemyMode_ReactionFallDown_Enter = 0x0025F928; // mode 0x1D enter: m_Aggression += 10, timer 240..120
+EnemyMode_ReactionFallDown_Update = 0x0025F978; // mode 0x1D: timer (at most 240) down, then 0x1E
+EnemyMode_ReactionGetup_Update = 0x0025F9D4; // mode 0x1E: back to 0xA when the anim ends
+EnemyMode_ReactionBlinded_Enter = 0x0025F9FC; // mode 0x1F enter: intensity +10, reaction delay 105..60
+EnemyMode_ReactionBlinded_Update = 0x0025FA54; // mode 0x1F: timer down, then 0xA
+EnemyMode_ReactionShocked_Enter = 0x0025FAB0; // mode 0x20 enter: m_Aggression += 10, condition timer cleared
+EnemyMode_ReactionShocked_Update = 0x0025FAD0; // mode 0x20: damage over time (34/s, flag 0x100000) through CAI__CallHurt, sound 0x227, then 0xA
+EnemyMode_ReactionBore_Enter = 0x0025FBB8; // mode 0x21 enter: intensity +20, timer 75..60
+EnemyMode_ReactionBore_Update = 0x0025FC08; // mode 0x21: when the timer runs out the actor dies (mode 0x38 or 0x34)
+EnemyMode_ReactionBoreClunk_Enter = 0x0025FCB8; // mode 0x22 enter: intensity +20, delay 75..60
+EnemyMode_ReactionBoreClunk_Update = 0x0025FD08; // mode 0x22: back to 0xA when the anim ends
+EnemyMode_WoundedArm_Update = 0x0025FD30; // modes 0x24-0x25: EnemyMode_Move_Update once the anim ends
+EnemyMode_FeignDeath_Enter = 0x0025FD58; // mode 0x33 enter: empty
+EnemyMode_FeignDeath_Update = 0x0025FD60; // mode 0x33: when the anim ends, 0x3C if dead else 0x1E
+EnemyAnim_ExtremeDeath = 0x0025FD98; // anim of modes 0x35/0x36: a death anim of the definition (+1 in mode 0x35)
+EnemyAnim_PfmDeath = 0x0025FDC8; // anim of mode 0x37: m_DeathAnims[0]
+EnemyAnim_HeadBlownOffDeath = 0x0025FDD8; // anim of mode 0x38: m_DeathAnims[1]
+EnemyAnim_LeftArmBlownOffDeath = 0x0025FDE8; // anim of mode 0x39: m_DeathAnims[2]
+EnemyAnim_RightArmBlownOffDeath = 0x0025FDF8; // anim of mode 0x3A: m_DeathAnims[3]
+EnemyAnim_BodyHoleDeath = 0x0025FE08; // anim of mode 0x3B: m_DeathAnims[4]
+EnemyMode_PlayerRide_Update = 0x0025FE18; // modes 0x2C-0x2E: follows the rider's ride states (33 -> 0x2C, 34 -> 0x2D)
 Projectile_PlaceAtMuzzle = 0x0025FEB0; // inherits the shooter's rotation, yaws by its own angle, pushed 10.24 along it
-EnemyMode31_Update = 0x0025FFF0; // mode 0x31: to 0x32 when an idle override slot (D_800F5C66) is set
+EnemyMode_JoypadTestIdle_Update = 0x0025FFF0; // mode 0x31: to 0x32 when an idle override slot (D_800F5C66) is set
