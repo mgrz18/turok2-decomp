@@ -2,19 +2,9 @@
  * past splat's end of virtual_text_0 (ROM 0x17A600) into what the yaml calls virtual_rodata_0. */
 #include "common.h"
 #include "structs/game.h"
+#include "structs/gbi.h"
+#include "globals/automap.h"
 
-typedef struct LineVtx {
-    /* 0x0 */ s16 ob[3];
-    /* 0x6 */ u16 flag;
-    /* 0x8 */ s16 tc[2];
-    /* 0xC */ u8 cn[4];
-} LineVtx;
-
-/* Two (double-buffered) sets of debug vertex buffers, one colour each. */
-extern LineVtx sAutomapLineVtx[2][0x200]; /* green */
-extern LineVtx sAutomapMagentaVtx[2][8];     /* magenta */
-extern LineVtx sAutomapRedVtx[2][0xC0];  /* red */
-extern LineVtx sAutomapYellowVtx[2][3];     /* yellow */
 
 #define SET_VTX(v, r, g, b)  \
     (v).ob[0] = 0;          \

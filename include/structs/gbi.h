@@ -15,4 +15,12 @@ typedef struct {
 
 typedef struct { u8 l[0x20]; } LookAt;       /* two Light_t directions */
 
+/* A vertex (PR/gbi.h Vtx_t). */
+typedef struct {
+    /* 0x0 */ s16 ob[3];        /* position */
+    /* 0x6 */ u16 flag;
+    /* 0x8 */ s16 tc[2];        /* texture coordinates */
+    /* 0xC */ u8 cn[4];         /* colour and alpha */
+} Vtx_t; /* size 0x10 */
+
 #endif
