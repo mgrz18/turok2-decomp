@@ -12,14 +12,9 @@
 #include "globals/controller.h"
 #include "globals/libultra.h"
 
-typedef struct {
-    /* 0x00 */ s16 type;
-} EngineMsg;
-
 extern u8 gPoolBuffers[];
 extern void *gCFB[];      /* frame buffers */
 extern f32 gCurrentFB[];
-extern EngineMsg *gGfxMsg;
 extern s32 D_800F6CA8;
 extern s32 D_8011F144;
 extern s32 D_8011B114;

@@ -6,6 +6,7 @@
 
 #include "ultra_types.h"
 #include "structs/frame.h"
+#include "structs/sched.h"
 #include "structs/gbi.h" /* Mtx */
 
 extern CFrameData *gFrameData;           /* the frame being finished */
@@ -33,6 +34,8 @@ extern s64 sGfxTaskStartTime;
 /* The engine thread's message queue ("gfxFrameMsgQ", "gfxFrameMsgBuf"). */
 extern OSMesgQueue gGfxFrameMessageQueue;
 extern OSMesg gGfxFrameMessageBuffer[0x1000];
+extern OSScClient gGfxClient;             /* the engine thread, osScAddClient'ed at boot ("gfxClient") */
+extern OSScMsg *gGfxMsg;                 /* the message CEngineApp__Main received ("pMsg") */
 
 /* The thread stacks and threads (Turok 3's names). */
 extern u64 gGfxYieldBuffer[];            /* the RSP yield buffer (the start of the cleared BSS) */
