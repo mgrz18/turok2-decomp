@@ -3,13 +3,13 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/boss.h"
+#include "globals/game.h"
 
 /* Script command: waits until the current player is within 716.8 units of the origin, then steps the
  * script to the next command. */
 
 
 extern BlindOnePhase sBlindOnePhases_2[];
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern f32 func_00298470(f32);
 
 /* Advances the script by one command, stops the movers and runs the new command. */
@@ -40,7 +40,7 @@ static __inline__ void NextCommand(BlindOneState *m) {
 }
 
 void BlindOne_PhaseWaitPlayerUpdate_2(BlindOneState *m) {
-    CPlayer *player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+    CPlayer *player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
 
     if (player != NULL) {
         if (func_00298470(player->m_CharacterActor.header.m_vPos.x * player->m_CharacterActor.header.m_vPos.x + player->m_CharacterActor.header.m_vPos.y * player->m_CharacterActor.header.m_vPos.y +

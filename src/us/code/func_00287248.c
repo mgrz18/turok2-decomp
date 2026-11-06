@@ -2,16 +2,15 @@
 #include "common.h"
 #include "structs/game.h"
 #include "gfx.h"
+#include "globals/frame.h"
 
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
 extern s32 gVideoClearFrames;          /* frames left to clear the screen */
-extern s32 gDepthBuffer;          /* z-buffer */
 extern s32 gEvenOdd;
 extern f32 gFrameIncrement;          /* frame time */
 extern f32 gRenderTime;          /* render time, seconds */
 extern void (*D_800B6D80[][3])(CEngineApp *);
-extern s32 gNextTicks;
 extern u8 gGfxFrameMessageQueue[];       /* the RSP task queue */
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 

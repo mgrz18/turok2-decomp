@@ -4,20 +4,15 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
+#include "globals/pak.h"
 
 void PakMenu_UpdateNoteRows_2(Menu *menu);
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuLeaving;
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuIsProfile;
-extern s32 gPakMenuWrites;
 extern s32 gPakMenuMode;
 extern char gPakMsgInsertToLoadDesc_2[];
 extern char gPakMsgPakNotFoundDesc_2[];
 extern char gCharacterMenuAfterPakDesc_2[];
-extern s32 gPakMenuAnyPak;
 extern s32 gDamagedPakContinued;
-extern char gEngineApp_m_Game_m_MenuPool[];
 extern char gDamagedPakAtBootMenuDesc_2[];
 extern char gPakLoadProfileMenuDesc_2[];
 extern void Pak_ProbeSlot_2(s32 ch);
@@ -48,10 +43,10 @@ void PakMenu_InitLoadProfile_2(Menu *menu) {
     }
     gPakMenuLeaving = 1;
     if (Pak_IsRumblePak_2(ch) != 0) {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToLoadDesc_2, menu->player, menu->controller, gCharacterMenuAfterPakDesc_2);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToLoadDesc_2, menu->player, menu->controller, gCharacterMenuAfterPakDesc_2);
     } else if (Pak_NeedsRepair_2(ch) != 0) {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc_2, menu->player, menu->controller, gPakLoadProfileMenuDesc_2);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc_2, menu->player, menu->controller, gPakLoadProfileMenuDesc_2);
     } else {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc_2, menu->player, menu->controller, gCharacterMenuAfterPakDesc_2);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc_2, menu->player, menu->controller, gCharacterMenuAfterPakDesc_2);
     }
 }

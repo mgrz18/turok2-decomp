@@ -6,19 +6,18 @@
 #include "structs/menu.h"
 #include "structs/pak.h"
 #include "structs/save.h"
+#include "globals/menu.h"
+#include "globals/pak.h"
 
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort; /* pad */
 extern s32 D_800F70A8;
-extern s32 gPakMenuIsSave;
 extern s32 gSaveBufferHandle;
 extern s32 gLoadBufferHandle;
 extern char gPakGameNoteName[];
 extern char gPakGameCode[];
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPakConfirmNoSpaceDesc_2[];
 extern u8 gPakMsgSaveDoneDesc_2[];
 extern u8 gPakMsgSaveFailedDesc_2[];
@@ -93,7 +92,7 @@ s32 PakMenu_WriteSaveGame_2(s32 unused, Menu *own) {
                 }
             }
             if (ok != 0) {
-                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakConfirmNoSpaceDesc_2, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakConfirmNoSpaceDesc_2, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -108,9 +107,9 @@ s32 PakMenu_WriteSaveGame_2(s32 unused, Menu *own) {
     }
     err = r;
     if (err == 0) {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc_2, plr, plr->m_ContState.m_pContState, (s32)gSavePortalMenuDescB_2);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc_2, plr, plr->m_ContState.m_pContState, (s32)gSavePortalMenuDescB_2);
     } else {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc_2, plr, plr->m_ContState.m_pContState, (s32)gSavePortalMenuDescB_2);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc_2, plr, plr->m_ContState.m_pContState, (s32)gSavePortalMenuDescB_2);
     }
     return 1;
 }

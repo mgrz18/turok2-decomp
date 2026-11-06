@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
@@ -9,9 +10,8 @@ extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
 extern f32 gFrameIncrement;          /* per-frame scale */
-extern f32 gLevelScript_script;         /* cooldown */
-extern BossStep *gLevelScript_script_steps;   /* script */
-extern s32 gLevelScript_script_cursor;         /* cursor */
+extern f32 gLevelScript_script; /* local type: the field's real type (or the member path) changes the ROM's code here */         /* cooldown */
+extern s32 gLevelScript_script_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */         /* cursor */
 
 void Primagen_UpdateMode1(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -36,17 +36,17 @@ void Primagen_UpdateMode1(CGameObjectInstance *obj, CAI *ai) {
     if (gLevelScript_bossState.scriptOn && gLevelScript_bossState.state != 10) {
         if (gLevelScript_bossState.script.current == -1) {
             if (gLevelScript_script_cursor != -1) {
-                gLevelScript_script = gLevelScript_script_steps[gLevelScript_script_cursor].delay;
+                gLevelScript_script = gLevelScript.script.steps[gLevelScript_script_cursor].delay;
             } else {
                 gLevelScript_script = 0.0f;
             }
             do {
                 gLevelScript_script_cursor++;
-                if (gLevelScript_script_steps[gLevelScript_script_cursor].type == 5) {
+                if (gLevelScript.script.steps[gLevelScript_script_cursor].type == 5) {
                     gLevelScript_script_cursor = 0;
                 }
                 gLevelScript_bossState.script.current = gLevelScript_script_cursor;
-            } while ((f32) gLevelScript_script_steps[gLevelScript_script_cursor].chance <= Random_Blend(0.0f, 100.0f));
+            } while ((f32) gLevelScript.script.steps[gLevelScript_script_cursor].chance <= Random_Blend(0.0f, 100.0f));
         }
         if (Primagen_RunAttackStep(obj, ai, t.m_Sight.m_Dist)) {
             return;

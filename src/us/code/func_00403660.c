@@ -2,6 +2,7 @@
 #include "structs/boss.h"
 #include "structs/light.h"
 #include "structs/model.h"
+#include "globals/boss.h"
 
 /* A weak spot seen from its animator: walking BossWeakSpot pointers and
  * taking &slot->anim moves the +4 into the loop and breaks the match. */

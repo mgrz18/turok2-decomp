@@ -19,6 +19,8 @@
 #include "structs/menu_model.h"
 #include "structs/camera.h"
 #include "gfx.h"
+#include "globals/game.h"
+#include "globals/menu.h"
 
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -26,8 +28,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F290.c, func_0043F290, with Turok 2's layouts. */
 
 extern s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
-extern char sMenuBindingValue[];
-extern char sMenuBindingText[];
 
 /* Reads the item's bound variable as a float, whatever its type. */
 static __inline__ f32 MenuItem_GetValue(MenuItem *item) {
@@ -303,7 +303,7 @@ void MenuItem_Layout(MenuItem *it, MenuItemLayout *o) {
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043FFAC.c, func_0043FFAC, with Turok 2's layouts. */
 
 extern s32 gMenuCurrentFont; /* current draw mode */
-extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[];
+extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 
@@ -551,7 +551,6 @@ extern f32 gFrameIncrement; /* frame time scale */
 extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
-extern s32 sMenuModelFade;
 extern u8 gScene[];
 extern s32 gCharacterModels[];
 
@@ -1608,7 +1607,6 @@ s32 CList__Remove(s32, s32);
 s32 CCache__Deallocate(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update");
 
-extern MenuPool gEngineApp_m_Game_m_MenuPool;
 
 void MenuPool_Update(MenuPool *arg0) {
     s32 (*temp_v0)(Menu *, MenuPool *);
@@ -1925,7 +1923,6 @@ extern s32 gBlendState;
 extern O06Cam gBlendState_m_Color[];
 extern O06Seg D_800AB0E8_4171F4 __asm__("gDefaultLights");
 extern s32 gEvenOdd;
-extern s32 sMenuModelFade;
 extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
 /* The selected model item's draw callback (MenuItem_DrawModel): drawn with the
  * lights of gDefaultLights and a fade by sMenuModelFade. */

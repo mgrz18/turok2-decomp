@@ -1,10 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00405454.c, func_00405454.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef unsigned char u8;
-typedef unsigned short u16;
-typedef signed int s32;
-extern s32 gPakState[];
+#include "common.h"
+#include "globals/pak.h"
 s32 Pak_FindNote_2(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
 s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext) {
     s32 mask = 0;

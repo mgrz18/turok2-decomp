@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
@@ -39,7 +40,6 @@ typedef struct {
 
 /* What this reads around gEngineApp_m_Settings_match. */
 
-extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
 extern s32 gLitVerticesKey;
 extern char D_800A57F8[];
 extern s8 gColorPulseTable[];         /* the colour pulse, 64 steps */
@@ -129,7 +129,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
         }
     } while (0);
     argument = prop->descriptor->argument;
-    if (gEngineApp_m_Settings_multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         mode = Actor_GetTypeClass();
         switch (mode) {
             case 1:
@@ -142,7 +142,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
                 lod = prop->descriptor->lod;
                 break;
             default: {
-                GameMatch *game = &gEngineApp_m_Settings_match;
+                GameMatch *game = &gEngineApp_m_Settings.match;
                 if (game->tag) {
                     lod = ((s8 *) game)[-0x1B0];
                 } else {

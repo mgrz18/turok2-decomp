@@ -1,19 +1,13 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 void Controller_WatchPak(s32 port);
 void Pak_ProbeSlot(s32 port);
 
 extern s32 gDamagedPakContinued;
 extern s32 gPakMenuPort;
-extern s32 sSavePortalChosen;
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsLoad;
-extern s32 gSavePortalActive;
-extern s32 gPakMenuWrites;
 extern s32 D_801309AC;
-extern s32 gPakMenuIsProfile;
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

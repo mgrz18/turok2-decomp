@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 extern s32 Pak_GetNotePages_2(s32 index, s32 entry, s32 *out);
 extern s32 Pak_BytesToPages_2(s32);

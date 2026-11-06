@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 typedef struct {
     /* 0x00 */ char pad0[0x14];
@@ -7,7 +8,6 @@ typedef struct {
 } KeyEvent;
 
 extern u8 gCheatEntryText[];
-extern s32 sEnterCheatResult;
 
 /* Inserts the event's character at the cursor (max 22 chars). */
 s32 EnterCheatMenu_InsertLetter(KeyEvent *ev) {

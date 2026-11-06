@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ f32 unk0;
@@ -7,7 +8,6 @@ typedef struct {
 } Tuning;
 
 extern Tuning D_800C0530;
-extern f32 gLevelScript_timer;
 
 void Primagen_EnterMode23(CGameObjectInstance *obj) {
     f32 *speed = &D_800C0530.animSpeed;
@@ -15,6 +15,6 @@ void Primagen_EnterMode23(CGameObjectInstance *obj) {
     s32 *flags = &obj->m_dwFlags;
 
     *animSpeed = *speed;
-    gLevelScript_timer = *speed;
+    gLevelScript.timer = *speed;
     *flags = (s32) (*flags | 0x2000);
 }

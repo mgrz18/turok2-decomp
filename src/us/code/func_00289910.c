@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/menu.h"
 
-extern s32 gEngineApp_m_Settings_match_unk44;
 extern s32 gFrameCountGameplay;
 extern f32 gFrameIncrement[2];   /* frame time scales */
 extern f32 gParticleTimeScale;
 extern f32 gEmitterTimeScale;
 extern u8 gScene[];
-extern s32 gInSinglePlayerMenu;
 
 extern void CEngineApp__UpdateControllers(void);
 extern void Demo_PlayNext(void);
@@ -23,7 +23,7 @@ extern void CScene__RequestWarp(void *, s32, s32);
 void EngineMode13_Game_Init(CEngineApp *state) {
     s32 flag;
 
-    gEngineApp_m_Settings_match_unk44 = 0;
+    gEngineApp_m_Settings.match.unk44 = 0;
     gFrameCountGameplay = 0;
     CEngineApp__UpdateControllers();
     flag = 1;

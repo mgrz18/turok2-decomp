@@ -1,5 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/game.h"
+#include "globals/frame.h"
+#include "globals/scene.h"
 
 /* libultra __OSThreadContext: 64-bit registers, read here as their low words. */
 typedef struct ThreadContext {
@@ -31,13 +34,9 @@ extern s32 gScreenWidth;              /* screen width */
 extern s32 gScreenHeight;              /* screen height */
 extern u16 *gCFB;             /* frame buffer */
 extern u16 *sCrashFrameBuffer;             /* crash screen frame buffer */
-extern u16 sCrashTextColor;              /* text colour */
 extern u16 sCrashBgColor;              /* background colour */
 extern char gEngineTimestamp[];           /* build string */
 extern char D_8010FED4[];
-extern s32 gScene_m_bWarpSpawn;              /* warping */
-extern s32 gScene_m_LevelID;              /* warp id */
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* players */
 extern char *gAssertFile;            /* failed assertion: file */
 extern s32 D_800F1FF0;              /* failed assertion: line */
 extern char *D_800F1FF4;            /* failed assertion: expression */
@@ -123,7 +122,7 @@ void Crash_ShowScreen(Thread *thread) {
         printString((u8 *)"NO WARP ID");
     }
     printString(D_800AA0F0);
-    for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead, i = 0; player != NULL; player = player->m_pNext, i++) {
+    for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead, i = 0; player != NULL; player = player->m_pNext, i++) {
         printString((u8 *)"PLAYER");
         printInt(i);
         printString((u8 *)" XYZ ");

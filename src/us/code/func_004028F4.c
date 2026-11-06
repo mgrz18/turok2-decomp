@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     f32 x, y, z;

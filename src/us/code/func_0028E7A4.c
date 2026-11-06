@@ -7,6 +7,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pager.h"
+#include "globals/pager.h"
 
 
 extern char gPager_readerStack[];               /* the reader thread's stack; its OSThread is 0x230 below */

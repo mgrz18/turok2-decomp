@@ -2,6 +2,7 @@
  * never-executed word (c.lt.s) ahead of the 16-aligned real start. */
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 typedef struct Layer {
     /* 0x00 */ u8 pad0[0x30];
@@ -14,6 +15,6 @@ typedef struct Screen {
 } Screen;
 
 void GameOverMenu_Init_2(Screen *screen) {
-    gEngineApp_m_Settings_match.countdown = 120.0f;
+    gEngineApp_m_Settings.match.countdown = 120.0f;
     screen->layer->flags &= ~0x4000000;
 }

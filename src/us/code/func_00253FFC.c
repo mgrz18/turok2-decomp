@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_paused;
 extern char gPauseMenuDesc; /* death screen */
 
 /* Whether the game is paused (gEngineApp_m_Settings_paused) or a menu other than the death
@@ -10,7 +10,7 @@ extern char gPauseMenuDesc; /* death screen */
 s32 CPlayer__IsPausedOrInMenu(CPlayer *p) {
     Menu *menu;
 
-    if (gEngineApp_m_Settings_paused) {
+    if (gEngineApp_m_Settings.paused) {
         return 1;
     }
     if (p->m_pCamera != NULL && (menu = p->m_pCamera->m_Menus.head) != NULL) {

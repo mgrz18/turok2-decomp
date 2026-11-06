@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* AI state: turn toward the target; after 100 steps, or when the target is within 460.8 and less than 20
  * degrees off, go to anim state 0x16. */

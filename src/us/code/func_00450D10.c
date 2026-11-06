@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/game.h"
 
 /* The game options seen from one player: each player has a 0x40-byte block, so the
  * view moves 0x40 bytes per player and its ready flag sits at 0xA8. */
@@ -8,7 +9,6 @@ typedef struct {
     /* 0xA8 */ u8 ready;
 } PlayerOptionsView;
 
-extern s32 gEngineApp_m_Settings;
 
 /* Number of active players, or 0 if any of them is not ready. */
 s32 Mp_CountJoinedControllers_2(void) {

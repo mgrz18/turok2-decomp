@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 typedef struct PlayerStateInfo {
     /* 0x00 */ void (*enter)(CPlayer *player, void *arg);
@@ -11,7 +12,6 @@ typedef struct PlayerStateInfo {
 } PlayerStateInfo;
 
 extern PlayerStateInfo gPlayerStateTable[];
-extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
 
@@ -22,7 +22,7 @@ s32 CPlayer__SetState(CPlayer *player, void *arg, s32 state) {
     s16 last;
     u32 lastFlags;
 
-    if (gEngineApp_m_Settings_multiplayer != 0 && CPlayer__IsInMatchEndState(player) != 0 && state != 18 && state != 16 && state != 17) {
+    if (gEngineApp_m_Settings.multiplayer != 0 && CPlayer__IsInMatchEndState(player) != 0 && state != 18 && state != 16 && state != 17) {
         return 0;
     }
     last = player->m_Mode;

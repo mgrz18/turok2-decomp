@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/menu.h"
 
-extern s32 sEnterCheatResult;
 
 void EnterCheatMenu_Init(void) {
     sEnterCheatResult = -1;

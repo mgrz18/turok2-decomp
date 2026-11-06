@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 CAI__SetMode(s32, s32, s32);
 s32 MantidQueen_Hurt(s32, s32, s32);
@@ -7,7 +8,6 @@ s32 MantidQueen_Step(s32, s32);
 s32 MantidQueen_Draw(s32, s32, s32);
 
 extern s32 sMantidQueenModeTable;
-extern s32 gScene_m_LevelID;
 extern s32 EnemyAI_HeadNodeCallback;
 
 void MantidQueen_InitAI(s32 arg0, CAI *arg1) {

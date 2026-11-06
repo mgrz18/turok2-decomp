@@ -4,6 +4,7 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 extern f32 D_800A6A98; /* 0.5f, in the engine's .rodata */
 

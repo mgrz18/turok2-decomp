@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 /* A 0x10-byte entry of sCheatCodes_unk4: the template first. */
 typedef struct {
@@ -9,7 +10,6 @@ typedef struct {
 
 extern TemplateEntry sCheatCodes_unk4[];
 extern s32 D_800C1144;
-extern u32 sEnterCheatResult;
 
 s32 EnterCheatMenu_ResultLabel(MenuItem *arg0) {
     if ((u32) sEnterCheatResult < 0xCU) {

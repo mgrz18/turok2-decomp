@@ -2,8 +2,8 @@
  * switch case (func_0041B178 ... func_0041B1C0, targets of jtbl_800C12E0) as its own
  * function. */
 #include "common.h"
+#include "globals/menu.h"
 
-extern s32 sCheatsMenuSelection;
 
 /* A time/score threshold per setting index. */
 s32 CheatMenu_GetWarpLevel(void) {

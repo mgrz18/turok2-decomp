@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/pak.h"
 #include "structs/controller.h"
+#include "globals/pak.h"
 
 extern void **gPakStateBuffer;
 extern s32 gPakDirectoryAllocated;

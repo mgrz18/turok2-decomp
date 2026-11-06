@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/demo.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern s32 gAttractRunCount;
 

@@ -22,7 +22,7 @@ typedef struct {
     s32 mask;               /* 0x00 */
 } ViewState;
 
-extern ViewState gEngineApp_m_Settings_difficulty;
+extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gCameraVisBits;
 extern Gfx *gSceneGeometryDL;     /* the level's display list, once built this frame */
 

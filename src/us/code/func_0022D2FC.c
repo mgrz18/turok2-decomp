@@ -19,6 +19,7 @@
 #include "structs/collision.h"
 #include "structs/frame.h"
 #include "structs/particle_event.h"
+#include "globals/game.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -582,10 +583,8 @@ extern Gfx *gDList;             /* display list head */
 extern u32 gDisplayListSize;              /* command buffer length, in commands */
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* matrix buffer index */
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
-extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* the current view */
-extern u8 gEngineApp_m_Settings_unk17;
-extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
+extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* the current view */
 extern CCollisionInfo gCollisionInfoLineOfSight;
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 extern u8 gScene_m_Heap[];             /* matrix pool */
@@ -628,7 +627,7 @@ static __inline__ s32 Particle_ColorMode(Particle *particle) {
     if (particle->desc->flags & 0x2000000) {
         if (particle->flags & 2) {
             mode = 2;
-        } else if (gEngineApp_m_Settings_unk17 == 2) {
+        } else if (gEngineApp_m_Settings.unk17 == 2) {
             mode = 1;
         }
     }
@@ -805,9 +804,9 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     } else if ((desc->flags & 0x400) && desc->fade->unkE != 4) {
         Render_SetRenderMode(0xF);
     } else if (desc->flags & 0x4000) {
-        Render_SetRenderMode(!(gEngineApp_m_Settings & 0x200) ? 0xD : 0x11);
+        Render_SetRenderMode(!(gEngineApp_m_Settings.cheatFlags & 0x200) ? 0xD : 0x11);
     } else {
-        Render_SetRenderMode((gEngineApp_m_Settings & 0x200) ? 0x12 : 0x13);
+        Render_SetRenderMode((gEngineApp_m_Settings.cheatFlags & 0x200) ? 0x12 : 0x13);
     }
 
     alpha = 0xFF;
@@ -1154,13 +1153,10 @@ typedef struct {
     /* 0x20C */ CMtxF view;
 } Camera;
 
-extern s32 gEngineApp_m_Settings_paused;              /* frozen; the current player list is 0x1414 bytes before */
-extern u8 gEngineApp_m_Settings_multiplayer;
-extern u8 gEngineApp_m_Settings_unk17;
 extern CCollisionResults *gCollisionResultsP;
 extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gEvenOdd;
 extern u8 gScene[];
 extern u8 gEngineApp_m_SwooshSystem[];
@@ -1336,7 +1332,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     f32 scale;
     f32 depth;
     s32 sound;
-    s32 *global = &gEngineApp_m_Settings_paused;
+    s32 *global = &gEngineApp_m_Settings.paused;
 
     if (global[0] != 0) {
         return 0;
@@ -1371,7 +1367,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
             }
         }
         mask = 1;
-        if (gEngineApp_m_Settings_multiplayer != 0) {
+        if (gEngineApp_m_Settings.multiplayer != 0) {
             mask = 2;
         }
         for (i = first; i <= last; i++) {
@@ -1435,12 +1431,12 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     break;
             }
             if (entry->flags & 0x2000000) {
-                if (gEngineApp_m_Settings_unk17 == 0 || !(arg11 & 1)) {
+                if (gEngineApp_m_Settings.unk17 == 0 || !(arg11 & 1)) {
                     ok = 0;
                 }
             }
             if (entry->flags & 0x4000000) {
-                if (gEngineApp_m_Settings_unk17 != 0) {
+                if (gEngineApp_m_Settings.unk17 != 0) {
                     ok = 0;
                 }
             }
@@ -1541,7 +1537,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 if (effect->entry->flags & 0x2000000) {
                     if (effect->flags & 2) {
                         layer = 2;
-                    } else if (gEngineApp_m_Settings_unk17 == 2) {
+                    } else if (gEngineApp_m_Settings.unk17 == 2) {
                         layer = 1;
                     }
                 }

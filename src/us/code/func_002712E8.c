@@ -1,4 +1,6 @@
 #include "structs/vector.h"
+#include "globals/game.h"
+#include "globals/camera.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/TEXTURE/80256220_16.CPP, func_8025842C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -210,7 +212,6 @@ typedef struct Table_func_804428F8_de Table_func_804428F8_de;
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 struct ContextRecAt2BC0;
 extern s32 CAudioWorld__Update(void *arg0);
-extern u8 gEngineApp_m_Settings_unk15;
 extern f32 D_800A80D0;
 struct GameplayCamera;
 typedef struct Lights Lights;
@@ -361,19 +362,17 @@ typedef struct MenuMatchGlobals {
     u8 unobserved1810[0x186C - 0x1810];
     s32 regenPaused;
 } MenuMatchGlobals;
-extern MenuMatchGlobals gEngineApp_m_Game_m_CameraPool;
 extern void SndVoicePool_Update(void **arg0);
 extern void SndSeq_UpdateFade(void *arg0);
 extern u32 __osDisableInt(void);
 extern void SndQueue_Update(void *arg0);
 extern void SpeechPlayer_Update(void *arg0);
 extern void SndSeq_Update(void *arg0);
-extern s32 gEngineApp_m_Settings_mode; /* game mode */
 extern void *CCameraPool__GetNearestCamera(MenuMatchGlobals *arg0, CVector3 *arg1);
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 s32 CAudioWorld__Update(void *arg0) {
     char *object = arg0;
-    u8 *bytes = &gEngineApp_m_Settings_unk15;
+    u8 *bytes = &gEngineApp_m_Settings.unk15;
     char *queue;
     u32 mask;
     s32 count;
@@ -411,7 +410,7 @@ s32 CAudioWorld__Update(void *arg0) {
     SndSeq_Update(queue);
     if (gAudioWorldReady != 0 &&
         ((struct ContextRecAt2BC0 *)(object))->field2BB4 != 0 &&
-        gEngineApp_m_Settings_mode == 13 &&
+        gEngineApp_m_Settings.mode == 13 &&
         ((struct ContextRecAt2BC0 *)(object))->track > 0) {
         CVector3 zero;
         void *result;

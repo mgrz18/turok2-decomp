@@ -22,7 +22,7 @@ typedef struct {
 
 typedef struct PlayerList PlayerList;
 
-extern Globals gEngineApp_m_Game_m_MenuPool;
+extern Globals gEngineApp_m_Game_m_MenuPool; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern f32 gFrameIncrement;          /* frame time scale */
 
 extern s32 MenuPool_CountOpen(void *menuPool);

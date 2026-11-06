@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/frame.h"
 
 typedef struct {
     /* 0x00 */ u32 type;
@@ -64,10 +65,6 @@ extern u32 gFrameCount;   /* frame counter */
 extern s32 gEvenOdd;   /* double-buffer index */
 extern s32 gFrameCountGameplay;
 extern u32 gTotalFramebuffers;   /* task count */
-extern s32 gLineList0;
-extern s32 gLineList1;
-extern s32 gDisplayList1;
-extern s32 gDisplayList0;
 
 extern void osWritebackDCacheAll(void);
 extern void Sched_SubmitTask(void *, ScTask *);

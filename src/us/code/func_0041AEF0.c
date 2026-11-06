@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 s32 Cheat_FindWarpLevel(s32 index, s32 step, s32 mode) {
     s32 i;
     s32 mask;
@@ -53,7 +53,7 @@ s32 Cheat_FindWarpLevel(s32 index, s32 step, s32 mode) {
             mask = 0x4000000;
             break;
         }
-        flags = &gEngineApp_m_Settings_unlockedCheats;
+        flags = &gEngineApp_m_Settings.unlockedCheats;
         if (*flags & mask) {
             return index;
         }

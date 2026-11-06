@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/controller.h"
+#include "globals/game.h"
 
-extern CPlayerOptions gEngineApp_m_Settings_slots[4]; /* gEngineApp_m_Settings.slots */
 
 extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 extern s32 Random_Next(void);
@@ -40,7 +40,7 @@ s32 MpMenu_StartTeamBlood(void) {
     }
     for (i = 0, ctl = gControllers; i < 4; i++, ctl++) {
         if (Controller_ConfirmPressed(ctl)) {
-            CPlayerOptions *slot = &gEngineApp_m_Settings_slots[i];
+            CPlayerOptions *slot = &gEngineApp_m_Settings.slots[i];
 
             slot->m_bActive = 1;
             slot->m_nController = i;

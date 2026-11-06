@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Calls CPlayerPool__SetInvincibility on the players with 900, then queues MotherBoss_OnDefeatCinemaDone. */
 

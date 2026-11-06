@@ -13,7 +13,7 @@ typedef struct EventParams {
     s32 unk4;           /* 0x4 */
 } EventParams;
 
-extern u8 gEngineApp_m_Game_m_CameraPool[];
+extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern SoundPair gLevelMessages[];
 extern void CCameraPool__AddText(void *arg0, void *arg1, s32 arg2);
 extern void Sound__PlaySpeech(s32 arg0);

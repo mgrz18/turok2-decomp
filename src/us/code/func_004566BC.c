@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Name entry accepted: copy the edited name (blank-padded to 8 characters)
  * into the current player's record; an empty name restores the default one. */

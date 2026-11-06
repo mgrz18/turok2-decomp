@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0xA50];

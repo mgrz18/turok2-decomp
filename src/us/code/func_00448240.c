@@ -67,7 +67,7 @@ extern Gfx *gDList;
 extern CScene gScene[];
 extern s32 gScene_m_CinemasKey;  /* gScene.trackLookup */
 extern s32 *gScene_m_pCinemas; /* gScene.trackBundle */
-extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
+extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */ /* current player */
 
 extern void *CISet__GetBlock(void *node, s32 index); /* child `index` of a resource node */
 extern s32 CISet__GetROMAddressAndSize(s32 *bundle, s32 lookup, s32 index, s32 *size);

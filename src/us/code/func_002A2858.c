@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/hostio.h"
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 typedef struct B01IoReq {
@@ -18,8 +19,6 @@ typedef struct B01IoReq {
                OSMesgQueue *reply;
 } B01IoReq;
 extern s32 sHostIoState;
-extern OSMesgQueue sHostIoRequestQueue;
-extern OSMesgQueue sHostIoReplyQueue;
 void HostIo_StartThread(s32 arg);
 s32 PCinitThreaded(void) {
     B01IoReq req;

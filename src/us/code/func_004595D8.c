@@ -5,23 +5,24 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/game.h"
+#include "globals/menu.h"
 
 /* Level chosen: load it, or set up the new player from the saved settings, or
  * open the next menu page. */
 
-extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakMenuPort;
-extern s32 gPakMenuLeaving;
-extern s32 sCharNoteLoad;
-extern s32 gPakNoteIndex;
-extern u8 gPakProfile_character;
-extern u16 gPakProfile[];
-extern u16 gPakProfile_deaths[];
-extern u16 gPakProfile_kills[];
-extern u16 gPakProfile_tags[];
-extern u8 gPakProfile_name[8];
-extern s8 gPakProfileRead_character;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern s32 gPakMenuLeaving; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern s32 sCharNoteLoad; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern s32 gPakNoteIndex; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern u8 gPakProfile_character; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern u16 gPakProfile[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern u16 gPakProfile_deaths[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern u16 gPakProfile_kills[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern u16 gPakProfile_tags[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern u8 gPakProfile_name[8]; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern s8 gPakProfileRead_character; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern u8 gPlayerSetupMenuDesc_2[];
 extern u8 gPakMsgDeleteDoneDesc_2[];
 extern u8 gPakMsgDeleteFailedDesc_2[];
@@ -71,9 +72,9 @@ s32 CharNoteMenu_SelectYes_2(void *arg0, Menu *event) {
         return 1;
     }
     if (Pak_DeleteNote_2(mode, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc_2, event->player, event->controller, event->context);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc_2, event->player, event->controller, event->context);
     } else {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, event->player, event->controller, event->context);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, event->player, event->controller, event->context);
     }
     return 1;
 }

@@ -4,6 +4,7 @@
 
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 
 

@@ -7,7 +7,7 @@ extern int Controller_MenuLeft(struct ControllerProfile *object);
 extern int Controller_MenuRight(struct ControllerProfile *object);
 s32 Controller_ConfirmPressed(char *);
 s32 OptionsMenu_CycleDifficulty(void) {
-    extern u32 gEngineApp_m_Settings_difficulty[];
+    extern u32 gEngineApp_m_Settings_difficulty[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
  if(((s32 (*)(char *))Controller_MenuLeft)((char *)&gMergedController)) {
  switch(gEngineApp_m_Settings_difficulty[0]) {
  case 8: gEngineApp_m_Settings_difficulty[0]=32; break;

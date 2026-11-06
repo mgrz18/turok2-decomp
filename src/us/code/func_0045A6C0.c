@@ -4,12 +4,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
 extern s32 PakMenu_CheckPak_2(Menu *action, s32 channel, s32 arg2);
 extern s32 PakMenu_CheckPak_2(Menu *, s32, s32);
-extern s32 gPakMenuLeaving;
 extern s32 Controller_PakChanged(s32);
 extern s32 PakMenu_CheckPak_2(struct Menu *, s32, s32);
 static __inline__ s32 func_80409BDC_de(struct Menu *record) {

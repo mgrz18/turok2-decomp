@@ -3,7 +3,7 @@
 
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList;  /* active actors */
 
-extern u8 *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
+extern u8 *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */          /* current player */
 
 void TotemDefense_StopEnemies(void) {
     CListedInstance *actor;

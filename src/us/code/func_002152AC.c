@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/level_actor.h"
+#include "globals/game.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
@@ -28,7 +29,6 @@ extern u8 D_800B6D1B;
 extern s32 gEvenOdd;
 extern u8 gScene_m_qSky[];
 extern u8 gScene[];
-extern s32 gEngineApp_m_Settings;
 
 void CLevelActor__Draw(CLevelActor *obj) {
     s32 *geometry;
@@ -62,10 +62,10 @@ void CLevelActor__Draw(CLevelActor *obj) {
         index = CScene__GetObjectTypeID(gScene, obj->header.m_nObjType);
         if (index < 0x6AB) {
             if (index >= 0x6A9) {
-                if ((gEngineApp_m_Settings & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {
+                if ((gEngineApp_m_Settings.cheatFlags & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {
                     variant = 1;
                 }
-                if ((gEngineApp_m_Settings & 0x1000) && *CISet__GetBlock(*geometry, 2) >= 3) {
+                if ((gEngineApp_m_Settings.cheatFlags & 0x1000) && *CISet__GetBlock(*geometry, 2) >= 3) {
                     variant = 2;
                 }
             }

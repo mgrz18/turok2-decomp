@@ -13,7 +13,7 @@ typedef struct {
     /* 0x08 */ s8 restart;
 } LevelScriptFA10;
 
-extern LevelScriptFA10 gLevelScript_script2_cursor;
+extern LevelScriptFA10 gLevelScript_script2_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 #define SCRIPT(state) (((s32 **) &(state))[-1])
 

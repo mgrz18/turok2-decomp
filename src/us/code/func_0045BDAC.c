@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
-extern s32 gPakMessageKind;
 extern char D_800B4BB0[];
 extern char D_800B4BB4[];
 s32 PakMessage_UpdateOk_2(MenuItem *item) {

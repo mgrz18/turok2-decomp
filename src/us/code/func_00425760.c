@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 /* Refreshes the cached state of the 16 notes of a controller pak (osPfsFileState, retried once; an invalid
  * note is cleared) and its free space. */

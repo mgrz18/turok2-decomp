@@ -3,6 +3,8 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/collision.h"
+#include "globals/game.h"
+#include "globals/scene.h"
 
 typedef struct Object Object;
 
@@ -25,9 +27,7 @@ struct Object {
     /* 0x27C */ u32 fxFlags;
 };
 
-extern s32 gScene_m_LevelID;          /* level */
 extern s32 gScene_m_bStreamAll;
-extern s32 gEngineApp_m_Settings;          /* cheats */
 extern u8 gEnemyAlertPoint[];         /* origin */
 
 void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
@@ -150,9 +150,9 @@ void EnemyAI_OnDamage(Object *obj, CAI *ai, DamageEvent *dmg) {
         justDied = health != 0;
     }
     if ((health != 0 || (ai->m_Mode != 0x3C && !ai->m_AnimRepeatedCount)) && info->m_PainSound != 0 && ai->m_LastHurtSFXTimer >= 11) {
-        if (gEngineApp_m_Settings & 0x40) {
+        if (gEngineApp_m_Settings.cheatFlags & 0x40) {
             volume = 2.5f;
-        } else if (gEngineApp_m_Settings & 0x20) {
+        } else if (gEngineApp_m_Settings.cheatFlags & 0x20) {
             volume = 0.35f;
         }
         Sound__PlayPitched(info->m_PainSound, obj->pos, 0, -1, volume);

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 s32 MenuPool_OpenChildMenu(s32, s32, s32);
 
@@ -8,7 +9,7 @@ extern u8 gTeamBloodMenuDesc[];
 s32 DeathmatchMenu_OpenTeamBlood(s32 arg0, s32 arg1, s32 arg2)
 {
   GameMatch *match;
-  match = &gEngineApp_m_Settings_match;
+  match = &gEngineApp_m_Settings.match;
   match->teamScore[0] = 0;
   match->teamScore[1] = 0;
   match->teamOver = 0;

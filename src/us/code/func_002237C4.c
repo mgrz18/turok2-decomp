@@ -9,7 +9,7 @@ typedef struct ColorEntry {
     /* 0x04 */ u8 pad4[4];
 } ColorEntry;
 
-extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
+extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern ColorEntry gWarpFadeColors[];
 extern f32 gFrameIncrement;                  /* the frame's time step */
 extern u8 D_800B54E0[];

@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/game.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00265E30.c, func_00265E30.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -22,7 +23,6 @@ typedef struct M04WorldB {
 } M04WorldB;
 extern M04Msg gImpactEventHandlers[];
 extern CScene gScene;
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the players, a list through m_pNext */
 /* Dispatch one message through the handler table (inlined). */
 static __inline__ void send_(void *tgt, void *dst, s32 kind, CVector3 p, M04Part q) {
     if (gImpactEventHandlers[kind].fn != 0) {
@@ -53,7 +53,7 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
                     i++;
                 } while (i < n);
             }
-            o = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+            o = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
             if (o != 0) {
                 do {
                     if ((void *)o != src && (void *)&o->m_WeaponActor != src) {
@@ -70,7 +70,7 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
                     send_(cur, dst, kind, pos, part);
                 }
             }
-            o = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+            o = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
             if (o != 0) {
                 do {
                     if ((void *)o != src && (void *)&o->m_WeaponActor != src) {

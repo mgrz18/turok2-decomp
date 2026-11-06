@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/save.h"
 
 void SavedPlayers_Clear(void) {
     gSavedPlayers.m_bActive = 0;

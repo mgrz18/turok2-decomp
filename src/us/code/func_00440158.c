@@ -10,7 +10,7 @@ extern s32 sPrimagenSoundScript2_2;
 extern s32 sPrimagenSoundScript1_2;
 extern s32 sPrimagenSoundScript3_2;
 extern s32 sPrimagenSoundScript4_2;
-extern State8012FA24 gLevelScript_script3_cursor;
+extern State8012FA24 gLevelScript_script3_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_SetSoundScript_2(s32 arg0) {
     gLevelScript_script3_cursor.unk0 = -1;

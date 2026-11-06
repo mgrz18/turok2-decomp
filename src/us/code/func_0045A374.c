@@ -5,9 +5,8 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
-extern PakProfile gPakProfile;
-extern u8 gPakProfile_name[8];
 void PakMenu_SaveCharacter_2(CPlayer *a) {
     CPlayerOptions *p = a->m_pOptions;
     s32 i;
@@ -20,6 +19,6 @@ void PakMenu_SaveCharacter_2(CPlayer *a) {
     gPakProfile.reserved[1] = 0;
     gPakProfile.reserved[2] = 0;
     for (i = 0; i < 8; i++) {
-        gPakProfile_name[i] = p->m_Name[i];
+        gPakProfile.name[i] = p->m_Name[i];
     }
 }

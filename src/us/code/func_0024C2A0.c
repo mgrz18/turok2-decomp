@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
 
 extern s32 sBarrelLayoutGroup1[8];   /* layouts: group 1, group 0, flag 0x80; then the same for gEngineApp_m_Settings_multiplayer */
 extern s32 sBarrelLayoutGroup0[8];
@@ -11,7 +12,6 @@ extern s32 sBarrelLayoutGroup1MP[8];
 extern s32 sBarrelLayoutGroup0MP[8];
 extern s32 sBarrelLayoutUnderwaterMP[8];
 extern f32 gBarrelSlotScale;              /* slot scale */
-extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 

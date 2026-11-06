@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00257380.c, func_00257380, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/sound.h"
+#include "globals/frame.h"
 
 typedef struct {
     s32 rate;
@@ -19,9 +20,7 @@ extern s32 gAudioWorldReady;      /* sound manager ready */
 extern u8 sAudioWorldReverbParams[];
 extern s32 gThreadPriorityAudio;
 extern s32 gAudioRomBase;
-extern u8 gEngineApp_m_Settings_unk15[];     /* volume settings (bytes from -2) */
-extern s32 gAudioHeapBase;      /* audio heap base */
-extern s32 gAudioHeapSize;      /* audio heap size */
+extern u8 gEngineApp_m_Settings_unk15[]; /* local type: the field's real type (or the member path) changes the ROM's code here */     /* volume settings (bytes from -2) */
 
 extern s32 __osDisableInt(void);         /* disable interrupts */
 extern void __osRestoreInt(s32 mask);    /* restore interrupts */

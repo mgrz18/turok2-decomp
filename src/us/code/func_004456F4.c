@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern u8 sMotherBossPhase1PlayerPos_2[];
 extern void AI_UpdateTargets(CGameObjectInstance *obj, void *ai, CAITargets *t, s32 f1, s32 f2);

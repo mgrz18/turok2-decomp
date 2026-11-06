@@ -1,15 +1,14 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A7F58.c, func_802A7554_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
+#include "common.h"
+#include "globals/frame.h"
+#include "globals/save.h"
 extern char gBootSignature;
-extern s32 gWarmBoot;
-extern char gSavedPlayers;
 extern char gEngineApp_m_Settings;
 extern char gLoadSavePersistentData;
 extern char gGamePersistentData;
-extern char gEngineApp_m_Settings_match;
+extern char gEngineApp_m_Settings_match; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
 /* Turok 2 region sizes differ from Rage Wars (0x430, 0x584, 0xB0). */
 s32 Boot_CanOverwrite(u32 address) {
     address |= 0x80000000;

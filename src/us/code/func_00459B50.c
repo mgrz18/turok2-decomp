@@ -3,15 +3,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
+#include "globals/pak.h"
 
-extern s32 gPakConfirmKind;
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
-extern s32 gPakMenuLeaving;
-extern s32 gPakOverwriteNote;
-extern s32 gPakNoteIndex;
 extern s32 D_8011B114;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPakMsgDeleteDoneDesc_2[];
 extern u8 gPakMsgDeleteFailedDesc_2[];
 extern u8 gPakMsgRepairedDesc_2[];
@@ -33,13 +29,13 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
         }
         if (PakMenu_CheckPak_2(own, pad, 1) != 0) {
             gPakMenuLeaving = 1;
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, own->context, own->player, own->controller, 0);
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, own->context, own->player, own->controller, 0);
         } else {
             Pak_ProbeSlot_2(pad);
             if (Pak_DeleteNote_2(pad, gPakOverwriteNote) == 0) {
-                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc_2, own->player, own->controller, own->context);
             } else {
-                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
             }
         }
         break;
@@ -51,14 +47,14 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
         }
         if (PakMenu_CheckPak_2(own, pad, 1) != 0) {
             gPakMenuLeaving = 1;
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, own->context, own->player, own->controller, 0);
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, own->context, own->player, own->controller, 0);
         } else {
             Pak_ProbeSlot_2(pad);
             if (Pak_DeleteNote_2(pad, gPakNoteIndex) == 0) {
                 PakMenu_WriteSaveGame_2(a, own, c);
                 return 1;
             } else {
-                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
             }
         }
         break;
@@ -70,13 +66,13 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
         }
         if (PakMenu_CheckPak_2(own, pad, 1) != 0) {
             gPakMenuLeaving = 1;
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, own->context, own->player, own->controller, 0);
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, own->context, own->player, own->controller, 0);
         } else {
             Pak_ProbeSlot_2(pad);
             if (Pak_RepairIfDamaged_2(pad) == 0) {
-                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgRepairedDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgRepairedDesc_2, own->player, own->controller, own->context);
             } else {
-                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gDamagedPakInGameMenuDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gDamagedPakInGameMenuDesc_2, own->player, own->controller, own->context);
             }
         }
         break;
@@ -85,7 +81,7 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
         if (gPakMenuAnyPak != 0) {
             D_8011B114 = 1;
         }
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, own->context, own->player, own->controller, 0);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, own->context, own->player, own->controller, 0);
         break;
     }
     return 1;

@@ -1,7 +1,7 @@
 /* WRONG CUT: REAL CScene__InitPersistentData size 0x5C (splat cut its last word into func_0042C414). */
 #include "common.h"
+#include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_unlockedCheats[];
 
 extern void CScene__LoadBitSections(void *menu);
 extern void CScene__LoadBitSections2(void *menu);
@@ -18,5 +18,5 @@ void CScene__InitPersistentData(MenuState *menu) {
     CScene__LoadBitSections2(menu);
     menu->unk18FE0 = 0;
     menu->unk18FE4 = 34;
-    menu->unk18FE8 = gEngineApp_m_Settings_unlockedCheats[0];
+    menu->unk18FE8 = gEngineApp_m_Settings.unlockedCheats;
 }

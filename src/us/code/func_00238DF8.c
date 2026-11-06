@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 typedef struct EventParams {
     s32 unk0;
     s32 unk4;
 } EventParams;
 
-extern s32 gScene_m_LevelID;
 extern void MantidQueen_SpawnMinion(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
 extern void Primagen_HandleAnimEvent(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);
 extern void MotherBoss_AnimEvent(s32 arg0, s32 arg1, s32 arg2, CVector3 pos, EventParams params);

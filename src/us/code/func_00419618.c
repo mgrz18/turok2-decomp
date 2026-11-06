@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/menu.h"
 
 s32 MenuPool_OpenMenu(s32, s32, s32, s32, s32);
 
 s32 func_00421250();                            /* extern */
 extern s32 gPakLoadGameMenuDesc;
-extern s32 gEngineApp_m_Game_m_MenuPool;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x1C];

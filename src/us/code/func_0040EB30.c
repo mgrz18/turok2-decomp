@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern u8 gScene[];
 extern void CPlayerPool__SetInvincibility(void *players, f32 value);

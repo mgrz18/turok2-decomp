@@ -3,12 +3,8 @@
  * (checked with the symbol size overridden to 0x134). */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsLoad;
-extern s32 gSavePortalActive;
-extern s32 gPakMenuIsProfile;
 extern s32 gPakMenuPort;
 extern u8 gCharacterMenuAfterPakDesc[];
 extern u8 gSingleMenuAfterPakDesc[];

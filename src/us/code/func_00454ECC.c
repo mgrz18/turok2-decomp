@@ -4,12 +4,12 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
-extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 extern char D_800B3EB8[];
 extern char D_800B3ED0[];
 s32 OptionsMenu_ControlTypeText_2(MenuItem *a, Menu *b) {
-CPlayerOptions *p = &gEngineApp_m_Settings_defaultSlot;
+CPlayerOptions *p = &gEngineApp_m_Settings.defaultSlot;
 if (b->player) { CPlayerOptions *q = b->player->m_pOptions; if (q) p = q; }
  switch (p->m_ControlType) { case 0: a->text = D_800B3EB8; break; case 1: a->text = D_800B3ED0; break; }
  return 0; }

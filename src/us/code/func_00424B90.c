@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 s32 CScene__GetLinkGroupCount(void *arg0, s32 arg1);
 s32 MenuItem_TextLength(void *item);
@@ -12,7 +13,6 @@ extern char D_800B4454[];
 extern char D_800B44B4[];
 extern char D_800B44E8[];
 extern char D_800B454C[];
-extern s32 sMissionHub;
 
 s32 MissionMenu_UpdateObjective1Count(MenuItem *item) {
     s32 rank = -1;

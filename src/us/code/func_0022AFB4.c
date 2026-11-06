@@ -4,6 +4,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
@@ -21,7 +22,6 @@ struct ContactHandler {
 extern f32 gFrameIncrement;                  /* the frame's time step */
 extern f32 gParticleTimeScale;
 extern CCollisionResults gCollisionResults;
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;              /* current player */
 extern ContactHandler sParticleAmmoPickups[4];
 extern CCollisionResults *gCollisionResultsP;
 extern u8 gScene_m_ParticleSystem[];
@@ -182,7 +182,7 @@ void CParticle__Update(CParticle *p) {
         p->m_Alignment = -3;
     }
     if (p->m_dwFlags & 0x60000) {
-        for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
+        for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; player != NULL; player = player->m_pNext) {
             if (player->m_Data.m_Health != 0 && player->m_Mode != 2) {
                 top = player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.m_CollisionYOffset;
                 if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + GameObject_GetCollisionHeight(player) + 20.479999f) {

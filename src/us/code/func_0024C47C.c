@@ -15,9 +15,9 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
+#include "globals/scene.h"
 
-extern s32 gScene_m_PreviewState;
-extern s32 gScene_m_PreviewTimer;
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
@@ -74,11 +74,8 @@ void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player) {
 #include "structs/camera.h"
 
 /* An animated HUD item (COverlay__Update ticks it, COverlay__StartScript restarts it). */
-extern s32 gEngineApp_m_Settings_nextMode;          /* game state */
-extern u8 gEngineApp_m_Settings_hudAlpha;           /* HUD alpha */
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
-extern s32 gEngineApp_m_Settings_match_tag;
 extern u8 gAmmoOverlayChangeScript[];
 extern u8 gLivesOverlayChangeScript[];
 extern u8 gTokensOverlayChangeScript[];
@@ -123,7 +120,7 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     CBarrel *strokes;
 
     showAmmo = 1;
-    if (gEngineApp_m_Settings_nextMode == 0xB || gEngineApp_m_Settings_nextMode == 8) {
+    if (gEngineApp_m_Settings.nextMode == 0xB || gEngineApp_m_Settings.nextMode == 8) {
         return;
     }
     COverlay__Update(&player->m_AmmoOverlay);
@@ -149,7 +146,7 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     } else {
         CBarrel__DrawRing(strokes, view, player);
     }
-    Hud_SetupTextureMode(gEngineApp_m_Settings_hudAlpha);
+    Hud_SetupTextureMode(gEngineApp_m_Settings.hudAlpha);
     sx = view->m_Viewport.m_Width / (f32)gScreenWidth;
     shift = sx * 32.0f;
     sy = view->m_Viewport.m_Height / (f32)gScreenHeight;
@@ -508,8 +505,6 @@ typedef struct PlayerStateInfo {
 
 
 extern f32 gFrameIncrement;              /* frame time */
-extern s32 gEngineApp_m_Game_m_DebugLines;
-extern s32 gEngineApp_m_Settings_match_tag;
 extern s32 gEvenOdd;
 extern f32 gCharacterHealthRegen[];           /* health regeneration per character */
 extern PlayerStateInfo gPlayerStateTable[];
@@ -518,7 +513,6 @@ extern u32 D_800F1F10;
 extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern s32 gCollisionResults_m_nFloorKind;
 extern u8 gScene;
-extern s32 gScene_m_PendingWarpID;
 extern s32 gCharacterModels[];
 extern s32 gTagModeModel;
 
@@ -661,7 +655,7 @@ void CPlayer__Update(Player *p) {
     }
     Sound__SetMuted(enable);
     if (gEngineApp_m_Settings.multiplayer == 0) {
-        if (!(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
+        if (!(gEngineApp_m_Game_m_DebugLines.unk0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
             if (p->unk12A4 != 0) {
                 p->unk12A4 = 0;
             } else {
@@ -669,7 +663,7 @@ void CPlayer__Update(Player *p) {
             }
         }
         if (gEngineApp_m_Settings.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
-            && !(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
+            && !(gEngineApp_m_Game_m_DebugLines.unk0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
             WeaponInfo *info = gWeaponInfoTable[p->nextWeapon];
             s16 next = info->alternate;
 
@@ -821,7 +815,7 @@ void CPlayer__Update(Player *p) {
         if (actor->aiFlags & 0x6000) {
             flag = 1;
         } else if ((u32) ((u16) p->state - 2) < 2) {
-            if ((p->input.pressed & 0x400) && gEngineApp_m_Settings.multiplayer == 0 && !(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20))) {
+            if ((p->input.pressed & 0x400) && gEngineApp_m_Settings.multiplayer == 0 && !(gEngineApp_m_Game_m_DebugLines.unk0 != 0 && (p->input.held & 0x20))) {
                 p->crouchToggle ^= 1;
             }
         } else {

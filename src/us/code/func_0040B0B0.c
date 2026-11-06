@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* AI state: turn toward the target (when there is one); once the anim is done, sends the module's six other
  * objects to anim state 0 and goes to anim state 2. */

@@ -2,6 +2,9 @@
 #include "structs/game_object.h"
 #include "structs/game.h"
 #include "structs/player.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/onscreen.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -20,12 +23,9 @@ typedef struct {
 } BossFight;
 
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the current player */
 extern u8 gScene[];
 extern u8 D_800B6660[];
-extern u8 gEngineApp_m_OnScreen[];
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
-extern s32 gScene_m_LevelID;         /* level id */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
@@ -61,7 +61,7 @@ void TotemDefense_Complete(BossFight *fight) {
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
     setAnim(fight->obj, 0x5337);
     CScene__UnmarkGeneratorsSaved(gScene);
-    gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead->m_FleeTime = 450.0f;
+    gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead->m_FleeTime = 450.0f;
     for (a = gScene_m_InstancePool_m_ActiveList[0]; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {
             a->m_Instance.m_AI.m_pPathTarget = NULL;
@@ -71,8 +71,8 @@ void TotemDefense_Complete(BossFight *fight) {
         }
     }
     fight->timer = 60.0f;
-    COnScreen__ClearBoss(gEngineApp_m_OnScreen);
-    COnScreen__ClearBoss2(gEngineApp_m_OnScreen);
+    COnScreen__ClearBoss(&gEngineApp_m_OnScreen);
+    COnScreen__ClearBoss2(&gEngineApp_m_OnScreen);
     switch (gScene_m_LevelID) {
     case 0x1BBC:
         player->m_Data.m_bLevel1TotemFlags = 1;

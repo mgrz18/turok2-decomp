@@ -21,7 +21,7 @@ extern f32 func_002974C0(f32 angle);                                      /* cos
 extern s32 D_800F1F50[];
 extern f32 gFrameIncrement;          /* per-frame scale */
 extern f32 D_8012F628;          /* last angle to the target */
-extern BossTimers gLevelScript_timer;
+extern BossTimers gLevelScript_timer; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 /* Pushes the target away from the boss while the push timer has run out. */
 void Primagen_UpdateMode20(CGameObjectInstance *obj, CAI *ai) {

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/demo.h"
+#include "globals/frame.h"
 
-extern s32 gNextTicks;
 
 void Demo_UpdateMatchStream(void) {
     DemoPlayer *s = &gDemoPlayer;

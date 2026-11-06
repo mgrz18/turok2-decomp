@@ -1,11 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
+#include "globals/scene.h"
 
 /* Module init: find the module actors (0x1DB1) and the controller (0x1DB2), set up the AI (mode table and callbacks),
  * then attach every slot to the object. */
 
-extern s32 gScene_m_LevelID;
 extern s32 D_800F1F10[];
 extern u8 gScene[];
 extern u8 sMotherBossModeTable_2[];

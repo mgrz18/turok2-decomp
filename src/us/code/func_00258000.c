@@ -4,6 +4,7 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/weapon.h"
+#include "globals/camera.h"
 
 
 typedef struct {
@@ -14,7 +15,6 @@ typedef struct {
 extern PoseInfo gPlayerStateTable_anim[];
 extern u32 gFrameCountGameplay;
 extern s32 gScene;
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern struct {
     s32 enabled;
 } gEngineApp_m_Settings_match_tag;
@@ -34,7 +34,7 @@ static __inline__ void switchWeapon(CGameObjectInstance *obj, CAI *ai) {
         ai->m_pModeTable = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->modeTable;
         ai->m_pfEffects = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->effects;
         if (gFrameCountGameplay >= 5) {
-            CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
+            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
         }
         ai->m_Weapon.m_BarrelAngle = 0;
         ai->m_Weapon.m_BarrelSpeed = 0;

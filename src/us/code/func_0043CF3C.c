@@ -1,5 +1,7 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
+#include "globals/onscreen.h"
 
 typedef struct {
     f32 x, y, z;
@@ -27,7 +29,6 @@ extern u8 sPrimagenTossTable_2[];
 extern u8 sPrimagenTossTableStage3_2[];
 extern u8 sPrimagenTossTable2_2[];
 extern u8 sPrimagenTossTable2Stage3_2[];
-extern u8 gEngineApp_m_OnScreen[];
 void AI_TurnHeadToTarget(Actor0043CF3C *actor, Level0043CF3C *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
@@ -122,7 +123,7 @@ void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {
     }
     Primagen_UpdateHealth_2(actor, level);
     Primagen_UpdateSpawner_2(actor, level);
-    COnScreen__SetBossPercent(gEngineApp_m_OnScreen, gLevelScript.total * 100 / gLevelScript.bonus);
+    COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, gLevelScript.total * 100 / gLevelScript.bonus);
     if (actor->pos.y < -204.79999f) {
         gLevelScript.bossMode = 11;
         gLevelScript.dest.x = 0.0f;

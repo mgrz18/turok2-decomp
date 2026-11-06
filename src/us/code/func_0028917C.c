@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "structs/game.h"
+#include "globals/pak.h"
 
 s32 Controller_UnwatchAllPaks();                            /* extern */
 s32 CEngineApp__SetupFadeTo(CEngineApp *, s32);                /* extern */
@@ -10,7 +11,6 @@ extern f32 gFrameIncrement;
 extern s32 gPakCheckStarted;
 extern f32 gPakCheckTimer;
 extern s32 gPakCheckTimedOut;
-extern s32 gPakCheckDone;
 
 void EngineMode00_PakCheck_Retrace(CEngineApp *app) {
     if (gPakCheckStarted != 0) {

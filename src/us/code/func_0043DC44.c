@@ -3,8 +3,9 @@
 #include "structs/game_object.h"
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern s32 gLevelScript;           /* stage */
+extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */           /* stage */
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
@@ -21,7 +22,7 @@ typedef struct {
     /* 0x4 */ f32 waitMax;       /* 0x8012F61C */
 } BossWait;
 
-extern BossWait gLevelScript_swayPhase;
+extern BossWait gLevelScript_swayPhase; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern BossAttack sPrimagenAttacks_2[];
 extern BossStep sPrimagenAttackScriptStage1_2[];
 extern BossStep sPrimagenAttackScript2Stage1_2[];

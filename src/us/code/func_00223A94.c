@@ -7,6 +7,7 @@
 #include "structs/game.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/game.h"
 
 typedef struct Entity Entity;
 struct Entity {

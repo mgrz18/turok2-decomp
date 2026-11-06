@@ -2,9 +2,8 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/player_options.h"
+#include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_match_tag;         /* match started */
-extern CPlayerOptions gEngineApp_m_Settings_slots[]; /* gEngineApp_m_Settings.slots */
 extern char D_800C1338[];      /* number format */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
@@ -18,13 +17,13 @@ s32 StatsMenu_PlayerRowText(MenuItem *a, Menu *c) {
     char *dst;
     s32 i;
 
-    if (gEngineApp_m_Settings_match_tag) {
+    if (gEngineApp_m_Settings.match.tag) {
         n = player->m_pOptions->m_Tagged[slot];
     } else {
         n = player->m_pOptions->m_Killed[slot];
     }
     dst = a->text;
-    src = (char *)gEngineApp_m_Settings_slots[slot].m_Name;
+    src = (char *)gEngineApp_m_Settings.slots[slot].m_Name;
     for (i = 0; i < 8; i++) {
         *dst++ = *src++;
     }

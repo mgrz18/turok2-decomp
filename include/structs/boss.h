@@ -91,8 +91,6 @@ typedef struct MotherBossState {
     /* 0x68C */ s32 maxRadius;
 } MotherBossState; /* size 0x690 */
 
-extern MotherBossState gMotherBoss;
-
 /* The Blind One (the second boss, "Blind" and "EyeBall" on its health
  * bars) and the small script VM that runs it. Its module is linked twice,
  * at BlindOne_UpdateMover-BlindOne_NextPhase and again at BlindOne_Setup_2-BlindOne_NextPhase_2
@@ -164,8 +162,6 @@ typedef struct BlindOneState {
     /* 0x514 */ s32 alive3;
     /* 0x518 */ BlindOneMover movers[3];
 } BlindOneState; /* size 0x560 */
-
-extern BlindOneState gBlindOne;
 
 /* A step of a boss script: what to do (type), its argument, and the odds
  * (chance, out of 100) that the runner takes it; a type marks the end
@@ -293,15 +289,6 @@ typedef struct LevelScriptState {
     /* 0x544 */ u8 pad544[0x568 - 0x544];
 } LevelScriptState; /* size 0x568 */
 
-/* A few files read only the stage, as a plain word: the ROM reloads its
- * address before every read there, which the struct does not give (gcc
- * keeps &gLevelScript in a register). They define BOSS_STAGE_AS_WORD and
- * declare it as an s32 themselves (Primagen_RunAttackStep, Primagen_RunAttackStep_2,
- * Primagen_UpdateMode19, Primagen_UpdateMode19_2). */
-#ifndef BOSS_STAGE_AS_WORD
-extern LevelScriptState gLevelScript;
-#endif
-
 /* LevelScriptState from bossState on (gLevelScript_bossState, +0x3D0). */
 typedef struct BossState {
     /* 0x00 */ s32 state;
@@ -330,10 +317,6 @@ typedef struct BossMode {
     /* 0x18 */ f32 timer3EC;
     /* 0x1C */ BossScript script;
 } BossMode; /* size 0x2C */
-
-extern BossState gLevelScript_bossState;
-extern BossMode gLevelScript_bossMode;
-extern BossScript3 gLevelScript_script3;  /* LevelScriptState.script3 */
 
 /* A spawn point of the Mother fight (gMotherSpawnPoints, and gMotherSpawnPoints_2 in the
  * second copy of the module): where its pickups drop (MotherBoss_DropPickupsAtSpawnPoints) and
@@ -388,7 +371,5 @@ typedef struct WaveBossState {
     /* 0x258 */ f32 blinkTimer;
 } WaveBossState; /* size 0x25C */
 
-extern WaveBossState gMantidQueen;
-extern WaveBossStep *gMantidQueen_step;  /* WaveBossState.step */
 
 #endif

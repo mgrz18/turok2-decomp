@@ -2,18 +2,15 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/cinema.h"
+#include "globals/game.h"
+#include "globals/scene.h"
 
 
 extern Cinema *gCinemaPlayerP;
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
-extern s32 gEngineApp_m_Settings_mode;
 extern u8 gScene[];             /* the world */
 extern s32 gScene_m_nLevel;              /* world +0x18FA8: the current warp id */
 extern s32 gScene_m_WarpFade;
 extern s32 gScene_m_WarpState;
-extern s32 gScene_m_WarpTime;
-extern s32 gScene_m_LevelID;              /* world +0x18FD0: selectionValues */
-extern s32 gScene_m_WarpID;
 
 void CScene__LoadLevel(void *world, s32 id, s32 flags);
 s32 CScene__GetRegion(void *world, s32 region);
@@ -34,7 +31,7 @@ void Cinema_RestorePlayer(void) {
     world = gScene;
     level = gCinemaPlayerP->startLevel;
     warp = gCinemaPlayerP->startWarp;
-    if (gEngineApp_m_Settings_mode != 13) {
+    if (gEngineApp_m_Settings.mode != 13) {
         gCinemaPlayerP->restored = 1;
         gCinemaPlayerP->saveStart = 0;
         gCinemaPlayerP->startLevel = -1;
@@ -49,7 +46,7 @@ void Cinema_RestorePlayer(void) {
         if (gScene_m_nLevel != warp) {
             CScene__LoadLevel(world, warp, 1);
         }
-        player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+        player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
         gScene_m_WarpFade = 0;
         gScene_m_WarpState = 0;
         gScene_m_WarpTime = 0;

@@ -11,7 +11,7 @@ extern u8 sPrimagenSoundScript2[];
 extern u8 sPrimagenSoundScript1[];
 extern u8 sPrimagenSoundScript3[];
 extern u8 sPrimagenSoundScript4[];
-extern ModePair gLevelScript_script3_cursor;
+extern ModePair gLevelScript_script3_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_SetSoundScript(s32 arg0) {
     gLevelScript_script3_cursor.unk0 = -1;

@@ -2,20 +2,20 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/cinema.h"
+#include "globals/game.h"
+#include "globals/camera.h"
 
 
 extern Cinema *gCinemaPlayerP;
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern u8 gRumblePool[];
 /* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
  * gScene_m_LevelID are arrays because the ROM accesses them as struct members: a
  * store through a pointer may alias them, so their loads stay after it. */
 extern u8 gScene[];             /* the world */
 extern s32 gScene_m_nLevel[];            /* world +0x18FA8: the current warp id */
-extern s32 gScene_m_bWarpSpawn;              /* world +0x18FB8: selectionFlags */
-extern u8 gScene_m_WarpSpawn[];             /* world +0x18FBC: selectionSpawn */
-extern s32 gScene_m_LevelID[];            /* world +0x18FD0: selectionValues */
+extern s32 gScene_m_bWarpSpawn; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */              /* world +0x18FB8: selectionFlags */
+extern u8 gScene_m_WarpSpawn[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */             /* world +0x18FBC: selectionSpawn */
+extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */            /* world +0x18FD0: selectionValues */
 
 void CPlayer__ResetControlState(CPlayer *player);
 s32 CScene__GetRegionIndex(void *world, s32 region);
@@ -39,7 +39,7 @@ void Cinema_Start(void) {
         return;
     }
     if (gCinemaPlayerP->resetPlayer != 0) {
-        player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+        player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
         if (player != NULL) {
             CPlayer__ResetControlState(player);
             if (gCinemaPlayerP->saveStart != 0 && gCinemaPlayerP->startLevel == -1
@@ -55,7 +55,7 @@ void Cinema_Start(void) {
             player->m_WeaponActor.m_AI.m_VarBuffer[1] = 0;
             player->m_WeaponActor.m_AI.m_VarBuffer[5] = 0;
         }
-        CCameraPool__ReleaseAllTexts(gEngineApp_m_Game_m_CameraPool);
+        CCameraPool__ReleaseAllTexts(&gEngineApp_m_Game_m_CameraPool);
         RumblePool_FreeAll(gRumblePool);
     }
     if (warp != -1) {

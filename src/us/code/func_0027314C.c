@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/sound.h"
+#include "globals/camera.h"
 
 /* The bank seen from 0x7C: the ROM addresses its sound ids from there. */
 typedef struct SoundVoice {
@@ -10,7 +11,6 @@ typedef struct SoundVoice {
     /* 0x60 */ s16 ids[1];                     /* CAudioWorld.handles */
 } SoundVoice;
 
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 
 extern s32 CCameraPool__GetNearestCamera(void *game, CVector3 *pos);
 extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
@@ -27,7 +27,7 @@ void SndVoice_Update(SndVoice *s) {
     s32 playing;
     void *player;
 
-    s->mgr->listener = CCameraPool__GetNearestCamera(gEngineApp_m_Game_m_CameraPool, &s->vp.pos);
+    s->mgr->listener = CCameraPool__GetNearestCamera(&gEngineApp_m_Game_m_CameraPool, &s->vp.pos);
     bank = s->mgr;
     alSndpSetSound(&bank->player, bank->handles[s->index]);
     playing = alSndpGetState(&bank->player);

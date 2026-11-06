@@ -1,6 +1,7 @@
 /* Second-module copy of MissionMenu_UpdateObjective1Count (first module; this one at link address 0x00424AB0), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 s32 CScene__GetLinkGroupCount(void *arg0, s32 arg1);
 s32 MenuItem_TextLength_2(void *item);
@@ -13,7 +14,6 @@ extern char D_800B4454[];
 extern char D_800B44B4[];
 extern char D_800B44E8[];
 extern char D_800B454C[];
-extern s32 sMissionHub;
 
 s32 MissionMenu_UpdateObjective1Count_2(MenuItem *item) {
     s32 rank = -1;

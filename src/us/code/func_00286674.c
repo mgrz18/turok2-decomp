@@ -4,6 +4,8 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/pak.h"
+#include "globals/frame.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
@@ -14,25 +16,18 @@ extern u8 gPoolBuffers[];
 extern void *gCFB[];      /* frame buffers */
 extern f32 gCurrentFB[];
 extern EngineMsg *gGfxMsg;
-extern s32 gDisplayListCount;
 extern s32 gCurrentTick;
 extern s32 gNumTicks0;
 extern s32 D_800F6CA8;
 extern s32 gNumTicks2;
 extern s32 gNumTicks3;
-extern s32 gNumTicksPending;
 extern s32 gCurrentTickWaiting;
-extern s32 gNumTicksWaiting;
 extern s32 gNextFrameToShow;
-extern s32 gPendingFB;
 extern u32 gTotalFramebuffers;          /* frame buffer count */
 extern s32 gScreenWidth;          /* width */
 extern s32 gScreenHeight;          /* height */
 extern u8 gScene[];
 extern u8 gValidControllerBits;
-extern s32 gPakCheckHasPak;
-extern s32 gPakCheckDone;
-extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
 extern f32 gPakCheckTimer;

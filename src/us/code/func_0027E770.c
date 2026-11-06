@@ -2,6 +2,7 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 #define GFX_WORDS(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 

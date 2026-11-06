@@ -4,6 +4,7 @@
 #include "rw/abu_types.h"
 #include "structs/game.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
 extern int Controller_MenuLeft(struct ControllerProfile *object);
 extern int Controller_MenuRight(struct ControllerProfile *object);

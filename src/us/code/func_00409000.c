@@ -5,6 +5,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/collision.h"
+#include "globals/boss.h"
 
 /* Boss hit callback: finds which weak spot the hit part covers, takes the
  * damage off the matching live spot for the current phase, and when a spot

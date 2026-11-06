@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/game.h"
 
 /* Builds an animated object's bone matrices: binds its animation index,
  * loads the current (and, when blending, the next) animation into the two
@@ -97,7 +98,6 @@ extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
 extern u8 gScene_m_Heap[];
 extern u8 gEngineApp_m_SwooshSystem[];
-extern u32 gEngineApp_m_Settings;
 
 s32 Cinema_PathPlaying(void);
 void *CISet__GetBlock(void *file, s32 index);
@@ -195,7 +195,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
                 ctx.moving = 1;
             }
             if (!(obj->flags & 0x200000) && (type == 1 || type == 11)) {
-                if (gEngineApp_m_Settings & 0x100) {
+                if (gEngineApp_m_Settings.cheatFlags & 0x100) {
                     ctx.f78 = 1;
                     ctx.f7C = 1;
                     ctx.f80 = 1;
@@ -206,12 +206,12 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
                     ctx.f80 = 0;
                     ctx.f84 = 0;
                 }
-                if (gEngineApp_m_Settings & 0x20) {
+                if (gEngineApp_m_Settings.cheatFlags & 0x20) {
                     ctx.f74 = 1;
                 } else {
                     ctx.f74 = 0;
                 }
-                if (gEngineApp_m_Settings & 0x80) {
+                if (gEngineApp_m_Settings.cheatFlags & 0x80) {
                     ctx.f88 = 1;
                 } else {
                     ctx.f88 = 0;

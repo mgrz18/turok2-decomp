@@ -3,6 +3,7 @@
 #include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target 4 (then 3 after a 4), otherwise 5
  * when fewer than 3 actors are in the gScene_m_InstancePool_m_ActiveList list, else 6. */

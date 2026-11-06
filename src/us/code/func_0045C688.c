@@ -3,15 +3,13 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
+#include "globals/pak.h"
 
 /* Start the selected level, then open the next menu page (on the player's own
  * menu when there is a player). */
 
-extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuPort;
-extern s32 gPakMenuLeaving;
-extern s32 gCameraPoolHideViews;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gSavePortalMenuDescB_2[];
 extern u8 gSavePortalMenuDesc_2[];
 
@@ -38,7 +36,7 @@ s32 DamagedPakMenu_SelectRetry_2(void *arg0, Menu *event) {
         if (event->player != NULL) {
             menu = (u8 *)event->player->m_pCamera + 0x53C;
         } else {
-            menu = gEngineApp_m_Game_m_MenuPool;
+            menu = &gEngineApp_m_Game_m_MenuPool;
         }
         if (event->context == gSavePortalMenuDescB_2 || event->context == gSavePortalMenuDesc_2) {
             gCameraPoolHideViews = 0;
@@ -49,7 +47,7 @@ s32 DamagedPakMenu_SelectRetry_2(void *arg0, Menu *event) {
         if (event->context == gSavePortalMenuDescB_2 || event->context == gSavePortalMenuDesc_2) {
             gCameraPoolHideViews = 0;
         }
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, event->context, event->player, event->controller, 0);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, event->controller, 0);
         return 1;
     }
 }

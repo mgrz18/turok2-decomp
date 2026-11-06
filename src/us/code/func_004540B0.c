@@ -1,8 +1,8 @@
 /* WRONG CUT: the real function is CheatMenu_GetWarpLevel_2, size 0x80: splat cut it after the jump-table dispatch
  * (0x30 bytes); the cases follow up to 0x454130. */
 #include "common.h"
+#include "globals/menu.h"
 
-extern s32 sCheatsMenuSelection; /* the selected option (see CheatsMenu_WarpSelect_2) */
 
 /* The level of the selected option. */
 s32 CheatMenu_GetWarpLevel_2(void) {

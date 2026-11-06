@@ -2,8 +2,8 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the players, a list through m_pNext */
 extern u32 sTintFlags;          /* the camera player's AI flags this frame, */
 extern u32 sTintFlagsPrev;          /* the frame before, */
 extern u32 sTintFlagsPrev2;          /* and the one before that */
@@ -29,7 +29,7 @@ s32 CCamera__DrawTints(CCamera *cam) {
     s32 i;
 
     /* CCamera__GetPlayer, inlined */
-    for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
+    for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; player != NULL; player = player->m_pNext) {
         if (player->m_pCamera == (void *) cam) {
             goto found;
         }

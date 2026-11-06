@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 

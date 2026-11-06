@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/game.h"
 
 /* Controller / rumble slot, 0x224 bytes (see Cont_ResetSlot). */
 
@@ -18,7 +19,6 @@ typedef struct Screen {
 
 extern s32 sPauseRumbleOn[4];
 extern char gRumblePool[];
-extern u8 gEngineApp_m_Settings_multiplayer; /* multiplayer */
 
 void RumblePool_FreeAll(void *);
 void Controller_ResetAllRumble(void);
@@ -34,7 +34,7 @@ void PauseMenu_Init_2(Screen *screen) {
     }
     RumblePool_FreeAll(gRumblePool);
     Controller_ResetAllRumble();
-    if (gEngineApp_m_Settings_multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         screen->layer->flagsA &= ~0x800000;
         screen->layer->flagsB &= ~0x800000;
     } else {

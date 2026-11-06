@@ -2,6 +2,7 @@
  * func_00421D90 (it starts in the middle of an if chain, reading $v0 set here). */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern char D_800C140C[];
 extern char D_800B4870[];
@@ -10,10 +11,6 @@ extern char D_800B4888[];
 extern char D_800B4894[];
 extern char D_800B48A8[];
 extern char D_800B48E4[];
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuIsProfile;
 
 s32 PakMenu_UpdateSubtitle(MenuItem *item, s16 *id) {
     s32 n = *id;

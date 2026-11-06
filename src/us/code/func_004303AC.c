@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 s32 CScene__FindWarpDests(s32, s32, s32, s32, s32);
 extern s32 gScene;
@@ -12,12 +13,12 @@ void func_004303AC(CEngineApp *arg0) {
     if (CScene__FindWarpDests((s32) &gScene, -1, -1, (s32) sp18, 1) == 0) {
         var_s1 = 0;
     }
-    gEngineApp_m_Settings_match.frames = 0;
-    gEngineApp_m_Settings_match.seconds = 0;
-    gEngineApp_m_Settings_match.minutes = 0;
-    gEngineApp_m_Settings_match.hours = 0;
+    gEngineApp_m_Settings.match.frames = 0;
+    gEngineApp_m_Settings.match.seconds = 0;
+    gEngineApp_m_Settings.match.minutes = 0;
+    gEngineApp_m_Settings.match.hours = 0;
     arg0->m_Settings.warpFlags = 0;
-    gEngineApp_m_Settings_match.unk44 = 0;
+    gEngineApp_m_Settings.match.unk44 = 0;
     arg0->m_Settings.fadeMode = 2;
     arg0->m_Settings.matchMode = var_s1;
     arg0->m_Settings.nextMode = 0xB;

@@ -2,14 +2,14 @@
 #include "structs/vector.h"
 #include "structs/level_actor.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Boss fight tick: updates the 15 attack slots, then (outside cinematics)
  * counts up the two timers: by phase, drops a random pickup somewhere in the
  * arena (inlined MotherBoss_SpawnPickup) and, later, a pickup at every spawn point
  * (MotherBoss_DropPickupsAtSpawnPoints). */
 
-extern s32 gMotherBoss_minRadius;      /* arena radius range */
-extern s32 gMotherBoss_maxRadius;
+extern s32 gMotherBoss_maxRadius; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern u8 sMotherBossPickupTable[];     /* pickup weights */
 extern u8 sMotherBossDropTablePhase1[];
 extern u8 sMotherBossDropTablePhase2[];
@@ -104,7 +104,7 @@ void MotherBoss_UpdateSpotsAndPickups(MotherBossState *s) {
     if (spawn) {
         s->pickupTimer = 0;
         id = (s16) WeightedTable_PickStatic(sMotherBossPickupTable);
-        dist = Random_Blend(gMotherBoss_minRadius, gMotherBoss_maxRadius);
+        dist = Random_Blend(gMotherBoss.minRadius, gMotherBoss_maxRadius);
         angle = Random_Blend(-3.1415927f, 3.1415927f);
         pos.x = dist * func_002982F0(angle);
         pos.z = dist * func_002974C0(angle);

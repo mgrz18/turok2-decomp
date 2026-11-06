@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern s32 D_800B4B84;
 extern s32 D_800B4B8C;
-extern s32 sGameNoteLoad;
 
 s32 GameNoteMenu_UpdatePrompt(MenuItem *arg0) {
     if (sGameNoteLoad != 0) {

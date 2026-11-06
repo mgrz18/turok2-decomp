@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 typedef struct {
     f32 x, y, z;
@@ -70,7 +71,7 @@ typedef struct {
     /* 0x28 */ u8 pad1[0x88 - 0x28];
 } Info0040457C;
 
-extern ModeState0040457C gLevelScript;
+extern ModeState0040457C gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 gScene_m_InstancePool[];
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 extern s32 D_800F1F50;

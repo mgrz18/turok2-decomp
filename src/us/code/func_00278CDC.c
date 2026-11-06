@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "gfx.h"
+#include "globals/onscreen.h"
 
 typedef struct FontStyle {
     /* 0x00 */ u8 pad0[0xA0];
@@ -19,7 +20,6 @@ typedef struct FontStyle {
     /* 0xBC */ f32 height;
 } FontStyle;
 
-extern FontStyle gEngineApp_m_OnScreen;
 extern s32 gLoadedFont;          /* the loaded font */
 extern s32 gScreenWidth;          /* screen width */
 

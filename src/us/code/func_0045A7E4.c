@@ -2,13 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 extern s32 Controller_PakChanged(s32);
 extern void Controller_UpdatePakInsertion();
-extern s32 gPakCheckDone;
-extern s32 gPakCheckHasPak;
-extern s32 gPakMenuLeaving;
-extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;
 extern s32 gPakMenuPort;
 extern s32 gEngineApp;

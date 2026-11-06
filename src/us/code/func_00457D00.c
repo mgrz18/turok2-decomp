@@ -4,15 +4,15 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/menu.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
-extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakMenuPort;
-extern s32 gPakMenuIsSave;
-extern char gPakProfile[];
+extern s32 gPakMenuIsSave; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern char gPakProfile[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern char gPakCharacterNoteName[];
 extern u8 gPakGameCode[];
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPakMsgPakFullDesc_2[];
 extern u8 gPakMsgSaveDoneDesc_2[];
 extern u8 gPakMsgSaveFailedDesc_2[];
@@ -97,7 +97,7 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
                 }
             }
             if (ok != 0) {
-                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgPakFullDesc_2, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgPakFullDesc_2, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -105,9 +105,9 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     O01FreeAll();
     if (flag != 0) {
         if (r == 0) {
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         } else {
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         }
     }
     return 1;

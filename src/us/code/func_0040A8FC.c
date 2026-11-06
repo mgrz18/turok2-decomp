@@ -4,6 +4,7 @@
 #include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target (or while anim 0x17 runs its first
  * 100 steps) 0x1A/0x1B; otherwise 0x18 after a long 0x17, and from afar 0x19 (when fewer than 2 actors are

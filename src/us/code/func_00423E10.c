@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/frame.h"
+#include "globals/camera.h"
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BBB0_de, with Turok 2's layouts. */
 /* Video setup: picks the low or high resolution set (high when an expansion pak is present, decided once), then
@@ -10,7 +11,6 @@ typedef struct {
 } VideoFlags;
 
 extern s32 osTvType; /* osTvType */
-extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;
 extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 extern s32 gResolution; /* resolution set, -1 until decided */
@@ -42,7 +42,7 @@ void Video_ApplyResolution(void) {
     VideoMode *mode = NULL;
     s32 flag;
 
-    gEngineApp_m_Game_m_CameraPool_m_bActiveChanged = 2;
+    gEngineApp_m_Game_m_CameraPool.m_bActiveChanged = 2;
     if (gResolution == -1) {
         if (GetMemSize() != 0x400000) {
             gResolution = 1;

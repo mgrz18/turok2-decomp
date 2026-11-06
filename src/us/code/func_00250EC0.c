@@ -2,6 +2,7 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 extern u8 gScene[];
 extern s16 D_800AE312[];        /* per character: climbing step sound (stride 4) */

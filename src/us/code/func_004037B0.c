@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x6C];

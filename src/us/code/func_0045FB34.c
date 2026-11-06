@@ -5,6 +5,7 @@
 #include "ultra_types.h"
 #include "structs/pak.h"
 #include "structs/controller.h"
+#include "globals/pak.h"
 
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
 extern OSMesgQueue gSiMessageQueue;

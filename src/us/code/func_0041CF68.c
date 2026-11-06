@@ -7,7 +7,8 @@
 extern s32 CPlayerPool__GetIndex(void *a, void *b);
 extern void Controller_WatchPak(s32 a);
 extern s32 gDamagedPakContinued;
-extern s32 gEngineApp_m_Settings_match_tag[];
+extern s32 gEngineApp_m_Settings_match_tag[]; /* local type: GameMatch.tag read as an array (the ROM bases the load on a register); so globals/game.h is not included here */
+extern CGame gEngineApp_m_Game; /* local: see above (globals/game.h) */
 void StatsMenu_InitAfterPak(Menu *a) {
     s32 n;
     gDamagedPakContinued = 0;

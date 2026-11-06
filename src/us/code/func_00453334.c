@@ -4,7 +4,7 @@
 #include "structs/menu.h"
 #include "structs/player.h"
 
-extern s32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount;
+extern s32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern u8 gEngineApp[];
 extern void func_00469250(void *a);
 s32 ContinueMenu_No_2(s32 a, Menu *b) {

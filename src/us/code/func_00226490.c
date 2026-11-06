@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];

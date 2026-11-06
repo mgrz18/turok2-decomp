@@ -10,6 +10,9 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/camera.h"
+#include "globals/frame.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -23,15 +26,12 @@ typedef struct {
     /* 0x1C */ u32 m_VisBits;
 } CFloor;
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern f32 gFrameIncrement;          /* the frame's time step */
 extern CCameraMode D_800B6CB4[];
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern f32 gQuaternionSin;          /* the last sine taken */
-extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera */
 /* The camera pool, seen from its main camera. */
-#define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool_m_MainCamera - 0x40))
-extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;          /* the pool wants on-screen projections */
+#define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool.m_MainCamera - 0x40))
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
 extern s32 gScene[];
@@ -100,7 +100,7 @@ void CCamera__Advance(CCamera *cam) {
     f32 boxX, boxY, boxZ;
     s32 n;
 
-    for (node = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; node != NULL; node = node->m_pNext) {
+    for (node = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; node != NULL; node = node->m_pNext) {
         if (node->m_pCamera == cam) {
             player = node;
             goto found;
@@ -372,7 +372,7 @@ found:
     cam->m_AnimMax.z = cam->m_vTCorners[0].z + radius;
     CQuaternion__ToMatrix(&cam->m_qViewAlignNoZ, cam->m_mfFaceScreen);
     CMtxF__SetRotateY(cam->m_mfFaceScreenYAxisUp, cam->m_vRotation.y);
-    if (gEngineApp_m_Game_m_CameraPool_m_bActiveChanged != 0) {
+    if (gEngineApp_m_Game_m_CameraPool.m_bActiveChanged != 0) {
         guPerspectiveF(mProj, &cam->m_OnScreenPerspNorm, 47.5f, gScreenWidth / gScreenHeight, 16.0f, 7168.0f, 1.0f);
         CMtxF__Identity(mView);
         CMtxF__Multiply(m, mView, mProj);
@@ -411,9 +411,6 @@ extern s32 gScreenHeight;          /* screen height */
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern Gfx gRspInitDL[];        /* RDP setup display lists */
 extern Gfx gRdpInitDL[];
-extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera (camera pool + 0x40) */
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;          /* the pool's active camera count */
-extern void *gDepthBuffer;        /* the z buffer */
 void Texture_InvalidateCache(void);
 void Render_SetRenderMode(s32 arg0);
 s32 Cinema_PathPlaying(void);
@@ -494,7 +491,7 @@ void CCamera__DisplayListSetup(CCamera *cam) {
         Texture_InvalidateCache();
     }
     GFX(gDList, 0xE3001201, 0x2000);                    /* gDPSetTextureFilter(bilerp) */
-    if (cam != &gEngineApp_m_Game_m_CameraPool_m_MainCamera || gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 0) {
+    if (cam != &gEngineApp_m_Game_m_CameraPool.m_MainCamera || gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 0) {
         Gfx **clearDl = &gDList;
 
         Render_SetRenderMode(0x14);
@@ -555,7 +552,7 @@ void CCamera__DisplayListSetup(CCamera *cam) {
     GFX(gDList, 0xE3001801, 0);                         /* gDPSetAlphaDither */
     GFX(gDList, 0xE3001A01, 0x10);
     GFX(gDList, 0xE3000A01, 0x100000);                  /* gDPSetCycleType(G_CYC_2CYCLE) */
-    if (cam != &gEngineApp_m_Game_m_CameraPool_m_MainCamera) {
+    if (cam != &gEngineApp_m_Game_m_CameraPool.m_MainCamera) {
         DLights_Load(cam);
     }
     GFX(gDList, 0xE7000000, 0);

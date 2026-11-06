@@ -4,12 +4,12 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/particle_event.h"
+#include "globals/game.h"
 
 typedef struct Target Target;
 
 extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern CVector3 gCollisionResults_m_vVelocity;                /* the direction of the hit */
-extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gScene_m_ParticleSystem[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
@@ -62,7 +62,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         kind = 4;
         p->m_dwFlags |= 2;
     }
-    if (gEngineApp_m_Settings_multiplayer != 0 && CParticle__IsUnderWater(p)) {
+    if (gEngineApp_m_Settings.multiplayer != 0 && CParticle__IsUnderWater(p)) {
         CROMParticleEffect *controlledDefinition = p->m_pEffect;
         s32 controlledKind, model, sound, effect;
 

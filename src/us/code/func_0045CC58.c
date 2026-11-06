@@ -3,10 +3,10 @@
  * func_0045CCB0 (the last one already in src/, it must go). */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Set the menu item's text from the game mode gPakConfirmKind. */
 
-extern s32 gPakConfirmKind;
 extern char D_800B5310[];
 extern char D_800B52DC[];
 

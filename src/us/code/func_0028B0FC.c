@@ -2,21 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/frame.h"
 
 extern int D_800B6E60;
 extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
-extern s64 sGfxTaskStartTime;
-extern f32 sGfxRspTime;
-extern s64 sRdpStartTime;
 extern s32 D_800B6E64;
-extern u64 sAudioTaskStartTime;
-extern u64 sGfxRspResumeTime;
 extern void osWritebackDCacheAll();
-extern u64 sAudioTaskStartTime;
-extern f32 sGfxRspTime;
-extern u64 sGfxRspResumeTime;
-extern s64 sRdpStartTime;
-extern s64 sGfxTaskStartTime;
 extern s32 D_800B6E64;
 extern s64 osGetTime(void);
 extern void osSpTaskLoad(s32 *mode);

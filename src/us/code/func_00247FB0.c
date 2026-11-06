@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
 
 
 

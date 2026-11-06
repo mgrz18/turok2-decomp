@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/MISC/8043DF84_2.CPP, func_8043E6A4_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
 extern s32 Menu_StepValue(void *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
 extern s32 Controller_MenuRight(s32);
@@ -13,7 +14,6 @@ typedef struct {
 } ScaleTable;
 
 extern ScaleTable sPlayerSpeedTable;
-extern f32 gEngineApp_m_Settings_speed;      /* resulting scale */
 
 /* Steps the selection (twice when the controller reports busy) and sets the scale
  * from the table plus one, clamped to [0.5, 2.0]. */
@@ -36,6 +36,6 @@ s32 MpMenu_StepPlayerSpeed(void *arg0, Menu *item) {
     } else {
         scale = 0.5f;
     }
-    gEngineApp_m_Settings_speed = scale;
+    gEngineApp_m_Settings.speed = scale;
     return 0;
 }

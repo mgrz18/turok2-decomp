@@ -2,6 +2,8 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "structs/collision.h"
+#include "globals/game.h"
+#include "globals/camera.h"
 
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
@@ -9,9 +11,7 @@ extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, *
 extern f32 gSplitScreenMarginTop;          /* top, */
 extern f32 gSplitScreenMarginLeft;          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
 extern f32 gSplitScreenMarginRight;          /* right */
-extern u8 gEngineApp_m_Settings_unk1B;           /* two players split side by side, not one above the other */
 extern s32 gDefaultVisBits[];        /* the visibility bits outside any region */
-extern CCameraPool gEngineApp_m_Game_m_CameraPool;  /* the camera pool */
 extern CBox gCameraViewBox;         /* the view boxes of all the active cameras together */
 extern CBox gCameraVisibleBox;         /* and their widened (animation) boxes */
 extern u32 gCameraVisBits;          /* and their visibility bits */
@@ -95,7 +95,7 @@ void CCameraPool__Advance(CCameraPool *pool) {
         CCamera__MoveViewport(view, width, height, 0.0f, 0.0f);
         break;
     case 2:
-        if (gEngineApp_m_Settings_unk1B == 0) {
+        if (gEngineApp_m_Settings.unk1B == 0) {
             CCamera__MoveViewport(view, width, halfHeight, left, top);
             view = view->m_pNext;
             CCamera__MoveViewport(view, width, halfHeight, left, top + halfHeight);

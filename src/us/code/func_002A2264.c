@@ -2,9 +2,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002014A4.c, func_002014A4, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/hostio.h"
 
-extern u8 sHostIoStopped;   /* debugger: stopped */
-extern u8 sHostIoResumeAllowed;   /* debugger: resume allowed */
 extern u32 D_801286D8;
 extern u32 HostIo_ReadWord(u32 address);
 extern void HostIo_WriteWord(u32 address, u32 value);

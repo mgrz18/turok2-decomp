@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Module init: collects up to 4 actors of type (0x44E, 9) into the module state, hooks their callbacks,
  * sets up the first phase (MotherBoss_SetupPhase0) and queues MotherBoss_OnIntroCinemaDone. */

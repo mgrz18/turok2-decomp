@@ -1,6 +1,7 @@
 /* WRONG CUT: the real function is CheatsMenu_Init_2, size 0x10C: splat's CheatsMenu_Init_2 starts with a stray
  * never-executed word (a jal) ahead of the 16-aligned real start. */
 #include "common.h"
+#include "globals/menu.h"
 
 typedef struct Layer {
     /* 0x000 */ u8 pad0[0x2D8];
@@ -12,8 +13,7 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-extern u32 gEngineApp_m_Settings_unlockedCheats; /* gEngineApp_m_Settings.flags (see Demo_End) */
-extern s32 sCheatsMenuSelection;
+extern u32 gEngineApp_m_Settings_unlockedCheats; /* local type: GameSettings.unlockedCheats; without this declaration here (globals/game.h alone) GCC loads the address instead of the value in the loop */
 
 /* Picks the first of the 11 options whose flag is set in the settings (-1 if none). */
 void CheatsMenu_Init_2(Screen *screen) {

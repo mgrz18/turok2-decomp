@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 Controller_Lock(s32 arg0);
-extern int gPakState[];
+extern int gPakState[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s8 gPakQueueState;
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
@@ -13,7 +13,7 @@ void Controller_Unlock();
 void Pak_Mount(s32);
 s32 osPfsRepairId(void *);
 s32 Pak_Repair(s32 arg0) {
-    extern char gPakFileSystems[];
+    extern char gPakFileSystems[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
     s32 var_s0;
     if (gPakState[arg0] != 3) {
         return -2;

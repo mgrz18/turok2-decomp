@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/game.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/8024D018_3.CPP, func_8024D4AC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */

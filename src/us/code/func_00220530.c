@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* The input state the controller reader fills (gEngineApp_m_Settings, 0x184 bytes). */
 
@@ -10,7 +11,7 @@ extern s32 gSceneGeometryDL;
 extern f32 gFrameIncrement;      /* frame time scale */
 extern f32 gQuaternionSin;
 extern u8 gEngineApp_m_SwooshSystem[];
-extern u8 gEngineApp_m_Game_m_CameraPool[];
+extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 
 void CCache__SetFrameDelay(s32, s32);
 void CScene__UpdateWarp(CScene *);

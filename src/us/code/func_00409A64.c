@@ -11,6 +11,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ CVector3 pos;

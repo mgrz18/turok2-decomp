@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/pager.h"
+#include "globals/pager.h"
 
 /* Four words of memory stats ending at D_801206BC. */
 extern s32 D_801206BC;

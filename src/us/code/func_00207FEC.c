@@ -9,6 +9,7 @@
 /* Render_SetupMaterial: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/80268160_12.CPP, func_80269A80_de, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
+#include "globals/game.h"
 
 /* The libultra GBI (F3DEX2) commands this function writes, as in PR/gbi.h. */
 #define _SHIFTL(v, s, w) (((unsigned int) (v) & (0xFFFFFFFFU >> (32 - (w)))) << (s))
@@ -273,7 +274,6 @@ void Render_DrawShadowQuad(void *matrix, s32 pass, u32 alpha) {
     Texture_InvalidateCache();
 }
 
-extern s32 gEngineApp_m_Settings;
 extern u32 gFrameCountGameplay;
 /* Scene colour mode: 0 none; otherwise an environment colour (and, for 6, a prim alpha). */
 extern s32 gBlendState;
@@ -313,7 +313,7 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
         return 0;
     }
     tailEnum = -1;
-    if (mat->texture != 0 && !(gEngineApp_m_Settings & 0x400)) {
+    if (mat->texture != 0 && !(gEngineApp_m_Settings.cheatFlags & 0x400)) {
         node = Texture_Request(&mat->texture);
         if (node == 0) {
             return 0;

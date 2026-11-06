@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/camera.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
 extern u32 gFrameCountGameplay;
 extern s32 gScene;
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 
 extern void CCameraPool__AddText(void *arg0, void *camera, s32 model);
 
@@ -20,7 +20,7 @@ void WeaponMode_Switch_Enter(CGameObjectInstance *weapon, CAI *state) {
         state->m_pModeTable = gWeaponInfoTable[requested]->modeTable;
         state->m_pfEffects = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->effects;
         if (gFrameCountGameplay >= 5) {
-            CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
+            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
         }
         state->m_Weapon.m_BarrelAngle = 0;
         state->m_Weapon.m_BarrelSpeed = 0;

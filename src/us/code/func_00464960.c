@@ -5,6 +5,8 @@
 #include "structs/vector.h"
 #include "structs/world.h"
 #include "structs/player.h"
+#include "globals/game.h"
+#include "globals/camera.h"
 
 typedef struct LevelRecord {
     /* 0x00 */ s32 unk0;
@@ -32,11 +34,7 @@ typedef struct Handle {
     void *data;
 } Handle;
 
-extern CVector3 gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos;
-extern s32 gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion;
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_Players;
-extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;
 
 extern s32 ProPackDecompress(Handle **handle, s32);
 extern s32 CScene__GetRegion(CScene *world, s32);
@@ -131,11 +129,11 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
                     continue;
                 }
                 world->m_nFirstActor++;
-                memcpy(&gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos, &rec->pos, sizeof(CVector3));
-                gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos.y += 204.79999f;
-                gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion = CScene__FindRegionAt(world, &rec->pos);
-                for (playerIndex = 0; playerIndex < gEngineApp_m_Game_m_PlayerList_m_nPlayers; playerIndex++) {
-                    player = &gEngineApp_m_Game_m_PlayerList_m_Players[playerIndex];
+                memcpy(&gEngineApp_m_Game_m_CameraPool.m_MainCamera.m_ViewParams.m_vPos, &rec->pos, sizeof(CVector3));
+                gEngineApp_m_Game_m_CameraPool.m_MainCamera.m_ViewParams.m_vPos.y += 204.79999f;
+                gEngineApp_m_Game_m_CameraPool.m_MainCamera.m_ViewParams.m_pCurrentRegion = CScene__FindRegionAt(world, &rec->pos);
+                for (playerIndex = 0; playerIndex < gEngineApp_m_Game.m_PlayerList.m_nPlayers; playerIndex++) {
+                    player = &gEngineApp_m_Game.m_PlayerList.m_Players[playerIndex];
                     if (nspawns != 0) {
                         rec->spawnId = spawns[spawnIndex].m_nID;
                         Angle_Wrap(&spawns[spawnIndex].m_RotY);

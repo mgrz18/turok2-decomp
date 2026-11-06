@@ -1,6 +1,8 @@
 /* Second-module twin of Primagen_InitAI (VM module 2 is linked over module 1; same source, its own strings and pool). */
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
+#include "globals/scene.h"
 
 typedef struct {
     f32 x, y, z;
@@ -26,9 +28,7 @@ typedef struct {
     /* 0x108 */ void *onDraw;
 } Level00403CF8;
 
-extern s32 gScene_m_LevelID;
-extern s32 gLevelScript_path;
-extern s32 sPrimagenPathPoint;
+extern s32 gLevelScript_path; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern u8 gScene[];
 extern u8 sPrimagenModeTable_2[];
 s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void **out, s32 max);
