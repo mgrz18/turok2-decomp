@@ -40,7 +40,10 @@
  * join block; no natural source shape tried (RW `size *=` form, lerp/farness/
  * range helpers as inlines, reused temporaries, early returns, depth reused
  * after the copy, permuter) reproduced either. Without the pins the best
- * natural form was 13 of 624 words. */
+ * natural form was 13 of 624 words. The L pass also tried the depth scaled in
+ * place (`depth *= ...`), a `range` local, the size as one expression, a lerp
+ * inline, and an early `return 1.0f`: none came closer (each misplaces the
+ * clamp's result and the range in $f0/$f1). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_4.CPP, Particle_BuildMatrix, with Turok 2's layouts. */
 
 /* Builds a particle's display matrix: its size scaled for camera depth and

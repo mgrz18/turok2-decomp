@@ -653,6 +653,18 @@ func_0041EA84 / func_004579A4 and func_0022D2FC keep their marker):
   second set keeps that copy from being propagated, which is what made
   CSE compute the centre from oldH's copy, as the ROM does.
 
+**Looked at again in the L pass (k5).** The seven VM/particle FAKEMATCH
+files keep their markers; each file's first comment now lists the forms
+tried. What was learned: func_0040C4F4's identical arms work through a
+temporary, not a count of refs. The arms' test loads `m_pNext` into a pseudo
+that lives in one block; local-alloc gives it `$v0`, so every value live
+across the loop conflicts with `$v0`. Cross-jumping merges the arms only
+after reload. Dead code (an unused counter, an empty `if`) is gone before
+allocation and leaves no temporary. func_0041EA84's shared 1 comes from
+cse1, not only cse2: it follows the `Pak_GetStatus` jump because the error
+label has one use and a barrier before it. A `do { } while (0)` stops cse1
+at its loop-end note, but cse2 runs after loop and ignores the note.
+
 ### The G pass (the last drafts)
 
 Two of the three drafts left in `nonmatching/` matched:
