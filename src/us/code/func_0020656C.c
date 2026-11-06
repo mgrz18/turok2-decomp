@@ -1,37 +1,25 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80254D44_de.c, func_80254D44_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2. */
 
-#include "rw/abu_types.h"
+#include "common.h"
 #include "globals/cache.h"
 
-extern void CCache__ClearDisplayListLocks(s32, s32);
-extern s32 gCache;
-void CCache__ClearDisplayListLocks(s32 arg0, s32 arg1)
-{
-  s32 mask;
-  u32 count;
-  int new_var;
-  u32 new_var2;
-  s32 offset;
-  u32 limit;
-  mask = -0x201;
-  if (arg1 != 0)
-  {
-    mask = -0x401;
-  }
- do { count = 0; limit = gCacheEntryCount; } while (0);
-  new_var2 = limit;
-  if (limit != 0)
-  {
-    offset = count;
-    do
-    {
-      new_var = offset + gCache;
-      count += 1;
-      *((s32 *) (new_var + 0xC)) &= mask;
-      offset += 0x28;
+/* Clears display list dlist's lock bit on every CMemEntry. */
+void CCache__ClearDisplayListLocks(s32 unused, s32 dlist) {
+    s32 mask;
+    u32 i;
+    u32 count;
+
+    mask = ~MEMENTRY_FLAG_DLISTA_LOCKED;
+    if (dlist != 0) {
+        mask = ~MEMENTRY_FLAG_DLISTB_LOCKED;
     }
-    while (count < new_var2);
-  }
-  gCache_dlistCount[arg1] = 0;
+    do { i = 0; count = gCacheEntryCount; } while (0);   /* changes only the asm label numbers */
+    if (count != 0) {
+        do {
+            gCache.memEntries[i].flags &= mask;
+            i++;
+        } while (i < count);
+    }
+    gCache_dlistCount[dlist] = 0;
 }

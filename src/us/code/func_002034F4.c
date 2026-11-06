@@ -3,20 +3,15 @@
 
 #include "rw/abu_types.h"
 #include "structs/cache.h"
+#include "globals/cache.h"
 
-extern int gCache_mutex_count;
 extern void *CCache__LookupAndLock(s32 arg0, s32 arg1);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-extern struct Shape_func_8021A2D4_de_2 gHashMask;
-extern struct Shape_func_8021A2D4_de_2 gHashTable;
 extern void CList__MoveToHead(void *, s32);
 void *CCache__LookupAndLock(s32 arg0, s32 arg1) {
     extern s32 osSendMesg(OSMesgQueue *, s32, s32);
-    extern struct Shape_func_8021A2D4_de_2 gCache_ageCount;
-    extern OSMesgQueue gCache_mutex;
-    extern s32 gCache_memAgeList;
     s32 temp_v1;
     s32 temp_v1_2;
     u32 temp_a0;
@@ -30,14 +25,14 @@ void *CCache__LookupAndLock(s32 arg0, s32 arg1) {
     gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg(&gCache_mutex, 0, 1);
+        osRecvMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
     out = &value;
-    node = (HashNode *)((s32)gHashTable.field_0 +
+    node = (HashNode *)((u8 *)gHashTable +
         ((((arg1 << 5) ^ ((u32)arg1 >> 1) ^ ((u32)arg1 >> 9) ^
-           ((u32)arg1 >> 17)) & gHashMask.field_0) * 0x10));
+           ((u32)arg1 >> 17)) & gHashMask) * 0x10));
     if (node->key != arg1) {
         goto not_initial;
     }
@@ -65,7 +60,7 @@ found:
         object = *(void **)value;
         object->lockCount += 1;
         object->flags |= MEMENTRY_FLAG_LOCKED;
-        object->age = gCache_ageCount.field_0;
+        object->age = gCache.ageCount;
         CList__MoveToHead(&gCache_memAgeList, object);
     }
     temp_v0 = __osDisableInt();
@@ -73,7 +68,7 @@ found:
     gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0);
-        osSendMesg(&gCache_mutex, 0, 1);
+        osSendMesg(&gCache_mutex.queue, 0, 1);
     } else {
         __osRestoreInt(temp_v0);
     }
