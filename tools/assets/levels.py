@@ -13,10 +13,8 @@ CScene__LoadLevel (func_0042AC0C.c) the nine blocks of a level, CScene__Decompre
 CScene__DecompressGridSection, CScene__DecompressAnimatedInstances, CScene__DecompressPaths,
 CScene__DecompressLinks, CScene__FindWarpDests.  docs/assets/LEVELS.md describes the formats.
 
-RNC unpacking uses part a1's tools/assets/propack.py (maybe_decompress) when it is importable and
-falls back to the built-in port below.  Locating uses a minimal set reader (rom_set/blocks); it can
-be swapped for romfs.RomFS (fs.level(i), fs.cinema(i)) without touching the parsers, which only
-see bytes.
+Locating goes through tools/assets/romfs.py (fs.level(i), fs.cinema(i)) and RNC unpacking through
+propack.py; the parsers only see bytes.
 """
 import argparse
 import json
@@ -27,227 +25,17 @@ import struct
 import sys
 import zlib
 
-# ---------------------------------------------------------------------------------------------
-# RNC ProPack (methods 1 and 2), ported from references/rw_junk/docs/hand_asm_c/rnc.c (the same
-# hand-written decoder Turok 2 calls from ProPackDecompress, src/us/code/func_00200B00.c).
-# Temporary: replace with tools/assets/propack.py (part a1) once it lands.
-# ---------------------------------------------------------------------------------------------
-def _crc16(data):
-    tab = []
-    for i in range(256):
-        c = i
-        for _ in range(8):
-            c = (c >> 1) ^ 0xA001 if c & 1 else c >> 1
-        tab.append(c)
-    crc = 0
-    for b in data:
-        crc = tab[(crc ^ b) & 0xFF] ^ (crc >> 8)
-    return crc
-
-
-class _Bits1:
-    __slots__ = ("d", "p", "window", "left")
-
-
-def _rnc1(d, p, out_len):
-    """d = whole buffer, p = start of packed stream (header + 0x12)."""
-    out = bytearray()
-    b = _Bits1()
-    b.d = d
-    b.p = p
-    b.window = d[p] | (d[p + 1] << 8)
-    b.left = 0
-
-    def byte(i):
-        return d[i] if i < len(d) else 0
-
-    def refill(n):
-        b.left += n
-        b.window >>= (b.left & 31)
-        b.window |= (byte(b.p + 3) << 24) | (byte(b.p + 2) << 16)
-        b.window &= 0xFFFFFFFF
-        b.p += 2
-        n -= b.left
-        b.left = 16 - n
-        return n
-
-    def bits(mask, n):
-        r = b.window & mask
-        b.left -= n
-        if b.left < 0:
-            n = refill(n)
-        b.window >>= (n & 31)
-        return r
-
-    def table():
-        n = bits(0x1F, 5)
-        if n == 0:
-            return None
-        lens = [bits(0xF, 4) for _ in range(n)]
-        t = []
-        code = 0
-        for ln in range(1, 17):
-            for i in range(n):
-                if lens[i] != ln:
-                    continue
-                rev = 0
-                for k in range(ln):
-                    rev |= ((code >> (ln - 1 - k)) & 1) << k
-                t.append(((1 << ln) - 1, rev, ln, i))
-                code += 1
-            code <<= 1
-        return t
-
-    def huff(t):
-        for mask, c, ln, idx in t:
-            if (b.window & mask) == c:
-                break
-        else:
-            raise ValueError("rnc1: bad huffman code")
-        bits(0, ln)
-        if idx < 2:
-            return idx
-        nb = idx - 1
-        return bits((1 << nb) - 1, nb) | (1 << nb)
-
-    bits(2, 2)
-    tabs = [None, None, None]
-    while len(out) < out_len:
-        for k in range(3):
-            t = table()
-            if t is not None:
-                tabs[k] = t
-        sub = (bits(0xFFFFFFFF, 16) - 1) & 0xFFFF
-        while True:
-            n = huff(tabs[0])
-            if n:
-                out += d[b.p:b.p + n]
-                b.p += n
-                w = byte(b.p) | (byte(b.p + 1) << 8)
-                b.window = ((b.window & ((1 << (b.left & 31)) - 1)) | (w << (b.left & 31))) & 0xFFFFFFFF
-            if sub == 0:
-                break
-            sub -= 1
-            dist = huff(tabs[1])
-            ln = huff(tabs[2]) + 2
-            src = len(out) - dist - 1
-            for _ in range(ln):
-                out.append(out[src])
-                src += 1
-    return bytes(out[:out_len])
-
-
-def _rnc2(d, h, out_len):
-    p = h + 0x12
-    out = bytearray()
-    st = {"p": p + 1, "t2": (((d[p] << 1) + 1) << 1)}
-
-    def bit():
-        t2 = st["t2"] << 1
-        v = (t2 >> 8) & 1
-        t2 &= 0xFF
-        if t2 == 0:
-            t2 = (d[st["p"]] << 1) + v
-            st["p"] += 1
-            v = (t2 >> 8) & 1
-            t2 &= 0xFF
-        st["t2"] = t2
-        return v
-
-    def rd():
-        v = d[st["p"]]
-        st["p"] += 1
-        return v
-
-    while True:
-        while bit() == 0:
-            out.append(rd())
-        hi = 0
-        if bit() == 0:
-            ln = 4 + bit()
-            if bit():
-                ln = (ln - 1) * 2 + bit()
-                if ln == 9:
-                    n = 0
-                    for _ in range(4):
-                        n = n * 2 + bit()
-                    n = 4 * (n + 3)
-                    out += d[st["p"]:st["p"] + n]
-                    st["p"] += n
-                    continue
-        else:
-            if bit() == 0:
-                ln = 2
-                dist = rd()
-                src = len(out) - dist - 1
-                for _ in range(ln):
-                    out.append(out[src]); src += 1
-                continue
-            ln = 3
-            if bit():
-                ln = rd()
-                if ln == 0:
-                    if bit():
-                        continue
-                    break
-                ln += 8
-        if bit():
-            hi = bit()
-            if bit():
-                hi = hi * 2 + bit()
-                hi |= 4
-                if bit() == 0:
-                    hi = hi * 2 + bit()
-            elif hi == 0:
-                hi = 2 + bit()
-        dist = (hi << 8) | rd()
-        src = len(out) - dist - 1
-        for _ in range(ln):
-            out.append(out[src]); src += 1
-    return bytes(out[:out_len])
-
-
-def rnc_unpack(d, off=0, check_crc=True):
-    """Unpack the RNC chunk at d[off:]; returns bytes.  Non-RNC data is returned unchanged by
-    unpack_block()."""
-    if d[off:off + 3] != b"RNC":
-        raise ValueError("not RNC")
-    method = d[off + 3]
-    ulen = int.from_bytes(d[off + 4:off + 8], "big")
-    if method == 1:
-        out = _rnc1(d, off + 0x12, ulen)
-    elif method == 2:
-        out = _rnc2(d, off, ulen)
-    else:
-        raise ValueError("RNC method %d" % method)
-    if check_crc and _crc16(out) != int.from_bytes(d[off + 0xC:off + 0xE], "big"):
-        raise ValueError("RNC crc mismatch")
-    return out
-
-
-def unpack_block(blob):
-    """ProPackDecompress semantics: RNC chunks are unpacked, raw blocks pass through."""
-    if blob[:3] == b"RNC":
-        return rnc_unpack(blob)
-    return blob
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import propack  # noqa: E402
+import romfs  # noqa: E402
 
 # ---------------------------------------------------------------------------------------------
-# ROMFS (minimal): the engine's "indexed set" (CISet) is  u32 count, (count+1) u32 offsets
-# relative to the set start, the last offset being the end; block i = [off[i], off[i+1]).
-# Keys passed to CCache__Request are plain ROM offsets (CLoader__Main -> osPiRawStartDma).
-# The cartridge index is at ROM 0xFCBFB4 (CEngineApp: m_CartridgeIndex = 0xFCBFB4, func_00286674.c).
+# Sets: the engine's "indexed set" (CISet) is  u32 count, (count+1) u32 offsets relative to the
+# set start, the last offset being the end; block i = [off[i], off[i+1]).  ROM-level locating is
+# romfs.RomFS; set_offsets/blocks below only split sets inside bytes already in hand.
 # ---------------------------------------------------------------------------------------------
-CARTRIDGE_INDEX = 0xFCBFB4
-
-# cartridge index entries (Turok 3's include/cartdir.h, same order; uses in CScene__Construct)
-CART = {
-    0: "objects index", 1: "intelligence", 2: "object types", 3: "texture sets index",
-    4: "particle effects", 5: "levels index", 6: "load/save persistent data",
-    7: "game persistent data", 8: "warp dests", 9: "binaries index", 10: "object types 2",
-    11: "particle swooshes", 12: "dynamic lights", 13: "curves", 14: "rumbles",
-    15: "rumble types", 16: "graphicset index", 17: "graphicset type", 18: "Cinemas index",
-    19: "link group types", 20: "(empty)",
-}
+CARTRIDGE_INDEX = romfs.CARTRIDGE
+CART = romfs.CART_NAMES   # cartridge index entries (CScene__Construct)
 
 
 def u32(d, o):
@@ -267,21 +55,17 @@ def blocks(d, base=0):
 
 
 def rom_set(rom, key):
-    """[(rom_offset, size)] of the set whose ROM key is `key`."""
+    """[(rom_offset, size)] of the set whose ROM key is `key` (rom = ROM bytes)."""
     return set_offsets(rom, key)
 
 
-try:  # part a1's shared decoder (tools/assets/propack.py) when present
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from propack import maybe_decompress as _shared_unpack
-except Exception:  # pragma: no cover - fall back to the copy above
-    _shared_unpack = None
-
-
 def unpack(blob):
-    if _shared_unpack is not None:
-        return _shared_unpack(blob)
-    return unpack_block(blob)
+    """ProPackDecompress semantics: RNC chunks are unpacked, raw blocks pass through."""
+    return propack.maybe_decompress(blob)
+
+
+def _fs(rom):
+    return rom if isinstance(rom, romfs.RomFS) else romfs.RomFS(rom)
 
 
 # ---------------------------------------------------------------------------------------------
@@ -559,11 +343,15 @@ def level_name(rom, rom_off, size):
     return cstr(rom[rom_off:rom_off + size])
 
 
-def parse_level(rom, levels_key, idx, with_sections=True):
-    lv = rom_set(rom, levels_key)
-    lkey, lsize = lv[idx]
-    sub = rom_set(rom, lkey)
-    raw = [rom[a:a + s] for a, s in sub]
+def parse_level(fs, idx, with_sections=True):
+    """Level idx (cart/5/<idx>, CScene__LoadLevel's nine blocks); fs = romfs.RomFS or ROM bytes."""
+    fs = _fs(fs)
+    rom = fs.rom
+    node = fs.level(idx)
+    lkey, lsize = node.rom, node.size
+    kids = fs.children(node)
+    sub = [(k.rom, k.size) for k in kids]
+    raw = [fs.read(k) for k in kids]
     out = {"index": idx, "rom": hex(lkey), "size": lsize,
            "blocks": [{"n": k, "name": LEVEL_BLOCKS.get(k, ("?",))[0], "rom": hex(a), "size": s,
                        "compressed": rom[a:a + 3] == b"RNC"} for k, (a, s) in enumerate(sub)]}
@@ -576,22 +364,22 @@ def parse_level(rom, levels_key, idx, with_sections=True):
     out["instances"] = parse_instances(unpack(raw[3]))
     out["paths"] = parse_paths(unpack(raw[2]))
     out["links"] = parse_links(unpack(raw[7]))
-    gs = rom_set(rom, sub[5][0])
     out["grid_sections"] = []
-    for k, (a, s) in enumerate(gs):
+    for k, gn in enumerate(fs.children(kids[5])):
+        a, s = gn.rom, gn.size
         ent = {"cell": k, "rom": hex(a), "size": s, "compressed": rom[a:a + 3] == b"RNC"}
         if with_sections and s:
-            ent["data"] = parse_grid_section(unpack(rom[a:a + s]), hdr["scale"])
+            ent["data"] = parse_grid_section(fs.blob(gn), hdr["scale"])
         out["grid_sections"].append(ent)
     return out
 
 
-def parse_warp_dests(rom, cart):
+def parse_warp_dests(fs):
     """Cartridge entry 8 "warp dests" (CScene__FindWarpDests): set of 2 tables:
     0 = {?, n, s32 key[n]} sorted warp ids (binary searched), 1 = {?, n, CWarpPoint[n]}
     (f32 pos[3], f32 rot_y, s16 level, s16 id)."""
-    a, s = cart[8]
-    bl = blocks(rom[a:a + s])
+    fs = _fs(fs)
+    bl = blocks(fs.read(fs.node("cart/8")))
     _, n = struct.unpack_from(">ii", bl[0], 0)
     keys = struct.unpack_from(">%di" % n, bl[0], 8)
     out = []
@@ -699,10 +487,8 @@ def main(argv=None):
     ap.add_argument("--map", type=int, action="append", help="draw maps of these levels ('-1' = all)")
     ap.add_argument("--no-sections", action="store_true", help="skip the grid section contents")
     a = ap.parse_args(argv)
-    rom = open(a.rom, "rb").read()
-    cart = rom_set(rom, CARTRIDGE_INDEX)
-    levels_key = cart[5][0]
-    nlev = len(rom_set(rom, levels_key))
+    fs = romfs.RomFS(a.rom)
+    nlev = fs.count("levels")
     os.makedirs(os.path.join(a.out, "levels"), exist_ok=True)
     which = a.level if a.level else list(range(nlev))
     maps = set(a.map or [])
@@ -710,7 +496,7 @@ def main(argv=None):
         maps = set(which)
     index = []
     for i in which:
-        lv = parse_level(rom, levels_key, i, not a.no_sections)
+        lv = parse_level(fs, i, not a.no_sections)
         slug = re.sub(r"[^A-Za-z0-9]+", "_", lv["name"]).strip("_") or "unnamed"
         fn = "%03d_%s" % (i, slug)
         with open(os.path.join(a.out, "levels", fn + ".json"), "w") as fp:
@@ -728,7 +514,7 @@ def main(argv=None):
     with open(os.path.join(a.out, "levels", "index.json"), "w") as fp:
         json.dump(index, fp, indent=1)
     with open(os.path.join(a.out, "warp_dests.json"), "w") as fp:
-        json.dump(parse_warp_dests(rom, cart), fp, indent=1)
+        json.dump(parse_warp_dests(fs), fp, indent=1)
     print("%d levels -> %s" % (len(index), a.out))
 
 

@@ -34,17 +34,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import propack  # noqa: E402  (tools/assets/propack.py, part a1)
 
 # ----------------------------------------------------------------------------------------------
-# Locating. tools/assets/romfs.py (part a1) is used when present; the fallback below is the
-# minimum needed (cartridge index -> objects index -> object), kept apart from the parsing.
+# Locating: tools/assets/romfs.py (cartridge index -> objects index -> object), kept apart from
+# the parsing; (rom_offset, size) pairs below are ROM nodes' ranges.
 # ----------------------------------------------------------------------------------------------
-CARTRIDGE_INDEX = 0xFCBFB4   # CEngineApp__Main: e->m_CartridgeIndex = 0xFCBFB4
+import romfs  # noqa: E402
+
+CARTRIDGE_INDEX = romfs.CARTRIDGE  # CEngineApp__Main: e->m_CartridgeIndex = 0xFCBFB4
 CART_OBJECTS = 0             # CScene__Construct: CISet__GetROMAddress(cart, file, 0) = objects index
 OBJ_INFO, OBJ_GEOMETRY, OBJ_ANIMATIONS, OBJ_STATIC_EVENTS = range(4)  # CGameObjectInstance__SetupAnimation
-
-try:
-    import romfs  # noqa: E402
-except ImportError:  # pragma: no cover
-    romfs = None
 
 
 def u32(b, o):
@@ -66,13 +63,9 @@ def uset(b, o):
 
 
 def objects(rom):
-    """-> list of (rom_offset, size) of every object in the objects index."""
-    if romfs is not None:
-        fs = romfs.RomFS(rom)
-        return [(n.rom, n.size) for n in (fs.object(i) for i in range(fs.count("objects")))]
-    cart = iset(rom, CARTRIDGE_INDEX)
-    base, _ = cart[CART_OBJECTS]
-    return iset(rom, base)
+    """-> list of (rom_offset, size) of every object in the objects index (rom = bytes or RomFS)."""
+    fs = rom if isinstance(rom, romfs.RomFS) else romfs.RomFS(rom)
+    return [(n.rom, n.size) for n in (fs.object(i) for i in range(fs.count("objects")))]
 
 
 def object_entries(rom, obj_off):

@@ -13,10 +13,9 @@ Formats are those the engine's loaders parse (see docs/assets/TEXTURES.md):
   Texture_Load / Texture_GetInfo / Texture_DecompressCallback  (texture banks, the "texture sets" index)
   CScene__LoadGraphicSet / Hud_GetImageFrame / Hud_DrawImageFrame  (graphic sets: tiled 2D images, fonts)
 
-Locating: the cartridge index lives at ROM 0xFCBFB4 (CEngineApp__Main stores it in m_CartridgeIndex and passes it
-to CScene__Construct). Entry 3 = texture sets, 16 = graphic sets, 17 = graphic-set type ids. This module carries a
-minimal locator and an RNC1 unpacker until tools/assets/romfs.py / propack.py (part a1) are used instead; the
-parsing functions below only take decompressed bytes.
+Locating goes through tools/assets/romfs.py (cartridge index at ROM 0xFCBFB4: entry 3 = texture sets, 16 = graphic
+sets, 17 = graphic-set type ids) and RNC through propack.py; the parsing functions below only take decompressed bytes.
+The export functions accept ROM bytes or a romfs.RomFS.
 """
 import argparse
 import json
@@ -26,10 +25,12 @@ import struct
 import sys
 import zlib
 
-CARTRIDGE_INDEX = 0xFCBFB4
-CART_TEXTURE_SETS = 3
-CART_GRAPHIC_SETS = 16
-CART_GRAPHIC_SET_TYPES = 17
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import romfs  # noqa: E402  (locating + ProPack: tools/assets/romfs.py, propack.py)
+
+CART_TEXTURE_SETS = 3        # cart/3  "texture sets index"
+CART_GRAPHIC_SETS = 16       # cart/16 "graphicset index"
+CART_GRAPHIC_SET_TYPES = 17  # cart/17 "graphicset type"
 
 FORMAT_NAMES = {
     0: 'CI8 (RGBA16 TLUT)',
@@ -40,7 +41,7 @@ FORMAT_NAMES = {
     5: 'I4 mip chain 64x64',
 }
 
-# --------------------------------------------------------------------------- locating (temporary)
+# --------------------------------------------------------------------------- locating (romfs)
 
 
 def _u32(b, o):
@@ -54,130 +55,8 @@ def iset_entries(buf, base):
     return [(base + offs[i], offs[i + 1] - offs[i]) for i in range(n)]
 
 
-def cartridge(rom):
-    return iset_entries(rom, CARTRIDGE_INDEX)
-
-
-def load_block(rom, start, size):
-    """Bytes of a ROM block, unpacked when it starts with an RNC1 header (what ProPack__Decompress does)."""
-    raw = rom[start:start + size]
-    if raw[:4] == b'RNC\x01':
-        return rnc_unpack(rom, start)
-    return raw
-
-
-try:  # prefer the shared decompressor once it exists
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    from propack import decompress as _shared_unpack  # noqa: E402  (part a1's tools/assets/propack.py)
-
-    def rnc_unpack(data, off=0):
-        return _shared_unpack(data, off)
-except Exception:  # pragma: no cover - fallback
-    _shared_unpack = None
-
-    def rnc_unpack(data, off=0):
-        return _rnc1_unpack(data, off)
-
-
-def _crc16(data):
-    crc = 0
-    for b in data:
-        crc = (crc >> 8) ^ _CRC[(crc ^ b) & 0xFF]
-    return crc
-
-
-def _mkcrc():
-    t = []
-    for i in range(256):
-        c = i
-        for _ in range(8):
-            c = (c >> 1) ^ 0xA001 if c & 1 else c >> 1
-        t.append(c)
-    return t
-
-
-_CRC = _mkcrc()
-
-
-def _rnc1_unpack(data, off=0):
-    """RNC ProPack method 1. Header: 'RNC\\x01', u32 unpacked, u32 packed, u16 crc(unpacked), u16 crc(packed),
-    u8 leeway, u8 chunks; bits LSB-first from little-endian 16-bit words, literal runs byte-aligned and spliced in."""
-    if data[off:off + 4] != b'RNC\x01':
-        raise ValueError('not RNC1')
-    ulen, plen, ucrc, _ = struct.unpack_from('>IIHH', data, off + 4)
-    chunks = data[off + 17]
-    d = bytes(data[off + 18:off + 18 + plen]) + b'\0' * 8
-
-    def lw(q):
-        return d[q] | d[q + 1] << 8 | d[q + 2] << 16 | d[q + 3] << 24
-
-    st = [lw(0), 16, 0]  # bit buffer, bits of the current+next word, address of the next word
-
-    def bits(n):
-        b, c, q = st
-        v = b & ((1 << n) - 1)
-        b >>= n
-        c -= n
-        if c < 16:
-            q += 2
-            b |= lw(q) << c
-            c += 16
-        st[0], st[1], st[2] = b, c, q
-        return v
-
-    def table():
-        n = bits(5)
-        lens = [bits(4) for _ in range(n)]
-        tab = {}
-        code = 0
-        for L in range(1, 17):
-            for i, ll in enumerate(lens):
-                if ll == L:
-                    v, r = code >> (16 - L), 0
-                    for _ in range(L):
-                        r = (r << 1) | (v & 1)
-                        v >>= 1
-                    tab[(L, r)] = i
-                    code += 1 << (16 - L)
-        return tab, (max(lens) if lens else 0)
-
-    def huf(t):
-        tab, maxl = t
-        b = st[0]
-        for L in range(1, maxl + 1):
-            v = tab.get((L, b & ((1 << L) - 1)))
-            if v is not None:
-                bits(L)
-                return (1 << (v - 1)) | bits(v - 1) if v >= 2 else v
-        raise ValueError('bad huffman code')
-
-    out = bytearray()
-    bits(2)
-    for _ in range(chunks):
-        raw, dist, ln = table(), table(), table()
-        sub = bits(16)
-        while sub:
-            sub -= 1
-            n = huf(raw)
-            if n:
-                q = st[2]
-                out += d[q:q + n]
-                q += n
-                c = st[1] - 16
-                st[0] = (st[0] & ((1 << c) - 1)) | (lw(q) << c)
-                st[1], st[2] = c + 16, q
-            if sub:
-                pos = huf(dist) + 1
-                n = huf(ln) + 2
-                if pos >= n:
-                    out += out[-pos:len(out) - pos + n]
-                else:
-                    for _ in range(n):
-                        out.append(out[-pos])
-    out = bytes(out[:ulen])
-    if _crc16(out) != ucrc:
-        raise ValueError('RNC CRC mismatch at 0x%X' % off)
-    return out
+def _fs(rom):
+    return rom if isinstance(rom, romfs.RomFS) else romfs.RomFS(rom)
 
 
 # --------------------------------------------------------------------------- pixel formats
@@ -370,15 +249,17 @@ def hstack(images, gap=1):
 
 
 def export_textures(rom, out, limit=None, png=True, split=False):
-    cart = cartridge(rom)
-    base, size = cart[CART_TEXTURE_SETS]
-    entries = iset_entries(rom, base)
+    fs = _fs(rom)
+    idx = fs.node('cart/%d' % CART_TEXTURE_SETS)
+    base, size = idx.rom, idx.size
+    entries = fs.children(idx)
     os.makedirs(os.path.join(out, 'textures'), exist_ok=True)
     meta = []
-    for i, (start, n) in enumerate(entries[:limit]):
-        blob = load_block(rom, start, n)
+    for i, node in enumerate(entries[:limit]):
+        start, n = node.rom, node.size
+        blob = fs.blob(node)
         bank = parse_texture_bank(blob)
-        rec = {'index': i, 'rom': '0x%07X' % start, 'rom_size': n, 'compressed': rom[start:start + 4] == b'RNC\x01',
+        rec = {'index': i, 'rom': '0x%07X' % start, 'rom_size': n, 'compressed': bool(node.compressed),
                'unpacked_size': len(blob), 'format': bank['format'], 'format_name': FORMAT_NAMES.get(bank['format']),
                'width': bank['width'], 'height': bank['height'], 'frames': len(bank['frames']),
                'palettes': len(bank['palettes']), 'speed': bank['speed'], 'lod': bank['lod'], 'kind': bank['kind'],
@@ -399,16 +280,18 @@ def export_textures(rom, out, limit=None, png=True, split=False):
 
 
 def export_graphics(rom, out, limit=None, png=True):
-    cart = cartridge(rom)
-    base, size = cart[CART_GRAPHIC_SETS]
-    tbase, _ = cart[CART_GRAPHIC_SET_TYPES]
-    stride, count = struct.unpack_from('>ii', rom, tbase)
-    ids = [_u32(rom, tbase + 8 + stride * k) if stride == 4 else struct.unpack_from('>H', rom, tbase + 8 + stride * k)[0]
+    fs = _fs(rom)
+    idx = fs.node('cart/%d' % CART_GRAPHIC_SETS)
+    base, size = idx.rom, idx.size
+    types = fs.read(fs.node('cart/%d' % CART_GRAPHIC_SET_TYPES))
+    stride, count = struct.unpack_from('>ii', types, 0)
+    ids = [_u32(types, 8 + stride * k) if stride == 4 else struct.unpack_from('>H', types, 8 + stride * k)[0]
            for k in range(count)]
-    entries = iset_entries(rom, base)
+    entries = fs.children(idx)
     meta = []
-    for i, (start, n) in enumerate(entries[:limit]):
-        blob = load_block(rom, start, n)
+    for i, node in enumerate(entries[:limit]):
+        start, n = node.rom, node.size
+        blob = fs.blob(node)
         gs = parse_graphic_set(blob)
         gid = ids[i] if i < len(ids) else gs['header_id']
         rec = {'index': i, 'id': gid, 'header_id': gs['header_id'], 'rom': '0x%07X' % start, 'rom_size': n,
@@ -429,7 +312,7 @@ def export_graphics(rom, out, limit=None, png=True):
     return meta
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('rom')
     ap.add_argument('--out', required=True)
@@ -437,8 +320,8 @@ def main():
     ap.add_argument('--limit', type=int)
     ap.add_argument('--no-png', action='store_true')
     ap.add_argument('--split', action='store_true', help='also one PNG per animation step')
-    a = ap.parse_args()
-    rom = open(a.rom, 'rb').read()
+    a = ap.parse_args(argv)
+    rom = romfs.RomFS(a.rom)
     if a.only != 'graphics':
         t = export_textures(rom, a.out, a.limit, not a.no_png, a.split)
         print('textures: %d banks, %d frames' % (len(t), sum(r['frames'] for r in t)))

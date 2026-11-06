@@ -15,10 +15,9 @@ Writes (never commit the output):
 
 Formats and how they were established: docs/assets/AUDIO.md.
 
-LOCATOR NOTE: the shared ROM-filesystem module (tools/assets/romfs.py, part a1) was not available
-when this was written, so the few ROM addresses this module needs are constants below, taken from
-CAudioWorld__Initialize / CAudioWorld__LoadSfxDataFile / __amDMA. Parsing never uses them directly:
-every parser takes (rom bytes, offset) so a romfs-based locator can be swapped in.
+Locating: the three audio regions come from tools/assets/romfs.py (AUDIO_CTL, AUDIO_TBL,
+SOUND_DATA: CAudioWorld__Initialize / CAudioWorld__LoadSfxDataFile / __amDMA); every parser
+takes (rom bytes, offset).
 """
 import argparse
 import json
@@ -28,32 +27,23 @@ import struct
 import sys
 
 # --------------------------------------------------------------------------------------------
-# Locator (temporary, see LOCATOR NOTE)
+# Locator (tools/assets/romfs.py)
 # --------------------------------------------------------------------------------------------
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import romfs  # noqa: E402
+
 # CAudioWorld__Initialize: VM_Alloc(0x2F194, 0, 0x1E0000) maps the "ctl region" (two bank files);
 # its pointers are pre-relocated to the VM address the pager gives it, 0x00480000.
-CTL_ROM = 0x1E0000
-CTL_SIZE = 0x2F194
-CTL_VADDR = 0x480000
+CTL_ROM, CTL_SIZE, CTL_VADDR = romfs.AUDIO_CTL, romfs.AUDIO_CTL_SIZE, romfs.AUDIO_CTL_VRAM
 # CAudioWorld__Initialize: gAudioRomBase = 0x20F194; __amDMA reads ROM offset + gAudioRomBase.
-TBL_ROM = 0x20F194
+TBL_ROM = romfs.AUDIO_TBL
 # CAudioWorld__LoadSfxDataFile: VM_Alloc(0x3EA7A0, 0, 0xBE1814) -> the sound tree file.
-TREE_ROM = 0xBE1814
-TREE_SIZE = 0x3EA7A0
+TREE_ROM, TREE_SIZE = romfs.SOUND_DATA, romfs.SOUND_DATA_SIZE
 # The adec decoder's tables live in the code's .rodata (us/asm/data/ABCA8.rodata.s).
 CODE_VRAM_DELTA = 0x7FFFF400          # vram - rom for that segment
 ADEC_SEGMENTS_VRAM = 0x800B8C54       # gAdecHuffSegments
 ADEC_BANDENDS_VRAM = 0x800B8A88       # gAdecBandEnds (u16[16])
 ADEC_STEPS_VRAM = 0x800B8AA8          # gAdecStepSizes (f32[64])
-
-# Same values as tools/assets/romfs.py (part a1); take them from there when it is present.
-try:
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    import romfs as _romfs
-    CTL_ROM, CTL_SIZE, CTL_VADDR = _romfs.AUDIO_CTL, _romfs.AUDIO_CTL_SIZE, _romfs.AUDIO_CTL_VRAM
-    TBL_ROM, TREE_ROM, TREE_SIZE = _romfs.AUDIO_TBL, _romfs.SOUND_DATA, _romfs.SOUND_DATA_SIZE
-except (ImportError, AttributeError):
-    pass
 
 OUTPUT_RATE = 22050                   # ai.rate = 0x5622 in CAudioWorld__Initialize
 
@@ -599,14 +589,14 @@ def _clamp(x):
 # --------------------------------------------------------------------------------------------
 # CLI
 # --------------------------------------------------------------------------------------------
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("rom")
     ap.add_argument("--out", required=True)
     ap.add_argument("--no-wav", action="store_true", help="skip bank sample WAVs")
     ap.add_argument("--no-streams", action="store_true", help="skip adec stream decoding (slow)")
     ap.add_argument("--only", type=int, default=None, help="decode only this song index (debug)")
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     r = open(a.rom, "rb").read()
     os.makedirs(a.out, exist_ok=True)
     stats = {"music_waves": [], "sfx_waves": [], "streams": [], "sequences": []}

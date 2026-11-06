@@ -22,6 +22,9 @@ import os
 import struct
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from romfs import ASSET_END, ASSET_START, AUDIO_CTL, AUDIO_TBL, CARTRIDGE, SOUND_DATA  # noqa: E402
+
 # The only release the decomp builds (Makefile EXPECTED_SHA1, versions/turok2.us.yaml).
 SUPPORTED_SHA1 = "fb0400f21e3f043939ab56500c7b12a3231006f1"
 KNOWN = {
@@ -29,19 +32,19 @@ KNOWN = {
 }
 
 ROM_SIZE = 0x2000000
-ASSET_REGION = (0x20F178, 0x1FF7AEC)  # docs/SEGMENTS.md
+ASSET_REGION = (ASSET_START, ASSET_END)  # docs/assets/ROMFS.md
 
 # Where the engine starts reading assets.  Every other asset address is computed
 # from these through the sets: CISet__GetROMAddress(table, base, i) = base + table[1 + i].
 ROOTS = [
     # (name, rom start, rom end, how the C reaches it)
-    ("audio_window", 0x1E0000, 0x20F194,
+    ("audio_window", AUDIO_CTL, AUDIO_TBL,
      "CAudioWorld__Initialize: VM_Alloc(0x2F194, 0, 0x1E0000) (bank file, sequence data)"),
-    ("audio_data", 0x20F194, 0xBE1814,
+    ("audio_data", AUDIO_TBL, SOUND_DATA,
      "gAudioRomBase = 0x20F194; read by the audio DMA callback (func_002700D0) via CLoader__LoadAsync"),
-    ("sound_data", 0xBE1814, 0xFCBFB4,
+    ("sound_data", SOUND_DATA, CARTRIDGE,
      "CAudioWorld__LoadSfxDataFile: VM_Alloc(0x3EA7A0, 0, 0xBE1814)"),
-    ("cartridge", 0xFCBFB4, 0x1FF7AEC,
+    ("cartridge", CARTRIDGE, ASSET_END,
      "m_CartridgeIndex = 0xFCBFB4 (func_00286674) -> CScene__Construct, 'cartridge index'"),
 ]
 
@@ -86,7 +89,7 @@ def u32(b, o):
     return struct.unpack_from(">I", b, o)[0]
 
 
-def cartridge_table(rom, base=0xFCBFB4):
+def cartridge_table(rom, base=CARTRIDGE):
     """The cartridge index: a CISet (u32 count, count + 1 offsets from base)."""
     n = u32(rom, base)
     offs = [u32(rom, base + 4 + 4 * i) for i in range(n + 1)]

@@ -10,8 +10,9 @@ Everything here is read off the C (docs/assets/MODELS.md has the format and the 
                  RNC-packed geometry: CLevelActor__LoadGeometry, Render_QueueModelByKey).
   * geometry   : Model_DecompressCallback* -> Model_Decompress (src/us/code/func_00209AF4.c).
   * materials  : Material_Unpack (func_0026D070.c), Render_SetupMaterial (func_00207FEC.c).
-The locator part (Rom, objects()) is separate from the parser (parse_geometry()) so it can be
-switched to tools/assets/romfs.py (part a1) once that lands.
+The locator part (Rom, on top of tools/assets/romfs.py; RNC through propack.py) is separate from
+the parser (parse_geometry()). Texture previews use tools/assets/textures.py's decoder and the
+bind pose of animated models uses tools/assets/anim.py (--pose).
 """
 import argparse
 import json
@@ -22,16 +23,9 @@ import sys
 import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-try:                                   # part a1's shared decompressor (tools/assets/propack.py)
-    from propack import decompress as rnc_unpack  # type: ignore
-except ImportError:                    # stand-in until it is merged
-    from rnc_min import unpack as rnc_unpack
-try:                                   # part a1's ROM filesystem (tools/assets/romfs.py)
-    import romfs  # type: ignore
-except ImportError:
-    romfs = None
+import romfs  # noqa: E402  (tools/assets/romfs.py: cartridge index, ProPack)
 
-CARTRIDGE_INDEX = 0xFCBFB4             # CEngineApp__Main: e->m_CartridgeIndex = 0xFCBFB4
+CARTRIDGE_INDEX = romfs.CARTRIDGE      # CEngineApp__Main: e->m_CartridgeIndex = 0xFCBFB4
 CART_OBJECTS = 0                       # CScene__Construct: "objects index"
 CART_TEXTURE_SETS = 3                  # "texture sets index" (material texture ids index it)
 
@@ -62,38 +56,40 @@ def iset_block_size(b, o, i):
 
 # ---------------------------------------------------------------- locator
 class Rom:
+    """Object locator on top of romfs: object i = cart/0/<i> (4 blocks: info, geometry,
+    animations index, static events)."""
+
     def __init__(self, path):
-        self.d = open(path, "rb").read()
-        self.fs = romfs.RomFS(self.d) if romfs is not None else None
-        c = CARTRIDGE_INDEX
-        self.cart = c
-        self.objects_key = iset_block(self.d, c, CART_OBJECTS)
-        self.texsets_key = iset_block(self.d, c, CART_TEXTURE_SETS)
-        self.nobjects = iset_count(self.d, self.objects_key)
+        self.fs = path if isinstance(path, romfs.RomFS) else romfs.RomFS(path)
+        self.d = self.fs.rom
+        self.cart = CARTRIDGE_INDEX
+        objs = self.fs.node("cart/%d" % CART_OBJECTS)
+        self.objects_key = objs.rom
+        self.texsets_key = self.fs.node("cart/%d" % CART_TEXTURE_SETS).rom
+        self.nobjects = objs.count
         # cartridge block 2, "object types": {s32 2, s32 count, u16 id[count]}; object i has type id[i]
         # (CScene__FindObjectType maps a type id back to the object index).
-        t = iset_block(self.d, c, 2)
-        n = be32(self.d, t + 4)
-        self.type_ids = list(struct.unpack_from(">%dH" % n, self.d, t + 8))
+        t = self.fs.read(self.fs.node("cart/2"))
+        n = be32(t, 4)
+        self.type_ids = list(struct.unpack_from(">%dH" % n, t, 8))
 
     def object_key(self, i):
         """CScene__GetObject / CISet__GetROMAddress(objects, key, i): the ROM address of object i."""
-        return iset_block(self.d, self.objects_key, i)
+        return self.fs.object(i).rom
+
+    def object_nodes(self, i):
+        return self.fs.children(self.fs.object(i))
 
     def object_blocks(self, i):
         """The object's set ("object index", 0x18 bytes: count 4 + 5 offsets): [(rom, size)] * 4."""
-        k = self.object_key(i)
-        n = iset_count(self.d, k)
-        return [iset_block_size(self.d, k, j) for j in range(n)]
+        return [(n.rom, n.size) for n in self.object_nodes(i)]
 
     def geometry_bytes(self, i):
-        if self.fs is not None:        # locate through romfs: cart/0/<i>/1 is the geometry
-            node = self.fs.children(self.fs.object(i))[1]
-            return self.fs.blob(node), node.rom, node.size, bool(node.compressed)
-        rom, size = self.object_blocks(i)[1]
-        if self.d[rom:rom + 3] == b"RNC":
-            return rnc_unpack(self.d, rom), rom, size, True
-        return self.d[rom:rom + size], rom, size, False
+        node = self.object_nodes(i)[1]   # cart/0/<i>/1 is the geometry
+        return self.fs.blob(node), node.rom, node.size, bool(node.compressed)
+
+    def texture_blob(self, tex_id):
+        return self.fs.blob(self.fs.texture_set(tex_id))
 
 
 # ---------------------------------------------------------------- parser
@@ -262,46 +258,30 @@ def apply_pose(verts, bone_matrices):
     return out
 
 
-# ---------------------------------------------------------------- texture preview (stand-in for part a2)
-def preview_texture(rom, tex_id, frame=0, palette=0):
-    """Just enough of the texture format (Texture_Load, func_00206B30.c) to check UVs: the material's
-    texture id indexes the cartridge's "texture sets index" (CScene__GetTextureSet); the resource is a
-    set {0: info (u8 format, ?, log2 width, log2 height, ...), 1: frames, 2: palettes (RGBA16)}.
-    Formats 0 = CI8, 1/3 = CI4 (3: IA16 palette), 2 = RGBA32, 4 = RGBA16; 5 (I16?) unsupported.
-    Returns (w, h, [rgba tuples]) or None. Part a2 owns the real decoder (docs/assets/TEXTURES.md)."""
-    d = rom.d
-    a, sz = iset_block_size(d, rom.texsets_key, tex_id)
-    g = rnc_unpack(d, a) if d[a:a + 3] == b"RNC" else d[a:a + sz]
-    info = g[iset_block(g, 0, 0):]
-    fmt, w, h = info[0], 1 << info[2], 1 << info[3]
-    fr = iset_block(g, iset_block(g, 0, 1), frame % max(1, be32(g, iset_block(g, 0, 1))))
-    pals = iset_block(g, 0, 2)
-    pal = []
-    if be32(g, pals):
-        po = iset_block(g, pals, palette % be32(g, pals))
-        for k in range(256 if fmt == 0 else 16):
-            c = struct.unpack_from(">H", g, po + 2 * k)[0] if po + 2 * k + 2 <= len(g) else 0
-            if fmt == 3:
-                pal.append((c >> 8, c >> 8, c >> 8, c & 255))
-            else:
-                pal.append(((c >> 11 & 31) * 255 // 31, (c >> 6 & 31) * 255 // 31, (c >> 1 & 31) * 255 // 31,
-                            255 * (c & 1)))
-    px = []
-    if fmt == 0:
-        px = [pal[g[fr + i]] for i in range(w * h)]
-    elif fmt in (1, 3):
-        for i in range(w * h // 2):
-            b = g[fr + i]
-            px += [pal[b >> 4], pal[b & 15]]
-    elif fmt == 2:
-        px = [tuple(g[fr + 4 * i:fr + 4 * i + 4]) for i in range(w * h)]
-    elif fmt == 4:
-        for i in range(w * h):
-            c = struct.unpack_from(">H", g, fr + 2 * i)[0]
-            px.append(((c >> 11 & 31) * 255 // 31, (c >> 6 & 31) * 255 // 31, (c >> 1 & 31) * 255 // 31, 255))
-    else:
+def pose_matrices(rom, i, anim_index=0, frame=0):
+    """Bone matrices of object i at `frame` of its animation `anim_index` (anim.py: parse_skeleton,
+    parse_animation, pose), for apply_pose(). None when the object has no animation."""
+    import anim
+    nodes = rom.object_nodes(i)
+    aset = rom.fs.children(nodes[2]) if len(nodes) > 2 else []
+    if not aset:
         return None
-    return w, h, px
+    bones = anim.parse_skeleton(rom.fs.blob(nodes[1]))
+    a = anim.parse_animation(rom.fs.blob(aset[min(anim_index, len(aset) - 1)]))
+    return anim.pose(a, bones, frame)
+
+
+# ---------------------------------------------------------------- texture preview (tools/assets/textures.py)
+def preview_texture(rom, tex_id, frame=0, palette=0):
+    """(w, h, [rgba tuples]) of texture set entry tex_id (the material's texture id indexes the
+    cartridge's "texture sets index", CScene__GetTextureSet), decoded by textures.py; None when
+    the format is not decodable."""
+    import textures
+    try:
+        bank = textures.parse_texture_bank(rom.texture_blob(tex_id))
+        return textures.decode_texture_frame(bank, frame % max(1, len(bank["frames"])), palette)
+    except ValueError:
+        return None
 
 
 _TEX_SIZE = {}
@@ -310,9 +290,7 @@ _TEX_SIZE = {}
 def texture_size(rom, tex_id):
     """(width, height, format) of texture set entry tex_id, from its info block."""
     if tex_id not in _TEX_SIZE:
-        d = rom.d
-        a, sz = iset_block_size(d, rom.texsets_key, tex_id)
-        g = rnc_unpack(d, a) if d[a:a + 3] == b"RNC" else d[a:a + sz]
+        g = rom.texture_blob(tex_id)
         i = iset_block(g, 0, 0)
         _TEX_SIZE[tex_id] = (1 << g[i + 2], 1 << g[i + 3], g[i])
     return _TEX_SIZE[tex_id]
@@ -548,7 +526,7 @@ def parse_ids(s, n):
     return ids
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("rom")
     ap.add_argument("--out", required=True)
@@ -561,7 +539,9 @@ def main():
     ap.add_argument("--textured", action="store_true", help="render with a preview decode of the textures")
     ap.add_argument("--json", action="store_true", help="write index.json with every model's summary")
     ap.add_argument("--lod", type=int, default=0)
-    a = ap.parse_args()
+    ap.add_argument("--pose", action="store_true",
+                    help="animated models: export/render posed at frame 0 of animation 0 (default: bone-local)")
+    a = ap.parse_args(argv)
     rom = Rom(a.rom)
     os.makedirs(a.out, exist_ok=True)
     ids = parse_ids(a.ids, rom.nobjects)[:a.limit]
@@ -578,12 +558,22 @@ def main():
         if a.obj or a.gltf or a.render:
             lod = min(a.lod, len(model["lods"]) - 1)
             verts, parts = build_mesh(model, lod)
+            skinned = "skeleton" in model
+            if skinned and a.pose:
+                try:
+                    mats = pose_matrices(rom, i)
+                except Exception as e:  # noqa: BLE001
+                    mats = None
+                    index[-1]["pose_error"] = str(e)
+                if mats is not None:
+                    verts, skinned = apply_pose(verts, mats), False
+                    index[-1]["posed"] = True
             attach_texture_sizes(rom, parts)
             name = "obj%04d" % i
             if a.obj:
                 write_obj(os.path.join(a.out, name + ".obj"), name, verts, parts)
             if a.gltf:
-                write_gltf(os.path.join(a.out, name + ".gltf"), name, verts, parts, "skeleton" in model)
+                write_gltf(os.path.join(a.out, name + ".gltf"), name, verts, parts, skinned)
             if a.render:
                 texs = {}
                 if a.textured:

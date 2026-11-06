@@ -16,7 +16,8 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from levels import CARTRIDGE_INDEX, blocks, cstr, f, rom_set, table, unpack  # noqa: E402
+import romfs  # noqa: E402
+from levels import blocks, cstr, f, table  # noqa: E402
 
 
 def parse_table(b):
@@ -70,20 +71,19 @@ def main(argv=None):
     ap.add_argument("rom")
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
-    rom = open(a.rom, "rb").read()
-    cart = rom_set(rom, CARTRIDGE_INDEX)
-    cs = rom_set(rom, cart[18][0])
-    t0, s0 = cs[0]
-    entries = parse_table(rom[t0:t0 + s0])
+    fs = romfs.RomFS(a.rom)
+    rom = fs.rom
+    cs = fs.children(fs.node("cart/18"))   # entry 0 = cinema table, entry k + 1 = cinema k
+    entries = parse_table(fs.read(cs[0]))
     d = os.path.join(a.out, "cinemas")
     os.makedirs(d, exist_ok=True)
     for e in entries:
         k = e["index"] + 1
         if k >= len(cs):
             continue
-        ro, sz = cs[k]
+        ro, sz = cs[k].rom, cs[k].size
         e["rom"], e["size"], e["compressed"] = hex(ro), sz, rom[ro:ro + 3] == b"RNC"
-        tr = parse_track(unpack(rom[ro:ro + sz]))
+        tr = parse_track(fs.blob(cs[k]))
         e["clips"], e["cues"] = len(tr["clips"]), len(tr["cues"])
         e["length_frames"] = f(sum(cl["eye_knots"][-1] for cl in tr["clips"] if cl["eye_knots"]))
         fn = "%03d_%s.json" % (e["index"], re.sub(r"[^A-Za-z0-9]+", "_", e["name"]).strip("_"))
