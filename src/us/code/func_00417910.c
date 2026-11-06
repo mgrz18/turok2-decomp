@@ -2,7 +2,6 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern char D_800C0EB0[]; /* "unknown weapon" */
 extern char D_800B6288[];
 extern char D_800B62A0[];
 extern char D_800B62B8[];
@@ -24,7 +23,7 @@ extern char D_800B63F0[];
 s32 WeaponsMenu_ToggleLabel(MenuItem *a) {
     switch (a->index - 2) {
     default:
-        a->text = D_800C0EB0;
+        a->text = "unknown weapon";
         break;
     case 0:
         if (gEngineApp_m_Settings.weaponEnabled[1]) {
