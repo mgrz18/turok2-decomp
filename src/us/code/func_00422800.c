@@ -3,6 +3,6 @@
 
 extern s32 D_801309C0;
 
-void func_00422800(void) {
+void PakMessage_InitNoteCorrupt(void) {
     D_801309C0 = 0xB;
 }

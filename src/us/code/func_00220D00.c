@@ -27,21 +27,21 @@ typedef struct { u8 pad0[0x48]; } SrcD;                                /* 0x48 *
 typedef struct { u8 pad0[0x90]; } ItemA;                               /* 0x90 */
 typedef struct { u8 pad0[0xC0]; } ItemD;                               /* 0xC0 */
 
-s32 func_00200B00(s32 ***, s32);
-void *func_002017D4(void *, s32);
-void func_00201818(void *, s32);
-s32 func_00201848(s32 *, s32, u16);
-void **func_00205D7C(s32, s32 ***, s32);
-void func_002057B0(s32, s32 ***, void **);
-void func_0020192C(StrideTable *, void *, s32);
-void func_002141F0(ItemA *, SrcA *, s32, void *, f32);
-void func_00214564(ItemA *, SrcB *, s32, void *);
-void func_002150C0(CLevelActor *, SrcC *, s32, void *);
-void func_00211F64(ItemD *, SrcD *);
-f32 func_002671B4(CLevelActor *);
-void func_00222A9C(void **, s32, f32 *, void *);
+s32 ProPackDecompress(s32 ***, s32);
+void *CISet__GetBlock(void *, s32);
+void CISet__GetBlockSize(void *, s32);
+s32 CISet__GetROMAddress(s32 *, s32, u16);
+void **CCache__AllocateMemoryForDecompression(s32, s32 ***, s32);
+void CCache__DeallocAndReplaceCompressedData(s32, s32 ***, void **);
+void CUSet__Transpose(StrideTable *, void *, s32);
+void CStaticObject__ConstructCompact(ItemA *, SrcA *, s32, void *, f32);
+void CStaticObject__Construct(ItemA *, SrcB *, s32, void *);
+void CLevelActor__Construct(CLevelActor *, SrcC *, s32, void *);
+void LightVolume_Construct(ItemD *, SrcD *);
+f32 GameObject_GetCollisionHeight(CLevelActor *);
+void CScene__ComputeLights(void **, s32, f32 *, void *);
 
-void func_00220D00(CWorld *world, s32 ***file) {
+void CScene__DecompressGridSection(CWorld *world, s32 ***file) {
     StrideTable *tE;
     void *links[128];
     void **pp;
@@ -94,24 +94,24 @@ void func_00220D00(CWorld *world, s32 ***file) {
     void *aux;
     void **handle;
 
-    if (func_00200B00(file, 1) != 0) {
+    if (ProPackDecompress(file, 1) != 0) {
         root = **file;
-        tA = func_002017D4(root, 0);
+        tA = CISet__GetBlock(root, 0);
         nA = tA->count;
-        tB = func_002017D4(root, 1);
+        tB = CISet__GetBlock(root, 1);
         nB = tB->count;
         n = nA + nB;
         szA = (n * 0x90) | 8;
-        tC = func_002017D4(root, 2);
+        tC = CISet__GetBlock(root, 2);
         nC = tC->count;
         szx = nC * 0x198;
         szC = szx + 8;
-        tD = func_002017D4(root, 3);
+        tD = CISet__GetBlock(root, 3);
         nD = tD->count;
         szD = (nD * 0xC0) | 8;
         tot = szC + 0x18;
         tt = szA + tot;
-        handle = func_00205D7C(0, file, tt + szD);
+        handle = CCache__AllocateMemoryForDecompression(0, file, tt + szD);
         if (handle != NULL) {
             block = *handle;
             off = 0x18;
@@ -119,12 +119,12 @@ void func_00220D00(CWorld *world, s32 ***file) {
             sec = (u8 *)block + off;
             block->count = 0;
             block->offsets[0] = off;
-            func_0020192C(tA, sec, 1);
-            func_0020192C(tB, sec, 1);
+            CUSet__Transpose(tA, sec, 1);
+            CUSet__Transpose(tB, sec, 1);
             nv = tA->entries;
             ((StrideTable *)sec)->stride = 0x90;
             ((StrideTable *)sec)->count = n;
-            tAux = func_002017D4(world->m_pRegionData, 2);
+            tAux = CISet__GetBlock(world->m_pRegionData, 2);
             pB = (SrcB *)tB->entries;
             itemsA = (ItemA *)((u8 *)block + 0x20);
             base = (u8 *)block;
@@ -133,7 +133,7 @@ void func_00220D00(CWorld *world, s32 ***file) {
             i = 0;
             if (nA > 0) {
                 do {
-                    func_002141F0(&itemsA[i], &pA[i], func_00201848(world->m_pObjects, world->m_ObjectsKey, pA[i].type), aux, world->m_pLevelHeader->m_Scale);
+                    CStaticObject__ConstructCompact(&itemsA[i], &pA[i], CISet__GetROMAddress(world->m_pObjects, world->m_ObjectsKey, pA[i].type), aux, world->m_pLevelHeader->m_Scale);
                     i++;
                 } while (i < nA);
             }
@@ -141,7 +141,7 @@ void func_00220D00(CWorld *world, s32 ***file) {
                 qb = pB;
                 j = 0;
                 do {
-                    func_00214564(&itemsA[j + nA], qb, func_00201848(world->m_pObjects, world->m_ObjectsKey, qb->type), aux);
+                    CStaticObject__Construct(&itemsA[j + nA], qb, CISet__GetROMAddress(world->m_pObjects, world->m_ObjectsKey, qb->type), aux);
                     qb++;
                     j++;
                 } while (j < nB);
@@ -151,7 +151,7 @@ void func_00220D00(CWorld *world, s32 ***file) {
             sn++;
             secC = base + off;
             block->offsets[block->count] = off;
-            func_0020192C(tC, secC, 1);
+            CUSet__Transpose(tC, secC, 1);
             ((StrideTable *)secC)->stride = 0x198;
             ((StrideTable *)secC)->count = nC;
             actors = (CLevelActor *)(secC + 8);
@@ -159,15 +159,15 @@ void func_00220D00(CWorld *world, s32 ***file) {
             k = 0;
             if (nC > 0) {
                 do {
-                    func_002150C0(&actors[k], &pC[k], func_00201848(world->m_pObjects, world->m_ObjectsKey, pC[k].type), aux);
+                    CLevelActor__Construct(&actors[k], &pC[k], CISet__GetROMAddress(world->m_pObjects, world->m_ObjectsKey, pC[k].type), aux);
                     index = actors[k].m_nKilledIndex;
                     level = world->m_nLevel;
-                    bits = func_002017D4(func_002017D4(func_002017D4(world->m_pBitSections, 0), level), 1);
+                    bits = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(world->m_pBitSections, 0), level), 1);
                     do {
                     } while (0);
-                    func_002017D4(bits, 0);
-                    func_00201818(bits, 1);
-                    killed = func_002017D4(bits, 1);
+                    CISet__GetBlock(bits, 0);
+                    CISet__GetBlockSize(bits, 1);
+                    killed = CISet__GetBlock(bits, 1);
                     mask = 1 << (index & 7);
                     if (killed[index / 8] & mask) {
                         actors[k].m_wFlags |= 1;
@@ -180,7 +180,7 @@ void func_00220D00(CWorld *world, s32 ***file) {
             sn++;
             secD = base + off;
             block->offsets[block->count] = off;
-            func_0020192C(tD, secD, 1);
+            CUSet__Transpose(tD, secD, 1);
             ((StrideTable *)secD)->stride = 0xC0;
             m = 0;
             ((StrideTable *)secD)->count = nD;
@@ -190,7 +190,7 @@ void func_00220D00(CWorld *world, s32 ***file) {
                 qpd = pD;
                 qid = itemsD;
                 do {
-                    func_00211F64(qid, qpd);
+                    LightVolume_Construct(qid, qpd);
                     qpd++;
                     qid++;
                     m++;
@@ -220,13 +220,13 @@ void func_00220D00(CWorld *world, s32 ***file) {
             if (nC > 0) {
                 do {
                     pos[0] = actors[k].header.m_vPos.x;
-                    pos[1] = actors[k].header.m_vPos.y + func_002671B4(&actors[k]) * 0.5f;
+                    pos[1] = actors[k].header.m_vPos.y + GameObject_GetCollisionHeight(&actors[k]) * 0.5f;
                     pos[2] = actors[k].header.m_vPos.z;
-                    func_00222A9C(links, nD, pos, actors[k].m_Lights);
+                    CScene__ComputeLights(links, nD, pos, actors[k].m_Lights);
                     k++;
                 } while (k < nC);
             }
         }
-        func_002057B0(0, file, handle);
+        CCache__DeallocAndReplaceCompressedData(0, file, handle);
     }
 }

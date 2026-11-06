@@ -62,16 +62,16 @@ typedef struct TrailMgr {
 extern s32 D_800ACFB0[];
 extern u8 D_800F7078[];
 
-void func_0020F79C(void *m);
+void CMtxF__Identity(void *m);
 void func_0026D230(void *p);
-Trail *func_0026D3BC(void *list);
+Trail *NodePool_Alloc(void *list);
 void func_002316A0(void *a, void *b);
-TrailInfo *func_00223F50(void *tbl, s32 arg);
+TrailInfo *CScene__GetSwoosh(void *tbl, s32 arg);
 void func_00207914(void *p, s32 v);
-TrailNode *func_002333C0(void *o, Trail *s, void *m);
+TrailNode *Swoosh_NewNode(void *o, Trail *s, void *m);
 
 /* Adds a node to the actor's trail, starting the trail first when the actor has none. */
-void func_002350EC(TrailMgr *mgr, TrailActor *a, s32 type) {
+void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
     u8 m[0x40];
     Trail *s;
     register Trail *q asm("$5");
@@ -104,11 +104,11 @@ void func_002350EC(TrailMgr *mgr, TrailActor *a, s32 type) {
         s = NULL;
     }
     if (s == NULL) {
-        s = func_0026D3BC(mgr->freeList);
+        s = NodePool_Alloc(mgr->freeList);
         if (s == NULL) {
             return;
         }
-        t = func_00223F50(D_800F7078, type);
+        t = CScene__GetSwoosh(D_800F7078, type);
         tex0 = D_800ACFB0[t->tex0];
         tex1 = D_800ACFB0[t->tex1];
         func_0026D230(s->nodes);
@@ -148,8 +148,8 @@ void func_002350EC(TrailMgr *mgr, TrailActor *a, s32 type) {
     }
     a->trailCount++;
     if (a->def->flags & 0x10000) {
-        func_0020F79C(m);
-        node = func_002333C0(mgr, s, m);
+        CMtxF__Identity(m);
+        node = Swoosh_NewNode(mgr, s, m);
         if (node != NULL) {
             node->owner = a;
         }

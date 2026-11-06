@@ -4,14 +4,14 @@
 #include "structs/vector.h"
 
 /* Draw an actor's shadow. Without flag 0x10000000 it gets the blob shadow
- * (func_0021E03C). Otherwise its projected shadow model is built once, while
+ * (Shadow_DrawBlob). Otherwise its projected shadow model is built once, while
  * above the ground: the current view's light direction (signed bytes) and
- * strength (colour) are sampled at the actor (func_00228910), the alpha is
+ * strength (colour) are sampled at the actor (DLights_GetAtPoint), the alpha is
  * 128 + 56 per unit of light (faded by D_800AB8C0 during a fade), the
  * direction is kept at least 0.15 from horizontal and the model is projected
  * along it onto a plane just under the actor (0.9 of its height, up to 512),
  * grown by 0.003 per unit of height, turned like the actor and set on the
- * ground; then it is submitted (func_0021ED04). */
+ * ground; then it is submitted (CGameObjectInstance__SubmitShadowModel). */
 
 typedef struct {
     u8 pad0[0x8];
@@ -33,20 +33,20 @@ extern u8 D_800F7148[];
 extern u8 D_8010FF34[];
 
 s32 func_00268160(void);
-f32 func_0026872C(CGameObjectInstance *, s32);
-void *func_00206950(void *, s32);
+f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *, s32);
+void *MtxPool_Alloc(void *, s32);
 f32 func_00298470(f32);     /* sqrtf */
-void func_00228910(void *, f32, f32, f32, CVector3 *, f32 *);
-void func_0020F040(CVector3 *);
-void func_00210004(void *, CVector3 *, f32);
-void func_00210318(void *, f32, f32, f32);
-void func_00210478(void *, f32, f32, f32);
-void func_00211114(void *, void *);
-void func_0020C618(void *, void *, void *);
-void func_0021ED04(CGameObjectInstance *, ShadowParams *, void *, u8);
-void func_0021E03C(CGameObjectInstance *, s32, s32);
+void DLights_GetAtPoint(void *, f32, f32, f32, CVector3 *, f32 *);
+void CVector3__Normalize(CVector3 *);
+void CMtxF__SetShadowProjection(void *, CVector3 *, f32);
+void CMtxF__Translate(void *, f32, f32, f32);
+void CMtxF__ScaleColumns(void *, f32, f32, f32);
+void CQuaternion__ToMatrix(void *, void *);
+void CMtxF__MultiplyAffine(void *, void *, void *);
+void CGameObjectInstance__SubmitShadowModel(CGameObjectInstance *, ShadowParams *, void *, u8);
+void Shadow_DrawBlob(CGameObjectInstance *, s32, s32);
 
-void func_0021DC84(CGameObjectInstance *a, s32 unused, ShadowParams *s) {
+void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, s32 unused, ShadowParams *s) {
     CVector3 dir;
     f32 r;
     u8 m[0x40];
@@ -63,7 +63,7 @@ void func_0021DC84(CGameObjectInstance *a, s32 unused, ShadowParams *s) {
     if (a->header.m_pCurrentRegion != 0 && func_00268160() != 0 && !(a->m_dwFlags & 0x200000)) {
         if (a->m_dwFlags & 0x10000000) {
             if (a->m_pmfShadow == NULL) {
-                h = func_0026872C(a, 0);
+                h = GameObject_GetRegionFloorHeight(a, 0);
                 py = a->header.m_vPos.y;
                 if (py < h) {
                     goto end;
@@ -73,7 +73,7 @@ void func_0021DC84(CGameObjectInstance *a, s32 unused, ShadowParams *s) {
                 if (512.0f < t) {
                     dy = 512.0f;
                 }
-                a->m_pmfShadow = func_00206950(D_800F7148, 1);
+                a->m_pmfShadow = MtxPool_Alloc(D_800F7148, 1);
                 if (a->m_pmfShadow == NULL) {
                     goto end;
                 }
@@ -85,7 +85,7 @@ void func_0021DC84(CGameObjectInstance *a, s32 unused, ShadowParams *s) {
                 u2 = (f32) light->colour[1] * (f32) light->colour[1];
                 t = t + u2;
                 r = func_00298470(t + u2) * -0.00090497744f;
-                func_00228910(D_8010FF34, a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, &dir, &r);
+                DLights_GetAtPoint(D_8010FF34, a->header.m_vPos.x, a->header.m_vPos.y, a->header.m_vPos.z, &dir, &r);
                 if (r < -1.0f) {
                     r = -1.0f;
                 }
@@ -95,7 +95,7 @@ void func_0021DC84(CGameObjectInstance *a, s32 unused, ShadowParams *s) {
                 }
                 a->m_ShadowAlpha = v;
                 dir.y = 1.0f;
-                func_0020F040(&dir);
+                CVector3__Normalize(&dir);
                 if (dir.y < 0.0f) {
                     if (-dir.y < 0.15f) {
                         goto clampy;
@@ -107,23 +107,23 @@ clampy:
                     } else {
                         dir.y = -0.15f;
                     }
-                    func_0020F040(&dir);
+                    CVector3__Normalize(&dir);
                 }
                 ty = h + dy * 0.9f;
-                func_00210004(m, &dir, ty);
-                func_00210318(m, -a->header.m_vPos.x, -ty, -a->header.m_vPos.z);
+                CMtxF__SetShadowProjection(m, &dir, ty);
+                CMtxF__Translate(m, -a->header.m_vPos.x, -ty, -a->header.m_vPos.z);
                 t = dy * 0.003f + 1.0f;
-                func_00210478(m, t, t, t);
-                func_00211114(&a->m_qGround, q);
-                func_0020C618(a->m_pmfShadow, m, q);
-                func_00210318(a->m_pmfShadow, a->header.m_vPos.x, h, a->header.m_vPos.z);
+                CMtxF__ScaleColumns(m, t, t, t);
+                CQuaternion__ToMatrix(&a->m_qGround, q);
+                CMtxF__MultiplyAffine(a->m_pmfShadow, m, q);
+                CMtxF__Translate(a->m_pmfShadow, a->header.m_vPos.x, h, a->header.m_vPos.z);
                 if (a->m_pmfShadow == NULL) {
                     goto end;
                 }
             }
-            func_0021ED04(a, s, a->m_pmfShadow, a->m_ShadowAlpha);
+            CGameObjectInstance__SubmitShadowModel(a, s, a->m_pmfShadow, a->m_ShadowAlpha);
         } else {
-            func_0021E03C(a, s->blobType, 0);
+            Shadow_DrawBlob(a, s->blobType, 0);
         }
     }
 end:

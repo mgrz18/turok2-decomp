@@ -5,10 +5,10 @@
 extern s32 D_800C2030;      /* screen width */
 extern s32 D_80130A78;      /* fill target (z-buffer) */
 
-extern void func_00207FEC(s32 mode);
+extern void Render_SetRenderMode(s32 mode);
 
 /* Fills the rectangle (x0, y0)-(x1, y1) of the z-buffer, then points the color image back at the frame. */
-void func_0028852C(s32 unused, s32 x0, s32 x1, s32 y0, s32 y1) {
+void CEngineApp__ClearDepthRect(s32 unused, s32 x0, s32 x1, s32 y0, s32 y1) {
     s32 colorImage;
 
     {
@@ -16,7 +16,7 @@ void func_0028852C(s32 unused, s32 x0, s32 x1, s32 y0, s32 y1) {
         g->w0 = 0xE7000000;     /* gDPPipeSync */
         g->w1 = 0;
     }
-    func_00207FEC(0x14);
+    Render_SetRenderMode(0x14);
     colorImage = 0xFF100000 | ((D_800C2030 - 1) & 0xFFF);
     {
         Gfx *g = D_800D8E24++;

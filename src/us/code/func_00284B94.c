@@ -13,40 +13,40 @@ extern s32 D_8011AC88;
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flags);
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
-extern void func_0026ECF0(void *);
-extern void func_002847E0(void);
-extern void func_002851C0(ControllerProfile *);
-extern s32 func_00285A20(void);
-extern void func_00298670(void *);
-extern void func_00298720(void *);
+extern void RumblePool_FreeFinished(void *);
+extern void Controller_ReadAll(void);
+extern void Controller_UpdateRumble(ControllerProfile *);
+extern s32 Controller_AnyPakWatched(void);
+extern void osContStartQuery(void *);
+extern void osContStartReadData(void *);
 
-void func_00284B94(void) {
+void Controller_Service(void) {
     ControllerProfile *pad;
     s32 i;
 
     if (D_800B6CF0 == 0) {
         return;
     }
-    func_0026ECF0(D_800F5A50);
+    RumblePool_FreeFinished(D_800F5A50);
     if (osRecvMesg(D_800F6758, NULL, 0) == 0) {
-        func_002847E0();
+        Controller_ReadAll();
         for (i = 0, pad = D_800F5EC0; i < 4; i++, pad++) {
-            func_002851C0(pad);
+            Controller_UpdateRumble(pad);
         }
         switch (D_800F6750) {
         case 0:
-            if (func_00285A20() != 0) {
+            if (Controller_AnyPakWatched() != 0) {
                 D_800F6750 = 1;
-                func_00298670(D_800F6798);
+                osContStartQuery(D_800F6798);
                 break;
             }
-            func_00298720(D_800F6798);
+            osContStartReadData(D_800F6798);
             break;
         case 1:
         case 2:
         case 3:
             D_800F6750 = 0;
-            func_00298720(D_800F6798);
+            osContStartReadData(D_800F6798);
             break;
         }
         osSendMesg(D_800F6758, NULL, 0);

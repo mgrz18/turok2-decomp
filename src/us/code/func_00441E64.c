@@ -3,7 +3,7 @@
 
 extern CListedInstance *D_8010FEB4;
 
-s32 func_00441E64(void) {
+s32 TotemDefense_AnyEnemyAlive_2(void) {
     CListedInstance *actor;
 
     for (actor = D_8010FEB4; actor != 0; actor = actor->m_pNext) {

@@ -36,8 +36,8 @@ struct Container {
 };
 struct Sub18;
 typedef struct Sub18 Sub18;
-extern s32 func_00225F6C(Container *arg0, s32 key0, s32 key1, s32 key2, RecordRecAtE4 **out, s32 max);
-s32 func_00225F6C(Container *arg0, s32 key0, s32 key1, s32 key2, RecordRecAtE4 **out, s32 max) {
+extern s32 CScene__FindInstances(Container *arg0, s32 key0, s32 key1, s32 key2, RecordRecAtE4 **out, s32 max);
+s32 CScene__FindInstances(Container *arg0, s32 key0, s32 key1, s32 key2, RecordRecAtE4 **out, s32 max) {
     s32 i = arg0->unkE4;
     s32 end = arg0->unkE8;
     RecordRecAtE4 *base = arg0->unkE0;

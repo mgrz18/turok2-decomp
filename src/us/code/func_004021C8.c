@@ -2,11 +2,11 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-void func_00243414(void *a0, void *a1, s32 event);
-void func_002666B0(CGameObjectInstance *actor, void *ai, s32 state);
+void CAI__SetMode(void *a0, void *a1, s32 event);
+void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
 extern CListedInstance *D_8010FEB4;
 
-/* func_00403520 */
+/* MantidQueen_NextStep */
 static __inline__ void State_NextStep(WaveBossState *s) {
     WaveBossStep *step;
     s32 value;
@@ -25,13 +25,13 @@ static __inline__ void State_NextStep(WaveBossState *s) {
         s->waveActive = 0;
     }
     if (s->stepIndex == 7) {
-        func_00243414(s->actor, ((u8 *)&s->actor->m_AI), 14);
+        CAI__SetMode(s->actor, ((u8 *)&s->actor->m_AI), 14);
     } else if (s->stepIndex == 8) {
-        func_00243414(s->actor, ((u8 *)&s->actor->m_AI), 16);
+        CAI__SetMode(s->actor, ((u8 *)&s->actor->m_AI), 16);
     }
 }
 
-/* func_004035F8 */
+/* MantidQueen_CountActiveMinions */
 static __inline__ s32 State_CountActive(WaveBossState *s) {
     s32 i;
     s32 n = 0;
@@ -50,7 +50,7 @@ static __inline__ s32 State_CountActive(WaveBossState *s) {
     return n;
 }
 
-/* func_00403430 */
+/* MantidQueen_UpdateBossAnim */
 static __inline__ void State_UpdateBoss(WaveBossState *s) {
     CGameObjectInstance *boss = s->boss;
     s32 aiState;
@@ -61,23 +61,23 @@ static __inline__ void State_UpdateBoss(WaveBossState *s) {
     } else if (aiState < 0x5AB5) {
     } else if (aiState == 0x5ABE) {
         if (boss->m_AI.m_AnimRepeatedCount != 0) {
-            func_002666B0(s->boss, ((u8 *)&s->boss->m_AI), 0x5ADC);
+            AI_PlayAnim(s->boss, ((u8 *)&s->boss->m_AI), 0x5ADC);
         }
     }
 }
 
 extern f32 D_800B6D28;
-void func_00235510(void *slot);
+void Animator_Update(void *slot);
 s32 Cinema_PathPlaying(void);
-void func_00401FCC(WaveBossState *s, s32 *active);
+void MantidQueen_SendMinions(WaveBossState *s, s32 *active);
 
-void func_004021C8(WaveBossState *s) {
+void MantidQueen_Update(WaveBossState *s) {
     CGameObjectInstance *actor = s->actor;
     s32 active;
     s32 i;
 
     for (i = 0; i < 5; i++) {
-        func_00235510(&s->spots[i].anim);
+        Animator_Update(&s->spots[i].anim);
     }
     if (Cinema_PathPlaying()) {
         return;
@@ -87,7 +87,7 @@ void func_004021C8(WaveBossState *s) {
     }
     active = State_CountActive(s);
     if (s->toSpawn != 0) {
-        func_00401FCC(s, &active);
+        MantidQueen_SendMinions(s, &active);
     }
     if (s->waveActive != 0 && s->toSpawn + active <= 0) {
         State_NextStep(s);

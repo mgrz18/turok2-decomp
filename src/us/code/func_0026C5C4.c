@@ -20,12 +20,12 @@ typedef struct Entry0026C5C4 {
     /* 0x18 */ struct Entry0026C5C4 *child2;
 } Entry0026C5C4;
 
-s32 func_0022425C(s32, s32);
+s32 CScene__GetRegionInfo(s32, s32);
 
-s32 func_0026CE44(s32, s32);                    /* extern */
+s32 CGameRegion__FloodSetWaterSame(s32, s32);                    /* extern */
 extern s32 D_800F7078;
 
-void func_0026C5C4(Entry0026C5C4 *arg0) {
+void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
     s32 temp_a0;
     s32 temp_a0_2;
     s32 temp_a0_3;
@@ -40,18 +40,18 @@ void func_0026C5C4(Entry0026C5C4 *arg0) {
             temp_s0 = arg0->key;
             arg0->flags = (u16) (temp_v1 | 1);
             if (temp_a0 != 0) {
-                func_0026CE44(temp_a0, temp_s0);
+                CGameRegion__FloodSetWaterSame(temp_a0, temp_s0);
             }
             temp_a0_2 = (s32) arg0->child1;
             if (temp_a0_2 != 0) {
-                func_0026CE44(temp_a0_2, temp_s0);
+                CGameRegion__FloodSetWaterSame(temp_a0_2, temp_s0);
             }
             temp_a0_3 = (s32) arg0->child2;
             if (temp_a0_3 != 0) {
-                func_0026CE44(temp_a0_3, temp_s0);
+                CGameRegion__FloodSetWaterSame(temp_a0_3, temp_s0);
             }
         }
-        temp_v0 = func_0022425C((s32) &D_800F7078, (s32) arg0);
+        temp_v0 = CScene__GetRegionInfo((s32) &D_800F7078, (s32) arg0);
         if (temp_v0 != 0) {
             ((Unk0022425C *)temp_v0)->unk5C = 2;
             ((Unk0022425C *)temp_v0)->flags = ((Unk0022425C *)temp_v0)->flags | 1;

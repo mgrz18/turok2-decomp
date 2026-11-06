@@ -7,7 +7,7 @@ extern s32 D_8011AADC;
 extern s32 D_8011AAD8;
 extern char D_800B596C[];
 extern char D_800B5988[];
-s32 func_0045458C(MenuItem *a) {
+s32 CheatMenu_BigHandsFeetModeText_2(MenuItem *a) {
     if (D_8011AADC & 0x100) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
     if (D_8011AAD8 & 0x100) a->text = D_800B596C; else a->text = D_800B5988;
     return 0;

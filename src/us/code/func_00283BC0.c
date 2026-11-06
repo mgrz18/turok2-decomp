@@ -6,13 +6,13 @@ extern Cinema *D_800C1BB0;
 extern s32 D_8011ACA4;
 extern f32 D_800B6D28;      /* frame time */
 
-extern void func_0040FD6C(s32);
-extern s32 func_00284174(void);
-extern s32 func_00284240(void);
-extern void func_002838A4(void);
-extern void func_00412798(void);
+extern void Cinema_Load(s32);
+extern s32 Cinema_IsActive(void);
+extern s32 Cinema_IsFinished(void);
+extern void Cinema_Start(void);
+extern void Cinema_FireCues(void);
 
-s32 func_00283BC0(void) {
+s32 Cinema_StartPending(void) {
     s32 none;
     Cinema *ctx;
     f32 value;
@@ -22,17 +22,17 @@ s32 func_00283BC0(void) {
     if (D_800C1BB0->entryIndex == none) {
         return 0;
     }
-    func_0040FD6C(D_800C1BB0->entryIndex);
+    Cinema_Load(D_800C1BB0->entryIndex);
     D_800C1BB0->entryIndex = none;
-    if (func_00284174() != 0) {
-        if (D_8011ACA4 != 0 || func_00284240() != 0) {
+    if (Cinema_IsActive() != 0) {
+        if (D_8011ACA4 != 0 || Cinema_IsFinished() != 0) {
             D_800C1BB0->prevTime = D_800C1BB0->time;
         } else {
             ctx = D_800C1BB0;
             ctx->prevTime = *(volatile f32 *)&ctx->time;
             ctx->time += D_800B6D28 * 0.06666667f;
             if (ctx->startTime <= ctx->time) {
-                func_002838A4();
+                Cinema_Start();
             }
             value = D_800C1BB0->time;
             limit = D_800C1BB0->clipEnd;
@@ -45,6 +45,6 @@ s32 func_00283BC0(void) {
             }
         }
     }
-    func_00412798();
+    Cinema_FireCues();
     return 1;
 }

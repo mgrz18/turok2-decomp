@@ -17,7 +17,7 @@ extern LevelScriptFA10 D_8012FA10;
 
 #define SCRIPT(state) (((s32 **) &(state))[-1])
 
-void func_004400B4(s32 arg0) {
+void Primagen_SetSpawnScript_2(s32 arg0) {
     D_8012FA10.scriptPrev = -1;
     D_8012FA10.restart = 1;
     D_8012FA10.scriptIndex = -1;

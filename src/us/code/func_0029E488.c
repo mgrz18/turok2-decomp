@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-unsigned char *func_0029E488(unsigned char *string, unsigned char value) {
+unsigned char *strchr(unsigned char *string, unsigned char value) {
     while (*string != value) {
         if (*string == 0) {
             return 0;

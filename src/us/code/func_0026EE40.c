@@ -4,7 +4,7 @@
 typedef unsigned char u8;
 typedef signed int s32;
 typedef float f32;
-extern f32 func_002119FC(f32 arg0, f32 arg1);
+extern f32 Random_Blend(f32 arg0, f32 arg1);
 struct func_8020CA10_G1;
 typedef struct func_8020CA10_G1 func_8020CA10_G1;
 struct func_8020CA10_G1;
@@ -32,14 +32,14 @@ struct PlayerRecAt8 {
 };
 struct PlayerRecAt8;
 typedef struct PlayerRecAt8 PlayerRecAt8;
-extern s32 func_0026EE40(void *arg0);
+extern s32 RumbleCurve_Advance(void *arg0);
 struct SampledCurve;
 typedef struct SampledCurve SampledCurve;
 extern func_8020CA10_G1 D_800A8074;
 extern func_8020CA10_G1 D_800A8070;
 extern func_8020CA10_G1 D_800A8078;
 extern f32 D_8011B0A0[2];
-s32 func_0026EE40(void *arg0) {
+s32 RumbleCurve_Advance(void *arg0) {
     PlayerRecAt8 *player = arg0;
     f32 temp_f1;
     f32 temp_f1_2;
@@ -65,7 +65,7 @@ s32 func_0026EE40(void *arg0) {
         if (temp_f1_2 <= 0.0f) {
             player->time =
                 temp_f1_2 + random->period;
-            player->value = func_002119FC(
+            player->value = Random_Blend(
                 (f32)random->minimum * D_800A8078.unk0,
                 (f32)random->maximum * D_800A8078.unk0);
         }

@@ -1,4 +1,4 @@
-/* Module-2 copy of func_0041BA50 (same code; callee at its link address). */
+/* Module-2 copy of GameSettings_SetDefaults (same code; callee at its link address). */
 #include "common.h"
 #include "structs/game.h"
 
@@ -20,7 +20,7 @@ static __inline__ void InitSlot(CPlayerOptions *slot, u8 index) {
 }
 
 /* Default multiplayer setup. */
-void func_004549B0(GameSettings *s) {
+void GameSettings_SetDefaults_2(GameSettings *s) {
     s32 i;
 
     s->unk13 = 1;

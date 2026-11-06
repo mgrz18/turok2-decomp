@@ -4,7 +4,7 @@
 extern s32 D_80130964;
 extern s32 D_8013099C;
 
-void func_0045C494(void) {
+void DamagedPakMenu_InitAtBoot_2(void) {
     D_8013099C = 0;
     D_80130964 = 0;
 }

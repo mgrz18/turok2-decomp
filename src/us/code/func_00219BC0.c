@@ -7,17 +7,17 @@ typedef struct {
     s32 words[6];
 } Lights1; /* libultra Lights1, copied as words */
 
-s32 func_00224180(CWorld *, s32);
-CQuaternion func_00267944(CGameObjectInstance *);
-void func_00219910(CAnimationState *);
-void func_0021E960(CGameObjectInstance *, s32);
-void func_0020F79C(CMtxF *);
-f32 func_0026872C(CGameObjectInstance *, s32);
-void func_002429BC(CGameObjectInstance *, CAI *, void *);
-void func_00284760(void *, s32, CVector3 *);
-void func_0021A150(CGameObjectInstance *, s32 *, s32, s32);
-s32 func_00214ED8(void);
-void func_0021DA8C(void);
+s32 CScene__FindObjectType(CWorld *, s32);
+CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *);
+void CAnimationState__Reset(CAnimationState *);
+void CGameObjectInstance__RequestAnim(CGameObjectInstance *, s32);
+void CMtxF__Identity(CMtxF *);
+f32 GameObject_GetRegionFloorHeight(CGameObjectInstance *, s32);
+void CAI__Setup(CGameObjectInstance *, CAI *, void *);
+void CPathTrack__StartAtNearestPoint(void *, s32, CVector3 *);
+void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32);
+s32 Instance_NextUniqueId(void);
+void CGameObjectInstance__DrawModelLitVertices(void);
 
 extern CWorld D_800F7078;
 extern s32 D_80119878;      /* player count */
@@ -61,7 +61,7 @@ static __inline__ void clear_motion(CGameObjectInstance *obj) {
     obj->m_pInstanceBelow = 0;
 }
 
-void func_00219BC0(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, void *intelligence, s32 sound,
+void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, void *intelligence, s32 sound,
                    void *region, f32 rotY, CVector3 pos, s32 flags, CVector3 scale, CVector3 velocity) {
     s32 animIndex;
     s32 frame;
@@ -70,7 +70,7 @@ void func_00219BC0(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, vo
 
     obj->m_dwFlags &= ~0x40000;
     if (model == -1) {
-        model = func_00224180(&D_800F7078, type);
+        model = CScene__FindObjectType(&D_800F7078, type);
         if (model == -1) {
             return;
         }
@@ -86,23 +86,23 @@ void func_00219BC0(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, vo
     obj->m_vScale = scale;
     obj->m_vVelocity = velocity;
     obj->m_nTypeFlag = type;
-    obj->m_qGround = func_00267944(obj);
+    obj->m_qGround = GameObject_GetGroundRotation(obj);
     obj->m_CollisionYOffset = 0;
     obj->m_nAnims = 0;
     obj->m_BlendFinish = 0;
     obj->m_BlendStart = 0;
     obj->m_dwHotPointFlags = 0x7800074;
-    func_00219910(&obj->m_CurrentAnimation);
-    func_00219910(&obj->m_BlendAnimation);
-    func_0021E960(obj, 0);
+    CAnimationState__Reset(&obj->m_CurrentAnimation);
+    CAnimationState__Reset(&obj->m_BlendAnimation);
+    CGameObjectInstance__RequestAnim(obj, 0);
     obj->m_dwFlags = (obj->m_dwFlags & ~0x400) | 0x2100;
-    func_0020F79C(&obj->m_mfOrient);
+    CMtxF__Identity(&obj->m_mfOrient);
     obj->m_pmtDrawMtxs = 0;
     obj->m_pmtLastFrameDrawMtxs = 0;
     obj->m_pmfShadow = 0;
     obj->m_ActiveSwooshes = 0;
     if (!(obj->m_dwFlags & 1) && obj->header.m_pCurrentRegion != 0) {
-        ground = func_0026872C(obj, 0);
+        ground = GameObject_GetRegionFloorHeight(obj, 0);
         if (obj->header.m_vPos.y - ground < 51.199997f) {
             obj->header.m_vPos.y = ground;
         }
@@ -114,23 +114,23 @@ void func_00219BC0(CGameObjectInstance *obj, s32 model, s32 type, s32 unused, vo
     }
     animIndex = 0;
     frame = 0;
-    func_002429BC(obj, &obj->m_AI, body_setup(obj));
+    CAI__Setup(obj, &obj->m_AI, body_setup(obj));
     if (obj->m_AI.m_pModeCurrent != 0) {
         animIndex = -obj->m_AI.m_AnimIndex;
     }
     obj->m_AI.m_pParent = 0;
     if (sound != -1) {
-        func_00284760((u8 *) obj + 0x1D4, sound, &obj->header.m_vPos);
+        CPathTrack__StartAtNearestPoint((u8 *) obj + 0x1D4, sound, &obj->header.m_vPos);
     }
     world = &D_800F7078;
-    func_0021A150(obj, world->m_pObjects, world->m_ObjectsKey, animIndex);
+    CGameObjectInstance__SetupAnimation(obj, world->m_pObjects, world->m_ObjectsKey, animIndex);
     if (frame != 0) {
         obj->m_CurrentAnimation.m_AnimationFrame = frame;
         obj->m_dwFlags &= ~0x400;
     }
-    obj->m_dwUniqueID = func_00214ED8() << 10;
+    obj->m_dwUniqueID = Instance_NextUniqueId() << 10;
     if (obj->m_dwFlags & 8) {
-        obj->m_AI.m_pfDraw = func_0021DA8C;
+        obj->m_AI.m_pfDraw = CGameObjectInstance__DrawModelLitVertices;
         *(Lights1 *) obj->m_Lights[0] = D_800AB0E8;
         *(Lights1 *) obj->m_Lights[1] = D_800AB0E8;
     }

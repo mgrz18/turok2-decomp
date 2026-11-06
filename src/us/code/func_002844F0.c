@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002844F0();
+extern void Cinema_Close();
 extern Shared_MenuContext *D_800C1BB0;
-extern void func_002052D8(void *arg0, void *arg1);
-void func_002844F0(void) {
+extern void CCache__Deallocate(void *arg0, void *arg1);
+void Cinema_Close(void) {
     if (D_800C1BB0->closed == 0) {
         {
             void *temp_a1 = D_800C1BB0->owner;
             if (temp_a1 != 0) {
-                func_002052D8(0, temp_a1);
+                CCache__Deallocate(0, temp_a1);
             }
         }
         {

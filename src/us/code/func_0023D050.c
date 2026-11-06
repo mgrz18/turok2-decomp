@@ -7,7 +7,7 @@
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
 
 /* A rectangle on the ground plane. */
-/* A scene model's bounds (what func_0023A640 tests). */
+/* A scene model's bounds (what Sweep_HitBox tests). */
 typedef struct ModelBounds {
     /* 0x00 */ CBox box;
     /* 0x18 */ u8 pad18[8];
@@ -46,22 +46,22 @@ typedef struct ModelHit {
 
 extern SceneCells D_800F8520;
 
-void func_0023DCBC(f32 mf[4][4], f32 xEye, f32 yEye, f32 zEye, f32 xAt, f32 yAt, f32 zAt, f32 xUp, f32 yUp,
+void Collision_LookAtF(f32 mf[4][4], f32 xEye, f32 yEye, f32 zEye, f32 xAt, f32 yAt, f32 zAt, f32 xUp, f32 yUp,
                    f32 zUp);
 f32 func_00298470(f32);                 /* sqrtf */
-s32 func_0023A968(Sweep *sweep, CRect *rect, f32 *t);
-s32 func_0023A640(Sweep *sweep, CBox *box, f32 *t);
-SceneModels *func_002017D4(s32 *list, s32 index);
-void func_00226F90(void *base, s32 count, s32 size, s32 (*cmp)(), void (*swap)());
-s32 func_0023DB98();
-void func_0023DB5C();
-s32 func_00245724(SceneModel *model);
-void func_0023DBBC(ModelSweep *ms);
+s32 Sweep_HitRect(Sweep *sweep, CRect *rect, f32 *t);
+s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
+SceneModels *CISet__GetBlock(s32 *list, s32 index);
+void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), void (*swap)());
+s32 Collision_SortCompare();
+void Collision_SortSwap();
+s32 Actor_GetTypeClass(SceneModel *model);
+void ModelSweep_TestModel(ModelSweep *ms);
 
 /* The collision test against the scene's models: gathers the models whose
  * bounds the sweep crosses, nearest first, and sweeps against each until a
  * hit nearer than the next one. */
-void func_0023D050(Sweep *sweep) {
+void Collision_TestModels(Sweep *sweep) {
     CBox box;
     CRect rect;
     ModelSweep ms;
@@ -91,7 +91,7 @@ void func_0023D050(Sweep *sweep) {
         return;
     }
     ms.sweep = sweep;
-    func_0023DCBC(ms.view, start->x, start->y, start->z, end->x, end->y, end->z, 0.0f, 1.0f, 0.0f);
+    Collision_LookAtF(ms.view, start->x, start->y, start->z, end->x, end->y, end->z, 0.0f, 1.0f, 0.0f);
     ms.scale = -func_00298470(sweep->delta.x * sweep->delta.x + sweep->delta.y * sweep->delta.y
                               + sweep->delta.z * sweep->delta.z);
     ms.hitDist = ms.scale * sweep->hit.fraction;
@@ -113,15 +113,15 @@ void func_0023D050(Sweep *sweep) {
     for (; i < cellCount && !sweep->stop; i++) {
         cell = &cells[i];
         if (cell->bounds->maxX > rect.minX && cell->bounds->minX < rect.maxX && cell->bounds->maxZ > rect.minZ
-            && cell->bounds->minZ < rect.maxZ && func_0023A968(sweep, cell->bounds, &t)) {
-            list = func_002017D4(*cell->data, 0);
+            && cell->bounds->minZ < rect.maxZ && Sweep_HitRect(sweep, cell->bounds, &t)) {
+            list = CISet__GetBlock(*cell->data, 0);
             j = list->count;
             model = list->models;
             while (--j != -1 && !sweep->stop && n < 128) {
                 if (!(model->bounds.flags & 0x10) && box.m_vMax.x > model->bounds.box.m_vMin.x
                     && box.m_vMin.x < model->bounds.box.m_vMax.x && box.m_vMax.z > model->bounds.box.m_vMin.z
                     && box.m_vMin.z < model->bounds.box.m_vMax.z && box.m_vMax.y > model->bounds.box.m_vMin.y
-                    && box.m_vMin.y < model->bounds.box.m_vMax.y && func_0023A640(sweep, &model->bounds.box, &t)) {
+                    && box.m_vMin.y < model->bounds.box.m_vMax.y && Sweep_HitBox(sweep, &model->bounds.box, &t)) {
                     n++;
                     hit->model = model;
                     hit->t = t;
@@ -132,7 +132,7 @@ void func_0023D050(Sweep *sweep) {
         }
     }
     if (n != 0) {
-        func_00226F90(hits, n, sizeof(ModelHit), func_0023DB98, func_0023DB5C);
+        Sort_Quick(hits, n, sizeof(ModelHit), Collision_SortCompare, Collision_SortSwap);
         hit = hits;
         for (j = 0; j < n; j++, hit++) {
             if (!(hit->t < sweep->hit.fraction)) {
@@ -140,13 +140,13 @@ void func_0023D050(Sweep *sweep) {
             }
             model = hit->model;
             ms.model = model;
-            ms.kind = func_00245724(model);
+            ms.kind = Actor_GetTypeClass(model);
             if (ms.kind == 9) {
                 ms.special = 1;
             } else {
                 ms.special = 0;
             }
-            func_0023DBBC(&ms);
+            ModelSweep_TestModel(&ms);
         }
     }
 }

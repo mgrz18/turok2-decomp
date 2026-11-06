@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00292B94(void *arg0, void *arg1);
-extern void func_002933B0(void *arg0);
-extern void func_002933E0(void *arg0, void **arg1);
-void func_00292B94(void *arg0, void *arg1) {
+extern void __seqpStopOsc(void *arg0, void *arg1);
+extern void alUnlink(void *arg0);
+extern void alLink(void *arg0, void **arg1);
+void __seqpStopOsc(void *arg0, void *arg1) {
     ALEventListItem *cur;
     ALEventListItem *next;
     u16 type;
@@ -21,12 +21,12 @@ void func_00292B94(void *arg0, void *arg1) {
                 ((ALEvent *)&cur->evt)->msg.osc.vs == arg1) {
                 ((ALSeqPlayer *)arg0)->stopOsc(
                     ((ALEvent *)&cur->evt)->msg.osc.oscState);
-                func_002933B0(cur);
+                alUnlink(cur);
                 if (next != 0) {
                     next->delta = next->delta +
                                         cur->delta;
                 }
-                func_002933E0(cur, &((ALSeqPlayer *)arg0)->evtq.freeList.next);
+                alLink(cur, &((ALSeqPlayer *)arg0)->evtq.freeList.next);
                 if ((short)type == type16) {
                     ((ALVoiceState *)arg1)->flags &= 0xFE;
                 } else {

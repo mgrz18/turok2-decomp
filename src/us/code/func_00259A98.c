@@ -11,10 +11,10 @@ typedef struct {
     /* 0x90 */ s32 type;
 } Bone;
 
-void func_00210A68(void *mtx, f32 angle);
+void CMtxF__PreRotateZ(void *mtx, f32 angle);
 
-void func_00259A98(void *mtx, Bone *bone) {
+void WeaponNode_Rotate_AF180(void *mtx, Bone *bone) {
     if (bone->type == 2) {
-        func_00210A68(mtx, -bone->anim->angle * 0.5f);
+        CMtxF__PreRotateZ(mtx, -bone->anim->angle * 0.5f);
     }
 }

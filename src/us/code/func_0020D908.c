@@ -5,7 +5,7 @@
 
 extern float D_800A54FC;
 extern float D_800A54F8;
-void func_0020D908(f32 *dst, PackedMatrixWords *src) {
+void CMtxF__FromMtxAffine(f32 *dst, PackedMatrixWords *src) {
     u32 upper;
     u32 lower;
     f32 scale = D_800A54F8;

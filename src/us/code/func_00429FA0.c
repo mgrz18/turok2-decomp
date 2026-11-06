@@ -29,26 +29,26 @@ extern s32 D_800B6D54;
 extern u8 D_800E6AC0[];
 extern u8 D_800EBAC0[];
 
-extern s32 func_00200AE0();
-extern s32 func_0020B490();
-extern s32 func_0042CBE4();
-extern s32 func_0042CAB4();
+extern s32 ProPack__Decompress();
+extern s32 Model_DecompressCallback();
+extern s32 CScene__DecompressIntelligence();
+extern s32 CScene__DecompressParticles();
 
-extern void *func_002017D4(void *table, s32 index);
-extern s32 func_00201848(s32 res, s32 file, s32 index);
-extern s32 func_0020185C(s32 res, s32 file, s32 index, s32 *size);
-extern void **func_0020367C(s32, s32, s32, s32, s32, s32 (*)(), char *, s32);
-extern void func_002052D8(s32, void **);
-extern void func_002053A8(s32);
-extern void func_00205B94(s32, s32 *, s32, char *);
-extern void **func_00205D0C(s32, s32, s32, s32, CWorld *, s32 (*)(), char *);
-extern s32 func_00224180(CWorld *w, s32 id);
-extern s32 func_00224F84(CWorld *w, s32 index);
-extern void func_00226390(void);
-extern void func_0042AC0C(CWorld *w, s32, s32);
-extern void func_0042C3BC(CWorld *w, s32 file);
-extern void func_0042C4F4(CWorld *w);
-extern void func_0042E894(CPlayerList *);
+extern void *CISet__GetBlock(void *table, s32 index);
+extern s32 CISet__GetROMAddress(s32 res, s32 file, s32 index);
+extern s32 CISet__GetROMAddressAndSize(s32 res, s32 file, s32 index, s32 *size);
+extern void **CCache__Request(s32, s32, s32, s32, s32, s32 (*)(), char *, s32);
+extern void CCache__Deallocate(s32, void **);
+extern void CCache__Flush(s32);
+extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
+extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, CWorld *, s32 (*)(), char *);
+extern s32 CScene__FindObjectType(CWorld *w, s32 id);
+extern s32 CScene__GetObject(CWorld *w, s32 index);
+extern void CScene__ClearListCounts(void);
+extern void CScene__LoadLevel(CWorld *w, s32, s32);
+extern void CScene__InitPersistentData(CWorld *w, s32 file);
+extern void CScene__ConstructWarp(CWorld *w);
+extern void CPlayerPool__LevelStart(CPlayerList *);
 
 /* Copies the header of object id's geometry (or clears it when the object is missing). */
 static __inline__ void loadGeomHeader(CWorld *w, CGeomHeader *out, s32 id) {
@@ -58,82 +58,82 @@ static __inline__ void loadGeomHeader(CWorld *w, CGeomHeader *out, s32 id) {
     void **objIndex;
     void **geometry;
 
-    index = func_00224180(w, id);
+    index = CScene__FindObjectType(w, id);
     if (index == -1) {
         out->m_Data[2] = 0;
         return;
     }
-    file = func_00224F84(w, index);
-    objIndex = func_0020367C(0, file, 0x18, 0, 0, NULL, D_800A5D70, 1);
+    file = CScene__GetObject(w, index);
+    objIndex = CCache__Request(0, file, 0x18, 0, 0, NULL, D_800A5D70, 1);
     if (objIndex != NULL) {
-        geometry = func_0020367C(0, func_0020185C((s32)*objIndex, file, 1, &size), size, 0, 0, func_0020B490,
+        geometry = CCache__Request(0, CISet__GetROMAddressAndSize((s32)*objIndex, file, 1, &size), size, 0, 0, Model_DecompressCallback,
                                  D_800A5D80, 1);
         if (geometry != NULL) {
-            *out = *(CGeomHeader *)func_002017D4(func_002017D4(func_002017D4(func_002017D4(*geometry, 2), 0), 0), 0);
-            func_002052D8(0, geometry);
+            *out = *(CGeomHeader *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(*geometry, 2), 0), 0), 0);
+            CCache__Deallocate(0, geometry);
         }
-        func_002052D8(0, objIndex);
+        CCache__Deallocate(0, objIndex);
     }
 }
 
-void func_00429FA0(CWorld *w, s32 file) {
+void CScene__Construct(CWorld *w, s32 file) {
     s32 cart;
     s32 res;
     f32 *vec;
 
-    func_00226390();
+    CScene__ClearListCounts();
     w->m_Mode = 0;
-    func_0042C4F4(w);
+    CScene__ConstructWarp(w);
     w->unk_04 = 0;
     w->unk_08 = 0;
     w->m_nLevel = -1;
     w->unk_18EB8 = 0;
     w->m_SkyAngle = 0;
-    func_0042E894(&D_80119870.m_PlayerList);
+    CPlayerPool__LevelStart(&D_80119870.m_PlayerList);
     vec = &w->m_qSky.x;
     w->m_qSky.x = vec[1] = vec[2] = 0.0f;
     w->m_qSky.w = 1.0f;
-    func_002053A8(0);
-    func_00205B94(0, &cart, file, D_800A5D8C);
-    res = func_00201848(cart, file, 5);
+    CCache__Flush(0);
+    CCache__LoadPersistantIndex(0, &cart, file, D_800A5D8C);
+    res = CISet__GetROMAddress(cart, file, 5);
     w->m_LevelsKey = res;
-    func_00205B94(0, (s32 *)&w->m_pLevels, res, D_800A5D9C);
-    res = func_00201848(cart, file, 3);
+    CCache__LoadPersistantIndex(0, (s32 *)&w->m_pLevels, res, D_800A5D9C);
+    res = CISet__GetROMAddress(cart, file, 3);
     w->m_TextureSetsKey = res;
-    func_00205B94(0, (s32 *)&w->m_pTextureSets, res, D_800A5DAC);
-    w->m_pObjectTypes = *func_00205D0C(0, cart, 2, file, w, NULL, D_800A5DC0);
-    res = func_00201848(cart, file, 0);
+    CCache__LoadPersistantIndex(0, (s32 *)&w->m_pTextureSets, res, D_800A5DAC);
+    w->m_pObjectTypes = *CCache__LoadPersistantSubBlock(0, cart, 2, file, w, NULL, D_800A5DC0);
+    res = CISet__GetROMAddress(cart, file, 0);
     w->m_ObjectsKey = res;
-    func_00205B94(0, (s32 *)&w->m_pObjects, res, D_800A5DD0);
-    w->m_pIntelligence = *func_00205D0C(0, cart, 1, file, w, func_0042CBE4, D_800A5DE0);
-    w->m_pParticleEffects = (s32 *)func_00205D0C(0, cart, 4, file, w, func_0042CAB4, D_800A5DF0);
-    w->m_pObjectTypes2 = *func_00205D0C(0, cart, 0xA, file, w, NULL, D_800A5DC0);
-    res = func_00201848(cart, file, 9);
+    CCache__LoadPersistantIndex(0, (s32 *)&w->m_pObjects, res, D_800A5DD0);
+    w->m_pIntelligence = *CCache__LoadPersistantSubBlock(0, cart, 1, file, w, CScene__DecompressIntelligence, D_800A5DE0);
+    w->m_pParticleEffects = (s32 *)CCache__LoadPersistantSubBlock(0, cart, 4, file, w, CScene__DecompressParticles, D_800A5DF0);
+    w->m_pObjectTypes2 = *CCache__LoadPersistantSubBlock(0, cart, 0xA, file, w, NULL, D_800A5DC0);
+    res = CISet__GetROMAddress(cart, file, 9);
     w->m_BinariesKey = res;
-    func_00205B94(0, (s32 *)&w->m_pBinaries, res, D_800A5E04);
-    w->m_pSwooshes = *func_00205D0C(0, cart, 0xB, file, w, NULL, D_800A5E14);
-    w->m_pLights = *func_00205D0C(0, cart, 0xC, file, w, NULL, D_800A5E28);
+    CCache__LoadPersistantIndex(0, (s32 *)&w->m_pBinaries, res, D_800A5E04);
+    w->m_pSwooshes = *CCache__LoadPersistantSubBlock(0, cart, 0xB, file, w, NULL, D_800A5E14);
+    w->m_pLights = *CCache__LoadPersistantSubBlock(0, cart, 0xC, file, w, NULL, D_800A5E28);
     w->m_pBitSections = D_800EBAC0;
-    w->unk_28 = func_0020185C(cart, file, 6, &w->unk_30);
+    w->unk_28 = CISet__GetROMAddressAndSize(cart, file, 6, &w->unk_30);
     w->m_pBitSections2 = D_800E6AC0;
-    w->unk_2C = func_0020185C(cart, file, 7, &w->unk_34);
-    w->m_pCurves = *func_00205D0C(0, cart, 0xD, file, w, func_00200AE0, D_800A5E38);
-    w->m_pRumbles = *func_00205D0C(0, cart, 0xE, file, w, func_00200AE0, D_800A5E40);
-    w->m_pRumbleTypes = *func_00205D0C(0, cart, 0xF, file, w, func_00200AE0, D_800A5E48);
-    w->m_pGraphicSetTypes = *func_00205D0C(0, cart, 0x11, file, w, NULL, D_800A5E58);
-    res = func_00201848(cart, file, 0x10);
+    w->unk_2C = CISet__GetROMAddressAndSize(cart, file, 7, &w->unk_34);
+    w->m_pCurves = *CCache__LoadPersistantSubBlock(0, cart, 0xD, file, w, ProPack__Decompress, D_800A5E38);
+    w->m_pRumbles = *CCache__LoadPersistantSubBlock(0, cart, 0xE, file, w, ProPack__Decompress, D_800A5E40);
+    w->m_pRumbleTypes = *CCache__LoadPersistantSubBlock(0, cart, 0xF, file, w, ProPack__Decompress, D_800A5E48);
+    w->m_pGraphicSetTypes = *CCache__LoadPersistantSubBlock(0, cart, 0x11, file, w, NULL, D_800A5E58);
+    res = CISet__GetROMAddress(cart, file, 0x10);
     w->m_GraphicSetsKey = res;
-    func_00205B94(0, (s32 *)&w->m_pGraphicSets, res, D_800A5E68);
-    res = func_00201848(cart, file, 0x12);
+    CCache__LoadPersistantIndex(0, (s32 *)&w->m_pGraphicSets, res, D_800A5E68);
+    res = CISet__GetROMAddress(cart, file, 0x12);
     w->m_CinemasKey = res;
-    func_00205B94(0, (s32 *)&w->m_pCinemas, res, D_800A5E7C);
-    w->m_pLinkGroupTypes = *func_00205D0C(0, cart, 0x13, file, w, NULL, D_800A5E8C);
-    func_0042C3BC(w, file);
+    CCache__LoadPersistantIndex(0, (s32 *)&w->m_pCinemas, res, D_800A5E7C);
+    w->m_pLinkGroupTypes = *CCache__LoadPersistantSubBlock(0, cart, 0x13, file, w, NULL, D_800A5E8C);
+    CScene__InitPersistentData(w, file);
     D_800B6D54 = 1;
     loadGeomHeader(w, &w->m_Geom[0], 0xDAC);
     loadGeomHeader(w, &w->m_Geom[1], 0xDAD);
     loadGeomHeader(w, &w->m_Geom[2], 0xDAE);
     loadGeomHeader(w, &w->m_Geom[3], 0xDAF);
     loadGeomHeader(w, &w->m_Geom[4], 0xDB0);
-    func_0042AC0C(w, 0, 0);
+    CScene__LoadLevel(w, 0, 0);
 }

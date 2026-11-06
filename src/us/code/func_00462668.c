@@ -4,8 +4,8 @@
 #include "common.h"
 #include "ultra_types.h"
 extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
 static __inline__ s32 __osIdCheckSum(u16 *ptr, u16 *csum, u16 *icsum) {
     u16 data = 0;
     u32 j;
@@ -36,7 +36,7 @@ s32 __osCheckPackId_2(OSPfs *pfs, __OSPackId *temp)
     index[2] = 4;
     index[3] = 6;
     for (i = 1; i < 4; i++) {
-        ret = func_00299680(pfs->queue, pfs->channel, index[i], (u8 *)temp);
+        ret = __osContRamRead(pfs->queue, pfs->channel, index[i], (u8 *)temp);
         if (ret != 0)
             return ret;
         __osIdCheckSum((u16 *)temp, &sum, &isum);
@@ -49,7 +49,7 @@ s32 __osCheckPackId_2(OSPfs *pfs, __OSPackId *temp)
     }
     for (j = 0; j < 4; j++) {
         if (j != i) {
-            ret = func_00299A40(pfs->queue, pfs->channel, index[j], (u8 *)temp, 1);
+            ret = __osContRamWrite(pfs->queue, pfs->channel, index[j], (u8 *)temp, 1);
             if (ret != 0)
                 return ret;
         }

@@ -33,17 +33,17 @@ typedef struct {
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
 
-void *func_0020367C(s32, s32, s32, s32, s32, void *, void *, s32);
-s32 func_0020185C(s32, s32, s32, s32 *);
-void func_002051F4(s32, void *);
-void func_0020D908(f32 *, f32 *);
-void func_0020F85C(f32 *, CVector3 *, CVector3 *);
-void func_00236EA0(void *, void *, s32, s32, CVector3, AttachmentParams);
+void *CCache__Request(s32, s32, s32, s32, s32, void *, void *, s32);
+s32 CISet__GetROMAddressAndSize(s32, s32, s32, s32 *);
+void CCache__Unlock(s32, void *);
+void CMtxF__FromMtxAffine(f32 *, f32 *);
+void CMtxF__TransformPoint(f32 *, CVector3 *, CVector3 *);
+void ImpactEvent_Send(void *, void *, s32, s32, CVector3, AttachmentParams);
 
 extern u8 D_800A5808[];
 extern u8 D_800A581C[];
 
-void func_00214B58(PlacedProp *prop, s32 all) {
+void CStaticObject__SpawnEvents(PlacedProp *prop, s32 all) {
     s32 *model;
     s32 **table;
     s32 *header;
@@ -58,12 +58,12 @@ void func_00214B58(PlacedProp *prop, s32 all) {
     s32 first;
     f32 *transform;
 
-    model = func_0020367C(0, prop->owner, 0x18, 4, 0, 0, D_800A5808, 0);
+    model = CCache__Request(0, prop->owner, 0x18, 4, 0, 0, D_800A5808, 0);
     if (model == NULL) {
         return;
     }
-    name = func_0020185C(*model, prop->owner, 3, &size);
-    table = func_0020367C(0, name, size, 0, 0, 0, D_800A581C, 0);
+    name = CISet__GetROMAddressAndSize(*model, prop->owner, 3, &size);
+    table = CCache__Request(0, name, size, 0, 0, 0, D_800A581C, 0);
     if (table != NULL) {
         header = *table;
         count = header[1];
@@ -77,15 +77,15 @@ void func_00214B58(PlacedProp *prop, s32 all) {
                 } else {
                     if (first) {
                         first = 0;
-                        func_0020D908(matrix, prop->matrix);
+                        CMtxF__FromMtxAffine(matrix, prop->matrix);
                     }
                     transform = matrix;
                 }
-                func_0020F85C(transform, &attachment->offset, &position);
-                func_00236EA0(prop, prop, attachment->type, -1, position, attachment->params);
+                CMtxF__TransformPoint(transform, &attachment->offset, &position);
+                ImpactEvent_Send(prop, prop, attachment->type, -1, position, attachment->params);
             }
         }
-        func_002051F4(0, table);
+        CCache__Unlock(0, table);
     }
-    func_002051F4(0, model);
+    CCache__Unlock(0, model);
 }

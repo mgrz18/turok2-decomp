@@ -1,11 +1,11 @@
-/* WRONG CUT: REAL func_00427524 size 0x1CC (splat cut it into func_00427524 + func_00427610 + func_004276A0). */
+/* WRONG CUT: REAL __osPfsDeclearPage size 0x1CC (splat cut it into __osPfsDeclearPage + func_00427610 + func_004276A0). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SDK/PFS/80446BD0_4.CPP, func_80446324_de, with Turok 2's layouts. */
 /* __osPfsDeclearPage (libultra pfsallocatefile.c). */
 #include "rw/abu_types.h"
 
-extern s32 func_004276F0(OSPfs *pfs, int page_no, u8 *data, u8 bank);
+extern s32 __osClearPage(OSPfs *pfs, int page_no, u8 *data, u8 bank);
 
-s32 func_00427524(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
+s32 __osPfsDeclearPage(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *first_page, u8 bank,
                   int *decleared, int *last_page)
 {
     int j;
@@ -40,7 +40,7 @@ s32 func_00427524(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *fir
         if (inode->inode_page[j].ipage == 3) {
             inode->inode_page[old_page].inode_t.bank = bank;
             inode->inode_page[old_page].inode_t.page = j;
-            ret = func_004276F0(pfs, old_page, tmp_data, bank);
+            ret = __osClearPage(pfs, old_page, tmp_data, bank);
             if (ret != 0)
                 return ret;
             old_page = j;
@@ -56,7 +56,7 @@ s32 func_00427524(OSPfs *pfs, __OSInode *inode, int file_size_in_pages, int *fir
         return ret;
     } else {
         inode->inode_page[old_page].ipage = 1;
-        ret = func_004276F0(pfs, old_page, tmp_data, bank);
+        ret = __osClearPage(pfs, old_page, tmp_data, bank);
         *last_page = 0;
         return ret;
     }

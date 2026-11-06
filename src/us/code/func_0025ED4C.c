@@ -12,9 +12,9 @@ extern s32 D_800AB8B0;
 #define sFillColor ((CVector3 *) (&D_800AB8B0 + 1))
 extern FillAlpha D_800AB8C0;
 
-void func_0021D928(CGameObjectInstance *obj, CAI *ai, s32 arg2);
+void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *obj, CAI *ai, s32 arg2);
 
-void func_0025ED4C(CGameObjectInstance *obj, CAI *ai, s32 arg2) {
+void EnemyAI_DrawWithBlend(CGameObjectInstance *obj, CAI *ai, s32 arg2) {
     f32 fade = 1.0f;
     CVector3 *color;
     FillAlpha *alpha;
@@ -36,6 +36,6 @@ void func_0025ED4C(CGameObjectInstance *obj, CAI *ai, s32 arg2) {
     alpha = &D_800AB8C0;
     alpha->alphaMax = 255.0f;
     alpha->alpha = fade * 210.0f;
-    func_0021D928(obj, ai, arg2);
+    CGameObjectInstance__DrawModelImmediate(obj, ai, arg2);
     D_800AB8B0 = 0;
 }

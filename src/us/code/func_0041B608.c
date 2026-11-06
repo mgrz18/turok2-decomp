@@ -3,7 +3,7 @@
 
 extern s32 D_8011AAD8;
 
-s32 func_0041B608(void) {
+s32 CheatMenu_ToggleBigHandsFeetMode(void) {
     D_8011AAD8 ^= 0x100;
     return 0;
 }

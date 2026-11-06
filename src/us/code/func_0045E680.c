@@ -1,4 +1,4 @@
-/* WRONG CUT: real function func_0045E680, size 0x188: splat's func_0045E674 starts with 3 junk words (0x45E674-0x45E680, linker fill after the hand-written func_0045E630). */
+/* WRONG CUT: real function Pak_RefreshNotes_2, size 0x188: splat's func_0045E674 starts with 3 junk words (0x45E674-0x45E680, linker fill after the hand-written func_0045E630). */
 #include "common.h"
 #include "structs/pak.h"
 
@@ -6,7 +6,7 @@ extern s32 func_00427B40(OSPfs *pfs, s32 file_no, OSPfsState *state); /* osPfsFi
 extern s32 func_00427D80(OSPfs *pfs, s32 *bytes);                  /* osPfsFreeBlocks */
 
 /* Re-reads the directory of the pak on channel ch into the cache. */
-void func_0045E680(s32 ch) {
+void Pak_RefreshNotes_2(s32 ch) {
     s32 i;
     s32 ret;
     s32 bytes;

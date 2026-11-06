@@ -8,7 +8,7 @@ typedef struct {
     /* 0x972 */ s8 slots[1];
 } SlotOwner;
 
-s32 func_00257280(SlotOwner *self, s32 slot) {
+s32 CPlayer__CanSelectWeapon(SlotOwner *self, s32 slot) {
     WeaponInfo *def = D_800AF618[slot];
 
     if (self->slots[slot] == 0) {

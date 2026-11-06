@@ -3,24 +3,24 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00273EB8(void *arg0, int arg1);
-extern s16 func_00276820(void *);
-extern s16 func_0027682C(void *);
-extern s8 func_00276874(void *);
-extern void func_00273EC0(void *, void *, s32);
-extern s8 func_00276838(void *);
-extern u8 func_00276868(void *);
-extern s16 func_00276898(void *);
-s32 func_00275FA0(ManagerRecAtD8V1 *manager, void *desc, Vec3Words *position, s32 volume, s32 extra) {
-    extern void func_00271514(s32 *);
-    extern void func_002714B0(s32 *);
+extern void SndVoice_SetSoundId(void *arg0, int arg1);
+extern s16 SoundEffectInfo_GetGroup(void *);
+extern s16 SoundEffectInfo_GetSample(void *);
+extern s8 SoundEffectInfo_GetPitch(void *);
+extern void SndVoice_Setup(void *, void *, s32);
+extern s8 SoundEffectInfo_GetPriority(void *);
+extern u8 SoundEffectInfo_GetPan(void *);
+extern s16 SoundEffectInfo_GetFlags(void *);
+s32 SndQueue_Add(ManagerRecAtD8V1 *manager, void *desc, Vec3Words *position, s32 volume, s32 extra) {
+    extern void CAudioWorld__Unlock(s32 *);
+    extern void CAudioWorld__Lock(s32 *);
     NodeRecAtC8 *node;
     NodeRecAtC8 *first;
     NodeRecAtC8 *at;
     s32 *scene;
     s32 priority;
     if (manager->free.next != (NodeRecAtC8 *)&manager->free) {
-        func_002714B0(manager->scene);
+        CAudioWorld__Lock(manager->scene);
         first = manager->free.next;
         first->prev->next = first->next;
         first->next->prev = first->prev;
@@ -31,12 +31,12 @@ s32 func_00275FA0(ManagerRecAtD8V1 *manager, void *desc, Vec3Words *position, s3
         node->volume = volume;
         node->voice = -1;
         node->volume16 = volume;
-        node->group = func_00276820(desc);
-        node->priority = func_00276838(desc);
-        node->sample = func_0027682C(desc);
-        node->pan = func_00276868(desc);
-        node->flags = func_00276898(desc);
-        node->pitch = func_00276874(desc);
+        node->group = SoundEffectInfo_GetGroup(desc);
+        node->priority = SoundEffectInfo_GetPriority(desc);
+        node->sample = SoundEffectInfo_GetSample(desc);
+        node->pan = SoundEffectInfo_GetPan(desc);
+        node->flags = SoundEffectInfo_GetFlags(desc);
+        node->pitch = SoundEffectInfo_GetPitch(desc);
         node->gainB = 0x7D00;
         node->gainA = 0x7D00;
         node->time = 0;
@@ -44,9 +44,9 @@ s32 func_00275FA0(ManagerRecAtD8V1 *manager, void *desc, Vec3Words *position, s3
         node->position = *position;
         node->pad58 = 0;
         node->padB4 = 0;
-        func_00273EB8(node->channel, ((struct ContextRecAt2BC0 *)manager->scene)->field2B8C);
+        SndVoice_SetSoundId(node->channel, ((struct ContextRecAt2BC0 *)manager->scene)->field2B8C);
         node->mix = manager->scene[0x2BAC / 4];
-        func_00273EC0(node->channel, desc, extra);
+        SndVoice_Setup(node->channel, desc, extra);
         at = manager->active.next;
         priority = node->priority;
         while (at != (NodeRecAtC8 *)&manager->active) {
@@ -59,7 +59,7 @@ s32 func_00275FA0(ManagerRecAtD8V1 *manager, void *desc, Vec3Words *position, s3
         node->next = at;
         at->prev->next = node;
         at->prev = node;
-        func_00271514(manager->scene);
+        CAudioWorld__Unlock(manager->scene);
         return node->handle;
     }
     return -1;

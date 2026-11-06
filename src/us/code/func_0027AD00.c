@@ -7,10 +7,10 @@ typedef struct {
     /* 0x8 */ s32 mode;
 } ModeState;
 
-void func_00277328();                               /* extern */
+void COverlay__Update();                               /* extern */
 
-void func_0027AD00(ModeState *arg0, s32 arg1) {
+void COverlay__StartScript(ModeState *arg0, s32 arg1) {
     arg0->value = arg1;
     arg0->mode = 2;
-    func_00277328();
+    COverlay__Update();
 }

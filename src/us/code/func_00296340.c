@@ -10,7 +10,7 @@ typedef struct {
     /* 0x10 */ s32 unk10;
 } Request;
 
-void func_00296340(Request *arg0, s32 arg1, s32 arg2, s32 arg3) {
+void alFilterNew(Request *arg0, s32 arg1, s32 arg2, s32 arg3) {
     arg0->unk0 = 0;
     arg0->unk4 = arg1;
     arg0->unk8 = arg2;

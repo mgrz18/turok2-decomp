@@ -36,16 +36,16 @@ struct PoolRecAt28V1 {
 };
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
-extern ControllerProfile *func_00450CA0(s32 *out);
-extern s32 func_002855E8(ControllerProfile *);
-extern s32 func_002855E8(ControllerProfile *slot);
-ControllerProfile *func_00450CA0(s32 *out) {
+extern ControllerProfile *Menu_FindPressingController_2(s32 *out);
+extern s32 Controller_ConfirmPressed(ControllerProfile *);
+extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
+ControllerProfile *Menu_FindPressingController_2(s32 *out) {
     s32 i;
     ControllerProfile *s;
     i = 0;
     s = D_800F5EC0;
     while (i < 4) {
-        if (func_002855E8(s) != 0) {
+        if (Controller_ConfirmPressed(s) != 0) {
             *out = i;
             return s;
         }

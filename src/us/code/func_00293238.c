@@ -9,7 +9,7 @@ typedef struct {
     /* 0x1A */ u16 unk1A;
 } CopySource;
 
-/* What func_00293238 fills from it. */
+/* What alSeqGetLoc fills from it. */
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;
@@ -17,7 +17,7 @@ typedef struct {
     /* 0x0C */ u16 unkC;
 } CopyDest;
 
-void func_00293238(CopySource *arg0, CopyDest *arg1) {
+void alSeqGetLoc(CopySource *arg0, CopyDest *arg1) {
     arg1->unk0 = arg0->unk8;
     arg1->unkC = arg0->unk1A;
     arg1->unk4 = arg0->unkC;

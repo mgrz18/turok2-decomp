@@ -5,7 +5,7 @@
 
 extern s8 D_800ACAF4[];
 extern s32 D_800B6D18;
-f32 func_00213E90(void *arg0)
+f32 LightVolume_GetFlicker(void *arg0)
 {
   ObjectRecAtBC *volume = arg0;
   u32 temp_a0;

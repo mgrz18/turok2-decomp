@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 func_00291034(s32, void *, s32);
+extern s32 alEvtqPostEvent(s32, void *, s32);
 
 typedef struct {
     s16 kind;
@@ -11,9 +11,9 @@ typedef struct {
     s32 c;
 } Msg;
 
-void func_00290EF0(s32 arg0) {
+void alCSPStop(s32 arg0) {
     Msg m;
 
     m.kind = 0x11;
-    func_00291034(arg0 + 0x48, &m, 0);
+    alEvtqPostEvent(arg0 + 0x48, &m, 0);
 }

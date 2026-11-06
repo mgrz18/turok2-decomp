@@ -7,8 +7,8 @@ typedef struct {
     s32 xC;
 } Quad; /* passed by value: starts in $a3, the rest on the stack */
 
-extern void func_0027580C(s32);
+extern void Sound__PlaySpeech(s32);
 
-void func_00238114(s32 arg0, s32 arg1, s32 arg2, Quad q) {
-    func_0027580C(q.xC);
+void ImpactEvent_PlaySound(s32 arg0, s32 arg1, s32 arg2, Quad q) {
+    Sound__PlaySpeech(q.xC);
 }

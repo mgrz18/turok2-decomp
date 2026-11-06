@@ -5,19 +5,19 @@
 extern s32 D_800C2030;              /* screen width */
 extern s32 D_800C2034;              /* screen height */
 
-extern void func_0028852C(s32, s32, s32, s32, s32);
-extern void func_0027AEA8(s32, s32, s32 *, s32 *);
-extern void func_00279028(s32);
-extern void func_0027B320(s32, s32, s32, s32, f32, f32, s32);
+extern void CEngineApp__ClearDepthRect(s32, s32, s32, s32, s32);
+extern void Hud_GetSpriteSize(s32, s32, s32 *, s32 *);
+extern void Hud_SetupTextureMode(s32);
+extern void Hud_DrawSprite(s32, s32, s32, s32, f32, f32, s32);
 
-void func_00285E60(s32 arg0) {
+void EngineMode07_Title_Draw(s32 arg0) {
     CFrameData *fb;
     s32 width;
     s32 height;
     Gfx *g;
 
     fb = D_800F7070;
-    func_0028852C(arg0, 0, D_800C2030, 0, D_800C2034);
+    CEngineApp__ClearDepthRect(arg0, 0, D_800C2030, 0, D_800C2034);
     width = 0;
     height = 0;
     /* gDPSetScissor(G_SC_NON_INTERLACE, 0, 0, w - 1, h - 1) */
@@ -48,9 +48,9 @@ void func_00285E60(s32 arg0) {
     g = D_800D8E24++;
     g->w0 = 0xF6000000 | ((D_800C2030 & 0x3FF) << 14) | ((D_800C2034 & 0x3FF) << 2);
     g->w1 = 0;
-    func_0027AEA8(0x386, 0, &width, &height);
+    Hud_GetSpriteSize(0x386, 0, &width, &height);
     if (width != 0 && height != 0) {
-        func_00279028(0xFF);
-        func_0027B320(0x386, 0, 0, 0, (f32)D_800C2030 / (f32)width, (f32)D_800C2034 / (f32)height, 1);
+        Hud_SetupTextureMode(0xFF);
+        Hud_DrawSprite(0x386, 0, 0, 0, (f32)D_800C2030 / (f32)width, (f32)D_800C2034 / (f32)height, 1);
     }
 }

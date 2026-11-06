@@ -1,7 +1,7 @@
 #include "common.h"
 
-f32 func_0026BE60(void *node, f32 x, f32 z);
-f32 func_002425A4(void *actor, f32 x, f32 z);
+f32 CGameRegion__GetHeight(void *node, f32 x, f32 z);
+f32 Platform_GetTopHeight(void *actor, f32 x, f32 z);
 
 static __inline__ f32 nodeFloor(u8 *actor, f32 x, f32 z) {
     void *node = *(void **) (actor + 0x10);
@@ -10,13 +10,13 @@ static __inline__ f32 nodeFloor(u8 *actor, f32 x, f32 z) {
     if (node == NULL) {
         result = *(f32 *) (actor + 0x8);
     } else {
-        result = func_0026BE60(node, x, z);
+        result = CGameRegion__GetHeight(node, x, z);
     }
     return result;
 }
 
 /* Floor height under (x, z) for the actor. */
-f32 func_00268688(u8 *actor, f32 x, f32 z) {
+f32 GameObject_GetFloorHeightAt(u8 *actor, f32 x, f32 z) {
     u8 *def;
 
     if (actor[0] == 1) {
@@ -27,7 +27,7 @@ f32 func_00268688(u8 *actor, f32 x, f32 z) {
                     return nodeFloor(actor, x, z);
                 case 1:
                 case 2:
-                    return func_002425A4(actor, x, z);
+                    return Platform_GetTopHeight(actor, x, z);
             }
         }
     }

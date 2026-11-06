@@ -3,16 +3,16 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_002A1384(s32 arg0);
-extern int func_002A1540(int arg0);
-int func_002A1540(int arg0);
-void func_002A15B8(s32 source, u8 *destination, u32 count) {
+extern s32 HostIo_ReadWord(s32 arg0);
+extern int HostIo_ReadByte(int arg0);
+int HostIo_ReadByte(int arg0);
+void HostIo_ReadBlock(s32 source, u8 *destination, u32 count) {
     while (count != 0 && (source & 3) != 0) {
-        *destination++ = func_002A1540(source++);
+        *destination++ = HostIo_ReadByte(source++);
         count--;
     }
     while (count >= 4) {
-        u32 word = func_002A1384(source);
+        u32 word = HostIo_ReadWord(source);
         *destination++ = word >> 24;
         *destination++ = word >> 16;
         *destination++ = word >> 8;
@@ -21,7 +21,7 @@ void func_002A15B8(s32 source, u8 *destination, u32 count) {
         count -= 4;
     }
     while (count != 0) {
-        *destination++ = func_002A1540(source++);
+        *destination++ = HostIo_ReadByte(source++);
         count--;
     }
 }

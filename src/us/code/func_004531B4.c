@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/controller.h"
 
-/* Controller / rumble slot, 0x224 bytes (see func_004301C8). */
+/* Controller / rumble slot, 0x224 bytes (see Cont_ResetSlot). */
 
 typedef struct Layer {
     /* 0x00 */ u8 pad0[0x80];
@@ -20,20 +20,20 @@ extern s32 D_80130910[4];
 extern char D_800F5A50[];
 extern u8 D_8011AAF1; /* multiplayer */
 
-void func_0026EDA8(void *);
-void func_00285304(void);
-void *func_00275F7C(void);
-void func_00275DC0(void *);
+void RumblePool_FreeAll(void *);
+void Controller_ResetAllRumble(void);
+void *LoopSounds_Get(void);
+void LoopSounds_Pause(void *);
 
-void func_004531B4(Screen *screen) {
+void PauseMenu_Init_2(Screen *screen) {
     s32 i;
 
     screen->state = 2;
     for (i = 0; i < 4; i++) {
         D_80130910[i] = D_800F5EC0[i].rumbleOn;
     }
-    func_0026EDA8(D_800F5A50);
-    func_00285304();
+    RumblePool_FreeAll(D_800F5A50);
+    Controller_ResetAllRumble();
     if (D_8011AAF1) {
         screen->layer->flagsA &= ~0x800000;
         screen->layer->flagsB &= ~0x800000;
@@ -41,5 +41,5 @@ void func_004531B4(Screen *screen) {
         screen->layer->flagsA |= 0x800000;
         screen->layer->flagsB |= 0x800000;
     }
-    func_00275DC0(func_00275F7C());
+    LoopSounds_Pause(LoopSounds_Get());
 }

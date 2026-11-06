@@ -20,7 +20,7 @@ typedef struct {
 
 /* Appends node to the owner list for its type: type 2 to the first list
  * (and flags that it has one), anything else to the second. */
-void func_0028AFF0(NodeLists *lists, Node *node) {
+void __scAppendList(NodeLists *lists, Node *node) {
     if (node->m_Type == 2) {
         if (lists->m_pTailA != NULL) {
             lists->m_pTailA->m_pNext = node;

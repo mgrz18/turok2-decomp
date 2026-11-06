@@ -7,10 +7,10 @@ u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 u32 __osDisableInt(void);
 void __osRestoreInt(u32);
-s32 func_0026EE40(void *);
+s32 RumbleCurve_Advance(void *);
 void CList__Remove(void *, void *);
 void CList__AddTail(void *, void *);
-void func_0026ECF0(B19Pool *pool) {
+void RumblePool_FreeFinished(B19Pool *pool) {
     u32 mask = __osDisableInt();
     B19Spawn *n;
     B19Spawn *next;
@@ -18,7 +18,7 @@ void func_0026ECF0(B19Pool *pool) {
     for (n = (B19Spawn *)pool->head; n != 0; n = next) {
         next = *(B19Spawn **)((u8 *)n + 4);
         r = 0;
-        if (func_0026EE40((u8 *)n + 0x20) || func_0026EE40((u8 *)n + 0x2C)) r = 1;
+        if (RumbleCurve_Advance((u8 *)n + 0x20) || RumbleCurve_Advance((u8 *)n + 0x2C)) r = 1;
         if (r) {
             if (n->link != 0) *n->link = 0;
             CList__Remove(&pool->head, n);

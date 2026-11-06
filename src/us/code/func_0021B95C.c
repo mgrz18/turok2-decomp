@@ -107,23 +107,23 @@ extern f32 D_800E6874;         /* object height */
 extern f32 D_800E6878;         /* depth below the ground */
 extern f32 D_800ACB98[];
 
-void *func_002017D4(void *file, s32 index);
-void func_0020C618(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);
-void func_0020DAA4(CQuaternion *out, f32 amount, CQuaternion *a, CQuaternion *b);
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020FCC4(f32 (*m)[4], f32 angle, f32 x, f32 y, f32 z);
-void func_0020FF80(f32 (*dst)[4], f32 (*src)[4]);
-void func_00210318(f32 (*m)[4], f32 x, f32 y, f32 z);
-void func_0021034C(f32 (*m)[4], f32 x, f32 y, f32 z);
+void *CISet__GetBlock(void *file, s32 index);
+void CMtxF__MultiplyAffine(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);
+void CQuaternion__Slerp(CQuaternion *out, f32 amount, CQuaternion *a, CQuaternion *b);
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CMtxF__SetAxisAngle(f32 (*m)[4], f32 angle, f32 x, f32 y, f32 z);
+void CMtxF__Copy(f32 (*dst)[4], f32 (*src)[4]);
+void CMtxF__Translate(f32 (*m)[4], f32 x, f32 y, f32 z);
+void CMtxF__ScaleAxes(f32 (*m)[4], f32 x, f32 y, f32 z);
 void func_0021B59C(PoseObject *obj, s32 flags, f32 (*m)[4]);
-f32 func_002671B4(PoseObject *obj);
-f32 func_00269C3C(CGameRegion *region, f32 x, f32 z); /* the ceiling height */
+f32 GameObject_GetCollisionHeight(PoseObject *obj);
+f32 CGameRegion__GetCeilingHeight(CGameRegion *region, f32 x, f32 z); /* the ceiling height */
 
 static __inline__ void trackPos(KeyLookup *t, s32 i, CVector3 *out) {
     if (t->joints[i].pos == -1) {
         *out = t->frames[i].pos;
     } else {
-        f32 *data = func_002017D4(t->posTable, t->joints[i].pos);
+        f32 *data = CISet__GetBlock(t->posTable, t->joints[i].pos);
         f32 *a = &data[t->posFrame0];
         f32 *b = &data[t->posFrame1];
         f32 blend = t->blend;
@@ -146,9 +146,9 @@ static __inline__ void defaultRot(KeyLookup *t, s32 i, CQuaternion *out) {
 /* Spherical interpolation between the two keys. */
 static __inline__ void slerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
     if (t->joints[i].rot != -1) {
-        f32 *data = func_002017D4(t->rotTable, t->joints[i].rot);
+        f32 *data = CISet__GetBlock(t->rotTable, t->joints[i].rot);
 
-        func_0020DAA4(out, t->blend, (CQuaternion *) &data[t->rotFrame0], (CQuaternion *) &data[t->rotFrame1]);
+        CQuaternion__Slerp(out, t->blend, (CQuaternion *) &data[t->rotFrame0], (CQuaternion *) &data[t->rotFrame1]);
     } else {
         defaultRot(t, i, out);
     }
@@ -159,7 +159,7 @@ static __inline__ void lerpRot(KeyLookup *t, s32 i, CQuaternion *out) {
     if (t->joints[i].rot == -1) {
         defaultRot(t, i, out);
     } else {
-        f32 *data = func_002017D4(t->rotTable, t->joints[i].rot);
+        f32 *data = CISet__GetBlock(t->rotTable, t->joints[i].rot);
         f32 *a = &data[t->rotFrame0];
         f32 *b = &data[t->rotFrame1];
         f32 blend = t->blend;
@@ -222,13 +222,13 @@ static __inline__ void twistPart(TwistPart *part, f32 (*cur)[4], s32 n, s32 i) {
         angle = D_800ACB98[0x19 - part->count];
         angle *= 0.3f;
         angle *= (n == 5 ? -2.0f : (f32) n);
-        func_0020FF80(inv, cur);
-        func_0020EF60(&turn, &turn, -1.0f);
-        func_00210318(inv, turn.x, turn.y, turn.z);
-        func_0020FCC4(rotm, angle, axis.x, axis.y, axis.z);
-        func_0020C618(cur, inv, rotm);
-        func_0020EF60(&turn, &turn, -1.0f);
-        func_00210318(cur, turn.x, turn.y, turn.z);
+        CMtxF__Copy(inv, cur);
+        CVector3__Scale(&turn, &turn, -1.0f);
+        CMtxF__Translate(inv, turn.x, turn.y, turn.z);
+        CMtxF__SetAxisAngle(rotm, angle, axis.x, axis.y, axis.z);
+        CMtxF__MultiplyAffine(cur, inv, rotm);
+        CVector3__Scale(&turn, &turn, -1.0f);
+        CMtxF__Translate(cur, turn.x, turn.y, turn.z);
         if (part->bones[0] == i) {
             part->count--;
         }
@@ -276,7 +276,7 @@ static __inline__ void packMtx(u32 *out, f32 (*m)[4]) {
     *lo++ = (e1 << 16) | (e2 & 0xFFFF);
 }
 
-void func_0021B95C(PoseObject *obj, PoseContext *ctx, s32 bone, f32 (*parent)[4]) {
+void CGameObjectInstance__PoseBone(PoseObject *obj, PoseContext *ctx, s32 bone, f32 (*parent)[4]) {
     void *node;
     u8 *boneData;
     u8 flags;
@@ -287,8 +287,8 @@ void func_0021B95C(PoseObject *obj, PoseContext *ctx, s32 bone, f32 (*parent)[4]
     u32 i;
     s32 n;
 
-    node = func_002017D4(ctx->anims, bone);
-    boneData = func_002017D4(node, 1);
+    node = CISet__GetBlock(ctx->anims, bone);
+    boneData = CISet__GetBlock(node, 1);
     D_800E6864 = boneData;
     flags = boneData[0x65];
     ctx->boneData = boneData;
@@ -309,7 +309,7 @@ void func_0021B95C(PoseObject *obj, PoseContext *ctx, s32 bone, f32 (*parent)[4]
             lerpRot(&ctx->blendKeys, bone, &D_800E6850);
         }
         lerpVec(&D_800E6800, obj->blend, &D_800E6820, &D_800E6810);
-        func_0020DAA4(&D_800E6830, obj->blend, &D_800E6850, &D_800E6840);
+        CQuaternion__Slerp(&D_800E6830, obj->blend, &D_800E6850, &D_800E6840);
     } else {
         D_800E6800 = D_800E6810;
         D_800E6830 = D_800E6840;
@@ -322,7 +322,7 @@ void func_0021B95C(PoseObject *obj, PoseContext *ctx, s32 bone, f32 (*parent)[4]
         obj->callback(D_800E67C0, ctx);
     }
     cur = ctx->bones[bone];
-    func_0020C618(cur, D_800E67C0, parent);
+    CMtxF__MultiplyAffine(cur, D_800E67C0, parent);
 
     if (bone == 0) {
         switch (D_800E6860 = *obj->def) {
@@ -331,14 +331,14 @@ void func_0021B95C(PoseObject *obj, PoseContext *ctx, s32 bone, f32 (*parent)[4]
                 break;
             case 1:
             case 11:
-                D_800E6874 = func_002671B4(obj);
+                D_800E6874 = GameObject_GetCollisionHeight(obj);
                 obj->height = cur[3][1] * (1.0f / 65536.0f) - obj->pos.y - D_800E6874 * 0.5f;
                 if (obj->height < 0.0f) {
                     obj->height = 0.0f;
                 }
                 if ((obj->flags & 0x20000000) && (D_800E686C = obj->region) != NULL
                     && (D_800E686C->m_wFlags & REGION_FLAG_CEILING)) {
-                    D_800E6870 = func_00269C3C(D_800E686C, obj->pos.x, obj->pos.z);
+                    D_800E6870 = CGameRegion__GetCeilingHeight(D_800E686C, obj->pos.x, obj->pos.z);
                     D_800E6878 = obj->pos.y + obj->height + D_800E6874 - D_800E6870;
                     if (D_800E6878 > 0.0f) {
                         cur[3][1] -= D_800E6878 * 65536.0f;
@@ -376,34 +376,34 @@ void func_0021B95C(PoseObject *obj, PoseContext *ctx, s32 bone, f32 (*parent)[4]
 
     if (ctx->f78 && (D_800E6868 & 0xC7) == 0xC3) {
         ctx->f78 = 0;
-        func_0021034C(cur, 2.0f, 2.0f, 2.0f);
+        CMtxF__ScaleAxes(cur, 2.0f, 2.0f, 2.0f);
     } else if (ctx->f7C && (D_800E6868 & 0xC7) == 0xC7) {
         ctx->f7C = 0;
-        func_0021034C(cur, 2.0f, 2.0f, 2.0f);
+        CMtxF__ScaleAxes(cur, 2.0f, 2.0f, 2.0f);
     } else if (ctx->f80 && (D_800E6868 & 0xC7) == 0xC2) {
         ctx->f80 = 0;
-        func_0021034C(cur, 2.0f, 2.0f, 2.0f);
+        CMtxF__ScaleAxes(cur, 2.0f, 2.0f, 2.0f);
     } else if (ctx->f84 && (D_800E6868 & 0xC7) == 0xC6) {
         ctx->f84 = 0;
-        func_0021034C(cur, 2.0f, 2.0f, 2.0f);
+        CMtxF__ScaleAxes(cur, 2.0f, 2.0f, 2.0f);
     } else if (ctx->f74 && (D_800E6868 & 3) == 1) {
         ctx->f74 = 0;
-        func_0021034C(cur, 3.0f, 3.0f, 3.0f);
+        CMtxF__ScaleAxes(cur, 3.0f, 3.0f, 3.0f);
     }
 
     if (ctx->f88) {
-        func_0020FF80(D_800E67C0, cur);
-        func_0021034C(D_800E67C0, 0.5f, 0.5f, 0.5f);
+        CMtxF__Copy(D_800E67C0, cur);
+        CMtxF__ScaleAxes(D_800E67C0, 0.5f, 0.5f, 0.5f);
         packMtx(ctx->out + bone * 16, D_800E67C0);
     } else {
         packMtx(ctx->out + bone * 16, cur);
     }
 
-    children = func_002017D4(node, 0);
+    children = CISet__GetBlock(node, 0);
     count = children->count;
     D_800E67B0 = children;
     items = children->items;
     for (i = 0; i < count; i++) {
-        func_0021B95C(obj, ctx, items[i], cur);
+        CGameObjectInstance__PoseBone(obj, ctx, items[i], cur);
     }
 }

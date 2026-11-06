@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-void func_00416644(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
+void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
 extern char D_0043BED0[];
 extern char D_0043BEF4[];
@@ -12,7 +12,7 @@ extern s32 D_800C2020;
 extern s32 D_80130940;
 extern s32 D_80130990;
 
-s32 func_00423880(s32 unused, Menu *event) {
+s32 DamagedPakMenu_SelectContinue(s32 unused, Menu *event) {
     char *dst;
 
     D_800C2020 = 1;
@@ -28,7 +28,7 @@ s32 func_00423880(s32 unused, Menu *event) {
         if (event->text == D_0043BEF4 || event->text == D_0043BED0) {
             D_80130940 = 0;
         }
-        func_00416644(dst, event->text, event->player, event->controller, 0);
+        MenuPool_OpenMenu(dst, event->text, event->player, event->controller, 0);
     }
     return 1;
 }

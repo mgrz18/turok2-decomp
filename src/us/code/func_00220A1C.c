@@ -19,12 +19,12 @@ typedef struct FloorGrid {
 
 extern s32 D_800B6D54;
 
-void *func_002017D4(void *table, s32 index);
-s32 func_0026BB9C(Floor *floor, f32 x, f32 z);      /* point over floor */
-f32 func_0026BE60(Floor *floor, f32 x, f32 z);      /* floor height at */
+void *CISet__GetBlock(void *table, s32 index);
+s32 CGameRegion__ContainsXZ(Floor *floor, f32 x, f32 z);      /* point over floor */
+f32 CGameRegion__GetHeight(Floor *floor, f32 x, f32 z);      /* floor height at */
 
 /* The floor under pos whose height is closest to it, or NULL. */
-Floor *func_00220A1C(CWorld *world, f32 *pos) {
+Floor *CScene__FindRegionAt(CWorld *world, f32 *pos) {
     Floor *floors;
     Floor *floor;
     Floor *best;
@@ -41,12 +41,12 @@ Floor *func_00220A1C(CWorld *world, f32 *pos) {
     if (D_800B6D54 == 0) {
         return NULL;
     }
-    floors = (Floor *)((u8 *)func_002017D4(world->m_pRegionData, 2) + 8);
+    floors = (Floor *)((u8 *)CISet__GetBlock(world->m_pRegionData, 2) + 8);
     k = 0;
     i = 0;
     bestDist = 0.0f;
     best = NULL;
-    grid = func_002017D4(world->m_pRegionData, 3);
+    grid = CISet__GetBlock(world->m_pRegionData, 3);
     cellCount = grid->count;
     cells = grid->cells;
     for (; i < cellCount; i++) {
@@ -56,8 +56,8 @@ Floor *func_00220A1C(CWorld *world, f32 *pos) {
             if (cell->count != 0) {
                 floor = (Floor *)(k * sizeof(Floor) + (u32)floors);
                 do {
-                    if (func_0026BB9C(floor, pos[0], pos[2])) {
-                        d = pos[1] - func_0026BE60(floor, pos[0], pos[2]);
+                    if (CGameRegion__ContainsXZ(floor, pos[0], pos[2])) {
+                        d = pos[1] - CGameRegion__GetHeight(floor, pos[0], pos[2]);
                         if (d < 0.0f) {
                             d = -d;
                         }

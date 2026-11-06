@@ -7,7 +7,7 @@ extern float D_800A8174;
 extern float D_800A8178;
 extern s16 D_800F2940[];
 extern float D_800A8170;
-void func_00273A94(s32 *arg0, s32 arg1) {
+void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
     s32 i;
     s32 idx;
     f32 t;

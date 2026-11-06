@@ -3,7 +3,7 @@
 #include "structs/region.h"
 
 /* The highest y of the triangle's three vertices. */
-f32 func_0026D028(CGameRegion *arg0) {
+f32 CGameRegion__GetMaxHeight(CGameRegion *arg0) {
     f32 temp_f0;
     f32 var_f0;
     f32 var_f1;

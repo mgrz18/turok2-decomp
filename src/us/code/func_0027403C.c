@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_0027314C(s32);
+s32 SndVoice_Update(s32);
 
 extern s32 D_800B2A5C;
 extern s32 D_800B2A60;
@@ -17,7 +17,7 @@ typedef struct {
     /* 0x102 */ s16 skipIndex;
 } Owner0027403C;
 
-void func_0027403C(void **arg0) {
+void SndVoicePool_Update(void **arg0) {
     s32 var_s0;
     s32 var_s2;
     void *var_s1;
@@ -27,7 +27,7 @@ void func_0027403C(void **arg0) {
     var_s0 = 0;
     do {
         if ((((Slot0027403C *)var_s1)->id != -1) && (((Owner0027403C *)*arg0)->skipIndex != var_s0)) {
-            func_0027314C((s32) var_s1);
+            SndVoice_Update((s32) var_s1);
             var_s2 += 1;
         }
         var_s0 += 1;

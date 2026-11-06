@@ -23,9 +23,9 @@ struct RecordRecAt20V2 {
 struct RecordRecAt20V2;
 struct PakMenuSlot;
 extern s32 D_800C2028;
-extern s32 func_0045A8C8(struct RecordRecAt20V2 *record, s32 *out);
+extern s32 PakMenu_GetPlayerAndPort_2(struct RecordRecAt20V2 *record, s32 *out);
 extern s32 D_80130990;
-s32 func_0045A8C8(struct RecordRecAt20V2 *record, s32 *out) {
+s32 PakMenu_GetPlayerAndPort_2(struct RecordRecAt20V2 *record, s32 *out) {
     s32 value;
     s32 result;
     if (D_80130990 != 0) {

@@ -8,7 +8,7 @@ typedef struct {
     /* 0x10 */ f32 radiusSq;
 } Cylinder;
 
-s32 func_0023CEC0(Cylinder *arg0, CVector3 *arg1) {
+s32 Cylinder_ContainsPoint(Cylinder *arg0, CVector3 *arg1) {
     f32 temp_f0;
     f32 temp_f1;
     s32 var_v0;

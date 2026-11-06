@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
 
-/* Advance an actor's animation (func_0021A7EC) and move it by the root motion
+/* Advance an actor's animation (CGameObjectInstance__AdvanceAnimation) and move it by the root motion
  * that produced: the new position is taken back out, turned by the actor's
- * rotation, collided along (func_0021A658), then the animation is applied. */
+ * rotation, collided along (CGameObjectInstance__MoveWithCollision), then the animation is applied. */
 
 typedef struct Actor Actor;
 
@@ -29,18 +29,18 @@ struct Actor {
 extern u8 D_800A5AC4[];     /* "anim object info" */
 extern s32 D_800F7078;
 
-s32 *func_0020367C(s32, s32, s32, s32, s32, s32, s32, s32);
-void *func_002017D4(s32, s32);
-void func_002051F4(s32, s32 *);
-void func_0020C0D0(void *, void *, void *);
-void func_0020EEF8(CVector3 *, CVector3 *, void *);
-void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
+s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
+void *CISet__GetBlock(s32, s32);
+void CCache__Unlock(s32, s32 *);
+void CMtxF__TransformBox(void *, void *, void *);
+void CVector3__Add(CVector3 *, CVector3 *, void *);
+void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
 void func_0021A500(Actor *);
-void func_0021A658(Actor *, CVector3 *);
-void func_0021A7EC(Actor *);
-void func_002233A8(s32 *, Actor *, CVector3 *, CVector3 *);
+void CGameObjectInstance__MoveWithCollision(Actor *, CVector3 *);
+void CGameObjectInstance__AdvanceAnimation(Actor *);
+void CScene__CheckAutoActivation(s32 *, Actor *, CVector3 *, CVector3 *);
 
-void func_0021A344(Actor *actor) {
+void CGameObjectInstance__UpdateAnimation(Actor *actor) {
     CVector3 oldPos;
     CVector3 newPos;
     s32 *set;
@@ -57,24 +57,24 @@ void func_0021A344(Actor *actor) {
     if (*game != 4 || (flags & 0x2000)) {
         moving = flags & 0x300000;
         oldPos = actor->pos;
-        func_0021A7EC(actor);
+        CGameObjectInstance__AdvanceAnimation(actor);
         newPos = actor->pos;
         actor->pos = oldPos;
         if (!moving && *actor->region != 0) {
-            func_0020EF2C(&newPos, &newPos, &oldPos);
-            func_0020EEF8(&newPos, &newPos, actor->unk194);
-            func_0021A658(actor, &newPos);
+            CVector3__Subtract(&newPos, &newPos, &oldPos);
+            CVector3__Add(&newPos, &newPos, actor->unk194);
+            CGameObjectInstance__MoveWithCollision(actor, &newPos);
             if (*actor->region == 1) {
-                func_002233A8(game, actor, &oldPos, &actor->pos);
+                CScene__CheckAutoActivation(game, actor, &oldPos, &actor->pos);
             }
         }
         func_0021A500(actor);
-        set = func_0020367C(0, actor->unkA4, actor->unkB0, 0, 0, 0, (s32) D_800A5AC4, 1);
+        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, (s32) D_800A5AC4, 1);
         if (set != NULL) {
-            data = func_002017D4(*set, 0);
+            data = CISet__GetBlock(*set, 0);
             actor->init(actor, actor->ai);
-            func_0020C0D0(actor->unk58, data, actor->unkBC);
-            func_002051F4(0, set);
+            CMtxF__TransformBox(actor->unk58, data, actor->unkBC);
+            CCache__Unlock(0, set);
         }
     }
 }

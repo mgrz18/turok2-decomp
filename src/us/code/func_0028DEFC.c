@@ -6,7 +6,7 @@
 extern void func_0028EEC0(int arg0);
 extern char D_80132000;
 extern EntryRecAt3 D_80121318[];
-void func_0028DEFC(Mapping *mapping) {
+void VM_UnmapTLBEntry(Mapping *mapping) {
     extern void func_0028EE40(s32, s32, s32, s32, s32, s32);
     s32 slot;
     if (mapping->slot == 0xFF) {

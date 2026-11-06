@@ -8,8 +8,8 @@
 #include "structs/controller.h"
 #include "structs/list.h"
 
-extern int func_00285628(ControllerProfile *object);
-extern int func_00285670(ControllerProfile *object);
+extern int Controller_MenuLeft(ControllerProfile *object);
+extern int Controller_MenuRight(ControllerProfile *object);
 struct Clip;
 struct Clip {
     s16 mode;
@@ -38,17 +38,17 @@ struct PoolRecAt28V1 {
 };
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
-s32 func_002855E8(char *);
+s32 Controller_ConfirmPressed(char *);
 extern u32 D_8011AAE0[];
-s32 func_00454CC4(void) {
- if(((s32 (*)(char *))func_00285628)((char *)&D_800F5C78)) {
+s32 OptionsMenu_CycleDifficulty_2(void) {
+ if(((s32 (*)(char *))Controller_MenuLeft)((char *)&D_800F5C78)) {
  switch(D_8011AAE0[0]) {
  case 8: D_8011AAE0[0]=32; break;
  case 16: D_8011AAE0[0]=8; break;
  case 32: D_8011AAE0[0]=16; break;
  }
  }
- if(((s32 (*)(char *))func_00285670)((char *)&D_800F5C78) || func_002855E8((char *)&D_800F5C78)) {
+ if(((s32 (*)(char *))Controller_MenuRight)((char *)&D_800F5C78) || Controller_ConfirmPressed((char *)&D_800F5C78)) {
  switch(D_8011AAE0[0]) {
  case 8: D_8011AAE0[0]=16; break;
  case 16: D_8011AAE0[0]=32; break;

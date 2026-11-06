@@ -1,10 +1,10 @@
-/* Item availability test (also inlined into func_00424780). The two row tests jump out to their bodies (gotos), which gives the ROM bnez/bnel + j layout. */
+/* Item availability test (also inlined into InventoryMenu_DrawItem). The two row tests jump out to their bodies (gotos), which gives the ROM bnez/bnel + j layout. */
 #include "common.h"
 #include "structs/menu.h"
 
-s32 func_00253748(u8 *player, s32 type);
+s32 CPlayer__GetPickupCountHigh(u8 *player, s32 type);
 
-s32 func_00424978(MenuItem *item, Menu *event) {
+s32 InventoryMenu_HasItem(MenuItem *item, Menu *event) {
     s32 type = item->def->param;
     s32 index = item->def->index;
     u8 *player = event->player;
@@ -12,7 +12,7 @@ s32 func_00424978(MenuItem *item, Menu *event) {
 
     switch (type) {
         default:
-            result = index < func_00253748(player, type);
+            result = index < CPlayer__GetPickupCountHigh(player, type);
             break;
         case 0x10FE:
             if (index >= 0) {

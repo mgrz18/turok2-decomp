@@ -1,6 +1,6 @@
 /* Boundary fixed in versions/cuts.us.txt: splat starts func_0028A018 two stray words early (`lwc1 $f0, 0x6F98($at)`,
  * `addu $a0, $s3, $zero`, never executed); the function really starts at 0x0028A020,
- * the thread entry func_0028ADF0 passes as &D_0028A020. Written whole as func_0028A020. */
+ * the thread entry osCreateScheduler passes as &D_0028A020. Written whole as __scMain. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028E910.c, func_0028E910, with Turok 2's layouts. */
 
 #include "common.h"
@@ -24,19 +24,19 @@ extern s32 D_800B6E5C;  /* retraces left before blanking */
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
-extern void func_0029A580(s32 black);   /* osViBlack */
-extern void func_0028A17C(Sched *sc);
-extern void func_0042454C(void);
-extern void func_0028A43C(Sched *sc);
-extern void func_0028A914(Sched *sc);
-extern void func_00275A08(void);
-extern void func_00275904(s32);
-extern s32 func_00275F7C(void);
-extern void func_00275EFC(s32);
-extern void func_0028B2AC(Sched *sc);
+extern void osViBlack(s32 black);   /* osViBlack */
+extern void __scHandleRetrace(Sched *sc);
+extern void Video_UpdateResolution(void);
+extern void __scHandleRSP(Sched *sc);
+extern void __scHandleRDP(Sched *sc);
+extern void Music_FadeOut(void);
+extern void Sound__StopAllExcept(s32);
+extern s32 LoopSounds_Get(void);
+extern void LoopSounds_StopAll(s32);
+extern void Sched_HandleCmdMsg(Sched *sc);
 
 /* Scheduler thread: serves retrace, RSP/RDP done, pre-NMI and fault messages forever. */
-void func_0028A020(Sched *sc) {
+void __scMain(Sched *sc) {
     s32 msg;
     Client *client;
 
@@ -47,24 +47,24 @@ void func_0028A020(Sched *sc) {
                 if (D_800B6E58 != 0) {
                     D_800B6E5C = D_800B6E5C - 1;
                     if (D_800B6E5C <= 0) {
-                        func_0029A580(1);
+                        osViBlack(1);
                         while (1) {
                         }
                     }
                 }
-                func_0028A17C(sc);
-                func_0042454C();
+                __scHandleRetrace(sc);
+                Video_UpdateResolution();
                 break;
             case 0x29B:
-                func_0028A43C(sc);
+                __scHandleRSP(sc);
                 break;
             case 0x29C:
-                func_0028A914(sc);
+                __scHandleRDP(sc);
                 break;
             case 0x29D:
-                func_00275A08();
-                func_00275904(-1);
-                func_00275EFC(func_00275F7C());
+                Music_FadeOut();
+                Sound__StopAllExcept(-1);
+                LoopSounds_StopAll(LoopSounds_Get());
                 client = sc->clients;
                 D_800B6E58 = 1;
                 D_800B6E5C = 20;
@@ -74,7 +74,7 @@ void func_0028A020(Sched *sc) {
                 }
                 break;
             case 6:
-                func_0028B2AC(sc);
+                Sched_HandleCmdMsg(sc);
                 break;
         }
     }

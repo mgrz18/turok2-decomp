@@ -4,7 +4,7 @@
 
 extern f32 D_800B6D28;
 
-void func_00254704(CPlayer *arg0) {
+void CPlayer__TickFlashlight(CPlayer *arg0) {
     f32 temp_f0;
     f32 temp_f1;
 

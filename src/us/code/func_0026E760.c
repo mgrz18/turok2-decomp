@@ -1,6 +1,6 @@
 /* Boundary fixed in versions/cuts.us.txt: splat starts this function at 0x26E758 with two stray words
- * (`sw $v0,0x10($s0); j .L0023587C`); the real function is func_0026E760
- * (func_002851C0 calls it there). */
+ * (`sw $v0,0x10($s0); j .L0023587C`); the real function is Rumble_GetLevelAt
+ * (Controller_UpdateRumble calls it there). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER/8028469C_17.CPP, func_802856E0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
@@ -26,10 +26,10 @@ typedef struct {
 
 extern s32 __osDisableInt(void);         /* disable interrupts */
 extern void __osRestoreInt(s32 mask);    /* restore interrupts */
-extern s32 func_0027BC34(void);
+extern s32 Demo_GetPlayerCount(void);
 extern s32 Cinema_PathPlaying(void);
 extern f32 func_00298470(f32);          /* sqrtf */
-extern f32 func_0026EF30(void *curve);
+extern f32 RumbleCurve_GetValue(void *curve);
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -40,7 +40,7 @@ static __inline__ f32 distance(Emitter *e, CVector3 a) {
 }
 
 /* Summed gain of a list's emitters heard from a point, clamped to [0, 1]. */
-f32 func_0026E760(EmitterList *list, CVector3 pos) {
+f32 Rumble_GetLevelAt(EmitterList *list, CVector3 pos) {
     Emitter *e;
     s32 mask;
     f32 total;
@@ -50,7 +50,7 @@ f32 func_0026E760(EmitterList *list, CVector3 pos) {
 
     total = list->base;
     mask = __osDisableInt();
-    if (func_0027BC34() || Cinema_PathPlaying()) {
+    if (Demo_GetPlayerCount() || Cinema_PathPlaying()) {
         total = 0.0f;
     } else {
         for (e = list->emitters; e != NULL; e = e->next) {
@@ -64,8 +64,8 @@ f32 func_0026E760(EmitterList *list, CVector3 pos) {
                 }
             }
             falloff *= e->gain;
-            a = func_0026EF30(e->curveA);
-            total += falloff * a * func_0026EF30(e->curveB);
+            a = RumbleCurve_GetValue(e->curveA);
+            total += falloff * a * RumbleCurve_GetValue(e->curveB);
         }
     }
     __osRestoreInt(mask);

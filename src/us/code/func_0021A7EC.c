@@ -54,23 +54,23 @@ typedef struct {
 extern s32 D_800F7078;          /* the world's mode */
 extern f32 D_800B6D28;          /* the frame's time step */
 
-void **func_0020367C(s32, s32, s32, s32, s32, s32, char *, s32);
-void func_002051F4(s32, void **);
-void func_00218B10(AnimTrack *track, s32 data, s32 key, s32 primary, s32 *active, AnimTrack *other);
-s32 func_00219968(AnimTrack *track);
-AnimBlendEntry *func_00219994(AnimTrack *track);
-void func_00219938(AnimTrack *track);
-void func_00218DCC(AnimTrack *track, CVector3 *delta, f32 *turn, AnimActor *actor);
-void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
-f32 func_00210DB4(f32 t, f32 a, f32 b);
-void func_00210EF0(f32 *angle);
-void func_002105A4(MatrixF *m, f32 angle);
-void func_0020F85C(MatrixF *m, CVector3 *in, CVector3 *out);
+void **CCache__Request(s32, s32, s32, s32, s32, s32, char *, s32);
+void CCache__Unlock(s32, void **);
+void CAnimationState__SwitchToQueued(AnimTrack *track, s32 data, s32 key, s32 primary, s32 *active, AnimTrack *other);
+s32 CAnimationState__IsLoaded(AnimTrack *track);
+AnimBlendEntry *CAnimationState__GetKeyHeader(AnimTrack *track);
+void CAnimationState__Release(AnimTrack *track);
+void CAnimationState__GetRootMotion(AnimTrack *track, CVector3 *delta, f32 *turn, AnimActor *actor);
+void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
+f32 Angle_Lerp(f32 t, f32 a, f32 b);
+void Angle_Wrap(f32 *angle);
+void CMtxF__SetRotateY(MatrixF *m, f32 angle);
+void CMtxF__TransformPoint(MatrixF *m, CVector3 *in, CVector3 *out);
 
 /* Advances an actor's animation and applies its root motion: the turn and,
  * with flag 0x20000, the move, blended over the transition from the previous
  * track while flag 0x400 is set. */
-void func_0021A7EC(AnimActor *actor) {
+void CGameObjectInstance__AdvanceAnimation(AnimActor *actor) {
     CVector3 first;
     CVector3 second;
     CVector3 saved;
@@ -99,7 +99,7 @@ void func_0021A7EC(AnimActor *actor) {
         }
     }
 
-    resource = func_0020367C(0, actor->animationKey, ((actor->animationCount * 4) + 0xF) & ~7, 4, 0, 0,
+    resource = CCache__Request(0, actor->animationKey, ((actor->animationCount * 4) + 0xF) & ~7, 4, 0, 0,
                              "animations index", 0);
     if (resource == NULL) {
         return;
@@ -107,15 +107,15 @@ void func_0021A7EC(AnimActor *actor) {
 
     track0 = &actor->currentTrack;
     track1 = &actor->previousTrack;
-    func_00218B10(track0, (s32) *resource, actor->animationKey, 1, &active, track1);
-    if (func_00219968(track0) != 0) {
+    CAnimationState__SwitchToQueued(track0, (s32) *resource, actor->animationKey, 1, &active, track1);
+    if (CAnimationState__IsLoaded(track0) != 0) {
         AnimBlendEntry *entry;
 
-        func_00218DCC(track0, &first, &first_value, actor);
+        CAnimationState__GetRootMotion(track0, &first, &first_value, actor);
         value = first_value;
         saved = first;
         if (active != 0 && track1->current != -1) {
-            entry = func_00219994(track0);
+            entry = CAnimationState__GetKeyHeader(track0);
             if (entry->frames != 0 && (actor->flags & 0x200)) {
                 u16 count;
 
@@ -130,8 +130,8 @@ void func_0021A7EC(AnimActor *actor) {
             }
         }
         if (actor->flags & 0x400) {
-            func_00218B10(track1, (s32) *resource, actor->animationKey, 0, 0, 0);
-            if (func_00219968(track1) != 0) {
+            CAnimationState__SwitchToQueued(track1, (s32) *resource, actor->animationKey, 0, 0, 0);
+            if (CAnimationState__IsLoaded(track1) != 0) {
                 f32 time;
                 f32 end;
 
@@ -146,29 +146,29 @@ void func_0021A7EC(AnimActor *actor) {
                     f32 t = time / (end + D_800B6D28);
 
                     actor->blend = ((a + -2.0f + b) * t * t * t) + (((3.0f - a) - (2.0f * b)) * t * t) + (b * t);
-                    func_00218DCC(&actor->previousTrack, &second, &second_value, actor);
-                    func_0020EF8C(&saved, actor->blend, &second, &first);
-                    value = func_00210DB4(actor->blend, second_value, first_value);
+                    CAnimationState__GetRootMotion(&actor->previousTrack, &second, &second_value, actor);
+                    CVector3__Lerp(&saved, actor->blend, &second, &first);
+                    value = Angle_Lerp(actor->blend, second_value, first_value);
                 }
-                func_00219938(track1);
+                CAnimationState__Release(track1);
             } else {
                 actor->flags &= ~0x400;
             }
         }
-        func_00219938(track0);
+        CAnimationState__Release(track0);
         if (actor->flags & 0x20000) {
             actor->heading -= value;
-            func_00210EF0(&actor->heading);
+            Angle_Wrap(&actor->heading);
             saved.z = saved.y;
             saved.y = 0.0f;
-            func_002105A4(&matrix, actor->heading);
-            func_0020F85C(&matrix, &saved, &moved);
+            CMtxF__SetRotateY(&matrix, actor->heading);
+            CMtxF__TransformPoint(&matrix, &saved, &moved);
             actor->position.x += moved.x * actor->scaleX;
             actor->position.z += moved.z * actor->scaleZ;
         } else if (!(actor->flags & 0x300000) && actor->type == 0x137) {
             actor->heading -= value;
-            func_00210EF0(&actor->heading);
+            Angle_Wrap(&actor->heading);
         }
     }
-    func_002051F4(0, resource);
+    CCache__Unlock(0, resource);
 }

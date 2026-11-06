@@ -4,10 +4,10 @@
 
 extern BlindOnePhase D_0043240C[];
 extern BlindOneStep D_00432340[]; /* the script */
-extern void func_0040EC14(BlindOneState *m, s32 cmd);
+extern void BlindOne_EnterPhase(BlindOneState *m, s32 cmd);
 
-void func_0040EBE4(BlindOneState *m, CGameObjectInstance *leader) {
+void BlindOne_StartScript(BlindOneState *m, CGameObjectInstance *leader) {
     m->boss = leader;
     m->script = D_00432340;
-    func_0040EC14(m, D_00432340[0].id);
+    BlindOne_EnterPhase(m, D_00432340[0].id);
 }

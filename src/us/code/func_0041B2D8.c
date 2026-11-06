@@ -3,7 +3,7 @@
 
 extern s32 D_8011AAD8;
 
-s32 func_0041B2D8(void) {
+s32 CheatMenu_ToggleAllWeapons(void) {
     D_8011AAD8 ^= 4;
     return 0;
 }

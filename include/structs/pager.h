@@ -4,8 +4,8 @@
 /* The resource pager, D_801206A0 (Rage Wars' src/SCHED/8023A284_*.CPP):
  * code and data regions that live on the cartridge are mapped at virtual
  * pages through 24 TLB slots. A TLB miss in a thread is caught
- * (func_0028E068), the faulting page is read in by the manager thread
- * (func_0028E7A4) through the reader thread (func_0028E8A4) into the least
+ * (VM_HandleTLBMiss), the faulting page is read in by the manager thread
+ * (VM_ManagerThread) through the reader thread (VM_ReaderThread) into the least
  * recently used slot, and the thread is resumed. The slots are kept in a
  * use-ordered list (chain): its head (also the symbol D_80121290) is the least
  * recently used, its tail (D_80121294) the last. tools/check_structs.py checks the
@@ -70,9 +70,9 @@ typedef struct Pager {
     /* 0x022 */ u8 _pad22[2];
     /* 0x024 */ OSMesgQueue completion; /* D_801206C4 */
     /* 0x03C */ OSMesg completionMsgs[0x21];
-    /* 0x0C0 */ u8 thread[0x230];       /* the manager thread (func_0028E7A4) */
+    /* 0x0C0 */ u8 thread[0x230];       /* the manager thread (VM_ManagerThread) */
     /* 0x2F0 */ u8 stack[0x200];        /* its stack */
-    /* 0x4F0 */ u8 readerThread[0x230]; /* the reader thread (func_0028E8A4) */
+    /* 0x4F0 */ u8 readerThread[0x230]; /* the reader thread (VM_ReaderThread) */
     /* 0x720 */ u8 readerStack[0x200];  /* D_80120DC0 is its top */
     /* 0x920 */ PageMapping slots[24];
     /* 0xAA0 */ OSMesgQueue jobs;

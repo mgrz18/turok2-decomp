@@ -24,49 +24,49 @@ extern u8 D_800F8928[];
 extern u8 D_80107590[];
 extern u8 D_8010ABA0[];
 
-extern f32 func_0026BE60(s32 region, f32 x, f32 z);
-extern s32 *func_00225E88(void *level, s32 model);
-extern s32 func_002241C0(void *level, s32 id);
-extern s32 func_00262C20(s32 id);
-extern CPooledLevelActor *func_00227240(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
-extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
+extern f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
+extern s32 *CScene__GetIntelligence(void *level, s32 model);
+extern s32 CScene__GetObjectTypeID(void *level, s32 id);
+extern s32 Generator_IsPickupUnlocked(s32 id);
+extern CPooledLevelActor *CLevelActorPool__Spawn(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
-extern s32 func_0022F350(void *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
+extern s32 CParticleSystem__Spawn(void *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
                          CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
-extern void func_00246690(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
-extern void *func_002532A8(void *players);
-extern s32 func_00253C14(void *player, s32 id);
-extern s32 func_00253CF0(void *player, s32 id);
-extern s16 func_0026D518(Pick *table);
-extern void func_0026D5DC(PickTable *t);
-extern s32 func_0026D5E4(PickTable *t, s16 id, s16 weight);
-extern s16 func_0026D628(PickTable *t);
+extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
+extern void *CPlayerPool__GetFirstActive(void *players);
+extern s32 CPlayer__HasRoomForAmmo(void *player, s32 id);
+extern s32 CPlayer__IsBelowFullHealth(void *player, s32 id);
+extern s16 WeightedTable_PickStatic(Pick *table);
+extern void WeightedTable_Clear(PickTable *t);
+extern s32 WeightedTable_Add(PickTable *t, s16 id, s16 weight);
+extern s16 WeightedTable_Pick(PickTable *t);
 
 /* Spawns pool pickup id at pos. */
 static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
     CPooledLevelActor *pickup;
 
-    pickup = func_00227240(D_80107590, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);
+    pickup = CLevelActorPool__Spawn(D_80107590, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);
     if (pickup != NULL) {
         ai->m_Generator.m_nRemaining--;
-        func_00246690(pickup, 0x11D, pickup->m_Actor.header.m_vPos, 0);
+        Actor_SpawnParticle(pickup, 0x11D, pickup->m_Actor.header.m_vPos, 0);
     }
 }
 
 /* Spawns the object model (an intelligence entry) at pos. */
 static __inline__ void spawnObject(CGameObjectInstance *actor, CAI *ai, CVector3 pos, CVector3 scale, s32 region, s32 type, s32 *model) {
-    if (func_00228108(D_8010ABA0, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_Generator.m_nActive)) {
+    if (CInstancePool__Spawn(D_8010ABA0, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_Generator.m_nActive)) {
         ai->m_Generator.m_nRemaining--;
     }
 }
 
 /* Spawns the effect at pos. */
 static __inline__ void spawnEffect(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 type) {
-    ai->m_Generator.m_nRemaining -= func_0022F350(D_800F8928, actor, actor, &ai->m_Generator.m_nActive, 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
+    ai->m_Generator.m_nRemaining -= CParticleSystem__Spawn(D_800F8928, actor, actor, &ai->m_Generator.m_nActive, 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
                                -1, 0);
 }
 
-void func_00262D74(CGameObjectInstance *actor, CAI *ai) {
+void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
     CVector3 pos;
     CVector3 scale;
     PickTable picks;
@@ -88,18 +88,18 @@ void func_00262D74(CGameObjectInstance *actor, CAI *ai) {
     pos = actor->header.m_vPos;
     region = actor->header.m_pCurrentRegion;
     if (region != 0) {
-        ground = func_0026BE60(region, actor->header.m_vPos.x, actor->header.m_vPos.z);
+        ground = CGameRegion__GetHeight(region, actor->header.m_vPos.x, actor->header.m_vPos.z);
         if (pos.y < ground) {
             pos.y = ground;
         }
     }
     switch (info->m_Type) {
     case 0:
-        model = func_00225E88(D_800F7078, info->m_VariationIndex);
+        model = CScene__GetIntelligence(D_800F7078, info->m_VariationIndex);
         switch (*model) {
         case 8:
-            id = func_002241C0(D_800F7078, info->m_ObjectIndex);
-            if (func_00262C20(id)) {
+            id = CScene__GetObjectTypeID(D_800F7078, info->m_ObjectIndex);
+            if (Generator_IsPickupUnlocked(id)) {
                 spawnPickup(actor, ai, pos, region, id);
             }
             break;
@@ -129,66 +129,66 @@ void func_00262D74(CGameObjectInstance *actor, CAI *ai) {
         flags = &D_8011AAD8;
         if (flags->multiplayer) {
             if (info->m_dwFlags & 0x20) {
-                weapon = func_0026D518(D_800B1F38);
+                weapon = WeightedTable_PickStatic(D_800B1F38);
             }
             if (info->m_dwFlags & 0x40) {
-                ammo = func_0026D518(D_800B1F78);
+                ammo = WeightedTable_PickStatic(D_800B1F78);
             }
             if (info->m_dwFlags & 0x80) {
-                func_0026D5DC(&unlocked);
+                WeightedTable_Clear(&unlocked);
                 for (e = D_800B1FE4; e->id != -1; e++) {
                     pickId = e->id;
-                    if (func_00262C20((s16)pickId)) {
-                        func_0026D5E4(&unlocked, e->id, e->weight);
+                    if (Generator_IsPickupUnlocked((s16)pickId)) {
+                        WeightedTable_Add(&unlocked, e->id, e->weight);
                     }
                 }
-                item = func_0026D628(&unlocked);
+                item = WeightedTable_Pick(&unlocked);
             }
         } else {
-            player = func_002532A8((u8 *)flags - 0x1268); /* the player list, D_80119870 */
+            player = CPlayerPool__GetFirstActive((u8 *)flags - 0x1268); /* the player list, D_80119870 */
             if (player == NULL) {
                 break;
             }
             if (info->m_dwFlags & 0x20) {
-                func_0026D5DC(&picks);
+                WeightedTable_Clear(&picks);
                 for (e = D_800B1EE0; e->id != -1; e++) {
                     pickId = e->id;
-                    if (func_00253C14(player, (s16)pickId)) {
-                        func_0026D5E4(&picks, e->id, e->weight);
+                    if (CPlayer__HasRoomForAmmo(player, (s16)pickId)) {
+                        WeightedTable_Add(&picks, e->id, e->weight);
                     }
                 }
-                weapon = func_0026D628(&picks);
+                weapon = WeightedTable_Pick(&picks);
             }
             if (info->m_dwFlags & 0x40) {
-                func_0026D5DC(&picks);
+                WeightedTable_Clear(&picks);
                 e = D_800B1F5C;
                 if (D_8011001C) {
                     e = D_800B1F6C;
                 }
                 for (; e->id != -1; e++) {
                     pickId = e->id;
-                    if (func_00253CF0(player, (s16)pickId)) {
-                        func_0026D5E4(&picks, e->id, e->weight);
+                    if (CPlayer__IsBelowFullHealth(player, (s16)pickId)) {
+                        WeightedTable_Add(&picks, e->id, e->weight);
                     }
                 }
-                ammo = func_0026D628(&picks);
+                ammo = WeightedTable_Pick(&picks);
             }
             if (info->m_dwFlags & 0x80) {
-                item = func_0026D518(D_800B1F88);
+                item = WeightedTable_PickStatic(D_800B1F88);
             }
         }
-        func_0026D5DC(&picks);
+        WeightedTable_Clear(&picks);
         if (weapon != -1) {
-            func_0026D5E4(&picks, weapon, 100);
+            WeightedTable_Add(&picks, weapon, 100);
         }
         if (ammo != -1) {
-            func_0026D5E4(&picks, ammo, 100);
+            WeightedTable_Add(&picks, ammo, 100);
         }
         if (item != -1) {
-            func_0026D5E4(&picks, item, 100);
+            WeightedTable_Add(&picks, item, 100);
         }
         if (picks.count != 0) {
-            spawnPickup(actor, ai, pos, region, func_0026D628(&picks));
+            spawnPickup(actor, ai, pos, region, WeightedTable_Pick(&picks));
         }
         break;
     }

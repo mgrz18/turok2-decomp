@@ -6,7 +6,7 @@ extern char D_800B45D8[];
 extern char D_800B45D4[];
 s32 func_00426CAC(char *s);
 s32 func_00426C74(char *a, char *b);
-s32 func_0045A180(char *a, char *b) {
+s32 Pak_IsTurok2Note_2(char *a, char *b) {
     if (func_00426CAC(b) == 4 && func_00426CAC(a) == 2 && func_00426C74(b, D_800B45D8) == 0 && func_00426C74(a, D_800B45D4) == 0) {
         return 1;
     }

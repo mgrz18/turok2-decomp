@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_0045AA70(s32 arg0);
+extern s32 PakMenu_FindNextPakPort_2(s32 arg0);
 extern void func_004263A0(s32);
 void func_004263A0(s32);
 s32 func_0042647C(s32);
-s32 func_0045AA70(s32 arg0) {
+s32 PakMenu_FindNextPakPort_2(s32 arg0) {
     s32 var_s0;
     s32 var_s1;
     s32 unavailable;

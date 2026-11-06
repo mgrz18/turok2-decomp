@@ -4,15 +4,15 @@
 #include "rw/abu_types.h"
 
 extern int __osDpDeviceBusy();
-extern u32 func_0029BF80(void *arg0);
-s32 func_00298D50(void *bufPtr, u64 size) {
+extern u32 osVirtualToPhysical(void *arg0);
+s32 osDpSetNextBuffer(void *bufPtr, u64 size) {
     if (__osDpDeviceBusy()) {
         return -1;
     }
     ((*(volatile u32 *)(0xA410000CU)) = (u32)(1));
     do {
     } while ((*(volatile u32 *)(0xA410000CU)) & 1);
-    ((*(volatile u32 *)(0xA4100000U)) = (u32)(func_0029BF80(bufPtr)));
-    ((*(volatile u32 *)(0xA4100004U)) = (u32)(func_0029BF80(bufPtr) + size));
+    ((*(volatile u32 *)(0xA4100000U)) = (u32)(osVirtualToPhysical(bufPtr)));
+    ((*(volatile u32 *)(0xA4100004U)) = (u32)(osVirtualToPhysical(bufPtr) + size));
     return 0;
 }

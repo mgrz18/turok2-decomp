@@ -18,7 +18,7 @@ extern u8 D_800B3EA0[];
 extern s32 D_8011AC88;
 extern u8 D_800B3E70[];
 extern u32 D_8011AAE0[];
-s32 func_00454DBC(MenuItemRecAt14 *item) {
+s32 OptionsMenu_DifficultyText_2(MenuItemRecAt14 *item) {
     if (D_8011AC88 == 8) {
         item->flags |= 0x01000000;
     } else {

@@ -3,7 +3,7 @@
 
 typedef struct { s16 *base; s16 *p; } S;
 
-s16 func_00246594(S *arg0) {
+s16 AI_NextInCycle(S *arg0) {
     s16 v = *arg0->p++;
 
     if (*arg0->p == -1) {

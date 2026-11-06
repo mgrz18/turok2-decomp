@@ -7,7 +7,7 @@ typedef struct {
 } Counter;
 
 /* How far arg1 is below the counter, or 1000 when it is past it. */
-s32 func_002927E8(Counter *arg0, s32 arg1) {
+s32 __vsDelta(Counter *arg0, s32 arg1) {
     s32 v = arg0->unk24 - arg1;
     if (v >= 0) {
         return v;

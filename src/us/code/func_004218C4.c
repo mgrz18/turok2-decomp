@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_0028591C(s32);
-extern void func_00284CE0();
+extern s32 Controller_PakChanged(s32);
+extern void Controller_UpdatePakInsertion();
 extern s32 D_8011F148;
 extern s32 D_8011F13C;
 extern s32 D_801309BC;
@@ -12,12 +12,12 @@ extern s32 D_8011B108;
 extern s32 D_8011F144;
 extern s32 D_800C2028;
 extern s32 D_800F6CB0;
-extern void func_002886AC(void *arg0);
-s32 func_004218C4(s32 arg0) {
-    extern s32 func_0041DD90(s32, s32, s32);
+extern void CEngineApp__UpdateControllers(void *arg0);
+s32 PakMenu_PollBootPak(s32 arg0) {
+    extern s32 PakMenu_CheckPak(s32, s32, s32);
     if (D_8011B108 == 0) {
-        func_002886AC(&D_800F6CB0);
-        func_00284CE0();
+        CEngineApp__UpdateControllers(&D_800F6CB0);
+        Controller_UpdatePakInsertion();
         if (D_8011B108 == 0) {
             if (D_8011F144 != 0) {
                 D_8011F148 = 1;
@@ -27,7 +27,7 @@ s32 func_004218C4(s32 arg0) {
         }
     }
     if (D_801309BC == 0) {
-        if ((D_800C2028 != -1) && (func_0028591C(D_800C2028) != 0) && (func_0041DD90(arg0, D_800C2028, 0) != 0)) {
+        if ((D_800C2028 != -1) && (Controller_PakChanged(D_800C2028) != 0) && (PakMenu_CheckPak(arg0, D_800C2028, 0) != 0)) {
             D_8011F13C = 0;
             D_801309BC = 1;
         }

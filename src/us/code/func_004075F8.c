@@ -6,7 +6,7 @@ extern f32 D_800C0524;
 extern f32 D_800C0528;
 extern s32 D_8012F9DC;
 
-void func_004075F8(void *arg0)
+void Primagen_EnterMode18(void *arg0)
 {
   f32 new_var;
   *((f32 *) (((s8 *) arg0) + 0x1FC)) = (f32) D_800C051C;

@@ -6,7 +6,7 @@
 extern s32 D_801309C0;
 extern char D_800B4B9C[];
 extern char D_800B4BA4[];
-s32 func_0045B784(MenuItem *item) {
+s32 PakMessage_UpdateHeading_2(MenuItem *item) {
     switch (D_801309C0) {
     default:
     case 0:

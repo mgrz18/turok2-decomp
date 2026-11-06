@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002111E8(void *arg0, f32 t, void *a, void *b);
-void func_002111E8(void *arg0, f32 t, void *a, void *b) {
+extern void CQuaternion__Lerp(void *arg0, f32 t, void *a, void *b);
+void CQuaternion__Lerp(void *arg0, f32 t, void *a, void *b) {
     Vector4f *out = arg0;
     Vector4f *left = a;
     Vector4f *right = b;

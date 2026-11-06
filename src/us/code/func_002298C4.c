@@ -1,23 +1,23 @@
 #include "common.h"
 #include "structs/vector.h"
 
-extern s32 func_00275F7C(void);
-extern void *func_00275C6C(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
-extern void func_00275D34(s32 bank, void *handle);                                  /* stops a sound */
-extern void func_00232B40(void *obj);
+extern s32 LoopSounds_Get(void);
+extern void *LoopSounds_Start(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
+extern void LoopSounds_Stop(s32 bank, void *handle);                                  /* stops a sound */
+extern void CParticle__StopLoopSound(void *obj);
 
-extern f32 func_0026D210(s32 half);                         /* half float -> f32 */
+extern f32 HalfToFloat(s32 half);                         /* half float -> f32 */
 extern f32 func_00298470(f32);                              /* sqrtf */
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
-extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
-extern void func_0020F040(CVector3 *v);                        /* normalize */
-extern void func_0020E810(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
-extern void func_00211074(CQuaternion *q);                        /* normalize */
-extern void func_0020DCC8(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b); /* slerp */
-extern void func_00211114(CQuaternion *q, CMtxF m);               /* to matrix */
-extern void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);  /* transform */
-extern void func_00229618(void *obj, f32 scale);
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
+extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
+extern void CVector3__Normalize(CVector3 *v);                        /* normalize */
+extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
+extern void CQuaternion__Normalize(CQuaternion *q);                        /* normalize */
+extern void CQuaternion__SlerpFast(CQuaternion *out, f32 t, CQuaternion *a, CQuaternion *b); /* slerp */
+extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF m);               /* to matrix */
+extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);  /* transform */
+extern void CParticle__Wobble(void *obj, f32 scale);
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x10];
@@ -60,7 +60,7 @@ typedef struct {
     /* 0x1B8 */ SoundHandle *loop;
 } Missile;
 
-/* Same as func_00231EF8: accelerate along dir, clamp to the max speed. */
+/* Same as CParticle__Accelerate: accelerate along dir, clamp to the max speed. */
 static __inline__ void Missile_Accelerate(Missile *obj) {
     CVector3 delta;
     CVector3 dir;
@@ -69,21 +69,21 @@ static __inline__ void Missile_Accelerate(Missile *obj) {
     f32 speed;
     f32 maxSpeed;
 
-    accel = func_0026D210(obj->parent->move->accel);
+    accel = HalfToFloat(obj->parent->move->accel);
     if (accel != 0.0f) {
         dir = obj->dir;
-        func_0020EF60(&delta, &dir, accel);
+        CVector3__Scale(&delta, &dir, accel);
         vel = &obj->vel;
-        func_0020EEF8(vel, vel, &delta);
+        CVector3__Add(vel, vel, &delta);
         speed = func_00298470(obj->vel.x * obj->vel.x + obj->vel.y * obj->vel.y + obj->vel.z * obj->vel.z);
-        maxSpeed = func_0026D210(obj->parent->move->maxSpeed);
+        maxSpeed = HalfToFloat(obj->parent->move->maxSpeed);
         if (accel > 0.0f) {
             if (maxSpeed < speed) {
-                func_0020EF60(vel, &dir, maxSpeed);
+                CVector3__Scale(vel, &dir, maxSpeed);
             }
         } else {
             if (speed < maxSpeed) {
-                func_0020EF60(vel, &dir, maxSpeed);
+                CVector3__Scale(vel, &dir, maxSpeed);
             }
         }
     }
@@ -91,7 +91,7 @@ static __inline__ void Missile_Accelerate(Missile *obj) {
 
 /* A homing missile: keeps its flight sound 0x1B2 playing, turns toward its
  * target (aiming above it when far), then accelerates. */
-void func_002298C4(Missile *obj) {
+void CParticle__UpdateHomingMissile(Missile *obj) {
     CVector3 targetPos;
     CVector3 toTarget;
     CVector3 forward;
@@ -109,7 +109,7 @@ void func_002298C4(Missile *obj) {
 
     if (obj->flags & 0x10000) {
         if (obj->loop != NULL) {
-            func_00275D34(func_00275F7C(), obj->loop);
+            LoopSounds_Stop(LoopSounds_Get(), obj->loop);
             obj->loop = NULL;
         }
         return;
@@ -120,35 +120,35 @@ void func_002298C4(Missile *obj) {
         if (loop->sound == sound && loop->state != -1) {
             goto playing;
         }
-        func_00232B40(obj);
+        CParticle__StopLoopSound(obj);
     }
-    obj->loop = func_00275C6C(func_00275F7C(), 0x1B2, &obj->pos, &obj->pos, -1);
+    obj->loop = LoopSounds_Start(LoopSounds_Get(), 0x1B2, &obj->pos, &obj->pos, -1);
 playing:
 
     target = obj->target;
     if (target != NULL && obj->speed > 7.0f) {
-        func_0020E810(&cur, &obj->dir);
+        CQuaternion__FromDirection(&cur, &obj->dir);
         speed = func_00298470(obj->vel.x * obj->vel.x + obj->vel.y * obj->vel.y + obj->vel.z * obj->vel.z);
         targetPos = target->pos;
-        func_0020EF2C(&toTarget, &targetPos, &obj->pos);
+        CVector3__Subtract(&toTarget, &targetPos, &obj->pos);
         dist = func_00298470(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
         if (dist < 102.399994f) {
-            func_0020E810(&rot, &toTarget);
-            func_00211114(&rot, mtx);
+            CQuaternion__FromDirection(&rot, &toTarget);
+            CQuaternion__ToMatrix(&rot, mtx);
             forward.x = 0.0f;
             forward.y = 0.0f;
             forward.z = 1.0f;
-            func_0020F85C(mtx, &forward, &obj->dir);
-            func_0020EF60(&obj->vel, &obj->dir, speed);
+            CMtxF__TransformPoint(mtx, &forward, &obj->dir);
+            CVector3__Scale(&obj->vel, &obj->dir, speed);
             return;
         }
         if (dist > 153.59999f) {
             targetPos.y += 102.399994f;
-            func_0020EF2C(&toTarget, &targetPos, &obj->pos);
+            CVector3__Subtract(&toTarget, &targetPos, &obj->pos);
             dist = func_00298470(toTarget.x * toTarget.x + toTarget.y * toTarget.y + toTarget.z * toTarget.z);
         }
-        func_0020F040(&toTarget);
-        func_0020E810(&want, &toTarget);
+        CVector3__Normalize(&toTarget);
+        CQuaternion__FromDirection(&want, &toTarget);
         if (dist < 1024.0f) {
             far = dist - 204.79999f;
             if (far < 0.0f) {
@@ -160,16 +160,16 @@ playing:
         } else {
             t = 0.04f;
         }
-        func_00211074(&want);
-        func_00211074(&cur);
-        func_0020DCC8(&rot, t, &cur, &want);
-        func_00211114(&rot, mtx);
+        CQuaternion__Normalize(&want);
+        CQuaternion__Normalize(&cur);
+        CQuaternion__SlerpFast(&rot, t, &cur, &want);
+        CQuaternion__ToMatrix(&rot, mtx);
         forward.x = 0.0f;
         forward.y = 0.0f;
         forward.z = 1.0f;
-        func_0020F85C(mtx, &forward, &obj->dir);
-        func_0020EF60(&obj->vel, &obj->dir, speed);
+        CMtxF__TransformPoint(mtx, &forward, &obj->dir);
+        CVector3__Scale(&obj->vel, &obj->dir, speed);
     }
     Missile_Accelerate(obj);
-    func_00229618(obj, 1.0f);
+    CParticle__Wobble(obj, 1.0f);
 }

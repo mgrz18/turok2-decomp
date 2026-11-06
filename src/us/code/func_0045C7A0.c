@@ -1,9 +1,9 @@
-/* Second-module copy of func_00423880 (first module; this one at link address 0x004237A0), calling this module's own functions at their link addresses. */
+/* Second-module copy of DamagedPakMenu_SelectContinue (first module; this one at link address 0x004237A0), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 
-void func_00416644(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
+void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
 extern char D_0043BDF0[];
 extern char D_0043BE14[];
@@ -13,7 +13,7 @@ extern s32 D_800C2020;
 extern s32 D_80130940;
 extern s32 D_80130990;
 
-s32 func_0045C7A0(s32 unused, Menu *event) {
+s32 DamagedPakMenu_SelectContinue_2(s32 unused, Menu *event) {
     char *dst;
 
     D_800C2020 = 1;
@@ -29,7 +29,7 @@ s32 func_0045C7A0(s32 unused, Menu *event) {
         if (event->text == D_0043BE14 || event->text == D_0043BDF0) {
             D_80130940 = 0;
         }
-        func_00416644(dst, event->text, event->player, event->controller, 0);
+        MenuPool_OpenMenu(dst, event->text, event->player, event->controller, 0);
     }
     return 1;
 }

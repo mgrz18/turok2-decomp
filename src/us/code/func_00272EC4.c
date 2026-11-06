@@ -6,10 +6,10 @@
 extern f32 D_800B2848[];                    /* pitch ratio every 60 cents from -6000 */
 #define PITCH_TABLE (D_800B2848 + 1)
 
-extern void func_00272D3C(SndVoice *s);
-extern f32 func_0026D210(s32 halfFloat);
-extern void func_00293E60(void *player, s32 id);    /* alSndpSetSound */
-extern void func_00293DE0(void *player, f32 pitch); /* alSndpSetPitch */
+extern void SndVoice_UpdateDoppler(SndVoice *s);
+extern f32 HalfToFloat(s32 halfFloat);
+extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
+extern void alSndpSetPitch(void *player, f32 pitch); /* alSndpSetPitch */
 
 static __inline__ f32 centsToPitch(f32 x) {
     f32 pos = (x + 6000.0f) * 0.016666668f;
@@ -29,11 +29,11 @@ static __inline__ f32 centsToPitch(f32 x) {
 static __inline__ void setPitch(SndVoice *s, f32 pitch) {
     SndMgr *bank = s->mgr;
 
-    func_00293E60(&bank->player, bank->handles[s->index]);
-    func_00293DE0(&bank->player, pitch * s->vp.doppler * s->pitchScale);
+    alSndpSetSound(&bank->player, bank->handles[s->index]);
+    alSndpSetPitch(&bank->player, pitch * s->vp.doppler * s->pitchScale);
 }
 
-void func_00272EC4(SndVoice *s) {
+void SndVoice_UpdatePitch(SndVoice *s) {
     SndVoiceParams *params;
     SndEnv *target;
     SndMgr *bank;
@@ -46,7 +46,7 @@ void func_00272EC4(SndVoice *s) {
     target = &s->env;
     bank = s->mgr;
     if ((s->flags & 0x400) && !(bank->frame & 3)) {
-        func_00272D3C(s);
+        SndVoice_UpdateDoppler(s);
         update = 1;
     }
     if ((s->flags & 0xA) == 0xA) {
@@ -57,15 +57,15 @@ void func_00272EC4(SndVoice *s) {
             if (s->envStep < 0.0f) {
                 down = 1;
             }
-            if (down ? s->envValue < func_0026D210(target->target) : func_0026D210(target->target) < s->envValue) {
+            if (down ? s->envValue < HalfToFloat(target->target) : HalfToFloat(target->target) < s->envValue) {
                 s->envValue -= s->envStep;
                 if (down) {
-                    if (func_0026D210(target->target) < s->envValue) {
-                        s->envValue = func_0026D210(target->target);
+                    if (HalfToFloat(target->target) < s->envValue) {
+                        s->envValue = HalfToFloat(target->target);
                     }
                 } else {
-                    if (s->envValue < func_0026D210(target->target)) {
-                        s->envValue = func_0026D210(target->target);
+                    if (s->envValue < HalfToFloat(target->target)) {
+                        s->envValue = HalfToFloat(target->target);
                     }
                 }
                 pitch = centsToPitch(s->envValue);

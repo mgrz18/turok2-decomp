@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-u8 func_00299E48(u8 *data)
+u8 __osContDataCrc(u8 *data)
 {
     u8 temp = 0;
     u8 temp2;

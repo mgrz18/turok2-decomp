@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_002602F8(CGameObjectInstance *arg0, CAI *arg1) {
+s32 EnemyAI_HasComboEndAnim(CGameObjectInstance *arg0, CAI *arg1) {
     CEnemyIntelligence *temp_a0;
 
     temp_a0 = &(arg0->header.m_pIntelligence)->m_Enemy;

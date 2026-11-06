@@ -4,13 +4,13 @@
 #include "structs/world.h"
 
 
-s32 func_00267090(s32);
+s32 GameObject_IsSolid(s32);
 s32 func_002681BC(s32);
 
-s32 func_0021EBC0(s32);                         /* extern */
+s32 CGameObjectInstance__ClearDrawMatrices(s32);                         /* extern */
 
 /* Files a new actor into every actor list of the world it belongs to. */
-void func_002255CC(CWorld *arg0, CGameObjectInstance *arg1) {
+void CScene__FileInstance(CWorld *arg0, CGameObjectInstance *arg1) {
     s32 temp_a0;
     s32 temp_a0_2;
     s32 temp_a0_3;
@@ -21,8 +21,8 @@ void func_002255CC(CWorld *arg0, CGameObjectInstance *arg1) {
     s32 temp_v1_4;
     s32 temp_v1_5;
 
-    func_0021EBC0((s32) arg1);
-    if (func_00267090((s32) arg1) != 0) {
+    CGameObjectInstance__ClearDrawMatrices((s32) arg1);
+    if (GameObject_IsSolid((s32) arg1) != 0) {
         temp_v1 = arg0->m_nDrawActors;
         if (temp_v1 != 0x200) {
             arg0->m_pDrawActors[temp_v1] = (CGameObjectInstance *)arg1;

@@ -6,9 +6,9 @@
  * D_8010FF14, D_8010FF18 entries). Each running emitter is drawn as a
  * translucent fan over the camera's view corners (CCamera.m_vTCorners) at
  * its height, which follows the camera, the floor or the water surface
- * (func_00282E4C updates them, func_00282340 draws one, func_00283238 sorts
+ * (CEmitterPool__Advance updates them, CEmitter__Draw draws one, CEmitterPool__Draw sorts
  * them around the camera's height). A camera keeps four of them in its
- * CEmitterPool (CCamera.m_SkySystem, built by func_0042FFF0).
+ * CEmitterPool (CCamera.m_SkySystem, built by CEmitterPool__Construct).
  * Rage Wars has the same code (src/SCHED/8023A284_*.CPP) with unnamed types.
  * tools/check_structs.py checks every offset below with the game's compiler. */
 

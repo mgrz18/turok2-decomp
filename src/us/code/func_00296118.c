@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_00296118(void *filter, s32 paramID, void *param)
+s32 alEnvmixerParam(void *filter, s32 paramID, void *param)
 {
     ALFilter *f = (ALFilter *)filter;
     ALEnvMixer *e = (ALEnvMixer *)filter;

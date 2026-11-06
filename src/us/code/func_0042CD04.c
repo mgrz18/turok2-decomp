@@ -23,12 +23,12 @@ typedef struct LevelState {
     /* 0x68 */ s32 *groups;
 } LevelState;
 
-extern s32 func_00200B00(s32 ***handle, s32);
-extern void *func_002017D4(void *table, s32 index);
-extern void func_00210EF0(void *);
+extern s32 ProPackDecompress(s32 ***handle, s32);
+extern void *CISet__GetBlock(void *table, s32 index);
+extern void Angle_Wrap(void *);
 
 /* Resolves the references of every item of every group of the loaded resource and keeps it in the level. */
-void func_0042CD04(LevelState *level, s32 ***handle) {
+void CScene__DecompressPaths(LevelState *level, s32 ***handle) {
     s32 *groups;
     s32 ngroups;
     s32 i;
@@ -39,22 +39,22 @@ void func_0042CD04(LevelState *level, s32 ***handle) {
     ListItem *item;
     Entry *entries;
 
-    if (func_00200B00(handle, 0) != 0) {
+    if (ProPackDecompress(handle, 0) != 0) {
         groups = **handle;
         ngroups = groups[0];
         for (i = 0; i < ngroups; i++) {
-            list = func_002017D4(func_002017D4(groups, i), 1);
+            list = CISet__GetBlock(CISet__GetBlock(groups, i), 1);
             count = list->count;
             item = list->items;
             for (j = 0; j < count; j++) {
                 ref = item->ref;
                 if (ref != -1) {
-                    entries = (Entry *)((u8 *)func_002017D4(level->table, 2) + 8);
+                    entries = (Entry *)((u8 *)CISet__GetBlock(level->table, 2) + 8);
                     item->ref = (s32)&entries[ref];
                 } else {
                     item->ref = 0;
                 }
-                func_00210EF0(item->data);
+                Angle_Wrap(item->data);
                 item++;
             }
         }

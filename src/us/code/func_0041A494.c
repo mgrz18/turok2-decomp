@@ -5,7 +5,7 @@
 #include "structs/game.h"
 
 extern f32 D_800B6D28;
-s32 func_0041A494(void) {
+s32 GameOverMenu_TickCountdown(void) {
     GameMatch *state = &D_8011ACB0;
     f32 timer = state->countdown - D_800B6D28;
     state->countdown = timer;

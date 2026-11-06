@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002759C4(s32 a);
+extern void Music_SetTrack(s32 a);
 extern s32 D_800C1F78;
-s32 func_0041A028(s32 arg0, struct RecordRecAt20V1 *arg1) {
+s32 SoundMenu_StepMusicTrack(s32 arg0, struct RecordRecAt20V1 *arg1) {
     s32 var_a0;
     var_a0 = D_800C1F78;
     if (arg1->inner->unkB0 & 0x20202) {
@@ -25,6 +25,6 @@ s32 func_0041A028(s32 arg0, struct RecordRecAt20V1 *arg1) {
         }
     }
     D_800C1F78 = var_a0;
-    func_002759C4(var_a0);
+    Music_SetTrack(var_a0);
     return 0;
 }

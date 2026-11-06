@@ -1,21 +1,21 @@
 #include "common.h"
 
-s32 func_00220530(s32);                         /* extern */
-s32 func_0027ADA8(s32);                         /* extern */
+s32 CScene__Update(s32);                         /* extern */
+s32 COnScreen__DrawBossBars(s32);                         /* extern */
 s32 func_00281354(s32);                         /* extern */
-s32 func_00288B1C(s32);                         /* extern */
-s32 func_004001D0(s32);                         /* extern */
-s32 func_00401C1C(s32);                             /* extern */
+s32 CEngineApp__DrawFade(s32);                         /* extern */
+s32 Automap_Update(s32);                         /* extern */
+s32 Automap_IsShown(s32);                             /* extern */
 
-void func_00288F60(s32 arg0) {
+void CEngineApp__DrawWorld(s32 arg0) {
     s32 temp_s0;
 
     temp_s0 = arg0 + 0x23DF0;
-    func_004001D0(temp_s0);
-    func_00220530(arg0 + 0x3C8);
+    Automap_Update(temp_s0);
+    CScene__Update(arg0 + 0x3C8);
     func_00281354(arg0 + 0x22C00);
-    func_0027ADA8(arg0 + 0x19440);
-    if (func_00401C1C(temp_s0) == 0) {
-        func_00288B1C(arg0);
+    COnScreen__DrawBossBars(arg0 + 0x19440);
+    if (Automap_IsShown(temp_s0) == 0) {
+        CEngineApp__DrawFade(arg0);
     }
 }

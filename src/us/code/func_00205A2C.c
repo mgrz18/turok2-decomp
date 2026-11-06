@@ -12,8 +12,8 @@ extern s32 D_800D81E0;
 extern s32 D_800D8DF0;
 extern s32 D_800D81C0;
 extern s32 D_800D81C4;
-extern void func_00200818(void *, s32);
-void func_00205A2C(s32 arg0, s32 arg1) {
+extern void CList__MoveToHead(void *, s32);
+void CCache__Touch(s32 arg0, s32 arg1) {
     extern s32 osSendMesg(OSMesgQueue *, s32, s32);
     extern OSMesgQueue D_800D8DB0;
     s32 temp_v1;
@@ -61,7 +61,7 @@ found:
     if (value != 0) {
         void *object = *(void **)value;
         ((CachedResource *)object)->stamp = D_800D8DF0;
-        func_00200818(&D_800D81E0, object);
+        CList__MoveToHead(&D_800D81E0, object);
     }
     temp_v0 = __osDisableInt();
     temp_v1_2 = D_800D8DCC - 1;

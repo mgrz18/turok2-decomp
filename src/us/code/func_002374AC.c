@@ -40,16 +40,16 @@ typedef struct PushTarget {
 
 extern s32 D_8011001C;
 
-void func_0020E810(CQuaternion *out, CVector3 *dir);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020F79C(CMtxF *m);
-void func_0020FAFC(CMtxF *m, CVector3 *in, CVector3 *out);
-void func_002105A4(CMtxF *m, f32 angle);
-void func_00211114(CQuaternion *q, CMtxF *m);
+void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CMtxF__Identity(CMtxF *m);
+void CMtxF__RotateVector(CMtxF *m, CVector3 *in, CVector3 *out);
+void CMtxF__SetRotateY(CMtxF *m, f32 angle);
+void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *m);
 
 /* The blast's push from `src` turned into a world vector, in the frame of `target`. */
-void func_002374AC(PushSource *src, PushTarget *target, Blast blast, CVector3 *out, u32 flags) {
+void Blast_GetPush(PushSource *src, PushTarget *target, Blast blast, CVector3 *out, u32 flags) {
     CVector3 v;
     CVector3 dir;
     CQuaternion q;
@@ -65,7 +65,7 @@ void func_002374AC(PushSource *src, PushTarget *target, Blast blast, CVector3 *o
     v.x = blast.x;
     v.y = blast.y;
     v.z = blast.z;
-    func_0020EF60(&v, &v, blast.strength * 0.80629915f);
+    CVector3__Scale(&v, &v, blast.strength * 0.80629915f);
     switch (target->kind) {
     case 1:
         if (target->playerFlags & 0x2000) {
@@ -73,7 +73,7 @@ void func_002374AC(PushSource *src, PushTarget *target, Blast blast, CVector3 *o
             v.z = 0.0f;
             v.y = 133.12f;
         }
-        func_002105A4(&m, target->angle + 3.1415927f);
+        CMtxF__SetRotateY(&m, target->angle + 3.1415927f);
         break;
     case 2:
         obj = target;
@@ -95,7 +95,7 @@ void func_002374AC(PushSource *src, PushTarget *target, Blast blast, CVector3 *o
             break;
         default:
             if (flags & 0x400000) {
-                func_0020EF2C(&dir, &src->pos, &obj->pos);
+                CVector3__Subtract(&dir, &src->pos, &obj->pos);
                 dir.y = 7.68f;
             } else {
                 dir.x = 0.0f;
@@ -104,17 +104,17 @@ void func_002374AC(PushSource *src, PushTarget *target, Blast blast, CVector3 *o
             }
             break;
         }
-        func_0020E810(&q, &dir);
-        func_00211114(&q, &m);
+        CQuaternion__FromDirection(&q, &dir);
+        CQuaternion__ToMatrix(&q, &m);
         break;
     default:
-        func_0020F79C(&m);
+        CMtxF__Identity(&m);
         break;
     }
     if (src->flags & 0x300000) {
         if (src->owner->reduced != 0) {
-            func_0020EF60(&v, &v, 0.1f);
+            CVector3__Scale(&v, &v, 0.1f);
         }
     }
-    func_0020FAFC(&m, &v, out);
+    CMtxF__RotateVector(&m, &v, out);
 }

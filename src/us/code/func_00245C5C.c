@@ -4,15 +4,15 @@
 typedef unsigned char u8;
 typedef signed int s32;
 typedef float f32;
-f32 func_00244E84(void *, s32, s32, s32, void *, f32);
-void func_00246440(void *, f32);
+f32 AI_FindClearHeading(void *, s32, s32, s32, void *, f32);
+void Actor_TurnBy(void *, f32);
 extern f32 D_800A696C;
 extern f32 D_800B6D28;
 typedef struct { u8 pad0[4]; s32 x, y, z; } B04Tg; /* Turok 2: pos at 0x4 */
-void func_00245C5C(void *o, s32 a1, B04Tg *t, f32 lim) {
+void AI_TurnTowardTarget(void *o, s32 a1, B04Tg *t, f32 lim) {
     f32 r, v, a;
     if (t != ((void *)0)) {
-        r = func_00244E84(o, t->x, t->y, t->z, t, D_800A696C);
+        r = AI_FindClearHeading(o, t->x, t->y, t->z, t, D_800A696C);
         v = r;
         if (lim < r) r = lim;
         else if (r < -lim) r = -lim;
@@ -25,6 +25,6 @@ void func_00245C5C(void *o, s32 a1, B04Tg *t, f32 lim) {
 blk:
             r = v;
         }
-        func_00246440(o, r);
+        Actor_TurnBy(o, r);
     }
 }

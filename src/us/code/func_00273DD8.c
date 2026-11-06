@@ -3,12 +3,12 @@
 
  /* size 0xCC */
 
-s32 func_00293EC0(s32);
+s32 alSndpStop(s32);
 
-s32 func_00293580(void *);                          /* extern */
-s32 func_00293E60(void *, s16);                 /* extern */
+s32 alSndpGetState(void *);                          /* extern */
+s32 alSndpSetSound(void *, s16);                 /* extern */
 
-void func_00273DD8(s32 arg0, s16 arg1) {
+void SndVoicePool_StopVoice(s32 arg0, s16 arg1) {
     SndMgr *temp_a0;
     SndVoice *var_s0;
     void *var_s1;
@@ -21,9 +21,9 @@ void func_00273DD8(s32 arg0, s16 arg1) {
     var_s0->vp.follow = 0;
     var_s1 = &temp_a0->player;
     if (var_s0->vp.frame != temp_a0->frame) {
-        func_00293E60(var_s1, temp_a0->handles[var_s0->index]);
-        if (func_00293580(var_s1) != 0) {
-            func_00293EC0((s32) var_s1);
+        alSndpSetSound(var_s1, temp_a0->handles[var_s0->index]);
+        if (alSndpGetState(var_s1) != 0) {
+            alSndpStop((s32) var_s1);
         }
         var_s0->sound = -1;
     }

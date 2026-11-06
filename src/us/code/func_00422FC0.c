@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-void func_00285A68(s32 port);
+void Controller_WatchPak(s32 port);
 
 extern s32 D_800C2020;
 extern s32 D_800C2028;
@@ -12,13 +12,13 @@ extern s32 D_80130998;
 extern s32 D_801309AC;
 extern s32 D_801309B4;
 
-/* Takes the port by address: the ROM keeps it in a stack slot (as func_0041DC5C does with its kind). */
+/* Takes the port by address: the ROM keeps it in a stack slot (as PakMenu_GetReturnMenu does with its kind). */
 static __inline__ void SelectPort(s32 *port) {
     D_800C2020 = 0;
-    func_00285A68(*port);
+    Controller_WatchPak(*port);
 }
 
-void func_00422FC0(Menu *event) {
+void SavePortalMenu_InitB(Menu *event) {
     s32 port;
 
     D_801309AC = 0;

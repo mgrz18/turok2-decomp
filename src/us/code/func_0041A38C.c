@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_004156FC(s32, s32);
+s32 Menu_Draw(s32, s32);
 
-void func_0041A38C(s32 arg0, s32 arg1) {
-    func_004156FC(arg0, arg1);
+void PauseMenu_Update(s32 arg0, s32 arg1) {
+    Menu_Draw(arg0, arg1);
 }

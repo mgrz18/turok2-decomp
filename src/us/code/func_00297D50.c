@@ -1,18 +1,18 @@
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 /* From decompals/ultralib (libultra): src/gu/ortho.c, guOrtho with guOrthoF
- * inlined (guOrthoF itself is func_00297E8C). */
+ * inlined (guOrthoF itself is guOrthoF). */
 
 typedef float Matrix[4][4];
 typedef struct { long m[4][4]; } Mtx;
 
-void func_00297BCC(float mf[4][4]);          /* guMtxIdentF */
-void func_00297C1C(float mf[4][4], Mtx *m);  /* guMtxF2L */
+void guMtxIdentF(float mf[4][4]);          /* guMtxIdentF */
+void guMtxF2L(float mf[4][4], Mtx *m);  /* guMtxF2L */
 
 static __inline__ void guOrthoF(float mf[4][4], float l, float r, float b, float t,
                                 float n, float f, float scale) {
     int i, j;
 
-    func_00297BCC(mf);
+    guMtxIdentF(mf);
 
     mf[0][0] = 2 / (r - l);
     mf[1][1] = 2 / (t - b);
@@ -27,11 +27,11 @@ static __inline__ void guOrthoF(float mf[4][4], float l, float r, float b, float
             mf[i][j] *= scale;
 }
 
-void func_00297D50(Mtx *m, float l, float r, float b, float t,
+void guOrtho(Mtx *m, float l, float r, float b, float t,
                    float n, float f, float scale) {
     Matrix mf;
 
     guOrthoF(mf, l, r, b, t, n, f, scale);
 
-    func_00297C1C(mf, m);
+    guMtxF2L(mf, m);
 }

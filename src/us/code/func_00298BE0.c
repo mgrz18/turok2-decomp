@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_00298BE0(u8 cmd) {
+void __osPackRequestData(u8 cmd) {
     extern OSPifRam D_801213E0;
     extern u8 D_801213DC;
     u8 *ptr;

@@ -21,11 +21,11 @@ extern CWorld D_800F7078;
 extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
 extern CVector3 D_800F2020;        /* cached raw normal */
 
-extern void *func_002017D4(void *file, s32 index); /* a block of a file */
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
-extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
+extern void *CISet__GetBlock(void *file, s32 index); /* a block of a file */
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
+extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
-/* func_0026BB9C, inlined: is (x, z) inside the XZ projection of the triangle? */
+/* CGameRegion__ContainsXZ, inlined: is (x, z) inside the XZ projection of the triangle? */
 static __inline__ s32 InTriangle(CGameRegion *tri, f32 x, f32 z) {
     s32 i, next;
     CVector3 *a, *b;
@@ -48,12 +48,12 @@ static __inline__ void cross_edges(CVector3 *out, CGameRegion *tri) {
     CVector3 edge0;
     CVector3 edge1;
 
-    func_0020EF2C(&edge0, tri->m_pVertices[1], tri->m_pVertices[0]);
-    func_0020EF2C(&edge1, tri->m_pVertices[2], tri->m_pVertices[1]);
-    func_0020EFDC(out, &edge0, &edge1);
+    CVector3__Subtract(&edge0, tri->m_pVertices[1], tri->m_pVertices[0]);
+    CVector3__Subtract(&edge1, tri->m_pVertices[2], tri->m_pVertices[1]);
+    CVector3__Cross(out, &edge0, &edge1);
 }
 
-/* func_0026BE60, inlined: height of a triangle's plane at (x, z). */
+/* CGameRegion__GetHeight, inlined: height of a triangle's plane at (x, z). */
 static __inline__ f32 TriHeight(CGameRegion *tri, f32 x, f32 z) {
     CVector3 normal;
     CVector3 point;
@@ -74,7 +74,7 @@ static __inline__ f32 TriHeight(CGameRegion *tri, f32 x, f32 z) {
 }
 
 /* The level triangle nearest below pos (other than skip), NULL if none. */
-CGameRegion *func_0026B4A4(CGameRegion *skip, CVector3 pos) {
+CGameRegion *CGameRegion__FindBelow(CGameRegion *skip, CVector3 pos) {
     CWorld *world;
     CGameRegion *tris;
     TriGroupList *list;
@@ -94,8 +94,8 @@ CGameRegion *func_0026B4A4(CGameRegion *skip, CVector3 pos) {
         return NULL;
     }
     world = &D_800F7078;
-    tris = (CGameRegion *) ((u8 *) func_002017D4(world->m_pRegionData, 2) + 8);
-    list = func_002017D4(world->m_pRegionData, 3);
+    tris = (CGameRegion *) ((u8 *) CISet__GetBlock(world->m_pRegionData, 2) + 8);
+    list = CISet__GetBlock(world->m_pRegionData, 3);
     n = list->count;
     groups = list->groups;
     best = NULL;

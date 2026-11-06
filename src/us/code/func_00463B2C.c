@@ -1,6 +1,6 @@
-/* Second VM module copy of func_0042AC0C (same source, linked 0xE0 lower): its own callees are named by their link
+/* Second VM module copy of CScene__LoadLevel (same source, linked 0xE0 lower): its own callees are named by their link
  * addresses (func_0042B304/func_0042B5D0/func_0042B960/func_0042CC24 are the callbacks the asm calls D_0042B304,
- * D_0042B5D0, .L0042B960 and func_0042CBE4 + 0x40). */
+ * D_0042B5D0, .L0042B960 and CScene__DecompressIntelligence + 0x40). */
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
@@ -27,32 +27,32 @@ extern u8 D_801102B8[];
 extern u8 *D_80119890; /* player list */
 extern u8 D_8011AAF1;  /* multiplayer */
 
-extern s32 func_00200AE0(s32, s32);
+extern s32 ProPack__Decompress(s32, s32);
 extern void CCollisionInfo__Reset(void);
-extern s32 func_00201848(s32 *levelCount, s32 file, s32 index);
-extern void func_00201C08(void *);
-extern void **func_00204EDC(s32 unused, s32 size, s32 mode, char *name);
-extern void func_002052D8(s32 unused, void **block);
-extern void func_002053A8(s32);
-extern void **func_00205B94(s32 unused, void **out, s32 key, char *name);
-extern void **func_00205D0C(s32 unused, void *file, s32 index, s32 key, CWorld *owner, void *callback, char *name);
-extern void func_00206068(s32);
-extern void func_0021A344(u8 *actor);
+extern s32 CISet__GetROMAddress(s32 *levelCount, s32 file, s32 index);
+extern void CDecompressor__Flush(void *);
+extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
+extern void CCache__Deallocate(s32 unused, void **block);
+extern void CCache__Flush(s32);
+extern void **CCache__LoadPersistantIndex(s32 unused, void **out, s32 key, char *name);
+extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CWorld *owner, void *callback, char *name);
+extern void CCache__SetFrameDelay(s32);
+extern void CGameObjectInstance__UpdateAnimation(u8 *actor);
 extern void func_0021E5D4(u8 *actor);
 extern void func_0021F1B4(u8 *actor);
-extern void func_0022629C(CWorld *w, s32 level, void *out, s32 mask);
-extern void func_00226390(CWorld *w);
-extern void func_00226724(CWorld *w);
-extern void *func_002532A8(void *players);
-extern void func_002758DC(s32);
-extern void func_00275B58(void);
-extern void func_00275BE8(void *, void *, s32);
-extern void func_00275EFC(s32);
-extern s32 func_00275F7C(void);
-extern s32 func_0027BC34(void);
-extern void func_0027ECF0(void *);
-extern s32 func_00284174(void);
-extern void func_00412B28(s32 sound);
+extern void CScene__GetLevelName(CWorld *w, s32 level, void *out, s32 mask);
+extern void CScene__ClearListCounts(CWorld *w);
+extern void CScene__ReleaseSectors(CWorld *w);
+extern void *CPlayerPool__GetFirstActive(void *players);
+extern void Sound__StopFlags(s32);
+extern void Sound__DetachAll(void);
+extern void LoopSounds_Construct(void *, void *, s32);
+extern void LoopSounds_StopAll(s32);
+extern s32 LoopSounds_Get(void);
+extern s32 Demo_GetPlayerCount(void);
+extern void CCameraPool__Advance(void *);
+extern s32 Cinema_IsActive(void);
+extern void Cinema_RequestOnce(s32 sound);
 extern void func_00429E40(void *heap, void *data, s32 size);
 extern void func_0042A9A0(CWorld *w);
 extern s32 func_0042B304(s32, s32);
@@ -73,7 +73,7 @@ extern void func_0042EA24(void *);
 extern void func_0042EADC(void *);
 extern void func_0042FE0C(void *);
 
-void func_00463B2C(CWorld *w, s32 level, s32 announce) {
+void CScene__LoadLevel_2(CWorld *w, s32 level, s32 announce) {
     void **block;
     u8 *data;
     u8 *player;
@@ -89,7 +89,7 @@ void func_00463B2C(CWorld *w, s32 level, s32 announce) {
     if (w->m_nLevel != -1) {
         func_0042C88C();
     }
-    if (func_00284174() == 0 && func_0027BC34() == 0 && announce != 0 && w->m_bWarpSpawn != 0) {
+    if (Cinema_IsActive() == 0 && Demo_GetPlayerCount() == 0 && announce != 0 && w->m_bWarpSpawn != 0) {
         switch (w->m_LevelID) {
             case 2000:
                 sound = 0x8E;
@@ -109,43 +109,43 @@ void func_00463B2C(CWorld *w, s32 level, s32 announce) {
             default:
                 goto loaded;
         }
-        func_00412B28(sound);
+        Cinema_RequestOnce(sound);
     }
 loaded:
-    func_00226724(w);
+    CScene__ReleaseSectors(w);
     w->m_Mode = 0;
-    func_00201C08(D_800D6D68);
-    func_002053A8(0);
+    CDecompressor__Flush(D_800D6D68);
+    CCache__Flush(0);
     if (w->m_nLevel != -1) {
-        ptr = func_002532A8(&D_80119870.m_PlayerList);
+        ptr = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
         if (ptr != NULL) {
             func_0042EA24(ptr);
         }
-        func_00275EFC(func_00275F7C());
-        func_00275B58();
-        func_002758DC(0x1000);
-        func_002052D8(0, w->m_hLevelIndex);
-        func_002052D8(0, w->m_hRegionData);
-        func_002052D8(0, w->m_hCollision);
-        func_002052D8(0, w->m_hLevelInfo);
-        func_002052D8(0, w->m_hLevelHeader);
-        func_002052D8(0, w->m_hActors);
-        func_002052D8(0, w->m_hLinks);
-        func_002052D8(0, w->m_hPaths);
-        func_002052D8(0, w->m_hSections);
-        func_002052D8(0, w->m_hHeap);
+        LoopSounds_StopAll(LoopSounds_Get());
+        Sound__DetachAll();
+        Sound__StopFlags(0x1000);
+        CCache__Deallocate(0, w->m_hLevelIndex);
+        CCache__Deallocate(0, w->m_hRegionData);
+        CCache__Deallocate(0, w->m_hCollision);
+        CCache__Deallocate(0, w->m_hLevelInfo);
+        CCache__Deallocate(0, w->m_hLevelHeader);
+        CCache__Deallocate(0, w->m_hActors);
+        CCache__Deallocate(0, w->m_hLinks);
+        CCache__Deallocate(0, w->m_hPaths);
+        CCache__Deallocate(0, w->m_hSections);
+        CCache__Deallocate(0, w->m_hHeap);
     }
-    func_002053A8(0);
+    CCache__Flush(0);
     D_800B6D20 = 0;
-    func_00206068(8);
-    func_00226390(w);
+    CCache__SetFrameDelay(8);
+    CScene__ClearListCounts(w);
     func_0042D140(w->m_ParticleSystem, *w->m_pParticleEffects);
     func_0042CEB0(w->m_ActorPool);
     func_0042CFC0(&w->m_InstancePool);
     func_0042D330(D_801102B8);
     CCollisionInfo__Reset();
     func_0042D040(w->unk_18EBC);
-    func_00275BE8(D_800E6A90, D_800E68B0, 0xF);
+    LoopSounds_Construct(D_800E6A90, D_800E68B0, 0xF);
     func_0042EADC(D_801102B8 - 0x1C8);
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;
@@ -155,7 +155,7 @@ loaded:
     if (announce == 0) {
         w->m_bWarpSpawn = 0;
     }
-    func_0022629C(w, level, w->unk_18E5C, 0x3F);
+    CScene__GetLevelName(w, level, w->unk_18E5C, 0x3F);
     switch (w->m_LevelID) {
         case 0x123A:
         case 0x1BBC:
@@ -195,27 +195,27 @@ loaded:
     if (D_8011AAF1 != 0) {
         size += 0x200;
     }
-    block = func_00204EDC(0, size << 6, 3, D_800A5EB4);
+    block = CCache__Allocate(0, size << 6, 3, D_800A5EB4);
     w->m_hHeap = block;
     func_00429E40(w->m_Heap, *block, size);
-    key = func_00201848(w->m_pLevels, w->m_LevelsKey, level);
-    w->m_hLevelIndex = func_00205B94(0, (void **)&w->m_pLevelFile, key, D_800A5EC0);
-    block = func_00205D0C(0, w->m_pLevelFile, 1, key, w, func_0042B5D0, D_800A5ECC);
+    key = CISet__GetROMAddress(w->m_pLevels, w->m_LevelsKey, level);
+    w->m_hLevelIndex = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelFile, key, D_800A5EC0);
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 1, key, w, func_0042B5D0, D_800A5ECC);
     w->m_hRegionData = block;
     w->m_pRegionData = *block;
-    block = func_00205D0C(0, w->m_pLevelFile, 4, key, w, func_00200AE0, D_800A5ED8);
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 4, key, w, ProPack__Decompress, D_800A5ED8);
     w->m_hCollision = block;
     w->m_pCollision = *block;
-    w->m_LevelInfoKey = func_00201848(w->m_pLevelFile, key, 5);
-    w->m_hLevelInfo = func_00205B94(0, (void **)&w->m_pLevelInfo, w->m_LevelInfoKey, D_800A5EE4);
-    w->m_hLinks = func_00205D0C(0, w->m_pLevelFile, 7, key, w, func_0042B304, D_800A5EF8);
-    w->m_hPaths = func_00205D0C(0, w->m_pLevelFile, 2, key, w, func_0042CC24, D_800A5F00);
-    block = func_00205D0C(0, w->m_pLevelFile, 0, key, w, NULL, D_800A5F0C);
+    w->m_LevelInfoKey = CISet__GetROMAddress(w->m_pLevelFile, key, 5);
+    w->m_hLevelInfo = CCache__LoadPersistantIndex(0, (void **)&w->m_pLevelInfo, w->m_LevelInfoKey, D_800A5EE4);
+    w->m_hLinks = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 7, key, w, func_0042B304, D_800A5EF8);
+    w->m_hPaths = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 2, key, w, func_0042CC24, D_800A5F00);
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 0, key, w, NULL, D_800A5F0C);
     w->m_hLevelHeader = block;
     w->m_pLevelHeader = *block;
     func_0042A9A0(w);
     D_800AB8A0 = (w->m_pLevelHeader->m_Flags >> 2) & 1;
-    block = func_00205D0C(0, w->m_pLevelFile, 6, key, w, func_00200AE0, D_800A5F18);
+    block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, D_800A5F18);
     w->m_hSections = block;
     data = *block;
     w->m_pSections = data + 8;
@@ -223,7 +223,7 @@ loaded:
     w->m_Mode = 1;
     w->m_pActors = NULL;
     w->m_nActors = 0;
-    w->m_hActors = func_00205D0C(0, w->m_pLevelFile, 3, key, w, func_0042B960, D_800A5F24);
+    w->m_hActors = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 3, key, w, func_0042B960, D_800A5F24);
     w->m_Mode = 2;
     func_0042C6BC(w);
     count = w->m_nActors;
@@ -247,12 +247,12 @@ loaded:
         ptr = (u8 *)w->m_pActors;
         p = ptr + i * 0x288;
         func_0021F1B4(p);
-        func_0021A344(p);
+        CGameObjectInstance__UpdateAnimation(p);
     }
     w->m_Mode = 4;
     func_0042E7B4(&D_80119870.m_PlayerList);
     func_0042FE0C(D_80119870.m_CameraPool);
-    func_0027ECF0(D_80119870.m_CameraPool);
+    CCameraPool__Advance(D_80119870.m_CameraPool);
     if (D_80119870.m_Settings.multiplayer != 0 || w->m_bStreamAll != 0) {
         func_0042BE68(w);
     }

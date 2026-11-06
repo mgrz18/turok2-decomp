@@ -26,26 +26,26 @@ extern ContactHandler D_800ACE18[4];
 extern CCollisionResults *D_800F1ADC;
 extern u8 D_800F8928[];
 
-s32 func_002113A4(void);
-s32 func_00239F00(CParticle *p, CVector3 pos, u32 *flags);
-f32 func_002671B4(CPlayer *player);
-f32 func_002672C8(CPlayer *player);
+s32 Random_Next(void);
+s32 Collision_MoveInstance(CParticle *p, CVector3 pos, u32 *flags);
+f32 GameObject_GetCollisionHeight(CPlayer *player);
+f32 GameObject_GetCollisionRadius(CPlayer *player);
 f32 func_00298470(f32 x);
-void func_002324E8(CParticle *p);
-void func_0022F1C8(void *list, CParticle *p);
-void func_00232B40(CParticle *p);
-void func_002323E0(CParticle *p);
-void func_0022A4C8(CParticle *p);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_0020F040(CVector3 *v);
-void func_0022AAE0(CParticle *p);
-void func_0022BD10(CParticle *p);
-void func_0022BA88(CParticle *p);
-void func_0022CA90(CParticle *p);
-void func_0022C488(CParticle *p);
-void func_0022BFA0(CParticle *p);
-void func_0022C228(CParticle *p);
-void func_00232934(CParticle *p);
+void CParticle__FireExpireEvent(CParticle *p);
+void CParticleSystem__Free(void *list, CParticle *p);
+void CParticle__StopLoopSound(CParticle *p);
+void CParticle__FireUpdateEvent(CParticle *p);
+void CParticle__Steer(CParticle *p);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void CVector3__Normalize(CVector3 *v);
+void CParticle__ReportCollision(CParticle *p);
+void CParticle__HitWater(CParticle *p);
+void CParticle__HitWall(CParticle *p);
+void CParticle__HitInstanceBody(CParticle *p);
+void CParticle__HitTarget(CParticle *p);
+void CParticle__HitFloor(CParticle *p);
+void CParticle__HitCeiling(CParticle *p);
+void CParticle__SpawnAlongPath(CParticle *p);
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
@@ -54,7 +54,7 @@ void func_00232934(CParticle *p);
  * size and spin (dying when a size goes negative) and, when it moves or falls, probes the
  * ground, orients itself to the surface it hit and runs the collision responses its
  * descriptor allows. */
-void func_0022AFB4(CParticle *p) {
+void CParticle__Update(CParticle *p) {
     Box bounds;
     CGameObjectInstance *target;
     CPlayer *player;
@@ -162,7 +162,7 @@ void func_0022AFB4(CParticle *p) {
             p->m_cFrame = 0.0f;
             p->m_Alignment = -7;
             p->m_dwFlags = (p->m_dwFlags & ~0x30000) | 0x40000;
-            p->m_vRot.z = (f32) (func_002113A4() % 360) * 0.017453294f;
+            p->m_vRot.z = (f32) (Random_Next() % 360) * 0.017453294f;
             p->m_vVelocity.y = 0.0f;
             if (p->m_dwFlags & 0x4000000) {
                 p->m_vVelocity.x = -p->m_vDirection.x;
@@ -178,17 +178,17 @@ void func_0022AFB4(CParticle *p) {
             }
         }
     }
-    if ((p->m_dwFlags & 0x40000) && func_00239F00(p, p->header.m_vPos, &p->m_dwHitFlags) && D_800F1CE0.m_pFloorRegion != 0) {
+    if ((p->m_dwFlags & 0x40000) && Collision_MoveInstance(p, p->header.m_vPos, &p->m_dwHitFlags) && D_800F1CE0.m_pFloorRegion != 0) {
         p->m_Alignment = -3;
     }
     if (p->m_dwFlags & 0x60000) {
         for (player = D_80119890; player != NULL; player = player->m_pNext) {
             if (player->m_Data.m_Health != 0 && player->m_Mode != 2) {
                 top = player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.m_CollisionYOffset;
-                if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + func_002671B4(player) + 20.479999f) {
+                if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + GameObject_GetCollisionHeight(player) + 20.479999f) {
                     dist = func_00298470((player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x) * (player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x)
                                          + (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z) * (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z));
-                    if (dist < func_002672C8(player) + 51.199997f) {
+                    if (dist < GameObject_GetCollisionRadius(player) + 51.199997f) {
                         handler = D_800ACE18;
                         for (i = 3; i != -1; handler++, i--) {
                             if (handler->type == p->header.m_nObjType && handler->func(player, handler)) {
@@ -219,9 +219,9 @@ void func_0022AFB4(CParticle *p) {
         grow = MIN(p->m_vSize.z * p->m_vGrowth.z, 400.0f);
         p->m_vSize.z += (grow - p->m_vSize.z) * D_800B6D28;
         if (p->m_vSize.x < 0.0f || p->m_vSize.y < 0.0f || p->m_vSize.z < 0.0f) {
-            func_002324E8(p);
-            func_0022F1C8(D_800F8928, p);
-            func_00232B40(p);
+            CParticle__FireExpireEvent(p);
+            CParticleSystem__Free(D_800F8928, p);
+            CParticle__StopLoopSound(p);
             return;
         }
     }
@@ -229,42 +229,42 @@ void func_0022AFB4(CParticle *p) {
     p->m_vRot.y += p->m_vRotSpeed.y * D_800B6D28;
     p->m_vRot.z += p->m_vRotSpeed.z * D_800B6D28;
     D_800F1ADC->m_vVelocity = p->m_vVelocity;
-    func_002323E0(p);
-    func_0022A4C8(p);
+    CParticle__FireUpdateEvent(p);
+    CParticle__Steer(p);
     if ((p->m_Gravity == 0.0f || (p->header.m_vPos.y == 0.0f && p->m_Gravity < 0.0f))
         && p->m_vVelocity.x * p->m_vVelocity.x + p->m_vVelocity.y * p->m_vVelocity.y + p->m_vVelocity.z * p->m_vVelocity.z < 0.001f) {
         return;
     }
     if (!(p->m_dwFlags & 0x72000)) {
-        die = func_00239F00(p, p->header.m_vPos, &p->m_dwHitFlags);
+        die = Collision_MoveInstance(p, p->header.m_vPos, &p->m_dwHitFlags);
         if (p->header.m_nObjType == 0x68 && D_800F1CE0.m_pInstance != NULL) {
             p->m_pTarget = (CGameObjectInstance *)D_800F1CE0.m_pInstance;
         }
         if (die) {
             if (D_800F1CE0.m_pInstance != NULL) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vInstancePos);
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vInstancePos);
             } else if (D_800F1CE0.m_pShape != 0) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vShapePos);
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vShapePos);
             } else if (D_800F1CE0.m_pWallRegion != 0) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vWallPos);
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vWallPos);
             } else if (D_800F1CE0.m_pFloorRegion != 0) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vFloorPos);
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vFloorPos);
                 if (p->m_Alignment == -7) {
                     p->m_Alignment = -3;
                 }
             } else if (D_800F1CE0.m_pWaterRegion != 0) {
-                func_0020EF2C(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vWaterPos);
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vWaterPos);
             }
-            func_0020F040(&p->m_vDirection);
+            CVector3__Normalize(&p->m_vDirection);
         }
-        func_0022AAE0(p);
+        CParticle__ReportCollision(p);
         if (D_800F1CE0.m_pWaterRegion != 0) {
-            func_0022BD10(p);
+            CParticle__HitWater(p);
         }
         if (p->m_dwFlags & 0x100) {
             if (D_800F1CE0.m_pWallRegion != 0) {
                 if (!(p->m_pEffect->m_dwFlags & 0x10000000)) {
-                    func_0022BA88(p);
+                    CParticle__HitWall(p);
                 }
                 if (p->m_pEffect->m_dwFlags & 0x800) {
                     p->m_bDieOnImpact = 1;
@@ -273,22 +273,22 @@ void func_0022AFB4(CParticle *p) {
             if (p->m_dwFlags & 0x100) {
                 if (D_800F1CE0.m_pInstance != NULL) {
                     if ((p->m_dwHitFlags & 0x1000000) && D_800F1CE0.m_pInstance->header.m_Type == 0) {
-                        func_0022CA90(p);
+                        CParticle__HitInstanceBody(p);
                     } else {
-                        func_0022C488(p);
+                        CParticle__HitTarget(p);
                     }
                 }
                 if ((p->m_dwFlags & 0x100) && D_800F1CE0.m_nFloorKind != 0 && !(p->m_pEffect->m_dwFlags & 0x20000000)) {
                     if (D_800F1CE0.m_nFloorKind == 1) {
-                        func_0022BFA0(p);
+                        CParticle__HitFloor(p);
                     } else {
-                        func_0022C228(p);
+                        CParticle__HitCeiling(p);
                     }
                 }
             }
         }
     }
     if ((p->m_dwFlags & 0x8100) == 0x100) {
-        func_00232934(p);
+        CParticle__SpawnAlongPath(p);
     }
 }

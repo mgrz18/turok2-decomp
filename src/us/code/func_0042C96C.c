@@ -26,14 +26,14 @@ struct Owner_func_8044D794_de {
 };
 extern void CList__AddHead(void *, Entry_func_8044D794_de *);
 extern void CList__Remove(void *, Entry_func_8044D794_de *);
-extern void func_0026DFB0(s32);
+extern void LevelEvent_Fire(s32);
 void func_0042C96C(Owner_func_8044D794_de *arg0) {
     Entry_func_8044D794_de *entry;
     Entry_func_8044D794_de *next;
     entry = arg0->active;
     while (entry != 0) {
         next = entry->next;
-        func_0026DFB0(entry->handle);
+        LevelEvent_Fire(entry->handle);
         CList__Remove(&arg0->active, entry);
         CList__AddHead(&arg0->spare, entry);
         entry = next;

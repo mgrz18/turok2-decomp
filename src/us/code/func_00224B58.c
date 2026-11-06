@@ -5,17 +5,17 @@
 #include "structs/world.h"
 
 typedef struct { u8 pad0[0x13]; u8 unk13; } Src;
-s32 *func_002017D4(s32 *tbl, s32 idx);
-void func_00201818(s32 *tbl, s32 idx);
-s32 func_00224B58(CWorld *lv, Src *s) {
+s32 *CISet__GetBlock(s32 *tbl, s32 idx);
+void CISet__GetBlockSize(s32 *tbl, s32 idx);
+s32 CScene__IsEventFired(CWorld *lv, Src *s) {
     s32 bit = s->unk13;
     s32 idx = lv->m_nLevel;
-    s32 *t = func_002017D4(func_002017D4(func_002017D4(lv->m_pBitSections, 0), idx), 2);
+    s32 *t = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(lv->m_pBitSections, 0), idx), 2);
     u8 *bits;
     s32 m;
-    func_002017D4(t, 0);
-    func_00201818(t, 1);
-    bits = (u8 *)func_002017D4(t, 1);
+    CISet__GetBlock(t, 0);
+    CISet__GetBlockSize(t, 1);
+    bits = (u8 *)CISet__GetBlock(t, 1);
     m = 1 << (bit & 7);
     return (bits[bit / 8] & m) != 0;
 }

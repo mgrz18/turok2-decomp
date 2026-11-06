@@ -13,8 +13,8 @@ typedef struct {
     /* 0x4 */ DMABuffer *firstFree;
 } DMAState;
 
-s32 func_002933B0(void *);                      /* alUnlink */
-s32 func_002933E0(void *, void *);              /* alLink */
+s32 alUnlink(void *);                      /* alUnlink */
+s32 alLink(void *, void *);              /* alLink */
 s32 osRecvMesg(s32 *, s32 *, s32);   /* extern */
 extern u32 D_800B2660;          /* audio frame */
 extern u32 D_800B2664;          /* DMAs issued this frame */
@@ -22,7 +22,7 @@ extern s32 D_800F2778;          /* DMA message queue */
 extern DMAState D_800F2794;
 
 /* Waits for this frame's audio DMAs and frees the buffers not used lately. */
-void func_0026FEA0(void) {
+void __clearAudioDMA(void) {
     s32 sp10;
     u32 var_s0;
     DMABuffer *temp_s1;
@@ -44,14 +44,14 @@ void func_0026FEA0(void) {
                 if (D_800F2794.firstUsed == var_s0_2) {
                     D_800F2794.firstUsed = temp_s1;
                 }
-                func_002933B0(var_s0_2);
+                alUnlink(var_s0_2);
                 if (D_800F2794.firstFree == NULL) {
                     D_800F2794.firstFree = var_s0_2;
                     var_s0_2->next = NULL;
                     var_s0_2->prev = 0;
                     goto block_11;
                 }
-                func_002933E0(var_s0_2, D_800F2794.firstFree);
+                alLink(var_s0_2, D_800F2794.firstFree);
                 var_s0_2 = temp_s1;
             } else {
 block_11:

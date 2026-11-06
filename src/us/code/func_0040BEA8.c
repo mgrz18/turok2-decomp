@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/game.h"
 
-/* Calls func_002535E4 on the players with 900, then queues func_0040C7DC. */
+/* Calls CPlayerPool__SetInvincibility on the players with 900, then queues MotherBoss_OnDefeatCinemaDone. */
 
-extern void func_002535E4(void *players, f32 value);
-extern void func_0040C7DC(void);
-extern s32 func_00283FF8(s32 id, void *arg1, void *arg2);
+extern void CPlayerPool__SetInvincibility(void *players, f32 value);
+extern void MotherBoss_OnDefeatCinemaDone(void);
+extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);
 
-void func_0040BEA8(void) {
-    func_002535E4(&D_80119870.m_PlayerList, 900.0f);
-    func_00283FF8(0xE6, func_0040C7DC, NULL);
+void MotherBoss_StartDefeatCinema(void) {
+    CPlayerPool__SetInvincibility(&D_80119870.m_PlayerList, 900.0f);
+    Cinema_SetNextCallbacks(0xE6, MotherBoss_OnDefeatCinemaDone, NULL);
 }

@@ -4,7 +4,7 @@
 #include "common.h"
 #include "structs/pak.h"
 
-void *func_00266C5C(void *s, int c, u32 n);
+void *memset(void *s, int c, u32 n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
 typedef struct K7Obj {
     s16 state;
@@ -52,11 +52,11 @@ s32 func_00426D5C();
 void func_0041D948();
 s32 func_00426C74();
 void func_00426D24();
-void func_002053A8();
-void func_002052D8();
-K7Mem *func_00204EDC();
-void *func_00266C5C();
-void func_00416644();
+void CCache__Flush();
+void CCache__Deallocate();
+K7Mem *CCache__Allocate();
+void *memset();
+void MenuPool_OpenMenu();
 s32 func_00426CAC();
 extern u8 D_800B45D8[];
 extern u8 D_800B45D4[];
@@ -67,7 +67,7 @@ static inline s32 k7_chk(u8 *gc, u8 *cc) {
     }
     return 0;
 }
-s32 func_0045824C(s32 *arg0, K7Obj *arg1) {
+s32 PakMenu_SelectNote_2(s32 *arg0, K7Obj *arg1) {
     u8 sp20[8];
     u8 sp28[8];
     u8 sp30[8];
@@ -116,7 +116,7 @@ s32 func_0045824C(s32 *arg0, K7Obj *arg1) {
     s3 = 0;
     D_80130948 = D_80130968;
     D_801309C4 = s5;
-    func_00416644(D_80119E2C, D_0043B994, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu(D_80119E2C, D_0043B994, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L0040799B:
     s3 = 0;
@@ -127,18 +127,18 @@ L004079A0:
     if (s2 != 0) goto L00407AD0;
     s0 = sp4C;
     if (D_800C2014 != 0) {
-        func_002053A8(0);
-        func_002052D8(0, D_800C2014);
+        CCache__Flush(0);
+        CCache__Deallocate(0, D_800C2014);
     }
     if (s0 == 0) {
         s0 = D_800F70A8 + 0x688;
     } else {
         s0 = s0 << 8;
     }
-    m = func_00204EDC(0, s0, 0x33, D_800C13F0);
+    m = CCache__Allocate(0, s0, 0x33, D_800C13F0);
     D_800C2014 = (s32)m;
     D_800C201C = m->addr;
-    func_00266C5C((void *)D_800C201C, 0, s0);
+    memset((void *)D_800C201C, 0, s0);
     if (func_004264D0(s4, s5, D_800C201C, sp4C << 8) != 0) goto L00407ACC;
     hs = *(s32 *)D_800C201C;
     if (hs != s7) goto L00407ACC;
@@ -146,7 +146,7 @@ L004079A0:
     s0 = 0;
     if (D_800F70A8 != *(s32 *)(D_800C201C + 4)) { s2 = 1; goto L00407AD0; }
     D_801309C4 = s5;
-    func_00416644(D_80119E2C, D_0043B808, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu(D_80119E2C, D_0043B808, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L00407ACC:
     s0 = 0;
@@ -179,7 +179,7 @@ L00407AD0:
         v1 += 1;
         d += 1;
     } while (v1 < 4);
-    func_00416644(D_80119E2C, D_0043B9B8, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu(D_80119E2C, D_0043B9B8, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L00407BBC:
     if (D_80130994 == 0) goto L00407EE8;
@@ -191,7 +191,7 @@ L00407BBC:
     if (func_004264D0(s4, s5, &D_80130968, 0x18) != 0) goto L00407CD0;
     if (func_00426D98(&D_80130968, 0x14, 4) != D_80130968.checksum) goto L00407CD0;
     D_80130948 = D_80130968;
-    func_00416644(D_80119E2C, D_0043B970, arg1->f1C, arg1->f20, 0);
+    MenuPool_OpenMenu(D_80119E2C, D_0043B970, arg1->f1C, arg1->f20, 0);
     return 1;
 L00407CD0:
     s2 = 1;
@@ -206,35 +206,35 @@ L00407CDC:
     if (func_00426C74(sp38, D_800B45CC) != 0) goto L00407EE8;
     s0 = sp4C;
     if (D_800C2014 != 0) {
-        func_002053A8(0);
-        func_002052D8(0, D_800C2014);
+        CCache__Flush(0);
+        CCache__Deallocate(0, D_800C2014);
     }
     if (s0 == 0) {
         s0 = D_800F70A8 + 0x688;
     } else {
         s0 = s0 << 8;
     }
-    m = func_00204EDC(0, s0, 0x33, D_800C13F0);
+    m = CCache__Allocate(0, s0, 0x33, D_800C13F0);
     D_800C2014 = (s32)m;
     D_800C201C = m->addr;
-    func_00266C5C((void *)D_800C201C, 0, s0);
+    memset((void *)D_800C201C, 0, s0);
     if (func_004264D0(s4, s5, D_800C201C, sp4C << 8) != 0) goto L00407E70;
     hs = *(s32 *)D_800C201C;
     if (hs != s7) goto L00407E70;
     if (func_00426D98(D_800C201C, hs - 4, 0xB) != *(s32 *)(*(s32 *)D_800C201C + D_800C201C - 4)) goto L00407E70;
     if (D_800F70A8 != *(s32 *)(D_800C201C + 4)) goto L00407E70;
-    func_00416644(D_80119E2C, D_0043B7E4, arg1->f1C, arg1->f20, 0);
+    MenuPool_OpenMenu(D_80119E2C, D_0043B7E4, arg1->f1C, arg1->f20, 0);
     return 1;
 L00407E70:
     s2 = 1;
     if (D_800C2010 != 0 || D_800C2014 != 0) {
-        func_002053A8(0);
+        CCache__Flush(0);
     }
     if (D_800C2010 != 0) {
-        func_002052D8(0, D_800C2010);
+        CCache__Deallocate(0, D_800C2010);
     }
     if (D_800C2014 != 0) {
-        func_002052D8(0, D_800C2014);
+        CCache__Deallocate(0, D_800C2014);
     }
     D_800C2010 = 0;
     D_800C2014 = 0;
@@ -247,6 +247,6 @@ L00407EF8:
     a1p = D_0043B610;
     if (v0 != 0) a1p = D_0043B5C8;
     D_80130988 = s5;
-    func_00416644(D_80119E2C, D_0043C150, arg1->f1C, arg1->f20, a1p);
+    MenuPool_OpenMenu(D_80119E2C, D_0043C150, arg1->f1C, arg1->f20, a1p);
     return 1;
 }

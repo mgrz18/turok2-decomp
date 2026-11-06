@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-int func_00200A9C(CList *arg0, int arg1) {
+int CList__Contains(CList *arg0, int arg1) {
     int node = arg0->m_pHead;
     if (node != 0) {
         do {

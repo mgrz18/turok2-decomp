@@ -1,8 +1,8 @@
-/* Second-module copy of func_00422F14 (first module; this one at link address 0x00422E34), calling this module's own functions at their link addresses. */
+/* Second-module copy of SavePortalMenu_Init (first module; this one at link address 0x00422E34), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
 
-void func_00285A68(s32 port);
+void Controller_WatchPak(s32 port);
 void func_004263A0(s32 port);
 
 extern s32 D_800C2020;
@@ -23,14 +23,14 @@ static __inline__ s32 GetPort(Menu *event) {
     return event->controller->port;
 }
 
-/* The pak selection (as in func_0041EA84): a two-word struct, so GCC keeps it in a stack slot; the store of
+/* The pak selection (as in PakMenu_InitSaveGame): a two-word struct, so GCC keeps it in a stack slot; the store of
  * the port and the frame's extra 8 bytes come from it, while the call reads the register. */
 typedef struct {
     s32 v;
     s32 w;
 } PadSel;
 
-void func_0045BE34(Menu *event) {
+void SavePortalMenu_Init_2(Menu *event) {
     ControllerProfile *controller = event->controller;
     PadSel sel;
 
@@ -44,6 +44,6 @@ void func_0045BE34(Menu *event) {
     D_801309B4 = 0;
     D_80130980 = 0;
     sel.v = controller->port;
-    func_00285A68(sel.v);
+    Controller_WatchPak(sel.v);
     func_004263A0(GetPort(event));
 }

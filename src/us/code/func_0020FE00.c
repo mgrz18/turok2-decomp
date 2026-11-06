@@ -6,7 +6,7 @@
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern float D_800A5600;
-void func_0020FE00(f32 *m, f32 x, f32 y, f32 z)
+void CMtxF__SetEulerXYZ(f32 *m, f32 x, f32 y, f32 z)
 {
   f32 zero;
   f32 ax = func_002982F0(x);

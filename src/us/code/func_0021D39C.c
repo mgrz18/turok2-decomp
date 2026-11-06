@@ -8,7 +8,7 @@
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
  * info", decide whether it is in the view (bounding box against the view
  * frustum, or a box grown by 512 units for actors casting shadows,
- * flag 0x10000000), make sure its model is loaded (func_0021CDAC, playing its
+ * flag 0x10000000), make sure its model is loaded (CGameObjectInstance__BuildBoneMatrices, playing its
  * spawn effect once, flag 0x200) and call its draw callback.
  *
  * The do { } while (0) blocks (macro bodies in the original, most likely)
@@ -44,18 +44,18 @@ extern s32 D_8011ACA4;
 extern s32 D_800B6D1C;      /* current view */
 extern u8 D_800F7078[];
 
-void **func_0020367C(s32, s32, s32, s32, s32, s32, void *, s32);
-s32 func_002017D4(void *, s32);
-void func_002051F4(s32, void **);
-void func_0020C0D0(void *, s32, f32 *);
-s32 func_0026F60C(void *, f32 *);
-f32 func_0026872C(Actor *, s32);
-void **func_0021F358(Actor *);
-s32 func_0021CDAC(Actor *, void *, s32);
-f32 func_002671B4(Actor *);
-void func_002254C0(void *, CVector3 *, void *);
+void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32);
+s32 CISet__GetBlock(void *, s32);
+void CCache__Unlock(s32, void **);
+void CMtxF__TransformBox(void *, s32, f32 *);
+s32 Frustum_TestBox(void *, f32 *);
+f32 GameObject_GetRegionFloorHeight(Actor *, s32);
+void **CGameObjectInstance__LoadGeometry(Actor *);
+s32 CGameObjectInstance__BuildBoneMatrices(Actor *, void *, s32);
+f32 GameObject_GetCollisionHeight(Actor *);
+void CScene__GetLightsAt(void *, CVector3 *, void *);
 
-void func_0021D39C(Actor *actor, CCamera *view) {
+void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
     f32 offset[3];
     f32 box[6];
     CVector3 pos;
@@ -77,15 +77,15 @@ void func_0021D39C(Actor *actor, CCamera *view) {
         return;
     }
     do {
-        anim = func_0020367C(0, actor->animFile, actor->animIndex, 0, 0, 0, D_800A5AC4, 1);
+        anim = CCache__Request(0, actor->animFile, actor->animIndex, 0, 0, 0, D_800A5AC4, 1);
         if (anim == NULL) {
             return;
         }
     } while (0);
-    info = func_002017D4(*anim, 0);
+    info = CISet__GetBlock(*anim, 0);
     if (D_8011ACA4 != 0) {
         actor->update(actor, actor->ai);
-        func_0020C0D0(actor->matrix, info, actor->boxMin);
+        CMtxF__TransformBox(actor->matrix, info, actor->boxMin);
     }
     if (!(actor->flags & 0x300000)) {
         inView = 0;
@@ -94,14 +94,14 @@ void func_0021D39C(Actor *actor, CCamera *view) {
             if (view->m_ViewMax.x > actor->boxMin[0] && view->m_ViewMin.x < actor->boxMax[0]
                 && view->m_ViewMax.z > actor->boxMin[2] && view->m_ViewMin.z < actor->boxMax[2]
                 && view->m_ViewMax.y > actor->boxMin[1] && view->m_ViewMin.y < actor->boxMax[1]
-                && func_0026F60C(view->m_ViewVolume, actor->boxMin)) {
+                && Frustum_TestBox(view->m_ViewVolume, actor->boxMin)) {
                 inView = 1;
                 if (actor->region != NULL) {
                     near = 1;
                 }
             }
             if (!near && actor->region != NULL && (actor->flags & 0x10000000)) {
-                y = func_0026872C(actor, 0);
+                y = GameObject_GetRegionFloorHeight(actor, 0);
                 box[0] = actor->boxMin[0] - 512.0f;
                 box[1] = y - 0.5f;
                 box[2] = actor->boxMin[2] - 512.0f;
@@ -111,7 +111,7 @@ void func_0021D39C(Actor *actor, CCamera *view) {
                 if (box[0] < view->m_ViewMax.x && view->m_ViewMin.x < box[3]
                     && box[2] < view->m_ViewMax.z && view->m_ViewMin.z < box[5]
                     && box[1] < view->m_ViewMax.y && view->m_ViewMin.y < box[4]
-                    && func_0026F60C(view->m_ViewVolume, box)) {
+                    && Frustum_TestBox(view->m_ViewVolume, box)) {
                 set_near:
                     near = 1;
                 }
@@ -123,18 +123,18 @@ void func_0021D39C(Actor *actor, CCamera *view) {
     }
     if (inView || near) {
         do {
-            model = func_0021F358(actor);
+            model = CGameObjectInstance__LoadGeometry(actor);
         } while (0);
         if (model != NULL) {
             if (!(actor->flags & 0x200)) {
-                if (!func_0021CDAC(actor, *model, info)) {
+                if (!CGameObjectInstance__BuildBoneMatrices(actor, *model, info)) {
                     goto free_model;
                 }
                 if (!(actor->flags & 8)) {
                     pos = actor->pos;
                     pos.y += actor->height;
-                    pos.y += func_002671B4(actor) * 0.5f;
-                    func_002254C0(D_800F7078, &pos, actor->lights[D_800B6D1C]);
+                    pos.y += GameObject_GetCollisionHeight(actor) * 0.5f;
+                    CScene__GetLightsAt(D_800F7078, &pos, actor->lights[D_800B6D1C]);
                 }
                 actor->flags |= 0x200;
             }
@@ -149,10 +149,10 @@ void func_0021D39C(Actor *actor, CCamera *view) {
             offset[0] = offset[1] = offset[2] = 0.0f;
             actor->draw(actor, actor->ai, &args);
         free_model:
-            func_002051F4(0, model);
+            CCache__Unlock(0, model);
         }
     }
     do {
-        func_002051F4(0, anim);
+        CCache__Unlock(0, anim);
     } while (0);
 }

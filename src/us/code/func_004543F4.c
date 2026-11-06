@@ -7,7 +7,7 @@ extern s32 D_8011AADC;
 extern s32 D_8011AAD8;
 extern char D_800B58C4[];
 extern char D_800B58E0[];
-s32 func_004543F4(MenuItem *a) {
+s32 CheatMenu_BigHeadModeText_2(MenuItem *a) {
     if (D_8011AADC & 0x20) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
     if (D_8011AAD8 & 0x20) a->text = D_800B58C4; else a->text = D_800B58E0;
     return 0;

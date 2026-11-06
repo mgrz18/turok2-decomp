@@ -19,18 +19,18 @@ extern f32 D_800AB8C0[2];    /* screen flash range */
 extern s32 D_800B6D1C;
 extern s32 D_800ADB5C;
 
-s32 *func_002017D4(s32 arg0, s32 arg1);
-s32 func_002548FC(CPlayer *player);
-void func_0021D928(CGameObjectInstance *actor, s32 arg1, void *hit);
-void func_0021D7BC(CGameObjectInstance *actor, s32 arg1, void *hit);
-void func_0020B258(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
-void func_0020A33C(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
-void func_0020B6A0(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
+s32 *CISet__GetBlock(s32 arg0, s32 arg1);
+s32 CPlayer__IsInMatchEndState(CPlayer *player);
+void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, s32 arg1, void *hit);
+void CGameObjectInstance__DrawModel(CGameObjectInstance *actor, s32 arg1, void *hit);
+void Render_DrawModelShared(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
+void Render_DrawModel(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
+void Render_QueueModelInstance(s32 *arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 
-#define HIT_LIMIT(hit) (*func_002017D4(*(hit)->unkC, 2))
+#define HIT_LIMIT(hit) (*CISet__GetBlock(*(hit)->unkC, 2))
 #define WEAPON_INDEX(player) (D_800AF618[(player)->m_Data.m_CurrentWeapon]->model - 0x5E0)
 
-void func_00247FB0(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
+void Player_DrawNodeCallback(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
     u8 *flags;
     f32 *color;
@@ -63,29 +63,29 @@ void func_00247FB0(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
             }
             D_800AB8C0[0] = 70.0f;
             D_800AB8C0[1] = 255.0f;
-            func_0021D928(actor, arg1, hit);
-            if (player->m_ShockedTimer > 0.0f && func_002548FC(player) == 0) {
-                func_0020B258(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, (s8) hit->amount, -1);
+            CGameObjectInstance__DrawModelImmediate(actor, arg1, hit);
+            if (player->m_ShockedTimer > 0.0f && CPlayer__IsInMatchEndState(player) == 0) {
+                Render_DrawModelShared(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, (s8) hit->amount, -1);
             }
             if (player->m_Data.m_nDeathmatchCharacter != 10 && player->m_Data.m_Health != 0) {
                 index = WEAPON_INDEX(player);
                 if (index >= 0 && index < HIT_LIMIT(hit)) {
-                    func_0020A33C(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, index, actor->m_AI.m_nTexture);
+                    Render_DrawModel(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, index, actor->m_AI.m_nTexture);
                 }
             }
             return;
         }
     }
-    if (player->m_ShockedTimer > 0.0f && func_002548FC(player) == 0) {
-        func_0021D928(actor, arg1, hit);
-        func_0020B258(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, (s8) hit->amount, -1);
+    if (player->m_ShockedTimer > 0.0f && CPlayer__IsInMatchEndState(player) == 0) {
+        CGameObjectInstance__DrawModelImmediate(actor, arg1, hit);
+        Render_DrawModelShared(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, (s8) hit->amount, -1);
     } else {
-        func_0021D7BC(actor, arg1, hit);
+        CGameObjectInstance__DrawModel(actor, arg1, hit);
     }
     if (player->m_Data.m_nDeathmatchCharacter != 10 && player->m_pOptions->m_TagMode == 0 && player->m_Data.m_Health != 0 && player->m_CharacterActor.m_nTypeFlag != D_800ADB5C) {
         index = WEAPON_INDEX(player);
         if (index >= 0 && index < HIT_LIMIT(hit)) {
-            func_0020B6A0(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, WEAPON_INDEX(player), actor->m_AI.m_nTexture);
+            Render_QueueModelInstance(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, WEAPON_INDEX(player), actor->m_AI.m_nTexture);
         }
     }
 }

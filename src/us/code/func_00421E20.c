@@ -3,6 +3,6 @@
 
 extern s32 D_801309B8;
 
-void func_00421E20(void) {
+void GameNoteMenu_InitLoad(void) {
     D_801309B8 = 1;
 }

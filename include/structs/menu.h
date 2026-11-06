@@ -3,8 +3,8 @@
 
 /* The menu system: menu windows built from a description (MenuDesc, a table
  * of MenuItemDesc), their items, the pool of open windows and the
- * controller a window reads. Layouts from the menu VM (func_00413230.c,
- * copied as func_0044C230.c) and the item callbacks; names after Rage Wars
+ * controller a window reads. Layouts from the menu VM (MenuItem_FormatBinding.c,
+ * copied as MenuItem_FormatBinding_2.c) and the item callbacks; names after Rage Wars
  * (CMenuItem_t and WidgetDescriptor in references/rw_abu/include/MENU/OBJECT1C8.H,
  * ControllerProfile in structs/controller.h) where it has them.
  * An item callback is called as callback(MenuItem *item, Menu *menu, ...).
@@ -22,21 +22,21 @@ struct MenuModel;
 struct MenuModelPart;
 struct CCamera;
 
-/* An item's type (MenuItemDesc / MenuItem type), as func_0041363C lays them
+/* An item's type (MenuItemDesc / MenuItem type), as MenuItem_Layout lays them
  * out: 0 text, 1 image, 2 slider (label, bar and knob: value 0-0xFF), 3 a
  * 3D model (MenuModelPart data, a MenuModel extra), 4 one character, 5 a
  * bound value (MenuBinding data, shown as "name value"). */
 
 /* The links of an item (MenuItemDesc / MenuItem link[]): how many items
  * the cursor moves (a signed byte) on left, right, up and down
- * (func_004151B4, called with 0x10 + the direction: the byte at that offset). */
+ * (Menu_MoveCursor, called with 0x10 + the direction: the byte at that offset). */
 #define MENU_LINK_LEFT 0
 #define MENU_LINK_RIGHT 1
 #define MENU_LINK_UP 2
 #define MENU_LINK_DOWN 3
 
 /* One entry of a MenuDesc's item table (Rage Wars' WidgetDescriptor):
- * func_00414EA8 copies it into the MenuItem it makes. */
+ * Menu_Construct copies it into the MenuItem it makes. */
 typedef struct MenuItemDesc {
     /* 0x00 */ s16 type;            /* 3: a model item (gets a 0x330-byte extra) */
     /* 0x02 */ u8 _pad2[2];
@@ -54,7 +54,7 @@ typedef struct MenuItemDesc {
 
 /* A type-5 item's data (Rage Wars' slider binding): a variable of any
  * numeric type, found by storage(item), shown as "name value / scale"
- * (func_00413230) and stepped by left/right within min..max (func_004133A4). */
+ * (MenuItem_FormatBinding) and stepped by left/right within min..max (MenuItem_UpdateBinding). */
 typedef struct MenuBinding {
     /* 0x00 */ char *name;
     /* 0x04 */ s32 type;            /* 0 f32, 1/2/5 s32, 3 s8, 4 s16, 6 u8, 7 u16, 8 u32 */
@@ -72,7 +72,7 @@ typedef struct MenuItem {
     /* 0x04 */ s16 type;            /* the desc's type */
     /* 0x06 */ u8 _pad6[2];
     /* 0x08 */ u32 flags;
-    /* 0x0C */ s16 x;               /* the desc's (read signed: func_0041363C) */
+    /* 0x0C */ s16 x;               /* the desc's (read signed: MenuItem_Layout) */
     /* 0x0E */ s16 y;
     /* 0x10 */ u8 link[4];          /* MENU_LINK_*: the cursor's moves, signed */
     union {
@@ -92,8 +92,8 @@ typedef struct MenuItem {
     /* 0x24 */ struct Menu *menu;   /* the window it belongs to */
 } MenuItem; /* size 0x28 */
 
-/* Where an item is drawn: func_0041363C lays an item out into one, the
- * draw callbacks get it (Rage Wars' MenuOptionBox). func_004156FC lays out
+/* Where an item is drawn: MenuItem_Layout lays an item out into one, the
+ * draw callbacks get it (Rage Wars' MenuOptionBox). Menu_Draw lays out
  * every item and hands each draw callback its layout and the window's area
  * (the box around all the items). */
 typedef struct MenuItemLayout {
@@ -121,13 +121,13 @@ typedef struct MenuDesc {
     /* 0x1A */ u16 offsetX;
     union {
     /* 0x1C */ u16 offsetY;
-    /* 0x1C */ s32 value;           /* what func_0041647C returns */
+    /* 0x1C */ s32 value;           /* what Menu_GetDescValue returns */
     };
     /* 0x20 */ s32 param;           /* handed to the window as its param */
 } MenuDesc; /* size 0x24 */
 
 /* How a text item's class is drawn: the item's flags & 0x3FE0 (0x20 to
- * 0x2000, one bit each) pick one of the nine D_800C1BD4 (func_00416EA8). */
+ * 0x2000, one bit each) pick one of the nine D_800C1BD4 (MenuItem_GetTextStyle). */
 typedef struct MenuTextStyle {
     /* 0x00 */ s32 font;            /* 0, 1, 2: the draw mode (D_800C1BD0) set for it */
     /* 0x04 */ s32 charWidth;
@@ -161,7 +161,7 @@ typedef struct MenuColor {
 } MenuColor; /* size 0x10 */
 
 /* An open menu window, 0x1D8 bytes followed by its items (and their
- * extras); func_00414EA8 builds it. Linked into a MenuPool by prev/next. */
+ * extras); Menu_Construct builds it. Linked into a MenuPool by prev/next. */
 typedef struct Menu {
     /* 0x000 */ s16 cursor;         /* the selected item */
     /* 0x002 */ s16 offsetX;
@@ -173,7 +173,7 @@ typedef struct Menu {
     /* 0x014 */ MenuDesc *desc;
     union {
     /* 0x018 */ s32 param;
-    /* 0x018 */ struct MenuDesc *submenu; /* what func_00415FB8 opens from it */
+    /* 0x018 */ struct MenuDesc *submenu; /* what MenuPool_OpenSubmenu opens from it */
     };
     /* 0x01C */ struct CPlayer *player; /* structs/player.h */
     /* 0x020 */ ControllerProfile *controller; /* structs/controller.h */
@@ -210,10 +210,10 @@ typedef struct MenuPool {
 } MenuPool; /* size 0x18 */
 
 /* A line of text being typed in a menu: the letters, where the next one
- * goes and the blinking cursor (drawn while timer <= 6, func_0041A904).
+ * goes and the blinking cursor (drawn while timer <= 6, EnterCheatMenu_DrawTextField).
  * D_800C1F80 is the cheat code entry (22 letters at most; its text also
  * has a symbol of its own, D_800C1F8C); D_800C1FB0 holds the four players'
- * names (8 letters at most), indexed by the player's slot (func_0025340C). */
+ * names (8 letters at most), indexed by the player's slot (CPlayerPool__GetIndex). */
 typedef struct TextEntry {
     /* 0x00 */ s32 cursor;          /* the column the next letter goes to */
     /* 0x04 */ f32 timer;           /* the cursor's blink, reset by each key */

@@ -5,17 +5,17 @@
 
 extern int __osSpDeviceBusy();
 extern void __osSpSetStatus(unsigned int arg0);
-extern s32 func_0029A3A0(s32 direction, s32 spAddress, s32 dramAddress, s32 size);
-extern OSTask *func_0029A160(OSTask *arg0);
+extern s32 __osSpRawStartDma(s32 direction, s32 spAddress, s32 dramAddress, s32 size);
+extern OSTask *_VirtualToPhysicalTask(OSTask *arg0);
 extern void osWritebackDCache(OSTask *, s32);
 extern void __osSpSetStatus(u32 arg0);
-extern s32 func_0029A4A0(u32 arg0);
+extern s32 __osSpSetPc(u32 arg0);
 extern s32 __osSpDeviceBusy(void);
-OSTask *func_0029A160(OSTask *intp);
-void func_0029A248(OSTask *arg0) {
+OSTask *_VirtualToPhysicalTask(OSTask *intp);
+void osSpTaskLoad(OSTask *arg0) {
     OSTask *block;
     s32 result;
-    block = func_0029A160(arg0);
+    block = _VirtualToPhysicalTask(arg0);
     if (block->t.flags & 1) {
         block->t.ucode_data = block->t.yield_data_ptr;
         block->t.ucode_data_size = block->t.yield_data_size;
@@ -27,14 +27,14 @@ void func_0029A248(OSTask *arg0) {
     osWritebackDCache(block, 0x40);
     __osSpSetStatus(0x2B00);
     do {
-        result = func_0029A4A0(0x04001000);
+        result = __osSpSetPc(0x04001000);
     } while (result == -1);
     do {
-        result = func_0029A3A0(1, 0x04000FC0, (s32)block, 0x40);
+        result = __osSpRawStartDma(1, 0x04000FC0, (s32)block, 0x40);
     } while (result == -1);
     while (__osSpDeviceBusy() != 0) {
     }
     do {
-        result = func_0029A3A0(1, 0x04001000, (s32)block->t.ucode_boot, block->t.ucode_boot_size);
+        result = __osSpRawStartDma(1, 0x04001000, (s32)block->t.ucode_boot, block->t.ucode_boot_size);
     } while (result == -1);
 }

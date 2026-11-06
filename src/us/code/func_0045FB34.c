@@ -8,7 +8,7 @@
 
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
 extern OSMesgQueue D_800F6798;
-s32 func_0045FB34(s32 ch) {
+s32 Pak_ProbeRumble_2(s32 ch) {
     RumblePak *r = &D_80130AA0[ch];
     if (D_800F6778[ch].errno != 0) {
         r->present = 0;

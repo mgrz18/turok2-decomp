@@ -18,25 +18,25 @@ extern f32 D_800B6D28;              /* frame time scale */
 extern u8 D_800F1360[];
 extern u8 D_800F1EF0[];
 
-void func_002156FC(Pickup *obj);
-void func_00239F00(Pickup *obj, f32 x, f32 y, f32 z, void *arg4);
+void CLevelActor__Update(Pickup *obj);
+void Collision_MoveInstance(Pickup *obj, f32 x, f32 y, f32 z, void *arg4);
 
-/* Counts the timer down, moves the object (func_002156FC), stops it unless its definition is
+/* Counts the timer down, moves the object (CLevelActor__Update), stops it unless its definition is
  * D_800F1360, places it at its position and refreshes its bounding box, 81.92 each way. */
-void func_00227680(Pickup *obj) {
+void CPooledLevelActor__Update(Pickup *obj) {
     CVector3 prev;
 
     if (obj->timer > 0.0f) {
         obj->timer -= D_800B6D28;
         prev = obj->pos;
     }
-    func_002156FC(obj);
+    CLevelActor__Update(obj);
     if (obj->def != D_800F1360) {
         obj->vel.x = 0.0f;
         obj->vel.y = 0.0f;
         obj->vel.z = 0.0f;
     }
-    func_00239F00(obj, obj->pos.x, obj->pos.y, obj->pos.z, D_800F1EF0);
+    Collision_MoveInstance(obj, obj->pos.x, obj->pos.y, obj->pos.z, D_800F1EF0);
     obj->boundsMin.x = obj->pos.x - 81.92f;
     obj->boundsMin.y = obj->pos.y - 81.92f;
     obj->boundsMin.z = obj->pos.z - 81.92f;

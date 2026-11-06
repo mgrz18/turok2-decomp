@@ -1,6 +1,6 @@
 /* WRONG CUT: splat named this D_002150B8 (0x2150B8, 500 bytes): its first 8 bytes are junk fill
- * ("ICKUP_SA" text), the real function starts at the 16-aligned 0x2150C0 (ROM symbol func_002150C0),
- * 492 bytes; func_00220D00 calls it for the level file's third table.
+ * ("ICKUP_SA" text), the real function starts at the 16-aligned 0x2150C0 (ROM symbol CLevelActor__Construct),
+ * 492 bytes; CScene__DecompressGridSection calls it for the level file's third table.
  * Sets up a placed level actor from its 0x20-byte record: position, bounds (position +- radius),
  * model, segment, angle (s8 in 1/254 turns), flags (always with bit 1), default 24-byte state. */
 
@@ -26,10 +26,10 @@ extern u8 D_800F1360[];         /* the empty model */
 extern u8 D_800F7078[];         /* the model cache */
 extern u8 D_800B6D1B;
 
-void *func_00225E88(void *cache, s32 model);
-f32 func_002671B4(CLevelActor *actor);
+void *CScene__GetIntelligence(void *cache, s32 model);
+f32 GameObject_GetCollisionHeight(CLevelActor *actor);
 
-void func_002150C0(CLevelActor *actor, PlacedActorRecord *record, s32 owner, u8 *segments) {
+void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 owner, u8 *segments) {
     CVector3 top;
 
     actor->header.m_Type = 3;
@@ -49,7 +49,7 @@ void func_002150C0(CLevelActor *actor, PlacedActorRecord *record, s32 owner, u8 
     if (record->model == 0xFFFF) {
         actor->header.m_pIntelligence = (CIntelligence *) D_800F1360;
     } else {
-        actor->header.m_pIntelligence = func_00225E88(D_800F7078, record->model);
+        actor->header.m_pIntelligence = CScene__GetIntelligence(D_800F7078, record->model);
     }
     if (record->segment == 0xFFFF) {
         actor->header.m_pCurrentRegion = NULL;
@@ -61,7 +61,7 @@ void func_002150C0(CLevelActor *actor, PlacedActorRecord *record, s32 owner, u8 
     actor->m_AnimSpeed = 0;
     actor->m_nKilledIndex = record->unk1A;
     top.x = actor->header.m_vPos.x;
-    top.y = actor->header.m_vPos.y + func_002671B4(actor) * 0.5f;
+    top.y = actor->header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
     top.z = actor->header.m_vPos.z;
     *(CLights1 *) actor->m_Lights = D_800AB0D0;
     actor->m_DrawnFrame = actor->m_UpdatedFrame = D_800B6D1B - 1;

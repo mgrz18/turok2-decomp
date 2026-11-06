@@ -24,8 +24,8 @@ struct B18Ent {
 };
 extern CWorld D_800F7078[];
 extern B18Ent *D_80119890;
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_00230AB0(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void CParticle__CheckProximity(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     CVector3 d;
     s32 i;
     s32 cnt;
@@ -33,7 +33,7 @@ void func_00230AB0(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     for (i = 0; i < cnt; i++) {
         B18Ent *e = (B18Ent *)D_800F7078->m_pKind1[i];
         if (e->health > 0) {
-            func_0020EF2C(&d, &e->pos, &o->pos);
+            CVector3__Subtract(&d, &e->pos, &o->pos);
             if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {
                 o->unk128 = 1;
                 return;
@@ -44,7 +44,7 @@ void func_00230AB0(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
         B18Ent *p;
         for (p = D_80119890; p != ((void *)0); p = p->next) {
             if (o->owner != p && p->unk524 > 0) {
-                func_0020EF2C(&d, &p->pos, &o->pos);
+                CVector3__Subtract(&d, &p->pos, &o->pos);
                 if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {
                     o->unk128 = 1;
                     return;
@@ -55,7 +55,7 @@ void func_00230AB0(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     for (i = 0; i < n; i++) {
         B18Ent *e = arr[i];
         if (e != o && (e->type == 0xC || e->type == 0x22)) {
-            func_0020EF2C(&d, &e->pos, &o->pos);
+            CVector3__Subtract(&d, &e->pos, &o->pos);
             if (d.x * d.x + d.y * d.y + d.z * d.z <= 262144.0f) {
                 o->unk128 = 1;
                 return;

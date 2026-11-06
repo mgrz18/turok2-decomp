@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_0020367C(s32, s32, s32, s32, s32, void *, void *, s32); /* resource load */
+s32 CCache__Request(s32, s32, s32, s32, s32, void *, void *, s32); /* resource load */
 extern char D_800A5CE0[];
-extern void func_0020B4D0(void);
+extern void Model_DecompressCallbackExtra(void);
 
-void func_0021F358(CGameObjectInstance *arg0) {
-    func_0020367C(0, (s32) arg0->m_rpGeometryHeader, arg0->m_rpGeometryHeaderSize, 0, 0, func_0020B4D0, D_800A5CE0, 0);
+void CGameObjectInstance__LoadGeometry(CGameObjectInstance *arg0) {
+    CCache__Request(0, (s32) arg0->m_rpGeometryHeader, arg0->m_rpGeometryHeaderSize, 0, 0, Model_DecompressCallbackExtra, D_800A5CE0, 0);
 }

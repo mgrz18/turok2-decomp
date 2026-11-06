@@ -8,8 +8,8 @@ extern f32 D_800B6D28;
 typedef struct { u8 pad0[4]; CVector3 pos; } B04A; /* pos at 0x4 in Turok 2 (0x8 in Rage Wars) */
 typedef struct { u8 pad0[0x78]; s32 unk78; f32 unk7C; s32 unk80; u8 pad84[4]; s32 unk88; } B04B;
 typedef struct { CAITarget a; CAITarget b; } B04C;
-void func_00244338(B04A *, B04B *, s32, CAITarget *);
-void func_002449E0(B04A *, B04B *, s32, CAITarget *);
+void AI_GetPathTargetInfo(B04A *, B04B *, s32, CAITarget *);
+void AI_GetSightTargetInfo(B04A *, B04B *, s32, CAITarget *);
 /* A separate function in Rage Wars; inlined here in Turok 2. */
 static inline void fill(CAITarget *d, B04A *a) {
     CVector3 p = a->pos;
@@ -29,7 +29,7 @@ static inline void fill(CAITarget *d, B04A *a) {
     d->m_vFlatDelta = z;
     d->m_FlatDist = 0;
 }
-void func_00246108(B04A *a, B04B *b, B04C *c, s32 f1, s32 f2) {
+void AI_UpdateTargets(B04A *a, B04B *b, B04C *c, s32 f1, s32 f2) {
     f32 t;
     if (b->unk7C > 0.0f) {
         t = b->unk7C - D_800B6D28;
@@ -40,11 +40,11 @@ void func_00246108(B04A *a, B04B *b, B04C *c, s32 f1, s32 f2) {
         }
     }
     if (f1 != 0)
-        func_00244338(a, b, b->unk88, &c->b);
+        AI_GetPathTargetInfo(a, b, b->unk88, &c->b);
     else
         fill(&c->b, a);
     if (f2 != 0) {
-        func_002449E0(a, b, b->unk80, &c->a);
+        AI_GetSightTargetInfo(a, b, b->unk80, &c->a);
         return;
     }
     fill(&c->a, a);

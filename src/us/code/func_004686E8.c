@@ -1,4 +1,4 @@
-/* Second VM module copy of func_0042F7C8 (same source, linked 0xE0 lower). */
+/* Second VM module copy of Demo_DecodeMatch (same source, linked 0xE0 lower). */
 #include "common.h"
 #include "structs/demo.h"
 
@@ -17,7 +17,7 @@ static __inline__ s32 readBits(DemoStream *r, s32 count) {
     return v;
 }
 
-void func_004686E8(DemoStream *t) {
+void Demo_DecodeMatch_2(DemoStream *t) {
     t->value = readBits(t, 2) + 2;
     func_0042EB50(t);
 }

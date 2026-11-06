@@ -8,8 +8,8 @@ extern f32 D_800A9DD8;
 extern f32 D_800A9DDC;
 extern s32 D_800C2030;
 extern s32 D_800C2034;
-void func_002883E0(CEngineApp *g, u8 *col, s32 a, s32 b, s32 c, s32 d);
-void func_00288B1C(CEngineApp *g) {
+void CEngineApp__DrawFilledRect(CEngineApp *g, u8 *col, s32 a, s32 b, s32 c, s32 d);
+void CEngineApp__DrawFade(CEngineApp *g) {
     u8 col[4];
     f32 t;
     s32 v;
@@ -22,5 +22,5 @@ void func_00288B1C(CEngineApp *g) {
     if (t < 0.0f) { c255: v = 255; } else { v = ~(s32)(t * D_800A9DDC); }
     done:;
     col[3] = v;
-    func_002883E0(g, col, 0, 0, D_800C2030, D_800C2034);
+    CEngineApp__DrawFilledRect(g, col, 0, 0, D_800C2030, D_800C2034);
 }

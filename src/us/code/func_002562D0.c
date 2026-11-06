@@ -1,7 +1,7 @@
 #include "common.h"
 
-void func_00255FF4();                            /* extern */
+void CPlayer__UpdateDeath();                            /* extern */
 
-void func_002562D0(void) {
-    func_00255FF4();
+void PlayerDeath46_Update(void) {
+    CPlayer__UpdateDeath();
 }

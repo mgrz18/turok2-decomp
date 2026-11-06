@@ -3,7 +3,7 @@
 
 extern s32 CList__AddHead(s32, s32);
 extern s32 CList__AddTail(s32, s32);
-extern s32 func_002005D0(s32, s32, s32);
+extern s32 CList__InsertBefore(s32, s32, s32);
 
 /* Insert arg1 into the list at 0xEC14: after the node with the same key at
  * 0xF8 if there is one, else at the end or the front by a flag. */
@@ -47,7 +47,7 @@ void func_00232D68(CDrawWorld *arg0, CRenderInst *arg1) {
         }
     }
     if (p != NULL) {
-        func_002005D0((s32)&arg0->drawHead, (s32)p, (s32)arg1);
+        CList__InsertBefore((s32)&arg0->drawHead, (s32)p, (s32)arg1);
     } else if (arg1->info->flags & 0x2000) {
         CList__AddHead((s32)&arg0->drawHead, (s32)arg1);
     } else {

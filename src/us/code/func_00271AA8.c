@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_00273E78(s32);                         /* extern */
+s32 SndVoicePool_ClearFollow(s32);                         /* extern */
 
-void func_00271AA8(s32 arg0) {
-    func_00273E78(arg0 + 0x1DB8);
+void CAudioWorld__DetachAllVoices(s32 arg0) {
+    SndVoicePool_ClearFollow(arg0 + 0x1DB8);
 }

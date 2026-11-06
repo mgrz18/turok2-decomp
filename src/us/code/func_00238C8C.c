@@ -28,7 +28,7 @@ struct Triple;
 struct IntPair;
 struct IntPair;
 struct Triple;
-extern void func_00237AFC(void *, s32, s32, Triple, struct IntPair, s32, s32, s32);
-void func_00238C8C(s32 arg0, s32 arg1, s32 arg2, Triple arg3, struct IntPair arg6) {
-    func_00237AFC((void *)arg0, arg1, arg2, arg3, arg6, 1, 0, 0x800000);
+extern void ImpactEvent_ApplyBlast(void *, s32, s32, Triple, struct IntPair, s32, s32, s32);
+void ImpactEvent_AreaDamage800000(s32 arg0, s32 arg1, s32 arg2, Triple arg3, struct IntPair arg6) {
+    ImpactEvent_ApplyBlast((void *)arg0, arg1, arg2, arg3, arg6, 1, 0, 0x800000);
 }

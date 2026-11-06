@@ -3,27 +3,27 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0021740C.c, func_0021740C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-f32 func_002672C8(void *);
-void func_002688C8(void *, f32, f32, f32, s32, s32, s32, s32);
-void func_0020EEF8(CVector3 *, CVector3 *, CVector3 *);
-void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
-void func_0020EF60(CVector3 *, CVector3 *, f32);
-void func_0020F040(CVector3 *);
+f32 GameObject_GetCollisionRadius(void *);
+void GameObject_TraceMove(void *, f32, f32, f32, s32, s32, s32, s32);
+void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
+void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
+void CVector3__Scale(CVector3 *, CVector3 *, f32);
+void CVector3__Normalize(CVector3 *);
 extern f32 D_800A6990;
 typedef struct { u8 pad0[4]; CVector3 pos; } B04Ob; /* pos at 0x4 in Turok 2 */
-void func_0024699C(B04Ob *a, s32 unused, B04Ob *b, B04Ob *c, s32 e, s32 f) {
+void AI_PushAway(B04Ob *a, s32 unused, B04Ob *b, B04Ob *c, s32 e, s32 f) {
     CVector3 d;
     CVector3 r;
     if (c != ((void *)0)) {
-        func_0020EF2C(&d, &b->pos, &c->pos);
+        CVector3__Subtract(&d, &b->pos, &c->pos);
         d.y = 0;
-        func_0020F040(&d);
+        CVector3__Normalize(&d);
     } else {
         d.x = 0;
         d.y = 0;
         d.z = 0;
     }
-    func_0020EF60(&d, &d, func_002672C8(b) + func_002672C8(a) + D_800A6990);
-    func_0020EEF8(&r, &b->pos, &d);
-    func_002688C8(b, r.x, r.y, r.z, e, f, 0, 0);
+    CVector3__Scale(&d, &d, GameObject_GetCollisionRadius(b) + GameObject_GetCollisionRadius(a) + D_800A6990);
+    CVector3__Add(&r, &b->pos, &d);
+    GameObject_TraceMove(b, r.x, r.y, r.z, e, f, 0, 0);
 }

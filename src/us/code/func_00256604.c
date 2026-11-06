@@ -7,7 +7,7 @@ extern f32 D_800B6D28;    /* frame time scale */
 /* Crouch: toggled by button 0x400 while standing or walking (poses 2 and 3),
  * forced by flags 0x6000; eases the crouch height toward 40.96 or 0 and sets
  * bit 0x80 of *out while it is within 10.24 of fully crouched. */
-void func_00256604(CPlayer *player, s32 unused, s32 *flags, s32 *out) {
+void CPlayer__UpdateCrouch(CPlayer *player, s32 unused, s32 *flags, s32 *out) {
     s32 crouching;
     f32 delta;
     u8 *input;

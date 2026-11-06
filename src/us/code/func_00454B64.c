@@ -17,7 +17,7 @@ typedef struct Widget {
 
 void func_0041BBB0(Widget *w);
 
-void func_00454B64(Widget *w, u8 arg1) {
+void PlayerOptions_SetDefaults_2(Widget *w, u8 arg1) {
     w->unk29 = 0x80;
     w->unk2A = 0x80;
     w->unk28 = 0;

@@ -5,8 +5,8 @@
 
 extern unsigned short D_800B8BAA;
 extern unsigned short D_800B8BAC;
-extern u16 func_0029FE70(u16 *, u16, s32, s32, void *);
-s32 func_002A0044(DecodeBlock *arg0, u16 *arg1, s16 arg2,
+extern u16 adecReadBits(u16 *, u16, s32, s32, void *);
+s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                     u16 *arg3, void *arg4) {
     u16 node;
     s16 block, output;
@@ -49,7 +49,7 @@ s32 func_002A0044(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                         output++;
                     } else if ((s16)value == 0x900) {
                         value = *bits;
-                        if (func_0029FE70(bits, table->width, 1, 0, arg4) == 0) {
+                        if (adecReadBits(bits, table->width, 1, 0, arg4) == 0) {
                             return -1;
                         }
                         mask = (s16)output;
@@ -91,7 +91,7 @@ s32 func_002A0044(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                     node = mask;
                 }
             } else {
-                if (func_0029FE70(&D_800B8BAA, 16, 1, 0, arg4) == 0) {
+                if (adecReadBits(&D_800B8BAA, 16, 1, 0, arg4) == 0) {
                     return -1;
                 }
                 *available += 16;

@@ -5,7 +5,7 @@
 /* Fills arg1[0..34] with whether each weapon can be selected and returns how many can.
  * The m_WeaponList[i] reads are written as (player + i)->m_WeaponList[0], read signed: the code adds the
  * index to the player first. */
-s32 func_00255048(CPlayer *arg0, s32 *arg1) {
+s32 CPlayer__GetSelectableWeapons(CPlayer *arg0, s32 *arg1) {
     s16 temp_a2;
     s32 *var_a1;
     s32 var_a3;

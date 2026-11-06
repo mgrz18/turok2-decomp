@@ -4,11 +4,11 @@
 
 extern f32 D_800AE2D8;              /* slot scale */
 
-s32 func_0024E700(CPlayer *player, s32 weapon);
+s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
 /* Fills the weapon menu with the weapons flagged in `owned` (35 entries,
  * `rows` times over), spreading the slots evenly around the wheel. */
-void func_0024BF1C(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player) {
+void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player) {
     s32 i;
     s32 n;
     s32 w;
@@ -26,7 +26,7 @@ void func_0024BF1C(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *pla
         for (w = 0; w < 35; w++) {
             if (owned[w] != 0) {
                 info = D_800AF618[w];
-                ok = func_0024E700(player, w) != 0;
+                ok = CPlayer__GetWeaponAmmo(player, w) != 0;
                 menu->m_Items[n].m_Weapon = w;
                 menu->m_Items[n].m_bAvailable = ok;
                 menu->m_Items[n].m_pInfo = info;

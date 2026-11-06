@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-volatile unsigned int func_00292804(void *arg0, void *arg1)
+volatile unsigned int __vsPan(void *arg0, void *arg1)
 {
   int new_var;
   s32 var_v1;

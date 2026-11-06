@@ -18,52 +18,52 @@ extern char D_800B5414[]; /* "killed by " */
 extern char D_800B5420[]; /* "you killed " */
 extern char D_800B542C[]; /* "you killed yourself" */
 
-char *func_00288800(char *dst, char *src); /* strcpy */
-void func_00281610(CGameFromCameraPool *game, struct CCamera *camera, char *text, f32 time);
+char *Util_StrCpy(char *dst, char *src); /* strcpy */
+void CCameraPool__AddTimedText(CGameFromCameraPool *game, struct CCamera *camera, char *text, f32 time);
 
 /* Shows a player's newest message (ring of four) on its camera. */
 #define SHOW_MESSAGE(game, player, time)                                                         \
-    func_00281610(game, (player)->m_pCamera,                                                     \
+    CCameraPool__AddTimedText(game, (player)->m_pCamera,                                                     \
                   (player)->m_DeathMatchString[(player)->m_nDeathmatchString], time);            \
     (player)->m_nDeathmatchString++;                                                             \
     (player)->m_nDeathmatchString %= 4;
 
 /* Deathmatch messages for a kill: "killed by" or "tagged by" on the victim's
    screen, "you killed", "you tagged" or "head shot!" on the killer's. */
-void func_002478C8(CPlayer *victim, CPlayer *killer, DamageEvent *hit) {
+void CPlayer__ShowKillMessages(CPlayer *victim, CPlayer *killer, DamageEvent *hit) {
     GameSettings *settings = &D_8011AAD8;
     HitFrame *target;
 
     if (settings->multiplayer != 0) {
         if (victim == killer) {
-            func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B542C);
+            Util_StrCpy(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B542C);
             SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
         } else if (victim->m_pOptions->m_TagMode != 0) {
             f32 time = 1.5f;
             CGameFromCameraPool *game;
 
-            func_00288800(victim->m_DeathMatchString[victim->m_nDeathmatchString], D_800B53FC);
-            func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
+            Util_StrCpy(victim->m_DeathMatchString[victim->m_nDeathmatchString], D_800B53FC);
+            Util_StrCpy(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
             game = GAME_OF(settings);
             SHOW_MESSAGE(game, victim, time);
-            func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B5408);
-            func_00288800(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->m_Name);
+            Util_StrCpy(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B5408);
+            Util_StrCpy(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->m_Name);
             SHOW_MESSAGE(game, killer, 1.5f);
         } else {
             f32 time = 1.5f;
             CGameFromCameraPool *game;
 
-            func_00288800(victim->m_DeathMatchString[victim->m_nDeathmatchString], D_800B5414);
-            func_00288800(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
+            Util_StrCpy(victim->m_DeathMatchString[victim->m_nDeathmatchString], D_800B5414);
+            Util_StrCpy(&victim->m_DeathMatchString[victim->m_nDeathmatchString][10], killer->m_pOptions->m_Name);
             game = GAME_OF(settings);
             SHOW_MESSAGE(game, victim, time);
             target = hit->frame;
             if (target != NULL && (target->flags & 3) == 1) {
-                func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B53D0);
+                Util_StrCpy(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B53D0);
                 SHOW_MESSAGE(game, killer, 1.5f);
             } else {
-                func_00288800(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B5420);
-                func_00288800(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->m_Name);
+                Util_StrCpy(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B5420);
+                Util_StrCpy(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->m_Name);
                 SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
             }
         }

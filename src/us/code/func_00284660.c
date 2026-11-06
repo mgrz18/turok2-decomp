@@ -15,7 +15,7 @@ typedef struct AnimDef {
 extern u8 D_800F7078[];
 extern AnimDef *func_00226134(void *table, u8 id);
 
-void func_00284660(AnimPlayer *player) {
+void CPathTrack__Advance(AnimPlayer *player) {
     AnimDef *anim;
     s32 count;
 

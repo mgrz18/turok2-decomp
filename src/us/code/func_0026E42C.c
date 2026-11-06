@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/event.h"
 
-void func_00275624(s16);                            /* extern */
+void Sound__Play2D(s16);                            /* extern */
 
-void func_0026E42C(LevelEvent *arg0) {
-    func_00275624(arg0->sound);
+void Event_PlaySoundRemote(LevelEvent *arg0) {
+    Sound__Play2D(arg0->sound);
 }

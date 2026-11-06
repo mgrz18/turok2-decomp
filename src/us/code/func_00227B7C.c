@@ -2,7 +2,7 @@
 #include "structs/level_actor.h"
 
 /* Releases arg1 back to the pool's free list. */
-void func_00227B7C(CLevelActorPool *arg0, CPooledLevelActor *arg1) {
+void CLevelActorPool__Free(CLevelActorPool *arg0, CPooledLevelActor *arg1) {
     s32 *temp_v1;
     s32 temp_a2;
     CPooledLevelActor *temp_v1_2;

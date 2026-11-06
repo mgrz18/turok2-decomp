@@ -56,23 +56,23 @@ typedef struct ResidentDataChunk {
     s32 count;
     u8 data[1];
 } ResidentDataChunk;
-void *func_002017D4(void *table, s32 index);
-extern s32 func_00200B00(void ***handle, s32 arg1);
-extern void func_00201818(void *node, s32 arg1);
+void *CISet__GetBlock(void *table, s32 index);
+extern s32 ProPackDecompress(void ***handle, s32 arg1);
+extern void CISet__GetBlockSize(void *node, s32 arg1);
 static __inline__ s32 groupHas(WorldRecAt1B40C *world, s32 n) {
     s32 index;
     void *g;
     u8 *bits;
     s32 mask;
     index = world->group;
-    g = func_002017D4(func_002017D4(func_002017D4(world->tree, 0), index), 2);
-    func_002017D4(g, 0);
-    func_00201818(g, 1);
-    bits = func_002017D4(g, 1);
+    g = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(world->tree, 0), index), 2);
+    CISet__GetBlock(g, 0);
+    CISet__GetBlockSize(g, 1);
+    bits = CISet__GetBlock(g, 1);
     mask = 1 << (n & 7);
     return bits[n / 8] & mask;
 }
-void func_00464304(WorldRecAt1B40C *world, void ***handle) {
+void CScene__DecompressLinks_2(WorldRecAt1B40C *world, void ***handle) {
     void *node;
     struct IntPair *l0;
     struct IntPair *l1;
@@ -83,12 +83,12 @@ void func_00464304(WorldRecAt1B40C *world, void ***handle) {
     s32 n;
     s32 count;
     Face *face;
-    if (func_00200B00(handle, 0) != 0) {
+    if (ProPackDecompress(handle, 0) != 0) {
         node = **handle;
-        l0 = func_002017D4(node, 0);
-        l1 = func_002017D4(node, 1);
-        l2 = func_002017D4(node, 2);
-        l3 = func_002017D4(node, 3);
+        l0 = CISet__GetBlock(node, 0);
+        l1 = CISet__GetBlock(node, 1);
+        l2 = CISet__GetBlock(node, 2);
+        l3 = CISet__GetBlock(node, 3);
         count = l0->field_4;
         world->verts = &((ResidentDataChunk *)(l0))->data[0];
         world->faces = (Face *)&((ResidentDataChunk *)(l1))->data[0];

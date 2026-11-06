@@ -9,7 +9,7 @@ extern s32 D_800D8DA4[];
 extern s32 D_800D8DD0;
 extern int D_800AB0C0;
 extern void osSendMesg(void *arg0, s32 arg1, s32 arg2);
-void func_002067C4(s32 unused, s32 arg1) {
+void CCache__ReleaseDisplayList(s32 unused, s32 arg1) {
     s32 mask;
     u32 count;
     s32 new_var;

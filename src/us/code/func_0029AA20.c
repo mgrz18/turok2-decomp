@@ -6,7 +6,7 @@ s32 __osRestoreInt(s32);                         /* extern */
 extern __OSViContext *D_800B7AC4; /* __osViNext */
 
 /* libultra's osViSetEvent. */
-void func_0029AA20(OSMesgQueue *mq, OSMesg m, u32 retraceCount) {
+void osViSetEvent(OSMesgQueue *mq, OSMesg m, u32 retraceCount) {
     s32 temp_a0;
 
     temp_a0 = __osDisableInt();

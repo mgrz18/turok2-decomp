@@ -1,4 +1,4 @@
-/* Second VM module copy of func_00421528 (same C). */
+/* Second VM module copy of SaveGame_Restore (same C). */
 /* D_80110060 is declared as an array so its store keeps its place after the save buffer reads (a scalar is assumed not to alias them and is hoisted). */
 #include "common.h"
 #include "structs/player.h"
@@ -10,7 +10,7 @@ extern CWorld D_800F7078;
 extern s32 D_80110060[];
 extern u8 D_800EBAC0[];
 
-void func_0045A448(CPlayer *p) {
+void SaveGame_Restore_2(CPlayer *p) {
     CWorld *level = &D_800F7078;
     u8 keep;
     s32 i;

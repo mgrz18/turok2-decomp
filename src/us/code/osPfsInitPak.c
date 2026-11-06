@@ -5,15 +5,15 @@
 #define PFS_INITIALIZED 1
 #define PFS_ERR_DEVICE 11
 
-extern void func_00299FE4(void); /* __osSiGetAccess */
-extern void func_0029A050(void); /* __osSiRelAccess */
-extern s32 func_00427F80(OSMesgQueue *queue, int channel); /* __osPfsGetStatus */
-extern s32 func_00429EC4(OSPfs *pfs); /* __osPfsSelectBank */
-extern s32 func_00299680(OSMesgQueue *mq, int channel, u16 address, u8 *buffer); /* __osContRamRead */
+extern void __osSiGetAccess(void); /* __osSiGetAccess */
+extern void __osSiRelAccess(void); /* __osSiRelAccess */
+extern s32 __osPfsGetStatus(OSMesgQueue *queue, int channel); /* __osPfsGetStatus */
+extern s32 __osPfsSelectBank(OSPfs *pfs); /* __osPfsSelectBank */
+extern s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer); /* __osContRamRead */
 extern s32 __osIdCheckSum(u16 *ptr, u16 *csum, u16 *icsum); /* __osIdCheckSum */
 extern s32 __osCheckPackId(OSPfs *pfs, __OSPackId *temp); /* __osCheckPackId */
 extern s32 __osRepairPackId(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid); /* __osRepairPackId */
-extern s32 func_00428330(OSPfs *pfs); /* osPfsChecker */
+extern s32 osPfsChecker(OSPfs *pfs); /* osPfsChecker */
 
 s32 osPfsInitPak(OSMesgQueue *queue, OSPfs *pfs, int channel) {
     int k;
@@ -24,9 +24,9 @@ s32 osPfsInitPak(OSMesgQueue *queue, OSPfs *pfs, int channel) {
     __OSPackId *id;
     __OSPackId newid;
 
-    func_00299FE4();
-    ret = func_00427F80(queue, channel);
-    func_0029A050();
+    __osSiGetAccess();
+    ret = __osPfsGetStatus(queue, channel);
+    __osSiRelAccess();
     if (ret != 0) {
         return ret;
     }
@@ -36,10 +36,10 @@ s32 osPfsInitPak(OSMesgQueue *queue, OSPfs *pfs, int channel) {
     pfs->status = 0;
 
     pfs->activebank = 0;
-    if ((ret = func_00429EC4(pfs)) != 0) {
+    if ((ret = __osPfsSelectBank(pfs)) != 0) {
         return ret;
     }
-    if ((ret = func_00299680(pfs->queue, pfs->channel, 1, temp)) != 0) {
+    if ((ret = __osContRamRead(pfs->queue, pfs->channel, 1, temp)) != 0) {
         return ret;
     }
 
@@ -78,11 +78,11 @@ s32 osPfsInitPak(OSMesgQueue *queue, OSPfs *pfs, int channel) {
     pfs->minode_table = (1 + pfs->banks) * 8;
     pfs->dir_table = pfs->minode_table + (pfs->banks * 8);
 
-    if ((ret = func_00299680(pfs->queue, pfs->channel, 7, pfs->label)) != 0) {
+    if ((ret = __osContRamRead(pfs->queue, pfs->channel, 7, pfs->label)) != 0) {
         return ret;
     }
 
-    ret = func_00428330(pfs);
+    ret = osPfsChecker(pfs);
     pfs->status |= PFS_INITIALIZED;
     return ret;
 }

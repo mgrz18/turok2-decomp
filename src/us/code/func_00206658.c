@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void *func_00206658(void) {
+void *CCache__TakeFreeCacheEntry(void) {
     extern void CList__Remove(void *, s32);
     extern s32 CList__AddHead(void *, s32);
     extern s32 D_800D8D68;

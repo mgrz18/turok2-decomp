@@ -2,7 +2,7 @@
 #include "structs/menu.h"
 #include "structs/save.h"
 
-s32 func_0026EFB8(s32 id);
+s32 Level_GetHub(s32 id);
 
 extern char D_800B4A40[];
 extern char D_800B4A50[];
@@ -13,8 +13,8 @@ extern char D_800B4A9C[];
 extern char D_800B4AB4[];
 extern char D_800B4ABC[];
 
-s32 func_00421F88(MenuItem *item) {
-    switch (func_0026EFB8(D_800C201C->player.m_CheckPointWarpID)) {
+s32 GameNoteMenu_UpdateLevel(MenuItem *item) {
+    switch (Level_GetHub(D_800C201C->player.m_CheckPointWarpID)) {
         case -1:
         default:
             item->text = D_800B4ABC;

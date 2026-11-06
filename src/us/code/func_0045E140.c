@@ -18,11 +18,11 @@ typedef struct {
     MemHandle *vtx;     /* 0x1C */
 } GfxPool;
 
-extern MemHandle *func_00204EDC(s32 heap, s32 size, s32 flags, char *name); /* allocate */
-extern MemHandle *func_00204FD0(s32 heap, s32 addr, s32 size, char *name);  /* claim a fixed block */
-extern void func_002052D8(s32 heap, MemHandle *handle);                     /* free */
-extern u32 func_00266B80(void);                                             /* osGetMemSize */
-extern void func_00266C5C(void *dst, s32 value, u32 size);                  /* memset */
+extern MemHandle *CCache__Allocate(s32 heap, s32 size, s32 flags, char *name); /* allocate */
+extern MemHandle *CCache__AllocateAt(s32 heap, s32 addr, s32 size, char *name);  /* claim a fixed block */
+extern void CCache__Deallocate(s32 heap, MemHandle *handle);                     /* free */
+extern u32 GetMemSize(void);                                             /* osGetMemSize */
+extern void memset(void *dst, s32 value, u32 size);                  /* memset */
 
 extern char D_800C1810[];
 extern char D_800C181C[];
@@ -44,7 +44,7 @@ extern s32 D_80130A7C;
 extern s32 D_80130A80;
 extern s32 D_80130A84;
 
-void func_0045E140(GfxPool *pool) {
+void GfxPool_Alloc_2(GfxPool *pool) {
     u32 mb = 0x100000;
     u32 i;
     s32 j;
@@ -56,20 +56,20 @@ void func_0045E140(GfxPool *pool) {
     u32 base;
 
     if (pool->gfx != 0) {
-        func_002052D8(0, pool->gfx);
+        CCache__Deallocate(0, pool->gfx);
     }
     if (pool->dynamic != 0) {
-        func_002052D8(0, pool->dynamic);
+        CCache__Deallocate(0, pool->dynamic);
     }
     if (pool->depth != 0) {
-        func_002052D8(0, pool->depth);
+        CCache__Deallocate(0, pool->depth);
     }
     if (pool->vtx != 0) {
-        func_002052D8(0, pool->vtx);
+        CCache__Deallocate(0, pool->vtx);
     }
     for (n = 0; n < 3; n++) {
         if (pool->fb[n] != 0) {
-            func_002052D8(0, pool->fb[n]);
+            CCache__Deallocate(0, pool->fb[n]);
         }
     }
 
@@ -82,13 +82,13 @@ void func_0045E140(GfxPool *pool) {
         pool->fb[j] = 0;
     }
 
-    if (func_00266B80() >= mb * 6) {
+    if (GetMemSize() >= mb * 6) {
         size = 0x54600;
-        base = func_00266B80() | 0x80000000;
-        depth = func_00204FD0(0, base - mb, size, D_800C1810);
-        fb = func_00204FD0(0, base - mb * 2, 0xFD200, D_800C181C);
-        func_00266C5C((void *) fb->addr, 0, 0xFD200);
-        func_00266C5C((void *) depth->addr, 0, 0x54600);
+        base = GetMemSize() | 0x80000000;
+        depth = CCache__AllocateAt(0, base - mb, size, D_800C1810);
+        fb = CCache__AllocateAt(0, base - mb * 2, 0xFD200, D_800C181C);
+        memset((void *) fb->addr, 0, 0xFD200);
+        memset((void *) depth->addr, 0, 0x54600);
         pool->depth = depth;
         pool->fb[0] = fb;
         D_80130A78 = pool->depth->addr;
@@ -98,7 +98,7 @@ void func_0045E140(GfxPool *pool) {
     } else {
         size = 0x1ECC0;
         base = 0x80400000;
-        block = func_00204FD0(0, base - (D_800C2210 + 1) * size, (D_800C2210 + 1) * size, D_800C182C);
+        block = CCache__AllocateAt(0, base - (D_800C2210 + 1) * size, (D_800C2210 + 1) * size, D_800C182C);
         pool->fb[0] = block;
         for (i = 0; i < D_800C2210; i++) {
             D_80130A88[i] = block->addr + i * size;
@@ -106,12 +106,12 @@ void func_0045E140(GfxPool *pool) {
         D_80130A78 = block->addr + size * i;
     }
     for (i = 0; i < D_800C2210; i++) {
-        func_00266C5C((void *) D_80130A88[i], 0, size);
+        memset((void *) D_80130A88[i], 0, size);
     }
-    func_00266C5C((void *) D_80130A78, 0, size);
-    pool->gfx = func_00204EDC(0, (D_800C2214 + D_800C2218) * 16, 0x23, D_800C184C);
-    pool->dynamic = func_00204EDC(0, 0x8000, 0x23, D_800C185C);
-    pool->vtx = func_00204EDC(0, 0x22000, 0x23, D_800C1864);
+    memset((void *) D_80130A78, 0, size);
+    pool->gfx = CCache__Allocate(0, (D_800C2214 + D_800C2218) * 16, 0x23, D_800C184C);
+    pool->dynamic = CCache__Allocate(0, 0x8000, 0x23, D_800C185C);
+    pool->vtx = CCache__Allocate(0, 0x22000, 0x23, D_800C1864);
     D_80130A80 = pool->gfx->addr;
     D_80130A4C = D_80130A80 + D_800C2214 * 8;
     D_80130A84 = D_80130A4C + D_800C2218 * 8;

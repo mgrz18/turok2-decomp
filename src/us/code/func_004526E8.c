@@ -19,9 +19,9 @@ struct Obj8043ECE8 {
 };
 struct Obj8043ECE8;
 typedef struct Obj8043ECE8 Obj8043ECE8;
-extern s32 func_002859DC(void);
-s32 func_004526E8(void *arg0, Obj8043ECE8 *arg1) {
-    if (func_002859DC() < 2) {
+extern s32 Controller_CountConnected(void);
+s32 TitleMenu_MultiUpdate_2(void *arg0, Obj8043ECE8 *arg1) {
+    if (Controller_CountConnected() < 2) {
         arg1->unkC->unk58 &= 0xFEFFFFFF;
         if (arg1->unk0 == 2) {
             arg1->unk0 = 1;

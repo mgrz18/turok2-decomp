@@ -17,18 +17,18 @@ extern u8 D_80119E2C[];
 extern u8 D_0043B714[];
 extern u8 D_0043C20C[];
 
-extern s32 func_0041DD90(Menu *c, s32 slot, s32 quiet);
-extern void func_0041DA28(Menu *c);
-extern void func_0041EDE0(void *menu, Menu *c, s32 arg2);
-extern void func_0041F0C8(void *menu, Menu *c, s32 arg2);
-extern void func_00426480(s32 slot);
-extern s32 func_0042655C(s32 slot);
-extern void func_00426978(s32 slot, s32 index, char **out);
-extern void func_00426C88(char *src, char *dst, s32 n);
-extern s32 func_00426D54(char *a, char *b);
-extern void func_00416644(void *menus, void *tmpl, s32 a, ControllerProfile *b, void *parent);
+extern s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet);
+extern void PakMenu_UpdateNoteRows(Menu *c);
+extern void PakMenu_WriteProfile(void *menu, Menu *c, s32 arg2);
+extern void PakMenu_WriteSaveGame(void *menu, Menu *c, s32 arg2);
+extern void Pak_ProbeSlot(s32 slot);
+extern s32 Pak_GetStatus(s32 slot);
+extern void Pak_GetNoteGameName(s32 slot, s32 index, char **out);
+extern void Pak_DecodeText(char *src, char *dst, s32 n);
+extern s32 Str_Compare(char *a, char *b);
+extern void MenuPool_OpenMenu(void *menus, void *tmpl, s32 a, ControllerProfile *b, void *parent);
 
-/* func_00421A54, inlined (the found path sets the result before storing the index) */
+/* PakMenu_FindNoteByName, inlined (the found path sets the result before storing the index) */
 static __inline__ s32 findFile(void *unused, char *file, s32 slot, s32 *index) {
     char name[16];
     char *entry;
@@ -36,9 +36,9 @@ static __inline__ s32 findFile(void *unused, char *file, s32 slot, s32 *index) {
     s32 i;
 
     for (i = 0; i < 16; i++) {
-        func_00426978(slot, i, &entry);
-        func_00426C88(entry, name, 16);
-        if (func_00426D54(name, file) == 0) {
+        Pak_GetNoteGameName(slot, i, &entry);
+        Pak_DecodeText(entry, name, 16);
+        if (Str_Compare(name, file) == 0) {
             found = 1;
             if (index != NULL) {
                 *index = i;
@@ -59,7 +59,7 @@ static __inline__ void menuSlot(Menu *c, s32 *slot) {
     }
 }
 
-s32 func_0041FEC4(void *menu, Menu *c, s32 arg2) {
+s32 PakMenu_SelectPak(void *menu, Menu *c, s32 arg2) {
     s32 slot;
     s32 pak;
     s32 n;
@@ -75,22 +75,22 @@ s32 func_0041FEC4(void *menu, Menu *c, s32 arg2) {
     } else {
         pak = slot;
     }
-    if (func_0041DD90(c, pak, 0) != 0) {
+    if (PakMenu_CheckPak(c, pak, 0) != 0) {
         D_801309BC = 1;
         return 1;
     }
     if (D_801309B4) {
         if (D_80130984) {
-            func_0041EDE0(menu, c, arg2);
+            PakMenu_WriteProfile(menu, c, arg2);
             return 1;
         }
     } else if (D_80130984) {
         D_801309C4 = -1;
         if (findFile(menu, D_800B45CC, pak, &D_801309C4) && D_801309C4 >= 0 && D_801309C4 < 16) {
-            func_00416644(D_80119E2C, D_0043C20C, c->player, c->controller, D_0043B714);
+            MenuPool_OpenMenu(D_80119E2C, D_0043C20C, c->player, c->controller, D_0043B714);
             return 1;
         }
-        func_0041F0C8(menu, c, arg2);
+        PakMenu_WriteSaveGame(menu, c, arg2);
         return 1;
     }
     if (D_80130990) {
@@ -103,8 +103,8 @@ s32 func_0041FEC4(void *menu, Menu *c, s32 arg2) {
             }
         }
         for (n = 0; n < 4; n++) {
-            func_00426480(next);
-            if (func_0042655C(next) != -2) {
+            Pak_ProbeSlot(next);
+            if (Pak_GetStatus(next) != -2) {
                 break;
             }
             next++;
@@ -126,11 +126,11 @@ s32 func_0041FEC4(void *menu, Menu *c, s32 arg2) {
             cur = c->controller->port;
         }
         slot = cur;
-        if (func_0041DD90(c, cur, 0) != 0) {
+        if (PakMenu_CheckPak(c, cur, 0) != 0) {
             D_801309BC = 1;
             return 1;
         }
-        func_0041DA28(c);
+        PakMenu_UpdateNoteRows(c);
     }
     return 0;
 }

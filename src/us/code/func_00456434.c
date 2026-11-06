@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00456434(u8 *a, u8 *b, s32 count);
-s32 func_00456434(u8 *a, u8 *b, s32 count) {
+extern s32 NameEntryMenu_CompareName_2(u8 *a, u8 *b, s32 count);
+s32 NameEntryMenu_CompareName_2(u8 *a, u8 *b, s32 count) {
     u8 c;
     u8 d;
     do {

@@ -198,12 +198,12 @@ typedef struct T2MotionState {
 } T2MotionState;
 
 extern char D_8010ABA0;
-extern s32 func_00228108(void *arg0, s32 arg1, s32 arg2, s32 arg3,
+extern s32 CInstancePool__Spawn(void *arg0, s32 arg1, s32 arg2, s32 arg3,
                          s32 arg4, Triple arg5, f32 arg6, CVector3 arg7,
                          Triple arg8, void *arg9);
-void func_002638A0(T2Actor *arg0, T2MotionState *arg1, Triple arg2, Triple arg3,
+void Generator_SpawnObject(T2Actor *arg0, T2MotionState *arg1, Triple arg2, Triple arg3,
                    s32 arg4, s32 arg5, s32 arg6) {
-    if (func_00228108(&D_8010ABA0, arg5, 0, arg6,
+    if (CInstancePool__Spawn(&D_8010ABA0, arg5, 0, arg6,
                       arg4, arg2,
                       arg0->yaw,
                       arg0->position, arg3,

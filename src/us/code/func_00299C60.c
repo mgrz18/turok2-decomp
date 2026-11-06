@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern u32 D_80130E20[];
-extern u32 func_00299E00(u32 arg0);
-void func_00299C60(s32 arg0, s32 arg1, u8 *arg2) {
+extern u32 __osContAddressCrc(u32 arg0);
+void __osPackRamWriteData(s32 arg0, s32 arg1, u8 *arg2) {
     Block40 packet;
     u8 *dst;
     s32 i;
@@ -19,7 +19,7 @@ void func_00299C60(s32 arg0, s32 arg1, u8 *arg2) {
     packet.bytes[1] = 0x23;
     packet.bytes[2] = 1;
     packet.bytes[3] = 3;
-    checksum = func_00299E00(arg1 & 0xFFFF);
+    checksum = __osContAddressCrc(arg1 & 0xFFFF);
     shifted = arg1 << 5;
     *(u16 *)&packet.bytes[4] = (checksum & 0xFF) | shifted;
     packet.bytes[0x26] = tail;

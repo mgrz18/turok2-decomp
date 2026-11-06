@@ -9,7 +9,7 @@
  * pointer variable: D_800F1CE0.m_pInstance does not give this code. */
 extern CGameObjectInstance *D_800F1CE0;
 
-void func_002540E4(CPlayer *p);
+void CPlayer__Respawn(CPlayer *p);
 
 static __inline__ u8 ActorKind(CGameObjectInstance *actor) {
     return actor->header.m_Type;
@@ -17,7 +17,7 @@ static __inline__ u8 ActorKind(CGameObjectInstance *actor) {
 
 /* In multiplayer, when actor 0x64E is a kind-1 actor whose 0x174/0x176 bytes
  * differ, ends the player's tag mode 1 and records it. */
-s32 func_002554D0(CPlayer *p) {
+s32 CPlayer__CheckTagHit(CPlayer *p) {
     CGameObjectInstance **slot;
     CGameObjectInstance *a;
     CPlayerOptions *opts;
@@ -35,7 +35,7 @@ s32 func_002554D0(CPlayer *p) {
             if (mode == kind) {
                 opts->m_TagMode = 0;
                 p->m_pOptions->m_LastTagMode = mode;
-                func_002540E4(p);
+                CPlayer__Respawn(p);
                 D_80119870.m_Settings.match.tagPhase = mode;
             }
         }

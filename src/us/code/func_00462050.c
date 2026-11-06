@@ -4,10 +4,10 @@
 #include "ultra_types.h"
 extern s32 func_00429CD4(u16 *ptr, u16 *csum, u16 *icsum);
 extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
 extern s32 func_00429668(OSPfs *pfs, __OSPackId *temp);
 extern s32 func_00429380(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid);
-s32 func_00462050(OSPfs *pfs)
+s32 osPfsRepairId_2(OSPfs *pfs)
 {
     int k;
     u16 sum;
@@ -22,7 +22,7 @@ s32 func_00462050(OSPfs *pfs)
         if (ret != 0)
             return ret;
     }
-    ret = func_00299680(pfs->queue, pfs->channel, 1, (u8 *)&temp);
+    ret = __osContRamRead(pfs->queue, pfs->channel, 1, (u8 *)&temp);
     if (ret != 0)
         return ret;
     func_00429CD4((u16 *)&temp, &sum, &isum);
@@ -57,9 +57,9 @@ s32 func_00462050(OSPfs *pfs)
     pfs->inode_table = 8;
     pfs->minode_table = (pfs->banks + 1) * 8;
     pfs->dir_table = pfs->minode_table + pfs->banks * 8;
-    ret = func_00299680(pfs->queue, pfs->channel, 7, pfs->label);
+    ret = __osContRamRead(pfs->queue, pfs->channel, 7, pfs->label);
     if (ret != 0)
         return ret;
     return 0;
 }
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);

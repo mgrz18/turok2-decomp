@@ -3,6 +3,6 @@
 
 extern s32 D_8011F290;
 
-void func_0028D0F0(void) {
+void SavedPlayers_Deactivate(void) {
     D_8011F290 = 0;
 }

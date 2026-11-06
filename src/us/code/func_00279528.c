@@ -92,7 +92,7 @@ extern Gfx *D_800D8E24;
         gImmp1(0xF1, (_SHIFTL((dsdx), 16, 16) | _SHIFTL((dtdy), 0, 16)));                       \
     }
 
-void func_00279528(u16 *image, u8 *mask, f32 x, f32 y, s32 texWidth, s32 texHeight, f32 scaleX, f32 scaleY) {
+void Hud_DrawMaskedBlockScaled(u16 *image, u8 *mask, f32 x, f32 y, s32 texWidth, s32 texHeight, f32 scaleX, f32 scaleY) {
     int dsdx = 1024, dtdy;
     int xl, yl, xh, yh;
 

@@ -207,9 +207,9 @@ struct ContextRecAt2BC0;
 struct ContextRecAt2BC0;
 struct Table_func_804428F8_de;
 typedef struct Table_func_804428F8_de Table_func_804428F8_de;
-extern s32 func_00270C80(void *, s32, CVector3, s32, s32);
+extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 struct ContextRecAt2BC0;
-extern s32 func_002712E8(void *arg0);
+extern s32 CAudioWorld__Update(void *arg0);
 extern u8 D_8011AAED;
 extern f32 D_800A80D0;
 struct GameplayCamera;
@@ -362,16 +362,16 @@ typedef struct MenuMatchGlobals {
     s32 regenPaused;
 } MenuMatchGlobals;
 extern MenuMatchGlobals D_801198B0;
-extern void func_0027403C(void **arg0);
-extern void func_00275018(void *arg0);
+extern void SndVoicePool_Update(void **arg0);
+extern void SndSeq_UpdateFade(void *arg0);
 extern u32 __osDisableInt(void);
-extern void func_00276180(void *arg0);
-extern void func_002768D0(void *arg0);
-extern void func_00274B40(void *arg0);
+extern void SndQueue_Update(void *arg0);
+extern void SpeechPlayer_Update(void *arg0);
+extern void SndSeq_Update(void *arg0);
 extern s32 D_8011AC88; /* game mode */
-extern void *func_00281444(MenuMatchGlobals *arg0, CVector3 *arg1);
-extern s32 func_00270C80(void *, s32, CVector3, s32, s32);
-s32 func_002712E8(void *arg0) {
+extern void *CCameraPool__GetNearestCamera(MenuMatchGlobals *arg0, CVector3 *arg1);
+extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
+s32 CAudioWorld__Update(void *arg0) {
     char *object = arg0;
     u8 *bytes = &D_8011AAED;
     char *queue;
@@ -391,7 +391,7 @@ s32 func_002712E8(void *arg0) {
     } else {
         __osRestoreInt(mask);
     }
-    func_0027403C(&((struct ContextRecAt2BC0 *)(object))->menu[0]);
+    SndVoicePool_Update(&((struct ContextRecAt2BC0 *)(object))->menu[0]);
     {
         char *queue2 = object + 0x110;
         u32 mask2 = __osDisableInt();
@@ -404,11 +404,11 @@ s32 func_002712E8(void *arg0) {
             __osRestoreInt(mask2);
         }
     }
-    func_00276180((char *)object + 0x138);
-    func_002768D0((char *)object + 0x2BC0);
+    SndQueue_Update((char *)object + 0x138);
+    SpeechPlayer_Update((char *)object + 0x2BC0);
     queue = object + 0x1D64;
-    func_00275018(queue);
-    func_00274B40(queue);
+    SndSeq_UpdateFade(queue);
+    SndSeq_Update(queue);
     if (D_800B2680 != 0 &&
         ((struct ContextRecAt2BC0 *)(object))->field2BB4 != 0 &&
         D_8011AC88 == 13 &&
@@ -419,10 +419,10 @@ s32 func_002712E8(void *arg0) {
         zero.z = 0.0f;
         zero.y = 0.0f;
         zero.x = 0.0f;
-        result = func_00281444(&D_801198B0, &zero);
+        result = CCameraPool__GetNearestCamera(&D_801198B0, &zero);
         vec = &((struct SharedRecAt564V1 *)(result))->position;
         if ((((struct ContextRecAt2BC0 *)(object))->frame & 3) == 0) {
-            func_00270C80(object, ((struct ContextRecAt2BC0 *)(object))->track, *vec, 0, -1);
+            CAudioWorld__PlaySound(object, ((struct ContextRecAt2BC0 *)(object))->track, *vec, 0, -1);
         }
     }
     return ++((struct ContextRecAt2BC0 *)(object))->frame;

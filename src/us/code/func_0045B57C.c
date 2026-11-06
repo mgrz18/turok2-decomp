@@ -11,15 +11,15 @@ struct ItemRecAt24 {
     int y;
     char *label;
 };
-extern int func_0045B57C(int unused, ItemRecAt24 *item);
+extern int CharNoteMenu_SelectNo_2(int unused, ItemRecAt24 *item);
 extern char D_80119E2C[];
 extern char D_0043B5C8[];
-extern void func_00416644(char *, char *, int, int, int);
-int func_0045B57C(int unused, ItemRecAt24 *item) {
+extern void MenuPool_OpenMenu(char *, char *, int, int, int);
+int CharNoteMenu_SelectNo_2(int unused, ItemRecAt24 *item) {
     if (D_80130960 != 0) {
-        func_00416644(D_80119E2C, D_0043B5C8, item->x, item->y, 0);
+        MenuPool_OpenMenu(D_80119E2C, D_0043B5C8, item->x, item->y, 0);
     } else {
-        func_00416644(D_80119E2C, item->label, item->x, item->y, 0);
+        MenuPool_OpenMenu(D_80119E2C, item->label, item->x, item->y, 0);
     }
     return 1;
 }

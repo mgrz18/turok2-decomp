@@ -3,6 +3,6 @@
 
 extern s32 D_800D8D78;
 
-s32 func_00206088(void) {
+s32 CCache__GetFreeCacheEntryCount(void) {
     return D_800D8D78;
 }

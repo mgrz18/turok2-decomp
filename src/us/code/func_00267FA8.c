@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-s32 func_00267FA8(void *arg0)
+s32 GameObject_CanLeaveWater(void *arg0)
 {
   void *temp_a0;
   unsigned long long new_var;

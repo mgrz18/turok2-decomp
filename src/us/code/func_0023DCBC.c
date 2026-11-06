@@ -3,21 +3,21 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0023DCBC(float mf[4][4], float xEye, float yEye, float zEye, float xAt, float yAt, float zAt, float xUp, float yUp, float zUp);
+extern void Collision_LookAtF(float mf[4][4], float xEye, float yEye, float zEye, float xAt, float yAt, float zAt, float xUp, float yUp, float zUp);
 extern const float D_800A66CC;
 extern const float D_800A66C4;
 f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern const float D_800A66C4;
 extern const float D_800A66CC;
-extern void func_00297BCC(float mf[4][4]);
+extern void guMtxIdentF(float mf[4][4]);
 extern float func_00298470(float);
-void func_0023DCBC(float mf[4][4], float xEye, float yEye, float zEye,
+void Collision_LookAtF(float mf[4][4], float xEye, float yEye, float zEye,
                    float xAt, float yAt, float zAt,
                    float xUp, float yUp, float zUp)
 {
     float one, len, xLook, yLook, zLook, xRight, yRight, zRight;
-    func_00297BCC(mf);
+    guMtxIdentF(mf);
     xLook = xAt - xEye;
     yLook = yAt - yEye;
     zLook = zAt - zEye;

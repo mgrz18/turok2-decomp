@@ -5,8 +5,8 @@
 
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-extern void func_002105A4(void *matrix, f32 angle);
-void func_002105A4(void *arg0, f32 arg1)
+extern void CMtxF__SetRotateY(void *matrix, f32 angle);
+void CMtxF__SetRotateY(void *arg0, f32 arg1)
 {
     extern f32 D_800A561C[];
   RW_Mtx *m = (char *) arg0;

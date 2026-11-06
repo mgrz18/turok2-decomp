@@ -1,4 +1,4 @@
-/* Second-module twin of func_00406000 (nonmatching/vm; the fix here, a local pointer to the 0x8012F9D4 block, should
+/* Second-module twin of Primagen_UpdateMode19 (nonmatching/vm; the fix here, a local pointer to the 0x8012F9D4 block, should
  * work there too). Same source, its own strings and pool. */
 #include "common.h"
 #include "structs/game_object.h"
@@ -29,18 +29,18 @@ typedef struct {
     /* 0x428 */ CVector3 dest;              /* 0x8012FA30 */
 } LevelScriptF604;
 
-extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
-extern f32 func_00246310(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
-extern void func_00245BAC(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a - b */
-extern f32 func_0020EAA0(CVector3 *v);                                    /* heading */
-extern f32 func_0021160C(f32 value, f32 target, f32 rate);
+extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
+extern f32 AI_AngleToPoint(CGameObjectInstance *obj, CVector3 point);       /* angle to a point */
+extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);       /* out = a - b */
+extern f32 CVector3__GetYaw(CVector3 *v);                                    /* heading */
+extern f32 Math_StepClamped(f32 value, f32 target, f32 rate);
 extern f32 func_00298470(f32 x);                                          /* sqrt */
 extern f32 func_002982F0(f32 angle);                                      /* sin */
 extern f32 func_002974C0(f32 angle);                                      /* cos */
-extern f32 func_002119FC(f32 lo, f32 hi);
-extern s32 func_00404C44(CGameObjectInstance *obj, CAI *ai, f32 dist);
+extern f32 Random_Blend(f32 lo, f32 hi);
+extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
 extern CVector3 *D_800C18F0[];  /* boss paths, ended by a point with y < 0 */
@@ -62,7 +62,7 @@ extern BossStep D_00430F28[];
 extern BossStep D_00431004[];
 extern BossStep D_00431158[];
 
-void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
+void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
     CVector3 d;
     CVector3 dest;
@@ -73,7 +73,7 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
     BossCtl *ctl = &D_8012F9D4;
 
     D_800F1F50[0] |= 0x8000;
-    func_00246108(obj, ai, &t, 0, 1);
+    AI_UpdateTargets(obj, ai, &t, 0, 1);
     ctl->unk0 = 3;
     D_800F1F50[0] &= ~0x8000;
     do {
@@ -83,13 +83,13 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
     if (target != NULL) {
         if (ctl->state == 4) {
             dest = target->header.m_vPos;
-            angle = func_00246310(obj, dest);
+            angle = AI_AngleToPoint(obj, dest);
         }
         dest = ctl->dest;
         if (ctl->state == 3 || ctl->state == 11) {
-            angle = func_00246310(obj, dest);
+            angle = AI_AngleToPoint(obj, dest);
         }
-        func_0020EF2C(&d, &obj->header.m_vPos, &dest);
+        CVector3__Subtract(&d, &obj->header.m_vPos, &dest);
         if (func_00298470(d.x * d.x + d.z * d.z) <= 50.0f) {
             if (D_8012F604.state == 3) {
                 if (D_8012F608 == 1) {
@@ -103,9 +103,9 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
                 }
                 D_8012F604.cursor = -1;
                 D_8012F604.index = -1;
-                func_00243414(D_8012F604.partB, &D_8012F604.partB->m_AI, 0);
-                func_00243414(D_8012F604.partA, &D_8012F604.partA->m_AI, 0);
-                func_00243414(obj, ai, 0x1A);
+                CAI__SetMode(D_8012F604.partB, &D_8012F604.partB->m_AI, 0);
+                CAI__SetMode(D_8012F604.partA, &D_8012F604.partA->m_AI, 0);
+                CAI__SetMode(obj, ai, 0x1A);
                 return;
             }
             if (D_8012F604.state == 11) {
@@ -120,7 +120,7 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
                 }
                 D_8012F604.cursor = -1;
                 D_8012F604.index = -1;
-                func_00243414(obj, ai, 0x17);
+                CAI__SetMode(obj, ai, 0x17);
                 return;
             }
             if (D_8012F604.state == 4) {
@@ -139,10 +139,10 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
         }
     }
     speed = 0.0f;
-    func_00245BAC(obj, ai, 0.261799425f, angle);
+    AI_TurnClamped(obj, ai, 0.261799425f, angle);
     dest = D_8012F604.dest;
-    func_0020EF2C(&d, &obj->header.m_vPos, &dest);
-    heading = func_0020EAA0(&d);
+    CVector3__Subtract(&d, &obj->header.m_vPos, &dest);
+    heading = CVector3__GetYaw(&d);
     if (D_8012F604.state == 3 || D_8012F604.state == 11) {
         if (obj->header.m_vPos.y < 921.6f) {
             obj->m_vVelocity.y = 460.8f;
@@ -153,7 +153,7 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
         obj->m_vVelocity.x = func_002982F0(heading) * speed;
         obj->m_vVelocity.z = func_002974C0(heading) * speed;
     } else {
-        speed = func_0021160C(speed, D_8012F604.speed, 5120.0f);
+        speed = Math_StepClamped(speed, D_8012F604.speed, 5120.0f);
         obj->m_vVelocity.x += speed * func_002982F0(heading);
         obj->m_vVelocity.z += speed * func_002974C0(heading);
         obj->m_vVelocity.y = 0.001f;
@@ -171,8 +171,8 @@ void func_0043F000(CGameObjectInstance *obj, CAI *ai) {
                     D_8012FA00 = 0;
                 }
                 D_8012F604.index = D_8012FA00;
-            } while ((f32) D_8012F9FC[D_8012FA00].chance <= func_002119FC(0.0f, 100.0f));
+            } while ((f32) D_8012F9FC[D_8012FA00].chance <= Random_Blend(0.0f, 100.0f));
         }
-        func_00404C44(obj, ai, t.m_Sight.m_Dist);
+        Primagen_RunAttackStep(obj, ai, t.m_Sight.m_Dist);
     }
 }

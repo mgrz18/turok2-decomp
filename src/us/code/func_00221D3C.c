@@ -12,7 +12,7 @@
  * grid region seen by one of the views, every static object and every level
  * actor shown in this view and inside a view's frustum is drawn, or, when
  * translucent, queued on the world's sorted list (0x1064, drawn later by
- * func_0022077C). The list is built in place behind a branch command that
+ * CScene__DrawSortedList). The list is built in place behind a branch command that
  * jumps over it, and later views just call it (0xDE000000). */
 
 /* D_8011AAD8 (structs/game.h) seen from its difficulty, D_8011AAE0: the
@@ -26,15 +26,15 @@ extern ViewState D_8011AAE0;
 extern s32 D_800F5A40;
 extern Gfx *D_800ACDE0;     /* the level's display list, once built this frame */
 
-void func_0020B5D4(void);
-void func_0020B624(void);
-void func_0020565C(s32, void **);
-void *func_002017D4(void *, s32);
-s32 func_0026F60C(void *, CBox *);
-void func_00214844(CStaticObject *, CCamera *);
-void func_002152AC(CLevelActor *);
+void Render_ResetBatches(void);
+void Render_FlushBatches(void);
+void CCache__LockForDisplayList(s32, void **);
+void *CISet__GetBlock(void *, s32);
+s32 Frustum_TestBox(void *, CBox *);
+void CStaticObject__Draw(CStaticObject *, CCamera *);
+void CLevelActor__Draw(CLevelActor *);
 
-void func_00221D3C(CWorld *w) {
+void CScene__BuildGeometryDisplayList(CWorld *w) {
     s32 r;
     s32 n;
     u8 *objs;
@@ -80,7 +80,7 @@ void func_00221D3C(CWorld *w) {
             g->w0 = 0xE3000A01;
             g->w1 = 0x100000;
         }
-        func_0020B5D4();
+        Render_ResetBatches();
         w->m_nDeferred = 0;
         {
             Gfx *g = D_800D8E24++;
@@ -122,10 +122,10 @@ void func_00221D3C(CWorld *w) {
                     v = v->m_pNext;
                 }
                 if (found) {
-                    func_0020565C(0, region->m_hData);
+                    CCache__LockForDisplayList(0, region->m_hData);
                     k = 0;
                     grp = *region->m_hData;
-                    t = func_002017D4(grp, k);
+                    t = CISet__GetBlock(grp, k);
                     cnt = t->count;
                     objs = t->entries;
                     if (cnt > 0) {
@@ -140,7 +140,7 @@ void func_00221D3C(CWorld *w) {
                                         if (v->m_ViewMax.x > o->m_Bounds.m_vMin.x && v->m_ViewMin.x < o->m_Bounds.m_vMax.x
                                             && v->m_ViewMax.z > o->m_Bounds.m_vMin.z && v->m_ViewMin.z < o->m_Bounds.m_vMax.z
                                             && v->m_ViewMax.y > o->m_Bounds.m_vMin.y && v->m_ViewMin.y < o->m_Bounds.m_vMax.y
-                                            && func_0026F60C(v->m_ViewVolume, &o->m_Bounds)) {
+                                            && Frustum_TestBox(v->m_ViewVolume, &o->m_Bounds)) {
                                             found = 1;
                                             break;
                                         }
@@ -155,7 +155,7 @@ void func_00221D3C(CWorld *w) {
                                                 w->m_nDeferred = c + 1;
                                             }
                                         } else {
-                                            func_00214844(o, views);
+                                            CStaticObject__Draw(o, views);
                                         }
                                     }
                                 }
@@ -165,7 +165,7 @@ void func_00221D3C(CWorld *w) {
                         } while (k < cnt);
                     }
                     do {
-                        t = func_002017D4(grp, 1);
+                        t = CISet__GetBlock(grp, 1);
                     } while (0);
                     k = 0;
                     cnt2 = t->count;
@@ -189,7 +189,7 @@ void func_00221D3C(CWorld *w) {
                                     if (v->m_ViewMax.x > a->m_Bounds.m_vMin.x && v->m_ViewMin.x < a->m_Bounds.m_vMax.x
                                         && v->m_ViewMax.z > a->m_Bounds.m_vMin.z && v->m_ViewMin.z < a->m_Bounds.m_vMax.z
                                         && v->m_ViewMax.y > a->m_Bounds.m_vMin.y && v->m_ViewMin.y < a->m_Bounds.m_vMax.y
-                                        && func_0026F60C(v->m_ViewVolume, &a->m_Bounds)) {
+                                        && Frustum_TestBox(v->m_ViewVolume, &a->m_Bounds)) {
                                         found = 1;
                                         break;
                                     }
@@ -203,7 +203,7 @@ void func_00221D3C(CWorld *w) {
                                             w->m_nDeferred = c + 1;
                                         }
                                     } else {
-                                        func_002152AC(a);
+                                        CLevelActor__Draw(a);
                                     }
                                 }
                             }
@@ -215,7 +215,7 @@ void func_00221D3C(CWorld *w) {
                 r++;
             } while (r < n);
         }
-        func_0020B624();
+        Render_FlushBatches();
         {
             Gfx *g = D_800D8E24++;
             g->w0 = 0xDF000000;

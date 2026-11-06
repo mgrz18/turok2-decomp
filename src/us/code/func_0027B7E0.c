@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0027B7E0(u16 *grid, s16 x0, s32 y);
-extern void func_0027A2C4(s32 *data, s32 x, s16 y, s32 w, s32 h);
-void func_0027B7E0(u16 *grid, s16 x0, s32 y) {
+extern void Hud_DrawI4Image(u16 *grid, s16 x0, s32 y);
+extern void Hud_DrawI4Block(s32 *data, s32 x, s16 y, s32 w, s32 h);
+void Hud_DrawI4Image(u16 *grid, s16 x0, s32 y) {
     s32 *tile;
     s32 rows;
     s32 cols;
@@ -21,7 +21,7 @@ void func_0027B7E0(u16 *grid, s16 x0, s32 y) {
         while (--cols != -1) {
             w = tile[0];
             h = tile[1];
-            func_0027A2C4(tile + 2, x, y, w, h);
+            Hud_DrawI4Block(tile + 2, x, y, w, h);
             x += w;
             tile = (s32 *)((char *)tile + ((u32)(w * h) >> 1));
             tile += 2;

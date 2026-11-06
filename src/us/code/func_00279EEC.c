@@ -79,7 +79,7 @@ extern Gfx *D_800D8E24;
         gDPSetTileSize(0, 0, 0, ((width) - 1) << 2, ((height) - 1) << 2)                        \
     }
 
-void func_00279EEC(u16 *image, u8 *mask, s32 x, s32 y, s32 texWidth, s32 texHeight, s32 width, s32 height) {
+void Hud_DrawMaskedBlockSized(u16 *image, u8 *mask, s32 x, s32 y, s32 texWidth, s32 texHeight, s32 width, s32 height) {
     gDPLoadMultiBlock_4b(mask, 0x100, 0, G_IM_FMT_I, texWidth, texHeight);
     gDPLoadTextureBlock_16b(image, G_IM_FMT_RGBA, texWidth, texHeight);
     gDPSetTile(G_IM_FMT_I, G_IM_SIZ_4b, texWidth / 16, 0x100, 1);

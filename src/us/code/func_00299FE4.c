@@ -9,8 +9,8 @@ struct Slot;
 struct Slot {
     char data[24];
 };
-extern void func_00299FE4(void);
-extern void func_0029B030(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
+extern void __osSiGetAccess(void);
+extern void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 static __inline__ void create_access_queue(void) {
@@ -18,10 +18,10 @@ static __inline__ void create_access_queue(void) {
     extern OSMesg D_80121670;
     extern s32 D_800B7A50[];
     D_800B7A50[0] = 1;
-    func_0029B030(&D_80121678, &D_80121670, 1);
+    osCreateMesgQueue(&D_80121678, &D_80121670, 1);
     osSendMesg(&D_80121678, 0, 0);
 }
-void func_00299FE4(void) {
+void __osSiGetAccess(void) {
     extern Slot D_80121678;
     extern s32 D_800B7A50[];
     OSMesg token;

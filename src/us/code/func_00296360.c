@@ -32,7 +32,7 @@
     _a->words.w1 = _SHIFTL(i, 16, 16) | _SHIFTL(o, 0, 16); \
 }
 
-Acmd *func_00296360(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) {
+Acmd *alMainBusPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) {
     Acmd *ptr = p;
     ALMainBus *m = (ALMainBus *)filter;
     ALFilter **sources = m->sources;

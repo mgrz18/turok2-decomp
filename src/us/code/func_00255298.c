@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern void func_0024E5F0(CPlayer *player, CGameObjectInstance *other, s32 mode);
+extern void CPlayer__SetState(CPlayer *player, CGameObjectInstance *other, s32 mode);
 
 /* s16 player mode at 0xA08. */
 #define PLAYER_MODE(p) (*(s16 *)((u8 *)(p) + 0xA08))
@@ -18,7 +18,7 @@ static __inline__ s32 InMode10To12(CPlayer *player) {
 
 /* Puts the player in mode 0xE when touching an actor whose intelligence has
  * flag 1 and whose AI has flag 0x1000 (and not 0x80). */
-s32 func_00255298(CPlayer *player, CGameObjectInstance *actor) {
+s32 CPlayer__CheckClimb(CPlayer *player, CGameObjectInstance *actor) {
     if (InMode10To12(player)) {
         return 0;
     }
@@ -38,7 +38,7 @@ s32 func_00255298(CPlayer *player, CGameObjectInstance *actor) {
         if (!(actor->m_AI.m_dwFlags & 0x1000)) {
             return 0;
         }
-        func_0024E5F0(player, actor, 0xE);
+        CPlayer__SetState(player, actor, 0xE);
         return 1;
     }
     return 0;

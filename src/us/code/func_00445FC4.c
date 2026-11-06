@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040CFC4 (in src/us/code/func_0040C850.c). */
+/* Second-module copy of BlindOne_PhaseWaitPlayerUpdate (in src/us/code/BlindOne_UpdateMover.c). */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
@@ -39,7 +39,7 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_00445FC4(BlindOneState *m) {
+void BlindOne_PhaseWaitPlayerUpdate_2(BlindOneState *m) {
     CPlayer *player = D_80119890;
 
     if (player != NULL) {

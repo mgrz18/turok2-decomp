@@ -4,8 +4,8 @@
 #include "rw/junk_types.h"
 #include "structs/controller.h"
 
-extern void func_0026EB3C(void *a, void *b, s32 n);
-s32 func_004690E8(S5Ctl *c, s32 port) {
+extern void RumblePool_Init(void *a, void *b, s32 n);
+s32 Cont_ResetSlot_2(S5Ctl *c, s32 port) {
     s32 i;
     c->port = port;
     c->f0 = 0;
@@ -34,6 +34,6 @@ s32 func_004690E8(S5Ctl *c, s32 port) {
     c->f0 = ((D_800F6778[port].errno >> 3) ^ 1) & 1;
     c->fD0 = 0;
     c->fD4 = 0;
-    func_0026EB3C(c->blkA, c->blkB, 3);
+    RumblePool_Init(c->blkA, c->blkB, 3);
     return c->f0;
 }

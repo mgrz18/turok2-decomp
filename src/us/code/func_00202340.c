@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00202340(Pool80255720 *arg0);
-void func_00202340(Pool80255720 *arg0)
+extern void CHeap__FreeAll(Pool80255720 *arg0);
+void CHeap__FreeAll(Pool80255720 *arg0)
 {
     Block80255720 *block;
     Block80255720 *header;

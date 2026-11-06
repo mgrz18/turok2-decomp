@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_0021153C(f32 arg0);
-extern f32 func_0020F5C0(f32 *arg0);
+extern f32 Math_AcosLookup(f32 arg0);
+extern f32 CVector3__GetPitch(f32 *arg0);
 extern float D_800A55D4;
 extern float D_800A55DC;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32 arg0);
-f32 func_0020F5C0(f32 *arg0) {
+f32 CVector3__GetPitch(f32 *arg0) {
     f32 y;
     f32 zero;
     f32 x;
@@ -34,7 +34,7 @@ f32 func_0020F5C0(f32 *arg0) {
     if (D_800A55DC < ratio) {
         goto return_zero;
     }
-    return func_0021153C(ratio) - *(&D_800A55DC + 1);
+    return Math_AcosLookup(ratio) - *(&D_800A55DC + 1);
 return_zero:
     return zero;
 }

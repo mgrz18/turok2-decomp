@@ -4,11 +4,11 @@
 extern u8 D_800F7078[];
 
 void func_002888BC(s32, s32, s32);
-s32 func_0042AC0C(void *, s32, s32);
+s32 CScene__LoadLevel(void *, s32, s32);
 
 /* The ROM bases every store on D_8011ACB0 (the match), the settings at
  * -0x1D8 from it. */
-void func_002892D8(s32 arg0) {
+void EngineMode01_Legal_Init(s32 arg0) {
     GameMatch *match = &D_8011ACB0;
     GameSettings *settings;
 
@@ -18,5 +18,5 @@ void func_002892D8(s32 arg0) {
     settings->multiplayer = 0;
     settings->playerCount = 1;
     func_002888BC(arg0, 0, 0);
-    func_0042AC0C(D_800F7078, 0, 0);
+    CScene__LoadLevel(D_800F7078, 0, 0);
 }

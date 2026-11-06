@@ -8,11 +8,11 @@ extern char D_800B6540[];
 extern char D_800B6588[];
 extern char D_800C1030[]; /* "  %2d" */
 extern char D_800C1038[]; /* " %3d" */
-extern s32 func_004160F0(MenuItem *a);
-extern void func_0029E3E0(char *dst, char *fmt, ...);
+extern s32 MenuItem_TextLength(MenuItem *a);
+extern void sprintf(char *dst, char *fmt, ...);
 
 /* Label of a slider setting: its value from -16 to 15, in steps of 8 raw units. */
-s32 func_00419F48(MenuItem *a) {
+s32 SoundMenu_SfxVolumeLabel(MenuItem *a) {
     s32 v = (D_8011AAED - 0x80) / 8;
 
     if (v == 0) {
@@ -23,10 +23,10 @@ s32 func_00419F48(MenuItem *a) {
         a->text = D_800B6540;
     } else if (v > 0) {
         a->text = D_800B6588;
-        func_0029E3E0(a->text + (func_004160F0(a) - 4), D_800C1030, v);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1030, v);
     } else {
         a->text = D_800B6588;
-        func_0029E3E0(a->text + (func_004160F0(a) - 4), D_800C1038, v);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1038, v);
     }
     return 0;
 }

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_00276790(Lists *arg0, s32 arg1) {
+void SndQueue_CancelFlags(Lists *arg0, s32 arg1) {
     NodeRecAtAC *var_a2;
     NodeRecAtAC *temp_a3;
     NodeRecAtAC *temp_v0;

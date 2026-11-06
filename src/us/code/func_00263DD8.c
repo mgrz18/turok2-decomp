@@ -96,11 +96,11 @@ struct M1Pad {
                 M1B1 stickX;
                 M1B1 stickY;
 };
-f32 func_00266F50(f32 x);
-void func_0020EF8C(CVector3 *dst, f32 t, CVector3 *src, CVector3 *v);
-f32 func_0026BE60(s32 id, f32 x, f32 z);
-void func_0026C888(s32 id, f32 y);
-void func_00263DD8(M1Actor *actor, M1State *state) {
+f32 SmoothStep(f32 x);
+void CVector3__Lerp(CVector3 *dst, f32 t, CVector3 *src, CVector3 *v);
+f32 CGameRegion__GetHeight(s32 id, f32 x, f32 z);
+void CGameRegion__SetGroupHeight(s32 id, f32 y);
+void Platform_UpdatePosition(M1Actor *actor, M1State *state) {
     M1Info *info;
     f32 t;
     f32 lo;
@@ -115,7 +115,7 @@ void func_00263DD8(M1Actor *actor, M1State *state) {
         t = lo;
     }
     if (info->unk28.b[1] == 0) {
-        t = func_00266F50(t);
+        t = SmoothStep(t);
     }
     v = state->v9C;
     v.y += info->f2C;
@@ -123,7 +123,7 @@ void func_00263DD8(M1Actor *actor, M1State *state) {
         v.x += info->f30 * func_002982F0(info->f34);
         v.z += info->f30 * func_002974C0(info->f34);
     }
-    func_0020EF8C(&state->v54, t, &state->v9C, &v);
+    CVector3__Lerp(&state->v54, t, &state->v9C, &v);
     switch (info->unk28.b[0]) {
     case 0:
         x = func_002982F0(state->f124);
@@ -158,6 +158,6 @@ join:
         break;
     }
     if (info->unk4.hu[0] == 0) {
-        func_0026C888(actor->unk10, (func_0026BE60(actor->unk10, actor->pos.x, actor->pos.z) + state->v54.y) - actor->pos.y);
+        CGameRegion__SetGroupHeight(actor->unk10, (CGameRegion__GetHeight(actor->unk10, actor->pos.x, actor->pos.z) + state->v54.y) - actor->pos.y);
     }
 }

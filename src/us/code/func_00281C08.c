@@ -17,7 +17,7 @@ typedef struct {
     /* 0x18 */ Block00281C08 blocks[3];
 } Unk00281C08;
 
-void func_00281C08(Unk00281C08 *arg0) {
+void CShake__Construct(Unk00281C08 *arg0) {
     Block00281C08 *temp_a0;
     Block00281C08 *temp_v0;
     Block00281C08 *temp_v0_2;

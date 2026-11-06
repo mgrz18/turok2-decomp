@@ -194,7 +194,7 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct LevelActor;
 struct LevelActor;
-s32 func_00225210(char *object, s32 type) {
+s32 CScene__AreEventsDone(char *object, s32 type) {
     s32 index;
     CWorldRecord *record;
     u8 *flags;

@@ -9,11 +9,11 @@ typedef struct {
     /* 0x131 */ s8 unk131;
 } State;
 
-s32 func_00259E60(CGameObjectInstance *actor, State *state);
-s32 func_00259E8C(CGameObjectInstance *actor, State *state);
-s32 func_00259EB8(CGameObjectInstance *actor, State *state);
+s32 EnemyAnim_Idle_AF6F0(CGameObjectInstance *actor, State *state);
+s32 EnemyAnim_Idle_AF720(CGameObjectInstance *actor, State *state);
+s32 EnemyAnim_Idle_AF750(CGameObjectInstance *actor, State *state);
 
-s32 func_0025E6E0(CGameObjectInstance *actor, State *state) {
+s32 EnemyAnim_PickStart(CGameObjectInstance *actor, State *state) {
     CEnemyIntelligence *ov = &actor->header.m_pIntelligence->m_Enemy;
 
     if (ov->m_StartAnim != 0) {
@@ -32,10 +32,10 @@ s32 func_0025E6E0(CGameObjectInstance *actor, State *state) {
         return ov->m_StartAnim;
     }
     if (state->unk130) {
-        return func_00259E60(actor, state);
+        return EnemyAnim_Idle_AF6F0(actor, state);
     }
     if (state->unk131) {
-        return func_00259E8C(actor, state);
+        return EnemyAnim_Idle_AF720(actor, state);
     }
-    return func_00259EB8(actor, state);
+    return EnemyAnim_Idle_AF750(actor, state);
 }

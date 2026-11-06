@@ -1,4 +1,4 @@
-/* Module-2 copy of func_00427524 (0x00460444 named, linked 0x00427444). */
+/* Module-2 copy of __osPfsDeclearPage (0x00460444 named, linked 0x00427444). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SDK/PFS/80446BD0_4.CPP, func_80446324_de, with Turok 2's layouts. */
 /* __osPfsDeclearPage_2 (libultra pfsallocatefile.c). */
 #include "rw/abu_types.h"

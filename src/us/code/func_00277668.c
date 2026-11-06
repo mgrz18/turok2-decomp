@@ -1,5 +1,5 @@
 /* Draw the outline of a box, `border` pixels thick, in one flat colour: the top, bottom, left and right bars as fill rectangles. */
-/* Same display-list style as its neighbour func_002778A8 (after Turok: Rage Wars' rectangle()). */
+/* Same display-list style as its neighbour Hud_DrawBevelBox (after Turok: Rage Wars' rectangle()). */
 
 #include "common.h"
 #include "gfx.h"
@@ -21,7 +21,7 @@ extern Gfx *D_800D8E24;
       _g->w0 = _SHIFTL(0xF6, 24, 8) | _SHIFTL(lrx, 14, 10) | _SHIFTL(lry, 2, 10);    \
       _g->w1 = _SHIFTL(ulx, 14, 10) | _SHIFTL(uly, 2, 10); }
 
-void func_00277668(s32 x0, s32 y0, s32 x1, s32 y1, s32 border, u8 r, u8 g, u8 b, u8 a) {
+void Hud_DrawBoxOutline(s32 x0, s32 y0, s32 x1, s32 y1, s32 border, u8 r, u8 g, u8 b, u8 a) {
     gDPPipeSync();
     gDPSetPrimColor(255, 255, r, g, b, a);
     gDPFillRectangle(CLAMP0(x0), CLAMP0(y0), CLAMP0(x1), CLAMP0(y0 + border));

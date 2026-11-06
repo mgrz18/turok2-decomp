@@ -1,4 +1,4 @@
-/* Second VM module copy of func_0042DC18 (same source, linked 0x0042DB38). */
+/* Second VM module copy of CPlayer__NewGame (same source, linked 0x0042DB38). */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
@@ -7,31 +7,31 @@
 extern u8 D_8011AAF1;   /* multiplayer */
 extern u8 D_801198B0[];
 
-extern s32 func_0027BC34(void);
-extern s32 func_0028D0E0(void);
+extern s32 Demo_GetPlayerCount(void);
+extern s32 SavedPlayers_IsActive(void);
 extern u8 *func_0042FE78(void *);
-extern void func_00254C44(void *strokes);
-extern void func_00248A8C(CPlayer *p);
+extern void CBarrel__Reset(void *strokes);
+extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void func_0042E920(CPlayer *p);
-extern void func_00416644(void *, void *callback, CPlayer *p, s32 controller, s32 index);
+extern void MenuPool_OpenMenu(void *, void *callback, CPlayer *p, s32 controller, s32 index);
 extern void func_00438800();
 extern void func_00438728();
 extern void func_0043908C();
 
-void func_00466B38(CPlayer *p, s32 character, s32 arg2) {
+void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
     GameSettings *flags;
     s32 i;
 
-    if (func_0027BC34()) {
+    if (Demo_GetPlayerCount()) {
         arg2 = 0;
     }
-    if (func_0028D0E0()) {
+    if (SavedPlayers_IsActive()) {
         arg2 = 0;
     }
     p->m_bActive = 1;
     p->m_Data.m_nDeathmatchCharacter = character;
     p->m_pCamera = (struct CCamera *) func_0042FE78(D_801198B0);
-    func_00254C44(&p->m_Barrel);
+    CBarrel__Reset(&p->m_Barrel);
     for (i = 0; i < 0x400; i++) {
         p->m_Data.m_SpecialPickupCount[i] = 0;
     }
@@ -47,7 +47,7 @@ void func_00466B38(CPlayer *p, s32 character, s32 arg2) {
     } else {
         p->m_Data.m_Lives = 1;
     }
-    func_00248A8C(p);
+    CPlayer__GiveStartingWeapons(p);
     p->m_InvincibilityTime = 0;
     p->m_PlaneWalkerTime = 0;
     p->m_CharAnim = -1;
@@ -92,12 +92,12 @@ void func_00466B38(CPlayer *p, s32 character, s32 arg2) {
             p->m_Data.m_nDeathmatchCharacter = 0;
             p->m_bEnteringDeathmatch = 1;
             if (flags->match.teams) {
-                func_00416644(p->m_pCamera->m_MenuPool, func_00438800, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_00438800, p, (s32) p->m_ContState.m_pContState, p->m_nController);
             } else {
-                func_00416644(p->m_pCamera->m_MenuPool, func_00438728, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_00438728, p, (s32) p->m_ContState.m_pContState, p->m_nController);
             }
         } else {
-            func_00416644(p->m_pCamera->m_MenuPool, func_0043908C, p, (s32) p->m_ContState.m_pContState, p->m_nController);
+            MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, func_0043908C, p, (s32) p->m_ContState.m_pContState, p->m_nController);
         }
     }
 }

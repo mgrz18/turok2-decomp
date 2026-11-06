@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002924CC(List802B663C *arg0, void *arg1);
-void func_002924CC(List802B663C *arg0, void *arg1) {
+extern void __unmapVoice(List802B663C *arg0, void *arg1);
+void __unmapVoice(List802B663C *arg0, void *arg1) {
     Node_func_80239AF4_de *node;
     Node_func_80239AF4_de *prev;
     prev = 0;

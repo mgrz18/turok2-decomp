@@ -8,15 +8,15 @@ typedef struct SweepModel {
     /* 0x28 */ u8 matrix[0x40];
 } SweepModel;
 
-char *func_002017D4(s32 *list, s32 index);
-void func_002051F4(s32 arg0, s32 *arg1);
-void func_0020C618(f32 (*dst)[4], f32 (*a)[4], f32 (*b)[4]);
-void func_0020D908(f32 (*mtx)[4], void *packed);
-s32 *func_00214DBC(void *model);
-void func_0023D7CC(ModelSweep *ms, char *group);
+char *CISet__GetBlock(s32 *list, s32 index);
+void CCache__Unlock(s32 arg0, s32 *arg1);
+void CMtxF__MultiplyAffine(f32 (*dst)[4], f32 (*a)[4], f32 (*b)[4]);
+void CMtxF__FromMtxAffine(f32 (*mtx)[4], void *packed);
+s32 *CStaticObject__LoadGeometry(void *model);
+void ModelSweep_TestGroup(ModelSweep *ms, char *group);
 
 /* Sweep against every polygon group of the model's current variant, until a hit. */
-void func_0023DBBC(ModelSweep *ms) {
+void ModelSweep_TestModel(ModelSweep *ms) {
     SweepModel *model;
     s32 *data;
     s32 *root;
@@ -26,18 +26,18 @@ void func_0023DBBC(ModelSweep *ms) {
     s32 i;
 
     model = ms->model;
-    data = func_00214DBC(model);
+    data = CStaticObject__LoadGeometry(model);
     if (data != NULL) {
-        func_0020D908(ms->mtx, model->matrix);
-        func_0020C618(ms->inverse, ms->mtx, ms->view);
+        CMtxF__FromMtxAffine(ms->mtx, model->matrix);
+        CMtxF__MultiplyAffine(ms->inverse, ms->mtx, ms->view);
         root = (s32 *)*data;
-        ms->meshes = func_002017D4(root, 0);
-        groups = (s32 *)func_002017D4((s32 *)func_002017D4(root, 2), model->def->variant);
+        ms->meshes = CISet__GetBlock(root, 0);
+        groups = (s32 *)CISet__GetBlock((s32 *)CISet__GetBlock(root, 2), model->def->variant);
         count = *groups;
         sweep = ms->sweep;
         for (i = 0; i < count && sweep->stop == 0; i++) {
-            func_0023D7CC(ms, func_002017D4(groups, i));
+            ModelSweep_TestGroup(ms, CISet__GetBlock(groups, i));
         }
-        func_002051F4(0, data);
+        CCache__Unlock(0, data);
     }
 }

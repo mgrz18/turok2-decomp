@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_004481D8(s32 arg0, s32 arg1, void **arg2, s32 *arg3, s32 *arg4)
+void BlindOne_SumGroupHealth_2(s32 arg0, s32 arg1, void **arg2, s32 *arg3, s32 *arg4)
 {
   s32 var_t0;
   void **var_a2;

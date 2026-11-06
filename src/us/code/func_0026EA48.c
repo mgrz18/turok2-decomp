@@ -5,10 +5,10 @@
 
 extern float D_800A8058;
 extern float D_800A8060;
-extern f32 func_0026EA48(f32 *arg0, u32 arg1, u32 arg2, u32 arg3);
+extern f32 Rumble_GetLevelOne(f32 *arg0, u32 arg1, u32 arg2, u32 arg3);
 extern f32 func_00298470(f32);
-extern f32 func_0026EF30(void *arg0);
-f32 func_0026EA48(f32 *arg0, u32 arg1, u32 arg2, u32 arg3) {
+extern f32 RumbleCurve_GetValue(void *arg0);
+f32 Rumble_GetLevelOne(f32 *arg0, u32 arg1, u32 arg2, u32 arg3) {
     f32 magnitude;
     f32 dx;
     f32 dy;
@@ -29,6 +29,6 @@ f32 func_0026EA48(f32 *arg0, u32 arg1, u32 arg2, u32 arg3) {
         }
     }
     factor *= arg0[7];
-    first = func_0026EF30(&arg0[8]);
-    return factor * first * func_0026EF30(&arg0[11]);
+    first = RumbleCurve_GetValue(&arg0[8]);
+    return factor * first * RumbleCurve_GetValue(&arg0[11]);
 }

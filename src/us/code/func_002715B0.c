@@ -1,9 +1,9 @@
 #include "common.h"
 
-s32 func_0027421C(s32);                         /* extern */
-s32 func_0027672C(s32, s32);                /* extern */
+s32 SndVoicePool_StopByOwner(s32);                         /* extern */
+s32 SndQueue_CancelOwner(s32, s32);                /* extern */
 
-void func_002715B0(s32 arg0, s32 arg1) {
-    func_0027421C(arg0 + 0x1DB8);
-    func_0027672C(arg0 + 0x138, arg1);
+void CAudioWorld__StopSoundsByOwner(s32 arg0, s32 arg1) {
+    SndVoicePool_StopByOwner(arg0 + 0x1DB8);
+    SndQueue_CancelOwner(arg0 + 0x138, arg1);
 }

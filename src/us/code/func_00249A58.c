@@ -3,10 +3,10 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-s32 func_00245FC8(CPlayer *, void *, CGameObjectInstance *);
+s32 AI_IsLineOfSightBlocked(CPlayer *, void *, CGameObjectInstance *);
 
 /* Whether the player's weapon may lock on to a target. */
-s32 func_00249A58(CPlayer *player, CGameObjectInstance *t) {
+s32 CPlayer__CanLockOn(CPlayer *player, CGameObjectInstance *t) {
     s32 weapon = player->m_Data.m_CurrentWeapon;
     s32 busy;
     s32 ok;
@@ -42,7 +42,7 @@ s32 func_00249A58(CPlayer *player, CGameObjectInstance *t) {
                 return 0;
             }
             if (t->m_AI.m_Health != 0) {
-                return func_00245FC8(player, &player->m_CharacterActor.m_AI, t) == 0;
+                return AI_IsLineOfSightBlocked(player, &player->m_CharacterActor.m_AI, t) == 0;
             }
             return 0;
         }
@@ -59,7 +59,7 @@ s32 func_00249A58(CPlayer *player, CGameObjectInstance *t) {
     case 4:
         if (t->m_AI.m_Health != 0) {
         visible:
-            return func_00245FC8(player, &player->m_CharacterActor.m_AI, t) == 0;
+            return AI_IsLineOfSightBlocked(player, &player->m_CharacterActor.m_AI, t) == 0;
         }
         return 0;
     case 7:

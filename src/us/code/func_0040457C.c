@@ -73,22 +73,22 @@ extern ModeState0040457C D_8012F608;
 extern u8 D_8010ABA0[];
 extern CListedInstance *D_8010FEB4;
 extern s32 D_800F1F50;
-Entity0040457C *func_002532EC(void *game, Vec3_0040457C pos);
-void func_00243414(void *actor, void *ai, s32 event);
-f32 func_002119FC(f32 lo, f32 hi);
-s32 func_00228108(void *a0, s32 a1, s32 model, s32 handle, s32 region, Vec3_0040457C pos, f32 a6,
+Entity0040457C *CPlayerPool__FindNearest(void *game, Vec3_0040457C pos);
+void CAI__SetMode(void *actor, void *ai, s32 event);
+f32 Random_Blend(f32 lo, f32 hi);
+s32 CInstancePool__Spawn(void *a0, s32 a1, s32 model, s32 handle, s32 region, Vec3_0040457C pos, f32 a6,
                   Vec3_0040457C rot, Vec3_0040457C scale, s32 a9);
-void func_00246108(Entity0040457C *actor, void *level, Info0040457C *info, s32 a3, s32 a4);
-void func_00404FE0(void);
-void func_004050E0(Entity0040457C *actor, void *level, s32 a2);
-void func_00405288(void);
-void func_004053C4(Entity0040457C *actor, void *level, s32 a2);
+void AI_UpdateTargets(Entity0040457C *actor, void *level, Info0040457C *info, s32 a3, s32 a4);
+void Primagen_NextSpawnStep(void);
+void Primagen_RunSpawnStep(Entity0040457C *actor, void *level, s32 a2);
+void Primagen_NextSoundStep(void);
+void Primagen_RunSoundStep(Entity0040457C *actor, void *level, s32 a2);
 
 static __inline__ Wave0040457C *CurrentWave(void) {
     return (Wave0040457C *)(D_8012F608.wave * sizeof(Wave0040457C) + (s32)D_8012F608.waves);
 }
 
-void func_0040457C(Entity0040457C *actor, void *level) {
+void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
     Info0040457C info;
     Vec3_0040457C scale;
     Vec3_0040457C pos;
@@ -100,7 +100,7 @@ void func_0040457C(Entity0040457C *actor, void *level) {
     f32 delay;
     s32 *flags;
 
-    player = func_002532EC(&D_80119870.m_PlayerList, actor->pos);
+    player = CPlayerPool__FindNearest(&D_80119870.m_PlayerList, actor->pos);
     if (player == NULL) {
         return;
     }
@@ -111,15 +111,15 @@ void func_0040457C(Entity0040457C *actor, void *level) {
     if (!D_8012F608.doorsOpen) {
         if (D_8012F608.spawnsLeft > 0) {
             D_8012F608.doorsOpen = 1;
-            func_00243414(D_8012F608.found[2], D_8012F608.found[2]->ai, 0);
-            func_00243414(D_8012F608.found[3], D_8012F608.found[3]->ai, 0);
+            CAI__SetMode(D_8012F608.found[2], D_8012F608.found[2]->ai, 0);
+            CAI__SetMode(D_8012F608.found[3], D_8012F608.found[3]->ai, 0);
         }
     }
     if (D_8012F608.doorsOpen) {
         if (D_8012F608.spawnsLeft == 0 && D_8012F608.spawnTimer <= 0.0f) {
             D_8012F608.doorsOpen = 0;
-            func_00243414(D_8012F608.found[2], D_8012F608.found[2]->ai, 1);
-            func_00243414(D_8012F608.found[3], D_8012F608.found[3]->ai, 1);
+            CAI__SetMode(D_8012F608.found[2], D_8012F608.found[2]->ai, 1);
+            CAI__SetMode(D_8012F608.found[3], D_8012F608.found[3]->ai, 1);
         }
     }
     if (D_8012F608.wavesLeft > 0 && D_8012F608.nextTimer <= 0.0f && D_8012F608.wave != -1) {
@@ -131,11 +131,11 @@ void func_0040457C(Entity0040457C *actor, void *level) {
             D_8012F608.wave = -1;
         } else if (extra != 3) {
             extra -= 3;
-            D_8012F608.nextTimer = delay - extra * 15 + func_002119FC(0.0f, extra * 2) * 15.0f;
+            D_8012F608.nextTimer = delay - extra * 15 + Random_Blend(0.0f, extra * 2) * 15.0f;
         } else {
             D_8012F608.nextTimer = delay;
         }
-        func_00243414(D_8012F608.found[4], D_8012F608.found[4]->ai, 0);
+        CAI__SetMode(D_8012F608.found[4], D_8012F608.found[4]->ai, 0);
     }
     if ((u32)(D_8012F608.spawnsLeft - 1) < 8 && D_8012F608.waveTimer <= 0.0f) {
         pos.x = 1669.12f;
@@ -144,7 +144,7 @@ void func_0040457C(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (func_00228108(D_8010ABA0, -1, 0x387, D_8012F608.handle, D_8012F608.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(D_8010ABA0, -1, 0x387, D_8012F608.handle, D_8012F608.region, pos, 0.0f, actor->rot,
                           scale, 0)) {
             D_8012F608.spawnsLeft--;
             if (D_8012F608.waves != NULL) {
@@ -165,7 +165,7 @@ void func_0040457C(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (func_00228108(D_8010ABA0, -1, 0x387, D_8012F608.handle, D_8012F608.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(D_8010ABA0, -1, 0x387, D_8012F608.handle, D_8012F608.region, pos, 0.0f, actor->rot,
                           scale, 0)) {
             D_8012F608.spawnsLeft--;
             if (D_8012F608.waves != NULL) {
@@ -184,7 +184,7 @@ void func_0040457C(Entity0040457C *actor, void *level) {
         if (D_8012F608.waves != NULL) {
             if (extra != 3) {
                 extra -= 3;
-                D_8012F608.waveTimer = delay - extra * 15 + func_002119FC(0.0f, extra * 2) * 15.0f;
+                D_8012F608.waveTimer = delay - extra * 15 + Random_Blend(0.0f, extra * 2) * 15.0f;
             } else {
                 D_8012F608.waveTimer = delay;
             }
@@ -202,16 +202,16 @@ void func_0040457C(Entity0040457C *actor, void *level) {
     }
     flags = &D_800F1F50;
     *flags |= 0x8000;
-    func_00246108(actor, level, &info, 0, 1);
+    AI_UpdateTargets(actor, level, &info, 0, 1);
     *flags &= ~0x8000;
     if (D_8012F608.wave == -1) {
-        func_00404FE0();
+        Primagen_NextSpawnStep();
     }
-    func_004050E0(actor, level, info.unk24);
+    Primagen_RunSpawnStep(actor, level, info.unk24);
     if (D_8012F608.unk420 == -1) {
-        func_00405288();
+        Primagen_NextSoundStep();
     }
-    func_004053C4(actor, level, info.unk24);
+    Primagen_RunSoundStep(actor, level, info.unk24);
     if (D_8012F608.waves != NULL) {
         if (D_8012F608.enemiesAlive == 0) {
             wave = CurrentWave();

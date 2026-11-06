@@ -8,13 +8,13 @@ extern s32 D_800C2038;
 extern Gfx *D_800D8E24;
 extern Gfx *D_800D8E24;
 extern s32 D_800C2038;
-extern void func_00207A70(s32 arg0);
-extern void func_00207FEC(s32 arg0);
-void func_00279028(s32 color) {
+extern void Render_SetCombineMode(s32 arg0);
+extern void Render_SetRenderMode(s32 arg0);
+void Hud_SetupTextureMode(s32 color) {
     { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
     { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x1)) << 20))); };
-    func_00207A70(0x1B);
-    func_00207FEC(0x19);
+    Render_SetCombineMode(0x1B);
+    Render_SetRenderMode(0x19);
     {
         Gfx *cmd = D_800D8E24++;
         { Gfx *_gbi = (Gfx *)(cmd); _gbi->w0 = ((((unsigned int)(0xFB) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = ((((unsigned int)(255) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(255) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(255) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(color) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); };

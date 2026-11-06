@@ -2,7 +2,7 @@
 #include "structs/demo.h"
 
 
-void func_00468410(void) {
+void Demo_Reset_2(void) {
     D_800F56B0.active = 0;
     D_800F56B0.unk4 = 0;
     D_800F56B0.playing = 0;

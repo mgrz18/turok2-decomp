@@ -10,7 +10,7 @@ typedef struct {
     /* 0x1C */ s32 unk1C;
 } Record8;
 
-void func_00425604(Record8 *arg0) {
+void GfxPool_Clear(Record8 *arg0) {
     s32 var_v1;
     s32 *var_v0;
 

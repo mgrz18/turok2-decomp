@@ -3,6 +3,6 @@
 
 extern s32 D_8011ACCC;
 
-s32 func_00451310(void) {
+s32 TeamMenu_Poll_2(void) {
     return D_8011ACCC;
 }

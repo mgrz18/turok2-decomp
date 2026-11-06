@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-u8 *func_0045FD24(u8 *arg0, u8 *arg1)
+u8 *Str_Copy_2(u8 *arg0, u8 *arg1)
 {
   u8 *var_a1;
   u8 *var_v1;

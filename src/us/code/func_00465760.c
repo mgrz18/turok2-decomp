@@ -20,29 +20,29 @@ struct Level {
 };
 struct Level;
 typedef struct Level Level;
-extern void func_002842C8();
-extern void func_002842B4();
-extern void func_002842C8(void);
-extern void func_002842B4(void);
-extern void func_00220BF0(Level *, Item_func_8044D668_de *);
+extern void Cinema_Disable();
+extern void Cinema_Enable();
+extern void Cinema_Disable(void);
+extern void Cinema_Enable(void);
+extern void CScene__RestoreFiredEvent(Level *, Item_func_8044D668_de *);
 void func_00465760(Level *level) {
     s32 i;
     s32 n;
     Item_func_8044D668_de *item;
-    func_002842C8();
+    Cinema_Disable();
     n = level->counts[0];
     for (i = 0; i < n; i++) {
         item = &level->items[0][i];
         if (item->kind == 1 || item->kind == 4 || item->kind == 2 || item->kind == 10) {
-            func_00220BF0(level, item);
+            CScene__RestoreFiredEvent(level, item);
         }
     }
     n = level->counts[1];
     for (i = 0; i < n; i++) {
         item = &level->items[1][i];
         if (item->kind == 1 || item->kind == 4 || item->kind == 2 || item->kind == 10) {
-            func_00220BF0(level, item);
+            CScene__RestoreFiredEvent(level, item);
         }
     }
-    func_002842B4();
+    Cinema_Enable();
 }

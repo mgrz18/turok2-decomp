@@ -5,7 +5,7 @@ typedef struct {
     s32 flags;                  /* 0x0C */
 } Item;
 
-s32 func_00443D28(void *unused, Item *item) {
+s32 MotherBoss_PickWarpAnim_2(void *unused, Item *item) {
     s32 flags = item->flags;
     s32 bit2 = flags & 2;
     s32 result;

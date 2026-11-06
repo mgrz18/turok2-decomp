@@ -11,10 +11,10 @@ typedef struct CollisionInfo {
 
 extern CCollisionResults D_800F1CE0;
 
-s32 func_00239F00(CObjectHead *obj, CVector3 to, CollisionInfo *info);
+s32 Collision_MoveInstance(CObjectHead *obj, CVector3 to, CollisionInfo *info);
 
 /* Whether obj can move to `to` without hitting anything; obj is left where it was. */
-s32 func_002698AC(CObjectHead *obj, CVector3 to, CollisionInfo *info) {
+s32 GameObject_CanMoveTo(CObjectHead *obj, CVector3 to, CollisionInfo *info) {
     CObjectHead saved;
     CollisionInfo probe;
     s32 hit;
@@ -23,7 +23,7 @@ s32 func_002698AC(CObjectHead *obj, CVector3 to, CollisionInfo *info) {
     probe = *info;
     probe.unk5 = 1;
     probe.unk4 = 0;
-    func_00239F00(obj, to, &probe);
+    Collision_MoveInstance(obj, to, &probe);
     *obj = saved;
     hit = 0;
     if (D_800F1CE0.m_pInstance != NULL || D_800F1CE0.m_pWallRegion != NULL) {

@@ -3,10 +3,10 @@
 
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
-void func_0026E110(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
-void func_00264518(CGameObjectInstance *actor, u32 *flags) {
+void GameObject_FireTriggers(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
+void Platform_ForwardEnter(CGameObjectInstance *actor, u32 *flags) {
     CPlatformIntelligence *info = &actor->header.m_pIntelligence->m_Platform;
-    func_0026E110(actor, 0x10000, actor);
+    GameObject_FireTriggers(actor, 0x10000, actor);
     if (!(info->m_dwPlatformFlags & 0x40)) {
         *flags &= 0xF7FFFFFF;
     }

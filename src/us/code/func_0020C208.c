@@ -5,7 +5,7 @@
  * Invert a row-major affine 4x4 transform (last column 0,0,0,1, translation in
  * the last row); a singular input is copied to out unchanged.
  */
-void func_0020C208(f32 *out, f32 *m) {
+void CMtxF__InvertAffine(f32 *out, f32 *m) {
     f32 determinant;
     f32 reciprocalDeterminant;
     f32 m01TimesM22;

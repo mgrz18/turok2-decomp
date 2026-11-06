@@ -9,11 +9,11 @@
 
 extern BlindOneState D_80130200;
 extern u8 D_00432464[];
-extern void func_00236314(void *dst, void *src);
-extern void func_00243414(void *obj, CAI *ai, s32 state);
-extern void func_00206068(s32 arg0);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
+extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
+extern void CCache__SetFrameDelay(s32 arg0);
 
-void func_0040D9B8(void *obj, CAI *ai, DamageEvent *event) {
+void BlindOne_BossHurt(void *obj, CAI *ai, DamageEvent *event) {
     BlindOneState *state;
     s32 health;
 
@@ -21,7 +21,7 @@ void func_0040D9B8(void *obj, CAI *ai, DamageEvent *event) {
         state = &D_80130200;
         if (state->phase != 9) {
             ai->m_AnimRepeatedCount = 0;
-            func_00243414(obj, ai, 6);
+            CAI__SetMode(obj, ai, 6);
         } else {
             health = ai->m_Health - event->damage;
             if (health < 0) {
@@ -30,11 +30,11 @@ void func_0040D9B8(void *obj, CAI *ai, DamageEvent *event) {
             ai->m_Health = health;
             if (ai->m_BlindOne.m_HitTimer == 0.0f) {
                 ai->m_BlindOne.m_HitTimer = 2.25f;
-                func_00236314(&state->faders[0], D_00432464);
+                ScriptAnimator_SetScript(&state->faders[0], D_00432464);
             }
             if (ai->m_Health == 0) {
-                func_00243414(obj, ai, 9);
-                func_00206068(8);
+                CAI__SetMode(obj, ai, 9);
+                CCache__SetFrameDelay(8);
             }
         }
     }

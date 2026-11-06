@@ -79,17 +79,17 @@ typedef struct {
 extern Gfx *D_800D8E24;             /* display list head */
 extern s32 D_800B6D1C;              /* matrix buffer index */
 
-extern void *func_0020798C(void *model);
-extern void func_002079D8(void *model, AnimInfo *info);
-extern void func_00207A70(s32 mode);
-extern void func_00207FEC(s32 mode);
-extern s32 func_00234C88(Trail *trail, TrailTrack *track, AnimInfo *info);
-extern void func_00206B30(void *slot, void *model, s32 frame, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
-extern Gfx *func_00235F8C(void *pool, s32 count);
-extern void func_00233868(Trail *trail, TrailNode *node, Gfx *vertices, f32 texS, Morph *morph);
-extern void func_002051F4(s32 a, void *model);
+extern void *Texture_Request(void *model);
+extern void Texture_GetInfo(void *model, AnimInfo *info);
+extern void Render_SetCombineMode(s32 mode);
+extern void Render_SetRenderMode(s32 mode);
+extern s32 Trail_GetAnimFrame(Trail *trail, TrailTrack *track, AnimInfo *info);
+extern void Texture_Load(void *slot, void *model, s32 frame, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
+extern Gfx *RibbonVtxPool_Alloc(void *pool, s32 count);
+extern void Morph_BlendVerticesTex(Trail *trail, TrailNode *node, Gfx *vertices, f32 texS, Morph *morph);
+extern void CCache__Unlock(s32 a, void *model);
 
-void func_00234348(void *pool, Trail *trail, s32 unused) {
+void Trail_DrawTextured(void *pool, Trail *trail, s32 unused) {
     AnimInfo info;
     Morph storage;
     AnimInfo *anim;
@@ -110,9 +110,9 @@ void func_00234348(void *pool, Trail *trail, s32 unused) {
             offset += node->length;
         }
     }
-    model = func_0020798C(trail->model);
+    model = Texture_Request(trail->model);
     if (model == 0) return;
-    func_002079D8(model, &info);
+    Texture_GetInfo(model, &info);
     anim = &info;
     storage.items = trail->track->blends;
     storage.count = trail->track->count;
@@ -136,34 +136,34 @@ void func_00234348(void *pool, Trail *trail, s32 unused) {
     GFX_CMD(0xE7000000, 0)
     switch (info.frame->kind) {
     case 3:
-        func_00207A70(0x29);
+        Render_SetCombineMode(0x29);
         GFX_CMD(0xFB000000, (track->env[0] << 24) | (track->env[1] << 16) | (track->env[2] << 8) | 0xFF)
         GFX_CMD(0xFA000000, (track->prim[0] << 24) | (track->prim[1] << 16) | (track->prim[2] << 8) | 0xFF)
         break;
     case 0:
     case 1:
-        func_00207A70(0x28);
+        Render_SetCombineMode(0x28);
         break;
     }
-    func_00207FEC(0xD);
+    Render_SetRenderMode(0xD);
     clock = trail->clock;
     count = track->count;
     next = clock->next;
-    frame = func_00234C88(trail, track, &info);
-    func_00206B30(trail->model, model, frame, 0, 0xFFFF, 0xFFFF, 0, 0, 0);
+    frame = Trail_GetAnimFrame(trail, track, &info);
+    Texture_Load(trail->model, model, frame, 0, 0xFFFF, 0xFFFF, 0, 0, 0);
     edges = count - 1;
     GFX_CMD(0xDA380003, (u32)clock->matrix[D_800B6D1C])
     while (clock != 0 && next != 0 && 0.0f < clock->time && 0.0f < next->time) {
-        vertices = func_00235F8C(pool, count);
+        vertices = RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
-        func_00233868(trail, clock, vertices, clock->offset, &storage);
+        Morph_BlendVerticesTex(trail, clock, vertices, clock->offset, &storage);
         GFX_CMD(0x01000000 | (count << 12) | ((count & 0x7F) << 1), (u32)vertices)
         GFX_CMD(0xDA380003, (u32)next->matrix[D_800B6D1C])
-        vertices = func_00235F8C(pool, count);
+        vertices = RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
         scale = next->offset;
         while (clock->offset < scale) scale -= period;
-        func_00233868(trail, next, vertices, scale, &storage);
+        Morph_BlendVerticesTex(trail, next, vertices, scale, &storage);
         GFX_CMD(0x01000000 | (count << 12) | (((count * 2) & 0x7F) << 1), (u32)vertices)
         for (i = 0; i < edges; i++) {
             GFX_CMD((((i * 2 & 255) << 16) | (((count + i) * 2 & 255) << 8) | ((count + i + 1) * 2 & 255)) | (6 << 24), ((i * 2 & 255) << 16) | (((count + i + 1) * 2 & 255) << 8) | ((i + 1) * 2 & 255))
@@ -174,5 +174,5 @@ void func_00234348(void *pool, Trail *trail, s32 unused) {
         clock = next;
         next = clock->next;
     }
-    func_002051F4(0, model);
+    CCache__Unlock(0, model);
 }

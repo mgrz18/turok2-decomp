@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00243414(s32, s32, s32);
+s32 CAI__SetMode(s32, s32, s32);
 extern f32 D_800B6D28;
 
-s32 func_0025C338(CGameObjectInstance *arg0, CAI *arg1) {
+s32 EnemyAI_TickTimers(CGameObjectInstance *arg0, CAI *arg1) {
     f32 temp_f0;
     f32 temp_f0_2;
     s8 temp_v1;
@@ -24,7 +24,7 @@ s32 func_0025C338(CGameObjectInstance *arg0, CAI *arg1) {
             if (arg1->m_Enemy.m_Timer2 <= 0.0f) {
                 temp_v1 = arg1->m_Mode;
                 if ((temp_v1 == 4) || (temp_v1 == 0xE) || (temp_v1 == 0xF) || (temp_v1 == 0x10) || (temp_v1 == 0x11) || (temp_v1 == 0x12) || (temp_v1 == 0xA)) {
-                    func_00243414((s32) arg0, (s32) arg1, 0x19);
+                    CAI__SetMode((s32) arg0, (s32) arg1, 0x19);
                     return 1;
                 }
                 return 0;

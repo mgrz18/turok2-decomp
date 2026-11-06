@@ -12,11 +12,11 @@ typedef struct {
     /* 0x14C */ CMtxF transform;
 } PlayerView;
 
-extern void func_0020D908(CMtxF out, void *in);              /* unpack a bone matrix */
-extern void func_0020F85C(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
-extern void func_0020FAFC(CMtxF m, CVector3 *in, CVector3 *out);   /* transform direction */
+extern void CMtxF__FromMtxAffine(CMtxF out, void *in);              /* unpack a bone matrix */
+extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
+extern void CMtxF__RotateVector(CMtxF m, CVector3 *in, CVector3 *out);   /* transform direction */
 
-void func_0022D09C(CParticle *actor, CVector3 *outPosition, CVector3 *outHeading) {
+void CParticle__Attach(CParticle *actor, CVector3 *outPosition, CVector3 *outHeading) {
     CMtxF matrix;
     CVector3 position;
     CVector3 heading;
@@ -39,9 +39,9 @@ void func_0022D09C(CParticle *actor, CVector3 *outPosition, CVector3 *outHeading
         case 0x132:
             skeleton = (u8 *)link->m_pmtDrawMtxs;
             if (skeleton != NULL) {
-                func_0020D908(matrix, skeleton + actor->m_nBone * 64);
-                func_0020F85C(matrix, &actor->m_vAttachPos, &position);
-                func_0020FAFC(matrix, &actor->m_vVelocity, &heading);
+                CMtxF__FromMtxAffine(matrix, skeleton + actor->m_nBone * 64);
+                CMtxF__TransformPoint(matrix, &actor->m_vAttachPos, &position);
+                CMtxF__RotateVector(matrix, &actor->m_vVelocity, &heading);
                 actor->header.m_vPos = position;
                 actor->m_vDirection = heading;
             } else {
@@ -56,9 +56,9 @@ void func_0022D09C(CParticle *actor, CVector3 *outPosition, CVector3 *outHeading
         link = actor->m_pOwner;
         if (link->m_dwFlags & 0x300000) {
             /* a player: its view's transform */
-            func_0020F85C(((PlayerView *)((CPlayer *)link->m_AI.m_pParent)->m_pCamera)->transform, &actor->m_vAttachPos, &position);
+            CMtxF__TransformPoint(((PlayerView *)((CPlayer *)link->m_AI.m_pParent)->m_pCamera)->transform, &actor->m_vAttachPos, &position);
         } else {
-            func_0020F85C(link->m_mfOrient, &actor->m_vAttachPos, &position);
+            CMtxF__TransformPoint(link->m_mfOrient, &actor->m_vAttachPos, &position);
         }
         actor->header.m_vPos = position;
     }

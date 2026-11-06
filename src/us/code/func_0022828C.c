@@ -27,7 +27,7 @@ struct SceneEffectPool {
 extern s32 CList__AddTail(CList *list, void *node);
 extern void CList__Remove(void *list, void *node);
 extern f32 D_800F5A18;
-extern void func_002255CC(s32, Effect_func_80262E88_de *);
+extern void CScene__FileInstance(s32, Effect_func_80262E88_de *);
 static __inline__ s32 overlaps(Effect_func_80262E88_de *effect, f32 *max) {
     if (max[0] > effect->min[0] && max[-3] < effect->max[0] && max[2] > effect->min[2] &&
         max[-1] < effect->max[2] && max[1] > effect->min[1] && max[-2] < effect->max[1]) {
@@ -35,7 +35,7 @@ static __inline__ s32 overlaps(Effect_func_80262E88_de *effect, f32 *max) {
     }
     return 0;
 }
-void func_0022828C(struct SceneEffectPool *scene, s32 arg1) {
+void CInstancePool__UpdateVisibility(struct SceneEffectPool *scene, s32 arg1) {
     Effect_func_80262E88_de *effect;
     Effect_func_80262E88_de *next;
     f32 *max;
@@ -48,7 +48,7 @@ void func_0022828C(struct SceneEffectPool *scene, s32 arg1) {
     next_effect:
         next = effect->next;
         if (overlaps(effect, max)) {
-            func_002255CC(arg1, effect);
+            CScene__FileInstance(arg1, effect);
             if (effect->ref != 0 && effect->busy == 0) {
                 *effect->ref -= 1;
                 effect->ref = 0;

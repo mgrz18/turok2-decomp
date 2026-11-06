@@ -5,9 +5,9 @@
  * 0x1D8 each) with its free list, its draw list and three active lists (a
  * particle's template picks the list), and the ROM templates the particles
  * are spawned from (CROMParticleEffect, with the impact events of
- * CROMParticleImpact). func_0042D220 builds the system, func_0022F350 spawns
- * particles, func_00230CB4 steps them, func_0022F1C8 frees one,
- * func_0023118C draws the draw list.
+ * CROMParticleImpact). CParticleSystem__Construct builds the system, CParticleSystem__Spawn spawns
+ * particles, CParticleSystem__Update steps them, CParticleSystem__Free frees one,
+ * CParticleSystem__Draw draws the draw list.
  *
  * Names from Rage Wars' debug records (CParticle_t, CParticleSystem_t,
  * CROMParticleEffect_t, CROMParticleImpact_t, CDLight_t: see
@@ -20,8 +20,8 @@
 #include "structs/game_object.h"
 #include "structs/list.h"
 
-/* A dynamic light (the set at D_8010FF34: func_00228AB0 takes one,
- * func_00228B4C gives it back). A particle with a light moves it along. */
+/* A dynamic light (the set at D_8010FF34: DLight_Spawn takes one,
+ * CDLightSet__Free gives it back). A particle with a light moves it along. */
 typedef struct CDLight {
     /* 0x00 */ struct CDLight *m_pPrev;
     /* 0x04 */ struct CDLight *m_pNext;
@@ -33,7 +33,7 @@ typedef struct CDLight {
     /* 0x16 */ s16 m_bEnabled;
 } CDLight; /* size 0x18 */
 
-/* The value an impact event passes to the effect it starts (func_00236EA0):
+/* The value an impact event passes to the effect it starts (ImpactEvent_Send):
  * two halfwords, or the pair as one word. */
 typedef struct CEventValue {
     /* 0x0 */ s16 upper;
@@ -51,8 +51,8 @@ typedef struct CROMParticleImpact {
     /* 0xA8 */ u16 m_ImpactSoundType[14];
 } CROMParticleImpact; /* size 0xC4 */
 
-/* How a particle's size follows its distance from the camera (func_0023270C,
- * func_0022D2FC): the scale near and far. */
+/* How a particle's size follows its distance from the camera (CParticle__GetDistanceScale,
+ * CParticle__BuildMatrix): the scale near and far. */
 typedef struct CROMParticleDistance {
     /* 0x00 */ u8 unk_00[0x1C];
     /* 0x1C */ f32 m_NearScale;
@@ -70,7 +70,7 @@ typedef struct CROMParticleParams {
     /* 0x08 */ s8 m_nList;            /* CParticleSystem.m_ActiveList index */
     /* 0x09 */ u8 unk_09[0x0B - 0x09];
     /* 0x0B */ s8 unk_0B;
-    /* 0x0C */ s8 m_nTrailCount;     /* copies spawned along its path each frame (func_00232934) */
+    /* 0x0C */ s8 m_nTrailCount;     /* copies spawned along its path each frame (CParticle__SpawnAlongPath) */
     /* 0x0D */ s8 m_Spread;
     /* 0x0E */ s8 m_Mode;
     /* 0x0F */ u8 m_Event;
@@ -81,7 +81,7 @@ typedef struct CROMParticleEffect {
     /* 0x00 */ u32 m_dwFlags;
     /* 0x04 */ s16 unk_04;
     /* 0x06 */ s8 unk_06;
-    /* 0x07 */ s8 m_DLightType;      /* the light func_00228AB0 gives the particle */
+    /* 0x07 */ s8 m_DLightType;      /* the light DLight_Spawn gives the particle */
     /* 0x08 */ s8 m_AnimMode;
     /* 0x09 */ u8 unk_09;
     /* 0x0A */ s8 m_bClampToGround;
@@ -136,7 +136,7 @@ typedef struct CParticle {
     /* 0x178 */ f32 m_WobblePhase[2];
     /* 0x180 */ u8 unk_180[0x188 - 0x180];
     /* 0x188 */ f32 m_WobbleAmplitude[2];
-    /* 0x190 */ u32 m_dwHitFlags;         /* the collision test's flags (func_00239F00) */
+    /* 0x190 */ u32 m_dwHitFlags;         /* the collision test's flags (Collision_MoveInstance) */
     /* 0x194 */ s8 m_ObjectImpact;        /* 1: it dies when it hits an object */
     /* 0x195 */ s8 m_bDieOnImpact;
     /* 0x196 */ s8 m_bDieOnBounce;
@@ -145,7 +145,7 @@ typedef struct CParticle {
     /* 0x19C */ f32 unk_19C;
     /* 0x1A0 */ f32 m_RotationScale;      /* applied to m_vRotSpeed on an impact */
     /* 0x1A4 */ u8 unk_1A4[0x1AC - 0x1A4];
-    /* 0x1AC */ s8 m_Alignment;           /* the space it lives in (func_0022CF40) */
+    /* 0x1AC */ s8 m_Alignment;           /* the space it lives in (CParticle__GetParentTransform) */
     /* 0x1AD */ union {
         /* 0x1AD */ s8 m_nBone;           /* the bone it sticks to */
         /* 0x1AD */ s8 m_Shake;           /* a decaying shake otherwise */

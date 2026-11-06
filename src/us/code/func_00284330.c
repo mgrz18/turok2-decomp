@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/cinema.h"
 extern Cinema *D_800C1BB0;
-s32 func_00284330(void)
+s32 Cinema_OverridesMusic2(void)
 {
   if (0 != D_800C1BB0->active)
   {

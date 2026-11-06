@@ -31,7 +31,7 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_0040E7D8(BlindOneState *m) {
+void BlindOne_PhaseGroup2Update(BlindOneState *m) {
     if (m->alive2 == 0) {
         NextCommand(m);
     }

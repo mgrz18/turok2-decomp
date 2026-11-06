@@ -8,17 +8,17 @@
 #include "structs/collision.h"
 #include "structs/camera.h"
 
-/* The second VM module's copy of src/us/code/func_0040F240.c, byte for byte,
+/* The second VM module's copy of src/us/code/Cinema_SplineSecondDerivs.c, byte for byte,
  * at the same link address (named 0x448240-0x44C228, linked 0x40F240-0x413228):
  * the same source, with the functions under their second-module names. Its
  * .rodata goes NOLOAD over the first module's at 0x800C0950
  * (versions/shared_rodata.us.txt). */
 
-/* The cinema system: one file from func_00448240 to func_0044C1B0 (0x40F240-0x413228).
+/* The cinema system: one file from Cinema_SplineSecondDerivs_2 to Cinema_IsWaitCue_2 (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
  * the block, which GCC does only within one file, and its .rodata is the ROM's
  * 0x198 bytes at 0x800C0950. The second VM module has a copy of the block at the
- * same link address (func_004491B8, func_0044AC94, ...) that reads this pool. */
+ * same link address (Cinema_SplineEval_2, Cinema_DrawLetterbox_2, ...) that reads this pool. */
 
 /* A spline record: a point, the second derivatives of its coordinates over the
  * arc length, the arc length, the weight (time) and the second derivative of the
@@ -69,31 +69,31 @@ extern s32 D_800F709C;  /* D_800F7078.trackLookup */
 extern s32 *D_800F70D8; /* D_800F7078.trackBundle */
 extern CGameObjectInstance *D_80119890; /* current player */
 
-extern void *func_002017D4(void *node, s32 index); /* child `index` of a resource node */
-extern s32 func_0020185C(s32 *bundle, s32 lookup, s32 index, s32 *size);
-extern s32 **func_0020367C(s32 a, s32 data, s32 size, s32 tag, s32 e, void *prepare, const char *name, s32 h);
-extern s32 **func_00204EDC(s32 heap, s32 size, s32 tag, const char *name);
-extern void func_002051F4(s32 unused, s32 **handle);
-extern void func_002052D8(s32 heap, s32 *block);
-extern void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
-extern void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = b - a */
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale); /* out = in * scale */
-extern f32 func_0020EAA0(CVector3 *v);                       /* heading */
-extern f32 func_0020F5C0(CVector3 *v);                       /* pitch */
+extern void *CISet__GetBlock(void *node, s32 index); /* child `index` of a resource node */
+extern s32 CISet__GetROMAddressAndSize(s32 *bundle, s32 lookup, s32 index, s32 *size);
+extern s32 **CCache__Request(s32 a, s32 data, s32 size, s32 tag, s32 e, void *prepare, const char *name, s32 h);
+extern s32 **CCache__Allocate(s32 heap, s32 size, s32 tag, const char *name);
+extern void CCache__Unlock(s32 unused, s32 **handle);
+extern void CCache__Deallocate(s32 heap, s32 *block);
+extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
+extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = b - a */
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale); /* out = in * scale */
+extern f32 CVector3__GetYaw(CVector3 *v);                       /* heading */
+extern f32 CVector3__GetPitch(CVector3 *v);                       /* pitch */
 
-CVector3 func_004491B8(SplineNode *nodes, s32 count, f32 t);
-void func_0044B314(void *owner, CueObject *obj);
-s32 func_0044B438(s32 key);
-s32 func_0044BDA4(void);
-Spline *func_0044BDD0(s32 index);
-void *func_0044BE1C(void);
+CVector3 Cinema_SplineEval_2(SplineNode *nodes, s32 count, f32 t);
+void Cinema_RequestForObject_2(void *owner, CueObject *obj);
+s32 Cinema_RequestById_2(s32 key);
+s32 Cinema_GetClipCount_2(void);
+Spline *Cinema_GetClipEyeSpline_2(s32 index);
+void *Cinema_GetFadeTrack_2(void);
 
 /* Allocates a temporary array; the block's first word points back at the handle. */
 static __inline__ f32 *TempAlloc(s32 size) {
     s32 **handle;
     s32 *block;
 
-    handle = func_00204EDC(0, size + 0x10, 0x13, "Cinema temp alloc");
+    handle = CCache__Allocate(0, size + 0x10, 0x13, "Cinema temp alloc");
     if (handle != NULL) {
         block = *handle;
         *block = (s32) handle;
@@ -104,14 +104,14 @@ static __inline__ f32 *TempAlloc(s32 size) {
 
 static __inline__ void TempFree(f32 *data) {
     if (data != NULL) {
-        func_002052D8(0, ((s32 **) data)[-4]);
+        CCache__Deallocate(0, ((s32 **) data)[-4]);
     }
 }
 
 /* Whether a cue's object is one the cinema waits for (a separate function in
  * Rage Wars). Inline but not static: GCC inlines it where it is called and
- * emits its own copy at the end of the file, func_0044C1B0. */
-__inline__ s32 func_0044C1B0(CueObject *k) {
+ * emits its own copy at the end of the file, Cinema_IsWaitCue_2. */
+__inline__ s32 Cinema_IsWaitCue_2(CueObject *k) {
     s32 r = 0;
     switch (k->kind) {
     case 1:
@@ -131,7 +131,7 @@ __inline__ s32 func_0044C1B0(CueObject *k) {
 }
 
 /* Computes the second derivatives of a natural cubic spline through n points (ys over xs) into out. */
-void func_00448240(s32 n, f32 *ys, f32 *xs, f32 *out) {
+void Cinema_SplineSecondDerivs_2(s32 n, f32 *ys, f32 *xs, f32 *out) {
     f32 *diagonal;
     f32 *rhs;
     f32 *width;
@@ -184,7 +184,7 @@ extern f32 func_00298470(f32 x); /* sqrt */
 
 /* Builds a spline through count points: arc lengths, then second derivatives of x, y and z over the arc length
  * and of the arc length over the weights. */
-void func_004485B8(s32 count, CVector3 *points, f32 *weights, Spline *spline) {
+void Cinema_SplineBuild_2(s32 count, CVector3 *points, f32 *weights, Spline *spline) {
     CVector3 delta;
     f32 *ys;
     f32 *xs;
@@ -222,14 +222,14 @@ void func_004485B8(s32 count, CVector3 *points, f32 *weights, Spline *spline) {
         if (i == count - 1) {
             break;
         }
-        func_0020EF2C(&delta, &nodes[i].p, &nodes[i + 1].p);
+        CVector3__Subtract(&delta, &nodes[i].p, &nodes[i + 1].p);
         length += func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z);
     }
     for (i = 0; i < count; i++) {
         ys[i] = nodes[i].p.x;
         xs[i] = nodes[i].s;
     }
-    func_00448240(count, ys, xs, d2);
+    Cinema_SplineSecondDerivs_2(count, ys, xs, d2);
     for (i = 0; i < count; i++) {
         nodes[i].d2p.x = d2[i];
     }
@@ -237,7 +237,7 @@ void func_004485B8(s32 count, CVector3 *points, f32 *weights, Spline *spline) {
         ys[i] = nodes[i].p.y;
         xs[i] = nodes[i].s;
     }
-    func_00448240(count, ys, xs, d2);
+    Cinema_SplineSecondDerivs_2(count, ys, xs, d2);
     for (i = 0; i < count; i++) {
         nodes[i].d2p.y = d2[i];
     }
@@ -245,7 +245,7 @@ void func_004485B8(s32 count, CVector3 *points, f32 *weights, Spline *spline) {
         ys[i] = nodes[i].p.z;
         xs[i] = nodes[i].s;
     }
-    func_00448240(count, ys, xs, d2);
+    Cinema_SplineSecondDerivs_2(count, ys, xs, d2);
     for (i = 0; i < count; i++) {
         nodes[i].d2p.z = d2[i];
     }
@@ -253,7 +253,7 @@ void func_004485B8(s32 count, CVector3 *points, f32 *weights, Spline *spline) {
         ys[i] = nodes[i].s;
         xs[i] = nodes[i].w;
     }
-    func_00448240(count, ys, xs, d2);
+    Cinema_SplineSecondDerivs_2(count, ys, xs, d2);
     for (i = 0; i < count; i++) {
         nodes[i].d2s = d2[i];
     }
@@ -266,15 +266,15 @@ void func_004485B8(s32 count, CVector3 *points, f32 *weights, Spline *spline) {
 typedef struct SplineSource { s32 stride,count; union { char data[0]; CVector3 points[0]; f32 weights[0]; }; } SplineSource;
 typedef struct SplineTable { s32 count; } SplineTable;
 typedef union SplineSourceCursor { SplineSource *header; CVector3 *points; f32 *weights; } SplineSourceCursor;
-extern int func_002018D8(int *);
-extern void func_00218548(void *,s32);
-extern char *func_00218590(Pack *,s32,s32);
-extern s32 func_00200B00(void **, s32);
-extern struct Shape_typemap_165 *func_00205D7C(s32,void *,s32);
-extern void func_002057B0(s32,struct Shape_typemap_165 **,struct Shape_typemap_165 *);
-static __inline__ char *packAppend(Pack *pack,void *prepare,s32 size) { return func_00218590(pack,(s32)prepare,size); }
+extern int CUSet__GetTotalSize(int *);
+extern void Pack_Init(void *,s32);
+extern char *Pack_Add(Pack *,s32,s32);
+extern s32 ProPackDecompress(void **, s32);
+extern struct Shape_typemap_165 *CCache__AllocateMemoryForDecompression(s32,void *,s32);
+extern void CCache__DeallocAndReplaceCompressedData(s32,struct Shape_typemap_165 **,struct Shape_typemap_165 *);
+static __inline__ char *packAppend(Pack *pack,void *prepare,s32 size) { return Pack_Add(pack,(s32)prepare,size); }
 static __inline__ s32 splineRecordSize(s32 left,s32 right) { s32 a=left*9,b=right*9; return (b+a)*4+48; }
-void func_004489F4(s32 unused, struct Shape_typemap_165 **handle) {
+void Cinema_PrepareResource_2(s32 unused, struct Shape_typemap_165 **handle) {
     struct Shape_typemap_165 *output;
     void *source, *a, *b, *c, *part, *extra;
     Pack *pack, *dest;
@@ -283,50 +283,50 @@ void func_004489F4(s32 unused, struct Shape_typemap_165 **handle) {
     SplineSourceCursor p,q,r,s;
     s32 count, i, size, sa, sb, sc, np, nr, byteP, byteR;
     void *dp, *dr;
-    if (!func_00200B00((void **)handle, 1)) return;
+    if (!ProPackDecompress((void **)handle, 1)) return;
     source = (*handle)->pack;
-    parts = func_002017D4(source, 0);
-    a = func_002017D4(source, 1);
-    b = func_002017D4(source, 2);
-    c = func_002017D4(source, 3);
+    parts = CISet__GetBlock(source, 0);
+    a = CISet__GetBlock(source, 1);
+    b = CISet__GetBlock(source, 2);
+    c = CISet__GetBlock(source, 3);
     count = parts->count;
     size = (count * 4 + 15) & ~7;
     for (i = 0; i < parts->count; i++) {
         SplineSource *firstP,*firstR;
         void *firstPart;
         s32 byteP,byteR;
-        firstPart = func_002017D4(parts, i);
-        firstP = func_002017D4(firstPart, 0);
-        firstR = func_002017D4(firstPart, 2);
+        firstPart = CISet__GetBlock(parts, i);
+        firstP = CISet__GetBlock(firstPart, 0);
+        firstR = CISet__GetBlock(firstPart, 2);
         size += splineRecordSize(firstP->count,firstR->count);
     }
-    sc = func_002018D8(c);
-    sa = func_002018D8(a);
-    sb = func_002018D8(b);
-    output = func_00205D7C(0, handle, size + sa + sb + sc + 24);
+    sc = CUSet__GetTotalSize(c);
+    sa = CUSet__GetTotalSize(a);
+    sb = CUSet__GetTotalSize(b);
+    output = CCache__AllocateMemoryForDecompression(0, handle, size + sa + sb + sc + 24);
     if (output == 0) return;
     pack = output->pack;
-    func_00218548(pack, 4);
+    Pack_Init(pack, 4);
     table = (void *)packAppend(pack, 0, size);
     packAppend(pack, a, sa);
     packAppend(pack, b, sb);
     packAppend(pack, c, sc);
-    func_00218548(table, count);
+    Pack_Init(table, count);
     for (i = 0; i < count; i++) {
         s32 byteP,byteR;
         SplineSource *sizeP,*sizeR;
-        part = func_002017D4(parts, i);
-        sizeP = func_002017D4(part, 0);
-        sizeR = func_002017D4(part, 2);
+        part = CISet__GetBlock(parts, i);
+        sizeP = CISet__GetBlock(part, 0);
+        sizeR = CISet__GetBlock(part, 2);
         byteP = sizeP->count * 9;
         byteR = sizeR->count * 9;
         dest = (void *)packAppend(table, 0, (byteR + byteP)*4 + 48);
-        func_00218548(dest, 3);
-        p.header = func_002017D4(part, 0);
-        q.header = func_002017D4(part, 1);
-        r.header = func_002017D4(part, 2);
-        s.header = func_002017D4(part, 3);
-        extra = func_002017D4(part, 4);
+        Pack_Init(dest, 3);
+        p.header = CISet__GetBlock(part, 0);
+        q.header = CISet__GetBlock(part, 1);
+        r.header = CISet__GetBlock(part, 2);
+        s.header = CISet__GetBlock(part, 3);
+        extra = CISet__GetBlock(part, 4);
         np = p.header->count;
         nr = r.header->count;
         { s32 pointBytes,otherBytes;
@@ -340,10 +340,10 @@ void func_004489F4(s32 unused, struct Shape_typemap_165 **handle) {
         r.points = r.header->points;
         s.weights = s.header->weights;
         packAppend(dest, extra, 8);
-        func_004485B8(np, p.points, q.weights, dp);
-        func_004485B8(nr, r.points, s.weights, dr);
+        Cinema_SplineBuild_2(np, p.points, q.weights, dp);
+        Cinema_SplineBuild_2(nr, r.points, s.weights, dr);
     }
-    func_002057B0(0, handle, output);
+    CCache__DeallocAndReplaceCompressedData(0, handle, output);
 }
 
 typedef struct {
@@ -357,7 +357,7 @@ typedef struct {
     /* 0x08 */ Cue cues[1];
 } CueList;
 
-extern void func_0028441C(void);
+extern void Cinema_Reset(void);
 
 static __inline__ void minTime(f32 *dest, f32 *src) {
     if (*dest > *src) {
@@ -378,7 +378,7 @@ static __inline__ void setTimes(f32 *a, f32 *b, f32 *c, f32 *t) {
 }
 
 /* Loads cinema `index`: its track, its time range from the clips and cues, and its entry in the cinema table. */
-s32 func_00448D6C(s32 index) {
+s32 Cinema_Load_2(s32 index) {
     s32 size;
     s32 size2;
     s32 i;
@@ -405,21 +405,21 @@ s32 func_00448D6C(s32 index) {
         return 0;
     } else {
         if (D_800C1BB0->active != 0) {
-            func_0028441C();
+            Cinema_Reset();
         }
-        loaded = func_0020185C(resources->m_pCinemas, resources->m_CinemasKey, index + 1, &size);
-        owner = func_0020367C(0, loaded, size, 0x13, 0, func_004489F4, "Cinema", 1);
+        loaded = CISet__GetROMAddressAndSize(resources->m_pCinemas, resources->m_CinemasKey, index + 1, &size);
+        owner = CCache__Request(0, loaded, size, 0x13, 0, Cinema_PrepareResource_2, "Cinema", 1);
         if (owner == NULL) {
             goto failed;
         }
         D_800C1BB0->owner = owner;
         D_800C1BB0->resource = *owner;
-        cues = func_0044BE1C();
+        cues = Cinema_GetFadeTrack_2();
         cue = cues->cues;
         count = cues->count;
         total = 0.0f;
-        for (i = 0; i < func_0044BDA4(); i++) {
-            clip = func_0044BDD0(i);
+        for (i = 0; i < Cinema_GetClipCount_2(); i++) {
+            clip = Cinema_GetClipEyeSpline_2(i);
             {
                 s32 n = clip->count;
                 SplineNode *base = clip->nodes;
@@ -444,11 +444,11 @@ s32 func_00448D6C(s32 index) {
         }
         setTimes(&D_800C1BB0->time, &D_800C1BB0->prevTime, &D_800C1BB0->time24, &D_800C1BB0->clipStart);
         previous = D_800C1BB0->spec.id;
-        loaded = func_0020185C(D_800F70D8, D_800F709C, 0, &size2);
+        loaded = CISet__GetROMAddressAndSize(D_800F70D8, D_800F709C, 0, &size2);
         if (loaded == 0) {
             table = NULL;
         } else {
-            table = func_0020367C(0, loaded, size2, 0x13, 0, NULL, "Cinema", 1);
+            table = CCache__Request(0, loaded, size2, 0x13, 0, NULL, "Cinema", 1);
         }
         {
             CinemaTable *entries = (CinemaTable *) *table;
@@ -477,7 +477,7 @@ s32 func_00448D6C(s32 index) {
                 D_800C1BB0->yaw = 0.0f;
             }
         }
-        func_002051F4(0, table);
+        CCache__Unlock(0, table);
         if (pending) {
             void (*first)(void);
             void (*second)(void);
@@ -512,7 +512,7 @@ s32 func_00448D6C(s32 index) {
 }
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00400E50.c. */
-CVector3 func_004491B8(SplineNode *rec, s32 n, f32 t) {
+CVector3 Cinema_SplineEval_2(SplineNode *rec, s32 n, f32 t) {
     CVector3 res;
     SplineNode *p = 0;
     SplineNode *q = 0;
@@ -601,7 +601,7 @@ CVector3 func_004491B8(SplineNode *rec, s32 n, f32 t) {
     return res;
 }
 
-CVector3 func_0044957C(f32 t) {
+CVector3 Cinema_GetEyePos_2(f32 t) {
     s32 i;
     s32 idx;
     s32 count;
@@ -615,9 +615,9 @@ CVector3 func_0044957C(f32 t) {
     idx = 0;
     i = 0;
     end = start;
-    while (i < *(s32 *)func_002017D4(D_800C1BB0->resource, 0)) {
+    while (i < *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0)) {
         idx = i;
-        clip = func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), idx), 0);
+        clip = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), idx), 0);
         count = clip[1];
         keys = (SplineNode *)(clip + 2);
         start = end;
@@ -625,7 +625,7 @@ CVector3 func_0044957C(f32 t) {
         if (idx == 0 && t <= start) {
             break;
         }
-        if (idx == *(s32 *)func_002017D4(D_800C1BB0->resource, 0) - 1 && end < t) {
+        if (idx == *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0) - 1 && end < t) {
             break;
         }
         i = idx + 1;
@@ -633,13 +633,13 @@ CVector3 func_0044957C(f32 t) {
             break;
         }
     }
-    if (*(s32 *)func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), idx), 2) != 0) {
+    if (*(s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), idx), 2) != 0) {
         t = start;
     }
-    return func_004491B8(keys, count, t - start);
+    return Cinema_SplineEval_2(keys, count, t - start);
 }
 
-CVector3 func_00449724(f32 t) {
+CVector3 Cinema_GetTargetPos_2(f32 t) {
     s32 i;
     s32 idx;
     s32 count;
@@ -653,9 +653,9 @@ CVector3 func_00449724(f32 t) {
     idx = 0;
     i = 0;
     end = start;
-    while (i < *(s32 *)func_002017D4(D_800C1BB0->resource, 0)) {
+    while (i < *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0)) {
         idx = i;
-        clip = func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), idx), 1);
+        clip = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), idx), 1);
         count = clip[1];
         keys = (SplineNode *)(clip + 2);
         start = end;
@@ -663,7 +663,7 @@ CVector3 func_00449724(f32 t) {
         if (idx == 0 && t <= start) {
             break;
         }
-        if (idx == *(s32 *)func_002017D4(D_800C1BB0->resource, 0) - 1 && end < t) {
+        if (idx == *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0) - 1 && end < t) {
             break;
         }
         i = idx + 1;
@@ -671,13 +671,13 @@ CVector3 func_00449724(f32 t) {
             break;
         }
     }
-    if (((s32 *)func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), idx), 2))[1] != 0) {
+    if (((s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), idx), 2))[1] != 0) {
         t = start;
     }
-    return func_004491B8(keys, count, t - start);
+    return Cinema_SplineEval_2(keys, count, t - start);
 }
 
-CVector3 func_004498CC(f32 t) {
+CVector3 Cinema_GetFadeColor_2(f32 t) {
     s32 *track;
     PositionKey *key;
     s32 count;
@@ -685,7 +685,7 @@ CVector3 func_004498CC(f32 t) {
     CVector3 result;
     CVector3 a;
     CVector3 b;
-    track = func_002017D4(D_800C1BB0->resource, 1);
+    track = CISet__GetBlock(D_800C1BB0->resource, 1);
     count = track[1];
     key = (PositionKey *)(track + 2);
     if (count == 0) {
@@ -714,9 +714,9 @@ CVector3 func_004498CC(f32 t) {
         b.x = key->x;
         b.y = key->y;
         b.z = key->z;
-        func_0020EF60(&a, &a, (1.0f) - u);
-        func_0020EF60(&b, &b, u);
-        func_0020EEF8(&result, &a, &b);
+        CVector3__Scale(&a, &a, (1.0f) - u);
+        CVector3__Scale(&b, &b, u);
+        CVector3__Add(&result, &a, &b);
     }
     return result;
 }
@@ -728,14 +728,14 @@ typedef struct {
 } ScalarKey; /* 0x14 bytes */
 
 /* Evaluates the scalar key track 1 of the current cinema at time t, then rescales and clamps it to [0, 1]. */
-f32 func_00449A74(f32 t) {
+f32 Cinema_GetFadeAlpha_2(f32 t) {
     s32 *track;
     ScalarKey *key;
     s32 count;
     f32 u;
     f32 v;
 
-    track = func_002017D4(D_800C1BB0->resource, 1);
+    track = CISet__GetBlock(D_800C1BB0->resource, 1);
     count = track[1];
     key = (ScalarKey *) (track + 2);
     if (count == 0) {
@@ -762,13 +762,13 @@ f32 func_00449A74(f32 t) {
     return v;
 }
 
-f32 func_00449BB4(f32 t) {
+f32 Cinema_GetFOV_2(f32 t) {
     s32 *track;
     D_800C7470_Pair *key;
     s32 count;
     s32 i;
     f32 u;
-    track = func_002017D4(D_800C1BB0->resource, 3);
+    track = CISet__GetBlock(D_800C1BB0->resource, 3);
     key = (D_800C7470_Pair *)(track + 2);
     count = track[1];
     for (i = 0; i < count; i++) {
@@ -794,14 +794,14 @@ extern u8 D_800F1B40[];   /* collision info */
 extern CCollisionResults D_800F1CE0;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
-extern CVector3 func_0044957C(f32 t); /* eye path */
-extern CVector3 func_00449724(f32 t); /* target path */
-extern void func_0020F79C(CMtxF *m);                         /* identity */
-extern void func_0020FE00(CMtxF *m, f32 x, f32 y, f32 z);    /* rotation */
-extern void func_0020F85C(CMtxF *m, CVector3 *in, CVector3 *out);    /* transform */
-extern void func_002216DC(void *world);
-extern s32 func_00239F00(CGameObjectInstance *actor, CVector3 to, void *info);
-extern void func_00226724(void *world);
+extern CVector3 Cinema_GetEyePos_2(f32 t); /* eye path */
+extern CVector3 Cinema_GetTargetPos_2(f32 t); /* target path */
+extern void CMtxF__Identity(CMtxF *m);                         /* identity */
+extern void CMtxF__SetEulerXYZ(CMtxF *m, f32 x, f32 y, f32 z);    /* rotation */
+extern void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);    /* transform */
+extern void CScene__LoadVisibleGridSections(void *world);
+extern s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 to, void *info);
+extern void CScene__ReleaseSectors(void *world);
 
 /* Places the cinema relative to its target (flag 1) or to the player (flag 2). */
 static __inline__ void Cinema_Anchor(CGameObjectInstance *player) {
@@ -823,7 +823,7 @@ static __inline__ void Cinema_Anchor(CGameObjectInstance *player) {
 }
 
 /* Drives the camera along the cinema paths. */
-void func_00449CE8(CCamera *cam) {
+void Cinema_UpdateCamera_2(CCamera *cam) {
     CVector3 eye;
     CVector3 target;
     CVector3 dir;
@@ -840,50 +840,50 @@ void func_00449CE8(CCamera *cam) {
     if (D_800C1BB0->time < D_800C1BB0->startTime || D_800C1BB0->endTime < D_800C1BB0->time) {
         return;
     }
-    eye = func_0044957C(D_800C1BB0->time);
-    target = func_00449724(D_800C1BB0->time);
-    func_0020EF60(&eye, &eye, 10.24f);
-    func_0020EF60(&target, &target, 10.24f);
+    eye = Cinema_GetEyePos_2(D_800C1BB0->time);
+    target = Cinema_GetTargetPos_2(D_800C1BB0->time);
+    CVector3__Scale(&eye, &eye, 10.24f);
+    CVector3__Scale(&target, &target, 10.24f);
     cam->m_ViewParams.m_RotY = 0.0f;
-    func_0020EF2C(&dir, &target, &eye);
+    CVector3__Subtract(&dir, &target, &eye);
     if (((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) || (D_800C1BB0->spec.flags & 2)) {
         player = D_80119890;
         Cinema_Anchor(player);
-        func_0020F79C(&mtx);
-        func_0020FE00(&mtx, 0.0f, D_800C1BB0->yaw, 0.0f);
-        func_0020F85C(&mtx, &target, &tmp);
+        CMtxF__Identity(&mtx);
+        CMtxF__SetEulerXYZ(&mtx, 0.0f, D_800C1BB0->yaw, 0.0f);
+        CMtxF__TransformPoint(&mtx, &target, &tmp);
         target = tmp;
-        func_0020F85C(&mtx, &eye, &tmp);
+        CMtxF__TransformPoint(&mtx, &eye, &tmp);
         eye = tmp;
-        func_0020EEF8(&target, &target, &D_800C1BB0->position);
-        func_0020EEF8(&eye, &eye, &D_800C1BB0->position);
-        func_0020EF2C(&dir, &target, &eye);
+        CVector3__Add(&target, &target, &D_800C1BB0->position);
+        CVector3__Add(&eye, &eye, &D_800C1BB0->position);
+        CVector3__Subtract(&dir, &target, &eye);
         if (player != NULL) {
             saved = *(CObjectHead *) player;
             player->header.m_vPos = target;
-            func_002216DC(D_800F7078);
-            hit = func_00239F00(player, eye, D_800F1B40);
-            func_00226724(D_800F7078);
+            CScene__LoadVisibleGridSections(D_800F7078);
+            hit = Collision_MoveInstance(player, eye, D_800F1B40);
+            CScene__ReleaseSectors(D_800F7078);
             *(CObjectHead *) player = saved;
             if (hit) {
                 eye = D_800F1CE0.m_vInstancePos;
             }
         }
     }
-    yaw = func_0020EAA0(&dir);
-    cam->m_ViewParams.m_vRotOffset.x = -func_0020F5C0(&dir);
+    yaw = CVector3__GetYaw(&dir);
+    cam->m_ViewParams.m_vRotOffset.x = -CVector3__GetPitch(&dir);
     cam->m_ViewParams.m_RotY += yaw;
     cam->m_ViewParams.m_vPos = eye;
 }
 
-extern void func_0020B5B8(void);
+extern void Render_InvalidateModeCache(void);
 
-void func_0044A0CC(s32 inset) {
+void Cinema_DrawFrameEdges_2(s32 inset) {
     f32 left;
     f32 top;
     f32 width;
     f32 height;
-    func_0020B5B8();
+    Render_InvalidateModeCache();
     left = 0.0f;
     top = (f32)inset;
     { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
@@ -908,10 +908,10 @@ void func_0044A0CC(s32 inset) {
     { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + width)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
 }
 
-s32 func_00207FEC(s32 a);
-s32 func_00207A70(s32 a);
+s32 Render_SetRenderMode(s32 a);
+s32 Render_SetCombineMode(s32 a);
 
-void func_0044AC94(void) {
+void Cinema_DrawLetterbox_2(void) {
     f32 fs;
     f32 k;
     f32 q;
@@ -938,13 +938,13 @@ void func_0044AC94(void) {
     fs = fs * k;
     { Gfx *_g = D_800D8E24++; _g->w0 = (0xE7000000); _g->w1 = (0); }
     { Gfx *_g = D_800D8E24++; _g->w0 = (0xE3000A01); _g->w1 = (0); }
-    func_00207FEC(0x13);
-    func_00207A70(0x19);
+    Render_SetRenderMode(0x13);
+    Render_SetCombineMode(0x19);
     { Gfx *_g = D_800D8E24++; _g->w0 = (0xFA00FFFF); _g->w1 = (0xFF); }
     { Gfx *_g = D_800D8E24++; _g->w0 = (0xF6000000 | ((((D_800C2030) > (0) ? (D_800C2030) : (0)) & 0x3FF) << 14) | (((((s32)fs) > (0) ? ((s32)fs) : (0)) & 0x3FF) << 2)); _g->w1 = (0); }
     { Gfx *_g = D_800D8E24++; _g->w0 = (0xF6000000 | ((((D_800C2030) > (0) ? (D_800C2030) : (0)) & 0x3FF) << 14) | ((((D_800C2034) > (0) ? (D_800C2034) : (0)) & 0x3FF) << 2)); _g->w1 = (({ f32 _y = (f32)D_800C2034 - fs; if (!(0.0f <= _y)) _y = 0.0f; (((u32)_y) & 0x3FF) << 2; })); }
     sh = (s32)fs;
-    func_0044A0CC(sh);
+    Cinema_DrawFrameEdges_2(sh);
 }
 
 typedef struct {
@@ -956,10 +956,10 @@ typedef struct {
 } ScreenRectangle;
 
 extern u8 D_800F6CB0[];
-extern void func_002883E0(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
+extern void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 
 /* Fills the cinema's screen rectangle with the colour and alpha of the current time. */
-void func_0044AEF8(ScreenRectangle *rectangle) {
+void Cinema_DrawFade_2(ScreenRectangle *rectangle) {
     CVector3 color;
     CVector3 baseColor;
     u8 rgba[4];
@@ -980,8 +980,8 @@ void func_0044AEF8(ScreenRectangle *rectangle) {
         height = rectangle->height;
         right = (f32) width + rectangle->x;
         bottom = (f32) height + rectangle->y;
-        baseColor = func_004498CC(D_800C1BB0->time);
-        alpha = func_00449A74(D_800C1BB0->time);
+        baseColor = Cinema_GetFadeColor_2(D_800C1BB0->time);
+        alpha = Cinema_GetFadeAlpha_2(D_800C1BB0->time);
         color = baseColor;
         if (D_800C1BB0->fading) {
             scale = D_800C1BB0->fade;
@@ -1025,13 +1025,13 @@ void func_0044AEF8(ScreenRectangle *rectangle) {
             value = 0.0f;
         }
         rgba[3] = (u32) value;
-        func_002883E0(D_800F6CB0, rgba, width, height, right, bottom);
+        CEngineApp__DrawFilledRect(D_800F6CB0, rgba, width, height, right, bottom);
     }
-    func_0044AC94();
+    Cinema_DrawLetterbox_2();
 }
 
 /* Finds the last cinema entry whose ids match the key's and makes it pending, with owner as its target. */
-void func_0044B314(void *owner, CueObject *obj) {
+void Cinema_RequestForObject_2(void *owner, CueObject *obj) {
     s32 size;
     s32 **table;
     s32 key;
@@ -1046,11 +1046,11 @@ void func_0044B314(void *owner, CueObject *obj) {
     if (D_800C1BB8 != 0) {
         id4 = obj->id4;
         idA = obj->idA;
-        key = func_0020185C(D_800F70D8, D_800F709C, 0, &size);
+        key = CISet__GetROMAddressAndSize(D_800F70D8, D_800F709C, 0, &size);
         if (key == 0) {
             table = NULL;
         } else {
-            table = func_0020367C(0, key, size, 0x13, 0, NULL, "Cinema", 1);
+            table = CCache__Request(0, key, size, 0x13, 0, NULL, "Cinema", 1);
         }
         n = *D_800F70D8 - 1;
         entry = (CinemaEntry *) (*table + 2);
@@ -1065,12 +1065,12 @@ void func_0044B314(void *owner, CueObject *obj) {
             D_800C1BB0->entryIndex = found;
             D_800C1BB0->resetPlayerNext = 1;
         }
-        func_002051F4(0, table);
+        CCache__Unlock(0, table);
     }
 }
 
 /* Makes every cinema entry with id `key` pending; returns the resulting target id. */
-s32 func_0044B438(s32 key) {
+s32 Cinema_RequestById_2(s32 key) {
     s32 size;
     s32 **table;
     s32 loaded;
@@ -1081,11 +1081,11 @@ s32 func_0044B438(s32 key) {
     if (D_800C1BB8 == 0) {
         return 0;
     }
-    loaded = func_0020185C(D_800F70D8, D_800F709C, 0, &size);
+    loaded = CISet__GetROMAddressAndSize(D_800F70D8, D_800F709C, 0, &size);
     if (loaded == 0) {
         table = NULL;
     } else {
-        table = func_0020367C(0, loaded, size, 0x13, 0, NULL, "Cinema", 1);
+        table = CCache__Request(0, loaded, size, 0x13, 0, NULL, "Cinema", 1);
     }
     i = 0;
     entries = (CinemaEntry *) (*table + 2);
@@ -1100,14 +1100,14 @@ s32 func_0044B438(s32 key) {
             D_800C1BB0->resetPlayerNext = 1;
         }
     }
-    func_002051F4(0, table);
+    CCache__Unlock(0, table);
     return D_800C1BB0->warpId;
 }
 
-extern s32 func_00288780(const char *a, const char *b); /* strcmp */
+extern s32 Util_StrCmp(const char *a, const char *b); /* strcmp */
 
 /* Makes the cinema entry called `name` pending. */
-void func_0044B548(const char *name) {
+void Cinema_RequestByName_2(const char *name) {
     s32 size;
     s32 **table;
     s32 loaded;
@@ -1117,17 +1117,17 @@ void func_0044B548(const char *name) {
     CinemaEntry *entries;
 
     if (D_800C1BB8 != 0) {
-        loaded = func_0020185C(D_800F70D8, D_800F709C, 0, &size);
+        loaded = CISet__GetROMAddressAndSize(D_800F70D8, D_800F709C, 0, &size);
         if (loaded == 0) {
             table = NULL;
         } else {
-            table = func_0020367C(0, loaded, size, 0x13, 0, NULL, "Cinema", 1);
+            table = CCache__Request(0, loaded, size, 0x13, 0, NULL, "Cinema", 1);
         }
         i = 0;
         entries = (CinemaEntry *) (*table + 2);
         n = *D_800F70D8 - 1;
         for (; i < n; i++) {
-            if (func_00288780(name, entries[i].name) == 0) {
+            if (Util_StrCmp(name, entries[i].name) == 0) {
                 D_800C1BB0->scriptId = entries[i].id;
                 id = entries[i].id0;
                 D_800C1BB0->entryIndex = i;
@@ -1136,7 +1136,7 @@ void func_0044B548(const char *name) {
                 break;
             }
         }
-        func_002051F4(0, table);
+        CCache__Unlock(0, table);
     }
 }
 
@@ -1146,10 +1146,10 @@ typedef struct {
     s32 unk8;
 } CueRef;
 
-s32 func_0044B66C(void) {
+s32 Cinema_NoWaitCues_2(void) {
     s32 any = 0;
     s32 i;
-    Track *n = func_002017D4(D_800C1BB0->resource, 2);
+    Track *n = CISet__GetBlock(D_800C1BB0->resource, 2);
     s32 cnt = n->count;
     CueRef *ents = (CueRef *)((u8 *)n + 8);
     CueRef *e;
@@ -1161,7 +1161,7 @@ s32 func_0044B66C(void) {
         } else {
             k = (CueObject *)(D_800F7078->m_pAltRecords + e->unk8);
         }
-        if (func_0044C1B0(k) != 0) {
+        if (Cinema_IsWaitCue_2(k) != 0) {
             any = 1;
         }
     }
@@ -1174,11 +1174,11 @@ typedef struct {
     s32 unk8;
 } TimedCueRef;
 
-s32 func_00284174(void);
-void func_0026E210(CueObject *k);
-void func_00224A68(CWorld *g, CueObject *k, s32 z);
+s32 Cinema_IsActive(void);
+void LevelEvent_Trigger(CueObject *k);
+void CScene__SetEventFired(CWorld *g, CueObject *k, s32 z);
 
-void func_0044B798(void) {
+void Cinema_FireCues_2(void) {
     f32 now = D_800C1BB0->time;
     s32 flag = 0;
     Track *n;
@@ -1187,9 +1187,9 @@ void func_0044B798(void) {
     CueObject *k;
     s32 cnt;
     s32 i;
-    if (func_00284174() != 0) {
+    if (Cinema_IsActive() != 0) {
         if (D_800C1BB0->unk50 != 0) {
-            n = func_002017D4(D_800C1BB0->resource, 2);
+            n = CISet__GetBlock(D_800C1BB0->resource, 2);
             cnt = n->count;
             ents = (TimedCueRef *)((u8 *)n + 8);
             if (cnt != 0) {
@@ -1211,15 +1211,15 @@ void func_0044B798(void) {
                     } else {
                         k = (CueObject *)(D_800F7078->m_pAltRecords + e->unk8);
                     }
-                    if (func_0044C1B0(k) != 0) {
-                        func_0044B314(0, k);
+                    if (Cinema_IsWaitCue_2(k) != 0) {
+                        Cinema_RequestForObject_2(0, k);
                         D_800C1BB0->resetPlayerNext = 0;
                     } else {
-                        func_0026E210(k);
+                        LevelEvent_Trigger(k);
                     }
                     e->time = -20000.0f;
                     k->unkE = (k->unkE | 1) & 0xEF;
-                    func_00224A68(D_800F7078, k, 0);
+                    CScene__SetEventFired(D_800F7078, k, 0);
                 }
             }
         }
@@ -1236,8 +1236,8 @@ static __inline__ CVector3 getA(void) {
         v.z = 0;
         return v;
     }
-    n = func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), 0), 0);
-    t = func_004491B8((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
+    n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), 0), 0);
+    t = Cinema_SplineEval_2((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
     return t;
 }
 static __inline__ CVector3 getB(void) {
@@ -1250,11 +1250,11 @@ static __inline__ CVector3 getB(void) {
         v.z = 0;
         return v;
     }
-    n = func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), 0), 1);
-    t = func_004491B8((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
+    n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), 0), 1);
+    t = Cinema_SplineEval_2((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
     return t;
 }
-CVector3 func_0044B998(void) {
+CVector3 Cinema_GetStartAngles_2(void) {
     CVector3 a;
     CVector3 b;
     f32 dir[4];
@@ -1265,9 +1265,9 @@ CVector3 func_0044B998(void) {
     } else {
         a = getA();
         b = getB();
-        func_0020EF2C((CVector3 *) dir, &b, &a);
-        res.x = -func_0020F5C0((CVector3 *) dir);
-        res.y = func_0020EAA0((CVector3 *) dir);
+        CVector3__Subtract((CVector3 *) dir, &b, &a);
+        res.x = -CVector3__GetPitch((CVector3 *) dir);
+        res.y = CVector3__GetYaw((CVector3 *) dir);
     }
     do {
         res.z = 0;
@@ -1275,11 +1275,11 @@ CVector3 func_0044B998(void) {
     return res;
 }
 
-void func_0044BB14(void) {
+void Cinema_StopAtEnd_2(void) {
     D_800C1BB0->stopAtEnd = 1;
 }
 
-void func_0044BB28(s32 a0) {
+void Cinema_RequestOnce_2(s32 a0) {
     register s32 a asm("$7");
     register u8 *bits asm("$4");
     register s32 id asm("$5");
@@ -1298,11 +1298,11 @@ void func_0044BB28(s32 a0) {
             if ((b & m) != 0) return;
             bits[i] = b | m;
         }
-        func_0044B438(a);
+        Cinema_RequestById_2(a);
     }
 }
 
-CVector3 func_0044BB9C(void) {
+CVector3 Cinema_GetStartEyePos_2(void) {
     CVector3 sp10;
     CVector3 sp20;
     StridedTable *temp_v0;
@@ -1312,12 +1312,12 @@ CVector3 func_0044BB9C(void) {
         sp20.z = 0;
         return sp20;
     }
-    temp_v0 = func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), 0), 0);
-    sp10 = func_004491B8((SplineNode *) temp_v0->data, temp_v0->count, 0.0f);
+    temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), 0), 0);
+    sp10 = Cinema_SplineEval_2((SplineNode *) temp_v0->data, temp_v0->count, 0.0f);
     return sp10;
 }
 
-CVector3 func_0044BC4C(void) {
+CVector3 Cinema_GetStartTargetPos_2(void) {
     CVector3 sp10;
     CVector3 sp20;
     StridedTable *temp_v0;
@@ -1327,12 +1327,12 @@ CVector3 func_0044BC4C(void) {
         sp20.x = 10.0f;
         return sp20;
     }
-    temp_v0 = func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), 0), 1);
-    sp10 = func_004491B8((SplineNode *) temp_v0->data, temp_v0->count, 0.0f);
+    temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), 0), 1);
+    sp10 = Cinema_SplineEval_2((SplineNode *) temp_v0->data, temp_v0->count, 0.0f);
     return sp10;
 }
 
-f32 func_0044BD04(void) {
+f32 Cinema_GetDuration_2(void) {
     f32 temp_f0;
     f32 var_f20;
     s32 *temp_v0;
@@ -1340,8 +1340,8 @@ f32 func_0044BD04(void) {
     var_f20 = 0.0f;
     var_s0 = 0;
 loop_1:
-    if (var_s0 < *(s32 *)func_002017D4(D_800C1BB0->resource, 0)) {
-        temp_v0 = func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), var_s0), 0);
+    if (var_s0 < *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0)) {
+        temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), var_s0), 0);
         temp_v0 = (s32 *)((char *)temp_v0 + temp_v0[1] * 0x24);
         temp_f0 = *(f32 *)temp_v0;
         var_s0 += 1;
@@ -1351,22 +1351,22 @@ loop_1:
     return var_f20;
 }
 
-s32 func_0044BDA4(void) {
-    return *(s32 *)func_002017D4(D_800C1BB0->resource, 0);
+s32 Cinema_GetClipCount_2(void) {
+    return *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0);
 }
 
-Spline *func_0044BDD0(s32 index) {
-    return func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index), 0);
+Spline *Cinema_GetClipEyeSpline_2(s32 index) {
+    return CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index), 0);
 }
 
-void *func_0044BE1C(void) {
-    return func_002017D4(D_800C1BB0->resource, 1);
+void *Cinema_GetFadeTrack_2(void) {
+    return CISet__GetBlock(D_800C1BB0->resource, 1);
 }
 
-s32 func_0044BE44(s32 arg0) {
+s32 Cinema_TrackData_2(s32 arg0) {
     return arg0 + 8;
 }
-u32 func_0044BE4C(u8 *bits, s32 index) {
+u32 Cinema_BitTest_2(u8 *bits, s32 index) {
     s32 byte = index >> 3;
     u32 mask;
     index &= 7;
@@ -1375,7 +1375,7 @@ u32 func_0044BE4C(u8 *bits, s32 index) {
     return *bits & (mask << index);
 }
 
-void func_0044BE6C(s32 arg0, s32 arg1, s32 arg2) {
+void Cinema_BitSet_2(s32 arg0, s32 arg1, s32 arg2) {
     s32 temp_a0;
     s32 temp_a3;
     u8 *temp_v0;
@@ -1393,11 +1393,11 @@ void func_0044BE6C(s32 arg0, s32 arg1, s32 arg2) {
 }
 
 /* Allocates a temporary block of `size` bytes; the word before the data's 0x10-byte header points back at the handle. */
-void *func_0044BEB0(s32 size) {
+void *Cinema_TempAlloc_2(s32 size) {
     s32 **handle;
     s32 *block;
 
-    handle = func_00204EDC(0, size + 0x10, 0x13, "Cinema temp alloc");
+    handle = CCache__Allocate(0, size + 0x10, 0x13, "Cinema temp alloc");
     if (handle != NULL) {
         block = *handle;
         *block = (s32) handle;
@@ -1406,63 +1406,63 @@ void *func_0044BEB0(s32 size) {
     return NULL;
 }
 
-void func_0044BEF4(void *arg0) {
+void Cinema_TempFree_2(void *arg0) {
     if (arg0 != NULL) {
-        func_002052D8(0, ((s32 **) arg0)[-4]);
+        CCache__Deallocate(0, ((s32 **) arg0)[-4]);
     }
 }
 
-s32 func_0044BF18(void *object) {
-    struct IntPair *first = func_002017D4(object, 0);
-    struct IntPair *second = func_002017D4(object, 2);
+s32 Cinema_SplineBlockSize_2(void *object) {
+    struct IntPair *first = CISet__GetBlock(object, 0);
+    struct IntPair *second = CISet__GetBlock(object, 2);
     s32 size = first->field_4 * 36;
     return size + second->field_4 * 36 + 0x30;
 }
 
-s32 func_0044BF74(void) {
+s32 Cinema_GetEntryCount_2(void) {
     return *D_800F70D8 - 1;
 }
 
 /* Loads the cinema table. */
-s32 **func_0044BF88(void) {
+s32 **Cinema_LoadTable_2(void) {
     s32 size;
     s32 loaded;
     CWorld *resources = D_800F7078;
 
-    loaded = func_0020185C(resources->m_pCinemas, resources->m_CinemasKey, 0, &size);
+    loaded = CISet__GetROMAddressAndSize(resources->m_pCinemas, resources->m_CinemasKey, 0, &size);
     if (loaded == 0) {
         return NULL;
     }
-    return func_0020367C(0, loaded, size, 0x13, 0, NULL, "Cinema", 1);
+    return CCache__Request(0, loaded, size, 0x13, 0, NULL, "Cinema", 1);
 }
 
 /* A Hermite basis term, (1 - t)^3 - (1 - t) and t^3 - t, weighted. */
-f32 func_0044BFF8(f32 a, f32 b, f32 t) {
+f32 Cinema_SplineCubicTerm_2(f32 a, f32 b, f32 t) {
     f32 u;
     u = 1.0f - t;
     return (a * ((u * u * u) - u)) + (b * ((t * t * t) - t));
 }
 
-f32 func_0044C038(f32 a, f32 b, f32 t) {
+f32 Cinema_Lerp_2(f32 a, f32 b, f32 t) {
     return (a * (1.0f - t)) + (b * t);
 }
 
-void *func_0044C05C(s32 index) {
-    return func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index);
+void *Cinema_GetClip_2(s32 index) {
+    return CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index);
 }
 
-s32 func_0044C09C(s32 index) {
-    return *(s32 *)func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index), 2);
+s32 Cinema_ClipEyeHeld_2(s32 index) {
+    return *(s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index), 2);
 }
 
-s32 func_0044C0EC(s32 index) {
-    return ((s32 *)func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index), 2))[1];
+s32 Cinema_ClipTargetHeld_2(s32 index) {
+    return ((s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index), 2))[1];
 }
 
-void *func_0044C13C(s32 index) {
-    return func_002017D4(func_002017D4(func_002017D4(D_800C1BB0->resource, 0), index), 1);
+void *Cinema_GetClipTargetSpline_2(s32 index) {
+    return CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index), 1);
 }
 
-void *func_0044C188(void) {
-    return func_002017D4(D_800C1BB0->resource, 3);
+void *Cinema_GetFOVTrack_2(void) {
+    return CISet__GetBlock(D_800C1BB0->resource, 3);
 }

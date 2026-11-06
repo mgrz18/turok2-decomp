@@ -1,7 +1,7 @@
 #include "common.h"
 
-void func_00243414();                            /* extern */
+void CAI__SetMode();                            /* extern */
 
-void func_0025864C(void) {
-    func_00243414();
+void WeaponActor_SetModeWrapper(void) {
+    CAI__SetMode();
 }

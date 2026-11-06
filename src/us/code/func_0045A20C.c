@@ -3,7 +3,7 @@ typedef signed int s32;
 
 extern char *D_800F70A8;
 
-char *func_0045A20C(s32 block) {
+char *Pak_GetBufferSize_2(s32 block) {
     if (block == 0) {
         return D_800F70A8 + 0x688;
     }

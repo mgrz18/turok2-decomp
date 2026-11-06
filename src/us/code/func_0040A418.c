@@ -1,4 +1,4 @@
-/* FAKEMATCH: identical if/else arms in fewerActorsThan's counting loop (as in func_0040C4F4). */
+/* FAKEMATCH: identical if/else arms in fewerActorsThan's counting loop (as in MotherBoss_FewerActorsThan). */
 #include "common.h"
 #include "structs/pick.h"
 #include "structs/game_object.h"
@@ -8,18 +8,18 @@
  * when fewer than 3 actors are in the D_8010FEB4 list, else 6. */
 
 extern CListedInstance *D_8010FEB4;
-extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern s16 func_0026D518(Pick *table);
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 state);
+extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern s16 WeightedTable_PickStatic(Pick *table);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
 
-/* func_0040BD60 */
+/* MotherBoss_GetTargetDist */
 static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CListedInstance **found) {
     CAITargets t;
     f32 dist;
 
     dist = -1.0f;
     *found = NULL;
-    func_00246108(obj, &obj->m_AI, &t, 1, 0);
+    AI_UpdateTargets(obj, &obj->m_AI, &t, 1, 0);
     if (t.m_Path.m_pTarget != NULL && (t.m_Path.m_pTarget->m_dwFlags & 0x300000)) {
         dist = t.m_Path.m_FlatDist;
         *found = (CListedInstance *) t.m_Path.m_pTarget;
@@ -27,7 +27,7 @@ static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CListedInstance **
     return dist;
 }
 
-/* func_0040C4F4 */
+/* MotherBoss_FewerActorsThan */
 static __inline__ s32 fewerActorsThan(s32 max) {
     CListedInstance *actor;
     s32 count = 0;
@@ -43,7 +43,7 @@ static __inline__ s32 fewerActorsThan(s32 max) {
     return count < max;
 }
 
-void func_0040A418(CGameObjectInstance *obj, CAI *ai) {
+void MotherBoss_Phase0ChooseAttack(CGameObjectInstance *obj, CAI *ai) {
     Pick picks[8];
     CListedInstance *found;
     MotherBossState *state = &D_8012FB70;
@@ -71,8 +71,8 @@ void func_0040A418(CGameObjectInstance *obj, CAI *ai) {
             }
         }
         picks[n].id = -1;
-        state->lastAnim = func_0026D518(picks);
+        state->lastAnim = WeightedTable_PickStatic(picks);
         state->counter = 0;
-        func_00243414(obj, ai, state->lastAnim);
+        CAI__SetMode(obj, ai, state->lastAnim);
     }
 }

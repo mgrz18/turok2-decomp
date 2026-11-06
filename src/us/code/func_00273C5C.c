@@ -3,10 +3,10 @@
 
 #include "structs/sound.h"
 
-void func_00293E60(void *p, s32 id);
-s32 func_00293580(void *p);
-void func_00293EC0(void *p);
-s32 func_00273C5C(SndVoicePool *p, s16 tag, s16 key) {
+void alSndpSetSound(void *p, s32 id);
+s32 alSndpGetState(void *p);
+void alSndpStop(void *p);
+s32 SndVoicePool_StopGroupVoice(SndVoicePool *p, s16 tag, s16 key) {
     s32 i;
     s32 j;
     SndVoice *v = p->voices;
@@ -21,9 +21,9 @@ s32 func_00273C5C(SndVoicePool *p, s16 tag, s16 key) {
             s->stopping = 1;
             s->vp.follow = 0;
             if (s->vp.frame != m->frame) {
-                func_00293E60(&m->player, m->handles[s->index]);
-                if (func_00293580(&m->player) != 0) {
-                    func_00293EC0(&m->player);
+                alSndpSetSound(&m->player, m->handles[s->index]);
+                if (alSndpGetState(&m->player) != 0) {
+                    alSndpStop(&m->player);
                 }
                 s->sound = -1;
             }

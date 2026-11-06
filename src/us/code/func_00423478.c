@@ -7,22 +7,22 @@
 
 extern s32 D_80130990;
 extern s32 D_800C2028;
-extern s32 func_0041DD90(Menu *action, s32 channel, s32 arg2);
-extern s32 func_0041DD90(Menu *, s32, s32);
+extern s32 PakMenu_CheckPak(Menu *action, s32 channel, s32 arg2);
+extern s32 PakMenu_CheckPak(Menu *, s32, s32);
 extern s32 D_8013099C;
-extern s32 func_0028591C(s32);
-extern s32 func_0041DD90(struct Menu *, s32, s32);
+extern s32 Controller_PakChanged(s32);
+extern s32 PakMenu_CheckPak(struct Menu *, s32, s32);
 static __inline__ s32 func_80409BDC_de(struct Menu *record) {
     if (D_80130990 != 0) {
         return D_800C2028;
     }
     return record->controller->port;
 }
-s32 func_00423478(struct Menu *record) {
+s32 DamagedPakMenu_Poll(struct Menu *record) {
     if (D_8013099C == 0) {
         if (func_80409BDC_de(record) != -1) {
-            if (func_0028591C(func_80409BDC_de(record)) != 0) {
-                if (func_0041DD90(record, func_80409BDC_de(record), 0) != 0) {
+            if (Controller_PakChanged(func_80409BDC_de(record)) != 0) {
+                if (PakMenu_CheckPak(record, func_80409BDC_de(record), 0) != 0) {
                     D_8013099C = 1;
                 }
             }

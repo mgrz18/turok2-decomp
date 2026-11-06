@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0027672C(OwnerRecAtD8 *arg0, s32 arg1) {
+void SndQueue_CancelOwner(OwnerRecAtD8 *arg0, s32 arg1) {
     ListNode *node;
     ListNode *next;
     ListNode *sentinel;

@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002007D0(CList *arg0);
-extern void func_00203330(s32, s32);
+extern void CList__RemoveHead(CList *arg0);
+extern void CCache__Compact(s32, s32);
 extern CList D_800D81F4;
 extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 extern s32 CList__AddTail(CList *list, void *node);
-extern s32 func_002024E0(void *, s32);
-extern void func_00266B90(u32, u32, s32);
-extern void func_002005D0(void *, s32, s32);
-void func_00203330(s32 unused, s32 arg1) {
+extern s32 CHeap__Alloc(void *, s32);
+extern void memmove(u32, u32, s32);
+extern void CList__InsertBefore(void *, s32, s32);
+void CCache__Compact(s32 unused, s32 arg1) {
     extern void CList__Remove(void *, s32);
-    extern void func_002026EC(void *, s32);
+    extern void CHeap__Free(void *, s32);
     extern s32 D_800D1CC0[3];
     extern s32 D_800D81D8[];
     CList queue;
@@ -38,10 +38,10 @@ void func_00203330(s32 unused, s32 arg1) {
         node = (Node80254C10 *)pool[0];
         pool[0] = *(s32 *)&node->next;
         if (!(*(s32 *)&node->flags & 0x701) && (u32)(*arena_end + 0x20) < node->start) {
-            func_002026EC(arena, node->start);
-            split = func_002024E0(arena, node->end);
+            CHeap__Free(arena, node->start);
+            split = CHeap__Alloc(arena, node->end);
             if (split < node->start) {
-                func_00266B90(split, node->start, node->end);
+                memmove(split, node->start, node->end);
                 node->start = split;
                 CList__Remove(&pool[7], (s32)node);
                 CList__AddTail(&queue, node);
@@ -55,11 +55,11 @@ drain:
     node = queue.m_pHead;
     while (node != 0) {
         next = node->next;
-        func_002007D0(&queue);
+        CList__RemoveHead(&queue);
         scan = D_800D81F4.m_pHead;
         while (scan != 0) {
             if (scan->start > node->start) {
-                func_002005D0(&D_800D81F4, (s32)scan, (s32)node);
+                CList__InsertBefore(&D_800D81F4, (s32)scan, (s32)node);
                 break;
             }
             scan = scan->next;

@@ -2,7 +2,7 @@
 #include "structs/boss.h"
 
 /* Starts a Blind One mover on a sequence of masks, one every interval frames. */
-void func_00447D94(BlindOneMover *mover, s32 *seq, f32 interval) {
+void BlindOne_StartMover_2(BlindOneMover *mover, s32 *seq, f32 interval) {
     mover->seq = seq;
     mover->pos = 0;
     mover->interval = interval;

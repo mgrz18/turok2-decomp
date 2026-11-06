@@ -6,15 +6,15 @@ typedef struct {
     /* 0xB0 */ s32 header;
 } Model;
 
-s32 func_00293580(s32);                         /* extern */
-s32 func_00293E60(s32, s16);                    /* extern */
+s32 alSndpGetState(s32);                         /* extern */
+s32 alSndpSetSound(s32, s16);                    /* extern */
 
-void func_002747EC(Model *arg0) {
+void SndVoice_GetState(Model *arg0) {
     s32 temp_s0;
     s32 temp_v1;
 
     temp_v1 = arg0->header;
     temp_s0 = temp_v1 + 0x84;
-    func_00293E60(temp_s0, ((s16 *) (temp_v1 + (arg0->index << 1)))[0xDC / 2]);
-    func_00293580(temp_s0);
+    alSndpSetSound(temp_s0, ((s16 *) (temp_v1 + (arg0->index << 1)))[0xDC / 2]);
+    alSndpGetState(temp_s0);
 }

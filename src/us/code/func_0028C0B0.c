@@ -48,14 +48,14 @@ extern u8 D_800C5400[];
 extern u8 D_800CFC80[];
 extern volatile s32 D_800B75EC;  /* set when the crash screen may be left */
 
-extern u64 func_0029B170(void);                 /* osGetTime */
-extern void func_00424508(s32);
-extern void func_0029AC90(u16 *frameBuffer);    /* osViSwapBuffer */
-extern void func_0028B430(u8 c);                /* draws one character */
-extern void func_0028CF38(char *s);             /* draws a string */
-extern void func_0028B614(u32 value, char *name, u8 *descriptions);
-extern void func_0028B7C0(char *name1, u32 value1, char *name2, u32 value2);
-extern void func_0028BDFC(u8 *stack, s32 size, ThreadContext *context, u8 id);
+extern u64 osGetTime(void);                 /* osGetTime */
+extern void Video_SetResolution(s32);
+extern void osViSwapBuffer(u16 *frameBuffer);    /* osViSwapBuffer */
+extern void Crash_PutChar(u8 c);                /* draws one character */
+extern void Crash_PrintString(char *s);             /* draws a string */
+extern void Crash_PrintFlags(u32 value, char *name, u8 *descriptions);
+extern void Crash_PrintRegPair(char *name1, u32 value1, char *name2, u32 value2);
+extern void Crash_PrintStack(u8 *stack, s32 size, ThreadContext *context, u8 id);
 extern void osWritebackDCacheAll(void);
 
 static __inline__ void clearScreen(void) {
@@ -69,7 +69,7 @@ static __inline__ void clearScreen(void) {
 
 static __inline__ void printString(u8 *s) {
     while (*s != 0) {
-        func_0028B430(*s++);
+        Crash_PutChar(*s++);
     }
 }
 
@@ -79,7 +79,7 @@ static __inline__ void printInt(s32 n) {
     s32 v;
 
     if (n < 0) {
-        func_0028B430('-');
+        Crash_PutChar('-');
         v = -n;
     } else {
         v = n;
@@ -90,21 +90,21 @@ static __inline__ void printInt(s32 n) {
         *--p = v % 10 + '0';
         v /= 10;
     } while (v != 0);
-    func_0028CF38(p);
+    Crash_PrintString(p);
 }
 
 /* The crash screen: waits, then shows the build, the players, and the fault or failed assertion with registers and stack. */
-void func_0028C0B0(Thread *thread) {
+void Crash_ShowScreen(Thread *thread) {
     ThreadContext *context = &thread->context;
     CPlayer *player;
     s32 i;
     u64 start;
 
-    start = func_0029B170();
+    start = osGetTime();
     do {
-    } while ((f32)(((func_0029B170() - start) * 64) / 3) * 0.000001f < 4.0f);
-    func_00424508(1);
-    func_0029AC90(D_80130A88);
+    } while ((f32)(((osGetTime() - start) * 64) / 3) * 0.000001f < 4.0f);
+    Video_SetResolution(1);
+    osViSwapBuffer(D_80130A88);
     D_8011F184 = 0xA529;
     D_800B7498 = 0x2955;
     D_8011F180 = D_80130A88;
@@ -154,27 +154,27 @@ void func_0028C0B0(Thread *thread) {
         printString((u8 *)"Fault in thread ");
         printInt(thread->id);
         printString(D_800AA0F0);
-        func_0028B614(context->cause, "cause", D_800B749C);
+        Crash_PrintFlags(context->cause, "cause", D_800B749C);
     }
     printString(D_800AA0F0);
-    func_0028B7C0("pc", context->pc, "sp", context->sp);
-    func_0028B7C0("ra", context->ra, "badvaddr", context->badvaddr);
-    func_0028B7C0("a0", context->a0, "a1", context->a1);
-    func_0028B7C0("a2", context->a2, "a3", context->a3);
-    func_0028B7C0("v0", context->v0, "v1", context->v1);
-    func_0028B7C0("sr", context->sr, "fpcsr", context->fpcsr);
+    Crash_PrintRegPair("pc", context->pc, "sp", context->sp);
+    Crash_PrintRegPair("ra", context->ra, "badvaddr", context->badvaddr);
+    Crash_PrintRegPair("a0", context->a0, "a1", context->a1);
+    Crash_PrintRegPair("a2", context->a2, "a3", context->a3);
+    Crash_PrintRegPair("v0", context->v0, "v1", context->v1);
+    Crash_PrintRegPair("sr", context->sr, "fpcsr", context->fpcsr);
     switch (thread->id) {
     case 0:
-        func_0028BDFC(D_800C7C00, 0x80, context, thread->id);
+        Crash_PrintStack(D_800C7C00, 0x80, context, thread->id);
         break;
     case 8:
-        func_0028BDFC(D_800C5400, 0x2800, context, thread->id);
+        Crash_PrintStack(D_800C5400, 0x2800, context, thread->id);
         break;
     case 7:
-        func_0028BDFC(D_800CFC80, 0x2000, context, thread->id);
+        Crash_PrintStack(D_800CFC80, 0x2000, context, thread->id);
         break;
     case 1:
-        func_0028BDFC(D_800C7C80, 0x8000, context, thread->id);
+        Crash_PrintStack(D_800C7C80, 0x8000, context, thread->id);
         break;
     }
     osWritebackDCacheAll();

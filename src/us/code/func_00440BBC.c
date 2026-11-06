@@ -12,7 +12,7 @@ typedef struct {
 extern u8 D_00431620[];
 extern LevelScriptF9D0 D_8012F9D0;
 
-void func_00440BBC(void) {
+void Primagen_EnterMode16_2(void) {
     D_8012F9D0.active = 1;
     D_8012F9D0.unk54 = -1;
     D_8012F9D0.unk58 = -1;

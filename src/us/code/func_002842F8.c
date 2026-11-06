@@ -5,7 +5,7 @@
 s32 Cinema_PathPlaying();                                /* extern */
 extern Cinema *D_800C1BB0;
 
-s32 func_002842F8(void)
+s32 Cinema_FollowsPlayer(void)
 {
   int new_var2;
   Cinema *new_var;

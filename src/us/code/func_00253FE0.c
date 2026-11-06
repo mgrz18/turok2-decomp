@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-s32 func_00253FE0(CPlayer *arg0) {
+s32 CPlayer__HasMenuOpen(CPlayer *arg0) {
     s32 var_v0;
     CCamera *temp_v1;
 

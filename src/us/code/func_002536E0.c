@@ -3,7 +3,7 @@
 
 extern s32 D_8011AAD8;
 
-void func_002536E0(CPlayer *arg0, s32 arg1) {
+void CPlayer__UseSpecialPickup(CPlayer *arg0, s32 arg1) {
 
     if (!(D_8011AAD8 & 0x10)) {
         if (arg1 < 0x1121) {

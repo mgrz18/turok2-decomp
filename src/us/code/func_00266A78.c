@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_00412314(s32, s32);                /* extern */
+s32 Cinema_RequestForObject(s32, s32);                /* extern */
 
-void func_00266A78(s32 arg0) {
-    func_00412314(0, arg0);
+void InteractiveAnim_EventPlayCinemaRemote(s32 arg0) {
+    Cinema_RequestForObject(0, arg0);
 }

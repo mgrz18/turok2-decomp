@@ -51,12 +51,12 @@ typedef struct MorphClock {
 } MorphClock;
 
 extern f32 func_002974C0(f32 x);        /* cosf */
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 
 #define LERP_COLOR(a, b) ((f32)(a) + t * (f32)((b) - (a)))
 
-/* func_0023353C with texture coordinates: S scaled by texS, T stepping by texStepT. */
-void func_00233868(MorphOwner *owner, MorphClock *clock, MorphVtx *dst, f32 texS, Morph *morph) {
+/* Morph_BlendVertices with texture coordinates: S scaled by texS, T stepping by texStepT. */
+void Morph_BlendVerticesTex(MorphOwner *owner, MorphClock *clock, MorphVtx *dst, f32 texS, Morph *morph) {
     CVector3 a;
     CVector3 b;
     f32 t;
@@ -78,8 +78,8 @@ void func_00233868(MorphOwner *owner, MorphClock *clock, MorphVtx *dst, f32 texS
     item = morph->items;
     while (--n != -1) {
         pb = &morph->pointsB[item->pointB];
-        func_0020EF60(&a, &morph->pointsA[item->pointA].pos, morph->scaleA);
-        func_0020EF60(&b, &pb->pos, morph->scaleB);
+        CVector3__Scale(&a, &morph->pointsA[item->pointA].pos, morph->scaleA);
+        CVector3__Scale(&b, &pb->pos, morph->scaleB);
         dst->ob[0] = a.x + t * (b.x - a.x);
         dst->ob[1] = a.y + t * (b.y - a.y);
         dst->ob[2] = a.z + t * (b.z - a.z);

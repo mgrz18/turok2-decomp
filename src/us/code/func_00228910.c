@@ -5,10 +5,10 @@
 
 extern float D_800A60B0;
 extern float D_800A60B4;
-extern void func_0020F040(f32 *);
-extern void func_0020EF60(void *, void *, f32);
-extern void func_0020EEF8(CVector3 *, CVector3 *, CVector3 *);
-void func_00228910(RangeNode **arg0, u32 arg1, u32 arg2, u32 arg3,
+extern void CVector3__Normalize(f32 *);
+extern void CVector3__Scale(void *, void *, f32);
+extern void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
+void DLights_GetAtPoint(RangeNode **arg0, u32 arg1, u32 arg2, u32 arg3,
                    CVector3 *arg4, f32 *arg5) {
     CVector3 delta;
     f32 temp_f0;
@@ -48,10 +48,10 @@ void func_00228910(RangeNode **arg0, u32 arg1, u32 arg2, u32 arg3,
                     delta.y = (f32)node->y - *(f32 *)&arg2;
                     delta.z = (f32)node->z - *(f32 *)&arg3;
                     temp_f20 = D_800A60B0 - (var_f2_3 / temp_f3);
-                    func_0020F040(&delta);
+                    CVector3__Normalize(&delta);
                     temp_f20_2 = temp_f20 * D_800A60B4;
-                    func_0020EF60(&delta, &delta, temp_f20_2);
-                    func_0020EEF8(arg4, arg4, &delta);
+                    CVector3__Scale(&delta, &delta, temp_f20_2);
+                    CVector3__Add(arg4, arg4, &delta);
                     *arg5 -= temp_f20_2;
                 }
             }

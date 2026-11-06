@@ -14,9 +14,9 @@ typedef struct {
     f32 timer; /* 0x40 */
 } MotionState;
 
-s32 func_00243414(void *actor, void *state, s32 mode);
+s32 CAI__SetMode(void *actor, void *state, s32 mode);
 
-void func_00264478(u8 *actor, MotionState *state) {
+void Platform_AtStartUpdate(u8 *actor, MotionState *state) {
     StateInfo *info = (StateInfo *) (*(u8 **) (actor + 0x14) + 0x14);
     s32 ok = 1;
 
@@ -36,7 +36,7 @@ void func_00264478(u8 *actor, MotionState *state) {
     }
     if (ok != 0) {
         if (state->timer >= info->delay) {
-            func_00243414(actor, state, 1);
+            CAI__SetMode(actor, state, 1);
         }
     } else {
         state->timer = 0.0f;

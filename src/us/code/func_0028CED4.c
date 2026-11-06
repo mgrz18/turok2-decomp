@@ -13,7 +13,7 @@ extern u16 D_800B7498;
 extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern u16 *D_8011F180;
-void func_0028CED4(void)
+void Crash_ClearScreen(void)
 {
   s32 var_a0;
   u16 *var_a1;

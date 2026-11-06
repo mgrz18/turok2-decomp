@@ -8,7 +8,7 @@ typedef struct {
 
 s32 __osSpGetStatus(void);
 
-s32 func_0029A510(SpState *arg0) {
+s32 osSpTaskYielded(SpState *arg0) {
     s32 temp_a0;
     u32 temp_v0;
 

@@ -3,6 +3,6 @@
 
 extern s32 D_8011ACCC;
 
-s32 func_0045679C(void) {
+s32 NameEntryMenu_IsMatchOver_2(void) {
     return D_8011ACCC;
 }

@@ -8,7 +8,7 @@
 extern f32 D_800A9DF4;                              /* units per next unit (presumably 60) */
 extern f32 D_800B6D28;                              /* frame delta */
 
-void func_00288FDC(CEngineApp *arg0) {
+void CEngineApp__UpdatePlayTime(CEngineApp *arg0) {
     f32 temp_f0;
     f32 temp_f0_2;
     f32 temp_f1;

@@ -6,15 +6,15 @@ typedef float f32;
 f32 func_00298470(f32);
 extern float D_800AA7B8;
 extern float D_800AA7BC;
-extern void func_00297BCC(u8 *arg0);
+extern void guMtxIdentF(u8 *arg0);
 extern f32 func_00298470(f32);
 extern f32 D_800AA7B8, D_800AA7BC;
-void func_00297860(f32 matrix[4][4], f32 eyeX, f32 eyeY, f32 eyeZ,
+void guLookAtF(f32 matrix[4][4], f32 eyeX, f32 eyeY, f32 eyeZ,
                       f32 atX, f32 atY, f32 atZ, f32 upX, f32 upY, f32 upZ) {
     f32 lookX, lookY, lookZ;
     f32 rightX, rightY, rightZ;
     f32 scale, one;
-    func_00297BCC(matrix);
+    guMtxIdentF(matrix);
     lookX = atX - eyeX;
     lookY = atY - eyeY;
     lookZ = atZ - eyeZ;

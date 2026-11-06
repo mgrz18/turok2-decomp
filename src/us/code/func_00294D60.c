@@ -24,7 +24,7 @@ typedef struct {
         _a->w1 = (u32)(c);                 \
     }
 
-AcmdW *func_00294D60(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, AcmdW *p) {
+AcmdW *alAuxBusPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, AcmdW *p) {
     AcmdW *ptr = p;
     AuxBus *m = (AuxBus *)filter;
     Filter **sources = m->sources;

@@ -36,14 +36,14 @@ struct Dest {
 };
 
 extern f32 D_800B6D28;
-extern void func_00246918(Source *, Dest *);
-extern void func_00242E34(Source *, Dest *);
-extern void func_00242C00(Source *, Dest *);
-extern void func_00243170(Source *, Dest *);
+extern void AI_StopSound(Source *, Dest *);
+extern void AI_UpdateRegionFlags(Source *, Dest *);
+extern void AI_RideMovingPlatform(Source *, Dest *);
+extern void CAI__UpdateModeAnim(Source *, Dest *);
 
-void func_00245848(Source *src, Dest *dst) {
+void CAI__Update(Source *src, Dest *dst) {
     if (dst->sound != NULL && dst->sound->unkC == -1) {
-        func_00246918(src, dst);
+        AI_StopSound(src, dst);
     }
     if (dst->timer != 0) {
         dst->timer--;
@@ -57,14 +57,14 @@ void func_00245848(Source *src, Dest *dst) {
         }
         dst->position = src->position;
         dst->value += D_800B6D28;
-        func_00242E34(src, dst);
+        AI_UpdateRegionFlags(src, dst);
         if (src->flags & 0x10000) {
-            func_00242C00(src, dst);
+            AI_RideMovingPlatform(src, dst);
         }
         if (dst->callback != NULL) {
             dst->callback(src, dst);
         }
-        func_00243170(src, dst);
+        CAI__UpdateModeAnim(src, dst);
         if (*src->kind != 2) {
             dst->old_position = src->position;
             dst->height = src->height;

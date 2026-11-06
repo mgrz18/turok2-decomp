@@ -6,7 +6,7 @@
 extern s32 D_800D81C8;
 extern s32 D_800D81C0;
 extern s32 D_800D81C0;
-void func_00202934(u32 key,s32 value) {
+void CHashTable__Insert(u32 key,s32 value) {
     extern EntryRecAtCV1 *D_800D81C4;
  EntryRecAtCV1 *entry = D_800D81C4 + (((key<<5)^(key>>1)^(key>>9)^(key>>17)) & D_800D81C0);
  EntryRecAtCV1 *tail;

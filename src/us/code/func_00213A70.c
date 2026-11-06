@@ -31,16 +31,16 @@ extern CVector3 D_800DD790[];
 extern CWorld D_800F7078;
 extern s32 D_8011AAD8;
 
-void *func_002017D4(void *file, s32 index);
-s32 *func_002017E8(s32 file, s32 index, s32 *size);
-s32 **func_00204EDC(s32, s32 size, s32, char *name);
-void func_0021285C(WRec **recs, s32 count, void *verts, s32 arg3, CVector3 *points, s32 arg5);
-void func_00212DA4(void *verts, s32 arg3, CVector3 *points, s32 arg5);
-void func_00212F98(void *verts, void *colors);
-void func_002130A8(void *verts, s32 arg3, CVector3 *points, s32 arg5);
-s32 func_002132B8(Box3 *q, WRec **out, s32 *cnt);
-void func_00213684(s32 file, s32 count, CVector3 *points);
-void func_0021375C(void *verts, CVector3 *points);
+void *CISet__GetBlock(void *file, s32 index);
+s32 *CISet__GetBlockAndSize(s32 file, s32 index, s32 *size);
+s32 **CCache__Allocate(s32, s32 size, s32, char *name);
+void Actors_AccumulateVertexLighting(WRec **recs, s32 count, void *verts, s32 arg3, CVector3 *points, s32 arg5);
+void Lighting_DebugHueColors(void *verts, s32 arg3, CVector3 *points, s32 arg5);
+void Lighting_CopyVertexColors(void *verts, void *colors);
+void Lighting_ApplyDirectional(void *verts, s32 arg3, CVector3 *points, s32 arg5);
+s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt);
+void Model_ApplyPackedOffsets(s32 file, s32 count, CVector3 *points);
+void Lighting_WriteVertexColors(void *verts, CVector3 *points);
 void func_0029E460(void *dst, void *src, s32 size);
 
 /* Collects the region records whose box overlaps q (at most 64); returns whether one is flagged. */
@@ -54,9 +54,9 @@ static __inline__ s32 findRecords(Box3 *q, s32 *regions, WRec **out, s32 *cnt) {
     n = 0;
     ret = 0;
     if (regions == NULL) {
-        return func_002132B8(q, out, cnt);
+        return Lighting_CollectVolumes(q, out, cnt);
     }
-    tab = func_002017D4(regions, 2);
+    tab = CISet__GetBlock(regions, 2);
     i = tab->count;
     i--;
     if (i != -1) {
@@ -88,7 +88,7 @@ static __inline__ s32 countVerts(s32 *src) {
 
     total = 0;
     for (i = 0; i < *src; i++) {
-        total += ((s32 *) func_002017D4(src, i))[1];
+        total += ((s32 *) CISet__GetBlock(src, i))[1];
     }
     return total;
 }
@@ -96,7 +96,7 @@ static __inline__ s32 countVerts(s32 *src) {
 /* The do { } while (0) blocks around the clearing loop and the copy weight
  * total's references (GCC counts refs by loop depth), so total gets $s4
  * before blk, as in the ROM. */
-s32 **func_00213A70(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
+s32 **Lighting_BuildLitVertices(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
     WRec *recs[64];
     s32 count;
     s32 size;
@@ -119,7 +119,7 @@ s32 **func_00213A70(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
 
     colors = NULL;
     ret = findRecords(box, regions, recs, &count);
-    src = func_002017E8(model, 0, &size);
+    src = CISet__GetBlockAndSize(model, 0, &size);
     total = countVerts(src);
     do {
         for (j = 0; j < total; j++) {
@@ -130,7 +130,7 @@ s32 **func_00213A70(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
     } while (0);
     if (ret != 0) {
         total2 = countVerts(src);
-        blk = func_00204EDC(0, size + 0x10 + total2 * 4, 0, D_800A57B8 + 4);
+        blk = CCache__Allocate(0, size + 0x10 + total2 * 4, 0, D_800A57B8 + 4);
         if (blk == NULL) {
             return NULL;
         }
@@ -145,7 +145,7 @@ s32 **func_00213A70(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
         dst = (u8 *) *blk + hdr[1];
         colors = (u8 *) *blk + hdr[2];
     } else {
-        blk = func_00204EDC(0, size + 8, 0, D_800A57B8 + 4);
+        blk = CCache__Allocate(0, size + 8, 0, D_800A57B8 + 4);
         if (blk == NULL) {
             return NULL;
         }
@@ -156,13 +156,13 @@ s32 **func_00213A70(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
     }
     do {
         func_0029E460(dst, copySrc, copySize);
-        func_00213684(model, total, D_800DD790);
+        Model_ApplyPackedOffsets(model, total, D_800DD790);
     } while (0);
     if (D_800ACAE0 == 0) {
         goto plain;
     }
     if (D_8011AAD8 & 0x8000) {
-        func_00212DA4(dst, arg3, D_800DD790, arg4);
+        Lighting_DebugHueColors(dst, arg3, D_800DD790, arg4);
         goto done;
     }
     if (count != 0) {
@@ -171,22 +171,22 @@ s32 **func_00213A70(s32 model, s32 *regions, Box3 *box, s32 arg3, s32 arg4) {
     n = 0;
     g = &D_800F7078;
     for (k = 0; k < g->m_nSectors; k++) {
-        n += ((s32 *) func_002017D4(*g->m_Sectors[k].m_hData, 2))[1];
+        n += ((s32 *) CISet__GetBlock(*g->m_Sectors[k].m_hData, 2))[1];
     }
     if (n != 0) {
         goto done;
     }
     do {
 plain:
-        func_002130A8(dst, arg3, D_800DD790, arg4);
+        Lighting_ApplyDirectional(dst, arg3, D_800DD790, arg4);
         goto done;
 lit:
-        func_0021285C(recs, count, dst, arg3, D_800DD790, arg4);
+        Actors_AccumulateVertexLighting(recs, count, dst, arg3, D_800DD790, arg4);
     } while (0);
 done:
-    func_0021375C(dst, D_800DD790);
+    Lighting_WriteVertexColors(dst, D_800DD790);
     if (ret != 0) {
-        func_00212F98(dst, colors);
+        Lighting_CopyVertexColors(dst, colors);
     }
     return blk;
 }

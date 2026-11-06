@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00416894(void *, void *, void *);
+extern void MenuPool_OpenChildMenu(void *, void *, void *);
 extern char D_00438670[];
-s32 func_0041812C(void *first, void *second, void *third) {
-    func_00416894(third, second, D_00438670);
+s32 PlayerSetupMenu_Play(void *first, void *second, void *third) {
+    MenuPool_OpenChildMenu(third, second, D_00438670);
     return 1;
 }

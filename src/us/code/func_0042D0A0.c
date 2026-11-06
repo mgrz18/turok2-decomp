@@ -4,7 +4,7 @@
 void CList__Construct(s32, s32, s32);
 s32 CList__AddTail(s32, s32);
 
-void func_0042D0A0(s32 arg0) {
+void CInstancePool__Construct(s32 arg0) {
     s32 var_s0;
     s32 var_s1;
 

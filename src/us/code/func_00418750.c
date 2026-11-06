@@ -14,7 +14,7 @@ extern char D_800B611C[];
 extern char D_800B6134[];
 extern char D_800B614C[];
 
-s32 func_00418750(MenuItem *a) {
+s32 FragTagMenu_TextureSetLabel(MenuItem *a) {
     switch (D_8011AB00) {
     case 0:
         a->text = D_800B608C;

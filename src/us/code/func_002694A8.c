@@ -8,13 +8,13 @@ typedef struct CollisionInfo {
 
 extern CollisionInfo D_800F1BE0;
 
-s32 func_00267F64(CGameObjectInstance *actor);
+s32 GameObject_CanEnterWater(CGameObjectInstance *actor);
 s32 func_00267F10(CGameObjectInstance *actor);
-f32 func_0026BE60(void *region, f32 x, f32 z);
-void func_00239F00(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
+f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);
+void Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
 
 /* Slides an actor to (x, z) with collision, keeping its height above the floor. */
-void func_002694A8(CGameObjectInstance *actor, f32 x, f32 z) {
+void GameObject_SlideTo(CGameObjectInstance *actor, f32 x, f32 z) {
     CVector3 savedVelocity;
     CVector3 to;
     s32 noA;
@@ -22,9 +22,9 @@ void func_002694A8(CGameObjectInstance *actor, f32 x, f32 z) {
     s32 oldFlags;
     f32 height;
 
-    noA = func_00267F64(actor) == 0;
+    noA = GameObject_CanEnterWater(actor) == 0;
     noB = func_00267F10(actor) == 0;
-    height = actor->header.m_vPos.y - func_0026BE60(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z);
+    height = actor->header.m_vPos.y - CGameRegion__GetHeight(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z);
     savedVelocity = actor->m_vVelocity;
     actor->m_vVelocity.x = actor->m_vVelocity.y = actor->m_vVelocity.z = 0.0f;
     to.x = x;
@@ -41,8 +41,8 @@ void func_002694A8(CGameObjectInstance *actor, f32 x, f32 z) {
     } else {
         D_800F1BE0.flags |= 0x30000;
     }
-    func_00239F00(actor, to, &D_800F1BE0);
+    Collision_MoveInstance(actor, to, &D_800F1BE0);
     D_800F1BE0.flags = oldFlags;
     actor->m_vVelocity = savedVelocity;
-    actor->header.m_vPos.y = func_0026BE60(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z) + height;
+    actor->header.m_vPos.y = CGameRegion__GetHeight(actor->header.m_pCurrentRegion, actor->header.m_vPos.x, actor->header.m_vPos.z) + height;
 }

@@ -3,10 +3,10 @@
 
 extern f32 D_800B6D28;          /* the frame's time step */
 
-/* Runs the screen flash (func_00281060 starts it): rises over m_AttackTime
+/* Runs the screen flash (CCamera__StartFlash starts it): rises over m_AttackTime
  * frames to m_MaxOpacity, holds for m_SustainTime, fades over m_DecayTime,
  * the opacity in m_FlashColor[3]. */
-void func_0027C074(CCamera *cam) {
+void CCamera__UpdateFlash(CCamera *cam) {
     switch ((u32) cam->m_FlashMode) {     /* unsigned: "not 1, below 2" is then just 0 */
         case 0:                 /* none */
             break;

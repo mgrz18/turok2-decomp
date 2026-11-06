@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00291034(void *, s16 *, s32);
-void func_00293CE0(ALSndPlayer *arg0) {
+extern s32 alEvtqPostEvent(void *, s16 *, s32);
+void alSndpPlay(ALSndPlayer *arg0) {
     s32 base = (s32)arg0->sndState;
     if (((ALSoundState *) (base + (arg0->target * 0x30)))->state == 0) {
         ParamsRecAt8V1 p;
         p.f0 = 0;
         p.f4 = base + arg0->target * 0x30;
-        func_00291034(&arg0->evtq, (s16 *)&p, 0);
+        alEvtqPostEvent(&arg0->evtq, (s16 *)&p, 0);
     }
 }
-extern s32 func_00291034(void *, s16 *, s32);
+extern s32 alEvtqPostEvent(void *, s16 *, s32);

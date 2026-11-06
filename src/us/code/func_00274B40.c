@@ -6,9 +6,9 @@ typedef signed short s16;
 typedef unsigned short u16;
 typedef signed int s32;
 typedef float f32;
-extern void func_00290E10(s32 arg0, s32 arg1);
-extern void func_00290E90(s32 arg0, s32 arg1);
-extern void func_00290EC0(s32 arg0, s16 arg1);
+extern void alCSPSetBank(s32 arg0, s32 arg1);
+extern void alCSPSetSeq(s32 arg0, s32 arg1);
+extern void alCSPSetVol(s32 arg0, s16 arg1);
 struct IntPair;
 struct IntPair {
     int field_0;
@@ -69,16 +69,16 @@ extern f32 D_800A81B4;
 extern f32 D_800A81B8;
 extern f32 D_800A81BC;
 extern f32 D_800A81C0;
-extern void func_00290DE0(s32);
-extern int func_0028FA00(void *object);
+extern void alCSPPlay(s32);
+extern int alCSPGetState(void *object);
 struct Track;
-extern void func_00290E40(s32 arg0, s32 arg1, s8 arg2);
-void *func_002017D4(void *table, s32 index);
-extern s32 func_00266D24(s32,s32,s32);
-extern f32 func_0026D210(u16);
-extern void func_0028F518(s32, void *);
+extern void alCSPSetChlFXMix(s32 arg0, s32 arg1, s8 arg2);
+void *CISet__GetBlock(void *table, s32 index);
+extern s32 BinarySearch(s32,s32,s32);
+extern f32 HalfToFloat(u16);
+extern void alCSeqNew(s32, void *);
 static __inline__ f32 fade_rate(Track *track,f32 time,f32 rate) {track->unk30=time;return (f32)track->unk20/(time*rate);}
-void func_00274B40(Track *arg0) {
+void SndSeq_Update(Track *arg0) {
     f32 temp_f0;
     f32 temp_f20;
     f32 var_f20;
@@ -129,14 +129,14 @@ void func_00274B40(Track *arg0) {
         var_v0 = 0x10;
         if (temp_a2 != -1) {
             temp_v0_2 = arg0->unk0;
-            temp_v0_3 = func_00266D24(temp_v0_2->unk2B60, temp_v0_2->unk2B64, temp_a2);
+            temp_v0_3 = BinarySearch(temp_v0_2->unk2B60, temp_v0_2->unk2B64, temp_a2);
             temp_s0 = temp_v0_3;
             if (temp_s0 != -1) {
                 temp_s0 *= 2;
-                temp_s0_2 = func_002017D4(arg0->unk0->unk2B50, temp_s0 | 1);
-                temp_v0_4 = func_002017D4(arg0->unk0->unk2B50, temp_s0);
+                temp_s0_2 = CISet__GetBlock(arg0->unk0->unk2B50, temp_s0 | 1);
+                temp_v0_4 = CISet__GetBlock(arg0->unk0->unk2B50, temp_s0);
                 arg0->unk24 = (s32) temp_v0_4->unk0;
-                temp_f0 = func_0026D210(temp_v0_4->unk4);
+                temp_f0 = HalfToFloat(temp_v0_4->unk4);
                 arg0->unk30 = temp_f0;
                 if (temp_f0 <= 0.0f) {
                     arg0->unk30 = D_800A81A0;
@@ -156,17 +156,17 @@ void func_00274B40(Track *arg0) {
             arg0->unk4 = 1;
         case 0x80:
             var_s0 = 0;
-            func_0028F518(arg0->unk10, arg0->unkC);
-            func_00290E90(arg0->unk14, arg0->unk10);
-            func_00290E10(arg0->unk14, arg0->unk8->field_4);
+            alCSeqNew(arg0->unk10, arg0->unkC);
+            alCSPSetSeq(arg0->unk14, arg0->unk10);
+            alCSPSetBank(arg0->unk14, arg0->unk8->field_4);
             do {
-                func_00290E40(arg0->unk14, var_s0 & 0xFF, 0);
+                alCSPSetChlFXMix(arg0->unk14, var_s0 & 0xFF, 0);
                 var_s0 += 1;
             } while (var_s0 < 0x14);
             temp_f20 = (f32) arg0->unk24 * (arg0->unk0->unk2BA4 * *(&D_800A81A0+1));
-            func_00290EC0(arg0->unk14, (s16) (s32) (temp_f20 * D_800A81A8));
+            alCSPSetVol(arg0->unk14, (s16) (s32) (temp_f20 * D_800A81A8));
             arg0->unk2C = temp_f20;
-            func_00290DE0(arg0->unk14);
+            alCSPPlay(arg0->unk14);
             arg0->unk1C = 0;
             arg0->unk18 = 0x10;
             D_800B2A70 = arg0->unk28;
@@ -175,7 +175,7 @@ void func_00274B40(Track *arg0) {
         goto block_44;
     case 0x10:
     default:
-        if ((D_800B2A70 > 0) && (func_0028FA00((void *)arg0->unk14) == 0)) {
+        if ((D_800B2A70 > 0) && (alCSPGetState((void *)arg0->unk14) == 0)) {
             D_800B2A70 = 0;
             arg0->unk28 = 0;
         } else {
@@ -192,7 +192,7 @@ void func_00274B40(Track *arg0) {
             }
             if (var_f20 != arg0->unk2C) {
 block_37:
-                func_00290EC0(arg0->unk14, (s16) (s32) (var_f20 * D_800A81B8));
+                alCSPSetVol(arg0->unk14, (s16) (s32) (var_f20 * D_800A81B8));
                 arg0->unk2C = var_f20;
             }
         }

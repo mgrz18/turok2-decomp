@@ -9,8 +9,8 @@ extern OSPfs D_80130C80[];
 extern s32 D_80130C70[];
 extern s32 D_80130C60[];
 s32 osPfsInitPak(OSMesgQueue *queue, OSPfs *pfs, int channel);
-s32 func_00425760(s32 pad);
-s32 func_004258E8(s32 pad) {
+s32 Pak_RefreshNotes(s32 pad);
+s32 Pak_Mount(s32 pad) {
     s32 i;
     s32 r;
     s32 v;
@@ -53,7 +53,7 @@ s32 func_004258E8(s32 pad) {
         goto fin2;
     got5:
         D_80130C60[pad] = 3;
-        if (func_00425760(pad) != 0) {
+        if (Pak_RefreshNotes(pad) != 0) {
             D_80130C70[pad] = -4;
             goto fin2;
         }

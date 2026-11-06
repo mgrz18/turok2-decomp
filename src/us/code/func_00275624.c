@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00270C80(void *, s32, CVector3, s32, s32);
-extern s32 func_002718C4(struct ContextRecAt2BC0 *arg0);
-extern void func_002718BC(struct ContextRecAt2BC0 *arg0, s32 arg1);
-extern int func_002718C4(struct ContextRecAt2BC0 *arg0);
-extern void func_002718BC(struct ContextRecAt2BC0 *arg0, int arg1);
+extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
+extern s32 CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
+extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, s32 arg1);
+extern int CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
+extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, int arg1);
 extern int D_8011ACA0;
-s32 func_00275624(s32 arg0) {
+s32 Sound__Play2D(s32 arg0) {
     extern s32 D_800F2A00;
     s32 temp_s0;
     s32 temp_s1;
@@ -22,10 +22,10 @@ s32 func_00275624(s32 arg0) {
         vec.z = zero;
         vec.y = zero;
         vec.x = zero;
-        temp_s1 = func_002718C4(&D_800F2A00);
-        func_002718BC(&D_800F2A00, 1);
-        temp_s0 = func_00270C80(&D_800F2A00, (s16)arg0, vec, 0, -1);
-        func_002718BC(&D_800F2A00, temp_s1);
+        temp_s1 = CAudioWorld__GetForce2D(&D_800F2A00);
+        CAudioWorld__SetForce2D(&D_800F2A00, 1);
+        temp_s0 = CAudioWorld__PlaySound(&D_800F2A00, (s16)arg0, vec, 0, -1);
+        CAudioWorld__SetForce2D(&D_800F2A00, temp_s1);
     }
     return temp_s0;
 }

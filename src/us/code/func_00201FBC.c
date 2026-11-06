@@ -19,7 +19,7 @@ s32 CLoader__DeallocLoaderEntry(s32, LoaderEntry *);                 /* extern *
 
 /* Loader thread: takes requests off the queue at +0x230, DMAs them in and
  * waits for completion on the queue at +0xA48. */
-void func_00201FBC(s32 arg0)
+void CLoader__Main(s32 arg0)
 {
   LoaderEntry *sp10;
   s32 sp14;

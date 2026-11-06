@@ -39,7 +39,7 @@ static __inline__ void lldiv(lldiv_t *ans, s64 num, s64 den) {
     ans->rem = num % den;
 }
 
-void func_0029EEA0(_Pft *x, u8 type) {
+void _Litob(_Pft *x, u8 type) {
     char buff[BUFF_LEN];
     const char *digs;
     s32 base;

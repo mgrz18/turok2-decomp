@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00291270(unsigned char *source, unsigned char *destination, int count);
-extern void func_0029F190(void);
-extern char func_0029F5D4;
-extern char func_0029F958;
-s32 func_0029FB64(void *filter, s32 paramID, ALWaveTable *param)
+extern void alCopy(unsigned char *source, unsigned char *destination, int count);
+extern void alAdpcmPull(void);
+extern char alRaw16Pull;
+extern char alAdecPull;
+s32 alLoadParam(void *filter, s32 paramID, ALWaveTable *param)
 {
     ALLoadFilter *a = (ALLoadFilter *)filter;
     ALFilter *f = (ALFilter *)filter;
@@ -18,21 +18,21 @@ s32 func_0029FB64(void *filter, s32 paramID, ALWaveTable *param)
             a->sample = 0;
             switch (a->table->type) {
                 case 0:
-                    f->handler = (void *) func_0029F190;
+                    f->handler = (void *) alAdpcmPull;
                     a->bookSize = 2 * a->table->waveInfo.adpcmWave.book->order *
                         a->table->waveInfo.adpcmWave.book->npredictors * 8;
                     if (a->table->waveInfo.adpcmWave.loop) {
                         a->loop.start = a->table->waveInfo.adpcmWave.loop->start;
                         a->loop.end = a->table->waveInfo.adpcmWave.loop->end;
                         a->loop.count = a->table->waveInfo.adpcmWave.loop->count;
-                        ((void (*)(void *, void *, s32))func_00291270)(a->table->waveInfo.adpcmWave.loop->state,
+                        ((void (*)(void *, void *, s32))alCopy)(a->table->waveInfo.adpcmWave.loop->state,
                                       a->lstate, sizeof(ADPCM_STATE));
                     } else {
                         a->loop.start = a->loop.end = a->loop.count = 0;
                     }
                     break;
                 case 1:
-                    f->handler = &func_0029F5D4;
+                    f->handler = &alRaw16Pull;
                     if (a->table->waveInfo.rawWave.loop) {
                         a->loop.start = a->table->waveInfo.rawWave.loop->start;
                         a->loop.end = a->table->waveInfo.rawWave.loop->end;
@@ -42,7 +42,7 @@ s32 func_0029FB64(void *filter, s32 paramID, ALWaveTable *param)
                     }
                     break;
                 case 2:
-                    f->handler = &func_0029F958;
+                    f->handler = &alAdecPull;
                     a->loop.start = a->loop.end = a->loop.count = 0;
                     break;
                 default:

@@ -6,28 +6,28 @@
 
 extern char D_801198B0[];
 
-void func_00275624(s32 sound);
-void func_00281060(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
-void func_0027FC2C(void *arg0, void *ui, void *resource);
-s32 func_00275544(s32 sound, CVector3 position, s32 arg4, s32 arg5);
-void func_0027580C(s32 callback);
+void Sound__Play2D(s32 sound);
+void CCamera__StartFlash(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
+void CCameraPool__AddText(void *arg0, void *ui, void *resource);
+s32 Sound__Play(s32 sound, CVector3 position, s32 arg4, s32 arg5);
+void Sound__PlaySpeech(s32 callback);
 
 /* Flashes the screen and plays the descriptor's optional resource, sound and callback. */
 static __inline__ void pickup_feedback(CPlayer *player, void *resource, s32 sound, s32 callback) {
-    func_00281060(player->m_pCamera, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
+    CCamera__StartFlash(player->m_pCamera, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
     if (resource != NULL) {
-        func_0027FC2C(D_801198B0, player->m_pCamera, resource);
+        CCameraPool__AddText(D_801198B0, player->m_pCamera, resource);
     }
     if (sound != 0) {
-        func_00275544(sound, player->m_CharacterActor.header.m_vPos, 0, -1);
+        Sound__Play(sound, player->m_CharacterActor.header.m_vPos, 0, -1);
     }
     if (callback != 0) {
-        func_0027580C(callback);
+        Sound__PlaySpeech(callback);
     }
 }
 
 /* Life force pickup: every 100 gives an extra life, up to 9. */
-s32 func_0023F524(CPlayer *player, CPickupEntry *entry) {
+s32 Pickup_GiveLifeForce(CPlayer *player, CPickupEntry *entry) {
     void *resource;
     s32 sound;
     s32 callback;
@@ -37,7 +37,7 @@ s32 func_0023F524(CPlayer *player, CPickupEntry *entry) {
         player->m_Data.m_LifeForce -= 100;
         if (player->m_Data.m_Lives < 9) {
             player->m_Data.m_Lives++;
-            func_00275624(0x3A9D);
+            Sound__Play2D(0x3A9D);
         }
     }
     sound = entry->m_Sound;

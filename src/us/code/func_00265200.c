@@ -1,5 +1,5 @@
 /* Boundary fixed in versions/cuts.us.txt: the function starts at 0x00265200 (its pointer in the data is
- * 0x00265200). The word splat puts at 0x002651FC, `jal func_0022F1C8`, is a
+ * 0x00265200). The word splat puts at 0x002651FC, `jal CParticleSystem__Free`, is a
  * stray word ahead of the prologue, never executed. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0020486C.c, func_0020486C, with Turok 2's layouts. */
 #include "common.h"
@@ -23,9 +23,9 @@ typedef struct {
 } ActionState;
 
 extern u8 D_800F7078[];
-extern void func_00237EE4(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, EventArg extra);
-extern void func_00220260(void *mgr, CGameObjectInstance *actor, s32 flag);
-extern void func_00243414(CGameObjectInstance *actor, ActionState *state, s32 mode);
+extern void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, EventArg extra);
+extern void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
+extern void CAI__SetMode(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
 static __inline__ s32 animReached(CGameObjectInstance *actor, ActionState *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;
@@ -38,7 +38,7 @@ static __inline__ s32 animReached(CGameObjectInstance *actor, ActionState *state
     }
 }
 
-void func_00265200(CGameObjectInstance *actor, ActionState *state) {
+void Door_OpenUpdate(CGameObjectInstance *actor, ActionState *state) {
     CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
     EventArg extra;
     f32 t;
@@ -46,8 +46,8 @@ void func_00265200(CGameObjectInstance *actor, ActionState *state) {
     if (info->m_OpenDoorEvent != -1) {
         if (animReached(actor, state, (f32) info->m_OpenDoorEvent * 0.007874016f)) {
             extra.a = 0;
-            func_00237EE4(actor, actor, 6, actor->header.m_vPos, extra);
-            func_00220260(D_800F7078, actor, 1);
+            ImpactEvent_Call(actor, actor, 6, actor->header.m_vPos, extra);
+            CScene__SetInstanceSavedBit(D_800F7078, actor, 1);
         }
     }
     if ((info->m_dwFlags & 1) && state->active != 0) {
@@ -60,6 +60,6 @@ void func_00265200(CGameObjectInstance *actor, ActionState *state) {
         }
     }
     if (state->duration != 0.0f && state->duration <= state->timer) {
-        func_00243414(actor, state, 1);
+        CAI__SetMode(actor, state, 1);
     }
 }

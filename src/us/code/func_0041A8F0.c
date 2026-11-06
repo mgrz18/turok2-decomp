@@ -3,6 +3,6 @@
 
 extern s32 D_80130920;
 
-void func_0041A8F0(void) {
+void EnterCheatMenu_Init(void) {
     D_80130920 = -1;
 }

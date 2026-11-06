@@ -6,7 +6,7 @@
 extern B09SlotA D_80121318[];
 extern B09LNode D_80120FC0[];
 extern B09SlotCtl D_80121390;
-s32 func_0028DAEC(void) {
+s32 VM_AcquireNextTLB(void) {
     s16 idx = D_80121390.cur++;
     if ((s16)D_80121390.cur >= 0x18) {
         D_80121390.cur = D_80121390.start;

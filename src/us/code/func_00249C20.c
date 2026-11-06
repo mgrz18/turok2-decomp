@@ -1,5 +1,5 @@
-/* func_00249C20 and func_0024A0DC, one source file: the file's .rodata
- * opens with func_00249C20's literals at 0x800A6AF0, and func_0024A0DC's
+/* Player_FindAutoAimTarget and Player_UpdateAim, one source file: the file's .rodata
+ * opens with Player_FindAutoAimTarget's literals at 0x800A6AF0, and Player_UpdateAim's
  * jump table at 0x800A6B28 is 8-aligned from there (from its own start,
  * 0x800A6B0C, it would not be). */
 #include "common.h"
@@ -62,25 +62,25 @@ extern s32 D_800F7E70;
 extern AimActor *D_800F7C70[];
 extern f32 D_800DD78C;
 
-void func_0021F00C(CVector3 *out, AimActor *actor, CVector3 off);
-f32 func_00253CFC(AimActor *);
+void CGameObjectInstance__LocalToWorld(CVector3 *out, AimActor *actor, CVector3 off);
+f32 Actor_GetEyeHeight(AimActor *);
 f32 func_002974C0(f32);
 f32 func_002982F0(f32);
 f32 func_00298470(f32);
-f32 func_0021153C(f32);
-s32 func_00249A58(AimActor *, AimActor *);
-f32 func_002671B4(AimActor *);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);
-f32 func_0020F040(CVector3 *);
-CQuaternion func_0021AE6C(AimActor *);
-void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+f32 Math_AcosLookup(f32);
+s32 CPlayer__CanLockOn(AimActor *, AimActor *);
+f32 GameObject_GetCollisionHeight(AimActor *);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
+f32 CVector3__Normalize(CVector3 *);
+CQuaternion CGameObjectInstance__GetRotation(AimActor *);
+void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
 extern f32 D_800B6D28;
-void func_0020F85C(f32 mtx[4][4], CVector3 *in, CVector3 *out);
-void func_0020EF60(CVector3 *out, CVector3 *a, f32 s);
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
+void CMtxF__TransformPoint(f32 mtx[4][4], CVector3 *in, CVector3 *out);
+void CVector3__Scale(CVector3 *out, CVector3 *a, f32 s);
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 
-CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) {
+CQuaternion Player_FindAutoAimTarget(AimActor *pl, AimActor **outTarget, CVector3 *outPos) {
     CVector3 tpos;
     CVector3 dir;
     CVector3 eye;
@@ -107,9 +107,9 @@ CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) 
     off.x = 0.0f;
     off.y = 0.0f;
     off.z = 1.0f;
-    func_0021F00C(&fwd, pl, off);
+    CGameObjectInstance__LocalToWorld(&fwd, pl, off);
     eye = pl->pos;
-    eye.y += func_00253CFC(pl);
+    eye.y += Actor_GetEyeHeight(pl);
     cone = D_800AF618[pl->weapon]->aimCone;
     best = NULL;
     bestDot = func_002974C0(cone * 0.5f);
@@ -122,16 +122,16 @@ CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) 
 
     if (D_80119870.m_Settings.multiplayer) {
         for (t = (AimActor *)D_80119870.m_PlayerList.m_ActiveList.m_pHead; t != NULL; t = t->next) {
-            if (func_00249A58(pl, t) && t != pl) {
+            if (CPlayer__CanLockOn(pl, t) && t != pl) {
                 if (pl->weapon == 29) {
                     tpos = t->aimPos;
                 } else {
                     tpos = t->pos;
                     tpos.y += t->height;
-                    tpos.y += func_002671B4(t) * 0.75f;
+                    tpos.y += GameObject_GetCollisionHeight(t) * 0.75f;
                 }
-                func_0020EF2C(&dir, &tpos, &eye);
-                func_0020F040(&dir);
+                CVector3__Subtract(&dir, &tpos, &eye);
+                CVector3__Normalize(&dir);
                 dot = fwd.x * dir.x + fwd.y * dir.y + fwd.z * dir.z;
                 if (bestDot < dot) {
                     bestDot = dot;
@@ -145,16 +145,16 @@ CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) 
     n = D_800F7E70;
     for (i = 0; i < n; i++) {
         t = D_800F7C70[i];
-        if (func_00249A58(pl, t)) {
+        if (CPlayer__CanLockOn(pl, t)) {
             if (pl->weapon == 13) {
                 tpos = t->aimPos;
             } else {
                 tpos = t->pos;
                 tpos.y += t->height;
-                tpos.y += func_002671B4(t) * 0.75f;
+                tpos.y += GameObject_GetCollisionHeight(t) * 0.75f;
             }
-            func_0020EF2C(&dir, &tpos, &eye);
-            func_0020F040(&dir);
+            CVector3__Subtract(&dir, &tpos, &eye);
+            CVector3__Normalize(&dir);
             dot = fwd.x * dir.x + fwd.y * dir.y + fwd.z * dir.z;
             if (bestDot < dot) {
                 bestDot = dot;
@@ -168,9 +168,9 @@ CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) 
     *outTarget = best;
     *outPos = bestPos;
     if (best != NULL) {
-        func_0020EFDC(&axis, &fwd, &bestDir);
-        func_0020F040(&axis);
-        theta = func_0021153C(bestDot);
+        CVector3__Cross(&axis, &fwd, &bestDir);
+        CVector3__Normalize(&axis);
+        theta = Math_AcosLookup(bestDot);
         half = 0.5f;
         angle = theta * func_00298470(func_00298470(1.0f - theta / (cone * half))) * half;
         s = func_002982F0(angle);
@@ -179,8 +179,8 @@ CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) 
         turn.z = axis.z * s;
         D_800DD78C = s;
         turn.w = func_002974C0(angle);
-        rot = func_0021AE6C(pl);
-        func_00210F68(&result, &rot, &turn);
+        rot = CGameObjectInstance__GetRotation(pl);
+        CQuaternion__Multiply(&result, &rot, &turn);
     } else {
         result.x = result.y = result.z = 0.0f;
         result.w = 1.0f;
@@ -190,7 +190,7 @@ CQuaternion func_00249C20(AimActor *pl, AimActor **outTarget, CVector3 *outPos) 
 
 /* Per-frame weapon aiming: the aim rotation, the auto-aim target lock
  * (acquire, hold, switch target) and the two spring-damped aim points. */
-void func_0024A0DC(AimActor *pl) {
+void Player_UpdateAim(AimActor *pl) {
     CVector3 tpos;
     CVector3 off;
     CVector3 delta;
@@ -210,7 +210,7 @@ void func_0024A0DC(AimActor *pl) {
     off.x = 0.0f;
     off.y = 0.0f;
     off.z = -1024.0f;
-    func_0020F85C(view->mtx, &off, &aimDir);
+    CMtxF__TransformPoint(view->mtx, &off, &aimDir);
     canLock = TRUE;
     stiff = 0.080000006f;
     damp = 0.52f;
@@ -254,7 +254,7 @@ void func_0024A0DC(AimActor *pl) {
     case 13:
     case 16:
     case 29:
-        func_00249C20(pl, &target, &tpos);
+        Player_FindAutoAimTarget(pl, &target, &tpos);
         canLock = FALSE;
         break;
     default:
@@ -262,7 +262,7 @@ void func_0024A0DC(AimActor *pl) {
         break;
     }
 
-    pl->aimRot = func_0021AE6C(pl);
+    pl->aimRot = CGameObjectInstance__GetRotation(pl);
     if (target == NULL) {
         tpos = aimDir;
         if (pl->options->autoAim && canLock) {
@@ -270,7 +270,7 @@ void func_0024A0DC(AimActor *pl) {
             CQuaternion rot2;
             AimActor *target2;
 
-            rot2 = func_00249C20(pl, &target2, &tpos2);
+            rot2 = Player_FindAutoAimTarget(pl, &target2, &tpos2);
             if (target2 != NULL) {
                 pl->aimRot = rot2;
             }
@@ -291,11 +291,11 @@ void func_0024A0DC(AimActor *pl) {
         pl->viewVel.z = 0.0f;
     }
 
-    func_0020EF2C(&delta, &tpos, &pl->viewPoint);
-    func_0020EF60(&delta, &delta, stiff * 1.25f);
-    func_0020EEF8(&pl->viewVel, &pl->viewVel, &delta);
-    func_0020EEF8(&pl->viewPoint, &pl->viewPoint, &pl->viewVel);
-    func_0020EF60(&pl->viewVel, &pl->viewVel, damp * 1.25f);
+    CVector3__Subtract(&delta, &tpos, &pl->viewPoint);
+    CVector3__Scale(&delta, &delta, stiff * 1.25f);
+    CVector3__Add(&pl->viewVel, &pl->viewVel, &delta);
+    CVector3__Add(&pl->viewPoint, &pl->viewPoint, &pl->viewVel);
+    CVector3__Scale(&pl->viewVel, &pl->viewVel, damp * 1.25f);
 
     if (target != NULL) {
         pl->range = D_800AF618[pl->weapon]->lockHold + 100;
@@ -332,7 +332,7 @@ void func_0024A0DC(AimActor *pl) {
         }
         target = pl->lockTarget;
         if (target != NULL) {
-            if (!func_00249A58(pl, target)) {
+            if (!CPlayer__CanLockOn(pl, target)) {
                 pl->lockState = 1;
                 pl->lockTimer = 0.0f;
             }
@@ -341,7 +341,7 @@ void func_0024A0DC(AimActor *pl) {
             } else {
                 tpos = target->pos;
                 tpos.y += target->height;
-                tpos.y += func_002671B4(target) * 0.75f;
+                tpos.y += GameObject_GetCollisionHeight(target) * 0.75f;
             }
             hold = D_800AF618[pl->weapon]->lockHold;
         } else {
@@ -350,10 +350,10 @@ void func_0024A0DC(AimActor *pl) {
         break;
     }
 
-    func_0020EF2C(&delta, &tpos, &pl->aimPoint);
-    func_0020EF60(&delta, &delta, stiff);
-    func_0020EEF8(&pl->aimVel, &pl->aimVel, &delta);
-    func_0020EEF8(&pl->aimPoint, &pl->aimPoint, &pl->aimVel);
-    func_0020EF60(&pl->aimVel, &pl->aimVel, damp);
+    CVector3__Subtract(&delta, &tpos, &pl->aimPoint);
+    CVector3__Scale(&delta, &delta, stiff);
+    CVector3__Add(&pl->aimVel, &pl->aimVel, &delta);
+    CVector3__Add(&pl->aimPoint, &pl->aimPoint, &pl->aimVel);
+    CVector3__Scale(&pl->aimVel, &pl->aimVel, damp);
     pl->hold = hold;
 }

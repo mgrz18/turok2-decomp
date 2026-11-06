@@ -7,20 +7,20 @@
 extern u16 D_800F5C66[];
 extern u8 D_800B0630[];
 extern u8 D_800AF6F0[];
-s32 func_00245A98(CGameObjectInstance *actor, void *state, void *table, s32 anim);
+s32 AI_PickAnimFromTable(CGameObjectInstance *actor, void *state, void *table, s32 anim);
 
-s32 func_0025AC88(CGameObjectInstance *actor, void *state) {
+s32 EnemyAnim_JoypadTestPlayAnim(CGameObjectInstance *actor, void *state) {
     u16 *slots = D_800F5C66;
     s32 r;
 
     if (slots[0] != 0) {
-        r = func_00245A98(actor, state, D_800B0630, slots[0]);
+        r = AI_PickAnimFromTable(actor, state, D_800B0630, slots[0]);
     } else if (slots[3] != 0) {
-        r = func_00245A98(actor, state, D_800B0630, slots[3]) + 100;
+        r = AI_PickAnimFromTable(actor, state, D_800B0630, slots[3]) + 100;
     } else if (slots[6] == 0) {
-        r = func_00245A98(actor, state, D_800AF6F0, actor->header.m_pIntelligence->m_Enemy.m_wIdleAnimFlags);
+        r = AI_PickAnimFromTable(actor, state, D_800AF6F0, actor->header.m_pIntelligence->m_Enemy.m_wIdleAnimFlags);
     } else {
-        r = func_00245A98(actor, state, D_800B0630, slots[6]) + 200;
+        r = AI_PickAnimFromTable(actor, state, D_800B0630, slots[6]) + 200;
     }
     return r;
 }

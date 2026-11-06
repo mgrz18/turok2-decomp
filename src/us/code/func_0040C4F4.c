@@ -7,7 +7,7 @@
 
 extern CListedInstance *D_8010FEB4;
 
-s32 func_0040C4F4(s32 max) {
+s32 MotherBoss_FewerActorsThan(s32 max) {
     CListedInstance *actor;
     s32 count;
 

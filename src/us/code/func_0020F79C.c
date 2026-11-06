@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0020F79C(void *arg0) {
+void CMtxF__Identity(void *arg0) {
     extern f32 D_800A55E4;
     Matrix *matrix = arg0;
     f32 zero = 0.0f;

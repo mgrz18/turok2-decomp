@@ -2,7 +2,7 @@
 
 extern s32 D_8011ACB0;
 
-s32 func_004559D8(void)
+s32 StatsMenu_IsMatchOver_2(void)
 {
   s8 *new_var;
   s32 var_v1;

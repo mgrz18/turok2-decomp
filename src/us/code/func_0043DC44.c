@@ -1,12 +1,12 @@
-/* Second-module twin of func_00404C44 (VM module 2 is linked over module 1; same source, its own strings and pool). */
+/* Second-module twin of Primagen_RunAttackStep (VM module 2 is linked over module 1; same source, its own strings and pool). */
 #include "common.h"
 #include "structs/game_object.h"
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
 
 extern s32 D_8012F608;           /* stage */
-extern f32 func_002119FC(f32 lo, f32 hi);
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+extern f32 Random_Blend(f32 lo, f32 hi);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 /* An attack: AI mode and the distance window it can start from (0x10 bytes). */
 typedef struct {
@@ -30,7 +30,7 @@ extern BossStep D_004310B8[];
 extern BossStep D_00431158[];
 extern BossStep D_00431220[];
 
-s32 func_0043DC44(CGameObjectInstance *obj, CAI *ai, f32 dist) {
+s32 Primagen_RunAttackStep_2(CGameObjectInstance *obj, CAI *ai, f32 dist) {
     f32 scale;
 
     if (D_8012F9DC.script.timer > 0.0f) {
@@ -43,22 +43,22 @@ s32 func_0043DC44(CGameObjectInstance *obj, CAI *ai, f32 dist) {
                 D_8012F618.waitMin = 0.0f;
             }
             if (D_8012F9DC.script.steps[D_8012F9DC.script.current].arg == 2) {
-                D_8012F618.waitMin = func_002119FC(0.0f, 2.0f);
-                D_8012F618.waitMax = func_002119FC(3.0f, 4.5f);
+                D_8012F618.waitMin = Random_Blend(0.0f, 2.0f);
+                D_8012F618.waitMax = Random_Blend(3.0f, 4.5f);
             }
             if (D_8012F9DC.script.steps[D_8012F9DC.script.current].arg == 3) {
                 D_8012F618.waitMax = 4.0f;
                 D_8012F618.waitMin = 1.0f;
             }
             D_8012F9DC.mode = 9;
-            func_00243414(obj, ai, 0x12);
+            CAI__SetMode(obj, ai, 0x12);
             return 1;
         case 3:
             scale = 10.24f;
             if (D_00430E30[D_8012F9DC.script.steps[D_8012F9DC.script.current].arg].minDist * scale <= dist
                 && dist <= D_00430E30[D_8012F9DC.script.steps[D_8012F9DC.script.current].arg].maxDist * scale) {
                 obj->m_AI.m_AnimSpeed = D_8012F9DC.script.steps[D_8012F9DC.script.current].animSpeed;
-                func_00243414(obj, ai, D_00430E30[D_8012F9DC.script.steps[D_8012F9DC.script.current].arg].mode);
+                CAI__SetMode(obj, ai, D_00430E30[D_8012F9DC.script.steps[D_8012F9DC.script.current].arg].mode);
                 return 1;
             }
             break;
@@ -78,7 +78,7 @@ s32 func_0043DC44(CGameObjectInstance *obj, CAI *ai, f32 dist) {
             D_8012F9DC.script.cursor = -1;
             D_8012F9DC.script.current = -1;
             D_8012F9DC.mode = 4;
-            func_00243414(obj, ai, 0x12);
+            CAI__SetMode(obj, ai, 0x12);
             return 1;
         case 7:
             if (D_8012F608 == 1) {
@@ -93,7 +93,7 @@ s32 func_0043DC44(CGameObjectInstance *obj, CAI *ai, f32 dist) {
             D_8012F9DC.script.cursor = -1;
             D_8012F9DC.script.current = -1;
             D_8012F9DC.mode = 2;
-            func_00243414(obj, ai, 0x18);
+            CAI__SetMode(obj, ai, 0x18);
             return 1;
     }
     return 0;

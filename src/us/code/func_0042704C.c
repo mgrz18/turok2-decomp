@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern u8 *func_0042704C(u8 *s, int c);
-u8 *func_0042704C(u8 *s, int c) {
+extern u8 *Str_FindLastChar(u8 *s, int c);
+u8 *Str_FindLastChar(u8 *s, int c) {
     u8 *start = s;
     while (*s++ != 0) {
     }

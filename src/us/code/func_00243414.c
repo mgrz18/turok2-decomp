@@ -339,9 +339,9 @@ struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
 extern CWorld D_800F7078;
-s32 func_00243414(void *arg0, void *arg1, s32 arg2);
-extern void func_00246918(void *, void *);
-s32 func_00243414(void *arg0, void *arg1, s32 arg2) {
+s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2);
+extern void AI_StopSound(void *, void *);
+s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {
     struct ActorStateTable *node;
     StateEntry *entry;
     StateEntry *scan;
@@ -388,7 +388,7 @@ s32 func_00243414(void *arg0, void *arg1, s32 arg2) {
         ((Dest *)arg1)->flags &= ~1U;
     }
     if (((Dest *)arg1)->sound != 0) {
-        func_00246918(arg0, arg1);
+        AI_StopSound(arg0, arg1);
     }
     if (entry->enter != 0) {
         entry->enter(arg0, arg1);

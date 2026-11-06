@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_002119FC(f32 arg0, f32 arg1);
+extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern s16 func_002744D0(s16 arg0, s16 arg1);
 s16 func_002744D0(s16 arg0, s16 arg1) {
     f32 temp_f20;
     f32 temp_f21;
     temp_f21 = (f32)arg1;
     temp_f20 = (f32)arg0;
-    return (s16)(s32)(func_002119FC(temp_f21, temp_f20) < 0.0f
-                          ? temp_f20 - func_002119FC(temp_f21, temp_f20)
-                          : temp_f20 + func_002119FC(temp_f21, temp_f20));
+    return (s16)(s32)(Random_Blend(temp_f21, temp_f20) < 0.0f
+                          ? temp_f20 - Random_Blend(temp_f21, temp_f20)
+                          : temp_f20 + Random_Blend(temp_f21, temp_f20));
 }

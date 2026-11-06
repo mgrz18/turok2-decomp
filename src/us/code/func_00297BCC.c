@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern float D_800AA7C8;
-void func_00297BCC(u8 *arg0) {
+void guMtxIdentF(u8 *arg0) {
     u8 *diag;
     u8 *elem;
     s32 r;

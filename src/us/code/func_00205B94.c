@@ -11,12 +11,12 @@ u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-void **func_0020367C(s32, s32, s32, s32, s32, s32, void *, s32);
-void func_002061B8(s32, void **);
+void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32);
+void CCache__DeallocateInternal(s32, void **);
 
 /* Loads a four-byte probe to read a count, frees it under the resource lock, then loads count*4+15
  * rounded to eight bytes and stores its first word through arg1, returning the allocation. */
-void **func_00205B94(s32 arg0, void **arg1, s32 arg2, void *arg3) {
+void **CCache__LoadPersistantIndex(s32 arg0, void **arg1, s32 arg2, void *arg3) {
     void **resource;
     s32 size;
     s32 counter;
@@ -25,7 +25,7 @@ void **func_00205B94(s32 arg0, void **arg1, s32 arg2, void *arg3) {
     u32 token2;
     s32 one = 1;
 
-    resource = func_0020367C(0, arg2, 4, 0x1B, 0, 0, D_800A51E0, one);
+    resource = CCache__Request(0, arg2, 4, 0x1B, 0, 0, D_800A51E0, one);
     size = **(s32 **)resource;
     token = __osDisableInt();
     counter = D_800D8DCC + one;
@@ -36,7 +36,7 @@ void **func_00205B94(s32 arg0, void **arg1, s32 arg2, void *arg3) {
     } else {
         __osRestoreInt(token);
     }
-    func_002061B8(0, resource);
+    CCache__DeallocateInternal(0, resource);
     token2 = __osDisableInt();
     counter2 = D_800D8DCC - 1;
     D_800D8DCC = counter2;
@@ -46,7 +46,7 @@ void **func_00205B94(s32 arg0, void **arg1, s32 arg2, void *arg3) {
     } else {
         __osRestoreInt(token2);
     }
-    resource = func_0020367C(0, arg2, ((size * 4) + 0xF) & ~7, 0x1B, 0, 0, arg3, 1);
+    resource = CCache__Request(0, arg2, ((size * 4) + 0xF) & ~7, 0x1B, 0, 0, arg3, 1);
     *arg1 = *resource;
     return resource;
 }

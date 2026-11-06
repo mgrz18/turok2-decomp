@@ -1,12 +1,12 @@
 /* Second-module copy of osPfsFreeBlocks (first module; this one at link address 0x00427D80), calling this module's own functions at their link addresses. */
-/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00460D80.c, func_00460D80.
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/osPfsFreeBlocks_2.c, osPfsFreeBlocks_2.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
 #include "ultra_types.h"
 s32 func_00429D1C(OSPfs *pfs);
 s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-s32 func_00460D80(OSPfs *pfs, s32 *leo_bytes) {
+s32 osPfsFreeBlocks_2(OSPfs *pfs, s32 *leo_bytes) {
     __OSInode inode;
     s32 j;
     u8 bank;

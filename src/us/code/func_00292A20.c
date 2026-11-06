@@ -28,7 +28,7 @@ typedef struct {
 } BindTable;
 
 /* Binds arg1 to slot arg2, copying a few of its values into the slot. */
-void func_00292A20(BindTable *arg0, BindSource *arg1, s32 arg2) {
+void __setInstChanState(BindTable *arg0, BindSource *arg1, s32 arg2) {
     arg0->slots[arg2].source = arg1;
     arg0->slots[arg2].unk7 = arg1->unk1;
     arg0->slots[arg2].unk9 = arg1->unk0;

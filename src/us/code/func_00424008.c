@@ -45,9 +45,9 @@ extern s16 D_801309D0; /* selected VI mode */
 extern ViMode D_801309D8;
 extern ViMode D_800B7BE0[]; /* osViModeTable */
 extern void *func_0029E460(void *dst, const void *src, s32 count);
-extern void func_0029AA80(ViMode *mode); /* osViSetMode */
+extern void osViSetMode(ViMode *mode); /* osViSetMode */
 
-void func_00424008(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY) {
+void Video_ResizeViMode(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY) {
     ViMode *mode = &D_801309D8;
     Span v[2];
     Span old[2];
@@ -100,5 +100,5 @@ void func_00424008(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY
     mode->comRegs.hStart = h;
     mode->fldRegs[0].vStart = v[0];
     mode->fldRegs[1].vStart = v[1];
-    func_0029AA80(mode);
+    osViSetMode(mode);
 }

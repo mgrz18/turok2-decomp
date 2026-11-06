@@ -6,7 +6,7 @@
 extern s32 D_80130924;
 
 /* A time/score threshold per setting index. */
-s32 func_0041B148(void) {
+s32 CheatMenu_GetWarpLevel(void) {
     switch ((u32) D_80130924) {
     case 0:
     default:

@@ -20,7 +20,7 @@ extern u16 D_80125000;     /* current stream word */
 
 /* Bit reader: fetches `count` fields of `nbits` bits (MSB first) from the stream of 16-bit words at st->rd into dst[],
    sign-extending each field to 16 bits when `sign` is set. Always returns 1. */
-s32 func_0029FE70(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st)
+s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st)
 {
     s16 i;
     u16 extra;     /* bits needed from the next word */

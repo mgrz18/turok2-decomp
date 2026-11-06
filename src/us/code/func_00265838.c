@@ -62,7 +62,7 @@ typedef struct ResourceManagerState ResourceManagerState;
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 struct LevelActor;
-extern void func_00220260(CWorld *, void *, s32);
+extern void CScene__SetInstanceSavedBit(CWorld *, void *, s32);
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -217,10 +217,10 @@ struct Record14;
 struct LevelActor;
 extern CWorld D_800F7078;
 struct LevelActor;
-extern void func_00237EE4(void *, void *, s32, CVector3, ResourceManagerState);
-void func_00265838(LevelActor *arg0) {
+extern void ImpactEvent_Call(void *, void *, s32, CVector3, ResourceManagerState);
+void Door_OpenNow(LevelActor *arg0) {
     ResourceManagerState pair;
     pair.active = 0;
-    func_00237EE4(arg0, arg0, 6, arg0->position0, pair);
-    func_00220260(&D_800F7078, arg0, 1);
+    ImpactEvent_Call(arg0, arg0, 6, arg0->position0, pair);
+    CScene__SetInstanceSavedBit(&D_800F7078, arg0, 1);
 }

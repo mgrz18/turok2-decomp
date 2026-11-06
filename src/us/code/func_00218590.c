@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void func_0029E460(char *data);
-char *func_00218590(Pack *pack, s32 prepare, s32 size)
+char *Pack_Add(Pack *pack, s32 prepare, s32 size)
 {
     s32 i;
     char *data;

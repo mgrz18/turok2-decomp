@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00218548(void *arg0, s32 arg1)
+void Pack_Init(void *arg0, s32 arg1)
 {
   s32 var_a2;
   void *var_a0;

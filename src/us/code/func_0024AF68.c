@@ -27,14 +27,14 @@ typedef struct MenuPlayer {
 extern u8 D_8011AAEA;
 extern Gfx *D_800D8E24;
 
-void func_00226F90(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
-s32 func_002571D8();
-s32 func_00257124();
+void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
+s32 CBarrel__CompareIcons();
+s32 CBarrel__SwapIcons();
 f32 func_002974C0(f32);
-void func_0027AEA8(s32 sprite, s32 frame, s32 *width, s32 *height);
-void func_0027B320(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32 arg6);
+void Hud_GetSpriteSize(s32 sprite, s32 frame, s32 *width, s32 *height);
+void Hud_DrawSprite(s32 sprite, s32 frame, s16 x, s16 y, f32 sx, f32 sy, s32 arg6);
 
-void func_0024AF68(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer *player) {
+void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer *player) {
     s32 width;
     s32 height;
     CBarrelIcon *item;
@@ -53,7 +53,7 @@ void func_0024AF68(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer *pla
     s32 green;
     s32 blue;
 
-    func_00226F90(items, count, sizeof(CBarrelIcon), func_002571D8, func_00257124);
+    Sort_Quick(items, count, sizeof(CBarrelIcon), CBarrel__CompareIcons, CBarrel__SwapIcons);
     level = D_8011AAEA + 0x40;
     fade = menu->m_Open * (level < 0x100 ? level : 255.0f);
     item = items;
@@ -80,7 +80,7 @@ void func_0024AF68(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer *pla
             y = viewport[3] + viewport[1] * 0.5f + item->m_vPos.y * 0.5f * viewport[1];
             alpha = item->m_Alpha;
         }
-        func_0027AEA8(item->m_Icon, 0, &width, &height);
+        Hud_GetSpriteSize(item->m_Icon, 0, &width, &height);
         if (width != 0) {
             if (menu->m_nCursor == item->m_Item) {
                 red = func_002974C0(menu->m_Glow) * 63.0f + 192.0f;
@@ -103,7 +103,7 @@ void func_0024AF68(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer *pla
                 _g->w1 = (red << 24) | ((green & 0xFF) << 16) | ((blue & 0xFF) << 8) |
                          ((u32)(alpha * fade) & 0xFF);
             }
-            func_0027B320(item->m_Icon, 0, x - width * item->m_Size * scaleX * 0.5f,
+            Hud_DrawSprite(item->m_Icon, 0, x - width * item->m_Size * scaleX * 0.5f,
                           y - height * item->m_Size * scaleY * 0.5f, scaleX * item->m_Size,
                           scaleY * item->m_Size, 1);
         }

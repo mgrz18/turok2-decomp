@@ -1,4 +1,4 @@
-/* First-module twin of src/us/code/func_00458C14.c. */
+/* First-module twin of src/us/code/PakMenu_FreePagesText_2.c. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408118.c, func_00408118, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
@@ -21,11 +21,11 @@ extern u8 D_800C1404[];
 extern char D_800B48B4[];
 extern char D_800B4914[];
 extern char D_800C140C[];
-s32 func_004267A0(s32 pad, s32 *out);
-u32 func_00426E6C(u32 n);
-void func_0029E3E0(char *dst, u8 *fmt, s32 a);
+s32 Pak_GetFreePages(s32 pad, s32 *out);
+u32 Pak_BytesToPages(u32 n);
+void sprintf(char *dst, u8 *fmt, s32 a);
 
-s32 func_0041FCF4(MenuItem *item, Menu *own) {
+s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
     Chars4 buf;
     char *bp;
     s32 pad;
@@ -45,21 +45,21 @@ s32 func_0041FCF4(MenuItem *item, Menu *own) {
     bp = buf.c;
     if (D_80130984 != 0) {
         item->text = D_800B48B4;
-        if (func_004267A0(pad, &freeb) == 0) {
+        if (Pak_GetFreePages(pad, &freeb) == 0) {
             if (D_801309B4 != 0) {
-                need = func_00426E6C(0x18);
+                need = Pak_BytesToPages(0x18);
             } else {
-                need = func_00426E6C(D_800F70A8 + 0x688);
+                need = Pak_BytesToPages(D_800F70A8 + 0x688);
             }
             dst = item->text;
             dst += 0xC;
-            func_0029E3E0(buf.c, D_800C1404, freeb);
+            sprintf(buf.c, D_800C1404, freeb);
             *dst = buf.c[0];
             dst++;
             *dst = buf.c[1];
             dst++;
             *dst = buf.c[2];
-            func_0029E3E0(buf.c, D_800C1404, need);
+            sprintf(buf.c, D_800C1404, need);
             dst += 0xC;
             *dst = buf.c[0];
             dst++;
@@ -76,19 +76,19 @@ s32 func_0041FCF4(MenuItem *item, Menu *own) {
             goto none;
         }
         item->text = t;
-        r = func_004267A0(pad, &freeb);
-        need = func_00426E6C(D_800F70A8 + 0x688);
+        r = Pak_GetFreePages(pad, &freeb);
+        need = Pak_BytesToPages(D_800F70A8 + 0x688);
         dst = item->text;
         if (r == 0) {
             dst += 0xC;
             fmt = D_800C1404;
-            func_0029E3E0(bp, fmt, freeb);
+            sprintf(bp, fmt, freeb);
             *dst = buf.c[0];
             dst++;
             *dst = buf.c[1];
             dst++;
             *dst = buf.c[2];
-            func_0029E3E0(bp, D_800C1404, need);
+            sprintf(bp, D_800C1404, need);
             dst += 0xC;
             *dst = buf.c[0];
             dst++;

@@ -1,6 +1,6 @@
 #include "common.h"
 
-/* A timer whose durations are read from a bit stream (see func_0042EC30). */
+/* A timer whose durations are read from a bit stream (see Demo_ReadRunLength). */
 typedef struct Timer {
     /* 0x00 */ s32 value;
     /* 0x04 */ u8 *data;
@@ -13,7 +13,7 @@ typedef struct Timer {
 } Timer; /* size 0x20 */
 
 /* Reads count bits, most significant first. */
-s32 func_0042F700(Timer *r, s32 count) {
+s32 DemoStream_ReadBits(Timer *r, s32 count) {
     s32 v = 0;
     u32 pos;
 

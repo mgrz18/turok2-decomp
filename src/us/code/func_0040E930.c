@@ -5,8 +5,8 @@
 extern BlindOnePhase D_0043240C[];
 
 extern u8 D_800F7078[];
-extern void func_00225C84(void *);
-extern s32 func_00243414(CGameObjectInstance *actor, void *ai, s32 state);
+extern void CScene__MarkGeneratorsSaved(void *);
+extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
 static __inline__ void StartTimer(BlindOneState *m, s32 n, void *proc, f32 seconds) {
     BlindOneMover *t;
@@ -47,7 +47,7 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_0040E930(BlindOneState *m) {
-    func_00243414(m->boss, &m->boss->m_AI, 0);
+void BlindOne_PhaseBossMode0Init(BlindOneState *m) {
+    CAI__SetMode(m->boss, &m->boss->m_AI, 0);
     NextCommand(m);
 }

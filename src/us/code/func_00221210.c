@@ -7,7 +7,7 @@
 /* Builds the frame's actor lists: every live level actor (flag 0x100) whose
  * type is shown in the current view is tested against the view's bounding
  * box (and frustum), or against the wider active box when it is not drawn;
- * the visible ones are animated (func_0021EBC0) and put in the world's lists
+ * the visible ones are animated (CGameObjectInstance__ClearDrawMatrices) and put in the world's lists
  * (drawn, ..., all, enemies, flagged 2, type 5, and actor types 0x64F and
  * 0x64D); the others lose their "visible" flag 0x200. */
 
@@ -25,15 +25,15 @@ extern f32 D_800F5A34[];    /* view box max (min at -3) */
 extern f32 D_800F5A18[];    /* active box: max at +4 (min at +1) */
 extern s32 D_800ACDE4;
 
-void func_002530A4(void *, CWorld *);
+void CPlayerPool__RegisterActors(void *, CWorld *);
 s32 Cinema_PathPlaying(void);
-s32 func_00267090(CGameObjectInstance *);
+s32 GameObject_IsSolid(CGameObjectInstance *);
 s32 func_002681BC(CGameObjectInstance *);
-s32 func_0026F60C(void *, f32 *);
-void func_0021EBC0(CGameObjectInstance *);
-void func_0022828C(void *, CWorld *);
+s32 Frustum_TestBox(void *, f32 *);
+void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *);
+void CInstancePool__UpdateVisibility(void *, CWorld *);
 
-void func_00221210(CWorld *w) {
+void CScene__BuildActorLists(CWorld *w) {
     s32 lim, mask, sflag, i, s2, t;
     s32 t0, t1, t2, t3, t4, t5, t6, t7;
     u8 *view;
@@ -48,7 +48,7 @@ void func_00221210(CWorld *w) {
     w->m_nRegistered = 0;
     w->m_nKind1 = 0;
     w->m_nFlagged = 0;
-    func_002530A4((u8 *)&D_8011AAE0 - 0x1270, w);
+    CPlayerPool__RegisterActors((u8 *)&D_8011AAE0 - 0x1270, w);
     view = NULL;
     if (D_8011AAE0.unk11 == 0) {
         view = *(u8 **)((u8 *)&D_8011AAE0 - 0x1210);
@@ -71,11 +71,11 @@ void func_00221210(CWorld *w) {
                 s2 = 0;
                 if (info->m_dwFlags & mask) {
                     if (sflag != 0 && !(fl & 2) && o->m_CurrentAnimation.m_bAnimActive == 0 && !(fl & 0x400) && info->m_Type != 3
-                        && func_00267090(o) == 0) {
+                        && GameObject_IsSolid(o) == 0) {
                         if (bB[0] > o->m_vMin.x && bB[-3] < o->m_vMax.x && bB[2] > o->m_vMin.z
                             && bB[-1] < o->m_vMax.z && bB[1] > o->m_vMin.y && bB[-2] < o->m_vMax.y) {
                             if (view != NULL) {
-                                s2 = func_0026F60C(view + 0x2D8, &o->m_vMin.x);
+                                s2 = Frustum_TestBox(view + 0x2D8, &o->m_vMin.x);
                             } else {
                                 goto set1;
                             }
@@ -97,8 +97,8 @@ void func_00221210(CWorld *w) {
                     s2 = 0;
                 }
                 if (s2 != 0) {
-                    func_0021EBC0(o);
-                    if (func_00267090(o) != 0) {
+                    CGameObjectInstance__ClearDrawMatrices(o);
+                    if (GameObject_IsSolid(o) != 0) {
                         t0 = w->m_nDrawActors;
                         if (t0 != 0x200) {
                             w->m_pDrawActors[t0] = (CGameObjectInstance *)o;
@@ -157,7 +157,7 @@ void func_00221210(CWorld *w) {
             i++;
         } while (i < lim);
     }
-    func_0022828C(&w->m_InstancePool, w);
+    CInstancePool__UpdateVisibility(&w->m_InstancePool, w);
     t = w->m_Kind1Cursor + 1;
     w->m_Kind1Cursor = t;
     if (t >= w->m_nKind1) {

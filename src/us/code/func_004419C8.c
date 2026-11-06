@@ -3,6 +3,6 @@
 
 extern s32 D_8012FB60[];
 
-void func_004419C8(void) {
+void TotemDefense_AddKill_2(void) {
     D_8012FB60[0] += 1;
 }

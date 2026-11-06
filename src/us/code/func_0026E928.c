@@ -5,11 +5,11 @@
 #include "structs/world.h"
 
 extern CWorld D_800F7078;
-extern void func_0026E928(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2, f32 arg5, f32 arg6, void **arg7);
-void func_0026E928(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
+extern void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2, f32 arg5, f32 arg6, void **arg7);
+void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
                    f32 arg5, f32 arg6, void **arg7) {
-    extern void *func_00225D94(void *object, int index);
-    extern void func_0026EE30(unsigned int *record, unsigned int value);
+    extern void *CScene__GetCurve(void *object, int index);
+    extern void RumbleCurve_Init(unsigned int *record, unsigned int value);
     arg0->key = arg1;
     arg0->position = arg2;
     arg0->value0 = arg5;
@@ -18,8 +18,8 @@ void func_0026E928(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
     if (arg7 != 0) {
         *arg7 = arg0;
     }
-    func_0026EE30(&arg0->amplitudeHandle,
-                  (unsigned int)func_00225D94(&D_800F7078, arg1->mode));
-    func_0026EE30(&arg0->lifetimeHandle,
-                  (unsigned int)func_00225D94(&D_800F7078, arg1->frames));
+    RumbleCurve_Init(&arg0->amplitudeHandle,
+                  (unsigned int)CScene__GetCurve(&D_800F7078, arg1->mode));
+    RumbleCurve_Init(&arg0->lifetimeHandle,
+                  (unsigned int)CScene__GetCurve(&D_800F7078, arg1->frames));
 }

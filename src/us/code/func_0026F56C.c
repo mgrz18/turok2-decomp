@@ -3,7 +3,7 @@
 
 #include "rw/junk_types.h"
 
-s32 func_0026F56C(B21Plane *pl, s32 n, CVector3 *pts) {
+s32 Frustum_TestPointsNoFar(B21Plane *pl, s32 n, CVector3 *pts) {
     s32 i;
     s32 j;
     s32 found;

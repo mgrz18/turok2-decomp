@@ -5,18 +5,18 @@
 /* Picks a random point on the ground around the origin: a distance in the phase's range
  * [unk688, unk68C] and a random angle in [-pi, pi]. */
 
-extern f32 func_002119FC(f32 min, f32 max);
+extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
 
-void func_0040C110(CVector3 *out) {
+void MotherBoss_RandomArenaPoint(CVector3 *out) {
     MotherBossState *state = &D_8012FB70;
     f32 dist;
     f32 angle;
     f32 z;
 
-    dist = func_002119FC((f32)state->minRadius, (f32)state->maxRadius);
-    angle = func_002119FC(-3.1415927f, 3.1415927f);
+    dist = Random_Blend((f32)state->minRadius, (f32)state->maxRadius);
+    angle = Random_Blend(-3.1415927f, 3.1415927f);
     out->x = dist * func_002982F0(angle);
     z = dist * func_002974C0(angle);
     out->y = 0.0f;

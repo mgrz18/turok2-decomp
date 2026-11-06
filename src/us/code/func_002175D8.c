@@ -3,9 +3,9 @@
 
 #include "rw/junk_types.h"
 
-u32 func_00217B64(u32 addr, u32 n);
-void func_00217214(B14Trk *t);
-f32 func_002175D8(B14Trk *t, f32 x) {
+u32 Bits_Peek(u32 addr, u32 n);
+void AnimCurve_LoadSegment(B14Trk *t);
+f32 AnimCurve_Evaluate(B14Trk *t, f32 x) {
     u32 frame;
     u32 fr;
     u32 start;
@@ -35,7 +35,7 @@ f32 func_002175D8(B14Trk *t, f32 x) {
             addr = data;
             idx = 0;
             s4 = 0;
-            s0 = func_00217B64(addr, 6);
+            s0 = Bits_Peek(addr, 6);
         }
         tb = tbl;
         p = (u32 *)(idx * 4 + (u32)tb);
@@ -44,7 +44,7 @@ f32 func_002175D8(B14Trk *t, f32 x) {
                 if (idx != t->cur) {
                     t->start = s4;
                     t->cur = idx;
-                    func_00217214(t);
+                    AnimCurve_LoadSegment(t);
                 }
                 break;
             }
@@ -52,7 +52,7 @@ f32 func_002175D8(B14Trk *t, f32 x) {
             p++;
             idx++;
             s4 = s0;
-            *p = func_00217B64(addr, 6);
+            *p = Bits_Peek(addr, 6);
             s0 += *p;
         }
     }

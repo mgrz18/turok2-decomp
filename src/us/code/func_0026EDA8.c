@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 CList__AddTail(CList *list, void *node);
-void func_0026EDA8(void *arg0) {
+void RumblePool_FreeAll(void *arg0) {
     extern void __osRestoreInt(s32 arg0);
     extern s32 __osDisableInt(void);
     extern void CList__Remove(void *, s32);

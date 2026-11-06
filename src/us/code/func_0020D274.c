@@ -15,7 +15,7 @@ extern float D_800A549C;
 extern float D_800A5494;
 extern float D_800A54D4;
 extern float D_800A54DC;
-void func_0020D274(f32 *src, PackedMatrixWords *dst) {
+void CMtxF__ToMtxAffine(f32 *src, PackedMatrixWords *dst) {
     u32 *upper = dst->upper;
     u32 *lower = dst->lower;
     f32 value;

@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* Bind an actor to its model and animation set, then choose its first
- * animation: `anim` > 0 is an action to pick at random (func_00219F74),
+ * animation: `anim` > 0 is an action to pick at random (CGameObjectInstance__PickRandomAnim),
  * otherwise -anim is the entry itself. */
 
 typedef struct Actor Actor;
@@ -39,16 +39,16 @@ struct Actor {
 extern u8 D_800A5AC4[];     /* "anim object info" */
 extern u8 D_800A5AD8[];     /* "anim object index" */
 
-s32 *func_0020367C(s32, s32, s32, s32, s32, s32, s32, s32);
-s32 func_00201848(s32, s32, u16);
-s32 func_0020185C(s32, s32, s32, s32 *);
-void *func_002017D4(s32, s32);
-void func_002051F4(s32, s32 *);
-void func_0020C0D0(void *, void *, void *);
-void func_00219910(void *);
-s32 func_00219F74(Actor *, s32, s32);
+s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
+s32 CISet__GetROMAddress(s32, s32, u16);
+s32 CISet__GetROMAddressAndSize(s32, s32, s32, s32 *);
+void *CISet__GetBlock(s32, s32);
+void CCache__Unlock(s32, s32 *);
+void CMtxF__TransformBox(void *, void *, void *);
+void CAnimationState__Reset(void *);
+s32 CGameObjectInstance__PickRandomAnim(Actor *, s32, s32);
 
-void func_0021A150(Actor *actor, s32 a1, s32 a2, s32 anim) {
+void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, s32 anim) {
     s32 *model;
     s32 *set;
     s32 id;
@@ -57,25 +57,25 @@ void func_0021A150(Actor *actor, s32 a1, s32 a2, s32 anim) {
     void *data;
 
     actor->flags &= ~0x40000;
-    id = func_00201848(a1, a2, actor->unk2);
-    model = func_0020367C(0, id, 0x18, 0, 0, 0, (s32) D_800A5AD8, 1);
+    id = CISet__GetROMAddress(a1, a2, actor->unk2);
+    model = CCache__Request(0, id, 0x18, 0, 0, 0, (s32) D_800A5AD8, 1);
     if (model != NULL) {
         tree = *model;
-        actor->unkAC = func_0020185C(tree, id, 1, &actor->unkB4);
-        actor->unkA4 = func_0020185C(tree, id, 0, &actor->unkB0);
-        actor->unkA8 = func_00201848(tree, id, 2);
-        set = func_0020367C(0, actor->unkA4, actor->unkB0, 0, 0, 0, (s32) D_800A5AC4, 1);
+        actor->unkAC = CISet__GetROMAddressAndSize(tree, id, 1, &actor->unkB4);
+        actor->unkA4 = CISet__GetROMAddressAndSize(tree, id, 0, &actor->unkB0);
+        actor->unkA8 = CISet__GetROMAddress(tree, id, 2);
+        set = CCache__Request(0, actor->unkA4, actor->unkB0, 0, 0, 0, (s32) D_800A5AC4, 1);
         if (set != NULL) {
             setTree = *set;
-            data = func_002017D4(setTree, 0);
+            data = CISet__GetBlock(setTree, 0);
             actor->init(actor, actor->ai);
-            func_0020C0D0(actor->unk58, data, actor->unkBC);
-            func_00219910(actor->unkD8);
-            func_00219910(actor->unkEC);
-            actor->setId = ((u16 *) func_002017D4(setTree, 1))[3];
+            CMtxF__TransformBox(actor->unk58, data, actor->unkBC);
+            CAnimationState__Reset(actor->unkD8);
+            CAnimationState__Reset(actor->unkEC);
+            actor->setId = ((u16 *) CISet__GetBlock(setTree, 1))[3];
             actor->flags |= 0x40000;
             if (anim > 0) {
-                anim = func_00219F74(actor, anim, -1);
+                anim = CGameObjectInstance__PickRandomAnim(actor, anim, -1);
             } else {
                 anim = -anim;
             }
@@ -89,8 +89,8 @@ void func_0021A150(Actor *actor, s32 a1, s32 a2, s32 anim) {
             }
             actor->unk175 = -1;
             actor->unk206 = anim;
-            func_002051F4(0, set);
+            CCache__Unlock(0, set);
         }
-        func_002051F4(0, model);
+        CCache__Unlock(0, model);
     }
 }

@@ -20,7 +20,7 @@ extern char D_800B4BB8[];
 extern char D_800B4E70[];
 extern char D_800B4C48[];
 extern u32 D_801309C0;
-s32 func_004228B0(struct FieldRecAt14 *field) {
+s32 PakMessage_UpdateLine1(struct FieldRecAt14 *field) {
     u32 state = D_801309C0;
     if (state >= 16) {
         goto state_other;

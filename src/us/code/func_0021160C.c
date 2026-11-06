@@ -4,7 +4,7 @@ extern f32 D_800A5688;          /* braking factor when reversing */
 extern f32 D_800B6D28;          /* per-frame scale */
 
 /* Moves value by delta, clamped to [-limit, limit]; reversing direction is damped. */
-f32 func_0021160C(f32 value, f32 delta, f32 limit) {
+f32 Math_StepClamped(f32 value, f32 delta, f32 limit) {
     if (delta < 0.0f && value <= -limit) {
         return value;
     }

@@ -6,14 +6,14 @@ extern u8 D_800F7078[];
 extern CGameRegion *D_800B2610;     /* region of the cached info */
 extern CRegionInfo *D_800B2614; /* its cached info */
 
-extern CRegionInfo *func_0022425C(void *table, CGameRegion *region);
+extern CRegionInfo *CScene__GetRegionInfo(void *table, CGameRegion *region);
 
 /* Whether the segment from a to b crosses the height of the region's surface,
  * strictly between its ends; *t gets the crossing fraction.
  * The failure paths share the first `return 0` through a label: the ROM's
  * single `v0 = 0; j epilogue` block sits right after the region test, where
  * three separate returns would be cross-jumped into the last one instead. */
-s32 func_0026C148(CGameRegion *region, CVector3 *a, CVector3 *b, f32 *t) {
+s32 CGameRegion__IntersectWater(CGameRegion *region, CVector3 *a, CVector3 *b, f32 *t) {
     CRegionInfo *info;
     f32 dy;
     f32 f;
@@ -24,7 +24,7 @@ s32 func_0026C148(CGameRegion *region, CVector3 *a, CVector3 *b, f32 *t) {
         return 0;
     }
     if (region != D_800B2610) {
-        D_800B2614 = func_0022425C(D_800F7078, region);
+        D_800B2614 = CScene__GetRegionInfo(D_800F7078, region);
         D_800B2610 = region;
     }
     info = D_800B2614;

@@ -13,7 +13,7 @@ extern u8 D_0043169C[];
 extern u8 D_00431700[];
 extern ModePair D_8012FA24;
 
-void func_00407158(s32 arg0) {
+void Primagen_SetSoundScript(s32 arg0) {
     D_8012FA24.unk0 = -1;
     D_8012FA24.unk4 = -1;
     if (arg0 == 0) {

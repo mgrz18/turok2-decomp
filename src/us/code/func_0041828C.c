@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_0041828C(void) {
+s32 CharacterMenu_LoadUpdate(void) {
     return 0;
 }

@@ -1,18 +1,18 @@
-/* func_00277090 and func_00277328, one source file: splat's func_00277088
+/* COnScreen__DrawBossBar and COverlay__Update, one source file: splat's func_00277088
  * started with the two junk words before this object (versions/cuts.us.txt),
  * and the 1.0f at 0x800A8240 that opens the file's .rodata is
- * func_00277090's. */
+ * COnScreen__DrawBossBar's. */
 #include "common.h"
 #include "m2c_macros.h"
 #include "structs/player.h"
 
 extern s32 Cinema_PathPlaying(void);
-extern void func_0027AEA8(s32 id, s32 frame, s32 *width, s32 *height); /* HUD sprite size */
-extern void func_0027AF4C(void);
-extern void func_00277328(COverlay *ov);                                /* runs the overlay script */
-extern void func_0027AFAC(s32 x0, s32 y0, s32 x1, s32 y1, u8 r, u8 g, u8 b, u8 a); /* filled rect */
-extern void func_00279028(u8 alpha);
-extern void func_0027B320(s32 id, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 flags);
+extern void Hud_GetSpriteSize(s32 id, s32 frame, s32 *width, s32 *height); /* HUD sprite size */
+extern void Hud_SetupFillMode(void);
+extern void COverlay__Update(COverlay *ov);                                /* runs the overlay script */
+extern void Hud_FillRect(s32 x0, s32 y0, s32 x1, s32 y1, u8 r, u8 g, u8 b, u8 a); /* filled rect */
+extern void Hud_SetupTextureMode(u8 alpha);
+extern void Hud_DrawSprite(s32 id, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 flags);
 
 extern s32 D_8011AC88;      /* game mode */
 extern u8 D_8011AAEA;       /* HUD opacity */
@@ -20,7 +20,7 @@ extern s32 D_800C2030;      /* screen width */
 
 /* Draws a boss health bar (1: m_BossOverlay, green; 2: m_BossOverlay2, red):
  * the frame sprite 0x191 and a bar whose length eases toward the boss percent. */
-void func_00277090(COnScreen *os, s32 which) {
+void COnScreen__DrawBossBar(COnScreen *os, s32 which) {
     s32 width;
     s32 height;
     COverlay *ov;
@@ -37,7 +37,7 @@ void func_00277090(COnScreen *os, s32 which) {
     if (Cinema_PathPlaying() != 0 || D_8011AC88 != 13) {
         return;
     }
-    func_0027AEA8(0x191, 0, &width, &height);
+    Hud_GetSpriteSize(0x191, 0, &width, &height);
     if (width == 0 || height == 0) {
         return;
     }
@@ -63,8 +63,8 @@ void func_00277090(COnScreen *os, s32 which) {
     }
     x = ov->m_PositionX + (f32)((D_800C2030 - width) / 2);
     y = ov->m_PositionY + (f32)yOff;
-    func_0027AF4C();
-    func_00277328(ov);
+    Hud_SetupFillMode();
+    COverlay__Update(ov);
     if (ov->m_Mode == 1) {
         if (ov->m_Value < percent) {
             ov->m_Value += 8;
@@ -80,10 +80,10 @@ void func_00277090(COnScreen *os, s32 which) {
     }
     alpha = &D_8011AAEA;
     left = x + 0x1E;
-    func_0027AFAC(left, y + 8, left + (width - 0x3C) * ov->m_Value / 100, y + 0xE,
+    Hud_FillRect(left, y + 8, left + (width - 0x3C) * ov->m_Value / 100, y + 0xE,
                   r, g, b, *alpha * 200 / 255);
-    func_00279028(*alpha);
-    func_0027B320(0x191, 0, x, y, 1.0f, 1.0f, 0);
+    Hud_SetupTextureMode(*alpha);
+    Hud_DrawSprite(0x191, 0, x, y, 1.0f, 1.0f, 0);
 }
 
 extern s32 D_800C2030;      /* screen width */
@@ -95,7 +95,7 @@ extern s32 D_800C2034;      /* screen height */
  * Y, 5 fall in X, 6 end. Script values are whole numbers; the fall
  * accelerations are 16.16 fixed point. An op that takes no time runs the
  * next one at once. */
-void func_00277328(COverlay *ov) {
+void COverlay__Update(COverlay *ov) {
     s32 next;
     f32 dx;
     f32 dy;

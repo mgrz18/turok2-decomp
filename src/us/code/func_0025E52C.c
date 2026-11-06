@@ -15,10 +15,10 @@ typedef struct {
     /* 0x00 */ s32 x, y, z;
 } NoisePos;
 
-f32 func_0020F6BC(void *, void *);
+f32 CVector3__Distance(void *, void *);
 extern NoisePos D_800B06AC;
 
-void func_0025E52C(u8 *actor, AlertState *state, NoisePos *pos, s32 kind) {
+void AI_HearNoise(u8 *actor, AlertState *state, NoisePos *pos, s32 kind) {
     s32 mode = state->modes[state->index];
     f32 strength;
     f32 dist;
@@ -40,7 +40,7 @@ void func_0025E52C(u8 *actor, AlertState *state, NoisePos *pos, s32 kind) {
         default:
             return;
         }
-        dist = func_0020F6BC(actor + 4, pos);
+        dist = CVector3__Distance(actor + 4, pos);
         if (dist < 3072.0f) {
             strength = strength * (1.0f / 3072.0f) * (3072.0f - dist);
             alert = state->alert;

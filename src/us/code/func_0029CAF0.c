@@ -87,7 +87,7 @@ extern u32 D_800B8908;          /* __OSGlobalIntMask */
 extern OSPiHandle *D_80123AD4;  /* __osDiskHandle */
 void __osLeoAbnormalResume(void);
 void __osLeoResume(void);
-s32 func_0029D190(OSPiHandle *pihandle, s32 dir, u32 cart_addr, void *dram_addr, u32 size); /* osEPiRawStartDma */
+s32 osEPiRawStartDma(OSPiHandle *pihandle, s32 dir, u32 cart_addr, void *dram_addr, u32 size); /* osEPiRawStartDma */
 
 s32 __osLeoInterrupt(void) {
     u32 stat = 0;
@@ -143,7 +143,7 @@ s32 __osLeoInterrupt(void) {
         } else {
             blockInfo->dramAddr = (void *)((u32)blockInfo->dramAddr + blockInfo->sectorSize);
             info->sectorNum++;
-            func_0029D190(D_80123AD4, OS_WRITE, LEO_SECTOR_BUFF, blockInfo->dramAddr, blockInfo->sectorSize);
+            osEPiRawStartDma(D_80123AD4, OS_WRITE, LEO_SECTOR_BUFF, blockInfo->dramAddr, blockInfo->sectorSize);
             return 1;
         }
     } else if (info->cmdType == LEO_CMD_TYPE_0) {
@@ -198,7 +198,7 @@ s32 __osLeoInterrupt(void) {
                 blockInfo->errStatus = LEO_ERROR_GOOD;
             }
 
-            func_0029D190(D_80123AD4, OS_READ, LEO_C2_BUFF, blockInfo->C2Addr, blockInfo->sectorSize * 4);
+            osEPiRawStartDma(D_80123AD4, OS_READ, LEO_C2_BUFF, blockInfo->C2Addr, blockInfo->sectorSize * 4);
             return 1;
         }
 
@@ -223,7 +223,7 @@ s32 __osLeoInterrupt(void) {
                 return 1;
             }
 
-            func_0029D190(D_80123AD4, 0, LEO_SECTOR_BUFF, blockInfo->dramAddr, blockInfo->sectorSize);
+            osEPiRawStartDma(D_80123AD4, 0, LEO_SECTOR_BUFF, blockInfo->dramAddr, blockInfo->sectorSize);
             blockInfo->errStatus = LEO_ERROR_GOOD;
             return 1;
         } else if (info->sectorNum <= 0x54) {

@@ -16,7 +16,7 @@ typedef struct {
 } Path;
 
 /* Stores where each segment starts, as a fraction of the whole path. */
-void func_00236B7C(Path *arg0) {
+void Path_StoreSegmentFractions(Path *arg0) {
     f32 temp_f0;
     f32 var_f1;
     Segment *var_v0;

@@ -22,14 +22,14 @@ extern char D_0043ABE8[];
 extern char D_0043AC0C[];
 extern void *D_800C2010;
 extern void *D_800C2014;
-s32 func_00426D8C(s32 n);
+s32 Str_Length(s32 n);
 s32 func_004266C0(s32 pad, s32 *out);
 s32 func_0042662C(s32 pad, s32 *out);
 s32 func_004269B4(s32 pad, u8 *ext);
 s32 func_00426084(s32 pad, s32 size, char *n1, char *n2, u8 *ext, u8 *buf);
-void func_00416644(u8 *a, void *b, void *c, void *d, void *e);
-void func_002053A8(s32 a);
-void func_002052D8(s32 a, void *p);
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
+void CCache__Flush(s32 a);
+void CCache__Deallocate(s32 a, void *p);
 /* Controller-pak name for the selected pad (inlined). */
 static __inline__ char *O01Pick(O01Pad *sel) {
     switch (sel->v) {
@@ -47,20 +47,20 @@ static __inline__ char *O01Pick(O01Pad *sel) {
 /* Release the menu buffers (inlined). */
 static __inline__ void O01FreeAll(void) {
     if (D_800C2010 != 0 || D_800C2014 != 0) {
-        func_002053A8(0);
+        CCache__Flush(0);
     }
     if (D_800C2010 != 0) {
-        func_002052D8(0, D_800C2010);
+        CCache__Deallocate(0, D_800C2010);
     }
     if (D_800C2014 != 0) {
-        func_002052D8(0, D_800C2014);
+        CCache__Deallocate(0, D_800C2014);
     }
     D_800C2010 = 0;
     D_800C2014 = 0;
     D_800C2018 = 0;
     D_800C201C = 0;
 }
-s32 func_00457D00(s32 unused, Menu *own, s32 unused3) {
+s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     CPlayer *plr;
     CPlayer *pp;
     s32 pv;
@@ -81,7 +81,7 @@ s32 func_00457D00(s32 unused, Menu *own, s32 unused3) {
     pad.v = pv;
     plr = pp;
     if (D_80130984 != 0) {
-        need = func_00426D8C(0x18);
+        need = Str_Length(0x18);
         r = func_004266C0(pad.v, &pad.freeb);
         if (r == 0) {
             if (pad.freeb >= need) {
@@ -97,7 +97,7 @@ s32 func_00457D00(s32 unused, Menu *own, s32 unused3) {
                 }
             }
             if (ok != 0) {
-                func_00416644(D_80119E2C, D_0043BAFC, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BAFC, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -105,9 +105,9 @@ s32 func_00457D00(s32 unused, Menu *own, s32 unused3) {
     O01FreeAll();
     if (flag != 0) {
         if (r == 0) {
-            func_00416644(D_80119E2C, D_0043BC88, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu(D_80119E2C, D_0043BC88, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         } else {
-            func_00416644(D_80119E2C, D_0043BD18, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu(D_80119E2C, D_0043BD18, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         }
     }
     return 1;

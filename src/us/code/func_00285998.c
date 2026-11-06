@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern u8 D_800F677B[];
-s32 func_00285998(void) {
+s32 Controller_AnyConnected(void) {
     s32 i = 0;
     while (1) {
         if (!(((D_800F677B[i * 4] >> 3) ^ 1) & 1)) {

@@ -3,6 +3,6 @@
 
 extern s32 D_801309B8;
 
-void func_00421E34(void) {
+void GameNoteMenu_InitDelete(void) {
     D_801309B8 = 0;
 }

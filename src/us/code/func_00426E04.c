@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-u8 *func_00426E04(u8 *arg0, u8 *arg1)
+u8 *Str_Copy(u8 *arg0, u8 *arg1)
 {
   u8 *var_v1;
   u8 temp_v0;

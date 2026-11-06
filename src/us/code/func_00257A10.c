@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00257A10(s32 arg0, s32 arg1);
-s32 func_00257A10(s32 arg0, s32 arg1) {
+extern s32 String_CountTrailingSpaces(s32 arg0, s32 arg1);
+s32 String_CountTrailingSpaces(s32 arg0, s32 arg1) {
     s32 var_a1;
     s32 var_v1;
     s32 space;

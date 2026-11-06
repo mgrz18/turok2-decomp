@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0028F828(CopyDest802B3998 *dst, CopySource802B3998 *src);
-void func_0028F828(CopyDest802B3998 *dst, CopySource802B3998 *src) {
+extern void alCSeqSetLoc(CopyDest802B3998 *dst, CopySource802B3998 *src);
+void alCSeqSetLoc(CopyDest802B3998 *dst, CopySource802B3998 *src) {
     int i;
     dst->word4 = src->word0;
     dst->wordC = src->word4;

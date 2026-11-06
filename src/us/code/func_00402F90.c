@@ -3,6 +3,6 @@
 
 extern s32 D_8012F3A4;
 
-void func_00402F90(void) {
+void MantidQueen_EnterPush(void) {
     D_8012F3A4 = 0;
 }

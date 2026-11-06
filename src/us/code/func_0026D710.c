@@ -26,18 +26,18 @@ typedef struct {
 
 extern u8 D_800F8928[];
 
-extern u8 *func_002017D4(void *list, s32 index);
-extern void func_0020F85C(CMtxF *mtx, CVector3 *in, CVector3 *out);
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-extern void func_0020E810(CQuaternion *out, CVector3 *dir);
-extern void func_00246690(CGameObjectInstance *obj, s32 sound, CVector3 pos, s32 flags);
-extern void func_002688C8(CGameObjectInstance *obj, CVector3 pos, CVector3 *out, s32 *region, s32 a, s32 b);
-extern void func_0022F350(void *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 ownerId, s32 target, s32 type, CVector3 dir,
+extern u8 *CISet__GetBlock(void *list, s32 index);
+extern void CMtxF__TransformPoint(CMtxF *mtx, CVector3 *in, CVector3 *out);
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
+extern void Actor_SpawnParticle(CGameObjectInstance *obj, s32 sound, CVector3 pos, s32 flags);
+extern void GameObject_TraceMove(CGameObjectInstance *obj, CVector3 pos, CVector3 *out, s32 *region, s32 a, s32 b);
+extern void CParticleSystem__Spawn(void *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 ownerId, s32 target, s32 type, CVector3 dir,
                           CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
 extern f32 func_0021F2B0(CGameObjectInstance *obj);
-extern void func_00236EA0(CGameObjectInstance *obj, CGameObjectInstance *owner, s32 type, s32 id, CVector3 pos, PuffArgs args);
+extern void ImpactEvent_Send(CGameObjectInstance *obj, CGameObjectInstance *owner, s32 type, s32 id, CVector3 pos, PuffArgs args);
 
-void func_0026D710(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectInstance *obj, void *bones) {
+void GameObject_EmitHotPoints(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectInstance *obj, void *bones) {
     CVector3 pos;
     CVector3 mapped;
     CVector3 zero;
@@ -51,16 +51,16 @@ void func_0026D710(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectInstance *ob
 
     for (n = n - 1; n != -1; n--) {
         if (ents->event & obj->m_dwHotPointFlags) {
-            flag = (func_002017D4(func_002017D4(bones, ents->bone), 1)[0x66] == 5) * 2;
+            flag = (CISet__GetBlock(CISet__GetBlock(bones, ents->bone), 1)[0x66] == 5) * 2;
             size = 0;
-            func_0020F85C(&mtxs[ents->bone], &ents->offset, &pos);
-            func_0020EF60(&pos, &pos, 1.0f / 65536.0f);
+            CMtxF__TransformPoint(&mtxs[ents->bone], &ents->offset, &pos);
+            CVector3__Scale(&pos, &pos, 1.0f / 65536.0f);
             switch (ents->event) {
             case 0x2:
-                func_00246690(obj, 0x51, pos, flag);
+                Actor_SpawnParticle(obj, 0x51, pos, flag);
                 break;
             case 0x8:
-                func_00246690(obj, 0x5C, pos, flag);
+                Actor_SpawnParticle(obj, 0x5C, pos, flag);
                 break;
             case 0x1:
             case 0x4:
@@ -71,77 +71,77 @@ void func_0026D710(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectInstance *ob
                 obj->m_AI.m_vBoreTarget = pos;
                 kind = obj->header.m_pIntelligence->m_Type;
                 if ((kind == 1 && obj->m_AI.m_Mode == 0x21) || (kind == 0xB && ((CPlayer *) obj->m_AI.m_pParent)->m_Mode == 0x23)) {
-                    func_002688C8(obj, pos, &mapped, &region, 0, 1);
-                    func_0020E810(&rot, &obj->m_AI.m_vBoreCollNormal);
+                    GameObject_TraceMove(obj, pos, &mapped, &region, 0, 1);
+                    CQuaternion__FromDirection(&rot, &obj->m_AI.m_vBoreCollNormal);
                     zero.x = 0;
                     zero.y = 0;
                     zero.z = 0;
                     if (obj->m_AI.m_ModeTime < 15.0f) {
-                        func_0022F350(D_800F8928, obj, obj, 0, 0, 0xE6, zero, rot, mapped, region, -1, flag | 1);
+                        CParticleSystem__Spawn(D_800F8928, obj, obj, 0, 0, 0xE6, zero, rot, mapped, region, -1, flag | 1);
                     }
-                    func_0022F350(D_800F8928, obj, obj, 0, 0, 0x8A, zero, rot, mapped, region, -1, flag | 1);
+                    CParticleSystem__Spawn(D_800F8928, obj, obj, 0, 0, 0x8A, zero, rot, mapped, region, -1, flag | 1);
                 }
                 break;
             case 0x80:
-                func_00246690(obj, 0xAC, pos, flag);
+                Actor_SpawnParticle(obj, 0xAC, pos, flag);
                 break;
             case 0x100:
-                func_00246690(obj, 0xAD, pos, flag);
+                Actor_SpawnParticle(obj, 0xAD, pos, flag);
                 break;
             case 0x200:
-                func_00246690(obj, 0xAE, pos, flag);
+                Actor_SpawnParticle(obj, 0xAE, pos, flag);
                 break;
             case 0x400:
-                func_00246690(obj, 0xAF, pos, flag);
+                Actor_SpawnParticle(obj, 0xAF, pos, flag);
                 break;
             case 0x800:
-                func_00246690(obj, 0xB0, pos, flag);
+                Actor_SpawnParticle(obj, 0xB0, pos, flag);
                 break;
             case 0x1000:
-                func_00246690(obj, 0xB1, pos, flag);
+                Actor_SpawnParticle(obj, 0xB1, pos, flag);
                 break;
             case 0x2000:
-                func_00246690(obj, 0xB2, pos, flag);
+                Actor_SpawnParticle(obj, 0xB2, pos, flag);
                 break;
             case 0x4000:
-                func_00246690(obj, 0xB3, pos, flag);
+                Actor_SpawnParticle(obj, 0xB3, pos, flag);
                 break;
             case 0x8000:
-                func_00246690(obj, 0xB4, pos, flag);
+                Actor_SpawnParticle(obj, 0xB4, pos, flag);
                 break;
             case 0x10000:
-                func_00246690(obj, 0xB5, pos, flag);
+                Actor_SpawnParticle(obj, 0xB5, pos, flag);
                 break;
             case 0x20000:
-                func_00246690(obj, 0xB6, pos, flag);
+                Actor_SpawnParticle(obj, 0xB6, pos, flag);
                 break;
             case 0x40000:
-                func_00246690(obj, 0xB7, pos, flag);
+                Actor_SpawnParticle(obj, 0xB7, pos, flag);
                 break;
             case 0x80000:
-                func_00246690(obj, 0xB8, pos, flag);
+                Actor_SpawnParticle(obj, 0xB8, pos, flag);
                 break;
             case 0x100000:
-                func_00246690(obj, 0xB9, pos, flag);
+                Actor_SpawnParticle(obj, 0xB9, pos, flag);
                 break;
             case 0x200000:
-                func_00246690(obj, 0xBA, pos, flag);
+                Actor_SpawnParticle(obj, 0xBA, pos, flag);
                 break;
             case 0x400000:
-                func_00246690(obj, 0xBB, pos, flag);
+                Actor_SpawnParticle(obj, 0xBB, pos, flag);
                 break;
             case 0x20000000:
-                func_00246690(obj, 0x1E9, pos, flag);
+                Actor_SpawnParticle(obj, 0x1E9, pos, flag);
                 break;
             case 0x40000000:
-                func_00246690(obj, 0x1EA, pos, flag);
+                Actor_SpawnParticle(obj, 0x1EA, pos, flag);
                 break;
             case 0x80000000:
-                func_00246690(obj, 0x1EB, pos, flag);
+                Actor_SpawnParticle(obj, 0x1EB, pos, flag);
                 break;
             case 0x8000000:
             case 0x10000000:
-                func_00246690(obj, 0x11C, pos, flag);
+                Actor_SpawnParticle(obj, 0x11C, pos, flag);
                 break;
             case 0x800000:
                 size = 5;
@@ -165,7 +165,7 @@ void func_0026D710(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectInstance *ob
                     t = t / len;
                     puff.lifeBase = t * 256.0f;
                 }
-                func_00236EA0(obj, obj, 3, -1, pos, puff);
+                ImpactEvent_Send(obj, obj, 3, -1, pos, puff);
             }
         }
         ents++;

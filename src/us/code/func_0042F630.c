@@ -6,6 +6,6 @@ typedef struct {
     /* 0x14 */ s32 (*handler)();
 } HandlerHolder;
 
-void func_0042F630(HandlerHolder *arg0) {
+void DemoStream_Decode(HandlerHolder *arg0) {
     arg0->handler();
 }

@@ -19,13 +19,13 @@ typedef struct Vtx {
 /* Bytes of an offset table of n entries: the count, n offsets and the next free offset, 8-aligned. */
 #define TABLE_SIZE(n) (((n) * 4 + 0xF) & ~7)
 
-s32 func_00200B00(void ***handle, s32 arg1);
-void *func_002017D4(void *table, s32 index);
-void *func_002017E8(void *table, s32 index, s32 *size);
-s32 func_0020192C(void *src, void *dst, s32 arg2);
-void **func_00205D7C(s32 heap, void ***handle, s32 size);
-void func_002057B0(s32 heap, void ***handle, void **block);
-void func_0026D070(void *dst, void *material);
+s32 ProPackDecompress(void ***handle, s32 arg1);
+void *CISet__GetBlock(void *table, s32 index);
+void *CISet__GetBlockAndSize(void *table, s32 index, s32 *size);
+s32 CUSet__Transpose(void *src, void *dst, s32 arg2);
+void **CCache__AllocateMemoryForDecompression(s32 heap, void ***handle, s32 size);
+void CCache__DeallocAndReplaceCompressedData(s32 heap, void ***handle, void **block);
+void Material_Unpack(void *dst, void *material);
 void *func_0029E460(void *dst, const void *src, u32 n); /* memcpy */
 
 /* Sets an offset table's entry count and the offset where the next entry starts. */
@@ -48,7 +48,7 @@ static __inline__ s32 TableAppend(s32 *tbl, s32 count, s32 end) {
  * withExtra, three more blocks copied as is. The packed commands are expanded into a display list:
  * 0x80 one or two triangles (5-bit vertex indices), 0x20 a vertex load from the matching frame,
  * 0x40 a matrix load from segment 1, 0x60 a moveword. withTerminator adds a -1 terminator entry. */
-void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator) {
+void Model_Decompress(s32 unused, void ***handle, s32 withExtra, s32 withTerminator) {
     s32 vtxSize;
     s32 dataSize;
     s32 extra3Size;
@@ -104,7 +104,7 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
     s32 g2;
     s32 b2;
 
-    if (func_00200B00(handle, 1) == 0) {
+    if (ProPackDecompress(handle, 1) == 0) {
         return;
     }
     count = 6;
@@ -116,25 +116,25 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
     }
     size = TABLE_SIZE(count);
     src = **handle;
-    frames = func_002017E8(src, 0, &vtxSize);
+    frames = CISet__GetBlockAndSize(src, 0, &vtxSize);
     vtxCount = *frames;
     size += vtxSize;
-    data = func_002017E8(src, 1, &dataSize);
+    data = CISet__GetBlockAndSize(src, 1, &dataSize);
     size += dataSize;
-    lods = func_002017D4(src, 2);
+    lods = CISet__GetBlock(src, 2);
     lodCount = *lods;
     size += TABLE_SIZE(lodCount);
     for (i = 0; i < lodCount; i++) {
-        parts = func_002017D4(lods, i);
+        parts = CISet__GetBlock(lods, i);
         partCount = *parts;
         size += TABLE_SIZE(partCount);
         for (j = 0; j < partCount; j++) {
             u8 op;
 
             /* Display list bytes: one command per packed command, plus the end and 8-alignment. */
-            part = func_002017D4(parts, j);
+            part = CISet__GetBlock(parts, j);
             size += 0x30;
-            p = func_002017D4(part, 1);
+            p = CISet__GetBlock(part, 1);
             len = 0;
             op = *p;
             while (op != 0) {
@@ -166,14 +166,14 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
         size += 8;
     }
     if (withExtra != 0) {
-        extra3 = func_002017E8(src, 3, &extra3Size);
+        extra3 = CISet__GetBlockAndSize(src, 3, &extra3Size);
         size += extra3Size;
-        extra4 = func_002017E8(src, 4, &extra4Size);
+        extra4 = CISet__GetBlockAndSize(src, 4, &extra4Size);
         size += extra4Size;
-        extra5 = func_002017E8(src, 5, &extra5Size);
+        extra5 = CISet__GetBlockAndSize(src, 5, &extra5Size);
         size += extra5Size;
     }
-    block = func_00205D7C(0, handle, size);
+    block = CCache__AllocateMemoryForDecompression(0, handle, size);
     if (block != NULL) {
         off = TABLE_SIZE(count);
         dst = *block;
@@ -184,7 +184,7 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
         TableSet(vtxTbl, 0, n);
         frameTbl = vtxTbl;
         for (frame = 0; frame < vtxCount;) {
-            func_0020192C(func_002017E8(frames, frame, &frameSize), base + off + n, 0);
+            CUSet__Transpose(CISet__GetBlockAndSize(frames, frame, &frameSize), base + off + n, 0);
             n += frameSize;
             frame = TableAppend(frameTbl, frame, n);
         }
@@ -196,22 +196,22 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
         TableSet(lodTbl, 0, lodOff);
         segment1 = 0x01000000;
         for (i = 0; i < lodCount;) {
-            parts = func_002017D4(lods, i);
+            parts = CISet__GetBlock(lods, i);
             vtxCounter = 0;
             partCount = *parts;
             partTbl = (s32 *)(base + off + lodOff);
             partOff = TABLE_SIZE(partCount);
             TableSet(partTbl, 0, partOff);
-            vtxBase = (Vtx *)((u8 *)func_002017D4(frameTbl, i) + 8);
+            vtxBase = (Vtx *)((u8 *)CISet__GetBlock(frameTbl, i) + 8);
             for (j = 0; j < partCount;) {
-                part = func_002017D4(parts, j);
+                part = CISet__GetBlock(parts, j);
                 partSize = 0x10;
                 outPart = (s32 *)(base + off + lodOff + partOff);
                 TableSet(outPart, 0, partSize);
-                func_0026D070((u8 *)outPart + partSize, func_002017D4(part, 0));
+                Material_Unpack((u8 *)outPart + partSize, CISet__GetBlock(part, 0));
                 partSize = 0x30;
                 TableSet(outPart, 1, partSize);
-                p = func_002017D4(part, 1);
+                p = CISet__GetBlock(part, 1);
                 start = (Gfx *)((u8 *)outPart + partSize);
                 c = *p;
                 gfx = start;
@@ -291,5 +291,5 @@ void func_00209AF4(s32 unused, void ***handle, s32 withExtra, s32 withTerminator
             TableSet(dst, 6, off += extra5Size);
         }
     }
-    func_002057B0(0, handle, block);
+    CCache__DeallocAndReplaceCompressedData(0, handle, block);
 }

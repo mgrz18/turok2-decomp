@@ -15,7 +15,7 @@ void __osRestoreInt(s32);
 extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
-void func_00205904(s32 arg0, CacheRefs *arg1, CMemEntry *arg2) {
+void CCache__ReleaseAndReplaceData(s32 arg0, CacheRefs *arg1, CMemEntry *arg2) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v0_2;

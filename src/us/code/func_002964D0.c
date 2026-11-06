@@ -6,8 +6,8 @@
 extern float D_800AA688;
 extern float D_800AA680;
 extern float D_800AA684;
-extern unsigned int func_0029BF80(void *);
-Acmd *func_002964D0(ALResampler *filter, s16 *outp, s32 outCnt, s32 sampleOffset, Acmd *p)
+extern unsigned int osVirtualToPhysical(void *);
+Acmd *alResamplePull(ALResampler *filter, s16 *outp, s32 outCnt, s32 sampleOffset, Acmd *p)
 {
     ALResampler *f = filter;
     Acmd *ptr = p;
@@ -35,7 +35,7 @@ Acmd *func_002964D0(ALResampler *filter, s16 *outp, s32 outCnt, s32 sampleOffset
         ptr = (*source->handler)(source, &inp, inCount, sampleOffset, p);
         incr = (s32)(f->ratio * unity);
         { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(inp) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(*outp) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(outCnt << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(5) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(f->first) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(incr) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (unsigned int)(func_0029BF80(f->state)); };
+        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(5) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(f->first) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(incr) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (unsigned int)(osVirtualToPhysical(f->state)); };
         f->first = 0;
     }
     return ptr;

@@ -4,12 +4,12 @@
 #include "rw/abu_types.h"
 #include "structs/menu.h"
 
-extern int func_00285628(struct ControllerProfile *object);
-extern int func_00285670(struct ControllerProfile *object);
+extern int Controller_MenuLeft(struct ControllerProfile *object);
+extern int Controller_MenuRight(struct ControllerProfile *object);
 extern f32 D_800C1274[];
 extern f32 D_800B6D28;
 extern f32 D_800C1274[];
-s32 func_0041AAA0(void *unused, MenuRecAt20V4 *menu) {
+s32 EnterCheatMenu_UpdateTextField(void *unused, MenuRecAt20V4 *menu) {
     f32 t;
     t = D_800C1F80.timer + D_800B6D28;
     D_800C1F80.timer = t;
@@ -17,10 +17,10 @@ s32 func_0041AAA0(void *unused, MenuRecAt20V4 *menu) {
         D_800C1F80.timer = t - D_800C1274[1];
     }
     if (menu->state == 2) {
-        if (((s32 (*)(s32))func_00285628)(menu->input) != 0 && D_800C1F80.cursor > 0) {
+        if (((s32 (*)(s32))Controller_MenuLeft)(menu->input) != 0 && D_800C1F80.cursor > 0) {
             D_800C1F80.cursor--;
             D_800C1F80.timer = 0.0f;
-        } else if (((s32 (*)(s32))func_00285670)(menu->input) != 0) {
+        } else if (((s32 (*)(s32))Controller_MenuRight)(menu->input) != 0) {
             if (D_800C1F80.cursor < D_800C1F80.length) {
                 D_800C1F80.cursor++;
                 D_800C1F80.timer = 0.0f;

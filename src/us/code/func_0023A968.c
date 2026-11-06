@@ -4,9 +4,9 @@
 #include "structs/rect.h"
 
 /* A rectangle on the ground plane. */
-/* func_0023A640 on the ground plane: where the segment from sweep->inst's
+/* Sweep_HitBox on the ground plane: where the segment from sweep->inst's
  * position to sweep->end first enters rect (x and z only). */
-s32 func_0023A968(Sweep *sweep, CRect *rect, f32 *t) {
+s32 Sweep_HitRect(Sweep *sweep, CRect *rect, f32 *t) {
     CVector3 hit;
     CVector3 *start;
     CVector3 *end;

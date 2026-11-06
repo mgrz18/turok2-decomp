@@ -11,7 +11,7 @@ extern ThreadNode *D_800B8920;
 extern void __osEnqueueThread(ThreadNode **queue, ThreadNode *node);
 extern ThreadNode *__osPopThread(ThreadNode **queue);
 extern void __osEnqueueAndYield(ThreadNode **queue, ThreadNode *node);
-void func_0029BB10(ThreadNode *arg0) {
+void osStartThread(ThreadNode *arg0) {
     ThreadNode **sentinel;
     u32 token;
     token = __osDisableInt();

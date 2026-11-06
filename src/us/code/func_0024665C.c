@@ -5,7 +5,7 @@
 
 /* Turok 2: actor position at 0x4 (Rage Wars 0x8). */
 /* Squared horizontal (XZ) distance from the actor to point. */
-f32 func_0024665C(CGameObjectInstance *arg0, CVector3 point)
+f32 AI_FlatDistSqToPoint(CGameObjectInstance *arg0, CVector3 point)
 {
     f32 dx = point.x - arg0->header.m_vPos.x;
     f32 dz = point.z - arg0->header.m_vPos.z;

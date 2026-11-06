@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00429DFC(OSPfs *pfs);
-extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_00429EC4(OSPfs *pfs);
-extern s32 func_00429EC4(OSPfs *pfs);
-extern s32 func_00429DFC(OSPfs *pfs);
-extern s32 func_00429AA4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_00429EC4(OSPfs *pfs);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-s32 func_00427C20(OSPfs *pfs, s32 file_no, NoteState *state)
+extern s32 __osCheckId(OSPfs *pfs);
+extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 __osPfsSelectBank(OSPfs *pfs);
+extern s32 __osPfsSelectBank(OSPfs *pfs);
+extern s32 __osCheckId(OSPfs *pfs);
+extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 __osPfsSelectBank(OSPfs *pfs);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+s32 osPfsFileState(OSPfs *pfs, s32 file_no, NoteState *state)
 {
     s32 ret;
     int pages;
@@ -26,15 +26,15 @@ s32 func_00427C20(OSPfs *pfs, s32 file_no, NoteState *state)
     }
     if ((pfs->status & 1) == 0)
         return 5;
-    if (func_00429DFC(pfs) == 2)
+    if (__osCheckId(pfs) == 2)
         return 2;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429EC4(pfs);
+        ret = __osPfsSelectBank(pfs);
         if (ret != 0)
             return ret;
     }
-    ret = func_00299680(pfs->queue, pfs->channel, pfs->dir_table + file_no, (u8 *)&dir);
+    ret = __osContRamRead(pfs->queue, pfs->channel, pfs->dir_table + file_no, (u8 *)&dir);
     if (ret != 0)
         return ret;
     if (dir.company_code == 0 || dir.game_code == 0) {
@@ -47,7 +47,7 @@ s32 func_00427C20(OSPfs *pfs, s32 file_no, NoteState *state)
     start_page = dir.start_page.inode_t.page;
     bank = dir.start_page.inode_t.bank;
     while (bank < pfs->banks) {
-        ret = func_00429AA4(pfs, &inode, 0, bank);
+        ret = __osPfsRWInode(pfs, &inode, 0, bank);
         if (ret != 0)
             return ret;
         next_page = inode.inode_page[start_page];

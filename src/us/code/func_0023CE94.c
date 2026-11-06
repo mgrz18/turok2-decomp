@@ -7,7 +7,7 @@ typedef struct Sphere {
     f32 radiusSq;    /* 0x10 */
 } Sphere;
 
-void func_0023CE94(Sphere *sphere, CVector3 *center, f32 radius) {
+void Sphere_Set(Sphere *sphere, CVector3 *center, f32 radius) {
     sphere->center = *center;
     sphere->radius = radius;
     sphere->radiusSq = radius * radius;

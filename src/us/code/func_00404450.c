@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/boss.h"
 
-void func_00243414(s32 a0, s32 a1, s32 a2);
-void func_00403C14(s32 mode);
+void CAI__SetMode(s32 a0, s32 a1, s32 a2);
+void Primagen_SetStage(s32 mode);
 
-void func_00404450(s32 a0, s32 a1) {
+void Primagen_UpdateHealth(s32 a0, s32 a1) {
     s32 count;
     s32 i;
     s32 bit;
@@ -25,7 +25,7 @@ void func_00404450(s32 a0, s32 a1) {
     if (D_8012F608.partActive == 0) {
         if (D_8012F608.stage == 3) {
             if (count == 0) {
-                func_00243414(a0, a1, 0x1D);
+                CAI__SetMode(a0, a1, 0x1D);
             }
         } else if (count == 0) {
             D_8012F608.stage++;
@@ -37,9 +37,9 @@ void func_00404450(s32 a0, s32 a1) {
                 D_8012F608.dest.x = D_8012F608.home.x;
                 D_8012F608.dest.y = D_8012F608.home.y;
                 D_8012F608.dest.z = D_8012F608.home.z;
-                func_00243414(a0, a1, 0x12);
+                CAI__SetMode(a0, a1, 0x12);
             }
-            func_00403C14(D_8012F608.stage);
+            Primagen_SetStage(D_8012F608.stage);
         }
     }
 }

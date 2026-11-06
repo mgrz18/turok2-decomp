@@ -21,25 +21,25 @@ struct Shared_ActorView {
 
 extern u8 D_8011AAD8[]; /* Shared_Game */
 
-extern void func_002542B4(void *arg0, s32 arg1);
-extern s32 func_0021EAE8(void *arg0, s32 arg1);
-extern void func_0020565C(s32 arg0, void *arg1);
-extern void func_0021EBC0(void *arg0);
+extern void Actor_ReloadAnimInfo(void *arg0, s32 arg1);
+extern s32 CGameObjectInstance__LoadBoneMatrices(void *arg0, s32 arg1);
+extern void CCache__LockForDisplayList(s32 arg0, void *arg1);
+extern void CGameObjectInstance__ClearDrawMatrices(void *arg0);
 
-void func_00253018(struct ObjectPool *arg0) {
+void CPlayerPool__PreUpdate(struct ObjectPool *arg0) {
     void *node;
     if (*(void **)arg0 != 0) {
-        func_0020565C(0, *(void **)arg0);
+        CCache__LockForDisplayList(0, *(void **)arg0);
     }
     node = arg0->object_queue.m_pHead;
     if (node != 0) {
         u8 *base = D_8011AAD8;
         do {
-            func_0021EBC0(node);
-            func_0021EBC0(&((struct Shared_ActorView *)(node))->weapon);
-            func_002542B4(node, 0);
+            CGameObjectInstance__ClearDrawMatrices(node);
+            CGameObjectInstance__ClearDrawMatrices(&((struct Shared_ActorView *)(node))->weapon);
+            Actor_ReloadAnimInfo(node, 0);
             if (base[0x19] != 0) {
-                func_0021EAE8(node, 1);
+                CGameObjectInstance__LoadBoneMatrices(node, 1);
             }
             node = ((struct Shared_ActorView *)(node))->next;
         } while (node != 0);

@@ -5,8 +5,8 @@
 #include "ultra_types.h"
 extern s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
 static __inline__ u16 sumcalc(u8 *ptr, int length) {
     int i;
     u32 sum = 0;
@@ -37,10 +37,10 @@ s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank)
     for (j = 0; j < 8; j++) {
         addr = ((u8 *)inode->inode_page + j * 32);
         if (flag == 1) {
-            ret = func_00299A40(pfs->queue, pfs->channel, pfs->inode_table + bank * 8 + j, addr, 0);
-            ret = func_00299A40(pfs->queue, pfs->channel, pfs->minode_table + bank * 8 + j, addr, 0);
+            ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->inode_table + bank * 8 + j, addr, 0);
+            ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->minode_table + bank * 8 + j, addr, 0);
         } else {
-            ret = func_00299680(pfs->queue, pfs->channel, pfs->inode_table + bank * 8 + j, addr);
+            ret = __osContRamRead(pfs->queue, pfs->channel, pfs->inode_table + bank * 8 + j, addr);
         }
         if (ret != 0) {
             return ret;
@@ -51,19 +51,19 @@ s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank)
         if (sum != inode->inode_page[0].inode_t.page) {
             for (j = 0; j < 8; j++) {
                 addr = ((u8 *)inode->inode_page + j * 32);
-                ret = func_00299680(pfs->queue, pfs->channel, pfs->minode_table + bank * 8 + j, addr);
+                ret = __osContRamRead(pfs->queue, pfs->channel, pfs->minode_table + bank * 8 + j, addr);
             }
             if (sum != inode->inode_page[0].inode_t.page) {
                 return 3;
             }
             for (j = 0; j < 8; j++) {
                 addr = ((u8 *)inode->inode_page + j * 32);
-                ret = func_00299A40(pfs->queue, pfs->channel, pfs->inode_table + bank * 8 + j, addr, 0);
+                ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->inode_table + bank * 8 + j, addr, 0);
             }
         } else {
             for (j = 0; j < 8; j++) {
                 addr = ((u8 *)inode->inode_page + j * 32);
-                ret = func_00299A40(pfs->queue, pfs->channel, pfs->minode_table + bank * 8 + j, addr, 0);
+                ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->minode_table + bank * 8 + j, addr, 0);
             }
         }
     }

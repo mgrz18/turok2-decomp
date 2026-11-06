@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0029A5E0(void);
-extern void func_0029ACE0();
+extern void __osViInit(void);
+extern void __osViSwapContext();
 extern __OSViContext D_800B7A60[2];
 extern __OSViContext *D_800B7AC0;
 extern __OSViContext *D_800B7AC4;
@@ -12,12 +12,12 @@ extern OSViMode D_800B7AF0;
 extern OSViMode D_800B7B40;
 extern OSViMode D_800B7B90;
 extern s32 D_80000300;
-extern void *func_00266C5C(void *destination, s32 value, u32 size);
-void func_0029A5E0(void)
+extern void *memset(void *destination, s32 value, u32 size);
+void __osViInit(void)
 {
     __OSViContext *contexts = D_800B7A60;
     s32 tv_type;
-    func_00266C5C(contexts, 0, sizeof(D_800B7A60));
+    memset(contexts, 0, sizeof(D_800B7A60));
     tv_type = D_80000300;
     D_800B7AC0 = &contexts[0];
     D_800B7AC4 = &contexts[1];
@@ -37,5 +37,5 @@ void func_0029A5E0(void)
     while ((*(volatile u32 *)(0xA4400010U)) > 10) {
     }
     (*(volatile u32 *)(0xA4400000U) = (0));
-    func_0029ACE0();
+    __osViSwapContext();
 }

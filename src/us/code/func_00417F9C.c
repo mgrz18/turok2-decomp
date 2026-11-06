@@ -9,11 +9,11 @@ extern char D_800B41E0[];
 extern char D_800B41F0[];
 extern char D_800B4200[];
 extern char D_800C0E7C[]; /* number format */
-extern s32 func_004160F0(MenuItem *a);
-extern void func_0029E3E0(char *dst, char *fmt, s32 value);
+extern s32 MenuItem_TextLength(MenuItem *a);
+extern void sprintf(char *dst, char *fmt, s32 value);
 
 /* Label of the handicap item, with the handicap value printed into it. */
-s32 func_00417F9C(MenuItem *a, Menu *c) {
+s32 PlayerSetupMenu_HandicapLabel(MenuItem *a, Menu *c) {
     s32 handicap = c->player->m_pOptions->m_Handicap;
 
     if (handicap == 0) {
@@ -36,7 +36,7 @@ s32 func_00417F9C(MenuItem *a, Menu *c) {
             a->text = D_800B41E0;
             break;
         }
-        func_0029E3E0(a->text + (func_004160F0(a) - 2), D_800C0E7C, handicap);
+        sprintf(a->text + (MenuItem_TextLength(a) - 2), D_800C0E7C, handicap);
     }
     return 0;
 }

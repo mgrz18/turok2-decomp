@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-void func_00264D98(s32 arg0, CAI *ai) {
+void Throwable_Step(s32 arg0, CAI *ai) {
     s32 (*temp_v0_2)();
     CAIModeInfo *temp_v0;
 

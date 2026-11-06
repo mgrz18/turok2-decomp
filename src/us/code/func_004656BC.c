@@ -13,15 +13,15 @@ struct State_func_8044D5C4_de {
 };
 struct State_func_8044D5C4_de;
 typedef struct State_func_8044D5C4_de State_func_8044D5C4_de;
-void func_002842B4();
-void func_002842C8();
-void func_00220BF0(void *, s32);
+void Cinema_Enable();
+void Cinema_Disable();
+void CScene__RestoreFiredEvent(void *, s32);
 void func_004656BC(State_func_8044D5C4_de *arg0) {
  s32 i,n;
- func_002842C8();
+ Cinema_Disable();
  n=arg0->unk1168;
- for(i=0;i<n;i++) func_00220BF0(arg0,arg0->unk1178+i*20);
+ for(i=0;i<n;i++) CScene__RestoreFiredEvent(arg0,arg0->unk1178+i*20);
  n=arg0->unk116C;
- for(i=0;i<n;i++) func_00220BF0(arg0,arg0->unk117C+i*20);
- func_002842B4();
+ for(i=0;i<n;i++) CScene__RestoreFiredEvent(arg0,arg0->unk117C+i*20);
+ Cinema_Enable();
 }

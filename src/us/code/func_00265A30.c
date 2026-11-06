@@ -1,9 +1,9 @@
-/* Boundary fixed in versions/cuts.us.txt: splat's func_00265954 (0x12C bytes) holds two functions:
- *   0x00265954  func_00265954, the animation check (0xD0 bytes), then a nop;
+/* Boundary fixed in versions/cuts.us.txt: splat's AI_AnimReached (0x12C bytes) holds two functions:
+ *   0x00265954  AI_AnimReached, the animation check (0xD0 bytes), then a nop;
  *   0x00265A28  two stray words (beq $18, $16, ...; sll $2, $18, 3), never run;
- *   0x00265A30  func_00265A30, an init callback (0x50 bytes; its pointer is in
+ *   0x00265A30  Destructible_Setup, an init callback (0x50 bytes; its pointer is in
  *               the data as 0x00265A30).
- * The check is the same as the inlined r01_check of func_002653F8 and
+ * The check is the same as the inlined r01_check of Door_CloseUpdate and
  * func_002651FC, here out of line. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0020486C.c, r01_check, with Turok 2's layouts. */
 #include "common.h"
@@ -23,15 +23,15 @@ typedef struct {
 } ActionState;
 
 extern u8 D_800B2330[];
-extern void func_00265AF8(CGameObjectInstance *actor, void *state);
-extern void func_00265EEC(CGameObjectInstance *actor, void *state);
-extern void func_004088B0(void);
+extern void Destructible_Step(CGameObjectInstance *actor, void *state);
+extern void Destructible_Hurt(CGameObjectInstance *actor, void *state);
+extern void TotemDefense_Init(void);
 
-void func_00265A30(CGameObjectInstance *actor, ActionState *state) {
+void Destructible_Setup(CGameObjectInstance *actor, ActionState *state) {
     state->table = D_800B2330;
-    state->update = func_00265AF8;
-    state->onEvent = func_00265EEC;
+    state->update = Destructible_Step;
+    state->onEvent = Destructible_Hurt;
     if (actor->m_nTypeFlag == 0x64D) {
-        func_004088B0();
+        TotemDefense_Init();
     }
 }

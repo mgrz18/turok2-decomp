@@ -4,14 +4,14 @@
 
 extern Gfx *D_800D8E24;
 extern s32 D_800F56A8;
-s32 func_0027B4EC(void);
+s32 COnScreen__GetFontTexture(void);
 
-/* Loads the texture func_0027B4EC returns into TMEM, as gDPLoadTextureBlock
+/* Loads the texture COnScreen__GetFontTexture returns into TMEM, as gDPLoadTextureBlock
  * would: set the image, the load tile, sync, load the block, then the render
  * tile and its size (16x16). */
-void func_00278188(void) {
+void COnScreen__SelectNormalFont(void) {
     Gfx *g;
-    s32 tex = func_0027B4EC();
+    s32 tex = COnScreen__GetFontTexture();
 
     if (tex != 0) {
         D_800F56A8 = 0;

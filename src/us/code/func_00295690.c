@@ -6,13 +6,13 @@
 
 extern ALGlobals *D_800B7760;
 extern s16 D_800B7900[]; /* eqpower */
-void func_0029B020(const char *exp, const char *file, s32 line); /* __assert */
-#define assert_ln(EX, ln) ((EX) ? ((void)0) : func_0029B020("EX", "audio/env.c", ln))
-void func_00294B9C(ALSynth *drvr, PVoice *pvoice); /* _freePVoice */
-void func_00294B84(ALParam *param); /* __freeParam */
-void *func_00295BDC(void *filter, s16 *inp, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p); /* _pullSubFrame */
-f32 func_002961E8(f32 ivol, s32 samples, s16 ratem, u16 ratel); /* _getVol */
-void *func_00295690(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) {
+void __assert(const char *exp, const char *file, s32 line); /* __assert */
+#define assert_ln(EX, ln) ((EX) ? ((void)0) : __assert("EX", "audio/env.c", ln))
+void _freePVoice(ALSynth *drvr, PVoice *pvoice); /* _freePVoice */
+void __freeParam(ALParam *param); /* __freeParam */
+void *_pullSubFrame(void *filter, s16 *inp, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p); /* _pullSubFrame */
+f32 _getVol(f32 ivol, s32 samples, s16 ratem, u16 ratel); /* _getVol */
+void *alEnvmixerPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) {
     Acmd *ptr = p;
     ALEnvMixer *e = (ALEnvMixer *)filter;
     s16 inp;
@@ -65,7 +65,7 @@ void *func_00295690(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
             case 11:
             case 12:
             case 16:
-                ptr = func_00295BDC(e, &inp, &loutp, delta, sampleOffset, ptr);
+                ptr = _pullSubFrame(e, &inp, &loutp, delta, sampleOffset, ptr);
                 if (e->delta >= e->segEnd) {
                     e->ltgt = (e->volume * eq[e->pan]) >> 15;
                     e->rtgt = (e->volume * eq[0x7F - e->pan]) >> 15;
@@ -73,8 +73,8 @@ void *func_00295690(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
                     e->cvolR = e->rtgt;
                     e->delta = e->segEnd;
                 } else {
-                    e->cvolL = func_002961E8((f32)e->cvolL, e->delta, e->lratm, e->lratl);
-                    e->cvolR = func_002961E8((f32)e->cvolR, e->delta, e->rratm, e->rratl);
+                    e->cvolL = _getVol((f32)e->cvolL, e->delta, e->lratm, e->lratl);
+                    e->cvolR = _getVol((f32)e->cvolR, e->delta, e->rratm, e->rratl);
                 }
                 if (e->cvolL == 0) e->cvolL = one;
                 if (e->cvolR == 0) e->cvolR = one;
@@ -103,17 +103,17 @@ void *func_00295690(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
                 (*e->filter.setParam)(e, 9, 0);
                 break; }
             case 15:
-                ptr = func_00295BDC(e, &inp, &loutp, delta, sampleOffset, ptr);
+                ptr = _pullSubFrame(e, &inp, &loutp, delta, sampleOffset, ptr);
                 (*e->filter.setParam)(e, 4, 0);
                 break;
             case 0: {
                 ALSynth *drvr = &D_800B7760->drvr;
                 ALFreeParam *pp = (ALFreeParam *)e->ctrlList;
                 pp->pvoice->offset = 0;
-                func_00294B9C(drvr, pp->pvoice);
+                _freePVoice(drvr, pp->pvoice);
                 break; }
             default:
-                ptr = func_00295BDC(e, &inp, &loutp, delta, sampleOffset, ptr);
+                ptr = _pullSubFrame(e, &inp, &loutp, delta, sampleOffset, ptr);
                 (*e->filter.setParam)(e, e->ctrlList->type, (void *) e->ctrlList->data.i);
                 break;
             }
@@ -124,10 +124,10 @@ void *func_00295690(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
             if (e->ctrlList == 0) {
                 e->ctrlTail = 0;
             }
-            func_00294B84(tmp);
+            __freeParam(tmp);
         }
     }
-    ptr = func_00295BDC(e, &inp, &loutp, outCount, sampleOffset, ptr);
+    ptr = _pullSubFrame(e, &inp, &loutp, outCount, sampleOffset, ptr);
     if (e->delta > e->segEnd) {
         e->delta = e->segEnd;
     }

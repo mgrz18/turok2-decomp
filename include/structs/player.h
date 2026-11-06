@@ -120,9 +120,9 @@ typedef struct {
     /* 0x47E */ u8 _pad1[2];
     /* 0x480 */ s32 m_AdonAmmoFlagHelped[6];
     /* 0x498 */ s32 m_AdonHealthFlagHelped[6];
-    /* The level 1..5 totem fights won (levels 7100..7500: func_00407F20
-     * sets the one of the level, func_00407CB0 checks all five for the
-     * ending); the boss flags after them are what func_004085A0 picks the
+    /* The level 1..5 totem fights won (levels 7100..7500: TotemDefense_Complete
+     * sets the one of the level, Primagen_EnterDeath checks all five for the
+     * ending); the boss flags after them are what TotemDefense_Update picks the
      * level 4 / 5 totem music by (Blind One, Queen). */
     /* 0x4B0 */ s32 m_bLevel1TotemFlags;
     /* 0x4B4 */ s32 m_bLevel2TotemFlags;
@@ -265,18 +265,18 @@ typedef struct CPlayer {
 
 /* CPlayerCList and CPlayerList (D_80119870) are in structs/player_list.h. */
 
-/* The players saved for a restart, D_8011F290: func_0028CF80 arms it (and
- * steps m_State), func_0028D264 copies the players in, func_0028D100 copies
- * them back; func_0028D0D0 reads m_WarpID. */
+/* The players saved for a restart, D_8011F290: SavedPlayers_Arm arms it (and
+ * steps m_State), SavedPlayers_Save copies the players in, SavedPlayers_Restore copies
+ * them back; SavedPlayers_GetWarpID reads m_WarpID. */
 typedef struct CSavedPlayers {
     /* 0x0000 */ s32 m_bActive;
-    /* 0x0004 */ s32 m_State;          /* 0 none, 1 back where they were (func_0028D100), 2 back at m_WarpID */
+    /* 0x0004 */ s32 m_State;          /* 0 none, 1 back where they were (SavedPlayers_Restore), 2 back at m_WarpID */
     /* 0x0008 */ s32 m_Timer;          /* 240 when armed */
     /* 0x000C */ s32 m_WarpID;         /* the checkpoint warp */
     /* 0x0010 */ CPlayerLoadSaveData m_Data[4];
     /* 0x13B0 */ CVector3 m_vPos[4];
     /* 0x13E0 */ f32 m_RotY[4];
-    /* 0x13F0 */ s32 m_Region[4];      /* region indices (func_002242B4 / func_002242F8) */
+    /* 0x13F0 */ s32 m_Region[4];      /* region indices (CScene__GetRegionIndex / CScene__GetRegion) */
 } CSavedPlayers; /* size 0x1400 */
 
 extern CSavedPlayers D_8011F290;

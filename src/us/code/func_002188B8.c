@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00217214(Curve *arg0);
-extern u32 func_00217B64(s32,s32);
-void func_002188B8(Stream *arg0, u32 arg1) {
+extern void AnimCurve_LoadSegment(Curve *arg0);
+extern u32 Bits_Peek(s32,s32);
+void AnimCurve_Seek(Stream *arg0, u32 arg1) {
     u32 sp10[64];
     s32 temp_a0;
     s32 temp_lo;
@@ -29,19 +29,19 @@ void func_002188B8(Stream *arg0, u32 arg1) {
         var_s1 += var_s2 * temp_s6;
         if(arg1 < temp_v1) {
             var_s1=temp_s1;var_s2=0;var_s4=0;
-            var_s0=func_00217B64(var_s1,6);
+            var_s0=Bits_Peek(var_s1,6);
         }
         for (;;) {
             var_s1 += temp_s6;
             if(arg1>=var_s4 && arg1<var_s0) {
                 if(var_s2!=arg0->unk28) {
-                    arg0->unk24=var_s4;arg0->unk28=var_s2;func_00217214(arg0);
+                    arg0->unk24=var_s4;arg0->unk28=var_s2;AnimCurve_LoadSegment(arg0);
                 }
                 break;
             }
             var_s2++;
             var_s4=var_s0;
-            sp10[var_s2]=func_00217B64(var_s1,6);
+            sp10[var_s2]=Bits_Peek(var_s1,6);
             var_s0+=sp10[var_s2];
         }
     }

@@ -9,10 +9,10 @@ struct RecordRecAt14 {
     char padC[0x14 - 0xC];
     s32 value;
 };
-extern s32 func_00266B80(struct RecordRecAt14 *);
+extern s32 GetMemSize(struct RecordRecAt14 *);
 extern s32 func_00424500();
 s32 func_00453138(struct RecordRecAt14 *record) {
-    if (func_00266B80(record) != 0x400000) {
+    if (GetMemSize(record) != 0x400000) {
         record->flags |= 0x800000;
     } else {
         record->flags &= ~0x800000;

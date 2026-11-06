@@ -15,26 +15,26 @@ extern s32 D_8011AD10;
 extern u8 D_8011AD28[];       /* the RSP task queue */
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 
-extern u64 func_0029B170(void);     /* osGetTime */
-extern void func_0020548C(s32, s32, CFrameData *);
-extern void func_00207A54(void);
+extern u64 osGetTime(void);     /* osGetTime */
+extern void CCache__BeginDisplayList(s32, s32, CFrameData *);
+extern void Texture_InvalidateCache(void);
 extern void func_0020B554(void);
-extern void func_00286A04(CEngineApp *);
-extern void func_002288D0(void);
-extern void func_00284CE0(void);
-extern void func_0027ECF0(void *);
-extern void func_002886AC(CEngineApp *);
-extern void func_002883E0(CEngineApp *, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
-extern void func_004242EC(void);
-extern void func_00207FEC(s32 mode);
-extern s32 func_00401C1C(void *);
-extern void func_004004D8(void *);
-extern s32 func_00205574(s32);
-extern void func_00286B58(CEngineApp *, CFrameData *);
-extern void func_00206078(void);
-extern void func_00283CD4(void);
+extern void CEngineApp__BeginDisplayList(CEngineApp *);
+extern void DLights_SwapBuffers(void);
+extern void Controller_UpdatePakInsertion(void);
+extern void CCameraPool__Advance(void *);
+extern void CEngineApp__UpdateControllers(CEngineApp *);
+extern void CEngineApp__DrawFilledRect(CEngineApp *, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
+extern void Video_NextResolution(void);
+extern void Render_SetRenderMode(s32 mode);
+extern s32 Automap_IsShown(void *);
+extern void Automap_Draw(void *);
+extern s32 CCache__EndDisplayList(s32);
+extern void CEngineApp__SubmitGfxTask(CEngineApp *, CFrameData *);
+extern void CCache__GetFrameDelay(void);
+extern void Cinema_Update(void);
 
-/* func_0028852C: fills a rectangle of the z-buffer, then points the color image back at the frame. */
+/* CEngineApp__ClearDepthRect: fills a rectangle of the z-buffer, then points the color image back at the frame. */
 static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) {
     s32 colorImage;
 
@@ -43,7 +43,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
         g->w0 = 0xE7000000;     /* gDPPipeSync */
         g->w1 = 0;
     }
-    func_00207FEC(0x14);
+    Render_SetRenderMode(0x14);
     colorImage = 0xFF100000 | ((D_800C2030 - 1) & 0xFFF);
     {
         Gfx *g = D_800D8E24++;
@@ -87,7 +87,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
     }
 }
 
-/* func_00288B1C: darkens the whole screen by the level fade. */
+/* CEngineApp__DrawFade: darkens the whole screen by the level fade. */
 static __inline__ void drawFade(CEngineApp *level) {
     u8 col[4];
     f32 t;
@@ -110,24 +110,24 @@ static __inline__ void drawFade(CEngineApp *level) {
     }
 done:
     col[3] = v;
-    func_002883E0(level, col, 0, 0, D_800C2030, D_800C2034);
+    CEngineApp__DrawFilledRect(level, col, 0, 0, D_800C2030, D_800C2034);
 }
 
 /* Draws one frame of the level and hands its display list to the RSP. */
-void func_00287248(CEngineApp *level) {
+void CEngineApp__Draw(CEngineApp *level) {
     u64 start;
     f32 inSpeed;
     f32 outSpeed;
 
-    start = func_0029B170();
-    func_0020548C(0, D_800B6D1C, D_8011F140 = D_800F6CB0.m_pCurrentFrameData);
-    func_00207A54();
+    start = osGetTime();
+    CCache__BeginDisplayList(0, D_800B6D1C, D_8011F140 = D_800F6CB0.m_pCurrentFrameData);
+    Texture_InvalidateCache();
     func_0020B554();
-    func_00286A04(level);
-    func_002288D0();
-    func_00284CE0();
-    func_0027ECF0(level->m_Game.m_CameraPool);
-    func_002886AC(level);
+    CEngineApp__BeginDisplayList(level);
+    DLights_SwapBuffers();
+    Controller_UpdatePakInsertion();
+    CCameraPool__Advance(level->m_Game.m_CameraPool);
+    CEngineApp__UpdateControllers(level);
     if (D_800B6D80[level->m_Settings.mode][0] != NULL) {
         D_800B6D80[level->m_Settings.mode][0](level);
     }
@@ -136,7 +136,7 @@ void func_00287248(CEngineApp *level) {
     }
     if (D_800C2040 != 0) {
         if (D_800C2040 == 0x14) {
-            func_004242EC();
+            Video_NextResolution();
         }
         clearDepth(level, 0, 0x1E0, 0, 0x168);
         {
@@ -188,13 +188,13 @@ void func_00287248(CEngineApp *level) {
     }
     D_8011F140->m_DisplayListSize = (u32)D_800D8E24 - (u32)D_8011F140->m_pDisplayList;
     if (level->m_Settings.mode == 0xD) {
-        D_8011F140->m_bLines = func_00401C1C(&level->m_Game.m_DebugLines);
+        D_8011F140->m_bLines = Automap_IsShown(&level->m_Game.m_DebugLines);
     } else {
         D_8011F140->m_bLines = 0;
     }
     if (D_8011F140->m_bLines != 0) {
         D_800D8E24 = D_800F6CB0.m_pCurrentFrameData->m_pLineList;
-        func_004004D8(&level->m_Game.m_DebugLines);
+        Automap_Draw(&level->m_Game.m_DebugLines);
         drawFade(level);
         {
             Gfx *g = D_800D8E24++;
@@ -209,11 +209,11 @@ void func_00287248(CEngineApp *level) {
         D_8011F140->m_LineListSize = (u32)D_800D8E24 - (u32)D_8011F140->m_pLineList;
     }
     D_8011F140->m_nPredictTicks = D_8011AD10;
-    D_800B6D48 = (f32)(((func_0029B170() - start) * 64) / 3) * 0.000001f;   /* OS_CYCLES_TO_USEC */
-    if (func_00205574(0) != 0) {
-        func_00286B58(level, D_8011F140);
+    D_800B6D48 = (f32)(((osGetTime() - start) * 64) / 3) * 0.000001f;   /* OS_CYCLES_TO_USEC */
+    if (CCache__EndDisplayList(0) != 0) {
+        CEngineApp__SubmitGfxTask(level, D_8011F140);
     } else {
-        func_00206078();
+        CCache__GetFrameDelay();
         osSendMesg(D_8011AD28, &D_8011F140->m_Msg, 1);
     }
     if (level->m_Settings.fadeMode != 0) {
@@ -252,5 +252,5 @@ void func_00287248(CEngineApp *level) {
             break;
         }
     }
-    func_00283CD4();
+    Cinema_Update();
 }

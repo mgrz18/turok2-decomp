@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040D4C8 (src/us/code/func_0040D4C8.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_PhaseBossMode1Init (src/us/code/BlindOne_PhaseBossMode1Init.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -8,8 +8,8 @@
 
 
 extern BlindOnePhase D_0043232C[];
-extern void func_00275624(s32 sound);
-extern void func_00243414(CGameObjectInstance *obj, void *ai, s32 state);
+extern void Sound__Play2D(s32 sound);
+extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase(BlindOneState *state) {
@@ -35,8 +35,8 @@ static __inline__ void nextPhase(BlindOneState *state) {
     }
 }
 
-void func_004464C8(BlindOneState *state) {
-    func_00275624(0x284F);
-    func_00243414(state->boss, &state->boss->m_AI, 1);
+void BlindOne_PhaseBossMode1Init_2(BlindOneState *state) {
+    Sound__Play2D(0x284F);
+    CAI__SetMode(state->boss, &state->boss->m_AI, 1);
     nextPhase(state);
 }

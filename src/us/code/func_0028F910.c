@@ -11,7 +11,7 @@ typedef struct {
     u32 timers[16];             /* 0xB8 */
 } Timers;
 
-s32 func_0028F910(Timers *t, u32 *out) {
+s32 __alCSeqNextDelta(Timers *t, u32 *out) {
     u32 elapsed = t->elapsed;
     u32 min = -1;
     u32 i;

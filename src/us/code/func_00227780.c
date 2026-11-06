@@ -6,7 +6,7 @@ extern CPooledLevelActor *D_8010AB94; /* active head */
 extern CPooledLevelActor *D_8010AB98; /* active tail */
 
 /* Unlinks an active node and pushes it on the free list. */
-void func_00227780(CPooledLevelActor *arg0) {
+void CPooledLevelActor__Release(CPooledLevelActor *arg0) {
     s32 *temp_v1;
     s32 temp_a1;
     CPooledLevelActor *temp_v1_2;

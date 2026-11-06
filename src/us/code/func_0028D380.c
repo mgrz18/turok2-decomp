@@ -1,5 +1,5 @@
 /* Boundary fixed in versions/cuts.us.txt: splat's func_0028D374 starts with 3 stray words (a jal
- * func_0021E03C / swc1 / addu tail that nothing executes); the real function
+ * Shadow_DrawBlob / swc1 / addu tail that nothing executes); the real function
  * starts at 0x28D380 (splat's D_0028D380), 0x38C bytes. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002A7F58.c,
  * func_802A71C0_de, with Turok 2's layouts. */
@@ -20,13 +20,13 @@ extern char D_800E6AC0[];
 extern s32 D_800C4000[];            /* BSS start */
 extern s32 D_8014A000[];            /* BSS end */
 
-void func_00266C5C(void *dst, s32 value, s32 size);
-s32 func_00288780(char *marker, char *name);
-void func_00288800(char *marker, char *name);
-void func_0029B1F0(void);
-void func_002881E8(void);
+void memset(void *dst, s32 value, s32 size);
+s32 Util_StrCmp(char *marker, char *name);
+void Util_StrCpy(char *marker, char *name);
+void osInitialize(void);
+void Engine_Boot(void);
 
-/* Whether a word may be overwritten on reset (func_0028D714 inlined). */
+/* Whether a word may be overwritten on reset (Boot_CanOverwrite inlined). */
 static __inline__ s32 isRestorable(u32 address) {
     if (address >= (u32)D_800B75F0 && address < (u32)D_800B75F0 + 0x10) {
         return 0;
@@ -67,12 +67,12 @@ s32 func_0028D380(void) {
     char name[16];
 
     *(Marker *)name = D_800AA200;
-    func_00266C5C(&name[15], 0, 1);
-    if (func_00288780(D_800B75F0, name) == 0) {
+    memset(&name[15], 0, 1);
+    if (Util_StrCmp(D_800B75F0, name) == 0) {
         D_80120690 = 0;
     } else {
         D_80120690 = 1;
-        func_00288800(D_800B75F0, name);
+        Util_StrCpy(D_800B75F0, name);
     }
     if (D_80120690 == 0) {
         src = (u32 *)0xB0001000;
@@ -95,7 +95,7 @@ s32 func_0028D380(void) {
             *dst = 0;
         }
     }
-    func_0029B1F0();
-    func_002881E8();
+    osInitialize();
+    Engine_Boot();
     return 0;
 }

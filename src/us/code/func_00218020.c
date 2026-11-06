@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern double D_800A59E0;
-f32 func_00218020(u32 *stream, Func802608ECResult range) {
+f32 Bits_ReadFloat(u32 *stream, Func802608ECResult range) {
     u32 bitAddress;
     u32 *streamPtr;
     s32 shift;

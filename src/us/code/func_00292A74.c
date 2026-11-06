@@ -4,12 +4,12 @@
 #include "rw/junk_types.h"
 
 void alSynSetVol(void *drvr, ALVoice *voice, s16 vol, s32 time);
-void func_002943D0(void *drvr, ALVoice *voice, s16 priority);
-void func_00291034(ALEventQueue *evtq, ALEvent *evt, ALMicroTime delta);
-void func_002933E0(ALLink *ln, ALLink *to);
-void func_002933B0(ALLink *ln);
-void func_00292A74(ALSeqPlayer *seqp, ALVoice *voice, s32 deltaTime);
-void func_00292A74(ALSeqPlayer *seqp, ALVoice *voice, s32 deltaTime) {
+void alSynSetPriority(void *drvr, ALVoice *voice, s16 priority);
+void alEvtqPostEvent(ALEventQueue *evtq, ALEvent *evt, ALMicroTime delta);
+void alLink(ALLink *ln, ALLink *to);
+void alUnlink(ALLink *ln);
+void __seqpReleaseVoice(ALSeqPlayer *seqp, ALVoice *voice, s32 deltaTime);
+void __seqpReleaseVoice(ALSeqPlayer *seqp, ALVoice *voice, s32 deltaTime) {
     ALEvent evt;
     ALVoiceState *vs = voice->clientPrivate;
     ALLink *thisNode;
@@ -26,8 +26,8 @@ void func_00292A74(ALSeqPlayer *seqp, ALVoice *voice, s32 deltaTime) {
                 if (nextItem != 0) {
                     nextItem->delta += thisItem->delta;
                 }
-                func_002933B0(thisNode);
-                func_002933E0(thisNode, &seqp->evtq.freeList);
+                alUnlink(thisNode);
+                alLink(thisNode, &seqp->evtq.freeList);
             }
             thisNode = nextNode;
         }
@@ -36,9 +36,9 @@ void func_00292A74(ALSeqPlayer *seqp, ALVoice *voice, s32 deltaTime) {
     vs->envPhase = 3;
     vs->envGain = 0;
     vs->envEndTime = seqp->curTime + deltaTime;
-    func_002943D0(seqp->drvr, voice, 0);
+    alSynSetPriority(seqp->drvr, voice, 0);
     alSynSetVol(seqp->drvr, voice, 0, deltaTime);
     evt.type = 5;
     evt.msg.note.voice = voice;
-    func_00291034(&seqp->evtq, &evt, deltaTime);
+    alEvtqPostEvent(&seqp->evtq, &evt, deltaTime);
 }

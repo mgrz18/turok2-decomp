@@ -156,7 +156,7 @@ typedef struct {
 /* Not libultra: the engine's recursive lock (Rage Wars' CMutex, built by
  * CMutex__Construct), a one-message queue and the number of holders. Taken
  * with __osDisableInt, ++count and osRecvMesg when count was not 0; released
- * with --count and osSendMesg when holders remain (func_002019F0). */
+ * with --count and osSendMesg when holders remain (CMutex__Wait). */
 typedef struct CMutex {
     /* 0x00 */ OSMesgQueue queue;
     /* 0x18 */ OSMesg msg;   /* the queue's one-message buffer */
@@ -165,7 +165,7 @@ typedef struct CMutex {
 
 /* The video interface (PR/os_vi.h, viint.h). __osViCurr / __osViNext are
  * D_800B7AC0 / D_800B7AC4 (osViSetEvent, osViSwapBuffer, osViSetYScale... set
- * the next one; __osViSwapContext, func_0029ACE0, loads it). */
+ * the next one; __osViSwapContext, __osViSwapContext, loads it). */
 typedef struct {
     /* 0x00 */ u32 ctrl;
     /* 0x04 */ u32 width;

@@ -6,7 +6,7 @@
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern float D_800A55FC;
-void func_0020FCC4(f32 (*mfThis)[4], f32 Theta, f32 X, f32 Y, f32 Z) {
+void CMtxF__SetAxisAngle(f32 (*mfThis)[4], f32 Theta, f32 X, f32 Y, f32 Z) {
     f32 sine;
     f32 cosine;
     f32 ab, bc, ca, t, one;

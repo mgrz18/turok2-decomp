@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/level_actor.h"
 
-extern void func_00227B7C(CLevelActorPool *pool, CPooledLevelActor *node);
+extern void CLevelActorPool__Free(CLevelActorPool *pool, CPooledLevelActor *node);
 
-CPooledLevelActor *func_00227AE0(CLevelActorPool *pool) {
+CPooledLevelActor *CLevelActorPool__Alloc(CLevelActorPool *pool) {
     CPooledLevelActor *node;
 
     if (pool->m_pFree == NULL) {
-        func_00227B7C(pool, pool->m_pTail);
+        CLevelActorPool__Free(pool, pool->m_pTail);
     }
     node = pool->m_pFree;
     pool->m_pFree = node->m_pNext;

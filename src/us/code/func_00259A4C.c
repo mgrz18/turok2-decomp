@@ -11,17 +11,17 @@ typedef struct {
     /* 0x90 */ s32 type;
 } Bone;
 
-extern void func_00210894(void *mtx, f32 angle);
+extern void CMtxF__PreRotateY(void *mtx, f32 angle);
 
-void func_00259A4C(void *mtx, Bone *bone) {
+void WeaponNode_Rotate_AF1D4(void *mtx, Bone *bone) {
     f32 angle = bone->anim->angle;
 
     switch (bone->type) {
     case 1:
-        func_00210894(mtx, -angle);
+        CMtxF__PreRotateY(mtx, -angle);
         break;
     case 12:
-        func_00210894(mtx, angle + angle);
+        CMtxF__PreRotateY(mtx, angle + angle);
         break;
     }
 }

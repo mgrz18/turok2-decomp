@@ -10,7 +10,7 @@ s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
 extern OSMesgQueue D_800D8DB0;
 extern s32 D_800D8DCC;
-void func_0020565C(s32 unused, B12Node *n) {
+void CCache__LockForDisplayList(s32 unused, B12Node *n) {
     u32 mask;
     u32 m2;
     s32 idx = D_800D7BE0.f638;

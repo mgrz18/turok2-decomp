@@ -3,6 +3,6 @@
 
 extern Cinema *D_800C1BB0;
 
-void func_002842E8(void) {
+void Cinema_ClearFinished(void) {
     D_800C1BB0->finished = 0;
 }

@@ -20,7 +20,7 @@ typedef struct B12Heap {
                B12HBlk *last;
                B12HBlk *cur;
 } B12Heap;
-u8 *func_002021F0(B12Heap *h, u8 *ptr, u32 size) {
+u8 *CHeap__AllocAt(B12Heap *h, u8 *ptr, u32 size) {
     B12HBlk *f;
     B12HBlk *b;
     B12HBlk *p;

@@ -9,10 +9,10 @@
  * (+0x30), D_800F70D8 (+0x60), D_800F70E4 (+0x6C), D_800F7148 (+0xD0),
  * D_800F7158 (+0xE0), D_800F7964 (+0x8EC).
  *
- * func_00429FA0 opens the game's resource files (the *Key fields are file
+ * CScene__Construct opens the game's resource files (the *Key fields are file
  * ids, the m_p* fields their loaded tables: a count, then offsets, read with
- * func_002017D4), func_0042AC0C loads a level into it (the m_h* fields are
- * the resource handles of the level's blocks), func_002237C4 runs the warp
+ * CISet__GetBlock), CScene__LoadLevel loads a level into it (the m_h* fields are
+ * the resource handles of the level's blocks), CScene__UpdateWarp runs the warp
  * fade. Rage Wars has the same object (Shared_World in its COMMON/WORLD.H)
  * with another layout: its actor lists sit 0x58 later and its level state
  * at 0x1B40C instead of 0x18FA8.
@@ -159,7 +159,7 @@ typedef struct CWorld {
     /* 0x18FAC */ s32 m_WarpFade;                   /* index in the fade table D_800ACDE8 */
     /* 0x18FB0 */ s32 m_WarpState;                  /* 0 none, 1 fading out to the warp, 2 fading back in */
     /* 0x18FB4 */ f32 m_WarpTime;
-    /* 0x18FB8 */ s32 m_bWarpSpawn;                 /* m_WarpSpawn was found (func_0042C194) */
+    /* 0x18FB8 */ s32 m_bWarpSpawn;                 /* m_WarpSpawn was found (CScene__FindWarpDests) */
     /* 0x18FBC */ CWarpPoint m_WarpSpawn;
     /* 0x18FD0 */ s32 m_LevelID;                    /* the warp id of the loaded level */
     /* 0x18FD4 */ s32 m_WarpID;                     /* where the pending warp goes (~id: a level index) */

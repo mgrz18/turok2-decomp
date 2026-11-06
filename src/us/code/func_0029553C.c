@@ -3,13 +3,13 @@
 
 #include "rw/junk_types.h"
 
-void func_00296340(ALFilter *f, void *handler, void *setParam, s32 type);
-void *func_002912A0(u8 *file, s32 line, ALHeap *hp, s32 num, s32 size);
-void *func_00295690(void);
+void alFilterNew(ALFilter *f, void *handler, void *setParam, s32 type);
+void *alHeapDBAlloc(u8 *file, s32 line, ALHeap *hp, s32 num, s32 size);
+void *alEnvmixerPull(void);
 s32 D_00296118(void *filter, s32 paramID, void *param);
-void func_0029553C(ALEnvMixer *e, ALHeap *hp) {
-    func_00296340(&e->filter, func_00295690, D_00296118, 4);
-    e->state = func_002912A0(0, 0, hp, 1, 0x50);
+void alEnvmixerNew(ALEnvMixer *e, ALHeap *hp) {
+    alFilterNew(&e->filter, alEnvmixerPull, D_00296118, 4);
+    e->state = alHeapDBAlloc(0, 0, hp, 1, 0x50);
     e->first = 1;
     e->motion = 0;
     e->volume = 1;

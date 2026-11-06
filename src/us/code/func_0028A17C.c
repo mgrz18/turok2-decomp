@@ -51,17 +51,17 @@ extern s32 D_800B6E50;          /* retrace counter */
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
-extern void func_0029B9B0(void *thread, s32 pri);   /* osSetThreadPri */
-extern void func_0029AC90(s32 framebuffer);         /* osViSwapBuffer */
-extern void func_0028AFF0(Sched *sc, ScTask *task);
-extern void func_0028A43C(Sched *sc);
-extern void func_0028B274(Sched *sc);
-extern s32 func_0028ABE0(Sched *sc, ScTask **sp, ScTask **dp, s32 state);
-extern void func_0028B0FC(Sched *sc, ScTask *sp, ScTask *dp);
-extern void func_00284B94(void);
+extern void osSetThreadPri(void *thread, s32 pri);   /* osSetThreadPri */
+extern void osViSwapBuffer(s32 framebuffer);         /* osViSwapBuffer */
+extern void __scAppendList(Sched *sc, ScTask *task);
+extern void __scHandleRSP(Sched *sc);
+extern void __scYield(Sched *sc);
+extern s32 __scSchedule(Sched *sc, ScTask **sp, ScTask **dp, s32 state);
+extern void __scExec(Sched *sc, ScTask *sp, ScTask *dp);
+extern void Controller_Service(void);
 
 /* Retrace: queue new tasks, swap the framebuffer when due, start the next tasks, wake the clients. */
-void func_0028A17C(Sched *sc) {
+void __scHandleRetrace(Sched *sc) {
     ScTask *rspTask;
     ScTask *sp;
     ScTask *dp;
@@ -78,12 +78,12 @@ void func_0028A17C(Sched *sc) {
     if (D_800B6E54 != 0) {
         D_800B6E54 = D_800B6E54 - 1;
         if (D_800B6E54 == 0) {
-            func_0029B9B0(D_800D6D68, D_800B6E7C);
+            osSetThreadPri(D_800D6D68, D_800B6E7C);
         }
     }
     sc->frameCount = sc->frameCount + 1;
     while (osRecvMesg(sc->cmdQueue, &rspTask, 0) != -1) {
-        func_0028AFF0(sc, rspTask);
+        __scAppendList(sc, rspTask);
     }
     D_8011AD88 = D_8011AD88 + 1;
     if (D_8011F130 != 0) {
@@ -97,7 +97,7 @@ void func_0028A17C(Sched *sc) {
         frame = D_8011AD18[D_800F6CA4];
         if (!((u32)(D_8011AD88 + 1) < frame->minRetraces)) {
             D_8011B098 = frame->framebuffer;
-            func_0029AC90(frame->framebuffer);
+            osViSwapBuffer(frame->framebuffer);
             D_8011F138 = D_8011F138 - 1;
             D_8011F130 = D_8011F130 + 1;
             D_800F6CA4 = D_800F6CA4 + 1;
@@ -116,7 +116,7 @@ void func_0028A17C(Sched *sc) {
             if (next == NULL) {
                 sc->gfxTail = NULL;
             }
-            func_0028A43C(sc);
+            __scHandleRSP(sc);
         }
     }
     D_800B6E50 = D_800B6E50 + 1;
@@ -124,11 +124,11 @@ void func_0028A17C(Sched *sc) {
         *(u8 *)0 = 0;
     }
     if (sc->doAudio != 0 && sc->curRSPTask != NULL) {
-        func_0028B274(sc);
+        __scYield(sc);
     } else {
         state = (sc->curRSPTask == NULL) << 1 | (sc->curRDPTask == NULL);
-        if (func_0028ABE0(sc, &sp, &dp, state) != state) {
-            func_0028B0FC(sc, sp, dp);
+        if (__scSchedule(sc, &sp, &dp, state) != state) {
+            __scExec(sc, sp, dp);
         }
     }
     client = sc->clients;
@@ -136,5 +136,5 @@ void func_0028A17C(Sched *sc) {
         osSendMesg(client->queue, sc, 0);
         client = client->next;
     }
-    func_00284B94();
+    Controller_Service();
 }

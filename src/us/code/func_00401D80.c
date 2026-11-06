@@ -1,7 +1,7 @@
 #include "common.h"
 
 /* Returns 0 when both points are strictly outside the same edge of the quad (x/z plane). */
-s32 func_00401D80(f32 (*quad)[3], f32 *a, f32 *b) {
+s32 Automap_EdgeVisible(f32 (*quad)[3], f32 *a, f32 *b) {
     s32 i;
     f32 *p;
     f32 *q;

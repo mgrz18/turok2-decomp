@@ -32,15 +32,15 @@ extern B10Obj *D_800F7C70[];
 extern s32 D_800F7E70;
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
-void func_0021AE6C(B10Q4 *out, B10Obj *o);
-f32 func_002671B4(B10Obj *o);
-void func_0020EF2C(CVector3 *o, CVector3 *a, CVector3 *b);
-void func_0020EFDC(CVector3 *o, CVector3 *a, CVector3 *b);
-void func_0020F040(CVector3 *v);
-void func_0020F85C(B10Mt *m, CVector3 *a, CVector3 *b);
-void func_00210F68(B10Q4 *o, B10Q4 *a, B10Q4 *b);
-void func_00211114(B10Q4 *q, B10Mt *m);
-f32 func_0021153C(f32 x);
+void CGameObjectInstance__GetRotation(B10Q4 *out, B10Obj *o);
+f32 GameObject_GetCollisionHeight(B10Obj *o);
+void CVector3__Subtract(CVector3 *o, CVector3 *a, CVector3 *b);
+void CVector3__Cross(CVector3 *o, CVector3 *a, CVector3 *b);
+void CVector3__Normalize(CVector3 *v);
+void CMtxF__TransformPoint(B10Mt *m, CVector3 *a, CVector3 *b);
+void CQuaternion__Multiply(B10Q4 *o, B10Q4 *a, B10Q4 *b);
+void CQuaternion__ToMatrix(B10Q4 *q, B10Mt *m);
+f32 Math_AcosLookup(f32 x);
 f32 func_00298470(f32 x); /* sqrtf */
 B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 angle) {
     CVector3 v10;
@@ -67,7 +67,7 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
     v20.x = 0;
     v20.y = 0;
     v20.z = D_800A5B2C;
-    func_0021AE6C(&q70, self);
+    CGameObjectInstance__GetRotation(&q70, self);
     if (new_var2 == 0.0f) {
         if (outq) {
             outq->x = outq->y = outq->z = 0;
@@ -76,8 +76,8 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
         *out = q70;
         return out;
     }
-    func_00211114(&q70, &mA0);
-    func_0020F85C(&mA0, &v20, &v30);
+    CQuaternion__ToMatrix(&q70, &mA0);
+    CMtxF__TransformPoint(&mA0, &v20, &v30);
     best = 0;
     thr = func_002974C0(new_var2 * D_800A5B30);
     n = D_800F7E70;
@@ -94,9 +94,9 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
         }
         v60 = obj->pos;
         v60.y = v60.y + obj->f54;
-        v60.y = v60.y + func_002671B4(obj) * D_800A5B34;
-        func_0020EF2C(&v10, &v60, &dir);
-        func_0020F040(&v10);
+        v60.y = v60.y + GameObject_GetCollisionHeight(obj) * D_800A5B34;
+        CVector3__Subtract(&v10, &v60, &dir);
+        CVector3__Normalize(&v10);
         d = v30.x * v10.x + v30.y * v10.y + v30.z * v10.z;
         if (thr < d) {
             thr = d;
@@ -105,9 +105,9 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
         }
     }
     if (best) {
-        func_0020EFDC(&v40, &v30, &v50);
-        func_0020F040(&v40);
-        t = func_0021153C(thr);
+        CVector3__Cross(&v40, &v30, &v50);
+        CVector3__Normalize(&v40);
+        t = Math_AcosLookup(thr);
         t *= func_00298470(func_00298470(D_800A5B3C - t / (new_var2 * D_800A5B38)));
         t *= D_800A5B40;
         s = func_002982F0(t);
@@ -117,7 +117,7 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
         q80.z = v40.z * s;
         new_var = t;
         q80.w = func_002974C0(new_var);
-        func_00210F68(&q90, &q70, &q80);
+        CQuaternion__Multiply(&q90, &q70, &q80);
         if (outq) {
             *outq = q80;
         }

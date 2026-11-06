@@ -1,11 +1,11 @@
 /* Second-module copy of osPfsReadWriteFile (first module; this one at link address 0x00428C10), calling this module's own functions at their link addresses. */
-/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00461C10.c, func_00461C10.
+/* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/osPfsReadWriteFile_2.c, osPfsReadWriteFile_2.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "common.h"
 #include "ultra_types.h"
-s32 func_00299680(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
-s32 func_00299A40(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
+s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
 s32 func_00429D1C(OSPfs *pfs);
 s32 func_00429DE4(OSPfs *pfs);
 s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
@@ -28,7 +28,7 @@ static __inline__ s32 next_page(OSPfs *pfs, u8 *cbank, __OSInode *inode, __OSIno
     }
     return 0;
 }
-s32 func_00461C10(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_in_bytes, u8 *data_buffer) {
+s32 osPfsReadWriteFile_2(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_in_bytes, u8 *data_buffer) {
     s32 ret;
     __OSDir dir;
     __OSInode inode;
@@ -60,7 +60,7 @@ s32 func_00461C10(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_in_byte
             return ret;
         }
     }
-    ret = func_00299680(pfs->queue, pfs->channel, (u16)(pfs->dir_table + file_no), (u8 *)&dir);
+    ret = __osContRamRead(pfs->queue, pfs->channel, (u16)(pfs->dir_table + file_no), (u8 *)&dir);
     if (ret != 0) {
         return ret;
     }
@@ -105,9 +105,9 @@ s32 func_00461C10(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_in_byte
         }
         addr = curr_page.inode_t.page * 8 + offset_in_blocks;
         if (flag == 0) {
-            ret = func_00299680(pfs->queue, pfs->channel, (u16)addr, buf);
+            ret = __osContRamRead(pfs->queue, pfs->channel, (u16)addr, buf);
         } else {
-            ret = func_00299A40(pfs->queue, pfs->channel, (u16)addr, buf, 0);
+            ret = __osContRamWrite(pfs->queue, pfs->channel, (u16)addr, buf, 0);
         }
         if (ret != 0) {
             return ret;
@@ -123,7 +123,7 @@ s32 func_00461C10(OSPfs *pfs, s32 file_no, u8 flag, int offset, int size_in_byte
         if (ret != 0) {
             return ret;
         }
-        ret = func_00299A40(pfs->queue, pfs->channel, (u16)(pfs->dir_table + file_no), (u8 *)&dir, 0);
+        ret = __osContRamWrite(pfs->queue, pfs->channel, (u16)(pfs->dir_table + file_no), (u8 *)&dir, 0);
         if (ret != 0) {
             return ret;
         }

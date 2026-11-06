@@ -10,18 +10,18 @@ typedef struct B01Pair {
 } B01Pair;
 extern s32 D_800F7078[];
 extern u8 D_801102B8[];
-void func_00237EE4(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, B01Pair extra);
-void func_00220260(void *mgr, CGameObjectInstance *actor, s32 flag);
-void func_0026E110(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
-void func_002365F8(void *p, CGameObjectInstance *actor);
-void func_002656BC(CGameObjectInstance *actor) {
+void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, B01Pair extra);
+void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
+void GameObject_FireTriggers(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
+void SwooshSet_FreeOwner(void *p, CGameObjectInstance *actor);
+void Door_CloseEnter(CGameObjectInstance *actor) {
     B01Pair extra;
     extra.a = 0;
-    func_00220260(D_800F7078, actor, 0);
-    func_0026E110(actor, 0x8000, actor);
-    func_002365F8(D_801102B8, actor);
+    CScene__SetInstanceSavedBit(D_800F7078, actor, 0);
+    GameObject_FireTriggers(actor, 0x8000, actor);
+    SwooshSet_FreeOwner(D_801102B8, actor);
     if (D_800F7078[0] != 4) {
-        func_00237EE4(actor, actor, 7, actor->header.m_vPos, extra);
+        ImpactEvent_Call(actor, actor, 7, actor->header.m_vPos, extra);
         actor->m_dwFlags |= 0x8000000;
     }
 }

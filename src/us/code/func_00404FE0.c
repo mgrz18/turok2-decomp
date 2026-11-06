@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/boss.h"
 
-extern f32 func_002119FC(f32 lo, f32 hi);
+extern f32 Random_Blend(f32 lo, f32 hi);
 
 /* LevelScriptState from spawnsLeft on (D_8012F950, +0x348): this file
  * reaches script2 through that symbol. */
@@ -17,7 +17,7 @@ typedef struct {
 extern LevelScriptF950 D_8012F950;
 
 /* Advance the second script to its next step, skipping steps by chance. */
-void func_00404FE0(void) {
+void Primagen_NextSpawnStep(void) {
     if (D_8012F950.script2.steps == NULL) {
         return;
     }
@@ -36,5 +36,5 @@ void func_00404FE0(void) {
             return;
         }
         D_8012F950.script2.current = D_8012F950.script2.cursor;
-    } while ((f32) D_8012F950.script2.steps[D_8012F950.script2.cursor].chance <= func_002119FC(0.0f, 100.0f));
+    } while ((f32) D_8012F950.script2.steps[D_8012F950.script2.cursor].chance <= Random_Blend(0.0f, 100.0f));
 }

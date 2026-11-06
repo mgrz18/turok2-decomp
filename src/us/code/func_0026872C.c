@@ -7,18 +7,18 @@ typedef struct {
     void *node;  /* 0x10 */
 } Placed;
 
-f32 func_0026BE60(void *node, f32 x, f32 z);
+f32 CGameRegion__GetHeight(void *node, f32 x, f32 z);
 
-f32 func_0026872C(Placed *obj, CVector3 *offset) {
+f32 GameObject_GetRegionFloorHeight(Placed *obj, CVector3 *offset) {
     void *node = obj->node;
     f32 result;
 
     if (node == NULL) {
         result = obj->pos.y;
     } else if (offset == NULL) {
-        result = func_0026BE60(node, obj->pos.x, obj->pos.z);
+        result = CGameRegion__GetHeight(node, obj->pos.x, obj->pos.z);
     } else {
-        result = func_0026BE60(node, obj->pos.x + offset->x, obj->pos.z + offset->z);
+        result = CGameRegion__GetHeight(node, obj->pos.x + offset->x, obj->pos.z + offset->z);
     }
     return result;
 }

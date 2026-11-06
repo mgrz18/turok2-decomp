@@ -3,6 +3,6 @@
 
 extern s32 D_800C1BB8;
 
-s32 func_002842D8(void) {
+s32 Cinema_IsEnabled(void) {
     return D_800C1BB8;
 }

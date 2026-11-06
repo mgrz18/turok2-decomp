@@ -12,7 +12,7 @@ extern B21Vp D_8011B0A8[];
 extern s32 D_800B6D1C;
 extern s32 D_800C2030;
 extern s32 D_800C2034;
-void func_00286A04(void)
+void CEngineApp__BeginDisplayList(void)
 {
   f32 new_var;
   s32 new_var2;

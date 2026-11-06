@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/libaudio.h"
 
-ALVoiceState *func_002925E0(ALSeqPlayer *seqp, u8 key, u8 chan);
-ALVoiceState *func_002925E0(ALSeqPlayer *seqp, u8 key, u8 chan) {
+ALVoiceState *__lookupVoice(ALSeqPlayer *seqp, u8 key, u8 chan);
+ALVoiceState *__lookupVoice(ALSeqPlayer *seqp, u8 key, u8 chan) {
     ALVoiceState *vs;
     for (vs = seqp->vAllocHead; vs != 0; vs = vs->next) {
         if (vs->key == key && vs->channel == chan && vs->phase != 3 && vs->phase != 4) {

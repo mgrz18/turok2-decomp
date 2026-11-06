@@ -1,19 +1,19 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-void func_0026426C(s32, s32);
-s32 func_00264378(s32, s32);
+void Platform_CalcOrientation(s32, s32);
+s32 Platform_Step(s32, s32);
 
 extern s32 D_800B20B0;
 
-void func_00264198(CGameObjectInstance *arg0, CAI *arg1) {
+void Platform_Setup(CGameObjectInstance *arg0, CAI *arg1) {
     CTurretIntelligence *temp_v0;
     CIntelligence *temp_v1;
 
     temp_v1 = arg0->header.m_pIntelligence;
     arg1->m_pModeTable = (CAIModeInfo *) &D_800B20B0;
-    arg1->m_pfStep = func_00264378;
-    arg1->m_pfCalculateOrientationMatrix = func_0026426C;
+    arg1->m_pfStep = Platform_Step;
+    arg1->m_pfCalculateOrientationMatrix = Platform_CalcOrientation;
     arg1->m_VarBuffer[4] = 0;
     arg1->m_VarBuffer[5] = 0;
     temp_v0 = &temp_v1->m_Turret;

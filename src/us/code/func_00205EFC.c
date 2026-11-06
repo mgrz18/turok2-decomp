@@ -1,9 +1,9 @@
 #include "common.h"
 
-s32 func_002031E8(s32, s32);
-s32 func_002062F8(s32, s32);
-s32 func_002063B4(s32, s32, s32, s32);
-s32 func_00206498(s32, s32);
+s32 CCache__AllocMemEntry(s32, s32);
+s32 CCache__FreeMemEntry(s32, s32);
+s32 CCache__HeapAlloc(s32, s32, s32, s32);
+s32 CCache__AddToAddressList(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
@@ -12,7 +12,7 @@ void __osRestoreInt(s32);
 extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
-s32 func_00205EFC(s32 arg0, s32 arg1, s32 arg2)
+s32 CCache__AllocateMemoryForDecompressionTop(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
   s32 temp_v0;
@@ -33,18 +33,18 @@ s32 func_00205EFC(s32 arg0, s32 arg1, s32 arg2)
   {
     __osRestoreInt(temp_a0);
   }
-  var_s0 = func_002031E8(0, 0x22);
+  var_s0 = CCache__AllocMemEntry(0, 0x22);
   if (var_s0 != 0)
   {
     *((s32 *) (((s8 *) var_s0) + 8)) = (s32) ((*((s32 *) (((s8 *) var_s0) + 8))) + 1);
     *((s32 *) (((s8 *) var_s0) + 0xC)) = (s32) ((*((s32 *) (((s8 *) var_s0) + 0xC))) | 0x100);
-    temp_v0 = func_002063B4(0, arg2, 1, 0x22);
+    temp_v0 = CCache__HeapAlloc(0, arg2, 1, 0x22);
     *((s32 *) (((s8 *) var_s0) + 0)) = temp_v0;
     if (temp_v0 != 0)
     {
       *((s32 *) (((s8 *) var_s0) + 4)) = arg2;
       *((s32 *) (((s8 *) var_s0) + 0xC)) = (s32) ((*((s32 *) (((s8 *) var_s0) + 0xC))) | 0x22);
-      func_00206498(0, var_s0);
+      CCache__AddToAddressList(0, var_s0);
     }
     else
     {
@@ -54,7 +54,7 @@ s32 func_00205EFC(s32 arg0, s32 arg1, s32 arg2)
       {
         *((s32 *) (((s8 *) var_s0) + 0xC)) = (s32) ((*((s32 *) (((s8 *) var_s0) + 0xC))) & (~0x100));
       }
-      func_002062F8(0, var_s0);
+      CCache__FreeMemEntry(0, var_s0);
       var_s0 = 0;
     }
   }

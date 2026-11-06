@@ -4,9 +4,9 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern void func_0042E14C(void *player);
+extern void CPlayer__StartGame(void *player);
 
-s32 func_0041A3B0(s32 menu, Menu *c) {
-    func_0042E14C(c->player);
+s32 ContinueMenu_Yes(s32 menu, Menu *c) {
+    CPlayer__StartGame(c->player);
     return 1;
 }

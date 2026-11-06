@@ -4,9 +4,9 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/controller.h"
-void func_002987B4(OSContPad *pad);
-s32 func_00298900(OSMesgQueue *mq, OSContStatus *data);
-void func_002986F8(OSContStatus *data);
+void osContGetReadData(OSContPad *pad);
+s32 osContReset(OSMesgQueue *mq, OSContStatus *data);
+void osContGetQuery(OSContStatus *data);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 typedef struct M04Pad {
     u16 button;
@@ -20,14 +20,14 @@ extern M04Pad D_800F5C60[];
 extern u8 D_800F6750;
 extern OSMesgQueue D_800F6798;
 extern OSMesg D_800F6770;
-void func_00284DAC(ControllerProfile *c);
-void func_00284EB8(ControllerProfile *c, s8 x, s8 y, u16 b);
-void func_002847E0(void) {
+void Controller_UpdateConnection(ControllerProfile *c);
+void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, u16 b);
+void Controller_ReadAll(void) {
     s32 i;
     switch (D_800F6750) {
     case 0:
         osRecvMesg(&D_800F6798, &D_800F6770, 1);
-        func_002987B4((OSContPad *)D_800F5C60);
+        osContGetReadData((OSContPad *)D_800F5C60);
         D_800F5C78.port = -1;
         D_800F5C78.connected = 0;
         D_800F5C78.inputStickX = 0;
@@ -47,7 +47,7 @@ void func_002847E0(void) {
         D_800F5C78.inputButtonsDouble = 0;
         D_800F5C78.inputButtonsRepeat = 0;
         for (i = 0; i < 4; i++) {
-            func_00284EB8(&D_800F5EC0[i], D_800F5C60[i].x, D_800F5C60[i].y, D_800F5C60[i].button);
+            Controller_ProcessInput(&D_800F5EC0[i], D_800F5C60[i].x, D_800F5C60[i].y, D_800F5C60[i].button);
             D_800F5C78.connected |= D_800F5EC0[i].connected;
             D_800F5C78.inputStickX += D_800F5EC0[i].inputStickX;
             D_800F5C78.inputStickY += D_800F5EC0[i].inputStickY;
@@ -72,13 +72,13 @@ void func_002847E0(void) {
         break;
     case 1:
         osRecvMesg(&D_800F6798, &D_800F6770, 1);
-        func_002986F8(D_800F6778);
+        osContGetQuery(D_800F6778);
         for (i = 0; i < 4; i++) {
-            func_00284DAC(&D_800F5EC0[i]);
+            Controller_UpdateConnection(&D_800F5EC0[i]);
         }
         break;
     case 3:
-        func_00298900(&D_800F6798, D_800F6778);
+        osContReset(&D_800F6798, D_800F6778);
     case 2:
         break;
     }

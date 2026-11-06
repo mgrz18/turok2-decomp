@@ -2,6 +2,6 @@
 
 s32 __osSpSetStatus(s32);                     /* extern */
 
-void func_0029A4F0(void) {
+void osSpTaskYield(void) {
     __osSpSetStatus(0x400);
 }

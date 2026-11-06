@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00245A98(CGameObjectInstance *obj, CAI *ai, u8 *table, s32 anim);
+s32 AI_PickAnimFromTable(CGameObjectInstance *obj, CAI *ai, u8 *table, s32 anim);
 
 extern u8 D_800AF810[];
 
-void func_00259EE4(CGameObjectInstance *obj, CAI *ai) {
-    func_00245A98(obj, ai, D_800AF810, obj->header.m_pIntelligence->m_Enemy.m_wAlertAnimFlags);
+void EnemyAnim_Alert_AF810(CGameObjectInstance *obj, CAI *ai) {
+    AI_PickAnimFromTable(obj, ai, D_800AF810, obj->header.m_pIntelligence->m_Enemy.m_wAlertAnimFlags);
 }

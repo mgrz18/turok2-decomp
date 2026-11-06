@@ -11,7 +11,7 @@ extern TemplateEntry D_00439774[];
 extern s32 D_800C1144;
 extern u32 D_80130920;
 
-s32 func_0041AEB0(MenuItem *arg0) {
+s32 EnterCheatMenu_ResultLabel(MenuItem *arg0) {
     if ((u32) D_80130920 < 0xCU) {
         arg0->table = D_00439774[D_80130920].tmpl;
     } else {

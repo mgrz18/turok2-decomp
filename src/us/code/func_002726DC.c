@@ -1,22 +1,22 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AUDIO/8025A3EC.CPP, func_8025A3CC_de, with Turok 2's layouts
- * (emitter layout as in src/us/code/func_00272278.c). */
+ * (emitter layout as in src/us/code/SndVoice_InitVolume.c). */
 #include "common.h"
 #include "structs/sound.h"
 #include "structs/camera.h"
 
 extern f32 D_800B2A30; /* hearing range squared */
 
-f32 func_0026D210(s32 x);
-s32 func_00284174(void);
-f32 func_00211774(f32 value, f32 target, f32 rate);
-void func_00293E60(void *sndp, s16 id);
-void func_00293E70(void *sndp, s16 vol);
-s32 func_00293580(void *sndp);
-void func_00293EC0(void *sndp);
+f32 HalfToFloat(s32 x);
+s32 Cinema_IsActive(void);
+f32 Math_Approach(f32 value, f32 target, f32 rate);
+void alSndpSetSound(void *sndp, s16 id);
+void alSndpSetVol(void *sndp, s16 vol);
+s32 alSndpGetState(void *sndp);
+void alSndpStop(void *sndp);
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-void func_002726DC(SndVoice *o) {
+void SndVoice_UpdateVolume(SndVoice *o) {
     SndVoiceParams *vp;
     SndEnv *env;
     SndMgr *settings;
@@ -88,8 +88,8 @@ void func_002726DC(SndVoice *o) {
                 g = 0.0f;
                 break;
         }
-        if (func_00284174() != 0) {
-            vp->scale = func_00211774(vp->scale, g, 0.017f);
+        if (Cinema_IsActive() != 0) {
+            vp->scale = Math_Approach(vp->scale, g, 0.017f);
         } else {
             vp->scale = g;
         }
@@ -105,22 +105,22 @@ void func_002726DC(SndVoice *o) {
             if (o->env2Step < 0.0f) {
                 down = 1;
             }
-            if (down ? (o->env2Value < func_0026D210(env->target)) : (func_0026D210(env->target) < o->env2Value)) {
+            if (down ? (o->env2Value < HalfToFloat(env->target)) : (HalfToFloat(env->target) < o->env2Value)) {
                 o->env2Value -= o->env2Step;
                 if (down) {
-                    if (func_0026D210(env->target) < o->env2Value) {
-                        o->env2Value = func_0026D210(env->target);
+                    if (HalfToFloat(env->target) < o->env2Value) {
+                        o->env2Value = HalfToFloat(env->target);
                     }
-                } else if (o->env2Value < func_0026D210(env->target)) {
-                    o->env2Value = func_0026D210(env->target);
+                } else if (o->env2Value < HalfToFloat(env->target)) {
+                    o->env2Value = HalfToFloat(env->target);
                     if (o->env2Value == 0.0f) {
                         ctx = o->mgr;
                         o->stopping = 1;
                         o->vp.follow = 0;
                         if (o->vp.frame != ctx->frame) {
-                            func_00293E60(&ctx->player, ctx->handles[o->index]);
-                            if (func_00293580(&ctx->player) != 0) {
-                                func_00293EC0(&ctx->player);
+                            alSndpSetSound(&ctx->player, ctx->handles[o->index]);
+                            if (alSndpGetState(&ctx->player) != 0) {
+                                alSndpStop(&ctx->player);
                             }
                             o->sound = -1;
                         }
@@ -128,7 +128,7 @@ void func_002726DC(SndVoice *o) {
                 }
             }
         }
-        level = func_0026D210(o->env2.level) * o->env2Value;
+        level = HalfToFloat(o->env2.level) * o->env2Value;
         vol = (f32)level * vp->scale;
         vp->vol = level;
     } else {
@@ -148,6 +148,6 @@ void func_002726DC(SndVoice *o) {
     do {
     } while (0);
     vi = vol * master;
-    func_00293E60(sndp, o->mgr->handles[slot]);
-    func_00293E70(sndp, (s32)((f32)vi * o->volumeScale));
+    alSndpSetSound(sndp, o->mgr->handles[slot]);
+    alSndpSetVol(sndp, (s32)((f32)vi * o->volumeScale));
 }

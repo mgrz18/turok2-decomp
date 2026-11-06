@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_00255FF4();                            /* extern */
+s32 CPlayer__UpdateDeath();                            /* extern */
 
-void func_00256180(void) {
-    func_00255FF4();
+void PlayerDeath0B_Update(void) {
+    CPlayer__UpdateDeath();
 }

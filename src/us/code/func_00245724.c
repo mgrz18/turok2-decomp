@@ -1,10 +1,10 @@
 #include "common.h"
 
-s32 func_00268C04(u8 *obj); /* the object's type id */
+s32 GameObject_GetTypeId(u8 *obj); /* the object's type id */
 
 /* Maps an object's type id to a class 0-9 (3 by default). */
-s32 func_00245724(u8 *obj) {
-    switch (func_00268C04(obj)) {
+s32 Actor_GetTypeClass(u8 *obj) {
+    switch (GameObject_GetTypeId(obj)) {
     case 1: case 2:
         return 0;
     case 3: case 4:

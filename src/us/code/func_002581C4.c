@@ -6,12 +6,12 @@
 
 extern f32 D_800AE350;
 
-extern s32 func_0024E700(CPlayer *player, s32 weapon);
-extern s32 func_00243414(void *obj, CAI *state, s32 mode);
+extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
+extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);
 
 /* Weapon state: sets the fire-rate scale D_800AE350 from the time held for
  * weapons 2-3 (and their 0x1294 ramp) and 12, then goes to state 7 or 5. */
-void func_002581C4(CGameObjectInstance *obj, CAI *state) {
+void WeaponMode_WindUp_Update(CGameObjectInstance *obj, CAI *state) {
     CPlayer *player = (CPlayer *) obj->m_AI.m_pParent;
     f32 t;
     f32 scale;
@@ -38,9 +38,9 @@ void func_002581C4(CGameObjectInstance *obj, CAI *state) {
         D_800AE350 = MAX(MIN(state->m_ModeTime * (2.0f / 21), 2.0f), 0.5f);
         break;
     }
-    if (func_0024E700(player, player->m_Data.m_CurrentWeapon) == 1) {
-        func_00243414(obj, state, 7);
+    if (CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon) == 1) {
+        CAI__SetMode(obj, state, 7);
     } else {
-        func_00243414(obj, state, 5);
+        CAI__SetMode(obj, state, 5);
     }
 }

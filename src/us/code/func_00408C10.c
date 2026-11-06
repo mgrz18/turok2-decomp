@@ -17,7 +17,7 @@ typedef struct {
 extern void *D_80119890;        /* current player */
 
 /* Point the player actors at a target (mode 0), or back at the player. */
-void func_00408C10(TargetInfo *info, s32 force) {
+void TotemDefense_RetargetEnemies(TargetInfo *info, s32 force) {
     CListedInstance *actor;
     void *player;
     s32 count;

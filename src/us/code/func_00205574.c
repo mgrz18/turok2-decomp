@@ -9,7 +9,7 @@ s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
 extern s32 D_800D8DCC;
-s32 func_00205574(void) {
+s32 CCache__EndDisplayList(void) {
     u32 mask;
     u32 m2;
     s32 r;

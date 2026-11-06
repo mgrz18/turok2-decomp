@@ -30,20 +30,20 @@ extern s32 D_8011001C;
 extern s32 D_8011AAD8;          /* cheats */
 extern u8 D_800B06A0[];         /* origin */
 
-void func_002600E8(Object *obj, CAI *ai);
-void func_002460FC(Object *obj, CAI *ai, Object *owner, f32 time);
-void func_0025E52C(Object *obj, CAI *ai, CVector3 *from, s32);
-void func_00243414(Object *obj, CAI *ai, s32 state);
-void func_002755B0(s16 sound, CVector3 pos, s32, s32, f32 volume);
-s32 func_002113A4(void);
-void func_00246918(Object *obj, CAI *ai);
-s32 func_0025B078(Object *obj, CAI *ai, DamageEvent *dmg);
-void func_004089C8(void);
-s32 func_0025DF04(Object *obj, CAI *ai);
-s32 func_00219F74(Object *obj, s32 node, s32);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
+void AI_SetTargetOverride(Object *obj, CAI *ai, Object *owner, f32 time);
+void AI_HearNoise(Object *obj, CAI *ai, CVector3 *from, s32);
+void CAI__SetMode(Object *obj, CAI *ai, s32 state);
+void Sound__PlayPitched(s16 sound, CVector3 pos, s32, s32, f32 volume);
+s32 Random_Next(void);
+void AI_StopSound(Object *obj, CAI *ai);
+s32 EnemyAI_PickDeathMode(Object *obj, CAI *ai, DamageEvent *dmg);
+void TotemDefense_AddKill(void);
+s32 EnemyAnim_PickDeath(Object *obj, CAI *ai);
+s32 CGameObjectInstance__PickRandomAnim(Object *obj, s32 node, s32);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_00298470(f32 x);
-f32 func_0020EAA0(CVector3 *v);
+f32 CVector3__GetYaw(CVector3 *v);
 
 /* An object's owner (0x1A8) lies inside its AI block. */
 #define OWNER(o) (*(Object **)((u8 *)(o) + 0x1A8))
@@ -51,7 +51,7 @@ f32 func_0020EAA0(CVector3 *v);
 /* AI damage: retarget the attacker, take the health, play the hurt sound and
  * pick the death, fall or flinch reaction; a knock back turns the actor to
  * face the push when the source was near enough. */
-void func_0025B2D4(Object *obj, CAI *ai, DamageEvent *dmg) {
+void EnemyAI_OnDamage(Object *obj, CAI *ai, DamageEvent *dmg) {
     CVector3 delta;
     s32 pushed;
     Object *attacker;
@@ -78,7 +78,7 @@ void func_0025B2D4(Object *obj, CAI *ai, DamageEvent *dmg) {
     index = ai->m_Enemy.m_BehaviorIndex;
     info = &def->m_Enemy;
     if (ai->m_Mode == 0x3D) {
-        func_002600E8(obj, ai);
+        EnemyAI_NukedFrozenRemove(obj, ai);
         return;
     }
     source = dmg->source;
@@ -88,17 +88,17 @@ void func_0025B2D4(Object *obj, CAI *ai, DamageEvent *dmg) {
                 if ((source->flags & 0x300000) && (u32)(D_80110048 - 7100) <= 400) {
                     newTarget = OWNER(source);
                     if (obj->ai.m_pSightTarget != newTarget) {
-                        func_002460FC(obj, ai, newTarget, 60.0f);
+                        AI_SetTargetOverride(obj, ai, newTarget, 60.0f);
                         ai->m_dwFlags &= ~0x40000000;
                     }
                 }
                 attacker = source;
-                func_0025E52C(obj, ai, &source->pos, 3);
+                AI_HearNoise(obj, ai, &source->pos, 3);
                 break;
             case 2:
                 if (source->particleType == 10) {
                     if ((def->m_Enemy.m_dwFlags & 0x80) && ai->m_Health != 0) {
-                        func_00243414(obj, ai, 0x1F);
+                        CAI__SetMode(obj, ai, 0x1F);
                     }
                     if (info->m_dwFlags & 0x40000) {
                         dmg->damage += 0x3200;
@@ -110,18 +110,18 @@ void func_0025B2D4(Object *obj, CAI *ai, DamageEvent *dmg) {
                     if ((owner->flags & 0x300000) && (u32)(D_80110048 - 7100) <= 400) {
                         newTarget = OWNER(owner);
                         if (ai->m_pSightTarget != newTarget) {
-                            func_002460FC(obj, ai, newTarget, 60.0f);
+                            AI_SetTargetOverride(obj, ai, newTarget, 60.0f);
                             ai->m_dwFlags &= ~0x40000000;
                         }
                     }
-                    func_0025E52C(obj, ai, &source->pos, 3);
+                    AI_HearNoise(obj, ai, &source->pos, 3);
                     if (owner->kind == 1) {
                         attacker = owner;
                     }
                 }
                 break;
             default:
-                func_0025E52C(obj, ai, &source->pos, 3);
+                AI_HearNoise(obj, ai, &source->pos, 3);
                 break;
         }
         if (!D_8011001C && attacker != NULL && attacker->typeId != obj->typeId) {
@@ -136,7 +136,7 @@ void func_0025B2D4(Object *obj, CAI *ai, DamageEvent *dmg) {
             }
         }
     } else {
-        func_0025E52C(obj, ai, (CVector3 *)D_800B06A0, 3);
+        AI_HearNoise(obj, ai, (CVector3 *)D_800B06A0, 3);
     }
     health = ai->m_Health;
     left = health - dmg->damage;
@@ -155,34 +155,34 @@ void func_0025B2D4(Object *obj, CAI *ai, DamageEvent *dmg) {
         } else if (D_8011AAD8 & 0x20) {
             volume = 0.35f;
         }
-        func_002755B0(info->m_PainSound, obj->pos, 0, -1, volume);
+        Sound__PlayPitched(info->m_PainSound, obj->pos, 0, -1, volume);
         ai->m_LastHurtSFXTimer = 0;
     }
     ai->m_Aggression = (ai->m_Aggression + dmg->damage < 255) ? 255 : ai->m_Aggression + dmg->damage;
-    if ((dmg->flags & 0x400000) && func_002113A4() % 1000 < 500) {
+    if ((dmg->flags & 0x400000) && Random_Next() % 1000 < 500) {
         dmg->flags = 0x800000;
     }
-    if ((dmg->flags & 0x100000) && func_002113A4() % 1000 < 500) {
+    if ((dmg->flags & 0x100000) && Random_Next() % 1000 < 500) {
         dmg->flags = 0x200000;
     }
     ai->m_dwFlags &= 0xFC0FFFFF;
     ai->m_dwFlags |= dmg->flags;
     if (justDied) {
-        func_00246918(obj, ai);
+        AI_StopSound(obj, ai);
         obj->fxFlags |= 8;
-        anim = func_0025B078(obj, ai, dmg);
+        anim = EnemyAI_PickDeathMode(obj, ai, dmg);
         if (anim == 0x34 && (dmg->flags & 0x400000)) {
             pushed = 1;
         }
-        func_00243414(obj, ai, anim);
-        func_004089C8();
+        CAI__SetMode(obj, ai, anim);
+        TotemDefense_AddKill();
     } else if (dead) {
-        func_00246918(obj, ai);
+        AI_StopSound(obj, ai);
         if (ai->m_Mode != 0x35 && ai->m_Mode != 0x3C && ai->m_AnimRepeatedCount && (dmg->flags & 0xC00000)) {
             ai->m_dwFlags = (ai->m_dwFlags & 0xFC0FFFFF) | 0x400000;
-            node = func_0025DF04(obj, ai);
+            node = EnemyAnim_PickDeath(obj, ai);
             if (node != -1) {
-                slot = func_00219F74(obj, node, -1);
+                slot = CGameObjectInstance__PickRandomAnim(obj, node, -1);
                 if (slot != -1) {
                     pushed = 1;
                     ai->m_AnimType = node;
@@ -198,28 +198,28 @@ void func_0025B2D4(Object *obj, CAI *ai, DamageEvent *dmg) {
             if (!(region->flags & 4)) {
                 if ((index == 0 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x1F)) || (index == 1 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x3E0))
                     || (index == 2 && (obj->def->m_Enemy.m_wLeftArmWoundAnimFlags & 0x7C00))) {
-                    func_00243414(obj, ai, 0x24);
+                    CAI__SetMode(obj, ai, 0x24);
                     return;
                 }
             } else {
                 if ((index == 0 && (obj->def->m_Enemy.m_wRightArmWoundAnimFlags & 0x1F)) || (index == 1 && (obj->def->m_Enemy.m_wRightArmWoundAnimFlags & 0x3E0))
                     || (index == 2 && (obj->def->m_Enemy.m_wRightArmWoundAnimFlags & 0x7C00))) {
-                    func_00243414(obj, ai, 0x25);
+                    CAI__SetMode(obj, ai, 0x25);
                     return;
                 }
             }
         }
         if (ai->m_AnimRepeatedCount && (ai->m_Mode == 0x11 || ai->m_Mode == 0x12)) {
-            func_00243414(obj, ai, 4);
+            CAI__SetMode(obj, ai, 4);
         } else if (ai->m_Mode != 0x33 && (dmg->flags & 0xC00000) && (info->m_dwFlags & 0x20000)) {
-            func_00243414(obj, ai, 0x33);
+            CAI__SetMode(obj, ai, 0x33);
             pushed = 1;
         }
     }
     if (pushed && source != NULL && dmg->radius > 0.0f) {
-        func_0020EF2C(&delta, &obj->pos, &source->pos);
+        CVector3__Subtract(&delta, &obj->pos, &source->pos);
         if (func_00298470(delta.x * delta.x + delta.y * delta.y + delta.z * delta.z) < dmg->radius) {
-            func_0020EAA0(&delta);
+            CVector3__GetYaw(&delta);
         }
     }
 }

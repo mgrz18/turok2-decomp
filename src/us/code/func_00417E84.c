@@ -2,7 +2,7 @@
 
 extern s32 D_8011ACB0;
 
-s32 func_00417E84(void)
+s32 RumbleMenu_Poll(void)
 {
   s32 *new_var;
   s32 var_a0;

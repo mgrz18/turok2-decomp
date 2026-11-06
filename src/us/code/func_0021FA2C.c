@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0021FA2C(void *arg0, s32 arg1, void *arg2);
-extern char *func_002017D4(s32 *, s32);
-void func_0021FA2C(void *arg0, s32 arg1, void *arg2) {
+extern void Anim_GetBoneTranslationLerp(void *arg0, s32 arg1, void *arg2);
+extern char *CISet__GetBlock(s32 *, s32);
+void Anim_GetBoneTranslationLerp(void *arg0, s32 arg1, void *arg2) {
     ObjectLinks24 *o = arg0;
     CVector3 *out = arg2;
     ObjRecAt2V1 *indices = (void *)o->unk_0;
@@ -20,7 +20,7 @@ void func_0021FA2C(void *arg0, s32 arg1, void *arg2) {
         *out = recs[arg1].position;
         return;
     }
-    base = func_002017D4(o->translationFrames, (s32) idx);
+    base = CISet__GetBlock(o->translationFrames, (s32) idx);
     a = base + o->translationFirst;
     base = base + o->translationNext;
     scale = o->unk_20;

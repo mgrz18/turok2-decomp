@@ -3,7 +3,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80213ED4.CPP, func_80213ED4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern s32 func_0021E9F8(void *arg0, s32 arg1, s32 arg2);
+extern s32 CGameObjectInstance__SetAnim(void *arg0, s32 arg1, s32 arg2);
 struct SoundSourceNode;
 struct SoundSourceNode {
     s32 unk0;
@@ -121,11 +121,11 @@ struct StateEntry {
 };
 extern double D_800A68B8;
 extern f32 D_800B6D28;
-extern s32 func_00267024(StateCallback);
-extern s32 func_00266FC0(u32);
-extern void *func_0021EA3C(void *, void *, s32);
-extern s32 func_00219F74(void *, s32, s32);
-void func_00243170(Source110 *src, Dest *dst) {
+extern s32 IsCodePointer(StateCallback);
+extern s32 IsDataPointer(u32);
+extern void *CGameObjectInstance__PickAvailableAction(void *, void *, s32);
+extern s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
+void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
     StateEntry *entry;
     StateCallback callback;
     f32 factor;
@@ -140,14 +140,14 @@ void func_00243170(Source110 *src, Dest *dst) {
             src->state_changed = 0;
             callback = entry->callback;
             if (callback != 0) {
-                if (func_00267024(callback) != 0) {
+                if (IsCodePointer(callback) != 0) {
                     callback = callback(src, dst);
-                } else if (func_00266FC0((u32)callback) != 0) {
-                    callback = (StateCallback)func_0021EA3C(src, callback, dst->state_result);
+                } else if (IsDataPointer((u32)callback) != 0) {
+                    callback = (StateCallback)CGameObjectInstance__PickAvailableAction(src, callback, dst->state_result);
                 }
                 if (callback != 0) {
                     if (callback != (StateCallback)-1) {
-                        dst->state_result = func_00219F74(src, (s32)callback, dst->state_result);
+                        dst->state_result = CGameObjectInstance__PickRandomAnim(src, (s32)callback, dst->state_result);
                         dst->result = (s16)callback;
                         if (src->current_state == dst->state_result) {
                             src->limit = 0.0f;
@@ -187,7 +187,7 @@ void func_00243170(Source110 *src, Dest *dst) {
             factor = dst->scale * dst->entry_scale;
         }
         D_800B6D28 *= factor;
-        func_0021E9F8(src, dst->state_result, (dst->entry_flags >> 5) & 1);
+        CGameObjectInstance__SetAnim(src, dst->state_result, (dst->entry_flags >> 5) & 1);
         if ((dst->state_result != -1) && (src->previous_state != dst->state_result)) {
             dst->count = 0;
             dst->flags &= ~1U;

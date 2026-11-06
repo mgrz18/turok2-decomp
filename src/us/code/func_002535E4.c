@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-void func_002535E4(CPlayerList *arg0, f32 arg1) {
+void CPlayerPool__SetInvincibility(CPlayerList *arg0, f32 arg1) {
     CPlayer *var_v0;
 
     var_v0 = arg0->m_ActiveList.m_pHead;

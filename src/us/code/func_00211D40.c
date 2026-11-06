@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00211D40(void *arg0, void *arg1);
-s32 func_00211D40(void *arg0, void *arg1) {
+extern s32 Edge_IsPointInFront(void *arg0, void *arg1);
+s32 Edge_IsPointInFront(void *arg0, void *arg1) {
     GeometryEdge *edge = arg0;
     CVector3 *point = arg1;
     CVector3 normal;

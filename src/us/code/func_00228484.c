@@ -6,7 +6,7 @@ s32 CList__AddTail(s32, void *);                 /* extern */
 s32 CList__Remove(s32, void *);                 /* extern */
 
 /* Retires an effect: drops the owner count and moves it back to the free list. */
-void func_00228484(CInstancePool *world, CListedInstance *arg1) {
+void CInstancePool__Free(CInstancePool *world, CListedInstance *arg1) {
     s32 *temp_v1;
 
     temp_v1 = arg1->m_pOwnerCount;

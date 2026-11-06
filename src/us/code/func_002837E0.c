@@ -3,7 +3,7 @@
 
 extern Cinema *D_800C1BB0;
 
-void func_002837E0(void) {
+void Cinema__Initialize(void) {
     Cinema *p = D_800C1BB0;
 
     p->owner = 0;

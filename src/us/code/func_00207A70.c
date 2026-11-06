@@ -6,7 +6,7 @@
 
 extern u32 D_800AB880;
 extern Gfx *D_800D8E24;
-void func_00207A70(u32 mode) {
+void Render_SetCombineMode(u32 mode) {
  if (D_800AB880 != mode) {
  D_800AB880=mode;
  switch(mode) {
@@ -58,4 +58,4 @@ void func_00207A70(u32 mode) {
 extern Gfx *D_800D8E24;
 extern Gfx *D_800D8E24;
 extern Gfx *D_800D8E24;
-void func_00207A70(u32);
+void Render_SetCombineMode(u32);

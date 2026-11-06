@@ -35,10 +35,10 @@ extern f32 D_80125430[128];     /* post-twiddle cos + sin */
 extern f32 D_80125630[128];     /* post-twiddle sin - cos */
 extern f32 D_80125830[128];     /* overlap state */
 
-extern void func_002A05D4(void);                    /* mdctInitTwiddles */
-extern MdctCtx *func_002A073C(s32 n);               /* mdctFftInit */
-extern s32 func_002A08C4(f32 *out, s16 *band);      /* adecDequantize */
-extern void func_002A09E8(f32 *d, s32 n, s32 sign, f32 *cos, f32 *sin, s32 *bitrev); /* mdctFft */
+extern void mdctInitTwiddles(void);                    /* mdctInitTwiddles */
+extern MdctCtx *mdctFftInit(s32 n);               /* mdctFftInit */
+extern s32 adecDequantize(f32 *out, s16 *band);      /* adecDequantize */
+extern void mdctFft(f32 *d, s32 n, s32 sign, f32 *cos, f32 *sin, s32 *bitrev); /* mdctFft */
 
 /* out[k] = (in[2k], in[255 - 2k]) for k < 128: folds the 256 spectrum values into 128 complex points. */
 static __inline__ void mdctPackSpectrum(AdecCpx *out, f32 *in) {
@@ -64,7 +64,7 @@ static __inline__ void mdctTwiddleMul(AdecCpx *d, f32 *c, f32 *s) {
 
 /* FFT with the tables of an MdctCtx. */
 static __inline__ void mdctFftCtx(f32 *data, MdctCtx *ctx, s32 sign) {
-    func_002A09E8(data, ctx->n, sign, ctx->cos, ctx->sin, ctx->bitrev);
+    mdctFft(data, ctx->n, sign, ctx->cos, ctx->sin, ctx->bitrev);
 }
 
 /* Rounds to nearest (half away from zero) and clamps to the s16 range. */
@@ -85,18 +85,18 @@ static __inline__ s16 adecRoundClampS16(f32 x) {
 }
 
 /* Inverse MDCT of the frame in st -> 256 s16 samples in out[]. The twiddle tables and the FFT context are built on first use. */
-void func_002A0B6C(s16 *out, AdecStream *st) {
+void adecImdctFrame(s16 *out, AdecStream *st) {
     f32 buf[256];
     f32 deq[256];
     s16 k;
     f32 scale;
     if (D_800B8BB0 == 0) {
-        func_002A05D4();
-        D_80125A30 = func_002A073C(0x80);
+        mdctInitTwiddles();
+        D_80125A30 = mdctFftInit(0x80);
         D_800B8BB0 = 1;
     }
     scale = 23170.475f;
-    func_002A08C4(deq, st->band);
+    adecDequantize(deq, st->band);
     mdctPackSpectrum((AdecCpx *)buf, deq);
     mdctTwiddleMul((AdecCpx *)buf, D_80125030, D_80125230);
     mdctFftCtx(buf, D_80125A30, -1);

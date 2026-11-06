@@ -19,16 +19,16 @@ typedef struct {
 } Boss00403660;
 
 extern s32 D_800B6D1C;
-void func_0021DC84(void *actor, void *state, CDrawArgs *req);
-void func_00236324(Slot00403660 *slot);
-void func_00235898(void);
-void func_0020A33C(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
+void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
+void ScriptAnimator_Apply(Slot00403660 *slot);
+void ScreenTint_UpdateMode(void);
+void Render_DrawModel(s32 hModel, s32 model, s32 one, CLights1 *slot, s32 zero, s32 index, s32 second);
 
 static __inline__ s32 hasBit(s32 mask, s32 bit) {
     return mask & bit;
 }
 
-void func_00403660(u8 *actor, u8 *state, CDrawArgs *req) {
+void MantidQueen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
     WaveBossState *s;
     Boss00403660 *boss;
     s32 mask;
@@ -46,10 +46,10 @@ void func_00403660(u8 *actor, u8 *state, CDrawArgs *req) {
         if (hasBit(mask, bit << i)) {
             req->m_nModel = i;
             req->m_nShadowModel = i;
-            func_0021DC84(actor, state, req);
-            func_00236324(slot);
-            func_00235898();
-            func_0020A33C(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[D_800B6D1C], 0, i,
+            CGameObjectInstance__DrawShadow(actor, state, req);
+            ScriptAnimator_Apply(slot);
+            ScreenTint_UpdateMode();
+            Render_DrawModel(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[D_800B6D1C], 0, i,
                           *(s8 *) (actor + 0x151));
             D_800AB8B0.m_Mode = 0;
         }

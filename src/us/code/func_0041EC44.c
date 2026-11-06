@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0041DA28(Shared_PakMenu *menu);
+void PakMenu_UpdateNoteRows(Shared_PakMenu *menu);
 extern s32 D_80130994;
 extern s32 D_801309BC;
 extern s32 D_80130984;
@@ -18,12 +18,12 @@ extern unsigned char D_0043B6F0[];
 extern char D_0043BC6C[];
 extern char D_0043C05C[];
 extern char D_0043BC00[];
-extern void func_00426480(s32 ch);
-extern s32 func_0042655C(s32 ch);
-extern s32 func_00426594(s32 ch);
-extern s32 func_00426BD8(s32 ch);
-extern void func_00416644(char *, char *, ObjRecAt5DC *, PakMenuSlot *, char *);
-void func_0041EC44(Shared_PakMenu *menu)
+extern void Pak_ProbeSlot(s32 ch);
+extern s32 Pak_GetStatus(s32 ch);
+extern s32 Pak_IsRumblePak(s32 ch);
+extern s32 Pak_NeedsRepair(s32 ch);
+extern void MenuPool_OpenMenu(char *, char *, ObjRecAt5DC *, PakMenuSlot *, char *);
+void PakMenu_InitLoadGame(Shared_PakMenu *menu)
 {
   Shared_PakMenu *new_var3;
   int new_var;
@@ -41,33 +41,33 @@ void func_0041EC44(Shared_PakMenu *menu)
   if (D_800C2020 != 0)
   {
     D_801309BC = 1;
-    func_00416644(D_80119E2C, D_00439190, menu->player, menu->slot, 0);
+    MenuPool_OpenMenu(D_80119E2C, D_00439190, menu->player, menu->slot, 0);
     return;
   }
   menu->items[20].flags &= ~0x01000000;
-  func_00426480(menu->slot->unk4);
+  Pak_ProbeSlot(menu->slot->unk4);
   new_var = 0;
-  if (func_0042655C(ch) == new_var)
+  if (Pak_GetStatus(ch) == new_var)
   {
-    func_0041DA28(menu);
+    PakMenu_UpdateNoteRows(menu);
     return;
   }
   D_801309BC = 1;
-  if (func_00426594(ch) != new_var)
+  if (Pak_IsRumblePak(ch) != new_var)
   {
     new_var2 = D_0043BC6C;
-    func_00416644(D_80119E2C, new_var2, menu->player, menu->slot, (char *) 1);
+    MenuPool_OpenMenu(D_80119E2C, new_var2, menu->player, menu->slot, (char *) 1);
   }
   else
   {
     new_var3 = menu;
-    if (func_00426BD8(ch) != 0)
+    if (Pak_NeedsRepair(ch) != 0)
     {
-      func_00416644(D_80119E2C, D_0043C05C, new_var3->player, menu->slot, D_0043B6F0);
+      MenuPool_OpenMenu(D_80119E2C, D_0043C05C, new_var3->player, menu->slot, D_0043B6F0);
     }
     else
     {
-      func_00416644(D_80119E2C, D_0043BC00, new_var3->player, new_var3->slot, D_00439190);
+      MenuPool_OpenMenu(D_80119E2C, D_0043BC00, new_var3->player, new_var3->slot, D_00439190);
     }
   }
 }

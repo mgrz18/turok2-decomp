@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 s32 func_0020B9F4(s32, void *, void *, s32, s32); /* extern */
-s32 func_002254C0(s32 *, s32, s32);         /* extern */
+s32 CScene__GetLightsAt(s32 *, s32, s32);         /* extern */
 extern s32 D_800B6D1C;
 extern s32 D_800F7078;
 
@@ -32,7 +32,7 @@ typedef struct CRenderInst {
     /* 0x1D0 */ struct CRenderInst *next;
 } CRenderInst;
 
-void func_002328A8(CRenderInst *arg0) {
-    func_002254C0(&D_800F7078, &arg0->pos, arg0->bounds[D_800B6D1C]);
+void CParticle__DrawModel(CRenderInst *arg0) {
+    CScene__GetLightsAt(&D_800F7078, &arg0->pos, arg0->bounds[D_800B6D1C]);
     func_0020B9F4(arg0->info->unk14, arg0->mtx[D_800B6D1C], arg0->bounds[D_800B6D1C], 0, -1);
 }

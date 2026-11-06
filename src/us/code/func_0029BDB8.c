@@ -7,8 +7,8 @@ extern u64 D_80122A28;
 extern s32 D_80122A20;
 extern s32 D_80122A24;
 extern void *D_800B8930;
-extern void func_0029BDB8();
-void func_0029BDB8(void) {
+extern void __osTimerServicesInit();
+void __osTimerServicesInit(void) {
     NodeRecAt1C *node = (NodeRecAt1C *)D_800B8930;
     D_80122A28 = 0;
     D_80122A20 = 0;

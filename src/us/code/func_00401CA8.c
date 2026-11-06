@@ -5,7 +5,7 @@ typedef struct {
     /* 0x04 */ s32 state;
 } Phase;
 
-void func_00401CA8(Phase *arg0) {
+void Automap_Close(Phase *arg0) {
     s32 temp_v0;
 
     temp_v0 = arg0->state;

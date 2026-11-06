@@ -3,7 +3,7 @@
 
 extern s32 D_8011AAD8;
 
-s32 func_00454460(void) {
+s32 CheatMenu_ToggleTinyMode_2(void) {
     D_8011AAD8 ^= 0x40;
     return 0;
 }

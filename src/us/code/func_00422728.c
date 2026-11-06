@@ -3,6 +3,6 @@
 
 extern s32 D_801309C0;
 
-void func_00422728(void) {
+void PakMessage_InitInsertRumblePak(void) {
     D_801309C0 = 5;
 }

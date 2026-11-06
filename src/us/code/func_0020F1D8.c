@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void *func_0020F1D8(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2);
-void *func_0020F1D8(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2) {
+extern void *CVector3__RemoveComponent(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2);
+void *CVector3__RemoveComponent(CVector3 *arg0, CVector3 *arg1, CVector3 *arg2) {
     CVector3 tmp;
     f32 temp_f2;
     f32 temp_f4;

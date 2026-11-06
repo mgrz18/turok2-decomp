@@ -3,7 +3,7 @@
 extern f32 D_800B6D28; /* frame time scale */
 
 /* Eases *value toward target by (target - *value) * rate * D_800B6D28; snaps when rate is 1. */
-void func_002117DC(f32 *value, f32 target, f32 rate) {
+void Math_EaseToward(f32 *value, f32 target, f32 rate) {
     f32 current;
     f32 step;
 

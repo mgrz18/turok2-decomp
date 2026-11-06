@@ -17,6 +17,6 @@ static __inline__ f32 angleDelta(f32 a, f32 b) {
 #define ABS(x) (((x) < 0.0f) ? -(x) : (x))
 
 /* Absolute difference between two angles, in [0, pi]. */
-f32 func_0020EC4C(f32 a, f32 b) {
+f32 Angle_AbsDifference(f32 a, f32 b) {
     return ABS(-angleDelta(a, b));
 }

@@ -5,7 +5,7 @@
 extern f32 D_800B6D28; /* frame delta */
 
 /* Grow-in effect: ramp the scale up to 0.35 over 0.75 time units. */
-void func_002157F0(CLevelActor *obj) {
+void CLevelActor__UpdateGrowIn(CLevelActor *obj) {
     f32 t;
 
     if (obj->m_wFlags & 0x10) {

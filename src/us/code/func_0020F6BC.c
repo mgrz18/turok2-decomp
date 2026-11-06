@@ -4,7 +4,7 @@
 f32 func_00298470(f32);
 
 /* Distance between two points (func_00298470 is the square root). */
-void func_0020F6BC(CVector3 *arg0, CVector3 *arg1) {
+void CVector3__Distance(CVector3 *arg0, CVector3 *arg1) {
     f32 temp_f0;
     f32 temp_f12;
     f32 temp_f2;

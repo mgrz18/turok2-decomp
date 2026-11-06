@@ -4,15 +4,15 @@
 #include "rw/abu_types.h"
 
 extern float D_800AA520;
-extern s32 func_002964D0;
-extern s32 func_00296690;
-void func_00296340(void *arg0, void *a, void *b, s32 c);
-s32 func_002912A0(s32 a, s32 b, s32 c, s32 d, s32 e);
-void func_0029546C(ALResampler *arg0, s32 arg1) {
+extern s32 alResamplePull;
+extern s32 alResampleParam;
+void alFilterNew(void *arg0, void *a, void *b, s32 c);
+s32 alHeapDBAlloc(s32 a, s32 b, s32 c, s32 d, s32 e);
+void alResampleNew(ALResampler *arg0, s32 arg1) {
     s32 result;
     f32 k;
-    func_00296340(arg0, &func_002964D0, &func_00296690, 1);
-    result = func_002912A0(0, 0, arg1, 1, 0x20);
+    alFilterNew(arg0, &alResamplePull, &alResampleParam, 1);
+    result = alHeapDBAlloc(0, 0, arg1, 1, 0x20);
     k = D_800AA520;
     arg0->state = (void *)result;
     arg0->delta = 0;

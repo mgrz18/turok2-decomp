@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* out = a * b (4x4 float matrices). */
-void func_0020C890(CMtxF out, CMtxF a, CMtxF b) {
+void CMtxF__Multiply(CMtxF out, CMtxF a, CMtxF b) {
     out[0][0] = (f32) ((a[0][0] * b[0][0]) + (a[0][1] * b[1][0]) + (a[0][2] * b[2][0]) + (a[0][3] * b[3][0]));
     out[0][1] = (f32) ((a[0][0] * b[0][1]) + (a[0][1] * b[1][1]) + (a[0][2] * b[2][1]) + (a[0][3] * b[3][1]));
     out[0][2] = (f32) ((a[0][0] * b[0][2]) + (a[0][1] * b[1][2]) + (a[0][2] * b[2][2]) + (a[0][3] * b[3][2]));

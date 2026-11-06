@@ -12,7 +12,7 @@ struct Triple {
 struct Triple;
 typedef struct Triple Triple;
 extern void func_0042FF10(char *);
-void func_00468E0C(Triple *group) {
+void CCameraPool__ResetEmitterPools_2(Triple *group) {
     int i;
     for (i = 0; i < group->z; i++) {
         func_0042FF10((char *)(i * 0xEC0 + group->y + 0x558));

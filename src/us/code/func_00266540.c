@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_002245BC(s32 *, u16, u16, s32); /* extern */
+s32 CScene__SetInstanceSavedBitInLevel(s32 *, u16, u16, s32); /* extern */
 extern s32 D_800F7078;
 
 typedef struct {
@@ -10,6 +10,6 @@ typedef struct {
     /* 0xA */ u16 unkA;
 } Unk00264900;
 
-void func_00266540(Unk00264900 *arg0) {
-    func_002245BC(&D_800F7078, arg0->unkA, arg0->unk4, 0);
+void Action_EventIdleRemote(Unk00264900 *arg0) {
+    CScene__SetInstanceSavedBitInLevel(&D_800F7078, arg0->unkA, arg0->unk4, 0);
 }

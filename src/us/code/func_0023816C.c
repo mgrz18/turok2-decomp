@@ -3,11 +3,11 @@
 #include "structs/player.h"
 
 
-extern void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
-extern f32 func_002671B4(CPlayer *player);
+extern void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
+extern f32 GameObject_GetCollisionHeight(CPlayer *player);
 extern f32 D_800A65B0;
 
-s32 func_0023816C(CGameObjectInstance *actor, CVector3 *pos) {
+s32 Blast_GetSourcePos(CGameObjectInstance *actor, CVector3 *pos) {
     s32 ret = 0;
     CPlayer *player;
     u16 state;
@@ -21,8 +21,8 @@ s32 func_0023816C(CGameObjectInstance *actor, CVector3 *pos) {
             if (state < 2 || (s16) state == 0x22) {
                 a = *pos;
                 b = player->m_CharacterActor.header.m_vPos;
-                func_0020EF8C(pos, 0.75f, &a, &b);
-                pos->y += func_002671B4(player) * D_800A65B0;
+                CVector3__Lerp(pos, 0.75f, &a, &b);
+                pos->y += GameObject_GetCollisionHeight(player) * D_800A65B0;
                 ret = 1;
             }
         }

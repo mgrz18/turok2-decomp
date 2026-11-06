@@ -194,14 +194,14 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-void *func_002017D4(void *table, s32 index);
-u32 func_002242B4(CWorld *arg0, s32 arg1) {
+void *CISet__GetBlock(void *table, s32 index);
+u32 CScene__GetRegionIndex(CWorld *arg0, s32 arg1) {
     s32 offset;
     s32 result;
     if (arg1 == 0) {
         return -1;
     }
-    offset = ((char *)func_002017D4(arg0->m_pRegionData, 2)) + 8;
+    offset = ((char *)CISet__GetBlock(arg0->m_pRegionData, 2)) + 8;
     result = arg1 - offset;
     return (u32)result >> 5;
 }

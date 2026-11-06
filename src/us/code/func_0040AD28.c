@@ -1,6 +1,6 @@
 typedef signed int s32;
 
-s32 func_0040AD28(char *arg0, char *arg1) {
+s32 MotherBoss_PickWarpAnim(char *arg0, char *arg1) {
     s32 flags = *(s32 *) (arg1 + 0xC);
     s32 alt = flags & 2;
 

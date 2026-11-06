@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_004280E4(int channel, EntryRecAt3 *data);
-void func_004280E4(s32 channel, EntryRecAt3 *data) {
+extern void __osPfsGetOneChannelData(int channel, EntryRecAt3 *data);
+void __osPfsGetOneChannelData(s32 channel, EntryRecAt3 *data) {
     extern char D_80130E20;
     u8 *ptr;
     __OSContRequesFormatShort requestformat;

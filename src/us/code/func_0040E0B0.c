@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00243414(s32, s32, s32);
+s32 CAI__SetMode(s32, s32, s32);
 
-void func_0040E0B0(s32 arg0, CAI *arg1) {
+void BlindOne_ActorAppearUpdate(s32 arg0, CAI *arg1) {
     if (arg1->m_AnimRepeatedCount != 0) {
-        func_00243414(arg0, (s32) arg1, 2);
+        CAI__SetMode(arg0, (s32) arg1, 2);
     }
 }

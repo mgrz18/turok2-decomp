@@ -2,16 +2,16 @@
 #define STRUCTS_MODEL_H
 
 /* Drawing models: what an actor's draw callback gets (CDrawArgs, filled by
- * func_0021D39C) and the model batch (func_0020B6A0 queues one instance of a
- * model's level of detail, func_0020B7F8 / func_0020B9F4 load the model
- * first, func_0020A568 flushes the batch through its material sort tree).
+ * CGameObjectInstance__Draw) and the model batch (Render_QueueModelInstance queues one instance of a
+ * model's level of detail, Render_QueueModelByKey / func_0020B9F4 load the model
+ * first, Render_FlushModelBatch flushes the batch through its material sort tree).
  * Rage Wars has the batch in src/RENDER_4 (Render_QueueModelInstance).
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
 #include "common.h"
 
 /* An actor's draw callback (CGameObjectInstance + 0x234) gets this from
- * func_0021D39C, and passes it on to func_0021DC84 (the shadow). */
+ * CGameObjectInstance__Draw, and passes it on to CGameObjectInstance__DrawShadow (the shadow). */
 typedef struct CDrawArgs {
     /* 0x00 */ s32 m_bDraw;                 /* in the view: draw the model */
     /* 0x04 */ s32 m_bShadow;               /* near enough: draw the shadow */
@@ -27,7 +27,7 @@ typedef struct CDrawArgs {
 typedef struct CModelInstance {
     /* 0x00 */ void *m_pMatrix;
     /* 0x04 */ void *m_pLights;
-    /* 0x08 */ void *m_pTextures;           /* NULL: the model's own (func_0020A568) */
+    /* 0x08 */ void *m_pTextures;           /* NULL: the model's own (Render_FlushModelBatch) */
     /* 0x0C */ s32 m_Segment;
 } CModelInstance; /* size 0x10 */
 

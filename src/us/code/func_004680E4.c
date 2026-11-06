@@ -1,4 +1,4 @@
-/* Second VM module copy of func_0042F1C4. */
+/* Second VM module copy of Demo_Update. */
 #include "common.h"
 #include "structs/demo.h"
 
@@ -7,9 +7,9 @@ extern f32 D_800B6D28;
 extern s32 D_800F5D2C;
 
 void func_00430250(void *);
-void func_00288C5C(void *, s32);
+void CEngineApp__SetupFadeTo(void *, s32);
 
-/* func_0042F868 (here inlined) */
+/* Demo_UpdateChecksum (here inlined) */
 static __inline__ void updateChecksum(void) {
     DemoPlayer *s = &D_800F56B0;
     s32 i;
@@ -22,7 +22,7 @@ static __inline__ void updateChecksum(void) {
     s->checksum += D_800B6D20 * s->match.value * 0x87651234;
 }
 
-void func_004680E4(void) {
+void Demo_Update_2(void) {
     DemoPlayer *s = &D_800F56B0;
 
     s->fastForward = 0;
@@ -32,7 +32,7 @@ void func_004680E4(void) {
             s->done = 1;
             func_00430250(&D_800F6CB0);
             if (D_800F5D2C != 0) {
-                func_00288C5C(&D_800F6CB0, 8);
+                CEngineApp__SetupFadeTo(&D_800F6CB0, 8);
             }
         }
     }

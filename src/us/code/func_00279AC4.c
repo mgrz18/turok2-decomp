@@ -80,7 +80,7 @@ extern Gfx *D_800D8E24;
       gImmp1(0xE1, (_SHIFTL(s, 16, 16) | _SHIFTL(t, 0, 16)));                                   \
       gImmp1(0xF1, (_SHIFTL(dsdx, 16, 16) | _SHIFTL(dtdy, 0, 16))); }
 
-void func_00279AC4(u16 *image, u8 *mask, s32 x, s32 y, s32 width, s32 height, s32 s, s32 t) {
+void Hud_DrawMaskedBlockAt(u16 *image, u8 *mask, s32 x, s32 y, s32 width, s32 height, s32 s, s32 t) {
     gDPLoadMultiBlock_4b(mask, 0x100, 0, G_IM_FMT_I, width, height, 5, 5);
     gDPLoadTextureBlock_16b(image, G_IM_FMT_RGBA, width, height, 5, 5);
     gDPSetTile(G_IM_FMT_I, G_IM_SIZ_4b, width / 16, 0x100, 1);

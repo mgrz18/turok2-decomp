@@ -10,7 +10,7 @@ extern char D_800B44FC[];
 extern char D_800B4560[];
 extern s32 D_80130A30;
 
-s32 func_0042505C(MenuItem *item) {
+s32 MissionMenu_UpdateObjective1(MenuItem *item) {
     switch (D_80130A30) {
         case -1:
         case 0:

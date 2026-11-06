@@ -7,7 +7,7 @@ extern s32 D_8011001C;
 
 /* Takes a free object (when fewer than three are active, or always while
  * D_8011001C is set), makes it active and counts it in *arg1. */
-CListedInstance *func_002283FC(CInstancePool *arg0, s32 *arg1) {
+CListedInstance *CInstancePool__Alloc(CInstancePool *arg0, s32 *arg1) {
     CListedInstance *node;
 
     if (D_8011001C != 0 || (u32) arg0->m_ActiveList.m_nCount < 3) {

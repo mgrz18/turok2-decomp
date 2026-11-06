@@ -9,10 +9,10 @@ extern s32 func_00429200(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_n
 extern s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 extern s32 func_00429D1C(OSPfs *pfs);
 extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
 s32 osPfsDeleteFile_2(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name)
 {
     s32 file_no;
@@ -43,7 +43,7 @@ s32 osPfsDeleteFile_2(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name
     if (file_no == -1) {
         return 5;
     }
-    ret = func_00299680(pfs->queue, pfs->channel, pfs->dir_table + file_no, (u8 *)&dir);
+    ret = __osContRamRead(pfs->queue, pfs->channel, pfs->dir_table + file_no, (u8 *)&dir);
     if (ret != 0)
         return ret;
     startpage = dir.start_page.inode_t.page;
@@ -77,9 +77,9 @@ s32 osPfsDeleteFile_2(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name
         dir.ext_name[k] = 0;
     }
     dir.status = 0;
-    ret = func_00299A40(pfs->queue, pfs->channel, pfs->dir_table + file_no, (u8 *)&dir, 0);
+    ret = __osContRamWrite(pfs->queue, pfs->channel, pfs->dir_table + file_no, (u8 *)&dir, 0);
     return ret;
 }
 s32 func_004278CC(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank,
                   __OSInodeUnit *last_page, int flag);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);

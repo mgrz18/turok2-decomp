@@ -10,7 +10,7 @@ typedef struct {
 extern s32 D_80130920;
 
 /* Inserts the selected character at the cursor of the name entry. */
-s32 func_00453AE8(ObjRecAt14 *arg0) {
+s32 EnterCheatMenu_InsertLetter_2(ObjRecAt14 *arg0) {
     s32 index;
     s32 count;
 

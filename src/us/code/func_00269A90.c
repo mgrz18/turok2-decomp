@@ -26,13 +26,13 @@ extern int D_800F2000;
 extern int D_800F2010;
 extern int D_800B2604;
 extern int D_800B2600;
-extern void func_0020F040(f32 *arg0);
+extern void CVector3__Normalize(f32 *arg0);
 struct Node75;
 extern int D_800F2000;
 extern int D_800F2010;
 extern int D_800B2600;
 extern int D_800B2604;
-extern void func_0020EFDC(CVector3 *, CVector3 *, CVector3 *);
+extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
     CVector3 a;
     CVector3 b;
@@ -61,20 +61,20 @@ static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
         p = node->next;
         q = node->cur;
         b.z = ((CollisionBuildVertex *)p)->z - ((CollisionBuildVertex *)q)->z;
-        func_0020EFDC((CVector3 *)&D_800F2000, &b, &a);
+        CVector3__Cross((CVector3 *)&D_800F2000, &b, &a);
     }
     D_800B2600 = (int)node;
     *out = *(CVector3 *)&D_800F2000;
     return out;
 }
-CVector3 *func_00269A90(CVector3 *out, Node75 *node) {
+CVector3 *CGameRegion__GetCeilingNormal(CVector3 *out, Node75 *node) {
     if (node == 0) {
         ((CVector3 *)&D_800F2010)->x = 0;
         ((CVector3 *)&D_800F2010)->z = 0;
         ((CVector3 *)&D_800F2010)->y = D_800A7F60;
     } else if ((int)node != D_800B2604) {
         cross_edges((CVector3 *)&D_800F2010, node);
-        func_0020F040((CVector3 *)&D_800F2010);
+        CVector3__Normalize((CVector3 *)&D_800F2010);
     }
     *out = *(CVector3 *)&D_800F2010;
     D_800B2604 = (int)node;

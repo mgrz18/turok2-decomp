@@ -8,7 +8,7 @@ void CList__AddHead(CList *list, void *element);
  * newest active one is reused. It shakes cameras within `radius` of `pos`,
  * each axis by its amplitude (a tenth of the value given) with the same
  * wave type. */
-void func_0028135C(CCameraPool *pool, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos) {
+void CCameraPool__StartShake(CCameraPool *pool, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos) {
     CShake *shake = pool->m_ShakeFreeList.m_pHead;
     u8 pad[0x18];       /* stack the original keeps here, unused (an inlined helper's, most likely) */
     CVector3 at;

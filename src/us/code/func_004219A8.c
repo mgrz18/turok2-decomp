@@ -4,7 +4,7 @@
 extern s32 D_800C2028;
 extern s32 D_80130990;
 
-s32 func_004219A8(Menu *arg0, s32 *arg1) {
+s32 PakMenu_GetPlayerAndPort(Menu *arg0, s32 *arg1) {
     s32 var_a0;
     s32 var_v0;
 

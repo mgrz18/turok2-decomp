@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002A1050(float *arg0, float *arg1, float *arg2);
-void func_002A1050(float *arg0, float *arg1, float *arg2) {
+extern void mdctTwiddleMul(float *arg0, float *arg1, float *arg2);
+void mdctTwiddleMul(float *arg0, float *arg1, float *arg2) {
     short i = 0;
     do {
         float re = arg0[i * 2];

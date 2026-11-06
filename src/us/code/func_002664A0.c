@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_002664A0(void *arg0)
+void Action_ChildVanishUpdate(void *arg0)
 {
   int new_var;
   new_var = ~0x2000;

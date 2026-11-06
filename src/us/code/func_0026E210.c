@@ -4,17 +4,17 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern s32 func_00225354(struct WorldRecAt1B40C *arg0, Record14 *arg1);
+extern s32 CScene__QueueDelayedEvent(struct WorldRecAt1B40C *arg0, Record14 *arg1);
 extern CWorld D_800F7078;
-extern s32 func_00224A68(void *arg0, void *arg1, s32 arg2);
-void func_0026E210(void *arg0) {
-    extern s32 func_0026DFB0(void *arg0);
+extern s32 CScene__SetEventFired(void *arg0, void *arg1, s32 arg2);
+void LevelEvent_Trigger(void *arg0) {
+    extern s32 LevelEvent_Fire(void *arg0);
     func_80278EEC_S1 *object = arg0;
     object->unkE |= 0x10;
-    func_00224A68(&D_800F7078, arg0, 1);
+    CScene__SetEventFired(&D_800F7078, arg0, 1);
     if ((D_800F7078.m_Mode == 4) && (object->unkE & 2)) {
-        func_00225354(&D_800F7078, arg0);
+        CScene__QueueDelayedEvent(&D_800F7078, arg0);
         return;
     }
-    func_0026DFB0(arg0);
+    LevelEvent_Fire(arg0);
 }

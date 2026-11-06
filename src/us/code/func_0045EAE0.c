@@ -5,9 +5,9 @@
 extern u8 D_800C222C[];  /* pak font code -> character */
 extern u8 D_800F6750;
 
-extern void func_00285878(s32);
-extern void func_002847E0(void);
-extern void func_002858A4(void);
+extern void Controller_Lock(s32);
+extern void Controller_ReadAll(void);
+extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 /* osPfsAllocateFile, osPfsReadWriteFile, osPfsDeleteFile and the directory refresh, at this module's link addresses */
 extern s32 func_004270A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 size, s32 *file_no);
@@ -42,7 +42,7 @@ static __inline__ void EncodePakText(u8 *dst, u8 *src, s32 n) {
 }
 
 /* Writes data as a note on the pak of channel ch; returns 0, -1 on failure or -2 if the pak is not ready. */
-s32 func_0045EAE0(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u8 *ext_name, u8 *company, u8 *code) {
+s32 Pak_WriteNote_2(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u8 *ext_name, u8 *company, u8 *code) {
     s32 result;
     u8 name[16];
     u8 ext[4];
@@ -54,8 +54,8 @@ s32 func_0045EAE0(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u8 
     if (D_80130C60[ch] != 3) {
         return -2;
     }
-    func_00285878(1);
-    func_002847E0();
+    Controller_Lock(1);
+    Controller_ReadAll();
     result = D_80130C70[ch];
     D_800F6750 = 2;
     if (result == 0) {
@@ -80,6 +80,6 @@ s32 func_0045EAE0(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u8 
         }
         func_00425808(ch);
     }
-    func_002858A4();
+    Controller_Unlock();
     return result;
 }

@@ -1,11 +1,11 @@
-/* Cut fixed in versions/cuts.us.txt: func_0025398C really is 0x25398C-0x253A1C (0x90 bytes): splat cut it at 0x2539DC (.L002539DC), the loop that follows is its body. */
+/* Cut fixed in versions/cuts.us.txt: CPlayer__GetFiringAmmo really is 0x25398C-0x253A1C (0x90 bytes): splat cut it at 0x2539DC (.L002539DC), the loop that follows is its body. */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
 
 /* The ammo entry a weapon fires now: the lower ammo when selected and stocked,
  * else the first stocked one, else the last one listed. */
-AmmoInfo *func_0025398C(CPlayer *player, s32 weapon) {
+AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *player, s32 weapon) {
     AmmoInfo *ammo;
     AmmoInfo *found;
     s32 i;

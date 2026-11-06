@@ -4,31 +4,31 @@
 extern u8 D_800C894C; /* bottom of the stack */
 extern u8 D_800F7078[];
 extern CVector3 D_8011AAB4;
-s32 func_002242B4(void *world, CGameRegion *region);
-void func_0022441C(void *world, s32 index, s32 a2);
+s32 CScene__GetRegionIndex(void *world, CGameRegion *region);
+void CScene__SetLevelBit(void *world, s32 index, s32 a2);
 
 #define NEAR(p) (((p)->x - D_8011AAB4.x) * ((p)->x - D_8011AAB4.x) + ((p)->z - D_8011AAB4.z) * ((p)->z - D_8011AAB4.z) < 167772.14f)
 
 /* Marks the regions around the camera, recursing into neighbours that have
  * a corner within ~410 units of it. */
-void func_00400000(CGameRegion *region) {
+void Automap_RevealRegion(CGameRegion *region) {
     if (region == NULL || (u32) &region < (u32) &D_800C894C) {
         return;
     }
     if (!(region->m_wFlags & 0x400)) {
-        func_0022441C(D_800F7078, func_002242B4(D_800F7078, region), 1);
+        CScene__SetLevelBit(D_800F7078, CScene__GetRegionIndex(D_800F7078, region), 1);
     }
     region->m_wFlags |= 0x8400;
     if (!(NEAR(region->m_pVertices[0]) || NEAR(region->m_pVertices[1]) || NEAR(region->m_pVertices[2]))) {
         return;
     }
     if (region->m_pNeighbours[0] != NULL && !(region->m_pNeighbours[0]->m_wFlags & 0x8000) && (REGION_WORD(region->m_pNeighbours[0]) & 6) != 2) {
-        func_00400000(region->m_pNeighbours[0]);
+        Automap_RevealRegion(region->m_pNeighbours[0]);
     }
     if (region->m_pNeighbours[1] != NULL && !(region->m_pNeighbours[1]->m_wFlags & 0x8000) && (REGION_WORD(region->m_pNeighbours[1]) & 6) != 2) {
-        func_00400000(region->m_pNeighbours[1]);
+        Automap_RevealRegion(region->m_pNeighbours[1]);
     }
     if (region->m_pNeighbours[2] != NULL && !(region->m_pNeighbours[2]->m_wFlags & 0x8000) && (REGION_WORD(region->m_pNeighbours[2]) & 6) != 2) {
-        func_00400000(region->m_pNeighbours[2]);
+        Automap_RevealRegion(region->m_pNeighbours[2]);
     }
 }

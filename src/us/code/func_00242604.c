@@ -6,11 +6,11 @@
 extern CCollisionInfo D_800F1E10;
 extern CCollisionResults *D_800F1ADC;
 
-s32 func_00241E30(Sweep *ctrl, CGameObjectInstance *actor);
-s32 func_00242284(Sweep *ctrl, CGameObjectInstance *actor);
-s32 func_00241FC8(Sweep *ctrl, CGameObjectInstance *actor);
+s32 Platform_CollideGround(Sweep *ctrl, CGameObjectInstance *actor);
+s32 Platform_CollideCylinder(Sweep *ctrl, CGameObjectInstance *actor);
+s32 Platform_CollideBox(Sweep *ctrl, CGameObjectInstance *actor);
 
-void func_00242604(Sweep *ctrl, CGameObjectInstance *actor) {
+void Platform_Collide(Sweep *ctrl, CGameObjectInstance *actor) {
     CPlatformIntelligence *info;
     CCollisionInfo *def;
     s32 ok;
@@ -20,13 +20,13 @@ void func_00242604(Sweep *ctrl, CGameObjectInstance *actor) {
     if (def != &D_800F1E10 && def->m_InstanceBehavior != 0) {
         switch (info->m_CollisionType) {
             case 0:
-                ok = func_00241E30(ctrl, actor);
+                ok = Platform_CollideGround(ctrl, actor);
                 break;
             case 1:
-                ok = func_00242284(ctrl, actor);
+                ok = Platform_CollideCylinder(ctrl, actor);
                 break;
             case 2:
-                ok = func_00241FC8(ctrl, actor);
+                ok = Platform_CollideBox(ctrl, actor);
                 break;
             default:
                 ok = 0;

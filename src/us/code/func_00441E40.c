@@ -1,9 +1,9 @@
 #include "common.h"
 
-s32 func_00225D0C(s32);
+s32 CScene__UnmarkGeneratorsSaved(s32);
 
 extern s32 D_800F7078;
 
-void func_00441E40(void) {
-    func_00225D0C((s32) &D_800F7078);
+void TotemDefense_StopGenerators_2(void) {
+    CScene__UnmarkGeneratorsSaved((s32) &D_800F7078);
 }

@@ -5,6 +5,6 @@ typedef struct {
     /* 0x0C */ s32 unkC;
 } Arg;
 
-s32 func_00293028(Arg *arg) {
+s32 alSeqGetTicks(Arg *arg) {
     return arg->unkC;
 }

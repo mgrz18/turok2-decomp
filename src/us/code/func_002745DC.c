@@ -19,7 +19,7 @@ extern f32 D_800B2A30;          /* audible radius squared */
 extern f32 D_800A8190;          /* 1.0f */
 
 /* Volume attenuation of a sound by its squared distance to the camera. */
-f32 func_002745DC(SoundSpatialSource *sound, GameplayCamera *camera) {
+f32 Sound_DistanceAttenuation(SoundSpatialSource *sound, GameplayCamera *camera) {
     CVector3 *a = &sound->position;
     CVector3 *b = &camera->position;
     f32 dx = a->x - b->x;

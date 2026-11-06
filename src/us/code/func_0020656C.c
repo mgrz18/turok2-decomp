@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0020656C(s32, s32);
+extern void CCache__ClearDisplayListLocks(s32, s32);
 extern s32 D_800D81D0;
 extern s32 D_800D8DA4[];
 extern int D_800AB0C0;
-void func_0020656C(s32 arg0, s32 arg1)
+void CCache__ClearDisplayListLocks(s32 arg0, s32 arg1)
 {
   s32 mask;
   u32 count;

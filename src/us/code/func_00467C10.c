@@ -1,4 +1,4 @@
-/* Second VM module copy of func_0042ECF0 (same source, linked 0xE0 lower). */
+/* Second VM module copy of Demo_DecodeButtons (same source, linked 0xE0 lower). */
 #include "common.h"
 #include "structs/demo.h"
 
@@ -11,7 +11,7 @@ static __inline__ s32 readBit(DemoStream *r) {
 }
 
 /* Reads a nine-bit code, its bits stored in a scrambled order, then decodes it. */
-void func_00467C10(DemoStream *r) {
+void Demo_DecodeButtons_2(DemoStream *r) {
     r->value = readBit(r) << 15;
     r->value |= readBit(r) << 14;
     r->value |= readBit(r) << 4;

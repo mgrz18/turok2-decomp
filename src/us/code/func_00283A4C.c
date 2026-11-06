@@ -15,14 +15,14 @@ extern s32 D_8011002C;
 extern s32 D_80110048;              /* world +0x18FD0: selectionValues */
 extern s32 D_8011004C;
 
-void func_0042AC0C(void *world, s32 id, s32 flags);
-s32 func_002242F8(void *world, s32 region);
-void func_0024CF58(CPlayer *player, CPlayer *other);
+void CScene__LoadLevel(void *world, s32 id, s32 flags);
+s32 CScene__GetRegion(void *world, s32 region);
+void CPlayer__UpdateOrbitCamera(CPlayer *player, CPlayer *other);
 
-/* Puts the current player back where func_002838A4 saw it start (once,
+/* Puts the current player back where Cinema_Start saw it start (once,
  * when D_8011AC88 is 13 and a start was saved), warping there first if
  * needed; any other D_8011AC88 drops the saved start. */
-void func_00283A4C(void) {
+void Cinema_RestorePlayer(void) {
     void *world;
     CPlayer *player;
     CVector3 pos;
@@ -47,7 +47,7 @@ void func_00283A4C(void) {
         rotY = D_800C1BB0->startRotY;
         region = D_800C1BB0->startRegion;
         if (D_80110020 != warp) {
-            func_0042AC0C(world, warp, 1);
+            CScene__LoadLevel(world, warp, 1);
         }
         player = D_80119890;
         D_80110024 = 0;
@@ -58,8 +58,8 @@ void func_00283A4C(void) {
         if (player != NULL) {
             player->m_CharacterActor.header.m_vPos = pos;
             player->m_CharacterActor.m_RotY = rotY;
-            player->m_CharacterActor.header.m_pCurrentRegion = func_002242F8(world, region);
-            func_0024CF58(player, player);
+            player->m_CharacterActor.header.m_pCurrentRegion = CScene__GetRegion(world, region);
+            CPlayer__UpdateOrbitCamera(player, player);
         }
         D_800C1BB0->saveStart = 0;
         D_800C1BB0->startLevel = -1;

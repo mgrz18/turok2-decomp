@@ -57,14 +57,14 @@ struct func_80237E70_G1 {
 };
 struct func_80237E70_G1;
 typedef struct func_80237E70_G1 func_80237E70_G1;
-extern void func_0021A658(char *, CVector3 *);
+extern void CGameObjectInstance__MoveWithCollision(char *, CVector3 *);
 typedef struct CollisionInfo CollisionInfo;
 extern CollisionInfo D_800F1EB0;
 extern func_80237E70_G1 D_800F1CE0;
-extern s32 func_00239F00(void *arg0, CVector3 arg1, CollisionInfo *arg2);
-extern void func_0026E19C(s32 arg0, s32 arg1, void *arg2);
-extern void func_0026E110(void *arg0, s32 arg1, void *arg2);
-void func_0021A658(char *arg0, CVector3 *arg1) {
+extern s32 Collision_MoveInstance(void *arg0, CVector3 arg1, CollisionInfo *arg2);
+extern void CGameRegion__FireTriggers(s32 arg0, s32 arg1, void *arg2);
+extern void GameObject_FireTriggers(void *arg0, s32 arg1, void *arg2);
+void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
     CollisionInfo *collision;
     u16 *old_contact;
     s32 collided;
@@ -80,7 +80,7 @@ void func_0021A658(char *arg0, CVector3 *arg1) {
             ((ObjectStateC *)(collision))->unk_8.v1 = 0;
         }
         old_contact = ((ObjectLinks23C *)(arg0))->unk_14;
-        collided = func_00239F00(arg0, *arg1, collision);
+        collided = Collision_MoveInstance(arg0, *arg1, collision);
         if (old_contact != ((ObjectLinks23C *)(arg0))->unk_14) {
             ((ObjectLinks23C *)(arg0))->unk_1F4 = old_contact;
         }
@@ -88,13 +88,13 @@ void func_0021A658(char *arg0, CVector3 *arg1) {
         if (old_contact != 0 && ((ObjectLinks23C *)(arg0))->unk_14 != 0 &&
                 *old_contact != *((ObjectLinks23C *)(arg0))->unk_14 &&
                 *((ObjectLinks23C *)(arg0))->unk_18 == 1) {
-            func_0026E19C((s32)old_contact, 0x80, arg0);
-            func_0026E19C((s32)((ObjectLinks23C *)(arg0))->unk_14, 0x40, arg0);
+            CGameRegion__FireTriggers((s32)old_contact, 0x80, arg0);
+            CGameRegion__FireTriggers((s32)((ObjectLinks23C *)(arg0))->unk_14, 0x40, arg0);
         }
         if (collided != 0 && !(((ObjectLinks23C *)(arg0))->unk_100 & 0x300000) &&
                 *((ObjectLinks23C *)(arg0))->unk_18 == 1 && D_800F1CE0.unk0 != 0 &&
                 *D_800F1CE0.unk0 == 1) {
-            func_0026E110(D_800F1CE0.unk0, 0x20, arg0);
+            GameObject_FireTriggers(D_800F1CE0.unk0, 0x20, arg0);
         }
         callback = ((struct CallbackState288 *) ((char *) arg0))->callback;
         if (callback != 0) {

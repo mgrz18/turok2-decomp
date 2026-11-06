@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern void func_00264B0C(void *obj, void *state, f32 *out);
-extern s32 func_00219F74(void *actor, s32 action, s32 skip);
-extern void func_0020EF8C(f32 *out, f32 t, f32 *from, f32 *to);
-extern void func_00243414(void *obj, void *state, s32 mode);
+extern void Throwable_GetCarryPoint(void *obj, void *state, f32 *out);
+extern s32 CGameObjectInstance__PickRandomAnim(void *actor, s32 action, s32 skip);
+extern void CVector3__Lerp(f32 *out, f32 t, f32 *from, f32 *to);
+extern void CAI__SetMode(void *obj, void *state, s32 mode);
 
 extern f32 D_800B6D28; /* frame time scale */
 extern s8 D_800F1F94;
@@ -20,7 +20,7 @@ typedef struct {
     /* 0x114 */ f32 tiltHeading;
 } OwnedState;
 
-void func_00264DF0(CGameObjectInstance *obj, OwnedState *state) {
+void Throwable_PickedUpUpdate(CGameObjectInstance *obj, OwnedState *state) {
     f32 target[3];
     s32 anim;
     CGameObjectInstance *owner = state->owner;
@@ -29,16 +29,16 @@ void func_00264DF0(CGameObjectInstance *obj, OwnedState *state) {
     if (owner == NULL) {
         return;
     }
-    anim = func_00219F74(owner, 10000, -1);
+    anim = CGameObjectInstance__PickRandomAnim(owner, 10000, -1);
     if (owner->m_CurrentAnimation.m_nAnimIndex == anim
         && owner->m_CurrentAnimation.m_nFrames * 0.3f <= owner->m_CurrentAnimation.m_AnimationFrame) {
-        func_00264B0C(obj, state, target);
+        Throwable_GetCarryPoint(obj, state, target);
         state->tiltHeading = owner->m_RotY - obj->m_RotY;
         state->blend += D_800B6D28 * 0.25f;
         if (state->blend > 1.0f) {
             state->blend = 1.0f;
         }
-        func_0020EF8C(state->pos, state->blend, &obj->header.m_vPos.x, target);
+        CVector3__Lerp(state->pos, state->blend, &obj->header.m_vPos.x, target);
         if (owner->m_CurrentAnimation.m_AnimationFrame < owner->m_CurrentAnimation.m_nFrames * 0.5f) {
             state->tiltAngle += 0.087266475f;
         } else {
@@ -46,6 +46,6 @@ void func_00264DF0(CGameObjectInstance *obj, OwnedState *state) {
         }
     }
     if (owner != NULL && owner->m_AI.m_Mode != 0x15) {
-        func_00243414(obj, state, 2);
+        CAI__SetMode(obj, state, 2);
     }
 }

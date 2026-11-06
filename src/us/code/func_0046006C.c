@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_0046006C(s32 arg0) {
+s32 Char_ToLower_2(s32 arg0) {
     s32 var_a0;
 
     var_a0 = arg0;

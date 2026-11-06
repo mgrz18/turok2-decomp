@@ -3,21 +3,21 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00284468(s32 unused);
-extern void func_00284080();
-extern int func_00284174(void);
-extern void func_002844F0(void);
-extern void func_002052D8(void *arg0, void *arg1);
-void func_00284080(void) {
+extern void Cinema_RunEnd(s32 unused);
+extern void Cinema_Stop();
+extern int Cinema_IsActive(void);
+extern void Cinema_Close(void);
+extern void CCache__Deallocate(void *arg0, void *arg1);
+void Cinema_Stop(void) {
     extern void *D_800C1BB0;
-    if (func_00284174() != 0) {
+    if (Cinema_IsActive() != 0) {
         s32 temp_a1;
         Shared_MenuContext *record;
-        func_00284468(1);
-        func_002844F0();
+        Cinema_RunEnd(1);
+        Cinema_Close();
         temp_a1 = (s32)((Shared_MenuContext *)D_800C1BB0)->owner;
         if (temp_a1 != 0) {
-            func_002052D8(0, temp_a1);
+            CCache__Deallocate(0, temp_a1);
         }
         record = D_800C1BB0;
         record->owner = 0;
@@ -27,4 +27,4 @@ void func_00284080(void) {
         record->unknown60 = 0;
     }
 }
-int func_00284174(void);
+int Cinema_IsActive(void);

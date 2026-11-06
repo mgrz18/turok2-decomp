@@ -39,7 +39,7 @@ static __inline__ void *modePage(s32 *mode) {
     return page;
 }
 
-void *func_00456B7C(Menu *event) {
+void *PakMenu_GetReturnMenu_2(Menu *event) {
     void *page = NULL;
     s32 mode;
 

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/cache.h"
 
-s32 func_002065CC(s32, s32);
+s32 CCache__TouchMemEntry(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
@@ -10,7 +10,7 @@ void __osRestoreInt(s32);
 extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
-void func_00205110(s32 arg0, CMemEntry *arg1) {
+void CCache__TouchAndLock(s32 arg0, CMemEntry *arg1) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v1;
@@ -25,7 +25,7 @@ void func_00205110(s32 arg0, CMemEntry *arg1) {
     } else {
         __osRestoreInt(temp_a0);
     }
-    func_002065CC(0, (s32) arg1);
+    CCache__TouchMemEntry(0, (s32) arg1);
     arg1->lockCount = (s32) (arg1->lockCount + 1);
     arg1->flags = (s32) (arg1->flags | 0x100);
     temp_v0 = __osDisableInt();

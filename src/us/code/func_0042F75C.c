@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/demo.h"
 
-void func_0042EC30(DemoStream *);
+void Demo_ReadRunLength(DemoStream *);
 
 /* Reads count bits, most significant first. */
 static __inline__ s32 readBits(DemoStream *r, s32 count) {
@@ -16,7 +16,7 @@ static __inline__ s32 readBits(DemoStream *r, s32 count) {
     return v;
 }
 
-void func_0042F75C(DemoStream *t) {
+void Demo_DecodeStick(DemoStream *t) {
     t->value = readBits(t, 8);
-    func_0042EC30(t);
+    Demo_ReadRunLength(t);
 }

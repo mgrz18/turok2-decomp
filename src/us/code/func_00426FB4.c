@@ -1,8 +1,8 @@
-/* WRONG CUT: REAL func_00426FB4 size 0x48 (splat cut it into func_00426FB4 + func_00426FC4). */
+/* WRONG CUT: REAL Str_CompareN size 0x48 (splat cut it into Str_CompareN + func_00426FC4). */
 #include "common.h"
 
 /* strncmp. */
-s32 func_00426FB4(u8 *a, u8 *b, s32 n) {
+s32 Str_CompareN(u8 *a, u8 *b, s32 n) {
     if (n == 0) {
         return 0;
     }

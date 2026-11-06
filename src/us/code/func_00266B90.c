@@ -2,7 +2,7 @@
 #include "common.h"
 
 /* memmove: bytes unless everything is 4-aligned, then words. */
-void func_00266B90(u8 *dst, u8 *src, s32 len) {
+void memmove(u8 *dst, u8 *src, s32 len) {
     u8 *d;
     u8 *s;
     s32 *dw;

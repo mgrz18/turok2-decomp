@@ -6,7 +6,7 @@
 #include "structs/menu.h"
 
 extern CPlayerOptions D_8011AB18;
-s32 func_0041C764(void *unused, Menu *menu) {
+s32 OptionsMenu_ToggleWeaponSelect(void *unused, Menu *menu) {
     CPlayerOptions *settings = &D_8011AB18;
     if (menu->player != 0) {
         settings = menu->player->m_pOptions;

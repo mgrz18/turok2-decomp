@@ -5,7 +5,7 @@ s32 CList__AddTail(void *, s32);                 /* extern */
 s32 CList__Remove(void *, s32);                 /* extern */
 
 /* Takes the first free emitter and moves it to the active list. */
-s32 func_002836E4(CEmitterPool *arg0) {
+s32 CEmitterPool__TakeEmitter(CEmitterPool *arg0) {
     s32 temp_s0;
 
     temp_s0 = (s32) arg0->m_FreeList.m_pHead;

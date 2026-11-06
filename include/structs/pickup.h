@@ -2,11 +2,11 @@
 #define STRUCTS_PICKUP_H
 
 /* A pickup's effect descriptor, what the pickup handlers get
- * (func_0023ECF8 weapons, func_0023F120 / func_0023F21C / func_0023F300
- * ammo, func_0023F3E4 health, func_0023F524 life force, func_0023F634 the
+ * (Pickup_GiveWeapon weapons, Pickup_GiveAmmo / func_0023F21C / func_0023F300
+ * ammo, Pickup_GiveHealth health, Pickup_GiveLifeForce life force, Pickup_GiveItem the
  * items by m_Id): the feedback (the screen flash, then the optional
  * message, sound and callback) and what the pickup gives, which each kind
- * reads its own way (m_Params). func_00253B54 gives ammo (type, amount).
+ * reads its own way (m_Params). CPlayer__AddAmmo gives ammo (type, amount).
  * Rage Wars: src/MENU/802ABDBC_11.CPP (the pickup feedback).
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
@@ -37,9 +37,9 @@ typedef union {
 
 typedef struct CPickupEntry {
     /* 0x00 */ void *m_pMessage;            /* shown on the player's camera */
-    /* 0x04 */ s16 m_Id;                    /* which item (func_0023F634) */
+    /* 0x04 */ s16 m_Id;                    /* which item (Pickup_GiveItem) */
     /* 0x06 */ s16 m_Sound;
-    /* 0x08 */ s16 m_Callback;              /* func_0027580C */
+    /* 0x08 */ s16 m_Callback;              /* Sound__PlaySpeech */
     /* 0x0A */ u8 _padA[2];
     /* 0x0C */ CPickupParams m_Params;
 } CPickupEntry; /* size 0x14 */

@@ -11,12 +11,12 @@ extern char D_800B48D4[];
 extern char D_800B48E0[];
 extern char D_800C1404[];
 
-extern s32 func_00425E74(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, void *a6, void *a7);
-extern s32 func_00426E3C(char *s, s32 n);
-extern void func_00426E04(char *dst, char *src);
-extern void func_0029E3E0(char *dst, char *fmt, s32 value);
+extern s32 Pak_FindNote(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, void *a6, void *a7);
+extern s32 Pak_TextHasInvalidChar(char *s, s32 n);
+extern void Str_Copy(char *dst, char *src);
+extern void sprintf(char *dst, char *fmt, s32 value);
 
-s32 func_0041FB50(MenuItem *item, Menu *c) {
+s32 PakMenu_NoteText(MenuItem *item, Menu *c) {
     char name[16];
     char ext[8];
     u8 unk38[8];
@@ -39,14 +39,14 @@ s32 func_0041FB50(MenuItem *item, Menu *c) {
     } else {
         slot = c->controller->port;
     }
-    r = func_00425E74(slot, note, &used, name, ext, &size, unk38, unk40);
+    r = Pak_FindNote(slot, note, &used, name, ext, &size, unk38, unk40);
     if (used != 0 && r == 0) {
-        if (func_00426E3C(name, 16) != 0) {
-            func_00426E04(name, D_800B48D4);
+        if (Pak_TextHasInvalidChar(name, 16) != 0) {
+            Str_Copy(name, D_800B48D4);
         }
     } else {
-        func_00426E04(name, D_800B48E0);
-        func_00426E04(ext, D_800B48E0);
+        Str_Copy(name, D_800B48E0);
+        Str_Copy(ext, D_800B48E0);
         size = 0;
     }
     /* copy the name and the extension, padding with spaces after the terminator */
@@ -76,6 +76,6 @@ s32 func_0041FB50(MenuItem *item, Menu *c) {
         *dst++ = ch;
     }
     *dst += 2;
-    func_0029E3E0(dst, D_800C1404, size);
+    sprintf(dst, D_800C1404, size);
     return 0;
 }

@@ -5,8 +5,8 @@
 
 extern char D_800AA380;
 extern char D_800AA384;
-extern void func_0029B020(void *arg0, void *arg1, s32 arg2);
-void *func_00292640(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
+extern void __assert(void *arg0, void *arg1, s32 arg2);
+void *__lookupSoundQuick(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 high;
     s32 low;
     s32 middle;
@@ -19,7 +19,7 @@ void *func_00292640(void *arg0, s32 arg1, s32 arg2, s32 arg3) {
     high = table->soundCount;
     low = 1;
     if (table == 0) {
-        func_0029B020(&D_800AA380, &D_800AA384, 0x376);
+        __assert(&D_800AA380, &D_800AA384, 0x376);
     }
     if (high > 0) {
         x = arg1;

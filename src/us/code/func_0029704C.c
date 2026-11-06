@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern Acmd *func_0029704C(ALFx *, s16 *, s32, s32, Acmd *);
-Acmd *func_0029704C(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
+extern Acmd *_loadBuffer(ALFx *, s16 *, s32, s32, Acmd *);
+Acmd *_loadBuffer(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
 {
-    extern u32 func_0029BF80(void *);
+    extern u32 osVirtualToPhysical(void *);
     Acmd *ptr = p;
     s32 after_end, before_end;
     s16 *updated_ptr, *delay_end;
@@ -18,12 +18,12 @@ Acmd *func_0029704C(ALFx *r, s16 *curr_ptr, s32 buff, s32 count, Acmd *p)
         after_end = updated_ptr - delay_end;
         before_end = delay_end - curr_ptr;
         { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(buff) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(before_end << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(func_0029BF80(curr_ptr)); };
+        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(osVirtualToPhysical(curr_ptr)); };
         { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(buff + (before_end << 1)) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(after_end << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(func_0029BF80(r->base)); };
+        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(osVirtualToPhysical(r->base)); };
     } else {
         { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(buff) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(count << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(func_0029BF80(curr_ptr)); };
+        { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)(osVirtualToPhysical(curr_ptr)); };
     }
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(count << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
     return ptr;

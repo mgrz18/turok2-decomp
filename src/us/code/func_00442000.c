@@ -9,10 +9,10 @@
  * state starts. */
 
 extern u8 D_00431D74[];
-extern void func_0040BDD0(void *obj, void *sound, s32 a2);
-extern void func_00243414(void *obj, CAI *ai, s32 state);
+extern void MotherBoss_StartSpotAnims(void *obj, void *sound, s32 a2);
+extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
-void func_00442000(void *obj, CAI *ai, DamageEvent *hit) {
+void MotherBoss_Hurt_2(void *obj, CAI *ai, DamageEvent *hit) {
     MotherBossState *state;
     HitFrame *part;
     s32 mask;
@@ -105,7 +105,7 @@ void func_00442000(void *obj, CAI *ai, DamageEvent *hit) {
     idx = state->slots[slot].health >= hit->damage ? hit->damage : state->slots[slot].health;
     state->slots[slot].health -= idx;
     state->health -= idx;
-    func_0040BDD0(obj, D_00431D74, sound);
+    MotherBoss_StartSpotAnims(obj, D_00431D74, sound);
     if (state->slots[slot].health > 0) {
         return;
     }
@@ -113,10 +113,10 @@ void func_00442000(void *obj, CAI *ai, DamageEvent *hit) {
         state->partsLeft--;
         switch (group) {
             case 0:
-                func_00243414(obj, ai, 7);
+                CAI__SetMode(obj, ai, 7);
                 break;
             case 1:
-                func_00243414(obj, ai, 8);
+                CAI__SetMode(obj, ai, 8);
                 break;
         }
     }
@@ -128,13 +128,13 @@ void func_00442000(void *obj, CAI *ai, DamageEvent *hit) {
     if (state->liveMask == 0) {
         switch (state->phase) {
             case 0:
-                func_00243414(obj, ai, 9);
+                CAI__SetMode(obj, ai, 9);
                 break;
             case 1:
-                func_00243414(obj, ai, 0x13);
+                CAI__SetMode(obj, ai, 0x13);
                 break;
             case 2:
-                func_00243414(obj, ai, 0x1E);
+                CAI__SetMode(obj, ai, 0x1E);
                 break;
         }
     }

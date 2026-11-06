@@ -7,7 +7,7 @@ typedef struct {
     /* 0x24C */ f32 sortKey;
 } SortedActor;
 
-s32 func_004035CC(SortedActor **arg0, SortedActor **arg1) {
+s32 MantidQueen_SortCompare(SortedActor **arg0, SortedActor **arg1) {
     s32 var_v0;
 
     var_v0 = 1;

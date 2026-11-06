@@ -7,31 +7,31 @@
 
 extern f32 D_800B6D28; /* frame delta */
 
-extern void func_00246108(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void func_00245BAC(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
-extern void func_00243414(CGameObjectInstance *actor, CAI *ai, s32 anim);
-extern void func_0025D308(CGameObjectInstance *actor, CAI *ai);
+extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
+extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
+extern void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai);
 
-void func_0025DDBC(CGameObjectInstance *actor, CAI *ai) {
+void EnemyMode_Combo_Update(CGameObjectInstance *actor, CAI *ai) {
     CAITargets t;
     f32 angle;
 
-    func_00246108(actor, ai, &t, 0, 1);
+    AI_UpdateTargets(actor, ai, &t, 0, 1);
     angle = 0.261799425f;
     if (ai->m_ModeBefore == 1 || ai->m_ModeBefore == 2) {
         angle = 1.0471977f;
     }
-    func_00245BAC(actor, ai, angle * 2.0f, t.m_Sight.m_Angle);
+    AI_TurnClamped(actor, ai, angle * 2.0f, t.m_Sight.m_Angle);
     if (ai->m_AnimType >= 4400 && ai->m_AnimType < 4555) {
         ai->m_dwFlags |= 0x4000000;
     }
     ai->m_ConditionTimer -= D_800B6D28;
     if (ai->m_AnimRepeatedCount != 0) {
         if (!(ai->m_dwFlags & 0x4000000)) {
-            func_00243414(actor, ai, 0xA);
+            CAI__SetMode(actor, ai, 0xA);
             actor->m_dwFlags |= 0x20000;
         } else if (ai->m_ConditionTimer <= 0.0f) {
-            func_00243414(actor, ai, 0x14);
+            CAI__SetMode(actor, ai, 0x14);
             actor->m_dwFlags |= 0x20000;
         } else {
             ai->m_dwFlags &= ~0x4000000;
@@ -39,6 +39,6 @@ void func_0025DDBC(CGameObjectInstance *actor, CAI *ai) {
         }
     }
     if (ai->m_ConditionTimer > 15.0f) {
-        func_0025D308(actor, ai);
+        EnemyAI_TryDodge(actor, ai);
     }
 }

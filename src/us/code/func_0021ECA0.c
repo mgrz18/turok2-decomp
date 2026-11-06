@@ -13,9 +13,9 @@ typedef struct Owner {
 } Owner;
 
 extern s32 D_800B6D1C;
-extern void func_0021D7BC(Owner *arg0, s32 arg1, s32 arg2);
+extern void CGameObjectInstance__DrawModel(Owner *arg0, s32 arg1, s32 arg2);
 
-void func_0021ECA0(Owner *arg0, s32 arg1, s32 arg2, Slot24 *src) {
+void CGameObjectInstance__DrawModelWithLights(Owner *arg0, s32 arg1, s32 arg2, Slot24 *src) {
     arg0->slots[D_800B6D1C] = *src;
-    func_0021D7BC(arg0, arg1, arg2);
+    CGameObjectInstance__DrawModel(arg0, arg1, arg2);
 }

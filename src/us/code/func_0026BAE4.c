@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0026BAE4(void *arg0);
+extern void UnpackScaledVec4(void *arg0);
 extern float D_800A7FE8;
-void func_0026BAE4(void *arg0) {
+void UnpackScaledVec4(void *arg0) {
     s32 *ip = (s32 *)arg0;
     f32 *fp = (f32 *)arg0;
     f32 scale = D_800A7FE8;

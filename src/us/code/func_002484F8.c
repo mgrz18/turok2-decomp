@@ -2,12 +2,12 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-s32 func_0026EFB8(s32 who);
+s32 Level_GetHub(s32 who);
 
 /* A full refill from player who (1-6): kind 0 tops up the ammo of every
  * weapon the player owns, kind 1 the health to 100; returns whether
  * anything was given, and if so notes who gave it. */
-s32 func_002484F8(CPlayer *p, s32 kind, s32 who) {
+s32 CPlayer__RefillFrom(CPlayer *p, s32 kind, s32 who) {
     s32 given = 0;
     s32 slot;
     s32 any;
@@ -17,7 +17,7 @@ s32 func_002484F8(CPlayer *p, s32 kind, s32 who) {
     AmmoInfo *info;
     s16 *ammo;
 
-    slot = func_0026EFB8(who);
+    slot = Level_GetHub(who);
     if (slot < 1 || slot > 6) {
         return given;
     }

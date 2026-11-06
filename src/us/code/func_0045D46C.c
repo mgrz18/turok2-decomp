@@ -1,16 +1,16 @@
-/* Second-module copy of func_0042454C (first module; this one at link address 0x0042446C), calling this module's own functions at their link addresses. */
+/* Second-module copy of Video_UpdateResolution (first module; this one at link address 0x0042446C), calling this module's own functions at their link addresses. */
 #include "common.h"
 
-s32 func_00266B80(void); /* osGetMemSize */
+s32 GetMemSize(void); /* osGetMemSize */
 void func_00423D30(void);
 
 extern s32 D_800C2038; /* current video mode */
 extern s32 D_800C203C; /* applied video mode */
 extern s32 D_800C2040;
 
-void func_0045D46C(void) {
+void Video_UpdateResolution_2(void) {
     if (D_800C2038 == -1) {
-        if (func_00266B80() != 0x400000) {
+        if (GetMemSize() != 0x400000) {
             D_800C2038 = 1;
         } else {
             D_800C2038 = 0;

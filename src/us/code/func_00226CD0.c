@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00226CD0(RenderSortRecord *left, RenderSortRecord *right);
-void func_00226CD0(RenderSortRecord *left, RenderSortRecord *right) {
+extern void SortRecord_Swap(RenderSortRecord *left, RenderSortRecord *right);
+void SortRecord_Swap(RenderSortRecord *left, RenderSortRecord *right) {
     RenderSortRecord temporary = *left;
     *left = *right;
     *right = temporary;

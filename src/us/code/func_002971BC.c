@@ -9,8 +9,8 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-s32 func_0029BF80(s32);
-void *func_002971BC(void *arg0, s32 arg1, s32 arg2, void *arg3)
+s32 osVirtualToPhysical(s32);
+void *_filterBuffer(void *arg0, s32 arg1, s32 arg2, void *arg3)
 {
   s32 temp_a1;
   void *var_s0;
@@ -25,10 +25,10 @@ void *func_002971BC(void *arg0, s32 arg1, s32 arg2, void *arg3)
   *((s32 *) (((s8 *) var_s0) + 0)) = (s32) (temp_a1 | 0x08000000);
   *((s32 *) (((s8 *) var_s0) + 4)) = (s32) ((temp_a1 << 0x10) | ((arg2 * 2) & 0xFFFF));
   *((s32 *) (((s8 *) var_s0) + 8)) = 0x0B000020;
-  *((s32 *) (((s8 *) var_s0) + 0xC)) = func_0029BF80(var_s2 + 8);
+  *((s32 *) (((s8 *) var_s0) + 0xC)) = osVirtualToPhysical(var_s2 + 8);
   *((s32 *) (((s8 *) var_s0) + 0x10)) = (s32) (((*((u8 *) (((s8 *) var_s2) + 0x2F))) << 0x10) | ((*((u16 *) (((s8 *) var_s2) + 2))) | new_var2));
   var_s1 = var_s0 + 0x18;
-  *((s32 *) (((s8 *) var_s0) + 0x14)) = func_0029BF80(*((s32 *) (((s8 *) var_s2) + 0x28)));
+  *((s32 *) (((s8 *) var_s0) + 0x14)) = osVirtualToPhysical(*((s32 *) (((s8 *) var_s2) + 0x28)));
   *((s32 *) ((new_var = (s8 *) var_s2) + 0x2C)) = 0;
   return var_s1;
 }

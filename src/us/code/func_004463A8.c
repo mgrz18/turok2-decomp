@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040D3A8 (src/us/code/func_0040D3A8.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_PhaseGroup3Update (src/us/code/BlindOne_PhaseGroup3Update.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -33,7 +33,7 @@ static __inline__ void nextPhase(BlindOneState *state) {
     }
 }
 
-void func_004463A8(BlindOneState *state) {
+void BlindOne_PhaseGroup3Update_2(BlindOneState *state) {
     s32 done = 1;
     s32 i;
 

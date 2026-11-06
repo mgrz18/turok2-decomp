@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern float D_800A54F4;
-void func_0020D6F8(f32 *dst, PackedMatrixWords *src) {
+void CMtxF__FromMtx(f32 *dst, PackedMatrixWords *src) {
     u32 upper;
     u32 lower;
     f32 scale = D_800A54F4;

@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern s32 func_00259E60(void *, s32, void *);
+extern s32 EnemyAnim_Idle_AF6F0(void *, s32, void *);
 
-s32 func_0025EFF8(CGameObjectInstance *arg0, s32 arg1) {
+s32 EnemyAnim_WaitForTrigger(CGameObjectInstance *arg0, s32 arg1) {
     u16 kind;
     CEnemyIntelligence *sub;
 
@@ -18,7 +18,7 @@ s32 func_0025EFF8(CGameObjectInstance *arg0, s32 arg1) {
             case 0x2B3E:
                 break;
             default:
-                return func_00259E60(arg0, arg1, sub);
+                return EnemyAnim_Idle_AF6F0(arg0, arg1, sub);
         }
     }
     return sub->m_StartAnim;

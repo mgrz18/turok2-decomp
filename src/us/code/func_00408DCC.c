@@ -5,7 +5,7 @@ extern CListedInstance *D_8010FEB4;  /* active actors */
 
 extern u8 *D_80119890;          /* current player */
 
-void func_00408DCC(void) {
+void TotemDefense_StopEnemies(void) {
     CListedInstance *actor;
 
     *(f32 *) (D_80119890 + 0xAAC) = 450.0f;

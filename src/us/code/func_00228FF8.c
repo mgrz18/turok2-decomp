@@ -3,7 +3,7 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 /* Blend a colour toward its brightest channel by percent (0..100). */
-void func_00228FF8(u8 percent, u8 r, u8 g, u8 b, u8 *outR, u8 *outG, u8 *outB) {
+void Color_Saturate(u8 percent, u8 r, u8 g, u8 b, u8 *outR, u8 *outG, u8 *outB) {
     s32 keep;
     s32 peak;
 

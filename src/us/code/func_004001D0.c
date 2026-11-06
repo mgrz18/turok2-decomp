@@ -19,11 +19,11 @@ typedef struct {
 } Look004001D0;
 
 extern f32 D_800B6D28;
-CPlayer *func_002532A8(CPlayerList *list);
-s32 func_00416AF8(u8 *a0);
-void func_002117DC(f32 *value, f32 target, f32 rate);
+CPlayer *CPlayerPool__GetFirstActive(CPlayerList *list);
+s32 MenuPool_CountOpen(u8 *a0);
+void Math_EaseToward(f32 *value, f32 target, f32 rate);
 
-void func_004001D0(Look004001D0 *look) {
+void Automap_Update(Look004001D0 *look) {
     CPlayer *player;
     s32 held;
     GameSettings *sub = &D_80119870.m_Settings;
@@ -31,12 +31,12 @@ void func_004001D0(Look004001D0 *look) {
     if (sub->multiplayer) {
         return;
     }
-    player = func_002532A8(&D_80119870.m_PlayerList);
+    player = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
     if (player == NULL) {
         return;
     }
     if (look->mode == 0) {
-        if (!func_00416AF8(((u8 *)player->m_pCamera) + 0x53C) && (player->m_ContState.m_dwButtonsSingle & 0x20) && player->m_SniperMode == 0) {
+        if (!MenuPool_CountOpen(((u8 *)player->m_pCamera) + 0x53C) && (player->m_ContState.m_dwButtonsSingle & 0x20) && player->m_SniperMode == 0) {
             look->mode = 1;
         }
     } else if (player->m_SniperMode != 0) {
@@ -74,8 +74,8 @@ void func_004001D0(Look004001D0 *look) {
             look->unk30 = 0.0f;
             look->pitchTarget = 0.0f;
         }
-        func_002117DC(&look->yaw, look->yawTarget, 0.33333334f);
-        func_002117DC(&look->pitch, look->pitchTarget, 0.25f);
+        Math_EaseToward(&look->yaw, look->yawTarget, 0.33333334f);
+        Math_EaseToward(&look->pitch, look->pitchTarget, 0.25f);
     }
     switch (look->state) {
         case 2:

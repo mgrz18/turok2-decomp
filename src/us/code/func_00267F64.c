@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00267F64(CGameObjectInstance *arg0) {
+s32 GameObject_CanEnterWater(CGameObjectInstance *arg0) {
     s32 var_v1;
     CIntelligence *temp_a1;
 

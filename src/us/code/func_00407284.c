@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-void func_00407284(CGameObjectInstance *obj) {
+void Primagen_EnterMode1(CGameObjectInstance *obj) {
     if (D_8012F9D8.mode == 5) {
         D_8012F9D8.state = 5;
     } else if (D_8012F9D8.mode == 6) {

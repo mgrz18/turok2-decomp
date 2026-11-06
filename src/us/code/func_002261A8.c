@@ -6,8 +6,8 @@
 #include "common.h"
 #include "structs/world.h"
 
-void func_0020EF2C(CVector3 *out, CVector3 *a, u8 *b);
-void *func_002017D4();
+void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
+void *CISet__GetBlock();
 s32 func_002261A8(CWorld *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
@@ -16,13 +16,13 @@ s32 func_002261A8(CWorld *lv, s32 unused, CVector3 *pt) {
     s32 *t;
     s32 n;
     u8 *p;
-    t = func_002017D4(func_002017D4(lv->unk_68), 1);
+    t = CISet__GetBlock(CISet__GetBlock(lv->unk_68), 1);
     n = t[1];
     p = (u8 *)(t + 2);
     if (n > 0) {
         do {
             f32 dd;
-            func_0020EF2C(&d, pt, p);
+            CVector3__Subtract(&d, pt, p);
             dd = d.x * d.x + d.y * d.y + d.z * d.z;
             if (bestIdx < 0.0f || dd < bestD) {
                 bestIdx = (f32)i;
@@ -35,16 +35,16 @@ s32 func_002261A8(CWorld *lv, s32 unused, CVector3 *pt) {
     return (s32)bestIdx;
 }
 
-/* func_0042CBE4 is VM code (the `virtual` segment) from this same source file:
+/* CScene__DecompressIntelligence is VM code (the `virtual` segment) from this same source file:
  * its 1.0f and jump table follow func_002261A8's -1.0f in one .rodata
  * (0x800A6010: -1.0f, 1.0f, then the table at 0x800A6018, 8-aligned in the
  * section), which only one object can give. Its .text goes to a section of its
  * own, .text_vm, which the yaml links into `virtual` (linker_section), while
- * .text stays in the engine. The second module's copy is func_00465B04.c.
+ * .text stays in the engine. The second module's copy is CScene__DecompressIntelligence_2.c.
  * docs/VMASM.md. */
 
-s32 func_00200B00(void ***resource, s32 index);
-void *func_002017D4(s32 *table, s32 index);
+s32 ProPackDecompress(void ***resource, s32 index);
+void *CISet__GetBlock(s32 *table, s32 index);
 
 typedef struct {
     /* 0x00 */ s32 type;
@@ -59,20 +59,20 @@ typedef struct {
     /* 0x54 */ f32 z2;
 } Element;
 
-void func_0042CBE4(s32 unused, void ***resource) __attribute__((section(".text_vm")));
+void CScene__DecompressIntelligence(s32 unused, void ***resource) __attribute__((section(".text_vm")));
 
-void func_0042CBE4(s32 unused, void ***resource) {
+void CScene__DecompressIntelligence(s32 unused, void ***resource) {
     f32 scale = 1.0f;
     s32 *table;
     s32 count;
     s32 i;
     Element *e;
 
-    if (func_00200B00(resource, 0)) {
+    if (ProPackDecompress(resource, 0)) {
         table = (s32 *) **resource;
         count = *table;
         for (i = 0; i < count; i++) {
-            e = func_002017D4(table, i);
+            e = CISet__GetBlock(table, i);
             switch (e->type) {
                 case 1:
                     e->x *= scale;

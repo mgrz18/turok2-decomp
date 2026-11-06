@@ -4,10 +4,10 @@
 typedef signed int s32;
 extern char D_800B45D8[];
 extern char D_800B45D4[];
-s32 func_00426D8C(char *s);
-s32 func_00426D54(char *a, char *b);
-s32 func_00421260(char *a, char *b) {
-    if (func_00426D8C(b) == 4 && func_00426D8C(a) == 2 && func_00426D54(b, D_800B45D8) == 0 && func_00426D54(a, D_800B45D4) == 0) {
+s32 Str_Length(char *s);
+s32 Str_Compare(char *a, char *b);
+s32 Pak_IsTurok2Note(char *a, char *b) {
+    if (Str_Length(b) == 4 && Str_Length(a) == 2 && Str_Compare(b, D_800B45D8) == 0 && Str_Compare(a, D_800B45D4) == 0) {
         return 1;
     }
     return 0;

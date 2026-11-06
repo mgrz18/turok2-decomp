@@ -2,7 +2,7 @@
 #include "structs/collision.h"
 
 /* Clears a sweep's hit: no hit yet, the whole move to go. */
-void func_0023C0FC(SweepHit *hit) {
+void SweepHit_Clear(SweepHit *hit) {
     hit->type = 0;
     hit->posOut = NULL;
     hit->regionOut = NULL;

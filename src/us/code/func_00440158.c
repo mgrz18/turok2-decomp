@@ -12,7 +12,7 @@ extern s32 D_004315BC;
 extern s32 D_00431620;
 extern State8012FA24 D_8012FA24;
 
-void func_00440158(s32 arg0) {
+void Primagen_SetSoundScript_2(s32 arg0) {
     D_8012FA24.unk0 = -1;
     D_8012FA24.unk4 = -1;
     if (arg0 == 0) {

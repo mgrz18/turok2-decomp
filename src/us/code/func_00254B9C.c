@@ -3,7 +3,7 @@
 #include "structs/camera.h"
 
 /* Counts the players with no menu open on their camera and m_LastTagMode clear. */
-s32 func_00254B9C(CPlayerList *arg0) {
+s32 CPlayerPool__CountPlaying(CPlayerList *arg0) {
     s32 var_a0;
     CCamera *temp_v0;
     CPlayer *var_v1;

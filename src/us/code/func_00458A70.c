@@ -14,9 +14,9 @@ extern u8 D_800C1404[];
 s32 func_00425D94(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
 s32 func_00426D5C(u8 *p, s32 n);
 char *func_00426D24(char *dst, char *src);
-void func_0029E3E0(char *dst, u8 *fmt, s32 a);
+void sprintf(char *dst, u8 *fmt, s32 a);
 
-s32 func_00458A70(MenuItem *item, Menu *own) {
+s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
     u8 name[16];
     u8 ext[8];
     u8 company[8];
@@ -83,6 +83,6 @@ s32 func_00458A70(MenuItem *item, Menu *own) {
         dst++;
     }
     *dst = *dst + 2;
-    func_0029E3E0((char *)dst, D_800C1404, blocks);
+    sprintf((char *)dst, D_800C1404, blocks);
     return 0;
 }

@@ -35,25 +35,25 @@ struct DecodeResult;
 typedef struct DecodeResult DecodeResult;
 struct MeasuredRecAt18 { unsigned char padding[24]; void * value; };
 struct MeasuredRecAt0V3 { u8 value; };
-extern s32 func_0028F460(s32, s32);
-extern u32 func_0028F98C(RuntimeState *, u32);
+extern s32 __getTrackByte(s32, s32);
+extern u32 __readVarLen(RuntimeState *, u32);
 s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) {
     u8 first;
     u8 command;
     u32 first_value;
     u32 command_value;
-    first = func_0028F460(state, index);
+    first = __getTrackByte(state, index);
     first_value = first & 0xFF;
     if (first_value == 0xFF) {
-        command = func_0028F460(state, index);
+        command = __getTrackByte(state, index);
         command_value = command & 0xFF;
         if (command_value == 0x51) {
             result->type = 3;
             result->status = first;
             result->first_data = command;
-            result->extra1 = func_0028F460(state, index);
-            ((u8 *)&result->extra2)[0] = func_0028F460(state, index);
-            ((u8 *)&result->extra2)[1] = func_0028F460(state, index);
+            result->extra1 = __getTrackByte(state, index);
+            ((u8 *)&result->extra2)[0] = __getTrackByte(state, index);
+            ((u8 *)&result->extra2)[1] = __getTrackByte(state, index);
             state->flagsA8[index] = 0;
         } else if (command_value == 0x2F) {
             u32 active = state->active ^ (1U << index);
@@ -64,8 +64,8 @@ s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) 
                 result->type = 4;
             }
         } else if (command_value == 0x2E) {
-            func_0028F460(state, index);
-            func_0028F460(state, index);
+            __getTrackByte(state, index);
+            __getTrackByte(state, index);
             state->flagsA8[index] = 0;
             result->type = 0x13;
         } else if (command_value == 0x2D) {
@@ -112,7 +112,7 @@ s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) 
         result->type = 1;
         if (first & 0x80) {
             result->status = first;
-            result->first_data = func_0028F460(state, index);
+            result->first_data = __getTrackByte(state, index);
             state->flagsA8[index] = first;
         } else {
             u8 running_status = state->flagsA8[index];
@@ -121,9 +121,9 @@ s32 __alCSeqGetTrackEvent(RuntimeState *state, u32 index, DecodeResult *result) 
         }
         command_value = result->status & 0xF0;
         if ((command_value != 0xC0) && (command_value != 0xD0)) {
-            result->second_data = func_0028F460(state, index);
+            result->second_data = __getTrackByte(state, index);
             if ((result->status & 0xF0) == 0x90) {
-                result->extra2 = func_0028F98C(state, index);
+                result->extra2 = __readVarLen(state, index);
             }
         } else {
             result->second_data = 0;

@@ -8,8 +8,8 @@ extern int D_800F2000;
 extern int D_800B2600;
 extern int D_800F2000;
 extern int D_800B2600;
-extern void func_0020EFDC(CVector3 *, CVector3 *, CVector3 *);
-f32 func_00269C3C(Node75 *node, f32 x, f32 z) {
+extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
+f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
     CVector3 normal;
     CVector3 point;
     CVector3 a;
@@ -38,7 +38,7 @@ f32 func_00269C3C(Node75 *node, f32 x, f32 z) {
         p = node->next;
         q = node->cur;
         b.z = ((CollisionBuildVertex *)p)->z - ((CollisionBuildVertex *)q)->z;
-        func_0020EFDC((CVector3 *)&D_800F2000, &b, &a);
+        CVector3__Cross((CVector3 *)&D_800F2000, &b, &a);
     }
     normal = *(CVector3 *)&D_800F2000;
     D_800B2600 = (int)node;

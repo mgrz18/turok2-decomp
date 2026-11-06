@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-void *func_002017D4(s32, s32);
+void *CISet__GetBlock(s32, s32);
 s32 func_00226D54(void *arg0)
 {
   s32 var_s0;
@@ -25,7 +25,7 @@ s32 func_00226D54(void *arg0)
     loop_2:
     var_s0 += 1;
 
-    if ((new_var2 = *((s32 *) (((s8 *) func_002017D4(*(*((s32 **) (((s8 *) var_s1) + 0x14AC))), 2)) + 4))) != 0)
+    if ((new_var2 = *((s32 *) (((s8 *) CISet__GetBlock(*(*((s32 **) (((s8 *) var_s1) + 0x14AC))), 2)) + 4))) != 0)
     {
       return 1;
     }

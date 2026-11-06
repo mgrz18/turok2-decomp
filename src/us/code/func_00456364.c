@@ -5,10 +5,10 @@
 /* Name entry: append the selected character to the current player's name. */
 
 
-s32 func_0025340C(void *state, void *player);
+s32 CPlayerPool__GetIndex(void *state, void *player);
 
-s32 func_00456364(MenuItem *item, Menu *event) {
-    s32 i = func_0025340C(&D_80119870.m_PlayerList, event->player);
+s32 NameEntryMenu_AddChar_2(MenuItem *item, Menu *event) {
+    s32 i = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, event->player);
 
     D_800C1FB0[i].timer = 0.0f;
     if (D_800C1FB0[i].length == 8) {

@@ -24,30 +24,30 @@ typedef struct {
 extern u8 D_8011AAF1; /* multiplayer */
 extern s32 D_800B6D1C;
 
-extern s32 func_00416AF8(void *arg0);
-extern void func_0025C018(WeaponActor *actor, void *ai);
-extern s32 func_0021D7BC(s32, s32, s32);
-extern void func_0021D39C(WeaponActor *actor, struct CCamera *camera);
-extern void func_0020B6A0(s32 arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
+extern s32 MenuPool_CountOpen(void *arg0);
+extern void EnemyAI_CalcOrientationMatrix(WeaponActor *actor, void *ai);
+extern s32 CGameObjectInstance__DrawModel(s32, s32, s32);
+extern void CGameObjectInstance__Draw(WeaponActor *actor, struct CCamera *camera);
+extern void Render_QueueModelInstance(s32 arg0, s32 arg1, s32 arg2, void *arg3, s32 arg4, s32 arg5, s32 arg6);
 
-void func_0025883C(WeaponActor *obj, CAI *state, CDrawArgs *args) {
+void WeaponActor_Draw(WeaponActor *obj, CAI *state, CDrawArgs *args) {
     CPlayer *player = obj->owner;
     WeaponActor *muzzle;
     s32 arg6 = -1;
 
-    if (D_8011AAF1 != 0 && func_00416AF8(((u8 *)player->m_pCamera) + 0x53C) != 0) {
+    if (D_8011AAF1 != 0 && MenuPool_CountOpen(((u8 *)player->m_pCamera) + 0x53C) != 0) {
         return;
     }
     muzzle = ((WeaponActor *)player->m_pOnEnemy);
     if (muzzle != NULL) {
-        func_0025C018(muzzle, (u8 *)muzzle + 0x140);
+        EnemyAI_CalcOrientationMatrix(muzzle, (u8 *)muzzle + 0x140);
         muzzle->render = obj->render;
-        muzzle->drawHook = func_0021D7BC;
-        func_0021D39C(muzzle, args->m_pCamera);
+        muzzle->drawHook = CGameObjectInstance__DrawModel;
+        CGameObjectInstance__Draw(muzzle, args->m_pCamera);
         muzzle->drawHook = NULL;
     }
     if (player->m_Data.m_CurrentWeapon == 0x15) {
         arg6 = state->m_Weapon.m_nPass;
     }
-    func_0020B6A0(args->m_hModel, obj->model, 1, obj->slots[D_800B6D1C], 0, state->m_Weapon.m_nLod, arg6);
+    Render_QueueModelInstance(args->m_hModel, obj->model, 1, obj->slots[D_800B6D1C], 0, state->m_Weapon.m_nLod, arg6);
 }

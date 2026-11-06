@@ -4,15 +4,15 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern s32 func_00220A1C(void *, void *);
+extern s32 CScene__FindRegionAt(void *, void *);
 extern float D_800A9BDC;
 extern float D_800A9BE4;
 extern float D_800A9BE0;
 extern CWorld D_800F7078;
 extern s32 Cinema_PathPlaying(void);
-extern f32 func_0026BE60(s32 arg0, f32 arg1, f32 arg2);
+extern f32 CGameRegion__GetHeight(s32 arg0, f32 arg1, f32 arg2);
 extern s32 D_800B6D00;
-void func_00280C94(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6,
+void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6,
                    f32 arg7, f32 arg8, f32 arg9, Shared_Quad arg10, s32 arg11, f32 arg12,
                    f32 arg13) {
     s32 object;
@@ -35,7 +35,7 @@ void func_00280C94(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4,
     arg0->unk5C = arg12;
     arg0->unk60 = arg13;
     if (Cinema_PathPlaying() != 0) {
-        arg0->unk58 = (void *)func_00220A1C(&D_800F7078, &arg0->unk38);
+        arg0->unk58 = (void *)CScene__FindRegionAt(&D_800F7078, &arg0->unk38);
     }
     object = (s32)arg0->unk58;
     x = arg0->unk38;
@@ -44,7 +44,7 @@ void func_00280C94(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4,
     w = arg0->unk44;
     arg0->unk64 = D_800B6D00;
     if (object != 0 && Cinema_PathPlaying() == 0) {
-        value = ((y + w) - func_0026BE60(object, x, z)) * D_800A9BDC;
+        value = ((y + w) - CGameRegion__GetHeight(object, x, z)) * D_800A9BDC;
         if (value < D_800A9BE0 && D_800A9BE4 < value) {
             arg0->unk64 = ((MenuRules *)(object))->locked;
         }

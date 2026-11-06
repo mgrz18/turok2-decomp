@@ -1,8 +1,8 @@
 #include "common.h"
 
-void func_0028B430(s32);                         /* extern */
+void Crash_PutChar(s32);                         /* extern */
 
-void func_0028CD68(s32 arg0) {
+void Crash_PrintHex8(s32 arg0) {
     s32 temp_a0;
     s32 temp_s0;
     s32 var_a0;
@@ -15,10 +15,10 @@ void func_0028CD68(s32 arg0) {
     } else {
         var_a0 = temp_a0 | 0x30;
     }
-    func_0028B430(var_a0);
+    Crash_PutChar(var_a0);
     var_a0_2 = temp_s0 | 0x30;
     if (temp_s0 >= 0xA) {
         var_a0_2 = temp_s0 + 0x57;
     }
-    func_0028B430(var_a0_2);
+    Crash_PutChar(var_a0_2);
 }

@@ -5,21 +5,21 @@ extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 extern f32 D_800B6D28;          /* the frame's time step */
 s32 Cinema_PathPlaying(void);
-void func_0027FDE4(CCameraPool *pool, CCamera *cam);
-void func_00277F6C(void);
-void func_0027836C(void);
-void func_00278CDC(char *string, s32 x, s32 y, s32 alpha, s32 arg4, s32 arg5, f32 scaleX, f32 scaleY);
+void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam);
+void COnScreen__BeginText(void);
+void COnScreen__SelectSmallFont(void);
+void COnScreen__DrawString(char *string, s32 x, s32 y, s32 alpha, s32 arg4, s32 arg5, f32 scaleX, f32 scaleY);
 f32 func_002982F0(f32 x);       /* sine */
 void CList__Remove(CList *list, void *element);
 void CList__AddHead(CList *list, void *element);
 
 /* A camera's on-screen texts, each frame (outside a cinema path; there
- * func_0027FDE4 does it): stacked upwards from 80% down the camera's
+ * CCameraPool__AdvanceCinemaText does it): stacked upwards from 80% down the camera's
  * viewport, centred, drawn half size unless the viewport is smaller than the
  * screen or the text is small, last to first. A text grows in (mode 2), stays
  * its display time (mode 3) and shrinks away (mode 4); finished texts go back
  * to the pool. */
-void func_002800A0(CCameraPool *pool, CCamera *cam) {
+void CCameraPool__AdvanceText(CCameraPool *pool, CCamera *cam) {
     CCameraText *text;
     CCameraText *next;
     f32 xScale;
@@ -34,7 +34,7 @@ void func_002800A0(CCameraPool *pool, CCamera *cam) {
     s32 small;
 
     if (Cinema_PathPlaying()) {
-        func_0027FDE4(pool, cam);
+        CCameraPool__AdvanceCinemaText(pool, cam);
         return;
     }
     size = 1.0f;
@@ -53,15 +53,15 @@ void func_002800A0(CCameraPool *pool, CCamera *cam) {
     for (text = cam->m_ActiveTextList.m_pTail; text != NULL; text = next) {
         next = text->m_pLast;
         if (text->m_nMode != 0) {
-            func_00277F6C();
+            COnScreen__BeginText();
             if (small || text->m_bSmall) {
                 size = 1.0f;
                 yScale = size;
-                func_0027836C();
+                COnScreen__SelectSmallFont();
             } else {
                 size = 0.5f;
             }
-            func_00278CDC(text->m_pString, x, y, text->m_nAlpha, 1, 1,
+            COnScreen__DrawString(text->m_pString, x, y, text->m_nAlpha, 1, 1,
                           text->m_Scale * xScale * size, text->m_Scale * yScale * size);
             switch (text->m_nMode) {
                 case 2:

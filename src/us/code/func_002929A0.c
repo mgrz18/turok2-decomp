@@ -30,7 +30,7 @@ typedef struct {
 extern f32 D_800AA410;
 
 /* Resets slot arg1 to its defaults. */
-void func_002929A0(BindTable *arg0, s32 arg1) {
+void __resetPerfChanState(BindTable *arg0, s32 arg1) {
     arg0->slots[arg1].unk6 = 0;
     arg0->slots[arg1].unkA = 0;
     arg0->slots[arg1].unk7 = 0x40;

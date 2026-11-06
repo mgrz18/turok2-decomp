@@ -6,13 +6,13 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
-s32 func_00266D8C(s32 a, s32 b, s32 c, s32 *lo, s32 *hi);
-void func_00224FC0(CWorld *lv, u16 *idp, CWorldRecord **outRecs, s32 *outCount) {
+s32 BinaryRange(s32 a, s32 b, s32 c, s32 *lo, s32 *hi);
+void CScene__GetRegionEventRecords(CWorld *lv, u16 *idp, CWorldRecord **outRecs, s32 *outCount) {
     s32 hi;
     s32 lo;
     s32 r; s32 a; s32 b; s32 id;
     id = *idp; a = (s32) lv->m_pAltRecordIndex; b = lv->m_nAltRecords;
-    r = func_00266D8C(a, b, id, &lo, &hi);
+    r = BinaryRange(a, b, id, &lo, &hi);
     if (r != 0) {
         *outRecs = lv->m_pAltRecords + lo;
         *outCount = hi - lo + 1;

@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/libaudio.h"
 
-extern s32 func_00294090(ALSynth *, PVoice **, s16);
-extern ALParam *func_00294B58(void);
+extern s32 _allocatePVoice(ALSynth *, PVoice **, s16);
+extern ALParam *__allocParam(void);
 s32 alSynAllocVoice(ALSynth *drvr, ALVoice *voice, ALVoiceConfig *vc)
 {
     PVoice *pvoice = 0;
@@ -17,19 +17,19 @@ s32 alSynAllocVoice(ALSynth *drvr, ALVoice *voice, ALVoiceConfig *vc)
     voice->fxBus = vc->fxBus;
     voice->state = 0;
     voice->pvoice = 0;
-    stolen = func_00294090(drvr, &pvoice, vc->priority);
+    stolen = _allocatePVoice(drvr, &pvoice, vc->priority);
     if (pvoice) {
         f = pvoice->channelKnob;
         if (stolen) {
             pvoice->offset = 512;
             pvoice->vvoice->pvoice = 0;
-            update = func_00294B58();
+            update = __allocParam();
             update->delta = drvr->paramSamples;
             update->type = 11;
             update->data.i = 0;
             update->moredata.i = pvoice->offset - 64;
             (*f->setParam)(f, 3, update);
-            update = func_00294B58();
+            update = __allocParam();
             if (update) {
                 update->delta = drvr->paramSamples + pvoice->offset;
                 update->type = 15;

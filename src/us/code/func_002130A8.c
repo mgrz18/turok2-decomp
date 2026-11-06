@@ -22,14 +22,14 @@ typedef struct {
 
 extern LightInfo *D_8010FEC8;
 
-void *func_002017D4(s32 *, s32);
-void func_0020D908(f32 *mtx, void *packed);
-void func_0020F040(CVector3 *v);
-void func_0020FAFC(f32 *mtx, CVector3 *in, CVector3 *out);
+void *CISet__GetBlock(s32 *, s32);
+void CMtxF__FromMtxAffine(f32 *mtx, void *packed);
+void CVector3__Normalize(CVector3 *v);
+void CMtxF__RotateVector(f32 *mtx, CVector3 *in, CVector3 *out);
 
 /* Adds directional light to the model's vertex colors: each lit vertex's
  * rotated normal against the light direction, plus an ambient term. */
-void func_002130A8(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
+void Lighting_ApplyDirectional(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
     CVector3 light;
     f32 mtx[16];
     CVector3 in;
@@ -42,14 +42,14 @@ void func_002130A8(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
     s32 j;
     s32 count;
 
-    func_0020D908(mtx, matrices);
+    CMtxF__FromMtxAffine(mtx, matrices);
     light.x = D_8010FEC8->lightX;
     n = 0;
     light.y = D_8010FEC8->lightY;
     light.z = D_8010FEC8->lightZ;
-    func_0020F040(&light);
+    CVector3__Normalize(&light);
     for (i = 0; i < *model; i++) {
-        group = func_002017D4(model, i);
+        group = CISet__GetBlock(model, i);
         count = group->count;
         verts = group->verts;
         for (j = 0; j < count; j++) {
@@ -57,12 +57,12 @@ void func_002130A8(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
                 continue;
             }
             if (skinned) {
-                func_0020D908(mtx, matrices + (verts[j].bone >> 8) * 64);
+                CMtxF__FromMtxAffine(mtx, matrices + (verts[j].bone >> 8) * 64);
             }
             in.x = verts[j].nx;
             in.y = verts[j].ny;
             in.z = verts[j].nz;
-            func_0020FAFC(mtx, &in, &out);
+            CMtxF__RotateVector(mtx, &in, &out);
             level = out.x * light.x + out.y * light.y + out.z * light.z;
             /* clamp at 0, then add the ambient term */
             level = ((level < 0.0f ? 0.0f : level) + 0.21960786f) * 255.0f;

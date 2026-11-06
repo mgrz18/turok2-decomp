@@ -31,6 +31,6 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_0040EF64(BlindOneState *m) {
+void BlindOne_NextPhase(BlindOneState *m) {
     NextCommand(m);
 }

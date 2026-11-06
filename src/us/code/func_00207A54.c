@@ -3,6 +3,6 @@
 
 extern s32 D_800AB570;
 
-void func_00207A54(void) {
+void Texture_InvalidateCache(void) {
     D_800AB570 = 0;
 }

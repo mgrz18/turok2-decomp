@@ -4,32 +4,32 @@
 
 extern char D_800ADE70;
 extern char D_800ADDBC;
-extern void func_002117DC(f32 *value, f32 target, f32 rate);
-extern void func_0024EF70(void *, void *, void *);
-extern void func_0024F174(void *, void *, void *);
-extern s32 func_0024E5F0(void *, void *, s32);
-extern s32 func_002685F0(void *body);
-extern f32 func_00267648(void *body, s32 arg);
+extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
+extern void CPlayer__TurnAndLook(void *, void *, void *);
+extern void CPlayer__MoveOnFoot(void *, void *, void *);
+extern s32 CPlayer__SetState(void *, void *, s32);
+extern s32 GameObject_IsOnGround(void *body);
+extern f32 GameObject_GetGroundHeight(void *body, s32 arg);
 
 /* Eases the lean back to zero, runs the movement tables, and on the ground
  * (falling) picks animation 0x7F8 when the slope speed is under 61.44. */
-void func_00255714(CPlayer *player, CGameObjectInstance *body) {
-    func_002117DC(&player->m_vHeadRotOffset.z, 0.0f, 0.25f);
-    func_0024EF70(player, body, &D_800ADE70);
+void PlayerFall_Update(CPlayer *player, CGameObjectInstance *body) {
+    Math_EaseToward(&player->m_vHeadRotOffset.z, 0.0f, 0.25f);
+    CPlayer__TurnAndLook(player, body, &D_800ADE70);
     if (!(player->m_ModeBeforeFlags & 0x8000)) {
-        func_0024F174(player, body, &D_800ADDBC);
+        CPlayer__MoveOnFoot(player, body, &D_800ADDBC);
     }
     if (body->m_vVelocity.y <= 0.0f) {
-        if (func_002685F0(body) != 0) {
-            func_0024E5F0(player, body, 2);
+        if (GameObject_IsOnGround(body) != 0) {
+            CPlayer__SetState(player, body, 2);
         }
     }
     if (body->m_vVelocity.y <= 0.0f) {
-        if (func_00267648(body, 0) < 0.0f) {
-            if (-func_00267648(body, 0) < 61.44f) {
+        if (GameObject_GetGroundHeight(body, 0) < 0.0f) {
+            if (-GameObject_GetGroundHeight(body, 0) < 61.44f) {
                 goto set_value;
             }
-        } else if (func_00267648(body, 0) < 61.44f) {
+        } else if (GameObject_GetGroundHeight(body, 0) < 61.44f) {
 set_value:
             player->m_CharAnim = 0x7F8;
         }

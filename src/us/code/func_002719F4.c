@@ -1,7 +1,7 @@
 #include "common.h"
 
-void func_00275248(s32);                         /* extern */
+void SndSeq_Stop(s32);                         /* extern */
 
-void func_002719F4(s32 arg0) {
-    func_00275248(arg0 + 0x1D64);
+void CAudioWorld__StopMusic(s32 arg0) {
+    SndSeq_Stop(arg0 + 0x1D64);
 }

@@ -1,8 +1,8 @@
 #include "common.h"
 
-s32 func_00202EEC(s32);                     /* extern */
-s32 func_00203330(s32, s32);            /* extern */
-s32 func_00206380(s32, s32, s32);       /* extern */
+s32 CCache__WaitForDisplayLists(s32);                     /* extern */
+s32 CCache__Compact(s32, s32);            /* extern */
+s32 CCache__FreeOldestMemEntryWithFlags(s32, s32, s32);       /* extern */
 s32 osRecvMesg(s32 *, s32, s32); /* extern */
 s32 osSendMesg(s32 *, s32, s32); /* extern */
 s32 __osDisableInt();                                /* extern */
@@ -10,7 +10,7 @@ s32 __osRestoreInt(s32);                         /* extern */
 extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
-void func_002053A8(void) {
+void CCache__Flush(void) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v1;
@@ -25,11 +25,11 @@ void func_002053A8(void) {
     } else {
         __osRestoreInt(temp_a0);
     }
-    func_00202EEC(0);
+    CCache__WaitForDisplayLists(0);
     do {
 
-    } while (func_00206380(0, 0, 0) != 0);
-    func_00203330(0, 1);
+    } while (CCache__FreeOldestMemEntryWithFlags(0, 0, 0) != 0);
+    CCache__Compact(0, 1);
     temp_v0 = __osDisableInt();
     temp_v1_2 = D_800D8DCC - 1;
     D_800D8DCC = temp_v1_2;

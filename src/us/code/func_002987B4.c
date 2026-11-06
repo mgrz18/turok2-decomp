@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002987B4(ContPad *data);
+extern void osContGetReadData(ContPad *data);
 extern s8 D_801213DC;
-void func_002987B4(ContPad *data) {
+void osContGetReadData(ContPad *data) {
     extern u8 D_801213E0[];
     u8 *ptr = D_801213E0;
     u8 *count = &D_801213DC;

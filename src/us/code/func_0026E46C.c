@@ -6,8 +6,8 @@ typedef struct CKeyEvent {
     /* 0x06 */ u16 param; /* sound id, ... */
 } CKeyEvent;
 
-s32 func_00275950(u16);                         /* extern */
+s32 Sound__SetAmbientTrack(u16);                         /* extern */
 
 void func_0026E46C(CKeyEvent *arg0) {
-    func_00275950(arg0->param);
+    Sound__SetAmbientTrack(arg0->param);
 }

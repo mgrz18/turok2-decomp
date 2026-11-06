@@ -4,7 +4,7 @@
 extern s32 D_80130960;
 extern s32 D_801309A8;
 
-void func_0045B0B0(void) {
+void CharNoteMenu_InitLoad_2(void) {
     D_80130960 = 1;
     D_801309A8 = 0;
 }

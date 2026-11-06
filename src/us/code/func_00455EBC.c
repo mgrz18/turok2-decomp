@@ -5,16 +5,16 @@
 #include "structs/menu.h"
 
 /* Turok 2 layout: the field Rage Wars keeps at 0x58 is at 0x1E8 here. */
-extern s32 func_0025340C(void *a, void *b);
-extern void func_00285A68(s32 a);
+extern s32 CPlayerPool__GetIndex(void *a, void *b);
+extern void Controller_WatchPak(s32 a);
 extern s32 D_800C2020;
 extern s32 D_8011ACE4[];
-void func_00455EBC(Menu *a) {
+void StatsMenu_InitAfterPak_2(Menu *a) {
     s32 n;
     D_800C2020 = 0;
     n = 0;
-    if (a->player) n = func_0025340C(&D_80119870.m_PlayerList, a->player);
-    func_00285A68(n);
+    if (a->player) n = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, a->player);
+    Controller_WatchPak(n);
     a->items[14].flags |= 0x1800000;
     a->items[15].flags |= 0x1800000;
     a->items[11].flags &= ~0x1800000;

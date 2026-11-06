@@ -12,7 +12,7 @@ struct ObjRecAt18V2 {
 };
 extern char D_800AE994[];
 extern void *D_800ACB60[];
-void *func_0021F770(char *arg0)
+void *CGameObjectInstance__GetBodySetup(char *arg0)
 {
     s32 type;
     s32 i;

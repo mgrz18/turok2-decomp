@@ -1,4 +1,4 @@
-/* Second-module copy of func_00422258 (first module): the name, right-aligned in an 8-space field at text+11. */
+/* Second-module copy of CharNoteMenu_UpdateName (first module): the name, right-aligned in an 8-space field at text+11. */
 #include "common.h"
 #include "structs/menu.h"
 
@@ -7,7 +7,7 @@ extern char D_800B4B34[];
 extern u8 D_80130954[8]; /* name, padded with spaces */
 extern s32 D_801309A8;
 
-s32 func_0045B178(MenuItem *item) {
+s32 CharNoteMenu_UpdateName_2(MenuItem *item) {
     s32 len = 8;
     u8 *src;
     char *field;

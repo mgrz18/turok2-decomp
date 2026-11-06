@@ -12,25 +12,25 @@ typedef struct SoundVoice {
 
 extern u8 D_801198B0[];
 
-extern s32 func_00281444(void *game, CVector3 *pos);
-extern void func_00293E60(void *player, s32 id);    /* alSndpSetSound */
-extern s32 func_00293580(void *player);             /* alSndpGetState */
-extern void func_00293EC0(void *player);            /* alSndpStop */
-extern void func_00293CE0(void *player);
-extern void func_00293530(void *player, s32 id);    /* alSndpDeallocate */
-extern void func_002726DC(SndVoice *s);
-extern void func_00272B54(SndVoice *s);
-extern void func_00272EC4(SndVoice *s);
+extern s32 CCameraPool__GetNearestCamera(void *game, CVector3 *pos);
+extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
+extern s32 alSndpGetState(void *player);             /* alSndpGetState */
+extern void alSndpStop(void *player);            /* alSndpStop */
+extern void alSndpPlay(void *player);
+extern void alSndpDeallocate(void *player, s32 id);    /* alSndpDeallocate */
+extern void SndVoice_UpdateVolume(SndVoice *s);
+extern void SndVoice_UpdatePan(SndVoice *s);
+extern void SndVoice_UpdatePitch(SndVoice *s);
 
-void func_0027314C(SndVoice *s) {
+void SndVoice_Update(SndVoice *s) {
     SndMgr *bank;
     s32 playing;
     void *player;
 
-    s->mgr->listener = func_00281444(D_801198B0, &s->vp.pos);
+    s->mgr->listener = CCameraPool__GetNearestCamera(D_801198B0, &s->vp.pos);
     bank = s->mgr;
-    func_00293E60(&bank->player, bank->handles[s->index]);
-    playing = func_00293580(&bank->player);
+    alSndpSetSound(&bank->player, bank->handles[s->index]);
+    playing = alSndpGetState(&bank->player);
     if ((s->vp.scale <= 0.075f && s->soundId != 0x228) || ((s->flags & 4) && s->vp.vol == 0)) {
         s->stopping = 1;
     }
@@ -44,9 +44,9 @@ void func_0027314C(SndVoice *s) {
             s->vp.follow = NULL;
             player = &b->player;
             if (s->vp.frame != b->frame) {
-                func_00293E60(player, b->handles[s->index]);
-                if (func_00293580(player)) {
-                    func_00293EC0(player);
+                alSndpSetSound(player, b->handles[s->index]);
+                if (alSndpGetState(player)) {
+                    alSndpStop(player);
                 }
                 s->sound = -1;
             }
@@ -58,13 +58,13 @@ void func_0027314C(SndVoice *s) {
         return;
     }
     if ((s->flags & 0x18) == 0x10) {
-        func_00293CE0(&s->mgr->player);
+        alSndpPlay(&s->mgr->player);
         return;
     }
     if (!playing) {
         SndMgr *b = s->mgr;
         SoundVoice *v = (SoundVoice *)((u8 *)b + 0x7C);
-        func_00293530(&b->player, v->ids[s->index]);
+        alSndpDeallocate(&b->player, v->ids[s->index]);
         v->ids[s->index] = -1;
         s->vp.priority = 0;
         s->id = -1;
@@ -77,7 +77,7 @@ void func_0027314C(SndVoice *s) {
     if (s->vp.follow != NULL) {
         s->vp.pos = *s->vp.follow;
     }
-    func_002726DC(s);
-    func_00272B54(s);
-    func_00272EC4(s);
+    SndVoice_UpdateVolume(s);
+    SndVoice_UpdatePan(s);
+    SndVoice_UpdatePitch(s);
 }

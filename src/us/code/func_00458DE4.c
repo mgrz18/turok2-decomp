@@ -25,9 +25,9 @@ void func_0041D948(Menu *o);
 s32 func_0041DCB0(Menu *o, s32 a, s32 b);
 void func_0041ED00(s32 a, Menu *o, s32 c);
 void func_0041EFE8(s32 a, Menu *o, s32 c);
-void func_00416644(void *a, void *b, s32 c, ControllerProfile *d, void *e);
+void MenuPool_OpenMenu(void *a, void *b, s32 c, ControllerProfile *d, void *e);
 
-s32 func_00458DE4(s32 a0, Menu *o, s32 a2) {
+s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
     u8 buf[16];
     struct {
         s32 pad;
@@ -78,7 +78,7 @@ s32 func_00458DE4(s32 a0, Menu *o, s32 a2) {
         found = 0;
     after:
         if (found != 0 && D_801309C4 >= 0 && D_801309C4 < 0x10) {
-            func_00416644(D_80119E2C, D_0043C12C, o->player, o->controller, D_0043B634);
+            MenuPool_OpenMenu(D_80119E2C, D_0043C12C, o->player, o->controller, D_0043B634);
             return 1;
         }
         func_0041EFE8(a0, o, a2);

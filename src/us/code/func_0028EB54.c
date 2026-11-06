@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0028EB54(OwnerRecAt8V2 *arg0);
+extern void VM_FreeRegion(OwnerRecAt8V2 *arg0);
 extern Slot_func_8023CCD4_de D_80120FC0[];
-void func_0028EB54(OwnerRecAt8V2 *arg0) {
+void VM_FreeRegion(OwnerRecAt8V2 *arg0) {
     extern s32 osSendMesg(s32, Node_func_8023CCD4_de *, s32);
-    extern void func_0028DEFC(Slot_func_8023CCD4_de *);
+    extern void VM_UnmapTLBEntry(Slot_func_8023CCD4_de *);
     extern Node_func_8023CCD4_de D_80121378;
     Node_func_8023CCD4_de *node;
     Node_func_8023CCD4_de *prev;
@@ -28,7 +28,7 @@ void func_0028EB54(OwnerRecAt8V2 *arg0) {
     slot = node->slots;
     for (i = 0; i < node->count; i++) {
         if (*slot != 0xFF) {
-            func_0028DEFC(&D_80120FC0[*slot]);
+            VM_UnmapTLBEntry(&D_80120FC0[*slot]);
             D_80120FC0[*slot].id = 0xFFFF;
         }
         slot++;

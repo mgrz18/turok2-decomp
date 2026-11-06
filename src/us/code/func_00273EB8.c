@@ -5,6 +5,6 @@ typedef struct {
     /* 0xA8 */ s32 unkA8;
 } Owner;
 
-void func_00273EB8(Owner *arg0, s32 arg1) {
+void SndVoice_SetSoundId(Owner *arg0, s32 arg1) {
     arg0->unkA8 = arg1;
 }

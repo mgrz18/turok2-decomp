@@ -3,16 +3,16 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_0029DA30(struct OSPiHandle_s *handle, u32 address, u32 *value);
+extern s32 osEPiRawReadIo(struct OSPiHandle_s *handle, u32 address, u32 *value);
 extern OSPiHandle_s *D_800B8980[];
 extern s32 D_800AA9B0;
 extern s32 D_800AA9B4;
-extern void func_0029B020(void *arg0, void *arg1, s32 arg2);
-s32 func_0029DA30(OSPiHandle_s *arg0, u32 arg1, u32 *arg2) {
+extern void __assert(void *arg0, void *arg1, s32 arg2);
+s32 osEPiRawReadIo(OSPiHandle_s *arg0, u32 arg1, u32 *arg2) {
     OSPiHandle_s *previous;
     s32 index;
     if (arg2 == 0) {
-        func_0029B020(&D_800AA9B0, &D_800AA9B4, 0x2B);
+        __assert(&D_800AA9B0, &D_800AA9B4, 0x2B);
     }
     while ((*(volatile u32 *)(0xA4600010U)) & 3) {
     }

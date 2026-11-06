@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-int func_00217B64(int bitAddress, unsigned int width) {
+int Bits_Peek(int bitAddress, unsigned int width) {
     int shift;
     int *word;
     unsigned int value;

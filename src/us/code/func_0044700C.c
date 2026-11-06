@@ -17,7 +17,7 @@ typedef struct {
 
 extern BlindOneState D_80130200;
 
-void func_0044700C(CGameObjectInstance *actor, Spawn *spawn) {
+void BlindOne_ActorAppearEnter_2(CGameObjectInstance *actor, Spawn *spawn) {
     BlindOneState *counters;
 
     spawn->unk28 = 0;

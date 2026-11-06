@@ -1,4 +1,4 @@
-/* Second-module copy of func_0040EF64 (src/us/code/func_0040EF64.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_NextPhase (src/us/code/BlindOne_NextPhase.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
@@ -32,6 +32,6 @@ static __inline__ void NextCommand(BlindOneState *m) {
     }
 }
 
-void func_00447F64(BlindOneState *m) {
+void BlindOne_NextPhase_2(BlindOneState *m) {
     NextCommand(m);
 }

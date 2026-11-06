@@ -7,18 +7,18 @@ extern s32 D_801198E0;
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
 
-extern void func_00279028(s32 color);
-extern void func_00277CF0(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32 arg5, s32 arg6, s32 arg7);
+extern void Hud_SetupTextureMode(s32 color);
+extern void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32 arg5, s32 arg6, s32 arg7);
 
 /* Draw the match clock (D_8011AAD8.match.timeLeft, in ticks of 1/15 s), minutes and seconds, centered at the top of the
  * screen (mid-screen when D_801198E0 != 1), scaled to cam's viewport; in the
  * last 30 seconds it blinks. */
-void func_00252E08(s32 arg0, CCamera *cam) {
+void Hud_DrawMatchClock(s32 arg0, CCamera *cam) {
     f32 secs, mins;
     f32 sx, sy;
     f32 x, y;
 
-    func_00279028(D_8011AAD8.hudAlpha);
+    Hud_SetupTextureMode(D_8011AAD8.hudAlpha);
     if (D_8011AAD8.match.timeLeft <= 0.0f) {
         return;
     }
@@ -37,6 +37,6 @@ void func_00252E08(s32 arg0, CCamera *cam) {
         x = D_800C2030 * 0.5f;
         y = (D_800C2034 - 10) * 0.5f;
     }
-    func_00277CF0((s32)mins, x - sx * 6.0f, y, sx, sy, 1, 1, 0);
-    func_00277CF0((s32)secs, x + sx * 2.0f, y, sx, sy, 1, 0, 2);
+    Hud_DrawNumber((s32)mins, x - sx * 6.0f, y, sx, sy, 1, 1, 0);
+    Hud_DrawNumber((s32)secs, x + sx * 2.0f, y, sx, sy, 1, 0, 2);
 }

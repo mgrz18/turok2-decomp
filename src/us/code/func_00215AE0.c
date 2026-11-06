@@ -3,8 +3,8 @@
 
 #include "rw/junk_types.h"
 
-void *func_002017D4(void *t, s32 i);
-void func_00215AE0(R05Anim *a, s32 idx, f32 time, f32 *out)
+void *CISet__GetBlock(void *t, s32 i);
+void CAnimationState__GetBonePosition(R05Anim *a, s32 idx, f32 time, f32 *out)
 {
     void *root;
     void *blk;
@@ -25,20 +25,20 @@ void func_00215AE0(R05Anim *a, s32 idx, f32 time, f32 *out)
     u8 *tab;
     f32 *dst;
     root = *a->data;
-    blk = func_002017D4(root, 5);
-    cfg = func_002017D4(blk, 0);
-    tab = func_002017D4(root, 1);
+    blk = CISet__GetBlock(root, 5);
+    cfg = CISet__GetBlock(blk, 0);
+    tab = CISet__GetBlock(root, 1);
     scale = cfg->scale;
     sel = *(s16 *)(tab + (idx << 2) + 8);
     n = cfg->n;
     time = time * scale;
     if (sel == -1) {
-        v2 = func_002017D4(root, 2);
+        v2 = CISet__GetBlock(root, 2);
         off = idx * *v2 + 8;
         *(R05Vec3i *)out = *(R05Vec3i *)((u8 *)v2 + off);
         return;
     }
-    t0 = func_002017D4(func_002017D4(blk, 1), sel);
+    t0 = CISet__GetBlock(CISet__GetBlock(blk, 1), sel);
     frac = time - (f32)(((time) >= 0.0f) ? (s32)(time) : (((f32)(s32)(time) == (time)) ? (s32)(time) : (s32)(time) - 1));
     ua = a->loopStart;
     dst = out;

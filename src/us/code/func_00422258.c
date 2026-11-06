@@ -6,7 +6,7 @@ extern char D_800B4B34[];
 extern u8 D_80130954[8]; /* name, padded with spaces */
 extern s32 D_801309A8;
 
-s32 func_00422258(MenuItem *item) {
+s32 CharNoteMenu_UpdateName(MenuItem *item) {
     s32 len = 8;
     u8 *src;
     char *field;

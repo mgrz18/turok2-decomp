@@ -4,13 +4,13 @@
 
 extern u32 D_800B6D20;
 
-void func_0026CB2C(CGameRegion *region, CVector3 *centre);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-s32 func_002698AC(CInstanceHeader *inst, CVector3 pos, s32 arg);
+void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+s32 GameObject_CanMoveTo(CInstanceHeader *inst, CVector3 pos, s32 arg);
 
 /* Picks the neighbouring region whose centre is farthest from pos and still
- * passes func_002698AC; its centre goes to *out. */
-CGameRegion *func_00239C28(CInstanceHeader *inst, CGameRegion *exclude, CVector3 pos, CGameRegion *none,
+ * passes GameObject_CanMoveTo; its centre goes to *out. */
+CGameRegion *Path_FindFleeRegion(CInstanceHeader *inst, CGameRegion *exclude, CVector3 pos, CGameRegion *none,
                       s32 arg, CVector3 *out) {
     CGameRegion *cur;
     CGameRegion *region;
@@ -39,10 +39,10 @@ CGameRegion *func_00239C28(CInstanceHeader *inst, CGameRegion *exclude, CVector3
         if (skipExcluded && exclude == region) {
             continue;
         }
-        func_0026CB2C(region, &centre);
-        func_0020EF2C(&delta, &centre, &pos);
+        CGameRegion__GetCentroid(region, &centre);
+        CVector3__Subtract(&delta, &centre, &pos);
         dist = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
-        if (bestDist < dist && func_002698AC(inst, centre, arg) != 0) {
+        if (bestDist < dist && GameObject_CanMoveTo(inst, centre, arg) != 0) {
             bestDist = dist;
             best = region;
             *out = centre;

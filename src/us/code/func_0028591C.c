@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 
-extern int func_00285A54(int arg0);
+extern int Controller_IsPakWatched(int arg0);
 extern int D_800F6788[];
-s32 func_0028591C(s32 arg0) {
-    if (func_00285A54(arg0) == 0) {
+s32 Controller_PakChanged(s32 arg0) {
+    if (Controller_IsPakWatched(arg0) == 0) {
         return 0;
     }
     return D_800F6788[arg0];
 }
-int func_00285A54(int arg0);
+int Controller_IsPakWatched(int arg0);

@@ -70,9 +70,9 @@ struct B19Obj {
     s16 unk128;      /* 0x128 */
 };
 extern const f32 D_800A6430;
-void func_0020EF2C(CVector3 *, CVector3 *, CVector3 *);
-void func_00230AB0(void *, B19Obj *, B19Obj **, s32);
-void func_00233268(void *owner, B19Obj **arr, s32 n) {
+void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
+void CParticle__CheckProximity(void *, B19Obj *, B19Obj **, s32);
+void CParticleSystem__ResolveInteractions(void *owner, B19Obj **arr, s32 n) {
     s32 i, j;
     CVector3 d;
     B19Obj *o;
@@ -83,13 +83,13 @@ void func_00233268(void *owner, B19Obj **arr, s32 n) {
         case 0xC:
             break;
         case 0x22:
-            func_00230AB0(owner, o, arr, n);
+            CParticle__CheckProximity(owner, o, arr, n);
             break;
         case 0x57:
             for (j = 0; j < n; j++) {
                 e = arr[j];
                 if (e->id != 0x57) {
-                    func_0020EF2C(&d, &e->pos, &o->pos);
+                    CVector3__Subtract(&d, &e->pos, &o->pos);
                     if (d.x * d.x + d.y * d.y + d.z * d.z <= D_800A6430) e->unk128 = 1;
                 }
             }

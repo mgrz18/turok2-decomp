@@ -13,7 +13,7 @@ typedef float f32;
 extern s32 D_800B8900;          /* osViClock */
 
 /* libultra osAiSetFrequency(). */
-s32 func_002984A0(u32 frequency) {
+s32 osAiSetFrequency(u32 frequency) {
     register u32 dacRate;
     register u8 bitRate;
     register f32 f;

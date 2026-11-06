@@ -15,7 +15,7 @@ typedef struct {
 void CList__AddHead(CList *, void *);               /* extern */
 void CList__Remove();                               /* extern */
 
-void func_00228B4C(ListOwner *arg0, ListNode *arg1) {
+void CDLightSet__Free(ListOwner *arg0, ListNode *arg1) {
     arg1->unk16 = 0;
     CList__Remove();
     CList__AddHead(&arg0->m_List, arg1);

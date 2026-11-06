@@ -6,7 +6,7 @@ typedef struct {
 } SortEntry;
 
 /* Sort callback: -1 when arg0's key is the lower, else 1. */
-s32 func_00226D0C(SortEntry *arg0, SortEntry *arg1) {
+s32 SortRecord_CompareDescending(SortEntry *arg0, SortEntry *arg1) {
     s32 var_v0;
 
     var_v0 = 1;

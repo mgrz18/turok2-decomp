@@ -36,20 +36,20 @@ typedef struct Volume {
 
 extern s32 D_8011AAD8;
 
-void func_0020C208(void *out, f32 *mtx);
-void func_0020F79C(f32 *mtx);
-void func_0020F9D4(f32 *mtx, CVector3 *in, CVector3 *out);
-void func_00210318(f32 *mtx, f32 x, f32 y, f32 z);
-void func_00210478(f32 *mtx, f32 x, f32 y, f32 z);
-void func_00210790(f32 *mtx, f32 angle);
-void func_00210968(f32 *mtx, f32 angle);
-void func_00210B38(f32 *mtx, f32 angle);
-void func_0026B9E0(f32 *bounds, s32 count, CVector3 *points);
+void CMtxF__InvertAffine(void *out, f32 *mtx);
+void CMtxF__Identity(f32 *mtx);
+void CMtxF__TransformPointProjective(f32 *mtx, CVector3 *in, CVector3 *out);
+void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__ScaleColumns(f32 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__RotateX(f32 *mtx, f32 angle);
+void CMtxF__RotateY(f32 *mtx, f32 angle);
+void CMtxF__RotateZ(f32 *mtx, f32 angle);
+void BoundingBox_FromPoints(f32 *bounds, s32 count, CVector3 *points);
 
 /* Builds a volume from its level record: its matrix (scale, rotations about z, y and x, then the
  * position), its size, whether it is unrotated (each angle within 0.01) and the bounds of its
  * eight transformed corners. In mode 1 the rotation only aims dir, the volume itself stays upright. */
-void func_00211F64(Volume *vol, VolumeRec *rec) {
+void LightVolume_Construct(Volume *vol, VolumeRec *rec) {
     CVector3 pos;
     CVector3 rot;
     CVector3 scale;
@@ -81,10 +81,10 @@ void func_00211F64(Volume *vol, VolumeRec *rec) {
         aim.y = rec->rot[1] * 9.313225746154785e-09f;
         aim.z = rec->rot[2] * 9.313225746154785e-09f;
         mtx = vol->mtx;
-        func_0020F79C(mtx);
-        func_00210B38(mtx, aim.x);
-        func_00210968(mtx, aim.y);
-        func_0020F9D4(mtx, &down, &vol->dir);
+        CMtxF__Identity(mtx);
+        CMtxF__RotateZ(mtx, aim.x);
+        CMtxF__RotateY(mtx, aim.y);
+        CMtxF__TransformPointProjective(mtx, &down, &vol->dir);
         rot.x = 0.0f;
         rot.y = 0.0f;
         rot.z = 0.0f;
@@ -142,14 +142,14 @@ void func_00211F64(Volume *vol, VolumeRec *rec) {
         vol->unkB8 = rec->unk37;
         i = 0;
         vol->unkBA = rec->unk3B;
-        func_0020F79C(arg);
+        CMtxF__Identity(arg);
     }
-    func_00210478(mtx, scale.x, scale.y, scale.z);
-    func_00210B38(mtx, rot.z);
-    func_00210968(mtx, rot.y);
-    func_00210790(mtx, rot.x);
-    func_00210318(mtx, pos.x, pos.y, pos.z);
-    func_0020C208(vol->unk20, mtx);
+    CMtxF__ScaleColumns(mtx, scale.x, scale.y, scale.z);
+    CMtxF__RotateZ(mtx, rot.z);
+    CMtxF__RotateY(mtx, rot.y);
+    CMtxF__RotateX(mtx, rot.x);
+    CMtxF__Translate(mtx, pos.x, pos.y, pos.z);
+    CMtxF__InvertAffine(vol->unk20, mtx);
     out = corners;
     do {
         x = 1.0f;
@@ -167,9 +167,9 @@ void func_00211F64(Volume *vol, VolumeRec *rec) {
         corner.x = x;
         corner.y = y;
         corner.z = z;
-        func_0020F9D4(vol->mtx, &corner, out);
+        CMtxF__TransformPointProjective(vol->mtx, &corner, out);
         out++;
         i++;
     } while (i < 8);
-    func_0026B9E0(vol->bounds, 8, corners);
+    BoundingBox_FromPoints(vol->bounds, 8, corners);
 }

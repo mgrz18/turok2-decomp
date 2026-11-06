@@ -29,17 +29,17 @@ typedef struct EffectParams {
 
 extern CCollisionResults *D_800F1ADC;
 
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
-s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
+s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
 s32 func_002682CC(HitInst *inst);
-void func_00236EA0(HitInst *a, HitInst *b, s32 type, s32 arg3, CVector3 pos, EffectParams params);
-void func_00275544(s32 sound, f32 x, f32 y, f32 z, s32 arg4, s32 arg5);
+void ImpactEvent_Send(HitInst *a, HitInst *b, s32 type, s32 arg3, CVector3 pos, EffectParams params);
+void Sound__Play(s32 sound, f32 x, f32 y, f32 z, s32 arg4, s32 arg5);
 
 #define DOT(a, b) ((a).x * (b).x + (a).y * (b).y + (a).z * (b).z)
 
 /* Sweep against the six faces of a box given by its eight corners. */
-s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVector3 *corners,
+s32 Sweep_TestBoxFaces(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVector3 *corners,
                   HitFrame *frame, s32 hitKind) {
     CVector3 *quad[4];
     CVector3 normal;
@@ -69,49 +69,49 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
                 quad[1] = &corners[6];
                 quad[2] = &corners[5];
                 quad[3] = &corners[4];
-                func_0020EF2C(&normal, &corners[4], &corners[0]);
+                CVector3__Subtract(&normal, &corners[4], &corners[0]);
                 break;
             case 1:
                 quad[0] = &corners[4];
                 quad[1] = &corners[5];
                 quad[2] = &corners[1];
                 quad[3] = &corners[0];
-                func_0020EF2C(&normal, &corners[0], &corners[3]);
+                CVector3__Subtract(&normal, &corners[0], &corners[3]);
                 break;
             case 2:
                 quad[0] = &corners[7];
                 quad[1] = &corners[4];
                 quad[2] = &corners[0];
                 quad[3] = &corners[3];
-                func_0020EF2C(&normal, &corners[3], &corners[2]);
+                CVector3__Subtract(&normal, &corners[3], &corners[2]);
                 break;
             case 3:
                 quad[0] = &corners[6];
                 quad[1] = &corners[7];
                 quad[2] = &corners[3];
                 quad[3] = &corners[2];
-                func_0020EF2C(&normal, &corners[2], &corners[1]);
+                CVector3__Subtract(&normal, &corners[2], &corners[1]);
                 break;
             case 4:
                 quad[0] = &corners[5];
                 quad[1] = &corners[6];
                 quad[2] = &corners[2];
                 quad[3] = &corners[1];
-                func_0020EF2C(&normal, &corners[1], &corners[0]);
+                CVector3__Subtract(&normal, &corners[1], &corners[0]);
                 break;
             case 5:
                 quad[0] = &corners[0];
                 quad[1] = &corners[1];
                 quad[2] = &corners[2];
                 quad[3] = &corners[3];
-                func_0020EF2C(&normal, &corners[3], &corners[7]);
+                CVector3__Subtract(&normal, &corners[3], &corners[7]);
                 break;
         }
         denom = DOT(normal, sweep->delta);
         if (denom == 0.0f) {
             continue;
         }
-        func_0020EF2C(&rel, start, quad[0]);
+        CVector3__Subtract(&rel, start, quad[0]);
         num = DOT(rel, normal);
         if (num == 0.0f) {
             continue;
@@ -130,8 +130,8 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
                 next = j + 1;
             }
             cur = quad[j];
-            func_0020EF2C(&edge, quad[next], cur);
-            func_0020EF2C(&toPoint, &point, cur);
+            CVector3__Subtract(&edge, quad[next], cur);
+            CVector3__Subtract(&toPoint, &point, cur);
             if (DOT(edge, toPoint) < 0.0f) {
                 inside = 0;
                 break;
@@ -140,7 +140,7 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
         if (!inside) {
             continue;
         }
-        if (!func_0023AB18(sweep, &normal, quad[0], 0,
+        if (!Sweep_HitPlane(sweep, &normal, quad[0], 0,
                            func_002682CC(other) ? sweep->def->m_WallBehavior : sweep->def->m_InstanceBehavior,
                            sweep->def->m_GroundFriction, 0)) {
             continue;
@@ -167,15 +167,15 @@ s32 func_0023F880(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start, CVe
             continue;
         }
         inst->target = other;
-        func_0020EF8C(&pos, sweep->hit.fraction, &sweep->inst->m_vPos, &sweep->end);
+        CVector3__Lerp(&pos, sweep->hit.fraction, &sweep->inst->m_vPos, &sweep->end);
         params.type = 5;
         params.scale = 0x6400;
         params.count = 5;
         params.r = ((HitInst *)sweep->inst)->colour[0];
         params.g = ((HitInst *)sweep->inst)->colour[1];
         params.b = ((HitInst *)sweep->inst)->colour[2];
-        func_00236EA0(other, (HitInst *)sweep->inst, 2, -1, pos, params);
-        func_00275544(0x1B4, pos.x, pos.y, pos.z, 0, -1);
+        ImpactEvent_Send(other, (HitInst *)sweep->inst, 2, -1, pos, params);
+        Sound__Play(0x1B4, pos.x, pos.y, pos.z, 0, -1);
         if (other->def->m_Type == result) {
             ((HitInst *)sweep->inst)->owner->player->hitByLaser = result;
         }

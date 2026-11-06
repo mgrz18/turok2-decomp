@@ -9,10 +9,10 @@
 #include "structs/game_object.h"
 
 f32 func_0026841C(CGameObjectInstance *e);
-f32 func_002671B4(CGameObjectInstance *e);
-s32 func_00265F90(CGameObjectInstance *e, u8 *p, CGameObjectInstance *me);
-void func_00243414(CGameObjectInstance *e, u8 *p, s32 a);
-void func_002233A8(CWorld *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *p1) {
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *e);
+s32 Action_CheckRequiredItem(CGameObjectInstance *e, u8 *p, CGameObjectInstance *me);
+void CAI__SetMode(CGameObjectInstance *e, u8 *p, s32 a);
+void CScene__CheckAutoActivation(CWorld *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *p1) {
     s32 isB;
     s32 is1;
     f32 myBot;
@@ -47,14 +47,14 @@ void func_002233A8(CWorld *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *
         isB = kind == 0xB;
         is1 = kind == 1;
         myBot = me->header.m_vPos.y + func_0026841C(me);
-        myTop = myBot + func_002671B4(me);
+        myTop = myBot + GameObject_GetCollisionHeight(me);
         for (i = 0; i < lv->m_nFlagged; i++) {
             e = (CGameObjectInstance *)lv->m_pFlagged[i];
             if (e != me) {
                 s4 = 0;
                 s1 = 0;
                 eBot = e->header.m_vPos.y + func_0026841C(e);
-                eTop = eBot + func_002671B4(e);
+                eTop = eBot + GameObject_GetCollisionHeight(e);
                 switch (e->header.m_pIntelligence->m_Type) {
                 case 6:
                     s2 = 0;
@@ -135,10 +135,10 @@ void func_002233A8(CWorld *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *
                         }
                         if (ok != 0) {
                             if (e->header.m_pIntelligence->m_Type == 10 && s2 == 1) {
-                                ok = func_00265F90(e, (u8 *)e + 0x140, me);
+                                ok = Action_CheckRequiredItem(e, (u8 *)e + 0x140, me);
                             }
                             if (ok != 0) {
-                                func_00243414(e, (u8 *)e + 0x140, s2);
+                                CAI__SetMode(e, (u8 *)e + 0x140, s2);
                             }
                         }
                     }
@@ -157,7 +157,7 @@ void func_002233A8(CWorld *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *
                             }
                         }
                         if (ok != 0) {
-                            func_00243414(e, (u8 *)e + 0x140, s3);
+                            CAI__SetMode(e, (u8 *)e + 0x140, s3);
                         }
                     }
                 }

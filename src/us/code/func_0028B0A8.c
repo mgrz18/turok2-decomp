@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0029AC90(s32 arg0);
-extern s32 func_0028B0A8(void *,void *);
-s32 func_0028B0A8(void *arg0, void *arg1) {
+extern void osViSwapBuffer(s32 arg0);
+extern s32 __scTaskComplete(void *,void *);
+s32 __scTaskComplete(void *arg0, void *arg1) {
     if ((((s32)((struct OSScTask_s *)arg1)->state)) & 3) {
         return 0;
     }
@@ -15,6 +15,6 @@ s32 func_0028B0A8(void *arg0, void *arg1) {
     if (((((s32)((struct OSScTask_s *)arg1)->flags)) & 0x60) != 0x60) {
         return 1;
     }
-    func_0029AC90(((s32)((struct OSScTask_s *)arg1)->framebuffer));
+    osViSwapBuffer(((s32)((struct OSScTask_s *)arg1)->framebuffer));
     return 1;
 }

@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern u8 *func_0045FCD0(u8 *arg0, u8 *arg1, s32 arg2);
-u8 *func_0045FCD0(u8 *arg0, u8 *arg1, s32 arg2) {
+extern u8 *Str_CopyN_2(u8 *arg0, u8 *arg1, s32 arg2);
+u8 *Str_CopyN_2(u8 *arg0, u8 *arg1, s32 arg2) {
     s32 var_a2;
     u8 *temp_v1;
     u8 *var_a0;

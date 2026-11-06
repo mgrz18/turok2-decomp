@@ -5,10 +5,10 @@
  * header with the play clock, the player's CPlayerLoadSaveData, the first
  * 0x184 bytes of the game settings, then the level flags (D_800EBAC0, as
  * many bytes as the level header says: D_800F70A8, CWorld +0x30), with a
- * checksum (func_00426E78) in its last word. func_0041D890 / func_004567B0
- * build one into D_800C2018; func_0041F32C reads one into D_800C201C and
- * func_00421528 / func_00420454 load the game from it. The pak menu items
- * show its clock (func_00422060), health, lives and difficulty.
+ * checksum (Crc32_Compute) in its last word. SaveGame_Build / SaveGame_Build_2
+ * build one into D_800C2018; PakMenu_SelectNote reads one into D_800C201C and
+ * SaveGame_Restore / GameNoteMenu_SelectYes load the game from it. The pak menu items
+ * show its clock (GameNoteMenu_UpdateTime), health, lives and difficulty.
  * tools/check_structs.py checks the offsets. */
 
 #include "common.h"

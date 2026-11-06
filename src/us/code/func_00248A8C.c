@@ -7,7 +7,7 @@ extern u8 D_8011AAF1;            /* multiplayer */
 /* Takes every weapon and all ammo away, then gives the starting kit: in
  * multiplayer by character (10 gets weapon 0x22), otherwise the
  * knife-and-bow set with 20 rounds. */
-void func_00248A8C(CPlayer *p) {
+void CPlayer__GiveStartingWeapons(CPlayer *p) {
     s32 i;
 
     for (i = 0; i < 0x1F; i++) {

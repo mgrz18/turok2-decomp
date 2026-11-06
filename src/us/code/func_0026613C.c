@@ -1,12 +1,12 @@
 #include "common.h"
 
 extern u8 D_800F7078[];
-s32 func_00220408(void *table, void *actor);
-s32 func_00243414(void *actor, void *state, s32 mode);
+s32 CScene__GetInstanceSavedBit(void *table, void *actor);
+s32 CAI__SetMode(void *actor, void *state, s32 mode);
 
-void func_0026613C(u8 *actor, u8 *state) {
-    if (func_00220408(D_800F7078, actor) == 1) {
-        func_00243414(actor, state, 1);
+void Action_Advance(u8 *actor, u8 *state) {
+    if (CScene__GetInstanceSavedBit(D_800F7078, actor) == 1) {
+        CAI__SetMode(actor, state, 1);
         switch (*(u16 *) (actor + 0xB8)) {
             case 0x64C:
                 *(s32 *) (actor + 0xD4) &= ~0x2000;
@@ -18,6 +18,6 @@ void func_0026613C(u8 *actor, u8 *state) {
                 break;
         }
     } else {
-        func_00243414(actor, state, 0);
+        CAI__SetMode(actor, state, 0);
     }
 }

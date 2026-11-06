@@ -20,13 +20,13 @@ typedef struct {
 extern CCollisionResults D_800F1CE0;  /* m_pInstance: what the player is aiming at */
 extern CVector3 D_800ADCBC;             /* rider seat */
 
-f32 func_00246310(CGameObjectInstance *body, CVector3 point);   /* angle to a point */
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);
-void func_002470E8(void *controls, void *settings);
-f32 func_00253CFC(CPlayer *player);
-void func_00206068(s32);
-void func_0025EB80(Mount *mount, void *ai, CPlayer *player);
-s32 func_0024E5F0(CPlayer *player, CGameObjectInstance *body, s32 arg2);
+f32 AI_AngleToPoint(CGameObjectInstance *body, CVector3 point);   /* angle to a point */
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);
+void CPlayerContState__Init(void *controls, void *settings);
+f32 Actor_GetEyeHeight(CPlayer *player);
+void CCache__SetFrameDelay(s32);
+void EnemyAI_Mount(Mount *mount, void *ai, CPlayer *player);
+s32 CPlayer__SetState(CPlayer *player, CGameObjectInstance *body, s32 arg2);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
@@ -39,19 +39,19 @@ static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
 /* Mounts the creature of type 0x136 in front, if within 45 degrees of the
  * heading and the player is not holding 0x8000: the player takes its seat
  * and heading, and the movement state is reset. */
-s32 func_0024EAF8(CPlayer *p, CGameObjectInstance *body) {
+s32 CPlayer__TryMount(CPlayer *p, CGameObjectInstance *body) {
     Mount *mount;
 
     if (p->m_pOnEnemy == NULL && !(p->m_ModeBeforeFlags & 0x8000)) {
         if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
             mount = (Mount *)D_800F1CE0.m_pInstance;
-            if (mount->type == 0x136 && ABS(func_00246310(body, mount->pos)) < 0.785398245f) {
+            if (mount->type == 0x136 && ABS(AI_AngleToPoint(body, mount->pos)) < 0.785398245f) {
                 p->m_pOnEnemy = mount;
                 p->m_OnEnemyObjectType = 0x136;
                 p->m_vOnEnemyScale = D_800ADCBC;
-                func_0020EF60(&p->m_vOnEnemyScale, &p->m_vOnEnemyScale, 0.03f);
+                CVector3__Scale(&p->m_vOnEnemyScale, &p->m_vOnEnemyScale, 0.03f);
                 body->m_RotY = mount->yaw;
-                func_002470E8(&p->m_ContState, &D_800F5EC0[p->m_nController]);
+                CPlayerContState__Init(&p->m_ContState, &D_800F5EC0[p->m_nController]);
                 p->m_Speed = 0;
                 p->m_SideSpeed = 0;
                 p->m_TotalSpeed = 0;
@@ -75,16 +75,16 @@ s32 func_0024EAF8(CPlayer *p, CGameObjectInstance *body) {
                 p->m_vHeadWobbleRotOffset.y = 0;
                 p->m_vHeadWobbleRotOffset.z = 0;
                 p->m_vEyeOffset.x = 0;
-                p->m_vEyeOffset.y = func_00253CFC(p);
+                p->m_vEyeOffset.y = Actor_GetEyeHeight(p);
                 p->m_vEyeOffset.z = 0;
                 setVec3(&p->m_qGround, 0.0f, 0.0f, 0.0f);
                 p->m_ActualCameraVertEyeOffset = 0;
                 p->m_qGround.w = 1.0f;
                 p->m_CameraMovementScaler = 1.0f;
                 p->m_vDesiredPos = p->m_CharacterActor.header.m_vPos;
-                func_00206068(8);
-                func_0025EB80(mount, mount->ai, p);
-                return func_0024E5F0(p, body, 0x21);
+                CCache__SetFrameDelay(8);
+                EnemyAI_Mount(mount, mount->ai, p);
+                return CPlayer__SetState(p, body, 0x21);
             }
         }
     }

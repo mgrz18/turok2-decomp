@@ -1,7 +1,7 @@
-/* func_0027A4DC and func_0027A7A0, one source file: the file's .rodata opens
- * at 0x800A83F0 with func_0027A4DC's 4.0f, and func_0027A7A0's doubles
+/* Hud_DrawI4BlockScaled and Hud_DrawImageFrame, one source file: the file's .rodata opens
+ * at 0x800A83F0 with Hud_DrawI4BlockScaled's 4.0f, and Hud_DrawImageFrame's doubles
  * (2^32 for unsigned-to-float) are 8-aligned from there; from its own
- * start, 0x800A83F4, they would land 4 bytes off. func_0027A4DC is the
+ * start, 0x800A83F4, they would land 4 bytes off. Hud_DrawI4BlockScaled is the
  * Rage Wars import, its 4.0f now a literal rather than an extern. */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/GFX/TEXT/802A8A94_3.CPP, func_802AA1AC_de, with Turok 2's layouts. */
 #include "common.h"
@@ -23,17 +23,17 @@ typedef struct {
     /* 0x8 */ TileBlock m_Blocks[1];
 } TileGrid;
 
-void func_0027AE44(void *table, s32 frame, TileGrid **pgrid, u8 *popaque);
-void func_0027A4DC(void *pTexture, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY);
-void func_0027A2C4(void *pTexture, int XPos, int YPos, int TextureWidth, int TextureHeight);
-void func_00279528(void *pTexture, void *pOpacity, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY);
-void func_00279158(void *pTexture, void *pOpacity, int XPos, int YPos, int TextureWidth, int TextureHeight);
-void func_0020565C(s32, void *);
+void Hud_GetImageFrame(void *table, s32 frame, TileGrid **pgrid, u8 *popaque);
+void Hud_DrawI4BlockScaled(void *pTexture, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY);
+void Hud_DrawI4Block(void *pTexture, int XPos, int YPos, int TextureWidth, int TextureHeight);
+void Hud_DrawMaskedBlockScaled(void *pTexture, void *pOpacity, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY);
+void Hud_DrawMaskedBlock(void *pTexture, void *pOpacity, int XPos, int YPos, int TextureWidth, int TextureHeight);
+void CCache__LockForDisplayList(s32, void *);
 
 /* The next block: past the data of this one (`size` bytes), then its header. */
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_802A7AA4_de_5.c, func_802A9EE8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-void func_0027A4DC(void *pTexture, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY) {
+void Hud_DrawI4BlockScaled(void *pTexture, f32 XPos, f32 YPos, int TextureWidth, int TextureHeight, f32 ScaleX, f32 ScaleY) {
     int dsdx;
     int dtdy;
     int xl, yl, xh, yh;
@@ -72,7 +72,7 @@ static __inline__ void DrawScaled(TileGrid *grid, f32 x, f32 y, f32 scaleX, f32 
         while (col-- != 0.0f) {
             height = block->m_Height;
             width = block->m_Width;
-            func_0027A4DC(block->m_Pixels, fx, fy, width, height, scaleX, scaleY);
+            Hud_DrawI4BlockScaled(block->m_Pixels, fx, fy, width, height, scaleX, scaleY);
             fx += (f32) width * scaleX;
             NEXT_BLOCK(block, (width * height) >> 1);
         }
@@ -96,7 +96,7 @@ static __inline__ void Draw(TileGrid *grid, s16 x, s32 y) {
         while (--i != -1) {
             width = block->m_Width;
             height = block->m_Height;
-            func_0027A2C4(block->m_Pixels, ix, (s16) iy, width, height);
+            Hud_DrawI4Block(block->m_Pixels, ix, (s16) iy, width, height);
             ix += width;
             NEXT_BLOCK(block, (width * height) >> 1);
         }
@@ -120,7 +120,7 @@ static __inline__ void DrawScaledMasked(TileGrid *grid, f32 x, f32 y, f32 scaleX
             height = block->m_Height;
             width = block->m_Width;
             size = width * height;
-            func_00279528(block->m_Pixels, block->m_Pixels + size, fx, fy, width, height, scaleX, scaleY);
+            Hud_DrawMaskedBlockScaled(block->m_Pixels, block->m_Pixels + size, fx, fy, width, height, scaleX, scaleY);
             fx += (f32) width * scaleX;
             NEXT_BLOCK(block, size * 2 + (size >> 1));
         }
@@ -145,7 +145,7 @@ static __inline__ void DrawMasked(TileGrid *grid, s16 x, s32 y) {
             height = block->m_Height;
             width = block->m_Width;
             size = width * height;
-            func_00279158(block->m_Pixels, block->m_Pixels + size, ix, (s16) iy, width, height);
+            Hud_DrawMaskedBlock(block->m_Pixels, block->m_Pixels + size, ix, (s16) iy, width, height);
             ix += width;
             NEXT_BLOCK(block, size * 2 + (size >> 1));
         }
@@ -156,7 +156,7 @@ static __inline__ void DrawMasked(TileGrid *grid, s16 x, s32 y) {
 /* Draws frame `frame` of a tiled image at (x, y): block by block, row by row,
  * scaled by (scaleX, scaleY) when `scaled` is set; an image whose frame byte
  * is clear carries an opacity mask after each block's texels. */
-void func_0027A7A0(void *table, s32 frame, s32 x, s32 y, f32 scaleX, f32 scaleY, s32 scaled) {
+void Hud_DrawImageFrame(void *table, s32 frame, s32 x, s32 y, f32 scaleX, f32 scaleY, s32 scaled) {
     TileGrid *grid;
     u8 opaque;
 
@@ -166,7 +166,7 @@ void func_0027A7A0(void *table, s32 frame, s32 x, s32 y, f32 scaleX, f32 scaleY,
         g->w1 = 0;
     }
     if (table != NULL) {
-        func_0027AE44(table, frame, &grid, &opaque);
+        Hud_GetImageFrame(table, frame, &grid, &opaque);
         if (grid != NULL) {
             if (opaque) {
                 if (scaled) {
@@ -179,7 +179,7 @@ void func_0027A7A0(void *table, s32 frame, s32 x, s32 y, f32 scaleX, f32 scaleY,
             } else {
                 DrawMasked(grid, x, y);
             }
-            func_0020565C(0, table);
+            CCache__LockForDisplayList(0, table);
         }
     }
 }

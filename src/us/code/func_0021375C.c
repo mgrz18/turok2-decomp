@@ -21,14 +21,14 @@ typedef struct {
 extern u32 D_8011AAD8;          /* game flags */
 extern u32 D_8011AAE4;          /* brightness, 0-255 */
 
-VtxBlk *func_002017D4(s32 *file, s32 index); /* returns chunk `index` of a chunked file */
+VtxBlk *CISet__GetBlock(s32 *file, s32 index); /* returns chunk `index` of a chunked file */
 
 #define MN(a, b) ((a) < (b) ? (a) : (b))
 
 /* Writes the vertex colours of every chunk of file from the light levels in
  * src, brightened toward white by the brightness setting; black with game
  * flag 0x4000. */
-void func_0021375C(s32 *file, CVector3 *src) {
+void Lighting_WriteVertexColors(s32 *file, CVector3 *src) {
     s32 i;
     VtxBlk *b;
     CVector3 t;
@@ -42,7 +42,7 @@ void func_0021375C(s32 *file, CVector3 *src) {
             s32 n;
             LitVtx *vp;
 
-            b = func_002017D4(file, j);
+            b = CISet__GetBlock(file, j);
             i = 0;
             n = b->count;
             vp = b->v;
@@ -57,7 +57,7 @@ void func_0021375C(s32 *file, CVector3 *src) {
             s32 n;
             LitVtx *vp;
 
-            b = func_002017D4(file, j);
+            b = CISet__GetBlock(file, j);
             i = 0;
             n = b->count;
             vp = b->v;

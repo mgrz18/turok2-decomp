@@ -1,11 +1,11 @@
-/* Second-module copy of func_0040E648 (src/us/code/func_0040E648.c), with its string/data addresses 0xE0 lower. */
+/* Second-module copy of BlindOne_PhaseGroup1Update (src/us/code/BlindOne_PhaseGroup1Update.c), with its string/data addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
 extern BlindOnePhase D_0043232C[];
 
-void func_00447648(BlindOneState *m) {
+void BlindOne_PhaseGroup1Update_2(BlindOneState *m) {
     BlindOneStep *script;
     s32 cmd;
     s32 i;

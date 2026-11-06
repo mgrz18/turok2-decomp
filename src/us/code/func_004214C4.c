@@ -5,7 +5,7 @@ extern s32 D_80130970;          /* the character of the pak profile D_80130968 (
 extern u8 D_80130974[];
 
 /* Copies the saved values into the options of the player. */
-void func_004214C4(CPlayer *arg0)
+void PakMenu_RestoreCharacter(CPlayer *arg0)
 {
   s32 var_a0;
   u8 temp_v0;

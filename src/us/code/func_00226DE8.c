@@ -7,12 +7,12 @@
 #include "structs/intelligence.h"
 #include "structs/game_object.h"
 
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-s32 func_00226DE8(CGameObjectInstance *e, CVector3 *target) {
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+s32 Blast_IsLivingEnemyInRange(CGameObjectInstance *e, CVector3 *target) {
     CVector3 d;
     f32 dist;
     u32 t;
-    func_0020EF2C(&d, &e->header.m_vPos, target);
+    CVector3__Subtract(&d, &e->header.m_vPos, target);
     dist = d.x * d.x + d.y * d.y + d.z * d.z;
     if (e->header.m_pIntelligence->m_Type == 1) {
         t = e->m_nTypeFlag;

@@ -5,7 +5,7 @@ extern s32 D_800B17C0;
 extern s32 D_800B1840;
 extern s32 D_800B18C0;
 
-s32 func_0025EAB0(CGameObjectInstance *arg0, CAI *arg1) {
+s32 EnemyAI_UsesRideTables(CGameObjectInstance *arg0, CAI *arg1) {
     s32 temp_v1;
 
     temp_v1 = (s32) arg1->m_pModeTable;

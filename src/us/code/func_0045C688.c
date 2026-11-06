@@ -1,5 +1,5 @@
 /* WRONG CUT: the real function starts at 0x0045C688 (size 0x118 = 280): splat
- * cut its first two words (lui/lw D_80130990) as func_0045C688. */
+ * cut its first two words (lui/lw D_80130990) as DamagedPakMenu_SelectRetry_2. */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
@@ -16,7 +16,7 @@ extern u8 D_0043BE14[];
 extern u8 D_0043BDF0[];
 
 s32 func_0041DCB0(Menu *event, s32 mode, s32 arg2);
-void func_00416644(void *menu, void *page, void *player, void *args, s32 flags);
+void MenuPool_OpenMenu(void *menu, void *page, void *player, void *args, s32 flags);
 
 static __inline__ s32 currentMode(Menu *event) {
     s32 mode;
@@ -29,7 +29,7 @@ static __inline__ s32 currentMode(Menu *event) {
     return mode;
 }
 
-s32 func_0045C688(void *arg0, Menu *event) {
+s32 DamagedPakMenu_SelectRetry_2(void *arg0, Menu *event) {
     s32 mode = currentMode(event);
     void *menu;
 
@@ -43,13 +43,13 @@ s32 func_0045C688(void *arg0, Menu *event) {
         if (event->context == D_0043BE14 || event->context == D_0043BDF0) {
             D_80130940 = 0;
         }
-        func_00416644(menu, event->context, event->player, event->controller, 0);
+        MenuPool_OpenMenu(menu, event->context, event->player, event->controller, 0);
         return 1;
     } else {
         if (event->context == D_0043BE14 || event->context == D_0043BDF0) {
             D_80130940 = 0;
         }
-        func_00416644(D_80119E2C, event->context, event->player, event->controller, 0);
+        MenuPool_OpenMenu(D_80119E2C, event->context, event->player, event->controller, 0);
         return 1;
     }
 }

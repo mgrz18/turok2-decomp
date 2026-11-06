@@ -11,13 +11,13 @@ extern u8 D_800AA0E0[];   /* "<" */
 extern u8 D_800AA0E4[];   /* "," */
 extern u8 D_800AA0E8[];   /* ">\n" */
 
-extern void func_0028B430(s32 c);       /* print a character */
-extern void func_0028CD68(s32 byte);    /* print a byte in hex */
+extern void Crash_PutChar(s32 c);       /* print a character */
+extern void Crash_PrintHex8(s32 byte);    /* print a byte in hex */
 
 static __inline__ void PrintString(u8 *s) {
     if (*s != 0) {
         do {
-            func_0028B430(*s++);
+            Crash_PutChar(*s++);
         } while (*s != 0);
     }
 }
@@ -26,12 +26,12 @@ static __inline__ void PrintHex32(u32 value) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        func_0028CD68(value >> ((3 - i) * 8));
+        Crash_PrintHex8(value >> ((3 - i) * 8));
     }
 }
 
 /* Fault screen: prints "name: XXXXXXXX<flag,flag>" with the names of the flags set in value. */
-void func_0028B614(u32 value, u8 *name, FlagDesc *desc) {
+void Crash_PrintFlags(u32 value, u8 *name, FlagDesc *desc) {
     s32 first;
 
     first = 1;

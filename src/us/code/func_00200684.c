@@ -2,7 +2,7 @@
 #include "structs/camera.h"
 
 /* CList: insert arg2 after arg1, or at the tail when arg1 has no next. */
-void func_00200684(CList *arg0, s32 arg1, s32 arg2) {
+void CList__InsertAfter(CList *arg0, s32 arg1, s32 arg2) {
     s32 temp_v0;
     s32 temp_v1;
     s32 temp_v1_2;

@@ -14,25 +14,25 @@ typedef struct {
     /* 0x50 */ f32 angle;
 } Thrown;
 
-extern void func_0025EC28(void *obj, void *ai, CPlayer *player);
-extern void func_0024E5F0(CPlayer *player, Thrown *other, s32 mode);
+extern void EnemyAI_Dismount(void *obj, void *ai, CPlayer *player);
+extern void CPlayer__SetState(CPlayer *player, Thrown *other, s32 mode);
 extern f32 func_002982F0(f32 x);   /* sinf */
 extern f32 func_002974C0(f32 x);   /* cosf */
-extern void func_00206068(s32 sound);
+extern void CCache__SetFrameDelay(s32 sound);
 
-void func_002553BC(CPlayer *player, Thrown *obj) {
+void CPlayer__Dismount(CPlayer *player, Thrown *obj) {
     if (player->m_ModeFlags & 0x8000) {
-        func_0025EC28(((u8 *)player->m_pOnEnemy), ((u8 *)player->m_pOnEnemy) + 0x140, player);
+        EnemyAI_Dismount(((u8 *)player->m_pOnEnemy), ((u8 *)player->m_pOnEnemy) + 0x140, player);
         player->m_pOnEnemy = NULL;
         player->m_Speed = 0;
         player->m_SideSpeed = 0;
-        func_0024E5F0(player, obj, 5);
+        CPlayer__SetState(player, obj, 5);
         obj->x -= func_002982F0(obj->angle + 3.1415927f) * 102.399994f;
         obj->y += 163.84f;
         obj->z -= func_002974C0(obj->angle + 3.1415927f) * 102.399994f;
         obj->vx = func_002982F0(obj->angle + 3.1415927f) * -358.4f;
         obj->vy = 358.4f;
         obj->vz = func_002974C0(obj->angle + 3.1415927f) * -358.4f;
-        func_00206068(8);
+        CCache__SetFrameDelay(8);
     }
 }

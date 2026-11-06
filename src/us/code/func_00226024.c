@@ -7,12 +7,12 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 typedef struct { f32 div; u8 r; u8 g; u8 b; u8 pad7; } Pal;
-void func_002883E0(u8 *a, u8 *col, s32 c, s32 d, s32 e, s32 f);
+void CEngineApp__DrawFilledRect(u8 *a, u8 *col, s32 c, s32 d, s32 e, s32 f);
 extern Pal D_800ACDE8[];
 extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern u8 D_800F6CB0[];
-void func_00226024(CWorld *lv) {
+void CScene__DrawWarpFade(CWorld *lv) {
     u8 col[4];
     f32 t;
     Pal *p;
@@ -27,7 +27,7 @@ void func_00226024(CWorld *lv) {
             col[2] = p->b;
             t = lv->m_WarpTime * 255.0f / p->div;
             col[3] = (u32)t;
-            func_002883E0(D_800F6CB0, col, 0, 0, D_800C2030, D_800C2034);
+            CEngineApp__DrawFilledRect(D_800F6CB0, col, 0, 0, D_800C2030, D_800C2034);
         }
        }
       }

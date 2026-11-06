@@ -8,7 +8,7 @@ typedef unsigned char u8;
 typedef signed int s32;
 typedef unsigned int u32;
 typedef float f32;
-void func_00228C40(u8 hue, u8 red_arg, u8 green_arg, u8 blue_arg,
+void Color_ShiftHue(u8 hue, u8 red_arg, u8 green_arg, u8 blue_arg,
     void *red_out, void *green_out, void *blue_out) {
     s32 phase;
     s32 distance0, distance1, distance2;

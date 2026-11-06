@@ -84,7 +84,7 @@ struct PagerState;
 typedef struct PagerState PagerState;
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 extern ResourcePageMapping *D_80121294;
-extern void func_0028DBAC(s16 flags, ResourcePageMapping *item, s32 unused, u8 *out);
+extern void VM_MapTLBEntry(s16 flags, ResourcePageMapping *item, s32 unused, u8 *out);
 extern ResourcePageMapping *D_80121290;
 typedef struct ResourcePageThread {
     u8 reserved0[0x12]; s16 state;
@@ -102,9 +102,9 @@ extern PagerState D_801206A0;
 extern char D_80121140[];
 extern void osInvalDCache(u32, s32);
 extern void osInvalICache(u32, s32);
-extern void func_0029BB10(void *);
+extern void osStartThread(void *);
 static __inline__ void writeLink(ResourcePageMapping **where, ResourcePageMapping *value) { *where = value; }
-void func_0028ED10(ResourcePageJob *req) {
+void VM_FinishPageJob(ResourcePageJob *req) {
     ResourcePageMapping *link;
     if (*req->slot == 0xFF) {
         link = req->mapping;
@@ -117,7 +117,7 @@ void func_0028ED10(ResourcePageJob *req) {
         if (D_80121290 == 0) {
             D_80121290 = link;
         }
-        func_0028DBAC(req->page, req->mapping, req->thread->slot, req->slot);
+        VM_MapTLBEntry(req->page, req->mapping, req->thread->slot, req->slot);
         osInvalDCache(req->page << 12, 0x1000);
         osInvalICache(req->page << 12, 0x1000);
     } else {
@@ -133,6 +133,6 @@ void func_0028ED10(ResourcePageJob *req) {
         }
     }
     req->thread->state = 2;
-    func_0029BB10(req->thread);
+    osStartThread(req->thread);
     osSendMesg(D_80121140, req, 1);
 }

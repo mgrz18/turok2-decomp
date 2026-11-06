@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00297CB4(f32 *arg0, s32 *arg1);
+extern void guMtxL2F(f32 *arg0, s32 *arg1);
 extern float D_800AA7D0;
-void func_00297CB4(f32 *arg0, s32 *arg1) {
+void guMtxL2F(f32 *arg0, s32 *arg1) {
     s32 *inLo;
     u32 *inHi;
     f32 *outRow;

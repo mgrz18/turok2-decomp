@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_002026EC(s32, s32);
-s32 func_002062F8(s32, s32);
-s32 func_002065F8(s32, s32);
+s32 CHeap__Free(s32, s32);
+s32 CCache__FreeMemEntry(s32, s32);
+s32 CCache__DetachCacheEntry(s32, s32);
 
 extern s32 D_800D1CC0;
 
-void func_002061B8(s32 arg0, CAI *ai) {
+void CCache__DeallocateInternal(s32 arg0, CAI *ai) {
     s32 temp_v0;
 
     ai->m_VisBits = (s32) (ai->m_VisBits & ~2);
@@ -23,8 +23,8 @@ loop_1:
         } while (ai->m_InitialHealth != 0);
     }
     if (!(ai->m_VisBits & 0x702)) {
-        func_002065F8(0, (s32) ai);
-        func_002026EC((s32) &D_800D1CC0, ai->m_dwFlags);
-        func_002062F8(0, (s32) ai);
+        CCache__DetachCacheEntry(0, (s32) ai);
+        CHeap__Free((s32) &D_800D1CC0, ai->m_dwFlags);
+        CCache__FreeMemEntry(0, (s32) ai);
     }
 }

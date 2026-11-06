@@ -8,7 +8,7 @@ extern f32 D_8011ACC0;
 #define OBJ(arg)        (*(u8 **) ((u8 *) (arg) + 0xC))
 #define OBJ_FLAGS(obj)  (*(s32 *) ((u8 *) (obj) + 0x30))
 
-void func_0041A420(void *arg0) {
+void GameOverMenu_Init(void *arg0) {
     u8 *obj;
 
     D_8011ACC0 = D_800C1064;

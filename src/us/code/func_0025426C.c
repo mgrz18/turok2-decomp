@@ -2,10 +2,10 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-s32 func_002241D8(s32 *, void *, u16, s32); /* extern */
+s32 CScene__SetInstanceObjectType(s32 *, void *, u16, s32); /* extern */
 
 extern s32 D_800F7078;
 
-void func_0025426C(CPlayer *arg0) {
-    func_002241D8(&D_800F7078, &arg0->m_WeaponActor, D_800AF618[arg0->m_Data.m_CurrentWeapon]->model, arg0->m_WeaponActor.m_AI.m_pModeTable->unk_10);
+void CPlayer__LoadWeaponModel(CPlayer *arg0) {
+    CScene__SetInstanceObjectType(&D_800F7078, &arg0->m_WeaponActor, D_800AF618[arg0->m_Data.m_CurrentWeapon]->model, arg0->m_WeaponActor.m_AI.m_pModeTable->unk_10);
 }

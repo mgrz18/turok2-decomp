@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern void *func_00294B58(void);
-extern void *func_00294B58(void);
-void func_002942B0(void *arg0, void *arg1, u8 arg2) {
+extern void *__allocParam(void);
+extern void *__allocParam(void);
+void alSynSetPan(void *arg0, void *arg1, u8 arg2) {
     s32 new_var;
     void *Shared_func_802B3350_de_v0;
     void *temp_a0;
     SharedRecV5 fn;
     if ((((ObjectStateC_2 *)(arg1))->unk_8.v0) != 0) {
-        Shared_func_802B3350_de_v0 = func_00294B58();
+        Shared_func_802B3350_de_v0 = __allocParam();
         if (Shared_func_802B3350_de_v0 != 0) {
             new_var = (((struct Shape_typemap_71 *)(arg0))->field_1C) + (((struct IntegerStateDC_2 *) ((ObjectStateC_2 *) arg1)->unk_8.v1)->state);
             ((ObjectState10_3 *)(Shared_func_802B3350_de_v0))->unk_8 = 0xC;
@@ -24,4 +24,4 @@ void func_002942B0(void *arg0, void *arg1, u8 arg2) {
         }
     }
 }
-extern void *func_00294B58(void);
+extern void *__allocParam(void);

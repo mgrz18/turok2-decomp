@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_002175D8();                            /* extern */
+s32 AnimCurve_Evaluate();                            /* extern */
 
 void func_0021852C(void) {
-    func_002175D8();
+    AnimCurve_Evaluate();
 }

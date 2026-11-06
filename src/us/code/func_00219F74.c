@@ -13,15 +13,15 @@ typedef struct {
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
 
-s32 *func_0020367C(s32, s32, s32, s32, s32, s32, s32, s32);
-s32 *func_002017D4(s32, s32);
-void func_002051F4(s32, s32 *);
-s32 func_00266D24(s32 *, s32, s32);
-void func_0026D5DC(RandList *);
-void func_0026D5E4(RandList *, s16, s32);
-s32 func_0026D628(RandList *);
+s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
+s32 *CISet__GetBlock(s32, s32);
+void CCache__Unlock(s32, s32 *);
+s32 BinarySearch(s32 *, s32, s32);
+void WeightedTable_Clear(RandList *);
+void WeightedTable_Add(RandList *, s16, s32);
+s32 WeightedTable_Pick(RandList *);
 
-s32 func_00219F74(CGameObjectInstance *actor, s32 action, s32 skip) {
+s32 CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, s32 action, s32 skip) {
     RandList list;
     s32 *res;
     s32 *data;
@@ -31,36 +31,36 @@ s32 func_00219F74(CGameObjectInstance *actor, s32 action, s32 skip) {
     s32 found;
 
     if (actor->m_dwFlags & 0x40000) {
-        res = func_0020367C(0, ((s32)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, (s32) D_800A5AC4, 1);
+        res = CCache__Request(0, ((s32)actor->m_rpObject), actor->m_rpObjectHeader, 0, 0, 0, (s32) D_800A5AC4, 1);
         if (res != NULL) {
-            data = func_002017D4(*res, 1);
+            data = CISet__GetBlock(*res, 1);
             entries = data + 2;
             count = data[1];
-            i = func_00266D24(entries, actor->m_nAnims, action);
+            i = BinarySearch(entries, actor->m_nAnims, action);
             if (i != -1) {
                 found = i;
                 while (i > 0 && entries[i - 1] == action) {
                     i--;
                 }
-                func_0026D5DC(&list);
+                WeightedTable_Clear(&list);
                 if (skip == -1) {
                     while (i < count && entries[i] == action) {
-                        func_0026D5E4(&list, i++, 10);
+                        WeightedTable_Add(&list, i++, 10);
                     }
                 } else {
                     while (i < count && entries[i] == action) {
                         if (skip != i) {
-                            func_0026D5E4(&list, i, 10);
+                            WeightedTable_Add(&list, i, 10);
                         }
                         i++;
                     }
                 }
                 if (list.count == 0) {
-                    func_0026D5E4(&list, found, 10);
+                    WeightedTable_Add(&list, found, 10);
                 }
-                i = (s16) func_0026D628(&list);
+                i = (s16) WeightedTable_Pick(&list);
             }
-            func_002051F4(0, res);
+            CCache__Unlock(0, res);
             return i;
         }
     }

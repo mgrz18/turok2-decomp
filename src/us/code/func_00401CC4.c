@@ -8,7 +8,7 @@ typedef struct {
     /* 0x20 */ s32 unk20[6];
 } Module;
 
-void func_00401CC4(Module *arg0) {
+void Automap_Reset(Module *arg0) {
     arg0->unk8 = 0;
     arg0->unk4 = 0;
     arg0->unk20[0] = 0;

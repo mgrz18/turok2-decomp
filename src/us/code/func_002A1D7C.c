@@ -3,10 +3,10 @@
 
 #include "rw/junk_types.h"
 
-u32 func_002A1540(u32 addr);
-void func_002A1954(u32 addr, u32 val);
-void func_002A1D7C(u32 dst, u32 src, u32 n) {
+u32 HostIo_ReadByte(u32 addr);
+void HostIo_WriteByte(u32 addr, u32 val);
+void HostIo_CopyCartBytes(u32 dst, u32 src, u32 n) {
     while (n--) {
-        func_002A1954(dst++, func_002A1540(src++) & 0xFF);
+        HostIo_WriteByte(dst++, HostIo_ReadByte(src++) & 0xFF);
     }
 }

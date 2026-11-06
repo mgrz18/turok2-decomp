@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern void func_004524C0(struct Shared_PakMenu *arg0);
-extern void func_00285A68(s32 kind);
+extern void SingleMenu_Init_2(struct Shared_PakMenu *arg0);
+extern void Controller_WatchPak(s32 kind);
 extern void func_004263A0(s32 kind);
-extern void func_00285A68(int);
-extern void func_00285A68(int arg0);
-void func_004524C0(struct Shared_PakMenu *arg0)
+extern void Controller_WatchPak(int);
+extern void Controller_WatchPak(int arg0);
+void SingleMenu_Init_2(struct Shared_PakMenu *arg0)
 {
     s32 kind = arg0->owner->unk4;
-    func_00285A68(kind);
+    Controller_WatchPak(kind);
     func_004263A0(kind);
 }

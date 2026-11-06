@@ -25,13 +25,13 @@ extern u8 D_800F7078[];
 extern u8 D_800F5618[0x90];
 extern u8 *D_800B2AC0;
 
-Resource *func_00224DF4(void *cache, s32 id, s32, s32);
-void func_002051F4(s32, Resource *res);
+Resource *CScene__LoadGraphicSet(void *cache, s32 id, s32, s32);
+void CCache__Unlock(s32, Resource *res);
 void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 
 /* Loads the 0x90-byte block of chunk 42 of resource 2 into D_800F5618 and
  * points D_800B2AC0 at it (NULL until it is loaded). */
-void func_0027B40C(void) {
+void COnScreen__LoadFontTexture(void) {
     Resource *res;
     Chunk chunk;
     ChunkTable *table;
@@ -40,7 +40,7 @@ void func_0027B40C(void) {
     s32 index;
 
     D_800B2AC0 = NULL;
-    res = func_00224DF4(D_800F7078, 2, 0, 1);
+    res = CScene__LoadGraphicSet(D_800F7078, 2, 0, 1);
     if (res != NULL) {
         table = res->table;
         index = 42 % table->count;
@@ -53,7 +53,7 @@ void func_0027B40C(void) {
             chunk.data += 0x10;
         }
         func_0029E460(D_800F5618, chunk.data, 0x90);
-        func_002051F4(0, res);
+        CCache__Unlock(0, res);
         D_800B2AC0 = D_800F5618;
     }
 }

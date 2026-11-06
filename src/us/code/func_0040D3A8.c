@@ -32,7 +32,7 @@ static __inline__ void nextPhase(BlindOneState *state) {
     }
 }
 
-void func_0040D3A8(BlindOneState *state) {
+void BlindOne_PhaseGroup3Update(BlindOneState *state) {
     s32 done = 1;
     s32 i;
 

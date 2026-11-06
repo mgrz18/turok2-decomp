@@ -1,5 +1,5 @@
 /* WRONG CUT: real function 0x0041DC5C, size 0x134 (through 0x0041DD90): splat cut it in two
- * (func_0041DC5C, func_0041DCB0) at a load in a delay slot. MATCHES over the real extent
+ * (PakMenu_GetReturnMenu, func_0041DCB0) at a load in a delay slot. MATCHES over the real extent
  * (checked with the symbol size overridden to 0x134). */
 #include "common.h"
 #include "structs/menu.h"
@@ -42,7 +42,7 @@ static __inline__ void *TmplForKind(s32 *kindp) {
 }
 
 /* Picks the menu template to open for the current game mode. */
-void *func_0041DC5C(Menu *c) {
+void *PakMenu_GetReturnMenu(Menu *c) {
     void *tmpl = NULL;
     s32 kind;
 

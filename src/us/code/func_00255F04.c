@@ -7,9 +7,9 @@
 
 extern f32 D_800B6D28; /* the frame's time step */
 
-extern void func_0024E5F0(void *player, void *other, s32 mode);
+extern void CPlayer__SetState(void *player, void *other, s32 mode);
 
-void func_00255F04(CPlayer *player) {
+void PlayerDeathWait_Update(CPlayer *player) {
     GameMatch *state;
     f32 timer;
 
@@ -24,9 +24,9 @@ void func_00255F04(CPlayer *player) {
     if (timer > 75.0f || ((state = &D_8011ACB0)->teamOver != 0 && state->over != 0)) {
         state = &D_8011ACB0;
         if (state->teamOver != 0 && state->over == 0) {
-            func_0024E5F0(player, player, 0x11);
+            CPlayer__SetState(player, player, 0x11);
         } else {
-            func_0024E5F0(player, player, 0x10);
+            CPlayer__SetState(player, player, 0x10);
         }
     }
 }

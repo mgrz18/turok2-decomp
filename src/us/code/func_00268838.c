@@ -10,9 +10,9 @@ typedef struct {
     s32 flags;   /* 0xD4 */
 } Placed;
 
-f32 func_0026BE60(void *node, f32 x, f32 z);
+f32 CGameRegion__GetHeight(void *node, f32 x, f32 z);
 
-/* func_0026872C, inlined here. */
+/* GameObject_GetRegionFloorHeight, inlined here. */
 static __inline__ f32 floorHeight(Placed *obj, CVector3 *offset) {
     void *node = obj->node;
     f32 result;
@@ -20,15 +20,15 @@ static __inline__ f32 floorHeight(Placed *obj, CVector3 *offset) {
     if (node == NULL) {
         result = obj->pos.y;
     } else if (offset == NULL) {
-        result = func_0026BE60(node, obj->pos.x, obj->pos.z);
+        result = CGameRegion__GetHeight(node, obj->pos.x, obj->pos.z);
     } else {
-        result = func_0026BE60(node, obj->pos.x + offset->x, obj->pos.z + offset->z);
+        result = CGameRegion__GetHeight(node, obj->pos.x + offset->x, obj->pos.z + offset->z);
     }
     return result;
 }
 
 /* Whether the actor is on (or within 0.4 above) the floor. */
-s32 func_00268838(Placed *actor) {
+s32 GameObject_IsNearFloor(Placed *actor) {
     if (actor->kind == 1 && (actor->flags & 0x1000)) {
         return 1;
     }

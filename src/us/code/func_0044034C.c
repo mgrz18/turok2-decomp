@@ -9,7 +9,7 @@ typedef struct {
 
 extern Flags9E0 D_8012F9E0;
 
-void func_0044034C(CGameObjectInstance *arg0) {
+void Primagen_EnterMode5_2(CGameObjectInstance *arg0) {
     s32 *flags = &arg0->m_dwFlags;
 
     *flags |= 0x2000;

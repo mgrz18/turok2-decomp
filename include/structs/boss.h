@@ -21,9 +21,9 @@
 
 #include "structs/vector.h"
 
-/* The 0x64-byte value/colour animator func_002362E4 sets up,
- * func_00236314 starts on a script (fires) and func_00235510 steps;
- * func_00236324 applies it when the owner is drawn (rgb and alpha to the
+/* The 0x64-byte value/colour animator ScriptAnimator_Start sets up,
+ * ScriptAnimator_SetScript starts on a script (fires) and Animator_Update steps;
+ * ScriptAnimator_Apply applies it when the owner is drawn (rgb and alpha to the
  * draw colour D_800AB8B0, alpha and value to D_800AB8C0) and func_00236390
  * adds it to the fade. The script is a list of floats: an op (the mode),
  * then its operands; mode 0 ends it (and restarts it from loop when that
@@ -33,7 +33,7 @@
  * Animator (rw/abu_types.h, names from there) is the same object without
  * the last word. */
 typedef struct ScriptAnimator {
-    /* 0x00 */ void *owner;                /* func_002362E4's second argument */
+    /* 0x00 */ void *owner;                /* ScriptAnimator_Start's second argument */
     /* 0x04 */ s32 mode;
     /* 0x08 */ f32 time;
     /* 0x0C */ f32 *loop;
@@ -60,8 +60,8 @@ typedef struct BossWeakSpot {
     /* 0x04 */ ScriptAnimator anim;
 } BossWeakSpot; /* size 0x68 */
 
-/* D_8012FB70: the Mother boss fight, func_00409000-func_0040C7DC (second
- * copy func_00442000-func_004457DC; func_0040C7DC sets
+/* D_8012FB70: the Mother boss fight, MotherBoss_Hurt-MotherBoss_OnDefeatCinemaDone (second
+ * copy MotherBoss_Hurt_2-MotherBoss_OnDefeatCinemaDone_2; MotherBoss_OnDefeatCinemaDone sets
  * m_bMotherBossComplete). Fifteen weak spots in three phases. Fields
  * with symbols of their own: D_801301CC (phase), D_801301D0 (activeMask),
  * D_801301D4 (liveMask), D_801301EC (counter), D_801301F8 / D_801301FC
@@ -75,7 +75,7 @@ typedef struct MotherBossState {
     /* 0x64C */ s32 partCount;
     /* 0x650 */ struct CGameObjectInstance *controller; /* the 0x1DB2 actor */
     /* 0x654 */ u8 pad654[0x658 - 0x654];
-    /* 0x658 */ void *intel;                         /* func_00225EBC(world, 1, 0x1DB1) */
+    /* 0x658 */ void *intel;                         /* CScene__FindIntelligence(world, 1, 0x1DB1) */
     /* 0x65C */ s32 phase;
     /* 0x660 */ s32 activeMask;                      /* spots that can be hit */
     /* 0x664 */ s32 liveMask;                        /* spots of the phase still alive */
@@ -85,7 +85,7 @@ typedef struct MotherBossState {
     /* 0x674 */ s32 totalHealth;
     /* 0x678 */ s32 health;
     /* 0x67C */ s32 counter;
-    /* 0x680 */ s32 pickupTimer;                     /* frames since the last random pickup (func_00409784) */
+    /* 0x680 */ s32 pickupTimer;                     /* frames since the last random pickup (MotherBoss_UpdateSpotsAndPickups) */
     /* 0x684 */ s32 dropTimer;                       /* frames since the last drop at the spawn points */
     /* 0x688 */ s32 minRadius;
     /* 0x68C */ s32 maxRadius;
@@ -95,19 +95,19 @@ extern MotherBossState D_8012FB70;
 
 /* The Blind One (the second boss, "Blind" and "EyeBall" on its health
  * bars) and the small script VM that runs it. Its module is linked twice,
- * at func_0040C850-func_0040EF64 and again at func_00445CC0-func_00447F64
+ * at BlindOne_UpdateMover-BlindOne_NextPhase and again at BlindOne_Setup_2-BlindOne_NextPhase_2
  * with its data 0xE0 lower; both copies use the same state, D_80130200, and
  * each has its own phase table (D_0043240C and D_0043232C). The script is a
  * list of BlindOneStep: stepping it (the nextPhase inlines and
- * func_0040E46C...) stops the three movers, clears every actor's
+ * BlindOne_PhaseWaitCinemaUpdate...) stops the three movers, clears every actor's
  * m_AI.m_BlindOne.m_nPhaseHits, stores the step's id in `phase` and calls that
  * phase's init; the phase's update then runs every frame. The boss's three
  * groups of actors (types 0x454, 0x455 and 0x456) keep their group index in
  * m_AI.m_BlindOne.m_nGroupIndex and their fader in m_AI.m_BlindOne.m_nFader
- * (func_0040CCC0). func_0040EDB0 reaches the faders through their own
- * symbol, D_8013023C (= D_80130200.faders), and func_0040ECDC the update
+ * (BlindOne_Setup). BlindOne_Draw reaches the faders through their own
+ * symbol, D_8013023C (= D_80130200.faders), and BlindOne_UpdateFight the update
  * entries of the phase table through D_00432410 (= &D_0043240C[0].update);
- * func_0040ECDC and func_0040EEA0 reach the faders from the block base by
+ * BlindOne_UpdateFight and BlindOne_Group3Draw reach the faders from the block base by
  * raw offsets, as the ROM does. */
 
 struct BlindOneState;
@@ -115,7 +115,7 @@ struct BlindOneState;
 /* One step of the script (D_00432340...). */
 typedef struct BlindOneStep {
     /* 0x00 */ s32 id;                 /* the phase: an index into the phase table */
-    /* 0x04 */ f32 seconds;            /* how long the phase's movers run (func_0040E59C) */
+    /* 0x04 */ f32 seconds;            /* how long the phase's movers run (BlindOne_PhaseGroup1Init) */
     /* 0x08 */ s32 unk8;
 } BlindOneStep; /* size 0xC */
 
@@ -127,7 +127,7 @@ typedef struct BlindOnePhase {
 
 /* Plays a sequence of bit masks: every interval, each set bit sends the
  * matching actor (bits 0-3: group 1, 4-7: group 2, 8-11: group 3, rotated
- * by offset) to an attack state (func_0040C850). A NULL seq stops it. */
+ * by offset) to an attack state (BlindOne_UpdateMover). A NULL seq stops it. */
 typedef struct BlindOneMover {
     /* 0x00 */ s32 *seq;
     /* 0x04 */ s32 pos;
@@ -137,11 +137,11 @@ typedef struct BlindOneMover {
     /* 0x14 */ s32 offset;
 } BlindOneMover; /* size 0x18 */
 
-/* D_80130200: the Blind One boss fight, func_0040C850 (setup) to
- * func_0040EEA0 (second copy func_00445CC0-func_0044700C). Three groups of
- * level actors, each with the count of its live ones (func_0040E00C counts
- * them up, func_0040E30C down), twelve hit-flash animators, the phase
- * script and the minions the phases spawn (func_0040D0F0). */
+/* D_80130200: the Blind One boss fight, BlindOne_UpdateMover (setup) to
+ * BlindOne_Group3Draw (second copy BlindOne_Setup_2-BlindOne_ActorAppearEnter_2). Three groups of
+ * level actors, each with the count of its live ones (BlindOne_ActorAppearEnter counts
+ * them up, BlindOne_ActorDeathEnter down), twelve hit-flash animators, the phase
+ * script and the minions the phases spawn (BlindOne_PhaseMinionsUpdate). */
 typedef struct BlindOneState {
     /* 0x000 */ struct CGameObjectInstance *boss;
     /* 0x004 */ s32 count1;            /* the actors of type 0x454 */
@@ -152,14 +152,14 @@ typedef struct BlindOneState {
     /* 0x030 */ struct CGameObjectInstance *actors3[3];
     /* 0x03C */ ScriptAnimator faders[12]; /* the boss's and every actor's (m_AI.m_BlindOne.m_nFader) */
     /* 0x4EC */ s32 faderCount;
-    /* 0x4F0 */ void *minionDefA;      /* the definitions of its two minion kinds (func_00225EBC 0x1CE9, 0x1CEA) */
+    /* 0x4F0 */ void *minionDefA;      /* the definitions of its two minion kinds (CScene__FindIntelligence 0x1CE9, 0x1CEA) */
     /* 0x4F4 */ void *minionDefB;
     /* 0x4F8 */ BlindOneStep *script;  /* the current step */
     /* 0x4FC */ s32 phase;
     /* 0x500 */ s32 toSpawn;           /* minions the phase still spawns */
     /* 0x504 */ s32 minionsAlive;
     /* 0x508 */ s32 maxMinions;
-    /* 0x50C */ s32 alive1;            /* live actors of each group (func_0040E00C, func_0040E30C) */
+    /* 0x50C */ s32 alive1;            /* live actors of each group (BlindOne_ActorAppearEnter, BlindOne_ActorDeathEnter) */
     /* 0x510 */ s32 alive2;
     /* 0x514 */ s32 alive3;
     /* 0x518 */ BlindOneMover movers[3];
@@ -169,7 +169,7 @@ extern BlindOneState D_80130200;
 
 /* A step of a boss script: what to do (type), its argument, and the odds
  * (chance, out of 100) that the runner takes it; a type marks the end
- * (4: stop, 5: wrap around, func_00406E0C).
+ * (4: stop, 5: wrap around, Primagen_NextAttackStep).
  * Script A (LevelScriptState.script) runs these. */
 typedef struct BossStep {
     /* 0x00 */ u8 type;
@@ -223,8 +223,8 @@ typedef struct BossScript3 {
 } BossScript3; /* size 0x10 */
 
 /* D_8012F608: the state of the running level script, shared by the mode
- * handlers of the first VM module (func_004037B0-func_004079C4, second copy
- * func_0043C7B0-func_004409C4): the stage the script is in, the lights and
+ * handlers of the first VM module (Primagen_Hurt-Primagen_UpdateMode10, second copy
+ * func_0043C7B0-Primagen_UpdateMode10_2): the stage the script is in, the lights and
  * animators, the wave spawner, the boss parts and the boss AI (its state,
  * mode and three step scripts). Each mode uses the fields it needs and
  * some reuse a word for something else; the names follow the boss, which
@@ -249,7 +249,7 @@ typedef struct LevelScriptState {
     /* 0x01C */ s32 subStage;
     /* 0x020 */ u8 pad020[0x24 - 0x20];
     /* 0x024 */ ScriptAnimator anims[8];
-    /* 0x344 */ void *intel;                         /* func_00225EBC(world, 1, ...) */
+    /* 0x344 */ void *intel;                         /* CScene__FindIntelligence(world, 1, ...) */
     /* 0x348 */ s32 spawnsLeft;
     /* 0x34C */ s32 wavesLeft;
     /* 0x350 */ s32 enemiesAlive;
@@ -296,8 +296,8 @@ typedef struct LevelScriptState {
 /* A few files read only the stage, as a plain word: the ROM reloads its
  * address before every read there, which the struct does not give (gcc
  * keeps &D_8012F608 in a register). They define BOSS_STAGE_AS_WORD and
- * declare it as an s32 themselves (func_00404C44, func_0043DC44,
- * func_00406000, func_0043F000). */
+ * declare it as an s32 themselves (Primagen_RunAttackStep, Primagen_RunAttackStep_2,
+ * Primagen_UpdateMode19, Primagen_UpdateMode19_2). */
 #ifndef BOSS_STAGE_AS_WORD
 extern LevelScriptState D_8012F608;
 #endif
@@ -336,9 +336,9 @@ extern BossMode D_8012F9DC;
 extern BossScript3 D_8012FA1C;  /* LevelScriptState.script3 */
 
 /* A spawn point of the Mother fight (D_00431D20, and D_00431C40 in the
- * second copy of the module): where its pickups drop (func_00409500) and
+ * second copy of the module): where its pickups drop (MotherBoss_DropPickupsAtSpawnPoints) and
  * around which it throws its target, inside the angle range
- * (func_00409A64). */
+ * (MotherBoss_TeleportTarget). */
 typedef struct SpawnPoint {
     /* 0x00 */ CVector3 pos;
     /* 0x0C */ f32 minAngle;
@@ -350,29 +350,29 @@ extern SpawnPoint D_00431C40[4];  /* the second copy */
 
 /* One step of the wave boss's script (D_00430824...): the minions of the
  * wave, how many may fight at once, and the weak spot it opens. Stepping it
- * (func_00403520) adds spawnCount to the minions still to come; the wave
+ * (MantidQueen_NextStep) adds spawnCount to the minions still to come; the wave
  * runs (waveActive) when both partPicks and spawnCount are set. */
 typedef struct WaveBossStep {
-    /* 0x00 */ struct Pick *partPicks;   /* weighted pick of the part a hit spawns (func_004028F4) */
+    /* 0x00 */ struct Pick *partPicks;   /* weighted pick of the part a hit spawns (MantidQueen_SpawnMinion) */
     /* 0x04 */ s32 spawnCount;
-    /* 0x08 */ s32 maxActive;            /* minions sent in at once (func_00401FCC) */
-    /* 0x0C */ s32 unkC;                 /* allows the long-range attack (func_00402658) */
-    /* 0x10 */ struct Pick *picks10;     /* func_004030A4 */
+    /* 0x08 */ s32 maxActive;            /* minions sent in at once (MantidQueen_SendMinions) */
+    /* 0x0C */ s32 unkC;                 /* allows the long-range attack (MantidQueen_ChooseAttack) */
+    /* 0x10 */ struct Pick *picks10;     /* MantidQueen_PickFromStep */
     /* 0x14 */ s32 weakSpot;             /* the spot open to hits, -1: none */
     /* 0x18 */ f32 onTime;               /* the blink of the open spot */
     /* 0x1C */ f32 offTime;
 } WaveBossStep; /* size 0x20 */
 
-/* D_8012F3A0: the boss of the first VM module (func_00401E30 sets it up,
- * func_004021C8 runs it; boss id 0x1D4D in D_80110048, between the Blind
+/* D_8012F3A0: the boss of the first VM module (MantidQueen_Init sets it up,
+ * MantidQueen_Update runs it; boss id 0x1D4D in D_80110048, between the Blind
  * One's and the Mother's: likely the Lord of the Dead). Five weak spots,
  * opened one at a time by the script, and waves of minions (type 0x651) in
  * between: while a wave runs the spots cannot be hit. Fields with symbols
  * of their own: D_8012F3A4 (pushed), D_8012F5B4 (step), D_8012F5C0 (boss),
  * D_8012F5F0 (waveActive), D_8012F5F4 (blink). */
 typedef struct WaveBossState {
-    /* 0x000 */ struct CGameObjectInstance *actor;   /* the script owner (func_00402ADC) */
-    /* 0x004 */ s32 pushed;                          /* the push attack hit (func_00402FA0) */
+    /* 0x000 */ struct CGameObjectInstance *actor;   /* the script owner (MantidQueen_EnterStart) */
+    /* 0x004 */ s32 pushed;                          /* the push attack hit (MantidQueen_UpdatePush) */
     /* 0x008 */ BossWeakSpot spots[5];
     /* 0x210 */ s32 stepIndex;
     /* 0x214 */ WaveBossStep *step;
@@ -381,7 +381,7 @@ typedef struct WaveBossState {
     /* 0x220 */ struct CGameObjectInstance *boss;    /* the 0x457 actor */
     /* 0x224 */ struct CGameObjectInstance *members[8]; /* the 0x651 minions */
     /* 0x244 */ s32 memberCount;
-    /* 0x248 */ void *intel[2];                      /* func_00225EBC(world, 1, D_004307B0[i].id) */
+    /* 0x248 */ void *intel[2];                      /* CScene__FindIntelligence(world, 1, D_004307B0[i].id) */
     /* 0x250 */ s32 waveActive;
     /* 0x254 */ s32 blink;
     /* 0x258 */ f32 blinkTimer;

@@ -27,18 +27,18 @@ extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4[]; /* the actor list head */
 extern s32 D_80110048;         /* level id */
 
-CPlayer *func_002532A8(CPlayerList *);
-void func_0027FC2C(void *hud, void *camera, u8 *msg);
-void func_0027580C(s32 sound);
-void func_002535E4(CPlayerList *list, f32 value);
-s8 func_00219F74(CListedInstance *actor, s32 id, s32);
-void func_00225D0C(void *world);
-void func_0027AD98(void *);
-void func_0027ADA0(void *);
+CPlayer *CPlayerPool__GetFirstActive(CPlayerList *);
+void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
+void Sound__PlaySpeech(s32 sound);
+void CPlayerPool__SetInvincibility(CPlayerList *list, f32 value);
+s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, s32 id, s32);
+void CScene__UnmarkGeneratorsSaved(void *world);
+void COnScreen__ClearBoss(void *);
+void COnScreen__ClearBoss2(void *);
 
 static __inline__ void setAnim(CListedInstance *actor, s32 id) {
     BossAI *ai;
-    s8 anim = func_00219F74(actor, id, -1);
+    s8 anim = CGameObjectInstance__PickRandomAnim(actor, id, -1);
 
     ai = (BossAI *) &actor->m_Instance.m_AI.m_dwFlags;
     ai->anim = anim;
@@ -48,19 +48,19 @@ static __inline__ void setAnim(CListedInstance *actor, s32 id) {
 }
 
 /* The boss is beaten: message, sound, its death animation, the helpers stop. */
-void func_00407F20(BossFight *fight) {
+void TotemDefense_Complete(BossFight *fight) {
     CGame *game = &D_80119870;
     CPlayer *player;
     CListedInstance *a;
     GameSettings *flags;
 
     fight->state = 1;
-    player = func_002532A8(&game->m_PlayerList);
-    func_0027FC2C(game->m_CameraPool, player->m_pCamera, D_800B6660);
-    func_0027580C(0x168);
-    func_002535E4(&game->m_PlayerList, 900.0f);
+    player = CPlayerPool__GetFirstActive(&game->m_PlayerList);
+    CCameraPool__AddText(game->m_CameraPool, player->m_pCamera, D_800B6660);
+    Sound__PlaySpeech(0x168);
+    CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
     setAnim(fight->obj, 0x5337);
-    func_00225D0C(D_800F7078);
+    CScene__UnmarkGeneratorsSaved(D_800F7078);
     D_80119890->m_FleeTime = 450.0f;
     for (a = D_8010FEB4[0]; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {
@@ -71,8 +71,8 @@ void func_00407F20(BossFight *fight) {
         }
     }
     fight->timer = 60.0f;
-    func_0027AD98(D_801100F0);
-    func_0027ADA0(D_801100F0);
+    COnScreen__ClearBoss(D_801100F0);
+    COnScreen__ClearBoss2(D_801100F0);
     switch (D_80110048) {
     case 0x1BBC:
         player->m_Data.m_bLevel1TotemFlags = 1;

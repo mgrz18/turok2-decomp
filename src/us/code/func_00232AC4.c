@@ -14,12 +14,12 @@ typedef struct {
     /* 0x1B8 */ SoundHandle *loop;
 } SoundObject;
 
-s32 func_00275C6C(s32, s32, s32, s32, s32);
-s32 func_00232B40(SoundObject *);                      /* extern */
-s32 func_00275F7C();                                /* extern */
+s32 LoopSounds_Start(s32, s32, s32, s32, s32);
+s32 CParticle__StopLoopSound(SoundObject *);                      /* extern */
+s32 LoopSounds_Get();                                /* extern */
 
 /* Starts (or restarts) the looping sound on the object. */
-void func_00232AC4(SoundObject *arg0, s32 arg1) {
+void CParticle__StartLoopSound(SoundObject *arg0, s32 arg1) {
     s32 var_s1;
     f32 *temp_a2;
     SoundHandle *temp_v1;
@@ -30,12 +30,12 @@ void func_00232AC4(SoundObject *arg0, s32 arg1) {
     var_s1 = arg1;
     if (temp_v1 != NULL) {
         if ((temp_v1->sound != var_s1) || (temp_v1->state == -1)) {
-            func_00232B40(var_s0);
+            CParticle__StopLoopSound(var_s0);
             goto block_4;
         }
     } else {
 block_4:
         temp_a2 = var_s0->pos;
-        var_s0->loop = (SoundHandle *) func_00275C6C(func_00275F7C(), var_s1, (s32) temp_a2, (s32) temp_a2, -1);
+        var_s0->loop = (SoundHandle *) LoopSounds_Start(LoopSounds_Get(), var_s1, (s32) temp_a2, (s32) temp_a2, -1);
     }
 }

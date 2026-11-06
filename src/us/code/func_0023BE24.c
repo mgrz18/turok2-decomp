@@ -5,20 +5,20 @@
 
 extern s32 D_800F7078[];
 
-CRegionInfo *func_0022425C(s32 *list, CGameRegion *region);
-void func_0026BC54(CVector3 *normal, CGameRegion *region);
-s32 func_0026AFC0(CGameRegion *region);
+CRegionInfo *CScene__GetRegionInfo(s32 *list, CGameRegion *region);
+void CGameRegion__GetNormalRaw(CVector3 *normal, CGameRegion *region);
+s32 CGameRegion__IsSteep(CGameRegion *region);
 s32 func_00267EA8(CGameObjectInstance *obj);
 s32 func_00267EE8(CGameObjectInstance *obj);
-f32 func_0026BE60(CGameRegion *region, f32 x, f32 z);
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
+f32 CGameRegion__GetHeight(CGameRegion *region, f32 x, f32 z);
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 func_002982F0(f32);   /* sinf */
 f32 func_002974C0(f32);   /* cosf */
 f32 func_00298470(f32);   /* sqrtf */
 
 /* Whether the sweep stays on the ground of its region; if so, end is put
  * on the region's surface at the same distance along the slope. */
-void func_0023BE24(Sweep *sweep) {
+void Sweep_FollowGround(Sweep *sweep) {
     CGameObjectInstance *obj;
     CRegionInfo *info;
     CVector3 normal;
@@ -42,7 +42,7 @@ void func_0023BE24(Sweep *sweep) {
     }
     obj = sweep->obj;
     if (sweep->checkRegionInfo) {
-        info = func_0022425C(D_800F7078, (CGameRegion *)obj->header.m_pCurrentRegion);
+        info = CScene__GetRegionInfo(D_800F7078, (CGameRegion *)obj->header.m_pCurrentRegion);
         if (info != NULL && (info->m_dwFlags & 0x4000)) {
             flag = 0;
         } else {
@@ -59,8 +59,8 @@ void func_0023BE24(Sweep *sweep) {
         sweep->onGround = 0;
         return;
     }
-    func_0026BC54(&normal, (CGameRegion *)obj->header.m_pCurrentRegion);
-    if (func_0026AFC0((CGameRegion *)obj->header.m_pCurrentRegion)) {
+    CGameRegion__GetNormalRaw(&normal, (CGameRegion *)obj->header.m_pCurrentRegion);
+    if (CGameRegion__IsSteep((CGameRegion *)obj->header.m_pCurrentRegion)) {
         if (func_00267EA8(obj)) {
             if (!(((CGameRegion *)obj->header.m_pCurrentRegion)->m_wFlags & 0x10)) {
                 sweep->onGround = 0;
@@ -82,10 +82,10 @@ void func_0023BE24(Sweep *sweep) {
             }
         }
     }
-    startY = func_0026BE60((CGameRegion *)obj->header.m_pCurrentRegion, obj->header.m_vPos.x, obj->header.m_vPos.z);
-    endY = func_0026BE60((CGameRegion *)obj->header.m_pCurrentRegion, sweep->end.x, sweep->end.z);
+    startY = CGameRegion__GetHeight((CGameRegion *)obj->header.m_pCurrentRegion, obj->header.m_vPos.x, obj->header.m_vPos.z);
+    endY = CGameRegion__GetHeight((CGameRegion *)obj->header.m_pCurrentRegion, sweep->end.x, sweep->end.z);
     if (obj->header.m_pCurrentRegion != NULL) {
-        func_0020EF2C(&toEnd, &sweep->end, ((CGameRegion *)obj->header.m_pCurrentRegion)->m_pVertices[0]);
+        CVector3__Subtract(&toEnd, &sweep->end, ((CGameRegion *)obj->header.m_pCurrentRegion)->m_pVertices[0]);
     } else {
         toEnd = sweep->end;
     }

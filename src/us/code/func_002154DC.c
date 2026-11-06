@@ -14,20 +14,20 @@ typedef struct {
     /* 0xB8 */ f32 shadowMatrices[4][16];
 } ShadowActor;
 
-f32 func_0026BE60(s32, f32, f32);
-f32 func_00268304(ShadowActor *);
-void func_00267944(f32 *, ShadowActor *);
-void func_0020F510(CVector3 *, f32);
-void func_00211114(f32 *, f32 *);
-void func_0021034C(f32 *, f32, f32, f32);
-void func_00210318(f32 *, f32, f32, f32);
-void func_0020D274(f32 *, f32 *);
-void func_002086BC(f32 *, s32, s32);
+f32 CGameRegion__GetHeight(s32, f32, f32);
+f32 GameObject_GetWallRadius(ShadowActor *);
+void GameObject_GetGroundRotation(f32 *, ShadowActor *);
+void CVector3__ClampLength(CVector3 *, f32);
+void CQuaternion__ToMatrix(f32 *, f32 *);
+void CMtxF__ScaleAxes(f32 *, f32, f32, f32);
+void CMtxF__Translate(f32 *, f32, f32, f32);
+void CMtxF__ToMtxAffine(f32 *, f32 *);
+void Render_DrawShadowQuad(f32 *, s32, s32);
 
 extern s32 D_800B6D1C;
 
 /* Places the actor's ground shadow: scaled by its radius, shrinking with its height above the ground. */
-void func_002154DC(ShadowActor *actor) {
+void Actor_DrawGroundShadow(ShadowActor *actor) {
     f32 matrix[16];
     CVector3 position;
     f32 rotation[4];
@@ -35,21 +35,21 @@ void func_002154DC(ShadowActor *actor) {
     f32 height;
     f32 size;
 
-    ground = func_0026BE60(actor->region, actor->x, actor->z);
+    ground = CGameRegion__GetHeight(actor->region, actor->x, actor->z);
     height = actor->y - ground;
-    if (!(MIN_LT(func_00268304(actor) * 0.5f, func_00268304(actor) * 0.5f - height * 0.1f) < 0.0f)) {
-        size = MIN_LT(func_00268304(actor) * 0.5f, func_00268304(actor) * 0.5f - height * 0.1f);
+    if (!(MIN_LT(GameObject_GetWallRadius(actor) * 0.5f, GameObject_GetWallRadius(actor) * 0.5f - height * 0.1f) < 0.0f)) {
+        size = MIN_LT(GameObject_GetWallRadius(actor) * 0.5f, GameObject_GetWallRadius(actor) * 0.5f - height * 0.1f);
     } else {
         size = 0.0f;
     }
-    func_00267944(rotation, actor);
+    GameObject_GetGroundRotation(rotation, actor);
     position.x = actor->x;
     position.z = actor->z;
     position.y = ground;
-    func_0020F510(&position, 20000.0f);
-    func_00211114(rotation, matrix);
-    func_0021034C(matrix, size, 1.0f, size);
-    func_00210318(matrix, position.x, position.y, position.z);
-    func_0020D274(matrix, actor->shadowMatrices[D_800B6D1C]);
-    func_002086BC(actor->shadowMatrices[D_800B6D1C], 1, 0x96);
+    CVector3__ClampLength(&position, 20000.0f);
+    CQuaternion__ToMatrix(rotation, matrix);
+    CMtxF__ScaleAxes(matrix, size, 1.0f, size);
+    CMtxF__Translate(matrix, position.x, position.y, position.z);
+    CMtxF__ToMtxAffine(matrix, actor->shadowMatrices[D_800B6D1C]);
+    Render_DrawShadowQuad(actor->shadowMatrices[D_800B6D1C], 1, 0x96);
 }

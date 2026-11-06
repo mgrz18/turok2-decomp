@@ -1,6 +1,6 @@
 /* 0x004567B0-0x00456948 (linked 0x0041D7B0, where its callers jal); the word at
  * 0x004567AC is junk between objects (src/us/asm/stray_004567AC.s).
- * Second-module twin of func_0041D890. */
+ * Second-module twin of SaveGame_Build. */
 #include "common.h"
 #include "structs/game.h"
 #include "structs/save.h"
@@ -25,25 +25,25 @@ extern MemHandle *D_800C2010; /* handle of the save block */
 extern u8 D_800EBAC0[];
 extern char D_800C13F0[];
 
-void func_002053A8(s32 heap);
-void func_002052D8(s32 heap, MemHandle *handle);
-MemHandle *func_00204EDC(s32 heap, s32 size, s32 tag, char *name);
-void func_00266C5C(void *dst, s32 value, s32 size);
+void CCache__Flush(s32 heap);
+void CCache__Deallocate(s32 heap, MemHandle *handle);
+MemHandle *CCache__Allocate(s32 heap, s32 size, s32 tag, char *name);
+void memset(void *dst, s32 value, s32 size);
 void func_0029E460(void *dst, void *src, s32 size);
 
-void func_004567B0(CPlayer *player) {
+void SaveGame_Build_2(CPlayer *player) {
     s32 size = D_800F70A8 + 0x688;
     s32 allocSize;
     SaveGame *data;
 
     if (D_800C2010 != NULL) {
-        func_002053A8(0);
-        func_002052D8(0, D_800C2010);
+        CCache__Flush(0);
+        CCache__Deallocate(0, D_800C2010);
     }
     allocSize = D_800F70A8 + 0x688;
-    D_800C2010 = func_00204EDC(0, allocSize, 0x33, D_800C13F0);
+    D_800C2010 = CCache__Allocate(0, allocSize, 0x33, D_800C13F0);
     D_800C2018 = D_800C2010->data;
-    func_00266C5C(D_800C2018, 0, allocSize);
+    memset(D_800C2018, 0, allocSize);
     D_800C2018->player = player->m_Data;
     D_800C2018->settings = *(GameSettingsBlock *)&D_8011AAD8;
     data = D_800C2018;

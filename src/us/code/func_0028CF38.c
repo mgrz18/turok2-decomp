@@ -1,8 +1,8 @@
 #include "common.h"
 
-s32 func_0028B430(u8);                          /* extern */
+s32 Crash_PutChar(u8);                          /* extern */
 
-void func_0028CF38(u8 *arg0) {
+void Crash_PrintString(u8 *arg0) {
     u8 *var_s0;
     u8 temp_a0;
 
@@ -11,7 +11,7 @@ void func_0028CF38(u8 *arg0) {
         do {
             temp_a0 = *var_s0;
             var_s0 += 1;
-            func_0028B430(temp_a0);
+            Crash_PutChar(temp_a0);
         } while (*var_s0 != 0);
     }
 }

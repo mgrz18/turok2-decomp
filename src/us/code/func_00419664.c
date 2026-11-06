@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00288C5C(struct GameSession *object, int value);
-extern s32 func_00419664(void *arg0, Outer8043E56C *arg1);
-extern void func_00285A80(s32 arg0);
+extern void CEngineApp__SetupFadeTo(struct GameSession *object, int value);
+extern s32 SingleMenu_GoBack(void *arg0, Outer8043E56C *arg1);
+extern void Controller_UnwatchPak(s32 arg0);
 extern s32 D_800F6CB0;
 extern s32 D_801308F8;
-s32 func_00419664(void *arg0, Outer8043E56C *arg1) {
-    func_00288C5C(&D_800F6CB0, 8);
+s32 SingleMenu_GoBack(void *arg0, Outer8043E56C *arg1) {
+    CEngineApp__SetupFadeTo(&D_800F6CB0, 8);
     D_801308F8 = 0;
-    func_00285A80(arg1->unk20->unk4);
+    Controller_UnwatchPak(arg1->unk20->unk4);
     return 1;
 }

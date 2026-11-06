@@ -5,6 +5,6 @@ typedef struct {
     /* 0x2C */ s32 unk2C;
 } Arg;
 
-s32 func_0028FA00(Arg *arg) {
+s32 alCSPGetState(Arg *arg) {
     return arg->unk2C;
 }

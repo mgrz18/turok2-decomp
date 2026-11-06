@@ -9,7 +9,7 @@ extern f32 D_800B6D28; /* frame time scale */
 extern s32 D_8011ACA4;
 
 /* Once-per-frame update. */
-void func_002156FC(CLevelActor *obj) {
+void CLevelActor__Update(CLevelActor *obj) {
     CIntelligence *def;
     f32 timer;
 

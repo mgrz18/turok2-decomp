@@ -1,8 +1,8 @@
-/* Second-module copy of func_00422FC0 (first module). The port comes back through a pointer (a stack slot), which gives the ROM's store-then-reload. */
+/* Second-module copy of SavePortalMenu_InitB (first module). The port comes back through a pointer (a stack slot), which gives the ROM's store-then-reload. */
 #include "common.h"
 #include "structs/menu.h"
 
-void func_00285A68(s32 port);
+void Controller_WatchPak(s32 port);
 
 extern s32 D_800C2020;
 extern s32 D_800C2028;
@@ -21,7 +21,7 @@ static __inline__ void GetPort(Menu *event, s32 *port) {
     }
 }
 
-void func_0045BEE0(Menu *event) {
+void SavePortalMenu_InitB_2(Menu *event) {
     s32 port;
 
     D_801309AC = 0;
@@ -31,5 +31,5 @@ void func_0045BEE0(Menu *event) {
     D_80130980 = 0;
     GetPort(event, &port);
     D_800C2020 = 0;
-    func_00285A68(port);
+    Controller_WatchPak(port);
 }

@@ -10,7 +10,7 @@ struct FieldRecAt14 {
 extern s32 D_801309B8;
 extern char D_800B49C4[];
 extern char D_800B49D0[];
-s32 func_0045AD64(struct FieldRecAt14 *field) {
+s32 GameNoteMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
     if (D_801309B8 != 0) {
         field->text = D_800B49C4;
     } else {

@@ -4,13 +4,13 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-extern s32 func_0025340C(void *a, void *b);
-extern void func_00285A68(s32 a);
+extern s32 CPlayerPool__GetIndex(void *a, void *b);
+extern void Controller_WatchPak(s32 a);
 extern void func_004263A0(s32 a);
 extern s32 D_800C2020;
 extern s32 D_80130990;
 extern s32 D_8011ACE4[];
-void func_00455DC0(Menu *a) {
+void StatsMenu_InitSaveDone_2(Menu *a) {
     s32 n;
     a->items[14].flags |= 0x1800000;
     a->items[15].flags |= 0x1800000;
@@ -21,7 +21,7 @@ void func_00455DC0(Menu *a) {
     D_800C2020 = 0;
     n = 0;
     if (D_8011ACE4[0]) a->items[7].flags |= 0x1000000; else a->items[7].flags &= ~0x1000000;
-    if (a->player) n = func_0025340C(&D_80119870.m_PlayerList, a->player);
-    func_00285A68(n);
+    if (a->player) n = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, a->player);
+    Controller_WatchPak(n);
     func_004263A0(n);
 }

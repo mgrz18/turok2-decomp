@@ -14,7 +14,7 @@ typedef struct Container {
 } Container;
 
 /* Index of arg1 in the scene's actor array, or -1. */
-s32 func_002265E8(void *arg0, void *arg1) {
+s32 CScene__GetInstanceIndex(void *arg0, void *arg1) {
     Container *scene = arg0;
     CGameObjectInstance *actor = arg1;
     void *base;

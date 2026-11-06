@@ -10,7 +10,7 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 extern s8 D_801213E0;
-void func_00298A0C(void)
+void __osPackResetData(void)
 {
   s32 var_v0;
   s8 *var_v1;

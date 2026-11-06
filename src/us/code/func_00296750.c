@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern void *func_002971BC(void *arg0, s32 arg1, s32 arg2, void *arg3);
-extern Acmd *func_0029704C(ALFx *, s16 *, s32, s32, Acmd *);
+extern void *_filterBuffer(void *arg0, s32 arg1, s32 arg2, void *arg3);
+extern Acmd *_loadBuffer(ALFx *, s16 *, s32, s32, Acmd *);
 extern char D_800AA6C0[];
 extern char D_800AA6C4[];
-extern void func_0029B020(char *, char *, s32);
-extern Acmd *func_00296CD0(ALFx *, ALDelay *, s32, s32, Acmd *);
-extern Acmd *func_0029704C(ALFx *, s16 *, s32, s32, Acmd *);
-extern Acmd *func_00296EC8(ALFx *, s16 *, s32, s32, Acmd *);
-Acmd *func_00296750(ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
+extern void __assert(char *, char *, s32);
+extern Acmd *_loadOutputBuffer(ALFx *, ALDelay *, s32, s32, Acmd *);
+extern Acmd *_loadBuffer(ALFx *, s16 *, s32, s32, Acmd *);
+extern Acmd *_saveBuffer(ALFx *, s16 *, s32, s32, Acmd *);
+Acmd *alFxPull(ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;
     ALFx *r = filter;
@@ -20,7 +20,7 @@ Acmd *func_00296750(ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
     s16 *in_ptr, *out_ptr, gain, *prev_out_ptr = 0;
     ALDelay *d, *pd;
     if (!source)
-        func_0029B020(D_800AA6C0, D_800AA6C4, 75);
+        __assert(D_800AA6C0, D_800AA6C4, 75);
     ptr = (*source->handler)(source, outp, outCount, sampleOffset, p);
     input = 1728;
     output = 2048;
@@ -29,7 +29,7 @@ Acmd *func_00296750(ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(outCount << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(12) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(0xda83) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(1728) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(input) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(12) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(0x5a82) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(2048) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(input) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-    ptr = func_00296EC8(r, r->input, input, outCount, ptr);
+    ptr = _saveBuffer(r, r->input, input, outCount, ptr);
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(output) & (0xFFFFFFFFU >> (32 - (24)))) << (0)); _a->words.w1 = (unsigned int)(outCount << 1); };
     for (i = 0; i < r->section_count; i++) {
         d = &r->delay[i];
@@ -38,23 +38,23 @@ Acmd *func_00296750(ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acm
         if (in_ptr == prev_out_ptr) {
             { s16 t = buff2; buff2 = buff1; buff1 = t; };
         } else {
-            ptr = func_0029704C(r, in_ptr, buff1, outCount, ptr);
+            ptr = _loadBuffer(r, in_ptr, buff1, outCount, ptr);
         }
-        ptr = func_00296CD0(r, d, buff2, outCount, ptr);
+        ptr = _loadOutputBuffer(r, d, buff2, outCount, ptr);
         if (d->ffcoef) {
             { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(12) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)((u16)d->ffcoef) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(buff1) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(buff2) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
             if (!d->rs && !d->lp) {
-                ptr = func_00296EC8(r, out_ptr, buff2, outCount, ptr);
+                ptr = _saveBuffer(r, out_ptr, buff2, outCount, ptr);
             }
         }
         if (d->fbcoef) {
             { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(12) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)((u16)d->fbcoef) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(buff2) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(buff1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-            ptr = func_00296EC8(r, in_ptr, buff1, outCount, ptr);
+            ptr = _saveBuffer(r, in_ptr, buff1, outCount, ptr);
         }
         if (d->lp)
-            ptr = func_002971BC(d->lp, buff2, outCount, ptr);
+            ptr = _filterBuffer(d->lp, buff2, outCount, ptr);
         if (!d->rs)
-            ptr = func_00296EC8(r, out_ptr, buff2, outCount, ptr);
+            ptr = _saveBuffer(r, out_ptr, buff2, outCount, ptr);
         if (d->gain)
             { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(12) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)((u16)d->gain) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(buff2) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(output) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
         prev_out_ptr = &r->input[d->output];

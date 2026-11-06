@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s16 func_002A0448();                                /* extern */
+s16 adecDecodeFrame();                                /* extern */
 
-u32 func_002A0EFC(void) {
-    return (u32) ~func_002A0448() >> 0x1F;
+u32 adecDecodeFrameOk(void) {
+    return (u32) ~adecDecodeFrame() >> 0x1F;
 }

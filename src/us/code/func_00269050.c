@@ -2,11 +2,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern s32 func_002685F0(void *actor);
-extern f32 func_0020EAA0(CVector3 *v);                                 /* yaw of v */
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 s);            /* out = in * s */
-extern void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);   /* out = lerp(a, b, t) */
-extern void func_00210EF0(f32 *angle);                              /* wraps an angle */
+extern s32 GameObject_IsOnGround(void *actor);
+extern f32 CVector3__GetYaw(CVector3 *v);                                 /* yaw of v */
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);            /* out = in * s */
+extern void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);   /* out = lerp(a, b, t) */
+extern void Angle_Wrap(f32 *angle);                              /* wraps an angle */
 
 extern f32 D_800B25F0[2];   /* current: blend rate, turn rate */
 extern f32 D_800B6D28;      /* frame time scale */
@@ -26,13 +26,13 @@ typedef struct {
 
 static __inline__ s32 currentEnabled(CGameObjectInstance *actor) {
     if (actor->m_AI.m_dwFlags & 0x280) return 1;
-    if (actor->m_AI.m_dwFlags & 0x400) return func_002685F0(actor);
+    if (actor->m_AI.m_dwFlags & 0x400) return GameObject_IsOnGround(actor);
     return 0;
 }
 
 /* Applies a surface current to an actor: pushes pos, turns the actor with it
  * (flags 0x600 spin, 0x2000 face the flow) and handles the vertical part. */
-void func_00269050(CGameObjectInstance *actor, Material *mat, CVector3 *pos, s32 active) {
+void GameObject_ApplyCurrent(CGameObjectInstance *actor, Material *mat, CVector3 *pos, s32 active) {
     CGameObjectInstance *rider;
     CVector3 flow;
     CVector3 flat;
@@ -69,7 +69,7 @@ void func_00269050(CGameObjectInstance *actor, Material *mat, CVector3 *pos, s32
         flow.z = mat->z * 0.007874016f;
         strength = mat->strength;
         spin = (strength + 1.0f) * 0.008726647f;
-        func_0020EF60(&flow, &flow, strength * 3.0f);
+        CVector3__Scale(&flow, &flow, strength * 3.0f);
         flags = mat->flags;
         if (flags & 0x600) {
             if (flags & 0x400) {
@@ -83,11 +83,11 @@ void func_00269050(CGameObjectInstance *actor, Material *mat, CVector3 *pos, s32
             rider = actor;
             flat = flow;
             flat.y = 0.0f;
-            want = func_0020EAA0(&flat);
+            want = CVector3__GetYaw(&flat);
             cur = actor->m_RotY;
             if (want != cur) {
-                func_00210EF0(&cur);
-                func_00210EF0(&want);
+                Angle_Wrap(&cur);
+                Angle_Wrap(&want);
                 if (cur > want) {
                     wrapped = want + 6.2831855f;
                     if ((wrapped - cur) < (cur - want)) want = wrapped;
@@ -104,7 +104,7 @@ void func_00269050(CGameObjectInstance *actor, Material *mat, CVector3 *pos, s32
                     cur = from - mat->strength * D_800B25F0[1] * D_800B6D28 * 0.017453294f;
                     if (cur < target) cur = target;
                 }
-                func_00210EF0(&cur);
+                Angle_Wrap(&cur);
             }
             rider->m_RotY = cur;
         }
@@ -116,7 +116,7 @@ void func_00269050(CGameObjectInstance *actor, Material *mat, CVector3 *pos, s32
     blend = mat->strength * D_800B25F0[0] * D_800B6D28;
     blend = ((blend < 0.0f ? 0.0f : blend) > 1.0f ? 1.0f : (blend < 0.0f ? 0.0f : blend));
     current = &actor->m_vWaterDisplacement;
-    func_0020EF8C(current, blend, current, &flow);
+    CVector3__Lerp(current, blend, current, &flow);
     pos->x += actor->m_vWaterDisplacement.x;
     pos->z += actor->m_vWaterDisplacement.z;
     if (mat->flags & 0x100) {

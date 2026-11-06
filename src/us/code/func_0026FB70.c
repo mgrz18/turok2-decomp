@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
-OSTime func_0029B170(void);
+OSTime osGetTime(void);
 u32 osAiGetStatus(void);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern u32 D_800B2660;
@@ -19,10 +19,10 @@ typedef struct B12Timer2 {
     u16 count;
 } B12Timer2;
 extern B12Timer2 *D_800F279C;
-void func_0028AF00(void *a, void *b, void *c);
-void func_0026FD88(s32 buf, s32 z);
-void func_00293430(void *g);
-void func_0026FB70(void) {
+void osScAddClient(void *a, void *b, void *c);
+void __amHandleFrameMsg(s32 buf, s32 z);
+void alClose(void *g);
+void __amMain(void) {
     s32 sp10[2];
     u32 msg;
     u32 cnt;
@@ -33,12 +33,12 @@ void func_0026FB70(void) {
     B12Timer2 *p;
     cnt = arg = done = 0;
     last = 0;
-    func_0028AF00(D_8011AD90, sp10, &D_800F27A0);
+    osScAddClient(D_8011AD90, sp10, &D_800F27A0);
     do {
-        now = func_0029B170();
+        now = osGetTime();
         D_800B2670 = (u32)(((now - last) << 6) / 3000);
         osRecvMesg(&D_800F27A0, (OSMesg *)&msg, 1);
-        last = func_0029B170();
+        last = osGetTime();
         switch (msg) {
         case 4:
             break;
@@ -49,7 +49,7 @@ void func_0026FB70(void) {
         case 7:
                 D_800B266C++;
                 while (!(osAiGetStatus() & 0x80000000)) {
-                    func_0026FD88(D_800F27C8[D_800B2660 % 3], arg);
+                    __amHandleFrameMsg(D_800F27C8[D_800B2660 % 3], arg);
                 }
                 for (p = D_800F279C; p; p = p->next) {
                     if (p->count) {
@@ -60,5 +60,5 @@ void func_0026FB70(void) {
             break;
         }
     } while (done == 0);
-    func_00293430(D_800F27D4);
+    alClose(D_800F27D4);
 }

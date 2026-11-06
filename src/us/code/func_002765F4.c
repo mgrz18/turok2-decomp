@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002765F4(struct ChannelSet *arg0, s32 arg1);
-void func_002765F4(ChannelSet *arg0, s32 arg1) {
+extern void SndQueue_CancelHandle(struct ChannelSet *arg0, s32 arg1);
+void SndQueue_CancelHandle(ChannelSet *arg0, s32 arg1) {
     Node_func_802598B4_de *node;
     Node_func_802598B4_de *next;
     Node_func_802598B4_de *end;

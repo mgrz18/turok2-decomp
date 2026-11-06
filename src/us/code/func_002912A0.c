@@ -7,7 +7,7 @@ typedef struct {
 } Heap;
 
 /* Takes a 16-byte aligned count*size block from the heap, or 0 if it does not fit. */
-u32 func_002912A0(s32 arg0, s32 arg1, Heap *arg2, s32 arg3, s32 arg4) {
+u32 alHeapDBAlloc(s32 arg0, s32 arg1, Heap *arg2, s32 arg3, s32 arg4) {
     u32 temp_a1;
     u32 temp_v1;
     u32 var_a3;

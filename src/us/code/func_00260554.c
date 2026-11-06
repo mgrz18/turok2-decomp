@@ -16,14 +16,14 @@ typedef struct {
     } flags;
 } Actor;
 
-void func_00246918(Actor *self, void *ai);
-void func_002280B0(Actor *self);
+void AI_StopSound(Actor *self, void *ai);
+void CListedInstance__Free(Actor *self);
 
-void func_00260554(Actor *self, void *ai) {
+void EnemyAI_StopSoundAndFree(Actor *self, void *ai) {
     self->flags.bits.b100 = 0;
     self->flags.bits.b2000 = 0;
-    func_00246918(self, ai);
+    AI_StopSound(self, ai);
     if (self->flags.word & 0x80000) {
-        func_002280B0(self);
+        CListedInstance__Free(self);
     }
 }

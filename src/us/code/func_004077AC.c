@@ -13,7 +13,7 @@ typedef struct {
 extern State D_8012F9E4;
 extern f32 D_800C0540;          /* 1.0f */
 
-void func_004077AC(CGameObjectInstance *actor) {
+void Primagen_EnterMode24(CGameObjectInstance *actor) {
     f32 one = D_800C0540;
     State *state;
 

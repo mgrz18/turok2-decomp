@@ -8,8 +8,8 @@ extern GFx D_8011AAD4;
 extern u8 D_800B2510[];
 void D_00266814(CGameObjectInstance *actor, CAI *state);
 void D_00266AB4(CGameObjectInstance *actor, CAI *state);
-s32 func_00284408(void);
-void func_002666F4(CGameObjectInstance *actor, CAI *state) {
+s32 Cinema_GetScriptId(void);
+void InteractiveAnim_Setup(CGameObjectInstance *actor, CAI *state) {
     state->m_pModeTable = D_800B2510;
     state->m_pfStep = D_00266814;
     actor->m_dwFlags |= 0x1000000;
@@ -18,7 +18,7 @@ void func_002666F4(CGameObjectInstance *actor, CAI *state) {
     if (D_8011AAD4.f == 0) {
         actor->m_dwFlags |= 0x10000000;
     }
-    if (actor->m_nTypeFlag == 0x453 && func_00284408() == 0x6F) {
+    if (actor->m_nTypeFlag == 0x453 && Cinema_GetScriptId() == 0x6F) {
         state->m_pfDraw = D_00266AB4;
     }
 }

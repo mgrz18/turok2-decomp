@@ -7,7 +7,7 @@ extern char D_800B40C8[];
 extern CPlayerOptions D_8011AB18;
 
 /* The weapon select item's text: quick or normal. */
-s32 func_0041C718(MenuItem *item, Menu *menu)
+s32 OptionsMenu_WeaponSelectText(MenuItem *item, Menu *menu)
 {
   char *quick;
   CPlayerOptions *settings;

@@ -5,9 +5,9 @@
 
 extern Link_func_8023CC08_de *D_80121294;
 extern Link_func_8023CC08_de *D_80121290;
-extern Node_func_8023CC08_de *func_0028EA40(u32 arg0);
-Link_func_8023CC08_de *func_0028EA88(void) {
-    extern void func_0028DEFC(void *arg0);
+extern Node_func_8023CC08_de *VM_FindRegion(u32 arg0);
+Link_func_8023CC08_de *VM_ReclaimLRUPage(void) {
+    extern void VM_UnmapTLBEntry(void *arg0);
     Link_func_8023CC08_de *entry;
     Node_func_8023CC08_de *node;
     entry = D_80121290;
@@ -23,9 +23,9 @@ Link_func_8023CC08_de *func_0028EA88(void) {
         D_80121294 = entry->prev;
         (*(Link_func_8023CC08_de * volatile *)&entry->prev)->next = 0;
     }
-    func_0028DEFC(entry);
+    VM_UnmapTLBEntry(entry);
     if (entry->id != 0xFFFF) {
-        node = func_0028EA40(entry->id);
+        node = VM_FindRegion(entry->id);
         node->data[entry->id - node->start] = 0xFF;
         entry->id = 0xFFFF;
     }

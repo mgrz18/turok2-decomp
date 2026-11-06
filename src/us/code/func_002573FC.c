@@ -6,7 +6,7 @@ extern s32 D_8011AAF1; /* a u8 game-mode flag; D_8011AAA0 is addressed through i
 
 #define D_8011AAA0 (*(s32 *) ((u8 *) &D_8011AAF1 - 0x51))
 
-void func_002573FC(CPlayer *arg0) {
+void CPlayer__PreferAlternateWeapon(CPlayer *arg0) {
     s16 temp_a1;
     WeaponInfo *temp_v0;
 

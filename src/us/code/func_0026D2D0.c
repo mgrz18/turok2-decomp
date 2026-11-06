@@ -13,7 +13,7 @@ typedef struct {
 } DLList;
 
 /* Unlinks arg1 from the list. */
-void func_0026D2D0(DLList *arg0, DLNode *arg1) {
+void DList_Remove(DLList *arg0, DLNode *arg1) {
     DLNode *temp_v1;
     DLNode *temp_v1_2;
 

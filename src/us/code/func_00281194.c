@@ -5,7 +5,7 @@
 extern CPlayer *D_80119890;     /* the players, a list through m_pNext */
 
 /* The player whose camera this is, or NULL. */
-CPlayer *func_00281194(CCamera *cam) {
+CPlayer *CCamera__GetPlayer(CCamera *cam) {
     CPlayer *player;
 
     for (player = D_80119890; player != NULL; player = player->m_pNext) {

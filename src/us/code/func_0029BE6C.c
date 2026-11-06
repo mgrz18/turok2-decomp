@@ -6,7 +6,7 @@
 extern OSTimer *D_800B8930;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
-u64 func_0029BE6C(OSTimer *t)
+u64 __osInsertTimer(OSTimer *t)
 {
     OSTimer *timep;
     u64 tim;

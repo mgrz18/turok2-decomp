@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern float D_800AA450;
-s16 func_00293470(PoolRecAt44 *pool, void *owner) {
+s16 alSndpAllocate(PoolRecAt44 *pool, void *owner) {
     s32 count = pool->count;
     SlotRecAt2F *slots = pool->slots;
     if (count > 0) {

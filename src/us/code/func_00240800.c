@@ -8,14 +8,14 @@ extern CCollisionResults *D_800F1ADC;
 extern u8 D_800C894C;                   /* bottom of the stack */
 
 f32 func_00298470(f32 x);               /* sqrtf */
-s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
-s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
+s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
+s32 Sweep_HitCylinder(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
                   s32 frontOnly, s32 arg7, f32 arg8, s32 fromInside);
-CGameRegion *func_0023B664(Sweep *mover, CGameRegion *region, s32 edge, CVector3 *pos);
+CGameRegion *Sweep_CrossRegionEdge(Sweep *mover, CGameRegion *region, s32 edge, CVector3 *pos);
 
 /* Walk the regions the sweep's box overlaps, from region, sweeping the
  * sweep's circle against each wall edge (and the corners at its ends). */
-void func_00240800(CGameRegion *region) {
+void Collision_SweepRegionWalls(CGameRegion *region) {
     u8 cornerDone[3];
     s32 i;
 
@@ -39,7 +39,7 @@ void func_00240800(CGameRegion *region) {
                     continue;
                 }
             } else {
-                D_800F1AB0->next = func_0023B664(D_800F1AB0->sweep, region, i, &D_800F1AB0->sweep->inst->m_vPos);
+                D_800F1AB0->next = Sweep_CrossRegionEdge(D_800F1AB0->sweep, region, i, &D_800F1AB0->sweep->inst->m_vPos);
             }
         }
         D_800F1AB0->a = region->m_pVertices[i];
@@ -57,7 +57,7 @@ void func_00240800(CGameRegion *region) {
             continue;
         }
         if (D_800F1AB0->next != NULL) {
-            func_00240800(D_800F1AB0->next);
+            Collision_SweepRegionWalls(D_800F1AB0->next);
             continue;
         }
         D_800F1AB0->normal.x = D_800F1AB0->b->z - D_800F1AB0->a->z;
@@ -80,12 +80,12 @@ void func_00240800(CGameRegion *region) {
         D_800F1AB0->hit = 0;
         if (!cornerDone[i]) {
             cornerDone[i] = 1;
-            D_800F1AB0->hit |= func_0023B38C(D_800F1AB0->sweep, D_800F1AB0->a, D_800F1AB0->radius, 0, 0.0f, 0.0f, 1,
+            D_800F1AB0->hit |= Sweep_HitCylinder(D_800F1AB0->sweep, D_800F1AB0->a, D_800F1AB0->radius, 0, 0.0f, 0.0f, 1,
                                              D_800F1AB0->sweep->def->m_WallBehavior, 0.0f, 1);
         }
         if (!cornerDone[i == 2 ? 0 : i + 1]) {
             cornerDone[i == 2 ? 0 : i + 1] = 1;
-            D_800F1AB0->hit |= func_0023B38C(D_800F1AB0->sweep, D_800F1AB0->b, D_800F1AB0->radius, 0, 0.0f, 0.0f, 1,
+            D_800F1AB0->hit |= Sweep_HitCylinder(D_800F1AB0->sweep, D_800F1AB0->b, D_800F1AB0->radius, 0, 0.0f, 0.0f, 1,
                                              D_800F1AB0->sweep->def->m_WallBehavior, 0.0f, 1);
         }
         D_800F1AB0->len = func_00298470(D_800F1AB0->normal.x * D_800F1AB0->normal.x +
@@ -107,7 +107,7 @@ void func_00240800(CGameRegion *region) {
                   D_800F1AB0->sweep->lastContact.x == D_800F1AB0->b->x &&
                   D_800F1AB0->sweep->lastContact.y == D_800F1AB0->b->y &&
                   D_800F1AB0->sweep->lastContact.z == D_800F1AB0->b->z)) {
-                D_800F1AB0->hit |= func_0023AB18(D_800F1AB0->sweep, &D_800F1AB0->normal, &D_800F1AB0->wallPoint, 0,
+                D_800F1AB0->hit |= Sweep_HitPlane(D_800F1AB0->sweep, &D_800F1AB0->normal, &D_800F1AB0->wallPoint, 0,
                                                  D_800F1AB0->sweep->def->m_WallBehavior, 0.0f, 1);
             }
         }

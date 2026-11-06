@@ -4,17 +4,17 @@
 
 extern s32 D_80110028;
 extern s32 D_8011ACA4;
-extern void *func_00275F7C(void);
-extern void func_00275D34(void *pool, struct CLoopingSoundData *sound);
-extern struct CLoopingSoundData *func_00275C6C(void *pool, s32 id, CVector3 *pos,
+extern void *LoopSounds_Get(void);
+extern void LoopSounds_Stop(void *pool, struct CLoopingSoundData *sound);
+extern struct CLoopingSoundData *LoopSounds_Start(void *pool, s32 id, CVector3 *pos,
                                                CVector3 *pos2, s32 arg4);
 
 /* Restarts the player's weapon firing looping sound with sound id. */
-void func_00253EB8(CPlayer *player, s32 id) {
+void CPlayer__StartWeaponFiringSound(CPlayer *player, s32 id) {
     if (D_80110028 == 0 && D_8011ACA4 == 0) {
-        func_00275D34(func_00275F7C(), player->m_pLoopingSound_WeaponFiring);
+        LoopSounds_Stop(LoopSounds_Get(), player->m_pLoopingSound_WeaponFiring);
         player->m_pLoopingSound_WeaponFiring =
-            func_00275C6C(func_00275F7C(), id, &player->m_pCamera->m_vPos,
+            LoopSounds_Start(LoopSounds_Get(), id, &player->m_pCamera->m_vPos,
                           &player->m_pCamera->m_vPos, -1);
     }
 }

@@ -23,15 +23,15 @@ typedef struct B15Src {
                u8 pad18[0x68];
                void *unk80;     /* 0x80 (0xD0 in Rage Wars) */
 } B15Src;
-void func_002755B0(s16 id, CVector3 pos, s32 a, void *src, f32 vol);
-s32 func_00268E60(void *a);
+void Sound__PlayPitched(s16 id, CVector3 pos, s32 a, void *src, f32 vol);
+s32 GameObject_GetFloorKind(void *a);
 extern f32 D_800A65F0;
 extern f32 D_800A65F4;
 extern f32 D_800A65F8;
 void func_00239254(B15Src *act, B15Src *src, s32 c, CVector3 pos, B15Blk8 k) {
     f32 vol = D_800A65F0;
     void *s = (void *)-1;
-    if (D_8011AAD8.paused == 0 && func_00268E60(act) == k.c) {
+    if (D_8011AAD8.paused == 0 && GameObject_GetFloorKind(act) == k.c) {
         switch (src->type) {
         case 0:
             s = src->unk80;
@@ -47,6 +47,6 @@ void func_00239254(B15Src *act, B15Src *src, s32 c, CVector3 pos, B15Blk8 k) {
             }
             break;
         }
-        func_002755B0(k.b, pos, 0, s, vol);
+        Sound__PlayPitched(k.b, pos, 0, s, vol);
     }
 }

@@ -8,7 +8,7 @@ typedef struct {
     /* 0x20 */ s32 unk20;
 } Arg1;
 
-void func_00255C5C(CPlayer *arg0, Arg1 *arg1) {
+void PlayerClimb_Enter(CPlayer *arg0, Arg1 *arg1) {
     arg0->m_Speed = 0;
     arg0->m_SideSpeed = 0;
     arg0->m_HandSide = 0.024348905f;

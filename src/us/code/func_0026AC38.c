@@ -3,20 +3,20 @@
 
 #include "rw/abu_types.h"
 
-extern f32 func_0021153C(f32 arg0);
+extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern float D_800A7FC4;
 extern f32 D_800DD78C;
-extern void func_0020EFDC(CVector3 *out, CVector3 *a, CVector3 *b);
-extern void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
+extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
+extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern f32 func_00298470(f32);
 extern float D_800A7FBC[];
 extern float D_800DD78C;
-extern void func_00269A90(CVector3 *);
-extern void func_0020EFDC(CVector3 *, CVector3 *, CVector3 *);
-extern void func_0020EF60(CVector3 *, CVector3 *, float);
-Vector4f *func_0026AC38(Vector4f *out) {
+extern void CGameRegion__GetCeilingNormal(CVector3 *);
+extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
+extern void CVector3__Scale(CVector3 *, CVector3 *, float);
+Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out) {
     CVector3 a;
     CVector3 up;
     CVector3 axis;
@@ -25,12 +25,12 @@ Vector4f *func_0026AC38(Vector4f *out) {
     float angle;
     float scale;
     float one;
-    func_00269A90(&a);
+    CGameRegion__GetCeilingNormal(&a);
     one = D_800A7FBC[1];
     up.x = 0;
     up.y = one;
     up.z = 0;
-    func_0020EFDC(&axis, &up, &a);
+    CVector3__Cross(&axis, &up, &a);
     len = func_00298470(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
     if (len == 0) {
         result.z = 0;
@@ -38,8 +38,8 @@ Vector4f *func_0026AC38(Vector4f *out) {
         result.x = 0;
         result.w = one;
     } else {
-        func_0020EF60(&axis, &axis, one / len);
-        angle = func_0021153C(up.x * a.x + up.y * a.y + up.z * a.z);
+        CVector3__Scale(&axis, &axis, one / len);
+        angle = Math_AcosLookup(up.x * a.x + up.y * a.y + up.z * a.z);
         angle *= D_800A7FC4;
         scale = func_002982F0(angle);
         result.x = axis.x * scale;

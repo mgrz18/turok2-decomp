@@ -1,15 +1,15 @@
 #include "common.h"
 #include "structs/collision.h"
 
-f32 func_002671B4(CGameObjectInstance *inst);
-f32 func_002672C8(CGameObjectInstance *inst);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *inst);
 f32 func_0026841C(CGameObjectInstance *inst);
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
 
 /* Fill the bounds of the volume a sweep's instance moves through. */
-void func_0023E6D8(Sweep *sweep, SweepBox *box) {
+void Sweep_GetVolumeBounds(Sweep *sweep, SweepBox *box) {
     CGameObjectInstance *inst;
     CCollisionInfo *def;
     f32 x;
@@ -17,10 +17,10 @@ void func_0023E6D8(Sweep *sweep, SweepBox *box) {
 
     inst = sweep->obj;
     def = sweep->def;
-    box->radius = func_002672C8(inst);
+    box->radius = GameObject_GetCollisionRadius(inst);
     box->flag = def->m_dwFlags & 0x100000;
     box->bottom = func_0026841C(inst);
-    box->top = box->bottom + func_002671B4(inst);
+    box->top = box->bottom + GameObject_GetCollisionHeight(inst);
     box->startBottom = inst->header.m_vPos.y + box->bottom;
     box->startTop = inst->header.m_vPos.y + box->top;
     box->endBottom = sweep->end.y + box->bottom;

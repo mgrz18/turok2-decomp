@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/sound.h"
 
-void func_00273A34(SndVoice *arg0, SndMgr *arg1, s32 arg2) {
+void SndVoice_Construct(SndVoice *arg0, SndMgr *arg1, s32 arg2) {
     arg0->id = -1;
     arg0->unk8 = -1;
     arg0->vp.channel = -1;

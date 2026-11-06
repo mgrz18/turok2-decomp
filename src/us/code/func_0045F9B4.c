@@ -6,7 +6,7 @@ typedef unsigned short u16;
 typedef signed int s32;
 extern s32 D_80130C60[];
 s32 func_00425D94(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
-s32 func_0045F9B4(s32 pad, u8 *ext) {
+s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext) {
     s32 mask = 0;
     s32 i;
     u8 company[3];

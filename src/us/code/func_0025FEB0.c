@@ -23,15 +23,15 @@ typedef struct {
 
 extern CVector3 D_800B17B0;
 extern f32 D_800DD78C;
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_00210F68(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-void func_00211114(CQuaternion *q, Mtx4 *mtx);
-void func_0020F85C(Mtx4 *m, CVector3 *in, CVector3 *out);
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
+void CQuaternion__ToMatrix(CQuaternion *q, Mtx4 *mtx);
+void CMtxF__TransformPoint(Mtx4 *m, CVector3 *in, CVector3 *out);
 f32 func_002982F0(f32 x); /* sinf */
 f32 func_002974C0(f32 x); /* cosf */
 
-void func_0025FEB0(Projectile *self, CAI *ai) {
+void Projectile_PlaceAtMuzzle(Projectile *self, CAI *ai) {
     Mtx4 m;
     CVector3 dir;
     CQuaternion yaw;
@@ -40,7 +40,7 @@ void func_0025FEB0(Projectile *self, CAI *ai) {
     CPlayer *owner = (CPlayer *) shooter->m_AI.m_pParent;
     f32 s;
 
-    func_0020EF60(&self->vel, &owner->m_vOnEnemyScale, 0.30719998f);   /* LibTEngine's name; a velocity here */
+    CVector3__Scale(&self->vel, &owner->m_vOnEnemyScale, 0.30719998f);   /* LibTEngine's name; a velocity here */
     self->yaw = shooter->m_RotY;
     self->rot = shooter->m_qGround;
     self->pos = owner->m_pCamera->m_vPos;
@@ -51,9 +51,9 @@ void func_0025FEB0(Projectile *self, CAI *ai) {
     yaw.z = 0.0f;
     D_800DD78C = s;
     yaw.w = func_002974C0(self->yaw * 0.5f);
-    func_00210F68(&rot, &yaw, &self->rot);
-    func_00211114(&rot, &m);
-    func_0020F85C(&m, &D_800B17B0, &dir);
-    func_0020EF60(&dir, &dir, 10.24f);
-    func_0020EEF8(&self->pos, &self->pos, &dir);
+    CQuaternion__Multiply(&rot, &yaw, &self->rot);
+    CQuaternion__ToMatrix(&rot, &m);
+    CMtxF__TransformPoint(&m, &D_800B17B0, &dir);
+    CVector3__Scale(&dir, &dir, 10.24f);
+    CVector3__Add(&self->pos, &self->pos, &dir);
 }

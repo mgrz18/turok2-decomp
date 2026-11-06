@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern f32 func_00298470(f32);
-void func_002101BC(void *arg0, f32 *arg1) {
+void CMtxF__GetScale(void *arg0, f32 *arg1) {
     Matrix *m = arg0;
     CVector3 tmp;
     tmp.x = m->m[0];

@@ -18,11 +18,11 @@ typedef struct Dest {
     SoundSourceNode *sound;  /* 0xEC (0xFC) */
 } Dest;
 
-extern void func_002758B4(void *);
-extern void *func_00275F7C(void);
-extern s32 func_00275D34(void *, void *);
+extern void Sound__StopOwner(void *);
+extern void *LoopSounds_Get(void);
+extern s32 LoopSounds_Stop(void *, void *);
 
-void func_00246918(void *arg0, Dest *arg1) {
+void AI_StopSound(void *arg0, Dest *arg1) {
     void *owner = 0;
     switch (((LevelActor *)arg0)->type) {
     case 1:
@@ -34,9 +34,9 @@ void func_00246918(void *arg0, Dest *arg1) {
         break;
     }
     if (arg1->sound != 0) {
-        func_002758B4(owner);
+        Sound__StopOwner(owner);
         if (arg1->sound != 0) {
-            func_00275D34(func_00275F7C(), arg1->sound);
+            LoopSounds_Stop(LoopSounds_Get(), arg1->sound);
             arg1->sound = 0;
         }
     }

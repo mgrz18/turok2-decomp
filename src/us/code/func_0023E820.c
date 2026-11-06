@@ -62,15 +62,15 @@ extern u8 D_800B38C4[];
 extern u8 D_800B38D4[];
 extern u8 D_800B38E4[];
 
-s32 func_002536B4(Picker *picker, s32 id);
-void func_00248644(Picker *picker, s32 id);
-s32 func_0026EFB8(s32 arg0);
-void func_00281060(s32 hud, s32 a, s32 r, s32 g, s32 b, s32 arg5, s32 arg6, s32 arg7);
-void func_0027FC2C(u8 *arg0, s32 hud, u8 *msg);
-void func_00275544(s32 sound, s32 x, s32 y, s32 z, s32 arg4, s32 arg5);
-void func_0027580C(s32 arg0);
+s32 CPlayer__IsSpecialPickup(Picker *picker, s32 id);
+void CPlayer__CollectKeyPiece(Picker *picker, s32 id);
+s32 Level_GetHub(s32 arg0);
+void CCamera__StartFlash(s32 hud, s32 a, s32 r, s32 g, s32 b, s32 arg5, s32 arg6, s32 arg7);
+void CCameraPool__AddText(u8 *arg0, s32 hud, u8 *msg);
+void Sound__Play(s32 sound, s32 x, s32 y, s32 z, s32 arg4, s32 arg5);
+void Sound__PlaySpeech(s32 arg0);
 
-/* func_0023EF30 */
+/* Pickup_FindWeaponEntry */
 static __inline__ PickupRow18 *FindRowA(s32 id) {
     s32 i;
     PickupRow18 *p = D_800AD1B0;
@@ -84,7 +84,7 @@ static __inline__ PickupRow18 *FindRowA(s32 id) {
     return NULL;
 }
 
-/* func_0023EF64 */
+/* Pickup_FindAmmoEntry */
 static __inline__ PickupRow14 *FindRowB(s32 id) {
     s32 i;
     PickupRow14 *p = D_800AD498;
@@ -98,7 +98,7 @@ static __inline__ PickupRow14 *FindRowB(s32 id) {
     return NULL;
 }
 
-/* func_0023EF98 */
+/* Pickup_FindHealthEntry */
 static __inline__ PickupRow18 *FindRowC(s32 id) {
     s32 i;
     PickupRow18 *p = D_800AD768;
@@ -126,7 +126,7 @@ static __inline__ PickupRow14 *FindRowD(s32 id) {
     return NULL;
 }
 
-/* func_0023F000 */
+/* Pickup_FindItemEntry */
 static __inline__ PickupRow10 *FindRowE(s32 id) {
     s32 i;
     PickupRow10 *p = D_800AD838;
@@ -142,7 +142,7 @@ static __inline__ PickupRow10 *FindRowE(s32 id) {
 
 /* Pick up an item of type id: the tables' handler takes it if one has it;
  * otherwise a generic pickup with its message, sound and effect. */
-s32 func_0023E820(Picker *picker, void *pickup, s32 id) {
+s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
     PickupRow18 *row18;
     PickupRow14 *row14;
     PickupRow10 *row10;
@@ -189,9 +189,9 @@ s32 func_0023E820(Picker *picker, void *pickup, s32 id) {
     if (result != 0) {
         return result;
     }
-    if (func_002536B4(picker, id)) {
+    if (CPlayer__IsSpecialPickup(picker, id)) {
         sound = 0x1388;
-        func_00248644(picker, id);
+        CPlayer__CollectKeyPiece(picker, id);
         if ((u32) (id - 0xFA0) < 0x20) {
             switch (id) {
                 case 0xFB4:
@@ -247,7 +247,7 @@ s32 func_0023E820(Picker *picker, void *pickup, s32 id) {
                     break;
                 case 0x10FE:
                     msg = D_800B3888;
-                    key = func_0026EFB8(D_80110048) - 1;
+                    key = Level_GetHub(D_80110048) - 1;
                     if (key < 6) {
                         picker->keys[key]++;
                     }
@@ -282,15 +282,15 @@ s32 func_0023E820(Picker *picker, void *pickup, s32 id) {
         } else {
             msg = NULL;
         }
-        func_00281060(picker->hud, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
+        CCamera__StartFlash(picker->hud, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
         if (msg != NULL) {
-            func_0027FC2C(D_801198B0, picker->hud, msg);
+            CCameraPool__AddText(D_801198B0, picker->hud, msg);
         }
         if (sound != 0) {
-            func_00275544(sound, picker->x, picker->y, picker->z, 0, -1);
+            Sound__Play(sound, picker->x, picker->y, picker->z, 0, -1);
         }
         if (effect != 0) {
-            func_0027580C(effect);
+            Sound__PlaySpeech(effect);
         }
         result = 1;
     }

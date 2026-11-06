@@ -1,16 +1,16 @@
 #include "common.h"
 
-void func_0029B020(void *, void *, s32); /* extern */
+void __assert(void *, void *, s32); /* extern */
 extern u8 D_800AA488[];
 extern u8 D_800AA48C[];
 extern f64 D_800AA4A0;
 
-s32 func_00293C50(s32 arg0, f32 arg1) {
+s32 _DivS32ByF32(s32 arg0, f32 arg1) {
     f64 temp_f0;
     s32 var_v0;
 
     if (arg1 == 0.0f) {
-        func_0029B020(D_800AA488, D_800AA48C, 0x11D);
+        __assert(D_800AA488, D_800AA48C, 0x11D);
     }
     temp_f0 = (f64) ((f32) arg0 / arg1);
     var_v0 = 0x7FFFFFFF;

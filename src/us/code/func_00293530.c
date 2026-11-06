@@ -14,7 +14,7 @@ typedef struct {
     /* 0x40 */ Slot *slots;
 } Pool;
 
-void func_00293530(Pool *p, s16 i) {
+void alSndpDeallocate(Pool *p, s16 i) {
     if (p->slots[i].x28 == 0) {
         p->slots[i].x1C = 0;
         if (p->cur == i) {

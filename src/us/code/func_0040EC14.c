@@ -6,7 +6,7 @@ extern BlindOnePhase D_0043240C[];
 
 
 /* Starts script command `cmd`: stops the movers, clears every member's flag and runs the command. */
-void func_0040EC14(BlindOneState *m, s32 cmd) {
+void BlindOne_EnterPhase(BlindOneState *m, s32 cmd) {
     s32 i;
 
     m->movers[0].seq = NULL;

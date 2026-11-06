@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-void func_00227184(u32 arg0, u32 arg1, s32 arg2, s32 (*arg3)(u32, u32), s32 (*arg4)(u32, u32))
+void Sort_Insertion(u32 arg0, u32 arg1, s32 arg2, s32 (*arg3)(u32, u32), s32 (*arg4)(u32, u32))
 {
   u32 var_a0;
   u32 var_s0;

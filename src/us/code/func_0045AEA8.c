@@ -1,5 +1,5 @@
 /* WRONG CUT: the real function starts at 0x0045AEA8 (size 0xD8 = 216): splat
- * cut its first two words (lui/lw D_800C201C) as func_0045AEA8. */
+ * cut its first two words (lui/lw D_800C201C) as GameNoteMenu_UpdateLevel_2. */
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/save.h"
@@ -15,10 +15,10 @@ extern char D_800B4A70[];
 extern char D_800B4A88[];
 extern char D_800B4A9C[];
 
-s32 func_0026EFB8(s32 id);
+s32 Level_GetHub(s32 id);
 
-s32 func_0045AEA8(MenuItem *item) {
-    switch (func_0026EFB8(D_800C201C->player.m_CheckPointWarpID)) {
+s32 GameNoteMenu_UpdateLevel_2(MenuItem *item) {
+    switch (Level_GetHub(D_800C201C->player.m_CheckPointWarpID)) {
     case -1:
     default:
         item->text = D_800B4ABC;

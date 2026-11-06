@@ -18,19 +18,19 @@ extern s32 D_80130940;
 extern Gfx D_800AB100[];
 extern Gfx D_800AB130[];
 
-void func_0020565C(s32 unused, void *resource);
-void func_0020B5B8(void);
-void func_0027E000(CCamera *cam);
-void func_0027E770(CCamera *cam, void *world);
-void func_0027C1E8(CCamera *cam);
-void func_002800A0(CCameraPool *pool, CCamera *cam);
-void func_00416AA4(void *menuPool);
-void func_0027F64C(CCamera *cam);
-void func_0025328C(CPlayerList *list, CCamera *cam);
+void CCache__LockForDisplayList(s32 unused, void *resource);
+void Render_InvalidateModeCache(void);
+void CCamera__DisplayListSetup(CCamera *cam);
+void CCamera__DrawScene(CCamera *cam, void *world);
+void CCamera__DrawTints(CCamera *cam);
+void CCameraPool__AdvanceText(CCameraPool *pool, CCamera *cam);
+void MenuPool_Draw(void *menuPool);
+void CCamera__DrawBorder(CCamera *cam);
+void CPlayerPool__DrawMatchClock(CPlayerList *list, CCamera *cam);
 
 /* Updates every camera of the pool, then the main camera. While
  * D_800F5A44 counts down, the frame is first cleared to black. */
-void func_0027F2C4(CCameraPool *pool, void *world) {
+void CCameraPool__Draw(CCameraPool *pool, void *world) {
     CCamera *cam;
     CCamera *main;
     s32 w;
@@ -40,7 +40,7 @@ void func_0027F2C4(CCameraPool *pool, void *world) {
     pool->m_MainCamera.m_FogColor[1] = 0;
     pool->m_MainCamera.m_FogColor[2] = 0;
     if (pool->m_pmeCameras != NULL) {
-        func_0020565C(0, pool->m_pmeCameras);
+        CCache__LockForDisplayList(0, pool->m_pmeCameras);
     }
     if (D_8011ACA4 != 0 || pool->m_ActiveList.m_nCount == 3) {
         D_800F5A44 = 30.0f;
@@ -71,30 +71,30 @@ void func_0027F2C4(CCameraPool *pool, void *world) {
             GFX_CMD(0xE200001C, 0)
             GFX_CMD(0xF7000000, 0x10001)
             GFX_CMD(0xF6000000 | ((w & 0x3FF) << 14) | ((h & 0x3FF) << 2), 0)
-            func_0020B5B8();
+            Render_InvalidateModeCache();
         }
     }
     for (cam = pool->m_ActiveList.m_pHead; cam != NULL; cam = cam->m_pNext) {
-        func_0027E000(cam);
+        CCamera__DisplayListSetup(cam);
         if (D_80130940 == 0) {
-            func_0027E770(cam, world);
+            CCamera__DrawScene(cam, world);
         }
-        func_0027C1E8(cam);
-        func_002800A0(pool, cam);
-        func_00416AA4(cam->m_MenuPool);
-        func_0027F64C(cam);
+        CCamera__DrawTints(cam);
+        CCameraPool__AdvanceText(pool, cam);
+        MenuPool_Draw(cam->m_MenuPool);
+        CCamera__DrawBorder(cam);
     }
     main = &pool->m_MainCamera;
-    func_0027E000(main);
+    CCamera__DisplayListSetup(main);
     if (pool->m_ActiveList.m_nCount == 0) {
-        func_0027C1E8(main);
+        CCamera__DrawTints(main);
     }
-    func_002800A0(pool, main);
+    CCameraPool__AdvanceText(pool, main);
     if (D_80119870.m_Settings.multiplayer != 0) {
         cam = pool->m_ActiveList.m_pHead;
         if (cam != NULL) {
-            func_0025328C(&D_80119870.m_PlayerList, cam);
+            CPlayerPool__DrawMatchClock(&D_80119870.m_PlayerList, cam);
         }
     }
-    func_00416AA4(pool->m_MainCamera.m_MenuPool);
+    MenuPool_Draw(pool->m_MainCamera.m_MenuPool);
 }

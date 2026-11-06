@@ -12,11 +12,11 @@ typedef struct Swing {
 
 extern f32 D_800ACB98[];        /* swing amplitude per step */
 
-void func_0020FF80(f32 *dst, f32 *src);
-void func_0020EF60(CVector3 *dst, CVector3 *src, f32 scale);
-void func_00210318(f32 *mtx, f32 x, f32 y, f32 z);
-void func_0020FCC4(f32 *mtx, f32 angle, f32 x, f32 y, f32 z);
-void func_0020C618(f32 *dst, f32 *a, f32 *b);
+void CMtxF__Copy(f32 *dst, f32 *src);
+void CVector3__Scale(CVector3 *dst, CVector3 *src, f32 scale);
+void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);
+void CMtxF__SetAxisAngle(f32 *mtx, f32 angle, f32 x, f32 y, f32 z);
+void CMtxF__MultiplyAffine(f32 *dst, f32 *a, f32 *b);
 
 /* Rotates the matrix about its own origin by the swing angle of this step. */
 void func_0021F7F4(s32 arg0, Swing *swing, f32 *matrix, s32 active, s32 dir) {
@@ -35,14 +35,14 @@ void func_0021F7F4(s32 arg0, Swing *swing, f32 *matrix, s32 active, s32 dir) {
         angle = D_800ACB98[25 - swing->step];
         angle *= 0.3f;
         angle *= (dir == 5 ? -2.0f : dir);
-        func_0020FF80(inverse, matrix);
+        CMtxF__Copy(inverse, matrix);
         flip = -1.0f;
-        func_0020EF60(&origin, &origin, flip);
-        func_00210318(inverse, origin.x, origin.y, origin.z);
-        func_0020FCC4(rotation, angle, axis.x, axis.y, axis.z);
-        func_0020C618(matrix, inverse, rotation);
-        func_0020EF60(&origin, &origin, flip);
-        func_00210318(matrix, origin.x, origin.y, origin.z);
+        CVector3__Scale(&origin, &origin, flip);
+        CMtxF__Translate(inverse, origin.x, origin.y, origin.z);
+        CMtxF__SetAxisAngle(rotation, angle, axis.x, axis.y, axis.z);
+        CMtxF__MultiplyAffine(matrix, inverse, rotation);
+        CVector3__Scale(&origin, &origin, flip);
+        CMtxF__Translate(matrix, origin.x, origin.y, origin.z);
         if (swing->lastStep == active) {
             swing->step--;
         }

@@ -9,11 +9,11 @@ extern u8 D_8011AB06;
 extern s32 D_8011ACD4;
 extern s32 D_8011ACE4;
 
-void func_00279028(s32);
-void func_0024A678(void *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f32 size);
+void Hud_SetupTextureMode(s32);
+void Hud_DrawWorldSprite(void *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f32 size);
 
 /* Draws the player's two target markers. */
-void func_0024A86C(CPlayer *player, void *view) {
+void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
     s32 sprite;
     u8 show;
     f32 scale;
@@ -22,7 +22,7 @@ void func_0024A86C(CPlayer *player, void *view) {
     if (player->m_CrossHairMode == 0 || player->m_pOptions->m_TagMode == 1) {
         return;
     }
-    func_00279028(0xFF);
+    Hud_SetupTextureMode(0xFF);
 
     sprite = player->m_SightIcon;
     if (sprite == 0x2DA && D_8011AAF1 != 0) {
@@ -55,7 +55,7 @@ void func_0024A86C(CPlayer *player, void *view) {
             break;
         }
         if (show) {
-            func_0024A678(view, &player->m_vSightPos, sprite, player->m_SightIconFrame, scale, 1.0f);
+            Hud_DrawWorldSprite(view, &player->m_vSightPos, sprite, player->m_SightIconFrame, scale, 1.0f);
         }
     }
 
@@ -90,7 +90,7 @@ void func_0024A86C(CPlayer *player, void *view) {
             break;
         }
         if (show) {
-            func_0024A678(view, &player->m_vCrossHairPos, sprite, player->m_SightIconFrame, scale, 1.0f);
+            Hud_DrawWorldSprite(view, &player->m_vCrossHairPos, sprite, player->m_SightIconFrame, scale, 1.0f);
         }
     }
 }

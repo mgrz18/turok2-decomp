@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_002841D0(void);
-s32 func_002841D0(void) {
+extern s32 Cinema_PathDone(void);
+s32 Cinema_PathDone(void) {
     extern func_802457D0_S1 *D_800C1BB0;
     if (D_800C1BB0->unk38 != 0) {
         if (D_800C1BB0->unk1C > D_800C1BB0->unk34) {

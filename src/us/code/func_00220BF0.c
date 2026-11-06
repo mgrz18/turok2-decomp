@@ -21,10 +21,10 @@ struct Entity {
     unsigned char index;
 };
 extern void *D_800F70E4;
-extern void *func_002017D4(void *table, s32 index);
-extern s32 func_00201818(void *table, s32 index);
-extern void func_0026DFB0(Entity *entity);
-void func_00220BF0(World_func_8028787C_de *world, Entity *entity) {
+extern void *CISet__GetBlock(void *table, s32 index);
+extern s32 CISet__GetBlockSize(void *table, s32 index);
+extern void LevelEvent_Fire(Entity *entity);
+void CScene__RestoreFiredEvent(World_func_8028787C_de *world, Entity *entity) {
     s32 index;
     s32 level;
     void *mask;
@@ -34,20 +34,20 @@ void func_00220BF0(World_func_8028787C_de *world, Entity *entity) {
     s32 bit;
     index = entity->index;
     level = world->level;
-    mask = func_002017D4(func_002017D4(func_002017D4(world->levels, 0), level), 2);
-    func_002017D4(mask, 0);
-    func_00201818(mask, 1);
-    bits = func_002017D4(mask, 1);
+    mask = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(world->levels, 0), level), 2);
+    CISet__GetBlock(mask, 0);
+    CISet__GetBlockSize(mask, 1);
+    bits = CISet__GetBlock(mask, 1);
     bit = 1 << (index & 7);
     if (bits[index / 8] & bit) {
         if (entity->flag != 0) {
             flag = entity->flag;
-            flags = func_002017D4(D_800F70E4, 1);
-            func_002017D4(flags, 0);
-            if (((unsigned char *)func_002017D4(flags, 1))[flag] != 0) {
+            flags = CISet__GetBlock(D_800F70E4, 1);
+            CISet__GetBlock(flags, 0);
+            if (((unsigned char *)CISet__GetBlock(flags, 1))[flag] != 0) {
                 return;
             }
         }
-        func_0026DFB0(entity);
+        LevelEvent_Fire(entity);
     }
 }

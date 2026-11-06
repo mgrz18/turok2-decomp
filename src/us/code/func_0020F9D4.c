@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-void func_0020F9D4(CMtxF mf, CVector3 *in, CVector3 *out) {
+void CMtxF__TransformPointProjective(CMtxF mf, CVector3 *in, CVector3 *out) {
     f32 temp_f1;
     f32 temp_f2;
 

@@ -4,7 +4,7 @@
 extern s32 D_8011ACE4;
 
 /* Sets or clears flag 0x01000000 of the item from D_8011ACE4. */
-void func_0041CD7C(Menu *arg0) {
+void StatsMenu_ShowTagsRow(Menu *arg0) {
     MenuItem *temp_a0;
     MenuItem *temp_v0;
 

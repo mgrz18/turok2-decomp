@@ -7,11 +7,11 @@
 extern s32 D_800B6D68;
 extern s32 D_800B6D6C;
 extern f32 D_800A9DFC;
-u32 func_00266B80();
-s32 func_00288D3C(CEngineApp *g, f32 x, s32 a, s32 b);
-void func_0028932C(CEngineApp *g) {
+u32 GetMemSize();
+s32 CEngineApp__TimedModeSwitch(CEngineApp *g, f32 x, s32 a, s32 b);
+void EngineMode01_Legal_Retrace(CEngineApp *g) {
     s32 mode;
-    u32 r = func_00266B80();
+    u32 r = GetMemSize();
     mode = 4;
     if (r > 0x400000) {
         if (D_800B6D68 != 0) {
@@ -22,11 +22,11 @@ void func_0028932C(CEngineApp *g) {
         D_800B6D6C = 0;
     }
     if (D_800B6D6C != 0) {
-        if (func_00288D3C(g, 12.0f, mode, -1)) {
+        if (CEngineApp__TimedModeSwitch(g, 12.0f, mode, -1)) {
             D_800B6D6C = 0;
         }
     } else {
-        if (func_00288D3C(g, 12.0f, mode, mode)) {
+        if (CEngineApp__TimedModeSwitch(g, 12.0f, mode, mode)) {
             D_800B6D6C = 0;
         }
     }

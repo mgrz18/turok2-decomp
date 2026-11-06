@@ -3,9 +3,9 @@
 
 /* Lighting: the libultra light block the display lists load (Lights1: one
  * ambient and one directional light), the scene light D_800AB0D0 (the level's
- * colours and direction, func_0042AA80; the default lights of a placed actor,
- * func_002150C0; what func_002254C0 returns where the level has no light
- * table), and the draw colour override D_800AB8B0 that func_00207FEC applies
+ * colours and direction, CScene__LoadLightSettings; the default lights of a placed actor,
+ * CLevelActor__Construct; what CScene__GetLightsAt returns where the level has no light
+ * table), and the draw colour override D_800AB8B0 that Render_SetRenderMode applies
  * to every material (most files only write its mode, as an s32).
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
@@ -27,7 +27,7 @@ typedef struct CLights1 {
     /* 0x13 */ u8 _pad13[5];
 } __attribute__((aligned(4))) CLights1; /* size 0x18 */
 
-/* The draw colour override (D_800AB8B0), set by func_00235898 from the
+/* The draw colour override (D_800AB8B0), set by ScreenTint_UpdateMode from the
  * fade / alpha D_800AB8C0 accumulates. m_Mode: 0 none, 1 alpha, 3 fade to
  * m_Color, 6 both. */
 typedef struct CBlendState {

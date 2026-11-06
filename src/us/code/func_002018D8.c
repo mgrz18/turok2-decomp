@@ -6,6 +6,6 @@ typedef struct {
 } TableHeader;
 
 /* Bytes taken by a table: count * element size plus the 8-byte header. */
-s32 func_002018D8(TableHeader *arg0) {
+s32 CUSet__GetTotalSize(TableHeader *arg0) {
     return (arg0->count * arg0->size) + 8;
 }

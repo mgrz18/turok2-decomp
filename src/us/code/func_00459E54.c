@@ -1,11 +1,11 @@
-/* Second-module copy of func_00420F34 (first module). NOTE: the ROM code reads jtbl_800C1450, whose entries are the first module copy's case addresses (link base 0x420F34, 0xE0 above this copy's 0x420E54): the switch here builds its own table, which will not equal the ROM's. */
+/* Second-module copy of PakConfirmMenu_SelectNo (first module). NOTE: the ROM code reads jtbl_800C1450, whose entries are the first module copy's case addresses (link base 0x420F34, 0xE0 above this copy's 0x420E54): the switch here builds its own table, which will not equal the ROM's. */
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
 
 s32 func_0041DCB0(void *event, s32 port, s32 arg2);
 char *func_0041DB7C(void *event);
-void func_00416644(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
+void MenuPool_OpenMenu(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
 extern char D_0043BDF0[];
 extern char D_0043BE14[];
@@ -27,13 +27,13 @@ static __inline__ s32 GetPort(Menu *event) {
 static __inline__ void ShowEvent(Menu *event) {
     if (func_0041DCB0(event, GetPort(event), 1) != 0) {
         D_801309BC = 1;
-        func_00416644(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
     } else {
-        func_00416644(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
     }
 }
 
-s32 func_00459E54(s32 unused, Menu *event) {
+s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
     char *text;
     char *dst;
 
@@ -67,7 +67,7 @@ s32 func_00459E54(s32 unused, Menu *event) {
             } else {
                 dst = D_80119E2C;
             }
-            func_00416644(dst, text, event->player, (s32) event->controller, NULL);
+            MenuPool_OpenMenu(dst, text, event->player, (s32) event->controller, NULL);
             break;
     }
     return 1;

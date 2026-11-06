@@ -12,13 +12,13 @@ typedef struct {
     /* 0x214 */ s32 *info;
 } State00403494;
 
-void func_00236314(void *slot, void *arg);
+void ScriptAnimator_SetScript(void *slot, void *arg);
 
-void func_00403494(State00403494 *s, void *arg) {
+void MantidQueen_FlashWeakSpot(State00403494 *s, void *arg) {
     s32 index = s->info[5];
 
     if (index != -1) {
         /* &s->slots[index].body, computed as an address */
-        func_00236314((void *)(index * sizeof(Slot00403494) + (s32)s + 0xC), arg);
+        ScriptAnimator_SetScript((void *)(index * sizeof(Slot00403494) + (s32)s + 0xC), arg);
     }
 }

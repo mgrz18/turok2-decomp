@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-/* func_00253AC0, inlined. */
+/* CPlayer__GetMaxAmmo, inlined. */
 static __inline__ s32 GetMaxAmmo(CPlayer *player, s32 type, s32 heldOnly) {
     s32 max;
     s32 w;
@@ -41,7 +41,7 @@ static __inline__ s32 GetMaxAmmo(CPlayer *player, s32 type, s32 heldOnly) {
  * whether there was room. */
 /* Adds rounds of an ammo type, up to the most any weapon carries; returns
  * whether there was room. */
-s32 func_00253B54(CPlayer *player, s32 type, s32 count) {
+s32 CPlayer__AddAmmo(CPlayer *player, s32 type, s32 count) {
     s16 *ammo = &player->m_Data.m_AmmoList[type];
     s32 max = GetMaxAmmo(player, type, 0);
     s32 room = max > *ammo;

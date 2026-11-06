@@ -3,7 +3,7 @@
 
 s32 func_0026E294(s32);
 
-void func_002252A0(void *arg0, s32 arg1)
+void CScene__FireEventsByKeyOnce(void *arg0, s32 arg1)
 {
   s32 var_s0;
   s32 var_s3;

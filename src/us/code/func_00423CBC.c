@@ -11,7 +11,7 @@ extern u8 D_800B5264[];
 extern u8 D_800B52C4[];
 extern s32 D_801309B0;
 
-s32 func_00423CBC(MenuItem *item) {
+s32 PakConfirmMenu_UpdateLine5(MenuItem *item) {
     switch (D_801309B0) {
         case 0:
         default:

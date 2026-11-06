@@ -6,13 +6,13 @@
 
 
 
-extern void func_00258734(void *actor, s32 flagsAddr, s32 arg2);
+extern void WeaponActor_FireCallback(void *actor, s32 flagsAddr, s32 arg2);
 
-void func_00238914(s32 arg0, void *arg1, s32 arg2, CVector3 arg3, s32 arg6)
+void ImpactEvent_SetWeaponFirePos(s32 arg0, void *arg1, s32 arg2, CVector3 arg3, s32 arg6)
 {
     s32 t6 = arg6;
     CPlayer *player = ((CPlayer *)((CGameObjectInstance *)arg1)->m_AI.m_pParent);
     player->m_vWeaponFirePos = arg3;
     do { } while (0);
-    func_00258734(arg1, (s32)&((CGameObjectInstance *)arg1)->m_AI.m_dwFlags, t6);
+    WeaponActor_FireCallback(arg1, (s32)&((CGameObjectInstance *)arg1)->m_AI.m_dwFlags, t6);
 }

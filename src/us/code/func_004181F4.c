@@ -2,7 +2,7 @@
 
 extern s32 D_8011ACB0;
 
-s32 func_004181F4(void)
+s32 CharacterMenu_Poll(void)
 {
   s8 *new_var;
   s32 var_a0;

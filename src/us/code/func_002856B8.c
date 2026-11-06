@@ -4,14 +4,14 @@
 
 /* ControllerProfile profile, stride 0x224. */
 
-void func_00275624(s32 sound);
+void Sound__Play2D(s32 sound);
 
 extern s32 D_800B6CF8; /* menu sounds enabled */
 
-s32 func_002856B8(ControllerProfile *ctrl) {
+s32 Controller_MenuUp(ControllerProfile *ctrl) {
     if (ctrl->buttonsRepeat & 0x10808) {
         if (D_800B6CF8 != 0) {
-            func_00275624(0x12D);
+            Sound__Play2D(0x12D);
         }
         return 1;
     }

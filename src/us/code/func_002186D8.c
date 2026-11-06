@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00217C58(s32 arg0, s32 arg1);
-void func_002186D8(s32 arg0, void *arg1, s32 arg2)
+extern s32 Bits_Read(s32 arg0, s32 arg1);
+void Anim_DecodeRawChannel(s32 arg0, void *arg1, s32 arg2)
 {
   int new_var;
   s32 sp10;
@@ -18,7 +18,7 @@ void func_002186D8(s32 arg0, void *arg1, s32 arg2)
     do
     {
       var_s0 += 1;
-      sp10 = func_00217C58(arg0, 0x20);
+      sp10 = Bits_Read(arg0, 0x20);
       *((f32 *) var_s1) = *((f32 *) (&sp10));
       var_s1 += 0x10;
     }

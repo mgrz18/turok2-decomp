@@ -7,13 +7,13 @@ f32 func_002982F0(f32 x);
 extern f32 D_800A80F0;
 extern f32 D_800A80F4;
 extern f32 D_800A80F8;
-void func_0020EF2C(CVector3 *out, void *src, s32 a);
-void func_0020FB90(void *src, CVector3 *a, CVector3 *out);
-void func_0020F040(CVector3 *v);
-f32 func_0021153C(f32 x);
+void CVector3__Subtract(CVector3 *out, void *src, s32 a);
+void CMtxF__InverseRotateVector(void *src, CVector3 *a, CVector3 *out);
+void CVector3__Normalize(CVector3 *v);
+f32 Math_AcosLookup(f32 x);
 f32 func_002982F0(f32 x);
 f32 __builtin_fabsf(f32 x);
-s32 func_00271E20(s32 a0, u8 *obj) {
+s32 Sound_CalcPan(s32 a0, u8 *obj) {
     CVector3 r;
     CVector3 d;
     CVector3 w;
@@ -22,18 +22,18 @@ s32 func_00271E20(s32 a0, u8 *obj) {
     if (obj == 0) {
         return 0x40;
     }
-    func_0020EF2C(&d, obj + 0x114, a0);
+    CVector3__Subtract(&d, obj + 0x114, a0);
     if (d.x * d.x + d.z * d.z < D_800A80F0) {
         return 0x40;
     }
-    func_0020FB90(obj + 0x14C, &d, &w);
+    CMtxF__InverseRotateVector(obj + 0x14C, &d, &w);
     w.y = 0.0f;
     zero = w.y;
     r.y = zero;
     r.x = zero;
     r.z = D_800A80F4;
-    func_0020F040(&w);
-    s = func_002982F0(func_0021153C(w.x * r.x + w.y * r.y + w.z * r.z));
+    CVector3__Normalize(&w);
+    s = func_002982F0(Math_AcosLookup(w.x * r.x + w.y * r.y + w.z * r.z));
     if (w.x == zero) {
         return 0x40;
     }

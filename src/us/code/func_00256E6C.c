@@ -20,7 +20,7 @@ typedef struct {
 
 extern Settings D_8011AAF1;
 
-u8 func_00256E6C(s32 unused, s32 id) {
+u8 Hud_GetSpriteValue(s32 unused, s32 id) {
     Settings *settings;
     SubSettings *sub;
 

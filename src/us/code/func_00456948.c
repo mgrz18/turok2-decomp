@@ -35,7 +35,7 @@ static __inline__ void disableEntry(MenuItem *entry) {
     entry->flags |= ENTRY_DISABLED;
 }
 
-void func_00456948(Menu *event) {
+void PakMenu_UpdateNoteRows_2(Menu *event) {
     s32 mode;
     s32 i;
     s32 enabled;

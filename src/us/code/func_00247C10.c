@@ -15,17 +15,17 @@ extern s32 D_8011ACDC;      /* team 0 score */
 extern s32 D_8011ACE0;      /* team 1 score */
 
 s32 Cinema_PathPlaying(void);
-s32 func_00284174(void);
-CRegionInfo *func_0022425C(void *world, void *region);
-void func_00249358(CPlayer *player, CGameObjectInstance *actor, s32 damage, s32 arg3, s32 arg4);
-s32 func_0025340C(void *players, CPlayer *player);
-void func_002478C8(CPlayer *victim, CPlayer *killer, DamageEvent *hit);
+s32 Cinema_IsActive(void);
+CRegionInfo *CScene__GetRegionInfo(void *world, void *region);
+void CPlayer__Hurt(CPlayer *player, CGameObjectInstance *actor, s32 damage, s32 arg3, s32 arg4);
+s32 CPlayerPool__GetIndex(void *players, CPlayer *player);
+void CPlayer__ShowKillMessages(CPlayer *victim, CPlayer *killer, DamageEvent *hit);
 
 static __inline__ s32 inSpecialRegion(CPlayer *player) {
     CRegionInfo *info;
 
     if (player->m_CharacterActor.header.m_pCurrentRegion != NULL) {
-        info = func_0022425C(D_800F7078, player->m_CharacterActor.header.m_pCurrentRegion);
+        info = CScene__GetRegionInfo(D_800F7078, player->m_CharacterActor.header.m_pCurrentRegion);
         if (info != NULL) {
             if (info->m_wFlags52 & 0x40) {
                 return 1;
@@ -37,7 +37,7 @@ static __inline__ s32 inSpecialRegion(CPlayer *player) {
 
 /* A player's actor took a lethal hit in multiplayer: works out the killer and
    updates the kill, death, tag and team counts. */
-void func_00247C10(CGameObjectInstance *actor, s32 arg1, DamageEvent *hit) {
+void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent *hit) {
     CPlayer *player;
     CPlayer *killer = NULL;
     s32 arg4 = -1;
@@ -57,7 +57,7 @@ void func_00247C10(CGameObjectInstance *actor, s32 arg1, DamageEvent *hit) {
     if (D_8011AAD8.cheatFlags & 1) {
         return;
     }
-    if (func_00284174() != 0) {
+    if (Cinema_IsActive() != 0) {
         return;
     }
     player = (CPlayer *) actor->m_AI.m_pParent;
@@ -69,7 +69,7 @@ void func_00247C10(CGameObjectInstance *actor, s32 arg1, DamageEvent *hit) {
     if (source != NULL && source->header.m_Type == 2 && ((CParticle *) source)->m_pOwner == (CGameObjectInstance *) player) {
         hit->damage = hit->damage * 0.25f;
     }
-    func_00249358(player, actor, hit->damage, hit->flags, arg4);
+    CPlayer__Hurt(player, actor, hit->damage, hit->flags, arg4);
 
     source = hit->source;
     if (source != NULL) {
@@ -100,20 +100,20 @@ void func_00247C10(CGameObjectInstance *actor, s32 arg1, DamageEvent *hit) {
         return;
     }
     player->m_pOptions->m_bDead = 1;
-    killerIndex = func_0025340C(&D_80119870.m_PlayerList, killer);
+    killerIndex = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, killer);
     options = player->m_pOptions;
     if (options->m_TagMode == 1) {
         options->m_TaggedBy[killerIndex]++;
     } else {
         options->m_KilledBy[killerIndex]++;
     }
-    victimIndex = func_0025340C(&D_80119870.m_PlayerList, player);
+    victimIndex = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, player);
     if (player->m_pOptions->m_TagMode == 1) {
         killer->m_pOptions->m_Tagged[victimIndex]++;
     } else {
         killer->m_pOptions->m_Killed[victimIndex]++;
     }
-    func_002478C8(player, killer, hit);
+    CPlayer__ShowKillMessages(player, killer, hit);
 
     if (killerIndex == victimIndex) {
         player->m_pOptions->m_Suicides++;

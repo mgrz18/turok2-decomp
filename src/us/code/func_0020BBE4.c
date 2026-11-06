@@ -7,10 +7,10 @@
 
 extern s32 D_800C2214;          /* display list capacity, in commands */
 
-s32 func_00208810(s32, s32);
-s32 *func_002017D4(s32 *, s32);
-void func_0020565C(s32, s32 **);
-void func_00207FEC(s32);
+s32 Render_SetupMaterial(s32, s32);
+s32 *CISet__GetBlock(s32 *, s32);
+void CCache__LockForDisplayList(s32, s32 **);
+void Render_SetRenderMode(s32);
 
 void func_0020BBE4(s32 arg0, s32 renderMode, s32 **model, s32 matrix, s32 projected,
                    s32 lights, s32 *segment, s32 group, s32 arg8) {
@@ -25,7 +25,7 @@ void func_0020BBE4(s32 arg0, s32 renderMode, s32 **model, s32 matrix, s32 projec
     if ((u32) (D_800C2214 - ((u32) ((u8 *) D_800D8E24 - (u8 *) D_800F7070->m_pDisplayList) >> 3)) < 3000) {
         return;
     }
-    if (func_00208810(arg0, arg8) == 0) {
+    if (Render_SetupMaterial(arg0, arg8) == 0) {
         return;
     }
     if (projected) {
@@ -39,21 +39,21 @@ void func_0020BBE4(s32 arg0, s32 renderMode, s32 **model, s32 matrix, s32 projec
         GFX_CMD(0xDC08090A, lights);
     }
     if (renderMode != -1) {
-        func_00207FEC(renderMode);
+        Render_SetRenderMode(renderMode);
     }
-    func_0020565C(0, model);
+    CCache__LockForDisplayList(0, model);
     obj = *model;
     seg = segment;
     if (seg == NULL) {
-        seg = func_002017D4(obj, 0);
+        seg = CISet__GetBlock(obj, 0);
     }
     GFX_CMD(0xDB060008, (u32) seg);
-    list = func_002017D4(func_002017D4(obj, 2), group);
+    list = CISet__GetBlock(CISet__GetBlock(obj, 2), group);
     count = *list;
     for (i = 0; i < count; i++) {
-        entry = func_002017D4(list, i);
-        func_002017D4(entry, 0);
-        dl = func_002017D4(entry, 1);
+        entry = CISet__GetBlock(list, i);
+        CISet__GetBlock(entry, 0);
+        dl = CISet__GetBlock(entry, 1);
         GFX_CMD(0xDE000000, (u32) dl);
     }
 }

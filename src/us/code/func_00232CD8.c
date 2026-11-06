@@ -5,7 +5,7 @@
 #include "structs/particle.h"
 
 /* Finds the particle of owner arg1 (and of template arg2, when given) in the template's active list. */
-void *func_00232CD8(CParticleSystem *arg0, s32 arg1, CROMParticleEffect *arg2) {
+void *CParticleSystem__FindOwned(CParticleSystem *arg0, s32 arg1, CROMParticleEffect *arg2) {
     CParticle *record;
     /* index[array] order matches the original addu operand order */
     record = arg2->m_pParams->m_nList[arg0->m_ActiveList].m_pHead;

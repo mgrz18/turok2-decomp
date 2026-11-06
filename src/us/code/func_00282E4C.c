@@ -11,15 +11,15 @@ extern s32 D_8010FF18;          /* how many */
 extern f32 D_800B6D28;          /* the frame's time step */
 extern f32 D_800B6D34;
 
-CRegionInfo *func_0022425C(void *world, s32 region);
-f32 func_0026BE60(s32 region, f32 x, f32 z);
-CVector3 func_00280E40(CCamera *camera);
+CRegionInfo *CScene__GetRegionInfo(void *world, s32 region);
+f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
+CVector3 CCamera__GetViewOrigin(CCamera *camera);
 void func_00207914(s32 *resource, s32 id);
 void CList__Remove(CList *list, void *element);
 void CList__AddHead(CList *list, void *element);
 void CList__AddTail(CList *list, void *element);
 
-/* func_002836E4, inlined: takes a free emitter. */
+/* CEmitterPool__TakeEmitter, inlined: takes a free emitter. */
 static __inline__ CEmitter *TakeEmitter(CEmitterPool *owner) {
     CEmitter *e = owner->m_FreeList.m_pHead;
 
@@ -30,13 +30,13 @@ static __inline__ CEmitter *TakeEmitter(CEmitterPool *owner) {
     return e;
 }
 
-/* func_00283730, inlined: gives an emitter back. */
+/* CEmitterPool__ReleaseEmitter, inlined: gives an emitter back. */
 static __inline__ void FreeEmitter(CEmitterPool *owner, CEmitter *e) {
     CList__Remove(&owner->m_ActiveList, e);
     CList__AddHead(&owner->m_FreeList, e);
 }
 
-/* func_002834CC, inlined. */
+/* CEmitter__Start, inlined. */
 static __inline__ void InitEmitter(CEmitter *e, CEmitterDef *def, s16 mask, f32 scale,
                                    f32 offset0, f32 offset1, f32 offset2) {
     e->m_pDef = def;
@@ -52,7 +52,7 @@ static __inline__ void InitEmitter(CEmitter *e, CEmitterDef *def, s16 mask, f32 
     e->m_Opacity = offset2;
 }
 
-/* func_00283550, inlined: returns 1 once the emitter has wound down. */
+/* CEmitter__Advance, inlined: returns 1 once the emitter has wound down. */
 static __inline__ s32 UpdateEmitter(CEmitter *e, s32 mask, f32 fallback, s32 boosting, f32 boost, CCamera *camera) {
     CEmitterDef *def = e->m_pDef;
     f32 x;
@@ -108,7 +108,7 @@ static __inline__ s32 UpdateEmitter(CEmitter *e, s32 mask, f32 fallback, s32 boo
  * from the table at D_8010FF14) and updates the running ones, giving back
  * those that have wound down. Under a region flagged 1, the emitters get a
  * boost while the camera is below the region's height. */
-void func_00282E4C(CEmitterPool *owner, CCamera *camera) {
+void CEmitterPool__Advance(CEmitterPool *owner, CCamera *camera) {
     CRegionInfo *info;
     CEmitterDef *def;
     CEmitter *e;
@@ -126,16 +126,16 @@ void func_00282E4C(CEmitterPool *owner, CCamera *camera) {
     if (region == 0) {
         return;
     }
-    info = func_0022425C(D_800F7078, region);
+    info = CScene__GetRegionInfo(D_800F7078, region);
     if (info == NULL) {
         return;
     }
     boost = 0.0f;
-    ground = func_0026BE60(region, camera->m_ViewParams.m_vPos.x, camera->m_ViewParams.m_vPos.z);
+    ground = CGameRegion__GetHeight(region, camera->m_ViewParams.m_vPos.x, camera->m_ViewParams.m_vPos.z);
     below = 0;
     if (info->m_dwFlags & 1) {
-        depth = MIN((info->m_WaterHeight - func_00280E40(camera).y) * 0.5f, 20.48f);
-        below = func_00280E40(camera).y < info->m_WaterHeight;
+        depth = MIN((info->m_WaterHeight - CCamera__GetViewOrigin(camera).y) * 0.5f, 20.48f);
+        below = CCamera__GetViewOrigin(camera).y < info->m_WaterHeight;
         boost = info->m_WaterHeight - depth;
     }
     def = D_8010FF14;

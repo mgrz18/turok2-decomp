@@ -24,7 +24,7 @@ typedef struct {
  * scheduler move the D_8011ACE4 load and change the register choice. */
 #define FIELD_AT(ptr, type, T, field) (*(type *)((s8 *)(ptr) + (s32) &((T *)0)->field))
 
-void func_0041CDBC(Menu *arg0) {
+void StatsMenu_InitContinue(Menu *arg0) {
     MenuItem *temp_a0;
     MenuItem *temp_v0;
     MenuData *temp_v1;

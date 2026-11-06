@@ -2,7 +2,7 @@
 
 extern s32 D_800F56A8;
 
-f32 func_0027BAEC(void) {
+f32 COnScreen__GetFontAdvance(void) {
     switch (D_800F56A8) {
         case 5:
             return 6.0f;

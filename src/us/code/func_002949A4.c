@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00294C70(ALSynth *drvr, ALPlayer **client);
-extern s32 func_00294D18(ALSynth *, s32);
-extern void func_00294BDC(ALSynth *);
-Acmd *func_002949A4(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
+extern s32 __nextSampleTime(ALSynth *drvr, ALPlayer **client);
+extern s32 _timeToSamples(ALSynth *, s32);
+extern void _collectPVoices(ALSynth *);
+Acmd *alAudioFrame(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
 {
     extern ALGlobals *D_800B7760;
     ALPlayer *client;
@@ -21,11 +21,11 @@ Acmd *func_002949A4(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
         *cmdLen = 0;
         return cmdList;
     }
-    for (drvr->paramSamples = func_00294C70(drvr, &client);
+    for (drvr->paramSamples = __nextSampleTime(drvr, &client);
          drvr->paramSamples - drvr->curSamples < outLen;
-         drvr->paramSamples = func_00294C70(drvr, &client)) {
+         drvr->paramSamples = __nextSampleTime(drvr, &client)) {
         drvr->paramSamples &= ~0xf;
-        client->samplesLeft += func_00294D18(drvr, (*client->handler)(client));
+        client->samplesLeft += _timeToSamples(drvr, (*client->handler)(client));
     }
     drvr->paramSamples &= ~0xf;
     while (outLen > 0) {
@@ -40,6 +40,6 @@ Acmd *func_002949A4(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
         drvr->curSamples += nOut;
     }
     *cmdLen = (s32)(cmdlEnd - cmdList);
-    func_00294BDC(drvr);
+    _collectPVoices(drvr);
     return cmdlEnd;
 }

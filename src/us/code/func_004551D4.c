@@ -12,7 +12,7 @@ extern char D_800B3FC0[];
 extern u8 D_8011AAEF;
 extern char D_800B3FA8[];
 extern char D_800B3F90[];
-s32 func_004551D4(struct FieldRecAt14 *field) {
+s32 OptionsMenu_BloodColorText_2(struct FieldRecAt14 *field) {
     switch (D_8011AAEF) {
     case 0:
         field->text = D_800B3F90;

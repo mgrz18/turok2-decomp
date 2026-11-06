@@ -7,10 +7,10 @@
 /* Turok 2: the mode block sits at 0x23FD0 (Rage Wars 0x26DB0). */
 
 extern s32 D_800F5D2C;
-extern s32 func_00284204(s32 *flags);
-extern s32 func_0028D0E0(void);
+extern s32 Cinema_IsIdle(s32 *flags);
+extern s32 SavedPlayers_IsActive(void);
 
-void func_00288E58(CEngineApp *session, s32 arg1, s32 target) {
+void CEngineApp__UpdateCinemaMode(CEngineApp *session, s32 arg1, s32 target) {
     s32 pending;
     s32 *flags;
     flags = &D_800F5D2C;
@@ -24,14 +24,14 @@ void func_00288E58(CEngineApp *session, s32 arg1, s32 target) {
         *flags = 0;
         return;
     }
-    if (func_00284204(flags) != 0) {
+    if (Cinema_IsIdle(flags) != 0) {
         s32 mode = session->m_Settings.mode;
         session->m_Settings.fadeMode = 1;
         session->m_Settings.fade = 0;
         session->m_Settings.mode = 0x11;
         session->m_Settings.nextMode = arg1;
         session->m_Settings.prevMode = mode;
-        if (func_0028D0E0() != 0) {
+        if (SavedPlayers_IsActive() != 0) {
             session->m_Settings.fade = (1.0f);
         }
     }

@@ -11,12 +11,12 @@ typedef struct {
     /* 0x118 */ f32 unk118;
 } State;
 
-void func_00253EB8(CPlayer *player, s32 id);
+void CPlayer__StartWeaponFiringSound(CPlayer *player, s32 id);
 
-void func_00259794(CGameObjectInstance *actor, State *state) {
+void WeaponMode_AE714_Enter(CGameObjectInstance *actor, State *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
 
     state->unk64 = 0;
     state->unk118 = D_800AF618[((CPlayer *)actor->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * 15.0f;
-    func_00253EB8(player, 0x1A9);
+    CPlayer__StartWeaponFiringSound(player, 0x1A9);
 }

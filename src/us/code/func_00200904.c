@@ -2,7 +2,7 @@
 #include "structs/camera.h"
 
 /* CList: unlinks element arg1 and appends it at the tail. */
-void func_00200904(CList *arg0, s32 arg1) {
+void CList__MoveToTail(CList *arg0, s32 arg1) {
     s32 temp_a2;
     s32 temp_a2_2;
     s32 temp_v0;

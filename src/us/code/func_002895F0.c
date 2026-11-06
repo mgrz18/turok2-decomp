@@ -1,9 +1,9 @@
 #include "common.h"
 
-s32 func_00288F60();                            /* extern */
+s32 CEngineApp__DrawWorld();                            /* extern */
 s32 func_00289108(s32);                         /* extern */
 
-void func_002895F0(s32 arg0) {
-    func_00288F60();
+void EngineMode05_Cinema_Draw(s32 arg0) {
+    CEngineApp__DrawWorld();
     func_00289108(arg0);
 }

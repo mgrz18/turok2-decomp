@@ -7,13 +7,13 @@
 #include "ultra_types.h"
 #include "structs/sound.h"
 extern f32 D_800A80C8;
-void func_00293DE0(void *p, s32 pitch);
-void func_00293D40(void *p, s32 mix);
-void func_00293D90(void *p, u8 pan);
-void func_00293E70(void *p, s16 vol);
-void func_002764C4(void *q, s32 a, s32 id);
-s32 func_00273B90(void *pool, s16 idx, s32 id);
-void func_00273BF8(void *pool, s16 idx);
+void alSndpSetPitch(void *p, s32 pitch);
+void alSndpSetFXMix(void *p, s32 mix);
+void alSndpSetPan(void *p, u8 pan);
+void alSndpSetVol(void *p, s16 vol);
+void SndQueue_RequeueVoice(void *q, s32 a, s32 id);
+s32 SndVoicePool_GetVoiceState(void *pool, s16 idx, s32 id);
+void SndVoicePool_PlayVoice(void *pool, s16 idx);
 static __inline__ s32 find17(SndMgr *m, s32 id) {
     s32 i;
     SndVoice *vv;
@@ -24,7 +24,7 @@ static __inline__ s32 find17(SndMgr *m, s32 id) {
     }
     return -1;
 }
-s32 func_002706A0(SndMgr *m, s32 id)
+s32 CAudioWorld__StartVoice(SndMgr *m, s32 id)
 {
   s16 idx;
   SndVoiceParams *p;
@@ -44,7 +44,7 @@ s32 func_002706A0(SndMgr *m, s32 id)
   }
   if (((s16) idx) == 16)
   {
-    func_002764C4(&m->queue, 16, id);
+    SndQueue_RequeueVoice(&m->queue, 16, id);
     return -1;
   }
   p = (SndVoiceParams *) ((u8 *)((((s16) idx) * 0xCC) + (u32) m) + 0x1DCC);
@@ -58,12 +58,12 @@ s32 func_002706A0(SndMgr *m, s32 id)
       return 0;
     }
   }
-  if (func_00273B90(&m->pool, idx, id) == 0)
+  if (SndVoicePool_GetVoiceState(&m->pool, idx, id) == 0)
   {
-    func_00293DE0(pl, p->pitch.i);
+    alSndpSetPitch(pl, p->pitch.i);
     mix = ((p->fxMix + m->fxMix) < 0x80) ? ((((u8 *) p)[0x11] + (*(((u8 *) m) + 0x2B9F))) & 0xFF) : (0x7F);
-    func_00293D40(pl, mix);
-    func_00293D90(pl, ((u8 *) (&p->pan))[1]);
+    alSndpSetFXMix(pl, mix);
+    alSndpSetPan(pl, ((u8 *) (&p->pan))[1]);
     if ((*((u32 *) ((((u8 *) m) - (-(((s16) idx) * 0xCC))) + 0x1E60))) & 0x200)
     {
       f = m->musicVolume;
@@ -83,10 +83,10 @@ s32 func_002706A0(SndMgr *m, s32 id)
         }
       }
     }
-    func_00293E70(pl, (s16) ((s32) ((((f32) p->vol) * f) * p->scale)));
+    alSndpSetVol(pl, (s16) ((s32) ((((f32) p->vol) * f) * p->scale)));
     if ((*((u32 *) ((((u8 *) m) - (-(((s16) idx) * 0xCC))) + 0x1E5C))) == 0)
     {
-      func_00273BF8(&m->pool, idx);
+      SndVoicePool_PlayVoice(&m->pool, idx);
     }
   }
   m->pendingCue = -1;

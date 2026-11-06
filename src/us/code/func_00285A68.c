@@ -3,6 +3,6 @@
 
 extern u8 D_800F5EA0[];
 
-void func_00285A68(s32 arg0) {
+void Controller_WatchPak(s32 arg0) {
     D_800F5EA0[arg0] = 1;
 }

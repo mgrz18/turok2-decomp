@@ -14,7 +14,7 @@ struct Shared__struct_D_800D34C0_0x18 {
     s16 unk10;
     char pad12[0x6];
 };
-void *func_0023EF30(s32 arg0) {
+void *Pickup_FindWeaponEntry(s32 arg0) {
     char *v1;
     s32 i;
     Shared__struct_D_800D34C0_0x18 *record;

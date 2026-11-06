@@ -3,7 +3,7 @@
 
 /* AI callback: clears AI flag 0x4000000 and actor flag 0x20000; sets the
  * timer from the intensity (0..255 -> 15..45). */
-void func_0025F2F8(CGameObjectInstance *self, CAI *ai) {
+void EnemyMode_Combo_Enter(CGameObjectInstance *self, CAI *ai) {
     f32 level;
 
     ai->m_dwFlags &= ~0x4000000;

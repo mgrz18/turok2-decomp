@@ -3,9 +3,9 @@
 
 #include "common.h"
 #include "ultra_types.h"
-s32 func_00299680(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
-s32 func_00299A40(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
-s32 func_00429EC4(OSPfs *pfs);
+s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
+s32 __osPfsSelectBank(OSPfs *pfs);
 static __inline__ s32 __osIdCheckSum(u16 *ptr, u16 *csum, u16 *icsum) {
     u16 data;
     u32 j;
@@ -26,14 +26,14 @@ s32 __osCheckPackId(OSPfs *pfs, __OSPackId *temp) {
     s32 ret;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429EC4(pfs);
+        ret = __osPfsSelectBank(pfs);
         if (ret != 0) {
             return ret;
         }
     }
     addr[0] = 1; addr[1] = 3; addr[2] = 4; addr[3] = 6; i = 1;
     for (; i < 4; i++) {
-        ret = func_00299680(pfs->queue, pfs->channel, addr[i], (u8 *)temp);
+        ret = __osContRamRead(pfs->queue, pfs->channel, addr[i], (u8 *)temp);
         if (ret != 0) {
             return ret;
         }
@@ -47,7 +47,7 @@ s32 __osCheckPackId(OSPfs *pfs, __OSPackId *temp) {
     }
     for (j = 0; j < 4; j++) {
         if (j != i) {
-            ret = func_00299A40(pfs->queue, pfs->channel, addr[j], (u8 *)temp, 1);
+            ret = __osContRamWrite(pfs->queue, pfs->channel, addr[j], (u8 *)temp, 1);
             if (ret != 0) {
                 return ret;
             }

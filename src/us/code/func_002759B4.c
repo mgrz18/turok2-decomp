@@ -3,6 +3,6 @@
 
 extern s32 D_800F478C;
 
-s32 func_002759B4(void) {
+s32 Music_GetTrack(void) {
     return D_800F478C;
 }

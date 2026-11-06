@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_0046168C(OSPfs *pfs, __OSInodeCache *cache);
+extern s32 corrupted_init_2(OSPfs *pfs, __OSInodeCache *cache);
 extern s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-s32 func_0046168C(OSPfs *pfs, __OSInodeCache *cache)
+s32 corrupted_init_2(OSPfs *pfs, __OSInodeCache *cache)
 {
     int i;
     int n;

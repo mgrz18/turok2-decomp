@@ -22,19 +22,19 @@ typedef struct ShadowActor {
 
 extern u8 D_800F7148[];
 
-s32 func_0026AFC0(ObjDef *def);
-void *func_00206950(void *pool, s32 count);
-f32 func_00267648(ShadowActor *actor, s32 arg1);    /* ground height */
-f32 func_00268304(ShadowActor *actor);              /* radius */
-void func_0020F510(CVector3 *v, f32 arg1);
-void func_00211114(void *rot, CMtxF *m);
-void func_0021034C(CMtxF *m, f32 x, f32 y, f32 z);  /* scale */
-void func_00210318(CMtxF *m, f32 x, f32 y, f32 z);  /* translate */
-void func_0020D274(CMtxF *m, void *dst);
-void func_002086BC(void *mtx, s32 arg1, s32 alpha);
+s32 CGameRegion__IsSteep(ObjDef *def);
+void *MtxPool_Alloc(void *pool, s32 count);
+f32 GameObject_GetGroundHeight(ShadowActor *actor, s32 arg1);    /* ground height */
+f32 GameObject_GetWallRadius(ShadowActor *actor);              /* radius */
+void CVector3__ClampLength(CVector3 *v, f32 arg1);
+void CQuaternion__ToMatrix(void *rot, CMtxF *m);
+void CMtxF__ScaleAxes(CMtxF *m, f32 x, f32 y, f32 z);  /* scale */
+void CMtxF__Translate(CMtxF *m, f32 x, f32 y, f32 z);  /* translate */
+void CMtxF__ToMtxAffine(CMtxF *m, void *dst);
+void Render_DrawShadowQuad(void *mtx, s32 arg1, s32 alpha);
 
 /* Draws the blob shadow under an actor. */
-void func_0021E03C(ShadowActor *actor, CVector3 *offset, s32 arg2) {
+void Shadow_DrawBlob(ShadowActor *actor, CVector3 *offset, s32 arg2) {
     CMtxF mtx;
     CVector3 pos;
     void *gmtx;
@@ -46,20 +46,20 @@ void func_0021E03C(ShadowActor *actor, CVector3 *offset, s32 arg2) {
     f32 a;
     u8 alpha;
 
-    visible = !func_0026AFC0(actor->def);
+    visible = !CGameRegion__IsSteep(actor->def);
     if (actor->def != NULL && (actor->def->flags & 0x4000)) {
         visible = 0;
     }
     if (!visible) {
         return;
     }
-    gmtx = func_00206950(D_800F7148, 1);
+    gmtx = MtxPool_Alloc(D_800F7148, 1);
     if (gmtx == NULL) {
         return;
     }
-    ground = func_00267648(actor, 0);
+    ground = GameObject_GetGroundHeight(actor, 0);
     height = actor->pos.y + actor->unk54 - ground;
-    size = MAX(MIN(func_00268304(actor), func_00268304(actor) - height * 0.1f), 0.0f);
+    size = MAX(MIN(GameObject_GetWallRadius(actor), GameObject_GetWallRadius(actor) - height * 0.1f), 0.0f);
     if (arg2) {
         lift = 15.36f;
         size *= 0.5f;
@@ -70,13 +70,13 @@ void func_0021E03C(ShadowActor *actor, CVector3 *offset, s32 arg2) {
     pos.x = actor->pos.x + offset->x;
     pos.z = actor->pos.z + offset->z;
     pos.y = ground + lift + offset->y;
-    func_0020F510(&pos, 20000.0f);
-    func_00211114(actor->rot, &mtx);
-    func_0021034C(&mtx, size, 1.0f, size);
-    func_00210318(&mtx, pos.x, pos.y, pos.z);
-    func_0020D274(&mtx, gmtx);
+    CVector3__ClampLength(&pos, 20000.0f);
+    CQuaternion__ToMatrix(actor->rot, &mtx);
+    CMtxF__ScaleAxes(&mtx, size, 1.0f, size);
+    CMtxF__Translate(&mtx, pos.x, pos.y, pos.z);
+    CMtxF__ToMtxAffine(&mtx, gmtx);
     a = 200.0f - height * 1.2207031f;
     alpha = a > 255.0f ? 255 : a < 0.0f ? 0 : a > 255.0f ? 255 : (u8)a;
     actor->shadowAlpha = actor->shadowAlpha + (alpha - actor->shadowAlpha) * 0.5f;
-    func_002086BC(gmtx, arg2 == 0, actor->shadowAlpha);
+    Render_DrawShadowQuad(gmtx, arg2 == 0, actor->shadowAlpha);
 }

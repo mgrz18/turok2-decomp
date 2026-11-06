@@ -10,7 +10,7 @@ typedef struct {
 extern void *func_0029E460(void *dst, void *src, s32 size); /* memcpy */
 
 /* Transpose src into dst; with copyBack, copy the result back over src. */
-void func_0020192C(ByteImage *src, ByteImage *dst, s32 copyBack) {
+void CUSet__Transpose(ByteImage *src, ByteImage *dst, s32 copyBack) {
     u8 *in = src->data;
     u8 *out;
     s32 width, height;

@@ -37,7 +37,7 @@ extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern void func_002066B0(s32 arg0, void *arg1);
+extern void CCache__FreeCacheEntry(s32 arg0, void *arg1);
 void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
 extern s32 D_800D81E0;
@@ -45,17 +45,17 @@ extern s32 D_800D8DF0;
 extern s32 D_800D81C0;
 extern s32 D_800D81C4;
 extern u32 __osDisableInt(void);
-extern CCacheEntry *func_002066F8(s32, s32);
-extern void func_00201B50(s32 *, CCacheEntry *);
-extern void func_00200818(void *, CMemEntry *);
-extern CCacheEntry *func_002044A8(s32 unused, CCacheEntry *request, s32 dropReference);
+extern CCacheEntry *CCache__AllocCacheEntry(s32, s32);
+extern void CDecompressor__DecompressSync(s32 *, CCacheEntry *);
+extern void CList__MoveToHead(void *, CMemEntry *);
+extern CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropReference);
 static __inline__ void addref(CMemEntry *node) {
     node->lockCount += 1;
     node->flags |= 0x100;
 }
 static __inline__ void stamp(CMemEntry *node) {
     node->age = D_800D8DF0;
-    func_00200818(&D_800D81E0, node);
+    CList__MoveToHead(&D_800D81E0, node);
 }
 static __inline__ void unref(CMemEntry *node) {
     if (--node->lockCount == 0) {
@@ -86,7 +86,7 @@ static __inline__ void release(void) {
         __osRestoreInt(token);
     }
 }
-extern s32 func_00201BDC(void *, void *, Manager *);
+extern s32 CDecompressor__DecompressAsync(void *, void *, Manager *);
 extern s32 D_800D6D68;
 static __inline__ void lock(void) {
     extern Manager D_800D8450;
@@ -100,7 +100,7 @@ static __inline__ void lock(void) {
         __osRestoreInt(token);
     }
 }
-CMemEntry *func_00203CA0(s32 unused, s32 key, CMemEntry *first, CMemEntry *second, s32 mode, void *owner,
+CMemEntry *CCache__RequestDecompression(s32 unused, s32 key, CMemEntry *first, CMemEntry *second, s32 mode, void *owner,
                     void *tag, void *spare, s32 async) {
     extern Manager D_800D8450;
     ResourceHashEntry *node;
@@ -152,7 +152,7 @@ done:
         scan = scan->next;
     }
     if (busy == 0) {
-        found = func_002066F8(0, mode);
+        found = CCache__AllocCacheEntry(0, mode);
         if (found != 0) {
             found->requestId = key;
             found->requestLength = 0;
@@ -172,16 +172,16 @@ done:
             release();
             if (async != 0) {
                 found->flags &= ~0xE;
-                func_00201B50(&D_800D6D68, found);
+                CDecompressor__DecompressSync(&D_800D6D68, found);
                 acquire();
-                found = func_002044A8(0, found, 0);
+                found = CCache__CompleteRequest(0, found, 0);
                 release();
                 if (found != 0) {
                     return found->memEntry;
                 }
                 return 0;
             }
-            if (func_00201BDC(&D_800D6D68, found, &D_800D8450) == 0) {
+            if (CDecompressor__DecompressAsync(&D_800D6D68, found, &D_800D8450) == 0) {
                 acquire();
                 if (first != 0) {
                     unref(first);
@@ -191,7 +191,7 @@ done:
                 }
                 CList__Remove(&D_800D8450.active, found);
                 CList__AddHead(&D_800D8450.pending, found);
-                func_002066B0(0, found);
+                CCache__FreeCacheEntry(0, found);
                 release();
             }
             return 0;

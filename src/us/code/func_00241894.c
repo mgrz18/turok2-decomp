@@ -4,7 +4,7 @@
 extern CCollisionResults *D_800F1ADC;
 
 /* Clears the collision results: nothing hit yet. */
-void func_00241894(void) {
+void CCollisionResults__Clear(void) {
     CCollisionResults *p = D_800F1ADC;
 
     p->m_pInstance = 0;

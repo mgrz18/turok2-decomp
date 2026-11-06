@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_0040E2AC(void) {
+void BlindOne_ActorAttack4Enter(void) {
 
 }

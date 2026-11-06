@@ -38,16 +38,16 @@ typedef struct BoneInfo {
     s32 mask;
 } BoneInfo;
 extern int D_800ACB94;
-extern void func_0020F85C(void *arg0, void *arg1, void *arg2);
-extern void *func_002017D4(void *, s32);
-extern void func_002051F4(void *heap, s32 *resource);
-extern CROMEventEntry *func_002199C8(void *);
-extern s32 func_002199F4(void *);
-extern s32 *func_0021F358(ObjectLinks *);
-extern void func_0020D908(f32 *, char *);
-extern void func_00236EA0(ObjectLinks *, ObjectLinks *, u16, s32, CVector3, struct IntPair);
+extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
+extern void *CISet__GetBlock(void *, s32);
+extern void CCache__Unlock(void *heap, s32 *resource);
+extern CROMEventEntry *CAnimationState__GetEvents(void *);
+extern s32 CAnimationState__GetEventCount(void *);
+extern s32 *CGameObjectInstance__LoadGeometry(ObjectLinks *);
+extern void CMtxF__FromMtxAffine(f32 *, char *);
+extern void ImpactEvent_Send(ObjectLinks *, ObjectLinks *, u16, s32, CVector3, struct IntPair);
 /* Fires the animation events whose frame lies in [from, to). */
-void func_0021ABC8(ObjectLinks *obj, void *anim, f32 from, f32 to) {
+void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from, f32 to) {
     CVector3 pos;
     CVector3 local;
     f32 matrix[16];
@@ -72,8 +72,8 @@ void func_0021ABC8(ObjectLinks *obj, void *anim, f32 from, f32 to) {
         break;
     }
     table = 0;
-    events = func_002199C8(anim);
-    count = func_002199F4(anim);
+    events = CAnimationState__GetEvents(anim);
+    count = CAnimationState__GetEventCount(anim);
     resource = 0;
     for (i = 0; i < count; i++) {
         if (from <= (f32)events[i].frame && (f32)events[i].frame < to) {
@@ -82,36 +82,36 @@ void func_0021ABC8(ObjectLinks *obj, void *anim, f32 from, f32 to) {
                 local.x = events[i].local.x;
                 local.y = events[i].local.z;
                 local.z = events[i].local.y;
-                func_0020F85C(obj->transform, &local, &pos);
+                CMtxF__TransformPoint(obj->transform, &local, &pos);
             } else {
                 if (checkMask && (D_800AD084[events[i].effect].m_Flags & 4)) {
                     if (resource == 0) {
-                        resource = func_0021F358(obj);
+                        resource = CGameObjectInstance__LoadGeometry(obj);
                         if (resource == 0) {
                             goto masked;
                         }
-                        table = func_002017D4((void *)*resource, 3);
+                        table = CISet__GetBlock((void *)*resource, 3);
                     }
-                    fire = ((BoneInfo *)func_002017D4(func_002017D4(table, events[i].bone), 1))->mask & obj->boneMask;
+                    fire = ((BoneInfo *)CISet__GetBlock(CISet__GetBlock(table, events[i].bone), 1))->mask & obj->boneMask;
                 }
             masked:
                 if (fire == 0) {
                     continue;
                 }
                 if (obj->boneMatrices != 0) {
-                    func_0020D908(matrix, obj->boneMatrices + (events[i].bone << 6));
-                    func_0020F85C(matrix, &events[i].local, &pos);
+                    CMtxF__FromMtxAffine(matrix, obj->boneMatrices + (events[i].bone << 6));
+                    CMtxF__TransformPoint(matrix, &events[i].local, &pos);
                 } else {
                     pos = obj->pos;
                 }
             }
             if (fire != 0) {
-                func_00236EA0(obj, obj, events[i].effect, -1, pos, events[i].params);
+                ImpactEvent_Send(obj, obj, events[i].effect, -1, pos, events[i].params);
                 D_800ACB94++;
             }
         }
     }
     if (resource != 0) {
-        func_002051F4(0, resource);
+        CCache__Unlock(0, resource);
     }
 }

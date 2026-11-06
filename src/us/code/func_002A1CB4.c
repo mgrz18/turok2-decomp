@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002A1954(s32 address, s32 value);
-extern void func_002A1350(s32 address, s32 value);
-void func_002A1CB4(s32 address, s32 value, u32 count)
+extern void HostIo_WriteByte(s32 address, s32 value);
+extern void HostIo_WriteWord(s32 address, s32 value);
+void HostIo_FillBlock(s32 address, s32 value, u32 count)
 {
   u32 new_var;
   u32 byte;
@@ -14,7 +14,7 @@ void func_002A1CB4(s32 address, s32 value, u32 count)
   new_var2 = value & 0xFF;
   while ((count != 0) && ((address & 3) != 0))
   {
-    func_002A1954(address++, new_var2);
+    HostIo_WriteByte(address++, new_var2);
     count--;
   }
   if (count >= 4)
@@ -24,7 +24,7 @@ void func_002A1CB4(s32 address, s32 value, u32 count)
     word = (((byte << 24) | (byte << 16)) | (new_var << 8)) | new_var;
     do
     {
-      func_002A1350(address, word);
+      HostIo_WriteWord(address, word);
       count -= 4;
       address += 4;
     }
@@ -32,7 +32,7 @@ void func_002A1CB4(s32 address, s32 value, u32 count)
   }
   while (count)
   {
-    func_002A1954(address++, new_var2);
+    HostIo_WriteByte(address++, new_var2);
     count--;
   }
 }

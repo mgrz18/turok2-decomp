@@ -29,7 +29,7 @@ static __inline__ void send_(void *tgt, void *dst, s32 kind, CVector3 p, M04Part
         D_800AD080[kind].fn(tgt, dst, kind, p, q);
     }
 }
-void func_00236EA0(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04Part part) {
+void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04Part part) {
     s32 i;
     s32 n;
     u8 *p;

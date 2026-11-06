@@ -13,7 +13,7 @@ typedef struct ActorMotionState {
 } ActorMotionState;
 extern int D_0026352C;
 extern int D_800B2008;
-void func_002633D8(void *arg0, void *arg1) {
+void Generator_Setup(void *arg0, void *arg1) {
     CGameObjectInstance *actor = arg0;
     ActorMotionState *state = arg1;
     CDestructibleIntelligence *inner = &actor->header.m_pIntelligence->m_Destructible;

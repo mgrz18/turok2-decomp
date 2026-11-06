@@ -2,7 +2,7 @@
 
 extern s32 D_8011ACB0;
 
-s32 func_00418388(void)
+s32 TeamMenu_Poll(void)
 {
   s32 var_a0;
   s8 *new_var;

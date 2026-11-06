@@ -10,14 +10,14 @@ typedef struct {
 
 extern u8 D_801213DC;   /* __osMaxControllers */
 extern char D_80130E20; /* __osPfsPifRam */
-extern void func_00299FE4(void);                         /* __osSiGetAccess */
-extern void func_0029A050(void);                         /* __osSiRelAccess */
-extern s32 func_0029A080(s32 direction, void *dramAddr); /* __osSiRawStartDma */
+extern void __osSiGetAccess(void);                         /* __osSiGetAccess */
+extern void __osSiRelAccess(void);                         /* __osSiRelAccess */
+extern s32 __osSiRawStartDma(s32 direction, void *dramAddr); /* __osSiRawStartDma */
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern void func_00428ABC(u8 cmd);                       /* __osPfsRequestData (this module, link address) */
 extern void func_00428B58(u8 *pattern, ContStatus *data); /* __osPfsGetInitData (this module, link address) */
 
-s32 func_00461940(void *queue, u8 *pattern) {
+s32 osPfsIsPlug_2(void *queue, u8 *pattern) {
     s32 ret = 0;
     void *dummy;
     u8 bitpattern;
@@ -27,12 +27,12 @@ s32 func_00461940(void *queue, u8 *pattern) {
     s32 crcErrorCount = 3;
     u8 *count;
 
-    func_00299FE4();
+    __osSiGetAccess();
     do {
         func_00428ABC(0);
-        ret = func_0029A080(1, &D_80130E20);
+        ret = __osSiRawStartDma(1, &D_80130E20);
         osRecvMesg(queue, &dummy, 1);
-        ret = func_0029A080(0, &D_80130E20);
+        ret = __osSiRawStartDma(0, &D_80130E20);
         osRecvMesg(queue, &dummy, 1);
         func_00428B58(&bitpattern, data);
         for (channel = 0; channel < D_801213DC; channel++) {
@@ -51,7 +51,7 @@ s32 func_00461940(void *queue, u8 *pattern) {
             bits |= 1 << channel;
         }
     }
-    func_0029A050();
+    __osSiRelAccess();
     *pattern = bits;
     return ret;
 }

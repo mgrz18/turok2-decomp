@@ -21,7 +21,7 @@ extern char D_800B63D8[];
 extern char D_800B63F0[];
 
 /* Label of a weapon toggle in the weapons menu: "<weapon> on/off". */
-s32 func_00417910(MenuItem *a) {
+s32 WeaponsMenu_ToggleLabel(MenuItem *a) {
     switch (a->index - 2) {
     default:
         a->text = D_800C0EB0;

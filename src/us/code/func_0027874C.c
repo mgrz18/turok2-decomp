@@ -30,10 +30,10 @@ extern u8 D_800F7078[];         /* the resource cache */
 extern u8 D_801101B8[];         /* glyph lookup */
 extern u8 D_80110238[];         /* glyph lookup, language 0 */
 
-extern void *func_00224DF4(void *cache, s32 id, s32 kind, s32 flag);
-extern void func_002051F4(s32 heap, void *resource);
-extern f32 func_004162FC(s32 ch, s32 next, f32 a, f32 b);    /* kerned advance */
-extern void func_0027A7A0(void *font, s32 glyph, s16 x, s16 y, f32 sx, f32 sy, s32 flag);
+extern void *CScene__LoadGraphicSet(void *cache, s32 id, s32 kind, s32 flag);
+extern void CCache__Unlock(s32 heap, void *resource);
+extern f32 Menu_CharWidth(s32 ch, s32 next, f32 a, f32 b);    /* kerned advance */
+extern void Hud_DrawImageFrame(void *font, s32 glyph, s16 x, s16 y, f32 sx, f32 sy, s32 flag);
 
 /* The advance follows the currently loaded font. */
 static __inline__ f32 fontGlyphWidth(void) {
@@ -114,7 +114,7 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
         special = 1;
         break;
     }
-    font = func_00224DF4(D_800F7078, resource, 0x10, 1);
+    font = CScene__LoadGraphicSet(D_800F7078, resource, 0x10, 1);
     if (font) {
         while (text && (ch = *text) && ch != 10) {
             next = text[1];
@@ -132,7 +132,7 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
                 glyph = D_80110238[ch];
                 a = fontGlyphWidth();
                 b = fontGlyphWidth();
-                advance = func_004162FC(ch, next, a, b);
+                advance = Menu_CharWidth(ch, next, a, b);
                 break;
             }
             sx = width;
@@ -142,11 +142,11 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
                 sy = D_800C2034 * (1.0f / 222.0f);
             }
             if (glyph != 255) {
-                func_0027A7A0(font, glyph, (s16) x, (s16) y, sx, sy, 1);
+                Hud_DrawImageFrame(font, glyph, (s16) x, (s16) y, sx, sy, 1);
             }
             x += advance * sx;
             text++;
         }
-        func_002051F4(0, font);
+        CCache__Unlock(0, font);
     }
 }

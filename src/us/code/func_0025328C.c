@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_00252E08();                            /* extern */
+s32 Hud_DrawMatchClock();                            /* extern */
 
-void func_0025328C(void) {
-    func_00252E08();
+void CPlayerPool__DrawMatchClock(void) {
+    Hud_DrawMatchClock();
 }

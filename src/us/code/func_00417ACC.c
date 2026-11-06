@@ -18,7 +18,7 @@ struct SharedRecAt224 {
 };
 struct SharedRecAtA8;
 typedef struct SharedRecAtA8 SharedRecAtA8;
-extern void func_00417ACC(func_80250BD4_S1 *arg0);
+extern void Menu_ClaimPressingController(func_80250BD4_S1 *arg0);
 struct SharedRecAt224;
 typedef struct SharedRecAt224 SharedRecAt224;
 struct SharedRecAtA8;
@@ -26,11 +26,11 @@ struct SharedRecAtA8 {
     char pad0[0xA8];
     s8 unkA8;
 };
-void func_00275A74(void);
-unsigned int func_002855E8(void *);
+void Music_RestoreVolume(void);
+unsigned int Controller_ConfirmPressed(void *);
 extern CPlayerOptions D_8011AB18;
 extern struct SharedRecAtA8 D_8011AB98[];
-void func_00417ACC(func_80250BD4_S1 *arg0) {
+void Menu_ClaimPressingController(func_80250BD4_S1 *arg0) {
     CPlayerOptions *settings;
     s8 *status;
     ControllerProfile *profile;
@@ -46,12 +46,12 @@ void func_00417ACC(func_80250BD4_S1 *arg0) {
     settings = &D_8011AB18;
     on = 1;
     for (profile = D_800F5EC0; i < 4; i++, profile++) {
-        if (func_002855E8(profile) != 0) {
+        if (Controller_ConfirmPressed(profile) != 0) {
             settings->m_bActive = on;
             settings->m_nController = i;
             arg0->unk20 = profile;
             break;
         }
     }
-    func_00275A74();
+    Music_RestoreVolume();
 }

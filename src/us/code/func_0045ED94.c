@@ -19,7 +19,7 @@ static __inline__ void DecodePakText(u8 *dst, u8 *src, s32 n) {
 }
 
 /* Reports note index of the pak on channel ch from the cached directory. */
-s32 func_0045ED94(s32 ch, s32 index, s32 *exists, u8 *name, u8 *ext, s32 *size, u8 *company, u8 *code) {
+s32 Pak_FindNote_2(s32 ch, s32 index, s32 *exists, u8 *name, u8 *ext, s32 *size, u8 *company, u8 *code) {
     if (D_80130C60[ch] != 3) {
         return -2;
     }

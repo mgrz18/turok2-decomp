@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00217BC4(u32 arg0, u32 arg1, u32 arg2);
-void func_00217BC4(u32 arg0, u32 arg1, u32 arg2) {
+extern void Bits_Poke(u32 arg0, u32 arg1, u32 arg2);
+void Bits_Poke(u32 arg0, u32 arg1, u32 arg2) {
     u32 temp_a0;
     s32 temp_v0;
     s32 temp_v0_2;

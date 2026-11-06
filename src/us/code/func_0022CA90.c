@@ -14,21 +14,21 @@ extern u8 D_800F8928[];
 extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
 
-s32 func_00245724(Target *target);
-s32 func_002325F0(CParticle *p);
-void func_00236EA0(void *source, CParticle *p, s32 effect, s32 arg3, CVector3 pos, CEventValue params);
-void func_00229340(CParticle *p, s32 model, s32 arg2, s32 enabled);
-void func_00275544(s16 sound, CVector3 pos, s32 arg2, s32 arg3);
+s32 Actor_GetTypeClass(Target *target);
+s32 CParticle__IsUnderWater(CParticle *p);
+void ImpactEvent_Send(void *source, CParticle *p, s32 effect, s32 arg3, CVector3 pos, CEventValue params);
+void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 enabled);
+void Sound__Play(s16 sound, CVector3 pos, s32 arg2, s32 arg3);
 void func_002364A4(void *list, CVector3 pos, CVector3 normal, s32 kind, s32 arg4);
-void func_0020F040(CVector3 *v);
-f32 func_002119FC(f32 lo, f32 hi);
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-void func_0020EEF8(CVector3 *out, CVector3 *a, CVector3 *b);
-void func_002327F4(CParticle *p);
-void func_00234E48(void *list, CParticle *p);
-void func_00228B4C(void *list, CDLight *light);
-void func_0022F1C8(void *list, CParticle *p);
-void func_00232B40(CParticle *p);
+void CVector3__Normalize(CVector3 *v);
+f32 Random_Blend(f32 lo, f32 hi);
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
+void CParticle__BuildCameraMatrix(CParticle *p);
+void Trail_DetachOwner(void *list, CParticle *p);
+void CDLightSet__Free(void *list, CDLight *light);
+void CParticleSystem__Free(void *list, CParticle *p);
+void CParticle__StopLoopSound(CParticle *p);
 
 /* Puts the particle at the hit point, flying along the hit direction, and pulls it back
  * along that direction by a random distance. */
@@ -38,16 +38,16 @@ static __inline__ void placeAtHit(CParticle *p) {
     p->header.m_vPos = D_800F1CE0.m_vInstancePos;
     p->m_vVelocity = D_800F1DB8;
     dir = D_800F1DB8;
-    func_0020F040(&dir);
+    CVector3__Normalize(&dir);
     p->m_vDirection = dir;
-    func_0020EF60(&dir, &dir, func_002119FC(-49.92f, 0.0f));
-    func_0020EEF8(&p->header.m_vPos, &p->header.m_vPos, &dir);
+    CVector3__Scale(&dir, &dir, Random_Blend(-49.92f, 0.0f));
+    CVector3__Add(&p->header.m_vPos, &p->header.m_vPos, &dir);
 }
 
 /* A particle hit the world (no target): leaves a decal, sticks or bounces off the surface
  * by type, plays the impact's effect, model and sound, and dies when its descriptor says so.
  * A particle under player control plays its own impact instead and always dies. */
-void func_0022CA90(CParticle *p) {
+void CParticle__HitInstanceBody(CParticle *p) {
     CEventValue params;
     CVector3 normal;
     CEventValue controlledParams;
@@ -57,16 +57,16 @@ void func_0022CA90(CParticle *p) {
 
     source = (Target *)D_800F1CE0.m_pInstance;
     definition = p->m_pEffect;
-    kind = func_00245724(source);
+    kind = Actor_GetTypeClass(source);
     if (kind == 5) {
         kind = 4;
         p->m_dwFlags |= 2;
     }
-    if (D_8011AAF1 != 0 && func_002325F0(p)) {
+    if (D_8011AAF1 != 0 && CParticle__IsUnderWater(p)) {
         CROMParticleEffect *controlledDefinition = p->m_pEffect;
         s32 controlledKind, model, sound, effect;
 
-        if (func_002325F0(p)) {
+        if (CParticle__IsUnderWater(p)) {
             controlledKind = 12;
         } else {
             controlledKind = 10;
@@ -76,13 +76,13 @@ void func_0022CA90(CParticle *p) {
         controlledParams = controlledDefinition->m_pImpact->m_ImpactEventValue[controlledKind];
         sound = controlledDefinition->m_pImpact->m_ImpactSoundType[controlledKind];
         if (effect != 0xFFFF) {
-            func_00236EA0(p, p, effect, -1, p->header.m_vPos, controlledParams);
+            ImpactEvent_Send(p, p, effect, -1, p->header.m_vPos, controlledParams);
         }
         if (model != 0xFFFF) {
-            func_00229340(p, model, p->m_Alignment, 1);
+            CParticle__SpawnChild(p, model, p->m_Alignment, 1);
         }
         if (sound != 0xFFFF) {
-            func_00275544(sound, p->header.m_vPos, 0, -1);
+            Sound__Play(sound, p->header.m_vPos, 0, -1);
         }
         goto remove;
     }
@@ -103,18 +103,18 @@ void func_0022CA90(CParticle *p) {
             p->m_dwFlags |= 0x4000000;
         }
         if (p->m_ActiveSwooshes) {
-            func_002327F4(p);
-            func_00234E48(D_801102B8, p);
+            CParticle__BuildCameraMatrix(p);
+            Trail_DetachOwner(D_801102B8, p);
         }
         if (p->m_pDLight) {
-            func_00228B4C(D_8010FF34, p->m_pDLight);
+            CDLightSet__Free(D_8010FF34, p->m_pDLight);
             p->m_pDLight = NULL;
         }
     }
     normal = D_800F1CE0.m_vNormal;
-    func_0020F040(&normal);
-    func_0020EF60(&normal, &normal, 1.024f);
-    func_0020EEF8(&p->header.m_vPos, &p->header.m_vPos, &normal);
+    CVector3__Normalize(&normal);
+    CVector3__Scale(&normal, &normal, 1.024f);
+    CVector3__Add(&p->header.m_vPos, &p->header.m_vPos, &normal);
     {
         s32 model, sound, effect;
 
@@ -128,18 +128,18 @@ void func_0022CA90(CParticle *p) {
             if (D_800AD084[effect].m_Flags & 2) {
                 eventSource = p;
             }
-            func_00236EA0(eventSource, p, effect, -1, D_800F1CE0.m_vInstancePos, params);
+            ImpactEvent_Send(eventSource, p, effect, -1, D_800F1CE0.m_vInstancePos, params);
         }
         if (model != 0xFFFF) {
-            func_00229340(p, model, -8, 1);
+            CParticle__SpawnChild(p, model, -8, 1);
         }
         if (sound != 0xFFFF) {
-            func_00275544(sound, D_800F1CE0.m_vInstancePos, 0, -1);
+            Sound__Play(sound, D_800F1CE0.m_vInstancePos, 0, -1);
         }
     }
     if (!(p->m_dwFlags & 0x30000) && p->m_bDieOnImpact == 1) {
 remove:
-        func_0022F1C8(D_800F8928, p);
-        func_00232B40(p);
+        CParticleSystem__Free(D_800F8928, p);
+        CParticle__StopLoopSound(p);
     }
 }

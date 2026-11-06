@@ -2,7 +2,7 @@ typedef signed int s32;
 typedef signed char s8;
 typedef unsigned short u16;
 
-s32 func_00260360(char *arg0, char *arg1) {
+s32 EnemyAI_CurrentHasComboEndAnim(char *arg0, char *arg1) {
     char *p = *(char **) (arg0 + 0x14) + 0x14;
     s8 c = *(s8 *) (arg1 + 0x34);
 

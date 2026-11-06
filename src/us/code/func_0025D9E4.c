@@ -23,12 +23,12 @@ extern AnimEntry D_800AF780[];
 extern AnimEntry D_800AF7B0[];
 extern AnimEntry D_800AF7E0[];
 
-extern Location *func_0028479C(s8 *location);
-extern s32 func_00245A98(void *actor, CAI *ai, AnimEntry *table, s32 flags);
-extern s32 func_002113A4(void);
+extern Location *CPathTrack__GetCurrentPoint(s8 *location);
+extern s32 AI_PickAnimFromTable(void *actor, CAI *ai, AnimEntry *table, s32 flags);
+extern s32 Random_Next(void);
 
-s32 func_0025D9E4(void *actor, CAI *ai) {
-    Location *loc = func_0028479C(&ai->m_PathTrack.m_Mode);
+s32 EnemyAnim_InteractiveIdle(void *actor, CAI *ai) {
+    Location *loc = CPathTrack__GetCurrentPoint(&ai->m_PathTrack.m_Mode);
     s32 animA = -1;
     s32 mode = ai->m_Enemy.m_BehaviorIndex;
     s32 animB = -1;
@@ -36,31 +36,31 @@ s32 func_0025D9E4(void *actor, CAI *ai) {
     if (loc->flagsA != 0) {
         switch (mode) {
         case 0:
-            animA = func_00245A98(actor, ai, D_800AF6F0, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, ai, D_800AF6F0, loc->flagsA);
             break;
         case 1:
-            animA = func_00245A98(actor, ai, D_800AF720, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, ai, D_800AF720, loc->flagsA);
             break;
         case 2:
-            animA = func_00245A98(actor, ai, D_800AF750, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, ai, D_800AF750, loc->flagsA);
             break;
         }
     }
     if (loc->flagsB != 0) {
         switch (mode) {
         case 0:
-            animB = func_00245A98(actor, ai, D_800AF780, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, ai, D_800AF780, loc->flagsB);
             break;
         case 1:
-            animB = func_00245A98(actor, ai, D_800AF7B0, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, ai, D_800AF7B0, loc->flagsB);
             break;
         case 2:
-            animB = func_00245A98(actor, ai, D_800AF7E0, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, ai, D_800AF7E0, loc->flagsB);
             break;
         }
     }
     if (animA != -1 && animB != -1) {
-        if (func_002113A4() % 1000 >= 501) {
+        if (Random_Next() % 1000 >= 501) {
             return animA;
         }
         return animB;

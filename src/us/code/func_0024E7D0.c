@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-/* func_0025398C, inlined. */
+/* CPlayer__GetFiringAmmo, inlined. */
 static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
     AmmoInfo *ammo;
     AmmoInfo *found;
@@ -30,7 +30,7 @@ static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
 extern s16 D_800AF6A8[];
 
 /* D_800AF6A8 entry of the current weapon ammo type, -1 if none. */
-s32 func_0024E7D0(CPlayer *player) {
+s32 CPlayer__GetCurrentAmmoInfo(CPlayer *player) {
     AmmoInfo *ammo;
     s32 type;
     s32 value;

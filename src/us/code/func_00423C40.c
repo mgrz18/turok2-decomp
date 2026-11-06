@@ -8,7 +8,7 @@ extern char D_800B51C4[];
 extern char D_800B5200[];
 extern char D_800B5250[];
 extern char D_800B52B0[];
-s32 func_00423C40(struct FieldRecAt14 *field) {
+s32 PakConfirmMenu_UpdateLine4(struct FieldRecAt14 *field) {
     extern u32 D_801309B0;
     u32 state = D_801309B0;
     if (state >= 5) {

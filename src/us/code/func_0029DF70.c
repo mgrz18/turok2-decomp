@@ -5,11 +5,11 @@
 
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
-extern void func_0029DF70();
+extern void osYieldThread();
 s32 __osEnqueueAndYield(s32 *, s32);
 extern s32 D_800B8918;
 extern void *D_800B8920;
-void func_0029DF70(void)
+void osYieldThread(void)
 {
   void *temp_s0;
   s32 *new_var2;

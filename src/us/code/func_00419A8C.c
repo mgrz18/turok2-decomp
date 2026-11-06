@@ -1,13 +1,13 @@
 #include "common.h"
 
-void func_00275A74();                            /* extern */
-void func_00275ABC();                            /* extern */
-void func_00275E1C(s32);                         /* extern */
-s32 func_00275F7C();                                /* extern */
+void Music_RestoreVolume();                            /* extern */
+void Sound__EnableAmbientTrack();                            /* extern */
+void LoopSounds_Resume(s32);                         /* extern */
+s32 LoopSounds_Get();                                /* extern */
 
-s32 func_00419A8C(void) {
-    func_00275E1C(func_00275F7C());
-    func_00275A74();
-    func_00275ABC();
+s32 PauseMenu_Resume(void) {
+    LoopSounds_Resume(LoopSounds_Get());
+    Music_RestoreVolume();
+    Sound__EnableAmbientTrack();
     return 1;
 }

@@ -47,14 +47,14 @@ typedef struct R8Actor { u8 pad0[0x48]; R8Mtx mtx[2]; u8 padC8[0x30]; R8Cfg *cfg
 typedef struct R8Mgr { u8 pad0[0x7520]; R8Emit *list; } R8Mgr;
 extern s32 D_800B6D1C;
 extern u8 D_801102B8[];
-void func_0020D274(void *, void *);
-void func_0020D908(void *, void *);
-void func_0020F7EC(void *);
-void func_002101A0(void *, void *);
-void func_002101BC(void *, void *);
-void func_0021034C(void *, f32, f32, f32);
-void func_002333C0(void *, void *, void *);
-void func_00234E48(R8Mgr *mgr, R8Actor *who) {
+void CMtxF__ToMtxAffine(void *, void *);
+void CMtxF__FromMtxAffine(void *, void *);
+void CMtxF__ClampEntries(void *);
+void CMtxF__GetTranslation(void *, void *);
+void CMtxF__GetScale(void *, void *);
+void CMtxF__ScaleAxes(void *, f32, f32, f32);
+void Swoosh_NewNode(void *, void *, void *);
+void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
     u8 sp10[0x40];
     R8Emit *e;
     R8Part *p;
@@ -76,18 +76,18 @@ void func_00234E48(R8Mgr *mgr, R8Actor *who) {
                                 p->mtx[D_800B6D1C] = p->mtx[D_800B6D1C ^ 1];
                                 p->owner = 0;
                             } else {
-                                func_0020D908(sp10, &who->mtx[D_800B6D1C]);
+                                CMtxF__FromMtxAffine(sp10, &who->mtx[D_800B6D1C]);
                                 k = 0.01f;
                                 if (who->cfg->unk14 != 0) {
                                     k = 0.29257143f;
                                 }
-                                func_0021034C(sp10, k, k, k);
-                                func_0020F7EC(sp10);
-                                func_002101A0(sp10, p->unk10);
+                                CMtxF__ScaleAxes(sp10, k, k, k);
+                                CMtxF__ClampEntries(sp10);
+                                CMtxF__GetTranslation(sp10, p->unk10);
                                 if (e->flags & 4) {
-                                    func_002101BC(sp10, (u8 *)p + 0x1C);
+                                    CMtxF__GetScale(sp10, (u8 *)p + 0x1C);
                                 } else {
-                                    func_0020D274(sp10, &p->mtx[D_800B6D1C]);
+                                    CMtxF__ToMtxAffine(sp10, &p->mtx[D_800B6D1C]);
                                 }
                             }
                             p->unk8 = e->info->unk8;
@@ -104,14 +104,14 @@ void func_00234E48(R8Mgr *mgr, R8Actor *who) {
               __asm__("" : "+r"(wm));
               if (e->unk24 > 0.0f) {
                 wm += 0x48;
-                func_0020D908(sp10, wm);
+                CMtxF__FromMtxAffine(sp10, wm);
                 k = 0.01f;
                 if (who->cfg->unk14 != 0) {
                     k = 0.29257143f;
                 }
-                func_0021034C(sp10, k, k, k);
-                func_0020F7EC(sp10);
-                func_002333C0(D_801102B8, e, sp10);
+                CMtxF__ScaleAxes(sp10, k, k, k);
+                CMtxF__ClampEntries(sp10);
+                Swoosh_NewNode(D_801102B8, e, sp10);
               }
             }
             if (e->owner != ((void *)0)) {

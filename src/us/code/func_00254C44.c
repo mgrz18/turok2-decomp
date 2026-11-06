@@ -37,8 +37,8 @@ typedef struct Menu Menu;
 extern float D_800A7128;
 extern float D_800AE2D8;
 struct Menu;
-extern void func_00254C44(Menu *menu);
-void func_00254C44(Menu *menu) {
+extern void CBarrel__Reset(Menu *menu);
+void CBarrel__Reset(Menu *menu) {
     s32 i;
     menu->active = 0;
     menu->pad4 = 0;

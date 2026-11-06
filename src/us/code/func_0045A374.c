@@ -8,7 +8,7 @@
 
 extern PakProfile D_80130968;
 extern u8 D_80130974[8];
-void func_0045A374(CPlayer *a) {
+void PakMenu_SaveCharacter_2(CPlayer *a) {
     CPlayerOptions *p = a->m_pOptions;
     s32 i;
     D_80130968.character = p->m_nCharacter;

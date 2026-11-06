@@ -7,9 +7,9 @@
 
 /* Turok 2 layouts (Rage Wars offsets in comments). */
 
-extern s32 func_00266D8C(s32 *index, s32 count, s32 key, s32 *first, s32 *last);
+extern s32 BinaryRange(s32 *index, s32 count, s32 key, s32 *first, s32 *last);
 
-/* Index of actor in the world's actor array, or -1 (same as func_002265E8). */
+/* Index of actor in the world's actor array, or -1 (same as CScene__GetInstanceIndex). */
 static __inline__ s32 World_ActorIndex(CWorld *world, CGameObjectInstance *actor) {
     CGameObjectInstance *base;
     if (actor->m_dwFlags & 0x80000) {
@@ -25,7 +25,7 @@ static __inline__ s32 World_ActorIndex(CWorld *world, CGameObjectInstance *actor
 
 /* Look up the run of records belonging to actor arg1: *arg2 = first record,
  * *arg3 = record count (0 if none). */
-void func_00225058(CWorld *arg0, CGameObjectInstance *arg1, CWorldRecord **arg2, s32 *arg3) {
+void CScene__GetInstanceEventRecords(CWorld *arg0, CGameObjectInstance *arg1, CWorldRecord **arg2, s32 *arg3) {
     s32 first;
     s32 last;
     s32 *recordIndex;
@@ -37,7 +37,7 @@ void func_00225058(CWorld *arg0, CGameObjectInstance *arg1, CWorldRecord **arg2,
     }
     recordIndex = arg0->m_pRecordIndex;
     recordCount = arg0->m_nRecords;
-    if (func_00266D8C(recordIndex, recordCount, index, &first, &last) != 0) {
+    if (BinaryRange(recordIndex, recordCount, index, &first, &last) != 0) {
         *arg2 = &arg0->m_pRecords[first];
         *arg3 = (last - first) + 1;
     } else {

@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* Calls the AI's hurt callback, if any. */
-void func_002465C8(s32 arg0, CAI *arg1) {
+void CAI__CallHurt(s32 arg0, CAI *arg1) {
     s32 (*temp_v0)();
 
     temp_v0 = arg1->m_pfHurt;

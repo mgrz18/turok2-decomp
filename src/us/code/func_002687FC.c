@@ -10,11 +10,11 @@ struct FloatState3C {
     unsigned char padding_0[56];
     f32 unk_38;
 };
-extern void func_0024599C(void *arg0, void *arg1, void *arg2);
-f32 func_002687FC(u8 *arg0) {
+extern void AI_ComputeFrameMotion(void *arg0, void *arg1, void *arg2);
+f32 GameObject_GetFrameTurn(u8 *arg0) {
     char buf[0x40];
     if (*arg0 == 1) {
-        func_0024599C(arg0, arg0 + 0x140, buf);
+        AI_ComputeFrameMotion(arg0, arg0 + 0x140, buf);
         return ((struct FloatState3C *) buf)->unk_38;
     }
     return 0.0f;

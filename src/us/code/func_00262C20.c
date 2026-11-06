@@ -10,7 +10,7 @@ extern u8 D_8011AB0F;
 extern u8 D_8011AB11;
 
 /* Whether the unlock flag behind an id is set; ids without a flag count as set. */
-s32 func_00262C20(s32 id) {
+s32 Generator_IsPickupUnlocked(s32 id) {
     switch (id) {
         default:
             return 1;

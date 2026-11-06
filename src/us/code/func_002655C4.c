@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* Calls the current AI mode's callback, if any. */
-void func_002655C4(s32 arg0, CAI *arg1) {
+void Door_Step(s32 arg0, CAI *arg1) {
     s32 (*temp_v0_2)();
     CAIModeInfo *temp_v0;
 

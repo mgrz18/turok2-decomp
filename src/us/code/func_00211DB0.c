@@ -17,7 +17,7 @@ static __inline__ f32 wrap(f32 x, f32 range) {
 }
 
 /* HSV to RGB, every component in 0..1 (hue wraps). */
-ColorF func_00211DB0(f32 h, f32 s, f32 v) {
+ColorF Color_HSVToRGB(f32 h, f32 s, f32 v) {
     ColorF c;
     f32 r;
     f32 g;

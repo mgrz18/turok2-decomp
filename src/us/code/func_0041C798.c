@@ -1,13 +1,13 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_004245E0(void);
+s32 Video_GetResolutionText(void);
 
-s32 func_00266B80();                                /* extern */
+s32 GetMemSize();                                /* extern */
 extern f32 D_800B6D28;
 extern f32 D_80130930;
 
-s32 func_0041C798(void *arg0)
+s32 OptionsMenu_ResolutionText(void *arg0)
 {
   f32 temp_f0;
   s32 var_v0;
@@ -19,7 +19,7 @@ s32 func_0041C798(void *arg0)
   {
     D_80130930 = 0.0f;
   }
-  if (func_00266B80() != 0x400000)
+  if (GetMemSize() != 0x400000)
   {
     new_var2 = 0x01000000;
     var_v0 = (*((s32 *) (((s8 *) arg0) + 8))) | new_var2;
@@ -31,6 +31,6 @@ s32 func_0041C798(void *arg0)
   new_var2 = var_v0;
   *((s32 *) (((s8 *) arg0) + 8)) = new_var2;
   new_var = ((s8 *) arg0) + 0x14;
-  *((s32 *) new_var) = func_004245E0();
+  *((s32 *) new_var) = Video_GetResolutionText();
   return 0;
 }

@@ -10,7 +10,7 @@
 
 extern s32 D_8011ACE4;
 
-void func_00455D10(Menu *arg0) {
+void StatsMenu_InitContinue_2(Menu *arg0) {
     void *temp_a0;
     void *temp_v0;
     void *temp_v1;

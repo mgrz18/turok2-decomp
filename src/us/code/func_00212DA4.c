@@ -17,15 +17,15 @@ typedef struct {
     /* 0x8 */ ModelVertex verts[1];
 } VertexGroup;
 
-void *func_002017D4(s32 *, s32);
-void func_0020D908(f32 *mtx, void *packed);
-void func_0020F040(CVector3 *v);
-void func_0020F85C(f32 *mtx, CVector3 *in, CVector3 *out);
-ColorF func_00211DB0(f32 h, f32 s, f32 v);
+void *CISet__GetBlock(s32 *, s32);
+void CMtxF__FromMtxAffine(f32 *mtx, void *packed);
+void CVector3__Normalize(CVector3 *v);
+void CMtxF__TransformPoint(f32 *mtx, CVector3 *in, CVector3 *out);
+ColorF Color_HSVToRGB(f32 h, f32 s, f32 v);
 
 /* Debug coloring: each vertex gets a hue from its transformed position along
  * the (1,1,1) diagonal. */
-void func_00212DA4(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
+void Lighting_DebugHueColors(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
     f32 mtx[16];
     CVector3 axis;
     ColorF c;
@@ -39,25 +39,25 @@ void func_00212DA4(s32 *model, u8 *matrices, CVector3 *colors, s32 skinned) {
     s32 j;
 
     n = 0;
-    func_0020D908(mtx, matrices);
+    CMtxF__FromMtxAffine(mtx, matrices);
     axis.x = 1.0f;
     axis.y = 1.0f;
     axis.z = 1.0f;
-    func_0020F040(&axis);
+    CVector3__Normalize(&axis);
     for (i = 0; i < *model; i++) {
-        group = func_002017D4(model, i);
+        group = CISet__GetBlock(model, i);
         verts = group->verts;
         for (j = 0; j < group->count; j++) {
             if (skinned) {
-                func_0020D908(mtx, matrices + (verts[j].bone >> 8) * 64);
+                CMtxF__FromMtxAffine(mtx, matrices + (verts[j].bone >> 8) * 64);
             }
             in.x = verts[j].x;
             in.y = verts[j].y;
             in.z = verts[j].z;
-            func_0020F85C(mtx, &in, &out);
+            CMtxF__TransformPoint(mtx, &in, &out);
             hue = out.x * axis.x + out.y * axis.y + out.z * axis.z;
             hue /= 1024.0f;
-            c = func_00211DB0(hue, 1.0f, 1.0f);
+            c = Color_HSVToRGB(hue, 1.0f, 1.0f);
             colors[n].x = c.r * 255.0f;
             colors[n].y = c.g * 255.0f;
             colors[n].z = c.b * 255.0f;

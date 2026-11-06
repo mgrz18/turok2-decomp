@@ -5,7 +5,7 @@
 
 /* AI chase update: turns toward the target and runs or walks at it; flying
  * modes (1, 2) also climb toward its height and bank into the turn. In range,
- * it attacks (path node 4 / special 7) or lets func_0025D030 pick a melee. */
+ * it attacks (path node 4 / special 7) or lets EnemyAI_PickAttack pick a melee. */
 
 typedef struct {
     /* 0x00 */ CVector3 d;
@@ -25,19 +25,19 @@ typedef struct {
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-extern void func_00246108(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void func_0024599C(CGameObjectInstance *actor, CAI *ai, Dir *dir);
-extern void func_00245BAC(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
-extern void func_00243414(CGameObjectInstance *actor, CAI *ai, s32 anim);
-extern f32 func_0021160C(f32 value, f32 delta, f32 limit);
-extern f32 func_00211774(f32 value, f32 target, f32 rate);
-extern s32 func_0025D030(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
-extern void func_0025D308(CGameObjectInstance *actor, CAI *ai);
-extern void func_0025C1B0(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
-extern PathNode *func_0028479C(void *path);
-extern void func_00284660(void *path);
+extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Dir *dir);
+extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
+extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
+extern f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
+extern f32 Math_Approach(f32 value, f32 target, f32 rate);
+extern s32 EnemyAI_PickAttack(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
+extern void EnemyAI_TryDodge(CGameObjectInstance *actor, CAI *ai);
+extern void EnemyAI_IdleSoundCallback(CGameObjectInstance *actor, CAI *ai, CAITargets *t);
+extern PathNode *CPathTrack__GetCurrentPoint(void *path);
+extern void CPathTrack__Advance(void *path);
 
-void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
+void EnemyMode_Move_Update(CGameObjectInstance *actor, CAI *ai) {
     CAITargets t;
     Dir dir;
     s32 runAnim;
@@ -53,7 +53,7 @@ void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
 
     actor->m_dwFlags |= 0x20000;
     actor->m_dwFlags |= 0x20000000;
-    func_00246108(actor, ai, &t, 1, 1);
+    AI_UpdateTargets(actor, ai, &t, 1, 1);
     runAnim = 4;
     if (t.m_Path.m_Kind == 1 && actor->header.m_pIntelligence->m_Enemy.m_wFleeAnimFlags) {
         dodge = 0;
@@ -65,7 +65,7 @@ void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
     if (ai->m_Action == 0) {
         walkAnim = 3;
     }
-    func_0024599C(actor, ai, &dir);
+    AI_ComputeFrameMotion(actor, ai, &dir);
     mode = ai->m_Enemy.m_BehaviorIndex;
     if (mode == 1 || mode == 2) {
         maxSpeed = 81.92f;
@@ -77,14 +77,14 @@ void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
             if (ai->m_ModeBefore == 1 || ai->m_ModeBefore == 2) {
                 turn = 1.0471977f;
             }
-            func_00245BAC(actor, ai, turn, t.m_Path.m_Angle);
+            AI_TurnClamped(actor, ai, turn, t.m_Path.m_Angle);
         }
         if (t.m_Path.m_Kind == 4) {
-            func_00243414(actor, ai, walkAnim);
+            CAI__SetMode(actor, ai, walkAnim);
         } else {
-            func_00243414(actor, ai, runAnim);
+            CAI__SetMode(actor, ai, runAnim);
         }
-        actor->m_vVelocity.y = func_0021160C(actor->m_vVelocity.y, t.m_Path.m_vDelta.y, dir.len * 16.0f);
+        actor->m_vVelocity.y = Math_StepClamped(actor->m_vVelocity.y, t.m_Path.m_vDelta.y, dir.len * 16.0f);
         if (maxSpeed < actor->m_vVelocity.y) {
             actor->m_vVelocity.y = maxSpeed;
         } else if (actor->m_vVelocity.y < -maxSpeed) {
@@ -97,7 +97,7 @@ void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
             } else if (bank < -0.43633235f) {
                 bank = -0.43633235f;
             }
-            ai->m_Enemy.m_Pitch = func_00211774(ai->m_Enemy.m_Pitch, bank, 0.069813177f);
+            ai->m_Enemy.m_Pitch = Math_Approach(ai->m_Enemy.m_Pitch, bank, 0.069813177f);
         }
     } else if (!(ai->m_ModeFlags & 0x400)) {
         angle = 0.261799425f;
@@ -110,13 +110,13 @@ void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
         if (ai->m_Mode == 3) {
             angle *= 0.5f;
         }
-        func_00245BAC(actor, ai, angle, t.m_Path.m_Angle);
+        AI_TurnClamped(actor, ai, angle, t.m_Path.m_Angle);
     } else {
         turn = 0.261799425f;
         if (ai->m_ModeBefore == 1 || ai->m_ModeBefore == 2) {
             turn = 1.0471977f;
         }
-        func_00245BAC(actor, ai, turn, t.m_Sight.m_Angle);
+        AI_TurnClamped(actor, ai, turn, t.m_Sight.m_Angle);
     }
     if (t.m_Sight.m_pTarget) {
         angle = 0.261799425f;
@@ -124,10 +124,10 @@ void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
             angle = 1.5707965f;
         }
         if (ABS(t.m_Sight.m_Angle) <= angle) {
-            anim = func_0025D030(actor, ai, &t);
+            anim = EnemyAI_PickAttack(actor, ai, &t);
             if (anim != 0) {
                 ai->m_ModeLastFrame = -1;
-                func_00243414(actor, ai, anim);
+                CAI__SetMode(actor, ai, anim);
                 return;
             }
         }
@@ -153,31 +153,31 @@ void func_0025D474(CGameObjectInstance *actor, CAI *ai) {
         if (t.m_Path.m_Dist <= range) {
             switch (t.m_Path.m_Kind) {
             case 4:
-                if (func_0028479C(&ai->m_PathTrack)->flags & 1) {
-                    func_00243414(actor, ai, 0xB);
+                if (CPathTrack__GetCurrentPoint(&ai->m_PathTrack)->flags & 1) {
+                    CAI__SetMode(actor, ai, 0xB);
                 } else {
-                    func_00284660(&ai->m_PathTrack);
+                    CPathTrack__Advance(&ai->m_PathTrack);
                 }
                 break;
             case 7:
-                func_00243414(actor, ai, 0xD);
+                CAI__SetMode(actor, ai, 0xD);
                 if (actor->m_dwFlags & 0x400) {
                     ai->m_vDesiredPos.x += t.m_Path.m_vDelta.x * 0.5f;
                     ai->m_vDesiredPos.z += t.m_Path.m_vDelta.z * 0.5f;
                 }
                 break;
             default:
-                func_00243414(actor, ai, 0xA);
+                CAI__SetMode(actor, ai, 0xA);
                 break;
             }
         } else if (t.m_Path.m_Kind == 4) {
-            func_00243414(actor, ai, walkAnim);
+            CAI__SetMode(actor, ai, walkAnim);
         } else if (dodge && ABS(t.m_Path.m_Angle) > 2.3561947f) {
-            func_00243414(actor, ai, 5);
+            CAI__SetMode(actor, ai, 5);
         } else {
-            func_00243414(actor, ai, runAnim);
+            CAI__SetMode(actor, ai, runAnim);
         }
     }
-    func_0025D308(actor, ai);
-    func_0025C1B0(actor, ai, &t);
+    EnemyAI_TryDodge(actor, ai);
+    EnemyAI_IdleSoundCallback(actor, ai, &t);
 }

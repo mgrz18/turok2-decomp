@@ -4,7 +4,7 @@
 
 /* Fills the ammo of every held weapon to its maximum; returns whether any
  * ammo was added. */
-s32 func_002569C8(CPlayer *player) {
+s32 CPlayer__FillAllAmmo(CPlayer *player) {
     s32 added = 0;
     s32 w;
     s32 i;

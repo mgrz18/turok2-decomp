@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00290CCC(void *arg0, Node_func_802AFD6C_de *arg1);
+extern void __CSPRepostEvent(void *arg0, Node_func_802AFD6C_de *arg1);
 extern s32 osSetIntMask(s32);
-void func_00290CCC(void *arg0, Node_func_802AFD6C_de *arg1) {
-    extern void func_002933E0(void *, void * *);
+void __CSPRepostEvent(void *arg0, Node_func_802AFD6C_de *arg1) {
+    extern void alLink(void *, void * *);
     ObjRecAt8V3 *object = arg0;
     s32 saved;
     Node_func_802AFD6C_de **link;
@@ -26,7 +26,7 @@ loop:
         if (value < node_value) {
             node->value = node_value - value;
 insert:
-            func_002933E0(arg1, link);
+            alLink(arg1, link);
             goto done;
         }
         arg1->value = value - node_value;

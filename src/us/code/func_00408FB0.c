@@ -4,7 +4,7 @@
 extern CListedInstance *D_8010FEB4;  /* active actors */
 
 /* Looks for a live player actor; the result is not used. */
-void func_00408FB0(void) {
+void TotemDefense_FindLiveEnemy(void) {
     CListedInstance *actor;
 
     for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {

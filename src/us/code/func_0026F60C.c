@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_0026F60C(f32 (*arg0)[4], f32 *arg1) {
+s32 Frustum_TestBox(f32 (*arg0)[4], f32 *arg1) {
     s32 i;
     s32 inside;
     f32 *plane;

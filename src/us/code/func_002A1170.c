@@ -22,7 +22,7 @@ extern unsigned short D_800B8BAC;
 extern s16 D_800B8BAE;
 extern unsigned short D_800B8BB0;
 extern char D_80125C38;
-u32 func_002A1170(s32 *source, u32 divisor, s32 *first)
+u32 adecStreamOpen(s32 *source, u32 divisor, s32 *first)
 {
     DecodeState *state = &D_80125C38;
     state->source = source;

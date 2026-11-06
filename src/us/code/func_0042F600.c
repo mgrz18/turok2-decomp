@@ -11,7 +11,7 @@ typedef struct Timer {
     /* 0x1C */ s32 unk1C;
 } Timer;
 
-void func_0042F600(Timer *t, s32 unk4, s32 reload, s32 index, void (*callback)(Timer *), s32 unk18, s32 unk1C) {
+void DemoStream_Init(Timer *t, s32 unk4, s32 reload, s32 index, void (*callback)(Timer *), s32 unk18, s32 unk1C) {
     t->unk4 = unk4;
     t->reload = reload;
     t->index = index;

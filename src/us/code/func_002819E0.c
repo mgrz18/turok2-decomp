@@ -5,7 +5,7 @@ s32 CList__Remove(s32, s32);
 
 extern void *D_801198D0;
 
-void func_002819E0(s32 arg0)
+void CCameraPool__ReleaseAllTexts(s32 arg0)
 {
   s32 *temp_s0;
   s32 *temp_s0_2;

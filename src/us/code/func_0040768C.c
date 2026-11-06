@@ -9,7 +9,7 @@ typedef struct {
 extern Tuning D_800C0530;
 extern f32 D_8012F9E4;
 
-void func_0040768C(CGameObjectInstance *obj) {
+void Primagen_EnterMode23(CGameObjectInstance *obj) {
     f32 *speed = &D_800C0530.animSpeed;
     f32 *animSpeed = &obj->m_AI.m_AnimSpeed;
     s32 *flags = &obj->m_dwFlags;

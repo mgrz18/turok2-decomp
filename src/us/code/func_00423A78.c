@@ -4,7 +4,7 @@
 extern s32 D_801309A4;
 extern s32 D_801309B0;
 
-void func_00423A78(void) {
+void PakConfirmMenu_InitNoSpaceAll(void) {
     D_801309B0 = 2;
     D_801309A4 = 0;
 }

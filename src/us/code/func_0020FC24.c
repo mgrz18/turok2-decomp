@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0020FC24(void *matrix, f32 x, f32 y, f32 z);
-void func_0020FC24(void *arg0, f32 arg1, f32 arg2, f32 arg3) {
+extern void CMtxF__SetTranslate(void *matrix, f32 x, f32 y, f32 z);
+void CMtxF__SetTranslate(void *arg0, f32 arg1, f32 arg2, f32 arg3) {
     extern f32 D_800A55F4;
     Matrix *o = arg0;
     f32 val = D_800A55F4;

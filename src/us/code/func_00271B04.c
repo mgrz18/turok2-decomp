@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_00276DFC(s32);                         /* extern */
+s32 SpeechPlayer_Stop(s32);                         /* extern */
 
-void func_00271B04(s32 arg0) {
-    func_00276DFC(arg0 + 0x2BC0);
+void CAudioWorld__StopSpeech(s32 arg0) {
+    SpeechPlayer_Stop(arg0 + 0x2BC0);
 }

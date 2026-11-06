@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/camera.h"
 
-/* Sets the camera's own shake source, as func_0028135C sets one of the
+/* Sets the camera's own shake source, as CCameraPool__StartShake sets one of the
  * pool's: position, radius, wave type and a tenth of each amplitude. */
-void func_002811CC(CCamera *cam, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos) {
-    u8 pad[0x18];       /* unused stack, as in func_0028135C */
+void CCamera__SetShake(CCamera *cam, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos) {
+    u8 pad[0x18];       /* unused stack, as in CCameraPool__StartShake */
     CVector3 at;
 
     at = pos;

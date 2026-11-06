@@ -3,7 +3,7 @@
 #include "structs/collision.h"
 
 /* Height of the quad's plane at (x, z); a vertical quad gives the mean corner height. */
-f32 func_0023C8A0(CollisionQuad *quad, f32 x, f32 z) {
+f32 Quad_GetHeightAt(CollisionQuad *quad, f32 x, f32 z) {
     CVector3 normal;
     CVector3 origin;
 

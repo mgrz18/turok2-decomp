@@ -8,16 +8,16 @@
 #include "structs/game_object.h"
 typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
 typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
-void func_0020B5D4();
-void func_0020B624(void);
-void func_0021D39C(CGameObjectInstance *e, s32 a);
-void func_00223F8C(CWorld *lv, s32 arg) {
+void Render_ResetBatches();
+void Render_FlushBatches(void);
+void CGameObjectInstance__Draw(CGameObjectInstance *e, s32 a);
+void CScene__DrawRegisteredInstances(CWorld *lv, s32 arg) {
     Gfx *g;
     s32 i;
     s32 n;
     s32 c;
     CGameObjectInstance **arr;
-    func_0020B5D4();
+    Render_ResetBatches();
     n = lv->m_nRegistered;
     g = D_800D8E24++;
     g->w0 = 0xDB040004;
@@ -41,8 +41,8 @@ void func_00223F8C(CWorld *lv, s32 arg) {
                 lv->m_nDeferred = c + 1;
             }
         } else {
-            func_0021D39C(e, arg);
+            CGameObjectInstance__Draw(e, arg);
         }
     }
-    func_0020B624();
+    Render_FlushBatches();
 }

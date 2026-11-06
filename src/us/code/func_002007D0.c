@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002007D0(CList *arg0);
-void func_002007D0(CList *arg0) {
+extern void CList__RemoveHead(CList *arg0);
+void CList__RemoveHead(CList *arg0) {
     char *cursor = arg0->m_pHead;
     int stride = arg0->m_NextOffset;
     int value = *(int *)(cursor + stride);

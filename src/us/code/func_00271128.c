@@ -30,9 +30,9 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
         __osRestoreInt(mask);
     }
 }
-void *func_002017D4(void *node, s32 idx);
-void func_00270A60(SndMgr *m, void *rec, CVector3 *pos, s32 id, s32 token, s32 a, s32 flags);
-s32 func_00271128(SndMgr *m, s32 id, CVector3 pos, s32 flags) {
+void *CISet__GetBlock(void *node, s32 idx);
+void CAudioWorld__PlayLayer(SndMgr *m, void *rec, CVector3 *pos, s32 id, s32 token, s32 a, s32 flags);
+s32 CAudioWorld__PlaySoundIndex(SndMgr *m, s32 id, CVector3 pos, s32 flags) {
     u32 *rec;
     u32 count;
     u32 i;
@@ -41,13 +41,13 @@ s32 func_00271128(SndMgr *m, s32 id, CVector3 pos, s32 flags) {
     if (!(id < m->rangeCount)) {
         return -1;
     }
-    n = func_002017D4(m->variants, (s16)id);
-    n = func_002017D4(n, 0);
+    n = CISet__GetBlock(m->variants, (s16)id);
+    n = CISet__GetBlock(n, 0);
     m->cue = n;
     m->cueId = 0x100;
     m->cueArg = -1;
-    n = func_002017D4(m->variants, (s16)id);
-    rec = func_002017D4(n, 1);
+    n = CISet__GetBlock(m->variants, (s16)id);
+    rec = CISet__GetBlock(n, 1);
     count = rec[1];
     if (count != 0) {
         SndMgr_Lock(m);
@@ -59,7 +59,7 @@ s32 func_00271128(SndMgr *m, s32 id, CVector3 pos, s32 flags) {
     i = 0;
     if (count != 0) {
         do {
-            func_00270A60(m, (u8 *)rec + (i * rec[0] + 8), &pos, id, token, 0, flags);
+            CAudioWorld__PlayLayer(m, (u8 *)rec + (i * rec[0] + 8), &pos, id, token, 0, flags);
             i++;
         } while (i < count);
     }

@@ -14,11 +14,11 @@ struct IntPair;
 struct IntPair;
 struct IntPair;
 extern s32 D_8011ACA4;
-extern void func_00246860(u8 *, u8 *, s32);
+extern void AI_StartSound(u8 *, u8 *, s32);
 void func_00239350(void *unused, u8 *object, s32 third, struct IntPair pair, s32 fifth, s32 sixth) {
     if (D_8011ACA4 == 0 && object != 0 && object[0] == 1) {
         do {
-            func_00246860(object, object + 0x140, sixth);
+            AI_StartSound(object, object + 0x140, sixth);
         } while (0);
     }
 }

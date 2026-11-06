@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00273BF8(SlotRecAtB8 *base, s16 index);
-extern void func_00293CE0(void *);
-void func_00273BF8(SlotRecAtB8 *base, s16 index)
+extern void SndVoicePool_PlayVoice(SlotRecAtB8 *base, s16 index);
+extern void alSndpPlay(void *);
+void SndVoicePool_PlayVoice(SlotRecAtB8 *base, s16 index)
 {
   unsigned int offset = index * (sizeof(SlotRecAtB8));
   char *entry = (char *) offset;
@@ -13,6 +13,6 @@ void func_00273BF8(SlotRecAtB8 *base, s16 index)
   SlotRecAtB8 *selected;
   entry += (unsigned int) base;
   slots = base;
- do { func_00293CE0(0x84 + ((SlotRecAtB8 *) entry)->owner); entry = (char *) slots; entry += offset; selected = (SlotRecAtB8 *) entry; } while (0);
+ do { alSndpPlay(0x84 + ((SlotRecAtB8 *) entry)->owner); entry = (char *) slots; entry += offset; selected = (SlotRecAtB8 *) entry; } while (0);
   selected->flags |= 8;
 }

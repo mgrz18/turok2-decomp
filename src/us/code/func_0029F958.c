@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern Acmd *func_0029F958(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p);
+extern Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p);
 extern s32 D_800B8A20;
-extern s32 func_002A122C();
+extern s32 adecNextFrame();
 extern void osWritebackDCache(s32 buffer, s32 size);
-Acmd *func_0029F958(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p)
+Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;
     s32 nbytes;
@@ -27,7 +27,7 @@ Acmd *func_0029F958(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOf
         do {
             nSam = byteCount;
             if (f->sample == 0) {
-                D_800B8A20 = func_002A122C();
+                D_800B8A20 = adecNextFrame();
                 if (D_800B8A20 == 0) {
                     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(op) & (0xFFFFFFFFU >> (32 - (24)))) << (0)); _a->words.w1 = (unsigned int)(byteCount << 1); };
                     return ptr;

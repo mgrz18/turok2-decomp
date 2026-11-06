@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-f32 func_00268508(void *arg0)
+f32 GameObject_GetAttackCombatRadius(void *arg0)
 {
   int new_var;
   void *temp_a0;

@@ -1,4 +1,4 @@
-/* WRONG CUT: REAL func_0042BF48 size 0x24C (splat cut it into func_0042BF48 + func_0042C0B4). */
+/* WRONG CUT: REAL CScene__StreamAllSections size 0x24C (splat cut it into CScene__StreamAllSections + func_0042C0B4). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_13.CPP, func_8044CD8C_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/world.h"
@@ -24,22 +24,22 @@ typedef struct ObjB {
 } ObjB; /* 0x198 */
 
 extern char D_800A5F6C[];
-extern void func_00220D00(void);
+extern void CScene__DecompressGridSection(void);
 
-extern void *func_002017D4(void *table, s32 index);
-extern s32 func_0020185C(void *file, s32 key, s32 index, s32 *size);
-extern void **func_0020367C(s32 unused, s32 key, s32 size, s32 mode, CWorld *owner, void *tag, char *name, s32 direct);
-extern void func_00214D04(ObjA *a, s32);
-extern void *func_00214DBC(ObjA *a);
-extern void *func_00215944(ObjB *b);
-extern void func_0020BE08(void *handle);
-extern void func_002051F4(s32, void *);
+extern void *CISet__GetBlock(void *table, s32 index);
+extern s32 CISet__GetROMAddressAndSize(void *file, s32 key, s32 index, s32 *size);
+extern void **CCache__Request(s32 unused, s32 key, s32 size, s32 mode, CWorld *owner, void *tag, char *name, s32 direct);
+extern void CStaticObject__RequestLitVertices(ObjA *a, s32);
+extern void *CStaticObject__LoadGeometry(ObjA *a);
+extern void *CLevelActor__LoadGeometry(ObjB *b);
+extern void Model_RequestTextures(void *handle);
+extern void CCache__Unlock(s32, void *);
 
 /* Streams in every grid cell of the level that is not loaded yet and spawns its objects. The loops run over
  * a rectangle of cells (firstRow..lastRow, firstCol..lastCol), here the whole grid: the column loop starting
  * from the variable firstCol, not the constant 0, is what keeps its entry test as the ROM's slt (Rage Wars'
  * decomp matches the same function with a lone `first` local it flags as a fake match). */
-void func_0042BF48(CWorld *level) {
+void CScene__StreamAllSections(CWorld *level) {
     s32 size;
     s32 width;
     s32 row;
@@ -65,9 +65,9 @@ void func_0042BF48(CWorld *level) {
     ObjB *b;
     void *handle;
 
-    width = ((Counted *)func_002017D4(level->m_pCollision, 0))->count;
-    rows = ((Counted *)func_002017D4(level->m_pCollision, 2))->count;
-    cells = (StreamCell *)((Counted *)func_002017D4(level->m_pCollision, 4) + 1);
+    width = ((Counted *)CISet__GetBlock(level->m_pCollision, 0))->count;
+    rows = ((Counted *)CISet__GetBlock(level->m_pCollision, 2))->count;
+    cells = (StreamCell *)((Counted *)CISet__GetBlock(level->m_pCollision, 4) + 1);
     firstRow = 0;
     lastRow = rows - 1;
     firstCol = 0;
@@ -78,39 +78,39 @@ void func_0042BF48(CWorld *level) {
             if (cell->occupied != 0) {
                 continue;
             }
-            key = func_0020185C(level->m_pLevelInfo, level->m_LevelInfoKey, col + row * width, &size);
-            block = func_0020367C(0, key, size, 4, level, func_00220D00, D_800A5F6C, 1);
+            key = CISet__GetROMAddressAndSize(level->m_pLevelInfo, level->m_LevelInfoKey, col + row * width, &size);
+            block = CCache__Request(0, key, size, 4, level, CScene__DecompressGridSection, D_800A5F6C, 1);
             if (block == 0) {
                 continue;
             }
             node = *block;
             if (*(s32 *)node != 0) {
-                list = func_002017D4(node, 0);
+                list = CISet__GetBlock(node, 0);
                 n = list->count;
                 objsA = (ObjA *)(list + 1);
                 for (i = 0; i < n; i++) {
                     a = &objsA[i];
                     a->block = block;
-                    func_00214D04(a, 0);
-                    handle = func_00214DBC(a);
+                    CStaticObject__RequestLitVertices(a, 0);
+                    handle = CStaticObject__LoadGeometry(a);
                     if (handle != 0) {
-                        func_0020BE08(handle);
-                        func_002051F4(0, handle);
+                        Model_RequestTextures(handle);
+                        CCache__Unlock(0, handle);
                     }
                 }
-                list = func_002017D4(node, 1);
+                list = CISet__GetBlock(node, 1);
                 m = list->count;
                 objsB = (ObjB *)(list + 1);
                 for (j = 0; j < m; j++) {
                     b = &objsB[j];
-                    handle = func_00215944(b);
+                    handle = CLevelActor__LoadGeometry(b);
                     if (handle != 0) {
-                        func_0020BE08(handle);
-                        func_002051F4(0, handle);
+                        Model_RequestTextures(handle);
+                        CCache__Unlock(0, handle);
                     }
                 }
             }
-            func_002051F4(0, block);
+            CCache__Unlock(0, block);
         }
     }
 }

@@ -1,14 +1,14 @@
 /* Boundary fixed in versions/cuts.us.txt: splat's func_00263A14 starts with 3 orphan words (addu a0,s0; addu a1,s0;
- * jal func_0020EEF8) whose delay slot is this function's first instruction. The real
- * function is func_00263A20 (called from func_00264378); this file matches it from
+ * jal CVector3__Add) whose delay slot is this function's first instruction. The real
+ * function is Platform_UpdateSpecial (called from Platform_Step); this file matches it from
  * 0x263A20 to the end of splat's func_00263A14. */
 #include "common.h"
 #include "structs/game_object.h"
 
 extern f32 D_800B6D28; /* frame time */
 
-f32 func_002119FC(f32 lo, f32 hi);
-f32 func_00266F50(f32 x);
+f32 Random_Blend(f32 lo, f32 hi);
+f32 SmoothStep(f32 x);
 
 static __inline__ s32 canClose(CPlatformIntelligence *params, CAI *ai) {
     if ((params->m_dwPlatformFlags & 0x8000000) && !(ai->m_dwFlags & 0x20000)) {
@@ -20,7 +20,7 @@ static __inline__ s32 canClose(CPlatformIntelligence *params, CAI *ai) {
     return 1;
 }
 
-void func_00263A20(CGameObjectInstance *self, CAI *ai) {
+void Platform_UpdateSpecial(CGameObjectInstance *self, CAI *ai) {
     CPlatformIntelligence *params;
     s32 oldState;
     s32 flags;
@@ -56,9 +56,9 @@ void func_00263A20(CGameObjectInstance *self, CAI *ai) {
             }
             break;
         case 3:
-            ai->m_Platform.m_vSpecialOffset.x = func_002119FC(-0.512f, 0.512f);
-            ai->m_Platform.m_vSpecialOffset.y = func_002119FC(-0.512f, 0.512f);
-            ai->m_Platform.m_vSpecialOffset.z = func_002119FC(-0.512f, 0.512f);
+            ai->m_Platform.m_vSpecialOffset.x = Random_Blend(-0.512f, 0.512f);
+            ai->m_Platform.m_vSpecialOffset.y = Random_Blend(-0.512f, 0.512f);
+            ai->m_Platform.m_vSpecialOffset.z = Random_Blend(-0.512f, 0.512f);
             ai->m_ActionTime += D_800B6D28;
             if (ai->m_ActionTime > 45.0f) {
                 ai->m_ActionTime = 0.0f;
@@ -82,7 +82,7 @@ void func_00263A20(CGameObjectInstance *self, CAI *ai) {
                 }
             }
             if (params->m_SpecialSinkTime > 0.0f) {
-                ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist * func_00266F50(ai->m_ActionTime / params->m_SpecialSinkTime);
+                ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist * SmoothStep(ai->m_ActionTime / params->m_SpecialSinkTime);
             } else {
                 ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist;
             }
@@ -95,7 +95,7 @@ void func_00263A20(CGameObjectInstance *self, CAI *ai) {
                 ai->m_Platform.m_SpecialTimer = 0.0f;
             }
             if (params->m_SpecialSinkTime > 0.0f) {
-                ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist * func_00266F50(ai->m_ActionTime / params->m_SpecialSinkTime);
+                ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist * SmoothStep(ai->m_ActionTime / params->m_SpecialSinkTime);
             } else {
                 ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist;
             }
@@ -105,7 +105,7 @@ void func_00263A20(CGameObjectInstance *self, CAI *ai) {
                 ai->m_ActionTime += D_800B6D28;
             }
             if (params->m_SpecialSinkTime > 0.0f) {
-                ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist * func_00266F50(ai->m_ActionTime / params->m_SpecialSinkTime);
+                ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist * SmoothStep(ai->m_ActionTime / params->m_SpecialSinkTime);
             } else {
                 ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist;
             }

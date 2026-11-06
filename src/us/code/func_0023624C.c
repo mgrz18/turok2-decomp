@@ -32,7 +32,7 @@ typedef struct {
 } SwooshSystem;
 
 /* Detaches every swoosh of owner arg1, letting each fade out. */
-void func_0023624C(SwooshSystem *arg0, SwooshOwner *arg1) {
+void Swoosh_DetachOwner(SwooshSystem *arg0, SwooshOwner *arg1) {
     f32 temp_f1;
     u8 temp_v0;
     u8 temp_v0_2;

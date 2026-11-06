@@ -30,40 +30,40 @@ extern s32 D_8012FB48;
 extern s32 D_8012F600;
 extern u8 D_800F7078[];
 extern u8 D_0043173C[];
-s32 func_00225F6C(void *world, s32 key0, s32 key1, s32 key2, void **out, s32 max);
-void *func_00225EBC(void *world, s32 a1, s32 id);
-void func_002362E4(void *light, void *actor);
-void func_00403C14(s32 mode);
-void func_004070B4(s32 a0);
-void func_00406F10(s32 a0);
-void func_00243414(void *actor, void *level, s32 event);
-void func_00403F3C();
-void func_004037B0();
-void func_00403AD4();
-void func_00407DC0();
+s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void **out, s32 max);
+void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
+void ScriptAnimator_Start(void *light, void *actor);
+void Primagen_SetStage(s32 mode);
+void Primagen_SetSpawnScript(s32 a0);
+void Primagen_SetAttackScript(s32 a0);
+void CAI__SetMode(void *actor, void *level, s32 event);
+void Primagen_Step();
+void Primagen_Hurt();
+void Primagen_Effects();
+void Primagen_Draw();
 
-void func_00403CF8(Actor00403CF8 *actor, Level00403CF8 *level) {
+void Primagen_InitAI(Actor00403CF8 *actor, Level00403CF8 *level) {
     s32 i;
 
     D_80110048 = 0x1DB2;
     level->data = D_0043173C;
-    level->onReset = func_00403F3C;
-    level->onHit = func_004037B0;
-    level->onDraw = func_00403AD4;
-    level->onEvent = func_00407DC0;
+    level->onReset = Primagen_Step;
+    level->onHit = Primagen_Hurt;
+    level->onDraw = Primagen_Effects;
+    level->onEvent = Primagen_Draw;
     level->unkC = -1;
     D_8012F608.actor = actor;
-    func_00225F6C(D_800F7078, -1, 6, 0xC8, &D_8012F608.found[1], 1);
-    func_00225F6C(D_800F7078, -1, 6, 0xC9, &D_8012F608.found[0], 1);
-    func_00225F6C(D_800F7078, -1, 6, 0xCA, &D_8012F608.found[2], 1);
-    func_00225F6C(D_800F7078, -1, 6, 0xCB, &D_8012F608.found[3], 1);
-    func_00225F6C(D_800F7078, -1, 6, 0xCC, &D_8012F608.found[4], 1);
-    D_8012F608.intel = func_00225EBC(D_800F7078, 1, 0x1DB2);
+    CScene__FindInstances(D_800F7078, -1, 6, 0xC8, &D_8012F608.found[1], 1);
+    CScene__FindInstances(D_800F7078, -1, 6, 0xC9, &D_8012F608.found[0], 1);
+    CScene__FindInstances(D_800F7078, -1, 6, 0xCA, &D_8012F608.found[2], 1);
+    CScene__FindInstances(D_800F7078, -1, 6, 0xCB, &D_8012F608.found[3], 1);
+    CScene__FindInstances(D_800F7078, -1, 6, 0xCC, &D_8012F608.found[4], 1);
+    D_8012F608.intel = CScene__FindIntelligence(D_800F7078, 1, 0x1DB2);
     for (i = 0; i < 8; i++) {
-        func_002362E4(&D_8012F608.anims[i], actor);
+        ScriptAnimator_Start(&D_8012F608.anims[i], actor);
     }
-    func_00403C14(1);
-    func_004070B4(1);
+    Primagen_SetStage(1);
+    Primagen_SetSpawnScript(1);
     D_8012F608.bossMode = 1;
     D_8012F608.bossState = 1;
     D_8012F608.spawnsLeft = 0;
@@ -74,7 +74,7 @@ void func_00403CF8(Actor00403CF8 *actor, Level00403CF8 *level) {
     D_8012F608.speed = 100.0f;
     D_8012F608.point.x = 5.0f;
     D_8012F608.point.z = 180.0f;
-    func_00406F10(1);
+    Primagen_SetAttackScript(1);
     D_8012F608.script.timer = 0;
     D_8012F608.script2.timer = 0;
     D_8012F608.spawnStep = 0;
@@ -88,6 +88,6 @@ void func_00403CF8(Actor00403CF8 *actor, Level00403CF8 *level) {
     D_8012F608.home.z = actor->pos.z;
     D_8012FB48 = 0;
     D_8012F600 = 0;
-    func_00243414(actor, level, 0);
+    CAI__SetMode(actor, level, 0);
     level->unk37 = 1;
 }

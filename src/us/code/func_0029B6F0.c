@@ -11,7 +11,7 @@ u32 __osDisableInt(void);
 void __osRestoreInt(u32);
 void __osEnqueueAndYield(OSThread **);
 OSThread *__osPopThread(OSThread **);
-void func_0029BB10(OSThread *);             /* osStartThread */
+void osStartThread(OSThread *);             /* osStartThread */
 
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flags) {
     register u32 saveMask;
@@ -36,7 +36,7 @@ s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flags) {
     mq->validCount--;
 
     if (mq->fullqueue->next != 0) {
-        func_0029BB10(__osPopThread(&mq->fullqueue));
+        osStartThread(__osPopThread(&mq->fullqueue));
     }
 
     __osRestoreInt(saveMask);

@@ -5,10 +5,10 @@
 
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-extern FftTables *func_002A073C(s32 n);
+extern FftTables *mdctFftInit(s32 n);
 extern float D_800AAC30;
 extern FftTables D_800B8A30;
-FftTables *func_002A073C(s32 n) {
+FftTables *mdctFftInit(s32 n) {
     FftTables *tables;
     s32 half;
     s32 i;

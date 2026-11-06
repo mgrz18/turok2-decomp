@@ -7,7 +7,7 @@ extern s32 D_8011AADC;
 extern s32 D_8011AAD8;
 extern char D_800B581C[];
 extern char D_800B5838[];
-s32 func_0045425C(MenuItem *a) {
+s32 CheatMenu_AllWeaponsText_2(MenuItem *a) {
     if (D_8011AADC & 4) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
     if (D_8011AAD8 & 4) a->text = D_800B581C; else a->text = D_800B5838;
     return 0;

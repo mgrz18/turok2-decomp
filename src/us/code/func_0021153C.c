@@ -4,7 +4,7 @@ typedef float f32;
 /* acos lookup: 1024 samples of acos over [0, 1]. */
 extern f32 D_800AB8D0[];
 
-f32 func_0021153C(f32 x) {
+f32 Math_AcosLookup(f32 x) {
     s32 neg;
     f32 pos;
     f32 lo;

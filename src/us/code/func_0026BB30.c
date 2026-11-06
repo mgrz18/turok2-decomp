@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0026BB30(HeaderRecAt1C *dst, Packed *src, char *base, int unused, char *extra);
-void func_0026BB30(HeaderRecAt1C *dst, Packed *src, char *base, int unused, char *extra) {
+extern void CGameRegion__Unpack(HeaderRecAt1C *dst, Packed *src, char *base, int unused, char *extra);
+void CGameRegion__Unpack(HeaderRecAt1C *dst, Packed *src, char *base, int unused, char *extra) {
     int i;
     dst->unk0 = src->unk0;
     dst->unk2 = src->unk2;

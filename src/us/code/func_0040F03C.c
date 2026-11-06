@@ -6,12 +6,12 @@ extern u8 D_8010ABA0[]; /* world */
 
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
-extern void func_002688C8(CGameObjectInstance *actor, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 flagA, s32 flagB);
-extern void *func_00228108(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
+extern void GameObject_TraceMove(CGameObjectInstance *actor, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 flagA, s32 flagB);
+extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
 
 /* Spawns an actor at `dist` from `origin` in direction `angle`, if the budget allows it. */
-void func_0040F03C(CGameObjectInstance **self, s32 *budget, s32 *spawned, s32 max, void *intelligence, CGameObjectInstance *origin, f32 dist,
+void BlindOne_SpawnMinion(CGameObjectInstance **self, s32 *budget, s32 *spawned, s32 max, void *intelligence, CGameObjectInstance *origin, f32 dist,
                    f32 angle) {
     CVector3 pos;
     CVector3 vel;
@@ -33,8 +33,8 @@ void func_0040F03C(CGameObjectInstance **self, s32 *budget, s32 *spawned, s32 ma
     pos.x = origin->header.m_vPos.x + dist * func_002982F0(angle);
     pos.y = 0.0f;
     pos.z = origin->header.m_vPos.z + dist * func_002974C0(angle);
-    func_002688C8(*self, pos, &pos, &region, 0, 0);
-    if (func_00228108(D_8010ABA0, -1, 0x1FF, intelligence, region, pos, angle, vel, scale, spawned) != NULL &&
+    GameObject_TraceMove(*self, pos, &pos, &region, 0, 0);
+    if (CInstancePool__Spawn(D_8010ABA0, -1, 0x1FF, intelligence, region, pos, angle, vel, scale, spawned) != NULL &&
         budget != NULL) {
         (*budget)--;
     }

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_00266C80(u8 *arg0, u8 *arg1, s32 arg2) {
+s32 memcmp(u8 *arg0, u8 *arg1, s32 arg2) {
     u8 *end = arg0 + arg2;
     if (arg2 >= 4 && !((u32)arg0 & 3) && !((u32)arg1 & 3)) {
         end -= 4;

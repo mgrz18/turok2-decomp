@@ -1,4 +1,4 @@
-/* Second-module copy of func_0042505C (first module; this one at link address 0x00424F7C), calling this module's own functions at their link addresses. */
+/* Second-module copy of MissionMenu_UpdateObjective1 (first module; this one at link address 0x00424F7C), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
 
@@ -11,7 +11,7 @@ extern char D_800B44FC[];
 extern char D_800B4560[];
 extern s32 D_80130A30;
 
-s32 func_0045DF7C(MenuItem *item) {
+s32 MissionMenu_UpdateObjective1_2(MenuItem *item) {
     switch (D_80130A30) {
         case -1:
         case 0:

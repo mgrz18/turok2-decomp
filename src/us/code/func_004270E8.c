@@ -2,7 +2,7 @@
 #include "m2c_macros.h"
 #include "rw/abu_protos.h"
 
-u8 *func_004270E8(u8 *arg0) {
+u8 *Str_ToLower(u8 *arg0) {
     u8 *var_v1;
     u8 temp_a1;
 

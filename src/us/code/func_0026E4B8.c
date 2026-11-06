@@ -5,17 +5,17 @@
 #include "structs/world.h"
 
 extern CWorld D_800F7078;
-extern s32 func_00224B58(CWorld *world, Trigger *trigger);
-extern s32 func_00225210(CWorld *world, s32 id);
-extern void func_002252A0(CWorld *world, s32 id);
+extern s32 CScene__IsEventFired(CWorld *world, Trigger *trigger);
+extern s32 CScene__AreEventsDone(CWorld *world, s32 id);
+extern void CScene__FireEventsByKeyOnce(CWorld *world, s32 id);
 extern void func_0026E294(Trigger *trigger);
-extern s32 func_0026E6D4(Trigger *trigger, s32 arg);
-extern void func_00224A68(CWorld *world, Trigger *trigger, s32 arg);
-extern void func_00224C98(CWorld *world, s32 id);
-extern s32 func_00224CF8(CWorld *world, s32 id);
-extern void func_0022515C(CWorld *world, s32 id);
-extern void func_0026E210(Trigger *trigger);
-void func_0026E4B8(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exclude, s32 group, s32 arg) {
+extern s32 LevelEvent_CheckRequiredItem(Trigger *trigger, s32 arg);
+extern void CScene__SetEventFired(CWorld *world, Trigger *trigger, s32 arg);
+extern void CScene__DecLinkGroupCount(CWorld *world, s32 id);
+extern s32 CScene__IsLinkGroupDone(CWorld *world, s32 id);
+extern void CScene__FireEventsByKey(CWorld *world, s32 id);
+extern void LevelEvent_Trigger(Trigger *trigger);
+void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exclude, s32 group, s32 arg) {
     s32 i;
     s32 active;
     s32 usable;
@@ -25,7 +25,7 @@ void func_0026E4B8(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exc
         world = &D_800F7078;
         usable = 1;
         if (world->m_Mode != 4) {
-            usable = func_00224B58(world, trigger) == 0;
+            usable = CScene__IsEventFired(world, trigger) == 0;
         }
         if (!usable) {
             continue;
@@ -34,8 +34,8 @@ void func_0026E4B8(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exc
         if (!(trigger->flags.bytes.state & 0x20) && enter != 0 && (trigger->mask & enter)) {
             trigger->flags.bytes.state |= 0x40;
             if (trigger->flags.bytes.id != 0) {
-                if (func_00225210(world, trigger->flags.bytes.id) != 0) {
-                    func_002252A0(world, trigger->flags.bytes.id);
+                if (CScene__AreEventsDone(world, trigger->flags.bytes.id) != 0) {
+                    CScene__FireEventsByKeyOnce(world, trigger->flags.bytes.id);
                 }
             } else {
                 func_0026E294(trigger);
@@ -57,7 +57,7 @@ void func_0026E4B8(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exc
         if ((trigger->flags.word & 0x1100) == 0x1000) {
             active = 0;
         }
-        if (func_0026E6D4(trigger, arg) == 0) {
+        if (LevelEvent_CheckRequiredItem(trigger, arg) == 0) {
             active = 0;
         }
         if (!active) {
@@ -65,15 +65,15 @@ void func_0026E4B8(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exc
         }
         if (trigger->flags.bytes.id != 0) {
             if (!(trigger->flags.bytes.state & 0x80)) {
-                func_00224A68(world, trigger, 1);
+                CScene__SetEventFired(world, trigger, 1);
                 trigger->flags.bytes.state |= 0x80;
-                func_00224C98(world, trigger->flags.bytes.id);
-                if (func_00224CF8(world, trigger->flags.bytes.id) != 0) {
-                    func_0022515C(world, trigger->flags.bytes.id);
+                CScene__DecLinkGroupCount(world, trigger->flags.bytes.id);
+                if (CScene__IsLinkGroupDone(world, trigger->flags.bytes.id) != 0) {
+                    CScene__FireEventsByKey(world, trigger->flags.bytes.id);
                 }
             }
         } else {
-            func_0026E210(trigger);
+            LevelEvent_Trigger(trigger);
         }
     }
 }

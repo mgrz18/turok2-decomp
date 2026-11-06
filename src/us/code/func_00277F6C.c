@@ -1,5 +1,5 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/GFX/TEXT/802A8A94.CPP, func_802A84F8_de, with Turok 2's layouts. */
-/* Set up the font texture: two-cycle mode, combiner and render mode, then load the texture func_0027B4EC
+/* Set up the font texture: two-cycle mode, combiner and render mode, then load the texture COnScreen__GetFontTexture
  * returns as an I texture (the 4-bit render tile 0 at 24x24 and tile 1 at 16x16), and reset the font
  * colour, scale and spacing. */
 
@@ -9,16 +9,16 @@
 extern s32 D_800F56A8;          /* which font texture is loaded */
 extern s32 D_801101B0[2];       /* font spacing */
 
-extern s32 func_0027B4EC(void);
-extern void func_00207A70(s32 mode);
-extern void func_00207FEC(s32 mode);
+extern s32 COnScreen__GetFontTexture(void);
+extern void Render_SetCombineMode(s32 mode);
+extern void Render_SetRenderMode(s32 mode);
 extern void COnScreen__SetFontColor(s32 r0, s32 g0, s32 b0, s32 r1, s32 g1, s32 b1);
 extern void COnScreen__SetFontScale(f32 x, f32 y);
 
-void func_00277F6C(void) {
+void COnScreen__BeginText(void) {
     s32 texture;
 
-    texture = func_0027B4EC();
+    texture = COnScreen__GetFontTexture();
     if (texture != 0) {
         {
             Gfx *g;
@@ -30,8 +30,8 @@ void func_00277F6C(void) {
             g->w1 = 0x00100000;
         }
 
-        func_00207A70(0x1A);
-        func_00207FEC(0x15);
+        Render_SetCombineMode(0x1A);
+        Render_SetRenderMode(0x15);
 
         D_800F56A8 = 0;
         {

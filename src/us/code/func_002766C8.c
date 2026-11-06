@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_002766C8(void *arg0, s32 arg1)
+void SndQueue_CancelSoundId(void *arg0, s32 arg1)
 {
     OwnerRecAtD8 *owner = arg0;
     Node_func_80259918_de *node = owner->activeNext;

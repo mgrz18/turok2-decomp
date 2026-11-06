@@ -13,16 +13,16 @@ typedef struct PlayerStateInfo {
 extern PlayerStateInfo D_800ADF54[];
 extern u8 D_8011AAF1;
 
-s32 func_002548FC(CPlayer *player);
+s32 CPlayer__IsInMatchEndState(CPlayer *player);
 
 /* Switches the player to `state` (only to states 16-18 while
- * func_002548FC holds in D_8011AAF1's mode): runs its enter hook and takes
+ * CPlayer__IsInMatchEndState holds in D_8011AAF1's mode): runs its enter hook and takes
  * its flags. Returns whether the player ends up in that state. */
-s32 func_0024E5F0(CPlayer *player, void *arg, s32 state) {
+s32 CPlayer__SetState(CPlayer *player, void *arg, s32 state) {
     s16 last;
     u32 lastFlags;
 
-    if (D_8011AAF1 != 0 && func_002548FC(player) != 0 && state != 18 && state != 16 && state != 17) {
+    if (D_8011AAF1 != 0 && CPlayer__IsInMatchEndState(player) != 0 && state != 18 && state != 16 && state != 17) {
         return 0;
     }
     last = player->m_Mode;

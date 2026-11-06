@@ -5,7 +5,7 @@
 extern f32 D_800A7EC4;
 extern f32 D_800A7EC8;
 extern f32 D_800A7ECC;
-f32 func_00268304(CGameObjectInstance *a) {
+f32 GameObject_GetWallRadius(CGameObjectInstance *a) {
     switch (a->header.m_pIntelligence->m_Type) {
     case 11:
         return a->header.m_pIntelligence->m_Player.m_CollisionRadius;

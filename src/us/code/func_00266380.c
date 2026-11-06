@@ -19,10 +19,10 @@ typedef struct {
     /* 0x114 */ s32 tagCleared;
 } ActionState;
 
-extern CPlayer *func_002532B4(CPlayerList *list);
-extern void func_00243414(CGameObjectInstance *actor, ActionState *state, s32 mode);
+extern CPlayer *CPlayerPool__FindTagged(CPlayerList *list);
+extern void CAI__SetMode(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
-void func_00266380(CGameObjectInstance *actor, ActionState *state) {
+void Action_GoUpdate(CGameObjectInstance *actor, ActionState *state) {
     CDoorIntelligence *info = &actor->header.m_pIntelligence->m_Door;
     CGame *game;
     CPlayer *player;
@@ -30,7 +30,7 @@ void func_00266380(CGameObjectInstance *actor, ActionState *state) {
 
     if (actor->m_nTypeFlag == 0x64E && state->unk36 != state->unk34) {
         game = &D_80119870;
-        player = func_002532B4(&game->m_PlayerList);
+        player = CPlayerPool__FindTagged(&game->m_PlayerList);
         if (player != NULL && state->tagCleared == 0) {
             mode = player->m_pOptions->m_TagMode;
             if (mode == 1) {
@@ -47,10 +47,10 @@ void func_00266380(CGameObjectInstance *actor, ActionState *state) {
             actor->m_dwFlags &= ~0x100;
         }
         if (state->done != 0) {
-            func_00243414(actor, state, 0);
+            CAI__SetMode(actor, state, 0);
         }
         if (actor->m_nTypeFlag == 0x64C) {
-            func_00243414(actor, state, 2);
+            CAI__SetMode(actor, state, 2);
         }
     }
 }

@@ -3,7 +3,7 @@
 
 extern s32 D_8011AAD8;
 
-s32 func_004544E8(void) {
+s32 CheatMenu_ToggleStickMode_2(void) {
     D_8011AAD8 ^= 0x80;
     return 0;
 }

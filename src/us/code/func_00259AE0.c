@@ -22,13 +22,13 @@ extern struct {
     /* 0x4 */ u32 pad4;
     /* 0x8 */ f32 delta;
 } D_800B6D20;
-f32 func_00211774(f32 value, f32 target, f32 rate);
-s16 *func_0025398C(CPlayer *player, s32 id);
+f32 Math_Approach(f32 value, f32 target, f32 rate);
+s16 *CPlayer__GetFiringAmmo(CPlayer *player, s32 id);
 
-void func_00259AE0(CGameObjectInstance *actor, State *state) {
+void WeaponBarrel_Spin_AF180(CGameObjectInstance *actor, State *state) {
     f32 v;
 
-    v = func_00211774(state->unk110, 0.174532949924469f /* 10 deg */, 0.0175f);
+    v = Math_Approach(state->unk110, 0.174532949924469f /* 10 deg */, 0.0175f);
     state->unk110 = v;
     state->unk10C += v * D_800B6D20.delta;
     if (state->unk34 == 4 && state->unkC4 != 0x4E84) {
@@ -43,7 +43,7 @@ void func_00259AE0(CGameObjectInstance *actor, State *state) {
     } else {
         CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
 
-        if (*(s16 *) ((s8 *) player + *func_0025398C(player, 0x15) * 2 + 0x934) != 0) {
+        if (*(s16 *) ((s8 *) player + *CPlayer__GetFiringAmmo(player, 0x15) * 2 + 0x934) != 0) {
             state->unk128 = 0;
         } else {
             state->unk128 = 1;

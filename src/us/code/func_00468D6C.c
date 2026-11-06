@@ -1,8 +1,8 @@
 #include "common.h"
 #include "rw/abu_protos.h"
 
-void *func_00266C5C(void *destination, s32 value, u32 size);
-s32 func_0027D160(s32);
+void *memset(void *destination, s32 value, u32 size);
+s32 CCamera__Advance(s32);
 
 s32 func_0042F8D0(void *);                      /* extern */
 
@@ -26,10 +26,10 @@ typedef struct {
     /* 0x11EC */ u8 pad11EC[0x11F0 - 0x11EC];
 } Unk00468D6C; /* size 0x11F0 */
 
-void func_00468D6C(Unk00468D6C *arg0) {
+void CCameraPool__Construct_2(Unk00468D6C *arg0) {
     void *temp_s1;
 
-    func_00266C5C(arg0, 0, 0x11F0U);
+    memset(arg0, 0, 0x11F0U);
     CList__Construct(arg0->list0C, 0, 4);
     CList__Construct(arg0->list20, 0, 4);
     CList__Construct(arg0->listF0C, 0, 4);
@@ -43,5 +43,5 @@ void func_00468D6C(Unk00468D6C *arg0) {
     arg0->unkF08 = 0;
     arg0->unk38 = 2;
     func_0042F8D0(temp_s1);
-    func_0027D160((s32) temp_s1);
+    CCamera__Advance((s32) temp_s1);
 }

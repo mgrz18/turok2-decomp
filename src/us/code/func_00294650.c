@@ -60,7 +60,7 @@ struct ObjectStateC_3 {
     char pad4[0x8 - 0x4 - sizeof(s32)];
     s16 unk_8;
 };
-extern void *func_00294B58(void);
+extern void *__allocParam(void);
 void alSynStopVoice(struct Shape_typemap_71 *arg0, void *arg1)
 {
   int new_var;
@@ -69,7 +69,7 @@ void alSynStopVoice(struct Shape_typemap_71 *arg0, void *arg1)
   SharedRecV12 fn;
   if ((((ObjectStateC_2 *)(arg1))->unk_8.v0) != 0)
   {
-    Shared_func_802B36F0_de_v0 = func_00294B58();
+    Shared_func_802B36F0_de_v0 = __allocParam();
     if (Shared_func_802B36F0_de_v0 != 0)
     {
       new_var = (arg0->field_1C) + (((struct IntegerStateDC_2 *) ((ObjectStateC_2 *) arg1)->unk_8.v1)->state);

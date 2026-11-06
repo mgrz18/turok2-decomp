@@ -3,7 +3,7 @@
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-extern f32 func_002119FC(f32 lo, f32 hi);
+extern f32 Random_Blend(f32 lo, f32 hi);
 
 /* LevelScriptState from spawnsLeft on (D_8012F950, +0x348): this file
  * reaches script2 through that symbol. */
@@ -18,7 +18,7 @@ typedef struct {
 
 extern LevelScriptF950 D_8012F950;
 
-s32 func_004050E0(void) {
+s32 Primagen_RunSpawnStep(void) {
     if (D_8012F950.script2.timer > 0.0f) {
         return 0;
     }
@@ -43,7 +43,7 @@ s32 func_004050E0(void) {
             D_8012F950.script2.current = -1;
             return 1;
         case 3:
-            if (func_002119FC(0.0f, 100.0f) < 50.0f) {
+            if (Random_Blend(0.0f, 100.0f) < 50.0f) {
                 if (D_8012F950.enemiesAlive < 9) {
                     D_8012F950.spawnsLeft = MIN(D_8012F950.script2.steps[D_8012F950.script2.current].arg, 8 - D_8012F950.enemiesAlive);
                 }

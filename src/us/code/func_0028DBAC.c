@@ -29,7 +29,7 @@ extern B09LNode D_80120FC0[];
 extern B09List D_80121290;
 extern u8 D_80132000[];
 void func_0028EE40(s32 index, s32 pm, void *vaddr, u32 evenpaddr, u32 oddpaddr, s32 asid);
-s32 func_0028DAEC(void);
+s32 VM_AcquireNextTLB(void);
 static __inline__ void m03_unlink(B09LNode *n) {
     if (n->prev != ((void *)0)) {
         n->prev->next = n->next;
@@ -55,7 +55,7 @@ static __inline__ void m03_push(B09LNode *n) {
         D_80121290.head = n;
     }
 }
-void func_0028DBAC(s16 slot, B09LNode *n, s32 unused, u8 *pair) {
+void VM_MapTLBEntry(s16 slot, B09LNode *n, s32 unused, u8 *pair) {
     u8 *p = pair;
     s32 idx;
     B09LNode *q;
@@ -69,7 +69,7 @@ void func_0028DBAC(s16 slot, B09LNode *n, s32 unused, u8 *pair) {
         idx = D_80120FC0[p[1]].tlb;
         D_80121318[(s16)idx].a = n->id;
     } else {
-        idx = func_0028DAEC();
+        idx = VM_AcquireNextTLB();
         if (slot & 1) {
             D_80121318[(s16)idx].b = n->id;
             if (p[0] != 0xFF) {

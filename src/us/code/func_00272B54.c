@@ -90,13 +90,13 @@ typedef struct M04Emitter {
                s32 unkC4;
                f32 unkC8;
 } M04Emitter;
-f32 func_0026D210(u16 x);                /* Trunc16ToF32 */
-void func_00293E60(void *p, s16 id);     /* alSndpSetSound */
-void func_00293D90(void *p, s32 pan);    /* alSndpSetPan */
-s32 func_002718E0(M04Ctx *c);
-s32 func_00271E20(f32 *pos, M04Tgt *t);
+f32 HalfToFloat(u16 x);                /* Trunc16ToF32 */
+void alSndpSetSound(void *p, s16 id);     /* alSndpSetSound */
+void alSndpSetPan(void *p, s32 pan);    /* alSndpSetPan */
+s32 CAudioWorld__GetStereo(M04Ctx *c);
+s32 Sound_CalcPan(f32 *pos, M04Tgt *t);
 
-void func_00272B54(M04Emitter *o) {
+void SndVoice_UpdatePan(M04Emitter *o) {
     M04VP *vp;
     s32 neg;
     u8 pan;
@@ -104,10 +104,10 @@ void func_00272B54(M04Emitter *o) {
     M04Ctx *c;
 
     vp = &o->vp;
-    if (func_002718E0(o->ctx) == 0) {
+    if (CAudioWorld__GetStereo(o->ctx) == 0) {
         c = o->ctx;
-        func_00293E60(c->player, c->snd[o->w0]);
-        func_00293D90(c->player, 0x40);
+        alSndpSetSound(c->player, c->snd[o->w0]);
+        alSndpSetPan(c->player, 0x40);
         return;
     }
     if (o->hasEnv != 0) {
@@ -119,19 +119,19 @@ void func_00272B54(M04Emitter *o) {
                 neg = 1;
             }
             if (neg) {
-                if (o->env0 < func_0026D210(o->rec.w2)) {
+                if (o->env0 < HalfToFloat(o->rec.w2)) {
                     goto slide;
                 }
-            } else if (func_0026D210(o->rec.w2) < o->env0) {
+            } else if (HalfToFloat(o->rec.w2) < o->env0) {
 slide:
                 o->env0 = o->env0 - o->envSlope;
                 if (neg) {
-                    if (func_0026D210(o->rec.w2) < o->env0) {
-                        o->env0 = func_0026D210(o->rec.w2);
+                    if (HalfToFloat(o->rec.w2) < o->env0) {
+                        o->env0 = HalfToFloat(o->rec.w2);
                     }
                 } else {
-                    if (o->env0 < func_0026D210(o->rec.w2)) {
-                        o->env0 = func_0026D210(o->rec.w2);
+                    if (o->env0 < HalfToFloat(o->rec.w2)) {
+                        o->env0 = HalfToFloat(o->rec.w2);
                     }
                 }
             }
@@ -140,12 +140,12 @@ slide:
         goto setpan;
     }
     if ((o->flags & 0x400) && o->resetFlag == 0) {
-        vp->pan = func_00271E20((f32 *)((u8 *)o + 0x44), o->ctx->tgt);
+        vp->pan = Sound_CalcPan((f32 *)((u8 *)o + 0x44), o->ctx->tgt);
 setpan:
         pan = ((u8 *)&vp->pan)[1];
         pl = o->ctx->player;
-        func_00293E60(pl, o->ctx->snd[o->w0]);
-        func_00293D90(pl, pan);
+        alSndpSetSound(pl, o->ctx->snd[o->w0]);
+        alSndpSetPan(pl, pan);
         return;
     }
     vp->pan = 0x40;

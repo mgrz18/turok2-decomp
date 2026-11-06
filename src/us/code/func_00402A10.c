@@ -25,10 +25,10 @@ typedef struct {
 } Obj00402A10;
 
 extern s32 D_8012F5F0[];
-void func_0025AD90(s32 a0, Obj00402A10 *obj, s32 a2);
-void func_004021C8(void *state);
+void AI_TurnHeadToTarget(s32 a0, Obj00402A10 *obj, s32 a2);
+void MantidQueen_Update(void *state);
 
-void func_00402A10(s32 a0, Obj00402A10 *obj) {
+void MantidQueen_Step(s32 a0, Obj00402A10 *obj) {
     obj->prevPos = obj->pos;
     obj->prevAngle = obj->angle;
     if (D_8012F5F0[0] != 0 || obj->kind == 15) {
@@ -37,9 +37,9 @@ void func_00402A10(s32 a0, Obj00402A10 *obj) {
     } else {
         obj->flags &= ~0x20000000;
     }
-    func_0025AD90(a0, obj, 0);
+    AI_TurnHeadToTarget(a0, obj, 0);
     if (obj->def != NULL && obj->def->onReset != NULL) {
         obj->def->onReset(a0, obj);
     }
-    func_004021C8(&D_8012F3A0);
+    MantidQueen_Update(&D_8012F3A0);
 }

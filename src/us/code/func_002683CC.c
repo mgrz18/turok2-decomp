@@ -1,6 +1,6 @@
 #include "common.h"
 
-f32 func_002683CC(u8 *actor) {
+f32 GameObject_GetDeadCollisionHeight(u8 *actor) {
     u8 *def = *(u8 **) (actor + 0x14);
 
     switch (*(s32 *) def) {

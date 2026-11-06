@@ -1,22 +1,22 @@
 #include "common.h"
 
-s32 func_002759C4(s32);
-s32 func_00416454(s32, s32, s32);
+s32 Music_SetTrack(s32);
+s32 MenuItem_SelectSubmenu(s32, s32, s32);
 
-s32 func_00275904(s32);                     /* extern */
-s32 func_0027598C(s32);                     /* extern */
-s32 func_00275A50();                            /* extern */
-s32 func_00285CD4();                            /* extern */
+s32 Sound__StopAllExcept(s32);                     /* extern */
+s32 Sound__SetForce2D(s32);                     /* extern */
+s32 Music_DuckVolume();                            /* extern */
+s32 Controller_EnableMenuSounds();                            /* extern */
 extern s32 D_800C1F70;
 extern s32 D_800C1F74;
 
-void func_00419BCC(s32 arg0, s32 arg1, s32 arg2) {
-    func_00275904(-1);
-    func_0027598C(0);
+void SoundMenu_GoBack(s32 arg0, s32 arg1, s32 arg2) {
+    Sound__StopAllExcept(-1);
+    Sound__SetForce2D(0);
     if (D_800C1F74 != 0) {
-        func_00275A50();
+        Music_DuckVolume();
     }
-    func_002759C4(D_800C1F70);
-    func_00285CD4();
-    func_00416454(arg0, arg1, arg2);
+    Music_SetTrack(D_800C1F70);
+    Controller_EnableMenuSounds();
+    MenuItem_SelectSubmenu(arg0, arg1, arg2);
 }

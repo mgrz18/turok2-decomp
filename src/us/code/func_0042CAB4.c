@@ -3,29 +3,29 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00200B00(void ***, s32);
-extern void *func_002017D4(void *, s32);
-extern s32 func_00224F84(s32, s32);
-void func_0042CAB4(s32 arg0, void ***arg1) {
+extern s32 ProPackDecompress(void ***, s32);
+extern void *CISet__GetBlock(void *, s32);
+extern s32 CScene__GetObject(s32, s32);
+void CScene__DecompressParticles(s32 arg0, void ***arg1) {
     void *obj;
     GroupCode8044E2B8 *group;
     Piece *piece;
     s32 base;
     s32 count;
     s32 i;
-    if (func_00200B00(arg1, 0) != 0) {
+    if (ProPackDecompress(arg1, 0) != 0) {
         obj = **arg1;
-        group = func_002017D4(obj, 2);
+        group = CISet__GetBlock(obj, 2);
         count = group->count;
         piece = group->pieces;
         i = 0;
-        base = (s32) func_002017D4(obj, i);
+        base = (s32) CISet__GetBlock(obj, i);
         if (count > 0) {
             do {
                 if (piece[i].tag == -1) {
                     piece[i].tag = 0;
                 } else {
-                    piece[i].tag = func_00224F84(arg0, piece[i].tag);
+                    piece[i].tag = CScene__GetObject(arg0, piece[i].tag);
                 }
                 piece[i].unk18 = base + piece[i].unk18;
                 piece[i].unk1C = base + piece[i].unk1C;

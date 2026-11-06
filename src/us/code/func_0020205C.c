@@ -7,7 +7,7 @@ extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 extern void CList__Remove(void *, s32);
 extern s32 CList__AddHead(void *, s32);
-void *func_0020205C(CartridgeReadWorker *arg0) {
+void *CLoader__AllocLoaderEntry(CartridgeReadWorker *arg0) {
     u32 temp_s2;
     void *temp_s0;
     temp_s2 = __osDisableInt();

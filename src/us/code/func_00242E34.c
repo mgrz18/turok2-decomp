@@ -16,18 +16,18 @@ typedef struct Dest {
 extern char D_800F7078[];
 extern f32 D_800B6D28;  /* frame time scale */
 
-CRegionInfo *func_0022425C(void *world, CGameRegion *region);
-f32 func_002671B4(CGameObjectInstance *actor);
-f32 func_00268A5C(CGameObjectInstance *actor);
-s32 func_0026AFC0(CGameRegion *region);
+CRegionInfo *CScene__GetRegionInfo(void *world, CGameRegion *region);
+f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
+f32 GameObject_GetWaterHeight(CGameObjectInstance *actor);
+s32 CGameRegion__IsSteep(CGameRegion *region);
 s32 func_0021F080(CGameObjectInstance *actor);
-f32 func_0026BE60(CGameRegion *region, f32 x, f32 z);
-s32 func_002685F0(CGameObjectInstance *actor);
-void func_00245828(DamageEvent *damage, s32 arg1, s32 amount, f32 force, s32 kind, s32 arg5);
-void func_002465C8(CGameObjectInstance *actor, Dest *dst, DamageEvent *damage);
+f32 CGameRegion__GetHeight(CGameRegion *region, f32 x, f32 z);
+s32 GameObject_IsOnGround(CGameObjectInstance *actor);
+void DamageEvent_Set(DamageEvent *damage, s32 arg1, s32 amount, f32 force, s32 kind, s32 arg5);
+void CAI__CallHurt(CGameObjectInstance *actor, Dest *dst, DamageEvent *damage);
 
 /* CGameRegion flags for the actor (water, ground...) and periodic damage from the region it stands in. */
-void func_00242E34(CGameObjectInstance *actor, Dest *dst) {
+void AI_UpdateRegionFlags(CGameObjectInstance *actor, Dest *dst) {
     CGameRegion *region;
     CRegionInfo *info;
     DamageEvent damage;
@@ -41,7 +41,7 @@ void func_00242E34(CGameObjectInstance *actor, Dest *dst) {
     if (region == NULL) {
         return;
     }
-    info = func_0022425C(D_800F7078, region);
+    info = CScene__GetRegionInfo(D_800F7078, region);
     if (info == NULL) {
         return;
     }
@@ -56,22 +56,22 @@ void func_00242E34(CGameObjectInstance *actor, Dest *dst) {
                 y = actor->header.m_vPos.y;
                 top = ((CPlayer *) actor->m_AI.m_pParent)->m_pCamera->m_vTCorners[0].y;
             } else {
-                top = func_002671B4(actor) + actor->header.m_vPos.y;
+                top = GameObject_GetCollisionHeight(actor) + actor->header.m_vPos.y;
                 y = actor->header.m_vPos.y;
             }
-            if (top <= func_00268A5C(actor)) {
+            if (top <= GameObject_GetWaterHeight(actor)) {
                 dst->flags |= 0x80;
-            } else if (func_00268A5C(actor) < y) {
+            } else if (GameObject_GetWaterHeight(actor) < y) {
                 dst->flags |= 0x100;
             } else {
                 dst->flags |= 0x200;
             }
         }
     }
-    if (func_0026AFC0(region) && (region->m_wFlags & 0x10) && func_0021F080(actor)) {
+    if (CGameRegion__IsSteep(region) && (region->m_wFlags & 0x10) && func_0021F080(actor)) {
         dst->flags |= 0x1000;
     }
-    if (func_0026BE60(region, actor->header.m_vPos.x, actor->header.m_vPos.z) - actor->header.m_vPos.y < 15.36f) {
+    if (CGameRegion__GetHeight(region, actor->header.m_vPos.x, actor->header.m_vPos.z) - actor->header.m_vPos.y < 15.36f) {
         if (region->m_wFlags & 0x100) {
             dst->flags |= 0x2000;
         }
@@ -87,7 +87,7 @@ void func_00242E34(CGameObjectInstance *actor, Dest *dst) {
         if (dst->flags & 0xC0000) {
             hurt = 0;
         }
-        if (!func_002685F0(actor)) {
+        if (!GameObject_IsOnGround(actor)) {
             hurt = 0;
         }
         if (actor->m_pInstanceBelow != NULL) {
@@ -102,8 +102,8 @@ void func_00242E34(CGameObjectInstance *actor, Dest *dst) {
                         kind = 0x1100000;
                     }
                     dst->timer -= info->m_DamageInterval;
-                    func_00245828(&damage, 0, info->m_DamageAmount << 8, 25.599998f, kind, 0);
-                    func_002465C8(actor, dst, &damage);
+                    DamageEvent_Set(&damage, 0, info->m_DamageAmount << 8, 25.599998f, kind, 0);
+                    CAI__CallHurt(actor, dst, &damage);
                 }
             }
             if (dst->flags & 0x8000) {

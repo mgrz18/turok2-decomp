@@ -7,11 +7,11 @@
 
 extern u8 D_800F7078[];
 
-extern s32 func_00224DF4(void *set, s32 a, s32 b, s32 c);  /* Render_StartWorldEffect */
-extern void func_002051F4(s32 arg0, s32 sprites);         /* release the sprite set */
-extern void func_0027A7A0(s32 sprites, s32 digit, s16 x, s16 y, f32 size, f32 arg4, s32 arg5);
+extern s32 CScene__LoadGraphicSet(void *set, s32 a, s32 b, s32 c);  /* Render_StartWorldEffect */
+extern void CCache__Unlock(s32 arg0, s32 sprites);         /* release the sprite set */
+extern void Hud_DrawImageFrame(s32 sprites, s32 digit, s16 x, s16 y, f32 size, f32 arg4, s32 arg5);
 
-void func_00277CF0(s32 value, f32 x, f32 y, f32 size, f32 arg4, s32 arg5, s32 rightAlign, s32 minDigits) {
+void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 size, f32 arg4, s32 arg5, s32 rightAlign, s32 minDigits) {
     s32 sprites;
     s32 thousands;
     s32 hundreds;
@@ -25,7 +25,7 @@ void func_00277CF0(s32 value, f32 x, f32 y, f32 size, f32 arg4, s32 arg5, s32 ri
     f32 width;
     f32 scale;
 
-    sprites = func_00224DF4(D_800F7078, 4, 0x10, 1);
+    sprites = CScene__LoadGraphicSet(D_800F7078, 4, 0x10, 1);
     if (sprites == 0) {
         return;
     }
@@ -80,12 +80,12 @@ void func_00277CF0(s32 value, f32 x, f32 y, f32 size, f32 arg4, s32 arg5, s32 ri
             x -= width;
         }
         if ((u32) digit < 10) {
-            func_0027A7A0(sprites, digit, x, y, size, arg4, arg5);
+            Hud_DrawImageFrame(sprites, digit, x, y, size, arg4, arg5);
         }
         if (!rightAlign) {
             x += width;
         }
     }
 release:
-    func_002051F4(0, sprites);
+    CCache__Unlock(0, sprites);
 }

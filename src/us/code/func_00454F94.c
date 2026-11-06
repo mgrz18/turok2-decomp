@@ -8,7 +8,7 @@
 extern CPlayerOptions D_8011AB18;
 extern char D_800B3F18[];
 extern char D_800B3F00[];
-s32 func_00454F94(MenuItem *a, Menu *b) {
+s32 OptionsMenu_ControlSideText_2(MenuItem *a, Menu *b) {
 CPlayerOptions *p = &D_8011AB18;
 if (b->player) { CPlayerOptions *q = b->player->m_pOptions; if (q) p = q; }
  if (p->m_ControlSide != 0) { if (p->m_ControlSide == 1) a->text = D_800B3F00; } else a->text = D_800B3F18;

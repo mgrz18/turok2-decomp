@@ -2,13 +2,13 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern f32 func_00298470(f32 x);                                          /* sqrt */
 
 extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
 
-void func_004076B0(CGameObjectInstance *obj, CAI *ai) {
+void Primagen_UpdateMode23(CGameObjectInstance *obj, CAI *ai) {
     CVector3 flat;
 
     if (ai->m_AnimRepeatedCount == 0) {
@@ -28,8 +28,8 @@ void func_004076B0(CGameObjectInstance *obj, CAI *ai) {
         D_800F1F50[0] &= ~0x300;
     }
     if (!D_8012F608.partActive) {
-        func_00243414(obj, ai, 7);
+        CAI__SetMode(obj, ai, 7);
     } else {
-        func_00243414(obj, ai, 0x10);
+        CAI__SetMode(obj, ai, 0x10);
     }
 }

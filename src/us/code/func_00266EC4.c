@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00266EC4(s32 arg0, s32 arg1, s32 arg2) {
+void BitSet(s32 arg0, s32 arg1, s32 arg2) {
     s32 temp_a0;
     s32 temp_a3;
     s32 var_v0;

@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002A0F28(s32 *arg0, s32 arg1);
-void func_002A0F28(s32 *arg0, s32 arg1) {
+extern void mdctBuildBitrevTable(s32 *arg0, s32 arg1);
+void mdctBuildBitrevTable(s32 *arg0, s32 arg1) {
     s32 *ptr;
     s32 i;
     s32 j;

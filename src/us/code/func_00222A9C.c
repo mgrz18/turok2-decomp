@@ -20,15 +20,15 @@ typedef struct B19bLObj {
                u8 padB9;
                u8 fBA;
 } B19bLObj;
-void func_0020F85C(void *, void *, void *);
-s32 func_002123D4(void *, B19bV3f, void *, f32 *);
-void func_0020EEF8(void *, void *, void *);
-void func_0020F9D4(void *, void *, void *);
-void func_0020EF2C(void *, void *, void *);
-void func_0020F040(void *);
-void func_0020EF60(void *, void *, f32);
-f32 func_00213E90(void *);
-void func_00222A9C(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
+void CMtxF__TransformPoint(void *, void *, void *);
+s32 Actors_GetLightVolumeFalloff(void *, B19bV3f, void *, f32 *);
+void CVector3__Add(void *, void *, void *);
+void CMtxF__TransformPointProjective(void *, void *, void *);
+void CVector3__Subtract(void *, void *, void *);
+void CVector3__Normalize(void *);
+void CVector3__Scale(void *, void *, f32);
+f32 LightVolume_GetFlicker(void *);
+void CScene__ComputeLights(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
     f32 w[128];
     B19bV3f dirs[128];
     B19bV3f t0, a, b, c, d, e, f, g, h, i, j;
@@ -72,33 +72,33 @@ void func_00222A9C(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
         db = dirs;
         do {
             o = ents[k];
-            func_0020F85C((u8 *)o + 0x20, pos, &t0);
-            if (func_002123D4(o, t0, &g, &wb[k]) != 0) {
-                func_0020EEF8(&h, &g, &t0);
-                func_0020F9D4((u8 *)o + 0x60, &h, &g);
-                func_0020EF2C((&db[k]), pos, &g);
-                func_0020F040((&db[k]));
+            CMtxF__TransformPoint((u8 *)o + 0x20, pos, &t0);
+            if (Actors_GetLightVolumeFalloff(o, t0, &g, &wb[k]) != 0) {
+                CVector3__Add(&h, &g, &t0);
+                CMtxF__TransformPointProjective((u8 *)o + 0x60, &h, &g);
+                CVector3__Subtract((&db[k]), pos, &g);
+                CVector3__Normalize((&db[k]));
                 b = o->pos;
                 if (o->fBA != 0) {
-                    i.z = i.y = i.x = func_00213E90(o);
-                    func_0020EF60(&f, &i, wb[k] * o->f4);
+                    i.z = i.y = i.x = LightVolume_GetFlicker(o);
+                    CVector3__Scale(&f, &i, wb[k] * o->f4);
                     last = o;
-                    if (o->fB8 != 0) func_0020EF60(&f, &f, -1.0f);
-                    func_0020EEF8(&c, &c, &f);
+                    if (o->fB8 != 0) CVector3__Scale(&f, &f, -1.0f);
+                    CVector3__Add(&c, &c, &f);
                 }
                 u1 = o->f4 * 0.5f;
                 u0 = 1.0f - u1;
-                func_0020EF60(&f, &b, wb[k] * u1);
-                if (o->fB8 != 0) func_0020EF60(&f, &f, -1.0f);
-                func_0020EEF8(&c, &c, &f);
+                CVector3__Scale(&f, &b, wb[k] * u1);
+                if (o->fB8 != 0) CVector3__Scale(&f, &f, -1.0f);
+                CVector3__Add(&c, &c, &f);
                 wb[k] *= u0;
                 x = b.x;
                 if (x < 0.0f) x = -x;
                 if (b.y < 0.0f) x2 = x - b.y; else x2 = x + b.y;
                 if (b.z < 0.0f) u0 = x2 - b.z; else u0 = x2 + b.z;
-                func_0020EF60(&f, (&db[k]), wb[k]);
-                func_0020EF60(&f, &f, u0);
-                func_0020EEF8(&a, &a, &f);
+                CVector3__Scale(&f, (&db[k]), wb[k]);
+                CVector3__Scale(&f, &f, u0);
+                CVector3__Add(&a, &a, &f);
                 if (o->fB8 != 0) wb[k] = -wb[k];
             } else {
                 (&db[k])->x = 0.0f;
@@ -109,7 +109,7 @@ void func_00222A9C(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
                         k++;
         } while (k < n);
     }
-    func_0020F040(&a);
+    CVector3__Normalize(&a);
     do {
         k = 0;
     } while (0);
@@ -127,21 +127,21 @@ void func_00222A9C(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
             b = o->pos;
             s2 = s1 - s0;
             if (o == last) {
-                i.z = i.y = i.x = func_00213E90(o);
-                func_0020EF60(&j, &i, s2 * *pw);
-                func_0020EEF8(&e, &e, &j);
-                func_0020EF60(&j, &i, s0 * *pw);
-                func_0020EEF8(&d, &d, &j);
+                i.z = i.y = i.x = LightVolume_GetFlicker(o);
+                CVector3__Scale(&j, &i, s2 * *pw);
+                CVector3__Add(&e, &e, &j);
+                CVector3__Scale(&j, &i, s0 * *pw);
+                CVector3__Add(&d, &d, &j);
             }
-            func_0020EF60(&f, &b, s2 * *pw);
-            func_0020EEF8(&e, &e, &f);
-            func_0020EF60(&f, &b, s0 * *pw);
-            func_0020EEF8(&d, &d, &f);
+            CVector3__Scale(&f, &b, s2 * *pw);
+            CVector3__Add(&e, &e, &f);
+            CVector3__Scale(&f, &b, s0 * *pw);
+            CVector3__Add(&d, &d, &f);
             k++;
         } while (k < n);
     }
-    func_0020EF60(&d, &d, 0.5f);
-    func_0020EEF8(&c, &c, &d);
+    CVector3__Scale(&d, &d, 0.5f);
+    CVector3__Add(&c, &c, &d);
     if (c.x < 0.0f) e.x += c.x;
     if (c.y < 0.0f) e.y += c.y;
     if (c.z < 0.0f) e.z += c.z;

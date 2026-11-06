@@ -11,7 +11,7 @@ extern char D_800EBAC0;
 extern char D_800E6AC0;
 extern char D_8011ACB0;
 /* Turok 2 region sizes differ from Rage Wars (0x430, 0x584, 0xB0). */
-s32 func_0028D714(u32 address) {
+s32 Boot_CanOverwrite(u32 address) {
     address |= 0x80000000;
     if (((address) >= (u32)&(D_800B75F0) && (address) < (u32)&(D_800B75F0) + (0x10)) || address == (u32)&D_80120690) {
         return 0;

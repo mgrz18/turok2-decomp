@@ -2,7 +2,7 @@
 #include "structs/sound.h"
 
 /* Clears every channel's state. */
-void func_00273E78(SndVoicePool *arg0) {
+void SndVoicePool_ClearFollow(SndVoicePool *arg0) {
     s32 var_v0;
     SndVoice *var_a0;
 

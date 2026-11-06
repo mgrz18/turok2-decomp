@@ -116,13 +116,13 @@ struct Record14 {
 };
 struct LevelActor;
 extern s32 func_00214108(void);
-void *func_002017D4(void *table, s32 index);
+void *CISet__GetBlock(void *table, s32 index);
 s32 func_00214108(void) {
     s32 total = 0;
     s32 i;
     char *base = (char *)&D_800F7078;
     for (i = 0; i < ((IntegerState1504 *)(base))->unk_14A8; i++) {
-        total += ((struct Shape_typemap_13 *)func_002017D4(*((struct ObjectLinks150C *) (base + (i * 8)))->unk_14AC, 2))->field_4;
+        total += ((struct Shape_typemap_13 *)CISet__GetBlock(*((struct ObjectLinks150C *) (base + (i * 8)))->unk_14AC, 2))->field_4;
     }
     return total;
 }

@@ -13,7 +13,7 @@ s32 CList__Remove(s32, s32);
 
 s32 func_0042F8D0(s32);                         /* extern */
 
-s32 func_00468E78(Pool *arg0) {
+s32 CCameraPool__AllocCamera_2(Pool *arg0) {
     s32 temp_s0;
 
     temp_s0 = (s32) arg0->freeList.m_pHead;

@@ -6,7 +6,7 @@ s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 
 /* Releases the sound manager lock. */
-void func_00271514(SndMgr *arg0) {
+void CAudioWorld__Unlock(SndMgr *arg0) {
     s32 temp_v0;
     s32 temp_v1;
     CMutex *temp_s0;

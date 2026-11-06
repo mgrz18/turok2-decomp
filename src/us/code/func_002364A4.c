@@ -15,24 +15,24 @@ typedef struct Pool6BD4 {
 } Pool6BD4;
 extern f32 D_800A6524;
 extern s32 D_800ACFC0;
-void func_0020E810(void *a, CVector3 *b);
+void CQuaternion__FromDirection(void *a, CVector3 *b);
 void CList__Remove(void *list, Node6BD4 *n);
 void CList__AddTail(void *list, Node6BD4 *n);
-void func_00211114(void *a, void *b);
-void func_002106C0(void *a, f32 f);
-void func_0020F040(CVector3 *v);
-void func_0020EF60(CVector3 *a, CVector3 *b, f32 s);
-void func_0020EEF8(CVector3 *a, CVector3 *b, CVector3 *c);
-void func_00210318(void *m, f32 x, f32 y, f32 z);
-void func_0021034C(void *m, f32 a, f32 b, f32 c);
-void func_0020D274(void *a, void *b);
+void CQuaternion__ToMatrix(void *a, void *b);
+void CMtxF__PreRotateX(void *a, f32 f);
+void CVector3__Normalize(CVector3 *v);
+void CVector3__Scale(CVector3 *a, CVector3 *b, f32 s);
+void CVector3__Add(CVector3 *a, CVector3 *b, CVector3 *c);
+void CMtxF__Translate(void *m, f32 x, f32 y, f32 z);
+void CMtxF__ScaleAxes(void *m, f32 a, f32 b, f32 c);
+void CMtxF__ToMtxAffine(void *a, void *b);
 Node6BD4 *func_002364A4(Pool6BD4 *o, CVector3 pos, CVector3 dir, s32 idx, s32 val) {
     u8 m10[0x40];
     u8 m50[0x10];
     Node6BD4 *n;
     u8 *list;
     u8 *l;
-    func_0020E810(m50, &dir);
+    CQuaternion__FromDirection(m50, &dir);
     if (D_800ACFC0 != 0) {
         return 0;
     }
@@ -51,14 +51,14 @@ have:
             CList__AddTail(list, n);
             if (n != 0) {
                 n->unk48 = val;
-                func_00211114(m50, m10);
-                func_002106C0(m10, 1.5707965f);
-                func_0020F040(&dir);
-                func_0020EF60(&dir, &dir, 2.048f);
-                func_0020EEF8(&pos, &pos, &dir);
-                func_00210318(m10, pos.x, pos.y, pos.z);
-                func_0021034C(m10, D_800A6524, 1.0f, D_800A6524);
-                func_0020D274(m10, n->sub);
+                CQuaternion__ToMatrix(m50, m10);
+                CMtxF__PreRotateX(m10, 1.5707965f);
+                CVector3__Normalize(&dir);
+                CVector3__Scale(&dir, &dir, 2.048f);
+                CVector3__Add(&pos, &pos, &dir);
+                CMtxF__Translate(m10, pos.x, pos.y, pos.z);
+                CMtxF__ScaleAxes(m10, D_800A6524, 1.0f, D_800A6524);
+                CMtxF__ToMtxAffine(m10, n->sub);
             }
         }
     }

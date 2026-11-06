@@ -4,7 +4,7 @@ typedef float f32;
 extern f32 D_800AA648;
 extern f32 D_800AA64C;
 
-f32 func_002961E8(f32 value, s32 shift, s32 whole, s32 frac) {
+f32 _getVol(f32 value, s32 shift, s32 whole, s32 frac) {
     s32 n = shift >> 3;
     s32 i = 0;
     f32 base;

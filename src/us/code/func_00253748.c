@@ -10,7 +10,7 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 extern s32 D_8011AAD8;
-u32 func_00253748(s32 arg0, s32 arg1)
+u32 CPlayer__GetPickupCountHigh(s32 arg0, s32 arg1)
 {
   s32 new_var;
   if (!(D_8011AAD8 & 0x10))

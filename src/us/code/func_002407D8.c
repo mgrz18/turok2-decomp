@@ -6,7 +6,7 @@ typedef struct {
 } SortItem;
 
 /* qsort-style comparator on the f32 key at 0x4. */
-s32 func_002407D8(SortItem *arg0, SortItem *arg1) {
+s32 Collision_CompareInstanceHits(SortItem *arg0, SortItem *arg1) {
     s32 var_v0;
 
     var_v0 = 1;

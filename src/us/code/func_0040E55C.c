@@ -11,14 +11,14 @@ typedef struct {
     /* 0x508 */ s32 targetZ;
 } Tracker;
 
-s32 func_00225C84(s32);
+s32 CScene__MarkGeneratorsSaved(s32);
 extern u8 D_800F7078[];
 
-void func_0040E55C(Tracker *arg0) {
+void BlindOne_PhaseMinionsInit(Tracker *arg0) {
     CVector3 *temp_v0;
 
     temp_v0 = arg0->target;
     arg0->targetY = (s32) temp_v0->y;
     arg0->targetZ = (s32) temp_v0->z;
-    func_00225C84((s32) D_800F7078);
+    CScene__MarkGeneratorsSaved((s32) D_800F7078);
 }

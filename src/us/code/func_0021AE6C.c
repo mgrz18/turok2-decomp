@@ -12,9 +12,9 @@ extern f32 D_800DD78C;
 
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */
-void func_00210F68(CQuaternion *, CQuaternion *, CQuaternion *);
+void CQuaternion__Multiply(CQuaternion *, CQuaternion *, CQuaternion *);
 
-CQuaternion func_0021AE6C(CGameObjectInstance *actor) {
+CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *actor) {
     CQuaternion result;
     CQuaternion pitch;
     CQuaternion yaw;
@@ -32,7 +32,7 @@ CQuaternion func_0021AE6C(CGameObjectInstance *actor) {
         yaw.y = s;
         yaw.z = 0.0f;
         yaw.w = func_002974C0(1.5707964f);
-        func_00210F68(&result, &yaw, &camera->m_qViewAlign);
+        CQuaternion__Multiply(&result, &yaw, &camera->m_qViewAlign);
     } else if (actor->header.m_pIntelligence->m_Type == 4) {
         s = func_002982F0(actor->m_AI.m_Turret.m_Pitch * 0.5f);
         pitch.x = s;
@@ -46,7 +46,7 @@ CQuaternion func_0021AE6C(CGameObjectInstance *actor) {
         yaw.z = 0.0f;
         D_800DD78C = s;
         yaw.w = func_002974C0((actor->m_RotY + 3.1415927f) * 0.5f);
-        func_00210F68(&result, &pitch, &yaw);
+        CQuaternion__Multiply(&result, &pitch, &yaw);
     } else {
     own:
         s = func_002982F0((actor->m_RotY + 3.1415927f) * 0.5f);
@@ -55,7 +55,7 @@ CQuaternion func_0021AE6C(CGameObjectInstance *actor) {
         yaw.z = 0.0f;
         D_800DD78C = s;
         yaw.w = func_002974C0((actor->m_RotY + 3.1415927f) * 0.5f);
-        func_00210F68(&result, &yaw, &actor->m_qGround);
+        CQuaternion__Multiply(&result, &yaw, &actor->m_qGround);
     }
     return result;
 }

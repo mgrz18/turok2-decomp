@@ -11,7 +11,7 @@ f32 func_00298470(f32);   /* sqrtf */
 
 /* Whether the segment from a to b crosses the circle of sphere on the ground
  * plane (x and z only). */
-s32 func_0023CF04(Sphere *sphere, CVector3 *a, CVector3 *b) {
+s32 Circle_SegmentIntersects(Sphere *sphere, CVector3 *a, CVector3 *b) {
     CVector3 toCenter;
     CVector3 dir;
     CVector3 perp;

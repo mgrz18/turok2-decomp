@@ -1,18 +1,18 @@
 #include "common.h"
 #include "structs/camera.h"
 
-void func_0027C074();                            /* extern */
-void func_002883E0(void *, void *, s32, s32, s32, s32); /* extern */
+void CCamera__UpdateFlash();                            /* extern */
+void CEngineApp__DrawFilledRect(void *, void *, s32, s32, s32, s32); /* extern */
 extern u8 D_800F6CB0[];
 
 /* Draws the camera's flash: a rectangle of m_FlashColor over its viewport. */
-void func_00280FD8(CCamera *cam) {
+void CCamera__DrawFlash(CCamera *cam) {
     f32 x;
 
-    func_0027C074();
+    CCamera__UpdateFlash();
     if (cam->m_FlashMode != 0) {
         x = cam->m_Viewport.m_ScreenPosX;
-        func_002883E0(D_800F6CB0, cam->m_FlashColor, (s32) x, (s32) cam->m_Viewport.m_ScreenPosY,
+        CEngineApp__DrawFilledRect(D_800F6CB0, cam->m_FlashColor, (s32) x, (s32) cam->m_Viewport.m_ScreenPosY,
                       (s32) (x + cam->m_Viewport.m_Width),
                       (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
     }

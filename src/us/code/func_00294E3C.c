@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_00294E3C(Obj_func_802B3EDC_de *arg0, s32 arg1, s32 arg2) {
+s32 alAuxBusParam(Obj_func_802B3EDC_de *arg0, s32 arg1, s32 arg2) {
     int new_var;
     s32 *base;
     s32 count;

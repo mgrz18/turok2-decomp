@@ -2,7 +2,7 @@
 #include "structs/camera.h"
 
 /* CList: inserts element arg2 before element arg1 (at the head when arg1 has no previous). */
-void func_002005D0(CList *arg0, s32 arg1, s32 arg2) {
+void CList__InsertBefore(CList *arg0, s32 arg1, s32 arg2) {
     s32 temp_v0;
     s32 temp_v1;
     s32 temp_v1_2;

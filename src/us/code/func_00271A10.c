@@ -5,7 +5,7 @@
 
 extern float D_800A80E0;
 extern float D_800A80E4;
-void func_00271A10(ObjRecAt2B9C *obj, float value) {
+void CAudioWorld__SetFxMix(ObjRecAt2B9C *obj, float value) {
     float v;
     float max = D_800A80E0;
     if (value > max || !(value < 0.0f)) {

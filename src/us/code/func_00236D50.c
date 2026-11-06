@@ -69,23 +69,23 @@ typedef struct EmitMgr {
                  u8 pad0[0x7520];
                  Emit *head;     /* 0x7520 in Turok 2 (0x7528 in Rage Wars) */
 } EmitMgr;
-void func_0023417C(Emit *);
-void func_00233FCC(Emit *, s32);
-void func_00234348(EmitMgr *, Emit *, s32);
-void func_00234928(EmitMgr *, Emit *, s32);
+void Trail_PlaceNodes(Emit *);
+void Trail_ComputeFrames(Emit *, s32);
+void Trail_DrawTextured(EmitMgr *, Emit *, s32);
+void Trail_DrawUntextured(EmitMgr *, Emit *, s32);
 /* Static inline in the Rage Wars source file (dropped by the importer). */
 static inline void upd(EmitMgr *m, Emit *e, s32 c) {
     if (e->flags & 8) {
-        func_0023417C(e);
+        Trail_PlaceNodes(e);
     }
     if (e->flags & 4) {
-        func_00233FCC(e, c);
+        Trail_ComputeFrames(e, c);
     }
     if (e->unk48 >= 2) {
         if (e->unk34 >= 0) {
-            func_00234348(m, e, c);
+            Trail_DrawTextured(m, e, c);
         } else {
-            func_00234928(m, e, c);
+            Trail_DrawUntextured(m, e, c);
         }
     }
 }

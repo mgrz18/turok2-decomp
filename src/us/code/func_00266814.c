@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-void func_00266814(s32 arg0, CAI *arg1) {
+void InteractiveAnim_Step(s32 arg0, CAI *arg1) {
     s32 (*temp_v0_2)();
     CAIModeInfo *temp_v0;
 

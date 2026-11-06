@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern void * func_0029E438(void * arg0, const char * arg1, int arg2);
-extern s32 func_0029E4F0(void *(*)(void *, const char *, s32), void *, const char *, char *);
-s32 func_0029E3E0(char *buffer, const char *format, ...) {
-    s32 length = func_0029E4F0(func_0029E438, buffer, format, __builtin_next_arg(format));
+extern void * proutSprintf(void * arg0, const char * arg1, int arg2);
+extern s32 _Printf(void *(*)(void *, const char *, s32), void *, const char *, char *);
+s32 sprintf(char *buffer, const char *format, ...) {
+    s32 length = _Printf(proutSprintf, buffer, format, __builtin_next_arg(format));
     if (length >= 0) {
         buffer[length] = 0;
     }

@@ -3,7 +3,7 @@
 
 extern f32 D_800B6D28;
 
-s32 func_004533F4(void)
+s32 GameOverMenu_TickCountdown_2(void)
 {
   f32 countdown;
   GameMatch *match;

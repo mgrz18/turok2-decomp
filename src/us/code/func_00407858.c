@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-s32 func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
+s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern f32 D_800C0548;
 extern s32 D_8012FA04;
 
-void func_00407858(CGameObjectInstance *obj, CAI *ai) {
+void Primagen_UpdateMode22(CGameObjectInstance *obj, CAI *ai) {
     f32 *animSpeed;
 
     if (ai->m_AnimRepeatedCount != 0) {
@@ -14,6 +14,6 @@ void func_00407858(CGameObjectInstance *obj, CAI *ai) {
         animSpeed = &obj->m_AI.m_AnimSpeed;
         *animSpeed = (f32) D_800C0548;
         D_8012FA04 = -1;
-        func_00243414(obj, ai, 0x13);
+        CAI__SetMode(obj, ai, 0x13);
     }
 }

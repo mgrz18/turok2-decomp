@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_00276658(OwnerRecAtD8 *arg0, s32 arg1) {
+void SndQueue_CancelAllExcept(OwnerRecAtD8 *arg0, s32 arg1) {
     Node_func_80259918_de *node;
     Node_func_80259918_de *next;
     node = arg0->activeNext;

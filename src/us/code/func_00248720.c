@@ -9,9 +9,9 @@ extern f32 D_800ACE10;          /* projectile speed scale */
 extern f32 D_800ACE14;          /* projectile power */
 extern u8 D_800F8928[];
 
-CQuaternion func_0021AE6C(CPlayer *p);
-AmmoInfo *func_0025398C(CPlayer *p, s32 weapon);
-void func_0022F350(void *list, CPlayer *src, CPlayer *owner, s32 a3, s32 target, s32 type,
+CQuaternion CGameObjectInstance__GetRotation(CPlayer *p);
+AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *p, s32 weapon);
+void CParticleSystem__Spawn(void *list, CPlayer *src, CPlayer *owner, s32 a3, s32 target, s32 type,
                    CVector3 vel, CQuaternion aim, CVector3 pos, s32 a40, s32 a44, s32 a48);
 
 /* A debug print compiled out of the release build. Its empty loop notes stop
@@ -40,7 +40,7 @@ static __inline__ s32 usesProjectile(s32 weapon, s32 type) {
 /* Fires the player's weapon: spends the ammo, advances the firing
  * animation, picks the projectile (sniper and charge variants) and
  * launches it from the camera. */
-void func_00248720(CPlayer *p, s32 type) {
+void CPlayer__FireWeapon(CPlayer *p, s32 type) {
     CVector3 pos;
     CVector3 vel;
     CQuaternion aim;
@@ -54,8 +54,8 @@ void func_00248720(CPlayer *p, s32 type) {
     if ((u16) p->m_Mode < 2) {
         return;
     }
-    aim = func_0021AE6C(p);
-    info = func_0025398C(p, p->m_Data.m_CurrentWeapon);
+    aim = CGameObjectInstance__GetRotation(p);
+    info = CPlayer__GetFiringAmmo(p, p->m_Data.m_CurrentWeapon);
     if (info != NULL) {
         found = usesProjectile(p->m_Data.m_CurrentWeapon, type); /* a user variable: loop.c keeps found = 1 in the loop */
         if (found) {
@@ -116,6 +116,6 @@ void func_00248720(CPlayer *p, s32 type) {
         f = D_800ACE14 * 6.0f;
         type = (s32)((f > 6.0f ? 6.0f : f) + 460.0f);
     }
-    func_0022F350(D_800F8928, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? 5 : 1);
+    CParticleSystem__Spawn(D_800F8928, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? 5 : 1);
     D_800ACE14 = p->weapon_particle_damage_scaler = D_800AE350 = D_800ACE10 = 1.0f;
 }

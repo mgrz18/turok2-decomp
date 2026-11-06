@@ -10,7 +10,7 @@ extern u8 D_800C1F8C[];
 extern s32 D_80130920;
 
 /* Inserts the event's character at the cursor (max 22 chars). */
-s32 func_0041AB80(KeyEvent *ev) {
+s32 EnterCheatMenu_InsertLetter(KeyEvent *ev) {
     s32 i;
 
     D_80130920 = -1;

@@ -26,9 +26,9 @@ extern u8 D_80121530[32];
 extern OSPifRam D_80121550[4];
 extern u8 D_80121650[32];
 extern s32 D_800B7A40[4];
-extern s32 func_00299680(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
-extern s32 func_00299A40(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
-extern u8 func_00299E00(u16 address);
+extern s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
+extern u8 __osContAddressCrc(u16 address);
 static __inline__ void _MakeMotorData(int channel, u16 address, u8 *buffer, OSPifRam *mdata) {
     u8 *ptr = (u8 *)mdata->ramarray;
     __OSContRamReadFormat ramreadformat;
@@ -41,7 +41,7 @@ static __inline__ void _MakeMotorData(int channel, u16 address, u8 *buffer, OSPi
     ramreadformat.txsize = 35;
     ramreadformat.rxsize = 1;
     ramreadformat.cmd = 3;
-    ramreadformat.address = (address << 0x5) | func_00299E00(address);
+    ramreadformat.address = (address << 0x5) | __osContAddressCrc(address);
     ramreadformat.datacrc = 0xFF;
     for (i = 0; i < ((s32)(sizeof(ramreadformat.data) / sizeof(ramreadformat.data[0]))); i++) {
         ramreadformat.data[i] = *buffer++;
@@ -69,14 +69,14 @@ s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel)
     for (i = 0; i < ((s32)(sizeof(temp) / sizeof(temp[0]))); i++) {
         temp[i] = 254;
     }
-    ret = func_00299A40(mq, channel, 0x400, temp, 0);
+    ret = __osContRamWrite(mq, channel, 0x400, temp, 0);
     if (ret == 2) {
-        ret = func_00299A40(mq, channel, 0x400, temp, 0);
+        ret = __osContRamWrite(mq, channel, 0x400, temp, 0);
     }
     if (ret != 0) {
         return ret;
     }
-    ret = func_00299680(mq, channel, 0x400, temp);
+    ret = __osContRamRead(mq, channel, 0x400, temp);
     if (ret == 2) {
         ret = 4;
     }
@@ -89,14 +89,14 @@ s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel)
     for (i = 0; i < ((s32)(sizeof(temp) / sizeof(temp[0]))); i++) {
         temp[i] = 128;
     }
-    ret = func_00299A40(mq, channel, 0x400, temp, 0);
+    ret = __osContRamWrite(mq, channel, 0x400, temp, 0);
     if (ret == 2) {
-        ret = func_00299A40(mq, channel, 0x400, temp, 0);
+        ret = __osContRamWrite(mq, channel, 0x400, temp, 0);
     }
     if (ret != 0) {
         return ret;
     }
-    ret = func_00299680(mq, channel, 0x400, temp);
+    ret = __osContRamRead(mq, channel, 0x400, temp);
     if (ret == 2) {
         ret = 4;
     }

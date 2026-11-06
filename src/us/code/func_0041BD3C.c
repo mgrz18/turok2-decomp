@@ -4,7 +4,7 @@
 
 extern s32 D_8011AB18;
 
-s32 *func_0041BD3C(Menu *arg0) {
+s32 *OptionsMenu_GetPlayerOptions(Menu *arg0) {
     s32 *temp_v1_2;
     s32 *var_v0;
     CPlayer *temp_v1;

@@ -9,7 +9,7 @@ extern char D_800C1F28[];
 extern char D_800C1F40[];
 extern char D_800C1F58[];
 
-s32 func_00419A00(MenuItem *a) {
+s32 Menu_DebugModeLabel(MenuItem *a) {
     switch (D_8011AAF0) {
     case 0:
         a->text = D_800C1EE0;

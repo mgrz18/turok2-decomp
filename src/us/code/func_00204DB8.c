@@ -7,7 +7,7 @@ typedef struct {
 } Arg0;
 
 /* Drops a reference; clears flag 0x100 at zero. */
-void func_00204DB8(Arg0 *arg0) {
+void CMemEntry__Unlock(Arg0 *arg0) {
     s32 temp_v0;
 
     temp_v0 = arg0->refCount - 1;

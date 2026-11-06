@@ -21,8 +21,8 @@ void func_004263A0(s32 ch);
 s32 func_00425F84(s32 pad, s32 idx);
 s32 func_00426734(s32 pad);
 s32 func_0041EFE8(s32 a, Menu *o, s32 c);
-void func_00416644(u8 *a, void *b, void *c, void *d, void *e);
-s32 func_00459B50(s32 a, Menu *own, s32 c) {
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
+s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
     s32 pad;
     switch (D_801309B0) {
     case 4:
@@ -33,13 +33,13 @@ s32 func_00459B50(s32 a, Menu *own, s32 c) {
         }
         if (func_0041DCB0(own, pad, 1) != 0) {
             D_801309BC = 1;
-            func_00416644(D_80119E2C, own->context, own->player, own->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, own->context, own->player, own->controller, 0);
         } else {
             func_004263A0(pad);
             if (func_00425F84(pad, D_80130988) == 0) {
-                func_00416644(D_80119E2C, D_0043BCD0, own->player, own->controller, own->context);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BCD0, own->player, own->controller, own->context);
             } else {
-                func_00416644(D_80119E2C, D_0043BD3C, own->player, own->controller, own->context);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BD3C, own->player, own->controller, own->context);
             }
         }
         break;
@@ -51,14 +51,14 @@ s32 func_00459B50(s32 a, Menu *own, s32 c) {
         }
         if (func_0041DCB0(own, pad, 1) != 0) {
             D_801309BC = 1;
-            func_00416644(D_80119E2C, own->context, own->player, own->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, own->context, own->player, own->controller, 0);
         } else {
             func_004263A0(pad);
             if (func_00425F84(pad, D_801309C4) == 0) {
                 func_0041EFE8(a, own, c);
                 return 1;
             } else {
-                func_00416644(D_80119E2C, D_0043BD3C, own->player, own->controller, own->context);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BD3C, own->player, own->controller, own->context);
             }
         }
         break;
@@ -70,13 +70,13 @@ s32 func_00459B50(s32 a, Menu *own, s32 c) {
         }
         if (func_0041DCB0(own, pad, 1) != 0) {
             D_801309BC = 1;
-            func_00416644(D_80119E2C, own->context, own->player, own->controller, 0);
+            MenuPool_OpenMenu(D_80119E2C, own->context, own->player, own->controller, 0);
         } else {
             func_004263A0(pad);
             if (func_00426734(pad) == 0) {
-                func_00416644(D_80119E2C, D_0043BCF4, own->player, own->controller, own->context);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BCF4, own->player, own->controller, own->context);
             } else {
-                func_00416644(D_80119E2C, D_0043BF58, own->player, own->controller, own->context);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BF58, own->player, own->controller, own->context);
             }
         }
         break;
@@ -85,7 +85,7 @@ s32 func_00459B50(s32 a, Menu *own, s32 c) {
         if (D_80130990 != 0) {
             D_8011B114 = 1;
         }
-        func_00416644(D_80119E2C, own->context, own->player, own->controller, 0);
+        MenuPool_OpenMenu(D_80119E2C, own->context, own->player, own->controller, 0);
         break;
     }
     return 1;

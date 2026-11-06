@@ -1,8 +1,8 @@
 #include "common.h"
 
-s32 func_002714B0(s32 *);                   /* extern */
+s32 CAudioWorld__Lock(s32 *);                   /* extern */
 extern s32 D_800F2A00;
 
-void func_00275B7C(void) {
-    func_002714B0(&D_800F2A00);
+void Sound__Lock(void) {
+    CAudioWorld__Lock(&D_800F2A00);
 }

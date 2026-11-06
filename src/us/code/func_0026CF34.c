@@ -4,7 +4,7 @@
 #include "structs/rect.h"
 
 /* The XZ bounding rectangle of the triangle. */
-void func_0026CF34(CGameRegion *arg0, CRect *arg1) {
+void CGameRegion__GetRect(CGameRegion *arg0, CRect *arg1) {
     f32 temp_f0;
     f32 temp_f0_2;
     f32 temp_f0_3;

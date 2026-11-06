@@ -1,15 +1,15 @@
 #include "common.h"
 #include "structs/sound.h"
 
-s32 func_0027392C(void *, s32);                /* extern */
-s32 func_00276658(void *, s32);                /* extern */
-s32 func_00276DFC(void *);                      /* extern */
+s32 SndVoicePool_StopAllExcept(void *, s32);                /* extern */
+s32 SndQueue_CancelAllExcept(void *, s32);                /* extern */
+s32 SpeechPlayer_Stop(void *);                      /* extern */
 s32 osRecvMesg(void *, s32, s32);    /* extern */
 s32 osSendMesg(void *, s32, s32);    /* extern */
 s32 __osDisableInt();                                /* extern */
 s32 __osRestoreInt(s32);                         /* extern */
 
-void func_002717C0(SndMgr *arg0, s32 arg1) {
+void CAudioWorld__StopAllSounds(SndMgr *arg0, s32 arg1) {
     s32 temp_a0;
     s32 temp_v0;
     s32 temp_v1;
@@ -30,8 +30,8 @@ void func_002717C0(SndMgr *arg0, s32 arg1) {
         __osRestoreInt(temp_a0);
         var_a0 = &arg0->pool;
     }
-    func_0027392C(var_a0, arg1);
-    func_00276658(&arg0->queue, arg1);
+    SndVoicePool_StopAllExcept(var_a0, arg1);
+    SndQueue_CancelAllExcept(&arg0->queue, arg1);
     temp_s0_2 = &arg0->lock;
     arg0->fxMix = 0;
     temp_v0 = __osDisableInt();
@@ -43,5 +43,5 @@ void func_002717C0(SndMgr *arg0, s32 arg1) {
     } else {
         __osRestoreInt(temp_v0);
     }
-    func_00276DFC(&arg0->fx);
+    SpeechPlayer_Stop(&arg0->fx);
 }

@@ -17,7 +17,7 @@ extern char D_800B49A0[];
 extern char D_800B49AC[];
 extern char D_800B49B8[];
 
-s32 func_0045B3A4(MenuItem *item) {
+s32 CharNoteMenu_UpdateRank_2(MenuItem *item) {
     s32 kills = D_8013094C;
     char *rank = NULL;
     char *dst;

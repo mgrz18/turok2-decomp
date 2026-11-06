@@ -5,7 +5,7 @@
 
 extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 extern s32 CList__AddTail(CList *list, void *node);
-void func_00275BE8(void *arg0, SoundSourceNode *arg1, s32 arg2) {
+void LoopSounds_Construct(void *arg0, SoundSourceNode *arg1, s32 arg2) {
     s32 i;
     CList__Construct(arg0, 0, 4);
     CList__Construct(&((SoundVoicePool *)arg0)->playing, 0, 4);

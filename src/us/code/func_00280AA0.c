@@ -22,24 +22,24 @@ extern CGlareSource *D_8010753C;
 extern f32 D_800A9BD0;
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
-void func_00279028(s32 a);
-void func_00207FEC(s32 a);
-void func_0020F9D4(CMtxF *m, CVector3 *in, CVector3 *out);
-void func_002803E8(CCamera *cam, f32 x, f32 y, f32 scale, s32 c, s32 d);
+void Hud_SetupTextureMode(s32 a);
+void Render_SetRenderMode(s32 a);
+void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);
+void CCamera__DrawGlare(CCamera *cam, f32 x, f32 y, f32 scale, s32 c, s32 d);
 
-/* func_002810EC, inlined here. */
+/* CCamera__WorldToScreen, inlined here. */
 static inline void ScreenPos(CCamera *cam, CVector3 *point, f32 *x, f32 *y) {
     CVector3 value;
     f32 half;
 
-    func_0020F9D4(&cam->m_mfProjection, point, &value);
+    CMtxF__TransformPointProjective(&cam->m_mfProjection, point, &value);
     half = (f32) (D_800C2030 / 2);
     *x = value.x * half + half;
     *y = value.y * (f32) (-D_800C2034 / 2) + (f32) (D_800C2034 / 2);
 }
 
 /* The glares (lens flares) of the objects this camera sees. */
-void func_00280AA0(CCamera *cam) {
+void CCamera__DrawGlares(CCamera *cam) {
     CGlareSource *e;
     u32 *dl;
     u32 *q0;
@@ -48,8 +48,8 @@ void func_00280AA0(CCamera *cam) {
     s32 mask;
 
     mask = 8 << cam->m_Index;
-    func_00279028(0x64);
-    func_00207FEC(0x1A);
+    Hud_SetupTextureMode(0x64);
+    Render_SetRenderMode(0x1A);
     pp = (u32 **) &D_800D8E24;
     q0 = *pp;
     dl = q0;
@@ -61,7 +61,7 @@ void func_00280AA0(CCamera *cam) {
     for (e = D_8010753C; e != NULL; e = e->m_pNext) {
         if ((e->m_CameraMask & mask) && (*e->m_pFlags & 0x80000)) {
             ScreenPos(cam, &e->m_vPos, &sx, &sy);
-            func_002803E8(cam, sx, sy, e->m_GlareScale * D_800A9BD0, 0, 0);
+            CCamera__DrawGlare(cam, sx, sy, e->m_GlareScale * D_800A9BD0, 0, 0);
         }
     }
 }

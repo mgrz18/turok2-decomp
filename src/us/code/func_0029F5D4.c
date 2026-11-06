@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern Acmd *func_0029F5D4(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
-Acmd *func_0029F5D4(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
+extern Acmd *alRaw16Pull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
+Acmd *alRaw16Pull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
 {
     Acmd *ptr = p;
     s32 nbytes;

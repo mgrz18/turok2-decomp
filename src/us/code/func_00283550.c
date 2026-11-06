@@ -45,7 +45,7 @@ extern f32 D_800B6D34;
 extern f32 D_800A9CB4;
 extern const f32 D_800A9CB8;
 extern const f32 D_800A9CBC;
-s32 func_00283550(B09Emitter *e, s32 mask, f32 f2, s32 flag, f32 f4, u8 *ctx) {
+s32 CEmitter__Advance(B09Emitter *e, s32 mask, f32 f2, s32 flag, f32 f4, u8 *ctx) {
     B09EDef *def = e->def;
     f32 x;
     f32 step;

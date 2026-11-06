@@ -13,8 +13,8 @@ struct Box {
     CVector3 min;
     CVector3 max;
 };
-extern void func_002117DC(f32 *value, f32 target, f32 rate);
-extern void func_00255940(s32 arg0, s32 arg1);
+extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
+extern void PlayerDodgeFall_Update(s32 arg0, s32 arg1);
 struct CQuatern_t;
 typedef struct CQuatern_t CQuatern;
 struct CQuatern_t;
@@ -130,17 +130,17 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern s32 func_0024E5F0(void *, void *, s32);
-extern void func_0024F174(void *, void *, void *);
-extern void func_0024EF70(void *, void *, void *);
-extern s32 func_002685F0(void *arg0);
-void func_00255940(s32 arg0, s32 arg1) {
-    func_002117DC(arg0 + 0xAD0, 0.0f, 0.25f);
-    func_0024EF70((void *)arg0, (void *)arg1, &D_800ADE70);
-    func_0024F174((void *)arg0, (void *)arg1, &D_800ADE28);
+extern s32 CPlayer__SetState(void *, void *, s32);
+extern void CPlayer__MoveOnFoot(void *, void *, void *);
+extern void CPlayer__TurnAndLook(void *, void *, void *);
+extern s32 GameObject_IsOnGround(void *arg0);
+void PlayerDodgeFall_Update(s32 arg0, s32 arg1) {
+    Math_EaseToward(arg0 + 0xAD0, 0.0f, 0.25f);
+    CPlayer__TurnAndLook((void *)arg0, (void *)arg1, &D_800ADE70);
+    CPlayer__MoveOnFoot((void *)arg0, (void *)arg1, &D_800ADE28);
     if (((LevelActor *)arg1)->position1.y <= 0.0f) {
-        if (func_002685F0((void *) arg1) != 0) {
-            func_0024E5F0((void *) arg0, (void *) arg1, 2);
+        if (GameObject_IsOnGround((void *) arg1) != 0) {
+            CPlayer__SetState((void *) arg0, (void *) arg1, 2);
         }
     }
 }

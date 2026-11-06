@@ -21,13 +21,13 @@ typedef struct MusicPlayer {
     /* 0x1E */ s16 id;
 } MusicPlayer;
 
-extern s32 func_00266D8C(s32 table, s32 count, s32 group, s32 *first, s32 *last);
-extern s32 func_002113A4(void);                     /* random */
-extern void *func_002718F4(MusicBank *bank);        /* the bank's sound player */
-extern void func_002714B0(MusicBank *bank);
-extern void func_00271514(MusicBank *bank);
-extern void func_00293E60(void *player, s32 id);    /* alSndpSetSound */
-extern void func_00293EC0(void *player);            /* alSndpStop */
+extern s32 BinaryRange(s32 table, s32 count, s32 group, s32 *first, s32 *last);
+extern s32 Random_Next(void);                     /* random */
+extern void *CAudioWorld__GetSndPlayer(MusicBank *bank);        /* the bank's sound player */
+extern void CAudioWorld__Lock(MusicBank *bank);
+extern void CAudioWorld__Unlock(MusicBank *bank);
+extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
+extern void alSndpStop(void *player);            /* alSndpStop */
 
 /* One song of the group, each with the same weight. */
 static __inline__ s32 pick(MusicBank *bank, s32 group) {
@@ -38,14 +38,14 @@ static __inline__ s32 pick(MusicBank *bank, s32 group) {
     s32 roll;
 
     total = 0;
-    if (func_00266D8C(bank->table, bank->count, group, &first, &last) == 0) {
+    if (BinaryRange(bank->table, bank->count, group, &first, &last) == 0) {
         return -1;
     }
     if (first != last) {
         for (i = first; i <= last; i++) {
             total += 100;
         }
-        roll = func_002113A4() % total;
+        roll = Random_Next() % total;
         total = 0;
         for (i = first; i < last; i++) {
             total += 100;
@@ -63,13 +63,13 @@ static __inline__ void restart(MusicPlayer *player) {
 
     if (player->state != 2 && player->state != 0) {
         player->state = 2;
-        channel = func_002718F4(player->bank);
-        func_00293E60(channel, player->id);
-        func_00293EC0(channel);
+        channel = CAudioWorld__GetSndPlayer(player->bank);
+        alSndpSetSound(channel, player->id);
+        alSndpStop(channel);
     }
 }
 
-s32 func_00276B10(MusicPlayer *player, s32 group, f32 scale) {
+s32 SpeechPlayer_Play(MusicPlayer *player, s32 group, f32 scale) {
     s32 song;
     s32 request;
 
@@ -77,8 +77,8 @@ s32 func_00276B10(MusicPlayer *player, s32 group, f32 scale) {
     if (song == -1) {
         return -1;
     }
-    func_002718F4(player->bank);
-    func_002714B0(player->bank);
+    CAudioWorld__GetSndPlayer(player->bank);
+    CAudioWorld__Lock(player->bank);
     player->group = group;
     player->song = song;
     request = ++player->request;
@@ -90,6 +90,6 @@ s32 func_00276B10(MusicPlayer *player, s32 group, f32 scale) {
     } else {
         player->state = 1;
     }
-    func_00271514(player->bank);
+    CAudioWorld__Unlock(player->bank);
     return request;
 }

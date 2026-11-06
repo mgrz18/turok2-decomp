@@ -17,16 +17,16 @@ extern s32 D_80110028;
 extern u8 D_800F7078[];         /* the level */
 extern char D_800B66D0[];
 
-s32 func_00284174(void);
-s32 func_002548FC(CPlayer *p);
-CRegionInfo *func_0022425C(void *level, void *region);
-void func_00249118(CPlayer *p, HitSource *src, s32 arg3, s32 type);
-void func_0027FC2C(CGameFromCameraPool *game, void *camera, char *text);
-void func_0027580C(s32 sound);
-void func_00225DB0(void *level, u8 *rumble, s32 id, CVector3 v, f32 f6, f32 f7);
-void func_00281054(void *camera, s32 alpha, s32 time);
-void func_00275624(s32 sound);
-void func_00275544(s16 sound, CVector3 pos, s32, s32);
+s32 Cinema_IsActive(void);
+s32 CPlayer__IsInMatchEndState(CPlayer *p);
+CRegionInfo *CScene__GetRegionInfo(void *level, void *region);
+void CPlayer__Kill(CPlayer *p, HitSource *src, s32 arg3, s32 type);
+void CCameraPool__AddText(CGameFromCameraPool *game, void *camera, char *text);
+void Sound__PlaySpeech(s32 sound);
+void CScene__StartRumbles(void *level, u8 *rumble, s32 id, CVector3 v, f32 f6, f32 f7);
+void CCamera__SetHitFlash(void *camera, s32 alpha, s32 time);
+void Sound__Play2D(s32 sound);
+void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -34,7 +34,7 @@ void func_00275544(s16 sound, CVector3 pos, s32, s32);
 /* Hurts a player: damage (8.8) scaled by the reduced-damage state and the
  * multiplayer handicap, unless the player is protected; then the red flash,
  * the low-health warning, the rumble and the hurt sound. */
-void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
+void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     s32 old;
     f32 f;
     s32 check;
@@ -50,10 +50,10 @@ void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
 
     f = 1.0f;
     old = p->m_Data.m_Health;
-    if (func_00284174()) {
+    if (Cinema_IsActive()) {
         return;
     }
-    if (func_002548FC(p)) {
+    if (CPlayer__IsInMatchEndState(p)) {
         return;
     }
     if (D_80110028) {
@@ -79,7 +79,7 @@ void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
         check = p->m_Data.m_SpecialPickupCount[384] & 0xF;
     }
     if (check && p->m_CharacterActor.header.m_pCurrentRegion != NULL) {
-        info = func_0022425C(D_800F7078, ((void *)p->m_CharacterActor.header.m_pCurrentRegion));
+        info = CScene__GetRegionInfo(D_800F7078, ((void *)p->m_CharacterActor.header.m_pCurrentRegion));
         if (info != NULL && (info->m_dwFlags & 0x400000)) {
             return;
         }
@@ -98,7 +98,7 @@ void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     dead = p->m_Data.m_Health == 0;
     if (dead) {
         if (!wasDead) {
-            func_00249118(p, src, arg3, type);
+            CPlayer__Kill(p, src, arg3, type);
         }
         alpha = 0xFF;
         time = 0xC;
@@ -107,8 +107,8 @@ void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
         alpha = (MIN(alpha, 0xFF) < 0x80) ? 0x80 : MIN(alpha, 0xFF);
         time = 0x1E;
         if (old > 0xF00 && p->m_Data.m_Health <= 0xF00 && !D_801198B0.m_Settings.multiplayer) {
-            func_0027FC2C(&D_801198B0, ((void *)p->m_pCamera), D_800B66D0);
-            func_0027580C(0x156);
+            CCameraPool__AddText(&D_801198B0, ((void *)p->m_pCamera), D_800B66D0);
+            Sound__PlaySpeech(0x156);
         }
         amount = damage >> 8;
         if (amount != 0) {
@@ -116,19 +116,19 @@ void func_00249358(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
             zero.x = 0;
             zero.y = 0;
             zero.z = 0;
-            func_00225DB0(D_800F7078, p->m_ContState.m_pContState->rumblePool, 0x11, zero, 51.199997f, f);
+            CScene__StartRumbles(D_800F7078, p->m_ContState.m_pContState->rumblePool, 0x11, zero, 51.199997f, f);
         }
     }
     if (!dead && (s16) (u16)p->m_Mode != 0xF) {
-        func_00281054(((void *)p->m_pCamera), alpha & 0xFF, time);
+        CCamera__SetHitFlash(((void *)p->m_pCamera), alpha & 0xFF, time);
     }
     if ((old >> 8) != (p->m_Data.m_Health >> 8)) {
         if (D_801198B0.m_Settings.multiplayer) {
             if (p->m_pOptions->m_TagMode == 1) {
-                func_00275624(0x27DA);
+                Sound__Play2D(0x27DA);
             }
         } else if (!(p->m_CharacterActor.m_AI.m_dwFlags & 0x80)) {
-            func_00275544(0x3AC0, src->pos, 0, -1);
+            Sound__Play(0x3AC0, src->pos, 0, -1);
         }
     }
 }

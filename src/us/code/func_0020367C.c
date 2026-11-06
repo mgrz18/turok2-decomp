@@ -33,17 +33,17 @@ extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 extern s32 osRecvMesg(void *mq, void **msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
-extern void func_00200818(void *, CMemEntry *);
-extern CCacheEntry *func_002066F8(s32, u32);
-extern CMemEntry *func_002031E8(s32, u32);
-extern void func_002062F8(s32, CMemEntry *);
-extern void func_00206498(s32, CMemEntry *);
-extern void *func_002063B4(s32, u32, u32, u32);
-extern void func_00201B50(s32 *, CCacheEntry *);
-extern CCacheEntry *func_002044A8(s32, CCacheEntry *, s32);
-extern void func_00201DBC(s32 *, u32, u32, void *);
-extern void func_00201E94(s32 *, u32, u32, void *, void *, CCacheEntry *, s32);
-extern void func_002066B0(s32, CCacheEntry *);
+extern void CList__MoveToHead(void *, CMemEntry *);
+extern CCacheEntry *CCache__AllocCacheEntry(s32, u32);
+extern CMemEntry *CCache__AllocMemEntry(s32, u32);
+extern void CCache__FreeMemEntry(s32, CMemEntry *);
+extern void CCache__AddToAddressList(s32, CMemEntry *);
+extern void *CCache__HeapAlloc(s32, u32, u32, u32);
+extern void CDecompressor__DecompressSync(s32 *, CCacheEntry *);
+extern CCacheEntry *CCache__CompleteRequest(s32, CCacheEntry *, s32);
+extern void CLoader__LoadSync(s32 *, u32, u32, void *);
+extern void CLoader__LoadAsync(s32 *, u32, u32, void *, void *, CCacheEntry *, s32);
+extern void CCache__FreeCacheEntry(s32, CCacheEntry *);
 extern void CList__Remove(void *list, void *node);
 extern s32 CList__AddTail(void *list, void *node);
 
@@ -96,21 +96,21 @@ static __inline__ void addref(CMemEntry *node) {
 
 static __inline__ void stamp(CMemEntry *node) {
     node->age = D_800D8DF0;
-    func_00200818(&D_800D81E0, node);
+    CList__MoveToHead(&D_800D81E0, node);
 }
 
 static __inline__ CMemEntry *allocate(u32 size, u32 flags) {
-    CMemEntry *node = func_002031E8(0, flags);
+    CMemEntry *node = CCache__AllocMemEntry(0, flags);
     if (node != 0) {
         addref(node);
-        node->data = func_002063B4(0, size, (flags >> 5) & 1, flags);
+        node->data = CCache__HeapAlloc(0, size, (flags >> 5) & 1, flags);
         if (node->data != 0) {
             node->size = size;
             node->flags |= flags;
-            func_00206498(0, node);
+            CCache__AddToAddressList(0, node);
         } else {
             if (--node->lockCount == 0) node->flags &= ~0x100;
-            func_002062F8(0, node);
+            CCache__FreeMemEntry(0, node);
             node = 0;
         }
     }
@@ -120,7 +120,7 @@ static __inline__ CMemEntry *allocate(u32 size, u32 flags) {
 /* Returns the cached resource for `key` (loading `size` bytes from ROM offset
  * `key` when absent): synchronously when `direct` (or the manager mask) is set,
  * otherwise queues the read and returns 0. */
-CMemEntry *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner, void *tag, s32 spare, u32 direct) {
+CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, void *tag, s32 spare, u32 direct) {
     CCacheEntry *request;
     CCacheEntry *scan;
     CCacheEntry *resolved;
@@ -141,7 +141,7 @@ CMemEntry *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner, voi
     direct |= D_800D8450.mask;
     busy = 0;
     if (direct != 0) {
-        allocated = func_002066F8(0, mode);
+        allocated = CCache__AllocCacheEntry(0, mode);
     } else {
         scan = D_800D8450.active.m_pHead;
         while (scan != 0) {
@@ -152,7 +152,7 @@ CMemEntry *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner, voi
             scan = scan->next;
         }
         if (direct == 0 && busy) goto failed;
-        allocated = func_002066F8(0, mode);
+        allocated = CCache__AllocCacheEntry(0, mode);
     }
     request = allocated;
     if (request != 0) {
@@ -173,11 +173,11 @@ CMemEntry *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner, voi
             if (direct != 0) {
                 if (tag != 0) request->flags |= 4;
                 release();
-                func_00201DBC(&D_800D1CD8, key, size, request->memEntry->data);
-                if (tag != 0) func_00201B50(&D_800D6D68, request);
+                CLoader__LoadSync(&D_800D1CD8, key, size, request->memEntry->data);
+                if (tag != 0) CDecompressor__DecompressSync(&D_800D6D68, request);
                 acquire();
                 if (tag != 0) request->flags &= ~4;
-                resolved = func_002044A8(0, request, 0);
+                resolved = CCache__CompleteRequest(0, request, 0);
                 if (resolved != 0 && resolved != request) addref(resolved->memEntry);
                 release();
                 if (resolved != 0) return resolved->memEntry;
@@ -187,11 +187,11 @@ CMemEntry *func_0020367C(s32 unused, u32 key, u32 size, u32 mode, s32 owner, voi
                 request->flags = oldFlags | 2;
                 if (tag != 0) request->flags = oldFlags | 0xE;
                 release();
-                func_00201E94(&D_800D1CD8, key, size, request->memEntry->data, &D_800D8450, request, 0);
+                CLoader__LoadAsync(&D_800D1CD8, key, size, request->memEntry->data, &D_800D8450, request, 0);
                 return 0;
             }
         }
-        func_002066B0(0, request);
+        CCache__FreeCacheEntry(0, request);
     }
 failed:
     release();

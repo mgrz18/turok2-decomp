@@ -19,10 +19,10 @@ typedef struct ItemList {
     Item items[1];          /* 0x08 */
 } ItemList;
 
-void *func_002017D4(void *table, s32 index);
+void *CISet__GetBlock(void *table, s32 index);
 
 /* Collects up to 10 items of the region containing pos whose bounds hold it. */
-void func_002228E4(CWorld *world, f32 *pos, Item **out, s32 *outCount) {
+void CScene__FindLightsAt(CWorld *world, f32 *pos, Item **out, s32 *outCount) {
     CWorldSector *found;
     ItemList *list;
     Item *item;
@@ -52,7 +52,7 @@ void func_002228E4(CWorld *world, f32 *pos, Item **out, s32 *outCount) {
         *outCount = 0;
         return;
     }
-    list = func_002017D4(*found->m_hData, 2);
+    list = CISet__GetBlock(*found->m_hData, 2);
     n = list->count;
     items = list->items;
     for (i = 0; i < n; i++) {

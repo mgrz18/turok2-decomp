@@ -1,5 +1,5 @@
 /* WRONG CUT: the real function starts at 0x004595D8 (size 0x1A4 = 420): splat
- * cut its first two words (lui/lw D_80130990) as func_004595D8. */
+ * cut its first two words (lui/lw D_80130990) as CharNoteMenu_SelectYes_2. */
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
@@ -27,11 +27,11 @@ extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
 
 s32 func_0041DCB0(Menu *event, s32 mode, s32 arg2);
-CPlayer *func_0025342C(void *state, ControllerProfile *args);
+CPlayer *CPlayerPool__FindByController(void *state, ControllerProfile *args);
 void func_0042E350(CPlayer *player, s32 arg1);
-void func_00416894(void *menu, Menu *event, void *page);
+void MenuPool_OpenChildMenu(void *menu, Menu *event, void *page);
 s32 func_00425F84(s32 mode, s32 arg1);
-void func_00416644(void *menu, void *page, void *player, void *args, void *prev);
+void MenuPool_OpenMenu(void *menu, void *page, void *player, void *args, void *prev);
 
 static __inline__ s32 currentMode(Menu *event) {
     s32 mode;
@@ -44,7 +44,7 @@ static __inline__ s32 currentMode(Menu *event) {
     return mode;
 }
 
-s32 func_004595D8(void *arg0, Menu *event) {
+s32 CharNoteMenu_SelectYes_2(void *arg0, Menu *event) {
     s32 mode = currentMode(event);
     CPlayer *player;
     CPlayerOptions *options;
@@ -55,7 +55,7 @@ s32 func_004595D8(void *arg0, Menu *event) {
         return 1;
     }
     if (D_80130960 != 0) {
-        player = func_0025342C(&D_80119870.m_PlayerList, event->controller);
+        player = CPlayerPool__FindByController(&D_80119870.m_PlayerList, event->controller);
         event->player = player;
         options = player->m_pOptions;
         options->m_nCharacter = D_80130970;
@@ -67,13 +67,13 @@ s32 func_004595D8(void *arg0, Menu *event) {
             options->m_Name[i] = D_80130974[i];
         }
         func_0042E350(player, D_80130950);
-        func_00416894(player->m_pCamera->m_MenuPool, event, D_00438668);
+        MenuPool_OpenChildMenu(player->m_pCamera->m_MenuPool, event, D_00438668);
         return 1;
     }
     if (func_00425F84(mode, D_801309C4) == 0) {
-        func_00416644(D_80119E2C, D_0043BCD0, event->player, event->controller, event->context);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BCD0, event->player, event->controller, event->context);
     } else {
-        func_00416644(D_80119E2C, D_0043BD3C, event->player, event->controller, event->context);
+        MenuPool_OpenMenu(D_80119E2C, D_0043BD3C, event->player, event->controller, event->context);
     }
     return 1;
 }

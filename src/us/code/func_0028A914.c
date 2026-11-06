@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0029AC90(s32 arg0);
-extern s32 func_0028ABE0(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
-extern void func_0028B0FC(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
-extern s32 func_0028B0A8(void *,void *);
+extern void osViSwapBuffer(s32 arg0);
+extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
+extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
+extern s32 __scTaskComplete(void *,void *);
 extern FrameSchedule *D_8011AD18[];
 extern s64 D_8011F168;
 extern void func_00228BBC();
 extern u32 D_800C2210;
-extern u64 func_0029B170(void);
+extern u64 osGetTime(void);
 extern u32 D_800F6CA8;
 extern u32 D_8011AD14;
 extern u32 D_8011B09C;
@@ -24,7 +24,7 @@ extern s32 D_8011B098;
 extern s32 D_8011F130;
 extern s32 D_8011F138;
 extern u32 D_8011F134;
-void func_0028A914(OSSched *sc)
+void __scHandleRDP(OSSched *sc)
 {
     s32 value1 = 0;
     s32 value2 = 0;
@@ -36,7 +36,7 @@ void func_0028A914(OSSched *sc)
     task->state &= ~1;
     if (task->list.type == 1) {
         if ((task->flags & 0x20) != 0) {
-            D_800B6D44 = (f32)(((func_0029B170() - D_8011F168) << 6) / 3) * D_800A9E40;
+            D_800B6D44 = (f32)(((osGetTime() - D_8011F168) << 6) / 3) * D_800A9E40;
         }
         sc->curRDPTask = 0;
         if ((task->flags & 0x20) != 0) {
@@ -57,7 +57,7 @@ void func_0028A914(OSSched *sc)
             D_8011B10C = D_8011AD88 + 1;
             if (D_8011B10C >= schedule->duration && D_8011F138 == 0 && D_8011F130 == 0) {
                 D_8011B098 = schedule->task;
-                func_0029AC90(schedule->task);
+                osViSwapBuffer(schedule->task);
                 D_8011F130++;
             } else {
                 D_8011F138++;
@@ -70,9 +70,9 @@ void func_0028A914(OSSched *sc)
             func_00228BBC(schedule);
         }
     }
-    func_0028B0A8(sc, task);
+    __scTaskComplete(sc, task);
     flags = (sc->curRSPTask == 0) * 2 | (sc->curRDPTask == 0);
-    if (func_0028ABE0(sc, &value1, &value2, flags) != flags) {
-        func_0028B0FC(sc, value1, value2);
+    if (__scSchedule(sc, &value1, &value2, flags) != flags) {
+        __scExec(sc, value1, value2);
     }
 }

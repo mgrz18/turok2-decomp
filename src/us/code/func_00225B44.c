@@ -9,7 +9,7 @@ typedef struct {
 } ActorTable;
 
 /* Clears m_AI.m_pParent on every actor whose parent is arg1. */
-void func_00225B44(ActorTable *arg0, s32 arg1) {
+void CScene__DetachChildren(ActorTable *arg0, s32 arg1) {
     s32 i;
     s32 n;
     CGameObjectInstance **p;

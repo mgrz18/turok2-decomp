@@ -2,31 +2,31 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-extern void func_00246108(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
-extern void func_00243414(CGameObjectInstance *obj, CAI *ai, s32 mode);
-extern void func_00245BAC(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
-extern f32 func_002119FC(f32 lo, f32 hi);
-extern s32 func_00404C44(CGameObjectInstance *obj, CAI *ai, f32 dist);
+extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
+extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
+extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 angle);
+extern f32 Random_Blend(f32 lo, f32 hi);
+extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
 extern f32 D_8012F9F8;         /* cooldown */
 extern BossStep *D_8012F9FC;   /* script */
 extern s32 D_8012FA00;         /* cursor */
 
-void func_00405E04(CGameObjectInstance *obj, CAI *ai) {
+void Primagen_UpdateMode7(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
 
     D_800F1F50[0] |= 0x8000;
-    func_00246108(obj, ai, &t, 1, 1);
+    AI_UpdateTargets(obj, ai, &t, 1, 1);
     D_800F1F50[0] &= ~0x8000;
 
     if (t.m_Sight.m_pTarget == NULL) {
         obj->m_AI.m_AnimSpeed = 1.0f;
         D_8012F9D8.mode = 10;
-        func_00243414(obj, ai, 1);
+        CAI__SetMode(obj, ai, 1);
         return;
     }
-    func_00245BAC(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
+    AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
     if (!D_8012F9D8.scriptOn) {
         return;
     }
@@ -42,13 +42,13 @@ void func_00405E04(CGameObjectInstance *obj, CAI *ai) {
                 D_8012FA00 = 0;
             }
             D_8012F9D8.script.current = D_8012FA00;
-        } while ((f32) D_8012F9FC[D_8012FA00].chance <= func_002119FC(0.0f, 100.0f));
+        } while ((f32) D_8012F9FC[D_8012FA00].chance <= Random_Blend(0.0f, 100.0f));
     }
-    if (func_00404C44(obj, ai, t.m_Sight.m_Dist)) {
+    if (Primagen_RunAttackStep(obj, ai, t.m_Sight.m_Dist)) {
         return;
     }
     if (t.m_Sight.m_Dist <= 460.8f) {
         obj->m_AI.m_AnimSpeed = 1.0f;
-        func_00243414(obj, ai, 1);
+        CAI__SetMode(obj, ai, 1);
     }
 }

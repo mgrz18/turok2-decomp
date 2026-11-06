@@ -4,7 +4,7 @@
 /* AI callback: raises the 0xC8 level by 10 (at most 255) and sets the timer
  * from it, 0..255 -> 240..120. The float temporaries (240 passed through two
  * variables) are what gives the ROM its alternating $f0/$f1 allocation. */
-void func_0025F928(void *self, CAI *ai) {
+void EnemyMode_ReactionFallDown_Enter(void *self, CAI *ai) {
     s32 level = ai->m_Aggression;
     f32 t;
     f32 scale;

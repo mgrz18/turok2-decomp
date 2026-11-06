@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00460610(OSPfs *pfs, int page_no, u8 *data, u8 bank);
+extern s32 __osClearPage_2(OSPfs *pfs, int page_no, u8 *data, u8 bank);
 extern s32 func_00429DE4(OSPfs *pfs);
 extern s32 func_00429DE4(OSPfs *pfs);
 extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-s32 func_00460610(OSPfs *pfs, int page_no, u8 *data, u8 bank)
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
+s32 __osClearPage_2(OSPfs *pfs, int page_no, u8 *data, u8 bank)
 {
     int i;
     s32 ret;
@@ -19,7 +19,7 @@ s32 func_00460610(OSPfs *pfs, int page_no, u8 *data, u8 bank)
     if (ret != 0)
         return ret;
     for (i = 0; i < 8; i++) {
-        ret = func_00299A40(pfs->queue, pfs->channel, page_no * 8 + i, data, 0);
+        ret = __osContRamWrite(pfs->queue, pfs->channel, page_no * 8 + i, data, 0);
         if (ret != 0) {
             break;
         }
@@ -28,4 +28,4 @@ s32 func_00460610(OSPfs *pfs, int page_no, u8 *data, u8 bank)
     ret = func_00429DE4(pfs);
     return ret;
 }
-extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
+extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);

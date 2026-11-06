@@ -7,13 +7,13 @@
 #include "structs/intelligence.h"
 #include "structs/game_object.h"
 
-void func_0020EF2C(CVector3 *out, CVector3 *a, CVector3 *b);
-s32 func_00226EBC(CGameObjectInstance *e, CVector3 *target) {
+void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
+s32 Blast_GetStrength(CGameObjectInstance *e, CVector3 *target) {
     CVector3 d;
     f32 dist;
     u32 t;
     if (*(u8 *)e == 1 && e->header.m_pIntelligence->m_Type == 7) {
-        func_0020EF2C(&d, &e->header.m_vPos, target);
+        CVector3__Subtract(&d, &e->header.m_vPos, target);
         dist = d.x * d.x + d.z * d.z;
         d.y = 0;
         if (262144.0f < dist) {

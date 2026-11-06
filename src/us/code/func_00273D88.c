@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-s32 func_00273D88(RecordRecAt4V3 *record, s32 value) {
+s32 SndVoicePool_IsSoundPlaying(RecordRecAt4V3 *record, s32 value) {
     s32 i;
     SlotRecAtA8 *slot = record->slots;
     for (i = 0; i < 16; i++, slot++) {

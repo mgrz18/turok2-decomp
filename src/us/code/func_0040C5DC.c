@@ -5,7 +5,7 @@
 /* Resets every active slot of the module state with D_00431EE4. */
 
 extern u8 D_00431EE4[];
-extern void func_00236314(void *dst, void *src);
+extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
     MotherBossState *state = &D_8012FB70;
@@ -13,12 +13,12 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 
     for (i = 0; i < 15; i++) {
         if ((mask >> i) & 1) {
-            func_00236314(&state->slots[i].anim, src);
+            ScriptAnimator_SetScript(&state->slots[i].anim, src);
         }
     }
 }
 
-void func_0040C5DC(void) {
+void MotherBoss_FlashActiveSpots(void) {
     MotherBossState *state = &D_8012FB70;
 
     resetSlots(state->activeMask, D_00431EE4);

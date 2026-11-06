@@ -1,4 +1,4 @@
-/* WRONG CUT: the real function is func_00453430, size 0x10C: splat's func_00453430 starts with a stray
+/* WRONG CUT: the real function is CheatsMenu_Init_2, size 0x10C: splat's CheatsMenu_Init_2 starts with a stray
  * never-executed word (a jal) ahead of the 16-aligned real start. */
 #include "common.h"
 
@@ -12,11 +12,11 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-extern u32 D_8011AADC; /* D_8011AAD8.flags (see func_0042F514) */
+extern u32 D_8011AADC; /* D_8011AAD8.flags (see Demo_End) */
 extern s32 D_80130924;
 
 /* Picks the first of the 11 options whose flag is set in the settings (-1 if none). */
-void func_00453430(Screen *screen) {
+void CheatsMenu_Init_2(Screen *screen) {
     s32 index = 0;
     s32 n;
     u32 bit;

@@ -13,13 +13,13 @@ typedef struct CollisionInfo {
 extern CollisionInfo D_800F1CC0;
 extern u8 D_80107590[];
 
-void func_00239F00(CInstanceHeader *actor, CVector3 pos, void *info);
-CVector3 func_0020DFE0(CVector3 *in, f32 amount);
-void func_0020F040(CVector3 *v);
-void func_0020EF60(CVector3 *out, CVector3 *in, f32 scale);
-u8 *func_00227240(void *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos, void *region, f32 arg);
+void Collision_MoveInstance(CInstanceHeader *actor, CVector3 pos, void *info);
+CVector3 CVector3__RandomPerturb(CVector3 *in, f32 amount);
+void CVector3__Normalize(CVector3 *v);
+void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
+u8 *CLevelActorPool__Spawn(void *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos, void *region, f32 arg);
 
-/* func_002688C8's logic, inlined with the collision flags addressed directly. */
+/* GameObject_TraceMove's logic, inlined with the collision flags addressed directly. */
 static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
     CInstanceHeader saved;
     CVector3 end;
@@ -36,7 +36,7 @@ static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *
     D_800F1CC0.flagA = flagA;
     D_800F1CC0.flagB = flagB;
     D_800F1ADC = &hits;
-    func_00239F00(actor, pos, &D_800F1CC0);
+    Collision_MoveInstance(actor, pos, &D_800F1CC0);
     actor->m_vPos.y = pos.y;
     end.x = actor->m_vPos.x;
     end.y = pos.y;
@@ -51,7 +51,7 @@ static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *
 }
 
 /* Spawns a particle of the given kind where an actor would end up at pos. */
-void func_00268C48(CInstanceHeader *actor, CVector3 pos, s32 kind, f32 arg) {
+void GameObject_DropPickupAt(CInstanceHeader *actor, CVector3 pos, s32 kind, f32 arg) {
     CVector3 up;
     CVector3 dir;
     CVector3 velocity;
@@ -62,8 +62,8 @@ void func_00268C48(CInstanceHeader *actor, CVector3 pos, s32 kind, f32 arg) {
     up.x = 0.0f;
     up.y = 1.0f;
     up.z = 0.0f;
-    dir = func_0020DFE0(&up, 0.25f);
-    func_0020F040(&dir);
-    func_0020EF60(&velocity, &dir, 409.59998f);
-    func_00227240(D_80107590, NULL, kind, velocity, at, region, arg);
+    dir = CVector3__RandomPerturb(&up, 0.25f);
+    CVector3__Normalize(&dir);
+    CVector3__Scale(&velocity, &dir, 409.59998f);
+    CLevelActorPool__Spawn(D_80107590, NULL, kind, velocity, at, region, arg);
 }

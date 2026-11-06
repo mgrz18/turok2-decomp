@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-EntryRecAt18V3 *func_00206870(s32 unused, EntryList *list, EntryRecAt18V3 **recent)
+EntryRecAt18V3 *CCache__FindOldestMemEntry(s32 unused, EntryList *list, EntryRecAt18V3 **recent)
 {
     extern s32 D_800D8DF0[];
     EntryRecAt18V3 *e = list->first;

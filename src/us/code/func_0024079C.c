@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0024079C(RenderSortRecord *left, RenderSortRecord *right);
-void func_0024079C(RenderSortRecord *left, RenderSortRecord *right) {
+extern void Collision_SwapInstanceHits(RenderSortRecord *left, RenderSortRecord *right);
+void Collision_SwapInstanceHits(RenderSortRecord *left, RenderSortRecord *right) {
     RenderSortRecord temporary = *left;
     *left = *right;
     *right = temporary;

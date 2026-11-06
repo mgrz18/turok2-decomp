@@ -28,10 +28,10 @@ typedef struct MenuMatchGlobals {
 
 extern int D_800B2680;
 extern MenuMatchGlobals D_801198B0;
-extern s32 func_00270C80(void *, s32, CVector3, s32, s32);
-extern void *func_00281444(MenuMatchGlobals *arg0, CVector3 *arg1);
+extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
+extern void *CCameraPool__GetNearestCamera(MenuMatchGlobals *arg0, CVector3 *arg1);
 
-void func_00271694(ContextRecAt2BC0 *arg0) {
+void CAudioWorld__UpdateAmbientTrack(ContextRecAt2BC0 *arg0) {
     CVector3 zero;
     void *result;
     CVector3 *vec;
@@ -45,10 +45,10 @@ void func_00271694(ContextRecAt2BC0 *arg0) {
             zero.y = value;
             zero.x = value;
         }
-        result = func_00281444(&D_801198B0, &zero);
+        result = CCameraPool__GetNearestCamera(&D_801198B0, &zero);
         vec = &((SharedRecAt564V1 *)(result))->position;
         if ((arg0->frame & 3) == 0) {
-            func_00270C80(arg0, arg0->track, *vec, 0, -1);
+            CAudioWorld__PlaySound(arg0, arg0->track, *vec, 0, -1);
         }
     }
 }

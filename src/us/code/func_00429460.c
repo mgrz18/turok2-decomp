@@ -3,10 +3,10 @@
 
 #include "common.h"
 #include "ultra_types.h"
-u32 func_0029DFC0(void);
-s32 func_00299680(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
-s32 func_00299A40(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
-s32 func_00429EC4(OSPfs *pfs);
+u32 osGetCount(void);
+s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
+s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
+s32 __osPfsSelectBank(OSPfs *pfs);
 static __inline__ s32 __osIdCheckSum(u16 *ptr, u16 *csum, u16 *icsum) {
     u16 data;
     u32 j;
@@ -28,22 +28,22 @@ s32 __osRepairPackId(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
     s32 dev;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429EC4(pfs);
+        ret = __osPfsSelectBank(pfs);
         if (ret != 0) {
             return ret;
         }
     }
     newid->repaired = -1;
-    newid->random = func_0029DFC0();
+    newid->random = osGetCount();
     newid->serial_mid = badid->serial_mid;
     newid->serial_low = badid->serial_low;
     for (i = 0; i < 62; i++) {
         pfs->activebank = i;
-        ret = func_00429EC4(pfs);
+        ret = __osPfsSelectBank(pfs);
         if (ret != 0) {
             return ret;
         }
-        ret = func_00299680(pfs->queue, pfs->channel, 0, buf);
+        ret = __osContRamRead(pfs->queue, pfs->channel, 0, buf);
         if (ret != 0) {
             return ret;
         }
@@ -51,11 +51,11 @@ s32 __osRepairPackId(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
         for (j = 1; j < 32; j++) {
             buf[j] = ~buf[j];
         }
-        ret = func_00299A40(pfs->queue, pfs->channel, 0, buf, 0);
+        ret = __osContRamWrite(pfs->queue, pfs->channel, 0, buf, 0);
         if (ret != 0) {
             return ret;
         }
-        ret = func_00299680(pfs->queue, pfs->channel, 0, temp2);
+        ret = __osContRamRead(pfs->queue, pfs->channel, 0, temp2);
         if (ret != 0) {
             return ret;
         }
@@ -69,11 +69,11 @@ s32 __osRepairPackId(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
         }
         if (i > 0) {
             pfs->activebank = 0;
-            ret = func_00429EC4(pfs);
+            ret = __osPfsSelectBank(pfs);
             if (ret != 0) {
                 return ret;
             }
-            ret = func_00299680(pfs->queue, pfs->channel, 0, buf);
+            ret = __osContRamRead(pfs->queue, pfs->channel, 0, buf);
             if (ret != 0) {
                 return ret;
             }
@@ -83,7 +83,7 @@ s32 __osRepairPackId(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
         }
     }
     pfs->activebank = 0;
-    ret = func_00429EC4(pfs);
+    ret = __osPfsSelectBank(pfs);
     if (ret != 0) {
         return ret;
     }
@@ -97,12 +97,12 @@ s32 __osRepairPackId(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid) {
     addr[2] = 4;
     addr[3] = 6;
     for (j = 0; j < 4; j++) {
-        ret = func_00299A40(pfs->queue, pfs->channel, addr[j], (u8 *)newid, 1);
+        ret = __osContRamWrite(pfs->queue, pfs->channel, addr[j], (u8 *)newid, 1);
         if (ret != 0) {
             return ret;
         }
     }
-    ret = func_00299680(pfs->queue, pfs->channel, 1, buf);
+    ret = __osContRamRead(pfs->queue, pfs->channel, 1, buf);
     if (ret != 0) {
         return ret;
     }

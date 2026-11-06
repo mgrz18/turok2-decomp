@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-void func_00254B6C(CPlayerList *arg0) {
+void CPlayerPool__ClearLastTagMode(CPlayerList *arg0) {
     struct CPlayerOptions *temp_a0;
     CPlayer *var_v1;
 

@@ -5,14 +5,14 @@
 #include "gfx.h"
 
 extern Gfx *D_800D8E24;
-extern s32 func_00207FEC(s32);
-extern void func_00207A70(u32);
-void func_002883E0(void *unused, u8 *color, s32 left, s32 top, s32 right, s32 bottom) {
+extern s32 Render_SetRenderMode(s32);
+extern void Render_SetCombineMode(u32);
+void CEngineApp__DrawFilledRect(void *unused, u8 *color, s32 left, s32 top, s32 right, s32 bottom) {
     if (color[3] != 0) {
         { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
         { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x0)) << 20))); };
-        func_00207FEC(0x13);
-        func_00207A70(0x19);
+        Render_SetRenderMode(0x13);
+        Render_SetCombineMode(0x19);
         { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xFA) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(255) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(255) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((((unsigned int)(color[0]) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(color[1]) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(color[2]) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(color[3]) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); };
         {
             Gfx *cmd = D_800D8E24++;

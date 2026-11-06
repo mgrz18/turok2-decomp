@@ -8,7 +8,7 @@ typedef struct {
     /* 0x40 */ s32 unk40;
 } Flags38;
 
-void func_00275224(Flags38 *arg0) {
+void SndSeq_Duck(Flags38 *arg0) {
     arg0->unk38 = 1;
     arg0->unk40 = 0;
 }

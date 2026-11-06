@@ -3,7 +3,7 @@
 #include "structs/collision.h"
 
 /* Point-in-quad test in one axis-aligned projection of the quad; the edge winding follows the sign of the normal. */
-s32 func_0023C7E8(CollisionQuad *quad, f32 u, f32 v) {
+s32 Quad_ContainsPointXY(CollisionQuad *quad, f32 u, f32 v) {
     s32 i;
     CVector3 *from;
     CVector3 *to;

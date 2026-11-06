@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_00446CFC(void) {
+void BlindOne_BossFlinchEnter_2(void) {
 
 }

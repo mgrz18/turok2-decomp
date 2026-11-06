@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0020C0D0(f32 m[4][4], BoxRecAtC *box, BoxRecAtC *out) {
+void CMtxF__TransformBox(f32 m[4][4], BoxRecAtC *box, BoxRecAtC *out) {
     f32 min[3];
     f32 max[3];
     f32 newMin[3];

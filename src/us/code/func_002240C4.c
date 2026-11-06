@@ -1,11 +1,11 @@
 #include "common.h"
 #include "gfx.h"
 
-void func_0020B5D4(void);
-void func_0023118C(void *, s32);
-void func_0020B624(void);
+void Render_ResetBatches(void);
+void CParticleSystem__Draw(void *, s32);
+void Render_FlushBatches(void);
 
-void func_002240C4(u8 *arg0, s32 arg1) {
+void CScene__DrawParticles(u8 *arg0, s32 arg1) {
     Gfx *g;
 
     /* gSPClipRatio(FRUSTRATIO_1) */
@@ -21,7 +21,7 @@ void func_002240C4(u8 *arg0, s32 arg1) {
     g = D_800D8E24++;
     g->w0 = 0xDB04001C;
     g->w1 = 0xFFFF;
-    func_0020B5D4();
-    func_0023118C(arg0 + 0x18B0, arg1);
-    func_0020B624();
+    Render_ResetBatches();
+    CParticleSystem__Draw(arg0 + 0x18B0, arg1);
+    Render_FlushBatches();
 }

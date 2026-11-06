@@ -6,6 +6,6 @@ typedef struct {
     /* 0x10 */ s32 *unk10;
 } Holder;
 
-s32 func_0021793C(Holder *arg0) {
+s32 CAnimationState__GetData(Holder *arg0) {
     return *arg0->unk10;
 }

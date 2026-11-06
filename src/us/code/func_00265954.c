@@ -1,9 +1,9 @@
-/* Boundary fixed in versions/cuts.us.txt: splat's func_00265954 (0x12C bytes) holds two functions:
- *   0x00265954  func_00265954, the animation check (0xD0 bytes), then a nop;
+/* Boundary fixed in versions/cuts.us.txt: splat's AI_AnimReached (0x12C bytes) holds two functions:
+ *   0x00265954  AI_AnimReached, the animation check (0xD0 bytes), then a nop;
  *   0x00265A28  two stray words (beq $18, $16, ...; sll $2, $18, 3), never run;
- *   0x00265A30  func_00265A30, an init callback (0x50 bytes; its pointer is in
+ *   0x00265A30  Destructible_Setup, an init callback (0x50 bytes; its pointer is in
  *               the data as 0x00265A30).
- * The check is the same as the inlined r01_check of func_002653F8 and
+ * The check is the same as the inlined r01_check of Door_CloseUpdate and
  * func_002651FC, here out of line. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0020486C.c, r01_check, with Turok 2's layouts. */
 #include "common.h"
@@ -23,7 +23,7 @@ typedef struct {
 } ActionState;
 
 /* Has the actor's animation for this state played up to `scale` of its length? */
-s32 func_00265954(CGameObjectInstance *actor, ActionState *state, f32 scale) {
+s32 AI_AnimReached(CGameObjectInstance *actor, ActionState *state, f32 scale) {
     if (actor->m_nAnims == 1) return 1;
     if (actor->m_CurrentAnimation.m_nAnimIndex != (s8) state->anim || actor->m_CurrentAnimation.m_nRequestedAnimIndex != (s8) state->anim) return 0;
     if (state->active != 0 && !(actor->m_dwFlags & 0x400)) return 1;
@@ -35,7 +35,7 @@ s32 func_00265954(CGameObjectInstance *actor, ActionState *state, f32 scale) {
 }
 
 extern u8 D_800B2330[];
-extern void func_00265AF8(CGameObjectInstance *actor, void *state);
-extern void func_00265EEC(CGameObjectInstance *actor, void *state);
-extern void func_004088B0(void);
+extern void Destructible_Step(CGameObjectInstance *actor, void *state);
+extern void Destructible_Hurt(CGameObjectInstance *actor, void *state);
+extern void TotemDefense_Init(void);
 

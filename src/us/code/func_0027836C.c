@@ -4,16 +4,16 @@
 #include "rw/abu_types.h"
 #include "gfx.h"
 
-extern void func_0027836C();
+extern void COnScreen__SelectSmallFont();
 extern s32 D_800F56A8;
 extern Gfx *D_800D8E24;
-extern s32 func_0027B4EC(void);
+extern s32 COnScreen__GetFontTexture(void);
 extern Gfx *D_800D8E24;
-extern s32 func_0027B4EC(void);
-void func_0027836C(void) {
+extern s32 COnScreen__GetFontTexture(void);
+void COnScreen__SelectSmallFont(void) {
     Gfx *cmd;
     s32 v0;
-    v0 = func_0027B4EC();
+    v0 = COnScreen__GetFontTexture();
     if (v0 != 0) {
         D_800F56A8 = 1;
         cmd = D_800D8E24++;
@@ -33,4 +33,4 @@ void func_0027836C(void) {
     }
 }
 extern Gfx *D_800D8E24;
-extern s32 func_0027B4EC(void);
+extern s32 COnScreen__GetFontTexture(void);

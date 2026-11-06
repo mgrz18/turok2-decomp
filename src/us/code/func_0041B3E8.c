@@ -3,7 +3,7 @@
 
 extern s32 D_8011AAD8;
 
-s32 func_0041B3E8(void) {
+s32 CheatMenu_ToggleAllSpecialObjects(void) {
     D_8011AAD8 ^= 0x10;
     return 0;
 }

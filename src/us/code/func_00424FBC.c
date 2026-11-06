@@ -10,7 +10,7 @@ extern char D_800B44D4[];
 extern char D_800B4534[];
 extern s32 D_80130A30;
 
-s32 func_00424FBC(MenuItem *item) {
+s32 MissionMenu_UpdateLevelName(MenuItem *item) {
     switch (D_80130A30) {
         case -1:
         case 0:

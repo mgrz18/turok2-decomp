@@ -3,7 +3,7 @@
 
 #include "rw/junk_types.h"
 
-void func_0026D330(NodePool *p, DLNode *mem, s32 stride, u32 n) {
+void NodePool_Init(NodePool *p, DLNode *mem, s32 stride, u32 n) {
     DLList *u;
     p->freel.head = 0;
     p->freel.tail = 0;

@@ -39,51 +39,51 @@ extern f32 D_8011AD40;
 extern u8 D_8011AD28[];         /* the engine message queue */
 extern u8 D_800B75F0;
 
-extern void func_00202130(void);
+extern void InitializeSystemResources(void);
 extern void osCreateViManager(s32 pri);
-extern void func_0029A580(s32 black);           /* osViBlack */
-extern void func_00425604(void *p);
-extern void func_00425220(void *p);
-extern void func_0029AC90(void *frameBuffer);   /* osViSwapBuffer */
-extern void func_0042F4F0(void);
-extern void func_00286440(CEngineApp *e);
-extern void func_00266C5C(void *p, s32 c, s32 n);   /* memset */
-extern void func_0042FE4C(void *p);
-extern void func_0042E834(void *p);
+extern void osViBlack(s32 black);           /* osViBlack */
+extern void GfxPool_Clear(void *p);
+extern void GfxPool_Alloc(void *p);
+extern void osViSwapBuffer(void *frameBuffer);   /* osViSwapBuffer */
+extern void Demo_Reset(void);
+extern void CEngineApp__Construct(CEngineApp *e);
+extern void memset(void *p, s32 c, s32 n);   /* memset */
+extern void CCameraPool__Construct(void *p);
+extern void CPlayerPool__Construct(void *p);
 extern void CCollisionInfo__Reset(void);
-extern void func_0042FBA4(void *p, s32 a);
-extern void func_0042E5AC(void *p, s32 a, s32 b);
-extern void func_00429FA0(void *p, s32 seed);
-extern void func_00430070(void);
+extern void CCameraPool__NewGame(void *p, s32 a);
+extern void CPlayerPool__NewGame(void *p, s32 a, s32 b);
+extern void CScene__Construct(void *p, s32 seed);
+extern void Cont_InitAll(void);
 extern void func_0042EB50(void *p);
-extern void func_004263DC(void);
-extern void func_00285A94(void);
-extern s32 func_0028D0E0(void);
-extern void func_00288BC8(CEngineApp *e, s32 mode);
+extern void Pak_AllocDirectory(void);
+extern void Controller_WatchAllPaks(void);
+extern s32 SavedPlayers_IsActive(void);
+extern void CEngineApp__SetMode(CEngineApp *e, s32 mode);
 extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
-extern void func_00288C80(CEngineApp *e);
-extern void func_00287ABC(CEngineApp *e);
-extern void func_00285304(void);
-extern void func_00285410(s32 a);
-extern void func_00288C5C(CEngineApp *e, s32 mode);
+extern void CEngineApp__Retrace(CEngineApp *e);
+extern void CEngineApp__Update(CEngineApp *e);
+extern void Controller_ResetAllRumble(void);
+extern void Controller_SetRumbleOptionAll(s32 a);
+extern void CEngineApp__SetupFadeTo(CEngineApp *e, s32 mode);
 
-void func_00286674(CEngineApp *e) {
+void CEngineApp__Main(CEngineApp *e) {
     u32 i;
 
-    func_00202130();
+    InitializeSystemResources();
     osCreateViManager(0xFE);
-    func_0029A580(1);
-    func_00425604(D_80130A58);
-    func_00425220(D_80130A58);
-    func_0029AC90(D_80130A88[0]);
-    func_0029A580(0);
+    osViBlack(1);
+    GfxPool_Clear(D_80130A58);
+    GfxPool_Alloc(D_80130A58);
+    osViSwapBuffer(D_80130A88[0]);
+    osViBlack(0);
     if (D_80000300 == 0) {
         D_8011B0A0[1] = 50.0f;
     } else {
         D_8011B0A0[1] = 60.0f;
     }
     D_8011F124 = NULL;
-    func_0042F4F0();
+    Demo_Reset();
     D_8011B110 = 2;
     D_8011AD88 = 0;
     D_8011B10C = 0;
@@ -96,40 +96,40 @@ void func_00286674(CEngineApp *e) {
     D_800F6CA4 = 0;
     D_8011B0A0[0] = 0;
     D_8011B098 = 0;
-    func_00286440(e);
+    CEngineApp__Construct(e);
     for (i = 0; i < D_800C2210; i++) {
-        func_00266C5C(D_80130A88[i], 0, D_800C2030 * D_800C2034 * 2);
+        memset(D_80130A88[i], 0, D_800C2030 * D_800C2034 * 2);
     }
-    func_0042FE4C((u8 *)e + 0x22C00);
-    func_0042E834((u8 *)e + 0x22BC0);
+    CCameraPool__Construct((u8 *)e + 0x22C00);
+    CPlayerPool__Construct((u8 *)e + 0x22BC0);
     CCollisionInfo__Reset();
     e->m_CartridgeIndex = 0xFCBFB4;
-    func_0042FBA4((u8 *)e + 0x22C00, 0);
-    func_0042E5AC((u8 *)e + 0x22BC0, 0, 0);
-    func_00429FA0(D_800F7078, e->m_CartridgeIndex);
+    CCameraPool__NewGame((u8 *)e + 0x22C00, 0);
+    CPlayerPool__NewGame((u8 *)e + 0x22BC0, 0, 0);
+    CScene__Construct(D_800F7078, e->m_CartridgeIndex);
     if (D_800B6CF1 == 0) {
-        func_00430070();
+        Cont_InitAll();
     }
     func_0042EB50((u8 *)e + 0x19440);
-    func_004263DC();
+    Pak_AllocDirectory();
     D_8011F13C = 0;
     D_8011F148 = 0;
     D_8011B108 = 0;
     D_8011F144 = 1;
     D_8011B114 = 0;
     D_8011AD40 = 120.0f;
-    func_00285A94();
-    if (func_0028D0E0()) {
-        func_00288BC8(e, 13);
+    Controller_WatchAllPaks();
+    if (SavedPlayers_IsActive()) {
+        CEngineApp__SetMode(e, 13);
     } else {
-        func_00288BC8(e, 0);
+        CEngineApp__SetMode(e, 0);
     }
 
     for (;;) {
         osRecvMesg(D_8011AD28, &D_8011F124, 1);
         switch (D_8011F124->type) {
         case 1:
-            func_00288C80(e);
+            CEngineApp__Retrace(e);
             break;
         case 2:
             if ((u8 *)D_8011F124 == (u8 *)e + 0xF0) {
@@ -142,7 +142,7 @@ void func_00286674(CEngineApp *e) {
             if (e->m_Settings.mode == 17) {
                 D_8011B110++;
             } else {
-                func_00287ABC(e);
+                CEngineApp__Update(e);
             }
             break;
         case 4:
@@ -151,18 +151,18 @@ void func_00286674(CEngineApp *e) {
              * (12 words differ). Found by the permuter; no natural form found. */
             if (D_8011F124 != NULL) {
                 D_800B75F0 = 0;
-                func_00285304();
-                func_00285410(0);
+                Controller_ResetAllRumble();
+                Controller_SetRumbleOptionAll(0);
                 e->m_Settings.fastFade = 1;
-                func_00288C5C(e, 17);
+                CEngineApp__SetupFadeTo(e, 17);
                 e->m_Settings.unk1C8 = 1;
                 break;
             } else {
                 D_800B75F0 = 0;
-                func_00285304();
-                func_00285410(0);
+                Controller_ResetAllRumble();
+                Controller_SetRumbleOptionAll(0);
                 e->m_Settings.fastFade = 1;
-                func_00288C5C(e, 17);
+                CEngineApp__SetupFadeTo(e, 17);
                 e->m_Settings.unk1C8 = 1;
                 break;
             }

@@ -23,8 +23,8 @@ s32 func_0042647C(s32 ch);
 s32 func_004264B4(s32 ch);
 s32 func_00426AF8(s32 ch);
 void func_0041D948(Menu *o);
-void func_00416644(u8 *a, void *b, void *c, void *d, void *e);
-void func_00457B64(Menu *own) {
+void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
+void PakMenu_InitLoadGame_2(Menu *own) {
     s32 pad;
     register s32 o1 asm("$8");
     register s32 o2 asm("$18");
@@ -39,7 +39,7 @@ void func_00457B64(Menu *own) {
     pad = own->controller->port;
     if (D_800C2020 != 0) {
         D_801309BC = o1;
-        func_00416644(D_80119E2C, D_004390B0, own->player, own->controller, 0);
+        MenuPool_OpenMenu(D_80119E2C, D_004390B0, own->player, own->controller, 0);
     } else {
         own->items[20].flags &= 0xFEFFFFFF;
         func_004263A0(own->controller->port);
@@ -49,11 +49,11 @@ void func_00457B64(Menu *own) {
             o2 = 1;
             D_801309BC = o2;
             if (func_004264B4(pad) != 0) {
-                func_00416644(D_80119E2C, D_0043BB8C, own->player, own->controller, (void *)o2);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BB8C, own->player, own->controller, (void *)o2);
             } else if (func_00426AF8(pad) != 0) {
-                func_00416644(D_80119E2C, D_0043BF7C, own->player, own->controller, D_0043B610);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, own->player, own->controller, D_0043B610);
             } else {
-                func_00416644(D_80119E2C, D_0043BB20, own->player, own->controller, D_004390B0);
+                MenuPool_OpenMenu(D_80119E2C, D_0043BB20, own->player, own->controller, D_004390B0);
             }
         }
     }

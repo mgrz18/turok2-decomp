@@ -10,7 +10,7 @@ typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
 extern s32 D_8011AAD8;
-s32 func_00253720(s32 arg0, s32 arg1)
+s32 CPlayer__GetPickupCountLow(s32 arg0, s32 arg1)
 {
   unsigned long long new_var;
   new_var = 1;

@@ -29,7 +29,7 @@ static inline f32 Ramp2(CROMParticleEffect *par, f32 xin) {
     }
     return x;
 }
-f32 func_0023270C(CParticle *o, f32 px, B19Q2 *q) {
+f32 CParticle__GetDistanceScale(CParticle *o, f32 px, B19Q2 *q) {
     CROMParticleEffect *par = o->m_pEffect;
     register f32 x asm("$f5") = px;
     f32 t;

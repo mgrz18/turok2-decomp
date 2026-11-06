@@ -7,7 +7,7 @@ typedef struct {
     /* 0x40 */ f32 unk40;
 } Arg0;
 
-void func_00275234(Arg0 *arg0) {
+void SndSeq_Unduck(Arg0 *arg0) {
     arg0->unk38 = 0;
     arg0->unk40 = 1.0f;
 }

@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00267090(s32);
+s32 GameObject_IsSolid(s32);
 
-void func_002530A4(void *arg0, void *arg1)
+void CPlayerPool__RegisterActors(void *arg0, void *arg1)
 {
   s32 temp_v1;
   s32 temp_v1_2;
@@ -17,7 +17,7 @@ void func_002530A4(void *arg0, void *arg1)
     {
       *((s32 *) (((s8 *) var_s0) + 0x54)) = 0;
       *((s32 *) (((s8 *) var_s0) + 0x2DC)) = 0;
-      if (func_00267090((s32) var_s0) != 0)
+      if (GameObject_IsSolid((s32) var_s0) != 0)
       {
         temp_v1 = *((s32 *) (((s8 *) arg1) + 0x8EC));
         if (temp_v1 != 0x200)

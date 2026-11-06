@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern void func_0029AAD0(s32 arg0);
+extern void osViSetSpecialFeatures(s32 arg0);
 extern __OSViContext *D_800B7AC4;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 arg0);
-void func_0029AAD0(s32 arg0) {
+void osViSetSpecialFeatures(s32 arg0) {
     u32 token;
     token = __osDisableInt();
     if (arg0 & 1) {

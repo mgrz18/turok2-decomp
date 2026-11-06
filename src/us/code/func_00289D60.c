@@ -1,11 +1,11 @@
 #include "common.h"
 
-void func_002860A4(s32);                         /* extern */
-void func_002862A4(s32);                         /* extern */
-void func_00288F60();                            /* extern */
+void Credits_Draw(s32);                         /* extern */
+void Credits_Update(s32);                         /* extern */
+void CEngineApp__DrawWorld();                            /* extern */
 
-void func_00289D60(s32 arg0) {
-    func_00288F60();
-    func_002860A4(arg0);
-    func_002862A4(arg0);
+void EngineMode16_Ending_Draw(s32 arg0) {
+    CEngineApp__DrawWorld();
+    Credits_Draw(arg0);
+    Credits_Update(arg0);
 }

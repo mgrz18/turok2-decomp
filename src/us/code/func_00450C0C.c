@@ -50,12 +50,12 @@ struct StatusStep;
 struct StatusStep {
     char pad[0x40];
 };
-extern void func_00450C0C(void);
+extern void Mp_JoinPressingController_2(void);
 extern StatusStep D_8011AB98[];
 extern CPlayerOptions D_8011AB58[];
-extern s32 func_002855E8(ControllerProfile *);
-extern s32 func_002855E8(ControllerProfile *slot);
-void func_00450C0C(void) {
+extern s32 Controller_ConfirmPressed(ControllerProfile *);
+extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
+void Mp_JoinPressingController_2(void) {
     StatusStep *status;
     CPlayerOptions *settings;
     s32 i;
@@ -70,7 +70,7 @@ void func_00450C0C(void) {
     active = 1;
     settings = D_8011AB58;
     for (; i < 4; i++) {
-        if (func_002855E8(&D_800F5EC0[i]) != 0) {
+        if (Controller_ConfirmPressed(&D_800F5EC0[i]) != 0) {
             settings[i].m_bActive = active;
             settings[i].m_nController = i;
             break;

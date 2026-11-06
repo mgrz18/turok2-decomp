@@ -1,11 +1,11 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-s32 func_00214B58(s32, s32);
+s32 CStaticObject__SpawnEvents(s32, s32);
 
 extern f32 D_800B6D28;
 
-void func_002263C0(void *arg0)
+void CScene__AdvanceListedInstances(void *arg0)
 {
   f32 temp_f1;
   int new_var;
@@ -33,7 +33,7 @@ void func_002263C0(void *arg0)
     {
       temp_a0 = *((s32 *) (((s8 *) var_s1) + 0xAF4));
       var_s1 += 4;
-      func_00214B58(temp_a0, var_s3);
+      CStaticObject__SpawnEvents(temp_a0, var_s3);
       var_s0 += 1;
     }
     while (var_s0 < (*((s32 *) (((s8 *) arg0) + 0xBF4))));

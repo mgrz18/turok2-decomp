@@ -1,15 +1,15 @@
-/* Second-module copy of func_0041760C (build/manual/W/func_0041760C.c), with its first-module addresses 0xE0 lower. */
+/* Second-module copy of MpMenu_StartBloodLust (build/manual/W/MpMenu_StartBloodLust.c), with its first-module addresses 0xE0 lower. */
 #include "common.h"
 #include "structs/game.h"
 #include "structs/controller.h"
 
 extern CPlayerOptions D_8011AB58[4]; /* D_8011AAD8.slots */
 
-extern s32 func_002855E8(ControllerProfile *ctl);
-extern s32 func_002113A4(void);
+extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
+extern s32 Random_Next(void);
 extern void func_00430374(void *a, s32 level);
 
-/* func_00417BB0, inlined; here written on the global (the copies in func_00450490/func_0045078C go
+/* Mp_SetupMatchRules, inlined; here written on the global (the copies in MpMenu_StartFragTag_2/MpMenu_StartTeamBlood_2 go
  * through a MatchState pointer, which this one does not match with). */
 static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
     D_8011AAD8.match.tag = started;
@@ -26,7 +26,7 @@ static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
     }
 }
 
-s32 func_0045060C(void) {
+s32 MpMenu_StartBloodLust_2(void) {
     GameSettings *setup = &D_8011AAD8;
     s32 level;
     s32 arg;
@@ -39,7 +39,7 @@ s32 func_0045060C(void) {
         setup->slots[i].m_nCharacter = 0;
     }
     for (i = 0, ctl = D_800F5EC0; i < 4; i++, ctl++) {
-        if (func_002855E8(ctl)) {
+        if (Controller_ConfirmPressed(ctl)) {
             CPlayerOptions *slot = &D_8011AB58[i];
 
             slot->m_bActive = 1;
@@ -51,10 +51,10 @@ s32 func_0045060C(void) {
         if ((u32) (level - 1) < 13) {
             arg = level + 0x2328;
         } else {
-            arg = func_002113A4() % 13 + 0x2329;
+            arg = Random_Next() % 13 + 0x2329;
         }
     } else {
-        arg = func_002113A4() % 13 + 0x2329;
+        arg = Random_Next() % 13 + 0x2329;
     }
     func_00430374(&D_800F6CB0, arg);
     return 1;

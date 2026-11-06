@@ -3,12 +3,12 @@
 #include "structs/sound.h"
 
  
-void func_00293E60(void *sound, s16 sample);
-s32 func_00293580(void *sound);
-void func_00293EC0(void *sound);
+void alSndpSetSound(void *sound, s16 sample);
+s32 alSndpGetState(void *sound);
+void alSndpStop(void *sound);
 
 /* Stop every voice in any of the groups in mask. */
-void func_002742F4(SndVoicePool *set, u32 mask) {
+void SndVoicePool_StopByFlags(SndVoicePool *set, u32 mask) {
     s32 i;
     SndVoice *voice = set->voices;
 
@@ -21,9 +21,9 @@ void func_002742F4(SndVoicePool *set, u32 mask) {
             voice->vp.follow = 0;
             if (voice->vp.frame != owner->frame) {
                 sound = &owner->player;
-                func_00293E60(sound, owner->handles[voice->index]);
-                if (func_00293580(sound)) {
-                    func_00293EC0(sound);
+                alSndpSetSound(sound, owner->handles[voice->index]);
+                if (alSndpGetState(sound)) {
+                    alSndpStop(sound);
                 }
                 voice->sound = -1;
             }

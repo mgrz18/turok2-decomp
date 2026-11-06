@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-void func_00416644(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
+void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
 extern char D_0043BC90[];
 extern s32 D_800C2028;
@@ -12,10 +12,10 @@ extern s32 D_80130990;
 extern s32 D_80130998;
 
 static __inline__ void ShowPlayerMessage(u8 *player, char *fmt) {
-    func_00416644(*(char **)(player + 0x51C) + 0x53C, fmt, player, *(s32 *)(player + 0xA50), 0);
+    MenuPool_OpenMenu(*(char **)(player + 0x51C) + 0x53C, fmt, player, *(s32 *)(player + 0xA50), 0);
 }
 
-s32 func_004233E8(s32 unused, Menu *event) {
+s32 SavePortalMenu_SelectGoBack(s32 unused, Menu *event) {
     u8 *player;
     s32 port;
     s32 *p = &port; /* the ROM stores the port through its address and never reads it */

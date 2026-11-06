@@ -49,7 +49,7 @@ extern SortNode *D_800D8E38;        /* its first node */
 extern DrawItem D_800D8E40[500];
 extern SortNode D_800DC4F0[100];
 
-void *func_002017D4(void *resource, s32 index);
+void *CISet__GetBlock(void *resource, s32 index);
 
 /* Returns the node keyed key in the tree under n, or the node a new key would hang from. */
 static __inline__ SortNode *find_node(SortNode *n, u32 key) {
@@ -72,7 +72,7 @@ static __inline__ SortNode *find_node(SortNode *n, u32 key) {
 /* Flushes the batched model: files each part of its level of detail under its material key into
  * the opaque or the translucent (flags 0x700) sort tree, allocating a node when the key is new,
  * and appends one draw item per queued instance to the node's list; then empties the queue. */
-void func_0020A568(void) {
+void Render_FlushModelBatch(void) {
     void *header;
     s32 *parts;
     s32 count;
@@ -92,14 +92,14 @@ void func_0020A568(void) {
         for (j = 0; j < D_800D8E34; j++) {
             inst = &D_800DD578[j];
             if (inst->m_pTextures == NULL) {
-                inst->m_pTextures = func_002017D4(header, 0);
+                inst->m_pTextures = CISet__GetBlock(header, 0);
             }
         }
-        parts = func_002017D4(func_002017D4(header, 2), D_800D8E14);
+        parts = CISet__GetBlock(CISet__GetBlock(header, 2), D_800D8E14);
         count = *parts;
         for (i = 0; i < count; i++) {
-            part = func_002017D4(parts, i);
-            material = func_002017D4(part, 0);
+            part = CISet__GetBlock(parts, i);
+            material = CISet__GetBlock(part, 0);
             key = (material->id << 8) | D_800D8E13;
             if (material->flags & 0x700) {
                 parent = find_node(D_800D8E30, key);
@@ -187,7 +187,7 @@ void func_0020A568(void) {
                     }
                 }
             }
-            list = func_002017D4(part, 1);
+            list = CISet__GetBlock(part, 1);
             for (j = 0; j < D_800D8E34; j++) {
                 inst = &D_800DD578[j];
                 if (D_800D8E20 != 500) {

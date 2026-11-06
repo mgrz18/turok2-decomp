@@ -1,6 +1,6 @@
 #include "common.h"
 
-s32 func_002640DC(s32 arg0, void *arg1) {
+s32 Platform_GetModeAnim(s32 arg0, void *arg1) {
     switch (*(s8 *)((u8 *)arg1 + 0x37)) {
         case 3:
             return 0x5280;

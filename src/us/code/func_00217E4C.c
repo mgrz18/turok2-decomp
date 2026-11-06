@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern double D_800A59D0;
-extern f32 func_00217E4C(s32 bitAddress, Func802608ECResult range);
-f32 func_00217E4C(s32 bitAddress, Func802608ECResult range) {
+extern f32 Bits_PeekFloat(s32 bitAddress, Func802608ECResult range);
+f32 Bits_PeekFloat(s32 bitAddress, Func802608ECResult range) {
     s32 shift;
     u32 *word;
     u32 value;

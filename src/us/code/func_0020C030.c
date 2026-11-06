@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-void func_0020C030(TreeNode **root, TreeNode **empty_root, TreeNode *node, TreeNode *current) {
+void Render_SortTreeInsert(TreeNode **root, TreeNode **empty_root, TreeNode *node, TreeNode *current) {
     if (current != 0) {
         if (node->key < current->key) {
             current->link18 = node;

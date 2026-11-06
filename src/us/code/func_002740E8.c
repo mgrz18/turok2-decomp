@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-int func_002740E8(ObjRecAtCV4 *obj, int keyA, int keyB) {
+int SndVoicePool_FindSoundWithOwner(ObjRecAtCV4 *obj, int keyA, int keyB) {
     int i;
     int *keys = &obj->slots[0].keyB;
     for (i = 0; i < 16; i++) {

@@ -13,15 +13,15 @@ typedef struct {
     /* 0x18 */ f32 unk18;
 } Arg3;
 
-f32 func_0021160C(f32 value, f32 delta, f32 limit);
-void func_00245BAC(CGameObjectInstance *self, CAI *ai, f32 angle, f32 arg3);
+f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
+void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 angle, f32 arg3);
 
-void func_002620B4(CGameObjectInstance *self, CAI *ai, Arg2 *a2, Arg3 *a3) {
-    self->m_vVelocity.y = func_0021160C(self->m_vVelocity.y, a2->unk60, a3->unk18 * 2.0f);
+void EnemySwim_SteerToPath(CGameObjectInstance *self, CAI *ai, Arg2 *a2, Arg3 *a3) {
+    self->m_vVelocity.y = Math_StepClamped(self->m_vVelocity.y, a2->unk60, a3->unk18 * 2.0f);
     if (self->m_vVelocity.y > 81.92f) {
         self->m_vVelocity.y = 81.92f;
     } else if (self->m_vVelocity.y < -81.92f) {
         self->m_vVelocity.y = -81.92f;
     }
-    func_00245BAC(self, ai, ai->m_Enemy.m_TurnRate, a2->unk4C);
+    AI_TurnClamped(self, ai, ai->m_Enemy.m_TurnRate, a2->unk4C);
 }

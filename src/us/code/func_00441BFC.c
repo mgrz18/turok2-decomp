@@ -13,6 +13,6 @@ typedef struct {
 } Arg0;
 
 /* What is left: info->total - used. */
-s32 func_00441BFC(Arg0 *arg0) {
+s32 TotemDefense_KillsLeft_2(Arg0 *arg0) {
     return arg0->info->total - arg0->used;
 }

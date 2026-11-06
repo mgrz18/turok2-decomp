@@ -17,11 +17,11 @@ typedef struct {
     /* 0x250 */ s32 enabled;
 } State00403520;
 
-void func_00243414(u8 *actor, u8 *ai, s32 a2);
+void CAI__SetMode(u8 *actor, u8 *ai, s32 a2);
 
 /* Moves the encounter to its next step: accumulates the step's value, sets
  * whether it is enabled, and fires the actor's events for steps 7 and 8. */
-void func_00403520(State00403520 *s) {
+void MantidQueen_NextStep(State00403520 *s) {
     Step00403520 *step;
     s32 value;
 
@@ -39,8 +39,8 @@ void func_00403520(State00403520 *s) {
         s->enabled = 0;
     }
     if (s->stepIndex == 7) {
-        func_00243414(s->actor, s->actor + 0x140, 14);
+        CAI__SetMode(s->actor, s->actor + 0x140, 14);
     } else if (s->stepIndex == 8) {
-        func_00243414(s->actor, s->actor + 0x140, 16);
+        CAI__SetMode(s->actor, s->actor + 0x140, 16);
     }
 }

@@ -6,8 +6,8 @@
 extern u16 func_00429CA4(u8 *bytes, s32 count);
 extern s32 __osBlockSum_2(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank);
 extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
-extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
+extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
 s32 __osBlockSum_2(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank)
 {
     int i;
@@ -19,7 +19,7 @@ s32 __osBlockSum_2(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank)
     if (ret != 0)
         return ret;
     for (i = 0; i < 8; i++) {
-        ret = func_00299680(pfs->queue, pfs->channel, page_no * 8 + i, data);
+        ret = __osContRamRead(pfs->queue, pfs->channel, page_no * 8 + i, data);
         if (ret != 0) {
             pfs->activebank = 0;
             func_00429DE4(pfs);

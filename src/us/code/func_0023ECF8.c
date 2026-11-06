@@ -8,15 +8,15 @@
 extern char D_801198B0[];
 extern u8 D_8011AAF1;
 
-s32 func_00253B54(CPlayer *player, s32 index, s32 argument);
-void func_00281060(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
-void func_0027FC2C(void *arg0, void *ui, void *resource);
-s32 func_00275544(s32 sound, CVector3 position, s32 arg4, s32 arg5);
-void func_0027580C(s32 callback);
+s32 CPlayer__AddAmmo(CPlayer *player, s32 index, s32 argument);
+void CCamera__StartFlash(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
+void CCameraPool__AddText(void *arg0, void *ui, void *resource);
+s32 Sound__Play(s32 sound, CVector3 position, s32 arg4, s32 arg5);
+void Sound__PlaySpeech(s32 callback);
 
 /* Weapon pickup: gives the weapon, selects it when it is better than the
  * current one, and plays the descriptor's feedback. */
-s32 func_0023ECF8(CPlayer *player, CPickupEntry *entry) {
+s32 Pickup_GiveWeapon(CPlayer *player, CPickupEntry *entry) {
     WeaponInfo *info;
     void *resource;
     s32 sound;
@@ -27,7 +27,7 @@ s32 func_0023ECF8(CPlayer *player, CPickupEntry *entry) {
 
     result = 0;
     if (entry->m_Params.m_Weapon.m_AmmoType != -1 && player->m_Data.m_WeaponList[entry->m_Params.m_Weapon.m_Weapon] != 0 &&
-        (result = func_00253B54(player, entry->m_Params.m_Weapon.m_AmmoType, entry->m_Params.m_Weapon.m_AmmoAmount)) == 0 &&
+        (result = CPlayer__AddAmmo(player, entry->m_Params.m_Weapon.m_AmmoType, entry->m_Params.m_Weapon.m_AmmoAmount)) == 0 &&
         (!D_8011AAF1 || !player->m_pOptions->m_TagMode)) {
         return 0;
     }
@@ -54,18 +54,18 @@ s32 func_0023ECF8(CPlayer *player, CPickupEntry *entry) {
     sound = entry->m_Sound;
     callback = entry->m_Callback;
     resource = entry->m_pMessage;
-    func_00281060(((void *)p->m_pCamera), 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
+    CCamera__StartFlash(((void *)p->m_pCamera), 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
     if (resource != NULL) {
-        func_0027FC2C(D_801198B0, ((void *)p->m_pCamera), resource);
+        CCameraPool__AddText(D_801198B0, ((void *)p->m_pCamera), resource);
     }
     if (sound != 0) {
-        func_00275544(sound, p->m_CharacterActor.header.m_vPos, 0, -1);
+        Sound__Play(sound, p->m_CharacterActor.header.m_vPos, 0, -1);
     }
     if (callback != 0) {
-        func_0027580C(callback);
+        Sound__PlaySpeech(callback);
     }
     if (result == 0) {
-        func_00253B54(p, entry->m_Params.m_Weapon.m_AmmoType, entry->m_Params.m_Weapon.m_AmmoAmount);
+        CPlayer__AddAmmo(p, entry->m_Params.m_Weapon.m_AmmoType, entry->m_Params.m_Weapon.m_AmmoAmount);
     }
     return 1;
 }

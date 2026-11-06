@@ -14,7 +14,7 @@ extern s32 D_8011AADC;
 extern s32 D_8011AAD8;
 extern s32 D_8011AAD8;
 extern s32 D_8011AADC;
-s32 func_0041B404(struct StateRecAt14 *item) {
+s32 CheatMenu_AllSpecialObjectsText(struct StateRecAt14 *item) {
     if (D_8011AADC & 0x10) {
         item->unk8 |= 0x1000000;
     } else {

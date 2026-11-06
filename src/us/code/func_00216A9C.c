@@ -3,8 +3,8 @@
 /* Expands a packed animation resource in place: rebuilds the six-chunk file
  * with chunks 0-4 copied unchanged and chunk 5 (the compressed animation)
  * replaced by a decoded one, whose position and rotation tracks
- * func_00216604 fills in. A resource that fails to decode is dropped.
- * packInit/packAdd/decodeAnim are func_00218548/func_00218590/func_00218748 inlined. */
+ * Anim_DecodeTracks fills in. A resource that fails to decode is dropped.
+ * packInit/packAdd/decodeAnim are Pack_Init/Pack_Add/Anim_DecodeAnimation inlined. */
 
 typedef struct Pack {
     /* 0x0 */ s32 count;
@@ -35,13 +35,13 @@ extern f32 D_800E67A0;
 extern s32 D_800E67A4;
 extern s32 D_800E67A8;
 
-s32 func_00200B00(Resource **res, s32 arg1);
-void *func_002017D4(void *file, s32 index);
-void *func_002017E8(void *file, s32 index, s32 *size);
-void func_002052D8(s32, Pack **blk);
-void func_002057B0(s32, Resource **res, Pack **blk);
-Pack **func_00205D7C(s32, Resource **res, s32 size);
-s32 func_00216604(void *source, Pack *table, s32 tracks, s32 channels, s32 radius, s32 encoding);
+s32 ProPackDecompress(Resource **res, s32 arg1);
+void *CISet__GetBlock(void *file, s32 index);
+void *CISet__GetBlockAndSize(void *file, s32 index, s32 *size);
+void CCache__Deallocate(s32, Pack **blk);
+void CCache__DeallocAndReplaceCompressedData(s32, Resource **res, Pack **blk);
+Pack **CCache__AllocateMemoryForDecompression(s32, Resource **res, s32 size);
+s32 Anim_DecodeTracks(void *source, Pack *table, s32 tracks, s32 channels, s32 radius, s32 encoding);
 void func_0029E460(void *dst, void *src, s32 size);
 
 static __inline__ void packInit(Pack *pack, s32 count) {
@@ -83,18 +83,18 @@ static __inline__ void *packAdd(Pack *pack, void *src, s32 size) {
 
 static __inline__ s32 decodeAnim(void *src, void *dst) {
     s32 ok;
-    AnimHeader *h = func_002017D4(src, 0);
-    void *posSrc = func_002017D4(src, 1);
-    void *rotSrc = func_002017D4(src, 2);
-    Pack *posDst = func_002017D4(dst, 1);
-    Pack *rotDst = func_002017D4(dst, 2);
+    AnimHeader *h = CISet__GetBlock(src, 0);
+    void *posSrc = CISet__GetBlock(src, 1);
+    void *rotSrc = CISet__GetBlock(src, 2);
+    Pack *posDst = CISet__GetBlock(dst, 1);
+    Pack *rotDst = CISet__GetBlock(dst, 2);
 
     D_800E6798 = 1;
     D_800E6794 = 0;
     D_800E679C = -2000.0f;
     D_800E67A0 = 2000.0f;
     D_800E6790 = h->fC;
-    if (func_00216604(posSrc, posDst, h->posTracks, 3, h->radius, h->encoding) == 0) {
+    if (Anim_DecodeTracks(posSrc, posDst, h->posTracks, 3, h->radius, h->encoding) == 0) {
         ok = 0;
     } else {
         D_800E6798 = 0;
@@ -102,12 +102,12 @@ static __inline__ s32 decodeAnim(void *src, void *dst) {
         D_800E679C = -1.0f;
         D_800E67A0 = 1.0f;
         D_800E6790 = h->fC;
-        ok = func_00216604(rotSrc, rotDst, h->rotTracks, 4, h->radius, h->encoding) != 0;
+        ok = Anim_DecodeTracks(rotSrc, rotDst, h->rotTracks, 4, h->radius, h->encoding) != 0;
     }
     return ok;
 }
 
-void func_00216A9C(s32 arg0, Resource **res) {
+void Anim_Decompress(s32 arg0, Resource **res) {
     s32 size0;
     s32 size1;
     s32 size2;
@@ -133,21 +133,21 @@ void func_00216A9C(s32 arg0, Resource **res) {
     Pack *pack;
     Pack *out;
 
-    if (func_00200B00(res, 1) == 0) {
+    if (ProPackDecompress(res, 1) == 0) {
         return;
     }
     file = (*res)->file;
     oldSize = (*res)->size;
-    chunk0 = func_002017E8(file, 0, &size0);
-    chunk1 = func_002017E8(file, 1, &size1);
-    chunk2 = func_002017E8(file, 2, &size2);
-    chunk3 = func_002017E8(file, 3, &size3);
-    chunk4 = func_002017E8(file, 4, &size4);
-    anim = func_002017E8(file, 5, &size5);
-    h = func_002017D4(anim, 0);
-    func_002017E8(anim, 1, &size6);
-    func_002017E8(anim, 2, &size7);
-    func_002017D4(chunk3, 0);
+    chunk0 = CISet__GetBlockAndSize(file, 0, &size0);
+    chunk1 = CISet__GetBlockAndSize(file, 1, &size1);
+    chunk2 = CISet__GetBlockAndSize(file, 2, &size2);
+    chunk3 = CISet__GetBlockAndSize(file, 3, &size3);
+    chunk4 = CISet__GetBlockAndSize(file, 4, &size4);
+    anim = CISet__GetBlockAndSize(file, 5, &size5);
+    h = CISet__GetBlock(anim, 0);
+    CISet__GetBlockAndSize(anim, 1, &size6);
+    CISet__GetBlockAndSize(anim, 2, &size7);
+    CISet__GetBlock(chunk3, 0);
     n = h->frames;
     D_800E67A4 = n;
     D_800E67A8 = n;
@@ -159,7 +159,7 @@ void func_00216A9C(s32 arg0, Resource **res) {
     posSize = (h->posTracks << 4) * D_800E67A8 + ((h->posTracks * 4 + 0xF) & ~7);
     rotSize = (h->rotTracks << 4) * D_800E67A8 + ((h->rotTracks * 4 + 0xF) & ~7);
     animSize = rotSize + posSize + 0x38;
-    blk = func_00205D7C(0, res, oldSize - size5 + animSize);
+    blk = CCache__AllocateMemoryForDecompression(0, res, oldSize - size5 + animSize);
     if (blk != NULL) {
         pack = *blk;
         packInit(pack, 6);
@@ -174,10 +174,10 @@ void func_00216A9C(s32 arg0, Resource **res) {
         packAdd(out, NULL, posSize);
         packAdd(out, NULL, rotSize);
         if (!decodeAnim(anim, out)) {
-            func_002052D8(0, blk);
-            func_002057B0(0, res, NULL);
+            CCache__Deallocate(0, blk);
+            CCache__DeallocAndReplaceCompressedData(0, res, NULL);
             return;
         }
     }
-    func_002057B0(0, res, blk);
+    CCache__DeallocAndReplaceCompressedData(0, res, blk);
 }

@@ -7,14 +7,14 @@ typedef struct {
     /* 0x50 */ f32 yaw;
 } BobObject;
 
-void func_002117DC(f32 *value, f32 target, f32 rate);
-f32 func_0021170C(f32 value, f32 rate);
+void Math_EaseToward(f32 *value, f32 target, f32 rate);
+f32 Math_DecayToZero(f32 value, f32 rate);
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 
 /* Settles the view tilt and kicks, then bobs the view with the stride,
  * scaled by the speed. */
-void func_0024FE10(CPlayer *p, BobObject *obj) {
+void CPlayer__BobViewStride(CPlayer *p, BobObject *obj) {
     f32 speed;
     f32 amount;
     f32 phase;
@@ -22,10 +22,10 @@ void func_0024FE10(CPlayer *p, BobObject *obj) {
     f32 y;
     f32 side;
 
-    func_002117DC(&p->m_vHeadRotOffset.z, 0.0f, 0.25f);
-    func_002117DC(&p->m_vHeadRotOffset.y, 0.0f, 0.5f);
-    p->m_vHeadWobbleRotOffset.x = func_0021170C(p->m_vHeadWobbleRotOffset.x, 0.087266475f);
-    p->m_vHeadWobbleRotOffset.y = func_0021170C(p->m_vHeadWobbleRotOffset.y, 0.087266475f);
+    Math_EaseToward(&p->m_vHeadRotOffset.z, 0.0f, 0.25f);
+    Math_EaseToward(&p->m_vHeadRotOffset.y, 0.0f, 0.5f);
+    p->m_vHeadWobbleRotOffset.x = Math_DecayToZero(p->m_vHeadWobbleRotOffset.x, 0.087266475f);
+    p->m_vHeadWobbleRotOffset.y = Math_DecayToZero(p->m_vHeadWobbleRotOffset.y, 0.087266475f);
 
     speed = p->m_Speed;
     if (speed < 0.0f) {
@@ -50,9 +50,9 @@ void func_0024FE10(CPlayer *p, BobObject *obj) {
     } else {
         y = base - amount * 15.36f * func_002982F0(phase);
     }
-    func_002117DC(&p->m_vEyeOffset.y, y, 0.5f);
+    Math_EaseToward(&p->m_vEyeOffset.y, y, 0.5f);
     side = amount * (func_002974C0(phase) * 7.68f);
-    func_002117DC(&p->m_vEyeOffset.x, -func_002982F0(obj->yaw - 1.5707964f) * side, 0.5f);
-    func_002117DC(&p->m_vEyeOffset.z, -func_002974C0(obj->yaw - 1.5707964f) * side, 0.5f);
-    func_002117DC(&p->m_vHeadWobbleRotOffset.z, -(side * 0.0017044232f), 0.25f);
+    Math_EaseToward(&p->m_vEyeOffset.x, -func_002982F0(obj->yaw - 1.5707964f) * side, 0.5f);
+    Math_EaseToward(&p->m_vEyeOffset.z, -func_002974C0(obj->yaw - 1.5707964f) * side, 0.5f);
+    Math_EaseToward(&p->m_vHeadWobbleRotOffset.z, -(side * 0.0017044232f), 0.25f);
 }

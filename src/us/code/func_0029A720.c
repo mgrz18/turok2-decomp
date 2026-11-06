@@ -36,7 +36,7 @@ struct OSDevMgr_func_802BA350_de;
 typedef struct OSDevMgr_func_802BA350_de OSDevMgr_func_802BA350_de;
 typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
-extern void func_0029B030(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
+extern void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
 extern OSIntMask __osDisableInt(void);
 extern u64 D_80121910[];
 extern void D_0029A890(void *arg);
@@ -44,8 +44,8 @@ extern OSIoMesgCode802BA23C D_80122970;
 extern OSIoMesgCode802BA23C D_80122950;
 extern OSDevMgr_func_802BA350_de D_800B7AD0;
 extern u32 __osDisableInt(void);
-extern void func_0029BDB8();
-extern void func_0029A5E0(void);
+extern void __osTimerServicesInit();
+extern void __osViInit(void);
 extern void osCreateViManager(s32 pri);
 extern OSDevMgr_func_802BA350_de D_800B7AD0;
 extern OSThread D_801216E0;
@@ -55,11 +55,11 @@ extern OSMesg D_80122930[5];
 extern OSIoMesgCode802BA23C D_80122950;
 extern OSIoMesgCode802BA23C D_80122970;
 extern void D_0029A890(void *arg);
-extern void func_0029B950(s32 event, OSMesgQueue *mq, OSMesg msg);
-extern s32 func_0029B150(OSThread *t);
-extern void func_0029B9B0(OSThread *t, s32 pri);
-extern void func_0029B060(OSThread *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
-extern void func_0029BB10(OSThread *t);
+extern void osSetEventMesg(s32 event, OSMesgQueue *mq, OSMesg msg);
+extern s32 osGetThreadPri(OSThread *t);
+extern void osSetThreadPri(OSThread *t, s32 pri);
+extern void osCreateThread(OSThread *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
+extern void osStartThread(OSThread *t);
 extern u32 __osDisableInt(void);
 void osCreateViManager(s32 pri)
 {
@@ -69,21 +69,21 @@ void osCreateViManager(s32 pri)
     if (D_800B7AD0.active) {
         return;
     }
-    func_0029BDB8();
-    func_0029B030(&D_80122910, D_80122930, 5);
+    __osTimerServicesInit();
+    osCreateMesgQueue(&D_80122910, D_80122930, 5);
     D_80122950.hdr.type = 13;
     D_80122950.hdr.pri = 0;
     D_80122950.hdr.retQueue = 0;
     D_80122970.hdr.type = 14;
     D_80122970.hdr.pri = 0;
     D_80122970.hdr.retQueue = 0;
-    func_0029B950(7, &D_80122910, &D_80122950);
-    func_0029B950(3, &D_80122910, &D_80122970);
+    osSetEventMesg(7, &D_80122910, &D_80122950);
+    osSetEventMesg(3, &D_80122910, &D_80122970);
     oldPri = -1;
-    myPri = func_0029B150(0);
+    myPri = osGetThreadPri(0);
     if (myPri < pri) {
         oldPri = myPri;
-        func_0029B9B0(0, pri);
+        osSetThreadPri(0, pri);
     }
     savedMask = __osDisableInt();
     D_800B7AD0.active = 1;
@@ -93,11 +93,11 @@ void osCreateViManager(s32 pri)
     D_800B7AD0.acsQueue = 0;
     D_800B7AD0.dma = 0;
     D_800B7AD0.edma = 0;
-    func_0029B060(&D_801216E0, 0, D_0029A890, &D_800B7AD0, D_80121910 + 0x1000 / sizeof(u64), pri);
-    func_0029A5E0();
-    func_0029BB10(&D_801216E0);
+    osCreateThread(&D_801216E0, 0, D_0029A890, &D_800B7AD0, D_80121910 + 0x1000 / sizeof(u64), pri);
+    __osViInit();
+    osStartThread(&D_801216E0);
     __osRestoreInt(savedMask);
     if (oldPri != -1) {
-        func_0029B9B0(0, oldPri);
+        osSetThreadPri(0, oldPri);
     }
 }

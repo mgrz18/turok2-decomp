@@ -2,13 +2,13 @@
 #include "structs/intelligence.h"
 #include "structs/vector.h"
 
-void func_00211114(void *src, CMtxF *dst);
-void func_002105A4(CMtxF *mtx, f32 angle);
-void func_0021034C(CMtxF *mtx, f32 x, f32 y, f32 z);
-void func_0020F510(void *pos, f32 value);
-void func_00210318(CMtxF *mtx, f32 x, f32 y, f32 z);
-void func_00210C3C(CMtxF *mtx);
-void func_0020D274(CMtxF *mtx, void *dst);
+void CQuaternion__ToMatrix(void *src, CMtxF *dst);
+void CMtxF__SetRotateY(CMtxF *mtx, f32 angle);
+void CMtxF__ScaleAxes(CMtxF *mtx, f32 x, f32 y, f32 z);
+void CVector3__ClampLength(void *pos, f32 value);
+void CMtxF__Translate(CMtxF *mtx, f32 x, f32 y, f32 z);
+void CMtxF__SwapYZRows(CMtxF *mtx);
+void CMtxF__ToMtxAffine(CMtxF *mtx, void *dst);
 
 extern s32 D_8010FF20;
 extern s32 D_800B6D1C; /* current buffer index */
@@ -28,17 +28,17 @@ typedef struct {
 } Func00215884Obj;
 
 /* Builds the object transform (rotation, uniform scale, translation) into its current matrix slot. */
-void func_00215884(Func00215884Obj *obj) {
+void CLevelActor__BuildMatrix(Func00215884Obj *obj) {
     CMtxF mtx;
 
     if (obj->def->m_Type == 8) {
-        func_00211114(&D_8010FF20, &mtx);
+        CQuaternion__ToMatrix(&D_8010FF20, &mtx);
     } else {
-        func_002105A4(&mtx, obj->angle);
+        CMtxF__SetRotateY(&mtx, obj->angle);
     }
-    func_0021034C(&mtx, obj->scale, obj->scale, obj->scale);
-    func_0020F510(obj->pos, 20000.0f);
-    func_00210318(&mtx, obj->pos[0], obj->pos[1] + obj->yOffset, obj->pos[2]);
-    func_00210C3C(&mtx);
-    func_0020D274(&mtx, &obj->mtx[D_800B6D1C]);
+    CMtxF__ScaleAxes(&mtx, obj->scale, obj->scale, obj->scale);
+    CVector3__ClampLength(obj->pos, 20000.0f);
+    CMtxF__Translate(&mtx, obj->pos[0], obj->pos[1] + obj->yOffset, obj->pos[2]);
+    CMtxF__SwapYZRows(&mtx);
+    CMtxF__ToMtxAffine(&mtx, &obj->mtx[D_800B6D1C]);
 }

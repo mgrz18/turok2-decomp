@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern void func_00211C30(void *arg0);
+extern void Edge_Normalize(void *arg0);
 f32 func_00298470(f32);
 extern float D_800A56CC;
 extern f32 func_00298470(f32);
 extern f32 D_800A56CC;
 extern float func_00298470(float);
-void func_00211C30(void *arg0)
+void Edge_Normalize(void *arg0)
 {
     ObjRecAt2CV1 *o = arg0;
     f32 magSq;

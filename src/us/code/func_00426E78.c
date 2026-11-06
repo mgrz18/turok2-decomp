@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern u32 func_00426E78(u8 *arg0, u32 arg1, u32 arg2);
-u32 func_00426E78(u8 *arg0, u32 arg1, u32 arg2) {
+extern u32 Crc32_Compute(u8 *arg0, u32 arg1, u32 arg2);
+u32 Crc32_Compute(u8 *arg0, u32 arg1, u32 arg2) {
     u32 table[256];
     u32 i;
     u32 j;

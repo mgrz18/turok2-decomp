@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern void func_004227B0(void);
+extern void PakMessage_InitRumblePak(void);
 extern s32 D_8013098C;
 extern s32 D_801309C0;
-void func_004227B0(void) {
+void PakMessage_InitRumblePak(void) {
     D_801309C0 = 9;
     D_8013098C = 0;
 }

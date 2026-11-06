@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-int func_00299E00(unsigned int arg0) {
+int __osContAddressCrc(unsigned int arg0) {
     int var_a1;
     int var_a2;
     int var_a3;

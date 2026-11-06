@@ -4,7 +4,7 @@
 typedef signed int s32;
 extern void func_00426898(s32,s32,s32 *),func_00426BA8(s32,void *,s32);
 extern s32 func_00426C74(void *,void *);
-s32 func_0045A974(void *unused, void *arg1, s32 arg2, s32 *arg3) {
+s32 PakMenu_FindNoteByName_2(void *unused, void *arg1, s32 arg2, s32 *arg3) {
     char sp10[16];
     s32 sp20;
     s32 var_s0;

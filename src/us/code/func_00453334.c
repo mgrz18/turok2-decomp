@@ -7,7 +7,7 @@
 extern s32 D_801198A0;
 extern u8 D_800F6CB0[];
 extern void func_00430250(void *a);
-s32 func_00453334(s32 a, Menu *b) {
+s32 ContinueMenu_No_2(s32 a, Menu *b) {
     if (D_801198A0 == 1) func_00430250(D_800F6CB0); else b->player->m_bActive = 0;
     return 1;
 }

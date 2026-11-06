@@ -9,14 +9,14 @@ typedef struct {
     /* 0x4 */ s32 unk4;
 } ModeHandler;
 
-s32 func_00235510(s32);
-s32 func_0040C850(s32);
-s32 func_0040CB28(s32);
-s32 func_0027AD88(s32 *, s32);
+s32 Animator_Update(s32);
+s32 BlindOne_UpdateMover(s32);
+s32 BlindOne_GetHealthPercent(s32);
+s32 COnScreen__SetBossPercent(s32 *, s32);
 extern ModeHandler D_00432410[];
 extern s32 D_801100F0;
 
-void func_0040ECDC(BlindOneState *arg0)
+void BlindOne_UpdateFight(BlindOneState *arg0)
 {
   void (*temp_v0)(void);
   s32 var_s0;
@@ -32,7 +32,7 @@ void func_0040ECDC(BlindOneState *arg0)
     var_s1 = 0x3C;      /* faders[i] */
     do
     {
-      func_00235510((s32) ((u8 *) arg0 + var_s1));
+      Animator_Update((s32) ((u8 *) arg0 + var_s1));
       var_s0 += 1;
       var_s1 += sizeof(ScriptAnimator);
       var_s0++;
@@ -40,8 +40,8 @@ void func_0040ECDC(BlindOneState *arg0)
     }
     while (var_s0 < arg0->faderCount);
   }
-  func_0040C850((s32) &arg0->movers[0]);
-  func_0040C850((s32) &arg0->movers[1]);
-  func_0040C850((s32) &arg0->movers[2]);
-  func_0027AD88(&D_801100F0, func_0040CB28((s32) arg0));
+  BlindOne_UpdateMover((s32) &arg0->movers[0]);
+  BlindOne_UpdateMover((s32) &arg0->movers[1]);
+  BlindOne_UpdateMover((s32) &arg0->movers[2]);
+  COnScreen__SetBossPercent(&D_801100F0, BlindOne_GetHealthPercent((s32) arg0));
 }

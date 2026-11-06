@@ -11,23 +11,23 @@ typedef struct {
     /* 0x118 */ f32 unk118;
 } State;
 
-void func_00253DE0(CPlayer *player, s32 id);
-void func_00253E68(CPlayer *player);
-void func_00243414(CGameObjectInstance *actor, State *state, s32 mode);
+void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
+void CPlayer__StopWeaponBackgroundSound(CPlayer *player);
+void CAI__SetMode(CGameObjectInstance *actor, State *state, s32 mode);
 
-void func_00259878(CGameObjectInstance *actor, State *state) {
+void WeaponMode_AE794_Update(CGameObjectInstance *actor, State *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
 
     if (player->m_pLoopingSound_WeaponBackground == 0) {
-        func_00253DE0(player, 0x464);
+        CPlayer__StartWeaponBackgroundSound(player, 0x464);
     }
     if (!(player->m_ContState.m_dwButtons & 0x2000)) {
-        func_00253E68(player);
+        CPlayer__StopWeaponBackgroundSound(player);
         if (state->unk110 < 0.27925270795822144f /* 16 deg */ || state->unk118 > 0.0f) {
-            func_00243414(actor, state, 2);
+            CAI__SetMode(actor, state, 2);
         } else {
             state->unk118 = D_800AF618[22]->fireDelay * 15.0f;
-            func_00243414(actor, state, 5);
+            CAI__SetMode(actor, state, 5);
         }
     }
 }

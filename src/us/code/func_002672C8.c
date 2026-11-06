@@ -3,7 +3,7 @@
 #include "structs/player.h"
 
 /* Radius of an object, by the kind of its definition. */
-f32 func_002672C8(CGameObjectInstance *obj) {
+f32 GameObject_GetCollisionRadius(CGameObjectInstance *obj) {
     CIntelligence *def;
     f32 r;
     f32 m;

@@ -61,13 +61,13 @@ typedef struct {
 
 extern s32 osRecvMesg(void *mq, void **msg, s32 flag);
 extern s32 osSendMesg(void *mq, void *msg, s32 flag);
-extern void func_0029DEE0(u32 mask);                                /* __osResetGlobalIntMask */
-extern void func_0029DF30(u32 mask);                                /* __osSetGlobalIntMask */
-extern s32 func_0029DBD0(OSPiHandle *pihandle, u32 devAddr, u32 data);   /* osEPiRawWriteIo */
-extern s32 func_0029DA30(OSPiHandle *pihandle, u32 devAddr, u32 *data);  /* osEPiRawReadIo */
-extern void func_0029DF70(void);                                    /* osYieldThread */
+extern void __osResetGlobalIntMask(u32 mask);                                /* __osResetGlobalIntMask */
+extern void __osSetGlobalIntMask(u32 mask);                                /* __osSetGlobalIntMask */
+extern s32 osEPiRawWriteIo(OSPiHandle *pihandle, u32 devAddr, u32 data);   /* osEPiRawWriteIo */
+extern s32 osEPiRawReadIo(OSPiHandle *pihandle, u32 devAddr, u32 *data);  /* osEPiRawReadIo */
+extern void osYieldThread(void);                                    /* osYieldThread */
 
-void func_0029D690(void *args) {
+void __osDevMgrMain(void *args) {
     OSIoMesg *mb;
     void *em;
     void *dummy;
@@ -99,8 +99,8 @@ void func_0029D690(void *args) {
                 messageSend = 0;
             }
             osRecvMesg(dm->acsQueue, &dummy, 1);
-            func_0029DEE0(0x100401);
-            func_0029DBD0(mb->piHandle, 0x05000510, info->bmCtlShadow | 0x80000000);
+            __osResetGlobalIntMask(0x100401);
+            osEPiRawWriteIo(mb->piHandle, 0x05000510, info->bmCtlShadow | 0x80000000);
 
         again:
             osRecvMesg(dm->evtQueue, &em, 1);
@@ -108,15 +108,15 @@ void func_0029D690(void *args) {
             blockInfo = &info->block[info->blockNum];
             if (blockInfo->errStatus == 0x1D) {
                 u32 stat;
-                func_0029DBD0(mb->piHandle, 0x05000510, info->bmCtlShadow | 0x10000000);
-                func_0029DBD0(mb->piHandle, 0x05000510, info->bmCtlShadow);
-                func_0029DA30(mb->piHandle, 0x05000508, &stat);
+                osEPiRawWriteIo(mb->piHandle, 0x05000510, info->bmCtlShadow | 0x10000000);
+                osEPiRawWriteIo(mb->piHandle, 0x05000510, info->bmCtlShadow);
+                osEPiRawReadIo(mb->piHandle, 0x05000508, &stat);
                 if (stat & 0x02000000) {
-                    func_0029DBD0(mb->piHandle, 0x05000510, info->bmCtlShadow | 0x01000000);
+                    osEPiRawWriteIo(mb->piHandle, 0x05000510, info->bmCtlShadow | 0x01000000);
                 }
                 blockInfo->errStatus = 4;
                 *(volatile u32 *)0xA4600010 = 2; /* PI_STATUS_REG */
-                func_0029DF30(0x100C01);
+                __osSetGlobalIntMask(0x100C01);
             }
             osSendMesg(mb->retQueue, mb, 0);
             if (messageSend == 1 && mb->piHandle->transferInfo.block[0].errStatus == 0) {
@@ -125,7 +125,7 @@ void func_0029D690(void *args) {
             }
             osSendMesg(dm->acsQueue, NULL, 0);
             if (mb->piHandle->transferInfo.blockNum == 1) {
-                func_0029DF70();
+                osYieldThread();
             }
         } else {
             switch (mb->type) {

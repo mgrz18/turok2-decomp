@@ -1,7 +1,7 @@
 #include "common.h"
 
-s32 func_0020367C(s32, s32, s32, s32, s32, s32 *, s32 *, s32); /* extern */
-extern s32 func_00206990;
+s32 CCache__Request(s32, s32, s32, s32, s32, s32 *, s32 *, s32); /* extern */
+extern s32 Texture_DecompressCallback;
 extern s32 D_800A51F0;
 
 typedef struct {
@@ -9,6 +9,6 @@ typedef struct {
     /* 0x4 */ s32 unk4;
 } Unk0020798C;
 
-void func_0020798C(Unk0020798C *arg0) {
-    func_0020367C(0, arg0->unk0, arg0->unk4, 0, 0, &func_00206990, &D_800A51F0, 0);
+void Texture_Request(Unk0020798C *arg0) {
+    CCache__Request(0, arg0->unk0, arg0->unk4, 0, 0, &Texture_DecompressCallback, &D_800A51F0, 0);
 }

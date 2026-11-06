@@ -1,16 +1,16 @@
 #include "common.h"
 
-void func_0028B430(s32 c);      /* print a character */
-void func_0028CF38(char *str);  /* print a string */
+void Crash_PutChar(s32 c);      /* print a character */
+void Crash_PrintString(char *str);  /* print a string */
 
 /* Print a signed decimal integer. */
-void func_0028CDC4(s32 value) {
+void Crash_PrintInt(s32 value) {
     char buf[16];
     char *p;
     s32 n;
 
     if (value < 0) {
-        func_0028B430('-');
+        Crash_PutChar('-');
         n = -value;
     } else {
         n = value;
@@ -21,5 +21,5 @@ void func_0028CDC4(s32 value) {
         *--p = n % 10 + '0';
         n /= 10;
     } while (n != 0);
-    func_0028CF38(p);
+    Crash_PrintString(p);
 }

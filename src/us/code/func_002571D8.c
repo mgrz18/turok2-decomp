@@ -6,7 +6,7 @@ typedef struct {
 } Sortable;
 
 /* qsort-style comparator on the float at 0xC. */
-s32 func_002571D8(Sortable *arg0, Sortable *arg1) {
+s32 CBarrel__CompareIcons(Sortable *arg0, Sortable *arg1) {
     s32 var_v0;
 
     var_v0 = 1;

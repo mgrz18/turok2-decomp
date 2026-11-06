@@ -1,35 +1,35 @@
 #include "common.h"
 
-s32 func_00298A0C(void);
-s32 func_00298BE0(s32);
-s32 func_00298C98(s32, s32);
-s32 func_00299FE4(void);
-s32 func_0029A080(s32, s32);
+s32 __osPackResetData(void);
+s32 __osPackRequestData(s32);
+s32 __osContGetInitData(s32, s32);
+s32 __osSiGetAccess(void);
+s32 __osSiRawStartDma(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 
-s32 func_0029A050();                            /* extern */
+s32 __osSiRelAccess();                            /* extern */
 extern s32 D_801213E0;
 extern u8 D_80121420[];
 
-s32 func_00298900(s32 arg0, s32 arg1) {
+s32 osContReset(s32 arg0, s32 arg1) {
     s32 sp10;
     s32 temp_s0;
 
-    func_00299FE4();
+    __osSiGetAccess();
     if (D_80121420[0] != 0xFF) {
-        func_00298A0C();
-        func_0029A080(1, (s32) &D_801213E0);
+        __osPackResetData();
+        __osSiRawStartDma(1, (s32) &D_801213E0);
         osRecvMesg(arg0, 0, 1);
-        func_0029A080(0, (s32) &D_801213E0);
+        __osSiRawStartDma(0, (s32) &D_801213E0);
         osRecvMesg(arg0, 0, 1);
-        func_00298BE0(0xFF);
-        func_0029A080(1, (s32) &D_801213E0);
+        __osPackRequestData(0xFF);
+        __osSiRawStartDma(1, (s32) &D_801213E0);
         osRecvMesg(arg0, 0, 1);
         D_80121420[0] = 0xFF;
     }
-    temp_s0 = func_0029A080(0, (s32) &D_801213E0);
+    temp_s0 = __osSiRawStartDma(0, (s32) &D_801213E0);
     osRecvMesg(arg0, 0, 1);
-    func_00298C98((s32) &sp10, arg1);
-    func_0029A050();
+    __osContGetInitData((s32) &sp10, arg1);
+    __osSiRelAccess();
     return temp_s0;
 }

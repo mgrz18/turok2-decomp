@@ -6,7 +6,7 @@ typedef struct Link {
 } Link;
 
 /* Unlinks a node from its list. */
-void func_002933B0(Link *arg0) {
+void alUnlink(Link *arg0) {
     Link **temp_v1_2;
     Link *temp_v1;
 

@@ -18,12 +18,12 @@ typedef struct PiHandle {
 
 extern PiHandle D_80124D30;     /* CartRomHandle */
 extern PiHandle *D_800B897C;    /* __osPiTable */
-extern s32 func_0029B410(u32 devAddr, u32 *data);   /* osPiRawReadIo */
-extern void func_00266C5C(void *p, s32 c, s32 n);   /* memset */
+extern s32 osPiRawReadIo(u32 devAddr, u32 *data);   /* osPiRawReadIo */
+extern void memset(void *p, s32 c, s32 n);   /* memset */
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
 
-PiHandle *func_0029D5D0(void) {
+PiHandle *osCartRomInit(void) {
     u32 piConfig;
     u32 saveMask;
 
@@ -32,14 +32,14 @@ PiHandle *func_0029D5D0(void) {
     if (D_80124D30.baseAddress != 0xB0000000) {
         D_80124D30.type = 0;
         D_80124D30.baseAddress = 0xB0000000;
-        func_0029B410(0, &piConfig);
+        osPiRawReadIo(0, &piConfig);
         D_80124D30.latency = piConfig & 0xFF;
         D_80124D30.pulse = (piConfig >> 8) & 0xFF;
         D_80124D30.pageSize = (piConfig >> 16) & 0xF;
         D_80124D30.relDuration = (piConfig >> 20) & 0xF;
         D_80124D30.domain = 0;
         D_80124D30.speed = 0;
-        func_00266C5C(&D_80124D30.transferInfo, 0, 0x60);
+        memset(&D_80124D30.transferInfo, 0, 0x60);
         saveMask = __osDisableInt();
         D_80124D30.next = D_800B897C;
         D_800B897C = &D_80124D30;

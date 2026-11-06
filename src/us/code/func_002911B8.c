@@ -1,11 +1,11 @@
 #include "common.h"
 
-s32 func_002933E0(s32, s32);
+s32 alLink(s32, s32);
 s32 osSetIntMask(s32);
 
-s32 func_002933B0(void *);                      /* extern */
+s32 alUnlink(void *);                      /* extern */
 
-void func_002911B8(void *arg0, s16 arg1)
+void alEvtqFlushType(void *arg0, s16 arg1)
 {
   s32 temp_s4;
   void *temp_s1;
@@ -25,8 +25,8 @@ void func_002911B8(void *arg0, s16 arg1)
         {
           *((s32 *) (((s8 *) temp_s1) + 8)) = (s32) ((*((s32 *) (((s8 *) temp_s1) + 8))) + (*((s32 *) (((s8 *) var_s0) + 8))));
         }
-        func_002933B0(var_s0);
-        func_002933E0((s32) var_s0, (s32) arg0);
+        alUnlink(var_s0);
+        alLink((s32) var_s0, (s32) arg0);
       }
       var_s0 = temp_s1;
     }

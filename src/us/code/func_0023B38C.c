@@ -3,13 +3,13 @@
 #include "structs/collision.h"
 
 f32 func_00298470(f32);   /* sqrtf */
-void func_0020EF8C(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
-s32 func_0023AB18(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
+void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
+s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *hit, s32 arg3, s32 arg4, f32 arg5, s32 arg6);
 
 /* Sweep against a vertical cylinder of the given radius round centre
  * (optionally only between minY and maxY): 1 if it is hit before maxT and
- * func_0023AB18 accepts the hit. */
-s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
+ * Sweep_HitPlane accepts the hit. */
+s32 Sweep_HitCylinder(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f32 maxY, f32 minY,
                   s32 frontOnly, s32 arg7, f32 arg8, s32 fromInside) {
     CVector3 delta;
     CVector3 dir;
@@ -52,7 +52,7 @@ s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f
     if (!(t < sweep->hit.fraction)) {
         return 0;
     }
-    func_0020EF8C(&hit, t, &sweep->inst->m_vPos, &sweep->end);
+    CVector3__Lerp(&hit, t, &sweep->inst->m_vPos, &sweep->end);
     if (checkHeight) {
         if (maxY < hit.y) {
             return 0;
@@ -64,7 +64,7 @@ s32 func_0023B38C(Sweep *sweep, CVector3 *centre, f32 radius, s32 checkHeight, f
     normal.x = hit.x - centre->x;
     normal.y = 0.0f;
     normal.z = hit.z - centre->z;
-    if (func_0023AB18(sweep, &normal, &hit, 0, arg7, arg8, 1) == 0) {
+    if (Sweep_HitPlane(sweep, &normal, &hit, 0, arg7, arg8, 1) == 0) {
         return 0;
     }
     sweep->kind = 2;

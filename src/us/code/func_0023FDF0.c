@@ -40,15 +40,15 @@ typedef struct HitInst {
     /* 0x14C */ s32 hitMask;
 } HitInst;
 
-void *func_002017D4(void *table, s32 index);
-void *func_0021F358(HitInst *inst);
-void func_002051F4(s32 arg0, void *res);
-void **func_0020367C(s32 unused, s32 key, s32 size, s32 mode, s32 owner, s32 tag, char *name, s32 direct);
-void func_0020D908(f32 (*mtx)[4], Joint *joint);
-void func_0021034C(f32 (*mtx)[4], f32 x, f32 y, f32 z);
-void func_0020F908(f32 (*mtx)[4], CVector3 *in, CVector3 *out, s32 count);
-s32 func_0023A640(Sweep *sweep, CBox *box, f32 *t);
-s32 func_0023F880(Sweep *sweep, CBox *box, HitInst *other, CVector3 *start, CVector3 *corners, HitNode *node,
+void *CISet__GetBlock(void *table, s32 index);
+void *CGameObjectInstance__LoadGeometry(HitInst *inst);
+void CCache__Unlock(s32 arg0, void *res);
+void **CCache__Request(s32 unused, s32 key, s32 size, s32 mode, s32 owner, s32 tag, char *name, s32 direct);
+void CMtxF__FromMtxAffine(f32 (*mtx)[4], Joint *joint);
+void CMtxF__ScaleAxes(f32 (*mtx)[4], f32 x, f32 y, f32 z);
+void CMtxF__TransformPoints(f32 (*mtx)[4], CVector3 *in, CVector3 *out, s32 count);
+s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
+s32 Sweep_TestBoxFaces(Sweep *sweep, CBox *box, HitInst *other, CVector3 *start, CVector3 *corners, HitNode *node,
                   s32 index);
 
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
@@ -67,7 +67,7 @@ static __inline__ void BoxCorners(CVector3 *c, CBox *b) {
 
 /* Sweep against an actor's boxes: each hit volume of its animated model's
  * nodes, or else its animation's box, or else its bounds. */
-void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box) {
+void Sweep_TestBox(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box) {
     CVector3 out[8];
     CVector3 in[8];
     CVector3 centre;
@@ -95,7 +95,7 @@ void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box) {
     }
     big = 0;
     if (other->joints != NULL) {
-        model = func_0021F358(other);
+        model = CGameObjectInstance__LoadGeometry(other);
     } else {
         model = NULL;
     }
@@ -105,10 +105,10 @@ void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box) {
         if (!(maxXY <= scale)) {
             scale = maxXY;
         }
-        nodes = func_002017D4(*(void **) model, 3);
+        nodes = CISet__GetBlock(*(void **) model, 3);
         count = *(s32 *) nodes;
         for (i = 0; i < count; i++) {
-            node = func_002017D4(func_002017D4(nodes, i), 1);
+            node = CISet__GetBlock(CISet__GetBlock(nodes, i), 1);
             if (!(node->mask & other->hitMask)) {
                 continue;
             }
@@ -138,27 +138,27 @@ void func_0023FDF0(Sweep *sweep, HitInst *other, CVector3 *start, CBox *box) {
                 !(box->m_vMin.y < nodeBox.m_vMax.y) || !(nodeBox.m_vMin.y < box->m_vMax.y)) {
                 continue;
             }
-            if (!func_0023A640(sweep, &nodeBox, &t)) {
+            if (!Sweep_HitBox(sweep, &nodeBox, &t)) {
                 continue;
             }
-            func_0020D908(mtx, &other->joints[i]);
+            CMtxF__FromMtxAffine(mtx, &other->joints[i]);
             if (big) {
-                func_0021034C(mtx, 1.5f, 1.5f, 1.5f);
+                CMtxF__ScaleAxes(mtx, 1.5f, 1.5f, 1.5f);
             }
-            func_0020F908(mtx, node->corners, out, 8);
-            func_0023F880(sweep, box, other, start, out, node, i);
+            CMtxF__TransformPoints(mtx, node->corners, out, 8);
+            Sweep_TestBoxFaces(sweep, box, other, start, out, node, i);
         }
-        func_002051F4(0, model);
+        CCache__Unlock(0, model);
         return;
     }
-    anim = func_0020367C(0, other->animKey, other->animSize, 4, 0, 0, "anim object info", 1);
+    anim = CCache__Request(0, other->animKey, other->animSize, 4, 0, 0, "anim object info", 1);
     if (anim != NULL) {
-        animBox = func_002017D4(*anim, 0);
+        animBox = CISet__GetBlock(*anim, 0);
         BoxCorners(in, animBox);
-        func_0020F908(other->mtx, in, out, 8);
-        func_002051F4(0, anim);
+        CMtxF__TransformPoints(other->mtx, in, out, 8);
+        CCache__Unlock(0, anim);
     } else {
         BoxCorners(out, &other->bounds);
     }
-    func_0023F880(sweep, box, other, start, out, NULL, -1);
+    Sweep_TestBoxFaces(sweep, box, other, start, out, NULL, -1);
 }

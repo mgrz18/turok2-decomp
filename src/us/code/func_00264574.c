@@ -9,9 +9,9 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-s32 func_00243414(s32, s32, s32);
+s32 CAI__SetMode(s32, s32, s32);
 extern f32 D_800B6D28;
-void func_00264574(void *arg0, void *arg1)
+void Platform_ForwardUpdate(void *arg0, void *arg1)
 {
   s32 temp_a3;
   s32 var_a2;
@@ -35,6 +35,6 @@ void func_00264574(void *arg0, void *arg1)
   }
   if ((*((f32 *) (((s8 *) arg1) + 0x64))) >= 1.0f)
   {
-    func_00243414(arg0, arg1, 2);
+    CAI__SetMode(arg0, arg1, 2);
   }
 }

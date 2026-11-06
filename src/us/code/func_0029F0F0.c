@@ -3,8 +3,8 @@
 
 #include "rw/junk_types.h"
 
-void func_0029F0F0(lldiv_t *ans, s64 num, s64 den);
-void func_0029F0F0(lldiv_t *ans, s64 num, s64 den) {
+void lldiv(lldiv_t *ans, s64 num, s64 den);
+void lldiv(lldiv_t *ans, s64 num, s64 den) {
     ans->quot = num / den;
     ans->rem = num % den;
 }

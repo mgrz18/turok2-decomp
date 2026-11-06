@@ -8,9 +8,9 @@ extern CacheEntry *D_800F279C;
 extern void *D_800F2840;
 extern void *func_0029E460(void *destination, const void *source, int count);
 extern void osWritebackDCache(void *, s32);
-extern s32 func_002912A0(s32, s32, void *, s32, s32);
-u32 func_0026FFA0(void *block, s32 size) {
-    extern u32 func_0029BF80(void *);
+extern s32 alHeapDBAlloc(s32, s32, void *, s32, s32);
+u32 AudioDMA_CacheBlock(void *block, s32 size) {
+    extern u32 osVirtualToPhysical(void *);
     CacheEntry *entry;
     CacheEntry *unused;
     unused = 0;
@@ -22,14 +22,14 @@ u32 func_0026FFA0(void *block, s32 size) {
                 func_0029E460(entry->data, block, size);
                 osWritebackDCache(entry->data, size);
             }
-            return func_0029BF80(entry->data);
+            return osVirtualToPhysical(entry->data);
         }
         if (entry->state == 0) {
             unused = entry;
         }
     }
     if (unused == 0) {
-        unused = (CacheEntry *)func_002912A0(0, 0, D_800F2840, 1, 0x90);
+        unused = (CacheEntry *)alHeapDBAlloc(0, 0, D_800F2840, 1, 0x90);
         unused->next = D_800F279C;
         D_800F279C = unused;
         D_800B2674++;
@@ -38,5 +38,5 @@ u32 func_0026FFA0(void *block, s32 size) {
     unused->state = 3;
     unused->size = size;
     func_0029E460(unused->data, block, size);
-    return func_0029BF80(unused->data);
+    return osVirtualToPhysical(unused->data);
 }

@@ -15,7 +15,7 @@ typedef struct {
     /* 0x1A */ u16 d;
 } Dst29;
 
-void func_0029321C(Dst29 *dst, Src29 *src) {
+void alSeqSetLoc(Dst29 *dst, Src29 *src) {
     dst->a = src->a;
     dst->d = src->d;
     dst->b = src->b;

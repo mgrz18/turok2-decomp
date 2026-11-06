@@ -10,7 +10,7 @@ struct FieldRecAt14 {
 extern s32 D_8011ACE4;
 extern char D_800B5C6C[];
 extern char D_800B5C60[];
-s32 func_00455A04(struct FieldRecAt14 *field) {
+s32 StatsMenu_HeaderText_2(struct FieldRecAt14 *field) {
     if (D_8011ACE4 != 0) {
         field->text = D_800B5C6C;
     } else {

@@ -1,6 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-void func_0040E0D8(void) {
+void BlindOne_ActorMode1Enter(void) {
 
 }

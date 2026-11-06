@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern void func_002A1954(s32 address, s32 value);
-extern void func_002A1954(s32 address, s32 value);
-extern void func_002A1350(s32 address, s32 value);
-void func_002A1A3C(s32 address, const u8 *source, u32 length)
+extern void HostIo_WriteByte(s32 address, s32 value);
+extern void HostIo_WriteByte(s32 address, s32 value);
+extern void HostIo_WriteWord(s32 address, s32 value);
+void HostIo_WriteBlock(s32 address, const u8 *source, u32 length)
 {
   u32 word;
   while ((length != 0) && ((address & 3) != 0))
   {
-    func_002A1954(address++, *(source++));
+    HostIo_WriteByte(address++, *(source++));
  do { } while (0);
     length--;
   }
@@ -20,7 +20,7 @@ void func_002A1A3C(s32 address, const u8 *source, u32 length)
     do
     {
       word = (((((u32) source[0]) << 24) | (((u32) source[1]) << 16)) | (((u32) source[2]) << 8)) | source[3];
-      func_002A1350(address, word);
+      HostIo_WriteWord(address, word);
       address += 4;
       source += 4;
       length -= 4;
@@ -29,7 +29,7 @@ void func_002A1A3C(s32 address, const u8 *source, u32 length)
   }
   while (length != 0)
   {
-    func_002A1954(address++, *(source++));
+    HostIo_WriteByte(address++, *(source++));
     length--;
   }
 }

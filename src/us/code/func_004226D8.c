@@ -3,6 +3,6 @@
 
 extern s32 D_801309C0;
 
-void func_004226D8(void) {
+void PakMessage_InitPakNotFound(void) {
     D_801309C0 = 1;
 }

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game.h"
 
-s32 func_0041D84C(void)
+s32 NameEntryMenu_IsMatchOver(void)
 {
   s32 var_a0;
   GameMatch *new_var;

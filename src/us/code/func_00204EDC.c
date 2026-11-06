@@ -9,8 +9,8 @@ s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern OSMesgQueue D_800D8DB0;
 extern s32 D_800D8DCC;
-B12Node *func_002060E0(s32 a, s32 b, u32 c, s32 d);
-B12Node *func_00204EDC(s32 unused, s32 a1, u32 a2, s32 a3) {
+B12Node *CCache__AllocateInternal(s32 a, s32 b, u32 c, s32 d);
+B12Node *CCache__Allocate(s32 unused, s32 a1, u32 a2, s32 a3) {
     u32 mask;
     u32 m2;
     B12Node *r;
@@ -21,7 +21,7 @@ B12Node *func_00204EDC(s32 unused, s32 a1, u32 a2, s32 a3) {
     } else {
         __osRestoreInt(mask);
     }
-    r = func_002060E0(0, a1, a2, a3);
+    r = CCache__AllocateInternal(0, a1, a2, a3);
     m2 = __osDisableInt();
     if (--D_800D8DCC != 0) {
         __osRestoreInt(m2);

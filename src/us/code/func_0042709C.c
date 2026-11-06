@@ -1,7 +1,7 @@
 typedef unsigned char u8;
 
 /* In-place upper-casing of a NUL-terminated string. */
-u8 *func_0042709C(u8 *str) {
+u8 *Str_ToUpper(u8 *str) {
     u8 *p = str;
 
     if (str == 0) {

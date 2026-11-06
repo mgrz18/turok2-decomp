@@ -1,6 +1,6 @@
 #include "common.h"
 
-/* The state func_0027AD00 sets up: a value and a mode, and two more words. */
+/* The state COverlay__StartScript sets up: a value and a mode, and two more words. */
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 value;
@@ -10,6 +10,6 @@ typedef struct {
     /* 0x44 */ s32 unk44;
 } ModeState;
 
-void func_0027AD98(ModeState *arg0) {
+void COnScreen__ClearBoss(ModeState *arg0) {
     arg0->unk40 = 0;
 }
