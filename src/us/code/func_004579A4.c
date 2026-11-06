@@ -1,7 +1,12 @@
 /* FAKEMATCH: two register asm pins and a second player pointer stand for what natural C does not give: the ROM
  * loads the player into $v0 and copies it to $s0 (pp, then p as the copy the branches use), and the constant 1 of
  * the error branch gets its own register (natural C shares one $s register for every 1: cse2 follows the jumps
- * into that branch). Twin of PakMenu_InitSaveGame_2 (same C). */
+ * into that branch). Already cse1 replaces the error branch's 1 with the first one's register: the
+ * Pak_GetStatus jump is followed, its label having one use and a barrier before it. Tried in the L pass,
+ * none splitting the 1 or loading the player through $v0: one `p` read once, `plr` copied into `p` in
+ * each branch, a chained `gPakMenuIsSave = gPakMenuWrites = 1`, a `one` local for every 1, inline reset
+ * and error helpers, early returns instead of the elses, both if/else orders, and an empty do-while
+ * (its loop-end note stops cse1, but cse2 runs after loop and ignores it). Twin of PakMenu_InitSaveGame (same C). */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00406F7C.c, func_00406F7C, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/player.h"
