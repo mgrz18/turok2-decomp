@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/menu_desc.h"
 
 /* Reset the current player state and open a menu page on the player's controller. */
 
-extern u8 gPakSaveProfileMenuDesc_2[];
 
 void CPlayerPool__GetIndex(void *state, void *player);
 void func_0045A170(void);
@@ -15,6 +15,6 @@ s32 StatsMenu_SaveProfile_2(s32 arg0, Menu *event) {
 
     CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, player);
     func_0045A170();
-    MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, gPakSaveProfileMenuDesc_2, player, *(void **)(player + 0xA50), 0);
+    MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, &gPakSaveProfileMenuDesc_2, player, *(void **)(player + 0xA50), 0);
     return 1;
 }

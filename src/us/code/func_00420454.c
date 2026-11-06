@@ -5,6 +5,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/menu_desc.h"
 
 /* Load game menu "select" handler: with the pak checked, either restores the
  * loaded save (player block, game progress, level times, the level's key
@@ -25,9 +26,6 @@ extern f32 gEngineApp_m_Settings_match_hours[];
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2];
 extern CScene gScene;
 extern u8 gLoadSavePersistentData[];
-extern u8 gPakMsgRumblePakDesc[];
-extern u8 gPakMsgDeleteDoneDesc[];
-extern u8 gPakMsgDeleteFailedDesc[];
 
 extern s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet);
 extern CPlayer *CPlayerPool__FindByController(void *players, ControllerProfile *ctl);
@@ -71,13 +69,13 @@ s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
         }
         gEngineApp_m_Game_m_PlayerList_m_bCinema[0] = 0;
         gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
-        MenuPool_OpenMenu((u8 *) gEngineApp_m_Game_m_PlayerList_m_bCinema + 0x588, gPakMsgRumblePakDesc, (s32) player, player->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu((u8 *) gEngineApp_m_Game_m_PlayerList_m_bCinema + 0x588, &gPakMsgRumblePakDesc, (s32) player, player->m_ContState.m_pContState, NULL);
         return 1;
     }
     if (Pak_DeleteNote(slot, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, gPakMsgDeleteDoneDesc, c->player, c->controller, c->context);
+        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, &gPakMsgDeleteDoneDesc, c->player, c->controller, c->context);
     } else {
-        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, gPakMsgDeleteFailedDesc, c->player, c->controller, c->context);
+        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, &gPakMsgDeleteFailedDesc, c->player, c->controller, c->context);
     }
     return 1;
 }

@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_desc.h"
 
-extern char gPakMsgDeleteDoneDesc[];
 extern s32 gPakMenuLeaving;
 extern int PakConfirmMenu_SelectYes(void * owner, struct MenuRecAt24 * menu, void * arg);
 extern int gPakNoteIndex;
-extern char gPakMsgDeleteFailedDesc[];
 extern s32 gPakMenuPort;
 extern s32 D_8011B114;
 extern s32 gPakMenuAnyPak;
@@ -16,8 +15,6 @@ extern s32 Pak_DeleteNote(s32 ch, s32 index);
 extern void Pak_ProbeSlot(s32 ch);
 extern s32 gPakConfirmKind;
 extern s32 gPakOverwriteNote;
-extern char gPakMsgRepairedDesc[];
-extern char gDamagedPakInGameMenuDesc[];
 extern s32 Pak_RepairIfDamaged(s32 ch);
 extern s32 PakMenu_WriteSaveGame(void *owner, MenuRecAt24 *menu, void *arg);
 s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
@@ -38,9 +35,9 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
             }
             Pak_ProbeSlot(ch);
             if (Pak_DeleteNote(ch, gPakOverwriteNote) == 0) {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc, menu->player, menu->slot, menu->prompt);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, (char *)&gPakMsgDeleteDoneDesc, menu->player, menu->slot, menu->prompt);
             } else {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc, menu->player, menu->slot, menu->prompt);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, (char *)&gPakMsgDeleteFailedDesc, menu->player, menu->slot, menu->prompt);
             }
             break;
         case 3:
@@ -59,7 +56,7 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
                 PakMenu_WriteSaveGame(owner, menu, arg);
                 return 1;
             }
-            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc, menu->player, menu->slot, menu->prompt);
+            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, (char *)&gPakMsgDeleteFailedDesc, menu->player, menu->slot, menu->prompt);
             break;
         case 0:
             if (gPakMenuAnyPak != 0) {
@@ -74,9 +71,9 @@ s32 PakConfirmMenu_SelectYes(void *owner, MenuRecAt24 *menu, void *arg) {
             }
             Pak_ProbeSlot(ch);
             if (Pak_RepairIfDamaged(ch) == 0) {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgRepairedDesc, menu->player, menu->slot, menu->prompt);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, (char *)&gPakMsgRepairedDesc, menu->player, menu->slot, menu->prompt);
             } else {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakInGameMenuDesc, menu->player, menu->slot, menu->prompt);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, (char *)&gDamagedPakInGameMenuDesc, menu->player, menu->slot, menu->prompt);
             }
             break;
         case 1:

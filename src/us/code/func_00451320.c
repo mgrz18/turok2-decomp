@@ -2,9 +2,9 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/camera.h"
+#include "globals/menu_desc.h"
 
 s32 MenuPool_OpenMenu_2(s32, s32, s32, s32, s32);
-extern s32 gCharacterMenuDesc_2;
 
 s32 TeamMenu_ChooseBlue_2(s32 arg0, Menu *arg1) {
     CPlayer *temp_a2;

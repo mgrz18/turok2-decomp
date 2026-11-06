@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/camera.h"
+#include "globals/menu_desc.h"
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -50,9 +51,6 @@ extern f32 gFrameIncrement;          /* frame time */
 extern PortSetup D_8011AB88[];
 extern char gEngineApp_m_Game_m_DebugLines;
 extern char gEngineApp_m_Game_m_CameraPool;
-extern char gPauseMenuDesc;         /* death screen */
-extern char gSavePortalMenuDesc;
-extern char gMissionFailedMenuDesc;         /* key screen */
 
 void CPlayer__Update(CPlayer *p);
 void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *other);

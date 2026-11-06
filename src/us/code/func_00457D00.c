@@ -4,6 +4,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/menu_desc.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 gPakMenuAnyPak;
@@ -13,13 +14,6 @@ extern char gPakProfile[];
 extern char gPakCharacterNoteName[];
 extern u8 gPakGameCode[];
 extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern u8 gPakMsgPakFullDesc_2[];
-extern u8 gPakMsgSaveDoneDesc_2[];
-extern u8 gPakMsgSaveFailedDesc_2[];
-extern char gStatsAfterPakMenuDesc1_2[];
-extern char gStatsAfterPakMenuDesc2_2[];
-extern char gStatsAfterPakMenuDesc3_2[];
-extern char gStatsAfterPakMenuDesc4_2[];
 extern void *gSaveBufferHandle;
 extern void *gLoadBufferHandle;
 s32 Pak_BytesToPages_2(s32 n);
@@ -35,13 +29,13 @@ static __inline__ char *O01Pick(O01Pad *sel) {
     switch (sel->v) {
     case 0:
     default:
-        return gStatsAfterPakMenuDesc1_2;
+        return (char *)&gStatsAfterPakMenuDesc1_2;
     case 1:
-        return gStatsAfterPakMenuDesc2_2;
+        return (char *)&gStatsAfterPakMenuDesc2_2;
     case 2:
-        return gStatsAfterPakMenuDesc3_2;
+        return (char *)&gStatsAfterPakMenuDesc3_2;
     case 3:
-        return gStatsAfterPakMenuDesc4_2;
+        return (char *)&gStatsAfterPakMenuDesc4_2;
     }
 }
 /* Release the menu buffers (inlined). */
@@ -97,7 +91,7 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
                 }
             }
             if (ok != 0) {
-                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgPakFullDesc_2, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgPakFullDesc_2, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -105,9 +99,9 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     O01FreeAll();
     if (flag != 0) {
         if (r == 0) {
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgSaveDoneDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         } else {
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgSaveFailedDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         }
     }
     return 1;

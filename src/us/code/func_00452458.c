@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/menu_desc.h"
 
 s32 MenuPool_OpenChildMenu_2(s32, s32, s32);
 
-extern s32 gTeamBloodMenuDesc_2;
 extern s32 gEngineApp_m_Settings_match;
 
 s32 DeathmatchMenu_OpenTeamBlood_2(s32 arg0, s32 arg1, s32 arg2)

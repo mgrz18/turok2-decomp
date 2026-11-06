@@ -1,12 +1,12 @@
 /* Second-module copy of SavePortalMenu_SelectSave (first module; this one at link address 0x00423098), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu_desc.h"
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
 void MenuPool_OpenMenu_2(char *dst, char *fmt, s32 arg2, s32 arg3, s32 arg4);
 
-extern char gPakSaveGameMenuDesc_2[];
 extern char gEngineApp_m_Game_m_MenuPool[];
 extern s32 sSavePortalChosen;
 
@@ -25,7 +25,7 @@ s32 SavePortalMenu_SelectSave_2(s32 unused, Menu *event) {
     }
     if (player != 0) {
         sSavePortalChosen = 1;
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakSaveGameMenuDesc_2, event->player, event->controller, 0);
+        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, (char *)&gPakSaveGameMenuDesc_2, event->player, event->controller, 0);
         return 1;
     }
     return 0;

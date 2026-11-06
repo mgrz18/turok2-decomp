@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/menu_desc.h"
 
 extern s32 gEngineApp_m_Settings_paused;
-extern char gPauseMenuDesc; /* death screen */
 
 /* Whether the game is paused (gEngineApp_m_Settings_paused) or a menu other than the death
  * screen is open on the player's camera. */

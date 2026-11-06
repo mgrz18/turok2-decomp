@@ -1,3 +1,4 @@
+#include "globals/menu_desc.h"
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0043E65C.c, func_0043E65C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -43,7 +44,6 @@ extern void CPlayer__SetCharacter_2(S10Ctx *c, s32 v);
 extern void MenuItem_SetModel_2(void *a, s32 b, s32 c);
 extern void Sound__Play2D(s32 a);
 extern void MenuPool_OpenChildMenu_2(s32 a, s32 b, void *c);
-extern u8 gPlayerSetupMenuDesc_2[];
 extern S10Pair D_800C1E7A[];
 s32 CharacterMenu_SelectCharacter_2(void *x, S10Menu *m, void *y) {
     S10Ctx *ctx = m->ctx;
@@ -51,7 +51,7 @@ s32 CharacterMenu_SelectCharacter_2(void *x, S10Menu *m, void *y) {
     if (Controller_ConfirmPressed(m->ctrl)) {
         CPlayer__SetCharacter_2(ctx, sub->b30);
         Sound__Play2D(D_800C1E7A[ctx->f520].v);
-        MenuPool_OpenChildMenu_2((s32)y, (s32)m, gPlayerSetupMenuDesc_2);
+        MenuPool_OpenChildMenu_2((s32)y, (s32)m, &gPlayerSetupMenuDesc_2);
         return 1;
     } else {
         s8 v = Menu_StepValueLR_2(m, sub->b30, 1, 0, 0xA, 1);

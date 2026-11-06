@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/menu_desc.h"
 
 /* Menu item handler: depending on the menu state, checks the item (PakMenu_CheckPak) and prints its text, or (states 1
  * and 2) resets the menu flags and opens the item's menu on its owner's camera. */
@@ -24,8 +25,6 @@ extern s32 gPakMenuLeaving;
 extern s32 gCameraPoolHideViews;
 extern s32 gPakCheckDone;
 extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern u8 gSavePortalMenuDesc[];
-extern u8 gSavePortalMenuDescB[];
 extern s32 PakMenu_CheckPak(Item *item, s32 id, s32 a2);
 extern void *PakMenu_GetReturnMenu(Item *item);
 extern void MenuPool_OpenMenu(void *dst, void *string, CPlayer *owner, ItemData *data, s32 a4);
@@ -81,7 +80,7 @@ s32 PakConfirmMenu_SelectNo(s32 arg0, Item *item) {
             if (string == NULL) {
                 string = item->string;
             }
-            if (item->string == gSavePortalMenuDescB || item->string == gSavePortalMenuDesc) {
+            if (item->string == &gSavePortalMenuDescB || item->string == &gSavePortalMenuDesc) {
                 gCameraPoolHideViews = 0;
             }
             MenuPool_OpenMenu(item->owner != NULL ? item->owner->m_pCamera->m_MenuPool : gEngineApp_m_Game_m_MenuPool, string, item->owner,

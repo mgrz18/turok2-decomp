@@ -3,13 +3,11 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/menu_desc.h"
 
 s32 PakMenu_CheckPak(void *event, s32 port, s32 arg2);
 void MenuPool_OpenMenu(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
-extern char gSavePortalMenuDesc[];
-extern char gSavePortalMenuDescB[];
-extern char gPakConfirmRepairDesc[];
 extern char gEngineApp_m_Game_m_MenuPool[];
 extern s32 gPakMenuPort;
 extern s32 gCameraPoolHideViews;
@@ -34,13 +32,13 @@ s32 DamagedPakMenu_SelectRetry(s32 unused, Menu *event) {
         } else {
             dst = gEngineApp_m_Game_m_MenuPool;
         }
-        if (event->context == gSavePortalMenuDescB || event->context == gSavePortalMenuDesc) {
+        if (event->context == &gSavePortalMenuDescB || event->context == &gSavePortalMenuDesc) {
             gCameraPoolHideViews = 0;
         }
         MenuPool_OpenMenu(dst, event->context, event->player, (s32) event->controller, NULL);
         return 1;
     } else {
-        if (event->context == gSavePortalMenuDescB || event->context == gSavePortalMenuDesc) {
+        if (event->context == &gSavePortalMenuDescB || event->context == &gSavePortalMenuDesc) {
             gCameraPoolHideViews = 0;
         }
         MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);

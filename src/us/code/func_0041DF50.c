@@ -5,6 +5,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
+#include "globals/menu_desc.h"
 
 typedef struct O01Sel { s32 v; s32 w; } O01Sel;
 extern s32 gPakMenuIsSave;
@@ -18,14 +19,6 @@ extern s32 gDamagedPakContinued;
 extern s32 gPakMenuPort;
 extern PakProfile gPakProfile;
 extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern u8 gPakMsgInsertToSaveDesc[];
-extern u8 gDamagedPakAtBootMenuDesc[];
-extern u8 gPakMsgPakNotFoundDesc[];
-extern u8 gPakSaveProfileMenuDesc[];
-extern u8 gStatsAfterPakMenuDesc1[];
-extern u8 gStatsAfterPakMenuDesc2[];
-extern u8 gStatsAfterPakMenuDesc3[];
-extern u8 gStatsAfterPakMenuDesc4[];
 void Pak_ProbeSlot(s32 ch);
 s32 Pak_GetStatus(s32 ch);
 s32 Pak_IsRumblePak(s32 ch);
@@ -39,16 +32,16 @@ static inline u8 *O01Pick(O01Sel *sel) {
     switch (sel->v) {
     case 0:
     default:
-        msg = gStatsAfterPakMenuDesc1;
+        msg = (u8 *)&gStatsAfterPakMenuDesc1;
         break;
     case 1:
-        msg = gStatsAfterPakMenuDesc2;
+        msg = (u8 *)&gStatsAfterPakMenuDesc2;
         break;
     case 2:
-        msg = gStatsAfterPakMenuDesc3;
+        msg = (u8 *)&gStatsAfterPakMenuDesc3;
         break;
     case 3:
-        msg = gStatsAfterPakMenuDesc4;
+        msg = (u8 *)&gStatsAfterPakMenuDesc4;
         break;
     }
     return msg;
@@ -104,11 +97,11 @@ void PakMenu_InitSaveProfile(Menu *own) {
         } else {
             gPakMenuLeaving = 1;
             if (Pak_IsRumblePak(sel.v) != 0) {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToSaveDesc, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgInsertToSaveDesc, plr, plr->m_ContState.m_pContState, msg);
             } else if (Pak_NeedsRepair(sel.v) != 0) {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, plr, plr->m_ContState.m_pContState, gPakSaveProfileMenuDesc);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, (u8 *)&gDamagedPakAtBootMenuDesc, plr, plr->m_ContState.m_pContState, (u8 *)&gPakSaveProfileMenuDesc);
             } else {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgPakNotFoundDesc, plr, plr->m_ContState.m_pContState, msg);
             }
         }
     }
