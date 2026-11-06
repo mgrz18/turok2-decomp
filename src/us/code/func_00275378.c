@@ -3,7 +3,6 @@
 
 #include "structs/sound.h"
 
-extern f32 D_800A8200;
 void alCSPSetVol(void *csp, s16 vol);
 void SndSeq_UpdateVolume(SndSeq *s) {
     f32 f;
@@ -20,6 +19,6 @@ void SndSeq_UpdateVolume(SndSeq *s) {
             return;
         }
     }
-    alCSPSetVol((void *)s->csp, f * D_800A8200);
+    alCSPSetVol((void *)s->csp, f * 32767.0f);
     s->vol = f;
 }
