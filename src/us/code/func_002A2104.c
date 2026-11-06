@@ -10,7 +10,7 @@ typedef struct MemoryBoundaryInit {
     /* 0x4 */ u32 flags;
 } MemoryBoundaryInit; /* i 0x8 */
 
-extern u32 osMemSize; /* 0x80000318 (ultralib), defined by the linker script */
+#define osMemSize (*(u32 *) 0x80000318) /* a constant address, not the symbol: extern u32 osMemSize schedules differently (round G2) */
 extern MemoryBoundaryInit gHostIoMemoryBounds[];
 extern u8 sHostIoStopped;
 extern u8 sHostIoResumeAllowed;
