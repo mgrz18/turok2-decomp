@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Module phase 2 entry: resets the actors' blend values and the fade timer, sets up phase 2 (timers, anim,
  * slot values), resets its active slots unless ai->m_Mode is 0x13, and queues MotherBoss_OnPhase2CinemaDone. */
@@ -15,10 +16,6 @@ extern s32 gMotherBoss_liveMask[]; /* gMotherBoss.liveMask */
 extern s32 gMotherBoss_counter[]; /* gMotherBoss.counter */
 extern f32 sMotherBossFadeTimer; /* fade timer (func_0040A17C) */
 extern s32 sMotherBossCinemaStarted;
-extern s32 sMotherBossPhaseVisBits_2[];
-extern s32 sMotherBossPhaseActiveMasks_2[]; /* active slot mask per phase */
-extern s32 sMotherBossPhaseLiveMasks_2[];
-extern u8 sMotherBossSpotResetScript_2[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void MotherBoss_OnPhase2CinemaDone_2(void);
 extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);

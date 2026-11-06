@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Second boss module: once none of its third group of actors has flag 0x100 left, steps the script to the
  * next phase. */
 
 
-extern BlindOnePhase sBlindOnePhases[];
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase(BlindOneState *state) {

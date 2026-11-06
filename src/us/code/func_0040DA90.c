@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
@@ -15,7 +16,6 @@ typedef struct Obj2 {
 
 extern BlindOneState gBlindOne;
 extern f32 gFrameIncrement; /* frame time */
-extern BlindOnePhase sBlindOnePhases[];
 extern u8 gEngineApp_m_OnScreen[];
 extern void Animator_Update(void *slot);
 extern void BlindOne_UpdateMover(BlindOneMover *mover);

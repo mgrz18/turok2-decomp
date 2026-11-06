@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss_ai.h"
 
 /* Module init: find the module actors (0x1DB1) and the controller (0x1DB2), set up the AI (mode table and callbacks),
  * then attach every slot to the object. */
@@ -8,7 +9,6 @@
 extern s32 gScene_m_LevelID;
 extern s32 D_800F1F10[];
 extern u8 gScene[];
-extern u8 sMotherBossModeTable_2[];
 extern s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void *out, s32 max);
 extern void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
 extern void ScriptAnimator_Start(void *slot, void *obj);

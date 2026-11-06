@@ -11,8 +11,8 @@ typedef float f32;
 typedef double f64;
 s32 CAI__SetMode(s32, s32, s32);
 s32 COnScreen__SetBoss(s32 *, s32, s32 *);
-extern s32 sPrimagenSpawnScript1_2;
-extern s32 sPrimagenSoundScript3_2;
+extern s32 sPrimagenSpawnScript1_2; /* local type: BossStep2[] in globals/boss.h; this file typedefs its own s8...f64 instead of common.h */
+extern s32 sPrimagenSoundScript3_2; /* local type: BossStep3[] in globals/boss.h (same reason) */
 extern s32 D_800C046C;
 extern s32 gEngineApp_m_OnScreen;
 extern s32 gLevelScript_script3_cursor;

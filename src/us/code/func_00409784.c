@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/level_actor.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Boss fight tick: updates the 15 attack slots, then (outside cinematics)
  * counts up the two timers: by phase, drops a random pickup somewhere in the
@@ -10,9 +11,6 @@
 
 extern s32 gMotherBoss_minRadius;      /* arena radius range */
 extern s32 gMotherBoss_maxRadius;
-extern u8 sMotherBossPickupTable[];     /* pickup weights */
-extern u8 sMotherBossDropTablePhase1[];
-extern u8 sMotherBossDropTablePhase2[];
 extern u8 gScene[];
 extern u8 gScene_m_ActorPool[];
 

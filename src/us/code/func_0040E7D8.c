@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern BlindOnePhase sBlindOnePhases[];
 
 /* Advances the script by one command, stops the movers and runs the new command. */
 static __inline__ void NextCommand(BlindOneState *m) {

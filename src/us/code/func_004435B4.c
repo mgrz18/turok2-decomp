@@ -2,15 +2,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Module phase 1 setup: timers, the anim for the phase, slot values; unless ai->m_Mode is 9, resets the
  * phase's active slots and runs MotherBoss_DropPickupsAtSpawnPoints three times. */
 
-extern s32 sMotherBossPhaseVisBits_2[];
-extern s32 sMotherBossPhaseActiveMasks_2[]; /* active slot mask per phase */
-extern s32 sMotherBossPhaseLiveMasks_2[];
-extern u8 sMotherBossSpotResetScript_2[];
-extern u8 sMotherBossPhase1SpawnDrops_2[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void MotherBoss_DropPickupsAtSpawnPoints_2(s32 arg0, void *arg1);
 

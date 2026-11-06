@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 void CAI__SetMode(void *a0, void *a1, s32 event);
 void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
@@ -77,8 +78,6 @@ typedef struct {
 } Part00401E30;
 
 extern u8 gScene[];
-extern WaveBossStep sMantidQueenScript[];
-extern Part00401E30 sMantidQueenMinions[];
 void ScriptAnimator_Start(void *slot, void *actor);
 s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void *out, s32 max);
 void *CScene__FindIntelligence(void *world, s32 a1, s32 id);

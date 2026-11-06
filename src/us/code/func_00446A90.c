@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern BlindOneState gBlindOne;
 
@@ -12,7 +13,6 @@ extern BlindOneState gBlindOne;
 
 
 extern f32 gFrameIncrement; /* frame time */
-extern BlindOnePhase sBlindOnePhases_2[];
 extern u8 gEngineApp_m_OnScreen[];
 extern void Animator_Update(void *slot);
 extern void BlindOne_UpdateMover_2(BlindOneMover *mover);

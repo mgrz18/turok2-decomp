@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 void CAI__SetMode(void *a0, void *a1, s32 event);
 void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
@@ -89,7 +90,6 @@ typedef struct {
     /* 0x10 */ Source00402404 *source;
 } Hit00402404;
 
-extern u8 sMantidQueenSpotHitScript[];
 extern u8 gEngineApp_m_OnScreen[];
 void ScriptAnimator_SetScript(void *slot, void *arg);
 void COnScreen__SetBossPercent(void *a0, s32 percent);

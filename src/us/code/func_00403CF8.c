@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss_ai.h"
 
 typedef struct {
     f32 x, y, z;
@@ -29,7 +30,6 @@ extern s32 gScene_m_LevelID;
 extern s32 gLevelScript_path;
 extern s32 sPrimagenPathPoint;
 extern u8 gScene[];
-extern u8 sPrimagenModeTable[];
 s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void **out, s32 max);
 void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
 void ScriptAnimator_Start(void *light, void *actor);

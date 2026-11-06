@@ -2,13 +2,13 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/collision.h"
+#include "globals/boss.h"
 
 /* Module hit callback (the level's onHit, func_00408FF8 + 8 at the link address): finds the first active part the
  * hit touched; parts 10-14 are three groups, each draining the health of one still-alive slot of the current phase.
  * A slot that dies changes the anim state and clears its bit; when no slot of the phase is left, the next phase
  * state starts. */
 
-extern u8 sMotherBossHurtScript_2[];
 extern void MotherBoss_StartSpotAnims_2(void *obj, void *sound, s32 a2);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 

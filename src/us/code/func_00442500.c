@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Spawns one actor near each of the four spawn points, scattered by up to +-15 units, skipping a point
  * closer than 460.8 to the target of the module object. */

@@ -4,6 +4,7 @@
 #include "structs/game_object.h"
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* LevelScriptState (structs/boss.h) seen from 0x8012F604, one word before it
  * (offsets below are from 0x8012F608): the ROM addresses it through D_8012F604. */
@@ -58,9 +59,6 @@ extern f32 gLevelScript_script;          /* cooldown */
 extern BossStep *gLevelScript_script_steps;    /* script */
 extern s32 gLevelScript_script_cursor;          /* cursor */
 extern s32 gLevelScript;          /* stage, as the script selection reads it */
-extern BossStep sPrimagenAttackScriptStage1_2[];
-extern BossStep sPrimagenAttackScriptStage2_2[];
-extern BossStep sPrimagenAttackScriptStage3_2[];
 
 void Primagen_UpdateMode19_2(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;

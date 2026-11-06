@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Teleports the current target (when it is a flagged actor) to a random spot: around the spawn point
  * nearest to it (within 460.8) inside that point's angle range, else around itself; retried until the spot

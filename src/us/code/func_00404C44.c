@@ -2,18 +2,11 @@
 #include "structs/game_object.h"
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern s32 gLevelScript;           /* stage */
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
-
-/* An attack: AI mode and the distance window it can start from (0x10 bytes). */
-typedef struct {
-    /* 0x0 */ s32 mode;
-    /* 0x4 */ f32 minDist;
-    /* 0x8 */ f32 maxDist;
-    /* 0xC */ s32 padC;
-} BossAttack;
 
 typedef struct {
     /* 0x0 */ f32 waitMin;       /* 0x8012F618 */
@@ -21,13 +14,6 @@ typedef struct {
 } BossWait;
 
 extern BossWait gLevelScript_swayPhase;
-extern BossAttack sPrimagenAttacks[];
-extern BossStep sPrimagenAttackScriptStage1[];
-extern BossStep sPrimagenAttackScript2Stage1[];
-extern BossStep sPrimagenAttackScriptStage2[];
-extern BossStep sPrimagenAttackScript2Stage2[];
-extern BossStep sPrimagenAttackScriptStage3[];
-extern BossStep sPrimagenAttackScript2Stage3[];
 
 s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist) {
     f32 scale;

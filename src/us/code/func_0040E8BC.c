@@ -1,10 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern BlindOnePhase sBlindOnePhases[];
 
-extern u8 sBlindOneMoverSeq3[];
 
 extern u8 gScene[];
 extern void CScene__MarkGeneratorsSaved(void *);

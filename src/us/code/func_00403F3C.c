@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     f32 x, y, z;
@@ -23,10 +24,6 @@ typedef struct {
 } Level00403F3C;
 
 extern f32 gFrameIncrement;
-extern u8 sPrimagenTossTable[];
-extern u8 sPrimagenTossTableStage3[];
-extern u8 sPrimagenTossTable2[];
-extern u8 sPrimagenTossTable2Stage3[];
 extern u8 gEngineApp_m_OnScreen[];
 void AI_TurnHeadToTarget(Actor00403F3C *actor, Level00403F3C *level, s32 a2);
 void Animator_Update(void *light);

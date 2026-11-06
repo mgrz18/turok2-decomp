@@ -3,12 +3,12 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Script command: waits until the current player is within 716.8 units of the origin, then steps the
  * script to the next command. */
 
 
-extern BlindOnePhase sBlindOnePhases_2[];
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern f32 func_00298470(f32);
 

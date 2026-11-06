@@ -1,15 +1,13 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Module update: ticks every slot, then (outside cinematics) counts the two phase timers: the first spawns
  * one actor at a random spot around the origin, the second starts a burst of spawns at the phase points. */
 
 extern s32 gMotherBoss_minRadius; /* gMotherBoss.minRadius */
 extern s32 gMotherBoss_maxRadius; /* gMotherBoss.maxRadius */
-extern u8 sMotherBossPickupTable_2[];
-extern u8 sMotherBossDropTablePhase1_2[];
-extern u8 sMotherBossDropTablePhase2_2[];
 extern u8 gScene[];
 extern u8 gScene_m_ActorPool[];
 extern void Animator_Update(void *slot);

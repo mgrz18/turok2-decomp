@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Second boss phase update: spawns a minion at a random point 1228.8-1536 around the boss while the phase has
  * some left (and fewer than its maximum are alive); once none are left and fewer than 5 are alive, steps the
@@ -11,7 +12,6 @@
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern BlindOnePhase sBlindOnePhases_2[];
 extern u8 gScene_m_InstancePool[];
 extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */

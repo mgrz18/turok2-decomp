@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x6C];
@@ -14,8 +15,6 @@ typedef struct {
     /* 0x10 */ Source004037B0 *source;
 } Hit004037B0;
 
-extern u8 sPrimagenPartHitScript[];
-extern u8 sPrimagenPartDestroyScript[];
 void ScriptAnimator_SetScript(void *light, void *arg);
 void Primagen_SetSpawnScript(s32 a0);
 f32 Random_Blend(f32 lo, f32 hi);

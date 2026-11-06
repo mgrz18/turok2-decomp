@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern BlindOneState gBlindOne;
 
@@ -11,7 +12,6 @@ extern BlindOneState gBlindOne;
 
 extern s32 gScene_m_LevelID[]; /* warp id */
 extern u8 gBlindOneBossModeTable[];
-extern BlindOneStep sBlindOneScript_2[];
 extern u8 gEngineApp_m_OnScreen[];
 extern void BlindOne_BossUpdate_2(void);
 extern void BlindOne_BossHurt_2(void);

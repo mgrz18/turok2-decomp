@@ -2,12 +2,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Second boss module: plays sound 0x284F, sends the module object to anim state 1 and steps the script to
  * the next phase. */
 
 
-extern BlindOnePhase sBlindOnePhases_2[];
 extern void Sound__Play2D(s32 sound);
 extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 

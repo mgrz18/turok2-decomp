@@ -2,13 +2,13 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/collision.h"
+#include "globals/boss.h"
 
 /* Damage callback of the second boss: outside phase 9 it only flinches (anim state 6); in phase 9 the damage
  * is taken, a hit effect plays at most every 2.25 s, and at zero health it dies (anim state 9). */
 
 
 extern BlindOneState gBlindOne;
-extern u8 sBlindOneHitScript[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 extern void CCache__SetFrameDelay(s32 arg0);
