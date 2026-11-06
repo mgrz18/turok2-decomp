@@ -34,14 +34,9 @@ typedef struct Thread {
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
 extern u8 D_800AA0F0[];
 extern u16 *gCFB;             /* frame buffer */
-extern char gEngineTimestamp[];           /* build string */
 extern char D_8010FED4[];
 extern s32 D_800F1FF0;              /* failed assertion: line */
 extern char *D_800F1FF4;            /* failed assertion: expression */
-extern u8 gThreadStackIdle[];             /* thread stacks */
-extern u8 gThreadStackMain[];
-extern u8 gThreadStackAudio[];
-extern u8 gSchedulerStack[];
 
 extern u64 osGetTime(void);                 /* osGetTime */
 extern void Video_SetResolution(s32);

@@ -8,7 +8,6 @@ extern void func_002888BC(s32, s32, s32);
 extern s32 PakMenu_PickDefaultPort(void);
 extern s32 PakMenu_HasPort(void);
 extern s32 CScene__LoadLevel(s32, s32, s32);
-extern s32 gPakCheckTimedOut;
 
 void EngineMode00_PakCheck_Init(s32 arg0) {
     gPakMenuPort = -1;

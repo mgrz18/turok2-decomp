@@ -33,7 +33,7 @@ typedef struct CFrameData {
     /* 0x118 */ void *m_pLineList;       /* Gfx *: the line / overlay list */
     /* 0x11C */ s32 m_DisplayListSize;   /* in bytes */
     /* 0x120 */ s32 m_LineListSize;
-    /* 0x124 */ s32 m_nPredictTicks;     /* the retraces the frame took (gNextTicks) */
+    /* 0x124 */ u32 m_nPredictTicks;     /* the retraces the frame took (gNextTicks) */
     /* 0x128 */ s32 m_bLines;            /* the line list has lines (Automap_IsShown) */
     /* 0x12C */ struct CFrameData *m_pPrev;
     /* 0x130 */ struct CFrameData *m_pNext;

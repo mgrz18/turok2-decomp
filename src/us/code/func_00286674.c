@@ -20,16 +20,9 @@ extern u8 gPoolBuffers[];
 extern void *gCFB[];      /* frame buffers */
 extern f32 gCurrentFB[];
 extern EngineMsg *gGfxMsg;
-extern s32 gCurrentTick;
-extern s32 gNumTicks0;
 extern s32 D_800F6CA8;
-extern s32 gNumTicks2;
-extern s32 gNumTicks3;
-extern s32 gCurrentTickWaiting;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
-extern f32 gPakCheckTimer;
-extern u8 gGfxFrameMessageQueue[];         /* the engine message queue */
 
 extern void InitializeSystemResources(void);
 extern void osCreateViManager(s32 pri);
@@ -118,7 +111,7 @@ void CEngineApp__Main(CEngineApp *e) {
     }
 
     for (;;) {
-        osRecvMesg(gGfxFrameMessageQueue, &gGfxMsg, 1);
+        osRecvMesg(&gGfxFrameMessageQueue, &gGfxMsg, 1);
         switch (gGfxMsg->type) {
         case 1:
             CEngineApp__Retrace(e);

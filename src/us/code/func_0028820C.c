@@ -1,16 +1,14 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "globals/frame.h"
 
-s32 osCreateThread(s32, s32, s32, s32, s32, s32);
-s32 osStartThread(s32);
-
-s32 memset(s32 *, s32, s32); /* extern */
-extern s32 gThreadStackIdle;
-extern s32 gThreadIdle;
-extern s32 Engine_Idle;
+extern void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
+extern void osStartThread(OSThread *thread);
+extern void *memset(void *dst, s32 value, u32 size);
+extern void Engine_Idle(void *arg);
 
 void CEngineApp__Boot(void) {
-    memset(&gThreadStackIdle, 0, 0x80);
-    osCreateThread((s32) &gThreadIdle, 0, (s32) &Engine_Idle, 0, (s32) ((void *)((s8 *)&gThreadStackIdle + 0x80)), gThreadPriorityIdleInit);
-    osStartThread((s32) &gThreadIdle);
+    memset(gThreadStackIdle, 0, sizeof(gThreadStackIdle));
+    osCreateThread(&gThreadIdle, 0, Engine_Idle, NULL, gThreadStackIdle + sizeof(gThreadStackIdle), gThreadPriorityIdleInit);
+    osStartThread(&gThreadIdle);
 }

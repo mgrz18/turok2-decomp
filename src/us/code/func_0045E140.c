@@ -33,8 +33,6 @@ extern char D_800C184C[];
 extern char D_800C185C[];
 extern char D_800C1864[];
 extern s32 gCFB[]; /* frame buffers */
-extern s32 gRspFifoSize;
-extern s32 gRspFifoBuffer;
 
 void GfxPool_Alloc_2(GfxPool *pool) {
     u32 mb = 0x100000;
@@ -110,7 +108,7 @@ void GfxPool_Alloc_2(GfxPool *pool) {
     gLineList1 = gDisplayList0 + gDisplayListSize * 8;
     gRspFifoSize = 0x8000;
     gAudioHeapSize = 0x22000;
-    gRspFifoBuffer = pool->dynamic->addr;
+    gRspFifoBuffer = (u64 *) pool->dynamic->addr;
     gAudioHeapBase = pool->vtx->addr;
     for (i = 0; i < gTotalFramebuffers; i++)
         ;
