@@ -1,0 +1,1221 @@
+// n7: names for VM module 1, 0x00400000-0x0041FFFF (automap, Mantid Queen, Primagen,
+// totem defense, Mother, Blind One, cinema system, menu windows, menus, cheats,
+// options, stats, name entry, Controller Pak), plus the _2 line of each module-2
+// copy (module 2 = module 1 at about +0x39000; copies verified word-identical).
+
+// n7 chunk A: VM module 1, 0x00400000-0x00403FFF (automap, Mantid Queen boss,
+// start of the Primagen boss), plus the module-2 copies of these.
+
+// The automap (L button): the CDebugLines-area block at CGame+0x1230
+// (D_8011AAA0); func_004004D8's header says "The automap", REGION_FLAG_REGISTERED
+// is "seen on the map"; drawn into the frame's line list (CFrameData.m_bLines).
+Automap_RevealRegion = 0x00400000; // sets REGION_FLAG_REGISTERED|VISITED on a region, recurses into neighbours with a corner near the camera; called by Automap_RevealAroundPlayer
+Automap_Update = 0x004001D0; // opens/closes on L (0x20) in mode 13, fades the blend, C buttons turn yaw/pitch; called each frame by func_00288F60/func_0028908C on CGame+0x1230
+Automap_Draw = 0x004004D8; // header "The automap: the level's navigation regions are drawn as lines"; called by func_00287248 when m_bLines
+Automap_SetPlayer = 0x00401B30; // stores region, yaw, pos (from func_00251FC4 with the player's region/m_RotY/m_vPos) then reveals around it
+Automap_RevealAroundPlayer = 0x00401B70; // Automap_RevealRegion from the stored region, then Automap_ClearVisited over its neighbours
+Automap_IsShown = 0x00401C1C; // state != 0, no cinema path playing: becomes CFrameData.m_bLines (func_00287248)
+Automap_IsOpen = 0x00401C78; // state is 1 (opening) or 2 (open), the states of Automap_Update
+Automap_Open = 0x00401C88; // state = 1 unless already opening/open
+Automap_Close = 0x00401CA8; // state = 3 (closing) unless closed/closing, as in Automap_Update
+Automap_Reset = 0x00401CC4; // clears state, blend and the yaw/pitch words Automap_Update zeroes when closed
+Automap_ClearVisited = 0x00401CE8; // recursive clear of REGION_FLAG_VISITED (0x8000) over the neighbour graph
+Automap_EdgeVisible = 0x00401D80; // outlined copy of Automap_Draw's EdgeVisible inline (segment vs the 4 screen corners)
+
+// The Mantid Queen boss (WaveBossState D_8012F3A0, type 0x451, boss id 0x1D4D):
+// health bar "Queen" (D_800C0330, func_00402BB0), sets m_bQueenBossComplete
+// (func_0040336C). Mode callbacks from its mode table D_00430CA4 (row: mode,
+// enter, update); func_00243414 sets an AI mode.
+MantidQueen_Init = 0x00401E30; // WaveBossState setup: 5 weak-spot healths and animators, first step D_00430824, finds the 0x457 boss and 0x651 minions
+MantidQueen_SendMinions = 0x00401FCC; // sorts minions by distance to the player (qsort with MantidQueen_SortCompare/Swap), wakes them while toSpawn and under step->maxActive
+MantidQueen_Update = 0x004021C8; // per-frame: animators, minion waves, next step when the wave is done, weak-spot blink; called by MantidQueen_Step
+MantidQueen_Hurt = 0x00402404; // m_pfHurt (func_00402888): damages the open weak spot, next step when it dies, sets the boss bar percent (func_0027AD88)
+MantidQueen_ChooseAttack = 0x00402658; // update of mode 8: turns to the target and picks modes 4/9/10/11/12 by distance/angle
+MantidQueen_InitAI = 0x00402888; // type 0x451 in the AI init dispatcher func_0025BE88: D_80110048 = 0x1D4D, mode table D_00430CA4, step/hurt/draw callbacks
+MantidQueen_SpawnMinion = 0x004028F4; // boss-id 0x1D4D case of func_00238DF8: spawns a part from step->partPicks with s->intel
+MantidQueen_Step = 0x00402A10; // m_pfStep (func_00402888): base step, then MantidQueen_Update(&D_8012F3A0)
+MantidQueen_EnterStart = 0x00402ADC; // mode 0 enter: hooks the 0x451 actors' draw (MantidQueen_Draw), MantidQueen_Init, mode 1
+MantidQueen_EnterIntro = 0x00402B94; // mode 1 enter: plays cinema 300 (func_00412438)
+MantidQueen_UpdateIntro = 0x00402BB0; // mode 1 update: when the cinema ends, moves to the marker, mode 8, starts the "Queen" health bar
+MantidQueen_EnterMode2 = 0x00402C8C; // mode 2 enter (D_00430CA4)
+MantidQueen_UpdateMode2 = 0x00402CC0; // mode 2 update: mode 3 once no wave runs
+MantidQueen_EnterMode3 = 0x00402CE8; // mode 3 enter: boss anim 0x5AAA
+MantidQueen_UpdateMode3 = 0x00402D28; // mode 3 update: anim done -> mode 7
+MantidQueen_EnterMode4 = 0x00402D50; // mode 4 enter: boss anim 0x5AB4
+MantidQueen_UpdateMode4 = 0x00402D98; // mode 4 update: damps m_vDesiredPos, anim done -> mode 5
+MantidQueen_EnterMode5 = 0x00402E0C; // mode 5 enter: boss anim 0x5ABE
+MantidQueen_UpdateMode5 = 0x00402E44; // mode 5 update: mode 6 once no wave runs
+MantidQueen_UpdateMode6 = 0x00402E6C; // mode 6 update: turns to the player; anim done -> boss anim 0x5ADC, mode 7, flashes the open spot
+MantidQueen_EnterMode6 = 0x00402F4C; // mode 6 enter: boss anim 0x5AB4
+MantidQueen_EnterPush = 0x00402F90; // mode 9 enter: clears WaveBossState.pushed
+MantidQueen_UpdatePush = 0x00402FA0; // mode 9 update: anim 0x1004 shoves the target once (WaveBossState.pushed), back to mode 8
+MantidQueen_PickFromStep = 0x004030A4; // the mode-10 row's extra function: func_0026D518(step->picks10)
+MantidQueen_UpdateAttackAnim = 0x004030D4; // update of modes 7 and 10: back to mode 8 after the anim plays once (twice for 0x10CC/0x1131)
+MantidQueen_UpdateTurn = 0x00403144; // update of modes 11 and 12 (the turn sides MantidQueen_GetTurnSide returns): turns, back to mode 8
+MantidQueen_UpdateMode13 = 0x00403218; // mode 13 update: anim done -> mode 8
+MantidQueen_EnterMode14 = 0x00403240; // mode 14 enter (step 7, MantidQueen_NextStep): func_00225D0C(world)
+MantidQueen_UpdateMode14 = 0x00403264; // mode 14 update: anim done -> mode 15
+MantidQueen_EnterMode15 = 0x0040328C; // mode 15 enter: flashes the open weak spot (D_00430C6C)
+MantidQueen_UpdateMode15 = 0x004032E4; // mode 15 update: slow turn to the target
+MantidQueen_EnterDeath = 0x0040333C; // mode 16 enter (step 8): func_002535E4(players, 900), cinema 0x136
+MantidQueen_UpdateDeath = 0x0040336C; // mode 16 update: sets m_bQueenBossComplete and cheats 0x6000 when the cinema ends
+MantidQueen_SetBossAnim = 0x0040340C; // func_002666B0 on WaveBossState.boss (0x220)
+MantidQueen_UpdateBossAnim = 0x00403430; // outlined State_UpdateBoss inline of MantidQueen_Update: 0x5ABE -> 0x5ADC
+MantidQueen_FlashWeakSpot = 0x00403494; // starts the open spot's animator with the given script
+MantidQueen_SetStep = 0x004034E0; // outlined State_SetStep inline of MantidQueen_Init
+MantidQueen_NextStep = 0x00403520; // outlined State_NextStep inline: next WaveBossStep, modes 14/16 at steps 7/8
+MantidQueen_SortSwap = 0x004035B8; // swap callback passed to func_00226F90 by MantidQueen_SendMinions
+MantidQueen_SortCompare = 0x004035CC; // compare callback passed to func_00226F90 by MantidQueen_SendMinions (distance at 0x24C)
+MantidQueen_CountActiveMinions = 0x004035F8; // outlined State_CountActive inline: awake minions + live D_8010FEB4 instances
+MantidQueen_Draw = 0x00403660; // m_pfDraw (func_00402888/func_00402ADC): draws the 5 weak-spot sub-models with their flash animators
+MantidQueen_GetTurnSide = 0x00403774; // func_002451AC(.., 45 deg) when WaveBossState.blink, else 0; inlined in MantidQueen_UpdateTurn
+
+// The Primagen boss (LevelScriptState D_8012F608, type 0x453, boss id
+// 0x1DB2): health bar "Primagen" (D_800C046C, func_00407C20),
+// m_bPrimagenBossComplete (func_00407CB0).
+Primagen_Hurt = 0x004037B0; // m_pfHurt (Primagen_InitAI): damages the 8 parts in values[0], flashes them, destroys a part
+Primagen_Effects = 0x00403AD4; // m_pfEffects (Primagen_InitAI, func_004071DC on the 0x453 actors): shades the destroyed part's model by partTimer
+Primagen_SetStage = 0x00403C14; // sets stage 1/2/3 and the part healths for it; called by Primagen_InitAI and func_00404450
+Primagen_InitAI = 0x00403CF8; // type 0x453 in the AI init dispatcher func_0025BE88: D_80110048 = 0x1DB2, callbacks, LevelScriptState setup
+Primagen_Step = 0x00403F3C; // m_pfStep (Primagen_InitAI): timers, sub-stages, minion drops, func_00404450/func_0040457C, boss bar percent
+Primagen_SetStage_2 = 0x0043CC14; // header: "Second VM module twin of func_00403C14"
+Primagen_InitAI_2 = 0x0043CCF8; // header: "Second-module twin of func_00403CF8"
+Primagen_Step_2 = 0x0043CF3C; // no header, but its code is func_00403F3C's line for line (diff: only the local type names)
+// n7 chunk B: VM module 1, 0x00404000-0x00408FFF: the rest of the Primagen
+// boss (LevelScriptState D_8012F608, boss id 0x1DB2 = warp 7602) and the
+// totem defense missions (levels 1-5, warps 0x1BBC..0x1D4C), plus their
+// module-2 copies at +0x39000 (0x0043D000-0x00441FFF: word-identical in the
+// ROM; most of them are still asm).
+
+// Primagen: the three step scripts of LevelScriptState (script = attacks,
+// script2 = minion spawns, script3 = sounds), the spawner and the part health.
+Primagen_UpdateHealth = 0x00404450; // called by Primagen_Step: sums the live parts' values[0] into total (the boss bar), next stage (Primagen_SetStage) when none left, mode 29 at stage 3
+Primagen_UpdateSpawner = 0x0040457C; // called by Primagen_Step: opens/closes the doors (found[2]/[3]), spawns model 0x387 minions at two fixed points, waves, leashes the enemies, runs script2/script3
+Primagen_RunAttackStep = 0x00404C44; // runs LevelScriptState.script's current BossStep (wait = mode 18, attack from D_00430F10 by distance, switch script); called by the mode updates
+Primagen_NextSpawnStep = 0x00404FE0; // advances script2 (steps skipped by chance, type 4 ends); called by Primagen_UpdateSpawner
+Primagen_RunSpawnStep = 0x004050E0; // runs script2's step: sets spawnsLeft (max 8 alive) or wavesLeft
+Primagen_NextSoundStep = 0x00405288; // advances script3 (delay + random range, type 4 ends)
+Primagen_RunSoundStep = 0x004053C4; // runs script3's step: func_00275544 (sound at the boss), weighted pick func_0026D518, jump, skip
+Primagen_NextAttackStep = 0x00406E0C; // advances script (type 5 wraps); same loop the mode updates inline
+Primagen_SetAttackScript = 0x00406F10; // script.steps by stage: kind 1 D_00431008/D_004310E4/D_00431238, kind 2 D_00431094/D_00431198/D_00431300
+Primagen_SetSpawnScript = 0x004070B4; // script2 steps D_004313B4..D_00431590 by index (0 = none); called by Primagen_InitAI and the mode code
+Primagen_SetSoundScript = 0x00407158; // script3 steps (D_8012FA20) D_00431660/D_00431624/D_0043169C/D_00431700 by index
+Primagen_SpawnTossedObject = 0x00406FE4; // func_00227240 an object of the given kind thrown up (vy 512) at pos, event 0x11D; Primagen_Step drops them every 300 frames from weighted tables
+Primagen_HandleAnimEvent = 0x00406C4C; // case 0x1DB2 of func_00238DF8 (the per-boss anim event switch): events 1/2 fire func_00236EA0 at the target in range
+Primagen_Draw = 0x00407DC0; // m_pfDraw (Primagen_InitAI, func_004071DC): draws the 8 part sub-models of the mask with their animators
+
+// Primagen mode table D_0043173C (CAIModeInfo rows: mode, enter, update):
+// the enter/update functions of each mode, by its number.
+Primagen_UpdateMode0 = 0x004071DC; // mode 0 update: puts Primagen_Draw/Primagen_Effects on the 0x453 actors, then mode 28
+Primagen_EnterMode1 = 0x00407284; // mode 1 enter: bossState from bossMode (5/6/10)
+Primagen_UpdateMode1 = 0x004056DC; // mode 1 update: waits / sees the target -> mode 7 or 5, runs the attack script
+Primagen_EnterMode2 = 0x004072C8; // mode 2 enter: sound 0x2779, func_00246860 0x3B21
+Primagen_UpdateMode2 = 0x00405958; // mode 2 update: the exposed part: destroyed past its damage limit or closed on partTimer (partsDone), -> mode 7
+Primagen_EnterMode5 = 0x0040734C; // mode 5 enter: bossState 1, armed/scriptOn off
+Primagen_UpdateMode5 = 0x00407374; // mode 5 update: anim done -> mode 1 with a random wait
+Primagen_EnterMode6 = 0x00407410; // mode 6 enter: bossState 0
+Primagen_UpdateMode6 = 0x0040742C; // mode 6 update: anim done -> found[0]/found[1] to mode 1, bossMode 8, mode 18
+Primagen_EnterMode7 = 0x00405C68; // mode 7 enter: anim speed by stage, starts the stage's part animators
+Primagen_UpdateMode7 = 0x00405E04; // mode 7 update: turns to the target, runs the attack script, close -> mode 1
+Primagen_EnterMode9 = 0x004078B0; // mode 9 enter: empty
+Primagen_UpdateMode9 = 0x004078B8; // mode 9 update: turns to the target, anim done -> mode 1 or 7
+Primagen_EnterMode10 = 0x004079BC; // mode 10 enter: empty
+Primagen_UpdateMode10 = 0x004079C4; // mode 10 update: turns to the target, anim done -> mode 1
+Primagen_EnterMode11 = 0x00407AC0; // mode 11 enter: empty
+Primagen_UpdateMode11 = 0x00407AC8; // mode 11 update: turns to the target, anim done -> mode 7
+Primagen_UpdateMode14 = 0x00407B80; // mode 14 update (no enter): anim done -> mode 19 or 7
+Primagen_EnterMode16 = 0x00407BBC; // mode 16 enter: script3 restarts at D_00431700
+Primagen_UpdateMode16 = 0x00407BE8; // mode 16 update: anim done -> mode 2
+Primagen_EnterMode18 = 0x004075F8; // mode 18 enter: anim speed and timers by bossMode
+Primagen_UpdateMode18 = 0x00406598; // mode 18 update: wait / turn and back off (bossMode 8) / sway (bossMode 9), -> modes 19/23/25
+Primagen_EnterMode19 = 0x004074D0; // modes 19 and 25 enter: bossState 3/4/11, path start D_800C18F0
+Primagen_UpdateMode19 = 0x00406000; // modes 19 and 25 update: flies to dest or along the D_800C18F0 paths, -> modes 23/26
+Primagen_EnterMode20 = 0x0040765C; // mode 20 enter: timers 15 and 11.25
+Primagen_UpdateMode20 = 0x0040688C; // mode 20 update: pushes the target away (716.8 or 179.2), -> mode 7
+Primagen_EnterMode21 = 0x004077F0; // mode 21 enter: flag 0x2000 only
+Primagen_UpdateMode21 = 0x00407800; // mode 21 update: anim done -> mode 19
+Primagen_EnterMode22 = 0x0040783C; // mode 22 enter: stops (velocity 0)
+Primagen_UpdateMode22 = 0x00407858; // mode 22 update: anim done -> mode 19
+Primagen_EnterMode23 = 0x0040768C; // mode 23 enter: anim speed
+Primagen_UpdateMode23 = 0x004076B0; // mode 23 update: landed (y < 10) -> mode 7 or 16
+Primagen_EnterMode24 = 0x004077AC; // modes 24 and 26 enter
+Primagen_UpdateMode24 = 0x00406AA8; // modes 24 and 26 update: reached dest.y -> home and script2 for the stage (mode 5), or mode 7/16
+Primagen_EnterMode27 = 0x00407894; // mode 27 enter: anim speed
+Primagen_UpdateMode27 = 0x00405AC8; // mode 27 update: lunges at the target, anim done -> mode 19
+Primagen_EnterMode28 = 0x00407C18; // mode 28 enter: empty
+Primagen_UpdateMode28 = 0x00407C20; // mode 28 update: boss bar named "Primagen" (D_800C046C), script2 D_004313B4, script3 D_0043169C, -> mode 5
+Primagen_EnterDeath = 0x00407CB0; // mode 29 enter: m_bPrimagenBossComplete, ending cinema 0x172 (all five totems) or 0x173, cheats
+Primagen_UpdateDeath = 0x00407D6C; // mode 29 update: when func_00284204 says the cinema is done, warp 8000 (func_00248BA8)
+
+// The totem defense missions (the 0x8012FB50 fight block): strings
+// "defend the totem", "mission complete.", "mission failed.", bars "Enemies"
+// and "Time", CIntelligence m_TotemMissionDuration, m_bLevel1..5TotemFlags.
+TotemDefense_Complete = 0x00407F20; // message "mission complete." (D_800B6660), totem anim 0x5337, enemies stop, sets m_bLevelNTotemFlags + cheat bit by warp 0x1BBC..0x1D4C
+TotemDefense_Fail = 0x0040813C; // message "mission failed." (D_800B6674), totem anim 0x5336, the enemies turn on the player
+TotemDefense_UpdateFight = 0x004082A0; // "defend the totem" (D_800B6684), Time/Enemies bars, warning anim 0x5335, Complete/Fail, sends maxHelpers enemies at the player and the rest at the totem
+TotemDefense_Update = 0x004085A0; // m_pfStep (TotemDefense_Init): runs the fight, then warps to the level's next warp (Blind One 0x1CE9 / Queen 0x1D4D unless beaten)
+TotemDefense_Init = 0x004088B0; // sets m_pfStep/TotemDefense_OnEvent, m_TotemMissionDuration*15, anim 0x5334, bars "Enemies" and "Time"; called by func_00265954/func_00265A30
+TotemDefense_GetState = 0x004089B8; // returns the fight state (D_8012FB58)
+TotemDefense_AddKill = 0x004089C8; // D_8012FB60++ (the kill count); called from the enemy death code (func_0025B2D4, func_0025FC08, func_002600E8)
+TotemDefense_DrawTotem = 0x004089E0; // the totem's draw (TotemDefense_Init, TotemDefense_Update): cached lit-vertex model with colour D_8012FB64
+TotemDefense_InitFight = 0x00408B20; // unreferenced out-of-line copy of TotemDefense_Init's setup on a given fight block (same anim 0x5334, "Enemies"/"Time")
+TotemDefense_KillsLeft = 0x00408BFC; // def->kills (0x46) - count
+TotemDefense_RetargetEnemies = 0x00408C10; // the enemy loop of TotemDefense_UpdateFight, out of line
+TotemDefense_TryHitEnemy = 0x00408CF4; // one time in four, event 0x17C + 0xFF00 damage to the first live enemy (inlined in TotemDefense_Update)
+TotemDefense_StopEnemies = 0x00408DCC; // player m_FleeTime 450, live enemies drop their targets (as TotemDefense_Complete)
+TotemDefense_StopGenerators = 0x00408E40; // func_00225D0C(world): turns the generator actors off (as TotemDefense_Complete)
+TotemDefense_AnyEnemyAlive = 0x00408E64; // any live INTELLIGENCE_ENEMY instance (inlined in TotemDefense_Update)
+TotemDefense_TryHitEnemyAfterDelay = 0x00408EAC; // TotemDefense_TryHitEnemy behind the fight's timer
+TotemDefense_FindLiveEnemy = 0x00408FB0; // looks for a live enemy, result unused
+TotemDefense_OnEvent = 0x00408FF0; // empty; the callback TotemDefense_Init stores next to m_pfStep
+
+// Module-2 copies (+0x39000, word-identical in the ROM).
+Primagen_UpdateHealth_2 = 0x0043D450; // asm
+Primagen_UpdateSpawner_2 = 0x0043D57C; // header: "twin of func_0040457C"
+Primagen_RunAttackStep_2 = 0x0043DC44; // header: "twin of func_00404C44"
+Primagen_NextSpawnStep_2 = 0x0043DFE0; // asm
+Primagen_RunSpawnStep_2 = 0x0043E0E0; // asm
+Primagen_NextSoundStep_2 = 0x0043E288; // asm
+Primagen_RunSoundStep_2 = 0x0043E3C4; // asm
+Primagen_NextAttackStep_2 = 0x0043FE0C; // asm
+Primagen_SetAttackScript_2 = 0x0043FF10; // C, same code
+Primagen_SetSpawnScript_2 = 0x004400B4; // C, same code
+Primagen_SetSoundScript_2 = 0x00440158; // C, same code
+Primagen_SpawnTossedObject_2 = 0x0043FFE4; // asm
+Primagen_HandleAnimEvent_2 = 0x0043FC4C; // asm
+Primagen_Draw_2 = 0x00440DC0; // asm
+Primagen_UpdateMode0_2 = 0x004401DC; // asm
+Primagen_EnterMode1_2 = 0x00440284; // asm
+Primagen_UpdateMode1_2 = 0x0043E6DC; // asm
+Primagen_EnterMode2_2 = 0x004402C8; // C, same code
+Primagen_UpdateMode2_2 = 0x0043E958; // asm
+Primagen_EnterMode5_2 = 0x0044034C; // C, same code
+Primagen_UpdateMode5_2 = 0x00440374; // asm
+Primagen_EnterMode6_2 = 0x00440410; // C, same code
+Primagen_UpdateMode6_2 = 0x0044042C; // C, same code
+Primagen_EnterMode7_2 = 0x0043EC68; // C, same code
+Primagen_UpdateMode7_2 = 0x0043EE04; // asm
+Primagen_EnterMode9_2 = 0x004408B0; // C, same code
+Primagen_UpdateMode9_2 = 0x004408B8; // asm
+Primagen_EnterMode10_2 = 0x004409BC; // C, same code
+Primagen_UpdateMode10_2 = 0x004409C4; // asm
+Primagen_EnterMode11_2 = 0x00440AC0; // C, same code
+Primagen_UpdateMode11_2 = 0x00440AC8; // asm
+Primagen_UpdateMode14_2 = 0x00440B80; // C, same code
+Primagen_EnterMode16_2 = 0x00440BBC; // C, same code
+Primagen_UpdateMode16_2 = 0x00440BE8; // C, same code
+Primagen_EnterMode18_2 = 0x004405F8; // C, same code
+Primagen_UpdateMode18_2 = 0x0043F598; // asm
+Primagen_EnterMode19_2 = 0x004404D0; // asm
+Primagen_UpdateMode19_2 = 0x0043F000; // header: "twin of func_00406000"
+Primagen_EnterMode20_2 = 0x0044065C; // C, same code
+Primagen_UpdateMode20_2 = 0x0043F88C; // asm
+Primagen_EnterMode21_2 = 0x004407F0; // C, same code
+Primagen_UpdateMode21_2 = 0x00440800; // C, same code
+Primagen_EnterMode22_2 = 0x0044083C; // C, same code
+Primagen_UpdateMode22_2 = 0x00440858; // C, same code
+Primagen_EnterMode23_2 = 0x0044068C; // C, same code
+Primagen_UpdateMode23_2 = 0x004406B0; // asm
+Primagen_EnterMode24_2 = 0x004407AC; // C, same code
+Primagen_UpdateMode24_2 = 0x0043FAA8; // header: "twin of func_00406AA8"
+Primagen_EnterMode27_2 = 0x00440894; // C, same code
+Primagen_UpdateMode27_2 = 0x0043EAC8; // header: "twin of func_00405AC8"
+Primagen_EnterMode28_2 = 0x00440C18; // C, same code
+Primagen_UpdateMode28_2 = 0x00440C20; // C, same code
+Primagen_EnterDeath_2 = 0x00440CB0; // asm
+Primagen_UpdateDeath_2 = 0x00440D6C; // C, same code
+TotemDefense_Fail_2 = 0x0044113C; // asm
+TotemDefense_UpdateFight_2 = 0x004412A0; // asm
+TotemDefense_Update_2 = 0x004415A0; // asm
+TotemDefense_Init_2 = 0x004418B0; // asm
+TotemDefense_GetState_2 = 0x004419B8; // C, same code
+TotemDefense_AddKill_2 = 0x004419C8; // C, same code
+TotemDefense_DrawTotem_2 = 0x004419E0; // asm
+TotemDefense_InitFight_2 = 0x00441B20; // C, same code
+TotemDefense_KillsLeft_2 = 0x00441BFC; // C, same code
+TotemDefense_RetargetEnemies_2 = 0x00441C10; // asm
+TotemDefense_TryHitEnemy_2 = 0x00441CF4; // asm
+TotemDefense_StopEnemies_2 = 0x00441DCC; // asm
+TotemDefense_StopGenerators_2 = 0x00441E40; // C, same code
+TotemDefense_AnyEnemyAlive_2 = 0x00441E64; // C, same code
+TotemDefense_TryHitEnemyAfterDelay_2 = 0x00441EAC; // asm
+TotemDefense_FindLiveEnemy_2 = 0x00441FB0; // asm
+TotemDefense_OnEvent_2 = 0x00441FF0; // asm
+// n7 chunk C: VM module 1, 0x00409000-0x0040C84F (the Mother boss), plus their module-2 copies (_2).
+// Mother boss fight (D_8012FB70 MotherBossState), 0x00409000-0x0040C84F; boss type 0x44E (func_0025BE88), D_80110048 = 0x1DB1.
+// Its mode table D_00431F00 (read from the ROM: rows {mode, enter fn, step fn, data, anim}) gives the mode numbers below.
+// Module-2 copies (+0x39000, word-identical modulo relocations) get _2.
+// AI callbacks, setup and the per-frame update
+MotherBoss_Hurt = 0x00409000; // installed as m_pfHurt by func_00409340 (via func_00408FF8+8); takes damage off the weak spot of the phase, clears liveMask bits, advances mode when all are gone
+MotherBoss_Init = 0x00409340; // func_0025BE88 case 0x44E; finds the 0x1DB1 parts and 0x1DB2 controller, sets m_pModeTable D_00431F00 and m_pfStep/Hurt/Effects/Collision/Draw
+MotherBoss_Step = 0x0040BC64; // m_pfStep set by func_00409340: AI step + current mode callback, then func_00409784
+MotherBoss_UpdateSpotsAndPickups = 0x00409784; // only caller MotherBoss_Step: steps the 15 weak-spot animators and the pickupTimer/dropTimer pickup drops by phase
+MotherBoss_Draw = 0x0040BEE4; // m_pfDraw (func_00409340, func_0040AD60): draws each model part whose bit is set, applying its weak-spot animator
+MotherBoss_Collision = 0x0040BFF0; // m_pfCollision (func_00409340): in modes 14/15 knocks the touched player away from (0,0,512) and deals 0x500 damage
+MotherBoss_PartEffects = 0x0040A25C; // m_pfEffects of the 0x44E actors (func_0040AD60): fades m_Mother.m_GrowScale/m_PulseScale and scales parts with them
+MotherBoss_AnimEvent = 0x00409D4C; // func_00238DF8 case D_80110048 == 0x1DB1: anim events spawn a 0x458 minion, impacts at the player, throw the parts, knock back
+// helpers
+MotherBoss_GetTargetDist = 0x0040BD60; // returns m_Path.m_FlatDist to the AI path target when it has flag 0x300000, else -1; inlined as getTargetDist in many
+MotherBoss_FewerActorsThan = 0x0040C4F4; // counts the D_8010FEB4 list < max; inlined as fewerActorsThan before minion spawns
+MotherBoss_KillMinions = 0x0040BD10; // zeroes m_Health of every D_8010FEB4 actor and sets mode 0x34; MotherBoss_Step calls it in phase 0 when the target is close
+MotherBoss_StartSpotAnims = 0x0040BDD0; // func_00236314 on the weak-spot animators selected by mask; MotherBoss_Hurt's hit flash
+MotherBoss_FlashActiveSpots = 0x0040C5DC; // func_00236314(D_00431EE4) on every spot in activeMask
+MotherBoss_TeleportTarget = 0x00409A64; // moves the target (event 0x112) to a random spot around the nearest spawn point D_00431D20 at least 460.8 from all; modes 16 and 28
+MotherBoss_DropPickupsAtSpawnPoints = 0x00409500; // spawns a picked pool actor (vel.y 512, sound 0x11D) at each of the 4 spawn points D_00431D20 far from the target
+MotherBoss_RandomArenaPoint = 0x0040C110; // random point at distance [minRadius, maxRadius] and angle [-pi, pi]; inlined in func_0040C394
+MotherBoss_RandomSpawnPoint = 0x0040C19C; // random one of the 4 spawn points D_00431D20 at least 460.8 from the target
+MotherBoss_SpawnPickup = 0x0040C2C4; // func_00227240 pool actor id at pos with vel.y 512 and lifetime, sound 0x11D; inlined in func_00409784
+MotherBoss_SpawnRandomPickup = 0x0040C394; // weighted pick (func_0026D518) + MotherBoss_RandomArenaPoint + MotherBoss_SpawnPickup inlined
+MotherBoss_SendImpactAt = 0x0040C518; // func_00236EA0 message kind 3 at the other actor's position with (0xA00, value << 8), as AnimEvent does inline
+MotherBoss_TurnToTarget = 0x0040C584; // func_00245BAC 15-degree turn toward m_Sight.m_Angle; the body every Mode*_TrackTarget shares
+MotherBoss_TurnThenPhase2Choose = 0x0040C684; // turn toward the target, then mode 0x16 (Phase2ChooseAttack) when the anim is done; not in the mode table
+MotherBoss_PickPhaseAnim = 0x0040A170; // anim function of modes 4, 10 and 13: anim 0x55FA/0x5604 (phase 0) or 0x5654/0x565E (phase 1) by m_VisBits
+MotherBoss_PickWarpAnim = 0x0040AD28; // anim function of mode 16 (the TeleportTarget mode): one of 0x5640/0x56C2/0x56B8/0x56A4 by flags 2 and 0x20
+// phase setup, cinemas (func_00283FF8 starts a cinema with a done callback)
+MotherBoss_StartIntro = 0x0040AD60; // mode 0 enter: collects the (0x44E, 9) actors, hooks Draw/PartEffects, MotherBoss_SetupPhase0, cinema 0xC8 -> OnIntroCinemaDone
+MotherBoss_OnIntroCinemaDone = 0x0040C65C; // cinema 0xC8 callback (func_0040AD60): sets the boss to mode 1
+MotherBoss_SetupPhase0 = 0x0040AE24; // mode 1 enter: phase = 0, six 0x2800 weak spots, health 0xF000
+MotherBoss_StartPhase1Cinema = 0x0040B180; // mode 9 enter: clears the actors' scales, MotherBoss_SetupPhase1, cinema 0xD2 -> OnPhase1CinemaDone
+MotherBoss_SetupPhase1 = 0x0040A5B4; // mode 10 enter: phase = 1, spots 1 and 5 at 0x9600, health 0x12C00, three spawn-point drops
+MotherBoss_OnPhase1CinemaDone = 0x0040C6F4; // cinema 0xD2 callback (func_0040B180): puts the player at D_00431D7C facing the boss, mode 0xA
+MotherBoss_StartPhase2Cinema = 0x0040ABB4; // mode 19 enter: resets the actors' scales, sets phase 2 (inlined SetupPhase2), cinema 0xDC -> OnPhase2CinemaDone
+MotherBoss_SetupPhase2 = 0x0040B644; // mode 20 enter: phase = 2, spot 13 and health 0x1F400
+MotherBoss_OnPhase2CinemaDone = 0x0040C7B4; // cinema 0xDC callback (func_0040ABB4): mode 0x14
+MotherBoss_StartDefeatCinema = 0x0040BEA8; // mode 31 enter: players invincible (func_002535E4 900), cinema 0xE6 -> OnDefeatCinemaDone
+MotherBoss_OnDefeatCinemaDone = 0x0040C7DC; // cinema 0xE6 callback: sets m_Data.m_bMotherBossComplete and cheat bit 4
+// mode step callbacks (D_00431F00 rows); the attack choosers pick weighted anims by distance and health ratio
+MotherBoss_Phase0ChooseAttack = 0x0040A418; // mode 2 step: weighted pick of modes 3-6 by target distance and minion count
+MotherBoss_Phase1ChooseAttack = 0x0040A6F0; // mode 12 step: weighted pick of modes 0xD/0xF/0x10/0x12 by distance and health ratio
+MotherBoss_Phase2ChooseAttack = 0x0040A8FC; // mode 22 step: weighted pick of modes 0x17-0x1D by distance, minions and health ratio
+MotherBoss_Mode01_FlashSpotsThenIdle = 0x0040AF20; // mode 1 step: when the anim is done, D_00431EE4 on the active spots, mode 2
+MotherBoss_Mode03_TrackTarget = 0x0040B298; // mode 3 step: turn toward the target, mode 2 when done
+MotherBoss_Mode04_TrackTarget = 0x0040AFD0; // mode 4 step: turn toward the target, mode 2 when done
+MotherBoss_Mode05_TrackTarget = 0x0040B040; // mode 5 step: turn toward the target, mode 2 when done
+MotherBoss_Mode06_RecallParts = 0x0040B0B0; // mode 6 step: turn; when done sends the six 0x1DB1 parts to mode 0 and itself to mode 2
+MotherBoss_Mode07_Enter = 0x0040B310; // mode 7 enter: sets m_dwHotPointFlags 0x08000000
+MotherBoss_Mode07_Step = 0x0040B324; // mode 7 step: clears m_dwHotPointFlags 0x08000000 and goes to mode 2 when the anim is done
+MotherBoss_Mode08_Enter = 0x0040B35C; // mode 8 enter: sets m_dwHotPointFlags 0x10000000
+MotherBoss_Mode08_Step = 0x0040B370; // mode 8 step: clears m_dwHotPointFlags 0x10000000 and goes to mode 2 when the anim is done
+MotherBoss_Mode10_FlashSpotsThenIdle = 0x0040B1E8; // mode 10 step: when the anim is done, D_00431EE4 on the active spots, mode 0xC
+MotherBoss_Mode11_TrackTarget = 0x0040B3A8; // mode 11 step: turn toward the target, mode 0xC when done
+MotherBoss_Mode13_TrackTarget = 0x0040B418; // mode 13 step: turn toward the target, mode 0xC when done
+MotherBoss_Mode14_ChargeStep = 0x0040B59C; // mode 14 and 15 step (the modes MotherBoss_Collision hits in): mode data state 7, mode 0xB when done
+MotherBoss_Mode16_TeleportTarget = 0x0040B488; // mode 16 step: MotherBoss_TeleportTarget every third step, mode 0x11 after 31
+MotherBoss_Mode17_TrackTarget = 0x0040B524; // mode 17 step: counter = 0, turn toward the target, mode 0xC when done
+MotherBoss_Mode18_TrackTarget = 0x0040B5D4; // mode 18 step: turn toward the target, mode 0xC when done
+MotherBoss_Mode20_Step = 0x0040B734; // mode 20 step: mode 0x15 when the anim is done
+MotherBoss_Mode21_FlashSpotsThenIdle = 0x0040B75C; // mode 21 step: when the anim is done, D_00431EE4 on the active spots, mode 0x16
+MotherBoss_Mode23_Approach = 0x0040B80C; // mode 23 step: turn to the target, mode 0x16 after 100 steps or once within 460.8 and 20 degrees
+MotherBoss_Mode24_GoToCenter = 0x0040B918; // mode 24 step: turn toward (0,0,512), mode 0x1C once within 51.2 of it
+MotherBoss_Mode25_TrackTarget = 0x0040B9D8; // mode 25 step: turn toward the target, mode 0x16 when done
+MotherBoss_Mode26_TrackTarget = 0x0040BA48; // mode 26 step: turn toward the target, mode 0x16 when done
+MotherBoss_Mode27_TrackTarget = 0x0040BAB8; // mode 27 step: turn toward the target, mode 0x16 when done
+MotherBoss_Mode28_Enter = 0x0040BB28; // mode 28 enter: empty
+MotherBoss_Mode28_TeleportTarget = 0x0040BB30; // mode 28 step: MotherBoss_TeleportTarget every third step, mode 0x16 when done
+MotherBoss_Mode29_TrackTarget = 0x0040BBF4; // mode 29 step: turn toward the target, mode 0x16 when done
+MotherBoss_Mode30_DeathStep = 0x0040BE50; // mode 30 step: players invincible (func_002535E4 900), mode 0x1F when the anim is done
+// module-2 copies, 0x00442000-0x004457DC
+MotherBoss_Hurt_2 = 0x00442000; // module-2 copy of MotherBoss_Hurt (word-identical at +0x39000)
+MotherBoss_Init_2 = 0x00442340; // module-2 copy of MotherBoss_Init (word-identical at +0x39000)
+MotherBoss_Step_2 = 0x00444C64; // module-2 copy of MotherBoss_Step (word-identical at +0x39000)
+MotherBoss_UpdateSpotsAndPickups_2 = 0x00442784; // module-2 copy of MotherBoss_UpdateSpotsAndPickups (word-identical at +0x39000)
+MotherBoss_Draw_2 = 0x00444EE4; // module-2 copy of MotherBoss_Draw (word-identical at +0x39000)
+MotherBoss_Collision_2 = 0x00444FF0; // module-2 copy of MotherBoss_Collision (word-identical at +0x39000)
+MotherBoss_PartEffects_2 = 0x0044325C; // module-2 copy of MotherBoss_PartEffects (word-identical at +0x39000)
+MotherBoss_AnimEvent_2 = 0x00442D4C; // module-2 copy of MotherBoss_AnimEvent (word-identical at +0x39000)
+MotherBoss_GetTargetDist_2 = 0x00444D60; // module-2 copy of MotherBoss_GetTargetDist (word-identical at +0x39000)
+MotherBoss_FewerActorsThan_2 = 0x004454F4; // module-2 copy of MotherBoss_FewerActorsThan (word-identical at +0x39000)
+MotherBoss_KillMinions_2 = 0x00444D10; // module-2 copy of MotherBoss_KillMinions (word-identical at +0x39000)
+MotherBoss_StartSpotAnims_2 = 0x00444DD0; // module-2 copy of MotherBoss_StartSpotAnims (word-identical at +0x39000)
+MotherBoss_FlashActiveSpots_2 = 0x004455DC; // module-2 copy of MotherBoss_FlashActiveSpots (word-identical at +0x39000)
+MotherBoss_TeleportTarget_2 = 0x00442A64; // module-2 copy of MotherBoss_TeleportTarget (word-identical at +0x39000)
+MotherBoss_DropPickupsAtSpawnPoints_2 = 0x00442500; // module-2 copy of MotherBoss_DropPickupsAtSpawnPoints (word-identical at +0x39000)
+MotherBoss_RandomArenaPoint_2 = 0x00445110; // module-2 copy of MotherBoss_RandomArenaPoint (word-identical at +0x39000)
+MotherBoss_RandomSpawnPoint_2 = 0x0044519C; // module-2 copy of MotherBoss_RandomSpawnPoint (word-identical at +0x39000)
+MotherBoss_SpawnPickup_2 = 0x004452C4; // module-2 copy of MotherBoss_SpawnPickup (word-identical at +0x39000)
+MotherBoss_SpawnRandomPickup_2 = 0x00445394; // module-2 copy of MotherBoss_SpawnRandomPickup (word-identical at +0x39000)
+MotherBoss_SendImpactAt_2 = 0x00445518; // module-2 copy of MotherBoss_SendImpactAt (word-identical at +0x39000)
+MotherBoss_TurnToTarget_2 = 0x00445584; // module-2 copy of MotherBoss_TurnToTarget (word-identical at +0x39000)
+MotherBoss_TurnThenPhase2Choose_2 = 0x00445684; // module-2 copy of MotherBoss_TurnThenPhase2Choose (word-identical at +0x39000)
+MotherBoss_PickPhaseAnim_2 = 0x00443170; // module-2 copy of MotherBoss_PickPhaseAnim (word-identical at +0x39000)
+MotherBoss_PickWarpAnim_2 = 0x00443D28; // module-2 copy of MotherBoss_PickWarpAnim (word-identical at +0x39000)
+MotherBoss_StartIntro_2 = 0x00443D60; // module-2 copy of MotherBoss_StartIntro (word-identical at +0x39000)
+MotherBoss_OnIntroCinemaDone_2 = 0x0044565C; // module-2 copy of MotherBoss_OnIntroCinemaDone (word-identical at +0x39000)
+MotherBoss_SetupPhase0_2 = 0x00443E24; // module-2 copy of MotherBoss_SetupPhase0 (word-identical at +0x39000)
+MotherBoss_StartPhase1Cinema_2 = 0x00444180; // module-2 copy of MotherBoss_StartPhase1Cinema (word-identical at +0x39000)
+MotherBoss_SetupPhase1_2 = 0x004435B4; // module-2 copy of MotherBoss_SetupPhase1 (word-identical at +0x39000)
+MotherBoss_OnPhase1CinemaDone_2 = 0x004456F4; // module-2 copy of MotherBoss_OnPhase1CinemaDone (word-identical at +0x39000)
+MotherBoss_StartPhase2Cinema_2 = 0x00443BB4; // module-2 copy of MotherBoss_StartPhase2Cinema (word-identical at +0x39000)
+MotherBoss_SetupPhase2_2 = 0x00444644; // module-2 copy of MotherBoss_SetupPhase2 (word-identical at +0x39000)
+MotherBoss_OnPhase2CinemaDone_2 = 0x004457B4; // module-2 copy of MotherBoss_OnPhase2CinemaDone (word-identical at +0x39000)
+MotherBoss_StartDefeatCinema_2 = 0x00444EA8; // module-2 copy of MotherBoss_StartDefeatCinema (word-identical at +0x39000)
+MotherBoss_OnDefeatCinemaDone_2 = 0x004457DC; // module-2 copy of MotherBoss_OnDefeatCinemaDone (word-identical at +0x39000)
+MotherBoss_Phase0ChooseAttack_2 = 0x00443418; // module-2 copy of MotherBoss_Phase0ChooseAttack (word-identical at +0x39000)
+MotherBoss_Phase1ChooseAttack_2 = 0x004436F0; // module-2 copy of MotherBoss_Phase1ChooseAttack (word-identical at +0x39000)
+MotherBoss_Phase2ChooseAttack_2 = 0x004438FC; // module-2 copy of MotherBoss_Phase2ChooseAttack (word-identical at +0x39000)
+MotherBoss_Mode01_FlashSpotsThenIdle_2 = 0x00443F20; // module-2 copy of MotherBoss_Mode01_FlashSpotsThenIdle (word-identical at +0x39000)
+MotherBoss_Mode03_TrackTarget_2 = 0x00444298; // module-2 copy of MotherBoss_Mode03_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode04_TrackTarget_2 = 0x00443FD0; // module-2 copy of MotherBoss_Mode04_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode05_TrackTarget_2 = 0x00444040; // module-2 copy of MotherBoss_Mode05_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode06_RecallParts_2 = 0x004440B0; // module-2 copy of MotherBoss_Mode06_RecallParts (word-identical at +0x39000)
+MotherBoss_Mode07_Enter_2 = 0x00444310; // module-2 copy of MotherBoss_Mode07_Enter (word-identical at +0x39000)
+MotherBoss_Mode07_Step_2 = 0x00444324; // module-2 copy of MotherBoss_Mode07_Step (word-identical at +0x39000)
+MotherBoss_Mode08_Enter_2 = 0x0044435C; // module-2 copy of MotherBoss_Mode08_Enter (word-identical at +0x39000)
+MotherBoss_Mode08_Step_2 = 0x00444370; // module-2 copy of MotherBoss_Mode08_Step (word-identical at +0x39000)
+MotherBoss_Mode10_FlashSpotsThenIdle_2 = 0x004441E8; // module-2 copy of MotherBoss_Mode10_FlashSpotsThenIdle (word-identical at +0x39000)
+MotherBoss_Mode11_TrackTarget_2 = 0x004443A8; // module-2 copy of MotherBoss_Mode11_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode13_TrackTarget_2 = 0x00444418; // module-2 copy of MotherBoss_Mode13_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode14_ChargeStep_2 = 0x0044459C; // module-2 copy of MotherBoss_Mode14_ChargeStep (word-identical at +0x39000)
+MotherBoss_Mode16_TeleportTarget_2 = 0x00444488; // module-2 copy of MotherBoss_Mode16_TeleportTarget (word-identical at +0x39000)
+MotherBoss_Mode17_TrackTarget_2 = 0x00444524; // module-2 copy of MotherBoss_Mode17_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode18_TrackTarget_2 = 0x004445D4; // module-2 copy of MotherBoss_Mode18_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode20_Step_2 = 0x00444734; // module-2 copy of MotherBoss_Mode20_Step (word-identical at +0x39000)
+MotherBoss_Mode21_FlashSpotsThenIdle_2 = 0x0044475C; // module-2 copy of MotherBoss_Mode21_FlashSpotsThenIdle (word-identical at +0x39000)
+MotherBoss_Mode23_Approach_2 = 0x0044480C; // module-2 copy of MotherBoss_Mode23_Approach (word-identical at +0x39000)
+MotherBoss_Mode24_GoToCenter_2 = 0x00444918; // module-2 copy of MotherBoss_Mode24_GoToCenter (word-identical at +0x39000)
+MotherBoss_Mode25_TrackTarget_2 = 0x004449D8; // module-2 copy of MotherBoss_Mode25_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode26_TrackTarget_2 = 0x00444A48; // module-2 copy of MotherBoss_Mode26_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode27_TrackTarget_2 = 0x00444AB8; // module-2 copy of MotherBoss_Mode27_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode28_Enter_2 = 0x00444B28; // module-2 copy of MotherBoss_Mode28_Enter (word-identical at +0x39000)
+MotherBoss_Mode28_TeleportTarget_2 = 0x00444B30; // module-2 copy of MotherBoss_Mode28_TeleportTarget (word-identical at +0x39000)
+MotherBoss_Mode29_TrackTarget_2 = 0x00444BF4; // module-2 copy of MotherBoss_Mode29_TrackTarget (word-identical at +0x39000)
+MotherBoss_Mode30_DeathStep_2 = 0x00444E50; // module-2 copy of MotherBoss_Mode30_DeathStep (word-identical at +0x39000)
+// --- chunk D: 0x0040C850-0x0040F23F, the Blind One boss (BlindOneState D_80130200, structs/boss.h) ---
+// Module-2 copies are at +0x39000 (0x00445850-0x004481D8); every one checked
+// instruction for instruction against build/ref.elf (objdump, immediates masked).
+
+// The fight: setup, movers, health, phase script (phase table D_0043240C: {init, update})
+BlindOne_UpdateMover = 0x0040C850; // steps a BlindOneMover: plays its seq of actor bit masks, sends actors to attack modes 3/4/5; called x3 from BlindOne_BossUpdate
+BlindOne_GetHealthPercent = 0x0040CB28; // sums m_InitialHealth of the three groups vs the live ones (flag 0x100), returns percent; fed to func_0027AD88 (health bar)
+BlindOne_Setup = 0x0040CCC0; // phase 0 update (D_00432410[0]): collects types 0x454-0x456, sets health/faders, minion defs 0x1CE9/0x1CEA, health bar "Blind", enters the next phase
+BlindOne_PhaseWaitPlayerUpdate = 0x0040CFC4; // phase 1 update: next phase once the player is within 716.8 of the origin
+BlindOne_PhaseMinionsUpdate = 0x0040D0F0; // phase 3 update: spawns minions (minionDefA) 1228.8-1536 around the boss; next phase when none left and <5 alive
+BlindOne_PhaseGroup3Update = 0x0040D3A8; // phase 6 update: next phase once no actors3 (type 0x456) keeps flag 0x100
+BlindOne_PhaseBossMode1Init = 0x0040D4C8; // phase 8 init: sound 0x284F, boss to AI mode 1, next phase
+BlindOne_PhaseStartCinemaInit = 0x0040E450; // phase 2 init: func_00412438(0x15E) (cinema: make entries with id 0x15E pending)
+BlindOne_PhaseWaitCinemaUpdate = 0x0040E46C; // phase 2 update: next phase when func_00284204 (cinema not active, no entry) is true
+BlindOne_PhaseMinionsInit = 0x0040E55C; // phase 3 init: toSpawn/maxMinions from the step's two operands (script D_00432340 {3, 16.0, 8.0})
+BlindOne_PhaseGroup1Init = 0x0040E59C; // phase 4 init: actors1 (0x454) to mode 0, mover 0 on D_00432494 at step seconds
+BlindOne_PhaseGroup1Update = 0x0040E648; // phase 4 update: next phase when alive1 == 0
+BlindOne_PhaseGroup2Init = 0x0040E72C; // phase 5 init: actors2 (0x455) to mode 0, mover 1 on D_004324C8
+BlindOne_PhaseGroup2Update = 0x0040E7D8; // phase 5 update: next phase when alive2 == 0
+BlindOne_PhaseGroup3Init = 0x0040E8BC; // phase 6 init: actors3[0] (0x456) to mode 0, mover 2 on D_004324F4
+BlindOne_PhaseBossMode0Init = 0x0040E930; // phase 7 init: boss to AI mode 0, next phase
+BlindOne_PhaseVulnerableInit = 0x0040EA24; // phase 9 init: boss to AI mode 0; phase 9 is the only one where BlindOne_BossHurt takes damage
+BlindOne_PhaseVulnerableUpdate = 0x0040EA48; // phase 9 update: next phase when the boss's m_Health is 0
+BlindOne_PhaseVictoryInit = 0x0040EB30; // phase 10 init: func_002535E4 (every player's m_InvincibilityTime = 900), func_00225D0C
+BlindOne_PhaseVictoryUpdate = 0x0040EB68; // phase 10 update: after the boss's m_ModeTime passes a limit sets m_Data.m_bBlindBossComplete, unlockedCheats |= 0x120, warps (func_00248BA8 0x1387); cf. Mother's func_0040C7DC
+BlindOne_StartScript = 0x0040EBE4; // boss = leader, script = D_00432340, BlindOne_EnterPhase(first step)
+BlindOne_EnterPhase = 0x0040EC14; // stops the movers, clears m_nPhaseHits, phase = id, runs D_0043240C[id].init
+BlindOne_UpdateFight = 0x0040ECDC; // phase update + faders + three movers + health bar (the tail of BlindOne_BossUpdate, out of line)
+BlindOne_StartMover = 0x0040ED94; // sets a BlindOneMover's seq and interval, zeroes pos/timer/step/offset
+BlindOne_NextPhase = 0x0040EF64; // out-of-line nextPhase inline: ++script, BlindOne_EnterPhase logic
+BlindOne_SpawnMinion = 0x0040F03C; // out-of-line spawnMinion inline of BlindOne_PhaseMinionsUpdate: func_00228108 at dist/angle around origin
+BlindOne_SumGroupHealth = 0x0040F1D8; // out-of-line sumHealth inline of BlindOne_GetHealthPercent
+
+// The boss actor (type 0x450): AI callbacks, init via func_0025BE88
+BlindOne_BossInit = 0x0040D5C4; // func_0025BE88 case 0x450: mode table D_800C1910, step/hurt/draw callbacks, starts script D_00432340, health bar "EyeBall"
+BlindOne_BossHurt = 0x0040D9B8; // m_pfHurt of the boss: flinch (mode 6) outside phase 9; in phase 9 takes damage, hit flash, mode 9 at zero
+BlindOne_BossUpdate = 0x0040DA90; // m_pfStep of the boss: mode callback, hit timer, phase update, faders, movers, health bar
+BlindOne_Draw = 0x0040EDB0; // m_pfDraw of the boss and actor groups 1/2: applies its fader, func_0020A33C
+BlindOne_Group3Draw = 0x0040EEA0; // m_pfDraw of type 0x456 (set in the actor inits): draws only while alive
+
+// The boss's mode table D_800C1910 (rows: mode, enter, update): mode N enter/update
+BlindOne_BossMode0Enter = 0x0040DB90; // D_800C1910 mode 0 enter (empty)
+BlindOne_BossMode0Update = 0x0040DB98; // mode 0 update: anim done -> mode 3
+BlindOne_BossMode1Enter = 0x0040DBC0; // mode 1 enter (empty)
+BlindOne_BossMode1Update = 0x0040DBC8; // mode 1 update (empty)
+BlindOne_BossMode2Enter = 0x0040DBD0; // mode 2 enter (empty)
+BlindOne_BossMode2Update = 0x0040DBD8; // mode 2 update: anim done -> mode 3
+BlindOne_BossMode3Enter = 0x0040DC00; // mode 3 enter: m_ConditionTimer = random(D_800C0900, D_800C0904)
+BlindOne_BossMode3Update = 0x0040DC38; // mode 3 update: once m_ModeTime > m_ConditionTimer -> mode 5
+BlindOne_BossMode4Enter = 0x0040DC9C; // mode 4 enter (empty)
+BlindOne_BossMode4Update = 0x0040DCA4; // mode 4 update: anim done -> mode 3
+BlindOne_BossMode5Enter = 0x0040DCCC; // mode 5 enter (empty)
+BlindOne_BossMode5Update = 0x0040DCD4; // mode 5 update: anim done -> mode 3
+BlindOne_BossFlinchEnter = 0x0040DCFC; // mode 6 (the flinch BlindOne_BossHurt sets) enter (empty)
+BlindOne_BossFlinchUpdate = 0x0040DD04; // mode 6 update: after 7 anim repeats -> mode 7
+BlindOne_BossMode7Enter = 0x0040DD30; // mode 7 enter (empty)
+BlindOne_BossMode7Update = 0x0040DD38; // mode 7 update: anim done -> mode 3
+BlindOne_BossMode8Enter = 0x0040DD60; // mode 8 (set when an actor dies, BlindOne_ActorDeathEnter) enter (empty)
+BlindOne_BossMode8Update = 0x0040DD68; // mode 8 update: anim done -> mode 3
+BlindOne_BossDeathEnter = 0x0040DD90; // mode 9 (death, set by BlindOne_BossHurt at zero health) enter: sound 0x284E
+BlindOne_BossDeathUpdate = 0x0040DDAC; // mode 9 update (empty)
+
+// The three actor groups (types 0x454/0x455/0x456): inits, callbacks, mode table D_800C1A90
+BlindOne_Group1Init = 0x0040D6A0; // func_0025BE88 case 0x454: mode table D_800C1A90, callbacks, targets the player, mode 1
+BlindOne_Group2Init = 0x0040D7A8; // func_0025BE88 case 0x455 (same body)
+BlindOne_Group3Init = 0x0040D8B0; // func_0025BE88 case 0x456 (same body)
+BlindOne_ActorInit = 0x0040DE68; // the same actor init body once more, unreferenced (the inline's own copy)
+BlindOne_ActorHurt = 0x0040DDB4; // m_pfHurt of the actors: damage, hit flash on its fader, mode 6 at zero
+BlindOne_ActorUpdate = 0x0040DF70; // m_pfStep of the actors: target the player while alive, mode callback, hit timer
+BlindOne_ActorAppearEnter = 0x0040E00C; // D_800C1A90 mode 0 enter: back to its spawn pos/region, alive1/2/3++ by type
+BlindOne_ActorAppearUpdate = 0x0040E0B0; // mode 0 update: anim done -> mode 2
+BlindOne_ActorMode1Enter = 0x0040E0D8; // mode 1 (the inits' start mode) enter (empty)
+BlindOne_ActorMode1Update = 0x0040E0E0; // mode 1 update: anim done -> clear flag 0x100
+BlindOne_ActorAimEnter = 0x0040E100; // mode 2 enter (empty)
+BlindOne_ActorAimUpdate = 0x0040E108; // mode 2 update: stores m_SightDist, turns toward the sight target within a per-type arc
+BlindOne_ActorAttack3Enter = 0x0040E27C; // mode 3 (attack sent by BlindOne_UpdateMover) enter (empty)
+BlindOne_ActorAttack3Update = 0x0040E284; // mode 3 update: anim done -> mode 2
+BlindOne_ActorAttack4Enter = 0x0040E2AC; // mode 4 (mover attack) enter (empty)
+BlindOne_ActorAttack4Update = 0x0040E2B4; // mode 4 update: anim done -> mode 2
+BlindOne_ActorAttack5Enter = 0x0040E2DC; // mode 5 (mover attack, 0x455 when m_SightDist >= 1228.8) enter (empty)
+BlindOne_ActorAttack5Update = 0x0040E2E4; // mode 5 update: anim done -> mode 2
+BlindOne_ActorDeathEnter = 0x0040E30C; // mode 6 (death, BlindOne_ActorHurt) enter: boss to mode 8, alive--, wakes the next 0x456
+BlindOne_ActorDeathUpdate = 0x0040E430; // mode 6 update: anim done -> clear flag 0x100
+
+// Module-2 copies (+0x39000), identical code
+BlindOne_UpdateMover_2 = 0x00445850; // copy of 0x0040C850
+BlindOne_GetHealthPercent_2 = 0x00445B28; // copy of 0x0040CB28
+BlindOne_Setup_2 = 0x00445CC0; // copy of 0x0040CCC0 (file header)
+BlindOne_PhaseWaitPlayerUpdate_2 = 0x00445FC4; // copy of 0x0040CFC4 (file header)
+BlindOne_PhaseMinionsUpdate_2 = 0x004460F0; // copy of 0x0040D0F0 (file header)
+BlindOne_PhaseGroup3Update_2 = 0x004463A8; // copy of 0x0040D3A8 (file header)
+BlindOne_PhaseBossMode1Init_2 = 0x004464C8; // copy of 0x0040D4C8 (file header)
+BlindOne_BossInit_2 = 0x004465C4; // copy of 0x0040D5C4 (file header)
+BlindOne_Group1Init_2 = 0x004466A0; // copy of 0x0040D6A0
+BlindOne_Group2Init_2 = 0x004467A8; // copy of 0x0040D7A8
+BlindOne_Group3Init_2 = 0x004468B0; // copy of 0x0040D8B0
+BlindOne_BossHurt_2 = 0x004469B8; // copy of 0x0040D9B8 (file header)
+BlindOne_BossUpdate_2 = 0x00446A90; // copy of 0x0040DA90 (file header)
+BlindOne_BossMode0Enter_2 = 0x00446B90; // copy of 0x0040DB90
+BlindOne_BossMode0Update_2 = 0x00446B98; // copy of 0x0040DB98
+BlindOne_BossMode1Enter_2 = 0x00446BC0; // copy of 0x0040DBC0
+BlindOne_BossMode1Update_2 = 0x00446BC8; // copy of 0x0040DBC8
+BlindOne_BossMode2Enter_2 = 0x00446BD0; // copy of 0x0040DBD0
+BlindOne_BossMode2Update_2 = 0x00446BD8; // copy of 0x0040DBD8
+BlindOne_BossMode3Enter_2 = 0x00446C00; // copy of 0x0040DC00
+BlindOne_BossMode3Update_2 = 0x00446C38; // copy of 0x0040DC38
+BlindOne_BossMode4Enter_2 = 0x00446C9C; // copy of 0x0040DC9C
+BlindOne_BossMode4Update_2 = 0x00446CA4; // copy of 0x0040DCA4
+BlindOne_BossMode5Enter_2 = 0x00446CCC; // copy of 0x0040DCCC
+BlindOne_BossMode5Update_2 = 0x00446CD4; // copy of 0x0040DCD4
+BlindOne_BossFlinchEnter_2 = 0x00446CFC; // copy of 0x0040DCFC
+BlindOne_BossFlinchUpdate_2 = 0x00446D04; // copy of 0x0040DD04
+BlindOne_BossMode7Enter_2 = 0x00446D30; // copy of 0x0040DD30
+BlindOne_BossMode7Update_2 = 0x00446D38; // copy of 0x0040DD38
+BlindOne_BossMode8Enter_2 = 0x00446D60; // copy of 0x0040DD60
+BlindOne_BossMode8Update_2 = 0x00446D68; // copy of 0x0040DD68
+BlindOne_BossDeathEnter_2 = 0x00446D90; // copy of 0x0040DD90
+BlindOne_BossDeathUpdate_2 = 0x00446DAC; // copy of 0x0040DDAC
+BlindOne_ActorHurt_2 = 0x00446DB4; // copy of 0x0040DDB4 (file header)
+BlindOne_ActorInit_2 = 0x00446E68; // copy of 0x0040DE68
+BlindOne_ActorUpdate_2 = 0x00446F70; // copy of 0x0040DF70
+BlindOne_ActorAppearEnter_2 = 0x0044700C; // copy of 0x0040E00C
+BlindOne_ActorAppearUpdate_2 = 0x004470B0; // copy of 0x0040E0B0
+BlindOne_ActorMode1Enter_2 = 0x004470D8; // copy of 0x0040E0D8
+BlindOne_ActorMode1Update_2 = 0x004470E0; // copy of 0x0040E0E0
+BlindOne_ActorAimEnter_2 = 0x00447100; // copy of 0x0040E100
+BlindOne_ActorAimUpdate_2 = 0x00447108; // copy of 0x0040E108
+BlindOne_ActorAttack3Enter_2 = 0x0044727C; // copy of 0x0040E27C
+BlindOne_ActorAttack3Update_2 = 0x00447284; // copy of 0x0040E284
+BlindOne_ActorAttack4Enter_2 = 0x004472AC; // copy of 0x0040E2AC
+BlindOne_ActorAttack4Update_2 = 0x004472B4; // copy of 0x0040E2B4
+BlindOne_ActorAttack5Enter_2 = 0x004472DC; // copy of 0x0040E2DC
+BlindOne_ActorAttack5Update_2 = 0x004472E4; // copy of 0x0040E2E4
+BlindOne_ActorDeathEnter_2 = 0x0044730C; // copy of 0x0040E30C
+BlindOne_ActorDeathUpdate_2 = 0x00447430; // copy of 0x0040E430
+BlindOne_PhaseStartCinemaInit_2 = 0x00447450; // copy of 0x0040E450
+BlindOne_PhaseWaitCinemaUpdate_2 = 0x0044746C; // copy of 0x0040E46C (file header)
+BlindOne_PhaseMinionsInit_2 = 0x0044755C; // copy of 0x0040E55C
+BlindOne_PhaseGroup1Init_2 = 0x0044759C; // copy of 0x0040E59C (file header)
+BlindOne_PhaseGroup1Update_2 = 0x00447648; // copy of 0x0040E648 (file header)
+BlindOne_PhaseGroup2Init_2 = 0x0044772C; // copy of 0x0040E72C (file header)
+BlindOne_PhaseGroup2Update_2 = 0x004477D8; // copy of 0x0040E7D8 (file header)
+BlindOne_PhaseGroup3Init_2 = 0x004478BC; // copy of 0x0040E8BC (file header)
+BlindOne_PhaseBossMode0Init_2 = 0x00447930; // copy of 0x0040E930 (file header)
+BlindOne_PhaseVulnerableInit_2 = 0x00447A24; // copy of 0x0040EA24
+BlindOne_PhaseVulnerableUpdate_2 = 0x00447A48; // copy of 0x0040EA48 (file header)
+BlindOne_PhaseVictoryInit_2 = 0x00447B30; // copy of 0x0040EB30
+BlindOne_PhaseVictoryUpdate_2 = 0x00447B68; // copy of 0x0040EB68
+BlindOne_StartScript_2 = 0x00447BE4; // copy of 0x0040EBE4 (file header)
+BlindOne_EnterPhase_2 = 0x00447C14; // copy of 0x0040EC14 (file header)
+BlindOne_UpdateFight_2 = 0x00447CDC; // copy of 0x0040ECDC (file header)
+BlindOne_StartMover_2 = 0x00447D94; // copy of 0x0040ED94
+BlindOne_Draw_2 = 0x00447DB0; // copy of 0x0040EDB0
+BlindOne_Group3Draw_2 = 0x00447EA0; // copy of 0x0040EEA0
+BlindOne_NextPhase_2 = 0x00447F64; // copy of 0x0040EF64 (file header)
+BlindOne_SpawnMinion_2 = 0x0044803C; // copy of 0x0040F03C
+BlindOne_SumGroupHealth_2 = 0x004481D8; // copy of 0x0040F1D8
+// Chunk E of n7: 0x0040F240-0x0041748F, the cinema system (func_0040F240.c) and
+// the menu window system (func_00413230.c). Both files are linked again byte for
+// byte at +0x39000 in the second VM module (func_00448240.c, func_0044C230.c,
+// "The second VM module's copy of src/us/code/func_0040F240.c / func_00413230.c,
+// byte for byte"): each function's copy is its name + _2. Rage Wars' versions are
+// unnamed (func_XXXX in both rw decomps), so the names are by behavior.
+
+// Cinema: splines (Rage Wars ovl_a func_00400E50 is Cinema_SplineEval's twin)
+Cinema_SplineSecondDerivs = 0x0040F240; // natural cubic spline second derivatives of n points into out (file comment); called by Cinema_SplineBuild
+Cinema_SplineBuild = 0x0040F5B8; // builds a SplineNode track: arc lengths then d2 of x/y/z over arc length and of arc length over weights
+Cinema_PrepareResource = 0x0040F9F4; // the prepare callback func_0040FD6C passes to func_0020367C(..., "Cinema"): rebuilds the loaded pack with splines
+Cinema_Load = 0x0040FD6C; // "Loads cinema index": track via m_pCinemas, time range, CinemaEntry spec; called from engine func_00283BC0
+Cinema_SplineEval = 0x004101B8; // evaluates a SplineNode track at time t (Hermite in arc length, then cubic spline); Rage Wars func_00400E50
+Cinema_GetEyePos = 0x0041057C; // finds the clip containing t, evaluates its spline child 0 (Cinema_UpdateCamera's eye)
+Cinema_GetTargetPos = 0x00410724; // same over spline child 1 (Cinema_UpdateCamera's look-at target)
+Cinema_GetFadeColor = 0x004108CC; // lerps the rgb of resource track 1 at t; Cinema_DrawFade's colour
+Cinema_GetFadeAlpha = 0x00410A74; // lerps the value of resource track 1 at t, rescaled and clamped to [0,1]; Cinema_DrawFade's alpha
+Cinema_GetFOV = 0x00410BB4; // smoothstep over resource track 3, 47.5 when empty; engine func_00284390 returns it or 47.5 (the default FOV)
+Cinema_UpdateCamera = 0x00410CE8; // "Drives the camera along the cinema paths": sets CCamera m_ViewParams from eye/target; engine func_00284254
+Cinema_DrawFrameEdges = 0x004110CC; // black fill-rect lines around the picture inset by the bar height; only caller Cinema_DrawLetterbox
+Cinema_DrawLetterbox = 0x00411C94; // top/bottom bars sized from spec.aspect, faded in/out over 0.3 around startTime/endTime
+Cinema_DrawFade = 0x00411EF8; // "Fills the cinema's screen rectangle with the colour and alpha of the current time", then the letterbox; engine func_00284284
+
+// Cinema: requests and cues
+Cinema_RequestForObject = 0x00412314; // finds the CinemaEntry matching a level object's ids, sets target/warpId/entryIndex/resetPlayerNext
+Cinema_RequestById = 0x00412438; // makes the CinemaEntry with id `key` pending; returns warpId; called from many level scripts
+Cinema_RequestByName = 0x00412548; // makes the CinemaEntry named `name` pending (strcmp on entry name)
+Cinema_NoWaitCues = 0x0041266C; // 1 when no object of resource track 2 is one Cinema_IsWaitCue accepts; engine func_002838A4
+Cinema_FireCues = 0x00412798; // triggers the cue objects of track 2 whose time has passed (or all at endTime); engine func_00283CD4
+Cinema_GetStartAngles = 0x00412998; // pitch/yaw from the first clip's start eye to its start target
+Cinema_StopAtEnd = 0x00412B14; // sets D_800C1BB0->stopAtEnd = 1
+Cinema_RequestOnce = 0x00412B28; // ids 0x8D-0x92 only once (a bit per id at player+0x9F4), then Cinema_RequestById
+Cinema_GetStartEyePos = 0x00412B9C; // first clip's eye spline at 0 (0,0,0 when inactive)
+Cinema_GetStartTargetPos = 0x00412C4C; // first clip's target spline at 0 ((10,0,0) when inactive)
+Cinema_GetDuration = 0x00412D04; // sums the last node's weight (time) of every clip's eye spline
+Cinema_GetClipCount = 0x00412DA4; // count of resource child 0 (the clips)
+Cinema_GetClipEyeSpline = 0x00412DD0; // clip index's child 0
+Cinema_GetFadeTrack = 0x00412E1C; // resource child 1 (the fade key track Cinema_GetFadeColor/Alpha read)
+Cinema_TrackData = 0x00412E44; // returns arg + 8: past a track's stride/count header
+Cinema_BitTest = 0x00412E4C; // bits[index >> 3] & (1 << (index & 7))
+Cinema_BitSet = 0x00412E6C; // sets or clears bit index of a byte array
+Cinema_TempAlloc = 0x00412EB0; // "Cinema temp alloc" block of size + 0x10 with a back pointer to its handle
+Cinema_TempFree = 0x00412EF4; // frees a Cinema_TempAlloc block through its back pointer (func_002052D8)
+Cinema_SplineBlockSize = 0x00412F18; // (n0 + n2) * 36 + 0x30: a clip's spline block size, as in Cinema_PrepareResource
+Cinema_GetEntryCount = 0x00412F74; // *trackBundle - 1: the entries of the cinema table
+Cinema_LoadTable = 0x00412F88; // "Loads the cinema table" (m_pCinemas index 0, "Cinema")
+Cinema_SplineCubicTerm = 0x00412FF8; // a*((1-t)^3-(1-t)) + b*(t^3-t): the cubic spline term of Cinema_SplineEval
+Cinema_Lerp = 0x00413038; // a*(1-t) + b*t
+Cinema_GetClip = 0x0041305C; // resource child 0's child index
+Cinema_ClipEyeHeld = 0x0041309C; // clip child 2 word 0: Cinema_GetEyePos holds the eye at the clip start when set
+Cinema_ClipTargetHeld = 0x004130EC; // clip child 2 word 1: Cinema_GetTargetPos holds the target when set
+Cinema_GetClipTargetSpline = 0x0041313C; // clip index's child 1
+Cinema_GetFOVTrack = 0x00413188; // resource child 3 (the track Cinema_GetFOV reads)
+Cinema_IsWaitCue = 0x004131B0; // "Whether a cue's object is one the cinema waits for" (kind/val pairs 1/5, 9/4, 10/3)
+
+// Menu windows: items (structs/menu.h Menu, MenuItem, MenuPool; Rage Wars ovl_a func_0043F290-func_00443298)
+MenuItem_FormatBinding = 0x00413230; // "Formats the item's value (scaled) after its name" (MenuBinding name/scale)
+MenuItem_UpdateBinding = 0x004133A4; // a type-5 item's update: steps the bound value by step on left/right within min..max
+MenuItem_Layout = 0x0041363C; // "Measures a menu item and places it on screen" (MenuItemLayout)
+MenuItem_DrawString = 0x00413F74; // "Draws a menu item's text in its class's style, brighter when it is the selected one"
+MenuItem_DrawImage = 0x004143DC; // "Draws a menu image" (type 1 item draw callback)
+MenuItem_DrawSlider = 0x004145B0; // "Draws a slider: its label, its bar and its knob" (type 2)
+MenuItem_DrawModel = 0x00414938; // "Draws a menu item's 3D model, loading it the first time" (type 3)
+Menu_Construct = 0x00414EA8; // "Builds a window in its block": items from the MenuDesc, colours, desc init and select callbacks
+Menu_MoveCursor = 0x004151B4; // moves Menu.cursor along the item's link for dir 0x10 + MENU_LINK_*
+Menu_Update = 0x0041531C; // per frame: desc poll, item updates, fade/alpha states 0-4, cursor moves, select; returns 1 when closed (MenuPool_Update)
+Menu_Draw = 0x004156FC; // "Draws a window's items": lays out, centres on the camera viewport, calls each item's draw
+Menu_DrawBar = 0x00415CE8; // "Draws the bar behind a window's line of items" across the screen width
+MenuPool_OpenSubmenu = 0x00415FB8; // "Opens the window c's submenu in the pool a" (Menu.submenu), "menu" block
+MenuItem_TextLength = 0x004160F0; // "Length of the item's text up to the end or the first newline"
+MenuItem_DrawText = 0x00416168; // text item draw callback: MenuItem_DrawString with the item's text; used by item draws in func_0041A904/func_0041D51C
+MenuItem_DrawChar = 0x00416188; // "Draws the item's single character (the low byte of its data)"
+MenuItem_DrawBinding = 0x004161B4; // draw callback: MenuItem_DrawString of MenuItem_FormatBinding's text
+MenuItem_SetModel = 0x00416214; // "Finds a model item's definition and copies it into the item's extra" (CIntelligence by id)
+Menu_CharWidth = 0x004162FC; // per-character width factor ('I' 0.5, 'M' 1.2, '!'/'.' 0.4, kerning before 't') times the scale
+Menu_TextWidth = 0x004163C0; // sums Menu_CharWidth up to the end or a newline
+MenuItem_SelectSubmenu = 0x00416454; // select callback: MenuPool_OpenSubmenu(pool, menu) != 0 (named so in MenuPool_OpenSubmenu's comment)
+Menu_GetDescValue = 0x0041647C; // returns menu->desc->value
+Menu_StepValue = 0x0041648C; // value -/+ step on left / right or A, clamped or wrapped within min..max
+Menu_StepValueLR = 0x00416558; // "func_0041648C with its own left/right reading" (no A button)
+MenuPool_Construct = 0x00416614; // CList__Construct(pool, 0x1D0, 0x1D4) (Menu.prev/next), opened = 0
+MenuPool_OpenMenu = 0x00416644; // "Opens the window described by b in the pool a" ("menu" block, Menu_Construct, CList__AddHead)
+MenuPool_OpenMenuFrom = 0x00416760; // "Opens the window described by b ... with the window c's param, player, controller and context"
+MenuPool_OpenChildMenu = 0x00416894; // opens desc t with the window c's player/controller/context and c's desc as its param
+MenuPool_Update = 0x004169C8; // runs Menu_Update on each open window, closes and frees the finished ones; on CCamera.m_MenuPool (docs/CAMERA.md)
+MenuPool_Draw = 0x00416AA4; // calls each window's desc->update tail to head; engine camera draw func_0027F2C4 on m_MenuPool
+MenuPool_CountOpen = 0x00416AF8; // counts windows not in state 4 (closing); the engine's "is a menu up" test (pause, D_80119E2C)
+MenuPool_GetCamera = 0x00416B28; // pool - 0x53C: the CCamera whose m_MenuPool it is (camera.h m_MenuPool at 0x53C)
+MenuPool_CloseAll = 0x00416B30; // "Closes and frees every open menu"
+MenuItem_TextWidth = 0x00416BAC; // "Width of the item's text at the given scale"
+Menu_ResetFlash = 0x00416C00; // flash = flashStep = 0
+Menu_StartFlash = 0x00416C0C; // flashStep = 1, flash = 0 unless already flashing
+Menu_UpdateFlash = 0x00416C28; // flash += flashStep, stops at 0x30; called from Menu_Update
+Menu_GetFlashLevel = 0x00416C54; // "The window's flash, up 0..0x17 then down again"
+Menu_DrawFlash = 0x00416C74; // "Draws a window's flash (image 0x67...) over its camera's viewport"
+MenuItemDesc_ExtraSize = 0x00416DA4; // 0x330 for a type-3 desc (the model extra), else 0
+MenuItemDesc_InitExtra = 0x00416DC0; // marks a type-3 item's MenuModel loaded
+MenuItem_Construct = 0x00416DDC; // "Makes item id of a window from its desc entry"
+MenuItem_GetTextStyle = 0x00416EA8; // "The item's text style (MenuTextStyle)": D_800C1BD4 by flags & 0x3FE0
+MenuItem_GetBindingValue = 0x00416F8C; // "A type-5 item's value, as a float" by MenuBinding.type
+MenuItem_SetBindingValue = 0x0041707C; // "Sets a type-5 item's value"
+MenuModel_DrawUnselected = 0x004171D0; // m_pfDraw MenuItem_DrawModel sets for a model item not under the cursor (lights D_800AB0E8)
+MenuModel_DrawSelected = 0x004171F4; // "The selected model item's draw callback" (lights plus fade D_801308E0)
+Menu_Close = 0x004172B0; // runs desc->close and clears the controller's buttons
+MenuPool_OpenMenuParam = 0x004172F8; // "Opens the window described by list in the pool owner" with a param (MenuPool_OpenMenu passes 0)
+MenuPool_CloseMenu = 0x00417418; // desc->close, clear buttons, CList__Remove and free the block
+
+// Second VM module copies (func_00448240.c / func_0044C230.c: byte-for-byte copies at +0x39000)
+Cinema_SplineSecondDerivs_2 = 0x00448240; // func_00448240.c: second-module copy of func_0040F240
+Cinema_SplineBuild_2 = 0x004485B8; // func_00448240.c: second-module copy of func_0040F5B8
+Cinema_PrepareResource_2 = 0x004489F4; // func_00448240.c: second-module copy of func_0040F9F4
+Cinema_Load_2 = 0x00448D6C; // func_00448240.c: second-module copy of func_0040FD6C
+Cinema_SplineEval_2 = 0x004491B8; // func_00448240.c: second-module copy of func_004101B8
+Cinema_GetEyePos_2 = 0x0044957C; // func_00448240.c: second-module copy of func_0041057C
+Cinema_GetTargetPos_2 = 0x00449724; // func_00448240.c: second-module copy of func_00410724
+Cinema_GetFadeColor_2 = 0x004498CC; // func_00448240.c: second-module copy of func_004108CC
+Cinema_GetFadeAlpha_2 = 0x00449A74; // func_00448240.c: second-module copy of func_00410A74
+Cinema_GetFOV_2 = 0x00449BB4; // func_00448240.c: second-module copy of func_00410BB4
+Cinema_UpdateCamera_2 = 0x00449CE8; // func_00448240.c: second-module copy of func_00410CE8
+Cinema_DrawFrameEdges_2 = 0x0044A0CC; // func_00448240.c: second-module copy of func_004110CC
+Cinema_DrawLetterbox_2 = 0x0044AC94; // func_00448240.c: second-module copy of func_00411C94
+Cinema_DrawFade_2 = 0x0044AEF8; // func_00448240.c: second-module copy of func_00411EF8
+Cinema_RequestForObject_2 = 0x0044B314; // func_00448240.c: second-module copy of func_00412314
+Cinema_RequestById_2 = 0x0044B438; // func_00448240.c: second-module copy of func_00412438
+Cinema_RequestByName_2 = 0x0044B548; // func_00448240.c: second-module copy of func_00412548
+Cinema_NoWaitCues_2 = 0x0044B66C; // func_00448240.c: second-module copy of func_0041266C
+Cinema_FireCues_2 = 0x0044B798; // func_00448240.c: second-module copy of func_00412798
+Cinema_GetStartAngles_2 = 0x0044B998; // func_00448240.c: second-module copy of func_00412998
+Cinema_StopAtEnd_2 = 0x0044BB14; // func_00448240.c: second-module copy of func_00412B14
+Cinema_RequestOnce_2 = 0x0044BB28; // func_00448240.c: second-module copy of func_00412B28
+Cinema_GetStartEyePos_2 = 0x0044BB9C; // func_00448240.c: second-module copy of func_00412B9C
+Cinema_GetStartTargetPos_2 = 0x0044BC4C; // func_00448240.c: second-module copy of func_00412C4C
+Cinema_GetDuration_2 = 0x0044BD04; // func_00448240.c: second-module copy of func_00412D04
+Cinema_GetClipCount_2 = 0x0044BDA4; // func_00448240.c: second-module copy of func_00412DA4
+Cinema_GetClipEyeSpline_2 = 0x0044BDD0; // func_00448240.c: second-module copy of func_00412DD0
+Cinema_GetFadeTrack_2 = 0x0044BE1C; // func_00448240.c: second-module copy of func_00412E1C
+Cinema_TrackData_2 = 0x0044BE44; // func_00448240.c: second-module copy of func_00412E44
+Cinema_BitTest_2 = 0x0044BE4C; // func_00448240.c: second-module copy of func_00412E4C
+Cinema_BitSet_2 = 0x0044BE6C; // func_00448240.c: second-module copy of func_00412E6C
+Cinema_TempAlloc_2 = 0x0044BEB0; // func_00448240.c: second-module copy of func_00412EB0
+Cinema_TempFree_2 = 0x0044BEF4; // func_00448240.c: second-module copy of func_00412EF4
+Cinema_SplineBlockSize_2 = 0x0044BF18; // func_00448240.c: second-module copy of func_00412F18
+Cinema_GetEntryCount_2 = 0x0044BF74; // func_00448240.c: second-module copy of func_00412F74
+Cinema_LoadTable_2 = 0x0044BF88; // func_00448240.c: second-module copy of func_00412F88
+Cinema_SplineCubicTerm_2 = 0x0044BFF8; // func_00448240.c: second-module copy of func_00412FF8
+Cinema_Lerp_2 = 0x0044C038; // func_00448240.c: second-module copy of func_00413038
+Cinema_GetClip_2 = 0x0044C05C; // func_00448240.c: second-module copy of func_0041305C
+Cinema_ClipEyeHeld_2 = 0x0044C09C; // func_00448240.c: second-module copy of func_0041309C
+Cinema_ClipTargetHeld_2 = 0x0044C0EC; // func_00448240.c: second-module copy of func_004130EC
+Cinema_GetClipTargetSpline_2 = 0x0044C13C; // func_00448240.c: second-module copy of func_0041313C
+Cinema_GetFOVTrack_2 = 0x0044C188; // func_00448240.c: second-module copy of func_00413188
+Cinema_IsWaitCue_2 = 0x0044C1B0; // func_00448240.c: second-module copy of func_004131B0
+MenuItem_FormatBinding_2 = 0x0044C230; // func_0044C230.c: second-module copy of func_00413230
+MenuItem_UpdateBinding_2 = 0x0044C3A4; // func_0044C230.c: second-module copy of func_004133A4
+MenuItem_Layout_2 = 0x0044C63C; // func_0044C230.c: second-module copy of func_0041363C
+MenuItem_DrawString_2 = 0x0044CF74; // func_0044C230.c: second-module copy of func_00413F74
+MenuItem_DrawImage_2 = 0x0044D3DC; // func_0044C230.c: second-module copy of func_004143DC
+MenuItem_DrawSlider_2 = 0x0044D5B0; // func_0044C230.c: second-module copy of func_004145B0
+MenuItem_DrawModel_2 = 0x0044D938; // func_0044C230.c: second-module copy of func_00414938
+Menu_Construct_2 = 0x0044DEA8; // func_0044C230.c: second-module copy of func_00414EA8
+Menu_MoveCursor_2 = 0x0044E1B4; // func_0044C230.c: second-module copy of func_004151B4
+Menu_Update_2 = 0x0044E31C; // func_0044C230.c: second-module copy of func_0041531C
+Menu_Draw_2 = 0x0044E6FC; // func_0044C230.c: second-module copy of func_004156FC
+Menu_DrawBar_2 = 0x0044ECE8; // func_0044C230.c: second-module copy of func_00415CE8
+MenuPool_OpenSubmenu_2 = 0x0044EFB8; // func_0044C230.c: second-module copy of func_00415FB8
+MenuItem_TextLength_2 = 0x0044F0F0; // func_0044C230.c: second-module copy of func_004160F0
+MenuItem_DrawText_2 = 0x0044F168; // func_0044C230.c: second-module copy of func_00416168
+MenuItem_DrawChar_2 = 0x0044F188; // func_0044C230.c: second-module copy of func_00416188
+MenuItem_DrawBinding_2 = 0x0044F1B4; // func_0044C230.c: second-module copy of func_004161B4
+MenuItem_SetModel_2 = 0x0044F214; // func_0044C230.c: second-module copy of func_00416214
+Menu_CharWidth_2 = 0x0044F2FC; // func_0044C230.c: second-module copy of func_004162FC
+Menu_TextWidth_2 = 0x0044F3C0; // func_0044C230.c: second-module copy of func_004163C0
+MenuItem_SelectSubmenu_2 = 0x0044F454; // func_0044C230.c: second-module copy of func_00416454
+Menu_GetDescValue_2 = 0x0044F47C; // func_0044C230.c: second-module copy of func_0041647C
+Menu_StepValue_2 = 0x0044F48C; // func_0044C230.c: second-module copy of func_0041648C
+Menu_StepValueLR_2 = 0x0044F558; // func_0044C230.c: second-module copy of func_00416558
+MenuPool_Construct_2 = 0x0044F614; // func_0044C230.c: second-module copy of func_00416614
+MenuPool_OpenMenu_2 = 0x0044F644; // func_0044C230.c: second-module copy of func_00416644
+MenuPool_OpenMenuFrom_2 = 0x0044F760; // func_0044C230.c: second-module copy of func_00416760
+MenuPool_OpenChildMenu_2 = 0x0044F894; // func_0044C230.c: second-module copy of func_00416894
+MenuPool_Update_2 = 0x0044F9C8; // func_0044C230.c: second-module copy of func_004169C8
+MenuPool_Draw_2 = 0x0044FAA4; // func_0044C230.c: second-module copy of func_00416AA4
+MenuPool_CountOpen_2 = 0x0044FAF8; // func_0044C230.c: second-module copy of func_00416AF8
+MenuPool_GetCamera_2 = 0x0044FB28; // func_0044C230.c: second-module copy of func_00416B28
+MenuPool_CloseAll_2 = 0x0044FB30; // func_0044C230.c: second-module copy of func_00416B30
+MenuItem_TextWidth_2 = 0x0044FBAC; // func_0044C230.c: second-module copy of func_00416BAC
+Menu_ResetFlash_2 = 0x0044FC00; // func_0044C230.c: second-module copy of func_00416C00
+Menu_StartFlash_2 = 0x0044FC0C; // func_0044C230.c: second-module copy of func_00416C0C
+Menu_UpdateFlash_2 = 0x0044FC28; // func_0044C230.c: second-module copy of func_00416C28
+Menu_GetFlashLevel_2 = 0x0044FC54; // func_0044C230.c: second-module copy of func_00416C54
+Menu_DrawFlash_2 = 0x0044FC74; // func_0044C230.c: second-module copy of func_00416C74
+MenuItemDesc_ExtraSize_2 = 0x0044FDA4; // func_0044C230.c: second-module copy of func_00416DA4
+MenuItemDesc_InitExtra_2 = 0x0044FDC0; // func_0044C230.c: second-module copy of func_00416DC0
+MenuItem_Construct_2 = 0x0044FDDC; // func_0044C230.c: second-module copy of func_00416DDC
+MenuItem_GetTextStyle_2 = 0x0044FEA8; // func_0044C230.c: second-module copy of func_00416EA8
+MenuItem_GetBindingValue_2 = 0x0044FF8C; // func_0044C230.c: second-module copy of func_00416F8C
+MenuItem_SetBindingValue_2 = 0x0045007C; // func_0044C230.c: second-module copy of func_0041707C
+MenuModel_DrawUnselected_2 = 0x004501D0; // func_0044C230.c: second-module copy of func_004171D0
+MenuModel_DrawSelected_2 = 0x004501F4; // func_0044C230.c: second-module copy of func_004171F4
+Menu_Close_2 = 0x004502B0; // func_0044C230.c: second-module copy of func_004172B0
+MenuPool_OpenMenuParam_2 = 0x004502F8; // func_0044C230.c: second-module copy of func_004172F8
+MenuPool_CloseMenu_2 = 0x00450418; // func_0044C230.c: second-module copy of func_00417418
+// n7 chunk F: VM module 1, 0x00417490-0x0041AFFF: the front-end and in-game
+// menu callbacks (MenuDesc init/close/update/poll and MenuItemDesc
+// draw/update/select, as tabled in us/asm/data/virtual_rodata_0.data.s and
+// C24A0.rodata.s). Menu identities come from each table's item strings
+// (read from build/ref.elf). Item "update" callbacks set the label text
+// (MenuItem.text), "select" callbacks step a setting with func_0041648C or
+// open a window with func_00416894 (descs named by their title string).
+
+// Multiplayer match start ('start game' selects of the three setup menus) and the match rules.
+MpMenu_StartFragTag = 0x00417490; // 'start game' select of the 'frag tag' desc D_00438AAC: tagArena/tagTimeLimit/tagScoreLimit, the inlined func_00417BB0 with tag=1, func_00430454 to arena warp 0x2337+ (random of 6 when 0)
+MpMenu_StartFragTag_2 = 0x00450490; // module-2 copy (header: copy of func_00417490)
+MpMenu_StartBloodLust = 0x0041760C; // 'start game' select of the 'blood lust' desc D_00438C38: dmArena/dmTimeLimit/dmScoreLimit, tag=0 teams=0, arena warp 0x2329+ (random of 13)
+MpMenu_StartBloodLust_2 = 0x0045060C; // module-2 copy (header: copy of func_0041760C)
+MpMenu_StartTeamBlood = 0x0041778C; // 'start game' select of the 'team blood' desc D_00438DC4: teamArena/teamTimeLimit/teamScoreLimit, teams=1
+MpMenu_StartTeamBlood_2 = 0x0045078C; // module-2 copy (header: copy of func_0041778C)
+Mp_SetupMatchRules = 0x00417BB0; // writes GameMatch D_8011ACB0: tag, teams, scoreLimit, clears scores/over, timeLeft = minutes*900 (-1 for none); inlined in the three MpMenu_Start*
+
+// Controllers joining (who pressed A/B/START: func_002855E8).
+Menu_ClaimPressingController = 0x00417ACC; // clears the slots' flags, gives the default slot D_8011AB18 the first controller pressing A/B/START, stores it as the menu's controller, func_00275A74; caller CheatsMenu_WarpSelect
+Mp_JoinPressingController = 0x00417C0C; // same for the slots D_8011AB58: the pressing controller's slot gets m_bActive and m_nController
+Menu_FindPressingController = 0x00417CA0; // returns the first ControllerProfile pressing A/B/START and its index in *out (-1/NULL if none)
+Mp_CountJoinedControllers = 0x00417D10; // counts connected controllers, 0 if one of them has no joined slot (slots[i].m_bActive at +0xA8)
+
+// 'final score' window (desc at 0x800C1E54, C24A0.rodata.s).
+FinalScoreMenu_Init = 0x00417D68; // init: clears the timer D_801308FC
+FinalScoreMenu_Poll = 0x00417D78; // poll: runs D_801308FC to 120, then func_002534E0 and closes
+FinalScoreMenu_BlueScoreLabel = 0x00417DD4; // update: 'blue blood score :' + "%04d" of D_8011ACDC
+FinalScoreMenu_RedScoreLabel = 0x00417E28; // update: ' red blood score :' + "%04d" of D_8011ACE0
+FinalScoreMenu_PleaseWaitSelect = 0x00417E7C; // select of 'please wait.....': returns 0
+
+// Rumble pak notice ('this game is rumble pak compatible...', desc D_00438670).
+RumbleMenu_Poll = 0x00417E84; // poll: closes once the match is over (match +0x28/+0x1C/+0x20 nonzero)
+RumbleMenu_Play = 0x00417EBC; // 'play' select: re-inits the controller's rumble (func_00285AE0, func_00285BD0(ctl, 1))
+
+// Multiplayer player setup (desc D_00438748: 'edit name', name, handicap, 'control :', 'play').
+PlayerSetupMenu_Poll = 0x00417F18; // poll: closes once the match is over
+PlayerSetupMenu_StepHandicap = 0x00417F50; // select: m_pOptions->m_Handicap 0..10
+PlayerSetupMenu_HandicapLabel = 0x00417F9C; // update: 'handicap : none'/'max'/'handicap :  ' + value
+PlayerSetupMenu_StepControlType = 0x00418090; // select: m_pOptions->m_ControlType 0..1
+PlayerSetupMenu_EditName = 0x004180DC; // 'edit name' select: opens the name editor desc D_0043B364 ('edit')
+PlayerSetupMenu_NameLabel = 0x00418108; // update of 'blahblah': text = slots[port].m_Name (D_8011AB8B + port*0x40)
+PlayerSetupMenu_Play = 0x0041812C; // 'play' select: opens the rumble notice D_00438670
+PlayerSetupMenu_ControlTypeLabel = 0x00418158; // update: 'control :expert' / 'control :arcade' by m_ControlType
+
+// Character select (descs D_00438808 / D_0043882C: a model item and 'load').
+CharacterMenu_Init = 0x004181A4; // init of D_00438808: func_00285A68(controller port)
+CharacterMenu_Poll = 0x004181F4; // poll of both: closes once the match is over
+CharacterMenu_LoadSelect = 0x0041822C; // 'load' select: func_00421250, opens the controller pak load desc D_0043B6A8 in D_80119E2C
+CharacterMenu_LoadUpdate = 0x0041828C; // update of 'load': returns 0
+CharacterMenu_SelectCharacter = 0x00418294; // select of the model item: left/right steps m_nCharacter 0..10 (func_0042E430 sets the model), A plays the character's sound and opens D_00438748
+CharacterMenu_ModelUpdate = 0x00418380; // update of the model item: returns 0
+
+// Team pick ('choose' 'blue blood' / 'red blood', desc D_004388E0).
+TeamMenu_Poll = 0x00418388; // poll: closes once the match is over
+TeamMenu_ChooseBlue = 0x004183C0; // 'blue blood' select: m_nDeathmatchTeamSelected = 0, opens the character select D_00438808
+TeamMenu_ChooseRed = 0x00418408; // 'red blood' select: m_nDeathmatchTeamSelected = 1, opens D_00438808
+
+// 'frag tag' setup (desc D_00438AAC). Selects step a GameSettings byte, updates print it.
+FragTagMenu_StepTimeLimit = 0x00418454; // select of 'timed game': tagTimeLimit 0..30 by 5
+FragTagMenu_TimeLimitLabel = 0x004184A8; // update: 'timed game :' + "  %02d" or "none"
+FragTagMenu_StepTagLimit = 0x00418530; // select of 'tag limit': tagScoreLimit 0..99
+FragTagMenu_TagLimitLabel = 0x00418584; // update: 'tag limit :' + value or "none"
+FragTagMenu_StepLevel = 0x0041860C; // select of 'level:': tagArena 0..6
+FragTagMenu_LevelLabel = 0x00418660; // update: 'level: random' / 'level: madhouse!'... by tagArena
+FragTagMenu_StepTextureSet = 0x004186FC; // select of 'texture set:': GameSettings+0x28 0..8
+FragTagMenu_TextureSetLabel = 0x00418750; // update: 'texture set: castle' / 'steel mill'... by +0x28
+FragTagMenu_StepCrosshairs = 0x0041880C; // select of 'crosshairs': +0x29 0..1
+FragTagMenu_CrosshairsLabel = 0x0041885C; // update: 'crosshairs : on/off' by +0x29
+
+// 'player speed' item, shared by the three setup menus.
+MpMenu_StepPlayerSpeed = 0x004188A4; // select: D_800C1EA8 0..15, speed (GameSettings+0x1C) = table D_00438900 + 1 clamped to 0.5..2
+MpMenu_PlayerSpeedLabel = 0x004189AC; // update: 'player speed : default' or the step - 5
+
+// 'blood lust' setup (desc D_00438C38).
+BloodLustMenu_StepTimeLimit = 0x00418A34; // select of 'timed game': dmTimeLimit 0..30 by 5
+BloodLustMenu_TimeLimitLabel = 0x00418A88; // update: 'timed game :' + value or "none"
+BloodLustMenu_StepFragLimit = 0x00418B10; // select of 'frag limit': dmScoreLimit 0..99
+BloodLustMenu_FragLimitLabel = 0x00418B64; // update: 'frag limit :' + value or "none"
+BloodLustMenu_StepLevel = 0x00418BEC; // select of 'level:': dmArena 0..13
+BloodLustMenu_LevelLabel = 0x00418C40; // update: 'level: random' / 'level: experimentata'... by dmArena
+BloodLustMenu_StepTextureSet = 0x00418D4C; // select of 'texture set:': GameSettings+0x23 0..8
+BloodLustMenu_TextureSetLabel = 0x00418DA0; // update: 'texture set: castle'... by +0x23
+BloodLustMenu_StepCrosshairs = 0x00418E5C; // select of 'crosshairs': +0x24 0..1
+BloodLustMenu_CrosshairsLabel = 0x00418EAC; // update: 'crosshairs : on/off' by +0x24
+
+// 'team blood' setup (desc D_00438DC4).
+TeamBloodMenu_StepTimeLimit = 0x00418EF4; // select of 'timed game': teamTimeLimit 0..30 by 5
+TeamBloodMenu_TimeLimitLabel = 0x00418F48; // update: 'timed game :' + value or "none"
+TeamBloodMenu_StepFragLimit = 0x00418FD0; // select of 'frag limit': teamScoreLimit 0..99
+TeamBloodMenu_FragLimitLabel = 0x00419024; // update: 'frag limit :' + value or "none"
+TeamBloodMenu_StepLevel = 0x004190AC; // select of 'level:': teamArena 0..13
+TeamBloodMenu_LevelLabel = 0x00419100; // update: 'level: ...' by teamArena
+TeamBloodMenu_StepTextureSet = 0x0041920C; // select of 'texture set:': GameSettings+0x2D 0..8
+TeamBloodMenu_TextureSetLabel = 0x00419260; // update: 'texture set: ...' by +0x2D
+TeamBloodMenu_StepCrosshairs = 0x0041931C; // select of 'crosshairs': +0x2E 0..1
+TeamBloodMenu_CrosshairsLabel = 0x0041936C; // update: 'crosshairs : on/off' by +0x2E
+
+// 'customize weapons' (desc D_00438F74).
+WeaponsMenu_ToggleLabel = 0x00417910; // update of its eight items: 'charge dart rifle : on'... 'torpedo launcher :off' by weaponEnabled[]
+WeaponsMenu_Toggle = 0x004193B4; // select: weaponEnabled[item] ^= 1
+
+// 'deathmatch' (desc D_00439094).
+DeathmatchMenu_OpenBloodLust = 0x004194A0; // 'blood lust' select: opens D_00438C38
+DeathmatchMenu_OpenFragTag = 0x004194CC; // 'frag tag' select: opens D_00438AAC
+DeathmatchMenu_OpenTeamBlood = 0x004194F8; // 'team blood' select: clears the team scores, opens D_00438DC4
+DeathmatchMenu_OpenWeapons = 0x00419534; // 'customize weapons' select: opens D_00438F74
+
+// 'single' (descs D_0043916C / D_00439190: 'new game', 'load', 'go back').
+SingleMenu_Init = 0x00419560; // init of D_0043916C: func_00285A68(port) and probes the port's rumble pak (func_00426480)
+SingleMenu_NewGame = 0x004195C0; // 'new game' select: opens D_0043BD44 in D_80119E2C
+SingleMenu_Load = 0x00419618; // 'load' select: func_00421250, opens the controller pak load desc D_0043B6F0
+SingleMenu_GoBack = 0x00419664; // 'go back' select: func_00288C5C(session, 8), clears D_801308F8, func_00285A80(port)
+
+// Title menu (desc D_004392B0: 'single', 'multi', 'enter cheat', 'cheats', 'options', 'sound options').
+TitleMenu_Single = 0x004196B0; // 'single' select: multiplayer = 0, playerCount = 1, default slot gets the pressing controller, func_00430454(session, -1), D_801308F8 = 1
+TitleMenu_MultiUpdate = 0x00419788; // update of 'multi': selectable (flag 0x01000000) only with 2+ controllers (func_002859DC)
+TitleMenu_Multi = 0x004197FC; // 'multi' select: multiplayer = 1, playerCount = 4, clears the slots, opens 'deathmatch' D_00439094
+TitleMenu_Options = 0x00419858; // 'options' select: opens D_0043A230
+TitleMenu_EnterCheat = 0x00419884; // 'enter cheat' select: opens D_00439CD4
+TitleMenu_Cheats = 0x004198B0; // 'cheats' select: opens D_00439FC8
+TitleMenu_SoundOptions = 0x004198DC; // 'sound options' select: saves the music track (D_800C1F70), plays the chosen one, opens D_004394B4
+
+// Quit confirmation ('quit' 'are you sure?', desc D_00439394).
+QuitMenu_Yes = 0x00419960; // 'yes' select: stops the music and sounds, func_00430330 (back to mode 1)
+QuitMenu_Init = 0x004199A0; // init: menu->state = 4
+
+// Debug mode option (no menu table refers to them).
+Menu_StepDebugMode = 0x004199AC; // steps D_8011AAF0 (GameSettings+0x18) 0..2
+Menu_DebugModeLabel = 0x00419A00; // 'debug : off/on/vis/ais' by D_8011AAF0
+
+// Pause menu ('paused', desc D_00439640).
+PauseMenu_Resume = 0x00419A8C; // 'resume game' select: restarts the looping sounds (func_00275E1C), resumes the music
+PauseMenu_MissionStatus = 0x00419AC4; // 'mission status' select: opens D_0043CA90
+PauseMenu_Inventory = 0x00419AF0; // 'inventory' select: opens D_0043C944
+PauseMenu_Options = 0x00419B1C; // 'options' select: opens D_0043A230
+PauseMenu_EnterCheat = 0x00419B48; // 'enter cheat' select: opens D_00439CD4
+PauseMenu_Cheats = 0x00419B74; // 'cheats' select: opens D_00439FC8
+PauseMenu_Quit = 0x00419BA0; // 'quit' select: opens the confirmation D_00439394
+PauseMenu_SoundOptions = 0x0041A140; // 'sound options' select: switches the music, opens D_004394B4
+PauseMenu_Init = 0x0041A254; // init: state 2, saves and stops the controllers' rumble (D_80130910), sets/clears flag 0x800000 of items 3-4 (mission status, inventory) by multiplayer, stops the sounds
+PauseMenu_Close = 0x0041A32C; // close: restores the rumble flags saved by PauseMenu_Init
+PauseMenu_Update = 0x0041A38C; // update: calls func_004156FC
+
+// 'sound options' (desc D_004394B4).
+SoundMenu_GoBack = 0x00419BCC; // 'go back' select: restores the saved music track, func_00416454
+SoundMenu_StepSpeechVolume = 0x00419C54; // select: GameSettings+0x16 by 8
+SoundMenu_SpeechVolumeLabel = 0x00419CB4; // update: 'speech volume : norm' / value
+SoundMenu_StepMusicVolume = 0x00419D94; // select: GameSettings+0x14 by 8, restarts a track if none plays
+SoundMenu_MusicVolumeLabel = 0x00419E04; // update: 'music volume : norm' / value
+SoundMenu_StepSfxVolume = 0x00419EE4; // select: GameSettings+0x15 by 8, plays sound 0x19E
+SoundMenu_SfxVolumeLabel = 0x00419F48; // update: 'sfx volume : norm' / value
+SoundMenu_StepMusicTrack = 0x0041A028; // select: D_800C1F78 0..22 (skips 12-14), func_002759C4 plays it
+SoundMenu_MusicTrackLabel = 0x0041A0CC; // update: 'music : none' or the track number
+
+// 'continue ?' (desc D_004396DC) and game over (desc D_00439748), opened on a single-player death by func_00255C80 (lives left or not).
+ContinueMenu_Yes = 0x0041A3B0; // 'yes' select: func_0042E14C(player) (respawn with lives)
+ContinueMenu_No = 0x0041A3D4; // 'no' select: func_00430330 (mode 1) when D_801198A0 == 1, else player->m_bActive = 0
+GameOverMenu_Init = 0x0041A420; // init: match countdown = 120 (D_800C1064)
+GameOverMenu_Poll = 0x0041A44C; // poll: countdown at 0 -> func_00430330
+GameOverMenu_TickCountdown = 0x0041A494; // update of its item: countdown -= D_800B6D28, clamped at 0
+
+// 'cheats' (desc D_00439FC8) and its level warp item.
+CheatsMenu_Init = 0x0041A4D0; // init: D_80130924 = first level whose warp bit (0x10000..0x4000000) is in unlockedCheats, enables the warp item
+CheatsMenu_WarpSelect = 0x0041A5DC; // select of the warp item: A warps to warp id 1000..8000 (func_002886D0), up/down step to the previous/next owned level
+Cheat_FindWarpLevel = 0x0041AEF0; // steps an index 0..10 to one whose warp bit is in D_8011AADC (unlockedCheats), -1 if none
+Cheat_FindWarpLevel_2 = 0x00453E58; // module-2 twin (header: twin of func_0041AEF0)
+CheatsMenu_SetToggle = 0x0041AFEC; // helper of the cheat items: selectable if unlockedCheats & bit, text on/off by cheatFlags & bit
+
+// 'enter cheat' (desc D_00439CD4: a text field, 'A'-'Z', backspace, enter).
+EnterCheatMenu_Init = 0x0041A8F0; // init: D_80130920 (matched code) = -1
+EnterCheatMenu_DrawTextField = 0x0041A904; // draw of the text field: blinking cursor box, then func_00416168
+EnterCheatMenu_UpdateTextField = 0x0041AAA0; // update of the text field: blink timer, left/right move the cursor
+EnterCheatMenu_TextFieldSelect = 0x0041AB78; // select of the text field: returns 0
+EnterCheatMenu_InsertLetter = 0x0041AB80; // select of 'A'-'Z': inserts the item's character at the cursor (22 max)
+EnterCheatMenu_Backspace = 0x0041AC3C; // select of the '\x03' key: deletes before the cursor
+EnterCheatMenu_MatchesCode = 0x0041ACD0; // whether the entered text equals a code (each char ^ index)
+EnterCheatMenu_Enter = 0x0041AD64; // select of the '\x04' key: tries the 12 codes of D_00439770, ORs the match's flags into unlockedCheats, plays its sound
+EnterCheatMenu_ResultLabel = 0x0041AEB0; // update: the matched cheat's text from D_00439774, else " "
+// n7 chunk G: VM module 1, 0x0041B000-0x0041FFFF (menus: cheats, options, multiplayer
+// stats, name entry, controller pak save/load), with their module-2 copies (_2).
+// Menu evidence: the MenuItemDesc / MenuDesc tables in us/asm/data/virtual_rodata_0.data.s
+// (item text string, then draw / update / select callbacks; desc items, count, init,
+// close, update, poll), strings read from build/ref.elf.
+
+// Cheat menu (MenuDescs D_00439CF8 / D_00439EE8): per cheat an update (sets the on/off text, item
+// enabled when the bit is in GameSettings.unlockedCheats) and a select (xors the bit into cheatFlags)
+CheatMenu_ToggleFlag = 0x0041B040; // xors its second argument into GameSettings.cheatFlags (D_8011AAD8); generic form of the toggles below
+CheatMenu_ToggleFlag_2 = 0x00453FA8; // module-2 copy of CheatMenu_ToggleFlag: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_WarpText = 0x0041B05C; // update of the warp item: text 'warp: port of adia' ... 'warp: credits' by the warp index D_80130924
+CheatMenu_WarpText_2 = 0x00453FC4; // module-2 copy of CheatMenu_WarpText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_GetWarpLevel = 0x0041B148; // the warp destination id (1000, 2000 ... 8000) for warp index D_80130924, same order as CheatMenu_WarpText
+CheatMenu_GetWarpLevel_2 = 0x004540B0; // module-2 copy of CheatMenu_GetWarpLevel: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleInvincibility = 0x0041B1C8; // select of the 'invincibility : on/off' item: cheatFlags ^= 0x1
+CheatMenu_ToggleInvincibility_2 = 0x00454130; // module-2 copy of CheatMenu_ToggleInvincibility: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_InvincibilityText = 0x0041B1E4; // update of the 'invincibility : on/off' item: bit 0x1 of cheatFlags / unlockedCheats
+CheatMenu_InvincibilityText_2 = 0x0045414C; // module-2 copy of CheatMenu_InvincibilityText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleInfiniteLives = 0x0041B250; // select of the 'infinite lives : on/off' item: cheatFlags ^= 0x2
+CheatMenu_ToggleInfiniteLives_2 = 0x004541B8; // module-2 copy of CheatMenu_ToggleInfiniteLives: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_InfiniteLivesText = 0x0041B26C; // update of the 'infinite lives : on/off' item: bit 0x2 of cheatFlags / unlockedCheats
+CheatMenu_InfiniteLivesText_2 = 0x004541D4; // module-2 copy of CheatMenu_InfiniteLivesText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleAllWeapons = 0x0041B2D8; // select of the 'all weapons : on/off' item: cheatFlags ^= 0x4
+CheatMenu_ToggleAllWeapons_2 = 0x00454240; // module-2 copy of CheatMenu_ToggleAllWeapons: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_AllWeaponsText = 0x0041B2F4; // update of the 'all weapons : on/off' item: bit 0x4 of cheatFlags / unlockedCheats
+CheatMenu_AllWeaponsText_2 = 0x0045425C; // module-2 copy of CheatMenu_AllWeaponsText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleUnlimitedAmmo = 0x0041B360; // select of the 'unlimited ammo : on/off' item: cheatFlags ^= 0x8
+CheatMenu_ToggleUnlimitedAmmo_2 = 0x004542C8; // module-2 copy of CheatMenu_ToggleUnlimitedAmmo: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_UnlimitedAmmoText = 0x0041B37C; // update of the 'unlimited ammo : on/off' item: bit 0x8 of cheatFlags / unlockedCheats
+CheatMenu_UnlimitedAmmoText_2 = 0x004542E4; // module-2 copy of CheatMenu_UnlimitedAmmoText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleAllSpecialObjects = 0x0041B3E8; // select of the 'all special objects : on/off' item: cheatFlags ^= 0x10
+CheatMenu_ToggleAllSpecialObjects_2 = 0x00454350; // module-2 copy of CheatMenu_ToggleAllSpecialObjects: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_AllSpecialObjectsText = 0x0041B404; // update of the 'all special objects : on/off' item: bit 0x10 of cheatFlags / unlockedCheats
+CheatMenu_AllSpecialObjectsText_2 = 0x0045436C; // module-2 copy of CheatMenu_AllSpecialObjectsText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleBigHeadMode = 0x0041B470; // select of the 'big head mode : on/off' item: cheatFlags ^= 0x20
+CheatMenu_ToggleBigHeadMode_2 = 0x004543D8; // module-2 copy of CheatMenu_ToggleBigHeadMode: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_BigHeadModeText = 0x0041B48C; // update of the 'big head mode : on/off' item: bit 0x20 of cheatFlags / unlockedCheats
+CheatMenu_BigHeadModeText_2 = 0x004543F4; // module-2 copy of CheatMenu_BigHeadModeText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleTinyMode = 0x0041B4F8; // select of the 'tiny mode : on/off' item: cheatFlags ^= 0x40
+CheatMenu_ToggleTinyMode_2 = 0x00454460; // module-2 copy of CheatMenu_ToggleTinyMode: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_TinyModeText = 0x0041B514; // update of the 'tiny mode : on/off' item: bit 0x40 of cheatFlags / unlockedCheats
+CheatMenu_TinyModeText_2 = 0x0045447C; // module-2 copy of CheatMenu_TinyModeText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleStickMode = 0x0041B580; // select of the 'stick mode : on/off' item: cheatFlags ^= 0x80
+CheatMenu_ToggleStickMode_2 = 0x004544E8; // module-2 copy of CheatMenu_ToggleStickMode: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_StickModeText = 0x0041B59C; // update of the 'stick mode : on/off' item: bit 0x80 of cheatFlags / unlockedCheats
+CheatMenu_StickModeText_2 = 0x00454504; // module-2 copy of CheatMenu_StickModeText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleBigHandsFeetMode = 0x0041B608; // select of the 'big hands / feet mode : on/off' item: cheatFlags ^= 0x100
+CheatMenu_ToggleBigHandsFeetMode_2 = 0x00454570; // module-2 copy of CheatMenu_ToggleBigHandsFeetMode: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_BigHandsFeetModeText = 0x0041B624; // update of the 'big hands / feet mode : on/off' item: bit 0x100 of cheatFlags / unlockedCheats
+CheatMenu_BigHandsFeetModeText_2 = 0x0045458C; // module-2 copy of CheatMenu_BigHandsFeetModeText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_TogglePenAndInkMode = 0x0041B690; // select of the 'pen and ink mode : on/off' item: cheatFlags ^= 0x200
+CheatMenu_TogglePenAndInkMode_2 = 0x004545F8; // module-2 copy of CheatMenu_TogglePenAndInkMode: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_PenAndInkModeText = 0x0041B6AC; // update of the 'pen and ink mode : on/off' item: bit 0x200 of cheatFlags / unlockedCheats
+CheatMenu_PenAndInkModeText_2 = 0x00454614; // module-2 copy of CheatMenu_PenAndInkModeText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleGouraudMode = 0x0041B718; // select of the 'gouraud mode : on/off' item: cheatFlags ^= 0x400
+CheatMenu_ToggleGouraudMode_2 = 0x00454680; // module-2 copy of CheatMenu_ToggleGouraudMode: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_GouraudModeText = 0x0041B734; // update of the 'gouraud mode : on/off' item: bit 0x400 of cheatFlags / unlockedCheats
+CheatMenu_GouraudModeText_2 = 0x0045469C; // module-2 copy of CheatMenu_GouraudModeText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleJuansCheat = 0x0041B7A0; // select of the 'juans cheat : on/off' item: cheatFlags ^= 0x800
+CheatMenu_ToggleJuansCheat_2 = 0x00454708; // module-2 copy of CheatMenu_ToggleJuansCheat: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_JuansCheatText = 0x0041B7BC; // update of the 'juans cheat : on/off' item: bit 0x800 of cheatFlags / unlockedCheats
+CheatMenu_JuansCheatText_2 = 0x00454724; // module-2 copy of CheatMenu_JuansCheatText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleZachAttack = 0x0041B828; // select of the 'zach attack cheat : on/off' item: cheatFlags ^= 0x1000
+CheatMenu_ToggleZachAttack_2 = 0x00454790; // module-2 copy of CheatMenu_ToggleZachAttack: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ZachAttackText = 0x0041B844; // update of the 'zach attack cheat : on/off' item: bit 0x1000 of cheatFlags / unlockedCheats
+CheatMenu_ZachAttackText_2 = 0x004547AC; // module-2 copy of CheatMenu_ZachAttackText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleAllMap = 0x0041B8B0; // select of the 'all map : on/off' item: cheatFlags ^= 0x2000
+CheatMenu_ToggleAllMap_2 = 0x00454818; // module-2 copy of CheatMenu_ToggleAllMap: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_AllMapText = 0x0041B8CC; // update of the 'all map : on/off' item: bit 0x2000 of cheatFlags / unlockedCheats
+CheatMenu_AllMapText_2 = 0x00454834; // module-2 copy of CheatMenu_AllMapText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleBlackout = 0x0041B938; // select of the 'blackout : on/off' item: cheatFlags ^= 0x4000
+CheatMenu_ToggleBlackout_2 = 0x004548A0; // module-2 copy of CheatMenu_ToggleBlackout: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_BlackoutText = 0x0041B954; // update of the 'blackout : on/off' item: bit 0x4000 of cheatFlags / unlockedCheats
+CheatMenu_BlackoutText_2 = 0x004548BC; // module-2 copy of CheatMenu_BlackoutText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_ToggleFrootyStripes = 0x0041B9C0; // select of the 'frooty stripes : on/off' item: cheatFlags ^= 0x8000
+CheatMenu_ToggleFrootyStripes_2 = 0x00454928; // module-2 copy of CheatMenu_ToggleFrootyStripes: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+CheatMenu_FrootyStripesText = 0x0041B9DC; // update of the 'frooty stripes : on/off' item: bit 0x8000 of cheatFlags / unlockedCheats
+CheatMenu_FrootyStripesText_2 = 0x00454944; // module-2 copy of CheatMenu_FrootyStripesText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F68)
+
+// Game settings and player options defaults
+GameSettings_SetDefaults = 0x0041BA50; // fills GameSettings (D_8011AAD8, from func_00286440 and func_0042EF2C): dm/tag/team limits, speed 1.0, weapons on, default and four player slots
+GameSettings_SetDefaults_2 = 0x004549B0; // module-2 copy of GameSettings_SetDefaults: its header says so
+PlayerOptions_SetDefaults = 0x0041BC04; // the CPlayerOptions defaults of GameSettings_SetDefaults' slot loop (stick 0x80, look spring, controller index arg1), then PlayerOptions_SetDefaultName
+PlayerOptions_SetDefaults_2 = 0x00454B64; // module-2 copy of PlayerOptions_SetDefaults: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+PlayerOptions_SetDefaultName = 0x0041BC50; // copies 'player 1'..'player 4' into m_Name by m_nController; also on an empty name (NameEntryMenu_Confirm)
+PlayerOptions_SetDefaultName_2 = 0x00454BB0; // module-2 copy of PlayerOptions_SetDefaultName: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_GetPlayerOptions = 0x0041BD3C; // returns menu->player->m_pOptions, else the default D_8011AB18: the lookup every options callback inlines
+OptionsMenu_GetPlayerOptions_2 = 0x00454C9C; // module-2 copy of OptionsMenu_GetPlayerOptions: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+
+// Options menus (MenuDescs D_0043A230 over items D_00439FF0, and D_0043A150): update = item text, select = change the value
+OptionsMenu_Init = 0x0041BD2C; // init of MenuDesc D_0043A230: clears D_80130930, the resolution toggle cooldown (OptionsMenu_ToggleResolution)
+OptionsMenu_Init_2 = 0x00454C8C; // module-2 copy of OptionsMenu_Init: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_CycleDifficulty = 0x0041BD64; // select of 'difficulty :': left/right cycles GameSettings.difficulty 8/16/32
+OptionsMenu_CycleDifficulty_2 = 0x00454CC4; // module-2 copy of OptionsMenu_CycleDifficulty: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_DifficultyText = 0x0041BE5C; // update of 'difficulty : easy/normal/hard' by GameSettings.difficulty
+OptionsMenu_DifficultyText_2 = 0x00454DBC; // module-2 copy of OptionsMenu_DifficultyText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepControlType = 0x0041BF08; // select of 'control type :' (m_ControlType)
+OptionsMenu_StepControlType_2 = 0x00454E68; // module-2 copy of OptionsMenu_StepControlType: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_ControlTypeText = 0x0041BF6C; // update: 'control type : expert/arcade'
+OptionsMenu_ControlTypeText_2 = 0x00454ECC; // module-2 copy of OptionsMenu_ControlTypeText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepControlSide = 0x0041BFD0; // select of 'control side :' (m_ControlSide)
+OptionsMenu_StepControlSide_2 = 0x00454F30; // module-2 copy of OptionsMenu_StepControlSide: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_ControlSideText = 0x0041C034; // update: 'control side : left/right'
+OptionsMenu_ControlSideText_2 = 0x00454F94; // module-2 copy of OptionsMenu_ControlSideText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepLookSpring = 0x0041C090; // select of 'look spring :' (m_bLookSpring)
+OptionsMenu_StepLookSpring_2 = 0x00454FF0; // module-2 copy of OptionsMenu_StepLookSpring: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_LookSpringText = 0x0041C0F4; // update: 'look spring : on/off'
+OptionsMenu_LookSpringText_2 = 0x00455054; // module-2 copy of OptionsMenu_LookSpringText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepAutoAim = 0x0041C158; // select of 'auto aim :' (m_bAutoAim)
+OptionsMenu_StepAutoAim_2 = 0x004550B8; // module-2 copy of OptionsMenu_StepAutoAim: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_AutoAimText = 0x0041C1BC; // update: 'auto aim : on/off'
+OptionsMenu_AutoAimText_2 = 0x0045511C; // module-2 copy of OptionsMenu_AutoAimText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepBloodColor = 0x0041C220; // select of 'blood color :' (GameSettings+0x17, 0-2)
+OptionsMenu_StepBloodColor_2 = 0x00455180; // module-2 copy of OptionsMenu_StepBloodColor: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_BloodColorText = 0x0041C274; // update: 'blood color : off/red/green'
+OptionsMenu_BloodColorText_2 = 0x004551D4; // module-2 copy of OptionsMenu_BloodColorText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepTwoPlayerLayout = 0x0041C2E8; // select of '2 plyr layout :' (GameSettings+0x1B)
+OptionsMenu_StepTwoPlayerLayout_2 = 0x00455248; // module-2 copy of OptionsMenu_StepTwoPlayerLayout: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_TwoPlayerLayoutText = 0x0041C338; // update: '2 plyr layout : horz/vert'
+OptionsMenu_TwoPlayerLayoutText_2 = 0x00455298; // module-2 copy of OptionsMenu_TwoPlayerLayoutText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_OpacityText = 0x0041C3C4; // update: 'opacity : clear/opaque/%02d' from hudAlphaSetting
+OptionsMenu_OpacityText_2 = 0x00455324; // module-2 copy of OptionsMenu_OpacityText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepOpacity = 0x0041C458; // select of 'opacity :': steps hudAlphaSetting by 16 (0-0x100), hudAlpha = it clamped to 0xFF
+OptionsMenu_StepOpacity_2 = 0x004553B8; // module-2 copy of OptionsMenu_StepOpacity: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepStickHorz = 0x0041C4C0; // select of 'control stick horz:' (m_SettingX, 8-0xF8 by 8)
+OptionsMenu_StepStickHorz_2 = 0x00455420; // module-2 copy of OptionsMenu_StepStickHorz: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StickHorzText = 0x0041C524; // update: 'control stick horz: norm/+-n' from m_SettingX
+OptionsMenu_StickHorzText_2 = 0x00455484; // module-2 copy of OptionsMenu_StickHorzText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepStickVert = 0x0041C5EC; // select of 'control stick vert:' (m_SettingY)
+OptionsMenu_StepStickVert_2 = 0x0045554C; // module-2 copy of OptionsMenu_StepStickVert: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StickVertText = 0x0041C650; // update: 'control stick vert: norm/+-n' from m_SettingY
+OptionsMenu_StickVertText_2 = 0x004555B0; // module-2 copy of OptionsMenu_StickVertText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_WeaponSelectText = 0x0041C718; // update: 'Weapon Select: quick/norm' (m_WeaponSelect)
+OptionsMenu_WeaponSelectText_2 = 0x00455678; // module-2 copy of OptionsMenu_WeaponSelectText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_ToggleWeaponSelect = 0x0041C764; // select of 'Weapon Select:': flips m_WeaponSelect
+OptionsMenu_ToggleWeaponSelect_2 = 0x004556C4; // module-2 copy of OptionsMenu_ToggleWeaponSelect: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_ResolutionText = 0x0041C798; // update of 'Resolution : lo-rez': counts down the cooldown D_80130930, item state from the memory size (0x400000), text from func_004245E0
+OptionsMenu_ResolutionText_2 = 0x004556F8; // module-2 copy of OptionsMenu_ResolutionText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_ToggleResolution = 0x0041C828; // select of 'Resolution :': when the cooldown D_80130930 is 0 calls func_0042452C and restarts it
+OptionsMenu_ToggleResolution_2 = 0x00455788; // module-2 copy of OptionsMenu_ToggleResolution: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_StepBrightness = 0x0041C880; // select of 'brightness :' (GameSettings.unkC, 0-0x80 by 0x10)
+OptionsMenu_StepBrightness_2 = 0x004557E0; // module-2 copy of OptionsMenu_StepBrightness: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+OptionsMenu_BrightnessText = 0x0041C8CC; // update: 'brightness : norm/%02d' from GameSettings.unkC
+OptionsMenu_BrightnessText_2 = 0x0045582C; // module-2 copy of OptionsMenu_BrightnessText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+
+// Multiplayer stats menu (items D_0043A260: 'you fragged', rows one..four, totals, 'continue ?' yes/no, save/done;
+// one MenuDesc per player: D_0043AB60.. (init StatsMenu_InitContinue), D_0043ABF0.. (StatsMenu_InitSaveDone), D_0043AC80.. (StatsMenu_InitAfterPak))
+StatsMenu_SaveProfile = 0x0041C960; // select of 'save': opens the pak menu D_0043B6CC (PakMenu_InitSaveProfile) for the player
+StatsMenu_SaveProfile_2 = 0x004558C0; // module-2 copy of StatsMenu_SaveProfile: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+StatsMenu_Done = 0x0041C9C4; // select of 'done': sets the player's CPlayerOptions.unk_0x3D
+StatsMenu_Done_2 = 0x00455924; // module-2 copy of StatsMenu_Done: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+StatsMenu_ContinueYes = 0x0041C9DC; // select of 'yes' under 'continue ?': func_0042E14C(player)
+StatsMenu_ContinueYes_2 = 0x0045593C; // module-2 copy of StatsMenu_ContinueYes: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+StatsMenu_ContinueNo = 0x0041CA00; // select of 'no' under 'continue ?': leaves (func_00430330) or clears the player's m_bActive
+StatsMenu_ContinueNo_2 = 0x00455960; // module-2 copy of StatsMenu_ContinueNo: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F60)
+StatsMenu_IsMatchOver = 0x0041CA78; // poll of MenuDescs D_0043AB60..D_0043ABCC: GameMatch teamOver || over || done
+StatsMenu_HeaderText = 0x0041CAB0; // update: 'you fragged' or 'you tagged' by GameMatch.tag (D_8011ACE4)
+StatsMenu_HeaderText_2 = 0x00455A04; // module-2 copy of StatsMenu_HeaderText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_TagsText = 0x0041CAE4; // update of 'tags :0000': prints the player slot's m_Tags
+StatsMenu_TagsText_2 = 0x00455A38; // module-2 copy of StatsMenu_TagsText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_FragsText = 0x0041CB58; // update of 'frags :0000': m_Kills
+StatsMenu_FragsText_2 = 0x00455AAC; // module-2 copy of StatsMenu_FragsText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_DeathsText = 0x0041CBCC; // update of 'deaths :0000': m_Deaths
+StatsMenu_DeathsText_2 = 0x00455B20; // module-2 copy of StatsMenu_DeathsText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_SuicidesText = 0x0041CC40; // update of 'suicides:0000': m_Suicides
+StatsMenu_SuicidesText_2 = 0x00455B94; // module-2 copy of StatsMenu_SuicidesText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_PlayerRowText = 0x0041CCB4; // update of rows 'one..four :0000': the slot's name and m_Tagged/m_Killed count
+StatsMenu_PlayerRowText_2 = 0x00455C08; // module-2 copy of StatsMenu_PlayerRowText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_ShowTagsRow = 0x0041CD7C; // sets/clears item 7's flag (the tags row) by GameMatch.tag; the same tail as the stats inits
+StatsMenu_ShowTagsRow_2 = 0x00455CD0; // module-2 copy of StatsMenu_ShowTagsRow: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_InitContinue = 0x0041CDBC; // init of D_0043AB60..: shows 'continue ?'/yes/no (items 11-13), hides save/done, tags row by GameMatch.tag
+StatsMenu_InitContinue_2 = 0x00455D10; // module-2 copy of StatsMenu_InitContinue: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_InitSaveDone = 0x0041CE6C; // init of D_0043ABF0..: shows save/done (items 14-15), hides continue, resets the pak menu state, func_00426480(player)
+StatsMenu_InitSaveDone_2 = 0x00455DC0; // module-2 copy of StatsMenu_InitSaveDone: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+StatsMenu_InitAfterPak = 0x0041CF68; // init of D_0043AC80..D_0043ACEC, the menus the pak menus return to (PakMenu_GetReturnMenu): as StatsMenu_InitSaveDone without the pak reset
+StatsMenu_InitAfterPak_2 = 0x00455EBC; // module-2 copy of StatsMenu_InitAfterPak: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F54)
+
+// Player name entry menu (MenuDesc D_0043B364, items D_0043AD10: four name rows, the character grid, delete and ok)
+NameEntryMenu_Init = 0x0041D050; // init of D_0043B364: highlights the player's row, copies its name (unless the default 'player') into the edit buffer D_800C1FB0
+NameEntryMenu_Init_2 = 0x00455FA0; // module-2 copy of NameEntryMenu_Init: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F50)
+NameEntryMenu_UpdateName = 0x0041D2C4; // update of the name rows: cursor blink timer, left/right move the cursor
+NameEntryMenu_UpdateName_2 = 0x00456214; // module-2 copy of NameEntryMenu_UpdateName: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F50)
+NameEntryMenu_AddChar = 0x0041D414; // select of every character item ('a'..'z', '0'..'9'): appends it, up to 8
+NameEntryMenu_AddChar_2 = 0x00456364; // module-2 copy of NameEntryMenu_AddChar: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F50)
+NameEntryMenu_CompareName = 0x0041D4E4; // string compare (only the first character, sic) used against 'player' by NameEntryMenu_Init (inlined there)
+NameEntryMenu_CompareName_2 = 0x00456434; // module-2 copy of NameEntryMenu_CompareName: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F50)
+NameEntryMenu_DrawName = 0x0041D51C; // draw of the name rows: the blinking cursor bar, then the item (func_00416168)
+NameEntryMenu_DrawName_2 = 0x0045646C; // module-2 copy of NameEntryMenu_DrawName: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F50)
+NameEntryMenu_DeleteChar = 0x0041D6D4; // select of the delete item: removes the last character
+NameEntryMenu_DeleteChar_2 = 0x00456624; // module-2 copy of NameEntryMenu_DeleteChar: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F50)
+NameEntryMenu_Confirm = 0x0041D76C; // select of the ok item: copies the name into the player slot's m_Name, an empty name gets PlayerOptions_SetDefaultName
+NameEntryMenu_Confirm_2 = 0x004566BC; // module-2 copy of NameEntryMenu_Confirm: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F50)
+NameEntryMenu_IsMatchOver = 0x0041D84C; // poll of D_0043B364: GameMatch teamOver || over || done
+
+// Controller pak save/load menus (items D_0043B390: 'controller pak: #x', the 16 note rows, free pages, cancel;
+// MenuDescs D_0043B6A8..D_0043B738). Notes 'TUROK 2' (a game) and 'T2 MULTI' (a multiplayer profile), game code 'NT2E', company '51'
+SaveGame_Build = 0x0041D890; // allocates the 'Single Save Block' (D_800C2010/D_800C2018) and fills the SaveGame: player data, GameSettingsBlock, play clock, level flags
+SaveGame_Build_2 = 0x004567B0; // module-2 copy of SaveGame_Build: its header says so
+PakMenu_UpdateNoteRows = 0x0041DA28; // sets or clears flag 0x01000000 of the note rows (items 3-18) from each note and the mode (D_800C2024: 0 save, 1 profile, 2 game)
+PakMenu_UpdateNoteRows_2 = 0x00456948; // module-2 copy of PakMenu_UpdateNoteRows: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_GetReturnMenu = 0x0041DC5C; // picks the MenuDesc to go back to for the current pak mode
+PakMenu_GetReturnMenu_2 = 0x00456B7C; // module-2 copy of PakMenu_GetReturnMenu: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_CheckPak = 0x0041DD90; // checks the pak in a slot; opens the missing / damaged / unformatted / full dialog; returns its status
+PakMenu_CheckPak_2 = 0x00456CB0; // module-2 copy of PakMenu_CheckPak: its header says so
+PakMenu_InitSaveProfile = 0x0041DF50; // init of D_0043B6CC: save mode (D_801309A0, D_801309B4 profile), captures the 0x18-byte PakProfile with its checksum
+PakMenu_InitSaveProfile_2 = 0x00456E70; // module-2 copy of PakMenu_InitSaveProfile: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_InitLoadProfile = 0x0041E1D8; // init of D_0043B6A8: load mode (D_80130994) for 'T2 MULTI' notes (D_800C2024 = 1)
+PakMenu_InitLoadProfile_2 = 0x004570F8; // module-2 copy of PakMenu_InitLoadProfile: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_CheckSlotForSave = 0x0041E374; // pak scan step of PakMenu_InitSaveGameAnyPak: a pak with a 'T2 MULTI'/'TUROK 2' note wins, else keeps the one with most free pages
+PakMenu_CheckSlotForSave_2 = 0x00457294; // module-2 copy of PakMenu_CheckSlotForSave: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_InitSaveGameAnyPak = 0x0041E500; // init of D_0043B738: save mode with D_80130990 set, finds a pad with a pak (D_800C2028) and checks its room for a save
+PakMenu_InitSaveGameAnyPak_2 = 0x00457420; // module-2 copy of PakMenu_InitSaveGameAnyPak: its header says so
+PakMenu_InitSaveGame = 0x0041EA84; // init of D_0043B714: save mode, builds the save (SaveGame_Build) and its checksum
+PakMenu_InitSaveGame_2 = 0x004579A4; // module-2 copy of PakMenu_InitSaveGame: its header says so
+PakMenu_InitLoadGame = 0x0041EC44; // init of D_0043B6F0: load mode for 'TUROK 2' notes (D_800C2024 = 2)
+PakMenu_InitLoadGame_2 = 0x00457B64; // module-2 copy of PakMenu_InitLoadGame: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_WriteProfile = 0x0041EDE0; // writes the 0x18-byte PakProfile D_80130968 as note 'T2 MULTI' (func_00426164); called by PakMenu_SelectPak
+PakMenu_WriteProfile_2 = 0x00457D00; // module-2 copy of PakMenu_WriteProfile: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_WriteSaveGame = 0x0041F0C8; // writes the save block as note 'TUROK 2' (func_00426164), then the result dialog
+PakMenu_WriteSaveGame_2 = 0x00457FE8; // module-2 copy of PakMenu_WriteSaveGame: its header says so
+PakMenu_SelectNote = 0x0041F32C; // select of the 16 note rows: load a profile/game, or confirm overwriting (save)
+PakMenu_SelectNote_2 = 0x0045824C; // module-2 copy of PakMenu_SelectNote: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_NoteText = 0x0041FB50; // update of the 16 note rows: 'NAME EXT size' of the note
+PakMenu_NoteText_2 = 0x00458A70; // module-2 copy of PakMenu_NoteText: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+PakMenu_FreePagesText = 0x0041FCF4; // update: 'free pages :xxx - needed :xxx'
+PakMenu_FreePagesText_2 = 0x00458C14; // module-2 copy of PakMenu_FreePagesText: its header says so
+PakMenu_SelectPak = 0x0041FEC4; // select of the pak line: checks the pak, writes the profile or the game (asks before replacing 'TUROK 2'), or moves to the next pak
+PakMenu_SelectPak_2 = 0x00458DE4; // module-2 copy of PakMenu_SelectPak: same instruction stream and size, at the module-2 offset of its neighbours (+0x38F20)
+
+// More module-2 copies (chunk F menus): from n8s twin map (/root/N2_n8/work/twins.txt),
+// kept only where the offset agrees with the neighbouring copies.
+TotemDefense_Complete_2 = 0x00440F20; // module-2 copy of 0x00407F20, n8 twin map (unique)
+WeaponsMenu_ToggleLabel_2 = 0x00450910; // module-2 copy of 0x00417910, n8 twin map (unique)
+Menu_ClaimPressingController_2 = 0x00450ACC; // module-2 copy of 0x00417ACC, n8 twin map (unique)
+Mp_SetupMatchRules_2 = 0x00450BB0; // module-2 copy of 0x00417BB0, n8 twin map (unique)
+Mp_JoinPressingController_2 = 0x00450C0C; // module-2 copy of 0x00417C0C, n8 twin map (unique)
+Menu_FindPressingController_2 = 0x00450CA0; // module-2 copy of 0x00417CA0, n8 twin map (unique)
+Mp_CountJoinedControllers_2 = 0x00450D10; // module-2 copy of 0x00417D10, n8 twin map (unique)
+FinalScoreMenu_Init_2 = 0x00450D68; // module-2 copy of 0x00417D68, n8 twin map (identical bodies; picked by neighbours' offset +0x39000)
+FinalScoreMenu_Poll_2 = 0x00450D78; // module-2 copy of 0x00417D78, n8 twin map (unique)
+FinalScoreMenu_BlueScoreLabel_2 = 0x00450DD4; // module-2 copy of 0x00417DD4, n8 twin map (unique)
+FinalScoreMenu_RedScoreLabel_2 = 0x00450E28; // module-2 copy of 0x00417E28, n8 twin map (unique)
+FinalScoreMenu_PleaseWaitSelect_2 = 0x00450E7C; // module-2 copy of 0x00417E7C, n8 twin map (identical bodies; picked by neighbours' offset +0x39000)
+RumbleMenu_Play_2 = 0x00450E94; // module-2 copy of 0x00417EBC, n8 twin map (unique)
+PlayerSetupMenu_StepHandicap_2 = 0x00450F00; // module-2 copy of 0x00417F50, n8 twin map (unique)
+PlayerSetupMenu_HandicapLabel_2 = 0x00450F4C; // module-2 copy of 0x00417F9C, n8 twin map (unique)
+PlayerSetupMenu_StepControlType_2 = 0x00451040; // module-2 copy of 0x00418090, n8 twin map (unique)
+PlayerSetupMenu_EditName_2 = 0x0045108C; // module-2 copy of 0x004180DC, n8 twin map (identical bodies; picked by neighbours' offset +0x38FB0)
+PlayerSetupMenu_NameLabel_2 = 0x004510B8; // module-2 copy of 0x00418108, n8 twin map (unique)
+PlayerSetupMenu_ControlTypeLabel_2 = 0x00451108; // module-2 copy of 0x00418158, n8 twin map (unique)
+CharacterMenu_Init_2 = 0x00451154; // module-2 copy of 0x004181A4, n8 twin map (unique)
+CharacterMenu_LoadSelect_2 = 0x004511B4; // module-2 copy of 0x0041822C, n8 twin map (unique)
+CharacterMenu_SelectCharacter_2 = 0x0045121C; // module-2 copy of 0x00418294, n8 twin map (unique)
+TeamMenu_ChooseBlue_2 = 0x00451320; // module-2 copy of 0x004183C0, n8 twin map (unique)
+TeamMenu_ChooseRed_2 = 0x00451368; // module-2 copy of 0x00418408, n8 twin map (unique)
+FragTagMenu_LevelLabel_2 = 0x004515C0; // module-2 copy of 0x00418660, n8 twin map (unique)
+MpMenu_StepPlayerSpeed_2 = 0x00451804; // module-2 copy of 0x004188A4, n8 twin map (unique)
+MpMenu_PlayerSpeedLabel_2 = 0x0045190C; // module-2 copy of 0x004189AC, n8 twin map (unique)
+WeaponsMenu_Toggle_2 = 0x00452314; // module-2 copy of 0x004193B4, n8 twin map (unique)
+DeathmatchMenu_OpenTeamBlood_2 = 0x00452458; // module-2 copy of 0x004194F8, n8 twin map (unique)
+SingleMenu_Init_2 = 0x004524C0; // module-2 copy of 0x00419560, n8 twin map (unique)
+SingleMenu_NewGame_2 = 0x00452520; // module-2 copy of 0x004195C0, n8 twin map (unique)
+SingleMenu_Load_2 = 0x00452578; // module-2 copy of 0x00419618, n8 twin map (unique)
+SingleMenu_GoBack_2 = 0x004525C4; // module-2 copy of 0x00419664, n8 twin map (unique)
+TitleMenu_Single_2 = 0x00452610; // module-2 copy of 0x004196B0, n8 twin map (unique)
+TitleMenu_MultiUpdate_2 = 0x004526E8; // module-2 copy of 0x00419788, n8 twin map (unique)
+TitleMenu_Multi_2 = 0x0045275C; // module-2 copy of 0x004197FC, n8 twin map (unique)
+TitleMenu_SoundOptions_2 = 0x0045283C; // module-2 copy of 0x004198DC, n8 twin map (unique)
+QuitMenu_Yes_2 = 0x004528C0; // module-2 copy of 0x00419960, n8 twin map (unique)
+QuitMenu_Init_2 = 0x00452900; // module-2 copy of 0x004199A0, n8 twin map (unique)
+Menu_StepDebugMode_2 = 0x0045290C; // module-2 copy of 0x004199AC, n8 twin map (unique)
+Menu_DebugModeLabel_2 = 0x00452960; // module-2 copy of 0x00419A00, n8 twin map (unique)
+PauseMenu_Resume_2 = 0x004529EC; // module-2 copy of 0x00419A8C, n8 twin map (unique)
+SoundMenu_GoBack_2 = 0x00452B2C; // module-2 copy of 0x00419BCC, n8 twin map (unique)
+SoundMenu_StepSpeechVolume_2 = 0x00452BB4; // module-2 copy of 0x00419C54, n8 twin map (unique)
+SoundMenu_SpeechVolumeLabel_2 = 0x00452C14; // module-2 copy of 0x00419CB4, n8 twin map (identical bodies; picked by neighbours' offset +0x38F60)
+SoundMenu_StepMusicVolume_2 = 0x00452CF4; // module-2 copy of 0x00419D94, n8 twin map (unique)
+SoundMenu_StepSfxVolume_2 = 0x00452E44; // module-2 copy of 0x00419EE4, n8 twin map (unique)
+SoundMenu_StepMusicTrack_2 = 0x00452F88; // module-2 copy of 0x0041A028, n8 twin map (unique)
+SoundMenu_MusicTrackLabel_2 = 0x0045302C; // module-2 copy of 0x0041A0CC, n8 twin map (unique)
+PauseMenu_SoundOptions_2 = 0x004530A0; // module-2 copy of 0x0041A140, n8 twin map (unique)
+PauseMenu_Init_2 = 0x004531B4; // module-2 copy of 0x0041A254, n8 twin map (unique)
+PauseMenu_Close_2 = 0x0045328C; // module-2 copy of 0x0041A32C, n8 twin map (unique)
+PauseMenu_Update_2 = 0x004532EC; // module-2 copy of 0x0041A38C, n8 twin map (unique)
+ContinueMenu_Yes_2 = 0x00453310; // module-2 copy of 0x0041A3B0, n8 twin map (unique)
+ContinueMenu_No_2 = 0x00453334; // module-2 copy of 0x0041A3D4, n8 twin map (unique)
+GameOverMenu_Init_2 = 0x00453380; // module-2 copy of 0x0041A420, n8 twin map (unique)
+GameOverMenu_Poll_2 = 0x004533AC; // module-2 copy of 0x0041A44C, n8 twin map (unique)
+GameOverMenu_TickCountdown_2 = 0x004533F4; // module-2 copy of 0x0041A494, n8 twin map (unique)
+CheatsMenu_Init_2 = 0x00453430; // module-2 copy of 0x0041A4D0, n8 twin map (unique)
+CheatsMenu_WarpSelect_2 = 0x0045353C; // module-2 copy of 0x0041A5DC, n8 twin map (unique)
+EnterCheatMenu_Init_2 = 0x00453858; // module-2 copy of 0x0041A8F0, n8 twin map (unique)
+EnterCheatMenu_DrawTextField_2 = 0x0045386C; // module-2 copy of 0x0041A904, n8 twin map (unique)
+EnterCheatMenu_UpdateTextField_2 = 0x00453A08; // module-2 copy of 0x0041AAA0, n8 twin map (unique)
+EnterCheatMenu_TextFieldSelect_2 = 0x00453AE0; // module-2 copy of 0x0041AB78, n8 twin map (unique)
+EnterCheatMenu_InsertLetter_2 = 0x00453AE8; // module-2 copy of 0x0041AB80, n8 twin map (unique)
+EnterCheatMenu_Backspace_2 = 0x00453BA4; // module-2 copy of 0x0041AC3C, n8 twin map (unique)
+EnterCheatMenu_MatchesCode_2 = 0x00453C38; // module-2 copy of 0x0041ACD0, n8 twin map (unique)
+EnterCheatMenu_Enter_2 = 0x00453CCC; // module-2 copy of 0x0041AD64, n8 twin map (unique)
+EnterCheatMenu_ResultLabel_2 = 0x00453E18; // module-2 copy of 0x0041AEB0, n8 twin map (unique)
+CheatsMenu_SetToggle_2 = 0x00453F54; // module-2 copy of 0x0041AFEC, n8 twin map (unique)
+StatsMenu_IsMatchOver_2 = 0x004559D8; // module-2 copy of 0x0041CA78, n8 twin map (unique)
