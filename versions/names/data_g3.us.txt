@@ -1,0 +1,127 @@
+// Data symbols 0x800B00C0-0x800B5117 (part g3): the .data of the AI, region, audio-manager, sound,
+// HUD, engine-mode and pak-menu source files. Not applied yet (apply_names.py handles functions only).
+// Skipped: one-use string literals (pickup names/messages 0x800B37BC-0x800B3E6F, options/mission/pak
+// menu texts 0x800B3E70-0x800B5117), which should become literals in C.
+
+// Enemy animation pick tables (AI_PickAnimFromTable): {flag bit, anim id} rows, -1 terminated, one per
+// EnemyAnim_* picker; the picker's suffix is the table's low address bits
+sEnemyAnimTable_Weapon_B00C0 = 0x800B00C0; // only EnemyAnim_Weapon_B00C0, by m_Enemy.m_wWeaponAnimFlags (anims 0x113A-0x113E)
+sEnemyAnimTable_Weapon_B00F0 = 0x800B00F0; // only EnemyAnim_Weapon_B00F0, m_wWeaponAnimFlags bits 0x400-0x4000
+sEnemyAnimTable_NormalDeath_B0120 = 0x800B0120; // only EnemyAnim_NormalDeath_B0120, m_wNormalDeathAnimFlags
+sEnemyAnimTable_NormalDeath_B0150 = 0x800B0150; // only EnemyAnim_NormalDeath_B0150
+sEnemyAnimTable_NormalDeath_B0180 = 0x800B0180; // only EnemyAnim_NormalDeath_B0180
+sEnemyAnimTable_MovingDeath_B01B0 = 0x800B01B0; // only EnemyAnim_MovingDeath_B01B0
+sEnemyAnimTable_MovingDeath_B01E0 = 0x800B01E0; // only EnemyAnim_MovingDeath_B01E0
+sEnemyAnimTable_MovingDeath_B0210 = 0x800B0210; // only EnemyAnim_MovingDeath_B0210
+sEnemyAnimTable_ViolentDeath_B0240 = 0x800B0240; // only EnemyAnim_ViolentDeath_B0240
+sEnemyAnimTable_ViolentDeath_B0270 = 0x800B0270; // only EnemyAnim_ViolentDeath_B0270
+sEnemyAnimTable_ViolentDeath_B02A0 = 0x800B02A0; // only EnemyAnim_ViolentDeath_B02A0
+sEnemyAnimTable_ExplosiveDeath_B02D0 = 0x800B02D0; // only EnemyAnim_ExplosiveDeath_B02D0
+sEnemyAnimTable_ExplosiveDeath_B0300 = 0x800B0300; // only EnemyAnim_ExplosiveDeath_B0300
+sEnemyAnimTable_ExplosiveDeath_B0330 = 0x800B0330; // only EnemyAnim_ExplosiveDeath_B0330
+sEnemyAnimTable_NormalDeath_B0360 = 0x800B0360; // only EnemyAnim_NormalDeath_B0360
+sEnemyAnimTable_NormalDeath_B0390 = 0x800B0390; // only EnemyAnim_NormalDeath_B0390
+sEnemyAnimTable_NormalDeath_B03C0 = 0x800B03C0; // only EnemyAnim_NormalDeath_B03C0
+sEnemyAnimTable_Evade_B03F0 = 0x800B03F0; // only EnemyAnim_Evade_B03F0
+sEnemyAnimTable_Evade_B0420 = 0x800B0420; // only EnemyAnim_Evade_B0420
+sEnemyAnimTable_Evade_B0450 = 0x800B0450; // only EnemyAnim_Evade_B0450
+sEnemyAnimTable_Evade_B0480 = 0x800B0480; // only EnemyAnim_Evade_B0480
+sEnemyAnimTable_Evade_B04B0 = 0x800B04B0; // only EnemyAnim_Evade_B04B0
+sEnemyAnimTable_Evade_B04E0 = 0x800B04E0; // only EnemyAnim_Evade_B04E0
+sEnemyAnimTable_Move_B0510 = 0x800B0510; // only EnemyAnim_Move_B0510
+sEnemyAnimTable_Move_B0540 = 0x800B0540; // only EnemyAnim_Move_B0540
+sEnemyAnimTable_Move_B0570 = 0x800B0570; // only EnemyAnim_Move_B0570
+sEnemyAnimTable_Move_B05A0 = 0x800B05A0; // only EnemyAnim_Move_B05A0
+sEnemyAnimTable_Move_B05D0 = 0x800B05D0; // only EnemyAnim_Move_B05D0
+sEnemyAnimTable_Move_B0600 = 0x800B0600; // only EnemyAnim_Move_B0600
+sJoypadTestAnimTable = 0x800B0630; // {button mask (0x800 U_JPAD...), anim 0x2C24+} rows; only EnemyAnim_JoypadTestPlayAnim (ENEMY_JOYPAD_TEST_PLAY_ANIM_MODE)
+
+// Enemy AI state shared by the enemy AI file
+gEnemyAlertPoint = 0x800B06A0; // CVector3 the alerted enemy turns/looks to (mode 0xC): set from gEnemyLastNoisePos by EnemyAI_AttackWait; read by AI_TurnHeadToTarget, EnemyAI_TurnToPoint, EnemyMode_Alert_Update, EnemyAI_OnDamage
+gEnemyAlertPoint_y = 0x800B06A4; // .y of gEnemyAlertPoint (EnemyMode_Alert_Update passes x, y, z as three globals)
+gEnemyAlertPoint_z = 0x800B06A8; // .z of gEnemyAlertPoint
+gEnemyLastNoisePos = 0x800B06AC; // CVector3 of the loudest noise heard: written by AI_HearNoise and EnemyAI_OnHit, copied to gEnemyAlertPoint by EnemyAI_AttackWait
+
+// AI mode tables (CAIModeInfo rows of 0x20 bytes after a 0x20-byte header) and AI type data
+gEnemyGroundModeTable = 0x800B0A60; // default behaviour's m_pGroundModeTable (CEnemyBehaviorInfo at 0x800B177C: {0, EnemyAI_AttackWait, 0x800B0A60, 0x800B0E80 air, 0x800B1200 underwater}); installed by EnemyAI_Init
+gEnemyBehaviorInfo = 0x800B1790; // n4's name: CEnemyBehaviorInfo *[8] by behaviour (ROM debug type s_CEnemyBehaviorInfo); EnemyAI_Update. Declared ModeHandler *[] (wrong type)
+sProjectileMuzzleOffset = 0x800B17B0; // CVector3 {0, -8.1, -8}: transformed by the shooter matrix in Projectile_PlaceAtMuzzle only
+gEnemyStationaryGroundModeTable = 0x800B17C0; // EnemyStationary behaviour (0x800B1940: EnemyStationary_Setup) m_pGroundModeTable, rows EnemyStationary_Update; EnemyAI_UsesRideTables
+gEnemyStationaryAirModeTable = 0x800B1840; // same behaviour's m_pAirModeTable (header -> 0x800B0E80)
+gEnemyStationaryUnderwaterModeTable = 0x800B18C0; // same behaviour's m_pUnderwaterModeTable (header -> 0x800B1200)
+gTurretModeTable = 0x800B1DE0; // CAIModeInfo rows Turret_ActivateUpdate/Turret_GetIdleAnim...; installed by Turret_Setup
+sGeneratorAmmoPicks = 0x800B1EE0; // Pick {id, weight} rows, -1 terminated: single player, flag 0x20, filtered by CPlayer__HasRoomForAmmo; Generator_SpawnEnter
+sGeneratorMultiAmmoPicks = 0x800B1F38; // multiplayer, flag 0x20, WeightedTable_PickStatic; Generator_SpawnEnter
+sGeneratorHealthPicks = 0x800B1F5C; // single player, flag 0x40, filtered by CPlayer__IsBelowFullHealth; Generator_SpawnEnter
+sGeneratorHealthPicksReduced = 0x800B1F6C; // the same without the first (0x6A5) entry, used while D_8011001C is set; Generator_SpawnEnter
+sGeneratorMultiHealthPicks = 0x800B1F78; // multiplayer, flag 0x40; Generator_SpawnEnter
+sGeneratorItemPicks = 0x800B1F88; // single player, flag 0x80, 21 weighted items; Generator_SpawnEnter
+sGeneratorMultiItemPicks = 0x800B1FE4; // multiplayer, flag 0x80, filtered by Generator_IsPickupUnlocked; Generator_SpawnEnter
+gGeneratorModeTable = 0x800B2008; // rows Generator_WaitEnter/Update, Generator_SpawnEnter/Update; Generator_Setup
+gPlatformModeTable = 0x800B20B0; // rows Platform_AtStartEnter/Update, Platform_ForwardEnter/Update...; Platform_Setup
+sThrowableCarryJointA = 0x800B21C0; // JointPoint {joint 10, offset 0}: first of the two owner joints whose midpoint is the carry point; Throwable_GetCarryPoint
+sThrowableCarryJointB = 0x800B21D0; // JointPoint {joint 19, offset 0}: the second; Throwable_GetCarryPoint
+gThrowableModeTable = 0x800B21E0; // rows Throwable_IdleUpdate, Throwable_PickedUpEnter/Update...; Throwable_Setup
+gDoorModeTable = 0x800B2290; // rows Door_OpenEnter/Update, Door_CloseEnter/Update; Door_Setup
+gDestructibleModeTable = 0x800B2330; // rows Destructible_GetIdleAnim, Destructible_GoEnter/Update; Destructible_Setup, AI_AnimReached
+gActionModeTable = 0x800B2410; // CAIModeInfo[]: Action_IdleEnter, Action_GoEnter/Update; Action_Setup
+gInteractiveAnimModeTable = 0x800B2510; // rows InteractiveAnim_Update/GetAnim; InteractiveAnim_Setup
+
+// Crash screen / surface currents
+gAssertFile = 0x800B25E4; // char *: file of the failed assertion, printed by Crash_ShowScreen ("ASSERTION FAILED!! ... File:"), with the line D_800F1FF0
+sSurfaceCurrentRates = 0x800B25F0; // f32[2] {0.3 blend rate, 3.0 turn rate} of a material current; GameObject_ApplyCurrent only
+
+// CGameRegion one-entry caches (the region whose result sits in the D_800F2000.. buffers)
+sCachedCeilingRawNormalRegion = 0x800B2600; // written by CGameRegion__GetCeilingNormalRaw; read by GetCeilingHeight, IntersectSegmentCeiling, GetCeilingNormal. Declared int and CGameRegion *
+sCachedCeilingNormalRegion = 0x800B2604; // CGameRegion__GetCeilingNormal's cache key (normalised result in D_800F2010)
+sCachedRawNormalRegion = 0x800B2608; // CGameRegion__GetNormalRaw's cache key; checked by GetHeight, FindBelow, IntersectSegment, GetClimbAngle... (12 files, region.h)
+sCachedNormalRegion = 0x800B260C; // CGameRegion__GetNormal's (unit normal) cache key; also GetTiltRotation, IsSteep
+sCachedRegionInfoRegion = 0x800B2610; // region whose CRegionInfo is cached; CGameRegion__IntersectWater
+sCachedRegionInfo = 0x800B2614; // CRegionInfo * from CScene__GetRegionInfo for sCachedRegionInfoRegion; CGameRegion__IntersectWater
+gLevelEventHandlers = 0x800B2628; // n4's name: EventHandler *[kind] -> {onActor, onEvent} pairs 8 bytes into the gIntelligenceTypeInfo blocks; LevelEvent_Fire
+
+// SDK audio manager (N64 SDK audiomgr.c statics, same roles)
+audFrameCt = 0x800B2660; // SDK name: frame counter, ++ in __clearAudioDMA, stamped by __amDMA (lastFrame), indexes the 3 audio infos in __amMain
+nextDMA = 0x800B2664; // SDK name: DMAs issued this frame; ++ in __amDMA, cleared by __clearAudioDMA
+curAcmdList = 0x800B2668; // SDK name: which of the 2 command lists alAudioFrame builds, ^= 1 in __amHandleFrameMsg
+sAmFramesHandled = 0x800B266C; // count of frame batches __amMain handled (++ before the __amHandleFrameMsg loop)
+sAmBusyTime = 0x800B2670; // (now - time of last message) * 64 / 3000 in __amMain: how long the last message took
+sAudioDMACacheBlocks = 0x800B2674; // number of 0x90-byte DMA cache entries allocated by AudioDMA_CacheBlock
+
+// CAudioWorld / sound voices / sequences
+gAudioWorldReady = 0x800B2680; // set to 1 at the end of CAudioWorld__Initialize; CAudioWorld__Update and UpdateAmbientTrack do nothing before
+sAudioWorldReverbParams = 0x800B2684; // s32[] custom reverb (6 sections ...) passed as ALSynConfig.params with fxType 6 (AL_FX_CUSTOM) by CAudioWorld__Initialize
+sSoundKindVolumeTable = 0x800B2750; // 31 x {kind, scale} (f32); SndVoice_InitVolume sets the voice's scale for sound kinds < 0x100
+sSndVoiceRampStep = 0x800B2848; // f32 0.0075: per-frame doppler/volume step in SndVoice_UpdateDoppler, SndVoice_UpdatePitch (Sound_CentsToPitch addresses the next table as this + 1)
+sPitchRatioTable = 0x800B284C; // 121 f32: 2^(cents/1200) every 60 cents from -6000; SndVoice_InitPitch, Sound_CentsToPitch
+sSoundHearingRangeSq = 0x800B2A30; // f32 5120^2: falloff range squared; Sound_DistanceFalloff, Sound_DistanceAttenuation, SndVoice_InitVolume, SndVoice_UpdateVolume
+sSndVoicesActive = 0x800B2A5C; // voices updated by the last SndVoicePool_Update
+sSndVoicesPeak = 0x800B2A60; // most voices ever active (max of sSndVoicesActive); SndVoicePool_Update
+sSndSeqCurrentId = 0x800B2A70; // sequence id now playing, -1 when stopped; SndSeq_Update
+sSndSeqLoadRetries = 0x800B2A74; // failed sequence lookups, gives up at 10; SndSeq_Update
+sLoopSoundsLastStarted = 0x800B2A80; // debug: last handle from Sound__Play in LoopSounds_Start (write-only)
+sLoopSoundsLastStopped = 0x800B2A84; // debug: last handle stopped by LoopSounds_Stop (write-only)
+sLoopSoundsLastPaused = 0x800B2A88; // debug: last handle stopped by LoopSounds_Pause (write-only)
+sLoopSoundsLastResumed = 0x800B2A8C; // debug: last handle restarted by LoopSounds_Resume (write-only)
+sSpeechSound = 0x800B2AA8; // ALSound {envelope 0x800B2A90, keymap 0x800B2AA0, wavetable D_800F55F0, pan 0x40, vol 0x3F}: alSndpAllocate'd by SpeechPlayer_Construct, wavetable filled from adecStreamOpen in SpeechPlayer_Update. Declared func_80203E78_S1 * / char[]
+
+// COnScreen (HUD text)
+sOnScreenFontTexture = 0x800B2AC0; // u8 *: NULL until COnScreen__LoadFontTexture points it at D_800F5618; COnScreen__GetFontTexture
+sCharacterLookUpPairs = 0x800B2AC4; // {char, glyph} pairs ending 0xFF ('A'..'Z','a'..'z' -> 0..25, digits, punctuation); COnScreen__Construct builds the table at COnScreen+0x148 from it
+sCharacterSmallLookUpPairs = 0x800B2B78; // the same plus quotes and glyphs 62-64; COnScreen__Construct builds COnScreen+0xC8 (m_CharacterSmallLookUpPos) from it
+sBossBarOverlayScript = 0x800B2C50; // COverlay script started by COnScreen__SetBoss
+sBossBar2OverlayScript = 0x800B2C64; // COverlay script started by COnScreen__SetBoss2
+sHudGlyph16x16LoadDL = 0x800B2C90; // Gfx[]: loads the 16x16 glyph texture; Hud_DrawGlyph16x16
+sCinemaTextFadeOut = 0x800B35D4; // "<use this to fade out cinema text>": a text pointer equal to it is drawn as "" (fade-out marker); CCameraPool__AddText/AddTextEx/AddTimedText/AddMultiLineText. Declared u8 *
+
+// Engine mode screens: text line tables (char *[], NULL terminated)
+sPakCheckText = 0x800B3634; // "accessing the", "", "controller pak"; EngineMode00_PakCheck_Draw
+sLegalText = 0x800B3644; // "TUROK 2 $ SEEDS OF EVIL TM", ... "LICENSED BY NINTENDO"; EngineMode01_Legal_Draw
+sDemoWarningText = 0x800B369C; // "THIS IN-STORE DEMONSTRATION" ... "ARRIVING CHRISTMAS 1998"; EngineMode02_DemoWarning_Draw
+sExpansionPakText = 0x800B36F4; // "EXPANSION PAK FOUND!", NULL, "PRESS ANY BUTTON"; EngineMode03_ExpansionPak_Draw
+
+// Controller pak note identity (pak menus, module 1 and its module-2 copies)
+gPakCharacterNoteName = 0x800B45C0; // "T2 MULTI": note name of the saved characters (Pak_SaveNoteVerified with D_80130968); PakMenu_CheckSlotForSave, Pak note scans
+gPakGameNoteName = 0x800B45CC; // "TUROK 2": note name of the game save (Pak_SaveNoteVerified with D_800C2018)
+gPakCompanyCode = 0x800B45D4; // "51": Acclaim's company code, compared by Pak_IsTurok2Note, PakMenu_SelectNote, PakMenu_UpdateNoteRows
+gPakGameCode = 0x800B45D8; // "NT2E": the game code of Turok 2 (US); Pak_IsTurok2Note, Pak_SaveNoteVerified callers
