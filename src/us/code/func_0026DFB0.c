@@ -5,20 +5,14 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 #include "globals/text.h"
-
-typedef struct {
-    void (*onActor)(void *actor, void *ai, LevelEvent *event);
-    void (*onEvent)(LevelEvent *event);
-} EventHandler;
-
-extern EventHandler *gLevelEventHandlers[];  /* handler tables by kind */
+#include "globals/event.h"
 
 extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, s32 arg3, f32 time);
 extern void Sound__PlaySpeech(s32 sound);
 extern void Cinema_RequestById(s32 track);
 
 void LevelEvent_Fire(LevelEvent *event) {
-    EventHandler *entry;
+    LevelEventHandler *entry;
     u8 *game;
     void *camera;
     u8 *actor;

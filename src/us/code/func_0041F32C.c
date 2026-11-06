@@ -19,10 +19,6 @@ typedef struct K7Obj {
 } K7Obj;
 typedef struct K7Mem { s32 addr; } K7Mem;
 extern s32 D_800F70A8;
-extern u8 gPakCharacterNoteName[];
-extern u8 gPakGameNoteName[];
-extern u8 gPakCompanyCode[];
-extern u8 gPakGameCode[];
 extern u8 D_800B48D4[];
 extern u8 D_800B4B1C[];
 extern u8 D_800C13F0[];

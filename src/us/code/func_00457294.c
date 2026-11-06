@@ -5,8 +5,6 @@
 /* Controller pak check for saving: a pad that already holds one of the game's two notes is usable as is
  * (0x7B blocks); otherwise checks the pak's free space against the save size and keeps the largest need. */
 
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
 extern s32 D_800F70A8;
 s32 Pak_GetNoteGameName_2(s32 pad, s32 idx, u8 **out);
 void func_0045FBA8(u8 *src, u8 *dst, s32 n);

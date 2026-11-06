@@ -22,7 +22,6 @@ s32 Sound__Update();                            /* extern */
 s32 Sound__Lock();                            /* extern */
 s32 Sound__Unlock();                            /* extern */
 s32 Sched_SubmitTask(s32 *, void *);           /* extern */
-extern s32 curAcmdList;
 extern s32 gAudioCmdLists;
 extern u16 D_800F283A;
 extern s32 gScheduler;

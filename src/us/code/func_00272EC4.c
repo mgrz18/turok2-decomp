@@ -2,9 +2,9 @@
 
 #include "common.h"
 #include "structs/sound.h"
+#include "globals/audio.h"
 
-extern f32 sSndVoiceRampStep[];                    /* pitch ratio every 60 cents from -6000 */
-#define PITCH_TABLE (sSndVoiceRampStep + 1)
+#define PITCH_TABLE sPitchRatioTable
 
 extern void SndVoice_UpdateDoppler(SndVoice *s);
 extern f32 HalfToFloat(s32 halfFloat);

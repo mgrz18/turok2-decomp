@@ -1,8 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
-
-extern s32 sOnScreenFontTexture;
+#include "globals/hud.h"
 
 s32 COnScreen__GetFontTexture(void) {
-    return sOnScreenFontTexture;
+    return (s32) sOnScreenFontTexture;
 }

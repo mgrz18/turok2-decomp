@@ -17,8 +17,6 @@ typedef struct {
 s32 alUnlink(void *);                      /* alUnlink */
 s32 alLink(void *, void *);              /* alLink */
 s32 osRecvMesg(s32 *, s32 *, s32);   /* extern */
-extern u32 audFrameCt;          /* audio frame */
-extern u32 nextDMA;          /* DMAs issued this frame */
 extern DMAState gAudioDmaState_firstUsed;
 
 /* Waits for this frame's audio DMAs and frees the buffers not used lately. */

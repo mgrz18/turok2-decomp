@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "globals/region.h"
 
 
 /* A collision vertex with a floor and a ceiling height. */
@@ -17,7 +18,6 @@ typedef struct {
 
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
-extern CGameRegion *sCachedCeilingRawNormalRegion;    /* triangle of the cached ceiling normal */
 extern CVector3 sRegionCeilingNormal;        /* cached raw ceiling normal */
 
 /* Raw normal of a triangle's ceiling plane (straight down for none), cached for the last triangle. */

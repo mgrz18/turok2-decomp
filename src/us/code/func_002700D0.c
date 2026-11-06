@@ -13,8 +13,6 @@ u32 __amDMA(s32 offset, s32 length) {
     extern void alLink(Window *, Window *);
     extern void alUnlink(Window *);
     extern Window *gAudioDmaState_firstUsed;
-    extern s32 nextDMA;
-    extern s32 audFrameCt;
     Window *window;
     Window *after;
     Window **pool;

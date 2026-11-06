@@ -13,8 +13,6 @@
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
 extern s32 D_800F70A8;
-extern char gPakGameNoteName[];
-extern char gPakGameCode[];
 extern u8 gPakConfirmNoSpaceDesc_2[];
 extern u8 gPakMsgSaveDoneDesc_2[];
 extern u8 gPakMsgSaveFailedDesc_2[];

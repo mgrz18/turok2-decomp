@@ -7,8 +7,6 @@
  * the slot with the most free pages is kept. Returns 1 to keep scanning. */
 
 extern u8 *D_800F70A8;
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
 
 extern void Pak_GetNoteGameName(s32 slot, s32 index, char **out);
 extern void Pak_DecodeText(char *src, char *dst, s32 n);

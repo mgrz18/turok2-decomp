@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/sound.h"
 #include "structs/camera.h"
-
-extern f32 sSndVoiceRampStep; /* volume step */
+#include "globals/audio.h"
 
 void SndVoice_UpdateDoppler(SndVoice *s) {
     f32 dx;

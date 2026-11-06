@@ -5,6 +5,7 @@
 #include "globals/scene.h"
 #include "globals/render.h"
 #include "globals/crash.h"
+#include "globals/engine.h"
 
 /* libultra __OSThreadContext: 64-bit registers, read here as their low words. */
 typedef struct ThreadContext {
@@ -36,7 +37,6 @@ extern u16 *gCFB;             /* frame buffer */
 extern u16 *sCrashFrameBuffer;             /* crash screen frame buffer */
 extern char gEngineTimestamp[];           /* build string */
 extern char D_8010FED4[];
-extern char *gAssertFile;            /* failed assertion: file */
 extern s32 D_800F1FF0;              /* failed assertion: line */
 extern char *D_800F1FF4;            /* failed assertion: expression */
 extern u8 gThreadStackIdle[];             /* thread stacks */

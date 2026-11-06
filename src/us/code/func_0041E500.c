@@ -11,8 +11,6 @@
 
 extern s32 D_8011F144;
 extern s32 D_8011B114;
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
 extern s32 D_800F70A8;
 extern u8 gPakMsgNoControllerDesc[];
 extern u8 gPakMsgCannotSaveDesc[];

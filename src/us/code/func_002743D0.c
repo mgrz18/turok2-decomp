@@ -1,7 +1,7 @@
 #include "structs/vector.h"
+#include "globals/audio.h"
 
 extern s32 D_800A8178;          /* f32 constants; [1] used here */
-extern f32 sSoundHearingRangeSq;          /* falloff distance squared */
 
 /* Distance falloff: 1 - d^2 / sSoundHearingRangeSq inside, 0 outside. */
 f32 Sound_DistanceFalloff(CVector3 *arg0, CVector3 *arg1)

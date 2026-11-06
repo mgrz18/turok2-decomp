@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/region.h"
 
 extern float D_800A7F68;
 extern int sRegionCeilingNormal;
-extern int sCachedCeilingRawNormalRegion;
 extern int sRegionCeilingNormal;
-extern int sCachedCeilingRawNormalRegion;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
     CVector3 normal;
@@ -19,7 +18,7 @@ f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
     if (node == 0) {
         return 0.0f;
     }
-    if ((int)node != sCachedCeilingRawNormalRegion) {
+    if ((struct CGameRegion *)node != sCachedCeilingRawNormalRegion) {
         p = node->cur;
         q = node->prev;
         a.x = ((CollisionBuildVertex *)p)->x - ((CollisionBuildVertex *)q)->x;
@@ -41,7 +40,7 @@ f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
         CVector3__Cross((CVector3 *)&sRegionCeilingNormal, &b, &a);
     }
     normal = *(CVector3 *)&sRegionCeilingNormal;
-    sCachedCeilingRawNormalRegion = (int)node;
+    sCachedCeilingRawNormalRegion = (struct CGameRegion *)node;
     if (normal.y == 0.0f) {
         return (((CollisionBuildVertex *)node->prev)->ceiling +
                 ((CollisionBuildVertex *)node->cur)->ceiling +

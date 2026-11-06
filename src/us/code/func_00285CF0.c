@@ -9,7 +9,6 @@
 
 extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern f32 sExpansionPakMtx[][16];        /* per-frame matrices */
-extern u8 sExpansionPakText[];
 
 extern s32 CScene__FindObjectType(void *, s32);
 extern void CCamera__DisplayListSetup(void *);

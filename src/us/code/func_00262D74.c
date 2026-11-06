@@ -7,19 +7,12 @@
 #include "structs/level_actor.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/ai.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
  * if it is unlocked), kind 1 a particle effect, kind 2 a pickup picked at
  * random from the weapon/ammo/item tables the definition enables. */
-
-extern Pick sGeneratorAmmoPicks[];
-extern Pick sGeneratorMultiAmmoPicks[];
-extern Pick sGeneratorHealthPicks[];
-extern Pick sGeneratorHealthPicksReduced[];
-extern Pick sGeneratorMultiHealthPicks[];
-extern Pick sGeneratorItemPicks[];
-extern Pick sGeneratorMultiItemPicks[];
 
 extern f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
 extern s32 *CScene__GetIntelligence(void *level, s32 model);

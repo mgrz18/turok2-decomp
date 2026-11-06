@@ -18,8 +18,6 @@ typedef struct {
     /* 0x0C */ ALBankFile *bankFile;
 } BankRes;
 
-extern s32 gAudioWorldReady;      /* sound manager ready */
-extern u8 sAudioWorldReverbParams[];
 extern u8 gEngineApp_m_Settings_unk15[]; /* local type: the field's real type (or the member path) changes the ROM's code here */     /* volume settings (bytes from -2) */
 
 extern s32 __osDisableInt(void);         /* disable interrupts */
@@ -83,7 +81,7 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     cfg.maxPVoices = 0x25;
     cfg.maxUpdates = 0x100;
     cfg.fxType = 6; /* AL_FX_CUSTOM */
-    cfg.params = (s32 *) sAudioWorldReverbParams;
+    cfg.params = sAudioWorldReverbParams;
     ai.rate = 0x5622;
     ai.one = 1;
     cfg.dmaproc = 0;

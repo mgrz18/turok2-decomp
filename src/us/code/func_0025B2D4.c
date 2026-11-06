@@ -5,6 +5,7 @@
 #include "structs/collision.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/ai.h"
 
 typedef struct Object Object;
 
@@ -26,8 +27,6 @@ struct Object {
     /* 0x140 */ CAI ai;
     /* 0x27C */ u32 fxFlags;
 };
-
-extern u8 gEnemyAlertPoint[];         /* origin */
 
 void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
 void AI_SetTargetOverride(Object *obj, CAI *ai, Object *owner, f32 time);
@@ -135,7 +134,7 @@ void EnemyAI_OnDamage(Object *obj, CAI *ai, DamageEvent *dmg) {
             }
         }
     } else {
-        AI_HearNoise(obj, ai, (CVector3 *)gEnemyAlertPoint, 3);
+        AI_HearNoise(obj, ai, &gEnemyAlertPoint, 3);
     }
     health = ai->m_Health;
     left = health - dmg->damage;

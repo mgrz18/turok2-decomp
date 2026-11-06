@@ -6,11 +6,6 @@
  * selectable unless it is this game's save (gPakCharacterNoteName when loading, mode 1,
  * gPakGameNoteName in mode 2) with Turok 2's game and company codes. */
 
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
-extern char gPakCompanyCode[];
-extern char gPakGameCode[];
-
 extern s32 Pak_FindNote(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, char *company, char *game);
 extern s32 Str_Length(char *s);
 extern s32 Str_Compare(char *a, char *b);

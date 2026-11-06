@@ -3,6 +3,7 @@
 #include "structs/world.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "globals/region.h"
 
 typedef struct {
     /* 0x00 */ f32 minX;
@@ -18,7 +19,6 @@ typedef struct {
     /* 0x08 */ TriGroup groups[1];
 } TriGroupList;
 
-extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
 extern CVector3 sRegionNormal;        /* cached raw normal */
 
 extern void *CISet__GetBlock(void *file, s32 index); /* a block of a file */

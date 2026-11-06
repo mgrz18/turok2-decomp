@@ -2,14 +2,13 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/engine.h"
+#include "globals/region.h"
 
 extern s32 GameObject_IsOnGround(void *actor);
 extern f32 CVector3__GetYaw(CVector3 *v);                                 /* yaw of v */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);            /* out = in * s */
 extern void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);   /* out = lerp(a, b, t) */
 extern void Angle_Wrap(f32 *angle);                              /* wraps an angle */
-
-extern f32 sSurfaceCurrentRates[2];   /* current: blend rate, turn rate */
 
 /* A surface that carries what stands on it (water current, conveyor). */
 typedef struct {
@@ -22,7 +21,6 @@ typedef struct {
     /* 0x60 */ s8 y;
     /* 0x61 */ s8 z;
 } Material;
-
 
 static __inline__ s32 currentEnabled(CGameObjectInstance *actor) {
     if (actor->m_AI.m_dwFlags & 0x280) return 1;

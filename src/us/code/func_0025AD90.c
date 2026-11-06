@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "globals/ai.h"
 
 /* AI head tracking: turns the head bones toward the target (or the player in state 0xC). */
 
@@ -13,8 +14,6 @@ typedef struct {
     /* 0x19 */ s8 headBone;
     /* 0x1A */ s8 boneCount;
 } AnimObjectInfo;
-
-extern CVector3 gEnemyAlertPoint; /* player position */
 
 extern s32 *CCache__Request(s32, s32, s32, s32, s32, s32, const char *, s32);
 extern AnimObjectInfo *CISet__GetBlock(s32 table, s32 index);

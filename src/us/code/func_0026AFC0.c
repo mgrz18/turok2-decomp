@@ -5,12 +5,11 @@
 
 #include "common.h"
 #include "structs/region.h"
+#include "globals/region.h"
 
 extern float D_800A7FD8;
 extern float D_800A7FD0;
 extern void CVector3__Normalize(f32 *arg0);
-extern CGameRegion *sCachedRawNormalRegion;
-extern CGameRegion *sCachedNormalRegion;
 extern CVector3 sRegionNormal;
 extern f32 sRegionNormal_y;
 extern s32 sRegionNormal_z;

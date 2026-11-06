@@ -60,4 +60,13 @@ extern s32 gThreadPriorityScheduler;
 
 extern char gBootSignature[0x10]; /* "sexysteve" while warm-booted ("signature") */
 
+/* Crash screen: file of the failed assertion */
+extern char *gAssertFile;
+
+/* Engine mode screens: text line tables (NULL entries are blank lines) */
+extern char *sPakCheckText[4];
+extern char *sLegalText[22];
+extern char *sDemoWarningText[22];
+extern char *sExpansionPakText[4];
+
 #endif

@@ -1,19 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/ai.h"
 
 extern void CMtxF__FromMtxAffine(f32 *out, f32 *mtx);
 extern void CMtxF__SetTranslate(f32 *mtx, f32 x, f32 y, f32 z);
 extern void CMtxF__Translate(f32 *mtx, f32 x, f32 y, f32 z);
 extern void CMtxF__TransformPoint(f32 *mtx, f32 *in, f32 *out);
 extern f32 GameObject_GetCollisionHeight(void *obj);
-
-typedef struct {
-    /* 0x0 */ s32 joint;
-    /* 0x4 */ f32 offset[3];
-} JointPoint;
-
-extern JointPoint sThrowableCarryJointA;
-extern JointPoint sThrowableCarryJointB;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x10C];

@@ -1,8 +1,8 @@
 #include "structs/vector.h"
+#include "globals/audio.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/AUDIO_2/802591C0.CPP, func_80258AE0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
-
 
 typedef struct ContextRecAt2BC0 {
     char pad0[0x104];
@@ -26,7 +26,6 @@ typedef struct MenuMatchGlobals {
     s32 state;          /* 0x13D8 (gEngineApp_m_Settings_mode) */
 } MenuMatchGlobals;
 
-extern int gAudioWorldReady;
 extern MenuMatchGlobals gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 extern void *CCameraPool__GetNearestCamera(MenuMatchGlobals *arg0, CVector3 *arg1);

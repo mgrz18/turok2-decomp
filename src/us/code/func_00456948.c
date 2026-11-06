@@ -9,11 +9,6 @@
 
 #define ENTRY_DISABLED 0x01000000
 
-extern char gPakGameCode[];
-extern char gPakCompanyCode[];
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
-
 s32 Pak_FindNote_2(s32 mode, s32 index, s32 *valid, char *name, void *arg4, s32 *arg5, char *arg6, char *arg7);
 s32 Str_Length_2(char *s);
 s32 Str_Compare_2(char *a, char *b);

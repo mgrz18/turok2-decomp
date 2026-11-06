@@ -2,9 +2,7 @@
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "globals/scene.h"
-
-extern CGameRegion *sCachedRegionInfoRegion;     /* region of the cached info */
-extern CRegionInfo *sCachedRegionInfo; /* its cached info */
+#include "globals/region.h"
 
 extern CRegionInfo *CScene__GetRegionInfo(void *table, CGameRegion *region);
 

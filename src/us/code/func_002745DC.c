@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/audio.h"
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/AUDIO/8025A3EC_4.CPP, func_8025C368_de, with Turok 2's layouts. */
 
@@ -15,7 +16,6 @@ typedef struct {
     CVector3 position;          /* 0x114 (0x128 in Rage Wars) */
 } GameplayCamera;
 
-extern f32 sSoundHearingRangeSq;          /* audible radius squared */
 extern f32 D_800A8190;          /* 1.0f */
 
 /* Volume attenuation of a sound by its squared distance to the camera. */
