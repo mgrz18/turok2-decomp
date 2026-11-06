@@ -703,6 +703,64 @@ rewrite taught about the compiler:
 - **A `CVector3` passed by value** gives the same three `lw a1-a3` as the
   three floats m2c passed as words, so the by-value prototype can be used.
 
+### Engine .rodata as C literals (the L pass, k7)
+
+The engine files read 446 anonymous `.rodata` symbols (`D_800A51F8`-
+`D_800AB0A7`: float and double pools, `CCache__Request` descriptions,
+`__assert` file names) through `extern` declarations; 36 symbols are left,
+in 71 extern lines of 513, in 44 files. Each converted file writes the values as
+literals (`1.0f / mag`, `4294967296.0`, `"anim geometry"`) and owns its slice
+of `code_rodata` in the yaml: 208 new `[rom, .rodata, code/<file>]`
+subsegments, grown or carved out of the `rodata` asm around them.
+
+`tools/rodata_match.py` is the check, since `tools/asm_diff.py` reports any
+such edit as a difference by construction. It compiles the file through the
+build's pipeline, places `.text` where `build/ref.elf` has its first
+function and `.rodata` at the lowest `.rdata` address the ROM's code reads
+where the bytes agree, resolves every relocation and compares both sections
+with the ROM word for word. `--write` then sets the file's subsegment, and
+refuses when the slice reaches into another file's or swallows a label that
+other source (C, headers, hand-written or data asm) still names: those
+labels vanish from the regenerated asm. After a `--write`, `make setup`
+regenerates `us/asm/data/` and `make verify` is the arbiter.
+
+What the pass showed:
+
+- **A second reader is often the same pool read one word on.**
+  `*(&D_X + 1)`, `(&D_X)[1]`, `D_X.scale` through a local `Tuning` or
+  `Unk800A7990` view, `M2C_FIELD(&D_X, f32 *, 4)`: these all name the next
+  file's first pool word. The literal belongs to the reader, and the views
+  (`Tuning`, `Unk800A71A8`, `Unk800A7990`, `func_8020CA10_G1` as a pool) are
+  gone.
+- **One pool word for a constant used twice** comes from writing it twice:
+  `s * 64.0f + 64.0f` gives the ROM's single entry (func_00271E20); GCC
+  shares the constant's pseudo within the expression. The reverse is
+  func_0023270C, whose ROM has 0.000492126f twice where the C's two equal
+  products are CSE'd into one: it keeps its externs.
+- **Files merged for a shared string.** GCC shares a string only within a
+  file, so two functions naming one string are one file:
+  func_0021F358 + func_0021F3A4 ("anim geometry") and func_00215944 +
+  func_00215A00 ("simp object index", "simp geometry") are now one file each.
+
+Left as externs, and why:
+
+- Strings two or more files name (one file in the original, still split):
+  func_0020B7F8/func_0020B9F4, func_00214844/func_00214D04,
+  func_00214B58/func_00214DBC, "anim object info" (func_00219F74,
+  func_0021A150, func_0021A344, func_0021D39C, func_0021EAE8, func_0021F2B0,
+  func_0021F5B8), func_0021A500/func_0021CDAC, func_00252C70/func_002542B4,
+  func_0028B614-func_0028C0B0 (libaudio), func_002900B0/func_00290240,
+  func_002914B4-func_00292640, func_00295690/func_00295BDC ("audio/env.c").
+  Each needs the files merged, and their prototypes and global declarations
+  made to agree first.
+- Engine strings the VM modules' code reads at their engine address
+  (D_800A5EC0, D_800A5F6C, D_800A7080, D_800A9A00, D_800A9A08) and a pool word
+  the trailing asm function at 0xC2ED8 reads (D_800A9DFC, func_0028932C).
+- A `CVector3` constant copied whole (func_00210090), a pointer into a pool
+  (func_00236928's `&D_800A652C + 1`), func_00215F4C's 0x60-byte pool,
+  func_00213A70's string inside func_0021375C's slice, func_0022629C's
+  strings (one shared with the VM module).
+
 ## Shared headers
 
 The readability pass left each file with local structs where no header fit;

@@ -2898,7 +2898,7 @@ segments:
       - [0xA6290, .rodata, code/func_002118B0]
       - [0xA62A0, .rodata, code/func_00211920]
       - [0xA62C0, .rodata, code/func_002119FC]
-      - [0xA62C8, rodata]
+      - [0xA62C8, .rodata, code/func_00211BA8]
       - [0xA62CC, .rodata, code/func_00211C30]
       - [0xA62D0, .rodata, code/func_00211DB0]
       - [0xA62F0, .rodata, code/func_00211F64]
