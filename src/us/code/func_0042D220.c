@@ -31,7 +31,7 @@ void CParticleSystem__Construct(CParticleSystem *sys, s32 arg1) {
         sys->m_ParticleVars[i].header.m_pIntelligence = (CIntelligence *)&gParticleIntelligence;
         sys->m_ParticleVars[i].header.m_Type = 2;
         sys->m_ParticleVars[i].m_dwFlags = 0;
-        sys->m_ParticleVars[i].unk_1B8 = 0;
+        sys->m_ParticleVars[i].m_pLoopSound = NULL;
         sys->m_ParticleVars[i].m_pActiveList = NULL;
     }
     CList__Construct(&sys->m_FreeList, 0x1C4, 0x1C8);

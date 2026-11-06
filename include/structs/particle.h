@@ -164,7 +164,7 @@ typedef struct CParticle {
     /* 0x1B4 */ u8 m_Opacity;
     /* 0x1B5 */ u8 m_ActiveSwooshes;      /* its trail is in the swoosh set gEngineApp_m_SwooshSystem */
     /* 0x1B6 */ u8 unk_1B6[0x1B8 - 0x1B6];
-    /* 0x1B8 */ s32 unk_1B8;
+    /* 0x1B8 */ struct SndSource *m_pLoopSound;  /* its looping sound (CParticle__StartLoopSound) */
     /* 0x1BC */ f32 m_Scale;
     /* 0x1C0 */ CList *m_pActiveList;
     /* 0x1C4 */ struct CParticle *m_pLast;      /* free list / active list links */
