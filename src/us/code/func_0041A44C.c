@@ -8,6 +8,7 @@
 #include "ultra_types.h"
 #include "gfx.h"
 #include "structs/list.h"
+#include "globals/game.h"
 
 struct LevelActor;
 struct Shared_World;
@@ -21,7 +22,6 @@ struct StridedTable {
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 extern s32 GameOverMenu_Poll(void);
-extern f32 gEngineApp_m_Settings_match_countdown; /* local type: the field's real type (or the member path) changes the ROM's code here */
 struct OSTask_t;
 struct OSTask_t {
     u32 type;
