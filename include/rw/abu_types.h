@@ -17,6 +17,7 @@
 #include "structs/vector.h"
 #include "structs/libaudio.h"
 #include "structs/list.h" /* CList (Rage Wars' IntrusiveList) */
+#include "structs/table.h" /* StrideTable (Rage Wars' StridedTable) */
 
 struct Access_u8_3;
 struct Access_u8_3 {
@@ -491,13 +492,6 @@ struct InputRecAt27 {
     u8 unk26;
     u8 unk27;
 };
-struct StridedTable;
-struct StridedTable {
-    s32 stride;
-    s32 count;
-    char data[1];
-};
-typedef struct StridedTable StridedTable;
 struct InputRecAt27;
 struct TableRecAt8;
 typedef struct TableRecAt8 TableRecAt8;

@@ -74,14 +74,6 @@ struct Shared_Actor {
     u8 pad5[8];
     struct Shared_Entity * entity;
 };
-struct StridedTable;
-struct StridedTable {
-    s32 stride;
-    s32 count;
-    char data[1];
-};
-struct StridedTable;
-typedef struct StridedTable StridedTable;
 struct LevelActor;
 extern void GameObject_FireTriggers(struct Shared_Actor *arg0, s32 arg1, void *arg2);
 extern void Actor_SpawnParticle(void *, s32, Triple, s32);
@@ -393,7 +385,6 @@ struct Player;
 typedef struct Player Player;
 struct LevelActor;
 struct Object_func_8028B274_de;
-struct StridedTable;
 struct LevelActor;
 struct WorldRecAt3C08;
 struct EffectSlot {

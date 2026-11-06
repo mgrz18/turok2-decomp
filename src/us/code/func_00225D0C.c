@@ -32,14 +32,6 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-struct StridedTable;
-struct StridedTable {
-    s32 stride;
-    s32 count;
-    char data[1];
-};
-struct StridedTable;
-typedef struct StridedTable StridedTable;
 struct LevelActor;
 struct TableRecAt8;
 typedef struct TableRecAt8 TableRecAt8;
@@ -121,7 +113,6 @@ struct Record14 {
     u8 reserved13;
 };
 struct LevelActor;
-struct StridedTable;
 struct Def;
 struct Def {
     s32 type;

@@ -7,19 +7,11 @@
 #include "common.h"
 #include "structs/world.h"
 struct LevelActor;
-struct StridedTable;
-struct StridedTable {
-    s32 stride;
-    s32 count;
-    char data[1];
-};
 struct Shape_typemap_13;
 struct Shape_typemap_13 {
     int field_0;
     int field_4;
 };
-struct StridedTable;
-typedef struct StridedTable StridedTable;
 struct LevelActor;
 struct TableRecAt8;
 typedef struct TableRecAt8 TableRecAt8;

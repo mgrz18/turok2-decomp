@@ -8,18 +8,11 @@
 #include "ultra_types.h"
 #include "gfx.h"
 #include "structs/list.h"
+#include "structs/table.h"
 
 struct LevelActor;
 struct Shared_World;
 struct GameSession;
-struct StridedTable;
-struct StridedTable {
-    s32 stride;
-    s32 count;
-    char data[1];
-};
-struct StridedTable;
-typedef struct StridedTable StridedTable;
 extern s32 GameOverMenu_Poll(void);
 extern f32 gEngineApp_m_Settings_match_countdown; /* local type: the field's real type (or the member path) changes the ROM's code here */
 struct OSTask_t;
@@ -187,12 +180,12 @@ typedef struct Shared_World {
     u8 unknown88[8];
     void *placedObjectTable;
     struct TableRecAt8 *modelIds;
-    StridedTable *lookupTable;
+    StrideTable *lookupTable;
     struct TableRecAt8 *resourceKindTable;
-    StridedTable *records;
-    StridedTable *stridedRecords;
+    StrideTable *records;
+    StrideTable *stridedRecords;
     u8 unknownA8[4];
-    StridedTable *actorRecords;
+    StrideTable *actorRecords;
     u8 unknownB0[0x38];
     s32 resource;
     u8 unknownEC[0x34];

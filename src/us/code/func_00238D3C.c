@@ -50,15 +50,7 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-struct StridedTable;
-struct StridedTable {
-    s32 stride;
-    s32 count;
-    char data[1];
-};
 extern float D_800A65D0;
-struct StridedTable;
-typedef struct StridedTable StridedTable;
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -147,7 +139,6 @@ struct LevelActor {
     s32 flags2E4;
 };
 struct LevelActor;
-struct StridedTable;
 struct LevelActor;
 struct WorldRecAt3C08;
 struct EffectSlot {

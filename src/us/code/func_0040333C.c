@@ -7,6 +7,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "structs/table.h"
 struct LevelActor;
 struct Shared_World;
 struct Box;
@@ -34,14 +35,6 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-struct StridedTable;
-struct StridedTable {
-    s32 stride;
-    s32 count;
-    char data[1];
-};
-struct StridedTable;
-typedef struct StridedTable StridedTable;
 struct Trigger;
 struct LevelActor;
 typedef struct LevelActor LevelActor;
@@ -132,7 +125,6 @@ struct LevelActor {
     s32 flags2E4;
 };
 struct LevelActor;
-struct StridedTable;
 struct Shared_World;
 struct LevelActor;
 struct WorldRecAt3C08;
@@ -248,12 +240,12 @@ typedef struct Shared_World {
     u8 unknown88[8];
     void *placedObjectTable;
     struct TableRecAt8 *modelIds;
-    StridedTable *lookupTable;
+    StrideTable *lookupTable;
     struct TableRecAt8 *resourceKindTable;
-    StridedTable *records;
-    StridedTable *stridedRecords;
+    StrideTable *records;
+    StrideTable *stridedRecords;
     u8 unknownA8[4];
-    StridedTable *actorRecords;
+    StrideTable *actorRecords;
     u8 unknownB0[0x38];
     s32 resource;
     u8 unknownEC[0x34];

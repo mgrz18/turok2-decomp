@@ -12,6 +12,7 @@
 #include "gfx.h"
 #include "structs/controller.h"
 #include "structs/list.h"
+#include "structs/table.h"
 
 struct LevelActor;
 struct Shared_World;
@@ -29,14 +30,6 @@ struct Record14 {
     u8 reserved13;
 };
 struct LevelActor;
-struct StridedTable;
-struct StridedTable {
-    s32 stride;
-    s32 count;
-    char data[1];
-};
-struct StridedTable;
-typedef struct StridedTable StridedTable;
 struct ObjRecAt20V2;
 struct ObjRecAt20V2 {
     char pad0[0x20];
@@ -213,12 +206,12 @@ typedef struct Shared_World {
     u8 unknown88[8];
     void *placedObjectTable;
     struct TableRecAt8 *modelIds;
-    StridedTable *lookupTable;
+    StrideTable *lookupTable;
     struct TableRecAt8 *resourceKindTable;
-    StridedTable *records;
-    StridedTable *stridedRecords;
+    StrideTable *records;
+    StrideTable *stridedRecords;
     u8 unknownA8[4];
-    StridedTable *actorRecords;
+    StrideTable *actorRecords;
     u8 unknownB0[0x38];
     s32 resource;
     u8 unknownEC[0x34];
