@@ -3,6 +3,7 @@
 #include "structs/game.h"
 #include "structs/save.h"
 #include "globals/pak.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x0 */ s32 size;
@@ -10,7 +11,6 @@ typedef struct {
 
 extern SaveSize D_800F70A8;
 extern char D_800C13F0[];
-extern char gLoadSavePersistentData[];
 extern void CCache__Flush(s32);
 extern void CCache__Deallocate(s32, void *);
 extern s32 *CCache__Allocate(s32, s32, s32, void *);

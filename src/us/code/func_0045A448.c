@@ -8,7 +8,6 @@
 #include "globals/scene.h"
 
 extern s32 gScene_m_PreviewOptions[];
-extern u8 gLoadSavePersistentData[];
 
 void SaveGame_Restore_2(CPlayer *p) {
     CScene *level = &gScene;

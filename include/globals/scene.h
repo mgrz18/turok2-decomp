@@ -5,6 +5,7 @@
  * fields inside it (gScene_m_<field> is &gScene.<field>). */
 
 #include "structs/world.h"
+#include "structs/intelligence.h"
 
 extern CScene gScene;
 
@@ -19,5 +20,14 @@ extern s32 gScene_m_nSections;
 extern s32 gScene_m_nLevel;
 extern s32 gScene_m_WarpFade;
 extern s32 gScene_m_WarpState;
+
+/* The bit sections of the level: m_pBitSections (saved with the game), m_pBitSections2. */
+extern u8 gLoadSavePersistentData[0x5800];
+extern u8 gGamePersistentData[0x5000];
+
+/* The definitions the level actor pool and the particle system give their objects. */
+extern CIntelligence gLevelActorIntelligenceMP;  /* level actors in multiplayer */
+extern CIntelligence gLevelActorIntelligence;    /* level actors in single player */
+extern CIntelligence gParticleIntelligence;      /* every particle */
 
 #endif

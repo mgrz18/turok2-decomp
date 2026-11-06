@@ -20,7 +20,6 @@ extern f32 gEngineApp_m_Settings_match_seconds[];
 extern f32 gEngineApp_m_Settings_match_minutes[];
 extern f32 gEngineApp_m_Settings_match_hours[];
 extern s32 gScene_m_PreviewOptions;
-extern u8 gLoadSavePersistentData[];
 extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPakMsgRumblePakDesc_2[];
 extern u8 gPakMsgDeleteDoneDesc_2[];

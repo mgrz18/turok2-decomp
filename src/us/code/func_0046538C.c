@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/scene.h"
 
 s32 CLoader__LoadSync(s32, s32, s32, s32);
 
 s32 SavedPlayers_IsActive();                                /* extern */
 extern s32 gLoader;
-extern s32 gGamePersistentData;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x2C];

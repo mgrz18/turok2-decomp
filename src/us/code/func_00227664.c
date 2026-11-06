@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
-extern struct CIntelligence gLevelActorIntelligence;
 
 void func_00227664(CGameObjectInstance *arg0) {
     arg0->header.m_pIntelligence = &gLevelActorIntelligence;

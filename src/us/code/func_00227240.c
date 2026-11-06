@@ -5,8 +5,6 @@
 
 extern s32 gPersistentDataLoaded;
 extern u8 gEngineApp_m_Settings_multiplayer;
-extern u8 gLevelActorIntelligenceMP[];
-extern u8 gLevelActorIntelligence[];
 extern u8 D_800B6D1B;                   /* frame counter */
 
 s32 CScene__FindObjectType(void *world, s32 id);
@@ -63,9 +61,9 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
         (*refCount)++;
     }
     if (gEngineApp_m_Settings_multiplayer) {
-        actor->m_Actor.header.m_pIntelligence = gLevelActorIntelligenceMP;
+        actor->m_Actor.header.m_pIntelligence = &gLevelActorIntelligenceMP;
     } else {
-        actor->m_Actor.header.m_pIntelligence = gLevelActorIntelligence;
+        actor->m_Actor.header.m_pIntelligence = &gLevelActorIntelligence;
     }
     actor->m_Lifetime = lifetime;
     actor->m_Timer = 0.0f;
