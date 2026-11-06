@@ -1,22 +1,13 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/cheat.h"
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU_2/80408AC4_41.CPP, func_8043CDF8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 GameSettings;
 GameSettings;
-struct CheatCode;
-struct CheatCode {
-    u8 *code;
-    s32 unk4;
-    s32 flags;
-    s32 sound;
-};
 extern int gScene_m_PreviewOptions;
-struct CheatCode;
-typedef struct CheatCode CheatCode;
 s32 Sound__Play2D(s32 arg0);
-extern CheatCode sCheatCodes_2[];
 extern u8 gCheatEntryText[];
 extern s32 sEnterCheatResult;
 extern s32 strlen(u8 *);

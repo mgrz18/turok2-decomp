@@ -99,6 +99,7 @@ extern f32 sMotherBossHurtScript_2[];
 extern f32 sMotherBossSpotFlashScript_2[];
 extern BlindOneStep sBlindOneScript_2[];
 extern BlindOnePhase sBlindOnePhases_2[];
+extern void (*sBlindOnePhases_update_2)(struct BlindOneState *state); /* = &sBlindOnePhases_2[0].update: BlindOne_UpdateFight_2 indexes it by 8 */
 extern f32 sBlindOneHitScript_2[];
 extern u32 sBlindOneMoverSeq1_2[];
 extern u32 sBlindOneMoverSeq2_2[];
