@@ -13,6 +13,7 @@ extern GameSettings gEngineApp_m_Settings;   /* gEngineApp.m_Settings, gEngineAp
 
 /* Fields of gEngineApp_m_Settings with symbols of their own: where the ROM
  * bases a load on the field (GCC would base it on the struct otherwise). */
+extern u32 gEngineApp_m_Settings_cheatFlags;     /* .cheatFlags (offset 0, so the address of gEngineApp_m_Settings: symbols_manual) */
 extern u8 gEngineApp_m_Settings_multiplayer;      /* .multiplayer */
 extern u8 gEngineApp_m_Settings_unk180;           /* .unk180 */
 extern s32 gEngineApp_m_Settings_mode;            /* .mode */
