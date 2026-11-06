@@ -1,12 +1,7 @@
 #include "common.h"
 #include "structs/event.h"
+#include "globals/event.h"
 
-typedef struct {
-    void (*onActor)(void *actor, void *ai, LevelEvent *event);
-    void (*onEvent)(LevelEvent *event);
-} EventHandler;
-
-extern EventHandler *gLevelEventHandlers[];  /* handler tables by kind */
 extern char *gLevelMessages[];          /* {text, sound} pairs */
 extern s32 D_800B69DC[];            /* gLevelMessages + 4 */
 extern s32 gFrameCountGameplay;
@@ -21,7 +16,7 @@ extern void Sound__PlaySpeech(s32 sound);
 extern void Cinema_RequestById(s32 track);
 
 void LevelEvent_Fire(LevelEvent *event) {
-    EventHandler *entry;
+    LevelEventHandler *entry;
     u8 *game;
     void *camera;
     u8 *actor;

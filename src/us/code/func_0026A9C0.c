@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "structs/region.h"
+#include "globals/region.h"
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
@@ -18,8 +19,6 @@ struct CQuatern_t {
     float w;
 };
 extern void CVector3__Normalize(f32 *arg0);
-extern CGameRegion *sCachedRawNormalRegion;
-extern CGameRegion *sCachedNormalRegion;
 extern CVector3 sRegionNormal;
 extern f32 sRegionNormal_y;
 extern s32 sRegionNormal_z;

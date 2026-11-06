@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/region.h"
 #include "structs/world.h"
+#include "globals/region.h"
 
 typedef struct {
     /* 0x00 */ f32 minX;
@@ -18,7 +19,6 @@ typedef struct {
 
 extern s32 gPersistentDataLoaded;          /* level loaded */
 extern CScene gScene;
-extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
 extern CVector3 sRegionNormal;        /* cached raw normal */
 
 extern void *CISet__GetBlock(void *file, s32 index); /* a block of a file */

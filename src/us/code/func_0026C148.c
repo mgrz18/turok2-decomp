@@ -1,10 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "globals/region.h"
 
 extern u8 gScene[];
-extern CGameRegion *sCachedRegionInfoRegion;     /* region of the cached info */
-extern CRegionInfo *sCachedRegionInfo; /* its cached info */
 
 extern CRegionInfo *CScene__GetRegionInfo(void *table, CGameRegion *region);
 

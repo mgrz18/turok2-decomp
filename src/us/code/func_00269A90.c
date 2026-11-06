@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/region.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/AI/NAV/8027451C.CPP, func_802750B0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -24,14 +25,10 @@ typedef struct CollisionBuildVertex {
 } CollisionBuildVertex;
 extern int sRegionCeilingNormal;
 extern int sRegionCeilingUnitNormal;
-extern int sCachedCeilingNormalRegion;
-extern int sCachedCeilingRawNormalRegion;
 extern void CVector3__Normalize(f32 *arg0);
 struct Node75;
 extern int sRegionCeilingNormal;
 extern int sRegionCeilingUnitNormal;
-extern int sCachedCeilingRawNormalRegion;
-extern int sCachedCeilingNormalRegion;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
     CVector3 a;
@@ -42,7 +39,7 @@ static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
         ((CVector3 *)&sRegionCeilingNormal)->x = 0;
         ((CVector3 *)&sRegionCeilingNormal)->z = 0;
         ((CVector3 *)&sRegionCeilingNormal)->y = D_800A7F64;
-    } else if ((int)node != sCachedCeilingRawNormalRegion) {
+    } else if ((struct CGameRegion *)node != sCachedCeilingRawNormalRegion) {
         p = node->cur;
         q = node->prev;
         a.x = ((CollisionBuildVertex *)p)->x - ((CollisionBuildVertex *)q)->x;
@@ -63,7 +60,7 @@ static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
         b.z = ((CollisionBuildVertex *)p)->z - ((CollisionBuildVertex *)q)->z;
         CVector3__Cross((CVector3 *)&sRegionCeilingNormal, &b, &a);
     }
-    sCachedCeilingRawNormalRegion = (int)node;
+    sCachedCeilingRawNormalRegion = (struct CGameRegion *)node;
     *out = *(CVector3 *)&sRegionCeilingNormal;
     return out;
 }
@@ -72,11 +69,11 @@ CVector3 *CGameRegion__GetCeilingNormal(CVector3 *out, Node75 *node) {
         ((CVector3 *)&sRegionCeilingUnitNormal)->x = 0;
         ((CVector3 *)&sRegionCeilingUnitNormal)->z = 0;
         ((CVector3 *)&sRegionCeilingUnitNormal)->y = D_800A7F60;
-    } else if ((int)node != sCachedCeilingNormalRegion) {
+    } else if ((struct CGameRegion *)node != sCachedCeilingNormalRegion) {
         cross_edges((CVector3 *)&sRegionCeilingUnitNormal, node);
         CVector3__Normalize((CVector3 *)&sRegionCeilingUnitNormal);
     }
     *out = *(CVector3 *)&sRegionCeilingUnitNormal;
-    sCachedCeilingNormalRegion = (int)node;
+    sCachedCeilingNormalRegion = (struct CGameRegion *)node;
     return out;
 }

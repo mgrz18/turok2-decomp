@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "globals/region.h"
 
 
 /* A vertex of this kind of triangle keeps its height after z. */
@@ -13,7 +14,6 @@ typedef struct Vertex {
 
 #define REGION_VERTEX(tri, i) ((Vertex *)(tri)->m_pVertices[i])
 
-extern CGameRegion *sCachedCeilingRawNormalRegion;    /* triangle whose normal is cached */
 extern CVector3 sRegionCeilingNormal;         /* its normal */
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
