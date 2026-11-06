@@ -308,4 +308,18 @@ typedef struct __OSEventState {
     /* 0x4 */ OSMesg message;
 } __OSEventState; /* size 0x8 */
 
+/* A double or a float as its bits (PRinternal/guint.h): the libm constants. */
+typedef union {
+    struct {
+        u32 hi;
+        u32 lo;
+    } w;
+    f64 d;
+} du;
+
+typedef union {
+    u32 w;
+    f32 f;
+} fu;
+
 #endif

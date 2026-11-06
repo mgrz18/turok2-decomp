@@ -110,4 +110,16 @@ extern OSMesg __osPiEventBuf[1];          /* piEventBuf */
 extern OSMesg __osPiAccessBuf[1];         /* piAccessBuf */
 extern OSMesgQueue __osPiAccessQueue;
 
+/* The libm .rodata (cosf.c and sinf.c statics), 0x800AA750-0x800AA874. */
+extern const du sCosfP[5];      /* the polynomial */
+extern const du sCosfRpi;       /* 1/pi */
+extern const du sCosfPiHi;      /* pi, high part */
+extern const du sCosfPiLo;      /* pi, low part */
+extern const fu sCosfZero;      /* 0.0f */
+extern const du sSinfP[5];
+extern const du sSinfRpi;
+extern const du sSinfPiHi;
+extern const du sSinfPiLo;
+extern const fu sSinfZero;
+
 #endif
