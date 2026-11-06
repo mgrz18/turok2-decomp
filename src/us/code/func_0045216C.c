@@ -8,6 +8,6 @@ s32 func_0045216C(s32 arg0, s32 arg1) {
 
     var_s0 = &D_8011AAD8;
     var_s0 = &D_8011AAD8;
-    D_8011AAD8.teamSkill = Menu_StepValue(arg1, (s32) D_8011AAD8.teamSkill, 1, 0, 8, 1);
+    D_8011AAD8.teamTextureSet = Menu_StepValue(arg1, (s32) D_8011AAD8.teamTextureSet, 1, 0, 8, 1);
     return 0;
 }

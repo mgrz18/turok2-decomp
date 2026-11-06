@@ -95,18 +95,18 @@ typedef struct GameSettings {
     /* 0x020 */ s8 dmTimeLimit;        /* minutes */
     /* 0x021 */ s8 dmScoreLimit;
     /* 0x022 */ s8 dmArena;            /* 0: random */
-    /* 0x023 */ s8 dmSkill;            /* the level actors spawn at (AI_InitHealth) */
-    /* 0x024 */ u8 dmUnk24;
+    /* 0x023 */ s8 dmTextureSet;       /* 'texture set:' 0..8 (BloodLustMenu_StepTextureSet); AI_InitHealth uses it for m_nTexture */
+    /* 0x024 */ u8 dmCrosshairs;       /* 'crosshairs : on/off' (BloodLustMenu_StepCrosshairs) */
     /* 0x025 */ s8 tagTimeLimit;
     /* 0x026 */ s8 tagScoreLimit;
     /* 0x027 */ s8 tagArena;
-    /* 0x028 */ s8 tagSkill;
-    /* 0x029 */ u8 tagUnk29;
+    /* 0x028 */ s8 tagTextureSet;      /* FragTagMenu_StepTextureSet */
+    /* 0x029 */ u8 tagCrosshairs;      /* FragTagMenu_StepCrosshairs */
     /* 0x02A */ s8 teamTimeLimit;
     /* 0x02B */ s8 teamScoreLimit;
     /* 0x02C */ s8 teamArena;
-    /* 0x02D */ s8 teamSkill;
-    /* 0x02E */ u8 teamUnk2E;
+    /* 0x02D */ s8 teamTextureSet;     /* TeamBloodMenu_StepTextureSet */
+    /* 0x02E */ u8 teamCrosshairs;     /* TeamBloodMenu_StepCrosshairs */
     /* 0x02F */ u8 unk2F;
     /* 0x030 */ u8 weaponEnabled[10];  /* D_8011AB08 */
     /* 0x03A */ u8 unk3A[0x3C - 0x3A];
@@ -143,8 +143,11 @@ extern GameMatch D_8011ACB0;
 
 #include "structs/player_list.h"
 
-/* The debug line counts (func_00430500 resets them and fills the coloured
- * vertex buffers D_80129A40, D_8012DA40, D_8012DB40, D_8012F340). */
+/* The automap's state at CGame+0x1230 (Automap_Update, Automap_Draw and
+ * Automap_IsShown take &m_DebugLines): mode, state, blend, then the yaw and
+ * pitch words from 0x20. func_00430500 clears the counts and fills the
+ * coloured vertex buffers D_80129A40, D_8012DA40, D_8012DB40, D_8012F340.
+ * The CDebugLines / m_DebugLines names are from before that was known. */
 typedef struct CDebugLines {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;
@@ -166,7 +169,7 @@ typedef struct CGame {
     /* 0x0040 */ u8 m_CameraPool[0x57C];   /* CCameraPool, D_801198B0 (0x11F0 bytes) */
     /* 0x05BC */ u8 m_MenuPool[0x18];      /* its m_MainCamera.m_MenuPool (MenuPool, structs/menu.h), D_80119E2C */
     /* 0x05D4 */ u8 m_CameraPoolEnd[0x1230 - 0x5D4];
-    /* 0x1230 */ CDebugLines m_DebugLines;   /* reset by func_00430500 */
+    /* 0x1230 */ CDebugLines m_DebugLines;   /* the automap (D_8011AAA0); reset by func_00430500 */
     /* 0x1268 */ GameSettings m_Settings;  /* D_8011AAD8 */
 } CGame; /* size 0x1490 */
 

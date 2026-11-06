@@ -365,7 +365,8 @@ typedef struct WaveBossStep {
 
 /* D_8012F3A0: the boss of the first VM module (MantidQueen_Init sets it up,
  * MantidQueen_Update runs it; boss id 0x1D4D in D_80110048, between the Blind
- * One's and the Mother's: likely the Lord of the Dead). Five weak spots,
+ * One's and the Mother's): the Mantid Queen, whose intro starts the "Queen"
+ * health bar (MantidQueen_UpdateIntro). Five weak spots,
  * opened one at a time by the script, and waves of minions (type 0x651) in
  * between: while a wave runs the spots cannot be hit. Fields with symbols
  * of their own: D_8012F3A4 (pushed), D_8012F5B4 (step), D_8012F5C0 (boss),

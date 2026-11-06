@@ -8,7 +8,7 @@
 #define AL_SEQ_END_EVT 4
 #define AL_TRACK_END 0x12
 
-u32 __readVarLen(ALCSeq *seq, u32 track);     /* __alCSeqNextDelta */
+u32 __readVarLen(ALCSeq *seq, u32 track);     /* ultralib cseq.c */
 u32 __alCSeqGetTrackEvent(ALCSeq *seq, u32 track, ALEvent *event);
 
 static __inline__ void alCSeqNew(ALCSeq *seq, u8 *ptr) {

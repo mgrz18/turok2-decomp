@@ -10,7 +10,7 @@ extern char D_800B6164[];
 
 /* Names setting 0x29. */
 s32 func_004517BC(MenuItem *item) {
-    switch (D_8011AAD8.tagUnk29) {
+    switch (D_8011AAD8.tagCrosshairs) {
     case 0:
         item->text = D_800B617C;
         break;

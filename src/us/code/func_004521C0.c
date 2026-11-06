@@ -17,7 +17,7 @@ extern char D_800B614C[];
 
 /* Names setting 0x2D. */
 s32 func_004521C0(MenuItem *item) {
-    switch (D_8011AAD8.teamSkill) {
+    switch (D_8011AAD8.teamTextureSet) {
     case 0:
         item->text = D_800B608C;
         break;

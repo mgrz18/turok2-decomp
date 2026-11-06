@@ -35,9 +35,9 @@ void AI_InitHealth(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
         level = def->m_nTexture;
         if (settings->multiplayer != 0 && def->m_Type != 1 && def->m_Type != 11) {
             if (settings->match.tag != 0) {
-                level = settings->tagSkill;
+                level = settings->tagTextureSet;
             } else {
-                level = settings->dmSkill;
+                level = settings->dmTextureSet;
             }
         }
         switch (def->m_Type) {

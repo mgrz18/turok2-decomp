@@ -1,15 +1,18 @@
 #include "common.h"
 
-/* Looping sprite/texture animation player. */
+/* A CPathTrack (callers pass &ai->m_PathTrack): steps the current point along
+ * its path, ping-pong or looping as the path says. Not a sprite animation
+ * player, as this comment once said: animId is the path index
+ * (m_nCurrentPathIndex), frame the point index (m_nCurrentPointIndex). */
 typedef struct AnimPlayer {
-    s8 state;       /* 0x0: 1-2 forward, 3-4 backward */
-    u8 animId;      /* 0x1 */
-    s16 frame;      /* 0x2 */
+    s8 state;       /* 0x0: direction, 1-2 forward, 3-4 backward */
+    u8 animId;      /* 0x1: the path */
+    s16 frame;      /* 0x2: the point on it */
 } AnimPlayer;
 
 typedef struct AnimDef {
     s16 mode;       /* 0x0: 0 ping-pong, 1 loop */
-    s16 frameCount; /* 0x2 */
+    s16 frameCount; /* 0x2: its points */
 } AnimDef;
 
 extern u8 D_800F7078[];

@@ -8,6 +8,6 @@ s32 func_00451DBC(s32 arg0, s32 arg1) {
 
     var_s0 = &D_8011AAD8;
     var_s0 = &D_8011AAD8;
-    D_8011AAD8.dmUnk24 = Menu_StepValue(arg1, (s32) D_8011AAD8.dmUnk24, 1, 0, 1, 1);
+    D_8011AAD8.dmCrosshairs = Menu_StepValue(arg1, (s32) D_8011AAD8.dmCrosshairs, 1, 0, 1, 1);
     return 0;
 }

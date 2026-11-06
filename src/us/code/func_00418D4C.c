@@ -8,6 +8,6 @@ s32 BloodLustMenu_StepTextureSet(s32 arg0, s32 arg1) {
 
     var_s0 = &D_8011AAD8;
     var_s0 = &D_8011AAD8;
-    D_8011AAD8.dmSkill = Menu_StepValue(arg1, (s32) D_8011AAD8.dmSkill, 1, 0, 8, 1);
+    D_8011AAD8.dmTextureSet = Menu_StepValue(arg1, (s32) D_8011AAD8.dmTextureSet, 1, 0, 8, 1);
     return 0;
 }

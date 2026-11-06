@@ -1,8 +1,11 @@
 #include "common.h"
 
-/* Picks the attack for an AI actor: a special one against a flagged target,
- * then the ranged/melee/close sets allowed by the mode bits (20-25), the
- * index (0..2) choosing which 5-bit group of the def mask enables it. */
+/* Picks the death animation for an AI actor (modes 0x33/0x34): a special one
+ * when the region under it is flagged, then the explosive, violent, moving or
+ * normal death pickers (the m_w*DeathAnimFlags tables) allowed by the mode
+ * bits (20-25), the index (0..2) choosing which 5-bit group of the def's
+ * death-flag words enables it. Not an attack picker, as this comment once
+ * said. */
 
 typedef struct {
     /* 0x00 */ u8 pad00[0x10];

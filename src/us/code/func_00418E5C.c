@@ -8,6 +8,6 @@ s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 s32 BloodLustMenu_StepCrosshairs(s32 arg0, s32 arg1) {
     GameSettings *settings = &D_8011AAD8;
 
-    settings->dmUnk24 = Menu_StepValue(arg1, settings->dmUnk24, 1, 0, 1, 1);
+    settings->dmCrosshairs = Menu_StepValue(arg1, settings->dmCrosshairs, 1, 0, 1, 1);
     return 0;
 }

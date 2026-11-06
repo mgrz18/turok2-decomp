@@ -75,7 +75,7 @@ void Demo_Start(DemoHeader *arg) {
     setup->playerCount = s->playerCount;
     setup->cheatFlags = 12;
     r = Random_Next() % 9;
-    setup->dmSkill = r;
-    setup->tagSkill = r;
-    setup->teamSkill = r;
+    setup->dmTextureSet = r;
+    setup->tagTextureSet = r;
+    setup->teamTextureSet = r;
 }

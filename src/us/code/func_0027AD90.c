@@ -1,11 +1,14 @@
 #include "common.h"
 
-/* Two HUD meters (COnScreen__SetBoss / COnScreen__SetBoss2 start them): the arena timer and kill count of TotemDefense_UpdateFight. */
+/* COnScreen's two boss bars (COnScreen__SetBoss / COnScreen__SetBoss2 start
+ * them): m_pBoss, m_pBossName and m_BossPercent, and the second boss's
+ * (docs/HUD.md). Not an arena timer and kill count, as this comment once
+ * said. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x3C];
-    /* 0x3C */ s32 unk3C;
-    /* 0x40 */ s32 active;
-    /* 0x44 */ s32 percent;
+    /* 0x3C */ s32 unk3C;   /* m_pBossName */
+    /* 0x40 */ s32 active;  /* m_pBoss */
+    /* 0x44 */ s32 percent; /* m_BossPercent */
 } HudMeter; /* size 0x48 */
 
 typedef struct {
