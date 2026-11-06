@@ -51,7 +51,6 @@ typedef struct {
     /* 0x08 */ u8 pad8[0x5C - 0x8];
     /* 0x5C */ CVector3 dest; /* 0x8012FA30 */
 } BossCtl;
-extern s32 sPrimagenPathPoint; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* point on the path */
 extern f32 gLevelScript_script; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* cooldown */
 extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */          /* stage, as the script selection reads it */
 

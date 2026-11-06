@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/boss.h"
 
 extern f32 D_800C051C;
 extern f32 D_800C0520;
 extern f32 D_800C0524;
 extern f32 D_800C0528;
-extern s32 gLevelScript_bossMode;
 
 void Primagen_EnterMode18_2(void *arg0)
 {

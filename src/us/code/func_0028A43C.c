@@ -75,9 +75,6 @@ void CCache__PostDisplayListDone(s32 a, s32 b);
 void __scTaskComplete(Vid *o, Job *j);
 s32 __scSchedule(Vid *o, Job **a, Job **b, s32 mode);
 void __scExec(Vid *o, Job *a, Job *b);
-extern u64 sGfxRspResumeTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u64 sAudioTaskStartTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
-extern f32 sGfxRspTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
 void __scHandleRSP(Vid *o) {
     Job *j;
     Job *a;

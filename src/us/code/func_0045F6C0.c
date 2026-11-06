@@ -3,9 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
-extern int gPakState[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern int gPakError[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 int Pak_GetFreePages_2(int slot, int *score) {
     if (gPakState[slot] != 3) {
         return -2;

@@ -7,8 +7,7 @@
 #include "common.h"
 #include "globals/frame.h"
 #include "globals/save.h"
-extern char gEngineApp_m_Settings;
-extern char gEngineApp_m_Settings_match; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
+#include "globals/game.h"
 /* Turok 2 region sizes differ from Rage Wars (0x430, 0x584, 0xB0). */
 s32 Boot_CanOverwrite(u32 address) {
     address |= 0x80000000;
