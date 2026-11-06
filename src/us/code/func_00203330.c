@@ -14,7 +14,7 @@ extern void CList__InsertBefore(void *, s32, s32);
 void CCache__Compact(s32 unused, s32 arg1) {
     extern void CList__Remove(void *, s32);
     extern void CHeap__Free(void *, s32);
-    extern s32 D_800D1CC0[3];
+    extern s32 gHeap[3];
     extern s32 D_800D81D8[];
     CList queue;
     Node80254C10 *node;
@@ -32,7 +32,7 @@ void CCache__Compact(s32 unused, s32 arg1) {
         }
     }
     pool = D_800D81D8;
-    arena_end = &D_800D1CC0[2];
+    arena_end = &gHeap[2];
     arena = arena_end - 2;
     do {
         node = (Node80254C10 *)pool[0];

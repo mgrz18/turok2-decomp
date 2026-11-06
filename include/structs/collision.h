@@ -4,7 +4,7 @@
 /* Collision: an object's collision response (CCollisionInfo), the move being
  * tested (Sweep, Collision_MoveInstance builds one on its stack and runs the tests of
  * D_800AD190 on it), and what the last test hit (CCollisionResults,
- * D_800F1CE0; D_800F1ADC points at the one being filled).
+ * gCollisionResults; gCollisionResultsP points at the one being filled).
  *
  * A test that takes a hit records where to write it back (SweepHit's *Out
  * pointers into the results); SweepHit_Store writes the object's position,
@@ -44,7 +44,7 @@ typedef struct CCollisionInfo {
 
 /* A hittable node of an instance (Rage Wars calls it a shield): what a hit on
  * it copies into the results (m_Frame, 0x70 bytes; D_800F1CF8 is the copy in
- * D_800F1CE0) and what a DamageEvent carries. */
+ * gCollisionResults) and what a DamageEvent carries. */
 typedef struct HitFrame {
     /* 0x00 */ s32 unk_00[0x19];
     /* 0x64 */ u8 unk_64;
@@ -55,7 +55,7 @@ typedef struct HitFrame {
     /* 0x6C */ s32 unk_6C;
 } HitFrame; /* size 0x70 */
 
-/* What the last collision test hit (D_800F1CE0, 0xF0), one record per kind
+/* What the last collision test hit (gCollisionResults, 0xF0), one record per kind
  * of thing: each has the region the object was in, where it was, and a kind
  * or the thing hit. CCollisionResults__Clear clears it (the instance's node to -1). */
 typedef struct CCollisionResults {

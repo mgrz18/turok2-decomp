@@ -35,7 +35,7 @@ struct Dest {
     void (*callback)(Source *, Dest *); /* 0xF0 */
 };
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern void AI_StopSound(Source *, Dest *);
 extern void AI_UpdateRegionFlags(Source *, Dest *);
 extern void AI_RideMovingPlatform(Source *, Dest *);
@@ -47,7 +47,7 @@ void CAI__Update(Source *src, Dest *dst) {
     }
     if (dst->timer != 0) {
         dst->timer--;
-        D_800B6D28 = 0.0f;
+        gFrameIncrement = 0.0f;
         return;
     }
     if (src->active != 0) {
@@ -56,7 +56,7 @@ void CAI__Update(Source *src, Dest *dst) {
             dst->height = src->height;
         }
         dst->position = src->position;
-        dst->value += D_800B6D28;
+        dst->value += gFrameIncrement;
         AI_UpdateRegionFlags(src, dst);
         if (src->flags & 0x10000) {
             AI_RideMovingPlatform(src, dst);

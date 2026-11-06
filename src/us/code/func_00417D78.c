@@ -125,12 +125,12 @@ struct Shared_Game {
 extern Shared_Game D_8011A6D8;
 extern f32 D_801308FC;
 extern s32 FinalScoreMenu_Poll(void);
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 void CPlayerPool__EndMatch(void *arg0);
 s32 FinalScoreMenu_Poll(void) {
     f32 time;
     RenderCounters *base;
-    time = D_801308FC + D_800B6D28;
+    time = D_801308FC + gFrameIncrement;
     D_801308FC = time;
     if ((120.0f) <= time) {
         base = &D_8011A6D8.counters;

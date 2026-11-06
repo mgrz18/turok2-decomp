@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void Actor_TurnBy(void *arg0, f32 arg1);
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 void AI_TurnClamped(void *arg0, s32 arg1, f32 arg2, f32 arg3) {
     f32 f0;
     f32 f1;
@@ -16,7 +16,7 @@ void AI_TurnClamped(void *arg0, s32 arg1, f32 arg2, f32 arg3) {
     if (f0 < f1 || (f0 = -f0, f1 < f0)) {
         f1 = f0;
     }
-    f1 = f1 * D_800B6D28;
+    f1 = f1 * gFrameIncrement;
     f2 = f1;
     if (f1 < 0.0f) {
         f2 = -f1;

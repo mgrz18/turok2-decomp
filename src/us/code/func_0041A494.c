@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 #include "structs/game.h"
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 s32 GameOverMenu_TickCountdown(void) {
     GameMatch *state = &D_8011ACB0;
-    f32 timer = state->countdown - D_800B6D28;
+    f32 timer = state->countdown - gFrameIncrement;
     state->countdown = timer;
     if (timer < 0.0f) {
         state->countdown = 0.0f;

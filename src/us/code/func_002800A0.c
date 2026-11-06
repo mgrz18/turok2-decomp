@@ -3,7 +3,7 @@
 
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
-extern f32 D_800B6D28;          /* the frame's time step */
+extern f32 gFrameIncrement;          /* the frame's time step */
 s32 Cinema_PathPlaying(void);
 void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam);
 void COnScreen__BeginText(void);
@@ -76,7 +76,7 @@ void CCameraPool__AdvanceText(CCameraPool *pool, CCamera *cam) {
                 case 3:
                     text->m_nAlpha = 255;
                     text->m_Scale = 1.0f;
-                    text->m_Time -= D_800B6D28;
+                    text->m_Time -= gFrameIncrement;
                     if (text->m_Time < 0.0f) {
                         text->m_nMode = 4;
                         text->m_nAlpha = 128;

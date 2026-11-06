@@ -36,7 +36,7 @@ typedef struct {
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern s32 D_800ACAF0;
 extern s32 D_800B6D00;
 extern u8 D_800B6D1B;
@@ -72,7 +72,7 @@ void CStaticObject__ConstructCompact(PlacedProp *prop, PlacedPropRecord *record,
     prop->id = record->id;
     prop->owner = owner;
     prop->unk1C = 0;
-    prop->model = CScene__GetIntelligence(D_800F7078, record->model);
+    prop->model = CScene__GetIntelligence(gScene, record->model);
     pos.x = record->x * scale;
     if (record->bits & 0x10) {
         pos.x = -pos.x;

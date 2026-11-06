@@ -11,7 +11,7 @@ extern s32 D_800B6D70;
 extern s32 D_800B6D74;
 extern s32 D_800C2034;
 extern s32 D_800F6CA0;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern s32 D_8011AD00;
 extern f32 D_8011F120;
 
@@ -36,7 +36,7 @@ void EngineMode16_Ending_Init(s32 arg0)
   }
   if (D_800B6D74 != 0)
   {
-    CScene__RequestWarp((s32) D_800F7078, ~Cinema_RequestById(0x82), 0);
+    CScene__RequestWarp((s32) gScene, ~Cinema_RequestById(0x82), 0);
   }
   else
   {

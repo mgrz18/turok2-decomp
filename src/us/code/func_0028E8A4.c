@@ -10,7 +10,7 @@
 
 
 extern char D_80120DC0[];               /* the reader thread's stack; its OSThread is 0x230 below */
-extern char D_800D1CD8[];               /* the cartridge reader */
+extern char gLoader[];               /* the cartridge reader */
 extern char D_80132000[];               /* the page array, 0x1000 per page */
 
 void memset(void *dst, s32 value, s32 size);
@@ -39,7 +39,7 @@ void VM_ReaderThread(void *unused) {
     for (;;) {
         osRecvMesg(&D_801206A0.pending, &message, 1);
         if (*((PageJob *)message)->slot == 0xFF) {
-            CLoader__LoadSync(D_800D1CD8, ((PageJob *)message)->source, (((PageJob *)message)->size + 1) & ~1,
+            CLoader__LoadSync(gLoader, ((PageJob *)message)->source, (((PageJob *)message)->size + 1) & ~1,
                           D_80132000 + (((PageJob *)message)->mapping->index << 12));
             osInvalDCache(D_80132000 + (((PageJob *)message)->mapping->index << 12), 0x1000);
             osInvalICache(D_80132000 + (((PageJob *)message)->mapping->index << 12), 0x1000);

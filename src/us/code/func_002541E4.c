@@ -5,7 +5,7 @@
 
 extern s32 D_800ADB5C;
 extern s32 D_800ADB30[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern void CScene__SetInstanceObjectType(void *, CPlayer *, s32, s32);
 
 void CPlayer__LoadCharacterModel(CPlayer *player) {
@@ -20,5 +20,5 @@ void CPlayer__LoadCharacterModel(CPlayer *player) {
     } else {
         id = D_800ADB30[player->m_CharacterActor.header.m_pIntelligence->m_Id];
     }
-    CScene__SetInstanceObjectType(D_800F7078, player, id, player->m_CharAnim);
+    CScene__SetInstanceObjectType(gScene, player, id, player->m_CharAnim);
 }

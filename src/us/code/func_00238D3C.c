@@ -249,7 +249,7 @@ struct TableRecAt8;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld D_800F7078;
+extern CWorld gScene;
 struct LevelActor;
 struct Triple;
 struct Triple;
@@ -266,6 +266,6 @@ void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, 
     } else {
         resource = &D_800F5A50;
     }
-    CScene__StartRumbles(&D_800F7078, resource, arg6.value, arg3,
+    CScene__StartRumbles(&gScene, resource, arg6.value, arg3,
                   arg6.angle * *(&D_800A65D0 + 1), arg6.scale * D_800A65D8);
 }

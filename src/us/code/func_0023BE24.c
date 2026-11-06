@@ -3,7 +3,7 @@
 #include "structs/region.h"
 #include "structs/collision.h"
 
-extern s32 D_800F7078[];
+extern s32 gScene[];
 
 CRegionInfo *CScene__GetRegionInfo(s32 *list, CGameRegion *region);
 void CGameRegion__GetNormalRaw(CVector3 *normal, CGameRegion *region);
@@ -42,7 +42,7 @@ void Sweep_FollowGround(Sweep *sweep) {
     }
     obj = sweep->obj;
     if (sweep->checkRegionInfo) {
-        info = CScene__GetRegionInfo(D_800F7078, (CGameRegion *)obj->header.m_pCurrentRegion);
+        info = CScene__GetRegionInfo(gScene, (CGameRegion *)obj->header.m_pCurrentRegion);
         if (info != NULL && (info->m_dwFlags & 0x4000)) {
             flag = 0;
         } else {

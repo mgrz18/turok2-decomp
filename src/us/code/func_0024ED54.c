@@ -5,7 +5,7 @@
 #include "structs/collision.h"
 
 
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 
 f32 func_002982F0(f32);         /* sinf */
 f32 func_002974C0(f32);         /* cosf */
@@ -20,7 +20,7 @@ void CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
  * the ROMs plain bne at the 0x2E test: with two returns, reorgs liveness at
  * the fall-through keeps $v0 and annuls the slot (bnel). */
 s32 CPlayer__RamWithMount(CPlayer *player, CGameObjectInstance *body) {
-    CGameObjectInstance *aim = D_800F1CE0.m_pInstance;
+    CGameObjectInstance *aim = gCollisionResults.m_pInstance;
     CGameObjectInstance *target;
     CGameObjectInstance *mount;
     s32 type;

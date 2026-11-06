@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern f32 D_800B6D28; /* frame time */
+extern f32 gFrameIncrement; /* frame time */
 
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
 f32 func_002974C0(f32 x);
@@ -35,7 +35,7 @@ void EnemySwim_Advance(CGameObjectInstance *self, CAI *ai) {
         }
     }
 
-    ai->m_Enemy.m_WanderTimer -= D_800B6D28;
+    ai->m_Enemy.m_WanderTimer -= gFrameIncrement;
     if (ai->m_Enemy.m_WanderTimer <= 0.0f) {
         ai->m_Enemy.m_WanderTimer = Random_Blend(60.0f, 120.0f);
         ai->m_vTargetOffset.x = Random_Blend(-51.199997f, 51.199997f);

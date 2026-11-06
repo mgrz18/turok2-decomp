@@ -14,7 +14,7 @@ typedef struct Obj2 {
 } Obj2;
 
 extern BlindOneState D_80130200;
-extern f32 D_800B6D28; /* frame time */
+extern f32 gFrameIncrement; /* frame time */
 extern BlindOnePhase D_0043240C[];
 extern u8 D_801100F0[];
 extern void Animator_Update(void *slot);
@@ -29,7 +29,7 @@ void BlindOne_BossUpdate(void *obj, CAI *ai) {
     if (ai->m_pModeCurrent != NULL && ai->m_pModeCurrent->m_pfCallback != NULL) {
         ai->m_pModeCurrent->m_pfCallback(obj, ai);
     }
-    ai->m_BlindOne.m_HitTimer = MAX(ai->m_BlindOne.m_HitTimer - D_800B6D28, 0.0f);
+    ai->m_BlindOne.m_HitTimer = MAX(ai->m_BlindOne.m_HitTimer - gFrameIncrement, 0.0f);
     if (D_0043240C[state->phase].update != NULL) {
         D_0043240C[state->phase].update(state);
     }

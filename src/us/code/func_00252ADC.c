@@ -4,7 +4,7 @@
 
 extern s32 D_8011AC8C;
 extern s32 D_8011ACA4;
-extern f32 D_800B6D28;          /* frame time scale */
+extern f32 gFrameIncrement;          /* frame time scale */
 
 extern s32 Cinema_PathPlaying(void);
 extern void *LoopSounds_Get(void);
@@ -41,14 +41,14 @@ void CPlayerPool__AnimateWeapons(CPlayerList *list) {
             if (!menu_open(p)) {
                 CGameObjectInstance *weapon = &p->m_WeaponActor;
                 s32 old = p->m_CharAnim;
-                f32 frameTime = D_800B6D28;
+                f32 frameTime = gFrameIncrement;
 
                 p->m_WeaponActor.m_dwFlags |= 0x200;
                 weapon->m_dwHotPointFlags = 16;
                 weapon->m_dwFlags &= ~0x20000;
                 func_0021F1B4(weapon);
                 CGameObjectInstance__UpdateAnimation(weapon);
-                D_800B6D28 = frameTime;
+                gFrameIncrement = frameTime;
                 if (old != p->m_CharAnim) {
                     p->m_CharacterActor.m_CurrentAnimation.m_bCycleCompleted = 0;
                 }

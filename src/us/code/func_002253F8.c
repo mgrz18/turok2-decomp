@@ -4,7 +4,7 @@ s32 CList__AddHead(s32, s32);
 s32 CList__Remove(s32, s32);
 s32 LevelEvent_Fire(s32);
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 /* A timed list entry: counts down and is freed at zero. */
 typedef struct TimedNode {
@@ -37,7 +37,7 @@ void CScene__UpdateDelayedEvents(TimedPool *arg0) {
             temp_s2 = var_s0->next;
             var_v1 = var_s1;
             if (temp_a0[0xE] & 2) {
-                temp_f1 = var_s0->timer - D_800B6D28;
+                temp_f1 = var_s0->timer - gFrameIncrement;
                 var_s0->timer = temp_f1;
                 if (temp_f1 <= 0.0f) {
                     var_v1 = 1;

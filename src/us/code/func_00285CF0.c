@@ -5,7 +5,7 @@
 #include "structs/game.h"
 
 extern s32 D_800AB8A0;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_801198F0[];
 extern s32 D_800B6D1C;              /* frame buffer index */
 extern f32 D_800F67C0[][16];        /* per-frame matrices */
@@ -31,7 +31,7 @@ void EngineMode03_ExpansionPak_Draw(CEngineApp *view) {
     s32 key;
 
     D_800AB8A0 = 0;
-    id = CScene__FindObjectType(D_800F7078, 0xE10);
+    id = CScene__FindObjectType(gScene, 0xE10);
     if (id == -1) {
         return;
     }
@@ -40,7 +40,7 @@ void EngineMode03_ExpansionPak_Draw(CEngineApp *view) {
     CMtxF__PreRotateY(mtx, view->m_Settings.modeTimer * 0.17453295f);
     CMtxF__SwapYZRows(mtx);
     CMtxF__ToMtxAffine(mtx, D_800F67C0[D_800B6D1C]);
-    key = CScene__GetObject(D_800F7078, id);
+    key = CScene__GetObject(gScene, id);
     Render_ResetBatches();
     Render_QueueModelByKey(key, D_800F67C0[D_800B6D1C], D_800AB0E8, 0, -1);
     Render_FlushBatches();

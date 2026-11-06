@@ -13,7 +13,7 @@ typedef struct HashEntry {
 extern char D_800D8D90[];           /* pending request list */
 extern u32 D_800D81C0;              /* hash mask */
 extern HashEntry *D_800D81C4;       /* hash table */
-extern char D_800D1CC0[];           /* heap */
+extern char gHeap[];           /* heap */
 extern s32 D_800D81E0;              /* cached node list; the current node sits 8 bytes before it, the free node count 0xBCC after */
 extern char D_800D81F4[];           /* locked node list */
 extern CMemEntry **D_800D81D4; /* free node stack */
@@ -68,12 +68,12 @@ CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropR
                 CHashTable__Remove(existing->requestId);
                 existing->memEntry->cacheEntry = 0;
                 if (!(existing->memEntry->flags & 0x702)) {
-                    CHeap__Free(D_800D1CC0, existing->memEntry->data);
+                    CHeap__Free(gHeap, existing->memEntry->data);
                     release(existing->memEntry);
                 }
                 CCache__FreeCacheEntry(0, existing);
             } else {
-                CHeap__Free(D_800D1CC0, request->memEntry->data);
+                CHeap__Free(gHeap, request->memEntry->data);
                 release(request->memEntry);
                 CCache__FreeCacheEntry(0, request);
                 return existing;

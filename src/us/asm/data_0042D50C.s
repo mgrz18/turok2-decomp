@@ -1,5 +1,5 @@
 /* 0x0042D50C-0x0042DA60: the head of the player code's file, before func_0042DA60.
- * One junk word (linker fill before the table), then D_0042D510, 34
+ * One junk word (linker fill before the table), then gCollisionSetupTable, 34
  * 0x28-byte records whose first word points at an engine object
  * (read by func_002418C0 through CCollisionInfo__Reset's caller
  * func_00241860). It sits in .text, so it is written here by hand. */
@@ -13,9 +13,9 @@ D_0042D50C:
     .word 0x46011080
 .size D_0042D50C, 4
 
-.globl D_0042D510
-.type D_0042D510, @object
-D_0042D510:
+.globl gCollisionSetupTable
+.type gCollisionSetupTable, @object
+gCollisionSetupTable:
     .word D_800F1F10, 0x1E5EC329, 0x00000005, 0x00000002, 0x00000002, 0xC50FFFFF, 0x00000000, 0x3F333333, 0x00000000, 0x00000000
     .word D_800F1E30, 0x1E5E4329, 0x00000005, 0x00000002, 0x00000002, 0x00000000, 0x00000000, 0x3F333333, 0x00000000, 0x00000000
     .word D_800F1C80, 0x1E5E4329, 0x00000002, 0x00000002, 0x00000002, 0xC5034000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -50,4 +50,4 @@ D_0042D510:
     .word D_800F1F70, 0x1E5F7F08, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
     .word D_800F1E10, 0x1E5F7329, 0x00000005, 0x00000002, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
     .word 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
-.size D_0042D510, . - D_0042D510
+.size gCollisionSetupTable, . - gCollisionSetupTable

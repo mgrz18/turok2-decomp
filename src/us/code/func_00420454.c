@@ -23,7 +23,7 @@ extern f32 D_8011ACB4[];
 extern f32 D_8011ACB8[];
 extern f32 D_8011ACBC[];
 extern s32 D_801198A4[2];
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern u8 D_800EBAC0[];
 extern u8 D_0043BD20[];
 extern u8 D_0043BDB0[];
@@ -54,7 +54,7 @@ s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
     }
     if (D_801309B8 != 0) {
         player = CPlayerPool__FindByController(&D_80119870.m_PlayerList, c->controller);
-        world = &D_800F7078;
+        world = &gScene;
         keep = D_8011AC58[0];
         player->m_Data = D_800C201C->player;
         *(GameSettingsBlock *)&D_8011AAD8 = D_800C201C->settings;

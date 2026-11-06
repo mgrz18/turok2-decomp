@@ -54,6 +54,6 @@ s32 MpMenu_StartBloodLust(void) {
     } else {
         arg = Random_Next() % 13 + 0x2329;
     }
-    func_00430454(&D_800F6CB0, arg);
+    func_00430454(&gEngineApp, arg);
     return 1;
 }

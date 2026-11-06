@@ -5,7 +5,7 @@
 
 #include "common.h"
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 extern s32 CScene__LoadGraphicSet(void *set, s32 a, s32 b, s32 c);  /* Render_StartWorldEffect */
 extern void CCache__Unlock(s32 arg0, s32 sprites);         /* release the sprite set */
@@ -25,7 +25,7 @@ void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 size, f32 arg4, s32 arg5, s32 r
     f32 width;
     f32 scale;
 
-    sprites = CScene__LoadGraphicSet(D_800F7078, 4, 0x10, 1);
+    sprites = CScene__LoadGraphicSet(gScene, 4, 0x10, 1);
     if (sprites == 0) {
         return;
     }

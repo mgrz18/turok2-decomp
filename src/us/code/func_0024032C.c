@@ -26,8 +26,8 @@ typedef struct InstanceHit {
     /* 0x04 */ f32 t;
 } InstanceHit;
 
-extern CWorld D_800F7078;
-extern CCollisionResults *D_800F1ADC;
+extern CWorld gScene;
+extern CCollisionResults *gCollisionResultsP;
 extern u8 D_8011AAF1;
 
 s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
@@ -74,14 +74,14 @@ void Collision_SweepActors(Sweep *sweep) {
     box.m_vMax.z = MAX(sweep->end.z, start->z);
     hit = hits;
     nHits = 0;
-    world = &D_800F7078;
+    world = &gScene;
     count = world->m_nMovers;
     for (i = 0; i < count && nHits < 0x80; i++) {
         other = (HitInst *)world->m_pMovers[i];
         if (inst == other) {
             continue;
         }
-        if (def->m_InstanceBehavior == 7 && (HitInst *)D_800F1ADC->m_pInstance == other) {
+        if (def->m_InstanceBehavior == 7 && (HitInst *)gCollisionResultsP->m_pInstance == other) {
             continue;
         }
         if ((def->m_dwFlags & 0x20000000) && other->typeId == 0x64F) {

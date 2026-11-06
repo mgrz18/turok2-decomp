@@ -5,7 +5,7 @@
 /* Weapon state: winding a spun-up weapon (barrel spin) while fire is held, else stopping it. */
 
 
-extern f32 D_800B6D28; /* frame time scale */
+extern f32 gFrameIncrement; /* frame time scale */
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);
@@ -38,7 +38,7 @@ void WeaponMode_SpinFire_Update(void *obj, CAI *state) {
     if (player->m_pLoopingSound_WeaponFiring == 0) {
         CPlayer__StartWeaponFiringSound(player, 0x1A7);
     }
-    state->m_ConditionTimer -= D_800B6D28;
+    state->m_ConditionTimer -= gFrameIncrement;
     if (state->m_ConditionTimer <= 0.0f) {
         state->m_ConditionTimer += 1.875f;
         CPlayer__FireWeapon(*(void **)((u8 *)obj + 0x1A8), 0x1A);

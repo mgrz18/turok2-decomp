@@ -14,7 +14,7 @@ typedef struct Pickup {
     /* 0x19C */ f32 timer;
 } Pickup;
 
-extern f32 D_800B6D28;              /* frame time scale */
+extern f32 gFrameIncrement;              /* frame time scale */
 extern u8 D_800F1360[];
 extern u8 D_800F1EF0[];
 
@@ -27,7 +27,7 @@ void CPooledLevelActor__Update(Pickup *obj) {
     CVector3 prev;
 
     if (obj->timer > 0.0f) {
-        obj->timer -= D_800B6D28;
+        obj->timer -= gFrameIncrement;
         prev = obj->pos;
     }
     CLevelActor__Update(obj);

@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 s32 CAI__SetMode(s32, s32, s32);
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 void Platform_BackUpdate(CGameObjectInstance *arg0, CAI *arg1) {
     s32 temp_a3;
@@ -19,7 +19,7 @@ void Platform_BackUpdate(CGameObjectInstance *arg0, CAI *arg1) {
         var_v1 = 0;
     }
     if (var_v1 != 0) {
-        arg1->m_ConditionTimer = arg1->m_ConditionTimer - (D_800B6D28 / temp_t0->m_MoveTime);
+        arg1->m_ConditionTimer = arg1->m_ConditionTimer - (gFrameIncrement / temp_t0->m_MoveTime);
     }
     if (arg1->m_ConditionTimer <= 0.0f) {
         CAI__SetMode((s32) arg0, (s32) arg1, 0);

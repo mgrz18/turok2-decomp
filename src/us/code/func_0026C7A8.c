@@ -9,12 +9,12 @@ typedef struct {
 
 ModelRecord *CScene__GetRegionInfo(s32 *, u16 *);              /* extern */
 s32 CGameRegion__FloodSetFlag4000Same(u16 *, u16);                  /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void func_0026C7A8(u16 *arg0) {
     ModelRecord *temp_v0;
 
-    temp_v0 = CScene__GetRegionInfo(&D_800F7078, arg0);
+    temp_v0 = CScene__GetRegionInfo(&gScene, arg0);
     if (temp_v0 != NULL) {
         temp_v0->flags |= 0x4000;
     }

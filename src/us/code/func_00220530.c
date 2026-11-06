@@ -7,7 +7,7 @@
 extern s32 D_800ACAD8;      /* buttons this frame */
 extern s32 D_800ACADC;      /* buttons changed */
 extern s32 D_800ACDE0;
-extern f32 D_800B6D28;      /* frame time scale */
+extern f32 gFrameIncrement;      /* frame time scale */
 extern f32 D_800DD78C;
 extern u8 D_801102B8[];
 extern u8 D_801198B0[];
@@ -75,7 +75,7 @@ void CScene__Update(CWorld *world) {
         CScene__AdvanceInstances(world);
         CScene__AdvanceListedInstances(world);
         CLevelActorPool__Update(world->m_ActorPool);
-        world->m_SkyAngle += D_800B6D28 * 0.087266475f;
+        world->m_SkyAngle += gFrameIncrement * 0.087266475f;
         s = func_002982F0(world->m_SkyAngle * 0.5f);
         D_800DD78C = s;
         world->m_qSky.x = 0;

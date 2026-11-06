@@ -18,7 +18,7 @@
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
 extern BlindOneState D_80130200;
-extern f32 D_800B6D28; /* frame time */
+extern f32 gFrameIncrement; /* frame time */
 extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
 void BlindOne_UpdateMover(BlindOneMover *mover) {
@@ -30,7 +30,7 @@ void BlindOne_UpdateMover(BlindOneMover *mover) {
     s32 n;
 
     if (mover->seq != NULL) {
-        mover->timer -= D_800B6D28;
+        mover->timer -= gFrameIncrement;
         state = &D_80130200;
         if (mover->timer <= 0.0f) {
             mover->timer += mover->interval;
@@ -131,7 +131,7 @@ s32 BlindOne_GetHealthPercent(BlindOneState *state) {
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
 extern BlindOnePhase D_0043240C[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_801100F0[];
 extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void ScriptAnimator_Start(void *slot, s32 arg1);
@@ -168,9 +168,9 @@ void BlindOne_Setup(BlindOneState *state) {
     CGameObjectInstance *actor;
     s32 i;
 
-    state->count1 = CScene__FindInstances(D_800F7078, 0x454, 1, -1, state->actors1, 4);
-    state->count2 = CScene__FindInstances(D_800F7078, 0x455, 1, -1, state->actors2, 4);
-    state->count3 = CScene__FindInstances(D_800F7078, 0x456, 1, -1, state->actors3, 3);
+    state->count1 = CScene__FindInstances(gScene, 0x454, 1, -1, state->actors1, 4);
+    state->count2 = CScene__FindInstances(gScene, 0x455, 1, -1, state->actors2, 4);
+    state->count3 = CScene__FindInstances(gScene, 0x456, 1, -1, state->actors3, 3);
     obj = state->boss;
     state->faderCount = 0;
     obj->m_AI.m_Health = obj->m_AI.m_InitialHealth = 0x3200;
@@ -199,8 +199,8 @@ void BlindOne_Setup(BlindOneState *state) {
     for (i = 0; i < state->faderCount; i++) {
         ScriptAnimator_Start(&state->faders[i], 0);
     }
-    state->minionDefA = CScene__FindIntelligence(D_800F7078, 1, 0x1CE9);
-    state->minionDefB = CScene__FindIntelligence(D_800F7078, 1, 0x1CEA);
+    state->minionDefA = CScene__FindIntelligence(gScene, 1, 0x1CE9);
+    state->minionDefB = CScene__FindIntelligence(gScene, 1, 0x1CEA);
     state->toSpawn = 0;
     state->minionsAlive = 0;
     state->maxMinions = 0;
@@ -208,7 +208,7 @@ void BlindOne_Setup(BlindOneState *state) {
     state->alive2 = 0;
     state->alive3 = 0;
     COnScreen__SetBoss(D_801100F0, state->boss, "Blind");
-    CScene__UnmarkGeneratorsSaved(D_800F7078);
+    CScene__UnmarkGeneratorsSaved(gScene);
     nextPhase_40CCC0(state);
 }
 

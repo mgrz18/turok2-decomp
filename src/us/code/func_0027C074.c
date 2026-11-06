@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern f32 D_800B6D28;          /* the frame's time step */
+extern f32 gFrameIncrement;          /* the frame's time step */
 
 /* Runs the screen flash (CCamera__StartFlash starts it): rises over m_AttackTime
  * frames to m_MaxOpacity, holds for m_SustainTime, fades over m_DecayTime,
@@ -35,5 +35,5 @@ void CCamera__UpdateFlash(CCamera *cam) {
             cam->m_FlashColor[3] = (u32) (cam->m_MaxOpacity - cam->m_FlashTimer / (cam->m_DecayTime + 1) * cam->m_MaxOpacity);
             break;
     }
-    cam->m_FlashTimer += D_800B6D28;
+    cam->m_FlashTimer += gFrameIncrement;
 }

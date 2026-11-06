@@ -24,7 +24,7 @@ typedef struct WTab {
                 WRec r[1];
 } WTab;
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
-extern CWorld D_800F7078;
+extern CWorld gScene;
 void *CISet__GetBlock();
 s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
 {
@@ -47,7 +47,7 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
   s32 off;
   CWorldSector *e;
   CWorld *g;
-  g = &D_800F7078;
+  g = &gScene;
   n = 0;
   ncell = 0;
   i = 0;

@@ -4,7 +4,7 @@
 s32 CScene__SetInstanceSavedBit(s32, s32, s32);
 
 s32 GameObject_FireTriggers(void *, s32, void *);     /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void EnemyMode_Death_Enter(CGameObjectInstance *arg0, CAI *arg1) {
     s32 temp_a0;
@@ -20,7 +20,7 @@ void EnemyMode_Death_Enter(CGameObjectInstance *arg0, CAI *arg1) {
     sub = &arg0->header.m_pIntelligence->m_Enemy;
     if (!(arg0->m_dwFlags & 0x80000)) {
         if (!(sub->m_dwFlags & 0x20)) {
-            CScene__SetInstanceSavedBit((s32) &D_800F7078, (s32) arg0, 1);
+            CScene__SetInstanceSavedBit((s32) &gScene, (s32) arg0, 1);
         }
         GameObject_FireTriggers(arg0, 1, arg0);
     }

@@ -28,7 +28,7 @@ typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
 extern char D_800A57B8[];
 extern s32 D_800ACAE0;
 extern CVector3 D_800DD790[];
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern s32 D_8011AAD8;
 
 void *CISet__GetBlock(void *file, s32 index);
@@ -169,7 +169,7 @@ s32 **Lighting_BuildLitVertices(s32 model, s32 *regions, Box3 *box, s32 arg3, s3
         goto lit;
     }
     n = 0;
-    g = &D_800F7078;
+    g = &gScene;
     for (k = 0; k < g->m_nSectors; k++) {
         n += ((s32 *) CISet__GetBlock(*g->m_Sectors[k].m_hData, 2))[1];
     }

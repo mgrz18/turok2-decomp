@@ -2,7 +2,7 @@
 #include "structs/demo.h"
 
 extern s32 D_800B6D20;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern s32 D_800F5D2C;
 
 void func_00430330(void *);
@@ -25,13 +25,13 @@ void Demo_Update(void) {
     DemoPlayer *s = &D_800F56B0;
 
     s->fastForward = 0;
-    s->time += D_800B6D28;
+    s->time += gFrameIncrement;
     if (s->done == 0) {
         if (--s->countdown <= 0 || D_800F5D2C != 0) {
             s->done = 1;
-            func_00430330(&D_800F6CB0);
+            func_00430330(&gEngineApp);
             if (D_800F5D2C != 0) {
-                CEngineApp__SetupFadeTo(&D_800F6CB0, 8);
+                CEngineApp__SetupFadeTo(&gEngineApp, 8);
             }
         }
     }

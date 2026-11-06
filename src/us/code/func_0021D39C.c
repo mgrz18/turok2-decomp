@@ -42,7 +42,7 @@ struct Actor {
 extern char D_800A5AC4[];   /* "anim object info" */
 extern s32 D_8011ACA4;
 extern s32 D_800B6D1C;      /* current view */
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32);
 s32 CISet__GetBlock(void *, s32);
@@ -134,7 +134,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
                     pos = actor->pos;
                     pos.y += actor->height;
                     pos.y += GameObject_GetCollisionHeight(actor) * 0.5f;
-                    CScene__GetLightsAt(D_800F7078, &pos, actor->lights[D_800B6D1C]);
+                    CScene__GetLightsAt(gScene, &pos, actor->lights[D_800B6D1C]);
                 }
                 actor->flags |= 0x200;
             }

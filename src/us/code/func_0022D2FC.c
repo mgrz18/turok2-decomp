@@ -391,7 +391,7 @@ typedef struct {
 
 extern u8 D_800F7148[];
 extern CCollisionInfo D_800F1B40;
-extern CCollisionResults D_800F1CE0;
+extern CCollisionResults gCollisionResults;
 extern f32 D_800DD78C;
 extern Gfx *D_800D8E24;
 
@@ -443,16 +443,16 @@ void CParticle__DrawShadow(ShadowActor *actor) {
         probe.m_vVelocity.y = 0;
         probe.m_vVelocity.z = 0;
         Collision_MoveInstance(&probe, pos, &D_800F1B40);
-        if (D_800F1CE0.m_pInstance == NULL) {
+        if (gCollisionResults.m_pInstance == NULL) {
             return;
         }
-        CQuaternion__FromDirection(&tilt, &D_800F1CE0.m_vNormal);
+        CQuaternion__FromDirection(&tilt, &gCollisionResults.m_vNormal);
         spin.x = D_800DD78C = func_002982F0(0.785398245f);
         spin.y = 0.0f;
         spin.z = 0.0f;
         spin.w = func_002974C0(0.785398245f);
         CQuaternion__Multiply(&rot, &spin, &tilt);
-        ground = D_800F1CE0.m_vInstancePos.y;
+        ground = gCollisionResults.m_vInstancePos.y;
     }
     height = actor->pos.y - ground;
     a = 200.0f - height * 0.30517578f;
@@ -580,7 +580,7 @@ typedef struct {
 
 extern Gfx *D_800D8E24;             /* display list head */
 extern u32 D_800C2214;              /* command buffer length, in commands */
-extern f32 D_800B6D28;              /* frame time */
+extern f32 gFrameIncrement;              /* frame time */
 extern s32 D_800B6D1C;              /* matrix buffer index */
 extern s32 D_801198E0;
 extern void *D_801198D0; /* the current view */
@@ -667,7 +667,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     u8 *envFrom;
     u8 *primFrom;
 
-    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->m_pDisplayList) / sizeof(Gfx) < 3000) {
+    if (D_800C2214 - ((u32)D_800D8E24 - (u32)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     if (particle->time < 0.0f) {
@@ -684,10 +684,10 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         }
         hit = Particle_Occluded(particle, view);
         if (!hit) {
-            fade = particle->opacity + D_800B6D28 * 128.0f;
+            fade = particle->opacity + gFrameIncrement * 128.0f;
             alpha = (fade > 255.0f) ? 255 : (s32)fade;
         } else {
-            fade = particle->opacity - D_800B6D28 * 128.0f;
+            fade = particle->opacity - gFrameIncrement * 128.0f;
             alpha = (fade < 0.0f) ? 0 : (s32)fade;
         }
         particle->opacity = alpha;
@@ -1157,12 +1157,12 @@ typedef struct {
 extern s32 D_8011ACA4;              /* frozen; the current player list is 0x1414 bytes before */
 extern u8 D_8011AAF1;
 extern u8 D_8011AAEF;
-extern CCollisionResults *D_800F1ADC;
-extern CCollisionResults D_800F1CE0;
+extern CCollisionResults *gCollisionResultsP;
+extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
 extern s32 D_801198E0;
 extern s32 D_800B6D1C;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_801102B8[];
 extern u8 D_8010FF34[];
 extern f32 D_800ACE10[2];
@@ -1261,20 +1261,20 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     s32 targetTeam;
     CCollisionResults *scene;
 
-    if (D_800F1CE0.m_nInstanceNode != -1) {
+    if (gCollisionResults.m_nInstanceNode != -1) {
         effect->mode = -4;
-        targetActor = (Actor *)D_800F1CE0.m_pInstance;
-        targetTeam = D_800F1CE0.m_Frame.action;
-        CMtxF__FromMtxAffine(&targetMtx, &targetActor->bones[D_800F1CE0.m_nInstanceNode]);
+        targetActor = (Actor *)gCollisionResults.m_pInstance;
+        targetTeam = gCollisionResults.m_Frame.action;
+        CMtxF__FromMtxAffine(&targetMtx, &targetActor->bones[gCollisionResults.m_nInstanceNode]);
         CMtxF__InvertAffine(&targetInv, &targetMtx);
-        scene = &D_800F1CE0;
+        scene = &gCollisionResults;
         CMtxF__TransformPoint(&targetInv, &scene->m_vInstancePos, &effect->attachPos);
-        up = D_800F1CE0.m_vVelocity;
+        up = gCollisionResults.m_vVelocity;
         CVector3__Normalize(&up);
         CMtxF__RotateVector(&targetInv, &up, vel);
         effect->target = (s32) targetActor;
         effect->flags |= 0x10000;
-        effect->shake = D_800F1CE0.m_nInstanceNode;
+        effect->shake = gCollisionResults.m_nInstanceNode;
         if (targetActor->def->m_Type == 1) {
             if (effect->owner != 0) {
                 AI_HearNoise(targetActor, &targetActor->ai, &effect->owner->pos, 3);
@@ -1343,12 +1343,12 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     }
     count = 0;
     resource = sys->resource;
-    D_800F1ADC = &target;
+    gCollisionResultsP = &target;
     block = CISet__GetBlock(resource, 1);
     numEntries = block->count;
     templates = block->entries;
     if (kind == 0xFC) {
-        CScene__Blast(D_800F7078, &pos);
+        CScene__Blast(gScene, &pos);
     }
     if (BinaryRange(templates, numEntries, kind, &first, &last) != 0) {
         entries = ((EntryBlock *) CISet__GetBlock(resource, 2))->entries;
@@ -1453,7 +1453,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 continue;
             }
             if (entry->params->event != 0) {
-                func_00225C08(D_800F7078, entry->params->event, &pos);
+                func_00225C08(gScene, entry->params->event, &pos);
             }
             extra = 0;
             if (entry->flags & 0x8000) {
@@ -1578,7 +1578,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     dirOut = dir;
                 }
                 if (mode == -8) {
-                    effect->direction = D_800F1CE0.m_vNormal;
+                    effect->direction = gCollisionResults.m_vNormal;
                     CVector3__Normalize(&effect->direction);
                 } else {
                     effect->direction = dirOut;
@@ -1702,7 +1702,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 vel = &effect->velocity;
                 CVector3__Scale(vel, vel, D_800ACE10[0]);
                 if ((kind == 0x2D || kind == 0x4F) && source->type == 2) {
-                    if (D_800F1CE0.m_pInstance != 0) {
+                    if (gCollisionResults.m_pInstance != 0) {
                         aimEffect(effect, vel);
                     }
                 }
@@ -1731,6 +1731,6 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
             }
         }
     }
-    D_800F1ADC = &D_800F1CE0;
+    gCollisionResultsP = &gCollisionResults;
     return count;
 }

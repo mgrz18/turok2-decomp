@@ -4,10 +4,10 @@
 #include "structs/player.h"
 
 
-/* D_800F1CE0 is the collision results (CCollisionResults, structs/collision.h);
+/* gCollisionResults is the collision results (CCollisionResults, structs/collision.h);
  * this reads its first word, m_pInstance (what the last test hit), as a
- * pointer variable: D_800F1CE0.m_pInstance does not give this code. */
-extern CGameObjectInstance *D_800F1CE0;
+ * pointer variable: gCollisionResults.m_pInstance does not give this code. */
+extern CGameObjectInstance *gCollisionResults;
 
 void CPlayer__Respawn(CPlayer *p);
 
@@ -24,12 +24,12 @@ s32 CPlayer__CheckTagHit(CPlayer *p) {
     s32 kind;
     s32 mode;
 
-    if (D_800F1CE0 != NULL) {
-        slot = &D_800F1CE0; /* read through the slot: the ROM copies the pointer */
+    if (gCollisionResults != NULL) {
+        slot = &gCollisionResults; /* read through the slot: the ROM copies the pointer */
         a = *slot;
         kind = a->header.m_Type;
-        if (kind == 1 && D_80119870.m_Settings.multiplayer && D_800F1CE0->m_nTypeFlag == 0x64E
-            && D_800F1CE0->m_AI.m_ModeBefore != D_800F1CE0->m_AI.m_Mode) {
+        if (kind == 1 && D_80119870.m_Settings.multiplayer && gCollisionResults->m_nTypeFlag == 0x64E
+            && gCollisionResults->m_AI.m_ModeBefore != gCollisionResults->m_AI.m_Mode) {
             opts = p->m_pOptions;
             mode = opts->m_TagMode;
             if (mode == kind) {

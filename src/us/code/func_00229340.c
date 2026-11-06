@@ -12,8 +12,8 @@ extern void GameObject_TraceMove(CParticle *p, CVector3 to, CVector3 *outPos, vo
 extern void CParticleSystem__Spawn(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 model, CVector3 dir,
                           CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
 extern CVector3 D_800F1DB8;
-extern CCollisionResults *D_800F1ADC;
-extern CCollisionResults D_800F1CE0;
+extern CCollisionResults *gCollisionResultsP;
+extern CCollisionResults gCollisionResults;
 extern u8 D_800F8928[];
 
 static __inline__ f32 offset_x(CParticle *p) {
@@ -65,14 +65,14 @@ void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 flags) {
             carried = turned;
         }
         CVector3__Add(&moved, &carried, &p->header.m_vPos);
-        D_800F1ADC = &scratch;
+        gCollisionResultsP = &scratch;
         if (p->header.m_pCurrentRegion != NULL) {
             GameObject_TraceMove(p, moved, &point, &region, 0, 0);
         } else {
             point = moved;
             region = NULL;
         }
-        D_800F1ADC = &D_800F1CE0;
+        gCollisionResultsP = &gCollisionResults;
     }
     CParticleSystem__Spawn(D_800F8928, p, p->m_pOwner, p->m_pOwnerCount, p->m_pTarget, model, direction, rotation, point, region,
                   arg2, flags | (p->m_dwFlags & 0x200006));

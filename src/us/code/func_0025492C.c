@@ -23,7 +23,7 @@ typedef struct {
 typedef struct PlayerList PlayerList;
 
 extern Globals D_80119E2C;
-extern f32 D_800B6D28;          /* frame time scale */
+extern f32 gFrameIncrement;          /* frame time scale */
 
 extern s32 MenuPool_CountOpen(void *menuPool);
 extern s32 CPlayerPool__CountIdleMenus(PlayerList *list);
@@ -41,7 +41,7 @@ void CPlayerPool__UpdateMatchClock(PlayerList *list) {
     }
     if (!MenuPool_CountOpen(&D_80119E2C) && match->timeLeft > 0.0f && !D_80119E2C.paused) {
         if (CPlayerPool__CountIdleMenus(list)) {
-            match->timeLeft -= D_800B6D28;
+            match->timeLeft -= gFrameIncrement;
         }
         if (match->timeLeft <= 0.0f && !match->over) {
             match->timeLeft = 0.0f;

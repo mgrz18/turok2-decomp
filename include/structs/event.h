@@ -3,7 +3,7 @@
 
 /* A level event record: what LevelEvent_Fire fires. It shows a message (an
  * index into the {text, sound} table D_800B69D8), starts a music track,
- * and calls the handler of its kind (D_800B2628[kind][handler]) on one of
+ * and calls the handler of its kind (gLevelEventHandlers[kind][handler]) on one of
  * the level actors (actor, in level). Fired late, it waits in the world's
  * voice queue first (CScene__QueueDelayedEvent), for its delay. */
 typedef struct LevelEvent {

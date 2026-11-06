@@ -10,7 +10,7 @@ typedef struct {
     /* 0x60 */ f32 speed;
 } Motion;
 
-extern f32 D_800B6D28; /* frame delta */
+extern f32 gFrameIncrement; /* frame delta */
 
 extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern f32 Random_Blend(f32 lo, f32 hi);
@@ -30,7 +30,7 @@ void EnemyAI_IdleSoundCallback(CGameObjectInstance *actor, CAI *ai, Motion *moti
         }
         return;
     }
-    ai->m_Enemy.m_IdleTimer -= D_800B6D28;
+    ai->m_Enemy.m_IdleTimer -= gFrameIncrement;
     if (ai->m_Enemy.m_IdleTimer < 0.0f) {
         ai->m_Enemy.m_IdleTimer = 0.0f;
     }

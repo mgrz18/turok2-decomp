@@ -86,7 +86,7 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld D_800F7078;
+extern CWorld gScene;
 struct ObjectLinks150C;
 typedef struct ObjectLinks150C ObjectLinks150C;
 struct IntegerState1504;
@@ -120,7 +120,7 @@ void *CISet__GetBlock(void *table, s32 index);
 s32 func_00214108(void) {
     s32 total = 0;
     s32 i;
-    char *base = (char *)&D_800F7078;
+    char *base = (char *)&gScene;
     for (i = 0; i < ((IntegerState1504 *)(base))->unk_14A8; i++) {
         total += ((struct Shape_typemap_13 *)CISet__GetBlock(*((struct ObjectLinks150C *) (base + (i * 8)))->unk_14AC, 2))->field_4;
     }

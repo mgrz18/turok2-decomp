@@ -60,7 +60,7 @@ typedef struct TrailMgr {
 } TrailMgr;
 
 extern s32 D_800ACFB0[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 void CMtxF__Identity(void *m);
 void func_0026D230(void *p);
@@ -108,7 +108,7 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
         if (s == NULL) {
             return;
         }
-        t = CScene__GetSwoosh(D_800F7078, type);
+        t = CScene__GetSwoosh(gScene, type);
         tex0 = D_800ACFB0[t->tex0];
         tex1 = D_800ACFB0[t->tex1];
         func_0026D230(s->nodes);

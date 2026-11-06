@@ -22,16 +22,16 @@ struct B18Ent {
     u8 pad528[0xDF8];
     B18Ent *next;       /* 0x1320 (0x16E0) */
 };
-extern CWorld D_800F7078[];
+extern CWorld gScene[];
 extern B18Ent *D_80119890;
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CParticle__CheckProximity(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     CVector3 d;
     s32 i;
     s32 cnt;
-    cnt = D_800F7078->m_nKind1;
+    cnt = gScene->m_nKind1;
     for (i = 0; i < cnt; i++) {
-        B18Ent *e = (B18Ent *)D_800F7078->m_pKind1[i];
+        B18Ent *e = (B18Ent *)gScene->m_pKind1[i];
         if (e->health > 0) {
             CVector3__Subtract(&d, &e->pos, &o->pos);
             if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {

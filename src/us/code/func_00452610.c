@@ -41,6 +41,6 @@ void TitleMenu_Single_2(void *arg0, struct ObjRecAt20V2 *menu) {
         profile++;
     }
     Music_RestoreVolume();
-    func_00430374(&D_800F6CB0, -1);
+    func_00430374(&gEngineApp, -1);
     D_801308F8 = 1;
 }

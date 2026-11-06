@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 
-extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults *gCollisionResultsP;
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);           /* out = a - b */
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);           /* out = a + b */
@@ -61,7 +61,7 @@ s32 Sweep_HitPlane(Sweep *sweep, CVector3 *normal, CVector3 *point, s32 frontOnl
     if (t < -0.2f) {
         t = -0.2f;
     }
-    D_800F1ADC->m_vNormal = *normal;
+    gCollisionResultsP->m_vNormal = *normal;
     sweep->hit.fraction = t;
     CVector3__Lerp(&sweep->hit.pos, t, &sweep->inst->m_vPos, &sweep->end);
     if (kind == 6) {

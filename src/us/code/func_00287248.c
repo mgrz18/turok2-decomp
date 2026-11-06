@@ -8,10 +8,10 @@ extern s32 D_800C2034;          /* screen height */
 extern s32 D_800C2040;          /* frames left to clear the screen */
 extern s32 D_80130A78;          /* z-buffer */
 extern s32 D_800B6D1C;
-extern f32 D_800B6D28;          /* frame time */
+extern f32 gFrameIncrement;          /* frame time */
 extern f32 D_800B6D48;          /* render time, seconds */
 extern void (*D_800B6D80[][3])(CEngineApp *);
-extern s32 D_8011AD10;
+extern s32 gNextTicks;
 extern u8 D_8011AD28[];       /* the RSP task queue */
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 
@@ -73,7 +73,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
     {
         Gfx *g = D_800D8E24++;
         g->w0 = colorImage;     /* gDPSetColorImage(RGBA, 16b, width, frame) */
-        g->w1 = D_800F6CB0.m_pCurrentFrameData->m_pFrameBuffer;
+        g->w1 = gEngineApp.m_pCurrentFrameData->m_pFrameBuffer;
     }
     {
         Gfx *g = D_800D8E24++;
@@ -120,7 +120,7 @@ void CEngineApp__Draw(CEngineApp *level) {
     f32 outSpeed;
 
     start = osGetTime();
-    CCache__BeginDisplayList(0, D_800B6D1C, D_8011F140 = D_800F6CB0.m_pCurrentFrameData);
+    CCache__BeginDisplayList(0, D_800B6D1C, D_8011F140 = gEngineApp.m_pCurrentFrameData);
     Texture_InvalidateCache();
     func_0020B554();
     CEngineApp__BeginDisplayList(level);
@@ -193,7 +193,7 @@ void CEngineApp__Draw(CEngineApp *level) {
         D_8011F140->m_bLines = 0;
     }
     if (D_8011F140->m_bLines != 0) {
-        D_800D8E24 = D_800F6CB0.m_pCurrentFrameData->m_pLineList;
+        D_800D8E24 = gEngineApp.m_pCurrentFrameData->m_pLineList;
         Automap_Draw(&level->m_Game.m_DebugLines);
         drawFade(level);
         {
@@ -208,7 +208,7 @@ void CEngineApp__Draw(CEngineApp *level) {
         }
         D_8011F140->m_LineListSize = (u32)D_800D8E24 - (u32)D_8011F140->m_pLineList;
     }
-    D_8011F140->m_nPredictTicks = D_8011AD10;
+    D_8011F140->m_nPredictTicks = gNextTicks;
     D_800B6D48 = (f32)(((osGetTime() - start) * 64) / 3) * 0.000001f;   /* OS_CYCLES_TO_USEC */
     if (CCache__EndDisplayList(0) != 0) {
         CEngineApp__SubmitGfxTask(level, D_8011F140);
@@ -227,7 +227,7 @@ void CEngineApp__Draw(CEngineApp *level) {
         switch (level->m_Settings.fadeMode) {
         case 2:
             if (level->m_Settings.fade > 0.0f) {
-                level->m_Settings.fade -= outSpeed * D_800B6D28;
+                level->m_Settings.fade -= outSpeed * gFrameIncrement;
                 if (level->m_Settings.fade < 0.0f) {
                     level->m_Settings.fade = 0.0f;
                 }
@@ -243,7 +243,7 @@ void CEngineApp__Draw(CEngineApp *level) {
             }
             break;
         case 1:
-            level->m_Settings.fade += inSpeed * ((D_800B6D28 < 0.5f) ? 0.5f : D_800B6D28);
+            level->m_Settings.fade += inSpeed * ((gFrameIncrement < 0.5f) ? 0.5f : gFrameIncrement);
             if (level->m_Settings.fade >= 1.0f) {
                 level->m_Settings.fadeMode = 0;
                 level->m_Settings.fade = 1.0f;

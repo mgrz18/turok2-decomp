@@ -4,7 +4,7 @@
 /* One frame in flight (Turok 3's CFrameData, references/turok3/include/
  * tengine.h; 8 bytes longer here: the word at 0x128). The engine keeps three
  * in a ring through m_pPrev / m_pNext (CEngineApp.m_FrameData, structs/
- * game.h; set up by CEngineApp__Construct). D_800F7070 (CEngineApp.m_pCurrentFrameData)
+ * game.h; set up by CEngineApp__Construct). gEngineApp_m_pCurrentFrameData (CEngineApp.m_pCurrentFrameData)
  * is the frame being built; CEngineApp__Update copies it to D_8011F140, the frame
  * CEngineApp__Draw finishes and sends (m_Msg) to the RSP task queue D_8011AD28.
  * The display list starts at m_pDisplayList and the engine writes it through
@@ -33,18 +33,18 @@ typedef struct CFrameData {
     /* 0x118 */ void *m_pLineList;       /* Gfx *: the line / overlay list */
     /* 0x11C */ s32 m_DisplayListSize;   /* in bytes */
     /* 0x120 */ s32 m_LineListSize;
-    /* 0x124 */ s32 m_nPredictTicks;     /* the retraces the frame took (D_8011AD10) */
+    /* 0x124 */ s32 m_nPredictTicks;     /* the retraces the frame took (gNextTicks) */
     /* 0x128 */ s32 m_bLines;            /* the line list has lines (Automap_IsShown) */
     /* 0x12C */ struct CFrameData *m_pPrev;
     /* 0x130 */ struct CFrameData *m_pNext;
     /* 0x134 */ u8 unk134[0x140 - 0x134];
 } CFrameData; /* size 0x140 */
 
-/* Read as a plain pointer, D_800F7070 makes some files schedule their code
+/* Read as a plain pointer, gEngineApp_m_pCurrentFrameData makes some files schedule their code
  * differently from the ROM: CCamera__Advance, Render_DrawTextLines, CEngineApp__Draw and
- * CEngineApp__ClearDepthRect read it as D_800F6CB0.m_pCurrentFrameData (structs/game.h,
+ * CEngineApp__ClearDepthRect read it as gEngineApp.m_pCurrentFrameData (structs/game.h,
  * the same address), Automap_Draw keeps a local array declaration. */
-extern CFrameData *D_800F7070;    /* the frame being built */
+extern CFrameData *gEngineApp_m_pCurrentFrameData;    /* the frame being built */
 extern CFrameData *D_8011F140;    /* the frame being finished */
 
 /* A screen mode, as Video_SetMode / func_0042456C start it: D_800C2054 holds

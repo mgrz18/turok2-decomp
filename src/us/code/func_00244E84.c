@@ -3,7 +3,7 @@
 #include "structs/collision.h"
 
 
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 
 f32 func_00298470(f32);         /* sqrtf */
 f32 func_002982F0(f32);         /* sinf */
@@ -58,7 +58,7 @@ f32 AI_FindClearHeading(CGameObjectInstance *self, CVector3 pos, CGameObjectInst
 
     angle = angleTo(self, pos);
     if ((self->m_dwFlags & 0x200) && GameObject_TestMove(self, pos, &out)) {
-        if (target != NULL && D_800F1CE0.m_pInstance == target) {
+        if (target != NULL && gCollisionResults.m_pInstance == target) {
             return angle;
         }
         probe.y = self->header.m_vPos.y;

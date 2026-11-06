@@ -11,7 +11,7 @@ struct ObjRecAt18V2 {
     s32 * unk18; /* at 0x14 in Turok 2 */
 };
 extern char D_800AE994[];
-extern void *D_800ACB60[];
+extern void *gIntelligenceTypeInfo[];
 void *CGameObjectInstance__GetBodySetup(char *arg0)
 {
     s32 type;
@@ -44,5 +44,5 @@ void *CGameObjectInstance__GetBodySetup(char *arg0)
             } while (i < limit);
         }
     }
-    return D_800ACB60[type];
+    return gIntelligenceTypeInfo[type];
 }

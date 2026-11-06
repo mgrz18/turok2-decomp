@@ -2,7 +2,7 @@
 #include "structs/region.h"
 
 extern u8 D_800C894C; /* bottom of the stack */
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern CVector3 D_8011AAB4;
 s32 CScene__GetRegionIndex(void *world, CGameRegion *region);
 void CScene__SetLevelBit(void *world, s32 index, s32 a2);
@@ -16,7 +16,7 @@ void Automap_RevealRegion(CGameRegion *region) {
         return;
     }
     if (!(region->m_wFlags & 0x400)) {
-        CScene__SetLevelBit(D_800F7078, CScene__GetRegionIndex(D_800F7078, region), 1);
+        CScene__SetLevelBit(gScene, CScene__GetRegionIndex(gScene, region), 1);
     }
     region->m_wFlags |= 0x8400;
     if (!(NEAR(region->m_pVertices[0]) || NEAR(region->m_pVertices[1]) || NEAR(region->m_pVertices[2]))) {

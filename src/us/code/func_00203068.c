@@ -10,7 +10,7 @@ extern CMemEntry *D_800D81D8;
 extern CMemEntry **D_800D81D4;
 extern s32 D_800D8DAC;
 extern s32 D_800D8DF0;
-extern char D_800D1CC0;
+extern char gHeap;
 extern char D_800D81E0;
 extern char D_800D81F4;
 extern void CCache__DetachCacheEntry(void *, CMemEntry *);
@@ -47,7 +47,7 @@ s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent) {
     }
     if (node != 0) {
         CCache__DetachCacheEntry(0, node);
-        result = CHeap__Free(&D_800D1CC0, node->data);
+        result = CHeap__Free(&gHeap, node->data);
         CList__Remove(&D_800D81E0, node);
         if (node->flags & 0x1000) {
             CList__Remove(&D_800D81F4, node);

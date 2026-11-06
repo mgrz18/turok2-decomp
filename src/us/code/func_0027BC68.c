@@ -6,7 +6,7 @@
 /* The ROM reaches these two through their own symbols, not D_800F56B0. */
 extern s32 D_800F56BC;                              /* D_800F56B0.fastForward */
 extern void (*D_800F5858)(DemoStream *);         /* D_800F56B0.match.decode */
-extern s32 D_8011AD10;
+extern s32 gNextTicks;
 
 void CCache__SetFrameDelay(s32);
 
@@ -34,6 +34,6 @@ void Demo_AdvanceMatchStream(void) {
         } else if (--timer->frames <= 0) {
             timer->decode(timer);
         }
-        D_8011AD10 = state->match.value;
+        gNextTicks = state->match.value;
     }
 }

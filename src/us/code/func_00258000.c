@@ -13,7 +13,7 @@ typedef struct {
 
 extern PoseInfo D_800ADF68[];
 extern u32 D_800B6D20;
-extern s32 D_800F7078;
+extern s32 gScene;
 extern u8 D_801198B0[];
 extern struct {
     s32 enabled;
@@ -29,7 +29,7 @@ extern void CCameraPool__AddText(void *buf, s32 camera, s32 model);
 static __inline__ void switchWeapon(CGameObjectInstance *obj, CAI *ai) {
     CPlayer *player = (CPlayer *) obj->m_AI.m_pParent;
 
-    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || D_800F7078 != 4) {
+    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || gScene != 4) {
         player->m_Data.m_CurrentWeapon = player->m_RequestedWeapon;
         ai->m_pModeTable = D_800AF618[player->m_Data.m_CurrentWeapon]->modeTable;
         ai->m_pfEffects = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;

@@ -3,10 +3,10 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 
-/* When the instance the last collision test hit (D_800F1CE0) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
+/* When the instance the last collision test hit (gCollisionResults) is one of the AI's two targets during anim state 0xE/0xF, knocks it back
  * away from the point (0, 0, 512) (and upward) and deals it 0x500 damage. */
 
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a + b */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
@@ -17,7 +17,7 @@ extern void CAI__CallHurt(CGameObjectInstance *target, CAI *ai, DamageEvent *eve
 void MotherBoss_Collision(CGameObjectInstance *obj, CAI *ai) {
     DamageEvent event;
     CVector3 dir;
-    CGameObjectInstance *player = (CGameObjectInstance *) D_800F1CE0.m_pInstance;
+    CGameObjectInstance *player = (CGameObjectInstance *) gCollisionResults.m_pInstance;
 
     if (player != NULL && player->header.m_Type == 1 && (player->m_dwFlags & 0x300000) && ai->m_Health != 0 &&
         (ai->m_Mode == 0xE || ai->m_Mode == 0xF) && (player == ai->m_pSightTarget || player == ai->m_pPathTarget)) {

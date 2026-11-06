@@ -13,7 +13,7 @@ typedef struct {
     /* 0x114 */ CVector3 pos;
 } Ui;
 
-extern f32 D_800B6D28;      /* frame time */
+extern f32 gFrameIncrement;      /* frame time */
 extern char D_800ADF00;     /* swimming look tuning */
 extern Tuning D_800ADEDC;   /* swimming move tuning */
 
@@ -78,7 +78,7 @@ void PlayerSwim_Update(CPlayer *player, CGameObjectInstance *body) {
             player->m_CharAnim = 0x14;
         }
     }
-    player->m_SfxTimer += D_800B6D28;
+    player->m_SfxTimer += gFrameIncrement;
     if (5.12f < player->m_TotalSpeed && 45.0f < player->m_SfxTimer) {
         player->m_SfxTimer = Random_Float(15.0f);
         Sound__Play(D_800ADEDC.strokeSound, body->header.m_vPos, NULL, -1);

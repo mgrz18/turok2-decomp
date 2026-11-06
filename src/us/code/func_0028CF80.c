@@ -3,7 +3,7 @@
 #include "structs/game.h"
 
 
-extern u8 D_800F7078[];             /* the world */
+extern u8 gScene[];             /* the world */
 extern s32 D_80110048;              /* world +0x18FD0 */
 
 s32 Demo_GetPlayerCount(void);
@@ -23,7 +23,7 @@ void SavedPlayers_Arm(void) {
     if (D_80119870.m_PlayerList.m_ActiveList.m_nCount == 0) {
         ok = 0;
     }
-    if (D_800F7078 == NULL) {
+    if (gScene == NULL) {
         ok = 0;
     }
     if (ok) {

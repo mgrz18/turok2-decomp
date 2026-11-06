@@ -46,9 +46,9 @@ typedef struct {
     /* 0xB8 */ s32 region;
 } Plan;
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_800F1B40[];
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern CharacterInfo D_800ADF5C[];
 
 s32 AI_UpdatePathHeading(Actor *self, Plan *plan, Actor *target);
@@ -127,20 +127,20 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                 if ((side == 0 && (self->def->m_Enemy.m_dwEnemyFlags & 0x40))
                     || (side == 1 && (self->def->m_Enemy.m_dwEnemyFlags & 0x80))
                     || (side == 2 && (self->def->m_Enemy.m_dwEnemyFlags & 0x100))) {
-                    t = func_00225848(D_800F7078, self);
+                    t = func_00225848(gScene, self);
                     ADD(t);
                 }
                 if (plan->approachFrom != NULL
                     && ((side == 0 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x1F))
                         || (side == 1 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x3E0))
                         || (side == 2 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x7C00)))) {
-                    t = func_0022594C(D_800F7078, self);
+                    t = func_0022594C(gScene, self);
                     ADD(t);
                 }
             }
             t = plan->ignore;
             ADD(t);
-            t = func_002259D0(D_800F7078, self);
+            t = func_002259D0(gScene, self);
             ADD(t);
         }
         if (self->flags & 0x300000) {
@@ -191,7 +191,7 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                         eye.y = eye.y + GameObject_GetCollisionHeight(self);
                         eye.y = eye.y + self->eye;
                         r = Collision_MoveInstance(t, eye, D_800F1B40);
-                        if ((Actor *)D_800F1CE0.m_pInstance == self) {
+                        if ((Actor *)gCollisionResults.m_pInstance == self) {
                             r = 0;
                         }
                         *(CObjectHead *)t = saved;

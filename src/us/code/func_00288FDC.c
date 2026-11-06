@@ -6,7 +6,7 @@
 /* Only the field read here. */
 
 extern f32 D_800A9DF4;                              /* units per next unit (presumably 60) */
-extern f32 D_800B6D28;                              /* frame delta */
+extern f32 gFrameIncrement;                              /* frame delta */
 
 void CEngineApp__UpdatePlayTime(CEngineApp *arg0) {
     f32 temp_f0;
@@ -14,7 +14,7 @@ void CEngineApp__UpdatePlayTime(CEngineApp *arg0) {
     f32 temp_f1;
 
     if (arg0->m_Settings.paused == 0) {
-        temp_f1 = D_8011ACB0.frames + D_800B6D28;
+        temp_f1 = D_8011ACB0.frames + gFrameIncrement;
         D_8011ACB0.frames = temp_f1;
         if (temp_f1 >= 15.0f) {
             temp_f0 = D_8011ACB0.seconds + 1.0f;

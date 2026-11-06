@@ -25,8 +25,8 @@ typedef struct {
 
 
 extern void *D_80119890;
-extern s32 D_800F7078;
-extern f32 D_800B6D28;
+extern s32 gScene;
+extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
 extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4;
@@ -61,7 +61,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
     u8 *obj;
     u8 *ai;
 
-    if (D_80119870.m_Settings.mode != 13 || D_800F7078 != 4) {
+    if (D_80119870.m_Settings.mode != 13 || gScene != 4) {
         return;
     }
     if ((f32) (*(s32 *) (fight->obj->def + 0x54) * 15) <= fight->timer) {
@@ -81,7 +81,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
             ai[0xC7] = 0;
             fight->warned = 1;
         }
-        timer = fight->timer - D_800B6D28;
+        timer = fight->timer - gFrameIncrement;
         left = fight->def->kills - fight->count;
         left2 = left;
         fight->timer = timer;

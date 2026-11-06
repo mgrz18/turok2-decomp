@@ -9,7 +9,7 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 D_800D1CC0;
+extern s32 gHeap;
 extern s32 D_800D8DB0;
 extern s32 D_800D8DCC;
 
@@ -45,7 +45,7 @@ loop_4:
     }
     if (!(temp_s0->flags & 0x702)) {
         CCache__DetachCacheEntry(0, (s32) temp_s0);
-        CHeap__Free((s32) &D_800D1CC0, temp_s0->data);
+        CHeap__Free((s32) &gHeap, temp_s0->data);
         CCache__FreeMemEntry(0, (s32) temp_s0);
     }
     *arg1 = arg2;

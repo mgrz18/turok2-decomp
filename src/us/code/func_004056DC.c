@@ -8,7 +8,7 @@ extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
-extern f32 D_800B6D28;          /* per-frame scale */
+extern f32 gFrameIncrement;          /* per-frame scale */
 extern f32 D_8012F9F8;         /* cooldown */
 extern BossStep *D_8012F9FC;   /* script */
 extern s32 D_8012FA00;         /* cursor */
@@ -31,7 +31,7 @@ void Primagen_UpdateMode1(CGameObjectInstance *obj, CAI *ai) {
         return;
     }
     if (D_8012F9D8.timer > 0.0f) {
-        D_8012F9D8.timer -= D_800B6D28;
+        D_8012F9D8.timer -= gFrameIncrement;
     }
     if (D_8012F9D8.scriptOn && D_8012F9D8.state != 10) {
         if (D_8012F9D8.script.current == -1) {

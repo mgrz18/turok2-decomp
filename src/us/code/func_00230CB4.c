@@ -9,7 +9,7 @@
  * collected type 0x22 particle react to the others and each type 0x57
  * particle expire the non-0x57 ones within range. */
 
-extern f32 D_800B6D28;          /* frame time scale */
+extern f32 gFrameIncrement;          /* frame time scale */
 extern f32 D_800B6D30;
 extern s32 D_8011ACA4;
 extern s32 D_80110028;
@@ -56,8 +56,8 @@ void CParticleSystem__Update(CParticleSystem *world) {
     if (D_8011ACA4 != 0 || D_80110028 != 0) {
         return;
     }
-    savedStep = D_800B6D28;
-    D_800B6D28 = savedStep * D_800B6D30;
+    savedStep = gFrameIncrement;
+    gFrameIncrement = savedStep * D_800B6D30;
     pairCount = 0;
     for (idx = 0; idx < count; idx++) {
         p = stepped[idx];
@@ -80,7 +80,7 @@ void CParticleSystem__Update(CParticleSystem *world) {
                     light->z = p->header.m_vPos.z;
                     light->m_ColorFade = p->m_Alpha * (1.0f / 255.0f);
                 }
-                p->m_cFrame += D_800B6D28;
+                p->m_cFrame += gFrameIncrement;
             } else {
                 CParticleSystem__Free(world, p);
             }
@@ -139,5 +139,5 @@ void CParticleSystem__Update(CParticleSystem *world) {
             }
         }
     }
-    D_800B6D28 = savedStep;
+    gFrameIncrement = savedStep;
 }

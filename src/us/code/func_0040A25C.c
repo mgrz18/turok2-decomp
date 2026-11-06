@@ -17,7 +17,7 @@ typedef struct {
     /* 0x90 */ u32 part;
 } PartInfo;
 
-extern f32 D_800B6D28; /* frame time */
+extern f32 gFrameIncrement; /* frame time */
 extern f32 D_800C1900; /* fade timer */
 extern s32 D_800C1904; /* second value reached its peak */
 extern void CMtxF__ScaleAxes(void *arg0, f32 r, f32 g, f32 b);
@@ -33,7 +33,7 @@ void MotherBoss_PartEffects(void *arg0, PartInfo *info) {
         case 0:
             obj = D_8012FB70.obj;
             if (obj->animState == 9) {
-                v = actor->m_AI.m_Mother.m_GrowScale + D_800B6D28 * 0.01f;
+                v = actor->m_AI.m_Mother.m_GrowScale + gFrameIncrement * 0.01f;
                 if (v > 1.0f) {
                     v = 1.0f;
                 }
@@ -42,16 +42,16 @@ void MotherBoss_PartEffects(void *arg0, PartInfo *info) {
             if (obj->animState == 0x13) {
                 t = D_800C1900;
                 if (t < 8.8f) {
-                    D_800C1900 = t + D_800B6D28 * (1.0f / 15);
+                    D_800C1900 = t + gFrameIncrement * (1.0f / 15);
                 } else if (D_800C1904 == 0) {
-                    dt = D_800B6D28;
+                    dt = gFrameIncrement;
                     actor->m_AI.m_Mother.m_PulseScale += dt * 0.4f;
                     if (actor->m_AI.m_Mother.m_PulseScale > 3.0f) {
                         D_800C1904 = 1;
                     }
                     D_800C1900 = t + dt * (1.0f / 15);
                 } else {
-                    v = actor->m_AI.m_Mother.m_PulseScale - D_800B6D28 * 0.12f;
+                    v = actor->m_AI.m_Mother.m_PulseScale - gFrameIncrement * 0.12f;
                     if (v < 1.0f) {
                         v = 1.0f;
                     }

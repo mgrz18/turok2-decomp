@@ -215,12 +215,12 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld D_800F7078;
+extern CWorld gScene;
 struct LevelActor;
 extern void ImpactEvent_Call(void *, void *, s32, CVector3, ResourceManagerState);
 void Door_CloseNow(LevelActor *arg0) {
     ResourceManagerState pair;
     pair.active = 0;
     ImpactEvent_Call(arg0, arg0, 7, arg0->position0, pair);
-    CScene__SetInstanceSavedBit(&D_800F7078, arg0, 0);
+    CScene__SetInstanceSavedBit(&gScene, arg0, 0);
 }

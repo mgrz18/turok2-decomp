@@ -4,7 +4,7 @@
 #include "structs/collision.h"
 #include "structs/camera.h"
 
-extern f32 D_800B6D28;      /* frame time */
+extern f32 gFrameIncrement;      /* frame time */
 extern char D_801198B0[];
 
 f32 Random_Float(f32 scale);
@@ -25,7 +25,7 @@ void PlayerShock_Update(CPlayer *player) {
         CCamera__StartFlash(cam, 0xFF, 0xFF, 0, 0, (u8) (u32) Random_Float(7.5f), 3, 7);
         CCameraPool__StartShake(D_801198B0, 0.0f, 204.79999f, 0.0f, 512.0f, 0, cam->m_vPos);
     }
-    player->m_CharacterActor.m_AI.m_ConditionTimer -= D_800B6D28;
+    player->m_CharacterActor.m_AI.m_ConditionTimer -= gFrameIncrement;
     if (player->m_CharacterActor.m_AI.m_ConditionTimer <= 0.0f || player->m_Data.m_Health == 0) {
         player->m_CharacterActor.m_dwFlags &= ~0x800000;
         CPlayer__SetState(player, player, 2);

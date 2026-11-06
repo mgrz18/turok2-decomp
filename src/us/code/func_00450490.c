@@ -57,6 +57,6 @@ s32 MpMenu_StartFragTag_2(void) {
     } else {
         arg = Random_Next() % 6 + 0x2337;
     }
-    func_00430374(&D_800F6CB0, arg);
+    func_00430374(&gEngineApp, arg);
     return 1;
 }

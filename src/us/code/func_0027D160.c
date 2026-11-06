@@ -24,7 +24,7 @@ typedef struct {
 } CFloor;
 
 extern CPlayer *D_80119890;
-extern f32 D_800B6D28;          /* the frame's time step */
+extern f32 gFrameIncrement;          /* the frame's time step */
 extern CCameraMode D_800B6CB4[];
 extern s32 D_800B6D1C;          /* which of the two frame buffers is drawn */
 extern f32 D_800DD78C;          /* the last sine taken */
@@ -34,7 +34,7 @@ extern CCamera D_801198F0;      /* the main camera */
 extern s32 D_801198E8;          /* the pool wants on-screen projections */
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
-extern s32 D_800F7078[];
+extern s32 gScene[];
 extern s32 D_800B6D00;
 void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
@@ -108,7 +108,7 @@ void CCamera__Advance(CCamera *cam) {
     }
     player = NULL;
 found:
-    cam->m_Time += D_800B6D28;
+    cam->m_Time += gFrameIncrement;
     CCamera__AdvanceAttributes(cam);
     if (Cinema_PathPlaying() == 0) {
         update = D_800B6CB4[cam->m_Mode].m_Update;
@@ -228,8 +228,8 @@ found:
     if (player != NULL && (player->m_ModeFlags & 0x40) && cam->m_ViewParams.m_nType == 0 && Cinema_PathPlaying() == 0) {
         cam->m_XScale = MIN1(cam->m_WaterWobbleXScale * 0.5f * (func_002982F0(cam->m_WaterWobbleXAngle) + 1.0f) + 0.8f);
         cam->m_YScale = MIN1(cam->m_WaterWobbleYScale * 0.5f * (func_002982F0(cam->m_WaterWobbleYAngle) + 1.0f) + 0.9f);
-        cam->m_WaterWobbleXAngle += D_800B6D28 * cam->m_WaterWobbleXSpeed;
-        cam->m_WaterWobbleYAngle += D_800B6D28 * cam->m_WaterWobbleYSpeed;
+        cam->m_WaterWobbleXAngle += gFrameIncrement * cam->m_WaterWobbleXSpeed;
+        cam->m_WaterWobbleYAngle += gFrameIncrement * cam->m_WaterWobbleYSpeed;
         swim = player->m_TotalSpeed * 2.5f;
         if (swim < 0.0f) {
             swim = 0.0f;
@@ -384,7 +384,7 @@ found:
     CEmitterPool__Advance(cam->m_SkySystem, cam);
     MenuPool_Update(cam->m_MenuPool);
     if (Cinema_PathPlaying() != 0) {
-        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(D_800F7078, &cam->m_ViewParams.m_vPos);
+        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(gScene, &cam->m_ViewParams.m_vPos);
     }
     floor = (CFloor *) cam->m_ViewParams.m_pCurrentRegion;
     x = cam->m_ViewParams.m_vPos.x;
@@ -478,7 +478,7 @@ void CCamera__DisplayListSetup(CCamera *cam) {
         if (ulx < 0) ulx = 0;
         if (uly < 0) uly = 0;
         if (lry > D_800C2034 - 1) lry = maxy;
-        buffer = D_800F6CB0.m_pCurrentFrameData;
+        buffer = gEngineApp.m_pCurrentFrameData;
         frame = D_800B6D1C;
         GFX(*setup, 0xDA380007, (u32) &cam->m_mProjection[frame]);   /* gSPMatrix */
         GFX(*setup, 0xDB0E0000, cam->m_PerspNorm);                    /* gSPPerspNormalize */

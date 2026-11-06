@@ -10,7 +10,7 @@
 
 
 extern char D_80120DC0[];               /* the reader thread's stack; its OSThread is 0x230 below */
-extern char D_800D1CD8[];               /* the cartridge reader */
+extern char gLoader[];               /* the cartridge reader */
 extern char D_80132000[];               /* the page array, 0x1000 per page */
 
 void memset(void *dst, s32 value, s32 size);

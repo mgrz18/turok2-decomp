@@ -28,7 +28,7 @@ extern s32 D_8011B098;
 extern u32 D_800C2210;          /* frame buffer count */
 extern s32 D_800C2030;          /* width */
 extern s32 D_800C2034;          /* height */
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_800B6CF1;
 extern s32 D_8011F13C;
 extern s32 D_8011F148;
@@ -106,7 +106,7 @@ void CEngineApp__Main(CEngineApp *e) {
     e->m_CartridgeIndex = 0xFCBFB4;
     CCameraPool__NewGame((u8 *)e + 0x22C00, 0);
     CPlayerPool__NewGame((u8 *)e + 0x22BC0, 0, 0);
-    CScene__Construct(D_800F7078, e->m_CartridgeIndex);
+    CScene__Construct(gScene, e->m_CartridgeIndex);
     if (D_800B6CF1 == 0) {
         Cont_InitAll();
     }

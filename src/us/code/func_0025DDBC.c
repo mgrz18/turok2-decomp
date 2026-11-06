@@ -5,7 +5,7 @@
  * recoil timer down, and on being hit either reacts (anim 0xA / 0x14) or
  * clears the recoil flag; dodges once the timer is above 15. */
 
-extern f32 D_800B6D28; /* frame delta */
+extern f32 gFrameIncrement; /* frame delta */
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);
@@ -25,7 +25,7 @@ void EnemyMode_Combo_Update(CGameObjectInstance *actor, CAI *ai) {
     if (ai->m_AnimType >= 4400 && ai->m_AnimType < 4555) {
         ai->m_dwFlags |= 0x4000000;
     }
-    ai->m_ConditionTimer -= D_800B6D28;
+    ai->m_ConditionTimer -= gFrameIncrement;
     if (ai->m_AnimRepeatedCount != 0) {
         if (!(ai->m_dwFlags & 0x4000000)) {
             CAI__SetMode(actor, ai, 0xA);

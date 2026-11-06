@@ -3,10 +3,10 @@
 
 extern s32 D_8011ACF4;
 extern s32 D_800B6D20;
-extern f32 D_800B6D28[2];   /* frame time scales */
+extern f32 gFrameIncrement[2];   /* frame time scales */
 extern f32 D_800B6D30;
 extern f32 D_800B6D34;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern s32 D_801308F8;
 
 extern void CEngineApp__UpdateControllers(void);
@@ -46,10 +46,10 @@ void EngineMode13_Game_Init(CEngineApp *state) {
     }
     CCollisionInfo__Reset();
     D_800B6D34 = 1.0f;
-    D_800B6D28[1] = 1.0f;
+    gFrameIncrement[1] = 1.0f;
     D_800B6D30 = 1.0f;
     func_00430500(&state->m_Game.m_DebugLines);
-    CScene__InitPersistentData(D_800F7078, state->m_CartridgeIndex);
-    CScene__RequestWarp(D_800F7078, state->m_Settings.matchMode, 0);
+    CScene__InitPersistentData(gScene, state->m_CartridgeIndex);
+    CScene__RequestWarp(gScene, state->m_Settings.matchMode, 0);
     D_801308F8 = 0;
 }

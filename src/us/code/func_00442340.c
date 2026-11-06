@@ -7,7 +7,7 @@
 
 extern s32 D_80110048;
 extern s32 D_800F1F10[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_00431E20[];
 extern s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void *out, s32 max);
 extern void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
@@ -26,14 +26,14 @@ void MotherBoss_Init_2(CGameObjectInstance *obj, CAI *ai) {
     D_80110048 = 0x1DB1;
     state->pickupTimer = 0;
     state->dropTimer = 0;
-    state->partCount = CScene__FindInstances(D_800F7078, 0x650, 10, 0x1DB1, state->parts, 6);
+    state->partCount = CScene__FindInstances(gScene, 0x650, 10, 0x1DB1, state->parts, 6);
     for (i = 0; i < state->partCount; i++) {
         state->parts[i]->m_AI.m_Mother.m_bActive = 1;
     }
     state->partsLeft = state->partCount;
-    CScene__FindInstances(D_800F7078, 0x650, 10, 0x1DB2, &state->controller, 1);
+    CScene__FindInstances(gScene, 0x650, 10, 0x1DB2, &state->controller, 1);
     state->controller->m_AI.m_Mother.m_bActive = 1;
-    state->intel = CScene__FindIntelligence(D_800F7078, 1, 0x1DB1);
+    state->intel = CScene__FindIntelligence(gScene, 1, 0x1DB1);
     ai->m_pModeTable = (struct CAIModeInfo *) D_00431E20;
     ai->m_pfStep = MotherBoss_Step;
     ai->m_pfHurt = (u8 *)func_00408FF8 + 8;

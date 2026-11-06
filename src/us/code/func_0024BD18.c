@@ -3,7 +3,7 @@
 #include "structs/weapon.h"
 
 extern s32 D_80119E2C;
-extern f32 D_800B6D28;      /* frame step */
+extern f32 gFrameIncrement;      /* frame step */
 
 s32 Cinema_IsActive(void);
 void CBarrel__Close(CBarrel *menu);
@@ -46,7 +46,7 @@ void CBarrel__Update(CBarrel *menu, CPlayer *player, u32 *input) {
     }
     switch (menu->m_State) {
     case 1:
-        menu->m_Open += D_800B6D28 * 0.25f;
+        menu->m_Open += gFrameIncrement * 0.25f;
         if (menu->m_Open >= 1.0f) {
             menu->m_Open = 1.0f;
             menu->m_State = 2;
@@ -60,7 +60,7 @@ void CBarrel__Update(CBarrel *menu, CPlayer *player, u32 *input) {
         player->m_bHeadMovementDisabled = 0;
         /* fall through */
     case 3:
-        menu->m_Open -= D_800B6D28 * 0.25f;
+        menu->m_Open -= gFrameIncrement * 0.25f;
         if (menu->m_Open <= 0.0f) {
             menu->m_Open = 0.0f;
             menu->m_State = 0;
@@ -68,7 +68,7 @@ void CBarrel__Update(CBarrel *menu, CPlayer *player, u32 *input) {
         break;
     }
     if (menu->m_State != 0) {
-        menu->m_Glow += D_800B6D28 * 0.52359885f;
+        menu->m_Glow += gFrameIncrement * 0.52359885f;
     } else {
         player->m_bHeadMovementDisabled = 0;
     }

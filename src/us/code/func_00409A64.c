@@ -78,7 +78,7 @@ void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
         if (idx >= 0) {
             break;
         }
-        CVector3__Subtract(&p, &target->m_Instance.header.m_vPos, &D_00431D20[i].pos);
+        CVector3__Subtract(&p, &target->m_Instance.header.m_vPos, &gMotherSpawnPoints[i].pos);
         if (func_00298470(p.x * p.x + p.y * p.y + p.z * p.z) < 460.8f) {
             idx = i;
         }
@@ -87,10 +87,10 @@ void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
         height = 1024.0f;
         do {
             if (idx >= 0) {
-                baseX = D_00431D20[idx].pos.x;
-                baseZ = D_00431D20[idx].pos.z;
+                baseX = gMotherSpawnPoints[idx].pos.x;
+                baseZ = gMotherSpawnPoints[idx].pos.z;
                 r = Random_Blend(460.8f, 921.6f);
-                angle = Random_Blend(D_00431D20[idx].minAngle, D_00431D20[idx].maxAngle);
+                angle = Random_Blend(gMotherSpawnPoints[idx].minAngle, gMotherSpawnPoints[idx].maxAngle);
             } else {
                 baseX = target->m_Instance.header.m_vPos.x;
                 baseZ = target->m_Instance.header.m_vPos.z;
@@ -111,7 +111,7 @@ void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
             p.y = height;
             p.z = baseZ;
             for (i = 0; i < 4 && !retry; i++) {
-                if (DistXZ(p, &D_00431D20[i].pos) < 460.8f) {
+                if (DistXZ(p, &gMotherSpawnPoints[i].pos) < 460.8f) {
                     retry = 1;
                 }
             }
@@ -121,7 +121,7 @@ void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
 }
 
 extern CListedInstance *D_8010FEB4;
-extern u8 D_8010ABA0[];
+extern u8 gScene_m_InstancePool[];
 
 extern void GameObject_TraceMove(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
 extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, s32 intelligence, s32 region, CVector3 pos, f32 rotY,
@@ -196,7 +196,7 @@ void MotherBoss_AnimEvent(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             scale.x = 0.5f;
             scale.y = 0.5f;
             scale.z = 0.5f;
-            CInstancePool__Spawn(D_8010ABA0, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
+            CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
         }
         break;
     case 1:

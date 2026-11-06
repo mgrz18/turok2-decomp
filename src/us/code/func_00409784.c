@@ -13,7 +13,7 @@ extern s32 D_801301FC;
 extern u8 D_00431D94[];     /* pickup weights */
 extern u8 D_00431DC4[];
 extern u8 D_00431DD0[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_80107590[];
 
 extern void Animator_Update(void *slot);
@@ -33,7 +33,7 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     s32 region;
     CPooledLevelActor *pickup;
 
-    region = CScene__FindRegionAt(D_800F7078, &pos);
+    region = CScene__FindRegionAt(gScene, &pos);
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;

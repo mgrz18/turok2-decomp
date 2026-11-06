@@ -1,8 +1,8 @@
 #include "common.h"
 
 s32 CAudioWorld__FadeOutMusic(s32 *);                   /* extern */
-extern s32 D_800F2A00;
+extern s32 gAudioWorld;
 
 void Music_FadeOut(void) {
-    CAudioWorld__FadeOutMusic(&D_800F2A00);
+    CAudioWorld__FadeOutMusic(&gAudioWorld);
 }

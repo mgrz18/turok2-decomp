@@ -21,7 +21,7 @@ typedef struct M04WorldB {
                 void *tab[1];
 } M04WorldB;
 extern M04Msg D_800AD080[];
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern CPlayer *D_80119890;     /* the players, a list through m_pNext */
 /* Dispatch one message through the handler table (inlined). */
 static __inline__ void send_(void *tgt, void *dst, s32 kind, CVector3 p, M04Part q) {
@@ -37,12 +37,12 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
     void *cur;
     u8 *base;
     CPlayer *o;
-    if (D_800F7078.m_Mode == 4 || (D_800AD080[kind].flags & 0x10)) {
+    if (gScene.m_Mode == 4 || (D_800AD080[kind].flags & 0x10)) {
         if (!(D_800AD080[kind].flags & 2)) {
             send_(src, dst, kind, pos, part);
         } else if (D_800AD080[kind].flags & 8) {
-            n = D_800F7078.m_nActors;
-            base = (u8 *)D_800F7078.m_pActors;
+            n = gScene.m_nActors;
+            base = (u8 *)gScene.m_pActors;
             i = 0;
             if (n > 0) {
                 do {
@@ -63,9 +63,9 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
                 } while (o != 0);
             }
         } else {
-            n = *(s32 *)((u8 *)&D_800F7078 + 0xDF8);
+            n = *(s32 *)((u8 *)&gScene + 0xDF8);
             for (i = 0; i < n; i++) {
-                cur = ((M04WorldB *)&D_800F7078)->tab[i];
+                cur = ((M04WorldB *)&gScene)->tab[i];
                 if (cur != src) {
                     send_(cur, dst, kind, pos, part);
                 }

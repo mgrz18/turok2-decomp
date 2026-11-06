@@ -59,8 +59,8 @@ extern s32 D_800B6D1C;      /* buffer index */
 extern s32 D_800B6D54;
 extern s32 D_800C2030;      /* screen width */
 extern s32 D_800C2034;      /* screen height */
-extern FrameBuffers *D_800F7070[]; /* CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (D_800F6CB0.m_pCurrentFrameData would need game.h, whose D_8011AAD8 is not this file's s32) */
-extern CWorld D_800F7078;
+extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose D_8011AAD8 is not this file's s32) */
+extern CWorld gScene;
 extern s32 D_8011AAD8;
 extern s32 D_8011AC8C;
 extern Vp D_8011B0A8[];
@@ -180,7 +180,7 @@ void Automap_Draw(MapView *view) {
     GFX(0xDE000000, (u32) D_800AB130);
     GFX(0xED000000, ((((s32) ((f32) (D_800C2030 - 1) * 4.0f)) & 0xFFF) << 12) |
                         (((s32) ((f32) (D_800C2034 - 1) * 4.0f)) & 0xFFF)); /* gDPSetScissor */
-    GFX(0xFF100000 | ((D_800C2030 - 1) & 0xFFF), (u32) D_800F7070[0]->colorImage); /* gDPSetColorImage */
+    GFX(0xFF100000 | ((D_800C2030 - 1) & 0xFFF), (u32) gEngineApp_m_pCurrentFrameData[0]->colorImage); /* gDPSetColorImage */
     GFX(0xDC080008, (u32) vp);                          /* gSPViewport */
     GFX(0xE7000000, 0);                                 /* gDPPipeSync */
     GFX(0xE3000A01, 0);                                 /* gDPSetCycleType(G_CYC_1CYCLE) */
@@ -244,7 +244,7 @@ void Automap_Draw(MapView *view) {
     GFX(0xDA380003, (u32) &D_80129100[D_800B6D1C]);    /* gSPMatrix(modelview, load) */
 
     vtx = D_80129A40[D_800B6D1C];
-    w = &D_800F7078;
+    w = &gScene;
     regions = (CGameRegion *) (CISet__GetBlock(w->m_pRegionData, 2) + 8);
     data = CISet__GetBlock(w->m_pRegionData, 3);
     areas = (Area *) (data + 8);

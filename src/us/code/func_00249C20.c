@@ -75,7 +75,7 @@ void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 CVector3__Normalize(CVector3 *);
 CQuaternion CGameObjectInstance__GetRotation(AimActor *);
 void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 void CMtxF__TransformPoint(f32 mtx[4][4], CVector3 *in, CVector3 *out);
 void CVector3__Scale(CVector3 *out, CVector3 *a, f32 s);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -312,7 +312,7 @@ void Player_UpdateAim(AimActor *pl) {
             pl->lockTarget = target;
             pl->lockTimer = 0.0f;
         }
-        pl->lockTimer += D_800B6D28;
+        pl->lockTimer += gFrameIncrement;
         if (lockTime <= pl->lockTimer) {
             pl->lockState = 2;
             pl->lockTimer = 0.0f;
@@ -324,7 +324,7 @@ void Player_UpdateAim(AimActor *pl) {
             pl->seenTarget = target;
             pl->lockTimer = 0.0f;
         } else {
-            pl->lockTimer += D_800B6D28;
+            pl->lockTimer += gFrameIncrement;
         }
         if (target != NULL && pl->lockTarget != target && switchTime <= pl->lockTimer) {
             pl->lockTarget = target;

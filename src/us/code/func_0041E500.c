@@ -23,7 +23,7 @@ extern char D_800B45C0[];
 extern char D_800B45CC[];
 extern s32 D_800F70A8;
 extern u8 D_80119E2C[];
-extern u8 D_800F6CB0[];
+extern u8 gEngineApp[];
 extern u8 D_0043BCFC[];
 extern u8 D_0043BCB4[];
 extern u8 D_0043C05C[];
@@ -98,7 +98,7 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     if (Pak_NeedsRepair(D_800C2028) != 0) {
         goto blk59;
     }
-    CEngineApp__UpdateControllers(D_800F6CB0);
+    CEngineApp__UpdateControllers(gEngineApp);
     if ((arg0->controller->buttons & 0x1000) && D_800C202C == 0) {
         D_8011B108 = 1;
         D_800C202C = 1;

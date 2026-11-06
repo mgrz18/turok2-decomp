@@ -9,7 +9,7 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 s32 Math_StepClampedInt(s32 arg0, s32 arg1, s32 arg2)
 {
   f32 temp_f1;
@@ -18,7 +18,7 @@ s32 Math_StepClampedInt(s32 arg0, s32 arg1, s32 arg2)
   s32 var_v0;
   var_a2 = arg2;
   temp_f1 = (f32) arg1;
-  var_a0 = arg0 + ((s32) (temp_f1 * D_800B6D28));
+  var_a0 = arg0 + ((s32) (temp_f1 * gFrameIncrement));
   if (temp_f1 < 0.0f)
   {
     var_a2 = -var_a2;

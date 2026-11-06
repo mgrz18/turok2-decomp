@@ -6,7 +6,7 @@
 
 #define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
 
-extern u8 D_800F6CB0[];
+extern u8 gEngineApp[];
 void Render_InvalidateModeCache(void);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
@@ -29,7 +29,7 @@ void CPlayer__DrawWeaponOverlay(CPlayer *player, CCamera *view) {
     vp = &view->m_Viewport;
     sx = vp->m_Width;
     sy = vp->m_Height;
-    CEngineApp__ClearDepthRect(D_800F6CB0,
+    CEngineApp__ClearDepthRect(gEngineApp,
                   def->scopeLeft * sx + vp->m_ScreenPosX,
                   def->scopeRight * sx + vp->m_ScreenPosX,
                   def->scopeTop * sy + vp->m_ScreenPosY,

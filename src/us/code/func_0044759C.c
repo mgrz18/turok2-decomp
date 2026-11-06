@@ -6,7 +6,7 @@
 extern BlindOnePhase D_0043232C[];
 
 extern u8 D_004323B4[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern void CScene__MarkGeneratorsSaved(void *);
 extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
@@ -29,5 +29,5 @@ void BlindOne_PhaseGroup1Init_2(BlindOneState *m) {
         CAI__SetMode(m->actors1[i], &m->actors1[i]->m_AI, 0);
     }
     StartTimer(m, D_004323B4, m->script->seconds);
-    CScene__MarkGeneratorsSaved(D_800F7078);
+    CScene__MarkGeneratorsSaved(gScene);
 }

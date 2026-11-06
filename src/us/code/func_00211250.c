@@ -13,7 +13,7 @@ struct CQuatern_t {
     float w;
 };
 extern void CQuaternion__TurnToward(CQuatern *rotation, CQuatern *target);
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 void CQuaternion__SlerpFast(void *, f32, void *, void *);
 void CQuaternion__TurnToward(CQuatern *rotation, CQuatern *target) {
     CQuatern result;
@@ -22,7 +22,7 @@ void CQuaternion__TurnToward(CQuatern *rotation, CQuatern *target) {
     f32 t;
     angle = Math_AcosLookup((rotation->x * target->x) + (rotation->y * target->y) + (rotation->z * target->z) + (rotation->w * target->w));
     if (angle != 0.0f) {
-        t = 1.0f - ((angle - (((angle * 0.1388889f) + 1.7453293e-4f) * D_800B6D28)) / angle);
+        t = 1.0f - ((angle - (((angle * 0.1388889f) + 1.7453293e-4f) * gFrameIncrement)) / angle);
         if ((1.0f < t) || !(t < 0.0f)) {
             blend = 1.0f;
             if (!(blend < t)) {

@@ -17,7 +17,7 @@ typedef struct {
 
 extern BossFight D_8012FB50;
 extern CListedInstance *D_8010FEB4;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern s32 D_80110048;
 
 extern void TotemDefense_DrawTotem();
@@ -45,7 +45,7 @@ static __inline__ void stunHelper(void) {
     CListedInstance *actor;
 
     if (D_8012FB50.timer > 0.0f) {
-        D_8012FB50.timer -= D_800B6D28;
+        D_8012FB50.timer -= gFrameIncrement;
     } else if (!(Random_Float(100.0f) > 25.0f)) {
         for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {
             if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {

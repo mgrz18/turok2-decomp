@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern s32 CScene__GetInstanceSavedBit(void *, void *);
 void Door_Advance(void *arg0, void *arg1) {
     extern s32 CAI__SetMode(void *, void *, s32);
-    s32 different = CScene__GetInstanceSavedBit(&D_800F7078, arg0) != 1;
+    s32 different = CScene__GetInstanceSavedBit(&gScene, arg0) != 1;
     if (different == 0) {
         CAI__SetMode(arg0, arg1, 0);
     } else {

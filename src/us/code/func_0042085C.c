@@ -18,8 +18,8 @@ extern s32 D_800C2028; /* pad */
 extern s32 D_80110054;
 extern s32 D_8011F148;
 extern s32 D_80130998;
-extern u8 D_800F7078[];
-extern u8 D_800F6CB0[];
+extern u8 gScene[];
+extern u8 gEngineApp[];
 extern u8 D_80119E2C[];
 extern u8 D_0043BEF4[];
 extern u8 D_0043BED0[];
@@ -59,10 +59,10 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
                 s1 = o->controller->port;
             }
             Controller_UnwatchPak(s1);
-            CScene__RequestWarp(D_800F7078, o->player->m_Data.m_CheckPointWarpID, 2);
+            CScene__RequestWarp(gScene, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
-        func_004303AC(D_800F6CB0);
+        func_004303AC(gEngineApp);
         return 1;
     }
     if (D_80130990 != 0) {
@@ -72,7 +72,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
     }
     if (D_801309C0 == 5) {
         Controller_UnwatchPak(s1);
-        CScene__RequestWarp(D_800F7078, D_80110054, 2);
+        CScene__RequestWarp(gScene, D_80110054, 2);
     }
     if (D_80130990 != 0) {
         if (D_801309C0 == 6) {

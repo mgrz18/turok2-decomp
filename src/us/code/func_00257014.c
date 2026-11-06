@@ -3,7 +3,7 @@
 
 f32 Angle_Wrap(s32);
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 f32 Angle_StepToward(f32 arg0, f32 arg1, s32 arg2, f32 arg3) {
     f32 temp_f3;
@@ -24,7 +24,7 @@ block_5:
         arg1 = var_f0;
     }
     temp_f3 = arg1 - arg0;
-    var_f1 = temp_f3 * arg3 * D_800B6D28;
+    var_f1 = temp_f3 * arg3 * gFrameIncrement;
     var_f2 = var_f1;
     if (var_f1 < 0.0f) {
         var_f2 = -var_f1;

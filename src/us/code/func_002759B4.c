@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800F478C;
+extern s32 gMusicTrack;
 
 s32 Music_GetTrack(void) {
-    return D_800F478C;
+    return gMusicTrack;
 }

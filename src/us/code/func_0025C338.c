@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 s32 CAI__SetMode(s32, s32, s32);
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 s32 EnemyAI_TickTimers(CGameObjectInstance *arg0, CAI *arg1) {
     f32 temp_f0;
@@ -10,10 +10,10 @@ s32 EnemyAI_TickTimers(CGameObjectInstance *arg0, CAI *arg1) {
     s8 temp_v1;
 
     if (arg0->header.m_pIntelligence->m_dwTypeFlags & 0x100000) {
-        temp_f0 = arg1->m_Enemy.m_Timer - D_800B6D28;
+        temp_f0 = arg1->m_Enemy.m_Timer - gFrameIncrement;
         arg1->m_Enemy.m_Timer = temp_f0;
         if (temp_f0 < 0.0f) {
-            temp_f0_2 = arg1->m_Enemy.m_Timer2 - D_800B6D28;
+            temp_f0_2 = arg1->m_Enemy.m_Timer2 - gFrameIncrement;
             arg1->m_Enemy.m_Timer = 0.0f;
             arg1->m_Enemy.m_Timer2 = temp_f0_2;
             if (temp_f0_2 < 0.0f) {

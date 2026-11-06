@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern void CCache__ClearDisplayListLocks(s32, s32);
-extern s32 D_800D81D0;
+extern s32 gCache;
 extern s32 D_800D8DA4[];
 extern int D_800AB0C0;
 void CCache__ClearDisplayListLocks(s32 arg0, s32 arg1)
@@ -27,7 +27,7 @@ void CCache__ClearDisplayListLocks(s32 arg0, s32 arg1)
     offset = count;
     do
     {
-      new_var = offset + D_800D81D0;
+      new_var = offset + gCache;
       count += 1;
       *((s32 *) (new_var + 0xC)) &= mask;
       offset += 0x28;

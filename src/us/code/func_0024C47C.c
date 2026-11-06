@@ -507,7 +507,7 @@ typedef struct PlayerStateInfo {
 } PlayerStateInfo;
 
 
-extern f32 D_800B6D28;              /* frame time */
+extern f32 gFrameIncrement;              /* frame time */
 extern s32 D_8011AAA0;
 extern s32 D_8011ACE4;
 extern s32 D_800B6D1C;
@@ -515,9 +515,9 @@ extern f32 D_800ADD88[];           /* health regeneration per character */
 extern PlayerStateInfo D_800ADF54[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern s32 D_800F1D90;
-extern u8 D_800F7078;
+extern u8 gScene;
 extern s32 D_80110054;
 extern s32 D_800ADB30[];
 extern s32 D_800ADB5C;
@@ -641,7 +641,7 @@ void CPlayer__Update(Player *p) {
     s32 j;
 
     linkFlags = 0;
-    scale = D_800B6D28;
+    scale = gFrameIncrement;
     actor = p;
     soundFlags = 0;
     human = p->control == 2;
@@ -685,7 +685,7 @@ void CPlayer__Update(Player *p) {
         if (health != 0.0f && p->options->m_TagMode == 0) {
             f32 max;
 
-            regen = health + (f32) (s32) (rate * 256.0f) * (D_800B6D28 * 0.06666667f);
+            regen = health + (f32) (s32) (rate * 256.0f) * (gFrameIncrement * 0.06666667f);
             max = (u32) (p->def->m_Player.m_StartHealth << 8);
             if (!(max <= regen)) {
                 max = regen;
@@ -698,7 +698,7 @@ void CPlayer__Update(Player *p) {
     if (human) {
         CGameObjectInstance__UpdateAnimation(actor);
     }
-    D_800B6D28 = scale;
+    gFrameIncrement = scale;
     AI_RideMovingPlatform(actor, &actor->aiFlags);
     if (link_enabled(&p->unk6A9)) {
         linkFlags |= 0x800;
@@ -712,7 +712,7 @@ void CPlayer__Update(Player *p) {
     }
     Cinema_PathPlaying();
     if (p->unkAAC > 0.0f) {
-        f32 left = p->unkAAC - D_800B6D28;
+        f32 left = p->unkAAC - gFrameIncrement;
 
         if (left < 0.0f) {
             left = 0.0f;
@@ -720,7 +720,7 @@ void CPlayer__Update(Player *p) {
         p->unkAAC = left;
     }
     if (p->unkA28 > 0.0f) {
-        f32 left = p->unkA28 - D_800B6D28;
+        f32 left = p->unkA28 - gFrameIncrement;
 
         if (left < 0.0f) {
             left = 0.0f;
@@ -729,7 +729,7 @@ void CPlayer__Update(Player *p) {
     }
     /* Run the frame in steps (one, here): the input's edges are seen once. */
     saved = p->input;
-    for (remaining = D_800B6D28; remaining > 0.0f;) {
+    for (remaining = gFrameIncrement; remaining > 0.0f;) {
         remaining = 0.0f;
         AI_UpdateRegionFlags(actor, &actor->aiFlags);
         p->prevState = (u16) p->state;
@@ -753,9 +753,9 @@ void CPlayer__Update(Player *p) {
             }
         }
         if (material != NULL) {
-            p->step = D_800B6D28 * p->unkB28;
+            p->step = gFrameIncrement * p->unkB28;
         } else {
-            p->step = D_800B6D28;
+            p->step = gFrameIncrement;
         }
         CPlayer__EaseEyeOffset(p, actor);
         p->speed = func_00298470(p->velX * p->velX + p->velZ * p->velZ);
@@ -774,7 +774,7 @@ void CPlayer__Update(Player *p) {
             }
             Sound__Play(0x227, p->pos, 0, -1);
         }
-        p->stateTime += D_800B6D28;
+        p->stateTime += gFrameIncrement;
         {
             s32 ground = GameObject_IsOnGround(actor);
 
@@ -784,7 +784,7 @@ void CPlayer__Update(Player *p) {
             p->onGround = ground;
             p->lastVelY = actor->velY;
             if (ground == 0 && p->state != 14 && !(actor->aiFlags & 0x200)) {
-                p->airTime += D_800B6D28;
+                p->airTime += gFrameIncrement;
             } else {
                 p->airTime = 0.0f;
             }
@@ -838,7 +838,7 @@ void CPlayer__Update(Player *p) {
             } else {
                 change = -p->crouch * 0.25f;
             }
-            p->crouch += change * D_800B6D28;
+            p->crouch += change * gFrameIncrement;
             change = 40.96f - p->crouch;
             if (-10.24f <= change && change <= 10.24f) {
                 *stateFlags |= 0x80;
@@ -848,7 +848,7 @@ void CPlayer__Update(Player *p) {
         }
         CPlayer__UpdateWaterRegion(p, actor, material);
         if (p->unkA30 > 0.0f) {
-            p->unkA30 -= D_800B6D28;
+            p->unkA30 -= gFrameIncrement;
             if (p->unkA30 < 0.0f) {
                 p->unkA30 = 0.0f;
             }
@@ -870,14 +870,14 @@ void CPlayer__Update(Player *p) {
             CGameRegion__FireTriggers(oldModel, linkFlags | 2, actor);
             CGameRegion__FireTriggers(model, linkFlags | 1, actor);
         }
-        CScene__CheckAutoActivation(&D_800F7078, actor, &prev, &actor->pos);
+        CScene__CheckAutoActivation(&gScene, actor, &prev, &actor->pos);
         landed = 0;
         if (hit) {
-            if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
-                GameObject_FireTriggers((u8 *)D_800F1CE0.m_pInstance, soundFlags | 2, actor);
+            if (gCollisionResults.m_pInstance != NULL && gCollisionResults.m_pInstance->header.m_Type == 1) {
+                GameObject_FireTriggers((u8 *)gCollisionResults.m_pInstance, soundFlags | 2, actor);
             }
-            if (D_800F1CE0.m_pWallRegion != NULL) {
-                CGameRegion__FireTriggers((Model *)D_800F1CE0.m_pWallRegion, linkFlags | 4, actor);
+            if (gCollisionResults.m_pWallRegion != NULL) {
+                CGameRegion__FireTriggers((Model *)gCollisionResults.m_pWallRegion, linkFlags | 4, actor);
             }
             CPlayer__RamWithMount(p, actor, stateFlags);
             landed = CPlayer__TryMount(p, actor, stateFlags);
@@ -890,8 +890,8 @@ void CPlayer__Update(Player *p) {
                 p->velX *= 0.1f;
             }
         }
-        if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 3) {
-            CPlayer__TouchPickup(p, (u8 *)D_800F1CE0.m_pInstance);
+        if (gCollisionResults.m_pInstance != NULL && gCollisionResults.m_pInstance->header.m_Type == 3) {
+            CPlayer__TouchPickup(p, (u8 *)gCollisionResults.m_pInstance);
         }
         if (before != NULL && material != NULL) {
             if ((p->stateFlags & 0x8000) && !landed && !(before->unk54 & 8) && (material->unk54 & 8)) {
@@ -915,7 +915,7 @@ void CPlayer__Update(Player *p) {
         p->input.unk34 = 0;
     }
     p->input = saved;
-    D_800B6D28 = scale;
+    gFrameIncrement = scale;
     under = GameObject_GetRegionInfo(actor);
     if (under != NULL && (under->flags & 0x4000)) {
         f32 x2 = actor->pos.x * actor->pos.x;
@@ -946,7 +946,7 @@ void CPlayer__Update(Player *p) {
                 sound = D_800ADB30[p->def->m_Id];
             }
         }
-        CScene__SetInstanceObjectType(&D_800F7078, p, sound, p->action);
+        CScene__SetInstanceObjectType(&gScene, p, sound, p->action);
         if (p->lastAction != p->action) {
             if (!CGameObjectInstance__SetAnimByAction(actor, p->action, 0) && Cinema_PathPlaying()) {
                 CGameObjectInstance__SetAnimByAction(actor, 7000, 0);
@@ -1020,7 +1020,7 @@ void CPlayer__Update(Player *p) {
     CPlayer__UpdateWeaponSet((CPlayer *) p);
     CBarrel__Update(&p->unkCD0, p, p->unk3C8);
     if (p->shake > 0.0f) {
-        p->shake -= D_800B6D28;
+        p->shake -= gFrameIncrement;
         if (p->shake > 0.0f) {
             p->flags |= 0x800000;
         } else {
@@ -1029,6 +1029,6 @@ void CPlayer__Update(Player *p) {
     }
     Player_UpdateAim(p);
     p->input.controller->pos = p->pos;
-    CScene__SetInstanceObjectType(&D_800F7078, p->emitter, D_800AF618[p->weapon]->model, p->voice->bank);
+    CScene__SetInstanceObjectType(&gScene, p->emitter, D_800AF618[p->weapon]->model, p->voice->bank);
     p->lastAction = p->action;
 }

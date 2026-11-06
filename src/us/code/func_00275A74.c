@@ -1,8 +1,8 @@
 #include "common.h"
 
 void CAudioWorld__UnduckMusic(void *);                   /* extern */
-extern u8 D_800F2A00[];
+extern u8 gAudioWorld[];
 
 void Music_RestoreVolume(void) {
-    CAudioWorld__UnduckMusic(D_800F2A00);
+    CAudioWorld__UnduckMusic(gAudioWorld);
 }

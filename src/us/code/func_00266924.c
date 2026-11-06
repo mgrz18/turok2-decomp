@@ -3,12 +3,12 @@
 
 s32 CScene__SetInstanceSavedBit(s32, s32, s32);
 
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void InteractiveAnim_EventHide(CGameObjectInstance *arg0)
 {
   int new_var;
   new_var = ~0x2000;
   arg0->m_dwFlags = (s32) ((arg0->m_dwFlags & new_var) & (~0x100));
-  CScene__SetInstanceSavedBit((s32) (&D_800F7078), (s32) arg0, 1);
+  CScene__SetInstanceSavedBit((s32) (&gScene), (s32) arg0, 1);
 }

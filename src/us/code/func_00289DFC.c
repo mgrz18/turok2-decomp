@@ -8,11 +8,11 @@ s32 Demo_End(void);
 
 s32 Sound__StopAllExcept(s32);                     /* extern */
 s32 Music_FadeOut();                            /* extern */
-extern s32 D_800B6D78;
+extern s32 gEngineModeTable;
 extern s32 D_8011B110;
 
 /* The frame/game state block passed to the per-mode handlers (the
- * handler table D_800B6D78/D_800B6D7C has 0xC-byte rows indexed by mode). */
+ * handler table gEngineModeTable/D_800B6D7C has 0xC-byte rows indexed by mode). */
 
 void EngineMode17_Switch_Retrace(CEngineApp *arg0) {
     s32 (*temp_v0)(CEngineApp *);
@@ -37,7 +37,7 @@ block_7:
             }
         }
         Controller_SetRumbleOptionAll(0);
-        temp_v0 = *(((__typeof__(&D_800B6D78))((s8 *)&D_800B6D78 + (arg0->m_Settings.mode * 0xC))));
+        temp_v0 = *(((__typeof__(&gEngineModeTable))((s8 *)&gEngineModeTable + (arg0->m_Settings.mode * 0xC))));
         if (temp_v0 != NULL) {
             temp_v0(arg0);
         }

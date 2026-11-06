@@ -11,7 +11,7 @@
 
 #define PROGRESS (&D_80119870.m_Settings)
 extern s32 D_80130924;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 extern s32 Controller_ConfirmPressed(s32 pad);
 extern s32 Controller_MenuLeft(s32 pad);
@@ -129,17 +129,17 @@ s32 CheatsMenu_WarpSelect_2(void *menu, Menu *c) {
             PROGRESS->multiplayer = 0;
             PROGRESS->playerCount = 1;
             Menu_ClaimPressingController(c);
-            CEngineApp__SetupFadeTo(&D_800F6CB0, 16);
+            CEngineApp__SetupFadeTo(&gEngineApp, 16);
             return 1;
         }
         if (D_80119870.m_Settings.mode == 13) {
-            func_0042C620(D_800F7078, id, 2);
+            func_0042C620(gScene, id, 2);
             return 0;
         }
         PROGRESS->multiplayer = 0;
         PROGRESS->playerCount = 1;
         Menu_ClaimPressingController(c);
-        CEngineApp__StartGameAtWarp(&D_800F6CB0, id);
+        CEngineApp__StartGameAtWarp(&gEngineApp, id);
         return 1;
     }
     if (Controller_MenuLeft(c->controller) != 0) {

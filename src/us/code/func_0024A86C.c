@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern f32 D_800B6D28;      /* frame step */
+extern f32 gFrameIncrement;      /* frame step */
 extern u8 D_8011AAF1;
 extern u8 D_8011AAFC;
 extern u8 D_8011AB01;
@@ -18,7 +18,7 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
     u8 show;
     f32 scale;
 
-    player->m_SightIconFrame += D_800B6D28;
+    player->m_SightIconFrame += gFrameIncrement;
     if (player->m_CrossHairMode == 0 || player->m_pOptions->m_TagMode == 1) {
         return;
     }

@@ -46,7 +46,7 @@ extern s32 D_8011ACA4;
 extern s32 D_8011AC8C;          /* game state */
 extern s32 D_8011ACA8;
 extern s32 D_80110048;          /* level */
-extern f32 D_800B6D28;          /* frame time */
+extern f32 gFrameIncrement;          /* frame time */
 extern PortSetup D_8011AB88[];
 extern char D_8011AAA0;
 extern char D_801198B0;
@@ -115,7 +115,7 @@ void CPlayerPool__Update(PlayerList *list) {
     if (D_8011AC8C == 0xB || D_8011AC8C == 8) {
         return;
     }
-    frameTime = D_800B6D28;
+    frameTime = gFrameIncrement;
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
         if (!in_menu(p)) {
             CPlayer__Update(p);
@@ -191,5 +191,5 @@ void CPlayerPool__Update(PlayerList *list) {
     }
     CPlayerPool__UpdateMatchClock(list);
     CPlayerPool__PickTagIt(list);
-    D_800B6D28 = frameTime;
+    gFrameIncrement = frameTime;
 }

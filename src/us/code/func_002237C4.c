@@ -11,7 +11,7 @@ typedef struct ColorEntry {
 
 extern CGameFromCameraPool D_801198B0;
 extern ColorEntry D_800ACDE8[];
-extern f32 D_800B6D28;                  /* the frame's time step */
+extern f32 gFrameIncrement;                  /* the frame's time step */
 extern u8 D_800B54E0[];
 
 void Cinema_Reset(ColorEntry *entry);
@@ -68,7 +68,7 @@ void CScene__UpdateWarp(CWorld *scene) {
                     }
                 }
             } else {
-                scene->m_WarpTime += D_800B6D28;
+                scene->m_WarpTime += gFrameIncrement;
                 if (entry->value < scene->m_WarpTime) {
                     scene->m_WarpTime = entry->value;
                 }
@@ -78,7 +78,7 @@ void CScene__UpdateWarp(CWorld *scene) {
             if (scene->m_WarpTime == 0.0f) {
                 scene->m_WarpState = 0;
             } else {
-                scene->m_WarpTime -= D_800B6D28;
+                scene->m_WarpTime -= gFrameIncrement;
                 if (scene->m_WarpTime < 0.0f) {
                     scene->m_WarpTime = 0.0f;
                 }

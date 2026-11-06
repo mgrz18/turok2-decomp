@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 
-extern u8 D_8010ABA0[]; /* world */
+extern u8 gScene_m_InstancePool[]; /* world */
 
 extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
@@ -34,7 +34,7 @@ void BlindOne_SpawnMinion(CGameObjectInstance **self, s32 *budget, s32 *spawned,
     pos.y = 0.0f;
     pos.z = origin->header.m_vPos.z + dist * func_002974C0(angle);
     GameObject_TraceMove(*self, pos, &pos, &region, 0, 0);
-    if (CInstancePool__Spawn(D_8010ABA0, -1, 0x1FF, intelligence, region, pos, angle, vel, scale, spawned) != NULL &&
+    if (CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x1FF, intelligence, region, pos, angle, vel, scale, spawned) != NULL &&
         budget != NULL) {
         (*budget)--;
     }

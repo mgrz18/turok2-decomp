@@ -4,7 +4,7 @@
 #include "structs/collision.h"
 
 extern MapSweep *D_800F1AB0;
-extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults *gCollisionResultsP;
 extern u8 D_800C894C;                   /* bottom of the stack */
 
 f32 func_00298470(f32 x);               /* sqrtf */
@@ -114,13 +114,13 @@ void Collision_SweepRegionWalls(CGameRegion *region) {
         if (D_800F1AB0->hit == 0) {
             continue;
         }
-        D_800F1AB0->sweep->hit.posOut = &D_800F1ADC->m_vWallPos;
-        D_800F1AB0->sweep->hit.regionOut = &D_800F1ADC->m_pWallRegion;
+        D_800F1AB0->sweep->hit.posOut = &gCollisionResultsP->m_vWallPos;
+        D_800F1AB0->sweep->hit.regionOut = &gCollisionResultsP->m_pWallRegion;
         D_800F1AB0->sweep->hit.kindOut = NULL;
         D_800F1AB0->sweep->hit.kind = 0;
         D_800F1AB0->sweep->hit.dataOut = NULL;
         D_800F1AB0->sweep->hit.data = NULL;
-        D_800F1ADC->m_nWallEdge = i;
+        gCollisionResultsP->m_nWallEdge = i;
         if (D_800F1AB0->sweep->def->m_dwFlags & 0x20000000) {
             return;
         }

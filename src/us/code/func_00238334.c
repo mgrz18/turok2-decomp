@@ -10,7 +10,7 @@ typedef struct BlastActor {
     /* 0x054 */ f32 footY;
 } BlastActor;
 
-extern CCollisionResults D_800F1CE0;  /* the last collision test: the node it hit (m_Frame) is the armour to use */
+extern CCollisionResults gCollisionResults;  /* the last collision test: the node it hit (m_Frame) is the armour to use */
 extern HitFrame D_800F1970;
 extern u8 D_8011AAF1;
 
@@ -39,7 +39,7 @@ f32 Blast_GetReach(BlastActor *a, BlastActor *t, CVector3 p, f32 reach, s32 fall
     if (D_8011AAF1 != 0 && (flags & 0x400000)) {
         armored = 0;
     }
-    if (t->kind == 2 && (BlastActor *)(o = &D_800F1CE0)->m_pInstance == a && o->m_nInstanceNode != -1) {
+    if (t->kind == 2 && (BlastActor *)(o = &gCollisionResults)->m_pInstance == a && o->m_nInstanceNode != -1) {
         sv = &o->m_Frame;
         falloff = 0;
     } else if (CGameObjectInstance__GetNearestBox(a, p, &D_800F1970) != 0) {

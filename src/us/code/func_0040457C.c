@@ -70,7 +70,7 @@ typedef struct {
 } Info0040457C;
 
 extern ModeState0040457C D_8012F608;
-extern u8 D_8010ABA0[];
+extern u8 gScene_m_InstancePool[];
 extern CListedInstance *D_8010FEB4;
 extern s32 D_800F1F50;
 Entity0040457C *CPlayerPool__FindNearest(void *game, Vec3_0040457C pos);
@@ -144,7 +144,7 @@ void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(D_8010ABA0, -1, 0x387, D_8012F608.handle, D_8012F608.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x387, D_8012F608.handle, D_8012F608.region, pos, 0.0f, actor->rot,
                           scale, 0)) {
             D_8012F608.spawnsLeft--;
             if (D_8012F608.waves != NULL) {
@@ -165,7 +165,7 @@ void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(D_8010ABA0, -1, 0x387, D_8012F608.handle, D_8012F608.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x387, D_8012F608.handle, D_8012F608.region, pos, 0.0f, actor->rot,
                           scale, 0)) {
             D_8012F608.spawnsLeft--;
             if (D_8012F608.waves != NULL) {

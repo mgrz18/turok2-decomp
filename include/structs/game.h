@@ -185,22 +185,22 @@ typedef struct CGameFromCameraPool {
     /* 0x1228 */ GameSettings m_Settings;   /* D_8011AAD8 */
 } CGameFromCameraPool; /* size 0x1450 */
 
-/* ---- The engine, D_800F6CB0 (CEngineApp) ---- */
+/* ---- The engine, gEngineApp (CEngineApp) ---- */
 
-/* CFrameData (one frame in flight, D_800F7070) is in structs/frame.h. */
+/* CFrameData (one frame in flight, gEngineApp_m_pCurrentFrameData) is in structs/frame.h. */
 
-/* The engine, D_800F6CB0 (CEngineApp__Boot's object; the field names after
+/* The engine, gEngineApp (CEngineApp__Boot's object; the field names after
  * Turok 3's CEngineApp, which has the same parts in the same order): the
- * frames, the world (CWorld D_800F7078, structs/world.h, kept as bytes so
+ * frames, the world (CWorld gScene, structs/world.h, kept as bytes so
  * that this header does not pull in the world), then CGame D_80119870, whose
  * settings (D_8011AAD8, also reachable as m_Settings) end with the engine's
  * mode block (0x23FD0-0x23FFC is GameSettings 0x1A8-0x1D4: Turok 3's
  * m_ModeTime, m_LastMode, m_Mode...). */
 typedef struct CEngineApp {
     /* 0x00000 */ CFrameData m_FrameData[3];
-    /* 0x003C0 */ CFrameData *m_pCurrentFrameData;   /* D_800F7070 */
+    /* 0x003C0 */ CFrameData *m_pCurrentFrameData;   /* gEngineApp_m_pCurrentFrameData */
     /* 0x003C4 */ s32 m_CartridgeIndex;              /* the ROM address of the cartridge index (0xFCBFB4: CEngineApp__Main, CScene__Construct) */
-    /* 0x003C8 */ u8 m_Scene[0x19440 - 0x3C8];       /* CWorld D_800F7078 (0x19078 bytes) */
+    /* 0x003C8 */ u8 m_Scene[0x19440 - 0x3C8];       /* CWorld gScene (0x19078 bytes) */
     /* 0x19440 */ u8 unk19440[0x22BC0 - 0x19440];
     union {
         /* 0x22BC0 */ CGame m_Game;                  /* D_80119870 */
@@ -211,6 +211,6 @@ typedef struct CEngineApp {
     };
 } CEngineApp; /* size 0x24050 */
 
-extern CEngineApp D_800F6CB0;
+extern CEngineApp gEngineApp;
 
 #endif

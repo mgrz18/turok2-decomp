@@ -20,7 +20,7 @@ typedef struct HitInst {
     /* 0x30 */ struct HitInst *standingOn;
 } HitInst;
 
-extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults *gCollisionResultsP;
 
 f32 GameObject_GetCollisionHeight(HitInst *inst);
 f32 GameObject_GetCollisionRadius(HitInst *inst);
@@ -137,7 +137,7 @@ void Sweep_TestInstance(Sweep *sweep, SweepBox *box, HitInst *other) {
     result |= Sweep_HitCylinder(sweep, &other->pos, reach, 1, top - box->bottom, bottom - box->top, 1,
                             special ? 7 : def->m_InstanceBehavior, 0.0f, 1);
     if (result) {
-        target = D_800F1ADC;
+        target = gCollisionResultsP;
         if (target->m_pInstance) {
             SweepHit_Clear(&sweep->hit.fraction);
         } else {

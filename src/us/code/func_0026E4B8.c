@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern s32 CScene__IsEventFired(CWorld *world, Trigger *trigger);
 extern s32 CScene__AreEventsDone(CWorld *world, s32 id);
 extern void CScene__FireEventsByKeyOnce(CWorld *world, s32 id);
@@ -22,7 +22,7 @@ void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 e
     CWorld *world;
     Trigger *trigger;
     for (trigger = triggers, i = 0; i < count; trigger++, i++) {
-        world = &D_800F7078;
+        world = &gScene;
         usable = 1;
         if (world->m_Mode != 4) {
             usable = CScene__IsEventFired(world, trigger) == 0;

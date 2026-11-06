@@ -28,10 +28,10 @@ typedef struct S10Game {
 } S10Game;
 extern S10Game D_8011ACB0[];
 extern f32 D_801308FC;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern void CPlayerPool__EndMatch(void *p);
 s32 FinalScoreMenu_Poll_2(void) {
-    D_801308FC += D_800B6D28;
+    D_801308FC += gFrameIncrement;
     if (D_801308FC >= 120.0f) {
         D_8011ACB0->unk24 = 0;
         CPlayerPool__EndMatch((u8 *)D_8011ACB0 - 0x1440);

@@ -2,14 +2,14 @@
 #include "common.h"
 #include "structs/level_actor.h"
 
-extern f32 D_800B6D28; /* frame delta */
+extern f32 gFrameIncrement; /* frame delta */
 
 /* Grow-in effect: ramp the scale up to 0.35 over 0.75 time units. */
 void CLevelActor__UpdateGrowIn(CLevelActor *obj) {
     f32 t;
 
     if (obj->m_wFlags & 0x10) {
-        t = obj->m_Timer + D_800B6D28 * 0.06666667f;
+        t = obj->m_Timer + gFrameIncrement * 0.06666667f;
         obj->m_Timer = t;
         if (t < 0.75f) {
             obj->m_ModelScale = t * 0.46666667f;

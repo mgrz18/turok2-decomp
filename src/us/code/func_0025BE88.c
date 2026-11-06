@@ -5,7 +5,7 @@
 /* AI init dispatcher: the 0x44E..0x456 types have their own init in the paged
  * VM code; everything else gets the generic init. */
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 extern void MantidQueen_InitAI(CGameObjectInstance *actor, CAI *ai);
 extern void MotherBoss_Init(CGameObjectInstance *actor, CAI *ai);
@@ -58,7 +58,7 @@ void EnemyAI_InitDispatch(CGameObjectInstance *actor, CAI *ai) {
         ai->m_Action = 1;
         AI_HearNoise(actor, ai, &actor->header.m_vPos.x, 3);
     }
-    if (CScene__GetInstanceSavedBit(D_800F7078, actor) == 1) {
+    if (CScene__GetInstanceSavedBit(gScene, actor) == 1) {
         actor->m_dwFlags &= ~0x100;
     }
 }

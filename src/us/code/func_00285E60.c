@@ -16,7 +16,7 @@ void EngineMode07_Title_Draw(s32 arg0) {
     s32 height;
     Gfx *g;
 
-    fb = D_800F7070;
+    fb = gEngineApp_m_pCurrentFrameData;
     CEngineApp__ClearDepthRect(arg0, 0, D_800C2030, 0, D_800C2034);
     width = 0;
     height = 0;

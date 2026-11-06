@@ -8,7 +8,7 @@
 
 extern struct { u8 value; } D_8011AAF1;
 extern u8 D_800B0A60[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 extern void EnemyAI_Update();
 extern void EnemyAI_CalcOrientationMatrix();
@@ -50,7 +50,7 @@ void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {
         ai->m_pfHit = NULL;
         ai->m_pfCollision = NULL;
         ai->m_pfHurt = NULL;
-        CScene__SetInstanceSavedBit(D_800F7078, actor, 0);
+        CScene__SetInstanceSavedBit(gScene, actor, 0);
     } else {
         ai->m_pfHit = EnemyAI_OnHit;
         ai->m_pfCollision = EnemyAI_CheckGrab;

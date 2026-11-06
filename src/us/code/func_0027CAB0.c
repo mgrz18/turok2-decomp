@@ -20,7 +20,7 @@ typedef struct {
     /* 0x5B */ u8 m_Music1;
 } CRegionSetAttributes;
 
-extern s32 D_800F7078[];
+extern s32 gScene[];
 extern s32 D_8011ACA4;
 extern CCamera *D_801198B4;     /* the camera pool's first camera */
 extern s32 D_8011AC88;          /* game mode */
@@ -28,7 +28,7 @@ extern s32 D_8011AC8C;
 extern CPlayer *D_80119890; /* the players */
 extern s32 D_80130940;
 extern s32 D_800B6D20;
-extern f32 D_800B6D28;          /* the frame's time step */
+extern f32 gFrameIncrement;          /* the frame's time step */
 CRegionSetAttributes *CScene__GetRegionInfo(s32 *list, u16 *key);
 s32 Cinema_OverridesMusic1(void);
 s32 Cinema_OverridesMusic2(void);
@@ -74,7 +74,7 @@ void CCamera__AdvanceAttributes(CCamera *cam) {
     if (key == NULL) {
         return;
     }
-    rec = CScene__GetRegionInfo(D_800F7078, key);
+    rec = CScene__GetRegionInfo(gScene, key);
     if (rec == NULL) {
         return;
     }
@@ -149,7 +149,7 @@ void CCamera__AdvanceAttributes(CCamera *cam) {
     if (D_800B6D20 == 0 || rec->m_BlendTime == 0.0f) {
         cam->m_cRegionSetBlend = 1.0f;
     } else {
-        t = cam->m_cRegionSetBlend + D_800B6D28 / (rec->m_BlendTime * 15.0f);
+        t = cam->m_cRegionSetBlend + gFrameIncrement / (rec->m_BlendTime * 15.0f);
         if (1.0f < t) {
             t = 1.0f;
         }

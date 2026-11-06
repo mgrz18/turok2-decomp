@@ -213,7 +213,7 @@ typedef struct CListedInstance {
     /* 0x294 */ s32 _pad294;
 } CListedInstance; /* size 0x298 */
 
-/* The pool of dynamic objects, D_8010ABA0: 32 of them, the free ones on
+/* The pool of dynamic objects, gScene_m_InstancePool: 32 of them, the free ones on
  * m_FreeList (D_8010FEA0) and the live ones on m_ActiveList (D_8010FEB4).
  * CInstancePool__Alloc takes one (only while fewer than 3 are live, unless
  * D_8011001C), CListedInstance__Free / CInstancePool__Free give it back; CInstancePool__SpawnAnimInstance,

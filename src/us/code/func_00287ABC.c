@@ -9,7 +9,7 @@ typedef struct VideoRate {
 } VideoRate;
 
 extern u64 D_8011AD08;          /* time of the last frame */
-extern s32 D_8011AD10;          /* retraces this frame */
+extern s32 gNextTicks;          /* retraces this frame */
 extern u32 D_8011B09C;          /* retrace counts of the last four frames */
 extern u32 D_8011B10C;
 extern u32 D_800F6CA8;
@@ -18,7 +18,7 @@ extern u32 D_801198A0;
 extern s32 D_801308F8;
 extern s32 D_800C2034;          /* screen height */
 extern VideoRate D_8011B0A0;
-extern f32 D_800B6D28;          /* frame time */
+extern f32 gFrameIncrement;          /* frame time */
 extern s32 D_801198A8;
 extern s32 D_80130940;
 extern u8 D_80119E2C[];
@@ -71,37 +71,37 @@ void CEngineApp__Update(CEngineApp *level) {
     case 1:
     case 3:
     case 4:
-        D_8011AD10 = frameRetraces(2);
+        gNextTicks = frameRetraces(2);
         break;
     default:
-        D_8011AD10 = frameRetraces(2);
+        gNextTicks = frameRetraces(2);
         if (D_801198A0 >= 3) {
-            D_8011AD10 = frameRetraces(3);
+            gNextTicks = frameRetraces(3);
         }
         if (Cinema_PathPlaying() != 0) {
             if ((u32)(level->m_Settings.mode - 0xF) < 2 && D_800C2034 < 0xDF) {
-                D_8011AD10 = frameRetraces(2);
+                gNextTicks = frameRetraces(2);
             } else {
-                D_8011AD10 = frameRetraces(4);
+                gNextTicks = frameRetraces(4);
             }
         }
         break;
     }
     Demo_AdvanceMatchStream();
-    D_800B6D28 = (f32)(D_8011AD10 * 15) / D_8011B0A0.hz;
+    gFrameIncrement = (f32)(gNextTicks * 15) / D_8011B0A0.hz;
     if (Cinema_PathPlaying() != 0) {
-        D_800B6D28 = elapsed;
+        gFrameIncrement = elapsed;
     }
     if (Demo_GetPlayerCount() != 0) {
-        D_800B6D28 = (f32)(D_8011AD10 * 15) * (1.0f / 60.0f);
+        gFrameIncrement = (f32)(gNextTicks * 15) * (1.0f / 60.0f);
     }
     CCache__Advance(0);
-    D_8011F140 = D_800F7070;
+    D_8011F140 = gEngineApp_m_pCurrentFrameData;
     if (D_801198A8 == 0) {
         D_80130940 = 0;
     }
     CEngineApp__Draw(level);
-    level->m_Settings.modeTimer += D_800B6D28;
+    level->m_Settings.modeTimer += gFrameIncrement;
     CEngineApp__UpdatePlayTime(level);
     if (MenuPool_CountOpen(D_80119E2C) == 0 && Cinema_PathPlaying() != 0 && Cinema_GetScriptId() == 0x78) {
         if (D_8011ACF4 == 0 && level->m_Settings.paused == 0) {

@@ -9,7 +9,7 @@ extern u32 D_800B6CBC;          /* the frame before, */
 extern u32 D_800B6CC0;          /* and the one before that */
 extern s32 D_800AE340;          /* a tint forced over the view */
 extern u8 D_800F1FE4[4];        /* its colour */
-extern f32 D_800B6D28;          /* the frame's time step */
+extern f32 gFrameIncrement;          /* the frame's time step */
 void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 void CCamera__UpdateFlash(CCamera *cam);
 s32 Cinema_PathPlaying(void);
@@ -56,20 +56,20 @@ found:
                 tint[1] >>= 3;
                 tint[2] >>= 3;
             }
-            CEngineApp__DrawFilledRect(&D_800F6CB0, tint, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
+            CEngineApp__DrawFilledRect(&gEngineApp, tint, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }
         CCamera__UpdateFlash(cam);
         if (cam->m_FlashMode != 0) {
-            CEngineApp__DrawFilledRect(&D_800F6CB0, cam->m_FlashColor, (s32) cam->m_Viewport.m_ScreenPosX,
+            CEngineApp__DrawFilledRect(&gEngineApp, cam->m_FlashColor, (s32) cam->m_Viewport.m_ScreenPosX,
                           (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }
         rgba = hurt;
         if (cam->m_Flash > cam->m_FlashDec) {
-            cam->m_Flash -= (u32) (cam->m_FlashDec * D_800B6D28);
+            cam->m_Flash -= (u32) (cam->m_FlashDec * gFrameIncrement);
         } else {
             cam->m_Flash = 0;
         }
@@ -78,7 +78,7 @@ found:
             hurt[1] = 0;
             hurt[2] = 0;
             hurt[3] = cam->m_Flash;
-            CEngineApp__DrawFilledRect(&D_800F6CB0, hurt, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
+            CEngineApp__DrawFilledRect(&gEngineApp, hurt, (s32) cam->m_Viewport.m_ScreenPosX, (s32) cam->m_Viewport.m_ScreenPosY,
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }

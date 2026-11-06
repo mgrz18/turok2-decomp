@@ -4,7 +4,7 @@
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
-extern f32 D_800B6D28;      /* frame step */
+extern f32 gFrameIncrement;      /* frame step */
 
 s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
@@ -77,7 +77,7 @@ void CBarrel__RunButtons(CBarrel *menu, CPlayer *player) {
         }
         do {
             diff = to - from;
-            turn = diff * 0.25f * D_800B6D28;
+            turn = diff * 0.25f * gFrameIncrement;
             if (ABS(turn) > ABS(diff)) {
                 turn = diff;
             }

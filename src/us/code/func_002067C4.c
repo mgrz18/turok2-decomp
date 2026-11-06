@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern s32 D_800D81D0;
+extern s32 gCache;
 extern int D_800D8210[];
 extern s32 D_800D8DA4[];
 extern s32 D_800D8DD0;
@@ -29,7 +29,7 @@ void CCache__ReleaseDisplayList(s32 unused, s32 arg1) {
     if (limit != 0) {
         offset = count;
         do {
-            new_var = offset + D_800D81D0;
+            new_var = offset + gCache;
             count += 1;
             *(s32 *)&((Node80254C10 *)new_var)->flags &= mask;
             offset += 0x28;

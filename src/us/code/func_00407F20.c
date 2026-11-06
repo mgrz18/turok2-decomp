@@ -21,7 +21,7 @@ typedef struct {
 
 
 extern CPlayer *D_80119890;     /* the current player */
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_800B6660[];
 extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4[]; /* the actor list head */
@@ -60,7 +60,7 @@ void TotemDefense_Complete(BossFight *fight) {
     Sound__PlaySpeech(0x168);
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
     setAnim(fight->obj, 0x5337);
-    CScene__UnmarkGeneratorsSaved(D_800F7078);
+    CScene__UnmarkGeneratorsSaved(gScene);
     D_80119890->m_FleeTime = 450.0f;
     for (a = D_8010FEB4[0]; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {

@@ -14,7 +14,7 @@ extern void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
 extern s32 D_800B6D00;
 extern s32 D_800B6D54;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern s32 D_8011001C;
 
 /* CInstancePool__Alloc without the owner counter. */
@@ -63,7 +63,7 @@ CGameObjectInstance *CInstancePool__SpawnCopy(CInstancePool *world, CGameObjectI
     if (intelligence == NULL) {
         return NULL;
     }
-    if ((model == -1 && (model = CScene__FindObjectType(D_800F7078, type)) == -1)
+    if ((model == -1 && (model = CScene__FindObjectType(gScene, type)) == -1)
         || (obj = take_free_instance(world)) == NULL) {
         return NULL;
     }

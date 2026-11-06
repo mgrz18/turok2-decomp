@@ -18,7 +18,7 @@ extern u32 D_8011B09C;
 extern u32 D_8011B10C;
 extern float D_800A9E40;
 extern float D_800B6D44;
-extern FrameSchedule D_800F6CB0[];
+extern FrameSchedule gEngineApp[];
 extern u32 D_8011AD88;
 extern s32 D_8011B098;
 extern s32 D_8011F130;
@@ -40,7 +40,7 @@ void __scHandleRDP(OSSched *sc)
         }
         sc->curRDPTask = 0;
         if ((task->flags & 0x20) != 0) {
-            schedules = D_800F6CB0;
+            schedules = gEngineApp;
             framebuffer = task->framebuffer;
             if (framebuffer == (void *)schedules[0].task) {
                 schedule = &schedules[0];

@@ -8,7 +8,7 @@
 /* The shared types come from the shared headers: libultra's (OSMesgQueue,
  * OSPfs and the Controller Pak internals) from ultra_types.h, CVector3 (Rage
  * Wars' Vec3) from structs/vector.h, libaudio's ALHeap, ALInstrument and Acmd
- * from structs/libaudio.h. The world D_800F7078 is structs/world.h's CWorld
+ * from structs/libaudio.h. The world gScene is structs/world.h's CWorld
  * (Rage Wars' Shared_World has another layout). Gfx is gfx.h's: the files that write display lists
  * include it. RW_Mtx is Rage Wars' float matrix with named rows (not gbi.h's
  * fixed-point Mtx). */

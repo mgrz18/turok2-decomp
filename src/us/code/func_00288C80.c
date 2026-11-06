@@ -10,7 +10,7 @@ extern s32 D_800B6D7C;
 extern s32 D_8011B110;
 
 /* The frame/game state block passed to the per-mode handlers (the
- * handler table D_800B6D78/D_800B6D7C has 0xC-byte rows indexed by mode). */
+ * handler table gEngineModeTable/D_800B6D7C has 0xC-byte rows indexed by mode). */
 
 void CEngineApp__Retrace(CEngineApp *arg0) {
     s32 (*temp_v0)(void *);

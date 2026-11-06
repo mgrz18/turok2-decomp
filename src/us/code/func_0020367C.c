@@ -25,9 +25,9 @@ extern Manager D_800D8450;
 extern s32 D_800D81E0;
 extern u32 D_800D81C0;
 extern ResourceHashEntry *D_800D81C4;
-extern s32 D_800D1CD8;
+extern s32 gLoader;
 extern s32 D_800D8DF0;
-extern s32 D_800D6D68;
+extern s32 gDecompressor;
 
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
@@ -173,8 +173,8 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, v
             if (direct != 0) {
                 if (tag != 0) request->flags |= 4;
                 release();
-                CLoader__LoadSync(&D_800D1CD8, key, size, request->memEntry->data);
-                if (tag != 0) CDecompressor__DecompressSync(&D_800D6D68, request);
+                CLoader__LoadSync(&gLoader, key, size, request->memEntry->data);
+                if (tag != 0) CDecompressor__DecompressSync(&gDecompressor, request);
                 acquire();
                 if (tag != 0) request->flags &= ~4;
                 resolved = CCache__CompleteRequest(0, request, 0);
@@ -187,7 +187,7 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, v
                 request->flags = oldFlags | 2;
                 if (tag != 0) request->flags = oldFlags | 0xE;
                 release();
-                CLoader__LoadAsync(&D_800D1CD8, key, size, request->memEntry->data, &D_800D8450, request, 0);
+                CLoader__LoadAsync(&gLoader, key, size, request->memEntry->data, &D_800D8450, request, 0);
                 return 0;
             }
         }

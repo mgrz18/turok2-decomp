@@ -22,7 +22,7 @@ typedef struct {
     /* 0x54 */ Vec3_0043CF3C spawn;
 } Level0043CF3C;
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern u8 D_00431BF4[];
 extern u8 D_00431C10[];
 extern u8 D_00431C2C[];
@@ -39,7 +39,7 @@ void CAI__SetMode(Actor0043CF3C *actor, Level0043CF3C *level, s32 event);
 
 #define COUNT_DOWN(t)              \
     if ((t) > 0.0f) {              \
-        (t) -= D_800B6D28;         \
+        (t) -= gFrameIncrement;         \
     }
 
 void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {

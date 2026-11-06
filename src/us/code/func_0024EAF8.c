@@ -17,7 +17,7 @@ typedef struct {
     /* 0x140 */ u8 ai[4];
 } Mount;
 
-extern CCollisionResults D_800F1CE0;  /* m_pInstance: what the player is aiming at */
+extern CCollisionResults gCollisionResults;  /* m_pInstance: what the player is aiming at */
 extern CVector3 D_800ADCBC;             /* rider seat */
 
 f32 AI_AngleToPoint(CGameObjectInstance *body, CVector3 point);   /* angle to a point */
@@ -43,8 +43,8 @@ s32 CPlayer__TryMount(CPlayer *p, CGameObjectInstance *body) {
     Mount *mount;
 
     if (p->m_pOnEnemy == NULL && !(p->m_ModeBeforeFlags & 0x8000)) {
-        if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
-            mount = (Mount *)D_800F1CE0.m_pInstance;
+        if (gCollisionResults.m_pInstance != NULL && gCollisionResults.m_pInstance->header.m_Type == 1) {
+            mount = (Mount *)gCollisionResults.m_pInstance;
             if (mount->type == 0x136 && ABS(AI_AngleToPoint(body, mount->pos)) < 0.785398245f) {
                 p->m_pOnEnemy = mount;
                 p->m_OnEnemyObjectType = 0x136;

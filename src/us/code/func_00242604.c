@@ -4,7 +4,7 @@
 
 
 extern CCollisionInfo D_800F1E10;
-extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults *gCollisionResultsP;
 
 s32 Platform_CollideGround(Sweep *ctrl, CGameObjectInstance *actor);
 s32 Platform_CollideCylinder(Sweep *ctrl, CGameObjectInstance *actor);
@@ -36,9 +36,9 @@ void Platform_Collide(Sweep *ctrl, CGameObjectInstance *actor) {
             ctrl->hit.kindOut = NULL;
             ctrl->hit.kind = 0;
             ctrl->hit.data = actor;
-            ctrl->hit.posOut = &D_800F1ADC->m_vShapePos;
-            ctrl->hit.regionOut = &D_800F1ADC->m_pShapeRegion;
-            ctrl->hit.dataOut = (void **)&D_800F1ADC->m_pShape;
+            ctrl->hit.posOut = &gCollisionResultsP->m_vShapePos;
+            ctrl->hit.regionOut = &gCollisionResultsP->m_pShapeRegion;
+            ctrl->hit.dataOut = (void **)&gCollisionResultsP->m_pShape;
         }
     }
 }

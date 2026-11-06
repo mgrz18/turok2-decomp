@@ -42,7 +42,7 @@ typedef struct {
     /* 0x24 */ u32 buttons[5];
 } PlayerInput;
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern ButtonMap D_800ADA70[];
 f32 Math_DecayToZero(f32 value, f32 rate);
 
@@ -65,7 +65,7 @@ void CPlayer__ReadInput(PlayerInput *in, CPlayer *pl) {
     damp = 1.0f - pl->m_ZoomBlend * 0.99f;
     rate = opt->m_SettingY * (1.0f / 128) - 1.0f;
     rate = rate * 0.75f + 1.0f;
-    rate = rate * (D_800B6D28 * (damp * 0.1f));
+    rate = rate * (gFrameIncrement * (damp * 0.1f));
     ctrl = in->ctrl;
     switch (opt->m_ControlType) {
     case 0:

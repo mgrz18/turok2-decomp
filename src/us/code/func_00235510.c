@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 void Animator_Update(Animator *a) {
     s32 next;
     f32 op0;
@@ -21,13 +21,13 @@ void Animator_Update(Animator *a) {
         }
         break;
     case 1:
-        a->time -= D_800B6D28;
+        a->time -= gFrameIncrement;
         if (a->time < 0.0f) {
             next = 1;
         }
         break;
     case 4:
-        a->time += D_800B6D28;
+        a->time += gFrameIncrement;
         if (a->valueDuration <= a->time) {
             a->time = a->valueDuration;
             next = 1;
@@ -37,7 +37,7 @@ void Animator_Update(Animator *a) {
         a->value = op0 * a->valueFrom + op1 * a->valueTo;
         break;
     case 6:
-        a->time += D_800B6D28;
+        a->time += gFrameIncrement;
         if (a->colourDuration <= a->time) {
             a->time = a->colourDuration;
             next = 1;

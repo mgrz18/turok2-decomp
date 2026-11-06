@@ -3,7 +3,7 @@
 #include "structs/collision.h"
 #include "structs/level_actor.h"
 
-extern f32 D_800B6D28;                  /* the frame's time step */
+extern f32 gFrameIncrement;                  /* the frame's time step */
 extern CBox D_800F5A10;               /* visible bounds */
 
 void CPooledLevelActor__Update(CPooledLevelActor *actor);
@@ -46,7 +46,7 @@ void CLevelActorPool__Update(CLevelActorPool *pool) {
         next = next->m_pNext;
         expired = 0;
         if (actor->m_Lifetime > 0.0f) {
-            actor->m_Lifetime -= D_800B6D28;
+            actor->m_Lifetime -= gFrameIncrement;
             if (actor->m_Lifetime <= 0.0f) {
                 expired = 1;
             }

@@ -10,7 +10,7 @@ extern s32 D_801301FC; /* D_8012FB70.maxRadius */
 extern u8 D_00431CB4[];
 extern u8 D_00431CE4[];
 extern u8 D_00431CF0[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_80107590[];
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
@@ -28,7 +28,7 @@ static __inline__ void SpawnAt(s32 delay, s16 type, CVector3 pos, f32 speed) {
     s32 region;
     void *actor;
 
-    region = CScene__FindRegionAt(D_800F7078, &pos);
+    region = CScene__FindRegionAt(gScene, &pos);
     vel.x = 0.0f;
     vel.y = speed;
     vel.z = 0.0f;

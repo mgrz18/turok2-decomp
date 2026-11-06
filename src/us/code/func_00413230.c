@@ -547,12 +547,12 @@ void MenuItem_DrawSlider(MenuItem *it, MenuItemLayout *box, MenuItemLayout *colu
 extern s32 D_800B6D1C;
 extern s32 D_800B6D20; /* frame counter */
 extern s32 D_800B6D00;
-extern f32 D_800B6D28; /* frame time scale */
+extern f32 gFrameIncrement; /* frame time scale */
 extern s32 D_800C2030; /* screen width */
 extern s32 D_800C2034; /* screen height */
 extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0"); /* current draw mode */
 extern s32 D_801308E0;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern s32 D_800ADB30[];
 
 extern void memset(void *p, s32 c, s32 n); /* memset */
@@ -616,7 +616,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
             if (!(o->flags & 0x2000000)) {
                 s2 = p->intelType;
                 x2 = o->model;
-                src = CScene__FindIntelligence(D_800F7078, s2, p->intelId);
+                src = CScene__FindIntelligence(gScene, s2, p->intelId);
                 if (src == NULL) {
                     x2->loaded = 0;
                 } else {
@@ -655,7 +655,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
                 CCache__SetFrameDelay(1);
             }
             if (x->intelType == INTELLIGENCE_PLAYER) {
-                CScene__SetInstanceObjectType(D_800F7078, fx, D_800ADB30[fx->header.m_pIntelligence->m_Id], 1);
+                CScene__SetInstanceObjectType(gScene, fx, D_800ADB30[fx->header.m_pIntelligence->m_Id], 1);
             }
             if (D_800C1BD0_4143DC != 4) {
                 D_800C1BD0_4143DC = 4;
@@ -691,7 +691,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
             fx->header.m_vPos = v70;
             fx->m_AI.m_vDesiredPos = v70;
             CGameObjectInstance__UpdateAnimation(fx);
-            fx->m_RotY = fx->m_RotY + p->spin * D_800B6D28;
+            fx->m_RotY = fx->m_RotY + p->spin * gFrameIncrement;
             fx->header.m_vPos = v70;
             fx->m_AI.m_vDesiredPos = v70;
             Render_ResetBatches();
@@ -903,7 +903,7 @@ void Menu_MoveCursor(Menu *menu, u8 dir) {
  * func_0041560C and func_004156D8 at branch targets. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00441384.c, func_00441384, with Turok 2's layouts. */
 
-extern f32 D_800B6D28; /* frame delta */
+extern f32 gFrameIncrement; /* frame delta */
 extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 extern s32 func_00285628_4143DC(ControllerProfile *ctl) __asm__("Controller_MenuLeft");
 extern s32 func_00285670_4143DC(ControllerProfile *ctl) __asm__("Controller_MenuRight");
@@ -935,33 +935,33 @@ s32 Menu_Update(Menu *menu, void *arg) {
         } while (i != -1);
     }
     item = (MenuItem *) ((u8 *) menu->items + menu->cursor * 0x28);
-    menu->time = menu->time + D_800B6D28;
+    menu->time = menu->time + gFrameIncrement;
     horizontal = item->flags & 0x400000;
     func_00416C28_4143DC(menu);
     switch (menu->state) {
     case 0:
-        menu->fade = menu->fade + D_800B6D28;
+        menu->fade = menu->fade + gFrameIncrement;
         if (1.0f <= menu->fade) {
             menu->fade = 1.0f;
             menu->state = 1;
         }
         break;
     case 1:
-        menu->alpha = menu->alpha + D_800B6D28 * 0.4f;
+        menu->alpha = menu->alpha + gFrameIncrement * 0.4f;
         if (1.0f <= menu->alpha) {
             menu->alpha = 1.0f;
             menu->state = 2;
         }
         break;
     case 3:
-        menu->alpha = menu->alpha - D_800B6D28 * 0.4f;
+        menu->alpha = menu->alpha - gFrameIncrement * 0.4f;
         if (menu->alpha <= 0.0f) {
             menu->alpha = 0.0f;
             menu->state = 4;
         }
         break;
     case 4:
-        menu->fade = menu->fade - D_800B6D28;
+        menu->fade = menu->fade - gFrameIncrement;
         if (menu->fade <= 0.0f) {
             menu->fade = 0.0f;
             return 1;
@@ -1283,14 +1283,14 @@ void MenuItem_DrawBinding(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 /* ---------------- MenuItem_SetModel ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004422BC.c, func_004422BC, with Turok 2's layouts. */
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern CIntelligence *func_00225EBC_416214(void *world, s32 type, s32 id) __asm__("CScene__FindIntelligence");
 
 /* Finds a model item's definition and copies it into the item's extra (as
  * MenuItem_DrawModel does). */
 CIntelligence *MenuItem_SetModel(MenuItem *a, s32 id, s32 arg) {
     MenuModel *p = a->model;
-    CIntelligence *v = func_00225EBC_416214(D_800F7078, id, arg);
+    CIntelligence *v = func_00225EBC_416214(gScene, id, arg);
 
     if (v == NULL) {
         p->loaded = 0;

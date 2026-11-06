@@ -11,7 +11,7 @@ extern u8 D_800F5A50[];
 /* The world and fields of it (see CScene__UpdateWarp's World). D_80110020 and
  * D_80110048 are arrays because the ROM accesses them as struct members: a
  * store through a pointer may alias them, so their loads stay after it. */
-extern u8 D_800F7078[];             /* the world */
+extern u8 gScene[];             /* the world */
 extern s32 D_80110020[];            /* world +0x18FA8: the current warp id */
 extern s32 D_80110030;              /* world +0x18FB8: selectionFlags */
 extern u8 D_80110034[];             /* world +0x18FBC: selectionSpawn */
@@ -49,7 +49,7 @@ void Cinema_Start(void) {
                 D_800C1BB0->restored = 0;
                 D_800C1BB0->startPos = player->m_CharacterActor.header.m_vPos;
                 D_800C1BB0->startRotY = player->m_CharacterActor.m_RotY;
-                D_800C1BB0->startRegion = CScene__GetRegionIndex(D_800F7078, player->m_CharacterActor.header.m_pCurrentRegion);
+                D_800C1BB0->startRegion = CScene__GetRegionIndex(gScene, player->m_CharacterActor.header.m_pCurrentRegion);
             }
             player->m_WeaponActor.m_AI.m_VarBuffer[0] = 0;
             player->m_WeaponActor.m_AI.m_VarBuffer[1] = 0;
@@ -59,7 +59,7 @@ void Cinema_Start(void) {
         RumblePool_FreeAll(D_800F5A50);
     }
     if (warp != -1) {
-        world = D_800F7078;
+        world = gScene;
         if (D_80110020[0] != warp) {
             out[0] = 0;
             out[1] = 0;

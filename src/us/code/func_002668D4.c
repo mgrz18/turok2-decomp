@@ -11,11 +11,11 @@ typedef struct AIModeParam {
     /* 0x6 */ u16 value;
 } AIModeParam;
 
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void InteractiveAnim_EventPlay(CGameObjectInstance *arg0, s32 arg1, AIModeParam *arg2) {
     AI_PlayAnim(arg0, arg1, (s32) arg2->value);
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2100);
     CGameObjectInstance__AdvanceAnimation(arg0);
-    CScene__SetInstanceSavedBit((s32) &D_800F7078, arg0, 0);
+    CScene__SetInstanceSavedBit((s32) &gScene, arg0, 0);
 }

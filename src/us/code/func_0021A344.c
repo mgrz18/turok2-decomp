@@ -27,7 +27,7 @@ struct Actor {
 };
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
 void *CISet__GetBlock(s32, s32);
@@ -53,7 +53,7 @@ void CGameObjectInstance__UpdateAnimation(Actor *actor) {
     if (!(flags & 0x40000)) {
         return;
     }
-    game = &D_800F7078;
+    game = &gScene;
     if (*game != 4 || (flags & 0x2000)) {
         moving = flags & 0x300000;
         oldPos = actor->pos;

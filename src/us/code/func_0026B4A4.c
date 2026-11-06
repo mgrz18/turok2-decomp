@@ -17,7 +17,7 @@ typedef struct {
 } TriGroupList;
 
 extern s32 D_800B6D54;          /* level loaded */
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
 extern CVector3 D_800F2020;        /* cached raw normal */
 
@@ -93,7 +93,7 @@ CGameRegion *CGameRegion__FindBelow(CGameRegion *skip, CVector3 pos) {
     if (!D_800B6D54) {
         return NULL;
     }
-    world = &D_800F7078;
+    world = &gScene;
     tris = (CGameRegion *) ((u8 *) CISet__GetBlock(world->m_pRegionData, 2) + 8);
     list = CISet__GetBlock(world->m_pRegionData, 3);
     n = list->count;

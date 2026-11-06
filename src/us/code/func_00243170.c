@@ -120,7 +120,7 @@ struct StateEntry {
     u32 flags;
 };
 extern double D_800A68B8;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern s32 IsCodePointer(StateCallback);
 extern s32 IsDataPointer(u32);
 extern void *CGameObjectInstance__PickAvailableAction(void *, void *, s32);
@@ -186,7 +186,7 @@ void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
         } else {
             factor = dst->scale * dst->entry_scale;
         }
-        D_800B6D28 *= factor;
+        gFrameIncrement *= factor;
         CGameObjectInstance__SetAnim(src, dst->state_result, (dst->entry_flags >> 5) & 1);
         if ((dst->state_result != -1) && (src->previous_state != dst->state_result)) {
             dst->count = 0;

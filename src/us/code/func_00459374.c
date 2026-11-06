@@ -13,7 +13,7 @@ extern s32 D_800C2028; /* pad */
 extern s32 D_801309BC;
 extern s32 D_801309B8;
 extern s32 D_801309C4;
-extern CWorld D_800F7078[];
+extern CWorld gScene[];
 extern u8 D_8011AC58;
 extern s32 D_8011AADC;
 extern f32 D_8011ACB4[];
@@ -52,7 +52,7 @@ s32 GameNoteMenu_SelectYes_2(s32 unused, Menu *own) {
     }
     if (D_801309B8 != 0) {
         plr = CPlayerPool__FindByController(&D_80119870.m_PlayerList, own->controller);
-        g = D_800F7078;
+        g = gScene;
         save = D_8011AC58;
         plr->m_Data = D_800C201C->player;
         {

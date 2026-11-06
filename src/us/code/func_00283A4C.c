@@ -7,7 +7,7 @@
 extern Cinema *D_800C1BB0;
 extern CPlayer *D_80119890;          /* current player */
 extern s32 D_8011AC88;
-extern u8 D_800F7078[];             /* the world */
+extern u8 gScene[];             /* the world */
 extern s32 D_80110020;              /* world +0x18FA8: the current warp id */
 extern s32 D_80110024;
 extern s32 D_80110028;
@@ -31,7 +31,7 @@ void Cinema_RestorePlayer(void) {
     s32 level;
     s32 warp;
 
-    world = D_800F7078;
+    world = gScene;
     level = D_800C1BB0->startLevel;
     warp = D_800C1BB0->startWarp;
     if (D_8011AC88 != 13) {

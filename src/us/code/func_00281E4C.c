@@ -14,7 +14,7 @@ struct CGameRegion *CScene__FindRegionAt(s32, CVector3 *);
 f32 CGameRegion__GetHeight(struct CGameRegion *, f32, f32);  /* extern */
 s32 Cinema_PathPlaying();                                /* extern */
 extern u32 D_800B6D00;
-extern s32 D_800F7078;
+extern s32 gScene;
 
 /* Picks the visibility bits of the camera: those of its region when it is 5 to 11 units
  * above the floor there, else the default D_800B6D00. */
@@ -27,7 +27,7 @@ void CCamera__UpdateVisBits(CCamera *arg0) {
     struct CGameRegion *temp_s1;
 
     if (Cinema_PathPlaying() != 0) {
-        arg0->m_ViewParams.m_pCurrentRegion = CScene__FindRegionAt((s32) &D_800F7078, &arg0->m_ViewParams.m_vPos);
+        arg0->m_ViewParams.m_pCurrentRegion = CScene__FindRegionAt((s32) &gScene, &arg0->m_ViewParams.m_vPos);
     }
     temp_s1 = arg0->m_ViewParams.m_pCurrentRegion;
     temp_f21 = arg0->m_ViewParams.m_vPos.x;

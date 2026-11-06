@@ -3,7 +3,7 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 
-extern u8 D_800F7078[];  /* the world */
+extern u8 gScene[];  /* the world */
 extern u8 D_8011AAF1;    /* multiplayer */
 extern s32 D_8011ACE4;
 extern s32 D_800ADB5C;
@@ -15,7 +15,7 @@ extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CScene__SetInstanceObjectType(void *world, CPlayer *p, s32, s32);
 
 static __inline__ CIntelligence *findDef(s32 kind, s32 character) {
-    return CScene__FindIntelligence(D_800F7078, kind, character);
+    return CScene__FindIntelligence(gScene, kind, character);
 }
 
 void CPlayer__SetCharacter(CPlayer *p, s32 character) {
@@ -53,5 +53,5 @@ void CPlayer__SetCharacter(CPlayer *p, s32 character) {
             sound = D_800ADB30[p->m_CharacterActor.header.m_pIntelligence->m_Id];
         }
     }
-    CScene__SetInstanceObjectType(D_800F7078, p, sound, p->m_CharAnim);
+    CScene__SetInstanceObjectType(gScene, p, sound, p->m_CharAnim);
 }

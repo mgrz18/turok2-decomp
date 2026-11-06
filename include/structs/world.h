@@ -1,7 +1,7 @@
 #ifndef STRUCTS_WORLD_H
 #define STRUCTS_WORLD_H
 
-/* The world (D_800F7078): the game's resource files, the loaded level and
+/* The world (gScene): the game's resource files, the loaded level and
  * its actor lists, the particle and actor pools, and the level-warp state.
  * One object of 0x19078 bytes and more (D_801102B8, world + 0x19240, is
  * passed on as an object of its own). Other symbols point inside it and must
@@ -144,7 +144,7 @@ typedef struct CWorld {
     /* 0x018AC */ u8 unk_18AC[0x4];
     /* 0x018B0 */ u8 m_ParticleSystem[0x10518 - 0x18B0];
     /* 0x10518 */ u8 m_ActorPool[0x13B28 - 0x10518];
-    /* 0x13B28 */ CInstancePool m_InstancePool;     /* D_8010ABA0 (structs/game_object.h) */
+    /* 0x13B28 */ CInstancePool m_InstancePool;     /* gScene_m_InstancePool (structs/game_object.h) */
     /* 0x18E50 */ CLevelHeader *m_pLevelHeader;
     /* 0x18E54 */ u8 unk_18E54[0x8];
     /* 0x18E5C */ u8 unk_18E5C[0x40];

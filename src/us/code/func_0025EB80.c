@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 void Throwable_SetModeAnim(CPlayer *player, CAI *ai, CGameObjectInstance *obj);
 void CScene__SetInstanceObjectType(void *level, CGameObjectInstance *obj, s32 a, s32 animType);
 void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
@@ -14,6 +14,6 @@ void EnemyAI_Mount(CGameObjectInstance *obj, CAI *ai, CPlayer *player) {
     }
     player->m_vOnEnemyOriginalScale = obj->m_vScale;
     obj->m_dwFlags &= ~0x20000000;
-    CScene__SetInstanceObjectType(D_800F7078, obj, player->m_OnEnemyObjectType + 1, ai->m_AnimType);
+    CScene__SetInstanceObjectType(gScene, obj, player->m_OnEnemyObjectType + 1, ai->m_AnimType);
     CAI__SetMode(obj, ai, 0x2C);
 }

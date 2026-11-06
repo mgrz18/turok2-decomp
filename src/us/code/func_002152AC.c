@@ -27,7 +27,7 @@ s32 *CISet__GetBlock(s32, s32);
 extern u8 D_800B6D1B;
 extern s32 D_800B6D1C;
 extern u8 D_8010FF20[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern s32 D_8011AAD8;
 
 void CLevelActor__Draw(CLevelActor *obj) {
@@ -59,7 +59,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
         Render_QueueModelInstance(geometry, obj->m_Matrices[D_800B6D1C], 0, obj->m_Lights, 0, D_800B6D1C, obj->header.m_pIntelligence->m_nTexture);
     } else {
         variant = obj->header.m_pIntelligence->m_nModel;
-        index = CScene__GetObjectTypeID(D_800F7078, obj->header.m_nObjType);
+        index = CScene__GetObjectTypeID(gScene, obj->header.m_nObjType);
         if (index < 0x6AB) {
             if (index >= 0x6A9) {
                 if ((D_8011AAD8 & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {

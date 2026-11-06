@@ -12,7 +12,7 @@ typedef struct ShotActor {
     /* 0x1A8 */ CPlayer *player;
 } ShotActor;
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_800F8928[];
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
@@ -50,5 +50,5 @@ void func_00238500(void *unused, ShotActor *actor, CVector3 pos, CVector3 dir, s
     p.x = 0.0f;
     p.y = 0.0f;
     p.z = 0.0f;
-    CScene__StartRumbles(D_800F7078, pl->m_ContState.m_pContState->rumblePool, 3, p, 10.24f, 1.0f);
+    CScene__StartRumbles(gScene, pl->m_ContState.m_pContState->rumblePool, 3, p, 10.24f, 1.0f);
 }

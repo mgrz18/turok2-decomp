@@ -26,7 +26,7 @@ typedef struct {
     /* 0x04 */ u8 pad4[0x18 - 4];
 } Mode;
 
-extern f32 D_800B6D28;      /* frame time */
+extern f32 gFrameIncrement;      /* frame time */
 extern Mode D_800ADF5C[];
 
 f32 Math_DecayToZero(f32 value, f32 rate);
@@ -64,7 +64,7 @@ void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, Tuning *tu
     ready = 1;
     if (!(value <= 0.0f)) {
         ready = 0;
-        player->m_BurstTimer = value - D_800B6D28;
+        player->m_BurstTimer = value - gFrameIncrement;
     }
     if (player->m_Data.m_CurrentWeapon == 0x12 || player->m_Data.m_CurrentWeapon == 0x21) {
         ready = 0;

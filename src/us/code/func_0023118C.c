@@ -23,7 +23,7 @@ extern Gfx *D_800D8E24;             /* display list head */
 extern s32 D_800B6D1C;              /* matrix buffer index */
 extern s32 D_801198E0;
 extern CCamera *D_801198D0;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_801102B8[];
 
 extern s32 Frustum_TestBox(void *planes, Box *box);
@@ -105,7 +105,7 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                         node->m_dwFlags |= builtFlag;
                     }
                     if (node->m_pEffect->m_pModel != 0) {
-                        CScene__GetLightsAt(D_800F7078, &node->header.m_vPos, node->m_Lights[D_800B6D1C]);
+                        CScene__GetLightsAt(gScene, &node->header.m_vPos, node->m_Lights[D_800B6D1C]);
                         func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[D_800B6D1C], node->m_Lights[D_800B6D1C], 0, -1);
                     } else {
                         CParticle__DrawSprite(node, view);

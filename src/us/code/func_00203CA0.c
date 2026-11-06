@@ -87,7 +87,7 @@ static __inline__ void release(void) {
     }
 }
 extern s32 CDecompressor__DecompressAsync(void *, void *, Manager *);
-extern s32 D_800D6D68;
+extern s32 gDecompressor;
 static __inline__ void lock(void) {
     extern Manager D_800D8450;
     u32 token = __osDisableInt();
@@ -172,7 +172,7 @@ done:
             release();
             if (async != 0) {
                 found->flags &= ~0xE;
-                CDecompressor__DecompressSync(&D_800D6D68, found);
+                CDecompressor__DecompressSync(&gDecompressor, found);
                 acquire();
                 found = CCache__CompleteRequest(0, found, 0);
                 release();
@@ -181,7 +181,7 @@ done:
                 }
                 return 0;
             }
-            if (CDecompressor__DecompressAsync(&D_800D6D68, found, &D_800D8450) == 0) {
+            if (CDecompressor__DecompressAsync(&gDecompressor, found, &D_800D8450) == 0) {
                 acquire();
                 if (first != 0) {
                     unref(first);

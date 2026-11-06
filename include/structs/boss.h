@@ -335,7 +335,7 @@ extern BossState D_8012F9D8;
 extern BossMode D_8012F9DC;
 extern BossScript3 D_8012FA1C;  /* LevelScriptState.script3 */
 
-/* A spawn point of the Mother fight (D_00431D20, and D_00431C40 in the
+/* A spawn point of the Mother fight (gMotherSpawnPoints, and gMotherSpawnPoints_2 in the
  * second copy of the module): where its pickups drop (MotherBoss_DropPickupsAtSpawnPoints) and
  * around which it throws its target, inside the angle range
  * (MotherBoss_TeleportTarget). */
@@ -345,8 +345,8 @@ typedef struct SpawnPoint {
     /* 0x10 */ f32 maxAngle;
 } SpawnPoint; /* size 0x14 */
 
-extern SpawnPoint D_00431D20[4];  /* the first copy of the module */
-extern SpawnPoint D_00431C40[4];  /* the second copy */
+extern SpawnPoint gMotherSpawnPoints[4];  /* the first copy of the module */
+extern SpawnPoint gMotherSpawnPoints_2[4];  /* the second copy */
 
 /* One step of the wave boss's script (D_00430824...): the minions of the
  * wave, how many may fight at once, and the weak spot it opens. Stepping it

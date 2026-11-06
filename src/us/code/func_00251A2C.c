@@ -10,7 +10,7 @@ typedef struct {
     /* 0x174 */ s8 aiState;
 } Mount;
 
-extern f32 D_800B6D28;          /* frame time */
+extern f32 gFrameIncrement;          /* frame time */
 extern f32 D_800ADDE4;          /* charge speed */
 extern f32 D_800AE344;          /* step length */
 extern CVector3 D_800ADCB0;        /* rider view offset */
@@ -46,7 +46,7 @@ void CPlayer__UpdateRiding(CPlayer *player, CGameObjectInstance *body) {
 
     mount = ((Mount *)player->m_pOnEnemy);
     turn = player->m_ContState.m_FinalLookX * (((func_002974C0(player->m_RideEnemyTime * 0.2792527f) + 1.0f) * 0.01f + 0.06f) * 80.0f);
-    player->m_RideEnemyTime += D_800B6D28;
+    player->m_RideEnemyTime += gFrameIncrement;
     turn *= 0.017453294f;
     yaw = body->m_RotY;
     Math_EaseToward(&body->m_RotY, yaw + turn, 0.9f);

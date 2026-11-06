@@ -76,7 +76,7 @@ typedef struct {
     /* 0x08 */ Vec3_00401E30 offset;
 } Part00401E30;
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern WaveBossStep D_00430824[];
 extern Part00401E30 D_004307B0[];
 void ScriptAnimator_Start(void *slot, void *actor);
@@ -110,10 +110,10 @@ void MantidQueen_Init(WaveBossState *s, CGameObjectInstance *actor) {
     s->toSpawn = 0;
     s->spots[0].health = 0;
     State_SetStep(s, D_00430824, 1);
-    CScene__FindInstances(D_800F7078, 0x457, 9, 0x1D4D, &s->boss, 1);
-    s->memberCount = CScene__FindInstances(D_800F7078, 0x651, 10, 0x1D4D, s->members, 8);
+    CScene__FindInstances(gScene, 0x457, 9, 0x1D4D, &s->boss, 1);
+    s->memberCount = CScene__FindInstances(gScene, 0x651, 10, 0x1D4D, s->members, 8);
     for (i = 0; i < 2; i++) {
-        s->intel[i] = CScene__FindIntelligence(D_800F7078, 1, D_004307B0[i].id);
+        s->intel[i] = CScene__FindIntelligence(gScene, 1, D_004307B0[i].id);
     }
     s->blink = 0;
     s->blinkTimer = 0.0f;

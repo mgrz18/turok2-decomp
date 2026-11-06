@@ -5,7 +5,7 @@
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
 extern u32 D_800B6D20;
-extern s32 D_800F7078;
+extern s32 gScene;
 extern u8 D_801198B0[];
 
 extern void CCameraPool__AddText(void *arg0, void *camera, s32 model);
@@ -15,7 +15,7 @@ void WeaponMode_Switch_Enter(CGameObjectInstance *weapon, CAI *state) {
     CPlayer *player = *(CPlayer **)((u8 *)weapon + 0x1A8);
     s16 requested = *(s16 *)((u8 *)player + 0xB14);
 
-    if (player->m_Data.m_CurrentWeapon != requested || D_800F7078 != 4) {
+    if (player->m_Data.m_CurrentWeapon != requested || gScene != 4) {
         player->m_Data.m_CurrentWeapon = *(s16 *)((u8 *)player + 0xB14);
         state->m_pModeTable = D_800AF618[requested]->modeTable;
         state->m_pfEffects = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;

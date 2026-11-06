@@ -2,7 +2,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 
-extern CCollisionResults D_800F1CE0;
+extern CCollisionResults gCollisionResults;
 void CVector3__Normalize(CVector3 *v);
 f32 Random_Blend(f32 a, f32 b);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
@@ -12,9 +12,9 @@ void CParticle__PlaceAtInstanceHit(CParticle *actor, s32 kind) {
     CVector3 dir;
 
     actor->m_dwFlags |= 0x20000;
-    actor->header.m_vPos = D_800F1CE0.m_vInstancePos;
-    actor->m_vVelocity = D_800F1CE0.m_vVelocity;
-    dir = D_800F1CE0.m_vVelocity;
+    actor->header.m_vPos = gCollisionResults.m_vInstancePos;
+    actor->m_vVelocity = gCollisionResults.m_vVelocity;
+    dir = gCollisionResults.m_vVelocity;
     CVector3__Normalize(&dir);
     actor->m_vDirection = dir;
     CVector3__Scale(&dir, &dir, Random_Blend(-49.92f, 0.0f));

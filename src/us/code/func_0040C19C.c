@@ -21,11 +21,11 @@ void MotherBoss_RandomSpawnPoint(CVector3 *out) {
         ok = 1;
         i = Random_Blend(0.0f, 0.99999f) * 4.0f;
         if (found != NULL) {
-            CVector3__Subtract(out, &found->header.m_vPos, &D_00431D20[i].pos);
+            CVector3__Subtract(out, &found->header.m_vPos, &gMotherSpawnPoints[i].pos);
             if (func_00298470(out->x * out->x + out->y * out->y + out->z * out->z) < 460.8f) {
                 ok = 0;
             }
         }
     } while (!ok);
-    *out = D_00431D20[i].pos;
+    *out = gMotherSpawnPoints[i].pos;
 }

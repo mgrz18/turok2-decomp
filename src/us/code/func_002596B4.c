@@ -18,7 +18,7 @@ typedef struct {
 } State;
 
 extern u32 D_800B6D20;
-extern s32 D_800F7078;
+extern s32 gScene;
 extern u8 D_801198B0[];
 void CCameraPool__AddText(void *buf, s32 a, s32 b);
 void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
@@ -26,7 +26,7 @@ void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 void WeaponActor_EquipRequested(CGameObjectInstance *actor, State *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
 
-    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || D_800F7078 != 4) {
+    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || gScene != 4) {
         player->m_Data.m_CurrentWeapon = player->m_RequestedWeapon;
         state->unk2C = D_800AF618[player->m_Data.m_CurrentWeapon]->modeTable;
         state->unk108 = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;

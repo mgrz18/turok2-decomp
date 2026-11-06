@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern f32 D_800B6D28; /* frame delta */
+extern f32 gFrameIncrement; /* frame delta */
 
 void TotemDefense_AddKill(void);
 void CAI__SetMode(CGameObjectInstance *self, CAI *ai, s32 mode);
@@ -12,7 +12,7 @@ void EnemyMode_ReactionBore_Update(CGameObjectInstance *self, CAI *ai) {
     if (ai->m_ConditionTimer > 75.0f) {
         ai->m_ConditionTimer = 75.0f;
     }
-    ai->m_ConditionTimer -= D_800B6D28;
+    ai->m_ConditionTimer -= gFrameIncrement;
     if (ai->m_ConditionTimer <= 0.0f) {
         ai->m_Health = 0;
         TotemDefense_AddKill();

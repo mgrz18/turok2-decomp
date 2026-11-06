@@ -4,7 +4,7 @@
 s32 Video_GetResolutionText(void);
 
 s32 GetMemSize();                                /* extern */
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern f32 D_80130930;
 
 s32 OptionsMenu_ResolutionText(void *arg0)
@@ -13,7 +13,7 @@ s32 OptionsMenu_ResolutionText(void *arg0)
   s32 var_v0;
   int new_var2;
   s8 *new_var;
-  temp_f0 = D_80130930 - D_800B6D28;
+  temp_f0 = D_80130930 - gFrameIncrement;
   D_80130930 = temp_f0;
   if (temp_f0 <= 0.0f)
   {

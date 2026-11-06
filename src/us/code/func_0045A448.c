@@ -6,12 +6,12 @@
 #include "structs/game.h"
 #include "structs/save.h"
 
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern s32 D_80110060[];
 extern u8 D_800EBAC0[];
 
 void SaveGame_Restore_2(CPlayer *p) {
-    CWorld *level = &D_800F7078;
+    CWorld *level = &gScene;
     u8 keep;
     s32 i;
     u8 *src;

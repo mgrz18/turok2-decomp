@@ -21,7 +21,7 @@ typedef struct {
     /* 0x04 */ u8 flag;
 } Chunk;
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_800F5618[0x90];
 extern u8 *D_800B2AC0;
 
@@ -40,7 +40,7 @@ void COnScreen__LoadFontTexture(void) {
     s32 index;
 
     D_800B2AC0 = NULL;
-    res = CScene__LoadGraphicSet(D_800F7078, 2, 0, 1);
+    res = CScene__LoadGraphicSet(gScene, 2, 0, 1);
     if (res != NULL) {
         table = res->table;
         index = 42 % table->count;

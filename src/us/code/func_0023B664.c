@@ -3,7 +3,7 @@
 #include "structs/region.h"
 #include "structs/collision.h"
 
-extern s32 D_800F7078[];
+extern s32 gScene[];
 
 CRegionInfo *CScene__GetRegionInfo(s32 *list, CGameRegion *region);
 s32 func_00267EA8(CGameObjectInstance *obj);
@@ -96,8 +96,8 @@ CGameRegion *Sweep_CrossRegionEdge(Sweep *sweep, CGameRegion *from, s32 edge, CV
             }
         }
     }
-    fromInfo = CScene__GetRegionInfo(D_800F7078, from);
-    toInfo = CScene__GetRegionInfo(D_800F7078, to);
+    fromInfo = CScene__GetRegionInfo(gScene, from);
+    toInfo = CScene__GetRegionInfo(gScene, to);
     if (!(def->m_dwFlags & 0x10) && (REGION_WORD(to) & 6) == 2) {
         return NULL;
     }

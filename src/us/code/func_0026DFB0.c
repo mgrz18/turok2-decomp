@@ -6,11 +6,11 @@ typedef struct {
     void (*onEvent)(LevelEvent *event);
 } EventHandler;
 
-extern EventHandler *D_800B2628[];  /* handler tables by kind */
+extern EventHandler *gLevelEventHandlers[];  /* handler tables by kind */
 extern char *D_800B69D8[];          /* {text, sound} pairs */
 extern s32 D_800B69DC[];            /* D_800B69D8 + 4 */
 extern s32 D_800B6D20;
-extern s32 D_800F7078;              /* world: game state */
+extern s32 gScene;              /* world: game state */
 extern u8 *D_800F7158;              /* world + 0xE0: level actors (0x288 bytes each) */
 extern s32 D_80110020;              /* current level */
 extern u8 D_801198B0[];             /* game */
@@ -26,7 +26,7 @@ void LevelEvent_Fire(LevelEvent *event) {
     void *camera;
     u8 *actor;
 
-    entry = D_800B2628[event->kind];
+    entry = gLevelEventHandlers[event->kind];
     if (entry == NULL) {
         return;
     }
@@ -38,7 +38,7 @@ void LevelEvent_Fire(LevelEvent *event) {
             camera = game - 0x1201;
         }
     }
-    if (D_800F7078 == 4) {
+    if (gScene == 4) {
         if (event->message != 0) {
             CCameraPool__AddMultiLineText(D_801198B0, camera, D_800B69D8[event->message * 2], D_800B6D20, 4.0f);
             if (D_800B69DC[event->message * 2] != 0) {

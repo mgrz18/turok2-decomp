@@ -8,7 +8,7 @@
 
 extern u8 D_14A000[];               /* the paged data in the ROM */
 extern u8 D_3CAE0[];                /* its size */
-extern char D_800D1CD8[];           /* the cartridge reader */
+extern char gLoader[];           /* the cartridge reader */
 
 u32 GetMemSize(void);            /* osGetMemSize */
 void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
@@ -68,7 +68,7 @@ void VM_Initialize(void) {
     D_801206A0.regions.source = (u8 *)((u32)D_14A000 | 0xB0000000);
     D_801206A0.mapped = 0;
     if (GetMemSize() > 0x4FFFFF) {
-        CLoader__LoadSync(D_800D1CD8, D_14A000, D_3CAE0, extra);
+        CLoader__LoadSync(gLoader, D_14A000, D_3CAE0, extra);
     }
     if (extra != 0) {
         func_0028EE40(0, 0x7E000, 0x400000, extra + 0x80000000, extra + 0x80040000, 7);

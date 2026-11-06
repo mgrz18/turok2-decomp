@@ -9,7 +9,7 @@ typedef struct CollisionInfo {
     /* 0x06 */ u8 pad6[0x1C - 0x6];
 } CollisionInfo; /* size 0x1C */
 
-extern CCollisionResults D_800F1CE0;
+extern CCollisionResults gCollisionResults;
 
 s32 Collision_MoveInstance(CObjectHead *obj, CVector3 to, CollisionInfo *info);
 
@@ -26,7 +26,7 @@ s32 GameObject_CanMoveTo(CObjectHead *obj, CVector3 to, CollisionInfo *info) {
     Collision_MoveInstance(obj, to, &probe);
     *obj = saved;
     hit = 0;
-    if (D_800F1CE0.m_pInstance != NULL || D_800F1CE0.m_pWallRegion != NULL) {
+    if (gCollisionResults.m_pInstance != NULL || gCollisionResults.m_pWallRegion != NULL) {
         hit = 1;
     }
     return hit ^ 1;

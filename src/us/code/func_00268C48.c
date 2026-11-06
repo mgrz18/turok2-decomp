@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 
-extern CCollisionResults *D_800F1ADC;     /* current hit buffer */
+extern CCollisionResults *gCollisionResultsP;     /* current hit buffer */
 typedef struct CollisionInfo {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s8 flagB;
@@ -32,17 +32,17 @@ static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *
     saved = *actor;
     oldA = D_800F1CC0.flagA;
     oldB = D_800F1CC0.flagB;
-    oldHits = D_800F1ADC;
+    oldHits = gCollisionResultsP;
     D_800F1CC0.flagA = flagA;
     D_800F1CC0.flagB = flagB;
-    D_800F1ADC = &hits;
+    gCollisionResultsP = &hits;
     Collision_MoveInstance(actor, pos, &D_800F1CC0);
     actor->m_vPos.y = pos.y;
     end.x = actor->m_vPos.x;
     end.y = pos.y;
     end.z = actor->m_vPos.z;
     region = actor->m_pCurrentRegion;
-    D_800F1ADC = oldHits;
+    gCollisionResultsP = oldHits;
     *actor = saved;
     *outPos = end;
     *outRegion = region;

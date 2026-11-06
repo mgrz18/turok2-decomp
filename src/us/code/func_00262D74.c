@@ -19,10 +19,10 @@ extern Pick D_800B1F6C[];
 extern Pick D_800B1F78[];
 extern Pick D_800B1F88[];
 extern Pick D_800B1FE4[];
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_800F8928[];
 extern u8 D_80107590[];
-extern u8 D_8010ABA0[];
+extern u8 gScene_m_InstancePool[];
 
 extern f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
 extern s32 *CScene__GetIntelligence(void *level, s32 model);
@@ -55,7 +55,7 @@ static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3
 
 /* Spawns the object model (an intelligence entry) at pos. */
 static __inline__ void spawnObject(CGameObjectInstance *actor, CAI *ai, CVector3 pos, CVector3 scale, s32 region, s32 type, s32 *model) {
-    if (CInstancePool__Spawn(D_8010ABA0, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_Generator.m_nActive)) {
+    if (CInstancePool__Spawn(gScene_m_InstancePool, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_Generator.m_nActive)) {
         ai->m_Generator.m_nRemaining--;
     }
 }
@@ -95,10 +95,10 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
     }
     switch (info->m_Type) {
     case 0:
-        model = CScene__GetIntelligence(D_800F7078, info->m_VariationIndex);
+        model = CScene__GetIntelligence(gScene, info->m_VariationIndex);
         switch (*model) {
         case 8:
-            id = CScene__GetObjectTypeID(D_800F7078, info->m_ObjectIndex);
+            id = CScene__GetObjectTypeID(gScene, info->m_ObjectIndex);
             if (Generator_IsPickupUnlocked(id)) {
                 spawnPickup(actor, ai, pos, region, id);
             }

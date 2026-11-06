@@ -11,12 +11,12 @@ extern s32 D_801309BC;
 extern s32 D_8011B108;
 extern s32 D_8011F144;
 extern s32 D_800C2028;
-extern s32 D_800F6CB0;
+extern s32 gEngineApp;
 extern void CEngineApp__UpdateControllers(void *arg0);
 s32 PakMenu_PollBootPak_2(s32 arg0) {
     extern s32 func_0041DCB0(s32, s32, s32);
     if (D_8011B108 == 0) {
-        CEngineApp__UpdateControllers(&D_800F6CB0);
+        CEngineApp__UpdateControllers(&gEngineApp);
         Controller_UpdatePakInsertion();
         if (D_8011B108 == 0) {
             if (D_8011F144 != 0) {

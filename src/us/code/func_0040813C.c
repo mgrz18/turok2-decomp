@@ -21,7 +21,7 @@ typedef struct {
 
 
 extern CPlayer *D_80119890;     /* the current player */
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_800B6674[];
 extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4[]; /* the actor list head */
@@ -62,7 +62,7 @@ void TotemDefense_Fail(BossFight *fight) {
     setAnim(fight->obj, 0x5336);
     COnScreen__ClearBoss(D_801100F0);
     COnScreen__ClearBoss2(D_801100F0);
-    CScene__UnmarkGeneratorsSaved(D_800F7078);
+    CScene__UnmarkGeneratorsSaved(gScene);
     if (fight->state != 1) {
         current = D_80119890;
         for (a = D_8010FEB4[0]; a != NULL; a = a->m_pNext) {

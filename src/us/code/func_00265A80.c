@@ -3,10 +3,10 @@
 
 s32 CScene__GetInstanceSavedBit(void *, void *);                  /* extern */
 void CAI__SetMode(void *, CAI *, s32);             /* extern */
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 void Destructible_Advance(CGameObjectInstance *arg0, CAI *arg1) {
-    if (CScene__GetInstanceSavedBit(D_800F7078, arg0) == 1) {
+    if (CScene__GetInstanceSavedBit(gScene, arg0) == 1) {
         CAI__SetMode(arg0, arg1, 1);
         return;
     }

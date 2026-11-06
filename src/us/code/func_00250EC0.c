@@ -3,7 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern s16 D_800AE312[];        /* per character: climbing step sound (stride 4) */
 
 s32 CGameRegion__IsSteep(void *region);
@@ -59,7 +59,7 @@ void PlayerClimb_Update(CPlayer *player, CGameObjectInstance *body) {
         CPlayer__SetState(player, body, 2);
         return;
     }
-    CScene__GetRegionInfo(D_800F7078, body->header.m_pCurrentRegion);
+    CScene__GetRegionInfo(gScene, body->header.m_pCurrentRegion);
     Math_EaseToward(&body->m_RotY, body->m_RotY - Angle_Difference(body->m_RotY, CGameRegion__GetDownhillYaw(body->header.m_pCurrentRegion)), 0.9f);
     Math_EaseToward(&player->m_vHeadRotOffset.y, player->m_ContState.m_FinalLookX * 3.4906588f, 0.25f);
     angle = -player->m_ContState.m_FinalLookY * 80.0f;

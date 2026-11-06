@@ -78,7 +78,7 @@ extern f32 D_8011F158;
 extern f32 D_800B6D40;
 extern f32 D_800B6D3C;
 extern s32 D_800B6E50;
-extern View D_800F6CB0[];
+extern View gEngineApp[];
 extern u32 D_80130A84;
 void __scHandleRSP(Vid *o) {
     Job *j;
@@ -114,7 +114,7 @@ void __scHandleRSP(Vid *o) {
             D_8011F158 = D_8011F158 + (f32)(((osGetTime() - D_8011F160) * 64) / 3) * 0.000001f;
             D_800B6D40 = D_8011F158;
             D_800B6D3C = (f32)(((osGetTime() - D_8011F150) * 64) / 3) * 0.000001f;
-            base = D_800F6CB0;
+            base = gEngineApp;
             fb = (u32)j->unkC;
             if (fb == base[0].fb) {
                 s = base;

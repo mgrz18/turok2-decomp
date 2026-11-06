@@ -21,7 +21,7 @@ struct CGameObjectInstance;
  * The flying steering (EnemyFly_SteerToPath, EnemyFly_SteerToPathScaled, behaviour 1) pitches
  * with the vertical speed and rolls with the turn; the swimming modes
  * (EnemySwim_Setup sets them up) turn at m_TurnRate and pulse m_BaseScale.
- * Timers are in frames, counted down by D_800B6D28. m_Timer and m_Timer2 run
+ * Timers are in frames, counted down by gFrameIncrement. m_Timer and m_Timer2 run
  * one after the other (EnemyMode_CloakActivate_Enter seeds both); when both are out the AI
  * goes to mode 0x19, whose draw fades with m_Timer (EnemyAI_DrawFaded). */
 typedef struct {

@@ -16,7 +16,7 @@ typedef struct {
     /* 0x22 */ s16 impulseSound;
 } Tuning;
 
-extern f32 D_800B6D28;      /* frame time */
+extern f32 gFrameIncrement;      /* frame time */
 
 s32 Cinema_IsActive(void);
 f32 Math_DecayToZero(f32 value, f32 rate);
@@ -45,7 +45,7 @@ void CPlayer__MoveOnFoot(CPlayer *player, CGameObjectInstance *body, Tuning *tun
         ready = 1;
         if (!(time <= 0.0f)) {
             ready = 0;
-            player->m_BurstTimer = time - D_800B6D28;
+            player->m_BurstTimer = time - gFrameIncrement;
         }
         forward = player->m_Speed;
         time = tuning->forwardMax;

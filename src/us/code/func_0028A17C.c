@@ -37,7 +37,7 @@ typedef struct {
 } GfxTask;
 
 extern s32 D_800B6E54;          /* retraces before the thread priority is restored */
-extern u8 D_800D6D68[];         /* OSThread */
+extern u8 gDecompressor[];         /* OSThread */
 extern s32 D_800B6E7C;          /* its priority */
 extern s32 D_8011AD88;          /* retraces since the last swap */
 extern s32 D_8011F130;          /* swap pending */
@@ -78,7 +78,7 @@ void __scHandleRetrace(Sched *sc) {
     if (D_800B6E54 != 0) {
         D_800B6E54 = D_800B6E54 - 1;
         if (D_800B6E54 == 0) {
-            osSetThreadPri(D_800D6D68, D_800B6E7C);
+            osSetThreadPri(gDecompressor, D_800B6E7C);
         }
     }
     sc->frameCount = sc->frameCount + 1;

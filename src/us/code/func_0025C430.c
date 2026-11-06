@@ -8,10 +8,10 @@
  * animation for the current mode if the definition allows it. State 1 counts
  * the cool-down and re-picks a region. */
 
-extern f32 D_800B6D28; /* frame delta */
+extern f32 gFrameIncrement; /* frame delta */
 extern CVector3 D_800B06A0;
 extern CVector3 D_800B06AC;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern s16 func_002261A8(void *level, s32 id, CVector3 *pos);
@@ -50,7 +50,7 @@ void EnemyAI_AttackWait(CGameObjectInstance *actor, CAI *ai) {
             D_800B06A0 = D_800B06AC;
             ai->m_Action = 1;
         } else if (ai->m_ActionTime > 0.0f) {
-            ai->m_ActionTime -= D_800B6D28;
+            ai->m_ActionTime -= gFrameIncrement;
             if (ai->m_ActionTime < 0.0f) {
                 ai->m_ActionTime = 0.0f;
             }
@@ -58,12 +58,12 @@ void EnemyAI_AttackWait(CGameObjectInstance *actor, CAI *ai) {
         ai->m_Enemy.m_AttackDelay = 0;
         break;
     case 1:
-        ai->m_ActionTime -= D_800B6D28;
+        ai->m_ActionTime -= gFrameIncrement;
         if (ai->m_ActionTime <= 0.0f) {
             ai->m_ActionTime = 0.0f;
             ai->m_Action = 0;
             if (ai->m_PathTrack.m_Mode) {
-                ai->m_PathTrack.m_nCurrentPointIndex = func_002261A8(D_800F7078, ai->m_PathTrack.m_nCurrentPathIndex, &actor->header.m_vPos);
+                ai->m_PathTrack.m_nCurrentPointIndex = func_002261A8(gScene, ai->m_PathTrack.m_nCurrentPathIndex, &actor->header.m_vPos);
             }
         }
         break;

@@ -18,7 +18,7 @@ typedef struct {
     /* 0x34 */ f32 pitchTarget;
 } Look004001D0;
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 CPlayer *CPlayerPool__GetFirstActive(CPlayerList *list);
 s32 MenuPool_CountOpen(u8 *a0);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
@@ -59,15 +59,15 @@ void Automap_Update(Look004001D0 *look) {
         held = player->m_ContState.m_dwButtons;
         if (held & 0x20) {
             if (held & 0x200) {
-                look->yawTarget += D_800B6D28 * 153.59999f;
+                look->yawTarget += gFrameIncrement * 153.59999f;
             } else if (held & 0x100) {
-                look->yawTarget -= D_800B6D28 * 153.59999f;
+                look->yawTarget -= gFrameIncrement * 153.59999f;
             }
             held = player->m_ContState.m_dwButtons;
             if (held & 0x800) {
-                look->pitchTarget += D_800B6D28 * 153.59999f;
+                look->pitchTarget += gFrameIncrement * 153.59999f;
             } else if (held & 0x400) {
-                look->pitchTarget -= D_800B6D28 * 153.59999f;
+                look->pitchTarget -= gFrameIncrement * 153.59999f;
             }
         } else {
             look->yawTarget = 0.0f;
@@ -81,14 +81,14 @@ void Automap_Update(Look004001D0 *look) {
         case 2:
             break;
         case 1:
-            look->blend += D_800B6D28 * 0.13333334f;
+            look->blend += gFrameIncrement * 0.13333334f;
             if (look->blend >= 1.0f) {
                 look->blend = 1.0f;
                 look->state = 2;
             }
             break;
         case 3:
-            look->blend -= D_800B6D28 * 0.26666668f;
+            look->blend -= gFrameIncrement * 0.26666668f;
             if (look->blend <= 0.0f) {
                 look->blend = 0.0f;
                 look->state = 0;

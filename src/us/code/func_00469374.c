@@ -7,7 +7,7 @@
 /* Start a level: check that the warp target exists, reset the multiplayer
  * options and switch the game state. */
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 s32 func_0042C0B4(void *level, s32 a, s32 id, void *out, s32 flags);
 
@@ -17,7 +17,7 @@ void func_00469374(CEngineApp *game, s32 warpId) {
 
     id = warpId;
 
-    if (func_0042C0B4(D_800F7078, -1, id, sp18, 1) == 0) {
+    if (func_0042C0B4(gScene, -1, id, sp18, 1) == 0) {
         id = 0;
     }
     D_8011ACB0.frames = 0;

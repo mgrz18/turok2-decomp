@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "structs/region.h"
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern CGameRegion *D_800B2610;     /* region of the cached info */
 extern CRegionInfo *D_800B2614; /* its cached info */
 
@@ -24,7 +24,7 @@ s32 CGameRegion__IntersectWater(CGameRegion *region, CVector3 *a, CVector3 *b, f
         return 0;
     }
     if (region != D_800B2610) {
-        D_800B2614 = CScene__GetRegionInfo(D_800F7078, region);
+        D_800B2614 = CScene__GetRegionInfo(gScene, region);
         D_800B2610 = region;
     }
     info = D_800B2614;

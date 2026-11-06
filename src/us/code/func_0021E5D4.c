@@ -57,7 +57,7 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 extern char D_800AE994[];
-extern TypeEntry *D_800ACB60[];
+extern TypeEntry *gIntelligenceTypeInfo[];
 extern char *D_80119874;
 void func_0021E5D4(char *arg0)
 {
@@ -96,7 +96,7 @@ valid_type:
             } while (i < limit);
         }
     }
-    entry = D_800ACB60[type];
+    entry = gIntelligenceTypeInfo[type];
 selected:
     if (entry != 0 && entry->callback != 0) {
         entry->callback(arg0, (char *)arg0 + 0x140);

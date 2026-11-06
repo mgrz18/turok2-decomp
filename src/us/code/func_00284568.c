@@ -3,7 +3,7 @@
 
 extern Cinema *D_800C1BB0;
 extern s32 D_8011ACA4;
-extern f32 D_800B6D28;          /* frame time scale */
+extern f32 gFrameIncrement;          /* frame time scale */
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
@@ -17,7 +17,7 @@ void Cinema_AdvanceClock(void) {
             return;
         }
         D_800C1BB0->prevTime = D_800C1BB0->time;
-        D_800C1BB0->time += D_800B6D28 * (1.0f / 15);
+        D_800C1BB0->time += gFrameIncrement * (1.0f / 15);
         if (D_800C1BB0->time >= D_800C1BB0->startTime) {
             Cinema_Start();
         }

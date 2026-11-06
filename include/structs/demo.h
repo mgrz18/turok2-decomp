@@ -5,7 +5,7 @@
  * zero-terminated list D_004384E8, played in turn by Demo_PlayNext) is a
  * bit stream per input: for each player the buttons (decoded by
  * Demo_DecodeButtons), the stick x and y (Demo_DecodeStick), plus one stream for the
- * whole match (Demo_DecodeMatch, copied to D_8011AD10 each frame). Each value
+ * whole match (Demo_DecodeMatch, copied to gNextTicks each frame). Each value
  * lasts a run of frames read after it (Demo_ReadRunLength). Demo_Start starts
  * a demo (saving the game settings first), Demo_UpdateStreams feeds the decoded
  * values to the controllers (D_800F5F70) and keeps a checksum

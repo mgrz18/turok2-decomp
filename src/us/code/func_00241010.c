@@ -23,8 +23,8 @@ typedef struct {
     /* 0x52 */ u16 flags52;
 } Water;
 
-extern CCollisionResults *D_800F1ADC;
-extern u8 D_800F7078[];
+extern CCollisionResults *gCollisionResultsP;
+extern u8 gScene[];
 
 void memset(void *p, s32 c, s32 n);                 /* memset */
 s32 Sweep_GetGroundBehavior(Sweep *sweep, CGameRegion *region);
@@ -129,8 +129,8 @@ void Collision_SweepRegions(Sweep *sweep) {
             }
         }
         waterT = 1.0f;
-        water = CScene__GetRegionInfo(D_800F7078, *regionp);
-        if (((*regionp)->m_wFlags & 1) && (sweep->def->m_dwFlags & 8) && D_800F1ADC->m_pWaterRegion == 0 && water != NULL
+        water = CScene__GetRegionInfo(gScene, *regionp);
+        if (((*regionp)->m_wFlags & 1) && (sweep->def->m_dwFlags & 8) && gCollisionResultsP->m_pWaterRegion == 0 && water != NULL
             && sweep->delta.y != 0.0f) {
             waterT = (water->level - pos->y) / sweep->delta.y;
             if (waterT < best) {
@@ -172,9 +172,9 @@ void Collision_SweepRegions(Sweep *sweep) {
                 sweep->hit.kind = kind;
                 sweep->hit.dataOut = 0;
                 sweep->hit.data = 0;
-                sweep->hit.posOut = &D_800F1ADC->m_vWaterPos;
-                sweep->hit.regionOut = &D_800F1ADC->m_pWaterRegion;
-                sweep->hit.kindOut = &D_800F1ADC->m_nWaterKind;
+                sweep->hit.posOut = &gCollisionResultsP->m_vWaterPos;
+                sweep->hit.regionOut = &gCollisionResultsP->m_pWaterRegion;
+                sweep->hit.kindOut = &gCollisionResultsP->m_nWaterKind;
             }
         }
         if (floorT <= best && floorT < sweep->hit.fraction) {
@@ -187,9 +187,9 @@ void Collision_SweepRegions(Sweep *sweep) {
                 sweep->hit.kind = 1;
                 sweep->hit.dataOut = 0;
                 sweep->hit.data = 0;
-                sweep->hit.posOut = &D_800F1ADC->m_vFloorPos;
-                sweep->hit.regionOut = &D_800F1ADC->m_pFloorRegion;
-                sweep->hit.kindOut = &D_800F1ADC->m_nFloorKind;
+                sweep->hit.posOut = &gCollisionResultsP->m_vFloorPos;
+                sweep->hit.regionOut = &gCollisionResultsP->m_pFloorRegion;
+                sweep->hit.kindOut = &gCollisionResultsP->m_nFloorKind;
                 if (def->m_dwFlags & 0x20000000) {
                     return;
                 }
@@ -200,9 +200,9 @@ void Collision_SweepRegions(Sweep *sweep) {
                 sweep->hit.kind = 2;
                 sweep->hit.dataOut = 0;
                 sweep->hit.data = 0;
-                sweep->hit.posOut = &D_800F1ADC->m_vFloorPos;
-                sweep->hit.regionOut = &D_800F1ADC->m_pFloorRegion;
-                sweep->hit.kindOut = &D_800F1ADC->m_nFloorKind;
+                sweep->hit.posOut = &gCollisionResultsP->m_vFloorPos;
+                sweep->hit.regionOut = &gCollisionResultsP->m_pFloorRegion;
+                sweep->hit.kindOut = &gCollisionResultsP->m_nFloorKind;
                 if (def->m_dwFlags & 0x20000000) {
                     return;
                 }
@@ -230,9 +230,9 @@ void Collision_SweepRegions(Sweep *sweep) {
                 sweep->hit.kind = 0;
                 sweep->hit.dataOut = 0;
                 sweep->hit.data = 0;
-                sweep->hit.posOut = &D_800F1ADC->m_vWallPos;
-                sweep->hit.regionOut = &D_800F1ADC->m_pWallRegion;
-                D_800F1ADC->m_nWallEdge = edge;
+                sweep->hit.posOut = &gCollisionResultsP->m_vWallPos;
+                sweep->hit.regionOut = &gCollisionResultsP->m_pWallRegion;
+                gCollisionResultsP->m_nWallEdge = edge;
             }
             return;
         }

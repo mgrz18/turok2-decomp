@@ -6,9 +6,9 @@
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 extern int D_8011ACA0;
 s32 Sound__Play(s16 arg0, CVector3 arg1, s32 arg4, s32 arg5) {
-    extern s32 D_800F2A00;
+    extern s32 gAudioWorld;
     if (D_8011ACA0 != 0) {
         return -1;
     }
-    return CAudioWorld__PlaySound(&D_800F2A00, arg0, arg1, arg4, arg5);
+    return CAudioWorld__PlaySound(&gAudioWorld, arg0, arg1, arg4, arg5);
 }

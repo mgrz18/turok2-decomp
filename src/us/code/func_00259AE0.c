@@ -16,7 +16,7 @@ typedef struct {
     /* 0x12C */ s32 unk12C;
 } State;
 
-/* Frame globals; the time step (D_800B6D28) must be read through the block to match. */
+/* Frame globals; the time step (gFrameIncrement) must be read through the block to match. */
 extern struct {
     /* 0x0 */ u32 frame;
     /* 0x4 */ u32 pad4;

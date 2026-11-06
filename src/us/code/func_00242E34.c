@@ -13,8 +13,8 @@ typedef struct Dest {
     f32 timer;         /* 0xCC */
 } Dest;
 
-extern char D_800F7078[];
-extern f32 D_800B6D28;  /* frame time scale */
+extern char gScene[];
+extern f32 gFrameIncrement;  /* frame time scale */
 
 CRegionInfo *CScene__GetRegionInfo(void *world, CGameRegion *region);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);
@@ -41,7 +41,7 @@ void AI_UpdateRegionFlags(CGameObjectInstance *actor, Dest *dst) {
     if (region == NULL) {
         return;
     }
-    info = CScene__GetRegionInfo(D_800F7078, region);
+    info = CScene__GetRegionInfo(gScene, region);
     if (info == NULL) {
         return;
     }
@@ -95,7 +95,7 @@ void AI_UpdateRegionFlags(CGameObjectInstance *actor, Dest *dst) {
         }
         if (hurt) {
             if (!(dst->flags & 0x8000)) {
-                dst->timer += D_800B6D28 * (1.0f / 15);
+                dst->timer += gFrameIncrement * (1.0f / 15);
                 if (dst->timer >= info->m_DamageInterval) {
                     kind = 0x100000;
                     if (info->m_dwFlags & 0x400000) {

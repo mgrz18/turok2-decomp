@@ -15,9 +15,9 @@ void VM_Initialize(s32 a, s32 b);
 void CCache__Construct(s32 a, s32 b);
 
 extern u8 D_8014A000[];   /* end of the loaded image */
-extern u8 D_800D1CC0[];   /* the main heap */
-extern u8 D_800D6D68[];
-extern u8 D_800D1CD8[];
+extern u8 gHeap[];   /* the main heap */
+extern u8 gDecompressor[];
+extern u8 gLoader[];
 
 void InitializeSystemResources(void) {
     u8 *base;
@@ -31,9 +31,9 @@ void InitializeSystemResources(void) {
     }
     size = top - (u32) base;
     memset(base, 0, size);
-    CHeap__Construct(D_800D1CC0, base, size);
-    CDecompressor__Construct(D_800D6D68, 3);
-    CLoader__Construct(D_800D1CD8, 4);
+    CHeap__Construct(gHeap, base, size);
+    CDecompressor__Construct(gDecompressor, 3);
+    CLoader__Construct(gLoader, 4);
     VM_Initialize(0, 0);
     CCache__Construct(0, 5);
 }

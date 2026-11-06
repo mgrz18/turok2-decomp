@@ -24,7 +24,7 @@ void CEngineApp__BeginDisplayList(void)
   DlCmd *d5;
   DlCmd *d6;
   B21Vp *vp;
-  D_800D8E24 = D_800F7070->m_pDisplayList;
+  D_800D8E24 = gEngineApp_m_pCurrentFrameData->m_pDisplayList;
   d1 = D_800D8E24++;
   d1->w0 = 0xDB060000;
   d1->w1 = 0;

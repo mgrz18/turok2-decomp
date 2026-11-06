@@ -3,7 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 
-extern f32 D_800B6D28;      /* frame time */
+extern f32 gFrameIncrement;      /* frame time */
 extern char D_800ADE70;     /* standing look tuning */
 extern char D_800ADE88;     /* crouching look tuning */
 extern char D_800ADDBC;     /* standing move tuning */
@@ -55,7 +55,7 @@ void PlayerWalk_Update(CPlayer *player, CGameObjectInstance *body) {
         CPlayer__SetState(player, body, 2);
     }
     if ((body->m_AI.m_dwFlags & 0x400) && player->m_bOnGround != 0) {
-        time = player->m_SfxTimer + D_800B6D28;
+        time = player->m_SfxTimer + gFrameIncrement;
         player->m_SfxTimer = time;
         if (player->m_TotalSpeed > 5.12f && time >= 6.0f) {
             player->m_SfxTimer = time - 6.0f;

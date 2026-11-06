@@ -8,7 +8,7 @@ typedef struct {
 } Spawn;
 
 Spawn *CScene__FindIntelligence(s32, s32, s32);
-extern s32 D_800F7078;
+extern s32 gScene;
 
 /* Picks a spawn point for the player and copies its position. */
 void CPlayer__PickSpawnPoint(CPlayer *arg0) {
@@ -22,13 +22,13 @@ void CPlayer__PickSpawnPoint(CPlayer *arg0) {
     if (var_s0->m_pOptions->m_TagMode == 1) {
         var_a2 = 0xB;
     }
-    var_s1 = &D_800F7078;
-    var_s1 = &D_800F7078;
-    var_v0 = CScene__FindIntelligence((s32) &D_800F7078, 0xB, var_a2);
+    var_s1 = &gScene;
+    var_s1 = &gScene;
+    var_v0 = CScene__FindIntelligence((s32) &gScene, 0xB, var_a2);
     if (var_v0 == 0) {
-        var_v0 = CScene__FindIntelligence((s32) &D_800F7078, 0xB, -1);
+        var_v0 = CScene__FindIntelligence((s32) &gScene, 0xB, -1);
         if (var_v0 == 0) {
-            var_v0 = CScene__FindIntelligence((s32) &D_800F7078, -1, -1);
+            var_v0 = CScene__FindIntelligence((s32) &gScene, -1, -1);
         }
     }
     var_s0->m_CharacterActor.header.m_pIntelligence = var_v0;

@@ -8,11 +8,11 @@ typedef struct { s16 unk0; u8 pad[0x1E]; void *unk20; } O06A2;
 extern s32 CPlayerPool__GetIndex(void *a, s32 b);
 extern s32 Controller_MenuLeft(void *a);
 extern s32 Controller_MenuRight(void *a);
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern f32 D_800C1348;
 s32 NameEntryMenu_UpdateName_2(s32 a, O06A2 *b) {
     s32 n = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, *(s32 *)((u8 *)b + 0x1C));
-    f32 v = D_800C1FB0[n].timer + D_800B6D28;
+    f32 v = D_800C1FB0[n].timer + gFrameIncrement;
     D_800C1FB0[n].timer = v;
     if (D_800C1348 <= v) D_800C1FB0[n].timer = v - D_800C1348;
     if (b->unk0 == 1) {

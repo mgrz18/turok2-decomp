@@ -6,12 +6,12 @@ typedef struct {
 } Entry;
 
 Entry *CScene__GetRegionInfo(s32 *, s32);                /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 u8 func_0026C114(s32 arg0) {
     Entry *temp_v0;
 
-    temp_v0 = CScene__GetRegionInfo(&D_800F7078, arg0);
+    temp_v0 = CScene__GetRegionInfo(&gScene, arg0);
     if (temp_v0 == NULL) {
         return 0U;
     }

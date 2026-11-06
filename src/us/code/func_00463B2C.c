@@ -20,9 +20,9 @@ extern char D_800A5F18[]; /* "sky layers" */
 extern char D_800A5F24[];
 extern s32 D_800AB8A0;
 extern s32 D_800B6D20;
-extern u8 D_800D6D68[];
+extern u8 gDecompressor[];
 extern u8 D_800E68B0[];
-extern u8 D_800E6A90[];
+extern u8 gLoopSounds[];
 extern u8 D_801102B8[];
 extern u8 *D_80119890; /* player list */
 extern u8 D_8011AAF1;  /* multiplayer */
@@ -114,7 +114,7 @@ void CScene__LoadLevel_2(CWorld *w, s32 level, s32 announce) {
 loaded:
     CScene__ReleaseSectors(w);
     w->m_Mode = 0;
-    CDecompressor__Flush(D_800D6D68);
+    CDecompressor__Flush(gDecompressor);
     CCache__Flush(0);
     if (w->m_nLevel != -1) {
         ptr = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
@@ -145,7 +145,7 @@ loaded:
     func_0042D330(D_801102B8);
     CCollisionInfo__Reset();
     func_0042D040(w->unk_18EBC);
-    LoopSounds_Construct(D_800E6A90, D_800E68B0, 0xF);
+    LoopSounds_Construct(gLoopSounds, D_800E68B0, 0xF);
     func_0042EADC(D_801102B8 - 0x1C8);
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;

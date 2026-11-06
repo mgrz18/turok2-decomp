@@ -342,11 +342,11 @@ struct GameSession {
     s32 selector;
     s32 selectionActive;
 };
-extern GameSession D_800F6CB0;
+extern GameSession gEngineApp;
 extern void func_00430330(void *);
 s32 GameOverMenu_Poll(void) {
     if (D_8011ACC0 <= 0.0f) {
-        func_00430330(&D_800F6CB0);
+        func_00430330(&gEngineApp);
         return 1;
     }
     return 0;

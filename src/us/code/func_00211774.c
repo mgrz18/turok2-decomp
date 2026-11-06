@@ -1,16 +1,16 @@
 #include "common.h"
 
-extern f32 D_800B6D28; /* frame time scale */
+extern f32 gFrameIncrement; /* frame time scale */
 
-/* Moves value toward target by rate * D_800B6D28 without overshooting. */
+/* Moves value toward target by rate * gFrameIncrement without overshooting. */
 f32 Math_Approach(f32 value, f32 target, f32 rate) {
     if (value < target) {
-        value += rate * D_800B6D28;
+        value += rate * gFrameIncrement;
         if (value > target) {
             value = target;
         }
     } else if (value > target) {
-        value -= rate * D_800B6D28;
+        value -= rate * gFrameIncrement;
         if (value < target) {
             value = target;
         }

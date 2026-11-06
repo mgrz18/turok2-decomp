@@ -6,7 +6,7 @@
 
 extern u8 D_8011AAF1;
 extern f32 D_800ADD88[];
-extern f32 D_800B6D28; /* the frame's time step */
+extern f32 gFrameIncrement; /* the frame's time step */
 
 void CPlayer__RegenerateHealth(CPlayer *player) {
     f32 rate;
@@ -19,7 +19,7 @@ void CPlayer__RegenerateHealth(CPlayer *player) {
         if (rate != next) {
             cur = P_S32(player, 0x524);
             if (cur != next && ((CPlayerOptions *)player->m_pOptions)->m_TagMode == 0) {
-                next = cur + (s32)(rate * 256.0f) * (D_800B6D28 * (1.0f / 15));
+                next = cur + (s32)(rate * 256.0f) * (gFrameIncrement * (1.0f / 15));
                 max = (u32)(player->m_CharacterActor.header.m_pIntelligence->m_Player.m_StartHealth << 8);
                 if (!(max <= next)) {
                     max = next;

@@ -7,7 +7,7 @@
  * closer than 460.8 to the target of the module object. */
 
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_80107590[];
 extern f32 MotherBoss_GetTargetDist(void *obj, CGameObjectInstance **found);
 extern s32 WeightedTable_PickStatic(void *a);
@@ -23,7 +23,7 @@ static __inline__ void SpawnAt(s32 arg0, s16 type, CVector3 pos, f32 speed) {
     s32 region;
     void *actor;
 
-    region = CScene__FindRegionAt(D_800F7078, &pos);
+    region = CScene__FindRegionAt(gScene, &pos);
     vel.x = 0.0f;
     vel.y = speed;
     vel.z = 0.0f;
@@ -49,16 +49,16 @@ void MotherBoss_DropPickupsAtSpawnPoints(s32 arg0, void *arg1) {
         dx = dx * 10.24f;
         dz = dz * 10.24f;
         if (found != NULL) {
-            CVector3__Subtract(&v, &found->header.m_vPos, &D_00431D20[i].pos);
+            CVector3__Subtract(&v, &found->header.m_vPos, &gMotherSpawnPoints[i].pos);
             if (func_00298470(v.x * v.x + v.y * v.y + v.z * v.z) > 460.8f) {
-                v = D_00431D20[i].pos;
+                v = gMotherSpawnPoints[i].pos;
                 v.y = 30.72f;
                 v.x += dx;
                 v.z += dz;
                 SpawnAt(arg0, type, v, 512.0f);
             }
         } else {
-            v = D_00431D20[i].pos;
+            v = gMotherSpawnPoints[i].pos;
             v.y = 30.72f;
             v.x += dx;
             v.z += dz;

@@ -10,7 +10,7 @@ extern int CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
 extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, int arg1);
 extern int D_8011ACA0;
 s32 Sound__Play2D(s32 arg0) {
-    extern s32 D_800F2A00;
+    extern s32 gAudioWorld;
     s32 temp_s0;
     s32 temp_s1;
     if (D_8011ACA0 != 0) {
@@ -22,10 +22,10 @@ s32 Sound__Play2D(s32 arg0) {
         vec.z = zero;
         vec.y = zero;
         vec.x = zero;
-        temp_s1 = CAudioWorld__GetForce2D(&D_800F2A00);
-        CAudioWorld__SetForce2D(&D_800F2A00, 1);
-        temp_s0 = CAudioWorld__PlaySound(&D_800F2A00, (s16)arg0, vec, 0, -1);
-        CAudioWorld__SetForce2D(&D_800F2A00, temp_s1);
+        temp_s1 = CAudioWorld__GetForce2D(&gAudioWorld);
+        CAudioWorld__SetForce2D(&gAudioWorld, 1);
+        temp_s0 = CAudioWorld__PlaySound(&gAudioWorld, (s16)arg0, vec, 0, -1);
+        CAudioWorld__SetForce2D(&gAudioWorld, temp_s1);
     }
     return temp_s0;
 }

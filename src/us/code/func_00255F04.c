@@ -5,7 +5,7 @@
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 #define P_F32(p, off) (*(f32 *)((u8 *)(p) + (off)))
 
-extern f32 D_800B6D28; /* the frame's time step */
+extern f32 gFrameIncrement; /* the frame's time step */
 
 extern void CPlayer__SetState(void *player, void *other, s32 mode);
 
@@ -13,7 +13,7 @@ void PlayerDeathWait_Update(CPlayer *player) {
     GameMatch *state;
     f32 timer;
 
-    timer = P_F32(player, 0xBFC) + D_800B6D28;
+    timer = P_F32(player, 0xBFC) + gFrameIncrement;
     P_S32(player, 0xC04) = 1;
     P_S32(player, 0x18) = 0;
     P_S32(player, 0x1C) = 0;

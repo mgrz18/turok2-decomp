@@ -26,7 +26,7 @@ extern FontStyle D_801100F0;
 extern u32 D_800F56A8;          /* the loaded font */
 extern s32 D_800C2030;          /* screen width */
 extern s32 D_800C2034;          /* screen height */
-extern u8 D_800F7078[];         /* the resource cache */
+extern u8 gScene[];         /* the resource cache */
 extern u8 D_801101B8[];         /* glyph lookup */
 extern u8 D_80110238[];         /* glyph lookup, language 0 */
 
@@ -114,7 +114,7 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
         special = 1;
         break;
     }
-    font = CScene__LoadGraphicSet(D_800F7078, resource, 0x10, 1);
+    font = CScene__LoadGraphicSet(gScene, resource, 0x10, 1);
     if (font) {
         while (text && (ch = *text) && ch != 10) {
             next = text[1];

@@ -16,7 +16,7 @@ typedef struct {
     /* 0x18 */ Vec3_004028F4 rot;
 } Obj004028F4;
 
-extern u8 D_8010ABA0[];
+extern u8 gScene_m_InstancePool[];
 extern Part004028F4 D_004307B4[];
 s16 WeightedTable_PickStatic(struct Pick *table);
 void GameObject_TraceMove(Obj004028F4 *obj, Vec3_004028F4 pos, Vec3_004028F4 *posp, s32 *out, s32 a5, s32 a6);
@@ -30,6 +30,6 @@ void MantidQueen_SpawnMinion(s32 a0, Obj004028F4 *obj, s32 a2, Vec3_004028F4 pos
 
     index = WeightedTable_PickStatic(s->step->partPicks);
     GameObject_TraceMove(obj, pos, &pos, &region, 0, 0);
-    CInstancePool__Spawn(D_8010ABA0, -1, D_004307B4[index].model, s->intel[index], region, pos, 0, obj->rot,
+    CInstancePool__Spawn(gScene_m_InstancePool, -1, D_004307B4[index].model, s->intel[index], region, pos, 0, obj->rot,
                   D_004307B4[index].offset, 0);
 }

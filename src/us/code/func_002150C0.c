@@ -23,7 +23,7 @@ typedef struct {
 } PlacedActorRecord;
 
 extern u8 D_800F1360[];         /* the empty model */
-extern u8 D_800F7078[];         /* the model cache */
+extern u8 gScene[];         /* the model cache */
 extern u8 D_800B6D1B;
 
 void *CScene__GetIntelligence(void *cache, s32 model);
@@ -49,7 +49,7 @@ void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 o
     if (record->model == 0xFFFF) {
         actor->header.m_pIntelligence = (CIntelligence *) D_800F1360;
     } else {
-        actor->header.m_pIntelligence = CScene__GetIntelligence(D_800F7078, record->model);
+        actor->header.m_pIntelligence = CScene__GetIntelligence(gScene, record->model);
     }
     if (record->segment == 0xFFFF) {
         actor->header.m_pCurrentRegion = NULL;

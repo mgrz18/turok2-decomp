@@ -5,7 +5,7 @@
 #include "structs/collision.h"
 #include "structs/particle.h"
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 typedef struct TeamGame {
     /* 0x00 */ s32 active;
 } TeamGame;
@@ -25,7 +25,7 @@ static __inline__ s32 inSpecialRegion(CPlayer *player) {
     CRegionInfo *info;
 
     if (player->m_CharacterActor.header.m_pCurrentRegion != NULL) {
-        info = CScene__GetRegionInfo(D_800F7078, player->m_CharacterActor.header.m_pCurrentRegion);
+        info = CScene__GetRegionInfo(gScene, player->m_CharacterActor.header.m_pCurrentRegion);
         if (info != NULL) {
             if (info->m_wFlags52 & 0x40) {
                 return 1;

@@ -11,11 +11,11 @@ struct RecordRecAt14 {
     s32 value;
 };
 extern f32 D_80130930;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern s32 GetMemSize(void);
 extern s32 func_00424500();
 s32 OptionsMenu_ResolutionText_2(struct RecordRecAt14 *record) {
-    D_80130930 -= D_800B6D28;
+    D_80130930 -= gFrameIncrement;
     if (D_80130930 <= 0.0f) {
         D_80130930 = 0.0f;
     }

@@ -9,7 +9,7 @@ extern void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);   /*
 extern void Angle_Wrap(f32 *angle);                              /* wraps an angle */
 
 extern f32 D_800B25F0[2];   /* current: blend rate, turn rate */
-extern f32 D_800B6D28;      /* frame time scale */
+extern f32 gFrameIncrement;      /* frame time scale */
 
 /* A surface that carries what stands on it (water current, conveyor). */
 typedef struct {
@@ -98,10 +98,10 @@ void GameObject_ApplyCurrent(CGameObjectInstance *actor, Material *mat, CVector3
                 target = want;
                 from = cur;
                 if (from < target) {
-                    cur = from + mat->strength * D_800B25F0[1] * D_800B6D28 * 0.017453294f;
+                    cur = from + mat->strength * D_800B25F0[1] * gFrameIncrement * 0.017453294f;
                     if (target < cur) cur = target;
                 } else {
-                    cur = from - mat->strength * D_800B25F0[1] * D_800B6D28 * 0.017453294f;
+                    cur = from - mat->strength * D_800B25F0[1] * gFrameIncrement * 0.017453294f;
                     if (cur < target) cur = target;
                 }
                 Angle_Wrap(&cur);
@@ -113,7 +113,7 @@ void GameObject_ApplyCurrent(CGameObjectInstance *actor, Material *mat, CVector3
         flow.y = 0.0f;
         flow.z = 0.0f;
     }
-    blend = mat->strength * D_800B25F0[0] * D_800B6D28;
+    blend = mat->strength * D_800B25F0[0] * gFrameIncrement;
     blend = ((blend < 0.0f ? 0.0f : blend) > 1.0f ? 1.0f : (blend < 0.0f ? 0.0f : blend));
     current = &actor->m_vWaterDisplacement;
     CVector3__Lerp(current, blend, current, &flow);

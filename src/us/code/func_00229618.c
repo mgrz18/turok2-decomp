@@ -38,7 +38,7 @@ extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = 
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
-extern f32 D_800B6D28;                                      /* frame time scale */
+extern f32 gFrameIncrement;                                      /* frame time scale */
 
 void CParticle__Wobble(Projectile *p, f32 scale) {
     CVector3 up;
@@ -63,12 +63,12 @@ void CParticle__Wobble(Projectile *p, f32 scale) {
         up.z = 0.0f;
         CVector3__Cross(&axis, &up, &dir);
         CVector3__Scale(&before, &axis, func_002982F0(p->phaseX) * p->ampX * k);
-        p->phaseX += p->freqX * k * D_800B6D28;
+        p->phaseX += p->freqX * k * gFrameIncrement;
         CVector3__Scale(&after, &axis, func_002982F0(p->phaseX) * p->ampX * k);
         CVector3__Subtract(&p->vel, &p->vel, &before);
         CVector3__Add(&p->vel, &p->vel, &after);
     } else {
-        p->phaseX += p->freqX * k * D_800B6D28;
+        p->phaseX += p->freqX * k * gFrameIncrement;
     }
     if (p->ampY > 0.0f) {
         up.x = 0.0f;
@@ -77,11 +77,11 @@ void CParticle__Wobble(Projectile *p, f32 scale) {
         CVector3__Cross(&side, &up, &dir);
         CVector3__Cross(&axis, &side, &dir);
         CVector3__Scale(&before, &axis, func_002982F0(p->phaseY) * p->ampY * k);
-        p->phaseY += p->freqY * k * D_800B6D28;
+        p->phaseY += p->freqY * k * gFrameIncrement;
         CVector3__Scale(&after, &axis, func_002982F0(p->phaseY) * p->ampY * k);
         CVector3__Subtract(&p->vel, &p->vel, &before);
         CVector3__Add(&p->vel, &p->vel, &after);
     } else {
-        p->phaseY += p->freqY * k * D_800B6D28;
+        p->phaseY += p->freqY * k * gFrameIncrement;
     }
 }

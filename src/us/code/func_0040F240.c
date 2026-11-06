@@ -58,9 +58,9 @@ extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern Gfx *D_800D8E24;
 /* An array to GCC: a function that reads two of its fields keeps its address in one register. */
-extern CWorld D_800F7078[];
-extern s32 D_800F709C;  /* D_800F7078.trackLookup */
-extern s32 *D_800F70D8; /* D_800F7078.trackBundle */
+extern CWorld gScene[];
+extern s32 D_800F709C;  /* gScene.trackLookup */
+extern s32 *D_800F70D8; /* gScene.trackBundle */
 extern CGameObjectInstance *D_80119890; /* current player */
 
 extern void *CISet__GetBlock(void *node, s32 index); /* child `index` of a resource node */
@@ -393,7 +393,7 @@ s32 Cinema_Load(s32 index) {
 
     captured = D_80119890;
     pending = D_800C1BB0->resetPlayerNext;
-    resources = D_800F7078;
+    resources = gScene;
     if (resources->m_CinemasKey == 0 || resources->m_pCinemas == 0) {
     failed:
         return 0;
@@ -785,7 +785,7 @@ f32 Cinema_GetFOV(f32 t) {
 }
 
 extern u8 D_800F1B40[];   /* collision info */
-extern CCollisionResults D_800F1CE0;  /* the last collision test */
+extern CCollisionResults gCollisionResults;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 Cinema_GetEyePos(f32 t); /* eye path */
@@ -855,12 +855,12 @@ void Cinema_UpdateCamera(CCamera *cam) {
         if (player != NULL) {
             saved = *(CObjectHead *) player;
             player->header.m_vPos = target;
-            CScene__LoadVisibleGridSections(D_800F7078);
+            CScene__LoadVisibleGridSections(gScene);
             hit = Collision_MoveInstance(player, eye, D_800F1B40);
-            CScene__ReleaseSectors(D_800F7078);
+            CScene__ReleaseSectors(gScene);
             *(CObjectHead *) player = saved;
             if (hit) {
-                eye = D_800F1CE0.m_vInstancePos;
+                eye = gCollisionResults.m_vInstancePos;
             }
         }
     }
@@ -949,7 +949,7 @@ typedef struct {
     /* 0x294 */ f32 height;
 } ScreenRectangle;
 
-extern u8 D_800F6CB0[];
+extern u8 gEngineApp[];
 extern void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 
 /* Fills the cinema's screen rectangle with the colour and alpha of the current time. */
@@ -1019,7 +1019,7 @@ void Cinema_DrawFade(ScreenRectangle *rectangle) {
             value = 0.0f;
         }
         rgba[3] = (u32) value;
-        CEngineApp__DrawFilledRect(D_800F6CB0, rgba, width, height, right, bottom);
+        CEngineApp__DrawFilledRect(gEngineApp, rgba, width, height, right, bottom);
     }
     Cinema_DrawLetterbox();
 }
@@ -1151,9 +1151,9 @@ s32 Cinema_NoWaitCues(void) {
     for (i = 0; i < cnt; i++) {
         e = &ents[i];
         if (e->unk4 == 0) {
-            k = (CueObject *)(D_800F7078->m_pRecords + e->unk8);
+            k = (CueObject *)(gScene->m_pRecords + e->unk8);
         } else {
-            k = (CueObject *)(D_800F7078->m_pAltRecords + e->unk8);
+            k = (CueObject *)(gScene->m_pAltRecords + e->unk8);
         }
         if (Cinema_IsWaitCue(k) != 0) {
             any = 1;
@@ -1201,9 +1201,9 @@ void Cinema_FireCues(void) {
                         }
                     }
                     if (e->unk4 == 0) {
-                        k = (CueObject *)(D_800F7078->m_pRecords + e->unk8);
+                        k = (CueObject *)(gScene->m_pRecords + e->unk8);
                     } else {
-                        k = (CueObject *)(D_800F7078->m_pAltRecords + e->unk8);
+                        k = (CueObject *)(gScene->m_pAltRecords + e->unk8);
                     }
                     if (Cinema_IsWaitCue(k) != 0) {
                         Cinema_RequestForObject(0, k);
@@ -1213,7 +1213,7 @@ void Cinema_FireCues(void) {
                     }
                     e->time = -20000.0f;
                     k->unkE = (k->unkE | 1) & 0xEF;
-                    CScene__SetEventFired(D_800F7078, k, 0);
+                    CScene__SetEventFired(gScene, k, 0);
                 }
             }
         }
@@ -1421,7 +1421,7 @@ s32 Cinema_GetEntryCount(void) {
 s32 **Cinema_LoadTable(void) {
     s32 size;
     s32 loaded;
-    CWorld *resources = D_800F7078;
+    CWorld *resources = gScene;
 
     loaded = CISet__GetROMAddressAndSize(resources->m_pCinemas, resources->m_CinemasKey, 0, &size);
     if (loaded == 0) {

@@ -6,7 +6,7 @@
 extern u32 __amDMA(s32 offset, s32 length);
 extern int D_800F2040;
 extern Window *D_800F2798;
-extern char D_800D1CD8;
+extern char gLoader;
 extern void CLoader__LoadAsync(void *, u32, s32, s32, void *, s32, s32);
 u32 __amDMA(s32 offset, s32 length) {
     extern u32 osVirtualToPhysical(s32);
@@ -62,6 +62,6 @@ u32 __amDMA(s32 offset, s32 length) {
     window->frame = D_800B2660;
     word = window->buffer;
     D_800B2664++;
-    CLoader__LoadAsync(&D_800D1CD8, address, 0x300, word, &D_800F2778, 0, 1);
+    CLoader__LoadAsync(&gLoader, address, 0x300, word, &D_800F2778, 0, 1);
     return osVirtualToPhysical(word) + odd;
 }

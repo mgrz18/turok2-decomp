@@ -4,7 +4,7 @@
 
 extern Cinema *D_800C1BB0;
 extern s32 D_8011ACA4;
-extern f32 D_800B6D28;      /* frame time */
+extern f32 gFrameIncrement;      /* frame time */
 
 extern void Cinema_Load(s32);
 extern s32 Cinema_IsActive(void);
@@ -30,7 +30,7 @@ s32 Cinema_StartPending(void) {
         } else {
             ctx = D_800C1BB0;
             ctx->prevTime = *(volatile f32 *)&ctx->time;
-            ctx->time += D_800B6D28 * 0.06666667f;
+            ctx->time += gFrameIncrement * 0.06666667f;
             if (ctx->startTime <= ctx->time) {
                 Cinema_Start();
             }

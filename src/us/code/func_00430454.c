@@ -5,7 +5,7 @@
 
 /* Turok 2: the mode block sits at 0x23FD0 (see CEngineApp__UpdateCinemaMode). */
 
-extern char D_800F7078[];
+extern char gScene[];
 
 s32 CScene__FindWarpDests(void *world, s32 arg1, s32 id, CWarpPoint *out, s32 max);
 
@@ -16,7 +16,7 @@ s32 CScene__FindWarpDests(void *world, s32 arg1, s32 id, CWarpPoint *out, s32 ma
 void func_00430454(CEngineApp *session, s32 warp) {
     CWarpPoint point;
 
-    if (CScene__FindWarpDests(D_800F7078, -1, warp, &point, 1) == 0) {
+    if (CScene__FindWarpDests(gScene, -1, warp, &point, 1) == 0) {
         warp = 0;
     }
     D_8011ACB0.frames = 0;

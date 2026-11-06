@@ -68,9 +68,9 @@ struct Object {
     /* 0x27C */ u32 fxFlags;
 };
 
-extern f32 D_800B6D28;          /* frame time */
+extern f32 gFrameIncrement;          /* frame time */
 extern f32 D_800B6D2C;          /* time scale */
-extern ModeHandler *D_800B1790[];
+extern ModeHandler *gEnemyBehaviorInfo[];
 
 void *CPlayerPool__FindNearest(CPlayerList *players, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
@@ -106,11 +106,11 @@ void EnemyAI_Update(Object *obj, AI *ai) {
     if (ai->age < 100) {
         ai->age++;
     }
-    D_800B6D28 *= D_800B6D2C;
+    gFrameIncrement *= D_800B6D2C;
     CPlayerPool__FindNearest(&D_80119870.m_PlayerList, obj->pos);
     mode = ai->mode[ai->modeIndex];
     index = ai->modeIndex;
-    handler = D_800B1790[mode];
+    handler = gEnemyBehaviorInfo[mode];
     swimming = mode == 2;
     if (handler != NULL) {
         switch (index) {
@@ -138,14 +138,14 @@ void EnemyAI_Update(Object *obj, AI *ai) {
         }
     }
     if (!(ai->state == 0x11 || ai->state == 0x12)) {
-        ai->timer120 -= D_800B6D28;
+        ai->timer120 -= gFrameIncrement;
         if (ai->timer120 < 0.0f) {
             ai->timer120 = 0.0f;
         }
     }
     index = ai->modeIndex;
     if (obj->def->m_dwTypeFlags & 0x40) {
-        ai->idleTime -= D_800B6D28;
+        ai->idleTime -= gFrameIncrement;
         if (ai->idleTime < 0.0f) {
             ai->idleTime = 0.0f;
         }
@@ -182,7 +182,7 @@ void EnemyAI_Update(Object *obj, AI *ai) {
     }
     AI_TurnHeadToTarget(obj, ai, 0.0f);
     if (ai->burnTime > 0.0f) {
-        ai->burnTime -= D_800B6D28;
+        ai->burnTime -= gFrameIncrement;
         obj->fxFlags |= 2;
         Sound__Play(0x3D1, obj->pos, 0, -1);
         if (ai->active) {

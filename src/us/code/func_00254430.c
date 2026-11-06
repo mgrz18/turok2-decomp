@@ -4,7 +4,7 @@
 s32 CPlayer__Hurt(s32, s32, s32, s32, s32);
 
 s32 Sound__PlaySpeech(s32);                     /* extern */
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern u8 D_8011AAF1;
 
 void CPlayer__UpdateOxygen(CPlayer *arg0, s32 arg1) {
@@ -15,7 +15,7 @@ void CPlayer__UpdateOxygen(CPlayer *arg0, s32 arg1) {
     s32 var_s1;
 
     temp_f1 = arg0->m_Oxygen;
-    temp_f0 = temp_f1 + D_800B6D28;
+    temp_f0 = temp_f1 + gFrameIncrement;
     arg0->m_Oxygen = temp_f0;
     if ((temp_f1 < 300.0f) && (temp_f0 > 300.0f) && (D_8011AAF1 == 0)) {
         Sound__PlaySpeech(0x163);

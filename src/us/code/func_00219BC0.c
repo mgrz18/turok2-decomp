@@ -19,11 +19,11 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32)
 s32 Instance_NextUniqueId(void);
 void CGameObjectInstance__DrawModelLitVertices(void);
 
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern s32 D_80119878;      /* player count */
 extern u8 *D_80119874;      /* players, 0x1328 bytes each */
 extern u8 D_800AE994[];
-extern void *D_800ACB60[];
+extern void *gIntelligenceTypeInfo[];
 extern Lights1 D_800AB0E8;
 
 /* The body (collision) setup for the object's intelligence type; a player's
@@ -48,7 +48,7 @@ static __inline__ void *body_setup(CGameObjectInstance *obj) {
             }
         }
     }
-    return D_800ACB60[type];
+    return gIntelligenceTypeInfo[type];
 }
 
 static __inline__ void clear_motion(CGameObjectInstance *obj) {
@@ -70,7 +70,7 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
 
     obj->m_dwFlags &= ~0x40000;
     if (model == -1) {
-        model = CScene__FindObjectType(&D_800F7078, type);
+        model = CScene__FindObjectType(&gScene, type);
         if (model == -1) {
             return;
         }
@@ -122,7 +122,7 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
     if (sound != -1) {
         CPathTrack__StartAtNearestPoint((u8 *) obj + 0x1D4, sound, &obj->header.m_vPos);
     }
-    world = &D_800F7078;
+    world = &gScene;
     CGameObjectInstance__SetupAnimation(obj, world->m_pObjects, world->m_ObjectsKey, animIndex);
     if (frame != 0) {
         obj->m_CurrentAnimation.m_AnimationFrame = frame;

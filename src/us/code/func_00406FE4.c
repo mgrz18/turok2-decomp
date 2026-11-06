@@ -6,7 +6,7 @@ extern void *CLevelActorPool__Spawn(void *table, void *slot, s32 kind, CVector3 
                            void *region, f32 arg);
 extern void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 arg);
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_80107590[];
 
 /* Spawn an object of the given kind at pos, thrown upwards, and send it event 0x11D. */
@@ -15,7 +15,7 @@ void Primagen_SpawnTossedObject(s32 kind, s32 count, CVector3 pos) {
     void *region;
     void *spawned;
 
-    region = CScene__FindRegionAt(D_800F7078, &pos);
+    region = CScene__FindRegionAt(gScene, &pos);
     velocity.x = 0.0f;
     velocity.y = 512.0f;
     velocity.z = 0.0f;

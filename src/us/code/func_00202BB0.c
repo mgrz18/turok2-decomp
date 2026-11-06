@@ -66,7 +66,7 @@ extern B12Mgr D_800D7BE0;
 extern s32 D_800D8DCC;
 extern u32 D_800AB0C0;
 extern s32 D_800B6E8C;
-extern u8 D_800D1CC0[];
+extern u8 gHeap[];
 void CMutex__Construct(void *lock);
 u32 GetMemSize(void);
 u8 *CHeap__Alloc(void *heap, u32 size);
@@ -94,9 +94,9 @@ void CCache__Construct(s32 unused, s32 id) {
     if (GetMemSize() > 0x400000) {
         D_800AB0C0 *= 2;
     }
-    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 0x28);
-    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 4);
-    D_800D7BE0.pool2 = CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 0x2C);
+    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(gHeap, D_800AB0C0 * 0x28);
+    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(gHeap, D_800AB0C0 * 4);
+    D_800D7BE0.pool2 = CHeap__Alloc(gHeap, D_800AB0C0 * 0x2C);
     osCreateMesgQueue(&D_800D7BE0.q11F0, &D_800D7BE0.buf11F0, 1);
     D_800D7BE0.tbl630[1] = 0;
     D_800D7BE0.tbl630[0] = 0;

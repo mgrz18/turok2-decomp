@@ -7,7 +7,7 @@
 
 typedef struct Target Target;
 
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern CVector3 D_800F1DB8;                /* the direction of the hit */
 extern u8 D_8011AAF1;
 extern u8 D_800F8928[];
@@ -35,7 +35,7 @@ void CParticle__StopLoopSound(CParticle *p);
 static __inline__ void placeAtHit(CParticle *p) {
     CVector3 dir;
 
-    p->header.m_vPos = D_800F1CE0.m_vInstancePos;
+    p->header.m_vPos = gCollisionResults.m_vInstancePos;
     p->m_vVelocity = D_800F1DB8;
     dir = D_800F1DB8;
     CVector3__Normalize(&dir);
@@ -55,7 +55,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
     CROMParticleEffect *definition;
     s32 kind;
 
-    source = (Target *)D_800F1CE0.m_pInstance;
+    source = (Target *)gCollisionResults.m_pInstance;
     definition = p->m_pEffect;
     kind = Actor_GetTypeClass(source);
     if (kind == 5) {
@@ -91,7 +91,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         case 2:
         case 3:
             if (definition->m_dwFlags & 0x800000) {
-                func_002364A4(D_801102B8, D_800F1CE0.m_vInstancePos, D_800F1CE0.m_vNormal, kind, 0);
+                func_002364A4(D_801102B8, gCollisionResults.m_vInstancePos, gCollisionResults.m_vNormal, kind, 0);
             }
             break;
     }
@@ -111,7 +111,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
             p->m_pDLight = NULL;
         }
     }
-    normal = D_800F1CE0.m_vNormal;
+    normal = gCollisionResults.m_vNormal;
     CVector3__Normalize(&normal);
     CVector3__Scale(&normal, &normal, 1.024f);
     CVector3__Add(&p->header.m_vPos, &p->header.m_vPos, &normal);
@@ -128,13 +128,13 @@ void CParticle__HitInstanceBody(CParticle *p) {
             if (D_800AD084[effect].m_Flags & 2) {
                 eventSource = p;
             }
-            ImpactEvent_Send(eventSource, p, effect, -1, D_800F1CE0.m_vInstancePos, params);
+            ImpactEvent_Send(eventSource, p, effect, -1, gCollisionResults.m_vInstancePos, params);
         }
         if (model != 0xFFFF) {
             CParticle__SpawnChild(p, model, -8, 1);
         }
         if (sound != 0xFFFF) {
-            Sound__Play(sound, D_800F1CE0.m_vInstancePos, 0, -1);
+            Sound__Play(sound, gCollisionResults.m_vInstancePos, 0, -1);
         }
     }
     if (!(p->m_dwFlags & 0x30000) && p->m_bDieOnImpact == 1) {

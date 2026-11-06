@@ -66,7 +66,7 @@ static __inline__ void State_UpdateBoss(WaveBossState *s) {
     }
 }
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 void Animator_Update(void *slot);
 s32 Cinema_PathPlaying(void);
 void MantidQueen_SendMinions(WaveBossState *s, s32 *active);
@@ -93,7 +93,7 @@ void MantidQueen_Update(WaveBossState *s) {
         State_NextStep(s);
     }
     State_UpdateBoss(s);
-    s->blinkTimer -= D_800B6D28;
+    s->blinkTimer -= gFrameIncrement;
     if (s->blinkTimer <= 0.0f) {
         s->blink ^= 1;
         if (s->blink) {

@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/collision.h"
 
-extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults *gCollisionResultsP;
 
 /* Clears the collision results: nothing hit yet. */
 void CCollisionResults__Clear(void) {
-    CCollisionResults *p = D_800F1ADC;
+    CCollisionResults *p = gCollisionResultsP;
 
     p->m_pInstance = 0;
     p->m_nInstanceNode = -1;

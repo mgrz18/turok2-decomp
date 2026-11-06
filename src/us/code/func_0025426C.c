@@ -4,8 +4,8 @@
 
 s32 CScene__SetInstanceObjectType(s32 *, void *, u16, s32); /* extern */
 
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void CPlayer__LoadWeaponModel(CPlayer *arg0) {
-    CScene__SetInstanceObjectType(&D_800F7078, &arg0->m_WeaponActor, D_800AF618[arg0->m_Data.m_CurrentWeapon]->model, arg0->m_WeaponActor.m_AI.m_pModeTable->unk_10);
+    CScene__SetInstanceObjectType(&gScene, &arg0->m_WeaponActor, D_800AF618[arg0->m_Data.m_CurrentWeapon]->model, arg0->m_WeaponActor.m_AI.m_pModeTable->unk_10);
 }

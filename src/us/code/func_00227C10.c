@@ -13,7 +13,7 @@ typedef struct AnimInfo {
     /* 0x1E */ u16 angle;
 } AnimInfo;
 
-extern CWorld D_800F7078;
+extern CWorld gScene;
 extern s32 D_800B6D54;                  /* effects enabled */
 extern s32 D_800B6D00;
 extern s32 D_8011001C;
@@ -87,15 +87,15 @@ CListedInstance *CInstancePool__SpawnAnimInstance(CInstancePool *scene, s32 vari
     s32 size;
 
     effect = NULL;
-    id = CScene__FindObjectType(&D_800F7078, variant);
+    id = CScene__FindObjectType(&gScene, variant);
     if (id != -1) {
-        src = CISet__GetROMAddress(D_800F7078.m_pObjects, D_800F7078.m_ObjectsKey, id);
+        src = CISet__GetROMAddress(gScene.m_pObjects, gScene.m_ObjectsKey, id);
         index = CCache__Request(0, src, 0x18, 0, 0, 0, D_800A6070, 1);
         if (index != NULL) {
             block = CCache__Request(0, CISet__GetROMAddressAndSize(*index, src, 0, &size), size, 0, 0, 0, D_800A6084, 1);
             if (block != NULL) {
                 info = CISet__GetBlock(*block, 0);
-                count = CScene__GetIntelligence(&D_800F7078, info->intelligence);
+                count = CScene__GetIntelligence(&gScene, info->intelligence);
                 CVector3__Scale(&color, &color, HalfToFloat(info->angle));
                 model = id;     /* a copy: the ROM allocates it apart from id */
                 effect = spawn_effect(scene, model, variant, count, owner, position, scale, direction, color, ref);

@@ -53,7 +53,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
     {
         Gfx *g = D_800D8E24++;
         g->w0 = colorImage;     /* gDPSetColorImage(RGBA, 16b, width, frame) */
-        g->w1 = D_800F6CB0.m_pCurrentFrameData->m_pFrameBuffer;
+        g->w1 = gEngineApp.m_pCurrentFrameData->m_pFrameBuffer;
     }
     {
         Gfx *g = D_800D8E24++;
@@ -69,7 +69,7 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
 
 /* Draws a NULL-terminated list of scaled strings, over a cleared screen if asked. */
 void Render_DrawTextLines(void *state, s32 drawBackdrop, char **lines, s32 x, s32 y, s32 lineStep, f32 scaleX, f32 scaleY) {
-    CFrameData *task = D_800F6CB0.m_pCurrentFrameData;
+    CFrameData *task = gEngineApp.m_pCurrentFrameData;
     char *text;
     s32 i;
 

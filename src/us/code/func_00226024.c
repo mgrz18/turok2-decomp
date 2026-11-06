@@ -11,7 +11,7 @@ void CEngineApp__DrawFilledRect(u8 *a, u8 *col, s32 c, s32 d, s32 e, s32 f);
 extern Pal D_800ACDE8[];
 extern s32 D_800C2030;
 extern s32 D_800C2034;
-extern u8 D_800F6CB0[];
+extern u8 gEngineApp[];
 void CScene__DrawWarpFade(CWorld *lv) {
     u8 col[4];
     f32 t;
@@ -27,7 +27,7 @@ void CScene__DrawWarpFade(CWorld *lv) {
             col[2] = p->b;
             t = lv->m_WarpTime * 255.0f / p->div;
             col[3] = (u32)t;
-            CEngineApp__DrawFilledRect(D_800F6CB0, col, 0, 0, D_800C2030, D_800C2034);
+            CEngineApp__DrawFilledRect(gEngineApp, col, 0, 0, D_800C2030, D_800C2034);
         }
        }
       }

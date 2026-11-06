@@ -29,7 +29,7 @@ typedef struct {
 extern s32 D_80110048;
 extern s32 D_8012FB48;
 extern s32 D_8012F600;
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern u8 D_0043165C[];
 s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void **out, s32 max);
 void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
@@ -54,12 +54,12 @@ void Primagen_InitAI_2(Actor00403CF8 *actor, Level00403CF8 *level) {
     level->onEvent = Primagen_Draw;
     level->unkC = -1;
     D_8012F608.actor = actor;
-    CScene__FindInstances(D_800F7078, -1, 6, 0xC8, &D_8012F608.found[1], 1);
-    CScene__FindInstances(D_800F7078, -1, 6, 0xC9, &D_8012F608.found[0], 1);
-    CScene__FindInstances(D_800F7078, -1, 6, 0xCA, &D_8012F608.found[2], 1);
-    CScene__FindInstances(D_800F7078, -1, 6, 0xCB, &D_8012F608.found[3], 1);
-    CScene__FindInstances(D_800F7078, -1, 6, 0xCC, &D_8012F608.found[4], 1);
-    D_8012F608.intel = CScene__FindIntelligence(D_800F7078, 1, 0x1DB2);
+    CScene__FindInstances(gScene, -1, 6, 0xC8, &D_8012F608.found[1], 1);
+    CScene__FindInstances(gScene, -1, 6, 0xC9, &D_8012F608.found[0], 1);
+    CScene__FindInstances(gScene, -1, 6, 0xCA, &D_8012F608.found[2], 1);
+    CScene__FindInstances(gScene, -1, 6, 0xCB, &D_8012F608.found[3], 1);
+    CScene__FindInstances(gScene, -1, 6, 0xCC, &D_8012F608.found[4], 1);
+    D_8012F608.intel = CScene__FindIntelligence(gScene, 1, 0x1DB2);
     for (i = 0; i < 8; i++) {
         ScriptAnimator_Start(&D_8012F608.anims[i], actor);
     }
