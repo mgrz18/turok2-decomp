@@ -388,7 +388,7 @@ RumbleCurve_GetValue = 0x0026EF30; // the curve's current sample (or its random 
 // View-volume planes.
 Frustum_FromCorners = 0x0026F080; // the six planes from the eye and the far rectangle's corners (comment in the file); only caller func_0027D160
 Plane_FromPoints = 0x0026F348; // unit normal and distance of the plane through three points (unreferenced)
-Plane_IntersectSegment = 0x0026F400; // where a->b crosses the plane, as a fraction (comment in the file)
+Plane_SegmentFraction = 0x0026F400; // where a->b crosses the plane, as a fraction (comment in the file); renamed by C12: n2 has Plane_IntersectSegment (0x0023C478, writes the hit point)
 Frustum_ContainsPoint = 0x0026F480; // the point is inside all six planes
 Frustum_TestPoints = 0x0026F4E0; // every plane has one of the n points inside (unreferenced)
 Frustum_TestPointsNoFar = 0x0026F56C; // the same skipping plane 2, the far plane (unreferenced)
