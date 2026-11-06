@@ -2,7 +2,6 @@
 #include "common.h"
 #include "globals/crash.h"
 
-extern u16 *sCrashFrameBuffer;
 void Crash_ClearScreen(void)
 {
   s32 var_a0;
