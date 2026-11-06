@@ -7,14 +7,10 @@ f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 typedef union M1IF { s32 i; f32 f; } M1IF;
 typedef union M1W4 { s32 i; f32 f; s16 h[2]; u16 hu[2]; u8 b[4]; u32 u; } M1W4;
-typedef union M1B1 { s8 s; u8 u; } M1B1;
 typedef struct M1Info M1Info;
 typedef struct M1Def M1Def;
 typedef struct M1Actor M1Actor;
 typedef struct M1State M1State;
-typedef struct M1Ref M1Ref;
-typedef struct M1Stats M1Stats;
-typedef struct M1Pad M1Pad;
 struct M1Info {
                 u32 flags;
                 M1W4 unk4;
@@ -77,24 +73,6 @@ struct M1State {
     M1IF unk114;
     CVector3 vec118;
     f32 f124;       /* 0x124 */
-};
-struct M1Ref {
-                u8 pad0[0xC];
-                s32 unkC;
-};
-struct M1Stats {
-                u8 pad0[0x8];
-                u16 h8;
-                u8 padA[0x85];
-                u8 b8F;
-                u8 b90;
-                u8 pad91[0x1];
-                u8 b92;
-};
-struct M1Pad {
-                u8 pad0[0xC6];
-                M1B1 stickX;
-                M1B1 stickY;
 };
 f32 SmoothStep(f32 x);
 void CVector3__Lerp(CVector3 *dst, f32 t, CVector3 *src, CVector3 *v);

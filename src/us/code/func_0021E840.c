@@ -18,13 +18,6 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-struct Box;
-typedef struct Box Box;
-struct Box;
-struct Box {
-    CVector3 min;
-    CVector3 max;
-};
 struct CQuatern_t;
 typedef struct CQuatern_t CQuatern;
 struct CQuatern_t;

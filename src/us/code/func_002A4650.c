@@ -8,7 +8,6 @@ typedef int SItype;
 typedef unsigned int USItype;
 typedef long long DItype;
 typedef unsigned long long UDItype;
-typedef int word_type;
 
 #define SI_TYPE_SIZE 32
 #define __BITS4 (SI_TYPE_SIZE / 4)

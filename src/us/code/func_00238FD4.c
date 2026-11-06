@@ -1,7 +1,6 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_3/80268160.CPP, func_8026835C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
 typedef unsigned char u8;
 typedef signed int s32;
 struct Triple;

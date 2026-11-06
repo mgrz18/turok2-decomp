@@ -4,28 +4,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "globals/scene.h"
-typedef struct ActorLink {
-               u8 pad0[8];
-               void (*cb)();
-} ActorLink;
 typedef union B01FH { f32 f; s32 i; s16 h; } B01FH;
-typedef struct B01Vec4 { f32 x, y, z, w; } B01Vec4;
 typedef union B01W4 { s32 i; f32 f; s16 h[2]; u8 b[4]; } B01W4;
-typedef struct B01Def {
-                u8 pad0[0x14];
-                u32 flags14;
-                u8 pad18[0x4];
-                s32 unk1C;
-                u8 pad20[0x4];
-                s32 unk24;
-                s16 unk28;
-                u8 pad2A[0x2];
-                s32 unk2C;
-                u8 pad30[0x8];
-                u32 flags38;
-                u8 pad3C[0x4];
-                s32 unk40;
-} B01Def;
 typedef struct B01Info {
                 u32 flags;
                 s32 unk4;

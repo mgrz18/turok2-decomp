@@ -20,34 +20,6 @@ struct MenuRecAt20V4 {
 };
 struct MenuRecAt20V4;
 typedef struct MenuRecAt20V4 MenuRecAt20V4;
-struct Clip;
-struct Clip {
-    s16 mode;
-    s16 frames;
-};
-struct Clip;
-typedef struct Clip Clip;
-struct NodeCode8028469C;
-struct NodeCode8028469C {
-    struct NodeCode8028469C *previous;
-    struct NodeCode8028469C *next;
-    Clip *key;
-    CVector3 position;
-    f32 value0;
-    f32 value1;
-    u32 amplitudeHandle;
-    char pad24[8];
-    u32 lifetimeHandle;
-    char pad30[8];
-    struct NodeCode8028469C **owner;
-};
-struct PoolRecAt28V1 {
-    CList free;
-    CList active;
-    s32 baseLevel;
-};
-struct NodeCode8028469C;
-typedef struct NodeCode8028469C NodeCode8028469C;
 extern f32 D_800C1274[];
 extern f32 D_800C1274[];
 s32 EnterCheatMenu_UpdateTextField_2(void *unused, MenuRecAt20V4 *menu) {

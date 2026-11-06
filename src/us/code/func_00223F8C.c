@@ -6,8 +6,6 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 #include "structs/game_object.h"
-typedef struct Ent12 { s32 **tblp; s32 b; s32 c; } Ent12;
-typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
 void Render_ResetBatches();
 void Render_FlushBatches(void);
 void CGameObjectInstance__Draw(CGameObjectInstance *e, s32 a);

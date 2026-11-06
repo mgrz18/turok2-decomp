@@ -11,16 +11,6 @@ struct OSIoMesgHdr_func_802BA350_de {
     u8 status;
     OSMesgQueue *retQueue;
 };
-struct OSDevMgr_func_802BA350_de;
-struct OSDevMgr_func_802BA350_de {
-    u32 active;
-    OSThread *thread;
-    OSMesgQueue *cmdQueue;
-    OSMesgQueue *evtQueue;
-    OSMesgQueue *acsQueue;
-    s32 (*dma)(s32, u32, void *, u32);
-    s32 (*edma)(void *, s32, u32, void *, u32);
-};
 struct OSIoMesgCode802BA23C;
 typedef struct OSIoMesgCode802BA23C OSIoMesgCode802BA23C;
 struct OSIoMesgHdr_func_802BA350_de;
@@ -33,8 +23,6 @@ struct OSIoMesgCode802BA23C {
     u32 size;
     void *piHandle;
 };
-struct OSDevMgr_func_802BA350_de;
-typedef struct OSDevMgr_func_802BA350_de OSDevMgr_func_802BA350_de;
 typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
 extern void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
