@@ -68,8 +68,9 @@ def compile_c(src, out):
     flags = (m.group(1) if m else CC_FLAGS).split()
     subprocess.run([str(CC1), *flags, "-o", str(s), str(i)], check=True,
                    stderr=subprocess.DEVNULL)
+    # gas warns about $at and odd float registers on every file; keep quiet
     subprocess.run([str(ROOT / "tools" / "sn_as.sh"), str(s), str(out)], check=True,
-                   env={**os.environ, "INC_DIR": str(ROOT / "us" / "include")})
+                   stderr=subprocess.DEVNULL, env={**os.environ, "INC_DIR": str(ROOT / "us" / "include")})
 
 
 def symbol_table():
