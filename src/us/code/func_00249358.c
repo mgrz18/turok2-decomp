@@ -14,7 +14,6 @@ typedef struct {
  * (+0x1228): the ROM reads them through this symbol, and through gEngineApp_m_Settings
  * the code no longer matches. */
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
-extern s32 gScene_m_WarpState;
 extern char D_800B66D0[];
 
 s32 Cinema_IsActive(void);
@@ -56,7 +55,7 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     if (CPlayer__IsInMatchEndState(p)) {
         return;
     }
-    if (gScene_m_WarpState) {
+    if (gScene.m_WarpState) {
         return;
     }
     if ((gEngineApp_m_Game_m_CameraPool.m_Settings.cheatFlags & 1) && type != 0x1D) {

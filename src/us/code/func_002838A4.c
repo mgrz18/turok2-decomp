@@ -12,7 +12,6 @@ extern u8 gRumblePool[];
 /* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
  * gScene_m_LevelID are arrays because the ROM accesses them as struct members: a
  * store through a pointer may alias them, so their loads stay after it. */
-extern s32 gScene_m_nLevel[];            /* world +0x18FA8: the current warp id */
 extern s32 gScene_m_bWarpSpawn;              /* world +0x18FB8: selectionFlags */
 extern u8 gScene_m_WarpSpawn[];             /* world +0x18FBC: selectionSpawn */
 extern s32 gScene_m_LevelID[];            /* world +0x18FD0: selectionValues */
@@ -45,7 +44,7 @@ void Cinema_Start(void) {
             if (gCinemaPlayerP->saveStart != 0 && gCinemaPlayerP->startLevel == -1
                 && gCinemaPlayerP->startWarp == gCinemaPlayerP->startLevel) {
                 gCinemaPlayerP->startLevel = gScene_m_LevelID[0];
-                gCinemaPlayerP->startWarp = gScene_m_nLevel[0];
+                gCinemaPlayerP->startWarp = gScene.m_nLevel;
                 gCinemaPlayerP->restored = 0;
                 gCinemaPlayerP->startPos = player->m_CharacterActor.header.m_vPos;
                 gCinemaPlayerP->startRotY = player->m_CharacterActor.m_RotY;
@@ -60,7 +59,7 @@ void Cinema_Start(void) {
     }
     if (warp != -1) {
         world = &gScene;
-        if (gScene_m_nLevel[0] != warp) {
+        if (gScene.m_nLevel != warp) {
             out[0] = 0;
             out[1] = 0;
             out[2] = 0;

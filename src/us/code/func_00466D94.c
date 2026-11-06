@@ -3,8 +3,8 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/scene.h"
 
-extern s32 gScene_m_bStreamAll;
 extern s32 gScene_m_LevelID;
 extern s32 gScreenHeight;          /* screen height */
 extern u8 gHealthOverlayScript[];
@@ -86,7 +86,7 @@ void CPlayer__LevelStart_2(CPlayer *p) {
     if (!Cinema_IsActive()) {
         warp = gScene_m_LevelID != 999;
     }
-    if (gScene_m_bStreamAll) {
+    if (gScene.m_bStreamAll) {
         warp = 1;
     }
     if (warp) {

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/scene.h"
 
-extern s32 gScene_m_WarpState;
 extern s32 gEngineApp_m_Settings_paused;
 extern void *LoopSounds_Get(void);
 extern void LoopSounds_Stop(void *pool, struct CLoopingSoundData *sound);
@@ -11,7 +11,7 @@ extern struct CLoopingSoundData *LoopSounds_Start(void *pool, s32 id, CVector3 *
 
 /* Restarts the player's weapon background looping sound with sound id. */
 void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id) {
-    if (gScene_m_WarpState == 0 && gEngineApp_m_Settings_paused == 0) {
+    if (gScene.m_WarpState == 0 && gEngineApp_m_Settings_paused == 0) {
         LoopSounds_Stop(LoopSounds_Get(), player->m_pLoopingSound_WeaponBackground);
         player->m_pLoopingSound_WeaponBackground =
             LoopSounds_Start(LoopSounds_Get(), id, &player->m_pCamera->m_vPos,

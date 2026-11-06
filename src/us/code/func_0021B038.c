@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00247BA4.c, func_00247BA4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -28,8 +29,6 @@ extern const f32 D_800A5B3C;
 extern const f32 D_800A5B40;
 extern const f32 D_800A5B44;
 extern f32 gQuaternionSin;
-extern B10Obj *gScene_m_pRegistered[];
-extern s32 gScene_m_nRegistered;
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void CGameObjectInstance__GetRotation(B10Q4 *out, B10Obj *o);
@@ -80,9 +79,9 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
     CMtxF__TransformPoint(&mA0, &v20, &v30);
     best = 0;
     thr = func_002974C0(new_var2 * D_800A5B30);
-    n = gScene_m_nRegistered;
+    n = gScene.m_nRegistered;
     for (i = 0; i < n; i++) {
-        obj = gScene_m_pRegistered[i];
+        obj = gScene.m_pRegistered[i];
         if (obj == self) {
             continue;
         }

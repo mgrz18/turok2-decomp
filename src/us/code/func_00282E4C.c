@@ -6,8 +6,6 @@
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
-extern CEmitterDef *gScene_m_pSections;  /* emitter definitions */
-extern s32 gScene_m_nSections;          /* how many */
 extern f32 gFrameIncrement;          /* the frame's time step */
 extern f32 gEmitterTimeScale;
 

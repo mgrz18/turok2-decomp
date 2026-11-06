@@ -8,9 +8,6 @@
 extern Cinema *gCinemaPlayerP;
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
 extern s32 gEngineApp_m_Settings_mode;
-extern s32 gScene_m_nLevel;              /* world +0x18FA8: the current warp id */
-extern s32 gScene_m_WarpFade;
-extern s32 gScene_m_WarpState;
 extern s32 gScene_m_WarpTime;
 extern s32 gScene_m_LevelID;              /* world +0x18FD0: selectionValues */
 extern s32 gScene_m_WarpID;

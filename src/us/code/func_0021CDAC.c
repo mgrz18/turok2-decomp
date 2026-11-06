@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 /* Builds an animated object's bone matrices: binds its animation index,
  * loads the current (and, when blending, the next) animation into the two
@@ -95,7 +96,6 @@ extern char D_800A5AF8[];
 extern s32 gFrameCount;
 extern Profile sBoneMatrixProfile;
 extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
-extern u8 gScene_m_Heap[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u32 gEngineApp_m_Settings;
 
@@ -143,7 +143,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
     s32 *data;
 
     anims = CISet__GetBlock(file, 3);
-    obj->animIndex = MtxPool_Alloc(gScene_m_Heap, *anims);
+    obj->animIndex = MtxPool_Alloc(gScene.m_Heap, *anims);
     if (obj->animIndex == 0) {
         return 0;
     }

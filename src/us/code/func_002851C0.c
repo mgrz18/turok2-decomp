@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/scene.h"
 
 extern void RumblePool_FreeFinished(void *arg0);
-extern int gScene_m_WarpState;
 extern u32 osMotorStop(struct Triple *);
 extern float D_800A9CF8;
 extern f32 Rumble_GetLevelAt(void *arg0, s32 arg1, s32 arg2, s32 arg3);
@@ -25,7 +25,7 @@ void Controller_UpdateRumble(ControllerProfile *arg0) {
             goto reset;
         }
         global = &gEngineApp_m_Settings_paused;
-        if ((*global != 0) || (gScene_m_WarpState != 0) || (global[-6] != 13)) {
+        if ((*global != 0) || (gScene.m_WarpState != 0) || (global[-6] != 13)) {
 reset:
             arg0->rumbleLevel = 0.0f;
             RumblePool_FreeAll(arg0->rumblePool);

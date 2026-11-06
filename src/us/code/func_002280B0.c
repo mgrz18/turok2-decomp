@@ -5,7 +5,6 @@
 s32 CList__AddTail(s32 *, void *);           /* extern */
 s32 CList__Remove(s32 *, void *);           /* extern */
 
-extern s32 gScene_m_InstancePool_m_FreeList;
 
 void CListedInstance__Free(CListedInstance *arg0) {
     s32 *temp_v1;

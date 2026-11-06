@@ -390,7 +390,6 @@ typedef struct {
     /* 0x134 */ f32 radius;
 } ShadowActor;
 
-extern u8 gScene_m_Heap[];
 extern CCollisionInfo gCollisionInfoLineOfSight;
 extern CCollisionResults gCollisionResults;
 extern f32 gQuaternionSin;
@@ -427,7 +426,7 @@ void CParticle__DrawShadow(ShadowActor *actor) {
     f32 a;
     f32 size;
 
-    gmtx = MtxPool_Alloc(gScene_m_Heap, 1);
+    gmtx = MtxPool_Alloc(gScene.m_Heap, 1);
     if (gmtx == NULL) {
         return;
     }
@@ -589,7 +588,6 @@ extern u8 gEngineApp_m_Settings_unk17;
 extern s32 gEngineApp_m_Settings;
 extern CCollisionInfo gCollisionInfoLineOfSight;
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
-extern u8 gScene_m_Heap[];             /* matrix pool */
 
 extern void *Texture_Request(s32 *ref);
 extern void Texture_GetInfo(void *model, AnimInfo *info);
@@ -778,7 +776,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
         GFX_CMD(0xDA380003, (u32)&particle->mtx[gEvenOdd])
     } else {
-        mtx = MtxPool_Alloc(gScene_m_Heap, 1);
+        mtx = MtxPool_Alloc(gScene.m_Heap, 1);
         if (mtx == 0) {
             CCache__Unlock(0, model);
             return;
@@ -899,7 +897,6 @@ typedef struct EffectActor {
     /* 0x1C0 */ void *list;
 } EffectActor;
 
-extern u8 gScene_m_ParticleSystem[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 s16 *CPlayer__GetFiringAmmo(u8 *, s32);
@@ -928,7 +925,7 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
         child = actor->child;
         if (child != NULL && (kind = child->kind) == 2 && (child->flags & 0x100) &&
             (child->typeId == kind || child->typeId == 0x111)) {
-            CParticleSystem__Free(gScene_m_ParticleSystem, child);
+            CParticleSystem__Free(gScene.m_ParticleSystem, child);
             CParticle__StopLoopSound(child);
         }
         CParticle__StopLoopSound(actor);

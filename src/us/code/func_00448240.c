@@ -65,8 +65,6 @@ extern s32 gScreenWidth;
 extern s32 gScreenHeight;
 extern Gfx *gDList;
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
-extern s32 gScene_m_CinemasKey;  /* gScene.trackLookup */
-extern s32 *gScene_m_pCinemas; /* gScene.trackBundle */
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 
 extern void *CISet__GetBlock(void *node, s32 index); /* child `index` of a resource node */

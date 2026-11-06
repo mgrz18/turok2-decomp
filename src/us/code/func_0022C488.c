@@ -4,6 +4,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/particle_event.h"
+#include "globals/scene.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -31,7 +32,6 @@ struct Target {
 extern CCollisionResults gCollisionResults;
 extern u8 gCollisionResults_m_Frame_flags;
 extern u8 gEngineApp_m_Settings_multiplayer;
-extern u8 gScene_m_ParticleSystem[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
@@ -231,7 +231,7 @@ void CParticle__HitTarget(CParticle *p) {
     }
     if (!(p->m_dwFlags & 0x30000)) {
         if (mode == 1 || (effect != 0xFFFF && (gImpactEventHandlers_m_Flags[effect].m_Flags & 1))) {
-            CParticleSystem__Free(gScene_m_ParticleSystem, p);
+            CParticleSystem__Free(gScene.m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
         }
     }

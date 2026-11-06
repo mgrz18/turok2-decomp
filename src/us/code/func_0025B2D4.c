@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/collision.h"
+#include "globals/scene.h"
 
 typedef struct Object Object;
 
@@ -26,7 +27,6 @@ struct Object {
 };
 
 extern s32 gScene_m_LevelID;          /* level */
-extern s32 gScene_m_bStreamAll;
 extern s32 gEngineApp_m_Settings;          /* cheats */
 extern u8 gEnemyAlertPoint[];         /* origin */
 
@@ -124,7 +124,7 @@ void EnemyAI_OnDamage(Object *obj, CAI *ai, DamageEvent *dmg) {
                 AI_HearNoise(obj, ai, &source->pos, 3);
                 break;
         }
-        if (!gScene_m_bStreamAll && attacker != NULL && attacker->typeId != obj->typeId) {
+        if (!gScene.m_bStreamAll && attacker != NULL && attacker->typeId != obj->typeId) {
             if (attacker->def->m_Type == 1) {
                 ai->m_pSightTarget = attacker;
                 ai->m_pPathTarget = attacker;

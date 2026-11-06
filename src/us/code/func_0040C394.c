@@ -8,7 +8,6 @@
 /* Spawns a pickup picked from a weighted table at a random point around the origin (MotherBoss_RandomArenaPoint and
  * MotherBoss_SpawnPickup inlined). */
 
-extern u8 gScene_m_ActorPool[];
 extern s16 WeightedTable_PickStatic(Pick *table);
 extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
@@ -42,7 +41,7 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;
-    pickup = CLevelActorPool__Spawn(gScene_m_ActorPool, NULL, id, vel, pos, region, lifetime);
+    pickup = CLevelActorPool__Spawn(gScene.m_ActorPool, NULL, id, vel, pos, region, lifetime);
     if (pickup != NULL) {
         Actor_SpawnParticle(pickup, 0x11D, pos, 0);
     }

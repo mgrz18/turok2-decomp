@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
+#include "globals/scene.h"
 
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
 extern void CMtxF__SetRotateZ(CMtxF m, s32 angle);              /* rotation about Y */
@@ -14,7 +15,6 @@ extern void CParticleSystem__Spawn(void *sys, CParticle *p, void *owner, s32 *ow
 extern CVector3 gCollisionResults_m_vVelocity;
 extern CCollisionResults *gCollisionResultsP;
 extern CCollisionResults gCollisionResults;
-extern u8 gScene_m_ParticleSystem[];
 
 static __inline__ f32 offset_x(CParticle *p) {
     if (p->m_pEffect->m_pModel != NULL) {
@@ -74,6 +74,6 @@ void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 flags) {
         }
         gCollisionResultsP = &gCollisionResults;
     }
-    CParticleSystem__Spawn(gScene_m_ParticleSystem, p, p->m_pOwner, p->m_pOwnerCount, p->m_pTarget, model, direction, rotation, point, region,
+    CParticleSystem__Spawn(gScene.m_ParticleSystem, p, p->m_pOwner, p->m_pOwnerCount, p->m_pTarget, model, direction, rotation, point, region,
                   arg2, flags | (p->m_dwFlags & 0x200006));
 }

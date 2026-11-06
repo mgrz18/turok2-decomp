@@ -6,6 +6,7 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/weapon.h"
+#include "globals/scene.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -58,8 +59,6 @@ struct AimActor {
     /* 0x1320 */ AimActor *next;
 };
 
-extern s32 gScene_m_nRegistered;
-extern AimActor *gScene_m_pRegistered[];
 extern f32 gQuaternionSin;
 
 void CGameObjectInstance__LocalToWorld(CVector3 *out, AimActor *actor, CVector3 off);
@@ -142,9 +141,9 @@ CQuaternion Player_FindAutoAimTarget(AimActor *pl, AimActor **outTarget, CVector
         }
     }
 
-    n = gScene_m_nRegistered;
+    n = gScene.m_nRegistered;
     for (i = 0; i < n; i++) {
-        t = gScene_m_pRegistered[i];
+        t = gScene.m_pRegistered[i];
         if (CPlayer__CanLockOn(pl, t)) {
             if (pl->weapon == 13) {
                 tpos = t->aimPos;

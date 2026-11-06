@@ -4,13 +4,13 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/particle_event.h"
+#include "globals/scene.h"
 
 typedef struct Target Target;
 
 extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern CVector3 gCollisionResults_m_vVelocity;                /* the direction of the hit */
 extern u8 gEngineApp_m_Settings_multiplayer;
-extern u8 gScene_m_ParticleSystem[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
@@ -139,7 +139,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
     }
     if (!(p->m_dwFlags & 0x30000) && p->m_bDieOnImpact == 1) {
 remove:
-        CParticleSystem__Free(gScene_m_ParticleSystem, p);
+        CParticleSystem__Free(gScene.m_ParticleSystem, p);
         CParticle__StopLoopSound(p);
     }
 }

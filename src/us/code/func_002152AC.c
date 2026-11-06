@@ -27,7 +27,6 @@ s32 *CISet__GetBlock(s32, s32);
 
 extern u8 D_800B6D1B;
 extern s32 gEvenOdd;
-extern u8 gScene_m_qSky[];
 extern s32 gEngineApp_m_Settings;
 
 void CLevelActor__Draw(CLevelActor *obj) {
@@ -42,7 +41,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
     }
     if (obj->m_DrawnFrame != D_800B6D1B) {
         if (obj->header.m_pIntelligence->m_Type == 8) {
-            CQuaternion__ToMatrix(gScene_m_qSky, matrix);
+            CQuaternion__ToMatrix(&gScene.m_qSky, matrix);
         } else {
             CMtxF__SetRotateY(matrix, obj->m_RotY);
         }

@@ -21,7 +21,6 @@ typedef struct {
     /* 0x66 */ u8 kind;
 } HitDef;
 
-extern u8 gScene_m_ParticleSystem[];
 
 extern void CCamera__SetShake(PlayerCamera *camera, f32 ampX, f32 ampY, f32 ampZ, f32 radius, s32 type, CVector3 pos);
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *v);
@@ -58,7 +57,7 @@ static __inline__ void sprayBlood(CGameObjectInstance *target, CGameObjectInstan
     zero.x = 0;
     zero.y = 0;
     zero.z = 0;
-    CParticleSystem__Spawn(gScene_m_ParticleSystem, actor, actor, 0, 0, 0xE9, zero, rotation, point, region, -1, kind == 5 ? 3 : 1);
+    CParticleSystem__Spawn(gScene.m_ParticleSystem, actor, actor, 0, 0, 0xE9, zero, rotation, point, region, -1, kind == 5 ? 3 : 1);
     point.x = 0;
     point.y = 0;
     point.z = 0;

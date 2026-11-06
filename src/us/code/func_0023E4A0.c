@@ -3,7 +3,6 @@
 #include "structs/collision.h"
 #include "globals/scene.h"
 
-extern s32 gScene_m_nDrawActors;
 extern CCollisionInfo D_800F1C60;
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);

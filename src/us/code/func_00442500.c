@@ -7,7 +7,6 @@
  * closer than 460.8 to the target of the module object. */
 
 
-extern u8 gScene_m_ActorPool[];
 extern f32 MotherBoss_GetTargetDist_2(void *obj, CGameObjectInstance **found);
 extern s32 WeightedTable_PickStatic(void *a);
 extern f32 Random_Blend(f32 min, f32 max);
@@ -26,7 +25,7 @@ static __inline__ void SpawnAt(s32 arg0, s16 type, CVector3 pos, f32 speed) {
     vel.x = 0.0f;
     vel.y = speed;
     vel.z = 0.0f;
-    actor = CLevelActorPool__Spawn(gScene_m_ActorPool, 0, type, vel, pos, region, arg0);
+    actor = CLevelActorPool__Spawn(gScene.m_ActorPool, 0, type, vel, pos, region, arg0);
     if (actor != NULL) {
         Actor_SpawnParticle(actor, 0x11D, pos, 0);
     }

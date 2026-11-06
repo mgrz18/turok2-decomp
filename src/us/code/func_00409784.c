@@ -14,7 +14,6 @@ extern s32 gMotherBoss_maxRadius;
 extern u8 sMotherBossPickupTable[];     /* pickup weights */
 extern u8 sMotherBossDropTablePhase1[];
 extern u8 sMotherBossDropTablePhase2[];
-extern u8 gScene_m_ActorPool[];
 
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
@@ -37,7 +36,7 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;
-    pickup = CLevelActorPool__Spawn(gScene_m_ActorPool, NULL, id, vel, pos, region, lifetime);
+    pickup = CLevelActorPool__Spawn(gScene.m_ActorPool, NULL, id, vel, pos, region, lifetime);
     if (pickup != NULL) {
         Actor_SpawnParticle(pickup, 0x11D, pos, 0);
     }

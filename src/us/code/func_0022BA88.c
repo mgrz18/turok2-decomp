@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_3.CPP, func_8027C274_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/particle.h"
+#include "globals/scene.h"
 
 extern s32 func_0026C114(void *region);                     /* region's surface type */
 extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
@@ -15,7 +16,6 @@ extern s32 gCollisionResults_m_pWallRegion;
 extern CVector3 gCollisionResults_m_vWallPos;
 extern s32 gCollisionResults_m_nWallEdge;
 extern CVector3 gCollisionResults_m_vVelocity;
-extern u8 gScene_m_ParticleSystem[];
 
 void CParticle__HitWall(CParticle *arg0) {
     CEventValue pair;
@@ -56,7 +56,7 @@ void CParticle__HitWall(CParticle *arg0) {
                 position = arg0->m_vVelocity;
             }
             CQuaternion__FromDirection(&rotation, &position);
-            CParticleSystem__Spawn(gScene_m_ParticleSystem, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
+            CParticleSystem__Spawn(gScene.m_ParticleSystem, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
                           rotation, gCollisionResults_m_vWallPos, gCollisionResults_m_pWallRegion, gCollisionResults_m_nWallEdge, (arg0->m_dwFlags & 0x200006) | 1);
         }
         if (sound != 0xFFFF) {
@@ -67,7 +67,7 @@ skip_effects:
     CVector3__Scale(&arg0->m_vRotSpeed, &arg0->m_vRotSpeed, arg0->m_RotationScale);
     arg0->m_dwFlags |= 0x400;
     if (arg0->m_bDieOnImpact == 1) {
-        CParticleSystem__Free(gScene_m_ParticleSystem, arg0);
+        CParticleSystem__Free(gScene.m_ParticleSystem, arg0);
         CParticle__StopLoopSound(arg0);
     }
 }

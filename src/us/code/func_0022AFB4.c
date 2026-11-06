@@ -4,6 +4,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
@@ -24,7 +25,6 @@ extern CCollisionResults gCollisionResults;
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;              /* current player */
 extern ContactHandler sParticleAmmoPickups[4];
 extern CCollisionResults *gCollisionResultsP;
-extern u8 gScene_m_ParticleSystem[];
 
 s32 Random_Next(void);
 s32 Collision_MoveInstance(CParticle *p, CVector3 pos, u32 *flags);
@@ -220,7 +220,7 @@ void CParticle__Update(CParticle *p) {
         p->m_vSize.z += (grow - p->m_vSize.z) * gFrameIncrement;
         if (p->m_vSize.x < 0.0f || p->m_vSize.y < 0.0f || p->m_vSize.z < 0.0f) {
             CParticle__FireExpireEvent(p);
-            CParticleSystem__Free(gScene_m_ParticleSystem, p);
+            CParticleSystem__Free(gScene.m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
             return;
         }

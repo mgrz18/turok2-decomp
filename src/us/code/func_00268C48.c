@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "globals/scene.h"
 
 extern CCollisionResults *gCollisionResultsP;     /* current hit buffer */
 typedef struct CollisionInfo {
@@ -11,7 +12,6 @@ typedef struct CollisionInfo {
 } CollisionInfo;
 
 extern CollisionInfo D_800F1CC0;
-extern u8 gScene_m_ActorPool[];
 
 void Collision_MoveInstance(CInstanceHeader *actor, CVector3 pos, void *info);
 CVector3 CVector3__RandomPerturb(CVector3 *in, f32 amount);
@@ -65,5 +65,5 @@ void GameObject_DropPickupAt(CInstanceHeader *actor, CVector3 pos, s32 kind, f32
     dir = CVector3__RandomPerturb(&up, 0.25f);
     CVector3__Normalize(&dir);
     CVector3__Scale(&velocity, &dir, 409.59998f);
-    CLevelActorPool__Spawn(gScene_m_ActorPool, NULL, kind, velocity, at, region, arg);
+    CLevelActorPool__Spawn(gScene.m_ActorPool, NULL, kind, velocity, at, region, arg);
 }

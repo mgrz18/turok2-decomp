@@ -37,8 +37,6 @@ struct WarpPlayer {
     /* 0x1320 */ WarpPlayer *next;
 };
 
-extern s32 gScene_m_bStreamAll;
-extern s32 gScene_m_nLevel;
 
 void CPlayer__StopLoopingSounds(void);
 s32 Controller_SetRumbleOption(s32, s32);
@@ -77,7 +75,7 @@ void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
     CPlayer__StopLoopingSounds();
     Controller_SetRumbleOption(pl->controller, 0);
 
-    if (gScene_m_bStreamAll && respawn) {
+    if (gScene.m_bStreamAll && respawn) {
         skip = TRUE;
     }
     if (!skip) {
@@ -228,8 +226,8 @@ void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
         }
     } else {
         do { /* a block of its own: it decides which of the two addresses gets $s0 */
-            if (CScene__FindWarpDests(&gScene, -1, warp, &rec, 1) && rec.m_nLevel == gScene_m_nLevel &&
-                (gEngineApp_m_Game.m_Settings.multiplayer || gScene_m_bStreamAll)) {
+            if (CScene__FindWarpDests(&gScene, -1, warp, &rec, 1) && rec.m_nLevel == gScene.m_nLevel &&
+                (gEngineApp_m_Game.m_Settings.multiplayer || gScene.m_bStreamAll)) {
                 pl->spawnPos = rec.m_vPos;
                 pl->pos = pl->spawnPos;
                 pl->angle = pl->spawnAngle = rec.m_RotY;

@@ -14,13 +14,12 @@ extern void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
 extern s32 gDefaultVisBits;
 extern s32 gPersistentDataLoaded;
-extern s32 gScene_m_bStreamAll;
 
 /* CInstancePool__Alloc */
 static __inline__ CGameObjectInstance *take_free_instance(CInstancePool *world, s32 *owner) {
     CGameObjectInstance *node;
 
-    if (gScene_m_bStreamAll != 0 || (u32)world->m_ActiveList.m_nCount < 3) {
+    if (gScene.m_bStreamAll != 0 || (u32)world->m_ActiveList.m_nCount < 3) {
         node = world->m_FreeList.m_pHead;
         if (node != NULL) {
             CList__Remove(&world->m_FreeList, node);

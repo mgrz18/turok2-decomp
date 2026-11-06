@@ -72,7 +72,6 @@ typedef struct {
 } Info0040457C;
 
 extern ModeState0040457C gLevelScript;
-extern u8 gScene_m_InstancePool[];
 extern s32 D_800F1F50;
 Entity0040457C *CPlayerPool__FindNearest(void *game, Vec3_0040457C pos);
 void CAI__SetMode(void *actor, void *ai, s32 event);
@@ -145,7 +144,7 @@ void Primagen_UpdateSpawner_2(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
                           scale, 0)) {
             gLevelScript.spawnsLeft--;
             if (gLevelScript.waves != NULL) {
@@ -166,7 +165,7 @@ void Primagen_UpdateSpawner_2(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
                           scale, 0)) {
             gLevelScript.spawnsLeft--;
             if (gLevelScript.waves != NULL) {
