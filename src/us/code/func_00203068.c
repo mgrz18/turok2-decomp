@@ -4,12 +4,12 @@
 #include "common.h"
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "globals/sysrc.h"
 
 extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
 extern CMemEntry *gCache_memAgeList_m_pTail;
-extern char gHeap;
 extern void CCache__DetachCacheEntry(void *, CMemEntry *);
-extern s32 CHeap__Free(void *, s32);
+extern s32 CHeap__Free(CHeap *, s32);
 extern void CList__Remove(void *, CMemEntry *);
 static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
     CMemEntry *node;

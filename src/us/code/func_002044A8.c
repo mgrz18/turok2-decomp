@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/cache.h"
+#include "globals/sysrc.h"
 
 typedef struct HashEntry {
     /* 0x00 */ u32 key;
@@ -13,7 +14,6 @@ typedef struct HashEntry {
 extern char gCache_cachePendingList[];           /* pending request list */
 extern u32 gHashMask;              /* hash mask */
 extern HashEntry *gHashTable;       /* hash table */
-extern char gHeap[];           /* heap */
 extern s32 gCache_memAgeList;              /* cached node list; the current node sits 8 bytes before it, the free node count 0xBCC after */
 extern char gCache_memLockedList[];           /* locked node list */
 extern CMemEntry **gCache_memEntriesFree; /* free node stack */
@@ -21,7 +21,7 @@ extern CMemEntry **gCache_memEntriesFree; /* free node stack */
 void CList__Remove(void *list, void *item);
 void CList__AddHead(void *list, void *item);
 void CHashTable__Remove(u32 key);
-void CHeap__Free(void *heap, s32 data);
+void CHeap__Free(CHeap *heap, s32 data);
 void CCache__FreeCacheEntry(s32 unused, CCacheEntry *request);
 void CHashTable__Insert(u32 key, CCacheEntry *value);
 
@@ -68,12 +68,12 @@ CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropR
                 CHashTable__Remove(existing->requestId);
                 existing->memEntry->cacheEntry = 0;
                 if (!(existing->memEntry->flags & 0x702)) {
-                    CHeap__Free(gHeap, existing->memEntry->data);
+                    CHeap__Free(&gHeap, existing->memEntry->data);
                     release(existing->memEntry);
                 }
                 CCache__FreeCacheEntry(0, existing);
             } else {
-                CHeap__Free(gHeap, request->memEntry->data);
+                CHeap__Free(&gHeap, request->memEntry->data);
                 release(request->memEntry);
                 CCache__FreeCacheEntry(0, request);
                 return existing;

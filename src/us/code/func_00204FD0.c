@@ -1,7 +1,8 @@
 #include "rw/junk_types.h" /* B12Node: a cached resource */
 #include "globals/cache.h"
+#include "globals/sysrc.h"
 
-s32 CHeap__AllocAt(s32, s32, s32);
+s32 CHeap__AllocAt(CHeap *, s32, s32);
 B12Node *CCache__AllocMemEntry(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSendMesg(s32, s32, s32);
@@ -9,7 +10,6 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 void CCache__FreeMemEntry(s32, B12Node *);
 void CCache__AddToAddressList(s32, B12Node *);
-extern u8 gHeap[];
 B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
@@ -33,7 +33,7 @@ B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
   var_s0 = CCache__AllocMemEntry(0, 0);
   if (var_s0 != 0)
   {
-    temp_v0 = CHeap__AllocAt((s32) (gHeap), arg1, arg2);
+    temp_v0 = CHeap__AllocAt(&gHeap, arg1, arg2);
     var_s0->key = temp_v0;
     if (temp_v0 != 0)
     {

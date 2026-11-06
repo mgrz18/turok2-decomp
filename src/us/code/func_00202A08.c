@@ -1,48 +1,48 @@
 #include "globals/cache.h"
 
-extern s32 gHashTable;
-void CHashTable__Remove(u32 arg0)
+void CHashTable__Remove(u32 key)
 {
-  s32 *temp_v0;
-  s32 *var_a0;
-  s32 *var_a2;
-  s32 *var_v1;
-  var_v1 = gHashTable + ((((((arg0 << 5) ^ (arg0 >> 1)) ^ (arg0 >> 9)) ^ (arg0 >> 0x11)) & gHashMask) * 0x10);
-  var_a2 = 0;
-  if ((*var_v1) != arg0)
+  HashEntry *next;
+  HashEntry *prev;
+  HashEntry *entry;
+  entry = &gHashTable[((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & gHashMask];
+  prev = 0;
+  if (entry->key != key)
   {
     loop_1:
-    var_a2 = var_v1;
+    prev = entry;
 
-    var_v1 = *((s32 **) (((s8 *) var_v1) + 0xC));
-    if (var_v1 != 0)
+    entry = entry->next;
+    if (entry != 0)
     {
- do { if ((*var_v1) == arg0) { goto block_3; } } while (0);
+ do { if (entry->key == key) { goto block_3; } } while (0);
       goto loop_1;
     }
   }
   else
   {
     block_3:
-    if (var_v1 != 0)
+    if (entry != 0)
     {
-      var_a0 = *((s32 **) (((s8 *) var_v1) + 0xC));
-      if (var_a0 != 0)
+      next = entry->next;
+      if (next != 0)
       {
-        *((s32 *) (((s8 *) var_v1) + 4)) = (s32) (*((s32 *) (((s8 *) var_a0) + 4)));
-        *((s32 *) (((s8 *) var_v1) + 0)) = *((s32 *) (((s8 *) var_a0) + 0));
-        *((s32 **) (((s8 *) var_v1) + 0xC)) = (s32 *) (*((s32 **) (((s8 *) var_a0) + 0xC)));
-        temp_v0 = var_v1;
-        var_v1 = var_a0;
-        var_a0 = temp_v0;
+        entry->value = next->value;
+        entry->key = next->key;
+        entry->next = next->next;
+        {
+          HashEntry *temp = entry;
+          entry = next;
+          next = temp;
+        }
       }
-      if (var_a2 != 0)
+      if (prev != 0)
       {
-        *((s32 **) (((s8 *) var_a2) + 0xC)) = var_a0;
+        prev->next = next;
       }
-      *((s32 *) (((s8 *) var_v1) + 4)) = 0;
-      *((s32 *) (((s8 *) var_v1) + 0)) = 0;
-      *((s32 *) (((s8 *) var_v1) + 0xC)) = 0;
+      entry->value = 0;
+      entry->key = 0;
+      entry->next = 0;
     }
 
   }
