@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern void osContGetReadData(ContPad *data);
-extern s8 __osContNumControllers;
 void osContGetReadData(ContPad *data) {
-    extern u8 __osContBuffer[];
-    u8 *ptr = __osContBuffer;
+    u8 *ptr = (u8 *)&__osContBuffer;
     u8 *count = &__osContNumControllers;
     ContReadFormat readformat;
     s32 i;

@@ -22,27 +22,6 @@ struct StridedTable;
 typedef struct StridedTable StridedTable;
 extern s32 GameOverMenu_Poll_2(void);
 extern f32 gEngineApp_m_Settings_match_countdown; /* local type: the field's real type (or the member path) changes the ROM's code here */
-struct OSTask_t;
-struct OSTask_t {
-    u32 type;
-    u32 flags;
-    u64 *ucode_boot;
-    u32 ucode_boot_size;
-    u64 *ucode;
-    u32 ucode_size;
-    u64 *ucode_data;
-    u32 ucode_data_size;
-    u64 *dram_stack;
-    u32 dram_stack_size;
-    u64 *output_buff;
-    u64 *output_buff_size;
-    u64 *data_ptr;
-    u32 data_size;
-    u64 *yield_data_ptr;
-    u32 yield_data_size;
-};
-struct OSTask_t;
-typedef struct OSTask_t OSTask_t;
 typedef struct OSScMsg {
     s16 type;
     char misc[0x1E];

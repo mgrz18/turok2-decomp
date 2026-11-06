@@ -48,27 +48,6 @@ struct ObjRecAt20V2;
 /* Turok 2 layouts (Rage Wars: 8 records of 0x96 bytes at 0xD0, local/mode at 0x1D/0x1E). */
 extern void TitleMenu_Single(void *arg0, struct ObjRecAt20V2 *menu);
 extern void Music_RestoreVolume();
-struct OSTask_t;
-struct OSTask_t {
-    u32 type;
-    u32 flags;
-    u64 *ucode_boot;
-    u32 ucode_boot_size;
-    u64 *ucode;
-    u32 ucode_size;
-    u64 *ucode_data;
-    u32 ucode_data_size;
-    u64 *dram_stack;
-    u32 dram_stack_size;
-    u64 *output_buff;
-    u64 *output_buff_size;
-    u64 *data_ptr;
-    u32 data_size;
-    u64 *yield_data_ptr;
-    u32 yield_data_size;
-};
-struct OSTask_t;
-typedef struct OSTask_t OSTask_t;
 typedef struct OSScMsg {
     s16 type;
     char misc[0x1E];

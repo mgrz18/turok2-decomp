@@ -6,9 +6,8 @@
  * REAL func_00428A18 size 0x17C at func_00428A18+0x8 */
 /* osPfsIsPlug (libultra pfsisplug.c), with Turok 2's symbols. */
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern u8 __osContNumControllers; /* __osMaxControllers */
-extern char __osPfsPifRam; /* __osPfsPifRam */
 extern void __osSiGetAccess(void); /* __osSiGetAccess */
 extern void __osSiRelAccess(void); /* __osSiRelAccess */
 extern s32 __osSiRawStartDma(s32 direction, void *dramAddr); /* __osSiRawStartDma */

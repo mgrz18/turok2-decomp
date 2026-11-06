@@ -8,17 +8,12 @@ extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern s32 __osSiRawStartDma(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
 extern void __osSiCreateAccessQueue();
-extern s32 __osContMesgBuff;
-extern s32 __osContMesgQueue;
-extern u8 __osContLastCmd;
 extern void osCreateMesgQueue(void *, s32, s32);
 extern u64 osGetTime(void);
-extern s8 __osContNumControllers;
 extern void __osPackRequestData(s32 arg0);
 extern void __osContGetInitData(s32 *arg0, s32 arg1);
 extern void osSetTimer(void *arg0, u64 arg1, u64 arg2, void *arg3, void *arg4);
 s32 osContInit(s32 arg0, s32 *arg1, s32 arg2) {
-    extern char __osContBuffer;
     s32 sp20[8];
     s32 sp40[6];
     s32 sp58[2];

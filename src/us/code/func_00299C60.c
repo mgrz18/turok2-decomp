@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
-extern u32 __osPfsPifRam[];
 extern u32 __osContAddressCrc(u32 arg0);
 void __osPackRamWriteData(s32 arg0, s32 arg1, u8 *arg2) {
     Block40 packet;
@@ -12,9 +12,9 @@ void __osPackRamWriteData(s32 arg0, s32 arg1, u8 *arg2) {
     u8 tail;
     u32 checksum;
     s32 shifted;
-    dst = (u8 *)__osPfsPifRam;
+    dst = (u8 *)&__osPfsPifRam;
     tail = 0xFF;
-    __osPfsPifRam[0xF] = 1;
+    __osPfsPifRam.pifstatus = 1;
     packet.bytes[0] = tail;
     packet.bytes[1] = 0x23;
     packet.bytes[2] = 1;

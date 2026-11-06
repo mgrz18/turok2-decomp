@@ -99,7 +99,6 @@ struct Voice {
     s32 fieldBC, fieldC0, fieldC4;
     f32 volumeScale;
 };
-typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
 extern OSIntMask __osDisableInt(void);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);

@@ -1,6 +1,7 @@
 /* osPfsIsPlug (libultra 2.0I pfsisplug.c), second-module copy, with Turok 2's symbols.
  * After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SDK/PFS/80447BB0_11.CPP, func_80448470_eu_x, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/libultra.h"
 
 typedef struct {
     /* 0x0 */ u16 type;
@@ -8,8 +9,6 @@ typedef struct {
     /* 0x3 */ u8 errnum;
 } ContStatus;
 
-extern u8 __osContNumControllers;   /* __osMaxControllers */
-extern char __osPfsPifRam; /* __osPfsPifRam */
 extern void __osSiGetAccess(void);                         /* __osSiGetAccess */
 extern void __osSiRelAccess(void);                         /* __osSiRelAccess */
 extern s32 __osSiRawStartDma(s32 direction, void *dramAddr); /* __osSiRawStartDma */
