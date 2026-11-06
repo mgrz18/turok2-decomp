@@ -1,11 +1,11 @@
 /* Second-module copy of SavePortalMenu_SelectGoBack (first module). The port comes back through a pointer (a stack slot the ROM stores but never reads). */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 void MenuPool_OpenMenu_2(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
 
 extern char gPakMsgInsertRumblePakDesc_2[];
-extern s32 gPakMenuPort;
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2];
 extern s32 gCameraPoolHideViews;
 extern s32 sSavePortalChosen;

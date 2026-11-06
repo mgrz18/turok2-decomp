@@ -5,12 +5,12 @@
 #include "structs/menu.h"
 #include "structs/save.h"
 #include "globals/scene.h"
+#include "globals/pak.h"
 
 /* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
  * and shows the "loaded" message; otherwise reports whether the note could be read. */
 
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort; /* pad */
 extern s32 gPakMenuLeaving;
 extern s32 sGameNoteLoad;
 extern s32 gPakNoteIndex;

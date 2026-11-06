@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/scene.h"
+#include "globals/render.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
@@ -24,11 +25,7 @@ extern s32 gNumTicks3;
 extern s32 gNumTicksPending;
 extern s32 gCurrentTickWaiting;
 extern s32 gNumTicksWaiting;
-extern s32 gNextFrameToShow;
 extern s32 gPendingFB;
-extern u32 gTotalFramebuffers;          /* frame buffer count */
-extern s32 gScreenWidth;          /* width */
-extern s32 gScreenHeight;          /* height */
 extern u8 gValidControllerBits;
 extern s32 gPakCheckHasPak;
 extern s32 gPakCheckDone;

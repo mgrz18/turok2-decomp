@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/cinema.h"
 
 /* The cinema state: a path playing between two times. */
 
-extern Cinema *gCinemaPlayerP;
 
 s32 Cinema_PathPlaying(void) {
     f32 temp_f1;

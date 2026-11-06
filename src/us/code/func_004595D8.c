@@ -5,12 +5,12 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/pak.h"
 
 /* Level chosen: load it, or set up the new player from the saved settings, or
  * open the next menu page. */
 
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 extern s32 gPakMenuLeaving;
 extern s32 sCharNoteLoad;
 extern s32 gPakNoteIndex;

@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004082FC.c, func_004082FC, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Controller pak menu, confirm: checks the pak, then saves (replacing the game's note when one exists, with a
  * message when it is in use) or, without a pak, looks for the next pad that has one. */
@@ -10,7 +11,6 @@ extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuIsProfile;
 extern s32 gPakMenuLeaving;
 extern s32 gPakNoteIndex; /* note index */
-extern s32 gPakMenuPort; /* pad */
 extern char gPakGameNoteName[];
 extern s32 gPakCheckDone;
 extern u8 gEngineApp_m_Game_m_MenuPool[];

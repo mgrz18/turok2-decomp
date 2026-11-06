@@ -2,10 +2,9 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC_6.CPP, func_80404958_read, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 extern void **gPakStateBuffer;
-extern s32 gPakDirectoryAllocated;
-extern u8 gPakQueueState;
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);

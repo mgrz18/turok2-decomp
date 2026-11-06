@@ -4,18 +4,16 @@
 #include "structs/menu.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/pak.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
-extern s32 gSaveBufferHandle;
-extern s32 gLoadBufferHandle;
 extern s32 gCameraPoolHideViews;
 extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuIsProfile;
 extern s32 gPakMenuIsLoad;
 extern s32 gPakMenuIsSave;
 extern s32 gPakMenuLeaving;
-extern s32 gPakMenuPort; /* pad */
 extern s32 gPakCheckDone;
 extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;

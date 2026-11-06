@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/render.h"
 
 extern s32 gCreditsDone;              /* credits finished */
 extern f32 gCreditsTimeLeft;              /* time left before leaving the credits */
@@ -7,7 +8,6 @@ extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEndingPrimagenDefeated;
 extern s32 gFinalEnding;
 extern s32 gEngineApp_m_Settings_match_unk48;
-extern s32 gScreenHeight;              /* screen height */
 extern s32 sCreditsLine;              /* first credits line on screen */
 extern f32 gCreditsScroll;              /* scroll position of that line */
 extern char *gCreditsLines[];          /* credits lines */

@@ -4,10 +4,10 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/pak.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 extern s32 gPakMenuIsSave;
 extern char gPakProfile[];
 extern char gPakCharacterNoteName[];
@@ -20,8 +20,6 @@ extern char gStatsAfterPakMenuDesc1_2[];
 extern char gStatsAfterPakMenuDesc2_2[];
 extern char gStatsAfterPakMenuDesc3_2[];
 extern char gStatsAfterPakMenuDesc4_2[];
-extern void *gSaveBufferHandle;
-extern void *gLoadBufferHandle;
 s32 Pak_BytesToPages_2(s32 n);
 s32 Pak_GetFreePages_2(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes_2(s32 pad, s32 *out);

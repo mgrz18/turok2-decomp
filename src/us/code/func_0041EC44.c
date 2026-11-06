@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 void PakMenu_UpdateNoteRows(Shared_PakMenu *menu);
 extern s32 gPakMenuIsLoad;
@@ -9,9 +10,7 @@ extern s32 gPakMenuLeaving;
 extern s32 gPakMenuIsSave;
 extern s32 gPakMenuIsProfile;
 extern s32 gPakMenuWrites;
-extern s32 gPakMenuMode;
 extern s32 gPakMenuAnyPak;
-extern s32 gDamagedPakContinued;
 extern char gEngineApp_m_Game_m_MenuPool[];
 extern char gSingleMenuAfterPakDesc[];
 extern unsigned char gPakLoadGameMenuDesc[];

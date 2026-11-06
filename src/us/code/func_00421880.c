@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
-extern s32 sPakMenuStartLatched;
 extern s32 gPakMenuStartPressed;
 
 /* A menu window callback: the window (structs/menu.h) and the controller it reads. */

@@ -3,9 +3,9 @@
 #include "structs/player.h"
 #include "structs/cinema.h"
 #include "globals/scene.h"
+#include "globals/cinema.h"
 
 
-extern Cinema *gCinemaPlayerP;
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
 extern s32 gEngineApp_m_Settings_mode;
 extern s32 gScene_m_WarpTime;

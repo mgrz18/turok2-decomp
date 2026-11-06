@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/pak.h"
 
 /* Per-controller rumble pak state. */
 
 extern u8 gControllersInitialised;           /* service enabled */
-extern u8 gPakQueueState;           /* rescan request */
-extern u8 gPakAccessQueue[];         /* OSMesgQueue: pak access lock */
 extern u8 gSiMessageQueue[];         /* OSMesgQueue for the SI */
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flags);
@@ -16,7 +15,7 @@ extern void RumblePool_Init(void *, void *, s32);
 extern void osMotorStop(void *);
 
 static __inline__ void ResetPadMotor(ControllerProfile *pad) {
-    osRecvMesg(gPakAccessQueue, NULL, 1);
+    osRecvMesg(&gPakAccessQueue, NULL, 1);
     Controller_ReadAll();
     gPakQueueState = 2;
     pad->rumbleOn = 0;
@@ -30,7 +29,7 @@ static __inline__ void ResetPadMotor(ControllerProfile *pad) {
         pad->rumblePak = 1;
     }
     gPakQueueState = 2;
-    osSendMesg(gPakAccessQueue, NULL, 0);
+    osSendMesg(&gPakAccessQueue, NULL, 0);
 }
 
 extern u8 gRumblePool[];

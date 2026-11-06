@@ -3,9 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "gfx.h"
+#include "globals/render.h"
 
-extern s32 gResolution;
-extern s32 gResolution;
 extern void Render_SetCombineMode(s32 arg0);
 extern void Render_SetRenderMode(s32 arg0);
 void Hud_SetupTextureMode(s32 color) {

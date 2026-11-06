@@ -2,6 +2,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00408118.c, func_00408118, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Controller pak menu item: picks the item's text for the pak state and prints the pak's free blocks and
  * the blocks a save needs into it ("%3d"-style, three characters each). */
@@ -11,7 +12,6 @@ typedef struct {
 } Chars4;
 
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort; /* pad */
 extern s32 gPakMenuIsSave;
 extern s32 gPakMenuIsLoad;
 extern s32 gPakMenuIsProfile;

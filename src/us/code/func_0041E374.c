@@ -1,11 +1,11 @@
 #include "common.h"
+#include "globals/pak.h"
 
 /* Pak slot scan step: a pak that already holds one of the game's two files
  * (names gPakCharacterNoteName, gPakGameNoteName) wins at once (*best = 123); otherwise the
  * slot is a candidate when the pak is usable and has room for a save, and
  * the slot with the most free pages is kept. Returns 1 to keep scanning. */
 
-extern s32 gPakMenuPort;
 extern u8 *D_800F70A8;
 extern char gPakCharacterNoteName[];
 extern char gPakGameNoteName[];

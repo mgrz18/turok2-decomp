@@ -2,13 +2,13 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/pak.h"
 
 typedef struct {
     /* 0x0 */ s32 size;
 } SaveSize;
 
 extern SaveSize D_800F70A8;
-extern s32 *gSaveBufferHandle;        /* buffer handle */
 extern char D_800C13F0[];
 extern char gLoadSavePersistentData[];
 extern void CCache__Flush(s32);

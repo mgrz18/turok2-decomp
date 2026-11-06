@@ -4,10 +4,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern void Pak_ProbeSlot_2(s32);
 void Pak_ProbeSlot_2(s32);
-extern s32 gPakMenuPort;
 extern void PakMenu_ProbeOwnerPort_2(struct Menu *record);
 extern s32 gPakMenuAnyPak;
 void PakMenu_ProbeOwnerPort_2(struct Menu *record) {

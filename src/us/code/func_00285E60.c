@@ -1,9 +1,8 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/frame.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;              /* screen width */
-extern s32 gScreenHeight;              /* screen height */
 
 extern void CEngineApp__ClearDepthRect(s32, s32, s32, s32, s32);
 extern void Hud_GetSpriteSize(s32, s32, s32 *, s32 *);

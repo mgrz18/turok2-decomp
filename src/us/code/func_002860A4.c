@@ -1,7 +1,6 @@
 #include "common.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;              /* screen width */
-extern s32 gScreenHeight;              /* screen height */
 extern s32 sCreditsLine;              /* first credits line on screen */
 extern f32 gCreditsScroll;              /* scroll position of that line */
 extern char *gCreditsLines[];          /* credits lines */

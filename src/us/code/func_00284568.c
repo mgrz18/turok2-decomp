@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/cinema.h"
 
-extern Cinema *gCinemaPlayerP;
 extern s32 gEngineApp_m_Settings_paused;
 extern f32 gFrameIncrement;          /* frame time scale */
 

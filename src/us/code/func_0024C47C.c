@@ -16,6 +16,7 @@
 #include "structs/game.h"
 #include "structs/weapon.h"
 #include "globals/scene.h"
+#include "globals/render.h"
 
 extern s32 gScene_m_PreviewState;
 extern s32 gScene_m_PreviewTimer;
@@ -77,8 +78,6 @@ void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player) {
 /* An animated HUD item (COverlay__Update ticks it, COverlay__StartScript restarts it). */
 extern s32 gEngineApp_m_Settings_nextMode;          /* game state */
 extern u8 gEngineApp_m_Settings_hudAlpha;           /* HUD alpha */
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 extern s32 gEngineApp_m_Settings_match_tag;
 extern u8 gAmmoOverlayChangeScript[];
 extern u8 gLivesOverlayChangeScript[];

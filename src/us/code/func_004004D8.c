@@ -5,6 +5,7 @@
 #include "structs/region.h"
 #include "structs/world.h"
 #include "globals/scene.h"
+#include "globals/render.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
@@ -58,8 +59,6 @@ typedef struct {
 
 extern s32 gEvenOdd;      /* buffer index */
 extern s32 gPersistentDataLoaded;
-extern s32 gScreenWidth;      /* screen width */
-extern s32 gScreenHeight;      /* screen height */
 extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose gEngineApp_m_Settings is not this file's s32) */
 extern s32 gEngineApp_m_Settings;
 extern s32 gEngineApp_m_Settings_nextMode;

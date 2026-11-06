@@ -9,6 +9,8 @@
 #include "structs/camera.h"
 #include "globals/scene.h"
 #include "structs/game.h"
+#include "globals/render.h"
+#include "globals/cinema.h"
 
 /* The second VM module's copy of src/us/code/Cinema_SplineSecondDerivs.c, byte for byte,
  * at the same link address (named 0x448240-0x44C228, linked 0x40F240-0x413228):
@@ -58,12 +60,8 @@ typedef struct {
     /* 0x12 */ u8 val;
 } CueObject;
 
-extern Cinema *gCinemaPlayerP;
-extern s32 gCinemaEnabled;
 extern s32 D_800C1BC4;
 extern f32 D_800C1BC8;
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 

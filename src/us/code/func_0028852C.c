@@ -1,8 +1,8 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/game.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;      /* screen width */
 extern s32 gDepthBuffer;      /* fill target (z-buffer) */
 
 extern void Render_SetRenderMode(s32 mode);

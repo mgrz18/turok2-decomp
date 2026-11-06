@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;      /* screen width */
-extern s32 gScreenHeight;      /* screen height */
 extern u8 gEngineApp_m_Settings_multiplayer;
 
 void CCamera__WorldToScreen(CCamera *, f32 *, f32 *, f32 *);

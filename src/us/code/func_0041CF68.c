@@ -3,10 +3,10 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern s32 CPlayerPool__GetIndex(void *a, void *b);
 extern void Controller_WatchPak(s32 a);
-extern s32 gDamagedPakContinued;
 extern s32 gEngineApp_m_Settings_match_tag[];
 void StatsMenu_InitAfterPak(Menu *a) {
     s32 n;

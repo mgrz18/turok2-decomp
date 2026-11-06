@@ -4,12 +4,12 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 extern s32 Controller_Lock(s32 arg0);
 extern u8 D_800F677B[];
 extern void Controller_Unlock();
 extern void Controller_ReadAll(void);
-extern u8 gPakQueueState;
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
 extern s32 Pak_Mount_2(s32);
 extern void Controller_ReadAll(void);

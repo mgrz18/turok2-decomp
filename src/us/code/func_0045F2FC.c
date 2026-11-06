@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 s32 CCache__Allocate(s32, s32, s32, s32);
 
 s32 memset(s32, s32, s32);       /* extern */
 extern s32 D_800C18A0;
-extern s32 gPakDirectoryAllocated;
 extern s32 *gPakStateBuffer;
 
 void Pak_AllocDirectory_2(void) {

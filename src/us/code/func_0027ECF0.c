@@ -2,9 +2,8 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "structs/collision.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, */
 extern f32 gSplitScreenMarginTop;          /* top, */
 extern f32 gSplitScreenMarginLeft;          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */

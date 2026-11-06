@@ -3,11 +3,10 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/render.h"
 
 extern f32 D_800A9DD8;
 extern f32 D_800A9DDC;
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
 void CEngineApp__DrawFilledRect(CEngineApp *g, u8 *col, s32 a, s32 b, s32 c, s32 d);
 void CEngineApp__DrawFade(CEngineApp *g) {
     u8 col[4];

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
@@ -8,7 +9,6 @@ extern char gSavePortalMenuDesc[];
 extern char gSavePortalMenuDescB[];
 extern char gEngineApp_m_Game_m_MenuPool[];
 extern s32 gPakCheckDone;
-extern s32 gDamagedPakContinued;
 extern s32 gCameraPoolHideViews;
 extern s32 gPakMenuAnyPak;
 

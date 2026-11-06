@@ -20,6 +20,7 @@
 #include "structs/frame.h"
 #include "structs/particle_event.h"
 #include "globals/scene.h"
+#include "globals/render.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -577,7 +578,6 @@ typedef struct {
 } ParticleView;
 
 
-extern u32 gDisplayListSize;              /* command buffer length, in commands */
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* matrix buffer index */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;

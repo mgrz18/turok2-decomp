@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/render.h"
 
 /* The game state (CEngineApp in CEngineApp__Construct). */
 
@@ -10,7 +11,6 @@ s32 osViSetYScale(f32);                         /* extern */
 extern f32 D_800A9E24;
 extern s32 osViModeTable;
 extern s32 D_800B7E60;
-extern s32 gResolution;
 
 void EngineMode17_Switch_Init(CEngineApp *arg0) {
     s32 *var_a0;

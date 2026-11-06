@@ -11,6 +11,7 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "globals/scene.h"
+#include "globals/render.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -33,8 +34,6 @@ extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main cam
 /* The camera pool, seen from its main camera. */
 #define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool_m_MainCamera - 0x40))
 extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;          /* the pool wants on-screen projections */
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 extern s32 gDefaultVisBits;
 void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
@@ -406,8 +405,6 @@ found:
     }
 }
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern Gfx gRspInitDL[];        /* RDP setup display lists */
 extern Gfx gRdpInitDL[];

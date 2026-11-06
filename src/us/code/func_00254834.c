@@ -1,19 +1,14 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/GFX/TEXT/8022BA90_3.CPP, func_8022C2B4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/render.h"
 
 struct ScreenRectangle;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef signed int s32;
-typedef float f32;
 extern float D_800A7120;
 extern float D_800A7124;
 extern void func_00254834(void *arg0, struct ScreenRectangle *arg1);
 typedef struct ScreenRectangle { char pad0[0x288]; f32 x,y,width,height; } ScreenRectangle;
 extern s32 Hud_DrawSprite(s32 arg0, s32 arg1, s16 arg2, s16 arg3, f32 arg4, f32 arg5, s32 arg6);
 extern u8 gEngineApp_m_Settings_hudAlpha;
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
 void Hud_SetupTextureMode(u8 arg0);
 void func_00254834(void *arg0, struct ScreenRectangle *arg1)
 {

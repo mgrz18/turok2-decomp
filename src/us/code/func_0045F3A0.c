@@ -3,11 +3,11 @@
 
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 extern s32 Controller_Lock(s32 arg0);
 extern u8 D_800F677B[];
 extern void Controller_ReadAll(void);
-extern u8 gPakQueueState;
 extern u8 D_800F677B[];
 extern u8 gSiMessageQueue[];
 extern s32 osMotorInit(u8 *a0, OSPfs *a1, s32 a2);

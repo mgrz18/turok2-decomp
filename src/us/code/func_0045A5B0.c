@@ -1,8 +1,6 @@
-typedef signed int s32;
-typedef signed char s8;
+#include "globals/pak.h"
 
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 
 s32 PakMenu_GetPort_2(char *arg0) {
     if (gPakMenuAnyPak != 0) {

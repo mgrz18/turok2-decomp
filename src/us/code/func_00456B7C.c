@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Pick the menu page to go back to, from the game mode flags. */
 
@@ -8,7 +9,6 @@ extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuIsLoad;
 extern s32 gSavePortalActive;
 extern s32 gPakMenuIsProfile;
-extern s32 gPakMenuPort;
 extern u8 gStatsAfterPakMenuDesc1_2[];
 extern u8 gStatsAfterPakMenuDesc2_2[];
 extern u8 gStatsAfterPakMenuDesc3_2[];

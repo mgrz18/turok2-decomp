@@ -1,7 +1,7 @@
 
 #include "common.h"
 #include "structs/cinema.h"
-extern Cinema *gCinemaPlayerP;
+#include "globals/cinema.h"
 s32 Cinema_OverridesMusic2(void)
 {
   if (0 != gCinemaPlayerP->active)

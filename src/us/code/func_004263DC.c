@@ -2,15 +2,14 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 void Pak_AllocDirectory(void);
 extern int *gPakStateBuffer;
-extern s32 gPakDirectoryAllocated;
 struct Shape_typemap_165 *CCache__Allocate(s32, s32, u32, void *);
 void *memset(void *, s32, u32);
 extern s32 D_800C18A0;
 extern s32 gPakDirectories;
-extern int gPakDirectoryAllocated;
 extern int gPakDirectories;
 extern int *gPakStateBuffer;
 void Pak_AllocDirectory(void) {

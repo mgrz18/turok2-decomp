@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "gfx.h"
+#include "globals/render.h"
 
 /* gEngineApp_m_Settings_match (GameMatch in structs/game.h) as a local array view, under an
  * alias of the symbol: through it the compiler bases both stores on
@@ -19,7 +20,6 @@ extern s32 gThreadPriorityScheduler;
 extern u8 gGfxClient[];
 extern u8 gIdentityMtx[];
 extern s32 gWarmBoot;
-extern u32 gTotalFramebuffers; /* task count */
 extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("gEngineApp_m_Settings_match");
 extern s32 gCameraPoolHideViews;
 extern s32 gCFB[];

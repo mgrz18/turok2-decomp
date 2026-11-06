@@ -4,14 +4,13 @@
 #include "rw/junk_types.h"
 #include "structs/frame.h"
 #include "gfx.h"
+#include "globals/render.h"
 
 extern u8 gRspInitDL[];
 extern u8 gRdpInitDL[];
 extern s32 gDepthBuffer;
 extern B21Vp gScreenViewport[];
 extern s32 gEvenOdd;
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
 void CEngineApp__BeginDisplayList(void)
 {
   f32 new_var;

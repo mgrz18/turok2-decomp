@@ -6,6 +6,7 @@
 #include "structs/menu.h"
 #include "structs/save.h"
 #include "globals/scene.h"
+#include "globals/pak.h"
 
 /* Load game menu "select" handler: with the pak checked, either restores the
  * loaded save (player block, game progress, level times, the level's key
@@ -16,7 +17,6 @@ extern s32 gPakMenuAnyPak;
 extern s32 sGameNoteLoad;
 extern s32 gPakMenuLeaving;
 extern s32 gPakNoteIndex;
-extern s32 gPakMenuPort;
 extern u32 gScene_m_PreviewOptions;
 extern u32 gEngineApp_m_Settings_unlockedCheats[];
 extern u8 gEngineApp_m_Settings_unk180[];

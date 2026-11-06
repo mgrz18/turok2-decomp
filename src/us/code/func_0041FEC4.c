@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Save/load menu "select pak" handler: checks the pak in the chosen slot;
  * when saving over an existing game file asks for confirmation, when there
@@ -10,7 +11,6 @@ extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuIsProfile;
 extern s32 gPakMenuLeaving;
 extern s32 gPakNoteIndex;
-extern s32 gPakMenuPort;
 extern s32 gPakCheckDone;
 extern char gPakGameNoteName[];
 extern u8 gEngineApp_m_Game_m_MenuPool[];

@@ -2,13 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 extern char gPakMsgDeleteDoneDesc[];
 extern s32 gPakMenuLeaving;
 extern int PakConfirmMenu_SelectYes(void * owner, struct MenuRecAt24 * menu, void * arg);
 extern int gPakNoteIndex;
 extern char gPakMsgDeleteFailedDesc[];
-extern s32 gPakMenuPort;
 extern s32 D_8011B114;
 extern s32 gPakMenuAnyPak;
 extern char gEngineApp_m_Game_m_MenuPool[];

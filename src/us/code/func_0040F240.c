@@ -9,6 +9,8 @@
 #include "structs/camera.h"
 #include "globals/scene.h"
 #include "structs/game.h"
+#include "globals/render.h"
+#include "globals/cinema.h"
 
 /* The cinema system: one file from Cinema_SplineSecondDerivs to Cinema_IsWaitCue (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -52,12 +54,8 @@ typedef struct {
     /* 0x12 */ u8 val;
 } CueObject;
 
-extern Cinema *gCinemaPlayerP;
-extern s32 gCinemaEnabled;
 extern s32 D_800C1BC4;
 extern f32 D_800C1BC8;
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 

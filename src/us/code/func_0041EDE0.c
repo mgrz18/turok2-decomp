@@ -4,10 +4,10 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/pak.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 extern s32 gPakMenuIsSave;
 extern u8 gPakProfile[];
 extern char gPakCharacterNoteName[];
@@ -22,8 +22,6 @@ s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
 s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
 s32 Pak_SaveNoteVerified(s32 pad, s32 size, u8 *buf, char *n1, u8 *ext, char *n2);
 void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
-extern s32 gSaveBufferHandle;
-extern s32 gLoadBufferHandle;
 extern u8 gStatsAfterPakMenuDesc1[];
 extern u8 gStatsAfterPakMenuDesc2[];
 extern u8 gStatsAfterPakMenuDesc3[];

@@ -2,9 +2,8 @@
  * func_80239244_de, with Turok 2's CCamera (its fields sit elsewhere). */
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);   /* transform a point */
 
 /* Where a point of the world falls on the screen, through the camera's

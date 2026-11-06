@@ -2,24 +2,19 @@
 /* Second VM module copy of Cont_InitAll (same source, linked 0xE0 lower). */
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/pak.h"
 
 
 /* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
 
 extern char gRumblePool[];
 extern char gRumbleEntries[];
-extern s8 gPakQueueState;     /* pak queue state */
-extern char gPakAccessQueue[]; /* pak OSMesgQueue */
 extern char gSiMessageQueue[]; /* SI OSMesgQueue */
 extern char gSiMesgBuf[];
-extern char gPakMesgBuf[];
 extern u8 gValidControllerBits;     /* controller bit pattern */
 extern s16 gFirstControllerPort;    /* lowest port with a controller */
 extern u8 gNumControllers;     /* number of controllers */
 extern u8 gControllersInitialised;     /* controllers initialised */
-extern s32 gPakChanged[];
-extern s32 gPakRemoved[];
-extern s32 gPakInserted[];
 
 s32 RumblePool_Init(void *dst, void *src, s32 n);
 void osCreateMesgQueue(void *mq, void *msgBuf, s32 count); /* osCreateMesgQueue */
@@ -36,10 +31,10 @@ s16 Cont_InitAll_2(void) {
     RumblePool_Init(gRumblePool, gRumbleEntries, 8);
     gPakQueueState = 2;
     osCreateMesgQueue(gSiMessageQueue, gSiMesgBuf, 1);
-    osCreateMesgQueue(gPakAccessQueue, gPakMesgBuf, 1);
+    osCreateMesgQueue(&gPakAccessQueue, gPakMesgBuf, 1);
     osSetEventMesg(5, gSiMessageQueue, 1);
     osContInit(gSiMessageQueue, &gValidControllerBits, gContStatus);
-    osSendMesg(gPakAccessQueue, 0, 0);
+    osSendMesg(&gPakAccessQueue, 0, 0);
     gFirstControllerPort = -1;
     gNumControllers = 0;
     for (i = 3; i >= 0; i--) {

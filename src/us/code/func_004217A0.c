@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 s32 Controller_PakChanged(s32);
 s32 PakMenu_CheckPak(s32, s32, s32);
 
-extern s32 gPakMenuPort;
 extern s32 gPakMenuAnyPak;
 extern s32 gPakMenuLeaving;
 

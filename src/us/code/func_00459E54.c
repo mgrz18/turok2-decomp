@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
 char *PakMenu_GetReturnMenu_2(void *event);
@@ -10,7 +11,6 @@ void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, s32 arg3, char *
 extern char gSavePortalMenuDesc_2[];
 extern char gSavePortalMenuDescB_2[];
 extern char gEngineApp_m_Game_m_MenuPool[];
-extern s32 gPakMenuPort;
 extern s32 gPakCheckDone;
 extern s32 gCameraPoolHideViews;
 extern s32 gPakMenuAnyPak;

@@ -6,10 +6,10 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 extern s8 gPakProfileRead_character[];
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 extern s32 gPakMenuLeaving;
 extern s32 sCharNoteLoad;
 extern s32 gPakNoteIndex;

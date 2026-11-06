@@ -3,10 +3,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 extern s32 gPakConfirmKind;
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 extern s32 gPakMenuLeaving;
 extern s32 gPakOverwriteNote;
 extern s32 gPakNoteIndex;

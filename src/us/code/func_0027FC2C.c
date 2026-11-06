@@ -1,10 +1,9 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/render.h"
 
 extern u8 *sCinemaTextFadeOut;
 extern u8 *D_800B2CD0;
-extern s32 gScreenWidth;      /* screen width */
-extern s32 gScreenHeight;      /* screen height */
 void CList__Remove(CList *list, void *element);
 void CList__AddHead(CList *list, void *element);
 void CList__AddTail(CList *list, void *element);

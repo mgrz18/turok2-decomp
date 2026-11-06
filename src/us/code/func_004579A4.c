@@ -7,6 +7,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/pak.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
@@ -20,10 +21,8 @@ extern s32 gPakMenuIsSave;
 extern s32 gPakMenuWrites;
 extern s32 gPakMenuIsLoad;
 extern s32 gPakMenuIsProfile;
-extern s32 gPakMenuMode;
 extern s32 gPakMenuLeaving;
 extern s32 gPakMenuAnyPak;
-extern s32 gDamagedPakContinued;
 extern s32 gCameraPoolHideViews;
 extern s32 D_800F70A8; /* save size */
 extern u8 gEngineApp_m_Game_m_MenuPool[];

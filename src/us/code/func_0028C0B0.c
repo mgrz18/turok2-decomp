@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/render.h"
 
 /* libultra __OSThreadContext: 64-bit registers, read here as their low words. */
 typedef struct ThreadContext {
@@ -27,8 +28,6 @@ typedef struct Thread {
 
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
 extern u8 D_800AA0F0[];
-extern s32 gScreenWidth;              /* screen width */
-extern s32 gScreenHeight;              /* screen height */
 extern u16 *gCFB;             /* frame buffer */
 extern u16 *sCrashFrameBuffer;             /* crash screen frame buffer */
 extern u16 sCrashTextColor;              /* text colour */

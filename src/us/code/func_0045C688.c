@@ -3,12 +3,12 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Start the selected level, then open the next menu page (on the player's own
  * menu when there is a player). */
 
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 extern s32 gPakMenuLeaving;
 extern s32 gCameraPoolHideViews;
 extern u8 gEngineApp_m_Game_m_MenuPool[];

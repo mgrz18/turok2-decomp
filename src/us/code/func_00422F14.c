@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 void Controller_WatchPak(s32 port);
 void Pak_ProbeSlot(s32 port);
 
-extern s32 gDamagedPakContinued;
-extern s32 gPakMenuPort;
 extern s32 sSavePortalChosen;
 extern s32 gPakMenuIsSave;
 extern s32 gPakMenuAnyPak;

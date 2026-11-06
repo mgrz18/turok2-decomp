@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/render.h"
 
 /* Text entry item: draws the item, with a blinking 2-pixel cursor bar under the character being edited
  * (sibling of NameEntryMenu_DrawName_2, for a single entry). */
 
-extern s32 gScreenWidth; /* screen width */
 extern s32 gMenuCurrentFont;
 
 void Hud_SetupFillMode(void);

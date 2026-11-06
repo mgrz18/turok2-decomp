@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 extern s32 Controller_Lock(s32 arg0);
 extern int gPakState[];
-extern s8 gPakQueueState;
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 void Controller_ReadAll();

@@ -2,10 +2,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "gfx.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
-extern s32 gVideoClearFrames;          /* frames left to clear the screen */
 extern s32 gDepthBuffer;          /* z-buffer */
 extern s32 gEvenOdd;
 extern f32 gFrameIncrement;          /* frame time */

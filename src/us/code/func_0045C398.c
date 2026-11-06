@@ -2,12 +2,12 @@
  * cut its first two words (lui/lw sDamagedPakDone) as DamagedPakMenu_Poll_2. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Load the selected level once: returns whether it has been loaded. */
 
 extern s32 sDamagedPakDone;
 extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuPort;
 
 s32 Controller_PakChanged(s32 mode);
 s32 PakMenu_CheckPak_2(Menu *event, s32 mode, s32 arg2);

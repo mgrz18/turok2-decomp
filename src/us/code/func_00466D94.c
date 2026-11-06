@@ -4,9 +4,9 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
+#include "globals/render.h"
 
 extern s32 gScene_m_LevelID;
-extern s32 gScreenHeight;          /* screen height */
 extern u8 gHealthOverlayScript[];
 extern u8 gAmmoOverlayScript[];
 extern u8 gLivesOverlayScript[];

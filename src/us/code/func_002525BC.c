@@ -2,12 +2,11 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/render.h"
 
 /* Tag game state. */
 
 extern u8 gEngineApp_m_Settings_hudAlpha;
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 
 extern s32 Random_Next(void);
 extern void CPlayer__BecomeIt(CPlayer *p);
