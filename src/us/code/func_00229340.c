@@ -13,7 +13,6 @@ extern CMtxF *CParticle__GetParentTransform(CParticle *p, s32 arg1);         /* 
 extern void GameObject_TraceMove(CParticle *p, CVector3 to, CVector3 *outPos, void **outRegion, s32, s32);
 extern void CParticleSystem__Spawn(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 model, CVector3 dir,
                           CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
-extern CVector3 gCollisionResults_m_vVelocity;
 
 static __inline__ f32 offset_x(CParticle *p) {
     if (p->m_pEffect->m_pModel != NULL) {
@@ -43,7 +42,7 @@ void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 flags) {
     CMtxF *parent;
 
     if (p->m_pEffect->m_dwFlags & 0x10) {
-        direction = gCollisionResults_m_vVelocity;
+        direction = gCollisionResults.m_vVelocity;
     } else {
         direction = p->m_vVelocity;
     }

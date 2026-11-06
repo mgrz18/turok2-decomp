@@ -4,7 +4,6 @@
 #include "globals/scene.h"
 #include "globals/collision.h"
 
-extern CVector3 gCollisionResults_m_vVelocity;
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 s32 CParticleSystem__Spawn(void *table, void *actor, void *owner, s32 *ownerCount, void *target, s32 kind, CVector3 origin,
                   CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
@@ -14,7 +13,7 @@ void CParticle__SpawnAtWaterHit(CParticle *actor, s32 kind) {
     CVector3 origin;
 
     if (actor->m_pEffect->m_dwFlags & 0x10) {
-        origin = gCollisionResults_m_vVelocity;
+        origin = gCollisionResults.m_vVelocity;
     } else {
         origin = actor->m_vVelocity;
     }

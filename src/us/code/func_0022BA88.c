@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "globals/scene.h"
+#include "globals/collision.h"
 
 extern s32 func_0026C114(void *region);                     /* region's surface type */
 extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
@@ -12,10 +13,6 @@ extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CParticleSystem__Free(void *sys, CParticle *p);
 extern void CParticle__StopLoopSound(CParticle *p);
-extern s32 gCollisionResults_m_pWallRegion;
-extern CVector3 gCollisionResults_m_vWallPos;
-extern s32 gCollisionResults_m_nWallEdge;
-extern CVector3 gCollisionResults_m_vVelocity;
 
 void CParticle__HitWall(CParticle *arg0) {
     CEventValue pair;

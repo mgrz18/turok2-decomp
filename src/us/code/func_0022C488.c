@@ -30,7 +30,6 @@ struct Target {
     /* 0x12B0 */ s32 extraUses;
 };
 
-extern u8 gCollisionResults_m_Frame_flags;
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
@@ -149,7 +148,7 @@ void CParticle__HitTarget(CParticle *p) {
                     }
                 }
                 if (p->header.m_nObjType == 0x56 || p->header.m_nObjType == 2 || p->header.m_nObjType == 0x126 || p->header.m_nObjType == 15 || special
-                    || (p->header.m_nObjType == 11 && (gCollisionResults_m_Frame_flags & 3) == 1)) {
+                    || (p->header.m_nObjType == 11 && (gCollisionResults.m_Frame.flags & 3) == 1)) {
                     attachParticle(p, boneMatrix, action);
                     if (p->m_ActiveSwooshes) {
                         CParticle__BuildCameraMatrix(p);

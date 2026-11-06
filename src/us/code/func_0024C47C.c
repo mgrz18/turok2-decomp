@@ -516,7 +516,6 @@ extern f32 gCharacterHealthRegen[];           /* health regeneration per charact
 extern PlayerStateInfo gPlayerStateTable[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
-extern s32 gCollisionResults_m_nFloorKind;
 extern s32 gScene_m_PendingWarpID;
 extern s32 gCharacterModels[];
 extern s32 gTagModeModel;
@@ -880,7 +879,7 @@ void CPlayer__Update(Player *p) {
             }
             CPlayer__RamWithMount(p, actor, stateFlags);
             landed = CPlayer__TryMount(p, actor, stateFlags);
-            if (gCollisionResults_m_nFloorKind == 2 && (u32) ((u16) p->state - 4) < 2) {
+            if (gCollisionResults.m_nFloorKind == 2 && (u32) ((u16) p->state - 4) < 2) {
                 if (actor->velY > 0.0f) {
                     actor->velY = 0.0f;
                 }

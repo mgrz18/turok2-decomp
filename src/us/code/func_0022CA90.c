@@ -9,7 +9,6 @@
 
 typedef struct Target Target;
 
-extern CVector3 gCollisionResults_m_vVelocity;                /* the direction of the hit */
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
@@ -36,8 +35,8 @@ static __inline__ void placeAtHit(CParticle *p) {
     CVector3 dir;
 
     p->header.m_vPos = gCollisionResults.m_vInstancePos;
-    p->m_vVelocity = gCollisionResults_m_vVelocity;
-    dir = gCollisionResults_m_vVelocity;
+    p->m_vVelocity = gCollisionResults.m_vVelocity;
+    dir = gCollisionResults.m_vVelocity;
     CVector3__Normalize(&dir);
     p->m_vDirection = dir;
     CVector3__Scale(&dir, &dir, Random_Blend(-49.92f, 0.0f));
