@@ -1,0 +1,384 @@
+// N2 part n1: functions at 0x00200500-0x0021FFFF (engine core: lists, mutex,
+// sets, loader, decompressor, heap, hash table, resource cache, ProPack,
+// textures and render state, model batching, vector/matrix/quaternion math,
+// random numbers, volume lighting, static objects and level actors, animation
+// decompression and players, object instance animation and drawing).
+// Evidence: "turok3 X" = Drahsid's Turok 3 decomp has the function or its
+// declaration under that name and ours does the same thing (same calls, same
+// struct offsets) or sits in the same place of the same file; "RW name" =
+// AbuN64/ragewars-decomp names the Rage Wars function this file cites;
+// "string" = the rodata string the function passes as the cache description;
+// otherwise by behavior, read in the C and its callers.
+
+// CList (turok3 list.c; the four already in names.us.txt are word-identical).
+CList__InsertBefore = 0x002005D0; // links element arg2 before arg1 through m_LastOffset/m_NextOffset, at the head when arg1 has no previous; bumps m_nCount
+CList__InsertAfter = 0x00200684; // mirror of CList__InsertBefore: after arg1, or at the tail
+CList__RemoveHead = 0x002007D0; // m_pHead = head's next, m_nCount-- (no unlink of the old head)
+CList__RemoveTail = 0x002007F4; // m_pTail = tail's previous, m_nCount--
+CList__MoveToHead = 0x00200818; // unlinks an element and re-adds it at the head; the cache uses it to keep CMemEntries in age order
+CList__MoveToTail = 0x00200904; // unlinks an element and re-adds it at the tail
+CList__GetRandom = 0x002009F0; // walks Random_Next() % m_nCount links from the head
+CList__Contains = 0x00200A9C; // walks the list, 1 if the element is on it
+
+// ProPack (RNC) decompression (turok3 ppdecom.c: ProPack__Decompress then
+// ProPackDecompress then the asm, the same order as here).
+ProPack__Decompress = 0x00200AE0; // turok3 ppdecom.c; the (notifyId, cacheEntry) decompress callback the cache requests take: calls ProPackDecompress(entry, 0)
+ProPackDecompress = 0x00200B00; // turok3 ppdecom.c; checks the "RNC" magic, allocates the output with CCache__AllocateMemoryForDecompression, unpacks by the method byte (1/2), swaps it in with CCache__DeallocAndReplaceCompressedData
+RNC_UnpackMethod1 = 0x00200C40; // asm (versions/asm_origin.us.txt: "RNC unpack entry"); ProPackDecompress's case 1
+RNC_UnpackMethod2 = 0x002010C0; // asm (asm_origin: "RNC decompressor body"); ProPackDecompress's case 2
+
+// CISet / CUSet (turok3 SetN64.c, include/SetN64.h). The run 0x2017B0-0x2019F0
+// has the sizes of turok3's func_282E40..func_282FBC one for one (0x24, 0x14,
+// 0x30, 0x30, 0x14, 0x30, 0x30, 0x1C, 0x18, 0x20, 0x1C, 0xC4), which places
+// turok3's four names.
+CISet__GetDataSize = 0x002017B0; // turok3 func_282E40's slot; returns offsets[blockCount], the set's data size (via CISet__GetSetAndSize)
+CISet__GetBlock = 0x002017D4; // turok3 SetN64.c, slot and code: set + offsets[i]
+CISet__GetBlockAndSize = 0x002017E8; // turok3 SetN64.c, slot and code: set + offsets[i], size = offsets[i+1] - offsets[i]
+CISet__GetBlockSize = 0x00201818; // turok3 func_282EA8's slot: offsets[i+1] - offsets[i]
+CISet__GetROMAddress = 0x00201848; // turok3 SetN64.h (thisx, romAddressBase, blockIndex): base + offsets[i]
+CISet__GetROMAddressAndSize = 0x0020185C; // turok3 SetN64.h (thisx, romAddressBase, blockIndex, length*)
+CISet__GetOffsetAndSize = 0x0020188C; // offsets[i] and the block's size
+CISet__GetSetAndSize = 0x002018BC; // the set and offsets[blockCount]
+CUSet__GetTotalSize = 0x002018D8; // turok3 CUSet (blockSize, blockCount, array): count * size + 8
+CUSet__GetSetAndSize = 0x002018F0; // the set and count * size + 8
+CUSet__GetArrayAndSize = 0x00201910; // the array and count * size
+CUSet__Transpose = 0x0020192C; // transposes the byte array into dst (and back over src when asked)
+
+// CMutex, CDecompressor, CLoader (turok3 mutex.c, decompressor.c, loader.c,
+// common/sysrc.c).
+CMutex__Wait = 0x002019F0; // CMutex__Begin then CMutex__End (turok3 mutex.h inlines) when the count is non-zero: waits for the holder
+CDecompressor__Construct = 0x00201AD0; // turok3 decompressor.c: queue, memset stack with the thread id, osCreateThread(CDecompressor__Main), start; called by InitializeSystemResources with thread 3
+CDecompressor__DecompressSync = 0x00201B50; // raises the thread priority, osJamMesg's the cache entry and blocks on a private reply queue
+CDecompressor__DecompressAsync = 0x00201BDC; // osSendMesg(no block) of the entry with its reply queue; returns whether it was queued
+CDecompressor__Flush = 0x00201C08; // keeps the decompressor at the high priority while it has pending work, then back to the low one
+CLoader__Construct = 0x00201CC0; // turok3 loader.c: two queues, OS_EVENT_PI, free/used CLists (links 0x18/0x1C), 0x210 entries on the free list, thread CLoader__Main
+CLoader__LoadSync = 0x00201DBC; // cuts a ROM read into 0x2000-byte loader entries, jams each and waits for it
+CLoader__LoadAsync = 0x00201E94; // queues a ROM read (in 0x2000-byte entries), the last one replying to the given queue
+CLoader__Main = 0x00201FBC; // turok3 loader.c CLoader__Main: osRecvMesg, writeback, osPiRawStartDma, wait, inval, reply, CLoader__DeallocLoaderEntry
+CLoader__AllocLoaderEntry = 0x0020205C; // takes the free list's head under __osDisableInt, marks it, adds it to the used list (mirror of CLoader__DeallocLoaderEntry)
+InitializeSystemResources = 0x00202130; // turok3 common/sysrc.c: clears the RAM above the image, CHeap__Construct, CDecompressor__Construct(3), CLoader__Construct(4), VM init, CCache__Construct(5)
+
+// CHeap (turok3 heap.h: start, end, free head/tail, used head).
+CHeap__AllocAt = 0x002021F0; // carves a block at a given address out of the free block that holds it
+CHeap__FreeAll = 0x00202340; // frees every block after the first, merging into the free list
+CHeap__Construct = 0x00202474; // turok3 heap.h signature (thisx, start, length); one 16-aligned free block; called by InitializeSystemResources
+CHeap__Alloc = 0x002024E0; // turok3 heap.h: first fit from the free head, (size + 0x2F) & ~0xF with the 0x20 header
+CHeap__AllocTop = 0x002025F4; // the same from the free tail, carving from the top of the block (LibTEngine's CHeap__AllocTop, docs/VRAM-LAYOUT.md)
+CHeap__Free = 0x002026EC; // merges the block back into its physical predecessor and the free list; returns the freed size
+CHeap__GetFreeStats = 0x0020280C; // sums the free blocks' sizes and keeps the largest
+
+// CHashTable (turok3 hash.c: gHashTable of 16-byte key/value/index/next).
+CHashTable__Insert = 0x00202934; // hashes key ((k<<5)^(k>>1)^(k>>9)^(k>>17)) & mask, sets or chains key/value
+CHashTable__Remove = 0x00202A08; // unlinks key from its chain
+RoundToPowerOfTwo = 0x00202AC0; // turok3 hash.c's static inline RoundToPowerOfTwo, out of line: counts bits, 1 << (high bit, + 1 if not a power)
+CHashTable__GetLongestChain = 0x00202B0C; // walks every bucket's chain keeping the longest (the result is discarded: a stripped debug print)
+
+// CCache (turok3 cache.c/cache.h; gCache is D_800D81D0, structs/cache.h).
+CCache__Construct = 0x00202BB0; // turok3 cache.c CCache__Construct, statement for statement: 0x400 entries (x2 over 4 MB), mem/cache entry pools, lists, CHashTable__Construct, thread CCache__Main
+CCache__WaitForDisplayLists = 0x00202EEC; // for each display list holding locks: the current one is cleared, the others are marked blocking and waited on through the blocker
+CCache__FreeOldestMemEntry = 0x00203068; // frees the least recently used unlocked CMemEntry not used for 5 frames (or the newest one when allowed); returns the bytes freed
+CCache__AllocMemEntry = 0x002031E8; // pops a CMemEntry off the free stack (flags ALLOCATED, age now, on the age list), freeing an old one if none is free
+CCache__Compact = 0x00203330; // moves unlocked blocks down the heap (CHeap__Free, CHeap__Alloc, memmove) and re-sorts them on the address list; one step or all
+CCache__LookupAndLock = 0x002034F4; // hash lookup of a request id: locks and ages its CMemEntry
+CCache__Request = 0x0020367C; // the cache's load: returns the cached block for a ROM address or allocates one and loads it (sync through CLoader__LoadSync, async through CLoader__LoadAsync), decompressing with the callback; args (.., rom, size, flags, notifyId, callback, description, sync)
+CCache__RequestDecompression = 0x00203CA0; // as CCache__Request but the source is a CMemEntry already in memory: queues it on the decompressor
+CCache__Main = 0x002041E4; // turok3 CCache__Main's place (osCreateThread target in CCache__Construct): receives completed loads and display-list releases
+CCache__CompleteRequest = 0x002044A8; // files a finished request in the hash table (keeping the larger of two for one id) and moves it to the free list when superseded
+CCache__DrawDebug = 0x00204778; // debug view of the heap: one coloured band per CMemEntry by lock state and age
+CMemEntry__IsLocked = 0x00204D90; // flags & MEMENTRY_FLAG_LOCKED
+CMemEntry__Lock = 0x00204D9C; // lockCount++, flags |= MEMENTRY_FLAG_LOCKED
+CMemEntry__Unlock = 0x00204DB8; // --lockCount, clears MEMENTRY_FLAG_LOCKED at zero
+CCache__Advance = 0x00204DE0; // turok3 CCache__Advance (once a frame from CEngineApp, only caller func_00287ABC): ageCount++ (D_800D8DF0), counts down the frame delay, compacts 10 steps
+CCache__Allocate = 0x00204EDC; // CCache__AllocateInternal under the cache mutex (34 callers)
+CCache__AllocateAt = 0x00204FD0; // a CMemEntry for a block at a fixed address (CHeap__AllocAt), under the mutex
+CCache__TouchAndLock = 0x00205110; // ages a CMemEntry and locks it, under the mutex
+CCache__Unlock = 0x002051F4; // CMemEntry unlock under the cache mutex: the release every CCache__Request user calls (48 callers)
+CCache__Deallocate = 0x002052D8; // turok3 cache.h CCache__Deallocate: CCache__DeallocateInternal under the mutex (56 callers)
+CCache__Flush = 0x002053A8; // waits for the display lists, frees every unlocked entry, compacts fully
+CCache__BeginDisplayList = 0x0020548C; // currentDlist = idx, dlistValid[idx] = 1 (turok3 cache.h fields)
+CCache__EndDisplayList = 0x00205574; // returns dlistValid[currentDlist], currentDlist = -1
+CCache__LockForDisplayList = 0x0020565C; // sets MEMENTRY_FLAG_DLISTA/B_LOCKED for the current display list and counts it in dlistCount
+CCache__PostDisplayListDone = 0x0020578C; // sends the display list index to the cache thread, which releases its locks (CCache__ReleaseDisplayList)
+CCache__DeallocAndReplaceCompressedData = 0x002057B0; // turok3 cache.h (cacheEntry, newData): unlocks and frees the entry's compressed block, puts newData in
+CCache__ReleaseAndReplaceData = 0x00205904; // unlocks the entry's memEntry and referencedMemEntry, puts the new block in (the CCache__RequestDecompression counterpart)
+CCache__Touch = 0x00205A2C; // hash lookup of a request id, ages its CMemEntry without locking
+CCache__LoadPersistantIndex = 0x00205B94; // turok3 cache.h (dest, romAddress, description "header"): loads a 4-byte probe for the count, then the whole index, stores its data in *dest
+CCache__LoadPersistantSubBlock = 0x00205D0C; // turok3 cache.h (sourceIndex, blockIndex, romAddressBase, notifyID, callback, description): CISet__GetROMAddressAndSize then CCache__Request
+CCache__AllocateMemoryForDecompression = 0x00205D7C; // turok3 cache.h (cacheEntry, length): allocates with the entry's memFlags (0x1C)
+CCache__AllocateMemoryForDecompressionTop = 0x00205EFC; // the same with flags 0x22 (bit 0x20: top of the heap); ProPackDecompress's in-place case
+CCache__SetFrameDelay = 0x00206068; // sets D_800D8DEC, which CCache__Advance counts down (callers pass 8)
+CCache__GetFrameDelay = 0x00206078; // returns D_800D8DEC
+CCache__GetFreeCacheEntryCount = 0x00206088; // the CCacheEntry free list's m_nCount
+CCache__GetFreeMemEntryCount = 0x00206098; // freeEntryCount (D_800D8DAC)
+CCache__GetMemEntryCount = 0x002060A8; // the age list's m_nCount (D_800D81F0); 0x2060B8 and 0x2060C8 return the same word
+CCache__AllocateInternal = 0x002060E0; // CMemEntry + heap block with the given flags, no mutex (CCache__Allocate's body)
+CCache__DeallocateInternal = 0x002061B8; // drops all locks, frees the block and the CMemEntry unless display lists hold it
+CCache__PopFreeMemEntry = 0x00206250; // the free-stack pop of CCache__AllocMemEntry, out of line
+CCache__FreeMemEntry = 0x002062F8; // off the age and address lists, back on the free stack
+CCache__FreeOldestMemEntryWithFlags = 0x00206380; // CCache__FreeOldestMemEntry honouring flag 0x10
+CCache__HeapAlloc = 0x002063B4; // CHeap__Alloc or CHeap__AllocTop, freeing old entries until it fits
+CCache__AddToAddressList = 0x00206498; // inserts a CMemEntry into the address-sorted list (D_800D81F4), flag 0x1000
+CCache__ClearCurrentDisplayList = 0x00206528; // CCache__ClearDisplayListLocks(currentDlist), dlistValid = 0
+CCache__ClearDisplayListLocks = 0x0020656C; // clears the DLISTA/B lock bit on every CMemEntry, dlistCount = 0
+CCache__TouchMemEntry = 0x002065CC; // age = ageCount, CList__MoveToHead on the age list
+CCache__DetachCacheEntry = 0x002065F8; // removes the entry's CCacheEntry from the hash table and returns it to the free list
+CCache__TakeFreeCacheEntry = 0x00206658; // free list head to the used list, flags 1
+CCache__FreeCacheEntry = 0x002066B0; // used list to free list, flags 0
+CCache__AllocCacheEntry = 0x002066F8; // CCache__TakeFreeCacheEntry, freeing old memory until one is free
+CCache__ReleaseDisplayList = 0x002067C4; // wakes a blocked waiter and clears the display list's lock bits (CCache__Main's handler for messages 0/1)
+CCache__FindOldestMemEntry = 0x00206870; // the least recently used unlocked entry not used for 5 frames
+MtxPool_Reset = 0x00206920; // a pool of 0x40-byte (Mtx-sized) blocks: back to its start for this frame buffer
+MtxPool_Alloc = 0x00206950; // takes n 0x40-byte blocks; the shadow and skinning code get their Mtx from it (D_800F7148)
+
+// Textures and RDP state.
+Texture_DecompressCallback = 0x00206990; // load callback of Texture_Request ("texture"): ProPackDecompress, then recolours RGBA5551 pixels by the request's top two bits
+Texture_Load = 0x00206B30; // loads a texture frame and palette into TMEM (LoadBlock/LoadTLUT by format), skipping what is already loaded, then gSPTexture
+Texture_RequestSync = 0x0020793C; // CCache__Request(.., Texture_DecompressCallback, "texture", sync)
+Texture_Request = 0x0020798C; // the same, asynchronous
+Texture_GetInfo = 0x002079D8; // a texture resource's three header words
+Texture_InvalidateCache = 0x00207A54; // D_800AB570 = 0: forgets the last texture Texture_Load loaded
+Render_SetCombineMode = 0x00207A70; // one G_SETCOMBINE per mode, cached in D_800AB880
+Render_SetRenderMode = 0x00207FEC; // one G_SETOTHERMODE_L render mode per mode (file's own comment)
+Render_DrawShadowQuad = 0x002086BC; // draws the 16x16 intensity texture D_800AB580 with a matrix at an alpha; the blob shadows' draw (Actor_DrawGroundShadow, Shadow_DrawBlob)
+Render_SetupMaterial = 0x00208810; // texture, colours, combiner, render and geometry modes of a material; 0 when not drawable (file's own comment)
+Model_BlendMorphFrames = 0x002097AC; // blends the two morph frames around t into the output vertices
+Model_Decompress = 0x00209AF4; // builds the drawable display lists of a packed model resource (file's own comment)
+Render_DrawModel = 0x0020A33C; // draws one level of detail of a model: matrix, segments, lights, each part whose material passes
+Render_FlushModelBatch = 0x0020A568; // files the queued instances under their material key in the opaque/translucent sort trees
+Render_DrawBatches = 0x0020A994; // emits the sorted batches, opaque then translucent
+Render_DrawModelFlat = 0x0020AF08; // a model flat-shaded in the primitive colour at an alpha
+Render_DrawModelShared = 0x0020B258; // a model with the shared material D_80110064
+Model_DecompressCallback = 0x0020B490; // Model_Decompress(.., 0, 0) as a cache load callback
+Model_DecompressCallbackTerminated = 0x0020B4B0; // Model_Decompress(.., 0, 1): passed with "geometry"/"simp geometry"
+Model_DecompressCallbackExtra = 0x0020B4D0; // Model_Decompress(.., 1, 0): passed with "anim geometry"
+Model_AdvanceMorph = 0x0020B4F0; // adds dt to a morph model's time once a frame and re-blends (Model_BlendMorphFrames)
+Render_InvalidateModeCache = 0x0020B5B8; // D_800AB880 = D_800AB884 = -1: the cached combine and render modes
+Render_ResetBatches = 0x0020B5D4; // clears the batch queue and registered-model counters
+Render_FlushBatches = 0x0020B624; // Render_FlushModelBatch, Render_DrawBatches, then locks for the display list and releases every registered model
+Render_QueueModelInstance = 0x0020B6A0; // RW name (src/RENDER_4/CODE_8026D844.CPP Render_QueueModelInstance)
+Render_QueueModelByKey = 0x0020B7F8; // loads "simp object index" and "geometry" for a key, queues an instance of it
+Model_RequestTextures = 0x0020BE08; // Texture_RequestSync for every part's material texture
+Model_TouchTextures = 0x0020BEE8; // CCache__Touch for every part's material texture
+Render_SortTreeFind = 0x0020BFE8; // binary tree lookup by key (the batch sort tree)
+Render_SortTreeInsert = 0x0020C030; // hangs a node off the found one, threading key order
+
+// CMtxF, CVector3, CQuaternion math (f32[4][4] row vectors, translation in row 3).
+CMtxF__TransformBox = 0x0020C0D0; // transforms an AABB by a matrix (min/max per axis)
+CMtxF__InvertAffine = 0x0020C208; // inverse of an affine matrix (file's own comment)
+CMtxF__MultiplyAffine = 0x0020C618; // 3x4 product, last column 0,0,0,1
+CMtxF__Multiply = 0x0020C890; // full 4x4 product
+CMtxF__ToMtx = 0x0020CC94; // float to the RSP's fixed-point Mtx, all 16 entries x65536 (guMtxF2L)
+CMtxF__ToMtxAffine = 0x0020D274; // the same skipping the last column (23 callers build draw matrices with it)
+CMtxF__FromMtx = 0x0020D6F8; // fixed-point Mtx to float, all 16 entries (guMtxL2F)
+CMtxF__FromMtxAffine = 0x0020D908; // the same, last column forced to 0,0,0,1
+CQuaternion__Slerp = 0x0020DAA4; // acos/sin slerp, through the shorter arc
+CQuaternion__SlerpFast = 0x0020DCC8; // slerp, but a normalised lerp when the quaternions are close
+CVector3__RandomPerturb = 0x0020DFE0; // normalises, then lerps toward a random direction by amount
+CVector3__RandomPerturbX = 0x0020E240; // the same with only x randomised
+CVector3__RandomPerturbY = 0x0020E428; // only y
+CVector3__RandomPerturbZ = 0x0020E61C; // only z
+CQuaternion__FromDirection = 0x0020E810; // rotation taking +z to a direction
+CVector3__GetYaw = 0x0020EAA0; // angle of (x, z) through the acos table
+Angle_AbsDifference = 0x0020EC4C; // |wrapped a - wrapped b|
+CVector3__Add = 0x0020EEF8; // out = a + b
+CVector3__Subtract = 0x0020EF2C; // out = a - b
+CVector3__Scale = 0x0020EF60; // out = v * s
+CVector3__Lerp = 0x0020EF8C; // out = a + t (b - a)
+CVector3__Cross = 0x0020EFDC; // out = a x b
+CVector3__Normalize = 0x0020F040; // unit length, zero left alone
+CVector3__PointAtHeight = 0x0020F0C8; // the point of segment a-b at a given y
+CVector3__Bounce = 0x0020F144; // v - (1 + k)(v.n) n: reflection with restitution
+CVector3__RemoveComponent = 0x0020F1D8; // v - (v.n) n
+CVector3__ProjectOntoPlaneNormal = 0x0020F260; // v's component along the normal of the plane spanned by a and b
+CVector3__ProjectKeepLength = 0x0020F3C0; // v without its n component, rescaled to v's length
+CVector3__ClampLength = 0x0020F510; // scales v down to a maximum length; returns whether it did
+CVector3__GetPitch = 0x0020F5C0; // acos(y / |v|) minus a rodata constant, 0 outside a range: the vector's elevation
+CVector3__DistanceSquared = 0x0020F680; // |a - b|^2
+CVector3__Distance = 0x0020F6BC; // |a - b|
+CVector3__LimitLength = 0x0020F70C; // CVector3__ClampLength without the zero check or result
+CMtxF__Identity = 0x0020F79C; // the identity matrix
+CMtxF__ClampEntries = 0x0020F7EC; // clamps all 16 entries to the fixed-point range before CMtxF__ToMtx
+CMtxF__TransformPoint = 0x0020F85C; // p * M with translation (50 callers)
+CMtxF__TransformPoints = 0x0020F908; // the same for an array
+CMtxF__TransformPointProjective = 0x0020F9D4; // with the w divide
+CMtxF__RotateVector = 0x0020FAFC; // p * M without translation
+CMtxF__InverseRotateVector = 0x0020FB90; // p * transpose(M3x3)
+CMtxF__SetTranslate = 0x0020FC24; // identity with a translation
+CMtxF__SetScale = 0x0020FC74; // diagonal scale
+CMtxF__SetAxisAngle = 0x0020FCC4; // rotation of theta about (x, y, z) (guRotateF)
+CMtxF__SetEulerXYZ = 0x0020FE00; // rotation from three angles
+CMtxF__Copy = 0x0020FF80; // element by element copy
+CMtxF__SetShadowProjection = 0x00210004; // projects along a direction onto the plane y = h (Shadow code's projected shadow)
+CMtxF__SetLookDirection = 0x00210090; // orientation whose forward axis is the direction (file's own comment)
+CMtxF__GetTranslation = 0x002101A0; // row 3 into a vector
+CMtxF__GetScale = 0x002101BC; // the three axis rows' lengths
+CMtxF__TranslateLocal = 0x00210284; // translation along the matrix's own axes
+CMtxF__Translate = 0x00210318; // adds to row 3 (23 callers)
+CMtxF__ScaleAxes = 0x0021034C; // scales rows 0-2 (23 callers)
+CMtxF__CopyScaled = 0x002103C8; // copy with rows 0-2 scaled
+CMtxF__ScaleColumns = 0x00210478; // scales columns 0-2 including the translation
+CMtxF__SetRotateX = 0x00210518; // rotation about x (right row 1,0,0)
+CMtxF__SetRotateY = 0x002105A4; // rotation about y (up row 0,1,0)
+CMtxF__SetRotateZ = 0x00210630; // rotation about z (forward row 0,0,1)
+CMtxF__PreRotateX = 0x002106C0; // mixes the up and forward rows
+CMtxF__RotateX = 0x00210790; // mixes the y and z columns, translation included
+CMtxF__PreRotateY = 0x00210894; // mixes the right and forward rows
+CMtxF__RotateY = 0x00210968; // mixes the x and z columns, translation included
+CMtxF__PreRotateZ = 0x00210A68; // mixes the right and up rows
+CMtxF__RotateZ = 0x00210B38; // mixes the x and y columns, translation included
+CMtxF__SwapYZRows = 0x00210C3C; // swaps rows 1 and 2 (the engine's y-up/z-up swap, after every model matrix)
+CMtxF__CopySwapYZRows = 0x00210C70; // copy with rows 1 and 2 swapped
+CMtxF__SwapYZColumns = 0x00210CF0; // swaps columns 1 and 2
+CMtxF__CopySwapYZColumns = 0x00210D34; // copy with columns 1 and 2 swapped
+Angle_Lerp = 0x00210DB4; // lerp between two angles the short way round, wrapped
+Angle_Difference = 0x00210E64; // a - b the short way round
+Angle_Wrap = 0x00210EF0; // wraps an angle in place into [-pi, pi)
+CQuaternion__Multiply = 0x00210F68; // Hamilton product (file's own comment)
+CQuaternion__Normalize = 0x00211074; // unit length, zero left alone
+CQuaternion__ToMatrix = 0x00211114; // rotation matrix of a quaternion
+CQuaternion__Lerp = 0x002111E8; // component-wise lerp
+CQuaternion__TurnToward = 0x00211250; // turns a rotation toward a target at a frame-rate scaled speed (CQuaternion__SlerpFast)
+
+// Random numbers and frame-rate helpers (D_800B6D28 is the frame time).
+Random_Seed = 0x00211384; // both LCG seeds = 0xE3F635E3
+Random_Next = 0x002113A4; // LCG on seed A (x * 0xA84A5B53 + 0x58348C2D), halves swapped, 0..0x7FFFFFFF (34 callers)
+Random_NextB = 0x00211420; // the same on seed B
+Random_Float = 0x0021149C; // seed A scaled to [0, scale]
+Math_AcosLookup = 0x0021153C; // acos from a 1024-entry table, interpolated (27 callers)
+Math_StepClamped = 0x0021160C; // value += delta * dt within [-limit, limit], damped when reversing
+Math_DecayToZero = 0x0021170C; // moves toward 0 by rate * dt without overshooting
+Math_Approach = 0x00211774; // moves toward a target by rate * dt without overshooting
+Math_EaseToward = 0x002117DC; // *value += (target - *value) * rate * dt, clamped
+Math_StepClampedInt = 0x00211860; // integer value + delta * dt clamped to the limit
+Angle_WrapValue = 0x002118B0; // returns the angle wrapped into [-pi, pi]
+Angle_Delta = 0x00211920; // a - wrap(b), wrapped
+Random_Blend = 0x002119FC; // t a + (1 - t) b with t random in [0, 1] (61 callers)
+Timer_Countdown = 0x00211AF8; // *timer -= dt; 1 (and 0) when it runs out
+Edge_Init = 0x00211B30; // RW GeometryEdge: start, end, direction, xz normal
+Edge_NormalizeXZ = 0x00211BA8; // unit normal from the xz direction
+Edge_Normalize = 0x00211C30; // unit normal from the full direction
+Edge_IntersectXZ = 0x00211CC4; // parameter where two edges meet in xz
+Edge_IsPointInFront = 0x00211D40; // the point is on the normal's side
+Color_HSVToRGB = 0x00211DB0; // HSV to RGB, components in 0..1 (file's own comment)
+
+// Volume lighting (Rage Wars' actors_volume_lighting.CPP).
+LightVolume_Construct = 0x00211F64; // builds a light volume from its level record (the level loader func_00220D00 calls it for its fourth table)
+Actors_GetLightVolumeFalloff = 0x002123D4; // the light at a point local to the volume by its shape (sphere/box ...); only caller Actors_EvaluateLightVolume
+Actors_EvaluateLightVolume = 0x00212680; // RW name: cites func_802773D4_de, which rw_abu names Actors_EvaluateLightVolume
+Actors_AccumulateVertexLighting = 0x0021285C; // RW name (src/ACTORS/actors_volume_lighting.CPP)
+Lighting_DebugHueColors = 0x00212DA4; // debug: hue from each vertex's position along (1,1,1) (file's own comment)
+Lighting_CopyVertexColors = 0x00212F98; // the model's vertex colours clamped to 30..225
+Lighting_ApplyDirectional = 0x002130A8; // adds a directional light and ambient to the vertex colours
+Lighting_CollectVolumes = 0x002132B8; // the light volumes whose box overlaps a box (at most 64)
+Model_ApplyPackedOffsets = 0x00213684; // adds packed signed-byte offsets to points
+Lighting_WriteVertexColors = 0x0021375C; // vertex colours from the light levels, brightness setting applied (file's own comment)
+Lighting_BuildLitVertices = 0x00213A70; // builds a model's "lit vertices" block: volumes, directional light, colours (CStaticObject__BuildLitVerticesCallback)
+LightVolume_GetFlicker = 0x00213E90; // a light level from the flicker table by the volume's animation seed and the frame
+Lighting_CollectVolumesForModel = 0x00213FA0; // Lighting_CollectVolumes against a model's table or the world grid (file's own comment)
+
+// CStaticObject ("stat object", structs/level_actor.h) and CLevelActor ("simp object").
+CStaticObject__ConstructCompact = 0x002141F0; // the level loader's first table (func_00220D00): a placed object from its compact record (byte grid x/z, quarter turns)
+CStaticObject__Construct = 0x00214564; // the second table: from its full record (position, scale, rotation)
+CStaticObject__Draw = 0x00214844; // queues the object's model with its pulsed lit-vertex colours (Render_QueueModelInstance)
+CStaticObject__SpawnEvents = 0x00214B58; // strings "stat object index", "static events": spawns the object's attached effects at their offsets
+CStaticObject__RequestLitVertices = 0x00214D04; // string "lit vertices": CCache__RequestDecompression with CStaticObject__BuildLitVerticesCallback
+CStaticObject__LoadGeometry = 0x00214DBC; // strings "stat object index", "stat geometry"
+CStaticObject__TouchLitVertices = 0x00214E88; // CCache__Touch of the lit vertices once a frame
+Instance_NextUniqueId = 0x00214ED8; // counter 0x380000..0x3FFFFF; CGameObjectInstance__Construct's only call
+CStaticObject__BuildLitVerticesCallback = 0x00214F14; // decompress callback: Lighting_BuildLitVertices then CCache__ReleaseAndReplaceData
+Model_PulseVertexColors = 0x00214F68; // pulses the colours of vertices flagged 0x70 (file's own comment, RW func_8027892C_de)
+CLevelActor__Construct = 0x002150C0; // the level loader's third table: an actor from its 0x20-byte record (file's own comment)
+CLevelActor__Draw = 0x002152AC; // rebuilds the matrix once a frame and queues the geometry (structs/level_actor.h: "drawn by func_002152AC")
+Actor_DrawGroundShadow = 0x002154DC; // a ground shadow scaled by radius and height above the floor (Render_DrawShadowQuad)
+CLevelActor__Update = 0x002156FC; // once-a-frame: anim speed, grow-in, view mask from its region
+CLevelActor__UpdateGrowIn = 0x002157F0; // LEVEL_ACTOR_FLAG_GROWING: scale to 0.35 over 0.75 (structs/level_actor.h names it)
+CLevelActor__UpdateAnimSpeed = 0x00215868; // m_AnimSpeed = dt * the intelligence's morph speed
+CLevelActor__BuildMatrix = 0x00215884; // rotation, scale, translation into the current matrix slot
+CLevelActor__LoadGeometry = 0x00215944; // strings "simp object index" (D_800A5858 + 4), "simp geometry"
+CLevelActor__TouchGeometry = 0x00215A00; // loads the geometry and Model_TouchTextures
+
+// Animation decompression and evaluation (bit streams addressed in bits:
+// (addr & 0xF0000000) | (addr & 0x0FFFFFFF) * 8).
+CAnimationState__GetBonePosition = 0x00215AE0; // (state, bone, time, out): a bone's position at a time from the decoded tracks (or its default frame)
+CAnimationState__GetBoneRotation = 0x00215F4C; // (state, bone, time, out): a bone's rotation quaternion at a time (CQuaternion__Slerp between keys)
+Anim_DecodeQuantizedChannel = 0x00216464; // decoder for encoding 1 (Anim_DecodeTracks's table)
+Anim_DecodeTracks = 0x00216604; // decodes every track with the encoding's decoder, smooths and renormalises rotations (file's own comment)
+Anim_Decompress = 0x00216A9C; // decompress callback of animations (passed with the string "animation"): rebuilds the six-chunk file with chunk 5 decoded
+AnimCurve_LoadSegment = 0x00217214; // reads a curve segment's 4 control values and builds its cubic coefficients
+AnimCurve_Init = 0x00217450; // a curve channel's header: range and key count
+AnimCurve_Evaluate = 0x002175D8; // a curve at a frame, seeking the segment
+Bits_WriteFloat = 0x002177DC; // packs a value into the bit stream (write_bits inline)
+CAnimationState__GetData = 0x0021793C; // *pmeAnimData (structs/game_object.h CAnimationState)
+Bits_Normalize = 0x00217AD4; // x / (2^n - 1)
+Math_Remap = 0x00217AF0; // x * (hi - lo) + lo
+BitAddr_FromPointer = 0x00217B04; // pointer to bit address
+BitAddr_ToPointer = 0x00217B24; // bit address to byte pointer
+BitAddr_ToWordPointer = 0x00217B44; // bit address to its word
+Bits_Peek = 0x00217B64; // width bits at a bit address
+Bits_Poke = 0x00217BC4; // stores width bits at a bit address
+Bits_Read = 0x00217C58; // reads width bits and advances the stream
+Bits_Write = 0x00217CC8; // writes width bits at the stream's address
+Bits_QuantizeRange = 0x00217D6C; // start, delta and bit count for a range at a precision
+Bits_PeekFloat = 0x00217E4C; // a quantized float at a bit address
+Bits_ReadFloat = 0x00218020; // a quantized float, advancing the stream
+Pack_Init = 0x00218548; // an offset table of n entries, the unused ones 0xDEADBEEF
+Pack_Add = 0x00218590; // appends an entry after the last used offset (file's own comment)
+Anim_DecodeCurveChannel = 0x00218620; // decoder for encoding 0: samples a curve channel at every frame
+Anim_DecodeRawChannel = 0x002186D8; // decoder for encoding 2: raw 32-bit floats
+Anim_DecodeAnimation = 0x00218748; // decodes the position (3 channels) and rotation (4) tracks of an animation
+AnimCurve_Seek = 0x002188B8; // moves a curve channel to the segment holding a frame
+Curve_EvaluateCubic = 0x00218A54; // a + b t + c t^2 + d t^3
+
+// CAnimationState (structs/game_object.h, m_CurrentAnimation at 0xD8).
+CAnimationState__SwitchToQueued = 0x00218B10; // switches to the requested animation, keeping the old state to blend from (file's own comment)
+CAnimationState__GetRootMotion = 0x00218DCC; // the root's move and turn between two times
+CAnimationState__FindKeys = 0x00219328; // the key frames and offsets of a channel at its time
+CAnimationState__Reset = 0x00219910; // index -1, time 0, no data
+CAnimationState__Release = 0x00219938; // CCache__Unlock of pmeAnimData
+CAnimationState__IsLoaded = 0x00219968; // pmeAnimData present and locked
+CAnimationState__GetKeyHeader = 0x00219994; // chunk 0 of chunk 3 of the data
+CAnimationState__GetEvents = 0x002199C8; // chunk 4's records; CGameObjectInstance__FireAnimEvents walks them
+CAnimationState__GetEventCount = 0x002199F4; // chunk 4's count
+CAnimationState__GetRootYaw = 0x00219A20; // the root yaw at a time between the two nearest keys (file's own comment)
+CAnimationState__Load = 0x00219ACC; // CCache__Request(.., Anim_Decompress, "animation") of an entry
+
+// CGameObjectInstance animation, drawing, shadows.
+CGameObjectInstance__Construct = 0x00219BC0; // sets an instance up from its model, type and intelligence: unique id (Instance_NextUniqueId), body setup, anim (CGameObjectInstance__SetupAnimation)
+CGameObjectInstance__PickRandomAnim = 0x00219F74; // string "anim object info": a random entry of the animation set for an action (file's own comment)
+CGameObjectInstance__SetupAnimation = 0x0021A150; // strings "anim object info"/"anim object index": binds the model and animation set, picks the first animation
+CGameObjectInstance__UpdateAnimation = 0x0021A344; // advances the animation and moves by its root motion (file's own comment)
+CGameObjectInstance__MoveWithCollision = 0x0021A658; // collides the instance along a move (func_00239F00, with its collision info), then signals the old and new contact (func_0026E19C 0x80/0x40) and the collision callback; only caller CGameObjectInstance__UpdateAnimation
+CGameObjectInstance__AdvanceAnimation = 0x0021A7EC; // advances the animation tracks and applies the root turn/move (file's own comment)
+CGameObjectInstance__FireAnimEvents = 0x0021ABC8; // fires the animation events whose frame lies in [from, to) (file's own comment)
+CGameObjectInstance__GetRotation = 0x0021AE6C; // the instance's facing as a quaternion (file's own comment)
+CGameObjectInstance__PoseBone = 0x0021B95C; // poses the skeleton recursively, one bone per call (file's own comment)
+CGameObjectInstance__BuildBoneMatrices = 0x0021CDAC; // builds the bone matrices from the current/next animation (file's own comment)
+CGameObjectInstance__Draw = 0x0021D39C; // the draw pass of one instance in one view: culling, model load, draw callback (file's own comment)
+CGameObjectInstance__DrawModel = 0x0021D7BC; // draws the model (Render_QueueModelInstance) with its colour sets, then its shadow
+CGameObjectInstance__DrawModelImmediate = 0x0021D928; // the same through Render_DrawModel
+CGameObjectInstance__DrawModelLitVertices = 0x0021DA8C; // the same from the cached "lit vertices" resource
+CGameObjectInstance__DrawShadow = 0x0021DC84; // the projected shadow model, or the blob shadow (file's own comment)
+Shadow_DrawBlob = 0x0021E03C; // the blob shadow under an actor (file's own comment)
+CGameObjectInstance__GetNearestBox = 0x0021E374; // the bounding box whose centre is nearest a point (file's own comment)
+CGameObjectInstance__ConstructFromRecord = 0x0021E6AC; // CGameObjectInstance__Construct from a placement record (resources through the CScene at D_800F7078)
+CGameObjectInstance__UpdateBounds = 0x0021E7F8; // runs m_pfCalculateOrientationMatrix, then CMtxF__TransformBox into m_vMin/m_vMax
+CGameObjectInstance__CalculateOrientationMatrix = 0x0021E840; // yaw quaternion times rotation, scale, position, CMtxF__SwapYZRows into the transform
+CGameObjectInstance__RequestAnim = 0x0021E960; // m_CurrentAnimation.m_nRequestedAnimIndex = n; active when it differs
+CGameObjectInstance__RestartAnim = 0x0021E980; // frame 0, active, flag 0x400 cleared
+CGameObjectInstance__SetAnimByAction = 0x0021E9A4; // CGameObjectInstance__PickRandomAnim then CGameObjectInstance__SetAnim
+CGameObjectInstance__SetAnim = 0x0021E9F8; // requests an animation unless locked by flag 0x400
+CGameObjectInstance__PickAvailableAction = 0x0021EA3C; // weighted random choice among the (action, weight) pairs the instance has animations for
+CGameObjectInstance__LoadBoneMatrices = 0x0021EAE8; // loads "anim object info" and the geometry, CGameObjectInstance__BuildBoneMatrices
+CGameObjectInstance__ClearDrawMatrices = 0x0021EBC0; // m_pmtLastFrameDrawMtxs = m_pmtDrawMtxs, m_pmtDrawMtxs = m_pmfShadow = 0
+CGameObjectInstance__GetDeathModels = 0x0021EBE4; // the two colour sets from the intelligence's m_DeathModels by AI mode
+CGameObjectInstance__DrawModelWithLights = 0x0021ECA0; // stores the lights for this frame, CGameObjectInstance__DrawModel
+CGameObjectInstance__SubmitShadowModel = 0x0021ED04; // a Mtx from MtxPool_Alloc for the shadow and Render_DrawModelFlat
+CGameObjectInstance__LocalToWorld = 0x0021F00C; // an offset turned by CGameObjectInstance__GetRotation
+CGameObjectInstance__GetAverageScale = 0x0021F268; // sqrt((sx^2 + sy^2 + sz^2) / 3)
+CGameObjectInstance__LoadGeometry = 0x0021F358; // string "anim geometry": CCache__Request with Model_DecompressCallbackExtra
+CGameObjectInstance__TouchGeometry = 0x0021F3A4; // the same and Model_TouchTextures
+CGameObjectInstance__GetBodySetup = 0x0021F770; // D_800ACB60[type], or the player body's own (D_800AE994) for a player's second object
+Anim_GetBoneTranslationLerp = 0x0021FA2C; // a bone's translation lerped between two key frames (RW func_8024C92C_de)
+Anim_GetBoneRotationLerp = 0x0021FB10; // a bone's rotation lerped between two key frames (RW func_8024CA10_de)
+Anim_GetBoneRotationSlerp = 0x0021FC4C; // the same through CQuaternion__Slerp (RW func_8024CB4C_de)
+CMtxF__ToMtxAffineUnscaled = 0x0021FD30; // CMtxF__ToMtxAffine for a matrix already in fixed-point units (no x65536)
