@@ -42,12 +42,6 @@ typedef struct {
 } Area; /* 0x14 bytes */
 
 typedef struct {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s32 count;
-    /* 0x08 */ Area areas[1];
-} AreaList;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x110];
     /* 0x110 */ void *colorImage;
 } FrameBuffers;

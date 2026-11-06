@@ -8,11 +8,6 @@
 #include "globals/engine.h"
 #include "globals/framebuffer.h"
 
-typedef struct VideoRate {
-    /* 0x0 */ s32 unk0;
-    /* 0x4 */ f32 hz;
-} VideoRate;
-
 extern u32 D_800F6CA8;
 extern u32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gInSinglePlayerMenu; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */

@@ -5,12 +5,6 @@ typedef unsigned char u8;
 typedef signed int s32;
 typedef float f32;
 extern f32 Random_Blend(f32 arg0, f32 arg1);
-struct func_8020CA10_G1;
-typedef struct func_8020CA10_G1 func_8020CA10_G1;
-struct func_8020CA10_G1;
-struct func_8020CA10_G1 {
-    f32 unk0;
-};
 struct SampledCurve;
 struct SampledCurve {
     int type;

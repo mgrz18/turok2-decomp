@@ -4,12 +4,6 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/libultra.h"
-struct Slot;
-typedef struct Slot Slot;
-struct Slot;
-struct Slot {
-    char data[24];
-};
 extern void __osSiGetAccess(void);
 extern void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
