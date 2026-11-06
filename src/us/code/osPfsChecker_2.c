@@ -1,5 +1,5 @@
 /* cc1-flags: -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float -funsigned-char -O3 -mcpu=VR4300 -mgp32 -mfp32 -fforce-addr -fno-builtin */
-/* From decompals/ultralib (libultra 2.0I): src/io/pfschecker.c, osPfsChecker. */
+/* From decompals/ultralib (libultra 2.0I): src/io/pfschecker.c, osPfsChecker (module-2 copy osPfsChecker_2). */
 #include "common.h"
 #include "ultra_types.h"
 
@@ -36,7 +36,7 @@ extern s32 func_00299A40(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, 
 extern s32 func_0042868C(OSPfs *pfs, __OSInodeCache *cache); /* corrupted_init */
 extern s32 func_004287D8(OSPfs *pfs, __OSInodeUnit fpage, __OSInodeCache *cache); /* corrupted */
 
-s32 osPfsChecker(OSPfs *pfs) {
+s32 osPfsChecker_2(OSPfs *pfs) {
     int j;
     s32 ret;
     __OSInodeUnit next_page;

@@ -3,11 +3,11 @@
 
 #include "common.h"
 #include "ultra_types.h"
-extern s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
 extern s32 func_00429DE4(OSPfs *pfs);
 extern s32 func_00299680(void *queue, int channel, u16 address, u8 *buffer);
 extern s32 func_00299A40(void *queue, int channel, u16 address, u8 *buffer, int force);
-static __inline__ u16 __osSumcalc(u8 *ptr, int length) {
+static __inline__ u16 sumcalc(u8 *ptr, int length) {
     int i;
     u32 sum = 0;
     u8 *tmp = ptr;
@@ -17,7 +17,7 @@ static __inline__ u16 __osSumcalc(u8 *ptr, int length) {
     }
     return sum;
 }
-s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank)
+s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank)
 {
     u8 sum;
     int j;
@@ -32,7 +32,7 @@ s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank)
     }
     offset = (bank > 0) ? 1 : pfs->inode_start_page;
     if (flag == 1) {
-        inode->inode_page[0].inode_t.page = __osSumcalc((u8 *)&inode->inode_page[offset], (128 - offset) * 2);
+        inode->inode_page[0].inode_t.page = sumcalc((u8 *)&inode->inode_page[offset], (128 - offset) * 2);
     }
     for (j = 0; j < 8; j++) {
         addr = ((u8 *)inode->inode_page + j * 32);
@@ -47,7 +47,7 @@ s32 __osPfsRWInode(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank)
         }
     }
     if (flag == 0) {
-        sum = __osSumcalc((u8 *)&inode->inode_page[offset], (128 - offset) * 2);
+        sum = sumcalc((u8 *)&inode->inode_page[offset], (128 - offset) * 2);
         if (sum != inode->inode_page[0].inode_t.page) {
             for (j = 0; j < 8; j++) {
                 addr = ((u8 *)inode->inode_page + j * 32);
