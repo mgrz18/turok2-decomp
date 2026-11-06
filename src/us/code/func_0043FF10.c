@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern s32 sPrimagenAttackScriptStage1_2;
 extern s32 sPrimagenAttackScript2Stage1_2;

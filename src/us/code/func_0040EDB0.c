@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -13,7 +14,6 @@ typedef struct {
     /* 0x18 */ s32 flag;
 } DrawInfo;
 
-extern ScriptAnimator gBlindOne_faders[];   /* gBlindOne.faders (structs/boss.h): the ROM uses this symbol */
 extern s32 gEvenOdd;
 extern s32 gBlendState;
 
@@ -22,7 +22,7 @@ extern void ScreenTint_UpdateMode(void);
 extern void Render_DrawModel(s32 a, s32 model, s32 c, Matrix18 *mtx, s32 e, s32 f, s32 g);
 
 void BlindOne_Draw(CGameObjectInstance *actor, CAI *ai, DrawInfo *info) {
-    ScriptAnimator_Apply(&gBlindOne_faders[ai->m_BlindOne.m_nFader]);
+    ScriptAnimator_Apply(&gBlindOne.faders[ai->m_BlindOne.m_nFader]);
     ScreenTint_UpdateMode();
     switch (actor->m_nTypeFlag) {
         case 0x450:

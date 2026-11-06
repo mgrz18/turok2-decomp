@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Module update: ticks every slot, then (outside cinematics) counts the two phase timers: the first spawns
  * one actor at a random spot around the origin, the second starts a burst of spawns at the phase points. */
 
-extern s32 gMotherBoss_minRadius; /* gMotherBoss.minRadius */
 extern s32 gMotherBoss_maxRadius; /* gMotherBoss.maxRadius */
 extern u8 sMotherBossPickupTable_2[];
 extern u8 sMotherBossDropTablePhase1_2[];
@@ -94,7 +94,7 @@ void MotherBoss_UpdateSpotsAndPickups_2(MotherBossState *state) {
     if (spawn) {
         state->pickupTimer = 0;
         type = (s16)WeightedTable_PickStatic(sMotherBossPickupTable_2);
-        r = Random_Blend(gMotherBoss_minRadius, gMotherBoss_maxRadius);
+        r = Random_Blend(gMotherBoss.minRadius, gMotherBoss_maxRadius);
         angle = Random_Blend(-3.1415927f, 3.1415927f);
         v.x = r * func_002982F0(angle);
         v.z = r * func_002974C0(angle);

@@ -3,6 +3,7 @@
 #include "structs/pick.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target only 0x10/0xD, otherwise 0xF
  * (when flagged and not just used), 0x10 and 0x12 weighted by the module's timer ratio. */

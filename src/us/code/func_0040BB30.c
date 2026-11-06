@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* AI state: turn toward the target, fire (MotherBoss_TeleportTarget) every third step, and go to anim state 0x16 once
  * the anim is done. */

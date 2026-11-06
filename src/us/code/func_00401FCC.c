@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/game.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -32,7 +33,7 @@ s32 MantidQueen_SortCompare();
 void MantidQueen_SortSwap();
 
 void MantidQueen_SendMinions(WaveBossState *s, s32 *active) {
-    WaveBossStep *cfg = gMantidQueen_step;
+    WaveBossStep *cfg = gMantidQueen.step;
     Entity00401FCC *player;
     CVector3 pos;
     Member00401FCC *member;

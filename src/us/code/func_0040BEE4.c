@@ -3,6 +3,7 @@
 #include "structs/boss.h"
 #include "structs/light.h"
 #include "structs/model.h"
+#include "globals/boss.h"
 
 /* Draw callback of the module's actors: draws each body part (anim group) whose slot is active in the
  * module object's mask, refreshing the slot's state first unless a cinema path is playing. */

@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern BlindOneState gBlindOne;
 
 /* AI init of the second boss: sets the level's warp id, the anim table and callbacks, starts the phase script
  * and shows its health bar ("EyeBall"). */

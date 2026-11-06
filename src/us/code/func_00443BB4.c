@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Module phase 2 entry: resets the actors' blend values and the fade timer, sets up phase 2 (timers, anim,
  * slot values), resets its active slots unless ai->m_Mode is 0x13, and queues MotherBoss_OnPhase2CinemaDone. */

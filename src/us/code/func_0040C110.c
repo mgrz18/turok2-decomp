@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Picks a random point on the ground around the origin: a distance in the phase's range
  * [unk688, unk68C] and a random angle in [-pi, pi]. */

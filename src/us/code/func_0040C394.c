@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/level_actor.h"
+#include "globals/boss.h"
 
 /* Spawns a pickup picked from a weighted table at a random point around the origin (MotherBoss_RandomArenaPoint and
  * MotherBoss_SpawnPickup inlined). */

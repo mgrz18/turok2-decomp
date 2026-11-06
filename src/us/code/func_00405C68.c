@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 s32 ScriptAnimator_SetScript(void *, s32 *);           /* extern */
 extern s32 sPrimagenMode7PartScript;

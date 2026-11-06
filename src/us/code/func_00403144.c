@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ s32 unk0;
@@ -13,7 +14,6 @@ typedef struct {
     /* 0xC7 */ s8 count;
 } Item00403144;
 
-extern s32 gMantidQueen_blink;
 void AI_UpdateTargets(s32 a0, Item00403144 *item, Info00403144 *info, s32 a3, s32 a4);
 void AI_TurnClamped(s32 a0, Item00403144 *item, f32 a2, s32 a3);
 s32 AI_IsAimedAt(s32 a0, Item00403144 *item, s32 a2, f32 a3);
@@ -22,7 +22,7 @@ void CAI__SetMode(s32 a0, Item00403144 *item, s32 a2);
 static __inline__ s32 func_00403774_inline(s32 a0, Item00403144 *item, s32 a2) {
     s32 result;
 
-    if (gMantidQueen_blink == 0) {
+    if (gMantidQueen.blink == 0) {
         result = 0;
     } else {
         result = AI_IsAimedAt(a0, item, a2, 0.785398245f);

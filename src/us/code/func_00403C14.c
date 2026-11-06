@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 void Primagen_SetStage(s32 mode) {
     if (mode == 1) {

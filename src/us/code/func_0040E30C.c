@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern BlindOneState gBlindOne;
 
 extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 

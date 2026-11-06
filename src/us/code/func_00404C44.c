@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern s32 gLevelScript;           /* stage */
 extern f32 Random_Blend(f32 lo, f32 hi);

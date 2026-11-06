@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 

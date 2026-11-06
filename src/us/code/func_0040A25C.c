@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Per-part callback of the module's actors: in part 0, fades the actor's two blend values in with the module
  * object's anim state (9: first value up to 1; 0x13: after a delay, second value up to 3 then back down to 1;

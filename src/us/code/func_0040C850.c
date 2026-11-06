@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/game.h"
+#include "globals/boss.h"
 
 /* One file: BlindOne_UpdateMover, BlindOne_GetHealthPercent, BlindOne_Setup and BlindOne_PhaseWaitPlayerUpdate.
  * BlindOne_Setup's only literal, the string "Blind", sits at 0x800C08D4, 4 past
@@ -18,7 +19,6 @@
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern BlindOneState gBlindOne;
 extern f32 gFrameIncrement; /* frame time */
 extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Module phase 1 setup: timers, the anim for the phase, slot values; unless ai->m_Mode is 9, resets the
  * phase's active slots and runs MotherBoss_DropPickupsAtSpawnPoints three times. */

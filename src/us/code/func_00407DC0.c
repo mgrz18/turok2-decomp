@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/light.h"
 #include "structs/model.h"
+#include "globals/boss.h"
 
 typedef struct {
     u8 data[0x64];
@@ -13,8 +14,6 @@ typedef struct {
     /* 0x174 */ s8 unk174;
 } Boss00407DC0;
 
-extern Boss00407DC0 *gLevelScript_actor;
-extern Slot00407DC0 gLevelScript_anims[];
 extern s32 gEvenOdd;
 s32 Cinema_PathPlaying(void);
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
@@ -28,7 +27,7 @@ static __inline__ s32 hasBit(s32 mask, s32 bit) {
 
 /* Draws each of the boss's 8 parts present in its mask; part 1 shows mesh 8 in state 29. */
 void Primagen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
-    Boss00407DC0 *boss = gLevelScript_actor;
+    Boss00407DC0 *boss = gLevelScript.actor;
     s32 mask;
     s32 i;
 
@@ -44,7 +43,7 @@ void Primagen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
             }
             CGameObjectInstance__DrawShadow(actor, state, req);
             if (!Cinema_PathPlaying()) {
-                ScriptAnimator_Apply(&gLevelScript_anims[i]);
+                ScriptAnimator_Apply(&gLevelScript.anims[i]);
                 ScreenTint_UpdateMode();
             }
             Render_DrawModel(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[gEvenOdd], 0,

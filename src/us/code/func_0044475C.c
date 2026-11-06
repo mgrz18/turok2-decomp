@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* AI state: once the anim is done, reset every active slot of the module state, then go to anim state 0x16. */
 
