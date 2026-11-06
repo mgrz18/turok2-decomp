@@ -4,6 +4,7 @@
 #include "globals/frame.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "globals/sysrc.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -39,7 +40,6 @@ typedef struct {
     /* 0x124 */ u32 minRetraces;
 } GfxTask;
 
-extern u8 gDecompressor[];         /* OSThread */
 extern s32 gCurrentTick;          /* retraces since the last swap */
 extern s32 gCurrentFB;          /* framebuffer on screen */
 extern GfxTask *gWaitingFrames[];
@@ -73,7 +73,7 @@ void __scHandleRetrace(Sched *sc) {
     if (gDecompressorBoostRetraces != 0) {
         gDecompressorBoostRetraces = gDecompressorBoostRetraces - 1;
         if (gDecompressorBoostRetraces == 0) {
-            osSetThreadPri(gDecompressor, gThreadPriorityDecompressorLow);
+            osSetThreadPri(&gDecompressor.thread, gThreadPriorityDecompressorLow);
         }
     }
     sc->frameCount = sc->frameCount + 1;

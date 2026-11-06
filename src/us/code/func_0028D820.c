@@ -5,18 +5,18 @@
 #include "ultra_types.h"
 #include "structs/pager.h"
 #include "globals/pager.h"
+#include "globals/sysrc.h"
 
 
 extern u8 D_14A000[];               /* the paged data in the ROM */
 extern u8 D_3CAE0[];                /* its size */
-extern char gLoader[];           /* the cartridge reader */
 
 u32 GetMemSize(void);            /* osGetMemSize */
 void __osUnmapTLBAll(void);           /* osUnmapTLBAll */
 void VM_ListAddTail(PageChain *chain, PageMapping *slot);
 void osCreateMesgQueue(OSMesgQueue *queue, void **msg, s32 count);
 s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
-void CLoader__LoadSync(void *reader, u8 *source, void *size, u32 dest);
+void CLoader__LoadSync(CLoader *reader, u8 *source, void *size, u32 dest);
 void func_0028EE40(s32 arg0, s32 arg1, s32 arg2, u32 addr, u32 arg4, s32 arg5);
 void osSetEventMesg(s32 event, OSMesgQueue *queue, s16 *msg);
 void memset(void *dst, s32 value, s32 size);
@@ -69,7 +69,7 @@ void VM_Initialize(void) {
     gPager.regions.source = (u8 *)((u32)D_14A000 | 0xB0000000);
     gPager.mapped = 0;
     if (GetMemSize() > 0x4FFFFF) {
-        CLoader__LoadSync(gLoader, D_14A000, D_3CAE0, extra);
+        CLoader__LoadSync(&gLoader, D_14A000, D_3CAE0, extra);
     }
     if (extra != 0) {
         func_0028EE40(0, 0x7E000, 0x400000, extra + 0x80000000, extra + 0x80040000, 7);

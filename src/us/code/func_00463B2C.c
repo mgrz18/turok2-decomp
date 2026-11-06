@@ -7,6 +7,7 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/render.h"
+#include "globals/sysrc.h"
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
@@ -21,7 +22,6 @@ extern char D_800A5F00[]; /* "level paths" */
 extern char D_800A5F0C[]; /* "level info" */
 extern char D_800A5F18[]; /* "sky layers" */
 extern char D_800A5F24[];
-extern u8 gDecompressor[];
 extern u8 gLoopSoundEntries[];
 extern u8 gLoopSounds[];
 extern u8 gEngineApp_m_SwooshSystem[];
@@ -29,7 +29,7 @@ extern u8 gEngineApp_m_SwooshSystem[];
 extern s32 ProPack__Decompress(s32, s32);
 extern void CCollisionInfo__Reset(void);
 extern s32 CISet__GetROMAddress(s32 *levelCount, s32 file, s32 index);
-extern void CDecompressor__Flush(void *);
+extern void CDecompressor__Flush(CDecompressor *thisx);
 extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
 extern void CCache__Deallocate(s32 unused, void **block);
 extern void CCache__Flush(s32);
@@ -113,7 +113,7 @@ void CScene__LoadLevel_2(CScene *w, s32 level, s32 announce) {
 loaded:
     CScene__ReleaseSectors(w);
     w->m_Mode = 0;
-    CDecompressor__Flush(gDecompressor);
+    CDecompressor__Flush(&gDecompressor);
     CCache__Flush(0);
     if (w->m_nLevel != -1) {
         ptr = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
