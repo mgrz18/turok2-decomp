@@ -101,3 +101,7 @@ func_0043CC14 0x800C0388  # twin of func_00403C14
 func_004436F0 0x800C0850  # twin of func_0040A6F0 (N)
 func_00464960 0x800A5F54  # twin of func_0042BA40 (B)
 func_00465B04 0x800A6010  # -1.0f of func_002261A8, then 1.0f and jtbl of func_0042CBE4 (one source file)
+func_004407AC 0x800C0540  # copy of func_004077AC, which now owns the pool
+func_00440800 0x800C0544  # copy of func_00407800, which now owns the pool
+func_00440858 0x800C0548  # copy of func_00407858, which now owns the pool
+func_00440894 0x800C054C  # copy of func_00407894, which now owns the pool
