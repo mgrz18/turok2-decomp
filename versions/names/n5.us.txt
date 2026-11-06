@@ -8,8 +8,8 @@
 // the VM pager (turok3 vhandler.c) and the start of libaudio (cseq.c,
 // csplayer.c). Evidence per line.
 
-// libaudio sample DMA
-Audio_DmaCallBack = 0x002700D0; // the ALDMAproc func_0026FD4C (libaudio's dmaNew pattern) returns: caches 0x300-byte ROM windows, PI read (func_00201E94) on a miss
+// audiomgr.c (SDK), the rest is in n4
+__amDMA = 0x002700D0; // SDK audiomgr.c __amDMA (n4 named the rest of audiomgr: __amDmaNew 0x0026FD4C returns this callback): caches 0x300-byte ROM windows, PI read on a miss
 
 // CAudioWorld (D_800F2A00, our SndMgr): Turok 3 audioworld.c has the same object (CMutex at 0x110, music node/table/count at 0x2B50/0x2B60/0x2B64), functions in the same order and sizes
 CAudioWorld__Initialize = 0x00270240; // turok3 audioworld.c first function: CMutex__Construct, alHeapInit, synth/bank/alSndpNew, queue/seq/pool init; called by Sound__Initialize
@@ -351,7 +351,7 @@ Cinema_IsActive = 0x00284174; // returns Cinema.active; 26 callers
 Cinema_PathDone = 0x002841D0; // !active || time > endTime (RW func_802457E0_de)
 Cinema_IsIdle = 0x00284204; // !active && !Cinema_IsPending
 Cinema_IsFinished = 0x00284240; // returns Cinema.finished
-Cinema_UpdateCamera = 0x00284254; // if active, func_00410CE8(cam) drives the camera along the cinema paths; from CCamera__Advance
+Cinema_UpdateCameraIfActive = 0x00284254; // if active, Cinema_UpdateCamera (func_00410CE8, n7)(cam) drives the camera along the cinema paths; from CCamera__Advance
 Cinema_DrawOverlay = 0x00284284; // if active, func_00411EF8(rect) fills the cinema's screen rectangle; from CCamera__DrawTints
 Cinema_Enable = 0x002842B4; // D_800C1BB8 = 1, the flag every cinema-table lookup checks
 Cinema_Disable = 0x002842C8; // D_800C1BB8 = 0
@@ -360,7 +360,7 @@ Cinema_ClearFinished = 0x002842E8; // finished = 0
 Cinema_FollowsPlayer = 0x002842F8; // Cinema_PathPlaying && spec.flags & 2; the player draw func_00253148
 Cinema_OverridesMusic2 = 0x00284330; // active ? spec.unk44 : 0; CCamera__AdvanceAttributes starts the region's m_Music2 only when 0
 Cinema_OverridesMusic1 = 0x00284358; // active ? spec.unk40 : 0; the same for m_Music1
-Cinema_GetFov = 0x00284390; // active ? func_00410BB4(time) : 47.5; the projection FOV in CCamera__Advance
+Cinema_GetCameraFov = 0x00284390; // active ? Cinema_GetFOV (func_00410BB4, n7)(time) : 47.5; the projection FOV in CCamera__Advance
 Cinema_GetFarClip = 0x002843D4; // spec.scale * 10.24; CCamera__Advance sets m_FarClip from it
 Cinema_GetFogColor = 0x002843F4; // spec.unk48; CCamera__Advance's cinematic fog colour
 Cinema_GetScriptId = 0x00284408; // returns scriptId
