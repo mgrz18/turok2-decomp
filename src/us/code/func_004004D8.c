@@ -4,6 +4,7 @@
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "structs/world.h"
+#include "globals/render.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
@@ -71,8 +72,6 @@ extern Mtx sAutomapOrthoMtx;
 extern MapVtx sAutomapLineVtx[2][0x200];
 extern MapVtx sAutomapMagentaVtx[2][8];
 extern MapVtx sAutomapYellowVtx[2][3];
-extern u8 gRspInitDL[];
-extern u8 gRdpInitDL[];
 
 extern char *CISet__GetBlock(s32 *data, s32 index);
 extern void CMtxF__InvertAffine(f32 *out, f32 *m);

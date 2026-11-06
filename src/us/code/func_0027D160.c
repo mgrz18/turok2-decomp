@@ -10,6 +10,7 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/render.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -409,8 +410,6 @@ found:
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
-extern Gfx gRspInitDL[];        /* RDP setup display lists */
-extern Gfx gRdpInitDL[];
 extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera (camera pool + 0x40) */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;          /* the pool's active camera count */
 extern void *gDepthBuffer;        /* the z buffer */

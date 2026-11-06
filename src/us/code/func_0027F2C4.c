@@ -3,6 +3,7 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/frame.h"
+#include "globals/render.h"
 
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
@@ -15,8 +16,6 @@ extern s32 gScreenWidth;              /* screen width */
 extern s32 gScreenHeight;              /* screen height */
 extern Gfx *gDList;             /* display list head */
 extern s32 gCameraPoolHideViews;
-extern Gfx gRspInitDL[];
-extern Gfx gRdpInitDL[];
 
 void CCache__LockForDisplayList(s32 unused, void *resource);
 void Render_InvalidateModeCache(void);

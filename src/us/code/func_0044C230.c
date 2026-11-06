@@ -25,6 +25,7 @@
 #include "structs/camera.h"
 #include "gfx.h"
 #include "structs/light.h"
+#include "globals/render.h"
 
 /* ---------------- MenuItem_FormatBinding_2 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -1907,7 +1908,6 @@ void MenuItem_SetBindingValue_2(MenuItem *item,float value) {
 /* ---------------- MenuModel_DrawUnselected_2 ---------------- */
 s32 CGameObjectInstance__DrawModelWithLights(s32, s32, s32, s32);
 
-extern s32 gDefaultLights;
 
 void MenuModel_DrawUnselected_2(s32 arg0, s32 arg1, s32 arg2) {
     CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (s32) &gDefaultLights);
@@ -1926,7 +1926,6 @@ typedef struct { u32 w[6]; } O06Seg;
 /* The instance seen with its m_Lights as words: indexing m_Lights itself
  * swaps an addu's operands. */
 typedef struct { u8 pad[0x110]; O06Seg seg[2]; } O06A_4171F4; /* seg at 0x110 in Turok 2 (0x140 in Rage Wars) */
-extern O06Seg D_800AB0E8_4171F4 __asm__("gDefaultLights");
 extern s32 gEvenOdd;
 extern s32 sMenuModelFade;
 extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
@@ -1934,7 +1933,7 @@ extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
  * lights of gDefaultLights and a fade by sMenuModelFade. */
 void MenuModel_DrawSelected_2(CGameObjectInstance *a, s32 b, s32 c) {
  gBlendState = 3;
- ((O06A_4171F4 *) a)->seg[gEvenOdd] = D_800AB0E8_4171F4;
+ ((O06A_4171F4 *) a)->seg[gEvenOdd] = *(O06Seg *) &gDefaultLights;
  gBlendState_m_Color[0] = 255.0f;
  gBlendState_m_Color[1] = 0;
  gBlendState_m_Color[2] = 0;

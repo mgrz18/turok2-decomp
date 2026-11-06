@@ -1,6 +1,7 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/vector.h"
+#include "globals/render.h"
 
 typedef struct { s32 m[4][4]; } Mtx64;   /* a packed N64 Mtx, 0x40 bytes */
 
@@ -30,9 +31,6 @@ typedef struct {
     /* 0x294 */ f32 top;
 } HudView;
 
-extern u8 gPrimAlphaOverride;
-extern u8 gPrimAlphaOverrideValue;
-extern u8 gSceneLights[];     /* lights */
 extern s32 gEvenOdd;      /* frame buffer index */
 extern s32 gResolution;
 extern f32 D_800ADDB8;
@@ -92,7 +90,7 @@ void CPlayer__DrawScope(HudModel *m, HudView *view) {
     }
     CMtxF__ToMtxAffine(&mfDraw[0][0], &m->mtx[gEvenOdd]);
     CMtxF__TransformPoint(&mf[0][0], &m->pos, &out);
-    Render_QueueModelByKey(m->object, &m->mtx[gEvenOdd], gSceneLights, 0, -1);
+    Render_QueueModelByKey(m->object, &m->mtx[gEvenOdd], &gSceneLights, 0, -1);
     Render_FlushBatches();
     gPrimAlphaOverride = 0;
     {

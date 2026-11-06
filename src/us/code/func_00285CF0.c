@@ -3,13 +3,12 @@
  * pointer `.word 0x00285CF0` in us/asm/data/AB858.rodata.s shows. */
 #include "common.h"
 #include "structs/game.h"
+#include "globals/render.h"
 
-extern s32 gFogEnabled;
 extern u8 gScene[];
 extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[];
 extern s32 gEvenOdd;              /* frame buffer index */
 extern f32 sExpansionPakMtx[][16];        /* per-frame matrices */
-extern u8 gDefaultLights[];
 extern u8 sExpansionPakText[];
 extern s32 gScreenWidth;              /* screen width */
 
@@ -42,7 +41,7 @@ void EngineMode03_ExpansionPak_Draw(CEngineApp *view) {
     CMtxF__ToMtxAffine(mtx, sExpansionPakMtx[gEvenOdd]);
     key = CScene__GetObject(gScene, id);
     Render_ResetBatches();
-    Render_QueueModelByKey(key, sExpansionPakMtx[gEvenOdd], gDefaultLights, 0, -1);
+    Render_QueueModelByKey(key, sExpansionPakMtx[gEvenOdd], &gDefaultLights, 0, -1);
     Render_FlushBatches();
     Render_DrawTextLines(view, 0, sExpansionPakText, gScreenWidth / 2, 0xBE, 0xA, 0.8f, 1.0f);
 }

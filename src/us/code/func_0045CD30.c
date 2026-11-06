@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/frame.h"
 #include "globals/libultra.h"
+#include "globals/render.h"
 
 /* One screen setting for a TV type and memory size (0x1C bytes). */
 typedef struct {
@@ -14,10 +15,6 @@ extern s32 gScreenHeight;
 extern s32 gResolution; /* current video mode */
 extern s32 D_800C2044;
 extern ScreenExtra gVideoModeFlags[];
-extern s32 gRenderAntiAlias;
-extern s32 gViAntiAlias;
-extern s32 gRenderZModeInter;
-extern s32 gRenderImageRead;
 extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;
 
 s32 GetMemSize(void); /* osGetMemSize */

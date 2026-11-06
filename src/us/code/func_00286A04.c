@@ -5,8 +5,8 @@
 #include "structs/frame.h"
 
 extern DlCmd *gDList;
-extern u8 gRspInitDL[];
-extern u8 gRdpInitDL[];
+extern u8 gRspInitDL[]; /* local type: globals/render.h (Gfx[]) brings gfx.h, whose gDList clashes with this file's DlCmd *gDList */
+extern u8 gRdpInitDL[]; /* local type: as gRspInitDL */
 extern s32 gDepthBuffer;
 extern B21Vp gScreenViewport[];
 extern s32 gEvenOdd;

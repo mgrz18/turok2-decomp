@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/frame.h"
 #include "globals/libultra.h"
+#include "globals/render.h"
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BBB0_de, with Turok 2's layouts. */
 /* Video setup: picks the low or high resolution set (high when an expansion pak is present, decided once), then
@@ -15,10 +16,6 @@ extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 extern s32 gResolution; /* resolution set, -1 until decided */
 extern s32 D_800C2044;
-extern s32 gRenderAntiAlias;
-extern s32 gViAntiAlias;
-extern s32 gRenderZModeInter;
-extern s32 gRenderImageRead;
 extern VideoFlags gVideoModeFlags[];
 extern s32 GetMemSize(void); /* osGetMemSize */
 extern void Video_SetMode(s32 width, s32 height, s32 a2, s32 a3, s32 a4, s32 a5);

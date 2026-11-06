@@ -3,16 +3,13 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/frame.h"
+#include "globals/render.h"
 
 
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 extern u32 gDisplayListSize;              /* command buffer length, in commands */
 extern Gfx *gDList;             /* display list head */
-extern s32 gCurrentCombineMode;
-extern s32 gCurrentRenderMode;
-extern u32 gFogGeometryMode;              /* extra geometry mode bits */
-extern u32 gFogRenderModeShadeA;              /* extra render mode bits */
 
 void *CISet__GetBlock(void *resource, s32 index);
 void CCache__LockForDisplayList(s32 unused, void **resource);
