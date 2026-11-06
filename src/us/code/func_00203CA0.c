@@ -5,48 +5,19 @@
 #include "ultra_types.h"
 #include "structs/list.h"
 #include "structs/cache.h"
+#include "globals/cache.h"
+#include "globals/sysrc.h"
 
-extern int gCache_mutex_count;
-struct Manager;
-struct Manager {
-    char queue[0x92C];
-    CList pending;
-    CList active;
-    char padActive[0x20 - sizeof(CList)];
-    char lock[0x18];
-    char unk978[0x24];
-    s32 mask;
-};
-struct Manager;
-struct ResourceHashEntry;
-struct ResourceHashEntry {
-    s32 key;
-    CCacheEntry *value;
-    s32 unk08;
-    struct ResourceHashEntry *next;
-};
-struct Manager;
-typedef struct Manager Manager;
-struct Manager;
-struct ResourceHashEntry;
-typedef struct ResourceHashEntry ResourceHashEntry;
-struct ResourceHashEntry;
 extern s32 CList__AddTail(CList *list, void *node);
-typedef u32 OSIntMask;
-extern void __osRestoreInt(OSIntMask mask);
-extern OSIntMask __osDisableInt(void);
+extern void __osRestoreInt(u32 mask);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 extern void CCache__FreeCacheEntry(s32 arg0, void *arg1);
 void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
-extern s32 gCache_memAgeList;
-extern s32 gCache_ageCount;
-extern s32 gHashMask;
-extern s32 gHashTable;
 extern u32 __osDisableInt(void);
 extern CCacheEntry *CCache__AllocCacheEntry(s32, s32);
-extern void CDecompressor__DecompressSync(s32 *, CCacheEntry *);
+extern void CDecompressor__DecompressSync(CDecompressor *, CCacheEntry *);
 extern void CList__MoveToHead(void *, CMemEntry *);
 extern CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropReference);
 static __inline__ void addref(CMemEntry *node) {
@@ -63,54 +34,49 @@ static __inline__ void unref(CMemEntry *node) {
     }
 }
 static __inline__ void acquire(void) {
-    extern Manager gCache_queue;
     u32 token = __osDisableInt();
     s32 counter = gCache_mutex_count + 1;
     gCache_mutex_count = counter;
     if (counter != 1) {
         __osRestoreInt(token);
-        osRecvMesg(gCache_queue.lock, 0, 1);
+        osRecvMesg(&gCache.mutex.queue, 0, 1);
     } else {
         __osRestoreInt(token);
     }
 }
 static __inline__ void release(void) {
-    extern Manager gCache_queue;
     u32 token = __osDisableInt();
     s32 counter = gCache_mutex_count - 1;
     gCache_mutex_count = counter;
     if (counter != 0) {
         __osRestoreInt(token);
-        osSendMesg(gCache_queue.lock, 0, 1);
+        osSendMesg(&gCache.mutex.queue, 0, 1);
     } else {
         __osRestoreInt(token);
     }
 }
-extern s32 CDecompressor__DecompressAsync(void *, void *, Manager *);
-extern s32 gDecompressor;
+extern s32 CDecompressor__DecompressAsync(CDecompressor *, CCacheEntry *, OSMesgQueue *);
 static __inline__ void lock(void) {
-    extern Manager gCache_queue;
     u32 token = __osDisableInt();
     s32 counter = gCache_mutex_count + 1;
     gCache_mutex_count = counter;
     if (counter != 1) {
         __osRestoreInt(token);
-        osRecvMesg(gCache_queue.lock, 0, 1);
+        osRecvMesg(&gCache.mutex.queue, 0, 1);
     } else {
         __osRestoreInt(token);
     }
 }
 CMemEntry *CCache__RequestDecompression(s32 unused, s32 key, CMemEntry *first, CMemEntry *second, s32 mode, void *owner,
                     void *tag, void *spare, s32 async) {
-    extern Manager gCache_queue;
-    ResourceHashEntry *node;
+    HashEntry *node;
     CCacheEntry *found;
     CCacheEntry **out;
     CCacheEntry *scan;
     s32 busy;
     acquire();
     out = &found;
-    node = (ResourceHashEntry *)((s32)gHashTable +
+    node = (HashEntry *)((u8 *)gHashTable +
         ((((key << 5) ^ ((u32)key >> 1) ^ ((u32)key >> 9) ^
            ((u32)key >> 17)) & gHashMask) * 0x10));
     if (node->key != key) {
@@ -142,8 +108,8 @@ done:
         release();
         return found->memEntry;
     }
-    async |= gCache_queue.mask;
-    scan = gCache_queue.active.m_pHead;
+    async |= gCache.frameDelay;
+    scan = gCache.cachePendingList.m_pHead;
     while (scan != 0) {
         if (scan->requestId == key) {
             busy = 1;
@@ -167,8 +133,8 @@ done:
             if (second != 0) {
                 addref(second);
             }
-            CList__Remove(&gCache_queue.pending, found);
-            CList__AddTail(&gCache_queue.active, found);
+            CList__Remove(&gCache.cacheUsedList, found);
+            CList__AddTail(&gCache.cachePendingList, found);
             release();
             if (async != 0) {
                 found->flags &= ~0xE;
@@ -181,7 +147,7 @@ done:
                 }
                 return 0;
             }
-            if (CDecompressor__DecompressAsync(&gDecompressor, found, &gCache_queue) == 0) {
+            if (CDecompressor__DecompressAsync(&gDecompressor, found, &gCache.queue) == 0) {
                 acquire();
                 if (first != 0) {
                     unref(first);
@@ -189,8 +155,8 @@ done:
                 if (second != 0) {
                     unref(second);
                 }
-                CList__Remove(&gCache_queue.active, found);
-                CList__AddHead(&gCache_queue.pending, found);
+                CList__Remove(&gCache.cachePendingList, found);
+                CList__AddHead(&gCache.cacheUsedList, found);
                 CCache__FreeCacheEntry(0, found);
                 release();
             }
