@@ -16,6 +16,8 @@ typedef struct AnimInfo {
     /* 0x1E */ u16 angle;
 } AnimInfo;
 
+extern char D_800A6070[];               /* "anim object index" */
+extern char D_800A6084[];               /* "anim object info" */
 
 s32 CScene__FindObjectType(CScene *world, s32 id);
 s32 CISet__GetROMAddress(s32 *table, s32 base, s32 index);
@@ -87,9 +89,9 @@ CListedInstance *CInstancePool__SpawnAnimInstance(CInstancePool *scene, s32 vari
     id = CScene__FindObjectType(&gScene, variant);
     if (id != -1) {
         src = CISet__GetROMAddress(gScene.m_pObjects, gScene.m_ObjectsKey, id);
-        index = CCache__Request(0, src, 0x18, 0, 0, 0, "anim object index", 1);
+        index = CCache__Request(0, src, 0x18, 0, 0, 0, D_800A6070, 1);
         if (index != NULL) {
-            block = CCache__Request(0, CISet__GetROMAddressAndSize(*index, src, 0, &size), size, 0, 0, 0, "anim object info", 1);
+            block = CCache__Request(0, CISet__GetROMAddressAndSize(*index, src, 0, &size), size, 0, 0, 0, D_800A6084, 1);
             if (block != NULL) {
                 info = CISet__GetBlock(*block, 0);
                 count = CScene__GetIntelligence(&gScene, info->intelligence);

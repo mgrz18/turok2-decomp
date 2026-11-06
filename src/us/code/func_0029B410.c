@@ -6,10 +6,12 @@
 
 extern s32 osPiRawReadIo(s32 arg0, s32 *arg1);
 extern void __assert(void *arg0, void *arg1, s32 arg2);
+extern s32 D_800AA8E0;
+extern s32 D_800AA8E4;
 s32 osPiRawReadIo(s32 arg0, s32 *arg1) {
     u32 status;
     if (arg1 == 0) {
-        __assert("EX", "io/pirawread.c", 0x3D);
+        __assert(&D_800AA8E0, &D_800AA8E4, 0x3D);
     }
     status = *(volatile u32 *)0xA4600010;
     while (status & 3) {

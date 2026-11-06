@@ -351,7 +351,7 @@ def main():
     ren = {k: v[0] for k, v in funcs.items()}
     ren.update({k: v[0] for k, v in data.items()})
     dpat = re.compile(r"\b(D_[0-9A-F]{8})\b")
-    both = re.compile(r"\b((?:func|D)_[0-9A-F]{8})\b")
+    both = re.compile(r"\b((?:func|D)_[0-9A-F]{8})\b(?!\.c\b)")  # not a file name (func_X.c)
     # Module-2 files: D_<link address> -> the _2 name at link + 0x39000, where
     # the file declares the symbol itself (a header's declaration is shared
     # with the first module, so those keep the first module's name).

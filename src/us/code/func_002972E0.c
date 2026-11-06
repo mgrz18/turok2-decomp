@@ -28,9 +28,11 @@
     _a->words.w1 = (unsigned int)(s); \
 }
 
+extern char D_800AA730[]; /* "EX" (expression text) */
+extern char D_800AA734[]; /* "audio/save.c" */
 void __assert(char *, char *, s32); /* __assert */
 
-#define assert(e, line) ((e) ? (void)0 : __assert("EX", "audio/save.c", line))
+#define assert(e, line) ((e) ? (void)0 : __assert(D_800AA730, D_800AA734, line))
 
 Acmd *alSavePull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p) {
     Acmd *ptr = p;
