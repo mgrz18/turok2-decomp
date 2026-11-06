@@ -1,24 +1,15 @@
 #include "common.h"
 #include "globals/scene.h"
+#include "structs/region.h"
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ s32 flags;
-    /* 0x48 */ u8 pad48[0x58 - 0x48];
-    /* 0x58 */ u8 unk58;
-    /* 0x59 */ u8 pad59[0x5B - 0x59];
-    /* 0x5B */ u8 unk5B;
-    /* 0x5C */ s8 unk5C;
-} Unk0022425C;
-
-void *CScene__GetRegionInfo(s32 *, s32);                /* extern */
+CRegionInfo *CScene__GetRegionInfo(CScene *, s32);                /* extern */
 
 u8 func_0026C0E0(s32 arg0) {
-    void *temp_v0;
+    CRegionInfo *temp_v0;
 
     temp_v0 = CScene__GetRegionInfo(&gScene, arg0);
     if (temp_v0 == NULL) {
         return 0U;
     }
-    return ((Unk0022425C *)temp_v0)->unk58;
+    return temp_v0->unk_58;
 }
