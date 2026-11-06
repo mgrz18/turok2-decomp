@@ -1,13 +1,9 @@
 #include "common.h"
+#include "structs/player.h"
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x52C];
-    /* 0x52C */ u8 counters[1]; /* two 4-bit counters per byte */
-} CounterOwner;
-
-u8 PickupCounter_Get(CounterOwner *owner, s32 index, s32 high) {
+u8 PickupCounter_Get(CPlayer *owner, s32 index, s32 high) {
     if (high != 0) {
-        return owner->counters[index] >> 4;
+        return owner->m_Data.m_SpecialPickupCount[index] >> 4;
     }
-    return owner->counters[index] & 0xF;
+    return owner->m_Data.m_SpecialPickupCount[index] & 0xF;
 }
