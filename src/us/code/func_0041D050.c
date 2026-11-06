@@ -8,7 +8,6 @@
  * still the default "player" name) into the edit buffer. */
 
 extern u8 D_8011AB8B[][0x40];   /* player options +0x33: names */
-extern u8 D_800C1340[];   /* "player" */
 
 extern s32 CPlayerPool__GetIndex(void *players, void *player);
 
@@ -76,7 +75,7 @@ void NameEntryMenu_Init(Menu *menu) {
         }
         spaces++;
     }
-    if (nameCmp(name, D_800C1340, 6) == 0) {
+    if (nameCmp(name, "player", 6) == 0) {
         spaces = 8;
     }
     for (i = 0; i < 8 - spaces; i++) {

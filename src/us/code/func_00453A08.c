@@ -48,14 +48,12 @@ struct PoolRecAt28V1 {
 };
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
-extern f32 D_800C1274[];
-extern f32 D_800C1274[];
 s32 EnterCheatMenu_UpdateTextField_2(void *unused, MenuRecAt20V4 *menu) {
     f32 t;
     t = gCheatEntry.timer + gFrameIncrement;
     gCheatEntry.timer = t;
-    if (t >= D_800C1274[1]) {
-        gCheatEntry.timer = t - D_800C1274[1];
+    if (t >= 15.0f) {
+        gCheatEntry.timer = t - 15.0f;
     }
     if (menu->state == 2) {
         if (((s32 (*)(s32))Controller_MenuLeft)(menu->input) != 0 && gCheatEntry.cursor > 0) {
