@@ -1,8 +1,8 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
-extern s32 gMenuCurrentFont;       /* current draw mode */
 
 s32 CPlayer__GetPickupCountHigh(u8 *player, s32 type);
 void Hud_SetupTextureMode(s32 alpha);

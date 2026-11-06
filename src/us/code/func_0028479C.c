@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x0 */ u8 unk0;
@@ -7,7 +8,6 @@ typedef struct {
 } Arg0;
 
 s32 func_00226160(s32 *, u8, s16);          /* extern */
-extern s32 gScene;
 
 void CPathTrack__GetCurrentPoint(Arg0 *arg0) {
     func_00226160(&gScene, arg0->unk1, arg0->unk2);

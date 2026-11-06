@@ -26,7 +26,7 @@ typedef struct B09SlotA {
 } B09SlotA;
 extern B09SlotA gPager_entries[];
 extern B09LNode gPager_slots[];
-extern B09List gPager_chain_head;
+extern B09List gPager_chain_head; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 gVMPages[];
 void func_0028EE40(s32 index, s32 pm, void *vaddr, u32 evenpaddr, u32 oddpaddr, s32 asid);
 s32 VM_AcquireNextTLB(void);

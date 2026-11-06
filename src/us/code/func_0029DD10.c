@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/libultra.h"
 
 s32 osCreateMesgQueue(s32 *, s32 *, s32); /* extern */
 s32 osSendMesg(s32 *, s32, s32); /* extern */
-extern s32 __osPiAccessQueueEnabled;
 extern s32 __osPiAccessBuf;
 extern s32 __osPiAccessQueue;
 

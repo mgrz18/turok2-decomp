@@ -2,6 +2,8 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/boss.h"
+#include "globals/game.h"
+#include "globals/boss.h"
 
 
 s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);

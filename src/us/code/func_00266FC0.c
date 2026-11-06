@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/cache.h"
 
-extern char gHashSize;
 extern char D_11059;
 extern char gPrimagenPaths;
 extern char D_94F;

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame time */
 
 f32 Math_Approach(f32 cur, f32 target, f32 rate);
 f32 func_002974C0(f32 x);

@@ -2,6 +2,8 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 typedef struct {
     f32 m[16];
@@ -51,9 +53,6 @@ typedef struct {
     /* 0x10D */ u8 blendEnd;
 } AnimActor;
 
-extern s32 gScene;          /* the world's mode */
-extern f32 gFrameIncrement;          /* the frame's time step */
-
 void **CCache__Request(s32, s32, s32, s32, s32, s32, char *, s32);
 void CCache__Unlock(s32, void **);
 void CAnimationState__SwitchToQueued(AnimTrack *track, s32 data, s32 key, s32 primary, s32 *active, AnimTrack *other);
@@ -84,7 +83,7 @@ void CGameObjectInstance__AdvanceAnimation(AnimActor *actor) {
     AnimTrack *track1;
     f32 value;
 
-    if (gScene == 4) {
+    if (gScene.m_Mode == 4) {
         if (actor->currentTrack.active == 0) {
             actor->currentTrack.blending = 1;
         }

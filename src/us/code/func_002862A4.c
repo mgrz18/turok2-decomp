@@ -1,16 +1,10 @@
 #include "common.h"
 #include "structs/game.h"
-
-extern s32 gCreditsDone;              /* credits finished */
-extern f32 gCreditsTimeLeft;              /* time left before leaving the credits */
-extern f32 gFrameIncrement;              /* frame time */
-extern s32 gEndingPrimagenDefeated;
-extern s32 gFinalEnding;
-extern s32 gEngineApp_m_Settings_match_unk48;
-extern s32 gScreenHeight;              /* screen height */
-extern s32 sCreditsLine;              /* first credits line on screen */
-extern f32 gCreditsScroll;              /* scroll position of that line */
-extern char *gCreditsLines[];          /* credits lines */
+#include "globals/game.h"
+#include "globals/menu.h"
+#include "globals/render.h"
+#include "globals/engine.h"
+#include "globals/text.h"
 
 extern void CPlayerPool__GetFirstActive(void *);
 extern void CEngineApp__StartGameAtWarp(s32, s32);
@@ -34,7 +28,7 @@ void Credits_Update(s32 arg0) {
                 return;
             }
             CEngineApp__SetupFadeTo(arg0, 1);
-            gEngineApp_m_Settings_match_unk48 = 1;
+            gEngineApp_m_Settings.match.unk48 = 1;
         }
         return;
     }

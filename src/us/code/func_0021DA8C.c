@@ -2,11 +2,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/model.h"
+#include "globals/scene.h"
 
 /* As CGameObjectInstance__DrawModel, for a model drawn from its cached "lit vertices"
  * resource (built by CGameObjectInstance__ConstructLitVertices, fixed up once by Model_PulseVertexColors). */
 
-extern s32 gLitVerticesKey;
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, void *, char *, s32, s32);

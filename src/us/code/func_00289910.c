@@ -1,13 +1,9 @@
 #include "common.h"
 #include "structs/game.h"
-
-extern s32 gEngineApp_m_Settings_match_unk44;
-extern s32 gFrameCountGameplay;
-extern f32 gFrameIncrement[2];   /* frame time scales */
-extern f32 gParticleTimeScale;
-extern f32 gEmitterTimeScale;
-extern u8 gScene[];
-extern s32 gInSinglePlayerMenu;
+#include "globals/game.h"
+#include "globals/menu.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 extern void CEngineApp__UpdateControllers(void);
 extern void Demo_PlayNext(void);
@@ -23,7 +19,7 @@ extern void CScene__RequestWarp(void *, s32, s32);
 void EngineMode13_Game_Init(CEngineApp *state) {
     s32 flag;
 
-    gEngineApp_m_Settings_match_unk44 = 0;
+    gEngineApp_m_Settings.match.unk44 = 0;
     gFrameCountGameplay = 0;
     CEngineApp__UpdateControllers();
     flag = 1;
@@ -46,10 +42,10 @@ void EngineMode13_Game_Init(CEngineApp *state) {
     }
     CCollisionInfo__Reset();
     gEmitterTimeScale = 1.0f;
-    gFrameIncrement[1] = 1.0f;
+    gEnemyTimeScale = 1.0f;
     gParticleTimeScale = 1.0f;
     func_00430500(&state->m_Game.m_Automap);
-    CScene__InitPersistentData(gScene, state->m_CartridgeIndex);
-    CScene__RequestWarp(gScene, state->m_Settings.matchMode, 0);
+    CScene__InitPersistentData(&gScene, state->m_CartridgeIndex);
+    CScene__RequestWarp(&gScene, state->m_Settings.matchMode, 0);
     gInSinglePlayerMenu = 0;
 }

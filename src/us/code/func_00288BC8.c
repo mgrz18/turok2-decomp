@@ -5,7 +5,7 @@ s32 SavedPlayers_IsActive();                                /* extern */
 extern f32 D_800A9DE0;
 
 /* The frame/game state block passed to the per-mode handlers (the
- * handler table gEngineModeTable/D_800B6D7C has 0xC-byte rows indexed by mode). */
+ * handler table gEngineModeTable has 0xC-byte rows indexed by mode). */
 
 void CEngineApp__SetMode(CEngineApp *arg0, s32 arg1) {
     s32 temp_v1;

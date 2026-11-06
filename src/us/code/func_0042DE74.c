@@ -3,16 +3,11 @@
 #include "structs/game.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/render.h"
+#include "globals/player.h"
 
-extern s32 gScene_m_bStreamAll;
-extern s32 gScene_m_LevelID;
-extern s32 gScreenHeight;          /* screen height */
-extern u8 gHealthOverlayScript[];
-extern u8 gAmmoOverlayScript[];
-extern u8 gLivesOverlayScript[];
-extern u8 gTokensOverlayScript[];
-extern u8 gTotalKillsOverlayScript[];
-extern u8 gTotalTagsOverlayScript[];
 /* In the engine's .rodata, the pool shared with CPlayer__FireWeapon. */
 extern f32 D_800A6AA0;          /* 437.5f */
 extern f32 D_800A6AA4;          /* -675.0f */
@@ -24,7 +19,7 @@ extern void CPlayer__PickSpawnPoint(void);
 extern void CPlayer__LoadCharacterModel(CPlayer *p);
 extern void Controller_SetRumbleOption(s32 controller, s32 state);
 extern void COverlay__Construct(COverlay *item, s32 x, s32 y);
-extern void COverlay__StartScript(COverlay *item, u8 *anim);
+extern void COverlay__StartScript(COverlay *item, s32 *script);
 extern void CPlayer__Reset(CPlayer *p);
 extern s32 Cinema_IsActive(void);
 extern s16 *CPlayer__GetFiringAmmo(CPlayer *p, s32);
@@ -86,7 +81,7 @@ void CPlayer__LevelStart(CPlayer *p) {
     if (!Cinema_IsActive()) {
         warp = gScene_m_LevelID != 999;
     }
-    if (gScene_m_bStreamAll) {
+    if (gScene.m_bStreamAll) {
         warp = 1;
     }
     if (warp) {

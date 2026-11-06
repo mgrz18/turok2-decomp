@@ -1,10 +1,8 @@
 /* WRONG CUT: REAL Pak_FindFreeExtLetter size 0x144 (splat cut it into Pak_FindFreeExtLetter + func_00426AF8 + func_00426BA8). */
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
-extern void **gPakStateBuffer;
-extern s32 gPakDirectoryAllocated;
-extern u8 gPakQueueState;
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);

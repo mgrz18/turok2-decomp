@@ -2,8 +2,8 @@
 #include "structs/menu.h"
 #include "rw/abu_protos.h"
 #include "structs/player_options.h"
+#include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_match_tag;
 
 /* A CPlayer view: rw/abu_protos.h (its Mtx) clashes with structs/player.h. */
 typedef struct {
@@ -48,7 +48,7 @@ void StatsMenu_InitContinue(Menu *arg0) {
     FIELD_AT(&temp_v1_5[14], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_5[14], s32, MenuItem, flags) & 0xFE7FFFFF);
     temp_v1_6 = arg0->items;
     FIELD_AT(&temp_v1_6[15], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_6[15], s32, MenuItem, flags) & 0xFE7FFFFF);
-    if (gEngineApp_m_Settings_match_tag != 0) {
+    if (gEngineApp_m_Settings.match.tag != 0) {
         temp_v0 = arg0->items;
         FIELD_AT(&temp_v0[7], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v0[7], s32, MenuItem, flags) | 0x01000000);
         return;

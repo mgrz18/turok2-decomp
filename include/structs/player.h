@@ -279,6 +279,5 @@ typedef struct CSavedPlayers {
     /* 0x13F0 */ s32 m_Region[4];      /* region indices (CScene__GetRegionIndex / CScene__GetRegion) */
 } CSavedPlayers; /* size 0x1400 */
 
-extern CSavedPlayers gSavedPlayers;
 
 #endif

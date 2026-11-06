@@ -3,9 +3,9 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 
 f32 func_002982F0(f32);         /* sinf */
 f32 func_002974C0(f32);         /* cosf */

@@ -1,17 +1,17 @@
 #include "common.h"
 #include "structs/pick.h"
 #include "structs/game_object.h"
+#include "globals/boss.h"
 
 /* Picks the module object's idle anim for the current phase (0, 1; none in phase 2) from the AI's flags. */
 
-extern s32 gMotherBoss_phase; /* module state +0x65C: phase */
 extern s16 WeightedTable_PickStatic(Pick *table);
 
 s16 MotherBoss_PickPhaseAnim(void *obj, CAI *ai) {
     Pick picks[8];
     s32 n = 0;
 
-    switch (gMotherBoss_phase) {
+    switch (gMotherBoss.phase) {
         case 0:
             if (ai->m_VisBits & 0x1C) {
                 picks[n].id = 0x55FA;

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 /* A triangle corner projected to the sweep's space, with its model vertex. */
 typedef struct ProjVertex {
@@ -16,7 +17,6 @@ typedef struct SweptModel {
     /* 0x10 */ void *data;
 } SweptModel;
 
-extern CCollisionResults *gCollisionResultsP;
 
 void CMtxF__TransformPoint(f32 (*mtx)[4], CVector3 *in, CVector3 *out);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);

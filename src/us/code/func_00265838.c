@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80204E78.CPP, func_80204EA8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -215,7 +216,6 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CScene gScene;
 struct LevelActor;
 extern void ImpactEvent_Call(void *, void *, s32, CVector3, ResourceManagerState);
 void Door_OpenNow(LevelActor *arg0) {

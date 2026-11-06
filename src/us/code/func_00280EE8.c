@@ -1,4 +1,6 @@
 #include "common.h"
+#include "structs/game.h"
+#include "globals/engine.h"
 
 typedef struct {
     u8 r, g, b, a;
@@ -14,9 +16,6 @@ typedef struct {
     /* 0x530 */ u8 m_FlashAlpha;
     /* 0x531 */ u8 m_FlashFade;
 } Screen;
-
-extern f32 gFrameIncrement;          /* frame time scale */
-extern u8 gEngineApp[];
 
 void CEngineApp__DrawFilledRect(void *, Color32 *, s32, s32, s32, s32);
 
@@ -34,7 +33,7 @@ void CCamera__DrawHitFlash(Screen *scr) {
         color.g = 0;
         color.b = 0;
         color.a = scr->m_FlashAlpha;
-        CEngineApp__DrawFilledRect(gEngineApp, &color, scr->m_X, scr->m_Y,
+        CEngineApp__DrawFilledRect(&gEngineApp, &color, scr->m_X, scr->m_Y,
                       scr->m_X + scr->m_Width, scr->m_Y + scr->m_Height);
     }
 }

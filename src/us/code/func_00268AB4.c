@@ -4,9 +4,9 @@
 #include "structs/region.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/scene.h"
 
 extern CRegionInfo *CScene__GetRegionInfo(void *table, CGameRegion *region);
-extern u8 gScene[];
 
 /* Height of the actor's region (0 if it has none), relative to the owner's
  * height for a kind-1 actor flagged 0x300000. */
@@ -17,7 +17,7 @@ f32 GameObject_GetViewWaterHeight(CGameObjectInstance *actor) {
 
     region = actor->header.m_pCurrentRegion;
     if (region == NULL || !(region->m_wFlags & 1)
-        || (info = CScene__GetRegionInfo(gScene, region)) == NULL) {
+        || (info = CScene__GetRegionInfo(&gScene, region)) == NULL) {
         return 0.0f;
     }
     h = info->m_WaterHeight;

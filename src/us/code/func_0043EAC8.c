@@ -14,7 +14,7 @@ extern f32 func_002982F0(f32 angle);                                      /* sin
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
 extern s32 D_800F1F50[];
-extern s32 gLevelScript_script_current[];        /* boss script index; an array so the store stays after the obj store */
+extern s32 gLevelScript_script_current[]; /* local type: the field's real type (or the member path) changes the ROM's code here */        /* boss script index; an array so the store stays after the obj store */
 
 void Primagen_UpdateMode27_2(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;

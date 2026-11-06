@@ -1,13 +1,12 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 s32 osCreateThread(s32, s32, s32, s32, s32, s32);
 s32 osSetThreadPri(s32, s32);
 s32 osStartThread(s32);
 
 s32 memset(s32 *, s32, s32); /* extern */
-extern s32 gThreadPriorityIdle;
-extern s32 gThreadPriorityMain;
 extern s32 gThreadStackMain;
 extern s32 gSchedulerStack;
 extern s32 gThreadMain;

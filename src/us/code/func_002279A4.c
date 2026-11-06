@@ -3,8 +3,8 @@
 #include "structs/world.h"
 #include "structs/collision.h"
 #include "structs/level_actor.h"
+#include "globals/camera.h"
 
-extern CBox gCameraVisibleBox;               /* visible bounds */
 
 s32 GameObject_IsSolid(CPooledLevelActor *actor);
 

@@ -2,34 +2,17 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004069F4.c, func_004069F4, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
+#include "globals/pak.h"
+#include "structs/game.h"
+#include "globals/menu_desc.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
 
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuWrites;
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuIsProfile;
-extern s32 gPakMenuMode;
-extern s32 gPakMenuLeaving;
-extern s32 gPakMenuAnyPak;
 extern s32 D_8011F144;
-extern s32 sPakMenuStartLatched;
-extern s32 gPakCheckHasPak;
-extern s32 gPakMenuPort; /* pad */
-extern s32 gPakMenuStartPressed;
 extern s32 D_8011B114;
-extern char gPakCharacterNoteName[];
-extern char gPakGameNoteName[];
 extern s32 D_800F70A8;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
-extern u8 gEngineApp[];
-extern u8 gPakMsgNoControllerDesc[];
-extern u8 gPakMsgCannotSaveDesc[];
-extern u8 gDamagedPakAtBootMenuDesc[];
-extern u8 gPakSaveGameAnyPakMenuDesc[];
-extern u8 gPakConfirmNoSpaceAllDesc[];
-extern u8 gPakConfirmNoSpaceDesc[];
 s32 Controller_AnyConnected(void);
 void CEngineApp__UpdateControllers(u8 *a);
 s32 Str_Compare(u8 *a, char *b);
@@ -48,7 +31,7 @@ void MenuPool_OpenMenu(u8 *a, u8 *b, s32 c, ControllerProfile *d, void *e);
 #define PAK_ERROR()                                                        \
     gPakMenuLeaving = 1;                                                        \
     D_8011F144 = 0;                                                        \
-    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgCannotSaveDesc, arg0->player, arg0->controller, NULL); \
+    MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgCannotSaveDesc, arg0->player, arg0->controller, NULL); \
     gPakCheckHasPak = 0;                                                        \
     sPakMenuStartLatched = 1;
 
@@ -67,7 +50,7 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     if (Controller_AnyConnected() == 0) {
         gPakMenuLeaving = 1;
         D_8011F144 = 0;
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgNoControllerDesc, arg0->player, arg0->controller, NULL);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgNoControllerDesc, arg0->player, arg0->controller, NULL);
         sPakMenuStartLatched = 1;
         gPakCheckHasPak = 0;
         return;
@@ -98,7 +81,7 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     if (Pak_NeedsRepair(gPakMenuPort) != 0) {
         goto blk59;
     }
-    CEngineApp__UpdateControllers(gEngineApp);
+    CEngineApp__UpdateControllers(&gEngineApp);
     if ((arg0->controller->buttons & 0x1000) && sPakMenuStartLatched == 0) {
         gPakMenuStartPressed = 1;
         sPakMenuStartLatched = 1;
@@ -204,7 +187,7 @@ L3:
     if (sp38 < m1) {
         gPakMenuLeaving = 1;
         gPakMenuStartPressed = 1;
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakConfirmNoSpaceAllDesc, arg0->player, arg0->controller, gPakSaveGameAnyPakMenuDesc);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakConfirmNoSpaceAllDesc, arg0->player, arg0->controller, (u8 *)&gPakSaveGameAnyPakMenuDesc);
         goto after;
     }
     if (sp38 < r2) {
@@ -214,7 +197,7 @@ L3:
 L56:
     gPakMenuLeaving = 1;
     gPakMenuStartPressed = 1;
-    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakConfirmNoSpaceDesc, arg0->player, arg0->controller, gPakSaveGameAnyPakMenuDesc);
+    MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakConfirmNoSpaceDesc, arg0->player, arg0->controller, (u8 *)&gPakSaveGameAnyPakMenuDesc);
 after:
     if (s0 == 0) {
         goto fin;
@@ -222,7 +205,7 @@ after:
 blk59:
     gPakMenuLeaving = 1;
     gPakMenuStartPressed = 1;
-    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, arg0->player, arg0->controller, gPakSaveGameAnyPakMenuDesc);
+    MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gDamagedPakAtBootMenuDesc, arg0->player, arg0->controller, (u8 *)&gPakSaveGameAnyPakMenuDesc);
 fin:
     if (gPakMenuLeaving == 0) {
         PakMenu_UpdateNoteRows(arg0);

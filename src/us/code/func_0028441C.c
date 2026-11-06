@@ -1,10 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "structs/cinema.h"
+#include "globals/cinema.h"
 
 s32 CCache__Deallocate(s32, s32);
 
-extern Cinema *gCinemaPlayerP;
 
 void Cinema_Reset(void)
 {

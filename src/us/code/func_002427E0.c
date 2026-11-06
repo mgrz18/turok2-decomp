@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/game.h"
 #include "structs/intelligence.h"
+#include "globals/game.h"
 
 typedef struct Dest {
     char pad0[4];
@@ -14,7 +15,6 @@ typedef struct Dest {
     u8 unkC8;          /* 0xC8 */
 } Dest;
 
-extern s32 gEngineApp_m_Settings_difficulty;  /* difficulty: 8, 16 or 32 */
 
 /* Initial health and level of an actor from its definition, scaled by difficulty. */
 void AI_InitHealth(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
@@ -54,7 +54,7 @@ void AI_InitHealth(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
                 break;
         }
         if (def->m_Type == 1 || def->m_Type == 4) {
-            switch (gEngineApp_m_Settings_difficulty) {
+            switch (gEngineApp_m_Settings.difficulty) {
                 case 8:
                     t = health * 0.5f;
                     b = 0.0f;

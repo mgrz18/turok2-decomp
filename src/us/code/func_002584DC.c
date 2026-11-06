@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
 /* Weapon state for weapon 0x14: drains ammo while firing, every third tick. */
 
-extern s32 gEvenOdd;
-extern u32 gFrameCountGameplay;
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);

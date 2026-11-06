@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
-extern s32 gParticleIntelligence;
 
 void func_002317C0(CGameObjectInstance *arg0) {
     arg0->header.m_pIntelligence = (struct CIntelligence *) &gParticleIntelligence;

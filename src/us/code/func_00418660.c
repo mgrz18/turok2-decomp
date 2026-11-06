@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
-extern s8 gEngineApp_m_Settings_tagArena; /* gEngineApp_m_Settings + 0x27: level */
 extern char D_800B5F3C[];
 extern char D_800B61D8[];
 extern char D_800B61F0[];
@@ -12,7 +12,7 @@ extern char D_800B6250[];
 
 /* Label of the level item. */
 s32 FragTagMenu_LevelLabel(MenuItem *a) {
-    switch (gEngineApp_m_Settings_tagArena) {
+    switch (gEngineApp_m_Settings.tagArena) {
     case 0:
         a->text = D_800B5F3C;
         break;

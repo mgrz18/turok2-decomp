@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "structs/light.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/RENDER_4/8028FD2C_12.CPP, func_802905F4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -32,8 +33,6 @@ typedef struct WorldRecAt3C08 {
 
 extern float D_800A6064;
 extern f32 D_800A6068;
-extern s32 gBlendState;
-extern f32 gBlendFade;
 extern void Render_ResetBatches();
 extern void Render_FlushBatches();
 extern s32 Frustum_TestBox(void *arg0, void *arg1);
@@ -66,7 +65,7 @@ void CLevelActorPool__Draw(char *arg0, char *arg1) {
                 gBlendState = 0;
                 if ((value > zero) && (value <= upper)) {
                     gBlendState = 1;
-                    gBlendFade = value * scale;
+                    gBlendState_m_Color[3] = value * scale;
                 }
                 CLevelActor__Draw(entry);
                 gBlendState = 0;

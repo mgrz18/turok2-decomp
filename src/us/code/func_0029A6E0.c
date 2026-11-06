@@ -2,14 +2,14 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern void *osViGetCurrentFramebuffer();
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-extern Field_void_4 *__osViCurr;
 void *osViGetCurrentFramebuffer(void) {
     void *result = __osDisableInt();
-    void *saved = __osViCurr->value;
+    void *saved = __osViCurr->framep;
     __osRestoreInt(result);
     return saved;
 }

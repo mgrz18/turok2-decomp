@@ -2,9 +2,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern BlindOnePhase sBlindOnePhases_2[];
-extern BlindOneStep sBlindOneScript_2[]; /* the script */
 extern void BlindOne_EnterPhase_2(BlindOneState *m, s32 cmd);
 
 void BlindOne_StartScript_2(BlindOneState *m, CGameObjectInstance *leader) {

@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/engine.h"
 
 s32 osCreateThread(s32, s32, s32, s32, s32, s32);
 s32 osStartThread(s32);
 
 s32 memset(s32 *, s32, s32); /* extern */
-extern s32 gThreadPriorityIdleInit;
 extern s32 gThreadStackIdle;
 extern s32 gThreadIdle;
 extern s32 Engine_Idle;

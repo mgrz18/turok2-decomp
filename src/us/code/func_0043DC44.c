@@ -3,32 +3,18 @@
 #include "structs/game_object.h"
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern s32 gLevelScript;           /* stage */
+extern s32 gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */           /* stage */
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
-
-/* An attack: AI mode and the distance window it can start from (0x10 bytes). */
-typedef struct {
-    /* 0x0 */ s32 mode;
-    /* 0x4 */ f32 minDist;
-    /* 0x8 */ f32 maxDist;
-    /* 0xC */ s32 padC;
-} BossAttack;
 
 typedef struct {
     /* 0x0 */ f32 waitMin;       /* 0x8012F618 */
     /* 0x4 */ f32 waitMax;       /* 0x8012F61C */
 } BossWait;
 
-extern BossWait gLevelScript_swayPhase;
-extern BossAttack sPrimagenAttacks_2[];
-extern BossStep sPrimagenAttackScriptStage1_2[];
-extern BossStep sPrimagenAttackScript2Stage1_2[];
-extern BossStep sPrimagenAttackScriptStage2_2[];
-extern BossStep sPrimagenAttackScript2Stage2_2[];
-extern BossStep sPrimagenAttackScriptStage3_2[];
-extern BossStep sPrimagenAttackScript2Stage3_2[];
+extern BossWait gLevelScript_swayPhase; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 s32 Primagen_RunAttackStep_2(CGameObjectInstance *obj, CAI *ai, f32 dist) {
     f32 scale;

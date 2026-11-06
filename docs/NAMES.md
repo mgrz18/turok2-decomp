@@ -361,6 +361,14 @@ The full list comes from scanning every `extern` of a named symbol (round G2
 coordinator's script; easy to redo: group the declarations by name, keep the
 names with more than one type).
 
+## Declarations
+
+The named globals now have one declaration each, with the real type, in
+`include/globals/<subsystem>.h` (round T2). The layout, the rule for local
+views, the strict check (`tools/asm_diff.py`, which closes the relocation-addend
+blind spot of `match_func.py`) and what is left are in
+[docs/GLOBALS.md](GLOBALS.md).
+
 ## Open questions
 
 - Generic names that may clash with Turok 3's or a library's later:

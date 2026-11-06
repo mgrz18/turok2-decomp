@@ -1,7 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80444EC0_14.CPP, func_804453F0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/menu.h"
 
-typedef signed int s32;
 extern void Music_SetTrack(s32 a);
 struct ObjRecAtB0;
 struct ObjRecAtB0 {
@@ -16,7 +16,6 @@ struct RecordRecAt20V1 {
     char pad[0x20];
     struct ObjRecAtB0 *inner;
 };
-extern s32 sSoundMenuTrack;
 s32 SoundMenu_StepMusicTrack_2(s32 arg0, struct RecordRecAt20V1 *arg1) {
     s32 var_a0;
     var_a0 = sSoundMenuTrack;

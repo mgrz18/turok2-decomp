@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libaudio.h"
 
 extern char __CSPVoiceHandler;
 extern void __initChanState(void *);
-extern ALGlobals *alGlobals; /* alGlobals */
 extern s32 alHeapDBAlloc(s32, s32, void *, s32, s32);
 extern void alEvtqNew(void *, void *, s32);
 extern void alSynAddPlayer(ALSynth *, ALPlayer *); /* alSynAddPlayer */

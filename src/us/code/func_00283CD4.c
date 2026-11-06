@@ -1,6 +1,9 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80243A80_6.CPP, func_802450CC_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/game.h"
+#include "globals/cinema.h"
+#include "globals/engine.h"
 
 typedef struct GameState {
     s32 busy;               /* 0x0000 */
@@ -8,12 +11,7 @@ typedef struct GameState {
     s32 paused;             /* 0x1450 */
 } GameState;
 
-extern Cinema *gCinemaPlayerP;
-extern s32 sCinemaLastFrame;      /* last frame handled */
-extern s32 gFrameCount;      /* frame counter */
-extern s32 gEngineApp_m_Settings_paused;
-extern f32 gFrameIncrement;      /* frame time */
-extern GameState gEngineApp_m_Game_m_PlayerList_m_bCinema;
+extern GameState gEngineApp_m_Game_m_PlayerList_m_bCinema; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 extern s32 Cinema_StartPending(void);
 extern s32 Cinema_IsActive(void);
@@ -38,7 +36,7 @@ void Cinema_Update(void) {
     sCinemaLastFrame = gFrameCount;
     if (Cinema_StartPending() == 0) {
         if (Cinema_IsActive() != 0) {
-            if (gEngineApp_m_Settings_paused != 0 || Cinema_IsFinished() != 0) {
+            if (gEngineApp_m_Settings.paused != 0 || Cinema_IsFinished() != 0) {
                 gCinemaPlayerP->prevTime = gCinemaPlayerP->time;
             } else {
                 ctx = gCinemaPlayerP;

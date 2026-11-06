@@ -1,6 +1,7 @@
 /* Second-module copy of DamagedPakMenu_UpdateLine3 (first module; this one at link address 0x00423514), calling this module's own functions at their link addresses. */
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 s32 MenuItem_TextLength_2(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
@@ -8,9 +9,6 @@ s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 extern char D_800B50B4[];
 extern char D_800B50E4[];
 extern char D_800C1430[];
-extern s32 gPakMenuPort;
-extern s32 sDamagedPakInGame;
-extern s32 gPakMenuAnyPak;
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

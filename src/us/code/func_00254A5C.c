@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 extern s32 CPlayerPool__GetIndex(CPlayerPool *list, CPlayer *player);
 
@@ -14,7 +15,7 @@ s32 CPlayerPool__IsScoreLimitReached(CPlayerPool *list) {
     s32 i;
 
     for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
-        state = &gEngineApp_m_Settings_match;
+        state = &gEngineApp_m_Settings.match;
         skip = CPlayerPool__GetIndex(list, p);
         sum = 0;
         for (i = 0; i < 4; i++) {

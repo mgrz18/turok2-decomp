@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);

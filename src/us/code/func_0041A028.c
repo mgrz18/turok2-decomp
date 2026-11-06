@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu.h"
 
 extern void Music_SetTrack(s32 a);
-extern s32 sSoundMenuTrack;
 s32 SoundMenu_StepMusicTrack(s32 arg0, struct RecordRecAt20V1 *arg1) {
     s32 var_a0;
     var_a0 = sSoundMenuTrack;

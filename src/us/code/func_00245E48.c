@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern CCollisionInfo gCollisionInfoSight;
-extern CCollisionResults gCollisionResults;
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *obj); /* the object's height */
 s32 Collision_MoveInstance(void *obj, CVector3 to, CCollisionInfo *info);
 

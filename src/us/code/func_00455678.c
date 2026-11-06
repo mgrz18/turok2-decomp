@@ -4,14 +4,14 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
-extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 extern char D_800B40B0[];
 extern char D_800B40C8[];
 s32 OptionsMenu_WeaponSelectText_2(MenuItem *a, Menu *b) {
  CPlayer *q = b->player;
  CPlayerOptions *p;
- if (q) p = q->m_pOptions; else p = &gEngineApp_m_Settings_defaultSlot;
+ if (q) p = q->m_pOptions; else p = &gEngineApp_m_Settings.defaultSlot;
  if (p->m_WeaponSelect == 1) a->text = D_800B40B0; else a->text = D_800B40C8;
  return 0;
 }

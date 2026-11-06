@@ -3,12 +3,10 @@
 
 #include "rw/abu_types.h"
 #include "gfx.h"
+#include "globals/menu.h"
 
 extern void COnScreen__SelectSmallFont();
-extern s32 gLoadedFont;
-extern Gfx *gDList;
 extern s32 COnScreen__GetFontTexture(void);
-extern Gfx *gDList;
 extern s32 COnScreen__GetFontTexture(void);
 void COnScreen__SelectSmallFont(void) {
     Gfx *cmd;
@@ -32,5 +30,4 @@ void COnScreen__SelectSmallFont(void) {
         { Gfx *_gbi = (Gfx *)(cmd); _gbi->w0 = ((((unsigned int)(0xF2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (12)))) << (12)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (12)))) << (0))); _gbi->w1 = ((((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (3)))) << (24)) | (((unsigned int)(60) & (0xFFFFFFFFU >> (32 - (12)))) << (12)) | (((unsigned int)(28) & (0xFFFFFFFFU >> (32 - (12)))) << (0))); };
     }
 }
-extern Gfx *gDList;
 extern s32 COnScreen__GetFontTexture(void);

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 void Primagen_EnterMode20(CGameObjectInstance *obj) {
     obj->m_dwFlags |= 0x2000;

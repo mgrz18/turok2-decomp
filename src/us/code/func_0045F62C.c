@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 s32 Pak_CountEmptyNotes_2(s32 i, s32 *freeCount) {
     s32 j;

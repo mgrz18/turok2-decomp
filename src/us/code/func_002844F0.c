@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/cinema.h"
 
 extern void Cinema_Close();
-extern Shared_MenuContext *gCinemaPlayerP;
 extern void CCache__Deallocate(void *arg0, void *arg1);
 void Cinema_Close(void) {
     if (gCinemaPlayerP->closed == 0) {
@@ -16,14 +16,14 @@ void Cinema_Close(void) {
         }
         {
             void *record = gCinemaPlayerP;
-            FuncPtr fn = ((Shared_MenuContext *)(record))->onClose;
-            ((Shared_MenuContext *)(record))->owner = 0;
-            ((Shared_MenuContext *)(record))->resource = 0;
-            ((Shared_MenuContext *)(record))->active = 0;
-            ((Shared_MenuContext *)(record))->state3C = 0;
-            ((Shared_MenuContext *)(record))->unknown60 = 0;
+            CinemaCallback fn = ((Cinema *)(record))->onClose;
+            ((Cinema *)(record))->owner = 0;
+            ((Cinema *)(record))->resource = 0;
+            ((Cinema *)(record))->active = 0;
+            ((Cinema *)(record))->finished = 0;
+            ((Cinema *)(record))->fading = 0;
             if (fn != 0) {
-                ((Shared_MenuContext *)(record))->onClose = 0;
+                ((Cinema *)(record))->onClose = 0;
                 fn();
             }
         }

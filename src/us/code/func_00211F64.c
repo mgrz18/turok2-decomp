@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/game.h"
 
 /* A placed volume as the level data stores it: fixed point position, rotation, scale and size. */
 typedef struct VolumeRec {
@@ -34,7 +35,6 @@ typedef struct Volume {
     /* 0xBB */ u8 mode;
 } Volume;
 
-extern s32 gEngineApp_m_Settings;
 
 void CMtxF__InvertAffine(void *out, f32 *mtx);
 void CMtxF__Identity(f32 *mtx);
@@ -125,7 +125,7 @@ void LightVolume_Construct(Volume *vol, VolumeRec *rec) {
     do {
         vol->height = 2.0f * rec->height * 4.656612873077393e-10f;
     } while (0);
-    if (gEngineApp_m_Settings & 0x4000) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
         vol->unk8[0] = 0.0f;
         vol->unk8[1] = 0.0f;
         vol->unk8[2] = 0.0f;

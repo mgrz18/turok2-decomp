@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
-extern OSTimer *__osTimerList;
+#include "globals/libultra.h"
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
 u64 __osInsertTimer(OSTimer *t)

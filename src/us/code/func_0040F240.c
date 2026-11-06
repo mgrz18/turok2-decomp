@@ -7,6 +7,11 @@
 #include "structs/cinema.h"
 #include "structs/collision.h"
 #include "structs/camera.h"
+#include "globals/scene.h"
+#include "structs/game.h"
+#include "globals/render.h"
+#include "globals/cinema.h"
+#include "globals/collision.h"
 
 /* The cinema system: one file from Cinema_SplineSecondDerivs to Cinema_IsWaitCue (0x40F240-0x413228).
  * Its strings ("Cinema temp alloc", "Cinema") are shared by functions all over
@@ -50,18 +55,10 @@ typedef struct {
     /* 0x12 */ u8 val;
 } CueObject;
 
-extern Cinema *gCinemaPlayerP;
-extern s32 gCinemaEnabled;
 extern s32 D_800C1BC4;
 extern f32 D_800C1BC8;
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
-extern Gfx *gDList;
-/* An array to GCC: a function that reads two of its fields keeps its address in one register. */
-extern CScene gScene[];
-extern s32 gScene_m_CinemasKey;  /* gScene.trackLookup */
-extern s32 *gScene_m_pCinemas; /* gScene.trackBundle */
-extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
+extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */ /* current player */
+/* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 
 extern void *CISet__GetBlock(void *node, s32 index); /* child `index` of a resource node */
 extern s32 CISet__GetROMAddressAndSize(s32 *bundle, s32 lookup, s32 index, s32 *size);
@@ -393,7 +390,7 @@ s32 Cinema_Load(s32 index) {
 
     captured = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
     pending = gCinemaPlayerP->resetPlayerNext;
-    resources = gScene;
+    resources = &gScene;
     if (resources->m_CinemasKey == 0 || resources->m_pCinemas == 0) {
     failed:
         return 0;
@@ -784,8 +781,6 @@ f32 Cinema_GetFOV(f32 t) {
     return key[-1].first * (1.0f - u) + key->first * u;
 }
 
-extern u8 gCollisionInfoLineOfSight[];   /* collision info */
-extern CCollisionResults gCollisionResults;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
 extern CVector3 Cinema_GetEyePos(f32 t); /* eye path */
@@ -855,9 +850,9 @@ void Cinema_UpdateCamera(CCamera *cam) {
         if (player != NULL) {
             saved = *(CObjectHead *) player;
             player->header.m_vPos = target;
-            CScene__LoadVisibleGridSections(gScene);
-            hit = Collision_MoveInstance(player, eye, gCollisionInfoLineOfSight);
-            CScene__ReleaseSectors(gScene);
+            CScene__LoadVisibleGridSections(&gScene);
+            hit = Collision_MoveInstance(player, eye, &gCollisionInfoLineOfSight);
+            CScene__ReleaseSectors(&gScene);
             *(CObjectHead *) player = saved;
             if (hit) {
                 eye = gCollisionResults.m_vInstancePos;
@@ -949,7 +944,6 @@ typedef struct {
     /* 0x294 */ f32 height;
 } ScreenRectangle;
 
-extern u8 gEngineApp[];
 extern void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 
 /* Fills the cinema's screen rectangle with the colour and alpha of the current time. */
@@ -1019,7 +1013,7 @@ void Cinema_DrawFade(ScreenRectangle *rectangle) {
             value = 0.0f;
         }
         rgba[3] = (u32) value;
-        CEngineApp__DrawFilledRect(gEngineApp, rgba, width, height, right, bottom);
+        CEngineApp__DrawFilledRect(&gEngineApp, rgba, width, height, right, bottom);
     }
     Cinema_DrawLetterbox();
 }
@@ -1148,12 +1142,14 @@ s32 Cinema_NoWaitCues(void) {
     CueRef *ents = (CueRef *)((u8 *)n + 8);
     CueRef *e;
     CueObject *k;
+    CScene *scene;
     for (i = 0; i < cnt; i++) {
         e = &ents[i];
+        scene = &gScene;
         if (e->unk4 == 0) {
-            k = (CueObject *)(gScene->m_pRecords + e->unk8);
+            k = (CueObject *)(scene->m_pRecords + e->unk8);
         } else {
-            k = (CueObject *)(gScene->m_pAltRecords + e->unk8);
+            k = (CueObject *)(scene->m_pAltRecords + e->unk8);
         }
         if (Cinema_IsWaitCue(k) != 0) {
             any = 1;
@@ -1179,6 +1175,7 @@ void Cinema_FireCues(void) {
     TimedCueRef *e;
     TimedCueRef *ents;
     CueObject *k;
+    CScene *scene;
     s32 cnt;
     s32 i;
     if (Cinema_IsActive() != 0) {
@@ -1192,6 +1189,7 @@ void Cinema_FireCues(void) {
                 }
                 for (i = 0; i < cnt; i++) {
                     e = &ents[i];
+                    scene = &gScene;
                     if (e->time <= -10000.0f) {
                         continue;
                     }
@@ -1201,9 +1199,9 @@ void Cinema_FireCues(void) {
                         }
                     }
                     if (e->unk4 == 0) {
-                        k = (CueObject *)(gScene->m_pRecords + e->unk8);
+                        k = (CueObject *)(scene->m_pRecords + e->unk8);
                     } else {
-                        k = (CueObject *)(gScene->m_pAltRecords + e->unk8);
+                        k = (CueObject *)(scene->m_pAltRecords + e->unk8);
                     }
                     if (Cinema_IsWaitCue(k) != 0) {
                         Cinema_RequestForObject(0, k);
@@ -1213,7 +1211,7 @@ void Cinema_FireCues(void) {
                     }
                     e->time = -20000.0f;
                     k->unkE = (k->unkE | 1) & 0xEF;
-                    CScene__SetEventFired(gScene, k, 0);
+                    CScene__SetEventFired(&gScene, k, 0);
                 }
             }
         }
@@ -1421,7 +1419,7 @@ s32 Cinema_GetEntryCount(void) {
 s32 **Cinema_LoadTable(void) {
     s32 size;
     s32 loaded;
-    CScene *resources = gScene;
+    CScene *resources = &gScene;
 
     loaded = CISet__GetROMAddressAndSize(resources->m_pCinemas, resources->m_CinemasKey, 0, &size);
     if (loaded == 0) {

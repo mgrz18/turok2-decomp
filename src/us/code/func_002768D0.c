@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/audio.h"
 
 extern void adecClearStopFlag();
 extern QueueRec D_800F55F4[];
@@ -20,7 +21,6 @@ void SpeechPlayer_Update(PlayerRecAt24 *player) {
     extern char *CAudioWorld__GetSndPlayer(Bank *);
     extern void CAudioWorld__Unlock(Bank *);
     extern void CAudioWorld__Lock(Bank *);
-    extern func_80203E78_S1 *sSpeechSound;
     s32 rate;
     char *channel;
     s32 index;
@@ -55,7 +55,7 @@ void SpeechPlayer_Update(PlayerRecAt24 *player) {
             player->volume = header->volume;
             sequence = CISet__GetBlock(player->bank->songs, index | 1);
             ((void **)D_800F55F4)[-1] = sequence;
-            sSpeechSound->unk4 = adecStreamOpen(sequence, 0x5622, &rate);
+            sSpeechSound.envelope->decayTime = adecStreamOpen(sequence, 0x5622, &rate);
             player->state = 3;
             alSndpSetSound(channel, player->id);
             alSndpSetPitch(channel, rate * 4.5351473e-05f);

@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/engine.h"
+#include "globals/scene.h"
 
-extern s8 gColorPulseTable[];
-extern s32 gFrameCount;
 f32 LightVolume_GetFlicker(void *arg0)
 {
   ObjectRecAtBC *volume = arg0;
@@ -15,4 +15,3 @@ f32 LightVolume_GetFlicker(void *arg0)
   idx = idx % 90;
   return (f32) gColorPulseTable[idx];
 }
-extern s32 gFrameCount;

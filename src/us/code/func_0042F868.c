@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/demo.h"
+#include "globals/engine.h"
 
-extern s32 gFrameCountGameplay;
 
 /* Folds the timers' values into the state's checksum. */
 void Demo_UpdateChecksum(void) {

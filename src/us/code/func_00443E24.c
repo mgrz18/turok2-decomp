@@ -2,15 +2,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Module phase 0 setup: timers, the anim for the phase, slot values, and reset of the phase's active slots
  * when ai->m_Mode is set. */
 
 
-extern s32 sMotherBossPhaseVisBits_2[];
-extern s32 sMotherBossPhaseActiveMasks_2[]; /* active slot mask per phase */
-extern s32 sMotherBossPhaseLiveMasks_2[];
-extern u8 sMotherBossSpotResetScript_2[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 static __inline__ void resetSlots(s32 mask, void *src) {

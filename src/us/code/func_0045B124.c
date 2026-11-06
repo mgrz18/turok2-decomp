@@ -1,7 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80409A88.CPP, func_8040A9F8_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
+#include "common.h"
+#include "globals/pak.h"
 struct FieldRecAt14;
 struct FieldRecAt14 {
     char pad[0x14];
@@ -10,7 +11,6 @@ struct FieldRecAt14 {
 extern char D_800B4AF8[];
 extern char D_800B4AE0[];
 extern char D_800B4AEC[];
-extern int sCharNoteLoad;
 extern s32 D_801309A8;
 s32 CharNoteMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
     if (sCharNoteLoad != 0) {

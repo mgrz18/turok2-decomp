@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/player.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-extern f32 gWeaponChargeScale;
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);

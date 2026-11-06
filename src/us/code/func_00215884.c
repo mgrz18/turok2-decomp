@@ -1,6 +1,8 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 void CQuaternion__ToMatrix(void *src, CMtxF *dst);
 void CMtxF__SetRotateY(CMtxF *mtx, f32 angle);
@@ -9,9 +11,6 @@ void CVector3__ClampLength(void *pos, f32 value);
 void CMtxF__Translate(CMtxF *mtx, f32 x, f32 y, f32 z);
 void CMtxF__SwapYZRows(CMtxF *mtx);
 void CMtxF__ToMtxAffine(CMtxF *mtx, void *dst);
-
-extern s32 gScene_m_qSky;
-extern s32 gEvenOdd; /* current buffer index */
 
 typedef struct {
     /* 0x000 */ u8 pad000[4];
@@ -32,7 +31,7 @@ void CLevelActor__BuildMatrix(Func00215884Obj *obj) {
     CMtxF mtx;
 
     if (obj->def->m_Type == 8) {
-        CQuaternion__ToMatrix(&gScene_m_qSky, &mtx);
+        CQuaternion__ToMatrix(&gScene.m_qSky, &mtx);
     } else {
         CMtxF__SetRotateY(&mtx, obj->angle);
     }

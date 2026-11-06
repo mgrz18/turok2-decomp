@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/demo.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Ends a demo: puts back the game settings saved when it started. */
 void Demo_End(void) {

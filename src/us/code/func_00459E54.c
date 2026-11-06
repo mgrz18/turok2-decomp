@@ -2,20 +2,16 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
+#include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
 char *PakMenu_GetReturnMenu_2(void *event);
 void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
-extern char gSavePortalMenuDesc_2[];
-extern char gSavePortalMenuDescB_2[];
-extern char gEngineApp_m_Game_m_MenuPool[];
-extern s32 gPakMenuPort;
-extern s32 gPakCheckDone;
-extern s32 gCameraPoolHideViews;
-extern s32 gPakMenuAnyPak;
-extern u32 gPakConfirmKind; /* menu state */
-extern s32 gPakMenuLeaving;
+extern s32 gPakCheckDone; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {
@@ -27,9 +23,9 @@ static __inline__ s32 GetPort(Menu *event) {
 static __inline__ void ShowEvent(Menu *event) {
     if (PakMenu_CheckPak_2(event, GetPort(event), 1) != 0) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
     } else {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
     }
 }
 
@@ -59,13 +55,13 @@ s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
             if (text == NULL) {
                 text = event->context;
             }
-            if (event->context == gSavePortalMenuDescB_2 || event->context == gSavePortalMenuDesc_2) {
+            if (event->context == &gSavePortalMenuDescB_2 || event->context == &gSavePortalMenuDesc_2) {
                 gCameraPoolHideViews = 0;
             }
             if (event->player != NULL) {
                 dst = (char *)event->player->m_pCamera + 0x53C;
             } else {
-                dst = gEngineApp_m_Game_m_MenuPool;
+                dst = &gEngineApp_m_Game_m_MenuPool;
             }
             MenuPool_OpenMenu_2(dst, text, event->player, (s32) event->controller, NULL);
             break;

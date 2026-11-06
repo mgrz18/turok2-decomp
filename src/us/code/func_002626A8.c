@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/ai.h"
 
 typedef void (*AICallback)(void *actor, void *ai);
 
-extern u8 gTurretModeTable[];
 void Turret_Step(void *actor, void *ai);
 void Turret_Hurt(void *actor, void *ai);
 void Turret_CalcOrientation(void *actor, void *ai);

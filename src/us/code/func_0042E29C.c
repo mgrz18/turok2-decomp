@@ -2,11 +2,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/engine.h"
+#include "globals/player.h"
 
-extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers; /* player count */
-extern u8 gEngineApp_m_Settings_multiplayer;  /* gEngineApp_m_Settings.multiplayer; read through gEngineApp_m_Settings the code no longer matches */
-extern u32 gFrameCountGameplay;
-extern s16 gLivesSpeech[];
 extern f32 D_800A6AC8; /* 60.0f, in the engine's .rodata */
 
 extern void CPlayer__SetState(CPlayer *p, CPlayer *q, s32);
@@ -18,7 +17,7 @@ extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CPlayer__Warp(CPlayer *p, s32 warp, s32 arg2, s32 respawn);
 
 void CPlayer__LoseLife(CPlayer *p) {
-    s32 mode = (gEngineApp_m_Game_m_PlayerList_m_nPlayers >= 2) * 2;
+    s32 mode = (gEngineApp_m_Game.m_PlayerList.m_nPlayers >= 2) * 2;
     GameSettings *flags = &gEngineApp_m_Settings;
 
     if (!(flags->cheatFlags & 2) || flags->multiplayer != 0) {

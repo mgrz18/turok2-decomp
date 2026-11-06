@@ -1,6 +1,5 @@
-typedef signed int s32;
+#include "globals/render.h"
 
-extern s32 gResolution;
 extern char D_800B40E0[];
 extern char D_800B40F8[];
 extern char D_800B4110[];

@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 CScene__SetInstanceSavedBit(s32, s32, s32);
 
-extern s32 gScene;
 
 void InteractiveAnim_EventHide(CGameObjectInstance *arg0)
 {

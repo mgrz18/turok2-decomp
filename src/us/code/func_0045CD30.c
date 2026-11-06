@@ -1,6 +1,9 @@
 /* Sets the video mode for the TV type and memory size: screen size, VI features. The mode record is read as an s32 array (an in-struct read changes GCC's alias ordering). */
 #include "common.h"
 #include "structs/frame.h"
+#include "globals/camera.h"
+#include "globals/render.h"
+#include "globals/libultra.h"
 
 /* One screen setting for a TV type and memory size (0x1C bytes). */
 typedef struct {
@@ -8,17 +11,8 @@ typedef struct {
     /* 0x04 */ s32 v[4];
 } ScreenExtra; /* 0x14 */
 
-extern s32 osTvType; /* osTvType */
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
-extern s32 gResolution; /* current video mode */
 extern s32 D_800C2044;
 extern ScreenExtra gVideoModeFlags[];
-extern s32 gRenderAntiAlias;
-extern s32 gViAntiAlias;
-extern s32 gRenderZModeInter;
-extern s32 gRenderImageRead;
-extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;
 
 s32 GetMemSize(void); /* osGetMemSize */
 void osViSetSpecialFeatures(u32 features); /* osViSetSpecialFeatures */
@@ -28,7 +22,7 @@ void Video_ApplyResolution_2(void) {
     s32 *mode = NULL;
     ScreenExtra extra;
 
-    gEngineApp_m_Game_m_CameraPool_m_bActiveChanged = 2;
+    gEngineApp_m_Game_m_CameraPool.m_bActiveChanged = 2;
     if (gResolution == -1) {
         if (GetMemSize() != 0x400000) {
             gResolution = 1;

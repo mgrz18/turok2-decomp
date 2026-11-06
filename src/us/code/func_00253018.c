@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/list.h"
+#include "globals/game.h"
 
 struct ObjectPool {
     void *allocation;
@@ -19,7 +20,6 @@ struct Shared_ActorView {
     struct Shared_ActorView *next; /* 0x1320 */
 };
 
-extern u8 gEngineApp_m_Settings[]; /* Shared_Game */
 
 extern void Actor_ReloadAnimInfo(void *arg0, s32 arg1);
 extern s32 CGameObjectInstance__LoadBoneMatrices(void *arg0, s32 arg1);
@@ -33,7 +33,7 @@ void CPlayerPool__PreUpdate(struct ObjectPool *arg0) {
     }
     node = arg0->object_queue.m_pHead;
     if (node != 0) {
-        u8 *base = gEngineApp_m_Settings;
+        u8 *base = (u8 *)&gEngineApp_m_Settings;
         do {
             CGameObjectInstance__ClearDrawMatrices(node);
             CGameObjectInstance__ClearDrawMatrices(&((struct Shared_ActorView *)(node))->weapon);

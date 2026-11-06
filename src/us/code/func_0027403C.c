@@ -1,9 +1,7 @@
 #include "common.h"
+#include "globals/audio.h"
 
 s32 SndVoice_Update(s32);
-
-extern s32 sSndVoicesActive;
-extern s32 sSndVoicesPeak;
 
 /* 0xCC-byte slot; 16 of them follow the owner pointer. */
 typedef struct {

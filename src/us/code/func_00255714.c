@@ -1,9 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SOUND/8022C894.CPP, func_8022CC34_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/player.h"
+#include "globals/player.h"
 
-extern char gStandLookTuning;
-extern char gStandMoveTuning;
 extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern void CPlayer__MoveOnFoot(void *, void *, void *);

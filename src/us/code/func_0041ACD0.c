@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu.h"
 
 s32 strlen(u8 *);
-extern u8 gCheatEntryText[0x64];
 s32 EnterCheatMenu_MatchesCode(u8 *arg0) {
     u8 *input = arg0;
     s32 index = 0;

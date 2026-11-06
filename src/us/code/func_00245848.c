@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/80213ED4_8.CPP, func_802164A8_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 typedef struct {
     u8 pad0[0xC];
@@ -35,7 +36,6 @@ struct Dest {
     void (*callback)(Source *, Dest *); /* 0xF0 */
 };
 
-extern f32 gFrameIncrement;
 extern void AI_StopSound(Source *, Dest *);
 extern void AI_UpdateRegionFlags(Source *, Dest *);
 extern void AI_RideMovingPlatform(Source *, Dest *);

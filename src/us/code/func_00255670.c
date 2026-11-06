@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 s32 CPlayer__SetState(s32, s32, s32);
 s32 PlayerFall_Update(s32, s32);
@@ -22,7 +23,6 @@ typedef struct {
 } Tuning;
 
 extern Tuning D_800A7170;
-extern s32 gScene_m_LevelID;
 
 void PlayerJump_Update(CPlayer *arg0, MoveState *arg1) {
     f32 var_f2;

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 /* AI idle-sound callback: while the actor moves fast the timer stays reset;
  * otherwise it counts down and, once idle in state 4, plays the ambient
@@ -10,7 +11,6 @@ typedef struct {
     /* 0x60 */ f32 speed;
 } Motion;
 
-extern f32 gFrameIncrement; /* frame delta */
 
 extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern f32 Random_Blend(f32 lo, f32 hi);

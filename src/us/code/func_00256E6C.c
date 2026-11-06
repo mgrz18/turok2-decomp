@@ -18,7 +18,7 @@ typedef struct {
     u8 value_15;                /* 0x015 */
 } Settings;
 
-extern Settings gEngineApp_m_Settings_multiplayer;
+extern Settings gEngineApp_m_Settings_multiplayer; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
 
 u8 Hud_GetSpriteValue(s32 unused, s32 id) {
     Settings *settings;

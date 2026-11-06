@@ -5,9 +5,10 @@
 #include "ultra_types.h"
 #include "structs/pak.h"
 #include "structs/controller.h"
+#include "globals/pak.h"
+#include "globals/controller.h"
 
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
-extern OSMesgQueue gSiMessageQueue;
 s32 Pak_ProbeRumble_2(s32 ch) {
     RumblePak *r = &gRumblePaks[ch];
     if (gContStatus[ch].errno != 0) {

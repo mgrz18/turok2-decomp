@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/enemy.h"
 
 s32 AI_PickAnimFromTable(CGameObjectInstance *obj, CAI *ai, u8 *table, s32 anim);
 
-extern u8 sEnemyAnimLeap_AFF18[];
 
 void EnemyAnim_DartFallback_AFF18(CGameObjectInstance *obj, CAI *ai) {
-    AI_PickAnimFromTable(obj, ai, sEnemyAnimLeap_AFF18, obj->header.m_pIntelligence->m_Enemy.m_wLeapAnimFlags);
+    AI_PickAnimFromTable(obj, ai, (u8 *) sEnemyAnimLeap_AFF18, obj->header.m_pIntelligence->m_Enemy.m_wLeapAnimFlags);
 }

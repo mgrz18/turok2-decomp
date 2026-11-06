@@ -2,7 +2,7 @@
 #include "structs/menu.h"
 
 s32 Controller_DisableMenuSounds(void *, void *);              /* extern */
-extern s32 gPakMessageKind[];
+extern s32 gPakMessageKind[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 
 void PakMessage_InitNoController(Menu *arg0)
 {

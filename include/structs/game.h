@@ -136,9 +136,6 @@ typedef struct GameSettings {
     /* 0x1D8 */ GameMatch match;       /* gEngineApp_m_Settings_match */
 } GameSettings; /* size 0x228 */
 
-extern GameSettings gEngineApp_m_Settings;
-extern GameMatch gEngineApp_m_Settings_match;
-
 /* ---- The game state, gEngineApp_m_Game (CGame) ---- */
 
 #include "structs/player_list.h"
@@ -173,8 +170,6 @@ typedef struct CGame {
     /* 0x1230 */ CAutomap m_Automap;   /* the automap (gEngineApp_m_Game_m_DebugLines); reset by func_00430500 */
     /* 0x1268 */ GameSettings m_Settings;  /* gEngineApp_m_Settings */
 } CGame; /* size 0x1490 */
-
-extern CGame gEngineApp_m_Game;
 
 /* CGame seen from its camera pool, gEngineApp_m_Game_m_CameraPool (CGame + 0x40): some files
  * read the settings through that symbol, as the ROM does there (through

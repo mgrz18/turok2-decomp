@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 /* Menu item: append the rank title earned for the number of kills (11 chars). */
 
-extern u16 gPakProfileRead_kills; /* kills */
 extern char D_800B4934[];
 extern char D_800B4940[];
 extern char D_800B494C[];
@@ -18,7 +18,7 @@ extern char D_800B49AC[];
 extern char D_800B49B8[];
 
 s32 CharNoteMenu_UpdateRank_2(MenuItem *item) {
-    s32 kills = gPakProfileRead_kills;
+    s32 kills = gPakProfileRead.kills;
     char *rank = NULL;
     char *dst;
     s32 i;

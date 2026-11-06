@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/engine.h"
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
-extern f32 gFrameIncrement;
 void Animator_Update(Animator *a) {
     s32 next;
     f32 op0;

@@ -2,13 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/engine.h"
 
 extern f32 Math_DecayToZero(f32 arg0, f32 arg1);
 extern float D_800A97D0;
 extern float D_800A97D4;
 extern float D_800A97D8;
 extern float D_800A97DC;
-extern f32 gFrameIncrement;
 u32 CShakeAxis__Advance(StateRecAt10 *state) {
     f32 scale;
     f32 step;

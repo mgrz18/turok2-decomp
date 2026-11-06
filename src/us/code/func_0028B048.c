@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/frame.h"
 
 extern void *__scTaskReady(struct OSScTask_s *arg0);
 extern void *osViGetCurrentFramebuffer();
-extern s32 gPendingFB;
 extern s32 gCurrentFB;
 void *__scTaskReady(struct OSScTask_s *arg0) {
     s32 f1a;

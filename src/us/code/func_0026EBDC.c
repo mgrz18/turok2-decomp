@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 struct Clip;
 struct Clip {
@@ -31,7 +32,6 @@ struct Pool_func_80285B64_de {
 };
 struct Pool_func_80285B64_de;
 typedef struct Pool_func_80285B64_de Pool_func_80285B64_de;
-extern char gScene;
 extern s32 __osDisableInt(void);
 extern void __osRestoreInt(s32 mask);
 extern void CList__Remove(Pool_func_80285B64_de *pool, Node_func_80285B64_de *node);

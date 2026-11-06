@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/audio.h"
 
-extern int sLoopSoundsLastStopped;
 extern s32 CList__AddTail(CList *list, void *node);
 extern void Sound__Stop(s32 arg0);
 s32 LoopSounds_Stop(void *arg0, void *arg1) {

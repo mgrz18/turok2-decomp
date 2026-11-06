@@ -1,11 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/AUDIO_2/8025D470.CPP, func_8025D450_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
+#include "globals/audio.h"
 extern void alCSPSetBank(s32 arg0, s32 arg1);
 extern void alCSPSetSeq(s32 arg0, s32 arg1);
 extern void alCSPSetVol(s32 arg0, s16 arg1);
@@ -60,8 +56,6 @@ struct Track {
     f32 unk3C;
     f32 unk40;
 };
-extern s32 sSndSeqCurrentId;
-extern s32 sSndSeqLoadRetries;
 extern f32 D_800A81A0;
 extern f32 D_800A81A8;
 extern f32 D_800A81B0;

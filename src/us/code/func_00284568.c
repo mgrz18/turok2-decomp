@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/cinema.h"
-
-extern Cinema *gCinemaPlayerP;
-extern s32 gEngineApp_m_Settings_paused;
-extern f32 gFrameIncrement;          /* frame time scale */
+#include "globals/game.h"
+#include "globals/cinema.h"
+#include "globals/engine.h"
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
@@ -12,7 +11,7 @@ void Cinema_Start(void);
 /* Advances the clock at gCinemaPlayerP by one frame. */
 void Cinema_AdvanceClock(void) {
     if (Cinema_IsActive()) {
-        if (gEngineApp_m_Settings_paused != 0 || Cinema_IsFinished()) {
+        if (gEngineApp_m_Settings.paused != 0 || Cinema_IsFinished()) {
             gCinemaPlayerP->prevTime = gCinemaPlayerP->time;
             return;
         }

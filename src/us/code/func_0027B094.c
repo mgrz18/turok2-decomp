@@ -10,7 +10,7 @@ typedef struct {
     /* 0x14 */ s32 unk14;
 } FontColor;
 
-extern FontColor gEngineApp_m_OnScreen_m_TopR;
+extern FontColor gEngineApp_m_OnScreen_m_TopR; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void COnScreen__SetFontColor(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
     gEngineApp_m_OnScreen_m_TopR.unk0 = arg0;

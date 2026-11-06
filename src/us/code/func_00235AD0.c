@@ -2,13 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/math.h"
 
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern float D_800A6508;
 extern Vector4f *Quat_AlignYTo(Vector4f *out, u32 bx, u32 by, u32 bz);
-extern f32 gQuaternionSin;
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern f32 func_00298470(f32);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);

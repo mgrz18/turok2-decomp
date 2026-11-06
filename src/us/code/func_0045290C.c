@@ -3,7 +3,7 @@
 
 s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
 
-extern u8 gEngineApp_m_Settings_unk18[];
+extern u8 gEngineApp_m_Settings_unk18[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 s32 Menu_StepDebugMode_2(s32 arg0, s32 arg1) {
     gEngineApp_m_Settings_unk18[0] = Menu_StepValue_2(arg1, (s32) gEngineApp_m_Settings_unk18[0], 1, 0, 2, 1);

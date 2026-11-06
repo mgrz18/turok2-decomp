@@ -1,12 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/model.h"
+#include "globals/engine.h"
+#include "structs/light.h"
 
 /* AI draw callback: draws the actor faded in or out (dying / teleporting states). */
 
-extern s32 gBlendState; /* fade mode */
-extern f32 gBlendFade[2]; /* fade level, alpha */
-extern s32 gEvenOdd; /* current view */
 extern u8 D_801100D4[];
 
 extern void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
@@ -34,11 +33,11 @@ void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
         }
         if (alpha != 255) {
             gBlendState = 1;
-            gBlendFade[0] = 255 - alpha;
+            gBlendState_m_Color[3] = 255 - alpha;
             CGameObjectInstance__DrawModelImmediate(actor, ai, params);
         }
         if (alpha != 0) {
-            gBlendFade[0] = alpha;
+            gBlendState_m_Color[3] = alpha;
             gBlendState = 1;
             func_0020BBE4(D_801100D4, -1, params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[gEvenOdd], 0,
                           params->m_nModel, actor->m_AI.m_nTexture);

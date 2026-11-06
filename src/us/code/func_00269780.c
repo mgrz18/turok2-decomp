@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/game_object.h"
+#include "globals/collision.h"
 
 typedef struct CollisionInfo {
     /* 0x00 */ s32 flags;
 } CollisionInfo;
 
-extern CollisionInfo gCollisionInfoSight;
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);    /* height */
 s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);

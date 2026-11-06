@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/audio.h"
 
-extern s32 gAudioWorld_seq_track;
 
 s32 Music_GetTrack(void) {
-    return gAudioWorld_seq_track;
+    return gAudioWorld.seq.track;
 }

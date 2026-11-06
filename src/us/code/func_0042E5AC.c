@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/controller.h"
+#include "globals/game.h"
 
 
 typedef struct PlayerList {
@@ -13,7 +14,6 @@ typedef struct PlayerList {
     /* 0x20 */ u8 list1[0x14];
 } PlayerList;
 
-extern s32 gEngineApp_m_Settings_match_tagPhase;
 extern char D_800A7080[]; /* in the engine's .rodata */
 
 extern void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
@@ -89,5 +89,5 @@ void CPlayerPool__NewGame(PlayerList *list, s32 count, s32 arg2) {
         CList__Remove(list->list0, p);
         CList__AddHead(list->list1, p);
     }
-    gEngineApp_m_Settings_match_tagPhase = 1;
+    gEngineApp_m_Settings.match.tagPhase = 1;
 }

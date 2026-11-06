@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/collision.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34.CPP, func_8024715C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -60,7 +61,6 @@ typedef struct func_80237E70_G1 func_80237E70_G1;
 extern void CGameObjectInstance__MoveWithCollision(char *, CVector3 *);
 typedef struct CollisionInfo CollisionInfo;
 extern CollisionInfo D_800F1EB0;
-extern func_80237E70_G1 gCollisionResults;
 extern s32 Collision_MoveInstance(void *arg0, CVector3 arg1, CollisionInfo *arg2);
 extern void CGameRegion__FireTriggers(s32 arg0, s32 arg1, void *arg2);
 extern void GameObject_FireTriggers(void *arg0, s32 arg1, void *arg2);
@@ -92,9 +92,9 @@ void CGameObjectInstance__MoveWithCollision(char *arg0, CVector3 *arg1) {
             CGameRegion__FireTriggers((s32)((ObjectLinks23C *)(arg0))->unk_14, 0x40, arg0);
         }
         if (collided != 0 && !(((ObjectLinks23C *)(arg0))->unk_100 & 0x300000) &&
-                *((ObjectLinks23C *)(arg0))->unk_18 == 1 && gCollisionResults.unk0 != 0 &&
-                *gCollisionResults.unk0 == 1) {
-            GameObject_FireTriggers(gCollisionResults.unk0, 0x20, arg0);
+                *((ObjectLinks23C *)(arg0))->unk_18 == 1 && gCollisionResults.m_pInstance != NULL &&
+                *(u8 *)gCollisionResults.m_pInstance == 1) {
+            GameObject_FireTriggers(gCollisionResults.m_pInstance, 0x20, arg0);
         }
         callback = ((struct CallbackState288 *) ((char *) arg0))->callback;
         if (callback != 0) {

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 CScene__SetInstanceSavedBit(s32, s32, s32);
 
 s32 GameObject_FireTriggers(void *, s32, void *);     /* extern */
-extern s32 gScene;
 
 void EnemyMode_Death_Enter(CGameObjectInstance *arg0, CAI *arg1) {
     s32 temp_a0;

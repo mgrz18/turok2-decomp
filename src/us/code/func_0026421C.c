@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 CScene__GetInstanceSavedBit(s32, s32);
 s32 CAI__SetMode(s32, s32, s32);
 
-extern s32 gScene;
 
 void Platform_Advance(CGameObjectInstance *arg0, CAI *arg1) {
     arg1->m_Action = 0;

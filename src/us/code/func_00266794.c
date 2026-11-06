@@ -1,9 +1,9 @@
 #include "common.h"
+#include "globals/scene.h"
 
 s32 CScene__GetInstanceSavedBit(s32, s32);
 s32 CAI__SetMode(s32, s32, s32);
 
-extern s32 gScene;
 
 void InteractiveAnim_Advance(void *arg0, void *arg1)
 {

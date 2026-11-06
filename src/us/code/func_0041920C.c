@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/game.h"
 
 s32 Menu_StepValue(s32, s32, s32, s32, s32, s32);
 
-extern s32 gEngineApp_m_Settings;
 
 s32 TeamBloodMenu_StepTextureSet(s32 arg0, s32 arg1)
 {

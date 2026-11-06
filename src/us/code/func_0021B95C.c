@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/region.h"
+#include "globals/object.h"
 
 /* A bone's track references: -1 means "use the default frame". */
 typedef struct JointRef {
@@ -105,7 +106,6 @@ extern CGameRegion *sPoseRegion;
 extern f32 sPoseCeilingHeight;         /* ground height */
 extern f32 sPoseCollisionHeight;         /* object height */
 extern f32 sPoseCeilingOverlap;         /* depth below the ground */
-extern f32 gSwingAmplitudes[];
 
 void *CISet__GetBlock(void *file, s32 index);
 void CMtxF__MultiplyAffine(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);

@@ -2,16 +2,14 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
+#include "globals/ai.h"
 
 /* AI attack-wait callback: state 0 counts the delay down; once it has run out
  * (more than 30 frames left means an attack is due) it plays the attack
  * animation for the current mode if the definition allows it. State 1 counts
  * the cool-down and re-picks a region. */
-
-extern f32 gFrameIncrement; /* frame delta */
-extern CVector3 gEnemyAlertPoint;
-extern CVector3 gEnemyLastNoisePos;
-extern u8 gScene[];
 
 extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
 extern s16 func_002261A8(void *level, s32 id, CVector3 *pos);
@@ -63,7 +61,7 @@ void EnemyAI_AttackWait(CGameObjectInstance *actor, CAI *ai) {
             ai->m_ActionTime = 0.0f;
             ai->m_Action = 0;
             if (ai->m_PathTrack.m_Mode) {
-                ai->m_PathTrack.m_nCurrentPointIndex = func_002261A8(gScene, ai->m_PathTrack.m_nCurrentPathIndex, &actor->header.m_vPos);
+                ai->m_PathTrack.m_nCurrentPointIndex = func_002261A8(&gScene, ai->m_PathTrack.m_nCurrentPathIndex, &actor->header.m_vPos);
             }
         }
         break;

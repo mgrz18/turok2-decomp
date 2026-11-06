@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
 extern void func_0021F1B4(CGameObjectInstance *);
 extern s32 CGameObjectInstance__UpdateAnimation(CGameObjectInstance *);
-extern f32 gFrameIncrement;
 
 /* Rebuilds the weapon actor (keeping gFrameIncrement across it) and puts it where
  * the character is. */

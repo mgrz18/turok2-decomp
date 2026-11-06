@@ -1,6 +1,9 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FX/8024F950.CPP, func_8024FD80_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
+#include "globals/camera.h"
+#include "globals/engine.h"
 
 /* A placed prop as the level file stores it. */
 typedef struct {
@@ -44,11 +47,6 @@ void CMtxF__Copy(f32 *, void *);
 void CMtxF__ToMtxAffine(void *, f32 *);
 f32 HalfToFloat(s32);
 
-extern u8 gScene[];
-extern s32 gNextUniqueId;
-extern s32 gDefaultVisBits;
-extern u8 D_800B6D1B;
-
 static __inline__ s32 next_key(void) {
     s32 next;
 
@@ -68,7 +66,7 @@ void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 ow
     prop->id = record->id;
     prop->owner = owner;
     prop->field1C = 0;
-    prop->model = CScene__GetIntelligence(gScene, record->model);
+    prop->model = CScene__GetIntelligence(&gScene, record->model);
     prop->flags = record->flags;
     rotation[0] = record->rotation[0] * 0.007874016f;
     rotation[1] = record->rotation[1] * 0.007874016f;
@@ -105,5 +103,5 @@ void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 ow
         prop->segment = segments + record->segment * 32;
     }
     prop->key = next_key() << 10;
-    prop->colorFrame = D_800B6D1B - 1;
+    prop->colorFrame = (u8)gFrameCount - 1;
 }

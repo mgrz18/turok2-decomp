@@ -1,6 +1,6 @@
 #include "common.h"
+#include "globals/libultra.h"
 
-extern s32 __osThreadTail;
 
 typedef struct {
     /* 0x00 */ s32 *head;

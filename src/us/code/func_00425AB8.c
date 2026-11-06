@@ -4,19 +4,19 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
+#include "globals/controller.h"
 
 extern s32 Controller_Lock(s32 arg0);
 extern u8 D_800F677B[];
 extern void Controller_Unlock();
 extern void Controller_ReadAll(void);
-extern u8 gPakQueueState;
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
 extern s32 Pak_Mount(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 s32 Pak_Mount(s32 ch);
 void Pak_ProbeAll(void) {
-    extern u8 gSiMessageQueue[];
     s32 channel;
     s32 present;
     RumblePak *record;
@@ -29,7 +29,7 @@ void Pak_ProbeAll(void) {
             present = 0;
             record->present = 0;
         } else {
-            record->present = osMotorInit(gSiMessageQueue, &record->pfs, channel) == 0;
+            record->present = osMotorInit(&gSiMessageQueue, &record->pfs, channel) == 0;
             present = record->present;
         }
         if (present) gPakState[channel] = 2;

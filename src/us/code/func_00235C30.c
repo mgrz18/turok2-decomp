@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "gfx.h"
+#include "globals/render.h"
 
 typedef struct VInfo {
     u8 pad0[0x18];
@@ -26,10 +27,9 @@ typedef struct VCtx {
                  s32 mode;
 } VCtx;
 typedef struct Vec3fv { f32 x, y, z; } Vec3fv;
-extern u8 gShadowTexture[];
 extern u8 D_800ACFC8[];
 extern u8 D_8011AD48[];
-extern f32 gCameraVisibleBox[6];
+extern f32 gCameraVisibleBox[6]; /* local type: the CBox read as six floats by index */
 void Render_InvalidateModeCache(void);
 void Texture_InvalidateCache(void);
 void CList__Remove(VList *, VNode *);

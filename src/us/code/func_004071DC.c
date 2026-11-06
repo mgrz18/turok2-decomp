@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 /* Just the AI callbacks this sets. */
 typedef struct {
@@ -14,7 +15,6 @@ extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 extern void Primagen_Draw();
 extern void Primagen_Effects();
 
-extern u8 gScene[];
 
 void Primagen_UpdateMode0(CGameObjectInstance *obj, CAI *ai) {
     Callbacks *found[10];
@@ -22,7 +22,7 @@ void Primagen_UpdateMode0(CGameObjectInstance *obj, CAI *ai) {
     s32 n;
     s32 i;
 
-    n = CScene__FindInstances(gScene, 0x453, 9, -1, found, 10);
+    n = CScene__FindInstances(&gScene, 0x453, 9, -1, found, 10);
     for (i = 0; i < n; i++) {
         item = found[i];
         item->onDraw = Primagen_Draw;

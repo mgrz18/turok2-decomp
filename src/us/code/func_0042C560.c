@@ -1,6 +1,7 @@
 /* WRONG CUT: REAL CScene__FindNearestWarpDest size 0x1A0 (splat cut it into CScene__FindNearestWarpDest + func_0042C620 + func_0042C6BC). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D3E8_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct SearchPoint {
     /* 0x00 */ f32 position[3];
@@ -21,7 +22,6 @@ typedef struct SearchPoints {
     SearchPoint points[1];
 } SearchPoints;
 
-extern s32 gEngineApp_m_CartridgeIndex;
 extern char D_800A5D8C[];
 extern char D_800A5FC4[];
 
@@ -47,7 +47,7 @@ s32 CScene__FindNearestWarpDest(void *world, void *position, s32 type, SearchPoi
     void **handle;
     void *table;
 
-    pool = gEngineApp_m_CartridgeIndex;
+    pool = gEngineApp.m_CartridgeIndex;
     CCache__LoadPersistantIndex(0, &resource, pool, D_800A5D8C);
     i = 0;
     best = 0;

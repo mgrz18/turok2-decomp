@@ -1,6 +1,9 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/vector.h"
+#include "structs/game.h"
+#include "globals/render.h"
+#include "globals/engine.h"
 
 typedef struct { s32 m[4][4]; } Mtx64;   /* a packed N64 Mtx, 0x40 bytes */
 
@@ -30,13 +33,7 @@ typedef struct {
     /* 0x294 */ f32 top;
 } HudView;
 
-extern u8 gPrimAlphaOverride;
-extern u8 gPrimAlphaOverrideValue;
-extern u8 gSceneLights[];     /* lights */
-extern s32 gEvenOdd;      /* frame buffer index */
-extern s32 gResolution;
 extern f32 D_800ADDB8;
-extern u8 gEngineApp[];
 
 void Render_InvalidateModeCache(void);
 void Render_ResetBatches(void);
@@ -80,7 +77,7 @@ void CPlayer__DrawScope(HudModel *m, HudView *view) {
         g->w1 = 0x2000;
     }
     Render_ResetBatches();
-    CEngineApp__ClearDepthRect(gEngineApp, view->left, view->width + view->left, view->top, view->height + view->top);
+    CEngineApp__ClearDepthRect(&gEngineApp, view->left, view->width + view->left, view->top, view->height + view->top);
     CMtxF__SetScale(&mf[0][0], m->scaleX, m->scaleY, m->scaleZ);
     CMtxF__RotateY(&mf[0][0], m->rotY);
     CMtxF__RotateX(&mf[0][0], m->rotX);
@@ -92,7 +89,7 @@ void CPlayer__DrawScope(HudModel *m, HudView *view) {
     }
     CMtxF__ToMtxAffine(&mfDraw[0][0], &m->mtx[gEvenOdd]);
     CMtxF__TransformPoint(&mf[0][0], &m->pos, &out);
-    Render_QueueModelByKey(m->object, &m->mtx[gEvenOdd], gSceneLights, 0, -1);
+    Render_QueueModelByKey(m->object, &m->mtx[gEvenOdd], &gSceneLights, 0, -1);
     Render_FlushBatches();
     gPrimAlphaOverride = 0;
     {

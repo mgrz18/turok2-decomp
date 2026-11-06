@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/scene.h"
 
 /* What this reads of a region: its flags. 0x10000 makes the ground tremble. */
 typedef struct {
@@ -7,7 +8,6 @@ typedef struct {
     /* 0x44 */ s32 m_Flags;
 } RegionTremor;
 
-extern u8 gScene[];
 RegionTremor *CScene__GetRegionInfo(void *regions, struct CGameRegion *region);
 f32 Random_Blend(f32 min, f32 max);          /* a random float between the two */
 
@@ -17,7 +17,7 @@ f32 Random_Blend(f32 min, f32 max);          /* a random float between the two *
 void CCamera__UpdateTremor(CCamera *cam, CVector3 *offset) {
     f32 height = 0.0f;
     f32 angle = height;
-    RegionTremor *region = CScene__GetRegionInfo(gScene, cam->m_ViewParams.m_pCurrentRegion);
+    RegionTremor *region = CScene__GetRegionInfo(&gScene, cam->m_ViewParams.m_pCurrentRegion);
 
     if (region == NULL) {
         offset->x = height;

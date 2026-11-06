@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 /* Clears the two scales (m_Mother) of every actor of the module, resets the module (MotherBoss_SetupPhase1) and queues MotherBoss_OnPhase1CinemaDone. */
 

@@ -2,11 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/game.h"
 
-extern u8 gEngineApp_m_Settings_unk18;
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 Menu_StepDebugMode(void *first, void *second) {
-    u8 *option = &gEngineApp_m_Settings_unk18;
+    u8 *option = &gEngineApp_m_Settings.unk18;
     *option = Menu_StepValue(second, *option, 1, 0, 2, 1);
     return 0;
 }

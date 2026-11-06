@@ -1,10 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A3F94.c, func_002A3F94.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/engine.h"
 
-typedef unsigned char u8;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
 typedef struct SEnt SEnt;
 typedef struct SSlot SSlot;
 typedef struct SShape {
@@ -51,9 +49,6 @@ typedef struct Owner3F94 {
     u8 pad0[0xD4];
     u32 flags; /* Turok 2: 0xD4 */
 } Owner3F94;
-extern f32 gFrameIncrement;
-extern f32 gEnemyTimeScale;
-extern f32 gParticleTimeScale;
 void SwooshGroup_Remove(s32 a, SSlot *s, SEnt *e);
 void func_002368B0(SSlot *s);
 s32 Swoosh_Update(s32 a0, SSlot *s) {

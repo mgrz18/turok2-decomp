@@ -3,9 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "gfx.h"
+#include "globals/render.h"
 
-extern u32 gCurrentCombineMode;
-extern Gfx *gDList;
 void Render_SetCombineMode(u32 mode) {
  if (gCurrentCombineMode != mode) {
  gCurrentCombineMode=mode;
@@ -55,7 +54,4 @@ void Render_SetCombineMode(u32 mode) {
  }
  }
 }
-extern Gfx *gDList;
-extern Gfx *gDList;
-extern Gfx *gDList;
 void Render_SetCombineMode(u32);

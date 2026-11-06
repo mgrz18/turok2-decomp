@@ -42,6 +42,22 @@ typedef struct CCollisionInfo {
     /* 0x18 */ f32 m_WaterFriction;
 } CCollisionInfo; /* size 0x1C */
 
+/* One record of a CCollisionInfo setup table (Rage Wars' CCollisionSetup_t;
+ * gCollisionSetupTable): CCollisionSetup__Construct copies the values into
+ * the info, record by record, until a NULL m_pInfo. */
+typedef struct CCollisionSetup {
+    /* 0x00 */ CCollisionInfo *m_pInfo;
+    /* 0x04 */ u32 m_dwFlags;
+    /* 0x08 */ s32 m_InstanceBehavior;   /* stored as the info's s8 */
+    /* 0x0C */ s32 m_WallBehavior;
+    /* 0x10 */ s32 m_GroundBehavior;
+    /* 0x14 */ f32 m_GravityAcceleration;
+    /* 0x18 */ f32 m_BounceReturnEnergy;
+    /* 0x1C */ f32 m_GroundFriction;
+    /* 0x20 */ f32 m_AirFriction;
+    /* 0x24 */ f32 m_WaterFriction;
+} CCollisionSetup; /* size 0x28 */
+
 /* A hittable node of an instance (Rage Wars calls it a shield): what a hit on
  * it copies into the results (m_Frame, 0x70 bytes; gCollisionResults_m_Frame is the copy in
  * gCollisionResults) and what a DamageEvent carries. */

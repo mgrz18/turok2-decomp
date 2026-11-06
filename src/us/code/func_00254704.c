@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;
 
 void CPlayer__TickFlashlight(CPlayer *arg0) {
     f32 temp_f0;

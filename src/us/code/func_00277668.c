@@ -5,7 +5,6 @@
 #include "gfx.h"
 
 
-extern Gfx *gDList;
 
 #define _SHIFTL(v, s, w) (((u32) (v) & ((1U << (w)) - 1)) << (s))
 #define CLAMP0(v) ((v) > 0 ? (v) : 0)

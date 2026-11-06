@@ -2,6 +2,7 @@
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 
 #include "common.h"
+#include "globals/adec.h"
 
 /* Acclaim compressed-audio stream decoder state (one instance) */
 typedef struct {
@@ -16,17 +17,6 @@ typedef struct {
     /* 0xB8 */ s16 coef[256];   /* quantized coefficients of the current frame */
 } AdecStream;
 
-/* one entry of the Huffman segment table, stride 0x14 */
-typedef struct {
-    /* 0x00 */ s32 kind;        /* 0 terminates the table */
-    /* 0x04 */ s32 start;
-    /* 0x08 */ s32 len;
-    /* 0x0C */ s32 pos;
-    /* 0x10 */ void *tree;
-} AdecHuffSeg;
-
-extern s16 sAdecHeaderDone;          /* first frame (raw header) done */
-extern AdecHuffSeg gAdecHuffSegments[]; /* segment table */
 extern u16 sAdecPrevScale[16];      /* previous scale indices */
 
 extern s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st);          /* adecReadBits */

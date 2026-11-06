@@ -2,61 +2,20 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/game.h"
 
 extern char D_800B596C[];
 extern char D_800B5988[];
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 s32 CheatMenu_BigHandsFeetModeText(struct StateRecAt14 *item) {
-    if (gEngineApp_m_Settings_unlockedCheats & 0x100) {
+    if (gEngineApp_m_Settings.unlockedCheats & 0x100) {
         item->unk8 |= 0x1000000;
     } else {
         item->unk8 &= ~0x1000000;
     }
-    if (gEngineApp_m_Settings & 0x100) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x100) {
         item->unk14 = D_800B596C;
     } else {
         item->unk14 = D_800B5988;
     }
     return 0;
 }
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings;
-extern s32 gEngineApp_m_Settings_unlockedCheats;

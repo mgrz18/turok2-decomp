@@ -39,7 +39,7 @@ struct PoolRecAt28V1 {
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
 s32 Controller_ConfirmPressed(char *);
-extern u32 gEngineApp_m_Settings_difficulty[];
+extern u32 gEngineApp_m_Settings_difficulty[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 s32 OptionsMenu_CycleDifficulty_2(void) {
  if(((s32 (*)(char *))Controller_MenuLeft)((char *)&gMergedController)) {
  switch(gEngineApp_m_Settings_difficulty[0]) {

@@ -2,12 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/cinema.h"
 
 extern s32 Cinema_PathDone(void);
 s32 Cinema_PathDone(void) {
-    extern func_802457D0_S1 *gCinemaPlayerP;
-    if (gCinemaPlayerP->unk38 != 0) {
-        if (gCinemaPlayerP->unk1C > gCinemaPlayerP->unk34) {
+    if (gCinemaPlayerP->active != 0) {
+        if (gCinemaPlayerP->time > gCinemaPlayerP->endTime) {
             return 1;
         }
         return 0;

@@ -1,13 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
-
-extern f32 gFrameIncrement;      /* frame step */
-extern u8 gEngineApp_m_Settings_multiplayer;
-extern u8 gEngineApp_m_Settings_dmCrosshairs;
-extern u8 gEngineApp_m_Settings_tagCrosshairs;
-extern u8 gEngineApp_m_Settings_teamCrosshairs;
-extern s32 gEngineApp_m_Settings_match_teams;
-extern s32 gEngineApp_m_Settings_match_tag;
+#include "globals/game.h"
+#include "globals/engine.h"
 
 void Hud_SetupTextureMode(s32);
 void Hud_DrawWorldSprite(void *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f32 size);
@@ -28,12 +22,12 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
     if (sprite == 0x2DA && gEngineApp_m_Settings_multiplayer != 0) {
         if (gEngineApp_m_Settings_match_tag == 0) {
             if (gEngineApp_m_Settings_match_teams != 0) {
-                show = gEngineApp_m_Settings_teamCrosshairs;
+                show = gEngineApp_m_Settings.teamCrosshairs;
             } else {
-                show = gEngineApp_m_Settings_dmCrosshairs;
+                show = gEngineApp_m_Settings.dmCrosshairs;
             }
         } else {
-            show = gEngineApp_m_Settings_tagCrosshairs;
+            show = gEngineApp_m_Settings.tagCrosshairs;
         }
     } else {
         show = 1;
@@ -63,12 +57,12 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
     if (sprite == 0x2DA && gEngineApp_m_Settings_multiplayer != 0) {
         if (gEngineApp_m_Settings_match_tag == 0) {
             if (gEngineApp_m_Settings_match_teams != 0) {
-                show = gEngineApp_m_Settings_teamCrosshairs;
+                show = gEngineApp_m_Settings.teamCrosshairs;
             } else {
-                show = gEngineApp_m_Settings_dmCrosshairs;
+                show = gEngineApp_m_Settings.dmCrosshairs;
             }
         } else {
-            show = gEngineApp_m_Settings_tagCrosshairs;
+            show = gEngineApp_m_Settings.tagCrosshairs;
         }
     } else {
         show = 1;

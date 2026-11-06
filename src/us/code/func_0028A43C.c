@@ -3,6 +3,9 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/frame.h"
+#include "structs/game.h"
+#include "globals/engine.h"
 typedef struct {
                u32 type;
                u32 flags;
@@ -72,14 +75,9 @@ void CCache__PostDisplayListDone(s32 a, s32 b);
 void __scTaskComplete(Vid *o, Job *j);
 s32 __scSchedule(Vid *o, Job **a, Job **b, s32 mode);
 void __scExec(Vid *o, Job *a, Job *b);
-extern u64 sGfxRspResumeTime;
-extern u64 sAudioTaskStartTime;
-extern f32 sGfxRspTime;
-extern f32 gSchedRspTotalTime;
-extern f32 gSchedRspTime;
-extern s32 sSchedGfxWatchdog;
-extern View gEngineApp[];
-extern u32 gDisplayList0;
+extern u64 sGfxRspResumeTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
+extern u64 sAudioTaskStartTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
+extern f32 sGfxRspTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
 void __scHandleRSP(Vid *o) {
     Job *j;
     Job *a;
@@ -114,7 +112,7 @@ void __scHandleRSP(Vid *o) {
             sGfxRspTime = sGfxRspTime + (f32)(((osGetTime() - sGfxRspResumeTime) * 64) / 3) * 0.000001f;
             gSchedRspTotalTime = sGfxRspTime;
             gSchedRspTime = (f32)(((osGetTime() - sAudioTaskStartTime) * 64) / 3) * 0.000001f;
-            base = gEngineApp;
+            base = (View *)gEngineApp.m_FrameData;
             fb = (u32)j->unkC;
             if (fb == base[0].fb) {
                 s = base;

@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern BlindOnePhase sBlindOnePhases_2[];
 
 
 /* Starts script command `cmd`: stops the movers, clears every member's flag and runs the command. */

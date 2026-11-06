@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -15,7 +16,6 @@ typedef struct {
     /* 0xA8 */ s32 unkA8;
 } Spawn;
 
-extern BlindOneState gBlindOne;
 
 void BlindOne_ActorAppearEnter_2(CGameObjectInstance *actor, Spawn *spawn) {
     BlindOneState *counters;

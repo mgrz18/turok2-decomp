@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/libultra/xlitob.c, _Litob, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/libc.h"
 
 #define BUFF_LEN 0x18
 #define FLAGS_MINUS 4
@@ -30,8 +31,6 @@ typedef struct {
     s64 rem;
 } lldiv_t;
 
-extern char ldigs[]; /* ldigs "0123456789abcdef" */
-extern char udigs[]; /* udigs "0123456789ABCDEF" */
 extern void *func_0029E460(void *dst, const void *src, u32 n); /* memcpy */
 
 static __inline__ void lldiv(lldiv_t *ans, s64 num, s64 den) {

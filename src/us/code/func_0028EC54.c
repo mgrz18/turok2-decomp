@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SCHED/CODE_8023CBF8.CPP, func_8023CDD4_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/pager.h"
+#include "globals/pager.h"
 
 typedef struct {
     u8 pad0[0x4];

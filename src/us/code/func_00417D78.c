@@ -1,13 +1,8 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/MISC/8043DF84.CPP, func_8043E134_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/engine.h"
 
-typedef signed char s8;
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef unsigned int u32;
-typedef float f32;
 typedef struct Shared_PlayerSettingsRecord Shared_PlayerSettingsRecord;
 struct Shared_PlayerSettingsRecord {
     char pad0[4];
@@ -125,7 +120,6 @@ struct Shared_Game {
 extern Shared_Game D_8011A6D8;
 extern f32 sFinalScoreTimer;
 extern s32 FinalScoreMenu_Poll(void);
-extern f32 gFrameIncrement;
 void CPlayerPool__EndMatch(void *arg0);
 s32 FinalScoreMenu_Poll(void) {
     f32 time;

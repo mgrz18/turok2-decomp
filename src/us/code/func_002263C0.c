@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/engine.h"
 
 s32 CStaticObject__SpawnEvents(s32, s32);
 
-extern f32 gFrameIncrement;
 
 void CScene__AdvanceListedInstances(void *arg0)
 {

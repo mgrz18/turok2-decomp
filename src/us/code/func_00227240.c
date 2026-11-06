@@ -1,13 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/level_actor.h"
-
-extern s32 gPersistentDataLoaded;
-extern u8 gScene[];                 /* the world */
-extern u8 gEngineApp_m_Settings_multiplayer;
-extern u8 gLevelActorIntelligenceMP[];
-extern u8 gLevelActorIntelligence[];
-extern u8 D_800B6D1B;                   /* frame counter */
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 s32 CScene__FindObjectType(void *world, s32 id);
 s32 CScene__GetObject(void *world, s32 index);
@@ -53,19 +49,19 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
     s32 index;
     s32 resource;
 
-    if (gPersistentDataLoaded == 0 || (index = CScene__FindObjectType(gScene, id)) == -1) {
+    if (gPersistentDataLoaded == 0 || (index = CScene__FindObjectType(&gScene, id)) == -1) {
         return NULL;
     }
     actor = allocActor(pool);
-    resource = CScene__GetObject(gScene, index);
+    resource = CScene__GetObject(&gScene, index);
     actor->m_pOwnerCount = refCount;
     if (refCount != NULL) {
         (*refCount)++;
     }
-    if (gEngineApp_m_Settings_multiplayer) {
-        actor->m_Actor.header.m_pIntelligence = gLevelActorIntelligenceMP;
+    if (gEngineApp_m_Settings.multiplayer) {
+        actor->m_Actor.header.m_pIntelligence = &gLevelActorIntelligenceMP;
     } else {
-        actor->m_Actor.header.m_pIntelligence = gLevelActorIntelligence;
+        actor->m_Actor.header.m_pIntelligence = &gLevelActorIntelligence;
     }
     actor->m_Lifetime = lifetime;
     actor->m_Timer = 0.0f;
@@ -87,10 +83,10 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
     actor->m_Actor.m_wFlags = 0x1A;
     actor->m_Actor.m_ModelScale = 0;
     actor->m_Actor.m_vVelocity = vel;
-    actor->m_Actor.m_DrawnFrame = actor->m_Actor.m_UpdatedFrame = D_800B6D1B - 1;
+    actor->m_Actor.m_DrawnFrame = actor->m_Actor.m_UpdatedFrame = (u8)gFrameCount - 1;
     p.x = actor->m_Actor.header.m_vPos.x;
     p.y = actor->m_Actor.header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
     p.z = actor->m_Actor.header.m_vPos.z;
-    CScene__GetLightsAt(gScene, &p, actor->m_Actor.m_Lights);
+    CScene__GetLightsAt(&gScene, &p, actor->m_Actor.m_Lights);
     return actor;
 }

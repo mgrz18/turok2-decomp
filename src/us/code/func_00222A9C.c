@@ -10,7 +10,7 @@ typedef struct B19bV3f { f32 x, y, z; } B19bV3f;
  * array view: through it the compiler bases both loads on gEngineApp_m_Settings + 0xC, as
  * the ROM does; through the struct it bases them on gEngineApp_m_Settings. */
 typedef struct B19bG8 { u32 flags; u8 pad4[0x8]; u32 fC; } B19bG8;
-extern B19bG8 gEngineApp_m_Settings[];
+extern B19bG8 gEngineApp_m_Settings[]; /* local type: array view, see above */
 typedef struct B19bLObj {
               u8 pad0[4];
               f32 f4;

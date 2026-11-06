@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
@@ -10,8 +11,6 @@ typedef struct {
     /* 0x14 */ u16 flags;
 } Location;
 
-extern s32 gScene_m_Kind1Cursor;
-extern s32 gScene_m_bStreamAll;
 
 CGameObjectInstance *AI_FindBestTarget(CGameObjectInstance *self, CAI *plan, s32 arg2, s32 arg3);
 Location *CPathTrack__GetCurrentPoint(s8 *location);
@@ -42,7 +41,7 @@ static __inline__ s32 Kind(CGameObjectInstance *self, CAI *plan, CGameObjectInst
     if (target->m_nTypeFlag == 0x64F) {
         return 7;
     }
-    if (gScene_m_bStreamAll == 0) {
+    if (gScene.m_bStreamAll == 0) {
         if (target->m_dwFlags & 0x300000) {
             player = ((CPlayer *)target->m_AI.m_pParent);
             if (player->m_FleeTime > 0.0f && (self->m_nTypeFlag != 0xCA || player->m_Data.m_CurrentWeapon != 0x14)) {
@@ -69,7 +68,7 @@ void AI_GetSightTargetInfo(CGameObjectInstance *self, CAI *plan, s32 unused, CAI
     CGameObjectInstance *target;
     Location *loc;
 
-    if (plan->m_PathFindCount == gScene_m_Kind1Cursor && (!(plan->m_dwFlags & 0x40000000) || plan->m_pTargetOverride != NULL)) {
+    if (plan->m_PathFindCount == gScene.m_Kind1Cursor && (!(plan->m_dwFlags & 0x40000000) || plan->m_pTargetOverride != NULL)) {
         plan->m_pSightTarget = AI_FindBestTarget(self, plan, 1, 0);
     }
     if (self->header.m_pIntelligence->m_Type == 1 && plan->m_Mode == 0xB && Kind(self, plan, plan->m_pPathTarget) == 4) {

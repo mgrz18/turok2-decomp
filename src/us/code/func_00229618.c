@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 /* Projectile wobble: swings the velocity sideways (and then up/down) along
  * sine waves whose amplitude scales with how close the projectile is to its
@@ -38,7 +39,6 @@ extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = 
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a - b */
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
-extern f32 gFrameIncrement;                                      /* frame time scale */
 
 void CParticle__Wobble(Projectile *p, f32 scale) {
     CVector3 up;

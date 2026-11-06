@@ -1,8 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/PAK/80403BCC.CPP, func_804042F0_encode, with Turok 2's layouts. */
 #include "common.h"
+#include "globals/pak.h"
 
 /* Pak font code -> character. */
-extern u8 gPakCharTable[];
 
 static __inline__ s32 toUpper(s32 c) {
     if ((u32)(c - 'a') < 26) {

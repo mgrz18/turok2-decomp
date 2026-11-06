@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 extern void Throwable_GetCarryPoint(void *obj, void *state, f32 *out);
 extern s32 CGameObjectInstance__PickRandomAnim(void *actor, s32 action, s32 skip);
 extern void CVector3__Lerp(f32 *out, f32 t, f32 *from, f32 *to);
 extern void CAI__SetMode(void *obj, void *state, s32 mode);
 
-extern f32 gFrameIncrement; /* frame time scale */
 extern s8 gThrowableCollisionInfo_m_InstanceBehavior;
 
 typedef struct {

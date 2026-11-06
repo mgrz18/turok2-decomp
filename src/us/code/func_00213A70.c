@@ -2,6 +2,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/world.h"
+#include "globals/game.h"
+#include "globals/scene.h"
 
 typedef struct Box3 {
     CVector3 mn;
@@ -26,10 +28,7 @@ typedef struct WTab {
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
 
 extern char D_800A57B8[];
-extern s32 gLevelLightsEnabled;
 extern CVector3 sLitVertexOffsets[];
-extern CScene gScene;
-extern s32 gEngineApp_m_Settings;
 
 void *CISet__GetBlock(void *file, s32 index);
 s32 *CISet__GetBlockAndSize(s32 file, s32 index, s32 *size);
@@ -161,7 +160,7 @@ s32 **Lighting_BuildLitVertices(s32 model, s32 *regions, Box3 *box, s32 arg3, s3
     if (gLevelLightsEnabled == 0) {
         goto plain;
     }
-    if (gEngineApp_m_Settings & 0x8000) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x8000) {
         Lighting_DebugHueColors(dst, arg3, sLitVertexOffsets, arg4);
         goto done;
     }

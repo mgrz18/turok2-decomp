@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "structs/libaudio.h"
+#include "globals/audio.h"
 
 #define AL_SEQ_REF_EVT 0
 #define AL_SEQ_MIDI_EVT 1
@@ -19,7 +20,6 @@
 /* An ALCSPlayer, as this reads it. */
 
 extern char D_800AA290[];
-extern char sCSPlayerFile[];
 
 void alCSeqNextEvent(void *seq, ALEvent *evt);            /* alCSeqNextEvent */
 s32 __alCSeqNextDelta(void *seq, s32 *deltaTicks);          /* __alCSeqNextDelta */

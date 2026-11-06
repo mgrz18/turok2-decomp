@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern CCollisionResults gCollisionResults;
 
 void DamageEvent_Set(DamageEvent *event, CGameObjectInstance *source, s32 damage, f32 radius, s32 flags, void *shield);
 void CAI__CallHurt(CGameObjectInstance *actor, void *ai, DamageEvent *event);

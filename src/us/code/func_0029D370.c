@@ -2,6 +2,7 @@
 /* libultra osLeoDiskInit: registers the 64DD drive (PI domain 2) as a PI
  * device and returns its handle (LeoDiskHandle, LeoDiskHandle). */
 #include "common.h"
+#include "globals/libultra.h"
 
 typedef struct OSPiHandle {
     /* 0x00 */ struct OSPiHandle *next;
@@ -26,7 +27,6 @@ typedef struct OSPiHandle {
 
 extern OSPiHandle LeoDiskHandle;   /* LeoDiskHandle */
 extern OSPiHandle *__osDiskHandle;  /* __osDiskHandle */
-extern OSPiHandle *__osPiTable;  /* __osPiTable */
 
 extern void memset(void *p, s32 c, u32 n); /* memset */
 extern u32 __osDisableInt(void);

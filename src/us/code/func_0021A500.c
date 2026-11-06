@@ -1,14 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00246FF4.c, func_00246FF4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/engine.h"
 
-typedef unsigned char u8;
-typedef signed char s8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef unsigned int u32;
-typedef signed int s32;
-typedef float f32;
-typedef double f64;
 typedef struct B10X B10X;
 typedef struct B10Q4 B10Q4;
 typedef struct B10Pq B10Pq;
@@ -99,7 +93,6 @@ extern f32 D_800A5AEC;
 extern f32 D_800A5AF0;
 extern f32 D_800A5AF4;
 extern f32 D_800A5AF8;
-extern f32 gFrameIncrement;
 s32 GameObject_IsOnGround();
 void GameObject_GetGroundRotation(f32 *loc, B10Obj *o);
 s32 func_002682A4(B10Obj *o);

@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/engine.h"
+#include "globals/object.h"
 
-extern SineTable sWobbleSineTable;
-extern s32 gFrameCount;
 extern void CVector3__Normalize(CVector3 *);
 extern void CMtxF__Copy(f32 *, f32 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, f32);

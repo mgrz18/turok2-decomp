@@ -1,8 +1,8 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/camera.h"
+#include "globals/engine.h"
 
-extern s32 gEvenOdd;
 
 /* Loads the camera's on-screen (2D) projection for this frame's buffer:
  * gSPMatrix(G_MTX_PROJECTION | G_MTX_LOAD). */

@@ -3,21 +3,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
-
-extern s32 gPakMenuIsSave;
-extern s32 gPakMenuAnyPak;
-extern s32 gPakMenuIsLoad;
-extern s32 gPakMenuWrites;
-extern s32 gPakMenuIsProfile;
-extern s32 gPakMenuLeaving;
-extern s32 gDamagedPakContinued;
-extern s32 gPakMenuMode;
-extern u8 gEngineApp_m_Game_m_MenuPool[];   /* menu pool */
-extern u8 gCharacterMenuAfterPakDesc[];
-extern u8 gPakLoadProfileMenuDesc[];
-extern u8 gPakMsgPakNotFoundDesc[];
-extern u8 gPakMsgInsertToLoadDesc[];
-extern u8 gDamagedPakAtBootMenuDesc[];
+#include "globals/menu.h"
+#include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 extern void MenuPool_OpenMenu(void *pool, void *tmpl, CPlayer *player, ControllerProfile *ctl, void *back);
 extern void Pak_ProbeSlot(s32 kind);
@@ -40,7 +28,7 @@ void PakMenu_InitLoadProfile(Menu *m) {
     kind = m->controller->port;
     if (gDamagedPakContinued) {
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu(((u8 *)m->player->m_pCamera) + 0x53C, gCharacterMenuAfterPakDesc, m->player, m->controller, NULL);
+        MenuPool_OpenMenu(((u8 *)m->player->m_pCamera) + 0x53C, &gCharacterMenuAfterPakDesc, m->player, m->controller, NULL);
         return;
     }
     Pak_ProbeSlot(kind);
@@ -50,10 +38,10 @@ void PakMenu_InitLoadProfile(Menu *m) {
     }
     gPakMenuLeaving = 1;
     if (Pak_IsRumblePak(kind)) {
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToLoadDesc, m->player, m->controller, gCharacterMenuAfterPakDesc);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakMsgInsertToLoadDesc, m->player, m->controller, &gCharacterMenuAfterPakDesc);
     } else if (Pak_NeedsRepair(kind)) {
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, m->player, m->controller, gPakLoadProfileMenuDesc);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gDamagedPakAtBootMenuDesc, m->player, m->controller, &gPakLoadProfileMenuDesc);
     } else {
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, m->player, m->controller, gCharacterMenuAfterPakDesc);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPakMsgPakNotFoundDesc, m->player, m->controller, &gCharacterMenuAfterPakDesc);
     }
 }

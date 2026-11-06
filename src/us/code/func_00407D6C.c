@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 s32 CPlayer__Warp(s32, s32, s32, s32);
 

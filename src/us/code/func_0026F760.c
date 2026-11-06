@@ -2,6 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
+#include "globals/audio.h"
+#include "globals/ucode.h"
 
 void osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg msg);
 void osStartThread(OSThread *thread);
@@ -11,26 +13,11 @@ void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg,
 void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
 s32 osAiSetFrequency(u32 freq);
 extern s8 gAudioDmaState[];
-extern s32 gAudioFrameSize;
-extern s32 gAudioMaxRSPCmds;
-extern s32 gAudioHeap;
 extern s32 gAudioDmaCache;
 extern B12DbEnt2 gAudioDmaBuffers[];
 extern void *gAudioCmdLists[];
 extern B12AiTask *gAudioInfo[];
-extern u8 gAudioGlobals[];
-extern OSMesgQueue gAudioReplyMsgQ;
-extern OSMesgQueue gAudioFrameMsgQ;
-extern OSMesgQueue gAudioDmaMessageQ;
-extern OSMesg gAudioReplyMsgBuf[];
-extern OSMesg gAudioFrameMsgBuf[];
-extern OSMesg gAudioDmaMessageBuf[];
-extern OSThread gAudioThread;
 extern u8 gThreadStackAudio[];
-extern u8 rspbootTextStart[];
-extern u8 gspF3DEX_NoN_fifoTextStart[];
-extern u8 aspMainTextStart[];
-extern u8 aspMainDataStart[];
 void __amDmaNew(void);
 void __amMain(void *arg);
 void alInit(void *g, ALSynConfig *c);
@@ -58,7 +45,7 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
     if (gAudioFrameSize & 0xF) {
         gAudioFrameSize = (gAudioFrameSize & ~0xF) + 0x10;
     }
-    alInit(gAudioGlobals, cfg);
+    alInit(&gAudioGlobals, cfg);
     gAudioDmaBuffers[0].link.prev = 0;
     gAudioDmaBuffers[0].link.next = 0;
     for (i = 0; i < 0x3B; i++) {
@@ -73,8 +60,8 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
     }
     gAudioMaxRSPCmds = c2->unk8;
     i = 0;
-    a20 = rspbootTextStart;
-    a24 = gspF3DEX_NoN_fifoTextStart - rspbootTextStart;
+    a20 = (u8 *)rspbootTextStart;
+    a24 = (u8 *)gspF3DEX_NoN_fifoTextStart - (u8 *)rspbootTextStart;
     tp = gAudioInfo;
     for (; i < 3; i++) {
         tk = alHeapDBAlloc(0, 0, cfg->heap, 1, 0x70);

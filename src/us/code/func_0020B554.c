@@ -1,10 +1,7 @@
 #include "common.h"
+#include "globals/render.h"
 
 void Render_InvalidateModeCache(void);
-extern s32 gFogEnabled;
-extern s32 gFogGeometryMode;
-extern s32 gFogRenderModeFogA;
-extern s32 gFogRenderModeShadeA;
 
 void func_0020B554(void) {
     Render_InvalidateModeCache();

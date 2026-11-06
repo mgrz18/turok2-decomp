@@ -3,9 +3,9 @@
 
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/ai.h"
 typedef struct { u8 p[0x1D]; u8 f; } GFx;
 extern GFx D_8011AAD4;
-extern u8 gInteractiveAnimModeTable[];
 void InteractiveAnim_Step(CGameObjectInstance *actor, CAI *state);
 void InteractiveAnim_DrawAllModels(CGameObjectInstance *actor, CAI *state);
 s32 Cinema_GetScriptId(void);

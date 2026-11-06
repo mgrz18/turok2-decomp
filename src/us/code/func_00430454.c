@@ -2,10 +2,11 @@
 #include "structs/vector.h"
 #include "structs/game.h"
 #include "structs/world.h"
+#include "globals/game.h"
+#include "globals/scene.h"
 
 /* Turok 2: the mode block sits at 0x23FD0 (see CEngineApp__UpdateCinemaMode). */
 
-extern char gScene[];
 
 s32 CScene__FindWarpDests(void *world, s32 arg1, s32 id, CWarpPoint *out, s32 max);
 
@@ -16,14 +17,14 @@ s32 CScene__FindWarpDests(void *world, s32 arg1, s32 id, CWarpPoint *out, s32 ma
 void func_00430454(CEngineApp *session, s32 warp) {
     CWarpPoint point;
 
-    if (CScene__FindWarpDests(gScene, -1, warp, &point, 1) == 0) {
+    if (CScene__FindWarpDests(&gScene, -1, warp, &point, 1) == 0) {
         warp = 0;
     }
-    gEngineApp_m_Settings_match.frames = 0;
-    gEngineApp_m_Settings_match.seconds = 0;
-    gEngineApp_m_Settings_match.minutes = 0;
-    gEngineApp_m_Settings_match.hours = 0;
-    gEngineApp_m_Settings_match.unk44 = 0;
+    gEngineApp_m_Settings.match.frames = 0;
+    gEngineApp_m_Settings.match.seconds = 0;
+    gEngineApp_m_Settings.match.minutes = 0;
+    gEngineApp_m_Settings.match.hours = 0;
+    gEngineApp_m_Settings.match.unk44 = 0;
     do {
         session->m_Settings.warpFlags = 0;
         session->m_Settings.matchMode = warp;

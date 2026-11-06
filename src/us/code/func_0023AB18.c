@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern CCollisionResults *gCollisionResultsP;
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);           /* out = a - b */
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);           /* out = a + b */

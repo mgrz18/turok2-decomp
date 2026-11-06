@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
 
-extern CPlayerOptions gEngineApp_m_Settings_defaultSlot; /* gEngineApp_m_Settings + 0x40: default options */
 extern char D_800B4050[];
 extern char D_800B4068[];
 extern char D_800C1318[]; /* "  %2d"-style */
@@ -13,7 +13,7 @@ extern void sprintf(char *dst, char *fmt, ...);
 
 /* Label of the player's 0x80-centred setting at options+0x29. */
 s32 OptionsMenu_StickHorzText(MenuItem *a, Menu *c) {
-    CPlayerOptions *options = &gEngineApp_m_Settings_defaultSlot;
+    CPlayerOptions *options = &gEngineApp_m_Settings.defaultSlot;
     s32 v;
 
     if (c->player != NULL && c->player->m_pOptions != NULL) {

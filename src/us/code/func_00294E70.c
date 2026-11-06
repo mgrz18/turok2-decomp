@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libaudio.h"
 
 extern double D_800AA508;
 extern float D_800AA514;
@@ -11,12 +12,6 @@ extern s32 alHeapDBAlloc(s32 file, s32 line, void *hp, s32 num, s32 size);
 extern char alFxParam;
 extern char alFxPull;
 extern char alFxParamHdl;
-extern s32 SMALLROOM_PARAMS[];
-extern s32 BIGROOM_PARAMS[];
-extern s32 ECHO_PARAMS[];
-extern s32 CHORUS_PARAMS[];
-extern s32 FLANGE_PARAMS[];
-extern s32 NULL_PARAMS[];
 extern const f32 D_800AA500;
 extern const f32 D_800AA510;
 void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)

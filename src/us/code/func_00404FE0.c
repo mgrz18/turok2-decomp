@@ -14,7 +14,7 @@ typedef struct {
     /* 0xC8 */ u8 script2On;      /* 0x8012FA18 */
 } LevelScriptF950;
 
-extern LevelScriptF950 gLevelScript_spawnsLeft;
+extern LevelScriptF950 gLevelScript_spawnsLeft; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 /* Advance the second script to its next step, skipping steps by chance. */
 void Primagen_NextSpawnStep(void) {

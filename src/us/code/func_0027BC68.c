@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/demo.h"
+#include "globals/frame.h"
 
 
 /* At gDemoPlayer + 0x194. */
 /* The ROM reaches these two through their own symbols, not gDemoPlayer. */
 extern s32 gDemoPlayer_fastForward;                              /* gDemoPlayer.fastForward */
 extern void (*gDemoPlayer_match_decode)(DemoStream *);         /* gDemoPlayer.match.decode */
-extern s32 gNextTicks;
 
 void CCache__SetFrameDelay(s32);
 

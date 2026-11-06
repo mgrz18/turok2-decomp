@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/libultra.h"
 #define NULL 0
 
 
@@ -15,7 +16,6 @@ typedef struct {
 #define MQ_IS_FULL(mq) ((mq)->validCount >= (mq)->msgCount)
 
 extern __OSEventState __osPiEventState; /* __osEventStateTab[OS_EVENT_PI] */
-extern OSThread *__osRunQueue;      /* __osRunQueue */
 
 extern void __osEnqueueThread(OSThread **queue, OSThread *thread);
 extern OSThread *__osPopThread(OSThread **queue);

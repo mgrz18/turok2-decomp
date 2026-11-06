@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/game.h"
 
 typedef struct Kind {
     s32 value;
@@ -22,10 +23,9 @@ extern s32 Sound__PlayPitched(s32 id, CVector3 pos, s32 arg4, s32 selected, f32 
 extern f32 D_800A65A4;
 extern f32 D_800A65A8;
 extern f32 D_800A65AC;
-extern s32 gEngineApp_m_Settings_paused;
 
 void func_0023801C(s32 arg0, Object *obj, s32 arg2, CVector3 pos, EventParams params) {
-    s32 *global = &gEngineApp_m_Settings_paused;
+    s32 *global = &gEngineApp_m_Settings.paused;
     s32 selected;
     f32 scale;
 

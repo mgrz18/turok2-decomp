@@ -1,8 +1,9 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 void Mp_SetupMatchRules(f32 minutes, s32 a1, s32 started, s32 a3) {
-    GameMatch *m = &gEngineApp_m_Settings_match;
+    GameMatch *m = &gEngineApp_m_Settings.match;
 
     m->tag = started;
     m->teams = a3;

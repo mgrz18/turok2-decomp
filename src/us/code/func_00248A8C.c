@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
 
-extern u8 gEngineApp_m_Settings_multiplayer;            /* multiplayer */
 
 /* Takes every weapon and all ammo away, then gives the starting kit: in
  * multiplayer by character (10 gets weapon 0x22), otherwise the
@@ -16,7 +16,7 @@ void CPlayer__GiveStartingWeapons(CPlayer *p) {
     for (i = 0; i < 0x23; i++) {
         p->m_Data.m_WeaponList[i] = 0;
     }
-    if (gEngineApp_m_Settings_multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         if (p->m_Data.m_nDeathmatchCharacter == 10) {
             p->m_Data.m_WeaponList[0x22] = 1;
             p->m_Data.m_LastWeapon[0] = 0x22;
@@ -46,7 +46,7 @@ void CPlayer__GiveStartingWeapons(CPlayer *p) {
         p->m_Data.m_LastWeapon[1] = 0;
         p->m_Data.m_LastWeapon[2] = 0x13;
     }
-    if (gEngineApp_m_Settings_multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         p->m_WeaponActor.m_AI.m_pModeTable = gWeaponInfoTable[p->m_RequestedWeapon]->modeTable;
         p->m_WeaponActor.m_AI.m_pfEffects = gWeaponInfoTable[p->m_Data.m_CurrentWeapon]->effects;
     }

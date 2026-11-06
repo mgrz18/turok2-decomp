@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/demo.h"
+#include "globals/demo.h"
 
-extern void *gDemoTable_2[]; /* NULL-terminated list */
-extern void Demo_Start_2(void *entry);
+extern void Demo_Start_2(DemoHeader *entry);
 
 void Demo_PlayNext_2(void) {
     DemoPlayer *s = &gDemoPlayer;

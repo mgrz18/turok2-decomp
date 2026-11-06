@@ -1,9 +1,9 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8024D018_3.CPP, func_8024D728_de, with Turok 2's layouts (Turok 2 reads the normal from the region). */
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/math.h"
 
 
-extern f32 gQuaternionSin;
 
 void CGameRegion__GetNormal(CVector3 *normal, void *region);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);     /* cross product */

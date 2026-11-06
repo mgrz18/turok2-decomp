@@ -2,14 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/scene.h"
 
-extern float sLightSphereFalloff[];
 extern float D_800A575C;
 extern float D_800A5760;
 extern float D_800A5758;
 extern float D_800A5750;
 extern float D_800A5754;
-extern float sLightConeFalloff[];
 extern f32 D_800A5764;
 extern void CVector3__Normalize(f32 *);
 s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 arg3,

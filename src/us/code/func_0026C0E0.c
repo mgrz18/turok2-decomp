@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
@@ -11,7 +12,6 @@ typedef struct {
 } Unk0022425C;
 
 void *CScene__GetRegionInfo(s32 *, s32);                /* extern */
-extern s32 gScene;
 
 u8 func_0026C0E0(s32 arg0) {
     void *temp_v0;

@@ -1,11 +1,11 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0024D860.c, func_8024D870_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/math.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 
-extern f32 gQuaternionSin;
 
 s32 CGameRegion__IsSteep(void *region);
 void CGameRegion__GetNormal(CVector3 *normal, void *region);

@@ -1,5 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 /* The scope model raised to the view. */
 typedef struct {
@@ -19,10 +22,6 @@ typedef struct {
     /* 0xB4 */ s32 state;           /* 0 hidden, 1 raising, 2 up, 3 lowering */
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
-
-extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
-extern f32 gFrameIncrement;          /* the frame's time step */
-extern u8 gScene[];         /* the level */
 
 s32 CScene__FindObjectType(void *level, s32 id);
 void *CScene__GetObject(void *level, s32 index);
@@ -50,9 +49,9 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
         m->roll = 3.141593f;
     }
     if (m->requested != m->current && m->state == 0) {
-        index = CScene__FindObjectType(gScene, m->requested);
+        index = CScene__FindObjectType(&gScene, m->requested);
         if (index != -1) {
-            m->model = CScene__GetObject(gScene, index);
+            m->model = CScene__GetObject(&gScene, index);
             m->state = 1;
             m->current = m->requested;
         } else {
@@ -69,7 +68,7 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
                 m->time = 3.75f;
             }
             if (m->current == 0xC83) {
-                if (gEngineApp_m_Settings_multiplayer) {
+                if (gEngineApp_m_Settings.multiplayer) {
                     m->roll = 0.0f;
                     m->pitch = 0.0f;
                 } else {
@@ -91,7 +90,7 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
                 }
             }
             if (m->current == 0xC83) {
-                if (gEngineApp_m_Settings_multiplayer) {
+                if (gEngineApp_m_Settings.multiplayer) {
                     m->roll = 0.0f;
                 } else {
                     m->roll = ((1.0f - m->time * 0.26666668f) * 180.0f + 180.0f) * 0.017453294f;

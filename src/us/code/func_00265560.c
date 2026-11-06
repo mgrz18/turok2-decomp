@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "structs/world.h"
+#include "globals/scene.h"
 
-extern CScene gScene;
 extern s32 CScene__GetInstanceSavedBit(void *, void *);
 void Door_Advance(void *arg0, void *arg1) {
     extern s32 CAI__SetMode(void *, void *, s32);

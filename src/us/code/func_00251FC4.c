@@ -3,6 +3,11 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/camera.h"
+#include "globals/game.h"
+#include "globals/camera.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
+#include "globals/menu_desc.h"
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -41,18 +46,8 @@ typedef struct {
     /* 0x01 */ u8 pad1[0x40 - 1];
 } PortSetup;
 
-extern Globals gEngineApp_m_Game_m_MenuPool;
-extern s32 gEngineApp_m_Settings_paused;
-extern s32 gEngineApp_m_Settings_nextMode;          /* game state */
-extern s32 gEngineApp_m_Settings_matchMode;
-extern s32 gScene_m_LevelID;          /* level */
-extern f32 gFrameIncrement;          /* frame time */
+extern Globals gEngineApp_m_Game_m_MenuPool; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern PortSetup D_8011AB88[];
-extern char gEngineApp_m_Game_m_DebugLines;
-extern char gEngineApp_m_Game_m_CameraPool;
-extern char gPauseMenuDesc;         /* death screen */
-extern char gSavePortalMenuDesc;
-extern char gMissionFailedMenuDesc;         /* key screen */
 
 void CPlayer__Update(CPlayer *p);
 void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *other);
@@ -91,7 +86,7 @@ static __inline__ void reset_strokes(CBarrel *s) {
 static __inline__ s32 in_menu(CPlayer *p) {
     s32 result;
 
-    if (gEngineApp_m_Settings_paused) {
+    if (gEngineApp_m_Settings.paused) {
         return 1;
     }
     result = 0;
@@ -112,7 +107,7 @@ void CPlayerPool__Update(PlayerList *list) {
     u32 hub;
     s32 character;
 
-    if (gEngineApp_m_Settings_nextMode == 0xB || gEngineApp_m_Settings_nextMode == 8) {
+    if (gEngineApp_m_Settings.nextMode == 0xB || gEngineApp_m_Settings.nextMode == 8) {
         return;
     }
     frameTime = gFrameIncrement;
@@ -121,7 +116,7 @@ void CPlayerPool__Update(PlayerList *list) {
             CPlayer__Update(p);
         }
         CPlayer__UpdateOrbitCamera(p, p);
-        Automap_SetPlayer(&gEngineApp_m_Game_m_DebugLines, p->m_CharacterActor.header.m_pCurrentRegion, p->m_CharacterActor.m_RotY, p->m_CharacterActor.header.m_vPos);
+        Automap_SetPlayer(&gEngineApp_m_Game.m_Automap, p->m_CharacterActor.header.m_pCurrentRegion, p->m_CharacterActor.m_RotY, p->m_CharacterActor.header.m_vPos);
     }
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
         CPlayer__ReadInput(&p->m_ContState, p);
@@ -173,7 +168,7 @@ void CPlayerPool__Update(PlayerList *list) {
             p->m_pOptions->m_bActive = 1;
             CPlayer__NewGame(p, character, 1);
             CAI__SetMode(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 2);
-            CPlayer__Warp(p, gEngineApp_m_Settings_matchMode, 0, 1);
+            CPlayer__Warp(p, gEngineApp_m_Settings.matchMode, 0, 1);
             CList__Remove(&list->idle, p);
             CList__AddHead(&list->active, p);
         }

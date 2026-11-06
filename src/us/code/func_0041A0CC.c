@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
-extern s32 sSoundMenuTrack; /* music track */
 extern char D_800B6600[];
 extern char D_800B6618[];
 extern char D_800C1040[]; /* number format */

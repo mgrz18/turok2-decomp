@@ -5,6 +5,9 @@
 #include "structs/world.h"
 #include "structs/list.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
+#include "globals/camera.h"
 
 /* The animation header: what this reads of it. */
 typedef struct AnimInfo {
@@ -13,10 +16,6 @@ typedef struct AnimInfo {
     /* 0x1E */ u16 angle;
 } AnimInfo;
 
-extern CScene gScene;
-extern s32 gPersistentDataLoaded;                  /* effects enabled */
-extern s32 gDefaultVisBits;
-extern s32 gScene_m_bStreamAll;
 extern char D_800A6070[];               /* "anim object index" */
 extern char D_800A6084[];               /* "anim object info" */
 
@@ -40,7 +39,7 @@ void func_0021E5D4(CListedInstance *effect);
 static __inline__ CListedInstance *take_effect(CInstancePool *scene, s32 *ref) {
     CListedInstance *effect;
 
-    if (gScene_m_bStreamAll == 0 && (u32)scene->m_ActiveList.m_nCount >= 3) {
+    if (gScene.m_bStreamAll == 0 && (u32)scene->m_ActiveList.m_nCount >= 3) {
         return NULL;
     }
     effect = scene->m_FreeList.m_pHead;

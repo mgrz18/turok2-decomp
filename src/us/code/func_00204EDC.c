@@ -2,13 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/junk_types.h"
+#include "globals/cache.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern OSMesgQueue gCache_mutex;
-extern s32 gCache_mutex_count;
 B12Node *CCache__AllocateInternal(s32 a, s32 b, u32 c, s32 d);
 B12Node *CCache__Allocate(s32 unused, s32 a1, u32 a2, s32 a3) {
     u32 mask;

@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 
 extern f32 Random_Blend(f32 lo, f32 hi); /* random in range */

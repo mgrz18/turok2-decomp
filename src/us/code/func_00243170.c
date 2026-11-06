@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80213ED4.CPP, func_80213ED4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -120,7 +121,6 @@ struct StateEntry {
     u32 flags;
 };
 extern double D_800A68B8;
-extern f32 gFrameIncrement;
 extern s32 IsCodePointer(StateCallback);
 extern s32 IsDataPointer(u32);
 extern void *CGameObjectInstance__PickAvailableAction(void *, void *, s32);

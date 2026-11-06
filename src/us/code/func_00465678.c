@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/world.h"
+#include "globals/render.h"
 
 s32 CScene__LoadLightSettings_2();                            /* extern */
-extern s32 gFogEnabled;
 
 void CScene__SetupLighting_2(CScene *arg0) {
     CScene__LoadLightSettings_2();

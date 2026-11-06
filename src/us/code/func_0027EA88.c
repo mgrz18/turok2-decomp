@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/camera.h"
 
-extern f32 gScreenClearTime;
 s32 SavedPlayers_IsActive(void);
 
 /* One step of a viewport value toward its target: 16 pixels a frame, or

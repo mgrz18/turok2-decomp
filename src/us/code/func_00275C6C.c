@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/audio.h"
 
-extern int sLoopSoundsLastStarted;
 extern s32 CList__AddTail(CList *list, void *node);
 extern s32 Sound__Play(s16 arg0, CVector3 position, s32 arg4, s32 arg5);
 void *LoopSounds_Start(void *arg0, s32 arg1, CVector3 *arg2, void *arg3, s32 arg4) {

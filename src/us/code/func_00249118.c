@@ -2,9 +2,9 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/game.h"
 
 
-extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
 
 void Controller_SetRumbleOption(s32 arg0, s32 arg1);
 void CPlayer__Dismount(CPlayer *player, s32 arg1);
@@ -32,7 +32,7 @@ void CPlayer__Kill(CPlayer *player, s32 arg1, s32 flags, s32 anim) {
     CPlayer__Dismount(player, arg1);
     GameObject_FireTriggers(arg1, 1, arg1);
     CPlayer__StopLoopingSounds(player);
-    if (gEngineApp_m_Settings_multiplayer != 0) {
+    if (gEngineApp_m_Settings.multiplayer != 0) {
         weapon = player->m_Data.m_CurrentWeapon;
         if (weapon != 32 && weapon != 24 && weapon != 34 && player->m_pOptions->m_TagMode == 0) {
             GameObject_DropPickupAt(player, player->m_CharacterActor.header.m_vPos, gWeaponInfoTable[weapon]->pickupId, 150.0f);

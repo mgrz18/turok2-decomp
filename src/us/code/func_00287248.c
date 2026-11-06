@@ -2,16 +2,10 @@
 #include "common.h"
 #include "structs/game.h"
 #include "gfx.h"
+#include "globals/frame.h"
+#include "globals/render.h"
+#include "globals/engine.h"
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
-extern s32 gVideoClearFrames;          /* frames left to clear the screen */
-extern s32 gDepthBuffer;          /* z-buffer */
-extern s32 gEvenOdd;
-extern f32 gFrameIncrement;          /* frame time */
-extern f32 gRenderTime;          /* render time, seconds */
-extern void (*D_800B6D80[][3])(CEngineApp *);
-extern s32 gNextTicks;
 extern u8 gGfxFrameMessageQueue[];       /* the RSP task queue */
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
 
@@ -128,8 +122,8 @@ void CEngineApp__Draw(CEngineApp *level) {
     Controller_UpdatePakInsertion();
     CCameraPool__Advance(level->m_Game.m_CameraPool);
     CEngineApp__UpdateControllers(level);
-    if (D_800B6D80[level->m_Settings.mode][0] != NULL) {
-        D_800B6D80[level->m_Settings.mode][0](level);
+    if (gEngineModeTable[level->m_Settings.mode].draw != NULL) {
+        gEngineModeTable[level->m_Settings.mode].draw(level);
     }
     if (gFrameData->m_bLines == 0) {
         drawFade(level);

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/game.h"
 
 /* Name entry: highlight the current player's column and load the player's
  * name (trailing spaces trimmed; the default name D_800C1340 counts as empty)

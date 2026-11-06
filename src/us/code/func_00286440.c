@@ -1,5 +1,11 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/game.h"
+#include "globals/menu.h"
+#include "globals/frame.h"
+#include "gfx.h"
+#include "globals/render.h"
+#include "globals/engine.h"
 
 /* gEngineApp_m_Settings_match (GameMatch in structs/game.h) as a local array view, under an
  * alias of the symbol: through it the compiler bases both stores on
@@ -14,14 +20,9 @@ extern u8 gGfxFrameMessageQueue[];
 extern u8 gGfxFrameMessageBuffer[];
 extern u8 gSchedulerStack[];
 extern u8 gScheduler[];
-extern s32 gThreadPriorityScheduler;
 extern u8 gGfxClient[];
-extern s32 gDList;
 extern u8 gIdentityMtx[];
-extern s32 gWarmBoot;
-extern u32 gTotalFramebuffers; /* task count */
 extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("gEngineApp_m_Settings_match");
-extern s32 gCameraPoolHideViews;
 extern s32 gCFB[];
 
 extern void osCreateMesgQueue(void *, void *, s32);
@@ -51,7 +52,7 @@ void CEngineApp__Construct(CEngineApp *state) {
     osScAddClient(gScheduler, gGfxClient, gGfxFrameMessageQueue);
     state->m_Settings.prevMode = -1;
     CEngineApp__InitFade(state);
-    gDList = 0;
+    gDList = NULL;
     guMtxIdent(gIdentityMtx);
     if (gWarmBoot != 0) {
         SavedPlayers_Clear();

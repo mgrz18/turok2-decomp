@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 typedef struct SpawnObj {
     /* 0x000 */ u8 type;            /* 0 = level actor, 1 = game object, 2 = ..., 3 = particle */
@@ -9,7 +10,6 @@ typedef struct SpawnObj {
     /* 0x1C0 */ s32 target;
 } SpawnObj;
 
-extern u8 gScene_m_ParticleSystem[];
 
 void GameObject_TraceMove(SpawnObj *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
 CQuaternion CGameObjectInstance__GetRotation(SpawnObj *obj);
@@ -51,5 +51,5 @@ void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
         rot = func_002156D4(obj);
         break;
     }
-    CParticleSystem__Spawn(gScene_m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
+    CParticleSystem__Spawn(gScene.m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
 }

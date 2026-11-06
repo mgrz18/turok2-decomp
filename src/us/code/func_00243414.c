@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80213ED4.CPP, func_80214178_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -338,7 +339,6 @@ struct TableRecAt8;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CScene gScene;
 s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2);
 extern void AI_StopSound(void *, void *);
 s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/engine.h"
 
 s32 Render_DrawModelShared(s32, s32, s32, s32, s32, s32, s32);
 s32 CGameObjectInstance__DrawModelImmediate(s32, s32, s32);
 
-extern s32 gEvenOdd;
 
 void EnemyAI_DrawNode(s32 arg0, s32 arg1, s32 arg2)
 {

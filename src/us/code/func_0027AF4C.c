@@ -2,7 +2,6 @@
 #include "gfx.h"
 
 
-extern Gfx *gDList;
 void Render_SetRenderMode(s32);
 void Render_SetCombineMode(s32);
 

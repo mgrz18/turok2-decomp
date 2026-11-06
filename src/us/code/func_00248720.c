@@ -3,11 +3,9 @@
 #include "structs/weapon.h"
 #include "structs/player.h"
 #include "structs/camera.h"
-
-extern f32 gWeaponChargeScale;
-extern f32 gProjectileSpeedScale;          /* projectile speed scale */
-extern f32 gProjectilePower;          /* projectile power */
-extern u8 gScene_m_ParticleSystem[];
+#include "globals/scene.h"
+#include "globals/player.h"
+#include "globals/particle.h"
 
 CQuaternion CGameObjectInstance__GetRotation(CPlayer *p);
 AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *p, s32 weapon);
@@ -116,6 +114,6 @@ void CPlayer__FireWeapon(CPlayer *p, s32 type) {
         f = gProjectilePower * 6.0f;
         type = (s32)((f > 6.0f ? 6.0f : f) + 460.0f);
     }
-    CParticleSystem__Spawn(gScene_m_ParticleSystem, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? 5 : 1);
+    CParticleSystem__Spawn(gScene.m_ParticleSystem, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? 5 : 1);
     gProjectilePower = p->weapon_particle_damage_scaler = gWeaponChargeScale = gProjectileSpeedScale = 1.0f;
 }

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/pager.h"
+#include "globals/pager.h"
 
 
 /* The memory region containing page arg0. */

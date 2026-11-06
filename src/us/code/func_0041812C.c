@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu_desc.h"
 
 extern void MenuPool_OpenChildMenu(void *, void *, void *);
-extern char gRumbleNoticeMenuDesc[];
 s32 PlayerSetupMenu_Play(void *first, void *second, void *third) {
-    MenuPool_OpenChildMenu(third, second, gRumbleNoticeMenuDesc);
+    MenuPool_OpenChildMenu(third, second, &gRumbleNoticeMenuDesc);
     return 1;
 }

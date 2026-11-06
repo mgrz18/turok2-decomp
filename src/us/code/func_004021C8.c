@@ -1,10 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
 void CAI__SetMode(void *a0, void *a1, s32 event);
 void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 /* MantidQueen_NextStep */
 static __inline__ void State_NextStep(WaveBossState *s) {
@@ -42,7 +43,7 @@ static __inline__ s32 State_CountActive(WaveBossState *s) {
             n++;
         }
     }
-    for (e = gScene_m_InstancePool_m_ActiveList; e != NULL; e = e->m_pNext) {
+    for (e = gScene.m_InstancePool.m_ActiveList.m_pHead; e != NULL; e = e->m_pNext) {
         if (e->m_Instance.m_AI.m_Health > 0) {
             n++;
         }
@@ -66,7 +67,6 @@ static __inline__ void State_UpdateBoss(WaveBossState *s) {
     }
 }
 
-extern f32 gFrameIncrement;
 void Animator_Update(void *slot);
 s32 Cinema_PathPlaying(void);
 void MantidQueen_SendMinions(WaveBossState *s, s32 *active);

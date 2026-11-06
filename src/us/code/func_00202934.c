@@ -2,10 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/cache.h"
 
-extern s32 gHashTableMask;
-extern s32 gHashMask;
-extern s32 gHashMask;
 void CHashTable__Insert(u32 key,s32 value) {
     extern EntryRecAtCV1 *gHashTable;
  EntryRecAtCV1 *entry = gHashTable + (((key<<5)^(key>>1)^(key>>9)^(key>>17)) & gHashMask);

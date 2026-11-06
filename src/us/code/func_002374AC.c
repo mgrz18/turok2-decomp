@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* A blast: radius, damage, then the push (strength, x, y, z). */
 typedef struct Blast {
@@ -38,7 +39,6 @@ typedef struct PushTarget {
     /* 0x17C */ u32 playerFlags;
 } PushTarget;
 
-extern s32 gScene_m_bStreamAll;
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -56,7 +56,7 @@ void Blast_GetPush(PushSource *src, PushTarget *target, Blast blast, CVector3 *o
     CMtxF m;
     PushTarget *obj;
 
-    if (gScene_m_bStreamAll != 0) {
+    if (gScene.m_bStreamAll != 0) {
         out->x = 0.0f;
         out->y = 0.0f;
         out->z = 0.0f;

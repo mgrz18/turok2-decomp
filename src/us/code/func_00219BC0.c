@@ -2,10 +2,11 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/world.h"
-
-typedef struct {
-    s32 words[6];
-} Lights1; /* libultra Lights1, copied as words */
+#include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/render.h"
+#include "globals/player.h"
+#include "globals/object.h"
 
 s32 CScene__FindObjectType(CScene *, s32);
 CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *);
@@ -19,13 +20,6 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32)
 s32 Instance_NextUniqueId(void);
 void CGameObjectInstance__DrawModelLitVertices(void);
 
-extern CScene gScene;
-extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;      /* player count */
-extern u8 *gEngineApp_m_Game_m_PlayerList_m_Players;      /* players, 0x1328 bytes each */
-extern u8 gWeaponActorTypeInfo[];
-extern void *gIntelligenceTypeInfo[];
-extern Lights1 gDefaultLights;
-
 /* The body (collision) setup for the object's intelligence type; a player's
  * second object (its body at +0x288) gets its own. */
 static __inline__ void *body_setup(CGameObjectInstance *obj) {
@@ -38,13 +32,13 @@ static __inline__ void *body_setup(CGameObjectInstance *obj) {
         return 0;
     }
     if (type == 11) {
-        for (i = 0; i < gEngineApp_m_Game_m_PlayerList_m_nPlayers; i++) {
-            player = gEngineApp_m_Game_m_PlayerList_m_Players + i * 0x1328;
+        for (i = 0; i < gEngineApp_m_Game.m_PlayerList.m_nPlayers; i++) {
+            player = (u8 *)gEngineApp_m_Game_m_PlayerList_m_Players + i * 0x1328;
             if (player == (u8 *) obj) {
                 return 0;
             }
             if (player + 0x288 == (u8 *) obj) {
-                return gWeaponActorTypeInfo;
+                return &gWeaponActorTypeInfo;
             }
         }
     }
@@ -131,7 +125,7 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
     obj->m_dwUniqueID = Instance_NextUniqueId() << 10;
     if (obj->m_dwFlags & 8) {
         obj->m_AI.m_pfDraw = CGameObjectInstance__DrawModelLitVertices;
-        *(Lights1 *) obj->m_Lights[0] = gDefaultLights;
-        *(Lights1 *) obj->m_Lights[1] = gDefaultLights;
+        *(CLights1 *) obj->m_Lights[0] = gDefaultLights;
+        *(CLights1 *) obj->m_Lights[1] = gDefaultLights;
     }
 }

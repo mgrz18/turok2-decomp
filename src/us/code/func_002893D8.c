@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/render.h"
+#include "globals/engine.h"
 
 extern s32 Render_DrawTextLines(s32, s32, void *, s32, s32, s32, f32, f32);
-extern u8 sLegalText[];
-extern s32 gScreenWidth; /* screen width */
 
 void EngineMode01_Legal_Draw(s32 arg0) {
     f32 x;

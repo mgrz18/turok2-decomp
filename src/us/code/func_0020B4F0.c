@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/engine.h"
 
 void *CISet__GetBlock(s32, s32);                  /* extern */
 s32 Model_BlendMorphFrames(s32, f32, void *);            /* extern */
-extern s32 gFrameCount;
 
 typedef struct {
     /* 0x00 */ s32 id;

@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 #include "structs/menu.h"
+#include "globals/engine.h"
 
 extern int Controller_MenuLeft(struct ControllerProfile *object);
 extern int Controller_MenuRight(struct ControllerProfile *object);
 extern f32 D_800C1274[];
-extern f32 gFrameIncrement;
 extern f32 D_800C1274[];
 s32 EnterCheatMenu_UpdateTextField(void *unused, MenuRecAt20V4 *menu) {
     f32 t;

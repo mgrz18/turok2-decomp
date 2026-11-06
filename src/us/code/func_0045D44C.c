@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/render.h"
 
-extern s32 gVideoClearFrames;
 
 void func_0045D44C(void) {
     if (gVideoClearFrames == 0) {

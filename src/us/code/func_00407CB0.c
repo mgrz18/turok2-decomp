@@ -4,6 +4,7 @@
 #include "structs/game_object.h"
 #include "structs/game.h"
 #include "structs/player.h"
+#include "globals/game.h"
 
 /* The object this callback gets (only +0xF8 is used). */
 typedef struct {

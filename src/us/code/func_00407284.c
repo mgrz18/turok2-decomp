@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
 void Primagen_EnterMode1(CGameObjectInstance *obj) {
     if (gLevelScript_bossState.mode == 5) {

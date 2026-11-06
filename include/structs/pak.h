@@ -50,10 +50,6 @@ typedef struct PakQuery {
     /* 0x08 */ s32 freeNotes;       /* Pak_CountEmptyNotes */
 } PakQuery; /* size 0xC */
 
-extern RumblePak gRumblePaks[];      /* per channel: its Rumble Pak */
-extern s32 gPakState[];            /* per channel: the pak state (3: mounted, directory read) */
-extern s32 gPakError[];            /* per channel: the last pak error (0: none) */
-extern OSPfs gPakFileSystems[];          /* per channel: the pak's file system */
 extern PakDirectory *gPakDirectories;    /* per channel: its cached directory */
 
 #endif

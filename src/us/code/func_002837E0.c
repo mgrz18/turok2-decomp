@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/cinema.h"
 
-extern Cinema *gCinemaPlayerP;
 
 void Cinema__Initialize(void) {
     Cinema *p = gCinemaPlayerP;

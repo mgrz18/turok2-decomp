@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x174];
@@ -12,7 +13,6 @@ typedef struct {
     /* 0x244 */ s32 count;
 } Group004035F8;
 
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 s32 MantidQueen_CountActiveMinions(Group004035F8 *group) {
     s32 i;
@@ -24,7 +24,7 @@ s32 MantidQueen_CountActiveMinions(Group004035F8 *group) {
             n++;
         }
     }
-    for (a = gScene_m_InstancePool_m_ActiveList; a != NULL; a = a->m_pNext) {
+    for (a = gScene.m_InstancePool.m_ActiveList.m_pHead; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.m_AI.m_Health > 0) {
             n++;
         }

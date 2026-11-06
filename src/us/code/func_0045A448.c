@@ -5,10 +5,11 @@
 #include "structs/world.h"
 #include "structs/game.h"
 #include "structs/save.h"
+#include "globals/game.h"
 
-extern CScene gScene;
-extern s32 gScene_m_PreviewOptions[];
-extern u8 gLoadSavePersistentData[];
+extern CScene gScene; /* local: globals/scene.h is not included here (its gScene_m_PreviewOptions would clash with this file's local-type view) */
+extern s32 gScene_m_PreviewOptions[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */
+extern u8 gLoadSavePersistentData[]; /* local: globals/scene.h is not included here (its gScene_m_PreviewOptions would clash with this file's local-type view) */
 
 void SaveGame_Restore_2(CPlayer *p) {
     CScene *level = &gScene;

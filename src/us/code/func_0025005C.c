@@ -3,11 +3,11 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/region.h"
+#include "globals/camera.h"
+#include "globals/scene.h"
+#include "globals/engine.h"
 
-extern u8 gScene[];
-extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern char D_800A6EA8[]; /* "Fly Mode Off" */
-extern f32 gFrameIncrement;    /* frame time */
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 f32 Math_StepClamped(f32 value, f32 target, f32 rate);
@@ -63,13 +63,13 @@ void CPlayer__UpdateFlyCheat(CPlayer *player, CGameObjectInstance *body) {
     move.z += player->m_SideSpeed * func_002974C0(body->m_RotY - 1.5707964f);
     CVector3__Scale(&move, &move, gFrameIncrement);
     CVector3__Add(&player->m_vDesiredPos, &player->m_vDesiredPos, &move);
-    floor = CScene__FindRegionAt(gScene, &body->header.m_vPos);
+    floor = CScene__FindRegionAt(&gScene, &body->header.m_vPos);
     if (floor != NULL) {
         body->header.m_pCurrentRegion = floor;
     }
     if (player->m_Mode == 1 && (player->m_ContState.m_dwButtons & 0xE000) == 0xE000 && (player->m_ContState.m_dwButtonsSingle & 0xE000)) {
         CPlayer__SetState(player, body, 2);
-        CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, D_800A6EA8);
+        CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, D_800A6EA8);
         if (floor == NULL) {
             floor = body->header.m_pCurrentRegion;
             body->header.m_vPos = *floor->m_pVertices[0];

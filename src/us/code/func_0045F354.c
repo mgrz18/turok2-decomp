@@ -1,10 +1,9 @@
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 s32 CCache__Deallocate(s32, s32);                /* extern */
 s32 CCache__Flush(s32);                     /* extern */
-extern s32 gPakDirectoryAllocated;
-extern s32 gPakStateBuffer;
 
 void Pak_FreeDirectory_2(void) {
     CCache__Flush(0);
