@@ -2935,7 +2935,7 @@ segments:
       - [0xA691C, .rodata, code/func_0021F7F4]
       - [0xA6928, .rodata, code/func_0021FB10]
       - [0xA692C, rodata]
-      - [0xA6AA0, .rodata, code/func_00429FA0]
+      - [0xA6970, .rodata, code/func_00429FA0]
       - [0xA6AA4, .rodata, code/func_00220530]
       - [0xA6AAC, .rodata, code/func_0022077C]
       - [0xA6AB0, .rodata, code/func_0042AA80]

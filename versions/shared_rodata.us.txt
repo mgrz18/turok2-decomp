@@ -90,7 +90,7 @@ func_00442000 0x800C05C0  # X batch
 func_00443BB4 0x800C0878  # X batch, twin of func_0040ABB4
 func_0045353C 0x800C11E0  # X batch: the warp menu of func_0041A5DC
 func_004549B0 0x800C1328  # X batch: copy of func_0041BA50
-func_00462EC0 0x800A5EA0  # X batch: 1.0f of func_00429FA0, in the engine .rodata
+func_00462EC0 0x800A5D70  # copy of func_00429FA0: its strings and 1.0f, in the engine .rodata
 func_00442500 0x800C05D4  # copy of func_00409500 (X), which now owns the pool
 func_00442784 0x800C05EC  # copy of func_00409784 (X), which now owns the pool
 func_00442A64 0x800C05F8  # twin of func_00409A64 (X), which now owns the pool

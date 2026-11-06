@@ -111,3 +111,11 @@ gSplitScreenMarginLeft = 0x800B6CCC; /* f32 after gSplitScreenMarginTop, read on
  * scalar, which GCC compiles from a symbol of its own but not from gEngineApp_m_Settings.cheatFlags
  * (it bases the load/store on a register). Declared in include/globals/game.h. */
 gEngineApp_m_Settings_cheatFlags = 0x8011AAD8;
+
+/* Literals a converted file emits in its own .rodata and other files of the same
+ * source still read by address: GCC shares a string only within a file, and
+ * those readers are separate C files (docs/MATCHING.md, "Strings shared across
+ * files"). */
+D_800A5D70 = 0x800A5D70; /* "object index", CScene__Construct (func_00429FA0); read by func_0042CE10 (and its copy) */
+D_800A5D80 = 0x800A5D80; /* "geometry", CScene__Construct; read by func_0042CE10 (and its copy) */
+D_800A5D8C = 0x800A5D8C; /* "cartridge index", CScene__Construct; read by func_0042C194, func_0042C560 (and copies) */
