@@ -2,6 +2,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BDB8_de, with Turok 2's layouts. */
 #include "common.h"
 #include "globals/libultra.h"
+#include "globals/render.h"
 
 /* Resizes the selected VI mode around its original horizontal and field centres, keeping the original lower
  * screen limits, then applies it. */
@@ -42,7 +43,6 @@ typedef struct {
 } ViMode; /* OSViMode, 0x50 */
 
 
-extern s16 sViModeIndex; /* selected VI mode */
 extern ViMode sResizedViMode;
 extern void *func_0029E460(void *dst, const void *src, s32 count);
 extern void osViSetMode(ViMode *mode); /* osViSetMode */

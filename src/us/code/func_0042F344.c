@@ -13,7 +13,7 @@ typedef struct Slot {
 } Slot;
 
 void Demo_Update(void);
-extern Slot gControllers_buttons[];
+extern Slot gControllers_buttons[]; /* local type: globals/controller.h declares it; this view (its type here) is what keeps the ROM's code */
 static __inline__ void fire(DemoStream *t) { t->decode(t); }
 static __inline__ void tick(DemoStream *t) { if (--t->frames <= 0) t->decode(t); }
 void Demo_UpdateStreams(void) {

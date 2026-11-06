@@ -78,4 +78,7 @@ extern s32 sTexLastWrapT;
 extern CVector3 sLitVertexOffsets[];
 extern f32 sExpansionPakMtx[2][16];   /* per-frame matrices (Mtx) */
 
+/* The VI mode: the selected mode index */
+extern s16 sViModeIndex;            /* the selected VI mode (osViModeTable index) */
+
 #endif

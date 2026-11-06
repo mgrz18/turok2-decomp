@@ -99,7 +99,7 @@ typedef struct ResourcePageJob {
     u8 *slot;
 } ResourcePageJob;
 extern PagerState gPager; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
-extern char gPager_jobs[];
+extern char gPager_jobs[]; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
 extern void osInvalDCache(u32, s32);
 extern void osInvalICache(u32, s32);
 extern void osStartThread(void *);
