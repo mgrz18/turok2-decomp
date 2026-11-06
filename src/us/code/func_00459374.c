@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/game.h"
 
 /* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
  * and shows the "loaded" message; otherwise reports whether the note could be read. */
@@ -15,7 +16,6 @@ extern s32 sGameNoteLoad;
 extern s32 gPakNoteIndex;
 extern CScene gScene[];
 extern u8 gEngineApp_m_Settings_unk180;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 extern f32 gEngineApp_m_Settings_match_seconds[];
 extern f32 gEngineApp_m_Settings_match_minutes[];
 extern f32 gEngineApp_m_Settings_match_hours[];
@@ -63,7 +63,7 @@ s32 GameNoteMenu_SelectYes_2(s32 unused, Menu *own) {
         gEngineApp_m_Settings_match.frames = c->frames;
         gEngineApp_m_Settings_match_seconds[0] = *new_var;
         gEngineApp_m_Settings_match_minutes[0] = c->minutes;
-        gScene_m_PreviewOptions = gEngineApp_m_Settings_unlockedCheats;
+        gScene_m_PreviewOptions = gEngineApp_m_Settings.unlockedCheats;
         gEngineApp_m_Settings_unk180 = save;
         gEngineApp_m_Settings_match_hours[0] = c->hours;
         src = c->levelFlags;

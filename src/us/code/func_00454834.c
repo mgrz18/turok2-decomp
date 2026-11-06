@@ -4,11 +4,10 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 extern char D_800B5A84[];
 extern char D_800B5AA0[];
 s32 CheatMenu_AllMapText_2(MenuItem *a) {
-    if (gEngineApp_m_Settings_unlockedCheats & 0x2000) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
+    if (gEngineApp_m_Settings.unlockedCheats & 0x2000) a->flags |= 0x1000000; else a->flags &= ~0x1000000;
     if (gEngineApp_m_Settings.cheatFlags & 0x2000) a->text = D_800B5A84; else a->text = D_800B5AA0;
     return 0;
 }

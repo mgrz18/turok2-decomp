@@ -11,4 +11,8 @@
 extern CGame gEngineApp_m_Game;              /* gEngineApp.m_Game */
 extern GameSettings gEngineApp_m_Settings;   /* gEngineApp.m_Settings, gEngineApp_m_Game.m_Settings */
 
+/* Fields of gEngineApp_m_Settings with symbols of their own: where the ROM
+ * bases a load on the field (GCC would base it on the struct otherwise). */
+extern u32 gEngineApp_m_Settings_unlockedCheats;  /* .unlockedCheats */
+
 #endif

@@ -4,12 +4,11 @@
 
 extern char D_800B5AF4[];
 extern char D_800B5B10[];
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 s32 CheatMenu_FrootyStripesText(MenuItem *item)
 {
   s32 var_v0;
   int new_var;
-  if (gEngineApp_m_Settings_unlockedCheats & 0x8000)
+  if (gEngineApp_m_Settings.unlockedCheats & 0x8000)
   {
  new_var = 0x01000000; do { var_v0 = item->flags | new_var; } while (0);
   }

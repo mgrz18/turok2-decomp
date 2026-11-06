@@ -3,13 +3,12 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 
-extern u32 gEngineApp_m_Settings_unlockedCheats; /* unlocked option bits */
 extern char D_800B5ABC[];
 extern char D_800B5AD8[];
 
 /* On/off option item for bit 0x4000: shown only when unlocked. */
 s32 CheatMenu_BlackoutText(MenuItem *a) {
-    if (gEngineApp_m_Settings_unlockedCheats & 0x4000) {
+    if (gEngineApp_m_Settings.unlockedCheats & 0x4000) {
         a->flags |= 0x1000000;
     } else {
         a->flags &= ~0x1000000;

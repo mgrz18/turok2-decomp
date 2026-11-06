@@ -4,11 +4,10 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 extern s32 D_800B57AC;
 extern s32 D_800B57C8;
 s32 CheatMenu_InvincibilityText(struct Func8043D458Arg *arg0) {
-    if (gEngineApp_m_Settings_unlockedCheats & 1) {
+    if (gEngineApp_m_Settings.unlockedCheats & 1) {
         arg0->flags |= 0x01000000;
     } else {
         arg0->flags &= 0xFEFFFFFF;

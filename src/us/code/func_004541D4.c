@@ -10,11 +10,10 @@ struct Func8043D458Arg {
     s8 padC[8];
     s32 *text;
 };
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 extern s32 D_800B57E4;
 extern s32 D_800B5800;
 s32 CheatMenu_InfiniteLivesText_2(struct Func8043D458Arg *arg0) {
-    if (gEngineApp_m_Settings_unlockedCheats & 2) {
+    if (gEngineApp_m_Settings.unlockedCheats & 2) {
         arg0->flags |= 0x01000000;
     } else {
         arg0->flags &= 0xFEFFFFFF;

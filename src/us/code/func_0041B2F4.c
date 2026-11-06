@@ -6,9 +6,8 @@
 
 extern char D_800B5838[];
 extern char D_800B581C[];
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 s32 CheatMenu_AllWeaponsText(struct StateRecAt14 *item) {
-    if (gEngineApp_m_Settings_unlockedCheats & 0x4) {
+    if (gEngineApp_m_Settings.unlockedCheats & 0x4) {
         item->unk8 |= 0x1000000;
     } else {
         item->unk8 &= ~0x1000000;
@@ -20,16 +19,3 @@ s32 CheatMenu_AllWeaponsText(struct StateRecAt14 *item) {
     }
     return 0;
 }
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;

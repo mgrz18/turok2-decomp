@@ -48,11 +48,10 @@ struct TextBoundsText {
     s32 field20;
     struct TextBoundsDescriptor *descriptor;
 };
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 extern s32 D_800B57AC;
 extern s32 D_800B57C8;
 s32 CheatMenu_InvincibilityText_2(TextBoundsText *arg0) {
-    if (gEngineApp_m_Settings_unlockedCheats & 1) {
+    if (gEngineApp_m_Settings.unlockedCheats & 1) {
         arg0->flags |= 0x01000000;
     } else {
         arg0->flags &= 0xFEFFFFFF;

@@ -12,7 +12,7 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-extern u32 gEngineApp_m_Settings_unlockedCheats; /* gEngineApp_m_Settings.flags (see Demo_End) */
+extern u32 gEngineApp_m_Settings_unlockedCheats; /* local type: GameSettings.unlockedCheats; without this declaration here (globals/game.h alone) GCC loads the address instead of the value in the loop */
 extern s32 sCheatsMenuSelection;
 
 /* Picks the first of the 11 options whose flag is set in the settings (-1 if none). */

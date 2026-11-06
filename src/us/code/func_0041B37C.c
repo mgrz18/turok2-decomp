@@ -6,10 +6,8 @@
 
 extern char D_800B5870[];
 extern char D_800B5854[];
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
 s32 CheatMenu_UnlimitedAmmoText(struct StateRecAt14 *item) {
-    if (gEngineApp_m_Settings_unlockedCheats & 0x8) {
+    if (gEngineApp_m_Settings.unlockedCheats & 0x8) {
         item->unk8 |= 0x1000000;
     } else {
         item->unk8 &= ~0x1000000;
@@ -21,15 +19,3 @@ s32 CheatMenu_UnlimitedAmmoText(struct StateRecAt14 *item) {
     }
     return 0;
 }
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
-extern s32 gEngineApp_m_Settings_unlockedCheats;
