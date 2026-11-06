@@ -5,7 +5,6 @@
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern s32 gPager_completion;
-extern s32 D_800AA210;
 void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
 void **CCache__Allocate(s32 arg0, s32 arg1, s32 arg2, void *arg3);
 void osSendMesg(void *arg0, void *arg1, s32 arg2);
@@ -33,7 +32,7 @@ s32 VM_Alloc(s32 arg0, s32 arg1_unused, s32 arg2)
     blk.f34 = (void **) sp10;
     new_var2 = temp_s1 * 4;
     rounded = new_var + 0x18;
-    temp_v0 = CCache__Allocate(0, new_var2 + rounded, 3, &D_800AA210);
+    temp_v0 = CCache__Allocate(0, new_var2 + rounded, 3, "Virtual Region");
     temp_v1 = *temp_v0;
     blk.f30 = temp_v1;
     temp_v1->model = temp_v0;

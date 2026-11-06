@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 
 extern float func_002974C0(float x);
-extern float D_800A7D20;
 extern f32 SmoothStep(f32 arg0);
 f32 SmoothStep(f32 arg0)
 {
@@ -24,5 +23,5 @@ f32 SmoothStep(f32 arg0)
       var_f0 = var_f1;
     }
   }
-  return (D_800A7D20 - func_002974C0(var_f0 * 3.141593f)) * (((struct func_802077F4_S2 *) ((char *) (&D_800A7D20)))->unk4);
+  return (1.0f - func_002974C0(var_f0 * 3.141593f)) * 0.5f;
 }

@@ -5,7 +5,6 @@ s32 CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
 s32 BinarySearch(s32, s32, s32);
 
 extern s32 ProPack__Decompress;
-extern s32 D_800A5F38;
 
 typedef struct {
     /* 0x0 */ u8 pad0[4];
@@ -30,7 +29,7 @@ s32 CScene__LoadBinaryBlock(Unk00224D54 *arg0, s32 arg1, s32 arg2, s32 arg3) {
     temp_a0 = arg0->table;
     temp_v0 = BinarySearch((s32) temp_a0->entries, temp_a0->count, arg1);
     if (temp_v0 != -1) {
-        return CCache__Request(0, CISet__GetROMAddressAndSize(arg0->unk44, arg0->unk18, temp_v0, (s32) &sp20), sp20, arg2, 0, (s32) &ProPack__Decompress, (s32) &D_800A5F38, arg3);
+        return CCache__Request(0, CISet__GetROMAddressAndSize(arg0->unk44, arg0->unk18, temp_v0, (s32) &sp20), sp20, arg2, 0, (s32) &ProPack__Decompress, (s32) "binary block", arg3);
     }
     return 0;
 }
