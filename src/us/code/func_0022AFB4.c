@@ -67,7 +67,9 @@ void CParticle__Update(CParticle *p) {
     scaled = p->m_vSize.y * extent;
     if (!(p->m_vSize.x * extent <= scaled)) {
         /* FAKEMATCH: an always-true test (folded only after CSE) keeps CSE from carrying the
-         * 0.0f of the time check into the code below, as in the ROM. */
+         * 0.0f of the time check into the code below, as in the ROM. Natural shapes of the
+         * maximum (if/else, ternary, MAX macros, inline helpers with one or two returns) all
+         * carry it into `p->m_cFrame = 0.0f` (docs/MATCHING.md, k4 pass). */
         if (p != NULL) {
             scaled = p->m_vSize.x * extent;
         } else {
