@@ -110,7 +110,7 @@ typedef struct CParticle {
     /* 0x040 */ u32 m_dwFlags;
     /* 0x044 */ u8 unk_044[0x48 - 0x44];
     /* 0x048 */ u8 m_mtxDraw[2][0x40];    /* Mtx, one per frame buffer (gEvenOdd) */
-    /* 0x0C8 */ u8 m_Lights[2][0x18];     /* Lights1, one per frame buffer */
+    /* 0x0C8 */ CLights1 m_Lights[2];     /* one per frame buffer */
     /* 0x0F8 */ CROMParticleEffect *m_pEffect;
     /* 0x0FC */ u32 unk_0FC;
     /* 0x100 */ u8 unk_100[0x104 - 0x100];

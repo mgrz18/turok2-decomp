@@ -58,7 +58,7 @@ void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, s32 arg
         CGameObjectInstance__DrawShadow(actor, arg1, params);
     }
     if (params->m_bDraw != 0) {
-        Render_DrawModel(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
+        Render_DrawModel(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, &actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
     }
     gBlendState = 0;
 }

@@ -125,7 +125,7 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
     obj->m_dwUniqueID = Instance_NextUniqueId() << 10;
     if (obj->m_dwFlags & 8) {
         obj->m_AI.m_pfDraw = CGameObjectInstance__DrawModelLitVertices;
-        *(CLights1 *) obj->m_Lights[0] = gDefaultLights;
-        *(CLights1 *) obj->m_Lights[1] = gDefaultLights;
+        obj->m_Lights[0] = gDefaultLights;
+        obj->m_Lights[1] = gDefaultLights;
     }
 }

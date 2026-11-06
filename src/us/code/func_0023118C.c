@@ -103,8 +103,8 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                         node->m_dwFlags |= builtFlag;
                     }
                     if (node->m_pEffect->m_pModel != 0) {
-                        CScene__GetLightsAt(&gScene, &node->header.m_vPos, node->m_Lights[gEvenOdd]);
-                        func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[gEvenOdd], node->m_Lights[gEvenOdd], 0, -1);
+                        CScene__GetLightsAt(&gScene, &node->header.m_vPos, &node->m_Lights[gEvenOdd]);
+                        func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[gEvenOdd], &node->m_Lights[gEvenOdd], 0, -1);
                     } else {
                         CParticle__DrawSprite(node, view);
                     }
