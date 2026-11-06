@@ -6,7 +6,8 @@ what it held (a headless server killed with SIGTERM does not save). So
 every name, prototype, local variable type, data label and comment that
 matters lives in the repo, and this puts it back:
 
-  versions/names.us.txt          function names
+  versions/names.us.txt,
+  versions/names/*.us.txt        function names (data_*.us.txt: data labels)
   tools/ghidra/annotations.json  names Ghidra only (sqrtf), prototypes,
                                  typed locals, data labels, comments
 
@@ -52,12 +53,15 @@ def main():
             return False
 
     ann = json.loads((ROOT / "tools" / "ghidra" / "annotations.json").read_text())
-    names = {}
-    for line in (ROOT / "versions" / "names.us.txt").read_text().splitlines():
-        m = re.match(r"^(\w+)\s*=\s*0x([0-9A-Fa-f]+);", line)
-        if m:
-            names[m.group(2).upper().zfill(8)] = m.group(1)
+    names, data_names = {}, {}
+    files = [ROOT / "versions" / "names.us.txt"] + sorted((ROOT / "versions" / "names").glob("*.us.txt"))
+    for f in files:
+        for line in f.read_text().splitlines():
+            m = re.match(r"^(\w+)\s*=\s*0x([0-9A-Fa-f]+);", line)
+            if m:
+                (data_names if f.name.startswith("data_") else names)[m.group(2).upper().zfill(8)] = m.group(1)
     names.update({a.upper(): n for a, n in ann.get("names", {}).items()})
+    data_names.update({a.upper(): n for a, n in ann.get("data_names", {}).items()})
 
     ok = {k: 0 for k in ("names", "prototypes", "locals", "data", "comments")}
     for addr, name in names.items():
@@ -72,12 +76,12 @@ def main():
         elif new and post("set_local_variable_type", function_address=addr.lower(),
                           variable_name=new, new_type=typ):
             ok["locals"] += 1                   # already renamed by an earlier run
-    for addr, name in ann.get("data_names", {}).items():
+    for addr, name in data_names.items():
         ok["data"] += post("rename_data", address=addr.lower(), new_name=name)
     for addr, text in ann.get("comments", {}).items():
         ok["comments"] += post("set_decompiler_comment", address=addr.lower(), comment=text)
     total = {"names": len(names), "prototypes": len(ann.get("prototypes", {})),
-             "locals": len(ann.get("locals", [])), "data": len(ann.get("data_names", {})),
+             "locals": len(ann.get("locals", [])), "data": len(data_names),
              "comments": len(ann.get("comments", {}))}
     print("  ".join(f"{k} {ok[k]}/{total[k]}" for k in ok))
     return 0

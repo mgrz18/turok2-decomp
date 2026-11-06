@@ -47,6 +47,9 @@ UNDEFINED_EXTRA = $(VERSIONS_DIR)/undefined_funcs_extra.$(VERSION).txt
 # Hand-derived symbols with their derivation recorded. Tracked, unlike the two
 # generated files above.
 SYMS_MANUAL     = $(VERSIONS_DIR)/symbols_manual.$(VERSION).txt
+# The second VM module's data names at their link address, for ld only
+# (tools/apply_names.py writes it; tracked).
+SYMS_NAMES_LD   = $(VERSIONS_DIR)/symbols_names_ld.$(VERSION).txt
 
 # Toolchain (Linux container)
 CROSS    = mips-linux-gnu-
@@ -97,6 +100,9 @@ LD_FLAGS         += -T $(FILTERED_DIR)/$(notdir $(UNDEFINED_EXTRA))
 endif
 ifneq (,$(wildcard $(SYMS_MANUAL)))
 LD_FLAGS         += -T $(SYMS_MANUAL)
+endif
+ifneq (,$(wildcard $(SYMS_NAMES_LD)))
+LD_FLAGS         += -T $(FILTERED_DIR)/$(notdir $(SYMS_NAMES_LD))
 endif
 FOREIGN_LABELS  = $(VERSIONS_DIR)/foreign_labels.$(VERSION).txt
 ifneq (,$(wildcard $(FOREIGN_LABELS)))
@@ -168,7 +174,7 @@ $(TARGET).z64: $(TARGET).elf | $(N64CRC)
 $(TARGET).elf: $(O_FILES) $(LD_SCRIPT)
 	@mkdir -p $(dir $@)
 	$(PYTHON) $(TOOLS_DIR)/filter_defined_syms.py $(FILTERED_DIR) \
-		$(UNDEFINED_SYMS) $(UNDEFINED_FUNCS) $(UNDEFINED_EXTRA) $(SYMS_MANUAL)
+		$(UNDEFINED_SYMS) $(UNDEFINED_FUNCS) $(UNDEFINED_EXTRA) $(SYMS_MANUAL) $(SYMS_NAMES_LD)
 	$(LD) $(LD_FLAGS) -o $@
 
 verify: $(TARGET).z64
