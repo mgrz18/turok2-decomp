@@ -1,10 +1,10 @@
 /* Second VM module copy of Demo_Update. */
 #include "common.h"
 #include "structs/demo.h"
+#include "structs/controller.h"
 
 extern s32 gFrameCountGameplay;
 extern f32 gFrameIncrement;
-extern s32 gMergedController_buttonsSingle;
 
 void func_00469250(void *);
 void CEngineApp__SetupFadeTo(void *, s32);
@@ -28,10 +28,10 @@ void Demo_Update_2(void) {
     s->fastForward = 0;
     s->time += gFrameIncrement;
     if (s->done == 0) {
-        if (--s->countdown <= 0 || gMergedController_buttonsSingle != 0) {
+        if (--s->countdown <= 0 || gMergedController.buttonsSingle != 0) {
             s->done = 1;
             func_00469250(&gEngineApp);
-            if (gMergedController_buttonsSingle != 0) {
+            if (gMergedController.buttonsSingle != 0) {
                 CEngineApp__SetupFadeTo(&gEngineApp, 8);
             }
         }

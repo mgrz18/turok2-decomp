@@ -3,8 +3,8 @@
 
 #include "rw/junk_types.h"
 #include "structs/controller.h"
+#include "globals/controller.h"
 
-extern OSMesgQueue gSiMessageQueue;
 extern OSPfs gPakFileSystems[];
 extern s32 gPakError[];
 extern s32 gPakState[];

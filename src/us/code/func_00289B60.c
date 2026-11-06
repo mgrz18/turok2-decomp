@@ -4,7 +4,7 @@
 s32 CEngineApp__UpdateCinemaMode(s32, s32, s32);
 
 extern s32 gFinalEnding[];
-extern s32 gMergedController_buttonsSingle[];
+extern s32 gMergedController_buttonsSingle[]; /* local type: indexed by a zero variable for the match (gMergedController.buttonsSingle) */
 extern s32 gCreditsDone[];
 extern f32 gCreditsTimeLeft[];
 

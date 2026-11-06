@@ -3,16 +3,14 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "globals/pak.h"
+#include "globals/controller.h"
 
 
 /* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
 
 extern char gRumblePool[];
 extern char gRumbleEntries[];
-extern char gSiMessageQueue[]; /* SI OSMesgQueue */
-extern char gSiMesgBuf[];
 extern u8 gValidControllerBits;     /* controller bit pattern */
-extern s16 gFirstControllerPort;    /* lowest port with a controller */
 extern u8 gNumControllers;     /* number of controllers */
 extern u8 gControllersInitialised;     /* controllers initialised */
 
@@ -30,10 +28,10 @@ s16 Cont_InitAll_2(void) {
 
     RumblePool_Init(gRumblePool, gRumbleEntries, 8);
     gPakQueueState = 2;
-    osCreateMesgQueue(gSiMessageQueue, gSiMesgBuf, 1);
+    osCreateMesgQueue(&gSiMessageQueue, &gSiMesgBuf, 1);
     osCreateMesgQueue(&gPakAccessQueue, gPakMesgBuf, 1);
-    osSetEventMesg(5, gSiMessageQueue, 1);
-    osContInit(gSiMessageQueue, &gValidControllerBits, gContStatus);
+    osSetEventMesg(5, &gSiMessageQueue, 1);
+    osContInit(&gSiMessageQueue, &gValidControllerBits, gContStatus);
     osSendMesg(&gPakAccessQueue, 0, 0);
     gFirstControllerPort = -1;
     gNumControllers = 0;

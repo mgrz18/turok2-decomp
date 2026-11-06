@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "globals/pak.h"
+#include "globals/controller.h"
 
 /* ControllerProfile profile, stride 0x224. */
 
@@ -13,7 +14,6 @@ s32 RumblePool_Init(void *dst, void *src, s32 n);
 u32 osMotorStop(void *pfs);
 
 extern u8 gControllersInitialised;  /* controllers initialised */
-extern u8 gSiMessageQueue;  /* SI OSMesgQueue */
 
 /* Controller_ResetRumble, inlined here. */
 static __inline__ void rumbleReset(ControllerProfile *ctrl) {

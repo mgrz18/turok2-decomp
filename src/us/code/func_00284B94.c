@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "globals/pak.h"
+#include "globals/controller.h"
 
 /* Controller pak / rumble service, run once per frame while enabled. */
 
 extern u8 gControllersInitialised;           /* service enabled */
 extern s32 sControllerRescanTimer;          /* rescan countdown */
 extern u8 gRumblePool[];
-extern u8 gSiMessageQueue[];
 extern s32 gEngineApp_m_Settings_mode;
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flags);
@@ -36,16 +36,16 @@ void Controller_Service(void) {
         case 0:
             if (Controller_AnyPakWatched() != 0) {
                 gPakQueueState = 1;
-                osContStartQuery(gSiMessageQueue);
+                osContStartQuery(&gSiMessageQueue);
                 break;
             }
-            osContStartReadData(gSiMessageQueue);
+            osContStartReadData(&gSiMessageQueue);
             break;
         case 1:
         case 2:
         case 3:
             gPakQueueState = 0;
-            osContStartReadData(gSiMessageQueue);
+            osContStartReadData(&gSiMessageQueue);
             break;
         }
         osSendMesg(&gPakAccessQueue, NULL, 0);
