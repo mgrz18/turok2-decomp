@@ -3,15 +3,9 @@
 
 #include "common.h"
 #include "structs/memory.h"
-
-/* The built-in map: pairs of {last address, flags}, ranges follow each other. */
-typedef struct MemoryBoundaryInit {
-    /* 0x0 */ u32 last;
-    /* 0x4 */ u32 flags;
-} MemoryBoundaryInit; /* i 0x8 */
+#include "globals/hostio.h"
 
 #define osMemSize (*(u32 *) 0x80000318) /* a constant address, not the symbol: extern u32 osMemSize schedules differently (round G2) */
-extern MemoryBoundaryInit gHostIoMemoryBounds[];
 extern u8 sHostIoStopped;
 extern u8 sHostIoResumeAllowed;
 extern s32 HostIo_DisableInt(void);

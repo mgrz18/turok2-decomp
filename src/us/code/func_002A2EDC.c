@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/hostio.h"
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 typedef struct IoReq {
@@ -16,7 +17,6 @@ typedef struct IoReq {
                s32 a2;
                OSMesgQueue *reply;
 } IoReq;
-extern s32 sHostIoState;
 extern OSMesgQueue sHostIoRequestQueue;
 extern OSMesgQueue sHostIoReplyQueue;
 s32 HostIo_DisableInt();

@@ -4,12 +4,12 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/hostio.h"
 typedef u32 OSEvent;
 void osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg msg);
 void osStartThread(OSThread *thread);
 void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
 void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
-extern volatile s32 sHostIoPiReady;
 extern OSMesg sHostIoEventBuf[];
 extern OSMesgQueue sHostIoEventQueue;
 extern OSMesg sHostIoRequestBuf[];

@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/hostio.h"
 
 /* Request block sent to the I/O thread through sHostIoRequestQueue. */
 typedef struct IoRequest {
@@ -26,8 +27,6 @@ typedef struct IoRequest {
     /* 0x1C */ OSMesgQueue *reply;
 } IoRequest; /* size 0x20 */
 
-extern s32 sHostIoPiReady;  /* DMA allowed */
-extern s32 sHostIoState;
 extern OSMesgQueue sHostIoEventQueue;
 extern OSMesgQueue sHostIoRequestQueue;
 extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
