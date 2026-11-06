@@ -712,9 +712,9 @@ files, the tail pool after the microcode (0x800BFD50-) for the bosses,
 menus and pak code, and the data area after .rodata (0x800AB0A8-) for the
 menu tables. Of the 1,054 such extern declarations (273 into the pools,
 781 into the data area), 165 became C literals (108 into the pools are
-left), each file then owning its slice (`[rom, .rodata, code/<file>]` in the yaml) and each
-module-2 copy written like its original and placed over it in
-`versions/shared_rodata.us.txt` (docs/VMASM.md). Where the yaml had given
+left), each file then owning its slice (`[rom, .rodata, code/<file>]`
+in the yaml) and each module-2 copy written like its original and placed
+over it in `versions/shared_rodata.us.txt` (docs/VMASM.md). Where the yaml had given
 the pool to the copy (func_0045302C), the original takes it back.
 
 - **`tools/rodata_check.py` checks a conversion without a build.**
