@@ -14,9 +14,9 @@ typedef struct AnimInfo {
 } AnimInfo;
 
 extern CScene gScene;
-extern s32 D_800B6D54;                  /* effects enabled */
-extern s32 D_800B6D00;
-extern s32 D_8011001C;
+extern s32 gPersistentDataLoaded;                  /* effects enabled */
+extern s32 gDefaultVisBits;
+extern s32 gScene_m_bStreamAll;
 extern char D_800A6070[];               /* "anim object index" */
 extern char D_800A6084[];               /* "anim object info" */
 
@@ -35,12 +35,12 @@ void CGameObjectInstance__Construct(CListedInstance *effect, s32 id, s32 variant
                    f32 scale, CVector3 position, s32 flags, CVector3 color, CVector3 direction, s32 arg12);
 void func_0021E5D4(CListedInstance *effect);
 
-/* Takes a node from the free list when allowed (always with D_8011001C, otherwise while fewer than
+/* Takes a node from the free list when allowed (always with gScene_m_bStreamAll, otherwise while fewer than
  * three are active), moves it to the active list and attaches the counted reference. */
 static __inline__ CListedInstance *take_effect(CInstancePool *scene, s32 *ref) {
     CListedInstance *effect;
 
-    if (D_8011001C == 0 && (u32)scene->m_ActiveList.m_nCount >= 3) {
+    if (gScene_m_bStreamAll == 0 && (u32)scene->m_ActiveList.m_nCount >= 3) {
         return NULL;
     }
     effect = scene->m_FreeList.m_pHead;
@@ -59,14 +59,14 @@ static __inline__ CListedInstance *spawn_effect(CInstancePool *scene, s32 id, s3
                                             CVector3 position, f32 scale, CVector3 direction, CVector3 color, s32 *ref) {
     CListedInstance *effect;
 
-    if (D_800B6D54 == 0 || count == 0) {
+    if (gPersistentDataLoaded == 0 || count == 0) {
         return NULL;
     }
     effect = take_effect(scene, ref);
     if (effect == NULL) {
         return NULL;
     }
-    CGameObjectInstance__Construct(effect, id, variant, D_800B6D00, count, -1, owner, scale, position, 0x80000, color, direction, 0);
+    CGameObjectInstance__Construct(effect, id, variant, gDefaultVisBits, count, -1, owner, scale, position, 0x80000, color, direction, 0);
     func_0021E5D4(effect);
     return effect;
 }

@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/region.h"
 
-extern u32 D_800B6D20;
+extern u32 gFrameCountGameplay;
 
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -29,7 +29,7 @@ CGameRegion *Path_FindFleeRegion(CInstanceHeader *inst, CGameRegion *exclude, CV
     }
     best = NULL;
     bestDist = 0.0f;
-    skipExcluded = D_800B6D20 >> 4;
+    skipExcluded = gFrameCountGameplay >> 4;
     skipExcluded &= 1;
     for (i = 0; i < 3; i++) {
         region = cur->m_pNeighbours[i];

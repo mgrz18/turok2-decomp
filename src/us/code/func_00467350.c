@@ -4,10 +4,10 @@
 #include "structs/player.h"
 
 extern u8 gScene[];  /* the world */
-extern u8 D_8011AAF1;    /* multiplayer */
-extern s32 D_8011ACE4;
-extern s32 D_800ADB5C;
-extern s32 D_800ADB30[];
+extern u8 gEngineApp_m_Settings_multiplayer;    /* multiplayer */
+extern s32 gEngineApp_m_Settings_match_tag;
+extern s32 gTagModeModel;
+extern s32 gCharacterModels[];
 
 extern CIntelligence *CScene__FindIntelligence(void *world, s32 kind, s32 character);
 extern s32 Random_Next(void);
@@ -46,11 +46,11 @@ void CPlayer__SetCharacter_2(CPlayer *p, s32 character) {
     }
     CPlayer__GiveStartingWeapons(p);
     modelId = 0x66;
-    if (D_8011AAF1) {
-        if (D_8011ACE4 != 0 && p->m_pOptions->m_TagMode != 0) {
-            modelId = D_800ADB5C;
+    if (gEngineApp_m_Settings_multiplayer) {
+        if (gEngineApp_m_Settings_match_tag != 0 && p->m_pOptions->m_TagMode != 0) {
+            modelId = gTagModeModel;
         } else {
-            modelId = D_800ADB30[p->m_CharacterActor.header.m_pIntelligence->m_Id];
+            modelId = gCharacterModels[p->m_CharacterActor.header.m_pIntelligence->m_Id];
         }
     }
     CScene__SetInstanceObjectType(gScene, p, modelId, p->m_CharAnim);

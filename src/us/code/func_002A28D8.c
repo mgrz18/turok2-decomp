@@ -4,7 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 
-/* Request block sent to the I/O thread (HostIo_ThreadMain) through D_80128370. */
+/* Request block sent to the I/O thread (HostIo_ThreadMain) through sHostIoRequestQueue. */
 typedef struct IoRequest {
     /* 0x00 */ u8 *buffer;
     /* 0x04 */ s32 size;
@@ -16,9 +16,9 @@ typedef struct IoRequest {
     /* 0x1C */ OSMesgQueue *reply;
 } IoRequest; /* size 0x20 */
 
-extern s32 D_800BC304; /* 2: the I/O thread is running */
-extern OSMesgQueue D_80128370;
-extern OSMesgQueue D_80128540;
+extern s32 sHostIoState; /* 2: the I/O thread is running */
+extern OSMesgQueue sHostIoRequestQueue;
+extern OSMesgQueue sHostIoReplyQueue;
 extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 HostIo_StrSize(u8 *s);
@@ -35,7 +35,7 @@ s32 PCopen(u8 *src, s32 arg) {
     s32 saved;
 
     len = HostIo_StrSize(src);
-    if (D_800BC304 == 2) {
+    if (sHostIoState == 2) {
         req.buffer = src;
         req.size = len;
         req.write = 1;
@@ -43,9 +43,9 @@ s32 PCopen(u8 *src, s32 arg) {
         req.arg0 = len;
         req.arg1 = arg;
         req.arg2 = 0;
-        req.reply = &D_80128540;
-        osSendMesg(&D_80128370, &req, 1);
-        osRecvMesg(&D_80128540, &reply, 1);
+        req.reply = &sHostIoReplyQueue;
+        osSendMesg(&sHostIoRequestQueue, &req, 1);
+        osRecvMesg(&sHostIoReplyQueue, &reply, 1);
         if (reply & 0x8000) {
             reply |= 0xFFFF0000;
         }

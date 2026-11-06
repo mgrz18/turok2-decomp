@@ -10,9 +10,9 @@
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern BlindOnePhase D_0043232C[];
+extern BlindOnePhase sBlindOnePhases_2[];
 extern u8 gScene[];
-extern u8 D_801100F0[];
+extern u8 gEngineApp_m_OnScreen[];
 extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void ScriptAnimator_Start(void *slot, s32 arg1);
 extern void *CScene__FindIntelligence(void *level, s32 arg1, s32 id);
@@ -38,8 +38,8 @@ static __inline__ void nextPhase(BlindOneState *state) {
         state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
-    if (D_0043232C[phase].init != NULL) {
-        D_0043232C[phase].init(state);
+    if (sBlindOnePhases_2[phase].init != NULL) {
+        sBlindOnePhases_2[phase].init(state);
     }
 }
 
@@ -87,7 +87,7 @@ void BlindOne_Setup_2(BlindOneState *state) {
     state->alive1 = 0;
     state->alive2 = 0;
     state->alive3 = 0;
-    COnScreen__SetBoss(D_801100F0, state->boss, "Blind");
+    COnScreen__SetBoss(gEngineApp_m_OnScreen, state->boss, "Blind");
     CScene__UnmarkGeneratorsSaved(gScene);
     nextPhase(state);
 }

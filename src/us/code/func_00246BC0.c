@@ -43,7 +43,7 @@ typedef struct {
 } PlayerInput;
 
 extern f32 gFrameIncrement;
-extern ButtonMap D_800ADA70[];
+extern ButtonMap sControlSide1ButtonMap[];
 f32 Math_DecayToZero(f32 value, f32 rate);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
@@ -78,7 +78,7 @@ void CPlayer__ReadInput(PlayerInput *in, CPlayer *pl) {
     if (opt->m_ControlType < 2) {
         if (opt->m_ControlType >= 0) {
             if (opt->m_ControlSide == 1) {
-                map = D_800ADA70;
+                map = sControlSide1ButtonMap;
             }
         }
     }

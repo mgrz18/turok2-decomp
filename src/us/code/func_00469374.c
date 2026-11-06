@@ -20,11 +20,11 @@ void func_00469374(CEngineApp *game, s32 warpId) {
     if (func_004650B4(gScene, -1, id, sp18, 1) == 0) {
         id = 0;
     }
-    D_8011ACB0.frames = 0;
-    D_8011ACB0.seconds = 0;
-    D_8011ACB0.minutes = 0;
-    D_8011ACB0.hours = 0;
-    D_8011ACB0.unk44 = 0;
+    gEngineApp_m_Settings_match.frames = 0;
+    gEngineApp_m_Settings_match.seconds = 0;
+    gEngineApp_m_Settings_match.minutes = 0;
+    gEngineApp_m_Settings_match.hours = 0;
+    gEngineApp_m_Settings_match.unk44 = 0;
     do {
         game->m_Settings.warpFlags = 0;
         game->m_Settings.matchMode = id;

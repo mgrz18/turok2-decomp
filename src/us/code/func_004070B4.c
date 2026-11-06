@@ -1,6 +1,6 @@
 #include "common.h"
 
-/* D_8012FA10: a small state block; the word before it (D_8012FA0C) is the
+/* gLevelScript_script2_cursor: a small state block; the word before it (gLevelScript_script2_steps) is the
  * script pointer chosen here. */
 typedef struct {
     /* 0x0 */ s32 unk0;
@@ -8,35 +8,35 @@ typedef struct {
     /* 0x8 */ s8 unk8;
 } State;
 
-extern s32 D_004313B4;
-extern s32 D_00431424;
-extern s32 D_004314CC;
-extern s32 D_00431558;
-extern s32 D_00431590;
-extern State D_8012FA10;
+extern s32 sPrimagenSpawnScript1;
+extern s32 sPrimagenSpawnScript2;
+extern s32 sPrimagenSpawnScript3;
+extern s32 sPrimagenSpawnScript4;
+extern s32 sPrimagenSpawnScript5;
+extern State gLevelScript_script2_cursor;
 
-#define SCRIPT (((s32 **) &D_8012FA10)[-1])
+#define SCRIPT (((s32 **) &gLevelScript_script2_cursor)[-1])
 
 void Primagen_SetSpawnScript(s32 arg0) {
-    D_8012FA10.unk0 = -1;
-    D_8012FA10.unk8 = 1;
-    D_8012FA10.unk4 = -1;
+    gLevelScript_script2_cursor.unk0 = -1;
+    gLevelScript_script2_cursor.unk8 = 1;
+    gLevelScript_script2_cursor.unk4 = -1;
     if (arg0 == 0) {
         SCRIPT = NULL;
     }
     if (arg0 == 1) {
-        SCRIPT = &D_004313B4;
+        SCRIPT = &sPrimagenSpawnScript1;
     }
     if (arg0 == 2) {
-        SCRIPT = &D_00431424;
+        SCRIPT = &sPrimagenSpawnScript2;
     }
     if (arg0 == 3) {
-        SCRIPT = &D_004314CC;
+        SCRIPT = &sPrimagenSpawnScript3;
     }
     if (arg0 == 4) {
-        SCRIPT = &D_00431558;
+        SCRIPT = &sPrimagenSpawnScript4;
     }
     if (arg0 == 5) {
-        SCRIPT = &D_00431590;
+        SCRIPT = &sPrimagenSpawnScript5;
     }
 }

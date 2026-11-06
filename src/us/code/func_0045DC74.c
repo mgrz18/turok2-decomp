@@ -13,12 +13,12 @@ extern char D_800B4470[];
 extern char D_800B450C[];
 extern char D_800B4574[];
 extern char D_800B4588[];
-extern s32 D_80130A30;
+extern s32 sMissionHub;
 
 s32 MissionMenu_UpdateObjective2Count_2(MenuItem *item) {
     s32 rank = -1;
 
-    switch (D_80130A30) {
+    switch (sMissionHub) {
         case -1:
         case 0:
         default:

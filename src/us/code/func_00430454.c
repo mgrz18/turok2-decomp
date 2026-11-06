@@ -19,11 +19,11 @@ void func_00430454(CEngineApp *session, s32 warp) {
     if (CScene__FindWarpDests(gScene, -1, warp, &point, 1) == 0) {
         warp = 0;
     }
-    D_8011ACB0.frames = 0;
-    D_8011ACB0.seconds = 0;
-    D_8011ACB0.minutes = 0;
-    D_8011ACB0.hours = 0;
-    D_8011ACB0.unk44 = 0;
+    gEngineApp_m_Settings_match.frames = 0;
+    gEngineApp_m_Settings_match.seconds = 0;
+    gEngineApp_m_Settings_match.minutes = 0;
+    gEngineApp_m_Settings_match.hours = 0;
+    gEngineApp_m_Settings_match.unk44 = 0;
     do {
         session->m_Settings.warpFlags = 0;
         session->m_Settings.matchMode = warp;

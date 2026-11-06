@@ -2,14 +2,14 @@
 #include "ultra_types.h"
 
 s32 __osDisableInt();                                /* extern */
-s32 __osRestoreInt(s32);                         extern __OSViContext *D_800B7AC4; /* __osViNext */
+s32 __osRestoreInt(s32);                         extern __OSViContext *__osViNext; /* __osViNext */
 
 /* libultra's osViSwapBuffer. */
 void osViSwapBuffer(void *frameBufPtr) {
     s32 temp_v0;
 
     temp_v0 = __osDisableInt();
-    D_800B7AC4->framep = frameBufPtr;
-    D_800B7AC4->state = (u16) (D_800B7AC4->state | VI_STATE_BUFFER_UPDATED);
+    __osViNext->framep = frameBufPtr;
+    __osViNext->state = (u16) (__osViNext->state | VI_STATE_BUFFER_UPDATED);
     __osRestoreInt(temp_v0);
 }

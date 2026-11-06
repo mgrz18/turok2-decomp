@@ -6,30 +6,30 @@
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
 
-extern s32 D_80130984;
-extern s32 D_801309A0;
-extern s32 D_80130994;
-extern s32 D_801309B4;
-extern s32 D_800C2024;
-extern s32 D_801309BC;
-extern s32 D_80130990;
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuWrites;
+extern s32 gPakMenuIsLoad;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuMode;
+extern s32 gPakMenuLeaving;
+extern s32 gPakMenuAnyPak;
 extern s32 D_8011F144;
-extern s32 D_800C202C;
-extern s32 D_8011F13C;
-extern s32 D_800C2028; /* pad */
-extern s32 D_8011B108;
+extern s32 sPakMenuStartLatched;
+extern s32 gPakCheckHasPak;
+extern s32 gPakMenuPort; /* pad */
+extern s32 gPakMenuStartPressed;
 extern s32 D_8011B114;
-extern char D_800B45C0[];
-extern char D_800B45CC[];
+extern char gPakCharacterNoteName[];
+extern char gPakGameNoteName[];
 extern s32 D_800F70A8;
-extern u8 D_80119E2C[];
+extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gEngineApp[];
-extern u8 D_0043BCFC[];
-extern u8 D_0043BCB4[];
-extern u8 D_0043C05C[];
-extern u8 D_0043B738[];
-extern u8 D_0043C1E8[];
-extern u8 D_0043C1C4[];
+extern u8 gPakMsgNoControllerDesc[];
+extern u8 gPakMsgCannotSaveDesc[];
+extern u8 gDamagedPakAtBootMenuDesc[];
+extern u8 gPakSaveGameAnyPakMenuDesc[];
+extern u8 gPakConfirmNoSpaceAllDesc[];
+extern u8 gPakConfirmNoSpaceDesc[];
 s32 Controller_AnyConnected(void);
 void CEngineApp__UpdateControllers(u8 *a);
 s32 Str_Compare(u8 *a, char *b);
@@ -46,34 +46,34 @@ s32 PakMenu_CheckSlotForSave(Menu *o, s32 a, s32 *b, s32 *c);
 void MenuPool_OpenMenu(u8 *a, u8 *b, s32 c, ControllerProfile *d, void *e);
 
 #define PAK_ERROR()                                                        \
-    D_801309BC = 1;                                                        \
+    gPakMenuLeaving = 1;                                                        \
     D_8011F144 = 0;                                                        \
-    MenuPool_OpenMenu(D_80119E2C, D_0043BCB4, arg0->player, arg0->controller, NULL); \
-    D_8011F13C = 0;                                                        \
-    D_800C202C = 1;
+    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgCannotSaveDesc, arg0->player, arg0->controller, NULL); \
+    gPakCheckHasPak = 0;                                                        \
+    sPakMenuStartLatched = 1;
 
 void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     u8 buf[16];
     s32 sp28, sp2C, sp30, sp34, sp38, sp3C;
     s32 s0, s1, s2, s3, f1, v0, m1, r2;
 
-    D_80130984 = 0;
-    D_801309A0 = 1;
-    D_80130994 = 0;
-    D_801309B4 = 0;
-    D_800C2024 = 0;
-    D_801309BC = 0;
-    D_80130990 = 1;
+    gPakMenuIsSave = 0;
+    gPakMenuWrites = 1;
+    gPakMenuIsLoad = 0;
+    gPakMenuIsProfile = 0;
+    gPakMenuMode = 0;
+    gPakMenuLeaving = 0;
+    gPakMenuAnyPak = 1;
     if (Controller_AnyConnected() == 0) {
-        D_801309BC = 1;
+        gPakMenuLeaving = 1;
         D_8011F144 = 0;
-        MenuPool_OpenMenu(D_80119E2C, D_0043BCFC, arg0->player, arg0->controller, NULL);
-        D_800C202C = 1;
-        D_8011F13C = 0;
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgNoControllerDesc, arg0->player, arg0->controller, NULL);
+        sPakMenuStartLatched = 1;
+        gPakCheckHasPak = 0;
         return;
     }
     s0 = 0;
-    if (D_800C2028 == -1) {
+    if (gPakMenuPort == -1) {
         s1 = 0;
         do {
             Pak_ProbeSlot(s0);
@@ -89,24 +89,24 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
         if (s1 == 4) {
             s0 = -1;
         }
-        D_800C2028 = s0;
+        gPakMenuPort = s0;
         if (s0 == -1) {
             PAK_ERROR()
             return;
         }
     }
-    if (Pak_NeedsRepair(D_800C2028) != 0) {
+    if (Pak_NeedsRepair(gPakMenuPort) != 0) {
         goto blk59;
     }
     CEngineApp__UpdateControllers(gEngineApp);
-    if ((arg0->controller->buttons & 0x1000) && D_800C202C == 0) {
-        D_8011B108 = 1;
-        D_800C202C = 1;
+    if ((arg0->controller->buttons & 0x1000) && sPakMenuStartLatched == 0) {
+        gPakMenuStartPressed = 1;
+        sPakMenuStartLatched = 1;
     }
-    D_800C202C = 1;
-    if (D_8011B114 != 0 || D_8011B108 != 0) {
-        Pak_ProbeSlot(D_800C2028);
-        if (Pak_GetStatus(D_800C2028) != -2) {
+    sPakMenuStartLatched = 1;
+    if (D_8011B114 != 0 || gPakMenuStartPressed != 0) {
+        Pak_ProbeSlot(gPakMenuPort);
+        if (Pak_GetStatus(gPakMenuPort) != -2) {
             goto fin;
         }
         PAK_ERROR()
@@ -115,17 +115,17 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
     s3 = 0;
     s2 = s3;
     sp2C = -1;
-    sp28 = D_800C2028;
+    sp28 = gPakMenuPort;
     do {
-        if (D_800C2028 != -1) {
-            s3 = PakMenu_CheckSlotForSave(arg0, D_800C2028, &sp28, &sp2C);
+        if (gPakMenuPort != -1) {
+            s3 = PakMenu_CheckSlotForSave(arg0, gPakMenuPort, &sp28, &sp2C);
             if (s3 != 0) {
                 goto found;
             }
         }
         s0 = 0;
-        if (D_800C2028 != -1) {
-            s0 = D_800C2028 + 1;
+        if (gPakMenuPort != -1) {
+            s0 = gPakMenuPort + 1;
             if (s0 >= 4) {
                 s0 = 0;
             }
@@ -145,24 +145,24 @@ void PakMenu_InitSaveGameAnyPak(Menu *arg0) {
         if (s1 == 4) {
             s0 = -1;
         }
-        D_800C2028 = s0;
+        gPakMenuPort = s0;
         s2++;
     } while (s2 < 4);
     if (s3 == 0) {
-        D_800C2028 = sp28;
+        gPakMenuPort = sp28;
         Pak_ProbeSlot(sp28);
-        if (Pak_GetStatus(D_800C2028) == -2) {
+        if (Pak_GetStatus(gPakMenuPort) == -2) {
             PAK_ERROR()
             return;
         }
     }
 found:
-    s1 = D_800C2028;
+    s1 = gPakMenuPort;
     s0 = 0;
     do {
         Pak_GetNoteGameName(s1, s0, &sp30);
         Pak_DecodeText(sp30, buf, 0x10);
-        if (Str_Compare(buf, D_800B45C0) == 0) {
+        if (Str_Compare(buf, gPakCharacterNoteName) == 0) {
             f1 = 1;
             goto L2;
         }
@@ -170,12 +170,12 @@ found:
     } while (s0 < 0x10);
     f1 = 0;
 L2:
-    s1 = D_800C2028;
+    s1 = gPakMenuPort;
     s0 = 0;
     do {
         Pak_GetNoteGameName(s1, s0, &sp34);
         Pak_DecodeText(sp34, buf, 0x10);
-        if (Str_Compare(buf, D_800B45CC) == 0) {
+        if (Str_Compare(buf, gPakGameNoteName) == 0) {
             v0 = 1;
             goto L3;
         }
@@ -189,10 +189,10 @@ L3:
     if (v0 != 0) {
         goto fin;
     }
-    if (Pak_GetFreePages(D_800C2028, &sp38) != 0) {
+    if (Pak_GetFreePages(gPakMenuPort, &sp38) != 0) {
         goto blk59;
     }
-    s0 = Pak_CountEmptyNotes(D_800C2028, &sp3C);
+    s0 = Pak_CountEmptyNotes(gPakMenuPort, &sp3C);
     if (s0 != 0) {
         goto blk59;
     }
@@ -202,9 +202,9 @@ L3:
         goto L56;
     }
     if (sp38 < m1) {
-        D_801309BC = 1;
-        D_8011B108 = 1;
-        MenuPool_OpenMenu(D_80119E2C, D_0043C1E8, arg0->player, arg0->controller, D_0043B738);
+        gPakMenuLeaving = 1;
+        gPakMenuStartPressed = 1;
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakConfirmNoSpaceAllDesc, arg0->player, arg0->controller, gPakSaveGameAnyPakMenuDesc);
         goto after;
     }
     if (sp38 < r2) {
@@ -212,21 +212,21 @@ L3:
     }
     goto after;
 L56:
-    D_801309BC = 1;
-    D_8011B108 = 1;
-    MenuPool_OpenMenu(D_80119E2C, D_0043C1C4, arg0->player, arg0->controller, D_0043B738);
+    gPakMenuLeaving = 1;
+    gPakMenuStartPressed = 1;
+    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakConfirmNoSpaceDesc, arg0->player, arg0->controller, gPakSaveGameAnyPakMenuDesc);
 after:
     if (s0 == 0) {
         goto fin;
     }
 blk59:
-    D_801309BC = 1;
-    D_8011B108 = 1;
-    MenuPool_OpenMenu(D_80119E2C, D_0043C05C, arg0->player, arg0->controller, D_0043B738);
+    gPakMenuLeaving = 1;
+    gPakMenuStartPressed = 1;
+    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, arg0->player, arg0->controller, gPakSaveGameAnyPakMenuDesc);
 fin:
-    if (D_801309BC == 0) {
+    if (gPakMenuLeaving == 0) {
         PakMenu_UpdateNoteRows(arg0);
     }
-    D_8011F13C = 0;
-    D_800C202C = 1;
+    gPakCheckHasPak = 0;
+    sPakMenuStartLatched = 1;
 }

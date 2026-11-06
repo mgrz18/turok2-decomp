@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-extern s32 D_80119E2C;
+extern s32 gEngineApp_m_Game_m_MenuPool;
 extern f32 gFrameIncrement;      /* frame step */
 
 s32 Cinema_IsActive(void);
@@ -31,7 +31,7 @@ void CBarrel__Update(CBarrel *menu, CPlayer *player, u32 *input) {
     do {
         menu->m_bStickWheel = player->m_pOptions->m_WeaponSelect == 1;
     } while (0);
-    if (D_80119E2C != 0 && menu->m_State != 0) {
+    if (gEngineApp_m_Game_m_MenuPool != 0 && menu->m_State != 0) {
         CBarrel__Close(menu);
         return;
     }

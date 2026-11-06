@@ -31,17 +31,17 @@ extern f32 D_800A65F8;
 void func_00239254(B15Src *act, B15Src *src, s32 c, CVector3 pos, B15Blk8 k) {
     f32 vol = D_800A65F0;
     void *s = (void *)-1;
-    if (D_8011AAD8.paused == 0 && GameObject_GetFloorKind(act) == k.c) {
+    if (gEngineApp_m_Settings.paused == 0 && GameObject_GetFloorKind(act) == k.c) {
         switch (src->type) {
         case 0:
             s = src->unk80;
             break;
         case 1:
             if (act->def->type == 1) {
-                if (D_8011AAD8.cheatFlags & 0x40) {
+                if (gEngineApp_m_Settings.cheatFlags & 0x40) {
                     vol = D_800A65F4;
                 }
-                if (D_8011AAD8.cheatFlags & 0x20) {
+                if (gEngineApp_m_Settings.cheatFlags & 0x20) {
                     vol = D_800A65F8;
                 }
             }

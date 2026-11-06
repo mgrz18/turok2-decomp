@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 
 /* The boss state at D_8012F978: an object, and a word at 0x64; the word
- * before it (D_8012F974) is a second object. */
+ * before it (gLevelScript_found) is a second object. */
 typedef struct {
     /* 0x00 */ CGameObjectInstance *obj;
     /* 0x04 */ u8 pad4[0x64 - 0x4];

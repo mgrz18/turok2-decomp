@@ -11,9 +11,9 @@ typedef struct MemoryBoundaryInit {
 } MemoryBoundaryInit; /* i 0x8 */
 
 extern u32 osMemSize; /* 0x80000318 (ultralib), defined by the linker script */
-extern MemoryBoundaryInit D_800B7600[];
-extern u8 D_80128880;
-extern u8 D_80128882;
+extern MemoryBoundaryInit gHostIoMemoryBounds[];
+extern u8 sHostIoStopped;
+extern u8 sHostIoResumeAllowed;
 extern s32 HostIo_DisableInt(void);
 extern void func_002A3100(void);
 extern void HostIo_WriteWord(u32 address, u32 value);
@@ -30,31 +30,31 @@ void HostIo_Init(void) {
     func_002A3100();
     HostIo_WriteWord(0xB1FFFFF0, 0);
     HostIo_WriteWord(0xB1FFFFFC, 0);
-    D_80128880 = 1;
+    sHostIoStopped = 1;
     i = osMemSize;
-    D_80128882 = 0xFF;
+    sHostIoResumeAllowed = 0xFF;
     if (i > 0x3FFFFF && (i & 0x1FFFF) == 0 && i <= 0x2000000) {
         i--;
-        D_800B7600[1].last = i + 0x80000000;
-        D_800B7600[3].last = i + 0xA0000000;
+        gHostIoMemoryBounds[1].last = i + 0x80000000;
+        gHostIoMemoryBounds[3].last = i + 0xA0000000;
     }
 
-    src = (u32 *) D_800B7600;
+    src = (u32 *) gHostIoMemoryBounds;
     first = 0x80000000;
     while (*src < first) {
         src += 2;
     }
     i = 0;
     do {
-        D_80128130[i].m_First = first;
-        D_80128130[i].m_Last = *src++;
-        D_80128130[i].m_Flags = *src++;
-        first = D_80128130[i].m_Last + 1;
+        sHostIoMemoryRanges[i].m_First = first;
+        sHostIoMemoryRanges[i].m_Last = *src++;
+        sHostIoMemoryRanges[i].m_Flags = *src++;
+        first = sHostIoMemoryRanges[i].m_Last + 1;
         i++;
     } while (first != 0);
     for (; i < 16; i++) {
-        D_80128130[i].m_First = -1;
-        D_80128130[i].m_Flags = 0;
+        sHostIoMemoryRanges[i].m_First = -1;
+        sHostIoMemoryRanges[i].m_Flags = 0;
     }
     HostIo_RestoreInt(saved);
 }

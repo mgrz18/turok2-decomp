@@ -17,8 +17,8 @@ typedef struct {
 
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
-extern CGameRegion *D_800B2600;    /* triangle of the cached ceiling normal */
-extern CVector3 D_800F2000;        /* cached raw ceiling normal */
+extern CGameRegion *sCachedCeilingRawNormalRegion;    /* triangle of the cached ceiling normal */
+extern CVector3 sRegionCeilingNormal;        /* cached raw ceiling normal */
 
 /* Raw normal of a triangle's ceiling plane (straight down for none), cached for the last triangle. */
 CVector3 *CGameRegion__GetCeilingNormalRaw(CVector3 *out, CGameRegion *tri) {
@@ -26,19 +26,19 @@ CVector3 *CGameRegion__GetCeilingNormalRaw(CVector3 *out, CGameRegion *tri) {
     CVector3 b;
 
     if (tri == NULL) {
-        D_800F2000.x = 0;
-        D_800F2000.z = 0;
-        D_800F2000.y = -1.0f;
-    } else if (tri != D_800B2600) {
+        sRegionCeilingNormal.x = 0;
+        sRegionCeilingNormal.z = 0;
+        sRegionCeilingNormal.y = -1.0f;
+    } else if (tri != sCachedCeilingRawNormalRegion) {
         a.x = CEILING_VERTEX(tri, 1)->x - CEILING_VERTEX(tri, 0)->x;
         a.y = CEILING_VERTEX(tri, 1)->ceiling - CEILING_VERTEX(tri, 0)->ceiling;
         a.z = CEILING_VERTEX(tri, 1)->z - CEILING_VERTEX(tri, 0)->z;
         b.x = CEILING_VERTEX(tri, 2)->x - CEILING_VERTEX(tri, 1)->x;
         b.y = CEILING_VERTEX(tri, 2)->ceiling - CEILING_VERTEX(tri, 1)->ceiling;
         b.z = CEILING_VERTEX(tri, 2)->z - CEILING_VERTEX(tri, 1)->z;
-        CVector3__Cross(&D_800F2000, &b, &a);
+        CVector3__Cross(&sRegionCeilingNormal, &b, &a);
     }
-    *out = D_800F2000;
-    D_800B2600 = tri;
+    *out = sRegionCeilingNormal;
+    sCachedCeilingRawNormalRegion = tri;
     return out;
 }

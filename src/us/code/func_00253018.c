@@ -19,7 +19,7 @@ struct Shared_ActorView {
     struct Shared_ActorView *next; /* 0x1320 */
 };
 
-extern u8 D_8011AAD8[]; /* Shared_Game */
+extern u8 gEngineApp_m_Settings[]; /* Shared_Game */
 
 extern void Actor_ReloadAnimInfo(void *arg0, s32 arg1);
 extern s32 CGameObjectInstance__LoadBoneMatrices(void *arg0, s32 arg1);
@@ -33,7 +33,7 @@ void CPlayerPool__PreUpdate(struct ObjectPool *arg0) {
     }
     node = arg0->object_queue.m_pHead;
     if (node != 0) {
-        u8 *base = D_8011AAD8;
+        u8 *base = gEngineApp_m_Settings;
         do {
             CGameObjectInstance__ClearDrawMatrices(node);
             CGameObjectInstance__ClearDrawMatrices(&((struct Shared_ActorView *)(node))->weapon);

@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern s32 D_800AB0B8;
-extern s32 D_800AB0B0;
+extern s32 gHashSize;
 void CHashTable__GetLongestChain(void) {
-    extern s32 D_800D81C4;
+    extern s32 gHashTable;
     s32 var_a1;
     s32 var_v1;
     u32 var_a0;
@@ -16,7 +16,7 @@ void CHashTable__GetLongestChain(void) {
     Shared_HashLink *buckets;
     var_a1 = 0;
     var_a0 = var_a1;
-    limit = D_800AB0B0;
+    limit = gHashSize;
     if (limit != 0) {
         var_v1 = limit;
         do {
@@ -24,8 +24,8 @@ void CHashTable__GetLongestChain(void) {
         } while (var_a0 < (u32)var_v1);
     }
     var_a0_2 = 0;
-    if (D_800AB0B0 != 0) {
-        buckets = (Shared_HashLink *)D_800D81C4;
+    if (gHashSize != 0) {
+        buckets = (Shared_HashLink *)gHashTable;
         do {
             var_v0 = &buckets[var_a0_2];
             var_v1 = 0;
@@ -40,7 +40,7 @@ void CHashTable__GetLongestChain(void) {
             }
             var_a0_2 += 1;
             var_a1 = var_v1;
-        } while (var_a0_2 < D_800AB0B0);
+        } while (var_a0_2 < gHashSize);
     }
     if (D_800AB0B8 != 0) {
         D_800AB0B8 = 0;

@@ -16,22 +16,22 @@ typedef struct {
     s32 w;
 } PadSel;
 
-extern s32 D_80130984;
-extern s32 D_801309A0;
-extern s32 D_80130994;
-extern s32 D_801309B4;
-extern s32 D_800C2024;
-extern s32 D_801309BC;
-extern s32 D_80130990;
-extern s32 D_800C2020;
-extern s32 D_80130940;
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuWrites;
+extern s32 gPakMenuIsLoad;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuMode;
+extern s32 gPakMenuLeaving;
+extern s32 gPakMenuAnyPak;
+extern s32 gDamagedPakContinued;
+extern s32 gCameraPoolHideViews;
 extern s32 D_800F70A8; /* save size */
-extern u8 D_80119E2C[];
-extern u8 D_0043BE14[];
-extern u8 D_0043BB68[];
-extern u8 D_0043BF7C[];
-extern u8 D_0043B634[];
-extern u8 D_0043BB20[];
+extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern u8 gSavePortalMenuDescB_2[];
+extern u8 gPakMsgInsertToSaveDesc_2[];
+extern u8 gDamagedPakAtBootMenuDesc_2[];
+extern u8 gPakSaveGameMenuDesc_2[];
+extern u8 gPakMsgPakNotFoundDesc_2[];
 void Pak_ProbeSlot_2(s32 ch);
 s32 Pak_GetStatus_2(s32 ch);
 s32 Pak_IsRumblePak_2(s32 ch);
@@ -46,32 +46,32 @@ void PakMenu_InitSaveGame_2(Menu *own) {
     CPlayer *p;
     PadSel sel;
 
-    D_80130984 = 1;
-    D_801309A0 = 1;
-    D_80130994 = 0;
-    D_801309B4 = 0;
-    D_800C2024 = 0;
-    D_801309BC = 0;
-    D_80130990 = 0;
+    gPakMenuIsSave = 1;
+    gPakMenuWrites = 1;
+    gPakMenuIsLoad = 0;
+    gPakMenuIsProfile = 0;
+    gPakMenuMode = 0;
+    gPakMenuLeaving = 0;
+    gPakMenuAnyPak = 0;
     sel.v = own->controller->port;
     {
         register CPlayer *pp asm("$2") = own->player;
 
         plr = pp;
     }
-    if (D_800C2020 != 0) {
+    if (gDamagedPakContinued != 0) {
         p = plr;
-        D_801309BC = 1;
-        MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, D_0043BE14, p, p->m_ContState.m_pContState, NULL);
-        D_80130940 = 0;
+        gPakMenuLeaving = 1;
+        MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, gSavePortalMenuDescB_2, p, p->m_ContState.m_pContState, NULL);
+        gCameraPoolHideViews = 0;
     } else {
         Pak_ProbeSlot_2(own->controller->port);
         p = plr;
         if (Pak_GetStatus_2(sel.v) == 0) {
             SaveGame_Build_2(plr);
             {
-                u32 crc = Crc32_Compute_2(D_800C2018, D_800F70A8 + 0x684, 0xB);
-                s32 buf = (s32)D_800C2018;
+                u32 crc = Crc32_Compute_2(gSaveBuffer, D_800F70A8 + 0x684, 0xB);
+                s32 buf = (s32)gSaveBuffer;
                 s32 size = D_800F70A8;
 
                 *(u32 *)(size + buf + 0x684) = crc;
@@ -80,13 +80,13 @@ void PakMenu_InitSaveGame_2(Menu *own) {
         } else {
             register s32 one asm("$17") = 1;
 
-            D_801309BC = one;
+            gPakMenuLeaving = one;
             if (Pak_IsRumblePak_2(sel.v) != 0) {
-                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, D_0043BB68, p, p->m_ContState.m_pContState, (void *)one);
+                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, gPakMsgInsertToSaveDesc_2, p, p->m_ContState.m_pContState, (void *)one);
             } else if (Pak_NeedsRepair_2(sel.v) != 0) {
-                MenuPool_OpenMenu_2(D_80119E2C, D_0043BF7C, p, p->m_ContState.m_pContState, D_0043B634);
+                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc_2, p, p->m_ContState.m_pContState, gPakSaveGameMenuDesc_2);
             } else {
-                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, D_0043BB20, p, p->m_ContState.m_pContState, D_0043BE14);
+                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, gPakMsgPakNotFoundDesc_2, p, p->m_ContState.m_pContState, gSavePortalMenuDescB_2);
             }
         }
     }

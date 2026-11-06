@@ -1,8 +1,8 @@
 #include "common.h"
 
 s32 osSendMesg(s32 *, s32, s32); /* extern */
-extern s32 D_80124DB8;
+extern s32 __osPiAccessQueue;
 
 void __osPiRelAccess(void) {
-    osSendMesg(&D_80124DB8, 0, 0);
+    osSendMesg(&__osPiAccessQueue, 0, 0);
 }

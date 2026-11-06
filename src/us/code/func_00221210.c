@@ -11,19 +11,19 @@
  * (drawn, ..., all, enemies, flagged 2, type 5, and actor types 0x64F and
  * 0x64D); the others lose their "visible" flag 0x200. */
 
-/* D_8011AAD8 (structs/game.h) seen from its difficulty, D_8011AAE0: the
+/* gEngineApp_m_Settings (structs/game.h) seen from its difficulty, gEngineApp_m_Settings_difficulty: the
  * ROM bases the CGame and camera-pool reads below on this symbol, and with
- * D_8011AAD8 / D_80119870 the code no longer matches. */
+ * gEngineApp_m_Settings / gEngineApp_m_Game the code no longer matches. */
 typedef struct {
     s32 mask;               /* 0x00 */
     u8 pad4[0xD];
     u8 unk11;               /* 0x11 */
 } ViewState;
 
-extern ViewState D_8011AAE0;
+extern ViewState gEngineApp_m_Settings_difficulty;
 extern f32 D_800F5A34[];    /* view box max (min at -3) */
 extern f32 D_800F5A18[];    /* active box: max at +4 (min at +1) */
-extern s32 D_800ACDE4;
+extern s32 gCinemaHidesActors;
 
 void CPlayerPool__RegisterActors(void *, CScene *);
 s32 Cinema_PathPlaying(void);
@@ -44,14 +44,14 @@ void CScene__BuildActorLists(CScene *w) {
     f32 *bB;
     f32 *bA;
 
-    mask = D_8011AAE0.mask;
+    mask = gEngineApp_m_Settings_difficulty.mask;
     w->m_nRegistered = 0;
     w->m_nKind1 = 0;
     w->m_nFlagged = 0;
-    CPlayerPool__RegisterActors((u8 *)&D_8011AAE0 - 0x1270, w);
+    CPlayerPool__RegisterActors((u8 *)&gEngineApp_m_Settings_difficulty - 0x1270, w);
     view = NULL;
-    if (D_8011AAE0.unk11 == 0) {
-        view = *(u8 **)((u8 *)&D_8011AAE0 - 0x1210);
+    if (gEngineApp_m_Settings_difficulty.unk11 == 0) {
+        view = *(u8 **)((u8 *)&gEngineApp_m_Settings_difficulty - 0x1210);
     }
     sflag = 0;
     if (Cinema_PathPlaying() == 0) {
@@ -89,7 +89,7 @@ void CScene__BuildActorLists(CScene *w) {
                         }
                     }
                 }
-                if (Cinema_PathPlaying() != 0 && D_800ACDE4 != 0) {
+                if (Cinema_PathPlaying() != 0 && gCinemaHidesActors != 0) {
                     if (!(info->m_dwFlags & 0x200)) {
                         s2 = 0;
                     }

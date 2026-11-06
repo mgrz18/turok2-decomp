@@ -3,28 +3,28 @@
 
 #include "rw/abu_types.h"
 
-extern int D_800B7A30;
+extern int __osContinitialized;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern s32 __osSiRawStartDma(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
 extern void __osSiCreateAccessQueue();
-extern s32 D_801213D8;
-extern s32 D_801213C0;
-extern u8 D_80121420;
+extern s32 __osContMesgBuff;
+extern s32 __osContMesgQueue;
+extern u8 __osContLastCmd;
 extern void osCreateMesgQueue(void *, s32, s32);
 extern u64 osGetTime(void);
-extern s8 D_801213DC;
+extern s8 __osContNumControllers;
 extern void __osPackRequestData(s32 arg0);
 extern void __osContGetInitData(s32 *arg0, s32 arg1);
 extern void osSetTimer(void *arg0, u64 arg1, u64 arg2, void *arg3, void *arg4);
 s32 osContInit(s32 arg0, s32 *arg1, s32 arg2) {
-    extern char D_801213E0;
+    extern char __osContBuffer;
     s32 sp20[8];
     s32 sp40[6];
     s32 sp58[2];
     u64 value;
     s32 result;
-    s32 *initialized = &D_800B7A30;
+    s32 *initialized = &__osContinitialized;
     if (*initialized != 0) {
         return 0;
     }
@@ -35,15 +35,15 @@ s32 osContInit(s32 arg0, s32 *arg1, s32 arg2) {
         osSetTimer(sp20, 0x0165A0BCULL - value, 0, sp40, sp58);
         osRecvMesg(sp40, (s32)sp58, 1);
     }
-    D_801213DC = 4;
+    __osContNumControllers = 4;
     __osPackRequestData(0);
-    __osSiRawStartDma(1, &D_801213E0);
+    __osSiRawStartDma(1, &__osContBuffer);
     osRecvMesg(arg0, (s32)sp58, 1);
-    result = __osSiRawStartDma(0, &D_801213E0);
+    result = __osSiRawStartDma(0, &__osContBuffer);
     osRecvMesg(arg0, (s32)sp58, 1);
     __osContGetInitData(arg1, arg2);
-    D_80121420 = 0;
+    __osContLastCmd = 0;
     __osSiCreateAccessQueue();
-    osCreateMesgQueue(&D_801213C0, (s32)&D_801213D8, 1);
+    osCreateMesgQueue(&__osContMesgQueue, (s32)&__osContMesgBuff, 1);
     return result;
 }

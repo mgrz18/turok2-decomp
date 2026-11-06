@@ -3,11 +3,11 @@
 
 s32 CAI__SetMode(s32, s32, s32);
 
-extern s8 D_8012F9D0;
+extern s8 gLevelScript_scriptCOn;
 
 void Primagen_UpdateMode16(s32 arg0, CAI *ai) {
     if (ai->m_AnimRepeatedCount != 0) {
-        D_8012F9D0 = 0;
+        gLevelScript_scriptCOn = 0;
         CAI__SetMode(arg0, (s32) ai, 2);
     }
 }

@@ -27,9 +27,9 @@ void CScene__LoadLightSettings(MenuState *menu) {
     f32 len;
 
     for (i = 0; i < 3; i++) {
-        D_800AB0D0.m_AmbColCopy[i] = D_800AB0D0.m_AmbCol[i] = menu->lights->ambient[i];
-        D_800AB0D0.m_ColCopy[i] = D_800AB0D0.m_Col[i] = menu->lights->color[i];
-        D_800AB0D0.m_Dir[i] = menu->lights->dir[i];
+        gSceneLights.m_AmbColCopy[i] = gSceneLights.m_AmbCol[i] = menu->lights->ambient[i];
+        gSceneLights.m_ColCopy[i] = gSceneLights.m_Col[i] = menu->lights->color[i];
+        gSceneLights.m_Dir[i] = menu->lights->dir[i];
     }
     dir[0] = menu->lights->dir[0];
     dir[1] = menu->lights->dir[1];

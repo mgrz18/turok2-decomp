@@ -3,17 +3,17 @@
 #include "structs/level_actor.h"
 #include "structs/region.h"
 
-extern s32 D_800B6D00;
+extern s32 gDefaultVisBits;
 extern u8 D_800B6D1B; /* frame counter */
 extern f32 gFrameIncrement; /* frame time scale */
-extern s32 D_8011ACA4;
+extern s32 gEngineApp_m_Settings_paused;
 
 /* Once-per-frame update. */
 void CLevelActor__Update(CLevelActor *obj) {
     CIntelligence *def;
     f32 timer;
 
-    if (obj->m_UpdatedFrame == D_800B6D1B || D_8011ACA4 != 0) {
+    if (obj->m_UpdatedFrame == D_800B6D1B || gEngineApp_m_Settings_paused != 0) {
         return;
     }
     def = obj->header.m_pIntelligence;
@@ -32,7 +32,7 @@ void CLevelActor__Update(CLevelActor *obj) {
     if (obj->header.m_pCurrentRegion != NULL) {
         obj->m_ViewMask = obj->header.m_pCurrentRegion->m_VisBits;
     } else {
-        obj->m_ViewMask = D_800B6D00;
+        obj->m_ViewMask = gDefaultVisBits;
     }
     obj->m_UpdatedFrame = D_800B6D1B;
 }

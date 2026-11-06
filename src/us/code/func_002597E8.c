@@ -4,7 +4,7 @@
 
 s32 CPlayer__StartWeaponBackgroundSound(void *, s32);             /* extern */
 s32 Sound__StopSoundId(s32);                     /* extern */
-extern s32 D_800B6D20;
+extern s32 gFrameCountGameplay;
 
 void WeaponSound_Update_AF12C(CGameObjectInstance *arg0, CAI *arg1) {
     CPlayer *temp_a0;
@@ -15,7 +15,7 @@ void WeaponSound_Update_AF12C(CGameObjectInstance *arg0, CAI *arg1) {
             CPlayer__StartWeaponBackgroundSound(temp_a0, 0x1A8);
         }
     }
-    if ((arg1->m_Mode != 4) && (D_800B6D20 & 1)) {
+    if ((arg1->m_Mode != 4) && (gFrameCountGameplay & 1)) {
         Sound__StopSoundId(0x1A9);
     }
 }

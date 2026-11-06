@@ -8,7 +8,7 @@ extern f32 func_00298470(f32 x); /* sqrtf */
 extern f32 func_002982F0(f32 x); /* sinf */
 extern f32 func_002974C0(f32 x); /* cosf */
 
-extern f32 D_800F1F98; /* gravity */
+extern f32 gThrowableCollisionInfo_m_GravityAcceleration; /* gravity */
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x10C];
@@ -30,7 +30,7 @@ void Throwable_FlyingEnter(CGameObjectInstance *obj, OwnedState *state) {
     } else if ((target = owner->m_AI.m_pSightTarget) != NULL) {
         r = Random_Blend(1.5f, 2.5f);
         speed = r * func_00298470(AI_DistSqToPointAtHeight(obj, target->header.m_vPos));
-        lift = -D_800F1F98 / (r * 3.8f);
+        lift = -gThrowableCollisionInfo_m_GravityAcceleration / (r * 3.8f);
     } else {
         speed = 512.0f;
         lift = 358.4f;

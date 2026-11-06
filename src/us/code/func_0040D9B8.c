@@ -7,8 +7,8 @@
  * is taken, a hit effect plays at most every 2.25 s, and at zero health it dies (anim state 9). */
 
 
-extern BlindOneState D_80130200;
-extern u8 D_00432464[];
+extern BlindOneState gBlindOne;
+extern u8 sBlindOneHitScript[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 extern void CCache__SetFrameDelay(s32 arg0);
@@ -18,7 +18,7 @@ void BlindOne_BossHurt(void *obj, CAI *ai, DamageEvent *event) {
     s32 health;
 
     if (ai->m_Health != 0 && ai->m_Mode != 1) {
-        state = &D_80130200;
+        state = &gBlindOne;
         if (state->phase != 9) {
             ai->m_AnimRepeatedCount = 0;
             CAI__SetMode(obj, ai, 6);
@@ -30,7 +30,7 @@ void BlindOne_BossHurt(void *obj, CAI *ai, DamageEvent *event) {
             ai->m_Health = health;
             if (ai->m_BlindOne.m_HitTimer == 0.0f) {
                 ai->m_BlindOne.m_HitTimer = 2.25f;
-                ScriptAnimator_SetScript(&state->faders[0], D_00432464);
+                ScriptAnimator_SetScript(&state->faders[0], sBlindOneHitScript);
             }
             if (ai->m_Health == 0) {
                 CAI__SetMode(obj, ai, 9);

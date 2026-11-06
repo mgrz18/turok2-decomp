@@ -2,19 +2,19 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-extern s32 D_8011ACA4;
-extern char D_00439640; /* death screen */
+extern s32 gEngineApp_m_Settings_paused;
+extern char gPauseMenuDesc; /* death screen */
 
-/* Whether the game is paused (D_8011ACA4) or a menu other than the death
+/* Whether the game is paused (gEngineApp_m_Settings_paused) or a menu other than the death
  * screen is open on the player's camera. */
 s32 CPlayer__IsPausedOrInMenu(CPlayer *p) {
     Menu *menu;
 
-    if (D_8011ACA4) {
+    if (gEngineApp_m_Settings_paused) {
         return 1;
     }
     if (p->m_pCamera != NULL && (menu = p->m_pCamera->m_Menus.head) != NULL) {
-        if (menu->desc != (MenuDesc *) &D_00439640) {
+        if (menu->desc != (MenuDesc *) &gPauseMenuDesc) {
             return 1;
         }
     }

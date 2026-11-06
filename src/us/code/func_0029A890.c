@@ -31,9 +31,9 @@ struct OSPiHandle_s {
 struct OSPiHandle_s;
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern u64 D_80122A28;
-extern s32 D_80122A20;
-extern s32 D_80122A24;
+extern u64 __osCurrentTime;
+extern s32 __osBaseCounter;
+extern s32 __osViIntrCount;
 struct OSIoMesg;
 typedef struct OSIoMesg OSIoMesg;
 struct OSIoMesgHdr;
@@ -55,12 +55,12 @@ struct OSIoMesg {
     void *piHandle;
 };
 extern void __osViSwapContext();
-extern u16 D_801216D0;
+extern u16 __osViRetraceCount;
 extern struct __OSViContext *__osViGetCurrentContext(void);
 extern u32 osGetCount(void);
 extern void __osTimerInterrupt(void);
 static __inline__ u16 *viRetrace(void) {
-    return &D_801216D0;
+    return &__osViRetraceCount;
 }
 void viMgrMain(struct OSDevMgr *arg)
 {
@@ -76,7 +76,7 @@ void viMgrMain(struct OSDevMgr *arg)
     mb = 0;
     first = 0;
     vc = __osViGetCurrentContext();
-    retraceInit = &D_801216D0;
+    retraceInit = &__osViRetraceCount;
     *retraceInit = vc->retraceCount;
     if (*retraceInit == 0) {
         *retraceInit = 1;
@@ -94,18 +94,18 @@ void viMgrMain(struct OSDevMgr *arg)
                     }
                     *viRetrace() = vc->retraceCount;
                 }
-                intrCount = &D_80122A24;
+                intrCount = &__osViIntrCount;
                 (*intrCount)++;
                 if (first) {
                     count = osGetCount();
-                    D_80122A28 = count;
+                    __osCurrentTime = count;
                     first = 0;
                 }
-                baseCounter = &D_80122A20;
+                baseCounter = &__osBaseCounter;
                 count = *baseCounter;
                 *baseCounter = osGetCount();
                 count = *baseCounter - count;
-                currentTime = &D_80122A28;
+                currentTime = &__osCurrentTime;
                 *currentTime = *currentTime + count;
                 break;
             case 14:

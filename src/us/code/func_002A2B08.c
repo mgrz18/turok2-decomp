@@ -16,9 +16,9 @@ typedef struct B01IoReq {
                s32 w18;
                OSMesgQueue *reply;
 } B01IoReq;
-extern s32 D_800BC304;
-extern OSMesgQueue D_80128370;
-extern OSMesgQueue D_80128540;
+extern s32 sHostIoState;
+extern OSMesgQueue sHostIoRequestQueue;
+extern OSMesgQueue sHostIoReplyQueue;
 s32 HostIo_DisableInt(void);
 void HostIo_RestoreInt(s32 mask);
 s32 HostIo_Call(u32 a0, u32 a1, u32 a2, u32 a3);
@@ -26,15 +26,15 @@ s32 PCclose(s32 arg) {
     B01IoReq req;
     s32 reply;
     s32 mask;
-    if (D_800BC304 == 2) {
+    if (sHostIoState == 2) {
         req.w4 = 0;
         req.wC.i = 0x80000404;
         req.w10 = arg;
         req.w14 = 0;
         req.w18 = 0;
-        req.reply = &D_80128540;
-        osSendMesg(&D_80128370, &req, 1);
-        osRecvMesg(&D_80128540, (OSMesg *)&reply, 1);
+        req.reply = &sHostIoReplyQueue;
+        osSendMesg(&sHostIoRequestQueue, &req, 1);
+        osRecvMesg(&sHostIoReplyQueue, (OSMesg *)&reply, 1);
         if (reply & 0x8000) {
             reply |= 0xFFFF0000;
         }

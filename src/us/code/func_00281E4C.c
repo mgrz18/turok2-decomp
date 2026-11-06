@@ -13,11 +13,11 @@ struct CGameRegion {
 struct CGameRegion *CScene__FindRegionAt(s32, CVector3 *);
 f32 CGameRegion__GetHeight(struct CGameRegion *, f32, f32);  /* extern */
 s32 Cinema_PathPlaying();                                /* extern */
-extern u32 D_800B6D00;
+extern u32 gDefaultVisBits;
 extern s32 gScene;
 
 /* Picks the visibility bits of the camera: those of its region when it is 5 to 11 units
- * above the floor there, else the default D_800B6D00. */
+ * above the floor there, else the default gDefaultVisBits. */
 void CCamera__UpdateVisBits(CCamera *arg0) {
     f32 temp_f1;
     f32 temp_f20;
@@ -34,7 +34,7 @@ void CCamera__UpdateVisBits(CCamera *arg0) {
     temp_f23 = arg0->m_ViewParams.m_vPos.y;
     temp_f20 = arg0->m_ViewParams.m_vPos.z;
     temp_f22 = arg0->m_ViewParams.m_YPosOffset;
-    arg0->m_ViewParams.m_VisBits = D_800B6D00;
+    arg0->m_ViewParams.m_VisBits = gDefaultVisBits;
     if ((temp_s1 != 0) && (Cinema_PathPlaying() == 0)) {
         temp_f1 = ((temp_f23 + temp_f22) - CGameRegion__GetHeight(temp_s1, temp_f21, temp_f20)) * 0.09765625f;
         if ((temp_f1 < 11.0f) && (temp_f1 > 5.0f)) {
@@ -42,9 +42,9 @@ void CCamera__UpdateVisBits(CCamera *arg0) {
         }
     }
     if (Cinema_PathPlaying() != 0) {
-        arg0->m_ViewParams.m_VisBits = D_800B6D00;
+        arg0->m_ViewParams.m_VisBits = gDefaultVisBits;
     }
     if (arg0->m_ViewParams.m_ZoomBlend > 0.0f) {
-        arg0->m_ViewParams.m_VisBits = D_800B6D00;
+        arg0->m_ViewParams.m_VisBits = gDefaultVisBits;
     }
 }

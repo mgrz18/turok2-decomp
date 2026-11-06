@@ -122,8 +122,8 @@ struct LevelActor {
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern char D_800ADE70;
-extern char D_800ADE28;
+extern char gStandLookTuning;
+extern char gDodgeMoveTuning;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
@@ -136,8 +136,8 @@ extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern s32 GameObject_IsOnGround(void *arg0);
 void PlayerDodgeFall_Update(s32 arg0, s32 arg1) {
     Math_EaseToward(arg0 + 0xAD0, 0.0f, 0.25f);
-    CPlayer__TurnAndLook((void *)arg0, (void *)arg1, &D_800ADE70);
-    CPlayer__MoveOnFoot((void *)arg0, (void *)arg1, &D_800ADE28);
+    CPlayer__TurnAndLook((void *)arg0, (void *)arg1, &gStandLookTuning);
+    CPlayer__MoveOnFoot((void *)arg0, (void *)arg1, &gDodgeMoveTuning);
     if (((LevelActor *)arg1)->position1.y <= 0.0f) {
         if (GameObject_IsOnGround((void *) arg1) != 0) {
             CPlayer__SetState((void *) arg0, (void *) arg1, 2);

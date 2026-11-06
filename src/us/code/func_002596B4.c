@@ -17,9 +17,9 @@ typedef struct {
     /* 0x128 */ s32 unk128;
 } State;
 
-extern u32 D_800B6D20;
+extern u32 gFrameCountGameplay;
 extern s32 gScene;
-extern u8 D_801198B0[];
+extern u8 gEngineApp_m_Game_m_CameraPool[];
 void CCameraPool__AddText(void *buf, s32 a, s32 b);
 void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 
@@ -28,10 +28,10 @@ void WeaponActor_EquipRequested(CGameObjectInstance *actor, State *state) {
 
     if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || gScene != 4) {
         player->m_Data.m_CurrentWeapon = player->m_RequestedWeapon;
-        state->unk2C = D_800AF618[player->m_Data.m_CurrentWeapon]->modeTable;
-        state->unk108 = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;
-        if (D_800B6D20 >= 5) {
-            CCameraPool__AddText(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
+        state->unk2C = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->modeTable;
+        state->unk108 = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->effects;
+        if (gFrameCountGameplay >= 5) {
+            CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
         }
         state->unk10C = 0;
         state->unk110 = 0;

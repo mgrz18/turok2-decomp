@@ -6,10 +6,10 @@
 extern char D_800B4AF8[];
 extern char D_800B4AE0[];
 extern char D_800B4AEC[];
-extern int D_80130960;
+extern int sCharNoteLoad;
 extern s32 D_801309A8;
 s32 CharNoteMenu_UpdateTitle(struct FieldRecAt14 *field) {
-    if (D_80130960 != 0) {
+    if (sCharNoteLoad != 0) {
         field->text = D_800B4AE0;
     } else if (D_801309A8 != 0) {
         field->text = D_800B4AF8;

@@ -14,7 +14,7 @@ extern void MotherBoss_OnIntroCinemaDone(void);
 extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);
 
 void MotherBoss_StartIntro(void *obj, void *ai) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     CGameObjectInstance *actor;
     s32 i;
 

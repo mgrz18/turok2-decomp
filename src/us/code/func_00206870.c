@@ -5,12 +5,12 @@
 
 EntryRecAt18V3 *CCache__FindOldestMemEntry(s32 unused, EntryList *list, EntryRecAt18V3 **recent)
 {
-    extern s32 D_800D8DF0[];
+    extern s32 gCache_ageCount[];
     EntryRecAt18V3 *e = list->first;
     if (*recent == 0) {
         for (; e != 0; e = e->next) {
             if (!(e->flags & 0x702)) {
-                if ((u32)(D_800D8DF0[0] - e->stamp) >= 5) {
+                if ((u32)(gCache_ageCount[0] - e->stamp) >= 5) {
                     return e;
                 }
                 *recent = e;
@@ -19,7 +19,7 @@ EntryRecAt18V3 *CCache__FindOldestMemEntry(s32 unused, EntryList *list, EntryRec
         }
     }
     for (; e != 0; e = e->next) {
-        if (!(e->flags & 0x702) && (u32)(D_800D8DF0[0] - e->stamp) >= 5) {
+        if (!(e->flags & 0x702) && (u32)(gCache_ageCount[0] - e->stamp) >= 5) {
             return e;
         }
     }

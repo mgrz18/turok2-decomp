@@ -3,10 +3,10 @@
 #include "gfx.h"
 #include "structs/game.h"
 
-extern s32 D_800C2030;      /* screen width */
-extern s32 D_800C2034;      /* screen height */
-extern s32 D_80130A78;      /* z-buffer */
-extern s32 D_801101B0[2];
+extern s32 gScreenWidth;      /* screen width */
+extern s32 gScreenHeight;      /* screen height */
+extern s32 gDepthBuffer;      /* z-buffer */
+extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[2];
 
 extern void Render_SetRenderMode(s32 mode);
 extern void COnScreen__BeginText(void);
@@ -19,49 +19,49 @@ static __inline__ void clearDepth(void *unused, s32 x0, s32 x1, s32 y0, s32 y1) 
     s32 colorImage;
 
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE7000000;     /* gDPPipeSync */
         g->w1 = 0;
     }
     Render_SetRenderMode(0x14);
-    colorImage = 0xFF100000 | ((D_800C2030 - 1) & 0xFFF);
+    colorImage = 0xFF100000 | ((gScreenWidth - 1) & 0xFFF);
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = colorImage;     /* gDPSetColorImage(RGBA, 16b, width, z-buffer) */
-        g->w1 = D_80130A78;
+        g->w1 = gDepthBuffer;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE7000000;     /* gDPPipeSync */
         g->w1 = 0;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE3000A01;     /* gDPSetCycleType(G_CYC_FILL) */
         g->w1 = 0x00300000;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xF7000000;     /* gDPSetFillColor(max depth) */
         g->w1 = 0xFFFCFFFC;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xF6000000 | ((x1 & 0x3FF) << 14) | ((y1 & 0x3FF) << 2); /* gDPFillRectangle */
         g->w1 = ((x0 & 0x3FF) << 14) | ((y0 & 0x3FF) << 2);
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = colorImage;     /* gDPSetColorImage(RGBA, 16b, width, frame) */
         g->w1 = gEngineApp.m_pCurrentFrameData->m_pFrameBuffer;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE7000000;     /* gDPPipeSync */
         g->w1 = 0;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE3000A01;     /* gDPSetCycleType(G_CYC_1CYCLE) */
         g->w1 = 0x00100000;
     }
@@ -73,54 +73,54 @@ void Render_DrawTextLines(void *state, s32 drawBackdrop, char **lines, s32 x, s3
     char *text;
     s32 i;
 
-    y = y * D_800C2034 / 222;
+    y = y * gScreenHeight / 222;
     if (drawBackdrop) {
-        clearDepth(state, 0, D_800C2030, 0, D_800C2034);
+        clearDepth(state, 0, gScreenWidth, 0, gScreenHeight);
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xED000000;     /* gDPSetScissor(0, 0, width - 1, height - 1) */
-            g->w1 = (((s32)((f32)(D_800C2030 - 1) * 4.0f) & 0xFFF) << 12) | ((s32)((f32)(D_800C2034 - 1) * 4.0f) & 0xFFF);
+            g->w1 = (((s32)((f32)(gScreenWidth - 1) * 4.0f) & 0xFFF) << 12) | ((s32)((f32)(gScreenHeight - 1) * 4.0f) & 0xFFF);
         }
         {
-            Gfx *g = D_800D8E24++;
-            g->w0 = 0xFF100000 | ((D_800C2030 - 1) & 0xFFF);  /* gDPSetColorImage(frame) */
+            Gfx *g = gDList++;
+            g->w0 = 0xFF100000 | ((gScreenWidth - 1) & 0xFFF);  /* gDPSetColorImage(frame) */
             g->w1 = task->m_pFrameBuffer;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xE3000A01;     /* gDPSetCycleType(G_CYC_FILL) */
             g->w1 = 0x00300000;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xFCFFFFFF;     /* gDPSetCombineMode(shade) */
             g->w1 = 0xFFFE793C;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xE200001C;     /* gDPSetRenderMode(0, 0) */
             g->w1 = 0;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xF7000000;     /* gDPSetFillColor */
             g->w1 = 0x10001;
         }
         {
-            Gfx *g = D_800D8E24++;
-            g->w0 = 0xF6000000 | ((D_800C2030 & 0x3FF) << 14) | ((D_800C2034 & 0x3FF) << 2); /* gDPFillRectangle */
+            Gfx *g = gDList++;
+            g->w0 = 0xF6000000 | ((gScreenWidth & 0x3FF) << 14) | ((gScreenHeight & 0x3FF) << 2); /* gDPFillRectangle */
             g->w1 = 0;
         }
     }
     COnScreen__BeginText();
     COnScreen__SelectSmallFont();
-    scaleX = scaleX * D_800C2030 * (1.0f / 284.0f);
-    scaleY = scaleY * D_800C2034 * (1.0f / 222.0f);
-    scaleX *= (D_800C2034 >= 0xDF) ? 0.8f : 0.85f;
+    scaleX = scaleX * gScreenWidth * (1.0f / 284.0f);
+    scaleY = scaleY * gScreenHeight * (1.0f / 222.0f);
+    scaleX *= (gScreenHeight >= 0xDF) ? 0.8f : 0.85f;
     scaleY *= 0.95f;
     COnScreen__SetFontScale(scaleX, scaleY);
-    D_801101B0[0] = 1;
-    D_801101B0[1] = 1;
+    gEngineApp_m_OnScreen_m_ShadowXOff[0] = 1;
+    gEngineApp_m_OnScreen_m_ShadowXOff[1] = 1;
     for (i = 0; lines[i] != NULL; i++) {
         text = lines[i];
         COnScreen__DrawString(text, x, y, 0xFF, 1, 1, 1.0f, 1.0f);

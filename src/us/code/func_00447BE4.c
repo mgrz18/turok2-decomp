@@ -3,12 +3,12 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-extern BlindOnePhase D_0043232C[];
-extern BlindOneStep D_00432260[]; /* the script */
+extern BlindOnePhase sBlindOnePhases_2[];
+extern BlindOneStep sBlindOneScript_2[]; /* the script */
 extern void BlindOne_EnterPhase_2(BlindOneState *m, s32 cmd);
 
 void BlindOne_StartScript_2(BlindOneState *m, CGameObjectInstance *leader) {
     m->boss = leader;
-    m->script = D_00432260;
-    BlindOne_EnterPhase_2(m, D_00432260[0].id);
+    m->script = sBlindOneScript_2;
+    BlindOne_EnterPhase_2(m, sBlindOneScript_2[0].id);
 }

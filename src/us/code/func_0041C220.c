@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern u8 D_8011AAEF;
+extern u8 gEngineApp_m_Settings_unk17;
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 OptionsMenu_StepBloodColor(void *first, void *second) {
-    u8 *option = &D_8011AAEF;
+    u8 *option = &gEngineApp_m_Settings_unk17;
     *option = Menu_StepValue(second, *option, 1, 0, 2, 1);
     return 0;
 }

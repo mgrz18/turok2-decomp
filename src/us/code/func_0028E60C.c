@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern s32 D_801206C4;
+extern s32 gPager_completion;
 extern s32 D_800AA210;
 void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
 void **CCache__Allocate(s32 arg0, s32 arg1, s32 arg2, void *arg3);
@@ -39,7 +39,7 @@ s32 VM_Alloc(s32 arg0, s32 arg1_unused, s32 arg2)
     temp_v1->model = temp_v0;
   }
   ((Draw *)blk.f30)->allocationMode = arg2;
-  osSendMesg(&D_801206C4, &blk.f28, 1);
+  osSendMesg(&gPager_completion, &blk.f28, 1);
   osRecvMesg(sp10, &sp3C, 1);
   return sp3C;
 }

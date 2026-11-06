@@ -4,8 +4,8 @@
 #include "common.h"
 #include "structs/game.h"
 
-extern s32 D_800B6D68;
-extern s32 D_800B6D6C;
+extern s32 gShowExpansionPakScreen;
+extern s32 gLegalScreenNoSkip;
 extern f32 D_800A9DFC;
 u32 GetMemSize();
 s32 CEngineApp__TimedModeSwitch(CEngineApp *g, f32 x, s32 a, s32 b);
@@ -14,20 +14,20 @@ void EngineMode01_Legal_Retrace(CEngineApp *g) {
     u32 r = GetMemSize();
     mode = 4;
     if (r > 0x400000) {
-        if (D_800B6D68 != 0) {
+        if (gShowExpansionPakScreen != 0) {
             mode = 3;
         }
     }
     if (g->m_Settings.modeTimer > D_800A9DFC) {
-        D_800B6D6C = 0;
+        gLegalScreenNoSkip = 0;
     }
-    if (D_800B6D6C != 0) {
+    if (gLegalScreenNoSkip != 0) {
         if (CEngineApp__TimedModeSwitch(g, 12.0f, mode, -1)) {
-            D_800B6D6C = 0;
+            gLegalScreenNoSkip = 0;
         }
     } else {
         if (CEngineApp__TimedModeSwitch(g, 12.0f, mode, mode)) {
-            D_800B6D6C = 0;
+            gLegalScreenNoSkip = 0;
         }
     }
 }

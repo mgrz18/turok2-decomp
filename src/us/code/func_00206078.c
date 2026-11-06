@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800D8DEC;
+extern s32 gCache_frameDelay;
 
 s32 CCache__GetFrameDelay(void) {
-    return D_800D8DEC;
+    return gCache_frameDelay;
 }

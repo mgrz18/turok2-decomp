@@ -12,7 +12,7 @@ extern char D_800B4098[];
 /* Shows the player's option unk2A (0-255, centred on 0x80) in steps of 8, falling back to the
  * default options when there is no player. */
 s32 OptionsMenu_StickVertText_2(MenuItem *item, Menu *menu) {
-    CPlayerOptions *options = &D_8011AAD8.defaultSlot;
+    CPlayerOptions *options = &gEngineApp_m_Settings.defaultSlot;
     s32 value;
 
     if (menu->player != NULL && menu->player->m_pOptions != NULL) {

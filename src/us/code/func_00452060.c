@@ -22,7 +22,7 @@ extern char D_800B6074[];
 
 /* Names setting 0x2C. */
 s32 func_00452060(MenuItem *item) {
-    switch (D_8011AAD8.teamArena) {
+    switch (gEngineApp_m_Settings.teamArena) {
     case 0:
         item->text = D_800B5F3C;
         break;

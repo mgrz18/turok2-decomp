@@ -17,7 +17,7 @@ extern void CMtxF__ScaleAxes(f32 *mtx, f32 x, f32 y, f32 z);
 extern void CVector3__ClampLength(f32 *vec, f32 limit);
 extern void CMtxF__SwapYZRows(f32 *mtx);
 
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -53,7 +53,7 @@ void Throwable_CalcOrientation(SpinObject *obj, SpinState *state) {
     axis[0] = 0.0f;
     axis[1] = s;
     axis[2] = 0.0f;
-    D_800DD78C = s;
+    gQuaternionSin = s;
     axis[3] = func_002974C0(obj->angle * 0.5f);
     CQuaternion__Multiply(quat, axis, obj->rotation);
     CQuaternion__ToMatrix(quat, rotMtx);

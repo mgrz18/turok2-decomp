@@ -3,10 +3,10 @@
 
 extern s32 D_800B436C;
 extern s32 D_800B437C;
-extern s32 D_80130A34;
+extern s32 sMissionFailed;
 
 s32 MissionMenu_UpdateTitle(MenuItem *arg0) {
-    if (D_80130A34 != 0) {
+    if (sMissionFailed != 0) {
         arg0->table = &D_800B437C;
     } else {
         arg0->table = &D_800B436C;

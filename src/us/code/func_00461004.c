@@ -5,11 +5,11 @@
 
 extern void __osPfsGetOneChannelData_2(int channel, EntryRecAt3 *data);
 void __osPfsGetOneChannelData_2(s32 channel, EntryRecAt3 *data) {
-    extern char D_80130E20;
+    extern char __osPfsPifRam;
     u8 *ptr;
     __OSContRequesFormatShort requestformat;
     s32 i;
-    ptr = (u8 *)&D_80130E20;
+    ptr = (u8 *)&__osPfsPifRam;
     for (i = 0; i < channel; i++) {
         ptr++;
     }

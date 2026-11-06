@@ -3,7 +3,7 @@
 #include "structs/boss.h"
 
 /* AI update for the module's actor: runs the AI step and the current anim's callback; in phase 0, a target
- * closer than 1228.8 makes the D_8010FEB4 actors drop their health; then updates the module (MotherBoss_UpdateSpotsAndPickups). */
+ * closer than 1228.8 makes the gScene_m_InstancePool_m_ActiveList actors drop their health; then updates the module (MotherBoss_UpdateSpotsAndPickups). */
 
 extern void AI_TurnHeadToTarget(void *obj, CAI *ai, f32 pitchOffset);
 extern f32 MotherBoss_GetTargetDist(void *obj, void **found);
@@ -11,7 +11,7 @@ extern void MotherBoss_KillMinions(void);
 extern void MotherBoss_UpdateSpotsAndPickups(MotherBossState *state);
 
 void MotherBoss_Step(void *obj, CAI *ai) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     void *found;
     f32 dist;
 
@@ -25,5 +25,5 @@ void MotherBoss_Step(void *obj, CAI *ai) {
             MotherBoss_KillMinions();
         }
     }
-    MotherBoss_UpdateSpotsAndPickups(&D_8012FB70);
+    MotherBoss_UpdateSpotsAndPickups(&gMotherBoss);
 }

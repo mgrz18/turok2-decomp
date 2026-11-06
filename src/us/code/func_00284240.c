@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/cinema.h"
 
-extern Cinema *D_800C1BB0;
+extern Cinema *gCinemaPlayerP;
 
 s32 Cinema_IsFinished(void) {
-    return D_800C1BB0->finished;
+    return gCinemaPlayerP->finished;
 }

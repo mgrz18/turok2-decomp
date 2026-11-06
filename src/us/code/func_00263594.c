@@ -16,8 +16,8 @@ void Generator_WaitEnter(CGameObjectInstance *actor, CAI *ai) {
 
     delay = Random_Blend(trigger->m_IntervalTime1, trigger->m_IntervalTime2);
     ai->m_ConditionTimer = delay;
-    opts = &D_80119870.m_Settings;
-    if (opts->multiplayer && (u32) D_80119870.m_PlayerList.m_ActiveList.m_nCount >= 3) {
-        ai->m_ConditionTimer = delay * 0.01f * (f32) (u32) (100 - ((u32) D_80119870.m_PlayerList.m_ActiveList.m_nCount - 2) * 25);
+    opts = &gEngineApp_m_Game.m_Settings;
+    if (opts->multiplayer && (u32) gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_nCount >= 3) {
+        ai->m_ConditionTimer = delay * 0.01f * (f32) (u32) (100 - ((u32) gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_nCount - 2) * 25);
     }
 }

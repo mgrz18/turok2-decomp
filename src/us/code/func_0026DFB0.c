@@ -7,14 +7,14 @@ typedef struct {
 } EventHandler;
 
 extern EventHandler *gLevelEventHandlers[];  /* handler tables by kind */
-extern char *D_800B69D8[];          /* {text, sound} pairs */
-extern s32 D_800B69DC[];            /* D_800B69D8 + 4 */
-extern s32 D_800B6D20;
+extern char *gLevelMessages[];          /* {text, sound} pairs */
+extern s32 D_800B69DC[];            /* gLevelMessages + 4 */
+extern s32 gFrameCountGameplay;
 extern s32 gScene;              /* world: game state */
-extern u8 *D_800F7158;              /* world + 0xE0: level actors (0x288 bytes each) */
-extern s32 D_80110020;              /* current level */
-extern u8 D_801198B0[];             /* game */
-extern u8 D_8011AAF1;               /* game + 0x1241: multiplayer flag */
+extern u8 *gScene_m_pActors;              /* world + 0xE0: level actors (0x288 bytes each) */
+extern s32 gScene_m_nLevel;              /* current level */
+extern u8 gEngineApp_m_Game_m_CameraPool[];             /* game */
+extern u8 gEngineApp_m_Settings_multiplayer;               /* game + 0x1241: multiplayer flag */
 
 extern void CCameraPool__AddMultiLineText(void *game, void *camera, char *text, s32 arg3, f32 time);
 extern void Sound__PlaySpeech(s32 sound);
@@ -30,17 +30,17 @@ void LevelEvent_Fire(LevelEvent *event) {
     if (entry == NULL) {
         return;
     }
-    game = &D_8011AAF1;
-    camera = game - 0x1201;                         /* D_801198F0: fallback camera */
+    game = &gEngineApp_m_Settings_multiplayer;
+    camera = game - 0x1201;                         /* gEngineApp_m_Game_m_CameraPool_m_MainCamera: fallback camera */
     if (*game == 0) {
-        camera = *(void **)(game - 0x1221);         /* D_801198D0: first viewer */
+        camera = *(void **)(game - 0x1221);         /* gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead: first viewer */
         if (camera == NULL) {
             camera = game - 0x1201;
         }
     }
     if (gScene == 4) {
         if (event->message != 0) {
-            CCameraPool__AddMultiLineText(D_801198B0, camera, D_800B69D8[event->message * 2], D_800B6D20, 4.0f);
+            CCameraPool__AddMultiLineText(gEngineApp_m_Game_m_CameraPool, camera, gLevelMessages[event->message * 2], gFrameCountGameplay, 4.0f);
             if (D_800B69DC[event->message * 2] != 0) {
                 Sound__PlaySpeech(D_800B69DC[event->message * 2]);
             }
@@ -50,8 +50,8 @@ void LevelEvent_Fire(LevelEvent *event) {
         }
     }
     entry += event->handler;
-    if (event->level == D_80110020) {
-        actor = D_800F7158 + event->actor * 0x288;
+    if (event->level == gScene_m_nLevel) {
+        actor = gScene_m_pActors + event->actor * 0x288;
         if (entry->onActor != NULL) {
             entry->onActor(actor, actor + 0x140, event);
         }

@@ -7,8 +7,8 @@ s32 *VM_FindRegion(u32 arg0) {
     PageRegion *var_v1;
     u16 temp_a1;
 
-    var_v1 = &D_80121378;
-    if (&D_80121378 != NULL) {
+    var_v1 = &gPager_regions;
+    if (&gPager_regions != NULL) {
 loop_1:
         temp_a1 = var_v1->start;
         if ((arg0 < temp_a1) || (arg0 >= (u32) (temp_a1 + var_v1->pages))) {

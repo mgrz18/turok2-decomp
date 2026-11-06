@@ -3,8 +3,8 @@
 #include "structs/region.h"
 
 extern u8 gScene[];
-extern CGameRegion *D_800B2610;     /* region of the cached info */
-extern CRegionInfo *D_800B2614; /* its cached info */
+extern CGameRegion *sCachedRegionInfoRegion;     /* region of the cached info */
+extern CRegionInfo *sCachedRegionInfo; /* its cached info */
 
 extern CRegionInfo *CScene__GetRegionInfo(void *table, CGameRegion *region);
 
@@ -23,11 +23,11 @@ s32 CGameRegion__IntersectWater(CGameRegion *region, CVector3 *a, CVector3 *b, f
     fail:
         return 0;
     }
-    if (region != D_800B2610) {
-        D_800B2614 = CScene__GetRegionInfo(gScene, region);
-        D_800B2610 = region;
+    if (region != sCachedRegionInfoRegion) {
+        sCachedRegionInfo = CScene__GetRegionInfo(gScene, region);
+        sCachedRegionInfoRegion = region;
     }
-    info = D_800B2614;
+    info = sCachedRegionInfo;
     if (info == NULL) {
         goto fail;
     }

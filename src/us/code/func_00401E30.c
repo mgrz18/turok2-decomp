@@ -4,7 +4,7 @@
 
 void CAI__SetMode(void *a0, void *a1, s32 event);
 void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
-extern CListedInstance *D_8010FEB4;
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 /* MantidQueen_NextStep */
 static __inline__ void State_NextStep(WaveBossState *s) {
@@ -42,7 +42,7 @@ static __inline__ s32 State_CountActive(WaveBossState *s) {
             n++;
         }
     }
-    for (e = D_8010FEB4; e != NULL; e = e->m_pNext) {
+    for (e = gScene_m_InstancePool_m_ActiveList; e != NULL; e = e->m_pNext) {
         if (e->m_Instance.m_AI.m_Health > 0) {
             n++;
         }
@@ -77,8 +77,8 @@ typedef struct {
 } Part00401E30;
 
 extern u8 gScene[];
-extern WaveBossStep D_00430824[];
-extern Part00401E30 D_004307B0[];
+extern WaveBossStep sMantidQueenScript[];
+extern Part00401E30 sMantidQueenMinions[];
 void ScriptAnimator_Start(void *slot, void *actor);
 s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void *out, s32 max);
 void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
@@ -109,11 +109,11 @@ void MantidQueen_Init(WaveBossState *s, CGameObjectInstance *actor) {
     s->spots[4].health = 0x1900;
     s->toSpawn = 0;
     s->spots[0].health = 0;
-    State_SetStep(s, D_00430824, 1);
+    State_SetStep(s, sMantidQueenScript, 1);
     CScene__FindInstances(gScene, 0x457, 9, 0x1D4D, &s->boss, 1);
     s->memberCount = CScene__FindInstances(gScene, 0x651, 10, 0x1D4D, s->members, 8);
     for (i = 0; i < 2; i++) {
-        s->intel[i] = CScene__FindIntelligence(gScene, 1, D_004307B0[i].id);
+        s->intel[i] = CScene__FindIntelligence(gScene, 1, sMantidQueenMinions[i].id);
     }
     s->blink = 0;
     s->blinkTimer = 0.0f;

@@ -19,12 +19,12 @@ struct ContactHandler {
 };
 
 extern f32 gFrameIncrement;                  /* the frame's time step */
-extern f32 D_800B6D30;
+extern f32 gParticleTimeScale;
 extern CCollisionResults gCollisionResults;
-extern CPlayer *D_80119890;              /* current player */
-extern ContactHandler D_800ACE18[4];
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;              /* current player */
+extern ContactHandler sParticleAmmoPickups[4];
 extern CCollisionResults *gCollisionResultsP;
-extern u8 D_800F8928[];
+extern u8 gScene_m_ParticleSystem[];
 
 s32 Random_Next(void);
 s32 Collision_MoveInstance(CParticle *p, CVector3 pos, u32 *flags);
@@ -182,14 +182,14 @@ void CParticle__Update(CParticle *p) {
         p->m_Alignment = -3;
     }
     if (p->m_dwFlags & 0x60000) {
-        for (player = D_80119890; player != NULL; player = player->m_pNext) {
+        for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
             if (player->m_Data.m_Health != 0 && player->m_Mode != 2) {
                 top = player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.m_CollisionYOffset;
                 if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + GameObject_GetCollisionHeight(player) + 20.479999f) {
                     dist = func_00298470((player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x) * (player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x)
                                          + (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z) * (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z));
                     if (dist < GameObject_GetCollisionRadius(player) + 51.199997f) {
-                        handler = D_800ACE18;
+                        handler = sParticleAmmoPickups;
                         for (i = 3; i != -1; handler++, i--) {
                             if (handler->type == p->header.m_nObjType && handler->func(player, handler)) {
                                 p->m_dwFlags |= 0x1000;
@@ -202,7 +202,7 @@ void CParticle__Update(CParticle *p) {
         }
     }
     p->m_vLastPos = p->header.m_vPos;
-    p->m_AnimFrame += gFrameIncrement * p->m_AnimSpeed * (D_800B6D30 * 0.06666667f);
+    p->m_AnimFrame += gFrameIncrement * p->m_AnimSpeed * (gParticleTimeScale * 0.06666667f);
     if (p->m_pEffect->m_dwFlags & 0x1000) {
         step = gFrameIncrement * 10.24f;
         p->m_vSize.x += step * p->m_vGrowth.x;
@@ -220,7 +220,7 @@ void CParticle__Update(CParticle *p) {
         p->m_vSize.z += (grow - p->m_vSize.z) * gFrameIncrement;
         if (p->m_vSize.x < 0.0f || p->m_vSize.y < 0.0f || p->m_vSize.z < 0.0f) {
             CParticle__FireExpireEvent(p);
-            CParticleSystem__Free(D_800F8928, p);
+            CParticleSystem__Free(gScene_m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
             return;
         }

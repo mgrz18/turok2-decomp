@@ -92,12 +92,12 @@ typedef struct Profile {
 } Profile;
 
 extern char D_800A5AF8[];
-extern s32 D_800B6D18;
-extern Profile D_800E6880;
-extern s32 D_800E6898[]; /* &D_800E6880.calls */
-extern u8 D_800F7148[];
-extern u8 D_801102B8[];
-extern u32 D_8011AAD8;
+extern s32 gFrameCount;
+extern Profile sBoneMatrixProfile;
+extern s32 sBoneMatrixCount[]; /* &sBoneMatrixProfile.calls */
+extern u8 gScene_m_Heap[];
+extern u8 gEngineApp_m_SwooshSystem[];
+extern u32 gEngineApp_m_Settings;
 
 s32 Cinema_PathPlaying(void);
 void *CISet__GetBlock(void *file, s32 index);
@@ -143,7 +143,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
     s32 *data;
 
     anims = CISet__GetBlock(file, 3);
-    obj->animIndex = MtxPool_Alloc(D_800F7148, *anims);
+    obj->animIndex = MtxPool_Alloc(gScene_m_Heap, *anims);
     if (obj->animIndex == 0) {
         return 0;
     }
@@ -195,7 +195,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
                 ctx.moving = 1;
             }
             if (!(obj->flags & 0x200000) && (type == 1 || type == 11)) {
-                if (D_8011AAD8 & 0x100) {
+                if (gEngineApp_m_Settings & 0x100) {
                     ctx.f78 = 1;
                     ctx.f7C = 1;
                     ctx.f80 = 1;
@@ -206,12 +206,12 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
                     ctx.f80 = 0;
                     ctx.f84 = 0;
                 }
-                if (D_8011AAD8 & 0x20) {
+                if (gEngineApp_m_Settings & 0x20) {
                     ctx.f74 = 1;
                 } else {
                     ctx.f74 = 0;
                 }
-                if (D_8011AAD8 & 0x80) {
+                if (gEngineApp_m_Settings & 0x80) {
                     ctx.f88 = 1;
                 } else {
                     ctx.f88 = 0;
@@ -239,12 +239,12 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
             mtx[0][3] = mtx[1][3] = mtx[2][3] = 0.0f;
             mtx[3][3] = 65536.0f;
 
-            prof = &D_800E6880;
+            prof = &sBoneMatrixProfile;
             prof->start = osGetCount();
             CGameObjectInstance__PoseBone(obj, &ctx, 0, mtx);
             elapsed = osGetCount() - (u32) prof->start;
-            if (D_800B6D18 != prof->frame) {
-                prof->frame = D_800B6D18;
+            if (gFrameCount != prof->frame) {
+                prof->frame = gFrameCount;
                 prof->average = prof->average * 0.97f + prof->usec * 0.03f;
                 prof->last = prof->usec;
                 prof->lastCalls = prof->calls;
@@ -253,7 +253,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
             }
             do { /* a profiling macro: its own block */
                 addMicroseconds(&prof->usec, elapsed);
-                D_800E6898[0]++;
+                sBoneMatrixCount[0]++;
             } while (0);
 
             if (obj->hasAttachments) {
@@ -272,7 +272,7 @@ s32 CGameObjectInstance__BuildBoneMatrices(AnimObject *obj, s32 *file, s32 arg2)
                 }
             }
             if (obj->hasEffects) {
-                func_002360A0(D_801102B8, obj, bones);
+                func_002360A0(gEngineApp_m_SwooshSystem, obj, bones);
             }
             if (ctx.blend) {
                 CAnimationState__Release(blendChannel);

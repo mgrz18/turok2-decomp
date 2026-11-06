@@ -7,7 +7,7 @@ s32 GameOverMenu_TickCountdown_2(void)
 {
   f32 countdown;
   GameMatch *match;
-  match = &D_8011ACB0;
+  match = &gEngineApp_m_Settings_match;
   countdown = match->countdown - gFrameIncrement;
   match->countdown = countdown;
   if (countdown < 0.0f)

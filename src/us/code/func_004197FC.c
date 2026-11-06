@@ -3,17 +3,17 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_4.CPP, func_8043EBE4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern char D_00439094[];
+extern char gDeathmatchMenuDesc[];
 extern void MenuPool_OpenChildMenu(void *, void *, void *);
 
 s32 TitleMenu_Multi(void *first, void *second, void *third) {
-    GameSettings *options = &D_8011AAD8;
+    GameSettings *options = &gEngineApp_m_Settings;
     s32 i;
     options->multiplayer = 1;
     options->playerCount = 4;
     for (i = 0; i < 4; i++) {
         options->slots[i].m_bActive = 0;
     }
-    MenuPool_OpenChildMenu(third, second, D_00439094);
+    MenuPool_OpenChildMenu(third, second, gDeathmatchMenuDesc);
     return 1;
 }

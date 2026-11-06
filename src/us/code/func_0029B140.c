@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800B8924;
+extern s32 __osFaultedThread;
 
 s32 __osGetCurrFaultedThread(void) {
-    return D_800B8924;
+    return __osFaultedThread;
 }

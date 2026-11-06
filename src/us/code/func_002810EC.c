@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
 void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);   /* transform a point */
 
 /* Where a point of the world falls on the screen, through the camera's
@@ -14,7 +14,7 @@ void CCamera__WorldToScreen(CCamera *cam, CVector3 *point, f32 *x, f32 *y) {
     f32 half;
 
     CMtxF__TransformPointProjective(&cam->m_mfProjection, point, &value);
-    half = (f32) (D_800C2030 / 2);
+    half = (f32) (gScreenWidth / 2);
     *x = value.x * half + half;
-    *y = value.y * (f32) (-D_800C2034 / 2) + (f32) (D_800C2034 / 2);
+    *y = value.y * (f32) (-gScreenHeight / 2) + (f32) (gScreenHeight / 2);
 }

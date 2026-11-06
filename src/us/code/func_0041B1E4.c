@@ -3,21 +3,21 @@
 
 #include "rw/abu_types.h"
 
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
 extern s32 D_800B57AC;
 extern s32 D_800B57C8;
 s32 CheatMenu_InvincibilityText(struct Func8043D458Arg *arg0) {
-    if (D_8011AADC & 1) {
+    if (gEngineApp_m_Settings_unlockedCheats & 1) {
         arg0->flags |= 0x01000000;
     } else {
         arg0->flags &= 0xFEFFFFFF;
     }
-    if (D_8011AAD8 & 1) {
+    if (gEngineApp_m_Settings & 1) {
         arg0->text = &D_800B57AC;
     } else {
         arg0->text = &D_800B57C8;
     }
     return 0;
 }
-extern s32 D_8011AAD8;
+extern s32 gEngineApp_m_Settings;

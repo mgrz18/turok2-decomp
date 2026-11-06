@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern OSPiHandle_s *D_800B8980[2];
+extern OSPiHandle_s *__osCurrentHandle[2];
 extern u32 osVirtualToPhysical(void *addr);
 s32 osEPiRawStartDma(OSPiHandle_s *pihandle, s32 direction, u32 devAddr, void *dramAddr, u32 size)
 {
@@ -13,8 +13,8 @@ s32 osEPiRawStartDma(OSPiHandle_s *pihandle, s32 direction, u32 devAddr, void *d
     while (stat & 3)
         stat = *(volatile u32 *)0xA4600010;
     domain = pihandle->domain;
-    if (D_800B8980[domain] != pihandle) {
-        OSPiHandle_s *cHandle = D_800B8980[domain];
+    if (__osCurrentHandle[domain] != pihandle) {
+        OSPiHandle_s *cHandle = __osCurrentHandle[domain];
         if (domain == 0) {
             if (cHandle->latency != pihandle->latency) (*(volatile u32 *)(0xA4600014) = (pihandle->latency));
             if (cHandle->pageSize != pihandle->pageSize) (*(volatile u32 *)(0xA460001C) = (pihandle->pageSize));
@@ -26,7 +26,7 @@ s32 osEPiRawStartDma(OSPiHandle_s *pihandle, s32 direction, u32 devAddr, void *d
             if (cHandle->relDuration != pihandle->relDuration) (*(volatile u32 *)(0xA4600030) = (pihandle->relDuration));
             if (cHandle->pulse != pihandle->pulse) (*(volatile u32 *)(0xA4600028) = (pihandle->pulse));
         }
-        D_800B8980[domain] = pihandle;
+        __osCurrentHandle[domain] = pihandle;
     }
     (*(volatile u32 *)(0xA4600000) = (osVirtualToPhysical(dramAddr)));
     (*(volatile u32 *)(0xA4600004) = ((pihandle->baseAddress | devAddr) & 0x1FFFFFFF));

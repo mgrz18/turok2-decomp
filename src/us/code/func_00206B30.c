@@ -59,32 +59,32 @@
     (((1 << G_TX_DXT_FRAC) + (1 > LINE_WORDS(bytes) ? 1 : LINE_WORDS(bytes)) - 1) / (1 > LINE_WORDS(bytes) ? 1 : LINE_WORDS(bytes)))
 #define LOAD_TEXTURE_BLOCK(fmt, loadSiz, incr, shift, bytes, renderSiz, line)                                          \
     {                                                                                                                   \
-        gDPSetTextureImage(D_800D8E24++, fmt, loadSiz, 1, texture);                                                     \
-        gDPSetTile(D_800D8E24++, fmt, loadSiz, 0, 0, G_TX_LOADTILE, 0, wrapT, maskT, mode, wrapS, maskS, mode);         \
-        gDPLoadSync(D_800D8E24++);                                                                                      \
-        gDPLoadBlock(D_800D8E24++, G_TX_LOADTILE, 0, 0, LOAD_LRS(incr, shift), LOAD_DXT(bytes));                        \
-        gDPPipeSync(D_800D8E24++);                                                                                      \
-        gDPSetTile(D_800D8E24++, fmt, renderSiz, line, 0, G_TX_RENDERTILE, 0, wrapT, maskT, mode, wrapS, maskS, mode);  \
-        gDPSetTileSize(D_800D8E24++, G_TX_RENDERTILE, 0, 0, (WIDTH - 1) << 2, (HEIGHT - 1) << 2);                       \
+        gDPSetTextureImage(gDList++, fmt, loadSiz, 1, texture);                                                     \
+        gDPSetTile(gDList++, fmt, loadSiz, 0, 0, G_TX_LOADTILE, 0, wrapT, maskT, mode, wrapS, maskS, mode);         \
+        gDPLoadSync(gDList++);                                                                                      \
+        gDPLoadBlock(gDList++, G_TX_LOADTILE, 0, 0, LOAD_LRS(incr, shift), LOAD_DXT(bytes));                        \
+        gDPPipeSync(gDList++);                                                                                      \
+        gDPSetTile(gDList++, fmt, renderSiz, line, 0, G_TX_RENDERTILE, 0, wrapT, maskT, mode, wrapS, maskS, mode);  \
+        gDPSetTileSize(gDList++, G_TX_RENDERTILE, 0, 0, (WIDTH - 1) << 2, (HEIGHT - 1) << 2);                       \
     }
 #define LOAD_TLUT(count)                                                             \
     {                                                                                \
-        gDPSetTextureImage(D_800D8E24++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, palette);   \
-        gDPTileSync(D_800D8E24++);                                                   \
-        gDPSetTile(D_800D8E24++, 0, 0, 0, 256, G_TX_LOADTILE, 0, 0, 0, 0, 0, 0, 0); \
-        gDPLoadSync(D_800D8E24++);                                                   \
-        gDPLoadTLUTCmd(D_800D8E24++, G_TX_LOADTILE, count);                          \
-        gDPPipeSync(D_800D8E24++);                                                   \
+        gDPSetTextureImage(gDList++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, palette);   \
+        gDPTileSync(gDList++);                                                   \
+        gDPSetTile(gDList++, 0, 0, 0, 256, G_TX_LOADTILE, 0, 0, 0, 0, 0, 0, 0); \
+        gDPLoadSync(gDList++);                                                   \
+        gDPLoadTLUTCmd(gDList++, G_TX_LOADTILE, count);                          \
+        gDPPipeSync(gDList++);                                                   \
     }
 
 extern void CCache__LockForDisplayList(s32 unused, void **resource);
 extern s32 *CISet__GetBlock(void *table, s32 index);
-extern s32 D_800AB570;
-extern s32 D_800D8E00;
-extern s32 D_800D8E04;
-extern s32 D_800D8E08;
-extern s32 D_800D8E0C;
-extern Gfx D_800AB190[], D_800AB210[], D_800AB290[], D_800AB328[], D_800AB3C0[];
+extern s32 sLoadedTexture;
+extern s32 sTexLastFrame;
+extern s32 sTexLastPalette;
+extern s32 sTexLastWrapS;
+extern s32 sTexLastWrapT;
+extern Gfx sTextureLoadDL_Detail[], sTextureLoadDL_DetailMirror[], sTextureLoadDL_Mode2[], sTextureLoadDL_Mode3[], sTextureLoadDL_I16[];
 
 /* Loads frame `frame` of the texture `resource` (and its palette `secondary`)
  * into TMEM, skipping what the last call already loaded, then turns texturing on. */
@@ -111,21 +111,21 @@ void Texture_Load(s32 *output, void **resource, s32 frame, s32 secondary, s32 sc
     if (*(s32 *) entries != 0) {
         palette = CISet__GetBlock(entries, secondary);
         paletteChanged = 0;
-        if (D_800AB570 != *output || D_800D8E04 != secondary) paletteChanged = 1;
+        if (sLoadedTexture != *output || sTexLastPalette != secondary) paletteChanged = 1;
     } else {
         paletteChanged = 0;
         palette = 0;
     }
     changed = 0;
-    if (D_800AB570 != *output || D_800D8E00 != frame || D_800D8E08 != wrapS || D_800D8E0C != wrapT) {
+    if (sLoadedTexture != *output || sTexLastFrame != frame || sTexLastWrapS != wrapS || sTexLastWrapT != wrapT) {
         changed = 1;
     }
     if (changed || paletteChanged) {
-        D_800AB570 = *output;
-        D_800D8E00 = frame;
-        D_800D8E04 = secondary;
-        D_800D8E08 = wrapS;
-        D_800D8E0C = wrapT;
+        sLoadedTexture = *output;
+        sTexLastFrame = frame;
+        sTexLastPalette = secondary;
+        sTexLastWrapS = wrapS;
+        sTexLastWrapT = wrapT;
         maskS = 0;
         if (!(wrapS & G_TX_CLAMP)) {
             maskS = info[2];
@@ -138,7 +138,7 @@ void Texture_Load(s32 *output, void **resource, s32 frame, s32 secondary, s32 sc
         case 0:
             if (changed) {
                 LOAD_TEXTURE_BLOCK(G_IM_FMT_CI, G_IM_SIZ_16b, 1, 1, 1, G_IM_SIZ_8b, (WIDTH + 7) >> 3);
-                gDPSetTextureLUT(D_800D8E24++, G_TT_RGBA16);
+                gDPSetTextureLUT(gDList++, G_TT_RGBA16);
             }
             if (paletteChanged) {
                 LOAD_TLUT(255);
@@ -147,7 +147,7 @@ void Texture_Load(s32 *output, void **resource, s32 frame, s32 secondary, s32 sc
         case 1:
             if (changed) {
                 LOAD_TEXTURE_BLOCK(G_IM_FMT_CI, G_IM_SIZ_16b, 3, 2, 0, G_IM_SIZ_4b, ((WIDTH >> 1) + 7) >> 3);
-                gDPSetTextureLUT(D_800D8E24++, G_TT_RGBA16);
+                gDPSetTextureLUT(gDList++, G_TT_RGBA16);
             }
             if (paletteChanged) {
                 LOAD_TLUT(15);
@@ -156,7 +156,7 @@ void Texture_Load(s32 *output, void **resource, s32 frame, s32 secondary, s32 sc
         case 3:
             if (changed) {
                 LOAD_TEXTURE_BLOCK(G_IM_FMT_CI, G_IM_SIZ_16b, 3, 2, 0, G_IM_SIZ_4b, ((WIDTH >> 1) + 7) >> 3);
-                gDPSetTextureLUT(D_800D8E24++, G_TT_IA16);
+                gDPSetTextureLUT(gDList++, G_TT_IA16);
             }
             if (paletteChanged) {
                 LOAD_TLUT(15);
@@ -165,50 +165,50 @@ void Texture_Load(s32 *output, void **resource, s32 frame, s32 secondary, s32 sc
         case 2:
             if (changed) {
                 LOAD_TEXTURE_BLOCK(G_IM_FMT_RGBA, G_IM_SIZ_32b, 0, 0, 4, G_IM_SIZ_32b, ((2 << info[2]) + 7) >> 3);
-                gDPSetTextureLUT(D_800D8E24++, G_TT_NONE);
+                gDPSetTextureLUT(gDList++, G_TT_NONE);
             }
             break;
         case 4:
             if (changed) {
-                gDPPipeSync(D_800D8E24++);
-                gDPSetTextureImage(D_800D8E24++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
+                gDPPipeSync(gDList++);
+                gDPSetTextureImage(gDList++, G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, texture);
                 switch (info[5]) {
                 case 2:
                 default:
-                    list = D_800AB290;
+                    list = sTextureLoadDL_Mode2;
                     break;
                 case 3:
-                    list = D_800AB328;
+                    list = sTextureLoadDL_Mode3;
                     break;
                 case 1:
-                    gDPSetTextureDetail(D_800D8E24++, G_TD_SHARPEN);
-                    list = D_800AB190;
-                    if (wrapS & 1) list = D_800AB210;
+                    gDPSetTextureDetail(gDList++, G_TD_SHARPEN);
+                    list = sTextureLoadDL_Detail;
+                    if (wrapS & 1) list = sTextureLoadDL_DetailMirror;
                     break;
                 case 0:
-                    gDPSetTextureDetail(D_800D8E24++, G_TD_CLAMP);
-                    list = D_800AB190;
-                    if (wrapS & 1) list = D_800AB210;
+                    gDPSetTextureDetail(gDList++, G_TD_CLAMP);
+                    list = sTextureLoadDL_Detail;
+                    if (wrapS & 1) list = sTextureLoadDL_DetailMirror;
                     break;
                 }
-                gSPDisplayList(D_800D8E24++, list);
+                gSPDisplayList(gDList++, list);
             }
             break;
         case 5:
             if (changed) {
-                gDPPipeSync(D_800D8E24++);
-                gDPSetTextureImage(D_800D8E24++, G_IM_FMT_I, G_IM_SIZ_16b, 1, texture);
-                gSPDisplayList(D_800D8E24++, D_800AB3C0);
+                gDPPipeSync(gDList++);
+                gDPSetTextureImage(gDList++, G_IM_FMT_I, G_IM_SIZ_16b, 1, texture);
+                gSPDisplayList(gDList++, sTextureLoadDL_I16);
             }
             break;
         }
     } else {
-        gDPPipeSync(D_800D8E24++);
+        gDPPipeSync(gDList++);
     }
     switch (info[0]) {
     case 4: level = 5; tile = 0; break;
     case 5: level = 6; tile = 0; break;
     default: level = 0; tile = 0; break;
     }
-    gSPTexture(D_800D8E24++, scaleS, scaleT, level, tile, G_ON);
+    gSPTexture(gDList++, scaleS, scaleT, level, tile, G_ON);
 }

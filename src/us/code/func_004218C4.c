@@ -5,32 +5,32 @@
 
 extern s32 Controller_PakChanged(s32);
 extern void Controller_UpdatePakInsertion();
-extern s32 D_8011F148;
-extern s32 D_8011F13C;
-extern s32 D_801309BC;
-extern s32 D_8011B108;
+extern s32 gPakCheckDone;
+extern s32 gPakCheckHasPak;
+extern s32 gPakMenuLeaving;
+extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;
-extern s32 D_800C2028;
+extern s32 gPakMenuPort;
 extern s32 gEngineApp;
 extern void CEngineApp__UpdateControllers(void *arg0);
 s32 PakMenu_PollBootPak(s32 arg0) {
     extern s32 PakMenu_CheckPak(s32, s32, s32);
-    if (D_8011B108 == 0) {
+    if (gPakMenuStartPressed == 0) {
         CEngineApp__UpdateControllers(&gEngineApp);
         Controller_UpdatePakInsertion();
-        if (D_8011B108 == 0) {
+        if (gPakMenuStartPressed == 0) {
             if (D_8011F144 != 0) {
-                D_8011F148 = 1;
+                gPakCheckDone = 1;
             }
-            D_8011F13C = 0;
-            D_801309BC = 1;
+            gPakCheckHasPak = 0;
+            gPakMenuLeaving = 1;
         }
     }
-    if (D_801309BC == 0) {
-        if ((D_800C2028 != -1) && (Controller_PakChanged(D_800C2028) != 0) && (PakMenu_CheckPak(arg0, D_800C2028, 0) != 0)) {
-            D_8011F13C = 0;
-            D_801309BC = 1;
+    if (gPakMenuLeaving == 0) {
+        if ((gPakMenuPort != -1) && (Controller_PakChanged(gPakMenuPort) != 0) && (PakMenu_CheckPak(arg0, gPakMenuPort, 0) != 0)) {
+            gPakCheckHasPak = 0;
+            gPakMenuLeaving = 1;
         }
     }
-    return D_801309BC;
+    return gPakMenuLeaving;
 }

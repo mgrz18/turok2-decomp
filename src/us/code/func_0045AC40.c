@@ -17,39 +17,39 @@ extern char *D_800B48A8[];
 extern char *D_800B4870[];
 extern char *D_800B487C[];
 extern char *D_800B4894[];
-extern s32 D_80130994;
-extern s32 D_80130984;
-extern s32 D_801309B4;
-extern s32 D_80130990;
+extern s32 gPakMenuIsLoad;
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuAnyPak;
 extern char *D_800C140C[];
 s32 PakMenu_UpdateSubtitle_2(struct Field *field, s16 *arg1) {
     s32 option;
     u32 rel;
     option = *arg1;
     rel = option - 3;
-    if (D_80130994 != 0) {
-        if (D_801309B4 != 0) {
+    if (gPakMenuIsLoad != 0) {
+        if (gPakMenuIsProfile != 0) {
             field->text = D_800B4870;
         } else {
             field->text = D_800B4888;
         }
         goto done;
     }
-    if (D_80130984 != 0) {
+    if (gPakMenuIsSave != 0) {
         if (rel < 16) {
             field->text = D_800B48A8;
             return 0;
         }
         if (option == 0x15) {
             field->text = D_800C140C;
-        } else if (D_801309B4 != 0) {
+        } else if (gPakMenuIsProfile != 0) {
             field->text = D_800B487C;
         } else {
             field->text = D_800B4894;
         }
         goto done;
     }
-    if (D_80130990 != 0) {
+    if (gPakMenuAnyPak != 0) {
         field->text = D_800B48E4;
     }
 done:

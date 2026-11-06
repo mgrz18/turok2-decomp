@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 
 extern float D_800A7F68;
-extern int D_800F2000;
-extern int D_800B2600;
-extern int D_800F2000;
-extern int D_800B2600;
+extern int sRegionCeilingNormal;
+extern int sCachedCeilingRawNormalRegion;
+extern int sRegionCeilingNormal;
+extern int sCachedCeilingRawNormalRegion;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
     CVector3 normal;
@@ -19,7 +19,7 @@ f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
     if (node == 0) {
         return 0.0f;
     }
-    if ((int)node != D_800B2600) {
+    if ((int)node != sCachedCeilingRawNormalRegion) {
         p = node->cur;
         q = node->prev;
         a.x = ((CollisionBuildVertex *)p)->x - ((CollisionBuildVertex *)q)->x;
@@ -38,10 +38,10 @@ f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
         p = node->next;
         q = node->cur;
         b.z = ((CollisionBuildVertex *)p)->z - ((CollisionBuildVertex *)q)->z;
-        CVector3__Cross((CVector3 *)&D_800F2000, &b, &a);
+        CVector3__Cross((CVector3 *)&sRegionCeilingNormal, &b, &a);
     }
-    normal = *(CVector3 *)&D_800F2000;
-    D_800B2600 = (int)node;
+    normal = *(CVector3 *)&sRegionCeilingNormal;
+    sCachedCeilingRawNormalRegion = (int)node;
     if (normal.y == 0.0f) {
         return (((CollisionBuildVertex *)node->prev)->ceiling +
                 ((CollisionBuildVertex *)node->cur)->ceiling +

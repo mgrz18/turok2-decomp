@@ -4,10 +4,10 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-extern f32 D_800AE350;
-extern f32 D_800ACE10;          /* projectile speed scale */
-extern f32 D_800ACE14;          /* projectile power */
-extern u8 D_800F8928[];
+extern f32 gWeaponChargeScale;
+extern f32 gProjectileSpeedScale;          /* projectile speed scale */
+extern f32 gProjectilePower;          /* projectile power */
+extern u8 gScene_m_ParticleSystem[];
 
 CQuaternion CGameObjectInstance__GetRotation(CPlayer *p);
 AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *p, s32 weapon);
@@ -22,7 +22,7 @@ void CParticleSystem__Spawn(void *list, CPlayer *src, CPlayer *owner, s32 a3, s3
 #define CHARGE(p) if ((p)->m_CharacterActor.m_CurrentAnimation.m_AnimationFrame >= 3.0f) { (p)->m_CharacterActor.m_CurrentAnimation.m_AnimationFrame -= 3.0f; }
 /* Whether the weapon fires the given projectile. */
 static __inline__ s32 usesProjectile(s32 weapon, s32 type) {
-    WeaponInfo *def = D_800AF618[weapon];
+    WeaponInfo *def = gWeaponInfoTable[weapon];
     s32 i;
 
     for (i = 0; i < 3; i++) {
@@ -83,7 +83,7 @@ void CPlayer__FireWeapon(CPlayer *p, s32 type) {
             p->m_CharacterActor.m_CurrentAnimation.m_bCycleCompleted = 0;
         }
     }
-    D_800ACE10 = D_800AE350;
+    gProjectileSpeedScale = gWeaponChargeScale;
     target = 0;
     if (camera != NULL) {
         pos = camera->m_vPos;
@@ -94,7 +94,7 @@ void CPlayer__FireWeapon(CPlayer *p, s32 type) {
     if (p->m_CrossHairMode == 2) {
         target = (s32) p->m_pCrossHairTarget;
     }
-    D_800ACE14 = p->weapon_particle_damage_scaler;
+    gProjectilePower = p->weapon_particle_damage_scaler;
     if (p->m_SniperMode) {
         switch (p->m_Data.m_CurrentWeapon) {
             case 10:
@@ -113,9 +113,9 @@ void CPlayer__FireWeapon(CPlayer *p, s32 type) {
         }
     }
     if (type == 4) {
-        f = D_800ACE14 * 6.0f;
+        f = gProjectilePower * 6.0f;
         type = (s32)((f > 6.0f ? 6.0f : f) + 460.0f);
     }
-    CParticleSystem__Spawn(D_800F8928, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? 5 : 1);
-    D_800ACE14 = p->weapon_particle_damage_scaler = D_800AE350 = D_800ACE10 = 1.0f;
+    CParticleSystem__Spawn(gScene_m_ParticleSystem, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? 5 : 1);
+    gProjectilePower = p->weapon_particle_damage_scaler = gWeaponChargeScale = gProjectileSpeedScale = 1.0f;
 }

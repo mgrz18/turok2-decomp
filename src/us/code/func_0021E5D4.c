@@ -31,7 +31,7 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-extern int D_80119878;
+extern int gEngineApp_m_Game_m_PlayerList_m_nPlayers;
 struct TypeEntry;
 typedef struct TypeEntry TypeEntry;
 struct TypeEntry;
@@ -56,9 +56,9 @@ struct LevelActor;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern char D_800AE994[];
+extern char gWeaponActorTypeInfo[];
 extern TypeEntry *gIntelligenceTypeInfo[];
-extern char *D_80119874;
+extern char *gEngineApp_m_Game_m_PlayerList_m_Players;
 void func_0021E5D4(char *arg0)
 {
     s32 type;
@@ -75,15 +75,15 @@ zero_entry:
     entry = 0;
     goto selected;
 special_entry:
-    entry = (TypeEntry *)D_800AE994;
+    entry = (TypeEntry *)gWeaponActorTypeInfo;
     goto selected;
 valid_type:
     if (type == 11) {
-        count = D_80119878;
+        count = gEngineApp_m_Game_m_PlayerList_m_nPlayers;
         i = 0;
         if (count > 0) {
             limit = count;
-            object = D_80119874;
+            object = gEngineApp_m_Game_m_PlayerList_m_Players;
             do {
                 if (object == arg0) {
                     goto zero_entry;

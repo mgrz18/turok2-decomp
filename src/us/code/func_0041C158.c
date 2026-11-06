@@ -5,10 +5,10 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern CPlayerOptions D_8011AB18;
+extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 OptionsMenu_StepAutoAim(void *first, Menu *menu) {
-    CPlayerOptions *settings = &D_8011AB18;
+    CPlayerOptions *settings = &gEngineApp_m_Settings_defaultSlot;
     if (menu->player != 0 && menu->player->m_pOptions != 0) {
         settings = menu->player->m_pOptions;
     }

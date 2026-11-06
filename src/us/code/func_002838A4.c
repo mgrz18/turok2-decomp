@@ -4,18 +4,18 @@
 #include "structs/cinema.h"
 
 
-extern Cinema *D_800C1BB0;
-extern CPlayer *D_80119890;          /* current player */
-extern u8 D_801198B0[];
-extern u8 D_800F5A50[];
-/* The world and fields of it (see CScene__UpdateWarp's World). D_80110020 and
- * D_80110048 are arrays because the ROM accesses them as struct members: a
+extern Cinema *gCinemaPlayerP;
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
+extern u8 gEngineApp_m_Game_m_CameraPool[];
+extern u8 gRumblePool[];
+/* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
+ * gScene_m_LevelID are arrays because the ROM accesses them as struct members: a
  * store through a pointer may alias them, so their loads stay after it. */
 extern u8 gScene[];             /* the world */
-extern s32 D_80110020[];            /* world +0x18FA8: the current warp id */
-extern s32 D_80110030;              /* world +0x18FB8: selectionFlags */
-extern u8 D_80110034[];             /* world +0x18FBC: selectionSpawn */
-extern s32 D_80110048[];            /* world +0x18FD0: selectionValues */
+extern s32 gScene_m_nLevel[];            /* world +0x18FA8: the current warp id */
+extern s32 gScene_m_bWarpSpawn;              /* world +0x18FB8: selectionFlags */
+extern u8 gScene_m_WarpSpawn[];             /* world +0x18FBC: selectionSpawn */
+extern s32 gScene_m_LevelID[];            /* world +0x18FD0: selectionValues */
 
 void CPlayer__ResetControlState(CPlayer *player);
 s32 CScene__GetRegionIndex(void *world, s32 region);
@@ -34,43 +34,43 @@ void Cinema_Start(void) {
     void *world;
     s32 out[3];
 
-    warp = D_800C1BB0->warpId;
-    if (D_800C1BB0->started != 0) {
+    warp = gCinemaPlayerP->warpId;
+    if (gCinemaPlayerP->started != 0) {
         return;
     }
-    if (D_800C1BB0->resetPlayer != 0) {
-        player = D_80119890;
+    if (gCinemaPlayerP->resetPlayer != 0) {
+        player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
         if (player != NULL) {
             CPlayer__ResetControlState(player);
-            if (D_800C1BB0->saveStart != 0 && D_800C1BB0->startLevel == -1
-                && D_800C1BB0->startWarp == D_800C1BB0->startLevel) {
-                D_800C1BB0->startLevel = D_80110048[0];
-                D_800C1BB0->startWarp = D_80110020[0];
-                D_800C1BB0->restored = 0;
-                D_800C1BB0->startPos = player->m_CharacterActor.header.m_vPos;
-                D_800C1BB0->startRotY = player->m_CharacterActor.m_RotY;
-                D_800C1BB0->startRegion = CScene__GetRegionIndex(gScene, player->m_CharacterActor.header.m_pCurrentRegion);
+            if (gCinemaPlayerP->saveStart != 0 && gCinemaPlayerP->startLevel == -1
+                && gCinemaPlayerP->startWarp == gCinemaPlayerP->startLevel) {
+                gCinemaPlayerP->startLevel = gScene_m_LevelID[0];
+                gCinemaPlayerP->startWarp = gScene_m_nLevel[0];
+                gCinemaPlayerP->restored = 0;
+                gCinemaPlayerP->startPos = player->m_CharacterActor.header.m_vPos;
+                gCinemaPlayerP->startRotY = player->m_CharacterActor.m_RotY;
+                gCinemaPlayerP->startRegion = CScene__GetRegionIndex(gScene, player->m_CharacterActor.header.m_pCurrentRegion);
             }
             player->m_WeaponActor.m_AI.m_VarBuffer[0] = 0;
             player->m_WeaponActor.m_AI.m_VarBuffer[1] = 0;
             player->m_WeaponActor.m_AI.m_VarBuffer[5] = 0;
         }
-        CCameraPool__ReleaseAllTexts(D_801198B0);
-        RumblePool_FreeAll(D_800F5A50);
+        CCameraPool__ReleaseAllTexts(gEngineApp_m_Game_m_CameraPool);
+        RumblePool_FreeAll(gRumblePool);
     }
     if (warp != -1) {
         world = gScene;
-        if (D_80110020[0] != warp) {
+        if (gScene_m_nLevel[0] != warp) {
             out[0] = 0;
             out[1] = 0;
             out[2] = 0;
-            D_80110048[0] = CScene__FindNearestWarpDest(world, out, warp, D_80110034);
-            D_80110030 = D_80110048[0] != 0;
-            CScene__LoadLevel(world, warp, D_80110030);
+            gScene_m_LevelID[0] = CScene__FindNearestWarpDest(world, out, warp, gScene_m_WarpSpawn);
+            gScene_m_bWarpSpawn = gScene_m_LevelID[0] != 0;
+            CScene__LoadLevel(world, warp, gScene_m_bWarpSpawn);
         }
     }
-    D_800C1BB0->restoreAtEnd = Cinema_NoWaitCues();
-    D_800C1BB0->unk50 = 1;
-    D_800C1BB0->warpId = -1;
-    D_800C1BB0->started = 1;
+    gCinemaPlayerP->restoreAtEnd = Cinema_NoWaitCues();
+    gCinemaPlayerP->unk50 = 1;
+    gCinemaPlayerP->warpId = -1;
+    gCinemaPlayerP->started = 1;
 }

@@ -3,9 +3,9 @@
 #include "common.h"
 #include "structs/pak.h"
 
-extern void **D_800C2228;
-extern s32 D_800C2220;
-extern u8 D_800F6750;
+extern void **gPakStateBuffer;
+extern s32 gPakDirectoryAllocated;
+extern u8 gPakQueueState;
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
@@ -20,10 +20,10 @@ extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 
 /* Releases the pak directory buffer and clears its global state. */
 void Pak_FreeDirectory(void) {
     CCache__Flush(0);
-    if (D_800C2228) {
-        CCache__Deallocate(0, D_800C2228);
-        D_800C2228 = 0;
-        D_800C2224 = 0;
+    if (gPakStateBuffer) {
+        CCache__Deallocate(0, gPakStateBuffer);
+        gPakStateBuffer = 0;
+        gPakDirectories = 0;
     }
-    D_800C2220 = 0;
+    gPakDirectoryAllocated = 0;
 }

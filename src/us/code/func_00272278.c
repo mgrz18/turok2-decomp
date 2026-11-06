@@ -108,9 +108,9 @@ extern f32 D_800A8118;
 extern f32 D_800A811C;
 extern f32 D_800A8120;
 extern f32 D_800A8124;
-extern f32 D_800B2A30;
-extern M04Tab D_800B2750[];
-extern u8 D_800F2940[];
+extern f32 sSoundHearingRangeSq;
+extern M04Tab sSoundKindVolumeTable[];
+extern u8 gSndVolumeCurve[];
 f32 HalfToFloat(u16 x);
 u16 FloatToHalf(f32 x);
 s32 Cinema_PathPlaying();
@@ -135,8 +135,8 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
     o->unkC8 = D_800A8110;
     if (o->kind < 0x100) {
         for (i = 0; i < 0x1F; i++) {
-            if (o->kind == (s32)D_800B2750[i].key) {
-                o->unkC8 = D_800B2750[i].val;
+            if (o->kind == (s32)sSoundKindVolumeTable[i].key) {
+                o->unkC8 = sSoundKindVolumeTable[i].val;
                 break;
             }
         }
@@ -164,10 +164,10 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
         q = (CVector3 *)&o->ctx->tgt->x;
         {
             f32 d2 = (p->x - q->x) * (p->x - q->x) + (p->y - q->y) * (p->y - q->y) + (p->z - q->z) * (p->z - q->z);
-            if (D_800B2A30 <= d2) {
+            if (sSoundHearingRangeSq <= d2) {
                 f = 0.0f;
             } else {
-                f = D_800A8120 - d2 / D_800B2A30;
+                f = D_800A8120 - d2 / sSoundHearingRangeSq;
             }
         }
         switch (vp->mode) {
@@ -208,13 +208,13 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
         } else {
             t = n * 2;
         }
-        vp->vol = (s32)((f32)(s32)((f32)*(s16 *)(D_800F2940 + t) * o->env2A) * vf);
+        vp->vol = (s32)((f32)(s32)((f32)*(s16 *)(gSndVolumeCurve + t) * o->env2A) * vf);
         if ((f32)n < 0.0f) {
             t = -n * 2;
         } else {
             t = n * 2;
         }
-        env->w0 = FloatToHalf((f32)*(s16 *)(D_800F2940 + t) * vf);
+        env->w0 = FloatToHalf((f32)*(s16 *)(gSndVolumeCurve + t) * vf);
         vp->wC = (s32)HalfToFloat(env->w0 & 0xFFFF);
         return;
     }
@@ -224,7 +224,7 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
     } else {
         t = n * 2;
     }
-    t = (s32)((f32)*(s16 *)(D_800F2940 + t) * vf);
+    t = (s32)((f32)*(s16 *)(gSndVolumeCurve + t) * vf);
     vp->vol = t;
     vp->wC = t;
 }

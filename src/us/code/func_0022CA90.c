@@ -8,10 +8,10 @@
 typedef struct Target Target;
 
 extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
-extern CVector3 D_800F1DB8;                /* the direction of the hit */
-extern u8 D_8011AAF1;
-extern u8 D_800F8928[];
-extern u8 D_801102B8[];
+extern CVector3 gCollisionResults_m_vVelocity;                /* the direction of the hit */
+extern u8 gEngineApp_m_Settings_multiplayer;
+extern u8 gScene_m_ParticleSystem[];
+extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
 s32 Actor_GetTypeClass(Target *target);
@@ -36,8 +36,8 @@ static __inline__ void placeAtHit(CParticle *p) {
     CVector3 dir;
 
     p->header.m_vPos = gCollisionResults.m_vInstancePos;
-    p->m_vVelocity = D_800F1DB8;
-    dir = D_800F1DB8;
+    p->m_vVelocity = gCollisionResults_m_vVelocity;
+    dir = gCollisionResults_m_vVelocity;
     CVector3__Normalize(&dir);
     p->m_vDirection = dir;
     CVector3__Scale(&dir, &dir, Random_Blend(-49.92f, 0.0f));
@@ -62,7 +62,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         kind = 4;
         p->m_dwFlags |= 2;
     }
-    if (D_8011AAF1 != 0 && CParticle__IsUnderWater(p)) {
+    if (gEngineApp_m_Settings_multiplayer != 0 && CParticle__IsUnderWater(p)) {
         CROMParticleEffect *controlledDefinition = p->m_pEffect;
         s32 controlledKind, model, sound, effect;
 
@@ -91,7 +91,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         case 2:
         case 3:
             if (definition->m_dwFlags & 0x800000) {
-                func_002364A4(D_801102B8, gCollisionResults.m_vInstancePos, gCollisionResults.m_vNormal, kind, 0);
+                func_002364A4(gEngineApp_m_SwooshSystem, gCollisionResults.m_vInstancePos, gCollisionResults.m_vNormal, kind, 0);
             }
             break;
     }
@@ -104,7 +104,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         }
         if (p->m_ActiveSwooshes) {
             CParticle__BuildCameraMatrix(p);
-            Trail_DetachOwner(D_801102B8, p);
+            Trail_DetachOwner(gEngineApp_m_SwooshSystem, p);
         }
         if (p->m_pDLight) {
             CDLightSet__Free(D_8010FF34, p->m_pDLight);
@@ -125,7 +125,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         if (effect != 0xFFFF) {
             void *eventSource = source;
 
-            if (D_800AD084[effect].m_Flags & 2) {
+            if (gImpactEventHandlers_m_Flags[effect].m_Flags & 2) {
                 eventSource = p;
             }
             ImpactEvent_Send(eventSource, p, effect, -1, gCollisionResults.m_vInstancePos, params);
@@ -139,7 +139,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
     }
     if (!(p->m_dwFlags & 0x30000) && p->m_bDieOnImpact == 1) {
 remove:
-        CParticleSystem__Free(D_800F8928, p);
+        CParticleSystem__Free(gScene_m_ParticleSystem, p);
         CParticle__StopLoopSound(p);
     }
 }

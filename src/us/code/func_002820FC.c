@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern f32 D_800F5A40[];
+extern f32 gCameraVisBits[];
 
 s32 SavedPlayers_IsActive(void);
 
 /* Moves value toward target by step, without overshooting; jumps straight
- * there when SavedPlayers_IsActive says so. While it moves, D_800F5A40[1] is set
+ * there when SavedPlayers_IsActive says so. While it moves, gCameraVisBits[1] is set
  * to 30. */
 f32 CCameraPool__StepToward(CCameraPool *pool, f32 value, f32 target, f32 step) {
     if (SavedPlayers_IsActive() != 0) {
@@ -14,13 +14,13 @@ f32 CCameraPool__StepToward(CCameraPool *pool, f32 value, f32 target, f32 step) 
     }
     if (value < target) {
         value += step;
-        D_800F5A40[1] = 30.0f;
+        gCameraVisBits[1] = 30.0f;
         if (value > target) {
             value = target;
         }
     } else if (value > target) {
         value -= step;
-        D_800F5A40[1] = 30.0f;
+        gCameraVisBits[1] = 30.0f;
         if (value < target) {
             value = target;
         }

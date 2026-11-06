@@ -6,8 +6,8 @@
 extern float D_800AA8D8;
 extern double D_800AA8D0;
 extern void __osViSwapContext();
-extern __OSViContext *D_800B7AC0;
-extern __OSViContext *D_800B7AC4;
+extern __OSViContext *__osViCurr;
+extern __OSViContext *__osViNext;
 extern u32 osVirtualToPhysical(void *addr);
 void __osViSwapContext(void)
 {
@@ -23,7 +23,7 @@ void __osViSwapContext(void)
     u32 *yscalep;
     __OSViContext **curr;
     field = 0;
-    vc = D_800B7AC4;
+    vc = __osViNext;
     vm = vc->modep;
     field = (*(volatile u32 *)(0xA4400010)) & 1;
     origin = osVirtualToPhysical(vc->framep) + (vm->fldRegs[field].origin);
@@ -78,8 +78,8 @@ void __osViSwapContext(void)
     (*(volatile u32 *)(0xA4400030) = (vc->x.scale));
     (*(volatile u32 *)(0xA4400034) = (vc->y.scale));
     (*(volatile u32 *)(0xA4400000) = (vc->control));
-    curr = &D_800B7AC0;
-    D_800B7AC4 = *curr;
+    curr = &__osViCurr;
+    __osViNext = *curr;
     *curr = vc;
-    *D_800B7AC4 = **curr;
+    *__osViNext = **curr;
 }

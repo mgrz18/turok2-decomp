@@ -11,12 +11,12 @@ extern s32 alHeapDBAlloc(s32 file, s32 line, void *hp, s32 num, s32 size);
 extern char alFxParam;
 extern char alFxPull;
 extern char alFxParamHdl;
-extern s32 D_800B7770[];
-extern s32 D_800B77D8[];
-extern s32 D_800B7860[];
-extern s32 D_800B7888[];
-extern s32 D_800B78B0[];
-extern s32 D_800B78D8[];
+extern s32 SMALLROOM_PARAMS[];
+extern s32 BIGROOM_PARAMS[];
+extern s32 ECHO_PARAMS[];
+extern s32 CHORUS_PARAMS[];
+extern s32 FLANGE_PARAMS[];
+extern s32 NULL_PARAMS[];
 extern const f32 D_800AA500;
 extern const f32 D_800AA510;
 void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
@@ -29,13 +29,13 @@ void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
     f->handler = &alFxPull;
     r->paramHdl = &alFxParamHdl;
     switch (c->fxType) {
-      case 1: param = D_800B7770; break;
-      case 2: param = D_800B77D8; break;
-      case 5: param = D_800B7860; break;
-      case 3: param = D_800B7888; break;
-      case 4: param = D_800B78B0; break;
+      case 1: param = SMALLROOM_PARAMS; break;
+      case 2: param = BIGROOM_PARAMS; break;
+      case 5: param = ECHO_PARAMS; break;
+      case 3: param = CHORUS_PARAMS; break;
+      case 4: param = FLANGE_PARAMS; break;
       case 6: param = c->params; break;
-      default: param = D_800B78D8; break;
+      default: param = NULL_PARAMS; break;
     }
     j = 0;
     r->section_count = param[j++];

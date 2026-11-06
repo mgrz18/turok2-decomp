@@ -5,9 +5,9 @@
 
 extern s32 adecDequantize(f32 *out, s16 *in);
 extern float D_800AAC34;
-extern u16 D_800B8A88[];
+extern u16 gAdecBandEnds[];
 extern s16 D_800B8AA6;
-extern f32 D_800B8AA8[];
+extern f32 gAdecStepSizes[];
 s32 adecDequantize(f32 *out, s16 *in) {
     s16 *scale;
     s16 band;
@@ -20,8 +20,8 @@ s32 adecDequantize(f32 *out, s16 *in) {
     start = 0;
     values = in + 0x50;
     band = 0;
-    ends = D_800B8A88;
-    steps = D_800B8AA8;
+    ends = gAdecBandEnds;
+    steps = gAdecStepSizes;
     gain = D_800AAC34;
     for (; band < 16; band++) {
         for (i = start; i < ends[band]; i++) {

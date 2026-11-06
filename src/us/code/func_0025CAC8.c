@@ -21,7 +21,7 @@ typedef struct Projectile {
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-extern CVector3 D_800B06AC;
+extern CVector3 gEnemyLastNoisePos;
 extern CCollisionResults gCollisionResults;
 
 extern f32 CVector3__Distance(CVector3 *a, CVector3 *b);
@@ -45,7 +45,7 @@ static __inline__ void hearNoise(CGameObjectInstance *actor, CAI *ai, CVector3 *
                     if (add < ai->m_ActionTime) {
                         ai->m_ActionTime = add;
                     }
-                    D_800B06AC = *pos;
+                    gEnemyLastNoisePos = *pos;
                 }
             }
         }

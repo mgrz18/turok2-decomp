@@ -3,12 +3,12 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 
-extern CPlayer *D_80119890;     /* the players, a list through m_pNext */
-extern u32 D_800B6CB8;          /* the camera player's AI flags this frame, */
-extern u32 D_800B6CBC;          /* the frame before, */
-extern u32 D_800B6CC0;          /* and the one before that */
-extern s32 D_800AE340;          /* a tint forced over the view */
-extern u8 D_800F1FE4[4];        /* its colour */
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the players, a list through m_pNext */
+extern u32 sTintFlags;          /* the camera player's AI flags this frame, */
+extern u32 sTintFlagsPrev;          /* the frame before, */
+extern u32 sTintFlagsPrev2;          /* and the one before that */
+extern s32 gDeathTint;          /* a tint forced over the view */
+extern u8 gDeathTintColor[4];        /* its colour */
 extern f32 gFrameIncrement;          /* the frame's time step */
 void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 void CCamera__UpdateFlash(CCamera *cam);
@@ -29,7 +29,7 @@ s32 CCamera__DrawTints(CCamera *cam) {
     s32 i;
 
     /* CCamera__GetPlayer, inlined */
-    for (player = D_80119890; player != NULL; player = player->m_pNext) {
+    for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
         if (player->m_pCamera == (void *) cam) {
             goto found;
         }
@@ -38,20 +38,20 @@ s32 CCamera__DrawTints(CCamera *cam) {
 found:
     if (player != NULL) {
         flags = player->m_CharacterActor.m_AI.m_dwFlags;
-        D_800B6CC0 = D_800B6CBC;
-        D_800B6CBC = D_800B6CB8;
-        D_800B6CB8 = flags;
-        if ((flags & 0x880) || D_800AE340 != 0) {
+        sTintFlagsPrev2 = sTintFlagsPrev;
+        sTintFlagsPrev = sTintFlags;
+        sTintFlags = flags;
+        if ((flags & 0x880) || gDeathTint != 0) {
             tint[0] = cam->m_FogColor[0] & 0xE0;
             tint[1] = cam->m_FogColor[1] & 0xE0;
             tint[2] = cam->m_FogColor[2] & 0xE0;
             tint[3] = cam->m_FogColor[3] & 0xE0;
-            if (D_800AE340 != 0) {
+            if (gDeathTint != 0) {
                 for (i = 0; i < 4; i++) {
-                    tint[i] = D_800F1FE4[i];
+                    tint[i] = gDeathTintColor[i];
                 }
             }
-            if (D_8011AAD8.cheatFlags & 0x4000) {
+            if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
                 tint[0] >>= 3;
                 tint[1] >>= 3;
                 tint[2] >>= 3;
@@ -82,8 +82,8 @@ found:
                           (s32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width),
                           (s32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height));
         }
-        if (Cinema_PathPlaying() == 0 && D_80119870.m_Settings.mode == 13) {
-            CPlayerPool__DrawHuds(&D_80119870.m_PlayerList, cam);
+        if (Cinema_PathPlaying() == 0 && gEngineApp_m_Game.m_Settings.mode == 13) {
+            CPlayerPool__DrawHuds(&gEngineApp_m_Game.m_PlayerList, cam);
         }
         return Cinema_DrawOverlay(cam);
     }

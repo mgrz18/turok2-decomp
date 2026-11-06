@@ -3,7 +3,7 @@
 
 extern f32 Random_Blend(f32 lo, f32 hi);
 
-/* LevelScriptState from spawnsLeft on (D_8012F950, +0x348): this file
+/* LevelScriptState from spawnsLeft on (gLevelScript_spawnsLeft, +0x348): this file
  * reaches script2 through that symbol. */
 typedef struct {
     /* 0x00 */ s32 spawnsLeft;    /* 0x8012F950 */
@@ -14,27 +14,27 @@ typedef struct {
     /* 0xC8 */ u8 script2On;      /* 0x8012FA18 */
 } LevelScriptF950;
 
-extern LevelScriptF950 D_8012F950;
+extern LevelScriptF950 gLevelScript_spawnsLeft;
 
 /* Advance the second script to its next step, skipping steps by chance. */
 void Primagen_NextSpawnStep(void) {
-    if (D_8012F950.script2.steps == NULL) {
+    if (gLevelScript_spawnsLeft.script2.steps == NULL) {
         return;
     }
-    if (D_8012F950.script2.cursor != -1) {
-        D_8012F950.script2.timer = D_8012F950.script2.steps[D_8012F950.script2.cursor].delay;
+    if (gLevelScript_spawnsLeft.script2.cursor != -1) {
+        gLevelScript_spawnsLeft.script2.timer = gLevelScript_spawnsLeft.script2.steps[gLevelScript_spawnsLeft.script2.cursor].delay;
     } else {
-        D_8012F950.script2.timer = 0.0f;
+        gLevelScript_spawnsLeft.script2.timer = 0.0f;
     }
     do {
-        D_8012F950.script2.cursor++;
-        if (D_8012F950.script2.steps[D_8012F950.script2.cursor].type == 4) {
-            D_8012F950.script2On = 0;
-            D_8012F950.script2.cursor = -1;
-            D_8012F950.script2.current = -1;
-            D_8012F950.script2.steps = NULL;
+        gLevelScript_spawnsLeft.script2.cursor++;
+        if (gLevelScript_spawnsLeft.script2.steps[gLevelScript_spawnsLeft.script2.cursor].type == 4) {
+            gLevelScript_spawnsLeft.script2On = 0;
+            gLevelScript_spawnsLeft.script2.cursor = -1;
+            gLevelScript_spawnsLeft.script2.current = -1;
+            gLevelScript_spawnsLeft.script2.steps = NULL;
             return;
         }
-        D_8012F950.script2.current = D_8012F950.script2.cursor;
-    } while ((f32) D_8012F950.script2.steps[D_8012F950.script2.cursor].chance <= Random_Blend(0.0f, 100.0f));
+        gLevelScript_spawnsLeft.script2.current = gLevelScript_spawnsLeft.script2.cursor;
+    } while ((f32) gLevelScript_spawnsLeft.script2.steps[gLevelScript_spawnsLeft.script2.cursor].chance <= Random_Blend(0.0f, 100.0f));
 }

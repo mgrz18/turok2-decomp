@@ -9,7 +9,7 @@ AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *player, s32 weapon) {
     AmmoInfo *ammo;
     AmmoInfo *found;
     s32 i;
-    WeaponInfo *def = D_800AF618[weapon];
+    WeaponInfo *def = gWeaponInfoTable[weapon];
 
     if (player->m_UseLowerAmmo && (ammo = def->ammo[1]) != NULL
         && player->m_Data.m_AmmoList[ammo->type] > 0) {

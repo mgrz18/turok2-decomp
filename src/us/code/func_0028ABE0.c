@@ -5,8 +5,8 @@
 
 extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
 extern void *osViGetCurrentFramebuffer();
-extern s32 D_8011B098;
-extern s32 D_8011B0A0;
+extern s32 gPendingFB;
+extern s32 gCurrentFB;
 s32 __scSchedule(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node_func_8028F544_de **arg2, s32 arg3) {
     Node_func_8028F544_de *temp_s0;
     Node_func_8028F544_de *temp_v1_0;
@@ -37,11 +37,11 @@ s32 __scSchedule(Ctx_func_8028F544_de *arg0, Node_func_8028F544_de **arg1, Node_
     } else {
         if (temp_s0 == 0) {
             var_v1 = 0;
-        } else if (temp_s0->unkC == D_8011B0A0) {
+        } else if (temp_s0->unkC == gCurrentFB) {
             var_v1 = 0;
         } else if (temp_s0->unkC == osViGetCurrentFramebuffer()) {
             var_v1 = 0;
-        } else if (temp_s0->unkC == D_8011B098) {
+        } else if (temp_s0->unkC == gPendingFB) {
             var_v1 = 0;
         } else {
             var_v1 = temp_s0;

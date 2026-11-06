@@ -22,8 +22,8 @@ typedef struct Viewer {
     f32 max[3];                 /* 0x35C */
 } Viewer;
 
-extern Viewer *D_801198D0;      /* viewers */
-extern CBox D_800F5A10;       /* visible bounds: min xyz, max xyz */
+extern Viewer *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;      /* viewers */
+extern CBox gCameraVisibleBox;       /* visible bounds: min xyz, max xyz */
 extern char D_800A5F6C[];       /* "grid section" */
 
 void *CISet__GetBlock(void *table, s32 index);
@@ -58,7 +58,7 @@ void CScene__LoadVisibleGridSections(CScene *world) {
     s32 found;
     s32 count;
 
-    viewers = D_801198D0;
+    viewers = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
     if (viewers == NULL) {
         return;
     }
@@ -76,16 +76,16 @@ void CScene__LoadVisibleGridSections(CScene *world) {
     cells = (GridCell *)((u8 *)CISet__GetBlock(world->m_pCollision, 4) + 8);
     z1 = nz - 1;
     z0 = 0;
-    while (x0 < nx && xMin[x0] < D_800F5A10.m_vMin.x) {
+    while (x0 < nx && xMin[x0] < gCameraVisibleBox.m_vMin.x) {
         x0++;
     }
-    while (x1 >= 0 && D_800F5A10.m_vMax.x < xMax[x1]) {
+    while (x1 >= 0 && gCameraVisibleBox.m_vMax.x < xMax[x1]) {
         x1--;
     }
-    while (z0 < nz && zMin[z0] < D_800F5A10.m_vMin.z) {
+    while (z0 < nz && zMin[z0] < gCameraVisibleBox.m_vMin.z) {
         z0++;
     }
-    while (z1 >= 0 && D_800F5A10.m_vMax.z < zMax[z1]) {
+    while (z1 >= 0 && gCameraVisibleBox.m_vMax.z < zMax[z1]) {
         z1--;
     }
     region = world->m_Sectors;

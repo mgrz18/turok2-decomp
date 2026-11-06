@@ -3,9 +3,9 @@
 
 s32 Video_ApplyResolution(void);
 
-extern s32 D_800C2038;
+extern s32 gResolution;
 
 void Video_SetResolution(s32 arg0) {
-    D_800C2038 = arg0;
+    gResolution = arg0;
     Video_ApplyResolution();
 }

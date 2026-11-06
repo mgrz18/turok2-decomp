@@ -8,7 +8,7 @@
  * player (flags 0x300000), its heading plus pitch (0x24C) in a region of
  * type 4, or else its heading applied to its own rotation (0x40). */
 
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */
@@ -27,7 +27,7 @@ CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *actor) {
             goto own;
         }
         s = func_002982F0(1.5707964f);
-        D_800DD78C = s;
+        gQuaternionSin = s;
         yaw.x = 0.0f;
         yaw.y = s;
         yaw.z = 0.0f;
@@ -38,13 +38,13 @@ CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *actor) {
         pitch.x = s;
         pitch.y = 0.0f;
         pitch.z = 0.0f;
-        D_800DD78C = s;
+        gQuaternionSin = s;
         pitch.w = func_002974C0(actor->m_AI.m_Turret.m_Pitch * 0.5f);
         s = func_002982F0((actor->m_RotY + 3.1415927f) * 0.5f);
         yaw.x = 0.0f;
         yaw.y = s;
         yaw.z = 0.0f;
-        D_800DD78C = s;
+        gQuaternionSin = s;
         yaw.w = func_002974C0((actor->m_RotY + 3.1415927f) * 0.5f);
         CQuaternion__Multiply(&result, &pitch, &yaw);
     } else {
@@ -53,7 +53,7 @@ CQuaternion CGameObjectInstance__GetRotation(CGameObjectInstance *actor) {
         yaw.x = 0.0f;
         yaw.y = s;
         yaw.z = 0.0f;
-        D_800DD78C = s;
+        gQuaternionSin = s;
         yaw.w = func_002974C0((actor->m_RotY + 3.1415927f) * 0.5f);
         CQuaternion__Multiply(&result, &yaw, &actor->m_qGround);
     }

@@ -6,8 +6,8 @@
 void *CCache__TakeFreeCacheEntry(void) {
     extern void CList__Remove(void *, s32);
     extern s32 CList__AddHead(void *, s32);
-    extern s32 D_800D8D68;
-    void **p = &D_800D8D68;
+    extern s32 gCache_cacheFreeList;
+    void **p = &gCache_cacheFreeList;
     void *temp_s0 = *p;
     if (temp_s0 != 0) {
         CList__Remove(p, (s32) temp_s0);

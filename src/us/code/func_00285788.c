@@ -6,11 +6,11 @@
 
 void Sound__Play2D(s32 sound);
 
-extern s32 D_800B6CF8; /* menu sounds enabled */
+extern s32 gMenuSoundsEnabled; /* menu sounds enabled */
 
 s32 Controller_MenuSelect(ControllerProfile *ctrl) {
     if (ctrl->buttonsSingle & 0x8000) {
-        if (D_800B6CF8 != 0) {
+        if (gMenuSoundsEnabled != 0) {
             Sound__Play2D(0x12C);
         }
         return 1;

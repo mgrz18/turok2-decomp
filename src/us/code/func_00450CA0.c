@@ -43,7 +43,7 @@ ControllerProfile *Menu_FindPressingController_2(s32 *out) {
     s32 i;
     ControllerProfile *s;
     i = 0;
-    s = D_800F5EC0;
+    s = gControllers;
     while (i < 4) {
         if (Controller_ConfirmPressed(s) != 0) {
             *out = i;

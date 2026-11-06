@@ -5,9 +5,9 @@
 /* Controller pak note list item: prints a note's name (16 characters), extension (4) and size in blocks
  * into the item's text; an empty slot prints blanks. */
 
-extern s32 D_801309BC;
-extern s32 D_80130990;
-extern s32 D_800C2028; /* pad */
+extern s32 gPakMenuLeaving;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort; /* pad */
 extern char D_800B48D4[];
 extern char D_800B48E0[];
 extern u8 D_800C1404[];
@@ -33,11 +33,11 @@ s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
 
     idx = item->index - 3;
     c = 0x20;
-    if (D_801309BC != 0) {
+    if (gPakMenuLeaving != 0) {
         return 0;
     }
-    if (D_80130990 != 0) {
-        pad = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        pad = gPakMenuPort;
     } else {
         pad = own->controller->port;
     }

@@ -36,9 +36,9 @@ typedef struct SortNode {
     /* 0x14 */ struct SortNode *next;
 } SortNode;
 
-extern SortNode *D_800D8E1C;        /* first opaque node */
-extern Gfx *D_800D8E24;             /* display list head */
-extern SortNode *D_800D8E38;        /* first translucent node */
+extern SortNode *sOpaqueSortFirst;        /* first opaque node */
+extern Gfx *gDList;             /* display list head */
+extern SortNode *sTranslucentSortFirst;        /* first translucent node */
 
 s32 Render_SetupMaterial(Material *material, s32 pass);
 void func_00209658(void);
@@ -55,7 +55,7 @@ void Render_DrawBatches(void) {
     u16 scaleS;
     u16 scaleT;
 
-    node = D_800D8E1C;
+    node = sOpaqueSortFirst;
     deferred = NULL;
     if (node != NULL) {
         do {
@@ -65,32 +65,32 @@ void Render_DrawBatches(void) {
                 scaleS = 0;
                 do {
                     if (item->lights != NULL) {
-                        GFX_W(D_800D8E24++, 0xDB020000, 0x18);                  /* gSPNumLights(1) */
-                        GFX_W(D_800D8E24++, 0xDC08060A, (u32)(item->lights + 8)); /* gSPLight(lights + 8, 1) */
-                        GFX_W(D_800D8E24++, 0xDC08090A, (u32)item->lights);       /* gSPLight(lights, 2) */
+                        GFX_W(gDList++, 0xDB020000, 0x18);                  /* gSPNumLights(1) */
+                        GFX_W(gDList++, 0xDC08060A, (u32)(item->lights + 8)); /* gSPLight(lights + 8, 1) */
+                        GFX_W(gDList++, 0xDC08090A, (u32)item->lights);       /* gSPLight(lights, 2) */
                     }
                     if (item->segment != 0) {
-                        GFX_W(D_800D8E24++, 0xDB060004, (u32)item->matrix);       /* gSPSegment(1, matrix) */
+                        GFX_W(gDList++, 0xDB060004, (u32)item->matrix);       /* gSPSegment(1, matrix) */
                     } else {
-                        GFX_W(D_800D8E24++, 0xDA380003, (u32)item->matrix);       /* gSPMatrix(matrix, G_MTX_LOAD) */
+                        GFX_W(gDList++, 0xDA380003, (u32)item->matrix);       /* gSPMatrix(matrix, G_MTX_LOAD) */
                     }
-                    GFX_W(D_800D8E24++, 0xDB060008, (u32)item->textures);         /* gSPSegment(2, textures) */
+                    GFX_W(gDList++, 0xDB060008, (u32)item->textures);         /* gSPSegment(2, textures) */
                     if (item->scaleS != 0) {
                         if (scaleS != item->scaleS || scaleT != item->scaleT) {
                             if (node->material->flags & 0x2000) {
-                                GFX_W(D_800D8E24++, 0xD7002802, (item->scaleS << 16) | item->scaleT); /* gSPTexture(s, t, 5, 0, on) */
+                                GFX_W(gDList++, 0xD7002802, (item->scaleS << 16) | item->scaleT); /* gSPTexture(s, t, 5, 0, on) */
                             } else {
-                                GFX_W(D_800D8E24++, 0xD7000002, (item->scaleS << 16) | item->scaleT); /* gSPTexture(s, t, 0, 0, on) */
+                                GFX_W(gDList++, 0xD7000002, (item->scaleS << 16) | item->scaleT); /* gSPTexture(s, t, 0, 0, on) */
                             }
                         }
                         scaleS = item->scaleS;
                         scaleT = item->scaleT;
                     }
-                    GFX_W(D_800D8E24++, 0xDE000000, (u32)item->list);             /* gSPDisplayList */
+                    GFX_W(gDList++, 0xDE000000, (u32)item->list);             /* gSPDisplayList */
                     item = item->next;
                 } while (item != NULL);
                 if (node->material->flags & 0x2000) {
-                    GFX_W(D_800D8E24++, 0xE3000F00, 0);                         /* gDPSetTextureLOD(G_TL_TILE) */
+                    GFX_W(gDList++, 0xE3000F00, 0);                         /* gDPSetTextureLOD(G_TL_TILE) */
                 }
                 if (node->material->flags & 0x4000) {
                     next = node->next;
@@ -111,27 +111,27 @@ void Render_DrawBatches(void) {
         do {
             item = node->head;
             if (item != NULL) {
-                GFX_W(D_800D8E24++, 0xFA000000, node->material->alpha);         /* gDPSetPrimColor(0, 0, 0, 0, 0, alpha) */
+                GFX_W(gDList++, 0xFA000000, node->material->alpha);         /* gDPSetPrimColor(0, 0, 0, 0, 0, alpha) */
                 do {
                     if (item->lights != NULL) {
-                        GFX_W(D_800D8E24++, 0xDB020000, 0x18);
-                        GFX_W(D_800D8E24++, 0xDC08060A, (u32)(item->lights + 8));
-                        GFX_W(D_800D8E24++, 0xDC08090A, (u32)item->lights);
+                        GFX_W(gDList++, 0xDB020000, 0x18);
+                        GFX_W(gDList++, 0xDC08060A, (u32)(item->lights + 8));
+                        GFX_W(gDList++, 0xDC08090A, (u32)item->lights);
                     }
                     if (item->segment != 0) {
-                        GFX_W(D_800D8E24++, 0xDB060004, (u32)item->matrix);
+                        GFX_W(gDList++, 0xDB060004, (u32)item->matrix);
                     } else {
-                        GFX_W(D_800D8E24++, 0xDA380003, (u32)item->matrix);
+                        GFX_W(gDList++, 0xDA380003, (u32)item->matrix);
                     }
-                    GFX_W(D_800D8E24++, 0xDB060008, (u32)item->textures);
-                    GFX_W(D_800D8E24++, 0xDE000000, (u32)item->list);
+                    GFX_W(gDList++, 0xDB060008, (u32)item->textures);
+                    GFX_W(gDList++, 0xDE000000, (u32)item->list);
                     item = item->next;
                 } while (item != NULL);
             }
             node = node->next;
         } while (node != NULL);
     }
-    node = D_800D8E38;
+    node = sTranslucentSortFirst;
     if (node != NULL) {
         do {
             item = node->head;
@@ -140,32 +140,32 @@ void Render_DrawBatches(void) {
                 scaleS = 0;
                 do {
                     if (item->lights != NULL) {
-                        GFX_W(D_800D8E24++, 0xDB020000, 0x18);
-                        GFX_W(D_800D8E24++, 0xDC08060A, (u32)(item->lights + 8));
-                        GFX_W(D_800D8E24++, 0xDC08090A, (u32)item->lights);
+                        GFX_W(gDList++, 0xDB020000, 0x18);
+                        GFX_W(gDList++, 0xDC08060A, (u32)(item->lights + 8));
+                        GFX_W(gDList++, 0xDC08090A, (u32)item->lights);
                     }
                     if (item->segment != 0) {
-                        GFX_W(D_800D8E24++, 0xDB060004, (u32)item->matrix);
+                        GFX_W(gDList++, 0xDB060004, (u32)item->matrix);
                     } else {
-                        GFX_W(D_800D8E24++, 0xDA380003, (u32)item->matrix);
+                        GFX_W(gDList++, 0xDA380003, (u32)item->matrix);
                     }
-                    GFX_W(D_800D8E24++, 0xDB060008, (u32)item->textures);
+                    GFX_W(gDList++, 0xDB060008, (u32)item->textures);
                     if (item->scaleS != 0) {
                         if (scaleS != item->scaleS || scaleT != item->scaleT) {
                             if (node->material->flags & 0x2000) {
-                                GFX_W(D_800D8E24++, 0xD7002802, (item->scaleS << 16) | item->scaleT);
+                                GFX_W(gDList++, 0xD7002802, (item->scaleS << 16) | item->scaleT);
                             } else {
-                                GFX_W(D_800D8E24++, 0xD7000002, (item->scaleS << 16) | item->scaleT);
+                                GFX_W(gDList++, 0xD7000002, (item->scaleS << 16) | item->scaleT);
                             }
                         }
                         scaleS = item->scaleS;
                         scaleT = item->scaleT;
                     }
-                    GFX_W(D_800D8E24++, 0xDE000000, (u32)item->list);
+                    GFX_W(gDList++, 0xDE000000, (u32)item->list);
                     item = item->next;
                 } while (item != NULL);
                 if (node->material->flags & 0x2000) {
-                    GFX_W(D_800D8E24++, 0xE3000F00, 0);
+                    GFX_W(gDList++, 0xE3000F00, 0);
                 }
             }
             node = node->next;

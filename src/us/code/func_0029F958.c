@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p);
-extern s32 D_800B8A20;
+extern s32 sAdecFrame;
 extern s32 adecNextFrame();
 extern void osWritebackDCache(s32 buffer, s32 size);
 Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffset, Acmd *p)
@@ -23,23 +23,23 @@ Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffse
         return ptr;
     }
     if (byteCount != 0) {
-        stream = &D_800B8A20;
+        stream = &sAdecFrame;
         do {
             nSam = byteCount;
             if (f->sample == 0) {
-                D_800B8A20 = adecNextFrame();
-                if (D_800B8A20 == 0) {
+                sAdecFrame = adecNextFrame();
+                if (sAdecFrame == 0) {
                     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(op) & (0xFFFFFFFFU >> (32 - (24)))) << (0)); _a->words.w1 = (unsigned int)(byteCount << 1); };
                     return ptr;
                 }
-                osWritebackDCache(D_800B8A20, 0x200);
+                osWritebackDCache(sAdecFrame, 0x200);
                 f->sample = 0x100;
             }
             if (f->sample < byteCount) {
                 nSam = f->sample;
             }
             nbytes = nSam << 1;
-            dramAlign = D_800B8A20 & 0x7;
+            dramAlign = sAdecFrame & 0x7;
             nbytes += dramAlign;
             if (op & 0x7) {
                 dmemAlign = 8 - (op & 0x7);
@@ -47,7 +47,7 @@ Acmd *alAdecPull(ALLoadFilter *filter, s16 *outp, s32 byteCount, s32 sampleOffse
                 dmemAlign = 0;
             }
             { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(op + dmemAlign) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(nbytes + 8 - (nbytes & 0x7)) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
-            { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)((D_800B8A20 & 0x1FFFFFFF) - dramAlign); };
+            { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (8)))) << (24)); _a->words.w1 = (unsigned int)((sAdecFrame & 0x1FFFFFFF) - dramAlign); };
             if (dramAlign || dmemAlign) {
                 { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(10) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(op + dramAlign + dmemAlign) & (0xFFFFFFFFU >> (32 - (24)))) << (0)); _a->words.w1 = (((unsigned int)(op) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(nSam << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
             }

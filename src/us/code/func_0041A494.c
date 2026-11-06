@@ -6,7 +6,7 @@
 
 extern f32 gFrameIncrement;
 s32 GameOverMenu_TickCountdown(void) {
-    GameMatch *state = &D_8011ACB0;
+    GameMatch *state = &gEngineApp_m_Settings_match;
     f32 timer = state->countdown - gFrameIncrement;
     state->countdown = timer;
     if (timer < 0.0f) {

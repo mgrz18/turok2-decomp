@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern char D_800AB0B0;
+extern char gHashSize;
 extern char D_11059;
-extern char D_800C18F0;
+extern char gPrimagenPaths;
 extern char D_94F;
 int IsDataPointer(u32 arg0) {
-    if (arg0 >= (u32)&D_800AB0B0 &&
-        arg0 < (u32)&D_800AB0B0 + (u32)&D_11059) {
+    if (arg0 >= (u32)&gHashSize &&
+        arg0 < (u32)&gHashSize + (u32)&D_11059) {
         return 1;
     }
-    if (arg0 >= (u32)&D_800C18F0 &&
-        arg0 < (u32)&D_800C18F0 + (u32)&D_94F) {
+    if (arg0 >= (u32)&gPrimagenPaths &&
+        arg0 < (u32)&gPrimagenPaths + (u32)&D_94F) {
         return 1;
     }
     return 0;

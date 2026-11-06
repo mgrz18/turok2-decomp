@@ -5,20 +5,20 @@
 
 /* Controller / rumble slot, 0x224 bytes (Controller in Controller_ResetRumble). */
 
-extern char D_800F5A50[];
-extern char D_800F5A80[];
-extern s8 D_800F6750;     /* pak queue state */
-extern char D_800F6758[]; /* pak OSMesgQueue */
-extern char D_800F6798[]; /* SI OSMesgQueue */
-extern char D_800F6770[];
-extern char D_800F5E9C[];
-extern u8 D_800B6CF1;     /* controller bit pattern */
-extern s16 D_800F5EB8;    /* lowest port with a controller */
-extern u8 D_800B6CF2;     /* number of controllers */
-extern u8 D_800B6CF0;     /* controllers initialised */
-extern s32 D_800F6788[];
-extern s32 D_800F67B0[];
-extern s32 D_800F5EA8[];
+extern char gRumblePool[];
+extern char gRumbleEntries[];
+extern s8 gPakQueueState;     /* pak queue state */
+extern char gPakAccessQueue[]; /* pak OSMesgQueue */
+extern char gSiMessageQueue[]; /* SI OSMesgQueue */
+extern char gSiMesgBuf[];
+extern char gPakMesgBuf[];
+extern u8 gValidControllerBits;     /* controller bit pattern */
+extern s16 gFirstControllerPort;    /* lowest port with a controller */
+extern u8 gNumControllers;     /* number of controllers */
+extern u8 gControllersInitialised;     /* controllers initialised */
+extern s32 gPakChanged[];
+extern s32 gPakRemoved[];
+extern s32 gPakInserted[];
 
 s32 RumblePool_Init(void *dst, void *src, s32 n);
 void osCreateMesgQueue(void *mq, void *msgBuf, s32 count); /* osCreateMesgQueue */
@@ -32,25 +32,25 @@ s32 Cont_ResetSlot(ControllerProfile *, s32);
 s16 Cont_InitAll(void) {
     s32 i;
 
-    RumblePool_Init(D_800F5A50, D_800F5A80, 8);
-    D_800F6750 = 2;
-    osCreateMesgQueue(D_800F6798, D_800F6770, 1);
-    osCreateMesgQueue(D_800F6758, D_800F5E9C, 1);
-    osSetEventMesg(5, D_800F6798, 1);
-    osContInit(D_800F6798, &D_800B6CF1, D_800F6778);
-    osSendMesg(D_800F6758, 0, 0);
-    D_800F5EB8 = -1;
-    D_800B6CF2 = 0;
+    RumblePool_Init(gRumblePool, gRumbleEntries, 8);
+    gPakQueueState = 2;
+    osCreateMesgQueue(gSiMessageQueue, gSiMesgBuf, 1);
+    osCreateMesgQueue(gPakAccessQueue, gPakMesgBuf, 1);
+    osSetEventMesg(5, gSiMessageQueue, 1);
+    osContInit(gSiMessageQueue, &gValidControllerBits, gContStatus);
+    osSendMesg(gPakAccessQueue, 0, 0);
+    gFirstControllerPort = -1;
+    gNumControllers = 0;
     for (i = 3; i >= 0; i--) {
-        D_800F6788[i] = 0;
-        D_800F67B0[i] = 0;
-        D_800F5EA8[i] = 0;
+        gPakChanged[i] = 0;
+        gPakRemoved[i] = 0;
+        gPakInserted[i] = 0;
         Controller_UnwatchPak(i);
-        if (Cont_ResetSlot(&D_800F5EC0[i], i) != 0) {
-            D_800F5EB8 = i;
-            D_800B6CF2++;
+        if (Cont_ResetSlot(&gControllers[i], i) != 0) {
+            gFirstControllerPort = i;
+            gNumControllers++;
         }
     }
-    D_800B6CF0 = 1;
-    return D_800F5EB8;
+    gControllersInitialised = 1;
+    return gFirstControllerPort;
 }

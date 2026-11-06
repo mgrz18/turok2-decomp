@@ -12,48 +12,48 @@ s32 Primagen_RunSoundStep(CGameObjectInstance *obj) {
     s32 sound;
     s32 i;
 
-    if (D_8012FA1C.timer > 0.0f) {
+    if (gLevelScript_script3.timer > 0.0f) {
         return 0;
     }
-    if (D_8012FA1C.steps == NULL) {
+    if (gLevelScript_script3.steps == NULL) {
         return 0;
     }
-    switch (D_8012FA1C.steps[D_8012FA1C.current].type) {
+    switch (gLevelScript_script3.steps[gLevelScript_script3.current].type) {
         case 1:
-            if (D_8012FA1C.steps[D_8012FA1C.current].arg != -1) {
-                Sound__Play(D_8012FA1C.steps[D_8012FA1C.current].arg, obj->header.m_vPos, 0, obj);
+            if (gLevelScript_script3.steps[gLevelScript_script3.current].arg != -1) {
+                Sound__Play(gLevelScript_script3.steps[gLevelScript_script3.current].arg, obj->header.m_vPos, 0, obj);
             }
-            D_8012FA1C.current = -1;
+            gLevelScript_script3.current = -1;
             return 1;
         case 2:
-            sound = (s16) WeightedTable_PickStatic(D_8012FA1C.steps[D_8012FA1C.current].arg);
+            sound = (s16) WeightedTable_PickStatic(gLevelScript_script3.steps[gLevelScript_script3.current].arg);
             if (sound != -1) {
                 Sound__Play(sound, obj->header.m_vPos, 0, obj);
             }
-            D_8012FA1C.current = -1;
+            gLevelScript_script3.current = -1;
             return 1;
         case 3:
-            D_8012FA1C.steps = (BossStep3 *) D_8012FA1C.steps[D_8012FA1C.current].arg;
-            D_8012FA1C.cursor = -1;
-            D_8012FA1C.current = -1;
+            gLevelScript_script3.steps = (BossStep3 *) gLevelScript_script3.steps[gLevelScript_script3.current].arg;
+            gLevelScript_script3.cursor = -1;
+            gLevelScript_script3.current = -1;
             return 1;
         case 5:
-            D_8012FA1C.current = -1;
+            gLevelScript_script3.current = -1;
             return 1;
         case 6:
-            D_8012FA1C.timer = D_8012FA1C.steps[D_8012FA1C.cursor].delay
-                             + Random_Blend(0.0f, D_8012FA1C.steps[D_8012FA1C.cursor].delayRange) * 15.0f;
-            for (i = 0; i < D_8012FA1C.steps[D_8012FA1C.current].arg; i++) {
-                D_8012FA1C.cursor++;
-                if (D_8012FA1C.steps[D_8012FA1C.cursor].type == 4 && i < D_8012FA1C.steps[D_8012FA1C.current].arg - 1) {
-                    D_8012FA1C.cursor = 0;
+            gLevelScript_script3.timer = gLevelScript_script3.steps[gLevelScript_script3.cursor].delay
+                             + Random_Blend(0.0f, gLevelScript_script3.steps[gLevelScript_script3.cursor].delayRange) * 15.0f;
+            for (i = 0; i < gLevelScript_script3.steps[gLevelScript_script3.current].arg; i++) {
+                gLevelScript_script3.cursor++;
+                if (gLevelScript_script3.steps[gLevelScript_script3.cursor].type == 4 && i < gLevelScript_script3.steps[gLevelScript_script3.current].arg - 1) {
+                    gLevelScript_script3.cursor = 0;
                 }
-                D_8012FA1C.current = D_8012FA1C.cursor;
+                gLevelScript_script3.current = gLevelScript_script3.cursor;
             }
-            if (D_8012FA1C.steps[D_8012FA1C.cursor].type == 4) {
-                D_8012FA1C.cursor = -1;
-                D_8012FA1C.current = -1;
-                D_8012FA1C.steps = NULL;
+            if (gLevelScript_script3.steps[gLevelScript_script3.cursor].type == 4) {
+                gLevelScript_script3.cursor = -1;
+                gLevelScript_script3.current = -1;
+                gLevelScript_script3.steps = NULL;
                 return 1;
             }
             return 0;

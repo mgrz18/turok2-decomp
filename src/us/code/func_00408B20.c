@@ -7,7 +7,7 @@ s32 TotemDefense_DrawTotem(s32, s32, s32);
 s32 COnScreen__SetBoss2(s32 *, void *, s32 *); /* extern */
 extern s32 D_800C0560;
 extern s32 D_800C0568;
-extern s32 D_801100F0;
+extern s32 gEngineApp_m_OnScreen;
 
 void TotemDefense_InitFight(void *arg0, void *arg1)
 {
@@ -28,6 +28,6 @@ void TotemDefense_InitFight(void *arg0, void *arg1)
   *((s16 *) (((s8 *) temp_a3) + 0xC4)) = 0x5334;
   *((s32 *) (((s8 *) temp_s0) + 0x140)) = (s32) ((*((s32 *) (((s8 *) temp_s0) + 0x140))) & (~1));
   *((s8 *) (((s8 *) temp_a3) + 0xC7)) = 0;
-  COnScreen__SetBoss((s32) (&D_801100F0), (s32) arg1, (s32) (&D_800C0560));
-  COnScreen__SetBoss2(&D_801100F0, arg1, &D_800C0568);
+  COnScreen__SetBoss((s32) (&gEngineApp_m_OnScreen), (s32) arg1, (s32) (&D_800C0560));
+  COnScreen__SetBoss2(&gEngineApp_m_OnScreen, arg1, &D_800C0568);
 }

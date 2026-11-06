@@ -16,7 +16,7 @@ typedef struct {
 } DrawWorld;
 
 
-/* The global at D_80119870: what this reads of it. */
+/* The global at gEngineApp_m_Game: what this reads of it. */
 extern f32 gFrameIncrement;          /* the frame time step */
 
 void func_0021F1B4(DrawActor *actor);
@@ -53,10 +53,10 @@ void CScene__AdvanceInstances(DrawWorld *world) {
         actor = actors[i++];
         drawActor(actor);
     }
-    if (D_80119870.m_Settings.mode == 13) {
-        CPlayerPool__Update(&D_80119870.m_PlayerList);
+    if (gEngineApp_m_Game.m_Settings.mode == 13) {
+        CPlayerPool__Update(&gEngineApp_m_Game.m_PlayerList);
     }
-    if (CPlayerPool__CheckAllReady(&D_80119870.m_PlayerList)) {
+    if (CPlayerPool__CheckAllReady(&gEngineApp_m_Game.m_PlayerList)) {
         func_00430330(&gEngineApp);
     }
     while (i < count) {

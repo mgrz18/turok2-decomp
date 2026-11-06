@@ -14,7 +14,7 @@ extern char D_800B6588[];
 
 /* Shows setting unk15 (0-255, centred on 0x80) in steps of 8 from -16 to 15. */
 s32 func_00452EA8(MenuItem *item) {
-    s32 value = (D_8011AAD8.unk15 - 0x80) / 8;
+    s32 value = (gEngineApp_m_Settings.unk15 - 0x80) / 8;
 
     if (value == 0) {
         item->text = D_800B6570;

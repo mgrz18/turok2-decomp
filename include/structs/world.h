@@ -3,11 +3,11 @@
 
 /* The world (gScene): the game's resource files, the loaded level and
  * its actor lists, the particle and actor pools, and the level-warp state.
- * One object of 0x19078 bytes and more (D_801102B8, world + 0x19240, is
+ * One object of 0x19078 bytes and more (gEngineApp_m_SwooshSystem, world + 0x19240, is
  * passed on as an object of its own). Other symbols point inside it and must
- * keep being used where the code uses them: D_800F709C (+0x24), D_800F70A8
- * (+0x30), D_800F70D8 (+0x60), D_800F70E4 (+0x6C), D_800F7148 (+0xD0),
- * D_800F7158 (+0xE0), D_800F7964 (+0x8EC).
+ * keep being used where the code uses them: gScene_m_CinemasKey (+0x24), D_800F70A8
+ * (+0x30), gScene_m_pCinemas (+0x60), gScene_m_pBitSections (+0x6C), gScene_m_Heap (+0xD0),
+ * gScene_m_pActors (+0xE0), gScene_m_nDrawActors (+0x8EC).
  *
  * CScene__Construct opens the game's resource files (the *Key fields are file
  * ids, the m_p* fields their loaded tables: a count, then offsets, read with
@@ -69,7 +69,7 @@ typedef struct CScene {
     /* 0x00018 */ s32 m_BinariesKey;
     /* 0x0001C */ s32 m_GraphicSetsKey;
     /* 0x00020 */ s32 m_LevelInfoKey;
-    /* 0x00024 */ s32 m_CinemasKey;                 /* D_800F709C */
+    /* 0x00024 */ s32 m_CinemasKey;                 /* gScene_m_CinemasKey */
     /* 0x00028 */ s32 unk_28;
     /* 0x0002C */ s32 unk_2C;
     /* 0x00030 */ s32 unk_30;                       /* D_800F70A8: the count of unk_28 */
@@ -84,11 +84,11 @@ typedef struct CScene {
     /* 0x00054 */ s32 *m_pCollision;
     /* 0x00058 */ s32 *m_pRegionData;               /* region infos, regions, floor grid (structs/region.h) */
     /* 0x0005C */ s32 *m_pSwooshes;
-    /* 0x00060 */ s32 *m_pCinemas;                  /* D_800F70D8 */
+    /* 0x00060 */ s32 *m_pCinemas;                  /* gScene_m_pCinemas */
     /* 0x00064 */ s32 *m_pIntelligence;
     /* 0x00068 */ s32 *unk_68;
-    /* 0x0006C */ void *m_pBitSections;             /* D_800F70E4: per-level bits (D_800EBAC0) */
-    /* 0x00070 */ void *m_pBitSections2;            /* (D_800E6AC0) */
+    /* 0x0006C */ void *m_pBitSections;             /* gScene_m_pBitSections: per-level bits (gLoadSavePersistentData) */
+    /* 0x00070 */ void *m_pBitSections2;            /* (gGamePersistentData) */
     /* 0x00074 */ s32 *m_pObjectTypes;
     /* 0x00078 */ s32 *m_pObjectTypes2;
     /* 0x0007C */ s32 *m_pGraphicSetTypes;
@@ -109,12 +109,12 @@ typedef struct CScene {
     /* 0x000B8 */ u8 unk_B8[0x10];
     /* 0x000C8 */ void **m_hHeap;
     /* 0x000CC */ void **m_hPaths;
-    /* 0x000D0 */ u8 m_Heap[0x10];                  /* D_800F7148 */
-    /* 0x000E0 */ struct CGameObjectInstance *m_pActors; /* D_800F7158: the level's actors */
+    /* 0x000D0 */ u8 m_Heap[0x10];                  /* gScene_m_Heap */
+    /* 0x000E0 */ struct CGameObjectInstance *m_pActors; /* gScene_m_pActors: the level's actors */
     /* 0x000E4 */ s32 m_nFirstActor;
     /* 0x000E8 */ s32 m_nActors;
     /* 0x000EC */ struct CGameObjectInstance *m_pDrawActors[0x200];
-    /* 0x008EC */ s32 m_nDrawActors;                /* D_800F7964 */
+    /* 0x008EC */ s32 m_nDrawActors;                /* gScene_m_nDrawActors */
     /* 0x008F0 */ struct CGameObjectInstance *m_pMovers[0x80];
     /* 0x00AF0 */ s32 m_nMovers;
     /* 0x00AF4 */ struct CGameObjectInstance *m_pListed[0x40];
@@ -158,7 +158,7 @@ typedef struct CScene {
     /* 0x18EBC */ u8 unk_18EBC[0xE8];
     /* 0x18FA4 */ s32 m_bStreamAll;
     /* 0x18FA8 */ s32 m_nLevel;                     /* index in m_pLevels, -1 for none */
-    /* 0x18FAC */ s32 m_WarpFade;                   /* index in the fade table D_800ACDE8 */
+    /* 0x18FAC */ s32 m_WarpFade;                   /* index in the fade table gWarpFadeColors */
     /* 0x18FB0 */ s32 m_WarpState;                  /* 0 none, 1 fading out to the warp, 2 fading back in */
     /* 0x18FB4 */ f32 m_WarpTime;
     /* 0x18FB8 */ s32 m_bWarpSpawn;                 /* m_WarpSpawn was found (CScene__FindWarpDests) */

@@ -10,8 +10,8 @@ void CMtxF__Translate(CMtxF *mtx, f32 x, f32 y, f32 z);
 void CMtxF__SwapYZRows(CMtxF *mtx);
 void CMtxF__ToMtxAffine(CMtxF *mtx, void *dst);
 
-extern s32 D_8010FF20;
-extern s32 D_800B6D1C; /* current buffer index */
+extern s32 gScene_m_qSky;
+extern s32 gEvenOdd; /* current buffer index */
 
 typedef struct {
     /* 0x000 */ u8 pad000[4];
@@ -32,7 +32,7 @@ void CLevelActor__BuildMatrix(Func00215884Obj *obj) {
     CMtxF mtx;
 
     if (obj->def->m_Type == 8) {
-        CQuaternion__ToMatrix(&D_8010FF20, &mtx);
+        CQuaternion__ToMatrix(&gScene_m_qSky, &mtx);
     } else {
         CMtxF__SetRotateY(&mtx, obj->angle);
     }
@@ -40,5 +40,5 @@ void CLevelActor__BuildMatrix(Func00215884Obj *obj) {
     CVector3__ClampLength(obj->pos, 20000.0f);
     CMtxF__Translate(&mtx, obj->pos[0], obj->pos[1] + obj->yOffset, obj->pos[2]);
     CMtxF__SwapYZRows(&mtx);
-    CMtxF__ToMtxAffine(&mtx, &obj->mtx[D_800B6D1C]);
+    CMtxF__ToMtxAffine(&mtx, &obj->mtx[gEvenOdd]);
 }

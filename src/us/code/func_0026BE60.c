@@ -5,8 +5,8 @@
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 
-extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
-extern CVector3 D_800F2020;        /* cached raw normal */
+extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
+extern CVector3 sRegionNormal;        /* cached raw normal */
 
 static __inline__ void cross_edges(CVector3 *out, CGameRegion *tri) {
     CVector3 edge0;
@@ -25,11 +25,11 @@ f32 CGameRegion__GetHeight(CGameRegion *tri, f32 x, f32 z) {
     if (tri == NULL) {
         return -14336.0f;
     }
-    if (tri != D_800B2608) {
-        cross_edges(&D_800F2020, tri);
+    if (tri != sCachedRawNormalRegion) {
+        cross_edges(&sRegionNormal, tri);
     }
-    normal = D_800F2020;
-    D_800B2608 = tri;
+    normal = sRegionNormal;
+    sCachedRawNormalRegion = tri;
     if (normal.y == 0.0f) {
         return (tri->m_pVertices[0]->y + tri->m_pVertices[1]->y + tri->m_pVertices[2]->y) * (1.0f / 3);
     }

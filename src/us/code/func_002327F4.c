@@ -24,8 +24,8 @@ struct Shared_ParticleView {
 };
 
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern s32 D_801198E0[];
-extern s32 D_800B6D1C;
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount[];
+extern s32 gEvenOdd;
 extern void CParticle__BuildMatrix(void *, s32, s32, f32);
 
 void CParticle__BuildCameraMatrix(void *arg0) {
@@ -33,7 +33,7 @@ void CParticle__BuildCameraMatrix(void *arg0) {
     void *arg1;
     f32 amount;
     s32 *state;
-    state = D_801198E0;
+    state = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
     if (state[0] == 1) {
         arg1 = (void *)state[-4];
         CMtxF__TransformPoint(&((struct Shared_ParticleView *)arg1)->viewMtx, &((Shared_Particle *)arg0)->pos, &delta);
@@ -42,11 +42,11 @@ void CParticle__BuildCameraMatrix(void *arg0) {
             amount = -amount;
         }
         CParticle__BuildMatrix(arg0,
-                      (s32)((char *)arg0 + ((D_800B6D1C << 6) + 0x48)),
+                      (s32)((char *)arg0 + ((gEvenOdd << 6) + 0x48)),
                       (s32)arg1, amount);
     } else {
         CParticle__BuildMatrix(arg0,
-                      (s32)((char *)arg0 + ((D_800B6D1C << 6) + 0x48)),
+                      (s32)((char *)arg0 + ((gEvenOdd << 6) + 0x48)),
                       0, 0.0f);
     }
     ((Shared_Particle *)arg0)->flags |= 0x100000;

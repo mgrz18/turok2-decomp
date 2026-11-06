@@ -14,7 +14,7 @@ typedef struct Dest {
     u8 unkC8;          /* 0xC8 */
 } Dest;
 
-extern s32 D_8011AAE0;  /* difficulty: 8, 16 or 32 */
+extern s32 gEngineApp_m_Settings_difficulty;  /* difficulty: 8, 16 or 32 */
 
 /* Initial health and level of an actor from its definition, scaled by difficulty. */
 void AI_InitHealth(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
@@ -31,7 +31,7 @@ void AI_InitHealth(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
     dst->handle = -1;
     health = a;
     if (def != NULL) {
-        settings = &D_8011AAD8;
+        settings = &gEngineApp_m_Settings;
         level = def->m_nTexture;
         if (settings->multiplayer != 0 && def->m_Type != 1 && def->m_Type != 11) {
             if (settings->match.tag != 0) {
@@ -54,7 +54,7 @@ void AI_InitHealth(Dest *dst, CIntelligence *def, CVector3 pos, void *actor) {
                 break;
         }
         if (def->m_Type == 1 || def->m_Type == 4) {
-            switch (D_8011AAE0) {
+            switch (gEngineApp_m_Settings_difficulty) {
                 case 8:
                     t = health * 0.5f;
                     b = 0.0f;

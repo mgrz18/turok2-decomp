@@ -69,7 +69,7 @@ struct Object {
 };
 
 extern f32 gFrameIncrement;          /* frame time */
-extern f32 D_800B6D2C;          /* time scale */
+extern f32 gEnemyTimeScale;          /* time scale */
 extern ModeHandler *gEnemyBehaviorInfo[];
 
 void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
@@ -106,8 +106,8 @@ void EnemyAI_Update(Object *obj, AI *ai) {
     if (ai->age < 100) {
         ai->age++;
     }
-    gFrameIncrement *= D_800B6D2C;
-    CPlayerPool__FindNearest(&D_80119870.m_PlayerList, obj->pos);
+    gFrameIncrement *= gEnemyTimeScale;
+    CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, obj->pos);
     mode = ai->mode[ai->modeIndex];
     index = ai->modeIndex;
     handler = gEnemyBehaviorInfo[mode];

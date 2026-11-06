@@ -5,14 +5,14 @@
  * func_0040Fxxx, and their second copies at func_0043Cxxx-func_00448xxx,
  * which use the same globals). Three blocks follow each other in BSS:
  *
- *   D_8012F608  LevelScriptState  the running script/boss mode (0x568)
- *   D_8012FB70  MotherBossState   the Mother boss fight (0x690)
- *   D_80130200  BlindOneState     the Blind One boss fight (0x560), with
+ *   gLevelScript  LevelScriptState  the running script/boss mode (0x568)
+ *   gMotherBoss  MotherBossState   the Mother boss fight (0x690)
+ *   gBlindOne  BlindOneState     the Blind One boss fight (0x560), with
  *               its script VM (BlindOneStep, BlindOnePhase, BlindOneMover)
  *
  * Several fields also have symbols of their own, which some files still
  * use, and some files reach a block through a neighbouring symbol at a
- * negative offset (D_8012F9DC - 0x3D4, D_8012F604, ...): those keep their
+ * negative offset (gLevelScript_bossMode - 0x3D4, D_8012F604, ...): those keep their
  * symbol, as the ROM addresses them that way. The extern declarations here
  * are the block-level symbols only.
  *
@@ -24,7 +24,7 @@
 /* The 0x64-byte value/colour animator ScriptAnimator_Start sets up,
  * ScriptAnimator_SetScript starts on a script (fires) and Animator_Update steps;
  * ScriptAnimator_Apply applies it when the owner is drawn (rgb and alpha to the
- * draw colour D_800AB8B0, alpha and value to D_800AB8C0) and func_00236390
+ * draw colour gBlendState, alpha and value to gBlendFade) and func_00236390
  * adds it to the fade. The script is a list of floats: an op (the mode),
  * then its operands; mode 0 ends it (and restarts it from loop when that
  * is set), 1 waits, 4 fades value, 6 fades rgb and alpha. The level
@@ -60,11 +60,11 @@ typedef struct BossWeakSpot {
     /* 0x04 */ ScriptAnimator anim;
 } BossWeakSpot; /* size 0x68 */
 
-/* D_8012FB70: the Mother boss fight, MotherBoss_Hurt-MotherBoss_OnDefeatCinemaDone (second
+/* gMotherBoss: the Mother boss fight, MotherBoss_Hurt-MotherBoss_OnDefeatCinemaDone (second
  * copy MotherBoss_Hurt_2-MotherBoss_OnDefeatCinemaDone_2; MotherBoss_OnDefeatCinemaDone sets
  * m_bMotherBossComplete). Fifteen weak spots in three phases. Fields
- * with symbols of their own: D_801301CC (phase), D_801301D0 (activeMask),
- * D_801301D4 (liveMask), D_801301EC (counter), D_801301F8 / D_801301FC
+ * with symbols of their own: gMotherBoss_phase (phase), gMotherBoss_activeMask (activeMask),
+ * gMotherBoss_liveMask (liveMask), gMotherBoss_counter (counter), gMotherBoss_minRadius / gMotherBoss_maxRadius
  * (minRadius / maxRadius). */
 typedef struct MotherBossState {
     /* 0x000 */ struct CGameObjectInstance *obj;     /* the boss */
@@ -91,13 +91,13 @@ typedef struct MotherBossState {
     /* 0x68C */ s32 maxRadius;
 } MotherBossState; /* size 0x690 */
 
-extern MotherBossState D_8012FB70;
+extern MotherBossState gMotherBoss;
 
 /* The Blind One (the second boss, "Blind" and "EyeBall" on its health
  * bars) and the small script VM that runs it. Its module is linked twice,
  * at BlindOne_UpdateMover-BlindOne_NextPhase and again at BlindOne_Setup_2-BlindOne_NextPhase_2
- * with its data 0xE0 lower; both copies use the same state, D_80130200, and
- * each has its own phase table (D_0043240C and D_0043232C). The script is a
+ * with its data 0xE0 lower; both copies use the same state, gBlindOne, and
+ * each has its own phase table (sBlindOnePhases and sBlindOnePhases_2). The script is a
  * list of BlindOneStep: stepping it (the nextPhase inlines and
  * BlindOne_PhaseWaitCinemaUpdate...) stops the three movers, clears every actor's
  * m_AI.m_BlindOne.m_nPhaseHits, stores the step's id in `phase` and calls that
@@ -105,21 +105,21 @@ extern MotherBossState D_8012FB70;
  * groups of actors (types 0x454, 0x455 and 0x456) keep their group index in
  * m_AI.m_BlindOne.m_nGroupIndex and their fader in m_AI.m_BlindOne.m_nFader
  * (BlindOne_Setup). BlindOne_Draw reaches the faders through their own
- * symbol, D_8013023C (= D_80130200.faders), and BlindOne_UpdateFight the update
- * entries of the phase table through D_00432410 (= &D_0043240C[0].update);
+ * symbol, gBlindOne_faders (= gBlindOne.faders), and BlindOne_UpdateFight the update
+ * entries of the phase table through sBlindOnePhases_update (= &sBlindOnePhases[0].update);
  * BlindOne_UpdateFight and BlindOne_Group3Draw reach the faders from the block base by
  * raw offsets, as the ROM does. */
 
 struct BlindOneState;
 
-/* One step of the script (D_00432340...). */
+/* One step of the script (sBlindOneScript...). */
 typedef struct BlindOneStep {
     /* 0x00 */ s32 id;                 /* the phase: an index into the phase table */
     /* 0x04 */ f32 seconds;            /* how long the phase's movers run (BlindOne_PhaseGroup1Init) */
     /* 0x08 */ s32 unk8;
 } BlindOneStep; /* size 0xC */
 
-/* An entry of the phase table (D_0043240C, D_0043232C). */
+/* An entry of the phase table (sBlindOnePhases, sBlindOnePhases_2). */
 typedef struct BlindOnePhase {
     /* 0x00 */ void (*init)(struct BlindOneState *state);
     /* 0x04 */ void (*update)(struct BlindOneState *state);
@@ -137,7 +137,7 @@ typedef struct BlindOneMover {
     /* 0x14 */ s32 offset;
 } BlindOneMover; /* size 0x18 */
 
-/* D_80130200: the Blind One boss fight, BlindOne_UpdateMover (setup) to
+/* gBlindOne: the Blind One boss fight, BlindOne_UpdateMover (setup) to
  * BlindOne_Group3Draw (second copy BlindOne_Setup_2-BlindOne_ActorAppearEnter_2). Three groups of
  * level actors, each with the count of its live ones (BlindOne_ActorAppearEnter counts
  * them up, BlindOne_ActorDeathEnter down), twelve hit-flash animators, the phase
@@ -165,7 +165,7 @@ typedef struct BlindOneState {
     /* 0x518 */ BlindOneMover movers[3];
 } BlindOneState; /* size 0x560 */
 
-extern BlindOneState D_80130200;
+extern BlindOneState gBlindOne;
 
 /* A step of a boss script: what to do (type), its argument, and the odds
  * (chance, out of 100) that the runner takes it; a type marks the end
@@ -222,7 +222,7 @@ typedef struct BossScript3 {
     /* 0xC */ s32 current;
 } BossScript3; /* size 0x10 */
 
-/* D_8012F608: the state of the running level script, shared by the mode
+/* gLevelScript: the state of the running level script, shared by the mode
  * handlers of the first VM module (Primagen_Hurt-Primagen_UpdateMode10, second copy
  * func_0043C7B0-Primagen_UpdateMode10_2): the stage the script is in, the lights and
  * animators, the wave spawner, the boss parts and the boss AI (its state,
@@ -231,13 +231,13 @@ typedef struct BossScript3 {
  * uses most of them.
  *
  * Fields with symbols of their own (and the files' views anchored there):
- * D_8012F618 (swayPhase/swayAmount: BossWait), D_8012F950 (spawnsLeft...),
- * D_8012F988 / D_8012F9A8 (values[0] / values[1]), D_8012F9D0
- * (scriptCOn...), D_8012F9D4 (unk3CC...), D_8012F9D8 (bossState...:
- * BossState), D_8012F9DC (bossMode...: BossMode), D_8012F9E0 (armed,
- * scriptOn), D_8012F9F8 (script), D_8012F9FC (script.steps), D_8012FA00
- * (script.cursor), D_8012FA10 (script2.cursor...), D_8012FA1C (script3),
- * D_8012FB48 (path). D_8012F600 and D_8012F604 come just before it. */
+ * gLevelScript_swayPhase (swayPhase/swayAmount: BossWait), gLevelScript_spawnsLeft (spawnsLeft...),
+ * gLevelScript_values / D_8012F9A8 (values[0] / values[1]), gLevelScript_scriptCOn
+ * (scriptCOn...), gLevelScript_unk3CC (unk3CC...), gLevelScript_bossState (bossState...:
+ * BossState), gLevelScript_bossMode (bossMode...: BossMode), gLevelScript_armed (armed,
+ * scriptOn), gLevelScript_script (script), gLevelScript_script_steps (script.steps), gLevelScript_script_cursor
+ * (script.cursor), gLevelScript_script2_cursor (script2.cursor...), gLevelScript_script3 (script3),
+ * gLevelScript_path (path). sPrimagenPathPoint and D_8012F604 come just before it. */
 typedef struct LevelScriptState {
     /* 0x000 */ s32 stage;
     /* 0x004 */ s32 total;
@@ -295,14 +295,14 @@ typedef struct LevelScriptState {
 
 /* A few files read only the stage, as a plain word: the ROM reloads its
  * address before every read there, which the struct does not give (gcc
- * keeps &D_8012F608 in a register). They define BOSS_STAGE_AS_WORD and
+ * keeps &gLevelScript in a register). They define BOSS_STAGE_AS_WORD and
  * declare it as an s32 themselves (Primagen_RunAttackStep, Primagen_RunAttackStep_2,
  * Primagen_UpdateMode19, Primagen_UpdateMode19_2). */
 #ifndef BOSS_STAGE_AS_WORD
-extern LevelScriptState D_8012F608;
+extern LevelScriptState gLevelScript;
 #endif
 
-/* LevelScriptState from bossState on (D_8012F9D8, +0x3D0). */
+/* LevelScriptState from bossState on (gLevelScript_bossState, +0x3D0). */
 typedef struct BossState {
     /* 0x00 */ s32 state;
     /* 0x04 */ s32 mode;
@@ -317,7 +317,7 @@ typedef struct BossState {
     /* 0x20 */ BossScript script;
 } BossState; /* size 0x30 */
 
-/* LevelScriptState from bossMode on (D_8012F9DC, +0x3D4). */
+/* LevelScriptState from bossMode on (gLevelScript_bossMode, +0x3D4). */
 typedef struct BossMode {
     /* 0x00 */ s32 mode;
     /* 0x04 */ u8 armed;
@@ -331,9 +331,9 @@ typedef struct BossMode {
     /* 0x1C */ BossScript script;
 } BossMode; /* size 0x2C */
 
-extern BossState D_8012F9D8;
-extern BossMode D_8012F9DC;
-extern BossScript3 D_8012FA1C;  /* LevelScriptState.script3 */
+extern BossState gLevelScript_bossState;
+extern BossMode gLevelScript_bossMode;
+extern BossScript3 gLevelScript_script3;  /* LevelScriptState.script3 */
 
 /* A spawn point of the Mother fight (gMotherSpawnPoints, and gMotherSpawnPoints_2 in the
  * second copy of the module): where its pickups drop (MotherBoss_DropPickupsAtSpawnPoints) and
@@ -348,7 +348,7 @@ typedef struct SpawnPoint {
 extern SpawnPoint gMotherSpawnPoints[4];  /* the first copy of the module */
 extern SpawnPoint gMotherSpawnPoints_2[4];  /* the second copy */
 
-/* One step of the wave boss's script (D_00430824...): the minions of the
+/* One step of the wave boss's script (sMantidQueenScript...): the minions of the
  * wave, how many may fight at once, and the weak spot it opens. Stepping it
  * (MantidQueen_NextStep) adds spawnCount to the minions still to come; the wave
  * runs (waveActive) when both partPicks and spawnCount are set. */
@@ -363,14 +363,14 @@ typedef struct WaveBossStep {
     /* 0x1C */ f32 offTime;
 } WaveBossStep; /* size 0x20 */
 
-/* D_8012F3A0: the boss of the first VM module (MantidQueen_Init sets it up,
- * MantidQueen_Update runs it; boss id 0x1D4D in D_80110048, between the Blind
+/* gMantidQueen: the boss of the first VM module (MantidQueen_Init sets it up,
+ * MantidQueen_Update runs it; boss id 0x1D4D in gScene_m_LevelID, between the Blind
  * One's and the Mother's): the Mantid Queen, whose intro starts the "Queen"
  * health bar (MantidQueen_UpdateIntro). Five weak spots,
  * opened one at a time by the script, and waves of minions (type 0x651) in
  * between: while a wave runs the spots cannot be hit. Fields with symbols
- * of their own: D_8012F3A4 (pushed), D_8012F5B4 (step), D_8012F5C0 (boss),
- * D_8012F5F0 (waveActive), D_8012F5F4 (blink). */
+ * of their own: gMantidQueen_pushed (pushed), gMantidQueen_step (step), gMantidQueen_boss (boss),
+ * gMantidQueen_waveActive (waveActive), gMantidQueen_blink (blink). */
 typedef struct WaveBossState {
     /* 0x000 */ struct CGameObjectInstance *actor;   /* the script owner (MantidQueen_EnterStart) */
     /* 0x004 */ s32 pushed;                          /* the push attack hit (MantidQueen_UpdatePush) */
@@ -382,13 +382,13 @@ typedef struct WaveBossState {
     /* 0x220 */ struct CGameObjectInstance *boss;    /* the 0x457 actor */
     /* 0x224 */ struct CGameObjectInstance *members[8]; /* the 0x651 minions */
     /* 0x244 */ s32 memberCount;
-    /* 0x248 */ void *intel[2];                      /* CScene__FindIntelligence(world, 1, D_004307B0[i].id) */
+    /* 0x248 */ void *intel[2];                      /* CScene__FindIntelligence(world, 1, sMantidQueenMinions[i].id) */
     /* 0x250 */ s32 waveActive;
     /* 0x254 */ s32 blink;
     /* 0x258 */ f32 blinkTimer;
 } WaveBossState; /* size 0x25C */
 
-extern WaveBossState D_8012F3A0;
-extern WaveBossStep *D_8012F5B4;  /* WaveBossState.step */
+extern WaveBossState gMantidQueen;
+extern WaveBossStep *gMantidQueen_step;  /* WaveBossState.step */
 
 #endif

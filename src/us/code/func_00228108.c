@@ -11,16 +11,16 @@ extern s32 CScene__FindObjectType(void *level, s32 type);
 extern void func_0021E5D4(CGameObjectInstance *obj);
 extern void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
-extern s32 D_800B6D00;
-extern s32 D_800B6D54;
+extern s32 gDefaultVisBits;
+extern s32 gPersistentDataLoaded;
 extern u8 gScene[];
-extern s32 D_8011001C;
+extern s32 gScene_m_bStreamAll;
 
 /* CInstancePool__Alloc */
 static __inline__ CGameObjectInstance *take_free_instance(CInstancePool *world, s32 *owner) {
     CGameObjectInstance *node;
 
-    if (D_8011001C != 0 || (u32)world->m_ActiveList.m_nCount < 3) {
+    if (gScene_m_bStreamAll != 0 || (u32)world->m_ActiveList.m_nCount < 3) {
         node = world->m_FreeList.m_pHead;
         if (node != NULL) {
             CList__Remove(&world->m_FreeList, node);
@@ -39,7 +39,7 @@ CGameObjectInstance *CInstancePool__Spawn(void *world, s32 model, s32 type, void
                                    CVector3 pos, f32 rotY, CVector3 velocity, CVector3 scale, s32 *owner) {
     CGameObjectInstance *obj;
 
-    if (D_800B6D54 == 0) {
+    if (gPersistentDataLoaded == 0) {
         return NULL;
     }
     if (intelligence == NULL) {
@@ -55,7 +55,7 @@ CGameObjectInstance *CInstancePool__Spawn(void *world, s32 model, s32 type, void
     if (obj == NULL) {
         return NULL;
     }
-    CGameObjectInstance__Construct(obj, model, type, D_800B6D00, intelligence, -1, region, rotY, pos, 0x80000, scale,
+    CGameObjectInstance__Construct(obj, model, type, gDefaultVisBits, intelligence, -1, region, rotY, pos, 0x80000, scale,
                   velocity, 0);
     func_0021E5D4(obj);
     return obj;

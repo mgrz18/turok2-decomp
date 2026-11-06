@@ -18,7 +18,7 @@ extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 extern f32 func_00298470(f32);
 Vector4f CQuaternion__FromDirection(CVector3 *input) {
     Vector4f result;
@@ -59,7 +59,7 @@ pole:
             halfAngle = 0.0f;
             scale = func_002982F0(halfAngle);
             result.z = normalized.z * scale;
-            D_800DD78C = scale;
+            gQuaternionSin = scale;
             result.x = halfAngle;
             result.y = halfAngle;
             result.w = func_002974C0(halfAngle);
@@ -90,7 +90,7 @@ general:
             result.x = axis.x * scale;
             result.y = axis.y * scale;
             result.z = axis.z * scale;
-            D_800DD78C = scale;
+            gQuaternionSin = scale;
             result.w = func_002974C0(halfAngle);
         }
         }

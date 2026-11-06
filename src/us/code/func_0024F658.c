@@ -27,7 +27,7 @@ typedef struct {
 } Mode;
 
 extern f32 gFrameIncrement;      /* frame time */
-extern Mode D_800ADF5C[];
+extern Mode gPlayerStateTable_tuning[];
 
 f32 Math_DecayToZero(f32 value, f32 rate);
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
@@ -143,7 +143,7 @@ void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, Tuning *tu
     player->m_vDesiredPos.z += (forwardOut.z + strafeOut.z) * player->m_FrameIncrementScaled;
     if (body->m_vVelocity.y < 0.0f) {
         CVector3__Add(&sum, &forwardOut, &strafeOut);
-        body->m_vVelocity.y -= D_800ADF5C[player->m_Mode].physics->drag
+        body->m_vVelocity.y -= gPlayerStateTable_tuning[player->m_Mode].physics->drag
             * (func_00298470(sum.x * sum.x + sum.y * sum.y + sum.z * sum.z) / (tuning->max * 4.0f))
             * player->m_FrameIncrementScaled;
     }

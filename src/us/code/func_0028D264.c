@@ -9,10 +9,10 @@ s32 CScene__GetRegionIndex(void *world, s32 region);
 /* Save every player's state, position, facing and region. */
 void SavedPlayers_Save(void) {
     CPlayerPool *list;
-    CSavedPlayers *save = &D_8011F290;
+    CSavedPlayers *save = &gSavedPlayers;
     s32 i;
 
-    for (i = 0; list = &D_80119870.m_PlayerList, i < list->m_nPlayers; i++) {
+    for (i = 0; list = &gEngineApp_m_Game.m_PlayerList, i < list->m_nPlayers; i++) {
         CPlayer *player = &list->m_Players[i];
 
         save->m_Data[i] = player->m_Data;

@@ -7,10 +7,10 @@ extern char D_800B4430[];
 extern char D_800B4484[];
 extern char D_800B4520[];
 extern char D_800B459C[];
-extern s32 D_80130A30;
+extern s32 sMissionHub;
 
 s32 MissionMenu_UpdateObjective2(MenuItem *item) {
-    switch (D_80130A30) {
+    switch (sMissionHub) {
         case -1:
         case 0:
         default:

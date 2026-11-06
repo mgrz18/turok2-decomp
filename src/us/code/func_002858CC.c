@@ -4,14 +4,14 @@
 #include "rw/abu_types.h"
 
 extern int Controller_IsPakWatched(int arg0);
-extern int D_800F6788[];
+extern int gPakChanged[];
 s32 Controller_TakePakChanged(s32 arg0) {
     s32 old;
     if (Controller_IsPakWatched(arg0) == 0) {
         return 0;
     }
-    old = D_800F6788[arg0];
-    D_800F6788[arg0] = 0;
+    old = gPakChanged[arg0];
+    gPakChanged[arg0] = 0;
     return old;
 }
 int Controller_IsPakWatched(int arg0);

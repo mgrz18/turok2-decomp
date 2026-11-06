@@ -23,11 +23,11 @@ typedef struct {
 } Level0043CF3C;
 
 extern f32 gFrameIncrement;
-extern u8 D_00431BF4[];
-extern u8 D_00431C10[];
-extern u8 D_00431C2C[];
-extern u8 D_00431C34[];
-extern u8 D_801100F0[];
+extern u8 sPrimagenTossTable_2[];
+extern u8 sPrimagenTossTableStage3_2[];
+extern u8 sPrimagenTossTable2_2[];
+extern u8 sPrimagenTossTable2Stage3_2[];
+extern u8 gEngineApp_m_OnScreen[];
 void AI_TurnHeadToTarget(Actor0043CF3C *actor, Level0043CF3C *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
@@ -52,82 +52,82 @@ void Primagen_Step_2(Actor0043CF3C *actor, Level0043CF3C *level) {
         level->def->onReset(actor, level);
     }
     for (i = 0; i < 8; i++) {
-        Animator_Update(&D_8012F608.anims[i]);
+        Animator_Update(&gLevelScript.anims[i]);
     }
-    if (D_8012F608.bossState == 1) {
-        level->spawn.x = D_8012F608.home.x;
-        level->spawn.y = D_8012F608.home.y;
-        level->spawn.z = D_8012F608.home.z;
+    if (gLevelScript.bossState == 1) {
+        level->spawn.x = gLevelScript.home.x;
+        level->spawn.y = gLevelScript.home.y;
+        level->spawn.z = gLevelScript.home.z;
     }
-    COUNT_DOWN(D_8012F608.waveTimer);
-    COUNT_DOWN(D_8012F608.script.timer);
-    COUNT_DOWN(D_8012F608.script2.timer);
-    COUNT_DOWN(D_8012F608.script3.timer);
-    COUNT_DOWN(D_8012F608.spawnTimer);
-    COUNT_DOWN(D_8012F608.swayTimer);
-    COUNT_DOWN(D_8012F608.nextTimer);
-    COUNT_DOWN(D_8012F608.timer3EC);
-    if (D_8012F608.stage == 3) {
-        if (D_8012F608.values[0][1] <= 0x95FF && D_8012F608.subStage == 0) {
-            D_8012F608.subStage = 1;
+    COUNT_DOWN(gLevelScript.waveTimer);
+    COUNT_DOWN(gLevelScript.script.timer);
+    COUNT_DOWN(gLevelScript.script2.timer);
+    COUNT_DOWN(gLevelScript.script3.timer);
+    COUNT_DOWN(gLevelScript.spawnTimer);
+    COUNT_DOWN(gLevelScript.swayTimer);
+    COUNT_DOWN(gLevelScript.nextTimer);
+    COUNT_DOWN(gLevelScript.timer3EC);
+    if (gLevelScript.stage == 3) {
+        if (gLevelScript.values[0][1] <= 0x95FF && gLevelScript.subStage == 0) {
+            gLevelScript.subStage = 1;
         }
-        if (D_8012F608.values[0][1] < 0x6400 && D_8012F608.subStage == 1) {
-            D_8012F608.subStage = 2;
+        if (gLevelScript.values[0][1] < 0x6400 && gLevelScript.subStage == 1) {
+            gLevelScript.subStage = 2;
         }
-        if (D_8012F608.values[0][1] < 0x3200 && D_8012F608.subStage == 2) {
-            D_8012F608.subStage = 3;
+        if (gLevelScript.values[0][1] < 0x3200 && gLevelScript.subStage == 2) {
+            gLevelScript.subStage = 3;
         }
     }
-    if (D_8012F608.timer3EC <= 0.0f) {
+    if (gLevelScript.timer3EC <= 0.0f) {
         offset.x = -2385.92f;
         offset.y = 0.0f;
         offset.z = 0.0f;
-        if (D_8012F608.stage == 3) {
-            type = WeightedTable_PickStatic(D_00431C10);
+        if (gLevelScript.stage == 3) {
+            type = WeightedTable_PickStatic(sPrimagenTossTableStage3_2);
         } else {
-            type = WeightedTable_PickStatic(D_00431BF4);
+            type = WeightedTable_PickStatic(sPrimagenTossTable_2);
         }
         Primagen_SpawnTossedObject_2(type, 0x11D, offset);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = -2324.48f;
-        if (D_8012F608.stage == 3) {
-            type = WeightedTable_PickStatic(D_00431C10);
+        if (gLevelScript.stage == 3) {
+            type = WeightedTable_PickStatic(sPrimagenTossTableStage3_2);
         } else {
-            type = WeightedTable_PickStatic(D_00431BF4);
+            type = WeightedTable_PickStatic(sPrimagenTossTable_2);
         }
         Primagen_SpawnTossedObject_2(type, 0x11D, offset);
         offset.x = 2314.24f;
         offset.y = 0.0f;
         offset.z = 0.0f;
-        if (D_8012F608.stage == 3) {
-            type = WeightedTable_PickStatic(D_00431C34);
+        if (gLevelScript.stage == 3) {
+            type = WeightedTable_PickStatic(sPrimagenTossTable2Stage3_2);
         } else {
-            type = WeightedTable_PickStatic(D_00431C2C);
+            type = WeightedTable_PickStatic(sPrimagenTossTable2_2);
         }
         Primagen_SpawnTossedObject_2(type, 0x11D, offset);
         offset.x = -460.8f;
         offset.y = 0.0f;
         offset.z = -460.8f;
-        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
+        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(sPrimagenTossTable_2), 0x11D, offset);
         offset.x = 460.8f;
         offset.y = 0.0f;
         offset.z = -460.8f;
-        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
+        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(sPrimagenTossTable_2), 0x11D, offset);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = 614.39996f;
-        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(D_00431BF4), 0x11D, offset);
-        D_8012F608.timer3EC = 300.0f;
+        Primagen_SpawnTossedObject_2(WeightedTable_PickStatic(sPrimagenTossTable_2), 0x11D, offset);
+        gLevelScript.timer3EC = 300.0f;
     }
     Primagen_UpdateHealth_2(actor, level);
     Primagen_UpdateSpawner_2(actor, level);
-    COnScreen__SetBossPercent(D_801100F0, D_8012F608.total * 100 / D_8012F608.bonus);
+    COnScreen__SetBossPercent(gEngineApp_m_OnScreen, gLevelScript.total * 100 / gLevelScript.bonus);
     if (actor->pos.y < -204.79999f) {
-        D_8012F608.bossMode = 11;
-        D_8012F608.dest.x = 0.0f;
-        D_8012F608.dest.y = 0.0f;
-        D_8012F608.dest.z = 0.0f;
+        gLevelScript.bossMode = 11;
+        gLevelScript.dest.x = 0.0f;
+        gLevelScript.dest.y = 0.0f;
+        gLevelScript.dest.z = 0.0f;
         CAI__SetMode(actor, level, 0x19);
     }
 }

@@ -8,7 +8,7 @@
 #include "structs/light.h"
 void CScene__FindLightsAt(CScene *lv, CVector3 *a, u8 *buf, s32 *out);
 void CScene__ComputeLights(u8 *buf, s32 n, CVector3 *a, CLights1 *out);
-extern s32 D_800ACAE0;
+extern s32 gLevelLightsEnabled;
 s32 *CISet__GetBlock(s32 *tbl, s32 idx);
 
 /* A separate function in Rage Wars; inlined into this one in Turok 2. */
@@ -24,8 +24,8 @@ static inline s32 hasTbl(CScene *lv) {
 void CScene__GetLightsAt(CScene *lv, CVector3 *a1, CLights1 *out) {
     u8 buf[0x28];
     s32 n;
-    if (hasTbl(lv) == 0 || D_800ACAE0 == 0) {
-        *out = D_800AB0D0;
+    if (hasTbl(lv) == 0 || gLevelLightsEnabled == 0) {
+        *out = gSceneLights;
         return;
     }
     CScene__FindLightsAt(lv, a1, buf, &n);

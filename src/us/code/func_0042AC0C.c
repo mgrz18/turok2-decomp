@@ -19,14 +19,14 @@ extern char D_800A5F00[]; /* "level paths" */
 extern char D_800A5F0C[]; /* "level info" */
 extern char D_800A5F18[]; /* "sky layers" */
 extern char D_800A5F24[];
-extern s32 D_800AB8A0;
-extern s32 D_800B6D20;
+extern s32 gFogEnabled;
+extern s32 gFrameCountGameplay;
 extern u8 gDecompressor[];
-extern u8 D_800E68B0[];
+extern u8 gLoopSoundEntries[];
 extern u8 gLoopSounds[];
-extern u8 D_801102B8[];
-extern u8 *D_80119890; /* player list */
-extern u8 D_8011AAF1;  /* multiplayer */
+extern u8 gEngineApp_m_SwooshSystem[];
+extern u8 *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* player list */
+extern u8 gEngineApp_m_Settings_multiplayer;  /* multiplayer */
 
 extern s32 ProPack__Decompress(s32, s32);
 extern void CCollisionInfo__Reset(void);
@@ -118,7 +118,7 @@ loaded:
     CDecompressor__Flush(gDecompressor);
     CCache__Flush(0);
     if (w->m_nLevel != -1) {
-        ptr = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+        ptr = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
         if (ptr != NULL) {
             CPlayer__StopLoopingSounds(ptr);
         }
@@ -137,17 +137,17 @@ loaded:
         CCache__Deallocate(0, w->m_hHeap);
     }
     CCache__Flush(0);
-    D_800B6D20 = 0;
+    gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
     CParticleSystem__Construct(w->m_ParticleSystem, *w->m_pParticleEffects);
     SceneActorPool_Construct(w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
-    func_0042D410(D_801102B8);
+    func_0042D410(gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
     func_0042D120(w->unk_18EBC);
-    LoopSounds_Construct(gLoopSounds, D_800E68B0, 0xF);
-    func_0042EBBC(D_801102B8 - 0x1C8);
+    LoopSounds_Construct(gLoopSounds, gLoopSoundEntries, 0xF);
+    func_0042EBBC(gEngineApp_m_SwooshSystem - 0x1C8);
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;
         announce = 0;
@@ -193,7 +193,7 @@ loaded:
             size = 0x320;
             break;
     }
-    if (D_8011AAF1 != 0) {
+    if (gEngineApp_m_Settings_multiplayer != 0) {
         size += 0x200;
     }
     block = CCache__Allocate(0, size << 6, 3, D_800A5EB4);
@@ -215,7 +215,7 @@ loaded:
     w->m_hLevelHeader = block;
     w->m_pLevelHeader = *block;
     CScene__LoadLightSettings(w);
-    D_800AB8A0 = (w->m_pLevelHeader->m_Flags >> 2) & 1;
+    gFogEnabled = (w->m_pLevelHeader->m_Flags >> 2) & 1;
     block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, D_800A5F18);
     w->m_hSections = block;
     data = *block;
@@ -233,7 +233,7 @@ loaded:
     for (; i < count; i++) {
         func_0021E5D4((u8 *)w->m_pActors + i * 0x288);
     }
-    player = D_80119890;
+    player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
     actor = player;
     while (player != NULL) {
         func_0021E5D4(actor);
@@ -251,10 +251,10 @@ loaded:
         CGameObjectInstance__UpdateAnimation(p);
     }
     w->m_Mode = 4;
-    CPlayerPool__LevelStart(&D_80119870.m_PlayerList);
-    CCameraPool__ResetEmitterPools(D_80119870.m_CameraPool);
-    CCameraPool__Advance(D_80119870.m_CameraPool);
-    if (D_80119870.m_Settings.multiplayer != 0 || w->m_bStreamAll != 0) {
+    CPlayerPool__LevelStart(&gEngineApp_m_Game.m_PlayerList);
+    CCameraPool__ResetEmitterPools(gEngineApp_m_Game.m_CameraPool);
+    CCameraPool__Advance(gEngineApp_m_Game.m_CameraPool);
+    if (gEngineApp_m_Game.m_Settings.multiplayer != 0 || w->m_bStreamAll != 0) {
         CScene__StreamAllSections(w);
     }
 }

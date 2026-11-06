@@ -8,7 +8,7 @@
  * MotherBoss_SpawnPickup inlined). */
 
 extern u8 gScene[];
-extern u8 D_80107590[];
+extern u8 gScene_m_ActorPool[];
 extern s16 WeightedTable_PickStatic(Pick *table);
 extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
@@ -19,7 +19,7 @@ extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 po
 
 /* MotherBoss_RandomArenaPoint */
 static __inline__ void randomGroundPoint(CVector3 *out) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     f32 dist;
     f32 angle;
     f32 z;
@@ -42,7 +42,7 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;
-    pickup = CLevelActorPool__Spawn(D_80107590, NULL, id, vel, pos, region, lifetime);
+    pickup = CLevelActorPool__Spawn(gScene_m_ActorPool, NULL, id, vel, pos, region, lifetime);
     if (pickup != NULL) {
         Actor_SpawnParticle(pickup, 0x11D, pos, 0);
     }

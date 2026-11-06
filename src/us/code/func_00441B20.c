@@ -18,7 +18,7 @@ s32 TotemDefense_DrawTotem_2(s32, s32, s32);
 void COnScreen__SetBoss2(void *, void *, void *);         /* extern */
 extern u8 D_800C0560[];
 extern u8 D_800C0568[];
-extern u8 D_801100F0[];
+extern u8 gEngineApp_m_OnScreen[];
 
 void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
 {
@@ -39,6 +39,6 @@ void TotemDefense_InitFight_2(ObjState *arg0, CGameObjectInstance *arg1)
   temp_a3->m_AnimType = 0x5334;
   temp_s0->m_AI.m_dwFlags = temp_s0->m_AI.m_dwFlags & (~1);
   temp_a3->m_AnimRepeatedCount = 0;
-  COnScreen__SetBoss((s32) D_801100F0, (s32) arg1, (s32) D_800C0560);
-  COnScreen__SetBoss2(D_801100F0, arg1, D_800C0568);
+  COnScreen__SetBoss((s32) gEngineApp_m_OnScreen, (s32) arg1, (s32) D_800C0560);
+  COnScreen__SetBoss2(gEngineApp_m_OnScreen, arg1, D_800C0568);
 }

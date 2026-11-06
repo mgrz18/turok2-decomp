@@ -18,7 +18,7 @@ typedef struct {
 void CScene__UnloadLevel_2(Unk004658FC *arg0) {
     s32 temp_v0;
 
-    temp_v0 = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     if (temp_v0 != 0) {
         CPlayer__StopLoopingSounds_2(temp_v0);
     }

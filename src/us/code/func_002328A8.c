@@ -3,7 +3,7 @@
 
 s32 func_0020B9F4(s32, void *, void *, s32, s32); /* extern */
 s32 CScene__GetLightsAt(s32 *, s32, s32);         /* extern */
-extern s32 D_800B6D1C;
+extern s32 gEvenOdd;
 extern s32 gScene;
 
 /* A drawn instance; 0xF8 points at its render info, 0x1D0 links it in the
@@ -33,6 +33,6 @@ typedef struct CRenderInst {
 } CRenderInst;
 
 void CParticle__DrawModel(CRenderInst *arg0) {
-    CScene__GetLightsAt(&gScene, &arg0->pos, arg0->bounds[D_800B6D1C]);
-    func_0020B9F4(arg0->info->unk14, arg0->mtx[D_800B6D1C], arg0->bounds[D_800B6D1C], 0, -1);
+    CScene__GetLightsAt(&gScene, &arg0->pos, arg0->bounds[gEvenOdd]);
+    func_0020B9F4(arg0->info->unk14, arg0->mtx[gEvenOdd], arg0->bounds[gEvenOdd], 0, -1);
 }

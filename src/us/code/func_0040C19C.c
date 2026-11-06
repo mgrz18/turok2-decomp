@@ -16,7 +16,7 @@ void MotherBoss_RandomSpawnPoint(CVector3 *out) {
     s32 ok;
     s32 i;
 
-    MotherBoss_GetTargetDist(D_8012FB70.obj, &found);
+    MotherBoss_GetTargetDist(gMotherBoss.obj, &found);
     do {
         ok = 1;
         i = Random_Blend(0.0f, 0.99999f) * 4.0f;

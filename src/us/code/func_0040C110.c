@@ -10,7 +10,7 @@ extern f32 func_002982F0(f32 angle); /* sin */
 extern f32 func_002974C0(f32 angle); /* cos */
 
 void MotherBoss_RandomArenaPoint(CVector3 *out) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     f32 dist;
     f32 angle;
     f32 z;

@@ -14,6 +14,6 @@ typedef struct Screen {
 } Screen;
 
 void GameOverMenu_Init_2(Screen *screen) {
-    D_8011ACB0.countdown = 120.0f;
+    gEngineApp_m_Settings_match.countdown = 120.0f;
     screen->layer->flags &= ~0x4000000;
 }

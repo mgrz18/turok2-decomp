@@ -4,14 +4,14 @@
 #include "common.h"
 #include "structs/menu.h"
 
-/* Set the menu item's text from the game mode D_801309B0. */
+/* Set the menu item's text from the game mode gPakConfirmKind. */
 
-extern s32 D_801309B0;
+extern s32 gPakConfirmKind;
 extern char D_800B5310[];
 extern char D_800B52DC[];
 
 s32 PakConfirmMenu_UpdateYes_2(MenuItem *item) {
-    switch (D_801309B0) {
+    switch (gPakConfirmKind) {
     case 0:
     default:
         item->text = D_800B5310;

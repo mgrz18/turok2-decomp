@@ -3,7 +3,7 @@
 #include "structs/game_object.h"
 
 
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 
 void CGameRegion__GetNormal(CVector3 *normal, void *region);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);     /* cross product */
@@ -27,10 +27,10 @@ CQuaternion GameObject_GetFloorTilt(CGameObjectInstance *obj) {
     CVector3__Cross(&axis, &up, &normal);
     CVector3__Normalize(&axis);
     angle = Math_AcosLookup(up.x * normal.x + up.y * normal.y + up.z * normal.z) * 0.5f;
-    D_800DD78C = func_002982F0(angle);
-    q.x = axis.x * D_800DD78C;
-    q.y = axis.y * D_800DD78C;
-    q.z = axis.z * D_800DD78C;
+    gQuaternionSin = func_002982F0(angle);
+    q.x = axis.x * gQuaternionSin;
+    q.y = axis.y * gQuaternionSin;
+    q.z = axis.z * gQuaternionSin;
     q.w = func_002974C0(angle);
     return q;
 }

@@ -4,7 +4,7 @@
 
 extern char D_800B40B0[];
 extern char D_800B40C8[];
-extern CPlayerOptions D_8011AB18;
+extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 
 /* The weapon select item's text: quick or normal. */
 s32 OptionsMenu_WeaponSelectText(MenuItem *item, Menu *menu)
@@ -15,7 +15,7 @@ s32 OptionsMenu_WeaponSelectText(MenuItem *item, Menu *menu)
   CPlayer *player;
   player = menu->player;
   quick = D_800B40B0;
-  settings = &D_8011AB18;
+  settings = &gEngineApp_m_Settings_defaultSlot;
   if (player != 0)
   {
     settings = player->m_pOptions;

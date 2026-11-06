@@ -5,11 +5,11 @@
 
 extern void adecDecodeFrame(void *arg0);
 extern void adecImdctFrame(void *arg0, void *arg1);
-extern unsigned short D_800B8BB2;
-extern DecodeState D_80125C38;
+extern unsigned short sAdecFrameCounter;
+extern DecodeState sAdecState;
 extern char D_80125EF0;
 void *adecNextFrame(void) {
-    struct DecodeState *base = &D_80125C38;
+    struct DecodeState *base = &sAdecState;
     unsigned short *counter;
     char *slots;
     unsigned short temp;
@@ -17,7 +17,7 @@ void *adecNextFrame(void) {
         return 0;
     }
     adecDecodeFrame(base);
-    counter = &D_800B8BB2;
+    counter = &sAdecFrameCounter;
     temp = *counter + 1;
     *counter = temp;
     if ((unsigned int)(temp & 0xFFFF) >= 6) {

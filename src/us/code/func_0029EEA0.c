@@ -30,8 +30,8 @@ typedef struct {
     s64 rem;
 } lldiv_t;
 
-extern char D_800B89F0[]; /* ldigs "0123456789abcdef" */
-extern char D_800B8A04[]; /* udigs "0123456789ABCDEF" */
+extern char ldigs[]; /* ldigs "0123456789abcdef" */
+extern char udigs[]; /* udigs "0123456789ABCDEF" */
 extern void *func_0029E460(void *dst, const void *src, u32 n); /* memcpy */
 
 static __inline__ void lldiv(lldiv_t *ans, s64 num, s64 den) {
@@ -46,9 +46,9 @@ void _Litob(_Pft *x, u8 type) {
     s32 i;
     u64 ullval;
 
-    digs = D_800B89F0;
+    digs = ldigs;
     if (type == 'X') {
-        digs = D_800B8A04;
+        digs = udigs;
     }
 
     base = (type == 'o') ? 8 : (type != 'x' && type != 'X') ? 10 : 16;

@@ -4,10 +4,10 @@
 #include "structs/model.h"
 
 /* As CGameObjectInstance__DrawModel, drawing through Render_DrawModel and without setting the
- * actor's mask; clears D_800AB8B0 afterwards. */
+ * actor's mask; clears gBlendState afterwards. */
 
-extern s32 D_800B6D1C;      /* current view */
-extern s32 D_800AB8B0;
+extern s32 gEvenOdd;      /* current view */
+extern s32 gBlendState;
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
 void Render_DrawModel(s32, s32, s32, void *, s32, s32, s32);
@@ -59,7 +59,7 @@ void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, s32 arg
         CGameObjectInstance__DrawShadow(actor, arg1, params);
     }
     if (params->m_bDraw != 0) {
-        Render_DrawModel(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[D_800B6D1C], 0, params->m_nModel, actor->m_AI.m_nTexture);
+        Render_DrawModel(params->m_hModel, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[gEvenOdd], 0, params->m_nModel, actor->m_AI.m_nTexture);
     }
-    D_800AB8B0 = 0;
+    gBlendState = 0;
 }

@@ -6,10 +6,10 @@
  * Turok 3's cache.h (references/turok3/include/cache.h), which has the
  * same objects; Turok 2's CMemEntry has a lock count at 0x08 that Turok 3
  * folded into the flags, so its later fields sit 4 bytes further.
- * The cache's lists start at D_800D81E0: every resident entry (CList,
- * links at 0x18/0x1C) and, from D_800D81F4, the locked ones sorted by
- * address (links at 0x20/0x24). D_800D8DB0 is the cache lock, taken with
- * the D_800D8DCC count.
+ * The cache's lists start at gCache_memAgeList: every resident entry (CList,
+ * links at 0x18/0x1C) and, from gCache_memLockedList, the locked ones sorted by
+ * address (links at 0x20/0x24). gCache_mutex is the cache lock, taken with
+ * the gCache_mutex_count count.
  * tools/check_structs.py checks every offset below with the game's compiler. */
 
 #include "common.h"
@@ -21,14 +21,14 @@ struct CCacheEntry;
 #define MEMENTRY_FLAG_DLISTA_LOCKED 0x200
 #define MEMENTRY_FLAG_DLISTB_LOCKED 0x400
 #define MEMENTRY_FLAG_ALLOCATED     0x800
-#define MEMENTRY_FLAG_ON_LOCKED     0x1000  /* on the locked list D_800D81F4 */
+#define MEMENTRY_FLAG_ON_LOCKED     0x1000  /* on the locked list gCache_memLockedList */
 
 typedef struct CMemEntry {
     /* 0x00 */ void *data;
     /* 0x04 */ s32 size;
     /* 0x08 */ s32 lockCount;       /* users; the last one clears MEMENTRY_FLAG_LOCKED */
     /* 0x0C */ s32 flags;           /* MEMENTRY_FLAG_* (0x702: in use) */
-    /* 0x10 */ s32 age;             /* the frame (D_800D8DF0) it was last used */
+    /* 0x10 */ s32 age;             /* the frame (gCache_ageCount) it was last used */
     /* 0x14 */ struct CCacheEntry *cacheEntry;
     /* 0x18 */ struct CMemEntry *last;
     /* 0x1C */ struct CMemEntry *next;

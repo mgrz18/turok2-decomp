@@ -1,10 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800C2040;
+extern s32 gVideoClearFrames;
 
 void func_0042452C(void) {
-    if (D_800C2040 == 0) {
-        D_800C2040 = 0x14;
+    if (gVideoClearFrames == 0) {
+        gVideoClearFrames = 0x14;
     }
 }

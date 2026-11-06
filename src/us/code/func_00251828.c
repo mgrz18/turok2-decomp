@@ -15,7 +15,7 @@ typedef struct TravelTarget {
 } TravelTarget;
 
 extern f32 gFrameIncrement;      /* frame time */
-extern char D_800ADE70;
+extern char gStandLookTuning;
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern s32 CPlayer__SetState(void *, void *, s32);
 extern void Angle_Wrap(f32 *value);
@@ -24,7 +24,7 @@ void PlayerJumpPad_Update(CPlayer *player, void *body) {
     f32 yaw, targetYaw, alternate, duration, t;
     Position pos;
 
-    CPlayer__TurnAndLook(player, body, &D_800ADE70);
+    CPlayer__TurnAndLook(player, body, &gStandLookTuning);
     player->m_JumpPadCurrentTime += gFrameIncrement;
     yaw = player->m_CharacterActor.m_RotY;
     targetYaw = player->m_JumpPadAngleDirection;

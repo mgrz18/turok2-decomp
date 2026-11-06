@@ -4,19 +4,19 @@
 
 void MenuPool_OpenMenu_2(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
 
-extern char D_0043BBB0[];
-extern s32 D_800C2028;
-extern s32 D_801198A4[2];
-extern s32 D_80130940;
-extern s32 D_80130980;
-extern s32 D_80130990;
-extern s32 D_80130998;
+extern char gPakMsgInsertRumblePakDesc_2[];
+extern s32 gPakMenuPort;
+extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2];
+extern s32 gCameraPoolHideViews;
+extern s32 sSavePortalChosen;
+extern s32 gPakMenuAnyPak;
+extern s32 gSavePortalActive;
 
 static __inline__ u8 *GetPlayer(Menu *event, s32 *port) {
     u8 *player = NULL;
 
-    if (D_80130990 != 0) {
-        *port = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        *port = gPakMenuPort;
     } else {
         player = event->player;
         *port = event->controller->port;
@@ -28,12 +28,12 @@ s32 SavePortalMenu_SelectGoBack_2(s32 unused, Menu *event) {
     u8 *player;
     s32 port;
 
-    D_80130980 = 1;
-    D_801198A4[0] = 0;
-    D_801198A4[1] = 0;
-    D_80130940 = 0;
+    sSavePortalChosen = 1;
+    gEngineApp_m_Game_m_PlayerList_m_bCinema[0] = 0;
+    gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
+    gCameraPoolHideViews = 0;
     player = GetPlayer(event, &port);
-    MenuPool_OpenMenu_2(*(char **)(player + 0x51C) + 0x53C, D_0043BBB0, player, *(s32 *)(player + 0xA50), 0);
-    D_80130998 = 0;
+    MenuPool_OpenMenu_2(*(char **)(player + 0x51C) + 0x53C, gPakMsgInsertRumblePakDesc_2, player, *(s32 *)(player + 0xA50), 0);
+    gSavePortalActive = 0;
     return 1;
 }

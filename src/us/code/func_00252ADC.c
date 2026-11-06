@@ -2,8 +2,8 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 
-extern s32 D_8011AC8C;
-extern s32 D_8011ACA4;
+extern s32 gEngineApp_m_Settings_nextMode;
+extern s32 gEngineApp_m_Settings_paused;
 extern f32 gFrameIncrement;          /* frame time scale */
 
 extern s32 Cinema_PathPlaying(void);
@@ -28,7 +28,7 @@ static __inline__ s32 menu_open(CPlayer *p) {
 void CPlayerPool__AnimateWeapons(CPlayerPool *list) {
     CPlayer *p;
 
-    if (D_8011AC8C == 11 || D_8011AC8C == 8) {
+    if (gEngineApp_m_Settings_nextMode == 11 || gEngineApp_m_Settings_nextMode == 8) {
         return;
     }
     for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
@@ -37,7 +37,7 @@ void CPlayerPool__AnimateWeapons(CPlayerPool *list) {
             p->m_pLoopingSound_WeaponBackground = NULL;
             LoopSounds_Stop(LoopSounds_Get(), p->m_pLoopingSound_WeaponFiring);
             p->m_pLoopingSound_WeaponFiring = NULL;
-        } else if (D_8011ACA4 == 0) {
+        } else if (gEngineApp_m_Settings_paused == 0) {
             if (!menu_open(p)) {
                 CGameObjectInstance *weapon = &p->m_WeaponActor;
                 s32 old = p->m_CharAnim;

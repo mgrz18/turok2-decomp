@@ -14,8 +14,8 @@ extern void CQuaternion__ToMatrix(CQuaternion *q, CMtxF m);                /* to
 extern void CMtxF__MultiplyAffine(CMtxF out, CMtxF a, CMtxF b);      /* out = a * b */
 extern f32 CGameRegion__GetEdgeYaw(void *region, s32 attach);
 extern void CMtxF__SetRotateY(CMtxF m, f32 angle);
-extern CMtxF D_800F1810;
-extern CMtxF D_800F18F0;
+extern CMtxF sParticleParentMtx;
+extern CMtxF sParticleRotXMtx;
 
 CMtxF *CParticle__GetParentTransform(CParticle *p, u8 *view) {
     CMtxF output;
@@ -23,8 +23,8 @@ CMtxF *CParticle__GetParentTransform(CParticle *p, u8 *view) {
 
     switch (p->m_Alignment) {
     case -8:
-        CMtxF__SetLookDirection(D_800F1810, &p->m_vDirection);
-        return &D_800F1810;
+        CMtxF__SetLookDirection(sParticleParentMtx, &p->m_vDirection);
+        return &sParticleParentMtx;
     case -6:
         if (view == NULL) {
             return NULL;
@@ -40,21 +40,21 @@ CMtxF *CParticle__GetParentTransform(CParticle *p, u8 *view) {
         if (p->header.m_vPos.y - CGameRegion__GetHeight(p->header.m_pCurrentRegion, p->header.m_vPos.x, p->header.m_vPos.z) <= 0.01f) {
             CGameRegion__GetTiltRotation(&state, p->header.m_pCurrentRegion);
             CQuaternion__ToMatrix(&state, output);
-            CMtxF__MultiplyAffine(D_800F1810, D_800F18F0, output);
-            return &D_800F1810;
+            CMtxF__MultiplyAffine(sParticleParentMtx, sParticleRotXMtx, output);
+            return &sParticleParentMtx;
         }
     case -5:
-        return &D_800F18F0;
+        return &sParticleRotXMtx;
     case -2:
         CGameRegion__GetCeilingTiltRotation(&state, p->header.m_pCurrentRegion);
         CQuaternion__ToMatrix(&state, output);
-        CMtxF__MultiplyAffine(D_800F1810, D_800F18F0, output);
-        return &D_800F1810;
+        CMtxF__MultiplyAffine(sParticleParentMtx, sParticleRotXMtx, output);
+        return &sParticleParentMtx;
     case 0:
     case 1:
     case 2:
-        CMtxF__SetRotateY(D_800F1810, CGameRegion__GetEdgeYaw(p->header.m_pCurrentRegion, p->m_Alignment));
-        return &D_800F1810;
+        CMtxF__SetRotateY(sParticleParentMtx, CGameRegion__GetEdgeYaw(p->header.m_pCurrentRegion, p->m_Alignment));
+        return &sParticleParentMtx;
     }
     return NULL;
 }

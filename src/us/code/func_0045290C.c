@@ -3,9 +3,9 @@
 
 s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
 
-extern u8 D_8011AAF0[];
+extern u8 gEngineApp_m_Settings_unk18[];
 
 s32 Menu_StepDebugMode_2(s32 arg0, s32 arg1) {
-    D_8011AAF0[0] = Menu_StepValue_2(arg1, (s32) D_8011AAF0[0], 1, 0, 2, 1);
+    gEngineApp_m_Settings_unk18[0] = Menu_StepValue_2(arg1, (s32) gEngineApp_m_Settings_unk18[0], 1, 0, 2, 1);
     return 0;
 }

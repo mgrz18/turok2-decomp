@@ -10,7 +10,7 @@ extern char D_800B6164[];
 
 /* Names setting 0x2E. */
 s32 func_004522CC(MenuItem *item) {
-    switch (D_8011AAD8.teamCrosshairs) {
+    switch (gEngineApp_m_Settings.teamCrosshairs) {
     case 0:
         item->text = D_800B617C;
         break;

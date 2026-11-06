@@ -1,20 +1,20 @@
 typedef signed int s32;
 
-extern char D_0043AC80[];
-extern char D_0043ACA4[];
-extern char D_0043ACC8[];
-extern char D_0043ACEC[];
+extern char gStatsAfterPakMenuDesc1[];
+extern char gStatsAfterPakMenuDesc2[];
+extern char gStatsAfterPakMenuDesc3[];
+extern char gStatsAfterPakMenuDesc4[];
 
 char *func_00421AEC(s32 unused, s32 which) {
     switch (which) {
         case 0:
         default:
-            return D_0043AC80;
+            return gStatsAfterPakMenuDesc1;
         case 1:
-            return D_0043ACA4;
+            return gStatsAfterPakMenuDesc2;
         case 2:
-            return D_0043ACC8;
+            return gStatsAfterPakMenuDesc3;
         case 3:
-            return D_0043ACEC;
+            return gStatsAfterPakMenuDesc4;
     }
 }

@@ -7,14 +7,14 @@
  * when ai->m_Mode is set. */
 
 
-extern s32 D_00431D04[];
-extern s32 D_00431D10[]; /* active slot mask per phase */
-extern s32 D_00431D1C[];
-extern u8 D_00431D28[];
+extern s32 sMotherBossPhaseVisBits_2[];
+extern s32 sMotherBossPhaseActiveMasks_2[]; /* active slot mask per phase */
+extern s32 sMotherBossPhaseLiveMasks_2[];
+extern u8 sMotherBossSpotResetScript_2[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     s32 i;
 
     for (i = 0; i < 15; i++) {
@@ -25,21 +25,21 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 }
 
 void MotherBoss_SetupPhase0_2(void *obj, CAI *ai) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     s32 mask;
 
     state->minRadius = 0x200;
     state->maxRadius = 0x600;
     state->phase = 0;
     state->counter = 0;
-    ai->m_VisBits = D_00431D04[state->phase];
-    state->liveMask = D_00431D1C[state->phase];
-    mask = D_00431D10[state->phase];
+    ai->m_VisBits = sMotherBossPhaseVisBits_2[state->phase];
+    state->liveMask = sMotherBossPhaseLiveMasks_2[state->phase];
+    mask = sMotherBossPhaseActiveMasks_2[state->phase];
     state->slots[2].health = state->slots[3].health = state->slots[4].health = 0x2800;
     state->slots[6].health = state->slots[7].health = state->slots[8].health = 0x2800;
     state->totalHealth = state->health = 0xF000;
     state->activeMask = mask;
     if (ai->m_Mode != 0) {
-        resetSlots(state->activeMask, D_00431D28);
+        resetSlots(state->activeMask, sMotherBossSpotResetScript_2);
     }
 }

@@ -120,7 +120,7 @@ void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
     Actor_SpawnParticle(target, 0x112, p, 0);
 }
 
-extern CListedInstance *D_8010FEB4;
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 extern u8 gScene_m_InstancePool[];
 
 extern void GameObject_TraceMove(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
@@ -137,7 +137,7 @@ static __inline__ s32 fewerActorsThan(s32 max) {
     CListedInstance *actor;
     s32 count = 0;
 
-    for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {
+    for (actor = gScene_m_InstancePool_m_ActiveList; actor != NULL; actor = actor->m_pNext) {
         /* both arms are merged by cross-jumping; the extra block gives the ROM's register allocation */
         if (actor->m_pNext != NULL) {
             count++;
@@ -168,7 +168,7 @@ static __inline__ f32 getTargetDist(CListedInstance *obj, CListedInstance **foun
  * live minions around the target, or knocks the target back. 1228.7999f: the
  * ROM's pool word is 0x44999999, one ulp under 1228.8f. */
 void MotherBoss_AnimEvent(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
-    MotherBossState *s = &D_8012FB70;
+    MotherBossState *s = &gMotherBoss;
     CListedInstance *obj = self;
     CListedInstance *found;
     CPlayer *owner;

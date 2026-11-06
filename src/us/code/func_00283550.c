@@ -41,7 +41,7 @@ struct B09Emitter {
 };
 extern f32 gFrameIncrement;
 extern f32 D_800A9CB0;
-extern f32 D_800B6D34;
+extern f32 gEmitterTimeScale;
 extern f32 D_800A9CB4;
 extern const f32 D_800A9CB8;
 extern const f32 D_800A9CBC;
@@ -67,7 +67,7 @@ s32 CEmitter__Advance(B09Emitter *e, s32 mask, f32 f2, s32 flag, f32 f4, u8 *ctx
         e->f208 = dn;
     }
     e->f20C = e->f20C + gFrameIncrement * def->f10 * e->f214;
-    step = gFrameIncrement * D_800B6D34 * def->f8;
+    step = gFrameIncrement * gEmitterTimeScale * def->f8;
     t = e->f1C + step * D_800A9CB4;
     e->f1C = t;
     if (D_800A9CB8 < t) {

@@ -3,14 +3,14 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s32 D_801309C0;
+extern s32 gPakMessageKind;
 extern char D_800B4BB0[];
 extern char D_800B4BB4[];
 s32 PakMessage_UpdateOk_2(MenuItem *item) {
     /* Rage Wars sends 5, 6, 9, 10, 12 and 15 to the second text; Turok 2's
      * jump table (jtbl_800C1630, 0-15) sends only 8 there. The other case
      * values are not in the table; 0 and 15 bound it. */
-    switch (D_801309C0) {
+    switch (gPakMessageKind) {
     default:
     case 0:
     case 5:

@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern f32 D_800C1064;
-extern f32 D_8011ACC0;
+extern f32 gEngineApp_m_Settings_match_countdown;
 
 /* Plain pointer arithmetic, not struct fields: GCC marks struct accesses
  * MEM_IN_STRUCT and would then hoist them above the global store. */
@@ -11,7 +11,7 @@ extern f32 D_8011ACC0;
 void GameOverMenu_Init(void *arg0) {
     u8 *obj;
 
-    D_8011ACC0 = D_800C1064;
+    gEngineApp_m_Settings_match_countdown = D_800C1064;
     obj = OBJ(arg0);
     OBJ_FLAGS(obj) &= ~0x04000000;
 }

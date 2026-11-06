@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern int D_80130C60[];
-extern int D_80130C70[];
+extern int gPakState[];
+extern int gPakError[];
 int Pak_GetFreePages_2(int slot, int *score) {
-    extern int *D_800C2224;
-    if (D_80130C60[slot] != 3) {
+    extern int *gPakDirectories;
+    if (gPakState[slot] != 3) {
         return -2;
     }
-    if (D_80130C70[slot] == 0) {
-        *score = D_800C2224[slot * 0x81] / 256;
+    if (gPakError[slot] == 0) {
+        *score = gPakDirectories[slot * 0x81] / 256;
     } else {
         *score = 0;
     }
-    return D_80130C70[slot];
+    return gPakError[slot];
 }

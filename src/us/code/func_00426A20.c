@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern int D_80130C60[];
+extern int gPakState[];
 extern s32 Pak_GetNotePages(s32 index, s32 entry, s32 *out);
 extern s32 Pak_BytesToPages(s32);
 s32 Pak_GetNotePages(s32 index, s32 entry, s32 *out) {
-    extern struct RecordRecAt4V2 *D_800C2224;
-    if (D_80130C60[index] != 3) {
+    extern struct RecordRecAt4V2 *gPakDirectories;
+    if (gPakState[index] != 3) {
         return -2;
     }
-    *out = Pak_BytesToPages(D_800C2224[index].entries[entry].size);
+    *out = Pak_BytesToPages(gPakDirectories[index].entries[entry].size);
     return 0;
 }

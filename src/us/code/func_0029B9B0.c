@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern OSThread *D_800B8918;
-extern OSThread *D_800B8920;
+extern OSThread *__osRunQueue;
+extern OSThread *__osRunningThread;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
 extern void __osDequeueThread(OSThread **queue, OSThread *t);
@@ -16,17 +16,17 @@ void osSetThreadPri(OSThread *t, s32 pri)
     OSThread **runQueue;
     saveMask = __osDisableInt();
     if (t == 0) {
-        t = D_800B8920;
+        t = __osRunningThread;
     }
     if (t->priority != pri) {
         t->priority = pri;
-        if (t != D_800B8920 && t->state != 1) {
+        if (t != __osRunningThread && t->state != 1) {
             __osDequeueThread(t->queue, t);
             __osEnqueueThread(t->queue, t);
         }
-        runQueue = &D_800B8918;
-        if (D_800B8920->priority < (*runQueue)->priority) {
-            D_800B8920->state = 2;
+        runQueue = &__osRunQueue;
+        if (__osRunningThread->priority < (*runQueue)->priority) {
+            __osRunningThread->state = 2;
             __osEnqueueAndYield(runQueue);
         }
     }

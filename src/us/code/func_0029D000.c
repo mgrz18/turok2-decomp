@@ -3,15 +3,15 @@
 
 #include "rw/abu_types.h"
 
-extern int D_800B8908;
+extern int __OSGlobalIntMask;
 extern void __osLeoAbnormalResume();
 extern void __osLeoResume();
-extern char *D_80123AD4;
+extern char *__osDiskHandle;
 void __osLeoAbnormalResume(void) {
     DiskTransferInfo *temp_a2;
     u32 status;
     status = *(volatile u32 *)0xA4600010;
-    temp_a2 = (DiskTransferInfo *)(D_80123AD4 + 0x14);
+    temp_a2 = (DiskTransferInfo *)(__osDiskHandle + 0x14);
     while (status & 3) {
         status = *(volatile u32 *)0xA4600010;
     }
@@ -25,7 +25,7 @@ void __osLeoAbnormalResume(void) {
     {
         volatile u32 *statusAddr = (volatile u32 *)0xA4600010;
         s32 mask = 0x100401;
-        s32 *flagsAddr = &D_800B8908;
+        s32 *flagsAddr = &__OSGlobalIntMask;
         s32 flags = *flagsAddr;
         *statusAddr = 2;
         *flagsAddr = flags | mask;

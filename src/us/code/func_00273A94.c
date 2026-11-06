@@ -5,7 +5,7 @@
 
 extern float D_800A8174;
 extern float D_800A8178;
-extern s16 D_800F2940[];
+extern s16 gSndVolumeCurve[];
 extern float D_800A8170;
 void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
     s32 i;
@@ -28,7 +28,7 @@ void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
         p = t * t * t * t * t * k2;
         idx = 0x5A - i;
         i += 1;
-        D_800F2940[idx] = (s16)(s32)p;
+        gSndVolumeCurve[idx] = (s16)(s32)p;
     } while (i < 0x5B);
     negone = -1;
     i = 0;

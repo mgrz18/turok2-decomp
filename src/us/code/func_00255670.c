@@ -22,13 +22,13 @@ typedef struct {
 } Tuning;
 
 extern Tuning D_800A7170;
-extern s32 D_80110048;
+extern s32 gScene_m_LevelID;
 
 void PlayerJump_Update(CPlayer *arg0, MoveState *arg1) {
     f32 var_f2;
 
     var_f2 = D_800A7170.scale;
-    if (D_80110048 == 0x1DB1) {
+    if (gScene_m_LevelID == 0x1DB1) {
         var_f2 = 481.28f;
     }
     if (!(arg0->m_ContState.m_dwButtons & 0x10) || (arg0->m_ModeTime >= 3.0f)) {

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern int D_800B2A84;
+extern int sLoopSoundsLastStopped;
 extern s32 CList__AddTail(CList *list, void *node);
 extern void Sound__Stop(s32 arg0);
 s32 LoopSounds_Stop(void *arg0, void *arg1) {
@@ -17,7 +17,7 @@ s32 LoopSounds_Stop(void *arg0, void *arg1) {
         do {
             if (var_s0 == arg1) {
                 Sound__Stop(((SoundSourceNode *)var_s0)->value);
-                D_800B2A84 = ((SoundSourceNode *)var_s0)->value;
+                sLoopSoundsLastStopped = ((SoundSourceNode *)var_s0)->value;
                 CList__Remove(&((SoundVoicePool *)arg0)->playing, (s32)var_s0);
                 CList__AddTail(arg0, var_s0);
                 return 1;

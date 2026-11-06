@@ -15,14 +15,14 @@ typedef struct Pickup {
 } Pickup;
 
 extern f32 gFrameIncrement;              /* frame time scale */
-extern u8 D_800F1360[];
+extern u8 gLevelActorIntelligence[];
 extern u8 D_800F1EF0[];
 
 void CLevelActor__Update(Pickup *obj);
 void Collision_MoveInstance(Pickup *obj, f32 x, f32 y, f32 z, void *arg4);
 
 /* Counts the timer down, moves the object (CLevelActor__Update), stops it unless its definition is
- * D_800F1360, places it at its position and refreshes its bounding box, 81.92 each way. */
+ * gLevelActorIntelligence, places it at its position and refreshes its bounding box, 81.92 each way. */
 void CPooledLevelActor__Update(Pickup *obj) {
     CVector3 prev;
 
@@ -31,7 +31,7 @@ void CPooledLevelActor__Update(Pickup *obj) {
         prev = obj->pos;
     }
     CLevelActor__Update(obj);
-    if (obj->def != D_800F1360) {
+    if (obj->def != gLevelActorIntelligence) {
         obj->vel.x = 0.0f;
         obj->vel.y = 0.0f;
         obj->vel.z = 0.0f;

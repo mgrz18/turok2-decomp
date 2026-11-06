@@ -10,7 +10,7 @@ extern float D_800A8100;
 extern float D_800A8104;
 extern float D_800A8108;
 extern float D_800A810C;
-extern float D_800B284C[];
+extern float sPitchRatioTable[];
 extern struct Bytes12 *CAudioWorld__GetPitchEnvelope(ContextRecAt2BC0 *, s32);
 extern s16 FloatToHalf(f32);
 extern s32 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *);
@@ -67,10 +67,10 @@ void SndVoice_InitPitch(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s
     index = position;
     if (index != position) {
         next = index + 1;
-        base = D_800B284C[index];
-        result = base + (position - index) * (D_800B284C[next] - base);
+        base = sPitchRatioTable[index];
+        result = base + (position - index) * (sPitchRatioTable[next] - base);
     } else {
-        result = D_800B284C[index];
+        result = sPitchRatioTable[index];
     }
     motion->heading = result;
     angles->heading = FloatToHalf(result);

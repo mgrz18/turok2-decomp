@@ -4,7 +4,7 @@
 s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern f32 D_800C0548;
-extern s32 D_8012FA04;
+extern s32 gLevelScript_script_current;
 
 void Primagen_UpdateMode22(CGameObjectInstance *obj, CAI *ai) {
     f32 *animSpeed;
@@ -13,7 +13,7 @@ void Primagen_UpdateMode22(CGameObjectInstance *obj, CAI *ai) {
         /* through a pointer: a plain struct store gets scheduled later */
         animSpeed = &obj->m_AI.m_AnimSpeed;
         *animSpeed = (f32) D_800C0548;
-        D_8012FA04 = -1;
+        gLevelScript_script_current = -1;
         CAI__SetMode(obj, ai, 0x13);
     }
 }

@@ -5,35 +5,35 @@
 
 extern void __osViInit(void);
 extern void __osViSwapContext();
-extern __OSViContext D_800B7A60[2];
-extern __OSViContext *D_800B7AC0;
-extern __OSViContext *D_800B7AC4;
-extern OSViMode D_800B7AF0;
-extern OSViMode D_800B7B40;
-extern OSViMode D_800B7B90;
-extern s32 D_80000300;
+extern __OSViContext __osViContexts[2];
+extern __OSViContext *__osViCurr;
+extern __OSViContext *__osViNext;
+extern OSViMode osViModeNtscLan1;
+extern OSViMode osViModePalLan1;
+extern OSViMode osViModeMpalLan1;
+extern s32 osTvType;
 extern void *memset(void *destination, s32 value, u32 size);
 void __osViInit(void)
 {
-    __OSViContext *contexts = D_800B7A60;
+    __OSViContext *contexts = __osViContexts;
     s32 tv_type;
-    memset(contexts, 0, sizeof(D_800B7A60));
-    tv_type = D_80000300;
-    D_800B7AC0 = &contexts[0];
-    D_800B7AC4 = &contexts[1];
+    memset(contexts, 0, sizeof(__osViContexts));
+    tv_type = osTvType;
+    __osViCurr = &contexts[0];
+    __osViNext = &contexts[1];
     contexts[1].retraceCount = 1;
     contexts[0].retraceCount = 1;
     contexts[1].framep = (void *)0x80000000U;
     contexts[0].framep = (void *)0x80000000U;
     if (tv_type == 0) {
-        contexts[1].modep = &D_800B7B40;
+        contexts[1].modep = &osViModePalLan1;
     } else if (tv_type == 2) {
-        contexts[1].modep = &D_800B7B90;
+        contexts[1].modep = &osViModeMpalLan1;
     } else {
-        contexts[1].modep = &D_800B7AF0;
+        contexts[1].modep = &osViModeNtscLan1;
     }
-    D_800B7AC4->state = 0x20;
-    D_800B7AC4->control = D_800B7AC4->modep->comRegs.ctrl;
+    __osViNext->state = 0x20;
+    __osViNext->control = __osViNext->modep->comRegs.ctrl;
     while ((*(volatile u32 *)(0xA4400010U)) > 10) {
     }
     (*(volatile u32 *)(0xA4400000U) = (0));

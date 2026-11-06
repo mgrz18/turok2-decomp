@@ -42,8 +42,8 @@ extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
-extern CVector3 *D_800C18F0[];  /* boss paths, ended by a point with y < 0 */
-extern s32 D_8012FB48;          /* path */
+extern CVector3 *gPrimagenPaths[];  /* boss paths, ended by a point with y < 0 */
+extern s32 gLevelScript_path;          /* path */
 extern LevelScriptF604 D_8012F604;
 typedef struct {
     /* 0x00 */ s32 unk0;   /* 0x8012F9D4 */
@@ -51,15 +51,15 @@ typedef struct {
     /* 0x08 */ u8 pad8[0x5C - 0x8];
     /* 0x5C */ CVector3 dest; /* 0x8012FA30 */
 } BossCtl;
-extern BossCtl D_8012F9D4;
-extern s32 D_8012F600;          /* point on the path */
-extern f32 D_8012F9F8;          /* cooldown */
-extern BossStep *D_8012F9FC;    /* script */
-extern s32 D_8012FA00;          /* cursor */
-extern s32 D_8012F608;          /* stage, as the script selection reads it */
-extern BossStep D_00431008[];
-extern BossStep D_004310E4[];
-extern BossStep D_00431238[];
+extern BossCtl gLevelScript_unk3CC;
+extern s32 sPrimagenPathPoint;          /* point on the path */
+extern f32 gLevelScript_script;          /* cooldown */
+extern BossStep *gLevelScript_script_steps;    /* script */
+extern s32 gLevelScript_script_cursor;          /* cursor */
+extern s32 gLevelScript;          /* stage, as the script selection reads it */
+extern BossStep sPrimagenAttackScriptStage1[];
+extern BossStep sPrimagenAttackScriptStage2[];
+extern BossStep sPrimagenAttackScriptStage3[];
 
 void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -69,7 +69,7 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
     f32 angle;
     f32 speed;
     f32 heading;
-    BossCtl *ctl = &D_8012F9D4;
+    BossCtl *ctl = &gLevelScript_unk3CC;
 
     D_800F1F50[0] |= 0x8000;
     AI_UpdateTargets(obj, ai, &t, 0, 1);
@@ -91,14 +91,14 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
         CVector3__Subtract(&d, &obj->header.m_vPos, &dest);
         if (func_00298470(d.x * d.x + d.z * d.z) <= 50.0f) {
             if (D_8012F604.state == 3) {
-                if (D_8012F608 == 1) {
-                    D_8012F604.script = D_00431008;
+                if (gLevelScript == 1) {
+                    D_8012F604.script = sPrimagenAttackScriptStage1;
                 }
-                if (D_8012F608 == 2) {
-                    D_8012F604.script = D_004310E4;
+                if (gLevelScript == 2) {
+                    D_8012F604.script = sPrimagenAttackScriptStage2;
                 }
-                if (D_8012F608 == 3) {
-                    D_8012F604.script = D_00431238;
+                if (gLevelScript == 3) {
+                    D_8012F604.script = sPrimagenAttackScriptStage3;
                 }
                 D_8012F604.cursor = -1;
                 D_8012F604.index = -1;
@@ -108,14 +108,14 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
                 return;
             }
             if (D_8012F604.state == 11) {
-                if (D_8012F608 == 1) {
-                    D_8012F604.script = D_00431008;
+                if (gLevelScript == 1) {
+                    D_8012F604.script = sPrimagenAttackScriptStage1;
                 }
-                if (D_8012F608 == 2) {
-                    D_8012F604.script = D_004310E4;
+                if (gLevelScript == 2) {
+                    D_8012F604.script = sPrimagenAttackScriptStage2;
                 }
-                if (D_8012F608 == 3) {
-                    D_8012F604.script = D_00431238;
+                if (gLevelScript == 3) {
+                    D_8012F604.script = sPrimagenAttackScriptStage3;
                 }
                 D_8012F604.cursor = -1;
                 D_8012F604.index = -1;
@@ -123,17 +123,17 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
                 return;
             }
             if (D_8012F604.state == 4) {
-                D_8012F600++;
-                if (D_800C18F0[D_8012FB48][D_8012F600].y < 0.0f) {
-                    D_8012F600 = 0;
+                sPrimagenPathPoint++;
+                if (gPrimagenPaths[gLevelScript_path][sPrimagenPathPoint].y < 0.0f) {
+                    sPrimagenPathPoint = 0;
                     if (D_8012F604.stage != 1) {
-                        D_8012FB48++;
-                        if (D_8012FB48 >= 3) {
-                            D_8012FB48 = 0;
+                        gLevelScript_path++;
+                        if (gLevelScript_path >= 3) {
+                            gLevelScript_path = 0;
                         }
                     }
                 }
-                D_8012F604.dest = D_800C18F0[D_8012FB48][D_8012F600];
+                D_8012F604.dest = gPrimagenPaths[gLevelScript_path][sPrimagenPathPoint];
             }
         }
     }
@@ -159,18 +159,18 @@ void Primagen_UpdateMode19(CGameObjectInstance *obj, CAI *ai) {
     }
     if (D_8012F604.scriptOn && D_8012F604.state != 3 && D_8012F604.state != 11) {
         if (D_8012F604.index == -1) {
-            if (D_8012FA00 != -1) {
-                D_8012F9F8 = D_8012F9FC[D_8012FA00].delay;
+            if (gLevelScript_script_cursor != -1) {
+                gLevelScript_script = gLevelScript_script_steps[gLevelScript_script_cursor].delay;
             } else {
-                D_8012F9F8 = 0.0f;
+                gLevelScript_script = 0.0f;
             }
             do {
-                D_8012FA00++;
-                if (D_8012F9FC[D_8012FA00].type == 5) {
-                    D_8012FA00 = 0;
+                gLevelScript_script_cursor++;
+                if (gLevelScript_script_steps[gLevelScript_script_cursor].type == 5) {
+                    gLevelScript_script_cursor = 0;
                 }
-                D_8012F604.index = D_8012FA00;
-            } while ((f32) D_8012F9FC[D_8012FA00].chance <= Random_Blend(0.0f, 100.0f));
+                D_8012F604.index = gLevelScript_script_cursor;
+            } while ((f32) gLevelScript_script_steps[gLevelScript_script_cursor].chance <= Random_Blend(0.0f, 100.0f));
         }
         Primagen_RunAttackStep(obj, ai, t.m_Sight.m_Dist);
     }

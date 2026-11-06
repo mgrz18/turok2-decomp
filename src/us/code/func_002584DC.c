@@ -4,8 +4,8 @@
 
 /* Weapon state for weapon 0x14: drains ammo while firing, every third tick. */
 
-extern s32 D_800B6D1C;
-extern u32 D_800B6D20;
+extern s32 gEvenOdd;
+extern u32 gFrameCountGameplay;
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);
@@ -31,11 +31,11 @@ void WeaponMode_StreamFire_Update(void *obj, CAI *state) {
     if (state->m_ModeTime > 30.0f) {
         player->m_FleeTime = 45.0f;
     }
-    if (D_800B6D1C != 0) {
+    if (gEvenOdd != 0) {
         state->m_ConditionTimer += 1.5f;
         CPlayer__FireWeapon(((CGameObjectInstance *) obj)->m_AI.m_pParent, 0x14);
     }
-    if (D_800B6D20 % 3 == 0) {
+    if (gFrameCountGameplay % 3 == 0) {
         USE_AMMO();
     }
 }

@@ -7,10 +7,10 @@ extern void CEngineApp__SetupFadeTo(struct GameSession *object, int value);
 extern s32 SingleMenu_GoBack(void *arg0, Outer8043E56C *arg1);
 extern void Controller_UnwatchPak(s32 arg0);
 extern s32 gEngineApp;
-extern s32 D_801308F8;
+extern s32 gInSinglePlayerMenu;
 s32 SingleMenu_GoBack(void *arg0, Outer8043E56C *arg1) {
     CEngineApp__SetupFadeTo(&gEngineApp, 8);
-    D_801308F8 = 0;
+    gInSinglePlayerMenu = 0;
     Controller_UnwatchPak(arg1->unk20->unk4);
     return 1;
 }

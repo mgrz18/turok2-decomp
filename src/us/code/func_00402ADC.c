@@ -27,6 +27,6 @@ void MantidQueen_EnterStart(s32 a0, s32 a1) {
         actor->onEvent = MantidQueen_Draw;
         actor->onUpdate = EnemyAI_HeadNodeCallback;
     }
-    MantidQueen_Init(&D_8012F3A0, a0);
+    MantidQueen_Init(&gMantidQueen, a0);
     CAI__SetMode(a0, a1, 1);
 }

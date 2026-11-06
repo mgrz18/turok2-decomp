@@ -9,12 +9,12 @@
 extern float D_800A7FD8;
 extern float D_800A7FD0;
 extern void CVector3__Normalize(f32 *arg0);
-extern CGameRegion *D_800B2608;
-extern CGameRegion *D_800B260C;
-extern CVector3 D_800F2020;
-extern f32 D_800F2024;
-extern s32 D_800F2028;
-extern CVector3 D_800F2030;
+extern CGameRegion *sCachedRawNormalRegion;
+extern CGameRegion *sCachedNormalRegion;
+extern CVector3 sRegionNormal;
+extern f32 sRegionNormal_y;
+extern s32 sRegionNormal_z;
+extern CVector3 sRegionUnitNormal;
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 static __inline__ void edge(CVector3 *out, CVector3 *a, CVector3 *b) {
@@ -38,21 +38,21 @@ s32 CGameRegion__IsSteep(CGameRegion *polygon) {
     up.x = 0.0f;
     up.y = *(&D_800A7FD0 + 1);
     up.z = 0.0f;
-    if (polygon != D_800B260C) {
+    if (polygon != sCachedNormalRegion) {
         if (polygon == 0) {
-            *(s32 *)&D_800F2020 = 0;
-            D_800F2024 = *(&D_800A7FD0 + 1);
-            D_800F2028 = 0;
-        } else if (polygon != D_800B2608) {
+            *(s32 *)&sRegionNormal = 0;
+            sRegionNormal_y = *(&D_800A7FD0 + 1);
+            sRegionNormal_z = 0;
+        } else if (polygon != sCachedRawNormalRegion) {
             edge(&edge0, polygon->m_pVertices[1], polygon->m_pVertices[0]);
             edge(&edge1, polygon->m_pVertices[2], polygon->m_pVertices[1]);
-            CVector3__Cross(&D_800F2020, &edge0, &edge1);
+            CVector3__Cross(&sRegionNormal, &edge0, &edge1);
         }
-        D_800B2608 = polygon;
-        normalize_copy(&D_800F2030, &D_800F2020);
+        sCachedRawNormalRegion = polygon;
+        normalize_copy(&sRegionUnitNormal, &sRegionNormal);
     }
-    normal = D_800F2030;
-    D_800B260C = polygon;
+    normal = sRegionUnitNormal;
+    sCachedNormalRegion = polygon;
     if (normal.x * up.x + normal.y * up.y + normal.z * up.z <= D_800A7FD8) {
         return 1;
     }

@@ -8,8 +8,8 @@ extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out =
 extern f32 func_00298470(f32);                                /* sqrtf */
 extern f32 Math_AcosLookup(f32);                                /* acosf */
 
-extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
-extern CVector3 D_800F2020;        /* cached raw normal */
+extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
+extern CVector3 sRegionNormal;        /* cached raw normal */
 
 /* Raw (unnormalised) normal of a triangle, cached for the last triangle. */
 static __inline__ CVector3 raw_normal(CGameRegion *tri) {
@@ -17,16 +17,16 @@ static __inline__ CVector3 raw_normal(CGameRegion *tri) {
     CVector3 edge1;
 
     if (tri == NULL) {
-        D_800F2020.x = 0;
-        D_800F2020.z = 0;
-        D_800F2020.y = 1.0f;
-    } else if (tri != D_800B2608) {
+        sRegionNormal.x = 0;
+        sRegionNormal.z = 0;
+        sRegionNormal.y = 1.0f;
+    } else if (tri != sCachedRawNormalRegion) {
         CVector3__Subtract(&edge0, tri->m_pVertices[1], tri->m_pVertices[0]);
         CVector3__Subtract(&edge1, tri->m_pVertices[2], tri->m_pVertices[1]);
-        CVector3__Cross(&D_800F2020, &edge0, &edge1);
+        CVector3__Cross(&sRegionNormal, &edge0, &edge1);
     }
-    D_800B2608 = tri;
-    return D_800F2020;
+    sCachedRawNormalRegion = tri;
+    return sRegionNormal;
 }
 
 /* Downhill yaw of a sloped triangle; 0 when it is not a slope or is level. */

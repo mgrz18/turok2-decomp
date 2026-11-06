@@ -31,8 +31,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F290.c, func_0043F290, with Turok 2's layouts. */
 
 extern s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
-extern char D_801308A0[];
-extern char D_80130860[];
+extern char sMenuBindingValue[];
+extern char sMenuBindingText[];
 
 /* Reads the item's bound variable as a float, whatever its type. */
 static __inline__ f32 MenuItem_GetValue(MenuItem *item) {
@@ -67,13 +67,13 @@ char *MenuItem_FormatBinding_2(MenuItem *item) {
     f32 value = MenuItem_GetValue(item);
 
     value = value / binding->scale;
-    sprintf(D_801308A0, "%3.2f", (f64) value);
+    sprintf(sMenuBindingValue, "%3.2f", (f64) value);
     if (binding->name) {
-        sprintf(D_80130860, "%s %s", binding->name, D_801308A0);
+        sprintf(sMenuBindingText, "%s %s", binding->name, sMenuBindingValue);
     } else {
-        sprintf(D_80130860, "%s", D_801308A0);
+        sprintf(sMenuBindingText, "%s", sMenuBindingValue);
     }
-    return D_80130860;
+    return sMenuBindingText;
 }
 
 /* ---------------- MenuItem_UpdateBinding_2 ---------------- */
@@ -137,8 +137,8 @@ s32 MenuItem_UpdateBinding_2(MenuItem *item, Menu *menu) {
 /* ---------------- MenuItem_Layout_2 ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F69C.c, func_0043F69C, with Turok 2's layouts. */
 
-extern s32 D_800C2030; /* screen width */
-extern s32 D_800C2034; /* screen height */
+extern s32 gScreenWidth; /* screen width */
+extern s32 gScreenHeight; /* screen height */
 
 extern s32 GetMemSize(void);
 extern CCamera *func_00416B28_41363C(void *pool) __asm__("MenuPool_GetCamera_2");
@@ -182,7 +182,7 @@ static __inline__ MenuTextStyle *MenuItem_Style_41363C(MenuItem *it) {
             i = 0;
             break;
     }
-    return &D_800C1BD4[i];
+    return &gMenuTextStyles[i];
 }
 
 /* Measures a menu item and places it on screen. */
@@ -221,22 +221,22 @@ void MenuItem_Layout_2(MenuItem *it, MenuItemLayout *o) {
                 o->width = n * E->charWidth;
             }
             if (it->flags & 0x08000000) {
-                o->height = (f32) D_800C2034 * 0.10810811f;
-            } else if (E->font == 2 && D_800C2034 >= 0xDF) {
-                o->height = ((f32) E->lineHeight + 0.5f) * (f32) D_800C2034 * 0.0045045046f;
+                o->height = (f32) gScreenHeight * 0.10810811f;
+            } else if (E->font == 2 && gScreenHeight >= 0xDF) {
+                o->height = ((f32) E->lineHeight + 0.5f) * (f32) gScreenHeight * 0.0045045046f;
             } else {
-                o->height = (E->lineHeight * D_800C2034) / 222;
+                o->height = (E->lineHeight * gScreenHeight) / 222;
             }
-            o->width = (o->width * D_800C2030) / 284;
+            o->width = (o->width * gScreenWidth) / 284;
             break;
         case 4:
             E = MenuItem_Style_41363C(it);
             o->width = E->charWidth;
-            o->height = (E->lineHeight * D_800C2034) / 222;
+            o->height = (E->lineHeight * gScreenHeight) / 222;
             break;
         case 1:
-            if ((D_8011AAD8.mode == 13 && (it->flags & 0x40000000)) ||
-                (D_8011AAD8.multiplayer != 0 && (s32) it->flags < 0 && GetMemSize() == 0x400000)) {
+            if ((gEngineApp_m_Settings.mode == 13 && (it->flags & 0x40000000)) ||
+                (gEngineApp_m_Settings.multiplayer != 0 && (s32) it->flags < 0 && GetMemSize() == 0x400000)) {
                 o->width = 0x11C;
                 o->height = 0xDE;
             } else {
@@ -246,8 +246,8 @@ void MenuItem_Layout_2(MenuItem *it, MenuItemLayout *o) {
                 fa = cam->m_Viewport.m_Width / (f32) o->width;
                 fb = cam->m_Viewport.m_Height / (f32) o->height;
             } else {
-                fa = (f32) D_800C2030 * 0.0035211267f;
-                fb = (f32) D_800C2034 * 0.0045045046f;
+                fa = (f32) gScreenWidth * 0.0035211267f;
+                fb = (f32) gScreenHeight * 0.0045045046f;
             }
             o->scaleX = fa;
             o->scaleY = fb;
@@ -276,15 +276,15 @@ void MenuItem_Layout_2(MenuItem *it, MenuItemLayout *o) {
             break;
         case 3:
             sub = it->part;
-            o->width = ((f32) sub->width * cam->m_Viewport.m_Width) / (f32) D_800C2030;
-            o->height = ((f32) sub->height * cam->m_Viewport.m_Height) / (f32) D_800C2034;
+            o->width = ((f32) sub->width * cam->m_Viewport.m_Width) / (f32) gScreenWidth;
+            o->height = ((f32) sub->height * cam->m_Viewport.m_Height) / (f32) gScreenHeight;
             break;
         default:
             o->width = 1;
             o->height = 1;
             break;
     }
-    vt = (f32) ((it->x * D_800C2030) / 284);
+    vt = (f32) ((it->x * gScreenWidth) / 284);
     if (!(it->flags & 0x8000)) {
         if (it->flags & 0x4000) {
             o->left = (f32) o->right + vt;
@@ -293,7 +293,7 @@ void MenuItem_Layout_2(MenuItem *it, MenuItemLayout *o) {
         }
     }
     o->right = (f32) o->left + (f32) o->width * o->scaleX;
-    vt2 = (f32) ((it->y * D_800C2034) / 222);
+    vt2 = (f32) ((it->y * gScreenHeight) / 222);
     if (!(it->flags & 0x20000)) {
         if (it->flags & 0x10000) {
             o->top = (f32) o->bottom + vt2;
@@ -307,10 +307,10 @@ void MenuItem_Layout_2(MenuItem *it, MenuItemLayout *o) {
 /* ---------------- MenuItem_DrawString_2 ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043FFAC.c, func_0043FFAC, with Turok 2's layouts. */
 
-extern s32 D_800C1BD0; /* current draw mode */
-extern s32 D_801101B0[];
-extern s32 D_800C2030; /* screen width */
-extern s32 D_800C2034; /* screen height */
+extern s32 gMenuCurrentFont; /* current draw mode */
+extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[];
+extern s32 gScreenWidth; /* screen width */
+extern s32 gScreenHeight; /* screen height */
 
 extern s32 GetMemSize(void);
 extern void func_00415CE8_413F74(Menu *w, MenuItem *it, s32 c) __asm__("Menu_DrawBar_2");
@@ -357,7 +357,7 @@ static __inline__ MenuTextStyle *MenuItem_Style_413F74(MenuItem *it) {
             i = 0;
             break;
     }
-    return &D_800C1BD4[i];
+    return &gMenuTextStyles[i];
 }
 
 /* Draws a menu item's text in its class's style, brighter when it is the selected one. */
@@ -368,8 +368,8 @@ void MenuItem_DrawString_2(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, M
     s32 r, g, bl, a, t, t2;
 
     en = 1;
-    if ((D_8011AAD8.mode == 13 && (it->flags & 0x40000000)) ||
-        (D_8011AAD8.multiplayer != 0 && (s32) it->flags < 0 && GetMemSize() == 0x400000)) {
+    if ((gEngineApp_m_Settings.mode == 13 && (it->flags & 0x40000000)) ||
+        (gEngineApp_m_Settings.multiplayer != 0 && (s32) it->flags < 0 && GetMemSize() == 0x400000)) {
         w->visible = 0;
     }
     if (it->flags & 0x08000000) {
@@ -384,7 +384,7 @@ void MenuItem_DrawString_2(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, M
         en = 0;
     }
     E = MenuItem_Style_413F74(it);
-    if (D_800C1BD0 != E->font) {
+    if (gMenuCurrentFont != E->font) {
         switch (E->font) {
             case 0:
                 COnScreen__BeginText();
@@ -398,7 +398,7 @@ void MenuItem_DrawString_2(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, M
                 COnScreen__SelectTinyFont();
                 break;
         }
-        D_800C1BD0 = E->font;
+        gMenuCurrentFont = E->font;
     }
     if (b->index == w->cursor) {
         k = 1.25f;
@@ -427,9 +427,9 @@ void MenuItem_DrawString_2(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, M
     }
     COnScreen__SetFontColor(r, g, bl, a, (t = (s32) ((f32) E->g1 * k)) < 0x100 ? t : 0xFF,
                             (t2 = (s32) ((f32) E->b1 * k)) < 0x100 ? t2 : 0xFF);
-    D_801101B0[0] = E->shadow;
-    D_801101B0[1] = E->shadow;
-    COnScreen__SetFontScale(E->scaleX * (f32) D_800C2030 * 0.0035211267f, E->scaleY * (f32) D_800C2034 * 0.0045045046f);
+    gEngineApp_m_OnScreen_m_ShadowXOff[0] = E->shadow;
+    gEngineApp_m_OnScreen_m_ShadowXOff[1] = E->shadow;
+    COnScreen__SetFontScale(E->scaleX * (f32) gScreenWidth * 0.0035211267f, E->scaleY * (f32) gScreenHeight * 0.0045045046f);
     if (en != 0) {
         en = E->shadow;
     }
@@ -442,7 +442,7 @@ void MenuItem_DrawString_2(MenuItem *it, MenuItemLayout *b, MenuItemLayout *c, M
  * address of the part that matched them. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0044044C.c, func_0044044C, with Turok 2's layouts. */
 
-extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0"); /* current draw mode */
+extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
 
 extern s32 GetMemSize(void);
 extern void Hud_SetupFillMode(); /* called with and without an argument */
@@ -458,8 +458,8 @@ void MenuItem_DrawImage_2(MenuItem *item, MenuItemLayout *box, MenuItemLayout *a
     f32 t1;
     f32 t2;
 
-    if ((D_8011AAD8.mode == 13 && (item->flags & 0x40000000)) ||
-        (D_8011AAD8.multiplayer != 0 && (s32) item->flags < 0 && GetMemSize() == 0x400000)) {
+    if ((gEngineApp_m_Settings.mode == 13 && (item->flags & 0x40000000)) ||
+        (gEngineApp_m_Settings.multiplayer != 0 && (s32) item->flags < 0 && GetMemSize() == 0x400000)) {
         window->highlighted = 1;
         if (D_800C1BD0_4143DC != 3) {
             D_800C1BD0_4143DC = 3;
@@ -471,8 +471,8 @@ void MenuItem_DrawImage_2(MenuItem *item, MenuItemLayout *box, MenuItemLayout *a
         fx = (f32) box->left;
         fx = fx + t1;
         fy = fy + t2;
-        if (D_8011AAD8.paused != 0) {
-            if (D_8011AAD8.multiplayer != 0) {
+        if (gEngineApp_m_Settings.paused != 0) {
+            if (gEngineApp_m_Settings.multiplayer != 0) {
                 if ((s32) item->flags < 0) {
                     alpha = 0xFF;
                 } else {
@@ -549,16 +549,16 @@ void MenuItem_DrawSlider_2(MenuItem *it, MenuItemLayout *box, MenuItemLayout *co
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004409A8.c, func_004409A8, with Turok 2's layouts. */
 
-extern s32 D_800B6D1C;
-extern s32 D_800B6D20; /* frame counter */
-extern s32 D_800B6D00;
+extern s32 gEvenOdd;
+extern s32 gFrameCountGameplay; /* frame counter */
+extern s32 gDefaultVisBits;
 extern f32 gFrameIncrement; /* frame time scale */
-extern s32 D_800C2030; /* screen width */
-extern s32 D_800C2034; /* screen height */
-extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0"); /* current draw mode */
-extern s32 D_801308E0;
+extern s32 gScreenWidth; /* screen width */
+extern s32 gScreenHeight; /* screen height */
+extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
+extern s32 sMenuModelFade;
 extern u8 gScene[];
-extern s32 D_800ADB30[];
+extern s32 gCharacterModels[];
 
 extern void memset(void *p, s32 c, s32 n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
@@ -605,14 +605,14 @@ void MenuItem_DrawModel_2(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unus
         fx = &x->instance;
         if (x->loaded != 0) {
             {
-                Gfx **pp = &D_800D8E24;
+                Gfx **pp = &gDList;
                 d = (*pp)++;
                 d->w0 = 0xDA380007;
-                d->w1 = (u32) &w->camera->m_mProjection[D_800B6D1C];
+                d->w1 = (u32) &w->camera->m_mProjection[gEvenOdd];
             }
             c = w->camera;
-            k = c->m_Viewport.m_Width / (f32) D_800C2030;
-            k2 = c->m_Viewport.m_Height / (f32) D_800C2034;
+            k = c->m_Viewport.m_Width / (f32) gScreenWidth;
+            k2 = c->m_Viewport.m_Height / (f32) gScreenHeight;
             v80.x = p->scale.x * k;
             v80.z = p->scale.z * k;
             v80.y = p->scale.y * k2;
@@ -642,15 +642,15 @@ void MenuItem_DrawModel_2(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unus
             v60.y = v60.y - x->height * v80.y * 0.8f;
             CMtxF__TransformPoint(&w->camera->m_mfViewOrient, &v60, &v70);
             if (s3 != NULL && !(o->flags & 0x2000000)) {
-                CGameObjectInstance__Construct(fx, -1, p->objType, D_800B6D00, s3, -1, 0, w->camera->m_ViewParams.m_RotY + 3.141593f, v70, 0, p->scale, v50,
+                CGameObjectInstance__Construct(fx, -1, p->objType, gDefaultVisBits, s3, -1, 0, w->camera->m_ViewParams.m_RotY + 3.141593f, v70, 0, p->scale, v50,
                               0);
                 func_0021E5D4(fx);
                 o->flags = o->flags | 0x2000000;
             }
-            tt = func_002982F0((f32) (u32) (D_800B6D20 * 10) * 0.017453294f);
+            tt = func_002982F0((f32) (u32) (gFrameCountGameplay * 10) * 0.017453294f);
             ta = w->fade;
             tb = w->alpha;
-            D_801308E0 = (s32) (ta * tb * ((tt + 1.0f) * 50.0f + 50.0f));
+            sMenuModelFade = (s32) (ta * tb * ((tt + 1.0f) * 50.0f + 50.0f));
             if (w->cursor == idp->index) {
                 fx->m_AI.m_pfDraw = (void *) func_004171F4_4143DC;
             } else {
@@ -660,30 +660,30 @@ void MenuItem_DrawModel_2(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unus
                 CCache__SetFrameDelay(1);
             }
             if (x->intelType == INTELLIGENCE_PLAYER) {
-                CScene__SetInstanceObjectType(gScene, fx, D_800ADB30[fx->header.m_pIntelligence->m_Id], 1);
+                CScene__SetInstanceObjectType(gScene, fx, gCharacterModels[fx->header.m_pIntelligence->m_Id], 1);
             }
             if (D_800C1BD0_4143DC != 4) {
                 D_800C1BD0_4143DC = 4;
                 {
-                    Gfx **pp = &D_800D8E24;
+                    Gfx **pp = &gDList;
                     Gfx *q = (*pp)++;
                     q->w0 = 0xE7000000;
                     q->w1 = 0;
                 }
                 {
-                    Gfx **pp = &D_800D8E24;
+                    Gfx **pp = &gDList;
                     Gfx *q = (*pp)++;
                     q->w0 = 0xE3000A01;
                     q->w1 = 0x100000;
                 }
                 {
-                    Gfx **pp = &D_800D8E24;
+                    Gfx **pp = &gDList;
                     Gfx *q = (*pp)++;
                     q->w0 = 0xE3000C00;
                     q->w1 = 0x80000;
                 }
                 {
-                    Gfx **pp = &D_800D8E24;
+                    Gfx **pp = &gDList;
                     Gfx *q = (*pp)++;
                     q->w0 = 0xE3001201;
                     q->w1 = 0x2000;
@@ -1034,7 +1034,7 @@ s32 Menu_Update_2(Menu *menu, void *arg) {
 f32 func_002982F0(f32 x);
 extern void Hud_DrawBevelBox(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
 extern f32 func_002982F0(f32 x);
-extern s32 D_800C1BD0_4143DC __asm__("D_800C1BD0");
+extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont");
 /* Draws a window's items: lays them all out, centres the box around them
  * (the area) on the camera's viewport and the window's offset, highlights
  * the cursor's and calls each item's draw callback. */
@@ -1120,7 +1120,7 @@ void Menu_Draw_2(Menu *p, void *a1) {
                             fa = (f32)cp.bottom;
                             fa = fb + (fa - fb);
                             Hud_SetupFillMode(it);
-                            tt = func_002982F0((f32)((u32) D_800B6D20 * 10) * 0.017453294f);
+                            tt = func_002982F0((f32)((u32) gFrameCountGameplay * 10) * 0.017453294f);
                             sv = p->fade * p->alpha * ((tt + 1.0f) * 50.0f + 50.0f);
                             if (it->flags & 0x10) {
                                 Hud_DrawBevelBox(cp.left - 4, (s32)fb, cp.right + 4, (s32)fa, 0, 0, 0xFF, 0, 10, (u32)sv & 0xFF);
@@ -1149,8 +1149,8 @@ void Menu_Draw_2(Menu *p, void *a1) {
 extern void func_0041363C_415CE8(MenuItem *it, void *info) __asm__("MenuItem_Layout_2");
 extern void func_0027AF4C_415CE8(void) __asm__("Hud_SetupFillMode");
 extern void func_002778A8_415CE8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j) __asm__("Hud_DrawBevelBox");
-extern s32 D_800C2030;
-extern s32 D_800C2034;
+extern s32 gScreenWidth;
+extern s32 gScreenHeight;
 /* Draws the bar behind a window's line of items (flag 0x08000000 text):
  * the screen's width, at the window's offset (c: from the bottom). */
 void Menu_DrawBar_2(Menu *a, MenuItem *b, s32 c) {
@@ -1179,14 +1179,14 @@ void Menu_DrawBar_2(Menu *a, MenuItem *b, s32 c) {
     area.height = area.bottom - area.top;
     if (area.width >= 0 && area.height >= 0) {
         base = cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width * 0.5f + (f32)a->offsetX;
-        area.width = D_800C2030;
-        half = (f32)(D_800C2030 / 2);
+        area.width = gScreenWidth;
+        half = (f32)(gScreenWidth / 2);
         area.left = (s32)(base - half);
         area.right = (s32)(base + half);
-        y0 = (f32)D_800C2034;
+        y0 = (f32)gScreenHeight;
         t = y0 * 0.21621622f;
-        t -= (D_800C2034 >= 0xDF) ? 13.0f : 9.0f;
-        if (c != 0) y0 = (cam->m_Viewport.m_ScreenPosY + (f32)D_800C2034 + (f32)a->offsetY) - t;
+        t -= (gScreenHeight >= 0xDF) ? 13.0f : 9.0f;
+        if (c != 0) y0 = (cam->m_Viewport.m_ScreenPosY + (f32)gScreenHeight + (f32)a->offsetY) - t;
         else { register f32 pa asm("$f0"); f32 pb; pa = cam->m_Viewport.m_ScreenPosY; pb = (f32)a->offsetY; y0 = pa + pb; }
         area.top = (s32)y0;
         area.bottom = (s32)((f32)area.top + t);
@@ -1613,7 +1613,7 @@ s32 CList__Remove(s32, s32);
 s32 CCache__Deallocate(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update_2");
 
-extern MenuPool D_80119E2C;
+extern MenuPool gEngineApp_m_Game_m_MenuPool;
 
 void MenuPool_Update_2(MenuPool *arg0) {
     s32 (*temp_v0)(Menu *, MenuPool *);
@@ -1625,8 +1625,8 @@ void MenuPool_Update_2(MenuPool *arg0) {
     if (var_s0 != NULL) {
         do {
             temp_s2 = var_s0->next;
-            if ((var_s0->state == 2) && (arg0 != &D_80119E2C)) {
-                if (D_80119E2C.count == 0) {
+            if ((var_s0->state == 2) && (arg0 != &gEngineApp_m_Game_m_MenuPool)) {
+                if (gEngineApp_m_Game_m_MenuPool.count == 0) {
                     goto block_6;
                 }
             } else {
@@ -1776,8 +1776,8 @@ s32 Menu_GetFlashLevel_2(Menu *obj) {
 extern void COnScreen__BeginText(void);
 extern void Render_SetRenderMode(s32 a);
 extern void func_0027B320_416C74(s32 a, s32 b, s16 c, s16 d, f32 e, f32 f, s32 g) __asm__("Hud_DrawSprite");
-extern s32 D_800C2030;
-extern s32 D_800C2034;
+extern s32 gScreenWidth;
+extern s32 gScreenHeight;
 /* Draws a window's flash (image 0x67, frame by the flash) over its camera's viewport. */
 void Menu_DrawFlash_2(Menu *a) {
     s32 v, t;
@@ -1790,13 +1790,13 @@ void Menu_DrawFlash_2(Menu *a) {
     Render_SetRenderMode(0x15);
     x = a->camera->m_Viewport.m_Width;
     y = a->camera->m_Viewport.m_Height;
-    g = D_800D8E24++;
+    g = gDList++;
     g->w0 = 0xFB000000; g->w1 = 0xFF0000FF;
-    g = D_800D8E24++;
+    g = gDList++;
     g->w0 = 0xFA000000; g->w1 = 0xE00000FF;
     func_0027B320_416C74(0x67, v, (s32)a->camera->m_Viewport.m_ScreenPosX, (s32)a->camera->m_Viewport.m_ScreenPosY,
-                  x / (f32)D_800C2030 * 5.0f,
-                  y / (f32)D_800C2034 * 4.0f, 1);
+                  x / (f32)gScreenWidth * 5.0f,
+                  y / (f32)gScreenHeight * 4.0f, 1);
 }
 
 /* ---------------- MenuItemDesc_ExtraSize_2 ---------------- */
@@ -1858,7 +1858,7 @@ void *MenuItem_GetTextStyle_2(MenuItem *arg0) {
  case 0x2000: index=8; break;
  default: index=0; break;
  }
- return &D_800C1BD4[index];
+ return &gMenuTextStyles[index];
 }
 
 /* ---------------- MenuItem_GetBindingValue_2 ---------------- */
@@ -1906,10 +1906,10 @@ void MenuItem_SetBindingValue_2(MenuItem *item,float value) {
 /* ---------------- MenuModel_DrawUnselected_2 ---------------- */
 s32 CGameObjectInstance__DrawModelWithLights(s32, s32, s32, s32);
 
-extern s32 D_800AB0E8;
+extern s32 gDefaultLights;
 
 void MenuModel_DrawUnselected_2(s32 arg0, s32 arg1, s32 arg2) {
-    CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (s32) &D_800AB0E8);
+    CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (s32) &gDefaultLights);
 }
 
 /* ---------------- MenuModel_DrawSelected_2 ---------------- */
@@ -1926,24 +1926,24 @@ typedef struct { u32 w[6]; } O06Seg;
  * swaps an addu's operands. */
 typedef struct { u8 pad[0x110]; O06Seg seg[2]; } O06A_4171F4; /* seg at 0x110 in Turok 2 (0x140 in Rage Wars) */
 typedef struct { f32 f0; s32 unk4; s32 unk8; f32 fC; s32 unk10; } O06Cam;
-extern s32 D_800AB8B0;
-extern O06Cam D_800AB8B4[];
-extern O06Seg D_800AB0E8_4171F4 __asm__("D_800AB0E8");
-extern s32 D_800B6D1C;
-extern s32 D_801308E0;
+extern s32 gBlendState;
+extern O06Cam gBlendState_m_Color[];
+extern O06Seg D_800AB0E8_4171F4 __asm__("gDefaultLights");
+extern s32 gEvenOdd;
+extern s32 sMenuModelFade;
 extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
 /* The selected model item's draw callback (MenuItem_DrawModel_2): drawn with the
- * lights of D_800AB0E8 and a fade by D_801308E0. */
+ * lights of gDefaultLights and a fade by sMenuModelFade. */
 void MenuModel_DrawSelected_2(CGameObjectInstance *a, s32 b, s32 c) {
- D_800AB8B0 = 3;
- ((O06A_4171F4 *) a)->seg[D_800B6D1C] = D_800AB0E8_4171F4;
- D_800AB8B4->f0 = 255.0f;
- D_800AB8B4->unk4 = 0;
- D_800AB8B4->unk8 = 0;
- D_800AB8B4->unk10 = 0;
- D_800AB8B4->fC = (f32)(D_801308E0 / 2);
+ gBlendState = 3;
+ ((O06A_4171F4 *) a)->seg[gEvenOdd] = D_800AB0E8_4171F4;
+ gBlendState_m_Color->f0 = 255.0f;
+ gBlendState_m_Color->unk4 = 0;
+ gBlendState_m_Color->unk8 = 0;
+ gBlendState_m_Color->unk10 = 0;
+ gBlendState_m_Color->fC = (f32)(sMenuModelFade / 2);
  CGameObjectInstance__DrawModelImmediate(a, b, c);
- D_800AB8B0 = 0;
+ gBlendState = 0;
 }
 
 /* ---------------- Menu_Close_2 ---------------- */

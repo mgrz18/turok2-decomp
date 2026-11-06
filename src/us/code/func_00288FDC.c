@@ -14,19 +14,19 @@ void CEngineApp__UpdatePlayTime(CEngineApp *arg0) {
     f32 temp_f1;
 
     if (arg0->m_Settings.paused == 0) {
-        temp_f1 = D_8011ACB0.frames + gFrameIncrement;
-        D_8011ACB0.frames = temp_f1;
+        temp_f1 = gEngineApp_m_Settings_match.frames + gFrameIncrement;
+        gEngineApp_m_Settings_match.frames = temp_f1;
         if (temp_f1 >= 15.0f) {
-            temp_f0 = D_8011ACB0.seconds + 1.0f;
-            D_8011ACB0.frames = (f32) (temp_f1 - 15.0f);
-            D_8011ACB0.seconds = temp_f0;
+            temp_f0 = gEngineApp_m_Settings_match.seconds + 1.0f;
+            gEngineApp_m_Settings_match.frames = (f32) (temp_f1 - 15.0f);
+            gEngineApp_m_Settings_match.seconds = temp_f0;
             if (D_800A9DF4 <= temp_f0) {
-                temp_f0_2 = D_8011ACB0.minutes + 1.0f;
-                D_8011ACB0.seconds = (f32) (temp_f0 - D_800A9DF4);
-                D_8011ACB0.minutes = temp_f0_2;
+                temp_f0_2 = gEngineApp_m_Settings_match.minutes + 1.0f;
+                gEngineApp_m_Settings_match.seconds = (f32) (temp_f0 - D_800A9DF4);
+                gEngineApp_m_Settings_match.minutes = temp_f0_2;
                 if (D_800A9DF4 <= temp_f0_2) {
-                    D_8011ACB0.minutes = (f32) (temp_f0_2 - D_800A9DF4);
-                    D_8011ACB0.hours = (f32) (D_8011ACB0.hours + 1.0f);
+                    gEngineApp_m_Settings_match.minutes = (f32) (temp_f0_2 - D_800A9DF4);
+                    gEngineApp_m_Settings_match.hours = (f32) (gEngineApp_m_Settings_match.hours + 1.0f);
                 }
             }
         }

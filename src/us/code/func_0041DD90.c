@@ -6,16 +6,16 @@
  * matching warning dialog (templates D_0043xxxx) when the pak is missing,
  * damaged or unformatted. */
 
-extern u8 D_80119E2C[];     /* D_80119870 + 0x5BC: the menu system */
-extern u8 D_0043BC00[];
-extern u8 D_0043BC24[];
-extern u8 D_0043BC48[];
-extern u8 D_0043BC6C[];
-extern u8 D_0043BCD8[];
-extern u8 D_0043C05C[];
-extern s32 D_80130984;
-extern s32 D_80130990;
-extern s32 D_801309BC;
+extern u8 gEngineApp_m_Game_m_MenuPool[];     /* gEngineApp_m_Game + 0x5BC: the menu system */
+extern u8 gPakMsgPakNotFoundDesc[];
+extern u8 gPakMsgInsertToManageDesc[];
+extern u8 gPakMsgInsertToSaveDesc[];
+extern u8 gPakMsgInsertToLoadDesc[];
+extern u8 gPakMsgPakChangedDesc[];
+extern u8 gDamagedPakAtBootMenuDesc[];
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuLeaving;
 
 extern void Pak_ProbeSlot(s32 slot);
 extern s32 Pak_GetStatus(s32 slot);
@@ -38,25 +38,25 @@ s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet) {
         full = Controller_TakePakChanged(slot);
         if ((status == 0 || full != 0) && status != -2) {
             if (full != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BCD8, c->player, c->controller, parent);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakChangedDesc, c->player, c->controller, parent);
                 return -1;
             }
         } else if (Pak_IsRumblePak(slot) != 0) {
-            D_801309BC = 1;
-            if (D_80130990 != 0) {
-                tmpl = D_0043BC24;
-            } else if (D_80130984 != 0) {
-                tmpl = D_0043BC48;
+            gPakMenuLeaving = 1;
+            if (gPakMenuAnyPak != 0) {
+                tmpl = gPakMsgInsertToManageDesc;
+            } else if (gPakMenuIsSave != 0) {
+                tmpl = gPakMsgInsertToSaveDesc;
             } else {
-                tmpl = D_0043BC6C;
+                tmpl = gPakMsgInsertToLoadDesc;
             }
-            MenuPool_OpenMenu(D_80119E2C, tmpl, c->player, c->controller, parent);
+            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, tmpl, c->player, c->controller, parent);
         } else if (quiet == 0) {
-            D_801309BC = 1;
+            gPakMenuLeaving = 1;
             if (Pak_NeedsRepair(slot) != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043C05C, c->player, c->controller, parent);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, c->player, c->controller, parent);
             } else {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BC00, c->player, c->controller, parent);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, c->player, c->controller, parent);
             }
         } else if (status != -2) {
             status = 0;

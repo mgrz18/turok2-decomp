@@ -13,8 +13,8 @@ s32 osJamMesg(s32, s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 s32 osSetThreadPri(s32, s32);
 s32 osCreateMesgQueue(s32 *, s32 *, s32);
-extern s32 D_800B6E54;
-extern s32 D_800B6E88;
+extern s32 gDecompressorBoostRetraces;
+extern s32 gThreadPriorityDecompressorHigh;
 s32 CDecompressor__DecompressSync(s32 arg0, void *arg1)
 {
   s32 new_var3;
@@ -26,9 +26,9 @@ s32 CDecompressor__DecompressSync(s32 arg0, void *arg1)
   new_var2 = 1;
   new_var = &sp28;
   osCreateMesgQueue(sp10, new_var, new_var2);
-  new_var3 = D_800B6E88;
+  new_var3 = gThreadPriorityDecompressorHigh;
   *((s32 **) (((s8 *) arg1) + 0x20)) = sp10;
-  D_800B6E54 = 2;
+  gDecompressorBoostRetraces = 2;
   osSetThreadPri(arg0, new_var3);
   osJamMesg(arg0 + 0x230, (s32) arg1, 1);
   osRecvMesg((s32) sp10, (s32) (&sp2C), new_var2);

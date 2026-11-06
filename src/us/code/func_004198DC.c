@@ -7,18 +7,18 @@ s32 Sound__StopAllExcept(s32);                     /* extern */
 s32 Sound__SetForce2D(s32);                     /* extern */
 s32 Music_GetTrack();                                /* extern */
 s32 Controller_DisableMenuSounds();                            /* extern */
-extern s32 D_004394B4;
-extern s32 D_800C1F70;
-extern s32 D_800C1F74;
-extern s32 D_800C1F78;
+extern s32 gSoundOptionsMenuDesc;
+extern s32 sSoundMenuSavedTrack;
+extern s32 sSoundMenuActive;
+extern s32 sSoundMenuTrack;
 
 s32 TitleMenu_SoundOptions(s32 arg0, s32 arg1, s32 arg2) {
     Sound__StopAllExcept(-1);
-    D_800C1F70 = Music_GetTrack();
-    Music_SetTrack(D_800C1F78);
+    sSoundMenuSavedTrack = Music_GetTrack();
+    Music_SetTrack(sSoundMenuTrack);
     Sound__SetForce2D(1);
-    D_800C1F74 = 0;
+    sSoundMenuActive = 0;
     Controller_DisableMenuSounds();
-    MenuPool_OpenChildMenu(arg2, arg1, (s32) &D_004394B4);
+    MenuPool_OpenChildMenu(arg2, arg1, (s32) &gSoundOptionsMenuDesc);
     return 1;
 }

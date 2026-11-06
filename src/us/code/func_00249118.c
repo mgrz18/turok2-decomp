@@ -4,7 +4,7 @@
 #include "structs/weapon.h"
 
 
-extern u8 D_8011AAF1;           /* multiplayer */
+extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
 
 void Controller_SetRumbleOption(s32 arg0, s32 arg1);
 void CPlayer__Dismount(CPlayer *player, s32 arg1);
@@ -32,10 +32,10 @@ void CPlayer__Kill(CPlayer *player, s32 arg1, s32 flags, s32 anim) {
     CPlayer__Dismount(player, arg1);
     GameObject_FireTriggers(arg1, 1, arg1);
     CPlayer__StopLoopingSounds(player);
-    if (D_8011AAF1 != 0) {
+    if (gEngineApp_m_Settings_multiplayer != 0) {
         weapon = player->m_Data.m_CurrentWeapon;
         if (weapon != 32 && weapon != 24 && weapon != 34 && player->m_pOptions->m_TagMode == 0) {
-            GameObject_DropPickupAt(player, player->m_CharacterActor.header.m_vPos, D_800AF618[weapon]->pickupId, 150.0f);
+            GameObject_DropPickupAt(player, player->m_CharacterActor.header.m_vPos, gWeaponInfoTable[weapon]->pickupId, 150.0f);
         }
         player->m_ShockedTimer = 0.0f;
         player->m_CharacterActor.m_dwFlags &= ~0x800000;

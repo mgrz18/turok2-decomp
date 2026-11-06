@@ -35,7 +35,7 @@ void NameEntryMenu_Init(Menu *menu) {
     u8 *name;
     u8 *dst;
 
-    index = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, menu->player);
+    index = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, menu->player);
     switch (index) {
     case 0:
     default:
@@ -63,8 +63,8 @@ void NameEntryMenu_Init(Menu *menu) {
         menu->items[3].flags &= ~ROW_SELECTED;
         break;
     }
-    D_800C1FB0[index].timer = 0;
-    dst = D_800C1FB0[index].name;
+    gNameEntries[index].timer = 0;
+    dst = gNameEntries[index].name;
     name = D_8011AB8B[index];
     i = 8;
     spaces = 0;
@@ -82,6 +82,6 @@ void NameEntryMenu_Init(Menu *menu) {
         *dst++ = *name++;
     }
     *dst = 0;
-    D_800C1FB0[index].cursor = 8 - spaces;
-    D_800C1FB0[index].length = 8 - spaces;
+    gNameEntries[index].cursor = 8 - spaces;
+    gNameEntries[index].length = 8 - spaces;
 }

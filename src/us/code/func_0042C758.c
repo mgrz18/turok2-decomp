@@ -13,11 +13,11 @@ typedef struct MenuState {
     /* 0x18E50 */ LevelLights *lights;
 } MenuState;
 
-extern s32 D_800AB8A0;
+extern s32 gFogEnabled;
 
 extern void CScene__LoadLightSettings(MenuState *menu);
 
 void CScene__SetupLighting(MenuState *menu) {
     CScene__LoadLightSettings(menu);
-    D_800AB8A0 = (menu->lights->flags >> 2) & 1;
+    gFogEnabled = (menu->lights->flags >> 2) & 1;
 }

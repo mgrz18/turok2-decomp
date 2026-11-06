@@ -112,7 +112,7 @@ stick:
             menu->m_Hover = slot;
             return;
         }
-        alternate = D_800AF618[weapon]->alternate;
+        alternate = gWeaponInfoTable[weapon]->alternate;
         if (alternate != -1 && player->m_Data.m_WeaponList[alternate] != 0) {
             entry->weapon.id = alternate;
         }

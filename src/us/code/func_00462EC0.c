@@ -26,9 +26,9 @@ extern char D_800A5E58[]; /* "graphicset type" */
 extern char D_800A5E68[]; /* "graphicset index" */
 extern char D_800A5E7C[]; /* "Cinemas index" */
 extern char D_800A5E8C[]; /* "link group types" */
-extern s32 D_800B6D54;
-extern u8 D_800E6AC0[];
-extern u8 D_800EBAC0[];
+extern s32 gPersistentDataLoaded;
+extern u8 gGamePersistentData[];
+extern u8 gLoadSavePersistentData[];
 
 extern s32 ProPack__Decompress();
 extern s32 Model_DecompressCallback();
@@ -90,7 +90,7 @@ void CScene__Construct_2(CScene *w, s32 file) {
     w->m_nLevel = -1;
     w->unk_18EB8 = 0;
     w->m_SkyAngle = 0;
-    CPlayerPool__LevelStart_2(&D_80119870.m_PlayerList);
+    CPlayerPool__LevelStart_2(&gEngineApp_m_Game.m_PlayerList);
     vec = &w->m_qSky.x;
     w->m_qSky.x = vec[1] = vec[2] = 0.0f;
     w->m_qSky.w = 1.0f;
@@ -114,9 +114,9 @@ void CScene__Construct_2(CScene *w, s32 file) {
     CCache__LoadPersistantIndex(0, (s32 *)&w->m_pBinaries, res, D_800A5E04);
     w->m_pSwooshes = *CCache__LoadPersistantSubBlock(0, cart, 0xB, file, w, NULL, D_800A5E14);
     w->m_pLights = *CCache__LoadPersistantSubBlock(0, cart, 0xC, file, w, NULL, D_800A5E28);
-    w->m_pBitSections = D_800EBAC0;
+    w->m_pBitSections = gLoadSavePersistentData;
     w->unk_28 = CISet__GetROMAddressAndSize(cart, file, 6, &w->unk_30);
-    w->m_pBitSections2 = D_800E6AC0;
+    w->m_pBitSections2 = gGamePersistentData;
     w->unk_2C = CISet__GetROMAddressAndSize(cart, file, 7, &w->unk_34);
     w->m_pCurves = *CCache__LoadPersistantSubBlock(0, cart, 0xD, file, w, ProPack__Decompress, D_800A5E38);
     w->m_pRumbles = *CCache__LoadPersistantSubBlock(0, cart, 0xE, file, w, ProPack__Decompress, D_800A5E40);
@@ -130,7 +130,7 @@ void CScene__Construct_2(CScene *w, s32 file) {
     CCache__LoadPersistantIndex(0, (s32 *)&w->m_pCinemas, res, D_800A5E7C);
     w->m_pLinkGroupTypes = *CCache__LoadPersistantSubBlock(0, cart, 0x13, file, w, NULL, D_800A5E8C);
     CScene__InitPersistentData_2(w, file);
-    D_800B6D54 = 1;
+    gPersistentDataLoaded = 1;
     loadGeomHeader(w, &w->m_Geom[0], 0xDAC);
     loadGeomHeader(w, &w->m_Geom[1], 0xDAD);
     loadGeomHeader(w, &w->m_Geom[2], 0xDAE);

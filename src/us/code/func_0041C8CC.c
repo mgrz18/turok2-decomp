@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern u32 D_8011AAE4; /* D_8011AAD8 + 0xC */
+extern u32 gEngineApp_m_Settings_unkC; /* gEngineApp_m_Settings + 0xC */
 extern char D_800B4158[];
 extern char D_800B4170[];
 extern char D_800C1318[];
@@ -12,7 +12,7 @@ extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
 s32 OptionsMenu_BrightnessText(MenuItem *a) {
-    u32 h = D_8011AAE4 >> 4;
+    u32 h = gEngineApp_m_Settings_unkC >> 4;
 
     CCache__SetFrameDelay(CCache__GetFrameDelay() + 2);
     if (h == 0) {

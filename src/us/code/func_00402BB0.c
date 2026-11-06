@@ -21,7 +21,7 @@ typedef struct {
 } Item00402BB0;
 
 extern u8 gScene[];
-extern u8 D_801100F0[];
+extern u8 gEngineApp_m_OnScreen[];
 extern u8 D_800C0330[];
 s32 Cinema_IsIdle(void);
 s32 CScene__FindInstances(void *world, s32 a1, s32 a2, s32 a3, Marker00402BB0 **out, s32 max);
@@ -39,6 +39,6 @@ void MantidQueen_UpdateIntro(Obj00402BB0 *obj, Item00402BB0 *item) {
             obj->region = CScene__FindRegionAt(gScene, &obj->pos);
         }
         CAI__SetMode(obj, item, 8);
-        COnScreen__SetBoss(D_801100F0, obj, D_800C0330);
+        COnScreen__SetBoss(gEngineApp_m_OnScreen, obj, D_800C0330);
     }
 }

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern u8 D_8011AAD8[];   /* input state */
+extern u8 gEngineApp_m_Settings[];   /* input state */
 extern f32 gFrameIncrement;    /* frame time scale */
 
 /* Crouch: toggled by button 0x400 while standing or walking (poses 2 and 3),
@@ -17,7 +17,7 @@ void CPlayer__UpdateCrouch(CPlayer *player, s32 unused, s32 *flags, s32 *out) {
         crouching = 1;
     } else if ((u16)(player->m_Mode - 2) < 2) {
         if (player->m_ContState.m_dwButtonsSingle & 0x400) {
-            input = D_8011AAD8;
+            input = gEngineApp_m_Settings;
             if (input[0x19] == 0) {
                 if (*(s32 *)(input - 0x38) == 0 || !(player->m_ContState.m_dwButtons & 0x20)) {
                     player->m_bDuckMode ^= 1;

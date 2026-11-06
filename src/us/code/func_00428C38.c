@@ -4,14 +4,14 @@
 #include "rw/abu_types.h"
 
 void __osPfsGetInitData(u8 *valid, EntryRecAt3 *data) {
-    extern char D_80130E20;
-    extern u8 D_801213DC[];
+    extern char __osPfsPifRam;
+    extern u8 __osContNumControllers[];
     u8 *ptr;
     __OSContRequesFormat readformat;
     s32 i;
     u8 mask = 0;
-    ptr = (u8 *)&D_80130E20;
-    for (i = 0; i < D_801213DC[0]; i++, ptr += sizeof(readformat), data++) {
+    ptr = (u8 *)&__osPfsPifRam;
+    for (i = 0; i < __osContNumControllers[0]; i++, ptr += sizeof(readformat), data++) {
         readformat = *(__OSContRequesFormat *)ptr;
         data->slot = (readformat.rxsize & 0xC0) >> 4;
         if (data->slot != 0) {

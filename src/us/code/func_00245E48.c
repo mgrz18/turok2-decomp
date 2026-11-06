@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 
-extern CCollisionInfo D_800F1AE0;
+extern CCollisionInfo gCollisionInfoSight;
 extern CCollisionResults gCollisionResults;
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *obj); /* the object's height */
 s32 Collision_MoveInstance(void *obj, CVector3 to, CCollisionInfo *info);
@@ -19,7 +19,7 @@ s32 AI_IsEyeLineBlocked(CGameObjectInstance *from, s32 unused, CGameObjectInstan
     target = to->header.m_vPos;
     target.y += GameObject_GetCollisionHeight(to) * 0.8f;
     target.y += to->m_CollisionYOffset;
-    Collision_MoveInstance(from, target, &D_800F1AE0);
+    Collision_MoveInstance(from, target, &gCollisionInfoSight);
     do {
         *(CObjectHead *) from = saved;
     } while (0);

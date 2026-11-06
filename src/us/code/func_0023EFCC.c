@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern char D_800AD810;
+extern char sLifeForcePickups;
 void *func_0023EFCC(s32 arg0) {
     char *v1;
     s32 i;
-    v1 = &D_800AD810;
+    v1 = &sLifeForcePickups;
     i = 1;
     do {
         i -= 1;

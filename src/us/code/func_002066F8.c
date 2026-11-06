@@ -6,13 +6,13 @@
 #include "structs/cache.h"
 
 extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
-extern char D_800D8D7C;
+extern char gCache_cacheUsedList;
 void CList__AddHead(void *list, void *node);
-extern CList D_800D8D68;
+extern CList gCache_cacheFreeList;
 extern void CList__Remove(void *list, void *node);
 static __inline__ CCacheEntry *take(s32 active) {
- CCacheEntry *node=D_800D8D68.m_pHead;
- if(node) {CList__Remove(&D_800D8D68,node); node->flags=active;CList__AddHead(&D_800D8D7C,node);}
+ CCacheEntry *node=gCache_cacheFreeList.m_pHead;
+ if(node) {CList__Remove(&gCache_cacheFreeList,node); node->flags=active;CList__AddHead(&gCache_cacheUsedList,node);}
  return node;
 }
 void *CCache__AllocCacheEntry(s32 unused,s32 flags) {

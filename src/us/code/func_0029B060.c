@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern OSThread *D_800B891C;
+extern OSThread *__osActiveQueue;
 extern void __osCleanupThread(void);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
@@ -28,7 +28,7 @@ void osCreateThread(OSThread *t, s32 id, void (*entry)(void *), void *arg, void 
     t->state = 1;
     t->flags = 0;
     saveMask = __osDisableInt();
-    active = &D_800B891C;
+    active = &__osActiveQueue;
     t->tlnext = *active;
     *active = t;
     __osRestoreInt(saveMask);

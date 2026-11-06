@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/cinema.h"
 
-extern Cinema *D_800C1BB0;
-extern s32 D_8011ACA4;
+extern Cinema *gCinemaPlayerP;
+extern s32 gEngineApp_m_Settings_paused;
 extern f32 gFrameIncrement;      /* frame time */
 
 extern void Cinema_Load(s32);
@@ -19,28 +19,28 @@ s32 Cinema_StartPending(void) {
     f32 limit;
 
     none = -1;
-    if (D_800C1BB0->entryIndex == none) {
+    if (gCinemaPlayerP->entryIndex == none) {
         return 0;
     }
-    Cinema_Load(D_800C1BB0->entryIndex);
-    D_800C1BB0->entryIndex = none;
+    Cinema_Load(gCinemaPlayerP->entryIndex);
+    gCinemaPlayerP->entryIndex = none;
     if (Cinema_IsActive() != 0) {
-        if (D_8011ACA4 != 0 || Cinema_IsFinished() != 0) {
-            D_800C1BB0->prevTime = D_800C1BB0->time;
+        if (gEngineApp_m_Settings_paused != 0 || Cinema_IsFinished() != 0) {
+            gCinemaPlayerP->prevTime = gCinemaPlayerP->time;
         } else {
-            ctx = D_800C1BB0;
+            ctx = gCinemaPlayerP;
             ctx->prevTime = *(volatile f32 *)&ctx->time;
             ctx->time += gFrameIncrement * 0.06666667f;
             if (ctx->startTime <= ctx->time) {
                 Cinema_Start();
             }
-            value = D_800C1BB0->time;
-            limit = D_800C1BB0->clipEnd;
+            value = gCinemaPlayerP->time;
+            limit = gCinemaPlayerP->clipEnd;
             if (limit <= value) {
-                D_800C1BB0->time = limit;
-                if (D_800C1BB0->stopAtEnd != 0) {
-                    D_800C1BB0->finished = 1;
-                    D_800C1BB0->stopAtEnd = 0;
+                gCinemaPlayerP->time = limit;
+                if (gCinemaPlayerP->stopAtEnd != 0) {
+                    gCinemaPlayerP->finished = 1;
+                    gCinemaPlayerP->stopAtEnd = 0;
                 }
             }
         }

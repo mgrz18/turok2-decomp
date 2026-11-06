@@ -12,12 +12,12 @@ typedef struct ActorMotionState {
     void *update;
 } ActorMotionState;
 void Generator_Step();
-extern int D_800B2008;
+extern int gGeneratorModeTable;
 void Generator_Setup(void *arg0, void *arg1) {
     CGameObjectInstance *actor = arg0;
     ActorMotionState *state = arg1;
     CDestructibleIntelligence *inner = &actor->header.m_pIntelligence->m_Destructible;
-    state->table = &D_800B2008;
+    state->table = &gGeneratorModeTable;
     state->update = &Generator_Step;
     if ((actor->m_nTypeFlag == 0x644) ||
         (inner->m_dwFlags & 8)) {

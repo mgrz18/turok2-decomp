@@ -4,7 +4,7 @@
 extern s32 gNextTicks;
 
 void Demo_UpdateMatchStream(void) {
-    DemoPlayer *s = &D_800F56B0;
+    DemoPlayer *s = &gDemoPlayer;
     DemoStream *t = &s->match;
 
     if (s->fastForward != 0 || --t->frames <= 0) {

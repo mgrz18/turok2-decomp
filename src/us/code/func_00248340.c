@@ -22,7 +22,7 @@ static __inline__ void setVec3(CVector3 *v, f32 x, f32 y, f32 z) {
 void CPlayer__Reset(CPlayer *p) {
     f32 zero;
 
-    CPlayerContState__Init(&p->m_ContState, &D_800F5EC0[p->m_nController]);
+    CPlayerContState__Init(&p->m_ContState, &gControllers[p->m_nController]);
     CLEAR_WORD(p->m_Speed);
     CLEAR_WORD(p->m_SideSpeed);
     CLEAR_WORD(p->m_TotalSpeed);

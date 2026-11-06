@@ -21,7 +21,7 @@ typedef struct {
     /* 0xA8 */ s32 region;
 } Spawn40E00C;
 
-extern BlindOneState D_80130200;
+extern BlindOneState gBlindOne;
 
 void BlindOne_ActorAppearEnter(Actor40E00C *actor, Spawn40E00C *spawn) {
     BlindOneState *stats;
@@ -31,7 +31,7 @@ void BlindOne_ActorAppearEnter(Actor40E00C *actor, Spawn40E00C *spawn) {
     spawn->cur = spawn->start;
     actor->pos = spawn->pos;
     actor->region = spawn->region;
-    stats = &D_80130200;
+    stats = &gBlindOne;
     switch (actor->type) {
         case 0x454:
             stats->alive1++;

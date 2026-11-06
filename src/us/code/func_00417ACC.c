@@ -28,7 +28,7 @@ struct SharedRecAtA8 {
 };
 void Music_RestoreVolume(void);
 unsigned int Controller_ConfirmPressed(void *);
-extern CPlayerOptions D_8011AB18;
+extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 extern struct SharedRecAtA8 D_8011AB98[];
 void Menu_ClaimPressingController(func_80250BD4_S1 *arg0) {
     CPlayerOptions *settings;
@@ -43,9 +43,9 @@ void Menu_ClaimPressingController(func_80250BD4_S1 *arg0) {
         status -= 0x40;
     }
     i = 0;
-    settings = &D_8011AB18;
+    settings = &gEngineApp_m_Settings_defaultSlot;
     on = 1;
-    for (profile = D_800F5EC0; i < 4; i++, profile++) {
+    for (profile = gControllers; i < 4; i++, profile++) {
         if (Controller_ConfirmPressed(profile) != 0) {
             settings->m_bActive = on;
             settings->m_nController = i;

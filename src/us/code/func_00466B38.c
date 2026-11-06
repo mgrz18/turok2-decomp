@@ -4,8 +4,8 @@
 #include "structs/game.h"
 #include "structs/camera.h"
 
-extern u8 D_8011AAF1;   /* multiplayer */
-extern u8 D_801198B0[];
+extern u8 gEngineApp_m_Settings_multiplayer;   /* multiplayer */
+extern u8 gEngineApp_m_Game_m_CameraPool[];
 
 extern s32 Demo_GetPlayerCount(void);
 extern s32 SavedPlayers_IsActive(void);
@@ -30,7 +30,7 @@ void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
     }
     p->m_bActive = 1;
     p->m_Data.m_nDeathmatchCharacter = character;
-    p->m_pCamera = (struct CCamera *) CCameraPool__AllocCamera_2(D_801198B0);
+    p->m_pCamera = (struct CCamera *) CCameraPool__AllocCamera_2(gEngineApp_m_Game_m_CameraPool);
     CBarrel__Reset(&p->m_Barrel);
     for (i = 0; i < 0x400; i++) {
         p->m_Data.m_SpecialPickupCount[i] = 0;
@@ -42,7 +42,7 @@ void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
     for (i = 0; i < 6; i++) {
         p->m_Data.m_KeySet6LevelFlags[i] = 0;
     }
-    if (!D_8011AAF1) {
+    if (!gEngineApp_m_Settings_multiplayer) {
         p->m_Data.m_Lives = 3;
     } else {
         p->m_Data.m_Lives = 1;
@@ -82,7 +82,7 @@ void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2) {
     p->m_Data.m_LevelIntroPlayedFlags = 0;
     p->m_Data.m_dwLevelFirstTimeFlags |= 1;
     CPlayer__ResetHealth_2(p);
-    flags = &D_8011AAD8;
+    flags = &gEngineApp_m_Settings;
     if (flags->multiplayer) {
         p->m_nDeathmatchString = 0;
     }

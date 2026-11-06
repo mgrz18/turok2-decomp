@@ -5,9 +5,9 @@ typedef struct {
     /* 0x04 */ f32 y;
 } FontScale;
 
-extern FontScale D_801101A8;
+extern FontScale gEngineApp_m_OnScreen_m_FontXScale;
 
 void COnScreen__SetFontScale(f32 arg0, f32 arg1) {
-    D_801101A8.x = arg0;
-    D_801101A8.y = arg1;
+    gEngineApp_m_OnScreen_m_FontXScale.x = arg0;
+    gEngineApp_m_OnScreen_m_FontXScale.y = arg1;
 }

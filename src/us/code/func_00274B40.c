@@ -60,8 +60,8 @@ struct Track {
     f32 unk3C;
     f32 unk40;
 };
-extern s32 D_800B2A70;
-extern s32 D_800B2A74;
+extern s32 sSndSeqCurrentId;
+extern s32 sSndSeqLoadRetries;
 extern f32 D_800A81A0;
 extern f32 D_800A81A8;
 extern f32 D_800A81B0;
@@ -101,7 +101,7 @@ void SndSeq_Update(Track *arg0) {
     case 0x20:
         if (arg0->unk1C & 4) {
             arg0->unk1C = 0;
-            D_800B2A70 = -1;
+            sSndSeqCurrentId = -1;
             if (arg0->unk28 >= 0) {
                 arg0->unk18 = 0x40;
                 return;
@@ -116,10 +116,10 @@ void SndSeq_Update(Track *arg0) {
             arg0->unk1C = 0;
             return;
         }
-        temp_v0 = D_800B2A74 + 1;
-        D_800B2A74 = temp_v0;
+        temp_v0 = sSndSeqLoadRetries + 1;
+        sSndSeqLoadRetries = temp_v0;
         if (temp_v0 >= 0xA) {
-            D_800B2A70 = -1;
+            sSndSeqCurrentId = -1;
             arg0->unk18 = 0x40;
             return;
         }
@@ -148,7 +148,7 @@ void SndSeq_Update(Track *arg0) {
             arg0->unkC = var_v0_2;
             if (var_v0_2 == ((void *)0)) {
                 arg0->unk18 = 0x100;
-                D_800B2A74 = 0;
+                sSndSeqLoadRetries = 0;
                 arg0->unk1C = 0;
                 return;
             }
@@ -169,14 +169,14 @@ void SndSeq_Update(Track *arg0) {
             alCSPPlay(arg0->unk14);
             arg0->unk1C = 0;
             arg0->unk18 = 0x10;
-            D_800B2A70 = arg0->unk28;
+            sSndSeqCurrentId = arg0->unk28;
             return;
         }
         goto block_44;
     case 0x10:
     default:
-        if ((D_800B2A70 > 0) && (alCSPGetState((void *)arg0->unk14) == 0)) {
-            D_800B2A70 = 0;
+        if ((sSndSeqCurrentId > 0) && (alCSPGetState((void *)arg0->unk14) == 0)) {
+            sSndSeqCurrentId = 0;
             arg0->unk28 = 0;
         } else {
             if (arg0->unk38 != 0) {
@@ -196,8 +196,8 @@ block_37:
                 arg0->unk2C = var_f20;
             }
         }
-        if (arg0->unk28 != D_800B2A70) {
-            if (D_800B2A70 > 0) {
+        if (arg0->unk28 != sSndSeqCurrentId) {
+            if (sSndSeqCurrentId > 0) {
                 var_f2 = arg0->unk30;
                 arg0->unk1C = 2;
                 arg0->unk18 = 0x20;

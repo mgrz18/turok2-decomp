@@ -8,10 +8,10 @@ extern u8 D_800A9D3C[];
 extern u8 D_800A9D44[];
 extern u8 D_800A9D50[];
 extern u8 gEngineApp[];
-extern u8 D_8011F188[];
+extern u8 gEngineTimestamp[];
 
 void mainproc(void) {
-    sprintf(D_8011F188, D_800A9D3C, D_800A9D44, D_800A9D50);
+    sprintf(gEngineTimestamp, D_800A9D3C, D_800A9D44, D_800A9D50);
     __osSetFpcCsr(__osGetFpcCsr() | 0x400);
     CEngineApp__Main(gEngineApp);
 }

@@ -6,8 +6,8 @@
 #include "common.h"
 #include "structs/memory.h"
 
-extern u32 D_801288A0[32][4];     /* saved TLB entries: PageMask, EntryHi, EntryLo0, EntryLo1 */
-extern u32 D_800BC308[];          /* page masks 4K, 16K, ... 16M; 0x80000000 ends the table */
+extern u32 sHostIoSavedTlb[32][4];     /* saved TLB entries: PageMask, EntryHi, EntryLo0, EntryLo1 */
+extern u32 sHostIoTlbPageMasks[];          /* page masks 4K, 16K, ... 16M; 0x80000000 ends the table */
 
 extern u32 func_002A31FC(void);   /* reads the TLB, returns EntryHi */
 
@@ -27,17 +27,17 @@ void HostIo_ScanTlb(void) {
     u32 i;
 
     asid = func_002A31FC() & 0xFF;
-    e = D_801288A0[0];
+    e = sHostIoSavedTlb[0];
     for (i = 16; i < 48; i++) {
-        D_80128130[i].m_First = -1;
-        D_80128130[i].m_Flags = 0;
+        sHostIoMemoryRanges[i].m_First = -1;
+        sHostIoMemoryRanges[i].m_Flags = 0;
         do { pageMask = *e++; } while (0);
         hi = *e++;
         lo0 = *e++;
         lo1 = *e++;
         if ((lo0 | lo1) & 2) {
             pageMask &= 0x1FFE000;
-            mask = D_800BC308;
+            mask = sHostIoTlbPageMasks;
             size = 0x1000;
         next_mask:
             m = *mask;
@@ -67,9 +67,9 @@ void HostIo_ScanTlb(void) {
                 } else if (lo1 & 2) {
                     start += size;
                 }
-                D_80128130[i].m_First = start;
-                D_80128130[i].m_Last = start + size - 1;
-                D_80128130[i].m_Flags = 3;
+                sHostIoMemoryRanges[i].m_First = start;
+                sHostIoMemoryRanges[i].m_Last = start + size - 1;
+                sHostIoMemoryRanges[i].m_Flags = 3;
             }
         }
     }

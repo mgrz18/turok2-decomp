@@ -3,12 +3,12 @@
 
 #include "rw/abu_types.h"
 
-extern int D_8011ACA0;
+extern int gEngineApp_m_Settings_unk1C8;
 extern s32 CAudioWorld__PlaySoundPitched(struct ContextRecAt2BC0 *arg0, s32 arg1, CVector3 arg2,
                          s32 arg3, s32 arg4, f32 arg5);
 s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5, f32 arg6) {
     extern s32 gAudioWorld;
-    if (D_8011ACA0 != 0) {
+    if (gEngineApp_m_Settings_unk1C8 != 0) {
         return -1;
     }
     return CAudioWorld__PlaySoundPitched(&gAudioWorld, (s16)arg0, arg1, arg4, arg5, arg6);

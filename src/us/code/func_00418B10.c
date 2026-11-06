@@ -5,7 +5,7 @@
 
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 BloodLustMenu_StepFragLimit(void *first, void *second) {
-    GameSettings *options = &D_8011AAD8;
+    GameSettings *options = &gEngineApp_m_Settings;
     options->dmScoreLimit = Menu_StepValue(second, options->dmScoreLimit, 1, 0, 0x63, 1);
     return 0;
 }

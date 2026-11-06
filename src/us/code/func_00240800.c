@@ -3,7 +3,7 @@
 #include "structs/region.h"
 #include "structs/collision.h"
 
-extern MapSweep *D_800F1AB0;
+extern MapSweep *sMapSweep;
 extern CCollisionResults *gCollisionResultsP;
 extern u8 D_800C894C;                   /* bottom of the stack */
 
@@ -28,100 +28,100 @@ void Collision_SweepRegionWalls(CGameRegion *region) {
     cornerDone[1] = 0;
     cornerDone[0] = 0;
     do {
-        D_800F1AB0->next = region->m_pNeighbours[i];
-        if (D_800F1AB0->next != NULL) {
-            if (D_800F1AB0->next->m_wFlags & 0x8000) {
+        sMapSweep->next = region->m_pNeighbours[i];
+        if (sMapSweep->next != NULL) {
+            if (sMapSweep->next->m_wFlags & 0x8000) {
                 continue;
             }
             if (region->m_wFlags & 0x20) {
-                if (D_800F1AB0->next->m_pNeighbours[0] != region && D_800F1AB0->next->m_pNeighbours[1] != region &&
-                    D_800F1AB0->next->m_pNeighbours[2] != region) {
+                if (sMapSweep->next->m_pNeighbours[0] != region && sMapSweep->next->m_pNeighbours[1] != region &&
+                    sMapSweep->next->m_pNeighbours[2] != region) {
                     continue;
                 }
             } else {
-                D_800F1AB0->next = Sweep_CrossRegionEdge(D_800F1AB0->sweep, region, i, &D_800F1AB0->sweep->inst->m_vPos);
+                sMapSweep->next = Sweep_CrossRegionEdge(sMapSweep->sweep, region, i, &sMapSweep->sweep->inst->m_vPos);
             }
         }
-        D_800F1AB0->a = region->m_pVertices[i];
-        D_800F1AB0->b = region->m_pVertices[i == 2 ? 0 : i + 1];
-        if (D_800F1AB0->a->x <= D_800F1AB0->minX && D_800F1AB0->b->x <= D_800F1AB0->minX) {
+        sMapSweep->a = region->m_pVertices[i];
+        sMapSweep->b = region->m_pVertices[i == 2 ? 0 : i + 1];
+        if (sMapSweep->a->x <= sMapSweep->minX && sMapSweep->b->x <= sMapSweep->minX) {
             continue;
         }
-        if (D_800F1AB0->maxX <= D_800F1AB0->a->x && D_800F1AB0->maxX <= D_800F1AB0->b->x) {
+        if (sMapSweep->maxX <= sMapSweep->a->x && sMapSweep->maxX <= sMapSweep->b->x) {
             continue;
         }
-        if (D_800F1AB0->a->z <= D_800F1AB0->minZ && D_800F1AB0->b->z <= D_800F1AB0->minZ) {
+        if (sMapSweep->a->z <= sMapSweep->minZ && sMapSweep->b->z <= sMapSweep->minZ) {
             continue;
         }
-        if (D_800F1AB0->maxZ <= D_800F1AB0->a->z && D_800F1AB0->maxZ <= D_800F1AB0->b->z) {
+        if (sMapSweep->maxZ <= sMapSweep->a->z && sMapSweep->maxZ <= sMapSweep->b->z) {
             continue;
         }
-        if (D_800F1AB0->next != NULL) {
-            Collision_SweepRegionWalls(D_800F1AB0->next);
+        if (sMapSweep->next != NULL) {
+            Collision_SweepRegionWalls(sMapSweep->next);
             continue;
         }
-        D_800F1AB0->normal.x = D_800F1AB0->b->z - D_800F1AB0->a->z;
-        D_800F1AB0->normal.z = D_800F1AB0->a->x - D_800F1AB0->b->x;
-        D_800F1AB0->toStart.x = D_800F1AB0->sweep->inst->m_vPos.x - D_800F1AB0->a->x;
-        D_800F1AB0->toStart.z = D_800F1AB0->sweep->inst->m_vPos.z - D_800F1AB0->a->z;
-        D_800F1AB0->startSide = D_800F1AB0->normal.x * D_800F1AB0->toStart.x +
-                                D_800F1AB0->normal.z * D_800F1AB0->toStart.z;
-        if (!(D_800F1AB0->startSide >= 0.0f)) {
+        sMapSweep->normal.x = sMapSweep->b->z - sMapSweep->a->z;
+        sMapSweep->normal.z = sMapSweep->a->x - sMapSweep->b->x;
+        sMapSweep->toStart.x = sMapSweep->sweep->inst->m_vPos.x - sMapSweep->a->x;
+        sMapSweep->toStart.z = sMapSweep->sweep->inst->m_vPos.z - sMapSweep->a->z;
+        sMapSweep->startSide = sMapSweep->normal.x * sMapSweep->toStart.x +
+                                sMapSweep->normal.z * sMapSweep->toStart.z;
+        if (!(sMapSweep->startSide >= 0.0f)) {
             continue;
         }
-        D_800F1AB0->side.x = -D_800F1AB0->sweep->delta.z;
-        D_800F1AB0->side.z = D_800F1AB0->sweep->delta.x;
-        D_800F1AB0->edge.x = D_800F1AB0->b->x - D_800F1AB0->a->x;
-        D_800F1AB0->edge.z = D_800F1AB0->b->z - D_800F1AB0->a->z;
-        D_800F1AB0->across = D_800F1AB0->side.x * D_800F1AB0->edge.x + D_800F1AB0->side.z * D_800F1AB0->edge.z;
-        if (!(D_800F1AB0->across < 0.0f)) {
+        sMapSweep->side.x = -sMapSweep->sweep->delta.z;
+        sMapSweep->side.z = sMapSweep->sweep->delta.x;
+        sMapSweep->edge.x = sMapSweep->b->x - sMapSweep->a->x;
+        sMapSweep->edge.z = sMapSweep->b->z - sMapSweep->a->z;
+        sMapSweep->across = sMapSweep->side.x * sMapSweep->edge.x + sMapSweep->side.z * sMapSweep->edge.z;
+        if (!(sMapSweep->across < 0.0f)) {
             continue;
         }
-        D_800F1AB0->hit = 0;
+        sMapSweep->hit = 0;
         if (!cornerDone[i]) {
             cornerDone[i] = 1;
-            D_800F1AB0->hit |= Sweep_HitCylinder(D_800F1AB0->sweep, D_800F1AB0->a, D_800F1AB0->radius, 0, 0.0f, 0.0f, 1,
-                                             D_800F1AB0->sweep->def->m_WallBehavior, 0.0f, 1);
+            sMapSweep->hit |= Sweep_HitCylinder(sMapSweep->sweep, sMapSweep->a, sMapSweep->radius, 0, 0.0f, 0.0f, 1,
+                                             sMapSweep->sweep->def->m_WallBehavior, 0.0f, 1);
         }
         if (!cornerDone[i == 2 ? 0 : i + 1]) {
             cornerDone[i == 2 ? 0 : i + 1] = 1;
-            D_800F1AB0->hit |= Sweep_HitCylinder(D_800F1AB0->sweep, D_800F1AB0->b, D_800F1AB0->radius, 0, 0.0f, 0.0f, 1,
-                                             D_800F1AB0->sweep->def->m_WallBehavior, 0.0f, 1);
+            sMapSweep->hit |= Sweep_HitCylinder(sMapSweep->sweep, sMapSweep->b, sMapSweep->radius, 0, 0.0f, 0.0f, 1,
+                                             sMapSweep->sweep->def->m_WallBehavior, 0.0f, 1);
         }
-        D_800F1AB0->len = func_00298470(D_800F1AB0->normal.x * D_800F1AB0->normal.x +
-                                        D_800F1AB0->normal.z * D_800F1AB0->normal.z);
-        if (D_800F1AB0->len != 0.0f) {
-            D_800F1AB0->len = D_800F1AB0->radius / D_800F1AB0->len;
-            D_800F1AB0->wallPoint.x = D_800F1AB0->a->x + D_800F1AB0->normal.x * D_800F1AB0->len;
-            D_800F1AB0->wallPoint.z = D_800F1AB0->a->z + D_800F1AB0->normal.z * D_800F1AB0->len;
-            D_800F1AB0->toEnd.x = D_800F1AB0->sweep->end.x - D_800F1AB0->wallPoint.x;
-            D_800F1AB0->toEnd.z = D_800F1AB0->sweep->end.z - D_800F1AB0->wallPoint.z;
-            D_800F1AB0->endSide = D_800F1AB0->side.x * D_800F1AB0->toEnd.x + D_800F1AB0->side.z * D_800F1AB0->toEnd.z;
-            D_800F1AB0->t = D_800F1AB0->endSide / D_800F1AB0->across;
-            if (D_800F1AB0->t >= 0.0f && D_800F1AB0->t <= 1.0f &&
-                !(D_800F1AB0->sweep->lastKind == 2 && D_800F1AB0->sweep->lastRadius == D_800F1AB0->radius &&
-                  D_800F1AB0->sweep->lastContact.x == D_800F1AB0->a->x &&
-                  D_800F1AB0->sweep->lastContact.y == D_800F1AB0->a->y &&
-                  D_800F1AB0->sweep->lastContact.z == D_800F1AB0->a->z) &&
-                !(D_800F1AB0->sweep->lastKind == 2 && D_800F1AB0->sweep->lastRadius == D_800F1AB0->radius &&
-                  D_800F1AB0->sweep->lastContact.x == D_800F1AB0->b->x &&
-                  D_800F1AB0->sweep->lastContact.y == D_800F1AB0->b->y &&
-                  D_800F1AB0->sweep->lastContact.z == D_800F1AB0->b->z)) {
-                D_800F1AB0->hit |= Sweep_HitPlane(D_800F1AB0->sweep, &D_800F1AB0->normal, &D_800F1AB0->wallPoint, 0,
-                                                 D_800F1AB0->sweep->def->m_WallBehavior, 0.0f, 1);
+        sMapSweep->len = func_00298470(sMapSweep->normal.x * sMapSweep->normal.x +
+                                        sMapSweep->normal.z * sMapSweep->normal.z);
+        if (sMapSweep->len != 0.0f) {
+            sMapSweep->len = sMapSweep->radius / sMapSweep->len;
+            sMapSweep->wallPoint.x = sMapSweep->a->x + sMapSweep->normal.x * sMapSweep->len;
+            sMapSweep->wallPoint.z = sMapSweep->a->z + sMapSweep->normal.z * sMapSweep->len;
+            sMapSweep->toEnd.x = sMapSweep->sweep->end.x - sMapSweep->wallPoint.x;
+            sMapSweep->toEnd.z = sMapSweep->sweep->end.z - sMapSweep->wallPoint.z;
+            sMapSweep->endSide = sMapSweep->side.x * sMapSweep->toEnd.x + sMapSweep->side.z * sMapSweep->toEnd.z;
+            sMapSweep->t = sMapSweep->endSide / sMapSweep->across;
+            if (sMapSweep->t >= 0.0f && sMapSweep->t <= 1.0f &&
+                !(sMapSweep->sweep->lastKind == 2 && sMapSweep->sweep->lastRadius == sMapSweep->radius &&
+                  sMapSweep->sweep->lastContact.x == sMapSweep->a->x &&
+                  sMapSweep->sweep->lastContact.y == sMapSweep->a->y &&
+                  sMapSweep->sweep->lastContact.z == sMapSweep->a->z) &&
+                !(sMapSweep->sweep->lastKind == 2 && sMapSweep->sweep->lastRadius == sMapSweep->radius &&
+                  sMapSweep->sweep->lastContact.x == sMapSweep->b->x &&
+                  sMapSweep->sweep->lastContact.y == sMapSweep->b->y &&
+                  sMapSweep->sweep->lastContact.z == sMapSweep->b->z)) {
+                sMapSweep->hit |= Sweep_HitPlane(sMapSweep->sweep, &sMapSweep->normal, &sMapSweep->wallPoint, 0,
+                                                 sMapSweep->sweep->def->m_WallBehavior, 0.0f, 1);
             }
         }
-        if (D_800F1AB0->hit == 0) {
+        if (sMapSweep->hit == 0) {
             continue;
         }
-        D_800F1AB0->sweep->hit.posOut = &gCollisionResultsP->m_vWallPos;
-        D_800F1AB0->sweep->hit.regionOut = &gCollisionResultsP->m_pWallRegion;
-        D_800F1AB0->sweep->hit.kindOut = NULL;
-        D_800F1AB0->sweep->hit.kind = 0;
-        D_800F1AB0->sweep->hit.dataOut = NULL;
-        D_800F1AB0->sweep->hit.data = NULL;
+        sMapSweep->sweep->hit.posOut = &gCollisionResultsP->m_vWallPos;
+        sMapSweep->sweep->hit.regionOut = &gCollisionResultsP->m_pWallRegion;
+        sMapSweep->sweep->hit.kindOut = NULL;
+        sMapSweep->sweep->hit.kind = 0;
+        sMapSweep->sweep->hit.dataOut = NULL;
+        sMapSweep->sweep->hit.data = NULL;
         gCollisionResultsP->m_nWallEdge = i;
-        if (D_800F1AB0->sweep->def->m_dwFlags & 0x20000000) {
+        if (sMapSweep->sweep->def->m_dwFlags & 0x20000000) {
             return;
         }
     } while (++i < 3);

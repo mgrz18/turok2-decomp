@@ -1,14 +1,14 @@
 #include "common.h"
 
 /* Pak slot scan step: a pak that already holds one of the game's two files
- * (names D_800B45C0, D_800B45CC) wins at once (*best = 123); otherwise the
+ * (names gPakCharacterNoteName, gPakGameNoteName) wins at once (*best = 123); otherwise the
  * slot is a candidate when the pak is usable and has room for a save, and
  * the slot with the most free pages is kept. Returns 1 to keep scanning. */
 
-extern s32 D_800C2028;
+extern s32 gPakMenuPort;
 extern u8 *D_800F70A8;
-extern char D_800B45C0[];
-extern char D_800B45CC[];
+extern char gPakCharacterNoteName[];
+extern char gPakGameNoteName[];
 
 extern void Pak_GetNoteGameName(s32 slot, s32 index, char **out);
 extern void Pak_DecodeText(char *src, char *dst, s32 n);
@@ -41,16 +41,16 @@ s32 PakMenu_CheckSlotForSave(void *unused, s32 slot, s32 *bestSlot, s32 *best) {
     s32 err;
     s32 need;
 
-    found = hasFile(D_800B45C0, slot);
-    found2 = hasFile(D_800B45CC, slot);
+    found = hasFile(gPakCharacterNoteName, slot);
+    found2 = hasFile(gPakGameNoteName, slot);
     if (found || found2) {
         *bestSlot = slot;
         *best = 123;
         return 1;
     }
-    err = Pak_GetFreePages(D_800C2028, &free);
+    err = Pak_GetFreePages(gPakMenuPort, &free);
     if (err == 0) {
-        err = Pak_CountEmptyNotes(D_800C2028, &files);
+        err = Pak_CountEmptyNotes(gPakMenuPort, &files);
         if (err == 0) {
             need = Pak_BytesToPages(D_800F70A8 + 0x688);
             if (files == 0 || free < need) {

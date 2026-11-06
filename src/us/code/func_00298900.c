@@ -8,26 +8,26 @@ s32 __osSiRawStartDma(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
 
 s32 __osSiRelAccess();                            /* extern */
-extern s32 D_801213E0;
-extern u8 D_80121420[];
+extern s32 __osContBuffer;
+extern u8 __osContLastCmd[];
 
 s32 osContReset(s32 arg0, s32 arg1) {
     s32 sp10;
     s32 temp_s0;
 
     __osSiGetAccess();
-    if (D_80121420[0] != 0xFF) {
+    if (__osContLastCmd[0] != 0xFF) {
         __osPackResetData();
-        __osSiRawStartDma(1, (s32) &D_801213E0);
+        __osSiRawStartDma(1, (s32) &__osContBuffer);
         osRecvMesg(arg0, 0, 1);
-        __osSiRawStartDma(0, (s32) &D_801213E0);
+        __osSiRawStartDma(0, (s32) &__osContBuffer);
         osRecvMesg(arg0, 0, 1);
         __osPackRequestData(0xFF);
-        __osSiRawStartDma(1, (s32) &D_801213E0);
+        __osSiRawStartDma(1, (s32) &__osContBuffer);
         osRecvMesg(arg0, 0, 1);
-        D_80121420[0] = 0xFF;
+        __osContLastCmd[0] = 0xFF;
     }
-    temp_s0 = __osSiRawStartDma(0, (s32) &D_801213E0);
+    temp_s0 = __osSiRawStartDma(0, (s32) &__osContBuffer);
     osRecvMesg(arg0, 0, 1);
     __osContGetInitData((s32) &sp10, arg1);
     __osSiRelAccess();

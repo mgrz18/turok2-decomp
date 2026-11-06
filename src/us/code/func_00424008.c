@@ -41,14 +41,14 @@ typedef struct {
 } ViMode; /* OSViMode, 0x50 */
 
 
-extern s16 D_801309D0; /* selected VI mode */
-extern ViMode D_801309D8;
-extern ViMode D_800B7BE0[]; /* osViModeTable */
+extern s16 sViModeIndex; /* selected VI mode */
+extern ViMode sResizedViMode;
+extern ViMode osViModeTable[]; /* osViModeTable */
 extern void *func_0029E460(void *dst, const void *src, s32 count);
 extern void osViSetMode(ViMode *mode); /* osViSetMode */
 
 void Video_ResizeViMode(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 borderY) {
-    ViMode *mode = &D_801309D8;
+    ViMode *mode = &sResizedViMode;
     Span v[2];
     Span old[2];
     s16 center[2];
@@ -58,7 +58,7 @@ void Video_ResizeViMode(s32 width, s32 height, s32 x, s32 y, s32 borderX, s32 bo
     s32 oldRight;
     s32 cx;
 
-    func_0029E460(mode, &D_800B7BE0[D_801309D0], 0x50);
+    func_0029E460(mode, &osViModeTable[sViModeIndex], 0x50);
     old[0] = v[0] = mode->fldRegs[0].vStart;
     old[1] = v[1] = mode->fldRegs[1].vStart;
     center[0] = v[0].h.start + (v[0].h.end - v[0].h.start) / 2;

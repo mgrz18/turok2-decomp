@@ -4,7 +4,7 @@
 
 #define ABS(a) (((a) < 0.0f) ? -(a) : (a))
 
-extern u8 D_8011AAF1;
+extern u8 gEngineApp_m_Settings_multiplayer;
 
 /* Returns the 8-way stick direction (0 = up, clockwise) or -1 inside the dead zone. */
 s32 CBarrel__GetStickDirection(s32 unused, CPlayer *player) {
@@ -15,7 +15,7 @@ s32 CBarrel__GetStickDirection(s32 unused, CPlayer *player) {
     if (x * x + y * y < 3600) {
         return -1;
     }
-    if (ABS(ABS(x) - ABS(y)) < 46 && x != 0 && y != 0 && !D_8011AAF1) {
+    if (ABS(ABS(x) - ABS(y)) < 46 && x != 0 && y != 0 && !gEngineApp_m_Settings_multiplayer) {
         if (x * y > 0) {
             if (x > 0) {
                 return 1;

@@ -2,8 +2,8 @@
 #include "m2c_macros.h"
 
 s32 Cinema_PathPlaying();                                /* extern */
-extern s32 D_800B6D54;
-extern s32 D_8011AC8C;
+extern s32 gPersistentDataLoaded;
+extern s32 gEngineApp_m_Settings_nextMode;
 
 s32 Automap_IsShown(void *arg0)
 {
@@ -13,12 +13,12 @@ s32 Automap_IsShown(void *arg0)
   if ((*((s32 *) (((s8 *) arg0) + 4))) != 0)
   {
     var_v0 = 0;
-    if (D_800B6D54 != 0)
+    if (gPersistentDataLoaded != 0)
     {
       var_v0 = 0;
       if (Cinema_PathPlaying() == 0)
       {
-        var_v0 = D_8011AC8C ^ 1;
+        var_v0 = gEngineApp_m_Settings_nextMode ^ 1;
         if (1)
         {
           var_s0 = ((u32) var_v0) > 0U;

@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern SineTable D_800ACBF8;
-extern s32 D_800B6D18;
+extern SineTable sWobbleSineTable;
+extern s32 gFrameCount;
 extern void CVector3__Normalize(CVector3 *);
 extern void CMtxF__Copy(f32 *, f32 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, f32);
@@ -20,7 +20,7 @@ void func_0021B59C(s32 time, s32 flags, f32 *matrix) {
     f32 angle;
     f32 flip;
     s32 mode;
-    t = D_800B6D18;
+    t = gFrameCount;
     t += (flags & 0x38) * 50;
     t += (u32)(time & 0xFFFF) / 113;
     if (!(flags & 4)) {
@@ -33,22 +33,22 @@ void func_0021B59C(s32 time, s32 flags, f32 *matrix) {
     if (mode == 2) {
         axis.z = 1.0f;
         axis.x = 0.0f;
-        angle = D_800ACBF8.value[t % 120] - 0.5f;
-        axis.y = D_800ACBF8.value[(t + 12) % 120];
+        angle = sWobbleSineTable.value[t % 120] - 0.5f;
+        axis.y = sWobbleSineTable.value[(t + 12) % 120];
     } else if (mode == 0x82) {
         axis.x = 1.0f;
         axis.z = 0.0f;
-        angle = D_800ACBF8.value[t % 120] - 0.5f;
-        axis.y = D_800ACBF8.value[(t + 12) % 120];
+        angle = sWobbleSineTable.value[t % 120] - 0.5f;
+        axis.y = sWobbleSineTable.value[(t + 12) % 120];
         angle *= 2.0f;
     } else if (mode == 0x40) {
-        angle = D_800ACBF8.value[(t + 30) % 120] - 0.5f;
-        axis.x = D_800ACBF8.value[(t + 12) % 120];
-        axis.y = D_800ACBF8.value[(t + 42) % 120];
-        axis.z = D_800ACBF8.value[(t + 110) % 120];
+        angle = sWobbleSineTable.value[(t + 30) % 120] - 0.5f;
+        axis.x = sWobbleSineTable.value[(t + 12) % 120];
+        axis.y = sWobbleSineTable.value[(t + 42) % 120];
+        axis.z = sWobbleSineTable.value[(t + 110) % 120];
         angle *= 2.0f;
     } else if (mode == 1) {
-        angle = D_800ACBF8.value[(t + 70) % 120] - 0.5f;
+        angle = sWobbleSineTable.value[(t + 70) % 120] - 0.5f;
         angle *= 0.7f;
     } else {
         return;

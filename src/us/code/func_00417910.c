@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern u8 D_8011AB08[10]; /* D_8011AAD8 + 0x30: weapons enabled */
+extern u8 gEngineApp_m_Settings_weaponEnabled[10]; /* gEngineApp_m_Settings + 0x30: weapons enabled */
 extern char D_800C0EB0[]; /* "unknown weapon" */
 extern char D_800B6288[];
 extern char D_800B62A0[];
@@ -27,56 +27,56 @@ s32 WeaponsMenu_ToggleLabel(MenuItem *a) {
         a->text = D_800C0EB0;
         break;
     case 0:
-        if (D_8011AB08[1]) {
+        if (gEngineApp_m_Settings_weaponEnabled[1]) {
             a->text = D_800B6288;
         } else {
             a->text = D_800B62A0;
         }
         break;
     case 1:
-        if (D_8011AB08[2]) {
+        if (gEngineApp_m_Settings_weaponEnabled[2]) {
             a->text = D_800B62B8;
         } else {
             a->text = D_800B62D0;
         }
         break;
     case 2:
-        if (D_8011AB08[3]) {
+        if (gEngineApp_m_Settings_weaponEnabled[3]) {
             a->text = D_800B62E8;
         } else {
             a->text = D_800B6300;
         }
         break;
     case 3:
-        if (D_8011AB08[4]) {
+        if (gEngineApp_m_Settings_weaponEnabled[4]) {
             a->text = D_800B6318;
         } else {
             a->text = D_800B6330;
         }
         break;
     case 4:
-        if (D_8011AB08[5]) {
+        if (gEngineApp_m_Settings_weaponEnabled[5]) {
             a->text = D_800B6348;
         } else {
             a->text = D_800B6360;
         }
         break;
     case 5:
-        if (D_8011AB08[6]) {
+        if (gEngineApp_m_Settings_weaponEnabled[6]) {
             a->text = D_800B6378;
         } else {
             a->text = D_800B6390;
         }
         break;
     case 6:
-        if (D_8011AB08[7]) {
+        if (gEngineApp_m_Settings_weaponEnabled[7]) {
             a->text = D_800B63A8;
         } else {
             a->text = D_800B63C0;
         }
         break;
     case 7:
-        if (D_8011AB08[9]) {
+        if (gEngineApp_m_Settings_weaponEnabled[9]) {
             a->text = D_800B63D8;
         } else {
             a->text = D_800B63F0;

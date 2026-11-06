@@ -36,8 +36,8 @@ struct WarpPlayer {
     /* 0x1320 */ WarpPlayer *next;
 };
 
-extern s32 D_8011001C;
-extern s32 D_80110020;
+extern s32 gScene_m_bStreamAll;
+extern s32 gScene_m_nLevel;
 extern u8 gScene[];
 
 void CPlayer__StopLoopingSounds(void);
@@ -55,7 +55,7 @@ static __inline__ f32 sumDistance(CWarpPoint *r) {
     f32 dist;
 
     dist = 0.0f;
-    for (other = (WarpPlayer *)D_80119870.m_PlayerList.m_ActiveList.m_pHead; other != NULL; other = other->next) {
+    for (other = (WarpPlayer *)gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; other != NULL; other = other->next) {
         if (other->active) {
             dist += CVector3__Distance(&r->m_vPos, &other->pos);
         }
@@ -77,7 +77,7 @@ void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
     CPlayer__StopLoopingSounds();
     Controller_SetRumbleOption(pl->controller, 0);
 
-    if (D_8011001C && respawn) {
+    if (gScene_m_bStreamAll && respawn) {
         skip = TRUE;
     }
     if (!skip) {
@@ -207,7 +207,7 @@ void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
         break;
     }
 
-    if (D_80119870.m_Settings.multiplayer) {
+    if (gEngineApp_m_Game.m_Settings.multiplayer) {
         count = CScene__FindWarpDests(gScene, -1, warp, recs, 32);
         best = -1;
         bestDist = 0.0f;
@@ -228,8 +228,8 @@ void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
         }
     } else {
         do { /* a block of its own: it decides which of the two addresses gets $s0 */
-            if (CScene__FindWarpDests(gScene, -1, warp, &rec, 1) && rec.m_nLevel == D_80110020 &&
-                (D_80119870.m_Settings.multiplayer || D_8011001C)) {
+            if (CScene__FindWarpDests(gScene, -1, warp, &rec, 1) && rec.m_nLevel == gScene_m_nLevel &&
+                (gEngineApp_m_Game.m_Settings.multiplayer || gScene_m_bStreamAll)) {
                 pl->spawnPos = rec.m_vPos;
                 pl->pos = pl->spawnPos;
                 pl->angle = pl->spawnAngle = rec.m_RotY;

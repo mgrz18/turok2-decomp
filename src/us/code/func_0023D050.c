@@ -44,7 +44,7 @@ typedef struct ModelHit {
     /* 0x04 */ f32 t;
 } ModelHit;
 
-extern SceneCells D_800F8520;
+extern SceneCells gScene_m_nSectors;
 
 void Collision_LookAtF(f32 mf[4][4], f32 xEye, f32 yEye, f32 zEye, f32 xAt, f32 yAt, f32 zAt, f32 xUp, f32 yUp,
                    f32 zUp);
@@ -108,8 +108,8 @@ void Collision_TestModels(Sweep *sweep) {
     hit = hits;
     i = 0;
     n = 0;
-    cells = D_800F8520.cells;
-    cellCount = D_800F8520.count;
+    cells = gScene_m_nSectors.cells;
+    cellCount = gScene_m_nSectors.count;
     for (; i < cellCount && !sweep->stop; i++) {
         cell = &cells[i];
         if (cell->bounds->maxX > rect.minX && cell->bounds->minX < rect.maxX && cell->bounds->maxZ > rect.minZ

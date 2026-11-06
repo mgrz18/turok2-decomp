@@ -7,8 +7,8 @@
 
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
-extern u32 D_800C2214;              /* command buffer length, in commands */
-extern Gfx *D_800D8E24;             /* display list head */
+extern u32 gDisplayListSize;              /* command buffer length, in commands */
+extern Gfx *gDList;             /* display list head */
 
 void *CISet__GetBlock(void *resource, s32 index);
 void CCache__LockForDisplayList(s32 unused, void **resource);
@@ -27,7 +27,7 @@ void Render_DrawModel(void **resource, void *matrix, s32 segment, char *lights, 
     s32 count;
     s32 i;
 
-    if (D_800C2214 - ((u32)D_800D8E24 - (u32)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
+    if (gDisplayListSize - ((u32)gDList - (u32)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     header = *resource;
@@ -37,19 +37,19 @@ void Render_DrawModel(void **resource, void *matrix, s32 segment, char *lights, 
     }
     CCache__LockForDisplayList(0, resource);
     if (segment != 0) {
-        GFX_W(D_800D8E24++, 0xDB060004, (u32)matrix);   /* gSPSegment(1, matrix) */
+        GFX_W(gDList++, 0xDB060004, (u32)matrix);   /* gSPSegment(1, matrix) */
     } else {
-        GFX_W(D_800D8E24++, 0xDA380003, (u32)matrix);   /* gSPMatrix(matrix, G_MTX_LOAD) */
+        GFX_W(gDList++, 0xDA380003, (u32)matrix);   /* gSPMatrix(matrix, G_MTX_LOAD) */
     }
     base = textures;
     if (base == 0) {
         base = CISet__GetBlock(header, 0);
     }
-    GFX_W(D_800D8E24++, 0xDB060008, (u32)base);     /* gSPSegment(2, base) */
+    GFX_W(gDList++, 0xDB060008, (u32)base);     /* gSPSegment(2, base) */
     if (lights != 0) {
-        GFX_W(D_800D8E24++, 0xDB020000, 0x18);           /* gSPNumLights(1) */
-        GFX_W(D_800D8E24++, 0xDC08060A, (u32)(lights + 8)); /* gSPLight(lights + 8, 1) */
-        GFX_W(D_800D8E24++, 0xDC08090A, (u32)lights);        /* gSPLight(lights, 2): ambient */
+        GFX_W(gDList++, 0xDB020000, 0x18);           /* gSPNumLights(1) */
+        GFX_W(gDList++, 0xDC08060A, (u32)(lights + 8)); /* gSPLight(lights + 8, 1) */
+        GFX_W(gDList++, 0xDC08090A, (u32)lights);        /* gSPLight(lights, 2): ambient */
     }
     lodParts = CISet__GetBlock(parts, lod);
     count = *(s32 *)lodParts;
@@ -58,7 +58,7 @@ void Render_DrawModel(void **resource, void *matrix, s32 segment, char *lights, 
         if (Render_SetupMaterial(CISet__GetBlock(part, 0), pass) != 0) {
             void *list = CISet__GetBlock(part, 1);
 
-            GFX_W(D_800D8E24++, 0xDE000000, (u32)list);     /* gSPDisplayList */
+            GFX_W(gDList++, 0xDE000000, (u32)list);     /* gSPDisplayList */
         }
     }
 }

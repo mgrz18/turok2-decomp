@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern int D_800B2A80;
+extern int sLoopSoundsLastStarted;
 extern s32 CList__AddTail(CList *list, void *node);
 extern s32 Sound__Play(s16 arg0, CVector3 position, s32 arg4, s32 arg5);
 void *LoopSounds_Start(void *arg0, s32 arg1, CVector3 *arg2, void *arg3, s32 arg4) {
@@ -19,7 +19,7 @@ void *LoopSounds_Start(void *arg0, s32 arg1, CVector3 *arg2, void *arg3, s32 arg
         result = Sound__Play((s16)arg1, *arg2,
                                 (s32)arg3, arg4);
         node->value = result;
-        D_800B2A80 = result;
+        sLoopSoundsLastStarted = result;
         node->state = arg1;
         node->position = *arg2;
         node->owner = arg3;

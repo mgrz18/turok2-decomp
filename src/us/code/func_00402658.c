@@ -7,7 +7,7 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x40];
 } Path;
 
-extern s32 D_8012F5F4;
+extern s32 gMantidQueen_blink;
 
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Path *path);
@@ -21,7 +21,7 @@ void MantidQueen_ChooseAttack(CGameObjectInstance *actor, CAI *ai) {
     Path path;
     CVector3 v;
     WaveBossStep *step;
-    WaveBossState *boss = &D_8012F3A0;
+    WaveBossState *boss = &gMantidQueen;
     f32 turn;
     s32 side;
     s32 visible;
@@ -36,7 +36,7 @@ void MantidQueen_ChooseAttack(CGameObjectInstance *actor, CAI *ai) {
     AI_ComputeFrameMotion(actor, ai, &path);
     AI_TurnClamped(actor, ai, turn, t.m_Path.m_Angle);
     visible = t.m_Sight.m_pTarget;
-    if (D_8012F5F4 == 0) {
+    if (gMantidQueen_blink == 0) {
         side = 0;
     } else {
         side = AI_IsAimedAt(actor, ai, visible, 0.785398245f);

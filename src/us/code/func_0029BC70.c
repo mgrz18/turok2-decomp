@@ -4,8 +4,8 @@
 #include "common.h"
 #include "ultra_types.h"
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern u32 D_80122A30;
-extern void *D_800B8930;
+extern u32 __osTimerCounter;
+extern void *__osTimerList;
 extern u32 osGetCount(void);
 extern void __osSetTimerIntr(u64 tim);
 extern u64 __osInsertTimer(OSTimer *t);
@@ -16,15 +16,15 @@ void __osTimerInterrupt(void)
     u32 count;
     u32 elapsed_cycles;
     u32 *counter;
-    if (((OSTimer *)D_800B8930)->next == D_800B8930) {
+    if (((OSTimer *)__osTimerList)->next == __osTimerList) {
         return;
     }
-    counter = &D_80122A30;
+    counter = &__osTimerCounter;
     for (;;) {
-        t = ((OSTimer *)D_800B8930)->next;
-        if (t == D_800B8930) {
+        t = ((OSTimer *)__osTimerList)->next;
+        if (t == __osTimerList) {
             __osSetCompare(0);
-            D_80122A30 = 0;
+            __osTimerCounter = 0;
             break;
         }
         count = osGetCount();

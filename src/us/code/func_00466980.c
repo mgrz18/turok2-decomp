@@ -29,14 +29,14 @@ void CPlayer__SetupActors_2(CPlayer *p, void *rec, s32 mode) {
     p->m_CharacterActor.m_dwFlags |= 0x10000;
     p->m_CharacterActor.m_dwFlags |= 0x1000000;
     p->m_CharacterActor.m_dwFlags |= 0x2000000;
-    if (!D_8011AAD8.multiplayer) {
+    if (!gEngineApp_m_Settings.multiplayer) {
         p->m_CharacterActor.m_dwFlags |= 0x10000000;
     }
     p->m_CharacterActor.m_AI.m_pfCalculateOrientationMatrix = CGameObjectInstance__CalculateOrientationMatrix;
     p->m_CharacterActor.m_AI.m_pfEffects = Actor_PlayRangedSound;
     p->m_CharacterActor.m_AI.m_pfHurt = Player_OnMultiplayerKill;
     p->m_CharacterActor.m_AI.m_pfHit = CPlayer__OnParticleHitCallback;
-    if (D_8011AAD8.multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         p->m_CharacterActor.m_AI.m_pfDraw = Player_DrawNodeCallback;
     }
 

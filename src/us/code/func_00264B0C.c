@@ -12,8 +12,8 @@ typedef struct {
     /* 0x4 */ f32 offset[3];
 } JointPoint;
 
-extern JointPoint D_800B21C0;
-extern JointPoint D_800B21D0;
+extern JointPoint sThrowableCarryJointA;
+extern JointPoint sThrowableCarryJointB;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x10C];
@@ -26,8 +26,8 @@ void Throwable_GetCarryPoint(void *obj, OwnedState *state, f32 *out) {
     f32 mtxB[16];
     f32 a[4];
     f32 b[4];
-    JointPoint *pa = &D_800B21C0;
-    JointPoint *pb = &D_800B21D0;
+    JointPoint *pa = &sThrowableCarryJointA;
+    JointPoint *pb = &sThrowableCarryJointB;
     CGameObjectInstance *owner = state->owner;
     CGameObjectInstance *src = owner;
 

@@ -30,19 +30,19 @@ extern char D_800C182C[];
 extern char D_800C184C[];
 extern char D_800C185C[];
 extern char D_800C1864[];
-extern u32 D_800C2210; /* frame buffer count */
-extern s32 D_800C2214;
-extern s32 D_800C2218;
-extern s32 D_80130A88[]; /* frame buffers */
-extern s32 D_80130A78;   /* depth buffer */
-extern s32 D_80130A40;
-extern s32 D_80130A44;
-extern s32 D_80130A48;
-extern s32 D_80130A4C;
-extern s32 D_80130A50;
-extern s32 D_80130A7C;
-extern s32 D_80130A80;
-extern s32 D_80130A84;
+extern u32 gTotalFramebuffers; /* frame buffer count */
+extern s32 gDisplayListSize;
+extern s32 gLineListSize;
+extern s32 gCFB[]; /* frame buffers */
+extern s32 gDepthBuffer;   /* depth buffer */
+extern s32 gAudioHeapBase;
+extern s32 gRspFifoSize;
+extern s32 gRspFifoBuffer;
+extern s32 gLineList0;
+extern s32 gLineList1;
+extern s32 gAudioHeapSize;
+extern s32 gDisplayList1;
+extern s32 gDisplayList0;
 
 void GfxPool_Alloc(GfxPool *pool) {
     u32 mb = 0x100000;
@@ -91,36 +91,36 @@ void GfxPool_Alloc(GfxPool *pool) {
         memset((void *) depth->addr, 0, 0x54600);
         pool->depth = depth;
         pool->fb[0] = fb;
-        D_80130A78 = pool->depth->addr;
-        for (i = 0; i < D_800C2210; i++) {
-            D_80130A88[i] = fb->addr + i * size;
+        gDepthBuffer = pool->depth->addr;
+        for (i = 0; i < gTotalFramebuffers; i++) {
+            gCFB[i] = fb->addr + i * size;
         }
     } else {
         size = 0x1ECC0;
         base = 0x80400000;
-        block = CCache__AllocateAt(0, base - (D_800C2210 + 1) * size, (D_800C2210 + 1) * size, D_800C182C);
+        block = CCache__AllocateAt(0, base - (gTotalFramebuffers + 1) * size, (gTotalFramebuffers + 1) * size, D_800C182C);
         pool->fb[0] = block;
-        for (i = 0; i < D_800C2210; i++) {
-            D_80130A88[i] = block->addr + i * size;
+        for (i = 0; i < gTotalFramebuffers; i++) {
+            gCFB[i] = block->addr + i * size;
         }
-        D_80130A78 = block->addr + size * i;
+        gDepthBuffer = block->addr + size * i;
     }
-    for (i = 0; i < D_800C2210; i++) {
-        memset((void *) D_80130A88[i], 0, size);
+    for (i = 0; i < gTotalFramebuffers; i++) {
+        memset((void *) gCFB[i], 0, size);
     }
-    memset((void *) D_80130A78, 0, size);
-    pool->gfx = CCache__Allocate(0, (D_800C2214 + D_800C2218) * 16, 0x23, D_800C184C);
+    memset((void *) gDepthBuffer, 0, size);
+    pool->gfx = CCache__Allocate(0, (gDisplayListSize + gLineListSize) * 16, 0x23, D_800C184C);
     pool->dynamic = CCache__Allocate(0, 0x8000, 0x23, D_800C185C);
     pool->vtx = CCache__Allocate(0, 0x22000, 0x23, D_800C1864);
-    D_80130A80 = pool->gfx->addr;
-    D_80130A4C = D_80130A80 + D_800C2214 * 8;
-    D_80130A84 = D_80130A4C + D_800C2218 * 8;
-    D_80130A50 = D_80130A84 + D_800C2214 * 8;
-    D_80130A44 = 0x8000;
-    D_80130A7C = 0x22000;
-    D_80130A48 = pool->dynamic->addr;
-    D_80130A40 = pool->vtx->addr;
-    for (i = 0; i < D_800C2210; i++)
+    gDisplayList1 = pool->gfx->addr;
+    gLineList0 = gDisplayList1 + gDisplayListSize * 8;
+    gDisplayList0 = gLineList0 + gLineListSize * 8;
+    gLineList1 = gDisplayList0 + gDisplayListSize * 8;
+    gRspFifoSize = 0x8000;
+    gAudioHeapSize = 0x22000;
+    gRspFifoBuffer = pool->dynamic->addr;
+    gAudioHeapBase = pool->vtx->addr;
+    for (i = 0; i < gTotalFramebuffers; i++)
         ;
     pool->ready = 1;
 }

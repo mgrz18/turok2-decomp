@@ -14,7 +14,7 @@ typedef struct {
     } s;
 } PakStatus;
 
-extern u8 D_80130E20[];
+extern u8 __osPfsPifRam[];
 
 void __osPfsRequestOneChannel_2(s32 channel);
 s32 __osSiRawStartDma(s32 enable, void *timer);
@@ -27,9 +27,9 @@ s32 __osPfsGetStatus_2(void *mq, s32 channel) {
     s32 ret;
 
     __osPfsRequestOneChannel_2(channel);
-    __osSiRawStartDma(1, D_80130E20);
+    __osSiRawStartDma(1, __osPfsPifRam);
     osRecvMesg(mq, &msg, 1);
-    ret = __osSiRawStartDma(0, D_80130E20);
+    ret = __osSiRawStartDma(0, __osPfsPifRam);
     osRecvMesg(mq, &msg, 1);
     __osPfsGetOneChannelData_2(channel, &status);
     if ((status.s.b.status & 1) && (status.s.b.status & 2)) {

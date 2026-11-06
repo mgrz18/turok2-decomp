@@ -7,8 +7,8 @@ typedef struct {
 } PackedRange;
 
 s32 Demo_GetPlayerCount(void);
-extern u32 D_800B6D20;
-extern u32 D_800DD784; /* random seed A */
+extern u32 gFrameCountGameplay;
+extern u32 gRandomValue; /* random seed A */
 
 /* base + random(0..1) * range, both unpacked from half-floats. */
 f32 RandomInPackedRange(PackedRange r) {
@@ -20,9 +20,9 @@ f32 RandomInPackedRange(PackedRange r) {
     }
     range = r.range << 16;
     if (Demo_GetPlayerCount()) {
-        D_800DD784 = D_800B6D20 * 0xA84A5B53 + 0x58348C2D;
+        gRandomValue = gFrameCountGameplay * 0xA84A5B53 + 0x58348C2D;
     } else {
-        D_800DD784 = D_800DD784 * 0xA84A5B53 + 0x58348C2D;
+        gRandomValue = gRandomValue * 0xA84A5B53 + 0x58348C2D;
     }
-    return *(f32 *) &base + (f32) ((D_800DD784 >> 16) & 0x7FFF) * *(f32 *) &range * (1.0f / 32767);
+    return *(f32 *) &base + (f32) ((gRandomValue >> 16) & 0x7FFF) * *(f32 *) &range * (1.0f / 32767);
 }

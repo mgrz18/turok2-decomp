@@ -5,22 +5,22 @@
 #include "structs/cache.h"
 
 extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
-extern CMemEntry *D_800D81E4;
-extern CMemEntry *D_800D81D8;
-extern CMemEntry **D_800D81D4;
-extern s32 D_800D8DAC;
-extern s32 D_800D8DF0;
+extern CMemEntry *gCache_memAgeList_m_pTail;
+extern CMemEntry *gCache_currentCompressPos;
+extern CMemEntry **gCache_memEntriesFree;
+extern s32 gCache_freeEntryCount;
+extern s32 gCache_ageCount;
 extern char gHeap;
-extern char D_800D81E0;
-extern char D_800D81F4;
+extern char gCache_memAgeList;
+extern char gCache_memLockedList;
 extern void CCache__DetachCacheEntry(void *, CMemEntry *);
 extern s32 CHeap__Free(void *, s32);
 extern void CList__Remove(void *, CMemEntry *);
 static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
     CMemEntry *node;
-    for (node = D_800D81E4; node != 0; node = node->last) {
+    for (node = gCache_memAgeList_m_pTail; node != 0; node = node->last) {
         if (!(node->flags & 0x702)) {
-            if ((u32)(D_800D8DF0 - node->age) >= 5) {
+            if ((u32)(gCache_ageCount - node->age) >= 5) {
                 return node;
             }
             *recent = node;
@@ -28,7 +28,7 @@ static __inline__ CMemEntry *find_stale(CMemEntry **recent) {
         }
     }
     for (; node != 0; node = node->last) {
-        if (!(node->flags & 0x702) && (u32)(D_800D8DF0 - node->age) >= 5) {
+        if (!(node->flags & 0x702) && (u32)(gCache_ageCount - node->age) >= 5) {
             return node;
         }
     }
@@ -48,18 +48,18 @@ s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent) {
     if (node != 0) {
         CCache__DetachCacheEntry(0, node);
         result = CHeap__Free(&gHeap, node->data);
-        CList__Remove(&D_800D81E0, node);
+        CList__Remove(&gCache_memAgeList, node);
         if (node->flags & 0x1000) {
-            CList__Remove(&D_800D81F4, node);
+            CList__Remove(&gCache_memLockedList, node);
         }
-        if (D_800D81D8 == node) {
-            D_800D81D8 = 0;
+        if (gCache_currentCompressPos == node) {
+            gCache_currentCompressPos = 0;
             node->flags = 0;
         } else {
             node->flags = 0;
         }
-        *(CMemEntry **)(D_800D8DAC * 4 + (char *)D_800D81D4) = node;
-        D_800D8DAC++;
+        *(CMemEntry **)(gCache_freeEntryCount * 4 + (char *)gCache_memEntriesFree) = node;
+        gCache_freeEntryCount++;
         return result;
     }
     return 0;

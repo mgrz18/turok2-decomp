@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/sound.h"
 
-extern f32 D_800B2848[];                    /* pitch ratio every 60 cents from -6000 */
-#define PITCH_TABLE (D_800B2848 + 1)
+extern f32 sSndVoiceRampStep[];                    /* pitch ratio every 60 cents from -6000 */
+#define PITCH_TABLE (sSndVoiceRampStep + 1)
 
 extern void SndVoice_UpdateDoppler(SndVoice *s);
 extern f32 HalfToFloat(s32 halfFloat);

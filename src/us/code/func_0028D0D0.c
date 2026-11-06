@@ -3,5 +3,5 @@
 #include "structs/player.h"
 
 s32 SavedPlayers_GetWarpID(void) {
-    return D_8011F290.m_WarpID;
+    return gSavedPlayers.m_WarpID;
 }

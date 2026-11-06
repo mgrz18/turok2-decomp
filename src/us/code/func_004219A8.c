@@ -1,15 +1,15 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s32 D_800C2028;
-extern s32 D_80130990;
+extern s32 gPakMenuPort;
+extern s32 gPakMenuAnyPak;
 
 s32 PakMenu_GetPlayerAndPort(Menu *arg0, s32 *arg1) {
     s32 var_a0;
     s32 var_v0;
 
-    if (D_80130990 != 0) {
-        var_v0 = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        var_v0 = gPakMenuPort;
         var_a0 = 0;
     } else {
         var_a0 = arg0->player;

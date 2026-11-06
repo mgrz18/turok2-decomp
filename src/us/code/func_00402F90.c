@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_8012F3A4;
+extern s32 gMantidQueen_pushed;
 
 void MantidQueen_EnterPush(void) {
-    D_8012F3A4 = 0;
+    gMantidQueen_pushed = 0;
 }

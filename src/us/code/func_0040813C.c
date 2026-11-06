@@ -20,11 +20,11 @@ typedef struct {
 } BossFight;
 
 
-extern CPlayer *D_80119890;     /* the current player */
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the current player */
 extern u8 gScene[];
 extern u8 D_800B6674[];
-extern u8 D_801100F0[];
-extern CListedInstance *D_8010FEB4[]; /* the actor list head */
+extern u8 gEngineApp_m_OnScreen[];
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
@@ -49,7 +49,7 @@ static __inline__ void setAnim(CListedInstance *actor, s32 id) {
  * (those not dead and, unless the fight is over, targeting the boss) turn on
  * the current player. */
 void TotemDefense_Fail(BossFight *fight) {
-    CGame *game = &D_80119870;
+    CGame *game = &gEngineApp_m_Game;
     CPlayer *player;
     CListedInstance *a;
     CPlayer *current;
@@ -60,12 +60,12 @@ void TotemDefense_Fail(BossFight *fight) {
     fight->state = 2;
     fight->warned = 2;
     setAnim(fight->obj, 0x5336);
-    COnScreen__ClearBoss(D_801100F0);
-    COnScreen__ClearBoss2(D_801100F0);
+    COnScreen__ClearBoss(gEngineApp_m_OnScreen);
+    COnScreen__ClearBoss2(gEngineApp_m_OnScreen);
     CScene__UnmarkGeneratorsSaved(gScene);
     if (fight->state != 1) {
-        current = D_80119890;
-        for (a = D_8010FEB4[0]; a != NULL; a = a->m_pNext) {
+        current = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+        for (a = gScene_m_InstancePool_m_ActiveList[0]; a != NULL; a = a->m_pNext) {
             if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_pTargetOverride == 0 && (fight->state == 0 || a->m_Instance.m_AI.m_pSightTarget == fight->obj)) {
                 a->m_Instance.m_AI.m_pPathTarget = current;
                 a->m_Instance.m_AI.m_pSightTarget = current;

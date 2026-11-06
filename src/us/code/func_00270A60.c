@@ -32,7 +32,7 @@ static inline void CAudioWorld_Unlock(CAudioWorld *m) {
         __osRestoreInt(mask);
     }
 }
-extern u8 D_801198B0[];
+extern u8 gEngineApp_m_Game_m_CameraPool[];
 s32 CCameraPool__GetNearestCamera(void *p, s32 id);
 s32 SndVoicePool_IsSoundPlaying(void *pool, s16 a);
 f32 Sound_DistanceFalloff(s32 id, s32 p);
@@ -46,7 +46,7 @@ void SndVoice_Setup(SndVoice *v, SoundEffectInfo *info, s32 a5);
 s32 CAudioWorld__StartVoice(CAudioWorld *m, s32 id, s32 a2, s32 a3);
 s32 CAudioWorld__PlayLayer(CAudioWorld *m, SoundEffectInfo *info, s32 id, s32 a3, s32 a4, s32 a5, s32 a6) {
     SndVoice *v;
-    m->listener = CCameraPool__GetNearestCamera(D_801198B0, id);
+    m->listener = CCameraPool__GetNearestCamera(gEngineApp_m_Game_m_CameraPool, id);
     if (info->flags & 1) {
         if (SndVoicePool_IsSoundPlaying(&m->pool, m->cueId) != 0) {
             return -1;

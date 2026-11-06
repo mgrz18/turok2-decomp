@@ -368,7 +368,7 @@ typedef struct {
     /* 0x48 */ s32 maxOutSamples;
 } ALSynth; /* size 0x4C */
 
-/* alGlobals is D_800B7760 (an ALGlobals *). */
+/* alGlobals is alGlobals (an ALGlobals *). */
 typedef struct {
     /* 0x00 */ ALSynth drvr;
 } ALGlobals; /* size 0x4C */

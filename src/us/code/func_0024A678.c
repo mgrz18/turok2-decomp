@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern s32 D_800C2030;      /* screen width */
-extern s32 D_800C2034;      /* screen height */
-extern u8 D_8011AAF1;
+extern s32 gScreenWidth;      /* screen width */
+extern s32 gScreenHeight;      /* screen height */
+extern u8 gEngineApp_m_Settings_multiplayer;
 
 void CCamera__WorldToScreen(CCamera *, f32 *, f32 *, f32 *);
 void Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
@@ -24,12 +24,12 @@ void Hud_DrawWorldSprite(CCamera *view, f32 *pos, s32 sprite, f32 frame, f32 sca
             return;
         }
         CCamera__WorldToScreen(view, pos, &x, &y);
-        if (x < -64.0f || (f32) (D_800C2030 + 64) < x || y < -64.0f || (f32) (D_800C2034 + 64) < y) {
+        if (x < -64.0f || (f32) (gScreenWidth + 64) < x || y < -64.0f || (f32) (gScreenHeight + 64) < y) {
             return;
         }
-        if (D_8011AAF1 != 0) {
-            x = view->m_Viewport.m_ScreenPosX + x / D_800C2030 * view->m_Viewport.m_Width;
-            y = view->m_Viewport.m_ScreenPosY + y / D_800C2034 * view->m_Viewport.m_Height;
+        if (gEngineApp_m_Settings_multiplayer != 0) {
+            x = view->m_Viewport.m_ScreenPosX + x / gScreenWidth * view->m_Viewport.m_Width;
+            y = view->m_Viewport.m_ScreenPosY + y / gScreenHeight * view->m_Viewport.m_Height;
         }
     }
     half = scale * size - 1.0f;

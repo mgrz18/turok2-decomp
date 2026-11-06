@@ -2,7 +2,7 @@
 #include "structs/menu.h"
 #include "structs/player.h"
 
-extern s32 D_8011AB18;
+extern s32 gEngineApp_m_Settings_defaultSlot;
 
 s32 *OptionsMenu_GetPlayerOptions(Menu *arg0) {
     s32 *temp_v1_2;
@@ -10,7 +10,7 @@ s32 *OptionsMenu_GetPlayerOptions(Menu *arg0) {
     CPlayer *temp_v1;
 
     temp_v1 = arg0->player;
-    var_v0 = &D_8011AB18;
+    var_v0 = &gEngineApp_m_Settings_defaultSlot;
     if (temp_v1 != NULL) {
         temp_v1_2 = (s32 *) temp_v1->m_pOptions;
         if (temp_v1_2 != NULL) {

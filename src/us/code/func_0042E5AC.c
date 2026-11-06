@@ -13,7 +13,7 @@ typedef struct PlayerList {
     /* 0x20 */ u8 list1[0x14];
 } PlayerList;
 
-extern s32 D_8011ACF0;
+extern s32 gEngineApp_m_Settings_match_tagPhase;
 extern char D_800A7080[]; /* in the engine's .rodata */
 
 extern void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
@@ -32,7 +32,7 @@ extern void CPlayer__NewGame(CPlayer *p, s32 character, s32 arg2);
 /* CPlayer__Construct, inlined. */
 static __inline__ void initPlayer(CPlayer *p, s32 index, CPlayerOptions *options) {
     p->m_bActive = 0;
-    CPlayerContState__Init(&p->m_ContState, &D_800F5EC0[index]);
+    CPlayerContState__Init(&p->m_ContState, &gControllers[index]);
     p->m_nController = index;
     p->m_pOptions = options;
     p->m_pLoopingSound_WeaponBackground = 0;
@@ -53,7 +53,7 @@ void CPlayerPool__NewGame(PlayerList *list, s32 count, s32 arg2) {
     CList__Construct(list->list1, 0x131C, 0x1320);
     Controller_SetRumbleOptionAll(0);
     CCache__Flush(0);
-    flags = &D_8011AAD8;
+    flags = &gEngineApp_m_Settings;
     if (list->handle != NULL) {
         CCache__Deallocate(0, list->handle);
         list->handle = NULL;
@@ -89,5 +89,5 @@ void CPlayerPool__NewGame(PlayerList *list, s32 count, s32 arg2) {
         CList__Remove(list->list0, p);
         CList__AddHead(list->list1, p);
     }
-    D_8011ACF0 = 1;
+    gEngineApp_m_Settings_match_tagPhase = 1;
 }

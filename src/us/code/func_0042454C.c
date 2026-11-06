@@ -3,20 +3,20 @@
 s32 GetMemSize(void); /* osGetMemSize */
 void Video_ApplyResolution(void);
 
-extern s32 D_800C2038; /* current video mode */
-extern s32 D_800C203C; /* applied video mode */
-extern s32 D_800C2040;
+extern s32 gResolution; /* current video mode */
+extern s32 gAppliedResolution; /* applied video mode */
+extern s32 gVideoClearFrames;
 
 void Video_UpdateResolution(void) {
-    if (D_800C2038 == -1) {
+    if (gResolution == -1) {
         if (GetMemSize() != 0x400000) {
-            D_800C2038 = 1;
+            gResolution = 1;
         } else {
-            D_800C2038 = 0;
+            gResolution = 0;
         }
     }
-    if (D_800C2040 < 5 && D_800C203C != D_800C2038) {
+    if (gVideoClearFrames < 5 && gAppliedResolution != gResolution) {
         Video_ApplyResolution();
-        D_800C203C = D_800C2038;
+        gAppliedResolution = gResolution;
     }
 }

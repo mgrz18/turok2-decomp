@@ -30,10 +30,10 @@ typedef struct Resource {
 extern f32 D_800E6790;
 extern s32 D_800E6794;
 extern s32 D_800E6798;
-extern f32 D_800E679C;
-extern f32 D_800E67A0;
-extern s32 D_800E67A4;
-extern s32 D_800E67A8;
+extern f32 sAnimRemapMin;
+extern f32 sAnimRemapMax;
+extern s32 sAnimTrackCount;
+extern s32 sAnimFrameCount;
 
 s32 ProPackDecompress(Resource **res, s32 arg1);
 void *CISet__GetBlock(void *file, s32 index);
@@ -91,16 +91,16 @@ static __inline__ s32 decodeAnim(void *src, void *dst) {
 
     D_800E6798 = 1;
     D_800E6794 = 0;
-    D_800E679C = -2000.0f;
-    D_800E67A0 = 2000.0f;
+    sAnimRemapMin = -2000.0f;
+    sAnimRemapMax = 2000.0f;
     D_800E6790 = h->fC;
     if (Anim_DecodeTracks(posSrc, posDst, h->posTracks, 3, h->radius, h->encoding) == 0) {
         ok = 0;
     } else {
         D_800E6798 = 0;
         D_800E6794 = 1;
-        D_800E679C = -1.0f;
-        D_800E67A0 = 1.0f;
+        sAnimRemapMin = -1.0f;
+        sAnimRemapMax = 1.0f;
         D_800E6790 = h->fC;
         ok = Anim_DecodeTracks(rotSrc, rotDst, h->rotTracks, 4, h->radius, h->encoding) != 0;
     }
@@ -149,15 +149,15 @@ void Anim_Decompress(s32 arg0, Resource **res) {
     CISet__GetBlockAndSize(anim, 2, &size7);
     CISet__GetBlock(chunk3, 0);
     n = h->frames;
-    D_800E67A4 = n;
-    D_800E67A8 = n;
+    sAnimTrackCount = n;
+    sAnimFrameCount = n;
     h->frameCount = n;
     h->frameStep = 1.0f;
     if (n >= 2) {
         h->frameStep = (f32) (n - 1) / (f32) (n - 1);
     }
-    posSize = (h->posTracks << 4) * D_800E67A8 + ((h->posTracks * 4 + 0xF) & ~7);
-    rotSize = (h->rotTracks << 4) * D_800E67A8 + ((h->rotTracks * 4 + 0xF) & ~7);
+    posSize = (h->posTracks << 4) * sAnimFrameCount + ((h->posTracks * 4 + 0xF) & ~7);
+    rotSize = (h->rotTracks << 4) * sAnimFrameCount + ((h->rotTracks * 4 + 0xF) & ~7);
     animSize = rotSize + posSize + 0x38;
     blk = CCache__AllocateMemoryForDecompression(0, res, oldSize - size5 + animSize);
     if (blk != NULL) {

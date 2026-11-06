@@ -18,7 +18,7 @@ typedef struct {
     /* 0x174 */ s8 unk174;
 } Boss00403660;
 
-extern s32 D_800B6D1C;
+extern s32 gEvenOdd;
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 void ScriptAnimator_Apply(Slot00403660 *slot);
 void ScreenTint_UpdateMode(void);
@@ -38,7 +38,7 @@ void MantidQueen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
 
     i = 0;
     bit = 1;
-    s = &D_8012F3A0;
+    s = &gMantidQueen;
     boss = (Boss00403660 *) s->actor;
     mask = boss->slotMask;
     slot = (Slot00403660 *) &s->spots[0].anim;
@@ -49,9 +49,9 @@ void MantidQueen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
             CGameObjectInstance__DrawShadow(actor, state, req);
             ScriptAnimator_Apply(slot);
             ScreenTint_UpdateMode();
-            Render_DrawModel(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[D_800B6D1C], 0, i,
+            Render_DrawModel(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[gEvenOdd], 0, i,
                           *(s8 *) (actor + 0x151));
-            D_800AB8B0.m_Mode = 0;
+            gBlendState.m_Mode = 0;
         }
         i++;
         slot++;

@@ -3,24 +3,24 @@
 
 #include "rw/abu_types.h"
 
-extern Link_func_8023CC08_de *D_80121294;
-extern Link_func_8023CC08_de *D_80121290;
+extern Link_func_8023CC08_de *gPager_chain_tail;
+extern Link_func_8023CC08_de *gPager_chain_head;
 extern Node_func_8023CC08_de *VM_FindRegion(u32 arg0);
 Link_func_8023CC08_de *VM_ReclaimLRUPage(void) {
     extern void VM_UnmapTLBEntry(void *arg0);
     Link_func_8023CC08_de *entry;
     Node_func_8023CC08_de *node;
-    entry = D_80121290;
+    entry = gPager_chain_head;
     if (entry->prev != 0) {
         entry->prev->next = *(Link_func_8023CC08_de * volatile *)&entry->next;
     } else {
-        D_80121290 = entry->next;
+        gPager_chain_head = entry->next;
         (*(Link_func_8023CC08_de * volatile *)&entry->next)->prev = 0;
     }
     if (entry->next != 0) {
         entry->next->prev = *(Link_func_8023CC08_de * volatile *)&entry->prev;
     } else {
-        D_80121294 = entry->prev;
+        gPager_chain_tail = entry->prev;
         (*(Link_func_8023CC08_de * volatile *)&entry->prev)->next = 0;
     }
     VM_UnmapTLBEntry(entry);

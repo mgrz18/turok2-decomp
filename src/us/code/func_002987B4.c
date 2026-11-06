@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 
 extern void osContGetReadData(ContPad *data);
-extern s8 D_801213DC;
+extern s8 __osContNumControllers;
 void osContGetReadData(ContPad *data) {
-    extern u8 D_801213E0[];
-    u8 *ptr = D_801213E0;
-    u8 *count = &D_801213DC;
+    extern u8 __osContBuffer[];
+    u8 *ptr = __osContBuffer;
+    u8 *count = &__osContNumControllers;
     ContReadFormat readformat;
     s32 i;
     for (i = 0; i < *count; i++, ptr += sizeof(ContReadFormat), data++) {

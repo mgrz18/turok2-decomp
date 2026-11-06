@@ -1,28 +1,28 @@
 #include "common.h"
 #include "structs/game.h"
 
-/* D_8011ACB0 (GameMatch in structs/game.h) as a local array view, under an
+/* gEngineApp_m_Settings_match (GameMatch in structs/game.h) as a local array view, under an
  * alias of the symbol: through it the compiler bases both stores on
- * D_8011ACB0 + 0x44, as the ROM does. */
+ * gEngineApp_m_Settings_match + 0x44, as the ROM does. */
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
     /* 0x44 */ s32 unk44;
     /* 0x48 */ s32 unk48;
 } Unk8011ACB0;
 
-extern u8 D_8011AD28[];
-extern u8 D_8011B120[];
-extern u8 D_800CFC80[];
-extern u8 D_8011AD90[];
-extern s32 D_800B6E98;
-extern u8 D_8011F128[];
-extern s32 D_800D8E24;
-extern u8 D_8011B0C8[];
-extern s32 D_80120690;
-extern u32 D_800C2210; /* task count */
-extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("D_8011ACB0");
-extern s32 D_80130940;
-extern s32 D_80130A88[];
+extern u8 gGfxFrameMessageQueue[];
+extern u8 gGfxFrameMessageBuffer[];
+extern u8 gSchedulerStack[];
+extern u8 gScheduler[];
+extern s32 gThreadPriorityScheduler;
+extern u8 gGfxClient[];
+extern s32 gDList;
+extern u8 gIdentityMtx[];
+extern s32 gWarmBoot;
+extern u32 gTotalFramebuffers; /* task count */
+extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("gEngineApp_m_Settings_match");
+extern s32 gCameraPoolHideViews;
+extern s32 gCFB[];
 
 extern void osCreateMesgQueue(void *, void *, s32);
 extern void memset(void *, s32, s32);
@@ -45,17 +45,17 @@ void CEngineApp__Construct(CEngineApp *state) {
     u32 prev;
     u32 next;
 
-    osCreateMesgQueue(D_8011AD28, D_8011B120, 0x1000);
-    memset(D_800CFC80, 7, 0x2000);
-    osCreateScheduler(D_8011AD90, D_800CFC80 + 0x2000, D_800B6E98, 0, 1);
-    osScAddClient(D_8011AD90, D_8011F128, D_8011AD28);
+    osCreateMesgQueue(gGfxFrameMessageQueue, gGfxFrameMessageBuffer, 0x1000);
+    memset(gSchedulerStack, 7, 0x2000);
+    osCreateScheduler(gScheduler, gSchedulerStack + 0x2000, gThreadPriorityScheduler, 0, 1);
+    osScAddClient(gScheduler, gGfxClient, gGfxFrameMessageQueue);
     state->m_Settings.prevMode = -1;
     CEngineApp__InitFade(state);
-    D_800D8E24 = 0;
-    guMtxIdent(D_8011B0C8);
-    if (D_80120690 != 0) {
+    gDList = 0;
+    guMtxIdent(gIdentityMtx);
+    if (gWarmBoot != 0) {
         SavedPlayers_Clear();
-        GameSettings_SetDefaults(&D_8011AAD8);
+        GameSettings_SetDefaults(&gEngineApp_m_Settings);
     }
     func_00430500(&state->m_Game.m_Automap);
     i = 0;
@@ -68,12 +68,12 @@ void CEngineApp__Construct(CEngineApp *state) {
     state->m_Settings.paused = 0;
     D_8011ACB0_arr->unk44 = 0;
     D_8011ACB0_arr->unk48 = 0;
-    D_80130940 = 0;
-    for (; i < D_800C2210; i++) {
-        prev = (i - 1 + D_800C2210) % D_800C2210;
-        next = (i + 1 + D_800C2210) % D_800C2210;
+    gCameraPoolHideViews = 0;
+    for (; i < gTotalFramebuffers; i++) {
+        prev = (i - 1 + gTotalFramebuffers) % gTotalFramebuffers;
+        next = (i + 1 + gTotalFramebuffers) % gTotalFramebuffers;
         state->m_FrameData[i].m_Msg.m_Type = 2;
-        state->m_FrameData[i].m_pFrameBuffer = D_80130A88[i];
+        state->m_FrameData[i].m_pFrameBuffer = gCFB[i];
         state->m_FrameData[i].m_pPrev = &state->m_FrameData[prev];
         state->m_FrameData[i].m_pNext = &state->m_FrameData[next];
         CSunFrameData__Construct(&state->m_FrameData[i]);

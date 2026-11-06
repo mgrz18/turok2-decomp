@@ -13,11 +13,11 @@ typedef struct {
 extern f32 gFrameIncrement;          /* frame time */
 extern f32 D_800ADDE4;          /* charge speed */
 extern f32 D_800AE344;          /* step length */
-extern CVector3 D_800ADCB0;        /* rider view offset */
-extern CVector3 D_800ADCBC;        /* rider seat */
-extern char D_800ADEA0;         /* riding look tuning */
-extern char D_800ADDE0;         /* riding forward move tuning */
-extern char D_800ADE04;         /* riding backward move tuning */
+extern CVector3 gRidingEyeOffset;        /* rider view offset */
+extern CVector3 gRidingScale;        /* rider seat */
+extern char gRidingLookTuning;         /* riding look tuning */
+extern char gRidingForwardMoveTuning;         /* riding forward move tuning */
+extern char gRidingBackwardMoveTuning;         /* riding backward move tuning */
 
 f32 func_002974C0(f32 x);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
@@ -51,7 +51,7 @@ void CPlayer__UpdateRiding(CPlayer *player, CGameObjectInstance *body) {
     yaw = body->m_RotY;
     Math_EaseToward(&body->m_RotY, yaw + turn, 0.9f);
     Math_EaseToward(&player->m_vHeadRotOffset.z, ((yaw - body->m_RotY) + player->m_ContState.m_FinalLookX * 8.0f) * 0.017453294f, 0.1f);
-    CPlayer__TurnAndLook(player, body, &D_800ADEA0);
+    CPlayer__TurnAndLook(player, body, &gRidingLookTuning);
 
     offset = NULL;
     if (player->m_ContState.m_dwButtonsDouble & 8) {
@@ -100,9 +100,9 @@ void CPlayer__UpdateRiding(CPlayer *player, CGameObjectInstance *body) {
     }
 
     if (player->m_Speed > 0.0f) {
-        CPlayer__MoveOnFoot(player, body, &D_800ADDE0);
+        CPlayer__MoveOnFoot(player, body, &gRidingForwardMoveTuning);
     } else {
-        CPlayer__MoveOnFoot(player, body, &D_800ADE04);
+        CPlayer__MoveOnFoot(player, body, &gRidingBackwardMoveTuning);
     }
     t = player->m_Speed;
     if ((t < 0.0f ? -t : t) > 10.24f) {
@@ -110,8 +110,8 @@ void CPlayer__UpdateRiding(CPlayer *player, CGameObjectInstance *body) {
     }
 
     if (player->m_OnEnemyObjectType == 0x136) {
-        offset = &D_800ADCB0;
-        player->m_vOnEnemyScale = D_800ADCBC;
+        offset = &gRidingEyeOffset;
+        player->m_vOnEnemyScale = gRidingScale;
     }
     if (offset != NULL) {
         CMtxF__SetRotateY(&m, body->m_RotY);

@@ -15,9 +15,9 @@ typedef struct {
     /* 0x1A8 */ CPlayer *owner;
 } WeaponModel;
 
-extern s32 D_800AE37C;             /* flip x */
-extern s32 D_800AE380;             /* flip y */
-extern s32 D_800AE384;             /* flip z */
+extern s32 sWeaponFlipX;             /* flip x */
+extern s32 sWeaponFlipY;             /* flip y */
+extern s32 sWeaponFlipZ;             /* flip z */
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern void CMtxF__SetScale(f32 *mtx, f32 x, f32 y, f32 z);
 extern void CMtxF__GetTranslation(void *src, CVector3 *out);
@@ -38,14 +38,14 @@ void WeaponActor_BuildMatrix(WeaponModel *model) {
     CPlayer *player;
 
     player = model->owner;
-    viewOffset = D_800AF618[player->m_Data.m_CurrentWeapon]->viewOffset;
-    if (D_800AE37C) {
+    viewOffset = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->viewOffset;
+    if (sWeaponFlipX) {
         viewOffset.x = -viewOffset.x;
     }
-    if (D_800AE380) {
+    if (sWeaponFlipY) {
         viewOffset.y = -viewOffset.y;
     }
-    if (D_800AE384) {
+    if (sWeaponFlipZ) {
         viewOffset.z = -viewOffset.z;
     }
     CVector3__Scale(&scaled, &model->offset, 0.1f);

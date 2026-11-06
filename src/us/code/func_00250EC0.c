@@ -132,7 +132,7 @@ void PlayerClimb_Update(CPlayer *player, CGameObjectInstance *body) {
         up = 0;
     }
     down = 0;
-    if (!D_8011AAD8.multiplayer && player->m_ContState.m_FinalMoveY < 0.0f) {
+    if (!gEngineApp_m_Settings.multiplayer && player->m_ContState.m_FinalMoveY < 0.0f) {
         down = 1;
     }
     lastForward = player->m_Speed;
@@ -159,7 +159,7 @@ void PlayerClimb_Update(CPlayer *player, CGameObjectInstance *body) {
         player->m_ModeTime = time - 11.25f;
         player->m_Speed *= 0.1f;
         player->m_SideSpeed *= 0.1f;
-        if (D_8011AAD8.multiplayer) {
+        if (gEngineApp_m_Settings.multiplayer) {
             if (player->m_pOptions->m_TagMode == 1) {
                 Sound__Play2D(0x27DB);
             } else {

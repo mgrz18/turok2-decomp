@@ -7,7 +7,7 @@
  * (Shadow_DrawBlob). Otherwise its projected shadow model is built once, while
  * above the ground: the current view's light direction (signed bytes) and
  * strength (colour) are sampled at the actor (DLights_GetAtPoint), the alpha is
- * 128 + 56 per unit of light (faded by D_800AB8C0 during a fade), the
+ * 128 + 56 per unit of light (faded by gBlendFade during a fade), the
  * direction is kept at least 0.15 from horizontal and the model is projected
  * along it onto a plane just under the actor (0.9 of its height, up to 512),
  * grown by 0.003 per unit of height, turned like the actor and set on the
@@ -26,10 +26,10 @@ typedef struct {
     s32 blobType;           /* 0x10 */
 } ShadowParams;
 
-extern s32 D_800AB8B0;      /* fade mode */
-extern f32 D_800AB8C0;      /* fade level */
-extern s32 D_800B6D1C;      /* current view */
-extern u8 D_800F7148[];
+extern s32 gBlendState;      /* fade mode */
+extern f32 gBlendFade;      /* fade level */
+extern s32 gEvenOdd;      /* current view */
+extern u8 gScene_m_Heap[];
 extern u8 D_8010FF34[];
 
 s32 func_00268160(void);
@@ -73,11 +73,11 @@ void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, s32 unused, ShadowP
                 if (512.0f < t) {
                     dy = 512.0f;
                 }
-                a->m_pmfShadow = MtxPool_Alloc(D_800F7148, 1);
+                a->m_pmfShadow = MtxPool_Alloc(gScene_m_Heap, 1);
                 if (a->m_pmfShadow == NULL) {
                     goto end;
                 }
-                light = (Light *) a->m_Lights[D_800B6D1C];
+                light = (Light *) a->m_Lights[gEvenOdd];
                 dir.x = light->dir[0] * 0.007874016f;
                 dir.y = light->dir[1] * 0.007874016f;
                 dir.z = light->dir[2] * 0.007874016f;
@@ -90,8 +90,8 @@ void CGameObjectInstance__DrawShadow(CGameObjectInstance *a, s32 unused, ShadowP
                     r = -1.0f;
                 }
                 v = (s32) (r * 56.0f + 128.0f);
-                if (D_800AB8B0 == 1) {
-                    v = (s32) ((f32) v * D_800AB8C0 * 0.003921569f);
+                if (gBlendState == 1) {
+                    v = (s32) ((f32) v * gBlendFade * 0.003921569f);
                 }
                 a->m_ShadowAlpha = v;
                 dir.y = 1.0f;

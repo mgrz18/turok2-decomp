@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 
 extern s32 gCache;
-extern int D_800D8210[];
-extern s32 D_800D8DA4[];
-extern s32 D_800D8DD0;
-extern int D_800AB0C0;
+extern int gCache_dlistBlocking[];
+extern s32 gCache_dlistCount[];
+extern s32 gCache_blocker;
+extern int gCacheEntryCount;
 extern void osSendMesg(void *arg0, s32 arg1, s32 arg2);
 void CCache__ReleaseDisplayList(s32 unused, s32 arg1) {
     s32 mask;
@@ -16,15 +16,15 @@ void CCache__ReleaseDisplayList(s32 unused, s32 arg1) {
     u32 new_var2;
     s32 offset;
     u32 limit;
-    if (D_800D8210[arg1] != 0) {
-        D_800D8210[arg1] = 0;
-        osSendMesg(&D_800D8DD0, 0, 1);
+    if (gCache_dlistBlocking[arg1] != 0) {
+        gCache_dlistBlocking[arg1] = 0;
+        osSendMesg(&gCache_blocker, 0, 1);
     }
     mask = -0x201;
     if (arg1 != 0) {
         mask = -0x401;
     }
-    do { count = 0; limit = D_800AB0C0; } while (0);
+    do { count = 0; limit = gCacheEntryCount; } while (0);
     new_var2 = limit;
     if (limit != 0) {
         offset = count;
@@ -35,5 +35,5 @@ void CCache__ReleaseDisplayList(s32 unused, s32 arg1) {
             offset += 0x28;
         } while (count < new_var2);
     }
-    do { D_800D8DA4[arg1] = 0; } while (0);
+    do { gCache_dlistCount[arg1] = 0; } while (0);
 }

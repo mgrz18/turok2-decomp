@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
 extern f32 gFrameIncrement;          /* the frame's time step */
 s32 Cinema_PathPlaying(void);
 void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam);
@@ -42,8 +42,8 @@ void CCameraPool__AdvanceText(CCameraPool *pool, CCamera *cam) {
     width = cam->m_Viewport.m_Width;
     left = cam->m_Viewport.m_ScreenPosX;
     top = cam->m_Viewport.m_ScreenPosY;
-    yScale = height / D_800C2034;
-    xScale = width / D_800C2030;
+    yScale = height / gScreenHeight;
+    xScale = width / gScreenWidth;
     small = 1;
     if (!(xScale < size) && !(yScale < size)) {
         small = 0;

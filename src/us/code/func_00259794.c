@@ -17,6 +17,6 @@ void WeaponMode_AE714_Enter(CGameObjectInstance *actor, State *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
 
     state->unk64 = 0;
-    state->unk118 = D_800AF618[((CPlayer *)actor->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * 15.0f;
+    state->unk118 = gWeaponInfoTable[((CPlayer *)actor->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * 15.0f;
     CPlayer__StartWeaponFiringSound(player, 0x1A9);
 }

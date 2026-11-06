@@ -2,7 +2,7 @@
 #include "gfx.h"
 #include "structs/menu.h"
 
-extern s32 D_800C1BD0;       /* current draw mode */
+extern s32 gMenuCurrentFont;       /* current draw mode */
 
 s32 CPlayer__GetPickupCountHigh(u8 *player, s32 type);
 void Hud_SetupTextureMode(s32 alpha);
@@ -39,26 +39,26 @@ void InventoryMenu_DrawItem(MenuItem *item, MenuItemLayout *box, s32 unused, Men
             owned = (player + index)[0x9FC] != 0;
             break;
     }
-    if (D_800C1BD0 != 0x14) {
-        D_800C1BD0 = 0x14;
+    if (gMenuCurrentFont != 0x14) {
+        gMenuCurrentFont = 0x14;
         Hud_SetupTextureMode((s32) (window->fade * (window->alpha * 255.0f)));
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE7000000;
         g->w1 = 0;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE3000A01;
         g->w1 = 0x100000;
     }
     if (owned) {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xFB000000;
         g->w1 = ((s32) (window->fade * (window->alpha * 255.0f)) & 0xFF) | 0xFFFFFF00;
     } else {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xFB000000;
         g->w1 = ((s32) (window->fade * (window->alpha * 255.0f)) & 0xFF) | 0x32323200;
     }

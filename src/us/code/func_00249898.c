@@ -4,7 +4,7 @@
 #include "structs/weapon.h"
 #include "structs/camera.h"
 
-#define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 extern u8 gEngineApp[];
 void Render_InvalidateModeCache(void);
@@ -25,7 +25,7 @@ void CPlayer__DrawWeaponOverlay(CPlayer *player, CCamera *view) {
     GFX_CMD(0xE3001201, 0x2000)
     GFX_CMD(0xE3000C00, 0x80000)
     Render_InvalidateModeCache();
-    def = D_800AF618[player->m_Data.m_CurrentWeapon];
+    def = gWeaponInfoTable[player->m_Data.m_CurrentWeapon];
     vp = &view->m_Viewport;
     sx = vp->m_Width;
     sy = vp->m_Height;

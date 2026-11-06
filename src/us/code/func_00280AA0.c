@@ -20,8 +20,8 @@ typedef struct CGlareSource {
 
 extern CGlareSource *D_8010753C;
 extern f32 D_800A9BD0;
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
 void Hud_SetupTextureMode(s32 a);
 void Render_SetRenderMode(s32 a);
 void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);
@@ -33,9 +33,9 @@ static inline void ScreenPos(CCamera *cam, CVector3 *point, f32 *x, f32 *y) {
     f32 half;
 
     CMtxF__TransformPointProjective(&cam->m_mfProjection, point, &value);
-    half = (f32) (D_800C2030 / 2);
+    half = (f32) (gScreenWidth / 2);
     *x = value.x * half + half;
-    *y = value.y * (f32) (-D_800C2034 / 2) + (f32) (D_800C2034 / 2);
+    *y = value.y * (f32) (-gScreenHeight / 2) + (f32) (gScreenHeight / 2);
 }
 
 /* The glares (lens flares) of the objects this camera sees. */
@@ -50,7 +50,7 @@ void CCamera__DrawGlares(CCamera *cam) {
     mask = 8 << cam->m_Index;
     Hud_SetupTextureMode(0x64);
     Render_SetRenderMode(0x1A);
-    pp = (u32 **) &D_800D8E24;
+    pp = (u32 **) &gDList;
     q0 = *pp;
     dl = q0;
     __asm__("" : "+r"(dl));

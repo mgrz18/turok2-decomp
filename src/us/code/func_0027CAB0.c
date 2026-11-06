@@ -21,13 +21,13 @@ typedef struct {
 } CRegionSetAttributes;
 
 extern s32 gScene[];
-extern s32 D_8011ACA4;
-extern CCamera *D_801198B4;     /* the camera pool's first camera */
-extern s32 D_8011AC88;          /* game mode */
-extern s32 D_8011AC8C;
-extern CPlayer *D_80119890; /* the players */
-extern s32 D_80130940;
-extern s32 D_800B6D20;
+extern s32 gEngineApp_m_Settings_paused;
+extern CCamera *gEngineApp_m_Game_m_CameraPool_m_Cameras;     /* the camera pool's first camera */
+extern s32 gEngineApp_m_Settings_mode;          /* game mode */
+extern s32 gEngineApp_m_Settings_nextMode;
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* the players */
+extern s32 gCameraPoolHideViews;
+extern s32 gFrameCountGameplay;
 extern f32 gFrameIncrement;          /* the frame's time step */
 CRegionSetAttributes *CScene__GetRegionInfo(s32 *list, u16 *key);
 s32 Cinema_OverridesMusic1(void);
@@ -41,7 +41,7 @@ static __inline__ CPlayer *GetPlayer(CCamera *cam) {
     CPlayer *player;
     CPlayer *node;
 
-    for (player = D_80119890; player != NULL; player = player->m_pNext) {
+    for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
         if (player->m_pCamera == cam) {
             return player;
         }
@@ -78,7 +78,7 @@ void CCamera__AdvanceAttributes(CCamera *cam) {
     if (rec == NULL) {
         return;
     }
-    if (D_8011ACA4 == 0 && cam == D_801198B4 && D_8011AC88 == 13 && D_8011AC8C == D_8011AC88) {
+    if (gEngineApp_m_Settings_paused == 0 && cam == gEngineApp_m_Game_m_CameraPool_m_Cameras && gEngineApp_m_Settings_mode == 13 && gEngineApp_m_Settings_nextMode == gEngineApp_m_Settings_mode) {
         if (Cinema_OverridesMusic1() == 0) {
             Sound__SetAmbientTrack(rec->m_Music1);
         }
@@ -130,7 +130,7 @@ void CCamera__AdvanceAttributes(CCamera *cam) {
             fov = rec->m_HeldFieldOfView;
         } while (0);
     } else {
-        if (D_80130940 != 0) {
+        if (gCameraPoolHideViews != 0) {
             u8 *p;
 
             for (i = 3, p = &target[3]; i >= 0; i--) {
@@ -146,7 +146,7 @@ void CCamera__AdvanceAttributes(CCamera *cam) {
         farClip = rec->m_FarClip;
         fov = rec->m_FieldOfView;
     }
-    if (D_800B6D20 == 0 || rec->m_BlendTime == 0.0f) {
+    if (gFrameCountGameplay == 0 || rec->m_BlendTime == 0.0f) {
         cam->m_cRegionSetBlend = 1.0f;
     } else {
         t = cam->m_cRegionSetBlend + gFrameIncrement / (rec->m_BlendTime * 15.0f);

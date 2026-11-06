@@ -5,10 +5,10 @@
 
 extern s32 CAudioWorld__PlaySoundIndex(void *, s32, CVector3, s32);
 extern int CAudioWorld__PlaySoundIndex(void *arg0, int arg1, CVector3 arg2, int arg3);
-extern int D_8011ACA0;
+extern int gEngineApp_m_Settings_unk1C8;
 s32 Sound__PlayIndex(s32 arg0, CVector3 arg1, s32 arg2) {
     extern s32 gAudioWorld;
-    if (D_8011ACA0 != 0) {
+    if (gEngineApp_m_Settings_unk1C8 != 0) {
         return -1;
     }
     return CAudioWorld__PlaySoundIndex(&gAudioWorld, arg0, arg1, arg2);

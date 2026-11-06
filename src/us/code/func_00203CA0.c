@@ -6,7 +6,7 @@
 #include "structs/list.h"
 #include "structs/cache.h"
 
-extern int D_800D8DCC;
+extern int gCache_mutex_count;
 struct Manager;
 struct Manager {
     char queue[0x92C];
@@ -40,10 +40,10 @@ extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 extern void CCache__FreeCacheEntry(s32 arg0, void *arg1);
 void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
-extern s32 D_800D81E0;
-extern s32 D_800D8DF0;
-extern s32 D_800D81C0;
-extern s32 D_800D81C4;
+extern s32 gCache_memAgeList;
+extern s32 gCache_ageCount;
+extern s32 gHashMask;
+extern s32 gHashTable;
 extern u32 __osDisableInt(void);
 extern CCacheEntry *CCache__AllocCacheEntry(s32, s32);
 extern void CDecompressor__DecompressSync(s32 *, CCacheEntry *);
@@ -54,8 +54,8 @@ static __inline__ void addref(CMemEntry *node) {
     node->flags |= 0x100;
 }
 static __inline__ void stamp(CMemEntry *node) {
-    node->age = D_800D8DF0;
-    CList__MoveToHead(&D_800D81E0, node);
+    node->age = gCache_ageCount;
+    CList__MoveToHead(&gCache_memAgeList, node);
 }
 static __inline__ void unref(CMemEntry *node) {
     if (--node->lockCount == 0) {
@@ -63,25 +63,25 @@ static __inline__ void unref(CMemEntry *node) {
     }
 }
 static __inline__ void acquire(void) {
-    extern Manager D_800D8450;
+    extern Manager gCache_queue;
     u32 token = __osDisableInt();
-    s32 counter = D_800D8DCC + 1;
-    D_800D8DCC = counter;
+    s32 counter = gCache_mutex_count + 1;
+    gCache_mutex_count = counter;
     if (counter != 1) {
         __osRestoreInt(token);
-        osRecvMesg(D_800D8450.lock, 0, 1);
+        osRecvMesg(gCache_queue.lock, 0, 1);
     } else {
         __osRestoreInt(token);
     }
 }
 static __inline__ void release(void) {
-    extern Manager D_800D8450;
+    extern Manager gCache_queue;
     u32 token = __osDisableInt();
-    s32 counter = D_800D8DCC - 1;
-    D_800D8DCC = counter;
+    s32 counter = gCache_mutex_count - 1;
+    gCache_mutex_count = counter;
     if (counter != 0) {
         __osRestoreInt(token);
-        osSendMesg(D_800D8450.lock, 0, 1);
+        osSendMesg(gCache_queue.lock, 0, 1);
     } else {
         __osRestoreInt(token);
     }
@@ -89,20 +89,20 @@ static __inline__ void release(void) {
 extern s32 CDecompressor__DecompressAsync(void *, void *, Manager *);
 extern s32 gDecompressor;
 static __inline__ void lock(void) {
-    extern Manager D_800D8450;
+    extern Manager gCache_queue;
     u32 token = __osDisableInt();
-    s32 counter = D_800D8DCC + 1;
-    D_800D8DCC = counter;
+    s32 counter = gCache_mutex_count + 1;
+    gCache_mutex_count = counter;
     if (counter != 1) {
         __osRestoreInt(token);
-        osRecvMesg(D_800D8450.lock, 0, 1);
+        osRecvMesg(gCache_queue.lock, 0, 1);
     } else {
         __osRestoreInt(token);
     }
 }
 CMemEntry *CCache__RequestDecompression(s32 unused, s32 key, CMemEntry *first, CMemEntry *second, s32 mode, void *owner,
                     void *tag, void *spare, s32 async) {
-    extern Manager D_800D8450;
+    extern Manager gCache_queue;
     ResourceHashEntry *node;
     CCacheEntry *found;
     CCacheEntry **out;
@@ -110,9 +110,9 @@ CMemEntry *CCache__RequestDecompression(s32 unused, s32 key, CMemEntry *first, C
     s32 busy;
     acquire();
     out = &found;
-    node = (ResourceHashEntry *)((s32)D_800D81C4 +
+    node = (ResourceHashEntry *)((s32)gHashTable +
         ((((key << 5) ^ ((u32)key >> 1) ^ ((u32)key >> 9) ^
-           ((u32)key >> 17)) & D_800D81C0) * 0x10));
+           ((u32)key >> 17)) & gHashMask) * 0x10));
     if (node->key != key) {
         goto not_initial;
     }
@@ -142,8 +142,8 @@ done:
         release();
         return found->memEntry;
     }
-    async |= D_800D8450.mask;
-    scan = D_800D8450.active.m_pHead;
+    async |= gCache_queue.mask;
+    scan = gCache_queue.active.m_pHead;
     while (scan != 0) {
         if (scan->requestId == key) {
             busy = 1;
@@ -167,8 +167,8 @@ done:
             if (second != 0) {
                 addref(second);
             }
-            CList__Remove(&D_800D8450.pending, found);
-            CList__AddTail(&D_800D8450.active, found);
+            CList__Remove(&gCache_queue.pending, found);
+            CList__AddTail(&gCache_queue.active, found);
             release();
             if (async != 0) {
                 found->flags &= ~0xE;
@@ -181,7 +181,7 @@ done:
                 }
                 return 0;
             }
-            if (CDecompressor__DecompressAsync(&gDecompressor, found, &D_800D8450) == 0) {
+            if (CDecompressor__DecompressAsync(&gDecompressor, found, &gCache_queue) == 0) {
                 acquire();
                 if (first != 0) {
                     unref(first);
@@ -189,8 +189,8 @@ done:
                 if (second != 0) {
                     unref(second);
                 }
-                CList__Remove(&D_800D8450.active, found);
-                CList__AddHead(&D_800D8450.pending, found);
+                CList__Remove(&gCache_queue.active, found);
+                CList__AddHead(&gCache_queue.pending, found);
                 CCache__FreeCacheEntry(0, found);
                 release();
             }

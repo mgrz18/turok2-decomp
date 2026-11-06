@@ -8,35 +8,35 @@ s32 WeaponsMenu_Toggle(s32 *arg0) {
     GameSettings *base;
     switch (arg0[0]) {
         case 2:
-            base = &D_8011AAD8;
+            base = &gEngineApp_m_Settings;
             base->weaponEnabled[1] ^= 1;
             break;
         case 3:
-            base = &D_8011AAD8;
+            base = &gEngineApp_m_Settings;
             base->weaponEnabled[2] ^= 1;
             break;
         case 4:
-            base = &D_8011AAD8;
+            base = &gEngineApp_m_Settings;
             base->weaponEnabled[3] ^= 1;
             break;
         case 5:
-            base = &D_8011AAD8;
+            base = &gEngineApp_m_Settings;
             base->weaponEnabled[4] ^= 1;
             break;
         case 6:
-            base = &D_8011AAD8;
+            base = &gEngineApp_m_Settings;
             base->weaponEnabled[5] ^= 1;
             break;
         case 7:
-            base = &D_8011AAD8;
+            base = &gEngineApp_m_Settings;
             base->weaponEnabled[6] ^= 1;
             break;
         case 8:
-            base = &D_8011AAD8;
+            base = &gEngineApp_m_Settings;
             base->weaponEnabled[7] ^= 1;
             break;
         case 9:
-            base = &D_8011AAD8;
+            base = &gEngineApp_m_Settings;
             base->weaponEnabled[9] ^= 1;
             break;
     }

@@ -8,7 +8,7 @@
 
 
 
-extern s32 D_80130924;
+extern s32 sCheatsMenuSelection;
 extern u8 gScene[];
 
 extern s32 Controller_ConfirmPressed(s32 pad);
@@ -67,8 +67,8 @@ static __inline__ s32 findLevel(s32 step) {
     s32 n;
     u32 keys;
 
-    sel = D_80130924;
-    keys = D_80119870.m_Settings.unlockedCheats;
+    sel = sCheatsMenuSelection;
+    keys = gEngineApp_m_Game.m_Settings.unlockedCheats;
     for (n = 0; n < 11; n++) {
         sel += step;
         if (sel > 10) {
@@ -87,7 +87,7 @@ s32 CheatsMenu_WarpSelect(void *menu, Menu *c) {
     s32 id;
     GameSettings *progress;
 
-    switch (D_80130924) {
+    switch (sCheatsMenuSelection) {
     case 0:
     default:
         id = 1000;
@@ -125,16 +125,16 @@ s32 CheatsMenu_WarpSelect(void *menu, Menu *c) {
     }
     if (Controller_ConfirmPressed(c->controller) != 0) {
         if (id == 8000) {
-            D_80119870.m_Settings.playerCount = 1;
+            gEngineApp_m_Game.m_Settings.playerCount = 1;
             Menu_ClaimPressingController(c);
             CEngineApp__SetupFadeTo(&gEngineApp, 16);
             return 1;
         }
-        if (D_80119870.m_Settings.mode == 13) {
+        if (gEngineApp_m_Game.m_Settings.mode == 13) {
             CScene__RequestWarp(gScene, id, 2);
             return 0;
         }
-        progress = &D_80119870.m_Settings;
+        progress = &gEngineApp_m_Game.m_Settings;
         progress->multiplayer = 0;
         progress->playerCount = 1;
         Menu_ClaimPressingController(c);
@@ -142,9 +142,9 @@ s32 CheatsMenu_WarpSelect(void *menu, Menu *c) {
         return 1;
     }
     if (Controller_MenuLeft(c->controller) != 0) {
-        D_80130924 = findLevel(-1);
+        sCheatsMenuSelection = findLevel(-1);
     } else if (Controller_MenuRight(c->controller) != 0) {
-        D_80130924 = findLevel(1);
+        sCheatsMenuSelection = findLevel(1);
     } else {
         return 0;
     }

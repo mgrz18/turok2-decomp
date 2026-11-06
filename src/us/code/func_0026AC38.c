@@ -7,12 +7,12 @@ extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern float D_800A7FC4;
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 extern f32 func_00298470(f32);
 extern float D_800A7FBC[];
-extern float D_800DD78C;
+extern float gQuaternionSin;
 extern void CGameRegion__GetCeilingNormal(CVector3 *);
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, float);
@@ -45,7 +45,7 @@ Vector4f *CGameRegion__GetCeilingTiltRotation(Vector4f *out) {
         result.x = axis.x * scale;
         result.y = axis.y * scale;
         result.z = axis.z * scale;
-        D_800DD78C = scale;
+        gQuaternionSin = scale;
         result.w = func_002974C0(angle);
     }
     *out = result;

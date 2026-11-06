@@ -63,7 +63,7 @@ struct Emit {
 };
 extern f32 D_800A6534;
 extern f32 D_800A6538;
-extern s32 D_800B6D1C;
+extern s32 gEvenOdd;
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
 void CMtxF__ClampEntries(void *);
@@ -77,10 +77,10 @@ void func_00236A34(Emit *e, EmitNode *n) {
     o = n->unkB0;
     if (o != ((void *)0)) {
         if (o == (EmitOwner *)-1) {
-            n->mtx[D_800B6D1C] = n->mtx[D_800B6D1C ^ 1];
+            n->mtx[gEvenOdd] = n->mtx[gEvenOdd ^ 1];
             n->unkB0 = ((void *)0);
         } else {
-            CMtxF__FromMtxAffine(m, (u8 *)o + ((D_800B6D1C << 6) + 0x48));
+            CMtxF__FromMtxAffine(m, (u8 *)o + ((gEvenOdd << 6) + 0x48));
             s = D_800A6534;
             if (o->info->unk14 != 0) {
                 s = D_800A6538;
@@ -91,7 +91,7 @@ void func_00236A34(Emit *e, EmitNode *n) {
             if (e->flags & 4) {
                 CMtxF__GetScale(m, n->v1C);
             } else {
-                CMtxF__ToMtxAffine(m, &n->mtx[D_800B6D1C]);
+                CMtxF__ToMtxAffine(m, &n->mtx[gEvenOdd]);
             }
         }
         n->unk8 = *(f32 *)((u8 *)e->def + 8);

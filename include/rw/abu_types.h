@@ -2867,7 +2867,7 @@ struct MenuRecAt10 {
     struct EntryRecAt18V2 *entries;
     s32 count;
 };
-/* ControllerProfile: Turok 2's controller state, D_800F5EC0 (one definition). */
+/* ControllerProfile: Turok 2's controller state, gControllers (one definition). */
 #include "structs/controller.h"
 struct func_8022A404_S1;
 struct func_8022A404_S1 {

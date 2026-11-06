@@ -32,11 +32,11 @@ typedef struct Handle {
     void *data;
 } Handle;
 
-extern CVector3 D_80119928;
-extern s32 D_80119948;
+extern CVector3 gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos;
+extern s32 gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion;
 
-extern CPlayer *D_80119874;
-extern s32 D_80119878;
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_Players;
+extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;
 
 extern s32 ProPackDecompress(Handle **handle, s32);
 extern s32 CScene__GetRegion(CScene *world, s32);
@@ -131,11 +131,11 @@ void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
                     continue;
                 }
                 world->m_nFirstActor++;
-                memcpy(&D_80119928, &rec->pos, sizeof(CVector3));
-                D_80119928.y += 204.79999f;
-                D_80119948 = CScene__FindRegionAt(world, &rec->pos);
-                for (playerIndex = 0; playerIndex < D_80119878; playerIndex++) {
-                    player = &D_80119874[playerIndex];
+                memcpy(&gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos, &rec->pos, sizeof(CVector3));
+                gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos.y += 204.79999f;
+                gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion = CScene__FindRegionAt(world, &rec->pos);
+                for (playerIndex = 0; playerIndex < gEngineApp_m_Game_m_PlayerList_m_nPlayers; playerIndex++) {
+                    player = &gEngineApp_m_Game_m_PlayerList_m_Players[playerIndex];
                     if (nspawns != 0) {
                         rec->spawnId = spawns[spawnIndex].m_nID;
                         Angle_Wrap(&spawns[spawnIndex].m_RotY);

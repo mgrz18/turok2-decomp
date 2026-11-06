@@ -9,9 +9,9 @@
 #include "structs/pager.h"
 
 
-extern char D_80120DC0[];               /* the reader thread's stack; its OSThread is 0x230 below */
+extern char gPager_readerStack[];               /* the reader thread's stack; its OSThread is 0x230 below */
 extern char gLoader[];               /* the cartridge reader */
-extern char D_80132000[];               /* the page array, 0x1000 per page */
+extern char gVMPages[];               /* the page array, 0x1000 per page */
 
 void memset(void *dst, s32 value, s32 size);
 void osCreateThread(void *thread, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
@@ -37,15 +37,15 @@ void VM_ReaderThread(void *unused) {
 
     osCreateMesgQueue(&queue, &queueMessage, 1);
     for (;;) {
-        osRecvMesg(&D_801206A0.pending, &message, 1);
+        osRecvMesg(&gPager.pending, &message, 1);
         if (*((PageJob *)message)->slot == 0xFF) {
             CLoader__LoadSync(gLoader, ((PageJob *)message)->source, (((PageJob *)message)->size + 1) & ~1,
-                          D_80132000 + (((PageJob *)message)->mapping->index << 12));
-            osInvalDCache(D_80132000 + (((PageJob *)message)->mapping->index << 12), 0x1000);
-            osInvalICache(D_80132000 + (((PageJob *)message)->mapping->index << 12), 0x1000);
+                          gVMPages + (((PageJob *)message)->mapping->index << 12));
+            osInvalDCache(gVMPages + (((PageJob *)message)->mapping->index << 12), 0x1000);
+            osInvalICache(gVMPages + (((PageJob *)message)->mapping->index << 12), 0x1000);
         }
         ((PageJob *)message)->type = 1;
-        osSendMesg(&D_801206A0.completion, message, 1);
+        osSendMesg(&gPager.completion, message, 1);
     }
 }
 

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern s32 D_800C2034;          /* screen height */
+extern s32 gScreenHeight;          /* screen height */
 extern f32 gFrameIncrement;          /* the frame's time step */
 void COnScreen__BeginText(void);
 void COnScreen__SelectTinyFont(void);
@@ -29,7 +29,7 @@ void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam) {
     f = 9.0f;
     prev = cam->m_ActiveTextList.m_pHead;
     if (prev != NULL) {
-        prev->m_PositionY = D_800C2034 * 0.81f;
+        prev->m_PositionY = gScreenHeight * 0.81f;
         for (text = prev->m_pNext; text != NULL; text = text->m_pNext) {
             text->m_PositionY = prev->m_PositionY + f;
             prev = text;

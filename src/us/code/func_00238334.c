@@ -11,8 +11,8 @@ typedef struct BlastActor {
 } BlastActor;
 
 extern CCollisionResults gCollisionResults;  /* the last collision test: the node it hit (m_Frame) is the armour to use */
-extern HitFrame D_800F1970;
-extern u8 D_8011AAF1;
+extern HitFrame sBlastShieldFrame;
+extern u8 gEngineApp_m_Settings_multiplayer;
 
 f32 CVector3__Distance(CVector3 *a, CVector3 *b);
 s32 CGameObjectInstance__GetNearestBox(BlastActor *a, CVector3 pos, HitFrame *out);
@@ -36,14 +36,14 @@ f32 Blast_GetReach(BlastActor *a, BlastActor *t, CVector3 p, f32 reach, s32 fall
     m = 1.0f;
     armored = 1;
     ok = 1;
-    if (D_8011AAF1 != 0 && (flags & 0x400000)) {
+    if (gEngineApp_m_Settings_multiplayer != 0 && (flags & 0x400000)) {
         armored = 0;
     }
     if (t->kind == 2 && (BlastActor *)(o = &gCollisionResults)->m_pInstance == a && o->m_nInstanceNode != -1) {
         sv = &o->m_Frame;
         falloff = 0;
-    } else if (CGameObjectInstance__GetNearestBox(a, p, &D_800F1970) != 0) {
-        sv = &D_800F1970;
+    } else if (CGameObjectInstance__GetNearestBox(a, p, &sBlastShieldFrame) != 0) {
+        sv = &sBlastShieldFrame;
     } else {
         sv = NULL;
     }

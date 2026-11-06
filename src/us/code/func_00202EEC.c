@@ -4,20 +4,20 @@
 #include "rw/abu_types.h"
 
 extern void CCache__ClearDisplayListLocks(s32, s32);
-extern int D_800D8218;
-extern int D_800D8DCC;
-extern int D_800D8208[];
-extern int D_800D8210[];
+extern int gCache_currentDlist;
+extern int gCache_mutex_count;
+extern int gCache_dlistValid[];
+extern int gCache_dlistBlocking[];
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern s32 D_800D8DA4[];
-extern s32 D_800D8DD0;
-extern s32 D_800D8DA4[];
-extern s32 D_800D8DD0;
+extern s32 gCache_dlistCount[];
+extern s32 gCache_blocker;
+extern s32 gCache_dlistCount[];
+extern s32 gCache_blocker;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 void CCache__WaitForDisplayLists(void) {
     extern s32 osSendMesg(void *, s32, s32);
-    extern s32 D_800D8DB0;
+    extern s32 gCache_mutex;
     s32 temp_v1;
     s32 temp_v1_2;
     s32 var_s0;
@@ -28,13 +28,13 @@ void CCache__WaitForDisplayLists(void) {
     var_s1 = 0;
     var_s0 = 0;
     do {
-        if (D_800D8DA4[var_s0] != 0) {
-            if (D_800D8218 != var_s0) {
+        if (gCache_dlistCount[var_s0] != 0) {
+            if (gCache_currentDlist != var_s0) {
                 var_s1 += 1;
-                D_800D8210[var_s0] = 1;
+                gCache_dlistBlocking[var_s0] = 1;
                 goto block_7;
             }
-            D_800D8208[var_s0] = 0;
+            gCache_dlistValid[var_s0] = 0;
             CCache__ClearDisplayListLocks(0, var_s0);
             var_s0 += 1;
         } else {
@@ -44,11 +44,11 @@ block_7:
     } while (var_s0 < 2);
     if (var_s1 != 0) {
         temp_v0 = __osDisableInt();
-        temp_v1 = D_800D8DCC - 1;
-        D_800D8DCC = temp_v1;
+        temp_v1 = gCache_mutex_count - 1;
+        gCache_mutex_count = temp_v1;
         if (temp_v1 != 0) {
             __osRestoreInt(temp_v0);
-            osSendMesg(&D_800D8DB0, 0, 1);
+            osSendMesg(&gCache_mutex, 0, 1);
             var_s0_2 = 0;
         } else {
             __osRestoreInt(temp_v0);
@@ -56,16 +56,16 @@ block_7:
         }
         if (var_s1 > 0) {
             do {
-                osRecvMesg(&D_800D8DD0, 0, 1);
+                osRecvMesg(&gCache_blocker, 0, 1);
                 var_s0_2 += 1;
             } while (var_s0_2 < var_s1);
         }
         temp_a0 = __osDisableInt();
-        temp_v1_2 = D_800D8DCC + 1;
-        D_800D8DCC = temp_v1_2;
+        temp_v1_2 = gCache_mutex_count + 1;
+        gCache_mutex_count = temp_v1_2;
         if (temp_v1_2 != 1) {
             __osRestoreInt(temp_a0);
-            osRecvMesg(&D_800D8DB0, 0, 1);
+            osRecvMesg(&gCache_mutex, 0, 1);
             return;
         }
         __osRestoreInt(temp_a0);

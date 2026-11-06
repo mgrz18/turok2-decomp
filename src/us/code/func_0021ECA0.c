@@ -12,10 +12,10 @@ typedef struct Owner {
     Slot24 slots[1];    /* 0x110 */
 } Owner;
 
-extern s32 D_800B6D1C;
+extern s32 gEvenOdd;
 extern void CGameObjectInstance__DrawModel(Owner *arg0, s32 arg1, s32 arg2);
 
 void CGameObjectInstance__DrawModelWithLights(Owner *arg0, s32 arg1, s32 arg2, Slot24 *src) {
-    arg0->slots[D_800B6D1C] = *src;
+    arg0->slots[gEvenOdd] = *src;
     CGameObjectInstance__DrawModel(arg0, arg1, arg2);
 }

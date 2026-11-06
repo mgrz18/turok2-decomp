@@ -1,37 +1,37 @@
 #include "common.h"
 #include "structs/boss.h"
 
-extern s32 D_00430F28;
-extern s32 D_00430FB4;
-extern s32 D_00431004;
-extern s32 D_004310B8;
-extern s32 D_00431158;
-extern s32 D_00431220;
+extern s32 sPrimagenAttackScriptStage1_2;
+extern s32 sPrimagenAttackScript2Stage1_2;
+extern s32 sPrimagenAttackScriptStage2_2;
+extern s32 sPrimagenAttackScript2Stage2_2;
+extern s32 sPrimagenAttackScriptStage3_2;
+extern s32 sPrimagenAttackScript2Stage3_2;
 void Primagen_SetAttackScript_2(s32 arg0) {
     if (arg0 == 2) {
-        if (D_8012F608.stage == 1) {
-            D_8012F608.script.steps = &D_00430FB4;
+        if (gLevelScript.stage == 1) {
+            gLevelScript.script.steps = &sPrimagenAttackScript2Stage1_2;
         }
-        if (D_8012F608.stage == arg0) {
-            D_8012F608.script.steps = &D_004310B8;
+        if (gLevelScript.stage == arg0) {
+            gLevelScript.script.steps = &sPrimagenAttackScript2Stage2_2;
         }
-        if (D_8012F608.stage == 3) {
-            D_8012F608.script.steps = &D_00431220;
+        if (gLevelScript.stage == 3) {
+            gLevelScript.script.steps = &sPrimagenAttackScript2Stage3_2;
         }
-        D_8012F608.script.cursor = -1;
-        D_8012F608.script.current = -1;
+        gLevelScript.script.cursor = -1;
+        gLevelScript.script.current = -1;
     }
     if (arg0 == 1) {
-        if (D_8012F608.stage == arg0) {
-            D_8012F608.script.steps = &D_00430F28;
+        if (gLevelScript.stage == arg0) {
+            gLevelScript.script.steps = &sPrimagenAttackScriptStage1_2;
         }
-        if (D_8012F608.stage == 2) {
-            D_8012F608.script.steps = &D_00431004;
+        if (gLevelScript.stage == 2) {
+            gLevelScript.script.steps = &sPrimagenAttackScriptStage2_2;
         }
-        if (D_8012F608.stage == 3) {
-            D_8012F608.script.steps = &D_00431158;
+        if (gLevelScript.stage == 3) {
+            gLevelScript.script.steps = &sPrimagenAttackScriptStage3_2;
         }
-        D_8012F608.script.cursor = -1;
-        D_8012F608.script.current = -1;
+        gLevelScript.script.cursor = -1;
+        gLevelScript.script.current = -1;
     }
 }

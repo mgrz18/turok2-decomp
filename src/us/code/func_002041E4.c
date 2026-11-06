@@ -8,8 +8,8 @@ void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
-extern OSMesgQueue D_800D8DB0;
-extern s32 D_800D8DCC;
+extern OSMesgQueue gCache_mutex;
+extern s32 gCache_mutex_count;
 extern u8 gDecompressor[];
 extern u8 gHeap[];
 void CCache__ReleaseDisplayList(s32 a, u32 b);
@@ -30,7 +30,7 @@ void CCache__Main(void) {
         osRecvMesg(&D_800D7BE0.q870, (OSMesg *)&msg, 1);
         if ((u32)msg < 2) {
             mask = __osDisableInt();
-            if (++D_800D8DCC != 1) {
+            if (++gCache_mutex_count != 1) {
                 __osRestoreInt(mask);
                 osRecvMesg(&D_800D7BE0.lock.queue, 0, 1);
             } else {
@@ -38,9 +38,9 @@ void CCache__Main(void) {
             }
             CCache__ReleaseDisplayList(0, (u32)msg);
             m2 = __osDisableInt();
-            if (--D_800D8DCC != 0) {
+            if (--gCache_mutex_count != 0) {
                 __osRestoreInt(m2);
-                osSendMesg(&D_800D8DB0, 0, 1);
+                osSendMesg(&gCache_mutex, 0, 1);
             } else {
                 __osRestoreInt(m2);
             }
@@ -52,7 +52,7 @@ void CCache__Main(void) {
                     continue;
                 }
                 mask = __osDisableInt();
-                if (++D_800D8DCC != 1) {
+                if (++gCache_mutex_count != 1) {
                     __osRestoreInt(mask);
                     osRecvMesg(&D_800D7BE0.lock.queue, 0, 1);
                 } else {
@@ -75,16 +75,16 @@ void CCache__Main(void) {
                 }
                 CCache__FreeCacheEntry(0, msg);
                 m2 = __osDisableInt();
-                if (--D_800D8DCC != 0) {
+                if (--gCache_mutex_count != 0) {
                     __osRestoreInt(m2);
-                    osSendMesg(&D_800D8DB0, 0, 1);
+                    osSendMesg(&gCache_mutex, 0, 1);
                 } else {
                     __osRestoreInt(m2);
                 }
             } else {
                 msg->flags &= ~4;
                 mask = __osDisableInt();
-                if (++D_800D8DCC != 1) {
+                if (++gCache_mutex_count != 1) {
                     __osRestoreInt(mask);
                     osRecvMesg(&D_800D7BE0.lock.queue, 0, 1);
                 } else {
@@ -92,9 +92,9 @@ void CCache__Main(void) {
                 }
                 CCache__CompleteRequest(0, msg, 1);
                 m2 = __osDisableInt();
-                if (--D_800D8DCC != 0) {
+                if (--gCache_mutex_count != 0) {
                     __osRestoreInt(m2);
-                    osSendMesg(&D_800D8DB0, 0, 1);
+                    osSendMesg(&gCache_mutex, 0, 1);
                 } else {
                     __osRestoreInt(m2);
                 }

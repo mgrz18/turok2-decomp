@@ -14,10 +14,10 @@ void BlindOne_PhaseVictoryUpdate_2(void **arg0)
   new_var = *((f32 *) (((s8 *) (*arg0)) + 0x180));
   if (D_800C093C < new_var)
   {
-    temp_v0 = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     if (temp_v0 != 0)
     {
-      temp_v1 = &D_80119870.m_Settings;
+      temp_v1 = &gEngineApp_m_Game.m_Settings;
       *((s32 *) (((s8 *) temp_v0) + 0x9E4)) = 1;
       temp_v1->unlockedCheats = (s32) (temp_v1->unlockedCheats | 0x120);
       CPlayer__Warp((s32) temp_v0, 0x1387, 2, 0);

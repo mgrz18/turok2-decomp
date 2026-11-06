@@ -52,8 +52,8 @@ typedef struct Owner3F94 {
     u32 flags; /* Turok 2: 0xD4 */
 } Owner3F94;
 extern f32 gFrameIncrement;
-extern f32 D_800B6D2C;
-extern f32 D_800B6D30;
+extern f32 gEnemyTimeScale;
+extern f32 gParticleTimeScale;
 void SwooshGroup_Remove(s32 a, SSlot *s, SEnt *e);
 void func_002368B0(SSlot *s);
 s32 Swoosh_Update(s32 a0, SSlot *s) {
@@ -63,10 +63,10 @@ s32 Swoosh_Update(s32 a0, SSlot *s) {
     s32 r;
     saved = gFrameIncrement;
     if (s->flags & 2) {
-        gFrameIncrement = saved * D_800B6D30;
+        gFrameIncrement = saved * gParticleTimeScale;
     }
     if (s->flags & 1) {
-        gFrameIncrement = gFrameIncrement * D_800B6D2C;
+        gFrameIncrement = gFrameIncrement * gEnemyTimeScale;
     }
     if (s->flags & 8) {
         s->unk50 = s->unk50 + 1;

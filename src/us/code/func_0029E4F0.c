@@ -15,8 +15,8 @@
 
 #define isdigit(c) ((c) >= '0' && (c) <= '9')
 
-extern char D_800B89A0[]; /* spaces: 32 blanks */
-extern char D_800B89C4[]; /* zeroes: 32 zeros */
+extern char spaces[]; /* spaces: 32 blanks */
+extern char zeroes[]; /* zeroes: 32 zeros */
 
 char *strchr(const char *s, int c); /* strchr */
 void _Putfld(_Pft *px, va_list *pap, char code, char *ac);
@@ -110,16 +110,16 @@ s32 _Printf(char *(*prout)(char *, const char *, u32), char *arg, const char *fm
         x.width -= x.n0 + x.nz0 + x.n1 + x.nz1 + x.n2 + x.nz2;
 
         if (!(x.flags & FLAGS_MINUS)) {
-            PAD(D_800B89A0, x.width)
+            PAD(spaces, x.width)
         }
         PUT(ac, x.n0)
-        PAD(D_800B89C4, x.nz0)
+        PAD(zeroes, x.nz0)
         PUT(x.s, x.n1)
-        PAD(D_800B89C4, x.nz1)
+        PAD(zeroes, x.nz1)
         PUT(x.s + x.n1, x.n2)
-        PAD(D_800B89C4, x.nz2)
+        PAD(zeroes, x.nz2)
         if (x.flags & FLAGS_MINUS) {
-            PAD(D_800B89A0, x.width)
+            PAD(spaces, x.width)
         }
 
         fmt = (const char *)s + 1;

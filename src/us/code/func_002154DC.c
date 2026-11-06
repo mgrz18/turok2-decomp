@@ -24,7 +24,7 @@ void CMtxF__Translate(f32 *, f32, f32, f32);
 void CMtxF__ToMtxAffine(f32 *, f32 *);
 void Render_DrawShadowQuad(f32 *, s32, s32);
 
-extern s32 D_800B6D1C;
+extern s32 gEvenOdd;
 
 /* Places the actor's ground shadow: scaled by its radius, shrinking with its height above the ground. */
 void Actor_DrawGroundShadow(ShadowActor *actor) {
@@ -50,6 +50,6 @@ void Actor_DrawGroundShadow(ShadowActor *actor) {
     CQuaternion__ToMatrix(rotation, matrix);
     CMtxF__ScaleAxes(matrix, size, 1.0f, size);
     CMtxF__Translate(matrix, position.x, position.y, position.z);
-    CMtxF__ToMtxAffine(matrix, actor->shadowMatrices[D_800B6D1C]);
-    Render_DrawShadowQuad(actor->shadowMatrices[D_800B6D1C], 1, 0x96);
+    CMtxF__ToMtxAffine(matrix, actor->shadowMatrices[gEvenOdd]);
+    Render_DrawShadowQuad(actor->shadowMatrices[gEvenOdd], 1, 0x96);
 }

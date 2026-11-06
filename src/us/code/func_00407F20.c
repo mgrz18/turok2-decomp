@@ -20,12 +20,12 @@ typedef struct {
 } BossFight;
 
 
-extern CPlayer *D_80119890;     /* the current player */
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the current player */
 extern u8 gScene[];
 extern u8 D_800B6660[];
-extern u8 D_801100F0[];
-extern CListedInstance *D_8010FEB4[]; /* the actor list head */
-extern s32 D_80110048;         /* level id */
+extern u8 gEngineApp_m_OnScreen[];
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
+extern s32 gScene_m_LevelID;         /* level id */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
@@ -49,7 +49,7 @@ static __inline__ void setAnim(CListedInstance *actor, s32 id) {
 
 /* The boss is beaten: message, sound, its death animation, the helpers stop. */
 void TotemDefense_Complete(BossFight *fight) {
-    CGame *game = &D_80119870;
+    CGame *game = &gEngineApp_m_Game;
     CPlayer *player;
     CListedInstance *a;
     GameSettings *flags;
@@ -61,8 +61,8 @@ void TotemDefense_Complete(BossFight *fight) {
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
     setAnim(fight->obj, 0x5337);
     CScene__UnmarkGeneratorsSaved(gScene);
-    D_80119890->m_FleeTime = 450.0f;
-    for (a = D_8010FEB4[0]; a != NULL; a = a->m_pNext) {
+    gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead->m_FleeTime = 450.0f;
+    for (a = gScene_m_InstancePool_m_ActiveList[0]; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {
             a->m_Instance.m_AI.m_pPathTarget = NULL;
             a->m_Instance.m_AI.m_pSightTarget = NULL;
@@ -71,32 +71,32 @@ void TotemDefense_Complete(BossFight *fight) {
         }
     }
     fight->timer = 60.0f;
-    COnScreen__ClearBoss(D_801100F0);
-    COnScreen__ClearBoss2(D_801100F0);
-    switch (D_80110048) {
+    COnScreen__ClearBoss(gEngineApp_m_OnScreen);
+    COnScreen__ClearBoss2(gEngineApp_m_OnScreen);
+    switch (gScene_m_LevelID) {
     case 0x1BBC:
         player->m_Data.m_bLevel1TotemFlags = 1;
-        flags = &D_8011AAD8;
+        flags = &gEngineApp_m_Settings;
         flags->unlockedCheats |= 0x8000;
         break;
     case 0x1C20:
         player->m_Data.m_bLevel2TotemFlags = 1;
-        flags = &D_8011AAD8;
+        flags = &gEngineApp_m_Settings;
         flags->unlockedCheats |= 0x200;
         break;
     case 0x1C84:
         player->m_Data.m_bLevel3TotemFlags = 1;
-        flags = &D_8011AAD8;
+        flags = &gEngineApp_m_Settings;
         flags->unlockedCheats |= 0x400;
         break;
     case 0x1CE8:
         player->m_Data.m_bLevel4TotemFlags = 1;
-        flags = &D_8011AAD8;
+        flags = &gEngineApp_m_Settings;
         flags->unlockedCheats |= 0x80;
         break;
     case 0x1D4C:
         player->m_Data.m_bLevel5TotemFlags = 1;
-        flags = &D_8011AAD8;
+        flags = &gEngineApp_m_Settings;
         flags->unlockedCheats |= 0x40;
         break;
     }

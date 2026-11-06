@@ -16,8 +16,8 @@ typedef struct MorphFrame {
     /* 0x08 */ MorphVtx verts[1];
 } MorphFrame;
 
-extern s32 D_800B6D18;
-extern s32 D_800B6D1C;
+extern s32 gFrameCount;
+extern s32 gEvenOdd;
 
 void *CISet__GetBlock(void *resource, s32 index);
 
@@ -42,13 +42,13 @@ void Model_BlendMorphFrames(void *resource, f32 t) {
     s32 p0;
 
     state = CISet__GetBlock(resource, 3);
-    state[0] = D_800B6D18;
+    state[0] = gFrameCount;
     anim = CISet__GetBlock(resource, 0);
     numFrames = *(s32 *)anim;
     if (numFrames < 3) {
         return;
     }
-    outFrame = CISet__GetBlock(anim, D_800B6D1C);
+    outFrame = CISet__GetBlock(anim, gEvenOdd);
     out = outFrame->verts;
     outCount = outFrame->count;
     while (t < 0.0f) {

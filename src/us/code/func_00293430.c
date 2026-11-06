@@ -2,11 +2,11 @@
 #include "structs/libaudio.h"
 
 void alSynDelete(ALSynth *drvr); /* alSynDelete */
-extern ALGlobals *D_800B7760; /* alGlobals */
+extern ALGlobals *alGlobals; /* alGlobals */
 
 /* libultra's alClose (audio.c). The ROM keeps &alGlobals in a register. */
 void alClose(ALGlobals *glob) {
-    ALGlobals **g = &D_800B7760;
+    ALGlobals **g = &alGlobals;
 
     if (*g != NULL) {
         alSynDelete(&glob->drvr);

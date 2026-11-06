@@ -16,12 +16,12 @@ typedef struct {
     /* 0x18 */ u16 flagsB;
 } Location;
 
-extern AnimEntry D_800AF6F0[];
-extern AnimEntry D_800AF720[];
-extern AnimEntry D_800AF750[];
-extern AnimEntry D_800AF780[];
-extern AnimEntry D_800AF7B0[];
-extern AnimEntry D_800AF7E0[];
+extern AnimEntry sEnemyAnimIdle_AF6F0[];
+extern AnimEntry sEnemyAnimIdle_AF720[];
+extern AnimEntry sEnemyAnimIdle_AF750[];
+extern AnimEntry sEnemyAnimIdle_AF780[];
+extern AnimEntry sEnemyAnimIdle_AF7B0[];
+extern AnimEntry sEnemyAnimIdle_AF7E0[];
 
 extern Location *CPathTrack__GetCurrentPoint(s8 *location);
 extern s32 AI_PickAnimFromTable(void *actor, CAI *ai, AnimEntry *table, s32 flags);
@@ -36,26 +36,26 @@ s32 EnemyAnim_InteractiveIdle(void *actor, CAI *ai) {
     if (loc->flagsA != 0) {
         switch (mode) {
         case 0:
-            animA = AI_PickAnimFromTable(actor, ai, D_800AF6F0, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF6F0, loc->flagsA);
             break;
         case 1:
-            animA = AI_PickAnimFromTable(actor, ai, D_800AF720, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF720, loc->flagsA);
             break;
         case 2:
-            animA = AI_PickAnimFromTable(actor, ai, D_800AF750, loc->flagsA);
+            animA = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF750, loc->flagsA);
             break;
         }
     }
     if (loc->flagsB != 0) {
         switch (mode) {
         case 0:
-            animB = AI_PickAnimFromTable(actor, ai, D_800AF780, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF780, loc->flagsB);
             break;
         case 1:
-            animB = AI_PickAnimFromTable(actor, ai, D_800AF7B0, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF7B0, loc->flagsB);
             break;
         case 2:
-            animB = AI_PickAnimFromTable(actor, ai, D_800AF7E0, loc->flagsB);
+            animB = AI_PickAnimFromTable(actor, ai, sEnemyAnimIdle_AF7E0, loc->flagsB);
             break;
         }
     }

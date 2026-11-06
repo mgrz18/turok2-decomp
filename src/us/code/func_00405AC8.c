@@ -1,6 +1,6 @@
 /* the real function is 0x00405AC8-0x00405C68 (size 0x1A0, 104 words); splat's func_00405BFC
  * (0x00405BFC, 0x6C bytes) is its tail, reached by a j from inside this function.
- * All 104 words match the ROM (checked over the real extent; D_8012FA04 as an array keeps the
+ * All 104 words match the ROM (checked over the real extent; gLevelScript_script_current as an array keeps the
  * store order that leaves li a2,0x13 in the jal delay slot). */
 #include "common.h"
 #include "structs/game_object.h"
@@ -16,7 +16,7 @@ extern f32 func_002982F0(f32 angle);                                      /* sin
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
 extern s32 D_800F1F50[];
-extern s32 D_8012FA04[];        /* boss script index */
+extern s32 gLevelScript_script_current[];        /* boss script index */
 
 void Primagen_UpdateMode27(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -28,7 +28,7 @@ void Primagen_UpdateMode27(CGameObjectInstance *obj, CAI *ai) {
 
     if (ai->m_AnimRepeatedCount != 0) {
         obj->m_AI.m_AnimSpeed = 1.0f;
-        D_8012FA04[0] = -1;
+        gLevelScript_script_current[0] = -1;
         CAI__SetMode(obj, ai, 0x13);
     }
     D_800F1F50[0] |= 0x8000;

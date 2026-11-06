@@ -52,7 +52,7 @@ typedef struct CollisionBuildWorld {
     /* 0x18FA8 */ s32 group;
 } CollisionBuildWorld;
 
-extern s32 D_800B6D00;
+extern s32 gDefaultVisBits;
 
 extern s32 ProPackDecompress(CollisionBuildMeshHandle **handle, s32);
 extern void *CISet__GetBlockAndSize(void *node, s32 index, s32 *size);
@@ -156,21 +156,21 @@ void CScene__DecompressCollision(CollisionBuildWorld *world, CollisionBuildMeshH
                 if (testBit(j, bits)) {
                     tri->flags |= 0x400;
                 }
-                if (!(tri->mask & D_800B6D00)) {
-                    tri->mask = D_800B6D00;
+                if (!(tri->mask & gDefaultVisBits)) {
+                    tri->mask = gDefaultVisBits;
                 }
                 if (Cinema_PathPlaying() != 0) {
-                    tri->mask = D_800B6D00;
+                    tri->mask = gDefaultVisBits;
                 }
                 if (tri->flags & 0x2000) {
-                    tri->mask = D_800B6D00;
+                    tri->mask = gDefaultVisBits;
                 }
             }
             for (j = 0; j < ntris; j++) {
                 tri = &tris[j];
                 for (k = 0; k < 3; k++) {
                     if (tri->adj[k] != 0 && (tri->adj[k]->flags & 0x2000)) {
-                        { s32 *surface = &tri->mask; *surface = D_800B6D00; }
+                        { s32 *surface = &tri->mask; *surface = gDefaultVisBits; }
                     }
                 }
             }

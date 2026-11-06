@@ -12,8 +12,8 @@ typedef struct AnimationInfo {
     /* 0xC */ u8 padC[4];
 } AnimationInfo;
 
-extern Gfx *D_800D8E24;             /* display list head */
-extern s32 D_800B6D1C;              /* frame buffer index */
+extern Gfx *gDList;             /* display list head */
+extern s32 gEvenOdd;              /* frame buffer index */
 
 extern void *Texture_Request(void *texture);
 extern void Texture_GetInfo(void *resource, AnimationInfo *info);
@@ -57,7 +57,7 @@ void CEmitter__Draw(CEmitter *object, CCamera *view) {
             scaleS = (s32)((1 << frame[2]) * scale);
             scaleT = (s32)((1 << frame[3]) * scale);
             {
-                Gfx *g = D_800D8E24++;
+                Gfx *g = gDList++;
                 g->w0 = 0xE7000000;     /* gDPPipeSync */
                 g->w1 = 0;
             }
@@ -72,7 +72,7 @@ void CEmitter__Draw(CEmitter *object, CCamera *view) {
             default:
                 Render_SetCombineMode(32);
                 {
-                    Gfx *g = D_800D8E24++;
+                    Gfx *g = gDList++;
                     g->w0 = 0xFB000000;     /* gDPSetEnvColor */
                     g->w1 = (descriptor->m_EnvRed << 24) | (descriptor->m_EnvGreen << 16) | (descriptor->m_EnvBlue << 8) | 0xFF;
                 }
@@ -215,7 +215,7 @@ void CEmitter__Draw(CEmitter *object, CCamera *view) {
                             shiftT = 0.0f;
                         }
                         for (i = 0; i < 3; i++) {
-                            vertex = i + &object->m_Vertices[D_800B6D1C][face * 3];
+                            vertex = i + &object->m_Vertices[gEvenOdd][face * 3];
                             vertex->flag = 0;
                             vertex->x = (s32)triangle[i].x;
                             vertex->y = (s32)triangle[i].y;
@@ -229,12 +229,12 @@ void CEmitter__Draw(CEmitter *object, CCamera *view) {
                             vertex->a = (u32)triAlpha[i];
                         }
                         {
-                            Gfx *g = D_800D8E24++;
+                            Gfx *g = gDList++;
                             g->w0 = 0x01003006;     /* gSPVertex(v, 3, 0) */
-                            g->w1 = (u32)&object->m_Vertices[D_800B6D1C][face * 3];
+                            g->w1 = (u32)&object->m_Vertices[gEvenOdd][face * 3];
                         }
                         {
-                            Gfx *g = D_800D8E24++;
+                            Gfx *g = gDList++;
                             g->w0 = 0x05000204;     /* gSP1Triangle(0, 1, 2, 0) */
                             g->w1 = 0;
                         }

@@ -25,7 +25,7 @@ void VM_AllocRegion(RegionDesc *desc) {
 
     start = 0;
     pages = (desc->size + 0xFFF) / 0x1000;
-    p = &D_80121378;
+    p = &gPager_regions;
     prev = 0;
     r = desc->region;
     r->map = (u8 *) (r + 1);

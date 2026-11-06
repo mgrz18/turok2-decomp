@@ -17,7 +17,7 @@ typedef struct FloorGrid {
     FloorCell cells[1];         /* 0x08 */
 } FloorGrid;
 
-extern s32 D_800B6D54;
+extern s32 gPersistentDataLoaded;
 
 void *CISet__GetBlock(void *table, s32 index);
 s32 CGameRegion__ContainsXZ(Floor *floor, f32 x, f32 z);      /* point over floor */
@@ -38,7 +38,7 @@ Floor *CScene__FindRegionAt(CScene *world, f32 *pos) {
     f32 d;
     f32 bestDist;
 
-    if (D_800B6D54 == 0) {
+    if (gPersistentDataLoaded == 0) {
         return NULL;
     }
     floors = (Floor *)((u8 *)CISet__GetBlock(world->m_pRegionData, 2) + 8);

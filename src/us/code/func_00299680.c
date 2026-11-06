@@ -4,14 +4,14 @@
 #include "rw/abu_types.h"
 
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern u8 D_80130E20[];
+extern u8 __osPfsPifRam[];
 extern void __osSiGetAccess(void);
 extern s32 __osSiRawStartDma(s32, s32);
 extern s32 osRecvMesg(OSMesgQueue *, void **, s32);
 extern u32 __osContDataCrc(void *arg0);
 extern void __osSiRelAccess(void);
-extern u8 D_80121420;
-extern u8 D_80130E20[];
+extern u8 __osContLastCmd;
+extern u8 __osPfsPifRam[];
 extern void __osPackRamReadData(s32 arg0, s32 arg1);
 extern s32 __osSiRawStartDma(s32, s32);
 extern u32 __osContDataCrc(void *arg0);
@@ -22,17 +22,17 @@ u32 __osContRamRead(s32 arg0, s32 arg1, u16 arg2, u8 *arg3) {
     s32 i;
     s32 retries;
     u32 result;
-    source = D_80130E20;
+    source = __osPfsPifRam;
     retries = 2;
     __osSiGetAccess();
-    D_80121420 = 2;
+    __osContLastCmd = 2;
     __osPackRamReadData(arg1, arg2 & 0xFFFF);
-    __osSiRawStartDma(1, D_80130E20);
+    __osSiRawStartDma(1, __osPfsPifRam);
     osRecvMesg(arg0, 0, 1);
     do {
-        __osSiRawStartDma(0, D_80130E20);
+        __osSiRawStartDma(0, __osPfsPifRam);
         osRecvMesg(arg0, 0, 1);
-        source = D_80130E20;
+        source = __osPfsPifRam;
         if (arg1 != 0) {
             i = 0;
             if (arg1 > 0) {

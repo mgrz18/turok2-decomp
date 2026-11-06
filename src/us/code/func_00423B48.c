@@ -9,8 +9,8 @@ extern char D_800B51D8[];
 extern char D_800B5228[];
 extern char D_800B5284[];
 s32 PakConfirmMenu_UpdateLine2(struct FieldRecAt14 *field) {
-    extern u32 D_801309B0;
-    u32 state = D_801309B0;
+    extern u32 gPakConfirmKind;
+    u32 state = gPakConfirmKind;
     if (state >= 5) {
         goto state_other;
     }

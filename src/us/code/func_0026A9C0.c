@@ -18,15 +18,15 @@ struct CQuatern_t {
     float w;
 };
 extern void CVector3__Normalize(f32 *arg0);
-extern CGameRegion *D_800B2608;
-extern CGameRegion *D_800B260C;
-extern CVector3 D_800F2020;
-extern f32 D_800F2024;
-extern s32 D_800F2028;
-extern CVector3 D_800F2030;
-extern f32 D_800F2034;
-extern s32 D_800F2038;
-extern f32 D_800DD78C;
+extern CGameRegion *sCachedRawNormalRegion;
+extern CGameRegion *sCachedNormalRegion;
+extern CVector3 sRegionNormal;
+extern f32 sRegionNormal_y;
+extern s32 sRegionNormal_z;
+extern CVector3 sRegionUnitNormal;
+extern f32 sRegionUnitNormal_y;
+extern s32 sRegionUnitNormal_z;
+extern f32 gQuaternionSin;
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
@@ -38,7 +38,7 @@ static __inline__ void normalize_copy(CVector3 *out, CVector3 *in) {
     *out = *in;
     CVector3__Normalize(out);
 }
-extern float D_800DD78C;
+extern float gQuaternionSin;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 extern void CVector3__Scale(CVector3 *, CVector3 *, float);
 CQuatern *CGameRegion__GetTiltRotation(CQuatern *out, CGameRegion *polygon) {
@@ -53,25 +53,25 @@ CQuatern *CGameRegion__GetTiltRotation(CQuatern *out, CGameRegion *polygon) {
     f32 angle;
     f32 scale;
     if (polygon == 0) {
-        *(s32 *)&D_800F2030 = 0;
-        D_800F2038 = 0;
-        D_800F2034 = 1.0f;
-    } else if (polygon != D_800B260C) {
+        *(s32 *)&sRegionUnitNormal = 0;
+        sRegionUnitNormal_z = 0;
+        sRegionUnitNormal_y = 1.0f;
+    } else if (polygon != sCachedNormalRegion) {
         if (polygon == 0) {
-            *(s32 *)&D_800F2020 = 0;
-            D_800F2028 = 0;
-            D_800F2024 = 1.0f;
-        } else if (polygon != D_800B2608) {
+            *(s32 *)&sRegionNormal = 0;
+            sRegionNormal_z = 0;
+            sRegionNormal_y = 1.0f;
+        } else if (polygon != sCachedRawNormalRegion) {
             edge(&edge0, polygon->m_pVertices[1], polygon->m_pVertices[0]);
             edge(&edge1, polygon->m_pVertices[2], polygon->m_pVertices[1]);
-            CVector3__Cross(&D_800F2020, &edge0, &edge1);
+            CVector3__Cross(&sRegionNormal, &edge0, &edge1);
         }
-        D_800B2608 = polygon;
-        normalize_copy(&D_800F2030, &D_800F2020);
+        sCachedRawNormalRegion = polygon;
+        normalize_copy(&sRegionUnitNormal, &sRegionNormal);
     }
     one = 1.0f;
-    D_800B260C = polygon;
-    normal = D_800F2030;
+    sCachedNormalRegion = polygon;
+    normal = sRegionUnitNormal;
     up.x = 0.0f;
     up.y = one;
     up.z = 0.0f;
@@ -90,7 +90,7 @@ CQuatern *CGameRegion__GetTiltRotation(CQuatern *out, CGameRegion *polygon) {
         result.x = axis.x * scale;
         result.y = axis.y * scale;
         result.z = axis.z * scale;
-        D_800DD78C = scale;
+        gQuaternionSin = scale;
         result.w = func_002974C0(angle);
     }
     *out = result;

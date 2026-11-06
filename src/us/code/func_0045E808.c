@@ -4,10 +4,10 @@
 #include "rw/junk_types.h"
 #include "structs/controller.h"
 
-extern OSMesgQueue D_800F6798;
-extern OSPfs D_80130C80[];
-extern s32 D_80130C70[];
-extern s32 D_80130C60[];
+extern OSMesgQueue gSiMessageQueue;
+extern OSPfs gPakFileSystems[];
+extern s32 gPakError[];
+extern s32 gPakState[];
 s32 osPfsInitPak_2(OSMesgQueue *queue, OSPfs *pfs, int channel); /* osPfsInitPak_2 (link address) */
 s32 Pak_RefreshNotes_2(s32 pad); /* Pak_RefreshNotes_2 (link address) */
 s32 Pak_Mount_2(s32 pad) {
@@ -17,20 +17,20 @@ s32 Pak_Mount_2(s32 pad) {
     s32 code;
     s32 ok;
     s32 ret;
-    if (D_800F6778[pad].errno != 0) {
-        D_80130C70[pad] = -2;
+    if (gContStatus[pad].errno != 0) {
+        gPakError[pad] = -2;
         ret = 0;
     } else {
         i = 0;
         do {
-            r = osPfsInitPak_2(&D_800F6798, &D_80130C80[pad], pad);
+            r = osPfsInitPak_2(&gSiMessageQueue, &gPakFileSystems[pad], pad);
             switch (r) {
             case 0:
             case 2:
-                D_80130C70[pad] = -5;
+                gPakError[pad] = -5;
                 break;
             case 1:
-                D_80130C70[pad] = -2;
+                gPakError[pad] = -2;
                 break;
             case 4:
             case 11:
@@ -39,28 +39,28 @@ s32 Pak_Mount_2(s32 pad) {
             case 10:
                 code = -4;
             st:
-                D_80130C70[pad] = code;
+                gPakError[pad] = code;
                 break;
             }
-            if (D_80130C70[pad] == -5) {
+            if (gPakError[pad] == -5) {
                 goto got5;
             }
-            if (D_80130C70[pad] == -2) {
+            if (gPakError[pad] == -2) {
                 goto fin;
             }
             i++;
         } while (i < 4);
         goto fin2;
     got5:
-        D_80130C60[pad] = 3;
+        gPakState[pad] = 3;
         if (Pak_RefreshNotes_2(pad) != 0) {
-            D_80130C70[pad] = -4;
+            gPakError[pad] = -4;
             goto fin2;
         }
-        D_80130C70[pad] = 0;
+        gPakError[pad] = 0;
     fin:
     fin2:
-        v = D_80130C70[pad];
+        v = gPakError[pad];
         ok = 0;
         if (v == 0 || v == -4) {
             ok = 1;

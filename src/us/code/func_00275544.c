@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
-extern int D_8011ACA0;
+extern int gEngineApp_m_Settings_unk1C8;
 s32 Sound__Play(s16 arg0, CVector3 arg1, s32 arg4, s32 arg5) {
     extern s32 gAudioWorld;
-    if (D_8011ACA0 != 0) {
+    if (gEngineApp_m_Settings_unk1C8 != 0) {
         return -1;
     }
     return CAudioWorld__PlaySound(&gAudioWorld, arg0, arg1, arg4, arg5);

@@ -8,7 +8,7 @@
  * A slot that dies changes the anim state and clears its bit; when no slot of the phase is left, the next phase
  * state starts. */
 
-extern u8 D_00431D74[];
+extern u8 sMotherBossHurtScript_2[];
 extern void MotherBoss_StartSpotAnims_2(void *obj, void *sound, s32 a2);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
@@ -27,7 +27,7 @@ void MotherBoss_Hurt_2(void *obj, CAI *ai, DamageEvent *hit) {
     if (part == NULL) {
         return;
     }
-    state = &D_8012FB70;
+    state = &gMotherBoss;
     i = 0;
     idx = -1;
     mask = state->activeMask & part->unk_6C;
@@ -105,7 +105,7 @@ void MotherBoss_Hurt_2(void *obj, CAI *ai, DamageEvent *hit) {
     idx = state->slots[slot].health >= hit->damage ? hit->damage : state->slots[slot].health;
     state->slots[slot].health -= idx;
     state->health -= idx;
-    MotherBoss_StartSpotAnims_2(obj, D_00431D74, sound);
+    MotherBoss_StartSpotAnims_2(obj, sMotherBossHurtScript_2, sound);
     if (state->slots[slot].health > 0) {
         return;
     }

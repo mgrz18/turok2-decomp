@@ -5,11 +5,11 @@
  * tengine.h; 8 bytes longer here: the word at 0x128). The engine keeps three
  * in a ring through m_pPrev / m_pNext (CEngineApp.m_FrameData, structs/
  * game.h; set up by CEngineApp__Construct). gEngineApp_m_pCurrentFrameData (CEngineApp.m_pCurrentFrameData)
- * is the frame being built; CEngineApp__Update copies it to D_8011F140, the frame
- * CEngineApp__Draw finishes and sends (m_Msg) to the RSP task queue D_8011AD28.
+ * is the frame being built; CEngineApp__Update copies it to gFrameData, the frame
+ * CEngineApp__Draw finishes and sends (m_Msg) to the RSP task queue gGfxFrameMessageQueue.
  * The display list starts at m_pDisplayList and the engine writes it through
- * D_800D8E24 (gfx.h); m_pLineList is the second list (the debug lines and the
- * pause/menu overlay). The draw code checks the list against D_800C2214 (its
+ * gDList (gfx.h); m_pLineList is the second list (the debug lines and the
+ * pause/menu overlay). The draw code checks the list against gDisplayListSize (its
  * length, in commands) before adding an object.
  * The lists are void * so that the header does not need gfx.h (game.h
  * includes this one). tools/check_structs.py checks the offsets. */
@@ -27,8 +27,8 @@ typedef struct CFrameData {
     /* 0x000 */ u8 m_SunFrame[0x20];     /* CSunFrameData (CSunFrameData__Construct) */
     /* 0x020 */ u8 m_Task[0x68];         /* OSScTask */
     /* 0x088 */ u8 m_LineTask[0x68];     /* OSScTask */
-    /* 0x0F0 */ CFrameMsg m_Msg;         /* sent to D_8011AD28 when the frame is done */
-    /* 0x110 */ u32 m_pFrameBuffer;      /* its colour image (D_80130A88[i], gDPSetColorImage) */
+    /* 0x0F0 */ CFrameMsg m_Msg;         /* sent to gGfxFrameMessageQueue when the frame is done */
+    /* 0x110 */ u32 m_pFrameBuffer;      /* its colour image (gCFB[i], gDPSetColorImage) */
     /* 0x114 */ void *m_pDisplayList;    /* Gfx *: the start of the frame's list */
     /* 0x118 */ void *m_pLineList;       /* Gfx *: the line / overlay list */
     /* 0x11C */ s32 m_DisplayListSize;   /* in bytes */
@@ -45,11 +45,11 @@ typedef struct CFrameData {
  * CEngineApp__ClearDepthRect read it as gEngineApp.m_pCurrentFrameData (structs/game.h,
  * the same address), Automap_Draw keeps a local array declaration. */
 extern CFrameData *gEngineApp_m_pCurrentFrameData;    /* the frame being built */
-extern CFrameData *D_8011F140;    /* the frame being finished */
+extern CFrameData *gFrameData;    /* the frame being finished */
 
-/* A screen mode, as Video_SetMode / func_0042456C start it: D_800C2054 holds
- * the NTSC modes, then the PAL/MPAL ones (D_800C20E0, a symbol of its own
- * that some files use), each indexed by the resolution set D_800C2038
+/* A screen mode, as Video_SetMode / func_0042456C start it: gVideoModes holds
+ * the NTSC modes, then the PAL/MPAL ones (gVideoModesPAL, a symbol of its own
+ * that some files use), each indexed by the resolution set gResolution
  * (1 with the expansion pak). */
 typedef struct VideoMode {
     /* 0x00 */ s32 width;
@@ -61,7 +61,7 @@ typedef struct VideoMode {
     /* 0x18 */ s32 unk18;
 } VideoMode; /* size 0x1C */
 
-extern VideoMode D_800C2054[2][5];
-extern VideoMode D_800C20E0[5];
+extern VideoMode gVideoModes[2][5];
+extern VideoMode gVideoModesPAL[5];
 
 #endif

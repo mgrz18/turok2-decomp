@@ -13,7 +13,7 @@ s32 MenuItem_TextLength_2(MenuItem *item);
 void sprintf(char *dst, char *fmt, s32 value);
 
 s32 StatsMenu_FragsText_2(MenuItem *item, Menu *event) {
-    s32 value = D_8011AB5C[CPlayerPool__GetIndex(&D_80119870.m_PlayerList, event->player) * 32];
+    s32 value = D_8011AB5C[CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player) * 32];
 
     sprintf(item->text + (MenuItem_TextLength_2(item) - 4), D_800C1330, value);
     return 0;

@@ -2,12 +2,12 @@
 #include "structs/player.h"
 
 extern f32 gFrameIncrement;      /* frame step */
-extern u8 D_8011AAF1;
-extern u8 D_8011AAFC;
-extern u8 D_8011AB01;
-extern u8 D_8011AB06;
-extern s32 D_8011ACD4;
-extern s32 D_8011ACE4;
+extern u8 gEngineApp_m_Settings_multiplayer;
+extern u8 gEngineApp_m_Settings_dmCrosshairs;
+extern u8 gEngineApp_m_Settings_tagCrosshairs;
+extern u8 gEngineApp_m_Settings_teamCrosshairs;
+extern s32 gEngineApp_m_Settings_match_teams;
+extern s32 gEngineApp_m_Settings_match_tag;
 
 void Hud_SetupTextureMode(s32);
 void Hud_DrawWorldSprite(void *view, f32 *pos, s32 sprite, f32 frame, f32 scale, f32 size);
@@ -25,15 +25,15 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
     Hud_SetupTextureMode(0xFF);
 
     sprite = player->m_SightIcon;
-    if (sprite == 0x2DA && D_8011AAF1 != 0) {
-        if (D_8011ACE4 == 0) {
-            if (D_8011ACD4 != 0) {
-                show = D_8011AB06;
+    if (sprite == 0x2DA && gEngineApp_m_Settings_multiplayer != 0) {
+        if (gEngineApp_m_Settings_match_tag == 0) {
+            if (gEngineApp_m_Settings_match_teams != 0) {
+                show = gEngineApp_m_Settings_teamCrosshairs;
             } else {
-                show = D_8011AAFC;
+                show = gEngineApp_m_Settings_dmCrosshairs;
             }
         } else {
-            show = D_8011AB01;
+            show = gEngineApp_m_Settings_tagCrosshairs;
         }
     } else {
         show = 1;
@@ -60,15 +60,15 @@ void CPlayer__DrawTargetMarkers(CPlayer *player, void *view) {
     }
 
     sprite = player->m_CrossHairIcon;
-    if (sprite == 0x2DA && D_8011AAF1 != 0) {
-        if (D_8011ACE4 == 0) {
-            if (D_8011ACD4 != 0) {
-                show = D_8011AB06;
+    if (sprite == 0x2DA && gEngineApp_m_Settings_multiplayer != 0) {
+        if (gEngineApp_m_Settings_match_tag == 0) {
+            if (gEngineApp_m_Settings_match_teams != 0) {
+                show = gEngineApp_m_Settings_teamCrosshairs;
             } else {
-                show = D_8011AAFC;
+                show = gEngineApp_m_Settings_dmCrosshairs;
             }
         } else {
-            show = D_8011AB01;
+            show = gEngineApp_m_Settings_tagCrosshairs;
         }
     } else {
         show = 1;

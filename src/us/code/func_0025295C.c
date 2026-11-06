@@ -7,7 +7,7 @@ extern s32 CPlayerPool__GetIndex(CPlayerPool *list, CPlayer *player);
 /* Whether the frag limit is reached: by either team's total in team games,
  * otherwise by one player's frags (the slot CPlayerPool__GetIndex names left out). */
 s32 CPlayerPool__IsFragLimitReached(CPlayerPool *list) {
-    GameMatch *state = &D_8011ACB0;
+    GameMatch *state = &gEngineApp_m_Settings_match;
     CPlayer *p;
     s32 i;
 
@@ -30,10 +30,10 @@ s32 CPlayerPool__IsFragLimitReached(CPlayerPool *list) {
                     }
                 }
             }
-            if (team0 >= D_8011ACB0.scoreLimit) {
+            if (team0 >= gEngineApp_m_Settings_match.scoreLimit) {
                 return 1;
             }
-            if (team1 >= D_8011ACB0.scoreLimit) {
+            if (team1 >= gEngineApp_m_Settings_match.scoreLimit) {
                 return 1;
             }
         }

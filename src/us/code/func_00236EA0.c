@@ -20,13 +20,13 @@ typedef struct M04WorldB {
                 u8 pad0[0xBF8];
                 void *tab[1];
 } M04WorldB;
-extern M04Msg D_800AD080[];
+extern M04Msg gImpactEventHandlers[];
 extern CScene gScene;
-extern CPlayer *D_80119890;     /* the players, a list through m_pNext */
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the players, a list through m_pNext */
 /* Dispatch one message through the handler table (inlined). */
 static __inline__ void send_(void *tgt, void *dst, s32 kind, CVector3 p, M04Part q) {
-    if (D_800AD080[kind].fn != 0) {
-        D_800AD080[kind].fn(tgt, dst, kind, p, q);
+    if (gImpactEventHandlers[kind].fn != 0) {
+        gImpactEventHandlers[kind].fn(tgt, dst, kind, p, q);
     }
 }
 void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04Part part) {
@@ -37,10 +37,10 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
     void *cur;
     u8 *base;
     CPlayer *o;
-    if (gScene.m_Mode == 4 || (D_800AD080[kind].flags & 0x10)) {
-        if (!(D_800AD080[kind].flags & 2)) {
+    if (gScene.m_Mode == 4 || (gImpactEventHandlers[kind].flags & 0x10)) {
+        if (!(gImpactEventHandlers[kind].flags & 2)) {
             send_(src, dst, kind, pos, part);
-        } else if (D_800AD080[kind].flags & 8) {
+        } else if (gImpactEventHandlers[kind].flags & 8) {
             n = gScene.m_nActors;
             base = (u8 *)gScene.m_pActors;
             i = 0;
@@ -53,7 +53,7 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
                     i++;
                 } while (i < n);
             }
-            o = D_80119890;
+            o = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
             if (o != 0) {
                 do {
                     if ((void *)o != src && (void *)&o->m_WeaponActor != src) {
@@ -70,7 +70,7 @@ void ImpactEvent_Send(void *src, void *dst, s32 kind, s32 id, CVector3 pos, M04P
                     send_(cur, dst, kind, pos, part);
                 }
             }
-            o = D_80119890;
+            o = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
             if (o != 0) {
                 do {
                     if ((void *)o != src && (void *)&o->m_WeaponActor != src) {

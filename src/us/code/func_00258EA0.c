@@ -4,7 +4,7 @@
 
 extern f32 Math_DecayToZero(f32 value, f32 rate);  /* moves value toward zero */
 extern void Sound__StopSoundId(s32 sound);
-extern s32 D_800B6D20;      /* frame counter */
+extern s32 gFrameCountGameplay;      /* frame counter */
 extern f32 gFrameIncrement;      /* frame time scale */
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
@@ -22,7 +22,7 @@ void WeaponBarrel_Spin_AEE38(CGameObjectInstance *actor, CAI *sp) {
     sp->m_Weapon.m_BarrelAngle += sp->m_Weapon.m_BarrelSpeed * gFrameIncrement * 2.0f;
     pad = owner->m_ContState.m_pContState;
     pad->rumbleBase = (ABS(sp->m_Weapon.m_BarrelSpeed) * 1.7904929f > 1.0f) ? 1.0f : ABS(sp->m_Weapon.m_BarrelSpeed) * 1.7904929f;
-    if (sp->m_Mode != 4 && (D_800B6D20 & 1)) {
+    if (sp->m_Mode != 4 && (gFrameCountGameplay & 1)) {
         Sound__StopSoundId(0x1A7);
         Sound__StopSoundId(0x1A5);
     }

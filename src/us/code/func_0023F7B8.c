@@ -3,7 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 
-extern char D_801198B0[];
+extern char gEngineApp_m_Game_m_CameraPool[];
 
 s32 CPlayer__AddAmmo(CPlayer *player, s32 index, s32 argument);
 void CCamera__StartFlash(void *ui, s32 red, s32 green, s32 blue, s32 alpha, s32 a5, s32 a6, s32 a7);
@@ -15,7 +15,7 @@ void Sound__PlaySpeech(s32 callback);
 void Pickup_Feedback(CPlayer *player, void *resource, s32 sound, s32 callback) {
     CCamera__StartFlash(player->m_pCamera, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
     if (resource != NULL) {
-        CCameraPool__AddText(D_801198B0, player->m_pCamera, resource);
+        CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, resource);
     }
     if (sound != 0) {
         Sound__Play(sound, player->m_CharacterActor.header.m_vPos, 0, -1);

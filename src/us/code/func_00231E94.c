@@ -6,14 +6,14 @@ s32 CParticle__BuildCameraMatrix();                            /* extern */
 s32 Trail_DetachOwner(s32 *, void *);           /* extern */
 
 extern s32 D_8010FF34;
-extern s32 D_801102B8;
+extern s32 gEngineApp_m_SwooshSystem;
 
 void CParticle__StopEffects(CParticle *arg0) {
     CDLight *temp_a1;
 
     if (arg0->m_ActiveSwooshes != 0) {
         CParticle__BuildCameraMatrix();
-        Trail_DetachOwner(&D_801102B8, arg0);
+        Trail_DetachOwner(&gEngineApp_m_SwooshSystem, arg0);
     }
     temp_a1 = arg0->m_pDLight;
     if (temp_a1 != 0) {

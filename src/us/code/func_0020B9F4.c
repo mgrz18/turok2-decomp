@@ -10,12 +10,12 @@ void CCache__Unlock(s32, s32);
 extern u8 D_800A53D8[];
 extern u8 D_800A53EC[];
 extern void Model_DecompressCallbackTerminated();
-extern s32 D_800D8E10;
-extern s32 D_800D8E14;
-extern s32 D_800D8E28;
-extern s32 D_800D8E34;
-extern s32 D_800DD170;
-extern s32 D_800DD178[];
+extern s32 sBatchPass;
+extern s32 sBatchLod;
+extern s32 sBatchResource;
+extern s32 sBatchInstanceCount;
+extern s32 sBatchResourceCount;
+extern s32 sBatchResources[];
 
 void func_0020B9F4(s32 res, s32 arg1, s32 arg2, s32 index, s32 arg4) {
     s32 size;
@@ -32,21 +32,21 @@ void func_0020B9F4(s32 res, s32 arg1, s32 arg2, s32 index, s32 arg4) {
         if (handle != 0) {
             count = CISet__GetBlock(*(s32 *) handle, 2);
             if (index >= 0 && index < *count) {
-                if (D_800D8E28 != handle || D_800D8E14 != index || D_800D8E10 != arg4 || D_800D8E34 == 32) {
+                if (sBatchResource != handle || sBatchLod != index || sBatchPass != arg4 || sBatchInstanceCount == 32) {
                     Render_FlushModelBatch();
-                    if (D_800DD170 == 256) {
+                    if (sBatchResourceCount == 256) {
                         goto done;
                     }
                     CCache__TouchAndLock(0, handle);
-                    D_800DD178[D_800DD170] = handle;
-                    D_800DD170++;
+                    sBatchResources[sBatchResourceCount] = handle;
+                    sBatchResourceCount++;
                 }
-                n = D_800D8E34;
-                D_800D8E28 = handle;
-                D_800D8E14 = index;
-                D_800D8E10 = arg4;
-                e = &D_800DD578[n++];
-                D_800D8E34 = n;
+                n = sBatchInstanceCount;
+                sBatchResource = handle;
+                sBatchLod = index;
+                sBatchPass = arg4;
+                e = &sBatchInstances[n++];
+                sBatchInstanceCount = n;
                 e->m_pMatrix = (void *)arg1;
                 e->m_Segment = 0;
                 e->m_pLights = (void *)arg2;

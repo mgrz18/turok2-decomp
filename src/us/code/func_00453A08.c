@@ -52,19 +52,19 @@ extern f32 gFrameIncrement;
 extern f32 D_800C1274[];
 s32 EnterCheatMenu_UpdateTextField_2(void *unused, MenuRecAt20V4 *menu) {
     f32 t;
-    t = D_800C1F80.timer + gFrameIncrement;
-    D_800C1F80.timer = t;
+    t = gCheatEntry.timer + gFrameIncrement;
+    gCheatEntry.timer = t;
     if (t >= D_800C1274[1]) {
-        D_800C1F80.timer = t - D_800C1274[1];
+        gCheatEntry.timer = t - D_800C1274[1];
     }
     if (menu->state == 2) {
-        if (((s32 (*)(s32))Controller_MenuLeft)(menu->input) != 0 && D_800C1F80.cursor > 0) {
-            D_800C1F80.cursor--;
-            D_800C1F80.timer = 0.0f;
+        if (((s32 (*)(s32))Controller_MenuLeft)(menu->input) != 0 && gCheatEntry.cursor > 0) {
+            gCheatEntry.cursor--;
+            gCheatEntry.timer = 0.0f;
         } else if (((s32 (*)(s32))Controller_MenuRight)(menu->input) != 0) {
-            if (D_800C1F80.cursor < D_800C1F80.length) {
-                D_800C1F80.cursor++;
-                D_800C1F80.timer = 0.0f;
+            if (gCheatEntry.cursor < gCheatEntry.length) {
+                gCheatEntry.cursor++;
+                gCheatEntry.timer = 0.0f;
             }
         }
     }

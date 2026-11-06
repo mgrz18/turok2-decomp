@@ -7,7 +7,7 @@ s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 /* Writes setting unk20 (or "none" when 0) over the end of the item's text. */
 s32 func_004519E8(MenuItem *item) {
-    GameSettings *s = &D_8011AAD8;
+    GameSettings *s = &gEngineApp_m_Settings;
 
     if (s->dmTimeLimit != 0) {
         sprintf(&item->text[MenuItem_TextLength_2(item) - 4], "  %02d", s->dmTimeLimit);

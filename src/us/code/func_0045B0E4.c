@@ -4,12 +4,12 @@
 #include "rw/abu_types.h"
 
 extern void func_0045B0E4(struct RecordRecAtCV1 *record);
-extern int D_80130960;
+extern int sCharNoteLoad;
 extern s32 D_801309A8;
-extern s32 D_80130960;
+extern s32 sCharNoteLoad;
 void func_0045B0E4(struct RecordRecAtCV1 *record) {
     record->target->first &= ~0x01800000;
-    D_80130960 = 0;
+    sCharNoteLoad = 0;
     D_801309A8 = 1;
     record->target->second &= ~0x01800000;
 }

@@ -10,10 +10,10 @@
  * particle expire the non-0x57 ones within range. */
 
 extern f32 gFrameIncrement;          /* frame time scale */
-extern f32 D_800B6D30;
-extern s32 D_8011ACA4;
-extern s32 D_80110028;
-extern CBox D_800F5A10;       /* visible bounds */
+extern f32 gParticleTimeScale;
+extern s32 gEngineApp_m_Settings_paused;
+extern s32 gScene_m_WarpState;
+extern CBox gCameraVisibleBox;       /* visible bounds */
 
 extern void CParticle__Update(CParticle *p);
 extern s32 CParticle__IsUnderWater(CParticle *p);
@@ -53,11 +53,11 @@ void CParticleSystem__Update(CParticleSystem *world) {
             stepped[count++] = node;
         }
     }
-    if (D_8011ACA4 != 0 || D_80110028 != 0) {
+    if (gEngineApp_m_Settings_paused != 0 || gScene_m_WarpState != 0) {
         return;
     }
     savedStep = gFrameIncrement;
-    gFrameIncrement = savedStep * D_800B6D30;
+    gFrameIncrement = savedStep * gParticleTimeScale;
     pairCount = 0;
     for (idx = 0; idx < count; idx++) {
         p = stepped[idx];
@@ -69,8 +69,8 @@ void CParticleSystem__Update(CParticleSystem *world) {
             p->m_pDLight->m_bEnabled = 0;
         }
         if (p->m_cFrame < (f32)p->m_nFrames && p->m_nFrames != 1 && !(p->m_dwFlags & 0x1000)) {
-            if (D_800F5A10.m_vMax.x > p->header.m_vPos.x && D_800F5A10.m_vMax.y > p->header.m_vPos.y && D_800F5A10.m_vMax.z > p->header.m_vPos.z &&
-                D_800F5A10.m_vMin.x <= p->header.m_vPos.x && D_800F5A10.m_vMin.y <= p->header.m_vPos.y && D_800F5A10.m_vMin.z <= p->header.m_vPos.z) {
+            if (gCameraVisibleBox.m_vMax.x > p->header.m_vPos.x && gCameraVisibleBox.m_vMax.y > p->header.m_vPos.y && gCameraVisibleBox.m_vMax.z > p->header.m_vPos.z &&
+                gCameraVisibleBox.m_vMin.x <= p->header.m_vPos.x && gCameraVisibleBox.m_vMin.y <= p->header.m_vPos.y && gCameraVisibleBox.m_vMin.z <= p->header.m_vPos.z) {
                 CParticle__Update(p);
                 light = p->m_pDLight;
                 if (light) {

@@ -6,10 +6,10 @@ extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* ou
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 extern void CVector3__Normalize(CVector3 *v);                         /* normalise */
 
-extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
-extern CGameRegion *D_800B260C;    /* triangle of the cached unit normal */
-extern CVector3 D_800F2020;        /* cached raw normal */
-extern CVector3 D_800F2030;        /* cached unit normal */
+extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
+extern CGameRegion *sCachedNormalRegion;    /* triangle of the cached unit normal */
+extern CVector3 sRegionNormal;        /* cached raw normal */
+extern CVector3 sRegionUnitNormal;        /* cached unit normal */
 
 /* Raw (unnormalised) normal of a triangle, cached for the last triangle. */
 static __inline__ CVector3 *raw_normal(CVector3 *out, CGameRegion *tri) {
@@ -17,30 +17,30 @@ static __inline__ CVector3 *raw_normal(CVector3 *out, CGameRegion *tri) {
     CVector3 edge1;
 
     if (tri == NULL) {
-        D_800F2020.x = 0;
-        D_800F2020.z = 0;
-        D_800F2020.y = 1.0f;
-    } else if (tri != D_800B2608) {
+        sRegionNormal.x = 0;
+        sRegionNormal.z = 0;
+        sRegionNormal.y = 1.0f;
+    } else if (tri != sCachedRawNormalRegion) {
         CVector3__Subtract(&edge0, tri->m_pVertices[1], tri->m_pVertices[0]);
         CVector3__Subtract(&edge1, tri->m_pVertices[2], tri->m_pVertices[1]);
-        CVector3__Cross(&D_800F2020, &edge0, &edge1);
+        CVector3__Cross(&sRegionNormal, &edge0, &edge1);
     }
-    D_800B2608 = tri;
-    *out = D_800F2020;
+    sCachedRawNormalRegion = tri;
+    *out = sRegionNormal;
     return out;
 }
 
 /* Unit normal of a triangle (straight up for none), cached for the last triangle. */
 CVector3 *CGameRegion__GetNormal(CVector3 *out, CGameRegion *tri) {
     if (tri == NULL) {
-        D_800F2030.x = 0;
-        D_800F2030.z = 0;
-        D_800F2030.y = 1.0f;
-    } else if (tri != D_800B260C) {
-        raw_normal(&D_800F2030, tri);
-        CVector3__Normalize(&D_800F2030);
+        sRegionUnitNormal.x = 0;
+        sRegionUnitNormal.z = 0;
+        sRegionUnitNormal.y = 1.0f;
+    } else if (tri != sCachedNormalRegion) {
+        raw_normal(&sRegionUnitNormal, tri);
+        CVector3__Normalize(&sRegionUnitNormal);
     }
-    *out = D_800F2030;
-    D_800B260C = tri;
+    *out = sRegionUnitNormal;
+    sCachedNormalRegion = tri;
     return out;
 }

@@ -7,9 +7,9 @@
 extern s32 Controller_Lock(s32 arg0);
 extern u8 D_800F677B[];
 extern void Controller_ReadAll(void);
-extern u8 D_800F6750;
+extern u8 gPakQueueState;
 extern u8 D_800F677B[];
-extern u8 D_800F6798[];
+extern u8 gSiMessageQueue[];
 extern s32 osMotorInit(u8 *a0, OSPfs *a1, s32 a2);
 extern s32 Pak_Mount_2(s32 a0);
 extern void Controller_Unlock(void);
@@ -19,21 +19,21 @@ void Pak_ProbeSlot_2(s32 kind)
     s32 ready;
     ((void (*)(s32))Controller_Lock)(1);
     Controller_ReadAll();
-    D_800F6750 = 2;
-    cur = &D_80130AA0[kind];
+    gPakQueueState = 2;
+    cur = &gRumblePaks[kind];
     if (D_800F677B[kind * 4] != 0) {
         cur->present = 0;
         ready = 0;
     } else {
-        cur->present = osMotorInit(D_800F6798, &cur->pfs, kind) == 0;
+        cur->present = osMotorInit(gSiMessageQueue, &cur->pfs, kind) == 0;
         ready = cur->present;
     }
     if (ready != 0) {
-        D_80130C60[kind] = 2;
+        gPakState[kind] = 2;
     } else if (Pak_Mount_2(kind) != 0) {
-        D_80130C60[kind] = 3;
+        gPakState[kind] = 3;
     } else {
-        D_80130C60[kind] = 1;
+        gPakState[kind] = 1;
     }
     Controller_Unlock();
 }

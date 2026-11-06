@@ -47,9 +47,9 @@ typedef struct {
 } Plan;
 
 extern u8 gScene[];
-extern u8 D_800F1B40[];
+extern u8 gCollisionInfoLineOfSight[];
 extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
-extern CharacterInfo D_800ADF5C[];
+extern CharacterInfo gPlayerStateTable_tuning[];
 
 s32 AI_UpdatePathHeading(Actor *self, Plan *plan, Actor *target);
 s32 AI_IsInViewCone(Actor *viewer, Actor *target, f32 range, f32 across, f32 up);
@@ -144,16 +144,16 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
             ADD(t);
         }
         if (self->flags & 0x300000) {
-            t = CPlayerPool__FindNearestOther(&D_80119870.m_PlayerList, self->pos, self->owner);
+            t = CPlayerPool__FindNearestOther(&gEngineApp_m_Game.m_PlayerList, self->pos, self->owner);
         } else {
-            t = CPlayerPool__FindNearest(&D_80119870.m_PlayerList, self->pos);
+            t = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, self->pos);
         }
         if (t != NULL && t->alive != 0 && t->character != 1) {
             cam = GameObject_GetRegionInfo(t);
             if (cam != NULL) {
                 range = cam->height - 102.399994f;
             }
-            if (self->def->m_Type == 1 && plan->unk37 == 0 && (*D_800ADF5C[t->character].flags & 0x80)) {
+            if (self->def->m_Type == 1 && plan->unk37 == 0 && (*gPlayerStateTable_tuning[t->character].flags & 0x80)) {
                 across *= 0.75f;
                 up *= 0.75f;
                 range *= 0.5f;
@@ -190,7 +190,7 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                         eye = self->pos;
                         eye.y = eye.y + GameObject_GetCollisionHeight(self);
                         eye.y = eye.y + self->eye;
-                        r = Collision_MoveInstance(t, eye, D_800F1B40);
+                        r = Collision_MoveInstance(t, eye, gCollisionInfoLineOfSight);
                         if ((Actor *)gCollisionResults.m_pInstance == self) {
                             r = 0;
                         }

@@ -3,7 +3,7 @@
 #include "common.h"
 
 /* Pak font code -> character. */
-extern u8 D_800C222C[];
+extern u8 gPakCharTable[];
 
 static __inline__ s32 toUpper(s32 c) {
     if ((u32)(c - 'a') < 26) {
@@ -20,7 +20,7 @@ void Pak_EncodeText_2(u8 *src, u8 *dst, s32 n) {
     for (i = 0; i < n; i++) {
         src[i] = toUpper(src[i]);
         for (j = 0; j < 0x42; j++) {
-            if (src[i] == D_800C222C[j]) {
+            if (src[i] == gPakCharTable[j]) {
                 dst[i] = j;
                 break;
             }

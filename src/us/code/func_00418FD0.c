@@ -4,7 +4,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 TeamBloodMenu_StepFragLimit(void *first, void *second) {
-    GameSettings *game = &D_8011AAD8;
+    GameSettings *game = &gEngineApp_m_Settings;
     game->teamScoreLimit = Menu_StepValue(second, game->teamScoreLimit, 1, 0, 99, 1);
     return 0;
 }

@@ -9,8 +9,8 @@
  * the cool-down and re-picks a region. */
 
 extern f32 gFrameIncrement; /* frame delta */
-extern CVector3 D_800B06A0;
-extern CVector3 D_800B06AC;
+extern CVector3 gEnemyAlertPoint;
+extern CVector3 gEnemyLastNoisePos;
 extern u8 gScene[];
 
 extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
@@ -47,7 +47,7 @@ void EnemyAI_AttackWait(CGameObjectInstance *actor, CAI *ai) {
             if (canAttack(ai, &actor->header.m_pIntelligence->m_Enemy, state)) {
                 CAI__SetMode(actor, ai, 0xC);
             }
-            D_800B06A0 = D_800B06AC;
+            gEnemyAlertPoint = gEnemyLastNoisePos;
             ai->m_Action = 1;
         } else if (ai->m_ActionTime > 0.0f) {
             ai->m_ActionTime -= gFrameIncrement;

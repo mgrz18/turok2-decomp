@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800C2020;
+extern s32 gDamagedPakContinued;
 
 void func_00421250(void) {
-    D_800C2020 = 0;
+    gDamagedPakContinued = 0;
 }

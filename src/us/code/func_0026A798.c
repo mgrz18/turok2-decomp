@@ -13,8 +13,8 @@ typedef struct Vertex {
 
 #define REGION_VERTEX(tri, i) ((Vertex *)(tri)->m_pVertices[i])
 
-extern CGameRegion *D_800B2600;    /* triangle whose normal is cached */
-extern CVector3 D_800F2000;         /* its normal */
+extern CGameRegion *sCachedCeilingRawNormalRegion;    /* triangle whose normal is cached */
+extern CVector3 sRegionCeilingNormal;         /* its normal */
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
@@ -24,17 +24,17 @@ static __inline__ CVector3 triNormal(CGameRegion *tri) {
     CVector3 edge1;
     CVector3 edge2;
 
-    if (tri != D_800B2600) {
+    if (tri != sCachedCeilingRawNormalRegion) {
         edge1.x = REGION_VERTEX(tri, 1)->x - REGION_VERTEX(tri, 0)->x;
         edge1.y = REGION_VERTEX(tri, 1)->y - REGION_VERTEX(tri, 0)->y;
         edge1.z = REGION_VERTEX(tri, 1)->z - REGION_VERTEX(tri, 0)->z;
         edge2.x = REGION_VERTEX(tri, 2)->x - REGION_VERTEX(tri, 1)->x;
         edge2.y = REGION_VERTEX(tri, 2)->y - REGION_VERTEX(tri, 1)->y;
         edge2.z = REGION_VERTEX(tri, 2)->z - REGION_VERTEX(tri, 1)->z;
-        CVector3__Cross(&D_800F2000, &edge2, &edge1);
+        CVector3__Cross(&sRegionCeilingNormal, &edge2, &edge1);
     }
-    D_800B2600 = tri;
-    return D_800F2000;
+    sCachedCeilingRawNormalRegion = tri;
+    return sRegionCeilingNormal;
 }
 
 /*

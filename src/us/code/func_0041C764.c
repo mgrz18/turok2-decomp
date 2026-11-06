@@ -5,9 +5,9 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern CPlayerOptions D_8011AB18;
+extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 s32 OptionsMenu_ToggleWeaponSelect(void *unused, Menu *menu) {
-    CPlayerOptions *settings = &D_8011AB18;
+    CPlayerOptions *settings = &gEngineApp_m_Settings_defaultSlot;
     if (menu->player != 0) {
         settings = menu->player->m_pOptions;
     }

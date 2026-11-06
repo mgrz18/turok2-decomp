@@ -4,7 +4,7 @@
 #include "structs/vector.h"
 #include "structs/weapon.h"
 
-extern f32 D_800AE2D8;              /* slot scale */
+extern f32 gBarrelSlotScale;              /* slot scale */
 
 f32 Math_Approach(f32 value, f32 target, f32 rate);
 void CMtxF__Identity(f32 *m);
@@ -32,12 +32,12 @@ void CBarrel__DrawRing(CBarrel *menu, s32 arg1, s32 arg2) {
     for (i = 0; i < menu->m_nCount; i++) {
         slot = &menu->m_Items[i];
         if (i == menu->m_nCursor) {
-            target = D_800AE2D8 * 1.3f;
+            target = gBarrelSlotScale * 1.3f;
         } else {
-            target = D_800AE2D8;
+            target = gBarrelSlotScale;
             slot->m_Lift = Math_Approach(slot->m_Lift, 0.0f, 0.35f);
         }
-        slot->m_Scale = Math_Approach(slot->m_Scale, target, D_800AE2D8 * 0.1f);
+        slot->m_Scale = Math_Approach(slot->m_Scale, target, gBarrelSlotScale * 0.1f);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = 0.75f;
@@ -47,7 +47,7 @@ void CBarrel__DrawRing(CBarrel *menu, s32 arg1, s32 arg2) {
         count++;
         item->m_Item = i;
         item->m_vPos = position;
-        item->m_Icon = D_800AF618[slot->m_Weapon]->icon;
+        item->m_Icon = gWeaponInfoTable[slot->m_Weapon]->icon;
         item->m_Alpha = 0;
         item->m_Size = 1.0f;
         item++;

@@ -7,10 +7,10 @@ typedef struct {
     /* 0x2584 */ void *current;
 } VtxBuffers;
 
-extern s32 D_800B6D1C;          /* current view */
+extern s32 gEvenOdd;          /* current view */
 
 void RibbonVtxPool_Reset(VtxBuffers *arg0) {
-    s32 i = D_800B6D1C;
+    s32 i = gEvenOdd;
     arg0->count = 0x12C;
     arg0->current = (s8 *)arg0 + i * 0x12C0;
 }

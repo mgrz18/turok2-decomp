@@ -28,7 +28,7 @@ s32 CPlayer__CheckTagHit(CPlayer *p) {
         slot = &gCollisionResults; /* read through the slot: the ROM copies the pointer */
         a = *slot;
         kind = a->header.m_Type;
-        if (kind == 1 && D_80119870.m_Settings.multiplayer && gCollisionResults->m_nTypeFlag == 0x64E
+        if (kind == 1 && gEngineApp_m_Game.m_Settings.multiplayer && gCollisionResults->m_nTypeFlag == 0x64E
             && gCollisionResults->m_AI.m_ModeBefore != gCollisionResults->m_AI.m_Mode) {
             opts = p->m_pOptions;
             mode = opts->m_TagMode;
@@ -36,7 +36,7 @@ s32 CPlayer__CheckTagHit(CPlayer *p) {
                 opts->m_TagMode = 0;
                 p->m_pOptions->m_LastTagMode = mode;
                 CPlayer__Respawn(p);
-                D_80119870.m_Settings.match.tagPhase = mode;
+                gEngineApp_m_Game.m_Settings.match.tagPhase = mode;
             }
         }
     }

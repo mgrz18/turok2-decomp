@@ -8,12 +8,12 @@ s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 extern char D_800C140C[];
 extern char D_800C1410[];
 extern char D_800B45E0[];
-extern s32 D_80130990;
+extern s32 gPakMenuAnyPak;
 
 s32 PakMenu_UpdateTitle_2(MenuItem *item, Menu *event) {
     s32 port;
 
-    if (D_80130990 != 0) {
+    if (gPakMenuAnyPak != 0) {
         item->text = D_800C140C;
     } else {
         port = event->controller->port;

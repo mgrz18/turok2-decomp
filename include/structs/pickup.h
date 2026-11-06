@@ -13,7 +13,7 @@
 #include "common.h"
 
 typedef struct {
-    /* 0x0 */ s16 m_Weapon;                 /* index into D_800AF618 */
+    /* 0x0 */ s16 m_Weapon;                 /* index into gWeaponInfoTable */
     /* 0x2 */ s16 m_AmmoType;               /* -1: no ammo with it */
     /* 0x4 */ s16 m_AmmoAmount;
 } CPickupWeapon; /* size 0x6 */

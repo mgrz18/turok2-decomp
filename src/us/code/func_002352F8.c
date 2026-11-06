@@ -3,7 +3,7 @@
 #include "common.h"
 #include "gfx.h"
 
-#define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct Trail Trail;
 struct Trail {

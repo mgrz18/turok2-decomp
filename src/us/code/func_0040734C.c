@@ -1,17 +1,17 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* Two flags at D_8012F9E0; the word 8 bytes before it is D_8012F9D8. */
+/* Two flags at gLevelScript_armed; the word 8 bytes before it is gLevelScript_bossState. */
 typedef struct {
     /* 0x0 */ s8 unk0;
     /* 0x1 */ s8 unk1;
 } BossFlags;
 
-extern BossFlags D_8012F9E0;
+extern BossFlags gLevelScript_armed;
 
 void Primagen_EnterMode5(CGameObjectInstance *arg0) {
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2000);
-    D_8012F9E0.unk0 = 0;
-    D_8012F9E0.unk1 = 0;
-    ((s32 *) &D_8012F9E0)[-2] = 1;
+    gLevelScript_armed.unk0 = 0;
+    gLevelScript_armed.unk1 = 0;
+    ((s32 *) &gLevelScript_armed)[-2] = 1;
 }

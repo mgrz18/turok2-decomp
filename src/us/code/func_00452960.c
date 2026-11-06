@@ -14,7 +14,7 @@ extern char D_800C1F58[];
 
 /* Names setting 0x18. */
 s32 Menu_DebugModeLabel_2(MenuItem *item) {
-    switch (D_8011AAD8.unk18) {
+    switch (gEngineApp_m_Settings.unk18) {
     case 0:
         item->text = D_800C1EE0;
         break;

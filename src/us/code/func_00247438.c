@@ -30,11 +30,11 @@ typedef struct {
     /* 0x294 */ f32 top;
 } HudView;
 
-extern u8 D_800AB8CC;
-extern u8 D_800AB8CD;
-extern u8 D_800AB0D0[];     /* lights */
-extern s32 D_800B6D1C;      /* frame buffer index */
-extern s32 D_800C2038;
+extern u8 gPrimAlphaOverride;
+extern u8 gPrimAlphaOverrideValue;
+extern u8 gSceneLights[];     /* lights */
+extern s32 gEvenOdd;      /* frame buffer index */
+extern s32 gResolution;
 extern f32 D_800ADDB8;
 extern u8 gEngineApp[];
 
@@ -62,20 +62,20 @@ void CPlayer__DrawScope(HudModel *m, HudView *view) {
     if (m->object == 0 || m->state == 0) {
         return;
     }
-    D_800AB8CC = 1;
-    D_800AB8CD = 0x20;
+    gPrimAlphaOverride = 1;
+    gPrimAlphaOverrideValue = 0x20;
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE3001801;
         g->w1 = 0xC0;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE3000C00;
         g->w1 = 0x80000;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE3001201;
         g->w1 = 0x2000;
     }
@@ -87,16 +87,16 @@ void CPlayer__DrawScope(HudModel *m, HudView *view) {
     CMtxF__Translate(&mf[0][0], m->pos.x, m->pos.y, m->pos.z);
     CMtxF__SwapYZRows(&mf[0][0]);
     CMtxF__Copy(&mfDraw[0][0], &mf[0][0]);
-    if (D_800C2038 == 2) {
+    if (gResolution == 2) {
         CMtxF__ScaleColumns(&mfDraw[0][0], D_800ADDB8, 1.0f, 1.0f);
     }
-    CMtxF__ToMtxAffine(&mfDraw[0][0], &m->mtx[D_800B6D1C]);
+    CMtxF__ToMtxAffine(&mfDraw[0][0], &m->mtx[gEvenOdd]);
     CMtxF__TransformPoint(&mf[0][0], &m->pos, &out);
-    Render_QueueModelByKey(m->object, &m->mtx[D_800B6D1C], D_800AB0D0, 0, -1);
+    Render_QueueModelByKey(m->object, &m->mtx[gEvenOdd], gSceneLights, 0, -1);
     Render_FlushBatches();
-    D_800AB8CC = 0;
+    gPrimAlphaOverride = 0;
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE3001801;
         g->w1 = 0;
     }

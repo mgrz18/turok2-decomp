@@ -4,8 +4,8 @@
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-extern CGameRegion *D_800B2608;    /* triangle whose normal is cached */
-extern CVector3 D_800F2020;         /* its normal */
+extern CGameRegion *sCachedRawNormalRegion;    /* triangle whose normal is cached */
+extern CVector3 sRegionNormal;         /* its normal */
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
@@ -17,13 +17,13 @@ static __inline__ CVector3 triNormal(CGameRegion *tri) {
     CVector3 edge1;
     CVector3 edge2;
 
-    if (tri != D_800B2608) {
+    if (tri != sCachedRawNormalRegion) {
         CVector3__Subtract(&edge1, tri->m_pVertices[1], tri->m_pVertices[0]);
         CVector3__Subtract(&edge2, tri->m_pVertices[2], tri->m_pVertices[1]);
-        CVector3__Cross(&D_800F2020, &edge1, &edge2);
+        CVector3__Cross(&sRegionNormal, &edge1, &edge2);
     }
-    D_800B2608 = tri;
-    return D_800F2020;
+    sCachedRawNormalRegion = tri;
+    return sRegionNormal;
 }
 
 /* Height of tri's plane above (x, z). */

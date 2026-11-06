@@ -7,23 +7,23 @@ typedef struct {
     /* 0x8 */ s32 value;
 } State;
 
-extern State D_800B8960;
+extern State __osPiDevMgr;
 
 s32 osPiGetCmdQueue(void)
 {
   s32 *new_var;
   s32 new_var2;
-  if (D_800B8960.active != 0)
+  if (__osPiDevMgr.active != 0)
   {
     if (new_var)
     {
-      new_var = &D_800B8960.value;
+      new_var = &__osPiDevMgr.value;
       ;
       return *new_var;
     }
     else
     {
-      new_var = &D_800B8960.value;
+      new_var = &__osPiDevMgr.value;
       ;
       return *new_var;
     }

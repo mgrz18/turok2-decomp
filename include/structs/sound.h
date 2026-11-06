@@ -206,11 +206,11 @@ struct CAudioWorld {
     /* 0x2B95 */ u8 pad2B95[3];
     /* 0x2B98 */ struct CCamera *listener; /* sounds are heard from its m_vPos, out to m_FarClip */
     /* 0x2B9C */ s32 fxMix;            /* added to each voice's FX mix */
-    /* 0x2BA0 */ f32 sfxVolume;        /* option byte D_8011AAED / 255 */
-    /* 0x2BA4 */ f32 volume2BA4;       /* option byte D_8011AAEC / 255 */
-    /* 0x2BA8 */ f32 musicVolume;      /* option byte D_8011AAEE / 255; voices flagged 0x200 */
+    /* 0x2BA0 */ f32 sfxVolume;        /* option byte gEngineApp_m_Settings_unk15 / 255 */
+    /* 0x2BA4 */ f32 volume2BA4;       /* option byte gEngineApp_m_Settings_unk14 / 255 */
+    /* 0x2BA8 */ f32 musicVolume;      /* option byte gEngineApp_m_Settings_unk16 / 255; voices flagged 0x200 */
     /* 0x2BAC */ s32 unk2BAC;
-    /* 0x2BB0 */ s32 unk2BB0;          /* option byte D_8011AAEB */
+    /* 0x2BB0 */ s32 unk2BB0;          /* option byte gEngineApp_m_Settings_unk13 */
     /* 0x2BB4 */ s32 unk2BB4;
     /* 0x2BB8 */ s32 muted;
     /* 0x2BBC */ f32 unk2BBC;

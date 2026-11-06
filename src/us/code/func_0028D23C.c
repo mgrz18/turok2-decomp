@@ -1,10 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_8011F290[];
+extern s32 gSavedPlayers[];
 
 void SavedPlayers_UpdateTimer(void) {
-    s32 *p = D_8011F290;
+    s32 *p = gSavedPlayers;
 
     if (p[2] != 0) {
         p[2]--;

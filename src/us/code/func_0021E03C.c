@@ -20,7 +20,7 @@ typedef struct ShadowActor {
     u8 shadowAlpha;             /* 0x10E */
 } ShadowActor;
 
-extern u8 D_800F7148[];
+extern u8 gScene_m_Heap[];
 
 s32 CGameRegion__IsSteep(ObjDef *def);
 void *MtxPool_Alloc(void *pool, s32 count);
@@ -53,7 +53,7 @@ void Shadow_DrawBlob(ShadowActor *actor, CVector3 *offset, s32 arg2) {
     if (!visible) {
         return;
     }
-    gmtx = MtxPool_Alloc(D_800F7148, 1);
+    gmtx = MtxPool_Alloc(gScene_m_Heap, 1);
     if (gmtx == NULL) {
         return;
     }

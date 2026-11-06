@@ -74,10 +74,10 @@ typedef struct {
     /* 0x20 */ f32 texStepT;
 } Morph;
 
-#define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern Gfx *D_800D8E24;             /* display list head */
-extern s32 D_800B6D1C;              /* matrix buffer index */
+extern Gfx *gDList;             /* display list head */
+extern s32 gEvenOdd;              /* matrix buffer index */
 
 extern void *Texture_Request(void *model);
 extern void Texture_GetInfo(void *model, AnimInfo *info);
@@ -152,13 +152,13 @@ void Trail_DrawTextured(void *pool, Trail *trail, s32 unused) {
     frame = Trail_GetAnimFrame(trail, track, &info);
     Texture_Load(trail->model, model, frame, 0, 0xFFFF, 0xFFFF, 0, 0, 0);
     edges = count - 1;
-    GFX_CMD(0xDA380003, (u32)clock->matrix[D_800B6D1C])
+    GFX_CMD(0xDA380003, (u32)clock->matrix[gEvenOdd])
     while (clock != 0 && next != 0 && 0.0f < clock->time && 0.0f < next->time) {
         vertices = RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
         Morph_BlendVerticesTex(trail, clock, vertices, clock->offset, &storage);
         GFX_CMD(0x01000000 | (count << 12) | ((count & 0x7F) << 1), (u32)vertices)
-        GFX_CMD(0xDA380003, (u32)next->matrix[D_800B6D1C])
+        GFX_CMD(0xDA380003, (u32)next->matrix[gEvenOdd])
         vertices = RibbonVtxPool_Alloc(pool, count);
         if (vertices == 0) break;
         scale = next->offset;

@@ -3,8 +3,8 @@
 
 s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
-extern s32 D_800AFF48;
+extern s32 sEnemyAnimDart_AFF48;
 
 void EnemyAnim_Dart_AFF48(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &D_800AFF48, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wDartAnimFlags);
+    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &sEnemyAnimDart_AFF48, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wDartAnimFlags);
 }

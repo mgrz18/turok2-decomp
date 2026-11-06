@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 osPiRawReadIo(s32 arg0, s32 *arg1);
-extern u32 D_80000308;
+extern u32 osRomBase;
 extern void __assert(void *arg0, void *arg1, s32 arg2);
 extern s32 D_800AA8E0;
 extern s32 D_800AA8E4;
@@ -17,6 +17,6 @@ s32 osPiRawReadIo(s32 arg0, s32 *arg1) {
     while (status & 3) {
         status = *(volatile u32 *)0xA4600010;
     }
-    *arg1 = *(s32 *)(D_80000308 | arg0 | 0xA0000000);
+    *arg1 = *(s32 *)(osRomBase | arg0 | 0xA0000000);
     return 0;
 }

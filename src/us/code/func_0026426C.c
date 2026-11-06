@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 
 void CMtxF__SetRotateZ(f32 mtx[4][4], f32 angle);
 void CMtxF__RotateX(f32 mtx[4][4], f32 angle);
@@ -28,7 +28,7 @@ void Platform_CalcOrientation(CGameObjectInstance *self, CAI *ai) {
     q.x = 0.0f;
     q.y = sinHalf;
     q.z = 0.0f;
-    D_800DD78C = sinHalf;
+    gQuaternionSin = sinHalf;
     q.w = func_002974C0(self->m_RotY * 0.5f);
     CQuaternion__Multiply(&rot, &q, &self->m_qGround);
     CQuaternion__ToMatrix(&rot, spin);

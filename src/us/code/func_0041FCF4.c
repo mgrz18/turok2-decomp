@@ -10,11 +10,11 @@ typedef struct {
     char c[4];
 } Chars4;
 
-extern s32 D_80130990;
-extern s32 D_800C2028; /* pad */
-extern s32 D_80130984;
-extern s32 D_80130994;
-extern s32 D_801309B4;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort; /* pad */
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuIsLoad;
+extern s32 gPakMenuIsProfile;
 extern s32 D_800F70A8;
 extern Chars4 D_800C1408;
 extern u8 D_800C1404[];
@@ -36,17 +36,17 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
     char *t;
     u8 *fmt;
 
-    if (D_80130990 != 0) {
-        pad = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        pad = gPakMenuPort;
     } else {
         pad = own->controller->port;
     }
     buf = D_800C1408;
     bp = buf.c;
-    if (D_80130984 != 0) {
+    if (gPakMenuIsSave != 0) {
         item->text = D_800B48B4;
         if (Pak_GetFreePages(pad, &freeb) == 0) {
-            if (D_801309B4 != 0) {
+            if (gPakMenuIsProfile != 0) {
                 need = Pak_BytesToPages(0x18);
             } else {
                 need = Pak_BytesToPages(D_800F70A8 + 0x688);
@@ -68,9 +68,9 @@ s32 PakMenu_FreePagesText(MenuItem *item, Menu *own) {
             *dst = buf.c[2];
         }
     } else {
-        if (D_80130990 != 0) {
+        if (gPakMenuAnyPak != 0) {
             t = D_800B4914;
-        } else if (D_80130994 != 0) {
+        } else if (gPakMenuIsLoad != 0) {
             t = D_800B48B4;
         } else {
             goto none;

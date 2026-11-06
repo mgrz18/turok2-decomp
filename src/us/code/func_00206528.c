@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 
 extern void CCache__ClearDisplayListLocks(s32, s32);
-extern int D_800D8218;
-extern int D_800D8208[];
+extern int gCache_currentDlist;
+extern int gCache_dlistValid[];
 extern void CCache__ClearCurrentDisplayList(void);
 void CCache__ClearCurrentDisplayList(void) {
-    s32 *p = &D_800D8218;
+    s32 *p = &gCache_currentDlist;
     CCache__ClearDisplayListLocks(0, *p);
-    D_800D8208[*p] = 0;
+    gCache_dlistValid[*p] = 0;
 }

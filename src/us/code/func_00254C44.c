@@ -35,7 +35,7 @@ struct Menu {
 struct Menu;
 typedef struct Menu Menu;
 extern float D_800A7128;
-extern float D_800AE2D8;
+extern float gBarrelSlotScale;
 struct Menu;
 extern void CBarrel__Reset(Menu *menu);
 void CBarrel__Reset(Menu *menu) {
@@ -54,6 +54,6 @@ void CBarrel__Reset(Menu *menu) {
     for (i = 0; i < 36; i++) {
         menu->slots[i].angle = -(i * D_800A7128);
         menu->slots[i].y = 0;
-        menu->slots[i].scale = D_800AE2D8;
+        menu->slots[i].scale = gBarrelSlotScale;
     }
 }

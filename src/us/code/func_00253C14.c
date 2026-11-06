@@ -19,7 +19,7 @@ static __inline__ s32 GetMaxAmmo(CPlayer *player, s32 type, s32 heldOnly) {
         if (heldOnly && (s8)player->m_Data.m_WeaponList[w] == 0) {
             continue;
         }
-        def = D_800AF618[w];
+        def = gWeaponInfoTable[w];
         for (i = 0; i < 3; i++) {
             ammo = def->ammo[i];
             if (ammo == NULL) {

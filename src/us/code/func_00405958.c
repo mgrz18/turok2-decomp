@@ -8,7 +8,7 @@ extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1F50[];
 extern f32 gFrameIncrement;          /* per-frame scale */
-extern s32 D_8012F988[];
+extern s32 gLevelScript_values[];
 extern s32 D_8012F9A8[];
 
 void Primagen_UpdateMode2(CGameObjectInstance *obj, CAI *ai) {
@@ -21,23 +21,23 @@ void Primagen_UpdateMode2(CGameObjectInstance *obj, CAI *ai) {
     D_800F1F50[0] &= ~0x8000;
 
     limit = 0x4B00;
-    if (D_8012F608.stage == 0) {
+    if (gLevelScript.stage == 0) {
         limit = 0x2580;
     }
-    if (D_8012F608.damage >= limit) {
+    if (gLevelScript.damage >= limit) {
         AI_StopSound(obj, ai);
-        ai->m_VisBits &= ~(1 << D_8012F608.part);
-        D_8012F608.partActive = 0;
+        ai->m_VisBits &= ~(1 << gLevelScript.part);
+        gLevelScript.partActive = 0;
         CAI__SetMode(obj, ai, 7);
-    } else if (D_8012F608.partTimer <= 0.0f) {
+    } else if (gLevelScript.partTimer <= 0.0f) {
         AI_StopSound(obj, ai);
-        D_8012F988[D_8012F608.part] = D_8012F9A8[D_8012F608.part];
-        bit = 1 << D_8012F608.part;
-        D_8012F608.partActive = 0;
-        D_8012F608.partsDone |= bit;
+        gLevelScript_values[gLevelScript.part] = D_8012F9A8[gLevelScript.part];
+        bit = 1 << gLevelScript.part;
+        gLevelScript.partActive = 0;
+        gLevelScript.partsDone |= bit;
         ai->m_VisBits |= bit;
         CAI__SetMode(obj, ai, 7);
     } else {
-        D_8012F608.partTimer -= gFrameIncrement;
+        gLevelScript.partTimer -= gFrameIncrement;
     }
 }

@@ -7,7 +7,7 @@ s32 osCreateMesgQueue(s32, s32, s32);           /* extern */
 s32 osCreateThread(s32, s32, s32 *, s32, s32, s32); /* extern */
 s32 osSetEventMesg(s32, s32, s32);       /* extern */
 s32 osStartThread(s32);                         /* extern */
-extern s32 D_800B6E94;
+extern s32 gThreadPriorityLoader;
 extern s32 CLoader__Main;
 
 typedef struct {
@@ -37,6 +37,6 @@ void CLoader__Construct(s32 arg0, s32 arg1) {
         var_s0 += 0x20;
     } while (var_s1 < 0x210);
     memset(arg0 + 0xA68, arg1 & 0xFF, 0x400);
-    osCreateThread(arg0, arg1, &CLoader__Main, arg0, arg0 + 0xE68, D_800B6E94);
+    osCreateThread(arg0, arg1, &CLoader__Main, arg0, arg0 + 0xE68, gThreadPriorityLoader);
     osStartThread(arg0);
 }

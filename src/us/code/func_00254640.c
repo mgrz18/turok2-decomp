@@ -2,7 +2,7 @@
 
 s32 GameObject_IsOnGround(s32);
 
-extern s32 D_8011AAD8;
+extern s32 gEngineApp_m_Settings;
 
 void CPlayer__UpdateSpeedScale(void *arg0, void *arg1, void *arg2)
 {
@@ -15,7 +15,7 @@ void CPlayer__UpdateSpeedScale(void *arg0, void *arg1, void *arg2)
   }
   temp_f1 = *((f32 *) (((s8 *) (*((void **) (((s8 *) arg1) + 0x14)))) + 0x1C));
   *((f32 *) (((s8 *) arg0) + 0xB28)) = temp_f1;
-  new_var = &D_8011AAD8;
+  new_var = &gEngineApp_m_Settings;
   if ((*((u8 *) (((s8 *) new_var) + 0x19))) != 0)
   {
     *((f32 *) (((s8 *) arg0) + 0xB28)) = (f32) (temp_f1 * (*((f32 *) (((s8 *) new_var) + 0x1C))));

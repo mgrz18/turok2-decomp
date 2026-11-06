@@ -3,46 +3,46 @@
 #include "structs/game_object.h"
 
 M2C_UNK ScriptAnimator_SetScript(void *, M2C_UNK *);           /* extern */
-extern M2C_UNK D_00431A74;
+extern M2C_UNK sPrimagenMode7PartScript_2;
 extern f32 D_800C0488;
 extern f32 D_800C048C;
 extern f32 D_800C0490;
-extern M2C_UNK D_8012F608;
-extern M2C_UNK D_8012F9DC;
+extern M2C_UNK gLevelScript;
+extern M2C_UNK gLevelScript_bossMode;
 
 void Primagen_EnterMode7_2(CGameObjectInstance *arg0) {
     void *temp_s2;
 
-    if (M2C_FIELD(&D_8012F9DC, s32 *, 0) == 2) {
-        M2C_FIELD(&D_8012F9DC, s8 *, 4) = 1;
-        M2C_FIELD(&D_8012F9DC, s8 *, 5) = 1;
-        M2C_FIELD(&D_8012F9DC, s32 *, -4) = 2;
+    if (M2C_FIELD(&gLevelScript_bossMode, s32 *, 0) == 2) {
+        M2C_FIELD(&gLevelScript_bossMode, s8 *, 4) = 1;
+        M2C_FIELD(&gLevelScript_bossMode, s8 *, 5) = 1;
+        M2C_FIELD(&gLevelScript_bossMode, s32 *, -4) = 2;
     }
-    temp_s2 = ((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x3D4));
-    if (M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 1) {
+    temp_s2 = ((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x3D4));
+    if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 1) {
         arg0->m_AI.m_AnimSpeed = (f32) D_800C0488;
     }
-    if (M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 2) {
+    if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 2) {
         arg0->m_AI.m_AnimSpeed = (f32) D_800C048C;
     }
-    if (M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 3) {
+    if (M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 3) {
         arg0->m_AI.m_AnimSpeed = (f32) D_800C0490;
     }
-    if ((M2C_FIELD(&D_8012F9DC, s32 *, -0x3D4) == 1) && (M2C_FIELD(temp_s2, s32 *, 0x18) == 0)) {
-        ScriptAnimator_SetScript(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x284)), &D_00431A74);
-        ScriptAnimator_SetScript(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x220)), &D_00431A74);
-        ScriptAnimator_SetScript(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x158)), &D_00431A74);
-        ScriptAnimator_SetScript(((__typeof__(&D_8012F9DC))((s8 *)&D_8012F9DC - 0x1BC)), &D_00431A74);
+    if ((M2C_FIELD(&gLevelScript_bossMode, s32 *, -0x3D4) == 1) && (M2C_FIELD(temp_s2, s32 *, 0x18) == 0)) {
+        ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x284)), &sPrimagenMode7PartScript_2);
+        ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x220)), &sPrimagenMode7PartScript_2);
+        ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x158)), &sPrimagenMode7PartScript_2);
+        ScriptAnimator_SetScript(((__typeof__(&gLevelScript_bossMode))((s8 *)&gLevelScript_bossMode - 0x1BC)), &sPrimagenMode7PartScript_2);
         M2C_FIELD(temp_s2, s32 *, 0x18) = (s32) (M2C_FIELD(temp_s2, s32 *, 0x18) + 1);
     }
-    if ((M2C_FIELD(&D_8012F608, s32 *, 0) == 2) && (M2C_FIELD(&D_8012F608, s32 *, 0x18) == 1)) {
-        ScriptAnimator_SetScript(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0x24)), &D_00431A74);
-        ScriptAnimator_SetScript(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0xEC)), &D_00431A74);
-        M2C_FIELD(&D_8012F608, s32 *, 0x18) = (s32) (M2C_FIELD(&D_8012F608, s32 *, 0x18) + 1);
+    if ((M2C_FIELD(&gLevelScript, s32 *, 0) == 2) && (M2C_FIELD(&gLevelScript, s32 *, 0x18) == 1)) {
+        ScriptAnimator_SetScript(((__typeof__(&gLevelScript))((s8 *)&gLevelScript + 0x24)), &sPrimagenMode7PartScript_2);
+        ScriptAnimator_SetScript(((__typeof__(&gLevelScript))((s8 *)&gLevelScript + 0xEC)), &sPrimagenMode7PartScript_2);
+        M2C_FIELD(&gLevelScript, s32 *, 0x18) = (s32) (M2C_FIELD(&gLevelScript, s32 *, 0x18) + 1);
     }
-    if ((M2C_FIELD(&D_8012F608, s32 *, 0) == 3) && (M2C_FIELD(&D_8012F608, s32 *, 0x18) == 2)) {
-        ScriptAnimator_SetScript(((__typeof__(&D_8012F608))((s8 *)&D_8012F608 + 0x88)), &D_00431A74);
-        M2C_FIELD(&D_8012F608, s32 *, 0x18) = (s32) (M2C_FIELD(&D_8012F608, s32 *, 0x18) + 1);
+    if ((M2C_FIELD(&gLevelScript, s32 *, 0) == 3) && (M2C_FIELD(&gLevelScript, s32 *, 0x18) == 2)) {
+        ScriptAnimator_SetScript(((__typeof__(&gLevelScript))((s8 *)&gLevelScript + 0x88)), &sPrimagenMode7PartScript_2);
+        M2C_FIELD(&gLevelScript, s32 *, 0x18) = (s32) (M2C_FIELD(&gLevelScript, s32 *, 0x18) + 1);
     }
     arg0->m_dwFlags = (s32) (arg0->m_dwFlags | 0x2000);
 }

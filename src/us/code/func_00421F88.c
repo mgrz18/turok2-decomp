@@ -14,7 +14,7 @@ extern char D_800B4AB4[];
 extern char D_800B4ABC[];
 
 s32 GameNoteMenu_UpdateLevel(MenuItem *item) {
-    switch (Level_GetHub(D_800C201C->player.m_CheckPointWarpID)) {
+    switch (Level_GetHub(gLoadBuffer->player.m_CheckPointWarpID)) {
         case -1:
         default:
             item->text = D_800B4ABC;

@@ -4,20 +4,20 @@
 #include "rw/abu_types.h"
 
 void PakMenu_UpdateNoteRows(Shared_PakMenu *menu);
-extern s32 D_80130994;
-extern s32 D_801309BC;
-extern s32 D_80130984;
-extern s32 D_801309B4;
-extern s32 D_801309A0;
-extern s32 D_800C2024;
-extern s32 D_80130990;
-extern s32 D_800C2020;
-extern char D_80119E2C[];
-extern char D_00439190[];
-extern unsigned char D_0043B6F0[];
-extern char D_0043BC6C[];
-extern char D_0043C05C[];
-extern char D_0043BC00[];
+extern s32 gPakMenuIsLoad;
+extern s32 gPakMenuLeaving;
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuWrites;
+extern s32 gPakMenuMode;
+extern s32 gPakMenuAnyPak;
+extern s32 gDamagedPakContinued;
+extern char gEngineApp_m_Game_m_MenuPool[];
+extern char gSingleMenuAfterPakDesc[];
+extern unsigned char gPakLoadGameMenuDesc[];
+extern char gPakMsgInsertToLoadDesc[];
+extern char gDamagedPakAtBootMenuDesc[];
+extern char gPakMsgPakNotFoundDesc[];
 extern void Pak_ProbeSlot(s32 ch);
 extern s32 Pak_GetStatus(s32 ch);
 extern s32 Pak_IsRumblePak(s32 ch);
@@ -30,18 +30,18 @@ void PakMenu_InitLoadGame(Shared_PakMenu *menu)
   char *new_var2;
   s32 ch;
   new_var = 1;
-  D_800C2024 = 2;
-  D_80130984 = 0;
-  D_801309A0 = 0;
-  D_80130994 = new_var;
-  D_801309B4 = 0;
-  D_801309BC = 0;
-  D_80130990 = 0;
+  gPakMenuMode = 2;
+  gPakMenuIsSave = 0;
+  gPakMenuWrites = 0;
+  gPakMenuIsLoad = new_var;
+  gPakMenuIsProfile = 0;
+  gPakMenuLeaving = 0;
+  gPakMenuAnyPak = 0;
   ch = menu->slot->unk4;
-  if (D_800C2020 != 0)
+  if (gDamagedPakContinued != 0)
   {
-    D_801309BC = 1;
-    MenuPool_OpenMenu(D_80119E2C, D_00439190, menu->player, menu->slot, 0);
+    gPakMenuLeaving = 1;
+    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gSingleMenuAfterPakDesc, menu->player, menu->slot, 0);
     return;
   }
   menu->items[20].flags &= ~0x01000000;
@@ -52,22 +52,22 @@ void PakMenu_InitLoadGame(Shared_PakMenu *menu)
     PakMenu_UpdateNoteRows(menu);
     return;
   }
-  D_801309BC = 1;
+  gPakMenuLeaving = 1;
   if (Pak_IsRumblePak(ch) != new_var)
   {
-    new_var2 = D_0043BC6C;
-    MenuPool_OpenMenu(D_80119E2C, new_var2, menu->player, menu->slot, (char *) 1);
+    new_var2 = gPakMsgInsertToLoadDesc;
+    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, new_var2, menu->player, menu->slot, (char *) 1);
   }
   else
   {
     new_var3 = menu;
     if (Pak_NeedsRepair(ch) != 0)
     {
-      MenuPool_OpenMenu(D_80119E2C, D_0043C05C, new_var3->player, menu->slot, D_0043B6F0);
+      MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, new_var3->player, menu->slot, gPakLoadGameMenuDesc);
     }
     else
     {
-      MenuPool_OpenMenu(D_80119E2C, D_0043BC00, new_var3->player, new_var3->slot, D_00439190);
+      MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, new_var3->player, new_var3->slot, gSingleMenuAfterPakDesc);
     }
   }
 }

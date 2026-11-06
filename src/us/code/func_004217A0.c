@@ -4,9 +4,9 @@
 s32 Controller_PakChanged(s32);
 s32 PakMenu_CheckPak(s32, s32, s32);
 
-extern s32 D_800C2028;
-extern s32 D_80130990;
-extern s32 D_801309BC;
+extern s32 gPakMenuPort;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuLeaving;
 
 /* A menu window callback: the window (structs/menu.h) and the controller it reads. */
 
@@ -15,29 +15,29 @@ s32 PakMenu_PollPakB(Menu *arg0) {
     s32 var_a1;
     s32 var_v1;
 
-    if (D_801309BC == 0) {
-        if (D_80130990 != 0) {
-            var_v1 = D_800C2028;
+    if (gPakMenuLeaving == 0) {
+        if (gPakMenuAnyPak != 0) {
+            var_v1 = gPakMenuPort;
         } else {
             var_v1 = (s32) arg0->controller->port;
         }
         if (var_v1 != -1) {
-            if (D_80130990 != 0) {
-                var_a0 = D_800C2028;
+            if (gPakMenuAnyPak != 0) {
+                var_a0 = gPakMenuPort;
             } else {
                 var_a0 = (s32) arg0->controller->port;
             }
             if (Controller_PakChanged(var_a0) != 0) {
-                if (D_80130990 != 0) {
-                    var_a1 = D_800C2028;
+                if (gPakMenuAnyPak != 0) {
+                    var_a1 = gPakMenuPort;
                 } else {
                     var_a1 = (s32) arg0->controller->port;
                 }
                 if (PakMenu_CheckPak((s32) arg0, var_a1, 0) != 0) {
-                    D_801309BC = 1;
+                    gPakMenuLeaving = 1;
                 }
             }
         }
     }
-    return D_801309BC;
+    return gPakMenuLeaving;
 }

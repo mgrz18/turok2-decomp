@@ -18,12 +18,12 @@ void Primagen_UpdateMode18(CGameObjectInstance *obj, CAI *ai) {
     CVector3 point;
     f32 angle;
 
-    if (D_8012F608.timer > 0.0f) {
-        D_8012F608.timer -= gFrameIncrement;
+    if (gLevelScript.timer > 0.0f) {
+        gLevelScript.timer -= gFrameIncrement;
     }
-    if ((D_8012F608.bossMode == 3 || D_8012F608.bossMode == 4) && D_8012F608.timer <= 0.0f && ai->m_AnimRepeatedCount != 0) {
+    if ((gLevelScript.bossMode == 3 || gLevelScript.bossMode == 4) && gLevelScript.timer <= 0.0f && ai->m_AnimRepeatedCount != 0) {
         obj->m_vVelocity.y = 0.0f;
-        if (D_8012F608.bossState == 3) {
+        if (gLevelScript.bossState == 3) {
             D_800F1C40[0] |= 0x300;
             D_800F1F50[0] |= 0x300;
             CAI__SetMode(obj, ai, 0x19);
@@ -32,8 +32,8 @@ void Primagen_UpdateMode18(CGameObjectInstance *obj, CAI *ai) {
         }
         return;
     }
-    if (D_8012F608.bossMode == 8) {
-        point = D_8012F608.point;
+    if (gLevelScript.bossMode == 8) {
+        point = gLevelScript.point;
         angle = AI_AngleToPoint(obj, point);
         if (ABS(angle) <= 0.1f) {
             obj->m_vVelocity.y += 0.0102400007f; /* 0x3C27C5AD: one ulp above 0.01024f */
@@ -46,16 +46,16 @@ void Primagen_UpdateMode18(CGameObjectInstance *obj, CAI *ai) {
         }
         AI_TurnClamped(obj, ai, 0.261799425f, angle);
     }
-    if (D_8012F608.bossMode == 9) {
-        if (D_8012F608.swayTimer <= 0.0f) {
+    if (gLevelScript.bossMode == 9) {
+        if (gLevelScript.swayTimer <= 0.0f) {
             obj->m_vVelocity.y += gFrameIncrement * 0.001f;
-            obj->m_vVelocity.x += -(D_8012F608.swayAmount * 10.24f)
-                                * func_002982F0(obj->m_RotY + D_8012F608.swayPhase * 3.14159274f) * gFrameIncrement;
-            obj->m_vVelocity.z += -(D_8012F608.swayAmount * 10.24f)
-                                * func_002974C0(obj->m_RotY + D_8012F608.swayPhase * 3.14159274f) * gFrameIncrement;
+            obj->m_vVelocity.x += -(gLevelScript.swayAmount * 10.24f)
+                                * func_002982F0(obj->m_RotY + gLevelScript.swayPhase * 3.14159274f) * gFrameIncrement;
+            obj->m_vVelocity.z += -(gLevelScript.swayAmount * 10.24f)
+                                * func_002974C0(obj->m_RotY + gLevelScript.swayPhase * 3.14159274f) * gFrameIncrement;
         }
         if (ai->m_AnimRepeatedCount != 0) {
-            D_8012F608.bossMode = 2;
+            gLevelScript.bossMode = 2;
             CAI__SetMode(obj, ai, 0x17);
         }
     }

@@ -14,7 +14,7 @@ void CCache__SetFrameDelay(s32);
 
 /* Shows setting 0x0C in sixteenths: a fixed line for 0, otherwise the number. */
 s32 OptionsMenu_BrightnessText_2(MenuItem *item) {
-    u32 value = D_8011AAD8.unkC >> 4;
+    u32 value = gEngineApp_m_Settings.unkC >> 4;
 
     CCache__SetFrameDelay(CCache__GetFrameDelay() + 2);
     if (value == 0) {

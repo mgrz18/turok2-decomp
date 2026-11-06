@@ -4,7 +4,7 @@
 #define TEAM(p) (*(s32 *) ((char *) (p) + 0xBF4))
 
 void CPlayerPool__AddTeamScore(char *player, char *other, s32 event) {
-    GameMatch *score = &D_8011ACB0;
+    GameMatch *score = &gEngineApp_m_Settings_match;
     s32 *count;
 
     if (score->teams == 0) {

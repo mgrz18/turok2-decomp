@@ -7,15 +7,15 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern s32 D_80130A34;
+extern s32 sMissionFailed;
 extern char D_800B437C[];
 extern char D_800B436C[];
 s32 MissionMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
-    if (D_80130A34 != 0) {
+    if (sMissionFailed != 0) {
         field->text = D_800B437C;
     } else {
         field->text = D_800B436C;
     }
     return 1;
 }
-extern s32 D_80130A34;
+extern s32 sMissionFailed;

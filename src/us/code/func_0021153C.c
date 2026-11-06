@@ -2,7 +2,7 @@ typedef signed int s32;
 typedef float f32;
 
 /* acos lookup: 1024 samples of acos over [0, 1]. */
-extern f32 D_800AB8D0[];
+extern f32 gAcosTable[];
 
 f32 Math_AcosLookup(f32 x) {
     s32 neg;
@@ -20,15 +20,15 @@ f32 Math_AcosLookup(f32 x) {
     }
     i = pos;
     if ((f32) i < 1023.0f) {
-        lo = D_800AB8D0[i];
-        r = lo + (pos - (f32) i) * (*(&D_800AB8D0[i] + 1) - lo);
+        lo = gAcosTable[i];
+        r = lo + (pos - (f32) i) * (*(&gAcosTable[i] + 1) - lo);
         if (neg) {
             return 3.1415927f - r;
         }
         return r;
     }
     if (neg) {
-        return 3.1415927f - D_800AB8D0[1023];
+        return 3.1415927f - gAcosTable[1023];
     }
-    return D_800AB8D0[1023];
+    return gAcosTable[1023];
 }

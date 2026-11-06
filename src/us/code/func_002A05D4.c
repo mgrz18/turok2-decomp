@@ -5,14 +5,14 @@
 
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-extern float D_80125430[];
+extern float sMdctPostCosPlusSin[];
 extern void mdctInitTwiddles();
 extern float D_800AAC20;
-extern float D_80125230[];
-extern float D_80125030[];
-extern float D_80125630[];
+extern float sMdctPreSin[];
+extern float sMdctPreCos[];
+extern float sMdctPostSinMinusCos[];
 extern float D_800AAC28;
-extern s32 D_80125830[];
+extern s32 sAdecOverlap[];
 void mdctInitTwiddles(void) {
     s16 i;
     f32 angle;
@@ -30,9 +30,9 @@ void mdctInitTwiddles(void) {
     offset = (*(&D_800AAC20 + 1));
     scale = D_800AAC28;
     i = 0;
-    sines = D_80125030;
-    cosines = D_80125230;
-    zeros = D_80125830;
+    sines = sMdctPreCos;
+    cosines = sMdctPreSin;
+    zeros = sAdecOverlap;
     for (; i < 128; i++) {
         angle = (i * step + offset) * scale;
         sines[i] = func_002974C0(angle);
@@ -41,8 +41,8 @@ void mdctInitTwiddles(void) {
     }
     i = 0;
     scale = (*(&D_800AAC28 + 1));
-    sums = D_80125430;
-    differences = D_80125630;
+    sums = sMdctPostCosPlusSin;
+    differences = sMdctPostSinMinusCos;
     for (; i < 128; i++) {
         angle = i * scale;
         s = func_002974C0(angle);

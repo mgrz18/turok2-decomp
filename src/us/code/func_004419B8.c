@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_8012FB58;
+extern s32 gTotemDefense_state;
 
 s32 TotemDefense_GetState_2(void) {
-    return D_8012FB58;
+    return gTotemDefense_state;
 }

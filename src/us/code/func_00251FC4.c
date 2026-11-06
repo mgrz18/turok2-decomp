@@ -25,15 +25,15 @@ typedef struct {
     /* 0x1C */ s32 over;
 } MatchState;
 
-/* The globals from D_80119E2C: a menu pool first. */
+/* The globals from gEngineApp_m_Game_m_MenuPool: a menu pool first. */
 typedef struct {
     /* 0x000 */ void *menus;            /* CMenuPool */
     /* 0x004 */ u8 pad4[0xCC5 - 4];
-    /* 0xCC5 */ u8 timed;               /* D_8011AAF1 */
+    /* 0xCC5 */ u8 timed;               /* gEngineApp_m_Settings_multiplayer */
     /* 0xCC6 */ u8 padCC6[0xE78 - 0xCC6];
-    /* 0xE78 */ s32 paused;             /* D_8011ACA4 */
+    /* 0xE78 */ s32 paused;             /* gEngineApp_m_Settings_paused */
     /* 0xE7C */ u8 padE7C[0xE84 - 0xE7C];
-    /* 0xE84 */ MatchState match;       /* D_8011ACB0 */
+    /* 0xE84 */ MatchState match;       /* gEngineApp_m_Settings_match */
 } Globals;
 
 typedef struct {
@@ -41,18 +41,18 @@ typedef struct {
     /* 0x01 */ u8 pad1[0x40 - 1];
 } PortSetup;
 
-extern Globals D_80119E2C;
-extern s32 D_8011ACA4;
-extern s32 D_8011AC8C;          /* game state */
-extern s32 D_8011ACA8;
-extern s32 D_80110048;          /* level */
+extern Globals gEngineApp_m_Game_m_MenuPool;
+extern s32 gEngineApp_m_Settings_paused;
+extern s32 gEngineApp_m_Settings_nextMode;          /* game state */
+extern s32 gEngineApp_m_Settings_matchMode;
+extern s32 gScene_m_LevelID;          /* level */
 extern f32 gFrameIncrement;          /* frame time */
 extern PortSetup D_8011AB88[];
-extern char D_8011AAA0;
-extern char D_801198B0;
-extern char D_00439640;         /* death screen */
-extern char D_0043BED0;
-extern char D_0043CAB4;         /* key screen */
+extern char gEngineApp_m_Game_m_DebugLines;
+extern char gEngineApp_m_Game_m_CameraPool;
+extern char gPauseMenuDesc;         /* death screen */
+extern char gSavePortalMenuDesc;
+extern char gMissionFailedMenuDesc;         /* key screen */
 
 void CPlayer__Update(CPlayer *p);
 void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *other);
@@ -91,12 +91,12 @@ static __inline__ void reset_strokes(CBarrel *s) {
 static __inline__ s32 in_menu(CPlayer *p) {
     s32 result;
 
-    if (D_8011ACA4) {
+    if (gEngineApp_m_Settings_paused) {
         return 1;
     }
     result = 0;
     if (p->m_pCamera != NULL && p->m_pCamera->m_Menus.head != NULL) {
-        result = p->m_pCamera->m_Menus.head->desc != (MenuDesc *) &D_00439640;
+        result = p->m_pCamera->m_Menus.head->desc != (MenuDesc *) &gPauseMenuDesc;
     }
     return result;
 }
@@ -112,7 +112,7 @@ void CPlayerPool__Update(PlayerList *list) {
     u32 hub;
     s32 character;
 
-    if (D_8011AC8C == 0xB || D_8011AC8C == 8) {
+    if (gEngineApp_m_Settings_nextMode == 0xB || gEngineApp_m_Settings_nextMode == 8) {
         return;
     }
     frameTime = gFrameIncrement;
@@ -121,33 +121,33 @@ void CPlayerPool__Update(PlayerList *list) {
             CPlayer__Update(p);
         }
         CPlayer__UpdateOrbitCamera(p, p);
-        Automap_SetPlayer(&D_8011AAA0, p->m_CharacterActor.header.m_pCurrentRegion, p->m_CharacterActor.m_RotY, p->m_CharacterActor.header.m_vPos);
+        Automap_SetPlayer(&gEngineApp_m_Game_m_DebugLines, p->m_CharacterActor.header.m_pCurrentRegion, p->m_CharacterActor.m_RotY, p->m_CharacterActor.header.m_vPos);
     }
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
         CPlayer__ReadInput(&p->m_ContState, p);
         if (Controller_StartPressedNoCinema(p->m_ContState.m_pContState)) {
             if (Cinema_IsActive()) {
                 Cinema_TrySkip();
-            } else if (!MenuPool_CountOpen(&D_80119E2C) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
-                       && p->m_pCamera->m_Menus.count == 0 && (D_80119E2C.match.over == 0 || D_80119E2C.timed == 0)) {
-                D_80119E2C.paused = 1;
+            } else if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && p->m_Data.m_Health != 0 && p->m_pCamera != NULL
+                       && p->m_pCamera->m_Menus.count == 0 && (gEngineApp_m_Game_m_MenuPool.match.over == 0 || gEngineApp_m_Game_m_MenuPool.timed == 0)) {
+                gEngineApp_m_Game_m_MenuPool.paused = 1;
                 Music_DuckVolume();
                 Sound__StopAllExcept(300);
                 Sound__DisableAmbientTrack();
                 reset_strokes(&p->m_Barrel);
                 p->m_LivesOverlay.m_Value = -1;
                 p->m_TokensOverlay.m_Value = -1;
-                MenuPool_OpenMenu(&D_80119E2C, &D_00439640, p, (p->m_ContState.m_pContState), 0);
+                MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gPauseMenuDesc, p, (p->m_ContState.m_pContState), 0);
             }
         }
         if (p->m_bLevelNotCompleteExit) {
-            hub = Level_GetHub(D_80110048) - 1;
+            hub = Level_GetHub(gScene_m_LevelID) - 1;
             if (hub < 6 && (p->m_Data.m_dwLevelFirstTimeFlags & (1 << hub))) {
-                MenuPool_OpenMenu(&D_80119E2C, &D_0043CAB4, p, (p->m_ContState.m_pContState), 0);
+                MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, &gMissionFailedMenuDesc, p, (p->m_ContState.m_pContState), 0);
             }
             p->m_bLevelNotCompleteExit = 0;
         }
-        if (!MenuPool_CountOpen(&D_80119E2C) && Cinema_PathPlaying() && Cinema_GetScriptId() == 400 && !list->cinema) {
+        if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && Cinema_PathPlaying() && Cinema_GetScriptId() == 400 && !list->cinema) {
             if (p->m_pCamera != NULL && p->m_pCamera->m_Menus.count == 0) {
                 list->cinema = 1;
                 list->cinemaStarted = 0;
@@ -156,7 +156,7 @@ void CPlayerPool__Update(PlayerList *list) {
         if (list->cinema) {
             if (Cinema_IsFinished() && !list->cinemaStarted) {
                 list->cinemaStarted = 1;
-                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, &D_0043BED0, p, (p->m_ContState.m_pContState), 0);
+                MenuPool_OpenMenu(p->m_pCamera->m_MenuPool, &gSavePortalMenuDesc, p, (p->m_ContState.m_pContState), 0);
             }
         }
     }
@@ -165,15 +165,15 @@ void CPlayerPool__Update(PlayerList *list) {
 
         CPlayer__ReadInput(&p->m_ContState, p);
         next = p->m_pNext;
-        match = &D_80119E2C.match;
-        if (p != NULL && !match->over && (match->timeLeft >= 900.0f || match->timeLeft < 0.0f || !D_80119E2C.timed)
+        match = &gEngineApp_m_Game_m_MenuPool.match;
+        if (p != NULL && !match->over && (match->timeLeft >= 900.0f || match->timeLeft < 0.0f || !gEngineApp_m_Game_m_MenuPool.timed)
             && ((p->m_ContState.m_pContState->buttonsSingle & 0x1000) || p->m_bActive)) {
             p->m_bActive = 1;
             character = D_8011AB88[p->m_nController].character;
             p->m_pOptions->m_bActive = 1;
             CPlayer__NewGame(p, character, 1);
             CAI__SetMode(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 2);
-            CPlayer__Warp(p, D_8011ACA8, 0, 1);
+            CPlayer__Warp(p, gEngineApp_m_Settings_matchMode, 0, 1);
             CList__Remove(&list->idle, p);
             CList__AddHead(&list->active, p);
         }
@@ -182,7 +182,7 @@ void CPlayerPool__Update(PlayerList *list) {
         next = p->m_pNext;
         if (p != NULL && !p->m_bActive && list->active.count >= 2) {
             if (p->m_pCamera != NULL) {
-                CCameraPool__FreeCamera(&D_801198B0, p->m_pCamera);
+                CCameraPool__FreeCamera(&gEngineApp_m_Game_m_CameraPool, p->m_pCamera);
                 p->m_pCamera = NULL;
             }
             CList__Remove(&list->active, p);

@@ -34,7 +34,7 @@ s32 AI_AnimReached(CGameObjectInstance *actor, ActionState *state, f32 scale) {
     }
 }
 
-extern u8 D_800B2330[];
+extern u8 gDestructibleModeTable[];
 extern void Destructible_Step(CGameObjectInstance *actor, void *state);
 extern void Destructible_Hurt(CGameObjectInstance *actor, void *state);
 extern void TotemDefense_Init(void);

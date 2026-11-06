@@ -3,8 +3,8 @@
 
 s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
-extern s32 D_800AF930;
+extern s32 sEnemyAnimLeftArmWound_AF930;
 
 void EnemyAnim_LeftArmWound_AF930(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &D_800AF930, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wLeftArmWoundAnimFlags);
+    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &sEnemyAnimLeftArmWound_AF930, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wLeftArmWoundAnimFlags);
 }

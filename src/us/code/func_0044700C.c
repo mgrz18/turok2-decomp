@@ -15,7 +15,7 @@ typedef struct {
     /* 0xA8 */ s32 unkA8;
 } Spawn;
 
-extern BlindOneState D_80130200;
+extern BlindOneState gBlindOne;
 
 void BlindOne_ActorAppearEnter_2(CGameObjectInstance *actor, Spawn *spawn) {
     BlindOneState *counters;
@@ -25,7 +25,7 @@ void BlindOne_ActorAppearEnter_2(CGameObjectInstance *actor, Spawn *spawn) {
     spawn->unk4 = spawn->unk8;
     actor->header.m_vPos = spawn->pos;
     actor->header.m_pCurrentRegion = spawn->unkA8;
-    counters = &D_80130200;
+    counters = &gBlindOne;
     switch (actor->m_nTypeFlag) {
         case 0x454:
             counters->alive1++;

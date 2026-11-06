@@ -2,12 +2,12 @@
 
 void osCreateMesgQueue(void *, void *, s32); /* extern */
 void osSendMesg(void *, s32, s32); /* extern */
-extern s32 D_800B7A50;
-extern u8 D_80121670[];
-extern u8 D_80121678[];
+extern s32 __osSiAccessQueueEnabled;
+extern u8 __osSiAccessBuf[];
+extern u8 __osSiAccessQueue[];
 
 void __osSiCreateAccessQueue(void) {
-    D_800B7A50 = 1;
-    osCreateMesgQueue(D_80121678, D_80121670, 1);
-    osSendMesg(D_80121678, 0, 0);
+    __osSiAccessQueueEnabled = 1;
+    osCreateMesgQueue(__osSiAccessQueue, __osSiAccessBuf, 1);
+    osSendMesg(__osSiAccessQueue, 0, 0);
 }

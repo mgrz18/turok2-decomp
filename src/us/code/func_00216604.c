@@ -25,8 +25,8 @@ u32 Bits_Read(u32 *, u32);
 f32 *CISet__GetBlock(TrackTable *, s32);
 void CQuaternion__Normalize(Quaternion *);
 
-extern s32 D_800E67A4;
-extern s32 D_800E67A8;
+extern s32 sAnimTrackCount;
+extern s32 sAnimFrameCount;
 
 s32 Anim_DecodeTracks(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 radius, s32 encoding) {
     TrackDecoder decode;
@@ -61,7 +61,7 @@ s32 Anim_DecodeTracks(s32 source, TrackTable *table, s32 tracks, s32 channels, s
     }
     i = 0;
     if (tracks > 0) {
-        s32 size = D_800E67A8 << 4;
+        s32 size = sAnimFrameCount << 4;
 
         do {
             for (index = 0; index <= table->count; index++) {
@@ -86,7 +86,7 @@ s32 Anim_DecodeTracks(s32 source, TrackTable *table, s32 tracks, s32 channels, s
 
                 do {
                     Bits_Read(&stream, 31);
-                    decode(&stream, out, D_800E67A4);
+                    decode(&stream, out, sAnimTrackCount);
                     out++;
                     j++;
                 } while (j < channels);
@@ -104,7 +104,7 @@ s32 Anim_DecodeTracks(s32 source, TrackTable *table, s32 tracks, s32 channels, s
                 s32 frames;
 
                 k = 0;
-                frames = D_800E67A8;
+                frames = sAnimFrameCount;
                 do {
                     /* box blur of channel k over [-radius, radius] frames, wrapping */
                     for (j = 0; j < frames; j++) {
@@ -128,7 +128,7 @@ s32 Anim_DecodeTracks(s32 source, TrackTable *table, s32 tracks, s32 channels, s
             do {
                 Quaternion *rotations = (Quaternion *) CISet__GetBlock(table, j);
 
-                for (i = 0; i < D_800E67A8; i++) {
+                for (i = 0; i < sAnimFrameCount; i++) {
                     CQuaternion__Normalize(&rotations[i]);
                 }
                 j++;

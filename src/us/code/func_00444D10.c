@@ -3,12 +3,12 @@
 
 s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
-extern CListedInstance *D_8010FEB4;
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 void MotherBoss_KillMinions_2(void) {
     CListedInstance *var_s0;
 
-    var_s0 = D_8010FEB4;
+    var_s0 = gScene_m_InstancePool_m_ActiveList;
     if (var_s0 != NULL) {
         do {
             if (var_s0->m_Instance.m_AI.m_Health > 0) {

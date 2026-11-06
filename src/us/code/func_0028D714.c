@@ -3,35 +3,35 @@
 
 typedef signed int s32;
 typedef unsigned int u32;
-extern char D_800B75F0;
-extern s32 D_80120690;
-extern char D_8011F290;
-extern char D_8011AAD8;
-extern char D_800EBAC0;
-extern char D_800E6AC0;
-extern char D_8011ACB0;
+extern char gBootSignature;
+extern s32 gWarmBoot;
+extern char gSavedPlayers;
+extern char gEngineApp_m_Settings;
+extern char gLoadSavePersistentData;
+extern char gGamePersistentData;
+extern char gEngineApp_m_Settings_match;
 /* Turok 2 region sizes differ from Rage Wars (0x430, 0x584, 0xB0). */
 s32 Boot_CanOverwrite(u32 address) {
     address |= 0x80000000;
-    if (((address) >= (u32)&(D_800B75F0) && (address) < (u32)&(D_800B75F0) + (0x10)) || address == (u32)&D_80120690) {
+    if (((address) >= (u32)&(gBootSignature) && (address) < (u32)&(gBootSignature) + (0x10)) || address == (u32)&gWarmBoot) {
         return 0;
     }
-    if (D_80120690 != 0) {
+    if (gWarmBoot != 0) {
         return 1;
     }
-    if (((address) >= (u32)&(D_8011F290) && (address) < (u32)&(D_8011F290) + (0x1400))) {
+    if (((address) >= (u32)&(gSavedPlayers) && (address) < (u32)&(gSavedPlayers) + (0x1400))) {
         return 0;
     }
-    if (((address) >= (u32)&(D_8011AAD8) && (address) < (u32)&(D_8011AAD8) + (0x184))) {
+    if (((address) >= (u32)&(gEngineApp_m_Settings) && (address) < (u32)&(gEngineApp_m_Settings) + (0x184))) {
         return 0;
     }
-    if (((address) >= (u32)&(D_800EBAC0) && (address) < (u32)&(D_800EBAC0) + (0x5800))) {
+    if (((address) >= (u32)&(gLoadSavePersistentData) && (address) < (u32)&(gLoadSavePersistentData) + (0x5800))) {
         return 0;
     }
-    if (((address) >= (u32)&(D_800E6AC0) && (address) < (u32)&(D_800E6AC0) + (0x5000))) {
+    if (((address) >= (u32)&(gGamePersistentData) && (address) < (u32)&(gGamePersistentData) + (0x5000))) {
         return 0;
     }
-    if (address >= (u32)&D_8011ACB0 && address <= (u32)&D_8011ACB0 + 0x4C) {
+    if (address >= (u32)&gEngineApp_m_Settings_match && address <= (u32)&gEngineApp_m_Settings_match + 0x4C) {
         return 0;
     }
     return 1;

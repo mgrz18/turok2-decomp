@@ -10,7 +10,7 @@
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern BlindOnePhase D_0043240C[];
+extern BlindOnePhase sBlindOnePhases[];
 extern u8 gScene_m_InstancePool[];
 extern f32 Random_Blend(f32 min, f32 max);
 extern f32 func_002982F0(f32 angle); /* sin */
@@ -38,8 +38,8 @@ static __inline__ void nextPhase(BlindOneState *state) {
         state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
-    if (D_0043240C[phase].init != NULL) {
-        D_0043240C[phase].init(state);
+    if (sBlindOnePhases[phase].init != NULL) {
+        sBlindOnePhases[phase].init(state);
     }
 }
 

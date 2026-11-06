@@ -3,7 +3,7 @@
 #include "rw/abu_protos.h"
 #include "structs/player_options.h"
 
-extern s32 D_8011ACE4;
+extern s32 gEngineApp_m_Settings_match_tag;
 
 /* A CPlayer view: rw/abu_protos.h (its Mtx) clashes with structs/player.h. */
 typedef struct {
@@ -21,7 +21,7 @@ typedef struct {
 } MenuData;
 
 /* Byte-offset field access: member references here would let the
- * scheduler move the D_8011ACE4 load and change the register choice. */
+ * scheduler move the gEngineApp_m_Settings_match_tag load and change the register choice. */
 #define FIELD_AT(ptr, type, T, field) (*(type *)((s8 *)(ptr) + (s32) &((T *)0)->field))
 
 void StatsMenu_InitContinue(Menu *arg0) {
@@ -48,7 +48,7 @@ void StatsMenu_InitContinue(Menu *arg0) {
     FIELD_AT(&temp_v1_5[14], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_5[14], s32, MenuItem, flags) & 0xFE7FFFFF);
     temp_v1_6 = arg0->items;
     FIELD_AT(&temp_v1_6[15], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v1_6[15], s32, MenuItem, flags) & 0xFE7FFFFF);
-    if (D_8011ACE4 != 0) {
+    if (gEngineApp_m_Settings_match_tag != 0) {
         temp_v0 = arg0->items;
         FIELD_AT(&temp_v0[7], s32, MenuItem, flags) = (s32) (FIELD_AT(&temp_v0[7], s32, MenuItem, flags) | 0x01000000);
         return;

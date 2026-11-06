@@ -5,7 +5,7 @@
 
 extern void CList__RemoveHead(CList *arg0);
 extern void CCache__Compact(s32, s32);
-extern CList D_800D81F4;
+extern CList gCache_memLockedList;
 extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 extern s32 CList__AddTail(CList *list, void *node);
 extern s32 CHeap__Alloc(void *, s32);
@@ -15,7 +15,7 @@ void CCache__Compact(s32 unused, s32 arg1) {
     extern void CList__Remove(void *, s32);
     extern void CHeap__Free(void *, s32);
     extern s32 gHeap[3];
-    extern s32 D_800D81D8[];
+    extern s32 gCache_currentCompressPos[];
     CList queue;
     Node80254C10 *node;
     Node80254C10 *next;
@@ -25,13 +25,13 @@ void CCache__Compact(s32 unused, s32 arg1) {
     s32 *arena;
     s32 *pool;
     CList__Construct(&queue, 0x20, 0x24);
-    if (arg1 != 0 || D_800D81D8[0] == 0) {
-        D_800D81D8[0] = D_800D81D8[7];
-        if (D_800D81D8[7] == 0) {
+    if (arg1 != 0 || gCache_currentCompressPos[0] == 0) {
+        gCache_currentCompressPos[0] = gCache_currentCompressPos[7];
+        if (gCache_currentCompressPos[7] == 0) {
             goto drain;
         }
     }
-    pool = D_800D81D8;
+    pool = gCache_currentCompressPos;
     arena_end = &gHeap[2];
     arena = arena_end - 2;
     do {
@@ -50,22 +50,22 @@ void CCache__Compact(s32 unused, s32 arg1) {
                 break;
             }
         }
-    } while (D_800D81D8[0] != 0);
+    } while (gCache_currentCompressPos[0] != 0);
 drain:
     node = queue.m_pHead;
     while (node != 0) {
         next = node->next;
         CList__RemoveHead(&queue);
-        scan = D_800D81F4.m_pHead;
+        scan = gCache_memLockedList.m_pHead;
         while (scan != 0) {
             if (scan->start > node->start) {
-                CList__InsertBefore(&D_800D81F4, (s32)scan, (s32)node);
+                CList__InsertBefore(&gCache_memLockedList, (s32)scan, (s32)node);
                 break;
             }
             scan = scan->next;
         }
         if (scan == 0) {
-            CList__AddTail(&D_800D81F4, node);
+            CList__AddTail(&gCache_memLockedList, node);
         }
         node->flags |= 0x1000;
         node = next;

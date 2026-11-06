@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 
-extern u32 D_801309B0;
+extern u32 gPakConfirmKind;
 extern char D_800B52F8[];
 extern char D_800B5314[];
 s32 PakConfirmMenu_UpdateNo(struct FieldRecAt14 *field) {
-    u32 state = D_801309B0;
+    u32 state = gPakConfirmKind;
     if (state >= 5) {
         goto state_other;
     }

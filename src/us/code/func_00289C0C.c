@@ -7,34 +7,34 @@ s32 CScene__RequestWarp(s32, s32, s32);
 
 CPlayer *CPlayerPool__GetFirstActive(void *);                     /* extern */
 void CEngineApp__StartWarp(s32, s32);                       /* extern */
-extern s32 D_800B6D70;
-extern s32 D_800B6D74;
-extern s32 D_800C2034;
-extern s32 D_800F6CA0;
+extern s32 gFinalEnding;
+extern s32 gEndingPrimagenDefeated;
+extern s32 gScreenHeight;
+extern s32 sCreditsLine;
 extern u8 gScene[];
-extern s32 D_8011AD00;
-extern f32 D_8011F120;
+extern s32 gCreditsDone;
+extern f32 gCreditsScroll;
 
 void EngineMode16_Ending_Init(s32 arg0)
 {
   CPlayer *temp_v0;
   s8 *new_var;
-  new_var = (s8 *) (&D_8011AAD8);
-  D_8011AAD8.multiplayer = 0;
-  D_800B6D70 = 0;
-  D_800F6CA0 = 0;
-  D_8011F120 = (f32) D_800C2034;
-  D_8011AD00 = 0;
-  temp_v0 = CPlayerPool__GetFirstActive(new_var - 0x1268);        /* the game state, D_80119870 */
+  new_var = (s8 *) (&gEngineApp_m_Settings);
+  gEngineApp_m_Settings.multiplayer = 0;
+  gFinalEnding = 0;
+  sCreditsLine = 0;
+  gCreditsScroll = (f32) gScreenHeight;
+  gCreditsDone = 0;
+  temp_v0 = CPlayerPool__GetFirstActive(new_var - 0x1268);        /* the game state, gEngineApp_m_Game */
   if ((temp_v0 != 0) && (temp_v0->m_Data.m_bPrimagenBossComplete != 0))
   {
-    D_800B6D74 = 1;
+    gEndingPrimagenDefeated = 1;
   }
   else
   {
-    D_800B6D74 = 0;
+    gEndingPrimagenDefeated = 0;
   }
-  if (D_800B6D74 != 0)
+  if (gEndingPrimagenDefeated != 0)
   {
     CScene__RequestWarp((s32) gScene, ~Cinema_RequestById(0x82), 0);
   }
@@ -42,6 +42,6 @@ void EngineMode16_Ending_Init(s32 arg0)
   {
     CEngineApp__StartWarp(arg0, 0x82);
   }
-  D_800B6D70 = 1;
-  D_800B6D74 = 0;
+  gFinalEnding = 1;
+  gEndingPrimagenDefeated = 0;
 }

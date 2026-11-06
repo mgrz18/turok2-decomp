@@ -7,7 +7,7 @@
  * the next phase. */
 
 
-extern BlindOnePhase D_0043232C[];
+extern BlindOnePhase sBlindOnePhases_2[];
 extern void Sound__Play2D(s32 sound);
 extern void CAI__SetMode(CGameObjectInstance *obj, void *ai, s32 state);
 
@@ -30,8 +30,8 @@ static __inline__ void nextPhase(BlindOneState *state) {
         state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
-    if (D_0043232C[phase].init != NULL) {
-        D_0043232C[phase].init(state);
+    if (sBlindOnePhases_2[phase].init != NULL) {
+        sBlindOnePhases_2[phase].init(state);
     }
 }
 

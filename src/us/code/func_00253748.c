@@ -9,11 +9,11 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-extern s32 D_8011AAD8;
+extern s32 gEngineApp_m_Settings;
 u32 CPlayer__GetPickupCountHigh(s32 arg0, s32 arg1)
 {
   s32 new_var;
-  if (!(D_8011AAD8 & 0x10))
+  if (!(gEngineApp_m_Settings & 0x10))
   {
     if (new_var)
     {

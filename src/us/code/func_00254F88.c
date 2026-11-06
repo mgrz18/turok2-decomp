@@ -12,7 +12,7 @@ s32 CBarrel__HasUnlistedWeapon(CBarrel *list, CPlayer *player) {
     s32 *aiFlags = &player->m_WeaponActor.m_AI.m_dwFlags;
 
     for (w = 0; w < 35; w++) {
-        def = D_800AF618[w];
+        def = gWeaponInfoTable[w];
         usable = 0;
         if ((s8)player->m_Data.m_WeaponList[w] == 0) {
             continue;

@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 #include "structs/game.h"
 
-extern int D_80110060;
-extern CheatCode D_00439770[];
-extern u8 D_800C1F8C[];
-extern s32 D_80130920;
+extern int gScene_m_PreviewOptions;
+extern CheatCode sCheatCodes[];
+extern u8 gCheatEntryText[];
+extern s32 sEnterCheatResult;
 extern s32 strlen(u8 *);
 extern void Sound__Play2D(s32);
 s32 EnterCheatMenu_Enter(void)
@@ -18,16 +18,16 @@ s32 EnterCheatMenu_Enter(void)
     s32 hasSound;
     GameSettings *settings;
     u8 *code;
-    D_80130920 = -1;
+    sEnterCheatResult = -1;
     for (i = 0; i < 12; i++) {
-        code = D_00439770[i].code;
+        code = sCheatCodes[i].code;
         j = 0;
-        if (strlen(code) != strlen(D_800C1F8C)) {
+        if (strlen(code) != strlen(gCheatEntryText)) {
             match = 0;
         } else {
             for (;;) {
                 if (j < strlen(code)) {
-                    if ((code[j] ^ j) != D_800C1F8C[j]) {
+                    if ((code[j] ^ j) != gCheatEntryText[j]) {
                         match = 0;
                         break;
                     }
@@ -39,15 +39,15 @@ s32 EnterCheatMenu_Enter(void)
             }
         }
         if (match) {
-            D_8011AAD8.unlockedCheats |= D_00439770[i].flags;
-            settings = &D_8011AAD8;
+            gEngineApp_m_Settings.unlockedCheats |= sCheatCodes[i].flags;
+            settings = &gEngineApp_m_Settings;
             do {
-                D_80110060 = settings->unlockedCheats;
+                gScene_m_PreviewOptions = settings->unlockedCheats;
             } while (0);
-            hasSound = D_00439770[i].sound != 0;
-            D_80130920 = i;
+            hasSound = sCheatCodes[i].sound != 0;
+            sEnterCheatResult = i;
             if (hasSound) {
-                Sound__Play2D((s16)D_00439770[i].sound);
+                Sound__Play2D((s16)sCheatCodes[i].sound);
             }
         }
     }

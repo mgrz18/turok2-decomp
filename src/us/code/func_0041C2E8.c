@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 
-extern u8 D_8011AAF3;
+extern u8 gEngineApp_m_Settings_unk1B;
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 OptionsMenu_StepTwoPlayerLayout(void *first, void *second) {
-    u8 *option = &D_8011AAF3;
+    u8 *option = &gEngineApp_m_Settings_unk1B;
     *option = Menu_StepValue(second, *option, 1, 0, 1, 1);
     return 0;
 }

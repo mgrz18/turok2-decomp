@@ -34,7 +34,7 @@ void CAI__SetMode(Obj00402FA0 *obj, Item00402FA0 *item, s32 a2);
 void MantidQueen_UpdatePush(Obj00402FA0 *obj, Item00402FA0 *item) {
     Vec3_00402FA0 dir;
     s32 anim;
-    WaveBossState *s = &D_8012F3A0;
+    WaveBossState *s = &gMantidQueen;
 
     anim = CGameObjectInstance__PickRandomAnim(obj, 0x1004, -1);
     if (obj->anim == anim) {

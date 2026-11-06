@@ -19,8 +19,8 @@ typedef struct {
     /* 0x2E0 */ Client *clients;
 } Sched;
 
-extern s32 D_800B6E58;  /* reset pressed */
-extern s32 D_800B6E5C;  /* retraces left before blanking */
+extern s32 sSchedResetPressed;  /* reset pressed */
+extern s32 sSchedResetBlankRetraces;  /* retraces left before blanking */
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
@@ -44,9 +44,9 @@ void __scMain(Sched *sc) {
         osRecvMesg(sc->queue, &msg, 1);
         switch (msg) {
             case 0x29A:
-                if (D_800B6E58 != 0) {
-                    D_800B6E5C = D_800B6E5C - 1;
-                    if (D_800B6E5C <= 0) {
+                if (sSchedResetPressed != 0) {
+                    sSchedResetBlankRetraces = sSchedResetBlankRetraces - 1;
+                    if (sSchedResetBlankRetraces <= 0) {
                         osViBlack(1);
                         while (1) {
                         }
@@ -66,8 +66,8 @@ void __scMain(Sched *sc) {
                 Sound__StopAllExcept(-1);
                 LoopSounds_StopAll(LoopSounds_Get());
                 client = sc->clients;
-                D_800B6E58 = 1;
-                D_800B6E5C = 20;
+                sSchedResetPressed = 1;
+                sSchedResetBlankRetraces = 20;
                 while (client != NULL) {
                     osSendMesg(client->queue, &sc->retraceMsg, 0);
                     client = client->next;

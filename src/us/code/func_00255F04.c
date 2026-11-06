@@ -21,8 +21,8 @@ void PlayerDeathWait_Update(CPlayer *player) {
     P_S32(player, 0x1298) = 0;
     P_S32(player, 0xD4) &= ~0x800000;
     P_F32(player, 0xBFC) = timer;
-    if (timer > 75.0f || ((state = &D_8011ACB0)->teamOver != 0 && state->over != 0)) {
-        state = &D_8011ACB0;
+    if (timer > 75.0f || ((state = &gEngineApp_m_Settings_match)->teamOver != 0 && state->over != 0)) {
+        state = &gEngineApp_m_Settings_match;
         if (state->teamOver != 0 && state->over == 0) {
             CPlayer__SetState(player, player, 0x11);
         } else {

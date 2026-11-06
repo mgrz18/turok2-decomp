@@ -28,11 +28,11 @@ struct B15Obj {               /* Turok 2 layout (Rage Wars offsets in comments) 
                 B15Obj *unk12C;       /* 0x10C (0x12C) */
 };
 s32 GameObject_IsSolid(B15Obj *a);
-extern s32 D_8011001C;
-extern u8 D_8011AAF1;
+extern s32 gScene_m_bStreamAll;
+extern u8 gEngineApp_m_Settings_multiplayer;
 static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
     u32 f;
-    if (D_8011AAF1 != 0) {
+    if (gEngineApp_m_Settings_multiplayer != 0) {
         return 1;
     }
     if (t->unkE4 == a->unkE4) {
@@ -42,7 +42,7 @@ static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
     if (!(f & 0x310000)) {
         return 0;
     }
-    if (D_8011001C != 0 && !(t->flags & 0x300000) && !(f & 0x300000)) {
+    if (gScene_m_bStreamAll != 0 && !(t->flags & 0x300000) && !(f & 0x300000)) {
         return 0;
     }
     switch (a->def->type) {
@@ -57,7 +57,7 @@ static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
 static __inline__ s32 chk3(B15Obj *a, B15Obj *t) {
     u32 f;
     register s32 res asm("$3");
-    if (D_8011AAF1 != 0) {
+    if (gEngineApp_m_Settings_multiplayer != 0) {
         res = 1;
         goto done;
     }
@@ -70,7 +70,7 @@ static __inline__ s32 chk3(B15Obj *a, B15Obj *t) {
         res = 0;
         goto done;
     }
-    if (D_8011001C != 0 && !(t->flags & 0x300000) && !(f & 0x300000)) {
+    if (gScene_m_bStreamAll != 0 && !(t->flags & 0x300000) && !(f & 0x300000)) {
         res = 0;
         goto done;
     }

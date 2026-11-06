@@ -5,7 +5,7 @@
 /* Menu text item: copy a player's 8-character name into the item's text and
  * print one of the current player's u16 counters (per opponent) after it. */
 
-extern s32 D_8011ACE4;
+extern s32 gEngineApp_m_Settings_match_tag;
 extern char D_8011AB8B[];
 extern char D_800C1338[];
 
@@ -20,7 +20,7 @@ s32 StatsMenu_PlayerRowText_2(MenuItem *item, Menu *event) {
     char *src;
     s32 i;
 
-    if (D_8011ACE4 != 0) {
+    if (gEngineApp_m_Settings_match_tag != 0) {
         value = ((CPlayerOptions *)*(void **)(player + 0x518))->m_Tagged[other];
     } else {
         value = ((CPlayerOptions *)*(void **)(player + 0x518))->m_Killed[other];

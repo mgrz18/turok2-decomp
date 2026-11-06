@@ -86,207 +86,207 @@ typedef struct TextureInfo {
 #define G_TX_NOMASK 0
 #define G_TX_NOLOD 0
 
-extern u32 D_800AB884;          /* current render mode index (Render_SetRenderMode) */
-extern s32 D_800AB890;          /* anti-aliasing enabled */
-extern u32 D_800AB8A8;          /* extra blender flags */
-extern u32 D_800AB8AC;          /* extra blender flags (z-buffered modes) */
-extern u32 D_800AB880;
-extern u8 D_800AB580[];         /* 16x16 I8 texture */
-extern Gfx D_800AB458[], D_800AB4E0[];
+extern u32 gCurrentRenderMode;          /* current render mode index (Render_SetRenderMode) */
+extern s32 gRenderAntiAlias;          /* anti-aliasing enabled */
+extern u32 gFogRenderModeFogA;          /* extra blender flags */
+extern u32 gFogRenderModeShadeA;          /* extra blender flags (z-buffered modes) */
+extern u32 gCurrentCombineMode;
+extern u8 gShadowTexture[];         /* 16x16 I8 texture */
+extern Gfx sShadowQuadDL[], sShadowQuadDL2[];
 
 void Texture_InvalidateCache(void);
 
 /* Switches the RDP render mode; returns 0 when it was already active. */
 s32 Render_SetRenderMode(u32 mode) {
-    if (D_800AB884 == mode) {
+    if (gCurrentRenderMode == mode) {
         return 0;
     }
-    D_800AB884 = mode;
+    gCurrentRenderMode = mode;
     switch (mode) {
     case 0:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, 0xC1849D8);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, 0xC1849D8);
         } else {
-            gDPSetRenderMode(D_800D8E24++, 0xC184A50);
+            gDPSetRenderMode(gDList++, 0xC184A50);
         }
         break;
     case 1:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x1049D8);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x1049D8);
         } else {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x104A50);
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x104A50);
         }
         break;
     case 2:
-        gDPSetRenderMode(D_800D8E24++, 0xC184A50);
+        gDPSetRenderMode(gDList++, 0xC184A50);
         break;
     case 3:
-        gDPSetRenderMode(D_800D8E24++, 0xC184B50);
+        gDPSetRenderMode(gDList++, 0xC184B50);
         break;
     case 4:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x104DD8);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x104DD8);
         } else {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x104E50);
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x104E50);
         }
         break;
     case 5:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x1041F8);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x1041F8);
         } else {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x1041F0);
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x1041F0);
         }
         break;
     case 6:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x113078);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x113078);
         } else {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x113078);
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x113078);
         }
         break;
     case 7:
-        gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x112E10);
+        gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x112E10);
         break;
     case 8:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x112478);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x112478);
         } else {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x112478);
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x112478);
         }
         break;
     case 9:
-        gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x112438);
+        gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x112438);
         break;
     case 10:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x112078);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x112078);
         } else {
-            gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x112230);
+            gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x112230);
         }
         break;
     case 11:
-        gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x112038);
+        gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x112038);
         break;
     case 12:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, 0x5045D8);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, 0x5045D8);
         } else {
-            gDPSetRenderMode(D_800D8E24++, 0x4045D0);
+            gDPSetRenderMode(gDList++, 0x4045D0);
         }
         break;
     case 13:
-        gDPSetRenderMode(D_800D8E24++, 0x504B50);
+        gDPSetRenderMode(gDList++, 0x504B50);
         break;
     case 14:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, 0x5049D8);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, 0x5049D8);
         } else {
-            gDPSetRenderMode(D_800D8E24++, 0x504A50);
+            gDPSetRenderMode(gDList++, 0x504A50);
         }
         break;
     case 15:
-        gDPSetRenderMode(D_800D8E24++, 0x504E50);
+        gDPSetRenderMode(gDList++, 0x504E50);
         break;
     case 16:
-        gDPSetRenderMode(D_800D8E24++, 0x504B53);
+        gDPSetRenderMode(gDList++, 0x504B53);
         break;
     case 17:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, 0x553078);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, 0x553078);
         } else {
-            gDPSetRenderMode(D_800D8E24++, 0x553078);
+            gDPSetRenderMode(gDList++, 0x553078);
         }
         break;
     case 18:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, 0x553048);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, 0x553048);
         } else {
-            gDPSetRenderMode(D_800D8E24++, 0xF0A7008);
+            gDPSetRenderMode(gDList++, 0xF0A7008);
         }
         break;
     case 19:
-        gDPSetRenderMode(D_800D8E24++, 0x504340);
+        gDPSetRenderMode(gDList++, 0x504340);
         break;
     case 20:
-        gDPSetRenderMode(D_800D8E24++, 0);
+        gDPSetRenderMode(gDList++, 0);
         break;
     case 21:
-        gDPSetRenderMode(D_800D8E24++, 0x504240);
+        gDPSetRenderMode(gDList++, 0x504240);
         break;
     case 22:
-        gDPSetRenderMode(D_800D8E24++, 0xFA54040);
+        gDPSetRenderMode(gDList++, 0xFA54040);
         break;
     case 23:
-        gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x104B50);
+        gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x104B50);
         break;
     case 24:
-        gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x104E50);
+        gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x104E50);
         break;
     case 25:
-        gDPSetRenderMode(D_800D8E24++, 0xC184240);
+        gDPSetRenderMode(gDList++, 0xC184240);
         break;
     case 26:
-        gDPSetRenderMode(D_800D8E24++, 0xC184340);
+        gDPSetRenderMode(gDList++, 0xC184340);
         break;
     case 27:
-        gDPSetRenderMode(D_800D8E24++, 0xF0A4000);
+        gDPSetRenderMode(gDList++, 0xF0A4000);
         break;
     case 28:
-        if (D_800AB890) {
-            gDPSetRenderMode(D_800D8E24++, 0x507048);
+        if (gRenderAntiAlias) {
+            gDPSetRenderMode(gDList++, 0x507048);
         } else {
-            gDPSetRenderMode(D_800D8E24++, 0x507040);
+            gDPSetRenderMode(gDList++, 0x507040);
         }
         break;
     case 29:
-        gDPSetRenderMode(D_800D8E24++, D_800AB8AC | 0x104F50);
+        gDPSetRenderMode(gDList++, gFogRenderModeShadeA | 0x104F50);
         break;
     case 30:
-        gDPSetRenderMode(D_800D8E24++, D_800AB8A8 | 0x104F50);
+        gDPSetRenderMode(gDList++, gFogRenderModeFogA | 0x104F50);
         break;
     }
     return 1;
 }
 
-/* Draws a 16x16 intensity texture (D_800AB580) with `matrix` and the display
+/* Draws a 16x16 intensity texture (gShadowTexture) with `matrix` and the display
  * list for `pass`, white at `alpha`; then forces the next render and combine
  * modes to be set again. */
 void Render_DrawShadowQuad(void *matrix, s32 pass, u32 alpha) {
     Gfx *list;
 
-    /* gDPLoadTextureBlock(D_800AB580, G_IM_FMT_I, G_IM_SIZ_8b, 16, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, ...) */
-    gDPSetTextureImage(D_800D8E24++, G_IM_FMT_I, G_IM_SIZ_16b, 1, D_800AB580);
-    gDPSetTile(D_800D8E24++, G_IM_FMT_I, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD,
+    /* gDPLoadTextureBlock(gShadowTexture, G_IM_FMT_I, G_IM_SIZ_8b, 16, 16, 0, G_TX_CLAMP, G_TX_CLAMP, 0, 0, ...) */
+    gDPSetTextureImage(gDList++, G_IM_FMT_I, G_IM_SIZ_16b, 1, gShadowTexture);
+    gDPSetTile(gDList++, G_IM_FMT_I, G_IM_SIZ_16b, 0, 0, G_TX_LOADTILE, 0, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD,
                G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD);
-    gDPLoadSync(D_800D8E24++);
-    gDPLoadBlock(D_800D8E24++, G_TX_LOADTILE, 0, 0, 127, 1024);
-    gDPPipeSync(D_800D8E24++);
-    gDPSetTile(D_800D8E24++, G_IM_FMT_I, G_IM_SIZ_8b, 2, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD,
+    gDPLoadSync(gDList++);
+    gDPLoadBlock(gDList++, G_TX_LOADTILE, 0, 0, 127, 1024);
+    gDPPipeSync(gDList++);
+    gDPSetTile(gDList++, G_IM_FMT_I, G_IM_SIZ_8b, 2, 0, G_TX_RENDERTILE, 0, G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD,
                G_TX_CLAMP, G_TX_NOMASK, G_TX_NOLOD);
-    gDPSetTileSize(D_800D8E24++, G_TX_RENDERTILE, 0, 0, 15 << 2, 15 << 2);
-    gDPSetPrimColor(D_800D8E24++, 0, 0, 255, 255, 255, alpha);
-    gSPMatrixLoad(D_800D8E24++, matrix);
-    list = D_800AB458;
-    gSPDisplayList(D_800D8E24++, ({ if (pass != 0) list = D_800AB4E0; list; }));
-    D_800AB884 = -1;
-    D_800AB880 = -1;
+    gDPSetTileSize(gDList++, G_TX_RENDERTILE, 0, 0, 15 << 2, 15 << 2);
+    gDPSetPrimColor(gDList++, 0, 0, 255, 255, 255, alpha);
+    gSPMatrixLoad(gDList++, matrix);
+    list = sShadowQuadDL;
+    gSPDisplayList(gDList++, ({ if (pass != 0) list = sShadowQuadDL2; list; }));
+    gCurrentRenderMode = -1;
+    gCurrentCombineMode = -1;
     Texture_InvalidateCache();
 }
 
-extern s32 D_8011AAD8;
-extern u32 D_800B6D20;
+extern s32 gEngineApp_m_Settings;
+extern u32 gFrameCountGameplay;
 /* Scene colour mode: 0 none; otherwise an environment colour (and, for 6, a prim alpha). */
-extern s32 D_800AB8B0;
-extern f32 D_800AB8B4[5];
-extern s32 D_800AB898;
-extern s32 D_800AB89C;
-extern s32 D_800AB8A4;
-extern u8 D_800AB8C8;
-extern u8 D_800AB8C9;
-extern u8 D_800AB8CA;
-extern u8 D_800AB8CB;
-extern u8 D_800AB8CC;
-extern u8 D_800AB8CD;
+extern s32 gBlendState;
+extern f32 gBlendState_m_Color[5];
+extern s32 gRenderZModeInter;
+extern s32 gRenderImageRead;
+extern s32 gFogGeometryMode;
+extern u8 gPrimColorOverride;
+extern u8 gPrimColorOverrideR;
+extern u8 gPrimColorOverrideG;
+extern u8 gPrimColorOverrideB;
+extern u8 gPrimAlphaOverride;
+extern u8 gPrimAlphaOverrideValue;
 
 extern void *Texture_Request(s32 *texture);
 extern void Texture_GetInfo(void *node, TextureInfo *info);
@@ -313,14 +313,14 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
         return 0;
     }
     tailEnum = -1;
-    if (mat->texture != 0 && !(D_8011AAD8 & 0x400)) {
+    if (mat->texture != 0 && !(gEngineApp_m_Settings & 0x400)) {
         node = Texture_Request(&mat->texture);
         if (node == 0) {
             return 0;
         }
         Texture_GetInfo(node, &info);
         if (pass < 0) {
-            pass = D_800B6D20 / info.frame->speed;
+            pass = gFrameCountGameplay / info.frame->speed;
         }
         a = pass % info.count;
         if (info.palettes != 0) {
@@ -348,16 +348,16 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
         }
         Texture_Load(&mat->texture, node, a, b, maskS, maskT, extra, extra2, 0);
         if (mat->flags & 0x2000) {
-            gDPSetTextureLOD(D_800D8E24++, G_TL_LOD);
+            gDPSetTextureLOD(gDList++, G_TL_LOD);
         }
-        gDPSetPrimColor(D_800D8E24++, info.frame->lod, 0, mat->prim[0], mat->prim[1], mat->prim[2], mat->prim[3]);
+        gDPSetPrimColor(gDList++, info.frame->lod, 0, mat->prim[0], mat->prim[1], mat->prim[2], mat->prim[3]);
         if (mat->flags & 0x400) {
-            gDPSetEnvColor(D_800D8E24++, mat->env[0], mat->env[1], mat->env[2],
-                           D_800AB8B0 == 0 ? mat->prim[3] : D_800AB8B4[3]);
+            gDPSetEnvColor(gDList++, mat->env[0], mat->env[1], mat->env[2],
+                           gBlendState == 0 ? mat->prim[3] : gBlendState_m_Color[3]);
             if (mat->flags & 2) {
                 if (!(mat->flags & 0x1000)) {
                     Render_SetCombineMode(2);
-                } else if (D_800AB8B0 == 0) {
+                } else if (gBlendState == 0) {
                     Render_SetCombineMode(0);
                 } else {
                     Render_SetCombineMode(1);
@@ -373,19 +373,19 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
                 switch (info.frame->kind) {
                 case 4:
                 case 5:
-                    gDPSetEnvColor(D_800D8E24++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
+                    gDPSetEnvColor(gDList++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
                     Render_SetCombineMode(0x23);
                     break;
                 default:
                     Render_SetCombineMode(5);
                     break;
                 }
-            } else if (D_800AB8B0 == 0) {
+            } else if (gBlendState == 0) {
                 Render_SetCombineMode(6);
             } else {
-                gDPSetEnvColor(D_800D8E24++, D_800AB8B4[0], D_800AB8B4[1], D_800AB8B4[2],
-                               D_800AB8B4[3]);
-                switch (D_800AB8B0) {
+                gDPSetEnvColor(gDList++, gBlendState_m_Color[0], gBlendState_m_Color[1], gBlendState_m_Color[2],
+                               gBlendState_m_Color[3]);
+                switch (gBlendState) {
                 case 1:
                 case 2:
                     Render_SetCombineMode(7);
@@ -401,7 +401,7 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
                     Render_SetCombineMode(10);
                     break;
                 case 6:
-                    gDPSetPrimColor(D_800D8E24++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], D_800AB8B4[4]);
+                    gDPSetPrimColor(gDList++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], gBlendState_m_Color[4]);
                     Render_SetCombineMode(0xB);
                     break;
                 default:
@@ -413,23 +413,23 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
             if (mat->flags & 0x2000) {
                 switch (info.frame->kind) {
                 case 4:
-                    gDPSetEnvColor(D_800D8E24++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
+                    gDPSetEnvColor(gDList++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
                     Render_SetCombineMode(0x25);
                     break;
                 case 5:
-                    gDPSetEnvColor(D_800D8E24++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
+                    gDPSetEnvColor(gDList++, mat->env[0], mat->env[1], mat->env[2], mat->env[3]);
                     Render_SetCombineMode(0x24);
                     break;
                 default:
                     Render_SetCombineMode(0xC);
                     break;
                 }
-            } else if (D_800AB8B0 == 0) {
+            } else if (gBlendState == 0) {
                 Render_SetCombineMode(0xD);
             } else {
-                gDPSetEnvColor(D_800D8E24++, D_800AB8B4[0], D_800AB8B4[1], D_800AB8B4[2],
-                               D_800AB8B4[3]);
-                switch (D_800AB8B0) {
+                gDPSetEnvColor(gDList++, gBlendState_m_Color[0], gBlendState_m_Color[1], gBlendState_m_Color[2],
+                               gBlendState_m_Color[3]);
+                switch (gBlendState) {
                 case 1:
                 case 2:
                     Render_SetCombineMode(0xE);
@@ -445,7 +445,7 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
                     Render_SetCombineMode(0x10);
                     break;
                 case 6:
-                    gDPSetPrimColor(D_800D8E24++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], D_800AB8B4[4]);
+                    gDPSetPrimColor(gDList++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], gBlendState_m_Color[4]);
                     Render_SetCombineMode(0x11);
                     break;
                 default:
@@ -455,27 +455,27 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
             CCache__Unlock(0, node);
         }
     } else {
-        gDPPipeSync(D_800D8E24++);
-        if (D_800AB8C8 != 0) {
-            if (D_800AB8CC != 0) {
-                gDPSetPrimColor(D_800D8E24++, 0, 0, D_800AB8C9, D_800AB8CA, D_800AB8CB, D_800AB8CD);
+        gDPPipeSync(gDList++);
+        if (gPrimColorOverride != 0) {
+            if (gPrimAlphaOverride != 0) {
+                gDPSetPrimColor(gDList++, 0, 0, gPrimColorOverrideR, gPrimColorOverrideG, gPrimColorOverrideB, gPrimAlphaOverrideValue);
             } else {
-                gDPSetPrimColor(D_800D8E24++, 0, 0, D_800AB8C9, D_800AB8CA, D_800AB8CB, mat->prim[3]);
+                gDPSetPrimColor(gDList++, 0, 0, gPrimColorOverrideR, gPrimColorOverrideG, gPrimColorOverrideB, mat->prim[3]);
             }
-        } else if (D_800AB8CC != 0) {
-            gDPSetPrimColor(D_800D8E24++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], D_800AB8CD);
+        } else if (gPrimAlphaOverride != 0) {
+            gDPSetPrimColor(gDList++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], gPrimAlphaOverrideValue);
         } else {
-            gDPSetPrimColor(D_800D8E24++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], mat->prim[3]);
+            gDPSetPrimColor(gDList++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], mat->prim[3]);
         }
-        gSPTexture(D_800D8E24++, 0, 0, 0, 0, 0);
+        gSPTexture(gDList++, 0, 0, 0, 0, 0);
         if (mat->flags & 2) {
             Render_SetCombineMode(0x12);
-        } else if (D_800AB8B0 == 0) {
+        } else if (gBlendState == 0) {
             Render_SetCombineMode(0x13);
         } else {
-            gDPSetEnvColor(D_800D8E24++, D_800AB8B4[0], D_800AB8B4[1], D_800AB8B4[2],
-                           D_800AB8B4[3]);
-            switch (D_800AB8B0) {
+            gDPSetEnvColor(gDList++, gBlendState_m_Color[0], gBlendState_m_Color[1], gBlendState_m_Color[2],
+                           gBlendState_m_Color[3]);
+            switch (gBlendState) {
             case 1:
             case 2:
                 Render_SetCombineMode(0x14);
@@ -491,7 +491,7 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
                 Render_SetCombineMode(0x17);
                 break;
             case 6:
-                gDPSetPrimColor(D_800D8E24++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], D_800AB8B4[4]);
+                gDPSetPrimColor(gDList++, 0, 0, mat->prim[0], mat->prim[1], mat->prim[2], gBlendState_m_Color[4]);
                 Render_SetCombineMode(0x11);
                 break;
             default:
@@ -499,8 +499,8 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
             }
         }
     }
-    if ((mat->flags & 0x100) || D_800AB8B0 == 1 || D_800AB8B0 == 4 || D_800AB8B0 == 6) {
-        if (D_800AB8B0 == 0) {
+    if ((mat->flags & 0x100) || gBlendState == 1 || gBlendState == 4 || gBlendState == 6) {
+        if (gBlendState == 0) {
             tailEnum = 3;
             if (!(mat->flags & 0x1000)) {
                 tailEnum = 1;
@@ -519,14 +519,14 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
     } else {
         tailEnum = 7;
         if (!(mat->flags & 0x200)) {
-            if (D_800AB898 != 0) {
+            if (gRenderZModeInter != 0) {
                 tailEnum = 9;
-                if (D_800AB89C != 0) {
+                if (gRenderImageRead != 0) {
                     tailEnum = 8;
                 }
             } else {
                 tailEnum = 0xB;
-                if (D_800AB89C != 0) {
+                if (gRenderImageRead != 0) {
                     tailEnum = 10;
                 }
             }
@@ -537,14 +537,14 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
     }
     mode = 0x260404;
     if (mat->flags & 0x1000) {
-        mode |= D_800AB8A4;
+        mode |= gFogGeometryMode;
     }
-    gSPGeometryMode(D_800D8E24++, mode, 0);
+    gSPGeometryMode(gDList++, mode, 0);
     mode = 0;
     if (!(mat->flags & 0x1000)) {
-        mode = D_800AB8A4;
+        mode = gFogGeometryMode;
     }
-    if (D_800AB8B0 == 7) {
+    if (gBlendState == 7) {
         mode |= 0x20000;
     }
     if (!(mat->flags & 0x42)) {
@@ -557,6 +557,6 @@ s32 Render_SetupMaterial(Material *mat, s32 pass) {
     if (mat->flags & 0x10) {
         mode |= 0x60000;
     }
-    gSPGeometryMode(D_800D8E24++, 0, mode);
+    gSPGeometryMode(gDList++, 0, mode);
     return 1;
 }

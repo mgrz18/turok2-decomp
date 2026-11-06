@@ -4,20 +4,20 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern s32 D_80130984;
-extern s32 D_80130990;
-extern s32 D_80130994;
-extern s32 D_801309A0;
-extern s32 D_801309B4;
-extern s32 D_801309BC;
-extern s32 D_800C2020;
-extern s32 D_800C2024;
-extern u8 D_80119E2C[];   /* menu pool */
-extern u8 D_0043882C[];
-extern u8 D_0043B6A8[];
-extern u8 D_0043BC00[];
-extern u8 D_0043BC6C[];
-extern u8 D_0043C05C[];
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuIsLoad;
+extern s32 gPakMenuWrites;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuLeaving;
+extern s32 gDamagedPakContinued;
+extern s32 gPakMenuMode;
+extern u8 gEngineApp_m_Game_m_MenuPool[];   /* menu pool */
+extern u8 gCharacterMenuAfterPakDesc[];
+extern u8 gPakLoadProfileMenuDesc[];
+extern u8 gPakMsgPakNotFoundDesc[];
+extern u8 gPakMsgInsertToLoadDesc[];
+extern u8 gDamagedPakAtBootMenuDesc[];
 
 extern void MenuPool_OpenMenu(void *pool, void *tmpl, CPlayer *player, ControllerProfile *ctl, void *back);
 extern void Pak_ProbeSlot(s32 kind);
@@ -29,18 +29,18 @@ extern void PakMenu_UpdateNoteRows(Menu *m);
 void PakMenu_InitLoadProfile(Menu *m) {
     s32 kind;
 
-    D_80130984 = 0;
-    D_801309A0 = 0;
-    D_80130994 = 1;
-    D_801309B4 = 1;
-    D_800C2024 = 1;
-    D_801309BC = 0;
-    D_80130990 = 0;
+    gPakMenuIsSave = 0;
+    gPakMenuWrites = 0;
+    gPakMenuIsLoad = 1;
+    gPakMenuIsProfile = 1;
+    gPakMenuMode = 1;
+    gPakMenuLeaving = 0;
+    gPakMenuAnyPak = 0;
     m->items[20].flags &= ~0x1000000;
     kind = m->controller->port;
-    if (D_800C2020) {
-        D_801309BC = 1;
-        MenuPool_OpenMenu(((u8 *)m->player->m_pCamera) + 0x53C, D_0043882C, m->player, m->controller, NULL);
+    if (gDamagedPakContinued) {
+        gPakMenuLeaving = 1;
+        MenuPool_OpenMenu(((u8 *)m->player->m_pCamera) + 0x53C, gCharacterMenuAfterPakDesc, m->player, m->controller, NULL);
         return;
     }
     Pak_ProbeSlot(kind);
@@ -48,12 +48,12 @@ void PakMenu_InitLoadProfile(Menu *m) {
         PakMenu_UpdateNoteRows(m);
         return;
     }
-    D_801309BC = 1;
+    gPakMenuLeaving = 1;
     if (Pak_IsRumblePak(kind)) {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BC6C, m->player, m->controller, D_0043882C);
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToLoadDesc, m->player, m->controller, gCharacterMenuAfterPakDesc);
     } else if (Pak_NeedsRepair(kind)) {
-        MenuPool_OpenMenu(D_80119E2C, D_0043C05C, m->player, m->controller, D_0043B6A8);
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, m->player, m->controller, gPakLoadProfileMenuDesc);
     } else {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BC00, m->player, m->controller, D_0043882C);
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, m->player, m->controller, gCharacterMenuAfterPakDesc);
     }
 }

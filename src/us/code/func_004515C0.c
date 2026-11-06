@@ -15,7 +15,7 @@ extern char D_800B6250[];
 
 /* Names setting 0x27. */
 s32 FragTagMenu_LevelLabel_2(MenuItem *item) {
-    switch (D_8011AAD8.tagArena) {
+    switch (gEngineApp_m_Settings.tagArena) {
     case 0:
         item->text = D_800B5F3C;
         break;

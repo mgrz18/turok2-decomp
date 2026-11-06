@@ -1,24 +1,24 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800D8E18;
-extern s32 D_800D8E1C;
-extern s32 D_800D8E20;
-extern s32 D_800D8E28;
-extern s32 D_800D8E2C;
-extern s32 D_800D8E30;
-extern s32 D_800D8E34;
-extern s32 D_800D8E38;
-extern s32 D_800DD170;
+extern s32 sOpaqueSortRoot;
+extern s32 sOpaqueSortFirst;
+extern s32 sDrawItemCount;
+extern s32 sBatchResource;
+extern s32 sSortNodeCount;
+extern s32 sTranslucentSortRoot;
+extern s32 sBatchInstanceCount;
+extern s32 sTranslucentSortFirst;
+extern s32 sBatchResourceCount;
 
 void Render_ResetBatches(void) {
-    D_800D8E28 = 0;
-    D_800D8E34 = 0;
-    D_800D8E2C = 0;
-    D_800D8E20 = 0;
-    D_800DD170 = 0;
-    D_800D8E1C = 0;
-    D_800D8E18 = 0;
-    D_800D8E38 = 0;
-    D_800D8E30 = 0;
+    sBatchResource = 0;
+    sBatchInstanceCount = 0;
+    sSortNodeCount = 0;
+    sDrawItemCount = 0;
+    sBatchResourceCount = 0;
+    sOpaqueSortFirst = 0;
+    sOpaqueSortRoot = 0;
+    sTranslucentSortFirst = 0;
+    sTranslucentSortRoot = 0;
 }

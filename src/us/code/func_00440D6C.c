@@ -11,7 +11,7 @@ void Primagen_UpdateDeath_2(void) {
     CPlayer *temp_v0;
 
     if (Cinema_IsIdle() != 0) {
-        temp_v0 = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+        temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
         if (temp_v0 != NULL) {
             temp_v0->m_Data.m_bPrimagenBossComplete = 1;
             CPlayer__Warp((s32) temp_v0, 0x1F40, 2, 0);

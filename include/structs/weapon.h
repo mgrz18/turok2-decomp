@@ -3,7 +3,7 @@
 
 /* The weapons.
  *
- * D_800AF618 is the weapon table: one WeaponInfo per weapon, indexed by the
+ * gWeaponInfoTable is the weapon table: one WeaponInfo per weapon, indexed by the
  * weapon number (CPlayer m_Data.m_CurrentWeapon, m_RequestedWeapon, the
  * m_WeaponList slots). Rage Wars has the same record (rw_abu
  * include/COMMON/ITEMRECAT20V1.H, struct WeaponInfo: model at 0x4,
@@ -21,7 +21,7 @@ typedef struct AmmoInfo {
     /* 0x6 */ u16 cost;             /* ammo used per shot */
 } AmmoInfo; /* size 0x8 */
 
-/* A weapon's definition (D_800AF618[weapon]). */
+/* A weapon's definition (gWeaponInfoTable[weapon]). */
 typedef struct WeaponInfo {
     /* 0x00 */ u8 *name;            /* the message shown when it is picked */
     /* 0x04 */ u16 model;           /* the weapon actor's object type */
@@ -91,6 +91,6 @@ typedef struct {
     /* 0x390 */ s32 m_Hover;
 } CBarrel; /* size 0x394 */
 
-extern WeaponInfo *D_800AF618[]; /* the weapon table */
+extern WeaponInfo *gWeaponInfoTable[]; /* the weapon table */
 
 #endif

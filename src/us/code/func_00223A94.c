@@ -26,7 +26,7 @@ struct Entity {
     /* 0x28C */ Entity *next;
 };
 
-extern CListedInstance *D_8010FEB4;
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void DamageEvent_Set(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
@@ -107,7 +107,7 @@ void CScene__Blast(CScene *world, CVector3 *target) {
             CAI__SetMode(e, e->ai, 0x3D);
         }
     }
-    for (node = D_8010FEB4; node != NULL; node = node->m_pNext) {
+    for (node = gScene_m_InstancePool_m_ActiveList; node != NULL; node = node->m_pNext) {
         actor = (Entity *)&node->m_Instance;
         strength = blastStrength(actor, target);
         if (strength != 0) {
@@ -118,7 +118,7 @@ void CScene__Blast(CScene *world, CVector3 *target) {
             CAI__SetMode(actor, actor->ai, 0x3D);
         }
     }
-    player = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    player = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     CVector3__Subtract(&d, &player->pos, target);
     if (d.x * d.x + d.y * d.y + d.z * d.z <= 262144.0f) {
         DamageEvent_Set(&event, 0, 0x1900, 102.399994f, 0x400000, 0);

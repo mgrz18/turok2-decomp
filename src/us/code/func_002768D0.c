@@ -20,7 +20,7 @@ void SpeechPlayer_Update(PlayerRecAt24 *player) {
     extern char *CAudioWorld__GetSndPlayer(Bank *);
     extern void CAudioWorld__Unlock(Bank *);
     extern void CAudioWorld__Lock(Bank *);
-    extern func_80203E78_S1 *D_800B2AA8;
+    extern func_80203E78_S1 *sSpeechSound;
     s32 rate;
     char *channel;
     s32 index;
@@ -55,7 +55,7 @@ void SpeechPlayer_Update(PlayerRecAt24 *player) {
             player->volume = header->volume;
             sequence = CISet__GetBlock(player->bank->songs, index | 1);
             ((void **)D_800F55F4)[-1] = sequence;
-            D_800B2AA8->unk4 = adecStreamOpen(sequence, 0x5622, &rate);
+            sSpeechSound->unk4 = adecStreamOpen(sequence, 0x5622, &rate);
             player->state = 3;
             alSndpSetSound(channel, player->id);
             alSndpSetPitch(channel, rate * 4.5351473e-05f);

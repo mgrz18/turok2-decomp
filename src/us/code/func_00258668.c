@@ -4,9 +4,9 @@
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
-extern u32 D_800B6D20;
+extern u32 gFrameCountGameplay;
 extern s32 gScene;
-extern u8 D_801198B0[];
+extern u8 gEngineApp_m_Game_m_CameraPool[];
 
 extern void CCameraPool__AddText(void *arg0, void *camera, s32 model);
 
@@ -17,10 +17,10 @@ void WeaponActor_SwitchToRequested(CGameObjectInstance *weapon, CAI *state) {
 
     if (player->m_Data.m_CurrentWeapon != requested || gScene != 4) {
         player->m_Data.m_CurrentWeapon = *(s16 *)((u8 *)player + 0xB14);
-        state->m_pModeTable = D_800AF618[requested]->modeTable;
-        state->m_pfEffects = D_800AF618[player->m_Data.m_CurrentWeapon]->effects;
-        if (D_800B6D20 >= 5) {
-            CCameraPool__AddText(D_801198B0, player->m_pCamera, D_800AF618[player->m_Data.m_CurrentWeapon]->name);
+        state->m_pModeTable = gWeaponInfoTable[requested]->modeTable;
+        state->m_pfEffects = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->effects;
+        if (gFrameCountGameplay >= 5) {
+            CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, player->m_pCamera, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->name);
         }
         state->m_Weapon.m_BarrelAngle = 0;
         state->m_Weapon.m_BarrelSpeed = 0;

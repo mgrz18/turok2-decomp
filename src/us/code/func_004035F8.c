@@ -12,7 +12,7 @@ typedef struct {
     /* 0x244 */ s32 count;
 } Group004035F8;
 
-extern CListedInstance *D_8010FEB4;
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 s32 MantidQueen_CountActiveMinions(Group004035F8 *group) {
     s32 i;
@@ -24,7 +24,7 @@ s32 MantidQueen_CountActiveMinions(Group004035F8 *group) {
             n++;
         }
     }
-    for (a = D_8010FEB4; a != NULL; a = a->m_pNext) {
+    for (a = gScene_m_InstancePool_m_ActiveList; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.m_AI.m_Health > 0) {
             n++;
         }

@@ -26,12 +26,12 @@ void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void Automap_Update(Look004001D0 *look) {
     CPlayer *player;
     s32 held;
-    GameSettings *sub = &D_80119870.m_Settings;
+    GameSettings *sub = &gEngineApp_m_Game.m_Settings;
 
     if (sub->multiplayer) {
         return;
     }
-    player = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    player = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     if (player == NULL) {
         return;
     }
@@ -48,7 +48,7 @@ void Automap_Update(Look004001D0 *look) {
     } else if (player->m_ContState.m_dwButtonsSingleNoHold & 0x20) {
         look->mode = 0;
     }
-    if (look->mode != 0 && D_8011AAD8.mode == 13 && D_8011AAD8.paused == 0) {
+    if (look->mode != 0 && gEngineApp_m_Settings.mode == 13 && gEngineApp_m_Settings.paused == 0) {
         if (look->state != 1 && look->state != 2) {
             look->state = 1;
         }

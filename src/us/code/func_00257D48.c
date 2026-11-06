@@ -37,7 +37,7 @@ typedef struct {
     /* 0x02 */ u8 pad2[0x16];
 } PoseInfo;   /* 0x18 bytes */
 
-extern PoseInfo D_800ADF68[];
+extern PoseInfo gPlayerStateTable_anim[];
 extern f32 gFrameIncrement;             /* frame time scale */
 extern u8 gScene[];
 extern void CAI__SetMode(Object *obj, AI *ai, s32 mode);
@@ -51,7 +51,7 @@ void WeaponActor_Update(Object *obj, AI *ai) {
     s32 mode;
 
     player = obj->owner;
-    mode = D_800ADF68[player->m_Mode].mode;
+    mode = gPlayerStateTable_anim[player->m_Mode].mode;
     if (ai->timer130 > 0.0f) {
         ai->timer130 -= gFrameIncrement;
     }
@@ -71,8 +71,8 @@ void WeaponActor_Update(Object *obj, AI *ai) {
     if (ai->state != NULL && ai->state->update != NULL) {
         ai->state->update(obj, ai);
     }
-    if (D_800AF618[player->m_Data.m_CurrentWeapon]->update != NULL) {
-        D_800AF618[player->m_Data.m_CurrentWeapon]->update(obj, ai);
+    if (gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->update != NULL) {
+        gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->update(obj, ai);
     }
-    CScene__SetInstanceObjectType(gScene, obj, D_800AF618[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
+    CScene__SetInstanceObjectType(gScene, obj, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
 }

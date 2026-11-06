@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_80125C48;
+extern s32 sAdecStopFlag;
 
 s32 adecGetStopFlag(void) {
-    return D_80125C48;
+    return sAdecStopFlag;
 }

@@ -4,11 +4,11 @@
 
 void Render_InvalidateModeCache(void);
 
-#define GFX(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 /* gDPFillRectangle with float corners, each converted to an unsigned int. */
 #define FILL_RECT(ulx, uly, lrx, lry)                                               \
     {                                                                               \
-        Gfx *_g = D_800D8E24++;                                                     \
+        Gfx *_g = gDList++;                                                     \
         _g->w0 = 0xF6000000 | ((u32) (lrx) & 0x3FF) << 14 | ((u32) (lry) & 0x3FF) << 2;   \
         _g->w1 = ((u32) (ulx) & 0x3FF) << 14 | ((u32) (uly) & 0x3FF) << 2;          \
     }

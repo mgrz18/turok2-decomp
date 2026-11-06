@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern OSTask D_80121690;
+extern OSTask __osTmpTask;
 extern void *func_0029E460(void *destination, const void *source, int count);
 extern u32 osVirtualToPhysical(void *addr);
 extern OSTask *_VirtualToPhysicalTask(OSTask *arg0);
 OSTask *_VirtualToPhysicalTask(OSTask *intp)
 {
     OSTask *tp;
-    OSTask *task = &D_80121690;
+    OSTask *task = &__osTmpTask;
     tp = task;
     func_0029E460(task, intp, sizeof(OSTask));
     if (task->t.ucode != 0) { task->t.ucode = (void *)osVirtualToPhysical(task->t.ucode); } (void)0;

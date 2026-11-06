@@ -15,10 +15,10 @@ extern char D_800B4994[];
 extern char D_800B49A0[];
 extern char D_800B49AC[];
 extern char D_800B49B8[];
-extern u16 D_8013094C; /* score */
+extern u16 gPakProfileRead_kills; /* score */
 
 s32 CharNoteMenu_UpdateRank(MenuItem *item) {
-    s32 score = D_8013094C;
+    s32 score = gPakProfileRead_kills;
     char *src = NULL;
     char *dst;
     s32 i;

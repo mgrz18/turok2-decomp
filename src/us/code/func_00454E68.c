@@ -3,7 +3,7 @@
 #include "structs/menu.h"
 
 s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
-extern CPlayerOptions D_8011AB18;
+extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 
 s32 OptionsMenu_StepControlType_2(s32 arg0, Menu *arg1) {
     CPlayerOptions *temp_v0_2;
@@ -11,7 +11,7 @@ s32 OptionsMenu_StepControlType_2(s32 arg0, Menu *arg1) {
     CPlayer *temp_v0;
 
     temp_v0 = arg1->player;
-    var_s0 = &D_8011AB18;
+    var_s0 = &gEngineApp_m_Settings_defaultSlot;
     if (temp_v0 != NULL) {
         temp_v0_2 = temp_v0->m_pOptions;
         if (temp_v0_2 != NULL) {

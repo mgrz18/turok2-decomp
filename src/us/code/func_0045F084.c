@@ -3,7 +3,7 @@
 #include "common.h"
 #include "structs/pak.h"
 
-extern u8 D_800F6750;
+extern u8 gPakQueueState;
 extern char D_800C18B0[];
 extern char D_800C18C8[];
 extern u8 D_800C18E0[];
@@ -29,17 +29,17 @@ static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {
     void *buf;
 
     blocks = (size + 0xFF) & ~0xFF;
-    if (D_80130C60[ch] != 3) {
+    if (gPakState[ch] != 3) {
         return -2;
     }
     handle = CCache__Allocate(0, blocks, 0x23, D_800C18B0);
     buf = *handle;
     Controller_Lock(1);
     Controller_ReadAll();
-    result = D_80130C70[ch];
-    D_800F6750 = 2;
+    result = gPakError[ch];
+    gPakQueueState = 2;
     if (result == 0) {
-        if ((result = osPfsReadWriteFile_2(&D_80130C80[ch], file_no, 0, 0, blocks, buf)) != 0) {
+        if ((result = osPfsReadWriteFile_2(&gPakFileSystems[ch], file_no, 0, 0, blocks, buf)) != 0) {
             result = -1;
         }
         if (result == 0) {
@@ -64,7 +64,7 @@ s32 Pak_SaveNoteVerified_2(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *
     s32 tries;
 
     blocks = (size + 0xFF) & ~0xFF;
-    if (D_80130C60[ch] != 3) {
+    if (gPakState[ch] != 3) {
         return -2;
     }
     handle = CCache__Allocate(0, blocks, 0x23, D_800C18C8);

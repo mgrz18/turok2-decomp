@@ -23,7 +23,7 @@ struct B18Ent {
     B18Ent *next;       /* 0x1320 (0x16E0) */
 };
 extern CScene gScene[];
-extern B18Ent *D_80119890;
+extern B18Ent *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CParticle__CheckProximity(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     CVector3 d;
@@ -42,7 +42,7 @@ void CParticle__CheckProximity(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {
     }
     {
         B18Ent *p;
-        for (p = D_80119890; p != ((void *)0); p = p->next) {
+        for (p = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; p != ((void *)0); p = p->next) {
             if (o->owner != p && p->unk524 > 0) {
                 CVector3__Subtract(&d, &p->pos, &o->pos);
                 if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) {

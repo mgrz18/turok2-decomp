@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern s32 D_8011AC88; /* game state */
+extern s32 gEngineApp_m_Settings_mode; /* game state */
 
 extern s32 SavedPlayers_IsActive(void);
 extern void SavedPlayers_Deactivate(void);
@@ -14,7 +14,7 @@ extern void Cinema_UpdateCameraIfActive(s32);
 void CPlayerPool__LevelStart(CPlayerPool *list) {
     CPlayer *p;
 
-    if (D_8011AC88 == 13 && SavedPlayers_IsActive() != 0) {
+    if (gEngineApp_m_Settings_mode == 13 && SavedPlayers_IsActive() != 0) {
         SavedPlayers_Restore();
         SavedPlayers_Deactivate();
     }

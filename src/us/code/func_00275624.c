@@ -8,12 +8,12 @@ extern s32 CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
 extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, s32 arg1);
 extern int CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
 extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, int arg1);
-extern int D_8011ACA0;
+extern int gEngineApp_m_Settings_unk1C8;
 s32 Sound__Play2D(s32 arg0) {
     extern s32 gAudioWorld;
     s32 temp_s0;
     s32 temp_s1;
-    if (D_8011ACA0 != 0) {
+    if (gEngineApp_m_Settings_unk1C8 != 0) {
         return -1;
     }
     {

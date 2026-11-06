@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern CListedInstance *D_8010FEB4;  /* active actors */
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;  /* active actors */
 
 typedef struct {
     /* 0x00 */ u8 pad00[0x44];
@@ -14,7 +14,7 @@ typedef struct {
     /* 0x8 */ s32 mode;
 } TargetInfo;
 
-extern void *D_80119890;        /* current player */
+extern void *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;        /* current player */
 
 /* Point the player actors at a target (mode 0), or back at the player. */
 void TotemDefense_RetargetEnemies(TargetInfo *info, s32 force) {
@@ -25,8 +25,8 @@ void TotemDefense_RetargetEnemies(TargetInfo *info, s32 force) {
     if (info->mode == 1) {
         return;
     }
-    actor = D_8010FEB4;
-    player = D_80119890;
+    actor = gScene_m_InstancePool_m_ActiveList;
+    player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
     count = 0;
     for (; actor != NULL; actor = actor->m_pNext) {
         if (actor->m_Instance.header.m_pIntelligence->m_Type != 1 || actor->m_Instance.m_AI.m_pTargetOverride != 0) {

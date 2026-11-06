@@ -3,16 +3,16 @@
 
 #include "rw/abu_types.h"
 
-extern u64 D_80122A28;
-extern s32 D_80122A20;
-extern s32 D_80122A24;
-extern void *D_800B8930;
+extern u64 __osCurrentTime;
+extern s32 __osBaseCounter;
+extern s32 __osViIntrCount;
+extern void *__osTimerList;
 extern void __osTimerServicesInit();
 void __osTimerServicesInit(void) {
-    NodeRecAt1C *node = (NodeRecAt1C *)D_800B8930;
-    D_80122A28 = 0;
-    D_80122A20 = 0;
-    D_80122A24 = 0;
+    NodeRecAt1C *node = (NodeRecAt1C *)__osTimerList;
+    __osCurrentTime = 0;
+    __osBaseCounter = 0;
+    __osViIntrCount = 0;
     node->field10 = 0;
     node->field8 = 0;
     node->prev = node;

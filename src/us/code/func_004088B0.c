@@ -34,17 +34,17 @@ extern void TotemDefense_Update();
 extern void TotemDefense_OnEvent();
 extern void TotemDefense_DrawTotem();
 
-extern u8 D_801100F0[];
+extern u8 gEngineApp_m_OnScreen[];
 /* Boss fight state (0x8012FB50 on). */
-extern BossActor *D_8012FB50[];   /* the boss */
-extern void *D_8012FB54[];        /* its definition + 0x14 */
-extern s32 D_8012FB58[];
-extern f32 D_8012FB5C[];          /* time left */
-extern s32 D_8012FB60[];
+extern BossActor *gTotemDefense[];   /* the boss */
+extern void *gTotemDefense_def[];        /* its definition + 0x14 */
+extern s32 gTotemDefense_state[];
+extern f32 gTotemDefense_timer[];          /* time left */
+extern s32 gTotemDefense_kills[];
 extern s32 D_8012FB64[];
 
 static __inline__ void startBossAnim(BossActor *obj) {
-    BossActor *boss = D_8012FB50[0];
+    BossActor *boss = gTotemDefense[0];
     BossAI *ai = &boss->ai;
 
     D_8012FB64[0] = 0;
@@ -52,18 +52,18 @@ static __inline__ void startBossAnim(BossActor *obj) {
     ai->animType = 0x5334;
     ai->flags &= ~1;
     ai->animRepeats = 0;
-    COnScreen__SetBoss(D_801100F0, obj, "Enemies", ai);
+    COnScreen__SetBoss(gEngineApp_m_OnScreen, obj, "Enemies", ai);
 }
 
 void TotemDefense_Init(BossActor *obj, BossEvents *events) {
     events->onUpdate = TotemDefense_Update;
     events->onEvent = TotemDefense_OnEvent;
-    D_8012FB50[0] = obj;
-    D_8012FB54[0] = (u8 *) obj->def + 0x14;
-    D_8012FB5C[0] = obj->def->m_Destructible.m_TotemMissionDuration * 15;
-    D_8012FB58[0] = 0;
-    D_8012FB60[0] = 0;
+    gTotemDefense[0] = obj;
+    gTotemDefense_def[0] = (u8 *) obj->def + 0x14;
+    gTotemDefense_timer[0] = obj->def->m_Destructible.m_TotemMissionDuration * 15;
+    gTotemDefense_state[0] = 0;
+    gTotemDefense_kills[0] = 0;
     obj->onDraw = TotemDefense_DrawTotem;
     startBossAnim(obj);
-    COnScreen__SetBoss2(D_801100F0, obj, "Time");
+    COnScreen__SetBoss2(gEngineApp_m_OnScreen, obj, "Time");
 }

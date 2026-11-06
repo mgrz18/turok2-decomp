@@ -16,16 +16,16 @@ typedef struct {
 } State;
 
 extern f32 D_800C0540;
-extern State D_8012F9D8;
+extern State gLevelScript_bossState;
 
 void Primagen_EnterMode24_2(char *actor) {
     f32 v = D_800C0540;
-    SubState *sub = &D_8012F9D8.sub;
+    SubState *sub = &gLevelScript_bossState.sub;
 
     *(f32 *) (actor + 0x1FC) = v;
     *(s32 *) (actor + 0xD4) |= 0x2000;
     sub->value = v;
-    if (D_8012F9D8.mode == 3) {
+    if (gLevelScript_bossState.mode == 3) {
         v = sub->src;
         sub->out = v;
     } else {

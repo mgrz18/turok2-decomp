@@ -8,9 +8,9 @@
 #include "structs/world.h"
 typedef struct { f32 div; u8 r; u8 g; u8 b; u8 pad7; } Pal;
 void CEngineApp__DrawFilledRect(u8 *a, u8 *col, s32 c, s32 d, s32 e, s32 f);
-extern Pal D_800ACDE8[];
-extern s32 D_800C2030;
-extern s32 D_800C2034;
+extern Pal gWarpFadeColors[];
+extern s32 gScreenWidth;
+extern s32 gScreenHeight;
 extern u8 gEngineApp[];
 void CScene__DrawWarpFade(CScene *lv) {
     u8 col[4];
@@ -20,14 +20,14 @@ void CScene__DrawWarpFade(CScene *lv) {
     if (a != 0) {
       if (a >= 0) {
        if (a < 3) {
-        p = &D_800ACDE8[lv->m_WarpFade];
+        p = &gWarpFadeColors[lv->m_WarpFade];
         if (p->div != 0.0f) {
             col[0] = p->r;
             col[1] = p->g;
             col[2] = p->b;
             t = lv->m_WarpTime * 255.0f / p->div;
             col[3] = (u32)t;
-            CEngineApp__DrawFilledRect(gEngineApp, col, 0, 0, D_800C2030, D_800C2034);
+            CEngineApp__DrawFilledRect(gEngineApp, col, 0, 0, gScreenWidth, gScreenHeight);
         }
        }
       }

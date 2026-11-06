@@ -9,8 +9,8 @@ void __osRestoreInt(s32);
 void CCache__FreeMemEntry(s32, B12Node *);
 void CCache__AddToAddressList(s32, B12Node *);
 extern u8 gHeap[];
-extern u8 D_800D8DB0[];
-extern s32 D_800D8DCC;
+extern u8 gCache_mutex[];
+extern s32 gCache_mutex_count;
 B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;
@@ -20,12 +20,12 @@ B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
   s32 temp_v1_2;
   B12Node *var_s0;
   temp_a0 = __osDisableInt();
-  temp_v1 = D_800D8DCC + 1;
-  D_800D8DCC = temp_v1;
+  temp_v1 = gCache_mutex_count + 1;
+  gCache_mutex_count = temp_v1;
   if (temp_v1 != 1)
   {
     __osRestoreInt(temp_a0);
-    osRecvMesg((s32) (D_800D8DB0), 0, 1);
+    osRecvMesg((s32) (gCache_mutex), 0, 1);
   }
   else
   {
@@ -49,20 +49,20 @@ B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
     }
   }
   temp_v0_2 = __osDisableInt();
-  temp_v1_2 = D_800D8DCC - 1;
-  D_800D8DCC = temp_v1_2;
+  temp_v1_2 = gCache_mutex_count - 1;
+  gCache_mutex_count = temp_v1_2;
   if (temp_v1_2 != 0)
   {
-    if (D_800D8DCC || var_s0)
+    if (gCache_mutex_count || var_s0)
     {
       __osRestoreInt(temp_v0_2);
-      osSendMesg((s32) (D_800D8DB0), 0, 1);
+      osSendMesg((s32) (gCache_mutex), 0, 1);
       return var_s0;
     }
     else
     {
       __osRestoreInt(temp_v0_2);
-      osSendMesg((s32) (D_800D8DB0), 0, 1);
+      osSendMesg((s32) (gCache_mutex), 0, 1);
       return var_s0;
     }
   }

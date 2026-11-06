@@ -29,10 +29,10 @@ struct Target {
 };
 
 extern CCollisionResults gCollisionResults;
-extern u8 D_800F1D5D;
-extern u8 D_8011AAF1;
-extern u8 D_800F8928[];
-extern u8 D_801102B8[];
+extern u8 gCollisionResults_m_Frame_flags;
+extern u8 gEngineApp_m_Settings_multiplayer;
+extern u8 gScene_m_ParticleSystem[];
+extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
 s32 func_002682CC(Target *target);
@@ -149,11 +149,11 @@ void CParticle__HitTarget(CParticle *p) {
                     }
                 }
                 if (p->header.m_nObjType == 0x56 || p->header.m_nObjType == 2 || p->header.m_nObjType == 0x126 || p->header.m_nObjType == 15 || special
-                    || (p->header.m_nObjType == 11 && (D_800F1D5D & 3) == 1)) {
+                    || (p->header.m_nObjType == 11 && (gCollisionResults_m_Frame_flags & 3) == 1)) {
                     attachParticle(p, boneMatrix, action);
                     if (p->m_ActiveSwooshes) {
                         CParticle__BuildCameraMatrix(p);
-                        Trail_DetachOwner(D_801102B8, p);
+                        Trail_DetachOwner(gEngineApp_m_SwooshSystem, p);
                     }
                     if (p->m_pDLight) {
                         CDLightSet__Free(D_8010FF34, p->m_pDLight);
@@ -189,20 +189,20 @@ void CParticle__HitTarget(CParticle *p) {
         }
     }
     if (effect != 0xFFFF) {
-        if (D_800AD084[effect].m_Flags & 4) {
+        if (gImpactEventHandlers_m_Flags[effect].m_Flags & 4) {
             if (p->header.m_nObjType == 0x56) {
                 primary.lower = primary.lower * p->m_Scale;
             }
         }
         other = source;
-        if (D_800AD084[effect].m_Flags & 2) {
+        if (gImpactEventHandlers_m_Flags[effect].m_Flags & 2) {
             other = p;
         }
         ImpactEvent_Send(other, p, effect, -1, gCollisionResults.m_vInstancePos, primary);
     }
     if (action != 4) {
         draw = 1;
-        if (D_8011AAF1) {
+        if (gEngineApp_m_Settings_multiplayer) {
             draw = source->def->m_Type != 11;
             if (mode == p->m_bDieOnImpact) {
                 draw = 0;
@@ -213,9 +213,9 @@ void CParticle__HitTarget(CParticle *p) {
             extraEffect = extraActions->m_ImpactEventType[4];
             if (extraEffect != 0xFFFF) {
                 secondary = extraActions->m_ImpactEventValue[4];
-                if (D_800AD084[extraEffect].m_Flags & 4) {
+                if (gImpactEventHandlers_m_Flags[extraEffect].m_Flags & 4) {
                     other = source;
-                    if (D_800AD084[extraEffect].m_Flags & 2) {
+                    if (gImpactEventHandlers_m_Flags[extraEffect].m_Flags & 2) {
                         other = p;
                     }
                     ImpactEvent_Send(other, p, extraEffect, -1, gCollisionResults.m_vInstancePos, secondary);
@@ -230,8 +230,8 @@ void CParticle__HitTarget(CParticle *p) {
         Sound__Play((s16) sound, gCollisionResults.m_vInstancePos, 0, -1);
     }
     if (!(p->m_dwFlags & 0x30000)) {
-        if (mode == 1 || (effect != 0xFFFF && (D_800AD084[effect].m_Flags & 1))) {
-            CParticleSystem__Free(D_800F8928, p);
+        if (mode == 1 || (effect != 0xFFFF && (gImpactEventHandlers_m_Flags[effect].m_Flags & 1))) {
+            CParticleSystem__Free(gScene_m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
         }
     }

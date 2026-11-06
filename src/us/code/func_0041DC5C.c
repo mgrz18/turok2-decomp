@@ -4,20 +4,20 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s32 D_80130984;
-extern s32 D_80130990;
-extern s32 D_80130994;
-extern s32 D_80130998;
-extern s32 D_801309B4;
-extern s32 D_800C2028;
-extern u8 D_0043882C[];
-extern u8 D_00439190[];
-extern u8 D_0043AC80[];
-extern u8 D_0043ACA4[];
-extern u8 D_0043ACC8[];
-extern u8 D_0043ACEC[];
-extern u8 D_0043B738[];
-extern u8 D_0043BEF4[];
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuIsLoad;
+extern s32 gSavePortalActive;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuPort;
+extern u8 gCharacterMenuAfterPakDesc[];
+extern u8 gSingleMenuAfterPakDesc[];
+extern u8 gStatsAfterPakMenuDesc1[];
+extern u8 gStatsAfterPakMenuDesc2[];
+extern u8 gStatsAfterPakMenuDesc3[];
+extern u8 gStatsAfterPakMenuDesc4[];
+extern u8 gPakSaveGameAnyPakMenuDesc[];
+extern u8 gSavePortalMenuDescB[];
 
 static __inline__ void *TmplForKind(s32 *kindp) {
     /* by address: kind stays in its stack slot, as in the ROM */
@@ -26,16 +26,16 @@ static __inline__ void *TmplForKind(s32 *kindp) {
     switch (*kindp) {
     case 0:
     default:
-        t = D_0043AC80;
+        t = gStatsAfterPakMenuDesc1;
         break;
     case 1:
-        t = D_0043ACA4;
+        t = gStatsAfterPakMenuDesc2;
         break;
     case 2:
-        t = D_0043ACC8;
+        t = gStatsAfterPakMenuDesc3;
         break;
     case 3:
-        t = D_0043ACEC;
+        t = gStatsAfterPakMenuDesc4;
         break;
     }
     return t;
@@ -46,27 +46,27 @@ void *PakMenu_GetReturnMenu(Menu *c) {
     void *tmpl = NULL;
     s32 kind;
 
-    if (D_80130984) {
-        if (D_801309B4) {
-            if (D_80130990) {
-                kind = D_800C2028;
+    if (gPakMenuIsSave) {
+        if (gPakMenuIsProfile) {
+            if (gPakMenuAnyPak) {
+                kind = gPakMenuPort;
             } else {
                 kind = c->controller->port;
             }
             tmpl = TmplForKind(&kind);
         } else {
-            tmpl = D_0043BEF4;
+            tmpl = gSavePortalMenuDescB;
         }
-    } else if (D_80130994) {
-        if (D_801309B4) {
-            tmpl = D_0043882C;
-        } else if (D_80130998) {
-            tmpl = D_0043BEF4;
+    } else if (gPakMenuIsLoad) {
+        if (gPakMenuIsProfile) {
+            tmpl = gCharacterMenuAfterPakDesc;
+        } else if (gSavePortalActive) {
+            tmpl = gSavePortalMenuDescB;
         } else {
-            tmpl = D_00439190;
+            tmpl = gSingleMenuAfterPakDesc;
         }
-    } else if (D_80130990) {
-        tmpl = D_0043B738;
+    } else if (gPakMenuAnyPak) {
+        tmpl = gPakSaveGameAnyPakMenuDesc;
     }
     return tmpl;
 }

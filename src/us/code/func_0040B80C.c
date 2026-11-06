@@ -15,7 +15,7 @@ void MotherBoss_Mode23_Approach(void *obj, void *ai) {
 
     AI_UpdateTargets(obj, ai, &t, 1, 1);
     AI_TurnClamped(obj, ai, 0.261799425f, t.m_Path.m_Angle);
-    state = &D_8012FB70;
+    state = &gMotherBoss;
     if (++state->counter > 100 ||
         (t.m_Path.m_pTarget != NULL && t.m_Sight.m_pTarget != NULL && t.m_Path.m_FlatDist < 460.8f &&
          (t.m_Sight.m_Angle < 0.0f ? -t.m_Sight.m_Angle <= 0.34906590f : t.m_Sight.m_Angle <= 0.34906590f))) {

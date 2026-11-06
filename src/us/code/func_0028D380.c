@@ -10,14 +10,14 @@ typedef struct Marker {
     char text[15];
 } Marker;
 
-extern Marker D_800AA200;           /* the boot marker string */
-extern char D_800B75F0[];           /* where the marker is kept (0x10 bytes) */
-extern s32 D_80120690;              /* set when the marker was found: a warm boot */
-extern char D_8011F290[];           /* the saved players (0x1400) */
-extern char D_8011AAD8[];           /* the settings (0x184), pads at +0x1D8..+0x224 */
-extern char D_800EBAC0[];
-extern char D_800E6AC0[];
-extern s32 D_800C4000[];            /* BSS start */
+extern Marker sBootMarker;           /* the boot marker string */
+extern char gBootSignature[];           /* where the marker is kept (0x10 bytes) */
+extern s32 gWarmBoot;              /* set when the marker was found: a warm boot */
+extern char gSavedPlayers[];           /* the saved players (0x1400) */
+extern char gEngineApp_m_Settings[];           /* the settings (0x184), pads at +0x1D8..+0x224 */
+extern char gLoadSavePersistentData[];
+extern char gGamePersistentData[];
+extern s32 gGfxYieldBuffer[];            /* BSS start */
 extern s32 D_8014A000[];            /* BSS end */
 
 void memset(void *dst, s32 value, s32 size);
@@ -28,28 +28,28 @@ void Engine_Boot(void);
 
 /* Whether a word may be overwritten on reset (Boot_CanOverwrite inlined). */
 static __inline__ s32 isRestorable(u32 address) {
-    if (address >= (u32)D_800B75F0 && address < (u32)D_800B75F0 + 0x10) {
+    if (address >= (u32)gBootSignature && address < (u32)gBootSignature + 0x10) {
         return 0;
     }
-    if (address == (u32)&D_80120690) {
+    if (address == (u32)&gWarmBoot) {
         return 0;
     }
-    if (D_80120690 != 0) {
+    if (gWarmBoot != 0) {
         return 1;
     }
-    if (address >= (u32)D_8011F290 && address < (u32)D_8011F290 + 0x1400) {
+    if (address >= (u32)gSavedPlayers && address < (u32)gSavedPlayers + 0x1400) {
         return 0;
     }
-    if (address >= (u32)D_8011AAD8 && address < (u32)D_8011AAD8 + 0x184) {
+    if (address >= (u32)gEngineApp_m_Settings && address < (u32)gEngineApp_m_Settings + 0x184) {
         return 0;
     }
-    if (address >= (u32)D_800EBAC0 && address < (u32)D_800EBAC0 + 0x5800) {
+    if (address >= (u32)gLoadSavePersistentData && address < (u32)gLoadSavePersistentData + 0x5800) {
         return 0;
     }
-    if (address >= (u32)D_800E6AC0 && address < (u32)D_800E6AC0 + 0x5000) {
+    if (address >= (u32)gGamePersistentData && address < (u32)gGamePersistentData + 0x5000) {
         return 0;
     }
-    if (address >= (u32)D_8011AAD8 + 0x1D8 && address <= (u32)D_8011AAD8 + 0x224) {
+    if (address >= (u32)gEngineApp_m_Settings + 0x1D8 && address <= (u32)gEngineApp_m_Settings + 0x224) {
         return 0;
     }
     return 1;
@@ -66,15 +66,15 @@ s32 func_0028D380(void) {
     u32 *piStatus;
     char name[16];
 
-    *(Marker *)name = D_800AA200;
+    *(Marker *)name = sBootMarker;
     memset(&name[15], 0, 1);
-    if (Util_StrCmp(D_800B75F0, name) == 0) {
-        D_80120690 = 0;
+    if (Util_StrCmp(gBootSignature, name) == 0) {
+        gWarmBoot = 0;
     } else {
-        D_80120690 = 1;
-        Util_StrCpy(D_800B75F0, name);
+        gWarmBoot = 1;
+        Util_StrCpy(gBootSignature, name);
     }
-    if (D_80120690 == 0) {
+    if (gWarmBoot == 0) {
         src = (u32 *)0xB0001000;
         dst = (u32 *)0x80000400;
         piStatus = (u32 *)0xA4600010;
@@ -90,7 +90,7 @@ s32 func_0028D380(void) {
             src++;
         } while (count-- != 0);
     }
-    for (dst = (u32 *)D_800C4000; (u32)dst < (u32)D_8014A000; dst++) {
+    for (dst = (u32 *)gGfxYieldBuffer; (u32)dst < (u32)D_8014A000; dst++) {
         if (isRestorable((u32)dst | 0x80000000)) {
             *dst = 0;
         }

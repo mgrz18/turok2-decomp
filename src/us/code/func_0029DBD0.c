@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern OSPiHandle_s *D_800B8980[];
+extern OSPiHandle_s *__osCurrentHandle[];
 s32 osEPiRawWriteIo(OSPiHandle_s *arg0, u32 arg1, u32 arg2) {
     OSPiHandle_s *previous;
     s32 index;
     while (*(volatile u32 *)0xA4600010 & 3) {
     }
     index = arg0->domain;
-    previous = D_800B8980[index];
+    previous = __osCurrentHandle[index];
     if (previous != arg0) {
         if (index == 0) {
             if (previous->latency != arg0->latency) {
@@ -39,7 +39,7 @@ s32 osEPiRawWriteIo(OSPiHandle_s *arg0, u32 arg1, u32 arg2) {
                 *(volatile u32 *)0xA4600028 = arg0->pulse;
             }
         }
-        D_800B8980[index] = arg0;
+        __osCurrentHandle[index] = arg0;
     }
     *(volatile u32 *)(arg0->baseAddress | arg1 | 0xA0000000) = arg2;
     return 0;

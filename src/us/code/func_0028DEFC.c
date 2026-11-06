@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern void func_0028EEC0(int arg0);
-extern char D_80132000;
-extern EntryRecAt3 D_80121318[];
+extern char gVMPages;
+extern EntryRecAt3 gPager_entries[];
 void VM_UnmapTLBEntry(Mapping *mapping) {
     extern void func_0028EE40(s32, s32, s32, s32, s32, s32);
     s32 slot;
@@ -13,23 +13,23 @@ void VM_UnmapTLBEntry(Mapping *mapping) {
         return;
     }
     if (mapping->flags & 1) {
-        D_80121318[mapping->slot].slot = 0xFF;
+        gPager_entries[mapping->slot].slot = 0xFF;
         slot = mapping->slot;
-        if (D_80121318[slot].team == 0xFF) {
+        if (gPager_entries[slot].team == 0xFF) {
             goto unmap;
         }
-        func_0028EE40(slot, 0, D_80121318[slot].id << 12,
-                      ((s32)&D_80132000 & 0x3FFFFFF) + (D_80121318[slot].team << 12), -1, 7);
+        func_0028EE40(slot, 0, gPager_entries[slot].id << 12,
+                      ((s32)&gVMPages & 0x3FFFFFF) + (gPager_entries[slot].team << 12), -1, 7);
     } else {
-        D_80121318[mapping->slot].team = 0xFF;
+        gPager_entries[mapping->slot].team = 0xFF;
         slot = mapping->slot;
-        if (D_80121318[slot].slot == 0xFF) {
+        if (gPager_entries[slot].slot == 0xFF) {
         unmap:
             func_0028EEC0(slot);
-            D_80121318[mapping->slot].id = 0xFFFF;
+            gPager_entries[mapping->slot].id = 0xFFFF;
         } else {
-            func_0028EE40(slot, 0, D_80121318[slot].id << 12, -1,
-                          ((s32)&D_80132000 & 0x3FFFFFF) + (D_80121318[slot].slot << 12), 7);
+            func_0028EE40(slot, 0, gPager_entries[slot].id << 12, -1,
+                          ((s32)&gVMPages & 0x3FFFFFF) + (gPager_entries[slot].slot << 12), 7);
         }
     }
     mapping->slot = 0xFF;

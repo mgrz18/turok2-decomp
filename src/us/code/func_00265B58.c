@@ -116,7 +116,7 @@ struct M1Pad {
                 M1B1 stickY;
 };
 extern s32 gScene[];
-extern u8 D_801102B8[];
+extern u8 gEngineApp_m_SwooshSystem[];
 void CScene__SetInstanceSavedBit(s32 *p, M1Actor *a, s32 n);
 void GameObject_FireTriggers(M1Actor *a, s32 b, M1Actor *c);
 void Sound__Play(s16 id, CVector3 pos, s32 a, s32 b);
@@ -144,7 +144,7 @@ void Destructible_GoEnter(M1Actor *actor, M1State *state) {
             Actor_SpawnParticle(actor, info->unk1C, actor->pos, 0);
         }
         AI_DropPickupsOnce(actor, state, 4, info->unk24.i, info->unk28.i);
-        SwooshSet_FreeOwner(D_801102B8, actor);
+        SwooshSet_FreeOwner(gEngineApp_m_SwooshSystem, actor);
         if (gScene[0] != mode) goto L;
     } else {
 L:

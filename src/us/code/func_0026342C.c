@@ -41,8 +41,8 @@ typedef struct B01Info {
 typedef struct B01Seg {
                 u8 b[0x18];
 } B01Seg;
-extern u8 D_8011AAF1[];
-extern u8 D_8011AAF2;
+extern u8 gEngineApp_m_Settings_multiplayer[];
+extern u8 gEngineApp_m_Settings_playerCount;
 f32 Random_Blend(f32 a, f32 b);
 void CAI__SetMode(CGameObjectInstance *actor, CAI *state, s32 event);
 void Generator_Advance(CGameObjectInstance *actor, CAI *state) {
@@ -51,7 +51,7 @@ void Generator_Advance(CGameObjectInstance *actor, CAI *state) {
     B01Info *info;
     a2 = actor;
     new_var = (B01Info *)(((u8 *)a2->header.m_pIntelligence) + 0x14);
-    if (!(a2->header.m_pIntelligence->m_dwTypeFlags & 0x10) || (D_8011AAF1[0] != 0 && D_8011AAF1[1] == 1)) {
+    if (!(a2->header.m_pIntelligence->m_dwTypeFlags & 0x10) || (gEngineApp_m_Settings_multiplayer[0] != 0 && gEngineApp_m_Settings_multiplayer[1] == 1)) {
         if (state) {
             state->m_ConditionTimer = Random_Blend(45.0f, 60.0f);
             info = new_var;
@@ -67,7 +67,7 @@ void Generator_Advance(CGameObjectInstance *actor, CAI *state) {
             a2->m_dwFlags &= ~0x2000;
         }
         CAI__SetMode(a2, state, 0);
-        if ((info->flags & 0x10) && D_8011AAF2 != 1) {
+        if ((info->flags & 0x10) && gEngineApp_m_Settings_playerCount != 1) {
             goto clear;
         }
     } else {

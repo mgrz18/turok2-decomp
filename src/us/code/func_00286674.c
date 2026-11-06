@@ -9,35 +9,35 @@ typedef struct {
     /* 0x00 */ s16 type;
 } EngineMsg;
 
-extern s32 D_80000300;          /* osTvType */
-extern u8 D_80130A58[];
-extern void *D_80130A88[];      /* frame buffers */
-extern f32 D_8011B0A0[];
-extern EngineMsg *D_8011F124;
-extern s32 D_8011B110;
-extern s32 D_8011AD88;
-extern s32 D_8011B10C;
+extern s32 osTvType;          /* osTvType */
+extern u8 gPoolBuffers[];
+extern void *gCFB[];      /* frame buffers */
+extern f32 gCurrentFB[];
+extern EngineMsg *gGfxMsg;
+extern s32 gDisplayListCount;
+extern s32 gCurrentTick;
+extern s32 gNumTicks0;
 extern s32 D_800F6CA8;
-extern s32 D_8011AD14;
-extern s32 D_8011B09C;
-extern s32 D_8011F130;
-extern s32 D_8011F134;
-extern s32 D_8011F138;
-extern s32 D_800F6CA4;
-extern s32 D_8011B098;
-extern u32 D_800C2210;          /* frame buffer count */
-extern s32 D_800C2030;          /* width */
-extern s32 D_800C2034;          /* height */
+extern s32 gNumTicks2;
+extern s32 gNumTicks3;
+extern s32 gNumTicksPending;
+extern s32 gCurrentTickWaiting;
+extern s32 gNumTicksWaiting;
+extern s32 gNextFrameToShow;
+extern s32 gPendingFB;
+extern u32 gTotalFramebuffers;          /* frame buffer count */
+extern s32 gScreenWidth;          /* width */
+extern s32 gScreenHeight;          /* height */
 extern u8 gScene[];
-extern u8 D_800B6CF1;
-extern s32 D_8011F13C;
-extern s32 D_8011F148;
-extern s32 D_8011B108;
+extern u8 gValidControllerBits;
+extern s32 gPakCheckHasPak;
+extern s32 gPakCheckDone;
+extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
-extern f32 D_8011AD40;
-extern u8 D_8011AD28[];         /* the engine message queue */
-extern u8 D_800B75F0;
+extern f32 gPakCheckTimer;
+extern u8 gGfxFrameMessageQueue[];         /* the engine message queue */
+extern u8 gBootSignature;
 
 extern void InitializeSystemResources(void);
 extern void osCreateViManager(s32 pri);
@@ -73,32 +73,32 @@ void CEngineApp__Main(CEngineApp *e) {
     InitializeSystemResources();
     osCreateViManager(0xFE);
     osViBlack(1);
-    GfxPool_Clear(D_80130A58);
-    GfxPool_Alloc(D_80130A58);
-    osViSwapBuffer(D_80130A88[0]);
+    GfxPool_Clear(gPoolBuffers);
+    GfxPool_Alloc(gPoolBuffers);
+    osViSwapBuffer(gCFB[0]);
     osViBlack(0);
-    if (D_80000300 == 0) {
-        D_8011B0A0[1] = 50.0f;
+    if (osTvType == 0) {
+        gCurrentFB[1] = 50.0f;
     } else {
-        D_8011B0A0[1] = 60.0f;
+        gCurrentFB[1] = 60.0f;
     }
-    D_8011F124 = NULL;
+    gGfxMsg = NULL;
     Demo_Reset();
-    D_8011B110 = 2;
-    D_8011AD88 = 0;
-    D_8011B10C = 0;
+    gDisplayListCount = 2;
+    gCurrentTick = 0;
+    gNumTicks0 = 0;
     D_800F6CA8 = 0;
-    D_8011AD14 = 0;
-    D_8011B09C = 0;
-    D_8011F130 = 0;
-    D_8011F134 = 0;
-    D_8011F138 = 0;
-    D_800F6CA4 = 0;
-    D_8011B0A0[0] = 0;
-    D_8011B098 = 0;
+    gNumTicks2 = 0;
+    gNumTicks3 = 0;
+    gNumTicksPending = 0;
+    gCurrentTickWaiting = 0;
+    gNumTicksWaiting = 0;
+    gNextFrameToShow = 0;
+    gCurrentFB[0] = 0;
+    gPendingFB = 0;
     CEngineApp__Construct(e);
-    for (i = 0; i < D_800C2210; i++) {
-        memset(D_80130A88[i], 0, D_800C2030 * D_800C2034 * 2);
+    for (i = 0; i < gTotalFramebuffers; i++) {
+        memset(gCFB[i], 0, gScreenWidth * gScreenHeight * 2);
     }
     CCameraPool__Construct((u8 *)e + 0x22C00);
     CPlayerPool__Construct((u8 *)e + 0x22BC0);
@@ -107,17 +107,17 @@ void CEngineApp__Main(CEngineApp *e) {
     CCameraPool__NewGame((u8 *)e + 0x22C00, 0);
     CPlayerPool__NewGame((u8 *)e + 0x22BC0, 0, 0);
     CScene__Construct(gScene, e->m_CartridgeIndex);
-    if (D_800B6CF1 == 0) {
+    if (gValidControllerBits == 0) {
         Cont_InitAll();
     }
     COnScreen__Construct((u8 *)e + 0x19440);
     Pak_AllocDirectory();
-    D_8011F13C = 0;
-    D_8011F148 = 0;
-    D_8011B108 = 0;
+    gPakCheckHasPak = 0;
+    gPakCheckDone = 0;
+    gPakMenuStartPressed = 0;
     D_8011F144 = 1;
     D_8011B114 = 0;
-    D_8011AD40 = 120.0f;
+    gPakCheckTimer = 120.0f;
     Controller_WatchAllPaks();
     if (SavedPlayers_IsActive()) {
         CEngineApp__SetMode(e, 13);
@@ -126,21 +126,21 @@ void CEngineApp__Main(CEngineApp *e) {
     }
 
     for (;;) {
-        osRecvMesg(D_8011AD28, &D_8011F124, 1);
-        switch (D_8011F124->type) {
+        osRecvMesg(gGfxFrameMessageQueue, &gGfxMsg, 1);
+        switch (gGfxMsg->type) {
         case 1:
             CEngineApp__Retrace(e);
             break;
         case 2:
-            if ((u8 *)D_8011F124 == (u8 *)e + 0xF0) {
-                D_8011F140 = (CFrameData *)e;
-            } else if ((u8 *)D_8011F124 == (u8 *)e + 0x230) {
-                D_8011F140 = (CFrameData *)((u8 *)e + 0x140);
-            } else if ((u8 *)D_8011F124 == (u8 *)e + 0x370) {
-                D_8011F140 = (CFrameData *)((u8 *)e + 0x280);
+            if ((u8 *)gGfxMsg == (u8 *)e + 0xF0) {
+                gFrameData = (CFrameData *)e;
+            } else if ((u8 *)gGfxMsg == (u8 *)e + 0x230) {
+                gFrameData = (CFrameData *)((u8 *)e + 0x140);
+            } else if ((u8 *)gGfxMsg == (u8 *)e + 0x370) {
+                gFrameData = (CFrameData *)((u8 *)e + 0x280);
             }
             if (e->m_Settings.mode == 17) {
-                D_8011B110++;
+                gDisplayListCount++;
             } else {
                 CEngineApp__Update(e);
             }
@@ -149,8 +149,8 @@ void CEngineApp__Main(CEngineApp *e) {
             /* FAKEMATCH: the test is always true and both branches are the same (cross-jumping
              * merges them); without it GCC also keeps the case constant 2 in $s1 across the loop
              * (12 words differ). Found by the permuter; no natural form found. */
-            if (D_8011F124 != NULL) {
-                D_800B75F0 = 0;
+            if (gGfxMsg != NULL) {
+                gBootSignature = 0;
                 Controller_ResetAllRumble();
                 Controller_SetRumbleOptionAll(0);
                 e->m_Settings.fastFade = 1;
@@ -158,7 +158,7 @@ void CEngineApp__Main(CEngineApp *e) {
                 e->m_Settings.unk1C8 = 1;
                 break;
             } else {
-                D_800B75F0 = 0;
+                gBootSignature = 0;
                 Controller_ResetAllRumble();
                 Controller_SetRumbleOptionAll(0);
                 e->m_Settings.fastFade = 1;

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern void *D_800B8930;
+extern void *__osTimerList;
 extern void __osSetTimerIntr(u64 tim);
 extern u64 __osInsertTimer(OSTimer *t);
 int osSetTimer(Node802C07B0 *node, u64 arg1, u64 arg2, void *arg3, void *arg4) {
@@ -18,7 +18,7 @@ int osSetTimer(Node802C07B0 *node, u64 arg1, u64 arg2, void *arg3, void *arg4) {
     node->field18 = arg3;
     node->field1C = arg4;
     value = __osInsertTimer(node);
-    if (*(void **)D_800B8930 == node) {
+    if (*(void **)__osTimerList == node) {
         __osSetTimerIntr(value);
     }
     return 0;

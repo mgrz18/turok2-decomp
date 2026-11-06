@@ -11,20 +11,20 @@ typedef float f32;
 typedef double f64;
 s32 CAI__SetMode(s32, s32, s32);
 s32 COnScreen__SetBoss(s32 *, s32, s32 *);
-extern s32 D_004312D4;
-extern s32 D_004315BC;
+extern s32 sPrimagenSpawnScript1_2;
+extern s32 sPrimagenSoundScript3_2;
 extern s32 D_800C046C;
-extern s32 D_801100F0;
-extern s32 D_8012FA24;
+extern s32 gEngineApp_m_OnScreen;
+extern s32 gLevelScript_script3_cursor;
 void Primagen_UpdateMode28_2(s32 arg0, s32 arg1)
 {
-  COnScreen__SetBoss(&D_801100F0, arg0, &D_800C046C);
-  *((s32 *) (((s8 *) (&D_8012FA24)) + 0)) = -1;
-  *((s32 **) (((s8 *) (&D_8012FA24)) + (-4))) = &D_004315BC;
-  *((s8 *) (((s8 *) (&D_8012FA24)) + (-0xC))) = 1;
-  *((s32 *) (((s8 *) (&D_8012FA24)) + 4)) = -1;
-  *((s32 *) (((s8 *) (&D_8012FA24)) + (-0x14))) = -1;
-  *((s32 *) (((s8 *) (&D_8012FA24)) + (-0x10))) = -1;
-  *((s32 **) (((s8 *) (&D_8012FA24)) + (-0x18))) = &D_004312D4;
+  COnScreen__SetBoss(&gEngineApp_m_OnScreen, arg0, &D_800C046C);
+  *((s32 *) (((s8 *) (&gLevelScript_script3_cursor)) + 0)) = -1;
+  *((s32 **) (((s8 *) (&gLevelScript_script3_cursor)) + (-4))) = &sPrimagenSoundScript3_2;
+  *((s8 *) (((s8 *) (&gLevelScript_script3_cursor)) + (-0xC))) = 1;
+  *((s32 *) (((s8 *) (&gLevelScript_script3_cursor)) + 4)) = -1;
+  *((s32 *) (((s8 *) (&gLevelScript_script3_cursor)) + (-0x14))) = -1;
+  *((s32 *) (((s8 *) (&gLevelScript_script3_cursor)) + (-0x10))) = -1;
+  *((s32 **) (((s8 *) (&gLevelScript_script3_cursor)) + (-0x18))) = &sPrimagenSpawnScript1_2;
   CAI__SetMode(arg0, arg1, 5);
 }

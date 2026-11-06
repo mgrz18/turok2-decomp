@@ -43,7 +43,7 @@ typedef struct {
     /* 0x02 */ s16 m_nCurrentPointIndex;
 } CPathTrack; /* size 0x4 */
 
-/* One row of an AI's mode table (CAI::m_pModeTable, e.g. D_800B0A60: a
+/* One row of an AI's mode table (CAI::m_pModeTable, e.g. gEnemyGroundModeTable: a
  * 0x20-byte header row, then one row per mode; m_pModeCurrent points at the
  * current one). The AI step calls m_pfCallback while the mode runs. */
 typedef struct CAIModeInfo {
@@ -203,8 +203,8 @@ typedef struct CObjectHead {
 
 /* A dynamic object (an actor spawned at run time, an effect...): the
  * instance followed by its links in the world's object lists (CList, links
- * at m_LastOffset 0x288 / m_NextOffset 0x28C: the active list D_8010FEB4,
- * the free list D_8010FEA0) and the counter it decrements when it goes. */
+ * at m_LastOffset 0x288 / m_NextOffset 0x28C: the active list gScene_m_InstancePool_m_ActiveList,
+ * the free list gScene_m_InstancePool_m_FreeList) and the counter it decrements when it goes. */
 typedef struct CListedInstance {
     /* 0x000 */ CGameObjectInstance m_Instance;
     /* 0x288 */ struct CListedInstance *m_pPrev;
@@ -214,14 +214,14 @@ typedef struct CListedInstance {
 } CListedInstance; /* size 0x298 */
 
 /* The pool of dynamic objects, gScene_m_InstancePool: 32 of them, the free ones on
- * m_FreeList (D_8010FEA0) and the live ones on m_ActiveList (D_8010FEB4).
+ * m_FreeList (gScene_m_InstancePool_m_FreeList) and the live ones on m_ActiveList (gScene_m_InstancePool_m_ActiveList).
  * CInstancePool__Alloc takes one (only while fewer than 3 are live, unless
- * D_8011001C), CListedInstance__Free / CInstancePool__Free give it back; CInstancePool__SpawnAnimInstance,
+ * gScene_m_bStreamAll), CListedInstance__Free / CInstancePool__Free give it back; CInstancePool__SpawnAnimInstance,
  * CInstancePool__SpawnCopy and CInstancePool__Spawn spawn into it. */
 typedef struct CInstancePool {
     /* 0x0000 */ CListedInstance m_Instances[32];
-    /* 0x5300 */ CList m_FreeList;     /* D_8010FEA0 */
-    /* 0x5314 */ CList m_ActiveList;   /* D_8010FEB4 */
+    /* 0x5300 */ CList m_FreeList;     /* gScene_m_InstancePool_m_FreeList */
+    /* 0x5314 */ CList m_ActiveList;   /* gScene_m_InstancePool_m_ActiveList */
 } CInstancePool; /* size 0x5328 */
 
 /* What an AI aims at this frame: AI_GetSightTargetInfo fills one from CAI's

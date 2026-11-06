@@ -348,6 +348,6 @@ extern void MantidQueen_EnterDeath(struct Trigger *arg0);
 extern void CPlayerPool__SetInvincibility(Shared_World *world, float value);
 extern void Cinema_RequestById(s32 id);
 void MantidQueen_EnterDeath(Trigger *arg0) {
-    CPlayerPool__SetInvincibility(&D_80119870.m_PlayerList, 900.0f);
+    CPlayerPool__SetInvincibility(&gEngineApp_m_Game.m_PlayerList, 900.0f);
     Cinema_RequestById(0x136);
 }

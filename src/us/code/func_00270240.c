@@ -15,13 +15,13 @@ typedef struct {
     /* 0x0C */ ALBankFile *bankFile;
 } BankRes;
 
-extern s32 D_800B2680;      /* sound manager ready */
-extern u8 D_800B2684[];
-extern s32 D_800B6E90;
-extern s32 D_800F2040;
-extern u8 D_8011AAED[];     /* volume settings (bytes from -2) */
-extern s32 D_80130A40;      /* audio heap base */
-extern s32 D_80130A7C;      /* audio heap size */
+extern s32 gAudioWorldReady;      /* sound manager ready */
+extern u8 sAudioWorldReverbParams[];
+extern s32 gThreadPriorityAudio;
+extern s32 gAudioRomBase;
+extern u8 gEngineApp_m_Settings_unk15[];     /* volume settings (bytes from -2) */
+extern s32 gAudioHeapBase;      /* audio heap base */
+extern s32 gAudioHeapSize;      /* audio heap size */
 
 extern s32 __osDisableInt(void);         /* disable interrupts */
 extern void __osRestoreInt(s32 mask);    /* restore interrupts */
@@ -79,19 +79,19 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     CMutex__Construct(&m->lock);
     CAudioWorld_Lock(m);
     m->soundState = 0;
-    alHeapInit(&m->heap, D_80130A40, D_80130A7C);
+    alHeapInit(&m->heap, gAudioHeapBase, gAudioHeapSize);
     cfg.maxVVoices = 0x25;
     cfg.maxPVoices = 0x25;
     cfg.maxUpdates = 0x100;
     cfg.fxType = 6; /* AL_FX_CUSTOM */
-    cfg.params = (s32 *) D_800B2684;
+    cfg.params = (s32 *) sAudioWorldReverbParams;
     ai.rate = 0x5622;
     ai.one = 1;
     cfg.dmaproc = 0;
     cfg.heap = &m->heap;
     ai.size = 0x800;
-    amCreateAudioMgr(&cfg, D_800B6E90, &ai);
-    D_800F2040 = 0x20F194;
+    amCreateAudioMgr(&cfg, gThreadPriorityAudio, &ai);
+    gAudioRomBase = 0x20F194;
     r = VM_Alloc(0x2F194, 0, 0x1E0000);
     m->seq.data = (s32 *)r->f4;
     bk = r->bankFile;
@@ -130,7 +130,7 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     m->fxMix = 0;
     SndQueue_Construct(&m->queue, m);
     SndVoicePool_Construct(&m->pool, m);
-    e = D_8011AAED;
+    e = gEngineApp_m_Settings_unk15;
     m->sfxVolume = (f32)e[0] * (1.0f / 255);
     m->volume2BA4 = (f32)e[-1] * (1.0f / 255);
     m->musicVolume = (f32)e[1] * (1.0f / 255);
@@ -139,6 +139,6 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     m->unk2BB4 = 1;
     m->unk2BBC = 1.0f;
     SpeechPlayer_Construct(&m->fx, m);
-    D_800B2680 = 1;
+    gAudioWorldReady = 1;
     CAudioWorld_Unlock(m);
 }

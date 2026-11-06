@@ -7,14 +7,14 @@ typedef struct {
 
 s32 osSetThreadPri(void *, s32);                 /* extern */
 
-extern s32 D_800B6E7C;
-extern s32 D_800B6E88;
+extern s32 gThreadPriorityDecompressorLow;
+extern s32 gThreadPriorityDecompressorHigh;
 
 void CDecompressor__Flush(Task *arg0) {
     if (arg0->pending != 0) {
         do {
-            osSetThreadPri(arg0, D_800B6E88);
+            osSetThreadPri(arg0, gThreadPriorityDecompressorHigh);
         } while (arg0->pending != 0);
     }
-    osSetThreadPri(arg0, D_800B6E7C);
+    osSetThreadPri(arg0, gThreadPriorityDecompressorLow);
 }

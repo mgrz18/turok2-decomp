@@ -4,18 +4,18 @@
 #include "rw/abu_types.h"
 
 extern void __osPackReadData();
-extern s8 D_801213DC;
+extern s8 __osContNumControllers;
 void __osPackReadData(void) {
-    extern OSPifRam D_801213E0;
+    extern OSPifRam __osContBuffer;
     ContReadFormat readformat;
     u8 *ptr;
     u8 *count;
     s32 i;
-    ptr = (u8 *)D_801213E0.ramarray;
+    ptr = (u8 *)__osContBuffer.ramarray;
     for (i = 14; i >= 0; i--) {
         ((s32 *)ptr)[i] = 0;
     }
-    D_801213E0.pifstatus = 1;
+    __osContBuffer.pifstatus = 1;
     readformat.dummy = 0xFF;
     readformat.txsize = 1;
     readformat.rxsize = 4;
@@ -23,7 +23,7 @@ void __osPackReadData(void) {
     readformat.button = 0xFFFF;
     readformat.stick_x = -1;
     readformat.stick_y = -1;
-    count = &D_801213DC;
+    count = &__osContNumControllers;
     for (i = 0; i < *count; i++) {
         *(ContReadFormat *)ptr = readformat;
         ptr += sizeof(ContReadFormat);

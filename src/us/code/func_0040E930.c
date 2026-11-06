@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-extern BlindOnePhase D_0043240C[];
+extern BlindOnePhase sBlindOnePhases[];
 
 extern u8 gScene[];
 extern void CScene__MarkGeneratorsSaved(void *);
@@ -42,8 +42,8 @@ static __inline__ void NextCommand(BlindOneState *m) {
         m->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     m->phase = cmd;
-    if (D_0043240C[cmd].init != NULL) {
-        D_0043240C[cmd].init(m);
+    if (sBlindOnePhases[cmd].init != NULL) {
+        sBlindOnePhases[cmd].init(m);
     }
 }
 

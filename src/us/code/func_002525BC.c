@@ -5,9 +5,9 @@
 
 /* Tag game state. */
 
-extern u8 D_8011AAEA;
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
+extern u8 gEngineApp_m_Settings_hudAlpha;
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
 
 extern s32 Random_Next(void);
 extern void CPlayer__BecomeIt(CPlayer *p);
@@ -27,7 +27,7 @@ void CPlayerPool__PickTagIt(CPlayerPool *list) {
     CPlayer *p;
     CCamera *cam;
     f32 w, h, cx, cy, sx, sy;
-    GameMatch *s = &D_8011ACB0;
+    GameMatch *s = &gEngineApp_m_Settings_match;
 
     if (!s->tag) {
         return;
@@ -37,7 +37,7 @@ void CPlayerPool__PickTagIt(CPlayerPool *list) {
         return;
     }
     count = CPlayerPool__CountPlaying(list);
-    s = &D_8011ACB0;
+    s = &gEngineApp_m_Settings_match;
     switch (s->tagPhase) {
         case 0:
         default:
@@ -58,16 +58,16 @@ void CPlayerPool__PickTagIt(CPlayerPool *list) {
             p = CPlayerPool__GetViewPlayer(list, s->tagPick % count);
             cam = p->m_pCamera;
             if (cam != NULL && cam->m_Menus.count == 0) {
-                Hud_SetupTextureMode(D_8011AAEA);
+                Hud_SetupTextureMode(gEngineApp_m_Settings_hudAlpha);
                 w = cam->m_Viewport.m_Width;
                 h = cam->m_Viewport.m_Height;
                 cx = cam->m_Viewport.m_ScreenPosX + w * 0.5f;
                 cy = cam->m_Viewport.m_ScreenPosY + h * 0.5f;
-                sx = w / D_800C2030;
-                sy = h / D_800C2034;
+                sx = w / gScreenWidth;
+                sy = h / gScreenHeight;
                 Hud_DrawSprite(0x1FB, 0, cx - sx * 16.0f, cy - sy * 16.0f, sx, sy, 1);
             }
-            s = &D_8011ACB0;
+            s = &gEngineApp_m_Settings_match;
             if (++s->tagPick >= (5 - count) * 20 - s->tagPickStart) {
                 CPlayerPool__ClearLastTagMode(list);
                 s->tagPhase = 3;

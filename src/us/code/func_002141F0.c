@@ -37,8 +37,8 @@ typedef struct {
 } PlacedProp;
 
 extern u8 gScene[];
-extern s32 D_800ACAF0;
-extern s32 D_800B6D00;
+extern s32 gNextUniqueId;
+extern s32 gDefaultVisBits;
 extern u8 D_800B6D1B;
 
 void *CScene__GetIntelligence(void *, s32);
@@ -54,12 +54,12 @@ void CMtxF__ToMtxAffine(f32 *src, f32 *dst);
 static __inline__ s32 nextColorKey(void) {
     s32 next;
 
-    next = D_800ACAF0 + 1;
-    D_800ACAF0 = next;
+    next = gNextUniqueId + 1;
+    gNextUniqueId = next;
     if (next == 0x3FFFFF) {
-        D_800ACAF0 = 0x380000;
+        gNextUniqueId = 0x380000;
     }
-    return D_800ACAF0;
+    return gNextUniqueId;
 }
 
 void CStaticObject__ConstructCompact(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *segments, f32 scale) {
@@ -108,7 +108,7 @@ void CStaticObject__ConstructCompact(PlacedProp *prop, PlacedPropRecord *record,
         prop->max.y = pos.y + 102.399994f;
         prop->max.z = pos.z + 102.399994f;
         CMtxF__Copy(prop->matrix, matrix);
-        prop->value = D_800B6D00;
+        prop->value = gDefaultVisBits;
     } else {
         prop->min.x = pos.x + record->extents[0] * 10.24f - 0.5f;
         prop->min.y = pos.y + record->extents[2] * 10.24f - 0.5f;

@@ -3,7 +3,7 @@
 #include "structs/menu.h"
 
 
-extern CPlayerOptions D_8011AB18; /* D_8011AAD8 + 0x40: default options */
+extern CPlayerOptions gEngineApp_m_Settings_defaultSlot; /* gEngineApp_m_Settings + 0x40: default options */
 extern char D_800B4080[];
 extern char D_800B4098[];
 extern char D_800C1318[]; /* "  %2d"-style */
@@ -13,7 +13,7 @@ extern void sprintf(char *dst, char *fmt, ...);
 
 /* Label of the player's 0x80-centred setting at options+0x2A. */
 s32 OptionsMenu_StickVertText(MenuItem *a, Menu *c) {
-    CPlayerOptions *options = &D_8011AB18;
+    CPlayerOptions *options = &gEngineApp_m_Settings_defaultSlot;
     s32 v;
 
     if (c->player != NULL && c->player->m_pOptions != NULL) {

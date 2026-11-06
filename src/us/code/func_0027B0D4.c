@@ -1,9 +1,9 @@
 #include "common.h"
 
 s32 COnScreen__SelectSmallFont();                            /* extern */
-extern s32 D_800F56A8;
+extern s32 gLoadedFont;
 
 void COnScreen__SelectFont2(void) {
     COnScreen__SelectSmallFont();
-    D_800F56A8 = 2;
+    gLoadedFont = 2;
 }

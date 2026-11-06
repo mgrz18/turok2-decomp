@@ -8,8 +8,8 @@ typedef struct {
     /* 0x3 */ u8 errnum;
 } ContStatus;
 
-extern u8 D_801213DC;   /* __osMaxControllers */
-extern char D_80130E20; /* __osPfsPifRam */
+extern u8 __osContNumControllers;   /* __osMaxControllers */
+extern char __osPfsPifRam; /* __osPfsPifRam */
 extern void __osSiGetAccess(void);                         /* __osSiGetAccess */
 extern void __osSiRelAccess(void);                         /* __osSiRelAccess */
 extern s32 __osSiRawStartDma(s32 direction, void *dramAddr); /* __osSiRawStartDma */
@@ -30,22 +30,22 @@ s32 osPfsIsPlug_2(void *queue, u8 *pattern) {
     __osSiGetAccess();
     do {
         __osPfsRequestData_2(0);
-        ret = __osSiRawStartDma(1, &D_80130E20);
+        ret = __osSiRawStartDma(1, &__osPfsPifRam);
         osRecvMesg(queue, &dummy, 1);
-        ret = __osSiRawStartDma(0, &D_80130E20);
+        ret = __osSiRawStartDma(0, &__osPfsPifRam);
         osRecvMesg(queue, &dummy, 1);
         __osPfsGetInitData_2(&bitpattern, data);
-        for (channel = 0; channel < D_801213DC; channel++) {
+        for (channel = 0; channel < __osContNumControllers; channel++) {
             if (!(data[channel].status & 4)) {
                 crcErrorCount--;
                 break;
             }
         }
-        if (channel == D_801213DC) {
+        if (channel == __osContNumControllers) {
             crcErrorCount = 0;
         }
     } while (crcErrorCount > 0);
-    count = &D_801213DC;
+    count = &__osContNumControllers;
     for (channel = 0; channel < *count; channel++) {
         if (data[channel].errnum == 0 && (data[channel].status & 1)) {
             bits |= 1 << channel;

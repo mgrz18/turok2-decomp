@@ -11,7 +11,7 @@ extern float D_800A9BE0;
 extern CScene gScene;
 extern s32 Cinema_PathPlaying(void);
 extern f32 CGameRegion__GetHeight(s32 arg0, f32 arg1, f32 arg2);
-extern s32 D_800B6D00;
+extern s32 gDefaultVisBits;
 void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6,
                    f32 arg7, f32 arg8, f32 arg9, Shared_Quad arg10, s32 arg11, f32 arg12,
                    f32 arg13) {
@@ -42,7 +42,7 @@ void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, 
     y = arg0->unk3C;
     z = arg0->unk40;
     w = arg0->unk44;
-    arg0->unk64 = D_800B6D00;
+    arg0->unk64 = gDefaultVisBits;
     if (object != 0 && Cinema_PathPlaying() == 0) {
         value = ((y + w) - CGameRegion__GetHeight(object, x, z)) * D_800A9BDC;
         if (value < D_800A9BE0 && D_800A9BE4 < value) {
@@ -50,9 +50,9 @@ void CCamera__SetViewParams(GameplayCamera *arg0, s32 arg1, f32 arg2, f32 arg3, 
         }
     }
     if (Cinema_PathPlaying() != 0) {
-        arg0->unk64 = D_800B6D00;
+        arg0->unk64 = gDefaultVisBits;
     }
     if (arg0->unk5C > 0.0f) {
-        arg0->unk64 = D_800B6D00;
+        arg0->unk64 = gDefaultVisBits;
     }
 }

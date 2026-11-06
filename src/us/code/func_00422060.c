@@ -8,9 +8,9 @@ s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 extern char D_800C1418[];
 
 s32 GameNoteMenu_UpdateTime(MenuItem *item) {
-    s32 seconds = D_800C201C->seconds;
-    s32 minutes = D_800C201C->minutes;
-    s32 hours = D_800C201C->hours;
+    s32 seconds = gLoadBuffer->seconds;
+    s32 minutes = gLoadBuffer->minutes;
+    s32 hours = gLoadBuffer->hours;
 
     sprintf(item->text + (MenuItem_TextLength(item) - 9), D_800C1418, hours, minutes, seconds);
     return 1;

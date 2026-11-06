@@ -11,23 +11,23 @@ void Pak_RefreshNotes_2(s32 ch) {
     s32 ret;
     s32 bytes;
 
-    if (D_800C2224 != NULL) {
+    if (gPakDirectories != NULL) {
         for (i = 0; i < 16; i++) {
-            ret = osPfsFileState_2(&D_80130C80[ch], i, &D_800C2224[ch].notes[i]);
+            ret = osPfsFileState_2(&gPakFileSystems[ch], i, &gPakDirectories[ch].notes[i]);
             if (ret != 0 && ret != 5) {
-                ret = osPfsFileState_2(&D_80130C80[ch], i, &D_800C2224[ch].notes[i]);
+                ret = osPfsFileState_2(&gPakFileSystems[ch], i, &gPakDirectories[ch].notes[i]);
             }
             if (ret == 5) {
-                D_800C2224[ch].notes[i].file_size = 0;
-                D_800C2224[ch].notes[i].game_code = 0;
-                D_800C2224[ch].notes[i].company_code = 0;
-                D_800C2224[ch].notes[i].ext_name[0] = 0;
-                D_800C2224[ch].notes[i].game_name[0] = 0;
+                gPakDirectories[ch].notes[i].file_size = 0;
+                gPakDirectories[ch].notes[i].game_code = 0;
+                gPakDirectories[ch].notes[i].company_code = 0;
+                gPakDirectories[ch].notes[i].ext_name[0] = 0;
+                gPakDirectories[ch].notes[i].game_name[0] = 0;
             }
-            if (osPfsFreeBlocks_2(&D_80130C80[ch], &bytes) == 0) {
-                D_800C2224[ch].freeBytes = bytes;
+            if (osPfsFreeBlocks_2(&gPakFileSystems[ch], &bytes) == 0) {
+                gPakDirectories[ch].freeBytes = bytes;
             }
         }
     }
-    osPfsFreeBlocks_2(&D_80130C80[ch], &bytes);
+    osPfsFreeBlocks_2(&gPakFileSystems[ch], &bytes);
 }

@@ -50,18 +50,18 @@ typedef struct {
     /* 0x12 */ u8 val;
 } CueObject;
 
-extern Cinema *D_800C1BB0;
-extern s32 D_800C1BB8;
+extern Cinema *gCinemaPlayerP;
+extern s32 gCinemaEnabled;
 extern s32 D_800C1BC4;
 extern f32 D_800C1BC8;
-extern s32 D_800C2030;
-extern s32 D_800C2034;
-extern Gfx *D_800D8E24;
+extern s32 gScreenWidth;
+extern s32 gScreenHeight;
+extern Gfx *gDList;
 /* An array to GCC: a function that reads two of its fields keeps its address in one register. */
 extern CScene gScene[];
-extern s32 D_800F709C;  /* gScene.trackLookup */
-extern s32 *D_800F70D8; /* gScene.trackBundle */
-extern CGameObjectInstance *D_80119890; /* current player */
+extern s32 gScene_m_CinemasKey;  /* gScene.trackLookup */
+extern s32 *gScene_m_pCinemas; /* gScene.trackBundle */
+extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 
 extern void *CISet__GetBlock(void *node, s32 index); /* child `index` of a resource node */
 extern s32 CISet__GetROMAddressAndSize(s32 *bundle, s32 lookup, s32 index, s32 *size);
@@ -391,14 +391,14 @@ s32 Cinema_Load(s32 index) {
     Cinema *scanContext;
     f32 total;
 
-    captured = D_80119890;
-    pending = D_800C1BB0->resetPlayerNext;
+    captured = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+    pending = gCinemaPlayerP->resetPlayerNext;
     resources = gScene;
     if (resources->m_CinemasKey == 0 || resources->m_pCinemas == 0) {
     failed:
         return 0;
     } else {
-        if (D_800C1BB0->active != 0) {
+        if (gCinemaPlayerP->active != 0) {
             Cinema_Reset();
         }
         loaded = CISet__GetROMAddressAndSize(resources->m_pCinemas, resources->m_CinemasKey, index + 1, &size);
@@ -406,8 +406,8 @@ s32 Cinema_Load(s32 index) {
         if (owner == NULL) {
             goto failed;
         }
-        D_800C1BB0->owner = owner;
-        D_800C1BB0->resource = *owner;
+        gCinemaPlayerP->owner = owner;
+        gCinemaPlayerP->resource = *owner;
         cues = Cinema_GetFadeTrack();
         cue = cues->cues;
         count = cues->count;
@@ -422,13 +422,13 @@ s32 Cinema_Load(s32 index) {
                 }
             }
         }
-        D_800C1BB0->startTime = 0.0f;
-        D_800C1BB0->endTime = total;
-        D_800C1BB0->clipStart = 0.0f;
-        D_800C1BB0->clipEnd = total;
+        gCinemaPlayerP->startTime = 0.0f;
+        gCinemaPlayerP->endTime = total;
+        gCinemaPlayerP->clipStart = 0.0f;
+        gCinemaPlayerP->clipEnd = total;
         i = 0;
         if (count > 0) {
-            scanContext = D_800C1BB0;
+            scanContext = gCinemaPlayerP;
             do {
                 Cue *c = &cue[i];
                 minTime(&scanContext->clipStart, &c->time);
@@ -436,9 +436,9 @@ s32 Cinema_Load(s32 index) {
                 i++;
             } while (i < count);
         }
-        setTimes(&D_800C1BB0->time, &D_800C1BB0->prevTime, &D_800C1BB0->time24, &D_800C1BB0->clipStart);
-        previous = D_800C1BB0->spec.id;
-        loaded = CISet__GetROMAddressAndSize(D_800F70D8, D_800F709C, 0, &size2);
+        setTimes(&gCinemaPlayerP->time, &gCinemaPlayerP->prevTime, &gCinemaPlayerP->time24, &gCinemaPlayerP->clipStart);
+        previous = gCinemaPlayerP->spec.id;
+        loaded = CISet__GetROMAddressAndSize(gScene_m_pCinemas, gScene_m_CinemasKey, 0, &size2);
         if (loaded == 0) {
             table = NULL;
         } else {
@@ -447,35 +447,35 @@ s32 Cinema_Load(s32 index) {
         {
             CinemaTable *entries = (CinemaTable *) *table;
             CinemaEntry *base = entries->entries;
-            D_800C1BB0->resetPlayer = pending;
-            D_800C1BB0->active = 1;
-            D_800C1BB0->spec = base[index];
+            gCinemaPlayerP->resetPlayer = pending;
+            gCinemaPlayerP->active = 1;
+            gCinemaPlayerP->spec = base[index];
         }
-        D_800C1BB0->unk50 = 0;
-        D_800C1BB0->started = 0;
-        D_800C1BB0->ended = 0;
-        D_800C1BB0->closed = 0;
-        D_800C1BB0->scriptId = D_800C1BB0->spec.id;
-        if ((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) {
-            D_800C1BB0->position = D_800C1BB0->target->header.m_vPos;
-            D_800C1BB0->yaw = D_800C1BB0->target->m_RotY + 1.5707964f;
+        gCinemaPlayerP->unk50 = 0;
+        gCinemaPlayerP->started = 0;
+        gCinemaPlayerP->ended = 0;
+        gCinemaPlayerP->closed = 0;
+        gCinemaPlayerP->scriptId = gCinemaPlayerP->spec.id;
+        if ((gCinemaPlayerP->spec.flags & 1) && gCinemaPlayerP->target != NULL) {
+            gCinemaPlayerP->position = gCinemaPlayerP->target->header.m_vPos;
+            gCinemaPlayerP->yaw = gCinemaPlayerP->target->m_RotY + 1.5707964f;
         }
-        if (D_800C1BB0->spec.flags & 2) {
+        if (gCinemaPlayerP->spec.flags & 2) {
             if (captured != NULL) {
-                D_800C1BB0->position = captured->header.m_vPos;
-                D_800C1BB0->yaw = captured->m_RotY;
+                gCinemaPlayerP->position = captured->header.m_vPos;
+                gCinemaPlayerP->yaw = captured->m_RotY;
             } else {
-                D_800C1BB0->position.x = 0.0f;
-                D_800C1BB0->position.y = 0.0f;
-                D_800C1BB0->position.z = 0.0f;
-                D_800C1BB0->yaw = 0.0f;
+                gCinemaPlayerP->position.x = 0.0f;
+                gCinemaPlayerP->position.y = 0.0f;
+                gCinemaPlayerP->position.z = 0.0f;
+                gCinemaPlayerP->yaw = 0.0f;
             }
         }
         CCache__Unlock(0, table);
         if (pending) {
             void (*first)(void);
             void (*second)(void);
-            context = D_800C1BB0;
+            context = gCinemaPlayerP;
             first = context->nextOnClose;
             second = context->nextOnEnd;
             context->resetPlayer = 1;
@@ -488,18 +488,18 @@ s32 Cinema_Load(s32 index) {
             if (context->scriptId - 10U < 0x47U) {
                 context->saveStart = 0;
             }
-            if (D_800C1BB0->scriptId - 400U < 4U) {
-                D_800C1BB0->saveStart = 0;
+            if (gCinemaPlayerP->scriptId - 400U < 4U) {
+                gCinemaPlayerP->saveStart = 0;
             }
         } else {
-            if (D_800C1BB0->spec.id < 3) {
-                D_800C1BB0->scriptId = previous;
+            if (gCinemaPlayerP->spec.id < 3) {
+                gCinemaPlayerP->scriptId = previous;
             }
-            D_800C1BB0->resetPlayer = 0;
-            D_800C1BB0->time = D_800C1BB0->startTime;
+            gCinemaPlayerP->resetPlayer = 0;
+            gCinemaPlayerP->time = gCinemaPlayerP->startTime;
         }
-        if (D_800C1BB0->spec.id == 0x9F) {
-            D_800C1BB0->saveStart = 0;
+        if (gCinemaPlayerP->spec.id == 0x9F) {
+            gCinemaPlayerP->saveStart = 0;
         }
         return 1;
     }
@@ -609,9 +609,9 @@ CVector3 Cinema_GetEyePos(f32 t) {
     idx = 0;
     i = 0;
     end = start;
-    while (i < *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0)) {
+    while (i < *(s32 *)CISet__GetBlock(gCinemaPlayerP->resource, 0)) {
         idx = i;
-        clip = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), idx), 0);
+        clip = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), idx), 0);
         count = clip[1];
         keys = (SplineNode *)(clip + 2);
         start = end;
@@ -619,7 +619,7 @@ CVector3 Cinema_GetEyePos(f32 t) {
         if (idx == 0 && t <= start) {
             break;
         }
-        if (idx == *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0) - 1 && end < t) {
+        if (idx == *(s32 *)CISet__GetBlock(gCinemaPlayerP->resource, 0) - 1 && end < t) {
             break;
         }
         i = idx + 1;
@@ -627,7 +627,7 @@ CVector3 Cinema_GetEyePos(f32 t) {
             break;
         }
     }
-    if (*(s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), idx), 2) != 0) {
+    if (*(s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), idx), 2) != 0) {
         t = start;
     }
     return Cinema_SplineEval(keys, count, t - start);
@@ -647,9 +647,9 @@ CVector3 Cinema_GetTargetPos(f32 t) {
     idx = 0;
     i = 0;
     end = start;
-    while (i < *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0)) {
+    while (i < *(s32 *)CISet__GetBlock(gCinemaPlayerP->resource, 0)) {
         idx = i;
-        clip = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), idx), 1);
+        clip = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), idx), 1);
         count = clip[1];
         keys = (SplineNode *)(clip + 2);
         start = end;
@@ -657,7 +657,7 @@ CVector3 Cinema_GetTargetPos(f32 t) {
         if (idx == 0 && t <= start) {
             break;
         }
-        if (idx == *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0) - 1 && end < t) {
+        if (idx == *(s32 *)CISet__GetBlock(gCinemaPlayerP->resource, 0) - 1 && end < t) {
             break;
         }
         i = idx + 1;
@@ -665,7 +665,7 @@ CVector3 Cinema_GetTargetPos(f32 t) {
             break;
         }
     }
-    if (((s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), idx), 2))[1] != 0) {
+    if (((s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), idx), 2))[1] != 0) {
         t = start;
     }
     return Cinema_SplineEval(keys, count, t - start);
@@ -679,7 +679,7 @@ CVector3 Cinema_GetFadeColor(f32 t) {
     CVector3 result;
     CVector3 a;
     CVector3 b;
-    track = CISet__GetBlock(D_800C1BB0->resource, 1);
+    track = CISet__GetBlock(gCinemaPlayerP->resource, 1);
     count = track[1];
     key = (PositionKey *)(track + 2);
     if (count == 0) {
@@ -729,7 +729,7 @@ f32 Cinema_GetFadeAlpha(f32 t) {
     f32 u;
     f32 v;
 
-    track = CISet__GetBlock(D_800C1BB0->resource, 1);
+    track = CISet__GetBlock(gCinemaPlayerP->resource, 1);
     count = track[1];
     key = (ScalarKey *) (track + 2);
     if (count == 0) {
@@ -762,7 +762,7 @@ f32 Cinema_GetFOV(f32 t) {
     s32 count;
     s32 i;
     f32 u;
-    track = CISet__GetBlock(D_800C1BB0->resource, 3);
+    track = CISet__GetBlock(gCinemaPlayerP->resource, 3);
     key = (D_800C7470_Pair *)(track + 2);
     count = track[1];
     for (i = 0; i < count; i++) {
@@ -784,7 +784,7 @@ f32 Cinema_GetFOV(f32 t) {
     return key[-1].first * (1.0f - u) + key->first * u;
 }
 
-extern u8 D_800F1B40[];   /* collision info */
+extern u8 gCollisionInfoLineOfSight[];   /* collision info */
 extern CCollisionResults gCollisionResults;  /* the last collision test */
 
 extern s32 Cinema_PathPlaying(void);
@@ -799,19 +799,19 @@ extern void CScene__ReleaseSectors(void *world);
 
 /* Places the cinema relative to its target (flag 1) or to the player (flag 2). */
 static __inline__ void Cinema_Anchor(CGameObjectInstance *player) {
-    if ((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) {
-        D_800C1BB0->position = D_800C1BB0->target->header.m_vPos;
-        D_800C1BB0->yaw = D_800C1BB0->target->m_RotY + 1.5707964f;
+    if ((gCinemaPlayerP->spec.flags & 1) && gCinemaPlayerP->target != NULL) {
+        gCinemaPlayerP->position = gCinemaPlayerP->target->header.m_vPos;
+        gCinemaPlayerP->yaw = gCinemaPlayerP->target->m_RotY + 1.5707964f;
     }
-    if (D_800C1BB0->spec.flags & 2) {
+    if (gCinemaPlayerP->spec.flags & 2) {
         if (player != NULL) {
-            D_800C1BB0->position = player->header.m_vPos;
-            D_800C1BB0->yaw = player->m_RotY;
+            gCinemaPlayerP->position = player->header.m_vPos;
+            gCinemaPlayerP->yaw = player->m_RotY;
         } else {
-            D_800C1BB0->position.x = 0.0f;
-            D_800C1BB0->position.y = 0.0f;
-            D_800C1BB0->position.z = 0.0f;
-            D_800C1BB0->yaw = 0.0f;
+            gCinemaPlayerP->position.x = 0.0f;
+            gCinemaPlayerP->position.y = 0.0f;
+            gCinemaPlayerP->position.z = 0.0f;
+            gCinemaPlayerP->yaw = 0.0f;
         }
     }
 }
@@ -828,35 +828,35 @@ void Cinema_UpdateCamera(CCamera *cam) {
     s32 hit;
     f32 yaw;
 
-    if (!D_800C1BB0->active || !Cinema_PathPlaying()) {
+    if (!gCinemaPlayerP->active || !Cinema_PathPlaying()) {
         return;
     }
-    if (D_800C1BB0->time < D_800C1BB0->startTime || D_800C1BB0->endTime < D_800C1BB0->time) {
+    if (gCinemaPlayerP->time < gCinemaPlayerP->startTime || gCinemaPlayerP->endTime < gCinemaPlayerP->time) {
         return;
     }
-    eye = Cinema_GetEyePos(D_800C1BB0->time);
-    target = Cinema_GetTargetPos(D_800C1BB0->time);
+    eye = Cinema_GetEyePos(gCinemaPlayerP->time);
+    target = Cinema_GetTargetPos(gCinemaPlayerP->time);
     CVector3__Scale(&eye, &eye, 10.24f);
     CVector3__Scale(&target, &target, 10.24f);
     cam->m_ViewParams.m_RotY = 0.0f;
     CVector3__Subtract(&dir, &target, &eye);
-    if (((D_800C1BB0->spec.flags & 1) && D_800C1BB0->target != NULL) || (D_800C1BB0->spec.flags & 2)) {
-        player = D_80119890;
+    if (((gCinemaPlayerP->spec.flags & 1) && gCinemaPlayerP->target != NULL) || (gCinemaPlayerP->spec.flags & 2)) {
+        player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
         Cinema_Anchor(player);
         CMtxF__Identity(&mtx);
-        CMtxF__SetEulerXYZ(&mtx, 0.0f, D_800C1BB0->yaw, 0.0f);
+        CMtxF__SetEulerXYZ(&mtx, 0.0f, gCinemaPlayerP->yaw, 0.0f);
         CMtxF__TransformPoint(&mtx, &target, &tmp);
         target = tmp;
         CMtxF__TransformPoint(&mtx, &eye, &tmp);
         eye = tmp;
-        CVector3__Add(&target, &target, &D_800C1BB0->position);
-        CVector3__Add(&eye, &eye, &D_800C1BB0->position);
+        CVector3__Add(&target, &target, &gCinemaPlayerP->position);
+        CVector3__Add(&eye, &eye, &gCinemaPlayerP->position);
         CVector3__Subtract(&dir, &target, &eye);
         if (player != NULL) {
             saved = *(CObjectHead *) player;
             player->header.m_vPos = target;
             CScene__LoadVisibleGridSections(gScene);
-            hit = Collision_MoveInstance(player, eye, D_800F1B40);
+            hit = Collision_MoveInstance(player, eye, gCollisionInfoLineOfSight);
             CScene__ReleaseSectors(gScene);
             *(CObjectHead *) player = saved;
             if (hit) {
@@ -880,26 +880,26 @@ void Cinema_DrawFrameEdges(s32 inset) {
     Render_InvalidateModeCache();
     left = 0.0f;
     top = (f32)inset;
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x0)) << 20))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xFC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (5)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (0))); _gbi->w1 = ((((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (28)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (24)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (18)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (6)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (3)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (0))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (3) - (29)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((29) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((( (((unsigned int)(0x1)) << (3 + 3)) | (((unsigned int)(0x2)) << (3 + 5)) | (((unsigned int)(0x0)) << (3 + 7)) | (((unsigned int)(0x1)) << (3 + 11)) | ( (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (30)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (26)) | (((unsigned int)(((unsigned int)(0x1))) & (0xFFFFFFFFU >> (32 - (2)))) << (22)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (18)) ) )) | (( (((unsigned int)(0x1)) << (3 + 3)) | (((unsigned int)(0x2)) << (3 + 5)) | (((unsigned int)(0x0)) << (3 + 7)) | (((unsigned int)(0x1)) << (3 + 11)) | ( (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (28)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (24)) | (((unsigned int)(((unsigned int)(0x1))) & (0xFFFFFFFFU >> (32 - (2)))) << (20)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (16)) ) )))); };
-    width = (f32)D_800C2030;
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xFA) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); };
-    height = (f32)(D_800C2034 - inset * 2);
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((width - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)((top + (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(((left + width) - (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x3)) << 20))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xFC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (5)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (0))); _gbi->w1 = ((((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (28)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (24)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (18)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (6)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (3)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (0))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xE2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (3) - (29)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((29) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((0) | (0))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = ((unsigned int)(0x10001)); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
-    { Gfx *_gbi = (Gfx *)(D_800D8E24++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + width)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x0)) << 20))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xFC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (5)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (0))); _gbi->w1 = ((((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (28)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (24)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (18)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (6)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (3)) | (((unsigned int)(3) & (0xFFFFFFFFU >> (32 - (3)))) << (0))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (3) - (29)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((29) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((( (((unsigned int)(0x1)) << (3 + 3)) | (((unsigned int)(0x2)) << (3 + 5)) | (((unsigned int)(0x0)) << (3 + 7)) | (((unsigned int)(0x1)) << (3 + 11)) | ( (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (30)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (26)) | (((unsigned int)(((unsigned int)(0x1))) & (0xFFFFFFFFU >> (32 - (2)))) << (22)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (18)) ) )) | (( (((unsigned int)(0x1)) << (3 + 3)) | (((unsigned int)(0x2)) << (3 + 5)) | (((unsigned int)(0x0)) << (3 + 7)) | (((unsigned int)(0x1)) << (3 + 11)) | ( (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (28)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (24)) | (((unsigned int)(((unsigned int)(0x1))) & (0xFFFFFFFFU >> (32 - (2)))) << (20)) | (((unsigned int)(((unsigned int)(0x0))) & (0xFFFFFFFFU >> (32 - (2)))) << (16)) ) )))); };
+    width = (f32)gScreenWidth;
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xFA) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); };
+    height = (f32)(gScreenHeight - inset * 2);
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((width - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)((top + (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(((left + width) - (2.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = (0); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (20) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x3)) << 20))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xFC) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (20)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (5)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (5)))) << (0))); _gbi->w1 = ((((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (28)) | (((unsigned int)(31) & (0xFFFFFFFFU >> (32 - (4)))) << (24)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (21)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (18)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (15)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (12)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (9)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (6)) | (((unsigned int)(7) & (0xFFFFFFFFU >> (32 - (3)))) << (3)) | (((unsigned int)(4) & (0xFFFFFFFFU >> (32 - (3)))) << (0))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE2) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (3) - (29)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((29) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((0) | (0))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF7) & (0xFFFFFFFFU >> (32 - (8)))) << (24))); _gbi->w1 = ((unsigned int)(0x10001)); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - 1.0f)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(left) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
+    { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xF6) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)((left + width)) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(((top + height) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); _gbi->w1 = ((((unsigned int)(((left + width) - (1.0f))) & (0xFFFFFFFFU >> (32 - (10)))) << (14)) | (((unsigned int)(top) & (0xFFFFFFFFU >> (32 - (10)))) << (2))); };
 }
 
 s32 Render_SetRenderMode(s32 a);
@@ -910,19 +910,19 @@ void Cinema_DrawLetterbox(void) {
     f32 k;
     f32 q;
     s32 sh;
-    fs = ((f32)D_800C2034 - (f32)D_800C2030 / D_800C1BB0->spec.aspect) * 0.5f;
+    fs = ((f32)gScreenHeight - (f32)gScreenWidth / gCinemaPlayerP->spec.aspect) * 0.5f;
     q = 0.3f;
     k = 1.0f;
-    if (D_800C1BB0->time < D_800C1BB0->startTime) {
-        k = D_800C1BB0->startTime - D_800C1BB0->time;
+    if (gCinemaPlayerP->time < gCinemaPlayerP->startTime) {
+        k = gCinemaPlayerP->startTime - gCinemaPlayerP->time;
         k = k / q;
         if (1.0f < k) {
             k = 1.0f;
         }
         k = 1.0f - k;
     }
-    if (D_800C1BB0->time > D_800C1BB0->endTime) {
-        k = D_800C1BB0->time - D_800C1BB0->endTime;
+    if (gCinemaPlayerP->time > gCinemaPlayerP->endTime) {
+        k = gCinemaPlayerP->time - gCinemaPlayerP->endTime;
         k = k / q;
         if (1.0f < k) {
             k = 1.0f;
@@ -930,13 +930,13 @@ void Cinema_DrawLetterbox(void) {
         k = 1.0f - k;
     }
     fs = fs * k;
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xE7000000); _g->w1 = (0); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xE3000A01); _g->w1 = (0); }
+    { Gfx *_g = gDList++; _g->w0 = (0xE7000000); _g->w1 = (0); }
+    { Gfx *_g = gDList++; _g->w0 = (0xE3000A01); _g->w1 = (0); }
     Render_SetRenderMode(0x13);
     Render_SetCombineMode(0x19);
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xFA00FFFF); _g->w1 = (0xFF); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xF6000000 | ((((D_800C2030) > (0) ? (D_800C2030) : (0)) & 0x3FF) << 14) | (((((s32)fs) > (0) ? ((s32)fs) : (0)) & 0x3FF) << 2)); _g->w1 = (0); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xF6000000 | ((((D_800C2030) > (0) ? (D_800C2030) : (0)) & 0x3FF) << 14) | ((((D_800C2034) > (0) ? (D_800C2034) : (0)) & 0x3FF) << 2)); _g->w1 = (({ f32 _y = (f32)D_800C2034 - fs; if (!(0.0f <= _y)) _y = 0.0f; (((u32)_y) & 0x3FF) << 2; })); }
+    { Gfx *_g = gDList++; _g->w0 = (0xFA00FFFF); _g->w1 = (0xFF); }
+    { Gfx *_g = gDList++; _g->w0 = (0xF6000000 | ((((gScreenWidth) > (0) ? (gScreenWidth) : (0)) & 0x3FF) << 14) | (((((s32)fs) > (0) ? ((s32)fs) : (0)) & 0x3FF) << 2)); _g->w1 = (0); }
+    { Gfx *_g = gDList++; _g->w0 = (0xF6000000 | ((((gScreenWidth) > (0) ? (gScreenWidth) : (0)) & 0x3FF) << 14) | ((((gScreenHeight) > (0) ? (gScreenHeight) : (0)) & 0x3FF) << 2)); _g->w1 = (({ f32 _y = (f32)gScreenHeight - fs; if (!(0.0f <= _y)) _y = 0.0f; (((u32)_y) & 0x3FF) << 2; })); }
     sh = (s32)fs;
     Cinema_DrawFrameEdges(sh);
 }
@@ -965,7 +965,7 @@ void Cinema_DrawFade(ScreenRectangle *rectangle) {
     f32 scale;
     f32 value;
 
-    if (!D_800C1BB0->active) {
+    if (!gCinemaPlayerP->active) {
         if (!D_800C1BC4) {
             return;
         }
@@ -974,11 +974,11 @@ void Cinema_DrawFade(ScreenRectangle *rectangle) {
         height = rectangle->height;
         right = (f32) width + rectangle->x;
         bottom = (f32) height + rectangle->y;
-        baseColor = Cinema_GetFadeColor(D_800C1BB0->time);
-        alpha = Cinema_GetFadeAlpha(D_800C1BB0->time);
+        baseColor = Cinema_GetFadeColor(gCinemaPlayerP->time);
+        alpha = Cinema_GetFadeAlpha(gCinemaPlayerP->time);
         color = baseColor;
-        if (D_800C1BB0->fading) {
-            scale = D_800C1BB0->fade;
+        if (gCinemaPlayerP->fading) {
+            scale = gCinemaPlayerP->fade;
             if (scale < 0.0f) {
                 scale = 0.0f;
             }
@@ -1037,16 +1037,16 @@ void Cinema_RequestForObject(void *owner, CueObject *obj) {
     s32 idA;
 
     found = -1;
-    if (D_800C1BB8 != 0) {
+    if (gCinemaEnabled != 0) {
         id4 = obj->id4;
         idA = obj->idA;
-        key = CISet__GetROMAddressAndSize(D_800F70D8, D_800F709C, 0, &size);
+        key = CISet__GetROMAddressAndSize(gScene_m_pCinemas, gScene_m_CinemasKey, 0, &size);
         if (key == 0) {
             table = NULL;
         } else {
             table = CCache__Request(0, key, size, 0x13, 0, NULL, "Cinema", 1);
         }
-        n = *D_800F70D8 - 1;
+        n = *gScene_m_pCinemas - 1;
         entry = (CinemaEntry *) (*table + 2);
         for (i = 0; i < n; i++, entry++) {
             if (entry->id4 == id4 && entry->id0 == idA) {
@@ -1054,10 +1054,10 @@ void Cinema_RequestForObject(void *owner, CueObject *obj) {
             }
         }
         if (found != -1) {
-            D_800C1BB0->target = owner;
-            D_800C1BB0->warpId = idA;
-            D_800C1BB0->entryIndex = found;
-            D_800C1BB0->resetPlayerNext = 1;
+            gCinemaPlayerP->target = owner;
+            gCinemaPlayerP->warpId = idA;
+            gCinemaPlayerP->entryIndex = found;
+            gCinemaPlayerP->resetPlayerNext = 1;
         }
         CCache__Unlock(0, table);
     }
@@ -1072,10 +1072,10 @@ s32 Cinema_RequestById(s32 key) {
     s32 n;
     CinemaEntry *entries;
 
-    if (D_800C1BB8 == 0) {
+    if (gCinemaEnabled == 0) {
         return 0;
     }
-    loaded = CISet__GetROMAddressAndSize(D_800F70D8, D_800F709C, 0, &size);
+    loaded = CISet__GetROMAddressAndSize(gScene_m_pCinemas, gScene_m_CinemasKey, 0, &size);
     if (loaded == 0) {
         table = NULL;
     } else {
@@ -1083,19 +1083,19 @@ s32 Cinema_RequestById(s32 key) {
     }
     i = 0;
     entries = (CinemaEntry *) (*table + 2);
-    n = *D_800F70D8 - 1;
+    n = *gScene_m_pCinemas - 1;
     for (; i < n; i++) {
         if (entries[i].id == key) {
             if ((entries[i].flags & 3) == 0) {
-                D_800C1BB0->warpId = entries[i].id0;
+                gCinemaPlayerP->warpId = entries[i].id0;
             }
-            D_800C1BB0->scriptId = key;
-            D_800C1BB0->entryIndex = i;
-            D_800C1BB0->resetPlayerNext = 1;
+            gCinemaPlayerP->scriptId = key;
+            gCinemaPlayerP->entryIndex = i;
+            gCinemaPlayerP->resetPlayerNext = 1;
         }
     }
     CCache__Unlock(0, table);
-    return D_800C1BB0->warpId;
+    return gCinemaPlayerP->warpId;
 }
 
 extern s32 Util_StrCmp(const char *a, const char *b); /* strcmp */
@@ -1110,8 +1110,8 @@ void Cinema_RequestByName(const char *name) {
     s32 n;
     CinemaEntry *entries;
 
-    if (D_800C1BB8 != 0) {
-        loaded = CISet__GetROMAddressAndSize(D_800F70D8, D_800F709C, 0, &size);
+    if (gCinemaEnabled != 0) {
+        loaded = CISet__GetROMAddressAndSize(gScene_m_pCinemas, gScene_m_CinemasKey, 0, &size);
         if (loaded == 0) {
             table = NULL;
         } else {
@@ -1119,14 +1119,14 @@ void Cinema_RequestByName(const char *name) {
         }
         i = 0;
         entries = (CinemaEntry *) (*table + 2);
-        n = *D_800F70D8 - 1;
+        n = *gScene_m_pCinemas - 1;
         for (; i < n; i++) {
             if (Util_StrCmp(name, entries[i].name) == 0) {
-                D_800C1BB0->scriptId = entries[i].id;
+                gCinemaPlayerP->scriptId = entries[i].id;
                 id = entries[i].id0;
-                D_800C1BB0->entryIndex = i;
-                D_800C1BB0->resetPlayerNext = 1;
-                D_800C1BB0->warpId = id;
+                gCinemaPlayerP->entryIndex = i;
+                gCinemaPlayerP->resetPlayerNext = 1;
+                gCinemaPlayerP->warpId = id;
                 break;
             }
         }
@@ -1143,7 +1143,7 @@ typedef struct {
 s32 Cinema_NoWaitCues(void) {
     s32 any = 0;
     s32 i;
-    Track *n = CISet__GetBlock(D_800C1BB0->resource, 2);
+    Track *n = CISet__GetBlock(gCinemaPlayerP->resource, 2);
     s32 cnt = n->count;
     CueRef *ents = (CueRef *)((u8 *)n + 8);
     CueRef *e;
@@ -1173,7 +1173,7 @@ void LevelEvent_Trigger(CueObject *k);
 void CScene__SetEventFired(CScene *g, CueObject *k, s32 z);
 
 void Cinema_FireCues(void) {
-    f32 now = D_800C1BB0->time;
+    f32 now = gCinemaPlayerP->time;
     s32 flag = 0;
     Track *n;
     TimedCueRef *e;
@@ -1182,12 +1182,12 @@ void Cinema_FireCues(void) {
     s32 cnt;
     s32 i;
     if (Cinema_IsActive() != 0) {
-        if (D_800C1BB0->unk50 != 0) {
-            n = CISet__GetBlock(D_800C1BB0->resource, 2);
+        if (gCinemaPlayerP->unk50 != 0) {
+            n = CISet__GetBlock(gCinemaPlayerP->resource, 2);
             cnt = n->count;
             ents = (TimedCueRef *)((u8 *)n + 8);
             if (cnt != 0) {
-                if (D_800C1BB0->endTime <= now) {
+                if (gCinemaPlayerP->endTime <= now) {
                     flag = 1;
                 }
                 for (i = 0; i < cnt; i++) {
@@ -1207,7 +1207,7 @@ void Cinema_FireCues(void) {
                     }
                     if (Cinema_IsWaitCue(k) != 0) {
                         Cinema_RequestForObject(0, k);
-                        D_800C1BB0->resetPlayerNext = 0;
+                        gCinemaPlayerP->resetPlayerNext = 0;
                     } else {
                         LevelEvent_Trigger(k);
                     }
@@ -1224,13 +1224,13 @@ static __inline__ CVector3 getA(void) {
     CVector3 t;
     CVector3 v;
     Track *n;
-    if (D_800C1BB0->active == 0) {
+    if (gCinemaPlayerP->active == 0) {
         v.x = 0;
         v.y = 0;
         v.z = 0;
         return v;
     }
-    n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), 0), 0);
+    n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), 0), 0);
     t = Cinema_SplineEval((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
     return t;
 }
@@ -1238,13 +1238,13 @@ static __inline__ CVector3 getB(void) {
     CVector3 t;
     CVector3 v;
     Track *n;
-    if (D_800C1BB0->active == 0) {
+    if (gCinemaPlayerP->active == 0) {
         v.x = 10.0f;
         v.y = 0;
         v.z = 0;
         return v;
     }
-    n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), 0), 1);
+    n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), 0), 1);
     t = Cinema_SplineEval((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
     return t;
 }
@@ -1253,7 +1253,7 @@ CVector3 Cinema_GetStartAngles(void) {
     CVector3 b;
     f32 dir[4];
     CVector3 res;
-    if (D_800C1BB0->active == 0) {
+    if (gCinemaPlayerP->active == 0) {
         res.x = 0;
         res.y = 0;
     } else {
@@ -1270,7 +1270,7 @@ CVector3 Cinema_GetStartAngles(void) {
 }
 
 void Cinema_StopAtEnd(void) {
-    D_800C1BB0->stopAtEnd = 1;
+    gCinemaPlayerP->stopAtEnd = 1;
 }
 
 void Cinema_RequestOnce(s32 a0) {
@@ -1281,8 +1281,8 @@ void Cinema_RequestOnce(s32 a0) {
     s32 m;
     s32 i;
     a = a0;
-    bits = (u8 *) D_80119890;
-    if (D_800C1BB8 != 0) {
+    bits = (u8 *) gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+    if (gCinemaEnabled != 0) {
         id = a - 0x8D;
         if ((u32)id < 6 && bits != 0) {
             bits += 0x9F4;
@@ -1300,13 +1300,13 @@ CVector3 Cinema_GetStartEyePos(void) {
     CVector3 sp10;
     CVector3 sp20;
     StridedTable *temp_v0;
-    if (D_800C1BB0->active == 0) {
+    if (gCinemaPlayerP->active == 0) {
         sp20.x = 0;
         sp20.y = 0;
         sp20.z = 0;
         return sp20;
     }
-    temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), 0), 0);
+    temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), 0), 0);
     sp10 = Cinema_SplineEval((SplineNode *) temp_v0->data, temp_v0->count, 0.0f);
     return sp10;
 }
@@ -1315,13 +1315,13 @@ CVector3 Cinema_GetStartTargetPos(void) {
     CVector3 sp10;
     CVector3 sp20;
     StridedTable *temp_v0;
-    if (D_800C1BB0->active == 0) {
+    if (gCinemaPlayerP->active == 0) {
         sp20.y = 0;
         sp20.z = 0;
         sp20.x = 10.0f;
         return sp20;
     }
-    temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), 0), 1);
+    temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), 0), 1);
     sp10 = Cinema_SplineEval((SplineNode *) temp_v0->data, temp_v0->count, 0.0f);
     return sp10;
 }
@@ -1334,8 +1334,8 @@ f32 Cinema_GetDuration(void) {
     var_f20 = 0.0f;
     var_s0 = 0;
 loop_1:
-    if (var_s0 < *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0)) {
-        temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), var_s0), 0);
+    if (var_s0 < *(s32 *)CISet__GetBlock(gCinemaPlayerP->resource, 0)) {
+        temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), var_s0), 0);
         temp_v0 = (s32 *)((char *)temp_v0 + temp_v0[1] * 0x24);
         temp_f0 = *(f32 *)temp_v0;
         var_s0 += 1;
@@ -1346,15 +1346,15 @@ loop_1:
 }
 
 s32 Cinema_GetClipCount(void) {
-    return *(s32 *)CISet__GetBlock(D_800C1BB0->resource, 0);
+    return *(s32 *)CISet__GetBlock(gCinemaPlayerP->resource, 0);
 }
 
 Spline *Cinema_GetClipEyeSpline(s32 index) {
-    return CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index), 0);
+    return CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), index), 0);
 }
 
 void *Cinema_GetFadeTrack(void) {
-    return CISet__GetBlock(D_800C1BB0->resource, 1);
+    return CISet__GetBlock(gCinemaPlayerP->resource, 1);
 }
 
 s32 Cinema_TrackData(s32 arg0) {
@@ -1414,7 +1414,7 @@ s32 Cinema_SplineBlockSize(void *object) {
 }
 
 s32 Cinema_GetEntryCount(void) {
-    return *D_800F70D8 - 1;
+    return *gScene_m_pCinemas - 1;
 }
 
 /* Loads the cinema table. */
@@ -1442,21 +1442,21 @@ f32 Cinema_Lerp(f32 a, f32 b, f32 t) {
 }
 
 void *Cinema_GetClip(s32 index) {
-    return CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index);
+    return CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), index);
 }
 
 s32 Cinema_ClipEyeHeld(s32 index) {
-    return *(s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index), 2);
+    return *(s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), index), 2);
 }
 
 s32 Cinema_ClipTargetHeld(s32 index) {
-    return ((s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index), 2))[1];
+    return ((s32 *)CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), index), 2))[1];
 }
 
 void *Cinema_GetClipTargetSpline(s32 index) {
-    return CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(D_800C1BB0->resource, 0), index), 1);
+    return CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), index), 1);
 }
 
 void *Cinema_GetFOVTrack(void) {
-    return CISet__GetBlock(D_800C1BB0->resource, 3);
+    return CISet__GetBlock(gCinemaPlayerP->resource, 3);
 }

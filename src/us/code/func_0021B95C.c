@@ -1,6 +1,6 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/80246E34_3.CPP, func_802484B0_de, with Turok 2's layouts.
  * Turok 2 poses the skeleton recursively, one bone per call, keeping its
- * scratch values in file statics (D_800E67B0-D_800E6878). */
+ * scratch values in file statics (sPoseChildren-sPoseCeilingOverlap). */
 
 #include "common.h"
 #include "structs/vector.h"
@@ -90,22 +90,22 @@ struct PoseContext {
 };
 
 /* Scratch shared by every level of the recursion. */
-extern BoneList *D_800E67B0;   /* children list */
-extern f32 D_800E67C0[4][4];   /* local matrix */
-extern CVector3 D_800E6800;       /* translation */
-extern CVector3 D_800E6810;       /* position, channel A */
-extern CVector3 D_800E6820;       /* position, channel B */
-extern CQuaternion D_800E6830;       /* rotation */
-extern CQuaternion D_800E6840;       /* rotation, channel A */
-extern CQuaternion D_800E6850;       /* rotation, channel B */
-extern s32 D_800E6860;         /* object type */
-extern u8 *D_800E6864;         /* bone data */
-extern u8 D_800E6868;          /* bone flags */
-extern CGameRegion *D_800E686C;
-extern f32 D_800E6870;         /* ground height */
-extern f32 D_800E6874;         /* object height */
-extern f32 D_800E6878;         /* depth below the ground */
-extern f32 D_800ACB98[];
+extern BoneList *sPoseChildren;   /* children list */
+extern f32 sPoseMtx[4][4];   /* local matrix */
+extern CVector3 sPosePos;       /* translation */
+extern CVector3 sPosePosA;       /* position, channel A */
+extern CVector3 sPosePosB;       /* position, channel B */
+extern CQuaternion sPoseRot;       /* rotation */
+extern CQuaternion sPoseRotA;       /* rotation, channel A */
+extern CQuaternion sPoseRotB;       /* rotation, channel B */
+extern s32 sPoseBoneType;         /* object type */
+extern u8 *sPoseBoneData;         /* bone data */
+extern u8 sPoseFlags;          /* bone flags */
+extern CGameRegion *sPoseRegion;
+extern f32 sPoseCeilingHeight;         /* ground height */
+extern f32 sPoseCollisionHeight;         /* object height */
+extern f32 sPoseCeilingOverlap;         /* depth below the ground */
+extern f32 gSwingAmplitudes[];
 
 void *CISet__GetBlock(void *file, s32 index);
 void CMtxF__MultiplyAffine(f32 (*out)[4], f32 (*a)[4], f32 (*b)[4]);
@@ -219,7 +219,7 @@ static __inline__ void twistPart(TwistPart *part, f32 (*cur)[4], s32 n, s32 i) {
         turn.y = cur[3][1];
         turn.z = cur[3][2];
         axis = part->axis;
-        angle = D_800ACB98[0x19 - part->count];
+        angle = gSwingAmplitudes[0x19 - part->count];
         angle *= 0.3f;
         angle *= (n == 5 ? -2.0f : (f32) n);
         CMtxF__Copy(inv, cur);
@@ -289,60 +289,60 @@ void CGameObjectInstance__PoseBone(PoseObject *obj, PoseContext *ctx, s32 bone, 
 
     node = CISet__GetBlock(ctx->anims, bone);
     boneData = CISet__GetBlock(node, 1);
-    D_800E6864 = boneData;
+    sPoseBoneData = boneData;
     flags = boneData[0x65];
     ctx->boneData = boneData;
     ctx->bone = bone;
-    D_800E6868 = flags;
+    sPoseFlags = flags;
 
-    trackPos(&ctx->keys, bone, &D_800E6810);
+    trackPos(&ctx->keys, bone, &sPosePosA);
     if (ctx->moving) {
-        slerpRot(&ctx->keys, bone, &D_800E6840);
+        slerpRot(&ctx->keys, bone, &sPoseRotA);
     } else {
-        lerpRot(&ctx->keys, bone, &D_800E6840);
+        lerpRot(&ctx->keys, bone, &sPoseRotA);
     }
     if (ctx->blend) {
-        trackPos(&ctx->blendKeys, bone, &D_800E6820);
+        trackPos(&ctx->blendKeys, bone, &sPosePosB);
         if (ctx->moving) {
-            slerpRot(&ctx->blendKeys, bone, &D_800E6850);
+            slerpRot(&ctx->blendKeys, bone, &sPoseRotB);
         } else {
-            lerpRot(&ctx->blendKeys, bone, &D_800E6850);
+            lerpRot(&ctx->blendKeys, bone, &sPoseRotB);
         }
-        lerpVec(&D_800E6800, obj->blend, &D_800E6820, &D_800E6810);
-        CQuaternion__Slerp(&D_800E6830, obj->blend, &D_800E6850, &D_800E6840);
+        lerpVec(&sPosePos, obj->blend, &sPosePosB, &sPosePosA);
+        CQuaternion__Slerp(&sPoseRot, obj->blend, &sPoseRotB, &sPoseRotA);
     } else {
-        D_800E6800 = D_800E6810;
-        D_800E6830 = D_800E6840;
+        sPosePos = sPosePosA;
+        sPoseRot = sPoseRotA;
     }
     if (bone == 0 && ctx->visible) {
-        D_800E6800.x = D_800E6800.y = 0.0f;
+        sPosePos.x = sPosePos.y = 0.0f;
     }
-    quatToMtx(D_800E67C0, &D_800E6830, &D_800E6800);
+    quatToMtx(sPoseMtx, &sPoseRot, &sPosePos);
     if (obj->callback != NULL) {
-        obj->callback(D_800E67C0, ctx);
+        obj->callback(sPoseMtx, ctx);
     }
     cur = ctx->bones[bone];
-    CMtxF__MultiplyAffine(cur, D_800E67C0, parent);
+    CMtxF__MultiplyAffine(cur, sPoseMtx, parent);
 
     if (bone == 0) {
-        switch (D_800E6860 = *obj->def) {
+        switch (sPoseBoneType = *obj->def) {
             case 4:
                 obj->height = ((f32 *) obj->def)[0xE];
                 break;
             case 1:
             case 11:
-                D_800E6874 = GameObject_GetCollisionHeight(obj);
-                obj->height = cur[3][1] * (1.0f / 65536.0f) - obj->pos.y - D_800E6874 * 0.5f;
+                sPoseCollisionHeight = GameObject_GetCollisionHeight(obj);
+                obj->height = cur[3][1] * (1.0f / 65536.0f) - obj->pos.y - sPoseCollisionHeight * 0.5f;
                 if (obj->height < 0.0f) {
                     obj->height = 0.0f;
                 }
-                if ((obj->flags & 0x20000000) && (D_800E686C = obj->region) != NULL
-                    && (D_800E686C->m_wFlags & REGION_FLAG_CEILING)) {
-                    D_800E6870 = CGameRegion__GetCeilingHeight(D_800E686C, obj->pos.x, obj->pos.z);
-                    D_800E6878 = obj->pos.y + obj->height + D_800E6874 - D_800E6870;
-                    if (D_800E6878 > 0.0f) {
-                        cur[3][1] -= D_800E6878 * 65536.0f;
-                        obj->height -= D_800E6878;
+                if ((obj->flags & 0x20000000) && (sPoseRegion = obj->region) != NULL
+                    && (sPoseRegion->m_wFlags & REGION_FLAG_CEILING)) {
+                    sPoseCeilingHeight = CGameRegion__GetCeilingHeight(sPoseRegion, obj->pos.x, obj->pos.z);
+                    sPoseCeilingOverlap = obj->pos.y + obj->height + sPoseCollisionHeight - sPoseCeilingHeight;
+                    if (sPoseCeilingOverlap > 0.0f) {
+                        cur[3][1] -= sPoseCeilingOverlap * 65536.0f;
+                        obj->height -= sPoseCeilingOverlap;
                     }
                 }
                 break;
@@ -371,37 +371,37 @@ void CGameObjectInstance__PoseBone(PoseObject *obj, PoseContext *ctx, s32 bone, 
         }
     }
     if (obj->flags & 0x800000) {
-        func_0021B59C(obj, D_800E6868, cur);
+        func_0021B59C(obj, sPoseFlags, cur);
     }
 
-    if (ctx->f78 && (D_800E6868 & 0xC7) == 0xC3) {
+    if (ctx->f78 && (sPoseFlags & 0xC7) == 0xC3) {
         ctx->f78 = 0;
         CMtxF__ScaleAxes(cur, 2.0f, 2.0f, 2.0f);
-    } else if (ctx->f7C && (D_800E6868 & 0xC7) == 0xC7) {
+    } else if (ctx->f7C && (sPoseFlags & 0xC7) == 0xC7) {
         ctx->f7C = 0;
         CMtxF__ScaleAxes(cur, 2.0f, 2.0f, 2.0f);
-    } else if (ctx->f80 && (D_800E6868 & 0xC7) == 0xC2) {
+    } else if (ctx->f80 && (sPoseFlags & 0xC7) == 0xC2) {
         ctx->f80 = 0;
         CMtxF__ScaleAxes(cur, 2.0f, 2.0f, 2.0f);
-    } else if (ctx->f84 && (D_800E6868 & 0xC7) == 0xC6) {
+    } else if (ctx->f84 && (sPoseFlags & 0xC7) == 0xC6) {
         ctx->f84 = 0;
         CMtxF__ScaleAxes(cur, 2.0f, 2.0f, 2.0f);
-    } else if (ctx->f74 && (D_800E6868 & 3) == 1) {
+    } else if (ctx->f74 && (sPoseFlags & 3) == 1) {
         ctx->f74 = 0;
         CMtxF__ScaleAxes(cur, 3.0f, 3.0f, 3.0f);
     }
 
     if (ctx->f88) {
-        CMtxF__Copy(D_800E67C0, cur);
-        CMtxF__ScaleAxes(D_800E67C0, 0.5f, 0.5f, 0.5f);
-        packMtx(ctx->out + bone * 16, D_800E67C0);
+        CMtxF__Copy(sPoseMtx, cur);
+        CMtxF__ScaleAxes(sPoseMtx, 0.5f, 0.5f, 0.5f);
+        packMtx(ctx->out + bone * 16, sPoseMtx);
     } else {
         packMtx(ctx->out + bone * 16, cur);
     }
 
     children = CISet__GetBlock(node, 0);
     count = children->count;
-    D_800E67B0 = children;
+    sPoseChildren = children;
     items = children->items;
     for (i = 0; i < count; i++) {
         CGameObjectInstance__PoseBone(obj, ctx, items[i], cur);

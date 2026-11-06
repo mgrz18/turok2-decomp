@@ -5,11 +5,11 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern CPlayerOptions D_8011AB18;
+extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
 extern char D_800B3F48[];
 extern char D_800B3F30[];
 s32 OptionsMenu_LookSpringText(MenuItem *item, Menu *menu) {
-    CPlayerOptions *settings = &D_8011AB18;
+    CPlayerOptions *settings = &gEngineApp_m_Settings_defaultSlot;
     if (menu->player != 0 && menu->player->m_pOptions != 0) {
         settings = menu->player->m_pOptions;
     }

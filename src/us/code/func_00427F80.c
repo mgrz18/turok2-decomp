@@ -10,17 +10,17 @@ extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 
 s32 __osPfsGetStatus(void *queue, int channel)
 {
-    extern char D_80130E20;
+    extern char __osPfsPifRam;
     s32 ret = 0;
     void *dummy;
     EntryRecAt3 data;
 
     __osPfsRequestOneChannel(channel);
 
-    ret = __osSiRawStartDma(1, &D_80130E20);
+    ret = __osSiRawStartDma(1, &__osPfsPifRam);
     osRecvMesg(queue, &dummy, 1);
 
-    ret = __osSiRawStartDma(0, &D_80130E20);
+    ret = __osSiRawStartDma(0, &__osPfsPifRam);
     osRecvMesg(queue, &dummy, 1);
 
     __osPfsGetOneChannelData(channel, &data);

@@ -1,8 +1,8 @@
 #ifndef STRUCTS_CONTROLLER_H
 #define STRUCTS_CONTROLLER_H
 
-/* A controller's state, D_800F5EC0[4] (one per port, 0x224 bytes each;
- * D_800F5C78 is a fifth one that merges the four). Rage Wars has the same
+/* A controller's state, gControllers[4] (one per port, 0x224 bytes each;
+ * gMergedController is a fifth one that merges the four). Rage Wars has the same
  * object (its D_8010F328[], named ControllerProfile in rw_abu's
  * include/COMMON/ITEMRECAT20V1.H); CPlayer::m_ContState.m_pContState
  * (CPlayer + 0xA50) points to the player's, and a menu window reads one
@@ -55,7 +55,7 @@ typedef struct ControllerProfile {
     /* 0x0C6 */ s8 stickX;          /* -80..80 */
     /* 0x0C7 */ s8 stickY;
     /* 0x0C8 */ s32 rumblePak;      /* a Rumble Pak answered osMotorInit */
-    /* 0x0CC */ s32 rumbleOn;       /* the rumble option (kept in D_80130910) */
+    /* 0x0CC */ s32 rumbleOn;       /* the rumble option (kept in sPauseRumbleOn) */
     /* 0x0D0 */ f32 rumbleLevel;
     /* 0x0D4 */ f32 rumbleTimer;
     /* 0x0D8 */ u8 rumblePfs[0x68]; /* the OSPfs osMotorInit fills */
@@ -65,8 +65,8 @@ typedef struct ControllerProfile {
     /* 0x220 */ s32 reset;
 } ControllerProfile; /* size 0x224 */
 
-extern ControllerProfile D_800F5EC0[4];
-extern ControllerProfile D_800F5C78;   /* the four merged */
-extern OSContStatus D_800F6778[4];   /* what osContInit / osContGetQuery report per port (errno bit 3: nothing plugged in) */
+extern ControllerProfile gControllers[4];
+extern ControllerProfile gMergedController;   /* the four merged */
+extern OSContStatus gContStatus[4];   /* what osContInit / osContGetQuery report per port (errno bit 3: nothing plugged in) */
 
 #endif

@@ -4,9 +4,9 @@
 /* Save/load menu: fills a pak file line ("NAME.EXT" and its size) for the
  * note of the chosen pak; an empty or unreadable note shows blanks. */
 
-extern s32 D_801309BC;
-extern s32 D_80130990;
-extern s32 D_800C2028;
+extern s32 gPakMenuLeaving;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort;
 extern char D_800B48D4[];
 extern char D_800B48E0[];
 extern char D_800C1404[];
@@ -31,11 +31,11 @@ s32 PakMenu_NoteText(MenuItem *item, Menu *c) {
     s32 i;
     char *dst;
 
-    if (D_801309BC != 0) {
+    if (gPakMenuLeaving != 0) {
         return 0;
     }
-    if (D_80130990 != 0) {
-        slot = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        slot = gPakMenuPort;
     } else {
         slot = c->controller->port;
     }

@@ -5,12 +5,12 @@
 #include "structs/game_object.h"
 typedef struct { u8 p[0x1D]; u8 f; } GFx;
 extern GFx D_8011AAD4;
-extern u8 D_800B2510[];
+extern u8 gInteractiveAnimModeTable[];
 void InteractiveAnim_Step(CGameObjectInstance *actor, CAI *state);
 void InteractiveAnim_DrawAllModels(CGameObjectInstance *actor, CAI *state);
 s32 Cinema_GetScriptId(void);
 void InteractiveAnim_Setup(CGameObjectInstance *actor, CAI *state) {
-    state->m_pModeTable = D_800B2510;
+    state->m_pModeTable = gInteractiveAnimModeTable;
     state->m_pfStep = InteractiveAnim_Step;
     actor->m_dwFlags |= 0x1000000;
     actor->m_dwFlags |= 0x2000000;

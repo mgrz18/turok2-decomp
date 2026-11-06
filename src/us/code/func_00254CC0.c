@@ -14,7 +14,7 @@ void CBarrel__Draw(Unk254CC0 *arg0, s32 arg1, s32 arg2) {
     Gfx *g;
 
     Hud_SetupTextureMode(0xFF);
-    g = D_800D8E24++;
+    g = gDList++;
     g->w0 = 0xE3001201; /* gDPSetTextureFilter(G_TF_BILERP) */
     g->w1 = 0x2000;
     if (arg0->field380) {

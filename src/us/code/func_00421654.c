@@ -1,14 +1,14 @@
 typedef signed int s32;
 
-extern char D_0043BEF4[];
-extern char D_0043BED0[];
-extern s32 D_80130940;
+extern char gSavePortalMenuDescB[];
+extern char gSavePortalMenuDesc[];
+extern s32 gCameraPoolHideViews;
 
 s32 PakMenu_IsSavePortalMenu(char *arg0) {
     char *p = *(char **) (arg0 + 0x24);
 
-    if (p == D_0043BEF4 || p == D_0043BED0) {
-        D_80130940 = 0;
+    if (p == gSavePortalMenuDescB || p == gSavePortalMenuDesc) {
+        gCameraPoolHideViews = 0;
         return 1;
     }
     return 0;

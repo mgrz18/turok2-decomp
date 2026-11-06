@@ -2,10 +2,10 @@
 #include "structs/cinema.h"
 
 s32 Cinema_DrawFade();                            /* extern */
-extern Cinema *D_800C1BB0;
+extern Cinema *gCinemaPlayerP;
 
 void Cinema_DrawOverlay(void) {
-    if (D_800C1BB0->active != 0) {
+    if (gCinemaPlayerP->active != 0) {
         Cinema_DrawFade();
     }
 }

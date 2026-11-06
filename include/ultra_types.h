@@ -164,7 +164,7 @@ typedef struct CMutex {
 } CMutex; /* size 0x20 */
 
 /* The video interface (PR/os_vi.h, viint.h). __osViCurr / __osViNext are
- * D_800B7AC0 / D_800B7AC4 (osViSetEvent, osViSwapBuffer, osViSetYScale... set
+ * __osViCurr / __osViNext (osViSetEvent, osViSwapBuffer, osViSetYScale... set
  * the next one; __osViSwapContext, __osViSwapContext, loads it). */
 typedef struct {
     /* 0x00 */ u32 ctrl;

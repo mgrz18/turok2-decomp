@@ -26,7 +26,7 @@ void WeaponMode_AE794_Update(CGameObjectInstance *actor, State *state) {
         if (state->unk110 < 0.27925270795822144f /* 16 deg */ || state->unk118 > 0.0f) {
             CAI__SetMode(actor, state, 2);
         } else {
-            state->unk118 = D_800AF618[22]->fireDelay * 15.0f;
+            state->unk118 = gWeaponInfoTable[22]->fireDelay * 15.0f;
             CAI__SetMode(actor, state, 5);
         }
     }

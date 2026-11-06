@@ -6,8 +6,8 @@ s32 Menu_StepValue_2(s32, s32, s32, s32, s32, s32);
 s32 func_004513B4(s32 arg0, s32 arg1) {
     GameSettings *var_s0;
 
-    var_s0 = &D_8011AAD8;
-    var_s0 = &D_8011AAD8;
-    D_8011AAD8.tagTimeLimit = Menu_StepValue_2(arg1, (s32) D_8011AAD8.tagTimeLimit, 5, 0, 0x1E, 1);
+    var_s0 = &gEngineApp_m_Settings;
+    var_s0 = &gEngineApp_m_Settings;
+    gEngineApp_m_Settings.tagTimeLimit = Menu_StepValue_2(arg1, (s32) gEngineApp_m_Settings.tagTimeLimit, 5, 0, 0x1E, 1);
     return 0;
 }

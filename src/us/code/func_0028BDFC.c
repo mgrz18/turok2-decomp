@@ -6,7 +6,7 @@ extern u8 D_800AA100[];           /* "(top:" */
 extern u8 D_800AA108[];           /* " bot:" */
 extern u8 D_800AA110[];           /* " low:" */
 extern u8 D_800AA118[];           /* ")\n" */
-extern u16 D_8011F184;            /* debug console foreground colour */
+extern u16 sCrashTextColor;            /* debug console foreground colour */
 
 void Crash_PutChar(s32 c);          /* debug console: draws one character */
 void Crash_PrintHex8(s32 byte);       /* debug console: draws a byte in hex */
@@ -53,7 +53,7 @@ void Crash_PrintStack(u8 *stack, s32 size, Thread *thread, u8 fill) {
     putString(D_800AA110);
     putHex32((u32)low);
     putString(D_800AA118);
-    D_8011F184 = 0xF7A9;
+    sCrashTextColor = 0xF7A9;
     for (sp = thread->sp, count = 1; sp < top && count < 6; sp++) {
         if (IsCodePointer(*sp)) {
             putHex32(*sp);
@@ -61,5 +61,5 @@ void Crash_PrintStack(u8 *stack, s32 size, Thread *thread, u8 fill) {
             count++;
         }
     }
-    D_8011F184 = 0xA529;
+    sCrashTextColor = 0xA529;
 }

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_80130964;
-extern s32 D_8013099C;
+extern s32 sDamagedPakInGame;
+extern s32 sDamagedPakDone;
 
 void DamagedPakMenu_InitAtBoot(void) {
-    D_8013099C = 0;
-    D_80130964 = 0;
+    sDamagedPakDone = 0;
+    sDamagedPakInGame = 0;
 }

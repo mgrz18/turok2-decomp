@@ -6,7 +6,7 @@
  * next phase. */
 
 
-extern BlindOnePhase D_0043240C[];
+extern BlindOnePhase sBlindOnePhases[];
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
 static __inline__ void nextPhase(BlindOneState *state) {
@@ -27,8 +27,8 @@ static __inline__ void nextPhase(BlindOneState *state) {
         state->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     state->phase = phase;
-    if (D_0043240C[phase].init != NULL) {
-        D_0043240C[phase].init(state);
+    if (sBlindOnePhases[phase].init != NULL) {
+        sBlindOnePhases[phase].init(state);
     }
 }
 

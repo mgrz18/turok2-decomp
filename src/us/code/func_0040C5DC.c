@@ -2,13 +2,13 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-/* Resets every active slot of the module state with D_00431EE4. */
+/* Resets every active slot of the module state with sMotherBossSpotFlashScript. */
 
-extern u8 D_00431EE4[];
+extern u8 sMotherBossSpotFlashScript[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     s32 i;
 
     for (i = 0; i < 15; i++) {
@@ -19,7 +19,7 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 }
 
 void MotherBoss_FlashActiveSpots(void) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
 
-    resetSlots(state->activeMask, D_00431EE4);
+    resetSlots(state->activeMask, sMotherBossSpotFlashScript);
 }

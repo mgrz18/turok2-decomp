@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern int _sndpVoiceHandler(void * arg0);
-extern ALGlobals *D_800B7760;
+extern ALGlobals *alGlobals;
 extern void *alHeapDBAlloc(u8 *, s32, ALHeap *, s32, s32);
 extern void alEvtqNew(ALEventQueue *, ALEventListItem *, s32);
 extern void alSynAddPlayer(ALSynth *, ALPlayer *);
@@ -26,7 +26,7 @@ void alSndpNew(ALSndPlayer *sndp, ALSndpConfig *c)
         sState[i].sound = 0;
     ptr = alHeapDBAlloc(0, 0, c->heap, 1, c->maxEvents * sizeof(ALEventListItem));
     alEvtqNew(&sndp->evtq, (ALEventListItem *)ptr, c->maxEvents);
-    sndp->drvr = &D_800B7760->drvr;
+    sndp->drvr = &alGlobals->drvr;
     sndp->node.next = 0;
     sndp->node.handler = _sndpVoiceHandler;
     sndp->node.clientData = sndp;

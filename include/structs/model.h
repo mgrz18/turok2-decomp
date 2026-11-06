@@ -31,6 +31,6 @@ typedef struct CModelInstance {
     /* 0x0C */ s32 m_Segment;
 } CModelInstance; /* size 0x10 */
 
-extern CModelInstance D_800DD578[32];    /* the batch: D_800D8E34 of them queued */
+extern CModelInstance sBatchInstances[32];    /* the batch: sBatchInstanceCount of them queued */
 
 #endif

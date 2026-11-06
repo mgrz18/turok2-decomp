@@ -3,7 +3,7 @@
 #include "structs/camera.h"
 
 struct CollisionInfo;
-extern struct CollisionInfo D_800F1B40;
+extern struct CollisionInfo gCollisionInfoLineOfSight;
 CGameObjectInstance *CCamera__GetPlayer(CCamera *cam);
 s32 Collision_MoveInstance(void *obj, CVector3 to, struct CollisionInfo *info);
 
@@ -20,12 +20,12 @@ s32 CCamera__CanSeeTarget(CGameObjectInstance *target, CCamera *cam) {
     if (player != NULL && cam->m_ViewParams.m_nType == 0) {
         tmp = *(CObjectHead *) player;
         player->header.m_vPos = cam->m_vPos;
-        hit = Collision_MoveInstance(player, target->header.m_vPos, &D_800F1B40);
+        hit = Collision_MoveInstance(player, target->header.m_vPos, &gCollisionInfoLineOfSight);
         *(CObjectHead *) player = tmp;
     } else {
         tmp = *(CObjectHead *) target;
         tmp.header.m_vPos = cam->m_vPos;
-        hit = Collision_MoveInstance(&tmp, target->header.m_vPos, &D_800F1B40);
+        hit = Collision_MoveInstance(&tmp, target->header.m_vPos, &gCollisionInfoLineOfSight);
     }
     return hit == 0;
 }

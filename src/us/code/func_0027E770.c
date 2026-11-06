@@ -3,9 +3,9 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 
-#define GFX_WORDS(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX_WORDS(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern u8 D_801102B8[];
+extern u8 gEngineApp_m_SwooshSystem[];
 void func_002847D0(void);
 void CScene__DrawGeometry(u8 *world, CCamera *cam);
 s32 Cinema_PathPlaying(void);
@@ -29,25 +29,25 @@ void CCamera__DrawScene(CCamera *cam, u8 *world) {
     func_002847D0();
     CScene__DrawGeometry(world, cam);
     if (Cinema_PathPlaying() == 0) {
-        CPlayerPool__ReloadAnimInfo(&D_80119870.m_PlayerList, cam);
+        CPlayerPool__ReloadAnimInfo(&gEngineApp_m_Game.m_PlayerList, cam);
     }
-    if (D_80119870.m_Settings.mode == 13) {
-        CPlayerPool__DrawCharacters(&D_80119870.m_PlayerList, cam);
+    if (gEngineApp_m_Game.m_Settings.mode == 13) {
+        CPlayerPool__DrawCharacters(&gEngineApp_m_Game.m_PlayerList, cam);
     }
     CScene__DrawRegisteredInstances(world, cam);
-    func_00235C30(D_801102B8, cam);
+    func_00235C30(gEngineApp_m_SwooshSystem, cam);
     if (Cinema_PathPlaying() == 0) {
         CLevelActorPool__Draw(world + 0x10518, cam);
     }
     CScene__DrawSortedList(world, cam);
     CEmitterPool__Draw(cam->m_SkySystem, cam);
     CScene__DrawParticles(world, cam);
-    Trail_DrawAll(D_801102B8, cam);
+    Trail_DrawAll(gEngineApp_m_SwooshSystem, cam);
     CCamera__DrawGlares(cam);
-    if (Cinema_PathPlaying() == 0 && D_80119870.m_Settings.mode == 13) {
-        CPlayerPool__DrawWeaponOverlays(&D_80119870.m_PlayerList, cam);
+    if (Cinema_PathPlaying() == 0 && gEngineApp_m_Game.m_Settings.mode == 13) {
+        CPlayerPool__DrawWeaponOverlays(&gEngineApp_m_Game.m_PlayerList, cam);
     }
-    if (D_8011AAD8.cheatFlags & 0x200) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x200) {
         GFX_WORDS(0xE7000000, 0);                   /* gDPPipeSync */
         GFX_WORDS(0xE3000A01, 0);                   /* gDPSetCycleType(G_CYC_FILL) */
         GFX_WORDS(0xF9000000, 0xFFFFFFFF);          /* gDPSetBlendColor */
@@ -55,7 +55,7 @@ void CCamera__DrawScene(CCamera *cam, u8 *world) {
         GFX_WORDS(0xE2001D00, 4);                   /* gDPSetRenderMode, z compare */
         Render_SetRenderMode(0x16);
         {                                           /* gDPFillRectangle over the viewport */
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xF6000000
               | ((u32) (cam->m_Viewport.m_ScreenPosX + cam->m_Viewport.m_Width) & 0x3FF) << 14
               | ((u32) (cam->m_Viewport.m_ScreenPosY + cam->m_Viewport.m_Height) & 0x3FF) << 2;

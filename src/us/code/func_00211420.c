@@ -1,15 +1,15 @@
 #include "common.h"
 
 s32 Demo_GetPlayerCount(void);
-extern u32 D_800B6D20;
-extern u32 D_800DD788; /* random seed B */
+extern u32 gFrameCountGameplay;
+extern u32 gRandomValueB; /* random seed B */
 
-/* LCG step on seed B (re-seeded from D_800B6D20 when Demo_GetPlayerCount()); returns 0..0x7FFFFFFF. */
+/* LCG step on seed B (re-seeded from gFrameCountGameplay when Demo_GetPlayerCount()); returns 0..0x7FFFFFFF. */
 s32 Random_NextB(void) {
     if (Demo_GetPlayerCount()) {
-        D_800DD788 = D_800B6D20 * 0xA84A5B53 + 0x58348C2D;
+        gRandomValueB = gFrameCountGameplay * 0xA84A5B53 + 0x58348C2D;
     } else {
-        D_800DD788 = D_800DD788 * 0xA84A5B53 + 0x58348C2D;
+        gRandomValueB = gRandomValueB * 0xA84A5B53 + 0x58348C2D;
     }
-    return ((D_800DD788 << 16) | (D_800DD788 >> 16)) & 0x7FFFFFFF;
+    return ((gRandomValueB << 16) | (gRandomValueB >> 16)) & 0x7FFFFFFF;
 }

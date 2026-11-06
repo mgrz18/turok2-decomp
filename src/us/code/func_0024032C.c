@@ -28,7 +28,7 @@ typedef struct InstanceHit {
 
 extern CScene gScene;
 extern CCollisionResults *gCollisionResultsP;
-extern u8 D_8011AAF1;
+extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
@@ -91,7 +91,7 @@ void Collision_SweepActors(Sweep *sweep) {
             if (*inst->particleDef & 0x40) {
                 continue;
             }
-            if (D_8011AAF1) {
+            if (gEngineApp_m_Settings_multiplayer) {
                 continue;
             }
             switch (*other->def) {
@@ -121,7 +121,7 @@ void Collision_SweepActors(Sweep *sweep) {
                 break;
             }
             other = hit->inst;
-            if ((other->flags & 0x300000) && !(multi = &D_8011AAD8)->multiplayer) {
+            if ((other->flags & 0x300000) && !(multi = &gEngineApp_m_Settings)->multiplayer) {
                 Sweep_GetVolumeBounds(sweep, &volume);
                 Sweep_TestInstance(sweep, &volume, other);
             } else {

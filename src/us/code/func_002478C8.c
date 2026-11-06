@@ -3,10 +3,10 @@
 #include "structs/game.h"
 #include "structs/collision.h"
 
-extern CGameFromCameraPool D_801198B0;
+extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
 
 /* The game the settings belong to, recovered from the settings pointer. Its address is
-   D_8011AAD8 - 0x1228 for the compiler, not D_801198B0: that is what keeps the tagged and
+   gEngineApp_m_Settings - 0x1228 for the compiler, not gEngineApp_m_Game_m_CameraPool: that is what keeps the tagged and
    head-shot messages from being cross-jumped into the "you killed" one. */
 #define GAME_OF(settings) ((CGameFromCameraPool *)((u8 *)(settings) - 0x1228))
 
@@ -31,13 +31,13 @@ void CCameraPool__AddTimedText(CGameFromCameraPool *game, struct CCamera *camera
 /* Deathmatch messages for a kill: "killed by" or "tagged by" on the victim's
    screen, "you killed", "you tagged" or "head shot!" on the killer's. */
 void CPlayer__ShowKillMessages(CPlayer *victim, CPlayer *killer, DamageEvent *hit) {
-    GameSettings *settings = &D_8011AAD8;
+    GameSettings *settings = &gEngineApp_m_Settings;
     HitFrame *target;
 
     if (settings->multiplayer != 0) {
         if (victim == killer) {
             Util_StrCpy(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B542C);
-            SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
+            SHOW_MESSAGE(&gEngineApp_m_Game_m_CameraPool, killer, 1.5f);
         } else if (victim->m_pOptions->m_TagMode != 0) {
             f32 time = 1.5f;
             CGameFromCameraPool *game;
@@ -64,7 +64,7 @@ void CPlayer__ShowKillMessages(CPlayer *victim, CPlayer *killer, DamageEvent *hi
             } else {
                 Util_StrCpy(killer->m_DeathMatchString[killer->m_nDeathmatchString], D_800B5420);
                 Util_StrCpy(&killer->m_DeathMatchString[killer->m_nDeathmatchString][11], victim->m_pOptions->m_Name);
-                SHOW_MESSAGE(&D_801198B0, killer, 1.5f);
+                SHOW_MESSAGE(&gEngineApp_m_Game_m_CameraPool, killer, 1.5f);
             }
         }
     }

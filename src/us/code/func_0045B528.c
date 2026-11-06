@@ -10,10 +10,10 @@ struct FieldRecAt14 {
 extern char D_800B4B94[];
 extern char D_800B4B84[];
 extern char D_800B4B8C[];
-extern int D_80130960;
+extern int sCharNoteLoad;
 extern s32 D_801309A8;
 s32 CharNoteMenu_UpdatePrompt_2(struct FieldRecAt14 *field) {
-    if (D_80130960 != 0) {
+    if (sCharNoteLoad != 0) {
         field->text = D_800B4B84;
     } else if (D_801309A8 != 0) {
         field->text = D_800B4B94;

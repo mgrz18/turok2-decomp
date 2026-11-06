@@ -3,8 +3,8 @@
 
 s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
-extern s32 D_800AF870;
+extern s32 sEnemyAnimAlert_AF870;
 
 void EnemyAnim_Alert_AF870(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &D_800AF870, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wAlertAnimFlags);
+    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &sEnemyAnimAlert_AF870, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wAlertAnimFlags);
 }

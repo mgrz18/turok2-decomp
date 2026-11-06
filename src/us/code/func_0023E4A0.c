@@ -3,7 +3,7 @@
 #include "structs/collision.h"
 
 extern CScene gScene;
-extern s32 D_800F7964;
+extern s32 gScene_m_nDrawActors;
 extern CCollisionInfo D_800F1C60;
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);
@@ -32,7 +32,7 @@ void Collision_TestInstances(Sweep *sweep) {
         return;
     }
     inst = sweep->obj;
-    count = D_800F7964; /* gScene.drawCount */
+    count = gScene_m_nDrawActors; /* gScene.drawCount */
     b = &box;
     box.radius = GameObject_GetCollisionRadius(inst);
     b->flag = def->m_dwFlags & 0x100000;

@@ -58,9 +58,9 @@ struct AimActor {
     /* 0x1320 */ AimActor *next;
 };
 
-extern s32 D_800F7E70;
-extern AimActor *D_800F7C70[];
-extern f32 D_800DD78C;
+extern s32 gScene_m_nRegistered;
+extern AimActor *gScene_m_pRegistered[];
+extern f32 gQuaternionSin;
 
 void CGameObjectInstance__LocalToWorld(CVector3 *out, AimActor *actor, CVector3 off);
 f32 Actor_GetEyeHeight(AimActor *);
@@ -110,7 +110,7 @@ CQuaternion Player_FindAutoAimTarget(AimActor *pl, AimActor **outTarget, CVector
     CGameObjectInstance__LocalToWorld(&fwd, pl, off);
     eye = pl->pos;
     eye.y += Actor_GetEyeHeight(pl);
-    cone = D_800AF618[pl->weapon]->aimCone;
+    cone = gWeaponInfoTable[pl->weapon]->aimCone;
     best = NULL;
     bestDot = func_002974C0(cone * 0.5f);
     bestPos.x = 0.0f;
@@ -120,8 +120,8 @@ CQuaternion Player_FindAutoAimTarget(AimActor *pl, AimActor **outTarget, CVector
     bestDir.y = 0.0f;
     bestDir.z = 0.0f;
 
-    if (D_80119870.m_Settings.multiplayer) {
-        for (t = (AimActor *)D_80119870.m_PlayerList.m_ActiveList.m_pHead; t != NULL; t = t->next) {
+    if (gEngineApp_m_Game.m_Settings.multiplayer) {
+        for (t = (AimActor *)gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; t != NULL; t = t->next) {
             if (CPlayer__CanLockOn(pl, t) && t != pl) {
                 if (pl->weapon == 29) {
                     tpos = t->aimPos;
@@ -142,9 +142,9 @@ CQuaternion Player_FindAutoAimTarget(AimActor *pl, AimActor **outTarget, CVector
         }
     }
 
-    n = D_800F7E70;
+    n = gScene_m_nRegistered;
     for (i = 0; i < n; i++) {
-        t = D_800F7C70[i];
+        t = gScene_m_pRegistered[i];
         if (CPlayer__CanLockOn(pl, t)) {
             if (pl->weapon == 13) {
                 tpos = t->aimPos;
@@ -177,7 +177,7 @@ CQuaternion Player_FindAutoAimTarget(AimActor *pl, AimActor **outTarget, CVector
         turn.x = axis.x * s;
         turn.y = axis.y * s;
         turn.z = axis.z * s;
-        D_800DD78C = s;
+        gQuaternionSin = s;
         turn.w = func_002974C0(angle);
         rot = CGameObjectInstance__GetRotation(pl);
         CQuaternion__Multiply(&result, &rot, &turn);
@@ -214,7 +214,7 @@ void Player_UpdateAim(AimActor *pl) {
     canLock = TRUE;
     stiff = 0.080000006f;
     damp = 0.52f;
-    hold = D_800AF618[pl->weapon]->aimHold;
+    hold = gWeaponInfoTable[pl->weapon]->aimHold;
     range = hold + 100;
 
     switch (pl->weapon) {
@@ -298,7 +298,7 @@ void Player_UpdateAim(AimActor *pl) {
     CVector3__Scale(&pl->viewVel, &pl->viewVel, damp * 1.25f);
 
     if (target != NULL) {
-        pl->range = D_800AF618[pl->weapon]->lockHold + 100;
+        pl->range = gWeaponInfoTable[pl->weapon]->lockHold + 100;
     } else {
         pl->range = range;
     }
@@ -343,7 +343,7 @@ void Player_UpdateAim(AimActor *pl) {
                 tpos.y += target->height;
                 tpos.y += GameObject_GetCollisionHeight(target) * 0.75f;
             }
-            hold = D_800AF618[pl->weapon]->lockHold;
+            hold = gWeaponInfoTable[pl->weapon]->lockHold;
         } else {
             tpos = aimDir;
         }

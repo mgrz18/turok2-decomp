@@ -10,8 +10,8 @@ typedef struct {
     /* 0x0C */ Player41A4D4 *player;
 } Menu41A4D4;
 
-extern s32 D_8011AADC; /* owned weapons */
-extern s32 D_80130924; /* selected weapon */
+extern s32 gEngineApp_m_Settings_unlockedCheats; /* owned weapons */
+extern s32 sCheatsMenuSelection; /* selected weapon */
 
 void CheatsMenu_Init(Menu41A4D4 *menu) {
     s32 weapon = 0;
@@ -55,7 +55,7 @@ void CheatsMenu_Init(Menu41A4D4 *menu) {
                 mask = 0x4000000;
                 break;
         }
-        if (D_8011AADC & mask) {
+        if (gEngineApp_m_Settings_unlockedCheats & mask) {
             goto found;
         }
         weapon++;
@@ -67,7 +67,7 @@ void CheatsMenu_Init(Menu41A4D4 *menu) {
     }
     weapon = -1;
 found:
-    D_80130924 = weapon;
+    sCheatsMenuSelection = weapon;
     if (weapon != -1) {
         menu->player->flags |= 0x1800000;
     } else {

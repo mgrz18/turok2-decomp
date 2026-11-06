@@ -15,10 +15,10 @@ typedef struct {
     /* 0x0C */ f32 timer;
 } BossFight;
 
-extern BossFight D_8012FB50;
-extern CListedInstance *D_8010FEB4;
+extern BossFight gTotemDefense;
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 extern f32 gFrameIncrement;
-extern s32 D_80110048;
+extern s32 gScene_m_LevelID;
 
 extern void TotemDefense_DrawTotem();
 extern void TotemDefense_UpdateFight(BossFight *fight);
@@ -32,7 +32,7 @@ extern void CPlayer__Warp(CPlayer *player, s32 track, s32 a, s32 b);
 static __inline__ s32 helperAlive(void) {
     CListedInstance *actor;
 
-    for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {
+    for (actor = gScene_m_InstancePool_m_ActiveList; actor != NULL; actor = actor->m_pNext) {
         if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {
             return 1;
         }
@@ -44,10 +44,10 @@ static __inline__ void stunHelper(void) {
     u8 anim[0x18];
     CListedInstance *actor;
 
-    if (D_8012FB50.timer > 0.0f) {
-        D_8012FB50.timer -= gFrameIncrement;
+    if (gTotemDefense.timer > 0.0f) {
+        gTotemDefense.timer -= gFrameIncrement;
     } else if (!(Random_Float(100.0f) > 25.0f)) {
-        for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {
+        for (actor = gScene_m_InstancePool_m_ActiveList; actor != NULL; actor = actor->m_pNext) {
             if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {
                 Actor_SpawnParticle(actor, 0x17C, actor->m_Instance.header.m_vPos, 0);
                 DamageEvent_Set(anim, 0, 0xFF00, 51.199997f, 0x100000, 0);
@@ -59,7 +59,7 @@ static __inline__ void stunHelper(void) {
 }
 
 void TotemDefense_Update(void *obj, CAI *ai) {
-    BossFight *fight = &D_8012FB50;
+    BossFight *fight = &gTotemDefense;
     CPlayer *player;
     s32 track;
 
@@ -92,11 +92,11 @@ void TotemDefense_Update(void *obj, CAI *ai) {
     } else if (ai->m_ModeTime < 75.0f) {
         return;
     }
-    player = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    player = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     if (player == NULL) {
         return;
     }
-    switch (D_80110048) {
+    switch (gScene_m_LevelID) {
     case 0x1BBC:
         track = 0x7CF;
         break;
@@ -119,7 +119,7 @@ void TotemDefense_Update(void *obj, CAI *ai) {
         }
         break;
     default:
-        track = D_80110048;
+        track = gScene_m_LevelID;
         break;
     }
     player->m_InvincibilityTime = 0.0f;

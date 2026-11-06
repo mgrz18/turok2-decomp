@@ -9,15 +9,15 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-extern s32 D_800D81C0;
-extern s32 D_800D81C4;
+extern s32 gHashMask;
+extern s32 gHashTable;
 void CHashTable__Remove(u32 arg0)
 {
   s32 *temp_v0;
   s32 *var_a0;
   s32 *var_a2;
   s32 *var_v1;
-  var_v1 = D_800D81C4 + ((((((arg0 << 5) ^ (arg0 >> 1)) ^ (arg0 >> 9)) ^ (arg0 >> 0x11)) & D_800D81C0) * 0x10);
+  var_v1 = gHashTable + ((((((arg0 << 5) ^ (arg0 >> 1)) ^ (arg0 >> 9)) ^ (arg0 >> 0x11)) & gHashMask) * 0x10);
   var_a2 = 0;
   if ((*var_v1) != arg0)
   {

@@ -11,28 +11,28 @@ typedef struct {
 
 void *CPlayerPool__GetFirstActive(CPlayerPool *);                     /* extern */
 s32 CEngineApp__StartWarp(s32, s32);                /* extern */
-extern s32 D_800B6D70;
-extern s32 D_800B6D74;
-extern s32 D_800C2034;
-extern s32 D_800F6CA0;
+extern s32 gFinalEnding;
+extern s32 gEndingPrimagenDefeated;
+extern s32 gScreenHeight;
+extern s32 sCreditsLine;
 extern s32 gScene;
-extern s32 D_8011AD00;
-extern f32 D_8011F120;
+extern s32 gCreditsDone;
+extern f32 gCreditsScroll;
 
 void EngineMode15_Ending_Init(s32 arg0) {
     void *temp_v0;
 
-    D_800B6D70 = 0;
-    D_800F6CA0 = 0;
-    D_8011F120 = (f32) D_800C2034;
-    D_8011AD00 = 0;
-    temp_v0 = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    gFinalEnding = 0;
+    sCreditsLine = 0;
+    gCreditsScroll = (f32) gScreenHeight;
+    gCreditsDone = 0;
+    temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     if ((temp_v0 != NULL) && (((Unk002532A8 *)temp_v0)->unk9F0 != 0)) {
-        D_800B6D74 = 1;
+        gEndingPrimagenDefeated = 1;
     } else {
-        D_800B6D74 = 0;
+        gEndingPrimagenDefeated = 0;
     }
-    if (D_800B6D74 != 0) {
+    if (gEndingPrimagenDefeated != 0) {
         CScene__RequestWarp((s32) &gScene, ~Cinema_RequestById(0x82), 0);
         return;
     }

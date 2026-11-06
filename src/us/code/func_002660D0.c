@@ -2,12 +2,12 @@
 #include "structs/game_object.h"
 
 s32 Action_Draw(s32, s32, s32);
-extern CAIModeInfo D_800B2410[];
+extern CAIModeInfo gActionModeTable[];
 extern void Action_Step(void);
 
 /* AI init: mode table, step/draw callbacks, cleared mode scratch. */
 void Action_Setup(CGameObjectInstance *arg0, CAI *arg1) {
-    arg1->m_pModeTable = D_800B2410;
+    arg1->m_pModeTable = gActionModeTable;
     arg1->m_pfStep = Action_Step;
     arg1->m_pfDraw = Action_Draw;
     arg1->m_VarBuffer[0] = 0;

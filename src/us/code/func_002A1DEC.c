@@ -29,15 +29,15 @@ void HostIo_MemoryTransfer(u32 mode) {
     }
     while (remaining != 0) {
         i = 0;
-        while (address < D_80128130[i].m_First || address > D_80128130[i].m_Last) {
+        while (address < sHostIoMemoryRanges[i].m_First || address > sHostIoMemoryRanges[i].m_Last) {
             i++;
         }
         if (i >= 48) {
             flags = 0;
             chunk = 0x1000 - (address & 0xFFF);
         } else {
-            flags = D_80128130[i].m_Flags;
-            chunk = (D_80128130[i].m_Last + 1) - address;
+            flags = sHostIoMemoryRanges[i].m_Flags;
+            chunk = (sHostIoMemoryRanges[i].m_Last + 1) - address;
         }
         if (remaining < chunk) {
             chunk = remaining;

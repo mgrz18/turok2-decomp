@@ -6,9 +6,9 @@
 extern void Render_DrawBatches();
 extern void Render_FlushModelBatch();
 extern void Render_FlushBatches();
-extern s32 D_800DD170;
+extern s32 sBatchResourceCount;
 extern void CCache__Unlock(s32 arg0, s32 arg1);
-extern s32 D_800DD178[];
+extern s32 sBatchResources[];
 void Render_FlushBatches(void) {
     extern void CCache__LockForDisplayList(s32 arg0, s32 arg1);
     s32 temp_s0;
@@ -16,12 +16,12 @@ void Render_FlushBatches(void) {
     Render_FlushModelBatch();
     var_s1 = 0;
     Render_DrawBatches();
-    if (D_800DD170 > 0) {
+    if (sBatchResourceCount > 0) {
         do {
-            temp_s0 = D_800DD178[var_s1];
+            temp_s0 = sBatchResources[var_s1];
             CCache__LockForDisplayList(0, temp_s0);
             CCache__Unlock(0, temp_s0);
             var_s1 += 1;
-        } while (var_s1 < D_800DD170);
+        } while (var_s1 < sBatchResourceCount);
     }
 }

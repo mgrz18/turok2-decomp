@@ -2,11 +2,11 @@
 #include "structs/vector.h"
 #include "structs/level_actor.h"
 
-extern s32 D_800B6D54;
+extern s32 gPersistentDataLoaded;
 extern u8 gScene[];                 /* the world */
-extern u8 D_8011AAF1;
-extern u8 D_800F12C0[];
-extern u8 D_800F1360[];
+extern u8 gEngineApp_m_Settings_multiplayer;
+extern u8 gLevelActorIntelligenceMP[];
+extern u8 gLevelActorIntelligence[];
 extern u8 D_800B6D1B;                   /* frame counter */
 
 s32 CScene__FindObjectType(void *world, s32 id);
@@ -53,7 +53,7 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
     s32 index;
     s32 resource;
 
-    if (D_800B6D54 == 0 || (index = CScene__FindObjectType(gScene, id)) == -1) {
+    if (gPersistentDataLoaded == 0 || (index = CScene__FindObjectType(gScene, id)) == -1) {
         return NULL;
     }
     actor = allocActor(pool);
@@ -62,10 +62,10 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
     if (refCount != NULL) {
         (*refCount)++;
     }
-    if (D_8011AAF1) {
-        actor->m_Actor.header.m_pIntelligence = D_800F12C0;
+    if (gEngineApp_m_Settings_multiplayer) {
+        actor->m_Actor.header.m_pIntelligence = gLevelActorIntelligenceMP;
     } else {
-        actor->m_Actor.header.m_pIntelligence = D_800F1360;
+        actor->m_Actor.header.m_pIntelligence = gLevelActorIntelligence;
     }
     actor->m_Lifetime = lifetime;
     actor->m_Timer = 0.0f;

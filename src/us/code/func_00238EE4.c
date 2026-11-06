@@ -37,10 +37,10 @@ struct ObjectRecAt17C {
 extern s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5,
                          f32 arg6);
 extern f32 D_800A65D8;
-extern s32 D_8011ACA4;
+extern s32 gEngineApp_m_Settings_paused;
 void func_00238EE4(ObjectRecAt17C *arg0, ObjectRecAt17C *arg1, s32 arg2, CVector3 arg3,
                    ParamsRecAt4 arg6) {
-    s32 *global = &D_8011ACA4;
+    s32 *global = &gEngineApp_m_Settings_paused;
     s32 selected;
     f32 scale;
     scale = (&D_800A65D8)[1];

@@ -14,9 +14,9 @@ extern void Hud_FillRect(s32 x0, s32 y0, s32 x1, s32 y1, u8 r, u8 g, u8 b, u8 a)
 extern void Hud_SetupTextureMode(u8 alpha);
 extern void Hud_DrawSprite(s32 id, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 flags);
 
-extern s32 D_8011AC88;      /* game mode */
-extern u8 D_8011AAEA;       /* HUD opacity */
-extern s32 D_800C2030;      /* screen width */
+extern s32 gEngineApp_m_Settings_mode;      /* game mode */
+extern u8 gEngineApp_m_Settings_hudAlpha;       /* HUD opacity */
+extern s32 gScreenWidth;      /* screen width */
 
 /* Draws a boss health bar (1: m_BossOverlay, green; 2: m_BossOverlay2, red):
  * the frame sprite 0x191 and a bar whose length eases toward the boss percent. */
@@ -34,7 +34,7 @@ void COnScreen__DrawBossBar(COnScreen *os, s32 which) {
     u8 *alpha;
     s32 left;
 
-    if (Cinema_PathPlaying() != 0 || D_8011AC88 != 13) {
+    if (Cinema_PathPlaying() != 0 || gEngineApp_m_Settings_mode != 13) {
         return;
     }
     Hud_GetSpriteSize(0x191, 0, &width, &height);
@@ -61,7 +61,7 @@ void COnScreen__DrawBossBar(COnScreen *os, s32 which) {
         default:
             return;
     }
-    x = ov->m_PositionX + (f32)((D_800C2030 - width) / 2);
+    x = ov->m_PositionX + (f32)((gScreenWidth - width) / 2);
     y = ov->m_PositionY + (f32)yOff;
     Hud_SetupFillMode();
     COverlay__Update(ov);
@@ -78,7 +78,7 @@ void COnScreen__DrawBossBar(COnScreen *os, s32 which) {
             }
         }
     }
-    alpha = &D_8011AAEA;
+    alpha = &gEngineApp_m_Settings_hudAlpha;
     left = x + 0x1E;
     Hud_FillRect(left, y + 8, left + (width - 0x3C) * ov->m_Value / 100, y + 0xE,
                   r, g, b, *alpha * 200 / 255);
@@ -86,8 +86,8 @@ void COnScreen__DrawBossBar(COnScreen *os, s32 which) {
     Hud_DrawSprite(0x191, 0, x, y, 1.0f, 1.0f, 0);
 }
 
-extern s32 D_800C2030;      /* screen width */
-extern s32 D_800C2034;      /* screen height */
+extern s32 gScreenWidth;      /* screen width */
+extern s32 gScreenHeight;      /* screen height */
 
 
 /* Runs a HUD overlay's script (docs/HUD.md) and the motion it started, one
@@ -99,8 +99,8 @@ void COverlay__Update(COverlay *ov) {
     s32 next;
     f32 dx;
     f32 dy;
-    s32 bottom = D_800C2034 + 0x60;
-    s32 right = D_800C2030 + 0x60;
+    s32 bottom = gScreenHeight + 0x60;
+    s32 right = gScreenWidth + 0x60;
 
     do {
         next = 0;

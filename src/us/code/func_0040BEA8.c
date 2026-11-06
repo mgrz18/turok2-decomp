@@ -8,6 +8,6 @@ extern void MotherBoss_OnDefeatCinemaDone(void);
 extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);
 
 void MotherBoss_StartDefeatCinema(void) {
-    CPlayerPool__SetInvincibility(&D_80119870.m_PlayerList, 900.0f);
+    CPlayerPool__SetInvincibility(&gEngineApp_m_Game.m_PlayerList, 900.0f);
     Cinema_SetNextCallbacks(0xE6, MotherBoss_OnDefeatCinemaDone, NULL);
 }

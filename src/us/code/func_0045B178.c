@@ -4,7 +4,7 @@
 
 extern char D_800B4B04[];
 extern char D_800B4B34[];
-extern u8 D_80130954[8]; /* name, padded with spaces */
+extern u8 gPakProfileRead_name[8]; /* name, padded with spaces */
 extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdateName_2(MenuItem *item) {
@@ -20,7 +20,7 @@ s32 CharNoteMenu_UpdateName_2(MenuItem *item) {
         item->text = D_800B4B04;
     } else {
         item->text = D_800B4B34;
-        src = &D_80130954[7];
+        src = &gPakProfileRead_name[7];
         while (*src-- == ' ' && len != 0) {
             len--;
         }
@@ -35,7 +35,7 @@ s32 CharNoteMenu_UpdateName_2(MenuItem *item) {
         p = field + 8;
         dst = p - len;
         for (i = 0; i < len; i++) {
-            *dst++ = D_80130954[i];
+            *dst++ = gPakProfileRead_name[i];
         }
     }
     return 0;

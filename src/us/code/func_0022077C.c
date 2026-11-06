@@ -46,22 +46,22 @@ void CScene__DrawSortedList(DrawList *list, void *cam) {
         return;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xDB040004;
         g->w1 = 1;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xDB04000C;
         g->w1 = 1;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xDB040014;
         g->w1 = 0xFFFF;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xDB04001C;
         g->w1 = 0xFFFF;
     }

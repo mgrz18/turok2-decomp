@@ -6,16 +6,16 @@
 /* Module phase 1 setup: timers, the anim for the phase, slot values; unless ai->m_Mode is 9, resets the
  * phase's active slots and runs MotherBoss_DropPickupsAtSpawnPoints three times. */
 
-extern s32 D_00431D04[];
-extern s32 D_00431D10[]; /* active slot mask per phase */
-extern s32 D_00431D1C[];
-extern u8 D_00431D28[];
-extern u8 D_00431CFC[];
+extern s32 sMotherBossPhaseVisBits_2[];
+extern s32 sMotherBossPhaseActiveMasks_2[]; /* active slot mask per phase */
+extern s32 sMotherBossPhaseLiveMasks_2[];
+extern u8 sMotherBossSpotResetScript_2[];
+extern u8 sMotherBossPhase1SpawnDrops_2[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void MotherBoss_DropPickupsAtSpawnPoints_2(s32 arg0, void *arg1);
 
 static __inline__ void resetSlots(s32 mask, void *src) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     s32 i;
 
     for (i = 0; i < 15; i++) {
@@ -26,7 +26,7 @@ static __inline__ void resetSlots(s32 mask, void *src) {
 }
 
 void MotherBoss_SetupPhase1_2(CGameObjectInstance *obj, CAI *ai) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     s32 mask;
     s32 i;
 
@@ -35,16 +35,16 @@ void MotherBoss_SetupPhase1_2(CGameObjectInstance *obj, CAI *ai) {
     state->phase = 1;
     state->counter = 0;
     obj->m_dwHotPointFlags &= ~0x18000000;
-    ai->m_VisBits = D_00431D04[state->phase];
-    state->liveMask = D_00431D1C[state->phase];
-    mask = D_00431D10[state->phase];
+    ai->m_VisBits = sMotherBossPhaseVisBits_2[state->phase];
+    state->liveMask = sMotherBossPhaseLiveMasks_2[state->phase];
+    mask = sMotherBossPhaseActiveMasks_2[state->phase];
     state->slots[1].health = state->slots[5].health = 0x9600;
     state->totalHealth = state->health = 0x12C00;
     state->activeMask = mask;
     if (ai->m_Mode != 9) {
-        resetSlots(state->activeMask, D_00431D28);
+        resetSlots(state->activeMask, sMotherBossSpotResetScript_2);
         for (i = 0; i < 3; i++) {
-            MotherBoss_DropPickupsAtSpawnPoints_2(0, D_00431CFC);
+            MotherBoss_DropPickupsAtSpawnPoints_2(0, sMotherBossPhase1SpawnDrops_2);
         }
     }
 }

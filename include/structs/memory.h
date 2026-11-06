@@ -2,7 +2,7 @@
 #define STRUCTS_MEMORY_H
 
 /* The debugger's memory permission map (the host I/O code, Rage Wars'
- * src/IO): D_80128130 holds 16 ranges of RAM (HostIo_Init builds them
+ * src/IO): sHostIoMemoryRanges holds 16 ranges of RAM (HostIo_Init builds them
  * for the installed RAM, HostIo_MemoryTransfer checks host reads and writes
  * against them) and then the 32 mapped TLB ranges (HostIo_ScanTlb).
  * tools/check_structs.py checks every offset below with the game's compiler. */
@@ -16,6 +16,6 @@ typedef struct CMemoryRange {
     /* 0x8 */ u32 m_Flags;
 } CMemoryRange; /* size 0xC */
 
-extern CMemoryRange D_80128130[48];     /* 16 memory ranges, then the 32 TLB ranges */
+extern CMemoryRange sHostIoMemoryRanges[48];     /* 16 memory ranges, then the 32 TLB ranges */
 
 #endif

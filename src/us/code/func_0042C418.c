@@ -12,11 +12,11 @@ typedef struct {
 s32 CLoader__LoadSync(s32, s32, s32, s32);
 s32 SavedPlayers_IsActive();                                /* extern */
 extern s32 gLoader;
-extern s32 D_800EBAC0;
+extern s32 gLoadSavePersistentData;
 
 void CScene__LoadBitSections(Arg0 *arg0) {
     if (SavedPlayers_IsActive() == 0) {
-        CLoader__LoadSync((s32) &gLoader, arg0->unk28, arg0->unk30, (s32) &D_800EBAC0);
+        CLoader__LoadSync((s32) &gLoader, arg0->unk28, arg0->unk30, (s32) &gLoadSavePersistentData);
         arg0->done = 1;
     }
 }

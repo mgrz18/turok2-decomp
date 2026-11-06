@@ -8,9 +8,9 @@ typedef struct {
 } SaveSize;
 
 extern SaveSize D_800F70A8;
-extern s32 *D_800C2010;        /* buffer handle */
+extern s32 *gSaveBufferHandle;        /* buffer handle */
 extern char D_800C13F0[];
-extern char D_800EBAC0[];
+extern char gLoadSavePersistentData[];
 extern void CCache__Flush(s32);
 extern void CCache__Deallocate(s32, void *);
 extern s32 *CCache__Allocate(s32, s32, s32, void *);
@@ -29,25 +29,25 @@ void SaveGame_Build(CPlayer *p) {
     s32 *handle;
     SaveGame *buf;
 
-    if (D_800C2010 != NULL) {
+    if (gSaveBufferHandle != NULL) {
         CCache__Flush(0);
-        CCache__Deallocate(0, D_800C2010);
+        CCache__Deallocate(0, gSaveBufferHandle);
     }
     allocSize = SaveFileSize();
     handle = CCache__Allocate(0, allocSize, 0x33, D_800C13F0);
     buf = (SaveGame *) *handle;
-    D_800C2010 = handle;
-    D_800C2018 = buf;
-    memset(D_800C2018, 0, allocSize);
-    D_800C2018->player = p->m_Data;
-    D_800C2018->settings = *(GameSettingsBlock *)&D_8011AAD8;
-    save = D_800C2018;
-    save->frames = D_8011ACB0.frames;
-    save->seconds = D_8011ACB0.seconds;
-    save->minutes = D_8011ACB0.minutes;
-    save->hours = D_8011ACB0.hours;
+    gSaveBufferHandle = handle;
+    gSaveBuffer = buf;
+    memset(gSaveBuffer, 0, allocSize);
+    gSaveBuffer->player = p->m_Data;
+    gSaveBuffer->settings = *(GameSettingsBlock *)&gEngineApp_m_Settings;
+    save = gSaveBuffer;
+    save->frames = gEngineApp_m_Settings_match.frames;
+    save->seconds = gEngineApp_m_Settings_match.seconds;
+    save->minutes = gEngineApp_m_Settings_match.minutes;
+    save->hours = gEngineApp_m_Settings_match.hours;
     /* D_800F70A8 is a struct field here, so it is reloaded after the store into the header. */
     save->size = size;
     save->levelFlagsSize = D_800F70A8.size;
-    func_0029E460((char *)save->levelFlags, D_800EBAC0, D_800F70A8.size);
+    func_0029E460((char *)save->levelFlags, gLoadSavePersistentData, D_800F70A8.size);
 }

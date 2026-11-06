@@ -5,17 +5,17 @@
  * when saving over an existing game file asks for confirmation, when there
  * is no usable pak cycles to the next slot with one. */
 
-extern s32 D_80130984;
-extern s32 D_80130990;
-extern s32 D_801309B4;
-extern s32 D_801309BC;
-extern s32 D_801309C4;
-extern s32 D_800C2028;
-extern s32 D_8011F148;
-extern char D_800B45CC[];
-extern u8 D_80119E2C[];
-extern u8 D_0043B714[];
-extern u8 D_0043C20C[];
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuLeaving;
+extern s32 gPakNoteIndex;
+extern s32 gPakMenuPort;
+extern s32 gPakCheckDone;
+extern char gPakGameNoteName[];
+extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern u8 gPakSaveGameMenuDesc[];
+extern u8 gPakConfirmOverwriteDesc[];
 
 extern s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet);
 extern void PakMenu_UpdateNoteRows(Menu *c);
@@ -52,8 +52,8 @@ end:
 }
 
 static __inline__ void menuSlot(Menu *c, s32 *slot) {
-    if (D_80130990) {
-        *slot = D_800C2028;
+    if (gPakMenuAnyPak) {
+        *slot = gPakMenuPort;
     } else {
         *slot = c->controller->port;
     }
@@ -67,37 +67,37 @@ s32 PakMenu_SelectPak(void *menu, Menu *c, s32 arg2) {
     s32 cur;
 
     slot = 0;
-    if (D_80130984) {
+    if (gPakMenuIsSave) {
         menuSlot(c, &slot);
     }
-    if (D_80130990) {
-        pak = D_800C2028;
+    if (gPakMenuAnyPak) {
+        pak = gPakMenuPort;
     } else {
         pak = slot;
     }
     if (PakMenu_CheckPak(c, pak, 0) != 0) {
-        D_801309BC = 1;
+        gPakMenuLeaving = 1;
         return 1;
     }
-    if (D_801309B4) {
-        if (D_80130984) {
+    if (gPakMenuIsProfile) {
+        if (gPakMenuIsSave) {
             PakMenu_WriteProfile(menu, c, arg2);
             return 1;
         }
-    } else if (D_80130984) {
-        D_801309C4 = -1;
-        if (findFile(menu, D_800B45CC, pak, &D_801309C4) && D_801309C4 >= 0 && D_801309C4 < 16) {
-            MenuPool_OpenMenu(D_80119E2C, D_0043C20C, c->player, c->controller, D_0043B714);
+    } else if (gPakMenuIsSave) {
+        gPakNoteIndex = -1;
+        if (findFile(menu, gPakGameNoteName, pak, &gPakNoteIndex) && gPakNoteIndex >= 0 && gPakNoteIndex < 16) {
+            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakConfirmOverwriteDesc, c->player, c->controller, gPakSaveGameMenuDesc);
             return 1;
         }
         PakMenu_WriteSaveGame(menu, c, arg2);
         return 1;
     }
-    if (D_80130990) {
-        if (D_800C2028 == -1) {
+    if (gPakMenuAnyPak) {
+        if (gPakMenuPort == -1) {
             next = 0;
         } else {
-            next = D_800C2028 + 1;
+            next = gPakMenuPort + 1;
             if (next >= 4) {
                 next = 0;
             }
@@ -115,19 +115,19 @@ s32 PakMenu_SelectPak(void *menu, Menu *c, s32 arg2) {
         if (n == 4) {
             next = -1;
         }
-        D_800C2028 = next;
+        gPakMenuPort = next;
         if (next == -1) {
-            D_8011F148 = D_801309BC = 1;
+            gPakCheckDone = gPakMenuLeaving = 1;
             return 1;
         }
-        if (D_80130990) {
-            cur = D_800C2028;
+        if (gPakMenuAnyPak) {
+            cur = gPakMenuPort;
         } else {
             cur = c->controller->port;
         }
         slot = cur;
         if (PakMenu_CheckPak(c, cur, 0) != 0) {
-            D_801309BC = 1;
+            gPakMenuLeaving = 1;
             return 1;
         }
         PakMenu_UpdateNoteRows(c);

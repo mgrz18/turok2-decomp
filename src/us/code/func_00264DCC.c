@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s8 D_800F1F94;
+extern s8 gThrowableCollisionInfo_m_InstanceBehavior;
 
 void Throwable_IdleUpdate(void) {
-    D_800F1F94 = 2;
+    gThrowableCollisionInfo_m_InstanceBehavior = 2;
 }

@@ -83,9 +83,9 @@ typedef struct Region Region;
 struct PagerState;
 typedef struct PagerState PagerState;
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
-extern ResourcePageMapping *D_80121294;
+extern ResourcePageMapping *gPager_chain_tail;
 extern void VM_MapTLBEntry(s16 flags, ResourcePageMapping *item, s32 unused, u8 *out);
-extern ResourcePageMapping *D_80121290;
+extern ResourcePageMapping *gPager_chain_head;
 typedef struct ResourcePageThread {
     u8 reserved0[0x12]; s16 state;
     u8 reserved14[3]; u8 slot;
@@ -98,8 +98,8 @@ typedef struct ResourcePageJob {
     ResourcePageThread *thread;
     u8 *slot;
 } ResourcePageJob;
-extern PagerState D_801206A0;
-extern char D_80121140[];
+extern PagerState gPager;
+extern char gPager_jobs[];
 extern void osInvalDCache(u32, s32);
 extern void osInvalICache(u32, s32);
 extern void osStartThread(void *);
@@ -109,13 +109,13 @@ void VM_FinishPageJob(ResourcePageJob *req) {
     if (*req->slot == 0xFF) {
         link = req->mapping;
         writeLink(&link->next, 0);
-        writeLink(&link->prev, D_801206A0.tail);
-        if (D_801206A0.tail != 0) {
-            D_801206A0.tail->next = link;
+        writeLink(&link->prev, gPager.tail);
+        if (gPager.tail != 0) {
+            gPager.tail->next = link;
         }
-        D_80121294 = link;
-        if (D_80121290 == 0) {
-            D_80121290 = link;
+        gPager_chain_tail = link;
+        if (gPager_chain_head == 0) {
+            gPager_chain_head = link;
         }
         VM_MapTLBEntry(req->page, req->mapping, req->thread->slot, req->slot);
         osInvalDCache(req->page << 12, 0x1000);
@@ -123,16 +123,16 @@ void VM_FinishPageJob(ResourcePageJob *req) {
     } else {
         link = req->mapping;
         writeLink(&link->prev, 0);
-        writeLink(&link->next, D_801206A0.head);
-        if (D_801206A0.head != 0) {
-            D_801206A0.head->prev = link;
+        writeLink(&link->next, gPager.head);
+        if (gPager.head != 0) {
+            gPager.head->prev = link;
         }
-        D_80121290 = link;
-        if (D_80121294 == 0) {
-            D_80121294 = link;
+        gPager_chain_head = link;
+        if (gPager_chain_tail == 0) {
+            gPager_chain_tail = link;
         }
     }
     req->thread->state = 2;
     osStartThread(req->thread);
-    osSendMesg(D_80121140, req, 1);
+    osSendMesg(gPager_jobs, req, 1);
 }

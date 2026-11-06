@@ -2,7 +2,7 @@
 #include "structs/menu.h"
 
 s32 Controller_DisableMenuSounds(void *, void *);              /* extern */
-extern s32 D_801309C0[];
+extern s32 gPakMessageKind[];
 
 void PakMessage_InitNoController(Menu *arg0)
 {
@@ -15,7 +15,7 @@ void PakMessage_InitNoController(Menu *arg0)
   temp_a1[7].flags = (s32) new_var;
   temp_a0 = arg0->items;
   new_var2 = temp_a0[7].flags;
-  D_801309C0[0] = 8;
+  gPakMessageKind[0] = 8;
   temp_a0[7].flags = (s32) (new_var2 | 8);
   Controller_DisableMenuSounds(temp_a0, temp_a1);
 }

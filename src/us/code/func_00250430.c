@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern char D_800ADE70;     /* standing look tuning */
-extern char D_800ADE88;     /* crouching look tuning */
+extern char gStandLookTuning;     /* standing look tuning */
+extern char gCrouchLookTuning;     /* crouching look tuning */
 
 void CPlayer__BobView(CPlayer *player, CGameObjectInstance *body);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
@@ -29,9 +29,9 @@ void PlayerStand_Update(CPlayer *player, CGameObjectInstance *body) {
     heading = body->m_RotY;
     crouching = 5.12f < player->m_DuckOffset;
     if (crouching) {
-        CPlayer__TurnAndLook(player, body, &D_800ADE88);
+        CPlayer__TurnAndLook(player, body, &gCrouchLookTuning);
     } else {
-        CPlayer__TurnAndLook(player, body, &D_800ADE70);
+        CPlayer__TurnAndLook(player, body, &gStandLookTuning);
     }
     heading = body->m_RotY - heading;
     if (try_jump(player, body)) {

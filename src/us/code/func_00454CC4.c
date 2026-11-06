@@ -39,20 +39,20 @@ struct PoolRecAt28V1 {
 struct NodeCode8028469C;
 typedef struct NodeCode8028469C NodeCode8028469C;
 s32 Controller_ConfirmPressed(char *);
-extern u32 D_8011AAE0[];
+extern u32 gEngineApp_m_Settings_difficulty[];
 s32 OptionsMenu_CycleDifficulty_2(void) {
- if(((s32 (*)(char *))Controller_MenuLeft)((char *)&D_800F5C78)) {
- switch(D_8011AAE0[0]) {
- case 8: D_8011AAE0[0]=32; break;
- case 16: D_8011AAE0[0]=8; break;
- case 32: D_8011AAE0[0]=16; break;
+ if(((s32 (*)(char *))Controller_MenuLeft)((char *)&gMergedController)) {
+ switch(gEngineApp_m_Settings_difficulty[0]) {
+ case 8: gEngineApp_m_Settings_difficulty[0]=32; break;
+ case 16: gEngineApp_m_Settings_difficulty[0]=8; break;
+ case 32: gEngineApp_m_Settings_difficulty[0]=16; break;
  }
  }
- if(((s32 (*)(char *))Controller_MenuRight)((char *)&D_800F5C78) || Controller_ConfirmPressed((char *)&D_800F5C78)) {
- switch(D_8011AAE0[0]) {
- case 8: D_8011AAE0[0]=16; break;
- case 16: D_8011AAE0[0]=32; break;
- case 32: D_8011AAE0[0]=8; break;
+ if(((s32 (*)(char *))Controller_MenuRight)((char *)&gMergedController) || Controller_ConfirmPressed((char *)&gMergedController)) {
+ switch(gEngineApp_m_Settings_difficulty[0]) {
+ case 8: gEngineApp_m_Settings_difficulty[0]=16; break;
+ case 16: gEngineApp_m_Settings_difficulty[0]=32; break;
+ case 32: gEngineApp_m_Settings_difficulty[0]=8; break;
  }
  }
  return 0;

@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern f32 D_800F5A44;
+extern f32 gScreenClearTime;
 s32 SavedPlayers_IsActive(void);
 
 /* One step of a viewport value toward its target: 16 pixels a frame, or
- * there at once when SavedPlayers_IsActive says so; while it moves, D_800F5A44 is
+ * there at once when SavedPlayers_IsActive says so; while it moves, gScreenClearTime is
  * set to 30. */
 #define STEP_TOWARD(field, target)              \
     {                                           \
@@ -16,13 +16,13 @@ s32 SavedPlayers_IsActive(void);
         }                                       \
         if (v < (target)) {                     \
             v += speed;                         \
-            D_800F5A44 = 30.0f;                 \
+            gScreenClearTime = 30.0f;                 \
             if ((target) < v) {                 \
                 v = (target);                   \
             }                                   \
         } else if ((target) < v) {              \
             v -= speed;                         \
-            D_800F5A44 = 30.0f;                 \
+            gScreenClearTime = 30.0f;                 \
             if (v < (target)) {                 \
                 v = (target);                   \
             }                                   \

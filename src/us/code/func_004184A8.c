@@ -9,7 +9,7 @@ extern void sprintf(char *dst, char *fmt, ...);
 
 /* Prints the time limit into the label, or "none". */
 s32 FragTagMenu_TimeLimitLabel(MenuItem *a) {
-    GameSettings *setup = &D_8011AAD8;
+    GameSettings *setup = &gEngineApp_m_Settings;
 
     if (setup->tagTimeLimit != 0) {
         sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C0E84, setup->tagTimeLimit);

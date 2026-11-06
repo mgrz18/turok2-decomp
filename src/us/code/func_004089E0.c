@@ -6,7 +6,7 @@
  * resource: the region sets come from CGameObjectInstance__GetDeathModels and the colour from the
  * module global D_8012FB64. */
 
-extern s32 D_800ACAD8;
+extern s32 gLitVerticesKey;
 extern s32 D_8012FB64;
 extern char D_800C0570[];   /* "lit vertices" */
 
@@ -33,7 +33,7 @@ void TotemDefense_DrawTotem(CGameObjectInstance *actor, s32 arg1, CDrawArgs *par
     if (params->m_bDraw == 0) {
         return;
     }
-    resource = CCache__RequestDecompression(0, actor->m_dwUniqueID | D_800ACAD8, params->m_hModel, 0, 0, actor,
+    resource = CCache__RequestDecompression(0, actor->m_dwUniqueID | gLitVerticesKey, params->m_hModel, 0, 0, actor,
                              CGameObjectInstance__ConstructLitVertices, D_800C0570, 1);
     if (resource == NULL) {
         return;

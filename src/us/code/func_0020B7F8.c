@@ -3,12 +3,12 @@
 #include "common.h"
 #include "structs/model.h"
 
-extern void **D_800D8E28;           /* batched model */
-extern s32 D_800D8E14;              /* its level of detail */
-extern s32 D_800D8E10;              /* its pass */
-extern s32 D_800D8E34;              /* queued instance count */
-extern s32 D_800DD170;              /* registered model count */
-extern void **D_800DD178[0x100];
+extern void **sBatchResource;           /* batched model */
+extern s32 sBatchLod;              /* its level of detail */
+extern s32 sBatchPass;              /* its pass */
+extern s32 sBatchInstanceCount;              /* queued instance count */
+extern s32 sBatchResourceCount;              /* registered model count */
+extern void **sBatchResources[0x100];
 extern char D_800A53D8[];
 extern char D_800A53EC[];
 
@@ -41,21 +41,21 @@ void Render_QueueModelByKey(s32 key, void *matrix, void *lights, s32 lod, s32 pa
     if (resource != 0) {
         parts = CISet__GetBlock(*resource, 2);
         if (lod >= 0 && lod < *parts) {
-            if (D_800D8E28 != resource || D_800D8E14 != lod || D_800D8E10 != pass || D_800D8E34 == 0x20) {
+            if (sBatchResource != resource || sBatchLod != lod || sBatchPass != pass || sBatchInstanceCount == 0x20) {
                 Render_FlushModelBatch();
-                if (D_800DD170 == 0x100) {
+                if (sBatchResourceCount == 0x100) {
                     goto done;
                 }
                 CCache__TouchAndLock(0, resource);
-                D_800DD178[D_800DD170] = resource;
-                D_800DD170 += 1;
+                sBatchResources[sBatchResourceCount] = resource;
+                sBatchResourceCount += 1;
             }
-            D_800D8E28 = resource;
-            D_800D8E14 = lod;
-            D_800D8E10 = pass;
-            n = D_800D8E34;
-            inst = &D_800DD578[n++];
-            D_800D8E34 = n;
+            sBatchResource = resource;
+            sBatchLod = lod;
+            sBatchPass = pass;
+            n = sBatchInstanceCount;
+            inst = &sBatchInstances[n++];
+            sBatchInstanceCount = n;
             inst->m_pMatrix = matrix;
             inst->m_Segment = 0;
             inst->m_pLights = lights;

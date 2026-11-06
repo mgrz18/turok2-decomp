@@ -5,10 +5,10 @@
 
 extern s32 CEngineApp__SetupFadeTo(s32, s32);
 extern f32 D_800A9E14[];
-extern s32 D_800F5D28[];
+extern s32 gMergedController_buttons[];
 
 void EngineMode08_MainMenu_Retrace(CEngineApp *arg0) {
-    if (D_800F5D28[0] != 0) {
+    if (gMergedController_buttons[0] != 0) {
         arg0->m_Settings.modeTimer = 0.0f;
     }
     if (arg0->m_Settings.modeTimer > D_800A9E14[0]) {

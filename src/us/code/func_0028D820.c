@@ -41,46 +41,46 @@ void VM_Initialize(void) {
     if (extra < 0x80400000) {
         extra = 0;
     }
-    fill(&D_801206A0, 0, sizeof(Pager));
-    fill(D_801206A0.lookup, 0xFF, sizeof(D_801206A0.lookup));
-    fill(D_801206A0.slots, 0xFF, sizeof(D_801206A0.slots));
+    fill(&gPager, 0, sizeof(Pager));
+    fill(gPager.lookup, 0xFF, sizeof(gPager.lookup));
+    fill(gPager.slots, 0xFF, sizeof(gPager.slots));
     __osUnmapTLBAll();
     for (i = 0; i < 24; i++) {
-        D_801206A0.entries[i].id = 0xFFFF;
-        D_801206A0.entries[i].team = 0xFF;
-        D_801206A0.entries[i].slot = 0xFF;
+        gPager.entries[i].id = 0xFFFF;
+        gPager.entries[i].team = 0xFF;
+        gPager.entries[i].slot = 0xFF;
     }
-    D_801206A0.chain.tail = NULL;
-    D_801206A0.chain.head = NULL;
+    gPager.chain.tail = NULL;
+    gPager.chain.head = NULL;
     for (i = 0; i < 24; i++) {
-        D_801206A0.slots[i].next = NULL;
-        D_801206A0.slots[i].prev = NULL;
-        VM_ListAddTail(&D_801206A0.chain, &D_801206A0.slots[i]);
-        D_801206A0.slots[i].index = i;
+        gPager.slots[i].next = NULL;
+        gPager.slots[i].prev = NULL;
+        VM_ListAddTail(&gPager.chain, &gPager.slots[i]);
+        gPager.slots[i].index = i;
     }
-    osCreateMesgQueue(&D_801206A0.completion, D_801206A0.completionMsgs, 0x21);
-    osCreateMesgQueue(&D_801206A0.jobs, D_801206A0.jobMsgs, 8);
-    osCreateMesgQueue(&D_801206A0.pending, D_801206A0.pendingMsgs, 8);
-    D_801206A0.regions.start = 0x400;
-    D_801206A0.regions.pages = 0x80;
-    D_801206A0.regions.map = D_801206A0.lookup;
-    D_801206A0.regions.next = NULL;
-    D_801206A0.regions.source = (u8 *)((u32)D_14A000 | 0xB0000000);
-    D_801206A0.mapped = 0;
+    osCreateMesgQueue(&gPager.completion, gPager.completionMsgs, 0x21);
+    osCreateMesgQueue(&gPager.jobs, gPager.jobMsgs, 8);
+    osCreateMesgQueue(&gPager.pending, gPager.pendingMsgs, 8);
+    gPager.regions.start = 0x400;
+    gPager.regions.pages = 0x80;
+    gPager.regions.map = gPager.lookup;
+    gPager.regions.next = NULL;
+    gPager.regions.source = (u8 *)((u32)D_14A000 | 0xB0000000);
+    gPager.mapped = 0;
     if (GetMemSize() > 0x4FFFFF) {
         CLoader__LoadSync(gLoader, D_14A000, D_3CAE0, extra);
     }
     if (extra != 0) {
         func_0028EE40(0, 0x7E000, 0x400000, extra + 0x80000000, extra + 0x80040000, 7);
-        D_801206A0.expanded = 1;
-        D_801206A0.mapped = 1;
+        gPager.expanded = 1;
+        gPager.mapped = 1;
     }
     for (i = 0; i < 8; i++) {
-        osSendMesg(&D_801206A0.jobs, D_801206A0.channels[i], 1);
+        osSendMesg(&gPager.jobs, gPager.channels[i], 1);
     }
-    D_801206A0.event = 0;
-    osSetEventMesg(0xC, &D_801206A0.completion, &D_801206A0.event);
-    memset(D_801206A0.stack, 0x63, 0x200);
-    osCreateThread(D_801206A0.thread, 0x63, VM_ManagerThread, NULL, D_801206A0.stack + 0x200, 0x93);
-    osStartThread(D_801206A0.thread);
+    gPager.event = 0;
+    osSetEventMesg(0xC, &gPager.completion, &gPager.event);
+    memset(gPager.stack, 0x63, 0x200);
+    osCreateThread(gPager.thread, 0x63, VM_ManagerThread, NULL, gPager.stack + 0x200, 0x93);
+    osStartThread(gPager.thread);
 }

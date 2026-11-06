@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern s32 D_800B6D1C;
+extern s32 gEvenOdd;
 extern void CMtxF__SetScale(void *, f32, f32, f32);
 extern void CMtxF__Identity(void *);
 extern void Trail_ComputeNodeFrame(Node438C *, Node438C *, struct GameplayCamera *, void *);
@@ -62,12 +62,12 @@ no_pair:
             matrix[14] = first->position.z;
         }
 apply:
-        CMtxF__ToMtxAffine(matrix, (s32)first->matrices[D_800B6D1C]);
+        CMtxF__ToMtxAffine(matrix, (s32)first->matrices[gEvenOdd]);
         first = next;
         next = first->next;
     }
     matrix[12] = first->position.x;
     matrix[13] = first->position.y;
     matrix[14] = first->position.z;
-    CMtxF__ToMtxAffine(matrix, (s32)first->matrices[D_800B6D1C]);
+    CMtxF__ToMtxAffine(matrix, (s32)first->matrices[gEvenOdd]);
 }

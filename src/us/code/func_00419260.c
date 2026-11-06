@@ -3,7 +3,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s8 D_8011AB05; /* D_8011AAD8 + 0x2D */
+extern s8 gEngineApp_m_Settings_teamTextureSet; /* gEngineApp_m_Settings + 0x2D */
 extern char D_800B608C[];
 extern char D_800B60A4[];
 extern char D_800B60BC[];
@@ -15,7 +15,7 @@ extern char D_800B6134[];
 extern char D_800B614C[];
 
 s32 TeamBloodMenu_TextureSetLabel(MenuItem *a) {
-    switch (D_8011AB05) {
+    switch (gEngineApp_m_Settings_teamTextureSet) {
     case 0:
         a->text = D_800B608C;
         break;

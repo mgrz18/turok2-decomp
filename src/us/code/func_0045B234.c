@@ -14,7 +14,7 @@ extern char D_800B5388[];
 extern char D_800B5394[];
 extern char D_800B53A0[];
 extern char D_800B53AC[];
-extern s8 D_80130950[];
+extern s8 gPakProfileRead_character[];
 extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdateType_2(MenuItem *item) {
@@ -26,7 +26,7 @@ s32 CharNoteMenu_UpdateType_2(MenuItem *item) {
         item->text = D_800B4B1C;
     } else {
         item->text = D_800B4B48;
-        switch (D_80130950[0]) {
+        switch (gPakProfileRead_character[0]) {
             case 0:
             default:
                 src = D_800B5340;

@@ -9,10 +9,10 @@ typedef struct Row18 {
     s16 id;
     u8 pad6[18];
 } Row18;
-extern Row18 D_800AD768[];
+extern Row18 sHealthPickups[];
 Row18 *Pickup_FindHealthEntry(s32 id) {
     s32 i;
-    Row18 *p = D_800AD768;
+    Row18 *p = sHealthPickups;
     for (i = 6; i != -1; i--) {
         if (p->id == id) {
             return p;

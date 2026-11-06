@@ -2,7 +2,7 @@
 #include "structs/sound.h"
 #include "structs/camera.h"
 
-extern f32 D_800B2848; /* volume step */
+extern f32 sSndVoiceRampStep; /* volume step */
 
 void SndVoice_UpdateDoppler(SndVoice *s) {
     f32 dx;
@@ -27,19 +27,19 @@ void SndVoice_UpdateDoppler(SndVoice *s) {
     d = dx * dx + dy * dy + dz * dz;
     s->vp.distSq = d;
     if (s->vp.prevDistSq < d) {
-        s->vp.doppler -= D_800B2848;
+        s->vp.doppler -= sSndVoiceRampStep;
     } else if (d < s->vp.prevDistSq) {
-        s->vp.doppler += D_800B2848;
+        s->vp.doppler += sSndVoiceRampStep;
     } else {
         v = s->vp.doppler;
         if (v > 1.0f) {
-            vol = v - D_800B2848;
+            vol = v - sSndVoiceRampStep;
             if (vol < 1.0f) {
                 vol = 1.0f;
             }
             s->vp.doppler = vol;
         } else if (v < 1.0f) {
-            vol = v + D_800B2848;
+            vol = v + sSndVoiceRampStep;
             if (vol > 1.0f) {
                 vol = 1.0f;
             }
