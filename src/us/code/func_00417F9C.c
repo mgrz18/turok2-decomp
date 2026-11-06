@@ -8,7 +8,6 @@ extern char D_800B41D0[];
 extern char D_800B41E0[];
 extern char D_800B41F0[];
 extern char D_800B4200[];
-extern char D_800C0E7C[]; /* number format */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, s32 value);
 
@@ -36,7 +35,7 @@ s32 PlayerSetupMenu_HandicapLabel(MenuItem *a, Menu *c) {
             a->text = D_800B41E0;
             break;
         }
-        sprintf(a->text + (MenuItem_TextLength(a) - 2), D_800C0E7C, handicap);
+        sprintf(a->text + (MenuItem_TextLength(a) - 2), "%02d", handicap);
     }
     return 0;
 }

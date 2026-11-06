@@ -11,7 +11,6 @@ typedef struct {
 } SaveSize;
 
 extern SaveSize D_800F70A8;
-extern char D_800C13F0[];
 extern void CCache__Flush(s32);
 extern void CCache__Deallocate(s32, void *);
 extern s32 *CCache__Allocate(s32, s32, s32, void *);
@@ -35,7 +34,7 @@ void SaveGame_Build(CPlayer *p) {
         CCache__Deallocate(0, gSaveBufferHandle);
     }
     allocSize = SaveFileSize();
-    handle = CCache__Allocate(0, allocSize, 0x33, D_800C13F0);
+    handle = CCache__Allocate(0, allocSize, 0x33, "Single Save Block");
     buf = (SaveGame *) *handle;
     gSaveBufferHandle = handle;
     gSaveBuffer = buf;

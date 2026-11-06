@@ -6,8 +6,6 @@
 
 extern char D_800B4050[];
 extern char D_800B4068[];
-extern char D_800C1318[]; /* "  %2d"-style */
-extern char D_800C1320[];
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -24,10 +22,10 @@ s32 OptionsMenu_StickHorzText(MenuItem *a, Menu *c) {
         a->text = D_800B4050;
     } else if (v > 0) {
         a->text = D_800B4068;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1318, v);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), "  %02d", v);
     } else {
         a->text = D_800B4068;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1320, v);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), " %03d", v);
     }
     return 0;
 }

@@ -6,8 +6,6 @@ extern char D_800B65D0[];
 extern char D_800B65B8[];
 extern char D_800B65A0[];
 extern char D_800B65E8[];
-extern char D_800C1030[]; /* "  %2d" */
-extern char D_800C1038[]; /* " %3d" */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
@@ -23,10 +21,10 @@ s32 SoundMenu_SpeechVolumeLabel(MenuItem *a) {
         a->text = D_800B65A0;
     } else if (v > 0) {
         a->text = D_800B65E8;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1030, v);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), "  %2d", v);
     } else {
         a->text = D_800B65E8;
-        sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C1038, v);
+        sprintf(a->text + (MenuItem_TextLength(a) - 4), " %3d", v);
     }
     return 0;
 }
