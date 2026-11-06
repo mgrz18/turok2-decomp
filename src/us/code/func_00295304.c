@@ -7,9 +7,9 @@ typedef s32 (*FuncPtr)(void *);
 extern void alFilterNew(void *arg0, void *a, void *b, s32 c);
 extern s32 alHeapDBAlloc(s32, s32, void *, s32, s32);
 extern void alAdpcmPull(void);
-extern char alLoadParam;
+extern s32 alLoadParam(void *filter, s32 paramID, void *param);
 void alLoadNew(void *arg0, FuncPtr arg1, s32 arg2) {
-    alFilterNew(arg0, (void *) alAdpcmPull, &alLoadParam, 0);
+    alFilterNew(arg0, (void *) alAdpcmPull, alLoadParam, 0);
     ((ALLoadFilter *)arg0)->state = alHeapDBAlloc(0, 0, arg2, 1, 0x20);
     ((ALLoadFilter *)arg0)->lstate = alHeapDBAlloc(0, 0, arg2, 1, 0x20);
     ((ALLoadFilter *)arg0)->dma = arg1(&((ALLoadFilter *)arg0)->dmaState);

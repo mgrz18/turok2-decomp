@@ -5,8 +5,8 @@
 
 extern void alCopy(unsigned char *source, unsigned char *destination, int count);
 extern void alAdpcmPull(void);
-extern char alRaw16Pull;
-extern char alAdecPull;
+extern Acmd *alRaw16Pull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
+extern Acmd *alAdecPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
 s32 alLoadParam(void *filter, s32 paramID, ALWaveTable *param)
 {
     ALLoadFilter *a = (ALLoadFilter *)filter;
@@ -32,7 +32,7 @@ s32 alLoadParam(void *filter, s32 paramID, ALWaveTable *param)
                     }
                     break;
                 case 1:
-                    f->handler = &alRaw16Pull;
+                    f->handler = alRaw16Pull;
                     if (a->table->waveInfo.rawWave.loop) {
                         a->loop.start = a->table->waveInfo.rawWave.loop->start;
                         a->loop.end = a->table->waveInfo.rawWave.loop->end;
@@ -42,7 +42,7 @@ s32 alLoadParam(void *filter, s32 paramID, ALWaveTable *param)
                     }
                     break;
                 case 2:
-                    f->handler = &alAdecPull;
+                    f->handler = alAdecPull;
                     a->loop.start = a->loop.end = a->loop.count = 0;
                     break;
                 default:

@@ -9,9 +9,9 @@ extern float D_800AA514;
 extern double D_800AA518;
 extern void alFilterNew(void *f, int h, int s, int type);
 extern s32 alHeapDBAlloc(s32 file, s32 line, void *hp, s32 num, s32 size);
-extern char alFxParam;
-extern char alFxPull;
-extern char alFxParamHdl;
+extern s32 alFxParam(void *filter, s32 paramID, void *param);
+extern Acmd *alFxPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
+extern s32 alFxParamHdl(void *filter, s32 paramID, void *param);
 extern const f32 D_800AA500;
 extern const f32 D_800AA510;
 void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
@@ -20,9 +20,9 @@ void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
     s32 *param = 0;
     ALFilter *f = &r->filter;
     ALDelay *d;
-    alFilterNew(f, 0, (s32)&alFxParam, 5);
-    f->handler = &alFxPull;
-    r->paramHdl = &alFxParamHdl;
+    alFilterNew(f, 0, (s32)alFxParam, 5);
+    f->handler = alFxPull;
+    r->paramHdl = alFxParamHdl;
     switch (c->fxType) {
       case 1: param = SMALLROOM_PARAMS; break;
       case 2: param = BIGROOM_PARAMS; break;
