@@ -1,6 +1,7 @@
 # turok2-decomp
 
-[![status](https://img.shields.io/badge/status-matching%20decomp-blue)](https://github.com/mgrz18/turok2-decomp/milestones)
+[![status](https://img.shields.io/badge/status-matched%20%E2%86%92%20readable%20code%20(phase%205)-blue)](#roadmap)
+[![next](https://img.shields.io/badge/goal-native%20PC%20source%20port-8A2BE2)](#roadmap)
 [![ROM](https://img.shields.io/badge/ROM-rebuilds%20byte--exact-brightgreen)](docs/MATCHING.md)
 [![total matched](https://img.shields.io/badge/total%20matched-100%25-brightgreen)](tools/progress.py)
 [![engine matched](https://img.shields.io/badge/engine%20matched-100%25-brightgreen)](tools/progress.py)
@@ -8,6 +9,8 @@
 [![readable](https://img.shields.io/badge/readable%20C-99.83%25-blue)](tools/progress.py)
 [![asm decoded](https://img.shields.io/badge/asm%20decoded-95.2%25-brightgreen)](docs/VRAM-LAYOUT.md)
 [![functions](https://img.shields.io/badge/functions-13%2C275-brightgreen)](docs/VRAM-LAYOUT.md)
+[![functions named](https://img.shields.io/badge/C%20functions%20named-92%25-blue)](docs/NAMES.md)
+[![globals named](https://img.shields.io/badge/globals%20named-1%2C204-blue)](docs/NAMES.md#round-g2-the-globals)
 [![RSP ucode](https://img.shields.io/badge/RSP%20ucode-stock%20F3DEX-success)](docs/MICROCODE.md)
 [![built with](https://img.shields.io/badge/built%20with-Claude%20Opus%205-D97757)](https://claude.com/claude-code)
 [![license](https://img.shields.io/badge/license-CC0--1.0-lightgrey)](LICENSE)
