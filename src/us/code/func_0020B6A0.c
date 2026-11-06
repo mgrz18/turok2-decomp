@@ -2,13 +2,8 @@
 
 #include "common.h"
 #include "structs/model.h"
+#include "globals/batch.h"
 
-extern void **sBatchResource;           /* batched model */
-extern s32 sBatchLod;              /* its level of detail */
-extern s32 sBatchPass;              /* its pass */
-extern s32 sBatchInstanceCount;              /* queued instance count */
-extern s32 sBatchResourceCount;              /* registered model count */
-extern void **sBatchResources[0x100];
 
 void *CISet__GetBlock(void *resource, s32 index);
 void Render_FlushModelBatch(void);
