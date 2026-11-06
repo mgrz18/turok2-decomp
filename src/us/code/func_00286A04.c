@@ -3,8 +3,8 @@
 
 #include "rw/junk_types.h"
 #include "structs/frame.h"
+#include "gfx.h"
 
-extern DlCmd *gDList;
 extern u8 gRspInitDL[];
 extern u8 gRdpInitDL[];
 extern s32 gDepthBuffer;

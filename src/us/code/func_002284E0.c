@@ -32,7 +32,6 @@ struct UnitLight {
 struct LightNode;
 typedef struct LightNode LightNode;
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern Gfx *gDList;
 extern s32 gDLightBufferIndex;
 extern UnitLight gDLightBuffer[];
 extern char D_8010FF34;

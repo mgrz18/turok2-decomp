@@ -5,8 +5,6 @@
 #include "gfx.h"
 
 extern s32 gResolution;
-extern Gfx *gDList;
-extern Gfx *gDList;
 extern s32 gResolution;
 extern void Render_SetCombineMode(s32 arg0);
 extern void Render_SetRenderMode(s32 arg0);
@@ -24,7 +22,3 @@ void Hud_SetupTextureMode(s32 color) {
     { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (19) - (1)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((1) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x0)) << 19))); };
     if (gResolution == 0) { { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (12) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x0)) << 12))); }; } else { { Gfx *_gbi = (Gfx *)(gDList++); _gbi->w0 = ((((unsigned int)(0xE3) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(32 - (12) - (2)) & (0xFFFFFFFFU >> (32 - (8)))) << (8)) | (((unsigned int)((2) - 1) & (0xFFFFFFFFU >> (32 - (8)))) << (0))); _gbi->w1 = ((unsigned int)((((unsigned int)(0x2)) << 12))); }; }
 }
-extern Gfx *gDList;
-extern Gfx *gDList;
-extern Gfx *gDList;
-extern Gfx *gDList;

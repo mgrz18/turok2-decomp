@@ -393,7 +393,6 @@ typedef struct {
 extern CCollisionInfo gCollisionInfoLineOfSight;
 extern CCollisionResults gCollisionResults;
 extern f32 gQuaternionSin;
-extern Gfx *gDList;
 
 void *MtxPool_Alloc(void *pool, s32 count);
 void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);
@@ -578,7 +577,6 @@ typedef struct {
 } ParticleView;
 
 
-extern Gfx *gDList;             /* display list head */
 extern u32 gDisplayListSize;              /* command buffer length, in commands */
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* matrix buffer index */

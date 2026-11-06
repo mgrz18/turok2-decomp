@@ -20,7 +20,6 @@ typedef struct {
     /* 0x0C */ CVector3 max;
 } Box;
 
-extern Gfx *gDList;             /* display list head */
 extern s32 gEvenOdd;              /* matrix buffer index */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern CCamera *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;

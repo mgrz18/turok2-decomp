@@ -76,7 +76,6 @@ typedef struct {
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern Gfx *gDList;             /* display list head */
 extern s32 gEvenOdd;              /* matrix buffer index */
 
 extern void *Texture_Request(void *model);

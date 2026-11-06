@@ -25,7 +25,6 @@ typedef struct MenuPlayer {
 } MenuPlayer;
 
 extern u8 gEngineApp_m_Settings_hudAlpha;
-extern Gfx *gDList;
 
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
 s32 CBarrel__CompareIcons();

@@ -8,7 +8,6 @@
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 extern u32 gDisplayListSize;              /* command buffer length, in commands */
-extern Gfx *gDList;             /* display list head */
 extern char gScene_m_Geom[];           /* shared material */
 
 void *CISet__GetBlock(void *resource, s32 index);

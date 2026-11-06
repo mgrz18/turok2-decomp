@@ -13,7 +13,6 @@ extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* frame buffer index */
 extern s32 gScreenWidth;              /* screen width */
 extern s32 gScreenHeight;              /* screen height */
-extern Gfx *gDList;             /* display list head */
 extern s32 gCameraPoolHideViews;
 extern Gfx gRspInitDL[];
 extern Gfx gRdpInitDL[];

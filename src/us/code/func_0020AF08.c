@@ -8,7 +8,6 @@
 #define GFX_W(pkt, a, b) { Gfx *_g = (Gfx *)(pkt); _g->w0 = (a); _g->w1 = (b); }
 
 extern u32 gDisplayListSize;              /* command buffer length, in commands */
-extern Gfx *gDList;             /* display list head */
 extern s32 gCurrentCombineMode;
 extern s32 gCurrentRenderMode;
 extern u32 gFogGeometryMode;              /* extra geometry mode bits */

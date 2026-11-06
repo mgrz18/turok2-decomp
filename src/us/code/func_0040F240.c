@@ -58,7 +58,6 @@ extern s32 D_800C1BC4;
 extern f32 D_800C1BC8;
 extern s32 gScreenWidth;
 extern s32 gScreenHeight;
-extern Gfx *gDList;
 /* gScene: a function that reads two of its fields does it through a local CScene * (one register). */
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 
