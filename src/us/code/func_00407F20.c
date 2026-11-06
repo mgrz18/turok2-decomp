@@ -4,6 +4,7 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/onscreen.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -24,7 +25,6 @@ typedef struct {
 
 extern u8 gScene[];
 extern u8 D_800B6660[];
-extern u8 gEngineApp_m_OnScreen[];
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
@@ -71,8 +71,8 @@ void TotemDefense_Complete(BossFight *fight) {
         }
     }
     fight->timer = 60.0f;
-    COnScreen__ClearBoss(gEngineApp_m_OnScreen);
-    COnScreen__ClearBoss2(gEngineApp_m_OnScreen);
+    COnScreen__ClearBoss(&gEngineApp_m_OnScreen);
+    COnScreen__ClearBoss2(&gEngineApp_m_OnScreen);
     switch (gScene_m_LevelID) {
     case 0x1BBC:
         player->m_Data.m_bLevel1TotemFlags = 1;

@@ -3,8 +3,8 @@
 
 #include "common.h"
 #include "globals/frame.h"
+#include "globals/save.h"
 extern char gBootSignature;
-extern char gSavedPlayers;
 extern char gEngineApp_m_Settings;
 extern char gLoadSavePersistentData;
 extern char gGamePersistentData;

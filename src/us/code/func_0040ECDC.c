@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/boss.h"
+#include "globals/onscreen.h"
 
 
 /* The update entries of the phase table: sBlindOnePhases_update is sBlindOnePhases + 4
@@ -14,7 +15,6 @@ s32 BlindOne_UpdateMover(s32);
 s32 BlindOne_GetHealthPercent(s32);
 s32 COnScreen__SetBossPercent(s32 *, s32);
 extern ModeHandler sBlindOnePhases_update[];
-extern s32 gEngineApp_m_OnScreen;
 
 void BlindOne_UpdateFight(BlindOneState *arg0)
 {

@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/onscreen.h"
 
 void CAI__SetMode(void *a0, void *a1, s32 event);
 void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
@@ -91,7 +92,6 @@ typedef struct {
 } Hit00402404;
 
 extern u8 sMantidQueenSpotHitScript[];
-extern u8 gEngineApp_m_OnScreen[];
 void ScriptAnimator_SetScript(void *slot, void *arg);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
 
@@ -142,5 +142,5 @@ void MantidQueen_Hurt(void *a0, Obj00402404 *obj, Hit00402404 *hit) {
     }
     percent = (sum >> 8) * 100 / 460;
     percent = MIN(MAX(percent, 0), 100);
-    COnScreen__SetBossPercent(gEngineApp_m_OnScreen, percent);
+    COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, percent);
 }

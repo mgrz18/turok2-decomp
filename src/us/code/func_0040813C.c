@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/onscreen.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -23,7 +24,6 @@ typedef struct {
 
 extern u8 gScene[];
 extern u8 D_800B6674[];
-extern u8 gEngineApp_m_OnScreen[];
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
@@ -60,8 +60,8 @@ void TotemDefense_Fail(BossFight *fight) {
     fight->state = 2;
     fight->warned = 2;
     setAnim(fight->obj, 0x5336);
-    COnScreen__ClearBoss(gEngineApp_m_OnScreen);
-    COnScreen__ClearBoss2(gEngineApp_m_OnScreen);
+    COnScreen__ClearBoss(&gEngineApp_m_OnScreen);
+    COnScreen__ClearBoss2(&gEngineApp_m_OnScreen);
     CScene__UnmarkGeneratorsSaved(gScene);
     if (fight->state != 1) {
         current = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;

@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/onscreen.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -28,7 +29,6 @@ typedef struct {
 extern s32 gScene;
 extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
-extern u8 gEngineApp_m_OnScreen[];
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 void *CPlayerPool__GetFirstActive(void *);
@@ -68,7 +68,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
         CCameraPool__AddTimedText(gEngineApp_m_Game.m_CameraPool, *(s32 *) ((u8 *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList) + 0x51C), D_800B6684, 4.0f);
         Sound__PlaySpeech(0x182);
     }
-    bar = gEngineApp_m_OnScreen;
+    bar = &gEngineApp_m_OnScreen;
     COnScreen__SetBossPercent(bar, toInt(fight->timer * (1.0f / 15) / (f32) fight->def->time * 100.0f));
     COnScreen__SetBossPercent2(bar, toInt((f32) (fight->def->kills - fight->count) / (f32) fight->def->kills * 100.0f));
     if (fight->state == 0) {

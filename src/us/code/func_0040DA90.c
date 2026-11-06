@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/onscreen.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
@@ -16,7 +17,6 @@ typedef struct Obj2 {
 
 extern f32 gFrameIncrement; /* frame time */
 extern BlindOnePhase sBlindOnePhases[];
-extern u8 gEngineApp_m_OnScreen[];
 extern void Animator_Update(void *slot);
 extern void BlindOne_UpdateMover(BlindOneMover *mover);
 extern s32 BlindOne_GetHealthPercent(BlindOneState *state);
@@ -39,5 +39,5 @@ void BlindOne_BossUpdate(void *obj, CAI *ai) {
     BlindOne_UpdateMover(&state->movers[0]);
     BlindOne_UpdateMover(&state->movers[1]);
     BlindOne_UpdateMover(&state->movers[2]);
-    COnScreen__SetBossPercent(gEngineApp_m_OnScreen, BlindOne_GetHealthPercent(state));
+    COnScreen__SetBossPercent(&gEngineApp_m_OnScreen, BlindOne_GetHealthPercent(state));
 }

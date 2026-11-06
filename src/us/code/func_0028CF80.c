@@ -3,6 +3,7 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/save.h"
 
 
 extern u8 gScene[];             /* the world */

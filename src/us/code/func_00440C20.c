@@ -1,12 +1,12 @@
 
 #include "common.h"
 #include "globals/boss.h"
+#include "globals/onscreen.h"
 s32 CAI__SetMode(s32, s32, s32);
 s32 COnScreen__SetBoss(s32 *, s32, s32 *);
 extern s32 sPrimagenSpawnScript1_2;
 extern s32 sPrimagenSoundScript3_2;
 extern s32 D_800C046C;
-extern s32 gEngineApp_m_OnScreen;
 void Primagen_UpdateMode28_2(s32 arg0, s32 arg1)
 {
   COnScreen__SetBoss(&gEngineApp_m_OnScreen, arg0, &D_800C046C);

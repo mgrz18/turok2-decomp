@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/save.h"
 
 extern u8 gScene[];             /* the world */
 s32 CScene__GetRegion(void *world, s32 region);

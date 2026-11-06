@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/onscreen.h"
 
 /* The actor's CAI (at 0x140), with the fields this sets. */
 typedef struct {
@@ -34,7 +35,6 @@ extern void TotemDefense_Update();
 extern void TotemDefense_OnEvent();
 extern void TotemDefense_DrawTotem();
 
-extern u8 gEngineApp_m_OnScreen[];
 /* Boss fight state (0x8012FB50 on). */
 extern BossActor *gTotemDefense[];   /* the boss */
 extern void *gTotemDefense_def[];        /* its definition + 0x14 */
@@ -52,7 +52,7 @@ static __inline__ void startBossAnim(BossActor *obj) {
     ai->animType = 0x5334;
     ai->flags &= ~1;
     ai->animRepeats = 0;
-    COnScreen__SetBoss(gEngineApp_m_OnScreen, obj, "Enemies", ai);
+    COnScreen__SetBoss(&gEngineApp_m_OnScreen, obj, "Enemies", ai);
 }
 
 void TotemDefense_Init(BossActor *obj, BossEvents *events) {
@@ -65,5 +65,5 @@ void TotemDefense_Init(BossActor *obj, BossEvents *events) {
     gTotemDefense_kills[0] = 0;
     obj->onDraw = TotemDefense_DrawTotem;
     startBossAnim(obj);
-    COnScreen__SetBoss2(gEngineApp_m_OnScreen, obj, "Time");
+    COnScreen__SetBoss2(&gEngineApp_m_OnScreen, obj, "Time");
 }
