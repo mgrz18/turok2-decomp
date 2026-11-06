@@ -1,27 +1,29 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80250938_de_14.c, func_80254A28_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/cache.h"
+#include "globals/cache.h"
 
-extern void *CCache__PopFreeMemEntry(s32 unused0, s32 arg1);
-extern s32 CList__AddHead(void *arg0, s32 arg1);
-void *CCache__PopFreeMemEntry(s32 unused0, s32 arg1) {
-    extern Pool gCache_freeEntryCount;
-    extern void **gCache_memEntriesFree;
-    struct ResourceCacheEntry *temp_s0;
-    if (gCache_freeEntryCount.count == 0) {
-        return 0;
+extern void CList__AddHead(CList *list, void *element);
+
+/* Takes a CMemEntry off the free stack and puts it at the head of the age list. */
+CMemEntry *CCache__PopFreeMemEntry(s32 unused0, s32 flags) {
+    CMemEntry *entry;
+
+    if (gCache.freeEntryCount == 0) {
+        return NULL;
     }
-    gCache_freeEntryCount.count -= 1;
-    temp_s0 = gCache_memEntriesFree[gCache_freeEntryCount.count];
-    temp_s0->flags = 0x800;
-    temp_s0->references = 0;
-    temp_s0->resource = 0;
-    temp_s0->callback = 0;
-    temp_s0->pending = 0;
-    temp_s0->owner = 0;
-    temp_s0->lastUsed = gCache_freeEntryCount.field44;
-    CList__AddHead((char *)&gCache_freeEntryCount - 0xBCC, (s32)temp_s0);
-    temp_s0->flags |= (arg1 & 0xC);
-    return temp_s0;
+    gCache.freeEntryCount -= 1;
+    entry = gCache.memEntriesFree[gCache.freeEntryCount];
+    entry->flags = MEMENTRY_FLAG_ALLOCATED;
+    entry->lockCount = 0;
+    entry->data = NULL;
+    entry->lockedNext = NULL;
+    entry->lockedLast = NULL;
+    entry->cacheEntry = NULL;
+    entry->age = gCache.ageCount;
+    CList__AddHead(&gCache.memAgeList, entry);
+    entry->flags |= (flags & 0xC);
+    return entry;
 }
