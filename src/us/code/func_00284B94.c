@@ -3,14 +3,14 @@
 #include "globals/game.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
+#include "globals/rumble.h"
 
 /* Controller pak / rumble service, run once per frame while enabled. */
 
-extern u8 gRumblePool[];
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flags);
 extern s32 osSendMesg(void *queue, void *msg, s32 flags);
-extern void RumblePool_FreeFinished(void *);
+extern void RumblePool_FreeFinished(RumblePool *pool);
 extern void Controller_ReadAll(void);
 extern void Controller_UpdateRumble(ControllerProfile *);
 extern s32 Controller_AnyPakWatched(void);
@@ -24,7 +24,7 @@ void Controller_Service(void) {
     if (gControllersInitialised == 0) {
         return;
     }
-    RumblePool_FreeFinished(gRumblePool);
+    RumblePool_FreeFinished(&gRumblePool);
     if (osRecvMesg(&gPakAccessQueue, NULL, 0) == 0) {
         Controller_ReadAll();
         for (i = 0, pad = gControllers; i < 4; i++, pad++) {

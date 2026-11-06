@@ -5,9 +5,9 @@
 #include "globals/game.h"
 #include "globals/camera.h"
 #include "globals/cinema.h"
+#include "globals/rumble.h"
 
 
-extern u8 gRumblePool[];
 /* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
  * gScene_m_LevelID are arrays because the ROM accesses them as struct members: a
  * store through a pointer may alias them, so their loads stay after it. */
@@ -20,7 +20,7 @@ extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this 
 void CPlayer__ResetControlState(CPlayer *player);
 s32 CScene__GetRegionIndex(void *world, s32 region);
 void CCameraPool__ReleaseAllTexts(void *game);
-void RumblePool_FreeAll(void *arg0);
+void RumblePool_FreeAll(RumblePool *pool);
 s32 CScene__FindNearestWarpDest(void *world, s32 *out, s32 id, void *spawn);
 void CScene__LoadLevel(void *world, s32 id, s32 flags);
 s32 Cinema_NoWaitCues(void);
@@ -56,7 +56,7 @@ void Cinema_Start(void) {
             player->m_WeaponActor.m_AI.m_VarBuffer[5] = 0;
         }
         CCameraPool__ReleaseAllTexts(&gEngineApp_m_Game_m_CameraPool);
-        RumblePool_FreeAll(gRumblePool);
+        RumblePool_FreeAll(&gRumblePool);
     }
     if (warp != -1) {
         world = gScene;

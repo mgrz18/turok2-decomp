@@ -2,6 +2,7 @@
 #include "structs/controller.h"
 #include "globals/pak.h"
 #include "globals/controller.h"
+#include "globals/rumble.h"
 
 /* Per-controller rumble pak state. */
 
@@ -30,8 +31,7 @@ static __inline__ void ResetPadMotor(ControllerProfile *pad) {
     osSendMesg(&gPakAccessQueue, NULL, 0);
 }
 
-extern u8 gRumblePool[];
-extern void RumblePool_FreeAll(void *);
+extern void RumblePool_FreeAll(RumblePool *pool);
 
 void Controller_SetRumbleOptionAll(s32 arg0) {
     ControllerProfile *pad;
@@ -46,6 +46,6 @@ void Controller_SetRumbleOptionAll(s32 arg0) {
         }
     }
     if (arg0 == 0) {
-        RumblePool_FreeAll(gRumblePool);
+        RumblePool_FreeAll(&gRumblePool);
     }
 }

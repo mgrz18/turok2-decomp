@@ -7,6 +7,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/world.h"
+#include "globals/rumble.h"
 struct LevelActor;
 struct Triple;
 struct Box;
@@ -254,7 +255,6 @@ struct LevelActor;
 struct Triple;
 struct Triple;
 extern f32 D_800A65D8;
-extern s32 gRumblePool;
 extern void CScene__StartRumbles(void *, void *, s32, Triple, f32, f32);
 void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, s32 arg2, Triple arg3, Params_func_802681A8_de arg6) {
     void *resource;

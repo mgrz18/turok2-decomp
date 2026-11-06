@@ -2,13 +2,13 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/rumble.h"
 
 /* Turok 2: the mode block sits at 0x23FD0 (see CEngineApp__UpdateCinemaMode). */
 
-extern char gRumblePool[];
 
 void Controller_SetRumbleOptionAll(s32);
-void RumblePool_FreeAll(void *);
+void RumblePool_FreeAll(RumblePool *pool);
 void func_0025359C(void *);
 
 /* Resets the match state and asks the session for mode 1. */
@@ -16,7 +16,7 @@ void func_00430330(CEngineApp *session) {
     GameMatch *m;
 
     Controller_SetRumbleOptionAll(0);
-    RumblePool_FreeAll(gRumblePool);
+    RumblePool_FreeAll(&gRumblePool);
     func_0025359C(&gEngineApp_m_Game.m_PlayerList);
     m = &gEngineApp_m_Settings.match;
     m->teams = 0;

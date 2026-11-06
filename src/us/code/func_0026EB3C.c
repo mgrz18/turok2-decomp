@@ -1,35 +1,27 @@
 #include "common.h"
-#include "structs/camera.h"
+#include "structs/rumble.h"
 
-/* A pool of 0x3C-byte elements: the free list, the used list and a count. */
-typedef struct {
-    /* 0x00 */ CList m_Free;
-    /* 0x14 */ CList m_Used;
-    /* 0x28 */ s32 m_nCount;
-} CPool;
+void CList__Construct(CList *list, s32 lastOffset, s32 nextOffset);
+void CList__AddTail(CList *list, void *element);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
 
-s32 CList__Construct(void *, s32, s32);    /* extern */
-s32 CList__AddTail(void *, s32);                 /* extern */
-s32 __osDisableInt();                                /* extern */
-s32 __osRestoreInt(s32);                         /* extern */
+/* Puts every one of the count effects on the pool's free list. */
+void RumblePool_Init(RumblePool *pool, RumbleEffect *effects, s32 count) {
+    u32 mask;
+    s32 i;
 
-void RumblePool_Init(CPool *arg0, s32 arg1, s32 arg2) {
-    s32 temp_s4;
-    s32 var_s0;
-    s32 var_s1;
-
-    var_s1 = arg1;
-    temp_s4 = __osDisableInt();
-    CList__Construct(&arg0->m_Free, 0, 4);
-    CList__Construct(&arg0->m_Used, 0, 4);
-    var_s0 = 0;
-    if (arg2 > 0) {
+    mask = __osDisableInt();
+    CList__Construct(&pool->free, 0, 4);
+    CList__Construct(&pool->active, 0, 4);
+    i = 0;
+    if (count > 0) {
         do {
-            CList__AddTail(&arg0->m_Free, var_s1);
-            var_s0 += 1;
-            var_s1 += 0x3C;
-        } while (var_s0 < arg2);
+            CList__AddTail(&pool->free, effects);
+            i++;
+            effects++;
+        } while (i < count);
     }
-    arg0->m_nCount = 0;
-    __osRestoreInt(temp_s4);
+    pool->baseLevel = 0;
+    __osRestoreInt(mask);
 }
