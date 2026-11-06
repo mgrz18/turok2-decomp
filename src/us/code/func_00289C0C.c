@@ -1,14 +1,13 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 s32 Cinema_RequestById(s32);
 s32 CScene__RequestWarp(s32, s32, s32);
 
 CPlayer *CPlayerPool__GetFirstActive(void *);                     /* extern */
 void CEngineApp__StartWarp(s32, s32);                       /* extern */
-extern s32 gFinalEnding;
-extern s32 gEndingPrimagenDefeated;
 extern s32 gScreenHeight;
 extern s32 sCreditsLine;
 extern u8 gScene[];

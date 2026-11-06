@@ -56,7 +56,6 @@ typedef struct {
     /* 0x110 */ void *colorImage;
 } FrameBuffers;
 
-extern s32 gPersistentDataLoaded;
 extern s32 gScreenWidth;      /* screen width */
 extern s32 gScreenHeight;      /* screen height */
 extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose gEngineApp_m_Settings is not this file's s32) */

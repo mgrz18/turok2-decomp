@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
@@ -37,7 +38,6 @@ extern s32 D_8011F144;
 extern s32 D_8011B114;
 extern f32 gPakCheckTimer;
 extern u8 gGfxFrameMessageQueue[];         /* the engine message queue */
-extern u8 gBootSignature;
 
 extern void InitializeSystemResources(void);
 extern void osCreateViManager(s32 pri);
@@ -150,7 +150,7 @@ void CEngineApp__Main(CEngineApp *e) {
              * merges them); without it GCC also keeps the case constant 2 in $s1 across the loop
              * (12 words differ). Found by the permuter; no natural form found. */
             if (gGfxMsg != NULL) {
-                gBootSignature = 0;
+                gBootSignature[0] = 0;
                 Controller_ResetAllRumble();
                 Controller_SetRumbleOptionAll(0);
                 e->m_Settings.fastFade = 1;
@@ -158,7 +158,7 @@ void CEngineApp__Main(CEngineApp *e) {
                 e->m_Settings.unk1C8 = 1;
                 break;
             } else {
-                gBootSignature = 0;
+                gBootSignature[0] = 0;
                 Controller_ResetAllRumble();
                 Controller_SetRumbleOptionAll(0);
                 e->m_Settings.fastFade = 1;

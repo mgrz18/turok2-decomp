@@ -1,11 +1,11 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/engine.h"
 
 extern void func_002888BC(s32, s32, s32);
 extern s32 PakMenu_PickDefaultPort(void);
 extern s32 PakMenu_HasPort(void);
 extern s32 CScene__LoadLevel(s32, s32, s32);
-extern s32 gPakCheckStarted;
 extern s32 gPakMenuPort;
 extern u8 gScene[];
 extern s32 gPakCheckTimedOut;

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/frame.h"
+#include "globals/engine.h"
 
 s32 CCache__Unlock(s32, s32);                /* extern */
 s32 CScene__LoadGraphicSet(s32 *, s32, s32, s32); /* extern */
 s32 Hud_DrawImageFrame(s32, s32, s16, s16, f32, f32, s32); /* extern */
-extern s32 gPersistentDataLoaded;
 extern s32 gDisplayListSize;
 extern s32 gDList;
 extern s32 gScene;

@@ -76,7 +76,6 @@ void __scExec(Vid *o, Job *a, Job *b);
 extern u64 sGfxRspResumeTime;
 extern u64 sAudioTaskStartTime;
 extern f32 sGfxRspTime;
-extern s32 sSchedGfxWatchdog;
 extern View gEngineApp[];
 extern u32 gDisplayList0;
 void __scHandleRSP(Vid *o) {

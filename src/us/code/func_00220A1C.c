@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/world.h"
+#include "globals/engine.h"
 
 typedef struct Floor {
     u8 data[0x20];
@@ -17,7 +18,6 @@ typedef struct FloorGrid {
     FloorCell cells[1];         /* 0x08 */
 } FloorGrid;
 
-extern s32 gPersistentDataLoaded;
 
 void *CISet__GetBlock(void *table, s32 index);
 s32 CGameRegion__ContainsXZ(Floor *floor, f32 x, f32 z);      /* point over floor */

@@ -5,6 +5,7 @@
 #include "structs/world.h"
 #include "structs/list.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 /* The animation header: what this reads of it. */
 typedef struct AnimInfo {
@@ -14,7 +15,6 @@ typedef struct AnimInfo {
 } AnimInfo;
 
 extern CScene gScene;
-extern s32 gPersistentDataLoaded;                  /* effects enabled */
 extern s32 gDefaultVisBits;
 extern s32 gScene_m_bStreamAll;
 extern char D_800A6070[];               /* "anim object index" */

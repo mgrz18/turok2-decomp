@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 /* gEngineApp_m_Settings_match (GameMatch in structs/game.h) as a local array view, under an
  * alias of the symbol: through it the compiler bases both stores on
@@ -14,7 +15,6 @@ extern u8 gGfxFrameMessageQueue[];
 extern u8 gGfxFrameMessageBuffer[];
 extern u8 gSchedulerStack[];
 extern u8 gScheduler[];
-extern s32 gThreadPriorityScheduler;
 extern u8 gGfxClient[];
 extern s32 gDList;
 extern u8 gIdentityMtx[];

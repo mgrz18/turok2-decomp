@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/engine.h"
 
 s32 memset(s32, s32, s32);           /* extern */
 s32 osCreateMesgQueue(s32, s32, s32);           /* extern */
 s32 osCreateThread(s32, s32, s32 *, s32, s32, s32); /* extern */
 s32 osStartThread(s32);                         /* extern */
-extern s32 gThreadPriorityDecompressorLow;
 extern s32 CDecompressor__Main;
 
 void CDecompressor__Construct(s32 arg0, s32 arg1) {

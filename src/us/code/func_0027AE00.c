@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/engine.h"
 
 extern u8 gScene[];
-extern s32 gPersistentDataLoaded;
 extern s32 CScene__LoadGraphicSet(void *, s32, s32, s32);
 
 s32 func_0027AE00(s32 arg0) {

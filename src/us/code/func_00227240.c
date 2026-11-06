@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/level_actor.h"
+#include "globals/engine.h"
 
-extern s32 gPersistentDataLoaded;
 extern u8 gScene[];                 /* the world */
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gLevelActorIntelligenceMP[];

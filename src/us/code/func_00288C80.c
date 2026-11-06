@@ -5,20 +5,19 @@
 s32 CEngineApp__Update(s32);
 s32 SavedPlayers_UpdateTimer(void);
 
-extern s32 D_800B6D7C;
 extern s32 gDisplayListCount;
 
 /* The frame/game state block passed to the per-mode handlers (the
- * handler table gEngineModeTable/D_800B6D7C has 0xC-byte rows indexed by mode). */
+ * handler table gEngineModeTable has 0xC-byte rows indexed by mode). */
 
 void CEngineApp__Retrace(CEngineApp *arg0) {
-    s32 (*temp_v0)(void *);
+    void (*temp_v0)(struct CEngineApp *);
 
     if (gFirstFrame != 0) {
         gFirstFrame = 0;
     }
     SavedPlayers_UpdateTimer();
-    temp_v0 = *(((__typeof__(&D_800B6D7C))((s8 *)&D_800B6D7C + (arg0->m_Settings.mode * 0xC))));
+    temp_v0 = gEngineModeTable[arg0->m_Settings.mode].retrace;
     if (temp_v0 != NULL) {
         temp_v0(arg0);
     }
