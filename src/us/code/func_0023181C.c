@@ -3,7 +3,7 @@
 #include "structs/particle.h"
 #include "globals/scene.h"
 
-s32 CParticleSystem__Free(s32 *, void *);           /* extern */
+s32 CParticleSystem__Free(CParticleSystem *, void *);           /* extern */
 s32 CParticle__StopLoopSound(void *);                      /* extern */
 s16 *CPlayer__GetFiringAmmo(s32, s32);                   /* extern */
 
@@ -27,7 +27,7 @@ void func_0023181C(CParticle *arg0) {
     if (temp_s0_2 != NULL) {
         temp_a0 = temp_s0_2->header.m_Type;
         if ((temp_a0 == 2) && (temp_s0_2->m_dwFlags & 0x100) && ((temp_v1 = temp_s0_2->header.m_nObjType, (temp_v1 == temp_a0)) || (temp_v1 == 0x111))) {
-            CParticleSystem__Free(gScene.m_ParticleSystem, temp_s0_2);
+            CParticleSystem__Free(&gScene.m_ParticleSystem, temp_s0_2);
             CParticle__StopLoopSound(temp_s0_2);
         }
     }

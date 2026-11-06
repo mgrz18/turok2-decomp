@@ -11,7 +11,7 @@ extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);  /* tra
 extern void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);  /* out = a + b */
 extern CMtxF *CParticle__GetParentTransform(CParticle *p, s32 arg1);         /* parent transform */
 extern void GameObject_TraceMove(CParticle *p, CVector3 to, CVector3 *outPos, void **outRegion, s32, s32);
-extern void CParticleSystem__Spawn(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 model, CVector3 dir,
+extern void CParticleSystem__Spawn(CParticleSystem *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 model, CVector3 dir,
                           CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
 
 static __inline__ f32 offset_x(CParticle *p) {
@@ -72,6 +72,6 @@ void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 flags) {
         }
         gCollisionResultsP = &gCollisionResults;
     }
-    CParticleSystem__Spawn(gScene.m_ParticleSystem, p, p->m_pOwner, p->m_pOwnerCount, p->m_pTarget, model, direction, rotation, point, region,
+    CParticleSystem__Spawn(&gScene.m_ParticleSystem, p, p->m_pOwner, p->m_pOwnerCount, p->m_pTarget, model, direction, rotation, point, region,
                   arg2, flags | (p->m_dwFlags & 0x200006));
 }

@@ -6,7 +6,7 @@ void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
-s32 CParticleSystem__Spawn(void *table, void *actor, void *owner, s32 *ownerCount, void *target, s32 kind, CVector3 origin,
+s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *owner, s32 *ownerCount, void *target, s32 kind, CVector3 origin,
                   CQuaternion rot, CVector3 pos, void *region, s32 b, s32 c);
 
 /* Spawns `count` copies along the segment the actor covered this frame. */
@@ -25,7 +25,7 @@ void CParticle__SpawnAlongPath(CParticle *actor) {
         dir = actor->m_vVelocity;
         CQuaternion__FromDirection(&rot, &dir);
         CVector3__Subtract(&delta, &actor->header.m_vPos, &actor->m_vLastPos);
-        table = gScene.m_ParticleSystem;
+        table = &gScene.m_ParticleSystem;
         for (i = 1; i <= count; i++) {
             CVector3__Scale(&pos, &delta, i / (count + 1.0f));
             CVector3__Add(&pos, &pos, &actor->m_vLastPos);

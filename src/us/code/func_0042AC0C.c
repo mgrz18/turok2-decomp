@@ -66,7 +66,7 @@ extern s32 CScene__DecompressPaths(s32, s32);
 extern void SceneActorPool_Construct(CLevelActorPool *);
 extern void CInstancePool__Construct(void *);
 extern void func_0042D120(void *);
-extern void CParticleSystem__Construct(void *, s32);
+extern void CParticleSystem__Construct(CParticleSystem *, s32);
 extern void func_0042D410(void *);
 extern void CPlayerPool__LevelStart(void *);
 extern void CPlayer__StopLoopingSounds(void *);
@@ -139,7 +139,7 @@ loaded:
     gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
-    CParticleSystem__Construct(w->m_ParticleSystem, *w->m_pParticleEffects);
+    CParticleSystem__Construct(&w->m_ParticleSystem, *w->m_pParticleEffects);
     SceneActorPool_Construct(&w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
     func_0042D410(gEngineApp_m_SwooshSystem);

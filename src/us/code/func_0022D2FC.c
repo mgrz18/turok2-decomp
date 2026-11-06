@@ -917,7 +917,7 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
         child = actor->child;
         if (child != NULL && (kind = child->kind) == 2 && (child->flags & 0x100) &&
             (child->typeId == kind || child->typeId == 0x111)) {
-            CParticleSystem__Free(gScene.m_ParticleSystem, child);
+            CParticleSystem__Free((u8 *) &gScene.m_ParticleSystem, child);
             CParticle__StopLoopSound(child);
         }
         CParticle__StopLoopSound(actor);

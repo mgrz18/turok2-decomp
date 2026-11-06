@@ -12,11 +12,11 @@ extern s32 func_0026C0E0(void *region);
  * through gCollisionResults does not give this code. */
 extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
-extern void CParticleSystem__Spawn(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 type, CVector3 dir,
+extern void CParticleSystem__Spawn(CParticleSystem *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 type, CVector3 dir,
                           CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
 extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
-extern void CParticleSystem__Free(void *sys, CParticle *p);
+extern void CParticleSystem__Free(CParticleSystem *sys, CParticle *p);
 extern void CParticle__StopLoopSound(CParticle *p);
 
 void CParticle__HitFloor(CParticle *arg0) {
@@ -56,7 +56,7 @@ void CParticle__HitFloor(CParticle *arg0) {
             position = arg0->m_vVelocity;
         }
         CQuaternion__FromDirection(&rotation, &position);
-        CParticleSystem__Spawn(gScene.m_ParticleSystem, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
+        CParticleSystem__Spawn(&gScene.m_ParticleSystem, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
                       rotation, gCollisionResults_m_vFloorPos, gCollisionResults_m_pFloorRegion, -3, (arg0->m_dwFlags & 0x200006) | 1);
     }
     if (sound != 0xFFFF) {
@@ -65,7 +65,7 @@ void CParticle__HitFloor(CParticle *arg0) {
     CVector3__Scale(&arg0->m_vRotSpeed, &arg0->m_vRotSpeed, arg0->m_RotationScale);
     arg0->m_dwFlags |= 0x200;
     if (arg0->m_bDieOnBounce == 1) {
-        CParticleSystem__Free(gScene.m_ParticleSystem, arg0);
+        CParticleSystem__Free(&gScene.m_ParticleSystem, arg0);
         CParticle__StopLoopSound(arg0);
     }
 }

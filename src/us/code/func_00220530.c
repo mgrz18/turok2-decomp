@@ -23,7 +23,7 @@ void CScene__LoadVisibleGridSections(CScene *);
 void CScene__CollectSectorObjects(CScene *);
 void CPlayerPool__AnimateWeapons(void *);
 void CCameraPool__Draw(void *, CScene *);
-void CParticleSystem__Update(void *);
+void CParticleSystem__Update(CParticleSystem *);
 void SwooshSystem_Update(void *);
 void CScene__AdvanceInstances(CScene *);
 void CScene__AdvanceListedInstances(CScene *);
@@ -68,7 +68,7 @@ void CScene__Update(CScene *world) {
         CPlayerPool__AnimateWeapons(&gEngineApp_m_Game.m_PlayerList);
     }
     CCameraPool__Draw(gEngineApp_m_Game_m_CameraPool, world);
-    CParticleSystem__Update(world->m_ParticleSystem);
+    CParticleSystem__Update(&world->m_ParticleSystem);
     if (world->m_WarpState == 0 && *(s32 *)(gEngineApp_m_Game_m_CameraPool + 0x13F4) == 0) {
         SwooshSystem_Update(gEngineApp_m_SwooshSystem);
         CScene__AdvanceInstances(world);
