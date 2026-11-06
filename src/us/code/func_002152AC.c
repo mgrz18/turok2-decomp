@@ -52,7 +52,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
         if (obj->m_DrawnFrame != (u8)gFrameCount) {
             Model_AdvanceMorph(geometry, obj->m_AnimSpeed);
         }
-        Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, gEvenOdd, obj->header.m_pIntelligence->m_nTexture);
+        Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, &obj->m_Lights, 0, gEvenOdd, obj->header.m_pIntelligence->m_nTexture);
     } else {
         variant = obj->header.m_pIntelligence->m_nModel;
         index = CScene__GetObjectTypeID(&gScene, obj->header.m_nObjType);
@@ -66,7 +66,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
                 }
             }
         }
-        Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, variant, obj->header.m_pIntelligence->m_nTexture);
+        Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, &obj->m_Lights, 0, variant, obj->header.m_pIntelligence->m_nTexture);
     }
     CCache__Unlock(0, geometry);
     obj->m_DrawnFrame = (u8)gFrameCount;

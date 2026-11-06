@@ -78,7 +78,7 @@ void CScene__CollectSectorObjects(CScene *world) {
                 pos.x = actor->header.m_vPos.x;
                 pos.y = actor->header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
                 pos.z = actor->header.m_vPos.z;
-                CScene__GetLightsAt(world, &pos, actor->m_Lights);
+                CScene__GetLightsAt(world, &pos, &actor->m_Lights);
             }
             if (gCameraVisibleBox.m_vMax.x > actor->m_Bounds.m_vMin.x && gCameraVisibleBox.m_vMin.x < actor->m_Bounds.m_vMax.x
                 && gCameraVisibleBox.m_vMax.z > actor->m_Bounds.m_vMin.z && gCameraVisibleBox.m_vMin.z < actor->m_Bounds.m_vMax.z
