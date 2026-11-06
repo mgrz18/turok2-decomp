@@ -3,7 +3,6 @@
 #include "globals/game.h"
 
 extern f32 gFrameIncrement;      /* frame step */
-extern u8 gEngineApp_m_Settings_multiplayer;
 extern s32 gEngineApp_m_Settings_match_teams;
 extern s32 gEngineApp_m_Settings_match_tag;
 

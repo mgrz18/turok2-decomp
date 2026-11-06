@@ -23,8 +23,6 @@ typedef struct {
 
 extern s32 gScene[];
 extern CCamera *gEngineApp_m_Game_m_CameraPool_m_Cameras;     /* the camera pool's first camera */
-extern s32 gEngineApp_m_Settings_mode;          /* game mode */
-extern s32 gEngineApp_m_Settings_nextMode;
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* the players */
 extern s32 gCameraPoolHideViews;
 extern s32 gFrameCountGameplay;

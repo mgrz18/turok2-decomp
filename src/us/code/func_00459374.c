@@ -15,7 +15,6 @@ extern s32 gPakMenuLeaving;
 extern s32 sGameNoteLoad;
 extern s32 gPakNoteIndex;
 extern CScene gScene[];
-extern u8 gEngineApp_m_Settings_unk180;
 extern f32 gEngineApp_m_Settings_match_seconds[];
 extern f32 gEngineApp_m_Settings_match_minutes[];
 extern f32 gEngineApp_m_Settings_match_hours[];
