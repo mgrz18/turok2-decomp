@@ -6,7 +6,6 @@
 
 extern void CCache__ClearDisplayListLocks(s32, s32);
 extern s32 gCache;
-extern int gCacheEntryCount;
 void CCache__ClearDisplayListLocks(s32 arg0, s32 arg1)
 {
   s32 mask;

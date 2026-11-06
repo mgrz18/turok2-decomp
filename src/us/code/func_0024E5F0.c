@@ -1,17 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/game.h"
-
-typedef struct PlayerStateInfo {
-    /* 0x00 */ void (*enter)(CPlayer *player, void *arg);
-    /* 0x04 */ void *unk4;
-    /* 0x08 */ void *unk8;
-    /* 0x0C */ u32 flags;
-    /* 0x10 */ s32 unk10;
-    /* 0x14 */ s16 unk14;
-} PlayerStateInfo;
-
-extern PlayerStateInfo gPlayerStateTable[];
+#include "globals/player.h"
 
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
 
@@ -35,8 +25,8 @@ s32 CPlayer__SetState(CPlayer *player, void *arg, s32 state) {
         gPlayerStateTable[state].enter(player, arg);
     }
     player->m_ModeFlags = gPlayerStateTable[player->m_Mode].flags;
-    if (gPlayerStateTable[player->m_Mode].unk10 != 0) {
-        player->m_CharAnim = gPlayerStateTable[player->m_Mode].unk10;
+    if (gPlayerStateTable[player->m_Mode].anim != 0) {
+        player->m_CharAnim = gPlayerStateTable[player->m_Mode].anim;
     }
     if (player->m_Mode == state) {
         player->m_ModeTime = 0.0f;

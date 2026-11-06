@@ -7,6 +7,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#include "globals/particle.h"
 
 typedef struct Target Target;
 
@@ -124,7 +125,7 @@ void CParticle__HitInstanceBody(CParticle *p) {
         if (effect != 0xFFFF) {
             void *eventSource = source;
 
-            if (gImpactEventHandlers_m_Flags[effect].m_Flags & 2) {
+            if (gImpactEventHandlers[effect].flags & 2) {
                 eventSource = p;
             }
             ImpactEvent_Send(eventSource, p, effect, -1, gCollisionResults.m_vInstancePos, params);

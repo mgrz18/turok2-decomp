@@ -8,21 +8,12 @@
 #include "globals/scene.h"
 #include "globals/collision.h"
 #include "globals/engine.h"
+#include "globals/pickup.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
     /* 0x0C */ CVector3 max;
 } Box;
-
-typedef struct ContactHandler ContactHandler;
-struct ContactHandler {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ s16 type;
-    /* 0x06 */ u8 pad6[0x10 - 6];
-    /* 0x10 */ s32 (*func)(CPlayer *player, ContactHandler *handler);
-};
-
-extern ContactHandler sParticleAmmoPickups[4];
 
 s32 Random_Next(void);
 s32 Collision_MoveInstance(CParticle *p, CVector3 pos, u32 *flags);
@@ -56,7 +47,7 @@ void CParticle__Update(CParticle *p) {
     Box bounds;
     CGameObjectInstance *target;
     CPlayer *player;
-    ContactHandler *handler;
+    CPickupRow14 *handler;
     f32 extent;
     f32 scaled;
     f32 half;
@@ -189,7 +180,7 @@ void CParticle__Update(CParticle *p) {
                     if (dist < GameObject_GetCollisionRadius(player) + 51.199997f) {
                         handler = sParticleAmmoPickups;
                         for (i = 3; i != -1; handler++, i--) {
-                            if (handler->type == p->header.m_nObjType && handler->func(player, handler)) {
+                            if (handler->m_Id == p->header.m_nObjType && handler->m_pHandler(player, handler)) {
                                 p->m_dwFlags |= 0x1000;
                                 return;
                             }

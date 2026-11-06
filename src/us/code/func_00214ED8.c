@@ -1,7 +1,7 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/scene.h"
 
-extern s32 gNextUniqueId;
 
 s32 Instance_NextUniqueId(void) {
     s32 temp_v0;

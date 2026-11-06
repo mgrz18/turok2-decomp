@@ -69,8 +69,6 @@ extern Mtx sAutomapOrthoMtx;
 extern MapVtx sAutomapLineVtx[2][0x200];
 extern MapVtx sAutomapMagentaVtx[2][8];
 extern MapVtx sAutomapYellowVtx[2][3];
-extern u8 gRspInitDL[];
-extern u8 gRdpInitDL[];
 
 extern char *CISet__GetBlock(s32 *data, s32 index);
 extern void CMtxF__InvertAffine(f32 *out, f32 *m);

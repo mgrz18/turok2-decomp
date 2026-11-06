@@ -4,9 +4,7 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/scene.h"
-
-extern s32 gTagModeModel;
-extern s32 gCharacterModels[];
+#include "globals/player.h"
 
 extern CIntelligence *CScene__FindIntelligence(void *world, s32 kind, s32 character);
 extern s32 Random_Next(void);

@@ -7,10 +7,8 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 
-extern s32 gFogEnabled;
 extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern f32 sExpansionPakMtx[][16];        /* per-frame matrices */
-extern u8 gDefaultLights[];
 extern u8 sExpansionPakText[];
 
 extern s32 CScene__FindObjectType(void *, s32);
@@ -42,7 +40,7 @@ void EngineMode03_ExpansionPak_Draw(CEngineApp *view) {
     CMtxF__ToMtxAffine(mtx, sExpansionPakMtx[gEvenOdd]);
     key = CScene__GetObject(&gScene, id);
     Render_ResetBatches();
-    Render_QueueModelByKey(key, sExpansionPakMtx[gEvenOdd], gDefaultLights, 0, -1);
+    Render_QueueModelByKey(key, sExpansionPakMtx[gEvenOdd], &gDefaultLights, 0, -1);
     Render_FlushBatches();
     Render_DrawTextLines(view, 0, sExpansionPakText, gScreenWidth / 2, 0xBE, 0xA, 0.8f, 1.0f);
 }

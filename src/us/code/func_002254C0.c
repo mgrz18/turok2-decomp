@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028C6B0.c, func_0028C6B0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -8,7 +9,6 @@
 #include "structs/light.h"
 void CScene__FindLightsAt(CScene *lv, CVector3 *a, u8 *buf, s32 *out);
 void CScene__ComputeLights(u8 *buf, s32 n, CVector3 *a, CLights1 *out);
-extern s32 gLevelLightsEnabled;
 s32 *CISet__GetBlock(s32 *tbl, s32 idx);
 
 /* A separate function in Rage Wars; inlined into this one in Turok 2. */

@@ -4,14 +4,7 @@
 #include "structs/player.h"
 #include "structs/intelligence.h"
 #include "globals/engine.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x22];
-    /* 0x22 */ s16 strokeSound;
-} Tuning;
-
-extern char gStandLookTuning;     /* standing look tuning */
-extern Tuning gWadeMoveTuning;   /* wading move tuning */
+#include "globals/player.h"
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
@@ -87,6 +80,6 @@ void PlayerWade_Update(CPlayer *player, CGameObjectInstance *body) {
     player->m_SfxTimer += gFrameIncrement;
     if (5.12f < player->m_TotalSpeed && 11.25f < player->m_SfxTimer) {
         player->m_SfxTimer = 0.0f;
-        Sound__Play(gWadeMoveTuning.strokeSound, body->header.m_vPos, 0, -1);
+        Sound__Play(gWadeMoveTuning.impulseSound, body->header.m_vPos, 0, -1);
     }
 }

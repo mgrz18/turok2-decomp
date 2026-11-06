@@ -8,7 +8,6 @@
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-extern void (*sCollisionTests[])(Sweep *);   /* the collision tests, NULL-ended */
 extern CCollisionInfo D_800F1E10;
 extern CCollisionInfo D_800F1CC0;
 extern CCollisionInfo D_800F1C60;

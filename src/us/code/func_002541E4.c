@@ -3,10 +3,8 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/player.h"
 
-
-extern s32 gTagModeModel;
-extern s32 gCharacterModels[];
 extern void CScene__SetInstanceObjectType(void *, CPlayer *, s32, s32);
 
 void CPlayer__LoadCharacterModel(CPlayer *player) {

@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/weapon.h"
+#include "globals/player.h"
 
-extern f32 gBarrelSlotScale;              /* slot scale */
 
 f32 Math_Approach(f32 value, f32 target, f32 rate);
 void CMtxF__Identity(f32 *m);

@@ -8,8 +8,6 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 
-extern u8 gRspInitDL[];
-extern u8 gRdpInitDL[];
 extern B21Vp gScreenViewport[];
 void CEngineApp__BeginDisplayList(void)
 {

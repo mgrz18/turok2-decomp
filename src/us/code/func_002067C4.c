@@ -6,7 +6,6 @@
 
 extern s32 gCache;
 extern s32 gCache_blocker;
-extern int gCacheEntryCount;
 extern void osSendMesg(void *arg0, s32 arg1, s32 arg2);
 void CCache__ReleaseDisplayList(s32 unused, s32 arg1) {
     s32 mask;

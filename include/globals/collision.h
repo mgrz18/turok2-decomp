@@ -4,6 +4,8 @@
 /* The collision results and the collision probes (structs/collision.h). */
 
 #include "structs/collision.h"
+#include "common.h"
+#include "structs/vector.h"
 
 extern CCollisionResults gCollisionResults;    /* Turok 3's collision_results */
 extern CCollisionResults *gCollisionResultsP;  /* Turok 3's p_collision_results */
@@ -23,5 +25,9 @@ extern CGameRegion *gCollisionResults_m_pWaterRegion;
 extern CVector3 gCollisionResults_m_vWaterPos;
 extern s32 gCollisionResults_m_nWaterKind;
 extern CVector3 gCollisionResults_m_vVelocity;
+
+extern void (*sCollisionTests[8])(Sweep *sweep);    /* NULL-ended; Collision_MoveInstance */
+/* Quad_SetBoxTop, Quad_SetBoxSide*: NULL-ended (Platform_CollideBox). */
+extern void (*sBoxSideFaceBuilders[8])(CollisionQuad *quad, CVector3 *points);
 
 #endif

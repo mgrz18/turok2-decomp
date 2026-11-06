@@ -28,7 +28,6 @@ typedef struct WTab {
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
 
 extern char D_800A57B8[];
-extern s32 gLevelLightsEnabled;
 extern CVector3 sLitVertexOffsets[];
 
 void *CISet__GetBlock(void *file, s32 index);

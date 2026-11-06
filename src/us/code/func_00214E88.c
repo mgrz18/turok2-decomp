@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "globals/scene.h"
 
 /* What this reads. */
 typedef struct {
@@ -11,7 +12,6 @@ typedef struct {
 } Drawable;
 
 void CCache__Touch(s32, s32);                       /* extern */
-extern s32 gLitVerticesKey;
 
 void CStaticObject__TouchLitVertices(Drawable *arg0) {
     if (!(arg0->flags & 0x40) && (arg0->frame != (u8)gFrameCount)) {

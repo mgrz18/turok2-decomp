@@ -2,10 +2,9 @@
 #include "structs/player.h"
 #include "globals/game.h"
 #include "globals/engine.h"
+#include "globals/player.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
-
-extern f32 gCharacterHealthRegen[];
 
 void CPlayer__RegenerateHealth(CPlayer *player) {
     f32 rate;

@@ -5,8 +5,8 @@
 #include "globals/game.h"
 #include "globals/engine.h"
 #include "globals/camera.h"
+#include "globals/player.h"
 
-extern s32 gDeathTint;          /* a tint forced over the view */
 extern u8 gDeathTintColor[4];        /* its colour */
 void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 void CCamera__UpdateFlash(CCamera *cam);

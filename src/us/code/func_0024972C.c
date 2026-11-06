@@ -4,10 +4,7 @@
 #include "gfx.h"
 #include "globals/game.h"
 #include "globals/scene.h"
-
-
-extern s32 gTagModeModel;
-extern s32 gCharacterModels[];
+#include "globals/player.h"
 
 void CScene__SetInstanceObjectType(void *world, CPlayer *player, s32 model, s32 arg3);
 void CGameObjectInstance__Draw(CPlayer *player, s32 arg1);

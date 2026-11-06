@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
 
-extern int osResetType;
 extern void osInitialize();
 extern int __osSiRawReadIo(unsigned int devAddr, unsigned int * data);
 extern int __osSiRawWriteIo(unsigned int devAddr, unsigned int data);
@@ -13,11 +12,9 @@ extern void osMapTLBRdb();
 extern u32 __osInitialized;
 extern Quad_func_802A1BE0_de __osException[];
 extern u64 osClockRate;
-extern unsigned char osAppNMIBuffer[];
 extern void __osSetSR(unsigned int sr);
 extern unsigned int __osSetFpcCsr(unsigned int csr);
 extern unsigned int __osGetSR();
-extern s32 osTvType;
 extern void osWritebackDCache(void *addr, s32 size);
 extern void osInvalICache(void *addr, s32 size);
 extern void *memset(void *dst, s32 value, u32 size);

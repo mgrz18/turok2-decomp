@@ -3,6 +3,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/engine.h"
+#include "structs/light.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -14,8 +15,6 @@ typedef struct {
     /* 0x10 */ u8 pad10[0x18 - 0x10];
     /* 0x18 */ s32 flag;
 } DrawInfo;
-
-extern s32 gBlendState;
 
 extern void ScriptAnimator_Apply(ScriptAnimator *light);
 extern void ScreenTint_UpdateMode(void);

@@ -39,8 +39,6 @@ typedef struct {
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
 
-extern s32 gNextUniqueId;
-
 void *CScene__GetIntelligence(void *, s32);
 void CMtxF__SetRotateY(f32 *mtx, f32 angle);
 void CMtxF__ScaleAxes(f32 *mtx, f32 x, f32 y, f32 z);

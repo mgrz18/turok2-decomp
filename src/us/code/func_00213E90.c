@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "globals/engine.h"
+#include "globals/scene.h"
 
-extern s8 gColorPulseTable[];
 f32 LightVolume_GetFlicker(void *arg0)
 {
   ObjectRecAtBC *volume = arg0;

@@ -4,10 +4,8 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
-
-extern f32 gWeaponChargeScale;
-extern f32 gProjectileSpeedScale;          /* projectile speed scale */
-extern f32 gProjectilePower;          /* projectile power */
+#include "globals/player.h"
+#include "globals/particle.h"
 
 CQuaternion CGameObjectInstance__GetRotation(CPlayer *p);
 AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *p, s32 weapon);

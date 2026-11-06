@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/engine.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
@@ -41,9 +42,7 @@ typedef struct {
 
 /* What this reads around gEngineApp_m_Settings_match. */
 
-extern s32 gLitVerticesKey;
 extern char D_800A57F8[];
-extern s8 gColorPulseTable[];         /* the colour pulse, 64 steps */
 
 s32 Actor_GetTypeClass(void);
 void **CStaticObject__LoadGeometry(PlacedProp *prop);

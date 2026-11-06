@@ -7,6 +7,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/collision.h"
+#include "globals/player.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
@@ -31,11 +32,6 @@ typedef struct {
 } CameraInfo;
 
 typedef struct {
-    /* 0x00 */ u32 *flags;
-    /* 0x04 */ u8 pad4[0x18 - 4];
-} CharacterInfo;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x37];
     /* 0x37 */ s8 unk37;
     /* 0x38 */ u8 pad38[0x68 - 0x38];
@@ -48,8 +44,6 @@ typedef struct {
     /* 0xAC */ CVector3 pos;
     /* 0xB8 */ s32 region;
 } Plan;
-
-extern CharacterInfo gPlayerStateTable_tuning[];
 
 s32 AI_UpdatePathHeading(Actor *self, Plan *plan, Actor *target);
 s32 AI_IsInViewCone(Actor *viewer, Actor *target, f32 range, f32 across, f32 up);
@@ -153,7 +147,7 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
             if (cam != NULL) {
                 range = cam->height - 102.399994f;
             }
-            if (self->def->m_Type == 1 && plan->unk37 == 0 && (*gPlayerStateTable_tuning[t->character].flags & 0x80)) {
+            if (self->def->m_Type == 1 && plan->unk37 == 0 && (gPlayerStateTable[t->character].physics->flags & 0x80)) {
                 across *= 0.75f;
                 up *= 0.75f;
                 range *= 0.5f;

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/object.h"
 
 typedef struct Swing {
     u8 pad0[0x12];
@@ -10,7 +11,6 @@ typedef struct Swing {
     CVector3 axis;                  /* 0x18 */
 } Swing;
 
-extern f32 gSwingAmplitudes[];        /* swing amplitude per step */
 
 void CMtxF__Copy(f32 *dst, f32 *src);
 void CVector3__Scale(CVector3 *dst, CVector3 *src, f32 scale);

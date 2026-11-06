@@ -395,8 +395,6 @@ found:
     }
 }
 
-extern Gfx gRspInitDL[];        /* RDP setup display lists */
-extern Gfx gRdpInitDL[];
 void Texture_InvalidateCache(void);
 void Render_SetRenderMode(s32 arg0);
 s32 Cinema_PathPlaying(void);

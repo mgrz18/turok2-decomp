@@ -1,6 +1,7 @@
 #include "common.h"
 #include "globals/camera.h"
 #include "globals/scene.h"
+#include "globals/pickup.h"
 
 typedef struct Picker {
     /* 0x000 */ u8 pad0[4];
@@ -13,33 +14,6 @@ typedef struct Picker {
     /* 0xA02 */ u8 keys[6];
 } Picker;
 
-/* The pickup tables: rows keyed by the pickup's type id, with a handler. */
-typedef struct PickupRow18 {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s16 id;
-    /* 0x06 */ u8 pad6[0xE];
-    /* 0x14 */ s32 (*handler)(Picker *picker, struct PickupRow18 *row);
-} PickupRow18;
-
-typedef struct PickupRow14 {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s16 id;
-    /* 0x06 */ u8 pad6[0xA];
-    /* 0x10 */ s32 (*handler)(Picker *picker, struct PickupRow14 *row);
-} PickupRow14;
-
-typedef struct PickupRow10 {
-    /* 0x00 */ s32 unk0;
-    /* 0x04 */ s16 id;
-    /* 0x06 */ u8 pad6[6];
-    /* 0x0C */ s32 (*handler)(Picker *picker, struct PickupRow10 *row, void *pickup);
-} PickupRow10;
-
-extern PickupRow18 sWeaponPickups[];
-extern PickupRow14 sAmmoPickups[];
-extern PickupRow18 sHealthPickups[];
-extern PickupRow14 sLifeForcePickups[];
-extern PickupRow10 sItemPickups[];
 extern u8 D_800B37BC[];
 extern u8 D_800B37CC[];
 extern u8 D_800B37D8[];
@@ -71,12 +45,12 @@ void Sound__Play(s32 sound, s32 x, s32 y, s32 z, s32 arg4, s32 arg5);
 void Sound__PlaySpeech(s32 arg0);
 
 /* Pickup_FindWeaponEntry */
-static __inline__ PickupRow18 *FindRowA(s32 id) {
+static __inline__ CPickupRow18 *FindRowA(s32 id) {
     s32 i;
-    PickupRow18 *p = sWeaponPickups;
+    CPickupRow18 *p = sWeaponPickups;
 
     for (i = 0x1E; i != -1; i--) {
-        if (p->id == id) {
+        if (p->m_Id == id) {
             return p;
         }
         p++;
@@ -85,12 +59,12 @@ static __inline__ PickupRow18 *FindRowA(s32 id) {
 }
 
 /* Pickup_FindAmmoEntry */
-static __inline__ PickupRow14 *FindRowB(s32 id) {
+static __inline__ CPickupRow14 *FindRowB(s32 id) {
     s32 i;
-    PickupRow14 *p = sAmmoPickups;
+    CPickupRow14 *p = sAmmoPickups;
 
     for (i = 0x23; i != -1; i--) {
-        if (p->id == id) {
+        if (p->m_Id == id) {
             return p;
         }
         p++;
@@ -99,12 +73,12 @@ static __inline__ PickupRow14 *FindRowB(s32 id) {
 }
 
 /* Pickup_FindHealthEntry */
-static __inline__ PickupRow18 *FindRowC(s32 id) {
+static __inline__ CPickupRow18 *FindRowC(s32 id) {
     s32 i;
-    PickupRow18 *p = sHealthPickups;
+    CPickupRow18 *p = sHealthPickups;
 
     for (i = 6; i != -1; i--) {
-        if (p->id == id) {
+        if (p->m_Id == id) {
             return p;
         }
         p++;
@@ -113,12 +87,12 @@ static __inline__ PickupRow18 *FindRowC(s32 id) {
 }
 
 /* func_0023EFCC */
-static __inline__ PickupRow14 *FindRowD(s32 id) {
+static __inline__ CPickupRow14 *FindRowD(s32 id) {
     s32 i;
-    PickupRow14 *p = sLifeForcePickups;
+    CPickupRow14 *p = sLifeForcePickups;
 
     for (i = 1; i != -1; i--) {
-        if (p->id == id) {
+        if (p->m_Id == id) {
             return p;
         }
         p++;
@@ -127,12 +101,12 @@ static __inline__ PickupRow14 *FindRowD(s32 id) {
 }
 
 /* Pickup_FindItemEntry */
-static __inline__ PickupRow10 *FindRowE(s32 id) {
+static __inline__ CPickupRow10 *FindRowE(s32 id) {
     s32 i;
-    PickupRow10 *p = sItemPickups;
+    CPickupRow10 *p = sItemPickups;
 
     for (i = 14; i != -1; i--) {
-        if (p->id == id) {
+        if (p->m_Id == id) {
             return p;
         }
         p++;
@@ -143,9 +117,9 @@ static __inline__ PickupRow10 *FindRowE(s32 id) {
 /* Pick up an item of type id: the tables' handler takes it if one has it;
  * otherwise a generic pickup with its message, sound and effect. */
 s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
-    PickupRow18 *row18;
-    PickupRow14 *row14;
-    PickupRow10 *row10;
+    CPickupRow18 *row18;
+    CPickupRow14 *row14;
+    CPickupRow10 *row10;
     u8 *msg;
     s32 sound;
     s32 effect;
@@ -156,35 +130,35 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
     effect = 0;
     row18 = FindRowA(id);
     if (row18 != NULL) {
-        result = row18->handler(picker, row18);
+        result = row18->m_pHandler(picker, row18);
     }
     if (result != 0) {
         return result;
     }
     row14 = FindRowB(id);
     if (row14 != NULL) {
-        result = row14->handler(picker, row14);
+        result = row14->m_pHandler(picker, row14);
     }
     if (result != 0) {
         return result;
     }
     row18 = FindRowC(id);
     if (row18 != NULL) {
-        result = row18->handler(picker, row18);
+        result = row18->m_pHandler(picker, row18);
     }
     if (result != 0) {
         return result;
     }
     row14 = FindRowD(id);
     if (row14 != NULL) {
-        result = row14->handler(picker, row14);
+        result = row14->m_pHandler(picker, row14);
     }
     if (result != 0) {
         return result;
     }
     row10 = FindRowE(id);
     if (row10 != NULL) {
-        result = row10->handler(picker, row10, pickup);
+        result = row10->m_pHandler(picker, row10, pickup);
     }
     if (result != 0) {
         return result;

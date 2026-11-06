@@ -24,4 +24,6 @@ extern ALHeap *gAudioHeap;                /* the DMA cache entries' heap */
 extern OSMesg gAudioDmaMessageBuf[0x3C];  /* audDMAMessageBuf */
 extern s16 gSndVolumeCurve[];             /* SndVoicePool_Construct builds it */
 
+extern char sCSPlayerFile[17];      /* "audio/csplayer.c", libaudio csplayer.c's __assert file name */
+
 #endif

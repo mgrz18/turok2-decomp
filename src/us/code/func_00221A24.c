@@ -5,14 +5,13 @@
 #include "structs/level_actor.h"
 #include "globals/game.h"
 #include "globals/camera.h"
+#include "globals/scene.h"
 
 typedef struct List {
     s32 pad0;
     s32 count;                  /* 0x04 */
     u8 items[1];                /* 0x08 */
 } List;
-
-extern s32 gLitVerticesKeyChanged;
 
 void *CISet__GetBlock(void *table, s32 index);
 void CStaticObject__TouchLitVertices(CStaticObject *inst);

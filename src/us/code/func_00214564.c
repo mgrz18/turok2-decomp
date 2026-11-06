@@ -47,8 +47,6 @@ void CMtxF__Copy(f32 *, void *);
 void CMtxF__ToMtxAffine(void *, f32 *);
 f32 HalfToFloat(s32);
 
-extern s32 gNextUniqueId;
-
 static __inline__ s32 next_key(void) {
     s32 next;
 

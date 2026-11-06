@@ -4,6 +4,8 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/player.h"
+#include "globals/object.h"
 struct ObjRecAt18V2;
 typedef struct ObjRecAt18V2 ObjRecAt18V2;
 struct ObjRecAt18V2;
@@ -11,8 +13,6 @@ struct ObjRecAt18V2 {
     char pad0[0x14];
     s32 * unk18; /* at 0x14 in Turok 2 */
 };
-extern char gWeaponActorTypeInfo[];
-extern void *gIntelligenceTypeInfo[];
 void *CGameObjectInstance__GetBodySetup(char *arg0)
 {
     s32 type;
@@ -38,7 +38,7 @@ void *CGameObjectInstance__GetBodySetup(char *arg0)
                     return 0;
                 }
                 if (object + 0x288 == arg0) {
-                    return gWeaponActorTypeInfo;
+                    return &gWeaponActorTypeInfo;
                 }
                 i++;
                 object += 0x1328;

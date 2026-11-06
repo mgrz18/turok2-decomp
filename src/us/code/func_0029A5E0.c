@@ -6,7 +6,6 @@
 
 extern void __osViInit(void);
 extern void __osViSwapContext();
-extern s32 osTvType;
 extern void *memset(void *destination, s32 value, u32 size);
 void __osViInit(void)
 {

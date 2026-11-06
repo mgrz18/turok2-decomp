@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 #include "gfx.h"
+#include "globals/render.h"
 
 extern void Texture_InvalidateCache();
 extern char D_800AB680;
-extern u32 gFogGeometryMode;
 extern s32 Render_SetRenderMode(s32);
 void func_00209658(void) {
     Gfx *cmd;

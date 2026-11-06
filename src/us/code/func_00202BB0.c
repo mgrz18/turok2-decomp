@@ -65,7 +65,6 @@ typedef struct B12Mgr {
                  B12Bucket * buckets;
 } B12Mgr;
 extern B12Mgr D_800D7BE0;
-extern u32 gCacheEntryCount;
 extern u8 gHeap[];
 void CMutex__Construct(void *lock);
 u32 GetMemSize(void);

@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 typedef void (*FaceFunc)(CollisionQuad *quad, CVector3 *points);
 
 /* The side faces of a box: Quad_SetBoxTop, Quad_SetBoxSide3267, Quad_SetBoxSide4510, Quad_SetBoxSide0374, Quad_SetBoxSide2156. */
-extern FaceFunc sBoxSideFaceBuilders[];
 
 void Platform_GetCollisionBox(CGameObjectInstance *mover, CVector3 *points, CGameObjectInstance *collider);
 void Quad_SetBoxBottom(CollisionQuad *quad, CVector3 *points);

@@ -3,11 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "globals/engine.h"
-
-extern char gStandLookTuning;     /* standing look tuning */
-extern char gCrouchLookTuning;     /* crouching look tuning */
-extern char gStandMoveTuning;     /* standing move tuning */
-extern char gCrouchMoveTuning;     /* crouching move tuning */
+#include "globals/player.h"
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void CPlayer__BobViewStride(CPlayer *player, CGameObjectInstance *body);

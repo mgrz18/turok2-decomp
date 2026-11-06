@@ -30,6 +30,8 @@
 #include "globals/render.h"
 #include "globals/engine.h"
 #include "globals/camera.h"
+#include "structs/light.h"
+#include "globals/player.h"
 
 /* ---------------- MenuItem_FormatBinding_2 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -546,7 +548,6 @@ void MenuItem_DrawSlider_2(MenuItem *it, MenuItemLayout *box, MenuItemLayout *co
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004409A8.c, func_004409A8, with Turok 2's layouts. */
 
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
-extern s32 gCharacterModels[];
 
 extern void memset(void *p, s32 c, s32 n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
@@ -1865,8 +1866,6 @@ void MenuItem_SetBindingValue_2(MenuItem *item,float value) {
 /* ---------------- MenuModel_DrawUnselected_2 ---------------- */
 s32 CGameObjectInstance__DrawModelWithLights(s32, s32, s32, s32);
 
-extern s32 gDefaultLights;
-
 void MenuModel_DrawUnselected_2(s32 arg0, s32 arg1, s32 arg2) {
     CGameObjectInstance__DrawModelWithLights(arg0, arg1, arg2, (s32) &gDefaultLights);
 }
@@ -1881,21 +1880,17 @@ typedef struct { u32 w[6]; } O06Seg;
 /* The instance seen with its m_Lights as words: indexing m_Lights itself
  * swaps an addu's operands. */
 typedef struct { u8 pad[0x110]; O06Seg seg[2]; } O06A_4171F4; /* seg at 0x110 in Turok 2 (0x140 in Rage Wars) */
-typedef struct { f32 f0; s32 unk4; s32 unk8; f32 fC; s32 unk10; } O06Cam;
-extern s32 gBlendState;
-extern O06Cam gBlendState_m_Color[];
-extern O06Seg D_800AB0E8_4171F4 __asm__("gDefaultLights");
 extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
 /* The selected model item's draw callback (MenuItem_DrawModel_2): drawn with the
  * lights of gDefaultLights and a fade by sMenuModelFade. */
 void MenuModel_DrawSelected_2(CGameObjectInstance *a, s32 b, s32 c) {
  gBlendState = 3;
- ((O06A_4171F4 *) a)->seg[gEvenOdd] = D_800AB0E8_4171F4;
- gBlendState_m_Color->f0 = 255.0f;
- gBlendState_m_Color->unk4 = 0;
- gBlendState_m_Color->unk8 = 0;
- gBlendState_m_Color->unk10 = 0;
- gBlendState_m_Color->fC = (f32)(sMenuModelFade / 2);
+ ((O06A_4171F4 *) a)->seg[gEvenOdd] = *(O06Seg *) &gDefaultLights;
+ gBlendState_m_Color[0] = 255.0f;
+ gBlendState_m_Color[1] = 0;
+ gBlendState_m_Color[2] = 0;
+ gBlendState_m_Color[4] = 0;
+ gBlendState_m_Color[3] = (f32)(sMenuModelFade / 2);
  CGameObjectInstance__DrawModelImmediate(a, b, c);
  gBlendState = 0;
 }

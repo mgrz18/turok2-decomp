@@ -16,11 +16,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/engine.h"
-
-typedef struct {
-    /* 0x00 */ u32 mask;
-    /* 0x04 */ u32 bits;
-} ButtonMap;
+#include "globals/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xB0];
@@ -43,7 +39,6 @@ typedef struct {
     /* 0x24 */ u32 buttons[5];
 } PlayerInput;
 
-extern ButtonMap sControlSide1ButtonMap[];
 f32 Math_DecayToZero(f32 value, f32 rate);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))

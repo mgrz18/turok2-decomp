@@ -5,6 +5,8 @@
 #include "structs/weapon.h"
 #include "globals/game.h"
 #include "globals/engine.h"
+#include "structs/light.h"
+#include "globals/player.h"
 
 typedef struct Hit {
     /* 0x00 */ u8 pad0[0xC];
@@ -12,11 +14,6 @@ typedef struct Hit {
     /* 0x10 */ u8 pad10[0x18 - 0x10];
     /* 0x18 */ s32 amount;
 } Hit;
-
-extern s32 gBlendState;       /* screen flash mode */
-extern f32 gBlendState_m_Color[3];    /* screen flash color */
-extern f32 gBlendFade[2];    /* screen flash range */
-extern s32 gTagModeModel;
 
 s32 *CISet__GetBlock(s32 arg0, s32 arg1);
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
@@ -60,8 +57,8 @@ void Player_DrawNodeCallback(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
                     color[0] = 192.0f;
                     break;
             }
-            gBlendFade[0] = 70.0f;
-            gBlendFade[1] = 255.0f;
+            gBlendState_m_Color[3] = 70.0f;
+            gBlendState_m_Color[4] = 255.0f;
             CGameObjectInstance__DrawModelImmediate(actor, arg1, hit);
             if (player->m_ShockedTimer > 0.0f && CPlayer__IsInMatchEndState(player) == 0) {
                 Render_DrawModelShared(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[gEvenOdd], 0, (s8) hit->amount, -1);

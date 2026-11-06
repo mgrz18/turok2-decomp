@@ -52,4 +52,13 @@ extern struct OSPiHandle_s *__osPiTable;
 extern struct OSPiHandle_s *__osCurrentHandle[2];
 extern u32 __osPiAccessQueueEnabled;
 
+/* libultra globals, with ultralib's own types. */
+
+/* The boot parameters the IPL3 leaves in low memory (ultralib parameters.s). */
+extern s32 osTvType;            /* 0 PAL, 1 NTSC, 2 MPAL */
+extern void *osRomBase;         /* cart base address for PI DMA */
+extern s32 osResetType;         /* 0 cold boot, 1 NMI */
+extern u32 osMemSize;
+extern u8 osAppNMIBuffer[64];
+
 #endif

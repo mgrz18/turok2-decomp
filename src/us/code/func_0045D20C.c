@@ -2,12 +2,11 @@
 #include "common.h"
 #include "structs/frame.h"
 #include "globals/render.h"
+#include "globals/libultra.h"
 
 s32 GetMemSize(void); /* osGetMemSize */
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
-
-extern s32 osTvType; /* osTvType */
 
 /* Steps to the next video mode of the TV region that fits in memory. */
 void Video_NextResolution_2(void) {

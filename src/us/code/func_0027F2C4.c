@@ -11,9 +11,6 @@
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern Gfx gRspInitDL[];
-extern Gfx gRdpInitDL[];
-
 void CCache__LockForDisplayList(s32 unused, void *resource);
 void Render_InvalidateModeCache(void);
 void CCamera__DisplayListSetup(CCamera *cam);
