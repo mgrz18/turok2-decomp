@@ -11,7 +11,6 @@ extern EventHandler *gLevelEventHandlers[];  /* handler tables by kind */
 extern char *gLevelMessages[];          /* {text, sound} pairs */
 extern s32 D_800B69DC[];            /* gLevelMessages + 4 */
 extern s32 gFrameCountGameplay;
-extern u8 *gScene_m_pActors;              /* world + 0xE0: level actors (0x288 bytes each) */
 extern u8 gEngineApp_m_Game_m_CameraPool[];             /* game */
 extern u8 gEngineApp_m_Settings_multiplayer;               /* game + 0x1241: multiplayer flag */
 
@@ -50,7 +49,7 @@ void LevelEvent_Fire(LevelEvent *event) {
     }
     entry += event->handler;
     if (event->level == gScene.m_nLevel) {
-        actor = gScene_m_pActors + event->actor * 0x288;
+        actor = (u8 *)gScene.m_pActors + event->actor * 0x288;
         if (entry->onActor != NULL) {
             entry->onActor(actor, actor + 0x140, event);
         }

@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "structs/rect.h"
+#include "globals/scene.h"
 
 #define MIN(a, b) ({ f32 _m = (a); if (!(_m <= (b))) _m = (b); _m; })
 #define MAX(a, b) ({ f32 _m = (a); if (!((b) <= _m)) _m = (b); _m; })
@@ -33,18 +34,12 @@ typedef struct SceneCell {
     /* 0x04 */ CRect *bounds;
 } SceneCell;
 
-typedef struct SceneCells {
-    /* 0x00 */ s32 count;
-    /* 0x04 */ SceneCell cells[1];
-} SceneCells;
-
 /* A model the sweep may hit, and from how far along. */
 typedef struct ModelHit {
     /* 0x00 */ SceneModel *model;
     /* 0x04 */ f32 t;
 } ModelHit;
 
-extern SceneCells gScene_m_nSectors;
 
 void Collision_LookAtF(f32 mf[4][4], f32 xEye, f32 yEye, f32 zEye, f32 xAt, f32 yAt, f32 zAt, f32 xUp, f32 yUp,
                    f32 zUp);
@@ -108,8 +103,8 @@ void Collision_TestModels(Sweep *sweep) {
     hit = hits;
     i = 0;
     n = 0;
-    cells = gScene_m_nSectors.cells;
-    cellCount = gScene_m_nSectors.count;
+    cells = (SceneCell *)gScene.m_Sectors;
+    cellCount = gScene.m_nSectors;
     for (; i < cellCount && !sweep->stop; i++) {
         cell = &cells[i];
         if (cell->bounds->maxX > rect.minX && cell->bounds->minX < rect.maxX && cell->bounds->maxZ > rect.minZ
