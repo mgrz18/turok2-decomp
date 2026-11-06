@@ -13,7 +13,7 @@ extern Cinema *gCinemaPlayerP;
 extern s32 sCinemaLastFrame;      /* last frame handled */
 extern s32 gFrameCount;      /* frame counter */
 extern f32 gFrameIncrement;      /* frame time */
-extern GameState gEngineApp_m_Game_m_PlayerList_m_bCinema;
+extern GameState gEngineApp_m_Game_m_PlayerList_m_bCinema; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 extern s32 Cinema_StartPending(void);
 extern s32 Cinema_IsActive(void);

@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern Link_func_8023CC08_de *gPager_chain_tail;
-extern Link_func_8023CC08_de *gPager_chain_head;
+extern Link_func_8023CC08_de *gPager_chain_tail; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
+extern Link_func_8023CC08_de *gPager_chain_head; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
 extern Node_func_8023CC08_de *VM_FindRegion(u32 arg0);
 Link_func_8023CC08_de *VM_ReclaimLRUPage(void) {
     extern void VM_UnmapTLBEntry(void *arg0);

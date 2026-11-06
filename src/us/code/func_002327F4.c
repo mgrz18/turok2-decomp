@@ -24,7 +24,7 @@ struct Shared_ParticleView {
 };
 
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount[];
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gEvenOdd;
 extern void CParticle__BuildMatrix(void *, s32, s32, f32);
 

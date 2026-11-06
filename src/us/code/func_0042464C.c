@@ -18,7 +18,7 @@ extern int gScreenWidth;
 extern int gScreenHeight;
 extern int osTvType,gViAntiAlias;
 extern unsigned short D_800C21AA[],sViModeIndex;
-extern NodeRecAt294 gEngineApp_m_Game_m_CameraPool_m_MainCamera;
+extern NodeRecAt294 gEngineApp_m_Game_m_CameraPool_m_MainCamera; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern int gScreenWidth,gScreenHeight;
 extern void Video_ResizeViMode(unsigned,int,int,int,int,int);
 void Video_SetMode(unsigned width,int a1,int a2,int a3,int a4,int a5) {

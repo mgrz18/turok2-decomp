@@ -20,7 +20,7 @@ typedef struct {
     u8 unk11;               /* 0x11 */
 } ViewState;
 
-extern ViewState gEngineApp_m_Settings_difficulty;
+extern ViewState gEngineApp_m_Settings_difficulty; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 D_800F5A34[];    /* view box max (min at -3) */
 extern f32 D_800F5A18[];    /* active box: max at +4 (min at +1) */
 extern s32 gCinemaHidesActors;

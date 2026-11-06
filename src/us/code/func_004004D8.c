@@ -62,7 +62,7 @@ extern s32 gScreenHeight;      /* screen height */
 extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose gEngineApp_m_Settings is not this file's s32) */
 extern CScene gScene;
 extern s32 gEngineApp_m_Settings; /* local type: GameSettings.cheatFlags; globals/game.h would bring frame.h, whose gEngineApp_m_pCurrentFrameData clashes with the array view above */
-extern s32 gEngineApp_m_Settings_nextMode;
+extern s32 gEngineApp_m_Settings_nextMode; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
 extern Vp gScreenViewport[];
 extern Mtx sAutomapWorldMtx[2];
 extern Mtx sAutomapScreenMtx[2];

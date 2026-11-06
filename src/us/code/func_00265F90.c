@@ -30,8 +30,8 @@ typedef struct {
     /* 0x1A8 */ CPlayer *owner;
 } Toucher;
 
-extern u8 gEngineApp_m_Game_m_CameraPool[]; /* game */
-extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[]; /* game + 0x40: fallback camera */
+extern u8 gEngineApp_m_Game_m_CameraPool[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* game */
+extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[]; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* game + 0x40: fallback camera */
 extern char *gLevelMessages[]; /* {text, sound} pairs */
 extern s32 D_800B69DC[];  /* gLevelMessages + 4 */
 

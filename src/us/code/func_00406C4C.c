@@ -13,7 +13,7 @@ extern void ImpactEvent_Send(CGameObjectInstance *src, CGameObjectInstance *dst,
                           CVector3 pos, EffectParams params);
 
 extern s32 D_800F1F50[];
-extern s32 gLevelScript_values;          /* parts left (mode 1) */
+extern s32 gLevelScript_values; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* parts left (mode 1) */
 extern s32 D_8012F990;          /* parts left (mode 2) */
 
 void Primagen_HandleAnimEvent(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVector3 pos, s32 event) {

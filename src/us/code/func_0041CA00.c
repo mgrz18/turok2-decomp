@@ -18,7 +18,7 @@ typedef struct Shared_Game {
 } Shared_Game;
 
 extern Shared_Game D_8011A6D8;
-extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount;
+extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern char gEngineApp[];
 extern void func_00430330(char *);
 

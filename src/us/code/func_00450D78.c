@@ -26,7 +26,7 @@ typedef struct S10Game {
                u8 pad7C[4];
                s32 unk80;
 } S10Game;
-extern S10Game gEngineApp_m_Settings_match[];
+extern S10Game gEngineApp_m_Settings_match[]; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
 extern f32 sFinalScoreTimer;
 extern f32 gFrameIncrement;
 extern void CPlayerPool__EndMatch(void *p);

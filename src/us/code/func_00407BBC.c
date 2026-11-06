@@ -11,7 +11,7 @@ typedef struct {
 } LevelScriptF9D0;
 
 extern s32 sPrimagenSoundScript4;
-extern LevelScriptF9D0 gLevelScript_scriptCOn;
+extern LevelScriptF9D0 gLevelScript_scriptCOn; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_EnterMode16(void) {
     gLevelScript_scriptCOn.restart = 1;

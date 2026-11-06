@@ -12,7 +12,7 @@ typedef struct {
 /* The camera pool gEngineApp_m_Game_m_CameraPool (CCameraPool) seen to the settings gEngineApp_m_Settings
  * (+0x1228): the ROM reads them through this symbol, and through gEngineApp_m_Settings
  * the code no longer matches. */
-extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
+extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gScene_m_WarpState;
 extern u8 gScene[];         /* the level */
 extern char D_800B66D0[];

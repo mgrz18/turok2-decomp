@@ -5,7 +5,7 @@
 
 /* AI state: once the anim is done, reset every active slot of the module state, then go to anim state 0xC. */
 
-extern s32 gMotherBoss_activeMask; /* active slot mask */
+extern s32 gMotherBoss_activeMask; /* local type: the field's real type (or the member path) changes the ROM's code here */ /* active slot mask */
 extern u8 sMotherBossSpotFlashScript[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);

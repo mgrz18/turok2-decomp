@@ -7,7 +7,7 @@ extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s
 
 extern s32 D_800F1F50[];
 extern CVector3 *gPrimagenPaths[];  /* boss paths */
-extern s32 gLevelScript_path;          /* path */
+extern s32 gLevelScript_path; /* local type: the field's real type (or the member path) changes the ROM's code here */          /* path */
 
 void Primagen_EnterMode19(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;

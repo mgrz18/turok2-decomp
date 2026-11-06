@@ -15,7 +15,7 @@ typedef struct MenuItemRecAt14 MenuItemRecAt14;
 extern u8 D_800B3E88[];
 extern u8 D_800B3EA0[];
 extern u8 D_800B3E70[];
-extern u32 gEngineApp_m_Settings_difficulty[];
+extern u32 gEngineApp_m_Settings_difficulty[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 s32 OptionsMenu_DifficultyText_2(MenuItemRecAt14 *item) {
     if (gEngineApp_m_Settings.mode == 8) {
         item->flags |= 0x01000000;

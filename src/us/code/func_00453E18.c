@@ -17,7 +17,7 @@ struct EntryRecAt0V2 {
 };
 struct EntryRecAt0V2;
 typedef struct EntryRecAt0V2 EntryRecAt0V2;
-extern u32 sEnterCheatResult;
+extern u32 sEnterCheatResult; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern EntryRecAt0V2 sCheatCodes_unk4_2[];
 extern char D_800C1144;
 s32 EnterCheatMenu_ResultLabel_2(ObjRecAt14V1 *arg0) {

@@ -14,13 +14,13 @@ extern u32 gNumTicks3;          /* retrace counts of the last four frames */
 extern u32 gNumTicks0;
 extern u32 D_800F6CA8;
 extern u32 gNumTicks2;
-extern u32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount;
-extern s32 gInSinglePlayerMenu;
+extern u32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern s32 gInSinglePlayerMenu; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gScreenHeight;          /* screen height */
 extern VideoRate gCurrentFB;
 extern f32 gFrameIncrement;          /* frame time */
-extern s32 gCameraPoolHideViews;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern s32 gCameraPoolHideViews; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
+extern u8 gEngineApp_m_Game_m_MenuPool[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 
 extern u64 osGetTime(void);     /* osGetTime */
 extern s32 MenuPool_CountOpen(void *);

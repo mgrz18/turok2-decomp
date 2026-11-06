@@ -10,17 +10,17 @@
 /* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
  * and shows the "loaded" message; otherwise reports whether the note could be read. */
 
-extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakMenuPort; /* pad */
-extern s32 gPakMenuLeaving;
-extern s32 sGameNoteLoad;
-extern s32 gPakNoteIndex;
+extern s32 gPakMenuLeaving; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern s32 sGameNoteLoad; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
+extern s32 gPakNoteIndex; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern CScene gScene[];
-extern f32 gEngineApp_m_Settings_match_seconds[];
-extern f32 gEngineApp_m_Settings_match_minutes[];
-extern f32 gEngineApp_m_Settings_match_hours[];
+extern f32 gEngineApp_m_Settings_match_seconds[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern f32 gEngineApp_m_Settings_match_minutes[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
+extern f32 gEngineApp_m_Settings_match_hours[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern u8 gLoadSavePersistentData[];
-extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern u8 gEngineApp_m_Game_m_MenuPool[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 gPakMsgRumblePakDesc_2[];
 extern u8 gPakMsgDeleteDoneDesc_2[];
 extern u8 gPakMsgDeleteFailedDesc_2[];

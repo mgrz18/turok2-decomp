@@ -13,7 +13,7 @@ extern s32 sPrimagenSpawnScript2;
 extern s32 sPrimagenSpawnScript3;
 extern s32 sPrimagenSpawnScript4;
 extern s32 sPrimagenSpawnScript5;
-extern State gLevelScript_script2_cursor;
+extern State gLevelScript_script2_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 #define SCRIPT (((s32 **) &gLevelScript_script2_cursor)[-1])
 

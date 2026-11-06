@@ -8,7 +8,7 @@
 #include "globals/game.h"
 
 extern CScene gScene;
-extern s32 gScene_m_PreviewOptions[];
+extern s32 gScene_m_PreviewOptions[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u8 gLoadSavePersistentData[];
 
 void SaveGame_Restore_2(CPlayer *p) {

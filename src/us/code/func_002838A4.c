@@ -13,9 +13,9 @@ extern u8 gRumblePool[];
  * store through a pointer may alias them, so their loads stay after it. */
 extern u8 gScene[];             /* the world */
 extern s32 gScene_m_nLevel[];            /* world +0x18FA8: the current warp id */
-extern s32 gScene_m_bWarpSpawn;              /* world +0x18FB8: selectionFlags */
-extern u8 gScene_m_WarpSpawn[];             /* world +0x18FBC: selectionSpawn */
-extern s32 gScene_m_LevelID[];            /* world +0x18FD0: selectionValues */
+extern s32 gScene_m_bWarpSpawn; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */              /* world +0x18FB8: selectionFlags */
+extern u8 gScene_m_WarpSpawn[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */             /* world +0x18FBC: selectionSpawn */
+extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */            /* world +0x18FD0: selectionValues */
 
 void CPlayer__ResetControlState(CPlayer *player);
 s32 CScene__GetRegionIndex(void *world, s32 region);

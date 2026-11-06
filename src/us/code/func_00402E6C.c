@@ -9,7 +9,7 @@ s32 ScriptAnimator_SetScript(void *, s32 *);           /* extern */
 void *CPlayerPool__GetFirstActive(CPlayerPool *);                     /* extern */
 s32 AI_PlayAnim(s32, s32, s32);           /* extern */
 extern s32 sMantidQueenMode6SpotScript;
-extern u8 gMantidQueen[];
+extern u8 gMantidQueen[]; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
 
 void MantidQueen_UpdateMode6(s32 arg0, void *arg1)
 {

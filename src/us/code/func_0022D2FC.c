@@ -583,8 +583,8 @@ extern Gfx *gDList;             /* display list head */
 extern u32 gDisplayListSize;              /* command buffer length, in commands */
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* matrix buffer index */
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
-extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* the current view */
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
+extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* the current view */
 extern CCollisionInfo gCollisionInfoLineOfSight;
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
 extern u8 gScene_m_Heap[];             /* matrix pool */
@@ -1156,7 +1156,7 @@ typedef struct {
 extern CCollisionResults *gCollisionResultsP;
 extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gEvenOdd;
 extern u8 gScene[];
 extern u8 gEngineApp_m_SwooshSystem[];

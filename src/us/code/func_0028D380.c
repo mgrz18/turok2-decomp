@@ -14,7 +14,7 @@ typedef struct Marker {
 
 extern Marker sBootMarker;           /* the boot marker string */
 extern char gBootSignature[];           /* where the marker is kept (0x10 bytes) */
-extern char gSavedPlayers[];           /* the saved players (0x1400) */
+extern char gSavedPlayers[]; /* local type: globals/save.h declares it; this view (its type here) is what keeps the ROM's code */           /* the saved players (0x1400) */
 extern char gLoadSavePersistentData[];
 extern char gGamePersistentData[];
 extern s32 gGfxYieldBuffer[];            /* BSS start */

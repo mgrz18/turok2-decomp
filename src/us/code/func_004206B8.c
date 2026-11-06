@@ -10,7 +10,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 
-extern s8 gPakProfileRead_character[];
+extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gPakMenuPort;
 extern u8 gPlayerSetupMenuDesc[];
 extern u8 gPakMsgDeleteDoneDesc[];

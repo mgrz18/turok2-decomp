@@ -10,8 +10,8 @@ extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
-extern f32 gLevelScript_script;         /* cooldown */
-extern s32 gLevelScript_script_cursor;         /* cursor */
+extern f32 gLevelScript_script; /* local type: the field's real type (or the member path) changes the ROM's code here */         /* cooldown */
+extern s32 gLevelScript_script_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */         /* cursor */
 
 void Primagen_UpdateMode7(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;

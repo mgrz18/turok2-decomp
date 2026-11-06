@@ -4,7 +4,7 @@
 #include "structs/collision.h"
 #include "globals/game.h"
 
-extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
+extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 
 /* The game the settings belong to, recovered from the settings pointer. Its address is
    gEngineApp_m_Settings - 0x1228 for the compiler, not gEngineApp_m_Game_m_CameraPool: that is what keeps the tagged and

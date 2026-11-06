@@ -5,8 +5,8 @@ s32 CEngineApp__UpdateCinemaMode(s32, s32, s32);
 
 extern s32 gFinalEnding[];
 extern s32 gMergedController_buttonsSingle[];
-extern s32 gCreditsDone[];
-extern f32 gCreditsTimeLeft[];
+extern s32 gCreditsDone[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
+extern f32 gCreditsTimeLeft[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
 
 void EngineMode15_Ending_Retrace(s32 arg0)
 {

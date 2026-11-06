@@ -303,7 +303,7 @@ void MenuItem_Layout(MenuItem *it, MenuItemLayout *o) {
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043FFAC.c, func_0043FFAC, with Turok 2's layouts. */
 
 extern s32 gMenuCurrentFont; /* current draw mode */
-extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[];
+extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 

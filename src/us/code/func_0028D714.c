@@ -8,7 +8,7 @@ extern char gBootSignature;
 extern char gEngineApp_m_Settings;
 extern char gLoadSavePersistentData;
 extern char gGamePersistentData;
-extern char gEngineApp_m_Settings_match;
+extern char gEngineApp_m_Settings_match; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
 /* Turok 2 region sizes differ from Rage Wars (0x430, 0x584, 0xB0). */
 s32 Boot_CanOverwrite(u32 address) {
     address |= 0x80000000;

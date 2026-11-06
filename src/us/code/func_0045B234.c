@@ -14,7 +14,7 @@ extern char D_800B5388[];
 extern char D_800B5394[];
 extern char D_800B53A0[];
 extern char D_800B53AC[];
-extern s8 gPakProfileRead_character[];
+extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 D_801309A8;
 
 s32 CharNoteMenu_UpdateType_2(MenuItem *item) {

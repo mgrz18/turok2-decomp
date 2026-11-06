@@ -10,7 +10,7 @@
  * and shows its health bar ("EyeBall"). */
 
 
-extern s32 gScene_m_LevelID[]; /* warp id */
+extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */ /* warp id */
 extern u8 gBlindOneBossModeTable[];
 extern BlindOneStep sBlindOneScript_2[];
 extern void BlindOne_BossUpdate_2(void);

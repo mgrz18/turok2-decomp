@@ -9,7 +9,7 @@ extern f32 D_800C0508;
 /* Field access by byte offset: a struct member reference here would let the
  * scheduler reorder these stores around the global ones. */
 #define OBJ_FIELD(obj, type, field) (*(type *)((s8 *)(obj) + (s32) &((CGameObjectInstance *)0)->field))
-extern s8 gLevelScript_unk3CA[];
+extern s8 gLevelScript_unk3CA[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 void Primagen_EnterMode2(void *arg0, s32 arg1) {
     OBJ_FIELD(arg0, f32, m_AI.m_AnimSpeed) = (f32) D_800C0508;

@@ -11,7 +11,7 @@ typedef struct {
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
 
-extern s32 gEngineApp_m_Game_m_DebugLines;
+extern s32 gEngineApp_m_Game_m_DebugLines; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
 
 void CPlayer__AnimateScope(HudModel *m, CPlayer *owner);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
