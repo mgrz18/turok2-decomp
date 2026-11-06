@@ -5,35 +5,35 @@
 
 // Enemy animation pick tables (AI_PickAnimFromTable): {flag bit, anim id} rows, -1 terminated, one per
 // EnemyAnim_* picker; the picker's suffix is the table's low address bits
-sEnemyAnimTable_Weapon_B00C0 = 0x800B00C0; // only EnemyAnim_Weapon_B00C0, by m_Enemy.m_wWeaponAnimFlags (anims 0x113A-0x113E)
-sEnemyAnimTable_Weapon_B00F0 = 0x800B00F0; // only EnemyAnim_Weapon_B00F0, m_wWeaponAnimFlags bits 0x400-0x4000
-sEnemyAnimTable_NormalDeath_B0120 = 0x800B0120; // only EnemyAnim_NormalDeath_B0120, m_wNormalDeathAnimFlags
-sEnemyAnimTable_NormalDeath_B0150 = 0x800B0150; // only EnemyAnim_NormalDeath_B0150
-sEnemyAnimTable_NormalDeath_B0180 = 0x800B0180; // only EnemyAnim_NormalDeath_B0180
-sEnemyAnimTable_MovingDeath_B01B0 = 0x800B01B0; // only EnemyAnim_MovingDeath_B01B0
-sEnemyAnimTable_MovingDeath_B01E0 = 0x800B01E0; // only EnemyAnim_MovingDeath_B01E0
-sEnemyAnimTable_MovingDeath_B0210 = 0x800B0210; // only EnemyAnim_MovingDeath_B0210
-sEnemyAnimTable_ViolentDeath_B0240 = 0x800B0240; // only EnemyAnim_ViolentDeath_B0240
-sEnemyAnimTable_ViolentDeath_B0270 = 0x800B0270; // only EnemyAnim_ViolentDeath_B0270
-sEnemyAnimTable_ViolentDeath_B02A0 = 0x800B02A0; // only EnemyAnim_ViolentDeath_B02A0
-sEnemyAnimTable_ExplosiveDeath_B02D0 = 0x800B02D0; // only EnemyAnim_ExplosiveDeath_B02D0
-sEnemyAnimTable_ExplosiveDeath_B0300 = 0x800B0300; // only EnemyAnim_ExplosiveDeath_B0300
-sEnemyAnimTable_ExplosiveDeath_B0330 = 0x800B0330; // only EnemyAnim_ExplosiveDeath_B0330
-sEnemyAnimTable_NormalDeath_B0360 = 0x800B0360; // only EnemyAnim_NormalDeath_B0360
-sEnemyAnimTable_NormalDeath_B0390 = 0x800B0390; // only EnemyAnim_NormalDeath_B0390
-sEnemyAnimTable_NormalDeath_B03C0 = 0x800B03C0; // only EnemyAnim_NormalDeath_B03C0
-sEnemyAnimTable_Evade_B03F0 = 0x800B03F0; // only EnemyAnim_Evade_B03F0
-sEnemyAnimTable_Evade_B0420 = 0x800B0420; // only EnemyAnim_Evade_B0420
-sEnemyAnimTable_Evade_B0450 = 0x800B0450; // only EnemyAnim_Evade_B0450
-sEnemyAnimTable_Evade_B0480 = 0x800B0480; // only EnemyAnim_Evade_B0480
-sEnemyAnimTable_Evade_B04B0 = 0x800B04B0; // only EnemyAnim_Evade_B04B0
-sEnemyAnimTable_Evade_B04E0 = 0x800B04E0; // only EnemyAnim_Evade_B04E0
-sEnemyAnimTable_Move_B0510 = 0x800B0510; // only EnemyAnim_Move_B0510
-sEnemyAnimTable_Move_B0540 = 0x800B0540; // only EnemyAnim_Move_B0540
-sEnemyAnimTable_Move_B0570 = 0x800B0570; // only EnemyAnim_Move_B0570
-sEnemyAnimTable_Move_B05A0 = 0x800B05A0; // only EnemyAnim_Move_B05A0
-sEnemyAnimTable_Move_B05D0 = 0x800B05D0; // only EnemyAnim_Move_B05D0
-sEnemyAnimTable_Move_B0600 = 0x800B0600; // only EnemyAnim_Move_B0600
+sEnemyAnimWeapon_B00C0 = 0x800B00C0; // only EnemyAnim_Weapon_B00C0, by m_Enemy.m_wWeaponAnimFlags (anims 0x113A-0x113E)
+sEnemyAnimWeapon_B00F0 = 0x800B00F0; // only EnemyAnim_Weapon_B00F0, m_wWeaponAnimFlags bits 0x400-0x4000
+sEnemyAnimNormalDeath_B0120 = 0x800B0120; // only EnemyAnim_NormalDeath_B0120, m_wNormalDeathAnimFlags
+sEnemyAnimNormalDeath_B0150 = 0x800B0150; // only EnemyAnim_NormalDeath_B0150
+sEnemyAnimNormalDeath_B0180 = 0x800B0180; // only EnemyAnim_NormalDeath_B0180
+sEnemyAnimMovingDeath_B01B0 = 0x800B01B0; // only EnemyAnim_MovingDeath_B01B0
+sEnemyAnimMovingDeath_B01E0 = 0x800B01E0; // only EnemyAnim_MovingDeath_B01E0
+sEnemyAnimMovingDeath_B0210 = 0x800B0210; // only EnemyAnim_MovingDeath_B0210
+sEnemyAnimViolentDeath_B0240 = 0x800B0240; // only EnemyAnim_ViolentDeath_B0240
+sEnemyAnimViolentDeath_B0270 = 0x800B0270; // only EnemyAnim_ViolentDeath_B0270
+sEnemyAnimViolentDeath_B02A0 = 0x800B02A0; // only EnemyAnim_ViolentDeath_B02A0
+sEnemyAnimExplosiveDeath_B02D0 = 0x800B02D0; // only EnemyAnim_ExplosiveDeath_B02D0
+sEnemyAnimExplosiveDeath_B0300 = 0x800B0300; // only EnemyAnim_ExplosiveDeath_B0300
+sEnemyAnimExplosiveDeath_B0330 = 0x800B0330; // only EnemyAnim_ExplosiveDeath_B0330
+sEnemyAnimNormalDeath_B0360 = 0x800B0360; // only EnemyAnim_NormalDeath_B0360
+sEnemyAnimNormalDeath_B0390 = 0x800B0390; // only EnemyAnim_NormalDeath_B0390
+sEnemyAnimNormalDeath_B03C0 = 0x800B03C0; // only EnemyAnim_NormalDeath_B03C0
+sEnemyAnimEvade_B03F0 = 0x800B03F0; // only EnemyAnim_Evade_B03F0
+sEnemyAnimEvade_B0420 = 0x800B0420; // only EnemyAnim_Evade_B0420
+sEnemyAnimEvade_B0450 = 0x800B0450; // only EnemyAnim_Evade_B0450
+sEnemyAnimEvade_B0480 = 0x800B0480; // only EnemyAnim_Evade_B0480
+sEnemyAnimEvade_B04B0 = 0x800B04B0; // only EnemyAnim_Evade_B04B0
+sEnemyAnimEvade_B04E0 = 0x800B04E0; // only EnemyAnim_Evade_B04E0
+sEnemyAnimMove_B0510 = 0x800B0510; // only EnemyAnim_Move_B0510
+sEnemyAnimMove_B0540 = 0x800B0540; // only EnemyAnim_Move_B0540
+sEnemyAnimMove_B0570 = 0x800B0570; // only EnemyAnim_Move_B0570
+sEnemyAnimMove_B05A0 = 0x800B05A0; // only EnemyAnim_Move_B05A0
+sEnemyAnimMove_B05D0 = 0x800B05D0; // only EnemyAnim_Move_B05D0
+sEnemyAnimMove_B0600 = 0x800B0600; // only EnemyAnim_Move_B0600
 sJoypadTestAnimTable = 0x800B0630; // {button mask (0x800 U_JPAD...), anim 0x2C24+} rows; only EnemyAnim_JoypadTestPlayAnim (ENEMY_JOYPAD_TEST_PLAY_ANIM_MODE)
 
 // Enemy AI state shared by the enemy AI file
