@@ -2,52 +2,9 @@
 #include "structs/game_object.h"
 #include "structs/region.h"
 #include "globals/ai.h"
-
-/* One step of a path, a node in the search's pool. */
-typedef struct PathNode {
-    /* 0x00 */ CGameRegion *region;
-    /* 0x04 */ struct PathNode *parent;
-    /* 0x08 */ s32 count;
-    /* 0x0C */ f32 cost;
-} PathNode;
-
-/* The path search state (see Path_FindRegionPath). */
-typedef struct PathSearch {
-    /* 0x000 */ CGameObjectInstance *obj;
-    /* 0x004 */ CGameRegion *startRegion;
-    /* 0x008 */ CVector3 startPos;
-    /* 0x014 */ CGameRegion *goalRegion;
-    /* 0x018 */ CVector3 goalPos;
-    /* 0x024 */ f32 bounds[4];          /* min x, min z, max x, max z */
-    /* 0x034 */ u8 pool[0x960];
-    /* 0x994 */ PathNode *poolNext;
-    /* 0x998 */ s32 nodeCount;
-    /* 0x99C */ PathNode *path;
-    /* 0x9A0 */ u8 mover[0xA8];         /* who moves, for Sweep_CrossRegionEdge */
-} PathSearch;
-
-/* A neighbour worth exploring: its edge index and squared distance. */
-typedef struct Candidate {
-    /* 0x0 */ s32 edge;
-    /* 0x4 */ f32 dist;
-} Candidate;
+#include "globals/path.h"
 
 extern u8 D_800C894C;                   /* bottom of the stack */
-
-/* The search's working variables are globals, to keep the recursion's
- * frames small. */
-extern CGameRegion *sPathNeighbour;              /* neighbour */
-extern Candidate sPathCandidates[3];         /* candidates */
-extern Candidate *sPathSorted[3];        /* candidates sorted by distance */
-extern Candidate *sPathSwap;           /* swap */
-extern s32 sPathCandidateCount;                  /* candidate count */
-extern s32 sPathEdge;                  /* edge */
-extern s32 sPathDepth;                  /* node count */
-extern s32 sPathBackEdge;                  /* neighbour's edge back */
-extern CVector3 sPathCentre;             /* neighbour's centre */
-extern f32 sPathCost;                  /* cost */
-extern s32 sPathFound;                  /* found */
-extern s32 sPathCrossed;                  /* passable */
 
 f32 CGameRegion__GetCentreDistance(CGameRegion *from, CGameRegion *to);
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
@@ -111,7 +68,7 @@ void Path_ExpandNode(PathNode *parent, CGameRegion *region) {
             }
             if (sPathFound) {
                 CGameRegion__GetCentroid(sPathNeighbour, &sPathCentre);
-                sPathCrossed = Sweep_CrossRegionEdge(sPathSearch->mover, sPathNeighbour, sPathBackEdge, &sPathCentre);
+                sPathCrossed = Sweep_CrossRegionEdge(&sPathSearch->mover, sPathNeighbour, sPathBackEdge, &sPathCentre);
                 if (sPathCrossed) {
                     CVector3__Subtract(&sPathCentre, &sPathCentre, &sPathSearch->startPos);
                     sPathCost = sPathCentre.x * sPathCentre.x + sPathCentre.y * sPathCentre.y

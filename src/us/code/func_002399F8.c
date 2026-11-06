@@ -3,35 +3,7 @@
 #include "structs/region.h"
 #include "globals/engine.h"
 #include "globals/ai.h"
-
-/* One step of the path found, a list node. */
-typedef struct PathNode {
-    /* 0x00 */ CGameRegion *region;
-    /* 0x04 */ struct PathNode *next;
-    /* 0x08 */ s32 count;
-} PathNode;
-
-/* The path search state, kept on the stack and reached through sPathSearch. */
-typedef struct PathSearch {
-    /* 0x000 */ CGameObjectInstance *obj;
-    /* 0x004 */ CGameRegion *startRegion;
-    /* 0x008 */ CVector3 startPos;
-    /* 0x014 */ CGameRegion *goalRegion;
-    /* 0x018 */ CVector3 goalPos;
-    /* 0x024 */ f32 bounds[4];          /* min x, min z, max x, max z */
-    /* 0x034 */ u8 pool[0x960];
-    /* 0x994 */ u8 *poolNext;
-    /* 0x998 */ s32 unk998;
-    /* 0x99C */ PathNode *path;
-    /* 0x9A0 */ CGameObjectInstance *obj2;
-    /* 0x9A4 */ s32 arg;
-    /* 0x9A8 */ u8 pad9A8[0x44];
-    /* 0x9EC */ CVector3 goalPos2;
-    /* 0x9F8 */ u8 pad9F8[0x44];
-    /* 0xA3C */ s32 unkA3C;
-    /* 0xA40 */ s32 unkA40;
-    /* 0xA44 */ s32 unkA44;
-} PathSearch; /* size 0xA48 */
+#include "globals/path.h"
 
 
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
@@ -70,7 +42,7 @@ s32 Path_FindRegionPath(CGameObjectInstance *obj, CVector3 goal, CGameRegion *go
     sPathSearch->goalRegion = goalRegion;
     sPathSearch->goalPos = goal;
     sPathSearch->poolNext = sPathSearch->pool;
-    sPathSearch->unk998 = 0;
+    sPathSearch->nodeCount = 0;
     sPathSearch->path = NULL;
     sPathSearch->bounds[0] = obj->header.m_vPos.x - 5120.0f;
     sPathSearch->bounds[2] = obj->header.m_vPos.x + 5120.0f;
@@ -80,11 +52,11 @@ s32 Path_FindRegionPath(CGameObjectInstance *obj, CVector3 goal, CGameRegion *go
         BoundingRect_AddPoints(sPathSearch->bounds, 1, region->m_pVertices[i]);
         i++;
     } while (i < 3);
-    sPathSearch->obj2 = obj;
-    sPathSearch->arg = arg;
-    sPathSearch->goalPos2 = goal;
-    sPathSearch->unkA3C = 0;
-    sPathSearch->unkA40 = 1;
+    sPathSearch->mover.obj = obj;
+    sPathSearch->mover.def = (CCollisionInfo *) arg;
+    sPathSearch->mover.end = goal;
+    sPathSearch->mover.stop = 0;
+    sPathSearch->mover.unkA0 = 1;
     Path_ExpandNode(0, sPathSearch->goalRegion);
     CGameRegion__ClearVisited(sPathSearch->goalRegion);
     node = sPathSearch->path;
@@ -94,8 +66,8 @@ s32 Path_FindRegionPath(CGameObjectInstance *obj, CVector3 goal, CGameRegion *go
     if (node->count >= 3) {
         i = (gFrameCountGameplay >> 4) & 1;
         for (; i != -1; i--) {
-            if (node->next != NULL) {
-                node = node->next;
+            if (node->parent != NULL) {
+                node = node->parent;
             }
         }
         CGameRegion__GetCentroid(node->region, out);
