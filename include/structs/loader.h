@@ -20,13 +20,18 @@
 #define LOADER_CHUNK_SIZE   0x2000
 #define LOADER_STACK_SIZE   0x400
 
+enum {
+    LOADERFLAGS_UNALLOCATED = 0,
+    LOADERFLAGS_ALLOCATED = (1 << 0)
+};
+
 typedef struct CLoaderEntry {
     /* 0x00 */ u32 address;                 /* ROM address */
     /* 0x04 */ void *dest;
     /* 0x08 */ s32 length;
     /* 0x0C */ OSMesgQueue *replyQueue;
     /* 0x10 */ OSMesg replyMessage;
-    /* 0x14 */ u32 flags;                   /* 1 while allocated */
+    /* 0x14 */ u32 flags;                   /* LOADERFLAGS_* */
     /* 0x18 */ struct CLoaderEntry *prev;
     /* 0x1C */ struct CLoaderEntry *next;
 } CLoaderEntry; /* size 0x20 */

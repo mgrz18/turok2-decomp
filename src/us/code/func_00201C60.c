@@ -1,16 +1,10 @@
 #include "common.h"
 #include "structs/cache.h"
 #include "globals/engine.h"
+#include "structs/decompressor.h"
 
 /* CDecompressor__Main, after Turok 3's (Drahsid/turok3, src/us/decompressor.c),
- * which also calls func_241BD8() each round; Turok 2 does not. The offsets
- * differ from Turok 3's too, so the structs here keep only what this reads. */
-
-typedef struct {
-    /* 0x0000 */ u8 _pad0[0x230];
-    /* 0x0230 */ u8 queue[0x1218];              /* OSMesgQueue, then the thread */
-    /* 0x1448 */ s32 lastDecompression;
-} CDecompressor;
+ * which also calls func_241BD8() each round; Turok 2 does not. */
 
 s32 osRecvMesg(void *queue, void *msg, s32 flags);
 s32 osSendMesg(void *queue, void *msg, s32 flags);

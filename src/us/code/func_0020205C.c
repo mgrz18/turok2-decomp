@@ -1,26 +1,25 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80256280_de_4.c, func_8025661C_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/loader.h"
 
-extern u32 __osDisableInt(void);
-extern void __osRestoreInt(u32);
-extern void CList__Remove(void *, s32);
-extern s32 CList__AddHead(void *, s32);
-void *CLoader__AllocLoaderEntry(CartridgeReadWorker *arg0) {
-    u32 temp_s2;
-    void *temp_s0;
-    temp_s2 = __osDisableInt();
-    temp_s0 = arg0->available.m_pHead;
-    if (temp_s0 != 0) {
-        CList__Remove(&arg0->available, (s32) temp_s0);
-        ((CartridgeReadRequest *)temp_s0)->active = 1;
-        CList__AddHead(&arg0->pending, (s32) temp_s0);
+u32 __osDisableInt(void);
+void __osRestoreInt(u32 mask);
+void CList__Remove(CList *list, void *element);
+void CList__AddHead(CList *list, void *element);
+
+CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx) {
+    u32 mask;
+    CLoaderEntry *entry;
+
+    mask = __osDisableInt();
+    entry = thisx->freeList.m_pHead;
+    if (entry != NULL) {
+        CList__Remove(&thisx->freeList, entry);
+        entry->flags = LOADERFLAGS_ALLOCATED;
+        CList__AddHead(&thisx->usedList, entry);
     }
-    __osRestoreInt(temp_s2);
-    return temp_s0;
+    __osRestoreInt(mask);
+    return entry;
 }
-extern u32 __osDisableInt(void);
-extern void __osRestoreInt(u32);
-extern void CList__Remove(void *, s32);
-extern s32 CList__AddHead(void *, s32);
