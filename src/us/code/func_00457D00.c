@@ -9,13 +9,13 @@
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
 extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakMenuPort;
+extern s32 gPakMenuPort; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 extern s32 gPakMenuIsSave; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern char gPakProfile[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern char gPakCharacterNoteName[];
-extern u8 gPakGameCode[];
-extern void *gSaveBufferHandle;
-extern void *gLoadBufferHandle;
+extern char gPakCharacterNoteName[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
+extern u8 gPakGameCode[]; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
+extern void *gSaveBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
+extern void *gLoadBufferHandle; /* local: globals/pak.h is not included here (its gPakProfile and the save handles would clash with this file's local-type view) */
 s32 Pak_BytesToPages_2(s32 n);
 s32 Pak_GetFreePages_2(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes_2(s32 pad, s32 *out);

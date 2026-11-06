@@ -5,7 +5,7 @@
 
 extern s32 Controller_Lock(s32 arg0);
 extern int gPakState[]; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s8 gPakQueueState;
+extern s8 gPakQueueState; /* local: globals/pak.h is not included here (its gPakFileSystems would clash with this file's local-type view) */
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 void Controller_ReadAll();

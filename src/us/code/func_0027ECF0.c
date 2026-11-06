@@ -10,10 +10,10 @@ extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, *
 extern f32 gSplitScreenMarginTop;          /* top, */
 extern f32 gSplitScreenMarginLeft;          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
 extern f32 gSplitScreenMarginRight;          /* right */
-extern CCameraPool gEngineApp_m_Game_m_CameraPool;  /* the camera pool */
-extern CBox gCameraViewBox;         /* the view boxes of all the active cameras together */
-extern CBox gCameraVisibleBox;         /* and their widened (animation) boxes */
-extern u32 gCameraVisBits;          /* and their visibility bits */
+extern CCameraPool gEngineApp_m_Game_m_CameraPool; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* the camera pool */
+extern CBox gCameraViewBox; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* the view boxes of all the active cameras together */
+extern CBox gCameraVisibleBox; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* and their widened (animation) boxes */
+extern u32 gCameraVisBits; /* local: globals/camera.h is not included here (its gDefaultVisBits would clash with this file's local-type view) */ /* and their visibility bits */
 extern s32 gDefaultVisBits[];        /* local type: the u32 of globals/camera.h loads it before the box copies (GCC 2 alias order) */
 
 /* gCameraVisBits seen as a structure: the loop ORs into it through one. */

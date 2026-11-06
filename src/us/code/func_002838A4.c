@@ -4,15 +4,15 @@
 #include "structs/cinema.h"
 #include "globals/game.h"
 #include "globals/camera.h"
+#include "globals/cinema.h"
 
 
-extern Cinema *gCinemaPlayerP;
 extern u8 gRumblePool[];
 /* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
  * gScene_m_LevelID are arrays because the ROM accesses them as struct members: a
  * store through a pointer may alias them, so their loads stay after it. */
-extern u8 gScene[];             /* the world */
-extern s32 gScene_m_nLevel[];            /* world +0x18FA8: the current warp id */
+extern u8 gScene[]; /* local: globals/scene.h is not included here (its gScene_m_WarpSpawn/gScene_m_LevelID would clash with this file's local-type view) */ /* the world */
+extern s32 gScene_m_nLevel[]; /* local: globals/scene.h is not included here (its gScene_m_WarpSpawn/gScene_m_LevelID would clash with this file's local-type view) */ /* world +0x18FA8: the current warp id */
 extern s32 gScene_m_bWarpSpawn; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */              /* world +0x18FB8: selectionFlags */
 extern u8 gScene_m_WarpSpawn[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */             /* world +0x18FBC: selectionSpawn */
 extern s32 gScene_m_LevelID[]; /* local type: globals/scene.h declares it; this view (its type here) is what keeps the ROM's code */            /* world +0x18FD0: selectionValues */

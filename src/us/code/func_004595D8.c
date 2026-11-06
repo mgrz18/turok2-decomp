@@ -13,7 +13,7 @@
  * open the next menu page. */
 
 extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakMenuPort;
+extern s32 gPakMenuPort; /* local: globals/pak.h is not included here (its gPakProfile would clash with this file's local-type view) */
 extern s32 gPakMenuLeaving; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 sCharNoteLoad; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakNoteIndex; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
