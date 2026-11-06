@@ -10,10 +10,6 @@
  * yaws it by its own angle and pushes it 10.24 units along the result. */
 
 typedef struct {
-    f32 m[4][4];
-} Mtx4;
-
-typedef struct {
     /* 0x00 */ u8 pad0[4];
     /* 0x04 */ CVector3 pos;
     /* 0x10 */ s32 unk10;
@@ -26,13 +22,13 @@ typedef struct {
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-void CQuaternion__ToMatrix(CQuaternion *q, Mtx4 *mtx);
-void CMtxF__TransformPoint(Mtx4 *m, CVector3 *in, CVector3 *out);
+void CQuaternion__ToMatrix(CQuaternion *q, CMtxF *mtx);
+void CMtxF__TransformPoint(CMtxF *m, CVector3 *in, CVector3 *out);
 f32 func_002982F0(f32 x); /* sinf */
 f32 func_002974C0(f32 x); /* cosf */
 
 void Projectile_PlaceAtMuzzle(Projectile *self, CAI *ai) {
-    Mtx4 m;
+    CMtxF m;
     CVector3 dir;
     CQuaternion yaw;
     CQuaternion rot;

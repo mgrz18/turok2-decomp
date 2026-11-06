@@ -6,6 +6,7 @@
 #include "gfx.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "globals/framebuffer.h"
 
 /* gEngineApp_m_Settings_match (GameMatch in structs/game.h) as a local array view, under an
  * alias of the symbol: through it the compiler bases both stores on
@@ -16,14 +17,8 @@ typedef struct {
     /* 0x48 */ s32 unk48;
 } Unk8011ACB0;
 
-extern u8 gGfxFrameMessageQueue[];
-extern u8 gGfxFrameMessageBuffer[];
-extern u8 gSchedulerStack[];
 extern u8 gScheduler[];
-extern u8 gGfxClient[];
-extern u8 gIdentityMtx[];
 extern Unk8011ACB0 D_8011ACB0_arr[] __asm__("gEngineApp_m_Settings_match");
-extern s32 gCFB[];
 
 extern void osCreateMesgQueue(void *, void *, s32);
 extern void memset(void *, s32, s32);
@@ -46,14 +41,14 @@ void CEngineApp__Construct(CEngineApp *state) {
     u32 prev;
     u32 next;
 
-    osCreateMesgQueue(gGfxFrameMessageQueue, gGfxFrameMessageBuffer, 0x1000);
+    osCreateMesgQueue(&gGfxFrameMessageQueue, gGfxFrameMessageBuffer, 0x1000);
     memset(gSchedulerStack, 7, 0x2000);
     osCreateScheduler(gScheduler, gSchedulerStack + 0x2000, gThreadPriorityScheduler, 0, 1);
-    osScAddClient(gScheduler, gGfxClient, gGfxFrameMessageQueue);
+    osScAddClient(gScheduler, &gGfxClient, &gGfxFrameMessageQueue);
     state->m_Settings.prevMode = -1;
     CEngineApp__InitFade(state);
     gDList = NULL;
-    guMtxIdent(gIdentityMtx);
+    guMtxIdent(&gIdentityMtx);
     if (gWarmBoot != 0) {
         SavedPlayers_Clear();
         GameSettings_SetDefaults(&gEngineApp_m_Settings);

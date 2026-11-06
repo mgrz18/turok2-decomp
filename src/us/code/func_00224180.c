@@ -5,9 +5,9 @@
 #include "structs/world.h"
 
 s32 CScene__FindObjectType(CScene *lv, s32 id) {
-    s32 *t = lv->m_pObjectTypes;
-    s32 n = t[1];
-    u16 *p = (u16 *)(t + 2);
+    IdTable *t = lv->m_pObjectTypes;
+    s32 n = t->count;
+    u16 *p = t->ids;
     s32 i = 0;
     if (n > 0) {
         do {

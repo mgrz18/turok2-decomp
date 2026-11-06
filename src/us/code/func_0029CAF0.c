@@ -5,38 +5,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/libultra/__osLeoInterrupt.c, __osLeoInterrupt, with Turok 2's layouts. */
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 
-struct OSPiHandle_s;
-typedef struct {
-    u32 errStatus;
-    void *dramAddr;
-    void *C2Addr;
-    u32 sectorSize;
-    u32 C1ErrNum;
-    u32 C1ErrSector[4];
-} __OSBlockInfo;
-typedef struct {
-    u32 cmdType;
-    u16 transferMode;
-    u16 blockNum;
-    s32 sectorNum;
-    u32 devAddr;
-    u32 bmCtlShadow;
-    u32 seqCtlShadow;
-    __OSBlockInfo block[2];
-} __OSTranxInfo;
-typedef struct OSPiHandle_s {
-               struct OSPiHandle_s *next;
-               u8 type;
-               u8 latency;
-               u8 pageSize;
-               u8 relDuration;
-               u8 pulse;
-               u8 domain;
-               u32 baseAddress;
-               u32 speed;
-               __OSTranxInfo transferInfo;
-} OSPiHandle;
-
 #define IO_READ(addr) (*(volatile u32 *)((u32)(addr) | 0xA0000000))
 #define IO_WRITE(addr, data) (*(volatile u32 *)((u32)(addr) | 0xA0000000) = (u32)(data))
 #define PI_STATUS_REG 0x04600010
@@ -78,8 +46,6 @@ typedef struct OSPiHandle_s {
     stat = IO_READ(PI_STATUS_REG); \
     while (stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY)) \
         stat = IO_READ(PI_STATUS_REG);
-
-extern OSPiHandle *__osDiskHandle;
 
 void __osLeoAbnormalResume(void);
 void __osLeoResume(void);

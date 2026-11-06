@@ -10,7 +10,6 @@ typedef struct {
 
 f32 Math_DecayToZero(f32, f32);
 s32 EnemyAI_GetBehaviorIndex(s32, s32);
-extern f32 D_800A7A38[];
 
 void EnemyRam_Advance(s32 arg0, CAI *arg1) {
     f32 temp_f0;
@@ -19,7 +18,7 @@ void EnemyRam_Advance(s32 arg0, CAI *arg1) {
 
     arg1->m_vLeashPos.y = (f32) arg1->m_vInitialPos.y;
     if ((EnemyAI_GetBehaviorIndex(arg0, (s32) arg1) != 1) || ((temp_v1 = arg1->m_Mode, (temp_v1 != 4)) && (temp_v1 != 0xE))) {
-        temp_f20 = D_800A7A38[1];
+        temp_f20 = 0.17453295f;
         ((AITurnVars *) arg1->m_VarBuffer)->angle1 = Math_DecayToZero(((AITurnVars *) arg1->m_VarBuffer)->angle1, temp_f20);
         ((AITurnVars *) arg1->m_VarBuffer)->angle0 = Math_DecayToZero(((AITurnVars *) arg1->m_VarBuffer)->angle0, temp_f20);
     }

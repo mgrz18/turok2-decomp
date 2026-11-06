@@ -653,6 +653,58 @@ func_0041EA84 / func_004579A4 and func_0022D2FC keep their marker):
   second set keeps that copy from being propagated, which is what made
   CSE compute the centre from oldH's copy, as the ROM does.
 
+**Looked at again in the L pass (k5).** The seven VM/particle FAKEMATCH
+files keep their markers; each file's first comment now lists the forms
+tried. What was learned: func_0040C4F4's identical arms work through a
+temporary, not a count of refs. The arms' test loads `m_pNext` into a pseudo
+that lives in one block; local-alloc gives it `$v0`, so every value live
+across the loop conflicts with `$v0`. Cross-jumping merges the arms only
+after reload. Dead code (an unused counter, an empty `if`) is gone before
+allocation and leaves no temporary. func_0041EA84's shared 1 comes from
+cse1, not only cse2: it follows the `Pak_GetStatus` jump because the error
+label has one use and a barrier before it. A `do { } while (0)` stops cse1
+at its loop-end note, but cse2 runs after loop and ignores the note.
+
+**The engine's nine, k4 pass (none de-faked).** Each was retried with the
+real types and names; three files lost their local struct views on the way
+(the FAKEMATCH stays, asm_diff clean against the base). What was learnt:
+
+- **func_00286674 (CEngineApp__Main): it is loop.c's insn count.** Now with
+  `e->m_FrameData[n].m_Msg`, `e->m_Game.m_PlayerList` / `m_CameraPool` and
+  `CFrameMsg`. loop.c hoists the case constant 2 out of the message loop
+  when `threshold * savings * lifetime >= insns in the loop`; any three or so
+  more insns in the loop at loop time keep it in, and later passes may remove
+  them (a dead `i = i * 3 + 1;` matches as well as the doubled case 4). Not
+  natural either: Turok 3's CEngineApp__Main (references/turok3 tengine.c)
+  has an options check in case 2 that Turok 2's ROM does not; T3's empty
+  `else { ((void)0); }`, a `default: break;` and `gFrameData = gFrameData`
+  add nothing.
+- **func_002603F0, func_0025E7E0, func_0025F114: register priority by
+  refs.** In all three `self` needs exactly two more refs than it has for
+  global-alloc to rank it above `ai` (floor_log2(refs) * refs / live length:
+  e.g. 3 vs 4 refs in EnemyAI_TurnToTarget), which is what the cross-jumped
+  twin call (a load from self plus one more argument) gives. A single call,
+  `if (self != NULL)`, an inline wrapper around AI_TurnClamped and a copy of
+  self in a local miss by 7-21 words. func_002603F0 now uses CAITargets and
+  the f32 prototype like its siblings.
+- **func_002429BC (CAI__Setup): the real CAI / CGameObjectInstance fields**
+  replace SetupActor / SetupSource (the "scale" at 0x50 is m_RotY). Unpinned,
+  every form tried misses by 9 words: `= -1` per store, chained assignments
+  in either order, an int temporary, the flags clear moved to each point of
+  the block (11-24 words), a loop over m_FlinchNode (61).
+- **func_0022AFB4 (CParticle__Update):** the 0.0f of the time check is
+  carried into `p->m_cFrame = 0.0f` (`swc1 $f4` instead of `sw $zero`) by
+  every natural shape of the size maximum: if/else in either sense, ternary
+  and MAX macros (nested or not), and inline helpers with one or two returns
+  (CParticle__GetMaxSize, MaxF): 53-61 words. Rage Wars' copy has an owner
+  test between the two that Turok 2 does not.
+- **func_002626A8 (Turret_Setup), func_00204778, func_00246BC0:** not
+  reworked: Turret_Setup's `$a0` needs `$v0` and `$v1` busy or a tie to the
+  dead first argument (the earlier tries stand); func_00204778 is a CCache
+  file being retyped in the same round (k1); func_00246BC0's `$s1` for opt
+  means the original read opt after Math_DecayToZero, which the ROM does not
+  show.
+
 ### The G pass (the last drafts)
 
 Two of the three drafts left in `nonmatching/` matched:
@@ -703,6 +755,159 @@ rewrite taught about the compiler:
 - **A `CVector3` passed by value** gives the same three `lw a1-a3` as the
   three floats m2c passed as words, so the by-value prototype can be used.
 
+### .rodata literals (the L pass)
+
+Two agents turned the anonymous `D_` externs into the pools of C literals:
+k7 the engine files, k8 the VM modules. Each converted file owns its slice of
+`code_rodata` (`[rom, .rodata, code/<file>]`); the yaml has 849 such
+subsegments, 604 before the pass. Neither agent could build, so the merge's
+build was the first test. It needed two fixes (commit `18050147`):
+
+- **Strings other files still read by address** need a definition once their
+  label leaves the asm. Six more went into `versions/symbols_manual.us.txt`:
+  the module-2 asm copies read their originals' strings, and Pak_ReadNote
+  reads readNote's "Mempak read temp data".
+- **A raw piece cannot start off a word.** The `code_rodata` output section
+  is `SUBALIGN(4)`, so the linker moves a `rodata` piece at an odd address
+  up to the next word. Where the bytes up to the word are zero, the piece now
+  starts on the word (0xA642C, 0xAACEC, 0xAB2D4) or is gone (eight 1-3 byte
+  zero pieces): the object's own padding gives them. Where they are linker
+  fill (below), C cannot give them, and six engine conversions were reverted.
+
+After the merge 605 distinct `D_` names are left in `src/` (1,076 before):
+91 point into the pools (53 into the engine's .rdata, 38 into the VM tail
+pool), each with a reason below; 514 are data (419 in the menu and pak tables
+after .rodata, 95 other data and BSS), which is initialised data of tables,
+not literals.
+
+#### The VM modules (k8)
+
+The VM files (module 1 at 0x400000 and its module-2 copies) read their
+floats and strings through anonymous `D_` externs in the KSEG0 pools: the
+engine's .rdata (0x800A51F8-0x800AB0A8) for the scene, player and camera
+files, the tail pool after the microcode (0x800BFD50-) for the bosses,
+menus and pak code, and the data area after .rodata (0x800AB0A8-) for the
+menu tables. Of the 1,054 such extern declarations (273 into the pools,
+781 into the data area), 165 became C literals (108 into the pools are
+left), each file then owning its slice (`[rom, .rodata, code/<file>]`
+in the yaml) and each module-2 copy written like its original and placed
+over it in `versions/shared_rodata.us.txt` (docs/VMASM.md). Where the yaml had given
+the pool to the copy (func_0045302C), the original takes it back.
+
+- **`tools/rodata_check.py` checks a conversion without a build.**
+  asm_diff reports every converted file as different by design (the load
+  now goes through `$LC0` or the pool `sn_li.py` writes). rodata_check
+  compiles the file as the Makefile does, places its .rodata where the yaml
+  or shared_rodata.us.txt puts it (or `--at`, for a draft), and compares
+  the .rodata and every word of .text, with all relocations resolved,
+  against the ROM; a shared copy's jump-table entries by their distances,
+  as `shared_rodata.py --check` does.
+- **The object's pad is zeros, the linker's is not.** Inside a file's
+  .rodata the assembler pads strings to 4 with zeros; between objects the
+  SN linker left garbage (`"%02d"` at 0x800C1338 is followed by `00 07 00
+  0d`, "audio heap" at 0x800C1864 by `0b`; the code-like words at
+  0x800C0E64 and 0x800C1028 are such fill). A string whose tail is fill
+  cannot come from C: it stays an extern, with a comment.
+- **Strings shared across files.** GCC shares a string only within a file,
+  so a string several current C files read is one file's literal in the
+  original. The first function that uses it now emits it and owns the
+  slice; the other files still read it by address, defined in
+  `versions/symbols_manual.us.txt` (the label leaves the asm with the
+  slice). Merging those functions into one file would make them literals
+  too (`"  %02d"`/`"none"` of func_004184A8 are read by five more FragTag
+  functions). The engine reads some of these strings the same way
+  (`"level index"`, `"Players"`, `"Cameras"`): CScene, CPlayerPool and
+  CCameraPool are split between the engine and the first module.
+- **One pool per function, in order of use, strings before floats and
+  jump tables.** CScene__Construct's 19 cache-block names come out as the
+  ROM has them, then its 1.0f; WeaponsMenu_ToggleLabel's "unknown weapon"
+  precedes its jump table. A float used twice in a function is one pool
+  entry (CPlayer__LevelStart's 0.25f), so the literal can be written at
+  each use.
+- **Copies come out cleaner.** Written from the original's source, the
+  permuter shapes of some copies went away (Primagen_EnterMode20_2,
+  Primagen_EnterMode23_2, Primagen_EnterMode18_2's empty `if` on a float
+  extern).
+
+What is left, and why:
+
+- the data area after .rodata (781 externs, both modules): fixed-width
+  menu text tables (`"difficulty   :     easy"` and its neighbours 0x18
+  apart, the debug menu at 0x800C1EE0) and the pak messages, whose lines
+  interleave across the functions that print them. They are initialised
+  data of tables, not literals of the functions that read them;
+- strings followed by linker fill (above), and pools a file cannot own
+  because its own pool is elsewhere (func_004189AC's `"%3d"`: its 1.0f is
+  at 0x800C0F40) or another file owns the slice (`"Enemies"`/`"Time"` of
+  TotemDefense_Init, read by TotemDefense_InitFight; 0x800C1064, owned by
+  func_00453380);
+- data the code reads in the pools (the cheat table at 0x800C1144, which
+  the data also points at; the cinema words at 0x800C1BC4).
+
+#### The engine (k7)
+
+The engine files read 446 anonymous `.rodata` symbols (`D_800A51F8`-
+`D_800AB0A7`: float and double pools, `CCache__Request` descriptions,
+`__assert` file names) through `extern` declarations; 48 symbols are left, in
+47 files (36 after the branch; the merge reverted six files, 12 symbols). Each converted file writes the values as
+literals (`1.0f / mag`, `4294967296.0`, `"anim geometry"`) and owns its slice
+of `code_rodata` in the yaml: 202 new `[rom, .rodata, code/<file>]`
+subsegments (208 in the branch), grown or carved out of the `rodata` asm around them.
+
+`tools/rodata_match.py` is the check, since `tools/asm_diff.py` reports any
+such edit as a difference by construction. It compiles the file through the
+build's pipeline, places `.text` where `build/ref.elf` has its first
+function and `.rodata` at the lowest `.rdata` address the ROM's code reads
+where the bytes agree, resolves every relocation and compares both sections
+with the ROM word for word. `--write` then sets the file's subsegment, and
+refuses when the slice reaches into another file's or swallows a label that
+other source (C, headers, hand-written or data asm) still names: those
+labels vanish from the regenerated asm. After a `--write`, `make setup`
+regenerates `us/asm/data/` and `make verify` is the arbiter.
+
+What the pass showed:
+
+- **A second reader is often the same pool read one word on.**
+  `*(&D_X + 1)`, `(&D_X)[1]`, `D_X.scale` through a local `Tuning` or
+  `Unk800A7990` view, `M2C_FIELD(&D_X, f32 *, 4)`: these all name the next
+  file's first pool word. The literal belongs to the reader, and the views
+  (`Tuning`, `Unk800A71A8`, `Unk800A7990`, `func_8020CA10_G1` as a pool) are
+  gone.
+- **One pool word for a constant used twice** comes from writing it twice:
+  `s * 64.0f + 64.0f` gives the ROM's single entry (func_00271E20); GCC
+  shares the constant's pseudo within the expression. The reverse is
+  func_0023270C, whose ROM has 0.000492126f twice where the C's two equal
+  products are CSE'd into one: it keeps its externs.
+- **Files merged for a shared string.** GCC shares a string only within a
+  file, so two functions naming one string are one file:
+  func_0021F358 + func_0021F3A4 ("anim geometry") and func_00215944 +
+  func_00215A00 ("simp object index", "simp geometry") are now one file each.
+
+Left as externs, and why:
+
+- Strings followed by linker fill: func_00227C10's "anim object index" and
+  "anim object info", and the `"EX"` and file-name `__assert` strings of
+  func_002972E0 ("audio/save.c"), func_0029A080, func_0029A3A0,
+  func_0029B410 and func_0029B4B0 (the io/ raw DMA files). The branch
+  converted them; `rodata_match.py` compares only the slice, and the build
+  showed that the bytes after each string are fill, not zeros. Reverted.
+- Strings two or more files name (one file in the original, still split):
+  func_0020B7F8/func_0020B9F4, func_00214844/func_00214D04,
+  func_00214B58/func_00214DBC, "anim object info" (func_00219F74,
+  func_0021A150, func_0021A344, func_0021D39C, func_0021EAE8, func_0021F2B0,
+  func_0021F5B8), func_0021A500/func_0021CDAC, func_00252C70/func_002542B4,
+  func_0028B614-func_0028C0B0 (libaudio), func_002900B0/func_00290240,
+  func_002914B4-func_00292640, func_00295690/func_00295BDC ("audio/env.c").
+  Each needs the files merged, and their prototypes and global declarations
+  made to agree first.
+- Engine strings the VM modules' code reads at their engine address
+  (D_800A5EC0, D_800A5F6C, D_800A7080, D_800A9A00, D_800A9A08) and a pool word
+  the trailing asm function at 0xC2ED8 reads (D_800A9DFC, func_0028932C).
+- A `CVector3` constant copied whole (func_00210090), a pointer into a pool
+  (func_00236928's `&D_800A652C + 1`), func_00215F4C's 0x60-byte pool,
+  func_00213A70's string inside func_0021375C's slice, func_0022629C's
+  strings (one shared with the VM module).
+
 ## Shared headers
 
 The readability pass left each file with local structs where no header fit;
@@ -728,6 +933,8 @@ compiler; `tools/struct_census.py` counts the local views that are left.
 | `structs/player_options.h` | CPlayerOptions (0x40): a player's options and per-opponent counts, `CPlayer::m_pOptions`; GameSettings holds five (included by player.h and game.h) |
 | `structs/game.h` | GameSettings (D_8011AAD8, the game settings and the multiplayer setup: the HUD alpha, CSun m_Sun at 0x184, the engine's mode block at 0x1A8) and GameSettingsBlock (its first 0x184 bytes, the block the save and the demo player copy), GameMatch (D_8011ACB0, the play clock and the running match's rules); CGame (D_80119870: the player list, the camera pool D_801198B0 and its menu pool D_80119E2C, CAutomap, the settings) and CGameFromCameraPool (CGame seen from D_801198B0); CEngineApp (D_800F6CB0, Turok 3's names: CFrameData m_FrameData[3], m_pCurrentFrameData D_800F7070, the world D_800F7078 as bytes, CGame m_Game at 0x22BC0 with its settings also as m_Settings); includes frame.h |
 | `structs/frame.h` | CFrameData (0x140, a frame in flight: its tasks, CFrameMsg for the task queue, frame buffer, display and line lists, the ring links; D_800F7070 is the one being built, D_8011F140 the one being finished) and VideoMode (the screen modes D_800C2054[2][5], D_800C20E0) (included by game.h) |
+| `structs/heap.h`, `loader.h`, `decompressor.h`, `hash.h` | the system resources (Turok 3's heap.h / loader.h / decompressor.h / hash.h with Turok 2's offsets): CHeap and CHeapBlock (a 0x20-byte block header), CLoader and CLoaderEntry, CDecompressor, HashEntry; gHeap/gLoader/gDecompressor are in `globals/sysrc.h`, gHashTable in `globals/cache.h` |
+| `structs/rumble.h` | RumblePool (two CLists and the base level), RumbleEffect (0x3C) and RumbleCurve; gRumblePool / gRumbleEntries are in `globals/rumble.h` |
 | `structs/emitter.h` | the region emitters (the textured layers a region turns on by CRegionInfo.m_EmitterMask): UnitVtx (an RSP vertex), CEmitterDef (the definition table D_8010FF14), CEmitter, CEmitterPool (a camera's four, CCamera.m_SkySystem) |
 | `structs/world.h` | CScene (D_800F7078, 0x19078): the resource files, the loaded level, its actor lists and pools, the warp state; CWarpPoint, CSceneSector, CSceneRecord, CLevelHeader, CGeomHeader |
 | `structs/table.h` | the resource and level table headers: StrideTable (a record size and count, then the records: the level file's tables), OffsetTable (a sectioned block, func_002017D4), ArrayTable (count and element size, func_002018F0) |

@@ -15,11 +15,10 @@ typedef struct {
     /* 0x0C */ SubState sub;
 } State;
 
-extern f32 D_800C0540;
 extern State gLevelScript_bossState;
 
 void Primagen_EnterMode24_2(char *actor) {
-    f32 v = D_800C0540;
+    f32 v = 1.0f;
     SubState *sub = &gLevelScript_bossState.sub;
 
     *(f32 *) (actor + 0x1FC) = v;

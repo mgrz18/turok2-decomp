@@ -5,8 +5,6 @@
 #include "structs/game.h"
 #include "globals/render.h"
 
-extern f32 D_800A9DD8;
-extern f32 D_800A9DDC;
 void CEngineApp__DrawFilledRect(CEngineApp *g, u8 *col, s32 a, s32 b, s32 c, s32 d);
 void CEngineApp__DrawFade(CEngineApp *g) {
     u8 col[4];
@@ -17,8 +15,8 @@ void CEngineApp__DrawFade(CEngineApp *g) {
     col[2] = 0;
     t = g->m_Settings.fade;
     if (t < 0.0f) goto c255;
-    if (D_800A9DD8 < t) { v = 0; goto done; }
-    if (t < 0.0f) { c255: v = 255; } else { v = ~(s32)(t * D_800A9DDC); }
+    if (1.0f < t) { v = 0; goto done; }
+    if (t < 0.0f) { c255: v = 255; } else { v = ~(s32)(t * 255.0f); }
     done:;
     col[3] = v;
     CEngineApp__DrawFilledRect(g, col, 0, 0, gScreenWidth, gScreenHeight);

@@ -6,21 +6,20 @@
 
 extern void __osLeoAbnormalResume();
 extern void __osLeoResume();
-extern char *__osDiskHandle;
 void __osLeoAbnormalResume(void) {
-    DiskTransferInfo *temp_a2;
+    __OSTranxInfo *info;
     u32 status;
     status = *(volatile u32 *)0xA4600010;
-    temp_a2 = (DiskTransferInfo *)(__osDiskHandle + 0x14);
+    info = &__osDiskHandle->transferInfo;
     while (status & 3) {
         status = *(volatile u32 *)0xA4600010;
     }
-    *(volatile u32 *)0xA5000510 = temp_a2->bmControl | 0x10000000;
+    *(volatile u32 *)0xA5000510 = info->bmCtlShadow | 0x10000000;
     status = *(volatile u32 *)0xA4600010;
     while (status & 3) {
         status = *(volatile u32 *)0xA4600010;
     }
-    *(volatile u32 *)0xA5000510 = temp_a2->bmControl;
+    *(volatile u32 *)0xA5000510 = info->bmCtlShadow;
     __osLeoResume();
     {
         volatile u32 *statusAddr = (volatile u32 *)0xA4600010;

@@ -10,12 +10,7 @@ void osSetEventMesg(OSEvent e, OSMesgQueue *mq, OSMesg msg);
 void osStartThread(OSThread *thread);
 void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
 void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
-extern OSMesg sHostIoEventBuf[];
-extern OSMesg sHostIoRequestBuf[];
-extern OSMesg sHostIoDmaBuf[];
 extern u8 D_801280DC[];
-extern OSMesgQueue sHostIoDmaQueue;
-extern OSMesg sHostIoReplyBuf[];
 void HostIo_ThreadMain(void *arg);
 void HostIo_StartThread(s32 pri) {
     if (sHostIoPiReady == 0) {

@@ -3,16 +3,6 @@
 #include "common.h"
 #include "globals/adec.h"
 
-typedef struct DecodeState {
-    s32 first;
-    s32 third;
-    void *source;
-    s32 second;
-    s32 count;
-    void *cursor;
-    u16 frame[336];
-} DecodeState;
-extern char sAdecState;
 u32 adecStreamOpen(s32 *source, u32 divisor, s32 *first)
 {
     DecodeState *state = &sAdecState;

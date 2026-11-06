@@ -1,19 +1,14 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "structs/decompressor.h"
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x238];
-    /* 0x238 */ s32 pending;
-} Task;
+void osSetThreadPri(OSThread *thread, OSPri pri);
 
-s32 osSetThreadPri(void *, s32);                 /* extern */
-
-
-void CDecompressor__Flush(Task *arg0) {
-    if (arg0->pending != 0) {
+void CDecompressor__Flush(CDecompressor *thisx) {
+    if (thisx->queue.validCount != 0) {
         do {
-            osSetThreadPri(arg0, gThreadPriorityDecompressorHigh);
-        } while (arg0->pending != 0);
+            osSetThreadPri(&thisx->thread, gThreadPriorityDecompressorHigh);
+        } while (thisx->queue.validCount != 0);
     }
-    osSetThreadPri(arg0, gThreadPriorityDecompressorLow);
+    osSetThreadPri(&thisx->thread, gThreadPriorityDecompressorLow);
 }

@@ -127,4 +127,27 @@ extern u32 sBlindOneMoverSeq1_2[];
 extern u32 sBlindOneMoverSeq2_2[];
 extern u32 sBlindOneMoverSeq3_2[];
 
+/* More gLevelScript fields with symbols of their own */
+extern u8 gLevelScript_armed;            /* gLevelScript.armed */
+extern s32 gLevelScript_path;            /* gLevelScript.path */
+extern BossStep *gLevelScript_script_steps; /* gLevelScript.script.steps */
+extern s32 gLevelScript_script_cursor;   /* gLevelScript.script.cursor */
+extern s32 gLevelScript_script_current;  /* gLevelScript.script.current */
+extern s32 gLevelScript_spawnsLeft;      /* gLevelScript.spawnsLeft */
+extern f32 gLevelScript_timer;           /* gLevelScript.timer */
+extern u8 gLevelScript_unk3CA;           /* gLevelScript.unk3CA */
+extern s32 gLevelScript_unk3CC;          /* gLevelScript.unk3CC */
+extern struct CGameObjectInstance *gMantidQueen_boss; /* gMantidQueen.boss */
+extern s32 gMantidQueen_blink;           /* gMantidQueen.blink */
+extern s32 gMotherBoss_maxRadius;        /* gMotherBoss.maxRadius */
+extern f32 sMotherBossFadeTimer;         /* the Mother's defeat fade */
+extern s32 sMotherBossCinemaStarted;     /* its defeat cinema has started */
+extern CVector3 *gPrimagenPaths[];         /* the Primagen's paths, each ended by a point with y < 0 */
+/* The totem defense missions (structs/boss.h), and its fields with symbols of their own */
+extern TotemDefenseState gTotemDefense;
+extern void *gTotemDefense_def;           /* gTotemDefense.def */
+extern s32 gTotemDefense_state;          /* gTotemDefense.state */
+extern f32 gTotemDefense_timer;          /* gTotemDefense.timer */
+extern s32 gTotemDefense_kills;          /* gTotemDefense.kills */
+
 #endif

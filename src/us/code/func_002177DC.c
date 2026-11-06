@@ -12,7 +12,6 @@ struct Func802608ECResult {
     f32 start;
     f32 delta;
 };
-extern float D_800A59C8;
 typedef struct { u32 low; u32 high; } PackedBitWords;
 static __inline__ void write_bits(u32 value, u32 bitAddress, u32 width) {
   u32 address;
@@ -52,7 +51,7 @@ static __inline__ void writeQuantized(u32 bitAddress, Func802608ECResult range, 
     f32 scaled;
     s32 integral;
     s32 quantized;
-    scaled = (((value - range.start) / range.delta) * (f32) ((1 << range.value) - 1)) + D_800A59C8;
+    scaled = (((value - range.start) / range.delta) * (f32) ((1 << range.value) - 1)) + 0.5f;
     if (scaled >= 0.0f) {
         quantized = (s32) scaled;
     } else {

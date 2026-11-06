@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/controller.h"
+#include "globals/rumble.h"
+#include "globals/menu.h"
 
-
-extern s32 sPauseRumbleOn[4];   /* saved per-controller words */
-extern u8 gRumblePool[];
 extern void Controller_ResetAllRumble(void);
-extern void RumblePool_FreeAll(void *);
+extern void RumblePool_FreeAll(RumblePool *pool);
 
 /* Restores the per-controller words saved by PauseMenu_Init. */
 void PauseMenu_Close(void) {
@@ -15,5 +14,5 @@ void PauseMenu_Close(void) {
     for (i = 0; i < 4; i++) {
         gControllers[i].rumbleOn = sPauseRumbleOn[i];
     }
-    RumblePool_FreeAll(gRumblePool);
+    RumblePool_FreeAll(&gRumblePool);
 }

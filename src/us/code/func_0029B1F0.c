@@ -9,9 +9,6 @@ extern int __osSiRawReadIo(unsigned int devAddr, unsigned int * data);
 extern int __osSiRawWriteIo(unsigned int devAddr, unsigned int data);
 extern s32 osPiRawReadIo(s32 arg0, s32 *arg1);
 extern void osMapTLBRdb();
-extern u32 __osInitialized;
-extern Quad_func_802A1BE0_de __osException[];
-extern u64 osClockRate;
 extern void __osSetSR(unsigned int sr);
 extern unsigned int __osSetFpcCsr(unsigned int csr);
 extern unsigned int __osGetSR();
@@ -34,12 +31,12 @@ __osGetSR
     while (__osSiRawWriteIo(0x1FC007FC, pifdata | 8)) {
         ;
     }
-    *(Quad_func_802A1BE0_de *)0x80000000 = *__osException;
-    *(Quad_func_802A1BE0_de *)0x80000080 = *__osException;
-    *(Quad_func_802A1BE0_de *)0x80000100 = *__osException;
-    *(Quad_func_802A1BE0_de *)0x80000180 = *__osException;
-    osWritebackDCache((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(Quad_func_802A1BE0_de));
-    osInvalICache((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(Quad_func_802A1BE0_de));
+    *(__osExceptionVector *)0x80000000 = *__osException;
+    *(__osExceptionVector *)0x80000080 = *__osException;
+    *(__osExceptionVector *)0x80000100 = *__osException;
+    *(__osExceptionVector *)0x80000180 = *__osException;
+    osWritebackDCache((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(__osExceptionVector));
+    osInvalICache((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(__osExceptionVector));
     osMapTLBRdb();
     osPiRawReadIo(4, &clock);
     clock &= ~0xf;

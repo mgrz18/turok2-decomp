@@ -254,6 +254,14 @@ before the round, 1,179 are names now; **1,087 are left**, on purpose:
 
 Jump tables are `jtbl_` and were never in scope.
 
+Round L wrote the pool rows as C literals (docs/MATCHING.md, ".rodata
+literals"). Counted the same way over `src/` (1,076 distinct `D_` at
+`b4bb727f`), **605 are left**: 91 pool words (53 in the engine's .rdata, 38 in
+the VM tail pool), each kept for a reason the MATCHING.md section lists
+(a string several files read, linker fill after it, a pool another file
+owns); and 514 that are data, not literals (419 in the menu and pak text
+tables after .rodata, 95 other data and BSS).
+
 The data by address (each part file has the detail, with the evidence per line):
 
 | Span | Part | What is there |
@@ -355,7 +363,7 @@ known:
 | `gEngineApp_m_Settings_match` | `s32` 7, `S10Game []`, `GameMatch` | `GameMatch` |
 | `gCollisionInfoLineOfSight` | `u8 []` 3, `CCollisionInfo` 2, `struct CollisionInfo` 2 | `CCollisionInfo` |
 | `gLevelScript` | `s32` 4, `ModeState0040457C` 2, `LevelScriptState` | `LevelScriptState` |
-| g1's literal pools | `Tuning`, `Unk800A71A8`, `Unk800A7990`, `func_8020CA10_G1` structs | float pools, not structs |
+| g1's literal pools | `Tuning`, `Unk800A71A8`, `Unk800A7990`, `func_8020CA10_G1` structs | float pools, not structs (round L: literals now, the pool views are gone) |
 
 The full list comes from scanning every `extern` of a named symbol (round G2
 coordinator's script; easy to redo: group the declarations by name, keep the

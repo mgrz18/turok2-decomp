@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "globals/engine.h"
+#include "globals/menu.h"
 
 /* gEngineApp_m_Settings_match (GameMatch in structs/game.h; unk24 is teams). Kept as a local
  * array view: through it the compiler bases the store and the argument on
@@ -26,7 +27,6 @@ typedef struct S10Game {
                s32 unk80;
 } S10Game;
 extern S10Game gEngineApp_m_Settings_match[]; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */
-extern f32 sFinalScoreTimer;
 extern void CPlayerPool__EndMatch(void *p);
 s32 FinalScoreMenu_Poll_2(void) {
     sFinalScoreTimer += gFrameIncrement;

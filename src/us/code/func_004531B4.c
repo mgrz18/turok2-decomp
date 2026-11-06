@@ -1,6 +1,9 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "globals/game.h"
+#include "globals/rumble.h"
+#include "globals/menu.h"
+
 
 /* Controller / rumble slot, 0x224 bytes (see Cont_ResetSlot). */
 
@@ -17,10 +20,8 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-extern s32 sPauseRumbleOn[4];
-extern char gRumblePool[];
 
-void RumblePool_FreeAll(void *);
+void RumblePool_FreeAll(RumblePool *pool);
 void Controller_ResetAllRumble(void);
 void *LoopSounds_Get(void);
 void LoopSounds_Pause(void *);
@@ -32,7 +33,7 @@ void PauseMenu_Init_2(Screen *screen) {
     for (i = 0; i < 4; i++) {
         sPauseRumbleOn[i] = gControllers[i].rumbleOn;
     }
-    RumblePool_FreeAll(gRumblePool);
+    RumblePool_FreeAll(&gRumblePool);
     Controller_ResetAllRumble();
     if (gEngineApp_m_Settings.multiplayer) {
         screen->layer->flagsA &= ~0x800000;

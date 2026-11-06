@@ -4,7 +4,6 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
-extern const f32 D_800A642C;
 void CParticle__ExpireNearby(void *owner, CParticle *ref, CParticle **arr, s32 n) {
     s32 i;
     CVector3 d;
@@ -12,7 +11,7 @@ void CParticle__ExpireNearby(void *owner, CParticle *ref, CParticle **arr, s32 n
         CParticle *o = arr[i];
         if (o->header.m_nObjType != 0x57) {
             CVector3__Subtract(&d, &o->header.m_vPos, &ref->header.m_vPos);
-            if (d.x * d.x + d.y * d.y + d.z * d.z <= D_800A642C) o->m_nFrames = 1;
+            if (d.x * d.x + d.y * d.y + d.z * d.z <= 65536.0f) o->m_nFrames = 1;
         }
     }
 }

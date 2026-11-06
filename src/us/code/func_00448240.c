@@ -5,6 +5,7 @@
 #include "structs/world.h"
 #include "structs/game_object.h"
 #include "structs/cinema.h"
+#include "structs/event.h"
 #include "structs/collision.h"
 #include "structs/camera.h"
 #include "globals/scene.h"
@@ -25,42 +26,6 @@
  * 0x198 bytes at 0x800C0950. The second VM module has a copy of the block at the
  * same link address (Cinema_SplineEval_2, Cinema_DrawLetterbox_2, ...) that reads this pool. */
 
-/* A spline record: a point, the second derivatives of its coordinates over the
- * arc length, the arc length, the weight (time) and the second derivative of the
- * arc length over the weight. */
-typedef struct {
-    /* 0x00 */ CVector3 p;
-    /* 0x0C */ CVector3 d2p;
-    /* 0x18 */ f32 s;
-    /* 0x1C */ f32 w;
-    /* 0x20 */ f32 d2s;
-} SplineNode; /* 0x24 bytes */
-
-typedef struct {
-    /* 0x00 */ s32 nodeSize;
-    /* 0x04 */ s32 count;
-    /* 0x08 */ SplineNode nodes[1];
-} Spline;
-
-/* A track header: its stride and record count, the records after it. */
-typedef struct {
-    /* 0x00 */ s32 stride;
-    /* 0x04 */ s32 count;
-} Track;
-
-/* A level object a cinema cue refers to. */
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ u16 id4;
-    /* 0x06 */ u8 pad6[0xA - 0x6];
-    /* 0x0A */ u16 idA;
-    /* 0x0C */ u8 padC[0xE - 0xC];
-    /* 0x0E */ u8 unkE;
-    /* 0x0F */ u8 padF[0x11 - 0xF];
-    /* 0x11 */ u8 kind;
-    /* 0x12 */ u8 val;
-} CueObject;
-
 extern s32 D_800C1BC4;
 extern f32 D_800C1BC8;
 extern CGameObjectInstance *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* local type: globals/game.h declares it; this view (its type here) is what keeps the ROM's code */ /* current player */
@@ -79,7 +44,7 @@ extern f32 CVector3__GetYaw(CVector3 *v);                       /* heading */
 extern f32 CVector3__GetPitch(CVector3 *v);                       /* pitch */
 
 CVector3 Cinema_SplineEval_2(SplineNode *nodes, s32 count, f32 t);
-void Cinema_RequestForObject_2(void *owner, CueObject *obj);
+void Cinema_RequestForObject_2(void *owner, LevelEvent *obj);
 s32 Cinema_RequestById_2(s32 key);
 s32 Cinema_GetClipCount_2(void);
 Spline *Cinema_GetClipEyeSpline_2(s32 index);
@@ -108,17 +73,17 @@ static __inline__ void TempFree(f32 *data) {
 /* Whether a cue's object is one the cinema waits for (a separate function in
  * Rage Wars). Inline but not static: GCC inlines it where it is called and
  * emits its own copy at the end of the file, Cinema_IsWaitCue_2. */
-__inline__ s32 Cinema_IsWaitCue_2(CueObject *k) {
+__inline__ s32 Cinema_IsWaitCue_2(LevelEvent *k) {
     s32 r = 0;
     switch (k->kind) {
     case 1:
-        if (k->val == 5) r = 1;
+        if (k->handler == 5) r = 1;
         break;
     case 9:
-        if (k->val == 4) r = 1;
+        if (k->handler == 4) r = 1;
         break;
     case 10:
-        if (k->val == 3) r = 1;
+        if (k->handler == 3) r = 1;
         break;
     default:
         r = 0;
@@ -342,17 +307,6 @@ void Cinema_PrepareResource_2(s32 unused, struct Shape_typemap_165 **handle) {
     }
     CCache__DeallocAndReplaceCompressedData(0, handle, output);
 }
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ f32 time;
-} Cue; /* 0x14 bytes */
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x4];
-    /* 0x04 */ s32 count;
-    /* 0x08 */ Cue cues[1];
-} CueList;
 
 extern void Cinema_Reset(void);
 
@@ -718,12 +672,6 @@ CVector3 Cinema_GetFadeColor_2(f32 t) {
     return result;
 }
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0xC];
-    /* 0x0C */ f32 value;
-    /* 0x10 */ f32 time;
-} ScalarKey; /* 0x14 bytes */
-
 /* Evaluates the scalar key track 1 of the current cinema at time t, then rescales and clamps it to [0, 1]. */
 f32 Cinema_GetFadeAlpha_2(f32 t) {
     s32 *track;
@@ -1025,7 +973,7 @@ void Cinema_DrawFade_2(ScreenRectangle *rectangle) {
 }
 
 /* Finds the last cinema entry whose ids match the key's and makes it pending, with owner as its target. */
-void Cinema_RequestForObject_2(void *owner, CueObject *obj) {
+void Cinema_RequestForObject_2(void *owner, LevelEvent *obj) {
     s32 size;
     s32 **table;
     s32 key;
@@ -1038,8 +986,8 @@ void Cinema_RequestForObject_2(void *owner, CueObject *obj) {
 
     found = -1;
     if (gCinemaEnabled != 0) {
-        id4 = obj->id4;
-        idA = obj->idA;
+        id4 = obj->actor;
+        idA = obj->level;
         key = CISet__GetROMAddressAndSize(gScene_m_pCinemas, gScene_m_CinemasKey, 0, &size);
         if (key == 0) {
             table = NULL;
@@ -1134,28 +1082,22 @@ void Cinema_RequestByName_2(const char *name) {
     }
 }
 
-typedef struct {
-    s32 unk0;
-    s32 unk4;
-    s32 unk8;
-} CueRef;
-
 s32 Cinema_NoWaitCues_2(void) {
     s32 any = 0;
     s32 i;
-    Track *n = CISet__GetBlock(gCinemaPlayerP->resource, 2);
+    StrideTable *n = CISet__GetBlock(gCinemaPlayerP->resource, 2);
     s32 cnt = n->count;
-    CueRef *ents = (CueRef *)((u8 *)n + 8);
+    CueRef *ents = (CueRef *)n->entries;
     CueRef *e;
-    CueObject *k;
+    LevelEvent *k;
     CScene *scene;
     for (i = 0; i < cnt; i++) {
         e = &ents[i];
         scene = &gScene;
         if (e->unk4 == 0) {
-            k = (CueObject *)(scene->m_pRecords + e->unk8);
+            k = (LevelEvent *)(scene->m_pRecords + e->unk8);
         } else {
-            k = (CueObject *)(scene->m_pAltRecords + e->unk8);
+            k = (LevelEvent *)(scene->m_pAltRecords + e->unk8);
         }
         if (Cinema_IsWaitCue_2(k) != 0) {
             any = 1;
@@ -1164,23 +1106,17 @@ s32 Cinema_NoWaitCues_2(void) {
     return any ^ 1;
 }
 
-typedef struct {
-    f32 time;
-    s32 unk4;
-    s32 unk8;
-} TimedCueRef;
-
 s32 Cinema_IsActive(void);
-void LevelEvent_Trigger(CueObject *k);
-void CScene__SetEventFired(CScene *g, CueObject *k, s32 z);
+void LevelEvent_Trigger(LevelEvent *k);
+void CScene__SetEventFired(CScene *g, LevelEvent *k, s32 z);
 
 void Cinema_FireCues_2(void) {
     f32 now = gCinemaPlayerP->time;
     s32 flag = 0;
-    Track *n;
+    StrideTable *n;
     TimedCueRef *e;
     TimedCueRef *ents;
-    CueObject *k;
+    LevelEvent *k;
     CScene *scene;
     s32 cnt;
     s32 i;
@@ -1188,7 +1124,7 @@ void Cinema_FireCues_2(void) {
         if (gCinemaPlayerP->unk50 != 0) {
             n = CISet__GetBlock(gCinemaPlayerP->resource, 2);
             cnt = n->count;
-            ents = (TimedCueRef *)((u8 *)n + 8);
+            ents = (TimedCueRef *)n->entries;
             if (cnt != 0) {
                 if (gCinemaPlayerP->endTime <= now) {
                     flag = 1;
@@ -1205,9 +1141,9 @@ void Cinema_FireCues_2(void) {
                         }
                     }
                     if (e->unk4 == 0) {
-                        k = (CueObject *)(scene->m_pRecords + e->unk8);
+                        k = (LevelEvent *)(scene->m_pRecords + e->unk8);
                     } else {
-                        k = (CueObject *)(scene->m_pAltRecords + e->unk8);
+                        k = (LevelEvent *)(scene->m_pAltRecords + e->unk8);
                     }
                     if (Cinema_IsWaitCue_2(k) != 0) {
                         Cinema_RequestForObject_2(0, k);
@@ -1216,7 +1152,7 @@ void Cinema_FireCues_2(void) {
                         LevelEvent_Trigger(k);
                     }
                     e->time = -20000.0f;
-                    k->unkE = (k->unkE | 1) & 0xEF;
+                    k->flags = (k->flags | 1) & 0xEF;
                     CScene__SetEventFired(&gScene, k, 0);
                 }
             }
@@ -1227,7 +1163,7 @@ void Cinema_FireCues_2(void) {
 static __inline__ CVector3 getA(void) {
     CVector3 t;
     CVector3 v;
-    Track *n;
+    StrideTable *n;
     if (gCinemaPlayerP->active == 0) {
         v.x = 0;
         v.y = 0;
@@ -1235,13 +1171,13 @@ static __inline__ CVector3 getA(void) {
         return v;
     }
     n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), 0), 0);
-    t = Cinema_SplineEval_2((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
+    t = Cinema_SplineEval_2((SplineNode *)n->entries, n->count, 0.0f);
     return t;
 }
 static __inline__ CVector3 getB(void) {
     CVector3 t;
     CVector3 v;
-    Track *n;
+    StrideTable *n;
     if (gCinemaPlayerP->active == 0) {
         v.x = 10.0f;
         v.y = 0;
@@ -1249,7 +1185,7 @@ static __inline__ CVector3 getB(void) {
         return v;
     }
     n = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), 0), 1);
-    t = Cinema_SplineEval_2((SplineNode *)((u8 *)n + 8), n->count, 0.0f);
+    t = Cinema_SplineEval_2((SplineNode *)n->entries, n->count, 0.0f);
     return t;
 }
 CVector3 Cinema_GetStartAngles_2(void) {
@@ -1303,7 +1239,7 @@ void Cinema_RequestOnce_2(s32 a0) {
 CVector3 Cinema_GetStartEyePos_2(void) {
     CVector3 sp10;
     CVector3 sp20;
-    StridedTable *temp_v0;
+    StrideTable *temp_v0;
     if (gCinemaPlayerP->active == 0) {
         sp20.x = 0;
         sp20.y = 0;
@@ -1311,14 +1247,14 @@ CVector3 Cinema_GetStartEyePos_2(void) {
         return sp20;
     }
     temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), 0), 0);
-    sp10 = Cinema_SplineEval_2((SplineNode *) temp_v0->data, temp_v0->count, 0.0f);
+    sp10 = Cinema_SplineEval_2((SplineNode *) temp_v0->entries, temp_v0->count, 0.0f);
     return sp10;
 }
 
 CVector3 Cinema_GetStartTargetPos_2(void) {
     CVector3 sp10;
     CVector3 sp20;
-    StridedTable *temp_v0;
+    StrideTable *temp_v0;
     if (gCinemaPlayerP->active == 0) {
         sp20.y = 0;
         sp20.z = 0;
@@ -1326,7 +1262,7 @@ CVector3 Cinema_GetStartTargetPos_2(void) {
         return sp20;
     }
     temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(gCinemaPlayerP->resource, 0), 0), 1);
-    sp10 = Cinema_SplineEval_2((SplineNode *) temp_v0->data, temp_v0->count, 0.0f);
+    sp10 = Cinema_SplineEval_2((SplineNode *) temp_v0->entries, temp_v0->count, 0.0f);
     return sp10;
 }
 

@@ -4,6 +4,8 @@
 #include "globals/frame.h"
 #include "globals/render.h"
 #include "globals/engine.h"
+#include "globals/sysrc.h"
+#include "globals/framebuffer.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -32,17 +34,6 @@ typedef struct {
     /* 0x300 */ s32 doAudio;
 } Sched;
 
-typedef struct {
-    /* 0x000 */ u8 pad0[0x110];
-    /* 0x110 */ s32 framebuffer;
-    /* 0x114 */ u8 pad114[0x124 - 0x114];
-    /* 0x124 */ u32 minRetraces;
-} GfxTask;
-
-extern u8 gDecompressor[];         /* OSThread */
-extern s32 gCurrentTick;          /* retraces since the last swap */
-extern s32 gCurrentFB;          /* framebuffer on screen */
-extern GfxTask *gWaitingFrames[];
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
@@ -63,9 +54,9 @@ void __scHandleRetrace(Sched *sc) {
     ScTask *task;
     ScTask *next;
     Client *client;
-    GfxTask *frame;
+    CFrameData *frame;
     s32 state;
-    s32 fb;
+    u16 *fb;
 
     rspTask = NULL;
     sp = NULL;
@@ -73,7 +64,7 @@ void __scHandleRetrace(Sched *sc) {
     if (gDecompressorBoostRetraces != 0) {
         gDecompressorBoostRetraces = gDecompressorBoostRetraces - 1;
         if (gDecompressorBoostRetraces == 0) {
-            osSetThreadPri(gDecompressor, gThreadPriorityDecompressorLow);
+            osSetThreadPri(&gDecompressor.thread, gThreadPriorityDecompressorLow);
         }
     }
     sc->frameCount = sc->frameCount + 1;
@@ -90,9 +81,9 @@ void __scHandleRetrace(Sched *sc) {
     }
     if (gNumTicksWaiting != 0) {
         frame = gWaitingFrames[gNextFrameToShow];
-        if (!((u32)(gCurrentTick + 1) < frame->minRetraces)) {
-            gPendingFB = frame->framebuffer;
-            osViSwapBuffer(frame->framebuffer);
+        if (!((u32)(gCurrentTick + 1) < frame->m_nPredictTicks)) {
+            gPendingFB = (u16 *) frame->m_pFrameBuffer;
+            osViSwapBuffer(frame->m_pFrameBuffer);
             gNumTicksWaiting = gNumTicksWaiting - 1;
             gNumTicksPending = gNumTicksPending + 1;
             gNextFrameToShow = gNextFrameToShow + 1;

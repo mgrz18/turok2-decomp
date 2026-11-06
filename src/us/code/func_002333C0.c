@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A6440;
 extern void *Swoosh_TakeNode(void *arg0, s32 arg1);
 extern void CMtxF__GetTranslation(char *object, f32 *output);
 extern void CMtxF__GetScale(void *arg0, f32 *arg1);
@@ -55,7 +54,7 @@ void *Swoosh_NewNode(void *arg0, void *arg1, void *arg2) {
             }
         } else {
             if (temp_s1 != 0) {
-                ((ObjectLinks54 *)(arg1))->unk_28 += ((ObjectStateB0 *)(temp_s1))->unk_AC * D_800A6440;
+                ((ObjectLinks54 *)(arg1))->unk_28 += ((ObjectStateB0 *)(temp_s1))->unk_AC * 0.005f;
             }
             ((ObjectLinksB4 *)(var_s0))->unk_A8 = ((ObjectLinks54 *)(arg1))->unk_28;
         }

@@ -18,10 +18,10 @@ extern f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
 extern s32 *CScene__GetIntelligence(void *level, s32 model);
 extern s32 CScene__GetObjectTypeID(void *level, s32 id);
 extern s32 Generator_IsPickupUnlocked(s32 id);
-extern CPooledLevelActor *CLevelActorPool__Spawn(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
 extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, void *intelligence, s32 region, CVector3 pos, f32 rotY,
                            CVector3 vel, CVector3 scale, s32 *owner);
-extern s32 CParticleSystem__Spawn(void *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
+extern s32 CParticleSystem__Spawn(CParticleSystem *sys, CGameObjectInstance *p, CGameObjectInstance *owner, s32 *ownerId, s32 target, s32 type, CVector3 dir,
                          CQuaternion rot, CVector3 pos, s32 region, s32 arg10, s32 flags);
 extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
 extern void *CPlayerPool__GetFirstActive(void *players);
@@ -36,7 +36,7 @@ extern s16 WeightedTable_Pick(PickTable *t);
 static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
     CPooledLevelActor *pickup;
 
-    pickup = CLevelActorPool__Spawn(gScene.m_ActorPool, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);
+    pickup = CLevelActorPool__Spawn(&gScene.m_ActorPool, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);
     if (pickup != NULL) {
         ai->m_Generator.m_nRemaining--;
         Actor_SpawnParticle(pickup, 0x11D, pickup->m_Actor.header.m_vPos, 0);
@@ -52,7 +52,7 @@ static __inline__ void spawnObject(CGameObjectInstance *actor, CAI *ai, CVector3
 
 /* Spawns the effect at pos. */
 static __inline__ void spawnEffect(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 type) {
-    ai->m_Generator.m_nRemaining -= CParticleSystem__Spawn(gScene.m_ParticleSystem, actor, actor, &ai->m_Generator.m_nActive, 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
+    ai->m_Generator.m_nRemaining -= CParticleSystem__Spawn(&gScene.m_ParticleSystem, actor, actor, &ai->m_Generator.m_nActive, 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
                                -1, 0);
 }
 

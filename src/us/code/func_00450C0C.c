@@ -9,35 +9,6 @@
 #include "structs/controller.h"
 #include "structs/player_options.h"
 #include "structs/list.h"
-
-struct Clip;
-struct Clip {
-    s16 mode;
-    s16 frames;
-};
-struct Clip;
-typedef struct Clip Clip;
-struct NodeCode8028469C;
-struct NodeCode8028469C {
-    struct NodeCode8028469C *previous;
-    struct NodeCode8028469C *next;
-    Clip *key;
-    CVector3 position;
-    f32 value0;
-    f32 value1;
-    u32 amplitudeHandle;
-    char pad24[8];
-    u32 lifetimeHandle;
-    char pad30[8];
-    struct NodeCode8028469C **owner;
-};
-struct PoolRecAt28V1 {
-    CList free;
-    CList active;
-    s32 baseLevel;
-};
-struct NodeCode8028469C;
-typedef struct NodeCode8028469C NodeCode8028469C;
 struct StatusView;
 struct StatusView {
     char pad[0xB0];

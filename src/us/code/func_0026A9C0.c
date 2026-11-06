@@ -20,12 +20,6 @@ struct CQuatern_t {
     float w;
 };
 extern void CVector3__Normalize(f32 *arg0);
-extern CVector3 sRegionNormal;
-extern f32 sRegionNormal_y;
-extern s32 sRegionNormal_z;
-extern CVector3 sRegionUnitNormal;
-extern f32 sRegionUnitNormal_y;
-extern s32 sRegionUnitNormal_z;
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);

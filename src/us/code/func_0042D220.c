@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "globals/scene.h"
+#include "globals/particle.h"
 
 /* One of the four default light directions. */
 typedef struct DirLight {
@@ -14,7 +15,6 @@ typedef struct DirLight {
     /* 0x0C */ u8 color[4];
 } DirLight;
 
-extern u8 sParticleRotXMtx[];
 extern DirLight gParticleSpriteVtx[4];
 
 extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
@@ -31,7 +31,7 @@ void CParticleSystem__Construct(CParticleSystem *sys, s32 arg1) {
         sys->m_ParticleVars[i].header.m_pIntelligence = (CIntelligence *)&gParticleIntelligence;
         sys->m_ParticleVars[i].header.m_Type = 2;
         sys->m_ParticleVars[i].m_dwFlags = 0;
-        sys->m_ParticleVars[i].unk_1B8 = 0;
+        sys->m_ParticleVars[i].m_pLoopSound = NULL;
         sys->m_ParticleVars[i].m_pActiveList = NULL;
     }
     CList__Construct(&sys->m_FreeList, 0x1C4, 0x1C8);

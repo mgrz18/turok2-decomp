@@ -120,7 +120,6 @@ struct StateEntry {
     s32 threshold;
     u32 flags;
 };
-extern double D_800A68B8;
 extern s32 IsCodePointer(StateCallback);
 extern s32 IsDataPointer(u32);
 extern void *CGameObjectInstance__PickAvailableAction(void *, void *, s32);
@@ -166,7 +165,7 @@ void CAI__UpdateModeAnim(Source110 *src, Dest *dst) {
                 s32 difference = src->counter - entry->threshold;
                 double converted = difference;
                 if (difference < 0) {
-                    converted += D_800A68B8;
+                    converted += 4294967296.0;
                 }
                 if ((f32)converted <= src->limit) {
                     dst->count++;

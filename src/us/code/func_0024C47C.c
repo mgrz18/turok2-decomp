@@ -241,11 +241,6 @@ typedef struct Quad {
     s32 w[4];
 } Quad;
 
-typedef struct Orbit {
-    /* 0x0 */ f32 angle;
-    /* 0x4 */ f32 distance;
-} Orbit;
-
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 f32 func_002982F0(f32);             /* sin */

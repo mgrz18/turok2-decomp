@@ -3,26 +3,22 @@
 
 #include "structs/sound.h"
 
-extern f32 D_800A81F4;
-extern f32 D_800A81F8;
-extern f32 D_800A81FC;
-extern f32 D_800A8200;
 void alCSPSetVol(void *csp, s16 vol);
 void SndSeq_UpdateVolume(SndSeq *s) {
     f32 f;
     if (s->sliding != 0) {
         f = (f32)s->unk24;
-        f *= s->owner->volume2BA4 * D_800A81F4;
+        f *= s->owner->volume2BA4 * 0.01f;
         f *= s->current;
     } else {
-        f = (f32)s->unk24 * (s->owner->volume2BA4 * D_800A81F8);
+        f = (f32)s->unk24 * (s->owner->volume2BA4 * 0.01f);
         if (s->owner->muted != 0) {
-            f *= D_800A81FC;
+            f *= 0.7f;
         }
         if (f == s->vol) {
             return;
         }
     }
-    alCSPSetVol((void *)s->csp, f * D_800A8200);
+    alCSPSetVol((void *)s->csp, f * 32767.0f);
     s->vol = f;
 }

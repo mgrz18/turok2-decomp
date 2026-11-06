@@ -4,11 +4,10 @@
 #include "rw/abu_types.h"
 #include "globals/cache.h"
 
-void CHashTable__Insert(u32 key,s32 value) {
-    extern EntryRecAtCV1 *gHashTable;
- EntryRecAtCV1 *entry = gHashTable + (((key<<5)^(key>>1)^(key>>9)^(key>>17)) & gHashMask);
- EntryRecAtCV1 *tail;
- EntryRecAtCV1 *slot;
+void CHashTable__Insert(u32 key, CCacheEntry *value) {
+ HashEntry *entry = gHashTable + (((key<<5)^(key>>1)^(key>>9)^(key>>17)) & gHashMask);
+ HashEntry *tail;
+ HashEntry *slot;
  s32 index;
  if (entry->value == 0) {entry->key=key;entry->value=value;return;}
  tail=entry;
@@ -20,6 +19,6 @@ void CHashTable__Insert(u32 key,s32 value) {
  }
  index=tail->index|1;
  while (gHashTable[index].value != 0) {index+=2; index &= gHashTableMask;}
- slot=(EntryRecAtCV1 *)((index << 4) + (u32)gHashTable);
+ slot=(HashEntry *)((index << 4) + (u32)gHashTable);
  slot->key=key;slot->value=value;tail->next=slot;
 }

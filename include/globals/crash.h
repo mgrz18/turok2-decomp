@@ -12,6 +12,7 @@ typedef struct FlagDesc {
     /* 0x8 */ u8 *name;
 } FlagDesc; /* size 0xC */
 
+extern u16 *sCrashFrameBuffer;        /* the frame buffer the crash screen draws into */
 extern u8 gCrashFont[0x60][16];       /* 8x16 font for ASCII 0x20-0x7F (Crash_PutChar) */
 extern u32 sCrashCursorX;             /* console column (2) */
 extern u32 sCrashCursorY;             /* console row */

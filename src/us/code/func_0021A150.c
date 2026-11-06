@@ -37,7 +37,6 @@ struct Actor {
 };
 
 extern u8 D_800A5AC4[];     /* "anim object info" */
-extern u8 D_800A5AD8[];     /* "anim object index" */
 
 s32 *CCache__Request(s32, s32, s32, s32, s32, s32, s32, s32);
 s32 CISet__GetROMAddress(s32, s32, u16);
@@ -58,7 +57,7 @@ void CGameObjectInstance__SetupAnimation(Actor *actor, s32 a1, s32 a2, s32 anim)
 
     actor->flags &= ~0x40000;
     id = CISet__GetROMAddress(a1, a2, actor->unk2);
-    model = CCache__Request(0, id, 0x18, 0, 0, 0, (s32) D_800A5AD8, 1);
+    model = CCache__Request(0, id, 0x18, 0, 0, 0, (s32) "anim object index", 1);
     if (model != NULL) {
         tree = *model;
         actor->unkAC = CISet__GetROMAddressAndSize(tree, id, 1, &actor->unkB4);

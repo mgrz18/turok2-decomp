@@ -99,12 +99,6 @@ typedef struct M04Info {
                u8 padA[5];
                s8 b0F;
 } M04Info;
-extern f32 D_800A8110;
-extern f32 D_800A8114;
-extern f32 D_800A8118;
-extern f32 D_800A811C;
-extern f32 D_800A8120;
-extern f32 D_800A8124;
 f32 HalfToFloat(u16 x);
 u16 FloatToHalf(f32 x);
 s32 Cinema_PathPlaying();
@@ -126,7 +120,7 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
     CVector3 *p;
     CVector3 *q;
     pp = o->ctx->tab2B88;
-    o->unkC8 = D_800A8110;
+    o->unkC8 = 1.0f;
     if (o->kind < 0x100) {
         for (i = 0; i < 0x1F; i++) {
             if (o->kind == (s32)sSoundKindVolumeTable[i].kind) {
@@ -136,7 +130,7 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
         }
     }
     if (Cinema_PathPlaying() != 0) {
-        o->unkC8 = o->unkC8 * D_800A8114;
+        o->unkC8 = o->unkC8 * 0.8f;
     }
     env = &o->env2;
     if (rec->envId != -1) {
@@ -145,10 +139,10 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
         env->w0 = FloatToHalf((f32)rec->b0F);
     }
     if (!(rec->bits6 & 0x800) && o->resetFlag != 1 && o->ctx->tgt != 0) {
-        a = (f32)pp[0] * D_800A8118;
-        b = (f32)pp[1] * D_800A8118;
-        if (a == D_800A811C) {
-            vf = D_800A811C;
+        a = (f32)pp[0] * 0.01f;
+        b = (f32)pp[1] * 0.01f;
+        if (a == 1.0f) {
+            vf = 1.0f;
         } else if (b == a) {
             vf = a;
         } else {
@@ -161,7 +155,7 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
             if (sSoundHearingRangeSq <= d2) {
                 f = 0.0f;
             } else {
-                f = D_800A8120 - d2 / sSoundHearingRangeSq;
+                f = 1.0f - d2 / sSoundHearingRangeSq;
             }
         }
         switch (vp->mode) {
@@ -182,7 +176,7 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
         }
         vp->f20 = f;
     } else {
-        vf = D_800A8124;
+        vf = 1.0f;
         vp->scale = vf;
         vp->f20 = vf;
     }

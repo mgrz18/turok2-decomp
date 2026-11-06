@@ -1,37 +1,41 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80256280_de.c, func_8025637C_de.
- * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+ * The same code in Turok 2. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/loader.h"
 
-extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern Chunk *CLoader__AllocLoaderEntry(CartridgeReadWorker *arg0);
-extern s32 osJamMesg(void *arg0, void *arg1, s32 arg2);
-extern s32 osJamMesg(void *, void *, s32);
-void CLoader__LoadSync(struct CartridgeReadWorker *arg0, u32 arg1, s32 arg2, void *arg3) {
-    extern void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
-    char queue[0x18];
-    s32 queue_init;
-    s32 completed;
+s32 osRecvMesg(OSMesgQueue *queue, OSMesg *msg, s32 flags);
+s32 osJamMesg(OSMesgQueue *queue, OSMesg msg, s32 flags);
+void osCreateMesgQueue(OSMesgQueue *queue, OSMesg *messages, s32 count);
+CLoaderEntry *CLoader__AllocLoaderEntry(CLoader *thisx);
+
+/* Reads length bytes of ROM at address into dest, LOADER_CHUNK_SIZE at a
+ * time, waiting for each. */
+void CLoader__LoadSync(CLoader *thisx, u32 address, s32 length, void *dest) {
+    OSMesgQueue replyQueue;
+    OSMesg replyMessage;
+    OSMesg reply;
     s32 remaining;
-    s32 length;
-    Chunk *chunk;
-    osCreateMesgQueue(queue, (s32) &queue_init, 1);
-    remaining = arg2;
+    s32 chunkLength;
+    CLoaderEntry *entry;
+
+    osCreateMesgQueue(&replyQueue, &replyMessage, 1);
+    remaining = length;
     do {
-        chunk = CLoader__AllocLoaderEntry(arg0);
-        length = 0x2000;
-        if (chunk == 0) {
+        entry = CLoader__AllocLoaderEntry(thisx);
+        chunkLength = LOADER_CHUNK_SIZE;
+        if (entry == NULL) {
             break;
         }
-        chunk->source = arg1 + (arg2 - remaining);
-        chunk->destination = (char *) arg3 + (arg2 - remaining);
-        if ((u32) remaining < 0x2001U) {
-            length = remaining;
+        entry->address = address + (length - remaining);
+        entry->dest = (u8 *)dest + (length - remaining);
+        if ((u32)remaining < LOADER_CHUNK_SIZE + 1) {
+            chunkLength = remaining;
         }
-        chunk->length = length;
-        chunk->queue = queue;
-        osJamMesg(&arg0->requestQueueStorage, chunk, 1);
-        osRecvMesg(queue, &completed, 1);
-        remaining -= length;
+        entry->length = chunkLength;
+        entry->replyQueue = &replyQueue;
+        osJamMesg(&thisx->queue, entry, 1);
+        osRecvMesg(&replyQueue, &reply, 1);
+        remaining -= chunkLength;
     } while (remaining != 0);
 }

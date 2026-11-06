@@ -2,8 +2,6 @@
 #include "structs/region.h"
 #include "globals/region.h"
 
-extern CVector3 sRegionNormal;         /* its normal */
-
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */
 f32 func_00298470(f32 x);                           /* sqrtf */

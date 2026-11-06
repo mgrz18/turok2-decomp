@@ -21,7 +21,7 @@ f32 GameObject_GetCollisionHeight(CPlayer *player);
 f32 GameObject_GetCollisionRadius(CPlayer *player);
 f32 func_00298470(f32 x);
 void CParticle__FireExpireEvent(CParticle *p);
-void CParticleSystem__Free(void *list, CParticle *p);
+void CParticleSystem__Free(CParticleSystem *list, CParticle *p);
 void CParticle__StopLoopSound(CParticle *p);
 void CParticle__FireUpdateEvent(CParticle *p);
 void CParticle__Steer(CParticle *p);
@@ -67,7 +67,9 @@ void CParticle__Update(CParticle *p) {
     scaled = p->m_vSize.y * extent;
     if (!(p->m_vSize.x * extent <= scaled)) {
         /* FAKEMATCH: an always-true test (folded only after CSE) keeps CSE from carrying the
-         * 0.0f of the time check into the code below, as in the ROM. */
+         * 0.0f of the time check into the code below, as in the ROM. Natural shapes of the
+         * maximum (if/else, ternary, MAX macros, inline helpers with one or two returns) all
+         * carry it into `p->m_cFrame = 0.0f` (docs/MATCHING.md, k4 pass). */
         if (p != NULL) {
             scaled = p->m_vSize.x * extent;
         } else {
@@ -209,7 +211,7 @@ void CParticle__Update(CParticle *p) {
         p->m_vSize.z += (grow - p->m_vSize.z) * gFrameIncrement;
         if (p->m_vSize.x < 0.0f || p->m_vSize.y < 0.0f || p->m_vSize.z < 0.0f) {
             CParticle__FireExpireEvent(p);
-            CParticleSystem__Free(gScene.m_ParticleSystem, p);
+            CParticleSystem__Free(&gScene.m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
             return;
         }

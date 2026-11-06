@@ -8,7 +8,6 @@
  * module global D_8012FB64. */
 
 extern s32 D_8012FB64;
-extern char D_800C0570[];   /* "lit vertices" */
 
 void CGameObjectInstance__GetDeathModels(CGameObjectInstance *, s32, s32 *, s32 *);
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
@@ -34,7 +33,7 @@ void TotemDefense_DrawTotem(CGameObjectInstance *actor, s32 arg1, CDrawArgs *par
         return;
     }
     resource = CCache__RequestDecompression(0, actor->m_dwUniqueID | gLitVerticesKey, params->m_hModel, 0, 0, actor,
-                             CGameObjectInstance__ConstructLitVertices, D_800C0570, 1);
+                             CGameObjectInstance__ConstructLitVertices, "lit vertices", 1);
     if (resource == NULL) {
         return;
     }

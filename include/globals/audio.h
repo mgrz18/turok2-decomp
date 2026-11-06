@@ -52,4 +52,8 @@ extern s32 sLoopSoundsLastPaused;
 extern s32 sLoopSoundsLastResumed;
 extern ALSound sSpeechSound;
 
+/* The level's looping sounds (structs/sound.h) */
+extern LoopSounds gLoopSounds;
+extern SndSource gLoopSoundEntries[15];
+
 #endif

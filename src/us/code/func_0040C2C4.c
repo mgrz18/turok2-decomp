@@ -6,7 +6,7 @@
 /* Spawns pool pickup id at pos, thrown upward, lasting the given time, and plays its spawn sound. */
 
 extern s32 CScene__FindRegionAt(void *level, CVector3 *pos);
-extern CPooledLevelActor *CLevelActorPool__Spawn(void *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
+extern CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, s32 id, CVector3 vel, CVector3 pos, s32 region, f32 lifetime);
 extern void Actor_SpawnParticle(CPooledLevelActor *actor, s32 sound, CVector3 pos, s32 arg);
 
 void MotherBoss_SpawnPickup(s32 id, s32 lifetime, CVector3 pos) {
@@ -18,7 +18,7 @@ void MotherBoss_SpawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;
-    pickup = CLevelActorPool__Spawn(gScene.m_ActorPool, NULL, id, vel, pos, region, lifetime);
+    pickup = CLevelActorPool__Spawn(&gScene.m_ActorPool, NULL, id, vel, pos, region, lifetime);
     if (pickup != NULL) {
         Actor_SpawnParticle(pickup, 0x11D, pos, 0);
     }

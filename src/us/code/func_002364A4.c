@@ -14,7 +14,6 @@ typedef struct Pool6BD4 {
     u8 lists[0xC8];     /* Turok 2: 0x94D8 (Rage Wars: 0x94E0) */
     Node6BD4 *unk95A0;
 } Pool6BD4;
-extern f32 D_800A6524;
 void CQuaternion__FromDirection(void *a, CVector3 *b);
 void CList__Remove(void *list, Node6BD4 *n);
 void CList__AddTail(void *list, Node6BD4 *n);
@@ -57,7 +56,7 @@ have:
                 CVector3__Scale(&dir, &dir, 2.048f);
                 CVector3__Add(&pos, &pos, &dir);
                 CMtxF__Translate(m10, pos.x, pos.y, pos.z);
-                CMtxF__ScaleAxes(m10, D_800A6524, 1.0f, D_800A6524);
+                CMtxF__ScaleAxes(m10, 6.144f, 1.0f, 6.144f);
                 CMtxF__ToMtxAffine(m10, n->sub);
             }
         }

@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 #include "globals/audio.h"
+#include "globals/sysrc.h"
 
 extern u32 __amDMA(s32 offset, s32 length);
 extern Window *gAudioDmaState_firstFree;
-extern char gLoader;
-extern void CLoader__LoadAsync(void *, u32, s32, s32, void *, s32, s32);
+extern void CLoader__LoadAsync(CLoader *reader, u32, s32, s32, void *, s32, s32);
 u32 __amDMA(s32 offset, s32 length) {
     extern u32 osVirtualToPhysical(s32);
     extern void alLink(Window *, Window *);

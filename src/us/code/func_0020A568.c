@@ -2,52 +2,9 @@
 
 #include "common.h"
 #include "structs/model.h"
-
-/* A part's material. */
-typedef struct Material {
-    /* 0x00 */ u32 flags;
-    /* 0x04 */ u32 id;
-    /* 0x08 */ u8 pad8[0x10];
-    /* 0x18 */ u16 unk18;
-    /* 0x1A */ u16 unk1A;
-} Material;
-
-/* One draw of a part with one instance's state. */
-typedef struct DrawItem {
-    /* 0x00 */ void *list;
-    /* 0x04 */ void *matrix;
-    /* 0x08 */ void *lights;
-    /* 0x0C */ void *textures;
-    /* 0x10 */ u16 unk10;
-    /* 0x12 */ u16 unk12;
-    /* 0x14 */ s32 segment;
-    /* 0x18 */ struct DrawItem *next;
-} DrawItem; /* size 0x1C */
-
-/* A material key in a sort tree, threaded in key order through next/prev. */
-typedef struct SortNode {
-    /* 0x00 */ u32 key;
-    /* 0x04 */ Material *material;
-    /* 0x08 */ DrawItem *head;
-    /* 0x0C */ DrawItem *tail;
-    /* 0x10 */ struct SortNode *prev;
-    /* 0x14 */ struct SortNode *next;
-    /* 0x18 */ struct SortNode *left;
-    /* 0x1C */ struct SortNode *right;
-} SortNode; /* size 0x20 */
+#include "globals/batch.h"
 
 extern u8 D_800D8E13;               /* low byte of the pass */
-extern s32 sBatchLod;              /* level of detail of the batched model */
-extern SortNode *sOpaqueSortRoot;        /* opaque tree root */
-extern SortNode *sOpaqueSortFirst;        /* its first node */
-extern s32 sDrawItemCount;              /* draw items used */
-extern void **sBatchResource;           /* batched model */
-extern s32 sSortNodeCount;              /* sort nodes used */
-extern SortNode *sTranslucentSortRoot;        /* translucent tree root */
-extern s32 sBatchInstanceCount;              /* queued instance count */
-extern SortNode *sTranslucentSortFirst;        /* its first node */
-extern DrawItem sDrawItems[500];
-extern SortNode sSortNodes[100];
 
 void *CISet__GetBlock(void *resource, s32 index);
 
@@ -196,8 +153,8 @@ void Render_FlushModelBatch(void) {
                     item->matrix = inst->m_pMatrix;
                     item->lights = inst->m_pLights;
                     item->textures = inst->m_pTextures;
-                    item->unk10 = material->unk18;
-                    item->unk12 = material->unk1A;
+                    item->scaleS = material->scaleS;
+                    item->scaleT = material->scaleT;
                     item->segment = inst->m_Segment;
                     item->next = NULL;
                     if (node->tail != NULL) {

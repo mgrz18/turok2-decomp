@@ -1,31 +1,31 @@
 #include "common.h"
 #include "structs/cache.h"
+#include "globals/cache.h"
 
-s32 CList__AddTail(s32, s32);
-s32 CList__InsertBefore(s32, s32, s32);
+void CList__AddTail(CList *list, void *element);
+void CList__InsertBefore(CList *list, void *before, void *element);
 
-extern CMemEntry *gCache_memLockedList;
+/* Files a CMemEntry in the locked list, which is sorted by address. */
+void CCache__AddToAddressList(s32 unused, CMemEntry *entry) {
+    CMemEntry *scan;
 
-void CCache__AddToAddressList(s32 arg0, CMemEntry *arg1) {
-    CMemEntry *var_s0;
-
-    var_s0 = gCache_memLockedList;
-    if (var_s0 != NULL) {
+    scan = gCache_memLockedList.m_pHead;
+    if (scan != NULL) {
 loop_1:
-        if (var_s0->data > arg1->data) {
-            CList__InsertBefore((s32) &gCache_memLockedList, (s32) var_s0, (s32) arg1);
+        if (scan->data > entry->data) {
+            CList__InsertBefore(&gCache_memLockedList, scan, entry);
         } else {
-            var_s0 = var_s0->lockedNext;
-            if (var_s0 != NULL) {
+            scan = scan->lockedNext;
+            if (scan != NULL) {
                 goto loop_1;
             }
         }
-        if (var_s0 == NULL) {
+        if (scan == NULL) {
             goto block_5;
         }
     } else {
 block_5:
-        CList__AddTail((s32) &gCache_memLockedList, (s32) arg1);
+        CList__AddTail(&gCache_memLockedList, entry);
     }
-    arg1->flags = arg1->flags | 0x1000;
+    entry->flags = entry->flags | MEMENTRY_FLAG_ON_LOCKED;
 }

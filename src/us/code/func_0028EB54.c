@@ -5,10 +5,9 @@
 #include "globals/pager.h"
 
 extern void VM_FreeRegion(OwnerRecAt8V2 *arg0);
-extern Slot_func_8023CCD4_de gPager_slots[];
 void VM_FreeRegion(OwnerRecAt8V2 *arg0) {
     extern s32 osSendMesg(s32, Node_func_8023CCD4_de *, s32);
-    extern void VM_UnmapTLBEntry(Slot_func_8023CCD4_de *);
+    extern void VM_UnmapTLBEntry(PageMapping *);
     Node_func_8023CCD4_de *node;
     Node_func_8023CCD4_de *prev;
     u8 *slot;

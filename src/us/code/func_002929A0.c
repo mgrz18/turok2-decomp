@@ -27,7 +27,6 @@ typedef struct {
     /* 0x60 */ BindSlot *slots;
 } BindTable;
 
-extern f32 D_800AA410;
 
 /* Resets slot arg1 to its defaults. */
 void __resetPerfChanState(BindTable *arg0, s32 arg1) {
@@ -38,5 +37,5 @@ void __resetPerfChanState(BindTable *arg0, s32 arg1) {
     arg0->slots[arg1].unk8 = 5;
     arg0->slots[arg1].unkB = 0;
     arg0->slots[arg1].unk4 = 0xC8;
-    arg0->slots[arg1].unkC = D_800AA410;
+    arg0->slots[arg1].unkC = 1.0f;
 }

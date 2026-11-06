@@ -5,8 +5,6 @@
 struct ScreenRectangle;
 #include "common.h"
 #include "globals/game.h"
-extern float D_800A7120;
-extern float D_800A7124;
 extern void func_00254834(void *arg0, struct ScreenRectangle *arg1);
 typedef struct ScreenRectangle { char pad0[0x288]; f32 x,y,width,height; } ScreenRectangle;
 extern s32 Hud_DrawSprite(s32 arg0, s32 arg1, s16 arg2, s16 arg3, f32 arg4, f32 arg5, s32 arg6);
@@ -25,13 +23,13 @@ void func_00254834(void *arg0, struct ScreenRectangle *arg1)
   f32 screenY;
   Hud_SetupTextureMode(gEngineApp_m_Settings.hudAlpha);
   x = arg1->x;
-  ax = x * D_800A7120;
+  ax = x * 0.5f;
   y = arg1->y;
-  ay = y * D_800A7120;
+  ay = y * 0.5f;
   sx = x / ((f32) gScreenWidth);
-  bx = sx * D_800A7124;
+  bx = sx * 16.0f;
   sy = y / ((f32) gScreenHeight);
-  by = sy * D_800A7124;
+  by = sy * 16.0f;
   screenX = ((arg1->width) + ax) - bx;
   screenY = ((arg1->height) + ay) - by;
   Hud_DrawSprite(0x1FB, 0, (s16) ((s32) (((arg1->width) + ax) - bx)), (s16) ((s32) screenY), sx, sy, 1);

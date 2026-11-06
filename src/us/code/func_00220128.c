@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5D60;
 extern void Quaternion_ToMatrix(f32 *m, f32 *q, f32 *t);
 void Quaternion_ToMatrix(f32 *m, f32 *q, f32 *t)
 {
@@ -38,5 +37,5 @@ void Quaternion_ToMatrix(f32 *m, f32 *q, f32 *t)
     m[3] = 0.0f;
     m[7] = 0.0f;
     m[11] = 0.0f;
-    m[15] = D_800A5D60;
+    m[15] = 1.0f;
 }

@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5604;
 void CMtxF__SetShadowProjection(void *arg0, void *arg1, f32 arg2) {
     CVector3 *direction = arg1;
     Matrix *o = arg0;
@@ -12,7 +11,7 @@ void CMtxF__SetShadowProjection(void *arg0, void *arg1, f32 arg2) {
     f32 temp_f1;
     f32 temp_f2;
     f32 temp_f3;
-    temp_f0 = D_800A5604;
+    temp_f0 = 1.0f;
     o->m[15] = temp_f0;
     o->m[10] = temp_f0;
     o->m[0] = temp_f0;

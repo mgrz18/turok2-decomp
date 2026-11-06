@@ -2,7 +2,6 @@
 #include "structs/game.h"
 
 s32 SavedPlayers_IsActive();                                /* extern */
-extern f32 D_800A9DE0;
 
 /* The frame/game state block passed to the per-mode handlers (the
  * handler table gEngineModeTable has 0xC-byte rows indexed by mode). */
@@ -17,6 +16,6 @@ void CEngineApp__SetMode(CEngineApp *arg0, s32 arg1) {
     arg0->m_Settings.nextMode = arg1;
     arg0->m_Settings.prevMode = temp_v1;
     if (SavedPlayers_IsActive() != 0) {
-        arg0->m_Settings.fade = D_800A9DE0;
+        arg0->m_Settings.fade = 1.0f;
     }
 }

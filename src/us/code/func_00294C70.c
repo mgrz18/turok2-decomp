@@ -15,8 +15,6 @@ typedef struct {
 } TimedList;
 
 s32 __assert(s32 *, s32 *, s32); /* extern */
-extern s32 D_800AA4B0;
-extern s32 D_800AA4B4;
 
 s32 __nextSampleTime(TimedList *arg0, TimedNode **arg1) {
     s32 var_s0;
@@ -24,7 +22,7 @@ s32 __nextSampleTime(TimedList *arg0, TimedNode **arg1) {
 
     var_s0 = 0x7FFFFFFF;
     if (arg0->head == NULL) {
-        __assert(&D_800AA4B0, &D_800AA4B4, 0x133);
+        __assert("EX", "audio/synthesizer.c", 0x133);
     }
     *arg1 = NULL;
     var_a0 = arg0->head;

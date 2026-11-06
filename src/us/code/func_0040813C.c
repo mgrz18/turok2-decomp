@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
@@ -12,15 +13,6 @@ typedef struct {
     /* 0xC6 */ s8 anim;
     /* 0xC7 */ s8 unkC7;
 } BossAI;
-
-typedef struct {
-    /* 0x00 */ CListedInstance *obj;
-    /* 0x04 */ void *def;
-    /* 0x08 */ s32 state;
-    /* 0x0C */ f32 timer;
-    /* 0x10 */ s32 count;
-    /* 0x14 */ s32 warned;
-} BossFight;
 
 
 extern u8 D_800B6674[];
@@ -47,7 +39,7 @@ static __inline__ void setAnim(CListedInstance *actor, s32 id) {
 /* The fight starts: message, the boss's intro animation, and the helpers
  * (those not dead and, unless the fight is over, targeting the boss) turn on
  * the current player. */
-void TotemDefense_Fail(BossFight *fight) {
+void TotemDefense_Fail(TotemDefenseState *fight) {
     CGame *game = &gEngineApp_m_Game;
     CPlayer *player;
     CListedInstance *a;
@@ -58,7 +50,7 @@ void TotemDefense_Fail(BossFight *fight) {
     player->m_InvincibilityTime = 900.0f;
     fight->state = 2;
     fight->warned = 2;
-    setAnim(fight->obj, 0x5336);
+    setAnim((CListedInstance *) fight->obj, 0x5336);
     COnScreen__ClearBoss(&gEngineApp_m_OnScreen);
     COnScreen__ClearBoss2(&gEngineApp_m_OnScreen);
     CScene__UnmarkGeneratorsSaved(&gScene);

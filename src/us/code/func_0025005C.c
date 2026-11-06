@@ -7,7 +7,6 @@
 #include "globals/scene.h"
 #include "globals/engine.h"
 
-extern char D_800A6EA8[]; /* "Fly Mode Off" */
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 f32 Math_StepClamped(f32 value, f32 target, f32 rate);
@@ -69,7 +68,7 @@ void CPlayer__UpdateFlyCheat(CPlayer *player, CGameObjectInstance *body) {
     }
     if (player->m_Mode == 1 && (player->m_ContState.m_dwButtons & 0xE000) == 0xE000 && (player->m_ContState.m_dwButtonsSingle & 0xE000)) {
         CPlayer__SetState(player, body, 2);
-        CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, D_800A6EA8);
+        CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, player->m_pCamera, "Fly Mode Off");
         if (floor == NULL) {
             floor = body->header.m_pCurrentRegion;
             body->header.m_vPos = *floor->m_pVertices[0];

@@ -6,11 +6,6 @@
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern f32 HalfToFloat(s32);
-extern float D_800A80FC;
-extern float D_800A8100;
-extern float D_800A8104;
-extern float D_800A8108;
-extern float D_800A810C;
 extern struct Bytes12 *CAudioWorld__GetPitchEnvelope(ContextRecAt2BC0 *, s32);
 extern s16 FloatToHalf(f32);
 extern s32 SoundEffectInfo_GetRandomRange0(ControllerCode802591C0 *);
@@ -44,13 +39,13 @@ void SndVoice_InitPitch(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s
     turn = (s16)(s32)(fx + ((Random_Blend(fy, fx)) < 0.0f ? -(Random_Blend(fy, fx)) : (Random_Blend(fy, fx))));
     angles->heading = FloatToHalf(HalfToFloat(angles->heading) + turn);
     if (flags & 0x40) {
-        angles->heading = FloatToHalf(HalfToFloat(angles->heading) + D_800A80FC);
+        angles->heading = FloatToHalf(HalfToFloat(angles->heading) + 1.0e3f);
     }
     if (flags & 0x80) {
-        angles->heading = FloatToHalf(HalfToFloat(angles->heading) - D_800A8100);
+        angles->heading = FloatToHalf(HalfToFloat(angles->heading) - 1.0e3f);
     }
-    if (HalfToFloat(angles->heading) >= D_800A8104) {
-        angles->heading = FloatToHalf(D_800A8104);
+    if (HalfToFloat(angles->heading) >= 1.2e3f) {
+        angles->heading = FloatToHalf(1.2e3f);
     }
     if (controller->flags & 2) {
         motion->heading = HalfToFloat(angles->heading);
@@ -63,7 +58,7 @@ void SndVoice_InitPitch(ViewRecAtB0 *view, ControllerCode802591C0 *controller, s
         }
         view->pitch = HalfToFloat(angles->pitch);
     }
-    position = (HalfToFloat(angles->heading) + D_800A8108) * D_800A810C;
+    position = (HalfToFloat(angles->heading) + 6.0e3f) * 0.016666668f;
     index = position;
     if (index != position) {
         next = index + 1;

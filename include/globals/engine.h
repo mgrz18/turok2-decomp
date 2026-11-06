@@ -36,6 +36,8 @@ extern EngineMode gEngineModeTable[18];
 extern s32 gPersistentDataLoaded;   /* the level's persistent data is loaded (CScene__InitPersistentData) */
 extern s32 gAttractRunCount;        /* attract-mode runs (cinema, demo) */
 extern s32 gPakCheckStarted;        /* EngineMode00_PakCheck has started */
+extern f32 gPakCheckTimer;          /* 120 at boot (CEngineApp__Main), counted down by EngineMode00_PakCheck_Retrace */
+extern s32 gPakCheckTimedOut;       /* gPakCheckTimer ran out */
 extern s32 gShowExpansionPakScreen; /* the legal screen goes on to the expansion pak screen (1) */
 extern s32 gLegalScreenNoSkip;      /* the legal screen cannot be skipped yet (1) */
 extern s32 gFinalEnding;            /* 0: EngineMode15_Ending, 1: EngineMode16_Ending */
@@ -59,6 +61,7 @@ extern s32 gThreadPriorityLoader;
 extern s32 gThreadPriorityScheduler;
 
 extern char gBootSignature[0x10]; /* "sexysteve" while warm-booted ("signature") */
+extern char gEngineTimestamp[];     /* the build string mainproc prints, shown by the crash screen */
 
 /* Crash screen: file of the failed assertion */
 extern char *gAssertFile;

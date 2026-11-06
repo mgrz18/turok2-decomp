@@ -1,8 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
-
-extern s32 gRandomValue;
-extern s32 gRandomValueB;
+#include "globals/math.h"
 
 void Random_Seed(void) {
     gRandomValue = 0xE3F635E3;

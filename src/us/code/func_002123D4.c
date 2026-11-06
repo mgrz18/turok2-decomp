@@ -4,12 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/scene.h"
 
-extern float D_800A575C;
-extern float D_800A5760;
-extern float D_800A5758;
-extern float D_800A5750;
-extern float D_800A5754;
-extern f32 D_800A5764;
 extern void CVector3__Normalize(f32 *);
 s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 arg3,
                   CVector3 *arg4, f32 *arg5) {
@@ -21,16 +15,16 @@ s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 ar
     u8 temp_v1;
     var_f3 = *(f32 *)&arg1;
     var_f20 = 0.0f;
-    if (!(D_800A5750 <= var_f3) && !(var_f3 <= D_800A5754) &&
-        !(D_800A5750 <= *(f32 *)&arg2) && !(*(f32 *)&arg2 <= D_800A5754) &&
-        !(D_800A5750 <= *(f32 *)&arg3) && !(*(f32 *)&arg3 <= D_800A5754)) {
+    if (!(1.0f <= var_f3) && !(var_f3 <= -1.0f) &&
+        !(1.0f <= *(f32 *)&arg2) && !(*(f32 *)&arg2 <= -1.0f) &&
+        !(1.0f <= *(f32 *)&arg3) && !(*(f32 *)&arg3 <= -1.0f)) {
         temp_v1 = arg0->shape;
         switch (temp_v1) {
         case 0:
             var_f20 = (var_f3 * var_f3) + (*(f32 *)&arg2 * *(f32 *)&arg2) +
                       (*(f32 *)&arg3 * *(f32 *)&arg3);
-            if (!(D_800A5750 < var_f20)) {
-                var_f20 = sLightSphereFalloff[(s32)(var_f20 * D_800A5758)];
+            if (!(1.0f < var_f20)) {
+                var_f20 = sLightSphereFalloff[(s32)(var_f20 * 64.0f)];
                 goto shared;
             }
             goto fail;
@@ -39,7 +33,7 @@ s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 ar
                 var_f20 = (*(f32 *)&arg2 * *(f32 *)&arg2) +
                           (*(f32 *)&arg3 * *(f32 *)&arg3);
                 if (!((var_f3 * var_f3) < var_f20)) {
-                    var_f20 = sLightConeFalloff[(s32)(var_f20 * D_800A575C)];
+                    var_f20 = sLightConeFalloff[(s32)(var_f20 * 64.0f)];
                     var_f20 /= var_f3;
                     goto shared;
                 }
@@ -72,12 +66,12 @@ s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 ar
             goto shared;
         }
 shared:
-        var_f20 = D_800A5760 - var_f20;
+        var_f20 = 1.0f - var_f20;
         temp_f0 = arg0->falloff;
         if (var_f20 < temp_f0) {
             var_f20 /= temp_f0;
         } else {
-            var_f20 = D_800A5760;
+            var_f20 = 1.0f;
         }
         if (arg0->shape == 1) {
             *arg4 = arg0->axis;
@@ -91,7 +85,7 @@ shared:
 fail:
         arg4->y = 0.0f;
         arg4->z = 0.0f;
-        arg4->x = D_800A5764;
+        arg4->x = 1.0f;
         *arg5 = 0.0f;
         return 0;
     }

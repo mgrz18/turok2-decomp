@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "structs/boss.h"
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/onscreen.h"
@@ -18,15 +19,6 @@ typedef struct {
     /* 0x46 */ s16 kills;
 } BossDef;
 
-typedef struct {
-    /* 0x00 */ BossObj *obj;
-    /* 0x04 */ BossDef *def;
-    /* 0x08 */ s32 state;
-    /* 0x0C */ f32 timer;
-    /* 0x10 */ s32 count;
-    /* 0x14 */ s32 warned;
-} BossFight;
-
 extern u8 D_800B6684[];
 
 void *CPlayerPool__GetFirstActive(void *);
@@ -35,8 +27,8 @@ void Sound__PlaySpeech(s32);
 void COnScreen__SetBossPercent(void *, s32);
 void COnScreen__SetBossPercent2(void *, s32);
 s8 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
-void TotemDefense_Fail(BossFight *);
-void TotemDefense_Complete(BossFight *);
+void TotemDefense_Fail(TotemDefenseState *);
+void TotemDefense_Complete(TotemDefenseState *);
 
 static __inline__ s32 toInt(f32 f) {
     s32 value;
@@ -48,7 +40,7 @@ static __inline__ s32 toInt(f32 f) {
     return value;
 }
 
-void TotemDefense_UpdateFight(BossFight *fight) {
+void TotemDefense_UpdateFight(TotemDefenseState *fight) {
     f32 timer;
     u8 *bar;
     void *player;
@@ -62,13 +54,13 @@ void TotemDefense_UpdateFight(BossFight *fight) {
     if (gEngineApp_m_Game.m_Settings.mode != 13 || gScene.m_Mode != 4) {
         return;
     }
-    if ((f32) (*(s32 *) (fight->obj->def + 0x54) * 15) <= fight->timer) {
+    if ((f32) (*(s32 *) (((BossObj *) fight->obj)->def + 0x54) * 15) <= fight->timer) {
         CCameraPool__AddTimedText(gEngineApp_m_Game.m_CameraPool, *(s32 *) ((u8 *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList) + 0x51C), D_800B6684, 4.0f);
         Sound__PlaySpeech(0x182);
     }
     bar = &gEngineApp_m_OnScreen;
-    COnScreen__SetBossPercent(bar, toInt(fight->timer * (1.0f / 15) / (f32) fight->def->time * 100.0f));
-    COnScreen__SetBossPercent2(bar, toInt((f32) (fight->def->kills - fight->count) / (f32) fight->def->kills * 100.0f));
+    COnScreen__SetBossPercent(bar, toInt(fight->timer * (1.0f / 15) / (f32) ((BossDef *) fight->def)->time * 100.0f));
+    COnScreen__SetBossPercent2(bar, toInt((f32) (((BossDef *) fight->def)->kills - fight->kills) / (f32) ((BossDef *) fight->def)->kills * 100.0f));
     if (fight->state == 0) {
         if (fight->timer < 450.0f && fight->warned != 1) {
             obj = (u8 *) fight->obj;
@@ -80,7 +72,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
             fight->warned = 1;
         }
         timer = fight->timer - gFrameIncrement;
-        left = fight->def->kills - fight->count;
+        left = ((BossDef *) fight->def)->kills - fight->kills;
         left2 = left;
         fight->timer = timer;
         if (timer <= 0.0f) {
@@ -102,7 +94,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
         for (; actor != NULL; actor = actor->m_pNext) {
             if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_pTargetOverride == 0) {
                 if (fight->state == 0) {
-                    if (n < fight->def->maxHelpers) {
+                    if (n < ((BossDef *) fight->def)->maxHelpers) {
                         /* the first helpers keep chasing the player */
                         n++;
                         actor->m_Instance.m_AI.m_pPathTarget = player;

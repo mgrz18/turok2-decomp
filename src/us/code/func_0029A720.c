@@ -4,62 +4,18 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "globals/libultra.h"
-struct OSIoMesgHdr_func_802BA350_de;
-struct OSIoMesgHdr_func_802BA350_de {
-    u16 type;
-    u8 pri;
-    u8 status;
-    OSMesgQueue *retQueue;
-};
-struct OSDevMgr_func_802BA350_de;
-struct OSDevMgr_func_802BA350_de {
-    u32 active;
-    OSThread *thread;
-    OSMesgQueue *cmdQueue;
-    OSMesgQueue *evtQueue;
-    OSMesgQueue *acsQueue;
-    s32 (*dma)(s32, u32, void *, u32);
-    s32 (*edma)(void *, s32, u32, void *, u32);
-};
-struct OSIoMesgCode802BA23C;
-typedef struct OSIoMesgCode802BA23C OSIoMesgCode802BA23C;
-struct OSIoMesgHdr_func_802BA350_de;
-typedef struct OSIoMesgHdr_func_802BA350_de OSIoMesgHdr_func_802BA350_de;
-struct OSIoMesgCode802BA23C;
-struct OSIoMesgCode802BA23C {
-    OSIoMesgHdr_func_802BA350_de hdr;
-    void *dramAddr;
-    u32 devAddr;
-    u32 size;
-    void *piHandle;
-};
-struct OSDevMgr_func_802BA350_de;
-typedef struct OSDevMgr_func_802BA350_de OSDevMgr_func_802BA350_de;
-typedef u32 OSIntMask;
 extern void __osRestoreInt(OSIntMask mask);
 extern void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
 extern OSIntMask __osDisableInt(void);
-extern u64 __osViThreadStack[];
-extern void viMgrMain(void *arg);
-extern OSIoMesgCode802BA23C __osViCounterMsg;
-extern OSIoMesgCode802BA23C __osViRetraceMsg;
-extern u32 __osDisableInt(void);
 extern void __osTimerServicesInit();
 extern void __osViInit(void);
 extern void osCreateViManager(s32 pri);
-extern OSThread __osViThread;
-extern u64 __osViThreadStack[];
-extern OSMesgQueue __osViEventQueue;
-extern OSMesg __osViEventBuf[5];
-extern OSIoMesgCode802BA23C __osViRetraceMsg;
-extern OSIoMesgCode802BA23C __osViCounterMsg;
 extern void viMgrMain(void *arg);
 extern void osSetEventMesg(s32 event, OSMesgQueue *mq, OSMesg msg);
 extern s32 osGetThreadPri(OSThread *t);
 extern void osSetThreadPri(OSThread *t, s32 pri);
 extern void osCreateThread(OSThread *t, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
 extern void osStartThread(OSThread *t);
-extern u32 __osDisableInt(void);
 void osCreateViManager(s32 pri)
 {
     u32 savedMask;

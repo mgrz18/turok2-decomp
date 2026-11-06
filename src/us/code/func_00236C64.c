@@ -12,8 +12,6 @@ s32 CMtxF__ClampEntries(s32);
 s32 Swoosh_NewNode(s32, s32, s32);
 s32 CMtxF__ScaleAxes(u8 *, f32, f32, f32);    /* extern */
 
-extern f32 D_800A653C;
-extern f32 D_800A6540;
 
 void func_00236C64(s32 arg0, Emitter *arg1, CParticle *arg2, s32 arg3) {
     u8 sp10[0x40];
@@ -23,9 +21,9 @@ void func_00236C64(s32 arg0, Emitter *arg1, CParticle *arg2, s32 arg3) {
     temp_s0 = arg1->owner;
     if ((temp_s0 == arg2) && (arg1->unk24 > 0.0f)) {
         CMtxF__FromMtxAffine((s32) sp10, arg3);
-        var_f0 = D_800A653C;
+        var_f0 = 0.01f;
         if (temp_s0->m_pEffect->m_pModel != NULL) {
-            var_f0 = D_800A6540;
+            var_f0 = 0.29257143f;
         }
         CMtxF__ScaleAxes(sp10, var_f0, var_f0, var_f0);
         CMtxF__ClampEntries((s32) sp10);

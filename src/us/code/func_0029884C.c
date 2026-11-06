@@ -2,11 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern void __osPackReadData();
-extern s8 __osContNumControllers;
 void __osPackReadData(void) {
-    extern OSPifRam __osContBuffer;
     ContReadFormat readformat;
     u8 *ptr;
     u8 *count;

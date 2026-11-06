@@ -24,10 +24,10 @@ typedef struct B09SlotA {
             u8 a;
             u8 b;
 } B09SlotA;
-extern B09SlotA gPager_entries[];
-extern B09LNode gPager_slots[];
+extern B09SlotA gPager_entries[]; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
+extern B09LNode gPager_slots[]; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
 extern B09List gPager_chain_head; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 gVMPages[];
+extern u8 gVMPages[]; /* local: globals/pager.h is not included here (its gPager_slots/gPager_entries clash with this file's views) */
 void func_0028EE40(s32 index, s32 pm, void *vaddr, u32 evenpaddr, u32 oddpaddr, s32 asid);
 s32 VM_AcquireNextTLB(void);
 static __inline__ void m03_unlink(B09LNode *n) {

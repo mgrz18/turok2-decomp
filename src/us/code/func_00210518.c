@@ -6,7 +6,6 @@
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 void CMtxF__SetRotateX(void *arg0, f32 arg1) {
-    extern f32 D_800A561C;
     RW_Mtx *m = arg0;
     f32 sin_v;
     f32 cos_v;
@@ -14,7 +13,7 @@ void CMtxF__SetRotateX(void *arg0, f32 arg1) {
     f32 identity;
     sin_v = func_002982F0(arg1);
     zero = 0;
-    identity = D_800A561C;
+    identity = 1.0f;
     m->forward.y = -sin_v;
     m->up.z = sin_v;
     m->right.y = zero;

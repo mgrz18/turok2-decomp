@@ -7,7 +7,6 @@ typedef struct Plane {
 } Plane;
 
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, void *b);
-extern f32 D_800A66A4;
 
 s32 Plane_IntersectSegmentT(Plane *plane, CVector3 *start, CVector3 *end, f32 *t) {
     CVector3 dir;
@@ -17,7 +16,7 @@ s32 Plane_IntersectSegmentT(Plane *plane, CVector3 *start, CVector3 *end, f32 *t
     CVector3__Subtract(&dir, end, start);
     denom = plane->normal.x * dir.x + plane->normal.y * dir.y + plane->normal.z * dir.z;
     if (denom >= 0.0f) {
-        *t = D_800A66A4;
+        *t = 1.0f;
         return 0;
     }
     CVector3__Subtract(&diff, start, plane);

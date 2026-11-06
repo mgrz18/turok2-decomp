@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern void __osPfsGetOneChannelData_2(int channel, EntryRecAt3 *data);
 void __osPfsGetOneChannelData_2(s32 channel, EntryRecAt3 *data) {
-    extern char __osPfsPifRam;
     u8 *ptr;
     __OSContRequesFormatShort requestformat;
     s32 i;

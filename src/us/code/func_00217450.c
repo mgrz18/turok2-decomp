@@ -2,13 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/object.h"
 
-extern float sAnimRemapMin;
 extern float Bits_Normalize(float value, int bits);
 extern s32 D_800E6798;
-extern s32 sAnimRemapMax;
 extern u32 Bits_Read(u32 *arg0, s32 arg1);
-extern f32 Math_Remap(f32 arg0, f32 arg1, s32 arg2);
+extern f32 Math_Remap(f32 value, f32 lower, f32 upper);
 extern void AnimCurve_LoadSegment(Curve *arg0);
 void AnimCurve_Init(Segment8025FFD0 *arg0, u32 *arg1) {
     u32 bits;

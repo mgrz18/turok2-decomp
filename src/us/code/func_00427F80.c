@@ -2,6 +2,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/SDK/PFS/80446BD0_10.CPP, func_80446D80_de, with Turok 2's layouts. */
 /* __osPfsGetStatus (libultra pfsgetstatus.c). */
 #include "rw/abu_types.h"
+#include "globals/libultra.h"
 
 extern void __osPfsRequestOneChannel(int channel);
 extern void __osPfsGetOneChannelData(s32 channel, EntryRecAt3 *data);
@@ -10,7 +11,6 @@ extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 
 s32 __osPfsGetStatus(void *queue, int channel)
 {
-    extern char __osPfsPifRam;
     s32 ret = 0;
     void *dummy;
     EntryRecAt3 data;

@@ -7,7 +7,6 @@
 
 extern char D_800B48D4[];
 extern char D_800B48E0[];
-extern char D_800C1404[];
 
 extern s32 Pak_FindNote(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, void *a6, void *a7);
 extern s32 Pak_TextHasInvalidChar(char *s, s32 n);
@@ -74,6 +73,6 @@ s32 PakMenu_NoteText(MenuItem *item, Menu *c) {
         *dst++ = ch;
     }
     *dst += 2;
-    sprintf(dst, D_800C1404, size);
+    sprintf(dst, "%3d", size);
     return 0;
 }

@@ -3,10 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern double D_800AA258;
 extern f32 alCSeqTicksToSec(void **arg0, s32 arg1, s32 arg2);
-extern double D_800AA250;
-extern float D_800AA260;
 f32 alCSeqTicksToSec(void **arg0, s32 arg1, s32 arg2) {
     f64 angle;
     f32 arg1f;
@@ -16,13 +13,13 @@ f32 alCSeqTicksToSec(void **arg0, s32 arg1, s32 arg2) {
     angle = (f64)arg2;
     arg1f = (f32)arg1;
     if (arg2 < 0) {
-        angle += D_800AA250;
+        angle += 4294967296.0;
     }
     temp_v0 = ((ObjRecAt40V1 *)((*arg0)))->unk40;
     scaled = arg1f * (f32)angle;
     val = (f64)temp_v0;
     if (temp_v0 < 0) {
-        val += D_800AA258;
+        val += 4294967296.0;
     }
-    return scaled / ((f32)val * D_800AA260);
+    return scaled / ((f32)val * 1.0e6f);
 }

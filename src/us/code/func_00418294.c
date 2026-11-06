@@ -4,13 +4,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "globals/menu_desc.h"
-
-typedef struct {
-    /* 0x0 */ s16 unk0;
-    /* 0x2 */ s16 sound;
-} CharacterSound;
-
-extern CharacterSound gCharacterSelectSounds[];
+#include "globals/menu.h"
 
 extern s32 Controller_ConfirmPressed(void *controller);
 extern s32 Menu_StepValueLR(Menu *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);

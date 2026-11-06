@@ -3,9 +3,6 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern char D_800A9A00[]; /* "Cameras" */
-extern char D_800A9A08[]; /* "Camera Texts" */
-
 void CCamera__Construct_2(void *);
 void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 s32 CList__AddTail(CList *list, void *node);
@@ -69,7 +66,7 @@ void CCameraPool__NewGame_2(CCameraPool *owner, s32 count) {
     }
     if (count) {
         owner->m_nCameras = count;
-        owner->m_pmeCameras = CCache__Allocate(0, count * sizeof(CCamera), 0x23, D_800A9A00);
+        owner->m_pmeCameras = CCache__Allocate(0, count * sizeof(CCamera), 0x23, "Cameras");
         owner->m_Cameras = *(CCamera **) owner->m_pmeCameras;
         memset(owner->m_Cameras, 0, count * sizeof(CCamera));
         for (i = 0; i < owner->m_nCameras; i++) {
@@ -80,7 +77,7 @@ void CCameraPool__NewGame_2(CCameraPool *owner, s32 count) {
         owner->m_bOnlyUseMainCameraForSound = 0;
     }
     owner->m_nTexts = 16;
-    owner->m_pmeTexts = CCache__Allocate(0, 0x400, 0x23, D_800A9A08);
+    owner->m_pmeTexts = CCache__Allocate(0, 0x400, 0x23, "Camera Texts");
     owner->m_Texts = *(CCameraText **) owner->m_pmeTexts;
     memset(owner->m_Texts, 0, 0x400);
     for (i = 0; i < owner->m_nTexts; i++) {

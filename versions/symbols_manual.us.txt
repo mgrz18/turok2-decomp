@@ -111,3 +111,34 @@ gSplitScreenMarginLeft = 0x800B6CCC; /* f32 after gSplitScreenMarginTop, read on
  * scalar, which GCC compiles from a symbol of its own but not from gEngineApp_m_Settings.cheatFlags
  * (it bases the load/store on a register). Declared in include/globals/game.h. */
 gEngineApp_m_Settings_cheatFlags = 0x8011AAD8;
+
+/* Literals a converted file emits in its own .rodata and other files of the same
+ * source still read by address: GCC shares a string only within a file, and
+ * those readers are separate C files (docs/MATCHING.md, "Strings shared across
+ * files"). */
+D_800A5D70 = 0x800A5D70; /* "object index", CScene__Construct (func_00429FA0); read by func_0042CE10 (and its copy) */
+D_800A5D80 = 0x800A5D80; /* "geometry", CScene__Construct; read by func_0042CE10 (and its copy) */
+D_800A5D8C = 0x800A5D8C; /* "cartridge index", CScene__Construct; read by func_0042C194, func_0042C560 (and copies) */
+D_800A5EC0 = 0x800A5EC0; /* "level index", CScene__LoadLevel (func_0042AC0C); read by CScene__GetLevelName (func_0022629C) */
+D_800A5F6C = 0x800A5F6C; /* "grid section", CScene__StreamAllSections (func_0042BF48); read by CScene__LoadVisibleGridSections (func_002216DC) */
+D_800C0E70 = 0x800C0E70; /* "%04d", FinalScoreMenu_BlueScoreLabel (func_00417DD4); read by func_00417E28 */
+D_800C0E84 = 0x800C0E84; /* "  %02d", FragTagMenu_TimeLimitLabel (func_004184A8); read by func_00418584, func_00418A88, func_00418B64, func_00418F48, func_00419024 */
+D_800C0E8C = 0x800C0E8C; /* "none", FragTagMenu_TimeLimitLabel (func_004184A8); read by func_00418584, func_00418A88, func_00418B64, func_00418F48, func_00419024 */
+D_800C1030 = 0x800C1030; /* "  %2d", SoundMenu_SpeechVolumeLabel (func_00419CB4); read by func_00419E04, func_00419F48 */
+D_800C1038 = 0x800C1038; /* " %3d", SoundMenu_SpeechVolumeLabel (func_00419CB4); read by func_00419E04, func_00419F48 */
+D_800C1318 = 0x800C1318; /* "  %02d", OptionsMenu_StickHorzText (func_0041C524); read by func_0041C650, func_0041C8CC */
+D_800C1320 = 0x800C1320; /* " %03d", OptionsMenu_StickHorzText (func_0041C524); read by func_0041C650 */
+D_800C1330 = 0x800C1330; /* "%04d", StatsMenu_TagsText (func_0041CAE4); read by func_0041CB58, func_0041CBCC, func_0041CC40 (and copies) */
+D_800C13F0 = 0x800C13F0; /* "Single Save Block", SaveGame_Build (func_0041D890); read by func_0041F32C, func_00421334 (and copies) */
+D_800C1404 = 0x800C1404; /* "%3d", PakMenu_NoteText (func_0041FB50); read by func_0041FCF4, func_00421ED4 (and copies) */
+D_800C1410 = 0x800C1410; /* "%1d", PakMenu_UpdateModeText (func_00421BE4); read by func_00421CA0 (and copies) */
+D_800A5FC4 = 0x800A5FC4; /* "warp dests", CScene__FindWarpDests (func_0042C194); read by func_0042C560 */
+D_800A7080 = 0x800A7080; /* "Players", CPlayerPool__NewGame (func_0042E5AC); read by CPlayerPool__AllocPlayers (func_00257830) */
+D_800A9A00 = 0x800A9A00; /* "Cameras", CCameraPool__NewGame (func_0042FBA4); read by CCameraPool__AllocCameras (func_00281F84) */
+D_800A9A08 = 0x800A9A08; /* "Camera Texts", CCameraPool__NewGame (func_0042FBA4); read by CCameraPool__AllocTexts (func_00281FF8) */
+D_800C0570 = 0x800C0570; /* "lit vertices", TotemDefense_DrawTotem (func_004089E0); read by its asm copy TotemDefense_DrawTotem_2 */
+D_800C0EB0 = 0x800C0EB0; /* "unknown weapon", WeaponsMenu_ToggleLabel (func_00417910); read by its asm copy WeaponsMenu_ToggleLabel_2 */
+D_800C1414 = 0x800C1414; /* "%2d", GameNoteMenu_UpdateLives (func_00421F30); read by its asm copy func_0045ADF4 */
+D_800C1418 = 0x800C1418; /* "%3d.%02d.%02d", GameNoteMenu_UpdateTime (func_00422060); read by its asm copy func_0045AF80 */
+D_800C1428 = 0x800C1428; /* "%04d", CharNoteMenu_UpdateFrags (func_00422430); read by its asm copy func_0045B350 */
+D_800C18B0 = 0x800C18B0; /* "Mempak read temp data", readNote in func_00426164; read by Pak_ReadNote (func_004265B0) and its copy func_0045F4D0 */

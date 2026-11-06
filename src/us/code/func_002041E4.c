@@ -3,20 +3,19 @@
 
 #include "rw/junk_types.h"
 #include "globals/cache.h"
+#include "globals/sysrc.h"
 
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
-extern u8 gDecompressor[];
-extern u8 gHeap[];
 void CCache__ReleaseDisplayList(s32 a, u32 b);
-s32 CDecompressor__DecompressAsync(void *port, B12Msg *n, void *q);
+s32 CDecompressor__DecompressAsync(CDecompressor *port, B12Msg *n, void *q);
 void CList__Remove(void *l, B12Msg *n);
 void CList__AddHead(void *l, B12Msg *n);
 void CCache__DetachCacheEntry(s32 a, B12Node *n);
-void CHeap__Free(void *heap, s32 key);
+void CHeap__Free(CHeap *heap, s32 key);
 void CCache__FreeMemEntry(s32 a, B12Node *n);
 void CCache__FreeCacheEntry(s32 a, B12Msg *n);
 void CCache__CompleteRequest(s32 a, B12Msg *n, s32 b);
@@ -47,7 +46,7 @@ void CCache__Main(void) {
             msg->flags &= ~2;
             if (msg->flags & 8) {
                 msg->flags &= ~8;
-                if (CDecompressor__DecompressAsync(gDecompressor, msg, &D_800D7BE0.q870) != 0) {
+                if (CDecompressor__DecompressAsync(&gDecompressor, msg, &D_800D7BE0.q870) != 0) {
                     continue;
                 }
                 mask = __osDisableInt();
@@ -69,7 +68,7 @@ void CCache__Main(void) {
                 }
                 if (!(p->flags & 0x702)) {
                     CCache__DetachCacheEntry(0, p);
-                    CHeap__Free(gHeap, p->key);
+                    CHeap__Free(&gHeap, p->key);
                     CCache__FreeMemEntry(0, p);
                 }
                 CCache__FreeCacheEntry(0, msg);

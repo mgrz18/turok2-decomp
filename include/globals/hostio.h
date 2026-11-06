@@ -8,8 +8,14 @@
 #include "structs/memory.h"
 
 extern volatile s32 sHostIoDelayCounter;
+extern OSMesg sHostIoEventBuf[1];       /* sHostIoEventQueue's buffer */
 extern OSMesgQueue sHostIoEventQueue;
+extern OSMesg sHostIoRequestBuf[1];     /* sHostIoRequestQueue's buffer */
+extern OSMesg sHostIoDmaBuf[1];         /* sHostIoDmaQueue's buffer */
+extern OSMesgQueue sHostIoDmaQueue;      /* HostIo_ReadBlockDma, HostIo_WriteBlockDma wait on it */
+extern OSIoMesg sHostIoDmaMsg;          /* the OSIoMesg of those DMAs */
 extern OSMesgQueue sHostIoRequestQueue;
+extern OSMesg sHostIoReplyBuf[1];       /* sHostIoReplyQueue's buffer */
 extern OSMesgQueue sHostIoReplyQueue;
 extern OSThread sHostIoThread;
 extern u8 sHostIoStopped;

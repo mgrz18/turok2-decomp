@@ -4,9 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/audio.h"
 
-extern float D_800A8174;
-extern float D_800A8178;
-extern float D_800A8170;
 void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
     s32 i;
     s32 idx;
@@ -20,8 +17,8 @@ void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
     s32 negone;
     s32 one;
     i = 0;
-    k1 = D_800A8170;
-    k2 = D_800A8174;
+    k1 = 0.011111111f;
+    k2 = 3.2e4f;
     *arg0 = arg1;
     do {
         t = (f32)i * k1;
@@ -32,7 +29,7 @@ void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
     } while (i < 0x5B);
     negone = -1;
     i = 0;
-    k3 = D_800A8178;
+    k3 = 1.0f;
     one = 1;
     off = i;
     do {

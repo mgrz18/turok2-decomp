@@ -6,8 +6,6 @@
 s32 CPlayer__SetState(s32, s32, s32);
 s32 CPlayer__LoseLife(s32);
 
-extern CPlayer *sDeathCinemaPlayer;
-
 void PlayerDeath_CinemaDone(void) {
     if (sDeathCinemaPlayer->m_Data.m_Lives == 1) {
         CPlayer__LoseLife((s32) sDeathCinemaPlayer);

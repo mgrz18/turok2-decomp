@@ -1,14 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
-
-extern s32 sOpaqueSortRoot;
-extern s32 sOpaqueSortFirst;
-extern s32 sTranslucentSortRoot;
-extern s32 sTranslucentSortFirst;
+#include "globals/batch.h"
 
 void func_0020BFC0(void) {
-    sOpaqueSortFirst = 0;
-    sOpaqueSortRoot = 0;
-    sTranslucentSortFirst = 0;
-    sTranslucentSortRoot = 0;
+    sOpaqueSortFirst = NULL;
+    sOpaqueSortRoot = NULL;
+    sTranslucentSortFirst = NULL;
+    sTranslucentSortRoot = NULL;
 }

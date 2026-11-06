@@ -6,22 +6,14 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/engine.h"
+#include "globals/boss.h"
 
 /* Boss fight AI tick: runs the fight phase (timer and helpers, then the
  * random stun of a live helper), and once the boss has waited long enough
  * outside the fight starts the level's boss music. */
 
-typedef struct {
-    /* 0x00 */ void *obj;
-    /* 0x04 */ void *def;
-    /* 0x08 */ s32 state;
-    /* 0x0C */ f32 timer;
-} BossFight;
-
-extern BossFight gTotemDefense;
-
 extern void TotemDefense_DrawTotem();
-extern void TotemDefense_UpdateFight(BossFight *fight);
+extern void TotemDefense_UpdateFight(TotemDefenseState *fight);
 extern f32 Random_Float(f32 range);
 extern void Actor_SpawnParticle(CListedInstance *actor, s32 sound, CVector3 pos, s32 arg);
 extern void DamageEvent_Set(void *out, s32 a, s32 b, f32 c, s32 d, s32 e);
@@ -59,7 +51,7 @@ static __inline__ void stunHelper(void) {
 }
 
 void TotemDefense_Update(void *obj, CAI *ai) {
-    BossFight *fight = &gTotemDefense;
+    TotemDefenseState *fight = &gTotemDefense;
     CPlayer *player;
     s32 track;
 

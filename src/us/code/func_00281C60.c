@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A9C34;
 extern void CShake__Set(struct RecordRecAt18 *record, f32 first, f32 second, f32 third, f32 value, s32 mode, Triple triple);
 void CShake__Set(struct RecordRecAt18 *record, f32 first, f32 second, f32 third, f32 value, s32 mode,
                    Triple triple) {
@@ -12,7 +11,7 @@ void CShake__Set(struct RecordRecAt18 *record, f32 first, f32 second, f32 third,
     record->channels[0].mode = mode;
     record->channels[1].mode = mode;
     record->channels[2].mode = mode;
-    record->channels[0].level = first * D_800A9C34;
-    record->channels[1].level = second * D_800A9C34;
-    record->channels[2].level = third * D_800A9C34;
+    record->channels[0].level = first * 0.1f;
+    record->channels[1].level = second * 0.1f;
+    record->channels[2].level = third * 0.1f;
 }

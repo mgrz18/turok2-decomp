@@ -1,8 +1,9 @@
 #include "common.h"
 #include "structs/cache.h"
 #include "globals/cache.h"
+#include "globals/sysrc.h"
 
-s32 CHeap__Free(s32, s32);
+s32 CHeap__Free(CHeap *, s32);
 s32 CCache__FreeMemEntry(s32, s32);
 s32 CCache__DetachCacheEntry(s32, s32);
 s32 osRecvMesg(s32, s32, s32);
@@ -10,7 +11,6 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 gHeap;
 
 void CCache__DeallocAndReplaceCompressedData(s32 arg0, CMemEntry **arg1, CMemEntry *arg2) {
     s32 temp_a0;
@@ -44,7 +44,7 @@ loop_4:
     }
     if (!(temp_s0->flags & 0x702)) {
         CCache__DetachCacheEntry(0, (s32) temp_s0);
-        CHeap__Free((s32) &gHeap, temp_s0->data);
+        CHeap__Free(&gHeap, temp_s0->data);
         CCache__FreeMemEntry(0, (s32) temp_s0);
     }
     *arg1 = arg2;

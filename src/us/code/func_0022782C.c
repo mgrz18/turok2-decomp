@@ -31,8 +31,6 @@ typedef struct WorldRecAt3C08 {
     SceneEffect *head;         /* 0x3604 (0x3C04) */
 } WorldRecAt3C08;
 
-extern float D_800A6064;
-extern f32 D_800A6068;
 extern void Render_ResetBatches();
 extern void Render_FlushBatches();
 extern s32 Frustum_TestBox(void *arg0, void *arg1);
@@ -51,8 +49,8 @@ void CLevelActorPool__Draw(char *arg0, char *arg1) {
     entry = world->head;
     if (entry != 0) {
         zero = 0.0f;
-        upper = D_800A6064;
-        scale = D_800A6068;
+        upper = 7.5f;
+        scale = 34.0f;
         do {
             if ((camera->clipBounds[1].x > entry->minX) &&
                 (camera->clipBounds[0].x < entry->maxX) &&

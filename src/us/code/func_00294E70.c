@@ -4,25 +4,20 @@
 #include "rw/abu_types.h"
 #include "globals/libaudio.h"
 
-extern double D_800AA508;
-extern float D_800AA514;
-extern double D_800AA518;
 extern void alFilterNew(void *f, int h, int s, int type);
 extern s32 alHeapDBAlloc(s32 file, s32 line, void *hp, s32 num, s32 size);
-extern char alFxParam;
-extern char alFxPull;
-extern char alFxParamHdl;
-extern const f32 D_800AA500;
-extern const f32 D_800AA510;
+extern s32 alFxParam(void *filter, s32 paramID, void *param);
+extern Acmd *alFxPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p);
+extern s32 alFxParamHdl(void *filter, s32 paramID, void *param);
 void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
 {
     u16 i, j, k;
     s32 *param = 0;
     ALFilter *f = &r->filter;
     ALDelay *d;
-    alFilterNew(f, 0, (s32)&alFxParam, 5);
-    f->handler = &alFxPull;
-    r->paramHdl = &alFxParamHdl;
+    alFilterNew(f, 0, (s32)alFxParam, 5);
+    f->handler = alFxPull;
+    r->paramHdl = alFxParamHdl;
     switch (c->fxType) {
       case 1: param = SMALLROOM_PARAMS; break;
       case 2: param = BIGROOM_PARAMS; break;
@@ -52,15 +47,15 @@ void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
             f64 flength;
             f32 rsinc;
             f32 depth;
-            rsinc = (f32)param[j++] * D_800AA500;
+            rsinc = (f32)param[j++] * 0.001f;
             d->rsinc = (rsinc + rsinc) / c->outputRate;
             depth = (f32)param[j++];
             length = d->output - d->input;
             flength = length;
             if (length < 0)
-                flength += D_800AA508;
-            d->rsgain = depth * ((f32)flength * D_800AA510);
-            d->rsval = D_800AA514;
+                flength += 4294967296.0;
+            d->rsgain = depth * ((f32)flength * 5.7762263e-6f);
+            d->rsval = 1.0f;
             d->rsdelta = 0;
             d->rs = (void *)alHeapDBAlloc(0, 0, hp, 1, sizeof(ALResampler));
             ((ALResampler *)d->rs)->state = (void *)alHeapDBAlloc(0, 0, hp, 1, 32);
@@ -87,7 +82,7 @@ void alFxNew(ALFx *r, ALSynConfig *c, ALHeap *hp)
                 for (n = 0; n < 8; n++)
                     lp->fcvec.fccoef[n] = 0;
                 lp->fcvec.fccoef[n++] = fc;
-                fcoef = ffc = (f64)fc * D_800AA518;
+                fcoef = ffc = (f64)fc * 6.103515625e-5;
                 for (; n < 16; n++) {
                     fcoef *= ffc;
                     lp->fcvec.fccoef[n] = (s16)(fcoef * 16384.0);

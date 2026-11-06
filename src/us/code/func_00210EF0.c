@@ -4,19 +4,16 @@
 #include "rw/abu_types.h"
 
 extern void Angle_Wrap(f32 *value);
-extern float D_800A5644;
-extern f32 D_800A564C;
 void Angle_Wrap(f32 *value)
 {
-    extern f32 D_800A563C;
     {
         f32 val;
         f32 limit;
         f32 step;
         val = *value;
-        limit = *(&D_800A563C + 1);
+        limit = -3.1415927f;
         if (val < limit) {
-            step = D_800A5644;
+            step = 6.2831855f;
             do {
                 val += step;
                 *value = val;
@@ -28,9 +25,9 @@ void Angle_Wrap(f32 *value)
         f32 limit;
         f32 step;
         val = *value;
-        limit = *(&D_800A5644 + 1);
+        limit = 3.1415927f;
         if (limit <= val) {
-            step = D_800A564C;
+            step = 6.2831855f;
             do {
                 val -= step;
                 *value = val;

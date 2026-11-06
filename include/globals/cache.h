@@ -8,9 +8,12 @@
 #include "ultra_types.h"
 #include "structs/list.h"
 #include "structs/cache.h"
+#include "structs/hash.h"
 
+extern CCache gCache;                       /* the fields below are also symbols of their own */
 extern u32 gHashMask;                       /* the bucket mask of every lookup */
 extern u32 gHashTableMask;                  /* CHashTable__Insert's probe wrap */
+extern HashEntry *gHashTable;               /* gHashTableSize entries (CHashTable__Construct) */
 extern CMemEntry **gCache_memEntriesFree;
 extern CMemEntry *gCache_currentCompressPos;
 extern CList gCache_memAgeList;             /* resident entries by age */

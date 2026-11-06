@@ -7,11 +7,9 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/pager.h"
+#include "globals/sysrc.h"
+#include "globals/pager.h"
 
-
-extern char gPager_readerStack[];               /* the reader thread's stack; its OSThread is 0x230 below */
-extern char gLoader[];               /* the cartridge reader */
-extern char gVMPages[];               /* the page array, 0x1000 per page */
 
 void memset(void *dst, s32 value, s32 size);
 void osCreateThread(void *thread, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
@@ -19,7 +17,7 @@ void osStartThread(void *thread);
 void osCreateMesgQueue(OSMesgQueue *queue, void **msg, s32 count);
 s32 osRecvMesg(OSMesgQueue *queue, void **msg, s32 block);
 s32 osSendMesg(OSMesgQueue *queue, void *msg, s32 block);
-void CLoader__LoadSync(void *reader, u8 *source, s32 size, void *dest);
+void CLoader__LoadSync(CLoader *reader, u8 *source, s32 size, void *dest);
 void osInvalDCache(void *addr, s32 size);
 void osInvalICache(void *addr, s32 size);
 void VM_HandleTLBMiss(void);

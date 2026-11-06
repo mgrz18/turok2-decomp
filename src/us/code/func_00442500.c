@@ -13,7 +13,7 @@ extern f32 Random_Blend(f32 min, f32 max);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
 extern f32 func_00298470(f32 x); /* sqrt */
 extern s32 CScene__FindRegionAt(void *world, CVector3 *pos);
-extern void *CLevelActorPool__Spawn(void *pool, s32 a1, s16 type, CVector3 vel, CVector3 pos, s32 region, f32 arg);
+extern void *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 a1, s16 type, CVector3 vel, CVector3 pos, s32 region, f32 arg);
 extern void Actor_SpawnParticle(void *actor, s32 id, CVector3 pos, s32 a5);
 
 static __inline__ void SpawnAt(s32 arg0, s16 type, CVector3 pos, f32 speed) {
@@ -25,7 +25,7 @@ static __inline__ void SpawnAt(s32 arg0, s16 type, CVector3 pos, f32 speed) {
     vel.x = 0.0f;
     vel.y = speed;
     vel.z = 0.0f;
-    actor = CLevelActorPool__Spawn(gScene.m_ActorPool, 0, type, vel, pos, region, arg0);
+    actor = CLevelActorPool__Spawn(&gScene.m_ActorPool, 0, type, vel, pos, region, arg0);
     if (actor != NULL) {
         Actor_SpawnParticle(actor, 0x11D, pos, 0);
     }

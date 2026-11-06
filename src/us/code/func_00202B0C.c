@@ -6,14 +6,13 @@
 
 extern s32 D_800AB0B8;
 void CHashTable__GetLongestChain(void) {
-    extern s32 gHashTable;
     s32 var_a1;
     s32 var_v1;
     u32 var_a0;
     u32 var_a0_2;
     u32 limit;
-    Shared_HashLink *var_v0;
-    Shared_HashLink *buckets;
+    HashEntry *var_v0;
+    HashEntry *buckets;
     var_a1 = 0;
     var_a0 = var_a1;
     limit = gHashSize;
@@ -25,7 +24,7 @@ void CHashTable__GetLongestChain(void) {
     }
     var_a0_2 = 0;
     if (gHashSize != 0) {
-        buckets = (Shared_HashLink *)gHashTable;
+        buckets = gHashTable;
         do {
             var_v0 = &buckets[var_a0_2];
             var_v1 = 0;

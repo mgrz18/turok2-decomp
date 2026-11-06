@@ -41,7 +41,6 @@ void CMtxF__TransformPoint(f32 *, CVector3 *, CVector3 *);
 void ImpactEvent_Send(void *, void *, s32, s32, CVector3, AttachmentParams);
 
 extern u8 D_800A5808[];
-extern u8 D_800A581C[];
 
 void CStaticObject__SpawnEvents(PlacedProp *prop, s32 all) {
     s32 *model;
@@ -63,7 +62,7 @@ void CStaticObject__SpawnEvents(PlacedProp *prop, s32 all) {
         return;
     }
     name = CISet__GetROMAddressAndSize(*model, prop->owner, 3, &size);
-    table = CCache__Request(0, name, size, 0, 0, 0, D_800A581C, 0);
+    table = CCache__Request(0, name, size, 0, 0, 0, "static events", 0);
     if (table != NULL) {
         header = *table;
         count = header[1];

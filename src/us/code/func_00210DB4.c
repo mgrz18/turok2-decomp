@@ -4,21 +4,18 @@
 #include "rw/abu_types.h"
 
 extern void Angle_Wrap(f32 *value);
-extern float D_800A5634;
-extern const f32 D_800A562C;
-extern f32 D_800A562C;
 f32 Angle_Lerp(f32 fraction, f32 first, f32 second) {
     f32 var_f3;
     f32 result;
     Angle_Wrap(&first);
     Angle_Wrap(&second);
     if (first > second) {
-        var_f3 = second + *(&D_800A562C + 1);
+        var_f3 = second + 6.2831855f;
         if ((var_f3 - first) < (first - second)) {
             second = var_f3;
         }
     } else {
-        var_f3 = second - D_800A5634;
+        var_f3 = second - 6.2831855f;
         if ((first - var_f3) < (second - first)) {
             second = var_f3;
         }

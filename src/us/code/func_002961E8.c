@@ -1,8 +1,6 @@
 typedef int s32;
 typedef float f32;
 
-extern f32 D_800AA648;
-extern f32 D_800AA64C;
 
 f32 _getVol(f32 value, s32 shift, s32 whole, s32 frac) {
     s32 n = shift >> 3;
@@ -13,8 +11,8 @@ f32 _getVol(f32 value, s32 shift, s32 whole, s32 frac) {
     if (n == 0) {
         return value;
     }
-    base = ((f32)(whole << 16) + (f32)(frac & 0xFFFF)) * D_800AA648;
-    result = D_800AA64C;
+    base = ((f32)(whole << 16) + (f32)(frac & 0xFFFF)) * 1.5258789e-5f;
+    result = 1.0f;
     do {
         if (n & 1) {
             result *= base;

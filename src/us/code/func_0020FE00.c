@@ -5,7 +5,6 @@
 
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-extern float D_800A5600;
 void CMtxF__SetEulerXYZ(f32 *m, f32 x, f32 y, f32 z)
 {
   f32 zero;
@@ -33,5 +32,5 @@ void CMtxF__SetEulerXYZ(f32 *m, f32 x, f32 y, f32 z)
   m[8] = ((bx * ay) * bz) + (ax * az);
   m[9] = ((bx * ay) * az) - (ax * bz);
   m[10] = bx * by;
-  m[15] = D_800A5600;
+  m[15] = 1.0f;
 }

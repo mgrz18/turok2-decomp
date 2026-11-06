@@ -12,16 +12,9 @@ struct func_80250BD4_S1 {
 };
 struct func_80250BD4_S1;
 typedef struct func_80250BD4_S1 func_80250BD4_S1;
-struct SharedRecAt224;
-struct SharedRecAt224 {
-    char pad0[0x224];
-    s32 unk224;
-};
 struct SharedRecAtA8;
 typedef struct SharedRecAtA8 SharedRecAtA8;
 extern void Menu_ClaimPressingController(func_80250BD4_S1 *arg0);
-struct SharedRecAt224;
-typedef struct SharedRecAt224 SharedRecAt224;
 struct SharedRecAtA8;
 struct SharedRecAtA8 {
     char pad0[0xA8];

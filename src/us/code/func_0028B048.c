@@ -3,10 +3,10 @@
 
 #include "rw/abu_types.h"
 #include "globals/frame.h"
+#include "globals/framebuffer.h"
 
 extern void *__scTaskReady(struct OSScTask_s *arg0);
 extern void *osViGetCurrentFramebuffer();
-extern s32 gCurrentFB;
 void *__scTaskReady(struct OSScTask_s *arg0) {
     s32 f1a;
     s32 f1b;

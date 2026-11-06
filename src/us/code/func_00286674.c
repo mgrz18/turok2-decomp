@@ -11,25 +11,12 @@
 #include "globals/engine.h"
 #include "globals/controller.h"
 #include "globals/libultra.h"
-
-typedef struct {
-    /* 0x00 */ s16 type;
-} EngineMsg;
+#include "globals/framebuffer.h"
 
 extern u8 gPoolBuffers[];
-extern void *gCFB[];      /* frame buffers */
-extern f32 gCurrentFB[];
-extern EngineMsg *gGfxMsg;
-extern s32 gCurrentTick;
-extern s32 gNumTicks0;
 extern s32 D_800F6CA8;
-extern s32 gNumTicks2;
-extern s32 gNumTicks3;
-extern s32 gCurrentTickWaiting;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
-extern f32 gPakCheckTimer;
-extern u8 gGfxFrameMessageQueue[];         /* the engine message queue */
 
 extern void InitializeSystemResources(void);
 extern void osCreateViManager(s32 pri);
@@ -70,9 +57,9 @@ void CEngineApp__Main(CEngineApp *e) {
     osViSwapBuffer(gCFB[0]);
     osViBlack(0);
     if (osTvType == 0) {
-        gCurrentFB[1] = 50.0f;
+        gRefreshRate = 50.0f;
     } else {
-        gCurrentFB[1] = 60.0f;
+        gRefreshRate = 60.0f;
     }
     gGfxMsg = NULL;
     Demo_Reset();
@@ -86,23 +73,23 @@ void CEngineApp__Main(CEngineApp *e) {
     gCurrentTickWaiting = 0;
     gNumTicksWaiting = 0;
     gNextFrameToShow = 0;
-    gCurrentFB[0] = 0;
-    gPendingFB = 0;
+    gCurrentFB = NULL;
+    gPendingFB = NULL;
     CEngineApp__Construct(e);
     for (i = 0; i < gTotalFramebuffers; i++) {
         memset(gCFB[i], 0, gScreenWidth * gScreenHeight * 2);
     }
-    CCameraPool__Construct((u8 *)e + 0x22C00);
-    CPlayerPool__Construct((u8 *)e + 0x22BC0);
+    CCameraPool__Construct(e->m_Game.m_CameraPool);
+    CPlayerPool__Construct(&e->m_Game.m_PlayerList);
     CCollisionInfo__Reset();
     e->m_CartridgeIndex = 0xFCBFB4;
-    CCameraPool__NewGame((u8 *)e + 0x22C00, 0);
-    CPlayerPool__NewGame((u8 *)e + 0x22BC0, 0, 0);
+    CCameraPool__NewGame(e->m_Game.m_CameraPool, 0);
+    CPlayerPool__NewGame(&e->m_Game.m_PlayerList, 0, 0);
     CScene__Construct(&gScene, e->m_CartridgeIndex);
     if (gValidControllerBits == 0) {
         Cont_InitAll();
     }
-    COnScreen__Construct((u8 *)e + 0x19440);
+    COnScreen__Construct(e->unk19440);
     Pak_AllocDirectory();
     gPakCheckHasPak = 0;
     gPakCheckDone = 0;
@@ -118,18 +105,18 @@ void CEngineApp__Main(CEngineApp *e) {
     }
 
     for (;;) {
-        osRecvMesg(gGfxFrameMessageQueue, &gGfxMsg, 1);
+        osRecvMesg(&gGfxFrameMessageQueue, &gGfxMsg, 1);
         switch (gGfxMsg->type) {
         case 1:
             CEngineApp__Retrace(e);
             break;
         case 2:
-            if ((u8 *)gGfxMsg == (u8 *)e + 0xF0) {
-                gFrameData = (CFrameData *)e;
-            } else if ((u8 *)gGfxMsg == (u8 *)e + 0x230) {
-                gFrameData = (CFrameData *)((u8 *)e + 0x140);
-            } else if ((u8 *)gGfxMsg == (u8 *)e + 0x370) {
-                gFrameData = (CFrameData *)((u8 *)e + 0x280);
+            if (gGfxMsg == (OSScMsg *) &e->m_FrameData[0].m_Msg) {
+                gFrameData = &e->m_FrameData[0];
+            } else if (gGfxMsg == (OSScMsg *) &e->m_FrameData[1].m_Msg) {
+                gFrameData = &e->m_FrameData[1];
+            } else if (gGfxMsg == (OSScMsg *) &e->m_FrameData[2].m_Msg) {
+                gFrameData = &e->m_FrameData[2];
             }
             if (e->m_Settings.mode == 17) {
                 gDisplayListCount++;
@@ -140,7 +127,12 @@ void CEngineApp__Main(CEngineApp *e) {
         case 4:
             /* FAKEMATCH: the test is always true and both branches are the same (cross-jumping
              * merges them); without it GCC also keeps the case constant 2 in $s1 across the loop
-             * (12 words differ). Found by the permuter; no natural form found. */
+             * (12 words differ). Found by the permuter; no natural form found. Why it works:
+             * loop.c hoists an invariant when threshold * savings * lifetime >= the loop's insn
+             * count, and the copy only makes the loop longer at loop time (any three or so more
+             * insns do, e.g. a dead `i = i * 3 + 1;`). The original must have had a little more
+             * code in the loop that a later pass removes; Turok 3's version (references/turok3
+             * tengine.c) adds an options check in case 2, which Turok 2's ROM does not have. */
             if (gGfxMsg != NULL) {
                 gBootSignature[0] = 0;
                 Controller_ResetAllRumble();

@@ -3,9 +3,9 @@
 
 #include "rw/junk_types.h"
 
-extern B09SlotA gPager_entries[];
-extern B09LNode gPager_slots[];
-extern B09SlotCtl gPager_expanded;
+extern B09SlotA gPager_entries[]; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
+extern B09LNode gPager_slots[]; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
+extern B09SlotCtl gPager_expanded; /* local type: globals/pager.h declares it; this view (its type here) is what keeps the ROM's code */
 s32 VM_AcquireNextTLB(void) {
     s16 idx = gPager_expanded.cur++;
     if ((s16)gPager_expanded.cur >= 0x18) {

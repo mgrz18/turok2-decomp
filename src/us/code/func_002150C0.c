@@ -61,6 +61,6 @@ void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 o
     top.x = actor->header.m_vPos.x;
     top.y = actor->header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
     top.z = actor->header.m_vPos.z;
-    *(CLights1 *) actor->m_Lights = gSceneLights;
+    actor->m_Lights = gSceneLights;
     actor->m_DrawnFrame = actor->m_UpdatedFrame = (u8)gFrameCount - 1;
 }

@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5654;
 void CQuaternion__ToMatrix(f32 *q, f32 *m)
 {
   f32 x = q[0];
@@ -36,7 +35,7 @@ void CQuaternion__ToMatrix(f32 *q, f32 *m)
   m[12] = 0.0f;
   m[13] = 0.0f;
   m[14] = 0.0f;
-  m[15] = D_800A5654;
+  m[15] = 1.0f;
   m[0] = r0;
   m[1] = r1;
   m[2] = r2;

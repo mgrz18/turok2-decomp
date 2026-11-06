@@ -20,23 +20,8 @@ typedef struct {
     f32 im;
 } AdecCpx;
 
-/* FFT tables: n complex points */
-typedef struct {
-    /* 0x00 */ f32 *cos;
-    /* 0x04 */ f32 *sin;
-    /* 0x08 */ s32 *bitrev;
-    /* 0x0C */ s32 n;
-} MdctCtx;
-
-extern MdctCtx *sMdctFft;     /* FFT context */
-extern f32 sMdctPreCos[128];     /* pre-twiddle cos */
-extern f32 sMdctPreSin[128];     /* pre-twiddle sin */
-extern f32 sMdctPostCosPlusSin[128];     /* post-twiddle cos + sin */
-extern f32 sMdctPostSinMinusCos[128];     /* post-twiddle sin - cos */
-extern f32 sAdecOverlap[128];     /* overlap state */
-
 extern void mdctInitTwiddles(void);                    /* mdctInitTwiddles */
-extern MdctCtx *mdctFftInit(s32 n);               /* mdctFftInit */
+extern FftTables *mdctFftInit(s32 n);               /* mdctFftInit */
 extern s32 adecDequantize(f32 *out, s16 *band);      /* adecDequantize */
 extern void mdctFft(f32 *d, s32 n, s32 sign, f32 *cos, f32 *sin, s32 *bitrev); /* mdctFft */
 
@@ -62,8 +47,8 @@ static __inline__ void mdctTwiddleMul(AdecCpx *d, f32 *c, f32 *s) {
     }
 }
 
-/* FFT with the tables of an MdctCtx. */
-static __inline__ void mdctFftCtx(f32 *data, MdctCtx *ctx, s32 sign) {
+/* FFT with the tables of an FftTables. */
+static __inline__ void mdctFftCtx(f32 *data, FftTables *ctx, s32 sign) {
     mdctFft(data, ctx->n, sign, ctx->cos, ctx->sin, ctx->bitrev);
 }
 

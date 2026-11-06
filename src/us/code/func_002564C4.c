@@ -11,8 +11,6 @@ struct Object126;
 typedef struct Object126 Object126;
 struct Actor126;
 typedef struct Actor126 Actor126;
-extern float D_800A71D4;
-extern float D_800A71D0;
 struct Actor126;
 struct Actor126 {         /* Turok 2 offsets (Rage Wars in comments) */
     u8 pad0[0xD4];
@@ -24,7 +22,6 @@ struct Actor126 {         /* Turok 2 offsets (Rage Wars in comments) */
     u8 padA0C[0xC0];
     f32 offsetACC;        /* 0xACC (0x728) */
 };
-extern float D_800A71CC;
 struct Object126;
 struct Object126 {
     u8 pad0[0x18];
@@ -42,15 +39,15 @@ void PlayerShock_Enter(Actor126 *actor, Object126 *arg1) {
     f32 sine;
     f32 cosine;
     actor->flags |= 0x800000;
-    actor->value1A4 = D_800A71CC;
+    actor->value1A4 = 52.5f;
     if (actor->stateA0A == 14) {
         object = arg1;
         object_angle = object->angle;
-        angle = D_800A71D0;
+        angle = 6.2831855f;
         sine = func_002982F0(object_angle + angle);
         cosine = func_002974C0(object->angle + angle);
-        sine *= D_800A71D4;
-        cosine *= D_800A71D4;
+        sine *= 384.0f;
+        cosine *= 384.0f;
         object->x += sine;
         object->y += cosine;
         object->angle += actor->offsetACC;

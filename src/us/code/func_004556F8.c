@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "globals/engine.h"
+#include "globals/menu.h"
 
 struct RecordRecAt14;
 struct RecordRecAt14 {
@@ -10,7 +11,6 @@ struct RecordRecAt14 {
     char padC[0x14 - 0xC];
     s32 value;
 };
-extern f32 sResolutionToggleDelay;
 extern s32 GetMemSize(void);
 extern s32 Video_GetResolutionText_2();
 s32 OptionsMenu_ResolutionText_2(struct RecordRecAt14 *record) {

@@ -4,9 +4,6 @@
 #include "globals/boss.h"
 
 s32 ScriptAnimator_SetScript(void *, f32 *);           /* extern */
-extern f32 D_800C0488;
-extern f32 D_800C048C;
-extern f32 D_800C0490;
 
 #define MODULE ((LevelScriptState *) ((u8 *) &gLevelScript_bossMode - 0x3D4))
 
@@ -20,13 +17,13 @@ void Primagen_EnterMode7(CGameObjectInstance *arg0) {
     }
     temp_s2 = MODULE;
     if (MODULE->stage == 1) {
-        arg0->m_AI.m_AnimSpeed = (f32) D_800C0488;
+        arg0->m_AI.m_AnimSpeed = 1.0f;
     }
     if (MODULE->stage == 2) {
-        arg0->m_AI.m_AnimSpeed = (f32) D_800C048C;
+        arg0->m_AI.m_AnimSpeed = 1.2f;
     }
     if (MODULE->stage == 3) {
-        arg0->m_AI.m_AnimSpeed = (f32) D_800C0490;
+        arg0->m_AI.m_AnimSpeed = 1.3f;
     }
     if ((MODULE->stage == 1) && (temp_s2->spawnStep == 0)) {
         ScriptAnimator_SetScript(&MODULE->anims[3], sPrimagenMode7PartScript);

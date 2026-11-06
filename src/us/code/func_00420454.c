@@ -19,10 +19,6 @@ extern CGame gEngineApp_m_Game;
  * bytes) and opens the "game loaded" dialog, or opens the "no save"/"bad
  * save" dialog for the pak note. */
 
-extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 sGameNoteLoad; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakMenuLeaving; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakNoteIndex; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern u32 gEngineApp_m_Settings_unlockedCheats[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern u8 gEngineApp_m_Settings_unk180[]; /* local type: GameSettings.unk180 read as an array (other registers otherwise) */
 extern f32 gEngineApp_m_Settings_match_seconds[]; /* local type: the field's real type (or the member path) changes the ROM's code here */

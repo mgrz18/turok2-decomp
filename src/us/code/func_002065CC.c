@@ -1,14 +1,11 @@
 #include "common.h"
+#include "structs/cache.h"
+#include "globals/cache.h"
 
-extern s32 CList__MoveToHead(s32, s32);
-extern s32 gCache_ageCount[];
+extern void CList__MoveToHead(CList *list, void *element);
 
-typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ s32 unk10;
-} Unk002065CC;
-
-void CCache__TouchMemEntry(s32 arg0, void *arg1) {
-    ((Unk002065CC *)arg1)->unk10 = gCache_ageCount[0];
-    CList__MoveToHead((s32)((s8 *)gCache_ageCount - 0xC10), (s32) arg1);
+/* Stamps a CMemEntry with this frame and moves it to the head of the age list. */
+void CCache__TouchMemEntry(s32 unused, CMemEntry *entry) {
+    entry->age = gCache.ageCount;
+    CList__MoveToHead(&gCache.memAgeList, entry);
 }

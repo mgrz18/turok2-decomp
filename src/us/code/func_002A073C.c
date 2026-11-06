@@ -7,7 +7,6 @@
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern FftTables *mdctFftInit(s32 n);
-extern float D_800AAC30;
 FftTables *mdctFftInit(s32 n) {
     FftTables *tables;
     s32 half;
@@ -25,16 +24,16 @@ FftTables *mdctFftInit(s32 n) {
     tables = &gMdctFftTables;
     i = 0;
     if (i < half) {
-        scale = D_800AAC30;
+        scale = 6.2831855f;
         count = n;
         do {
             angle = i * scale / count;
-            tables->sines[i] = func_002974C0(angle);
-            tables->cosines[i] = -func_002982F0(angle);
+            tables->cos[i] = func_002974C0(angle);
+            tables->sin[i] = -func_002982F0(angle);
             i++;
         } while (i < half);
     }
-    order = tables->order;
+    order = tables->bitrev;
     limit = n * 2;
     for (k = 0; k < n; k++) {
         order[k] = k;
@@ -53,6 +52,6 @@ FftTables *mdctFftInit(s32 n) {
         }
         j += m;
     }
-    tables->size = n;
+    tables->n = n;
     return tables;
 }

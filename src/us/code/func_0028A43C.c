@@ -6,28 +6,6 @@
 #include "globals/frame.h"
 #include "structs/game.h"
 #include "globals/engine.h"
-typedef struct {
-               u32 type;
-               u32 flags;
-               u64 *ucode_boot;
-               u32 ucode_boot_size;
-               u64 *ucode;
-               u32 ucode_size;
-               u64 *ucode_data;
-               u32 ucode_data_size;
-               u64 *dram_stack;
-               u32 dram_stack_size;
-               u64 *output_buff;
-               u64 *output_buff_size;
-               u64 *data_ptr;
-               u32 data_size;
-               u64 *yield_data_ptr;
-               u32 yield_data_size;
-} OSTask_t;
-typedef union {
-    OSTask_t t;
-    long long int force_structure_alignment;
-} OSTask;
 OSTime osGetTime(void);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osSpTaskYielded(OSTask *task);
@@ -75,9 +53,6 @@ void CCache__PostDisplayListDone(s32 a, s32 b);
 void __scTaskComplete(Vid *o, Job *j);
 s32 __scSchedule(Vid *o, Job **a, Job **b, s32 mode);
 void __scExec(Vid *o, Job *a, Job *b);
-extern u64 sGfxRspResumeTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u64 sAudioTaskStartTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
-extern f32 sGfxRspTime; /* local type: globals/frame.h declares it; this view (its type here) is what keeps the ROM's code */
 void __scHandleRSP(Vid *o) {
     Job *j;
     Job *a;

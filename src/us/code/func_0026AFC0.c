@@ -7,13 +7,7 @@
 #include "structs/region.h"
 #include "globals/region.h"
 
-extern float D_800A7FD8;
-extern float D_800A7FD0;
 extern void CVector3__Normalize(f32 *arg0);
-extern CVector3 sRegionNormal;
-extern f32 sRegionNormal_y;
-extern s32 sRegionNormal_z;
-extern CVector3 sRegionUnitNormal;
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 static __inline__ void edge(CVector3 *out, CVector3 *a, CVector3 *b) {
@@ -35,12 +29,12 @@ s32 CGameRegion__IsSteep(CGameRegion *polygon) {
         return polygon->m_wFlags & 8;
     }
     up.x = 0.0f;
-    up.y = *(&D_800A7FD0 + 1);
+    up.y = 1.0f;
     up.z = 0.0f;
     if (polygon != sCachedNormalRegion) {
         if (polygon == 0) {
             *(s32 *)&sRegionNormal = 0;
-            sRegionNormal_y = *(&D_800A7FD0 + 1);
+            sRegionNormal_y = 1.0f;
             sRegionNormal_z = 0;
         } else if (polygon != sCachedRawNormalRegion) {
             edge(&edge0, polygon->m_pVertices[1], polygon->m_pVertices[0]);
@@ -52,7 +46,7 @@ s32 CGameRegion__IsSteep(CGameRegion *polygon) {
     }
     normal = sRegionUnitNormal;
     sCachedNormalRegion = polygon;
-    if (normal.x * up.x + normal.y * up.y + normal.z * up.z <= D_800A7FD8) {
+    if (normal.x * up.x + normal.y * up.y + normal.z * up.z <= 0.5f) {
         return 1;
     }
     return 0;

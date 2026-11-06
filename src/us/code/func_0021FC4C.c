@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5D2C;
 extern char *CISet__GetBlock(s32 *, s32);
 extern void CQuaternion__Slerp(void *arg0, s32 arg1, void *arg2, void *arg3);
 void Anim_GetBoneRotationSlerp(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) {
@@ -17,7 +16,7 @@ void Anim_GetBoneRotationSlerp(ObjectLinks24_2 *arg0, s32 arg1, Vector4f *arg2) 
     idx = indices[arg1].unk2;
     if (idx == -1) {
         rec = (void *)(o->unk_4 + arg1 * 0x14);
-        scale = D_800A5D2C;
+        scale = 3.051851e-5f;
         arg2->x = (f32)rec->unk_C * scale;
         arg2->y = (f32)rec->unk_E * scale;
         arg2->z = (f32)rec->unk_10 * scale;

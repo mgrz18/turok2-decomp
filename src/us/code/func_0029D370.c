@@ -4,19 +4,6 @@
 #include "common.h"
 #include "globals/libultra.h"
 
-typedef struct OSPiHandle {
-    /* 0x00 */ struct OSPiHandle *next;
-    /* 0x04 */ u8 type;
-    /* 0x05 */ u8 latency;
-    /* 0x06 */ u8 pageSize;
-    /* 0x07 */ u8 relDuration;
-    /* 0x08 */ u8 pulse;
-    /* 0x09 */ u8 domain;
-    /* 0x0C */ u32 baseAddress;
-    /* 0x10 */ u32 speed;
-    /* 0x14 */ u8 transferInfo[0x60]; /* __OSTranxInfo */
-} OSPiHandle;
-
 #define IO_WRITE(addr, data) (*(volatile u32 *) (addr) = (u32) (data))
 #define PI_BSD_DOM2_LAT_REG 0xA4600024
 #define PI_BSD_DOM2_PWD_REG 0xA4600028
@@ -24,9 +11,6 @@ typedef struct OSPiHandle {
 #define PI_BSD_DOM2_RLS_REG 0xA4600030
 #define DEVICE_TYPE_64DD 2
 #define PI_DOMAIN2 1
-
-extern OSPiHandle LeoDiskHandle;   /* LeoDiskHandle */
-extern OSPiHandle *__osDiskHandle;  /* __osDiskHandle */
 
 extern void memset(void *p, s32 c, u32 n); /* memset */
 extern u32 __osDisableInt(void);

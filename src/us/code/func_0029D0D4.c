@@ -8,14 +8,8 @@
 
 
 
-typedef struct {
-    /* 0x00 */ OSMesgQueue *messageQueue;
-    /* 0x04 */ OSMesg message;
-} __OSEventState;
-
 #define MQ_IS_FULL(mq) ((mq)->validCount >= (mq)->msgCount)
 
-extern __OSEventState __osPiEventState; /* __osEventStateTab[OS_EVENT_PI] */
 
 extern void __osEnqueueThread(OSThread **queue, OSThread *thread);
 extern OSThread *__osPopThread(OSThread **queue);

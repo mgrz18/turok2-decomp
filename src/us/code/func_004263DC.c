@@ -8,11 +8,10 @@
 void Pak_AllocDirectory(void);
 struct Shape_typemap_165 *CCache__Allocate(s32, s32, u32, void *);
 void *memset(void *, s32, u32);
-extern s32 D_800C18A0;
 void Pak_AllocDirectory(void) {
     struct Shape_typemap_165 *temp_v0;
     s32 temp_a0;
-    temp_v0 = CCache__Allocate(0, 0x810, 0x23, &D_800C18A0);
+    temp_v0 = CCache__Allocate(0, 0x810, 0x23, "Mempak pakstate");
     temp_a0 = temp_v0->field_0;
     gPakStateBuffer = (CMemEntry *)temp_v0;
     gPakDirectories = (PakDirectory *)temp_a0;

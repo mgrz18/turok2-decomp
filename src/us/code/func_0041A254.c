@@ -1,6 +1,9 @@
 #include "common.h"
 #include "structs/controller.h"
 #include "globals/game.h"
+#include "globals/rumble.h"
+#include "globals/menu.h"
+
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x80];
@@ -16,10 +19,8 @@ typedef struct {
 } A254Menu;
 
 
-extern s32 sPauseRumbleOn[4];
-extern u8 gRumblePool[];
 extern void Controller_ResetAllRumble(void);
-extern void RumblePool_FreeAll(void *);
+extern void RumblePool_FreeAll(RumblePool *pool);
 extern s32 LoopSounds_Get(void);
 extern void LoopSounds_Pause(s32);
 
@@ -30,7 +31,7 @@ void PauseMenu_Init(A254Menu *menu) {
     for (i = 0; i < 4; i++) {
         sPauseRumbleOn[i] = gControllers[i].rumbleOn;
     }
-    RumblePool_FreeAll(gRumblePool);
+    RumblePool_FreeAll(&gRumblePool);
     Controller_ResetAllRumble();
     if (gEngineApp_m_Settings.multiplayer) {
         menu->screen->flags80 &= ~0x800000;

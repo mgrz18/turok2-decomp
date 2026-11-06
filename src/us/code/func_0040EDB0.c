@@ -35,6 +35,6 @@ void BlindOne_Draw(CGameObjectInstance *actor, CAI *ai, DrawInfo *info) {
             }
             break;
     }
-    Render_DrawModel(info->unkC, actor->m_pmtDrawMtxs, 1, (Matrix18 *) actor->m_Lights[gEvenOdd], 0, info->flag, actor->m_AI.m_nTexture);
+    Render_DrawModel(info->unkC, actor->m_pmtDrawMtxs, 1, &actor->m_Lights[gEvenOdd], 0, info->flag, actor->m_AI.m_nTexture);
     gBlendState = 0;
 }

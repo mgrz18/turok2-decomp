@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800AA7C8;
 void guMtxIdentF(u8 *arg0) {
     u8 *diag;
     u8 *elem;
@@ -11,7 +10,7 @@ void guMtxIdentF(u8 *arg0) {
     s32 c;
     f32 one;
     r = 0;
-    one = D_800AA7C8;
+    one = 1.0f;
     diag = arg0;
     do {
         c = 0;

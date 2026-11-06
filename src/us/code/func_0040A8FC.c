@@ -1,4 +1,5 @@
-/* FAKEMATCH: identical if/else arms in fewerActorsThan's counting loop (as in MotherBoss_FewerActorsThan); the plain
+/* FAKEMATCH: identical if/else arms in fewerActorsThan's counting loop (as in MotherBoss_FewerActorsThan,
+ * src/us/code/func_0040C4F4.c, which says why and what was tried); the plain
  * loop shifts its registers by one. */
 #include "common.h"
 #include "structs/pick.h"

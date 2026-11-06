@@ -4,13 +4,12 @@
 #include "globals/game.h"
 
 /* Name entry: highlight the current player's column and load the player's
- * name (trailing spaces trimmed; the default name D_800C1340 counts as empty)
+ * name (trailing spaces trimmed; the default name "player" counts as empty)
  * into the editing buffer. */
 
 #define ENTRY_SELECTED 0x01800000
 
 extern u8 D_8011AB8B[];
-extern u8 D_800C1340[];
 
 s32 CPlayerPool__GetIndex(void *state, void *player);
 
@@ -69,7 +68,7 @@ void NameEntryMenu_Init_2(Menu *event) {
             break;
         }
     }
-    if (nameEquals(src, D_800C1340, 6)) {
+    if (nameEquals(src, "player", 6)) {
         trailing = 8;
     }
     for (k = 0; k < 8 - trailing; k++) {

@@ -1869,18 +1869,12 @@ void MenuModel_DrawUnselected(s32 arg0, s32 arg1, s32 arg2) {
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_00443298.c, func_00443298.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-/* The instance's lights (CGameObjectInstance m_Lights, a Lights1 per frame
- * buffer), copied as words. */
-typedef struct { u32 w[6]; } O06Seg;
-/* The instance seen with its m_Lights as words: indexing m_Lights itself
- * swaps an addu's operands. */
-typedef struct { u8 pad[0x110]; O06Seg seg[2]; } O06A_4171F4; /* seg at 0x110 in Turok 2 (0x140 in Rage Wars) */
 extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
 /* The selected model item's draw callback (MenuItem_DrawModel): drawn with the
  * lights of gDefaultLights and a fade by sMenuModelFade. */
 void MenuModel_DrawSelected(CGameObjectInstance *a, s32 b, s32 c) {
  gBlendState = 3;
- ((O06A_4171F4 *) a)->seg[gEvenOdd] = *(O06Seg *) &gDefaultLights;
+ a->m_Lights[gEvenOdd] = gDefaultLights;
  gBlendState_m_Color[0] = 255.0f;
  gBlendState_m_Color[1] = 0;
  gBlendState_m_Color[2] = 0;

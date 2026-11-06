@@ -4,20 +4,10 @@
 #include "structs/cache.h"
 #include "common.h"
 #include "globals/cache.h"
+#include "globals/sysrc.h"
 
-struct EntryRecAtCV1;
-typedef struct EntryRecAtCV1 EntryRecAtCV1;
-struct EntryRecAtCV1;
-struct EntryRecAtCV1 {
-    u32 key;
-    CCacheEntry *value;
-    s32 index;
-    struct EntryRecAtCV1 *next;
-};
-extern EntryRecAtCV1 *gHashTable;
 extern void CHashTable__Construct(s32 capacity);
-extern char gHeap;
-extern EntryRecAtCV1 *CHeap__Alloc(void *, s32);
+extern HashEntry *CHeap__Alloc(CHeap *, s32);
 void CHashTable__Construct(s32 capacity)
 {
     s32 bits = 0;

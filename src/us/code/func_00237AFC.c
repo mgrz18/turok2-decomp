@@ -5,6 +5,7 @@
 #include "structs/collision.h"
 #include "globals/game.h"
 #include "globals/collision.h"
+#include "globals/player.h"
 
 /* A blast: radius, damage, then the push (strength, x, y, z). */
 typedef struct Blast {
@@ -35,8 +36,6 @@ typedef struct {
     /* 0x140 */ u8 ai[0x1A8 - 0x140];
     /* 0x1A8 */ BlastOwner *owner;
 } BlastActor;
-
-extern HitFrame sBlastShieldFrame;       /* the shield CGameObjectInstance__GetNearestBox finds */
 
 s32 Blast_CanHit(BlastActor *victim, BlastActor *source);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);

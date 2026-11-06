@@ -4,13 +4,12 @@
 #include "rw/abu_types.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/rumble.h"
 
-extern void RumblePool_FreeFinished(void *arg0);
+extern void RumblePool_FreeFinished(RumblePool *pool);
 extern u32 osMotorStop(struct Triple *);
-extern float D_800A9CF8;
 extern f32 Rumble_GetLevelAt(void *arg0, s32 arg1, s32 arg2, s32 arg3);
-extern s32 gRumblePool;
-extern void RumblePool_FreeAll(s32 *);
+extern void RumblePool_FreeAll(RumblePool *pool);
 extern unsigned int osMotorStart(void *arg0);
 void Controller_UpdateRumble(ControllerProfile *arg0) {
     Triple zero;
@@ -38,8 +37,8 @@ reset:
         if (arg0->rumblePak != 0) {
             if (arg0->rumbleLevel != 0.0f) {
                 arg0->rumbleTimer += arg0->rumbleLevel;
-                if (arg0->rumbleTimer >= D_800A9CF8) {
-                    arg0->rumbleTimer -= D_800A9CF8;
+                if (arg0->rumbleTimer >= 1.0f) {
+                    arg0->rumbleTimer -= 1.0f;
 osMotorStart
 ((void *)arg0->rumblePfs);
                     return;

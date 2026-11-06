@@ -1,45 +1,46 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80254D44_de_16.c, func_80255A34_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/heap.h"
 
-void *CHeap__AllocTop(HeapRecAtC *heap, s32 request)
+void *CHeap__AllocTop(CHeap *heap, s32 request)
 {
-    BlockRecAt20 *block;
-    BlockRecAt20 *split;
+    CHeapBlock *block;
+    CHeapBlock *split;
     u32 size;
     size = (request + 0x2F) & ~0xF;
-    for (block = heap->tail; block != 0; block = block->prevFree) {
+    for (block = heap->freeTail; block != 0; block = block->freeLast) {
         if (block->free >= size) {
-            { u8 *cursor = (u8 *)block; cursor += block->size; cursor += block->free; cursor -= size; split = (BlockRecAt20 *)cursor; }
-            split->size = size;
+            { u8 *cursor = (u8 *)block; cursor += block->used; cursor += block->free; cursor -= size; split = (CHeapBlock *)cursor; }
+            split->used = size;
             split->free = 0;
             block->free -= size;
-            split->nextFree = 0;
-            split->prevFree = 0;
+            split->freeNext = 0;
+            split->freeLast = 0;
             if (block->free == 0) {
-                if (block->prevFree != 0) {
-                    block->prevFree->nextFree = block->nextFree;
+                if (block->freeLast != 0) {
+                    block->freeLast->freeNext = block->freeNext;
                 }
-                if (block->nextFree != 0) {
-                    block->nextFree->prevFree = block->prevFree;
+                if (block->freeNext != 0) {
+                    block->freeNext->freeLast = block->freeLast;
                 }
-                if (heap->head == block) {
-                    heap->head = block->nextFree;
+                if (heap->freeHead == block) {
+                    heap->freeHead = block->freeNext;
                 }
-                if (heap->tail == block) {
-                    heap->tail = block->nextFree != 0 ? block->nextFree : block->prevFree;
+                if (heap->freeTail == block) {
+                    heap->freeTail = block->freeNext != 0 ? block->freeNext : block->freeLast;
                 }
-                block->prevFree = 0;
-                block->nextFree = 0;
+                block->freeLast = 0;
+                block->freeNext = 0;
             }
-            split->prev = block;
-            split->next = block->next;
-            if (block->next != 0) {
-                split->next->prev = split;
+            split->usedLast = block;
+            split->usedNext = block->usedNext;
+            if (block->usedNext != 0) {
+                split->usedNext->usedLast = split;
             }
-            block->next = split;
-            return split->data;
+            block->usedNext = split;
+            return split + 1;
         }
     }
     return 0;

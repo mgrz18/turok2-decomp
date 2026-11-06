@@ -3,8 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A8058;
-extern float D_800A8060;
 extern f32 Rumble_GetLevelOne(f32 *arg0, u32 arg1, u32 arg2, u32 arg3);
 extern f32 func_00298470(f32);
 extern f32 RumbleCurve_GetValue(void *arg0);
@@ -21,11 +19,11 @@ f32 Rumble_GetLevelOne(f32 *arg0, u32 arg1, u32 arg2, u32 arg3) {
     dz = *(f32 *)&arg3 - arg0[5];
     magnitude = func_00298470((dx * dx) + (dy * dy) + (dz * dz));
     if ((magnitude == 0.0f) || ((limit = arg0[6]) == 0.0f)) {
-        factor = *(&D_800A8058 + 1);
+        factor = 1.0f;
     } else {
         factor = 0.0f;
         if (magnitude < limit) {
-            factor = D_800A8060 - (magnitude / limit);
+            factor = 1.0f - (magnitude / limit);
         }
     }
     factor *= arg0[7];

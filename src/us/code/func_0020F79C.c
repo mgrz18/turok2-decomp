@@ -4,13 +4,12 @@
 #include "rw/abu_types.h"
 
 void CMtxF__Identity(void *arg0) {
-    extern f32 D_800A55E4;
     Matrix *matrix = arg0;
     f32 zero = 0.0f;
-    matrix->m[15] = D_800A55E4;
-    matrix->m[10] = D_800A55E4;
-    matrix->m[5] = D_800A55E4;
-    matrix->m[0] = D_800A55E4;
+    matrix->m[15] = 1.0f;
+    matrix->m[10] = 1.0f;
+    matrix->m[5] = 1.0f;
+    matrix->m[0] = 1.0f;
     matrix->m[14] = zero;
     matrix->m[13] = zero;
     matrix->m[12] = zero;

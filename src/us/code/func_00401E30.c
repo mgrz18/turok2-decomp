@@ -67,16 +67,6 @@ static __inline__ void State_UpdateBoss(WaveBossState *s) {
     }
 }
 
-typedef struct {
-    f32 x, y, z;
-} Vec3_00401E30;
-
-typedef struct {
-    /* 0x00 */ s32 id;
-    /* 0x04 */ s32 model;
-    /* 0x08 */ Vec3_00401E30 offset;
-} Part00401E30;
-
 void ScriptAnimator_Start(void *slot, void *actor);
 s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void *out, s32 max);
 void *CScene__FindIntelligence(void *world, s32 a1, s32 id);

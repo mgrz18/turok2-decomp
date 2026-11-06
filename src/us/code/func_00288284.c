@@ -1,21 +1,19 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/engine.h"
+#include "globals/frame.h"
 
-s32 osCreateThread(s32, s32, s32, s32, s32, s32);
-s32 osSetThreadPri(s32, s32);
-s32 osStartThread(s32);
+extern void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
+extern void osSetThreadPri(OSThread *thread, OSPri pri);
+extern void osStartThread(OSThread *thread);
+extern void *memset(void *dst, s32 value, u32 size);
+extern void mainproc(void *arg);
 
-s32 memset(s32 *, s32, s32); /* extern */
-extern s32 gThreadStackMain;
-extern s32 gSchedulerStack;
-extern s32 gThreadMain;
-extern s32 mainproc;
-
-void CEngineApp__Idle(CEngineApp *arg0, s32 arg1) {
-    memset(&gThreadStackMain, 1, 0x8000);
-    osCreateThread((s32) &gThreadMain, 1, (s32) &mainproc, arg1, (s32) &gSchedulerStack, gThreadPriorityMain);
-    osStartThread((s32) &gThreadMain);
+void CEngineApp__Idle(CEngineApp *arg0, void *arg1) {
+    memset(gThreadStackMain, 1, sizeof(gThreadStackMain));
+    /* the stack top given is gSchedulerStack, which follows gThreadStackMain */
+    osCreateThread(&gThreadMain, 1, mainproc, arg1, gSchedulerStack, gThreadPriorityMain);
+    osStartThread(&gThreadMain);
     {
         s32 v = gThreadPriorityIdle;
 

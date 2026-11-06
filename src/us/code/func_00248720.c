@@ -9,7 +9,7 @@
 
 CQuaternion CGameObjectInstance__GetRotation(CPlayer *p);
 AmmoInfo *CPlayer__GetFiringAmmo(CPlayer *p, s32 weapon);
-void CParticleSystem__Spawn(void *list, CPlayer *src, CPlayer *owner, s32 a3, s32 target, s32 type,
+void CParticleSystem__Spawn(CParticleSystem *list, CPlayer *src, CPlayer *owner, s32 a3, s32 target, s32 type,
                    CVector3 vel, CQuaternion aim, CVector3 pos, s32 a40, s32 a44, s32 a48);
 
 /* A debug print compiled out of the release build. Its empty loop notes stop
@@ -114,6 +114,6 @@ void CPlayer__FireWeapon(CPlayer *p, s32 type) {
         f = gProjectilePower * 6.0f;
         type = (s32)((f > 6.0f ? 6.0f : f) + 460.0f);
     }
-    CParticleSystem__Spawn(gScene.m_ParticleSystem, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? 5 : 1);
+    CParticleSystem__Spawn(&gScene.m_ParticleSystem, p, p, 0, target, type, vel, aim, pos, 0, -1, (p->m_CharacterActor.m_AI.m_dwFlags & 0x80) ? 5 : 1);
     gProjectilePower = p->weapon_particle_damage_scaler = gWeaponChargeScale = gProjectileSpeedScale = 1.0f;
 }

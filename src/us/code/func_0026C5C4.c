@@ -1,15 +1,6 @@
 #include "common.h"
 #include "globals/scene.h"
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x44];
-    /* 0x44 */ s32 flags;
-    /* 0x48 */ u8 pad48[0x58 - 0x48];
-    /* 0x58 */ u8 unk58;
-    /* 0x59 */ u8 pad59[0x5B - 0x59];
-    /* 0x5B */ u8 unk5B;
-    /* 0x5C */ s8 unk5C;
-} Unk0022425C;
+#include "structs/region.h"
 
 /* Resource entry: a key, its flags and three child entries. */
 typedef struct Entry0026C5C4 {
@@ -21,7 +12,7 @@ typedef struct Entry0026C5C4 {
     /* 0x18 */ struct Entry0026C5C4 *child2;
 } Entry0026C5C4;
 
-s32 CScene__GetRegionInfo(s32, s32);
+CRegionInfo *CScene__GetRegionInfo(CScene *, s32);
 
 s32 CGameRegion__FloodSetWaterSame(s32, s32);                    /* extern */
 
@@ -29,7 +20,7 @@ void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
     s32 temp_a0;
     s32 temp_a0_2;
     s32 temp_a0_3;
-    s32 temp_v0;
+    CRegionInfo *temp_v0;
     s32 temp_s0;
     u16 temp_v1;
 
@@ -51,11 +42,11 @@ void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
                 CGameRegion__FloodSetWaterSame(temp_a0_3, temp_s0);
             }
         }
-        temp_v0 = CScene__GetRegionInfo((s32) &gScene, (s32) arg0);
-        if (temp_v0 != 0) {
-            ((Unk0022425C *)temp_v0)->unk5C = 2;
-            ((Unk0022425C *)temp_v0)->flags = ((Unk0022425C *)temp_v0)->flags | 1;
-            ((Unk0022425C *)temp_v0)->unk5B = (u8) (((Unk0022425C *)temp_v0)->unk5B | 2);
+        temp_v0 = CScene__GetRegionInfo(&gScene, (s32) arg0);
+        if (temp_v0 != NULL) {
+            temp_v0->m_MapColour = 2;
+            temp_v0->m_dwFlags = temp_v0->m_dwFlags | 1;
+            temp_v0->unk_5B = (u8) (temp_v0->unk_5B | 2);
         }
     }
 }

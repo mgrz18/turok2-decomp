@@ -2,9 +2,9 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu.h"
 
 extern void OptionsMenu_Init();
 void OptionsMenu_Init(void) {
-    extern int sResolutionToggleDelay;
     sResolutionToggleDelay = 0;
 }

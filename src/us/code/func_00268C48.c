@@ -17,7 +17,7 @@ void Collision_MoveInstance(CInstanceHeader *actor, CVector3 pos, void *info);
 CVector3 CVector3__RandomPerturb(CVector3 *in, f32 amount);
 void CVector3__Normalize(CVector3 *v);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
-u8 *CLevelActorPool__Spawn(void *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos, void *region, f32 arg);
+u8 *CLevelActorPool__Spawn(CLevelActorPool *table, void *slot, s32 kind, CVector3 velocity, CVector3 pos, void *region, f32 arg);
 
 /* GameObject_TraceMove's logic, inlined with the collision flags addressed directly. */
 static __inline__ void tracePos(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos, void **outRegion, s32 flagA, s32 flagB) {
@@ -65,5 +65,5 @@ void GameObject_DropPickupAt(CInstanceHeader *actor, CVector3 pos, s32 kind, f32
     dir = CVector3__RandomPerturb(&up, 0.25f);
     CVector3__Normalize(&dir);
     CVector3__Scale(&velocity, &dir, 409.59998f);
-    CLevelActorPool__Spawn(gScene.m_ActorPool, NULL, kind, velocity, at, region, arg);
+    CLevelActorPool__Spawn(&gScene.m_ActorPool, NULL, kind, velocity, at, region, arg);
 }

@@ -4,8 +4,6 @@
 #include "rw/abu_types.h"
 
 void CMtxF__ClampEntries(f32 *arg0) {
-    extern f32 D_800A55E4[2];
-    extern f32 D_800A55EC;
     f32 *var_a0;
     f32 *var_v1;
     f32 temp_f0;
@@ -13,8 +11,8 @@ void CMtxF__ClampEntries(f32 *arg0) {
     s32 var_a2;
     f32 maxVal;
     f32 minVal;
-    maxVal = D_800A55E4[1];
-    minVal = D_800A55EC;
+    maxVal = 32767.0f;
+    minVal = -32767.0f;
     var_a0 = arg0;
     var_a2 = 0;
     do {

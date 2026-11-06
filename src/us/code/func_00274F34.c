@@ -3,8 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A81C8;
-extern float D_800A81CC;
 s32 alHeapDBAlloc(s32 a, s32 b, void *c, s32 d, s32 e);
 void SndSeq_Construct(struct AudioStateD844 *state, struct AudioRootD844 *root) {
     ALSeqpConfig params;
@@ -26,8 +24,8 @@ void SndSeq_Construct(struct AudioStateD844 *state, struct AudioRootD844 *root) 
     state->allocation = alHeapDBAlloc(0, 0, &state->root->heap, 1, 0xF8);
     state->timer = 50;
     state->counter = 0;
-    state->first = D_800A81C8;
-    state->second = D_800A81CC;
-    state->third = D_800A81C8;
-    state->fourth = D_800A81C8;
+    state->first = 1.0f;
+    state->second = 125.0f;
+    state->third = 1.0f;
+    state->fourth = 1.0f;
 }

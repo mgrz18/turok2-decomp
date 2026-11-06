@@ -15,7 +15,7 @@ void GameObject_TraceMove(SpawnObj *obj, CVector3 pos, CVector3 *outPos, s32 *ou
 CQuaternion CGameObjectInstance__GetRotation(SpawnObj *obj);
 CQuaternion func_002156D4(SpawnObj *obj);
 s32 func_0021F1F8(SpawnObj *obj);
-s32 CParticleSystem__Spawn(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
                   CQuaternion rot, CVector3 pos, s32 region, s32 b, s32 c);
 
 /* Spawns a particle of `kind` from `obj` at `at`, moving with it and
@@ -51,5 +51,5 @@ void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
         rot = func_002156D4(obj);
         break;
     }
-    CParticleSystem__Spawn(gScene.m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
+    CParticleSystem__Spawn(&gScene.m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
 }

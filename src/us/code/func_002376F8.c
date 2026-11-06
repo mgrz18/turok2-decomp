@@ -26,7 +26,7 @@ extern void CCamera__SetShake(PlayerCamera *camera, f32 ampX, f32 ampY, f32 ampZ
 extern void CPlayer__TransformByView(CPlayer *player, CVector3 *v);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
 extern void GameObject_TraceMove(CGameObjectInstance *actor, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 flagA, s32 flagB);
-extern s32 CParticleSystem__Spawn(void *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
+extern s32 CParticleSystem__Spawn(CParticleSystem *table, void *actor, void *parent, void *slot, s32 a, s32 kind, CVector3 origin,
                          CQuaternion rot, CVector3 pos, s32 arg, s32 b, s32 c);
 extern void CScene__StartRumbles(void *table, void *owner, s32 id, CVector3 pos, f32 a, f32 b);
 extern void GameObject_FireTriggers(CGameObjectInstance *actor, s32 mask, CGameObjectInstance *other);
@@ -57,7 +57,7 @@ static __inline__ void sprayBlood(CGameObjectInstance *target, CGameObjectInstan
     zero.x = 0;
     zero.y = 0;
     zero.z = 0;
-    CParticleSystem__Spawn(gScene.m_ParticleSystem, actor, actor, 0, 0, 0xE9, zero, rotation, point, region, -1, kind == 5 ? 3 : 1);
+    CParticleSystem__Spawn(&gScene.m_ParticleSystem, actor, actor, 0, 0, 0xE9, zero, rotation, point, region, -1, kind == 5 ? 3 : 1);
     point.x = 0;
     point.y = 0;
     point.z = 0;

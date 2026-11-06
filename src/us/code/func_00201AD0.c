@@ -1,15 +1,17 @@
 #include "common.h"
 #include "globals/engine.h"
+#include "structs/decompressor.h"
 
-s32 memset(s32, s32, s32);           /* extern */
-s32 osCreateMesgQueue(s32, s32, s32);           /* extern */
-s32 osCreateThread(s32, s32, s32 *, s32, s32, s32); /* extern */
-s32 osStartThread(s32);                         /* extern */
-extern s32 CDecompressor__Main;
+void *memset(void *dst, s32 value, u32 size);
+void osCreateMesgQueue(OSMesgQueue *queue, OSMesg *messages, s32 count);
+void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
+void osStartThread(OSThread *thread);
+void CDecompressor__Main(CDecompressor *thisx);
 
-void CDecompressor__Construct(s32 arg0, s32 arg1) {
-    osCreateMesgQueue(arg0 + 0x230, arg0 + 0x248, 0x80);
-    memset(arg0 + 0x448, arg1 & 0xFF, 0x1000);
-    osCreateThread(arg0, arg1, &CDecompressor__Main, arg0, arg0 + 0x1448, gThreadPriorityDecompressorLow);
-    osStartThread(arg0);
+void CDecompressor__Construct(CDecompressor *thisx, OSId threadId) {
+    osCreateMesgQueue(&thisx->queue, thisx->messages, DECOMPRESSOR_QUEUE_SIZE);
+    memset(thisx->stack, threadId & 0xFF, DECOMPRESSOR_STACK_SIZE);
+    osCreateThread(&thisx->thread, threadId, (void (*)(void *))CDecompressor__Main, thisx,
+                   (u8 *)thisx->stack + DECOMPRESSOR_STACK_SIZE, gThreadPriorityDecompressorLow);
+    osStartThread(&thisx->thread);
 }

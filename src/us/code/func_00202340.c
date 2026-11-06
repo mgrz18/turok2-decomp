@@ -1,72 +1,72 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/func_80254D44_de_16.c, func_80255780_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-#include "rw/abu_types.h"
+#include "common.h"
+#include "structs/heap.h"
 
-extern void CHeap__FreeAll(Pool80255720 *arg0);
-void CHeap__FreeAll(Pool80255720 *arg0)
+void CHeap__FreeAll(CHeap *heap)
 {
-    Block80255720 *block;
-    Block80255720 *header;
-    Block80255720 *other;
-    Block80255720 *scan;
-    Block80255720 *next;
-    while (arg0->anchor->next_phys != 0) {
-        header = arg0->anchor->next_phys;
-        block = header->prev_phys;
-        if (block->size == 0) {
-            other = header->prev;
+    CHeapBlock *block;
+    CHeapBlock *header;
+    CHeapBlock *other;
+    CHeapBlock *scan;
+    CHeapBlock *next;
+    while (heap->usedHead->usedNext != 0) {
+        header = heap->usedHead->usedNext;
+        block = header->usedLast;
+        if (block->free == 0) {
+            other = header->freeLast;
             if (other != 0) {
-                block->prev = other;
+                block->freeLast = other;
             } else {
                 scan = block;
                 while (scan != 0) {
-                    if (scan->size != 0) {
+                    if (scan->free != 0) {
                         break;
                     }
-                    scan = scan->prev_phys;
+                    scan = scan->usedLast;
                 }
                 if (scan != 0) {
-                    block->prev = scan;
+                    block->freeLast = scan;
                 } else {
                     goto insert_head;
                 }
                 other = scan;
             }
-            next = other->next;
-            block->next = next;
-            if (other->next != 0) {
-                next->prev = block;
+            next = other->freeNext;
+            block->freeNext = next;
+            if (other->freeNext != 0) {
+                next->freeLast = block;
             }
-            other->next = block;
-            if (arg0->tail == other) {
-                arg0->tail = block;
+            other->freeNext = block;
+            if (heap->freeTail == other) {
+                heap->freeTail = block;
             }
             goto merge;
 insert_head:
-            block->next = arg0->head;
-            if (arg0->head != 0) {
-                arg0->head->prev = block;
+            block->freeNext = heap->freeHead;
+            if (heap->freeHead != 0) {
+                heap->freeHead->freeLast = block;
             } else {
-                arg0->tail = block;
+                heap->freeTail = block;
             }
-            arg0->head = block;
+            heap->freeHead = block;
         }
 merge:
-        block->size += header->offset + header->size;
-        if (header->next_phys != 0) {
-            header->next_phys->prev_phys = header->prev_phys;
+        block->free += header->used + header->free;
+        if (header->usedNext != 0) {
+            header->usedNext->usedLast = header->usedLast;
         }
-        header->prev_phys->next_phys = header->next_phys;
-        if (header->size != 0) {
-            if (header->prev != 0) {
-                header->prev->next = header->next;
+        header->usedLast->usedNext = header->usedNext;
+        if (header->free != 0) {
+            if (header->freeLast != 0) {
+                header->freeLast->freeNext = header->freeNext;
             }
-            if (header->next != 0) {
-                header->next->prev = header->prev;
+            if (header->freeNext != 0) {
+                header->freeNext->freeLast = header->freeLast;
             }
-            if (arg0->tail == header) {
-                arg0->tail = header->prev;
+            if (heap->freeTail == header) {
+                heap->freeTail = header->freeLast;
             }
         }
     }

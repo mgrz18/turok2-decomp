@@ -5,12 +5,7 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00205F18.c, func_00205F18.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef struct ActorLink {
-               u8 pad0[8];
-               void (*cb)();
-} ActorLink;
 typedef union B01FH { f32 f; s32 i; s16 h; } B01FH;
-typedef struct B01Vec4 { f32 x, y, z, w; } B01Vec4;
 typedef union B01W4 { s32 i; f32 f; s16 h[2]; u8 b[4]; } B01W4;
 typedef struct B01Info {
                 u32 flags;
@@ -39,9 +34,6 @@ typedef struct B01Info {
                 u8 pad50[0x1C];
                 f32 unk6C;
 } B01Info;
-typedef struct B01Seg {
-                u8 b[0x18];
-} B01Seg;
 f32 Random_Blend(f32 a, f32 b);
 void CAI__SetMode(CGameObjectInstance *actor, CAI *state, s32 event);
 void Generator_Advance(CGameObjectInstance *actor, CAI *state) {

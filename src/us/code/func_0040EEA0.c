@@ -20,7 +20,7 @@ void BlindOne_Group3Draw(CGameObjectInstance *arg0, CAI *arg1, CDrawArgs *arg2)
   {
     ScriptAnimator_Apply(&state->faders[arg1->m_BlindOne.m_nFader]);
     ScreenTint_UpdateMode();
-    Render_DrawModel(arg2->m_hModel, (s32) arg0->m_pmtDrawMtxs, 1, (s32) arg0->m_Lights[gEvenOdd], 0, 1, arg0->m_AI.m_nTexture);
+    Render_DrawModel(arg2->m_hModel, (s32) arg0->m_pmtDrawMtxs, 1, (s32) &arg0->m_Lights[gEvenOdd], 0, 1, arg0->m_AI.m_nTexture);
   }
   gBlendState = 0;
 }

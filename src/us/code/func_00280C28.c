@@ -3,8 +3,6 @@
 
 #include "rw/junk_types.h"
 
-extern f32 D_800A9BD4;
-extern f32 D_800A9BD8;
 extern s32 gDefaultVisBits[]; /* local type: the u32 of globals/camera.h loads it first (GCC 2 alias order) */
 void CCameraViewParams__Construct(ObjInit *o) {
     CVector3 *p;
@@ -21,9 +19,9 @@ void CCameraViewParams__Construct(ObjInit *o) {
     o->unk1C = 0;
     p = &o->v;
     p->x = p->y = p->z = z;
-    o->unk30 = D_800A9BD4;
+    o->unk30 = 1.0f;
     o->unk34 = 0;
     o->unk38 = z;
-    o->unk3C = D_800A9BD8;
+    o->unk3C = 0.17453295f;
     o->unk40 = gDefaultVisBits[0];
 }

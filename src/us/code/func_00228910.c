@@ -3,8 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A60B0;
-extern float D_800A60B4;
 extern void CVector3__Normalize(f32 *);
 extern void CVector3__Scale(void *, void *, f32);
 extern void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
@@ -47,9 +45,9 @@ void DLights_GetAtPoint(RangeNode **arg0, u32 arg1, u32 arg2, u32 arg3,
                     delta.x = (f32)node->x - *(f32 *)&arg1;
                     delta.y = (f32)node->y - *(f32 *)&arg2;
                     delta.z = (f32)node->z - *(f32 *)&arg3;
-                    temp_f20 = D_800A60B0 - (var_f2_3 / temp_f3);
+                    temp_f20 = 1.0f - (var_f2_3 / temp_f3);
                     CVector3__Normalize(&delta);
-                    temp_f20_2 = temp_f20 * D_800A60B4;
+                    temp_f20_2 = temp_f20 * 0.4f;
                     CVector3__Scale(&delta, &delta, temp_f20_2);
                     CVector3__Add(arg4, arg4, &delta);
                     *arg5 -= temp_f20_2;

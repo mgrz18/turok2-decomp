@@ -1,7 +1,6 @@
 #include "common.h"
 #include "m2c_macros.h"
-
-extern s32 sAdecStopFlag;
+#include "globals/adec.h"
 
 void adecClearStopFlag(void) {
     sAdecStopFlag = 0;

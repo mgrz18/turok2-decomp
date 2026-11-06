@@ -19,7 +19,7 @@ s32 GameObject_IsSolid(CStaticObject *inst);
 f32 GameObject_GetCollisionHeight(CLevelActor *actor);
 void CScene__GetLightsAt(CScene *world, CVector3 *pos, void *out);
 void CLevelActor__Update(CLevelActor *actor);
-void CLevelActorPool__CollectVisible(void *arg0, CScene *world);
+void CLevelActorPool__CollectVisible(CLevelActorPool *arg0, CScene *world);
 
 /* Collects the instances and actors of the loaded sections inside the visible bounds. */
 void CScene__CollectSectorObjects(CScene *world) {
@@ -78,7 +78,7 @@ void CScene__CollectSectorObjects(CScene *world) {
                 pos.x = actor->header.m_vPos.x;
                 pos.y = actor->header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
                 pos.z = actor->header.m_vPos.z;
-                CScene__GetLightsAt(world, &pos, actor->m_Lights);
+                CScene__GetLightsAt(world, &pos, &actor->m_Lights);
             }
             if (gCameraVisibleBox.m_vMax.x > actor->m_Bounds.m_vMin.x && gCameraVisibleBox.m_vMin.x < actor->m_Bounds.m_vMax.x
                 && gCameraVisibleBox.m_vMax.z > actor->m_Bounds.m_vMin.z && gCameraVisibleBox.m_vMin.z < actor->m_Bounds.m_vMax.z
@@ -90,5 +90,5 @@ void CScene__CollectSectorObjects(CScene *world) {
             }
         }
     }
-    CLevelActorPool__CollectVisible(world->m_ActorPool, world);
+    CLevelActorPool__CollectVisible(&world->m_ActorPool, world);
 }

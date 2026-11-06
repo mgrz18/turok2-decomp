@@ -20,16 +20,13 @@ typedef struct EventParams {
 } EventParams;
 
 extern s32 Sound__PlayPitched(s32 id, CVector3 pos, s32 arg4, s32 selected, f32 scale);
-extern f32 D_800A65A4;
-extern f32 D_800A65A8;
-extern f32 D_800A65AC;
 
 void func_0023801C(s32 arg0, Object *obj, s32 arg2, CVector3 pos, EventParams params) {
     s32 *global = &gEngineApp_m_Settings.paused;
     s32 selected;
     f32 scale;
 
-    scale = D_800A65A4;
+    scale = 1.0f;
     selected = -1;
     if (global[0] != 0) {
         return;
@@ -39,9 +36,9 @@ void func_0023801C(s32 arg0, Object *obj, s32 arg2, CVector3 pos, EventParams pa
             case 1:
                 if (obj->kind->value == obj->type) {
                     if (global[-115] & 0x40) {
-                        scale = D_800A65A8;
+                        scale = 2.5f;
                     } else if (global[-115] & 0x20) {
-                        scale = D_800A65AC;
+                        scale = 0.35f;
                     }
                 }
                 selected = (s32) obj;
