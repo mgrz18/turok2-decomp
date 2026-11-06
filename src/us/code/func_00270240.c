@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_00257380.c, func_00257380, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/sound.h"
+#include "globals/audio.h"
 
 typedef struct {
     s32 rate;
@@ -15,8 +16,6 @@ typedef struct {
     /* 0x0C */ ALBankFile *bankFile;
 } BankRes;
 
-extern s32 gAudioWorldReady;      /* sound manager ready */
-extern u8 sAudioWorldReverbParams[];
 extern s32 gThreadPriorityAudio;
 extern s32 gAudioRomBase;
 extern u8 gEngineApp_m_Settings_unk15[];     /* volume settings (bytes from -2) */
@@ -84,7 +83,7 @@ void CAudioWorld__Initialize(CAudioWorld *m) {
     cfg.maxPVoices = 0x25;
     cfg.maxUpdates = 0x100;
     cfg.fxType = 6; /* AL_FX_CUSTOM */
-    cfg.params = (s32 *) sAudioWorldReverbParams;
+    cfg.params = sAudioWorldReverbParams;
     ai.rate = 0x5622;
     ai.one = 1;
     cfg.dmaproc = 0;

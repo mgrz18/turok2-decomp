@@ -7,6 +7,7 @@
 #include "ultra_types.h"
 #include "structs/list.h"
 #include "structs/libaudio.h"
+#include "globals/audio.h"
 
 struct Shared_Quad;
 struct Shared_Quad {
@@ -41,7 +42,6 @@ struct SharedRecAt564V1 {
 };
 struct MenuRules;
 typedef struct MenuRules MenuRules;
-extern int gAudioWorldReady;
 struct MenuRules;
 struct MenuRules {
     char pad0[0x1C];

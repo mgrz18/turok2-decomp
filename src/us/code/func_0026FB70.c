@@ -3,12 +3,10 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/audio.h"
 OSTime osGetTime(void);
 u32 osAiGetStatus(void);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern u32 audFrameCt;
-extern s32 sAmFramesHandled;
-extern u32 sAmBusyTime;
 extern u8 gScheduler[];
 extern OSMesgQueue gAudioFrameMsgQ;
 extern s32 gAudioInfo[];

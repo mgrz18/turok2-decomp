@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/audio.h"
 
-extern f32 sSndVoiceRampStep[];
-#define TABLE (sSndVoiceRampStep + 1)
+#define TABLE sPitchRatioTable
 
 /* Linear interpolation in a table sampled every 60 units from -6000. */
 f32 Sound_CentsToPitch(f32 x) {

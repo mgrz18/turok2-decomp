@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/audio.h"
 
-extern int sAudioDMACacheBlocks;
 extern CacheEntry *gAudioDmaCache;
 extern void *gAudioHeap;
 extern void *func_0029E460(void *destination, const void *source, int count);

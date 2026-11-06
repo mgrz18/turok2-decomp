@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/audio.h"
 
 extern u32 __amDMA(s32 offset, s32 length);
 extern int gAudioRomBase;
@@ -14,8 +15,6 @@ u32 __amDMA(s32 offset, s32 length) {
     extern void alUnlink(Window *);
     extern Window *gAudioDmaState_firstUsed;
     extern char gAudioDmaMessageQ;
-    extern s32 nextDMA;
-    extern s32 audFrameCt;
     Window *window;
     Window *after;
     Window **pool;

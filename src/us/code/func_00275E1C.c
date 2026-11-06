@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/sound.h"
+#include "globals/audio.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -10,7 +11,6 @@ typedef struct {
 } SoundOwner;
 
 s32 Sound__Play(s16, CVector3, s32, s32);    /* extern */
-extern s32 sLoopSoundsLastResumed;
 
 /* Restarts every looping sound of the owner. */
 void LoopSounds_Resume(SoundOwner *arg0) {
