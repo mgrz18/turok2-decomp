@@ -3729,7 +3729,8 @@ segments:
       - [0xC23B0, .rodata, code/func_00424FBC]
       - [0xC23D0, .rodata, code/func_0042505C]
       - [0xC23F0, .rodata, code/func_004250FC]
-      - [0xC2410, rodata]
+      - [0xC2410, .rodata, code/func_00425220]
+      - [0xC2464, rodata]
       - [0xC2470, .rodata, code/func_004258E8]
       - [0xC24A0, rodata]
 

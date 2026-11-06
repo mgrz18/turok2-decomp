@@ -115,3 +115,4 @@ func_0044068C 0x800C0534  # copy of func_0040768C, which now owns the pool
 func_0044065C 0x800C052C  # copy of func_0040765C
 func_00453A08 0x800C1278  # copy of func_0041AAA0 (menu block), which now owns the pool
 func_00455FA0 0x800C1340  # copy of func_0041D050 (menu block), which now owns the pool
+func_0045E140 0x800C1810  # copy of func_00425140, which now owns the pool
