@@ -105,3 +105,9 @@ func_004407AC 0x800C0540  # copy of func_004077AC, which now owns the pool
 func_00440800 0x800C0544  # copy of func_00407800, which now owns the pool
 func_00440858 0x800C0548  # copy of func_00407858, which now owns the pool
 func_00440894 0x800C054C  # copy of func_00407894, which now owns the pool
+func_0043EC68 0x800C0488  # copy of func_00405C68, which now owns the pool
+func_004402C8 0x800C0508  # copy of func_004072C8, which now owns the pool
+func_004405F8 0x800C051C  # copy of func_004075F8, which now owns the pool
+func_00446C00 0x800C0900  # copy of func_0040DC00, which now owns the pool
+func_00447B68 0x800C093C  # copy of func_0040EB68, which now owns the pool
+func_00440C20 0x800C046C  # copy of func_00407C20, which now owns the pool

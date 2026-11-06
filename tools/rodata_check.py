@@ -187,7 +187,7 @@ def check(path, at, syms, rsyms, rom, verbose):
                         continue
                     first = None
                     if len(got) < 4:
-                        got = got + want[len(got):]   # the trailing pad is the next object's
+                        got = got + bytes(4 - len(got))   # the linker pads to SUBALIGN 4 with zeros
                     if got != want:
                         bad.append(f".rodata 0x{ro_vram + o:08X}: ROM {want.hex()} C {got.hex()}")
 

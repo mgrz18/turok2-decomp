@@ -5,7 +5,6 @@
 s32 CPlayer__Warp(s32, s32, s32, s32);
 
 void *CPlayerPool__GetFirstActive(s32 *);                     /* extern */
-extern f32 D_800C093C;
 
 void BlindOne_PhaseVictoryUpdate(void **arg0)
 {
@@ -15,7 +14,7 @@ void BlindOne_PhaseVictoryUpdate(void **arg0)
   GameSettings *temp_v1;
   s32 *new_var;
   new_var3 = *((f32 *) (((s8 *) (*arg0)) + 0x180));
-  if (D_800C093C < new_var3)
+  if (120.0f < new_var3)
   {
     temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     new_var2 = temp_v0;
