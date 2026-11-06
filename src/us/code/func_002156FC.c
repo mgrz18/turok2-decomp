@@ -5,7 +5,6 @@
 #include "globals/engine.h"
 #include "globals/camera.h"
 
-extern u8 D_800B6D1B; /* frame counter */
 extern s32 gEngineApp_m_Settings_paused;
 
 /* Once-per-frame update. */
@@ -13,7 +12,7 @@ void CLevelActor__Update(CLevelActor *obj) {
     CIntelligence *def;
     f32 timer;
 
-    if (obj->m_UpdatedFrame == D_800B6D1B || gEngineApp_m_Settings_paused != 0) {
+    if (obj->m_UpdatedFrame == (u8)gFrameCount || gEngineApp_m_Settings_paused != 0) {
         return;
     }
     def = obj->header.m_pIntelligence;
@@ -34,5 +33,5 @@ void CLevelActor__Update(CLevelActor *obj) {
     } else {
         obj->m_ViewMask = gDefaultVisBits;
     }
-    obj->m_UpdatedFrame = D_800B6D1B;
+    obj->m_UpdatedFrame = (u8)gFrameCount;
 }

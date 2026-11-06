@@ -25,7 +25,6 @@ void CCache__Unlock(s32, void *);
 s32 CScene__GetObjectTypeID(void *, s32);
 s32 *CISet__GetBlock(s32, s32);
 
-extern u8 D_800B6D1B;
 extern u8 gScene_m_qSky[];
 extern u8 gScene[];
 extern s32 gEngineApp_m_Settings;
@@ -40,7 +39,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
     if (geometry == NULL) {
         return;
     }
-    if (obj->m_DrawnFrame != D_800B6D1B) {
+    if (obj->m_DrawnFrame != (u8)gFrameCount) {
         if (obj->header.m_pIntelligence->m_Type == 8) {
             CQuaternion__ToMatrix(gScene_m_qSky, matrix);
         } else {
@@ -53,7 +52,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
         CMtxF__ToMtxAffine(matrix, obj->m_Matrices[gEvenOdd]);
     }
     if (obj->header.m_pIntelligence->m_Type == 12) {
-        if (obj->m_DrawnFrame != D_800B6D1B) {
+        if (obj->m_DrawnFrame != (u8)gFrameCount) {
             Model_AdvanceMorph(geometry, obj->m_AnimSpeed);
         }
         Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, gEvenOdd, obj->header.m_pIntelligence->m_nTexture);
@@ -73,5 +72,5 @@ void CLevelActor__Draw(CLevelActor *obj) {
         Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, variant, obj->header.m_pIntelligence->m_nTexture);
     }
     CCache__Unlock(0, geometry);
-    obj->m_DrawnFrame = D_800B6D1B;
+    obj->m_DrawnFrame = (u8)gFrameCount;
 }

@@ -8,6 +8,7 @@
 #include "structs/vector.h"
 #include "structs/level_actor.h"
 #include "structs/light.h"
+#include "globals/engine.h"
 
 /* A placed actor's record in the level data. */
 typedef struct {
@@ -24,7 +25,6 @@ typedef struct {
 
 extern u8 gLevelActorIntelligence[];         /* the empty model */
 extern u8 gScene[];         /* the model cache */
-extern u8 D_800B6D1B;
 
 void *CScene__GetIntelligence(void *cache, s32 model);
 f32 GameObject_GetCollisionHeight(CLevelActor *actor);
@@ -64,5 +64,5 @@ void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 o
     top.y = actor->header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
     top.z = actor->header.m_vPos.z;
     *(CLights1 *) actor->m_Lights = gSceneLights;
-    actor->m_DrawnFrame = actor->m_UpdatedFrame = D_800B6D1B - 1;
+    actor->m_DrawnFrame = actor->m_UpdatedFrame = (u8)gFrameCount - 1;
 }

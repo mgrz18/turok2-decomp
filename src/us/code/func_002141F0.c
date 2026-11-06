@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/camera.h"
+#include "globals/engine.h"
 
 /* A placed prop's record in the level data. */
 typedef struct {
@@ -39,7 +40,6 @@ typedef struct {
 
 extern u8 gScene[];
 extern s32 gNextUniqueId;
-extern u8 D_800B6D1B;
 
 void *CScene__GetIntelligence(void *, s32);
 void CMtxF__SetRotateY(f32 *mtx, f32 angle);
@@ -126,5 +126,5 @@ void CStaticObject__ConstructCompact(PlacedProp *prop, PlacedPropRecord *record,
         prop->segment = segments + record->segment * 32;
     }
     prop->colorKey = nextColorKey() << 10;
-    prop->colorFrame = D_800B6D1B - 1;
+    prop->colorFrame = (u8)gFrameCount - 1;
 }

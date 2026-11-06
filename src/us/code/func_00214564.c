@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "globals/camera.h"
+#include "globals/engine.h"
 
 /* A placed prop as the level file stores it. */
 typedef struct {
@@ -47,7 +48,6 @@ f32 HalfToFloat(s32);
 
 extern u8 gScene[];
 extern s32 gNextUniqueId;
-extern u8 D_800B6D1B;
 
 static __inline__ s32 next_key(void) {
     s32 next;
@@ -105,5 +105,5 @@ void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 ow
         prop->segment = segments + record->segment * 32;
     }
     prop->key = next_key() << 10;
-    prop->colorFrame = D_800B6D1B - 1;
+    prop->colorFrame = (u8)gFrameCount - 1;
 }
