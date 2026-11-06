@@ -2,7 +2,6 @@
 #include "structs/collision.h"
 #include "globals/collision.h"
 
-
 f32 func_00268460(CGameObjectInstance *inst);
 void Collision_SweepRegionWalls(void *region);
 void CGameRegion__ClearVisited(void *region);

@@ -12,7 +12,6 @@
  * random stun of a live helper), and once the boss has waited long enough
  * outside the fight starts the level's boss music. */
 
-
 extern void TotemDefense_DrawTotem();
 extern void TotemDefense_UpdateFight(TotemDefenseState *fight);
 extern f32 Random_Float(f32 range);

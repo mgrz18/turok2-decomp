@@ -2,7 +2,6 @@
 #include "structs/region.h"
 #include "globals/region.h"
 
-
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);    /* a - b */
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);    /* cross product */

@@ -9,7 +9,6 @@ extern f32 func_00298470(f32 x); /* sqrtf */
 extern f32 func_002982F0(f32 x); /* sinf */
 extern f32 func_002974C0(f32 x); /* cosf */
 
-
 typedef struct {
     /* 0x000 */ u8 pad0[0x10C];
     /* 0x10C */ CGameObjectInstance *owner;

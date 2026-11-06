@@ -37,7 +37,6 @@ typedef struct {
     /* 0x1A8 */ BlastOwner *owner;
 } BlastActor;
 
-
 s32 Blast_CanHit(BlastActor *victim, BlastActor *source);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 f32 GameObject_GetCollisionHeight(void *actor);

@@ -13,7 +13,6 @@ typedef struct BlastActor {
     /* 0x054 */ f32 footY;
 } BlastActor;
 
-
 f32 CVector3__Distance(CVector3 *a, CVector3 *b);
 s32 CGameObjectInstance__GetNearestBox(BlastActor *a, CVector3 pos, HitFrame *out);
 f32 GameObject_GetCollisionHeight(BlastActor *a);

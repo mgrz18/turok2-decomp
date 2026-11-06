@@ -4,7 +4,6 @@
 #include "structs/model.h"
 #include "globals/batch.h"
 
-
 void *CISet__GetBlock(void *resource, s32 index);
 void Render_FlushModelBatch(void);
 void CCache__TouchAndLock(s32 unused, void **resource);

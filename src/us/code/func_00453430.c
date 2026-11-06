@@ -14,7 +14,6 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-
 /* Picks the first of the 11 options whose flag is set in the settings (-1 if none). */
 void CheatsMenu_Init_2(Screen *screen) {
     s32 index = 0;

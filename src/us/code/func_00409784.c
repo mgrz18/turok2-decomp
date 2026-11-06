@@ -10,7 +10,6 @@
  * arena (inlined MotherBoss_SpawnPickup) and, later, a pickup at every spawn point
  * (MotherBoss_DropPickupsAtSpawnPoints). */
 
-
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
 extern s32 WeightedTable_PickStatic(void *table);

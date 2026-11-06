@@ -12,7 +12,6 @@ typedef struct {
     /* 0x0C */ Player41A4D4 *player;
 } Menu41A4D4;
 
-
 void CheatsMenu_Init(Menu41A4D4 *menu) {
     s32 weapon = 0;
     s32 tries;

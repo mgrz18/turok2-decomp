@@ -6,7 +6,6 @@
 #include "globals/menu_desc.h"
 #include "globals/menu.h"
 
-
 extern s32 Controller_ConfirmPressed(void *controller);
 extern s32 Menu_StepValueLR(Menu *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);
 extern void CPlayer__SetCharacter(CPlayer *player, s32 team);

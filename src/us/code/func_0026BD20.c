@@ -7,7 +7,6 @@ extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* ou
 extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a x b */
 extern void CVector3__Normalize(CVector3 *v);                         /* normalise */
 
-
 /* Raw (unnormalised) normal of a triangle, cached for the last triangle. */
 static __inline__ CVector3 *raw_normal(CVector3 *out, CGameRegion *tri) {
     CVector3 edge0;

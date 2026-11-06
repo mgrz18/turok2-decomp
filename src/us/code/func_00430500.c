@@ -5,7 +5,6 @@
 #include "structs/gbi.h"
 #include "globals/automap.h"
 
-
 #define SET_VTX(v, r, g, b)  \
     (v).ob[0] = 0;          \
     (v).ob[1] = 0;          \

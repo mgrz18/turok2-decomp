@@ -8,7 +8,6 @@ typedef struct {
     /* 0x00 */ u8 pad0[0x40];
 } Path;
 
-
 extern void AI_UpdateTargets(CGameObjectInstance *actor, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern void AI_ComputeFrameMotion(CGameObjectInstance *actor, CAI *ai, Path *path);
 extern void AI_TurnClamped(CGameObjectInstance *actor, CAI *ai, f32 angle, f32 dist);

@@ -5,7 +5,6 @@
 #include "globals/ai.h"
 #include "globals/path.h"
 
-
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
 void BoundingRect_AddPoints(f32 *bounds, s32 count, CVector3 *points);
 void CGameRegion__ClearVisited(CGameRegion *region);

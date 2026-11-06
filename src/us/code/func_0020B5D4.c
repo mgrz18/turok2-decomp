@@ -2,7 +2,6 @@
 #include "m2c_macros.h"
 #include "globals/batch.h"
 
-
 void Render_ResetBatches(void) {
     sBatchResource = NULL;
     sBatchInstanceCount = 0;

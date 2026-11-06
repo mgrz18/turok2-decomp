@@ -26,7 +26,6 @@ u32 Bits_Read(u32 *, u32);
 f32 *CISet__GetBlock(TrackTable *, s32);
 void CQuaternion__Normalize(Quaternion *);
 
-
 s32 Anim_DecodeTracks(s32 source, TrackTable *table, s32 tracks, s32 channels, s32 radius, s32 encoding) {
     TrackDecoder decode;
     u32 stream;

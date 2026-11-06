@@ -8,7 +8,6 @@ extern s32 CGameObjectInstance__PickRandomAnim(void *actor, s32 action, s32 skip
 extern void CVector3__Lerp(f32 *out, f32 t, f32 *from, f32 *to);
 extern void CAI__SetMode(void *obj, void *state, s32 mode);
 
-
 typedef struct {
     /* 0x000 */ u8 pad0[0x54];
     /* 0x054 */ f32 pos[3];

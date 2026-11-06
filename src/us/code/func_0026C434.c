@@ -9,7 +9,6 @@ extern void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);   /* out =
 extern f32 func_00298470(f32);                                /* sqrtf */
 extern f32 Math_AcosLookup(f32);                                /* acosf */
 
-
 /* Raw (unnormalised) normal of a triangle, cached for the last triangle. */
 static __inline__ CVector3 raw_normal(CGameRegion *tri) {
     CVector3 edge0;
