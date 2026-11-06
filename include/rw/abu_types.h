@@ -17,6 +17,7 @@
 #include "structs/vector.h"
 #include "structs/libaudio.h"
 #include "structs/list.h" /* CList (Rage Wars' IntrusiveList) */
+#include "structs/adec.h" /* DecodeState, FftTables */
 
 struct Access_u8_3;
 struct Access_u8_3 {
@@ -2736,22 +2737,6 @@ typedef struct DecodeBlock {
     s32 offset;
     DecodeTable *table;
 } DecodeBlock;
-struct FftTables;
-typedef struct FftTables FftTables;
-struct FftTables {
-    f32 *sines;
-    f32 *cosines;
-    s32 *order;
-    s32 size;
-};
-typedef struct DecodeState {
-    s32 first;
-    s32 third;
-    void *source;
-    s32 second;
-    s32 count;
-    void *cursor;
-} DecodeState;
 struct KeyRecAt1C;
 typedef struct KeyRecAt1C KeyRecAt1C;
 struct KeyRecAt1C {

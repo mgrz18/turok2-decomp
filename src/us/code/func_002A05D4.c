@@ -2,17 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/adec.h"
 
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-extern float sMdctPostCosPlusSin[];
 extern void mdctInitTwiddles();
 extern float D_800AAC20;
-extern float sMdctPreSin[];
-extern float sMdctPreCos[];
-extern float sMdctPostSinMinusCos[];
 extern float D_800AAC28;
-extern s32 sAdecOverlap[];
 void mdctInitTwiddles(void) {
     s16 i;
     f32 angle;

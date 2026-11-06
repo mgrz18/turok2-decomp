@@ -6,7 +6,6 @@
 
 extern void adecDecodeFrame(void *arg0);
 extern void adecImdctFrame(void *arg0, void *arg1);
-extern DecodeState sAdecState;
 extern char D_80125EF0;
 void *adecNextFrame(void) {
     struct DecodeState *base = &sAdecState;
