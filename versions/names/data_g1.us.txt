@@ -1,0 +1,14 @@
+// Data names, part g1: D_80000000-D_800A81A7 (343 distinct D_ symbols referenced from src/include).
+// Only 5 are named. Everything from 0x800A51E0 up is the engine .rodata (code_rodata, linked from
+// 0x800A51F8 in KSEG0, plus the string tail of .code at 0x800A51E0): float literal pools (also the ones
+// declared as Tuning / Unk800A71A8 / Unk800A7990 / func_8020CA10_G1 structs, which are just the pools
+// seen through a struct to keep the load order), CCache__Request description strings ("anim object
+// info", "simp geometry", "level index"...), a {0,1,0} CVector3 initializer and jump tables. Those should
+// become literals in C, so they are skipped.
+
+// libultra boot parameters (low memory, set by the IPL3; references/ultralib/src/os/parameters.s ABS() list)
+osTvType = 0x80000300; // ultralib parameters.s; read by __osViInit, CEngineApp__Main and the Video_* resolution/mode code (NTSC/PAL/MPAL choice)
+osRomBase = 0x80000308; // ultralib parameters.s; read by osPiRawStartDma and osPiRawReadIo (cart base address for PI DMA)
+osResetType = 0x8000030C; // ultralib parameters.s; read by osInitialize (cold/NMI reset test before clearing osAppNMIBuffer)
+osMemSize = 0x80000318; // ultralib parameters.s; returned by GetMemSize (Turok 3 defs.c); func_002A2104.c spells it as a local #define
+osAppNMIBuffer = 0x8000031C; // ultralib parameters.s; 64-byte NMI buffer cleared by osInitialize on a cold boot
