@@ -20,7 +20,6 @@ extern s32 gInSinglePlayerMenu;
 extern s32 gScreenHeight;          /* screen height */
 extern VideoRate gCurrentFB;
 extern f32 gFrameIncrement;          /* frame time */
-extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinemaStarted;
 extern s32 gCameraPoolHideViews;
 extern u8 gEngineApp_m_Game_m_MenuPool[];
 
@@ -97,7 +96,7 @@ void CEngineApp__Update(CEngineApp *level) {
     }
     CCache__Advance(0);
     gFrameData = gEngineApp_m_pCurrentFrameData;
-    if (gEngineApp_m_Game_m_PlayerList_m_bCinemaStarted == 0) {
+    if (gEngineApp_m_Game.m_PlayerList.m_bCinemaStarted == 0) {
         gCameraPoolHideViews = 0;
     }
     CEngineApp__Draw(level);

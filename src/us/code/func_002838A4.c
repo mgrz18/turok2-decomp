@@ -2,10 +2,10 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/cinema.h"
+#include "globals/game.h"
 
 
 extern Cinema *gCinemaPlayerP;
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
 extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern u8 gRumblePool[];
 /* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
@@ -39,7 +39,7 @@ void Cinema_Start(void) {
         return;
     }
     if (gCinemaPlayerP->resetPlayer != 0) {
-        player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+        player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
         if (player != NULL) {
             CPlayer__ResetControlState(player);
             if (gCinemaPlayerP->saveStart != 0 && gCinemaPlayerP->startLevel == -1

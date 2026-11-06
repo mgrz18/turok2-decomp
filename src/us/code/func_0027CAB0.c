@@ -23,7 +23,6 @@ typedef struct {
 
 extern s32 gScene[];
 extern CCamera *gEngineApp_m_Game_m_CameraPool_m_Cameras;     /* the camera pool's first camera */
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* the players */
 extern s32 gCameraPoolHideViews;
 extern s32 gFrameCountGameplay;
 extern f32 gFrameIncrement;          /* the frame's time step */
@@ -39,7 +38,7 @@ static __inline__ CPlayer *GetPlayer(CCamera *cam) {
     CPlayer *player;
     CPlayer *node;
 
-    for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
+    for (player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; player != NULL; player = player->m_pNext) {
         if (player->m_pCamera == cam) {
             return player;
         }

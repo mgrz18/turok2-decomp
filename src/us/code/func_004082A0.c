@@ -25,7 +25,6 @@ typedef struct {
 } BossFight;
 
 
-extern void *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern s32 gScene;
 extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
@@ -100,7 +99,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
     }
     if (fight->state != 1) {
         actor = gScene_m_InstancePool_m_ActiveList;
-        player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+        player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
         n = 0;
         for (; actor != NULL; actor = actor->m_pNext) {
             if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_pTargetOverride == 0) {

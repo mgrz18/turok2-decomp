@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/game.h"
 
 /* One file: BlindOne_UpdateMover, BlindOne_GetHealthPercent, BlindOne_Setup and BlindOne_PhaseWaitPlayerUpdate.
  * BlindOne_Setup's only literal, the string "Blind", sits at 0x800C08D4, 4 past
@@ -216,7 +217,6 @@ void BlindOne_Setup(BlindOneState *state) {
 /* Second boss phase update: steps the script to the next phase once the player comes within 716.8 of the
  * origin. */
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 extern f32 func_00298470(f32 x); /* sqrt */
 
 /* Steps the script: clears the movers and the actors' m_BlindOne.m_nPhaseHits, enters the next phase and runs its init. */
@@ -244,7 +244,7 @@ static __inline__ void nextPhase_40CFC4(BlindOneState *state) {
 }
 
 void BlindOne_PhaseWaitPlayerUpdate(BlindOneState *state) {
-    CPlayer *player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+    CPlayer *player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
 
     if (player != NULL &&
         func_00298470(player->m_CharacterActor.header.m_vPos.x * player->m_CharacterActor.header.m_vPos.x + player->m_CharacterActor.header.m_vPos.y * player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.header.m_vPos.z * player->m_CharacterActor.header.m_vPos.z) <

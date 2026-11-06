@@ -46,7 +46,6 @@ extern Globals gEngineApp_m_Game_m_MenuPool;
 extern s32 gScene_m_LevelID;          /* level */
 extern f32 gFrameIncrement;          /* frame time */
 extern PortSetup D_8011AB88[];
-extern char gEngineApp_m_Game_m_DebugLines;
 extern char gEngineApp_m_Game_m_CameraPool;
 extern char gPauseMenuDesc;         /* death screen */
 extern char gSavePortalMenuDesc;
@@ -119,7 +118,7 @@ void CPlayerPool__Update(PlayerList *list) {
             CPlayer__Update(p);
         }
         CPlayer__UpdateOrbitCamera(p, p);
-        Automap_SetPlayer(&gEngineApp_m_Game_m_DebugLines, p->m_CharacterActor.header.m_pCurrentRegion, p->m_CharacterActor.m_RotY, p->m_CharacterActor.header.m_vPos);
+        Automap_SetPlayer(&gEngineApp_m_Game.m_Automap, p->m_CharacterActor.header.m_pCurrentRegion, p->m_CharacterActor.m_RotY, p->m_CharacterActor.header.m_vPos);
     }
     for (p = list->active.head; p != NULL; p = p->m_pNext) {
         CPlayer__ReadInput(&p->m_ContState, p);

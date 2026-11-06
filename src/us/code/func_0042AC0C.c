@@ -26,7 +26,6 @@ extern u8 gDecompressor[];
 extern u8 gLoopSoundEntries[];
 extern u8 gLoopSounds[];
 extern u8 gEngineApp_m_SwooshSystem[];
-extern u8 *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* player list */
 
 extern s32 ProPack__Decompress(s32, s32);
 extern void CCollisionInfo__Reset(void);
@@ -233,7 +232,7 @@ loaded:
     for (; i < count; i++) {
         func_0021E5D4((u8 *)w->m_pActors + i * 0x288);
     }
-    player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+    player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
     actor = player;
     while (player != NULL) {
         func_0021E5D4(actor);

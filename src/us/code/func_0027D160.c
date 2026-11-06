@@ -24,7 +24,6 @@ typedef struct {
     /* 0x1C */ u32 m_VisBits;
 } CFloor;
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern f32 gFrameIncrement;          /* the frame's time step */
 extern CCameraMode D_800B6CB4[];
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
@@ -101,7 +100,7 @@ void CCamera__Advance(CCamera *cam) {
     f32 boxX, boxY, boxZ;
     s32 n;
 
-    for (node = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; node != NULL; node = node->m_pNext) {
+    for (node = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; node != NULL; node = node->m_pNext) {
         if (node->m_pCamera == cam) {
             player = node;
             goto found;

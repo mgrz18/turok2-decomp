@@ -6,7 +6,6 @@
 
 
 extern Cinema *gCinemaPlayerP;
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;          /* current player */
 extern u8 gScene[];             /* the world */
 extern s32 gScene_m_nLevel;              /* world +0x18FA8: the current warp id */
 extern s32 gScene_m_WarpFade;
@@ -49,7 +48,7 @@ void Cinema_RestorePlayer(void) {
         if (gScene_m_nLevel != warp) {
             CScene__LoadLevel(world, warp, 1);
         }
-        player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+        player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
         gScene_m_WarpFade = 0;
         gScene_m_WarpState = 0;
         gScene_m_WarpTime = 0;

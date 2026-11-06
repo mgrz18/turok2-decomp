@@ -21,7 +21,6 @@ typedef struct {
 } BossFight;
 
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the current player */
 extern u8 gScene[];
 extern u8 D_800B6660[];
 extern u8 gEngineApp_m_OnScreen[];
@@ -62,7 +61,7 @@ void TotemDefense_Complete(BossFight *fight) {
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
     setAnim(fight->obj, 0x5337);
     CScene__UnmarkGeneratorsSaved(gScene);
-    gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead->m_FleeTime = 450.0f;
+    gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead->m_FleeTime = 450.0f;
     for (a = gScene_m_InstancePool_m_ActiveList[0]; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {
             a->m_Instance.m_AI.m_pPathTarget = NULL;
