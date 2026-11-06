@@ -2,10 +2,10 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/game.h"
+#include "globals/frame.h"
 
 extern s32 gScreenWidth;      /* screen width */
 extern s32 gScreenHeight;      /* screen height */
-extern s32 gDepthBuffer;      /* z-buffer */
 extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[2];
 
 extern void Render_SetRenderMode(s32 mode);

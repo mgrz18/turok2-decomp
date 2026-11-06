@@ -20,7 +20,6 @@ typedef struct {
 } Item;
 
 extern s32 gPakMenuPort;
-extern s32 gCameraPoolHideViews;
 extern u8 gSavePortalMenuDesc[];
 extern u8 gSavePortalMenuDescB[];
 extern s32 PakMenu_CheckPak(Item *item, s32 id, s32 a2);

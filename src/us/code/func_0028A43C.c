@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
+#include "globals/frame.h"
 typedef struct {
                u32 type;
                u32 flags;
@@ -79,7 +80,6 @@ extern f32 gSchedRspTotalTime;
 extern f32 gSchedRspTime;
 extern s32 sSchedGfxWatchdog;
 extern View gEngineApp[];
-extern u32 gDisplayList0;
 void __scHandleRSP(Vid *o) {
     Job *j;
     Job *a;

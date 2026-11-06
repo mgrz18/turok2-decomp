@@ -3,14 +3,13 @@
 #include "structs/game.h"
 #include "structs/frame.h"
 #include "globals/game.h"
+#include "globals/frame.h"
 
 typedef struct VideoRate {
     /* 0x0 */ s32 unk0;
     /* 0x4 */ f32 hz;
 } VideoRate;
 
-extern u64 gLastEngineUpdate;          /* time of the last frame */
-extern s32 gNextTicks;          /* retraces this frame */
 extern u32 gNumTicks3;          /* retrace counts of the last four frames */
 extern u32 gNumTicks0;
 extern u32 D_800F6CA8;

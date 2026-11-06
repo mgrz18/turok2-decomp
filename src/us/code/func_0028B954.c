@@ -1,10 +1,10 @@
 #include "common.h"
+#include "globals/frame.h"
 
 extern u8 D_800AA0DC[];   /* ": " */
 extern u8 D_800AA0EC[];   /* "   " */
 extern u8 D_800AA0F0[];   /* "\n" */
 
-extern u16 sCrashTextColor;     /* debug console foreground colour */
 
 extern void Crash_PutChar(s32 c);       /* print a character */
 extern void Crash_PrintHex8(s32 byte);    /* print a byte in hex */

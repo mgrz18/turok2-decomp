@@ -1,10 +1,9 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002A7F58.c, func_802A7554_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-typedef signed int s32;
-typedef unsigned int u32;
+#include "common.h"
+#include "globals/frame.h"
 extern char gBootSignature;
-extern s32 gWarmBoot;
 extern char gSavedPlayers;
 extern char gEngineApp_m_Settings;
 extern char gLoadSavePersistentData;

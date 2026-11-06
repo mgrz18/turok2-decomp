@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "globals/frame.h"
 
 /* libultra __OSThreadContext: 64-bit registers, read here as their low words. */
 typedef struct ThreadContext {
@@ -32,7 +33,6 @@ extern s32 gScreenWidth;              /* screen width */
 extern s32 gScreenHeight;              /* screen height */
 extern u16 *gCFB;             /* frame buffer */
 extern u16 *sCrashFrameBuffer;             /* crash screen frame buffer */
-extern u16 sCrashTextColor;              /* text colour */
 extern u16 sCrashBgColor;              /* background colour */
 extern char gEngineTimestamp[];           /* build string */
 extern char D_8010FED4[];

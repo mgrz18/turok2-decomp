@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 s32 Cinema_RequestById(s32);
 s32 CScene__RequestWarp(s32, s32, s32);
@@ -13,8 +14,6 @@ extern s32 gEndingPrimagenDefeated;
 extern s32 gScreenHeight;
 extern s32 sCreditsLine;
 extern u8 gScene[];
-extern s32 gCreditsDone;
-extern f32 gCreditsScroll;
 
 void EngineMode16_Ending_Init(s32 arg0)
 {

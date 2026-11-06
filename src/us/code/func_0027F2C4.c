@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "structs/frame.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
@@ -14,7 +15,6 @@ extern s32 gEvenOdd;              /* frame buffer index */
 extern s32 gScreenWidth;              /* screen width */
 extern s32 gScreenHeight;              /* screen height */
 extern Gfx *gDList;             /* display list head */
-extern s32 gCameraPoolHideViews;
 extern Gfx gRspInitDL[];
 extern Gfx gRdpInitDL[];
 

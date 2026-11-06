@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0028EAAC.c, func_0028EAAC, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/frame.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -40,10 +41,7 @@ extern s32 gDecompressorBoostRetraces;          /* retraces before the thread pr
 extern u8 gDecompressor[];         /* OSThread */
 extern s32 gThreadPriorityDecompressorLow;          /* its priority */
 extern s32 gCurrentTick;          /* retraces since the last swap */
-extern s32 gNumTicksPending;          /* swap pending */
-extern s32 gPendingFB;          /* framebuffer just swapped in */
 extern s32 gCurrentFB;          /* framebuffer on screen */
-extern s32 gNumTicksWaiting;          /* frames waiting to be shown */
 extern GfxTask *gWaitingFrames[];
 extern u32 gNextFrameToShow;          /* next frame to show */
 extern u32 gTotalFramebuffers;          /* task count */

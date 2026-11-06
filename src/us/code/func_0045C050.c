@@ -1,5 +1,6 @@
 #include "common.h"
 #include "globals/pak.h"
+#include "globals/menu.h"
 
 /* The second argument: only its word at 0x10 is read (0 or 1 passes). */
 typedef struct {
@@ -7,7 +8,6 @@ typedef struct {
     /* 0x10 */ u32 kind;
 } Arg1;
 
-extern s32 gCameraPoolHideViews;
 extern s32 D_801309AC;
 
 void SavePortalMenu_Close_2(s32 arg0, Arg1 *arg1) {

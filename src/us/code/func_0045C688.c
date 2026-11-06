@@ -10,7 +10,6 @@
  * menu when there is a player). */
 
 extern s32 gPakMenuPort;
-extern s32 gCameraPoolHideViews;
 extern u8 gSavePortalMenuDescB_2[];
 extern u8 gSavePortalMenuDesc_2[];
 

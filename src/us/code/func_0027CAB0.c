@@ -4,6 +4,7 @@
 #include "structs/camera.h"
 #include "globals/game.h"
 #include "globals/camera.h"
+#include "globals/menu.h"
 
 /* What a region set gives a camera (the record CScene__GetRegionInfo finds). */
 typedef struct {
@@ -23,7 +24,6 @@ typedef struct {
 } CRegionSetAttributes;
 
 extern s32 gScene[];
-extern s32 gCameraPoolHideViews;
 extern s32 gFrameCountGameplay;
 extern f32 gFrameIncrement;          /* the frame's time step */
 CRegionSetAttributes *CScene__GetRegionInfo(s32 *list, u16 *key);

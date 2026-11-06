@@ -9,7 +9,6 @@ void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 extern char gSavePortalMenuDesc[];
 extern char gSavePortalMenuDescB[];
 extern s32 gDamagedPakContinued;
-extern s32 gCameraPoolHideViews;
 
 s32 DamagedPakMenu_SelectContinue(s32 unused, Menu *event) {
     char *dst;

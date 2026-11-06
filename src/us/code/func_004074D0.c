@@ -7,7 +7,6 @@ extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s
 
 extern s32 D_800F1F50[];
 extern CVector3 *gPrimagenPaths[];  /* boss paths */
-extern s32 sPrimagenPathPoint;          /* point on the path */
 extern s32 gLevelScript_path;          /* path */
 
 void Primagen_EnterMode19(CGameObjectInstance *obj, CAI *ai) {

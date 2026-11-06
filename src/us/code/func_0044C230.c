@@ -33,8 +33,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F290.c, func_0043F290, with Turok 2's layouts. */
 
 extern s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
-extern char sMenuBindingValue[];
-extern char sMenuBindingText[];
 
 /* Reads the item's bound variable as a float, whatever its type. */
 static __inline__ f32 MenuItem_GetValue(MenuItem *item) {
@@ -558,7 +556,6 @@ extern f32 gFrameIncrement; /* frame time scale */
 extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
-extern s32 sMenuModelFade;
 extern u8 gScene[];
 extern s32 gCharacterModels[];
 
@@ -1931,7 +1928,6 @@ extern s32 gBlendState;
 extern O06Cam gBlendState_m_Color[];
 extern O06Seg D_800AB0E8_4171F4 __asm__("gDefaultLights");
 extern s32 gEvenOdd;
-extern s32 sMenuModelFade;
 extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
 /* The selected model item's draw callback (MenuItem_DrawModel_2): drawn with the
  * lights of gDefaultLights and a fade by sMenuModelFade. */

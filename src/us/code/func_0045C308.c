@@ -2,13 +2,13 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/pak.h"
+#include "globals/menu.h"
 
 void MenuPool_OpenMenu_2(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
 
 extern char gPakMsgInsertRumblePakDesc_2[];
 extern s32 gPakMenuPort;
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2];
-extern s32 gCameraPoolHideViews;
 
 static __inline__ u8 *GetPlayer(Menu *event, s32 *port) {
     u8 *player = NULL;

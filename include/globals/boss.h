@@ -8,6 +8,7 @@
 extern WaveBossState gMantidQueen;          /* the Mantid Queen */
 extern MotherBossState gMotherBoss;         /* the Mother */
 extern BlindOneState gBlindOne;             /* the Blind One */
+extern s32 sPrimagenPathPoint;              /* the Primagen's path point (just before gLevelScript) */
 
 /* A few files read only the stage, as a plain word: the ROM reloads its
  * address before every read there, which the struct does not give (gcc

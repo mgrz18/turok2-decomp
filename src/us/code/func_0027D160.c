@@ -12,6 +12,7 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/camera.h"
+#include "globals/frame.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -410,7 +411,6 @@ extern s32 gScreenHeight;          /* screen height */
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern Gfx gRspInitDL[];        /* RDP setup display lists */
 extern Gfx gRdpInitDL[];
-extern void *gDepthBuffer;        /* the z buffer */
 void Texture_InvalidateCache(void);
 void Render_SetRenderMode(s32 arg0);
 s32 Cinema_PathPlaying(void);

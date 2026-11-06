@@ -11,7 +11,6 @@ extern char gSavePortalMenuDesc_2[];
 extern char gSavePortalMenuDescB_2[];
 extern char gPakConfirmRepairDesc_2[];
 extern s32 gPakMenuPort;
-extern s32 gCameraPoolHideViews;
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

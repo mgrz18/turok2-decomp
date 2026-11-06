@@ -20,7 +20,6 @@ typedef struct {
 
 extern s32 gPakMenuMode;
 extern s32 gDamagedPakContinued;
-extern s32 gCameraPoolHideViews;
 extern s32 D_800F70A8; /* save size */
 extern u8 gSavePortalMenuDescB_2[];
 extern u8 gPakMsgInsertToSaveDesc_2[];

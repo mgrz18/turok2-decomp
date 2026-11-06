@@ -2,6 +2,7 @@
 #include "structs/game.h"
 #include "structs/controller.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MULTI/8043E9A8_4.CPP, func_8043EA98_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
@@ -10,7 +11,6 @@ struct ObjRecAt20V2 {
     char *unk20;
 };
 
-extern s32 gInSinglePlayerMenu;
 extern s32 Controller_ConfirmPressed(char *);
 extern void Music_RestoreVolume(void);
 extern void func_00469374(void *, s32);

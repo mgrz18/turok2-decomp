@@ -1,4 +1,5 @@
-typedef signed int s32;
+#include "common.h"
+#include "globals/menu.h"
 
 typedef struct {
     /* 0x000 */ char pad0[0x2D8];
@@ -11,7 +12,6 @@ typedef struct {
 } Menu41A4D4;
 
 extern s32 gEngineApp_m_Settings_unlockedCheats; /* local type: GameSettings.unlockedCheats; declared from globals/game.h (u32, before the loop) GCC loads the address instead of the value */
-extern s32 sCheatsMenuSelection; /* selected weapon */
 
 void CheatsMenu_Init(Menu41A4D4 *menu) {
     s32 weapon = 0;

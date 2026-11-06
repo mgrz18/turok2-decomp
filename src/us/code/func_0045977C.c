@@ -7,7 +7,6 @@
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
-extern s32 gCameraPoolHideViews;
 extern s32 gPakMenuPort; /* pad */
 extern s32 gScene_m_PendingWarpID;
 extern u8 gScene[];

@@ -6,6 +6,7 @@
 
 #include "common.h"
 #include "globals/game.h"
+#include "globals/frame.h"
 
 typedef struct Marker {
     char text[15];
@@ -13,7 +14,6 @@ typedef struct Marker {
 
 extern Marker sBootMarker;           /* the boot marker string */
 extern char gBootSignature[];           /* where the marker is kept (0x10 bytes) */
-extern s32 gWarmBoot;              /* set when the marker was found: a warm boot */
 extern char gSavedPlayers[];           /* the saved players (0x1400) */
 extern char gLoadSavePersistentData[];
 extern char gGamePersistentData[];

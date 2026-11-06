@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 extern int gScene_m_PreviewOptions;
 extern CheatCode sCheatCodes[];
 extern u8 gCheatEntryText[];
-extern s32 sEnterCheatResult;
 extern s32 strlen(u8 *);
 extern void Sound__Play2D(s32);
 s32 EnterCheatMenu_Enter(void)

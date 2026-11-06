@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/frame.h"
 
 s32 Music_SetTrack(s32);
 s32 Cinema_Stop(void);
@@ -9,7 +10,6 @@ s32 Demo_End(void);
 s32 Sound__StopAllExcept(s32);                     /* extern */
 s32 Music_FadeOut();                            /* extern */
 extern s32 gEngineModeTable;
-extern s32 gDisplayListCount;
 
 /* The frame/game state block passed to the per-mode handlers (the
  * handler table gEngineModeTable/D_800B6D7C has 0xC-byte rows indexed by mode). */

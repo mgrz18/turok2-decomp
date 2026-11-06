@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 extern char D_800C1768[];
 extern char D_800B4398[];
@@ -8,7 +9,6 @@ extern char D_800B4444[];
 extern char D_800B449C[];
 extern char D_800B44D4[];
 extern char D_800B4534[];
-extern s32 sMissionHub;
 
 s32 MissionMenu_UpdateLevelName(MenuItem *item) {
     switch (sMissionHub) {
