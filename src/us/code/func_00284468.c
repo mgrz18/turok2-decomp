@@ -1,9 +1,9 @@
 
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/cinema.h"
 s32 Cinema_RestorePlayer(void);
 s32 Sound__StopAllExcept(s32);
-extern Cinema *gCinemaPlayerP;
 void Cinema_RunEnd(s32 arg0)
 {
   CinemaCallback temp_v1;

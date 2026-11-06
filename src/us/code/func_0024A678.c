@@ -1,9 +1,8 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "globals/game.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;      /* screen width */
-extern s32 gScreenHeight;      /* screen height */
 
 void CCamera__WorldToScreen(CCamera *, f32 *, f32 *, f32 *);
 void Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);

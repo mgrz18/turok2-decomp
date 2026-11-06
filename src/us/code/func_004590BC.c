@@ -10,9 +10,6 @@
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
-extern s32 gSaveBufferHandle;
-extern s32 gLoadBufferHandle;
-extern s32 gPakMenuPort; /* pad */
 extern s32 D_8011F144;
 extern s32 D_8011B114;
 extern u8 gPakSaveGameAnyPakMenuDesc_2[];

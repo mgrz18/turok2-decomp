@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 func_0020B9F4(s32, void *, void *, s32, s32); /* extern */
 s32 CScene__GetLightsAt(s32 *, s32, s32);         /* extern */
 extern s32 gEvenOdd;
-extern s32 gScene;
 
 /* A drawn instance; 0xF8 points at its render info, 0x1D0 links it in the
  * world's draw list at 0xEC14. */

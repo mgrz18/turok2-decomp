@@ -8,12 +8,10 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "globals/scene.h"
+#include "structs/game.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
-extern s32 gPakMenuPort; /* pad */
-extern u8 gScene[];
-extern u8 gEngineApp[];
 extern u8 gSavePortalMenuDescB[];
 extern u8 gSavePortalMenuDesc[];
 extern u8 gPakLoadGameMenuDesc[];
@@ -52,10 +50,10 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
                 s1 = o->controller->port;
             }
             Controller_UnwatchPak(s1);
-            CScene__RequestWarp(gScene, o->player->m_Data.m_CheckPointWarpID, 2);
+            CScene__RequestWarp(&gScene, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
-        func_004303AC(gEngineApp);
+        func_004303AC(&gEngineApp);
         return 1;
     }
     if (gPakMenuAnyPak != 0) {
@@ -65,7 +63,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
     }
     if (gPakMessageKind == 5) {
         Controller_UnwatchPak(s1);
-        CScene__RequestWarp(gScene, gScene_m_PendingWarpID, 2);
+        CScene__RequestWarp(&gScene, gScene_m_PendingWarpID, 2);
     }
     if (gPakMenuAnyPak != 0) {
         if (gPakMessageKind == 6) {

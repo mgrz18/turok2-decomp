@@ -6,8 +6,6 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 
-extern s32 gPakMenuMode;
-extern s32 gDamagedPakContinued;
 extern u8 gSingleMenuAfterPakDesc_2[];
 extern u8 gPakMsgInsertToLoadDesc_2[];
 extern u8 gDamagedPakAtBootMenuDesc_2[];

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/cinema.h"
 
 s32 Cinema_RequestById();                                /* extern */
-extern Cinema *gCinemaPlayerP;
 
 s32 Cinema_SetNextCallbacks(s32 arg0, void (*arg1)(Cinema *), void (*arg2)()) {
     s32 temp_s3;

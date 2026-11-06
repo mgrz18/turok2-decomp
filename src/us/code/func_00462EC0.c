@@ -3,6 +3,7 @@
 #include "structs/world.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 /* Level start: resets the world, opens the cartridge index and the level resource tables (levels, texture
  * sets, object types, objects, intelligence, particle effects, binaries, swooshes, lights, curves, rumbles,
@@ -28,8 +29,6 @@ extern char D_800A5E68[]; /* "graphicset index" */
 extern char D_800A5E7C[]; /* "Cinemas index" */
 extern char D_800A5E8C[]; /* "link group types" */
 extern s32 gPersistentDataLoaded;
-extern u8 gGamePersistentData[];
-extern u8 gLoadSavePersistentData[];
 
 extern s32 ProPack__Decompress();
 extern s32 Model_DecompressCallback();

@@ -7,7 +7,6 @@ typedef struct {
     /* 0x14 */ u8 *key;
 } KeyEvent;
 
-extern u8 gCheatEntryText[];
 
 /* Inserts the event's character at the cursor (max 22 chars). */
 s32 EnterCheatMenu_InsertLetter(KeyEvent *ev) {

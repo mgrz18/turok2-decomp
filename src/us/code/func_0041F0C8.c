@@ -11,10 +11,7 @@
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
-extern s32 gPakMenuPort; /* pad */
 extern s32 D_800F70A8;
-extern s32 gSaveBufferHandle;
-extern s32 gLoadBufferHandle;
 extern char gPakGameNoteName[];
 extern char gPakGameCode[];
 extern u8 gPakConfirmNoSpaceDesc[];

@@ -2,13 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/pak.h"
 
 extern int Controller_IsPakWatched(int arg0);
-extern int gPakChanged[];
 extern void Controller_UpdatePakInsertion();
 extern int Controller_PakInserted(int arg0);
-extern s32 gPakInserted[];
-extern s32 gPakRemoved[];
 void Controller_UpdatePakInsertion(void)
 {
     s32 i;

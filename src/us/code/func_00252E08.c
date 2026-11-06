@@ -3,10 +3,9 @@
 #include "structs/camera.h"
 #include "globals/game.h"
 #include "globals/camera.h"
+#include "globals/render.h"
 
 extern u32 gFrameCountGameplay;          /* frame counter */
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 
 extern void Hud_SetupTextureMode(s32 color);
 extern void Hud_DrawNumber(s32 value, f32 x, f32 y, f32 sx, f32 sy, s32 arg5, s32 arg6, s32 arg7);

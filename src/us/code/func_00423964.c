@@ -5,7 +5,6 @@
 s32 Controller_PakChanged(s32);
 s32 PakMenu_CheckPak(s32, s32, s32);
 
-extern s32 gPakMenuPort;
 
 s32 PakConfirmMenu_Poll(Menu *arg0) {
     s32 var_a0;

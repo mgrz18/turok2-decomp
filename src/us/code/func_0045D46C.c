@@ -1,12 +1,10 @@
 /* Second-module copy of Video_UpdateResolution (first module; this one at link address 0x0042446C), calling this module's own functions at their link addresses. */
 #include "common.h"
+#include "globals/render.h"
 
 s32 GetMemSize(void); /* osGetMemSize */
 void Video_ApplyResolution_2(void);
 
-extern s32 gResolution; /* current video mode */
-extern s32 gAppliedResolution; /* applied video mode */
-extern s32 gVideoClearFrames;
 
 void Video_UpdateResolution_2(void) {
     if (gResolution == -1) {

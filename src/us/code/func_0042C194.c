@@ -1,6 +1,7 @@
 /* WRONG CUT: REAL CScene__FindWarpDests size 0x228 (splat cut it into CScene__FindWarpDests + func_0042C2DC + func_0042C338 + func_0042C38C). */
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/MENU/ITEMS/8044ACCC_29.CPP, func_8044D220_de, with Turok 2's layouts. */
 #include "common.h"
+#include "structs/game.h"
 
 typedef struct ListRec {
     /* 0x00 */ u8 pad0[0x10];
@@ -20,7 +21,6 @@ typedef struct Placed {
     /* 0x12 */ s16 unk12;
 } Placed; /* 0x14 */
 
-extern s32 gEngineApp_m_CartridgeIndex;
 extern char D_800A5D8C[];
 extern char D_800A5FC4[];
 
@@ -54,7 +54,7 @@ s32 CScene__FindWarpDests(void *world, s32 kind, s32 key, Placed *out, s32 max) 
     s32 pool;
 
     found = 0;
-    pool = gEngineApp_m_CartridgeIndex;
+    pool = gEngineApp.m_CartridgeIndex;
     CCache__LoadPersistantIndex(found, &resource, pool, D_800A5D8C);
     handle = CCache__LoadPersistantSubBlock(found, resource, 8, pool, world, 0, D_800A5FC4);
     table = *handle;

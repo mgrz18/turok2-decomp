@@ -4,6 +4,7 @@
 #include "structs/camera.h"
 #include "structs/model.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 /* Draw pass for one actor in one view: if the actor is drawable (flags
  * 0x40000 and a draw callback) and active (0x2000), load its "anim object
@@ -42,7 +43,6 @@ struct Actor {
 
 extern char D_800A5AC4[];   /* "anim object info" */
 extern s32 gEvenOdd;      /* current view */
-extern u8 gScene[];
 
 void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32);
 s32 CISet__GetBlock(void *, s32);
@@ -134,7 +134,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
                     pos = actor->pos;
                     pos.y += actor->height;
                     pos.y += GameObject_GetCollisionHeight(actor) * 0.5f;
-                    CScene__GetLightsAt(gScene, &pos, actor->lights[gEvenOdd]);
+                    CScene__GetLightsAt(&gScene, &pos, actor->lights[gEvenOdd]);
                 }
                 actor->flags |= 0x200;
             }

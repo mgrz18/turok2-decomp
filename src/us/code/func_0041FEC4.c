@@ -7,7 +7,6 @@
  * when saving over an existing game file asks for confirmation, when there
  * is no usable pak cycles to the next slot with one. */
 
-extern s32 gPakMenuPort;
 extern char gPakGameNoteName[];
 extern u8 gPakSaveGameMenuDesc[];
 extern u8 gPakConfirmOverwriteDesc[];

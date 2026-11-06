@@ -17,6 +17,8 @@
 #include "structs/weapon.h"
 #include "globals/game.h"
 #include "globals/scene.h"
+#include "globals/render.h"
+#include "globals/collision.h"
 
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
@@ -74,8 +76,6 @@ void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player) {
 #include "structs/camera.h"
 
 /* An animated HUD item (COverlay__Update ticks it, COverlay__StartScript restarts it). */
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 extern u8 gAmmoOverlayChangeScript[];
 extern u8 gLivesOverlayChangeScript[];
 extern u8 gTokensOverlayChangeScript[];
@@ -510,9 +510,6 @@ extern f32 gCharacterHealthRegen[];           /* health regeneration per charact
 extern PlayerStateInfo gPlayerStateTable[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
-extern s32 gCollisionResults_m_nFloorKind;
-extern u8 gScene;
 extern s32 gCharacterModels[];
 extern s32 gTagModeModel;
 
@@ -875,7 +872,7 @@ void CPlayer__Update(Player *p) {
             }
             CPlayer__RamWithMount(p, actor, stateFlags);
             landed = CPlayer__TryMount(p, actor, stateFlags);
-            if (gCollisionResults_m_nFloorKind == 2 && (u32) ((u16) p->state - 4) < 2) {
+            if (gCollisionResults.m_nFloorKind == 2 && (u32) ((u16) p->state - 4) < 2) {
                 if (actor->velY > 0.0f) {
                     actor->velY = 0.0f;
                 }

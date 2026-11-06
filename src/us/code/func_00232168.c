@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/particle.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 typedef struct { f32 m[4][4]; } Mtx4;
 
-extern CCollisionResults gCollisionResults;  /* the last collision test: the spawn is placed at its hit */
 void CMtxF__FromMtxAffine(Mtx4 *out, void *src);
 void CMtxF__InvertAffine(Mtx4 *out, Mtx4 *in);
 void CMtxF__TransformPoint(Mtx4 *m, CVector3 *in, CVector3 *out);

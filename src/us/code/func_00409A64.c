@@ -12,6 +12,7 @@
 #include "structs/player.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
@@ -121,8 +122,6 @@ void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
     Actor_SpawnParticle(target, 0x112, p, 0);
 }
 
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
-extern u8 gScene_m_InstancePool[];
 
 extern void GameObject_TraceMove(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
 extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, s32 intelligence, s32 region, CVector3 pos, f32 rotY,
@@ -138,7 +137,7 @@ static __inline__ s32 fewerActorsThan(s32 max) {
     CListedInstance *actor;
     s32 count = 0;
 
-    for (actor = gScene_m_InstancePool_m_ActiveList; actor != NULL; actor = actor->m_pNext) {
+    for (actor = gScene.m_InstancePool.m_ActiveList.m_pHead; actor != NULL; actor = actor->m_pNext) {
         /* both arms are merged by cross-jumping; the extra block gives the ROM's register allocation */
         if (actor->m_pNext != NULL) {
             count++;
@@ -197,7 +196,7 @@ void MotherBoss_AnimEvent(s32 arg0, void *self, s32 arg2, AnimEvent ev) {
             scale.x = 0.5f;
             scale.y = 0.5f;
             scale.z = 0.5f;
-            CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
+            CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x458, (s32)s->intel, region, ev.pos, 0.0f, obj->m_Instance.m_vVelocity, scale, NULL);
         }
         break;
     case 1:

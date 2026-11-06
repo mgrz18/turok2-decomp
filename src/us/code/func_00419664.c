@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 #include "globals/menu.h"
+#include "structs/game.h"
 
 extern void CEngineApp__SetupFadeTo(struct GameSession *object, int value);
 extern s32 SingleMenu_GoBack(void *arg0, Outer8043E56C *arg1);
 extern void Controller_UnwatchPak(s32 arg0);
-extern s32 gEngineApp;
 s32 SingleMenu_GoBack(void *arg0, Outer8043E56C *arg1) {
     CEngineApp__SetupFadeTo(&gEngineApp, 8);
     gInSinglePlayerMenu = 0;

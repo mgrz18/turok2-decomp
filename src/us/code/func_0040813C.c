@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/onscreen.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -22,9 +23,7 @@ typedef struct {
 } BossFight;
 
 
-extern u8 gScene[];
 extern u8 D_800B6674[];
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
@@ -62,10 +61,10 @@ void TotemDefense_Fail(BossFight *fight) {
     setAnim(fight->obj, 0x5336);
     COnScreen__ClearBoss(&gEngineApp_m_OnScreen);
     COnScreen__ClearBoss2(&gEngineApp_m_OnScreen);
-    CScene__UnmarkGeneratorsSaved(gScene);
+    CScene__UnmarkGeneratorsSaved(&gScene);
     if (fight->state != 1) {
         current = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
-        for (a = gScene_m_InstancePool_m_ActiveList[0]; a != NULL; a = a->m_pNext) {
+        for (a = gScene.m_InstancePool.m_ActiveList.m_pHead; a != NULL; a = a->m_pNext) {
             if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_pTargetOverride == 0 && (fight->state == 0 || a->m_Instance.m_AI.m_pSightTarget == fight->obj)) {
                 a->m_Instance.m_AI.m_pPathTarget = current;
                 a->m_Instance.m_AI.m_pSightTarget = current;

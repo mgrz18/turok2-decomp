@@ -10,7 +10,6 @@ typedef struct {
     char c[4];
 } Chars4;
 
-extern s32 gPakMenuPort; /* pad */
 extern s32 D_800F70A8;
 extern Chars4 D_800C1408;
 extern u8 D_800C1404[];

@@ -8,6 +8,7 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 typedef struct Entity Entity;
 struct Entity {
@@ -27,7 +28,6 @@ struct Entity {
     /* 0x28C */ Entity *next;
 };
 
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void DamageEvent_Set(DamageEvent *event, s32 source, s32 damage, f32 radius, s32 flags, s32 arg5);
@@ -108,7 +108,7 @@ void CScene__Blast(CScene *world, CVector3 *target) {
             CAI__SetMode(e, e->ai, 0x3D);
         }
     }
-    for (node = gScene_m_InstancePool_m_ActiveList; node != NULL; node = node->m_pNext) {
+    for (node = gScene.m_InstancePool.m_ActiveList.m_pHead; node != NULL; node = node->m_pNext) {
         actor = (Entity *)&node->m_Instance;
         strength = blastStrength(actor, target);
         if (strength != 0) {

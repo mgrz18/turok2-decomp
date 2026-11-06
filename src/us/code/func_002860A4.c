@@ -1,9 +1,7 @@
 #include "common.h"
 #include "globals/menu.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;              /* screen width */
-extern s32 gScreenHeight;              /* screen height */
-extern s32 sCreditsLine;              /* first credits line on screen */
 extern char *gCreditsLines[];          /* credits lines */
 
 extern void COnScreen__BeginText(void);

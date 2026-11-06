@@ -1,5 +1,6 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00267540.c, func_00267540.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/scene.h"
 
 #include "common.h"
 #include "globals/game.h"
@@ -12,7 +13,6 @@ typedef struct {
     u8 padBA[0xD4 - 0xBA];
     u32 flags;              /* 0xD4 (0x100) */
 } P3Actor;
-extern s32 gScene_m_bStreamAll;
 s32 func_00238258(P3Actor *a, P3Actor *b) {
     if (gEngineApp_m_Settings.multiplayer != 0) {
         return 1;
@@ -20,7 +20,7 @@ s32 func_00238258(P3Actor *a, P3Actor *b) {
     if (a->id == b->id || !(b->flags & 0x310000)) {
         return 0;
     }
-    if (gScene_m_bStreamAll != 0 && !(a->flags & 0x300000) && !(b->flags & 0x300000)) {
+    if (gScene.m_bStreamAll != 0 && !(a->flags & 0x300000) && !(b->flags & 0x300000)) {
         return 0;
     }
     switch (b->info->kind) {

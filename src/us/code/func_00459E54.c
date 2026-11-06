@@ -11,7 +11,6 @@ void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, s32 arg3, char *
 
 extern char gSavePortalMenuDesc_2[];
 extern char gSavePortalMenuDescB_2[];
-extern s32 gPakMenuPort;
 extern s32 gPakCheckDone; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 

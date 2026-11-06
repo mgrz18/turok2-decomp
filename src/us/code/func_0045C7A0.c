@@ -9,7 +9,6 @@ void MenuPool_OpenMenu_2(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
 extern char gSavePortalMenuDesc_2[];
 extern char gSavePortalMenuDescB_2[];
-extern s32 gDamagedPakContinued;
 
 s32 DamagedPakMenu_SelectContinue_2(s32 unused, Menu *event) {
     char *dst;

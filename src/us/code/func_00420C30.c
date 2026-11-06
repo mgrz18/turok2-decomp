@@ -8,7 +8,6 @@
 extern char gPakMsgDeleteDoneDesc[];
 extern int PakConfirmMenu_SelectYes(void * owner, struct MenuRecAt24 * menu, void * arg);
 extern char gPakMsgDeleteFailedDesc[];
-extern s32 gPakMenuPort;
 extern s32 D_8011B114;
 extern s32 Pak_DeleteNote(s32 ch, s32 index);
 extern void Pak_ProbeSlot(s32 ch);

@@ -8,6 +8,7 @@
 #include "structs/vector.h"
 #include "structs/level_actor.h"
 #include "structs/light.h"
+#include "globals/scene.h"
 
 /* A placed actor's record in the level data. */
 typedef struct {
@@ -22,8 +23,6 @@ typedef struct {
     /* 0x1E */ s8 angle;
 } PlacedActorRecord;
 
-extern u8 gLevelActorIntelligence[];         /* the empty model */
-extern u8 gScene[];         /* the model cache */
 extern u8 D_800B6D1B;
 
 void *CScene__GetIntelligence(void *cache, s32 model);
@@ -47,9 +46,9 @@ void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 o
     actor->m_Bounds.m_vMax.z = record->pos.z + record->radius;
     actor->m_Resource = owner;
     if (record->model == 0xFFFF) {
-        actor->header.m_pIntelligence = (CIntelligence *) gLevelActorIntelligence;
+        actor->header.m_pIntelligence = (CIntelligence *) &gLevelActorIntelligence;
     } else {
-        actor->header.m_pIntelligence = CScene__GetIntelligence(gScene, record->model);
+        actor->header.m_pIntelligence = CScene__GetIntelligence(&gScene, record->model);
     }
     if (record->segment == 0xFFFF) {
         actor->header.m_pCurrentRegion = NULL;

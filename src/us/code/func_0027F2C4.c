@@ -5,16 +5,14 @@
 #include "structs/frame.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+#include "globals/render.h"
+#include "globals/camera.h"
 
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern f32 gScreenClearTime;              /* seconds the screen is cleared for (splat: gCameraVisBits + 4) */
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* frame buffer index */
-extern s32 gScreenWidth;              /* screen width */
-extern s32 gScreenHeight;              /* screen height */
-extern Gfx *gDList;             /* display list head */
 extern Gfx gRspInitDL[];
 extern Gfx gRdpInitDL[];
 

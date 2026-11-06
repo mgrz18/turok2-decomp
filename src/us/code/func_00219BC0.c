@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/world.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 typedef struct {
     s32 words[6];
@@ -20,7 +21,6 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32)
 s32 Instance_NextUniqueId(void);
 void CGameObjectInstance__DrawModelLitVertices(void);
 
-extern CScene gScene;
 extern u8 gWeaponActorTypeInfo[];
 extern void *gIntelligenceTypeInfo[];
 extern Lights1 gDefaultLights;

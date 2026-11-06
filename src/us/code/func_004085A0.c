@@ -18,7 +18,6 @@ typedef struct {
 } BossFight;
 
 extern BossFight gTotemDefense;
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 extern f32 gFrameIncrement;
 
 extern void TotemDefense_DrawTotem();
@@ -33,7 +32,7 @@ extern void CPlayer__Warp(CPlayer *player, s32 track, s32 a, s32 b);
 static __inline__ s32 helperAlive(void) {
     CListedInstance *actor;
 
-    for (actor = gScene_m_InstancePool_m_ActiveList; actor != NULL; actor = actor->m_pNext) {
+    for (actor = gScene.m_InstancePool.m_ActiveList.m_pHead; actor != NULL; actor = actor->m_pNext) {
         if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {
             return 1;
         }
@@ -48,7 +47,7 @@ static __inline__ void stunHelper(void) {
     if (gTotemDefense.timer > 0.0f) {
         gTotemDefense.timer -= gFrameIncrement;
     } else if (!(Random_Float(100.0f) > 25.0f)) {
-        for (actor = gScene_m_InstancePool_m_ActiveList; actor != NULL; actor = actor->m_pNext) {
+        for (actor = gScene.m_InstancePool.m_ActiveList.m_pHead; actor != NULL; actor = actor->m_pNext) {
             if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_Health != 0) {
                 Actor_SpawnParticle(actor, 0x17C, actor->m_Instance.header.m_vPos, 0);
                 DamageEvent_Set(anim, 0, 0xFF00, 51.199997f, 0x100000, 0);

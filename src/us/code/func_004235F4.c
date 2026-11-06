@@ -8,7 +8,6 @@ s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 extern char D_800B50B4[];
 extern char D_800B50E4[];
 extern char D_800C1430[];
-extern s32 gPakMenuPort;
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

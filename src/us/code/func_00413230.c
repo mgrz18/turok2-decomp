@@ -21,6 +21,8 @@
 #include "gfx.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+#include "globals/scene.h"
+#include "globals/render.h"
 
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -132,8 +134,6 @@ s32 MenuItem_UpdateBinding(MenuItem *item, Menu *menu) {
 /* ---------------- MenuItem_Layout ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043F69C.c, func_0043F69C, with Turok 2's layouts. */
 
-extern s32 gScreenWidth; /* screen width */
-extern s32 gScreenHeight; /* screen height */
 
 extern s32 GetMemSize(void);
 extern CCamera *func_00416B28_41363C(void *pool) __asm__("MenuPool_GetCamera");
@@ -302,10 +302,7 @@ void MenuItem_Layout(MenuItem *it, MenuItemLayout *o) {
 /* ---------------- MenuItem_DrawString ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_0043FFAC.c, func_0043FFAC, with Turok 2's layouts. */
 
-extern s32 gMenuCurrentFont; /* current draw mode */
 extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern s32 gScreenWidth; /* screen width */
-extern s32 gScreenHeight; /* screen height */
 
 extern s32 GetMemSize(void);
 extern void func_00415CE8_413F74(Menu *w, MenuItem *it, s32 c) __asm__("Menu_DrawBar");
@@ -548,10 +545,7 @@ extern s32 gEvenOdd;
 extern s32 gFrameCountGameplay; /* frame counter */
 extern s32 gDefaultVisBits;
 extern f32 gFrameIncrement; /* frame time scale */
-extern s32 gScreenWidth; /* screen width */
-extern s32 gScreenHeight; /* screen height */
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
-extern u8 gScene[];
 extern s32 gCharacterModels[];
 
 extern void memset(void *p, s32 c, s32 n); /* memset */
@@ -615,7 +609,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
             if (!(o->flags & 0x2000000)) {
                 s2 = p->intelType;
                 x2 = o->model;
-                src = CScene__FindIntelligence(gScene, s2, p->intelId);
+                src = CScene__FindIntelligence(&gScene, s2, p->intelId);
                 if (src == NULL) {
                     x2->loaded = 0;
                 } else {
@@ -654,7 +648,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
                 CCache__SetFrameDelay(1);
             }
             if (x->intelType == INTELLIGENCE_PLAYER) {
-                CScene__SetInstanceObjectType(gScene, fx, gCharacterModels[fx->header.m_pIntelligence->m_Id], 1);
+                CScene__SetInstanceObjectType(&gScene, fx, gCharacterModels[fx->header.m_pIntelligence->m_Id], 1);
             }
             if (D_800C1BD0_4143DC != 4) {
                 D_800C1BD0_4143DC = 4;
@@ -1143,8 +1137,6 @@ void Menu_Draw(Menu *p, void *a1) {
 extern void func_0041363C_415CE8(MenuItem *it, void *info) __asm__("MenuItem_Layout");
 extern void func_0027AF4C_415CE8(void) __asm__("Hud_SetupFillMode");
 extern void func_002778A8_415CE8(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j) __asm__("Hud_DrawBevelBox");
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
 /* Draws the bar behind a window's line of items (flag 0x08000000 text):
  * the screen's width, at the window's offset (c: from the bottom). */
 void Menu_DrawBar(Menu *a, MenuItem *b, s32 c) {
@@ -1282,14 +1274,13 @@ void MenuItem_DrawBinding(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 /* ---------------- MenuItem_SetModel ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004422BC.c, func_004422BC, with Turok 2's layouts. */
 
-extern u8 gScene[];
 extern CIntelligence *func_00225EBC_416214(void *world, s32 type, s32 id) __asm__("CScene__FindIntelligence");
 
 /* Finds a model item's definition and copies it into the item's extra (as
  * MenuItem_DrawModel does). */
 CIntelligence *MenuItem_SetModel(MenuItem *a, s32 id, s32 arg) {
     MenuModel *p = a->model;
-    CIntelligence *v = func_00225EBC_416214(gScene, id, arg);
+    CIntelligence *v = func_00225EBC_416214(&gScene, id, arg);
 
     if (v == NULL) {
         p->loaded = 0;
@@ -1769,8 +1760,6 @@ s32 Menu_GetFlashLevel(Menu *obj) {
 extern void COnScreen__BeginText(void);
 extern void Render_SetRenderMode(s32 a);
 extern void func_0027B320_416C74(s32 a, s32 b, s16 c, s16 d, f32 e, f32 f, s32 g) __asm__("Hud_DrawSprite");
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
 /* Draws a window's flash (image 0x67, frame by the flash) over its camera's viewport. */
 void Menu_DrawFlash(Menu *a) {
     s32 v, t;

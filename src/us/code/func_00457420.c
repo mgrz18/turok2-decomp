@@ -3,19 +3,16 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "structs/game.h"
 
 /* Controller pak menu, load: finds a pad with a controller pak (trying each pad in turn), checks it for the
  * game's notes and free space and opens the load menu, or shows why the pak cannot be used. */
 
-extern s32 gPakMenuMode;
 extern s32 D_8011F144;
-extern s32 sPakMenuStartLatched;
-extern s32 gPakMenuPort; /* pad */
 extern s32 D_8011B114;
 extern char gPakCharacterNoteName[];
 extern char gPakGameNoteName[];
 extern s32 D_800F70A8;
-extern u8 gEngineApp[];
 extern u8 gPakMsgNoControllerDesc_2[];
 extern u8 gPakMsgCannotSaveDesc_2[];
 extern u8 gDamagedPakAtBootMenuDesc_2[];
@@ -90,7 +87,7 @@ void PakMenu_InitSaveGameAnyPak_2(Menu *arg0) {
     if (Pak_NeedsRepair_2(gPakMenuPort) != 0) {
         goto blk59;
     }
-    CEngineApp__UpdateControllers(gEngineApp);
+    CEngineApp__UpdateControllers(&gEngineApp);
     if ((arg0->controller->buttons & 0x1000) && sPakMenuStartLatched == 0) {
         gPakMenuStartPressed = 1;
         sPakMenuStartLatched = 1;

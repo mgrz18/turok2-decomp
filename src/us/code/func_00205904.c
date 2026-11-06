@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/cache.h"
+#include "globals/cache.h"
 
 /* Two cache references. */
 typedef struct {
@@ -12,8 +13,6 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 gCache_mutex;
-extern s32 gCache_mutex_count;
 
 void CCache__ReleaseAndReplaceData(s32 arg0, CacheRefs *arg1, CMemEntry *arg2) {
     s32 temp_a0;

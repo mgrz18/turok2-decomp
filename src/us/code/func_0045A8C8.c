@@ -1,5 +1,6 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/PAK/80409A88_5.CPP, func_80409EF4_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/pak.h"
 
 #include "common.h"
 #include "globals/pak.h"
@@ -22,7 +23,6 @@ struct RecordRecAt20V2 {
 };
 struct RecordRecAt20V2;
 struct PakMenuSlot;
-extern s32 gPakMenuPort;
 extern s32 PakMenu_GetPlayerAndPort_2(struct RecordRecAt20V2 *record, s32 *out);
 s32 PakMenu_GetPlayerAndPort_2(struct RecordRecAt20V2 *record, s32 *out) {
     s32 value;

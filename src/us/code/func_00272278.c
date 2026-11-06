@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/audio.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00259F88.c, func_00259F88.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -110,7 +111,6 @@ extern f32 D_800A8120;
 extern f32 D_800A8124;
 extern f32 sSoundHearingRangeSq;
 extern M04Tab sSoundKindVolumeTable[];
-extern u8 gSndVolumeCurve[];
 f32 HalfToFloat(u16 x);
 u16 FloatToHalf(f32 x);
 s32 Cinema_PathPlaying();
@@ -208,13 +208,13 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
         } else {
             t = n * 2;
         }
-        vp->vol = (s32)((f32)(s32)((f32)*(s16 *)(gSndVolumeCurve + t) * o->env2A) * vf);
+        vp->vol = (s32)((f32)(s32)((f32)*(s16 *)((u8 *)gSndVolumeCurve + t) * o->env2A) * vf);
         if ((f32)n < 0.0f) {
             t = -n * 2;
         } else {
             t = n * 2;
         }
-        env->w0 = FloatToHalf((f32)*(s16 *)(gSndVolumeCurve + t) * vf);
+        env->w0 = FloatToHalf((f32)*(s16 *)((u8 *)gSndVolumeCurve + t) * vf);
         vp->wC = (s32)HalfToFloat(env->w0 & 0xFFFF);
         return;
     }
@@ -224,7 +224,7 @@ void SndVoice_InitVolume(M04Emitter *o, M04Info *rec) {
     } else {
         t = n * 2;
     }
-    t = (s32)((f32)*(s16 *)(gSndVolumeCurve + t) * vf);
+    t = (s32)((f32)*(s16 *)((u8 *)gSndVolumeCurve + t) * vf);
     vp->vol = t;
     vp->wC = t;
 }

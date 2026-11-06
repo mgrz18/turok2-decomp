@@ -2,11 +2,11 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern s32 gMpPlayerSpeed;     /* the speed setting, 0-15 (5 is normal) */
 extern char D_800B6698[];
 extern char D_800B66B0[];
 extern char D_800C0E9C[];  /* "%3d", earlier in the file */

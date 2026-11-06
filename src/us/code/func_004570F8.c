@@ -8,11 +8,9 @@
 #include "globals/pak.h"
 
 void PakMenu_UpdateNoteRows_2(Menu *menu);
-extern s32 gPakMenuMode;
 extern char gPakMsgInsertToLoadDesc_2[];
 extern char gPakMsgPakNotFoundDesc_2[];
 extern char gCharacterMenuAfterPakDesc_2[];
-extern s32 gDamagedPakContinued;
 extern char gDamagedPakAtBootMenuDesc_2[];
 extern char gPakLoadProfileMenuDesc_2[];
 extern void Pak_ProbeSlot_2(s32 ch);

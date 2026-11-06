@@ -5,6 +5,7 @@
 #include "structs/collision.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/scene.h"
 
 
 typedef struct Dest {
@@ -13,7 +14,6 @@ typedef struct Dest {
     f32 timer;         /* 0xCC */
 } Dest;
 
-extern char gScene[];
 extern f32 gFrameIncrement;  /* frame time scale */
 
 CRegionInfo *CScene__GetRegionInfo(void *world, CGameRegion *region);
@@ -41,7 +41,7 @@ void AI_UpdateRegionFlags(CGameObjectInstance *actor, Dest *dst) {
     if (region == NULL) {
         return;
     }
-    info = CScene__GetRegionInfo(gScene, region);
+    info = CScene__GetRegionInfo(&gScene, region);
     if (info == NULL) {
         return;
     }

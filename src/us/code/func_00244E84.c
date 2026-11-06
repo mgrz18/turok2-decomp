@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 
 f32 func_00298470(f32);         /* sqrtf */
 f32 func_002982F0(f32);         /* sinf */

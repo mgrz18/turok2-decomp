@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/math.h"
 
 s32 Demo_GetPlayerCount(void);
 extern u32 gFrameCountGameplay;
-extern u32 gRandomValue; /* random seed A */
 
 /* LCG step on seed A, scaled to a float in [0, scale]. */
 f32 Random_Float(f32 scale) {

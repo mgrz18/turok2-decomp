@@ -2,12 +2,11 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+#include "globals/render.h"
 
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEndingPrimagenDefeated;
 extern s32 gFinalEnding;
-extern s32 gScreenHeight;              /* screen height */
-extern s32 sCreditsLine;              /* first credits line on screen */
 extern char *gCreditsLines[];          /* credits lines */
 
 extern void CPlayerPool__GetFirstActive(void *);

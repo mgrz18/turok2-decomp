@@ -7,7 +7,6 @@
 void MenuPool_OpenMenu_2(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
 
 extern char gPakMsgInsertRumblePakDesc_2[];
-extern s32 gPakMenuPort;
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 static __inline__ u8 *GetPlayer(Menu *event, s32 *port) {

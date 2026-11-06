@@ -4,8 +4,8 @@
 #include "structs/controller.h"
 #include "structs/region.h"
 #include "globals/camera.h"
+#include "globals/scene.h"
 
-extern u8 gScene[];
 extern char D_800A6EA8[]; /* "Fly Mode Off" */
 extern f32 gFrameIncrement;    /* frame time */
 
@@ -63,7 +63,7 @@ void CPlayer__UpdateFlyCheat(CPlayer *player, CGameObjectInstance *body) {
     move.z += player->m_SideSpeed * func_002974C0(body->m_RotY - 1.5707964f);
     CVector3__Scale(&move, &move, gFrameIncrement);
     CVector3__Add(&player->m_vDesiredPos, &player->m_vDesiredPos, &move);
-    floor = CScene__FindRegionAt(gScene, &body->header.m_vPos);
+    floor = CScene__FindRegionAt(&gScene, &body->header.m_vPos);
     if (floor != NULL) {
         body->header.m_pCurrentRegion = floor;
     }

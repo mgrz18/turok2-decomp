@@ -4,7 +4,6 @@
 
 /* Pick the menu page to go back to, from the game mode flags. */
 
-extern s32 gPakMenuPort;
 extern u8 gStatsAfterPakMenuDesc1_2[];
 extern u8 gStatsAfterPakMenuDesc2_2[];
 extern u8 gStatsAfterPakMenuDesc3_2[];

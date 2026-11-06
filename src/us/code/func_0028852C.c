@@ -2,8 +2,8 @@
 #include "gfx.h"
 #include "structs/game.h"
 #include "globals/frame.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;      /* screen width */
 
 extern void Render_SetRenderMode(s32 mode);
 

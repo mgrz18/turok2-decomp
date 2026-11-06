@@ -5,12 +5,12 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/scene.h"
 
 /* Picks the next attack anim from a weighted table: close to the target (or while anim 0x17 runs its first
  * 100 steps) 0x1A/0x1B; otherwise 0x18 after a long 0x17, and from afar 0x19 (when fewer than 2 actors are
  * in the gScene_m_InstancePool_m_ActiveList list), 0x1D and 0x17 weighted by the module's timer ratio. */
 
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern s16 WeightedTable_PickStatic(Pick *table);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
@@ -35,7 +35,7 @@ static __inline__ s32 fewerActorsThan(s32 max) {
     CListedInstance *actor;
     s32 count = 0;
 
-    for (actor = gScene_m_InstancePool_m_ActiveList; actor != NULL; actor = actor->m_pNext) {
+    for (actor = gScene.m_InstancePool.m_ActiveList.m_pHead; actor != NULL; actor = actor->m_pNext) {
         /* both arms are merged by cross-jumping; the extra block gives the ROM's register allocation */
         if (actor->m_pNext != NULL) {
             count++;

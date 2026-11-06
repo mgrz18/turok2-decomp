@@ -19,7 +19,6 @@ typedef struct {
     /* 0x24 */ void *string;
 } Item;
 
-extern s32 gPakMenuPort;
 extern u8 gSavePortalMenuDesc[];
 extern u8 gSavePortalMenuDescB[];
 extern s32 PakMenu_CheckPak(Item *item, s32 id, s32 a2);

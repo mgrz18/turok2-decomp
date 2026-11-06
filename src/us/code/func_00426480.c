@@ -4,10 +4,8 @@
 #include "structs/pak.h"
 #include "structs/controller.h"
 #include "globals/pak.h"
+#include "globals/controller.h"
 
-extern void **gPakStateBuffer;
-extern s32 gPakDirectoryAllocated;
-extern u8 gPakQueueState;
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
@@ -18,7 +16,6 @@ extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size);
 extern s32 Pak_Mount(s32 ch);
 extern s32 osPfsReadWriteFile(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
-extern u8 gSiMessageQueue[];
 extern s32 osMotorInit(void *queue, void *pfs, s32 channel);
 
 /* Probes the pak in slot ch and records its state: 2 for a Rumble Pak, otherwise 3 or 1 depending on Pak_Mount. */
@@ -35,7 +32,7 @@ void Pak_ProbeSlot(s32 ch) {
         cur->present = 0;
         ready = 0;
     } else {
-        cur->present = osMotorInit(gSiMessageQueue, &cur->pfs, ch) == 0;
+        cur->present = osMotorInit(&gSiMessageQueue, &cur->pfs, ch) == 0;
         ready = cur->present;
     }
 

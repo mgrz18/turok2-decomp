@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/cinema.h"
 #include "globals/game.h"
+#include "globals/cinema.h"
 
 typedef struct GameState {
     s32 busy;               /* 0x0000 */
@@ -9,7 +10,6 @@ typedef struct GameState {
     s32 paused;             /* 0x1450 */
 } GameState;
 
-extern Cinema *gCinemaPlayerP;
 extern s32 sCinemaLastFrame;      /* last frame handled */
 extern s32 gFrameCount;      /* frame counter */
 extern f32 gFrameIncrement;      /* frame time */

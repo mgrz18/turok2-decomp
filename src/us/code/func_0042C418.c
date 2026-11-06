@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -12,7 +13,6 @@ typedef struct {
 s32 CLoader__LoadSync(s32, s32, s32, s32);
 s32 SavedPlayers_IsActive();                                /* extern */
 extern s32 gLoader;
-extern s32 gLoadSavePersistentData;
 
 void CScene__LoadBitSections(Arg0 *arg0) {
     if (SavedPlayers_IsActive() == 0) {

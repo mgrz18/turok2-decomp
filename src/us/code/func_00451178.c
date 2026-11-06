@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/menu.h"
+#include "globals/pak.h"
 
 s32 Controller_WatchPak(s8);                          /* extern */
-extern s32 gDamagedPakContinued;
 
 /* A menu window callback: the window (structs/menu.h) and the controller it reads. */
 

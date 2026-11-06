@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
-extern u8 gScene[];
 void EnemyAI_DrawFaded();
 void EnemyAI_CalcOrientationMatrix();
 void CScene__SetInstanceObjectType(void *level, CGameObjectInstance *obj, s32 a, s32 animType);
@@ -17,5 +17,5 @@ void EnemyAI_Dismount(CGameObjectInstance *obj, CAI *ai, CPlayer *player) {
     obj->m_vScale = player->m_vOnEnemyOriginalScale;
     obj->m_dwFlags |= 0x20000000;
     CAI__SetMode(obj, ai, 10);
-    CScene__SetInstanceObjectType(gScene, obj, player->m_OnEnemyObjectType, ai->m_AnimType);
+    CScene__SetInstanceObjectType(&gScene, obj, player->m_OnEnemyObjectType, ai->m_AnimType);
 }

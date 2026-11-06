@@ -37,7 +37,6 @@ typedef struct SortNode {
 } SortNode;
 
 extern SortNode *sOpaqueSortFirst;        /* first opaque node */
-extern Gfx *gDList;             /* display list head */
 extern SortNode *sTranslucentSortFirst;        /* first translucent node */
 
 s32 Render_SetupMaterial(Material *material, s32 pass);

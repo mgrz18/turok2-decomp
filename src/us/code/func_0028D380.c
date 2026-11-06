@@ -7,6 +7,7 @@
 #include "common.h"
 #include "globals/game.h"
 #include "globals/frame.h"
+#include "globals/scene.h"
 
 typedef struct Marker {
     char text[15];
@@ -15,8 +16,6 @@ typedef struct Marker {
 extern Marker sBootMarker;           /* the boot marker string */
 extern char gBootSignature[];           /* where the marker is kept (0x10 bytes) */
 extern char gSavedPlayers[]; /* local type: globals/save.h declares it; this view (its type here) is what keeps the ROM's code */           /* the saved players (0x1400) */
-extern char gLoadSavePersistentData[];
-extern char gGamePersistentData[];
 extern s32 gGfxYieldBuffer[];            /* BSS start */
 extern s32 D_8014A000[];            /* BSS end */
 

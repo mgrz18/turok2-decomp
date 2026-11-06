@@ -3,17 +3,17 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "structs/controller.h"
 
 /* Turok 2: the mode block sits at 0x23FD0 (Rage Wars 0x26DB0). */
 
-extern s32 gMergedController_buttonsSingle;
 extern s32 Cinema_IsIdle(s32 *flags);
 extern s32 SavedPlayers_IsActive(void);
 
 void CEngineApp__UpdateCinemaMode(CEngineApp *session, s32 arg1, s32 target) {
     s32 pending;
     s32 *flags;
-    flags = &gMergedController_buttonsSingle;
+    flags = &gMergedController.buttonsSingle;
     pending = *flags & 0x1000;
     if ((unsigned)(session->m_Settings.mode - 0xB) < 2) {
         pending = 0;

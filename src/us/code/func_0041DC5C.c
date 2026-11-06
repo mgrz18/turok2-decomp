@@ -5,7 +5,6 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern s32 gPakMenuPort;
 extern u8 gCharacterMenuAfterPakDesc[];
 extern u8 gSingleMenuAfterPakDesc[];
 extern u8 gStatsAfterPakMenuDesc1[];

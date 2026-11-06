@@ -3,6 +3,8 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+#include "globals/scene.h"
+#include "globals/render.h"
 
 s32 Cinema_RequestById(s32);
 s32 CScene__RequestWarp(s32, s32, s32);
@@ -11,9 +13,6 @@ CPlayer *CPlayerPool__GetFirstActive(void *);                     /* extern */
 void CEngineApp__StartWarp(s32, s32);                       /* extern */
 extern s32 gFinalEnding;
 extern s32 gEndingPrimagenDefeated;
-extern s32 gScreenHeight;
-extern s32 sCreditsLine;
-extern u8 gScene[];
 
 void EngineMode16_Ending_Init(s32 arg0)
 {
@@ -36,7 +35,7 @@ void EngineMode16_Ending_Init(s32 arg0)
   }
   if (gEndingPrimagenDefeated != 0)
   {
-    CScene__RequestWarp((s32) gScene, ~Cinema_RequestById(0x82), 0);
+    CScene__RequestWarp((s32) &gScene, ~Cinema_RequestById(0x82), 0);
   }
   else
   {

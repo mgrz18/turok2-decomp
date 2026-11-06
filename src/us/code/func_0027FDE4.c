@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/render.h"
 
-extern s32 gScreenHeight;          /* screen height */
 extern f32 gFrameIncrement;          /* the frame's time step */
 void COnScreen__BeginText(void);
 void COnScreen__SelectTinyFont(void);

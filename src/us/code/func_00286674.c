@@ -6,6 +6,8 @@
 #include "structs/game.h"
 #include "globals/pak.h"
 #include "globals/frame.h"
+#include "globals/scene.h"
+#include "globals/render.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
@@ -22,11 +24,6 @@ extern s32 D_800F6CA8;
 extern s32 gNumTicks2;
 extern s32 gNumTicks3;
 extern s32 gCurrentTickWaiting;
-extern s32 gNextFrameToShow;
-extern u32 gTotalFramebuffers;          /* frame buffer count */
-extern s32 gScreenWidth;          /* width */
-extern s32 gScreenHeight;          /* height */
-extern u8 gScene[];
 extern u8 gValidControllerBits;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
@@ -101,7 +98,7 @@ void CEngineApp__Main(CEngineApp *e) {
     e->m_CartridgeIndex = 0xFCBFB4;
     CCameraPool__NewGame((u8 *)e + 0x22C00, 0);
     CPlayerPool__NewGame((u8 *)e + 0x22BC0, 0, 0);
-    CScene__Construct(gScene, e->m_CartridgeIndex);
+    CScene__Construct(&gScene, e->m_CartridgeIndex);
     if (gValidControllerBits == 0) {
         Cont_InitAll();
     }

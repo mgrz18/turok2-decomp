@@ -9,9 +9,6 @@
 #include "globals/pak.h"
 
 typedef struct O01Sel { s32 v; s32 w; } O01Sel;
-extern s32 gPakMenuMode;
-extern s32 gDamagedPakContinued;
-extern s32 gPakMenuPort;
 extern u8 gPakMsgInsertToSaveDesc[];
 extern u8 gDamagedPakAtBootMenuDesc[];
 extern u8 gPakMsgPakNotFoundDesc[];

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/math.h"
 
 /* Two floats packed as their upper 16 bits (see FloatToHalf / HalfToFloat). */
 typedef struct {
@@ -8,7 +9,6 @@ typedef struct {
 
 s32 Demo_GetPlayerCount(void);
 extern u32 gFrameCountGameplay;
-extern u32 gRandomValue; /* random seed A */
 
 /* base + random(0..1) * range, both unpacked from half-floats. */
 f32 RandomInPackedRange(PackedRange r) {

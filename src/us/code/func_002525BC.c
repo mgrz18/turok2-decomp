@@ -3,11 +3,10 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/render.h"
 
 /* Tag game state. */
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 
 extern s32 Random_Next(void);
 extern void CPlayer__BecomeIt(CPlayer *p);

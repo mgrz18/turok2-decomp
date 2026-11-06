@@ -3,6 +3,7 @@
 #include "structs/level_actor.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/scene.h"
 
 /* Boss fight tick: updates the 15 attack slots, then (outside cinematics)
  * counts up the two timers: by phase, drops a random pickup somewhere in the
@@ -13,8 +14,6 @@ extern s32 gMotherBoss_maxRadius; /* local type: the field's real type (or the m
 extern u8 sMotherBossPickupTable[];     /* pickup weights */
 extern u8 sMotherBossDropTablePhase1[];
 extern u8 sMotherBossDropTablePhase2[];
-extern u8 gScene[];
-extern u8 gScene_m_ActorPool[];
 
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
@@ -33,11 +32,11 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     s32 region;
     CPooledLevelActor *pickup;
 
-    region = CScene__FindRegionAt(gScene, &pos);
+    region = CScene__FindRegionAt(&gScene, &pos);
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;
-    pickup = CLevelActorPool__Spawn(gScene_m_ActorPool, NULL, id, vel, pos, region, lifetime);
+    pickup = CLevelActorPool__Spawn(gScene.m_ActorPool, NULL, id, vel, pos, region, lifetime);
     if (pickup != NULL) {
         Actor_SpawnParticle(pickup, 0x11D, pos, 0);
     }

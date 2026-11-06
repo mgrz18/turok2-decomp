@@ -2,14 +2,13 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ CVector3 pos;
     /* 0x0C */ s32 region;
 } Location;
 
-extern s32 gScene_m_Kind1Cursor;
-extern s32 gScene_m_bStreamAll;
 
 s32 EnemyAI_GetBehaviorIndex(CGameObjectInstance *self, CAI *plan);
 s32 AI_UpdatePathHeading(CGameObjectInstance *self, CAI *plan, CGameObjectInstance *target);
@@ -82,7 +81,7 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
     } else {
         mode = -1;
     }
-    if (plan->m_PathFindCount == gScene_m_Kind1Cursor) {
+    if (plan->m_PathFindCount == gScene.m_Kind1Cursor) {
         if ((plan->m_dwFlags & 0x20000000) && plan->m_pTargetOverride == NULL) {
             if (AI_UpdatePathHeading(self, plan, plan->m_pPathTarget) == 0) {
                 plan->m_dwFlags &= ~0x20000000;
@@ -108,7 +107,7 @@ void AI_GetPathTargetInfo(CGameObjectInstance *self, CAI *plan, CGameObjectInsta
                 kind = 7;
             } else {
                 kind = 0;
-                if (gScene_m_bStreamAll == 0) {
+                if (gScene.m_bStreamAll == 0) {
                     if ((!(target->m_dwFlags & 0x300000)
                          || (player = ((CPlayer *)target->m_AI.m_pParent),
                              (!(player->m_FleeTime > 0.0f) || (kind = 1, self->m_nTypeFlag == 0xCA && player->m_Data.m_CurrentWeapon == 0x14))

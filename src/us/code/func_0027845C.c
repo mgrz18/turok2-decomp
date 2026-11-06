@@ -2,8 +2,8 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 #include "common.h"
 #include "gfx.h"
+#include "globals/menu.h"
 
-extern s32 gLoadedFont;
 void *COnScreen__GetFontTexture(void);
 void COnScreen__SelectTinyFont(void) {
     void *tex = COnScreen__GetFontTexture();

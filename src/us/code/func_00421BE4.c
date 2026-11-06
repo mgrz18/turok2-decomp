@@ -6,7 +6,6 @@ s32 MenuItem_TextLength(void *item);
 s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 
 extern char D_800C1410[];
-extern s32 gPakMenuPort;
 extern char D_800B47F4[];
 extern char D_800B4804[];
 extern char D_800B48F8[];

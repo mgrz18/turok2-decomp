@@ -25,7 +25,6 @@ typedef struct MenuPlayer {
     /* 0x972 */ s8 owned[1];
 } MenuPlayer;
 
-extern Gfx *gDList;
 
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
 s32 CBarrel__CompareIcons();

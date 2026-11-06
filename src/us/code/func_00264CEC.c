@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, s32 arg5);
 void CAI__CallHurt(void *actor, void *behavior, DamageEvent *event);
 s32 CAI__SetMode(void *actor, void *state, s32 mode);

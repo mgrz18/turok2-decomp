@@ -1,7 +1,7 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0028784C.c, func_8028787C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/scene.h"
 
-typedef signed int s32;
 struct World_func_8028787C_de;
 typedef struct World_func_8028787C_de World_func_8028787C_de;
 struct World_func_8028787C_de;
@@ -20,7 +20,6 @@ struct Entity {
     char pad10[3];
     unsigned char index;
 };
-extern void *gScene_m_pBitSections;
 extern void *CISet__GetBlock(void *table, s32 index);
 extern s32 CISet__GetBlockSize(void *table, s32 index);
 extern void LevelEvent_Fire(Entity *entity);
@@ -42,7 +41,7 @@ void CScene__RestoreFiredEvent(World_func_8028787C_de *world, Entity *entity) {
     if (bits[index / 8] & bit) {
         if (entity->flag != 0) {
             flag = entity->flag;
-            flags = CISet__GetBlock(gScene_m_pBitSections, 1);
+            flags = CISet__GetBlock(gScene.m_pBitSections, 1);
             CISet__GetBlock(flags, 0);
             if (((unsigned char *)CISet__GetBlock(flags, 1))[flag] != 0) {
                 return;

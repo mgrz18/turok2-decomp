@@ -3,12 +3,11 @@
 
 #include "rw/abu_types.h"
 #include "globals/pak.h"
+#include "structs/game.h"
 
 extern s32 Controller_PakChanged(s32);
 extern void Controller_UpdatePakInsertion();
 extern s32 D_8011F144;
-extern s32 gPakMenuPort;
-extern s32 gEngineApp;
 extern void CEngineApp__UpdateControllers(void *arg0);
 s32 PakMenu_PollBootPak(s32 arg0) {
     extern s32 PakMenu_CheckPak(s32, s32, s32);

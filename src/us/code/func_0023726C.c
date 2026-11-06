@@ -1,5 +1,6 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_002661FC.c, func_002661FC.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/scene.h"
 
 #include "common.h"
 #include "globals/game.h"
@@ -25,7 +26,6 @@ struct B15Obj {               /* Turok 2 layout (Rage Wars offsets in comments) 
                 B15Obj *unk12C;       /* 0x10C (0x12C) */
 };
 s32 GameObject_IsSolid(B15Obj *a);
-extern s32 gScene_m_bStreamAll;
 static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
     u32 f;
     if (gEngineApp_m_Settings.multiplayer != 0) {
@@ -38,7 +38,7 @@ static __inline__ s32 chk(B15Obj *a, B15Obj *t) {
     if (!(f & 0x310000)) {
         return 0;
     }
-    if (gScene_m_bStreamAll != 0 && !(t->flags & 0x300000) && !(f & 0x300000)) {
+    if (gScene.m_bStreamAll != 0 && !(t->flags & 0x300000) && !(f & 0x300000)) {
         return 0;
     }
     switch (a->def->type) {
@@ -66,7 +66,7 @@ static __inline__ s32 chk3(B15Obj *a, B15Obj *t) {
         res = 0;
         goto done;
     }
-    if (gScene_m_bStreamAll != 0 && !(t->flags & 0x300000) && !(f & 0x300000)) {
+    if (gScene.m_bStreamAll != 0 && !(t->flags & 0x300000) && !(f & 0x300000)) {
         res = 0;
         goto done;
     }

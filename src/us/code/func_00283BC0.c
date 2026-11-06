@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/cinema.h"
 #include "globals/game.h"
+#include "globals/cinema.h"
 
-extern Cinema *gCinemaPlayerP;
 extern f32 gFrameIncrement;      /* frame time */
 
 extern void Cinema_Load(s32);

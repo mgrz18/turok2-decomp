@@ -5,7 +5,6 @@
 s32 Controller_PakChanged(s32 port);
 s32 PakMenu_CheckPak(void *event, s32 port, s32 arg2);
 
-extern s32 gPakMenuPort;
 extern s32 D_801309AC;
 
 static __inline__ s32 GetPort(Menu *event) {

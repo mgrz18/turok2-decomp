@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 CParticleSystem__Free(s32 *, void *);           /* extern */
 s32 CParticle__StopLoopSound(void *);                      /* extern */
 s16 *CPlayer__GetFiringAmmo(s32, s32);                   /* extern */
-extern s32 gScene_m_ParticleSystem;
 
 /* A drawn instance; 0xF8 points at its render info, 0x1D0 links it in the
  * world's draw list at 0xEC14. */
@@ -52,7 +52,7 @@ void func_0023181C(CRenderInst *arg0) {
     if (temp_s0_2 != NULL) {
         temp_a0 = temp_s0_2->type;
         if ((temp_a0 == 2) && (temp_s0_2->flags & 0x100) && ((temp_v1 = temp_s0_2->objType, (temp_v1 == temp_a0)) || (temp_v1 == 0x111))) {
-            CParticleSystem__Free(&gScene_m_ParticleSystem, temp_s0_2);
+            CParticleSystem__Free(gScene.m_ParticleSystem, temp_s0_2);
             CParticle__StopLoopSound(temp_s0_2);
         }
     }

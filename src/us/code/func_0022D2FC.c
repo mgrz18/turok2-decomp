@@ -20,6 +20,10 @@
 #include "structs/frame.h"
 #include "structs/particle_event.h"
 #include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/render.h"
+#include "globals/collision.h"
+#include "globals/math.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -390,11 +394,6 @@ typedef struct {
     /* 0x134 */ f32 radius;
 } ShadowActor;
 
-extern u8 gScene_m_Heap[];
-extern CCollisionInfo gCollisionInfoLineOfSight;
-extern CCollisionResults gCollisionResults;
-extern f32 gQuaternionSin;
-extern Gfx *gDList;
 
 void *MtxPool_Alloc(void *pool, s32 count);
 void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);
@@ -427,7 +426,7 @@ void CParticle__DrawShadow(ShadowActor *actor) {
     f32 a;
     f32 size;
 
-    gmtx = MtxPool_Alloc(gScene_m_Heap, 1);
+    gmtx = MtxPool_Alloc(gScene.m_Heap, 1);
     if (gmtx == NULL) {
         return;
     }
@@ -579,15 +578,11 @@ typedef struct {
 } ParticleView;
 
 
-extern Gfx *gDList;             /* display list head */
-extern u32 gDisplayListSize;              /* command buffer length, in commands */
 extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEvenOdd;              /* matrix buffer index */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */ /* the current view */
-extern CCollisionInfo gCollisionInfoLineOfSight;
 extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
-extern u8 gScene_m_Heap[];             /* matrix pool */
 
 extern void *Texture_Request(s32 *ref);
 extern void Texture_GetInfo(void *model, AnimInfo *info);
@@ -776,7 +771,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
         GFX_CMD(0xDA380003, (u32)&particle->mtx[gEvenOdd])
     } else {
-        mtx = MtxPool_Alloc(gScene_m_Heap, 1);
+        mtx = MtxPool_Alloc(gScene.m_Heap, 1);
         if (mtx == 0) {
             CCache__Unlock(0, model);
             return;
@@ -897,7 +892,6 @@ typedef struct EffectActor {
     /* 0x1C0 */ void *list;
 } EffectActor;
 
-extern u8 gScene_m_ParticleSystem[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 s16 *CPlayer__GetFiringAmmo(u8 *, s32);
@@ -926,7 +920,7 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
         child = actor->child;
         if (child != NULL && (kind = child->kind) == 2 && (child->flags & 0x100) &&
             (child->typeId == kind || child->typeId == 0x111)) {
-            CParticleSystem__Free(gScene_m_ParticleSystem, child);
+            CParticleSystem__Free(gScene.m_ParticleSystem, child);
             CParticle__StopLoopSound(child);
         }
         CParticle__StopLoopSound(actor);
@@ -1153,12 +1147,9 @@ typedef struct {
     /* 0x20C */ CMtxF view;
 } Camera;
 
-extern CCollisionResults *gCollisionResultsP;
-extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gEvenOdd;
-extern u8 gScene[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 extern f32 gProjectileSpeedScale[2];
@@ -1344,7 +1335,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     numEntries = block->count;
     templates = block->entries;
     if (kind == 0xFC) {
-        CScene__Blast(gScene, &pos);
+        CScene__Blast(&gScene, &pos);
     }
     if (BinaryRange(templates, numEntries, kind, &first, &last) != 0) {
         entries = ((EntryBlock *) CISet__GetBlock(resource, 2))->entries;
@@ -1449,7 +1440,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 continue;
             }
             if (entry->params->event != 0) {
-                func_00225C08(gScene, entry->params->event, &pos);
+                func_00225C08(&gScene, entry->params->event, &pos);
             }
             extra = 0;
             if (entry->flags & 0x8000) {

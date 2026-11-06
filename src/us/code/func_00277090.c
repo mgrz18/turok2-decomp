@@ -6,6 +6,7 @@
 #include "m2c_macros.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "globals/render.h"
 
 extern s32 Cinema_PathPlaying(void);
 extern void Hud_GetSpriteSize(s32 id, s32 frame, s32 *width, s32 *height); /* HUD sprite size */
@@ -15,7 +16,6 @@ extern void Hud_FillRect(s32 x0, s32 y0, s32 x1, s32 y1, u8 r, u8 g, u8 b, u8 a)
 extern void Hud_SetupTextureMode(u8 alpha);
 extern void Hud_DrawSprite(s32 id, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 flags);
 
-extern s32 gScreenWidth;      /* screen width */
 
 /* Draws a boss health bar (1: m_BossOverlay, green; 2: m_BossOverlay2, red):
  * the frame sprite 0x191 and a bar whose length eases toward the boss percent. */
@@ -85,8 +85,6 @@ void COnScreen__DrawBossBar(COnScreen *os, s32 which) {
     Hud_DrawSprite(0x191, 0, x, y, 1.0f, 1.0f, 0);
 }
 
-extern s32 gScreenWidth;      /* screen width */
-extern s32 gScreenHeight;      /* screen height */
 
 
 /* Runs a HUD overlay's script (docs/HUD.md) and the motion it started, one

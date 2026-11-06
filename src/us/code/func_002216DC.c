@@ -23,7 +23,6 @@ typedef struct Viewer {
     f32 max[3];                 /* 0x35C */
 } Viewer;
 
-extern CBox gCameraVisibleBox;       /* visible bounds: min xyz, max xyz */
 extern char D_800A5F6C[];       /* "grid section" */
 
 void *CISet__GetBlock(void *table, s32 index);

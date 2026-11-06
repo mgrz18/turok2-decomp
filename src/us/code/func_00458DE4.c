@@ -7,7 +7,6 @@
 /* Controller pak menu, confirm: checks the pak, then saves (replacing the game's note when one exists, with a
  * message when it is in use) or, without a pak, looks for the next pad that has one. */
 
-extern s32 gPakMenuPort; /* pad */
 extern char gPakGameNoteName[];
 extern u8 gPakConfirmOverwriteDesc_2[];
 extern u8 gPakSaveGameMenuDesc_2[];

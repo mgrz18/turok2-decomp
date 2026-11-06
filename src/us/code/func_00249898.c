@@ -3,10 +3,10 @@
 #include "gfx.h"
 #include "structs/weapon.h"
 #include "structs/camera.h"
+#include "structs/game.h"
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern u8 gEngineApp[];
 void Render_InvalidateModeCache(void);
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
@@ -29,7 +29,7 @@ void CPlayer__DrawWeaponOverlay(CPlayer *player, CCamera *view) {
     vp = &view->m_Viewport;
     sx = vp->m_Width;
     sy = vp->m_Height;
-    CEngineApp__ClearDepthRect(gEngineApp,
+    CEngineApp__ClearDepthRect(&gEngineApp,
                   def->scopeLeft * sx + vp->m_ScreenPosX,
                   def->scopeRight * sx + vp->m_ScreenPosX,
                   def->scopeTop * sy + vp->m_ScreenPosY,

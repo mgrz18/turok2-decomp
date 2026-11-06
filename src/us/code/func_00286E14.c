@@ -3,9 +3,8 @@
 #include "gfx.h"
 #include "structs/game.h"
 #include "globals/frame.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;      /* screen width */
-extern s32 gScreenHeight;      /* screen height */
 extern s32 gEngineApp_m_OnScreen_m_ShadowXOff[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 extern void Render_SetRenderMode(s32 mode);

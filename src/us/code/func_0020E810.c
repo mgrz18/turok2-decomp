@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/math.h"
 
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
@@ -18,7 +19,6 @@ extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
-extern f32 gQuaternionSin;
 extern f32 func_00298470(f32);
 Vector4f CQuaternion__FromDirection(CVector3 *input) {
     Vector4f result;

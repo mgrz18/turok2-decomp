@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 
 typedef struct {
@@ -33,7 +34,6 @@ typedef struct {
     /* 0xB8 */ s32 region;
 } Plan;
 
-extern s32 gScene_m_bStreamAll;
 
 Location *CPathTrack__GetCurrentPoint(s8 *location);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
@@ -94,7 +94,7 @@ s32 AI_UpdatePathHeading(CGameObjectInstance *self, Plan *plan, CGameObjectInsta
                 mode = 7;
             } else {
                 mode = 0;
-                if (gScene_m_bStreamAll == 0) {
+                if (gScene.m_bStreamAll == 0) {
                     if ((!(target->m_dwFlags & 0x300000)
                          || (player = ((CPlayer *)target->m_AI.m_pParent),
                              (!(player->m_FleeTime > 0.0f) || (mode = 1, self->m_nTypeFlag == 0xCA && player->m_Data.m_CurrentWeapon == 0x14))

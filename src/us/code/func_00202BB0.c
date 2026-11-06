@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/list.h"
+#include "globals/cache.h"
 u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 void osStartThread(OSThread *thread);
@@ -63,7 +64,6 @@ typedef struct B12Mgr {
                  B12Bucket * buckets;
 } B12Mgr;
 extern B12Mgr D_800D7BE0;
-extern s32 gCache_mutex_count;
 extern u32 gCacheEntryCount;
 extern s32 gThreadPriorityCache;
 extern u8 gHeap[];

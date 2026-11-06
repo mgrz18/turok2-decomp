@@ -1,5 +1,6 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/FRONTEND/8040B45C_22.CPP, func_8040C484_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/render.h"
 
 struct NodeRecAt294;
 typedef struct NodeRecAt294 NodeRecAt294;
@@ -14,12 +15,9 @@ struct NodeRecAt294 {
     int y;
 };
 extern int osTvType;
-extern int gScreenWidth;
-extern int gScreenHeight;
 extern int osTvType,gViAntiAlias;
 extern unsigned short D_800C21AA[],sViModeIndex;
 extern NodeRecAt294 gEngineApp_m_Game_m_CameraPool_m_MainCamera; /* local type: globals/camera.h declares it; this view (its type here) is what keeps the ROM's code */
-extern int gScreenWidth,gScreenHeight;
 extern void func_0045CF28(unsigned,int,int,int,int,int);
 void Video_SetMode_2(unsigned width,int a1,int a2,int a3,int a4,int a5) {
  int flags=0,region=0; NodeRecAt294 *node; float h;

@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/frame.h"
 #include "globals/camera.h"
+#include "globals/render.h"
 
 /* One screen setting for a TV type and memory size (0x1C bytes). */
 typedef struct {
@@ -10,9 +11,6 @@ typedef struct {
 } ScreenExtra; /* 0x14 */
 
 extern s32 osTvType; /* osTvType */
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
-extern s32 gResolution; /* current video mode */
 extern s32 D_800C2044;
 extern ScreenExtra gVideoModeFlags[];
 extern s32 gRenderAntiAlias;

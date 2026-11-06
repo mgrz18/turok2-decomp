@@ -6,7 +6,6 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 
-extern s32 gPakMenuPort;
 extern s32 D_8011B114;
 extern u8 gPakMsgDeleteDoneDesc_2[];
 extern u8 gPakMsgDeleteFailedDesc_2[];

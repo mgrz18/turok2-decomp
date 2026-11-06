@@ -5,6 +5,8 @@
 #include "structs/collision.h"
 #include "structs/particle_event.h"
 #include "globals/game.h"
+#include "globals/scene.h"
+#include "globals/collision.h"
 
 typedef struct Bone {
     /* 0x00 */ u8 pad0[0x40];
@@ -29,9 +31,6 @@ struct Target {
     /* 0x12B0 */ s32 extraUses;
 };
 
-extern CCollisionResults gCollisionResults;
-extern u8 gCollisionResults_m_Frame_flags;
-extern u8 gScene_m_ParticleSystem[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 
@@ -149,7 +148,7 @@ void CParticle__HitTarget(CParticle *p) {
                     }
                 }
                 if (p->header.m_nObjType == 0x56 || p->header.m_nObjType == 2 || p->header.m_nObjType == 0x126 || p->header.m_nObjType == 15 || special
-                    || (p->header.m_nObjType == 11 && (gCollisionResults_m_Frame_flags & 3) == 1)) {
+                    || (p->header.m_nObjType == 11 && (gCollisionResults.m_Frame.flags & 3) == 1)) {
                     attachParticle(p, boneMatrix, action);
                     if (p->m_ActiveSwooshes) {
                         CParticle__BuildCameraMatrix(p);
@@ -231,7 +230,7 @@ void CParticle__HitTarget(CParticle *p) {
     }
     if (!(p->m_dwFlags & 0x30000)) {
         if (mode == 1 || (effect != 0xFFFF && (gImpactEventHandlers_m_Flags[effect].m_Flags & 1))) {
-            CParticleSystem__Free(gScene_m_ParticleSystem, p);
+            CParticleSystem__Free(gScene.m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
         }
     }

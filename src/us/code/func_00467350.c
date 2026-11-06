@@ -3,8 +3,8 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
-extern u8 gScene[];  /* the world */
 extern s32 gTagModeModel;
 extern s32 gCharacterModels[];
 
@@ -14,7 +14,7 @@ extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CScene__SetInstanceObjectType(void *world, CPlayer *p, s32, s32);
 
 static __inline__ CIntelligence *findDef(s32 kind, s32 character) {
-    return CScene__FindIntelligence(gScene, kind, character);
+    return CScene__FindIntelligence(&gScene, kind, character);
 }
 
 void CPlayer__SetCharacter_2(CPlayer *p, s32 character) {
@@ -52,5 +52,5 @@ void CPlayer__SetCharacter_2(CPlayer *p, s32 character) {
             modelId = gCharacterModels[p->m_CharacterActor.header.m_pIntelligence->m_Id];
         }
     }
-    CScene__SetInstanceObjectType(gScene, p, modelId, p->m_CharAnim);
+    CScene__SetInstanceObjectType(&gScene, p, modelId, p->m_CharAnim);
 }

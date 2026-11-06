@@ -4,7 +4,6 @@
 void Controller_UnwatchPak(s32);
 s32 CScene__RequestWarp(s32, s32, s32);
 
-extern s32 gScene;
 
 void func_00421A20(s32 arg0, s32 arg1) {
     Controller_UnwatchPak(arg1);

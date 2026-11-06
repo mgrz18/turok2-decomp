@@ -2,11 +2,11 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/scene.h"
 
 /* Module init: collects up to 4 actors of type (0x44E, 9) into the module state, hooks their callbacks,
  * sets up the first phase (MotherBoss_SetupPhase0) and queues MotherBoss_OnIntroCinemaDone. */
 
-extern u8 gScene[];
 extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void MotherBoss_Draw(void);
 extern void MotherBoss_PartEffects(void);
@@ -19,7 +19,7 @@ void MotherBoss_StartIntro(void *obj, void *ai) {
     CGameObjectInstance *actor;
     s32 i;
 
-    state->count = CScene__FindInstances(gScene, 0x44E, 9, -1, state->actors, 4);
+    state->count = CScene__FindInstances(&gScene, 0x44E, 9, -1, state->actors, 4);
     for (i = 0; i < state->count; i++) {
         actor = state->actors[i];
         actor->m_AI.m_pfDraw = MotherBoss_Draw;

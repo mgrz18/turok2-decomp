@@ -5,6 +5,7 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "globals/camera.h"
+#include "globals/scene.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -20,9 +21,7 @@ typedef struct {
     /* 0x0C */ CVector3 max;
 } Box;
 
-extern Gfx *gDList;             /* display list head */
 extern s32 gEvenOdd;              /* matrix buffer index */
-extern u8 gScene[];
 extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 Frustum_TestBox(void *planes, Box *box);
@@ -104,7 +103,7 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                         node->m_dwFlags |= builtFlag;
                     }
                     if (node->m_pEffect->m_pModel != 0) {
-                        CScene__GetLightsAt(gScene, &node->header.m_vPos, node->m_Lights[gEvenOdd]);
+                        CScene__GetLightsAt(&gScene, &node->header.m_vPos, node->m_Lights[gEvenOdd]);
                         func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[gEvenOdd], node->m_Lights[gEvenOdd], 0, -1);
                     } else {
                         CParticle__DrawSprite(node, view);

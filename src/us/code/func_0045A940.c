@@ -5,7 +5,6 @@
 #include "structs/world.h"
 #include "globals/scene.h"
 
-extern CScene gScene;
 extern void CScene__RequestWarp_2(void *, int, int);
 extern void Controller_UnwatchPak(void *);
 void func_0045A940(void *unused, void *object) {

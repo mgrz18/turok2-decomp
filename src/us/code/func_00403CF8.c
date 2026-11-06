@@ -28,7 +28,6 @@ typedef struct {
 } Level00403CF8;
 
 extern s32 gLevelScript_path; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u8 gScene[];
 extern u8 sPrimagenModeTable[];
 s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void **out, s32 max);
 void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
@@ -53,12 +52,12 @@ void Primagen_InitAI(Actor00403CF8 *actor, Level00403CF8 *level) {
     level->onEvent = Primagen_Draw;
     level->unkC = -1;
     gLevelScript.actor = actor;
-    CScene__FindInstances(gScene, -1, 6, 0xC8, &gLevelScript.found[1], 1);
-    CScene__FindInstances(gScene, -1, 6, 0xC9, &gLevelScript.found[0], 1);
-    CScene__FindInstances(gScene, -1, 6, 0xCA, &gLevelScript.found[2], 1);
-    CScene__FindInstances(gScene, -1, 6, 0xCB, &gLevelScript.found[3], 1);
-    CScene__FindInstances(gScene, -1, 6, 0xCC, &gLevelScript.found[4], 1);
-    gLevelScript.intel = CScene__FindIntelligence(gScene, 1, 0x1DB2);
+    CScene__FindInstances(&gScene, -1, 6, 0xC8, &gLevelScript.found[1], 1);
+    CScene__FindInstances(&gScene, -1, 6, 0xC9, &gLevelScript.found[0], 1);
+    CScene__FindInstances(&gScene, -1, 6, 0xCA, &gLevelScript.found[2], 1);
+    CScene__FindInstances(&gScene, -1, 6, 0xCB, &gLevelScript.found[3], 1);
+    CScene__FindInstances(&gScene, -1, 6, 0xCC, &gLevelScript.found[4], 1);
+    gLevelScript.intel = CScene__FindIntelligence(&gScene, 1, 0x1DB2);
     for (i = 0; i < 8; i++) {
         ScriptAnimator_Start(&gLevelScript.anims[i], actor);
     }

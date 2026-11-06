@@ -6,7 +6,6 @@
 #include "structs/pak.h"
 #include "globals/pak.h"
 
-extern u8 gPakQueueState;
 s32 Controller_Lock(s32 flag);
 void Controller_ReadAll();
 void Controller_Unlock(void);

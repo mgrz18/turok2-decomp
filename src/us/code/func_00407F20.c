@@ -23,9 +23,7 @@ typedef struct {
 } BossFight;
 
 
-extern u8 gScene[];
 extern u8 D_800B6660[];
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
@@ -60,9 +58,9 @@ void TotemDefense_Complete(BossFight *fight) {
     Sound__PlaySpeech(0x168);
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
     setAnim(fight->obj, 0x5337);
-    CScene__UnmarkGeneratorsSaved(gScene);
+    CScene__UnmarkGeneratorsSaved(&gScene);
     gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead->m_FleeTime = 450.0f;
-    for (a = gScene_m_InstancePool_m_ActiveList[0]; a != NULL; a = a->m_pNext) {
+    for (a = gScene.m_InstancePool.m_ActiveList.m_pHead; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {
             a->m_Instance.m_AI.m_pPathTarget = NULL;
             a->m_Instance.m_AI.m_pSightTarget = NULL;

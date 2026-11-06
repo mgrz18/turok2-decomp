@@ -27,7 +27,6 @@ struct Object {
     /* 0x27C */ u32 fxFlags;
 };
 
-extern s32 gScene_m_bStreamAll;
 extern u8 gEnemyAlertPoint[];         /* origin */
 
 void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
@@ -124,7 +123,7 @@ void EnemyAI_OnDamage(Object *obj, CAI *ai, DamageEvent *dmg) {
                 AI_HearNoise(obj, ai, &source->pos, 3);
                 break;
         }
-        if (!gScene_m_bStreamAll && attacker != NULL && attacker->typeId != obj->typeId) {
+        if (!gScene.m_bStreamAll && attacker != NULL && attacker->typeId != obj->typeId) {
             if (attacker->def->m_Type == 1) {
                 ai->m_pSightTarget = attacker;
                 ai->m_pPathTarget = attacker;

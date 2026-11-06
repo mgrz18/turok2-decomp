@@ -3,16 +3,11 @@
 
 #include "common.h"
 #include "structs/cache.h"
+#include "globals/cache.h"
 
 extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
 extern CMemEntry *gCache_memAgeList_m_pTail;
-extern CMemEntry *gCache_currentCompressPos;
-extern CMemEntry **gCache_memEntriesFree;
-extern s32 gCache_freeEntryCount;
-extern s32 gCache_ageCount;
 extern char gHeap;
-extern char gCache_memAgeList;
-extern char gCache_memLockedList;
 extern void CCache__DetachCacheEntry(void *, CMemEntry *);
 extern s32 CHeap__Free(void *, s32);
 extern void CList__Remove(void *, CMemEntry *);

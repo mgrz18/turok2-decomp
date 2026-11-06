@@ -5,8 +5,6 @@
 
 void Controller_WatchPak(s32 port);
 
-extern s32 gDamagedPakContinued;
-extern s32 gPakMenuPort;
 extern s32 D_801309AC;
 
 static __inline__ void GetPort(Menu *event, s32 *port) {

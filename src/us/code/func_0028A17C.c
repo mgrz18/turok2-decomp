@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "globals/frame.h"
+#include "globals/render.h"
 
 typedef struct Client {
     /* 0x0 */ struct Client *next;
@@ -43,8 +44,6 @@ extern s32 gThreadPriorityDecompressorLow;          /* its priority */
 extern s32 gCurrentTick;          /* retraces since the last swap */
 extern s32 gCurrentFB;          /* framebuffer on screen */
 extern GfxTask *gWaitingFrames[];
-extern u32 gNextFrameToShow;          /* next frame to show */
-extern u32 gTotalFramebuffers;          /* task count */
 extern s32 sSchedGfxWatchdog;          /* retrace counter */
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);

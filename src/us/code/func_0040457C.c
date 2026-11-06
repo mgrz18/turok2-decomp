@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 typedef struct {
     f32 x, y, z;
@@ -71,8 +72,6 @@ typedef struct {
 } Info0040457C;
 
 extern ModeState0040457C gLevelScript; /* local type: globals/boss.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 gScene_m_InstancePool[];
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 extern s32 D_800F1F50;
 Entity0040457C *CPlayerPool__FindNearest(void *game, Vec3_0040457C pos);
 void CAI__SetMode(void *actor, void *ai, s32 event);
@@ -145,7 +144,7 @@ void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
                           scale, 0)) {
             gLevelScript.spawnsLeft--;
             if (gLevelScript.waves != NULL) {
@@ -166,7 +165,7 @@ void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
         scale.x = 2.0f;
         scale.y = 2.0f;
         scale.z = 2.0f;
-        if (CInstancePool__Spawn(gScene_m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
+        if (CInstancePool__Spawn(&gScene.m_InstancePool, -1, 0x387, gLevelScript.handle, gLevelScript.region, pos, 0.0f, actor->rot,
                           scale, 0)) {
             gLevelScript.spawnsLeft--;
             if (gLevelScript.waves != NULL) {
@@ -192,7 +191,7 @@ void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
         }
     }
     gLevelScript.enemiesAlive = 0;
-    for (enemy = gScene_m_InstancePool_m_ActiveList; enemy != NULL; enemy = enemy->m_pNext) {
+    for (enemy = gScene.m_InstancePool.m_ActiveList.m_pHead; enemy != NULL; enemy = enemy->m_pNext) {
         enemy->m_Instance.m_AI.m_vLeashPos.x = 0;
         enemy->m_Instance.m_AI.m_vLeashPos.y = 768.0f;
         enemy->m_Instance.m_AI.m_vLeashPos.z = 0;

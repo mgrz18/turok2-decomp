@@ -1,8 +1,8 @@
 /* WRONG CUT: REAL CScene__LoadBitSections2 size 0x4C (splat cut it into CScene__LoadBitSections2 + func_0042C480). */
 #include "common.h"
+#include "globals/scene.h"
 
 extern u8 gLoader[];
-extern u8 gGamePersistentData[];
 
 extern s32 SavedPlayers_IsActive(void);
 extern void CLoader__LoadSync(void *, s32, s32, void *);

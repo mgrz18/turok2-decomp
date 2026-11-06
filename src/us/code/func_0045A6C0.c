@@ -6,7 +6,6 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern s32 gPakMenuPort;
 extern s32 PakMenu_CheckPak_2(Menu *action, s32 channel, s32 arg2);
 extern s32 PakMenu_CheckPak_2(Menu *, s32, s32);
 extern s32 Controller_PakChanged(s32);

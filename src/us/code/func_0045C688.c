@@ -9,7 +9,6 @@
 /* Start the selected level, then open the next menu page (on the player's own
  * menu when there is a player). */
 
-extern s32 gPakMenuPort;
 extern u8 gSavePortalMenuDescB_2[];
 extern u8 gSavePortalMenuDesc_2[];
 

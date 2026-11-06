@@ -1,7 +1,6 @@
 #include "common.h"
 #include "globals/pak.h"
 
-extern s32 gPakMenuPort;
 
 s32 PakMenu_GetPort_2(char *arg0) {
     if (gPakMenuAnyPak != 0) {

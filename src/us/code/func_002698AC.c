@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 typedef struct CollisionInfo {
     /* 0x00 */ s32 flags;
@@ -9,7 +10,6 @@ typedef struct CollisionInfo {
     /* 0x06 */ u8 pad6[0x1C - 0x6];
 } CollisionInfo; /* size 0x1C */
 
-extern CCollisionResults gCollisionResults;
 
 s32 Collision_MoveInstance(CObjectHead *obj, CVector3 to, CollisionInfo *info);
 

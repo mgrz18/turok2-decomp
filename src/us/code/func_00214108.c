@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/GAMECORE/80278900_2.CPP, func_80278ABC_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -86,7 +87,6 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CScene gScene;
 struct ObjectLinks150C;
 typedef struct ObjectLinks150C ObjectLinks150C;
 struct IntegerState1504;

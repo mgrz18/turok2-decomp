@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FX/8024F950.CPP, func_8024FD80_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* A placed prop's record in the level data. */
 typedef struct {
@@ -36,7 +37,6 @@ typedef struct {
     /* 0x8A */ u8 colorFrame;
 } PlacedProp;
 
-extern u8 gScene[];
 extern s32 gNextUniqueId;
 extern s32 gDefaultVisBits;
 extern u8 D_800B6D1B;
@@ -72,7 +72,7 @@ void CStaticObject__ConstructCompact(PlacedProp *prop, PlacedPropRecord *record,
     prop->id = record->id;
     prop->owner = owner;
     prop->unk1C = 0;
-    prop->model = CScene__GetIntelligence(gScene, record->model);
+    prop->model = CScene__GetIntelligence(&gScene, record->model);
     pos.x = record->x * scale;
     if (record->bits & 0x10) {
         pos.x = -pos.x;

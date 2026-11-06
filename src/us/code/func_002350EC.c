@@ -1,6 +1,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002A5588.c, func_002A5588, with Turok 2's layouts. */
 
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct TrailActorDef {
     /* 0x00 */ s32 flags;           /* bit 31: ..., 0x10000: keyed trail */
@@ -60,7 +61,6 @@ typedef struct TrailMgr {
 } TrailMgr;
 
 extern s32 sTrailTextures[];
-extern u8 gScene[];
 
 void CMtxF__Identity(void *m);
 void func_0026D230(void *p);
@@ -108,7 +108,7 @@ void Trail_AddNode(TrailMgr *mgr, TrailActor *a, s32 type) {
         if (s == NULL) {
             return;
         }
-        t = CScene__GetSwoosh(gScene, type);
+        t = CScene__GetSwoosh(&gScene, type);
         tex0 = sTrailTextures[t->tex0];
         tex1 = sTrailTextures[t->tex1];
         func_0026D230(s->nodes);

@@ -3,11 +3,11 @@
 #include "structs/player.h"
 #include "gfx.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 
 extern s32 gTagModeModel;
 extern s32 gCharacterModels[];
-extern u8 gScene[];
 
 void CScene__SetInstanceObjectType(void *world, CPlayer *player, s32 model, s32 arg3);
 void CGameObjectInstance__Draw(CPlayer *player, s32 arg1);
@@ -25,7 +25,7 @@ void CPlayer__DrawCharacter(CPlayer *player, s32 arg1) {
     } else {
         model = gCharacterModels[player->m_CharacterActor.header.m_pIntelligence->m_Id];
     }
-    CScene__SetInstanceObjectType(gScene, player, model, player->m_CharAnim);
+    CScene__SetInstanceObjectType(&gScene, player, model, player->m_CharAnim);
     g = gDList++;
     g->w0 = 0xE7000000;
     g->w1 = 0;

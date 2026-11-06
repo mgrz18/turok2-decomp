@@ -4,8 +4,8 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/save.h"
+#include "globals/scene.h"
 
-extern u8 gScene[];             /* the world */
 s32 CScene__GetRegion(void *world, s32 region);
 
 /* Restore every player's state saved by SavedPlayers_Save, and in state 1 also
@@ -22,7 +22,7 @@ void SavedPlayers_Restore(void) {
         if (save->m_State == 1) {
             player->m_CharacterActor.header.m_vPos = save->m_vPos[i];
             player->m_CharacterActor.m_RotY = save->m_RotY[i];
-            player->m_CharacterActor.header.m_pCurrentRegion = CScene__GetRegion(gScene, save->m_Region[i]);
+            player->m_CharacterActor.header.m_pCurrentRegion = CScene__GetRegion(&gScene, save->m_Region[i]);
         }
     }
 }

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/scene.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -39,7 +40,6 @@ typedef struct {
 
 extern PoseInfo gPlayerStateTable_anim[];
 extern f32 gFrameIncrement;             /* frame time scale */
-extern u8 gScene[];
 extern void CAI__SetMode(Object *obj, AI *ai, s32 mode);
 extern void CScene__SetInstanceObjectType(void *level, Object *obj, s32 model, s32 animType);
 
@@ -74,5 +74,5 @@ void WeaponActor_Update(Object *obj, AI *ai) {
     if (gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->update != NULL) {
         gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->update(obj, ai);
     }
-    CScene__SetInstanceObjectType(gScene, obj, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
+    CScene__SetInstanceObjectType(&gScene, obj, gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->model, ai->anim->animType);
 }

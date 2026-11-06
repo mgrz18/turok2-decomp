@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/audio.h"
 
 /* An audio DMA buffer (libultra sample code's DMABuffer). */
 typedef struct DMABuffer {
@@ -18,7 +19,6 @@ s32 alLink(void *, void *);              /* alLink */
 s32 osRecvMesg(s32 *, s32 *, s32);   /* extern */
 extern u32 audFrameCt;          /* audio frame */
 extern u32 nextDMA;          /* DMAs issued this frame */
-extern s32 gAudioDmaMessageQ;          /* DMA message queue */
 extern DMAState gAudioDmaState_firstUsed;
 
 /* Waits for this frame's audio DMAs and frees the buffers not used lately. */

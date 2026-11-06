@@ -8,7 +8,6 @@
 
 extern void Pak_ProbeSlot_2(s32);
 void Pak_ProbeSlot_2(s32);
-extern s32 gPakMenuPort;
 extern void PakMenu_ProbeOwnerPort_2(struct Menu *record);
 void PakMenu_ProbeOwnerPort_2(struct Menu *record) {
     s32 value;

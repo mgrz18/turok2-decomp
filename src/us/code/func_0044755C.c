@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 /* The record whose position at 0x4F8 gets copied, as integers, to 0x500 / 0x508. */
 typedef struct {
@@ -13,7 +14,6 @@ typedef struct {
 
 s32 CScene__MarkGeneratorsSaved(s32);
 
-extern s32 gScene;
 
 void BlindOne_PhaseMinionsInit_2(PosCopy *arg0) {
     CVector3 *temp_v0;

@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 #include "gfx.h"
 
-extern Gfx *gDList;
 extern s32 gEvenOdd;
 extern float D_800A6488;
 Vtx *RibbonVtxPool_Alloc(func_802A66B4_S1 *pool, s32 count);

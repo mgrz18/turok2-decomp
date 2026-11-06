@@ -1,10 +1,9 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/collision.h"
 
 struct CollisionInfo;
-extern struct CollisionInfo gCollisionInfoLineOfSight;
-extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *obj); /* the object's height */
 s32 Collision_MoveInstance(void *obj, CVector3 to, struct CollisionInfo *info);
 

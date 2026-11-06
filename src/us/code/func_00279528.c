@@ -6,7 +6,6 @@
 #include "gfx.h"
 
 
-extern Gfx *gDList;
 
 /* What this needs of libultra's PR/gbi.h (F3DEX2), written to gDList. */
 #define _SHIFTL(v, s, w) ((unsigned int) (((unsigned int) (v) & ((0x01 << (w)) - 1)) << (s)))

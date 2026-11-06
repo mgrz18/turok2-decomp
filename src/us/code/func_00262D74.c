@@ -6,13 +6,13 @@
 #include "structs/game.h"
 #include "structs/level_actor.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
  * if it is unlocked), kind 1 a particle effect, kind 2 a pickup picked at
  * random from the weapon/ammo/item tables the definition enables. */
 
-extern s32 gScene_m_bStreamAll;
 extern Pick sGeneratorAmmoPicks[];
 extern Pick sGeneratorMultiAmmoPicks[];
 extern Pick sGeneratorHealthPicks[];
@@ -20,10 +20,6 @@ extern Pick sGeneratorHealthPicksReduced[];
 extern Pick sGeneratorMultiHealthPicks[];
 extern Pick sGeneratorItemPicks[];
 extern Pick sGeneratorMultiItemPicks[];
-extern u8 gScene[];
-extern u8 gScene_m_ParticleSystem[];
-extern u8 gScene_m_ActorPool[];
-extern u8 gScene_m_InstancePool[];
 
 extern f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
 extern s32 *CScene__GetIntelligence(void *level, s32 model);
@@ -47,7 +43,7 @@ extern s16 WeightedTable_Pick(PickTable *t);
 static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 id) {
     CPooledLevelActor *pickup;
 
-    pickup = CLevelActorPool__Spawn(gScene_m_ActorPool, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);
+    pickup = CLevelActorPool__Spawn(gScene.m_ActorPool, &ai->m_Generator.m_nActive, id, actor->m_vVelocity, pos, region, 0.0f);
     if (pickup != NULL) {
         ai->m_Generator.m_nRemaining--;
         Actor_SpawnParticle(pickup, 0x11D, pickup->m_Actor.header.m_vPos, 0);
@@ -56,14 +52,14 @@ static __inline__ void spawnPickup(CGameObjectInstance *actor, CAI *ai, CVector3
 
 /* Spawns the object model (an intelligence entry) at pos. */
 static __inline__ void spawnObject(CGameObjectInstance *actor, CAI *ai, CVector3 pos, CVector3 scale, s32 region, s32 type, s32 *model) {
-    if (CInstancePool__Spawn(gScene_m_InstancePool, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_Generator.m_nActive)) {
+    if (CInstancePool__Spawn(&gScene.m_InstancePool, type, 0, model, region, pos, actor->m_RotY, actor->m_vVelocity, scale, &ai->m_Generator.m_nActive)) {
         ai->m_Generator.m_nRemaining--;
     }
 }
 
 /* Spawns the effect at pos. */
 static __inline__ void spawnEffect(CGameObjectInstance *actor, CAI *ai, CVector3 pos, s32 region, s32 type) {
-    ai->m_Generator.m_nRemaining -= CParticleSystem__Spawn(gScene_m_ParticleSystem, actor, actor, &ai->m_Generator.m_nActive, 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
+    ai->m_Generator.m_nRemaining -= CParticleSystem__Spawn(gScene.m_ParticleSystem, actor, actor, &ai->m_Generator.m_nActive, 0, type, actor->m_vVelocity, actor->m_qGround, pos, region,
                                -1, 0);
 }
 
@@ -96,10 +92,10 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
     }
     switch (info->m_Type) {
     case 0:
-        model = CScene__GetIntelligence(gScene, info->m_VariationIndex);
+        model = CScene__GetIntelligence(&gScene, info->m_VariationIndex);
         switch (*model) {
         case 8:
-            id = CScene__GetObjectTypeID(gScene, info->m_ObjectIndex);
+            id = CScene__GetObjectTypeID(&gScene, info->m_ObjectIndex);
             if (Generator_IsPickupUnlocked(id)) {
                 spawnPickup(actor, ai, pos, region, id);
             }
@@ -163,7 +159,7 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
             if (info->m_dwFlags & 0x40) {
                 WeightedTable_Clear(&picks);
                 e = sGeneratorHealthPicks;
-                if (gScene_m_bStreamAll) {
+                if (gScene.m_bStreamAll) {
                     e = sGeneratorHealthPicksReduced;
                 }
                 for (; e->id != -1; e++) {

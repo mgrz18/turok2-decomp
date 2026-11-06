@@ -6,8 +6,6 @@
 #include "globals/pak.h"
 
 void PakMenu_UpdateNoteRows(Shared_PakMenu *menu);
-extern s32 gPakMenuMode;
-extern s32 gDamagedPakContinued;
 extern char gSingleMenuAfterPakDesc[];
 extern unsigned char gPakLoadGameMenuDesc[];
 extern char gPakMsgInsertToLoadDesc[];

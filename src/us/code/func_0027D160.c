@@ -13,6 +13,9 @@
 #include "globals/game.h"
 #include "globals/camera.h"
 #include "globals/frame.h"
+#include "globals/scene.h"
+#include "globals/render.h"
+#include "globals/math.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -29,12 +32,8 @@ typedef struct {
 extern f32 gFrameIncrement;          /* the frame's time step */
 extern CCameraMode D_800B6CB4[];
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
-extern f32 gQuaternionSin;          /* the last sine taken */
 /* The camera pool, seen from its main camera. */
 #define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool.m_MainCamera - 0x40))
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
-extern s32 gScene[];
 extern s32 gDefaultVisBits;
 void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
@@ -384,7 +383,7 @@ found:
     CEmitterPool__Advance(cam->m_SkySystem, cam);
     MenuPool_Update(cam->m_MenuPool);
     if (Cinema_PathPlaying() != 0) {
-        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(gScene, &cam->m_ViewParams.m_vPos);
+        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(&gScene, &cam->m_ViewParams.m_vPos);
     }
     floor = (CFloor *) cam->m_ViewParams.m_pCurrentRegion;
     x = cam->m_ViewParams.m_vPos.x;
@@ -406,8 +405,6 @@ found:
     }
 }
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern Gfx gRspInitDL[];        /* RDP setup display lists */
 extern Gfx gRdpInitDL[];

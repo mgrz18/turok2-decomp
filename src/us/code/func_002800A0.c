@@ -1,8 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 extern f32 gFrameIncrement;          /* the frame's time step */
 s32 Cinema_PathPlaying(void);
 void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam);

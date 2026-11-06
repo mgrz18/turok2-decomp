@@ -5,6 +5,8 @@
 #include "structs/game.h"
 #include "structs/save.h"
 #include "globals/game.h"
+#include "globals/pak.h"
+#include "globals/scene.h"
 
 /* Build the save block: the player's profile, the multiplayer settings and the
  * player's options are copied into a freshly allocated buffer. */
@@ -22,8 +24,6 @@ typedef struct {
     void *data;
 } MemHandle;
 
-extern MemHandle *gSaveBufferHandle; /* handle of the save block */
-extern u8 gLoadSavePersistentData[];
 extern char D_800C13F0[];
 
 void CCache__Flush(s32 heap);

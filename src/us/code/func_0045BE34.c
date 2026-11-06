@@ -6,8 +6,6 @@
 void Controller_WatchPak(s32 port);
 void Pak_ProbeSlot_2(s32 port);
 
-extern s32 gDamagedPakContinued;
-extern s32 gPakMenuPort;
 extern s32 D_801309AC;
 
 static __inline__ s32 GetPort(Menu *event) {

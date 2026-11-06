@@ -1,11 +1,11 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/frame.h"
+#include "globals/render.h"
 
 /* One two-word display list command at the list head. */
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern s32 gDisplayListSize;          /* display list capacity, in commands */
 
 s32 Render_SetupMaterial(s32, s32);
 s32 *CISet__GetBlock(s32 *, s32);

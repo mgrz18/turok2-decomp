@@ -3,6 +3,7 @@
 #include "structs/intelligence.h"
 #include "structs/level_actor.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
@@ -27,8 +28,6 @@ s32 *CISet__GetBlock(s32, s32);
 
 extern u8 D_800B6D1B;
 extern s32 gEvenOdd;
-extern u8 gScene_m_qSky[];
-extern u8 gScene[];
 
 void CLevelActor__Draw(CLevelActor *obj) {
     s32 *geometry;
@@ -42,7 +41,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
     }
     if (obj->m_DrawnFrame != D_800B6D1B) {
         if (obj->header.m_pIntelligence->m_Type == 8) {
-            CQuaternion__ToMatrix(gScene_m_qSky, matrix);
+            CQuaternion__ToMatrix(&gScene.m_qSky, matrix);
         } else {
             CMtxF__SetRotateY(matrix, obj->m_RotY);
         }
@@ -59,7 +58,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
         Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, gEvenOdd, obj->header.m_pIntelligence->m_nTexture);
     } else {
         variant = obj->header.m_pIntelligence->m_nModel;
-        index = CScene__GetObjectTypeID(gScene, obj->header.m_nObjType);
+        index = CScene__GetObjectTypeID(&gScene, obj->header.m_nObjType);
         if (index < 0x6AB) {
             if (index >= 0x6A9) {
                 if ((gEngineApp_m_Settings.cheatFlags & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {

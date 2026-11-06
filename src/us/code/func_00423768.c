@@ -12,7 +12,6 @@ void MenuPool_OpenMenu(char *dst, char *fmt, CPlayer *player, s32 arg3, char *ar
 extern char gSavePortalMenuDesc[];
 extern char gSavePortalMenuDescB[];
 extern char gPakConfirmRepairDesc[];
-extern s32 gPakMenuPort;
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

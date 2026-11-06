@@ -6,7 +6,6 @@
 
 /* Load the selected level once: returns whether it has been loaded. */
 
-extern s32 gPakMenuPort;
 
 s32 Controller_PakChanged(s32 mode);
 s32 PakMenu_CheckPak_2(Menu *event, s32 mode, s32 arg2);

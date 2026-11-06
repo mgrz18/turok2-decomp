@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 typedef struct Pickup {
     /* 0x000 */ u8 pad0[0x4];
@@ -15,7 +16,6 @@ typedef struct Pickup {
 } Pickup;
 
 extern f32 gFrameIncrement;              /* frame time scale */
-extern u8 gLevelActorIntelligence[];
 extern u8 D_800F1EF0[];
 
 void CLevelActor__Update(Pickup *obj);
@@ -31,7 +31,7 @@ void CPooledLevelActor__Update(Pickup *obj) {
         prev = obj->pos;
     }
     CLevelActor__Update(obj);
-    if (obj->def != gLevelActorIntelligence) {
+    if (obj->def != &gLevelActorIntelligence) {
         obj->vel.x = 0.0f;
         obj->vel.y = 0.0f;
         obj->vel.z = 0.0f;

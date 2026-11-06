@@ -4,11 +4,11 @@
 #include "common.h"
 #include "structs/game.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 /* Start a level: check that the warp target exists, reset the multiplayer
  * options and switch the game state. */
 
-extern u8 gScene[];
 
 s32 func_004650B4(void *level, s32 a, s32 id, void *out, s32 flags);
 
@@ -18,7 +18,7 @@ void func_00469374(CEngineApp *game, s32 warpId) {
 
     id = warpId;
 
-    if (func_004650B4(gScene, -1, id, sp18, 1) == 0) {
+    if (func_004650B4(&gScene, -1, id, sp18, 1) == 0) {
         id = 0;
     }
     gEngineApp_m_Settings.match.frames = 0;

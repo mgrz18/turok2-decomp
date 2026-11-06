@@ -11,7 +11,6 @@ typedef struct {
     /* 0x20 */ Item *item;
 } Arg0;
 
-extern s32 sPakMenuStartLatched;
 
 s32 PakMenu_PollStartPressed_2(Arg0 *arg0) {
     if ((arg0->item->flags & 0x1000) && (sPakMenuStartLatched == 0)) {

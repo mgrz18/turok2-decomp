@@ -19,7 +19,6 @@ struct CheatCode;
 typedef struct CheatCode CheatCode;
 s32 Sound__Play2D(s32 arg0);
 extern CheatCode sCheatCodes_2[];
-extern u8 gCheatEntryText[];
 extern s32 strlen(u8 *);
 s32 EnterCheatMenu_Enter_2(void)
 {

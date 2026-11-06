@@ -5,6 +5,7 @@
 #include "structs/pak.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "structs/save.h"
 
 void *memset(void *s, int c, u32 n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
@@ -18,15 +19,10 @@ typedef struct K7Obj {
 } K7Obj;
 typedef struct K7Mem { s32 addr; } K7Mem;
 extern s32 D_800F70A8;
-extern s32 gPakMenuPort;
 extern u8 gPakCharacterNoteName[];
 extern u8 gPakGameNoteName[];
 extern u8 D_800B48D4[];
 extern u8 D_800B4B1C[];
-extern s32 gSaveBufferHandle;
-extern s32 gLoadBufferHandle;
-extern s32 gSaveBuffer;
-extern s32 gLoadBuffer; /* a SaveGame * (structs/save.h); kept an s32 for the address arithmetic below */
 extern u8 D_800C13F0[];
 extern u8 gCharNoteDeleteMenuDesc_2[];
 extern u8 gGameNoteDeleteMenuDesc_2[];
@@ -129,14 +125,14 @@ L004079A0:
     }
     m = CCache__Allocate(0, s0, 0x33, D_800C13F0);
     gLoadBufferHandle = (s32)m;
-    gLoadBuffer = m->addr;
+    gLoadBuffer = (SaveGame *)m->addr;
     memset((void *)gLoadBuffer, 0, s0);
     if (Pak_ReadNote_2(s4, s5, gLoadBuffer, sp4C << 8) != 0) goto L00407ACC;
     hs = *(s32 *)gLoadBuffer;
     if (hs != s7) goto L00407ACC;
-    if (Crc32_Compute_2(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + gLoadBuffer - 4)) goto L00407ACC;
+    if (Crc32_Compute_2(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (s32)gLoadBuffer - 4)) goto L00407ACC;
     s0 = 0;
-    if (D_800F70A8 != *(s32 *)(gLoadBuffer + 4)) { s2 = 1; goto L00407AD0; }
+    if (D_800F70A8 != *(s32 *)((s32)gLoadBuffer + 4)) { s2 = 1; goto L00407AD0; }
     gPakNoteIndex = s5;
     MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gGameNoteDeleteMenuDesc_2, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
@@ -208,13 +204,13 @@ L00407CDC:
     }
     m = CCache__Allocate(0, s0, 0x33, D_800C13F0);
     gLoadBufferHandle = (s32)m;
-    gLoadBuffer = m->addr;
+    gLoadBuffer = (SaveGame *)m->addr;
     memset((void *)gLoadBuffer, 0, s0);
     if (Pak_ReadNote_2(s4, s5, gLoadBuffer, sp4C << 8) != 0) goto L00407E70;
     hs = *(s32 *)gLoadBuffer;
     if (hs != s7) goto L00407E70;
-    if (Crc32_Compute_2(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + gLoadBuffer - 4)) goto L00407E70;
-    if (D_800F70A8 != *(s32 *)(gLoadBuffer + 4)) goto L00407E70;
+    if (Crc32_Compute_2(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (s32)gLoadBuffer - 4)) goto L00407E70;
+    if (D_800F70A8 != *(s32 *)((s32)gLoadBuffer + 4)) goto L00407E70;
     MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gGameNoteLoadMenuDesc_2, arg1->f1C, arg1->f20, 0);
     return 1;
 L00407E70:

@@ -2,7 +2,6 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern s32 sPakMenuStartLatched;
 
 /* A menu window callback: the window (structs/menu.h) and the controller it reads. */
 

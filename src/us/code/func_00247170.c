@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "globals/game.h"
+#include "globals/scene.h"
 
 /* The scope model raised to the view. */
 typedef struct {
@@ -22,7 +23,6 @@ typedef struct {
 } HudModel; /* size 0xBC */
 
 extern f32 gFrameIncrement;          /* the frame's time step */
-extern u8 gScene[];         /* the level */
 
 s32 CScene__FindObjectType(void *level, s32 id);
 void *CScene__GetObject(void *level, s32 index);
@@ -50,9 +50,9 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
         m->roll = 3.141593f;
     }
     if (m->requested != m->current && m->state == 0) {
-        index = CScene__FindObjectType(gScene, m->requested);
+        index = CScene__FindObjectType(&gScene, m->requested);
         if (index != -1) {
-            m->model = CScene__GetObject(gScene, index);
+            m->model = CScene__GetObject(&gScene, index);
             m->state = 1;
             m->current = m->requested;
         } else {

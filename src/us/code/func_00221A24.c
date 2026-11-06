@@ -4,6 +4,7 @@
 #include "structs/collision.h"
 #include "structs/level_actor.h"
 #include "globals/game.h"
+#include "globals/camera.h"
 
 typedef struct List {
     s32 pad0;
@@ -12,7 +13,6 @@ typedef struct List {
 } List;
 
 extern s32 gLitVerticesKeyChanged;
-extern CBox gCameraVisibleBox;       /* visible bounds */
 
 void *CISet__GetBlock(void *table, s32 index);
 void CStaticObject__TouchLitVertices(CStaticObject *inst);

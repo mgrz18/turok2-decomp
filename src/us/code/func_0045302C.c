@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
-extern s32 sSoundMenuTrack;
 extern char D_800B6600[];
 extern char D_800B6618[];
 

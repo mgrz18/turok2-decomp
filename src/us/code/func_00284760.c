@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x0 */ s8 kind;
@@ -7,7 +8,6 @@ typedef struct {
 } Arg0;
 
 s16 func_002261A8(s32 *);                       /* extern */
-extern s32 gScene;
 
 void CPathTrack__StartAtNearestPoint(Arg0 *arg0, s8 arg1) {
     arg0->kind = 2;

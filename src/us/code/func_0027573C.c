@@ -3,6 +3,7 @@
 
 #include "rw/abu_types.h"
 #include "globals/game.h"
+#include "globals/audio.h"
 
 extern int Sound__PlayIndex2D(int arg0);
 extern s32 CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
@@ -12,7 +13,6 @@ extern int CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
 extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, int arg1);
 extern int CAudioWorld__PlaySoundIndex(void *arg0, int arg1, CVector3 arg2, int arg3);
 int Sound__PlayIndex2D(int arg0) {
-    extern signed char gAudioWorld;
     int temp_s0;
     int temp_s1;
     if (gEngineApp_m_Settings.unk1C8 != 0) {

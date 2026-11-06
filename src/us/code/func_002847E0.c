@@ -4,6 +4,8 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/controller.h"
+#include "globals/pak.h"
+#include "globals/controller.h"
 void osContGetReadData(OSContPad *pad);
 s32 osContReset(OSMesgQueue *mq, OSContStatus *data);
 void osContGetQuery(OSContStatus *data);
@@ -17,14 +19,11 @@ typedef struct M04Pad {
 } M04Pad;
 extern f32 D_800A9CE0;
 extern M04Pad gContPadData[];
-extern u8 gPakQueueState;
-extern OSMesgQueue gSiMessageQueue;
-extern OSMesg gSiMesgBuf;
 void Controller_UpdateConnection(ControllerProfile *c);
 void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, u16 b);
 void Controller_ReadAll(void) {
     s32 i;
-    switch (gPakQueueState) {
+    switch ((u8)gPakQueueState) {
     case 0:
         osRecvMesg(&gSiMessageQueue, &gSiMesgBuf, 1);
         osContGetReadData((OSContPad *)gContPadData);

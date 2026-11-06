@@ -2,7 +2,6 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 
-extern s32 gPakMenuPort;
 
 s32 PakMenu_GetPlayerAndPort(Menu *arg0, s32 *arg1) {
     s32 var_a0;

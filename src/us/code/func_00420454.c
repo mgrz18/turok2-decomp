@@ -6,6 +6,7 @@
 #include "structs/menu.h"
 #include "structs/save.h"
 #include "globals/scene.h"
+#include "globals/pak.h"
 
 /* local: globals/game.h declares these, but its gEngineApp_m_Settings_unk180 (u8) clashes with the array view below, which the ROM needs here */
 extern GameSettings gEngineApp_m_Settings;
@@ -21,15 +22,12 @@ extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (
 extern s32 sGameNoteLoad; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakMenuLeaving; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakNoteIndex; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
-extern s32 gPakMenuPort;
 extern u32 gEngineApp_m_Settings_unlockedCheats[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern u8 gEngineApp_m_Settings_unk180[]; /* local type: GameSettings.unk180 read as an array (other registers otherwise) */
 extern f32 gEngineApp_m_Settings_match_seconds[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_minutes[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_hours[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern CScene gScene;
-extern u8 gLoadSavePersistentData[];
 extern u8 gPakMsgRumblePakDesc[];
 extern u8 gPakMsgDeleteDoneDesc[];
 extern u8 gPakMsgDeleteFailedDesc[];

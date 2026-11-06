@@ -3,12 +3,12 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/math.h"
 
 /* An actor's facing as a quaternion: turned half a circle from its owner's
  * player (flags 0x300000), its heading plus pitch (0x24C) in a region of
  * type 4, or else its heading applied to its own rotation (0x40). */
 
-extern f32 gQuaternionSin;
 
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */

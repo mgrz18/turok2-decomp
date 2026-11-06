@@ -3,6 +3,7 @@
 #include "structs/game.h"
 #include "globals/game.h"
 #include "globals/onscreen.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -26,10 +27,8 @@ typedef struct {
 } BossFight;
 
 
-extern s32 gScene;
 extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 void *CPlayerPool__GetFirstActive(void *);
 void CCameraPool__AddTimedText(void *, s32, void *, f32);
@@ -61,7 +60,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
     u8 *obj;
     u8 *ai;
 
-    if (gEngineApp_m_Game.m_Settings.mode != 13 || gScene != 4) {
+    if (gEngineApp_m_Game.m_Settings.mode != 13 || gScene.m_Mode != 4) {
         return;
     }
     if ((f32) (*(s32 *) (fight->obj->def + 0x54) * 15) <= fight->timer) {
@@ -98,7 +97,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
         }
     }
     if (fight->state != 1) {
-        actor = gScene_m_InstancePool_m_ActiveList;
+        actor = gScene.m_InstancePool.m_ActiveList.m_pHead;
         player = gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead;
         n = 0;
         for (; actor != NULL; actor = actor->m_pNext) {

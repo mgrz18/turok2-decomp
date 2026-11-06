@@ -1,14 +1,14 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 void MotherBoss_KillMinions_2(void) {
     CListedInstance *var_s0;
 
-    var_s0 = gScene_m_InstancePool_m_ActiveList;
+    var_s0 = gScene.m_InstancePool.m_ActiveList.m_pHead;
     if (var_s0 != NULL) {
         do {
             if (var_s0->m_Instance.m_AI.m_Health > 0) {

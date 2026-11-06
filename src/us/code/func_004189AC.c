@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
-extern s32 gMpPlayerSpeed;
 extern char D_800B6698[];
 extern char D_800B66B0[];
 extern char D_800C0E9C[];  /* "%3d" */

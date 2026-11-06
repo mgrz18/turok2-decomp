@@ -1,14 +1,13 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/game_object.h"
+#include "globals/collision.h"
 
 typedef struct CollisionInfo {
     /* 0x00 */ s32 flags;
 } CollisionInfo;
 
-extern CollisionInfo gCollisionInfoTestMove;
 extern CollisionInfo D_800F1B60;
-extern CollisionInfo gCollisionInfoTestMoveWater;
 extern CollisionInfo D_800F1BE0;
 
 s32 func_00267EE8(CGameObjectInstance *actor);

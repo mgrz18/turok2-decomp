@@ -2,9 +2,8 @@
 #include "common.h"
 #include "gfx.h"
 #include "structs/camera.h"
+#include "globals/render.h"
 
-extern s32 gScreenWidth;          /* screen width */
-extern s32 gScreenHeight;          /* screen height */
 f32 func_00298470(f32 x);       /* square root */
 void Hud_DrawSprite(s32 sprite, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 arg6);
 

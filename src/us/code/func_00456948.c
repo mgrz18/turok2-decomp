@@ -9,8 +9,6 @@
 
 #define ENTRY_DISABLED 0x01000000
 
-extern s32 gPakMenuPort;
-extern s32 gPakMenuMode;
 extern char gPakGameCode[];
 extern char gPakCompanyCode[];
 extern char gPakCharacterNoteName[];

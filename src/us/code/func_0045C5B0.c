@@ -10,7 +10,6 @@ void MenuPool_OpenMenu_2(char *dst, char *fmt, u8 *player, s32 arg3, char *arg4)
 extern char gSavePortalMenuDesc_2[];
 extern char gSavePortalMenuDescB_2[];
 extern char gPakConfirmRepairDesc_2[];
-extern s32 gPakMenuPort;
 
 static __inline__ s32 GetPort(Menu *event) {
     if (gPakMenuAnyPak != 0) {

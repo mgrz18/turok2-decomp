@@ -12,7 +12,6 @@ typedef struct AnimationInfo {
     /* 0xC */ u8 padC[4];
 } AnimationInfo;
 
-extern Gfx *gDList;             /* display list head */
 extern s32 gEvenOdd;              /* frame buffer index */
 
 extern void *Texture_Request(void *texture);

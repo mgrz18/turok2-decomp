@@ -6,7 +6,6 @@
 /* Controller pak note list item: prints a note's name (16 characters), extension (4) and size in blocks
  * into the item's text; an empty slot prints blanks. */
 
-extern s32 gPakMenuPort; /* pad */
 extern char D_800B48D4[];
 extern char D_800B48E0[];
 extern u8 D_800C1404[];

@@ -12,7 +12,6 @@ typedef struct {
     /* 0x0D4 */ s32 flags;
 } Obj;
 
-extern u8 gScene[];
 extern u32 D_800F1F10[];
 extern u8 sMotherBossModeTable[];
 
@@ -33,14 +32,14 @@ void MotherBoss_Init(Obj *obj, CAI *ai) {
     gScene_m_LevelID = 0x1DB1;
     s->pickupTimer = 0;
     s->dropTimer = 0;
-    s->partCount = CScene__FindInstances(gScene, 0x650, 10, 0x1DB1, (CGameObjectInstance **)s->parts, 6);
+    s->partCount = CScene__FindInstances(&gScene, 0x650, 10, 0x1DB1, (CGameObjectInstance **)s->parts, 6);
     for (i = 0; i < s->partCount; i++) {
         ((CGameObjectInstance *)s->parts[i])->m_AI.m_Mother.m_bActive = 1;
     }
     s->partsLeft = s->partCount;
-    CScene__FindInstances(gScene, 0x650, 10, 0x1DB2, (CGameObjectInstance **)&s->controller, 1);
+    CScene__FindInstances(&gScene, 0x650, 10, 0x1DB2, (CGameObjectInstance **)&s->controller, 1);
     ((CGameObjectInstance *)s->controller)->m_AI.m_Mother.m_bActive = 1;
-    s->intel = (void *)CScene__FindIntelligence(gScene, 1, 0x1DB1);
+    s->intel = (void *)CScene__FindIntelligence(&gScene, 1, 0x1DB1);
     ai->m_pModeTable = sMotherBossModeTable;
     ai->m_pfStep = MotherBoss_Step;
     ai->m_pfHurt = func_00408FF8 + 8;

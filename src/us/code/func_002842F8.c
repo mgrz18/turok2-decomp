@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
 #include "structs/cinema.h"
+#include "globals/cinema.h"
 
 s32 Cinema_PathPlaying();                                /* extern */
-extern Cinema *gCinemaPlayerP;
 
 s32 Cinema_FollowsPlayer(void)
 {

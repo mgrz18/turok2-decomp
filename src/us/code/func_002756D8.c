@@ -3,11 +3,11 @@
 
 #include "rw/abu_types.h"
 #include "globals/game.h"
+#include "globals/audio.h"
 
 extern s32 CAudioWorld__PlaySoundIndex(void *, s32, CVector3, s32);
 extern int CAudioWorld__PlaySoundIndex(void *arg0, int arg1, CVector3 arg2, int arg3);
 s32 Sound__PlayIndex(s32 arg0, CVector3 arg1, s32 arg2) {
-    extern s32 gAudioWorld;
     if (gEngineApp_m_Settings.unk1C8 != 0) {
         return -1;
     }

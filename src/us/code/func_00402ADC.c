@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/boss.h"
 #include "globals/boss.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x234];
@@ -9,7 +10,6 @@ typedef struct {
     /* 0x248 */ void *onUpdate;
 } Actor00402ADC;
 
-extern u8 gScene[];
 s32 CScene__FindInstances(void *world, s32 a1, s32 a2, s32 a3, Actor00402ADC **out, s32 max);
 void MantidQueen_Init(void *state, s32 a1);
 void CAI__SetMode(s32 a0, s32 a1, s32 a2);
@@ -22,7 +22,7 @@ void MantidQueen_EnterStart(s32 a0, s32 a1) {
     s32 count;
     s32 i;
 
-    count = CScene__FindInstances(gScene, 0x451, 9, -1, found, 2);
+    count = CScene__FindInstances(&gScene, 0x451, 9, -1, found, 2);
     for (i = 0; i < count; i++) {
         actor = found[i];
         actor->onEvent = MantidQueen_Draw;

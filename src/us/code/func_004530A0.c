@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/menu.h"
 
 s32 Music_SetTrack(s32);
 s32 MenuPool_OpenChildMenu_2(s32, s32, s32);
@@ -10,9 +11,6 @@ s32 Music_RestoreVolume();                            /* extern */
 s32 Sound__DisableAmbientTrack();                            /* extern */
 s32 Controller_DisableMenuSounds();                            /* extern */
 extern s32 gSoundOptionsMenuDesc_2;
-extern s32 sSoundMenuSavedTrack;
-extern s32 sSoundMenuActive;
-extern s32 sSoundMenuTrack;
 
 s32 PauseMenu_SoundOptions_2(s32 arg0, s32 arg1, s32 arg2) {
     Sound__StopAllExcept(0x12C);

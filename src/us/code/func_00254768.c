@@ -1,11 +1,10 @@
+#include "globals/render.h"
 
 #include "common.h"
 #include "globals/game.h"
 s32 Hud_SetupTextureMode(s32);
 s32 Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
 extern f32 D_800A711C;
-extern s32 gScreenWidth;
-extern s32 gScreenHeight;
 void func_00254768(void *arg0, void *arg1)
 {
   f32 temp_f0;

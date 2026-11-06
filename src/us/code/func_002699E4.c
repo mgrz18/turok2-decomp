@@ -1,9 +1,9 @@
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 s32 GameObject_GetFloorKind(CGameObjectInstance *obj);
 void Sound__Play(s32 sound, CVector3 pos, s32 arg4, s32 arg5);
 void func_00225C08(void *table, s32 arg1, CVector3 *pos);
-extern u8 gScene[];
 
 void GameObject_PlayLandSound(CGameObjectInstance *obj) {
     s32 kind = GameObject_GetFloorKind(obj);
@@ -37,5 +37,5 @@ void GameObject_PlayLandSound(CGameObjectInstance *obj) {
             break;
     }
     Sound__Play(sound, obj->header.m_vPos, 0, -1);
-    func_00225C08(gScene, 1, &obj->header.m_vPos);
+    func_00225C08(&gScene, 1, &obj->header.m_vPos);
 }
