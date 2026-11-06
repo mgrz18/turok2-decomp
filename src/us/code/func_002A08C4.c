@@ -2,12 +2,11 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/adec.h"
 
 extern s32 adecDequantize(f32 *out, s16 *in);
 extern float D_800AAC34;
-extern u16 gAdecBandEnds[];
 extern s16 D_800B8AA6;
-extern f32 gAdecStepSizes[];
 s32 adecDequantize(f32 *out, s16 *in) {
     s16 *scale;
     s16 band;

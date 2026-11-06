@@ -2,6 +2,7 @@
 /* cc1-flags: -quiet -G0 -mips3 -mgas -meb -mno-fix4300 -mhard-float -funsigned-char -O3 -mcpu=VR4300 -mgp32 -mfp32 -fforce-addr -fno-builtin */
 
 #include "rw/ultralib_types.h"
+#include "globals/libc.h"
 
 #define NULL 0
 #define TRUE 1
@@ -15,8 +16,6 @@
 
 #define isdigit(c) ((c) >= '0' && (c) <= '9')
 
-extern char spaces[]; /* spaces: 32 blanks */
-extern char zeroes[]; /* zeroes: 32 zeros */
 
 char *strchr(const char *s, int c); /* strchr */
 void _Putfld(_Pft *px, va_list *pap, char code, char *ac);
