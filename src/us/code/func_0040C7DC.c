@@ -7,7 +7,7 @@
 s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 s32 CPlayer__Warp(s32, s32, s32, s32);
 
-CPlayer *CPlayerPool__GetFirstActive(CPlayerList *);                     /* extern */
+CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);                     /* extern */
 
 void MotherBoss_OnDefeatCinemaDone(void) {
     CPlayer *temp_v0;

@@ -18,7 +18,7 @@ extern u8 D_00438748[];
 extern u8 D_0043BDB0[];
 extern u8 D_0043BE1C[];
 s32 PakMenu_CheckPak(Menu *o, s32 pad, s32 z);
-CPlayer *CPlayerPool__FindByController(CPlayerList *world, ControllerProfile *s);
+CPlayer *CPlayerPool__FindByController(CPlayerPool *world, ControllerProfile *s);
 void CPlayer__SetCharacter(CPlayer *a, s32 b);
 void MenuPool_OpenChildMenu(u8 *a, Menu *o, u8 *c);
 s32 Pak_DeleteNote(s32 pad, s32 idx);

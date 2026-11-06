@@ -25,15 +25,15 @@ extern f32 D_800F5A34[];    /* view box max (min at -3) */
 extern f32 D_800F5A18[];    /* active box: max at +4 (min at +1) */
 extern s32 D_800ACDE4;
 
-void CPlayerPool__RegisterActors(void *, CWorld *);
+void CPlayerPool__RegisterActors(void *, CScene *);
 s32 Cinema_PathPlaying(void);
 s32 GameObject_IsSolid(CGameObjectInstance *);
 s32 func_002681BC(CGameObjectInstance *);
 s32 Frustum_TestBox(void *, f32 *);
 void CGameObjectInstance__ClearDrawMatrices(CGameObjectInstance *);
-void CInstancePool__UpdateVisibility(void *, CWorld *);
+void CInstancePool__UpdateVisibility(void *, CScene *);
 
-void CScene__BuildActorLists(CWorld *w) {
+void CScene__BuildActorLists(CScene *w) {
     s32 lim, mask, sflag, i, s2, t;
     s32 t0, t1, t2, t3, t4, t5, t6, t7;
     u8 *view;

@@ -11,8 +11,8 @@ typedef struct {
     /* 0xF8 */ void *held;
 } Holder;
 
-extern void CPlayerPool__SetInvincibility(CPlayerList *list, f32 arg1);
-extern CPlayer *CPlayerPool__GetFirstActive(CPlayerList *list);
+extern void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 arg1);
+extern CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *list);
 extern void Cinema_RequestById(s32 id);
 
 

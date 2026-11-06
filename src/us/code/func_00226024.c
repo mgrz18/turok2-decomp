@@ -12,7 +12,7 @@ extern Pal D_800ACDE8[];
 extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern u8 gEngineApp[];
-void CScene__DrawWarpFade(CWorld *lv) {
+void CScene__DrawWarpFade(CScene *lv) {
     u8 col[4];
     f32 t;
     Pal *p;

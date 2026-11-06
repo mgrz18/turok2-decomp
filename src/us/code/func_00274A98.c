@@ -7,7 +7,7 @@
 void alSndpDeallocate(void *p, s32 id);
 s32 SndVoicePool_ReleaseVoice(SndVoicePool *p, s16 idx) {
     SndVoice *v;
-    SndMgr *m;
+    CAudioWorld *m;
     SndCore *c;
     (v) = (SndVoice *)((idx) * 0xCC + (u32)(p)); (v) = (SndVoice *)((u8 *)(v) + 4);
     m = v->mgr;

@@ -72,7 +72,7 @@ extern f32 gFrameIncrement;          /* frame time */
 extern f32 D_800B6D2C;          /* time scale */
 extern ModeHandler *gEnemyBehaviorInfo[];
 
-void *CPlayerPool__FindNearest(CPlayerList *players, CVector3 pos);
+void *CPlayerPool__FindNearest(CPlayerPool *players, CVector3 pos);
 f32 Random_Blend(f32 lo, f32 hi);
 void CAI__SetMode(Object *obj, AI *ai, s32 state);
 void EnemyAI_TickTimers(Object *obj, AI *ai);

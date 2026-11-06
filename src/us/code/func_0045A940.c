@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern CWorld gScene;
+extern CScene gScene;
 extern s32 D_80110054;
 extern void func_0042C620(void *, int, int);
 extern void Controller_UnwatchPak(void *);

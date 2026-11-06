@@ -24,7 +24,7 @@ s32 CGameRegion__ContainsXZ(Floor *floor, f32 x, f32 z);      /* point over floo
 f32 CGameRegion__GetHeight(Floor *floor, f32 x, f32 z);      /* floor height at */
 
 /* The floor under pos whose height is closest to it, or NULL. */
-Floor *CScene__FindRegionAt(CWorld *world, f32 *pos) {
+Floor *CScene__FindRegionAt(CScene *world, f32 *pos) {
     Floor *floors;
     Floor *floor;
     Floor *best;

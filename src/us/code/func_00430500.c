@@ -28,7 +28,7 @@ extern LineVtx D_8012F340[2][3];     /* yellow */
     (v).cn[2] = (b);        \
     (v).cn[3] = 0xFF;
 
-void func_00430500(CDebugLines *s) {
+void func_00430500(CAutomap *s) {
     s32 i;
     s32 j;
 

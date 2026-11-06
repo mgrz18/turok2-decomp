@@ -23,7 +23,7 @@ extern f32 D_8011ACB4[];
 extern f32 D_8011ACB8[];
 extern f32 D_8011ACBC[];
 extern s32 D_801198A4[2];
-extern CWorld gScene;
+extern CScene gScene;
 extern u8 D_800EBAC0[];
 extern u8 D_0043BD20[];
 extern u8 D_0043BDB0[];
@@ -41,7 +41,7 @@ s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
     s32 i;
     u8 *src;
     u8 *dst;
-    CWorld *world;
+    CScene *world;
 
     if (D_80130990) {
         slot = D_800C2028;

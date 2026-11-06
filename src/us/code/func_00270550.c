@@ -6,7 +6,7 @@ extern void *VM_Alloc(s32 a, s32 b, s32 c);
 extern u32 *CISet__GetBlock(void *table, s32 index);   /* entry of a packed table */
 
 /* Sound manager: find the sound tables in the sound data file. */
-void CAudioWorld__LoadSfxDataFile(SndMgr *m) {
+void CAudioWorld__LoadSfxDataFile(CAudioWorld *m) {
     u32 *s3;
     u32 *t0;
     u32 *t1;

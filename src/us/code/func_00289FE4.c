@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game.h"
 
-s32 func_0025359C(CPlayerList *);                   /* extern */
+s32 func_0025359C(CPlayerPool *);                   /* extern */
 s32 RumblePool_FreeAll(s32 *);                   /* extern */
 extern s32 D_800F5A50;
 

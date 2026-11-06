@@ -3,6 +3,6 @@
 
 void CISet__GetBlock(s32);                            /* extern */
 
-void CScene__GetSwoosh(CWorld *arg0) {
+void CScene__GetSwoosh(CScene *arg0) {
     CISet__GetBlock((s32)arg0->m_pSwooshes);
 }

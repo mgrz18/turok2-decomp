@@ -196,10 +196,10 @@ struct LevelActor;
 struct LevelActor;
 s32 CScene__AreEventsDone(char *object, s32 type) {
     s32 index;
-    CWorldRecord *record;
+    CSceneRecord *record;
     u8 *flags;
-    index = ((CWorld *)object)->m_nRecords;
-    record = ((CWorld *)object)->m_pRecords;
+    index = ((CScene *)object)->m_nRecords;
+    record = ((CScene *)object)->m_pRecords;
     index--;
     if (index != -1) {
         flags = &record->m_Flags;
@@ -209,11 +209,11 @@ s32 CScene__AreEventsDone(char *object, s32 type) {
                 return 0;
             }
             index--;
-            flags += sizeof(CWorldRecord);
+            flags += sizeof(CSceneRecord);
         } while (index != -1);
     }
-    index = ((CWorld *)object)->m_nAltRecords;
-    record = ((CWorld *)object)->m_pAltRecords;
+    index = ((CScene *)object)->m_nAltRecords;
+    record = ((CScene *)object)->m_pAltRecords;
     index--;
     if (index != -1) {
         do {

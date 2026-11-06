@@ -3,7 +3,7 @@
 
 s32 Sound__Play2D(s32);
 
-void CScene__RequestWarp(CWorld *arg0, s32 arg1, s32 arg2) {
+void CScene__RequestWarp(CScene *arg0, s32 arg1, s32 arg2) {
     arg0->m_WarpState = 1;
     arg0->m_WarpFade = arg2;
     arg0->m_WarpID = arg1;

@@ -144,16 +144,17 @@ extern GameMatch D_8011ACB0;
 #include "structs/player_list.h"
 
 /* The automap's state at CGame+0x1230 (Automap_Update, Automap_Draw and
- * Automap_IsShown take &m_DebugLines): mode, state, blend, then the yaw and
+ * Automap_IsShown take &m_Automap): mode, state, blend, then the yaw and
  * pitch words from 0x20. func_00430500 clears the counts and fills the
  * coloured vertex buffers D_80129A40, D_8012DA40, D_8012DB40, D_8012F340.
- * The CDebugLines / m_DebugLines names are from before that was known. */
-typedef struct CDebugLines {
+ * Named CAutomap / m_Automap (Turok 3 and Rage Wars give no name); it was
+ * CDebugLines / m_DebugLines before the naming rounds showed what it is. */
+typedef struct CAutomap {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 unk8;
     /* 0x0C */ s32 m_Counts[11];
-} CDebugLines; /* size 0x38 */
+} CAutomap; /* size 0x38 */
 
 /* The engine's globals at D_80119870: the players, the cameras and the
  * settings. Some parts have symbols of their own, which the ROM uses where
@@ -164,12 +165,12 @@ typedef struct CDebugLines {
  * objects; the menus' pool is the one of its main camera
  * (m_MainCamera.m_MenuPool), so it is written out. */
 typedef struct CGame {
-    /* 0x0000 */ CPlayerList m_PlayerList;
+    /* 0x0000 */ CPlayerPool m_PlayerList;
     /* 0x003C */ s32 _pad3C;
     /* 0x0040 */ u8 m_CameraPool[0x57C];   /* CCameraPool, D_801198B0 (0x11F0 bytes) */
     /* 0x05BC */ u8 m_MenuPool[0x18];      /* its m_MainCamera.m_MenuPool (MenuPool, structs/menu.h), D_80119E2C */
     /* 0x05D4 */ u8 m_CameraPoolEnd[0x1230 - 0x5D4];
-    /* 0x1230 */ CDebugLines m_DebugLines;   /* the automap (D_8011AAA0); reset by func_00430500 */
+    /* 0x1230 */ CAutomap m_Automap;   /* the automap (D_8011AAA0); reset by func_00430500 */
     /* 0x1268 */ GameSettings m_Settings;  /* D_8011AAD8 */
 } CGame; /* size 0x1490 */
 
@@ -181,7 +182,7 @@ extern CGame D_80119870;
  * camera pool files declare it CCameraPool (structs/camera.h). */
 typedef struct CGameFromCameraPool {
     /* 0x0000 */ u8 m_CameraPool[0x11F0];   /* CCameraPool: m_MainCamera at 0x40 */
-    /* 0x11F0 */ CDebugLines m_DebugLines;
+    /* 0x11F0 */ CAutomap m_Automap;
     /* 0x1228 */ GameSettings m_Settings;   /* D_8011AAD8 */
 } CGameFromCameraPool; /* size 0x1450 */
 
@@ -191,7 +192,7 @@ typedef struct CGameFromCameraPool {
 
 /* The engine, gEngineApp (CEngineApp__Boot's object; the field names after
  * Turok 3's CEngineApp, which has the same parts in the same order): the
- * frames, the world (CWorld gScene, structs/world.h, kept as bytes so
+ * frames, the world (CScene gScene, structs/world.h, kept as bytes so
  * that this header does not pull in the world), then CGame D_80119870, whose
  * settings (D_8011AAD8, also reachable as m_Settings) end with the engine's
  * mode block (0x23FD0-0x23FFC is GameSettings 0x1A8-0x1D4: Turok 3's
@@ -200,7 +201,7 @@ typedef struct CEngineApp {
     /* 0x00000 */ CFrameData m_FrameData[3];
     /* 0x003C0 */ CFrameData *m_pCurrentFrameData;   /* gEngineApp_m_pCurrentFrameData */
     /* 0x003C4 */ s32 m_CartridgeIndex;              /* the ROM address of the cartridge index (0xFCBFB4: CEngineApp__Main, CScene__Construct) */
-    /* 0x003C8 */ u8 m_Scene[0x19440 - 0x3C8];       /* CWorld gScene (0x19078 bytes) */
+    /* 0x003C8 */ u8 m_Scene[0x19440 - 0x3C8];       /* CScene gScene (0x19078 bytes) */
     /* 0x19440 */ u8 unk19440[0x22BC0 - 0x19440];
     union {
         /* 0x22BC0 */ CGame m_Game;                  /* D_80119870 */

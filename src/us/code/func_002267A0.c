@@ -4,7 +4,7 @@
 s32 CISet__GetBlock(s32, s32);                    /* extern */
 s32 CISet__GetBlockSize(s32, s32);                /* extern */
 
-void func_002267A0(CWorld *arg0, s32 arg1, s32 arg2, s32 arg3) {
+void func_002267A0(CScene *arg0, s32 arg1, s32 arg2, s32 arg3) {
     s32 temp_v0;
     s32 var_a0;
 

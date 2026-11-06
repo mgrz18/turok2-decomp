@@ -10,7 +10,7 @@ s32 GameObject_IsSolid(CPooledLevelActor *actor);
 
 /* Adds to the world's draw list the pool actors with flags 0x20000 (of 0x30000) that
  * GameObject_IsSolid accepts and that are inside the visible bounds. */
-void CLevelActorPool__CollectVisible(CLevelActorPool *pool, CWorld *world) {
+void CLevelActorPool__CollectVisible(CLevelActorPool *pool, CScene *world) {
     CPooledLevelActor *actor;
 
     for (actor = pool->m_pHead; actor != NULL; actor = actor->m_pNext) {

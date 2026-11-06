@@ -4,7 +4,7 @@
 
 /* Once every player has options byte 0x3D set to 1, turns the pending flag
  * into the done flag and returns 1. */
-s32 CPlayerPool__CheckAllReady(CPlayerList *list) {
+s32 CPlayerPool__CheckAllReady(CPlayerPool *list) {
     GameMatch *state = &D_8011ACB0;
     CPlayer *p;
     s32 n;

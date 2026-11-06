@@ -31,14 +31,14 @@ extern void CMutex__Construct(CMutex *lock);
 extern void alHeapInit(void *heap, s32 base, s32 len);    /* alHeapInit */
 extern void amCreateAudioMgr(ALSynConfig *cfg, s32 a, AiCfg *ai);
 extern BankRes *VM_Alloc(s32 a, s32 b, s32 c);
-extern void CAudioWorld__LoadSfxDataFile(SndMgr *m);
-extern void SndSeq_Construct(void *seq, SndMgr *m);
+extern void CAudioWorld__LoadSfxDataFile(CAudioWorld *m);
+extern void SndSeq_Construct(void *seq, CAudioWorld *m);
 extern void alSndpNew(void *player, void *cfg);           /* alSndpNew */
-extern void SndQueue_Construct(void *q, SndMgr *m);
-extern void SndVoicePool_Construct(void *pool, SndMgr *m);
-extern void SpeechPlayer_Construct(void *fx, SndMgr *m);
+extern void SndQueue_Construct(void *q, CAudioWorld *m);
+extern void SndVoicePool_Construct(void *pool, CAudioWorld *m);
+extern void SpeechPlayer_Construct(void *fx, CAudioWorld *m);
 
-static __inline__ void SndMgr_Lock(SndMgr *m) {
+static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     s32 mask = __osDisableInt();
 
@@ -50,7 +50,7 @@ static __inline__ void SndMgr_Lock(SndMgr *m) {
     }
 }
 
-static __inline__ void SndMgr_Unlock(SndMgr *m) {
+static __inline__ void CAudioWorld_Unlock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     s32 mask = __osDisableInt();
 
@@ -63,7 +63,7 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
 }
 
 /* Sound manager start-up: heap, synthesizer, banks, player and state. */
-void CAudioWorld__Initialize(SndMgr *m) {
+void CAudioWorld__Initialize(CAudioWorld *m) {
     ALSynConfig cfg;
     AiCfg ai;
     BankRes *r;
@@ -77,7 +77,7 @@ void CAudioWorld__Initialize(SndMgr *m) {
     u8 *e;
 
     CMutex__Construct(&m->lock);
-    SndMgr_Lock(m);
+    CAudioWorld_Lock(m);
     m->soundState = 0;
     alHeapInit(&m->heap, D_80130A40, D_80130A7C);
     cfg.maxVVoices = 0x25;
@@ -140,5 +140,5 @@ void CAudioWorld__Initialize(SndMgr *m) {
     m->unk2BBC = 1.0f;
     SpeechPlayer_Construct(&m->fx, m);
     D_800B2680 = 1;
-    SndMgr_Unlock(m);
+    CAudioWorld_Unlock(m);
 }

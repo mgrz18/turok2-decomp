@@ -7,7 +7,7 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 /* How many of the manager's voices play the given sound (CMutex taken
  * around the scan). */
-s32 CAudioWorld__CountHandleVoices(SndMgr *mgr, s32 sound)
+s32 CAudioWorld__CountHandleVoices(CAudioWorld *mgr, s32 sound)
 {
   s32 mask;
   s32 mask2;
@@ -17,7 +17,7 @@ s32 CAudioWorld__CountHandleVoices(SndMgr *mgr, s32 sound)
   s32 n;
   CMutex *lock;
   CMutex *lock2;
-  SndMgr *m;
+  CAudioWorld *m;
   lock = &mgr->lock;
   n = 0;
   mask = __osDisableInt();
@@ -42,7 +42,7 @@ s32 CAudioWorld__CountHandleVoices(SndMgr *mgr, s32 sound)
       n += 1;
     }
     i += 1;
-    m = (SndMgr *) ((u8 *) m + sizeof(SndVoice));
+    m = (CAudioWorld *) ((u8 *) m + sizeof(SndVoice));
   }
   while (i < 0x11);
   lock2 = &mgr->lock;

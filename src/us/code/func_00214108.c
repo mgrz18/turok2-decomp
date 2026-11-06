@@ -86,7 +86,7 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld gScene;
+extern CScene gScene;
 struct ObjectLinks150C;
 typedef struct ObjectLinks150C ObjectLinks150C;
 struct IntegerState1504;

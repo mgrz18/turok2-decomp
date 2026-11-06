@@ -79,7 +79,7 @@ typedef struct CPooledLevelActor {
     /* 0x1AC */ struct CPooledLevelActor *m_pNext;
 } CPooledLevelActor; /* size 0x1B0 */
 
-/* The world's level actor pool (CWorld.m_ActorPool, 0x10518): 32 slots, the
+/* The world's level actor pool (CScene.m_ActorPool, 0x10518): 32 slots, the
  * free list and the live list (newest at the head, oldest at the tail,
  * released first when no slot is free). */
 typedef struct CLevelActorPool {

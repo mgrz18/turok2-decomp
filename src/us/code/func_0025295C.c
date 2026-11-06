@@ -2,11 +2,11 @@
 #include "structs/player.h"
 #include "structs/game.h"
 
-extern s32 CPlayerPool__GetIndex(CPlayerList *list, CPlayer *player);
+extern s32 CPlayerPool__GetIndex(CPlayerPool *list, CPlayer *player);
 
 /* Whether the frag limit is reached: by either team's total in team games,
  * otherwise by one player's frags (the slot CPlayerPool__GetIndex names left out). */
-s32 CPlayerPool__IsFragLimitReached(CPlayerList *list) {
+s32 CPlayerPool__IsFragLimitReached(CPlayerPool *list) {
     GameMatch *state = &D_8011ACB0;
     CPlayer *p;
     s32 i;

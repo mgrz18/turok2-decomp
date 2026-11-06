@@ -474,7 +474,7 @@ typedef struct Object_func_8028B274_de Object_func_8028B274_de;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld gScene;
+extern CScene gScene;
 struct LevelActor;
 struct LevelActor;
 struct Shared_Actor;

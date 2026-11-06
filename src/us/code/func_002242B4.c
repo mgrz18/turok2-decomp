@@ -195,7 +195,7 @@ struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
 void *CISet__GetBlock(void *table, s32 index);
-u32 CScene__GetRegionIndex(CWorld *arg0, s32 arg1) {
+u32 CScene__GetRegionIndex(CScene *arg0, s32 arg1) {
     s32 offset;
     s32 result;
     if (arg1 == 0) {

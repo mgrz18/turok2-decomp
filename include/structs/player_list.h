@@ -22,7 +22,8 @@ typedef struct {
 } CPlayerCList; /* size 0x14 */
 
 /* All players (D_80119870, the start of the engine's globals; its active
- * list is D_80119890): the idle ones and the ones in the game. */
+ * list is D_80119890): the idle ones and the ones in the game. Turok 3's
+ * CPlayerPool (CPlayerPool__* methods); called CPlayerList here until round N3. */
 typedef struct {
     /* 0x00 */ struct CMemEntry *m_pmePlayers;
     /* 0x04 */ struct CPlayer *m_Players;
@@ -31,6 +32,6 @@ typedef struct {
     /* 0x20 */ CPlayerCList m_ActiveList;    /* D_80119890; m_nCount: the players in the game */
     /* 0x34 */ s32 m_bCinema;                    /* a cinema runs for the players */
     /* 0x38 */ s32 m_bCinemaStarted;
-} CPlayerList; /* 0x3C known */
+} CPlayerPool; /* 0x3C known */
 
 #endif

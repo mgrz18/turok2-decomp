@@ -7,7 +7,7 @@
 extern s32 CScene__GetRegion(void *arg0, s32 arg1);
 extern void CGameObjectInstance__ConstructFromRecord(void *obj, InputRecAt27 *rec, s32 mode, s32 index);
 extern f32 D_800A5CEC[];
-extern CWorld gScene;
+extern CScene gScene;
 extern f32 D_800A5CEC[];
 extern void *CScene__GetIntelligence(void *, s32);
 extern s32 CScene__GetInstanceSavedBit(void *, void *);

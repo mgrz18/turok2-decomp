@@ -263,7 +263,7 @@ typedef struct CPlayer {
     /* 0x1324 */ s32 _pad3;                      /* sizeof is a multiple of 8 (Mtx) */
 } CPlayer; /* size 0x1328 */
 
-/* CPlayerCList and CPlayerList (D_80119870) are in structs/player_list.h. */
+/* CPlayerCList and CPlayerPool (D_80119870) are in structs/player_list.h. */
 
 /* The players saved for a restart, D_8011F290: SavedPlayers_Arm arms it (and
  * steps m_State), SavedPlayers_Save copies the players in, SavedPlayers_Restore copies

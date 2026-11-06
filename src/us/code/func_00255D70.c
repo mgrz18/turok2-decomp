@@ -9,7 +9,7 @@ extern char D_0043AC38;
 extern char D_0043AC5C;
 
 void CPlayer__StopLoopingSounds(CPlayer *);
-s32 CPlayerPool__GetIndex(CPlayerList *players, CPlayer *player);
+s32 CPlayerPool__GetIndex(CPlayerPool *players, CPlayer *player);
 void MenuPool_OpenMenu(void *pool, void *screen, CPlayer *p, void *controller, s32);
 
 /* CPlayer__StopLoopingSounds takes the player (as in CPlayer__Kill): the call keeps it in $a0,

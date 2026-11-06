@@ -7,7 +7,7 @@
 typedef struct { u8 pad0[0x13]; u8 unk13; } Src;
 s32 *CISet__GetBlock(s32 *tbl, s32 idx);
 void CISet__GetBlockSize(s32 *tbl, s32 idx);
-s32 CScene__IsEventFired(CWorld *lv, Src *s) {
+s32 CScene__IsEventFired(CScene *lv, Src *s) {
     s32 bit = s->unk13;
     s32 idx = lv->m_nLevel;
     s32 *t = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(lv->m_pBitSections, 0), idx), 2);

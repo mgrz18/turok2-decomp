@@ -26,7 +26,7 @@ void CCamera__DrawTints(CCamera *cam);
 void CCameraPool__AdvanceText(CCameraPool *pool, CCamera *cam);
 void MenuPool_Draw(void *menuPool);
 void CCamera__DrawBorder(CCamera *cam);
-void CPlayerPool__DrawMatchClock(CPlayerList *list, CCamera *cam);
+void CPlayerPool__DrawMatchClock(CPlayerPool *list, CCamera *cam);
 
 /* Updates every camera of the pool, then the main camera. While
  * D_800F5A44 counts down, the frame is first cleared to black. */

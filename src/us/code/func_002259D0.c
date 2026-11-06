@@ -8,7 +8,7 @@ s32 Throwable_GetModeAnim(CGameObjectInstance *actor, void *ai);
 
 /* The actor of kind 5 in the second world list (0x1050) nearest to target (squared distance) for which
  * Throwable_GetModeAnim returns 0, or NULL. */
-CGameObjectInstance *func_002259D0(CWorld *world, CGameObjectInstance *target) {
+CGameObjectInstance *func_002259D0(CScene *world, CGameObjectInstance *target) {
     CGameObjectInstance **actors;
     CGameObjectInstance *actor;
     CGameObjectInstance *nearest;

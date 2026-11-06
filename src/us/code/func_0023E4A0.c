@@ -2,7 +2,7 @@
 #include "structs/world.h"
 #include "structs/collision.h"
 
-extern CWorld gScene;
+extern CScene gScene;
 extern s32 D_800F7964;
 extern CCollisionInfo D_800F1C60;
 
@@ -21,7 +21,7 @@ void Collision_TestInstances(Sweep *sweep) {
     CGameObjectInstance *inst;
     CCollisionInfo *def;
     CGameObjectInstance *other;
-    CWorld *world;
+    CScene *world;
     s32 count;
     f32 x;
     f32 z;

@@ -13,7 +13,7 @@ extern s32 D_800C2028; /* pad */
 extern s32 D_801309BC;
 extern s32 D_801309B8;
 extern s32 D_801309C4;
-extern CWorld gScene[];
+extern CScene gScene[];
 extern u8 D_8011AC58;
 extern s32 D_8011AADC;
 extern f32 D_8011ACB4[];
@@ -26,7 +26,7 @@ extern u8 D_0043BC40[];
 extern u8 D_0043BCD0[];
 extern u8 D_0043BD3C[];
 s32 func_0041DCB0(Menu *o, s32 pad, s32 z);
-CPlayer *CPlayerPool__FindByController(CPlayerList *list, ControllerProfile *s);
+CPlayer *CPlayerPool__FindByController(CPlayerPool *list, ControllerProfile *s);
 s32 func_00425F84(s32 pad, s32 idx);
 void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, s32 e);
 
@@ -34,7 +34,7 @@ s32 GameNoteMenu_SelectYes_2(s32 unused, Menu *own) {
     f32 *new_var;
     s32 pad;
     CPlayer *plr;
-    CWorld *g;
+    CScene *g;
     u8 save;
     s32 i;
     SaveGame *c;

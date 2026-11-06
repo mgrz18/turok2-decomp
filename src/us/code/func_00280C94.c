@@ -8,7 +8,7 @@ extern s32 CScene__FindRegionAt(void *, void *);
 extern float D_800A9BDC;
 extern float D_800A9BE4;
 extern float D_800A9BE0;
-extern CWorld gScene;
+extern CScene gScene;
 extern s32 Cinema_PathPlaying(void);
 extern f32 CGameRegion__GetHeight(s32 arg0, f32 arg1, f32 arg2);
 extern s32 D_800B6D00;

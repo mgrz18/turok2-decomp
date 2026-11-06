@@ -41,7 +41,7 @@ void LightVolume_Construct(ItemD *, SrcD *);
 f32 GameObject_GetCollisionHeight(CLevelActor *);
 void CScene__ComputeLights(void **, s32, f32 *, void *);
 
-void CScene__DecompressGridSection(CWorld *world, s32 ***file) {
+void CScene__DecompressGridSection(CScene *world, s32 ***file) {
     StrideTable *tE;
     void *links[128];
     void **pp;

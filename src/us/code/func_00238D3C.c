@@ -249,7 +249,7 @@ struct TableRecAt8;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld gScene;
+extern CScene gScene;
 struct LevelActor;
 struct Triple;
 struct Triple;

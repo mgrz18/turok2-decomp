@@ -10,7 +10,7 @@ u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-static __inline__ void SndMgr_Lock(SndMgr *m) {
+static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     u32 mask = __osDisableInt();
     if (++l->count != 1) {
@@ -20,7 +20,7 @@ static __inline__ void SndMgr_Lock(SndMgr *m) {
         __osRestoreInt(mask);
     }
 }
-static __inline__ void SndMgr_Unlock(SndMgr *m) {
+static __inline__ void CAudioWorld_Unlock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     u32 mask = __osDisableInt();
     if (--l->count != 0) {
@@ -31,8 +31,8 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
     }
 }
 void *CISet__GetBlock(void *node, s32 idx);
-void CAudioWorld__PlayLayer(SndMgr *m, void *rec, CVector3 *pos, s32 id, s32 token, s32 a, s32 flags);
-s32 CAudioWorld__PlaySoundIndex(SndMgr *m, s32 id, CVector3 pos, s32 flags) {
+void CAudioWorld__PlayLayer(CAudioWorld *m, void *rec, CVector3 *pos, s32 id, s32 token, s32 a, s32 flags);
+s32 CAudioWorld__PlaySoundIndex(CAudioWorld *m, s32 id, CVector3 pos, s32 flags) {
     u32 *rec;
     u32 count;
     u32 i;
@@ -50,9 +50,9 @@ s32 CAudioWorld__PlaySoundIndex(SndMgr *m, s32 id, CVector3 pos, s32 flags) {
     rec = CISet__GetBlock(n, 1);
     count = rec[1];
     if (count != 0) {
-        SndMgr_Lock(m);
+        CAudioWorld_Lock(m);
         token = ++m->handle;
-        SndMgr_Unlock(m);
+        CAudioWorld_Unlock(m);
     } else {
         token = -1;
     }

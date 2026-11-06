@@ -7,7 +7,7 @@ typedef struct {
     s32 words[6];
 } Lights1; /* libultra Lights1, copied as words */
 
-s32 CScene__FindObjectType(CWorld *, s32);
+s32 CScene__FindObjectType(CScene *, s32);
 CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *);
 void CAnimationState__Reset(CAnimationState *);
 void CGameObjectInstance__RequestAnim(CGameObjectInstance *, s32);
@@ -19,7 +19,7 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32)
 s32 Instance_NextUniqueId(void);
 void CGameObjectInstance__DrawModelLitVertices(void);
 
-extern CWorld gScene;
+extern CScene gScene;
 extern s32 D_80119878;      /* player count */
 extern u8 *D_80119874;      /* players, 0x1328 bytes each */
 extern u8 D_800AE994[];
@@ -65,7 +65,7 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
                    void *region, f32 rotY, CVector3 pos, s32 flags, CVector3 scale, CVector3 velocity) {
     s32 animIndex;
     s32 frame;
-    CWorld *world;
+    CScene *world;
     f32 ground;
 
     obj->m_dwFlags &= ~0x40000;

@@ -3,7 +3,7 @@
 
 s32 CCache__Deallocate(s32, s32);
 
-s32 CPlayerPool__GetFirstActive(CPlayerList *);                       /* extern */
+s32 CPlayerPool__GetFirstActive(CPlayerPool *);                       /* extern */
 s32 Sound__StopFlags(s32);                     /* extern */
 s32 Sound__DetachAll();                            /* extern */
 s32 LoopSounds_StopAll(s32);                         /* extern */

@@ -13,19 +13,19 @@ typedef struct AnimInfo {
     /* 0x1E */ u16 angle;
 } AnimInfo;
 
-extern CWorld gScene;
+extern CScene gScene;
 extern s32 D_800B6D54;                  /* effects enabled */
 extern s32 D_800B6D00;
 extern s32 D_8011001C;
 extern char D_800A6070[];               /* "anim object index" */
 extern char D_800A6084[];               /* "anim object info" */
 
-s32 CScene__FindObjectType(CWorld *world, s32 id);
+s32 CScene__FindObjectType(CScene *world, s32 id);
 s32 CISet__GetROMAddress(s32 *table, s32 base, s32 index);
 s32 *CCache__Request(s32 heap, s32 src, s32 size, s32 type, s32 arg4, s32 callback, char *name, s32 arg7);
 s32 CISet__GetROMAddressAndSize(s32 table, s32 base, s32 index, s32 *size);
 void *CISet__GetBlock(s32 table, s32 index);
-s32 CScene__GetIntelligence(CWorld *world, s32 index);
+s32 CScene__GetIntelligence(CScene *world, s32 index);
 f32 HalfToFloat(s32 angle);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 angle);
 void CCache__Unlock(s32 heap, s32 *block);

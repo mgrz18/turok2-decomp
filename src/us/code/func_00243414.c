@@ -338,7 +338,7 @@ struct TableRecAt8;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld gScene;
+extern CScene gScene;
 s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2);
 extern void AI_StopSound(void *, void *);
 s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {

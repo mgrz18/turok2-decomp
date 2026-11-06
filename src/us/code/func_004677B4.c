@@ -11,7 +11,7 @@ extern void func_0042DD94(CPlayer *p);
 extern void CPlayer__UpdateOrbitCamera(CPlayer *p, CPlayer *q);
 extern void Cinema_UpdateCameraIfActive(s32);
 
-void CPlayerPool__LevelStart_2(CPlayerList *list) {
+void CPlayerPool__LevelStart_2(CPlayerPool *list) {
     CPlayer *p;
 
     if (D_8011AC88 == 13 && SavedPlayers_IsActive() != 0) {

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/world.h"
 
-void CScene__ConstructWarp_2(CWorld *arg0) {
+void CScene__ConstructWarp_2(CScene *arg0) {
     arg0->m_WarpFade = 2;
     arg0->m_WarpState = 0;
     arg0->m_WarpTime = 0;

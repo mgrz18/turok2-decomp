@@ -60,7 +60,7 @@ extern s32 D_800B6D54;
 extern s32 D_800C2030;      /* screen width */
 extern s32 D_800C2034;      /* screen height */
 extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose D_8011AAD8 is not this file's s32) */
-extern CWorld gScene;
+extern CScene gScene;
 extern s32 D_8011AAD8;
 extern s32 D_8011AC8C;
 extern Vp D_8011B0A8[];
@@ -138,7 +138,7 @@ void Automap_Draw(MapView *view) {
     CVector3 *p1;
     CVector3 *a;
     char *data;
-    CWorld *w;
+    CScene *w;
     f32 s;
     f32 c;
     f32 cx;

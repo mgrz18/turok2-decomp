@@ -5,7 +5,7 @@ s32 alSndpSetVol(s32, s32);
 s32 alSndpSetSound(s32, s16);                    /* extern */
 
 void SndVoice_SetVolume(SndVoice *arg0, s32 arg1) {
-    SndMgr *temp_s0;
+    CAudioWorld *temp_s0;
     s32 temp_s0_2;
 
     temp_s0 = arg0->mgr;

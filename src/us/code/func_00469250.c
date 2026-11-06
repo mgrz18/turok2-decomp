@@ -3,7 +3,7 @@
 
 void RumblePool_FreeAll(s32);
 s32 Controller_SetRumbleOptionAll(s32);
-s32 func_0025359C(CPlayerList *);                   /* extern */
+s32 func_0025359C(CPlayerPool *);                   /* extern */
 
 /* The multiplayer match state at D_8011ACB0: the fields this resets. */
 

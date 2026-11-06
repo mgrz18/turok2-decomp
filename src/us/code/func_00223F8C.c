@@ -11,7 +11,7 @@ typedef struct Obj2 { u8 pad0[8]; void *unk8; f32 unkC; } Obj2;
 void Render_ResetBatches();
 void Render_FlushBatches(void);
 void CGameObjectInstance__Draw(CGameObjectInstance *e, s32 a);
-void CScene__DrawRegisteredInstances(CWorld *lv, s32 arg) {
+void CScene__DrawRegisteredInstances(CScene *lv, s32 arg) {
     Gfx *g;
     s32 i;
     s32 n;

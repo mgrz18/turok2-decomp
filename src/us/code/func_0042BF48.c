@@ -28,7 +28,7 @@ extern void CScene__DecompressGridSection(void);
 
 extern void *CISet__GetBlock(void *table, s32 index);
 extern s32 CISet__GetROMAddressAndSize(void *file, s32 key, s32 index, s32 *size);
-extern void **CCache__Request(s32 unused, s32 key, s32 size, s32 mode, CWorld *owner, void *tag, char *name, s32 direct);
+extern void **CCache__Request(s32 unused, s32 key, s32 size, s32 mode, CScene *owner, void *tag, char *name, s32 direct);
 extern void CStaticObject__RequestLitVertices(ObjA *a, s32);
 extern void *CStaticObject__LoadGeometry(ObjA *a);
 extern void *CLevelActor__LoadGeometry(ObjB *b);
@@ -39,7 +39,7 @@ extern void CCache__Unlock(s32, void *);
  * a rectangle of cells (firstRow..lastRow, firstCol..lastCol), here the whole grid: the column loop starting
  * from the variable firstCol, not the constant 0, is what keeps its entry test as the ROM's slt (Rage Wars'
  * decomp matches the same function with a lone `first` local it flags as a fake match). */
-void CScene__StreamAllSections(CWorld *level) {
+void CScene__StreamAllSections(CScene *level) {
     s32 size;
     s32 width;
     s32 row;

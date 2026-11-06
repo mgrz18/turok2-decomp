@@ -64,7 +64,7 @@ extern s32 D_800C2030;
 extern s32 D_800C2034;
 extern Gfx *D_800D8E24;
 /* An array to GCC: a function that reads two of its fields keeps its address in one register. */
-extern CWorld gScene[];
+extern CScene gScene[];
 extern s32 D_800F709C;  /* gScene.trackLookup */
 extern s32 *D_800F70D8; /* gScene.trackBundle */
 extern CGameObjectInstance *D_80119890; /* current player */
@@ -387,7 +387,7 @@ s32 Cinema_Load_2(s32 index) {
     s32 pending;
     s32 loaded;
     CGameObjectInstance *captured;
-    CWorld *resources;
+    CScene *resources;
     s32 **owner;
     s32 **table;
     CueList *cues;
@@ -1176,7 +1176,7 @@ typedef struct {
 
 s32 Cinema_IsActive(void);
 void LevelEvent_Trigger(CueObject *k);
-void CScene__SetEventFired(CWorld *g, CueObject *k, s32 z);
+void CScene__SetEventFired(CScene *g, CueObject *k, s32 z);
 
 void Cinema_FireCues_2(void) {
     f32 now = D_800C1BB0->time;
@@ -1427,7 +1427,7 @@ s32 Cinema_GetEntryCount_2(void) {
 s32 **Cinema_LoadTable_2(void) {
     s32 size;
     s32 loaded;
-    CWorld *resources = gScene;
+    CScene *resources = gScene;
 
     loaded = CISet__GetROMAddressAndSize(resources->m_pCinemas, resources->m_CinemasKey, 0, &size);
     if (loaded == 0) {

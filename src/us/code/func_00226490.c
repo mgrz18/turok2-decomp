@@ -21,8 +21,8 @@ extern f32 gFrameIncrement;          /* the frame time step */
 
 void func_0021F1B4(DrawActor *actor);
 void CGameObjectInstance__UpdateAnimation(DrawActor *actor);
-void CPlayerPool__Update(CPlayerList *list);
-s32 CPlayerPool__CheckAllReady(CPlayerList *list);
+void CPlayerPool__Update(CPlayerPool *list);
+s32 CPlayerPool__CheckAllReady(CPlayerPool *list);
 void func_00430330(u8 *);
 s32 LoopSounds_Get(void);
 void LoopSounds_Update(s32);

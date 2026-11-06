@@ -4,22 +4,22 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern CWorld gScene;
-extern s32 CScene__IsEventFired(CWorld *world, Trigger *trigger);
-extern s32 CScene__AreEventsDone(CWorld *world, s32 id);
-extern void CScene__FireEventsByKeyOnce(CWorld *world, s32 id);
+extern CScene gScene;
+extern s32 CScene__IsEventFired(CScene *world, Trigger *trigger);
+extern s32 CScene__AreEventsDone(CScene *world, s32 id);
+extern void CScene__FireEventsByKeyOnce(CScene *world, s32 id);
 extern void func_0026E294(Trigger *trigger);
 extern s32 LevelEvent_CheckRequiredItem(Trigger *trigger, s32 arg);
-extern void CScene__SetEventFired(CWorld *world, Trigger *trigger, s32 arg);
-extern void CScene__DecLinkGroupCount(CWorld *world, s32 id);
-extern s32 CScene__IsLinkGroupDone(CWorld *world, s32 id);
-extern void CScene__FireEventsByKey(CWorld *world, s32 id);
+extern void CScene__SetEventFired(CScene *world, Trigger *trigger, s32 arg);
+extern void CScene__DecLinkGroupCount(CScene *world, s32 id);
+extern s32 CScene__IsLinkGroupDone(CScene *world, s32 id);
+extern void CScene__FireEventsByKey(CScene *world, s32 id);
 extern void LevelEvent_Trigger(Trigger *trigger);
 void LevelEvent_ProcessTriggers(Trigger *triggers, s32 count, s32 require, s32 enter, s32 exclude, s32 group, s32 arg) {
     s32 i;
     s32 active;
     s32 usable;
-    CWorld *world;
+    CScene *world;
     Trigger *trigger;
     for (trigger = triggers, i = 0; i < count; trigger++, i++) {
         world = &gScene;

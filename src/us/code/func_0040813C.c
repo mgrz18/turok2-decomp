@@ -26,7 +26,7 @@ extern u8 D_800B6674[];
 extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4[]; /* the actor list head */
 
-CPlayer *CPlayerPool__GetFirstActive(CPlayerList *);
+CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);
 s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, s32 id, s32);

@@ -6,7 +6,7 @@
 
 typedef struct { s32 key; u8 pad4[8]; s16 unkC; } Ent;
 Ent *CISet__GetBlock(s32 *tbl, s32 idx);
-Ent *CScene__FindIntelligence(CWorld *lv, s32 a, s32 b) {
+Ent *CScene__FindIntelligence(CScene *lv, s32 a, s32 b) {
     s32 n = lv->m_pIntelligence[0];
     s32 i = 0;
     Ent *e;

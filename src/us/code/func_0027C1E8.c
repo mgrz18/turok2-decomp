@@ -13,7 +13,7 @@ extern f32 gFrameIncrement;          /* the frame's time step */
 void CEngineApp__DrawFilledRect(void *ctx, u8 *rgba, s32 left, s32 top, s32 right, s32 bottom);
 void CCamera__UpdateFlash(CCamera *cam);
 s32 Cinema_PathPlaying(void);
-void CPlayerPool__DrawHuds(CPlayerList *list, CCamera *cam);
+void CPlayerPool__DrawHuds(CPlayerPool *list, CCamera *cam);
 s32 Cinema_DrawOverlay(CCamera *cam);
 
 /* The tints over a camera's view (LibTEngine's CCamera DrawTints): the fog

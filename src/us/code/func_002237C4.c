@@ -17,12 +17,12 @@ extern u8 D_800B54E0[];
 void Cinema_Reset(ColorEntry *entry);
 void Cinema_StopAtEnd(void);
 void Cinema_RequestById(s32 arg0);
-s32 CScene__FindWarpDests(CWorld *world, s32 arg1, s32 id, CWarpPoint *spawn, s32 arg4);
-void CScene__LoadLevel(CWorld *world, s32 id, s32 flags);
+s32 CScene__FindWarpDests(CScene *world, s32 arg1, s32 id, CWarpPoint *spawn, s32 arg4);
+void CScene__LoadLevel(CScene *world, s32 id, s32 flags);
 s32 Demo_GetPlayerCount(void);
 void CCameraPool__AddTimedText(CGameFromCameraPool *game, void *camera, u8 *text, f32 time);
 
-static __inline__ s32 transitionId(CWorld *scene) {
+static __inline__ s32 transitionId(CScene *scene) {
     if (scene->m_bWarpSpawn != 0) {
         return scene->m_WarpSpawn.m_nLevel;
     }
@@ -31,7 +31,7 @@ static __inline__ s32 transitionId(CWorld *scene) {
 
 /* Runs the fade of a level transition: state 1 fades in to the entry length and then warps
  * (CScene__FindWarpDests, or straight to ~id for a negative id), state 2 fades back out. */
-void CScene__UpdateWarp(CWorld *scene) {
+void CScene__UpdateWarp(CScene *scene) {
     ColorEntry *entry = &D_800ACDE8[scene->m_WarpFade];
     s32 id;
     GameSettings *settings;

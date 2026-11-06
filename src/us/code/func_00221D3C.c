@@ -34,7 +34,7 @@ s32 Frustum_TestBox(void *, CBox *);
 void CStaticObject__Draw(CStaticObject *, CCamera *);
 void CLevelActor__Draw(CLevelActor *);
 
-void CScene__BuildGeometryDisplayList(CWorld *w) {
+void CScene__BuildGeometryDisplayList(CScene *w) {
     s32 r;
     s32 n;
     u8 *objs;
@@ -42,8 +42,8 @@ void CScene__BuildGeometryDisplayList(CWorld *w) {
     s32 mask;
     s32 vmask;
     CCamera *v;
-    CWorldSector *regions;
-    CWorldSector *region;
+    CSceneSector *regions;
+    CSceneSector *region;
     CRect *cell;
     void *grp;
     StrideTable *t;

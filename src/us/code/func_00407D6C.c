@@ -4,7 +4,7 @@
 
 s32 CPlayer__Warp(s32, s32, s32, s32);
 
-CPlayer *CPlayerPool__GetFirstActive(CPlayerList *);                       /* extern */
+CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);                       /* extern */
 s32 Cinema_IsIdle();                                /* extern */
 
 void Primagen_UpdateDeath(void) {

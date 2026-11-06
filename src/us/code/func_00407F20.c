@@ -27,10 +27,10 @@ extern u8 D_801100F0[];
 extern CListedInstance *D_8010FEB4[]; /* the actor list head */
 extern s32 D_80110048;         /* level id */
 
-CPlayer *CPlayerPool__GetFirstActive(CPlayerList *);
+CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
 void CCameraPool__AddText(void *hud, void *camera, u8 *msg);
 void Sound__PlaySpeech(s32 sound);
-void CPlayerPool__SetInvincibility(CPlayerList *list, f32 value);
+void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 value);
 s8 CGameObjectInstance__PickRandomAnim(CListedInstance *actor, s32 id, s32);
 void CScene__UnmarkGeneratorsSaved(void *world);
 void COnScreen__ClearBoss(void *);

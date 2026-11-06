@@ -22,8 +22,8 @@ typedef struct ItemList {
 void *CISet__GetBlock(void *table, s32 index);
 
 /* Collects up to 10 items of the region containing pos whose bounds hold it. */
-void CScene__FindLightsAt(CWorld *world, f32 *pos, Item **out, s32 *outCount) {
-    CWorldSector *found;
+void CScene__FindLightsAt(CScene *world, f32 *pos, Item **out, s32 *outCount) {
+    CSceneSector *found;
     ItemList *list;
     Item *item;
     Item *items;

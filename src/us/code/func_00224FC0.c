@@ -7,7 +7,7 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 s32 BinaryRange(s32 a, s32 b, s32 c, s32 *lo, s32 *hi);
-void CScene__GetRegionEventRecords(CWorld *lv, u16 *idp, CWorldRecord **outRecs, s32 *outCount) {
+void CScene__GetRegionEventRecords(CScene *lv, u16 *idp, CSceneRecord **outRecs, s32 *outCount) {
     s32 hi;
     s32 lo;
     s32 r; s32 a; s32 b; s32 id;

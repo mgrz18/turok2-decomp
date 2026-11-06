@@ -27,7 +27,7 @@ typedef struct {
 extern u8 D_8011AAF1;       /* D_8011AAD8.multiplayer */
 extern s32 D_800B6D20;
 
-void CScene__BuildGeometryDisplayList(CWorld *);
+void CScene__BuildGeometryDisplayList(CScene *);
 CPlayer *CCamera__GetPlayer(CCamera *);
 s32 CPlayer__GetPickupCountLow(CPlayer *, s32);
 void Render_ResetBatches(void);
@@ -39,7 +39,7 @@ void CStaticObject__RequestLitVertices(CStaticObject *, CCamera *);
 void CStaticObject__Draw(CStaticObject *, CCamera *);
 void CLevelActor__Draw(CLevelActor *);
 
-void CScene__DrawGeometry(CWorld *w, CCamera *v_) {
+void CScene__DrawGeometry(CScene *w, CCamera *v_) {
     register CCamera *v asm("$18") = v_;
     u8 *base;
     void *grp;
@@ -55,8 +55,8 @@ void CScene__DrawGeometry(CWorld *w, CCamera *v_) {
     s32 si;
     u16 *ip;
     StrideTable *t;
-    CWorldSector *regions;
-    CWorldSector *region;
+    CSceneSector *regions;
+    CSceneSector *region;
     CRect *cell;
     CStaticObject *a;
     CLevelActor *p;

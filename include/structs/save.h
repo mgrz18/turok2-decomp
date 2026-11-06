@@ -4,7 +4,7 @@
 /* The save game as it is written to and read from the controller pak: a
  * header with the play clock, the player's CPlayerLoadSaveData, the first
  * 0x184 bytes of the game settings, then the level flags (D_800EBAC0, as
- * many bytes as the level header says: D_800F70A8, CWorld +0x30), with a
+ * many bytes as the level header says: D_800F70A8, CScene +0x30), with a
  * checksum (Crc32_Compute) in its last word. SaveGame_Build / SaveGame_Build_2
  * build one into D_800C2018; PakMenu_SelectNote reads one into D_800C201C and
  * SaveGame_Restore / GameNoteMenu_SelectYes load the game from it. The pak menu items

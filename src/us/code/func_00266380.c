@@ -19,7 +19,7 @@ typedef struct {
     /* 0x114 */ s32 tagCleared;
 } ActionState;
 
-extern CPlayer *CPlayerPool__FindTagged(CPlayerList *list);
+extern CPlayer *CPlayerPool__FindTagged(CPlayerPool *list);
 extern void CAI__SetMode(CGameObjectInstance *actor, ActionState *state, s32 mode);
 
 void Action_GoUpdate(CGameObjectInstance *actor, ActionState *state) {

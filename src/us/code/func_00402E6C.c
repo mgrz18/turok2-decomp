@@ -5,7 +5,7 @@ s32 CAI__SetMode(s32, s32, s32);
 f32 AI_AngleToPoint(s32, s32, s32, s32);
 
 s32 ScriptAnimator_SetScript(void *, s32 *);           /* extern */
-void *CPlayerPool__GetFirstActive(CPlayerList *);                     /* extern */
+void *CPlayerPool__GetFirstActive(CPlayerPool *);                     /* extern */
 s32 AI_PlayAnim(s32, s32, s32);           /* extern */
 extern s32 D_00430954;
 extern u8 D_8012F3A0[];

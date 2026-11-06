@@ -11,18 +11,18 @@ extern s32 D_800C2034;          /* screen height */
 
 extern s32 Random_Next(void);
 extern void CPlayer__BecomeIt(CPlayer *p);
-extern void CPlayerPool__RespawnAll(CPlayerList *list);
-extern void CPlayerPool__EndMatch(CPlayerList *list);
-extern s32 CPlayerPool__IsScoreLimitReached(CPlayerList *list);
-extern CPlayer *CPlayerPool__GetViewPlayer(CPlayerList *list, u32 index);
-extern void CPlayerPool__ClearLastTagMode(CPlayerList *list);
-extern s32 CPlayerPool__CountPlaying(CPlayerList *list);
+extern void CPlayerPool__RespawnAll(CPlayerPool *list);
+extern void CPlayerPool__EndMatch(CPlayerPool *list);
+extern s32 CPlayerPool__IsScoreLimitReached(CPlayerPool *list);
+extern CPlayer *CPlayerPool__GetViewPlayer(CPlayerPool *list, u32 index);
+extern void CPlayerPool__ClearLastTagMode(CPlayerPool *list);
+extern s32 CPlayerPool__CountPlaying(CPlayerPool *list);
 extern void Hud_SetupTextureMode(s32 color);
 extern void Hud_DrawSprite(s32, s32, s16, s16, f32, f32, s32);
 
 /* Tag: pick who is "it" at the start of a round, flashing over the viewports
  * in turn until the pick lands. */
-void CPlayerPool__PickTagIt(CPlayerList *list) {
+void CPlayerPool__PickTagIt(CPlayerPool *list) {
     s32 count;
     CPlayer *p;
     CCamera *cam;

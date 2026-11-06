@@ -3,7 +3,7 @@
 
 /* The sound manager and its voices.
  *
- * One SndMgr drives all sound effects (Rage Wars' audio context,
+ * One CAudioWorld drives all sound effects (Rage Wars' audio context,
  * ContextRecAt2BC0 at D_8010C080 there). CAudioWorld__Initialize builds it: an audio
  * heap, the libaudio synthesizer and sound player, the sound bank, then the
  * voice queue, the music sequence, the 17-voice pool and the effects block.
@@ -19,7 +19,9 @@
 #include "structs/libaudio.h" /* ALHeap, ALBank, ALSndPlayer, ALSndpConfig, Acmd... */
 #include "structs/game_object.h" /* CVector3 */
 
-typedef struct SndMgr SndMgr;
+/* Turok 3's CAudioWorld (audioworld.c), gAudioWorld; called SndMgr here
+ * until round N3. */
+typedef struct CAudioWorld CAudioWorld;
 
 /* Value at the voice's pitch slot: written as an int, read as a float. */
 typedef union {
@@ -29,11 +31,11 @@ typedef union {
 
 /* What the sound player is given for one voice (M04VP). */
 typedef struct {
-    /* 0x00 */ s32 frame;        /* SndMgr.frame when it started */
+    /* 0x00 */ s32 frame;        /* CAudioWorld.frame when it started */
     /* 0x04 */ s32 w4;
     /* 0x08 */ s32 vol;        /* alSndpSetVol, times scale and the volume setting */
     /* 0x0C */ s32 wC;
-    /* 0x10 */ s16 fxMix;      /* alSndpSetFXMix, plus SndMgr.fxMix */
+    /* 0x10 */ s16 fxMix;      /* alSndpSetFXMix, plus CAudioWorld.fxMix */
     /* 0x12 */ u8 pad12[2];
     /* 0x14 */ SndIF32 pitch;  /* alSndpSetPitch */
     /* 0x18 */ s16 pan;        /* alSndpSetPan (its low byte) */
@@ -86,10 +88,10 @@ typedef struct SndVoice {
     /* 0xA4 */ u32 flags;      /* 0x4 enveloped, 0x8 stop, 0x200 music volume, 0x400 positional */
     /* 0xA8 */ s32 soundId;
     /* 0xAC */ s32 stopping;
-    /* 0xB0 */ SndMgr *mgr;
+    /* 0xB0 */ CAudioWorld *mgr;
     /* 0xB4 */ s32 unkB4;
     /* 0xB8 */ f32 pitchScale;
-    /* 0xBC */ s32 hasTrack;     /* stops when SndMgr.track is no longer soundId */
+    /* 0xBC */ s32 hasTrack;     /* stops when CAudioWorld.track is no longer soundId */
     /* 0xC0 */ s32 reset;
     /* 0xC4 */ s32 unkC4;
     /* 0xC8 */ f32 volumeScale;
@@ -107,7 +109,7 @@ typedef struct {
 
 /* Requests waiting for a voice (initialised by SndQueue_Construct). */
 typedef struct {
-    /* 0x0000 */ SndMgr *owner;
+    /* 0x0000 */ CAudioWorld *owner;
     /* 0x0004 */ SndNode active;
     /* 0x00D8 */ SndNode free;
     /* 0x01AC */ SndNode nodes[32];
@@ -116,7 +118,7 @@ typedef struct {
 /* The music sequence (initialised by SndSeq_Construct; faded and slid by
  * SndSeq_UpdateFade). */
 typedef struct {
-    /* 0x00 */ SndMgr *owner;
+    /* 0x00 */ CAudioWorld *owner;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 *data;
     /* 0x0C */ s32 unkC;
@@ -143,13 +145,13 @@ typedef struct {
 
 /* The voices (initialised by SndVoicePool_Construct). */
 typedef struct {
-    /* 0x000 */ SndMgr *owner;
+    /* 0x000 */ CAudioWorld *owner;
     /* 0x004 */ SndVoice voices[17];
 } SndVoicePool; /* size 0xD90 */
 
 /* Effects block (initialised by SpeechPlayer_Construct). */
 typedef struct {
-    /* 0x00 */ SndMgr *owner;
+    /* 0x00 */ CAudioWorld *owner;
     /* 0x04 */ s32 unk4;
     /* 0x08 */ s32 unk8;
     /* 0x0C */ s32 unkC;
@@ -160,7 +162,7 @@ typedef struct {
     /* 0x20 */ u8 pad20[0x20];
 } SndFx; /* size 0x40 */
 
-struct SndMgr {
+struct CAudioWorld {
     /* 0x0000 */ u8 pad0[0x24];
     /* 0x0024 */ ALSndpConfig playerConfig;
     /* 0x0030 */ u8 pad30[0x4C];

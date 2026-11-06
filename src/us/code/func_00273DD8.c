@@ -9,7 +9,7 @@ s32 alSndpGetState(void *);                          /* extern */
 s32 alSndpSetSound(void *, s16);                 /* extern */
 
 void SndVoicePool_StopVoice(s32 arg0, s16 arg1) {
-    SndMgr *temp_a0;
+    CAudioWorld *temp_a0;
     SndVoice *var_s0;
     void *var_s1;
 

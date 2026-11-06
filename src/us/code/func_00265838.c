@@ -62,7 +62,7 @@ typedef struct ResourceManagerState ResourceManagerState;
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 struct LevelActor;
-extern void CScene__SetInstanceSavedBit(CWorld *, void *, s32);
+extern void CScene__SetInstanceSavedBit(CScene *, void *, s32);
 typedef struct LevelActor LevelActor;
 struct LevelActor {
     u8 kind;
@@ -215,7 +215,7 @@ typedef struct WorldRecAt3C08 WorldRecAt3C08;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld gScene;
+extern CScene gScene;
 struct LevelActor;
 extern void ImpactEvent_Call(void *, void *, s32, CVector3, ResourceManagerState);
 void Door_OpenNow(LevelActor *arg0) {

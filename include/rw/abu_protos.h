@@ -6,7 +6,7 @@
 
 #include "rw/abu_types.h"
 
-struct CWorld; /* structs/world.h */
+struct CScene; /* structs/world.h */
 
 s32 CList__AddHead(void *, s32);
 s32 CList__AddTail(CList *list, void *node);
@@ -139,13 +139,13 @@ s32 CScene__GetInstanceSavedBit(void *, void *);
 s32 CScene__FindRegionAt(void *, void *);
 s32 CScene__GetRegion(void *arg0, s32 arg1);
 s32 CScene__SetEventFired(void *arg0, void *arg1, s32 arg2);
-s32 CScene__IsEventFired(struct CWorld *world, Trigger *trigger);
-void CScene__DecLinkGroupCount(struct CWorld *world, s32 id);
-s32 CScene__IsLinkGroupDone(struct CWorld *world, s32 id);
+s32 CScene__IsEventFired(struct CScene *world, Trigger *trigger);
+void CScene__DecLinkGroupCount(struct CScene *world, s32 id);
+s32 CScene__IsLinkGroupDone(struct CScene *world, s32 id);
 s32 CScene__GetObject(s32, s32);
-void CScene__FireEventsByKey(struct CWorld *world, s32 id);
-s32 CScene__AreEventsDone(struct CWorld *world, s32 id);
-void CScene__FireEventsByKeyOnce(struct CWorld *world, s32 id);
+void CScene__FireEventsByKey(struct CScene *world, s32 id);
+s32 CScene__AreEventsDone(struct CScene *world, s32 id);
+void CScene__FireEventsByKeyOnce(struct CScene *world, s32 id);
 s32 CScene__QueueDelayedEvent(struct WorldRecAt1B40C *arg0, Record14 *arg1);
 void *CScene__GetIntelligence(void *, s32);
 void SortRecord_Swap(RenderSortRecord *left, RenderSortRecord *right);

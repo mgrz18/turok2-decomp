@@ -13,29 +13,29 @@ extern u8 D_801102B8[];
 extern u8 D_801198B0[];
 
 void CCache__SetFrameDelay(s32, s32);
-void CScene__UpdateWarp(CWorld *);
-void CScene__ClearListCounts(CWorld *);
+void CScene__UpdateWarp(CScene *);
+void CScene__ClearListCounts(CScene *);
 void MtxPool_Reset(void *);
 void CCache__LockForDisplayList(s32, void **);
 void RibbonVtxPool_Reset(void *);
 void CPlayerPool__PreUpdate(void *);
-void CScene__BuildActorLists(CWorld *);
-void CScene__LoadVisibleGridSections(CWorld *);
-void CScene__CollectSectorObjects(CWorld *);
+void CScene__BuildActorLists(CScene *);
+void CScene__LoadVisibleGridSections(CScene *);
+void CScene__CollectSectorObjects(CScene *);
 void CPlayerPool__AnimateWeapons(void *);
-void CCameraPool__Draw(void *, CWorld *);
+void CCameraPool__Draw(void *, CScene *);
 void CParticleSystem__Update(void *);
 void SwooshSystem_Update(void *);
-void CScene__AdvanceInstances(CWorld *);
-void CScene__AdvanceListedInstances(CWorld *);
+void CScene__AdvanceInstances(CScene *);
+void CScene__AdvanceListedInstances(CScene *);
 void CLevelActorPool__Update(void *);
 f32 func_002982F0(f32);     /* sinf */
 f32 func_002974C0(f32);     /* cosf */
-void CScene__UpdateDelayedEvents(CWorld *);
-void CScene__ReleaseSectors(CWorld *);
-void CScene__DrawWarpFade(CWorld *);
+void CScene__UpdateDelayedEvents(CScene *);
+void CScene__ReleaseSectors(CScene *);
+void CScene__DrawWarpFade(CScene *);
 
-void CScene__Update(CWorld *world) {
+void CScene__Update(CScene *world) {
     GameSettings *input;
     s32 old;
     f32 s;

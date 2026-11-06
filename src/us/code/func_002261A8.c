@@ -8,7 +8,7 @@
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, u8 *b);
 void *CISet__GetBlock();
-s32 func_002261A8(CWorld *lv, s32 unused, CVector3 *pt) {
+s32 func_002261A8(CScene *lv, s32 unused, CVector3 *pt) {
     CVector3 d;
     f32 bestIdx = -1.0f;
     f32 bestD = 0.0f;

@@ -30,18 +30,18 @@ typedef struct CWarpPoint {
 } CWarpPoint; /* size 0x14 */
 
 /* A streamed sector of the level: its data block and its extent on the ground plane. */
-typedef struct CWorldSector {
+typedef struct CSceneSector {
     /* 0x00 */ void **m_hData;
     /* 0x04 */ void *m_pBounds;
-} CWorldSector; /* size 0x8 */
+} CSceneSector; /* size 0x8 */
 
 /* A record of the level's object tables (two of them, by key). */
-typedef struct CWorldRecord {
+typedef struct CSceneRecord {
     /* 0x00 */ u8 unk_00[0xE];
     /* 0x0E */ u8 m_Flags;
     /* 0x0F */ u8 m_Key;
     /* 0x10 */ u8 unk_10[0x4];
-} CWorldRecord; /* size 0x14 */
+} CSceneRecord; /* size 0x14 */
 
 /* The head of the level file (block 0): its scale and its lighting. */
 typedef struct CLevelHeader {
@@ -57,7 +57,9 @@ typedef struct CGeomHeader {
     /* 0x00 */ s32 m_Data[7];
 } CGeomHeader; /* size 0x1C */
 
-typedef struct CWorld {
+/* Turok 3's CScene, the level (gScene). Called CWorld here until round N3;
+ * CSceneSector and CSceneRecord were CWorldSector and CWorldRecord. */
+typedef struct CScene {
     /* 0x00000 */ s32 m_Mode;                       /* 2, 4: multiplayer modes */
     /* 0x00004 */ s32 unk_04;
     /* 0x00008 */ s32 unk_08;
@@ -136,11 +138,11 @@ typedef struct CWorld {
     /* 0x0116C */ s32 m_nAltRecords;
     /* 0x01170 */ s32 *m_pRecordIndex;
     /* 0x01174 */ s32 *m_pAltRecordIndex;
-    /* 0x01178 */ CWorldRecord *m_pRecords;
-    /* 0x0117C */ CWorldRecord *m_pAltRecords;
+    /* 0x01178 */ CSceneRecord *m_pRecords;
+    /* 0x0117C */ CSceneRecord *m_pAltRecords;
     /* 0x01180 */ u8 unk_1180[0x14A8 - 0x1180];
     /* 0x014A8 */ s32 m_nSectors;
-    /* 0x014AC */ CWorldSector m_Sectors[128];
+    /* 0x014AC */ CSceneSector m_Sectors[128];
     /* 0x018AC */ u8 unk_18AC[0x4];
     /* 0x018B0 */ u8 m_ParticleSystem[0x10518 - 0x18B0];
     /* 0x10518 */ u8 m_ActorPool[0x13B28 - 0x10518];
@@ -169,6 +171,6 @@ typedef struct CWorld {
     /* 0x18FE4 */ s32 m_PreviewTimer;
     /* 0x18FE8 */ s32 m_PreviewOptions;             /* the option flags last announced */
     /* 0x18FEC */ CGeomHeader m_Geom[5];
-} CWorld; /* size 0x19078 */
+} CScene; /* size 0x19078 */
 
 #endif

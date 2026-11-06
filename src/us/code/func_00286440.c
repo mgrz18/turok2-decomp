@@ -57,7 +57,7 @@ void CEngineApp__Construct(CEngineApp *state) {
         SavedPlayers_Clear();
         GameSettings_SetDefaults(&D_8011AAD8);
     }
-    func_00430500(&state->m_Game.m_DebugLines);
+    func_00430500(&state->m_Game.m_Automap);
     i = 0;
     Cinema__Initialize();
     func_004302A0();

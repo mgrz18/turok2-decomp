@@ -48,7 +48,7 @@ void EngineMode13_Game_Init(CEngineApp *state) {
     D_800B6D34 = 1.0f;
     gFrameIncrement[1] = 1.0f;
     D_800B6D30 = 1.0f;
-    func_00430500(&state->m_Game.m_DebugLines);
+    func_00430500(&state->m_Game.m_Automap);
     CScene__InitPersistentData(gScene, state->m_CartridgeIndex);
     CScene__RequestWarp(gScene, state->m_Settings.matchMode, 0);
     D_801308F8 = 0;

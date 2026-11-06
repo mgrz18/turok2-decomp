@@ -26,7 +26,7 @@ typedef struct InstanceHit {
     /* 0x04 */ f32 t;
 } InstanceHit;
 
-extern CWorld gScene;
+extern CScene gScene;
 extern CCollisionResults *gCollisionResultsP;
 extern u8 D_8011AAF1;
 
@@ -52,7 +52,7 @@ void Collision_SweepActors(Sweep *sweep) {
     CCollisionInfo *def;
     HitInst *inst;
     HitInst *other;
-    CWorld *world;
+    CScene *world;
     InstanceHit *hit;
     GameSettings *multi;
     s32 count;

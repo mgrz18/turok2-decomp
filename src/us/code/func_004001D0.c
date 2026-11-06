@@ -19,7 +19,7 @@ typedef struct {
 } Look004001D0;
 
 extern f32 gFrameIncrement;
-CPlayer *CPlayerPool__GetFirstActive(CPlayerList *list);
+CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *list);
 s32 MenuPool_CountOpen(u8 *a0);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 

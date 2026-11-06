@@ -9,7 +9,7 @@ typedef struct {
     /* 0x9F0 */ s32 unk9F0;
 } Unk002532A8;
 
-void *CPlayerPool__GetFirstActive(CPlayerList *);                     /* extern */
+void *CPlayerPool__GetFirstActive(CPlayerPool *);                     /* extern */
 s32 CEngineApp__StartWarp(s32, s32);                /* extern */
 extern s32 D_800B6D70;
 extern s32 D_800B6D74;

@@ -6,7 +6,7 @@ char *CISet__GetBlock(s32 *, s32);
 s32 CISet__GetBlockSize(s32, s32);
 
 /* Tests a bit of the given level's saved-actor bitmap. */
-s32 CScene__IsEventFiredInLevel(CWorld *arg0, s32 arg1, s32 arg2) {
+s32 CScene__IsEventFiredInLevel(CScene *arg0, s32 arg1, s32 arg2) {
     s32 *temp_v0;
     s32 temp_v1;
     s32 var_s1;

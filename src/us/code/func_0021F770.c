@@ -19,7 +19,7 @@ void *CGameObjectInstance__GetBodySetup(char *arg0)
     s32 count;
     s32 limit;
     char *object;
-    CPlayerList *list;
+    CPlayerPool *list;
     ObjRecAt18V2 *actor = (void *)arg0;
     type = *actor->unk18;
     if ((unsigned int)type >= 13) {

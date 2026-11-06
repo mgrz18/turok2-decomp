@@ -84,7 +84,7 @@ static __inline__ s32 inBlastRange(Entity *e, CVector3 *target) {
 
 /* A blast at `target`: damages every entity of the world and of the actor list, then damages
  * the current player when within 512 units. */
-void CScene__Blast(CWorld *world, CVector3 *target) {
+void CScene__Blast(CScene *world, CVector3 *target) {
     DamageEvent event;
     CVector3 d;
     Entity *e;

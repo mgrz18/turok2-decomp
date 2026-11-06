@@ -5,7 +5,7 @@
 #include "structs/world.h"
 
 extern s32 CScene__QueueDelayedEvent(struct WorldRecAt1B40C *arg0, Record14 *arg1);
-extern CWorld gScene;
+extern CScene gScene;
 extern s32 CScene__SetEventFired(void *arg0, void *arg1, s32 arg2);
 void LevelEvent_Trigger(void *arg0) {
     extern s32 LevelEvent_Fire(void *arg0);

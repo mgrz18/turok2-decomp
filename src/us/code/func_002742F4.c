@@ -14,7 +14,7 @@ void SndVoicePool_StopByFlags(SndVoicePool *set, u32 mask) {
 
     for (i = 0; i < 17; voice++, i++) {
         if (voice->flags & mask) {
-            SndMgr *owner = voice->mgr;
+            CAudioWorld *owner = voice->mgr;
             void *sound;
 
             voice->stopping = 1;

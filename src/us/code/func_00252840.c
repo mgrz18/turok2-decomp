@@ -28,7 +28,7 @@ static __inline__ void place_at_spawn(CPlayer *p) {
 
 /* Respawn every player at a spawn point, with full health, out of tag mode.
  * A goto loop: as a for/do loop GCC hoists the constant 1 out of it. */
-void CPlayerPool__RespawnAll(CPlayerList *list) {
+void CPlayerPool__RespawnAll(CPlayerPool *list) {
     CPlayer *p;
 
     p = list->m_ActiveList.m_pHead;

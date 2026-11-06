@@ -4,7 +4,7 @@
 #include "common.h"
 #include "structs/world.h"
 s32 *CISet__GetBlock(s32 *tbl, s32 idx);
-s32 CScene__GetLinkGroupCount(CWorld *lv, s32 key) {
+s32 CScene__GetLinkGroupCount(CScene *lv, s32 key) {
     s32 *t = lv->m_pLinkGroupTypes;
     s32 n = t[1];
     s32 *ents = t + 2;

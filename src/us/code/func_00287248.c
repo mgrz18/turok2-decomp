@@ -188,13 +188,13 @@ void CEngineApp__Draw(CEngineApp *level) {
     }
     D_8011F140->m_DisplayListSize = (u32)D_800D8E24 - (u32)D_8011F140->m_pDisplayList;
     if (level->m_Settings.mode == 0xD) {
-        D_8011F140->m_bLines = Automap_IsShown(&level->m_Game.m_DebugLines);
+        D_8011F140->m_bLines = Automap_IsShown(&level->m_Game.m_Automap);
     } else {
         D_8011F140->m_bLines = 0;
     }
     if (D_8011F140->m_bLines != 0) {
         D_800D8E24 = gEngineApp.m_pCurrentFrameData->m_pLineList;
-        Automap_Draw(&level->m_Game.m_DebugLines);
+        Automap_Draw(&level->m_Game.m_Automap);
         drawFade(level);
         {
             Gfx *g = D_800D8E24++;

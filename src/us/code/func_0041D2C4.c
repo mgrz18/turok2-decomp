@@ -8,7 +8,7 @@
 extern int Controller_MenuLeft(struct ControllerProfile *object);
 extern int Controller_MenuRight(struct ControllerProfile *object);
 extern f32 gFrameIncrement;
-extern s32 CPlayerPool__GetIndex(CPlayerList *, s32);
+extern s32 CPlayerPool__GetIndex(CPlayerPool *, s32);
 s32 NameEntryMenu_UpdateName(void *unused, MenuRecAt20V1 *menu) {
     s32 i;
     f32 t;

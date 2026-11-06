@@ -9,8 +9,8 @@ extern u8 D_801102B8[];
 void func_002847D0(void);
 void CScene__DrawGeometry(u8 *world, CCamera *cam);
 s32 Cinema_PathPlaying(void);
-void CPlayerPool__ReloadAnimInfo(CPlayerList *list, CCamera *cam);
-void CPlayerPool__DrawCharacters(CPlayerList *list, CCamera *cam);
+void CPlayerPool__ReloadAnimInfo(CPlayerPool *list, CCamera *cam);
+void CPlayerPool__DrawCharacters(CPlayerPool *list, CCamera *cam);
 void CScene__DrawRegisteredInstances(u8 *world, CCamera *cam);
 void func_00235C30(void *arg0, CCamera *cam);
 void CLevelActorPool__Draw(u8 *arg0, CCamera *cam);
@@ -19,7 +19,7 @@ void CEmitterPool__Draw(u8 *sky, CCamera *cam);
 void CScene__DrawParticles(u8 *world, CCamera *cam);
 void Trail_DrawAll(void *arg0, CCamera *cam);
 void CCamera__DrawGlares(CCamera *cam);
-void CPlayerPool__DrawWeaponOverlays(CPlayerList *list, CCamera *cam);
+void CPlayerPool__DrawWeaponOverlays(CPlayerPool *list, CCamera *cam);
 void Render_SetRenderMode(s32 arg0);
 
 /* Draws the scene through a camera, layer by layer (LibTEngine's CCamera

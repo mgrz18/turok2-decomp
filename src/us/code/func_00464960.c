@@ -39,14 +39,14 @@ extern CPlayer *D_80119874;
 extern s32 D_80119878;
 
 extern s32 ProPackDecompress(Handle **handle, s32);
-extern s32 CScene__GetRegion(CWorld *world, s32);
+extern s32 CScene__GetRegion(CScene *world, s32);
 extern Handle *CCache__AllocateMemoryForDecompression(s32, Handle **handle, s32 size);
 extern void CUSet__Transpose(LevelNode *node, void *data, s32);
-extern s32 func_0042C480(CWorld *world, CVector3 *pos, s32 group, void *info);
-extern s32 func_0042C0B4(CWorld *world, s32 group, s32 key, CWarpPoint *out, s32 max);
-extern s32 *CScene__GetIntelligence(CWorld *world, u16 id);
+extern s32 func_0042C480(CScene *world, CVector3 *pos, s32 group, void *info);
+extern s32 func_0042C0B4(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
+extern s32 *CScene__GetIntelligence(CScene *world, u16 id);
 extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, LevelRecord *rec, s32 mode, s32 index);
-extern s32 CScene__FindRegionAt(CWorld *world, CVector3 *pos);
+extern s32 CScene__FindRegionAt(CScene *world, CVector3 *pos);
 extern void Angle_Wrap(f32 *angle);
 extern void func_0042D980(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00267DBC(CGameObjectInstance *obj);
@@ -59,7 +59,7 @@ extern void CCache__DeallocAndReplaceCompressedData(s32, Handle **handle, Handle
    the same definition. The spawn point is indexed afresh on each use and the position copied with
    memcpy (as in Rage Wars): both set loop.c's insn count and giv benefits, which decide the ROM's
    hoisting of the spawns base and of the angle constants. */
-void CScene__DecompressAnimatedInstances_2(CWorld *world, Handle **handle) {
+void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
     CWarpPoint spawns[4];
     CGameObjectInstance *objects;
     s32 mode;

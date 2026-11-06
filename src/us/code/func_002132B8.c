@@ -24,12 +24,12 @@ typedef struct WTab {
                 WRec r[1];
 } WTab;
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
-extern CWorld gScene;
+extern CScene gScene;
 void *CISet__GetBlock();
 s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
 {
   s32 hashes[64];
-  CWorldSector *list[64];
+  CSceneSector *list[64];
   s32 spare[64];
   s32 n;
   s32 ncell;
@@ -45,8 +45,8 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
   register M5Cell *c asm("$3");
   s32 *wp;
   s32 off;
-  CWorldSector *e;
-  CWorld *g;
+  CSceneSector *e;
+  CScene *g;
   g = &gScene;
   n = 0;
   ncell = 0;
@@ -57,7 +57,7 @@ s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
     off = 0x14AC;
     do
     {
-      e = (CWorldSector *) (((u8 *) g) + off);
+      e = (CSceneSector *) (((u8 *) g) + off);
       c = e->m_pBounds;
       if ((((c->x1 > q->mn.x) && (c->x0 < q->mx.x)) && (c->z1 > q->mn.z)) && (c->z0 < q->mx.z))
       {

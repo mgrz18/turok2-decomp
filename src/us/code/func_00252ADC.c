@@ -25,7 +25,7 @@ static __inline__ s32 menu_open(CPlayer *p) {
 
 /* Animate each living player's weapon model on its own (frame time kept),
  * then put it back on the player; stop the weapon sounds otherwise. */
-void CPlayerPool__AnimateWeapons(CPlayerList *list) {
+void CPlayerPool__AnimateWeapons(CPlayerPool *list) {
     CPlayer *p;
 
     if (D_8011AC8C == 11 || D_8011AC8C == 8) {

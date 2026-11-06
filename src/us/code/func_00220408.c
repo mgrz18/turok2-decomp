@@ -10,7 +10,7 @@ void *CISet__GetBlock(void *table, s32 index);
 extern void CISet__GetBlockSize(s32 arg0, s32 arg1);
 
 s32 CScene__GetInstanceSavedBit(void *arg0, void *arg1) {
-    CWorld *world = arg0;
+    CScene *world = arg0;
     CGameObjectInstance *actor = arg1;
     void *field80;
     void *temp_v0;

@@ -6,13 +6,13 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/light.h"
-void CScene__FindLightsAt(CWorld *lv, CVector3 *a, u8 *buf, s32 *out);
+void CScene__FindLightsAt(CScene *lv, CVector3 *a, u8 *buf, s32 *out);
 void CScene__ComputeLights(u8 *buf, s32 n, CVector3 *a, CLights1 *out);
 extern s32 D_800ACAE0;
 s32 *CISet__GetBlock(s32 *tbl, s32 idx);
 
 /* A separate function in Rage Wars; inlined into this one in Turok 2. */
-static inline s32 hasTbl(CWorld *lv) {
+static inline s32 hasTbl(CScene *lv) {
     s32 i;
     for (i = 0; i < lv->m_nSectors; i++) {
         if (CISet__GetBlock(*lv->m_Sectors[i].m_hData, 2)[1] != 0) {
@@ -21,7 +21,7 @@ static inline s32 hasTbl(CWorld *lv) {
     }
     return 0;
 }
-void CScene__GetLightsAt(CWorld *lv, CVector3 *a1, CLights1 *out) {
+void CScene__GetLightsAt(CScene *lv, CVector3 *a1, CLights1 *out) {
     u8 buf[0x28];
     s32 n;
     if (hasTbl(lv) == 0 || D_800ACAE0 == 0) {

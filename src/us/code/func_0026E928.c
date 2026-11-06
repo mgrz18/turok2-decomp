@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern CWorld gScene;
+extern CScene gScene;
 extern void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2, f32 arg5, f32 arg6, void **arg7);
 void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
                    f32 arg5, f32 arg6, void **arg7) {

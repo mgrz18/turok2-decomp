@@ -22,7 +22,7 @@ struct B18Ent {
     u8 pad528[0xDF8];
     B18Ent *next;       /* 0x1320 (0x16E0) */
 };
-extern CWorld gScene[];
+extern CScene gScene[];
 extern B18Ent *D_80119890;
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CParticle__CheckProximity(s32 unused, B18Ent *o, B18Ent **arr, s32 n) {

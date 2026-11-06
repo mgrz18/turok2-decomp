@@ -8,7 +8,7 @@ s32 Cinema_FollowsPlayer(void);
 
 void Render_ResetBatches();                               /* extern */
 
-void CPlayerPool__DrawCharacters(CPlayerList *arg0, CCamera *arg1) {
+void CPlayerPool__DrawCharacters(CPlayerPool *arg0, CCamera *arg1) {
     CPlayer *var_s0;
 
     Render_ResetBatches();

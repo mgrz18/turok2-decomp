@@ -19,8 +19,8 @@ void alSndpStop(void *sndp);
 void SndVoice_UpdateVolume(SndVoice *o) {
     SndVoiceParams *vp;
     SndEnv *env;
-    SndMgr *settings;
-    SndMgr *ctx;
+    CAudioWorld *settings;
+    CAudioWorld *ctx;
     f32 hear;
     f32 range;
     f32 rangeSq;

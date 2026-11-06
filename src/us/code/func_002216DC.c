@@ -33,14 +33,14 @@ s32 CScene__DecompressGridSection();
 void CCache__Unlock(s32 arg0, void **handle);
 
 /* Loads the grid sections inside the visible bounds that some viewer overlaps. */
-void CScene__LoadVisibleGridSections(CWorld *world) {
+void CScene__LoadVisibleGridSections(CScene *world) {
     s32 size;
     s32 nx;
     s32 x0;
     GridCell *cells;
     Viewer *viewers;
     Viewer *v;
-    CWorldSector *region;
+    CSceneSector *region;
     GridCell *cell;
     void **handle;
     f32 *xMax;

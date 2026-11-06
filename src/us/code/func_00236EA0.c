@@ -21,7 +21,7 @@ typedef struct M04WorldB {
                 void *tab[1];
 } M04WorldB;
 extern M04Msg D_800AD080[];
-extern CWorld gScene;
+extern CScene gScene;
 extern CPlayer *D_80119890;     /* the players, a list through m_pNext */
 /* Dispatch one message through the handler table (inlined). */
 static __inline__ void send_(void *tgt, void *dst, s32 kind, CVector3 p, M04Part q) {

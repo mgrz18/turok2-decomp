@@ -17,7 +17,7 @@ typedef struct {
 } TriGroupList;
 
 extern s32 D_800B6D54;          /* level loaded */
-extern CWorld gScene;
+extern CScene gScene;
 extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
 extern CVector3 D_800F2020;        /* cached raw normal */
 
@@ -75,7 +75,7 @@ static __inline__ f32 TriHeight(CGameRegion *tri, f32 x, f32 z) {
 
 /* The level triangle nearest below pos (other than skip), NULL if none. */
 CGameRegion *CGameRegion__FindBelow(CGameRegion *skip, CVector3 pos) {
-    CWorld *world;
+    CScene *world;
     CGameRegion *tris;
     TriGroupList *list;
     TriGroup *groups;

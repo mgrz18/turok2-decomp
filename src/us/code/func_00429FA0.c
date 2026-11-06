@@ -41,17 +41,17 @@ extern void **CCache__Request(s32, s32, s32, s32, s32, s32 (*)(), char *, s32);
 extern void CCache__Deallocate(s32, void **);
 extern void CCache__Flush(s32);
 extern void CCache__LoadPersistantIndex(s32, s32 *, s32, char *);
-extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, CWorld *, s32 (*)(), char *);
-extern s32 CScene__FindObjectType(CWorld *w, s32 id);
-extern s32 CScene__GetObject(CWorld *w, s32 index);
+extern void **CCache__LoadPersistantSubBlock(s32, s32, s32, s32, CScene *, s32 (*)(), char *);
+extern s32 CScene__FindObjectType(CScene *w, s32 id);
+extern s32 CScene__GetObject(CScene *w, s32 index);
 extern void CScene__ClearListCounts(void);
-extern void CScene__LoadLevel(CWorld *w, s32, s32);
-extern void CScene__InitPersistentData(CWorld *w, s32 file);
-extern void CScene__ConstructWarp(CWorld *w);
-extern void CPlayerPool__LevelStart(CPlayerList *);
+extern void CScene__LoadLevel(CScene *w, s32, s32);
+extern void CScene__InitPersistentData(CScene *w, s32 file);
+extern void CScene__ConstructWarp(CScene *w);
+extern void CPlayerPool__LevelStart(CPlayerPool *);
 
 /* Copies the header of object id's geometry (or clears it when the object is missing). */
-static __inline__ void loadGeomHeader(CWorld *w, CGeomHeader *out, s32 id) {
+static __inline__ void loadGeomHeader(CScene *w, CGeomHeader *out, s32 id) {
     s32 size;
     s32 index;
     s32 file;
@@ -76,7 +76,7 @@ static __inline__ void loadGeomHeader(CWorld *w, CGeomHeader *out, s32 id) {
     }
 }
 
-void CScene__Construct(CWorld *w, s32 file) {
+void CScene__Construct(CScene *w, s32 file) {
     s32 cart;
     s32 res;
     f32 *vec;

@@ -3,7 +3,7 @@
 
 s32 CISet__GetBlock(s32, s32);                    /* extern */
 
-void CScene__DecLinkGroupCount(CWorld *arg0, s32 arg1) {
+void CScene__DecLinkGroupCount(CScene *arg0, s32 arg1) {
     s32 temp_v0;
     u8 *temp_v0_2;
 

@@ -2,11 +2,11 @@
 #include "structs/player.h"
 #include "structs/game.h"
 
-extern s32 CPlayerPool__GetIndex(CPlayerList *list, CPlayer *player);
+extern s32 CPlayerPool__GetIndex(CPlayerPool *list, CPlayer *player);
 
 /* Whether some player sums, over the slots other than CPlayerPool__GetIndex's, at
  * least D_8011ACB0.scoreLimit in options field 0x10. */
-s32 CPlayerPool__IsScoreLimitReached(CPlayerList *list) {
+s32 CPlayerPool__IsScoreLimitReached(CPlayerPool *list) {
     GameMatch *state;
     CPlayer *p;
     s32 skip;

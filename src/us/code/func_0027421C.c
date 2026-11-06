@@ -14,7 +14,7 @@ void SndVoicePool_StopByOwner(SndVoicePool *set, s32 key) {
 
     for (i = 0; i < 17; voice++, i++) {
         if (voice->unkB4 == key) {
-            SndMgr *owner = voice->mgr;
+            CAudioWorld *owner = voice->mgr;
             void *sound;
 
             voice->stopping = 1;
