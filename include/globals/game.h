@@ -37,4 +37,13 @@ extern s32 gEngineApp_m_Settings_match_teamScore[2]; /* .match.teamScore */
 extern s32 gEngineApp_m_Settings_match_tag;       /* .match.tag */
 extern s32 gEngineApp_m_Settings_match_unk44;     /* .match.unk44 */
 
+/* Members of gEngineApp_m_Game with symbols of their own (kept where the ROM
+ * bases the access on them). */
+extern struct CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* .m_PlayerList.m_ActiveList.m_pHead */
+extern s32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount;            /* .m_PlayerList.m_ActiveList.m_nCount */
+extern struct CPlayer *gEngineApp_m_Game_m_PlayerList_m_Players;            /* .m_PlayerList.m_Players */
+extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;                       /* .m_PlayerList.m_nPlayers */
+extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema;                        /* .m_PlayerList.m_bCinema */
+extern CAutomap gEngineApp_m_Game_m_DebugLines;                             /* .m_Automap */
+
 #endif

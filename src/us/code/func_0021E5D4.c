@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/game.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/particle/80246E34_8.CPP, func_8024B2D0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -31,7 +32,6 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-extern int gEngineApp_m_Game_m_PlayerList_m_nPlayers;
 struct TypeEntry;
 typedef struct TypeEntry TypeEntry;
 struct TypeEntry;
@@ -58,7 +58,6 @@ struct LevelActor;
 struct LevelActor;
 extern char gWeaponActorTypeInfo[];
 extern TypeEntry *gIntelligenceTypeInfo[];
-extern char *gEngineApp_m_Game_m_PlayerList_m_Players;
 void func_0021E5D4(char *arg0)
 {
     s32 type;

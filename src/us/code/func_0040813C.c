@@ -21,7 +21,6 @@ typedef struct {
 } BossFight;
 
 
-extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the current player */
 extern u8 gScene[];
 extern u8 D_800B6674[];
 extern u8 gEngineApp_m_OnScreen[];
