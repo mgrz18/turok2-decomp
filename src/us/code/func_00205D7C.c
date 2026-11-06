@@ -8,7 +8,6 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 s32 CCache__FreeMemEntry(s32, s32);
 s32 CCache__AddToAddressList(s32, s32);
-extern s32 gCache_mutex_count;
 s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
 {
   s32 temp_a0;

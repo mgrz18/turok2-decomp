@@ -25,6 +25,7 @@ extern CList gCache_cachePendingList;
 extern s32 gCache_dlistCount[2];
 extern s32 gCache_freeEntryCount;
 extern CMutex gCache_mutex;                 /* the cache lock */
+extern s32 gCache_mutex_count;              /* gCache_mutex.count, kept: the code reaches it by its own %hi/%lo */
 extern s32 gCache_frameDelay;
 extern u32 gCache_ageCount;                 /* the frame stamp CMemEntry.age is compared with */
 

@@ -7,7 +7,6 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 gCache_mutex_count;
 
 /* Releases one use of a resource; the last one clears its 0x100 flag. */
 void CCache__Unlock(s32 arg0, CMemEntry *arg1) {

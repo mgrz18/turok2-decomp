@@ -9,7 +9,6 @@ void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
-extern s32 gCache_mutex_count;
 void CCache__LockForDisplayList(s32 unused, B12Node *n) {
     u32 mask;
     u32 m2;

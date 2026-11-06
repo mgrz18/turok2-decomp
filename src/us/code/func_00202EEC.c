@@ -5,7 +5,6 @@
 #include "globals/cache.h"
 
 extern void CCache__ClearDisplayListLocks(s32, s32);
-extern int gCache_mutex_count;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern s32 gCache_blocker;
 extern s32 gCache_blocker;

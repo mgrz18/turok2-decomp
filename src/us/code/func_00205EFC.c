@@ -10,7 +10,6 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 gCache_mutex_count;
 
 s32 CCache__AllocateMemoryForDecompressionTop(s32 arg0, s32 arg1, s32 arg2)
 {

@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/cache.h"
 
-extern int gCache_mutex_count;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 arg0);

@@ -10,7 +10,6 @@ void __osRestoreInt(s32);
 void CCache__FreeMemEntry(s32, B12Node *);
 void CCache__AddToAddressList(s32, B12Node *);
 extern u8 gHeap[];
-extern s32 gCache_mutex_count;
 B12Node *CCache__AllocateAt(s32 arg0, s32 arg1, s32 arg2)
 {
   s32 temp_a0;

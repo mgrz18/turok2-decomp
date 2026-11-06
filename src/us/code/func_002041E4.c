@@ -9,7 +9,6 @@ void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern B12Mgr D_800D7BE0;
-extern s32 gCache_mutex_count;
 extern u8 gDecompressor[];
 extern u8 gHeap[];
 void CCache__ReleaseDisplayList(s32 a, u32 b);
