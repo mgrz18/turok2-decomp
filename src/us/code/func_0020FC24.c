@@ -5,9 +5,8 @@
 
 extern void CMtxF__SetTranslate(void *matrix, f32 x, f32 y, f32 z);
 void CMtxF__SetTranslate(void *arg0, f32 arg1, f32 arg2, f32 arg3) {
-    extern f32 D_800A55F4;
     Matrix *o = arg0;
-    f32 val = D_800A55F4;
+    f32 val = 1.0f;
     f32 zero = 0.0f;
     o->m[12] = arg1;
     o->m[13] = arg2;

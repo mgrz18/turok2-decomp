@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A54FC;
 void CMtxF__FromMtxAffine(f32 *dst, PackedMatrixWords *src) {
     u32 upper;
     u32 lower;
@@ -20,7 +19,7 @@ void CMtxF__FromMtxAffine(f32 *dst, PackedMatrixWords *src) {
         upper = src->upper[7];
         lower = src->lower[7];
         last = (f32)(s32)((upper & 0xFFFF0000) | (lower >> 16)) * scale;
-        dst[15] = D_800A54FC;
+        dst[15] = 1.0f;
         dst[14] = last;
     }
 }

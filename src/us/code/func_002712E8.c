@@ -212,7 +212,6 @@ typedef struct Table_func_804428F8_de Table_func_804428F8_de;
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 struct ContextRecAt2BC0;
 extern s32 CAudioWorld__Update(void *arg0);
-extern f32 D_800A80D0;
 struct GameplayCamera;
 typedef struct Lights Lights;
 struct Lights {
@@ -376,9 +375,9 @@ s32 CAudioWorld__Update(void *arg0) {
     char *queue;
     u32 mask;
     s32 count;
-    ((struct ContextRecAt2BC0 *)(object))->red = (f32)bytes[0] * D_800A80D0;
-    ((struct ContextRecAt2BC0 *)(object))->green = (f32)bytes[-1] * D_800A80D0;
-    ((struct ContextRecAt2BC0 *)(object))->blue = (f32)bytes[1] * D_800A80D0;
+    ((struct ContextRecAt2BC0 *)(object))->red = (f32)bytes[0] * 0.003921569f;
+    ((struct ContextRecAt2BC0 *)(object))->green = (f32)bytes[-1] * 0.003921569f;
+    ((struct ContextRecAt2BC0 *)(object))->blue = (f32)bytes[1] * 0.003921569f;
     queue = object + 0x110;
     ((struct ContextRecAt2BC0 *)(object))->field2BB0 = bytes[-2];
     mask = __osDisableInt();
