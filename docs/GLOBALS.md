@@ -41,7 +41,7 @@ to check that a declaration change keeps the code, and what is left.
 
 ## Where the declarations live
 
-`include/globals/` holds 40 headers with 837 declarations. Each header includes
+`include/globals/` holds 46 headers with 1,066 declarations. Each header includes
 the struct headers its types need, so any file that uses `common.h` can include it.
 
 | header | subsystem | declares |
@@ -51,7 +51,9 @@ the struct headers its types need, so any file that uses `common.h` can include 
 | `audio.h` | sound world and audio manager | `gAudioWorld` (`CAudioWorld`), SDK audio-manager statics, voice and sequence state, `sPitchRatioTable`, `sSoundKindVolumeTable` (`SoundKindVolume`), `sSpeechSound` (`ALSound`), `sCSPlayerFile` (36) |
 | `boss.h` | boss fights | `gMantidQueen` (`WaveBossState`), `gLevelScript` (`LevelScriptState`) and their kept field symbols; the VM modules' boss scripts and tables (`BossStep*`, `BossAttack`, `WaveBossMinion`, `gMotherSpawnPoints`) (95) |
 | `boss_ai.h` | boss AI | the bosses' AI mode tables (5) |
-| `cache.h` | resource cache (`CCache`) | the cache fields (`gCache_*`), hash sizes, entry counts (22) |
+| `automap.h` | automap | the automap matrices, line indices and double-buffered line vertices (`Vtx_t`, `structs/gbi.h`) (8) |
+| `batch.h` | render batcher | `sBatch*`, `sDrawItems`, `sSortNodes`, the opaque and translucent sort trees (`Material`, `DrawItem`, `SortNode`, `structs/batch.h`) (14) |
+| `cache.h` | resource cache (`CCache`) | `gCache` (`CCache`, `structs/cache.h`), the kept field symbols (`gCache_*`), `gHashTable` (`HashEntry *`), hash sizes, entry counts (24) |
 | `camera.h` | cameras | `gEngineApp_m_Game_m_CameraPool` (`CCameraPool`) and its member symbols, `gCameraModeTable` (`CameraMode`), view and visible boxes, vis bits, tint flags, split-screen margins (17) |
 | `cheat.h` | cheat menu (VM) | `sCheatCodes` (3) |
 | `cinema.h` | cinemas | `gCinemaPlayerP`, `gCinemaEnabled`, `sCinemaLastFrame` (3) |
@@ -62,6 +64,7 @@ the struct headers its types need, so any file that uses `common.h` can include 
 | `enemy.h` | enemy animation | every enemy animation pick table, from `sEnemyAnim<Kind>_<addr>` at 0x800AF6F0 to 0x800B0600, plus `sJoypadTestAnimTable`, all as `CEnemyAnimPick` arrays (74) |
 | `engine.h` | engine loop | frame timing (`gFrameIncrement`, `gFrameCount`...), `gEngineModeTable` (`EngineMode`), engine state flags, scheduler statics, thread priorities, `gBootSignature`, `gEngineTimestamp`, `gAssertFile`, the pak check timer, mode text tables (43) |
 | `event.h` | level events | `gLevelEventHandlers` (`LevelEventHandler *[14]`) (1) |
+| `framebuffer.h` | frame buffers | `gCFB` (`u16 *[]`), `gCurrentFB` (`u16 *`) and the `gRefreshRate` macro for the word after it (2) |
 | `frame.h` | frame loop and scheduler | `gFrameData`, frame and scheduler timing (`gCurrentTick`, `gNumTicks*`, `gWaitingFrames` as `CFrameData *[3]`), the engine queue `gGfxFrameMessageQueue`, `gGfxClient` (`OSScClient`, `structs/sched.h`), `gGfxMsg`, the thread stacks and threads, the RDP fifo, `gIdentityMtx` (`Mtx`), pool buffers (41) |
 | `game.h` | game state | `gEngineApp_m_Game` (`CGame`), `gEngineApp_m_Settings` (`GameSettings`), their kept field symbols, `gEngineApp_m_Settings_cheatFlags` (15) |
 | `hostio.h` | SN host I/O | the I/O thread and its queues, `gHostIoMemoryBounds` (`MemoryBoundaryInit`), PI and state flags, TLB page masks, the DMA message (`OSIoMesg`) and the queue buffers (18) |
@@ -78,12 +81,15 @@ the struct headers its types need, so any file that uses `common.h` can include 
 | `pager.h` | VM pager | `gPager` and its symbols (4) |
 | `pak.h` | controller paks | rumble paks, pak state and errors, file systems, profiles (`PakProfile`), pak-menu state, save handles (`CMemEntry *`), note identity strings (47) |
 | `particle.h` | particles | impact event handlers (`CImpactEventHandler`), projectile scales, trails (5) |
+| `path.h` | region path search | `sPathSearch` and the recursion's working variables (`PathNode`, `PathSearch`, `PathCandidate`, `structs/path.h`) (13) |
 | `pickup.h` | pickups | pickup rows (`CPickupRow18/14/10`, `CDropPickup`) (8) |
 | `player.h` | player | `gPlayerStateTable` (`PlayerStateInfo`), tunings (`CMoveTuning`, `CLookTuning`), button maps, HUD overlay scripts, barrel layouts, weapon actor (53) |
 | `region.h` | regions | one-entry `CGameRegion` caches, surface current rates (7) |
 | `render.h` | rendering | screen size, video modes, frame buffers, `gDefaultLights` (`CLights1`), init, texture and shadow display lists (`Gfx[n]`), render-mode caches, fog masks (39) |
+| `rumble.h` | rumble | `gRumblePool` (`RumblePool`, `structs/rumble.h`), `gRumbleEntries` (2) |
 | `save.h` | saves | `gSavedPlayers` (`CSavedPlayers`) (1) |
 | `scene.h` | the level | `gScene` (`CScene`) and its kept field symbols, the bit-section buffers, the `CIntelligence` objects for level actors and particles (36) |
+| `sysrc.h` | system resources | `gHeap` (`CHeap`), `gLoader` (`CLoader`), `gDecompressor` (`CDecompressor`) (3) |
 | `text.h` | text | `gCreditsLines`, `gLevelMessages` (`LevelMessage`) (2) |
 | `ucode.h` | RSP microcode | the text and data starts of rspboot, F3DEX, L3DEX and aspMain (`u64[]`), `rspbootTextEnd` (8) |
 
@@ -135,22 +141,25 @@ the ROM differs. `make verify` remains the final check.
 
 ## Counts
 
-Both columns use the same counting method: `extern` lines of data in
+All columns use the same counting method: `extern` lines of data in
 `src/**/*.c`, not counting function prototypes. A "named" global is anything
-except a `D_`/`func_`/`jtbl_` address name.
+except a `D_`/`func_`/`jtbl_` address name. (Recounted at `b4bb727f` with the
+round L script the T2 column comes out at 902 lines, 392 names: a few lines
+declare two names.)
 
-| | at `ecba2b71` (round G2) | after round T2 |
-|---|---:|---:|
-| local `extern` lines of named globals | 5,269 (1,967 files, 1,204 names) | 911 (424 files, 400 names) |
-| of them with `/* local type */` | 0 | 238 (156 files) |
-| all local data `extern` lines, `D_` names included | 7,117 | 2,744 |
-| headers in `include/globals/` | 0 | 40 (837 declarations) |
+| | at `ecba2b71` (round G2) | after round T2 | after round L |
+|---|---:|---:|---:|
+| local `extern` lines of named globals | 5,269 (1,967 files, 1,204 names) | 911 (424 files, 400 names) | 330 (202 files, 165 names) |
+| of them with `/* local type */` | 0 | 238 (156 files) | 223 |
+| all local data `extern` lines, `D_` names included | 7,117 | 2,744 | 1,573 |
+| headers in `include/globals/` | 0 | 40 (837 declarations) | 46 (1,066 declarations) |
 
-The 911 remaining lines split into two groups:
+After round L the 330 remaining lines split into two groups:
 
-- 212 lines (92 names) redeclare a global that a header already has. 126 of
-  them are annotated local types; the rest are listed under "Left" below.
-- 699 lines (308 names) are globals that no header declares yet.
+- 211 lines (114 names) redeclare a global that a header already has. All
+  but 15 carry a `local type` or `local:` comment; the 15 are listed under
+  "Left" below.
+- 119 lines (51 names) are globals that no header declares yet.
 
 ## Round T2
 
@@ -199,7 +208,36 @@ Decisions taken during the merge:
   (`gRspInitDL`/`gRdpInitDL` as `Gfx[]`) and `func_00440C20` (the Primagen
   `BossStep` scripts).
 
-## Round L, k1: engine objects
+## Round L
+
+Three agents gave the rest of the named globals their header declarations: k2
+the SDK, scheduler and frame statics (part A), k3 everything else without a
+header (part B), and k1 the engine objects that first needed a struct. They
+were merged after the FAKEMATCH branches and before the literal branches;
+`tools/asm_diff.py` found 0 differing files after each merge. Merge decisions:
+
+- `gGfxMsg` is k2's `OSScMsg *` (`globals/frame.h`); CEngineApp__Main (k4's
+  rewrite on `CEngineApp`) compares it with `(OSScMsg *) &e->m_FrameData[n].m_Msg`.
+- `gPendingFB` is declared once, k1's `u16 *` in `globals/frame.h`;
+  `__scHandleRetrace` swaps it as a `u16 *`.
+- CEngineApp__Main and `Crash_ResetFrameBuffer` (func_0028CEBC) now include
+  `globals/framebuffer.h`: `gRefreshRate = 50.0f`, `gCurrentFB = NULL`,
+  `sCrashFrameBuffer = gCFB[0]` compile as the local views did.
+- `PauseMenu_Close_2` (func_0045328C) frees `&gRumblePool` with its real type
+  (k3 had left an `s32` view for k1); the TotemDefense functions
+  (func_00407F20, func_0040813C, func_004082A0) take k3's `TotemDefenseState`
+  instead of their local `BossFight` view.
+
+### Part A: the SDK, the scheduler and the frame (k2)
+
+libultra's types moved to `include/ultra_types.h` (`OSPifRam`, `OSTask`,
+`OSPiHandle`, `OSIoMesg`, `__OSEventState`, `OSIntMask`, `du`/`fu`) and out of
+`rw/abu_types.h` and eleven files' local copies; `structs/sched.h` has `OSScMsg`
+and `OSScClient`, `structs/adec.h` the decoder's state. The libultra, adec,
+HostIo, crash-screen, frame and microcode statics are in their headers (see the
+table above); the `al*` filter handlers are prototypes, not `char` views.
+
+### Engine objects (k1)
 
 The system resources and the cache now have their real structs, and their users read them
 through those structs: `gHeap` (CHeap), `gLoader` (CLoader), `gDecompressor` (CDecompressor)
@@ -223,11 +261,11 @@ Local externs of these objects (and of the `gCache_*` field symbols): 141 -> 31.
 - Left: `gScheduler` (OSSched, 4 files) waits for `structs/sched.h` (k2 has OSTask in
   ultra_types.h); `gEngineApp_m_SwooshSystem` (17 files) needs a CSwooshSystem layout (the
   ribbon vertex pool at 0, the swoosh list at 0x7514, the timers at 0x7580, the swoosh set
-  lists at 0x94D8/0x95A0) that is not worked out yet; `func_00204778` and `func_00286674`
-  (FAKEMATCH files, k4) still declare gCache/gHeap_usedHead/gCFB/gCurrentFB locally;
-  `func_0028CEBC` (gCFB as a word), `func_0028C0B0` and `func_0026EE40` keep a `local type`.
+  lists at 0x94D8/0x95A0) that is not worked out yet; `func_00204778` (a FAKEMATCH file)
+  still declares the `gCache_*` fields and `gHeap_usedHead` locally;
+  `func_0028C0B0` and `func_0026EE40` keep a `local type` of `gCFB`/`gCurrentFB`.
 
-## Round L, globals without a header (part B)
+### Part B: globals without a header (k3)
 
 Part B covered every named global still declared only by local `extern`s,
 except the SDK/scheduler/frame ones (part A) and the engine objects that
@@ -267,71 +305,40 @@ an array or struct view (`/* local type */`): the header documents it, and a
 file that drops its view gets the right type. 13 older local redeclarations
 were dropped because the header type compiles the same.
 
-Left in part B (each needs a code rewrite, not a declaration):
-
-- Field symbols whose files read them as arrays or through a struct view and
-  also include the header, so the header type would clash:
-  `gEngineApp_m_Settings_difficulty`, `_match_seconds/_minutes/_hours`,
-  `gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount`, `_m_bCinema`,
-  `gLevelScript_script`, `_script2_cursor`, `_script3_cursor`, `_scriptCOn`,
-  `_swayPhase`, `_values`, `gMantidQueen_waveActive`, `gMotherBoss_phase`,
-  `_activeMask`, `_liveMask`, `_counter`, `gPakProfileRead_character`.
-- The audio manager's DMA state (`gAudioDmaState`, `_firstUsed`, `_firstFree`,
-  `gAudioDmaBuffers`, `gAudioDmaCache`, `gAudioCmdLists`, `gAudioInfo`): the SDK
-  `AMDMAState`/`AMDMABuffer`, read through four different local views
-  (`Window`, `DMAState`, `B12DbEnt2`...); `__amDMA` and `__CSPVoiceHandler`
-  are functions.
-- Struct views still local to two files: `gVideoModeFlags` (`ScreenExtra` /
-  `VideoFlags`), `gParticleSpriteVtx` (`DirLight`, and `func_0022D2FC`),
-  `gDLightBuffer` (`UnitLight`), `sResizedViMode` (an `OSViMode` with packed
-  register halves), `gScreenViewport` (`Vp`: `globals/render.h` cannot include
-  `structs/gbi.h`, several files define their own `Mtx`).
-- Next to other tasks' files: `sBoneMatrixProfile`/`sBoneMatrixCount`
-  (`func_0021CDAC`, next to `gEngineApp_m_SwooshSystem`), `gRumbleEntries`
-  (`RumblePool`), `gCache` and the `gCache_*` field symbols.
+What part B left (field symbols read through views, the audio DMA state, struct
+views local to one or two files) is listed under "Left" below.
 
 ## Left
 
-- **Globals without a header (699 lines, 308 names).** The largest groups:
-  - Objects that still need a real struct type: `gHeap` (`CHeap`), `gLoader`
-    (`CLoader`), `gDecompressor` (`CDecompressor`), `gHashTable`, `gRumblePool`
-    (`RumblePool`), `gEngineApp_m_SwooshSystem` (`CSwooshSystem`), `gScheduler`.
-  - Frame buffers and the scheduler: `gCFB`, `gCurrentFB`, `gScheduler` (its
-    `OSSched` with Acclaim's 0x80 extra bytes, and `OSScTask`, are still local
-    views in the scheduler files and `rw/abu_types.h`), `gPoolBuffers` (its
-    `GfxPool` is a local struct in two files), `sBootMarker` (.rodata),
-    `gVMPages`.
-  - libultra, libaudio, the adec decoder, HostIo, the crash screen and the frame
-    statics are all in their headers. Six SDK controller files keep a
-    `local type` array view of `__osContLastCmd` or `__osContNumControllers`
-    (`osContStartQuery`, `osContStartReadData`, `osContReset`,
-    `__osContGetInitData` and its two module copies): as a scalar, a pointer
-    local or a cast, GCC 2 no longer keeps the address in a register the way
-    the ROM does.
-  - Field symbols not declared yet: `gEngineApp_m_Settings_difficulty`,
-    `gEngineApp_m_Game_m_PlayerList_m_*`, `gEngineApp_m_OnScreen_m_*`,
-    `gLevelScript_path/_script*`, `gMantidQueen_boss`, `gMotherBoss_*`,
-    `gTotemDefense_kills`, `gPager_entries/_slots`, `gPakProfileRead_character`.
-  - Other subsystems: the automap, the render batcher (`sBatch*`,
-    `s*SortFirst/Root`), the region normals (`sRegionNormal`...), the animation
-    and pose statics (`sAnimRemap*`, `sPose*`), the audio DMA buffers, and the
-    adec frame slots (`D_80125EF0`).
-- **Local views of header globals without a `local type` comment (86 lines):**
-  - The `CCache` files read the cache through their own struct views and do not
-    include `globals/cache.h`: `func_002031E8`, `func_00203330`,
-    `func_002034F4`, `func_0020367C`, `func_00203CA0`, `func_002044A8`,
-    `func_00204778`, `func_00204DE0`, `func_00206250`, `func_002062F8`,
-    `func_00206498`, `func_00206870`.
-  - The merge files listed above.
-  - A few files that read `gLevelScript_bossState/_bossMode`,
-    `gEngineApp_m_Game`, `gEngineApp_m_Settings`, `gRandomValue` or
-    `sHostIoSavedTlb` through their own types: `func_00407410`,
-    `func_004075F8`, `func_00440410`, `func_004405F8`, `func_004407AC`,
-    `func_0041CE6C`, `func_0041CF68`, `func_00455DC0`, `func_00455EBC`,
-    `func_00420454`, `func_0028D714`, `func_00211384`, `func_002A13F0`.
-- **Two untyped views of boss globals.** `func_00402E6C` and `func_0043EC68`
-  keep `u8 []`/`M2C_UNK` views of `gMantidQueen`/`gLevelScript`, which are now
-  typed in `globals/boss.h`. The typed versions do not match yet.
-- **The 238 `local type` lines** are the list to revisit when a struct gets a
+- **Globals without a header (119 lines, 51 names).**
+  - `gEngineApp_m_SwooshSystem` (16 files): needs a `CSwooshSystem` layout.
+  - `gScheduler` (4 files): its `OSSched`, with Acclaim's 0x80 extra bytes,
+    and `OSScTask` are still local views in the scheduler files.
+  - Field symbols whose files read them as arrays or through a struct view
+    and also include the header, so a header type would clash:
+    `gMotherBoss_activeMask` (8 files), `_phase`, `_liveMask`, `_counter`,
+    `gEngineApp_m_Settings_difficulty` (6), `_match_seconds/_minutes/_hours`,
+    `gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount` (5), `_m_bCinema`,
+    `gLevelScript_script`, `_script2_cursor`, `_script3_cursor`,
+    `_scriptCOn`, `_swayPhase`, `_values`, `gMantidQueen_waveActive`,
+    `gPakProfileRead_character`.
+  - The audio manager's DMA state (`gAudioDmaState`, `_firstUsed`,
+    `_firstFree`, `gAudioDmaBuffers`, `gAudioDmaCache`, `gAudioCmdLists`,
+    `gAudioInfo`): the SDK `AMDMAState`/`AMDMABuffer`, read through four
+    different local views.
+  - Struct views local to one or two files: `gVideoModeFlags`,
+    `gParticleSpriteVtx`, `gDLightBuffer`, `sResizedViMode`,
+    `gScreenViewport`, `gPoolBuffers`, `sBoneMatrixProfile`/`sBoneMatrixCount`,
+    `gHeap_usedHead`, `sBootMarker`.
+  - Functions declared as data to take their address (callbacks such as
+    `Texture_DecompressCallback`, `ProPack__Decompress`, `__amDMA`,
+    `__CSPVoiceHandler`): these want prototypes, not header data.
+- **Header globals redeclared without a `local` comment (15 lines):** the
+  `gCache_*` fields in `func_00204778` (FAKEMATCH); the split-screen margins in
+  `func_0027ECF0`; `sHostIoSavedTlb` in `func_002A13F0`;
+  `gLevelScript_bossState/_bossMode` in `func_00407410`, `func_0043EC68`,
+  `func_00440410`, `func_004407AC`; `gEngineApp_m_Game`/`_m_Settings` in
+  `func_00420454`.
+- **The 223 `local type` lines** are the list to revisit when a struct gets a
   better layout or a function is rewritten. Most are GCC 2 alias-order cases:
   an array view keeps a load after a store, where a scalar would let GCC hoist it.

@@ -755,7 +755,32 @@ rewrite taught about the compiler:
 - **A `CVector3` passed by value** gives the same three `lw a1-a3` as the
   three floats m2c passed as words, so the by-value prototype can be used.
 
-### Literals in the VM modules (the L pass)
+### .rodata literals (the L pass)
+
+Two agents turned the anonymous `D_` externs into the pools of C literals:
+k7 the engine files, k8 the VM modules. Each converted file owns its slice of
+`code_rodata` (`[rom, .rodata, code/<file>]`); the yaml has 849 such
+subsegments, 604 before the pass. Neither agent could build, so the merge's
+build was the first test. It needed two fixes (commit `18050147`):
+
+- **Strings other files still read by address** need a definition once their
+  label leaves the asm. Six more went into `versions/symbols_manual.us.txt`:
+  the module-2 asm copies read their originals' strings, and Pak_ReadNote
+  reads readNote's "Mempak read temp data".
+- **A raw piece cannot start off a word.** The `code_rodata` output section
+  is `SUBALIGN(4)`, so the linker moves a `rodata` piece at an odd address
+  up to the next word. Where the bytes up to the word are zero, the piece now
+  starts on the word (0xA642C, 0xAACEC, 0xAB2D4) or is gone (eight 1-3 byte
+  zero pieces): the object's own padding gives them. Where they are linker
+  fill (below), C cannot give them, and six engine conversions were reverted.
+
+After the merge 605 distinct `D_` names are left in `src/` (1,076 before):
+91 point into the pools (53 into the engine's .rdata, 38 into the VM tail
+pool), each with a reason below; 514 are data (419 in the menu and pak tables
+after .rodata, 95 other data and BSS), which is initialised data of tables,
+not literals.
+
+#### The VM modules (k8)
 
 The VM files (module 1 at 0x400000 and its module-2 copies) read their
 floats and strings through anonymous `D_` externs in the KSEG0 pools: the
@@ -819,15 +844,15 @@ What is left, and why:
 - data the code reads in the pools (the cheat table at 0x800C1144, which
   the data also points at; the cinema words at 0x800C1BC4).
 
-### Engine .rodata as C literals (the L pass, k7)
+#### The engine (k7)
 
 The engine files read 446 anonymous `.rodata` symbols (`D_800A51F8`-
 `D_800AB0A7`: float and double pools, `CCache__Request` descriptions,
-`__assert` file names) through `extern` declarations; 36 symbols are left,
-in 71 extern lines of 513, in 44 files. Each converted file writes the values as
+`__assert` file names) through `extern` declarations; 48 symbols are left, in
+47 files (36 after the branch; the merge reverted six files, 12 symbols). Each converted file writes the values as
 literals (`1.0f / mag`, `4294967296.0`, `"anim geometry"`) and owns its slice
-of `code_rodata` in the yaml: 208 new `[rom, .rodata, code/<file>]`
-subsegments, grown or carved out of the `rodata` asm around them.
+of `code_rodata` in the yaml: 202 new `[rom, .rodata, code/<file>]`
+subsegments (208 in the branch), grown or carved out of the `rodata` asm around them.
 
 `tools/rodata_match.py` is the check, since `tools/asm_diff.py` reports any
 such edit as a difference by construction. It compiles the file through the
@@ -860,6 +885,12 @@ What the pass showed:
 
 Left as externs, and why:
 
+- Strings followed by linker fill: func_00227C10's "anim object index" and
+  "anim object info", and the `"EX"` and file-name `__assert` strings of
+  func_002972E0 ("audio/save.c"), func_0029A080, func_0029A3A0,
+  func_0029B410 and func_0029B4B0 (the io/ raw DMA files). The branch
+  converted them; `rodata_match.py` compares only the slice, and the build
+  showed that the bytes after each string are fill, not zeros. Reverted.
 - Strings two or more files name (one file in the original, still split):
   func_0020B7F8/func_0020B9F4, func_00214844/func_00214D04,
   func_00214B58/func_00214DBC, "anim object info" (func_00219F74,
