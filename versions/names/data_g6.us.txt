@@ -1,0 +1,336 @@
+// Data symbols 0x8011002C-0x8FFFFFFF (part g6). Not applied yet (apply_names handles functions only).
+// Convention (coordinator): a symbol inside a known object is gObject_<field path>, with the exact
+// struct member names joined by "_" (gEngineApp = D_800F6CB0, gScene = D_800F7078 = gEngineApp +0x3C8).
+// Array elements other than [0] (weaponEnabled[3], slots[1].m_Deaths, ...) are left unnamed.
+
+// ---- gScene (CWorld, structs/world.h): fields with symbols of their own, 0x800F7078 + offset ----
+gScene_m_WarpTime = 0x8011002C; // CWorld +0x18FB4; Cinema_RestorePlayer
+gScene_m_bWarpSpawn = 0x80110030; // CWorld +0x18FB8; Cinema_Start, Crash_ShowScreen
+gScene_m_WarpSpawn = 0x80110034; // CWorld +0x18FBC (CWarpPoint); Cinema_Start
+gScene_m_LevelID = 0x80110048; // CWorld +0x18FD0, the warp id of the loaded level; 28 users (Cinema_Start, CPlayer__LevelStart, TotemDefense_Update, MissionMenu_InitStatus...)
+gScene_m_WarpID = 0x8011004C; // CWorld +0x18FD4; Cinema_RestorePlayer
+gScene_unk_18FDC = 0x80110054; // CWorld +0x18FDC: a warp id kept for later (CPlayer__Update stores material->item, PakMessage_SelectOk passes it to CScene__RequestWarp); the field could be m_PendingWarpID
+gScene_m_PreviewState = 0x80110058; // CWorld +0x18FE0; NOTE CBarrel__Open and CPlayer__GetNextUsableWeapon read it as the first usable weapon - 1: the field name looks wrong
+gScene_m_PreviewTimer = 0x8011005C; // CWorld +0x18FE4; NOTE read as the weapon count by CBarrel__Open, CPlayer__GetNextUsableWeapon (set to 0x22 next to m_PreviewState = 0): the field name looks wrong
+gScene_m_PreviewOptions = 0x80110060; // CWorld +0x18FE8: the unlocked-cheat bits last announced (SaveGame_Restore, EnterCheatMenu_Enter, GameNoteMenu_SelectYes copy unlockedCheats in)
+gScene_m_Geom = 0x80110064; // CWorld +0x18FEC (CGeomHeader[5], [0] here); Render_DrawModelShared ("shared material")
+
+// ---- gEngineApp (D_800F6CB0) after the scene: on-screen text and the swoosh system ----
+gEngineApp_m_OnScreen = 0x801100F0; // CEngineApp +0x19440, COnScreen (structs/player.h): COnScreen__Construct((u8 *)e + 0x19440) in CEngineApp__Main (Turok 3 does the same with its unk_0x1D7E0); NEEDS a member m_OnScreen in CEngineApp (now unk19440 bytes); n5 called it g_OnScreen
+gEngineApp_m_OnScreen_m_TopR = 0x80110190; // COnScreen +0xA0, the font colours; COnScreen__SetFontColor
+gEngineApp_m_OnScreen_m_FontXScale = 0x801101A8; // COnScreen +0xB8; COnScreen__SetFontScale
+gEngineApp_m_OnScreen_m_ShadowXOff = 0x801101B0; // COnScreen +0xC0 (shadow x/y read as s32[2]); COnScreen__BeginText, Render_DrawTextLines, MenuPool_CloseMenu
+gEngineApp_m_OnScreen_m_CharacterSmallLookUpPos = 0x801101B8; // COnScreen +0xC8, the glyph lookup; COnScreen__DrawText
+gEngineApp_m_SwooshSystem = 0x801102B8; // CEngineApp +0x19608, right after COnScreen (0x1C8): the swoosh/trail system passed to SwooshSystem_Update, RibbonVtxPool_Reset, SwooshSet_FreeOwner, Trail_DetachOwner (CScene__Update, CParticleSystem__*); NEEDS a member in CEngineApp
+
+// ---- gEngineApp.m_Game (CGame D_80119870 = gEngineApp +0x22BC0, structs/game.h) ----
+gEngineApp_m_Game = 0x80119870; // CGame: the player list, camera pool, menus, automap and settings (CEngineApp.m_Game); 98 users (CScene__LoadLevel, CCamera__DrawScene, CPlayer__Warp...)
+gEngineApp_m_Game_m_PlayerList_m_Players = 0x80119874; // CPlayerList +0x04, the CPlayer array (0x1328 each); CGameObjectInstance__Construct, CScene__DecompressAnimatedInstances
+gEngineApp_m_Game_m_PlayerList_m_nPlayers = 0x80119878; // CPlayerList +0x08, the player count (Turok 3's CPlayerPool); PlayerPool_GetNumPlayers, CPlayer__StartGame, CPlayer__LoseLife
+gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead = 0x80119890; // CPlayerList +0x20 (m_ActiveList.m_pHead): the first active player, a list through m_pNext; 31 users (BlindOne_ActorUpdate, Cinema_GetFOVTrack, ImpactEvent_Send, CParticle__Steer...)
+gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount = 0x801198A0; // CPlayerList +0x30, the players in the game; CEngineApp__Update (3 and more: 20 fps), ContinueMenu_No, StatsMenu_ContinueNo
+gEngineApp_m_Game_m_PlayerList_m_bCinema = 0x801198A4; // CPlayerList +0x34 (m_bCinemaStarted after it); Cinema_Update, GameNoteMenu_SelectYes, SavePortalMenu_SelectGoBack
+gEngineApp_m_Game_m_PlayerList_m_bCinemaStarted = 0x801198A8; // CPlayerList +0x38; CEngineApp__Update
+gEngineApp_m_Game_m_CameraPool = 0x801198B0; // CGame +0x40, CCameraPool (structs/camera.h; Turok 3's m_CameraPool); 36 users (CPlayer__Hurt, CScene__UpdateWarp, CCameraPool__Advance...); also declared CGameFromCameraPool where the settings are read through it
+gEngineApp_m_Game_m_CameraPool_m_Cameras = 0x801198B4; // CCameraPool +0x04; CCamera__AdvanceAttributes
+gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead = 0x801198D0; // CCameraPool +0x20, the active cameras (views); CParticleSystem__Draw/Spawn, ImpactEvent_FlashScreens, CCameraPool__ReleaseAllTexts
+gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount = 0x801198E0; // CCameraPool +0x30, the active camera count; CParticleSystem__Spawn, Hud_DrawMatchClock, CCamera__DisplayListSetup
+gEngineApp_m_Game_m_CameraPool_m_bActiveChanged = 0x801198E8; // CCameraPool +0x38; Video_ApplyResolution, CCamera__DisplayListSetup
+gEngineApp_m_Game_m_CameraPool_m_MainCamera = 0x801198F0; // CCameraPool +0x40 (CCamera); CCamera__DisplayListSetup, Video_SetMode, EngineMode03_ExpansionPak_Draw
+gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos = 0x80119928; // CCamera +0x24 +0x14; CScene__DecompressAnimatedInstances (start position, 204.8 up)
+gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion = 0x80119948; // CCamera +0x24 +0x34; CScene__DecompressAnimatedInstances (CScene__FindRegionAt)
+gEngineApp_m_Game_m_MenuPool = 0x80119E2C; // CGame +0x5BC (= the main camera's m_MenuPool, MenuPool structs/menu.h): every MenuPool_OpenMenu/CountOpen caller; 59 users (CPlayerPool__Update, PakMenu_*, PakMessage_*)
+gEngineApp_m_Game_m_DebugLines = 0x8011AAA0; // CGame +0x1230, the automap state (CDebugLines); CPlayer__Update, CPlayer__UpdateZoom, CPlayerPool__Update
+
+// ---- gEngineApp.m_Settings (GameSettings D_8011AAD8 = gEngineApp +0x23E28, structs/game.h; Turok 3's m_Options + m_Sun + mode block) ----
+gEngineApp_m_Settings = 0x8011AAD8; // GameSettings: cheats, options, MP setup, engine mode, match; 891 uses in 256 files (CheatMenu_*, CPlayer__Update, MpMenu_Start*...)
+gEngineApp_m_Settings_unlockedCheats = 0x8011AADC; // +0x04; CheatMenu_*Text, EnterCheatMenu_Enter (227 uses)
+gEngineApp_m_Settings_difficulty = 0x8011AAE0; // +0x08: 8, 16 or 32, also the visible-layer mask; OptionsMenu_CycleDifficulty, AI_InitHealth, CScene__BuildActorLists
+gEngineApp_m_Settings_unkC = 0x8011AAE4; // +0x0C: the brightness 0-255 (OptionsMenu_BrightnessText, Lighting_WriteVertexColors); the field could be brightness
+gEngineApp_m_Settings_hudAlphaSetting = 0x8011AAE8; // +0x10
+gEngineApp_m_Settings_hudAlpha = 0x8011AAEA; // +0x12; COverlay__Update, COnScreen__DrawBossBars, CBarrel__DrawIcons
+gEngineApp_m_Settings_unk13 = 0x8011AAEB; // +0x13: an option byte CAudioWorld reads (sound.h unk2BB0)
+gEngineApp_m_Settings_unk14 = 0x8011AAEC; // +0x14: the music volume per SoundMenu_StepMusicVolume (sound.h: volume2BA4)
+gEngineApp_m_Settings_unk15 = 0x8011AAED; // +0x15: the sfx volume (SoundMenu_StepSfxVolume, CAudioWorld__Initialize/Update)
+gEngineApp_m_Settings_unk16 = 0x8011AAEE; // +0x16: the speech volume per SoundMenu_StepSpeechVolume (sound.h calls its copy musicVolume: one of the two is wrong)
+gEngineApp_m_Settings_unk17 = 0x8011AAEF; // +0x17: the blood colour (OptionsMenu_StepBloodColor, CParticleSystem__Spawn, EnemyAI_PickDeathMode)
+gEngineApp_m_Settings_unk18 = 0x8011AAF0; // +0x18: the debug mode (Menu_StepDebugMode, Menu_DebugModeLabel)
+gEngineApp_m_Settings_multiplayer = 0x8011AAF1; // +0x19; 138 uses (CPlayer__*, Generator_Advance, Pickup_GiveWeapon...)
+gEngineApp_m_Settings_playerCount = 0x8011AAF2; // +0x1A; Generator_Advance
+gEngineApp_m_Settings_unk1B = 0x8011AAF3; // +0x1B: two players side by side (OptionsMenu_StepTwoPlayerLayout, CCameraPool__Advance)
+gEngineApp_m_Settings_speed = 0x8011AAF4; // +0x1C; MpMenu_StepPlayerSpeed, MpMenu_PlayerSpeedLabel
+gEngineApp_m_Settings_dmArena = 0x8011AAFA; // +0x22; BloodLustMenu_LevelLabel
+gEngineApp_m_Settings_dmTextureSet = 0x8011AAFB; // +0x23; BloodLustMenu_TextureSetLabel
+gEngineApp_m_Settings_dmCrosshairs = 0x8011AAFC; // +0x24; BloodLustMenu_CrosshairsLabel, CPlayer__DrawTargetMarkers
+gEngineApp_m_Settings_tagArena = 0x8011AAFF; // +0x27; FragTagMenu_LevelLabel
+gEngineApp_m_Settings_tagTextureSet = 0x8011AB00; // +0x28; FragTagMenu_TextureSetLabel
+gEngineApp_m_Settings_tagCrosshairs = 0x8011AB01; // +0x29; FragTagMenu_CrosshairsLabel, CPlayer__DrawTargetMarkers
+gEngineApp_m_Settings_teamArena = 0x8011AB04; // +0x2C; TeamBloodMenu_LevelLabel
+gEngineApp_m_Settings_teamTextureSet = 0x8011AB05; // +0x2D; TeamBloodMenu_TextureSetLabel
+gEngineApp_m_Settings_teamCrosshairs = 0x8011AB06; // +0x2E; TeamBloodMenu_CrosshairsLabel, CPlayer__DrawTargetMarkers
+gEngineApp_m_Settings_weaponEnabled = 0x8011AB08; // +0x30 u8[10]; WeaponsMenu_ToggleLabel (elements 0x8011AB09-0x8011AB11, read by Generator_IsPickupUnlocked, left unnamed)
+gEngineApp_m_Settings_defaultSlot = 0x8011AB18; // +0x40 CPlayerOptions, the single player's; OptionsMenu_*, TitleMenu_Single, Menu_ClaimPressingController
+gEngineApp_m_Settings_defaultSlot_m_nController = 0x8011AB47; // +0x40 +0x2F; TitleMenu_Single
+gEngineApp_m_Settings_slots = 0x8011AB58; // +0x80 CPlayerOptions[4]; MpMenu_Start*, StatsMenu_*Text, Mp_JoinPressingController
+gEngineApp_m_Settings_unk180 = 0x8011AC58; // +0x180: the hi-res option (OptionsMenu_ToggleResolution, GameNoteMenu_SelectYes)
+gEngineApp_m_Settings_mode = 0x8011AC88; // +0x1B0, the engine mode (Turok 3's m_Mode); Cinema_RestorePlayer, COverlay__Update, Controller_Service, CAudioWorld__Update
+gEngineApp_m_Settings_nextMode = 0x8011AC8C; // +0x1B4; CPlayerPool__Update, Automap_Draw, CCamera__AdvanceAttributes
+gEngineApp_m_Settings_unk1C8 = 0x8011ACA0; // +0x1C8: set on pre-NMI (CEngineApp__Main); Sound__Play*, Music_SetTrack do nothing while it is set
+gEngineApp_m_Settings_paused = 0x8011ACA4; // +0x1CC; 42 uses (CPlayer__IsPausedOrInMenu, CParticleSystem__Update, CLevelActor__Update...)
+gEngineApp_m_Settings_matchMode = 0x8011ACA8; // +0x1D0; CPlayer__Activate, CPlayerPool__Update
+gEngineApp_m_Settings_match = 0x8011ACB0; // +0x1D8 GameMatch (Rage Wars' RenderCounters/GameRules); CEngineApp__UpdatePlayTime, CPlayerPool__EndMatch, SaveGame_Build
+gEngineApp_m_Settings_match_seconds = 0x8011ACB4; // GameMatch +0x04; GameNoteMenu_SelectYes
+gEngineApp_m_Settings_match_minutes = 0x8011ACB8; // GameMatch +0x08; GameNoteMenu_SelectYes
+gEngineApp_m_Settings_match_hours = 0x8011ACBC; // GameMatch +0x0C; GameNoteMenu_SelectYes
+gEngineApp_m_Settings_match_countdown = 0x8011ACC0; // GameMatch +0x10; GameOverMenu_Init/Poll
+gEngineApp_m_Settings_match_over = 0x8011ACCC; // GameMatch +0x1C; RumbleMenu_Poll, CharacterMenu_Poll, TeamMenu_Poll, NameEntryMenu_IsMatchOver
+gEngineApp_m_Settings_match_teams = 0x8011ACD4; // GameMatch +0x24; Player_OnMultiplayerKill, CPlayer__DrawTargetMarkers
+gEngineApp_m_Settings_match_teamScore = 0x8011ACDC; // GameMatch +0x2C, [0] blue; FinalScoreMenu_BlueScoreLabel ([1], 0x8011ACE0, red, left unnamed)
+gEngineApp_m_Settings_match_tag = 0x8011ACE4; // GameMatch +0x34; CPlayer__Update, StatsMenu_ShowTagsRow, CPlayer__SetCharacter
+gEngineApp_m_Settings_match_tagPhase = 0x8011ACF0; // GameMatch +0x40; RumbleMenu_Play, CPlayerPool__NewGame
+gEngineApp_m_Settings_match_unk44 = 0x8011ACF4; // GameMatch +0x44: the ending cinema (script 0x78) was told to stop (CEngineApp__Update); cleared by EngineMode13_Game_Init
+gEngineApp_m_Settings_match_unk48 = 0x8011ACF8; // GameMatch +0x48; set by Credits_Update
+
+// ---- engine globals after CEngineApp (Turok 3's tengine names; CEngineApp__Main clears them in Turok 3's order) ----
+gCreditsDone = 0x8011AD00; // set by Credits_Update and the A press in EngineMode15/16_Ending_Retrace, cleared by EngineMode15/16_Ending_Init
+gLastEngineUpdate = 0x8011AD08; // Turok 3 "LastEngineUpdate": osGetTime of the last CEngineApp__Update
+gNextTicks = 0x8011AD10; // Turok 3 "nNextFields": the retraces of this frame (CEngineApp__Update), read by CEngineApp__Draw, Demo_*MatchStream
+gNumTicks2 = 0x8011AD14; // Turok 3 "n_ll_fields": retrace counts of the last frames, shifted by __scHandleRDP
+gWaitingFrames = 0x8011AD18; // CFrameData *[3]: frames done but not yet shown, a ring indexed by gCurrentTickWaiting / D_800F6CA4 (__scHandleRDP, __scHandleRetrace)
+gGfxFrameMessageQueue = 0x8011AD28; // Turok 3 "gfxFrameMsgQ": the engine thread's queue (CEngineApp__Main, CEngineApp__Construct, CEngineApp__SubmitGfxTask)
+gPakCheckTimer = 0x8011AD40; // 120 at boot (CEngineApp__Main), counted down by EngineMode00_PakCheck_Retrace
+gCurrentTick = 0x8011AD88; // Turok 3 "c_field": retraces since the last swap (__scHandleRetrace)
+gScheduler = 0x8011AD90; // Turok 3 "sc", OSSched: osScAddClient / Sched_SubmitTask in CEngineApp__Construct / CEngineApp__SubmitGfxTask, __amMain
+gPendingFB = 0x8011B098; // Turok 3 "p_pending_fb": the frame buffer just swapped in (__scHandleRetrace)
+gNumTicks3 = 0x8011B09C; // Turok 3 "n_lll_fields" (fourth of the four retrace counts)
+gCurrentFB = 0x8011B0A0; // Turok 3 "p_current_fb": the frame buffer on screen; the word after it is the refresh rate (50/60, Turok 3's gRefreshRate), read as D_8011B0A0[1] / VideoRate.hz
+gScreenViewport = 0x8011B0A8; // Vp[2], one per buffer; CEngineApp__BeginDisplayList, Automap_Draw
+gIdentityMtx = 0x8011B0C8; // Mtx, guMtxIdent in CEngineApp__Construct; loaded by CEmitterPool__Draw
+gPakMenuStartPressed = 0x8011B108; // set by PakMenu_PollStartPressed and the any-pak save errors, cleared by PakMenu_SelectCancel
+gNumTicks0 = 0x8011B10C; // Turok 3 "n_fields"
+gDisplayListCount = 0x8011B110; // Turok 3 "nDisplayLists": 2 at boot, counted up on a done message in switch mode (CEngineApp__Main), CEngineApp__Retrace
+gPakCheckTimedOut = 0x8011B118; // gPakCheckTimer ran out (EngineMode00_PakCheck_Init/Retrace)
+gCreditsTimeLeft = 0x8011B11C; // Credits_Update, EngineMode15/16_Ending_Retrace
+gGfxFrameMessageBuffer = 0x8011B120; // Turok 3 "gfxFrameMsgBuf": the OSMesg[0x1000] of gGfxFrameMessageQueue (CEngineApp__Construct)
+gCreditsScroll = 0x8011F120; // Credits_Update, Credits_Draw, EngineMode15/16_Ending_Init
+gGfxMsg = 0x8011F124; // Turok 3 "pMsg": the message CEngineApp__Main received
+gGfxClient = 0x8011F128; // Turok 3 "gfxClient", OSScClient: osScAddClient(gScheduler, ...) in CEngineApp__Construct
+gNumTicksPending = 0x8011F130; // Turok 3 "n_pending": a swap pending (__scHandleRetrace, __scHandleRDP)
+gCurrentTickWaiting = 0x8011F134; // Turok 3 "c_waiting": the write index of gWaitingFrames
+gNumTicksWaiting = 0x8011F138; // Turok 3 "n_waiting": frames waiting to be shown
+gPakCheckHasPak = 0x8011F13C; // PakMenu_HasPort() in EngineMode00_PakCheck_Init; its Draw shows the pak menu while set
+gFrameData = 0x8011F140; // Turok 3 "pFrameData": the frame being finished (CEngineApp__Main, CEngineApp__Draw)
+gPakCheckDone = 0x8011F148; // set when a boot pak menu is left (PakMenu_SelectPak, PakMessage_SelectOk, DamagedPakMenu_SelectContinue...); EngineMode00_PakCheck_Retrace then moves on
+sAudioTaskStartTime = 0x8011F150; // osGetTime at an audio task's start (__scExec), timed in __scHandleRSP
+sGfxRspTime = 0x8011F158; // the gfx task's RSP time, summed across yields (__scHandleRSP, __scExec)
+sGfxRspResumeTime = 0x8011F160; // osGetTime at a gfx task's (re)start (__scExec)
+sRdpStartTime = 0x8011F168; // osGetTime when the RDP part starts (__scExec), timed in __scHandleRDP
+sGfxTaskStartTime = 0x8011F170; // osGetTime at a gfx task's first start (__scExec)
+sCrashFrameBuffer = 0x8011F180; // u16 *, the crash screen's frame buffer (Crash_ShowScreen, Crash_PutChar, Crash_ClearScreen)
+sCrashTextColor = 0x8011F184; // Crash_SetTextColor, Crash_PutChar, Crash_PrintStack
+gEngineTimestamp = 0x8011F188; // Turok 3's name: the build string mainproc sprintf's, shown by Crash_ShowScreen
+gSavedPlayers = 0x8011F290; // CSavedPlayers (structs/player.h), SavedPlayers_*
+gWarmBoot = 0x80120690; // set when the boot marker was found (func_0028D380), read by CEngineApp__Construct, Boot_CanOverwrite
+
+// ---- VM pager (Pager, structs/pager.h; Rage Wars' SCHED/8023A284) ----
+gPager = 0x801206A0; // Pager: VM_Initialize, VM_HandleTLBMiss, VM_FinishPageJob, VM_GetStats
+gPager_completion = 0x801206C4; // Pager +0x24, OSMesgQueue; VM_Alloc, VM_Free
+gPager_readerStack = 0x80120DC0; // Pager +0x720, the reader thread's stack; VM_ManagerThread
+gPager_slots = 0x80120FC0; // Pager +0x920, PageMapping[24]; VM_MapTLBEntry, VM_AcquireNextTLB, VM_FreeRegion
+gPager_jobs = 0x80121140; // Pager +0xAA0, OSMesgQueue; VM_FinishPageJob
+gPager_pending = 0x80121178; // Pager +0xAD8, OSMesgQueue; VM_HandleTLBMiss
+gPager_chain_head = 0x80121290; // Pager +0xBF0, the least recently used mapping; VM_MapTLBEntry, VM_ReclaimLRUPage
+gPager_chain_tail = 0x80121294; // Pager +0xBF4; VM_FinishPageJob, VM_ReclaimLRUPage
+gPager_entries = 0x80121318; // Pager +0xC78, PageEntry[24]; VM_MapTLBEntry, VM_UnmapTLBEntry, VM_AcquireNextTLB
+gPager_regions = 0x80121378; // Pager +0xCD8, the first PageRegion; VM_FindRegion, VM_AllocRegion, VM_FreeRegion, VM_Age
+gPager_expanded = 0x80121390; // Pager +0xCF0; VM_AcquireNextTLB
+gVMPages = 0x80132000; // the page frames, 0x1000 each (VM_ReaderThread, VM_MapTLBEntry, VM_UnmapTLBEntry)
+
+// ---- libultra BSS (names from Rage Wars' rw_junk/symbol_addrs.txt, same layout there; ultralib's in brackets) ----
+__osContMesgQueue = 0x801213C0; // osContInit
+__osContMesgBuff = 0x801213D8; // osContInit
+__osContNumControllers = 0x801213DC; // (__osMaxControllers) osContInit, osPfsIsPlug, __osPackReadData
+__osContBuffer = 0x801213E0; // (__osContPifRam) OSPifRam; osContReset, osContStartReadData, osContStartQuery
+__osContLastCmd = 0x80121420; // osContStartReadData, osContStartQuery, __osContRamRead/Write
+__osMotorStartData = 0x80121430; // (_MotorStartData) OSPifRam[4]; osMotorInit, osMotorStart
+__osMotorStartBuf = 0x80121530; // (_motorstartbuf) u8[32]; osMotorInit, osMotorStart
+__osMotorStopData = 0x80121550; // (_MotorStopData) OSPifRam[4]; osMotorStop, osMotorInit
+__osMotorStopBuf = 0x80121650; // (_motorstopbuf) u8[32]; osMotorStop, osMotorInit
+__osSiAccessBuf = 0x80121670; // (siAccessBuf) __osSiCreateAccessQueue
+__osSiAccessQueue = 0x80121678; // __osSiGetAccess, __osSiRelAccess
+__osTmpTask = 0x80121690; // (sptask.c's tmp_task) _VirtualToPhysicalTask
+__osViRetraceCount = 0x801216D0; // (viMgrMain's static retrace) viMgrMain
+__osViThread = 0x801216E0; // osCreateViManager
+__osViThreadStack = 0x80121910; // osCreateViManager
+__osViEventQueue = 0x80122910; // osCreateViManager
+__osViEventBuf = 0x80122930; // OSMesg[5]; osCreateViManager
+__osViRetraceMsg = 0x80122950; // OSIoMesg type 13; osCreateViManager
+__osViCounterMsg = 0x80122970; // OSIoMesg type 14; osCreateViManager
+osClockRate = 0x80122990; // osInitialize
+__osInitialized = 0x80122998; // set to 1 by osInitialize (Rage Wars' name; __osFinalrom in ultralib)
+__osEventStateTab = 0x801229A0; // osSetEventMesg
+__osPiEventState = 0x801229E0; // __osEventStateTab[OS_EVENT_PI] (a symbol of its own in Rage Wars too); __osLeoResume
+__osBaseCounter = 0x80122A20; // osGetTime, __osTimerServicesInit
+__osViIntrCount = 0x80122A24; // viMgrMain, __osTimerServicesInit
+__osCurrentTime = 0x80122A28; // osGetTime, viMgrMain (Rage Wars' list spells it _osCurrentTime)
+__osTimerCounter = 0x80122A30; // __osSetTimerIntr, __osTimerInterrupt
+LeoDiskHandle = 0x80123A60; // osLeoDiskInit (ultralib leodiskinit.c)
+__osDiskHandle = 0x80123AD4; // __osLeoInterrupt, osLeoDiskInit
+__osPiThread = 0x80123AE0; // osCreatePiManager
+__osPiThreadStack = 0x80123D10; // osCreatePiManager
+__osPiEventQueue = 0x80124D10; // osCreatePiManager
+__osPiEventBuf = 0x80124D28; // osCreatePiManager
+CartRomHandle = 0x80124D30; // osCartRomInit
+__osPiAccessBuf = 0x80124DB0; // __osPiCreateAccessQueue
+__osPiAccessQueue = 0x80124DB8; // __osPiGetAccess, __osPiRelAccess, osCreatePiManager
+__osPfsPifRam = 0x80130E20; // OSPifRam; __osContRamRead/Write, osPfsIsPlug, osMotorStart/Stop
+
+// ---- Acclaim's audio decoder (adec*, mdct*) ----
+sAdecBitWord = 0x80125000; // the current stream word; adecReadBits
+sAdecPrevScale = 0x80125010; // u16[16], the previous scale indices; adecDecodeFrame
+sMdctPreCos = 0x80125030; // f32[128] pre-twiddle cos; mdctInitTwiddles, adecImdctFrame
+sMdctPreSin = 0x80125230; // f32[128] pre-twiddle sin
+sMdctPostCosPlusSin = 0x80125430; // f32[128] post-twiddle cos + sin
+sMdctPostSinMinusCos = 0x80125630; // f32[128] post-twiddle sin - cos
+sAdecOverlap = 0x80125830; // f32[128], the overlap state; adecImdctFrame, mdctInitTwiddles
+sMdctFft = 0x80125A30; // MdctCtx *, mdctFftInit(0x80) in adecImdctFrame
+sAdecState = 0x80125C38; // DecodeState; adecStreamOpen, adecNextFrame
+sAdecStopFlag = 0x80125C48; // adecGetStopFlag, adecClearStopFlag
+
+// ---- SN host I/O (HostIo_*, PC*) ----
+sHostIoDelayCounter = 0x801270B0; // the volatile loop counter of HostIo_Delay
+sHostIoEventBuf = 0x801270B4; // OSMesg[1] of sHostIoEventQueue
+sHostIoEventQueue = 0x801270C0; // osSetEventMesg(0, ...) in HostIo_StartThread; HostIo_ThreadMain waits on it
+sHostIoRequestBuf = 0x801280E0; // OSMesg[1] of sHostIoRequestQueue
+sHostIoDmaBuf = 0x801280E4; // OSMesg[1] of sHostIoDmaQueue
+sHostIoDmaQueue = 0x801280F0; // HostIo_ReadBlockDma, HostIo_WriteBlockDma
+sHostIoDmaMsg = 0x80128110; // the OSIoMesg of those DMAs
+sHostIoMemoryRanges = 0x80128130; // CMemoryRange[48] (structs/memory.h): 16 memory ranges, then 32 TLB ones; HostIo_Init, HostIo_ScanTlb, HostIo_MemoryTransfer
+sHostIoRequestQueue = 0x80128370; // PCopen/PCread/PCwrite... send to HostIo_ThreadMain
+sHostIoReplyBuf = 0x80128388; // OSMesg[1] of sHostIoReplyQueue
+sHostIoThread = 0x80128390; // OSThread; HostIo_StartThread
+sHostIoReplyQueue = 0x80128540; // PCopen/PCread/PCwrite... wait on it
+sHostIoStopped = 0x80128880; // debugger: stopped (HostIo_CommandLoop, HostIo_Init)
+sHostIoResumeAllowed = 0x80128882; // debugger: resume allowed
+sHostIoSavedTlb = 0x801288A0; // u32[32][4] PageMask/EntryHi/EntryLo0/EntryLo1; HostIo_ScanTlb
+
+// ---- automap (Automap_Draw; func_00430500 fills the vertex buffers) ----
+sAutomapWorldMtx = 0x80129100; // Mtx[2], the modelview
+sAutomapScreenMtx = 0x80129180; // Mtx[2] for the screen-space markers
+sAutomapLineIndices = 0x80129200; // u16[], the line vertex indices
+sAutomapOrthoMtx = 0x80129A00; // Mtx, guOrtho over the screen
+sAutomapLineVtx = 0x80129A40; // [2][0x200], the green map lines
+sAutomapMagentaVtx = 0x8012DA40; // [2][8]
+sAutomapRedVtx = 0x8012DB40; // [2][0xC0]
+sAutomapYellowVtx = 0x8012F340; // [2][3]
+
+// ---- bosses of the first VM module (structs/boss.h; the _2 copies use the same globals) ----
+gMantidQueen = 0x8012F3A0; // WaveBossState: MantidQueen_* (n7: "Mantid Queen state")
+gMantidQueen_pushed = 0x8012F3A4; // +0x004; MantidQueen_EnterPush
+gMantidQueen_step = 0x8012F5B4; // +0x214; MantidQueen_SendMinions, MantidQueen_PickFromStep
+gMantidQueen_boss = 0x8012F5C0; // +0x220; MantidQueen_EnterMode3-6
+gMantidQueen_waveActive = 0x8012F5F0; // +0x250; MantidQueen_Step, MantidQueen_UpdateMode2/5
+gMantidQueen_blink = 0x8012F5F4; // +0x254; MantidQueen_UpdateTurn, MantidQueen_ChooseAttack, MantidQueen_GetTurnSide
+sPrimagenPathPoint = 0x8012F600; // the index on the path gLevelScript_path (D_800C18F0[path][i]); Primagen_UpdateMode19, Primagen_EnterMode19, Primagen_InitAI
+gLevelScript = 0x8012F608; // LevelScriptState, the Primagen fight / level script (n7: "Primagen state"); 560 uses, Primagen_*
+gLevelScript_swayPhase = 0x8012F618; // +0x010 (viewed as BossWait); Primagen_RunAttackStep
+gLevelScript_anims = 0x8012F62C; // +0x024 ScriptAnimator[8]; Primagen_Draw
+gLevelScript_spawnsLeft = 0x8012F950; // +0x348; Primagen_RunSpawnStep, Primagen_NextSpawnStep
+gLevelScript_actor = 0x8012F970; // +0x368; Primagen_Draw
+gLevelScript_found = 0x8012F974; // +0x36C, the boss parts; Primagen_UpdateMode6
+gLevelScript_values = 0x8012F988; // +0x380 s32[2][8]; Primagen_UpdateMode2, Primagen_HandleAnimEvent
+gLevelScript_scriptCOn = 0x8012F9D0; // +0x3C8; Primagen_EnterMode16, Primagen_UpdateMode16
+gLevelScript_unk3CA = 0x8012F9D2; // +0x3CA; Primagen_EnterMode2, Primagen_UpdateMode14
+gLevelScript_unk3CC = 0x8012F9D4; // +0x3CC (viewed as BossCtl); Primagen_UpdateMode19
+gLevelScript_bossState = 0x8012F9D8; // +0x3D0 (viewed as BossState); Primagen_UpdateMode1, Primagen_EnterMode1
+gLevelScript_bossMode = 0x8012F9DC; // +0x3D4 (viewed as BossMode); Primagen_RunAttackStep, Primagen_EnterMode7/18
+gLevelScript_armed = 0x8012F9E0; // +0x3D8; Primagen_EnterMode5
+gLevelScript_timer = 0x8012F9E4; // +0x3DC; Primagen_UpdateMode20, Primagen_EnterMode23/24
+gLevelScript_swayTimer = 0x8012F9E8; // +0x3E0; Primagen_EnterMode20
+gLevelScript_script = 0x8012F9F8; // +0x3F0 BossScript (its timer is the cooldown); Primagen_NextAttackStep
+gLevelScript_script_steps = 0x8012F9FC; // +0x3F4; Primagen_UpdateMode1/7/19
+gLevelScript_script_cursor = 0x8012FA00; // +0x3F8; Primagen_UpdateMode1/7/19
+gLevelScript_script_current = 0x8012FA04; // +0x3FC; Primagen_UpdateMode11/21/22/27
+gLevelScript_script2_steps = 0x8012FA0C; // +0x404; Primagen_SetSpawnScript
+gLevelScript_script2_cursor = 0x8012FA10; // +0x408; Primagen_SetSpawnScript
+gLevelScript_script3 = 0x8012FA1C; // +0x414 BossScript3; Primagen_RunSoundStep, Primagen_NextSoundStep
+gLevelScript_script3_steps = 0x8012FA20; // +0x418; Primagen_SetSoundScript
+gLevelScript_script3_cursor = 0x8012FA24; // +0x41C; Primagen_SetSoundScript, Primagen_UpdateMode28
+gLevelScript_path = 0x8012FB48; // +0x540; Primagen_UpdateMode19, Primagen_InitAI
+gTotemDefense = 0x8012FB50; // the totem fight {obj, def, state, timer} (BossFight in TotemDefense_Init/Update; it lies in LevelScriptState's pad544)
+gTotemDefense_def = 0x8012FB54; // +0x04, its definition + 0x14; TotemDefense_Init
+gTotemDefense_state = 0x8012FB58; // +0x08; TotemDefense_GetState, TotemDefense_Init
+gTotemDefense_timer = 0x8012FB5C; // +0x0C, the time left; TotemDefense_Init/Update
+gTotemDefense_kills = 0x8012FB60; // +0x10, past the local BossFight struct (a field to add); TotemDefense_AddKill, TotemDefense_Init
+gMotherBoss = 0x8012FB70; // MotherBossState: MotherBoss_* (n7: "Mother state")
+gMotherBoss_phase = 0x801301CC; // +0x65C; MotherBoss_StartPhase2Cinema, MotherBoss_PickPhaseAnim
+gMotherBoss_activeMask = 0x801301D0; // +0x660; MotherBoss_Mode01/10/21_FlashSpotsThenIdle
+gMotherBoss_liveMask = 0x801301D4; // +0x664; MotherBoss_StartPhase2Cinema
+gMotherBoss_counter = 0x801301EC; // +0x67C; MotherBoss_Mode17_TrackTarget
+gMotherBoss_minRadius = 0x801301F8; // +0x688; MotherBoss_UpdateSpotsAndPickups
+gMotherBoss_maxRadius = 0x801301FC; // +0x68C; MotherBoss_UpdateSpotsAndPickups
+gBlindOne = 0x80130200; // BlindOneState: BlindOne_* (n7: "Blind One state")
+gBlindOne_faders = 0x8013023C; // +0x03C ScriptAnimator[12]; BlindOne_Draw
+
+// ---- menus of the first VM module ----
+sMenuBindingText = 0x80130860; // char[], "%s %s" of name and value, returned by MenuItem_FormatBinding
+sMenuBindingValue = 0x801308A0; // char[], "%3.2f" of the value; MenuItem_FormatBinding
+sMenuModelFade = 0x801308E0; // written by MenuItem_DrawModel, read by MenuModel_DrawSelected
+gInSinglePlayerMenu = 0x801308F8; // set by TitleMenu_Single, cleared by SingleMenu_GoBack and EngineMode13_Game_Init; CEngineApp__Update pauses mode 0xB while it is set
+sFinalScoreTimer = 0x801308FC; // FinalScoreMenu_Init/Poll
+sPauseRumbleOn = 0x80130910; // s32[4]: each ControllerProfile.rumbleOn, kept while paused (PauseMenu_Init/Close)
+sEnterCheatResult = 0x80130920; // the index of the cheat the code matched, -1 none; EnterCheatMenu_*
+sCheatsMenuSelection = 0x80130924; // the selected warp/weapon option; CheatsMenu_Init, CheatsMenu_WarpSelect, CheatMenu_WarpText, CheatMenu_GetWarpLevel
+sResolutionToggleDelay = 0x80130930; // OptionsMenu_ToggleResolution sets it, OptionsMenu_ResolutionText counts it down
+gCameraPoolHideViews = 0x80130940; // cleared by CEngineApp__Update/Construct and the pak menus when they are left; CCameraPool__Draw draws only while 0, CCamera__AdvanceAttributes
+gPakProfileRead = 0x80130948; // PakProfile, the last one read back with a good checksum (structs/pak.h); PakMenu_SelectNote
+gPakProfileRead_kills = 0x8013094C; // +0x04; CharNoteMenu_UpdateFrags, CharNoteMenu_UpdateRank
+gPakProfileRead_character = 0x80130950; // +0x08; CharNoteMenu_UpdateType, CharNoteMenu_SelectYes
+gPakProfileRead_name = 0x80130954; // +0x0C; CharNoteMenu_UpdateName
+sCharNoteLoad = 0x80130960; // 1 load (CharNoteMenu_InitLoad), 0 delete (CharNoteMenu_InitDelete); CharNoteMenu_*
+sDamagedPakInGame = 0x80130964; // 1 DamagedPakMenu_InitInGame, 0 DamagedPakMenu_InitAtBoot; DamagedPakMenu_UpdateLine*
+gPakProfile = 0x80130968; // PakProfile, the one being saved or loaded (structs/pak.h); PakMenu_InitSaveProfile, PakMenu_SaveCharacter, PakMenu_WriteProfile
+gPakProfile_deaths = 0x8013096A; // +0x02; CharNoteMenu_SelectYes_2
+gPakProfile_kills = 0x8013096C; // +0x04; CharNoteMenu_SelectYes_2
+gPakProfile_tags = 0x8013096E; // +0x06; CharNoteMenu_SelectYes_2
+gPakProfile_character = 0x80130970; // +0x08; PakMenu_RestoreCharacter
+gPakProfile_name = 0x80130974; // +0x0C; PakMenu_SaveCharacter, PakMenu_RestoreCharacter
+sSavePortalChosen = 0x80130980; // set by SavePortalMenu_SelectSave/SelectGoBack; SavePortalMenu_Poll waits for it
+gPakMenuIsSave = 0x80130984; // 1 for PakMenu_InitSaveGame/InitSaveProfile and SavePortalMenu_Init, 0 for the loads and the any-pak save; PakMenu_WriteSaveGame, PakMenu_SelectCancel...
+gPakOverwriteNote = 0x80130988; // the note PakMenu_SelectNote picked; PakConfirmMenu_SelectYes deletes it
+sPakMessageRumbleB = 0x8013098C; // 1 PakMessage_InitRumblePakB, 0 PakMessage_InitRumblePak; PakMessage_SelectOk
+gPakMenuAnyPak = 0x80130990; // 1 only for PakMenu_InitSaveGameAnyPak; 80 users in the pak menus, CharNoteMenu, StatsMenu_InitSaveDone
+gPakMenuIsLoad = 0x80130994; // 1 for PakMenu_InitLoadGame/InitLoadProfile; PakMessage_SelectOk, PakMenu_SelectNote
+gSavePortalActive = 0x80130998; // 1 SavePortalMenu_Init/InitB, 0 SavePortalMenu_SelectGoBack; PakMenu_GetReturnMenu, PakMessage_SelectOk
+sDamagedPakDone = 0x8013099C; // DamagedPakMenu_Poll's result
+gPakMenuWrites = 0x801309A0; // 1 for every save menu (PakMenu_InitSave*, SavePortalMenu_Init), 0 for the loads
+sPakConfirmDone = 0x801309A4; // PakConfirmMenu_Poll's result, cleared by PakConfirmMenu_Init*
+gPakConfirmKind = 0x801309B0; // 0 repair, 1 no space, 2 no space (all), 3 overwrite, 4 corrupt note (PakConfirmMenu_Init*); PakConfirmMenu_Update*/Select*
+gPakMenuIsProfile = 0x801309B4; // 1 for PakMenu_InitSaveProfile/InitLoadProfile; PakMenu_SelectNote, PakMenu_UpdateModeText, PakMenu_SelectCancel
+sGameNoteLoad = 0x801309B8; // 1 GameNoteMenu_InitLoad, 0 GameNoteMenu_InitDelete; GameNoteMenu_*
+gPakMenuLeaving = 0x801309BC; // set when a pak menu opens another (an error or a message) or is left; PakMenu_PollPak keeps polling while it is 0
+gPakMessageKind = 0x801309C0; // the message PakMessage_Init* chose (0 pak full ... 0xF repaired); PakMessage_Update*, PakMessage_SelectOk
+gPakNoteIndex = 0x801309C4; // the note selected (PakMenu_SelectPak/SelectNote); GameNoteMenu/CharNoteMenu/PakConfirmMenu_SelectYes delete it
+sViModeIndex = 0x801309D0; // the selected VI mode (Video_SetMode); Video_ResizeViMode
+sResizedViMode = 0x801309D8; // the OSViMode copy Video_ResizeViMode adjusts
+sMissionHub = 0x80130A30; // Level_GetHub(gScene_m_LevelID) (MissionMenu_InitStatus/InitFailed); MissionMenu_Update*
+sMissionFailed = 0x80130A34; // 0 MissionMenu_InitStatus, 1 MissionMenu_InitFailed; MissionMenu_UpdateTitle, MissionMenu_SelectOk
+
+// ---- graphics memory (GfxPool_Alloc) ----
+gAudioHeapBase = 0x80130A40; // the 0x22000 block GfxPool_Alloc allocates; CAudioWorld__Initialize's heap
+gRspFifoSize = 0x80130A44; // 0x8000, the output_buff size (CEngineApp__SubmitGfxTask)
+gRspFifoBuffer = 0x80130A48; // the RDP fifo, output_buff (CEngineApp__SubmitGfxTask)
+gLineList0 = 0x80130A4C; // Turok 3 "line_list_a": the second slice of the gfx block; CEngineApp__AdvanceFrameData (m_pLineList on even frames)
+gLineList1 = 0x80130A50; // Turok 3 "line_list_b": the fourth slice
+gPoolBuffers = 0x80130A58; // Turok 3 "pool_buffers" (CPool__Construct/AllocateStandardBuffers there): GfxPool_Clear/GfxPool_Alloc in CEngineApp__Main (n8: "GfxPool")
+gDepthBuffer = 0x80130A78; // the z-buffer's address; GfxPool_Alloc, CEngineApp__Draw, CEngineApp__ClearDepthRect, CCamera__DisplayListSetup
+gAudioHeapSize = 0x80130A7C; // 0x22000; CAudioWorld__Initialize
+gDisplayList1 = 0x80130A80; // Turok 3 "display_list_b": the first slice of the gfx block; CEngineApp__AdvanceFrameData (m_pDisplayList on odd frames)
+gDisplayList0 = 0x80130A84; // Turok 3 "display_list_a": the third slice; CEngineApp__AdvanceFrameData, __scHandleRSP
+gCFB = 0x80130A88; // Turok 3 "cfb_16": the frame buffers; GfxPool_Alloc, CEngineApp__Main, Crash_ShowScreen
+
+// ---- controller paks (structs/pak.h) ----
+gRumblePaks = 0x80130AA0; // RumblePak[4]; Pak_ProbeSlot, Pak_ProbeRumble, Pak_ProbeAll
+gPakState = 0x80130C60; // s32[4] per channel (3: mounted, directory read); Pak_* (n8: "pak kind")
+gPakError = 0x80130C70; // s32[4] per channel, the last pak error; Pak_Mount, Pak_GetFreePages (n8: "pak status")
+gPakFileSystems = 0x80130C80; // OSPfs[4]; Pak_Mount, Pak_RefreshNotes, Pak_Repair
