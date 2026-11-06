@@ -4,6 +4,7 @@
  * First-module copy of src/us/code/Pak_FindNote_2.c. */
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 extern u8 gPakCharTable[];       /* pak font code -> character */
 

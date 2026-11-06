@@ -13,37 +13,20 @@ extern GameSettings gEngineApp_m_Settings;   /* gEngineApp.m_Settings, gEngineAp
 
 /* Fields of gEngineApp_m_Settings with symbols of their own: where the ROM
  * bases a load on the field (GCC would base it on the struct otherwise). */
-extern u32 gEngineApp_m_Settings_unlockedCheats;  /* .unlockedCheats */
-extern s32 gEngineApp_m_Settings_difficulty;      /* .difficulty */
-extern u8 gEngineApp_m_Settings_unk14;            /* .unk14 */
-extern u8 gEngineApp_m_Settings_unk15;            /* .unk15 */
-extern u8 gEngineApp_m_Settings_unk16;            /* .unk16 */
-extern u8 gEngineApp_m_Settings_unk17;            /* .unk17 */
-extern u8 gEngineApp_m_Settings_unk18;            /* .unk18 */
 extern u8 gEngineApp_m_Settings_multiplayer;      /* .multiplayer */
-extern u8 gEngineApp_m_Settings_unk1B;            /* .unk1B */
 extern u8 gEngineApp_m_Settings_unk180;           /* .unk180 */
 extern s32 gEngineApp_m_Settings_mode;            /* .mode */
 extern s32 gEngineApp_m_Settings_nextMode;        /* .nextMode */
-extern s32 gEngineApp_m_Settings_unk1C8;          /* .unk1C8 */
-extern s32 gEngineApp_m_Settings_paused;          /* .paused */
 extern GameMatch gEngineApp_m_Settings_match;     /* .match */
-extern f32 gEngineApp_m_Settings_match_seconds;   /* .match.seconds */
-extern f32 gEngineApp_m_Settings_match_minutes;   /* .match.minutes */
-extern f32 gEngineApp_m_Settings_match_hours;     /* .match.hours */
-extern f32 gEngineApp_m_Settings_match_countdown; /* .match.countdown */
 extern s32 gEngineApp_m_Settings_match_teams;     /* .match.teams */
-extern s32 gEngineApp_m_Settings_match_teamScore[2]; /* .match.teamScore */
 extern s32 gEngineApp_m_Settings_match_tag;       /* .match.tag */
 extern s32 gEngineApp_m_Settings_match_unk44;     /* .match.unk44 */
 
 /* Members of gEngineApp_m_Game with symbols of their own (kept where the ROM
  * bases the access on them). */
 extern struct CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* .m_PlayerList.m_ActiveList.m_pHead */
-extern s32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount;            /* .m_PlayerList.m_ActiveList.m_nCount */
 extern struct CPlayer *gEngineApp_m_Game_m_PlayerList_m_Players;            /* .m_PlayerList.m_Players */
 extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;                       /* .m_PlayerList.m_nPlayers */
-extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema;                        /* .m_PlayerList.m_bCinema */
 extern CAutomap gEngineApp_m_Game_m_DebugLines;                             /* .m_Automap */
 
 #endif

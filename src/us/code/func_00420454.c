@@ -5,7 +5,11 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "structs/save.h"
-#include "globals/game.h"
+
+/* local: globals/game.h declares these, but its gEngineApp_m_Settings_unk180 (u8) clashes with the array view below, which the ROM needs here */
+extern GameSettings gEngineApp_m_Settings;
+extern GameMatch gEngineApp_m_Settings_match;
+extern CGame gEngineApp_m_Game;
 
 /* Load game menu "select" handler: with the pak checked, either restores the
  * loaded save (player block, game progress, level times, the level's key
@@ -18,7 +22,8 @@ extern s32 gPakMenuLeaving;
 extern s32 gPakNoteIndex;
 extern s32 gPakMenuPort;
 extern u32 gScene_m_PreviewOptions;
-extern u8 gEngineApp_m_Settings_unk180[];
+extern u32 gEngineApp_m_Settings_unlockedCheats[];
+extern u8 gEngineApp_m_Settings_unk180[]; /* local type: GameSettings.unk180 read as an array (other registers otherwise) */
 extern f32 gEngineApp_m_Settings_match_seconds[];
 extern f32 gEngineApp_m_Settings_match_minutes[];
 extern f32 gEngineApp_m_Settings_match_hours[];
@@ -61,7 +66,7 @@ s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
         gEngineApp_m_Settings_match.frames = gLoadBuffer->frames;
         gEngineApp_m_Settings_match_seconds[0] = gLoadBuffer->seconds;
         gEngineApp_m_Settings_match_minutes[0] = gLoadBuffer->minutes;
-        gScene_m_PreviewOptions = gEngineApp_m_Settings.unlockedCheats;
+        gScene_m_PreviewOptions = gEngineApp_m_Settings_unlockedCheats[0];
         gEngineApp_m_Settings_match_hours[0] = gLoadBuffer->hours;
         src = gLoadBuffer->levelFlags;
         dst = gLoadSavePersistentData;

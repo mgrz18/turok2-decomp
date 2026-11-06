@@ -21,7 +21,6 @@ s32 Instance_NextUniqueId(void);
 void CGameObjectInstance__DrawModelLitVertices(void);
 
 extern CScene gScene;
-extern u8 *gEngineApp_m_Game_m_PlayerList_m_Players;      /* players, 0x1328 bytes each */
 extern u8 gWeaponActorTypeInfo[];
 extern void *gIntelligenceTypeInfo[];
 extern Lights1 gDefaultLights;
@@ -39,7 +38,7 @@ static __inline__ void *body_setup(CGameObjectInstance *obj) {
     }
     if (type == 11) {
         for (i = 0; i < gEngineApp_m_Game.m_PlayerList.m_nPlayers; i++) {
-            player = gEngineApp_m_Game_m_PlayerList_m_Players + i * 0x1328;
+            player = (u8 *)gEngineApp_m_Game_m_PlayerList_m_Players + i * 0x1328;
             if (player == (u8 *) obj) {
                 return 0;
             }

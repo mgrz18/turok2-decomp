@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/game.h"
 #include "structs/menu.h"
+#include "globals/game.h"
 
 struct ObjRecAt5D8;
 typedef struct ObjRecAt5D8 ObjRecAt5D8;

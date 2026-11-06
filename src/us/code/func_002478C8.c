@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/collision.h"
+#include "globals/game.h"
 
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
 

@@ -506,7 +506,6 @@ typedef struct PlayerStateInfo {
 
 
 extern f32 gFrameIncrement;              /* frame time */
-extern s32 gEngineApp_m_Game_m_DebugLines;
 extern s32 gEvenOdd;
 extern f32 gCharacterHealthRegen[];           /* health regeneration per character */
 extern PlayerStateInfo gPlayerStateTable[];
@@ -658,7 +657,7 @@ void CPlayer__Update(Player *p) {
     }
     Sound__SetMuted(enable);
     if (gEngineApp_m_Settings.multiplayer == 0) {
-        if (!(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
+        if (!(gEngineApp_m_Game_m_DebugLines.unk0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
             if (p->unk12A4 != 0) {
                 p->unk12A4 = 0;
             } else {
@@ -666,7 +665,7 @@ void CPlayer__Update(Player *p) {
             }
         }
         if (gEngineApp_m_Settings.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
-            && !(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
+            && !(gEngineApp_m_Game_m_DebugLines.unk0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
             WeaponInfo *info = gWeaponInfoTable[p->nextWeapon];
             s16 next = info->alternate;
 
@@ -818,7 +817,7 @@ void CPlayer__Update(Player *p) {
         if (actor->aiFlags & 0x6000) {
             flag = 1;
         } else if ((u32) ((u16) p->state - 2) < 2) {
-            if ((p->input.pressed & 0x400) && gEngineApp_m_Settings.multiplayer == 0 && !(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20))) {
+            if ((p->input.pressed & 0x400) && gEngineApp_m_Settings.multiplayer == 0 && !(gEngineApp_m_Game_m_DebugLines.unk0 != 0 && (p->input.held & 0x20))) {
                 p->crouchToggle ^= 1;
             }
         } else {

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/pak.h"
+#include "globals/pak.h"
 
 s32 Pak_GetNoteExtName(s32 bank, s32 slot, u8 **out) {
     if (gPakState[bank] != 3) {

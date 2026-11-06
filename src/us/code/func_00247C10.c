@@ -11,7 +11,6 @@ typedef struct TeamGame {
     /* 0x00 */ s32 active;
 } TeamGame;
 
-extern TeamGame gEngineApp_m_Settings_match_teams;
 extern s32 D_8011ACE0;      /* team 1 score */
 
 s32 Cinema_PathPlaying(void);
@@ -117,7 +116,7 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
 
     if (killerIndex == victimIndex) {
         player->m_pOptions->m_Suicides++;
-        if (gEngineApp_m_Settings_match_teams.active != 0) {
+        if (((TeamGame *)&gEngineApp_m_Settings_match_teams)->active != 0) {
             switch (player->m_nDeathmatchTeamSelected) {
                 case 0:
                     teamScore = &gEngineApp_m_Settings.match.teamScore;
@@ -134,7 +133,7 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
         player->m_pOptions->m_Deaths++;
         if (player->m_pOptions->m_TagMode == 1) {
             killer->m_pOptions->m_Tags++;
-            if (gEngineApp_m_Settings_match_teams.active != 0) {
+            if (((TeamGame *)&gEngineApp_m_Settings_match_teams)->active != 0) {
                 switch (killer->m_nDeathmatchTeamSelected) {
                     case 0:
                         score = &gEngineApp_m_Settings.match.teamScore;
@@ -151,7 +150,7 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
             }
         } else {
             killer->m_pOptions->m_Kills++;
-            if (gEngineApp_m_Settings_match_teams.active != 0) {
+            if (((TeamGame *)&gEngineApp_m_Settings_match_teams)->active != 0) {
                 switch (killer->m_nDeathmatchTeamSelected) {
                     case 0:
                         score = &gEngineApp_m_Settings.match.teamScore;
