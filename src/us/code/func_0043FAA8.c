@@ -10,9 +10,6 @@ extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
-extern BossStep2 sPrimagenSpawnScript1_2[];
-extern BossStep2 sPrimagenSpawnScript2_2[];
-extern BossStep2 sPrimagenSpawnScript3_2[];
 
 /* Primagen_SetSpawnScript: start the second script for a stage. */
 static __inline__ void StartScript2(s32 stage) {

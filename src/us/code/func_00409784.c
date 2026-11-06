@@ -11,9 +11,6 @@
  * (MotherBoss_DropPickupsAtSpawnPoints). */
 
 extern s32 gMotherBoss_maxRadius; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u8 sMotherBossPickupTable[];     /* pickup weights */
-extern u8 sMotherBossDropTablePhase1[];
-extern u8 sMotherBossDropTablePhase2[];
 
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);

@@ -9,6 +9,7 @@
 #include "structs/save.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 /* Controller pak menu, "save" entry: when the pak is ready, builds the save note (with its checksum) and
  * opens the save menu; otherwise shows why the pak cannot be used. */
@@ -19,11 +20,6 @@ typedef struct {
 } PadSel;
 
 extern s32 D_800F70A8; /* save size */
-extern u8 gSavePortalMenuDescB_2[];
-extern u8 gPakMsgInsertToSaveDesc_2[];
-extern u8 gDamagedPakAtBootMenuDesc_2[];
-extern u8 gPakSaveGameMenuDesc_2[];
-extern u8 gPakMsgPakNotFoundDesc_2[];
 void Pak_ProbeSlot_2(s32 ch);
 s32 Pak_GetStatus_2(s32 ch);
 s32 Pak_IsRumblePak_2(s32 ch);
@@ -54,7 +50,7 @@ void PakMenu_InitSaveGame_2(Menu *own) {
     if (gDamagedPakContinued != 0) {
         p = plr;
         gPakMenuLeaving = 1;
-        MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, gSavePortalMenuDescB_2, p, p->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, &gSavePortalMenuDescB_2, p, p->m_ContState.m_pContState, NULL);
         gCameraPoolHideViews = 0;
     } else {
         Pak_ProbeSlot_2(own->controller->port);
@@ -74,11 +70,11 @@ void PakMenu_InitSaveGame_2(Menu *own) {
 
             gPakMenuLeaving = one;
             if (Pak_IsRumblePak_2(sel.v) != 0) {
-                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, gPakMsgInsertToSaveDesc_2, p, p->m_ContState.m_pContState, (void *)one);
+                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, &gPakMsgInsertToSaveDesc_2, p, p->m_ContState.m_pContState, (void *)one);
             } else if (Pak_NeedsRepair_2(sel.v) != 0) {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc_2, p, p->m_ContState.m_pContState, gPakSaveGameMenuDesc_2);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gDamagedPakAtBootMenuDesc_2, p, p->m_ContState.m_pContState, &gPakSaveGameMenuDesc_2);
             } else {
-                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, gPakMsgPakNotFoundDesc_2, p, p->m_ContState.m_pContState, gSavePortalMenuDescB_2);
+                MenuPool_OpenMenu_2(((u8 *)p->m_pCamera) + 0x53C, &gPakMsgPakNotFoundDesc_2, p, p->m_ContState.m_pContState, &gSavePortalMenuDescB_2);
             }
         }
     }

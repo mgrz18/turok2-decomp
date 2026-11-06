@@ -195,6 +195,16 @@ typedef struct BossStep3 {
     /* 0x10 */ f32 delayRange;
 } BossStep3; /* size 0x14 */
 
+/* An attack the boss can choose (sPrimagenAttacks, indexed by a script A
+ * step's arg): its AI mode and the distance range it is taken in, scaled
+ * (Primagen_RunAttackStep). */
+typedef struct BossAttack {
+    /* 0x0 */ s32 mode;
+    /* 0x4 */ f32 minDist;
+    /* 0x8 */ f32 maxDist;
+    /* 0xC */ s32 padC;
+} BossAttack; /* size 0x10 */
+
 /* A script runner: the time left before the next step, the steps, the
  * cursor the runner advances and the step it took (-1 when stopped). */
 typedef struct BossScript {
@@ -328,8 +338,14 @@ typedef struct SpawnPoint {
     /* 0x10 */ f32 maxAngle;
 } SpawnPoint; /* size 0x14 */
 
-extern SpawnPoint gMotherSpawnPoints[4];  /* the first copy of the module */
-extern SpawnPoint gMotherSpawnPoints_2[4];  /* the second copy */
+/* A minion kind of the wave boss (sMantidQueenMinions): the intelligence
+ * id MantidQueen_Init finds, and the model and spawn offset MantidQueen_SpawnMinion
+ * uses. */
+typedef struct WaveBossMinion {
+    /* 0x00 */ s32 id;
+    /* 0x04 */ s32 model;
+    /* 0x08 */ CVector3 offset;
+} WaveBossMinion; /* size 0x14 */
 
 /* One step of the wave boss's script (sMantidQueenScript...): the minions of the
  * wave, how many may fight at once, and the weak spot it opens. Stepping it

@@ -3,10 +3,10 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 #include "globals/menu.h"
+#include "globals/menu_desc.h"
 
 void MenuPool_OpenMenu_2(char *dst, char *fmt, void *player, s32 controller, s32 arg4);
 
-extern char gPakMsgInsertRumblePakDesc_2[];
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 static __inline__ u8 *GetPlayer(Menu *event, s32 *port) {
@@ -30,7 +30,7 @@ s32 SavePortalMenu_SelectGoBack_2(s32 unused, Menu *event) {
     gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
     gCameraPoolHideViews = 0;
     player = GetPlayer(event, &port);
-    MenuPool_OpenMenu_2(*(char **)(player + 0x51C) + 0x53C, gPakMsgInsertRumblePakDesc_2, player, *(s32 *)(player + 0xA50), 0);
+    MenuPool_OpenMenu_2(*(char **)(player + 0x51C) + 0x53C, (char *)&gPakMsgInsertRumblePakDesc_2, player, *(s32 *)(player + 0xA50), 0);
     gSavePortalActive = 0;
     return 1;
 }

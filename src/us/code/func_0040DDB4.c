@@ -7,8 +7,6 @@
 /* Damage callback of the second boss' minions: takes the damage, plays the minion's hit effect at most every
  * 2.25 s, and at zero health goes to anim state 6. */
 
-
-extern u8 sBlindOneHitScript[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 

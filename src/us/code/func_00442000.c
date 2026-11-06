@@ -9,7 +9,6 @@
  * A slot that dies changes the anim state and clears its bit; when no slot of the phase is left, the next phase
  * state starts. */
 
-extern u8 sMotherBossHurtScript_2[];
 extern void MotherBoss_StartSpotAnims_2(void *obj, void *sound, s32 a2);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 

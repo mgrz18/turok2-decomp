@@ -3,8 +3,7 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 #include "globals/menu.h"
-
-extern f32 sPlayerSpeedTable_scale_2[];   /* speed per setting */
+#include "globals/menu_data.h"
 
 s32 Menu_StepValue_2(Menu *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
 s32 Controller_MenuRight(s32 controller);

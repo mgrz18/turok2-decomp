@@ -5,12 +5,9 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 extern s32 D_8011B114;
-extern u8 gPakMsgDeleteDoneDesc_2[];
-extern u8 gPakMsgDeleteFailedDesc_2[];
-extern u8 gPakMsgRepairedDesc_2[];
-extern u8 gDamagedPakInGameMenuDesc_2[];
 s32 PakMenu_CheckPak_2(Menu *o, s32 pad, s32 z);
 void Pak_ProbeSlot_2(s32 ch);
 s32 Pak_DeleteNote_2(s32 pad, s32 idx);
@@ -32,9 +29,9 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
         } else {
             Pak_ProbeSlot_2(pad);
             if (Pak_DeleteNote_2(pad, gPakOverwriteNote) == 0) {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteDoneDesc_2, own->player, own->controller, own->context);
             } else {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
             }
         }
         break;
@@ -53,7 +50,7 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
                 PakMenu_WriteSaveGame_2(a, own, c);
                 return 1;
             } else {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
             }
         }
         break;
@@ -69,9 +66,9 @@ s32 PakConfirmMenu_SelectYes_2(s32 a, Menu *own, s32 c) {
         } else {
             Pak_ProbeSlot_2(pad);
             if (Pak_RepairIfDamaged_2(pad) == 0) {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgRepairedDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgRepairedDesc_2, own->player, own->controller, own->context);
             } else {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gDamagedPakInGameMenuDesc_2, own->player, own->controller, own->context);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gDamagedPakInGameMenuDesc_2, own->player, own->controller, own->context);
             }
         }
         break;

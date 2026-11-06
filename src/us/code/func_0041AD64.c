@@ -6,8 +6,8 @@
 #include "globals/game.h"
 #include "globals/menu.h"
 #include "globals/scene.h"
+#include "globals/cheat.h"
 
-extern CheatCode sCheatCodes[];
 extern s32 strlen(u8 *);
 extern void Sound__Play2D(s32);
 s32 EnterCheatMenu_Enter(void)

@@ -15,7 +15,6 @@ typedef struct Obj2 {
     /* 0x140 */ u8 ai[1];
 } Obj2;
 
-extern BlindOnePhase sBlindOnePhases[];
 extern void Animator_Update(void *slot);
 extern void BlindOne_UpdateMover(BlindOneMover *mover);
 extern s32 BlindOne_GetHealthPercent(BlindOneState *state);

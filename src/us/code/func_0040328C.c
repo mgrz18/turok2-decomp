@@ -2,7 +2,6 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 
-extern u8 sMantidQueenSpotOpenScript[];
 void ScriptAnimator_SetScript(void *slot, void *arg);
 
 void MantidQueen_EnterMode15(void) {

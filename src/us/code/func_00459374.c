@@ -7,6 +7,7 @@
 #include "globals/game.h"
 #include "globals/scene.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 /* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
  * and shows the "loaded" message; otherwise reports whether the note could be read. */
@@ -19,9 +20,6 @@ extern f32 gEngineApp_m_Settings_match_seconds[]; /* local type: the field's rea
 extern f32 gEngineApp_m_Settings_match_minutes[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_hours[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern u8 gEngineApp_m_Game_m_MenuPool[]; /* local type: globals/menu.h declares it; this view (its type here) is what keeps the ROM's code */
-extern u8 gPakMsgRumblePakDesc_2[];
-extern u8 gPakMsgDeleteDoneDesc_2[];
-extern u8 gPakMsgDeleteFailedDesc_2[];
 s32 PakMenu_CheckPak_2(Menu *o, s32 pad, s32 z);
 CPlayer *CPlayerPool__FindByController(CPlayerPool *list, ControllerProfile *s);
 s32 Pak_DeleteNote_2(s32 pad, s32 idx);
@@ -70,13 +68,13 @@ s32 GameNoteMenu_SelectYes_2(s32 unused, Menu *own) {
         }
         gEngineApp_m_Game.m_PlayerList.m_bCinema = 0;
         gEngineApp_m_Game.m_PlayerList.m_bCinemaStarted = 0;
-        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, gPakMsgRumblePakDesc_2, plr, plr->m_ContState.m_pContState, 0);
+        MenuPool_OpenMenu_2(gEngineApp_m_Game.m_MenuPool, &gPakMsgRumblePakDesc_2, plr, plr->m_ContState.m_pContState, 0);
         return 1;
     }
     if (Pak_DeleteNote_2(pad, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc_2, own->player, own->controller, own->context);
+        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteDoneDesc_2, own->player, own->controller, own->context);
     } else {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
+        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, &gPakMsgDeleteFailedDesc_2, own->player, own->controller, own->context);
     }
     return 1;
 }

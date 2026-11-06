@@ -6,7 +6,6 @@
 
 /* Resets every active slot of the module state with sMotherBossSpotFlashScript_2. */
 
-extern u8 sMotherBossSpotFlashScript_2[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 static __inline__ void resetSlots(s32 mask, void *src) {

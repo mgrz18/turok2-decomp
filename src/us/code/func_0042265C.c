@@ -4,13 +4,13 @@
 #include "rw/abu_types.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 extern int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item);
-extern char gPakLoadProfileMenuDesc[];
 extern void MenuPool_OpenMenu(char *, char *, int, int, int);
 int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item) {
     if (sCharNoteLoad != 0) {
-        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakLoadProfileMenuDesc, item->x, item->y, 0);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (char *)&gPakLoadProfileMenuDesc, item->x, item->y, 0);
     } else {
         MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, item->label, item->x, item->y, 0);
     }

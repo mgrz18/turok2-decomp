@@ -12,7 +12,6 @@
  * dies plays the stagger animation and clears its bit; when all spots of the
  * phase are gone, moves the boss to its next state. */
 
-extern u8 sMotherBossHurtScript[];
 
 extern void MotherBoss_StartSpotAnims(void *obj, void *sounds, s32 flags);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);

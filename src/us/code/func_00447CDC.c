@@ -6,7 +6,7 @@ s32 Animator_Update(s32);
 s32 BlindOne_UpdateMover_2(s32);
 s32 BlindOne_GetHealthPercent_2(s32);
 s32 COnScreen__SetBossPercent(s32 *, s32);
-extern s32 sBlindOnePhases_update_2;
+extern s32 sBlindOnePhases_update_2; /* local type: this file typedefs its own s8...f64 instead of common.h (globals/boss.h has the alias) */
 void BlindOne_UpdateFight_2(void *arg0)
 {
   s32 (*temp_v0)();

@@ -2,6 +2,7 @@
 #include "structs/boss.h"
 #include "globals/boss.h"
 #include "globals/scene.h"
+#include "globals/boss_ai.h"
 
 typedef struct {
     f32 x, y, z;
@@ -28,7 +29,6 @@ typedef struct {
 } Level00403CF8;
 
 extern s32 gLevelScript_path; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u8 sPrimagenModeTable[];
 s32 CScene__FindInstances(void *world, s32 key0, s32 key1, s32 key2, void **out, s32 max);
 void *CScene__FindIntelligence(void *world, s32 a1, s32 id);
 void ScriptAnimator_Start(void *light, void *actor);

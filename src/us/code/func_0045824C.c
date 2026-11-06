@@ -6,6 +6,7 @@
 #include "globals/menu.h"
 #include "globals/pak.h"
 #include "structs/save.h"
+#include "globals/menu_desc.h"
 
 void *memset(void *s, int c, u32 n);
 typedef struct K7Sub { u8 pad0[4]; s8 b4; } K7Sub;
@@ -22,14 +23,6 @@ extern s32 D_800F70A8;
 extern u8 D_800B48D4[];
 extern u8 D_800B4B1C[];
 extern u8 D_800C13F0[];
-extern u8 gCharNoteDeleteMenuDesc_2[];
-extern u8 gGameNoteDeleteMenuDesc_2[];
-extern u8 gCharNoteMenuDesc3_2[];
-extern u8 gCharNoteLoadMenuDesc_2[];
-extern u8 gGameNoteLoadMenuDesc_2[];
-extern u8 gPakConfirmCorruptNoteDesc_2[];
-extern u8 gPakLoadGameMenuDesc_2[];
-extern u8 gPakLoadProfileMenuDesc_2[];
 s32 PakMenu_CheckPak_2();
 s32 Pak_FindNote_2();
 s32 Pak_ReadNote_2();
@@ -100,7 +93,7 @@ s32 PakMenu_SelectNote_2(s32 *arg0, K7Obj *arg1) {
     s3 = 0;
     gPakProfileRead = gPakProfile;
     gPakNoteIndex = s5;
-    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gCharNoteDeleteMenuDesc_2, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gCharNoteDeleteMenuDesc_2, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L0040799B:
     s3 = 0;
@@ -130,7 +123,7 @@ L004079A0:
     s0 = 0;
     if (D_800F70A8 != *(s32 *)((s32)gLoadBuffer + 4)) { s2 = 1; goto L00407AD0; }
     gPakNoteIndex = s5;
-    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gGameNoteDeleteMenuDesc_2, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gGameNoteDeleteMenuDesc_2, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L00407ACC:
     s0 = 0;
@@ -163,7 +156,7 @@ L00407AD0:
         v1 += 1;
         d += 1;
     } while (v1 < 4);
-    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gCharNoteMenuDesc3_2, arg1->f1C, arg1->f20, arg1->f14);
+    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gCharNoteMenuDesc3_2, arg1->f1C, arg1->f20, arg1->f14);
     return 1;
 L00407BBC:
     if (gPakMenuIsLoad == 0) goto L00407EE8;
@@ -175,7 +168,7 @@ L00407BBC:
     if (Pak_ReadNote_2(s4, s5, &gPakProfile, 0x18) != 0) goto L00407CD0;
     if (Crc32_Compute_2(&gPakProfile, 0x14, 4) != gPakProfile.checksum) goto L00407CD0;
     gPakProfileRead = gPakProfile;
-    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gCharNoteLoadMenuDesc_2, arg1->f1C, arg1->f20, 0);
+    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gCharNoteLoadMenuDesc_2, arg1->f1C, arg1->f20, 0);
     return 1;
 L00407CD0:
     s2 = 1;
@@ -207,7 +200,7 @@ L00407CDC:
     if (hs != s7) goto L00407E70;
     if (Crc32_Compute_2(gLoadBuffer, hs - 4, 0xB) != *(s32 *)(*(s32 *)gLoadBuffer + (s32)gLoadBuffer - 4)) goto L00407E70;
     if (D_800F70A8 != *(s32 *)((s32)gLoadBuffer + 4)) goto L00407E70;
-    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gGameNoteLoadMenuDesc_2, arg1->f1C, arg1->f20, 0);
+    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gGameNoteLoadMenuDesc_2, arg1->f1C, arg1->f20, 0);
     return 1;
 L00407E70:
     s2 = 1;
@@ -228,9 +221,9 @@ L00407EE8:
     if (s2 == 0) return 0;
     v0 = gPakMenuIsProfile;
 L00407EF8:
-    a1p = gPakLoadGameMenuDesc_2;
-    if (v0 != 0) a1p = gPakLoadProfileMenuDesc_2;
+    a1p = (u8 *)&gPakLoadGameMenuDesc_2;
+    if (v0 != 0) a1p = (u8 *)&gPakLoadProfileMenuDesc_2;
     gPakOverwriteNote = s5;
-    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakConfirmCorruptNoteDesc_2, arg1->f1C, arg1->f20, a1p);
+    MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakConfirmCorruptNoteDesc_2, arg1->f1C, arg1->f20, a1p);
     return 1;
 }

@@ -5,12 +5,8 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
-extern u8 gSingleMenuAfterPakDesc_2[];
-extern u8 gPakMsgInsertToLoadDesc_2[];
-extern u8 gDamagedPakAtBootMenuDesc_2[];
-extern u8 gPakLoadGameMenuDesc_2[];
-extern u8 gPakMsgPakNotFoundDesc_2[];
 void Pak_ProbeSlot_2(s32 ch);
 s32 Pak_GetStatus_2(s32 ch);
 s32 Pak_IsRumblePak_2(s32 ch);
@@ -32,7 +28,7 @@ void PakMenu_InitLoadGame_2(Menu *own) {
     pad = own->controller->port;
     if (gDamagedPakContinued != 0) {
         gPakMenuLeaving = o1;
-        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gSingleMenuAfterPakDesc_2, own->player, own->controller, 0);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gSingleMenuAfterPakDesc_2, own->player, own->controller, 0);
     } else {
         own->items[20].flags &= 0xFEFFFFFF;
         Pak_ProbeSlot_2(own->controller->port);
@@ -42,11 +38,11 @@ void PakMenu_InitLoadGame_2(Menu *own) {
             o2 = 1;
             gPakMenuLeaving = o2;
             if (Pak_IsRumblePak_2(pad) != 0) {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToLoadDesc_2, own->player, own->controller, (void *)o2);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgInsertToLoadDesc_2, own->player, own->controller, (void *)o2);
             } else if (Pak_NeedsRepair_2(pad) != 0) {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc_2, own->player, own->controller, gPakLoadGameMenuDesc_2);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gDamagedPakAtBootMenuDesc_2, own->player, own->controller, &gPakLoadGameMenuDesc_2);
             } else {
-                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc_2, own->player, own->controller, gSingleMenuAfterPakDesc_2);
+                MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakMsgPakNotFoundDesc_2, own->player, own->controller, &gSingleMenuAfterPakDesc_2);
             }
         }
     }

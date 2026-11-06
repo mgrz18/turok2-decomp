@@ -11,7 +11,6 @@
 /* Update callback of the second boss: runs the anim callback, counts the hit timer down, runs the phase's
  * update, then updates the slots, the three movers and the boss' health bar. */
 
-extern BlindOnePhase sBlindOnePhases_2[];
 extern void Animator_Update(void *slot);
 extern void BlindOne_UpdateMover_2(BlindOneMover *mover);
 extern s32 BlindOne_GetHealthPercent_2(BlindOneState *state);

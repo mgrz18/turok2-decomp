@@ -16,10 +16,6 @@ extern s32 gMotherBoss_liveMask[]; /* local type: the field's real type (or the 
 extern s32 gMotherBoss_counter[]; /* local type: the field's real type (or the member path) changes the ROM's code here */ /* gMotherBoss.counter */
 extern f32 sMotherBossFadeTimer; /* fade timer (func_0040A17C) */
 extern s32 sMotherBossCinemaStarted;
-extern s32 sMotherBossPhaseVisBits_2[];
-extern s32 sMotherBossPhaseActiveMasks_2[]; /* active slot mask per phase */
-extern s32 sMotherBossPhaseLiveMasks_2[];
-extern u8 sMotherBossSpotResetScript_2[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void MotherBoss_OnPhase2CinemaDone_2(void);
 extern s32 Cinema_SetNextCallbacks(s32 id, void *arg1, void *arg2);

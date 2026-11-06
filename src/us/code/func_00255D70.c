@@ -3,11 +3,7 @@
 #include "structs/game.h"
 #include "structs/camera.h"
 #include "globals/game.h"
-
-extern char gStatsSaveDoneMenuDesc1;
-extern char gStatsSaveDoneMenuDesc2;
-extern char gStatsSaveDoneMenuDesc3;
-extern char gStatsSaveDoneMenuDesc4;
+#include "globals/menu_desc.h"
 
 void CPlayer__StopLoopingSounds(CPlayer *);
 s32 CPlayerPool__GetIndex(CPlayerPool *players, CPlayer *player);
@@ -18,7 +14,7 @@ void MenuPool_OpenMenu(void *pool, void *screen, CPlayer *p, void *controller, s
 /* Clears the player's flag 0x800000 and, in multiplayer, opens the screen of
  * the player's slot (one of four) on the player's camera. */
 void PlayerState16_Enter(CPlayer *player) {
-    char *screen;
+    struct MenuDesc *screen;
 
     player->m_ShockedTimer = 0;
     player->m_CharacterActor.m_dwFlags &= ~0x800000;

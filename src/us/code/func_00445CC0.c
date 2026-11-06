@@ -4,15 +4,14 @@
 #include "structs/boss.h"
 #include "globals/onscreen.h"
 #include "globals/scene.h"
+#include "globals/boss.h"
 
 /* Second boss setup: collects its three groups of actors (types 0x454-0x456), sets their health and slots,
  * finds its two level objects, shows its health bar ("Blind") and enters the first phase of its script. */
 
-
 /* Plays a sequence of bit masks: every interval seconds, each set bit sends the matching actor (bits 0-3:
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
-extern BlindOnePhase sBlindOnePhases_2[];
 extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void ScriptAnimator_Start(void *slot, s32 arg1);
 extern void *CScene__FindIntelligence(void *level, s32 arg1, s32 id);
@@ -91,5 +90,4 @@ void BlindOne_Setup_2(BlindOneState *state) {
     CScene__UnmarkGeneratorsSaved(&gScene);
     nextPhase(state);
 }
-
 

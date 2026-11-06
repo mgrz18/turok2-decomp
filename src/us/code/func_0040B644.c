@@ -7,10 +7,6 @@
  * phase's active slots. */
 
 
-extern s32 sMotherBossPhaseVisBits[];
-extern s32 sMotherBossPhaseActiveMasks[]; /* active slot mask per phase */
-extern s32 sMotherBossPhaseLiveMasks[];
-extern u8 sMotherBossSpotResetScript[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 static __inline__ void resetSlots(s32 mask, void *src) {

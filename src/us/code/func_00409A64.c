@@ -25,7 +25,6 @@ typedef struct {
     u8 c[4];
 } __attribute__((aligned(4))) Part;
 
-
 extern void AI_UpdateTargets(CListedInstance *actor, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern f32 Random_Blend(f32 min, f32 max);
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b); /* out = a - b */
@@ -121,7 +120,6 @@ void MotherBoss_TeleportTarget(CListedInstance *obj, s32 nearSelf) {
     }
     Actor_SpawnParticle(target, 0x112, p, 0);
 }
-
 
 extern void GameObject_TraceMove(void *obj, CVector3 in, CVector3 *out, s32 *region, s32 a, s32 b);
 extern void *CInstancePool__Spawn(void *world, s32 model, s32 type, s32 intelligence, s32 region, CVector3 pos, f32 rotY,

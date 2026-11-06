@@ -3,17 +3,11 @@
 #include "structs/menu.h"
 #include "globals/game.h"
 #include "globals/menu.h"
+#include "globals/menu_data.h"
 
 extern s32 Menu_StepValue(void *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
 extern s32 Controller_MenuRight(s32);
 extern s32 Controller_ConfirmPressed(s32);
-
-typedef struct {
-    /* 0x00 */ f32 unk0;
-    /* 0x04 */ f32 scale[16];  /* per entry */
-} ScaleTable;
-
-extern ScaleTable sPlayerSpeedTable;
 
 /* Steps the selection (twice when the controller reports busy) and sets the scale
  * from the table plus one, clamped to [0.5, 2.0]. */

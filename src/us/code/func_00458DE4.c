@@ -3,12 +3,11 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 /* Controller pak menu, confirm: checks the pak, then saves (replacing the game's note when one exists, with a
  * message when it is in use) or, without a pak, looks for the next pad that has one. */
 
-extern u8 gPakConfirmOverwriteDesc_2[];
-extern u8 gPakSaveGameMenuDesc_2[];
 s32 Str_Compare_2(u8 *a, char *b);
 void Pak_ProbeSlot_2(s32 a);
 s32 Pak_GetStatus_2(s32 a);
@@ -71,7 +70,7 @@ s32 PakMenu_SelectPak_2(s32 a0, Menu *o, s32 a2) {
         found = 0;
     after:
         if (found != 0 && gPakNoteIndex >= 0 && gPakNoteIndex < 0x10) {
-            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakConfirmOverwriteDesc_2, o->player, o->controller, gPakSaveGameMenuDesc_2);
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, &gPakConfirmOverwriteDesc_2, o->player, o->controller, &gPakSaveGameMenuDesc_2);
             return 1;
         }
         PakMenu_WriteSaveGame_2(a0, o, a2);

@@ -4,13 +4,12 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
 char *PakMenu_GetReturnMenu_2(void *event);
 void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
-extern char gSavePortalMenuDesc_2[];
-extern char gSavePortalMenuDescB_2[];
 extern s32 gPakCheckDone; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 extern s32 gPakMenuAnyPak; /* local type: globals/pak.h declares it; this view (its type here) is what keeps the ROM's code */
 
@@ -56,7 +55,7 @@ s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
             if (text == NULL) {
                 text = event->context;
             }
-            if (event->context == gSavePortalMenuDescB_2 || event->context == gSavePortalMenuDesc_2) {
+            if (event->context == &gSavePortalMenuDescB_2 || event->context == &gSavePortalMenuDesc_2) {
                 gCameraPoolHideViews = 0;
             }
             if (event->player != NULL) {

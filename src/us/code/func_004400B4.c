@@ -1,10 +1,6 @@
 #include "common.h"
+#include "globals/boss.h"
 
-extern s32 sPrimagenSpawnScript1_2;
-extern s32 sPrimagenSpawnScript2_2;
-extern s32 sPrimagenSpawnScript3_2;
-extern s32 sPrimagenSpawnScript4_2;
-extern s32 sPrimagenSpawnScript5_2;
 /* LevelScriptState.script2 (structs/boss.h, 0x8012FA08 on); the ROM addresses it
  * through gLevelScript_script2_cursor, one word in, so the script pointer is at index -1. */
 typedef struct {
@@ -15,7 +11,7 @@ typedef struct {
 
 extern LevelScriptFA10 gLevelScript_script2_cursor; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
-#define SCRIPT(state) (((s32 **) &(state))[-1])
+#define SCRIPT(state) (((BossStep2 **) &(state))[-1])
 
 void Primagen_SetSpawnScript_2(s32 arg0) {
     gLevelScript_script2_cursor.scriptPrev = -1;
@@ -25,18 +21,18 @@ void Primagen_SetSpawnScript_2(s32 arg0) {
         SCRIPT(gLevelScript_script2_cursor) = NULL;
     }
     if (arg0 == 1) {
-        SCRIPT(gLevelScript_script2_cursor) = &sPrimagenSpawnScript1_2;
+        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript1_2;
     }
     if (arg0 == 2) {
-        SCRIPT(gLevelScript_script2_cursor) = &sPrimagenSpawnScript2_2;
+        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript2_2;
     }
     if (arg0 == 3) {
-        SCRIPT(gLevelScript_script2_cursor) = &sPrimagenSpawnScript3_2;
+        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript3_2;
     }
     if (arg0 == 4) {
-        SCRIPT(gLevelScript_script2_cursor) = &sPrimagenSpawnScript4_2;
+        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript4_2;
     }
     if (arg0 == 5) {
-        SCRIPT(gLevelScript_script2_cursor) = &sPrimagenSpawnScript5_2;
+        SCRIPT(gLevelScript_script2_cursor) = sPrimagenSpawnScript5_2;
     }
 }

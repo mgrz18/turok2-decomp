@@ -8,9 +8,6 @@
  * one actor at a random spot around the origin, the second starts a burst of spawns at the phase points. */
 
 extern s32 gMotherBoss_maxRadius; /* local type: the field's real type (or the member path) changes the ROM's code here */ /* gMotherBoss.maxRadius */
-extern u8 sMotherBossPickupTable_2[];
-extern u8 sMotherBossDropTablePhase1_2[];
-extern u8 sMotherBossDropTablePhase2_2[];
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
 extern s32 WeightedTable_PickStatic(void *a);

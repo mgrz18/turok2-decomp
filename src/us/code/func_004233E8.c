@@ -2,10 +2,10 @@
 #include "structs/menu.h"
 #include "globals/pak.h"
 #include "globals/menu.h"
+#include "globals/menu_desc.h"
 
 void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
-extern char gPakMsgInsertRumblePakDesc[];
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 
 static __inline__ void ShowPlayerMessage(u8 *player, char *fmt) {
@@ -28,7 +28,7 @@ s32 SavePortalMenu_SelectGoBack(s32 unused, Menu *event) {
         player = event->player;
         *p = event->controller->port;
     }
-    ShowPlayerMessage(player, gPakMsgInsertRumblePakDesc);
+    ShowPlayerMessage(player, (char *)&gPakMsgInsertRumblePakDesc);
     gSavePortalActive = 0;
     return 1;
 }

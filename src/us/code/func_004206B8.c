@@ -9,11 +9,9 @@
 #include "globals/game.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 extern s8 gPakProfileRead_character[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u8 gPlayerSetupMenuDesc[];
-extern u8 gPakMsgDeleteDoneDesc[];
-extern u8 gPakMsgDeleteFailedDesc[];
 s32 PakMenu_CheckPak(Menu *o, s32 pad, s32 z);
 CPlayer *CPlayerPool__FindByController(CPlayerPool *world, ControllerProfile *s);
 void CPlayer__SetCharacter(CPlayer *a, s32 b);
@@ -50,13 +48,13 @@ s32 CharNoteMenu_SelectYes(s32 unused, Menu *own) {
         own->player = plr;
         O01Restore(plr);
         CPlayer__SetCharacter(plr, gPakProfileRead_character[0]);
-        MenuPool_OpenChildMenu((u8 *)plr->m_pCamera + 0x53C, own, gPlayerSetupMenuDesc);
+        MenuPool_OpenChildMenu((u8 *)plr->m_pCamera + 0x53C, own, (u8 *)&gPlayerSetupMenuDesc);
         return 1;
     }
     if (Pak_DeleteNote(pad, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc, own->player, own->controller, (void *)own->context);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgDeleteDoneDesc, own->player, own->controller, (void *)own->context);
     } else {
-        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc, own->player, own->controller, (void *)own->context);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, (u8 *)&gPakMsgDeleteFailedDesc, own->player, own->controller, (void *)own->context);
     }
     return 1;
 }

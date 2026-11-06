@@ -30,4 +30,12 @@ extern void (*sCollisionTests[8])(Sweep *sweep);    /* NULL-ended; Collision_Mov
 /* Quad_SetBoxTop, Quad_SetBoxSide*: NULL-ended (Platform_CollideBox). */
 extern void (*sBoxSideFaceBuilders[8])(CollisionQuad *quad, CVector3 *points);
 
+/* The engine objects' collision setups (Turok 3's colinfo.c name), at the
+ * head of the player code's file in the first VM module, and its module-2
+ * copy (written by hand in asm/data_0046642C.s). The last record ends the
+ * table (NULL m_pInfo). */
+
+extern CCollisionSetup gCollisionSetupTable[34];
+extern CCollisionSetup gCollisionSetupTable_2[34];
+
 #endif

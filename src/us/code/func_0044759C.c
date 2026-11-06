@@ -3,10 +3,8 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "globals/scene.h"
+#include "globals/boss.h"
 
-extern BlindOnePhase sBlindOnePhases_2[];
-
-extern u8 sBlindOneMoverSeq1_2[];
 extern void CScene__MarkGeneratorsSaved(void *);
 extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 

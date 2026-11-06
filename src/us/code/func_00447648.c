@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/boss.h"
 
-extern BlindOnePhase sBlindOnePhases_2[];
 
 void BlindOne_PhaseGroup1Update_2(BlindOneState *m) {
     BlindOneStep *script;

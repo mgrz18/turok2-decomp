@@ -25,10 +25,6 @@ typedef struct {
     /* 0x54 */ Vec3_0043CF3C spawn;
 } Level0043CF3C;
 
-extern u8 sPrimagenTossTable_2[];
-extern u8 sPrimagenTossTableStage3_2[];
-extern u8 sPrimagenTossTable2_2[];
-extern u8 sPrimagenTossTable2Stage3_2[];
 void AI_TurnHeadToTarget(Actor0043CF3C *actor, Level0043CF3C *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);

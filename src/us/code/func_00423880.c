@@ -3,11 +3,9 @@
 #include "structs/menu.h"
 #include "globals/menu.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
-
-extern char gSavePortalMenuDesc[];
-extern char gSavePortalMenuDescB[];
 
 s32 DamagedPakMenu_SelectContinue(s32 unused, Menu *event) {
     char *dst;
@@ -22,7 +20,7 @@ s32 DamagedPakMenu_SelectContinue(s32 unused, Menu *event) {
         } else {
             dst = &gEngineApp_m_Game_m_MenuPool;
         }
-        if (event->text == gSavePortalMenuDescB || event->text == gSavePortalMenuDesc) {
+        if (event->text == (char *)&gSavePortalMenuDescB || event->text == (char *)&gSavePortalMenuDesc) {
             gCameraPoolHideViews = 0;
         }
         MenuPool_OpenMenu(dst, event->text, event->player, event->controller, 0);

@@ -91,7 +91,6 @@ typedef struct {
     /* 0x10 */ Source00402404 *source;
 } Hit00402404;
 
-extern u8 sMantidQueenSpotHitScript[];
 void ScriptAnimator_SetScript(void *slot, void *arg);
 void COnScreen__SetBossPercent(void *a0, s32 percent);
 

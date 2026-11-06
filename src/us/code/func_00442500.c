@@ -7,7 +7,6 @@
 /* Spawns one actor near each of the four spawn points, scattered by up to +-15 units, skipping a point
  * closer than 460.8 to the target of the module object. */
 
-
 extern f32 MotherBoss_GetTargetDist_2(void *obj, CGameObjectInstance **found);
 extern s32 WeightedTable_PickStatic(void *a);
 extern f32 Random_Blend(f32 min, f32 max);

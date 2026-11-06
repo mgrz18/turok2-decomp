@@ -7,6 +7,7 @@
 #include "structs/save.h"
 #include "globals/scene.h"
 #include "globals/pak.h"
+#include "globals/menu_desc.h"
 
 /* local: globals/game.h declares these, but its gEngineApp_m_Settings_unk180 (u8) clashes with the array view below, which the ROM needs here */
 extern GameSettings gEngineApp_m_Settings;
@@ -28,9 +29,6 @@ extern f32 gEngineApp_m_Settings_match_seconds[]; /* local type: the field's rea
 extern f32 gEngineApp_m_Settings_match_minutes[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern f32 gEngineApp_m_Settings_match_hours[]; /* local type: the field's real type (or the member path) changes the ROM's code here */
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2]; /* local type: the field's real type (or the member path) changes the ROM's code here */
-extern u8 gPakMsgRumblePakDesc[];
-extern u8 gPakMsgDeleteDoneDesc[];
-extern u8 gPakMsgDeleteFailedDesc[];
 
 extern s32 PakMenu_CheckPak(Menu *c, s32 slot, s32 quiet);
 extern CPlayer *CPlayerPool__FindByController(void *players, ControllerProfile *ctl);
@@ -74,13 +72,13 @@ s32 GameNoteMenu_SelectYes(void *menu, Menu *c) {
         }
         gEngineApp_m_Game_m_PlayerList_m_bCinema[0] = 0;
         gEngineApp_m_Game_m_PlayerList_m_bCinema[1] = 0;
-        MenuPool_OpenMenu((u8 *) gEngineApp_m_Game_m_PlayerList_m_bCinema + 0x588, gPakMsgRumblePakDesc, (s32) player, player->m_ContState.m_pContState, NULL);
+        MenuPool_OpenMenu((u8 *) gEngineApp_m_Game_m_PlayerList_m_bCinema + 0x588, &gPakMsgRumblePakDesc, (s32) player, player->m_ContState.m_pContState, NULL);
         return 1;
     }
     if (Pak_DeleteNote(slot, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, gPakMsgDeleteDoneDesc, c->player, c->controller, c->context);
+        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, &gPakMsgDeleteDoneDesc, c->player, c->controller, c->context);
     } else {
-        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, gPakMsgDeleteFailedDesc, c->player, c->controller, c->context);
+        MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, &gPakMsgDeleteFailedDesc, c->player, c->controller, c->context);
     }
     return 1;
 }
