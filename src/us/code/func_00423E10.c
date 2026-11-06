@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/frame.h"
+#include "globals/libultra.h"
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/FRONTEND/8040B45C_21.CPP, func_8040BBB0_de, with Turok 2's layouts. */
 /* Video setup: picks the low or high resolution set (high when an expansion pak is present, decided once), then
@@ -9,7 +10,6 @@ typedef struct {
     s32 a, b, c, d, e;
 } VideoFlags;
 
-extern s32 osTvType; /* osTvType */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;
 extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */

@@ -1,5 +1,6 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/FRONTEND/8040B45C_22.CPP, func_8040C484_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/libultra.h"
 
 struct NodeRecAt294;
 typedef struct NodeRecAt294 NodeRecAt294;
@@ -13,10 +14,9 @@ struct NodeRecAt294 {
     int x;
     int y;
 };
-extern int osTvType;
 extern int gScreenWidth;
 extern int gScreenHeight;
-extern int osTvType,gViAntiAlias;
+extern int gViAntiAlias;
 extern unsigned short D_800C21AA[],sViModeIndex;
 extern NodeRecAt294 gEngineApp_m_Game_m_CameraPool_m_MainCamera;
 extern int gScreenWidth,gScreenHeight;

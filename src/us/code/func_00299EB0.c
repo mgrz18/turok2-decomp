@@ -5,7 +5,7 @@
 typedef unsigned long u32;
 typedef long s32;
 typedef volatile unsigned long vu32;
-extern void *osRomBase;
+extern void *osRomBase; /* local type: preprocessed ultralib file with its own u32/s32 typedefs (long), cannot include common.h */
 extern u32 osVirtualToPhysical(void *);
 s32 osPiRawStartDma(s32, u32 , void *, u32 );
 #ident "$Revision: 1.17 $"

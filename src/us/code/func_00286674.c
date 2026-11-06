@@ -4,12 +4,12 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/libultra.h"
 
 typedef struct {
     /* 0x00 */ s16 type;
 } EngineMsg;
 
-extern s32 osTvType;          /* osTvType */
 extern u8 gPoolBuffers[];
 extern void *gCFB[];      /* frame buffers */
 extern f32 gCurrentFB[];

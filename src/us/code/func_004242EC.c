@@ -2,12 +2,12 @@
  * All 135 words match (checked over the real extent). First-module copy of src/us/code/Video_NextResolution_2.c. */
 #include "common.h"
 #include "structs/frame.h"
+#include "globals/libultra.h"
 
 s32 GetMemSize(void); /* osGetMemSize */
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
 
-extern s32 osTvType; /* osTvType */
 extern s32 gScreenWidth;
 extern s32 gScreenHeight;
 extern s32 gResolution; /* current mode */
