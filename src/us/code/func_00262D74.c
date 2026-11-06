@@ -5,6 +5,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 #include "structs/level_actor.h"
+#include "globals/scene.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
@@ -19,7 +20,6 @@ extern Pick sGeneratorHealthPicksReduced[];
 extern Pick sGeneratorMultiHealthPicks[];
 extern Pick sGeneratorItemPicks[];
 extern Pick sGeneratorMultiItemPicks[];
-extern u8 gScene[];
 extern u8 gScene_m_ParticleSystem[];
 extern u8 gScene_m_ActorPool[];
 extern u8 gScene_m_InstancePool[];
@@ -95,10 +95,10 @@ void Generator_SpawnEnter(CGameObjectInstance *actor, CAI *ai) {
     }
     switch (info->m_Type) {
     case 0:
-        model = CScene__GetIntelligence(gScene, info->m_VariationIndex);
+        model = CScene__GetIntelligence(&gScene, info->m_VariationIndex);
         switch (*model) {
         case 8:
-            id = CScene__GetObjectTypeID(gScene, info->m_ObjectIndex);
+            id = CScene__GetObjectTypeID(&gScene, info->m_ObjectIndex);
             if (Generator_IsPickupUnlocked(id)) {
                 spawnPickup(actor, ai, pos, region, id);
             }

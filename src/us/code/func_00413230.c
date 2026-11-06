@@ -19,6 +19,7 @@
 #include "structs/menu_model.h"
 #include "structs/camera.h"
 #include "gfx.h"
+#include "globals/scene.h"
 
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -552,7 +553,6 @@ extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
 extern s32 sMenuModelFade;
-extern u8 gScene[];
 extern s32 gCharacterModels[];
 
 extern void memset(void *p, s32 c, s32 n); /* memset */
@@ -616,7 +616,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
             if (!(o->flags & 0x2000000)) {
                 s2 = p->intelType;
                 x2 = o->model;
-                src = CScene__FindIntelligence(gScene, s2, p->intelId);
+                src = CScene__FindIntelligence(&gScene, s2, p->intelId);
                 if (src == NULL) {
                     x2->loaded = 0;
                 } else {
@@ -655,7 +655,7 @@ void MenuItem_DrawModel(MenuItem *o, MenuItemLayout *idp, MenuItemLayout *unused
                 CCache__SetFrameDelay(1);
             }
             if (x->intelType == INTELLIGENCE_PLAYER) {
-                CScene__SetInstanceObjectType(gScene, fx, gCharacterModels[fx->header.m_pIntelligence->m_Id], 1);
+                CScene__SetInstanceObjectType(&gScene, fx, gCharacterModels[fx->header.m_pIntelligence->m_Id], 1);
             }
             if (D_800C1BD0_4143DC != 4) {
                 D_800C1BD0_4143DC = 4;
@@ -1283,14 +1283,13 @@ void MenuItem_DrawBinding(s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
 /* ---------------- MenuItem_SetModel ---------------- */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004422BC.c, func_004422BC, with Turok 2's layouts. */
 
-extern u8 gScene[];
 extern CIntelligence *func_00225EBC_416214(void *world, s32 type, s32 id) __asm__("CScene__FindIntelligence");
 
 /* Finds a model item's definition and copies it into the item's extra (as
  * MenuItem_DrawModel does). */
 CIntelligence *MenuItem_SetModel(MenuItem *a, s32 id, s32 arg) {
     MenuModel *p = a->model;
-    CIntelligence *v = func_00225EBC_416214(gScene, id, arg);
+    CIntelligence *v = func_00225EBC_416214(&gScene, id, arg);
 
     if (v == NULL) {
         p->loaded = 0;

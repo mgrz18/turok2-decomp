@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/scene.h"
 
 void CAI__SetMode(void *a0, void *a1, s32 event);
 void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
@@ -76,7 +77,6 @@ typedef struct {
     /* 0x08 */ Vec3_00401E30 offset;
 } Part00401E30;
 
-extern u8 gScene[];
 extern WaveBossStep sMantidQueenScript[];
 extern Part00401E30 sMantidQueenMinions[];
 void ScriptAnimator_Start(void *slot, void *actor);
@@ -110,10 +110,10 @@ void MantidQueen_Init(WaveBossState *s, CGameObjectInstance *actor) {
     s->toSpawn = 0;
     s->spots[0].health = 0;
     State_SetStep(s, sMantidQueenScript, 1);
-    CScene__FindInstances(gScene, 0x457, 9, 0x1D4D, &s->boss, 1);
-    s->memberCount = CScene__FindInstances(gScene, 0x651, 10, 0x1D4D, s->members, 8);
+    CScene__FindInstances(&gScene, 0x457, 9, 0x1D4D, &s->boss, 1);
+    s->memberCount = CScene__FindInstances(&gScene, 0x651, 10, 0x1D4D, s->members, 8);
     for (i = 0; i < 2; i++) {
-        s->intel[i] = CScene__FindIntelligence(gScene, 1, sMantidQueenMinions[i].id);
+        s->intel[i] = CScene__FindIntelligence(&gScene, 1, sMantidQueenMinions[i].id);
     }
     s->blink = 0;
     s->blinkTimer = 0.0f;

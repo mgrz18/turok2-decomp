@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 s32 Cinema_RequestById(s32);
 s32 CScene__RequestWarp(s32, s32, s32);
@@ -15,7 +16,6 @@ extern s32 gFinalEnding;
 extern s32 gEndingPrimagenDefeated;
 extern s32 gScreenHeight;
 extern s32 sCreditsLine;
-extern s32 gScene;
 extern s32 gCreditsDone;
 extern f32 gCreditsScroll;
 

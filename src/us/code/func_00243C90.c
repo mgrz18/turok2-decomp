@@ -4,6 +4,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 #include "structs/collision.h"
+#include "globals/scene.h"
 
 typedef struct Actor {
     /* 0x000 */ u8 pad0[4];
@@ -46,7 +47,6 @@ typedef struct {
     /* 0xB8 */ s32 region;
 } Plan;
 
-extern u8 gScene[];
 extern u8 gCollisionInfoLineOfSight[];
 extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 extern CharacterInfo gPlayerStateTable_tuning[];
@@ -127,20 +127,20 @@ Actor *AI_FindBestTarget(Actor *self, Plan *plan, s32 checkSight, s32 flag) {
                 if ((side == 0 && (self->def->m_Enemy.m_dwEnemyFlags & 0x40))
                     || (side == 1 && (self->def->m_Enemy.m_dwEnemyFlags & 0x80))
                     || (side == 2 && (self->def->m_Enemy.m_dwEnemyFlags & 0x100))) {
-                    t = func_00225848(gScene, self);
+                    t = func_00225848(&gScene, self);
                     ADD(t);
                 }
                 if (plan->approachFrom != NULL
                     && ((side == 0 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x1F))
                         || (side == 1 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x3E0))
                         || (side == 2 && (self->def->m_Enemy.m_wTakeCoverAnimFlags & 0x7C00)))) {
-                    t = func_0022594C(gScene, self);
+                    t = func_0022594C(&gScene, self);
                     ADD(t);
                 }
             }
             t = plan->ignore;
             ADD(t);
-            t = func_002259D0(gScene, self);
+            t = func_002259D0(&gScene, self);
             ADD(t);
         }
         if (self->flags & 0x300000) {

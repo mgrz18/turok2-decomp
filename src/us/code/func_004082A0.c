@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -25,7 +26,6 @@ typedef struct {
 
 
 extern void *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
-extern s32 gScene;
 extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
 extern u8 gEngineApp_m_OnScreen[];
@@ -61,7 +61,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
     u8 *obj;
     u8 *ai;
 
-    if (gEngineApp_m_Game.m_Settings.mode != 13 || gScene != 4) {
+    if (gEngineApp_m_Game.m_Settings.mode != 13 || gScene.m_Mode != 4) {
         return;
     }
     if ((f32) (*(s32 *) (fight->obj->def + 0x54) * 15) <= fight->timer) {

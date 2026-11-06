@@ -3,11 +3,11 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 #include "structs/level_actor.h"
+#include "globals/scene.h"
 
 /* Spawns a pickup picked from a weighted table at a random point around the origin (MotherBoss_RandomArenaPoint and
  * MotherBoss_SpawnPickup inlined). */
 
-extern u8 gScene[];
 extern u8 gScene_m_ActorPool[];
 extern s16 WeightedTable_PickStatic(Pick *table);
 extern f32 Random_Blend(f32 min, f32 max);
@@ -38,7 +38,7 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     s32 region;
     CPooledLevelActor *pickup;
 
-    region = CScene__FindRegionAt(gScene, &pos);
+    region = CScene__FindRegionAt(&gScene, &pos);
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/boss.h"
+#include "globals/scene.h"
 
 /* Module update: ticks every slot, then (outside cinematics) counts the two phase timers: the first spawns
  * one actor at a random spot around the origin, the second starts a burst of spawns at the phase points. */
@@ -10,7 +11,6 @@ extern s32 gMotherBoss_maxRadius; /* gMotherBoss.maxRadius */
 extern u8 sMotherBossPickupTable_2[];
 extern u8 sMotherBossDropTablePhase1_2[];
 extern u8 sMotherBossDropTablePhase2_2[];
-extern u8 gScene[];
 extern u8 gScene_m_ActorPool[];
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
@@ -28,7 +28,7 @@ static __inline__ void SpawnAt(s32 delay, s16 type, CVector3 pos, f32 speed) {
     s32 region;
     void *actor;
 
-    region = CScene__FindRegionAt(gScene, &pos);
+    region = CScene__FindRegionAt(&gScene, &pos);
     vel.x = 0.0f;
     vel.y = speed;
     vel.z = 0.0f;

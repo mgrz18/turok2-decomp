@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 /* Level select (warp) menu input: A warps to the selected level (or, on the
  * last entry, starts the credits/next mode), up and down move the selection
@@ -9,7 +10,6 @@
 
 
 extern s32 sCheatsMenuSelection;
-extern u8 gScene[];
 
 extern s32 Controller_ConfirmPressed(s32 pad);
 extern s32 Controller_MenuLeft(s32 pad);
@@ -131,7 +131,7 @@ s32 CheatsMenu_WarpSelect(void *menu, Menu *c) {
             return 1;
         }
         if (gEngineApp_m_Game.m_Settings.mode == 13) {
-            CScene__RequestWarp(gScene, id, 2);
+            CScene__RequestWarp(&gScene, id, 2);
             return 0;
         }
         progress = &gEngineApp_m_Game.m_Settings;

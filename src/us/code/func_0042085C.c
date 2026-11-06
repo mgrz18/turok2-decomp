@@ -5,6 +5,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/scene.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
@@ -18,7 +19,6 @@ extern s32 gPakMenuPort; /* pad */
 extern s32 gScene_m_PendingWarpID;
 extern s32 gPakCheckDone;
 extern s32 gSavePortalActive;
-extern u8 gScene[];
 extern u8 gEngineApp[];
 extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gSavePortalMenuDescB[];
@@ -59,7 +59,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
                 s1 = o->controller->port;
             }
             Controller_UnwatchPak(s1);
-            CScene__RequestWarp(gScene, o->player->m_Data.m_CheckPointWarpID, 2);
+            CScene__RequestWarp(&gScene, o->player->m_Data.m_CheckPointWarpID, 2);
             return 1;
         }
         func_004303AC(gEngineApp);
@@ -72,7 +72,7 @@ s32 PakMessage_SelectOk(s32 a0, Menu *o) {
     }
     if (gPakMessageKind == 5) {
         Controller_UnwatchPak(s1);
-        CScene__RequestWarp(gScene, gScene_m_PendingWarpID, 2);
+        CScene__RequestWarp(&gScene, gScene_m_PendingWarpID, 2);
     }
     if (gPakMenuAnyPak != 0) {
         if (gPakMessageKind == 6) {

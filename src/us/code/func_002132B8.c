@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00277CC4.c, func_00277CC4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -24,7 +25,6 @@ typedef struct WTab {
                 WRec r[1];
 } WTab;
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
-extern CScene gScene;
 void *CISet__GetBlock();
 s32 Lighting_CollectVolumes(Box3 *q, WRec **out, s32 *cnt)
 {

@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/game.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xC4];
@@ -21,7 +22,6 @@ typedef struct {
 
 
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the current player */
-extern u8 gScene[];
 extern u8 D_800B6660[];
 extern u8 gEngineApp_m_OnScreen[];
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
@@ -60,7 +60,7 @@ void TotemDefense_Complete(BossFight *fight) {
     Sound__PlaySpeech(0x168);
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);
     setAnim(fight->obj, 0x5337);
-    CScene__UnmarkGeneratorsSaved(gScene);
+    CScene__UnmarkGeneratorsSaved(&gScene);
     gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead->m_FleeTime = 450.0f;
     for (a = gScene_m_InstancePool_m_ActiveList[0]; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {

@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/event.h"
+#include "globals/scene.h"
 
 typedef struct {
     void (*onActor)(void *actor, void *ai, LevelEvent *event);
@@ -10,7 +11,6 @@ extern EventHandler *gLevelEventHandlers[];  /* handler tables by kind */
 extern char *gLevelMessages[];          /* {text, sound} pairs */
 extern s32 D_800B69DC[];            /* gLevelMessages + 4 */
 extern s32 gFrameCountGameplay;
-extern s32 gScene;              /* world: game state */
 extern u8 *gScene_m_pActors;              /* world + 0xE0: level actors (0x288 bytes each) */
 extern s32 gScene_m_nLevel;              /* current level */
 extern u8 gEngineApp_m_Game_m_CameraPool[];             /* game */
@@ -38,7 +38,7 @@ void LevelEvent_Fire(LevelEvent *event) {
             camera = game - 0x1201;
         }
     }
-    if (gScene == 4) {
+    if (gScene.m_Mode == 4) {
         if (event->message != 0) {
             CCameraPool__AddMultiLineText(gEngineApp_m_Game_m_CameraPool, camera, gLevelMessages[event->message * 2], gFrameCountGameplay, 4.0f);
             if (D_800B69DC[event->message * 2] != 0) {

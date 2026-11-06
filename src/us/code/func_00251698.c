@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/scene.h"
 
 /* A 0x64-byte record of the world model sections (CScene__GetRegionInfo finds it from an id). */
 typedef struct {
@@ -25,7 +26,6 @@ extern s32 gCinemaHidesActors;
 extern s32 gDeathTint;
 extern void *sDeathCinemaPlayer;
 extern u8 gDeathTintColor[];
-extern s32 gScene;
 extern s32 gScene_m_bStreamAll;
 extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;
 extern s32 PlayerDeath_CinemaDone;

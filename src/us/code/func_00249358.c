@@ -3,6 +3,7 @@
 #include "structs/region.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[4];
@@ -14,7 +15,6 @@ typedef struct {
  * the code no longer matches. */
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
 extern s32 gScene_m_WarpState;
-extern u8 gScene[];         /* the level */
 extern char D_800B66D0[];
 
 s32 Cinema_IsActive(void);
@@ -79,7 +79,7 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
         check = p->m_Data.m_SpecialPickupCount[384] & 0xF;
     }
     if (check && p->m_CharacterActor.header.m_pCurrentRegion != NULL) {
-        info = CScene__GetRegionInfo(gScene, ((void *)p->m_CharacterActor.header.m_pCurrentRegion));
+        info = CScene__GetRegionInfo(&gScene, ((void *)p->m_CharacterActor.header.m_pCurrentRegion));
         if (info != NULL && (info->m_dwFlags & 0x400000)) {
             return;
         }
@@ -116,7 +116,7 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
             zero.x = 0;
             zero.y = 0;
             zero.z = 0;
-            CScene__StartRumbles(gScene, p->m_ContState.m_pContState->rumblePool, 0x11, zero, 51.199997f, f);
+            CScene__StartRumbles(&gScene, p->m_ContState.m_pContState->rumblePool, 0x11, zero, 51.199997f, f);
         }
     }
     if (!dead && (s16) (u16)p->m_Mode != 0xF) {

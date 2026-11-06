@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/scene.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/WEAPONS/80204E78_5.CPP, func_802054E0_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -474,7 +475,6 @@ typedef struct Object_func_8028B274_de Object_func_8028B274_de;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CScene gScene;
 struct LevelActor;
 struct LevelActor;
 struct Shared_Actor;

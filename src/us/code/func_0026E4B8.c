@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "structs/world.h"
+#include "globals/scene.h"
 
-extern CScene gScene;
 extern s32 CScene__IsEventFired(CScene *world, Trigger *trigger);
 extern s32 CScene__AreEventsDone(CScene *world, s32 id);
 extern void CScene__FireEventsByKeyOnce(CScene *world, s32 id);

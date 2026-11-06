@@ -3,9 +3,9 @@
  * pointer `.word 0x00285CF0` in us/asm/data/AB858.rodata.s shows. */
 #include "common.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 extern s32 gFogEnabled;
-extern u8 gScene[];
 extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[];
 extern s32 gEvenOdd;              /* frame buffer index */
 extern f32 sExpansionPakMtx[][16];        /* per-frame matrices */
@@ -31,7 +31,7 @@ void EngineMode03_ExpansionPak_Draw(CEngineApp *view) {
     s32 key;
 
     gFogEnabled = 0;
-    id = CScene__FindObjectType(gScene, 0xE10);
+    id = CScene__FindObjectType(&gScene, 0xE10);
     if (id == -1) {
         return;
     }
@@ -40,7 +40,7 @@ void EngineMode03_ExpansionPak_Draw(CEngineApp *view) {
     CMtxF__PreRotateY(mtx, view->m_Settings.modeTimer * 0.17453295f);
     CMtxF__SwapYZRows(mtx);
     CMtxF__ToMtxAffine(mtx, sExpansionPakMtx[gEvenOdd]);
-    key = CScene__GetObject(gScene, id);
+    key = CScene__GetObject(&gScene, id);
     Render_ResetBatches();
     Render_QueueModelByKey(key, sExpansionPakMtx[gEvenOdd], gDefaultLights, 0, -1);
     Render_FlushBatches();

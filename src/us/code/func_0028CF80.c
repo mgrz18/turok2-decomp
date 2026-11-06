@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 
-extern u8 gScene[];             /* the world */
 extern s32 gScene_m_LevelID;              /* world +0x18FD0 */
 
 s32 Demo_GetPlayerCount(void);
@@ -23,7 +23,7 @@ void SavedPlayers_Arm(void) {
     if (gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_nCount == 0) {
         ok = 0;
     }
-    if (gScene == NULL) {
+    if (&gScene == NULL) {
         ok = 0;
     }
     if (ok) {

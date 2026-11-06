@@ -2,6 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/scene.h"
 
 
 typedef struct {
@@ -18,7 +19,6 @@ typedef struct {
 } State;
 
 extern u32 gFrameCountGameplay;
-extern s32 gScene;
 extern u8 gEngineApp_m_Game_m_CameraPool[];
 void CCameraPool__AddText(void *buf, s32 a, s32 b);
 void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
@@ -26,7 +26,7 @@ void CPlayer__StartWeaponBackgroundSound(CPlayer *player, s32 id);
 void WeaponActor_EquipRequested(CGameObjectInstance *actor, State *state) {
     CPlayer *player = ((CPlayer *)actor->m_AI.m_pParent);
 
-    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || gScene != 4) {
+    if (player->m_Data.m_CurrentWeapon != player->m_RequestedWeapon || gScene.m_Mode != 4) {
         player->m_Data.m_CurrentWeapon = player->m_RequestedWeapon;
         state->unk2C = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->modeTable;
         state->unk108 = gWeaponInfoTable[player->m_Data.m_CurrentWeapon]->effects;

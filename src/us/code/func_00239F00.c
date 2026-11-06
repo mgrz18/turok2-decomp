@@ -2,10 +2,10 @@
 #include "structs/game_object.h"
 #include "structs/region.h"
 #include "structs/collision.h"
+#include "globals/scene.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-extern s32 gScene[];
 extern f32 gFrameIncrement;                  /* frame time, in 15ths of a second */
 extern CCollisionResults *gCollisionResultsP;
 extern void (*sCollisionTests[])(Sweep *);   /* the collision tests, NULL-ended */
@@ -45,7 +45,7 @@ s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInf
     f32 ground;
     f32 dy;
 
-    info = CScene__GetRegionInfo(gScene, obj->header.m_pCurrentRegion);
+    info = CScene__GetRegionInfo(&gScene, obj->header.m_pCurrentRegion);
     if (def != &D_800F1E10 && def != &D_800F1CC0 && def != &gCollisionInfoSight && def != &D_800F1C60) {
         obj->m_pInstanceBelow = 0;
         if (obj->header.m_Type == 1) {

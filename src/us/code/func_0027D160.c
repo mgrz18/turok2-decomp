@@ -10,6 +10,7 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -34,7 +35,6 @@ extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main cam
 extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;          /* the pool wants on-screen projections */
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
-extern s32 gScene[];
 extern s32 gDefaultVisBits;
 void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
@@ -384,7 +384,7 @@ found:
     CEmitterPool__Advance(cam->m_SkySystem, cam);
     MenuPool_Update(cam->m_MenuPool);
     if (Cinema_PathPlaying() != 0) {
-        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(gScene, &cam->m_ViewParams.m_vPos);
+        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(&gScene, &cam->m_ViewParams.m_vPos);
     }
     floor = (CFloor *) cam->m_ViewParams.m_pCurrentRegion;
     x = cam->m_ViewParams.m_vPos.x;

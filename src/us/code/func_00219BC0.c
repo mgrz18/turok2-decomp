@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/world.h"
+#include "globals/scene.h"
 
 typedef struct {
     s32 words[6];
@@ -19,7 +20,6 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32)
 s32 Instance_NextUniqueId(void);
 void CGameObjectInstance__DrawModelLitVertices(void);
 
-extern CScene gScene;
 extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;      /* player count */
 extern u8 *gEngineApp_m_Game_m_PlayerList_m_Players;      /* players, 0x1328 bytes each */
 extern u8 gWeaponActorTypeInfo[];

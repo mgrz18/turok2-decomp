@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/collision.h"
+#include "globals/scene.h"
 
-extern CScene gScene;
 extern s32 gScene_m_nDrawActors;
 extern CCollisionInfo D_800F1C60;
 

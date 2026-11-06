@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/list.h"
+#include "globals/scene.h"
 
 /* Spawns a copy of an actor: takes a free instance off the world's free list
  * and initialises it from src. */
@@ -14,7 +15,6 @@ extern void CList__AddHead(void *list, void *node);
 extern void CList__Remove(void *list, void *node);
 extern s32 gDefaultVisBits;
 extern s32 gPersistentDataLoaded;
-extern u8 gScene[];
 extern s32 gScene_m_bStreamAll;
 
 /* CInstancePool__Alloc without the owner counter. */
@@ -63,7 +63,7 @@ CGameObjectInstance *CInstancePool__SpawnCopy(CInstancePool *world, CGameObjectI
     if (intelligence == NULL) {
         return NULL;
     }
-    if ((model == -1 && (model = CScene__FindObjectType(gScene, type)) == -1)
+    if ((model == -1 && (model = CScene__FindObjectType(&gScene, type)) == -1)
         || (obj = take_free_instance(world)) == NULL) {
         return NULL;
     }

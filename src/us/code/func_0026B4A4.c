@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/region.h"
 #include "structs/world.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ f32 minX;
@@ -17,7 +18,6 @@ typedef struct {
 } TriGroupList;
 
 extern s32 gPersistentDataLoaded;          /* level loaded */
-extern CScene gScene;
 extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
 extern CVector3 sRegionNormal;        /* cached raw normal */
 

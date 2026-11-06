@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 /* Where an actor was placed: CScene__SetInstanceSavedBitInLevel(world, level, index, 1) sets its bit
  * in the per-level bit sections of the world. */
@@ -10,7 +11,6 @@ typedef struct {
 } ActorPlacement;
 
 s32 CScene__SetInstanceSavedBitInLevel(s32 *, u16, u16, s32); /* extern */
-extern s32 gScene;
 
 void Action_EventGoRemote(ActorPlacement *arg0) {
     CScene__SetInstanceSavedBitInLevel(&gScene, arg0->level, arg0->actorIndex, 1);

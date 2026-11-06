@@ -19,6 +19,7 @@
 #include "structs/collision.h"
 #include "structs/frame.h"
 #include "structs/particle_event.h"
+#include "globals/scene.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -1162,7 +1163,6 @@ extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern s32 gEvenOdd;
-extern u8 gScene[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 extern f32 gProjectileSpeedScale[2];
@@ -1348,7 +1348,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     numEntries = block->count;
     templates = block->entries;
     if (kind == 0xFC) {
-        CScene__Blast(gScene, &pos);
+        CScene__Blast(&gScene, &pos);
     }
     if (BinaryRange(templates, numEntries, kind, &first, &last) != 0) {
         entries = ((EntryBlock *) CISet__GetBlock(resource, 2))->entries;
@@ -1453,7 +1453,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 continue;
             }
             if (entry->params->event != 0) {
-                func_00225C08(gScene, entry->params->event, &pos);
+                func_00225C08(&gScene, entry->params->event, &pos);
             }
             extra = 0;
             if (entry->flags & 0x8000) {

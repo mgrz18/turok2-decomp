@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/scene.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x44];
@@ -23,7 +24,6 @@ typedef struct Entry0026C5C4 {
 s32 CScene__GetRegionInfo(s32, s32);
 
 s32 CGameRegion__FloodSetWaterSame(s32, s32);                    /* extern */
-extern s32 gScene;
 
 void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
     s32 temp_a0;

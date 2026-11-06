@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/cinema.h"
+#include "globals/scene.h"
 
 
 extern Cinema *gCinemaPlayerP;
@@ -11,7 +12,6 @@ extern u8 gRumblePool[];
 /* The world and fields of it (see CScene__UpdateWarp's World). gScene_m_nLevel and
  * gScene_m_LevelID are arrays because the ROM accesses them as struct members: a
  * store through a pointer may alias them, so their loads stay after it. */
-extern u8 gScene[];             /* the world */
 extern s32 gScene_m_nLevel[];            /* world +0x18FA8: the current warp id */
 extern s32 gScene_m_bWarpSpawn;              /* world +0x18FB8: selectionFlags */
 extern u8 gScene_m_WarpSpawn[];             /* world +0x18FBC: selectionSpawn */
@@ -49,7 +49,7 @@ void Cinema_Start(void) {
                 gCinemaPlayerP->restored = 0;
                 gCinemaPlayerP->startPos = player->m_CharacterActor.header.m_vPos;
                 gCinemaPlayerP->startRotY = player->m_CharacterActor.m_RotY;
-                gCinemaPlayerP->startRegion = CScene__GetRegionIndex(gScene, player->m_CharacterActor.header.m_pCurrentRegion);
+                gCinemaPlayerP->startRegion = CScene__GetRegionIndex(&gScene, player->m_CharacterActor.header.m_pCurrentRegion);
             }
             player->m_WeaponActor.m_AI.m_VarBuffer[0] = 0;
             player->m_WeaponActor.m_AI.m_VarBuffer[1] = 0;
@@ -59,7 +59,7 @@ void Cinema_Start(void) {
         RumblePool_FreeAll(gRumblePool);
     }
     if (warp != -1) {
-        world = gScene;
+        world = &gScene;
         if (gScene_m_nLevel[0] != warp) {
             out[0] = 0;
             out[1] = 0;

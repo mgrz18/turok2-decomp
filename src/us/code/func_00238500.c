@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/scene.h"
 
 typedef struct ViewInfo {
     /* 0x000 */ u8 pad0[0x114];
@@ -12,7 +13,6 @@ typedef struct ShotActor {
     /* 0x1A8 */ CPlayer *player;
 } ShotActor;
 
-extern u8 gScene[];
 extern u8 gScene_m_ParticleSystem[];
 
 void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);
@@ -50,5 +50,5 @@ void func_00238500(void *unused, ShotActor *actor, CVector3 pos, CVector3 dir, s
     p.x = 0.0f;
     p.y = 0.0f;
     p.z = 0.0f;
-    CScene__StartRumbles(gScene, pl->m_ContState.m_pContState->rumblePool, 3, p, 10.24f, 1.0f);
+    CScene__StartRumbles(&gScene, pl->m_ContState.m_pContState->rumblePool, 3, p, 10.24f, 1.0f);
 }

@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/level_actor.h"
+#include "globals/scene.h"
 
 extern s32 gPersistentDataLoaded;
-extern u8 gScene[];                 /* the world */
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gLevelActorIntelligenceMP[];
 extern u8 gLevelActorIntelligence[];
@@ -53,11 +53,11 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
     s32 index;
     s32 resource;
 
-    if (gPersistentDataLoaded == 0 || (index = CScene__FindObjectType(gScene, id)) == -1) {
+    if (gPersistentDataLoaded == 0 || (index = CScene__FindObjectType(&gScene, id)) == -1) {
         return NULL;
     }
     actor = allocActor(pool);
-    resource = CScene__GetObject(gScene, index);
+    resource = CScene__GetObject(&gScene, index);
     actor->m_pOwnerCount = refCount;
     if (refCount != NULL) {
         (*refCount)++;
@@ -91,6 +91,6 @@ CPooledLevelActor *CLevelActorPool__Spawn(CLevelActorPool *pool, s32 *refCount, 
     p.x = actor->m_Actor.header.m_vPos.x;
     p.y = actor->m_Actor.header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
     p.z = actor->m_Actor.header.m_vPos.z;
-    CScene__GetLightsAt(gScene, &p, actor->m_Actor.m_Lights);
+    CScene__GetLightsAt(&gScene, &p, actor->m_Actor.m_Lights);
     return actor;
 }

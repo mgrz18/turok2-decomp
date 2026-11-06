@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/scene.h"
 
 /* Controller pak menu, load: after the pak check, copies the loaded save into the player and the game state
  * and shows the "loaded" message; otherwise reports whether the note could be read. */
@@ -13,7 +14,6 @@ extern s32 gPakMenuPort; /* pad */
 extern s32 gPakMenuLeaving;
 extern s32 sGameNoteLoad;
 extern s32 gPakNoteIndex;
-extern CScene gScene[];
 extern u8 gEngineApp_m_Settings_unk180;
 extern s32 gEngineApp_m_Settings_unlockedCheats;
 extern f32 gEngineApp_m_Settings_match_seconds[];
@@ -52,7 +52,7 @@ s32 GameNoteMenu_SelectYes_2(s32 unused, Menu *own) {
     }
     if (sGameNoteLoad != 0) {
         plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, own->controller);
-        g = gScene;
+        g = &gScene;
         save = gEngineApp_m_Settings_unk180;
         plr->m_Data = gLoadBuffer->player;
         {

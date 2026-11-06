@@ -1,11 +1,11 @@
 #include "common.h"
+#include "globals/scene.h"
 
 s32 CCache__Unlock(s32, s32);
 s32 CScene__LoadGraphicSet(s32, s32, s32, s32);
 s32 Hud_GetImageFrame(s32, s32, s32, s32);
 
 extern s32 gPersistentDataLoaded;
-extern s32 gScene;
 
 void Hud_GetSpriteSize(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3)
 {

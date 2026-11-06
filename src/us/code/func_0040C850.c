@@ -2,6 +2,7 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/scene.h"
 
 /* One file: BlindOne_UpdateMover, BlindOne_GetHealthPercent, BlindOne_Setup and BlindOne_PhaseWaitPlayerUpdate.
  * BlindOne_Setup's only literal, the string "Blind", sits at 0x800C08D4, 4 past
@@ -131,7 +132,6 @@ s32 BlindOne_GetHealthPercent(BlindOneState *state) {
  * group 1, 4-7: group 2, 8-11: group 3, rotated by offset) to an attack state. */
 
 extern BlindOnePhase sBlindOnePhases[];
-extern u8 gScene[];
 extern u8 gEngineApp_m_OnScreen[];
 extern s32 CScene__FindInstances(void *container, s32 key0, s32 key1, s32 key2, CGameObjectInstance **out, s32 max);
 extern void ScriptAnimator_Start(void *slot, s32 arg1);
@@ -168,9 +168,9 @@ void BlindOne_Setup(BlindOneState *state) {
     CGameObjectInstance *actor;
     s32 i;
 
-    state->count1 = CScene__FindInstances(gScene, 0x454, 1, -1, state->actors1, 4);
-    state->count2 = CScene__FindInstances(gScene, 0x455, 1, -1, state->actors2, 4);
-    state->count3 = CScene__FindInstances(gScene, 0x456, 1, -1, state->actors3, 3);
+    state->count1 = CScene__FindInstances(&gScene, 0x454, 1, -1, state->actors1, 4);
+    state->count2 = CScene__FindInstances(&gScene, 0x455, 1, -1, state->actors2, 4);
+    state->count3 = CScene__FindInstances(&gScene, 0x456, 1, -1, state->actors3, 3);
     obj = state->boss;
     state->faderCount = 0;
     obj->m_AI.m_Health = obj->m_AI.m_InitialHealth = 0x3200;
@@ -199,8 +199,8 @@ void BlindOne_Setup(BlindOneState *state) {
     for (i = 0; i < state->faderCount; i++) {
         ScriptAnimator_Start(&state->faders[i], 0);
     }
-    state->minionDefA = CScene__FindIntelligence(gScene, 1, 0x1CE9);
-    state->minionDefB = CScene__FindIntelligence(gScene, 1, 0x1CEA);
+    state->minionDefA = CScene__FindIntelligence(&gScene, 1, 0x1CE9);
+    state->minionDefB = CScene__FindIntelligence(&gScene, 1, 0x1CEA);
     state->toSpawn = 0;
     state->minionsAlive = 0;
     state->maxMinions = 0;
@@ -208,7 +208,7 @@ void BlindOne_Setup(BlindOneState *state) {
     state->alive2 = 0;
     state->alive3 = 0;
     COnScreen__SetBoss(gEngineApp_m_OnScreen, state->boss, "Blind");
-    CScene__UnmarkGeneratorsSaved(gScene);
+    CScene__UnmarkGeneratorsSaved(&gScene);
     nextPhase_40CCC0(state);
 }
 

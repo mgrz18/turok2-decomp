@@ -5,6 +5,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 #include "structs/save.h"
+#include "globals/scene.h"
 
 /* Load game menu "select" handler: with the pak checked, either restores the
  * loaded save (player block, game progress, level times, the level's key
@@ -23,7 +24,6 @@ extern f32 gEngineApp_m_Settings_match_seconds[];
 extern f32 gEngineApp_m_Settings_match_minutes[];
 extern f32 gEngineApp_m_Settings_match_hours[];
 extern s32 gEngineApp_m_Game_m_PlayerList_m_bCinema[2];
-extern CScene gScene;
 extern u8 gLoadSavePersistentData[];
 extern u8 gPakMsgRumblePakDesc[];
 extern u8 gPakMsgDeleteDoneDesc[];

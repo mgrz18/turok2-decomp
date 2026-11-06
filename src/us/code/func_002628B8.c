@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 typedef struct ActorLink {
                u8 pad0[8];
                void (*cb)();
@@ -52,7 +53,6 @@ typedef struct B01Info {
                 u8 pad50[0x1C];
                 f32 unk6C;
 } B01Info;
-extern s32 gScene[];
 void AI_DropPickupsOnce(CGameObjectInstance *actor, CAI *state, s32 kind, s32 a, s32 b);
 void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
 void GameObject_FireTriggers(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
@@ -60,10 +60,10 @@ void Turret_DeathEnter(CGameObjectInstance *actor, CAI *state) {
     B01Info *info = ((B01Info *)((u8 *)(actor->header.m_pIntelligence) + 0x14));
     AI_DropPickupsOnce(actor, state, 4, info->unkC.i, info->unk10.i);
     state->m_pfHurt = 0;
-    CScene__SetInstanceSavedBit(gScene, actor, 1);
+    CScene__SetInstanceSavedBit(&gScene, actor, 1);
     GameObject_FireTriggers(actor, 1, actor);
     actor->m_dwFlags &= ~0x10000;
-    if (gScene[0] != 4) {
+    if (gScene.m_Mode != 4) {
         actor->m_dwFlags |= 0x8000000;
     }
 }

@@ -1,20 +1,13 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/scene.h"
 
-/* The region (floor triangle) the camera is in: its three corners at 4, 8, 0xC
- * (see GameObject_GetRegionTopAbove) and the visibility bits the camera takes from it. */
-struct CGameRegion {
-    /* 0x00 */ u8 pad0[4];
-    /* 0x04 */ CVector3 *m_pCorners[3];
-    /* 0x10 */ u8 pad10[0x1C - 0x10];
-    /* 0x1C */ u32 unk1C; /* visibility bits, see CCamera__UpdateVisBits */
-};
+/* The region (floor triangle) the camera is in: structs/region.h (via structs/world.h). */
 
 struct CGameRegion *CScene__FindRegionAt(s32, CVector3 *);
 f32 CGameRegion__GetHeight(struct CGameRegion *, f32, f32);  /* extern */
 s32 Cinema_PathPlaying();                                /* extern */
 extern u32 gDefaultVisBits;
-extern s32 gScene;
 
 /* Picks the visibility bits of the camera: those of its region when it is 5 to 11 units
  * above the floor there, else the default gDefaultVisBits. */
@@ -38,7 +31,7 @@ void CCamera__UpdateVisBits(CCamera *arg0) {
     if ((temp_s1 != 0) && (Cinema_PathPlaying() == 0)) {
         temp_f1 = ((temp_f23 + temp_f22) - CGameRegion__GetHeight(temp_s1, temp_f21, temp_f20)) * 0.09765625f;
         if ((temp_f1 < 11.0f) && (temp_f1 > 5.0f)) {
-            arg0->m_ViewParams.m_VisBits = temp_s1->unk1C;
+            arg0->m_ViewParams.m_VisBits = temp_s1->m_VisBits;
         }
     }
     if (Cinema_PathPlaying() != 0) {

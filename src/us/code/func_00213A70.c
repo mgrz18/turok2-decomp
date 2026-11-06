@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/world.h"
+#include "globals/scene.h"
 
 typedef struct Box3 {
     CVector3 mn;
@@ -28,7 +29,6 @@ typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
 extern char D_800A57B8[];
 extern s32 gLevelLightsEnabled;
 extern CVector3 sLitVertexOffsets[];
-extern CScene gScene;
 extern s32 gEngineApp_m_Settings;
 
 void *CISet__GetBlock(void *file, s32 index);

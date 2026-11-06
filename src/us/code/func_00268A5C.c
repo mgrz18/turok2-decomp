@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/region.h"
 #include "structs/game_object.h"
+#include "globals/scene.h"
 
 CRegionInfo *CScene__GetRegionInfo(s32 *, CGameRegion *);             /* extern */
-extern s32 gScene;
 
 f32 GameObject_GetWaterHeight(CInstanceHeader *arg0) {
     CGameRegion *temp_a1;

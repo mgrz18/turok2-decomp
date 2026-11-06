@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "structs/collision.h"
+#include "globals/scene.h"
 
 
 /* A region corner: its floor point and the ceiling height above it. */
@@ -24,7 +25,6 @@ typedef struct {
 } Water;
 
 extern CCollisionResults *gCollisionResultsP;
-extern u8 gScene[];
 
 void memset(void *p, s32 c, s32 n);                 /* memset */
 s32 Sweep_GetGroundBehavior(Sweep *sweep, CGameRegion *region);
@@ -129,7 +129,7 @@ void Collision_SweepRegions(Sweep *sweep) {
             }
         }
         waterT = 1.0f;
-        water = CScene__GetRegionInfo(gScene, *regionp);
+        water = CScene__GetRegionInfo(&gScene, *regionp);
         if (((*regionp)->m_wFlags & 1) && (sweep->def->m_dwFlags & 8) && gCollisionResultsP->m_pWaterRegion == 0 && water != NULL
             && sweep->delta.y != 0.0f) {
             waterT = (water->level - pos->y) / sweep->delta.y;

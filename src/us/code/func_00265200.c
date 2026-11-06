@@ -6,6 +6,7 @@
 #include "structs/game_object.h"
 #include "structs/vector.h"
 #include "structs/intelligence.h"
+#include "globals/scene.h"
 
 typedef struct {
     s32 a;
@@ -22,7 +23,6 @@ typedef struct {
     /* 0xC7 */ s8 active;
 } ActionState;
 
-extern u8 gScene[];
 extern void ImpactEvent_Call(CGameObjectInstance *a, CGameObjectInstance *b, s32 kind, CVector3 pos, EventArg extra);
 extern void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
 extern void CAI__SetMode(CGameObjectInstance *actor, ActionState *state, s32 mode);
@@ -47,7 +47,7 @@ void Door_OpenUpdate(CGameObjectInstance *actor, ActionState *state) {
         if (animReached(actor, state, (f32) info->m_OpenDoorEvent * 0.007874016f)) {
             extra.a = 0;
             ImpactEvent_Call(actor, actor, 6, actor->header.m_vPos, extra);
-            CScene__SetInstanceSavedBit(gScene, actor, 1);
+            CScene__SetInstanceSavedBit(&gScene, actor, 1);
         }
     }
     if ((info->m_dwFlags & 1) && state->active != 0) {
