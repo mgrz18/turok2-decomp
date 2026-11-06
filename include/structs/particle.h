@@ -76,6 +76,15 @@ typedef struct CROMParticleParams {
     /* 0x0F */ u8 m_Event;
 } CROMParticleParams; /* size 0x10 */
 
+/* How a template's particles speed up (CParticle__Accelerate): the
+ * acceleration along m_vDirection and the speed it stops at, half floats
+ * (HalfToFloat). */
+typedef struct CROMParticleMotion {
+    /* 0x00 */ u8 unk_00[0x10];
+    /* 0x10 */ u16 m_Accel;
+    /* 0x12 */ u16 m_MaxSpeed;
+} CROMParticleMotion;
+
 /* A particle template (block 2 of the particle data; CParticle.m_pEffect). */
 typedef struct CROMParticleEffect {
     /* 0x00 */ u32 m_dwFlags;
@@ -97,7 +106,7 @@ typedef struct CROMParticleEffect {
     /* 0x24 */ CROMParticleDistance *m_pDistanceRange;
     /* 0x28 */ void *m_pDirection;
     /* 0x2C */ void *m_pOscillation;
-    /* 0x30 */ void *m_pMotion;
+    /* 0x30 */ CROMParticleMotion *m_pMotion;
     /* 0x34 */ void *m_pColors;
     /* 0x38 */ CROMParticleParams *m_pParams;
 } CROMParticleEffect; /* size 0x3C */

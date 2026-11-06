@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "structs/particle.h"
 
 /* Same family as CParticle__UpdateHomingMissile (homing missile): here a projectile that flies
  * back to a point beside its owner's player and is caught there. */
@@ -27,17 +28,6 @@ extern void CPlayer__TransformByView(CPlayer *player, CVector3 *pos);      /* pl
 extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *owner);                     /* height */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ u16 accel;      /* half floats */
-    /* 0x12 */ u16 maxSpeed;
-} MoveParams;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ MoveParams *move;
-} ParentDef;
-
-typedef struct {
     /* 0x00 */ u8 pad0[0x8];
     /* 0x08 */ s32 state;
     /* 0x0C */ s32 sound;
@@ -49,7 +39,7 @@ typedef struct {
     /* 0x010 */ u8 pad10[0x18 - 0x10];
     /* 0x018 */ CVector3 vel;
     /* 0x024 */ u8 pad24[0xF8 - 0x24];
-    /* 0x0F8 */ ParentDef *parent;
+    /* 0x0F8 */ CROMParticleEffect *parent;
     /* 0x0FC */ u8 padFC[0x10C - 0xFC];
     /* 0x10C */ CGameObjectInstance *owner;
     /* 0x110 */ u8 pad110[0x11C - 0x110];
@@ -74,14 +64,14 @@ static __inline__ void Missile_Accelerate(Missile *obj) {
     f32 speed;
     f32 maxSpeed;
 
-    accel = HalfToFloat(obj->parent->move->accel);
+    accel = HalfToFloat(obj->parent->m_pMotion->m_Accel);
     if (accel != 0.0f) {
         dir = obj->dir;
         CVector3__Scale(&delta, &dir, accel);
         vel = &obj->vel;
         CVector3__Add(vel, vel, &delta);
         speed = func_00298470(obj->vel.x * obj->vel.x + obj->vel.y * obj->vel.y + obj->vel.z * obj->vel.z);
-        maxSpeed = HalfToFloat(obj->parent->move->maxSpeed);
+        maxSpeed = HalfToFloat(obj->parent->m_pMotion->m_MaxSpeed);
         if (accel > 0.0f) {
             if (maxSpeed < speed) {
                 CVector3__Scale(vel, &dir, maxSpeed);

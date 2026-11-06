@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "structs/particle.h"
 
 extern s32 LoopSounds_Get(void);
 extern void *LoopSounds_Start(s32 bank, s32 sound, CVector3 *pos, CVector3 *pos2, s32 loops);  /* starts a sound */
@@ -20,17 +21,6 @@ extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);  /* tra
 extern void CParticle__Wobble(void *obj, f32 scale);
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x10];
-    /* 0x10 */ u16 accel;      /* half floats */
-    /* 0x12 */ u16 maxSpeed;
-} MoveParams;
-
-typedef struct {
-    /* 0x00 */ u8 pad0[0x30];
-    /* 0x30 */ MoveParams *move;
-} ParentDef;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x214];
     /* 0x214 */ CVector3 pos;
 } Target;
@@ -49,7 +39,7 @@ typedef struct {
     /* 0x024 */ u8 pad24[0x40 - 0x24];
     /* 0x040 */ s32 flags;
     /* 0x044 */ u8 pad44[0xF8 - 0x44];
-    /* 0x0F8 */ ParentDef *parent;
+    /* 0x0F8 */ CROMParticleEffect *parent;
     /* 0x0FC */ u8 padFC[0x114 - 0xFC];
     /* 0x114 */ Target *target;
     /* 0x118 */ u8 pad118[0x11C - 0x118];
@@ -69,14 +59,14 @@ static __inline__ void Missile_Accelerate(Missile *obj) {
     f32 speed;
     f32 maxSpeed;
 
-    accel = HalfToFloat(obj->parent->move->accel);
+    accel = HalfToFloat(obj->parent->m_pMotion->m_Accel);
     if (accel != 0.0f) {
         dir = obj->dir;
         CVector3__Scale(&delta, &dir, accel);
         vel = &obj->vel;
         CVector3__Add(vel, vel, &delta);
         speed = func_00298470(obj->vel.x * obj->vel.x + obj->vel.y * obj->vel.y + obj->vel.z * obj->vel.z);
-        maxSpeed = HalfToFloat(obj->parent->move->maxSpeed);
+        maxSpeed = HalfToFloat(obj->parent->m_pMotion->m_MaxSpeed);
         if (accel > 0.0f) {
             if (maxSpeed < speed) {
                 CVector3__Scale(vel, &dir, maxSpeed);
