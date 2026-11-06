@@ -322,4 +322,12 @@ typedef union {
     f32 f;
 } fu;
 
+/* Four instructions copied to an exception vector (PRinternal/osint.h). */
+typedef struct {
+    /* 0x0 */ u32 inst1;
+    /* 0x4 */ u32 inst2;
+    /* 0x8 */ u32 inst3;
+    /* 0xC */ u32 inst4;
+} __osExceptionVector; /* size 0x10 */
+
 #endif

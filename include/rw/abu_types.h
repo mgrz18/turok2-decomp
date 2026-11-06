@@ -2652,14 +2652,6 @@ struct Block40 {
     u8 bytes[0x28];
 };
 typedef struct Block40 Block40;
-struct Quad_func_802A1BE0_de;
-typedef struct Quad_func_802A1BE0_de Quad_func_802A1BE0_de;
-struct Quad_func_802A1BE0_de {
-    u32 x;
-    u32 y;
-    u32 z;
-    u32 w;
-};
 struct Opaque_OSMesgQueue;
 typedef struct Opaque_OSMesgQueue Opaque_OSMesgQueue;
 struct Node802C07B0;

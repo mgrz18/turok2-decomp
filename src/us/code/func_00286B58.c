@@ -53,7 +53,6 @@ typedef struct {
     /* 0x3C0 */ GfxTask *cur;
 } GfxState;
 
-extern u64 rspbootTextEnd[]; /* = 0x800BC400, same address as gspF3DEX_NoN_fifoTextStart: needs a linker symbol */
 extern u8 gScheduler[];
 
 extern void osWritebackDCacheAll(void);

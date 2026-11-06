@@ -88,6 +88,7 @@ extern OSIoMesg __osViRetraceMsg;         /* viRetraceMsg */
 extern OSIoMesg __osViCounterMsg;         /* viCounterMsg */
 
 extern OSTime osClockRate;
+extern __osExceptionVector __osException[]; /* the handler's entry (exceptasm.s), its first words copied to the vectors (__osExceptPreamble) */
 extern u32 __osInitialized;               /* osInitialize has run (__osFinalrom) */
 extern __OSEventState __osEventStateTab[];
 extern __OSEventState __osPiEventState;   /* __osEventStateTab[OS_EVENT_PI], a symbol of its own */
