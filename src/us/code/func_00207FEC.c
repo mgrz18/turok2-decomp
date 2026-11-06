@@ -9,6 +9,7 @@
 /* Render_SetupMaterial: after AbuN64/ragewars-decomp (Turok: Rage Wars), src/RENDER_3/80268160_12.CPP, func_80269A80_de, with Turok 2's layouts. */
 #include "common.h"
 #include "gfx.h"
+#include "structs/light.h"
 
 /* The libultra GBI (F3DEX2) commands this function writes, as in PR/gbi.h. */
 #define _SHIFTL(v, s, w) (((unsigned int) (v) & (0xFFFFFFFFU >> (32 - (w)))) << (s))
@@ -276,8 +277,6 @@ void Render_DrawShadowQuad(void *matrix, s32 pass, u32 alpha) {
 extern s32 gEngineApp_m_Settings;
 extern u32 gFrameCountGameplay;
 /* Scene colour mode: 0 none; otherwise an environment colour (and, for 6, a prim alpha). */
-extern s32 gBlendState;
-extern f32 gBlendState_m_Color[5];
 extern s32 gRenderZModeInter;
 extern s32 gRenderImageRead;
 extern s32 gFogGeometryMode;

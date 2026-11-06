@@ -51,7 +51,7 @@ void MantidQueen_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
             ScreenTint_UpdateMode();
             Render_DrawModel(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[gEvenOdd], 0, i,
                           *(s8 *) (actor + 0x151));
-            gBlendState.m_Mode = 0;
+            gBlendState = 0;
         }
         i++;
         slot++;

@@ -41,7 +41,7 @@ void MotherBoss_Draw(CGameObjectInstance *actor, void *ai, CDrawArgs *req) {
                 ScreenTint_UpdateMode();
             }
             Render_DrawModel(req->m_hModel, actor->m_pmtDrawMtxs, 1, (CLights1 *) actor->m_Lights[gEvenOdd], 0, i, actor->m_AI.m_nTexture);
-            gBlendState.m_Mode = 0;
+            gBlendState = 0;
         }
         i++;
         data += sizeof(BossWeakSpot);

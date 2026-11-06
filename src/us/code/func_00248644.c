@@ -3,7 +3,6 @@
 
 extern s32 gEngineApp_m_Settings;
 extern s32 gScene_m_LevelID;
-extern WeaponInfo *gWeaponInfoTable_22; /* gWeaponInfoTable[22] */
 
 s32 Level_GetHub(s32 arg0);
 
@@ -27,7 +26,7 @@ void CPlayer__CollectKeyPiece(u8 *player, s32 id) {
             }
             if ((s8) (key[0x52C] & 0xF) >= 6) {
                 player[0x988] = 1;
-                info = gWeaponInfoTable_22->ammo[0];
+                info = gWeaponInfoTable[22]->ammo[0];
                 ammo = (s16 *) (player + (info->type * 2 + 0x934));
                 count = *ammo + 2;
                 max = info->max;

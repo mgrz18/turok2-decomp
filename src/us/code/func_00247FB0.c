@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/weapon.h"
+#include "structs/light.h"
 
 
 
@@ -13,9 +14,6 @@ typedef struct Hit {
     /* 0x18 */ s32 amount;
 } Hit;
 
-extern s32 gBlendState;       /* screen flash mode */
-extern f32 gBlendState_m_Color[3];    /* screen flash color */
-extern f32 gBlendFade[2];    /* screen flash range */
 extern s32 gEvenOdd;
 extern s32 gTagModeModel;
 
@@ -61,8 +59,8 @@ void Player_DrawNodeCallback(CGameObjectInstance *actor, s32 arg1, Hit *hit) {
                     color[0] = 192.0f;
                     break;
             }
-            gBlendFade[0] = 70.0f;
-            gBlendFade[1] = 255.0f;
+            gBlendState_m_Color[3] = 70.0f;
+            gBlendState_m_Color[4] = 255.0f;
             CGameObjectInstance__DrawModelImmediate(actor, arg1, hit);
             if (player->m_ShockedTimer > 0.0f && CPlayer__IsInMatchEndState(player) == 0) {
                 Render_DrawModelShared(hit->unkC, ((s32)actor->m_pmtDrawMtxs), 1, actor->m_Lights[gEvenOdd], 0, (s8) hit->amount, -1);
