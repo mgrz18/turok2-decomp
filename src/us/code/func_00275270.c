@@ -6,7 +6,6 @@
 extern s32 BinarySearch(void *, s32, s32);
 extern void *CISet__GetBlock(void *, s32);
 extern f32 HalfToFloat(s32);
-extern f32 D_800A81EC;
 void *SndSeq_GetSongData(SequenceState *state, s32 index) {
     s32 selection;
     s32 section;
@@ -21,7 +20,7 @@ void *SndSeq_GetSongData(SequenceState *state, s32 index) {
         state->command = command->command;
         duration = HalfToFloat(command->duration);
         state->duration = duration;
-        if (duration <= 0.0f) state->duration = D_800A81EC;
+        if (duration <= 0.0f) state->duration = 0.1f;
         return result;
     }
     return ((void *)0);

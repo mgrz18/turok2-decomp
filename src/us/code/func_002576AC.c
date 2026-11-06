@@ -1,8 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern f32 D_800A723C;
-extern f32 D_800A7240;
 
 void CPlayer__PickLandingAnim(CPlayer *arg0) {
     f32 temp_f1;
@@ -14,11 +12,11 @@ void CPlayer__PickLandingAnim(CPlayer *arg0) {
     }
     if (var_a1 == 0) {
         temp_f1 = arg0->m_Speed;
-        if (D_800A723C <= temp_f1) {
+        if (1.024f <= temp_f1) {
             arg0->m_CharAnim = 0x8A2;
             return;
         }
-        if (temp_f1 <= D_800A7240) {
+        if (temp_f1 <= -1.024f) {
             arg0->m_CharAnim = 0x8A7;
             return;
         }

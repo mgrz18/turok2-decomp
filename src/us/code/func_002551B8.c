@@ -4,16 +4,13 @@
 #include "rw/abu_types.h"
 
 extern float func_002551B8(void * arg0);
-extern float D_800A7140;
-extern float D_800A7148;
-extern float D_800A7150;
 float func_002551B8(void *arg0) {
     ObjRecAtB8 *obj = arg0;
-    float f1 = D_800A7140;
-    float f2 = *(float *)((char *)&D_800A7140 + 4);
-    float f0 = D_800A7148;
-    float f3 = *(float *)((char *)&D_800A7148 + 4);
-    float f4 = D_800A7150;
+    float f1 = 437.5f;
+    float f2 = -675.0f;
+    float f0 = 0.25f;
+    float f3 = 0.1875f;
+    float f4 = 1.5707965f;
     obj->unkB4 = 0;
     obj->unk8 = 0;
     obj->unkB8 = 0;

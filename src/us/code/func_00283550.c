@@ -36,10 +36,6 @@ struct B09Emitter {
                 f32 f21C;
                 f32 f220;
 };
-extern f32 D_800A9CB0;
-extern f32 D_800A9CB4;
-extern const f32 D_800A9CB8;
-extern const f32 D_800A9CBC;
 s32 CEmitter__Advance(B09Emitter *e, s32 mask, f32 f2, s32 flag, f32 f4, u8 *ctx) {
     B09EDef *def = e->def;
     f32 x;
@@ -48,8 +44,8 @@ s32 CEmitter__Advance(B09Emitter *e, s32 mask, f32 f2, s32 flag, f32 f4, u8 *ctx
     if (e->mask & mask) {
         f32 up = e->f208;
         up += def->f20 * gFrameIncrement;
-        if (D_800A9CB0 < up) {
-            up = D_800A9CB0;
+        if (1.0f < up) {
+            up = 1.0f;
         }
         e->f208 = up;
     } else {
@@ -63,15 +59,15 @@ s32 CEmitter__Advance(B09Emitter *e, s32 mask, f32 f2, s32 flag, f32 f4, u8 *ctx
     }
     e->f20C = e->f20C + gFrameIncrement * def->f10 * e->f214;
     step = gFrameIncrement * gEmitterTimeScale * def->f8;
-    t = e->f1C + step * D_800A9CB4;
+    t = e->f1C + step * 1.536f;
     e->f1C = t;
-    if (D_800A9CB8 < t) {
-        e->f1C = t - D_800A9CB8;
+    if (2.048e4f < t) {
+        e->f1C = t - 2.048e4f;
     }
-    t = e->f20 + step * D_800A9CBC;
+    t = e->f20 + step * 3.072f;
     e->f20 = t;
-    if (D_800A9CB8 < t) {
-        e->f20 = t - D_800A9CB8;
+    if (2.048e4f < t) {
+        e->f20 = t - 2.048e4f;
     }
     x = def->f14 + e->f21C;
     if (flag != 0 && *(s32 *)(ctx + 0x24) == 0) {

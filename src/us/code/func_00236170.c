@@ -7,8 +7,6 @@ s32 CMtxF__ClampEntries(s32);
 s32 Swoosh_NewNode(s32, s32, s32);
 
 s32 CMtxF__ScaleAxes(s32 *, f32, f32, f32);    /* extern */
-extern f32 D_800A6514;
-extern f32 D_800A6518;
 
 typedef struct Node00236170 {
     /* 0x00 */ u8 pad0[4];
@@ -38,9 +36,9 @@ void Swoosh_AddParticleNode(World00236170 *arg0, CParticle *arg1, s32 arg2) {
                 if (temp_f0 > 0.0f) {
                     if (temp_f0 > 0.0f) {
                         CMtxF__FromMtxAffine((s32) sp10, arg2);
-                        var_f0 = D_800A6514;
+                        var_f0 = 0.01f;
                         if (arg1->m_pEffect->m_pModel != 0) {
-                            var_f0 = D_800A6518;
+                            var_f0 = 0.29257143f;
                         }
                         CMtxF__ScaleAxes(sp10, var_f0, var_f0, var_f0);
                         CMtxF__ClampEntries((s32) sp10);

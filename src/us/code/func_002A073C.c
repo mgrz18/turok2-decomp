@@ -7,7 +7,6 @@
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern FftTables *mdctFftInit(s32 n);
-extern float D_800AAC30;
 FftTables *mdctFftInit(s32 n) {
     FftTables *tables;
     s32 half;
@@ -25,7 +24,7 @@ FftTables *mdctFftInit(s32 n) {
     tables = &gMdctFftTables;
     i = 0;
     if (i < half) {
-        scale = D_800AAC30;
+        scale = 6.2831855f;
         count = n;
         do {
             angle = i * scale / count;

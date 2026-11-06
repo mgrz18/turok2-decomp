@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 
 extern void CMtxF__CopyScaled(float * arg0, float * arg1, float sx, float sy, float sz);
-extern f32 D_800A5618;
 void CMtxF__CopyScaled(f32 *arg0, f32 *arg1, f32 sx, f32 sy, f32 sz) {
     arg0[0] = arg1[0] * sx;
     arg0[1] = arg1[1] * sx;
@@ -19,5 +18,5 @@ void CMtxF__CopyScaled(f32 *arg0, f32 *arg1, f32 sx, f32 sy, f32 sz) {
     arg0[13] = arg1[13];
     arg0[14] = arg1[14];
     arg0[3] = arg0[7] = arg0[11] = 0.0f;
-    arg0[15] = D_800A5618;
+    arg0[15] = 1.0f;
 }

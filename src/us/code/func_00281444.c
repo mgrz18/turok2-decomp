@@ -3,7 +3,6 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern f32 D_800A9C08;          /* farther than any camera, squared */
 void CVector3__ClampLength(f32 *v, f32 limit);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);     /* out = a - b */
 
@@ -21,7 +20,7 @@ CCamera *CCameraPool__GetNearestCamera(CCameraPool *pool, CVector3 *point) {
         return &pool->m_MainCamera;
     }
     cam = pool->m_ActiveList.m_pHead;
-    bestDist = D_800A9C08;
+    bestDist = 3.4028235e38f;
     best = NULL;
     if (cam != NULL) {
         do {

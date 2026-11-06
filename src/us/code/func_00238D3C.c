@@ -34,7 +34,6 @@ struct Shared_ParticleLighting {
     s8 direction[3];
     u8 reserved13[5];
 } __attribute__((aligned(4)));
-extern float D_800A65D0;
 struct Triple;
 struct Triple;
 struct Triple;
@@ -65,7 +64,6 @@ struct Context_func_802681A8_de {
 };
 struct Triple;
 struct Triple;
-extern f32 D_800A65D8;
 extern void CScene__StartRumbles(void *, void *, s32, Triple, f32, f32);
 void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, s32 arg2, Triple arg3, Params_func_802681A8_de arg6) {
     void *resource;
@@ -78,5 +76,5 @@ void ImpactEvent_Rumble(func_8024E8F0_S1 *arg0, Context_func_802681A8_de *arg1, 
         resource = &gRumblePool;
     }
     CScene__StartRumbles(&gScene, resource, arg6.value, arg3,
-                  arg6.angle * *(&D_800A65D0 + 1), arg6.scale * D_800A65D8);
+                  arg6.angle * 10.24f, arg6.scale * 0.003921569f);
 }

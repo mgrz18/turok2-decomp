@@ -2,9 +2,6 @@
 #include "globals/crash.h"
 
 extern u8 D_800AA0DC[];   /* ": " */
-extern u8 D_800AA0E0[];   /* "<" */
-extern u8 D_800AA0E4[];   /* "," */
-extern u8 D_800AA0E8[];   /* ">\n" */
 
 extern void Crash_PutChar(s32 c);       /* print a character */
 extern void Crash_PrintHex8(s32 byte);    /* print a byte in hex */
@@ -33,17 +30,17 @@ void Crash_PrintFlags(u32 value, u8 *name, FlagDesc *desc) {
     PrintString(name);
     PrintString(D_800AA0DC);
     PrintHex32(value);
-    PrintString(D_800AA0E0);
+    PrintString("<");
     while (desc->mask != 0) {
         if ((value & desc->mask) == desc->value) {
             if (first) {
                 first = 0;
             } else {
-                PrintString(D_800AA0E4);
+                PrintString(",");
             }
             PrintString(desc->name);
         }
         desc++;
     }
-    PrintString(D_800AA0E8);
+    PrintString(">\n");
 }

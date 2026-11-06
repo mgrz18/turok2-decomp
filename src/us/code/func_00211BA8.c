@@ -4,10 +4,8 @@
 #include "rw/abu_types.h"
 
 extern void Edge_NormalizeXZ(void *arg0);
-extern char D_800A56C8;
 f32 func_00298470(f32);
 extern f32 func_00298470(f32);
-extern char D_800A56C8;
 extern float func_00298470(float);
 void Edge_NormalizeXZ(void *arg0)
 {
@@ -20,7 +18,7 @@ void Edge_NormalizeXZ(void *arg0)
     zOut = 0.0f;
     if (magSq != 0.0f) {
         mag = func_00298470(magSq);
-        magSq = *(f32 *)&D_800A56C8 / mag;
+        magSq = 1.0f / mag;
         o->unk24 = o->unk18 * magSq;
         o->unk28 = o->unk1C * magSq;
         zOut = o->unk20 * magSq;

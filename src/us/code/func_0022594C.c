@@ -9,7 +9,6 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-extern s32 D_800A5FF8;
 void *func_0022594C(void *arg0, void *arg1)
 {
   f32 temp_f0;
@@ -24,7 +23,7 @@ void *func_0022594C(void *arg0, void *arg1)
   void *var_a2;
  do { var_v1 = 0; var_a2 = 0; } while (0);
   temp_a3 = *((s32 *) (((s8 *) arg0) + 0x104C));
-  var_f3 = *((f32 *) (((s8 *) (&D_800A5FF8)) + 4));
+  var_f3 = 3.4028235e38f;
   var_a0 = arg0 + 0xFCC;
   if (temp_a3 > 0)
   {

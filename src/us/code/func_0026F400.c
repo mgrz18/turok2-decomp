@@ -7,7 +7,6 @@ typedef struct {
     /* 0xC */ f32 d;
 } Plane;
 
-extern f32 D_800A8090;
 
 /* Where the segment a->b crosses the plane, as a fraction of the way. */
 f32 Plane_SegmentFraction(Plane *arg0, CVector3 *arg1, CVector3 *arg2)
@@ -35,5 +34,5 @@ f32 Plane_SegmentFraction(Plane *arg0, CVector3 *arg1, CVector3 *arg2)
       return (arg0->d - temp_f5) / (temp_f1 - temp_f5);
     }
   }
-  return D_800A8090;
+  return 1.0f;
 }

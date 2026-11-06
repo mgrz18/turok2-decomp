@@ -120,7 +120,6 @@ struct LevelActor {
     s32 renderFlags;
     s32 flags2E4;
 };
-extern float D_800A7104;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
@@ -132,6 +131,6 @@ f32 Actor_GetHeightOrDefault(LevelActor *arg0) {
     if (arg0->definition != 0) {
         return GameObject_GetCollisionHeight();
     } else {
-        return D_800A7104;
+        return 92.159996f;
     }
 }

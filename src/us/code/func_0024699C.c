@@ -9,7 +9,6 @@ void CVector3__Add(CVector3 *, CVector3 *, CVector3 *);
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
 void CVector3__Scale(CVector3 *, CVector3 *, f32);
 void CVector3__Normalize(CVector3 *);
-extern f32 D_800A6990;
 typedef struct { u8 pad0[4]; CVector3 pos; } B04Ob; /* pos at 0x4 in Turok 2 */
 void AI_PushAway(B04Ob *a, s32 unused, B04Ob *b, B04Ob *c, s32 e, s32 f) {
     CVector3 d;
@@ -23,7 +22,7 @@ void AI_PushAway(B04Ob *a, s32 unused, B04Ob *b, B04Ob *c, s32 e, s32 f) {
         d.y = 0;
         d.z = 0;
     }
-    CVector3__Scale(&d, &d, GameObject_GetCollisionRadius(b) + GameObject_GetCollisionRadius(a) + D_800A6990);
+    CVector3__Scale(&d, &d, GameObject_GetCollisionRadius(b) + GameObject_GetCollisionRadius(a) + 51.199997f);
     CVector3__Add(&r, &b->pos, &d);
     GameObject_TraceMove(b, r.x, r.y, r.z, e, f, 0, 0);
 }

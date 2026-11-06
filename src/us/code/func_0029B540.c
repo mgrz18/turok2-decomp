@@ -7,11 +7,9 @@ extern int __osSiRawWriteIo(unsigned int devAddr, unsigned int data);
 extern int __osSiDeviceBusy();
 extern void __assert(void *arg0, void *arg1, s32 arg2);
 extern void __assert(void *arg0, void *arg1, s32 arg2);
-extern s32 D_800AA920;
-extern s32 D_800AA924;
 int __osSiRawWriteIo(u32 arg0, u32 arg1) {
     if (arg0 & 3) {
-        __assert(&D_800AA920, &D_800AA924, 0x34);
+        __assert("EX", "io/sirawwrite.c", 0x34);
     }
     if (__osSiDeviceBusy() != 0) {
         return -1;

@@ -5,10 +5,6 @@
 #include "globals/engine.h"
 
 extern f32 Math_DecayToZero(f32 arg0, f32 arg1);
-extern float D_800A97D0;
-extern float D_800A97D4;
-extern float D_800A97D8;
-extern float D_800A97DC;
 u32 CShakeAxis__Advance(StateRecAt10 *state) {
     f32 scale;
     f32 step;
@@ -16,25 +12,25 @@ u32 CShakeAxis__Advance(StateRecAt10 *state) {
         state->limit = state->value;
     }
     if (state->rate == 0.0f) {
-        state->accumulator = D_800A97D0;
+        state->accumulator = 9.0e1f;
     }
     if (state->rate < state->limit + state->limit) {
         state->rate = state->limit + state->limit;
     }
     step = gFrameIncrement;
-    scale = D_800A97D4;
+    scale = 3.0f;
     state->value = Math_DecayToZero(state->value, step * scale);
     state->limit = Math_DecayToZero(state->limit, gFrameIncrement * scale);
     switch (state->mode) {
     case 1:
         if (state->rate > 0.0f) {
             state->accumulator += (state->rate + state->rate) * (gFrameIncrement * scale);
-            state->rate = Math_DecayToZero(state->rate, D_800A97D8);
+            state->rate = Math_DecayToZero(state->rate, 6.0f);
         }
         break;
     case 0:
         if (state->rate > 0.0f) {
-            state->rate = Math_DecayToZero(state->rate, D_800A97DC);
+            state->rate = Math_DecayToZero(state->rate, 6.0f);
         }
         break;
     }

@@ -6,15 +6,12 @@ typedef struct {
     /* 0x1C */ f32 unk1C;
 } Arg1;
 
-extern f32 D_800A7188;
-extern f32 D_800A718C;
-extern f32 D_800A7190;
 
 void PlayerDodge_Enter(CPlayer *arg0, Arg1 *arg1) {
     if (arg0->m_ContState.m_FinalMoveX < 0.0f) {
-        arg0->m_SideSpeed = (f32) D_800A7188;
+        arg0->m_SideSpeed = (f32) -30.72f;
     } else {
-        arg0->m_SideSpeed = (f32) D_800A718C;
+        arg0->m_SideSpeed = (f32) 30.72f;
     }
-    arg1->unk1C = (f32) D_800A7190;
+    arg1->unk1C = (f32) 307.19998f;
 }

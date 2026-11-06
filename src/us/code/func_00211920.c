@@ -3,35 +3,31 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A56A8;
-extern float D_800A56A0;
 extern f32 Angle_Delta(f32 arg0, f32 arg1);
-extern float D_800A56B8;
-extern float D_800A56B0;
 f32 Angle_Delta(f32 arg0, f32 arg1) {
     f32 var_f0;
     f32 var_f14;
     var_f14 = arg1;
-    if (var_f14 < D_800A56A0) {
+    if (var_f14 < -3.1415927f) {
         do {
-            var_f14 += *(&D_800A56A0 + 1);
-        } while (var_f14 < D_800A56A0);
+            var_f14 += 6.2831855f;
+        } while (var_f14 < -3.1415927f);
     }
-    if (D_800A56A8 < var_f14) {
+    if (3.1415927f < var_f14) {
         do {
-            var_f14 -= *(&D_800A56A8 + 1);
-        } while (D_800A56A8 < var_f14);
+            var_f14 -= 6.2831855f;
+        } while (3.1415927f < var_f14);
     }
     var_f0 = arg0 - var_f14;
-    if (var_f0 < D_800A56B0) {
+    if (var_f0 < -3.1415927f) {
         do {
-            var_f0 += *(&D_800A56B0 + 1);
-        } while (var_f0 < D_800A56B0);
+            var_f0 += 6.2831855f;
+        } while (var_f0 < -3.1415927f);
     }
-    if (D_800A56B8 < var_f0) {
+    if (3.1415927f < var_f0) {
         do {
-            var_f0 -= *(&D_800A56B8 + 1);
-        } while (D_800A56B8 < var_f0);
+            var_f0 -= 6.2831855f;
+        } while (3.1415927f < var_f0);
     }
     return -var_f0;
 }

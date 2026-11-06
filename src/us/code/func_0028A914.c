@@ -14,7 +14,6 @@ extern s32 __scTaskComplete(void *,void *);
 extern void func_00228BBC();
 extern u64 osGetTime(void);
 extern u32 D_800F6CA8;
-extern float D_800A9E40;
 void __scHandleRDP(OSSched *sc)
 {
     s32 value1 = 0;
@@ -27,7 +26,7 @@ void __scHandleRDP(OSSched *sc)
     task->state &= ~1;
     if (task->list.type == 1) {
         if ((task->flags & 0x20) != 0) {
-            gSchedRdpTime = (f32)(((osGetTime() - sRdpStartTime) << 6) / 3) * D_800A9E40;
+            gSchedRdpTime = (f32)(((osGetTime() - sRdpStartTime) << 6) / 3) * 1.0e-6f;
         }
         sc->curRDPTask = 0;
         if ((task->flags & 0x20) != 0) {

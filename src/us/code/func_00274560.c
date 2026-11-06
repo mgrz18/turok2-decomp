@@ -6,14 +6,12 @@
 extern f32 Random_Float(f32 arg0);
 extern f32 Sound_RandomVolume(u8 arg0, u8 arg1);
 f32 Sound_RandomVolume(u8 arg0, u8 arg1) {
-    extern f32 D_800A818C;
-    extern f32 D_800A8184[];
     f32 first;
     f32 second;
-    first = arg0 * D_800A8184[1];
-    second = arg1 * D_800A8184[1];
-    if (first == D_800A818C) {
-        return D_800A818C;
+    first = arg0 * 0.01f;
+    second = arg1 * 0.01f;
+    if (first == 1.0f) {
+        return 1.0f;
     }
     if (second == first) {
         return first;

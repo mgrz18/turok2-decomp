@@ -7,8 +7,6 @@
 
 extern s32 CScene__GetRegion(void *arg0, s32 arg1);
 extern void CGameObjectInstance__ConstructFromRecord(void *obj, InputRecAt27 *rec, s32 mode, s32 index);
-extern f32 D_800A5CEC[];
-extern f32 D_800A5CEC[];
 extern void *CScene__GetIntelligence(void *, s32);
 extern s32 CScene__GetInstanceSavedBit(void *, void *);
 extern void CGameObjectInstance__Construct(void *, u16, u16, s32, void *, s32, s32, f32,
@@ -29,7 +27,7 @@ void CGameObjectInstance__ConstructFromRecord(void *arg0, InputRecAt27 *arg1, s3
     }
     amountRaw = arg1->amount24;
     fzero = 0.0f;
-    amount = amountRaw * D_800A5CEC[1];
+    amount = amountRaw * 9.587673e-5f;
     zero.x = zero.y = zero.z = fzero;
     lookup = CScene__GetInstanceSavedBit(&gScene, arg0);
     CGameObjectInstance__Construct(arg0, arg1->unk1C, arg1->unk1E, arg1->unk0,

@@ -6,12 +6,10 @@
 
 struct Kind;
 typedef struct Kind Kind;
-extern float D_800A65E0;
 struct ParamsRecAt4;
 typedef struct ParamsRecAt4 ParamsRecAt4;
 struct ObjectRecAt17C;
 typedef struct ObjectRecAt17C ObjectRecAt17C;
-extern float D_800A65E4;
 struct ParamsRecAt4;
 struct ParamsRecAt4 {
     s16 unk0;
@@ -37,13 +35,12 @@ struct ObjectRecAt17C {
 };
 extern s32 Sound__PlayPitched(s32 arg0, CVector3 arg1, s32 arg4, s32 arg5,
                          f32 arg6);
-extern f32 D_800A65D8;
 void func_00238EE4(ObjectRecAt17C *arg0, ObjectRecAt17C *arg1, s32 arg2, CVector3 arg3,
                    ParamsRecAt4 arg6) {
     s32 *global = &gEngineApp_m_Settings.paused;
     s32 selected;
     f32 scale;
-    scale = (&D_800A65D8)[1];
+    scale = 1.0f;
     selected = -1;
     if (global[0] != 0) {
         return;
@@ -58,9 +55,9 @@ void func_00238EE4(ObjectRecAt17C *arg0, ObjectRecAt17C *arg1, s32 arg2, CVector
     case 1:
         if (arg1->kind->value == arg1->type) {
             if (global[-115] & 0x40) {
-                scale = D_800A65E0;
+                scale = 2.5f;
             } else if (global[-115] & 0x20) {
-                scale = D_800A65E4;
+                scale = 0.35f;
             }
         }
         if ((arg1->mask & (1 << arg6.team)) == 0) {

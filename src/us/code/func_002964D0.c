@@ -3,9 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800AA688;
-extern float D_800AA680;
-extern float D_800AA684;
 extern unsigned int osVirtualToPhysical(void *);
 Acmd *alResamplePull(ALResampler *filter, s16 *outp, s32 outCnt, s32 sampleOffset, Acmd *p)
 {
@@ -25,10 +22,10 @@ Acmd *alResamplePull(ALResampler *filter, s16 *outp, s32 outCnt, s32 sampleOffse
         ptr = (*source->handler)(source, &inp, outCnt, sampleOffset, p);
         { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(10) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(inp) & (0xFFFFFFFFU >> (32 - (24)))) << (0)); _a->words.w1 = (((unsigned int)(*outp) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(outCnt << 1) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
     } else {
-        if (f->ratio > D_800AA680) f->ratio = D_800AA680;
+        if (f->ratio > 1.99996f) f->ratio = 1.99996f;
         ratio = f->ratio;
-        unity = D_800AA684;
-        f->ratio = (f32)(s32)(ratio * unity) * D_800AA688;
+        unity = 32768.0f;
+        f->ratio = (f32)(s32)(ratio * unity) * 3.0517578e-5f;
         finCount = f->delta + (f->ratio * (f32)outCnt);
         inCount = (s32)finCount;
         f->delta = finCount - (f32)inCount;

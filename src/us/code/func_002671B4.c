@@ -4,8 +4,6 @@
 #include "structs/player.h"
 
 extern f32 GameObject_GetDeadCollisionHeight(CGameObjectInstance *a);
-extern f32 D_800A7D9C;
-extern f32 D_800A7DA0;
 
 /* NOTE: Turok 2 differs from Rage Wars in case 11 (subtracts two owner values
  * and falls through to case 1/4) and has no cases 13/14.
@@ -31,7 +29,7 @@ f32 GameObject_GetCollisionHeight(CGameObjectInstance *a) {
     case 8:
         d = a->header.m_pIntelligence;
         r = d->m_Pickup.m_dwFlags & 1; /* dead store, needed for scheduling */
-        r = D_800A7D9C;
+        r = 122.88f;
         if (!(d->m_Pickup.m_dwFlags & 1)) {
             r = d->m_Pickup.m_CollisionHeight;
         }
@@ -39,7 +37,7 @@ f32 GameObject_GetCollisionHeight(CGameObjectInstance *a) {
     case 7:
         return a->header.m_pIntelligence->m_Destructible.m_CollisionHeight;
     case 6:
-        return D_800A7DA0;
+        return 102.399994f;
     case 0:
     case 5:
     case 10:

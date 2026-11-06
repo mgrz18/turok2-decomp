@@ -3,14 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800AA450;
 s16 alSndpAllocate(PoolRecAt44 *pool, void *owner) {
     s32 count = pool->count;
     SlotRecAt2F *slots = pool->slots;
     if (count > 0) {
         s16 i = 0;
         s16 state = 5;
-        f32 value = D_800AA450;
+        f32 value = 1.0f;
         u8 flags = 0x40;
         do {
         s16 index = i;

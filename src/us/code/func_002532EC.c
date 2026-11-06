@@ -15,11 +15,10 @@ typedef struct PlrGroup {
     u8 pad0[0x20];
     Plr *head;          /* 0x20 */
 } PlrGroup;
-extern f32 D_800A70D0;
 Plr *CPlayerPool__FindNearest(PlrGroup *g, CVector3 p) {
     Plr *a;
     Plr *best = ((void *)0);
-    f32 min = D_800A70D0;
+    f32 min = 3.4028235e38f;
     f32 dx, dy, dz, d;
     for (a = g->head; a != ((void *)0); a = a->next) {
         dx = a->pos.x - p.x;

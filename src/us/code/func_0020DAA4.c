@@ -5,7 +5,6 @@
 
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002982F0(float x);
-extern float D_800A54FC;
 void CQuaternion__Slerp(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b) {
     Vector4f negative;
     Vector4f *other;
@@ -35,8 +34,8 @@ void CQuaternion__Slerp(Vector4f *out, f32 amount, Vector4f *a, Vector4f *b) {
         *out = *a;
         return;
     }
-    inverseSine = *(&D_800A54FC + 1) / sine;
-    scaleA = func_002982F0((*(&D_800A54FC + 1) - amount) * angle) * inverseSine;
+    inverseSine = 1.0f / sine;
+    scaleA = func_002982F0((1.0f - amount) * angle) * inverseSine;
     scaleB = func_002982F0(amount * angle) * inverseSine;
     if (dot < negativeDot) {
         other = &negative;

@@ -23,11 +23,10 @@ struct PlrGroup {
                  u8 pad24[0x1C];
                  s32 unk40;
 };
-extern f32 D_800A70D4;
 Plr *CPlayerPool__FindNearestOther(PlrGroup *g, CVector3 p, Plr *skip) {
     Plr *a;
     Plr *best = ((void *)0);
-    f32 min = D_800A70D4;
+    f32 min = 3.4028235e38f;
     f32 dx, dy, dz, d;
     for (a = g->head; a != ((void *)0); a = a->next) {
         if (a->unk524 != 0 && a != skip) {

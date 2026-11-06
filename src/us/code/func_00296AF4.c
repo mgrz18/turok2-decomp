@@ -4,10 +4,7 @@
 #include "rw/abu_types.h"
 #include "globals/libaudio.h"
 
-extern const double D_800AA700;
-extern const float D_800AA708;
 extern void init_lpfilter(ALLowPass *lp);
-extern float D_800AA6F8;
 s32 alFxParamHdl(ALFx *filter, s32 paramID, void *param)
 {
     ALFx *f = filter;
@@ -31,15 +28,15 @@ s32 alFxParamHdl(ALFx *filter, s32 paramID, void *param)
             f->delay[s].gain = (s16)val;
             break;
         case 5:
-            f->delay[s].rsinc = (((f32)val * D_800AA6F8) * 2.0f) / alGlobals->drvr.outputRate;
+            f->delay[s].rsinc = (((f32)val * 0.001f) * 2.0f) / alGlobals->drvr.outputRate;
             break;
         case 6: {
             f32 fval = (f32)val;
             s32 length = (f->delay[s].output - f->delay[s].input);
             double flength = length;
             if (length < 0)
-                flength += D_800AA700;
-            f->delay[s].rsgain = fval * ((f32)flength * D_800AA708);
+                flength += 4294967296.0;
+            f->delay[s].rsgain = fval * ((f32)flength * 5.7762263e-6f);
             break;
         }
         case 7:

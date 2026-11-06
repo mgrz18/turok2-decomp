@@ -4,14 +4,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 func_00298470(f32);
-extern float D_800A55D4;
 extern CVector3 *CVector3__ProjectOntoPlaneNormal(CVector3 *out, CVector3 *value, CVector3 *a, CVector3 *b);
 static __inline__ void normalizeProjectionNormal(CVector3 *normal) {
     f32 length;
     f32 inverse;
     length = func_00298470(normal->x * normal->x + normal->y * normal->y + normal->z * normal->z);
     if (length != 0.0f) {
-        inverse = D_800A55D4 / length;
+        inverse = 1.0f / length;
         normal->x *= inverse;
         normal->y *= inverse;
         normal->z *= inverse;

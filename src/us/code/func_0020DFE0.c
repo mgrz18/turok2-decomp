@@ -3,8 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5510;
-extern float D_800A5514;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern s32 Random_Next(void);
@@ -25,7 +23,7 @@ CVector3 CVector3__RandomPerturb(CVector3 *in, f32 amount) {
                                     (randomPtr->y * randomPtr->y) +
                                     (randomPtr->z * randomPtr->z));
     if (randomMagnitude != 0.0f) {
-        randomScale = D_800A5510 / randomMagnitude;
+        randomScale = 1.0f / randomMagnitude;
         randomPtr->x *= randomScale;
         randomPtr->y *= randomScale;
         randomPtr->z *= randomScale;
@@ -34,7 +32,7 @@ CVector3 CVector3__RandomPerturb(CVector3 *in, f32 amount) {
                                    (in->y * in->y) +
                                    (in->z * in->z));
     if (inputMagnitude != 0.0f) {
-        inputScale = D_800A5514 / inputMagnitude;
+        inputScale = 1.0f / inputMagnitude;
         in->x *= inputScale;
         in->y *= inputScale;
         in->z *= inputScale;

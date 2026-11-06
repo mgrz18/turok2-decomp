@@ -22,13 +22,6 @@ typedef struct B10Obj {
     u8 padD8[0x144 - 0xD8];
     s32 f144;               /* 0x144 */
 } B10Obj;
-extern const f32 D_800A5B2C;
-extern const f32 D_800A5B30;
-extern const f32 D_800A5B34;
-extern const f32 D_800A5B38;
-extern const f32 D_800A5B3C;
-extern const f32 D_800A5B40;
-extern const f32 D_800A5B44;
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void CGameObjectInstance__GetRotation(B10Q4 *out, B10Obj *o);
@@ -65,12 +58,12 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
     new_var2 = angle;
     v20.x = 0;
     v20.y = 0;
-    v20.z = D_800A5B2C;
+    v20.z = 1.0f;
     CGameObjectInstance__GetRotation(&q70, self);
     if (new_var2 == 0.0f) {
         if (outq) {
             outq->x = outq->y = outq->z = 0;
-            outq->w = D_800A5B2C;
+            outq->w = 1.0f;
         }
         *out = q70;
         return out;
@@ -78,7 +71,7 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
     CQuaternion__ToMatrix(&q70, &mA0);
     CMtxF__TransformPoint(&mA0, &v20, &v30);
     best = 0;
-    thr = func_002974C0(new_var2 * D_800A5B30);
+    thr = func_002974C0(new_var2 * 0.008726647f);
     n = gScene.m_nRegistered;
     for (i = 0; i < n; i++) {
         obj = gScene.m_pRegistered[i];
@@ -93,7 +86,7 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
         }
         v60 = obj->pos;
         v60.y = v60.y + obj->f54;
-        v60.y = v60.y + GameObject_GetCollisionHeight(obj) * D_800A5B34;
+        v60.y = v60.y + GameObject_GetCollisionHeight(obj) * 0.5f;
         CVector3__Subtract(&v10, &v60, &dir);
         CVector3__Normalize(&v10);
         d = v30.x * v10.x + v30.y * v10.y + v30.z * v10.z;
@@ -107,8 +100,8 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
         CVector3__Cross(&v40, &v30, &v50);
         CVector3__Normalize(&v40);
         t = Math_AcosLookup(thr);
-        t *= func_00298470(func_00298470(D_800A5B3C - t / (new_var2 * D_800A5B38)));
-        t *= D_800A5B40;
+        t *= func_00298470(func_00298470(1.0f - t / (new_var2 * 0.008726647f)));
+        t *= 0.5f;
         s = func_002982F0(t);
         gQuaternionSin = s;
         q80.x = v40.x * s;
@@ -125,7 +118,7 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
     }
     if (outq) {
         outq->x = outq->y = outq->z = 0.0f;
-        outq->w = D_800A5B44;
+        outq->w = 1.0f;
     }
     *out = q70;
     return out;

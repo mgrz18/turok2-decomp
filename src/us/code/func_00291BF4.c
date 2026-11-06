@@ -4,15 +4,11 @@
 #include "rw/abu_types.h"
 
 extern f32 alCents2Ratio(s32 arg0);
-extern const float D_800AA400;
-extern const float D_800AA408;
 extern char D_800AA380[];
 extern char D_800AA384[];
 extern void __handleMIDIMsg(ALSeqPlayer *, ALEvent *);
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, ALMicroTime);
 extern void __assert(char *, char *, s32);
-extern const float D_800AA400;
-extern const float D_800AA408;
 extern char D_800AA380[];
 extern char D_800AA384[];
 extern ALSound *__lookupSoundQuick(ALSeqPlayer *, u8, u8, u8);
@@ -90,7 +86,7 @@ void __handleMIDIMsg(ALSeqPlayer *seqp, ALEvent *event)
             vstate->envEndTime = seqp->curTime + sound->envelope->attackTime;
             vstate->flags = 0;
             inst = seqp->chanState[chan].instrument;
-            oscValue = D_800AA400;
+            oscValue = 127.0f;
             if (inst->tremType) {
                 if (seqp->initOsc) {
                     deltaTime = (*seqp->initOsc)(&oscState, &oscValue, inst->tremType,
@@ -105,14 +101,14 @@ void __handleMIDIMsg(ALSeqPlayer *seqp, ALEvent *event)
                 }
             }
             tremeloSlot = &vstate->tremelo;
-            if (!(oscValue >= (*(&D_800AA400 + 1)))) {
+            if (!(oscValue >= (2.1474836e9f))) {
                 tremelo = (s32)oscValue;
             } else {
-                tremelo = (s32)(oscValue - (*(&D_800AA400 + 1)));
+                tremelo = (s32)(oscValue - (2.1474836e9f));
                 tremelo |= 0x80000000;
             }
             *tremeloSlot = tremelo;
-            oscValue = D_800AA408;
+            oscValue = 1.0f;
             if (inst->vibType) {
                 if (seqp->initOsc) {
                     deltaTime = (*seqp->initOsc)(&oscState, &oscValue, inst->vibType,

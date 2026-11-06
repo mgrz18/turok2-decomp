@@ -15,7 +15,6 @@ typedef struct {
 } MidiReader;
 
 s16 __alSeqReadShort(void *);                          /* extern */
-extern f32 D_800AA420;
 
 void alSeqNew(MidiReader *arg0, s32 arg1, s32 arg2) {
     s16 temp_v0;
@@ -31,7 +30,7 @@ void alSeqNew(MidiReader *arg0, s32 arg1, s32 arg2) {
             temp_v0 = __alSeqReadShort(arg0);
             arg0->division = temp_v0;
             if (!(temp_v0 & 0x8000)) {
-                arg0->tickScale = (f32) (D_800AA420 / (f32) temp_v0);
+                arg0->tickScale = (f32) (1.0f / (f32) temp_v0);
                 if (__alSeqReadWord((s32) arg0) == 0x4D54726B) {
                     __alSeqReadWord((s32) arg0);
                     arg0->trackStart = arg0->cursor;

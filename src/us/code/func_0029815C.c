@@ -5,10 +5,6 @@
 
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-extern const float D_800AA818;
-extern const float D_800AA81C;
-extern const float D_800AA820;
-extern const float D_800AA828;
 extern void guMtxIdentF(float mf[4][4]);
 void guPerspectiveF(float mf[4][4], u16 *perspNorm, float fovy, float aspect, float near, float far, float scale)
 {
@@ -17,30 +13,30 @@ void guPerspectiveF(float mf[4][4], u16 *perspNorm, float fovy, float aspect, fl
     float norm;
     unsigned int value;
     guMtxIdentF(mf);
-    fovy *= D_800AA818;
-    fovy *= D_800AA81C;
+    fovy *= 0.017453292f;
+    fovy *= 0.5f;
     cot = func_002974C0(fovy) / func_002982F0(fovy);
     mf[0][0] = cot / aspect;
     mf[1][1] = cot;
     mf[2][2] = (near + far) / (near - far);
-    mf[2][3] = D_800AA820;
+    mf[2][3] = -1.0f;
     mf[3][2] = (2 * near * far) / (near - far);
     mf[3][3] = 0;
     for (i = 0; i < 4; i++)
         for (j = 0; j < 4; j++)
             mf[i][j] *= scale;
     if (perspNorm != (u16 *)0) {
-        if (near + far <= (*(&D_800AA820 + 1))) {
+        if (near + far <= (2.0f)) {
             *perspNorm = (u16)0xFFFF;
         } else {
-            norm = D_800AA828 / (near + far);
-            if (norm >= (*(&D_800AA828 + 1))) {
+            norm = 131072.0f / (near + far);
+            if (norm >= (2.1474836e9f)) {
                 goto large;
             }
             value = (int)norm;
             goto converted;
         large:
-            value = (int)(norm - (*(&D_800AA828 + 1)));
+            value = (int)(norm - (2.1474836e9f));
             value |= 0x80000000;
         converted:
             *perspNorm = (u16)value;

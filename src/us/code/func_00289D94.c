@@ -9,7 +9,6 @@ void osViSetMode(s32);
 s32 osViSetSpecialFeatures(s32);
 
 s32 osViSetYScale(f32);                         /* extern */
-extern f32 D_800A9E24;
 
 void EngineMode17_Switch_Init(CEngineApp *arg0) {
     OSViMode *var_a0;
@@ -20,7 +19,7 @@ void EngineMode17_Switch_Init(CEngineApp *arg0) {
             var_a0 = &osViModeTable[0];
         }
         osViSetMode((s32) var_a0);
-        osViSetYScale(D_800A9E24);
+        osViSetYScale(1.0f);
         osViSetSpecialFeatures(2);
     }
 }

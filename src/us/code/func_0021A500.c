@@ -16,9 +16,6 @@ struct B10H {
     u8 pad0[0x2];
                 u16 h2;
 };
-extern f32 D_800A5AEC;
-extern f32 D_800A5AF0;
-extern f32 D_800A5AF4;
 extern f32 D_800A5AF8;
 s32 GameObject_IsOnGround();
 void GameObject_GetGroundRotation(f32 *loc, B10Obj *o);
@@ -49,7 +46,7 @@ void func_0021A500(B10Obj *o) {
     }
     if (s) {
         loc[0] = loc[1] = loc[2] = 0.0f;
-        loc[3] = D_800A5AEC;
+        loc[3] = 1.0f;
     }
     if (mask) {
         if ((!(o->flags100 & 0x1000) && r) || s) {
@@ -58,10 +55,10 @@ void func_0021A500(B10Obj *o) {
     } else {
         if (r && !(o->flags100 & 0x1000)) {
             t = gFrameIncrement;
-            t *= D_800A5AF0;
+            t *= 0.125f;
         } else {
             t = gFrameIncrement;
-            t *= D_800A5AF4;
+            t *= 0.0375f;
         }
         CQuaternion__SlerpFast(&o->f5C, (D_800A5AF8 < t) ? D_800A5AF8 : t, &o->f5C, loc);
     }

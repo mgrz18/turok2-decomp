@@ -10,11 +10,9 @@ extern int __osSiDeviceBusy(void);
 extern void osWritebackDCache(s32 arg0, s32 arg1);
 extern s32 osVirtualToPhysical(s32);
 extern void osInvalDCache(s32 arg0, s32 arg1);
-extern s32 D_800AA890;
-extern s32 D_800AA894;
 s32 __osSiRawStartDma(s32 arg0, s32 arg1) {
     if (arg1 & 3) {
-        __assert(&D_800AA890, &D_800AA894, 0x37);
+        __assert("EX", "io/sirawdma.c", 0x37);
     }
     if (__osSiDeviceBusy() != 0) {
         return -1;

@@ -6,7 +6,6 @@ s32 alCSPSetChlFXMix(s32, s32, s32);
 s32 alCSPSetBank(s32, s32);                    /* extern */
 s32 alCSPSetSeq(s32, s32);                    /* extern */
 s32 alCSPSetVol(s32, s16);                    /* extern */
-extern s32 D_800A8200;
 
 void SndSeq_Load(void *arg0)
 {
@@ -24,7 +23,7 @@ void SndSeq_Load(void *arg0)
     var_s0 += 1;
   }
   while (var_s0 < 0x14);
-  temp_f20 = ((f32) (*((s32 *) (((s8 *) arg0) + 0x24)))) * ((*((f32 *) (((s8 *) (*((void **) (((s8 *) arg0) + 0)))) + 0x2BA4))) * (*((f32 *) (((s8 *) (&D_800A8200)) + 4))));
+  temp_f20 = ((f32) (*((s32 *) (((s8 *) arg0) + 0x24)))) * ((*((f32 *) (((s8 *) (*((void **) (((s8 *) arg0) + 0)))) + 0x2BA4))) * 0.01f);
   alCSPSetVol(*((s32 *) (((s8 *) arg0) + 0x14)), (s16) ((s32) (temp_f20 * 32767.0f)));
   *((f32 *) (((s8 *) arg0) + 0x2C)) = temp_f20;
 }

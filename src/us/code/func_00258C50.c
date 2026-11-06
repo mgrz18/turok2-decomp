@@ -7,7 +7,6 @@ s32 CAI__SetMode(s32, s32, s32);
 s32 CPlayer__GetWeaponAmmo(s32, s32);
 s32 WeaponActor_CheckFire(s32, s32);
 
-extern f32 D_800A7298;
 
 void WeaponMode_Fire_Update(CGameObjectInstance *obj, CAI *ai) {
     s16 temp_a1;
@@ -21,7 +20,7 @@ void WeaponMode_Fire_Update(CGameObjectInstance *obj, CAI *ai) {
                 ai->m_ModeLastFrame = -1;
                 ai->m_Mode = -1;
                 CAI__SetMode((s32) obj, (s32) ai, 4);
-                *(f32 *) &ai->m_VarBuffer[3] = (f32) (gWeaponInfoTable[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A7298);
+                *(f32 *) &ai->m_VarBuffer[3] = (f32) (gWeaponInfoTable[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * 15.0f);
             } else {
                 goto block_9;
             }

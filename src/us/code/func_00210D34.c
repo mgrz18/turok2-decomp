@@ -4,8 +4,6 @@
 #include "rw/abu_types.h"
 
 extern void CMtxF__CopySwapYZColumns(f32 *dst, f32 *src);
-extern const f32 D_800A562C;
-extern f32 D_800A562C;
 void CMtxF__CopySwapYZColumns(f32 *dst, f32 *src) {
     dst[0] = src[0];
     dst[1] = src[2];
@@ -20,5 +18,5 @@ void CMtxF__CopySwapYZColumns(f32 *dst, f32 *src) {
     dst[13] = src[14];
     dst[14] = src[13];
     dst[3] = dst[7] = dst[11] = 0.0f;
-    dst[15] = D_800A562C;
+    dst[15] = 1.0f;
 }

@@ -4,11 +4,10 @@
 #include "rw/abu_types.h"
 
 extern void UnpackScaledVec4(void *arg0);
-extern float D_800A7FE8;
 void UnpackScaledVec4(void *arg0) {
     s32 *ip = (s32 *)arg0;
     f32 *fp = (f32 *)arg0;
-    f32 scale = D_800A7FE8;
+    f32 scale = 0.029296875f;
     fp[0] = (f32)ip[0] * scale;
     fp[1] = (f32)ip[1] * scale;
     fp[2] = (f32)ip[2] * scale;

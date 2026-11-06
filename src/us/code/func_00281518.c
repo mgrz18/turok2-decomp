@@ -3,7 +3,6 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern f64 D_800A9C10;          /* 2^32, for an unsigned count */
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);     /* out = a - b */
 f32 func_00298470(f32 x);                                       /* square root */
 
@@ -30,7 +29,7 @@ f32 CCameraPool__GetAverageDistance(CCameraPool *pool, CVector3 *point) {
     count = pool->m_ActiveList.m_nCount;
     n = (f64) count;
     if (count < 0) {
-        n += D_800A9C10;
+        n += 4294967296.0;
     }
     return sum / (f32) n;
 }

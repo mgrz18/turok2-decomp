@@ -10,7 +10,6 @@ void osContGetReadData(OSContPad *pad);
 s32 osContReset(OSMesgQueue *mq, OSContStatus *data);
 void osContGetQuery(OSContStatus *data);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern f32 D_800A9CE0;
 void Controller_UpdateConnection(ControllerProfile *c);
 void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, u16 b);
 void Controller_ReadAll(void) {
@@ -56,10 +55,10 @@ void Controller_ReadAll(void) {
             gMergedController.inputButtonsDouble |= gControllers[i].inputButtonsDouble;
             gMergedController.inputButtonsRepeat |= gControllers[i].inputButtonsRepeat;
         }
-        gMergedController.inputStickX = (s8)((f32)(s8)gMergedController.inputStickX * D_800A9CE0);
-        gMergedController.inputStickY = (s8)((f32)(s8)gMergedController.inputStickY * D_800A9CE0);
-        gMergedController.stickX = (s8)((f32)(s8)gMergedController.stickX * D_800A9CE0);
-        gMergedController.stickY = (s8)((f32)(s8)gMergedController.stickY * D_800A9CE0);
+        gMergedController.inputStickX = (s8)((f32)(s8)gMergedController.inputStickX * 0.25f);
+        gMergedController.inputStickY = (s8)((f32)(s8)gMergedController.inputStickY * 0.25f);
+        gMergedController.stickX = (s8)((f32)(s8)gMergedController.stickX * 0.25f);
+        gMergedController.stickY = (s8)((f32)(s8)gMergedController.stickY * 0.25f);
         break;
     case 1:
         osRecvMesg(&gSiMessageQueue, &gSiMesgBuf, 1);
