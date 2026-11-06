@@ -1,13 +1,13 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
+#include "globals/ai.h"
 
 /* AI init for a family of actors: installs the AI callbacks and seeds the
  * timers/flags from the actor definition. Types 0x44E..0x456 (except 0x44F and
  * 0x452) are left alone. */
 
 extern struct { u8 value; } gEngineApp_m_Settings_multiplayer;
-extern u8 gEnemyGroundModeTable[];
 extern u8 gScene[];
 
 extern void EnemyAI_Update();

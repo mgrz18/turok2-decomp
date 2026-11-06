@@ -8,6 +8,7 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_0020486C.c, r01_check, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/ai.h"
 
 
 typedef struct {
@@ -22,7 +23,6 @@ typedef struct {
     /* 0xF8 */ void (*onEvent)(CGameObjectInstance *, void *);
 } ActionState;
 
-extern u8 gDestructibleModeTable[];
 extern void Destructible_Step(CGameObjectInstance *actor, void *state);
 extern void Destructible_Hurt(CGameObjectInstance *actor, void *state);
 extern void TotemDefense_Init(void);

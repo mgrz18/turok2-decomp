@@ -5,6 +5,7 @@
 #include "structs/intelligence.h"
 #include "structs/game.h"
 #include "structs/level_actor.h"
+#include "globals/ai.h"
 
 /* Drops an actor's loot at its feet (raised to the ground height): kind 0
  * spawns the definition's object (or, for a pickup-type entry, a pool pickup
@@ -12,13 +13,6 @@
  * random from the weapon/ammo/item tables the definition enables. */
 
 extern s32 gScene_m_bStreamAll;
-extern Pick sGeneratorAmmoPicks[];
-extern Pick sGeneratorMultiAmmoPicks[];
-extern Pick sGeneratorHealthPicks[];
-extern Pick sGeneratorHealthPicksReduced[];
-extern Pick sGeneratorMultiHealthPicks[];
-extern Pick sGeneratorItemPicks[];
-extern Pick sGeneratorMultiItemPicks[];
 extern u8 gScene[];
 extern u8 gScene_m_ParticleSystem[];
 extern u8 gScene_m_ActorPool[];

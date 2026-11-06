@@ -20,4 +20,11 @@ typedef struct LevelEvent {
     /* 0x12 */ u8 handler;      /* entry in that table */
 } LevelEvent; /* size 0x14 */
 
+/* One entry of a gLevelEventHandlers table: the callbacks LevelEvent_Fire calls
+ * with the level actor of the event (onActor) or with the event alone (onEvent). */
+typedef struct LevelEventHandler {
+    void (*onActor)(void *actor, void *ai, LevelEvent *event);
+    void (*onEvent)(LevelEvent *event);
+} LevelEventHandler; /* size 0x8 */
+
 #endif

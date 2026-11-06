@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/ai.h"
 
 /* Pushes an AI state's alert level up when a noise of the given kind is
  * heard within 3072 units, remembering where it came from. */
@@ -11,14 +12,9 @@ typedef struct {
     /* 0x133 */ s8 index;
 } AlertState;
 
-typedef struct {
-    /* 0x00 */ s32 x, y, z;
-} NoisePos;
-
 f32 CVector3__Distance(void *, void *);
-extern NoisePos gEnemyLastNoisePos;
 
-void AI_HearNoise(u8 *actor, AlertState *state, NoisePos *pos, s32 kind) {
+void AI_HearNoise(u8 *actor, AlertState *state, CVector3 *pos, s32 kind) {
     s32 mode = state->modes[state->index];
     f32 strength;
     f32 dist;

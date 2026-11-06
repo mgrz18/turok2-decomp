@@ -1,17 +1,16 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/ai.h"
 
 void Platform_CalcOrientation(s32, s32);
 s32 Platform_Step(s32, s32);
-
-extern s32 gPlatformModeTable;
 
 void Platform_Setup(CGameObjectInstance *arg0, CAI *arg1) {
     CTurretIntelligence *temp_v0;
     CIntelligence *temp_v1;
 
     temp_v1 = arg0->header.m_pIntelligence;
-    arg1->m_pModeTable = (CAIModeInfo *) &gPlatformModeTable;
+    arg1->m_pModeTable = gPlatformModeTable;
     arg1->m_pfStep = Platform_Step;
     arg1->m_pfCalculateOrientationMatrix = Platform_CalcOrientation;
     arg1->m_VarBuffer[4] = 0;

@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/collision.h"
+#include "globals/ai.h"
 
 typedef struct Object Object;
 
@@ -28,7 +29,6 @@ struct Object {
 extern s32 gScene_m_LevelID;          /* level */
 extern s32 gScene_m_bStreamAll;
 extern s32 gEngineApp_m_Settings;          /* cheats */
-extern u8 gEnemyAlertPoint[];         /* origin */
 
 void EnemyAI_NukedFrozenRemove(Object *obj, CAI *ai);
 void AI_SetTargetOverride(Object *obj, CAI *ai, Object *owner, f32 time);
@@ -136,7 +136,7 @@ void EnemyAI_OnDamage(Object *obj, CAI *ai, DamageEvent *dmg) {
             }
         }
     } else {
-        AI_HearNoise(obj, ai, (CVector3 *)gEnemyAlertPoint, 3);
+        AI_HearNoise(obj, ai, &gEnemyAlertPoint, 3);
     }
     health = ai->m_Health;
     left = health - dmg->damage;

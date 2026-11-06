@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/ai.h"
 
 /* Places a projectile at its owner's muzzle: inherits the shooter's rotation,
  * yaws it by its own angle and pushes it 10.24 units along the result. */
@@ -21,7 +22,6 @@ typedef struct {
     /* 0x50 */ f32 yaw;
 } Projectile;
 
-extern CVector3 sProjectileMuzzleOffset;
 extern f32 gQuaternionSin;
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);

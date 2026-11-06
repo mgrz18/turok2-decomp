@@ -3,6 +3,7 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/collision.h"
+#include "globals/ai.h"
 
 /* AI hit callback: a projectile (or its owner) close enough lengthens the
  * wait and becomes the last-heard position; then the projectile type picks a
@@ -21,7 +22,6 @@ typedef struct Projectile {
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-extern CVector3 gEnemyLastNoisePos;
 extern CCollisionResults gCollisionResults;
 
 extern f32 CVector3__Distance(CVector3 *a, CVector3 *b);
