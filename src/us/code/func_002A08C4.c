@@ -6,7 +6,6 @@
 
 extern s32 adecDequantize(f32 *out, s16 *in);
 extern float D_800AAC34;
-extern s16 D_800B8AA6;
 s32 adecDequantize(f32 *out, s16 *in) {
     s16 *scale;
     s16 band;
@@ -28,7 +27,7 @@ s32 adecDequantize(f32 *out, s16 *in) {
         }
         start = ends[band];
     }
-    for (band = D_800B8AA6; band < 0x100; band++) {
+    for (band = gAdecBandEnds[15]; band < 0x100; band++) {
         out[band] = 0.0f;
     }
     return 1;

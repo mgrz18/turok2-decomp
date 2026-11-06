@@ -38,6 +38,7 @@ extern OSViMode osViModeNtscLan1;
 extern OSViMode osViModePalLan1;
 extern OSViMode osViModeMpalLan1;
 extern OSViMode osViModeTable[42];          /* indexed by OS_VI_* */
+extern OSViMode D_800B7E60;                 /* osViModeTable[8] (NTSC HPN1) as a symbol of its own: EngineMode17_Switch_Init needs its own %hi/%lo */
 extern s32 osViClock;
 extern u32 __OSGlobalIntMask;
 extern __OSThreadTail __osThreadTail;
