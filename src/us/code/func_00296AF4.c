@@ -2,12 +2,12 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libaudio.h"
 
 extern const double D_800AA700;
 extern const float D_800AA708;
 extern void init_lpfilter(ALLowPass *lp);
 extern float D_800AA6F8;
-extern ALGlobals *alGlobals;
 s32 alFxParamHdl(ALFx *filter, s32 paramID, void *param)
 {
     ALFx *f = filter;

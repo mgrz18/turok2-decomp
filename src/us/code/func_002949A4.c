@@ -2,13 +2,13 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/libaudio.h"
 
 extern s32 __nextSampleTime(ALSynth *drvr, ALPlayer **client);
 extern s32 _timeToSamples(ALSynth *, s32);
 extern void _collectPVoices(ALSynth *);
 Acmd *alAudioFrame(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
 {
-    extern ALGlobals *alGlobals;
     ALPlayer *client;
     ALFilter *output;
     ALSynth *drvr = &alGlobals->drvr;

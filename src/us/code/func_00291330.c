@@ -5,12 +5,12 @@
  * loopStart/loopEnd/loopCount and installs __seqpVoiceHandler (__seqpVoiceHandler). */
 #include "common.h"
 #include "structs/libaudio.h"
+#include "globals/libaudio.h"
 
 #define AL_STOPPED 0
 #define AL_USEC_PER_FRAME 16000
 #define AL_SEQP_API_EVT 9
 
-extern ALGlobals *alGlobals; /* alGlobals */
 void *alHeapDBAlloc(char *file, s32 line, void *hp, s32 num, s32 size); /* alHeapDBAlloc */
 void __initChanState(ALSeqPlayer *seqp);                                   /* __initChanState */
 void alEvtqNew(ALEventQueue *evtq, void *items, s32 itemCount);     /* alEvtqNew */
