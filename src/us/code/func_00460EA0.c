@@ -15,7 +15,6 @@ typedef struct {
     } s;
 } PakStatus;
 
-
 void __osPfsRequestOneChannel_2(s32 channel);
 s32 __osSiRawStartDma(s32 enable, void *timer);
 s32 osRecvMesg(void *mq, void *msg, s32 flag);

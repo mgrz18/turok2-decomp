@@ -4,7 +4,6 @@
 #include "common.h"
 #include "globals/libultra.h"
 
-
 #define IO_WRITE(addr, data) (*(volatile u32 *) (addr) = (u32) (data))
 #define PI_BSD_DOM2_LAT_REG 0xA4600024
 #define PI_BSD_DOM2_PWD_REG 0xA4600028
@@ -12,7 +11,6 @@
 #define PI_BSD_DOM2_RLS_REG 0xA4600030
 #define DEVICE_TYPE_64DD 2
 #define PI_DOMAIN2 1
-
 
 extern void memset(void *p, s32 c, u32 n); /* memset */
 extern u32 __osDisableInt(void);

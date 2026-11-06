@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
 
-
 void __osPfsRequestOneChannel(int channel)
 {
     u8 *base;

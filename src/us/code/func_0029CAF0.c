@@ -5,7 +5,6 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/libultra/__osLeoInterrupt.c, __osLeoInterrupt, with Turok 2's layouts. */
 /* cc1-flags: -quiet -G0 -mips3 -O2 -mgas -meb -mcpu=VR4300 -mno-fix4300 -mhard-float -mfp64 -fforce-addr */
 
-
 #define IO_READ(addr) (*(volatile u32 *)((u32)(addr) | 0xA0000000))
 #define IO_WRITE(addr, data) (*(volatile u32 *)((u32)(addr) | 0xA0000000) = (u32)(data))
 #define PI_STATUS_REG 0x04600010
@@ -47,7 +46,6 @@
     stat = IO_READ(PI_STATUS_REG); \
     while (stat & (PI_STATUS_IO_BUSY | PI_STATUS_DMA_BUSY)) \
         stat = IO_READ(PI_STATUS_REG);
-
 
 void __osLeoAbnormalResume(void);
 void __osLeoResume(void);

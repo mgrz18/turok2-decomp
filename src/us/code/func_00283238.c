@@ -8,7 +8,6 @@
 
 #define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-
 void Render_SetRenderMode(s32 mode);
 void Sort_Quick(void *items, s32 count, s32 size, void *compare, void *swap);
 s32 Emitter_CompareHeightDesc(void *a, void *b);

@@ -14,7 +14,6 @@ typedef struct {
     /* 0x14 */ u16 *rd;       /* bitstream read pointer */
 } AdecStream;
 
-
 /* Bit reader: fetches `count` fields of `nbits` bits (MSB first) from the stream of 16-bit words at st->rd into dst[],
    sign-extending each field to 16 bits when `sign` is set. Always returns 1. */
 s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st)

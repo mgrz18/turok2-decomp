@@ -20,7 +20,6 @@ typedef struct {
     f32 im;
 } AdecCpx;
 
-
 extern void mdctInitTwiddles(void);                    /* mdctInitTwiddles */
 extern FftTables *mdctFftInit(s32 n);               /* mdctFftInit */
 extern s32 adecDequantize(f32 *out, s16 *band);      /* adecDequantize */
