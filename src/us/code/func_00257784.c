@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/player.h"
 
 s32 CPlayer__SetState(s32, s32, s32);
 s32 CPlayer__LoseLife(s32);
 
 extern s32 gCinemaHidesActors;
-extern s32 gDeathTint;
 extern CPlayer *sDeathCinemaPlayer;
 
 void PlayerDeath_CinemaDone(void) {

@@ -15,11 +15,7 @@
  * access to it differs. */
 #include "common.h"
 #include "structs/player.h"
-
-typedef struct {
-    /* 0x00 */ u32 mask;
-    /* 0x04 */ u32 bits;
-} ButtonMap;
+#include "globals/player.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xB0];
@@ -43,7 +39,6 @@ typedef struct {
 } PlayerInput;
 
 extern f32 gFrameIncrement;
-extern ButtonMap sControlSide1ButtonMap[];
 f32 Math_DecayToZero(f32 value, f32 rate);
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))

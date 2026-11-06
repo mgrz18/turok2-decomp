@@ -3,6 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/world.h"
 #include "globals/render.h"
+#include "globals/player.h"
 
 s32 CScene__FindObjectType(CScene *, s32);
 CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *);
@@ -19,7 +20,6 @@ void CGameObjectInstance__DrawModelLitVertices(void);
 extern CScene gScene;
 extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;      /* player count */
 extern u8 *gEngineApp_m_Game_m_PlayerList_m_Players;      /* players, 0x1328 bytes each */
-extern u8 gWeaponActorTypeInfo[];
 extern void *gIntelligenceTypeInfo[];
 
 /* The body (collision) setup for the object's intelligence type; a player's
@@ -40,7 +40,7 @@ static __inline__ void *body_setup(CGameObjectInstance *obj) {
                 return 0;
             }
             if (player + 0x288 == (u8 *) obj) {
-                return gWeaponActorTypeInfo;
+                return &gWeaponActorTypeInfo;
             }
         }
     }

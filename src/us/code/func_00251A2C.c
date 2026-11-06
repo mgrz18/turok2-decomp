@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/player.h"
 
 /* The ridden creature (an AI actor). */
 typedef struct {
@@ -11,13 +12,8 @@ typedef struct {
 } Mount;
 
 extern f32 gFrameIncrement;          /* frame time */
-extern f32 D_800ADDE4;          /* charge speed */
 extern f32 D_800AE344;          /* step length */
-extern CVector3 gRidingEyeOffset;        /* rider view offset */
-extern CVector3 gRidingScale;        /* rider seat */
-extern char gRidingLookTuning;         /* riding look tuning */
-extern char gRidingForwardMoveTuning;         /* riding forward move tuning */
-extern char gRidingBackwardMoveTuning;         /* riding backward move tuning */
+extern f32 D_800ADDE4;          /* charge speed: gRidingForwardMoveTuning.forwardMax, its own symbol (through the struct 4 words differ) */
 
 f32 func_002974C0(f32 x);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);

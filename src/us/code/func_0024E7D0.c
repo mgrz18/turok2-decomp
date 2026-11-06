@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/player.h"
 
 /* CPlayer__GetFiringAmmo, inlined. */
 static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
@@ -27,7 +28,6 @@ static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
     return found;
 }
 
-extern s16 gAmmoIcons[];
 
 /* gAmmoIcons entry of the current weapon ammo type, -1 if none. */
 s32 CPlayer__GetCurrentAmmoInfo(CPlayer *player) {

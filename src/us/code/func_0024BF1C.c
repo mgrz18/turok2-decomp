@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/player.h"
 
-extern f32 gBarrelSlotScale;              /* slot scale */
 
 s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 

@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/player.h"
 
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/SOUND/8022C894.CPP, func_8022CE78_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -122,8 +123,6 @@ struct LevelActor {
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern char gStandLookTuning;
-extern char gDodgeMoveTuning;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;

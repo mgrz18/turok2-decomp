@@ -1,9 +1,7 @@
 /* From AbuN64/ragewars-decomp (Turok: Rage Wars): src/MENU/TEAM/80217388_7.CPP, func_8021836C_de.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "globals/player.h"
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef float f32;
 struct SlotRecAt14;
 typedef struct SlotRecAt14 SlotRecAt14;
 struct SlotRecAt14;
@@ -35,7 +33,6 @@ struct Menu {
 struct Menu;
 typedef struct Menu Menu;
 extern float D_800A7128;
-extern float gBarrelSlotScale;
 struct Menu;
 extern void CBarrel__Reset(Menu *menu);
 void CBarrel__Reset(Menu *menu) {

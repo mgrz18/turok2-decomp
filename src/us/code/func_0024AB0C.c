@@ -1,4 +1,5 @@
 #include "structs/vector.h"
+#include "globals/player.h"
 
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0021E5D4.c, func_0021E5D4.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
@@ -18,10 +19,6 @@ typedef struct B05P14 {
 typedef struct B05Fx { u8 pad0[8]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s16 unk14; s16 unk16; } B05Fx;
 extern s32 gEngineApp_m_Settings;
 extern u8 D_8010FF34[];
-extern u8 sFlashlightLight1[];
-extern u8 sFlashlightLight2[];
-extern u8 sDarkCityLight[];
-extern u8 sDarkCityLight2[];
 void CDLightSet__Free(u8 *, void *);
 s32 Random_Next();
 B05Fx *CDLightSet__Alloc(u8 *, u8 *);

@@ -3,8 +3,8 @@
 #include "structs/weapon.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/player.h"
 
-extern f32 gWeaponChargeScale;
 extern f32 gProjectileSpeedScale;          /* projectile speed scale */
 extern f32 gProjectilePower;          /* projectile power */
 extern u8 gScene_m_ParticleSystem[];

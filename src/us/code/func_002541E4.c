@@ -1,10 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/player.h"
 
 
-extern s32 gTagModeModel;
-extern s32 gCharacterModels[];
 extern u8 gScene[];
 extern void CScene__SetInstanceObjectType(void *, CPlayer *, s32, s32);
 

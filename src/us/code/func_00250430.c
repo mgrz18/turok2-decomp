@@ -1,9 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WEAPONS/8021CD70_15.CPP, func_80224408_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/player.h"
+#include "globals/player.h"
 
-extern char gStandLookTuning;     /* standing look tuning */
-extern char gCrouchLookTuning;     /* crouching look tuning */
 
 void CPlayer__BobView(CPlayer *player, CGameObjectInstance *body);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);

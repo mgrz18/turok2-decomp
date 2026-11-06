@@ -4,6 +4,7 @@
 #include "structs/game.h"
 #include "structs/weapon.h"
 #include "structs/light.h"
+#include "globals/player.h"
 
 
 
@@ -15,7 +16,6 @@ typedef struct Hit {
 } Hit;
 
 extern s32 gEvenOdd;
-extern s32 gTagModeModel;
 
 s32 *CISet__GetBlock(s32 arg0, s32 arg1);
 s32 CPlayer__IsInMatchEndState(CPlayer *player);

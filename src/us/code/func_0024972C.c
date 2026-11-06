@@ -2,12 +2,11 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 #include "gfx.h"
+#include "globals/player.h"
 
 
 extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
 extern s32 gEngineApp_m_Settings_match_tag;
-extern s32 gTagModeModel;
-extern s32 gCharacterModels[];
 extern u8 gScene[];
 
 void CScene__SetInstanceObjectType(void *world, CPlayer *player, s32 model, s32 arg3);

@@ -4,14 +4,9 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/weapon.h"
+#include "globals/player.h"
 
 
-typedef struct {
-    /* 0x00 */ s16 mode;
-    /* 0x02 */ u8 pad2[0x16];
-} PoseInfo;   /* 0x18 bytes */
-
-extern PoseInfo gPlayerStateTable_anim[];
 extern u32 gFrameCountGameplay;
 extern s32 gScene;
 extern u8 gEngineApp_m_Game_m_CameraPool[];
@@ -52,7 +47,7 @@ void WeaponMode_Idle_Update(CGameObjectInstance *obj, CAI *ai) {
     s32 mode;
 
     player = (CPlayer *) obj->m_AI.m_pParent;
-    mode = gPlayerStateTable_anim[player->m_Mode].mode;
+    mode = gPlayerStateTable[player->m_Mode].pose;
     if (ai->m_AnimRepeatedCount && !CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon)) {
         player->m_RequestedWeapon = CPlayer__GetNextUsableWeapon(player);
     }

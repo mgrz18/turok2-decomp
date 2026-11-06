@@ -26,6 +26,7 @@
 #include "gfx.h"
 #include "structs/light.h"
 #include "globals/render.h"
+#include "globals/player.h"
 
 /* ---------------- MenuItem_FormatBinding_2 ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -560,7 +561,6 @@ extern s32 gScreenHeight; /* screen height */
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
 extern s32 sMenuModelFade;
 extern u8 gScene[];
-extern s32 gCharacterModels[];
 
 extern void memset(void *p, s32 c, s32 n); /* memset */
 extern f32 func_002982F0(f32 angle);             /* sin */
