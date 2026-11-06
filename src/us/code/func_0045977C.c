@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 /* Controller pak menu: closes the current message box and shows the next one for the menu state. */
 
@@ -17,7 +18,6 @@ extern s32 gPakCheckDone;
 extern s32 gSavePortalActive;
 extern u8 gScene[];
 extern u8 gEngineApp[];
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gSavePortalMenuDescB_2[];
 extern u8 gSavePortalMenuDesc_2[];
 extern u8 gPakLoadGameMenuDesc_2[];
@@ -81,21 +81,21 @@ s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
         s0 = Pak_GetStatus_2(s1);
         v = Controller_TakePakChanged(s1);
         if ((s0 == 0 || v != 0) && s0 != -2 && o->context == (void *)1) {
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakLoadGameMenuDesc_2, o->player, o->controller, 0);
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakLoadGameMenuDesc_2, o->player, o->controller, 0);
         } else {
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gSingleMenuAfterPakDesc_2, o->player, o->controller, 0);
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gSingleMenuAfterPakDesc_2, o->player, o->controller, 0);
         }
     } else if (gPakMessageKind == 3 && gSavePortalActive != 0) {
         Pak_ProbeSlot_2(s1);
         s0 = Pak_GetStatus_2(s1);
         v = Controller_TakePakChanged(s1);
         if ((s0 == 0 || v != 0) && s0 != -2 && o->context == (void *)1) {
-            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakSaveGameMenuDesc_2, o->player, o->controller, 0);
+            MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakSaveGameMenuDesc_2, o->player, o->controller, 0);
         } else {
             if (o->player != NULL) {
                 p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
-                p = gEngineApp_m_Game_m_MenuPool;
+                p = &gEngineApp_m_Game_m_MenuPool;
             }
             MenuPool_OpenMenu_2(p, gSavePortalMenuDescB_2, o->player, o->controller, 0);
             gCameraPoolHideViews = 0;
@@ -108,7 +108,7 @@ s32 PakMessage_SelectOk_2(s32 a0, Menu *o) {
             if (o->context != gPakSaveProfileMenuDesc_2 && o->player != NULL) {
                 p = ((u8 *)o->player->m_pCamera) + 0x53C;
             } else {
-                p = gEngineApp_m_Game_m_MenuPool;
+                p = &gEngineApp_m_Game_m_MenuPool;
             }
             MenuPool_OpenMenu_2(p, o->context, o->player, o->controller, s1);
         }

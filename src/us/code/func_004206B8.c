@@ -7,6 +7,7 @@
 #include "structs/menu.h"
 #include "structs/pak.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 extern s8 gPakProfileRead_character[];
 extern s32 gPakMenuAnyPak;
@@ -14,7 +15,6 @@ extern s32 gPakMenuPort;
 extern s32 gPakMenuLeaving;
 extern s32 sCharNoteLoad;
 extern s32 gPakNoteIndex;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPlayerSetupMenuDesc[];
 extern u8 gPakMsgDeleteDoneDesc[];
 extern u8 gPakMsgDeleteFailedDesc[];
@@ -59,9 +59,9 @@ s32 CharNoteMenu_SelectYes(s32 unused, Menu *own) {
         return 1;
     }
     if (Pak_DeleteNote(pad, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc, own->player, own->controller, (void *)own->context);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc, own->player, own->controller, (void *)own->context);
     } else {
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc, own->player, own->controller, (void *)own->context);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc, own->player, own->controller, (void *)own->context);
     }
     return 1;
 }

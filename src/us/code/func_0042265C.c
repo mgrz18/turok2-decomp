@@ -2,17 +2,17 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu.h"
 
 extern int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item);
 extern int sCharNoteLoad;
-extern char gEngineApp_m_Game_m_MenuPool[];
 extern char gPakLoadProfileMenuDesc[];
 extern void MenuPool_OpenMenu(char *, char *, int, int, int);
 int CharNoteMenu_SelectNo(int unused, ItemRecAt24 *item) {
     if (sCharNoteLoad != 0) {
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakLoadProfileMenuDesc, item->x, item->y, 0);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakLoadProfileMenuDesc, item->x, item->y, 0);
     } else {
-        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, item->label, item->x, item->y, 0);
+        MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, item->label, item->x, item->y, 0);
     }
     return 1;
 }

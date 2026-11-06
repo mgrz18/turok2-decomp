@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/menu.h"
 
 void PakMenu_UpdateNoteRows(Shared_PakMenu *menu);
 extern s32 gPakMenuIsLoad;
@@ -12,7 +13,6 @@ extern s32 gPakMenuWrites;
 extern s32 gPakMenuMode;
 extern s32 gPakMenuAnyPak;
 extern s32 gDamagedPakContinued;
-extern char gEngineApp_m_Game_m_MenuPool[];
 extern char gSingleMenuAfterPakDesc[];
 extern unsigned char gPakLoadGameMenuDesc[];
 extern char gPakMsgInsertToLoadDesc[];
@@ -41,7 +41,7 @@ void PakMenu_InitLoadGame(Shared_PakMenu *menu)
   if (gDamagedPakContinued != 0)
   {
     gPakMenuLeaving = 1;
-    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gSingleMenuAfterPakDesc, menu->player, menu->slot, 0);
+    MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gSingleMenuAfterPakDesc, menu->player, menu->slot, 0);
     return;
   }
   menu->items[20].flags &= ~0x01000000;
@@ -56,18 +56,18 @@ void PakMenu_InitLoadGame(Shared_PakMenu *menu)
   if (Pak_IsRumblePak(ch) != new_var)
   {
     new_var2 = gPakMsgInsertToLoadDesc;
-    MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, new_var2, menu->player, menu->slot, (char *) 1);
+    MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, new_var2, menu->player, menu->slot, (char *) 1);
   }
   else
   {
     new_var3 = menu;
     if (Pak_NeedsRepair(ch) != 0)
     {
-      MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, new_var3->player, menu->slot, gPakLoadGameMenuDesc);
+      MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, new_var3->player, menu->slot, gPakLoadGameMenuDesc);
     }
     else
     {
-      MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, new_var3->player, new_var3->slot, gSingleMenuAfterPakDesc);
+      MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, new_var3->player, new_var3->slot, gSingleMenuAfterPakDesc);
     }
   }
 }

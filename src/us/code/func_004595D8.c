@@ -6,6 +6,7 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 /* Level chosen: load it, or set up the new player from the saved settings, or
  * open the next menu page. */
@@ -22,7 +23,6 @@ extern u16 gPakProfile_kills[];
 extern u16 gPakProfile_tags[];
 extern u8 gPakProfile_name[8];
 extern s8 gPakProfileRead_character;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPlayerSetupMenuDesc_2[];
 extern u8 gPakMsgDeleteDoneDesc_2[];
 extern u8 gPakMsgDeleteFailedDesc_2[];
@@ -72,9 +72,9 @@ s32 CharNoteMenu_SelectYes_2(void *arg0, Menu *event) {
         return 1;
     }
     if (Pak_DeleteNote_2(mode, gPakNoteIndex) == 0) {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc_2, event->player, event->controller, event->context);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc_2, event->player, event->controller, event->context);
     } else {
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, event->player, event->controller, event->context);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc_2, event->player, event->controller, event->context);
     }
     return 1;
 }

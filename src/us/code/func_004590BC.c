@@ -5,6 +5,7 @@
 #include "structs/game.h"
 #include "structs/save.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 /* Controller pak menu: stops the pak sounds and shows the message for the pak's state. */
 
@@ -21,7 +22,6 @@ extern s32 gPakCheckDone;
 extern s32 gPakMenuStartPressed;
 extern s32 D_8011F144;
 extern s32 D_8011B114;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPakSaveGameAnyPakMenuDesc_2[];
 extern u8 gCharacterMenuDesc_2[];
 extern u8 gSingleMenuAfterPakDesc_2[];
@@ -69,7 +69,7 @@ s32 PakMenu_SelectCancel_2(s32 a0, Menu *arg) {
         gPakMenuStartPressed = 0;
         D_8011F144 = 1;
         D_8011B114 = 0;
-        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakSaveGameAnyPakMenuDesc_2, 0, (s32)arg->controller, 0);
+        MenuPool_OpenMenu_2(&gEngineApp_m_Game_m_MenuPool, gPakSaveGameAnyPakMenuDesc_2, 0, (s32)arg->controller, 0);
         return 1;
     }
     if (gPakMenuIsProfile != 0) {

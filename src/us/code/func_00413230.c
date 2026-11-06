@@ -20,6 +20,7 @@
 #include "structs/camera.h"
 #include "gfx.h"
 #include "globals/game.h"
+#include "globals/menu.h"
 
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -1609,7 +1610,6 @@ s32 CList__Remove(s32, s32);
 s32 CCache__Deallocate(s32, s32);
 s32 func_0041531C_4169C8(s32, s32) __asm__("Menu_Update");
 
-extern MenuPool gEngineApp_m_Game_m_MenuPool;
 
 void MenuPool_Update(MenuPool *arg0) {
     s32 (*temp_v0)(Menu *, MenuPool *);

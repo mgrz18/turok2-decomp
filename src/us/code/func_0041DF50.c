@@ -5,6 +5,7 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 #include "structs/pak.h"
+#include "globals/menu.h"
 
 typedef struct O01Sel { s32 v; s32 w; } O01Sel;
 extern s32 gPakMenuIsSave;
@@ -17,7 +18,6 @@ extern s32 gPakMenuAnyPak;
 extern s32 gDamagedPakContinued;
 extern s32 gPakMenuPort;
 extern PakProfile gPakProfile;
-extern u8 gEngineApp_m_Game_m_MenuPool[];
 extern u8 gPakMsgInsertToSaveDesc[];
 extern u8 gDamagedPakAtBootMenuDesc[];
 extern u8 gPakMsgPakNotFoundDesc[];
@@ -104,11 +104,11 @@ void PakMenu_InitSaveProfile(Menu *own) {
         } else {
             gPakMenuLeaving = 1;
             if (Pak_IsRumblePak(sel.v) != 0) {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToSaveDesc, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToSaveDesc, plr, plr->m_ContState.m_pContState, msg);
             } else if (Pak_NeedsRepair(sel.v) != 0) {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, plr, plr->m_ContState.m_pContState, gPakSaveProfileMenuDesc);
+                MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc, plr, plr->m_ContState.m_pContState, gPakSaveProfileMenuDesc);
             } else {
-                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu(&gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc, plr, plr->m_ContState.m_pContState, msg);
             }
         }
     }

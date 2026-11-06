@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/menu.h"
+#include "globals/menu.h"
 
 void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
 extern char gSavePortalMenuDesc[];
 extern char gSavePortalMenuDescB[];
-extern char gEngineApp_m_Game_m_MenuPool[];
 extern s32 gPakCheckDone;
 extern s32 gDamagedPakContinued;
 extern s32 gCameraPoolHideViews;
@@ -23,7 +23,7 @@ s32 DamagedPakMenu_SelectContinue(s32 unused, Menu *event) {
         if (event->player != NULL) {
             dst = (char *)event->player->m_pCamera + 0x53C;
         } else {
-            dst = gEngineApp_m_Game_m_MenuPool;
+            dst = &gEngineApp_m_Game_m_MenuPool;
         }
         if (event->text == gSavePortalMenuDescB || event->text == gSavePortalMenuDesc) {
             gCameraPoolHideViews = 0;
