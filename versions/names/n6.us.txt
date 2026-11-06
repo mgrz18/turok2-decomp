@@ -1,0 +1,332 @@
+// N2 part n6: functions at 0x00290000-0x002AFFFF (libaudio, libultra, libc, the
+// SN debugger host I/O, Acclaim's audio decoder). Most of this range is
+// libultra / libaudio linked in the same order as in Turok: Rage Wars:
+// thejunkman9000's symbol_addrs.txt (references/rw_junk) names the same
+// functions in the same order with the same sizes, and decompals/ultralib gives
+// the canonical names. Where a run of small same-sized API wrappers made the
+// order ambiguous, the code itself decided (event type constants, hardware
+// registers, the handler a ...New function installs). Names already in
+// versions/names.us.txt are not repeated.
+
+// libaudio csplayer.c (compact sequence player)
+__CSPHandleNextSeqEvent = 0x002900B0; // rw_junk symbol_addrs, same size (0x190) and order; callers' prototypes say so
+__CSPHandleMIDIMsg = 0x00290240; // ultralib csplayer.c; rw_junk same size (0x88C) and order
+__CSPPostNextSeqEvent = 0x00290C60; // ultralib csplayer.c; rw_junk same size and order
+__CSPRepostEvent = 0x00290CCC; // ultralib csplayer.c; header cites RW's __CSPRepostEvent; same size
+__CSPSetUsptFromTempo = 0x00290D5C; // ultralib csplayer.c's static __setUsptFromTempo (uspt = tempo scale or 488); renamed: seqplayer.c's copy is __setUsptFromTempo
+alCents2Ratio = 0x00290D90; // ultralib cents2ratio.c; header cites rw_junk alCents2Ratio
+alCSPPlay = 0x00290DE0; // ultralib cspplay.c: posts AL_SEQP_PLAY_EVT (15) to seqp->evtq
+alCSPSetBank = 0x00290E10; // ultralib cspsetbank.c: posts AL_SEQP_BANK_EVT (14) with the bank
+alCSPSetChlFXMix = 0x00290E40; // ultralib cspsetfxmix.c: posts a MIDI 0xB0|chan, AL_MIDI_FX1_CTRL (0x5B), fxmix
+alCSPSetSeq = 0x00290E90; // ultralib cspsetseq.c: posts AL_SEQP_SEQ_EVT (13) with the sequence
+alCSPSetVol = 0x00290EC0; // ultralib cspsetvol.c: posts AL_SEQP_VOL_EVT (10) with an s16
+alCSPStop = 0x00290EF0; // ultralib cspstop.c: posts AL_SEQP_STOPPING_EVT (17)
+
+// libaudio event.c, copy.c, heapalloc.c, heapinit.c
+alEvtqNew = 0x00290F20; // ultralib event.c; rw_junk same size and order
+alEvtqNextEvent = 0x00290F9C; // ultralib event.c; rw_junk same size and order
+alEvtqPostEvent = 0x00291034; // ultralib event.c; rw_junk same size; every alSndp*/alCSP* wrapper posts through it
+alEvtqFlush = 0x00291140; // ultralib event.c; rw_junk same size and order
+alEvtqFlushType = 0x002911B8; // ultralib event.c: under osSetIntMask unlinks the events of type arg1, adding their delta to the next
+alCopy = 0x00291270; // ultralib copy.c: byte copy loop
+alHeapDBAlloc = 0x002912A0; // ultralib heapalloc.c: 16-byte aligned num*size from the heap or 0
+alHeapInit = 0x002912F0; // ultralib heapinit.c; rw_junk same size and order
+
+// libaudio seqplayer.c (MIDI sequence player)
+alSeqpNew = 0x00291330; // ultralib seqplayer.c (file header: clears loop fields, installs __seqpVoiceHandler)
+__seqpVoiceHandler = 0x002914B4; // ultralib seqplayer.c (rw_junk: __voiceHandler); installed by alSeqpNew
+__handleNextSeqEvent = 0x002919F0; // rw_junk symbol_addrs, same size and order
+__handleMIDIMsg = 0x00291BF4; // ultralib seqplayer.c; rw_junk same size (0x888) and order
+__mapVoice = 0x0029247C; // ultralib seqplayer.c; rw_junk same size and order
+__unmapVoice = 0x002924CC; // ultralib seqplayer.c; rw_junk same size and order
+__voiceNeedsNoteKill = 0x00292530; // ultralib seqplayer.c; rw_junk same size and order
+__lookupVoice = 0x002925E0; // ultralib seqplayer.c; file header cites rw_junk __lookupVoice
+__lookupSoundQuick = 0x00292640; // ultralib seqplayer.c; rw_junk same size and order
+__vsVol = 0x00292774; // ultralib seqplayer.c; rw_junk same size and order
+__vsDelta = 0x002927E8; // ultralib seqplayer.c; rw_junk same size and order
+__vsPan = 0x00292804; // ultralib seqplayer.c; rw_junk same size and order
+__initFromBank = 0x00292844; // ultralib seqplayer.c; rw_junk same size and order
+__initChanState = 0x002928F0; // ultralib seqplayer.c; rw_junk same size; called from alSeqpNew
+__resetPerfChanState = 0x002929A0; // ultralib seqplayer.c; rw_junk same size and order
+__setInstChanState = 0x00292A20; // ultralib seqplayer.c; rw_junk same size and order
+__seqpReleaseVoice = 0x00292A74; // ultralib seqplayer.c; header cites rw_junk __seqpReleaseVoice
+__seqpStopOsc = 0x00292B94; // ultralib seqplayer.c; rw_junk same size and order
+__postNextSeqEvent = 0x00292C84; // ultralib seqplayer.c; rw_junk same size and order
+__handleMetaMsg = 0x00292D4C; // ultralib seqplayer.c; rw_junk same size and order
+__setUsptFromTempo = 0x00292DB0; // ultralib seqplayer.c; xmatch 1.0 against ultralib's seqplayer.c
+
+// libaudio seq.c (MIDI file reader)
+alSeqNextEvent = 0x00292DE0; // ultralib seq.c; header cites rw_junk alSeqNextEvent
+alSeqNew = 0x00292F48; // ultralib seq.c: checks the "MThd"/"MTrk" tags
+alSeqGetTicks = 0x00293028; // ultralib seq.c; rw_junk same size and order
+alSeqTicksToSec = 0x00293034; // ultralib seq.c; file header
+alSeqSecToTicks = 0x00293080; // ultralib seq.c; xmatch 1.0
+alSeqNewMarker = 0x00293108; // ultralib seq.c; header cites rw_junk alSeqNewMarker
+alSeqSetLoc = 0x0029321C; // ultralib seq.c; rw_junk same size and order
+alSeqGetLoc = 0x00293238; // ultralib seq.c; rw_junk same size and order
+__alSeqNextDelta = 0x00293254; // ultralib seq.c; rw_junk same size and order
+__alSeqReadVarLen = 0x002932BC; // rw_junk symbol_addrs (ultralib seq.c's static readVarLen), same size and order
+__alSeqReadByte = 0x00293310; // rw_junk symbol_addrs, same size and order
+__alSeqReadShort = 0x00293324; // rw_junk symbol_addrs, same size and order
+__alSeqReadWord = 0x00293354; // rw_junk symbol_addrs: reads 4 bytes big-endian from seq->curPtr
+
+// libaudio sl.c (globals, links)
+alUnlink = 0x002933B0; // ultralib sl.c; rw_junk same size and order
+alLink = 0x002933E0; // ultralib sl.c; rw_junk same size and order
+alInit = 0x00293400; // ultralib sl.c (file header)
+alClose = 0x00293430; // ultralib sl.c: alSynDelete(&glob->drvr), alGlobals = 0
+
+// libaudio sndplayer (sound player; event numbers are ultralib sndp.h's AL_SNDP_*_EVT)
+alSndpAllocate = 0x00293470; // ultralib sndpallocate.c: first free sndState slot, priority 5, pan 0x40, vol from sampleVolume
+alSndpDeallocate = 0x00293530; // ultralib sndpdeallocate.c: clears the slot's sound if stopped, resets target
+alSndpGetState = 0x00293580; // ultralib sndpgetstate.c: sndState[target].state
+alSndpNew = 0x002935B0; // ultralib sndplayer.c; rw_junk same size and order
+_handleEvent = 0x002936E0; // ultralib sndplayer.c; rw_junk same size (0x43C) and order
+_sndpVoiceHandler = 0x00293B1C; // ultralib sndplayer.c; rw_junk same size and order
+_removeEvents = 0x00293BA8; // ultralib sndplayer.c; rw_junk same size and order
+_DivS32ByF32 = 0x00293C50; // ultralib sndplayer.c: asserts f != 0, clamps i/f to 0x7FFFFFFF
+alSndpPlay = 0x00293CE0; // ultralib sndpplay.c: AL_SNDP_PLAY_EVT (0) if the target is stopped
+alSndpSetFXMix = 0x00293D40; // ultralib sndpsetfxmix.c: AL_SNDP_FX_EVT (8) with an s8
+alSndpSetPan = 0x00293D90; // ultralib sndpsetpan.c: AL_SNDP_PAN_EVT (2)
+alSndpSetPitch = 0x00293DE0; // ultralib sndpsetpitch.c: AL_SNDP_PITCH_EVT (4)
+alSndpSetPriority = 0x00293E30; // ultralib sndpsetpriority.c: sndState[id].priority = priority
+alSndpSetSound = 0x00293E60; // ultralib sndpsetsound.c: sndp->target = id
+alSndpSetVol = 0x00293E70; // ultralib sndpsetvol.c: AL_SNDP_VOL_EVT (3) with an s16
+alSndpStop = 0x00293EC0; // ultralib sndpstop.c: AL_SNDP_STOP_EVT (1); header cites RW's alSndpStop
+
+// libaudio synthesizer (syn*.c, synthesizer.c)
+alSynAddPlayer = 0x00293F10; // ultralib synaddplayer.c; rw_junk same size and order
+_allocatePVoice = 0x00294090; // ultralib synallocvoice.c: lame list, free list, else steal by priority
+alSynDelete = 0x00294150; // ultralib syndelete.c: drvr->head = 0
+alSynFreeVoice = 0x00294160; // ultralib synfreevoice.c; header cites RW's alSynFreeVoice
+alSynSetFXMix = 0x00294200; // ultralib synsetfxmix.c; rw_junk same size and order
+alSynSetPan = 0x002942B0; // ultralib synsetpan.c; rw_junk same size and order
+alSynSetPitch = 0x00294340; // ultralib synsetpitch.c; callers' prototypes
+alSynSetPriority = 0x002943D0; // ultralib synsetpriority.c: voice->priority (ALVoice 0x16) = priority
+alSynStartVoice = 0x002944A0; // ultralib synstartvoice.c; rw_junk same size and order
+alSynStartVoiceParams = 0x00294540; // ultralib synstartvoiceparam.c: an AL_FILTER_START_VOICE_ALT (13) update with pitch/vol/pan/fxmix
+alAudioFrame = 0x002949A4; // ultralib synthesizer.c; rw_junk same size (0x1B4) and order
+__allocParam = 0x00294B58; // ultralib synthesizer.c (file header)
+__freeParam = 0x00294B84; // ultralib synthesizer.c (file header)
+_freePVoice = 0x00294B9C; // ultralib synthesizer.c; rw_junk same size and order
+_collectPVoices = 0x00294BDC; // ultralib synthesizer.c; rw_junk same size and order
+_timeToSamplesNoRound = 0x00294C30; // ultralib synthesizer.c: micros * outputRate / 1e6
+__nextSampleTime = 0x00294C70; // ultralib synthesizer.c; rw_junk same size and order
+_timeToSamples = 0x00294D18; // ultralib synthesizer.c: the rounding twin of _timeToSamplesNoRound (+ a rodata 0.5)
+
+// libaudio filters: auxbus.c, reverb.c, load.c, mainbus.c, resample.c, save.c, env.c, filter.c
+alAuxBusPull = 0x00294D60; // ultralib auxbus.c: clears AL_AUX_L_OUT/R_OUT (0x6C0/0x800), pulls each source; installed by alAuxBusNew
+alAuxBusParam = 0x00294E3C; // ultralib auxbus.c: AL_FILTER_ADD_SOURCE appends a source; installed by alAuxBusNew
+alFxNew = 0x00294E70; // ultralib reverb.c (in synthesizer.c's init): installs alFxPull/alFxParam; rw_junk same size (0x494)
+alLoadNew = 0x00295304; // ultralib load.c: installs alAdpcmPull/alLoadParam; rw_junk same size and order
+alMainBusNew = 0x002953B4; // ultralib mainbus.c: installs alMainBusPull/alMainBusParam
+alAuxBusNew = 0x00295410; // ultralib auxbus.c: installs alAuxBusPull/alAuxBusParam
+alResampleNew = 0x0029546C; // ultralib resample.c: installs alResamplePull/alResampleParam
+alSaveNew = 0x002954F8; // ultralib save.c: installs alSavePull/alSaveParam
+alEnvmixerNew = 0x0029553C; // ultralib env.c; header cites rw_junk alEnvmixerNew
+init_lpfilter = 0x002955EC; // ultralib reverb.c's init_lpfilter (ALLowPass *); rw_junk same name
+alEnvmixerPull = 0x00295690; // ultralib env.c; installed by alEnvmixerNew
+_pullSubFrame = 0x00295BDC; // ultralib env.c; rw_junk same size and order
+_getRate = 0x00295EC8; // ultralib env.c; rw_junk same size and order
+alEnvmixerParam = 0x00296118; // ultralib env.c; installed by alEnvmixerNew
+_getVol = 0x002961E8; // ultralib env.c; xmatch 1.0 against rw_junk _getVol
+_frexpf = 0x00296260; // ultralib env.c's static _frexpf (rw_junk: libm_frexp), used by _getRate
+_ldexpf = 0x00296314; // ultralib env.c's static _ldexpf (rw_junk: libm_ldexp), right after _frexpf
+alFilterNew = 0x00296340; // ultralib filter.c: every ...New calls it with (filter, handler, setParam, type)
+alMainBusPull = 0x00296360; // ultralib mainbus.c (file header); installed by alMainBusNew
+alMainBusParam = 0x002964A0; // ultralib mainbus.c: AL_FILTER_ADD_SOURCE; installed by alMainBusNew
+alResamplePull = 0x002964D0; // ultralib resample.c; installed by alResampleNew
+alResampleParam = 0x00296690; // ultralib resample.c; installed by alResampleNew
+alFxPull = 0x00296750; // ultralib reverb.c; referenced by alFxNew; rw_junk same size (0x3A4)
+alFxParamHdl = 0x00296AF4; // ultralib reverb.c: switch on the reverb parameter ids; rw_junk same size
+_loadOutputBuffer = 0x00296CD0; // ultralib reverb.c: calls _doModFunc and _loadBuffer, emits A_RESAMPLE
+_saveBuffer = 0x00296EC8; // ultralib reverb.c: A_SAVEBUFF (6) commands
+alFxParam = 0x00297038; // ultralib reverb.c; installed by alFxNew
+_loadBuffer = 0x0029704C; // ultralib reverb.c: A_LOADBUFF (4) commands
+_filterBuffer = 0x002971BC; // ultralib reverb.c; rw_junk same size and order
+_doModFunc = 0x00297260; // ultralib reverb.c: the modulation value _loadOutputBuffer uses
+alSavePull = 0x002972E0; // ultralib save.c (file header; "audio/save.c" assert string)
+alSaveParam = 0x002973E0; // ultralib save.c: AL_FILTER_SET_SOURCE (1) / AL_FILTER_SET_DRAM (6)
+alSynAllocFX = 0x00297420; // ultralib synallocfx.c: calls alFxNew, alMainBusParam, alFxParam
+
+// libultra gu/ and libm
+// cosf (0x002974C0) and sinf (0x002982F0) are rw_junk's cosf/sinf, but like sqrtf they stay
+// unnamed: GCC 2.8 treats calls to sinf/cosf as builtins and func_00406598,
+// func_00250EC0 and func_0023BE24 stop matching once their calls carry those names.
+guLookAt = 0x002975D0; // ultralib gu/lookat.c (file header: guLookAt with guLookAtF inlined)
+guLookAtF = 0x00297860; // ultralib gu/lookat.c; rw_junk same order; normalises with sqrtf
+guMtxIdent = 0x00297AE0; // ultralib gu/mtxutil.c; xmatch 1.0
+guMtxIdentF = 0x00297BCC; // ultralib gu/mtxutil.c; rw_junk same size and order
+guMtxF2L = 0x00297C1C; // ultralib gu/mtxutil.c; rw_junk same size and order
+guMtxL2F = 0x00297CB4; // ultralib gu/mtxutil.c: s32 fixed-point Mtx halves to floats; rw_junk same order
+guOrtho = 0x00297D50; // ultralib gu/ortho.c (file header, xmatch 1.0)
+guOrthoF = 0x00297E8C; // ultralib gu/ortho.c (file header, xmatch 1.0)
+guPerspective = 0x00297FB0; // ultralib gu/perspective.c (file header after rw_junk guPerspective)
+guPerspectiveF = 0x0029815C; // ultralib gu/perspective.c: cot = cosf/sinf of fovy
+
+// libultra ai/, cont/, dp, motor, pi/si/sp access
+osAiSetFrequency = 0x002984A0; // ultralib ai/aisetfreq.c (file header, xmatch 1.0)
+osAiSetNextBuffer = 0x002985C0; // ultralib ai/aisetnextbuf.c: writes AI_DRAM_ADDR_REG (0xA4500000)
+osContStartQuery = 0x00298670; // ultralib io/contquery.c; rw_junk same size and order
+osContGetQuery = 0x002986F8; // ultralib io/contquery.c: __osContGetInitData(&pattern, data)
+osContStartReadData = 0x00298720; // ultralib io/contreaddata.c; rw_junk same size and order
+osContGetReadData = 0x002987B4; // ultralib io/contreaddata.c; rw_junk same size and order
+__osPackReadData = 0x0029884C; // ultralib io/contreaddata.c; rw_junk same size and order
+osContReset = 0x00298900; // rw_junk symbol_addrs, same size and order
+__osPackResetData = 0x00298A0C; // rw_junk symbol_addrs, same size and order
+osContInit = 0x00298A40; // ultralib io/controller.c; rw_junk same size; callers' prototypes
+__osPackRequestData = 0x00298BE0; // ultralib io/controller.c; rw_junk same size and order
+__osContGetInitData = 0x00298C98; // ultralib io/controller.c; rw_junk same order
+osDpSetNextBuffer = 0x00298D50; // ultralib io/dpsetnextbuf.c: DPC_STATUS/START/END registers
+osMotorStop = 0x00298E10; // ultralib io/motor.c (2.0I's osMotorStop); rw_junk same size and order
+osMotorStart = 0x00298FD4; // ultralib io/motor.c (2.0I's osMotorStart); rw_junk same size and order
+__osContRamRead = 0x00299680; // ultralib io/contramread.c; rw_junk same size; callers' prototypes
+__osPackRamReadData = 0x002998B0; // rw_junk symbol_addrs (contramread.c), same order
+__osContRamWrite = 0x00299A40; // ultralib io/contramwrite.c; rw_junk same size; callers' prototypes
+__osPackRamWriteData = 0x00299C60; // rw_junk symbol_addrs (contramwrite.c), same order
+__osContAddressCrc = 0x00299E00; // ultralib io/crc.c; rw_junk same size and order
+__osContDataCrc = 0x00299E48; // ultralib io/crc.c; rw_junk same order
+__osSiCreateAccessQueue = 0x00299F90; // ultralib io/siacs.c: sets __osSiAccessQueueEnabled, creates and fills the queue
+__osSiGetAccess = 0x00299FE4; // ultralib io/siacs.c; callers' prototypes (the Controller code)
+__osSiRelAccess = 0x0029A050; // ultralib io/siacs.c; callers' prototypes
+__osSiRawStartDma = 0x0029A080; // ultralib io/sirawdma.c; header cites RW's __osSiRawStartDma
+_VirtualToPhysicalTask = 0x0029A160; // ultralib io/sptask.c; rw_junk same size and order
+osSpTaskLoad = 0x0029A248; // ultralib io/sptask.c; rw_junk same size and order
+osSpTaskStartGo = 0x0029A34C; // ultralib io/sptask.c; rw_junk same order
+__osSpRawStartDma = 0x0029A3A0; // ultralib io/sprawdma.c: SP_MEM_ADDR/DRAM_ADDR/RD_LEN/WR_LEN (0xA4040000-C)
+__osSpSetPc = 0x0029A4A0; // ultralib io/spsetpc.c; header cites rw_junk __osSpSetPc
+osSpTaskYield = 0x0029A4F0; // ultralib io/sptaskyield.c: __osSpSetStatus(SP_SET_SIG0)
+osSpTaskYielded = 0x0029A510; // ultralib io/sptaskyielded.c: SP_STATUS_YIELDED/YIELD bits into the task flags
+
+// libultra vi/
+osViBlack = 0x0029A580; // ultralib io/viblack.c; header cites RW's osViBlack; callers' prototypes
+__osViInit = 0x0029A5E0; // ultralib io/vi.c: clears the two contexts, VI_STATUS/VI_CURRENT, calls __osViSwapContext
+osViGetCurrentFramebuffer = 0x0029A6E0; // ultralib io/vigetcurrframebuf.c: __osViCurr->framep under __osDisableInt
+viMgrMain = 0x0029A890; // ultralib io/vimgr.c's static thread entry (rw_junk counts it in osCreateViManager: 0x170 + 0x180 = its 0x2F0)
+__osViGetCurrentContext = 0x0029AA10; // ultralib io/vigetcurrcontext.c: returns __osViCurr
+osViSetEvent = 0x0029AA20; // ultralib io/visetevent.c (file header)
+osViSetMode = 0x0029AA80; // ultralib io/visetmode.c; callers' prototypes
+osViSetSpecialFeatures = 0x0029AAD0; // ultralib io/visetspecial.c; callers' prototypes
+osViSetYScale = 0x0029AC40; // ultralib io/visetyscale.c (file header)
+osViSwapBuffer = 0x0029AC90; // ultralib io/viswapbuf.c (file header, callers)
+__osViSwapContext = 0x0029ACE0; // ultralib io/viswapcontext.c: writes VI registers 0xA4400000-34
+
+// libultra os/ (threads, messages, timers, init)
+__assert = 0x0029B020; // ultralib debug/assert.c; callers pass (expr string, "audio/save.c", line)
+osCreateMesgQueue = 0x0029B030; // ultralib os/createmesgqueue.c; callers' prototypes
+osCreateThread = 0x0029B060; // ultralib os/createthread.c; sets __osCleanupThread as the return address
+__osGetCurrFaultedThread = 0x0029B140; // ultralib os/getcurrfaultthread.c; rw_junk same size and order
+osGetThreadPri = 0x0029B150; // ultralib os/getthreadpri.c: (t ? t : __osRunningThread)->priority
+osGetTime = 0x0029B170; // ultralib os/gettime.c: osGetCount and __osCurrentTime under __osDisableInt
+osInitialize = 0x0029B1F0; // ultralib os/initialize.c; rw_junk same size (0x220) and order
+osPiRawReadIo = 0x0029B410; // ultralib io/pirawread.c; callers' prototypes
+__osSiRawReadIo = 0x0029B4B0; // ultralib io/sirawread.c; rw_junk same size and order
+__osSiRawWriteIo = 0x0029B540; // ultralib io/sirawwrite.c; rw_junk same order
+osSetEventMesg = 0x0029B950; // ultralib os/seteventmesg.c; callers' prototypes
+osSetThreadPri = 0x0029B9B0; // ultralib os/setthreadpri.c: dequeue, re-enqueue, __osEnqueueAndYield
+osSetTimer = 0x0029BA80; // ultralib os/settimer.c: fills the OSTimer, __osInsertTimer, __osSetTimerIntr
+osStartThread = 0x0029BB10; // ultralib os/startthread.c; callers' prototypes
+__osTimerInterrupt = 0x0029BC70; // ultralib os/timerintr.c; rw_junk same size and order
+__osTimerServicesInit = 0x0029BDB8; // ultralib os/timerintr.c; rw_junk same size and order
+__osSetTimerIntr = 0x0029BE0C; // ultralib os/timerintr.c; rw_junk same size and order
+__osInsertTimer = 0x0029BE6C; // ultralib os/timerintr.c; header cites RW's __osInsertTimer
+osVirtualToPhysical = 0x0029BF80; // ultralib os/virtualtophysical.c; rw_junk same size; every audio command converts through it
+
+// libultra io/ PI manager, 64DD, EPI
+osEPiRawStartDma = 0x0029D190; // ultralib io/epirawdma.c; callers' prototypes (osCreatePiManager's handler)
+osLeoDiskInit = 0x0029D370; // ultralib io/leodiskinit.c (file header: registers the 64DD as PI domain 2)
+osCreatePiManager = 0x0029D450; // ultralib io/pimgr.c (file header after rw_junk osCreatePiManager)
+osCartRomInit = 0x0029D5D0; // ultralib io/cartrominit.c (file header after rw_junk osCartRomInit)
+__osDevMgrMain = 0x0029D690; // ultralib io/devmgr.c; osCreatePiManager starts it as the PI thread
+osEPiRawReadIo = 0x0029DA30; // ultralib io/epirawread.c; callers' prototypes
+osEPiRawWriteIo = 0x0029DBD0; // ultralib io/epirawwrite.c; callers' prototypes
+__osPiCreateAccessQueue = 0x0029DD10; // ultralib io/piacs.c: sets __osPiAccessQueueEnabled (D_800B8990, osCreatePiManager's)
+__osPiGetAccess = 0x0029DD64; // ultralib io/piacs.c: twin of __osSiGetAccess on the PI queue
+__osPiRelAccess = 0x0029DDD0; // ultralib io/piacs.c: twin of __osSiRelAccess on the PI queue
+osDestroyThread = 0x0029DE00; // ultralib os/destroythread.c: dequeue from the active list, __osDispatchThread if self
+__osResetGlobalIntMask = 0x0029DEE0; // ultralib os/resetglobalintmask.c; callers' prototypes
+__osSetGlobalIntMask = 0x0029DF30; // ultralib os/setglobalintmask.c; callers' prototypes
+osYieldThread = 0x0029DF70; // ultralib os/yieldthread.c; callers' prototypes
+osGetCount = 0x0029DFC0; // ultralib os/getcount.s: mfc0 $9 (Count)
+__osSetCompare = 0x0029E210; // ultralib os/setcompare.s: mtc0 $11 (Compare)
+
+// libc (ultralib libc/)
+sprintf = 0x0029E3E0; // ultralib libc/sprintf.c; 39 callers' prototypes
+proutSprintf = 0x0029E438; // ultralib libc/sprintf.c's static output routine (memcpy then advance); rw_junk same name and order
+// memcpy (0x0029E460, ultralib libc/string.c, callers' prototypes) stays unnamed: as
+// memcpy GCC's builtin takes over the calls (proutSprintf's prototype-less call
+// no longer compiles).
+strchr = 0x0029E488; // ultralib libc/string.c; _Printf's prototype
+strlen = 0x0029E4C0; // ultralib libc/string.c: the length loop
+_Printf = 0x0029E4F0; // ultralib libc/xprintf.c (file header after rw_junk _Printf); calls strchr and _Putfld
+_Litob = 0x0029EEA0; // ultralib libc/xlitob.c (file header); _Putfld calls it for d/i/o/u/x/X
+lldiv = 0x0029F0F0; // ultralib libc/ll.c (file header after rw_junk lldiv)
+_Ldtob = 0x0029F180; // where _Putfld calls _Ldtob for e/f/g: an empty stub in this build (rw_junk names it _Ldtob too)
+
+// libaudio load.c with Acclaim's compressed-audio decoder (rw_junk's names)
+alAdpcmPull = 0x0029F190; // ultralib load.c (file header); installed by alLoadNew
+alRaw16Pull = 0x0029F5D4; // ultralib load.c; rw_junk same size and order
+alAdecPull = 0x0029F958; // rw_junk symbol_addrs (port name), same size and order: the third loader pull
+alLoadParam = 0x0029FB64; // ultralib load.c; installed by alLoadNew
+_decodeChunk = 0x0029FCF4; // ultralib load.c; callers' prototypes
+adecReadBits = 0x0029FE70; // rw_junk port name (file header)
+adecHuffDecode = 0x002A0044; // rw_junk port name, same size and order; callers' prototypes
+adecDecodeFrame = 0x002A0448; // rw_junk port name (file header)
+mdctInitTwiddles = 0x002A05D4; // rw_junk port name, same size and order
+mdctFftInit = 0x002A073C; // rw_junk port name, same size and order
+adecDequantize = 0x002A08C4; // rw_junk port name, same size and order
+mdctFft = 0x002A09E8; // rw_junk port name (file header)
+adecImdctFrame = 0x002A0B6C; // rw_junk port name (file header)
+adecDecodeFrameOk = 0x002A0EFC; // rw_junk port name, same size and order
+mdctBuildBitrevTable = 0x002A0F28; // rw_junk port name, same size and order
+mdctPackSpectrum = 0x002A0FF0; // rw_junk port name, same size and order
+mdctTwiddleMul = 0x002A1050; // rw_junk port name, same size and order
+mdctFftCtx = 0x002A10CC; // rw_junk port name, same size; file comment: the FFT tables mdctFft needs
+adecRoundClampS16 = 0x002A1104; // rw_junk port name; file comment: round a float to a saturated s16
+adecStreamOpen = 0x002A1170; // rw_junk port name, same size and order
+adecNextFrame = 0x002A122C; // rw_junk port name, same size and order
+adecGetStopFlag = 0x002A12CC; // rw_junk port name: returns D_80125C48
+adecClearStopFlag = 0x002A12DC; // rw_junk port name: clears D_80125C48
+
+// SN Systems debugger host I/O (cartridge mailbox at 0xB1FFFFxx, no rw_junk
+// names; named by behavior). The PC* functions are SN's libsn PC file server
+// calls, by their command numbers 0x101..0x707 in SN's PCinit/PCopen/PCcreat/
+// PCclose/PCread/PCwrite/PClseek order and their arguments.
+HostIo_DisableInt = 0x002A12F0; // clears SR.IE through the asm SR accessors, returns the old IE bit
+HostIo_RestoreInt = 0x002A1324; // ors the saved bit back into SR
+HostIo_WriteWord = 0x002A1350; // waits on PI_STATUS (0xA4600010), stores a word to cartridge space
+HostIo_ReadWord = 0x002A1384; // waits on PI_STATUS, loads a word of cartridge space
+HostIo_Delay = 0x002A13BC; // counts a volatile global up to n
+HostIo_ScanTlb = 0x002A13F0; // file comment: rebuilds the table of ranges the 32 TLB entries map
+HostIo_ReadByte = 0x002A1540; // byte of cartridge space through HostIo_ReadWord (used by the non-DMA copies)
+HostIo_ReadByteDma = 0x002A157C; // the same code, used by the DMA copy HostIo_ReadBlockDma
+HostIo_ReadBlock = 0x002A15B8; // cartridge -> RAM copy: bytes, whole words, bytes
+HostIo_ReadBlockDma = 0x002A1690; // file comment: the same with osPiStartDma when the PI manager runs
+HostIo_PokeByte = 0x002A1808; // stores a byte at an unaligned RAM address by word read-modify-write
+HostIo_ReadBlockRmw = 0x002A1844; // cartridge -> RAM copy storing through HostIo_PokeByte
+HostIo_WriteByte = 0x002A1954; // byte to cartridge space by word read-modify-write (non-DMA paths)
+HostIo_WriteByteDma = 0x002A19C8; // the same code, used by HostIo_WriteBlockDma
+HostIo_WriteBlock = 0x002A1A3C; // RAM -> cartridge copy: bytes, whole words, bytes
+HostIo_WriteBlockDma = 0x002A1B24; // file comment: the same with osPiStartDma when aligned
+HostIo_FillBlock = 0x002A1CB4; // fills cartridge space with a byte (memset)
+HostIo_CopyCartBytes = 0x002A1D7C; // cartridge -> cartridge byte copy
+HostIo_MemoryTransfer = 0x002A1DEC; // file comment: splits the debugger's memory transfer at permission boundaries
+HostIo_CopyMailboxBlock = 0x002A2008; // copies the block whose address/length the host left at 0xB1FFFFF4/F8
+HostIo_Init = 0x002A2104; // file comment: resets the mailbox and builds the memory permission map
+HostIo_CommandLoop = 0x002A2264; // file comment: the host's command loop on the 0xB1FFFFF0 mailbox
+HostIo_StrSize = 0x002A2494; // string length including the terminator (PCopen/PCcreat send it)
+HostIo_StartThread = 0x002A24B4; // creates the queues and starts the I/O thread (HostIo_ThreadMain) once
+HostIo_Call = 0x002A259C; // posts cmd + 3 args at 0xB1FFFFE0-EC, waits, returns 0xB1FFFFDC
+HostIo_ThreadMain = 0x002A2650; // file comment: the I/O thread, serves requests from D_80128370
+PCinit = 0x002A2804; // command 0x101 straight to the host (D_800BC304 = 1)
+PCinitThreaded = 0x002A2858; // command 0x101 through the I/O thread (starts it, D_800BC304 = 2)
+PCopen = 0x002A28D8; // command 0x202 with a file name string and a mode
+PCcreat = 0x002A29F0; // command 0x303 with a file name string and attributes
+PCclose = 0x002A2B08; // command 0x404 with one handle
+PCread = 0x002A2BE8; // command 0x505: handle, buffer, length; copies host -> buffer in 0x8000 chunks
+PCwrite = 0x002A2D64; // command 0x606: handle, buffer, length; copies buffer -> host in 0x8000 chunks
+PClseek = 0x002A2EDC; // command 0x707 with three args (handle, offset, mode)
+
+// libultra io/ (linked after the host I/O)
+osPiStartDma = 0x002A2FB0; // ultralib io/pidma.c: OS_MESG_TYPE_DMAREAD/WRITE (11/12) to the PI manager; callers' prototypes
+osPiGetCmdQueue = 0x002A3060; // ultralib io/pigetcmdq.c: __osPiDevMgr.cmdQueue if active, else 0
