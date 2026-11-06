@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/game.h"
+#include "globals/scene.h"
 
 typedef struct {
     f32 x, y, z;
@@ -71,7 +72,6 @@ typedef struct {
 
 extern ModeState0040457C gLevelScript;
 extern u8 gScene_m_InstancePool[];
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 extern s32 D_800F1F50;
 Entity0040457C *CPlayerPool__FindNearest(void *game, Vec3_0040457C pos);
 void CAI__SetMode(void *actor, void *ai, s32 event);
@@ -191,7 +191,7 @@ void Primagen_UpdateSpawner(Entity0040457C *actor, void *level) {
         }
     }
     gLevelScript.enemiesAlive = 0;
-    for (enemy = gScene_m_InstancePool_m_ActiveList; enemy != NULL; enemy = enemy->m_pNext) {
+    for (enemy = gScene.m_InstancePool.m_ActiveList.m_pHead; enemy != NULL; enemy = enemy->m_pNext) {
         enemy->m_Instance.m_AI.m_vLeashPos.x = 0;
         enemy->m_Instance.m_AI.m_vLeashPos.y = 768.0f;
         enemy->m_Instance.m_AI.m_vLeashPos.z = 0;

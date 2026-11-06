@@ -29,7 +29,6 @@ extern void *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
 extern u8 gEngineApp_m_OnScreen[];
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 void *CPlayerPool__GetFirstActive(void *);
 void CCameraPool__AddTimedText(void *, s32, void *, f32);
@@ -98,7 +97,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
         }
     }
     if (fight->state != 1) {
-        actor = gScene_m_InstancePool_m_ActiveList;
+        actor = gScene.m_InstancePool.m_ActiveList.m_pHead;
         player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
         n = 0;
         for (; actor != NULL; actor = actor->m_pNext) {

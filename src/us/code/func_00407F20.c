@@ -24,7 +24,6 @@ typedef struct {
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* the current player */
 extern u8 D_800B6660[];
 extern u8 gEngineApp_m_OnScreen[];
-extern CListedInstance *gScene_m_InstancePool_m_ActiveList[]; /* the actor list head */
 extern s32 gScene_m_LevelID;         /* level id */
 
 CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *);
@@ -62,7 +61,7 @@ void TotemDefense_Complete(BossFight *fight) {
     setAnim(fight->obj, 0x5337);
     CScene__UnmarkGeneratorsSaved(&gScene);
     gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead->m_FleeTime = 450.0f;
-    for (a = gScene_m_InstancePool_m_ActiveList[0]; a != NULL; a = a->m_pNext) {
+    for (a = gScene.m_InstancePool.m_ActiveList.m_pHead; a != NULL; a = a->m_pNext) {
         if (a->m_Instance.header.m_pIntelligence->m_Type == 1 && a->m_Instance.m_AI.m_Health != 0) {
             a->m_Instance.m_AI.m_pPathTarget = NULL;
             a->m_Instance.m_AI.m_pSightTarget = NULL;
