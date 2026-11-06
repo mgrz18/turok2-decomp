@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/engine.h"
 
 extern s32 gEngineApp_m_Game_m_MenuPool;
-extern f32 gFrameIncrement;      /* frame step */
 
 s32 Cinema_IsActive(void);
 void CBarrel__Close(CBarrel *menu);

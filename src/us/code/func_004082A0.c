@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -26,7 +27,6 @@ typedef struct {
 
 extern void *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern s32 gScene;
-extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
 extern u8 gEngineApp_m_OnScreen[];
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList;

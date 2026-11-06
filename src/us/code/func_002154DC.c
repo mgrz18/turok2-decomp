@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_6.CPP, func_8024EF28_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 #define MIN_LT(a, b) ((a) < (b) ? (a) : (b))
 
@@ -24,7 +25,6 @@ void CMtxF__Translate(f32 *, f32, f32, f32);
 void CMtxF__ToMtxAffine(f32 *, f32 *);
 void Render_DrawShadowQuad(f32 *, s32, s32);
 
-extern s32 gEvenOdd;
 
 /* Places the actor's ground shadow: scaled by its radius, shrinking with its height above the ground. */
 void Actor_DrawGroundShadow(ShadowActor *actor) {

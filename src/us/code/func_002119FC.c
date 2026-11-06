@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/engine.h"
 
 s32 Demo_GetPlayerCount(void);
-extern u32 gFrameCountGameplay;
 extern u32 gRandomValue; /* random seed A */
 
 /* Random blend between a and b (t in [0, 1] from seed A, steps of 1/9999). */

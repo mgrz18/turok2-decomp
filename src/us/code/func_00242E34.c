@@ -5,6 +5,7 @@
 #include "structs/collision.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/engine.h"
 
 
 typedef struct Dest {
@@ -14,7 +15,6 @@ typedef struct Dest {
 } Dest;
 
 extern char gScene[];
-extern f32 gFrameIncrement;  /* frame time scale */
 
 CRegionInfo *CScene__GetRegionInfo(void *world, CGameRegion *region);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);

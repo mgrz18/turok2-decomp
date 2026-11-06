@@ -3,11 +3,11 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/region.h"
+#include "globals/engine.h"
 
 extern u8 gScene[];
 extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern char D_800A6EA8[]; /* "Fly Mode Off" */
-extern f32 gFrameIncrement;    /* frame time */
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 f32 Math_StepClamped(f32 value, f32 target, f32 rate);

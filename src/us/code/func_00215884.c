@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 void CQuaternion__ToMatrix(void *src, CMtxF *dst);
 void CMtxF__SetRotateY(CMtxF *mtx, f32 angle);
@@ -11,7 +12,6 @@ void CMtxF__SwapYZRows(CMtxF *mtx);
 void CMtxF__ToMtxAffine(CMtxF *mtx, void *dst);
 
 extern s32 gScene_m_qSky;
-extern s32 gEvenOdd; /* current buffer index */
 
 typedef struct {
     /* 0x000 */ u8 pad000[4];

@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 typedef struct {
     u8 r, g, b, a;
@@ -15,7 +16,6 @@ typedef struct {
     /* 0x531 */ u8 m_FlashFade;
 } Screen;
 
-extern f32 gFrameIncrement;          /* frame time scale */
 extern u8 gEngineApp[];
 
 void CEngineApp__DrawFilledRect(void *, Color32 *, s32, s32, s32, s32);

@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 /* Draw an actor's shadow. Without flag 0x10000000 it gets the blob shadow
  * (Shadow_DrawBlob). Otherwise its projected shadow model is built once, while
@@ -28,7 +29,6 @@ typedef struct {
 
 extern s32 gBlendState;      /* fade mode */
 extern f32 gBlendFade;      /* fade level */
-extern s32 gEvenOdd;      /* current view */
 extern u8 gScene_m_Heap[];
 extern u8 D_8010FF34[];
 

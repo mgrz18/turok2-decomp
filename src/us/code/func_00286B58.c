@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u32 type;
@@ -60,9 +61,6 @@ extern u8 gGfxFrameMessageQueue[];  /* message queue */
 extern u8 gScheduler[];
 extern u32 gRspFifoSize;   /* fifo size */
 extern u64 *gRspFifoBuffer;  /* fifo buffer */
-extern u32 gFrameCount;   /* frame counter */
-extern s32 gEvenOdd;   /* double-buffer index */
-extern s32 gFrameCountGameplay;
 extern u32 gTotalFramebuffers;   /* task count */
 extern s32 gLineList0;
 extern s32 gLineList1;

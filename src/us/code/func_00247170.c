@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
 /* The scope model raised to the view. */
 typedef struct {
@@ -21,7 +22,6 @@ typedef struct {
 } HudModel; /* size 0xBC */
 
 extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
-extern f32 gFrameIncrement;          /* the frame's time step */
 extern u8 gScene[];         /* the level */
 
 s32 CScene__FindObjectType(void *level, s32 id);

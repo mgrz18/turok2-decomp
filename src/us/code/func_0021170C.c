@@ -1,6 +1,6 @@
 #include "common.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame time scale */
 
 /* Moves value toward zero by rate * gFrameIncrement without overshooting. */
 f32 Math_DecayToZero(f32 value, f32 rate) {

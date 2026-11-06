@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ f32 accel;
@@ -26,7 +27,6 @@ typedef struct {
     /* 0x04 */ u8 pad4[0x18 - 4];
 } Mode;
 
-extern f32 gFrameIncrement;      /* frame time */
 extern Mode gPlayerStateTable_tuning[];
 
 f32 Math_DecayToZero(f32 value, f32 rate);

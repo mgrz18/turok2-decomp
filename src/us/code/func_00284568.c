@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/engine.h"
 
 extern Cinema *gCinemaPlayerP;
 extern s32 gEngineApp_m_Settings_paused;
-extern f32 gFrameIncrement;          /* frame time scale */
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);

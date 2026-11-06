@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 typedef struct Slot24 {
     s32 w[6];
@@ -12,7 +13,6 @@ typedef struct Owner {
     Slot24 slots[1];    /* 0x110 */
 } Owner;
 
-extern s32 gEvenOdd;
 extern void CGameObjectInstance__DrawModel(Owner *arg0, s32 arg1, s32 arg2);
 
 void CGameObjectInstance__DrawModelWithLights(Owner *arg0, s32 arg1, s32 arg2, Slot24 *src) {

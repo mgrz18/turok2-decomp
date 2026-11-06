@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/camera.h"
+#include "globals/engine.h"
 
 /* What a region set gives a camera (the record CScene__GetRegionInfo finds). */
 typedef struct {
@@ -27,8 +28,6 @@ extern s32 gEngineApp_m_Settings_mode;          /* game mode */
 extern s32 gEngineApp_m_Settings_nextMode;
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* the players */
 extern s32 gCameraPoolHideViews;
-extern s32 gFrameCountGameplay;
-extern f32 gFrameIncrement;          /* the frame's time step */
 CRegionSetAttributes *CScene__GetRegionInfo(s32 *list, u16 *key);
 s32 Cinema_OverridesMusic1(void);
 s32 Cinema_OverridesMusic2(void);

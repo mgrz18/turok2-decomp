@@ -19,6 +19,7 @@
 #include "structs/menu_model.h"
 #include "structs/camera.h"
 #include "gfx.h"
+#include "globals/engine.h"
 
 /* ---------------- MenuItem_FormatBinding ---------------- */
 /* WRONG CUT: splat's func_0041321C (0x41321C-0x4133A4) is the shared return of Cinema_IsWaitCue (3 words), a padding nop,
@@ -544,10 +545,7 @@ void MenuItem_DrawSlider(MenuItem *it, MenuItemLayout *box, MenuItemLayout *colu
 
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_004409A8.c, func_004409A8, with Turok 2's layouts. */
 
-extern s32 gEvenOdd;
-extern s32 gFrameCountGameplay; /* frame counter */
 extern s32 gDefaultVisBits;
-extern f32 gFrameIncrement; /* frame time scale */
 extern s32 gScreenWidth; /* screen width */
 extern s32 gScreenHeight; /* screen height */
 extern s32 D_800C1BD0_4143DC __asm__("gMenuCurrentFont"); /* current draw mode */
@@ -903,7 +901,6 @@ void Menu_MoveCursor(Menu *menu, u8 dir) {
  * func_0041560C and func_004156D8 at branch targets. */
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/ovl_a/func_00441384.c, func_00441384, with Turok 2's layouts. */
 
-extern f32 gFrameIncrement; /* frame delta */
 extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 extern s32 func_00285628_4143DC(ControllerProfile *ctl) __asm__("Controller_MenuLeft");
 extern s32 func_00285670_4143DC(ControllerProfile *ctl) __asm__("Controller_MenuRight");
@@ -1924,7 +1921,6 @@ typedef struct { f32 f0; s32 unk4; s32 unk8; f32 fC; s32 unk10; } O06Cam;
 extern s32 gBlendState;
 extern O06Cam gBlendState_m_Color[];
 extern O06Seg D_800AB0E8_4171F4 __asm__("gDefaultLights");
-extern s32 gEvenOdd;
 extern s32 sMenuModelFade;
 extern void CGameObjectInstance__DrawModelImmediate(void *a, s32 b, s32 c);
 /* The selected model item's draw callback (MenuItem_DrawModel): drawn with the

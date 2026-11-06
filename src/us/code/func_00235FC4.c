@@ -1,4 +1,5 @@
 #include "common.h"
+#include "globals/engine.h"
 
 /* Per-view vertex buffers: 0x12C0 bytes each, the current one at 0x2584. */
 typedef struct {
@@ -7,7 +8,6 @@ typedef struct {
     /* 0x2584 */ void *current;
 } VtxBuffers;
 
-extern s32 gEvenOdd;          /* current view */
 
 void RibbonVtxPool_Reset(VtxBuffers *arg0) {
     s32 i = gEvenOdd;

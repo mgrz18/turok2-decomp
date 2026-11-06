@@ -3,9 +3,9 @@
 
 #include "rw/abu_types.h"
 #include "gfx.h"
+#include "globals/engine.h"
 
 extern Gfx *gDList;
-extern s32 gEvenOdd;
 extern float D_800A6488;
 Vtx *RibbonVtxPool_Alloc(func_802A66B4_S1 *pool, s32 count);
 void Morph_BlendVertices(Actor_func_802A274C_de *actor, ObjRecAt28V1 *clock, Vtx *vertices, Morph *morph);

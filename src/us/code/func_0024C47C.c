@@ -15,6 +15,7 @@
 #include "structs/camera.h"
 #include "structs/game.h"
 #include "structs/weapon.h"
+#include "globals/engine.h"
 
 extern s32 gScene_m_PreviewState;
 extern s32 gScene_m_PreviewTimer;
@@ -507,10 +508,8 @@ typedef struct PlayerStateInfo {
 } PlayerStateInfo;
 
 
-extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEngineApp_m_Game_m_DebugLines;
 extern s32 gEngineApp_m_Settings_match_tag;
-extern s32 gEvenOdd;
 extern f32 gCharacterHealthRegen[];           /* health regeneration per character */
 extern PlayerStateInfo gPlayerStateTable[];
 extern u32 D_800F1E30;

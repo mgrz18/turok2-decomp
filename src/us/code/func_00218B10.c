@@ -13,6 +13,7 @@
  * CAnimationState__GetRootMotion and CAnimationState__FindKeys are Rage Wars imports. */
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 /* Switches an animation player to its queued animation. With `blend` set and a
  * different animation queued, it loads that one and, if `previous` is given,
@@ -143,7 +144,6 @@ typedef struct RootActor {
     /* 0xD4 */ u32 flags;
 } RootActor;
 
-extern f32 gFrameIncrement;
 
 void CGameObjectInstance__FireAnimEvents(RootActor *actor, AnimPlayer *anim, f32 from, f32 to);
 void CAnimationState__GetBonePosition(AnimPlayer *anim, s32 bone, f32 time, CVector3 *out);

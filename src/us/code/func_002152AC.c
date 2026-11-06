@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/intelligence.h"
 #include "structs/level_actor.h"
+#include "globals/engine.h"
 
 /* Draws a simple object: rebuilds its matrix for this frame's slot once per
  * frame (from a fixed rotation for type 8, else its yaw), then draws its
@@ -25,7 +26,6 @@ s32 CScene__GetObjectTypeID(void *, s32);
 s32 *CISet__GetBlock(s32, s32);
 
 extern u8 D_800B6D1B;
-extern s32 gEvenOdd;
 extern u8 gScene_m_qSky[];
 extern u8 gScene[];
 extern s32 gEngineApp_m_Settings;

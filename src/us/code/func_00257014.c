@@ -1,9 +1,9 @@
 #include "common.h"
 #include "m2c_macros.h"
+#include "globals/engine.h"
 
 f32 Angle_Wrap(s32);
 
-extern f32 gFrameIncrement;
 
 f32 Angle_StepToward(f32 arg0, f32 arg1, s32 arg2, f32 arg3) {
     f32 temp_f3;

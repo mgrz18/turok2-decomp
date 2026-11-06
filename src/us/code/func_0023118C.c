@@ -4,6 +4,7 @@
 #include "structs/particle.h"
 #include "gfx.h"
 #include "structs/camera.h"
+#include "globals/engine.h"
 
 /* Draws the particle render list: culls each sprite particle by its bounds
  * against the view, builds its matrix once per frame, draws it as a model or
@@ -20,7 +21,6 @@ typedef struct {
 } Box;
 
 extern Gfx *gDList;             /* display list head */
-extern s32 gEvenOdd;              /* matrix buffer index */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern CCamera *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
 extern u8 gScene[];

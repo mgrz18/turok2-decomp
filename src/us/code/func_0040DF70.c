@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame time scale */
 extern s32 gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* current player */
 
 /* Step callback of the Blind One's actors: while alive they target the

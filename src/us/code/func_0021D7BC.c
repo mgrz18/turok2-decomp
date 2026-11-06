@@ -2,12 +2,12 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/model.h"
+#include "globals/engine.h"
 
 /* Draw an actor's model (params->m_hModel) with the current view's lighting:
  * first pick its two colour sets (params->m_nModel/set1), from its intelligence's
  * death models (by AI mode) for an enemy (type 1), then its shadow (CGameObjectInstance__DrawShadow). */
 
-extern s32 gEvenOdd;      /* current view */
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, void *, s32, s32, s32);

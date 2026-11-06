@@ -9,6 +9,7 @@
 #include "structs/level_actor.h"
 #include "structs/camera.h"
 #include "structs/rect.h"
+#include "globals/engine.h"
 
 /* Draws the level geometry seen by one view: every static object and level
  * actor of the grid regions inside the view's box that is shown in this view
@@ -25,7 +26,6 @@ typedef struct {
 } IdTable;
 
 extern u8 gEngineApp_m_Settings_multiplayer;       /* gEngineApp_m_Settings.multiplayer */
-extern s32 gFrameCountGameplay;
 
 void CScene__BuildGeometryDisplayList(CScene *);
 CPlayer *CCamera__GetPlayer(CCamera *);

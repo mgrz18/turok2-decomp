@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/region.h"
+#include "globals/engine.h"
 
-extern u32 gFrameCountGameplay;
 
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);

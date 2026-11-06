@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/game.h"
 #include "structs/weapon.h"
+#include "globals/engine.h"
 
 
 
@@ -16,7 +17,6 @@ typedef struct Hit {
 extern s32 gBlendState;       /* screen flash mode */
 extern f32 gBlendState_m_Color[3];    /* screen flash color */
 extern f32 gBlendFade[2];    /* screen flash range */
-extern s32 gEvenOdd;
 extern s32 gTagModeModel;
 
 s32 *CISet__GetBlock(s32 arg0, s32 arg1);

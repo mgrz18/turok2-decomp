@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/event.h"
+#include "globals/engine.h"
 
 typedef struct {
     void (*onActor)(void *actor, void *ai, LevelEvent *event);
@@ -9,7 +10,6 @@ typedef struct {
 extern EventHandler *gLevelEventHandlers[];  /* handler tables by kind */
 extern char *gLevelMessages[];          /* {text, sound} pairs */
 extern s32 D_800B69DC[];            /* gLevelMessages + 4 */
-extern s32 gFrameCountGameplay;
 extern s32 gScene;              /* world: game state */
 extern u8 *gScene_m_pActors;              /* world + 0xE0: level actors (0x288 bytes each) */
 extern s32 gScene_m_nLevel;              /* current level */

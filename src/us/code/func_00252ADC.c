@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 extern s32 gEngineApp_m_Settings_nextMode;
 extern s32 gEngineApp_m_Settings_paused;
-extern f32 gFrameIncrement;          /* frame time scale */
 
 extern s32 Cinema_PathPlaying(void);
 extern void *LoopSounds_Get(void);

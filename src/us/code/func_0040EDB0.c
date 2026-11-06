@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x18];
@@ -14,7 +15,6 @@ typedef struct {
 } DrawInfo;
 
 extern ScriptAnimator gBlindOne_faders[];   /* gBlindOne.faders (structs/boss.h): the ROM uses this symbol */
-extern s32 gEvenOdd;
 extern s32 gBlendState;
 
 extern void ScriptAnimator_Apply(ScriptAnimator *light);

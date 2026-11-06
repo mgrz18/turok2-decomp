@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;      /* frame step */
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern u8 gEngineApp_m_Settings_dmCrosshairs;
 extern u8 gEngineApp_m_Settings_tagCrosshairs;

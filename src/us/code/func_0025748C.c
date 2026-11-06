@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
 
 extern u8 gEngineApp_m_Settings_multiplayer;
 extern f32 gCharacterHealthRegen[];
-extern f32 gFrameIncrement; /* the frame's time step */
 
 void CPlayer__RegenerateHealth(CPlayer *player) {
     f32 rate;

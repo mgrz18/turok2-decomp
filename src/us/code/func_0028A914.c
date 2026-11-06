@@ -2,6 +2,7 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/engine.h"
 
 extern void osViSwapBuffer(s32 arg0);
 extern s32 __scSchedule(struct Ctx_func_8028F544_de *, struct Node_func_8028F544_de **, struct Node_func_8028F544_de **, s32);
@@ -17,7 +18,6 @@ extern u32 gNumTicks2;
 extern u32 gNumTicks3;
 extern u32 gNumTicks0;
 extern float D_800A9E40;
-extern float gSchedRdpTime;
 extern FrameSchedule gEngineApp[];
 extern u32 gCurrentTick;
 extern s32 gPendingFB;

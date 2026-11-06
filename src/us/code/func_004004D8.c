@@ -4,6 +4,7 @@
 #include "structs/vector.h"
 #include "structs/region.h"
 #include "structs/world.h"
+#include "globals/engine.h"
 
 /* The automap: the level's navigation regions are drawn as lines in a 2D
  * orthographic view around the player, with an arrow for the player and a
@@ -55,7 +56,6 @@ typedef struct {
     /* 0x110 */ void *colorImage;
 } FrameBuffers;
 
-extern s32 gEvenOdd;      /* buffer index */
 extern s32 gPersistentDataLoaded;
 extern s32 gScreenWidth;      /* screen width */
 extern s32 gScreenHeight;      /* screen height */

@@ -1,8 +1,8 @@
 /* After thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars), src/game/func_002935A4.c, func_002935A4, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame delta */
 
 void CEngineApp__UpdateFade(CEngineApp *g) {
     f32 speed;

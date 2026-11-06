@@ -1,9 +1,8 @@
 /* Second VM module copy of Demo_Update. */
 #include "common.h"
 #include "structs/demo.h"
+#include "globals/engine.h"
 
-extern s32 gFrameCountGameplay;
-extern f32 gFrameIncrement;
 extern s32 gMergedController_buttonsSingle;
 
 void func_00469250(void *);

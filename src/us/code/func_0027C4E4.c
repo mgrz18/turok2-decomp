@@ -3,8 +3,8 @@
 #include "common.h"
 #include "structs/camera.h"
 #include "structs/light.h"
+#include "globals/engine.h"
 
-extern u32 gFrameCountGameplay;          /* frame counter */
 f32 func_002974C0(f32 x);       /* cosine */
 f32 func_002982F0(f32 x);       /* sine */
 void CVector3__Normalize(f32 *v);     /* normalise */

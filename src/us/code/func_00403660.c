@@ -2,6 +2,7 @@
 #include "structs/boss.h"
 #include "structs/light.h"
 #include "structs/model.h"
+#include "globals/engine.h"
 
 /* A weak spot seen from its animator: walking BossWeakSpot pointers and
  * taking &slot->anim moves the +4 into the loop and breaks the match. */
@@ -18,7 +19,6 @@ typedef struct {
     /* 0x174 */ s8 unk174;
 } Boss00403660;
 
-extern s32 gEvenOdd;
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 void ScriptAnimator_Apply(Slot00403660 *slot);
 void ScreenTint_UpdateMode(void);

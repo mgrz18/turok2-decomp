@@ -1,8 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/WORLD_2/8024E914_8.CPP, func_8024F5A0_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/level_actor.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement; /* frame delta */
 
 /* Grow-in effect: ramp the scale up to 0.35 over 0.75 time units. */
 void CLevelActor__UpdateGrowIn(CLevelActor *obj) {

@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 f32 Math_DecayToZero(f32, f32);
 s32 EnemyAI_GetBehaviorIndex(s32, s32);
 
 extern f32 D_800A79D0;
-extern f32 gFrameIncrement;
 
 void EnemyHover_Advance(s32 arg0, CAI *ai) {
     f32 temp_f0;

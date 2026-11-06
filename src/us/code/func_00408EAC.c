@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/collision.h"
+#include "globals/engine.h"
 
 extern CListedInstance *gScene_m_InstancePool_m_ActiveList;  /* active actors */
 
-extern f32 gFrameIncrement;          /* per-frame scale */
 extern f32 Random_Float(f32 scale);                                      /* random 0..scale */
 extern void Actor_SpawnParticle(void *actor, s32 event, CVector3 pos, s32 arg);
 extern void DamageEvent_Set(DamageEvent *event, void *source, s32 damage, f32 radius, s32 flags, void *shield);

@@ -19,6 +19,7 @@
 #include "structs/collision.h"
 #include "structs/frame.h"
 #include "structs/particle_event.h"
+#include "globals/engine.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
@@ -580,8 +581,6 @@ typedef struct {
 
 extern Gfx *gDList;             /* display list head */
 extern u32 gDisplayListSize;              /* command buffer length, in commands */
-extern f32 gFrameIncrement;              /* frame time */
-extern s32 gEvenOdd;              /* matrix buffer index */
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
 extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* the current view */
 extern u8 gEngineApp_m_Settings_unk17;
@@ -1161,7 +1160,6 @@ extern CCollisionResults *gCollisionResultsP;
 extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
 extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
-extern s32 gEvenOdd;
 extern u8 gScene[];
 extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];

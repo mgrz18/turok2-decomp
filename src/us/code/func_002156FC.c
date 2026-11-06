@@ -2,10 +2,10 @@
 #include "structs/intelligence.h"
 #include "structs/level_actor.h"
 #include "structs/region.h"
+#include "globals/engine.h"
 
 extern s32 gDefaultVisBits;
 extern u8 D_800B6D1B; /* frame counter */
-extern f32 gFrameIncrement; /* frame time scale */
 extern s32 gEngineApp_m_Settings_paused;
 
 /* Once-per-frame update. */

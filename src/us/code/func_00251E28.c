@@ -3,8 +3,8 @@
 #include "structs/player.h"
 #include "structs/collision.h"
 #include "structs/camera.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;      /* frame time */
 extern char gEngineApp_m_Game_m_CameraPool[];
 
 f32 Random_Float(f32 scale);

@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;          /* the frame's time step */
 
 /* Runs the screen flash (CCamera__StartFlash starts it): rises over m_AttackTime
  * frames to m_MaxOpacity, holds for m_SustainTime, fades over m_DecayTime,

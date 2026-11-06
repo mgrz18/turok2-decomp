@@ -4,6 +4,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 /* Loads a level into the world: frees the previous level's blocks, resets the subsystems, then opens the
  * level's data blocks and spawns its actors. */
@@ -19,7 +20,6 @@ extern char D_800A5F0C[]; /* "level info" */
 extern char D_800A5F18[]; /* "sky layers" */
 extern char D_800A5F24[];
 extern s32 gFogEnabled;
-extern s32 gFrameCountGameplay;
 extern u8 gDecompressor[];
 extern u8 gLoopSoundEntries[];
 extern u8 gLoopSounds[];

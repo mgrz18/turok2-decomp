@@ -2,14 +2,13 @@
 #include "structs/camera.h"
 #include "structs/region.h"
 #include "structs/emitter.h"
+#include "globals/engine.h"
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 extern u8 gScene[];
 extern CEmitterDef *gScene_m_pSections;  /* emitter definitions */
 extern s32 gScene_m_nSections;          /* how many */
-extern f32 gFrameIncrement;          /* the frame's time step */
-extern f32 gEmitterTimeScale;
 
 CRegionInfo *CScene__GetRegionInfo(void *world, s32 region);
 f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);

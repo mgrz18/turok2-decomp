@@ -3,11 +3,11 @@
  * pointer `.word 0x00285CF0` in us/asm/data/AB858.rodata.s shows. */
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 extern s32 gFogEnabled;
 extern u8 gScene[];
 extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[];
-extern s32 gEvenOdd;              /* frame buffer index */
 extern f32 sExpansionPakMtx[][16];        /* per-frame matrices */
 extern u8 gDefaultLights[];
 extern u8 sExpansionPakText[];

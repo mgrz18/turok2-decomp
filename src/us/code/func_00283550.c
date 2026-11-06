@@ -1,11 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_0023B708.c, func_0023B708.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/engine.h"
 
-typedef unsigned char u8;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed int s32;
-typedef float f32;
 typedef struct B09EDef {
                s16 id;
                u8 pad2[6];
@@ -39,9 +36,7 @@ struct B09Emitter {
                 f32 f21C;
                 f32 f220;
 };
-extern f32 gFrameIncrement;
 extern f32 D_800A9CB0;
-extern f32 gEmitterTimeScale;
 extern f32 D_800A9CB4;
 extern const f32 D_800A9CB8;
 extern const f32 D_800A9CBC;

@@ -2,11 +2,11 @@
 #include "structs/game_object.h"
 #include "structs/region.h"
 #include "structs/collision.h"
+#include "globals/engine.h"
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
 extern s32 gScene[];
-extern f32 gFrameIncrement;                  /* frame time, in 15ths of a second */
 extern CCollisionResults *gCollisionResultsP;
 extern void (*sCollisionTests[])(Sweep *);   /* the collision tests, NULL-ended */
 extern CCollisionInfo D_800F1E10;

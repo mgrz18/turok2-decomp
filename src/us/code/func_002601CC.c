@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 f32 Random_Blend(f32, f32);                        /* extern */
 s32 CAI__SetMode(void *, void *, s32);     /* extern */
 extern f32 D_800A797C;
 extern f32 D_800A7980;
-extern f32 gFrameIncrement;
 
 /* m_VarBuffer[6] holds a float timer here. */
 s32 EnemyAI_TryTeleportOut(CGameObjectInstance *arg0, CAI *arg1) {

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/intelligence.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x14];
@@ -17,7 +18,6 @@ typedef struct {
 
 
 /* The global at gEngineApp_m_Game: what this reads of it. */
-extern f32 gFrameIncrement;          /* the frame time step */
 
 void func_0021F1B4(DrawActor *actor);
 void CGameObjectInstance__UpdateAnimation(DrawActor *actor);

@@ -6,6 +6,7 @@
 #include "structs/game.h"
 #include "structs/vector.h"
 #include "structs/weapon.h"
+#include "globals/engine.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -75,7 +76,6 @@ void CVector3__Cross(CVector3 *out, CVector3 *a, CVector3 *b);
 f32 CVector3__Normalize(CVector3 *);
 CQuaternion CGameObjectInstance__GetRotation(AimActor *);
 void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
-extern f32 gFrameIncrement;
 void CMtxF__TransformPoint(f32 mtx[4][4], CVector3 *in, CVector3 *out);
 void CVector3__Scale(CVector3 *out, CVector3 *a, f32 s);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);

@@ -4,6 +4,7 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/weapon.h"
+#include "globals/engine.h"
 
 
 typedef struct {
@@ -12,7 +13,6 @@ typedef struct {
 } PoseInfo;   /* 0x18 bytes */
 
 extern PoseInfo gPlayerStateTable_anim[];
-extern u32 gFrameCountGameplay;
 extern s32 gScene;
 extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern struct {

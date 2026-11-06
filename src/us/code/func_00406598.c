@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/engine.h"
 
 #define ABS(x) ((x) < 0.0f ? -(x) : (x))
 
@@ -12,7 +13,6 @@ extern f32 func_002974C0(f32 angle);                                      /* cos
 
 extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
-extern f32 gFrameIncrement;          /* per-frame scale */
 
 void Primagen_UpdateMode18(CGameObjectInstance *obj, CAI *ai) {
     CVector3 point;

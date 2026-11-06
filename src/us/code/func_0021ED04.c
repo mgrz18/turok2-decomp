@@ -2,6 +2,7 @@
 #include "gfx.h"
 #include "structs/gbi.h"
 #include "structs/game_object.h"
+#include "globals/engine.h"
 
 typedef struct Slot24 {
     s32 w[6];
@@ -21,7 +22,6 @@ typedef struct ModelRef {
     s32 unk1C;                  /* 0x1C */
 } ModelRef;
 
-extern s32 gEvenOdd;          /* frame buffer index */
 extern u8 gScene_m_Heap[];
 
 Mtx *MtxPool_Alloc(void *pool, s32 count);

@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;
 s32 GameOverMenu_TickCountdown(void) {
     GameMatch *state = &gEngineApp_m_Settings_match;
     f32 timer = state->countdown - gFrameIncrement;

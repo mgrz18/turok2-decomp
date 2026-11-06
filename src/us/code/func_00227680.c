@@ -1,5 +1,6 @@
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 typedef struct Pickup {
     /* 0x000 */ u8 pad0[0x4];
@@ -14,7 +15,6 @@ typedef struct Pickup {
     /* 0x19C */ f32 timer;
 } Pickup;
 
-extern f32 gFrameIncrement;              /* frame time scale */
 extern u8 gLevelActorIntelligence[];
 extern u8 D_800F1EF0[];
 

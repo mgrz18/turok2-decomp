@@ -2,10 +2,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 
 extern u8 gEngineApp_m_Settings_multiplayer; /* multiplayer */
-extern u32 gFrameCountGameplay;
 extern s16 gLivesSpeech[];
 extern f32 D_800A70D8; /* 60.0f, in the engine's .rodata */
 

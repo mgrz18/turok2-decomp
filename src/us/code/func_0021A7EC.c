@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/vector.h"
+#include "globals/engine.h"
 
 typedef struct {
     f32 m[16];
@@ -52,7 +53,6 @@ typedef struct {
 } AnimActor;
 
 extern s32 gScene;          /* the world's mode */
-extern f32 gFrameIncrement;          /* the frame's time step */
 
 void **CCache__Request(s32, s32, s32, s32, s32, s32, char *, s32);
 void CCache__Unlock(s32, void **);

@@ -10,6 +10,7 @@
 #include "gfx.h"
 #include "structs/camera.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 /* A camera mode: its update, then a word. */
 typedef struct {
@@ -24,9 +25,7 @@ typedef struct {
 } CFloor;
 
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
-extern f32 gFrameIncrement;          /* the frame's time step */
 extern CCameraMode D_800B6CB4[];
-extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern f32 gQuaternionSin;          /* the last sine taken */
 extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera */
 /* The camera pool, seen from its main camera. */
@@ -408,7 +407,6 @@ found:
 
 extern s32 gScreenWidth;          /* screen width */
 extern s32 gScreenHeight;          /* screen height */
-extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern Gfx gRspInitDL[];        /* RDP setup display lists */
 extern Gfx gRdpInitDL[];
 extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera (camera pool + 0x40) */

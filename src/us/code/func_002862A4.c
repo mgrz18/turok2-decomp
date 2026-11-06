@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 extern s32 gCreditsDone;              /* credits finished */
 extern f32 gCreditsTimeLeft;              /* time left before leaving the credits */
-extern f32 gFrameIncrement;              /* frame time */
 extern s32 gEndingPrimagenDefeated;
 extern s32 gFinalEnding;
 extern s32 gEngineApp_m_Settings_match_unk48;

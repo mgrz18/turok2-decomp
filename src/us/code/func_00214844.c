@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ u8 pad0[0xE];
@@ -43,7 +44,6 @@ extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
 extern s32 gLitVerticesKey;
 extern char D_800A57F8[];
 extern s8 gColorPulseTable[];         /* the colour pulse, 64 steps */
-extern s32 gFrameCount;          /* frame count */
 extern u8 D_800B6D1B;           /* its low byte */
 
 s32 Actor_GetTypeClass(void);

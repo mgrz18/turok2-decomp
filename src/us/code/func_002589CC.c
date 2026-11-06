@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/engine.h"
 
 #define P_S32(p, off) (*(s32 *)((u8 *)(p) + (off)))
 
-extern u32 gFrameCountGameplay;
 extern s32 gScene;
 extern u8 gEngineApp_m_Game_m_CameraPool[];
 

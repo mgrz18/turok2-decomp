@@ -1,10 +1,10 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80243A80_6.CPP, func_80244FB4_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/engine.h"
 
 extern Cinema *gCinemaPlayerP;
 extern s32 gEngineApp_m_Settings_paused;
-extern f32 gFrameIncrement;      /* frame time */
 
 extern void Cinema_Load(s32);
 extern s32 Cinema_IsActive(void);

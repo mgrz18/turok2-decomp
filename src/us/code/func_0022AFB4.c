@@ -4,6 +4,7 @@
 #include "structs/particle.h"
 #include "structs/collision.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
 typedef struct Box {
     /* 0x00 */ CVector3 min;
@@ -18,8 +19,6 @@ struct ContactHandler {
     /* 0x10 */ s32 (*func)(CPlayer *player, ContactHandler *handler);
 };
 
-extern f32 gFrameIncrement;                  /* the frame's time step */
-extern f32 gParticleTimeScale;
 extern CCollisionResults gCollisionResults;
 extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;              /* current player */
 extern ContactHandler sParticleAmmoPickups[4];

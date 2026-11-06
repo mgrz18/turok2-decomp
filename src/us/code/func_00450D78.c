@@ -1,9 +1,8 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/ovl_a/func_0043E1C0.c, func_0043E1C0.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
+#include "common.h"
+#include "globals/engine.h"
 
-typedef unsigned char u8;
-typedef signed int s32;
-typedef float f32;
 /* gEngineApp_m_Settings_match (GameMatch in structs/game.h; unk24 is teams). Kept as a local
  * array view: through it the compiler bases the store and the argument on
  * gEngineApp_m_Settings_match + 0x24, as the ROM does; through the struct it bases them on
@@ -28,7 +27,6 @@ typedef struct S10Game {
 } S10Game;
 extern S10Game gEngineApp_m_Settings_match[];
 extern f32 sFinalScoreTimer;
-extern f32 gFrameIncrement;
 extern void CPlayerPool__EndMatch(void *p);
 s32 FinalScoreMenu_Poll_2(void) {
     sFinalScoreTimer += gFrameIncrement;

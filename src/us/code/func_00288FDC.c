@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 /* A play-time clock: frames, seconds, minutes, hours. */
 
 /* Only the field read here. */
 
 extern f32 D_800A9DF4;                              /* units per next unit (presumably 60) */
-extern f32 gFrameIncrement;                              /* frame delta */
 
 void CEngineApp__UpdatePlayTime(CEngineApp *arg0) {
     f32 temp_f0;

@@ -3,6 +3,7 @@
 #include "structs/player.h"
 #include "structs/controller.h"
 #include "structs/camera.h"
+#include "globals/engine.h"
 
 typedef struct {
     /* 0x00 */ CPlayer *head;
@@ -46,7 +47,6 @@ extern s32 gEngineApp_m_Settings_paused;
 extern s32 gEngineApp_m_Settings_nextMode;          /* game state */
 extern s32 gEngineApp_m_Settings_matchMode;
 extern s32 gScene_m_LevelID;          /* level */
-extern f32 gFrameIncrement;          /* frame time */
 extern PortSetup D_8011AB88[];
 extern char gEngineApp_m_Game_m_DebugLines;
 extern char gEngineApp_m_Game_m_CameraPool;

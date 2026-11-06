@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/engine.h"
 
 s32 Demo_GetPlayerCount(void);
-extern u32 gFrameCountGameplay;
 extern u32 gRandomValue; /* random seed A */
 
 /* LCG step on seed A (re-seeded from gFrameCountGameplay when Demo_GetPlayerCount()); returns 0..0x7FFFFFFF. */

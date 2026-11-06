@@ -1,6 +1,7 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/CAMERA/80243A80_6.CPP, func_802450CC_de, with Turok 2's layouts. */
 #include "common.h"
 #include "structs/cinema.h"
+#include "globals/engine.h"
 
 typedef struct GameState {
     s32 busy;               /* 0x0000 */
@@ -10,9 +11,7 @@ typedef struct GameState {
 
 extern Cinema *gCinemaPlayerP;
 extern s32 sCinemaLastFrame;      /* last frame handled */
-extern s32 gFrameCount;      /* frame counter */
 extern s32 gEngineApp_m_Settings_paused;
-extern f32 gFrameIncrement;      /* frame time */
 extern GameState gEngineApp_m_Game_m_PlayerList_m_bCinema;
 
 extern s32 Cinema_StartPending(void);

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/light.h"
 #include "structs/model.h"
+#include "globals/engine.h"
 
-extern s32 gEvenOdd;
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 void Render_QueueModelInstance(s32 anim, s32 model, s32 one, CLights1 *slot, s32 zero, s32 first, s32 second);
 

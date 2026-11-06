@@ -3,6 +3,7 @@
 #include "common.h"
 #include "structs/world.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 typedef struct ColorEntry {
     /* 0x00 */ f32 value;               /* the fade's length */
@@ -11,7 +12,6 @@ typedef struct ColorEntry {
 
 extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
 extern ColorEntry gWarpFadeColors[];
-extern f32 gFrameIncrement;                  /* the frame's time step */
 extern u8 D_800B54E0[];
 
 void Cinema_Reset(ColorEntry *entry);

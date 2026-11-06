@@ -1,6 +1,7 @@
 #include "common.h"
 #include "structs/player.h"
 #include "structs/weapon.h"
+#include "globals/engine.h"
 
 typedef struct Object Object;
 typedef struct AI AI;
@@ -38,7 +39,6 @@ typedef struct {
 } PoseInfo;   /* 0x18 bytes */
 
 extern PoseInfo gPlayerStateTable_anim[];
-extern f32 gFrameIncrement;             /* frame time scale */
 extern u8 gScene[];
 extern void CAI__SetMode(Object *obj, AI *ai, s32 mode);
 extern void CScene__SetInstanceObjectType(void *level, Object *obj, s32 model, s32 animType);

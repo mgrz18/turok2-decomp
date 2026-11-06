@@ -1,11 +1,11 @@
 #include "common.h"
 #include "structs/vector.h"
 #include "structs/player.h"
+#include "globals/engine.h"
 
 /* Weapon state: spins the barrel up while fire is held, else stops it. */
 
 
-extern f32 gFrameIncrement; /* frame time scale */
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);

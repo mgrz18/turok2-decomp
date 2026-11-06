@@ -2,6 +2,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 #include "structs/boss.h"
+#include "globals/engine.h"
 
 extern BlindOneState gBlindOne;
 
@@ -11,7 +12,6 @@ extern BlindOneState gBlindOne;
  * update, then updates the slots, the three movers and the boss' health bar. */
 
 
-extern f32 gFrameIncrement; /* frame time */
 extern BlindOnePhase sBlindOnePhases_2[];
 extern u8 gEngineApp_m_OnScreen[];
 extern void Animator_Update(void *slot);

@@ -1,11 +1,10 @@
 #include "common.h"
 #include "structs/game.h"
+#include "globals/engine.h"
 
 s32 CEngineApp__Update(s32);
 s32 SavedPlayers_UpdateTimer(void);
 
-extern s32 gFirstFrame;
-extern s32 gRetraceCount;
 extern s32 D_800B6D7C;
 extern s32 gDisplayListCount;
 

@@ -1,6 +1,6 @@
 #include "common.h"
+#include "globals/engine.h"
 
-extern f32 gFrameIncrement;
 
 s32 CBarrel__ShouldClose(u8 *self, u8 *other) {
     if (*(s32 *)(self + 0x380) != 0) {
