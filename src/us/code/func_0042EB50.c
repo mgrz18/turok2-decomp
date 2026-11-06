@@ -1,4 +1,4 @@
-/* Player code: func_0042EB50, 0x0042EB50-0x0042EBB4 (splat had it inside the data D_0042D50C). */
+/* COnScreen__Construct (the HUD's lookups and font texture), 0x0042EB50-0x0042EBB4 (splat had it inside the data D_0042D50C). */
 #include "common.h"
 
 typedef struct Hud {
@@ -19,7 +19,7 @@ extern void func_0042EBB4(void);
 extern void COnScreen__LoadFontTexture(void);
 extern void COnScreen__BuildCharacterLookUp(Hud *hud, u8 *anim, void *item);
 
-void func_0042EB50(Hud *hud) {
+void COnScreen__Construct(Hud *hud) {
     hud->unk90 = 0;
     hud->unk94 = 0;
     hud->unk98 = 0;

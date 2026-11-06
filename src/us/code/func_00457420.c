@@ -39,7 +39,7 @@ s32 func_004266C0(s32 a, s32 *b);
 void func_00426898(s32 a, s32 b, s32 *c);
 s32 func_00426AF8(s32 a);
 void func_00426BA8(s32 a, u8 *b, s32 c);
-s32 Str_Length(s32 a);
+s32 Pak_BytesToPages_2(s32 a);
 void func_0041D948(Menu *o);
 s32 func_0041E294(Menu *o, s32 a, s32 *b, s32 *c);
 void MenuPool_OpenMenu(u8 *a, u8 *b, s32 c, ControllerProfile *d, void *e);
@@ -195,8 +195,8 @@ L3:
     if (s0 != 0) {
         goto blk59;
     }
-    m1 = Str_Length(D_800F70A8 + 0x688);
-    r2 = Str_Length(0x18);
+    m1 = Pak_BytesToPages_2(D_800F70A8 + 0x688);
+    r2 = Pak_BytesToPages_2(0x18);
     if (sp3C == 0 || sp38 < r2) {
         goto L56;
     }

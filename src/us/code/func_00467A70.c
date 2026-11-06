@@ -1,4 +1,4 @@
-/* Second VM module copy of func_0042EB50 (same source, linked 0x0042EA70). */
+/* Second VM module copy of COnScreen__Construct (same source, linked 0x0042EA70). */
 #include "common.h"
 
 typedef struct Hud {
@@ -19,7 +19,7 @@ extern void func_0042EAD4(void);
 extern void COnScreen__LoadFontTexture(void);
 extern void COnScreen__BuildCharacterLookUp(Hud *hud, u8 *anim, void *item);
 
-void func_00467A70(Hud *hud) {
+void COnScreen__Construct_2(Hud *hud) {
     hud->unk90 = 0;
     hud->unk94 = 0;
     hud->unk98 = 0;

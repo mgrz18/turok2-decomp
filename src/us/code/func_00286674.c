@@ -55,7 +55,7 @@ extern void CCameraPool__NewGame(void *p, s32 a);
 extern void CPlayerPool__NewGame(void *p, s32 a, s32 b);
 extern void CScene__Construct(void *p, s32 seed);
 extern void Cont_InitAll(void);
-extern void func_0042EB50(void *p);
+extern void COnScreen__Construct(void *p);
 extern void Pak_AllocDirectory(void);
 extern void Controller_WatchAllPaks(void);
 extern s32 SavedPlayers_IsActive(void);
@@ -110,7 +110,7 @@ void CEngineApp__Main(CEngineApp *e) {
     if (D_800B6CF1 == 0) {
         Cont_InitAll();
     }
-    func_0042EB50((u8 *)e + 0x19440);
+    COnScreen__Construct((u8 *)e + 0x19440);
     Pak_AllocDirectory();
     D_8011F13C = 0;
     D_8011F148 = 0;

@@ -301,6 +301,7 @@ CEmitterPool__Construct = 0x0042FFF0; // active and free lists, its 4 CEmitters 
 
 // Demo (attract mode) playback: D_800F56B0, input streams decoded from bit
 // streams with a run length.
+COnScreen__Construct = 0x0042EB50; // n5's suggestion, checked by C12: zeroes 0x90-0x9C, func_0042EBB4, COnScreen__LoadFontTexture, then COnScreen__BuildCharacterLookUp for both lookups (m_CharacterSmallLookUpPos); func_00286674 calls it on the engine's COnScreen
 Demo_ReadRunLength = 0x0042EC30; // 3 bits n, then n bits + 1: how many frames the value holds
 Demo_DecodeButtons = 0x0042ECF0; // the buttons stream's decoder (nine scrambled bits), set by Demo_Start
 Demo_DecodeStick = 0x0042F75C; // the stick X/Y streams' decoder (8 bits), set by Demo_Start
@@ -538,6 +539,7 @@ CPlayer__Construct_2 = 0x0046783C; // module-2 copy of 0x0042E91C (twin map: sam
 CPlayer__Activate_2 = 0x004678C4; // module-2 copy of 0x0042E9A4 (twin map: same code at link address + 0xE0)
 CPlayer__ResetHealth_2 = 0x00467920; // module-2 copy of 0x0042EA00 (twin map: same code at link address + 0xE0)
 CPlayer__StopLoopingSounds_2 = 0x00467A24; // module-2 copy of 0x0042EB04 (twin map: same code at link address + 0xE0)
+COnScreen__Construct_2 = 0x00467A70; // module-2 copy of 0x0042EB50 (func_00467A70.c says so; linked 0x0042EA70)
 Demo_ReadRunLength_2 = 0x00467B50; // module-2 copy of 0x0042EC30 (twin map: same code at link address + 0xE0)
 Demo_DecodeButtons_2 = 0x00467C10; // module-2 copy of 0x0042ECF0 (twin map: same code at link address + 0xE0)
 Demo_Start_2 = 0x00467E4C; // module-2 copy of 0x0042EF2C (twin map: same code at link address + 0xE0)

@@ -23,7 +23,7 @@ extern u8 D_0043C0E4[];
 extern u8 D_0043BC88[];
 extern u8 D_0043BD18[];
 extern u8 D_0043BE14[];
-u32 Str_Length(u32 n);
+u32 Pak_BytesToPages_2(u32 n);
 s32 func_004266C0(s32 pad, s32 *out);
 s32 func_0042662C(s32 pad, s32 *out);
 s32 func_004269B4(s32 pad, u8 *ext);
@@ -77,7 +77,7 @@ s32 PakMenu_WriteSaveGame_2(s32 unused, Menu *own) {
     plr = pp;
     size = D_800F70A8 + 0x688;
     if (D_80130984 != 0) {
-        need = Str_Length(size);
+        need = Pak_BytesToPages_2(size);
         r = func_004266C0(pad.channel, &pad.freeBytes);
         if (r == 0) {
             if (pad.freeBytes >= need) {

@@ -13,7 +13,7 @@ void func_00426BA8(u8 *src, u8 *dst, s32 n);
 s32 func_00426C74(char *a, char *b);
 s32 func_004266C0(s32 pad, s32 *out);
 s32 func_0042662C(s32 pad, s32 *out);
-s32 Str_Length(s32 n);
+s32 Pak_BytesToPages_2(s32 n);
 
 static __inline__ s32 FindNote(s32 pad, char *name) {
     u8 buf[16];
@@ -49,7 +49,7 @@ s32 PakMenu_CheckSlotForSave_2(s32 unused, s32 pad, s32 *outPad, s32 *outBlocks)
     if (r == 0) {
         r = func_0042662C(D_800C2028, &b);
         if (r == 0) {
-            need = Str_Length(D_800F70A8 + 0x688);
+            need = Pak_BytesToPages_2(D_800F70A8 + 0x688);
             if (b == 0 || a < need) {
                 if (*outBlocks < need) {
                     *outBlocks = need;

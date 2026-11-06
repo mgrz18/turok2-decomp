@@ -22,7 +22,7 @@ extern char D_0043ABE8[];
 extern char D_0043AC0C[];
 extern void *D_800C2010;
 extern void *D_800C2014;
-s32 Str_Length(s32 n);
+s32 Pak_BytesToPages_2(s32 n);
 s32 func_004266C0(s32 pad, s32 *out);
 s32 func_0042662C(s32 pad, s32 *out);
 s32 func_004269B4(s32 pad, u8 *ext);
@@ -81,7 +81,7 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     pad.v = pv;
     plr = pp;
     if (D_80130984 != 0) {
-        need = Str_Length(0x18);
+        need = Pak_BytesToPages_2(0x18);
         r = func_004266C0(pad.v, &pad.freeb);
         if (r == 0) {
             if (pad.freeb >= need) {

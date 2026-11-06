@@ -5,11 +5,11 @@
 #include "structs/pak.h"
 
 extern s32 Pak_GetNotePages_2(s32 index, s32 entry, s32 *out);
-extern s32 Str_Length(s32);
+extern s32 Pak_BytesToPages_2(s32);
 s32 Pak_GetNotePages_2(s32 index, s32 entry, s32 *out) {
     if (D_80130C60[index] != 3) {
         return -2;
     }
-    *out = Str_Length(D_800C2224[index].notes[entry].file_size);
+    *out = Pak_BytesToPages_2(D_800C2224[index].notes[entry].file_size);
     return 0;
 }
