@@ -33,15 +33,6 @@ struct Shared_ParticleLighting {
     u8 reserved13[5];
 } __attribute__((aligned(4)));
 struct LevelActor;
-struct TableRecAt8;
-typedef struct TableRecAt8 TableRecAt8;
-struct TableRecAt8;
-struct TableRecAt8 {
-    s32 unused;
-    s32 count;
-    u16 entries[1];
-};
-struct TableRecAt8;
 typedef struct Shared_Placed Shared_Placed;
 struct Shared_Placed {
     CVector3 pos;

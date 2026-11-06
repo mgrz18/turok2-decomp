@@ -318,15 +318,6 @@ struct ActorStateTable {
 };
 struct LevelActor;
 struct LevelActor;
-struct TableRecAt8;
-typedef struct TableRecAt8 TableRecAt8;
-struct TableRecAt8;
-struct TableRecAt8 {
-    s32 unused;
-    s32 count;
-    u16 entries[1];
-};
-struct TableRecAt8;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;

@@ -20,12 +20,6 @@
  * unless the view's player passes the CPlayer__GetPickupCountLow(0x111F) test. With the
  * shared flag set, the cached list of CScene__BuildGeometryDisplayList is used instead. */
 
-typedef struct {
-    s32 stride;             /* 0x00 */
-    s32 count;              /* 0x04 */
-    u16 ids[1];             /* 0x08 */
-} IdTable;
-
 void CScene__BuildGeometryDisplayList(CScene *);
 CPlayer *CCamera__GetPlayer(CCamera *);
 s32 CPlayer__GetPickupCountLow(CPlayer *, s32);
@@ -74,7 +68,7 @@ void CScene__DrawGeometry(CScene *w, CCamera *v_) {
     }
     player = CCamera__GetPlayer(v);
     si = 0;
-    tbl = (IdTable *)w->m_pObjectTypes;
+    tbl = w->m_pObjectTypes;
     cnt = tbl->count;
     ip = tbl->ids;
     if (cnt > 0) {

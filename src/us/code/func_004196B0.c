@@ -101,16 +101,7 @@ struct Display {
     Frame *current;
 };
 struct LevelActor;
-struct TableRecAt8;
-typedef struct TableRecAt8 TableRecAt8;
 struct Shared_World;
-struct TableRecAt8;
-struct TableRecAt8 {
-    s32 unused;
-    s32 count;
-    u16 entries[1];
-};
-struct TableRecAt8;
 typedef struct Shared_Placed Shared_Placed;
 struct Shared_Placed {
     CVector3 pos;
@@ -205,9 +196,9 @@ typedef struct Shared_World {
     void *secondaryLevels;
     u8 unknown88[8];
     void *placedObjectTable;
-    struct TableRecAt8 *modelIds;
+    IdTable *modelIds;
     StrideTable *lookupTable;
-    struct TableRecAt8 *resourceKindTable;
+    IdTable *resourceKindTable;
     StrideTable *records;
     StrideTable *stridedRecords;
     u8 unknownA8[4];

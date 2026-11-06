@@ -451,15 +451,6 @@ struct LevelActor;
 struct Triple;
 struct LevelActor;
 struct LevelActor;
-struct TableRecAt8;
-typedef struct TableRecAt8 TableRecAt8;
-struct TableRecAt8;
-struct TableRecAt8 {
-    s32 unused;
-    s32 count;
-    u16 entries[1];
-};
-struct TableRecAt8;
 struct Object_func_8028B274_de;
 struct Object_func_8028B274_de;
 typedef struct Object_func_8028B274_de Object_func_8028B274_de;
