@@ -1,7 +1,7 @@
 #include "common.h"
+#include "globals/audio.h"
 
 s32 CAudioWorld__PlaySpeech(s32 *, s32);              /* extern */
-extern s32 gAudioWorld;
 extern s32 gEngineApp_m_Settings_unk1C8;
 
 void Sound__PlaySpeech(s32 arg0) {

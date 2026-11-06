@@ -1,8 +1,8 @@
 #include "common.h"
+#include "globals/audio.h"
 
-extern char gAudioWorld[];
 extern void CAudioWorld__Unlock(void *);
 
 void Sound__Unlock(void) {
-    CAudioWorld__Unlock(gAudioWorld);
+    CAudioWorld__Unlock(&gAudioWorld);
 }

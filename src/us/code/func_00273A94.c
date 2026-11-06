@@ -2,10 +2,10 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "rw/abu_types.h"
+#include "globals/audio.h"
 
 extern float D_800A8174;
 extern float D_800A8178;
-extern s16 gSndVolumeCurve[];
 extern float D_800A8170;
 void SndVoicePool_Construct(s32 *arg0, s32 arg1) {
     s32 i;
