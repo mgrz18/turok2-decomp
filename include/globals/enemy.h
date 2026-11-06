@@ -51,5 +51,36 @@ extern CEnemyAnimPick sEnemyAnimDart_AFF78[12];
 extern CEnemyAnimPick sEnemyAnimProjectile_AFFD8[6];
 extern CEnemyAnimPick sEnemyAnimProjectile_B0008[12];
 extern CEnemyAnimPick sEnemyAnimWeapon_B0068[11];
+extern CEnemyAnimPick sEnemyAnimWeapon_B00C0[6];
+extern CEnemyAnimPick sEnemyAnimWeapon_B00F0[6];
+extern CEnemyAnimPick sEnemyAnimNormalDeath_B0120[6];
+extern CEnemyAnimPick sEnemyAnimNormalDeath_B0150[6];
+extern CEnemyAnimPick sEnemyAnimNormalDeath_B0180[6];
+extern CEnemyAnimPick sEnemyAnimMovingDeath_B01B0[6];
+extern CEnemyAnimPick sEnemyAnimMovingDeath_B01E0[6];
+extern CEnemyAnimPick sEnemyAnimMovingDeath_B0210[6];
+extern CEnemyAnimPick sEnemyAnimViolentDeath_B0240[6];
+extern CEnemyAnimPick sEnemyAnimViolentDeath_B0270[6];
+extern CEnemyAnimPick sEnemyAnimViolentDeath_B02A0[6];
+extern CEnemyAnimPick sEnemyAnimExplosiveDeath_B02D0[6];
+extern CEnemyAnimPick sEnemyAnimExplosiveDeath_B0300[6];
+extern CEnemyAnimPick sEnemyAnimExplosiveDeath_B0330[6];
+extern CEnemyAnimPick sEnemyAnimNormalDeath_B0360[6];
+extern CEnemyAnimPick sEnemyAnimNormalDeath_B0390[6];
+extern CEnemyAnimPick sEnemyAnimNormalDeath_B03C0[6];
+extern CEnemyAnimPick sEnemyAnimEvade_B03F0[6];
+extern CEnemyAnimPick sEnemyAnimEvade_B0420[6];
+extern CEnemyAnimPick sEnemyAnimEvade_B0450[6];
+extern CEnemyAnimPick sEnemyAnimEvade_B0480[6];
+extern CEnemyAnimPick sEnemyAnimEvade_B04B0[6];
+extern CEnemyAnimPick sEnemyAnimEvade_B04E0[6];
+extern CEnemyAnimPick sEnemyAnimMove_B0510[6];
+extern CEnemyAnimPick sEnemyAnimMove_B0540[6];
+extern CEnemyAnimPick sEnemyAnimMove_B0570[6];
+extern CEnemyAnimPick sEnemyAnimMove_B05A0[6];
+extern CEnemyAnimPick sEnemyAnimMove_B05D0[6];
+extern CEnemyAnimPick sEnemyAnimMove_B0600[6];
+
+extern CEnemyAnimPick sJoypadTestAnimTable[14];   /* EnemyAnim_JoypadTestPlayAnim: m_Flags is a button mask */
 
 #endif

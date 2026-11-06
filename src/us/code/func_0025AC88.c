@@ -2,7 +2,6 @@
 #include "structs/game_object.h"
 #include "structs/intelligence.h"
 #include "globals/enemy.h"
-#include "globals/ai.h"
 
 /* Three override slots, 6 bytes apart. */
 extern u16 D_800F5C66[];

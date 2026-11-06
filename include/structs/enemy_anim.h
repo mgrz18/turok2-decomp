@@ -3,7 +3,8 @@
 
 #include "common.h"
 
-/* A row of an enemy animation pick table (sEnemyAnim<Kind>_<addr>): AI_PickAnimFromTable
+/* A row of an enemy animation pick table (sEnemyAnim<Kind>_<addr>, sJoypadTestAnimTable; all
+ * declared in globals/enemy.h): AI_PickAnimFromTable
  * adds m_Anim when the intelligence's anim flags have a bit of m_Flags; 0
  * stops once something was found, -1 ends the table; the first row's anim is
  * the fallback. */

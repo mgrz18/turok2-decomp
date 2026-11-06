@@ -1,6 +1,6 @@
 #include "common.h"
 #include "structs/game_object.h"
-#include "globals/ai.h"
+#include "globals/enemy.h"
 
 s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
