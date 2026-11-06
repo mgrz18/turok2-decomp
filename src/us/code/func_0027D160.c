@@ -410,7 +410,6 @@ extern s32 gScreenHeight;          /* screen height */
 extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
 extern Gfx gRspInitDL[];        /* RDP setup display lists */
 extern Gfx gRdpInitDL[];
-extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;          /* the pool's active camera count */
 extern void *gDepthBuffer;        /* the z buffer */
 void Texture_InvalidateCache(void);
 void Render_SetRenderMode(s32 arg0);

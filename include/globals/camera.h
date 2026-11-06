@@ -7,4 +7,9 @@
 
 extern CCameraPool gEngineApp_m_Game_m_CameraPool;
 
+/* Members with symbols of their own (kept where the ROM bases the access on them). */
+extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;  /* .m_ActiveList.m_pHead */
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;   /* .m_ActiveList.m_nCount */
+extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;        /* .m_MainCamera */
+
 #endif
