@@ -2,6 +2,7 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 #include "structs/particle.h"
+#include "structs/sound.h"
 
 /* Same family as CParticle__UpdateHomingMissile (homing missile): here a projectile that flies
  * back to a point beside its owner's player and is caught there. */
@@ -28,12 +29,6 @@ extern void CPlayer__TransformByView(CPlayer *player, CVector3 *pos);      /* pl
 extern f32 GameObject_GetCollisionHeight(CGameObjectInstance *owner);                     /* height */
 
 typedef struct {
-    /* 0x00 */ u8 pad0[0x8];
-    /* 0x08 */ s32 state;
-    /* 0x0C */ s32 sound;
-} SoundHandle;
-
-typedef struct {
     /* 0x000 */ u8 pad0[0x4];
     /* 0x004 */ CVector3 pos;
     /* 0x010 */ u8 pad10[0x18 - 0x10];
@@ -49,7 +44,7 @@ typedef struct {
     /* 0x12A */ u8 pad12A[0x150 - 0x12A];
     /* 0x150 */ CVector3 dir;
     /* 0x15C */ u8 pad15C[0x1B8 - 0x15C];
-    /* 0x1B8 */ SoundHandle *loop;
+    /* 0x1B8 */ SndSource *loop;
 } Missile;
 
 extern f32 D_800ACE68; /* speed above which it flies home (15) */
@@ -96,7 +91,7 @@ void CParticle__UpdateReturning(Missile *obj) {
     CQuaternion rot;
     CMtxF mtx;
     CPlayer *player;
-    SoundHandle *loop;
+    SndSource *loop;
     f32 speed;
     f32 dist;
     f32 t;
@@ -151,7 +146,7 @@ void CParticle__UpdateReturning(Missile *obj) {
         loop = obj->loop;
         sound = 0x1B3;
         if (loop != NULL) {
-            if (loop->sound == sound && loop->state != -1) {
+            if (loop->sound.w == sound && loop->handle != -1) {
                 goto playing;
             }
             CParticle__StopLoopSound(obj);
