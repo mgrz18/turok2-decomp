@@ -32,6 +32,7 @@ Python API (import romfs):
     fs.object(i), fs.texture_set(i), fs.level(i), fs.graphicset(i), fs.cinema(i)  -> Node
     fs.count("objects") etc.  (objects, texture_sets, levels, graphicsets, cinemas)
     fs.find_rom(addr)                             # deepest ROM-level node containing addr
+    fs.load_unit(n) -> (key, size); fs.load_units() -> (key, size, node)  # cache keys for an archive
 
 Paths: "<region>/<i>/<j>/...". Inside a compressed block the path simply goes on
 (the children are entries of the unpacked blob); such nodes have rom=None and
@@ -336,6 +337,32 @@ class RomFS:
                 break
             n = nxt[0]
         return n
+
+    # -------- load units (what one CCache request / VM_Alloc reads)
+    def load_unit(self, n):
+        """(key, size) the engine passes to CCache__Request for node n, or None when n
+        lives inside a compressed blob. An ISet is loaded as its header only
+        (LoadPersistantIndex: count*4 + 15 & ~7 bytes; the 0x18-byte "object index"
+        requests are the same rule for count 4); any other node as its whole slot."""
+        if n.rom is None:
+            return None
+        if n.kind in ("iset", "empty") and n._offs is not None:
+            return n.rom, (n.count * 4 + 15) & ~7
+        return n.rom, n.size
+
+    def load_units(self):
+        """Every ROM-level load unit: yields (key, size, node). The audio control block
+        and the sound data file are each one VM_Alloc unit (whole region); the wave table
+        is read piecemeal (CLoader__LoadAsync, key = 0x20F194 + ALWaveTable.base)."""
+        for r in self.regions:
+            if r.name in ("audioctl", "audiotbl", "sound"):
+                n = self._region_node(r)
+                yield r.start, r.end - r.start, n
+                continue
+            for n in self.walk(r.name):
+                u = self.load_unit(n)
+                if u is not None:
+                    yield u[0], u[1], n
 
     # -------- convenience
     _COLL = {"objects": "cart/0", "texture_sets": "cart/3", "levels": "cart/5",
