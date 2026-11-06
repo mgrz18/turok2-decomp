@@ -665,6 +665,46 @@ cse1, not only cse2: it follows the `Pak_GetStatus` jump because the error
 label has one use and a barrier before it. A `do { } while (0)` stops cse1
 at its loop-end note, but cse2 runs after loop and ignores the note.
 
+**The engine's nine, k4 pass (none de-faked).** Each was retried with the
+real types and names; three files lost their local struct views on the way
+(the FAKEMATCH stays, asm_diff clean against the base). What was learnt:
+
+- **func_00286674 (CEngineApp__Main): it is loop.c's insn count.** Now with
+  `e->m_FrameData[n].m_Msg`, `e->m_Game.m_PlayerList` / `m_CameraPool` and
+  `CFrameMsg`. loop.c hoists the case constant 2 out of the message loop
+  when `threshold * savings * lifetime >= insns in the loop`; any three or so
+  more insns in the loop at loop time keep it in, and later passes may remove
+  them (a dead `i = i * 3 + 1;` matches as well as the doubled case 4). Not
+  natural either: Turok 3's CEngineApp__Main (references/turok3 tengine.c)
+  has an options check in case 2 that Turok 2's ROM does not; T3's empty
+  `else { ((void)0); }`, a `default: break;` and `gFrameData = gFrameData`
+  add nothing.
+- **func_002603F0, func_0025E7E0, func_0025F114: register priority by
+  refs.** In all three `self` needs exactly two more refs than it has for
+  global-alloc to rank it above `ai` (floor_log2(refs) * refs / live length:
+  e.g. 3 vs 4 refs in EnemyAI_TurnToTarget), which is what the cross-jumped
+  twin call (a load from self plus one more argument) gives. A single call,
+  `if (self != NULL)`, an inline wrapper around AI_TurnClamped and a copy of
+  self in a local miss by 7-21 words. func_002603F0 now uses CAITargets and
+  the f32 prototype like its siblings.
+- **func_002429BC (CAI__Setup): the real CAI / CGameObjectInstance fields**
+  replace SetupActor / SetupSource (the "scale" at 0x50 is m_RotY). Unpinned,
+  every form tried misses by 9 words: `= -1` per store, chained assignments
+  in either order, an int temporary, the flags clear moved to each point of
+  the block (11-24 words), a loop over m_FlinchNode (61).
+- **func_0022AFB4 (CParticle__Update):** the 0.0f of the time check is
+  carried into `p->m_cFrame = 0.0f` (`swc1 $f4` instead of `sw $zero`) by
+  every natural shape of the size maximum: if/else in either sense, ternary
+  and MAX macros (nested or not), and inline helpers with one or two returns
+  (CParticle__GetMaxSize, MaxF): 53-61 words. Rage Wars' copy has an owner
+  test between the two that Turok 2 does not.
+- **func_002626A8 (Turret_Setup), func_00204778, func_00246BC0:** not
+  reworked: Turret_Setup's `$a0` needs `$v0` and `$v1` busy or a tie to the
+  dead first argument (the earlier tries stand); func_00204778 is a CCache
+  file being retyped in the same round (k1); func_00246BC0's `$s1` for opt
+  means the original read opt after Math_DecayToZero, which the ROM does not
+  show.
+
 ### The G pass (the last drafts)
 
 Two of the three drafts left in `nonmatching/` matched:
