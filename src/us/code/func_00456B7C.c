@@ -3,20 +3,20 @@
 
 /* Pick the menu page to go back to, from the game mode flags. */
 
-extern s32 D_80130984;
-extern s32 D_80130990;
-extern s32 D_80130994;
-extern s32 D_80130998;
-extern s32 D_801309B4;
-extern s32 D_800C2028;
-extern u8 D_0043ABA0[];
-extern u8 D_0043ABC4[];
-extern u8 D_0043ABE8[];
-extern u8 D_0043AC0C[];
-extern u8 D_0043874C[];
-extern u8 D_004390B0[];
-extern u8 D_0043BE14[];
-extern u8 D_0043B658[];
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuIsLoad;
+extern s32 gSavePortalActive;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuPort;
+extern u8 gStatsAfterPakMenuDesc1_2[];
+extern u8 gStatsAfterPakMenuDesc2_2[];
+extern u8 gStatsAfterPakMenuDesc3_2[];
+extern u8 gStatsAfterPakMenuDesc4_2[];
+extern u8 gCharacterMenuAfterPakDesc_2[];
+extern u8 gSingleMenuAfterPakDesc_2[];
+extern u8 gSavePortalMenuDescB_2[];
+extern u8 gPakSaveGameAnyPakMenuDesc_2[];
 
 static __inline__ void *modePage(s32 *mode) {
     void *page;
@@ -24,16 +24,16 @@ static __inline__ void *modePage(s32 *mode) {
     switch (*mode) {
     case 0:
     default:
-        page = D_0043ABA0;
+        page = gStatsAfterPakMenuDesc1_2;
         break;
     case 1:
-        page = D_0043ABC4;
+        page = gStatsAfterPakMenuDesc2_2;
         break;
     case 2:
-        page = D_0043ABE8;
+        page = gStatsAfterPakMenuDesc3_2;
         break;
     case 3:
-        page = D_0043AC0C;
+        page = gStatsAfterPakMenuDesc4_2;
         break;
     }
     return page;
@@ -43,27 +43,27 @@ void *PakMenu_GetReturnMenu_2(Menu *event) {
     void *page = NULL;
     s32 mode;
 
-    if (D_80130984 != 0) {
-        if (D_801309B4 != 0) {
-            if (D_80130990 != 0) {
-                mode = D_800C2028;
+    if (gPakMenuIsSave != 0) {
+        if (gPakMenuIsProfile != 0) {
+            if (gPakMenuAnyPak != 0) {
+                mode = gPakMenuPort;
             } else {
                 mode = event->controller->port;
             }
             page = modePage(&mode);
         } else {
-            page = D_0043BE14;
+            page = gSavePortalMenuDescB_2;
         }
-    } else if (D_80130994 != 0) {
-        if (D_801309B4 != 0) {
-            page = D_0043874C;
-        } else if (D_80130998 != 0) {
-            page = D_0043BE14;
+    } else if (gPakMenuIsLoad != 0) {
+        if (gPakMenuIsProfile != 0) {
+            page = gCharacterMenuAfterPakDesc_2;
+        } else if (gSavePortalActive != 0) {
+            page = gSavePortalMenuDescB_2;
         } else {
-            page = D_004390B0;
+            page = gSingleMenuAfterPakDesc_2;
         }
-    } else if (D_80130990 != 0) {
-        page = D_0043B658;
+    } else if (gPakMenuAnyPak != 0) {
+        page = gPakSaveGameAnyPakMenuDesc_2;
     }
     return page;
 }

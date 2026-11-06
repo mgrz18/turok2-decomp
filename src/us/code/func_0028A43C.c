@@ -72,14 +72,14 @@ void CCache__PostDisplayListDone(s32 a, s32 b);
 void __scTaskComplete(Vid *o, Job *j);
 s32 __scSchedule(Vid *o, Job **a, Job **b, s32 mode);
 void __scExec(Vid *o, Job *a, Job *b);
-extern u64 D_8011F160;
-extern u64 D_8011F150;
-extern f32 D_8011F158;
-extern f32 D_800B6D40;
-extern f32 D_800B6D3C;
-extern s32 D_800B6E50;
-extern View D_800F6CB0[];
-extern u32 D_80130A84;
+extern u64 sGfxRspResumeTime;
+extern u64 sAudioTaskStartTime;
+extern f32 sGfxRspTime;
+extern f32 gSchedRspTotalTime;
+extern f32 gSchedRspTime;
+extern s32 sSchedGfxWatchdog;
+extern View gEngineApp[];
+extern u32 gDisplayList0;
 void __scHandleRSP(Vid *o) {
     Job *j;
     Job *a;
@@ -102,19 +102,19 @@ void __scHandleRSP(Vid *o) {
             }
         }
         if (j->flags8 & 0x20) {
-            D_8011F158 = D_8011F158 + (f32)(((osGetTime() - D_8011F160) * 64) / 3) * 0.000001f;
+            sGfxRspTime = sGfxRspTime + (f32)(((osGetTime() - sGfxRspResumeTime) * 64) / 3) * 0.000001f;
         }
     } else {
         j->flags4 &= ~2;
         if (j->unk10 == 1) {
-            D_800B6E50 = 0;
+            sSchedGfxWatchdog = 0;
             if (!(j->flags8 & 0x20)) {
                 goto done;
             }
-            D_8011F158 = D_8011F158 + (f32)(((osGetTime() - D_8011F160) * 64) / 3) * 0.000001f;
-            D_800B6D40 = D_8011F158;
-            D_800B6D3C = (f32)(((osGetTime() - D_8011F150) * 64) / 3) * 0.000001f;
-            base = D_800F6CB0;
+            sGfxRspTime = sGfxRspTime + (f32)(((osGetTime() - sGfxRspResumeTime) * 64) / 3) * 0.000001f;
+            gSchedRspTotalTime = sGfxRspTime;
+            gSchedRspTime = (f32)(((osGetTime() - sAudioTaskStartTime) * 64) / 3) * 0.000001f;
+            base = gEngineApp;
             fb = (u32)j->unkC;
             if (fb == base[0].fb) {
                 s = base;
@@ -129,12 +129,12 @@ void __scHandleRSP(Vid *o) {
                 s += 2;
             }
 sel:
-            CCache__PostDisplayListDone(0, s->unk114 == D_80130A84);
+            CCache__PostDisplayListDone(0, s->unk114 == gDisplayList0);
             if (osSendMesg((OSMesgQueue *)((s32 *)j)[0x50 / 4], (OSMesg)((s32 *)j)[0x54 / 4], 0 /* OS_MESG_NOBLOCK */) == -1) {
                 *(u8 *)0 = 0;
             }
         } else {
-            D_800B6D3C = (f32)(((osGetTime() - D_8011F150) * 64) / 3) * 0.000001f;
+            gSchedRspTime = (f32)(((osGetTime() - sAudioTaskStartTime) * 64) / 3) * 0.000001f;
             if (osSendMesg((OSMesgQueue *)((s32 *)j)[0x50 / 4], (OSMesg)((s32 *)j)[0x54 / 4], 0 /* OS_MESG_NOBLOCK */) == -1) {
                 *(u8 *)0 = 0;
             }

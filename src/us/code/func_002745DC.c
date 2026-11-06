@@ -15,7 +15,7 @@ typedef struct {
     CVector3 position;          /* 0x114 (0x128 in Rage Wars) */
 } GameplayCamera;
 
-extern f32 D_800B2A30;          /* audible radius squared */
+extern f32 sSoundHearingRangeSq;          /* audible radius squared */
 extern f32 D_800A8190;          /* 1.0f */
 
 /* Volume attenuation of a sound by its squared distance to the camera. */
@@ -34,10 +34,10 @@ f32 Sound_DistanceAttenuation(SoundSpatialSource *sound, GameplayCamera *camera)
     dz = a->z - b->z;
     dz *= dz;
     d = dx + dy + dz;
-    if (d >= D_800B2A30) {
+    if (d >= sSoundHearingRangeSq) {
         t = 0.0f;
     } else {
-        t = D_800A8190 - d / D_800B2A30;
+        t = D_800A8190 - d / sSoundHearingRangeSq;
     }
     switch (sound->curve) {
     case 2:

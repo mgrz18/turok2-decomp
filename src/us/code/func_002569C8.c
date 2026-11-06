@@ -14,7 +14,7 @@ s32 CPlayer__FillAllAmmo(CPlayer *player) {
     s16 n;
 
     for (w = 0; w < 35; w++) {
-        def = D_800AF618[w];
+        def = gWeaponInfoTable[w];
         if ((s8)player->m_Data.m_WeaponList[w] == 0) {
             continue;
         }

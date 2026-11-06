@@ -9,8 +9,8 @@ typedef struct {
     /* 0x2 */ s16 sound;
 } CharacterSound;
 
-extern CharacterSound D_800C1E78[];
-extern u8 D_00438748[];  /* menu template */
+extern CharacterSound gCharacterSelectSounds[];
+extern u8 gPlayerSetupMenuDesc[];  /* menu template */
 
 extern s32 Controller_ConfirmPressed(void *controller);
 extern s32 Menu_StepValueLR(Menu *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);
@@ -26,8 +26,8 @@ s32 CharacterMenu_SelectCharacter(s32 menu, Menu *c, s32 pool) {
 
     if (Controller_ConfirmPressed(c->controller)) {
         CPlayer__SetCharacter(player, options->m_nCharacter);
-        Sound__Play2D(D_800C1E78[player->m_Data.m_nDeathmatchCharacter].sound);
-        MenuPool_OpenChildMenu(pool, c, D_00438748);
+        Sound__Play2D(gCharacterSelectSounds[player->m_Data.m_nDeathmatchCharacter].sound);
+        MenuPool_OpenChildMenu(pool, c, gPlayerSetupMenuDesc);
         return 1;
     } else {
         s8 team = Menu_StepValueLR(c, options->m_nCharacter, 1, 0, 10, 1);

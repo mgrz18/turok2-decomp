@@ -22,16 +22,16 @@ typedef struct CollisionBuildVertex {
     f32 z;
     f32 ceiling;
 } CollisionBuildVertex;
-extern int D_800F2000;
-extern int D_800F2010;
-extern int D_800B2604;
-extern int D_800B2600;
+extern int sRegionCeilingNormal;
+extern int sRegionCeilingUnitNormal;
+extern int sCachedCeilingNormalRegion;
+extern int sCachedCeilingRawNormalRegion;
 extern void CVector3__Normalize(f32 *arg0);
 struct Node75;
-extern int D_800F2000;
-extern int D_800F2010;
-extern int D_800B2600;
-extern int D_800B2604;
+extern int sRegionCeilingNormal;
+extern int sRegionCeilingUnitNormal;
+extern int sCachedCeilingRawNormalRegion;
+extern int sCachedCeilingNormalRegion;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
 static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
     CVector3 a;
@@ -39,10 +39,10 @@ static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
     char *p;
     char *q;
     if (node == 0) {
-        ((CVector3 *)&D_800F2000)->x = 0;
-        ((CVector3 *)&D_800F2000)->z = 0;
-        ((CVector3 *)&D_800F2000)->y = D_800A7F64;
-    } else if ((int)node != D_800B2600) {
+        ((CVector3 *)&sRegionCeilingNormal)->x = 0;
+        ((CVector3 *)&sRegionCeilingNormal)->z = 0;
+        ((CVector3 *)&sRegionCeilingNormal)->y = D_800A7F64;
+    } else if ((int)node != sCachedCeilingRawNormalRegion) {
         p = node->cur;
         q = node->prev;
         a.x = ((CollisionBuildVertex *)p)->x - ((CollisionBuildVertex *)q)->x;
@@ -61,22 +61,22 @@ static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
         p = node->next;
         q = node->cur;
         b.z = ((CollisionBuildVertex *)p)->z - ((CollisionBuildVertex *)q)->z;
-        CVector3__Cross((CVector3 *)&D_800F2000, &b, &a);
+        CVector3__Cross((CVector3 *)&sRegionCeilingNormal, &b, &a);
     }
-    D_800B2600 = (int)node;
-    *out = *(CVector3 *)&D_800F2000;
+    sCachedCeilingRawNormalRegion = (int)node;
+    *out = *(CVector3 *)&sRegionCeilingNormal;
     return out;
 }
 CVector3 *CGameRegion__GetCeilingNormal(CVector3 *out, Node75 *node) {
     if (node == 0) {
-        ((CVector3 *)&D_800F2010)->x = 0;
-        ((CVector3 *)&D_800F2010)->z = 0;
-        ((CVector3 *)&D_800F2010)->y = D_800A7F60;
-    } else if ((int)node != D_800B2604) {
-        cross_edges((CVector3 *)&D_800F2010, node);
-        CVector3__Normalize((CVector3 *)&D_800F2010);
+        ((CVector3 *)&sRegionCeilingUnitNormal)->x = 0;
+        ((CVector3 *)&sRegionCeilingUnitNormal)->z = 0;
+        ((CVector3 *)&sRegionCeilingUnitNormal)->y = D_800A7F60;
+    } else if ((int)node != sCachedCeilingNormalRegion) {
+        cross_edges((CVector3 *)&sRegionCeilingUnitNormal, node);
+        CVector3__Normalize((CVector3 *)&sRegionCeilingUnitNormal);
     }
-    *out = *(CVector3 *)&D_800F2010;
-    D_800B2604 = (int)node;
+    *out = *(CVector3 *)&sRegionCeilingUnitNormal;
+    sCachedCeilingNormalRegion = (int)node;
     return out;
 }

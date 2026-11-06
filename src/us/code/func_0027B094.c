@@ -1,6 +1,6 @@
 #include "common.h"
 
-/* The font colour COnScreen__SetFontColor sets (D_80110190): six words, in argument order. */
+/* The font colour COnScreen__SetFontColor sets (gEngineApp_m_OnScreen_m_TopR): six words, in argument order. */
 typedef struct {
     /* 0x00 */ s32 unk0;
     /* 0x04 */ s32 unk4;
@@ -10,13 +10,13 @@ typedef struct {
     /* 0x14 */ s32 unk14;
 } FontColor;
 
-extern FontColor D_80110190;
+extern FontColor gEngineApp_m_OnScreen_m_TopR;
 
 void COnScreen__SetFontColor(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
-    D_80110190.unk0 = arg0;
-    D_80110190.unk4 = arg1;
-    D_80110190.unk8 = arg2;
-    D_80110190.unkC = arg3;
-    D_80110190.unk10 = arg4;
-    D_80110190.unk14 = arg5;
+    gEngineApp_m_OnScreen_m_TopR.unk0 = arg0;
+    gEngineApp_m_OnScreen_m_TopR.unk4 = arg1;
+    gEngineApp_m_OnScreen_m_TopR.unk8 = arg2;
+    gEngineApp_m_OnScreen_m_TopR.unkC = arg3;
+    gEngineApp_m_OnScreen_m_TopR.unk10 = arg4;
+    gEngineApp_m_OnScreen_m_TopR.unk14 = arg5;
 }

@@ -16,8 +16,8 @@ typedef struct PiHandle {
     /* 0x14 */ u8 transferInfo[0x60];
 } PiHandle;
 
-extern PiHandle D_80124D30;     /* CartRomHandle */
-extern PiHandle *D_800B897C;    /* __osPiTable */
+extern PiHandle CartRomHandle;     /* CartRomHandle */
+extern PiHandle *__osPiTable;    /* __osPiTable */
 extern s32 osPiRawReadIo(u32 devAddr, u32 *data);   /* osPiRawReadIo */
 extern void memset(void *p, s32 c, s32 n);   /* memset */
 extern u32 __osDisableInt(void);
@@ -29,22 +29,22 @@ PiHandle *osCartRomInit(void) {
 
     piConfig = 0;
 
-    if (D_80124D30.baseAddress != 0xB0000000) {
-        D_80124D30.type = 0;
-        D_80124D30.baseAddress = 0xB0000000;
+    if (CartRomHandle.baseAddress != 0xB0000000) {
+        CartRomHandle.type = 0;
+        CartRomHandle.baseAddress = 0xB0000000;
         osPiRawReadIo(0, &piConfig);
-        D_80124D30.latency = piConfig & 0xFF;
-        D_80124D30.pulse = (piConfig >> 8) & 0xFF;
-        D_80124D30.pageSize = (piConfig >> 16) & 0xF;
-        D_80124D30.relDuration = (piConfig >> 20) & 0xF;
-        D_80124D30.domain = 0;
-        D_80124D30.speed = 0;
-        memset(&D_80124D30.transferInfo, 0, 0x60);
+        CartRomHandle.latency = piConfig & 0xFF;
+        CartRomHandle.pulse = (piConfig >> 8) & 0xFF;
+        CartRomHandle.pageSize = (piConfig >> 16) & 0xF;
+        CartRomHandle.relDuration = (piConfig >> 20) & 0xF;
+        CartRomHandle.domain = 0;
+        CartRomHandle.speed = 0;
+        memset(&CartRomHandle.transferInfo, 0, 0x60);
         saveMask = __osDisableInt();
-        D_80124D30.next = D_800B897C;
-        D_800B897C = &D_80124D30;
+        CartRomHandle.next = __osPiTable;
+        __osPiTable = &CartRomHandle;
         __osRestoreInt(saveMask);
     }
 
-    return &D_80124D30;
+    return &CartRomHandle;
 }

@@ -4,10 +4,10 @@
 #include "rw/abu_types.h"
 
 extern void PakConfirmMenu_InitNoSpace(void);
-extern int D_801309B0;
-extern s32 D_801309A4;
-extern s32 D_801309B0;
+extern int gPakConfirmKind;
+extern s32 sPakConfirmDone;
+extern s32 gPakConfirmKind;
 void PakConfirmMenu_InitNoSpace(void) {
-    D_801309B0 = 1;
-    D_801309A4 = 0;
+    gPakConfirmKind = 1;
+    sPakConfirmDone = 0;
 }

@@ -4,7 +4,7 @@
 /* From thejunkman9000/Turok-Rage-Wars-Decomp (Turok: Rage Wars): src/game/func_00216D3C.c, func_00216D3C.
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 typedef struct { u8 pad0[4]; CVector3 pos; } B04A; /* pos at 0x4 in Turok 2 (0x8 in Rage Wars) */
 typedef struct { u8 pad0[0x78]; s32 unk78; f32 unk7C; s32 unk80; u8 pad84[4]; s32 unk88; } B04B;
 typedef struct { CAITarget a; CAITarget b; } B04C;
@@ -32,7 +32,7 @@ static inline void fill(CAITarget *d, B04A *a) {
 void AI_UpdateTargets(B04A *a, B04B *b, B04C *c, s32 f1, s32 f2) {
     f32 t;
     if (b->unk7C > 0.0f) {
-        t = b->unk7C - D_800B6D28;
+        t = b->unk7C - gFrameIncrement;
         b->unk7C = t;
         if (t <= 0.0f) {
             b->unk78 = 0;

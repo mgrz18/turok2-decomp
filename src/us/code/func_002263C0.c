@@ -3,7 +3,7 @@
 
 s32 CStaticObject__SpawnEvents(s32, s32);
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 void CScene__AdvanceListedInstances(void *arg0)
 {
@@ -13,7 +13,7 @@ void CScene__AdvanceListedInstances(void *arg0)
   s32 var_s0;
   s32 var_s3;
   void *var_s1;
-  temp_f1 = (*((f32 *) (((s8 *) arg0) + 0x18EB8))) + D_800B6D28;
+  temp_f1 = (*((f32 *) (((s8 *) arg0) + 0x18EB8))) + gFrameIncrement;
   *((f32 *) (((s8 *) arg0) + 0x18EB8)) = temp_f1;
   var_s3 = 1;
   if (!(temp_f1 > 0.0f))

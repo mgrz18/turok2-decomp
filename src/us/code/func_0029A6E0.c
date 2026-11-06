@@ -6,10 +6,10 @@
 extern void *osViGetCurrentFramebuffer();
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-extern Field_void_4 *D_800B7AC0;
+extern Field_void_4 *__osViCurr;
 void *osViGetCurrentFramebuffer(void) {
     void *result = __osDisableInt();
-    void *saved = D_800B7AC0->value;
+    void *saved = __osViCurr->value;
     __osRestoreInt(result);
     return saved;
 }

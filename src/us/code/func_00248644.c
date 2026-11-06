@@ -1,9 +1,9 @@
 #include "common.h"
 #include "structs/weapon.h"
 
-extern s32 D_8011AAD8;
-extern s32 D_80110048;
-extern WeaponInfo *D_800AF670; /* D_800AF618[22] */
+extern s32 gEngineApp_m_Settings;
+extern s32 gScene_m_LevelID;
+extern WeaponInfo *gWeaponInfoTable_22; /* gWeaponInfoTable[22] */
 
 s32 Level_GetHub(s32 arg0);
 
@@ -17,17 +17,17 @@ void CPlayer__CollectKeyPiece(u8 *player, s32 id) {
     s32 count;
     s32 max;
 
-    if (!(D_8011AAD8 & 0x10)) {
+    if (!(gEngineApp_m_Settings & 0x10)) {
         key = player + (id - 4000);
         key[0x52C] += 0x11;
         if (id == 4500) {
-            level = Level_GetHub(D_80110048) - 1;
+            level = Level_GetHub(gScene_m_LevelID) - 1;
             if (level < 6) {
                 (player + level)[0x9FC]++;
             }
             if ((s8) (key[0x52C] & 0xF) >= 6) {
                 player[0x988] = 1;
-                info = D_800AF670->ammo[0];
+                info = gWeaponInfoTable_22->ammo[0];
                 ammo = (s16 *) (player + (info->type * 2 + 0x934));
                 count = *ammo + 2;
                 max = info->max;

@@ -20,14 +20,14 @@ typedef struct ResourceHashEntry {
     struct ResourceHashEntry *next;
 } ResourceHashEntry;
 
-extern s32 D_800D8DCC;
-extern Manager D_800D8450;
-extern s32 D_800D81E0;
-extern u32 D_800D81C0;
-extern ResourceHashEntry *D_800D81C4;
-extern s32 D_800D1CD8;
-extern s32 D_800D8DF0;
-extern s32 D_800D6D68;
+extern s32 gCache_mutex_count;
+extern Manager gCache_queue;
+extern s32 gCache_memAgeList;
+extern u32 gHashMask;
+extern ResourceHashEntry *gHashTable;
+extern s32 gLoader;
+extern s32 gCache_ageCount;
+extern s32 gDecompressor;
 
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
@@ -49,11 +49,11 @@ extern s32 CList__AddTail(void *list, void *node);
 
 static __inline__ void acquire(void) {
     u32 token = __osDisableInt();
-    s32 count = D_800D8DCC + 1;
-    D_800D8DCC = count;
+    s32 count = gCache_mutex_count + 1;
+    gCache_mutex_count = count;
     if (count != 1) {
         __osRestoreInt(token);
-        osRecvMesg(D_800D8450.lock, 0, 1);
+        osRecvMesg(gCache_queue.lock, 0, 1);
     } else {
         __osRestoreInt(token);
     }
@@ -61,18 +61,18 @@ static __inline__ void acquire(void) {
 
 static __inline__ void release(void) {
     u32 token = __osDisableInt();
-    s32 count = D_800D8DCC - 1;
-    D_800D8DCC = count;
+    s32 count = gCache_mutex_count - 1;
+    gCache_mutex_count = count;
     if (count != 0) {
         __osRestoreInt(token);
-        osSendMesg(D_800D8450.lock, 0, 1);
+        osSendMesg(gCache_queue.lock, 0, 1);
     } else {
         __osRestoreInt(token);
     }
 }
 
 static __inline__ void find(u32 key, CCacheEntry **out) {
-    ResourceHashEntry *node = D_800D81C4 + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & D_800D81C0);
+    ResourceHashEntry *node = gHashTable + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & gHashMask);
     if (node->key != key) goto not_initial;
     *out = node->value;
     goto done;
@@ -95,8 +95,8 @@ static __inline__ void addref(CMemEntry *node) {
 }
 
 static __inline__ void stamp(CMemEntry *node) {
-    node->age = D_800D8DF0;
-    CList__MoveToHead(&D_800D81E0, node);
+    node->age = gCache_ageCount;
+    CList__MoveToHead(&gCache_memAgeList, node);
 }
 
 static __inline__ CMemEntry *allocate(u32 size, u32 flags) {
@@ -138,12 +138,12 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, v
         release();
         return request->memEntry;
     }
-    direct |= D_800D8450.mask;
+    direct |= gCache_queue.mask;
     busy = 0;
     if (direct != 0) {
         allocated = CCache__AllocCacheEntry(0, mode);
     } else {
-        scan = D_800D8450.active.m_pHead;
+        scan = gCache_queue.active.m_pHead;
         while (scan != 0) {
             if (scan->requestId == key && size <= scan->requestLength) {
                 busy = 1;
@@ -168,13 +168,13 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, v
             request->notifyId = owner;
             request->decompressCallback = tag;
             request->memFlags = mode;
-            CList__Remove(&D_800D8450.pending, request);
-            CList__AddTail(&D_800D8450.active, request);
+            CList__Remove(&gCache_queue.pending, request);
+            CList__AddTail(&gCache_queue.active, request);
             if (direct != 0) {
                 if (tag != 0) request->flags |= 4;
                 release();
-                CLoader__LoadSync(&D_800D1CD8, key, size, request->memEntry->data);
-                if (tag != 0) CDecompressor__DecompressSync(&D_800D6D68, request);
+                CLoader__LoadSync(&gLoader, key, size, request->memEntry->data);
+                if (tag != 0) CDecompressor__DecompressSync(&gDecompressor, request);
                 acquire();
                 if (tag != 0) request->flags &= ~4;
                 resolved = CCache__CompleteRequest(0, request, 0);
@@ -187,7 +187,7 @@ CMemEntry *CCache__Request(s32 unused, u32 key, u32 size, u32 mode, s32 owner, v
                 request->flags = oldFlags | 2;
                 if (tag != 0) request->flags = oldFlags | 0xE;
                 release();
-                CLoader__LoadAsync(&D_800D1CD8, key, size, request->memEntry->data, &D_800D8450, request, 0);
+                CLoader__LoadAsync(&gLoader, key, size, request->memEntry->data, &gCache_queue, request, 0);
                 return 0;
             }
         }

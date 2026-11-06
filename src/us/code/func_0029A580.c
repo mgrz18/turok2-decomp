@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern __OSViContext *D_800B7AC4; /* __osViNext */
+extern __OSViContext *__osViNext; /* __osViNext */
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
 void osViBlack(s32 arg0) {
@@ -12,10 +12,10 @@ void osViBlack(s32 arg0) {
     u16 v;
     temp_a0 = __osDisableInt();
     if (arg0 & 0xFF) {
-        ptr = &D_800B7AC4->state;
+        ptr = &__osViNext->state;
         v = *ptr | 0x20;
     } else {
-        ptr = &D_800B7AC4->state;
+        ptr = &__osViNext->state;
         v = *ptr & 0xFFDF;
     }
     *ptr = v;

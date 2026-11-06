@@ -7,10 +7,10 @@ typedef struct {
 } Arg0;
 
 s16 func_002261A8(s32 *);                       /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void CPathTrack__StartAtNearestPoint(Arg0 *arg0, s8 arg1) {
     arg0->kind = 2;
     arg0->value = arg1;
-    arg0->id = func_002261A8(&D_800F7078);
+    arg0->id = func_002261A8(&gScene);
 }

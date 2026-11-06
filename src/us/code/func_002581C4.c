@@ -4,12 +4,12 @@
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-extern f32 D_800AE350;
+extern f32 gWeaponChargeScale;
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);
 
-/* Weapon state: sets the fire-rate scale D_800AE350 from the time held for
+/* Weapon state: sets the fire-rate scale gWeaponChargeScale from the time held for
  * weapons 2-3 (and their 0x1294 ramp) and 12, then goes to state 7 or 5. */
 void WeaponMode_WindUp_Update(CGameObjectInstance *obj, CAI *state) {
     CPlayer *player = (CPlayer *) obj->m_AI.m_pParent;
@@ -23,10 +23,10 @@ void WeaponMode_WindUp_Update(CGameObjectInstance *obj, CAI *state) {
     case 2:
     case 3:
         if (player->m_SniperMode) {
-            D_800AE350 = 1.5f;
+            gWeaponChargeScale = 1.5f;
         } else {
             scale = MAX(MIN(state->m_ModeTime * (2.0f / 21), 1.5f), 0.5f);
-            D_800AE350 = scale;
+            gWeaponChargeScale = scale;
             t = state->m_ModeTime * (2.0f / 15) + 0.5f;
             if (t > 1.0f) {
                 t = 1.0f;
@@ -35,7 +35,7 @@ void WeaponMode_WindUp_Update(CGameObjectInstance *obj, CAI *state) {
         }
         break;
     case 12:
-        D_800AE350 = MAX(MIN(state->m_ModeTime * (2.0f / 21), 2.0f), 0.5f);
+        gWeaponChargeScale = MAX(MIN(state->m_ModeTime * (2.0f / 21), 2.0f), 0.5f);
         break;
     }
     if (CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon) == 1) {

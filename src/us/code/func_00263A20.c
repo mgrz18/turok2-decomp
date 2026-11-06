@@ -5,7 +5,7 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-extern f32 D_800B6D28; /* frame time */
+extern f32 gFrameIncrement; /* frame time */
 
 f32 Random_Blend(f32 lo, f32 hi);
 f32 SmoothStep(f32 x);
@@ -35,13 +35,13 @@ void Platform_UpdateSpecial(CGameObjectInstance *self, CAI *ai) {
             }
             if (flags & 0x4000000) {
                 if (ai->m_dwFlags & 0x20000) {
-                    ai->m_Platform.m_SpecialTimer += D_800B6D28;
+                    ai->m_Platform.m_SpecialTimer += gFrameIncrement;
                 } else {
                     ai->m_Platform.m_SpecialTimer = 0.0f;
                     break;
                 }
             } else if (ai->m_Platform.m_SpecialTimer > 0.0f || (ai->m_dwFlags & 0x10000)) {
-                ai->m_Platform.m_SpecialTimer += D_800B6D28;
+                ai->m_Platform.m_SpecialTimer += gFrameIncrement;
             }
             if (ai->m_Platform.m_SpecialTimer >= params->m_SpecialDelay) {
                 ai->m_ActionTime = 0.0f;
@@ -59,7 +59,7 @@ void Platform_UpdateSpecial(CGameObjectInstance *self, CAI *ai) {
             ai->m_Platform.m_vSpecialOffset.x = Random_Blend(-0.512f, 0.512f);
             ai->m_Platform.m_vSpecialOffset.y = Random_Blend(-0.512f, 0.512f);
             ai->m_Platform.m_vSpecialOffset.z = Random_Blend(-0.512f, 0.512f);
-            ai->m_ActionTime += D_800B6D28;
+            ai->m_ActionTime += gFrameIncrement;
             if (ai->m_ActionTime > 45.0f) {
                 ai->m_ActionTime = 0.0f;
                 flags = params->m_dwPlatformFlags;
@@ -72,7 +72,7 @@ void Platform_UpdateSpecial(CGameObjectInstance *self, CAI *ai) {
             break;
         case 1:
             if (ai->m_ActionTime < params->m_SpecialSinkTime) {
-                ai->m_ActionTime += D_800B6D28;
+                ai->m_ActionTime += gFrameIncrement;
             } else if (params->m_dwPlatformFlags & 0x2000000) {
                 self->m_dwFlags &= ~0x2000;
             } else {
@@ -89,7 +89,7 @@ void Platform_UpdateSpecial(CGameObjectInstance *self, CAI *ai) {
             break;
         case 2:
             if (ai->m_ActionTime > 0.0f) {
-                ai->m_ActionTime -= D_800B6D28;
+                ai->m_ActionTime -= gFrameIncrement;
             } else {
                 ai->m_Action = 0;
                 ai->m_Platform.m_SpecialTimer = 0.0f;
@@ -102,7 +102,7 @@ void Platform_UpdateSpecial(CGameObjectInstance *self, CAI *ai) {
             break;
         case 4:
             if (ai->m_ActionTime < params->m_SpecialSinkTime) {
-                ai->m_ActionTime += D_800B6D28;
+                ai->m_ActionTime += gFrameIncrement;
             }
             if (params->m_SpecialSinkTime > 0.0f) {
                 ai->m_Platform.m_vSpecialOffset.y = -params->m_SpecialSinkDist * SmoothStep(ai->m_ActionTime / params->m_SpecialSinkTime);

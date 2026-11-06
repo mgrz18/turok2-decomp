@@ -1,4 +1,4 @@
-/* (&D_80119870.m_Settings)->unlockedCheats instead of D_80119870.m_Settings.unlockedCheats gives the ROM's register choice (found
+/* (&gEngineApp_m_Game.m_Settings)->unlockedCheats instead of gEngineApp_m_Game.m_Settings.unlockedCheats gives the ROM's register choice (found
  * with the permuter). */
 #include "common.h"
 #include "structs/game_object.h"
@@ -11,8 +11,8 @@ typedef struct {
     /* 0xF8 */ void *held;
 } Holder;
 
-extern void CPlayerPool__SetInvincibility(CPlayerList *list, f32 arg1);
-extern CPlayer *CPlayerPool__GetFirstActive(CPlayerList *list);
+extern void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 arg1);
+extern CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *list);
 extern void Cinema_RequestById(s32 id);
 
 
@@ -21,16 +21,16 @@ void Primagen_EnterDeath(s32 arg0, Holder *obj) {
     GameSettings *flags;
 
     obj->held = NULL;
-    CPlayerPool__SetInvincibility(&D_80119870.m_PlayerList, 900.0f);
-    player = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    CPlayerPool__SetInvincibility(&gEngineApp_m_Game.m_PlayerList, 900.0f);
+    player = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     player->m_Data.m_bPrimagenBossComplete = 1;
     if (player->m_Data.m_bLevel1TotemFlags && player->m_Data.m_bLevel2TotemFlags && player->m_Data.m_bLevel3TotemFlags
         && player->m_Data.m_bLevel4TotemFlags && player->m_Data.m_bLevel5TotemFlags) {
         Cinema_RequestById(0x172);
-        (&D_80119870.m_Settings)->unlockedCheats |= 0x7FF0019;
+        (&gEngineApp_m_Game.m_Settings)->unlockedCheats |= 0x7FF0019;
     } else {
         Cinema_RequestById(0x173);
-        flags = &D_8011AAD8;
+        flags = &gEngineApp_m_Settings;
         flags->unlockedCheats |= 2;
     }
 }

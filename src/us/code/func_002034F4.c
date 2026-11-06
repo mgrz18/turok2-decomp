@@ -4,19 +4,19 @@
 #include "rw/abu_types.h"
 #include "structs/cache.h"
 
-extern int D_800D8DCC;
+extern int gCache_mutex_count;
 extern void *CCache__LookupAndLock(s32 arg0, s32 arg1);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32);
-extern struct Shape_func_8021A2D4_de_2 D_800D81C0;
-extern struct Shape_func_8021A2D4_de_2 D_800D81C4;
+extern struct Shape_func_8021A2D4_de_2 gHashMask;
+extern struct Shape_func_8021A2D4_de_2 gHashTable;
 extern void CList__MoveToHead(void *, s32);
 void *CCache__LookupAndLock(s32 arg0, s32 arg1) {
     extern s32 osSendMesg(OSMesgQueue *, s32, s32);
-    extern struct Shape_func_8021A2D4_de_2 D_800D8DF0;
-    extern OSMesgQueue D_800D8DB0;
-    extern s32 D_800D81E0;
+    extern struct Shape_func_8021A2D4_de_2 gCache_ageCount;
+    extern OSMesgQueue gCache_mutex;
+    extern s32 gCache_memAgeList;
     s32 temp_v1;
     s32 temp_v1_2;
     u32 temp_a0;
@@ -26,18 +26,18 @@ void *CCache__LookupAndLock(s32 arg0, s32 arg1) {
     void **out;
     CMemEntry *object;
     temp_a0 = __osDisableInt();
-    temp_v1 = D_800D8DCC + 1;
-    D_800D8DCC = temp_v1;
+    temp_v1 = gCache_mutex_count + 1;
+    gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg(&D_800D8DB0, 0, 1);
+        osRecvMesg(&gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
     out = &value;
-    node = (HashNode *)((s32)D_800D81C4.field_0 +
+    node = (HashNode *)((s32)gHashTable.field_0 +
         ((((arg1 << 5) ^ ((u32)arg1 >> 1) ^ ((u32)arg1 >> 9) ^
-           ((u32)arg1 >> 17)) & D_800D81C0.field_0) * 0x10));
+           ((u32)arg1 >> 17)) & gHashMask.field_0) * 0x10));
     if (node->key != arg1) {
         goto not_initial;
     }
@@ -65,15 +65,15 @@ found:
         object = *(void **)value;
         object->lockCount += 1;
         object->flags |= MEMENTRY_FLAG_LOCKED;
-        object->age = D_800D8DF0.field_0;
-        CList__MoveToHead(&D_800D81E0, object);
+        object->age = gCache_ageCount.field_0;
+        CList__MoveToHead(&gCache_memAgeList, object);
     }
     temp_v0 = __osDisableInt();
-    temp_v1_2 = D_800D8DCC - 1;
-    D_800D8DCC = temp_v1_2;
+    temp_v1_2 = gCache_mutex_count - 1;
+    gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0);
-        osSendMesg(&D_800D8DB0, 0, 1);
+        osSendMesg(&gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(temp_v0);
     }

@@ -12,19 +12,19 @@
  * The list walk is a goto loop and the built flag a local, as in the ROM: the
  * flag stays in a saved register and nothing else is hoisted out of the walk. */
 
-#define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct {
     /* 0x00 */ CVector3 min;
     /* 0x0C */ CVector3 max;
 } Box;
 
-extern Gfx *D_800D8E24;             /* display list head */
-extern s32 D_800B6D1C;              /* matrix buffer index */
-extern s32 D_801198E0;
-extern CCamera *D_801198D0;
-extern u8 D_800F7078[];
-extern u8 D_801102B8[];
+extern Gfx *gDList;             /* display list head */
+extern s32 gEvenOdd;              /* matrix buffer index */
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
+extern CCamera *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
+extern u8 gScene[];
+extern u8 gEngineApp_m_SwooshSystem[];
 
 extern s32 Frustum_TestBox(void *planes, Box *box);
 extern void CMtxF__TransformPoint(CMtxF m, CVector3 *in, CVector3 *out);   /* transform point */
@@ -93,20 +93,20 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
             do {
                 if (visible) {
                     if (!built) {
-                        if (D_801198E0 == 1) {
-                            camera = D_801198D0;
+                        if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
+                            camera = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
                             CMtxF__TransformPoint(camera->m_mfView, &node->header.m_vPos, &transformed);
                             depth = transformed.z;
                             if (depth < 0.0f) depth = -depth;
-                            CParticle__BuildMatrix(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
+                            CParticle__BuildMatrix(node, node->m_mtxDraw[gEvenOdd], camera, depth);
                         } else {
-                            CParticle__BuildMatrix(node, node->m_mtxDraw[D_800B6D1C], 0, 0.0f);
+                            CParticle__BuildMatrix(node, node->m_mtxDraw[gEvenOdd], 0, 0.0f);
                         }
                         node->m_dwFlags |= builtFlag;
                     }
                     if (node->m_pEffect->m_pModel != 0) {
-                        CScene__GetLightsAt(D_800F7078, &node->header.m_vPos, node->m_Lights[D_800B6D1C]);
-                        func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[D_800B6D1C], node->m_Lights[D_800B6D1C], 0, -1);
+                        CScene__GetLightsAt(gScene, &node->header.m_vPos, node->m_Lights[gEvenOdd]);
+                        func_0020B9F4(node->m_pEffect->m_pModel, node->m_mtxDraw[gEvenOdd], node->m_Lights[gEvenOdd], 0, -1);
                     } else {
                         CParticle__DrawSprite(node, view);
                     }
@@ -115,22 +115,22 @@ void CParticleSystem__Draw(CParticleSystem *world, CCamera *view) {
                     }
                     if (!node->m_ActiveSwooshes || built) break;
                     if (!(node->m_pEffect->m_dwFlags & 0x10000)) {
-                        Swoosh_AddParticleNode(D_801102B8, node, node->m_mtxDraw[D_800B6D1C]);
+                        Swoosh_AddParticleNode(gEngineApp_m_SwooshSystem, node, node->m_mtxDraw[gEvenOdd]);
                     }
                 } else {
                     if (!node->m_ActiveSwooshes || built) break;
-                    if (D_801198E0 == 1) {
-                        camera = D_801198D0;
+                    if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
+                        camera = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
                         CMtxF__TransformPoint(camera->m_mfView, &node->header.m_vPos, &transformed);
                         depth = transformed.z;
                         if (depth < 0.0f) depth = -depth;
-                        CParticle__BuildMatrix(node, node->m_mtxDraw[D_800B6D1C], camera, depth);
+                        CParticle__BuildMatrix(node, node->m_mtxDraw[gEvenOdd], camera, depth);
                     } else {
-                        CParticle__BuildMatrix(node, node->m_mtxDraw[D_800B6D1C], 0, 0.0f);
+                        CParticle__BuildMatrix(node, node->m_mtxDraw[gEvenOdd], 0, 0.0f);
                     }
                     node->m_dwFlags |= builtFlag;
                     if (!(node->m_pEffect->m_dwFlags & 0x10000)) {
-                        Swoosh_AddParticleNode(D_801102B8, node, node->m_mtxDraw[D_800B6D1C]);
+                        Swoosh_AddParticleNode(gEngineApp_m_SwooshSystem, node, node->m_mtxDraw[gEvenOdd]);
                     }
                 }
             } while (0);

@@ -18,12 +18,12 @@ void Primagen_UpdateMode9(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_AnimRepeatedCount == 0) {
         return;
     }
-    D_8012F9D8.script.current = -1;
+    gLevelScript_bossState.script.current = -1;
     obj->m_AI.m_AnimSpeed = 1.0f;
-    if (D_8012F9D8.state == 6 || t.m_Sight.m_Dist <= 460.8f) {
-        D_8012F9D8.mode = 6;
+    if (gLevelScript_bossState.state == 6 || t.m_Sight.m_Dist <= 460.8f) {
+        gLevelScript_bossState.mode = 6;
         CAI__SetMode(obj, ai, 1);
-    } else if (D_8012F9D8.state == 2) {
+    } else if (gLevelScript_bossState.state == 2) {
         CAI__SetMode(obj, ai, 7);
     }
 }

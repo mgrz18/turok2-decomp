@@ -15,7 +15,7 @@ typedef struct Widget {
     /* 0x32 */ u8 unk32;
 } Widget;
 
-void func_0041BBB0(Widget *w);
+void PlayerOptions_SetDefaultName_2(Widget *w);
 
 void PlayerOptions_SetDefaults_2(Widget *w, u8 arg1) {
     w->unk29 = 0x80;
@@ -29,5 +29,5 @@ void PlayerOptions_SetDefaults_2(Widget *w, u8 arg1) {
     w->unk30 = 0;
     w->unk31 = 1;
     w->unk32 = 0;
-    func_0041BBB0(w);
+    PlayerOptions_SetDefaultName_2(w);
 }

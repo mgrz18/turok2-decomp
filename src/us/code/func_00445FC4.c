@@ -8,8 +8,8 @@
  * script to the next command. */
 
 
-extern BlindOnePhase D_0043232C[];
-extern CPlayer *D_80119890;
+extern BlindOnePhase sBlindOnePhases_2[];
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 extern f32 func_00298470(f32);
 
 /* Advances the script by one command, stops the movers and runs the new command. */
@@ -34,13 +34,13 @@ static __inline__ void NextCommand(BlindOneState *m) {
         m->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     m->phase = cmd;
-    if (D_0043232C[cmd].init != NULL) {
-        D_0043232C[cmd].init(m);
+    if (sBlindOnePhases_2[cmd].init != NULL) {
+        sBlindOnePhases_2[cmd].init(m);
     }
 }
 
 void BlindOne_PhaseWaitPlayerUpdate_2(BlindOneState *m) {
-    CPlayer *player = D_80119890;
+    CPlayer *player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
 
     if (player != NULL) {
         if (func_00298470(player->m_CharacterActor.header.m_vPos.x * player->m_CharacterActor.header.m_vPos.x + player->m_CharacterActor.header.m_vPos.y * player->m_CharacterActor.header.m_vPos.y +

@@ -10,19 +10,19 @@ typedef struct PlayerStateInfo {
     /* 0x14 */ s16 unk14;
 } PlayerStateInfo;
 
-extern PlayerStateInfo D_800ADF54[];
-extern u8 D_8011AAF1;
+extern PlayerStateInfo gPlayerStateTable[];
+extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 CPlayer__IsInMatchEndState(CPlayer *player);
 
 /* Switches the player to `state` (only to states 16-18 while
- * CPlayer__IsInMatchEndState holds in D_8011AAF1's mode): runs its enter hook and takes
+ * CPlayer__IsInMatchEndState holds in gEngineApp_m_Settings_multiplayer's mode): runs its enter hook and takes
  * its flags. Returns whether the player ends up in that state. */
 s32 CPlayer__SetState(CPlayer *player, void *arg, s32 state) {
     s16 last;
     u32 lastFlags;
 
-    if (D_8011AAF1 != 0 && CPlayer__IsInMatchEndState(player) != 0 && state != 18 && state != 16 && state != 17) {
+    if (gEngineApp_m_Settings_multiplayer != 0 && CPlayer__IsInMatchEndState(player) != 0 && state != 18 && state != 16 && state != 17) {
         return 0;
     }
     last = player->m_Mode;
@@ -31,12 +31,12 @@ s32 CPlayer__SetState(CPlayer *player, void *arg, s32 state) {
     player->m_ModeBefore = last;
     player->m_ModeBeforeFlags = lastFlags;
     player->m_CharacterActor.m_dwFlags &= ~0x800000;
-    if (D_800ADF54[state].enter != NULL) {
-        D_800ADF54[state].enter(player, arg);
+    if (gPlayerStateTable[state].enter != NULL) {
+        gPlayerStateTable[state].enter(player, arg);
     }
-    player->m_ModeFlags = D_800ADF54[player->m_Mode].flags;
-    if (D_800ADF54[player->m_Mode].unk10 != 0) {
-        player->m_CharAnim = D_800ADF54[player->m_Mode].unk10;
+    player->m_ModeFlags = gPlayerStateTable[player->m_Mode].flags;
+    if (gPlayerStateTable[player->m_Mode].unk10 != 0) {
+        player->m_CharAnim = gPlayerStateTable[player->m_Mode].unk10;
     }
     if (player->m_Mode == state) {
         player->m_ModeTime = 0.0f;

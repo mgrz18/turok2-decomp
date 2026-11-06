@@ -16,12 +16,12 @@ typedef struct {
     /* 0x12C */ s32 unk12C;
 } State;
 
-/* Frame globals; the time step (D_800B6D28) must be read through the block to match. */
+/* Frame globals; the time step (gFrameIncrement) must be read through the block to match. */
 extern struct {
     /* 0x0 */ u32 frame;
     /* 0x4 */ u32 pad4;
     /* 0x8 */ f32 delta;
-} D_800B6D20;
+} gFrameCountGameplay;
 f32 Math_Approach(f32 value, f32 target, f32 rate);
 s16 *CPlayer__GetFiringAmmo(CPlayer *player, s32 id);
 
@@ -30,7 +30,7 @@ void WeaponBarrel_Spin_AF180(CGameObjectInstance *actor, State *state) {
 
     v = Math_Approach(state->unk110, 0.174532949924469f /* 10 deg */, 0.0175f);
     state->unk110 = v;
-    state->unk10C += v * D_800B6D20.delta;
+    state->unk10C += v * gFrameCountGameplay.delta;
     if (state->unk34 == 4 && state->unkC4 != 0x4E84) {
         if (7.0f <= actor->m_CurrentAnimation.m_AnimationFrame) {
             if (state->unk128 == 0) {

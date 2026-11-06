@@ -13,19 +13,19 @@ typedef struct AnimInfo {
     /* 0x1E */ u16 angle;
 } AnimInfo;
 
-extern CWorld D_800F7078;
-extern s32 D_800B6D54;                  /* effects enabled */
-extern s32 D_800B6D00;
-extern s32 D_8011001C;
+extern CScene gScene;
+extern s32 gPersistentDataLoaded;                  /* effects enabled */
+extern s32 gDefaultVisBits;
+extern s32 gScene_m_bStreamAll;
 extern char D_800A6070[];               /* "anim object index" */
 extern char D_800A6084[];               /* "anim object info" */
 
-s32 CScene__FindObjectType(CWorld *world, s32 id);
+s32 CScene__FindObjectType(CScene *world, s32 id);
 s32 CISet__GetROMAddress(s32 *table, s32 base, s32 index);
 s32 *CCache__Request(s32 heap, s32 src, s32 size, s32 type, s32 arg4, s32 callback, char *name, s32 arg7);
 s32 CISet__GetROMAddressAndSize(s32 table, s32 base, s32 index, s32 *size);
 void *CISet__GetBlock(s32 table, s32 index);
-s32 CScene__GetIntelligence(CWorld *world, s32 index);
+s32 CScene__GetIntelligence(CScene *world, s32 index);
 f32 HalfToFloat(s32 angle);
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 angle);
 void CCache__Unlock(s32 heap, s32 *block);
@@ -35,12 +35,12 @@ void CGameObjectInstance__Construct(CListedInstance *effect, s32 id, s32 variant
                    f32 scale, CVector3 position, s32 flags, CVector3 color, CVector3 direction, s32 arg12);
 void func_0021E5D4(CListedInstance *effect);
 
-/* Takes a node from the free list when allowed (always with D_8011001C, otherwise while fewer than
+/* Takes a node from the free list when allowed (always with gScene_m_bStreamAll, otherwise while fewer than
  * three are active), moves it to the active list and attaches the counted reference. */
 static __inline__ CListedInstance *take_effect(CInstancePool *scene, s32 *ref) {
     CListedInstance *effect;
 
-    if (D_8011001C == 0 && (u32)scene->m_ActiveList.m_nCount >= 3) {
+    if (gScene_m_bStreamAll == 0 && (u32)scene->m_ActiveList.m_nCount >= 3) {
         return NULL;
     }
     effect = scene->m_FreeList.m_pHead;
@@ -59,14 +59,14 @@ static __inline__ CListedInstance *spawn_effect(CInstancePool *scene, s32 id, s3
                                             CVector3 position, f32 scale, CVector3 direction, CVector3 color, s32 *ref) {
     CListedInstance *effect;
 
-    if (D_800B6D54 == 0 || count == 0) {
+    if (gPersistentDataLoaded == 0 || count == 0) {
         return NULL;
     }
     effect = take_effect(scene, ref);
     if (effect == NULL) {
         return NULL;
     }
-    CGameObjectInstance__Construct(effect, id, variant, D_800B6D00, count, -1, owner, scale, position, 0x80000, color, direction, 0);
+    CGameObjectInstance__Construct(effect, id, variant, gDefaultVisBits, count, -1, owner, scale, position, 0x80000, color, direction, 0);
     func_0021E5D4(effect);
     return effect;
 }
@@ -87,15 +87,15 @@ CListedInstance *CInstancePool__SpawnAnimInstance(CInstancePool *scene, s32 vari
     s32 size;
 
     effect = NULL;
-    id = CScene__FindObjectType(&D_800F7078, variant);
+    id = CScene__FindObjectType(&gScene, variant);
     if (id != -1) {
-        src = CISet__GetROMAddress(D_800F7078.m_pObjects, D_800F7078.m_ObjectsKey, id);
+        src = CISet__GetROMAddress(gScene.m_pObjects, gScene.m_ObjectsKey, id);
         index = CCache__Request(0, src, 0x18, 0, 0, 0, D_800A6070, 1);
         if (index != NULL) {
             block = CCache__Request(0, CISet__GetROMAddressAndSize(*index, src, 0, &size), size, 0, 0, 0, D_800A6084, 1);
             if (block != NULL) {
                 info = CISet__GetBlock(*block, 0);
-                count = CScene__GetIntelligence(&D_800F7078, info->intelligence);
+                count = CScene__GetIntelligence(&gScene, info->intelligence);
                 CVector3__Scale(&color, &color, HalfToFloat(info->angle));
                 model = id;     /* a copy: the ROM allocates it apart from id */
                 effect = spawn_effect(scene, model, variant, count, owner, position, scale, direction, color, ref);

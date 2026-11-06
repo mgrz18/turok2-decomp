@@ -3,11 +3,11 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-extern BlindOnePhase D_0043232C[];
+extern BlindOnePhase sBlindOnePhases_2[];
 
-extern u8 D_004323E8[];
+extern u8 sBlindOneMoverSeq2_2[];
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern void CScene__MarkGeneratorsSaved(void *);
 extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
@@ -29,6 +29,6 @@ void BlindOne_PhaseGroup2Init_2(BlindOneState *m) {
     for (i = 0; i < m->count2; i++) {
         CAI__SetMode(m->actors2[i], &m->actors2[i]->m_AI, 0);
     }
-    StartTimer(m, 1, D_004323E8, m->script->seconds);
-    CScene__MarkGeneratorsSaved(D_800F7078);
+    StartTimer(m, 1, sBlindOneMoverSeq2_2, m->script->seconds);
+    CScene__MarkGeneratorsSaved(gScene);
 }

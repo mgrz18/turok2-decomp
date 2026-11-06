@@ -64,7 +64,7 @@ extern void CMtxF__ScaleAxes(void *arg0, f32 sx, f32 sy, f32 sz);
 extern s32 CVector3__ClampLength(f32 *arg0, f32 arg1);
 extern void CMtxF__Translate(char *, f32, f32, f32);
 extern void CMtxF__SwapYZRows(void *);
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
     CQuatern trig;
     CQuatern product;
@@ -87,7 +87,7 @@ void CGameObjectInstance__CalculateOrientationMatrix(void *arg0) {
     trig.y = sine;
     trig.z = 0.0f;
     angle = ((struct LevelActor *)(arg0))->yaw * scale;
-    D_800DD78C = sine;
+    gQuaternionSin = sine;
     trig.w = func_002974C0(angle);
     product_ptr = &product;
     CQuaternion__Multiply(product_ptr, &trig, copy_ptr);

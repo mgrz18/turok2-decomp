@@ -1,1 +1,2 @@
 // One file per area: tools/apply_names.py reads them all with names.us.txt.
+// data_<part>.us.txt: data names (gName = 0x800XXXXX; // evidence), see docs/NAMES.md "Data names".

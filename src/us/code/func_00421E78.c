@@ -8,7 +8,7 @@ extern char D_800B49DC[];
 extern char D_800B49F0[];
 extern char D_800B4A04[];
 s32 GameNoteMenu_UpdateDifficulty(MenuItem *item) {
-    switch (D_800C201C->settings.difficulty) {
+    switch (gLoadBuffer->settings.difficulty) {
     default:
     case 0:
         item->text = D_800B49DC;

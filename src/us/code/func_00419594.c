@@ -2,9 +2,9 @@
 #include "structs/menu.h"
 
 s32 Controller_WatchPak(s8);                          /* extern */
-extern s32 D_800C2020;
+extern s32 gDamagedPakContinued;
 
 void func_00419594(Menu *arg0) {
     Controller_WatchPak(arg0->controller->port);
-    D_800C2020 = 0;
+    gDamagedPakContinued = 0;
 }

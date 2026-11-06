@@ -3,8 +3,8 @@
 
 s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
-extern s32 D_800B05A0;
+extern s32 sEnemyAnimMove_B05A0;
 
 void EnemyAnim_Move_B05A0(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &D_800B05A0, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wMoveAnimFlags);
+    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &sEnemyAnimMove_B05A0, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wMoveAnimFlags);
 }

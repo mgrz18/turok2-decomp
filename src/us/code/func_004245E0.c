@@ -1,13 +1,13 @@
 typedef signed int s32;
 
-extern s32 D_800C2038;
+extern s32 gResolution;
 extern char D_800B40E0[];
 extern char D_800B40F8[];
 extern char D_800B4110[];
 extern char D_800B4140[];
 
 char *Video_GetResolutionText(void) {
-    switch (D_800C2038) {
+    switch (gResolution) {
         case 0:
         default:
             return D_800B40E0;

@@ -4,6 +4,6 @@
 
 void Primagen_EnterMode20(CGameObjectInstance *obj) {
     obj->m_dwFlags |= 0x2000;
-    D_8012F9DC.swayTimer = 15.0f;
-    D_8012F9DC.timer = 11.25f;
+    gLevelScript_bossMode.swayTimer = 15.0f;
+    gLevelScript_bossMode.timer = 11.25f;
 }

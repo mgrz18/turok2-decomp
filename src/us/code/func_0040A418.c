@@ -5,9 +5,9 @@
 #include "structs/boss.h"
 
 /* Picks the next attack anim from a weighted table: close to the target 4 (then 3 after a 4), otherwise 5
- * when fewer than 3 actors are in the D_8010FEB4 list, else 6. */
+ * when fewer than 3 actors are in the gScene_m_InstancePool_m_ActiveList list, else 6. */
 
-extern CListedInstance *D_8010FEB4;
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 extern void AI_UpdateTargets(CGameObjectInstance *obj, CAI *ai, CAITargets *t, s32 f1, s32 f2);
 extern s16 WeightedTable_PickStatic(Pick *table);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 state);
@@ -32,7 +32,7 @@ static __inline__ s32 fewerActorsThan(s32 max) {
     CListedInstance *actor;
     s32 count = 0;
 
-    for (actor = D_8010FEB4; actor != NULL; actor = actor->m_pNext) {
+    for (actor = gScene_m_InstancePool_m_ActiveList; actor != NULL; actor = actor->m_pNext) {
         /* both arms are merged by cross-jumping; the extra block gives the ROM's register allocation */
         if (actor->m_pNext != NULL) {
             count++;
@@ -46,7 +46,7 @@ static __inline__ s32 fewerActorsThan(s32 max) {
 void MotherBoss_Phase0ChooseAttack(CGameObjectInstance *obj, CAI *ai) {
     Pick picks[8];
     CListedInstance *found;
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     s32 n;
     f32 dist;
 

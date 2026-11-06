@@ -5,8 +5,8 @@
 /* AI matrix callback: builds the actors world matrix from the AIs look
  * angles, its yaw about Y, its rotation, scale and position. */
 
-extern f32 D_800DD78C;
-extern s32 D_8011AAD8;
+extern f32 gQuaternionSin;
+extern s32 gEngineApp_m_Settings;
 
 extern void Projectile_PlaceAtMuzzle(CGameObjectInstance *actor, CAI *ai);
 extern f32 Math_DecayToZero(f32 angle, f32 step);
@@ -42,12 +42,12 @@ void EnemyAI_CalcOrientationMatrix(CGameObjectInstance *actor, CAI *ai) {
     spin.x = 0.0f;
     spin.y = sin;
     spin.z = 0.0f;
-    D_800DD78C = sin;
+    gQuaternionSin = sin;
     spin.w = func_002974C0(actor->m_RotY * 0.5f);
     CQuaternion__Multiply(&rot, &spin, &actor->m_qGround);
     CQuaternion__ToMatrix(&rot, &rotMtx);
     CMtxF__MultiplyAffine((CMtxF *) &actor->m_mfOrient, &look, &rotMtx);
-    if (D_8011AAD8 & 0x40) {
+    if (gEngineApp_m_Settings & 0x40) {
         CMtxF__ScaleAxes((CMtxF *) &actor->m_mfOrient, actor->m_vScale.x * 0.5f, actor->m_vScale.y * 0.5f, actor->m_vScale.z * 0.5f);
     } else {
         CMtxF__ScaleAxes((CMtxF *) &actor->m_mfOrient, actor->m_vScale.x, actor->m_vScale.y, actor->m_vScale.z);

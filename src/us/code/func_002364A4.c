@@ -14,7 +14,7 @@ typedef struct Pool6BD4 {
     Node6BD4 *unk95A0;
 } Pool6BD4;
 extern f32 D_800A6524;
-extern s32 D_800ACFC0;
+extern s32 sSwooshSpawned;
 void CQuaternion__FromDirection(void *a, CVector3 *b);
 void CList__Remove(void *list, Node6BD4 *n);
 void CList__AddTail(void *list, Node6BD4 *n);
@@ -33,11 +33,11 @@ Node6BD4 *func_002364A4(Pool6BD4 *o, CVector3 pos, CVector3 dir, s32 idx, s32 va
     u8 *list;
     u8 *l;
     CQuaternion__FromDirection(m50, &dir);
-    if (D_800ACFC0 != 0) {
+    if (sSwooshSpawned != 0) {
         return 0;
     }
     {
-        D_800ACFC0 = 1;
+        sSwooshSpawned = 1;
         n = o->unk95A0;
         list = o->lists + idx * 0x14;
         if (n != 0) {

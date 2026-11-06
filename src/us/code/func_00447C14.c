@@ -3,7 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-extern BlindOnePhase D_0043232C[];
+extern BlindOnePhase sBlindOnePhases_2[];
 
 
 /* Starts script command `cmd`: stops the movers, clears every member's flag and runs the command. */
@@ -23,7 +23,7 @@ void BlindOne_EnterPhase_2(BlindOneState *m, s32 cmd) {
         m->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
     }
     m->phase = cmd;
-    if (D_0043232C[cmd].init != NULL) {
-        D_0043232C[cmd].init(m);
+    if (sBlindOnePhases_2[cmd].init != NULL) {
+        sBlindOnePhases_2[cmd].init(m);
     }
 }

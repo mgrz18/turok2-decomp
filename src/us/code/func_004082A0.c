@@ -24,12 +24,12 @@ typedef struct {
 } BossFight;
 
 
-extern void *D_80119890;
-extern s32 D_800F7078;
-extern f32 D_800B6D28;
+extern void *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+extern s32 gScene;
+extern f32 gFrameIncrement;
 extern u8 D_800B6684[];
-extern u8 D_801100F0[];
-extern CListedInstance *D_8010FEB4;
+extern u8 gEngineApp_m_OnScreen[];
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 void *CPlayerPool__GetFirstActive(void *);
 void CCameraPool__AddTimedText(void *, s32, void *, f32);
@@ -61,14 +61,14 @@ void TotemDefense_UpdateFight(BossFight *fight) {
     u8 *obj;
     u8 *ai;
 
-    if (D_80119870.m_Settings.mode != 13 || D_800F7078 != 4) {
+    if (gEngineApp_m_Game.m_Settings.mode != 13 || gScene != 4) {
         return;
     }
     if ((f32) (*(s32 *) (fight->obj->def + 0x54) * 15) <= fight->timer) {
-        CCameraPool__AddTimedText(D_80119870.m_CameraPool, *(s32 *) ((u8 *) CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList) + 0x51C), D_800B6684, 4.0f);
+        CCameraPool__AddTimedText(gEngineApp_m_Game.m_CameraPool, *(s32 *) ((u8 *) CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList) + 0x51C), D_800B6684, 4.0f);
         Sound__PlaySpeech(0x182);
     }
-    bar = D_801100F0;
+    bar = gEngineApp_m_OnScreen;
     COnScreen__SetBossPercent(bar, toInt(fight->timer * (1.0f / 15) / (f32) fight->def->time * 100.0f));
     COnScreen__SetBossPercent2(bar, toInt((f32) (fight->def->kills - fight->count) / (f32) fight->def->kills * 100.0f));
     if (fight->state == 0) {
@@ -81,7 +81,7 @@ void TotemDefense_UpdateFight(BossFight *fight) {
             ai[0xC7] = 0;
             fight->warned = 1;
         }
-        timer = fight->timer - D_800B6D28;
+        timer = fight->timer - gFrameIncrement;
         left = fight->def->kills - fight->count;
         left2 = left;
         fight->timer = timer;
@@ -98,8 +98,8 @@ void TotemDefense_UpdateFight(BossFight *fight) {
         }
     }
     if (fight->state != 1) {
-        actor = D_8010FEB4;
-        player = D_80119890;
+        actor = gScene_m_InstancePool_m_ActiveList;
+        player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
         n = 0;
         for (; actor != NULL; actor = actor->m_pNext) {
             if (actor->m_Instance.header.m_pIntelligence->m_Type == 1 && actor->m_Instance.m_AI.m_pTargetOverride == 0) {

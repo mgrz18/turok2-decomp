@@ -21,8 +21,8 @@ typedef struct Projectile {
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-extern CVector3 D_800B06AC;
-extern CCollisionResults D_800F1CE0;
+extern CVector3 gEnemyLastNoisePos;
+extern CCollisionResults gCollisionResults;
 
 extern f32 CVector3__Distance(CVector3 *a, CVector3 *b);
 extern void CAI__SetMode(CGameObjectInstance *actor, CAI *ai, s32 anim);
@@ -45,7 +45,7 @@ static __inline__ void hearNoise(CGameObjectInstance *actor, CAI *ai, CVector3 *
                     if (add < ai->m_ActionTime) {
                         ai->m_ActionTime = add;
                     }
-                    D_800B06AC = *pos;
+                    gEnemyLastNoisePos = *pos;
                 }
             }
         }
@@ -139,7 +139,7 @@ void EnemyAI_OnHit(CGameObjectInstance *actor, CAI *ai, Projectile *proj) {
         break;
     case 11:
     case 0x129:
-        if (D_800F1CE0.m_pInstance != 0 && (D_800F1CE0.m_Frame.flags & 3) == 1) {
+        if (gCollisionResults.m_pInstance != 0 && (gCollisionResults.m_Frame.flags & 3) == 1) {
             if (info->m_dwFlags & 0x400) {
                 Sound__Play(0x1AB, actor->header.m_vPos, 0, -1);
                 if (ai->m_Mode == 0x21) {
@@ -154,7 +154,7 @@ void EnemyAI_OnHit(CGameObjectInstance *actor, CAI *ai, Projectile *proj) {
                     delay = level * -15.0f + 75.0f;
                     ai->m_ConditionTimer += delay;
                 } else {
-                    ai->m_vBoreCollNormal = D_800F1CE0.m_vNormal;
+                    ai->m_vBoreCollNormal = gCollisionResults.m_vNormal;
                     CAI__SetMode(actor, ai, 0x21);
                 }
             } else if (info->m_dwFlags & 0x2000) {

@@ -3,14 +3,14 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s32 D_801309B0;
+extern s32 gPakConfirmKind;
 extern char D_800B5130[];
 extern char D_800B5194[];
 extern char D_800B51D0[];
 extern char D_800B521C[];
 extern char D_800B527C[];
 s32 PakConfirmMenu_UpdateLine1_2(MenuItem *item) {
-    switch (D_801309B0) {
+    switch (gPakConfirmKind) {
     default:
     case 0:
         item->text = D_800B5130;

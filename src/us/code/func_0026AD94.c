@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "structs/region.h"
 
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 
 f32 func_00298470(f32 x);   /* sqrtf */
 f32 Math_AcosLookup(f32 x);   /* acosf */
@@ -42,12 +42,12 @@ CQuaternion CGameRegion__GetEdgeRotation(CGameRegion *tri, s32 i) {
         heading.x = 0.0f;
         heading.y = t;
         heading.z = 0.0f;
-        D_800DD78C = t;
+        gQuaternionSin = t;
     }
     heading.w = func_002974C0(edgeHeading(tri, i) * 0.5f);
     half = -0.785398245f;
     s = func_002982F0(half);
-    D_800DD78C = s;
+    gQuaternionSin = s;
     tilt.x = s;
     tilt.y = 0.0f;
     tilt.z = 0.0f;

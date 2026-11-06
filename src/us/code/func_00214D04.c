@@ -15,7 +15,7 @@ s32 CCache__Unlock(s32, s32);                /* extern */
 s32 Model_RequestTextures(s32);                         /* extern */
 s32 CStaticObject__LoadGeometry();                                /* extern */
 extern s32 D_800A57F8;
-extern s32 D_800ACAD8;
+extern s32 gLitVerticesKey;
 extern s32 CStaticObject__BuildLitVerticesCallback;
 
 void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
@@ -26,7 +26,7 @@ void CStaticObject__RequestLitVertices(SpawnSource *arg0) {
         temp_v0 = CStaticObject__LoadGeometry();
         if (temp_v0 != 0) {
             Model_RequestTextures(temp_v0);
-            temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | D_800ACAD8, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &D_800A57F8, 0);
+            temp_v0_2 = CCache__RequestDecompression(0, arg0->spawnFlags | gLitVerticesKey, temp_v0, arg0->id, 8, arg0, &CStaticObject__BuildLitVerticesCallback, &D_800A57F8, 0);
             if (temp_v0_2 != 0) {
                 CCache__Unlock(0, temp_v0_2);
             }

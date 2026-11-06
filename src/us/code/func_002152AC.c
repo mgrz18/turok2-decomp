@@ -25,10 +25,10 @@ s32 CScene__GetObjectTypeID(void *, s32);
 s32 *CISet__GetBlock(s32, s32);
 
 extern u8 D_800B6D1B;
-extern s32 D_800B6D1C;
-extern u8 D_8010FF20[];
-extern u8 D_800F7078[];
-extern s32 D_8011AAD8;
+extern s32 gEvenOdd;
+extern u8 gScene_m_qSky[];
+extern u8 gScene[];
+extern s32 gEngineApp_m_Settings;
 
 void CLevelActor__Draw(CLevelActor *obj) {
     s32 *geometry;
@@ -42,7 +42,7 @@ void CLevelActor__Draw(CLevelActor *obj) {
     }
     if (obj->m_DrawnFrame != D_800B6D1B) {
         if (obj->header.m_pIntelligence->m_Type == 8) {
-            CQuaternion__ToMatrix(D_8010FF20, matrix);
+            CQuaternion__ToMatrix(gScene_m_qSky, matrix);
         } else {
             CMtxF__SetRotateY(matrix, obj->m_RotY);
         }
@@ -50,27 +50,27 @@ void CLevelActor__Draw(CLevelActor *obj) {
         CVector3__ClampLength(&obj->header.m_vPos, 20000.0f);
         CMtxF__Translate(matrix, obj->header.m_vPos.x, obj->header.m_vPos.y + obj->m_Height, obj->header.m_vPos.z);
         CMtxF__SwapYZRows(matrix);
-        CMtxF__ToMtxAffine(matrix, obj->m_Matrices[D_800B6D1C]);
+        CMtxF__ToMtxAffine(matrix, obj->m_Matrices[gEvenOdd]);
     }
     if (obj->header.m_pIntelligence->m_Type == 12) {
         if (obj->m_DrawnFrame != D_800B6D1B) {
             Model_AdvanceMorph(geometry, obj->m_AnimSpeed);
         }
-        Render_QueueModelInstance(geometry, obj->m_Matrices[D_800B6D1C], 0, obj->m_Lights, 0, D_800B6D1C, obj->header.m_pIntelligence->m_nTexture);
+        Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, gEvenOdd, obj->header.m_pIntelligence->m_nTexture);
     } else {
         variant = obj->header.m_pIntelligence->m_nModel;
-        index = CScene__GetObjectTypeID(D_800F7078, obj->header.m_nObjType);
+        index = CScene__GetObjectTypeID(gScene, obj->header.m_nObjType);
         if (index < 0x6AB) {
             if (index >= 0x6A9) {
-                if ((D_8011AAD8 & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {
+                if ((gEngineApp_m_Settings & 0x800) && *CISet__GetBlock(*geometry, 2) >= 2) {
                     variant = 1;
                 }
-                if ((D_8011AAD8 & 0x1000) && *CISet__GetBlock(*geometry, 2) >= 3) {
+                if ((gEngineApp_m_Settings & 0x1000) && *CISet__GetBlock(*geometry, 2) >= 3) {
                     variant = 2;
                 }
             }
         }
-        Render_QueueModelInstance(geometry, obj->m_Matrices[D_800B6D1C], 0, obj->m_Lights, 0, variant, obj->header.m_pIntelligence->m_nTexture);
+        Render_QueueModelInstance(geometry, obj->m_Matrices[gEvenOdd], 0, obj->m_Lights, 0, variant, obj->header.m_pIntelligence->m_nTexture);
     }
     CCache__Unlock(0, geometry);
     obj->m_DrawnFrame = D_800B6D1B;

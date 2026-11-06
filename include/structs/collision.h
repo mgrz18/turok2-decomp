@@ -3,8 +3,8 @@
 
 /* Collision: an object's collision response (CCollisionInfo), the move being
  * tested (Sweep, Collision_MoveInstance builds one on its stack and runs the tests of
- * D_800AD190 on it), and what the last test hit (CCollisionResults,
- * D_800F1CE0; D_800F1ADC points at the one being filled).
+ * sCollisionTests on it), and what the last test hit (CCollisionResults,
+ * gCollisionResults; gCollisionResultsP points at the one being filled).
  *
  * A test that takes a hit records where to write it back (SweepHit's *Out
  * pointers into the results); SweepHit_Store writes the object's position,
@@ -43,8 +43,8 @@ typedef struct CCollisionInfo {
 } CCollisionInfo; /* size 0x1C */
 
 /* A hittable node of an instance (Rage Wars calls it a shield): what a hit on
- * it copies into the results (m_Frame, 0x70 bytes; D_800F1CF8 is the copy in
- * D_800F1CE0) and what a DamageEvent carries. */
+ * it copies into the results (m_Frame, 0x70 bytes; gCollisionResults_m_Frame is the copy in
+ * gCollisionResults) and what a DamageEvent carries. */
 typedef struct HitFrame {
     /* 0x00 */ s32 unk_00[0x19];
     /* 0x64 */ u8 unk_64;
@@ -55,7 +55,7 @@ typedef struct HitFrame {
     /* 0x6C */ s32 unk_6C;
 } HitFrame; /* size 0x70 */
 
-/* What the last collision test hit (D_800F1CE0, 0xF0), one record per kind
+/* What the last collision test hit (gCollisionResults, 0xF0), one record per kind
  * of thing: each has the region the object was in, where it was, and a kind
  * or the thing hit. CCollisionResults__Clear clears it (the instance's node to -1). */
 typedef struct CCollisionResults {
@@ -154,7 +154,7 @@ typedef struct SweepBox {
 } SweepBox; /* size 0x30 */
 
 /* A sweep's circle against the map's wall edges (Collision_SweepMapWalls builds it on
- * its stack and D_800F1AB0 points at it while Collision_SweepRegionWalls walks the
+ * its stack and sMapSweep points at it while Collision_SweepRegionWalls walks the
  * regions). */
 typedef struct MapSweep {
     /* 0x00 */ Sweep *sweep;
@@ -182,7 +182,7 @@ typedef struct MapSweep {
 } MapSweep; /* size 0x88 */
 
 /* A face of an object's collision box (Platform_GetCollisionBox gives the box's eight
- * corners, Quad_SetBoxBottom and the D_800AD930 face builders take four of them):
+ * corners, Quad_SetBoxBottom and the sBoxSideFaceBuilders face builders take four of them):
  * its corners in order and its normal. */
 typedef struct CollisionQuad {
     /* 0x00 */ CVector3 corner[4];
@@ -201,8 +201,8 @@ typedef struct DamageEvent {
     /* 0x14 */ u8 pad14[4];
 } DamageEvent; /* size 0x18 */
 
-/* An axis-aligned box. D_800F5A10 is the box of what the active cameras can
- * see (widened for animation), D_800F5A28 their plain view boxes
+/* An axis-aligned box. gCameraVisibleBox is the box of what the active cameras can
+ * see (widened for animation), gCameraViewBox their plain view boxes
  * (CCameraPool__Advance builds both); an object is drawn or tested when its box
  * (CGameObjectInstance m_vMin / m_vMax) meets it. */
 typedef struct CBox {

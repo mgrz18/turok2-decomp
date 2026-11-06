@@ -52,18 +52,18 @@ typedef struct B01Info {
                 u8 pad50[0x1C];
                 f32 unk6C;
 } B01Info;
-extern s32 D_800F7078[];
-void AI_SpawnParticlesOnce(CGameObjectInstance *actor, CAI *state, s32 kind, s32 a, s32 b);
+extern s32 gScene[];
+void AI_DropPickupsOnce(CGameObjectInstance *actor, CAI *state, s32 kind, s32 a, s32 b);
 void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
 void GameObject_FireTriggers(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
 void Turret_DeathEnter(CGameObjectInstance *actor, CAI *state) {
     B01Info *info = ((B01Info *)((u8 *)(actor->header.m_pIntelligence) + 0x14));
-    AI_SpawnParticlesOnce(actor, state, 4, info->unkC.i, info->unk10.i);
+    AI_DropPickupsOnce(actor, state, 4, info->unkC.i, info->unk10.i);
     state->m_pfHurt = 0;
-    CScene__SetInstanceSavedBit(D_800F7078, actor, 1);
+    CScene__SetInstanceSavedBit(gScene, actor, 1);
     GameObject_FireTriggers(actor, 1, actor);
     actor->m_dwFlags &= ~0x10000;
-    if (D_800F7078[0] != 4) {
+    if (gScene[0] != 4) {
         actor->m_dwFlags |= 0x8000000;
     }
 }

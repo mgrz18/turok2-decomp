@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/game_object.h"
 
-/* The point turned to, as three globals (D_800B06A0 is a CVector3 elsewhere). */
-extern f32 D_800B06A0;
-extern f32 D_800B06A4;
-extern f32 D_800B06A8;
+/* The point turned to, as three globals (gEnemyAlertPoint is a CVector3 elsewhere). */
+extern f32 gEnemyAlertPoint;
+extern f32 gEnemyAlertPoint_y;
+extern f32 gEnemyAlertPoint_z;
 
 f32 AI_AngleToPoint(CGameObjectInstance *self, f32 x, f32 y, f32 z); /* angle to a point (a CVector3 by value) */
 void AI_TurnClamped(CGameObjectInstance *self, CAI *ai, f32 rate, f32 angle);
@@ -20,10 +20,10 @@ static __inline__ f32 TurnRate(CGameObjectInstance *self, CAI *ai) {
     return rate;
 }
 
-/* AI callback: turns toward the point D_800B06A0, then calls EnemyMode_Move_Update
+/* AI callback: turns toward the point gEnemyAlertPoint, then calls EnemyMode_Move_Update
  * once 0xC7 reaches 5. */
 void EnemyMode_Alert_Update(CGameObjectInstance *self, CAI *ai) {
-    AI_TurnClamped(self, ai, TurnRate(self, ai), AI_AngleToPoint(self, D_800B06A0, D_800B06A4, D_800B06A8));
+    AI_TurnClamped(self, ai, TurnRate(self, ai), AI_AngleToPoint(self, gEnemyAlertPoint, gEnemyAlertPoint_y, gEnemyAlertPoint_z));
     if (ai->m_AnimRepeatedCount >= 5) {
         /* FAKEMATCH: the identical branches are merged by cross-jumping; the
          * extra use of self only gives it the register priority it has in the

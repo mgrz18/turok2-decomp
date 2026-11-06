@@ -3,7 +3,7 @@
 #include "structs/cinema.h"
 
 s32 Cinema_PathPlaying();                                /* extern */
-extern Cinema *D_800C1BB0;
+extern Cinema *gCinemaPlayerP;
 
 s32 Cinema_FollowsPlayer(void)
 {
@@ -14,6 +14,6 @@ s32 Cinema_FollowsPlayer(void)
     return 0;
   }
   new_var2 = 0;
-  new_var = D_800C1BB0;
+  new_var = gCinemaPlayerP;
   return (new_var->spec.flags & 2) != new_var2;
 }

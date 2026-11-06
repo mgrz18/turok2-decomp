@@ -228,9 +228,9 @@ typedef struct Def Def;
 struct LevelActor;
 struct LevelActor;
 struct LevelActor;
-extern void CScene__SetInstanceSavedBit(CWorld *, void *, s32);
+extern void CScene__SetInstanceSavedBit(CScene *, void *, s32);
 void CScene__UnmarkGeneratorsSaved(void *arg0) {
-    CWorld *object;
+    CScene *object;
     s32 count;
     s32 i;
     s32 offset;

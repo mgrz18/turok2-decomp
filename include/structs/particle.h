@@ -1,7 +1,7 @@
 #ifndef STRUCTS_PARTICLE_H
 #define STRUCTS_PARTICLE_H
 
-/* The particle system: D_800F8928, a pool of 128 particles (CParticle,
+/* The particle system: gScene_m_ParticleSystem, a pool of 128 particles (CParticle,
  * 0x1D8 each) with its free list, its draw list and three active lists (a
  * particle's template picks the list), and the ROM templates the particles
  * are spawned from (CROMParticleEffect, with the impact events of
@@ -109,7 +109,7 @@ typedef struct CParticle {
     /* 0x034 */ CVector3 m_vAttachPos;    /* in the frame of the bone (or owner) it sticks to */
     /* 0x040 */ u32 m_dwFlags;
     /* 0x044 */ u8 unk_044[0x48 - 0x44];
-    /* 0x048 */ u8 m_mtxDraw[2][0x40];    /* Mtx, one per frame buffer (D_800B6D1C) */
+    /* 0x048 */ u8 m_mtxDraw[2][0x40];    /* Mtx, one per frame buffer (gEvenOdd) */
     /* 0x0C8 */ u8 m_Lights[2][0x18];     /* Lights1, one per frame buffer */
     /* 0x0F8 */ CROMParticleEffect *m_pEffect;
     /* 0x0FC */ u32 unk_0FC;
@@ -153,7 +153,7 @@ typedef struct CParticle {
     /* 0x1AE */ u8 m_PrimColor[3];
     /* 0x1B1 */ u8 m_EnvColor[3];
     /* 0x1B4 */ u8 m_Opacity;
-    /* 0x1B5 */ u8 m_ActiveSwooshes;      /* its trail is in the swoosh set D_801102B8 */
+    /* 0x1B5 */ u8 m_ActiveSwooshes;      /* its trail is in the swoosh set gEngineApp_m_SwooshSystem */
     /* 0x1B6 */ u8 unk_1B6[0x1B8 - 0x1B6];
     /* 0x1B8 */ s32 unk_1B8;
     /* 0x1BC */ f32 m_Scale;

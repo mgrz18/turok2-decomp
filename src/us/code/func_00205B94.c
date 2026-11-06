@@ -3,8 +3,8 @@
 #include "common.h"
 #include "ultra_types.h"
 
-extern OSMesgQueue D_800D8DB0;      /* resource lock queue */
-extern s32 D_800D8DCC;              /* resource lock depth */
+extern OSMesgQueue gCache_mutex;      /* resource lock queue */
+extern s32 gCache_mutex_count;              /* resource lock depth */
 extern char D_800A51E0[];
 
 u32 __osDisableInt(void);
@@ -28,21 +28,21 @@ void **CCache__LoadPersistantIndex(s32 arg0, void **arg1, s32 arg2, void *arg3) 
     resource = CCache__Request(0, arg2, 4, 0x1B, 0, 0, D_800A51E0, one);
     size = **(s32 **)resource;
     token = __osDisableInt();
-    counter = D_800D8DCC + one;
-    D_800D8DCC = counter;
+    counter = gCache_mutex_count + one;
+    gCache_mutex_count = counter;
     if (counter != one) {
         __osRestoreInt(token);
-        osRecvMesg(&D_800D8DB0, 0, one);
+        osRecvMesg(&gCache_mutex, 0, one);
     } else {
         __osRestoreInt(token);
     }
     CCache__DeallocateInternal(0, resource);
     token2 = __osDisableInt();
-    counter2 = D_800D8DCC - 1;
-    D_800D8DCC = counter2;
+    counter2 = gCache_mutex_count - 1;
+    gCache_mutex_count = counter2;
     if (counter2 != 0) {
         __osRestoreInt(token2);
-        osSendMesg(&D_800D8DB0, 0, 1);
+        osSendMesg(&gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(token2);
     }

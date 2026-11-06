@@ -29,7 +29,7 @@ static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CGameObjectInstanc
 void MotherBoss_Phase1ChooseAttack_2(CGameObjectInstance *obj, CAI *ai) {
     Pick picks[8];
     CGameObjectInstance *found;
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     s32 n;
     s32 flagged;
     f32 dist;

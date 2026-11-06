@@ -25,7 +25,7 @@ static __inline__ s32 nameEquals(u8 *a, u8 *b, s32 count) {
 }
 
 void NameEntryMenu_Init_2(Menu *event) {
-    s32 i = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, event->player);
+    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);
     s32 trailing;
     char *dst;
     u8 *src;
@@ -60,8 +60,8 @@ void NameEntryMenu_Init_2(Menu *event) {
         break;
     }
 
-    D_800C1FB0[i].timer = 0.0f;
-    dst = D_800C1FB0[i].name;
+    gNameEntries[i].timer = 0.0f;
+    dst = gNameEntries[i].name;
     src = &D_8011AB8B[i * 64];
     for (n = 8, trailing = 0; n > 0; trailing++) {
         if (src[--n] != ' ') {
@@ -75,6 +75,6 @@ void NameEntryMenu_Init_2(Menu *event) {
         *dst++ = *src++;
     }
     *dst = '\0';
-    D_800C1FB0[i].cursor = 8 - trailing;
-    D_800C1FB0[i].length = 8 - trailing;
+    gNameEntries[i].cursor = 8 - trailing;
+    gNameEntries[i].length = 8 - trailing;
 }

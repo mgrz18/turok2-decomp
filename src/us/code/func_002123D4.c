@@ -3,13 +3,13 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800AC8D0[];
+extern float sLightSphereFalloff[];
 extern float D_800A575C;
 extern float D_800A5760;
 extern float D_800A5758;
 extern float D_800A5750;
 extern float D_800A5754;
-extern float D_800AC9D4[];
+extern float sLightConeFalloff[];
 extern f32 D_800A5764;
 extern void CVector3__Normalize(f32 *);
 s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 arg3,
@@ -31,7 +31,7 @@ s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 ar
             var_f20 = (var_f3 * var_f3) + (*(f32 *)&arg2 * *(f32 *)&arg2) +
                       (*(f32 *)&arg3 * *(f32 *)&arg3);
             if (!(D_800A5750 < var_f20)) {
-                var_f20 = D_800AC8D0[(s32)(var_f20 * D_800A5758)];
+                var_f20 = sLightSphereFalloff[(s32)(var_f20 * D_800A5758)];
                 goto shared;
             }
             goto fail;
@@ -40,7 +40,7 @@ s32 Actors_GetLightVolumeFalloff(ObjectRecAtBC *arg0, u32 arg1, u32 arg2, u32 ar
                 var_f20 = (*(f32 *)&arg2 * *(f32 *)&arg2) +
                           (*(f32 *)&arg3 * *(f32 *)&arg3);
                 if (!((var_f3 * var_f3) < var_f20)) {
-                    var_f20 = D_800AC9D4[(s32)(var_f20 * D_800A575C)];
+                    var_f20 = sLightConeFalloff[(s32)(var_f20 * D_800A575C)];
                     var_f20 /= var_f3;
                     goto shared;
                 }

@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
-extern s32 func_00429DE4(OSPfs *pfs);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
 extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
 extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
 static __inline__ s32 __osIdCheckSum(u16 *ptr, u16 *csum, u16 *icsum) {
@@ -27,7 +27,7 @@ s32 __osCheckPackId_2(OSPfs *pfs, __OSPackId *temp)
     int j;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429DE4(pfs);
+        ret = __osPfsSelectBank_2(pfs);
         if (ret != 0)
             return ret;
     }

@@ -10,17 +10,17 @@ struct RecordRecAt24 {
     void *resource;
 };
 struct RecordRecAt24;
-extern s32 D_801309B8;
+extern s32 sGameNoteLoad;
 extern s32 GameNoteMenu_SelectNo_2(void *unused, struct RecordRecAt24 *record);
-extern char D_80119E2C[];
-extern char D_0043B610[];
-extern void MenuPool_OpenMenu(void *, void *, s32, s32, s32);
+extern char gEngineApp_m_Game_m_MenuPool[];
+extern char gPakLoadGameMenuDesc_2[];
+extern void MenuPool_OpenMenu_2(void *, void *, s32, s32, s32);
 s32 GameNoteMenu_SelectNo_2(void *unused, struct RecordRecAt24 *record) {
     do {
-        if (D_801309B8 != 0) {
-            MenuPool_OpenMenu(D_80119E2C, D_0043B610, record->first, record->second, 0);
+        if (sGameNoteLoad != 0) {
+            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakLoadGameMenuDesc_2, record->first, record->second, 0);
         } else {
-            MenuPool_OpenMenu(D_80119E2C, record->resource, record->first, record->second, 0);
+            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, record->resource, record->first, record->second, 0);
         }
     } while (0);
     return 1;

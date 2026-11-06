@@ -5,7 +5,7 @@
 
 extern char __CSPVoiceHandler;
 extern void __initChanState(void *);
-extern ALGlobals *D_800B7760; /* alGlobals */
+extern ALGlobals *alGlobals; /* alGlobals */
 extern s32 alHeapDBAlloc(s32, s32, void *, s32, s32);
 extern void alEvtqNew(void *, void *, s32);
 extern void alSynAddPlayer(ALSynth *, ALPlayer *); /* alSynAddPlayer */
@@ -13,7 +13,7 @@ void alCSPNew(ALCSPlayer *arg0, ALSeqpConfig *arg1) {
     ALCSPlayer *obj = arg0;
     ALSeqpConfig *params = arg1;
     ALHeap *heap = params->heap;
-    ALSynth *drvr = &D_800B7760->drvr;
+    ALSynth *drvr = &alGlobals->drvr;
     s32 allocation;
     s32 i;
     obj->chanMask = 0xFF;
@@ -56,6 +56,6 @@ void alCSPNew(ALCSPlayer *arg0, ALSeqpConfig *arg1) {
         node->next = 0;
         node->handler = &__CSPVoiceHandler;
         node->clientData = node;
-        alSynAddPlayer(&D_800B7760->drvr, node);
+        alSynAddPlayer(&alGlobals->drvr, node);
     }
 }

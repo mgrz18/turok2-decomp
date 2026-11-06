@@ -29,8 +29,8 @@ typedef struct {
 f32 Math_DecayToZero(f32 value, f32 rate);
 void Sound__StopSoundId(s32 sound);
 
-extern u32 D_800B6D20;
-extern f32 D_800B6D28;
+extern u32 gFrameCountGameplay;
+extern f32 gFrameIncrement;
 
 void WeaponBarrel_Spin_AF324(SpinObj *obj, SpinState *s) {
     SpinOwner *owner = obj->owner;
@@ -39,10 +39,10 @@ void WeaponBarrel_Spin_AF324(SpinObj *obj, SpinState *s) {
     if (s->mode != 4) {
         s->spin = Math_DecayToZero(s->spin, 0.0065449853f);
     }
-    s->angle += s->spin * D_800B6D28 * 2;
+    s->angle += s->spin * gFrameIncrement * 2;
     target = owner->target;
     target->rate = (ABS(s->spin) * 1.7904929f > 1.0f) ? 1.0f : ABS(s->spin) * 1.7904929f;
-    if (s->mode != 4 && (D_800B6D20 & 1)) {
+    if (s->mode != 4 && (gFrameCountGameplay & 1)) {
         Sound__StopSoundId(0x1A7);
         Sound__StopSoundId(0x1A5);
     }

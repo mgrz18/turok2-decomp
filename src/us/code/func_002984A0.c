@@ -10,7 +10,7 @@ typedef float f32;
 #define AI_MIN_DAC_RATE 132
 #define AI_MAX_BIT_RATE 16
 
-extern s32 D_800B8900;          /* osViClock */
+extern s32 osViClock;          /* osViClock */
 
 /* libultra osAiSetFrequency(). */
 s32 osAiSetFrequency(u32 frequency) {
@@ -18,7 +18,7 @@ s32 osAiSetFrequency(u32 frequency) {
     register u8 bitRate;
     register f32 f;
 
-    f = D_800B8900 / (f32)frequency + .5f;
+    f = osViClock / (f32)frequency + .5f;
     dacRate = f;
     if (dacRate < AI_MIN_DAC_RATE) {
         return -1;
@@ -30,5 +30,5 @@ s32 osAiSetFrequency(u32 frequency) {
     IO_WRITE(AI_DACRATE_REG, dacRate - 1);
     IO_WRITE(AI_BITRATE_REG, bitRate - 1);
     IO_WRITE(AI_CONTROL_REG, 1);
-    return D_800B8900 / (s32)dacRate;
+    return osViClock / (s32)dacRate;
 }

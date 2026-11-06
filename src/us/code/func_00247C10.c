@@ -5,13 +5,13 @@
 #include "structs/collision.h"
 #include "structs/particle.h"
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 typedef struct TeamGame {
     /* 0x00 */ s32 active;
 } TeamGame;
 
-extern TeamGame D_8011ACD4;
-extern s32 D_8011ACDC;      /* team 0 score */
+extern TeamGame gEngineApp_m_Settings_match_teams;
+extern s32 gEngineApp_m_Settings_match_teamScore;      /* team 0 score */
 extern s32 D_8011ACE0;      /* team 1 score */
 
 s32 Cinema_PathPlaying(void);
@@ -25,7 +25,7 @@ static __inline__ s32 inSpecialRegion(CPlayer *player) {
     CRegionInfo *info;
 
     if (player->m_CharacterActor.header.m_pCurrentRegion != NULL) {
-        info = CScene__GetRegionInfo(D_800F7078, player->m_CharacterActor.header.m_pCurrentRegion);
+        info = CScene__GetRegionInfo(gScene, player->m_CharacterActor.header.m_pCurrentRegion);
         if (info != NULL) {
             if (info->m_wFlags52 & 0x40) {
                 return 1;
@@ -54,7 +54,7 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
     if (Cinema_PathPlaying() != 0) {
         return;
     }
-    if (D_8011AAD8.cheatFlags & 1) {
+    if (gEngineApp_m_Settings.cheatFlags & 1) {
         return;
     }
     if (Cinema_IsActive() != 0) {
@@ -100,14 +100,14 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
         return;
     }
     player->m_pOptions->m_bDead = 1;
-    killerIndex = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, killer);
+    killerIndex = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, killer);
     options = player->m_pOptions;
     if (options->m_TagMode == 1) {
         options->m_TaggedBy[killerIndex]++;
     } else {
         options->m_KilledBy[killerIndex]++;
     }
-    victimIndex = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, player);
+    victimIndex = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, player);
     if (player->m_pOptions->m_TagMode == 1) {
         killer->m_pOptions->m_Tagged[victimIndex]++;
     } else {
@@ -117,10 +117,10 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
 
     if (killerIndex == victimIndex) {
         player->m_pOptions->m_Suicides++;
-        if (D_8011ACD4.active != 0) {
+        if (gEngineApp_m_Settings_match_teams.active != 0) {
             switch (player->m_nDeathmatchTeamSelected) {
                 case 0:
-                    teamScore = &D_8011ACDC;
+                    teamScore = &gEngineApp_m_Settings_match_teamScore;
                     break;
                 case 1:
                     teamScore = &D_8011ACE0;
@@ -134,10 +134,10 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
         player->m_pOptions->m_Deaths++;
         if (player->m_pOptions->m_TagMode == 1) {
             killer->m_pOptions->m_Tags++;
-            if (D_8011ACD4.active != 0) {
+            if (gEngineApp_m_Settings_match_teams.active != 0) {
                 switch (killer->m_nDeathmatchTeamSelected) {
                     case 0:
-                        score = &D_8011ACDC;
+                        score = &gEngineApp_m_Settings_match_teamScore;
                         break;
                     case 1:
                         score = &D_8011ACE0;
@@ -151,10 +151,10 @@ void Player_OnMultiplayerKill(CGameObjectInstance *actor, s32 arg1, DamageEvent 
             }
         } else {
             killer->m_pOptions->m_Kills++;
-            if (D_8011ACD4.active != 0) {
+            if (gEngineApp_m_Settings_match_teams.active != 0) {
                 switch (killer->m_nDeathmatchTeamSelected) {
                     case 0:
-                        score = &D_8011ACDC;
+                        score = &gEngineApp_m_Settings_match_teamScore;
                         break;
                     case 1:
                         score = &D_8011ACE0;

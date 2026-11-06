@@ -4,17 +4,17 @@
 #include "rw/abu_types.h"
 
 void __osPackRequestData(u8 cmd) {
-    extern OSPifRam D_801213E0;
-    extern u8 D_801213DC;
+    extern OSPifRam __osContBuffer;
+    extern u8 __osContNumControllers;
     u8 *ptr;
     __OSContRequesFormat requestformat;
     s32 i;
     u8 *count;
     OSPifRam *pifram;
     for (i = 0; i < 15; i++) {
-        ((u32 *)&D_801213E0)[i] = 0;
+        ((u32 *)&__osContBuffer)[i] = 0;
     }
-    pifram = &D_801213E0;
+    pifram = &__osContBuffer;
     pifram->pifstatus = 1;
     ptr = (u8 *)pifram->ramarray;
     requestformat.dummy = 0xFF;
@@ -25,7 +25,7 @@ void __osPackRequestData(u8 cmd) {
     requestformat.typel = 0xFF;
     requestformat.status = 0xFF;
     requestformat.dummy1 = 0xFF;
-    count = &D_801213DC;
+    count = &__osContNumControllers;
     for (i = 0; i < *count; i++) {
         *(__OSContRequesFormat *)ptr = requestformat;
         ptr += sizeof(requestformat);

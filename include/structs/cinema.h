@@ -1,7 +1,7 @@
 #ifndef STRUCTS_CINEMA_H
 #define STRUCTS_CINEMA_H
 
-/* The cinema (cutscene) state, *D_800C1BB0, and the entries of the cinema
+/* The cinema (cutscene) state, *gCinemaPlayerP, and the entries of the cinema
  * table it plays (Cinema_SplineSecondDerivs's module, linked again at Cinema_SplineSecondDerivs_2).
  * Cinema__Initialize clears it; Cinema_Update / Cinema_AdvanceClock advance its clock;
  * Cinema_Start runs once at startTime (resets the player, warps); the end
@@ -34,7 +34,7 @@ typedef struct CinemaTable {
 
 typedef void (*CinemaCallback)();
 
-/* The cinema state, *D_800C1BB0. */
+/* The cinema state, *gCinemaPlayerP. */
 typedef struct Cinema {
     /* 0x000 */ s32 **owner;           /* the loaded track (freed with CCache__Deallocate) */
     /* 0x004 */ void *resource;

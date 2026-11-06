@@ -4,7 +4,7 @@
 
 typedef f32 Mtx4[4][4];
 
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 
 f32 CGameRegion__GetHeight(void *region, f32 x, f32 z);
 f32 GameObject_GetCollisionRadius(CGameObjectInstance *collider);
@@ -136,7 +136,7 @@ void Platform_GetCollisionBox(CGameObjectInstance *mover, CVector3 *points, CGam
         q.x = 0.0f;
         q.y = sinHalf;
         q.z = 0.0f;
-        D_800DD78C = sinHalf;
+        gQuaternionSin = sinHalf;
         q.w = func_002974C0(mover->m_RotY * 0.5f);
         CQuaternion__Multiply(&spin, &q, &mover->m_qGround);
         CQuaternion__ToMatrix(&spin, &spinMtx);

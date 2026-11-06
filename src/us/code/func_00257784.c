@@ -4,16 +4,16 @@
 s32 CPlayer__SetState(s32, s32, s32);
 s32 CPlayer__LoseLife(s32);
 
-extern s32 D_800ACDE4;
-extern s32 D_800AE340;
-extern CPlayer *D_800F1FD0;
+extern s32 gCinemaHidesActors;
+extern s32 gDeathTint;
+extern CPlayer *sDeathCinemaPlayer;
 
 void PlayerDeath_CinemaDone(void) {
-    if (D_800F1FD0->m_Data.m_Lives == 1) {
-        CPlayer__LoseLife((s32) D_800F1FD0);
+    if (sDeathCinemaPlayer->m_Data.m_Lives == 1) {
+        CPlayer__LoseLife((s32) sDeathCinemaPlayer);
     } else {
-        CPlayer__SetState((s32) D_800F1FD0, (s32) D_800F1FD0, 0x1F);
+        CPlayer__SetState((s32) sDeathCinemaPlayer, (s32) sDeathCinemaPlayer, 0x1F);
     }
-    D_800ACDE4 = 1;
-    D_800AE340 = 0;
+    gCinemaHidesActors = 1;
+    gDeathTint = 0;
 }

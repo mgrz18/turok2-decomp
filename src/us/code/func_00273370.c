@@ -8,7 +8,7 @@ void alSndpSetSound(void *p, s32 id);
 s32 alSndpGetState(void *p);
 void alSndpStop(void *p);
 s32 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
-    SndMgr *m;
+    CAudioWorld *m;
     SndCore *core;
     s32 i;
     s32 best;
@@ -16,7 +16,7 @@ s32 SndVoicePool_FindSlot(SndVoicePool *p, s32 a, s32 b, s16 pri, s32 c) {
     s16 lim;
     SndVoice *v;
     SndVoice *s;
-    SndMgr *m2;
+    CAudioWorld *m2;
     s32 r;
     best = pri;
     bestIdx = -1;

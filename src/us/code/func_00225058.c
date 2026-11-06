@@ -10,7 +10,7 @@
 extern s32 BinaryRange(s32 *index, s32 count, s32 key, s32 *first, s32 *last);
 
 /* Index of actor in the world's actor array, or -1 (same as CScene__GetInstanceIndex). */
-static __inline__ s32 World_ActorIndex(CWorld *world, CGameObjectInstance *actor) {
+static __inline__ s32 World_ActorIndex(CScene *world, CGameObjectInstance *actor) {
     CGameObjectInstance *base;
     if (actor->m_dwFlags & 0x80000) {
         return -1;
@@ -25,7 +25,7 @@ static __inline__ s32 World_ActorIndex(CWorld *world, CGameObjectInstance *actor
 
 /* Look up the run of records belonging to actor arg1: *arg2 = first record,
  * *arg3 = record count (0 if none). */
-void CScene__GetInstanceEventRecords(CWorld *arg0, CGameObjectInstance *arg1, CWorldRecord **arg2, s32 *arg3) {
+void CScene__GetInstanceEventRecords(CScene *arg0, CGameObjectInstance *arg1, CSceneRecord **arg2, s32 *arg3) {
     s32 first;
     s32 last;
     s32 *recordIndex;

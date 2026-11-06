@@ -2,7 +2,7 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 extern char D_800B608C[];
@@ -17,7 +17,7 @@ extern char D_800B614C[];
 
 /* Names setting 0x2D. */
 s32 func_004521C0(MenuItem *item) {
-    switch (D_8011AAD8.teamTextureSet) {
+    switch (gEngineApp_m_Settings.teamTextureSet) {
     case 0:
         item->text = D_800B608C;
         break;

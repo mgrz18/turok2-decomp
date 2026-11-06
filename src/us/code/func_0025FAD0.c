@@ -2,7 +2,7 @@
 #include "structs/game_object.h"
 #include "structs/collision.h"
 
-extern f32 D_800B6D28; /* frame delta */
+extern f32 gFrameIncrement; /* frame delta */
 
 void DamageEvent_Set(DamageEvent *event, void *target, s32 damage, f32 radius, s32 flags, void *shield);
 void CAI__CallHurt(CGameObjectInstance *self, CAI *ai, DamageEvent *event);
@@ -15,10 +15,10 @@ void EnemyMode_ReactionShocked_Update(CGameObjectInstance *self, CAI *ai) {
     if (ai->m_ConditionTimer > 300.0f) {
         ai->m_ConditionTimer = 300.0f;
     }
-    DamageEvent_Set(&event, NULL, D_800B6D28 * 34.133335f, 51.199997f, 0x100000, NULL);
+    DamageEvent_Set(&event, NULL, gFrameIncrement * 34.133335f, 51.199997f, 0x100000, NULL);
     CAI__CallHurt(self, ai, &event);
     Sound__Play(0x227, self->header.m_vPos, 0, -1);
-    ai->m_ConditionTimer -= D_800B6D28;
+    ai->m_ConditionTimer -= gFrameIncrement;
     if (ai->m_ConditionTimer <= 0.0f) {
         CAI__SetMode(self, ai, 10);
     }

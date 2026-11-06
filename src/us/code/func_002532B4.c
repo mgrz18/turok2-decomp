@@ -2,7 +2,7 @@
 #include "structs/player.h"
 
 /* The first player whose tag mode (options 0x3E) is 1. */
-CPlayer *CPlayerPool__FindTagged(CPlayerList *list) {
+CPlayer *CPlayerPool__FindTagged(CPlayerPool *list) {
     CPlayer *p;
 
     for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {

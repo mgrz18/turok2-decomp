@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern Reusable *D_800F1ADC;
+extern Reusable *gCollisionResultsP;
 void CCollisionSetup__Construct(EntryRecAt24 *arg0)
 {
     EntryRecAt24 *e = arg0;
@@ -11,13 +11,13 @@ void CCollisionSetup__Construct(EntryRecAt24 *arg0)
     if (e->dst != 0) {
         do {
             Dst *dst = e->dst;
-            D_800F1ADC->unk0 = 0;
-            D_800F1ADC->unk14 = counter;
-            D_800F1ADC->unk88 = 0;
-            D_800F1ADC->unk9C = 0;
-            D_800F1ADC->unkB0 = 0;
-            D_800F1ADC->unkB4 = 0;
-            D_800F1ADC->unkC4 = 0;
+            gCollisionResultsP->unk0 = 0;
+            gCollisionResultsP->unk14 = counter;
+            gCollisionResultsP->unk88 = 0;
+            gCollisionResultsP->unk9C = 0;
+            gCollisionResultsP->unkB0 = 0;
+            gCollisionResultsP->unkB4 = 0;
+            gCollisionResultsP->unkC4 = 0;
             dst->unk0 = e->val0;
             dst->unk4 = e->flag0;
             dst->unk5 = e->flag1;

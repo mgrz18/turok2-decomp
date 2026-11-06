@@ -3,9 +3,9 @@
 
 #include "structs/sound.h"
 
-SndEnv *CAudioWorld__GetPanEnvelope(SndMgr *m, s16 id);
-s32 CAudioWorld__GetStereo(SndMgr *m, s16 id);
-s16 Sound_CalcPan(CVector3 *pos, SndMgr *m);
+SndEnv *CAudioWorld__GetPanEnvelope(CAudioWorld *m, s16 id);
+s32 CAudioWorld__GetStereo(CAudioWorld *m, s16 id);
+s16 Sound_CalcPan(CVector3 *pos, CAudioWorld *m);
 f32 HalfToFloat(u16 v);
 void SndVoice_InitPan(SndVoice *v, SoundEffectInfo *info) {
     f32 d;
@@ -26,7 +26,7 @@ void SndVoice_InitPan(SndVoice *v, SoundEffectInfo *info) {
                 v->vp.pan = (s8)v->mgr->cueVolume;
             }
         } else if (v->reset == 0 && CAudioWorld__GetStereo(v->mgr, id) != 0) {
-            v->vp.pan = Sound_CalcPan(&v->vp.pos, (SndMgr *)v->mgr->listener);
+            v->vp.pan = Sound_CalcPan(&v->vp.pos, (CAudioWorld *)v->mgr->listener);
         }
     }
 }

@@ -6,7 +6,7 @@ char *CISet__GetBlock(s32 *, s32);
 s32 CISet__GetBlockSize(s32, s32);
 
 /* Tests a bit of the current level's second saved bitmap. */
-s32 CScene__GetLevelBit(CWorld *arg0, s32 arg1) {
+s32 CScene__GetLevelBit(CScene *arg0, s32 arg1) {
     s32 *temp_v0;
     s32 temp_s0;
     s32 temp_v1;

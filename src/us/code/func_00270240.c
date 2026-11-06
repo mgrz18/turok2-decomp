@@ -15,13 +15,13 @@ typedef struct {
     /* 0x0C */ ALBankFile *bankFile;
 } BankRes;
 
-extern s32 D_800B2680;      /* sound manager ready */
-extern u8 D_800B2684[];
-extern s32 D_800B6E90;
-extern s32 D_800F2040;
-extern u8 D_8011AAED[];     /* volume settings (bytes from -2) */
-extern s32 D_80130A40;      /* audio heap base */
-extern s32 D_80130A7C;      /* audio heap size */
+extern s32 gAudioWorldReady;      /* sound manager ready */
+extern u8 sAudioWorldReverbParams[];
+extern s32 gThreadPriorityAudio;
+extern s32 gAudioRomBase;
+extern u8 gEngineApp_m_Settings_unk15[];     /* volume settings (bytes from -2) */
+extern s32 gAudioHeapBase;      /* audio heap base */
+extern s32 gAudioHeapSize;      /* audio heap size */
 
 extern s32 __osDisableInt(void);         /* disable interrupts */
 extern void __osRestoreInt(s32 mask);    /* restore interrupts */
@@ -31,14 +31,14 @@ extern void CMutex__Construct(CMutex *lock);
 extern void alHeapInit(void *heap, s32 base, s32 len);    /* alHeapInit */
 extern void amCreateAudioMgr(ALSynConfig *cfg, s32 a, AiCfg *ai);
 extern BankRes *VM_Alloc(s32 a, s32 b, s32 c);
-extern void CAudioWorld__LoadSfxDataFile(SndMgr *m);
-extern void SndSeq_Construct(void *seq, SndMgr *m);
+extern void CAudioWorld__LoadSfxDataFile(CAudioWorld *m);
+extern void SndSeq_Construct(void *seq, CAudioWorld *m);
 extern void alSndpNew(void *player, void *cfg);           /* alSndpNew */
-extern void SndQueue_Construct(void *q, SndMgr *m);
-extern void SndVoicePool_Construct(void *pool, SndMgr *m);
-extern void SpeechPlayer_Construct(void *fx, SndMgr *m);
+extern void SndQueue_Construct(void *q, CAudioWorld *m);
+extern void SndVoicePool_Construct(void *pool, CAudioWorld *m);
+extern void SpeechPlayer_Construct(void *fx, CAudioWorld *m);
 
-static __inline__ void SndMgr_Lock(SndMgr *m) {
+static __inline__ void CAudioWorld_Lock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     s32 mask = __osDisableInt();
 
@@ -50,7 +50,7 @@ static __inline__ void SndMgr_Lock(SndMgr *m) {
     }
 }
 
-static __inline__ void SndMgr_Unlock(SndMgr *m) {
+static __inline__ void CAudioWorld_Unlock(CAudioWorld *m) {
     CMutex *l = &m->lock;
     s32 mask = __osDisableInt();
 
@@ -63,7 +63,7 @@ static __inline__ void SndMgr_Unlock(SndMgr *m) {
 }
 
 /* Sound manager start-up: heap, synthesizer, banks, player and state. */
-void CAudioWorld__Initialize(SndMgr *m) {
+void CAudioWorld__Initialize(CAudioWorld *m) {
     ALSynConfig cfg;
     AiCfg ai;
     BankRes *r;
@@ -77,21 +77,21 @@ void CAudioWorld__Initialize(SndMgr *m) {
     u8 *e;
 
     CMutex__Construct(&m->lock);
-    SndMgr_Lock(m);
+    CAudioWorld_Lock(m);
     m->soundState = 0;
-    alHeapInit(&m->heap, D_80130A40, D_80130A7C);
+    alHeapInit(&m->heap, gAudioHeapBase, gAudioHeapSize);
     cfg.maxVVoices = 0x25;
     cfg.maxPVoices = 0x25;
     cfg.maxUpdates = 0x100;
     cfg.fxType = 6; /* AL_FX_CUSTOM */
-    cfg.params = (s32 *) D_800B2684;
+    cfg.params = (s32 *) sAudioWorldReverbParams;
     ai.rate = 0x5622;
     ai.one = 1;
     cfg.dmaproc = 0;
     cfg.heap = &m->heap;
     ai.size = 0x800;
-    amCreateAudioMgr(&cfg, D_800B6E90, &ai);
-    D_800F2040 = 0x20F194;
+    amCreateAudioMgr(&cfg, gThreadPriorityAudio, &ai);
+    gAudioRomBase = 0x20F194;
     r = VM_Alloc(0x2F194, 0, 0x1E0000);
     m->seq.data = (s32 *)r->f4;
     bk = r->bankFile;
@@ -130,7 +130,7 @@ void CAudioWorld__Initialize(SndMgr *m) {
     m->fxMix = 0;
     SndQueue_Construct(&m->queue, m);
     SndVoicePool_Construct(&m->pool, m);
-    e = D_8011AAED;
+    e = gEngineApp_m_Settings_unk15;
     m->sfxVolume = (f32)e[0] * (1.0f / 255);
     m->volume2BA4 = (f32)e[-1] * (1.0f / 255);
     m->musicVolume = (f32)e[1] * (1.0f / 255);
@@ -139,6 +139,6 @@ void CAudioWorld__Initialize(SndMgr *m) {
     m->unk2BB4 = 1;
     m->unk2BBC = 1.0f;
     SpeechPlayer_Construct(&m->fx, m);
-    D_800B2680 = 1;
-    SndMgr_Unlock(m);
+    gAudioWorldReady = 1;
+    CAudioWorld_Unlock(m);
 }

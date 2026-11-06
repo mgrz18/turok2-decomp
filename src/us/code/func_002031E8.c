@@ -13,24 +13,24 @@ struct Pool {
 };
 struct Pool;
 typedef struct Pool Pool;
-extern Pool D_800D8DAC;
-extern void **D_800D81D4;
+extern Pool gCache_freeEntryCount;
+extern void **gCache_memEntriesFree;
 extern s32 CList__AddHead(void *arg0, s32 arg1);
 static __inline__ void *pool_alloc(s32 arg1) {
     void *temp_s0;
-    if (D_800D8DAC.count == 0) {
+    if (gCache_freeEntryCount.count == 0) {
         return 0;
     }
-    D_800D8DAC.count -= 1;
-    temp_s0 = D_800D81D4[D_800D8DAC.count];
+    gCache_freeEntryCount.count -= 1;
+    temp_s0 = gCache_memEntriesFree[gCache_freeEntryCount.count];
     ((CMemEntry *)(temp_s0))->flags = MEMENTRY_FLAG_ALLOCATED;
     ((CMemEntry *)(temp_s0))->lockCount = 0;
     ((CMemEntry *)(temp_s0))->data = 0;
     ((CMemEntry *)(temp_s0))->lockedNext = 0;
     ((CMemEntry *)(temp_s0))->lockedLast = 0;
     ((CMemEntry *)(temp_s0))->cacheEntry = 0;
-    ((CMemEntry *)(temp_s0))->age = D_800D8DAC.field44;
-    CList__AddHead((char *)&D_800D8DAC - 0xBCC, (s32)temp_s0);
+    ((CMemEntry *)(temp_s0))->age = gCache_freeEntryCount.field44;
+    CList__AddHead((char *)&gCache_freeEntryCount - 0xBCC, (s32)temp_s0);
     ((CMemEntry *)(temp_s0))->flags |= (arg1 & 0xC);
     return temp_s0;
 }

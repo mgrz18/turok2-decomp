@@ -16,7 +16,7 @@ typedef struct {
 } NoisePos;
 
 f32 CVector3__Distance(void *, void *);
-extern NoisePos D_800B06AC;
+extern NoisePos gEnemyLastNoisePos;
 
 void AI_HearNoise(u8 *actor, AlertState *state, NoisePos *pos, s32 kind) {
     s32 mode = state->modes[state->index];
@@ -49,7 +49,7 @@ void AI_HearNoise(u8 *actor, AlertState *state, NoisePos *pos, s32 kind) {
                 if (strength < alert + strength) {
                     state->alert = strength;
                 }
-                D_800B06AC = *pos;
+                gEnemyLastNoisePos = *pos;
             }
         }
     }

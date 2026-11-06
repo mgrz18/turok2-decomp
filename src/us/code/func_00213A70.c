@@ -26,10 +26,10 @@ typedef struct WTab {
 typedef struct M5Cell { f32 x0, z0, x1, z1; } M5Cell;
 
 extern char D_800A57B8[];
-extern s32 D_800ACAE0;
-extern CVector3 D_800DD790[];
-extern CWorld D_800F7078;
-extern s32 D_8011AAD8;
+extern s32 gLevelLightsEnabled;
+extern CVector3 sLitVertexOffsets[];
+extern CScene gScene;
+extern s32 gEngineApp_m_Settings;
 
 void *CISet__GetBlock(void *file, s32 index);
 s32 *CISet__GetBlockAndSize(s32 file, s32 index, s32 *size);
@@ -115,7 +115,7 @@ s32 **Lighting_BuildLitVertices(s32 model, s32 *regions, Box3 *box, s32 arg3, s3
     s32 magic;
     s32 *copySrc;
     s32 copySize;
-    CWorld *g;
+    CScene *g;
 
     colors = NULL;
     ret = findRecords(box, regions, recs, &count);
@@ -123,9 +123,9 @@ s32 **Lighting_BuildLitVertices(s32 model, s32 *regions, Box3 *box, s32 arg3, s3
     total = countVerts(src);
     do {
         for (j = 0; j < total; j++) {
-            D_800DD790[j].x = 0;
-            D_800DD790[j].y = 0;
-            D_800DD790[j].z = 0;
+            sLitVertexOffsets[j].x = 0;
+            sLitVertexOffsets[j].y = 0;
+            sLitVertexOffsets[j].z = 0;
         }
     } while (0);
     if (ret != 0) {
@@ -156,20 +156,20 @@ s32 **Lighting_BuildLitVertices(s32 model, s32 *regions, Box3 *box, s32 arg3, s3
     }
     do {
         func_0029E460(dst, copySrc, copySize);
-        Model_ApplyPackedOffsets(model, total, D_800DD790);
+        Model_ApplyPackedOffsets(model, total, sLitVertexOffsets);
     } while (0);
-    if (D_800ACAE0 == 0) {
+    if (gLevelLightsEnabled == 0) {
         goto plain;
     }
-    if (D_8011AAD8 & 0x8000) {
-        Lighting_DebugHueColors(dst, arg3, D_800DD790, arg4);
+    if (gEngineApp_m_Settings & 0x8000) {
+        Lighting_DebugHueColors(dst, arg3, sLitVertexOffsets, arg4);
         goto done;
     }
     if (count != 0) {
         goto lit;
     }
     n = 0;
-    g = &D_800F7078;
+    g = &gScene;
     for (k = 0; k < g->m_nSectors; k++) {
         n += ((s32 *) CISet__GetBlock(*g->m_Sectors[k].m_hData, 2))[1];
     }
@@ -178,13 +178,13 @@ s32 **Lighting_BuildLitVertices(s32 model, s32 *regions, Box3 *box, s32 arg3, s3
     }
     do {
 plain:
-        Lighting_ApplyDirectional(dst, arg3, D_800DD790, arg4);
+        Lighting_ApplyDirectional(dst, arg3, sLitVertexOffsets, arg4);
         goto done;
 lit:
-        Actors_AccumulateVertexLighting(recs, count, dst, arg3, D_800DD790, arg4);
+        Actors_AccumulateVertexLighting(recs, count, dst, arg3, sLitVertexOffsets, arg4);
     } while (0);
 done:
-    Lighting_WriteVertexColors(dst, D_800DD790);
+    Lighting_WriteVertexColors(dst, sLitVertexOffsets);
     if (ret != 0) {
         Lighting_CopyVertexColors(dst, colors);
     }

@@ -3,7 +3,7 @@
 #include "structs/game_object.h"
 
 CRegionInfo *CScene__GetRegionInfo(s32 *, CGameRegion *);             /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 f32 GameObject_GetWaterHeight(CInstanceHeader *arg0) {
     CGameRegion *temp_a1;
@@ -11,7 +11,7 @@ f32 GameObject_GetWaterHeight(CInstanceHeader *arg0) {
 
     temp_a1 = arg0->m_pCurrentRegion;
     if ((temp_a1 != NULL) && (temp_a1->m_wFlags & 1)) {
-        temp_v0 = CScene__GetRegionInfo(&D_800F7078, temp_a1);
+        temp_v0 = CScene__GetRegionInfo(&gScene, temp_a1);
         if (temp_v0 != NULL) {
             return temp_v0->m_WaterHeight;
         }

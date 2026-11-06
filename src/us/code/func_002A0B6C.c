@@ -27,13 +27,13 @@ typedef struct {
     /* 0x0C */ s32 n;
 } MdctCtx;
 
-extern s16 D_800B8BB0;          /* IMDCT tables built */
-extern MdctCtx *D_80125A30;     /* FFT context */
-extern f32 D_80125030[128];     /* pre-twiddle cos */
-extern f32 D_80125230[128];     /* pre-twiddle sin */
-extern f32 D_80125430[128];     /* post-twiddle cos + sin */
-extern f32 D_80125630[128];     /* post-twiddle sin - cos */
-extern f32 D_80125830[128];     /* overlap state */
+extern s16 sAdecImdctReady;          /* IMDCT tables built */
+extern MdctCtx *sMdctFft;     /* FFT context */
+extern f32 sMdctPreCos[128];     /* pre-twiddle cos */
+extern f32 sMdctPreSin[128];     /* pre-twiddle sin */
+extern f32 sMdctPostCosPlusSin[128];     /* post-twiddle cos + sin */
+extern f32 sMdctPostSinMinusCos[128];     /* post-twiddle sin - cos */
+extern f32 sAdecOverlap[128];     /* overlap state */
 
 extern void mdctInitTwiddles(void);                    /* mdctInitTwiddles */
 extern MdctCtx *mdctFftInit(s32 n);               /* mdctFftInit */
@@ -90,25 +90,25 @@ void adecImdctFrame(s16 *out, AdecStream *st) {
     f32 deq[256];
     s16 k;
     f32 scale;
-    if (D_800B8BB0 == 0) {
+    if (sAdecImdctReady == 0) {
         mdctInitTwiddles();
-        D_80125A30 = mdctFftInit(0x80);
-        D_800B8BB0 = 1;
+        sMdctFft = mdctFftInit(0x80);
+        sAdecImdctReady = 1;
     }
     scale = 23170.475f;
     adecDequantize(deq, st->band);
     mdctPackSpectrum((AdecCpx *)buf, deq);
-    mdctTwiddleMul((AdecCpx *)buf, D_80125030, D_80125230);
-    mdctFftCtx(buf, D_80125A30, -1);
-    mdctTwiddleMul((AdecCpx *)buf, D_80125430, D_80125630);
+    mdctTwiddleMul((AdecCpx *)buf, sMdctPreCos, sMdctPreSin);
+    mdctFftCtx(buf, sMdctFft, -1);
+    mdctTwiddleMul((AdecCpx *)buf, sMdctPostCosPlusSin, sMdctPostSinMinusCos);
     for (k = 0; k < 128; k++) {
-        f32 ov = D_80125830[k];
-        f32 cc = D_80125030[k];
+        f32 ov = sAdecOverlap[k];
+        f32 cc = sMdctPreCos[k];
         f32 im = buf[k * 2 + 1];
-        f32 ss = D_80125230[k];
+        f32 ss = sMdctPreSin[k];
         f32 t1 = ov * cc + im * ss;
         f32 t2 = ov * ss - im * cc;
-        D_80125830[k] = buf[k * 2];
+        sAdecOverlap[k] = buf[k * 2];
         out[k * 2] = adecRoundClampS16(scale * t1);
         out[255 - k * 2] = adecRoundClampS16(scale * t2);
     }

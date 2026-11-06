@@ -31,21 +31,21 @@ typedef struct Handle {
     void *data;
 } Handle;
 
-extern CVector3 D_80119928;
-extern s32 D_80119948;
+extern CVector3 gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos;
+extern s32 gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion;
 
-extern CPlayer *D_80119874;
-extern s32 D_80119878;
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_Players;
+extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;
 
 extern s32 ProPackDecompress(Handle **handle, s32);
-extern s32 CScene__GetRegion(CWorld *world, s32);
+extern s32 CScene__GetRegion(CScene *world, s32);
 extern Handle *CCache__AllocateMemoryForDecompression(s32, Handle **handle, s32 size);
 extern void CUSet__Transpose(LevelNode *node, void *data, s32);
-extern s32 CScene__FindNearestWarpDest(CWorld *world, CVector3 *pos, s32 group, void *info);
-extern s32 CScene__FindWarpDests(CWorld *world, s32 group, s32 key, CWarpPoint *out, s32 max);
-extern s32 *CScene__GetIntelligence(CWorld *world, u16 id);
+extern s32 CScene__FindNearestWarpDest(CScene *world, CVector3 *pos, s32 group, void *info);
+extern s32 CScene__FindWarpDests(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
+extern s32 *CScene__GetIntelligence(CScene *world, u16 id);
 extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, LevelRecord *rec, s32 mode, s32 index);
-extern s32 CScene__FindRegionAt(CWorld *world, CVector3 *pos);
+extern s32 CScene__FindRegionAt(CScene *world, CVector3 *pos);
 extern void Angle_Wrap(f32 *angle);
 extern void CPlayer__SetupActors(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00267DBC(CGameObjectInstance *obj);
@@ -58,7 +58,7 @@ extern void CCache__DeallocAndReplaceCompressedData(s32, Handle **handle, Handle
    the same definition. The spawn point is indexed afresh on each use and the position copied with
    memcpy (as in Rage Wars): both set loop.c's insn count and giv benefits, which decide the ROM's
    hoisting of the spawns base and of the angle constants. */
-void CScene__DecompressAnimatedInstances(CWorld *world, Handle **handle) {
+void CScene__DecompressAnimatedInstances(CScene *world, Handle **handle) {
     CWarpPoint spawns[4];
     CGameObjectInstance *objects;
     s32 mode;
@@ -130,11 +130,11 @@ void CScene__DecompressAnimatedInstances(CWorld *world, Handle **handle) {
                     continue;
                 }
                 world->m_nFirstActor++;
-                memcpy(&D_80119928, &rec->pos, sizeof(CVector3));
-                D_80119928.y += 204.79999f;
-                D_80119948 = CScene__FindRegionAt(world, &rec->pos);
-                for (playerIndex = 0; playerIndex < D_80119878; playerIndex++) {
-                    player = &D_80119874[playerIndex];
+                memcpy(&gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos, &rec->pos, sizeof(CVector3));
+                gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos.y += 204.79999f;
+                gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion = CScene__FindRegionAt(world, &rec->pos);
+                for (playerIndex = 0; playerIndex < gEngineApp_m_Game_m_PlayerList_m_nPlayers; playerIndex++) {
+                    player = &gEngineApp_m_Game_m_PlayerList_m_Players[playerIndex];
                     if (nspawns != 0) {
                         rec->spawnId = spawns[spawnIndex].m_nID;
                         Angle_Wrap(&spawns[spawnIndex].m_RotY);

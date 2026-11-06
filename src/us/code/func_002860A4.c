@@ -1,10 +1,10 @@
 #include "common.h"
 
-extern s32 D_800C2030;              /* screen width */
-extern s32 D_800C2034;              /* screen height */
-extern s32 D_800F6CA0;              /* first credits line on screen */
-extern f32 D_8011F120;              /* scroll position of that line */
-extern char *D_800B66DC[];          /* credits lines */
+extern s32 gScreenWidth;              /* screen width */
+extern s32 gScreenHeight;              /* screen height */
+extern s32 sCreditsLine;              /* first credits line on screen */
+extern f32 gCreditsScroll;              /* scroll position of that line */
+extern char *gCreditsLines[];          /* credits lines */
 
 extern void COnScreen__BeginText(void);
 extern void COnScreen__SelectTinyFont(void);
@@ -23,13 +23,13 @@ void Credits_Draw(void) {
     char *text;
     s32 a;
 
-    line = D_800F6CA0;
-    y = D_8011F120;
+    line = sCreditsLine;
+    y = gCreditsScroll;
     COnScreen__BeginText();
     COnScreen__SelectTinyFont();
     COnScreen__SetFontScale(1.0f, 1.0f);
     do {
-        text = D_800B66DC[line];
+        text = gCreditsLines[line];
         if (text != NULL) {
             alpha = MIN(MAX(y, 0.0f), 16.0f) * 16.0f;
             if (alpha > 255.0f) {
@@ -38,11 +38,11 @@ void Credits_Draw(void) {
             a = alpha;
             COnScreen__SetFontColor(0xFF, 0xFF, 0xFF, a, a, a);
             if (y >= 0.0f) {
-                COnScreen__DrawTextShadowed(text, (D_800C2030 * 14) / 284, (s32)y, D_800C2030 * 0.0028169014f,
-                              D_800C2034 * 0.0045045046f, 1, a, 4);
+                COnScreen__DrawTextShadowed(text, (gScreenWidth * 14) / 284, (s32)y, gScreenWidth * 0.0028169014f,
+                              gScreenHeight * 0.0045045046f, 1, a, 4);
             }
             line++;
         }
-        y += D_800C2034 * 0.045045048f;
-    } while (y <= D_800C2034);
+        y += gScreenHeight * 0.045045048f;
+    } while (y <= gScreenHeight);
 }

@@ -9,7 +9,7 @@ typedef struct PathNode {
     /* 0x08 */ s32 count;
 } PathNode;
 
-/* The path search state, kept on the stack and reached through D_800F1A48. */
+/* The path search state, kept on the stack and reached through sPathSearch. */
 typedef struct PathSearch {
     /* 0x000 */ CGameObjectInstance *obj;
     /* 0x004 */ CGameRegion *startRegion;
@@ -31,8 +31,8 @@ typedef struct PathSearch {
     /* 0xA44 */ s32 unkA44;
 } PathSearch; /* size 0xA48 */
 
-extern u32 D_800B6D20;
-extern PathSearch *D_800F1A48;
+extern u32 gFrameCountGameplay;
+extern PathSearch *sPathSearch;
 
 void CGameRegion__GetCentroid(CGameRegion *region, CVector3 *centre);
 void BoundingRect_AddPoints(f32 *bounds, s32 count, CVector3 *points);
@@ -62,37 +62,37 @@ s32 Path_FindRegionPath(CGameObjectInstance *obj, CVector3 goal, CGameRegion *go
         i = 0;
     } while (0);
     s = &search;
-    D_800F1A48 = s;
+    sPathSearch = s;
     pos = obj->header.m_vPos;
     search.obj = obj;
     s->startRegion = region;
     search.startPos = pos;
-    D_800F1A48->goalRegion = goalRegion;
-    D_800F1A48->goalPos = goal;
-    D_800F1A48->poolNext = D_800F1A48->pool;
-    D_800F1A48->unk998 = 0;
-    D_800F1A48->path = NULL;
-    D_800F1A48->bounds[0] = obj->header.m_vPos.x - 5120.0f;
-    D_800F1A48->bounds[2] = obj->header.m_vPos.x + 5120.0f;
-    D_800F1A48->bounds[1] = obj->header.m_vPos.z - 5120.0f;
-    D_800F1A48->bounds[3] = obj->header.m_vPos.z + 5120.0f;
+    sPathSearch->goalRegion = goalRegion;
+    sPathSearch->goalPos = goal;
+    sPathSearch->poolNext = sPathSearch->pool;
+    sPathSearch->unk998 = 0;
+    sPathSearch->path = NULL;
+    sPathSearch->bounds[0] = obj->header.m_vPos.x - 5120.0f;
+    sPathSearch->bounds[2] = obj->header.m_vPos.x + 5120.0f;
+    sPathSearch->bounds[1] = obj->header.m_vPos.z - 5120.0f;
+    sPathSearch->bounds[3] = obj->header.m_vPos.z + 5120.0f;
     do {
-        BoundingRect_AddPoints(D_800F1A48->bounds, 1, region->m_pVertices[i]);
+        BoundingRect_AddPoints(sPathSearch->bounds, 1, region->m_pVertices[i]);
         i++;
     } while (i < 3);
-    D_800F1A48->obj2 = obj;
-    D_800F1A48->arg = arg;
-    D_800F1A48->goalPos2 = goal;
-    D_800F1A48->unkA3C = 0;
-    D_800F1A48->unkA40 = 1;
-    Path_ExpandNode(0, D_800F1A48->goalRegion);
-    CGameRegion__ClearVisited(D_800F1A48->goalRegion);
-    node = D_800F1A48->path;
+    sPathSearch->obj2 = obj;
+    sPathSearch->arg = arg;
+    sPathSearch->goalPos2 = goal;
+    sPathSearch->unkA3C = 0;
+    sPathSearch->unkA40 = 1;
+    Path_ExpandNode(0, sPathSearch->goalRegion);
+    CGameRegion__ClearVisited(sPathSearch->goalRegion);
+    node = sPathSearch->path;
     if (node == NULL) {
         return 0;
     }
     if (node->count >= 3) {
-        i = (D_800B6D20 >> 4) & 1;
+        i = (gFrameCountGameplay >> 4) & 1;
         for (; i != -1; i--) {
             if (node->next != NULL) {
                 node = node->next;

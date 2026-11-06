@@ -14,14 +14,14 @@ typedef struct {
 
 #define MQ_IS_FULL(mq) ((mq)->validCount >= (mq)->msgCount)
 
-extern __OSEventState D_801229E0; /* __osEventStateTab[OS_EVENT_PI] */
-extern OSThread *D_800B8918;      /* __osRunQueue */
+extern __OSEventState __osPiEventState; /* __osEventStateTab[OS_EVENT_PI] */
+extern OSThread *__osRunQueue;      /* __osRunQueue */
 
 extern void __osEnqueueThread(OSThread **queue, OSThread *thread);
 extern OSThread *__osPopThread(OSThread **queue);
 
 void __osLeoResume(void) {
-    __OSEventState *es = &D_801229E0;
+    __OSEventState *es = &__osPiEventState;
     OSMesgQueue *mq = es->messageQueue;
     s32 last;
 
@@ -34,6 +34,6 @@ void __osLeoResume(void) {
     mq->validCount++;
 
     if (mq->mtqueue->next != NULL) {
-        __osEnqueueThread(&D_800B8918, __osPopThread(&mq->mtqueue));
+        __osEnqueueThread(&__osRunQueue, __osPopThread(&mq->mtqueue));
     }
 }

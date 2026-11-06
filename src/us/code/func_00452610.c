@@ -9,12 +9,12 @@ struct ObjRecAt20V2 {
     char *unk20;
 };
 
-extern CPlayerOptions D_8011AB18;
-extern signed char D_8011AB47;
-extern s32 D_801308F8;
+extern CPlayerOptions gEngineApp_m_Settings_defaultSlot;
+extern signed char gEngineApp_m_Settings_defaultSlot_m_nController;
+extern s32 gInSinglePlayerMenu;
 extern s32 Controller_ConfirmPressed(char *);
 extern void Music_RestoreVolume(void);
-extern void func_00430374(void *, s32);
+extern void func_00469374(void *, s32);
 
 void TitleMenu_Single_2(void *arg0, struct ObjRecAt20V2 *menu) {
     GameSettings *globals;
@@ -22,25 +22,25 @@ void TitleMenu_Single_2(void *arg0, struct ObjRecAt20V2 *menu) {
     ControllerProfile *profile;
     s32 on;
     s32 i;
-    globals = &D_8011AAD8;
+    globals = &gEngineApp_m_Settings;
     globals->multiplayer = 0;
     globals->playerCount = 1;
     for (i = 3; i >= 0; i--) {
         globals->slots[i].m_bActive = 0;
     }
     i = 0;
-    settings = &D_8011AB18;
+    settings = &gEngineApp_m_Settings_defaultSlot;
     on = 1;
-    for (profile = D_800F5EC0; i < 4; i++) {
+    for (profile = gControllers; i < 4; i++) {
         if (Controller_ConfirmPressed(profile) != 0) {
             settings->m_bActive = on;
-            D_8011AB47 = i;
+            gEngineApp_m_Settings_defaultSlot_m_nController = i;
             menu->unk20 = profile;
             break;
         }
         profile++;
     }
     Music_RestoreVolume();
-    func_00430374(&D_800F6CB0, -1);
-    D_801308F8 = 1;
+    func_00469374(&gEngineApp, -1);
+    gInSinglePlayerMenu = 1;
 }

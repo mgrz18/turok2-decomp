@@ -12,8 +12,8 @@ s32 osSendMesg(s32, s32, s32);
 s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 
-extern s32 D_800D8DB0;
-extern s32 D_800D8DCC;
+extern s32 gCache_mutex;
+extern s32 gCache_mutex_count;
 
 void CCache__ReleaseAndReplaceData(s32 arg0, CacheRefs *arg1, CMemEntry *arg2) {
     s32 temp_a0;
@@ -26,11 +26,11 @@ void CCache__ReleaseAndReplaceData(s32 arg0, CacheRefs *arg1, CMemEntry *arg2) {
     CMemEntry *temp_a0_3;
 
     temp_a0 = __osDisableInt();
-    temp_v1 = D_800D8DCC + 1;
-    D_800D8DCC = temp_v1;
+    temp_v1 = gCache_mutex_count + 1;
+    gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg((s32) &D_800D8DB0, 0, 1);
+        osRecvMesg((s32) &gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
@@ -52,11 +52,11 @@ void CCache__ReleaseAndReplaceData(s32 arg0, CacheRefs *arg1, CMemEntry *arg2) {
     }
     arg1->first = arg2;
     temp_v0_3 = __osDisableInt();
-    temp_v1_2 = D_800D8DCC - 1;
-    D_800D8DCC = temp_v1_2;
+    temp_v1_2 = gCache_mutex_count - 1;
+    gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0_3);
-        osSendMesg((s32) &D_800D8DB0, 0, 1);
+        osSendMesg((s32) &gCache_mutex, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0_3);

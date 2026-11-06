@@ -2,18 +2,18 @@
 #include "common.h"
 #include "structs/pak.h"
 
-extern u8 D_800C222C[];  /* pak font code -> character */
-extern u8 D_800F6750;
+extern u8 gPakCharTable[];  /* pak font code -> character */
+extern u8 gPakQueueState;
 
 extern void Controller_Lock(s32);
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size); /* memcpy */
 /* osPfsAllocateFile, osPfsReadWriteFile, osPfsDeleteFile and the directory refresh, at this module's link addresses */
-extern s32 func_004270A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 size, s32 *file_no);
-extern s32 func_00428C10(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
-extern s32 func_004276A0(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name);
-extern s32 func_00425808(s32 ch);
+extern s32 osPfsAllocateFile_2(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name, s32 size, s32 *file_no);
+extern s32 osPfsReadWriteFile_2(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+extern s32 osPfsDeleteFile_2(OSPfs *pfs, u16 company_code, u32 game_code, u8 *game_name, u8 *ext_name);
+extern s32 Pak_Mount_2(s32 ch);
 
 static __inline__ s32 ToUpper(s32 c) {
     if (c - 'a' < 26U) {
@@ -30,7 +30,7 @@ static __inline__ void EncodePakText(u8 *dst, u8 *src, s32 n) {
     for (i = 0; i < n; i++) {
         src[i] = ToUpper(src[i]);
         for (j = 0; j < 0x42; j++) {
-            if (src[i] == D_800C222C[j]) {
+            if (src[i] == gPakCharTable[j]) {
                 dst[i] = j;
                 break;
             }
@@ -51,34 +51,34 @@ s32 Pak_WriteNote_2(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u
     OSPfs *pfs;
     s32 offset;
 
-    if (D_80130C60[ch] != 3) {
+    if (gPakState[ch] != 3) {
         return -2;
     }
     Controller_Lock(1);
     Controller_ReadAll();
-    result = D_80130C70[ch];
-    D_800F6750 = 2;
+    result = gPakError[ch];
+    gPakQueueState = 2;
     if (result == 0) {
         EncodePakText(ext, ext_name, 4);
         size = (size + 0xFF) & ~0xFF;
         func_0029E460(name, game_name, 16);
         EncodePakText(name, game_name, 16);
-        pfs = &D_80130C80[ch];
+        pfs = &gPakFileSystems[ch];
         company_code = (company[0] << 8) | company[1];
         game_code = (code[0] << 24) | (code[1] << 16) | (code[2] << 8) | code[3];
-        result = func_004270A0(pfs, company_code, game_code, name, ext, size, file_no);
+        result = osPfsAllocateFile_2(pfs, company_code, game_code, name, ext, size, file_no);
         if (result != 0) {
             result = -1;
         }
         offset = 0;
         if (result == 0) {
-            result = func_00428C10(pfs, *file_no, 1, offset, size, data);
+            result = osPfsReadWriteFile_2(pfs, *file_no, 1, offset, size, data);
             if (result != 0) {
-                func_004276A0(pfs, company_code, game_code, name, ext);
+                osPfsDeleteFile_2(pfs, company_code, game_code, name, ext);
                 result = -1;
             }
         }
-        func_00425808(ch);
+        Pak_Mount_2(ch);
     }
     Controller_Unlock();
     return result;

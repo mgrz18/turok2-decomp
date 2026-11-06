@@ -9,21 +9,21 @@ typedef struct {
     /* 0x34 */ s32 tagMode;
 } MatchState;
 
-/* The globals from D_80119E2C: a menu pool first. */
+/* The globals from gEngineApp_m_Game_m_MenuPool: a menu pool first. */
 typedef struct {
     /* 0x000 */ void *menus;            /* CMenuPool */
     /* 0x004 */ u8 pad4[0xCC5 - 4];
-    /* 0xCC5 */ u8 timed;               /* D_8011AAF1 */
+    /* 0xCC5 */ u8 timed;               /* gEngineApp_m_Settings_multiplayer */
     /* 0xCC6 */ u8 padCC6[0xE78 - 0xCC6];
-    /* 0xE78 */ s32 paused;             /* D_8011ACA4 */
+    /* 0xE78 */ s32 paused;             /* gEngineApp_m_Settings_paused */
     /* 0xE7C */ u8 padE7C[0xE84 - 0xE7C];
-    /* 0xE84 */ MatchState match;       /* D_8011ACB0 */
+    /* 0xE84 */ MatchState match;       /* gEngineApp_m_Settings_match */
 } Globals;
 
 typedef struct PlayerList PlayerList;
 
-extern Globals D_80119E2C;
-extern f32 D_800B6D28;          /* frame time scale */
+extern Globals gEngineApp_m_Game_m_MenuPool;
+extern f32 gFrameIncrement;          /* frame time scale */
 
 extern s32 MenuPool_CountOpen(void *menuPool);
 extern s32 CPlayerPool__CountIdleMenus(PlayerList *list);
@@ -33,22 +33,22 @@ extern void CPlayerPool__EndMatch(PlayerList *list);
 /* Run the match clock and end the match when the time is up or, outside tag
  * mode, when the frag limit is reached. Not while a menu is open. */
 void CPlayerPool__UpdateMatchClock(PlayerList *list) {
-    MatchState *match = &D_80119E2C.match;
+    MatchState *match = &gEngineApp_m_Game_m_MenuPool.match;
     Globals *g;
 
-    if (match->over || !D_80119E2C.timed) {
+    if (match->over || !gEngineApp_m_Game_m_MenuPool.timed) {
         return;
     }
-    if (!MenuPool_CountOpen(&D_80119E2C) && match->timeLeft > 0.0f && !D_80119E2C.paused) {
+    if (!MenuPool_CountOpen(&gEngineApp_m_Game_m_MenuPool) && match->timeLeft > 0.0f && !gEngineApp_m_Game_m_MenuPool.paused) {
         if (CPlayerPool__CountIdleMenus(list)) {
-            match->timeLeft -= D_800B6D28;
+            match->timeLeft -= gFrameIncrement;
         }
         if (match->timeLeft <= 0.0f && !match->over) {
             match->timeLeft = 0.0f;
             CPlayerPool__EndMatch(list);
         }
     }
-    g = &D_80119E2C;
+    g = &gEngineApp_m_Game_m_MenuPool;
     if (!MenuPool_CountOpen(g) && CPlayerPool__IsFragLimitReached(list)) {
         MatchState *m = &g->match;
 

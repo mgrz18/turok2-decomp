@@ -5,7 +5,7 @@
 typedef unsigned long u32;
 typedef long s32;
 typedef volatile unsigned long vu32;
-extern void *D_80000308;
+extern void *osRomBase;
 extern u32 osVirtualToPhysical(void *);
 s32 osPiRawStartDma(s32, u32 , void *, u32 );
 #ident "$Revision: 1.17 $"
@@ -13,7 +13,7 @@ s32 osPiRawStartDma(s32 direction, u32 devAddr, void* dramAddr, u32 size) {
     register u32 stat;
     { stat = (*(vu32*)((u32)((0x04600000 + 0x10))|0xA0000000)); while (stat & ((1 << 1) | (1 << 0))) stat = (*(vu32*)((u32)((0x04600000 + 0x10))|0xA0000000)); } (void)0;
     (*(vu32*)((u32)((0x04600000 + 0x00))|0xA0000000)=(u32)(osVirtualToPhysical(dramAddr)));
-    (*(vu32*)((u32)((0x04600000 + 0x04))|0xA0000000)=(u32)(((u32)((u32)D_80000308 | devAddr)&0x1FFFFFFF)));
+    (*(vu32*)((u32)((0x04600000 + 0x04))|0xA0000000)=(u32)(((u32)((u32)osRomBase | devAddr)&0x1FFFFFFF)));
     switch (direction) {
         case 0:
             (*(vu32*)((u32)((0x04600000 + 0x0C))|0xA0000000)=(u32)(size - 1));

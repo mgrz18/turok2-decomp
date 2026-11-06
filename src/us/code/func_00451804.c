@@ -2,10 +2,10 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-extern s32 D_800C1EA8;     /* the speed setting, 0-15 */
-extern f32 D_00438824[];   /* speed per setting */
+extern s32 gMpPlayerSpeed;     /* the speed setting, 0-15 */
+extern f32 sPlayerSpeedTable_scale_2[];   /* speed per setting */
 
-s32 Menu_StepValue(Menu *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
+s32 Menu_StepValue_2(Menu *menu, s32 value, s32 step, s32 minimum, s32 maximum, s32 wrap);
 s32 Controller_MenuRight(s32 controller);
 s32 Controller_ConfirmPressed(s32 controller);
 
@@ -16,12 +16,12 @@ s32 Controller_ConfirmPressed(s32 controller);
 s32 MpMenu_StepPlayerSpeed_2(void *item, Menu *menu) {
     f32 speed;
 
-    D_800C1EA8 = Menu_StepValue(menu, D_800C1EA8, 1, 0, 15, 0);
+    gMpPlayerSpeed = Menu_StepValue_2(menu, gMpPlayerSpeed, 1, 0, 15, 0);
     if (Controller_MenuRight(menu->controller) || Controller_ConfirmPressed(menu->controller)) {
-        Menu_StepValue(menu, D_800C1EA8, 1, 0, 15, 0);
+        Menu_StepValue_2(menu, gMpPlayerSpeed, 1, 0, 15, 0);
     }
-    speed = D_00438824[D_800C1EA8] + 1.0f;
+    speed = sPlayerSpeedTable_scale_2[gMpPlayerSpeed] + 1.0f;
     speed = MIN(MAX(speed, 0.5f), 2.0f);
-    D_8011AAD8.speed = speed;
+    gEngineApp_m_Settings.speed = speed;
     return 0;
 }

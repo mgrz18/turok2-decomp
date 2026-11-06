@@ -10,24 +10,24 @@ typedef struct List {
     u8 items[1];                /* 0x08 */
 } List;
 
-extern s32 D_8011AAE0;          /* visible layers */
-extern s32 D_800ACADC;
-extern CBox D_800F5A10;       /* visible bounds */
+extern s32 gEngineApp_m_Settings_difficulty;          /* visible layers */
+extern s32 gLitVerticesKeyChanged;
+extern CBox gCameraVisibleBox;       /* visible bounds */
 
 void *CISet__GetBlock(void *table, s32 index);
 void CStaticObject__TouchLitVertices(CStaticObject *inst);
 s32 GameObject_IsSolid(CStaticObject *inst);
 f32 GameObject_GetCollisionHeight(CLevelActor *actor);
-void CScene__GetLightsAt(CWorld *world, CVector3 *pos, void *out);
+void CScene__GetLightsAt(CScene *world, CVector3 *pos, void *out);
 void CLevelActor__Update(CLevelActor *actor);
-void CLevelActorPool__CollectVisible(void *arg0, CWorld *world);
+void CLevelActorPool__CollectVisible(void *arg0, CScene *world);
 
 /* Collects the instances and actors of the loaded sections inside the visible bounds. */
-void CScene__CollectSectorObjects(CWorld *world) {
+void CScene__CollectSectorObjects(CScene *world) {
     CVector3 pos;
     s32 regionCount;
     void *data;
-    CWorldSector *regions;
+    CSceneSector *regions;
     List *list;
     CStaticObject *inst;
     CStaticObject *insts;
@@ -41,7 +41,7 @@ void CScene__CollectSectorObjects(CWorld *world) {
 
     i = 0;
     regionCount = world->m_nSectors;
-    layers = D_8011AAE0;
+    layers = gEngineApp_m_Settings_difficulty;
     regions = world->m_Sectors;
     for (; i < regionCount; i++) {
         data = *regions[i].m_hData;
@@ -54,9 +54,9 @@ void CScene__CollectSectorObjects(CWorld *world) {
             if (!(inst->header.m_pIntelligence->m_dwFlags & layers)) {
                 continue;
             }
-            if (D_800F5A10.m_vMax.x > inst->m_Bounds.m_vMin.x && D_800F5A10.m_vMin.x < inst->m_Bounds.m_vMax.x
-                && D_800F5A10.m_vMax.z > inst->m_Bounds.m_vMin.z && D_800F5A10.m_vMin.z < inst->m_Bounds.m_vMax.z
-                && D_800F5A10.m_vMax.y > inst->m_Bounds.m_vMin.y && D_800F5A10.m_vMin.y < inst->m_Bounds.m_vMax.y) {
+            if (gCameraVisibleBox.m_vMax.x > inst->m_Bounds.m_vMin.x && gCameraVisibleBox.m_vMin.x < inst->m_Bounds.m_vMax.x
+                && gCameraVisibleBox.m_vMax.z > inst->m_Bounds.m_vMin.z && gCameraVisibleBox.m_vMin.z < inst->m_Bounds.m_vMax.z
+                && gCameraVisibleBox.m_vMax.y > inst->m_Bounds.m_vMin.y && gCameraVisibleBox.m_vMin.y < inst->m_Bounds.m_vMax.y) {
                 CStaticObject__TouchLitVertices(inst);
                 if (GameObject_IsSolid(inst) && world->m_nDrawActors != 0x200) {
                     world->m_pDrawActors[world->m_nDrawActors++] = (CGameObjectInstance *)inst;
@@ -75,15 +75,15 @@ void CScene__CollectSectorObjects(CWorld *world) {
             if (actor->m_wFlags & 0x41) {
                 continue;
             }
-            if (D_800ACADC != 0) {
+            if (gLitVerticesKeyChanged != 0) {
                 pos.x = actor->header.m_vPos.x;
                 pos.y = actor->header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
                 pos.z = actor->header.m_vPos.z;
                 CScene__GetLightsAt(world, &pos, actor->m_Lights);
             }
-            if (D_800F5A10.m_vMax.x > actor->m_Bounds.m_vMin.x && D_800F5A10.m_vMin.x < actor->m_Bounds.m_vMax.x
-                && D_800F5A10.m_vMax.z > actor->m_Bounds.m_vMin.z && D_800F5A10.m_vMin.z < actor->m_Bounds.m_vMax.z
-                && D_800F5A10.m_vMax.y > actor->m_Bounds.m_vMin.y && D_800F5A10.m_vMin.y < actor->m_Bounds.m_vMax.y) {
+            if (gCameraVisibleBox.m_vMax.x > actor->m_Bounds.m_vMin.x && gCameraVisibleBox.m_vMin.x < actor->m_Bounds.m_vMax.x
+                && gCameraVisibleBox.m_vMax.z > actor->m_Bounds.m_vMin.z && gCameraVisibleBox.m_vMin.z < actor->m_Bounds.m_vMax.z
+                && gCameraVisibleBox.m_vMax.y > actor->m_Bounds.m_vMin.y && gCameraVisibleBox.m_vMin.y < actor->m_Bounds.m_vMax.y) {
                 CLevelActor__Update(actor);
                 if (world->m_nDrawActors != 0x200) {
                     world->m_pDrawActors[world->m_nDrawActors++] = (CGameObjectInstance *)actor;

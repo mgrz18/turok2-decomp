@@ -6,7 +6,7 @@
 extern s32 Menu_StepValue(void *c, s32 value, s32 step, s32 min, s32 max, s32 wrap);
 
 s32 OptionsMenu_StepBrightness(s32 menu, void *c) {
-    GameSettings *s = &D_8011AAD8;
+    GameSettings *s = &gEngineApp_m_Settings;
 
     s->unkC = Menu_StepValue(c, s->unkC, 0x10, 0, 0x80, 0);
     return 0;

@@ -35,9 +35,9 @@ void VM_Age(void) {
         var_a1 += 1;
         var_a0 = (__typeof__(var_a0))((s8 *)var_a0 + 0x10);
     } while (var_a1 < 0x18);
-    var_v1 = &D_80121378;
+    var_v1 = &gPager_regions;
     var_a0_2 = 0;
-    if (&D_80121378 != NULL) {
+    if (&gPager_regions != NULL) {
         do {
             temp_v0 = var_v1->pages;
             var_v1 = var_v1->next;
@@ -47,5 +47,5 @@ void VM_Age(void) {
     *(s32 *)((s8 *)&D_801206BC + 0) = var_a0_2;     /* total pages << 12 */
     *(s32 *)((s8 *)&D_801206BC - 0xC) = var_a2;   /* largest counter */
     *(s32 *)((s8 *)&D_801206BC - 0x8) = var_a3;   /* smallest counter */
-    *(s32 *)((s8 *)&D_801206BC - 0x4) = FIELD_AT(D_80121290, s32, PageMapping, age);
+    *(s32 *)((s8 *)&D_801206BC - 0x4) = FIELD_AT(gPager_chain_head, s32, PageMapping, age);
 }

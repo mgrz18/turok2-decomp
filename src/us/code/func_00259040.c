@@ -21,5 +21,5 @@ void WeaponMode_AE634_Enter(CGameObjectInstance *obj, CAI *ai) {
     CPlayer__FireWeapon((s32) obj->m_AI.m_pParent, 0x12B);
     CPlayer__StartWeaponBackgroundSound(temp_s1, 0x1A5);
     CPlayer__StartWeaponFiringSound(temp_s1, 0x1A7);
-    *(f32 *) &ai->m_VarBuffer[3] = D_800AF618[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A72C8.scale;
+    *(f32 *) &ai->m_VarBuffer[3] = gWeaponInfoTable[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A72C8.scale;
 }

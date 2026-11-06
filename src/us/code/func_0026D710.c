@@ -24,7 +24,7 @@ typedef struct {
     s8 countRange;
 } __attribute__((aligned(4))) PuffArgs;
 
-extern u8 D_800F8928[];
+extern u8 gScene_m_ParticleSystem[];
 
 extern u8 *CISet__GetBlock(void *list, s32 index);
 extern void CMtxF__TransformPoint(CMtxF *mtx, CVector3 *in, CVector3 *out);
@@ -77,9 +77,9 @@ void GameObject_EmitHotPoints(Attachment *ents, s32 n, CMtxF *mtxs, CGameObjectI
                     zero.y = 0;
                     zero.z = 0;
                     if (obj->m_AI.m_ModeTime < 15.0f) {
-                        CParticleSystem__Spawn(D_800F8928, obj, obj, 0, 0, 0xE6, zero, rot, mapped, region, -1, flag | 1);
+                        CParticleSystem__Spawn(gScene_m_ParticleSystem, obj, obj, 0, 0, 0xE6, zero, rot, mapped, region, -1, flag | 1);
                     }
-                    CParticleSystem__Spawn(D_800F8928, obj, obj, 0, 0, 0x8A, zero, rot, mapped, region, -1, flag | 1);
+                    CParticleSystem__Spawn(gScene_m_ParticleSystem, obj, obj, 0, 0, 0x8A, zero, rot, mapped, region, -1, flag | 1);
                 }
                 break;
             case 0x80:

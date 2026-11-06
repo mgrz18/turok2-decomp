@@ -15,8 +15,8 @@ typedef struct {
     /* 0x531 */ u8 m_FlashFade;
 } Screen;
 
-extern f32 D_800B6D28;          /* frame time scale */
-extern u8 D_800F6CB0[];
+extern f32 gFrameIncrement;          /* frame time scale */
+extern u8 gEngineApp[];
 
 void CEngineApp__DrawFilledRect(void *, Color32 *, s32, s32, s32, s32);
 
@@ -25,7 +25,7 @@ void CCamera__DrawHitFlash(Screen *scr) {
     Color32 color;
 
     if (scr->m_FlashAlpha > scr->m_FlashFade) {
-        scr->m_FlashAlpha -= (u32)(scr->m_FlashFade * D_800B6D28);
+        scr->m_FlashAlpha -= (u32)(scr->m_FlashFade * gFrameIncrement);
     } else {
         scr->m_FlashAlpha = 0;
     }
@@ -34,7 +34,7 @@ void CCamera__DrawHitFlash(Screen *scr) {
         color.g = 0;
         color.b = 0;
         color.a = scr->m_FlashAlpha;
-        CEngineApp__DrawFilledRect(D_800F6CB0, &color, scr->m_X, scr->m_Y,
+        CEngineApp__DrawFilledRect(gEngineApp, &color, scr->m_X, scr->m_Y,
                       scr->m_X + scr->m_Width, scr->m_Y + scr->m_Height);
     }
 }

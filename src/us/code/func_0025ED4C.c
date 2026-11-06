@@ -6,11 +6,11 @@ typedef struct {
     /* 0x4 */ f32 alphaMax;
 } FillAlpha;
 
-/* Draw override: fill mode, then the fill colour right after it (D_800AB8B0,
+/* Draw override: fill mode, then the fill colour right after it (gBlendState,
  * CBlendState in structs/light.h: through the struct this does not match). */
-extern s32 D_800AB8B0;
-#define sFillColor ((CVector3 *) (&D_800AB8B0 + 1))
-extern FillAlpha D_800AB8C0;
+extern s32 gBlendState;
+#define sFillColor ((CVector3 *) (&gBlendState + 1))
+extern FillAlpha gBlendFade;
 
 void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *obj, CAI *ai, s32 arg2);
 
@@ -32,10 +32,10 @@ void EnemyAI_DrawWithBlend(CGameObjectInstance *obj, CAI *ai, s32 arg2) {
             fade = (ai->m_ModeTime - 15.0f) * (1.0f / 75.0f);
         }
     }
-    D_800AB8B0 = 3;
-    alpha = &D_800AB8C0;
+    gBlendState = 3;
+    alpha = &gBlendFade;
     alpha->alphaMax = 255.0f;
     alpha->alpha = fade * 210.0f;
     CGameObjectInstance__DrawModelImmediate(obj, ai, arg2);
-    D_800AB8B0 = 0;
+    gBlendState = 0;
 }

@@ -3,7 +3,7 @@
 
 typedef signed short s16;
 typedef signed int s32;
-extern char D_800AD1B0;
+extern char sWeaponPickups;
 typedef struct Shared__struct_D_800D34C0_0x18 Shared__struct_D_800D34C0_0x18;
 struct Shared__struct_D_800D34C0_0x18 {
     char pad0[4];
@@ -18,7 +18,7 @@ void *Pickup_FindWeaponEntry(s32 arg0) {
     char *v1;
     s32 i;
     Shared__struct_D_800D34C0_0x18 *record;
-    v1 = &D_800AD1B0;
+    v1 = &sWeaponPickups;
     i = 0x1E;
     do {
         record = (Shared__struct_D_800D34C0_0x18 *)v1;

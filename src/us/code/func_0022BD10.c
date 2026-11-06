@@ -2,9 +2,9 @@
 #include "common.h"
 #include "structs/particle.h"
 
-extern s32 D_800F1DA4;
-extern CVector3 D_800F1DA8;
-extern s32 D_800F1DB4;
+extern s32 gCollisionResults_m_pWaterRegion;
+extern CVector3 gCollisionResults_m_vWaterPos;
+extern s32 gCollisionResults_m_nWaterKind;
 extern void ImpactEvent_Send(CParticle *, CParticle *, s32 effect, s32, CVector3 pos, CEventValue params);
 extern void CQuaternion__FromDirection(CQuaternion *out, CVector3 *dir);          /* rotation facing dir */
 extern void CParticleSystem__Spawn(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 type, CVector3 dir,
@@ -13,8 +13,8 @@ extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CParticleSystem__Free(void *sys, CParticle *p);
 extern void CParticle__StopLoopSound(CParticle *p);
-extern CVector3 D_800F1DB8;
-extern u8 D_800F8928[];
+extern CVector3 gCollisionResults_m_vVelocity;
+extern u8 gScene_m_ParticleSystem[];
 
 void CParticle__HitWater(CParticle *arg0) {
     CEventValue pair;
@@ -28,7 +28,7 @@ void CParticle__HitWater(CParticle *arg0) {
     s32 sound;
     CROMParticleEffect *desc;
 
-    switch (D_800F1DB4) {
+    switch (gCollisionResults_m_nWaterKind) {
     case 1:
     default:
         surface = 1;
@@ -49,24 +49,24 @@ void CParticle__HitWater(CParticle *arg0) {
     pair = events->m_ImpactEventValue[surface];
     sound = desc->m_pImpact->m_ImpactSoundType[index];
     if (effect != 0xFFFF) {
-        ImpactEvent_Send(arg0, arg0, effect, -1, D_800F1DA8, pair);
+        ImpactEvent_Send(arg0, arg0, effect, -1, gCollisionResults_m_vWaterPos, pair);
     }
     if (particle != 0xFFFF) {
         if ((arg0->m_pEffect->m_dwFlags & 0x10) != 0) {
-            position = D_800F1DB8;
+            position = gCollisionResults_m_vVelocity;
         } else {
             position = arg0->m_vVelocity;
         }
         CQuaternion__FromDirection(&rotation, &position);
-        CParticleSystem__Spawn(D_800F8928, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
-                      rotation, D_800F1DA8, (arg0->m_dwHitFlags & 0x1000000) ? 0 : D_800F1DA4, -5, (arg0->m_dwFlags & 0x200006) | 1);
+        CParticleSystem__Spawn(gScene_m_ParticleSystem, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
+                      rotation, gCollisionResults_m_vWaterPos, (arg0->m_dwHitFlags & 0x1000000) ? 0 : gCollisionResults_m_pWaterRegion, -5, (arg0->m_dwFlags & 0x200006) | 1);
     }
     if (sound != 0xFFFF) {
-        Sound__Play((s16)sound, D_800F1DA8, 0, -1);
+        Sound__Play((s16)sound, gCollisionResults_m_vWaterPos, 0, -1);
     }
     arg0->m_dwFlags |= 0x200;
     if ((arg0->m_pEffect->m_dwFlags & 0x20000) != 0) {
-        CParticleSystem__Free(D_800F8928, arg0);
+        CParticleSystem__Free(gScene_m_ParticleSystem, arg0);
         CParticle__StopLoopSound(arg0);
     }
 }

@@ -16,26 +16,26 @@ typedef struct {
 } DrawWorld;
 
 
-/* The global at D_80119870: what this reads of it. */
-extern f32 D_800B6D28;          /* the frame time step */
+/* The global at gEngineApp_m_Game: what this reads of it. */
+extern f32 gFrameIncrement;          /* the frame time step */
 
 void func_0021F1B4(DrawActor *actor);
 void CGameObjectInstance__UpdateAnimation(DrawActor *actor);
-void CPlayerPool__Update(CPlayerList *list);
-s32 CPlayerPool__CheckAllReady(CPlayerList *list);
+void CPlayerPool__Update(CPlayerPool *list);
+s32 CPlayerPool__CheckAllReady(CPlayerPool *list);
 void func_00430330(u8 *);
 s32 LoopSounds_Get(void);
 void LoopSounds_Update(s32);
 
 /* Draws one actor, keeping the frame time step. */
 static __inline__ void drawActor(DrawActor *actor) {
-    f32 step = D_800B6D28;
+    f32 step = gFrameIncrement;
 
     func_0021F1B4(actor);
     if (actor->flags & 0x2000) {
         CGameObjectInstance__UpdateAnimation(actor);
     }
-    D_800B6D28 = step;
+    gFrameIncrement = step;
 }
 /* Draws the leading run of type-2 actors, then the mode extras, then the rest.
  * One actor variable for both loops: its pseudo outlives the first loop, so
@@ -53,11 +53,11 @@ void CScene__AdvanceInstances(DrawWorld *world) {
         actor = actors[i++];
         drawActor(actor);
     }
-    if (D_80119870.m_Settings.mode == 13) {
-        CPlayerPool__Update(&D_80119870.m_PlayerList);
+    if (gEngineApp_m_Game.m_Settings.mode == 13) {
+        CPlayerPool__Update(&gEngineApp_m_Game.m_PlayerList);
     }
-    if (CPlayerPool__CheckAllReady(&D_80119870.m_PlayerList)) {
-        func_00430330(&D_800F6CB0);
+    if (CPlayerPool__CheckAllReady(&gEngineApp_m_Game.m_PlayerList)) {
+        func_00430330(&gEngineApp);
     }
     while (i < count) {
         actor = actors[i++];

@@ -17,9 +17,9 @@ typedef struct B01IoReq {
                s32 w18;
                OSMesgQueue *reply;
 } B01IoReq;
-extern s32 D_800BC304;
-extern OSMesgQueue D_80128370; /* request queue */
-extern OSMesgQueue D_80128540; /* reply queue (Turok 2) */
+extern s32 sHostIoState;
+extern OSMesgQueue sHostIoRequestQueue; /* request queue */
+extern OSMesgQueue sHostIoReplyQueue; /* reply queue (Turok 2) */
 s32 HostIo_DisableInt(void);
 void HostIo_RestoreInt(s32 mask);
 void HostIo_WriteBlock(u32 dst, u8 *src, u32 n);
@@ -30,7 +30,7 @@ s32 PCwrite(s32 arg, u8 *buf, u32 n) {
     s32 done = 0;
     s32 mask;
     u32 chunk;
-    if (D_800BC304 == 2) {
+    if (sHostIoState == 2) {
         while (n != 0) {
             chunk = n;
             if (chunk > 0x8000) {
@@ -43,9 +43,9 @@ s32 PCwrite(s32 arg, u8 *buf, u32 n) {
             req.w10 = arg;
             req.w14 = chunk;
             req.w18 = 0;
-            req.reply = &D_80128540;
-            osSendMesg(&D_80128370, &req, 1);
-            osRecvMesg(&D_80128540, (OSMesg *)&reply, 1);
+            req.reply = &sHostIoReplyQueue;
+            osSendMesg(&sHostIoRequestQueue, &req, 1);
+            osRecvMesg(&sHostIoReplyQueue, (OSMesg *)&reply, 1);
             if (reply == 0) {
                 return done;
             }

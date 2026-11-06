@@ -6,10 +6,10 @@
  * neighbours (the region graph the path search and the floor walks follow),
  * and the region attributes (CRegionInfo) the regions share by index.
  *
- * Both live in the level's region data (CWorld.m_pRegionData, see
+ * Both live in the level's region data (CScene.m_pRegionData, see
  * structs/world.h): section 0 holds the CRegionInfo table (0x64 each,
  * CScene__GetRegionInfo indexes it with m_nInfo), section 2 the regions (0x20 each),
- * section 3 the floor grid. D_800B2608 caches the region whose normal was
+ * section 3 the floor grid. sCachedRawNormalRegion caches the region whose normal was
  * computed last. Rage Wars has the same region (CGameRegion_t in its
  * COMMON/PACKED.H) with unnamed fields.
  * tools/check_structs.py checks every offset below with the game's compiler. */

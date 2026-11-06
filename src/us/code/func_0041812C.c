@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern void MenuPool_OpenChildMenu(void *, void *, void *);
-extern char D_00438670[];
+extern char gRumbleNoticeMenuDesc[];
 s32 PlayerSetupMenu_Play(void *first, void *second, void *third) {
-    MenuPool_OpenChildMenu(third, second, D_00438670);
+    MenuPool_OpenChildMenu(third, second, gRumbleNoticeMenuDesc);
     return 1;
 }

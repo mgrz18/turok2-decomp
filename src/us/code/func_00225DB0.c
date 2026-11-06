@@ -6,7 +6,7 @@
 #include "structs/world.h"
 s32 BinaryRange(s32 *ents, s32 n, s32 id, s32 *lo, s32 *hi);
 void Rumble_Start(s32 a, u8 *p, CVector3 v, f32 f, f32 g, s32 h);
-void CScene__StartRumbles(CWorld *lv, s32 a1, s32 id, CVector3 v, f32 f6, f32 f7) {
+void CScene__StartRumbles(CScene *lv, s32 a1, s32 id, CVector3 v, f32 f6, f32 f7) {
     s32 lo;
     s32 hi;
     s32 i;

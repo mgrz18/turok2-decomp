@@ -7,13 +7,13 @@
 #include "structs/controller.h"
 
 s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel);
-extern OSMesgQueue D_800F6798;
+extern OSMesgQueue gSiMessageQueue;
 s32 Pak_ProbeRumble_2(s32 ch) {
-    RumblePak *r = &D_80130AA0[ch];
-    if (D_800F6778[ch].errno != 0) {
+    RumblePak *r = &gRumblePaks[ch];
+    if (gContStatus[ch].errno != 0) {
         r->present = 0;
         return 0;
     }
-    r->present = osMotorInit(&D_800F6798, &r->pfs, ch) == 0;
+    r->present = osMotorInit(&gSiMessageQueue, &r->pfs, ch) == 0;
     return r->present;
 }

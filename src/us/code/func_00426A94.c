@@ -2,9 +2,9 @@
 #include "common.h"
 #include "structs/pak.h"
 
-extern void **D_800C2228;
-extern s32 D_800C2220;
-extern u8 D_800F6750;
+extern void **gPakStateBuffer;
+extern s32 gPakDirectoryAllocated;
+extern u8 gPakQueueState;
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
@@ -30,7 +30,7 @@ s32 Pak_FindFreeExtLetter(s32 ch, u8 *ext) {
     s32 i;
 
     used = 0;
-    if (D_80130C60[ch] != 3) {
+    if (gPakState[ch] != 3) {
         return -2;
     }
     for (i = 0; i < 16; i++) {

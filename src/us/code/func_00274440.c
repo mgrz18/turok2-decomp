@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern f32 D_800B2848[];
-#define TABLE (D_800B2848 + 1)
+extern f32 sSndVoiceRampStep[];
+#define TABLE (sSndVoiceRampStep + 1)
 
 /* Linear interpolation in a table sampled every 60 units from -6000. */
 f32 Sound_CentsToPitch(f32 x) {

@@ -25,9 +25,9 @@ typedef struct {
     /* 0x10 */ void *tree;
 } AdecHuffSeg;
 
-extern s16 D_800B8BAE;          /* first frame (raw header) done */
-extern AdecHuffSeg D_800B8C54[]; /* segment table */
-extern u16 D_80125010[16];      /* previous scale indices */
+extern s16 sAdecHeaderDone;          /* first frame (raw header) done */
+extern AdecHuffSeg gAdecHuffSegments[]; /* segment table */
+extern u16 sAdecPrevScale[16];      /* previous scale indices */
 
 extern s32 adecReadBits(u16 *dst, u16 nbits, u16 count, s16 sign, AdecStream *st);          /* adecReadBits */
 extern s16 adecHuffDecode(AdecHuffSeg *segs, s16 *out, s16 n, s16 *cnt, AdecStream *st);    /* adecHuffDecode */
@@ -39,15 +39,15 @@ s32 adecDecodeFrame(AdecStream *st) {
     s16 nv;
     s16 i;
     s32 rv;
-    AdecHuffSeg *seg = D_800B8C54;
-    if (D_800B8BAE == 0) {
-        D_800B8BAE = 1;
+    AdecHuffSeg *seg = gAdecHuffSegments;
+    if (sAdecHeaderDone == 0) {
+        sAdecHeaderDone = 1;
         if ((s16)adecReadBits((u16 *)st->band, 6, 16, 0, st) <= 0) {
             return -1;
         }
         seg->pos += 0x60;
         for (i = 0; i < 16; i++) {
-            D_80125010[i] = st->band[i];
+            sAdecPrevScale[i] = st->band[i];
         }
         while (seg->kind != 0) {
             seg++;
@@ -59,9 +59,9 @@ s32 adecDecodeFrame(AdecStream *st) {
         }
         seg = &seg[nv = cnt];
         for (i = 0; i < 16; i++) {
-            nv = D_80125010[i];
+            nv = sAdecPrevScale[i];
             st->band[i] += nv;
-            D_80125010[i] = st->band[i];
+            sAdecPrevScale[i] = st->band[i];
         }
     }
     rv = adecHuffDecode(seg, st->coef, 256, &cnt, st);

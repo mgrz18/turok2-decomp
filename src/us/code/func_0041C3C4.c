@@ -11,7 +11,7 @@ extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
 s32 OptionsMenu_OpacityText(MenuItem *a) {
-    u32 h = D_8011AAD8.hudAlphaSetting.value >> 4;
+    u32 h = gEngineApp_m_Settings.hudAlphaSetting.value >> 4;
 
     if (h == 0) {
         a->text = D_800B4008;

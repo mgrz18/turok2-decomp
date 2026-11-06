@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_80130930;
+extern s32 sResolutionToggleDelay;
 
 void OptionsMenu_Init_2(void) {
-    D_80130930 = 0;
+    sResolutionToggleDelay = 0;
 }

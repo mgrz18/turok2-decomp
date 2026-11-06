@@ -6,7 +6,7 @@
 /* game options block; Turok 2 keeps this option as a signed byte at +0x25 */
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 FragTagMenu_StepTimeLimit(void *first, void *second) {
-    GameSettings *opts = &D_8011AAD8;
+    GameSettings *opts = &gEngineApp_m_Settings;
     opts->tagTimeLimit = Menu_StepValue(second, opts->tagTimeLimit, 5, 0, 0x1E, 1);
     return 0;
 }

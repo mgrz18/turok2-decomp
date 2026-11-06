@@ -86,7 +86,7 @@ extern void GameObject_FireTriggers(struct Shared_Actor *arg0, s32 arg1, void *a
 extern void Actor_SpawnParticle(void *, s32, Triple, s32);
 extern s32 Sound__Play(s16, CVector3, s32, s32);
 struct Player;
-extern void AI_SpawnParticlesOnce(struct Player *, s32 *, s32, s32, s32);
+extern void AI_DropPickupsOnce(struct Player *, s32 *, s32, s32, s32);
 typedef struct {
     s16 hi;
     s16 id;
@@ -474,7 +474,7 @@ typedef struct Object_func_8028B274_de Object_func_8028B274_de;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld D_800F7078;
+extern CScene gScene;
 struct LevelActor;
 struct LevelActor;
 struct Shared_Actor;
@@ -487,13 +487,13 @@ void Destructible_GoDeathEnter(Obj54E0 *arg0, void *arg1) {
         arg0->flags &= ~0x2000;
         arg0->flags &= ~0x100;
     }
-    if (D_800F7078.m_Mode == 4) {
+    if (gScene.m_Mode == 4) {
         if (rec->unk34.whole != -1) {
             Sound__Play(rec->unk34.half.id, arg0->pos.v, 0, -1);
         }
         if (rec->unk30 != -1) {
             Actor_SpawnParticle(arg0, rec->unk30, arg0->pos.t, 0);
         }
-        AI_SpawnParticlesOnce(arg0, arg1, 8, rec->unk38, rec->unk3C);
+        AI_DropPickupsOnce(arg0, arg1, 8, rec->unk38, rec->unk3C);
     }
 }

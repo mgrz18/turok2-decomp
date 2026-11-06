@@ -3,8 +3,8 @@
 
 s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
-extern s32 D_800AF750;
+extern s32 sEnemyAnimIdle_AF750;
 
 void EnemyAnim_Idle_AF750(CGameObjectInstance *obj, s32 arg1) {
-    AI_PickAnimFromTable((s32) obj, arg1, (s32) &D_800AF750, obj->header.m_pIntelligence->m_Enemy.m_wIdleAnimFlags);
+    AI_PickAnimFromTable((s32) obj, arg1, (s32) &sEnemyAnimIdle_AF750, obj->header.m_pIntelligence->m_Enemy.m_wIdleAnimFlags);
 }

@@ -2,8 +2,8 @@
 #include "structs/world.h"
 #include "structs/collision.h"
 
-extern CWorld D_800F7078;
-extern s32 D_800F7964;
+extern CScene gScene;
+extern s32 gScene_m_nDrawActors;
 extern CCollisionInfo D_800F1C60;
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *inst);
@@ -21,7 +21,7 @@ void Collision_TestInstances(Sweep *sweep) {
     CGameObjectInstance *inst;
     CCollisionInfo *def;
     CGameObjectInstance *other;
-    CWorld *world;
+    CScene *world;
     s32 count;
     f32 x;
     f32 z;
@@ -32,7 +32,7 @@ void Collision_TestInstances(Sweep *sweep) {
         return;
     }
     inst = sweep->obj;
-    count = D_800F7964; /* D_800F7078.drawCount */
+    count = gScene_m_nDrawActors; /* gScene.drawCount */
     b = &box;
     box.radius = GameObject_GetCollisionRadius(inst);
     b->flag = def->m_dwFlags & 0x100000;
@@ -48,7 +48,7 @@ void Collision_TestInstances(Sweep *sweep) {
     b->maxX = MAX(sweep->end.x, x) + box.radius;
     b->minZ = MIN(sweep->end.z, z) - box.radius;
     b->maxZ = MAX(sweep->end.z, z) + box.radius;
-    world = &D_800F7078;
+    world = &gScene;
     for (i = 0; i < count; i++) {
         other = (CGameObjectInstance *)world->m_pDrawActors[i];
         if (other == inst || def->m_InstanceBehavior == 0) {

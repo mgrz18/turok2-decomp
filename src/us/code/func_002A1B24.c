@@ -4,9 +4,9 @@
 #include "common.h"
 #include "ultra_types.h"
 
-extern s32 D_800BC300;          /* PI manager started */
-extern u8 D_80128110[];         /* OSIoMesg used for the DMA */
-extern OSMesgQueue D_801280F0;  /* its reply queue */
+extern s32 sHostIoPiReady;          /* PI manager started */
+extern u8 sHostIoDmaMsg[];         /* OSIoMesg used for the DMA */
+extern OSMesgQueue sHostIoDmaQueue;  /* its reply queue */
 extern void HostIo_WriteByteDma(s32 address, u8 value);
 extern void HostIo_WriteWord(s32 address, s32 value);
 extern s32 osPiStartDma(void *entry, s32 pri, s32 direction, u32 devAddr, void *dramAddr, u32 size,
@@ -18,7 +18,7 @@ extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 void HostIo_WriteBlockDma(u32 address, u8 *source, u32 remaining) {
     s32 dmaResult = 0;
 
-    if (D_800BC300 == 0) {
+    if (sHostIoPiReady == 0) {
         dmaResult = -1;
     }
     while (remaining != 0 && (address & 3) != 0) {
@@ -27,9 +27,9 @@ void HostIo_WriteBlockDma(u32 address, u8 *source, u32 remaining) {
     }
     while (remaining >= 4) {
         if (remaining >= 16 && ((u32) source & 15) == 0 && dmaResult != -1) {
-            dmaResult = osPiStartDma(D_80128110, 1, 1, address, source, remaining, &D_801280F0);
+            dmaResult = osPiStartDma(sHostIoDmaMsg, 1, 1, address, source, remaining, &sHostIoDmaQueue);
             if (dmaResult != -1) {
-                osRecvMesg(&D_801280F0, NULL, 1);
+                osRecvMesg(&sHostIoDmaQueue, NULL, 1);
                 remaining = 0;
             }
         } else {

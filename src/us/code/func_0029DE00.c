@@ -4,8 +4,8 @@
 #include "rw/abu_types.h"
 
 extern void __osDispatchThread();
-extern Func802C1F10Node *D_800B891C;
-extern void *D_800B8920;
+extern Func802C1F10Node *__osActiveQueue;
+extern void *__osRunningThread;
 extern u32 __osDisableInt(void);
 extern void __osDequeueThread(void *arg0, Func802C1F10Node *arg1);
 extern void __osRestoreInt(u32);
@@ -17,11 +17,11 @@ void osDestroyThread(Func802C1F10Node *arg0) {
     node = arg0;
     token = __osDisableInt();
     if (node == 0) {
-        node = D_800B8920;
+        node = __osRunningThread;
     } else if (node->field10 != 1) {
         __osDequeueThread(node->field8, node);
     }
-    head = &D_800B891C;
+    head = &__osActiveQueue;
     if (*head == node) {
         *head = node->next;
     } else {
@@ -34,7 +34,7 @@ void osDestroyThread(Func802C1F10Node *arg0) {
             cur = cur->next;
         }
     }
-    if (node == D_800B8920) {
+    if (node == __osRunningThread) {
         __osDispatchThread();
     }
     __osRestoreInt(token);

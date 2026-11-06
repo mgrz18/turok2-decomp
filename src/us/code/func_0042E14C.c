@@ -3,10 +3,10 @@
 #include "structs/game.h"
 #include "structs/player.h"
 
-extern s32 D_80119878; /* player count */
-extern u8 D_8011AAF1;  /* D_8011AAD8.multiplayer; read through D_8011AAD8 the code no longer matches */
-extern u32 D_800B6D20;
-extern s16 D_800AE2B4[];
+extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers; /* player count */
+extern u8 gEngineApp_m_Settings_multiplayer;  /* gEngineApp_m_Settings.multiplayer; read through gEngineApp_m_Settings the code no longer matches */
+extern u32 gFrameCountGameplay;
+extern s16 gLivesSpeech[];
 extern f32 D_800A6AC4; /* 60.0f, in the engine's .rodata */
 
 extern void Controller_SetRumbleOption(s32 controller, s32 state);
@@ -17,14 +17,14 @@ extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CPlayer__Warp(CPlayer *p, s32 warp, s32 arg2, s32 respawn);
 
 void CPlayer__StartGame(CPlayer *p) {
-    s32 mode = (D_80119878 >= 2) * 2;
+    s32 mode = (gEngineApp_m_Game_m_PlayerList_m_nPlayers >= 2) * 2;
 
-    if (D_8011AAF1) {
+    if (gEngineApp_m_Settings_multiplayer) {
         p->m_Data.m_Lives = 1;
     } else {
         p->m_Data.m_Lives = 3;
     }
-    if (D_8011AAF1 != 0 || (Controller_SetRumbleOption(p->m_ContState.m_pContState, 1), D_8011AAF1 != 0)) {
+    if (gEngineApp_m_Settings_multiplayer != 0 || (Controller_SetRumbleOption(p->m_ContState.m_pContState, 1), gEngineApp_m_Settings_multiplayer != 0)) {
         CPlayer__Respawn(p);
     } else {
         p->m_Data.m_Health = 0x6400;
@@ -37,12 +37,12 @@ void CPlayer__StartGame(CPlayer *p) {
     p->m_pHitMeWithChargeDart = 0;
     p->m_nNumArrowsStuckInMe = 0;
     p->m_UseLowerAmmo = 0;
-    if (D_8011AAD8.mode == 13 && D_8011AAF1 == 0 && D_800B6D20 >= 11) {
+    if (gEngineApp_m_Settings.mode == 13 && gEngineApp_m_Settings_multiplayer == 0 && gFrameCountGameplay >= 11) {
         if (p->m_Data.m_Lives < 11) {
-            Sound__PlaySpeech(D_800AE2B4[p->m_Data.m_Lives]);
+            Sound__PlaySpeech(gLivesSpeech[p->m_Data.m_Lives]);
         }
     }
-    if (D_8011AAF1 != 0) {
+    if (gEngineApp_m_Settings_multiplayer != 0) {
         CPlayer__GiveStartingWeapons(p);
     }
     p->m_bEnteringDeathmatch = 0;

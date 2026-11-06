@@ -22,8 +22,8 @@ typedef struct {
     /* 0x1E */ s8 angle;
 } PlacedActorRecord;
 
-extern u8 D_800F1360[];         /* the empty model */
-extern u8 D_800F7078[];         /* the model cache */
+extern u8 gLevelActorIntelligence[];         /* the empty model */
+extern u8 gScene[];         /* the model cache */
 extern u8 D_800B6D1B;
 
 void *CScene__GetIntelligence(void *cache, s32 model);
@@ -47,9 +47,9 @@ void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 o
     actor->m_Bounds.m_vMax.z = record->pos.z + record->radius;
     actor->m_Resource = owner;
     if (record->model == 0xFFFF) {
-        actor->header.m_pIntelligence = (CIntelligence *) D_800F1360;
+        actor->header.m_pIntelligence = (CIntelligence *) gLevelActorIntelligence;
     } else {
-        actor->header.m_pIntelligence = CScene__GetIntelligence(D_800F7078, record->model);
+        actor->header.m_pIntelligence = CScene__GetIntelligence(gScene, record->model);
     }
     if (record->segment == 0xFFFF) {
         actor->header.m_pCurrentRegion = NULL;
@@ -63,6 +63,6 @@ void CLevelActor__Construct(CLevelActor *actor, PlacedActorRecord *record, s32 o
     top.x = actor->header.m_vPos.x;
     top.y = actor->header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.5f;
     top.z = actor->header.m_vPos.z;
-    *(CLights1 *) actor->m_Lights = D_800AB0D0;
+    *(CLights1 *) actor->m_Lights = gSceneLights;
     actor->m_DrawnFrame = actor->m_UpdatedFrame = D_800B6D1B - 1;
 }

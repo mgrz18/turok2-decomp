@@ -7,8 +7,8 @@
  * screen) under the edited column, faded by the window alpha, then draws the
  * item as usual. As EnterCheatMenu_DrawTextField. */
 
-extern s32 D_800C2030;
-extern s32 D_800C1BD0;
+extern s32 gScreenWidth;
+extern s32 gMenuCurrentFont;
 
 extern s32 CPlayerPool__GetIndex(void *players, void *player);
 extern void Hud_SetupFillMode(void);
@@ -21,12 +21,12 @@ void NameEntryMenu_DrawName(void *menu, MenuItemLayout *item, s32 arg2, Menu *wi
     f32 alpha;
     s32 x;
 
-    index = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, win->player);
-    if (D_800C1FB0[index].timer <= 6.0f) {
-        width = D_800C2030 * 9 / 284;
-        x = item->left + D_800C1FB0[index].cursor * width;
+    index = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, win->player);
+    if (gNameEntries[index].timer <= 6.0f) {
+        width = gScreenWidth * 9 / 284;
+        x = item->left + gNameEntries[index].cursor * width;
         alpha = win->fade * (win->alpha * 64.0f);
-        D_800C1BD0 = -1;
+        gMenuCurrentFont = -1;
         Hud_SetupFillMode();
         Hud_DrawBevelBox(x, item->bottom - 2, x + width, item->bottom, 0, 0, 0xFF, 0xFF, 0xFF, (u8) alpha);
     }

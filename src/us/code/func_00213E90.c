@@ -3,16 +3,16 @@
 
 #include "rw/abu_types.h"
 
-extern s8 D_800ACAF4[];
-extern s32 D_800B6D18;
+extern s8 gColorPulseTable[];
+extern s32 gFrameCount;
 f32 LightVolume_GetFlicker(void *arg0)
 {
   ObjectRecAtBC *volume = arg0;
   u32 temp_a0;
   s32 idx;
   temp_a0 = volume->animationSeed;
-  idx = D_800B6D18 + ((((temp_a0 % 7) & 0xFF) + 1) * 0x10);
+  idx = gFrameCount + ((((temp_a0 % 7) & 0xFF) + 1) * 0x10);
   idx = idx % 90;
-  return (f32) D_800ACAF4[idx];
+  return (f32) gColorPulseTable[idx];
 }
-extern s32 D_800B6D18;
+extern s32 gFrameCount;

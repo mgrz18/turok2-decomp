@@ -127,9 +127,9 @@ typedef struct MenuDesc {
 } MenuDesc; /* size 0x24 */
 
 /* How a text item's class is drawn: the item's flags & 0x3FE0 (0x20 to
- * 0x2000, one bit each) pick one of the nine D_800C1BD4 (MenuItem_GetTextStyle). */
+ * 0x2000, one bit each) pick one of the nine gMenuTextStyles (MenuItem_GetTextStyle). */
 typedef struct MenuTextStyle {
-    /* 0x00 */ s32 font;            /* 0, 1, 2: the draw mode (D_800C1BD0) set for it */
+    /* 0x00 */ s32 font;            /* 0, 1, 2: the draw mode (gMenuCurrentFont) set for it */
     /* 0x04 */ s32 charWidth;
     /* 0x08 */ s32 lineHeight;      /* in 222ths of the screen */
     /* 0x0C */ f32 scaleX;
@@ -144,7 +144,7 @@ typedef struct MenuTextStyle {
     /* 0x1B */ u8 _pad1B;
 } MenuTextStyle; /* size 0x1C */
 
-extern MenuTextStyle D_800C1BD4[9];
+extern MenuTextStyle gMenuTextStyles[9];
 
 /* One of a window's 2x8 colour records, from the table D_800C1CD2. */
 typedef struct MenuColor {
@@ -211,8 +211,8 @@ typedef struct MenuPool {
 
 /* A line of text being typed in a menu: the letters, where the next one
  * goes and the blinking cursor (drawn while timer <= 6, EnterCheatMenu_DrawTextField).
- * D_800C1F80 is the cheat code entry (22 letters at most; its text also
- * has a symbol of its own, D_800C1F8C); D_800C1FB0 holds the four players'
+ * gCheatEntry is the cheat code entry (22 letters at most; its text also
+ * has a symbol of its own, gCheatEntryText); gNameEntries holds the four players'
  * names (8 letters at most), indexed by the player's slot (CPlayerPool__GetIndex). */
 typedef struct TextEntry {
     /* 0x00 */ s32 cursor;          /* the column the next letter goes to */
@@ -228,7 +228,7 @@ typedef struct NameEntry {
     /* 0x0C */ char name[12];
 } NameEntry; /* size 0x18 */
 
-extern TextEntry D_800C1F80;
-extern NameEntry D_800C1FB0[4];
+extern TextEntry gCheatEntry;
+extern NameEntry gNameEntries[4];
 
 #endif

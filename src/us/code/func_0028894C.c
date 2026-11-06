@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/game.h"
 
-extern f32 D_800B6D28; /* frame delta */
+extern f32 gFrameIncrement; /* frame delta */
 
 void CEngineApp__UpdateFade(CEngineApp *g) {
     f32 speed;
@@ -12,7 +12,7 @@ void CEngineApp__UpdateFade(CEngineApp *g) {
         speed = 0.1f;
         if (g->m_Settings.fastFade != 0) {
             /* Redundant branches kept: they split the blocks so fadeState is reloaded. */
-            if (g || D_800B6D28) {
+            if (g || gFrameIncrement) {
                 speed = 0.5f;
             } else {
                 speed = 0.5f;
@@ -26,7 +26,7 @@ void CEngineApp__UpdateFade(CEngineApp *g) {
         if (g->m_Settings.fadeMode != 1) {
             if (g->m_Settings.fadeMode == 2) {
                 if (0.0f < g->m_Settings.fade) {
-                    g->m_Settings.fade = g->m_Settings.fade - (kk * D_800B6D28);
+                    g->m_Settings.fade = g->m_Settings.fade - (kk * gFrameIncrement);
                     if (g->m_Settings.fade < 0.0f) {
                         g->m_Settings.fade = 0.0f;
                     }
@@ -42,7 +42,7 @@ void CEngineApp__UpdateFade(CEngineApp *g) {
                 }
             }
         } else {
-            g->m_Settings.fade = g->m_Settings.fade + (speed * ((D_800B6D28 < 0.5f) ? 0.5f : D_800B6D28));
+            g->m_Settings.fade = g->m_Settings.fade + (speed * ((gFrameIncrement < 0.5f) ? 0.5f : gFrameIncrement));
             if (1.0f <= g->m_Settings.fade) {
                 g->m_Settings.fadeMode = 0;
                 g->m_Settings.fade = 1.0f;

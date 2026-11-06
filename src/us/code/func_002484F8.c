@@ -26,7 +26,7 @@ s32 CPlayer__RefillFrom(CPlayer *p, s32 kind, s32 who) {
         case 0:
             any = 0;
             for (i = 0; i < 0x23; i++) {
-                weapon = D_800AF618[i];
+                weapon = gWeaponInfoTable[i];
                 if (p->m_Data.m_WeaponList[i] == 0) {
                     continue;
                 }

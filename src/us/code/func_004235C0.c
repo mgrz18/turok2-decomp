@@ -5,9 +5,9 @@
 
 extern char D_800B50D4[];
 extern char D_800B509C[];
-extern s32 D_80130964;
+extern s32 sDamagedPakInGame;
 s32 DamagedPakMenu_UpdateLine2(struct FieldRecAt14 *field) {
-    if (D_80130964 != 0) {
+    if (sDamagedPakInGame != 0) {
         field->text = D_800B509C;
     } else {
         field->text = D_800B50D4;

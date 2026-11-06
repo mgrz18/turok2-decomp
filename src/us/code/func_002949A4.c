@@ -8,10 +8,10 @@ extern s32 _timeToSamples(ALSynth *, s32);
 extern void _collectPVoices(ALSynth *);
 Acmd *alAudioFrame(Acmd *cmdList, s32 *cmdLen, s16 *outBuf, s32 outLen)
 {
-    extern ALGlobals *D_800B7760;
+    extern ALGlobals *alGlobals;
     ALPlayer *client;
     ALFilter *output;
-    ALSynth *drvr = &D_800B7760->drvr;
+    ALSynth *drvr = &alGlobals->drvr;
     s16 tmp = 0;
     Acmd *cmdlEnd = cmdList;
     Acmd *cmdPtr;

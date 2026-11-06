@@ -24,35 +24,35 @@ typedef struct B09SlotA {
             u8 a;
             u8 b;
 } B09SlotA;
-extern B09SlotA D_80121318[];
-extern B09LNode D_80120FC0[];
-extern B09List D_80121290;
-extern u8 D_80132000[];
+extern B09SlotA gPager_entries[];
+extern B09LNode gPager_slots[];
+extern B09List gPager_chain_head;
+extern u8 gVMPages[];
 void func_0028EE40(s32 index, s32 pm, void *vaddr, u32 evenpaddr, u32 oddpaddr, s32 asid);
 s32 VM_AcquireNextTLB(void);
 static __inline__ void m03_unlink(B09LNode *n) {
     if (n->prev != ((void *)0)) {
         n->prev->next = n->next;
     } else {
-        D_80121290.head = n->next;
+        gPager_chain_head.head = n->next;
         n->next->prev = ((void *)0);
     }
     if (n->next != ((void *)0)) {
         n->next->prev = n->prev;
     } else {
-        D_80121290.tail = n->prev;
+        gPager_chain_head.tail = n->prev;
         n->prev->next = ((void *)0);
     }
 }
 static __inline__ void m03_push(B09LNode *n) {
     n->next = ((void *)0);
-    n->prev = D_80121290.tail;
-    if (D_80121290.tail != ((void *)0)) {
-        D_80121290.tail->next = n;
+    n->prev = gPager_chain_head.tail;
+    if (gPager_chain_head.tail != ((void *)0)) {
+        gPager_chain_head.tail->next = n;
     }
-    D_80121290.tail = n;
-    if (D_80121290.head == ((void *)0)) {
-        D_80121290.head = n;
+    gPager_chain_head.tail = n;
+    if (gPager_chain_head.head == ((void *)0)) {
+        gPager_chain_head.head = n;
     }
 }
 void VM_MapTLBEntry(s16 slot, B09LNode *n, s32 unused, u8 *pair) {
@@ -62,39 +62,39 @@ void VM_MapTLBEntry(s16 slot, B09LNode *n, s32 unused, u8 *pair) {
     if (slot & 1) {
         p = pair - 1;
     }
-    if (p[0] != 0xFF && D_80120FC0[p[0]].tlb != 0xFF) {
-        idx = D_80120FC0[p[0]].tlb;
-        D_80121318[(s16)idx].b = n->id;
-    } else if (p[1] != 0xFF && D_80120FC0[p[1]].tlb != 0xFF) {
-        idx = D_80120FC0[p[1]].tlb;
-        D_80121318[(s16)idx].a = n->id;
+    if (p[0] != 0xFF && gPager_slots[p[0]].tlb != 0xFF) {
+        idx = gPager_slots[p[0]].tlb;
+        gPager_entries[(s16)idx].b = n->id;
+    } else if (p[1] != 0xFF && gPager_slots[p[1]].tlb != 0xFF) {
+        idx = gPager_slots[p[1]].tlb;
+        gPager_entries[(s16)idx].a = n->id;
     } else {
         idx = VM_AcquireNextTLB();
         if (slot & 1) {
-            D_80121318[(s16)idx].b = n->id;
+            gPager_entries[(s16)idx].b = n->id;
             if (p[0] != 0xFF) {
-                q = &D_80120FC0[p[0]];
-                D_80121318[(s16)idx].a = q->id;
+                q = &gPager_slots[p[0]];
+                gPager_entries[(s16)idx].a = q->id;
                 q->tlb = idx;
                 m03_unlink(q);
                 m03_push(q);
             }
         } else {
-            D_80121318[(s16)idx].a = n->id;
+            gPager_entries[(s16)idx].a = n->id;
             if (p[1] != 0xFF) {
-                q = &D_80120FC0[p[1]];
-                D_80121318[(s16)idx].b = q->id;
+                q = &gPager_slots[p[1]];
+                gPager_entries[(s16)idx].b = q->id;
                 q->tlb = idx;
                 m03_unlink(q);
                 m03_push(q);
             }
         }
-        D_80121318[(s16)idx].key = slot & 0xFFFE;
+        gPager_entries[(s16)idx].key = slot & 0xFFFE;
     }
     n->slot = slot;
     n->tlb = idx;
     *pair = n->id;
-    func_0028EE40((s16)idx, 0, (void *)(D_80121318[(s16)idx].key << 12),
-             D_80121318[(s16)idx].a != 0xFF ? ((u32)D_80132000 & 0x3FFFFFF) + (D_80121318[(s16)idx].a << 12) : -1,
-             D_80121318[(s16)idx].b != 0xFF ? ((u32)D_80132000 & 0x3FFFFFF) + (D_80121318[(s16)idx].b << 12) : -1, 7);
+    func_0028EE40((s16)idx, 0, (void *)(gPager_entries[(s16)idx].key << 12),
+             gPager_entries[(s16)idx].a != 0xFF ? ((u32)gVMPages & 0x3FFFFFF) + (gPager_entries[(s16)idx].a << 12) : -1,
+             gPager_entries[(s16)idx].b != 0xFF ? ((u32)gVMPages & 0x3FFFFFF) + (gPager_entries[(s16)idx].b << 12) : -1, 7);
 }

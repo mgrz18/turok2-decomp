@@ -4,15 +4,15 @@
 #include "rw/abu_types.h"
 
 s32 strlen(u8 *);
-extern u8 D_800C1F8C[0x64];
+extern u8 gCheatEntryText[0x64];
 s32 EnterCheatMenu_MatchesCode(u8 *arg0) {
     u8 *input = arg0;
     s32 index = 0;
-    if (strlen(input) != strlen(D_800C1F8C)) {
+    if (strlen(input) != strlen(gCheatEntryText)) {
         return 0;
     }
     for (; index < strlen(input); index++) {
-        if ((input[index] ^ index) != D_800C1F8C[index]) {
+        if ((input[index] ^ index) != gCheatEntryText[index]) {
             return 0;
         }
     }

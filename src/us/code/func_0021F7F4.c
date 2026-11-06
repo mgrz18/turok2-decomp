@@ -10,7 +10,7 @@ typedef struct Swing {
     CVector3 axis;                  /* 0x18 */
 } Swing;
 
-extern f32 D_800ACB98[];        /* swing amplitude per step */
+extern f32 gSwingAmplitudes[];        /* swing amplitude per step */
 
 void CMtxF__Copy(f32 *dst, f32 *src);
 void CVector3__Scale(CVector3 *dst, CVector3 *src, f32 scale);
@@ -32,7 +32,7 @@ void func_0021F7F4(s32 arg0, Swing *swing, f32 *matrix, s32 active, s32 dir) {
         origin.y = matrix[13];
         origin.z = matrix[14];
         axis = swing->axis;
-        angle = D_800ACB98[25 - swing->step];
+        angle = gSwingAmplitudes[25 - swing->step];
         angle *= 0.3f;
         angle *= (dir == 5 ? -2.0f : dir);
         CMtxF__Copy(inverse, matrix);

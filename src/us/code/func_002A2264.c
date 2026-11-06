@@ -3,8 +3,8 @@
 
 #include "common.h"
 
-extern u8 D_80128880;   /* debugger: stopped */
-extern u8 D_80128882;   /* debugger: resume allowed */
+extern u8 sHostIoStopped;   /* debugger: stopped */
+extern u8 sHostIoResumeAllowed;   /* debugger: resume allowed */
 extern u32 D_801286D8;
 extern u32 HostIo_ReadWord(u32 address);
 extern void HostIo_WriteWord(u32 address, u32 value);
@@ -44,22 +44,22 @@ void HostIo_CommandLoop(void) {
                     break;
                 case 0x12:
                     D_801286D8 &= ~1;
-                    D_80128880 = 0;
-                    D_80128882 = 0;
+                    sHostIoStopped = 0;
+                    sHostIoResumeAllowed = 0;
                     func_002A31F0(func_002A31E4() & ~1);
                     break;
                 case 0x13:
-                    D_80128882 = 0;
-                    D_80128880 = 0;
+                    sHostIoResumeAllowed = 0;
+                    sHostIoStopped = 0;
                     break;
                 case 0x14:
-                    D_80128882 = 0xFF;
+                    sHostIoResumeAllowed = 0xFF;
                     break;
                 case 0x15:
-                    D_80128882 = 0;
+                    sHostIoResumeAllowed = 0;
                     break;
                 case 0x16:
-                    HostIo_WriteWord(0xB1FE0000, (D_80128882 << 24) | (D_80128880 << 16));
+                    HostIo_WriteWord(0xB1FE0000, (sHostIoResumeAllowed << 24) | (sHostIoStopped << 16));
                     break;
                 case 0x17:
                     HostIo_MemoryTransfer(2);
@@ -77,6 +77,6 @@ void HostIo_CommandLoop(void) {
                 }
             }
         }
-    } while (cont != 0 || D_80128882 == 0);
+    } while (cont != 0 || sHostIoResumeAllowed == 0);
     HostIo_WriteWord(0xB1FFFFF0, 0);
 }

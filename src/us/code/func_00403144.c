@@ -13,7 +13,7 @@ typedef struct {
     /* 0xC7 */ s8 count;
 } Item00403144;
 
-extern s32 D_8012F5F4;
+extern s32 gMantidQueen_blink;
 void AI_UpdateTargets(s32 a0, Item00403144 *item, Info00403144 *info, s32 a3, s32 a4);
 void AI_TurnClamped(s32 a0, Item00403144 *item, f32 a2, s32 a3);
 s32 AI_IsAimedAt(s32 a0, Item00403144 *item, s32 a2, f32 a3);
@@ -22,7 +22,7 @@ void CAI__SetMode(s32 a0, Item00403144 *item, s32 a2);
 static __inline__ s32 func_00403774_inline(s32 a0, Item00403144 *item, s32 a2) {
     s32 result;
 
-    if (D_8012F5F4 == 0) {
+    if (gMantidQueen_blink == 0) {
         result = 0;
     } else {
         result = AI_IsAimedAt(a0, item, a2, 0.785398245f);

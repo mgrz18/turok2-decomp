@@ -23,19 +23,19 @@ typedef struct {
     /* 0x1C */ u32 m_VisBits;
 } CFloor;
 
-extern CPlayer *D_80119890;
-extern f32 D_800B6D28;          /* the frame's time step */
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
+extern f32 gFrameIncrement;          /* the frame's time step */
 extern CCameraMode D_800B6CB4[];
-extern s32 D_800B6D1C;          /* which of the two frame buffers is drawn */
-extern f32 D_800DD78C;          /* the last sine taken */
-extern CCamera D_801198F0;      /* the main camera */
+extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
+extern f32 gQuaternionSin;          /* the last sine taken */
+extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera */
 /* The camera pool, seen from its main camera. */
-#define D_801198B0 (*(CCameraPool *) ((u8 *) &D_801198F0 - 0x40))
-extern s32 D_801198E8;          /* the pool wants on-screen projections */
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
-extern s32 D_800F7078[];
-extern s32 D_800B6D00;
+#define gEngineApp_m_Game_m_CameraPool (*(CCameraPool *) ((u8 *) &gEngineApp_m_Game_m_CameraPool_m_MainCamera - 0x40))
+extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;          /* the pool wants on-screen projections */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
+extern s32 gScene[];
+extern s32 gDefaultVisBits;
 void CCamera__AdvanceAttributes(CCamera *cam);
 s32 Cinema_PathPlaying(void);
 void guLookAtF(CMtxF m, f32 eyeX, f32 eyeY, f32 eyeZ, f32 atX, f32 atY, f32 atZ, f32 upX, f32 upY, f32 upZ);
@@ -100,7 +100,7 @@ void CCamera__Advance(CCamera *cam) {
     f32 boxX, boxY, boxZ;
     s32 n;
 
-    for (node = D_80119890; node != NULL; node = node->m_pNext) {
+    for (node = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; node != NULL; node = node->m_pNext) {
         if (node->m_pCamera == cam) {
             player = node;
             goto found;
@@ -108,7 +108,7 @@ void CCamera__Advance(CCamera *cam) {
     }
     player = NULL;
 found:
-    cam->m_Time += D_800B6D28;
+    cam->m_Time += gFrameIncrement;
     CCamera__AdvanceAttributes(cam);
     if (Cinema_PathPlaying() == 0) {
         update = D_800B6CB4[cam->m_Mode].m_Update;
@@ -116,7 +116,7 @@ found:
             update(cam);
         }
     }
-    lookAt = &cam->m_LookAt[D_800B6D1C];
+    lookAt = &cam->m_LookAt[gEvenOdd];
     guLookAtF(mLookAt, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f);
     Cinema_UpdateCameraIfActive(cam);
     rotX = cam->m_ViewParams.m_vRotOffset.x;
@@ -138,21 +138,21 @@ found:
         half = 0.5f;
         a = rotZ * half;
         sn = func_002982F0(a);
-        D_800DD78C = sn;
+        gQuaternionSin = sn;
         qZ.x = 0.0f;
         qZ.y = 0.0f;
         qZ.z = sn;
         qZ.w = func_002974C0(a);
         a = rotX * half;
         sn = func_002982F0(a);
-        D_800DD78C = sn;
+        gQuaternionSin = sn;
         qX.x = sn;
         qX.y = 0.0f;
         qX.z = 0.0f;
         qX.w = func_002974C0(a);
         yawCam = (rotY + rotYOffset) * half;
         sn = func_002982F0(yawCam);
-        D_800DD78C = sn;
+        gQuaternionSin = sn;
         qY.x = 0.0f;
         qY.y = sn;
         qY.z = 0.0f;
@@ -171,8 +171,8 @@ found:
         CShakeAxis__Advance(&cam->m_Shake.m_XAxis);
         CShakeAxis__Advance(&cam->m_Shake.m_YAxis);
         CShakeAxis__Advance(&cam->m_Shake.m_ZAxis);
-        if (cam != &D_801198B0.m_MainCamera) {
-            for (s = (CShake *) D_801198B0.m_ShakeActiveList.m_pHead; s != NULL; s = s->m_pNext) {
+        if (cam != &gEngineApp_m_Game_m_CameraPool.m_MainCamera) {
+            for (s = (CShake *) gEngineApp_m_Game_m_CameraPool.m_ShakeActiveList.m_pHead; s != NULL; s = s->m_pNext) {
                 CShake__ApplyOffset(s, cam->m_ViewParams.m_vPos, &shake);
             }
         }
@@ -189,21 +189,21 @@ found:
         half = 0.5f;
         a = rotZ * half;
         sn = func_002982F0(a);
-        D_800DD78C = sn;
+        gQuaternionSin = sn;
         qZ.x = 0.0f;
         qZ.y = 0.0f;
         qZ.z = sn;
         qZ.w = func_002974C0(a);
         a = rotX * half;
         sn = func_002982F0(a);
-        D_800DD78C = sn;
+        gQuaternionSin = sn;
         qX.x = sn;
         qX.y = 0.0f;
         qX.z = 0.0f;
         qX.w = func_002974C0(a);
         yawPath = (rotY + rotYOffset) * half;
         sn = func_002982F0(yawPath);
-        D_800DD78C = sn;
+        gQuaternionSin = sn;
         qY.x = 0.0f;
         qY.y = sn;
         qY.z = 0.0f;
@@ -228,8 +228,8 @@ found:
     if (player != NULL && (player->m_ModeFlags & 0x40) && cam->m_ViewParams.m_nType == 0 && Cinema_PathPlaying() == 0) {
         cam->m_XScale = MIN1(cam->m_WaterWobbleXScale * 0.5f * (func_002982F0(cam->m_WaterWobbleXAngle) + 1.0f) + 0.8f);
         cam->m_YScale = MIN1(cam->m_WaterWobbleYScale * 0.5f * (func_002982F0(cam->m_WaterWobbleYAngle) + 1.0f) + 0.9f);
-        cam->m_WaterWobbleXAngle += D_800B6D28 * cam->m_WaterWobbleXSpeed;
-        cam->m_WaterWobbleYAngle += D_800B6D28 * cam->m_WaterWobbleYSpeed;
+        cam->m_WaterWobbleXAngle += gFrameIncrement * cam->m_WaterWobbleXSpeed;
+        cam->m_WaterWobbleYAngle += gFrameIncrement * cam->m_WaterWobbleYSpeed;
         swim = player->m_TotalSpeed * 2.5f;
         if (swim < 0.0f) {
             swim = 0.0f;
@@ -276,9 +276,9 @@ found:
     CMtxF__Multiply(m, mView, mProj);
     CMtxF__Multiply(cam->m_mfProjection, m, mFlip);
     CMtxF__ClampEntries(cam->m_mfProjection);
-    CMtxF__ToMtx(cam->m_mfProjection, &cam->m_mProjection[D_800B6D1C]);
+    CMtxF__ToMtx(cam->m_mfProjection, &cam->m_mProjection[gEvenOdd]);
     CMtxF__Copy(mLight, mView);
-    if (D_80119870.m_Settings.mode == 4) {
+    if (gEngineApp_m_Game.m_Settings.mode == 4) {
         CMtxF__RotateX(mLight, cam->m_Time * 0.010908309f);
         CMtxF__RotateY(mLight, cam->m_Time * 0.008726647f);
     }
@@ -317,7 +317,7 @@ found:
     lookAt->l[0x15] = 0x80;
     lookAt->l[0x16] = 0;
     lookAt->l[0x17] = 0;
-    if (!D_80119870.m_Settings.multiplayer) {
+    if (!gEngineApp_m_Game.m_Settings.multiplayer) {
         ang = fov * aspect * 0.008726647f;
         radius = cam->m_FarClip / func_002974C0(ang);
         corners[0].x = 0.0f;
@@ -372,26 +372,26 @@ found:
     cam->m_AnimMax.z = cam->m_vTCorners[0].z + radius;
     CQuaternion__ToMatrix(&cam->m_qViewAlignNoZ, cam->m_mfFaceScreen);
     CMtxF__SetRotateY(cam->m_mfFaceScreenYAxisUp, cam->m_vRotation.y);
-    if (D_801198E8 != 0) {
-        guPerspectiveF(mProj, &cam->m_OnScreenPerspNorm, 47.5f, D_800C2030 / D_800C2034, 16.0f, 7168.0f, 1.0f);
+    if (gEngineApp_m_Game_m_CameraPool_m_bActiveChanged != 0) {
+        guPerspectiveF(mProj, &cam->m_OnScreenPerspNorm, 47.5f, gScreenWidth / gScreenHeight, 16.0f, 7168.0f, 1.0f);
         CMtxF__Identity(mView);
         CMtxF__Multiply(m, mView, mProj);
         CMtxF__SetScale(mFlip, -1.0f, 1.0f, 1.0f);
         CMtxF__Multiply(mOnScreen, m, mFlip);
         CMtxF__ClampEntries(mOnScreen);
-        CMtxF__ToMtx(mOnScreen, &cam->m_mOnScreenProjection[D_800B6D1C]);
+        CMtxF__ToMtx(mOnScreen, &cam->m_mOnScreenProjection[gEvenOdd]);
     }
     CEmitterPool__Advance(cam->m_SkySystem, cam);
     MenuPool_Update(cam->m_MenuPool);
     if (Cinema_PathPlaying() != 0) {
-        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(D_800F7078, &cam->m_ViewParams.m_vPos);
+        cam->m_ViewParams.m_pCurrentRegion = (struct CGameRegion *) CScene__FindRegionAt(gScene, &cam->m_ViewParams.m_vPos);
     }
     floor = (CFloor *) cam->m_ViewParams.m_pCurrentRegion;
     x = cam->m_ViewParams.m_vPos.x;
     y = cam->m_ViewParams.m_vPos.y;
     z = cam->m_ViewParams.m_vPos.z;
     height = cam->m_ViewParams.m_YPosOffset;
-    cam->m_ViewParams.m_VisBits = D_800B6D00;
+    cam->m_ViewParams.m_VisBits = gDefaultVisBits;
     if (floor != NULL && Cinema_PathPlaying() == 0) {
         above = ((y + height) - CGameRegion__GetHeight(floor, x, z)) * 0.09765625f;
         if (above < 11.0f && above > 5.0f) {
@@ -399,21 +399,21 @@ found:
         }
     }
     if (Cinema_PathPlaying() != 0) {
-        cam->m_ViewParams.m_VisBits = D_800B6D00;
+        cam->m_ViewParams.m_VisBits = gDefaultVisBits;
     }
     if (cam->m_ViewParams.m_ZoomBlend > 0.0f) {
-        cam->m_ViewParams.m_VisBits = D_800B6D00;
+        cam->m_ViewParams.m_VisBits = gDefaultVisBits;
     }
 }
 
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
-extern s32 D_800B6D1C;          /* which of the two frame buffers is drawn */
-extern Gfx D_800AB100[];        /* RDP setup display lists */
-extern Gfx D_800AB130[];
-extern CCamera D_801198F0;      /* the main camera (camera pool + 0x40) */
-extern s32 D_801198E0;          /* the pool's active camera count */
-extern void *D_80130A78;        /* the z buffer */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
+extern s32 gEvenOdd;          /* which of the two frame buffers is drawn */
+extern Gfx gRspInitDL[];        /* RDP setup display lists */
+extern Gfx gRdpInitDL[];
+extern CCamera gEngineApp_m_Game_m_CameraPool_m_MainCamera;      /* the main camera (camera pool + 0x40) */
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;          /* the pool's active camera count */
+extern void *gDepthBuffer;        /* the z buffer */
 void Texture_InvalidateCache(void);
 void Render_SetRenderMode(s32 arg0);
 s32 Cinema_PathPlaying(void);
@@ -453,17 +453,17 @@ void CCamera__DisplayListSetup(CCamera *cam) {
     s32 frame;
 
     {
-        Gfx **setup = &D_800D8E24;
+        Gfx **setup = &gDList;
 
         GFX(*setup, 0xE7000000, 0);                         /* gDPPipeSync */
-        GFX(*setup, 0xDE000000, (u32) D_800AB100);          /* gSPDisplayList */
-        GFX(*setup, 0xDE000000, (u32) D_800AB130);
+        GFX(*setup, 0xDE000000, (u32) gRspInitDL);          /* gSPDisplayList */
+        GFX(*setup, 0xDE000000, (u32) gRdpInitDL);
         ResetPixelScale(cam);
         SetPixelScale(cam, cam->m_WarpXScale, cam->m_WarpYScale);
         sx = cam->m_PixelXScale;
         sy = cam->m_PixelYScale;
-        maxx = (u16) D_800C2030 - 1;
-        maxy = (u16) D_800C2034 - 1;
+        maxx = (u16) gScreenWidth - 1;
+        maxy = (u16) gScreenHeight - 1;
         width = cam->m_Viewport.m_Width;
         height = cam->m_Viewport.m_Height;
         x = cam->m_Viewport.m_ScreenPosX;
@@ -474,12 +474,12 @@ void CCamera__DisplayListSetup(CCamera *cam) {
         lrx = (s32) (x + width);
         lry = (s32) (y + height);
         vy = (s32) ((height + height) * sy);
-        if (D_800C2030 - 1 < lrx) lrx = maxx;
+        if (gScreenWidth - 1 < lrx) lrx = maxx;
         if (ulx < 0) ulx = 0;
         if (uly < 0) uly = 0;
-        if (lry > D_800C2034 - 1) lry = maxy;
-        buffer = D_800F6CB0.m_pCurrentFrameData;
-        frame = D_800B6D1C;
+        if (lry > gScreenHeight - 1) lry = maxy;
+        buffer = gEngineApp.m_pCurrentFrameData;
+        frame = gEvenOdd;
         GFX(*setup, 0xDA380007, (u32) &cam->m_mProjection[frame]);   /* gSPMatrix */
         GFX(*setup, 0xDB0E0000, cam->m_PerspNorm);                    /* gSPPerspNormalize */
         cam->m_vp[frame].vscale[0] = vx;
@@ -493,14 +493,14 @@ void CCamera__DisplayListSetup(CCamera *cam) {
         GFX(*setup, 0xDC08030A, (u32) &cam->m_LookAt[frame] + 0x10);                 /* gSPLookAtY */
         Texture_InvalidateCache();
     }
-    GFX(D_800D8E24, 0xE3001201, 0x2000);                    /* gDPSetTextureFilter(bilerp) */
-    if (cam != &D_801198F0 || D_801198E0 == 0) {
-        Gfx **clearDl = &D_800D8E24;
+    GFX(gDList, 0xE3001201, 0x2000);                    /* gDPSetTextureFilter(bilerp) */
+    if (cam != &gEngineApp_m_Game_m_CameraPool_m_MainCamera || gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 0) {
+        Gfx **clearDl = &gDList;
 
         Render_SetRenderMode(0x14);
         GFX(*clearDl, 0xE7000000, 0);
         GFX(*clearDl, 0xE3000A01, 0x300000);                /* gDPSetCycleType(G_CYC_FILL) */
-        GFX(*clearDl, 0xFF100000 | ((D_800C2030 - 1) & 0xFFF), (u32) D_80130A78);   /* colour image: z buffer */
+        GFX(*clearDl, 0xFF100000 | ((gScreenWidth - 1) & 0xFFF), (u32) gDepthBuffer);   /* colour image: z buffer */
         GFX(*clearDl, 0xE7000000, 0);
         GFX(*clearDl, 0xE3000A01, 0x300000);
         GFX(*clearDl, 0xF7000000, 0xFFFCFFFC);              /* gDPSetFillColor(max z) */
@@ -511,7 +511,7 @@ void CCamera__DisplayListSetup(CCamera *cam) {
                 (ulx & 0x3FF) << 14 | (uly & 0x3FF) << 2);  /* gDPFillRectangle */
             *clearDl = cmd;
         }
-        if (D_8011AAD8.cheatFlags & 0x4000) {
+        if (gEngineApp_m_Settings.cheatFlags & 0x4000) {
             rgb.red = 0;
             rgb.green = 0;
             rgb.blue = 0;
@@ -528,9 +528,9 @@ void CCamera__DisplayListSetup(CCamera *cam) {
                 rgb.red = color;
             }
         }
-        GFX(D_800D8E24, 0xD9FFFFFF, 0x10000);               /* gSPSetGeometryMode(G_FOG) */
+        GFX(gDList, 0xD9FFFFFF, 0x10000);               /* gSPSetGeometryMode(G_FOG) */
         {
-            Gfx *g = D_800D8E24++;                          /* gSPFogPosition(m_FogStart, 1000) */
+            Gfx *g = gDList++;                          /* gSPFogPosition(m_FogStart, 1000) */
             g->w0 = 0xDB080000;
             far = (u16) cam->m_FogStart;
             denom = 1000 - far;
@@ -538,7 +538,7 @@ void CCamera__DisplayListSetup(CCamera *cam) {
             g->w1 = (u32) (0x1F400 / denom) << 16 | ((near / denom) & 0xFFFF);
         }
         {
-            Gfx *g = D_800D8E24++;                          /* gDPSetFogColor */
+            Gfx *g = gDList++;                          /* gDPSetFogColor */
             g->w0 = 0xF8000000;
             red = rgb.red;
             green = rgb.green;
@@ -546,17 +546,17 @@ void CCamera__DisplayListSetup(CCamera *cam) {
             g->w1 = red << 24 | green << 16 | blue << 8 | 0xFF;
         }
         fill = ((red << 8) & 0xF800) | ((green << 3) & 0x7C0) | ((blue >> 2) & 0x3E);
-        GFX(D_800D8E24, 0xFF100000 | ((D_800C2030 - 1) & 0xFFF), buffer->m_pFrameBuffer);
-        GFX(D_800D8E24, 0xF7000000, ((fill | 1) << 16 | 1) + (u16) fill);
-        GFX(D_800D8E24, 0xF6000000 | (lrx & 0x3FF) << 14 | (lry & 0x3FF) << 2,
+        GFX(gDList, 0xFF100000 | ((gScreenWidth - 1) & 0xFFF), buffer->m_pFrameBuffer);
+        GFX(gDList, 0xF7000000, ((fill | 1) << 16 | 1) + (u16) fill);
+        GFX(gDList, 0xF6000000 | (lrx & 0x3FF) << 14 | (lry & 0x3FF) << 2,
             (ulx & 0x3FF) << 14 | (uly & 0x3FF) << 2);
     }
-    GFX(D_800D8E24, 0xE7000000, 0);
-    GFX(D_800D8E24, 0xE3001801, 0);                         /* gDPSetAlphaDither */
-    GFX(D_800D8E24, 0xE3001A01, 0x10);
-    GFX(D_800D8E24, 0xE3000A01, 0x100000);                  /* gDPSetCycleType(G_CYC_2CYCLE) */
-    if (cam != &D_801198F0) {
+    GFX(gDList, 0xE7000000, 0);
+    GFX(gDList, 0xE3001801, 0);                         /* gDPSetAlphaDither */
+    GFX(gDList, 0xE3001A01, 0x10);
+    GFX(gDList, 0xE3000A01, 0x100000);                  /* gDPSetCycleType(G_CYC_2CYCLE) */
+    if (cam != &gEngineApp_m_Game_m_CameraPool_m_MainCamera) {
         DLights_Load(cam);
     }
-    GFX(D_800D8E24, 0xE7000000, 0);
+    GFX(gDList, 0xE7000000, 0);
 }

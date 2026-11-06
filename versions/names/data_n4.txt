@@ -1,4 +1,0 @@
-// Data symbols met while naming 0x00260000-0x0026FFFF (not applied this round).
-gIntelligenceTypeInfo = 0x800ACB60; // [m_Type] -> {setup, advance, event handler pairs...}: Enemy 0x800B1760 ... Action 0x800B24B0 (func_0021F770, func_00219BC0)
-gEnemyBehaviorInfo = 0x800B1790; // CEnemyBehaviorInfo *[8] by behaviour value (struct name from the ROM debug types); func_0025C5F8
-gLevelEventHandlers = 0x800B2628; // [kind] -> {onActor, onEvent} pairs, 8 bytes into each gIntelligenceTypeInfo block; LevelEvent_Fire

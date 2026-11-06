@@ -14,19 +14,19 @@ extern void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msg, s32 msgCount);
 extern s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 static __inline__ void create_access_queue(void) {
-    extern Slot D_80121678;
-    extern OSMesg D_80121670;
-    extern s32 D_800B7A50[];
-    D_800B7A50[0] = 1;
-    osCreateMesgQueue(&D_80121678, &D_80121670, 1);
-    osSendMesg(&D_80121678, 0, 0);
+    extern Slot __osSiAccessQueue;
+    extern OSMesg __osSiAccessBuf;
+    extern s32 __osSiAccessQueueEnabled[];
+    __osSiAccessQueueEnabled[0] = 1;
+    osCreateMesgQueue(&__osSiAccessQueue, &__osSiAccessBuf, 1);
+    osSendMesg(&__osSiAccessQueue, 0, 0);
 }
 void __osSiGetAccess(void) {
-    extern Slot D_80121678;
-    extern s32 D_800B7A50[];
+    extern Slot __osSiAccessQueue;
+    extern s32 __osSiAccessQueueEnabled[];
     OSMesg token;
-    if (!D_800B7A50[0]) {
+    if (!__osSiAccessQueueEnabled[0]) {
         create_access_queue();
     }
-    osRecvMesg(&D_80121678, &token, 1);
+    osRecvMesg(&__osSiAccessQueue, &token, 1);
 }

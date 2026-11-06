@@ -3,8 +3,8 @@
 
 s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
-extern s32 D_800B0008;
+extern s32 sEnemyAnimProjectile_B0008;
 
 void EnemyAnim_Projectile_B0008(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &D_800B0008, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wProjectileAnimFlags);
+    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &sEnemyAnimProjectile_B0008, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wProjectileAnimFlags);
 }

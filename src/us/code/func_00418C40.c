@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s8 D_8011AAFA; /* D_8011AAD8 + 0x22 */
+extern s8 gEngineApp_m_Settings_dmArena; /* gEngineApp_m_Settings + 0x22 */
 extern char D_800B5F3C[];
 extern char D_800B5F54[];
 extern char D_800B5F6C[];
@@ -18,7 +18,7 @@ extern char D_800B605C[];
 extern char D_800B6074[];
 
 s32 BloodLustMenu_LevelLabel(MenuItem *a) {
-    switch (D_8011AAFA) {
+    switch (gEngineApp_m_Settings_dmArena) {
     case 0:
         a->text = D_800B5F3C;
         break;

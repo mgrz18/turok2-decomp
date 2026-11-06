@@ -31,13 +31,13 @@ s32 MantidQueen_SortCompare();
 void MantidQueen_SortSwap();
 
 void MantidQueen_SendMinions(WaveBossState *s, s32 *active) {
-    WaveBossStep *cfg = D_8012F5B4;
+    WaveBossStep *cfg = gMantidQueen_step;
     Entity00401FCC *player;
     CVector3 pos;
     Member00401FCC *member;
     s32 i;
 
-    player = CPlayerPool__FindNearest(&D_80119870.m_PlayerList, s->actor->header.m_vPos);
+    player = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, s->actor->header.m_vPos);
     if (player != NULL) {
         pos = player->pos;
     } else {

@@ -8,53 +8,53 @@ typedef struct {
     /* 0x04 */ s32 v[4];
 } ScreenExtra; /* 0x14 */
 
-extern s32 D_80000300; /* osTvType */
-extern s32 D_800C2030;
-extern s32 D_800C2034;
-extern s32 D_800C2038; /* current video mode */
+extern s32 osTvType; /* osTvType */
+extern s32 gScreenWidth;
+extern s32 gScreenHeight;
+extern s32 gResolution; /* current video mode */
 extern s32 D_800C2044;
-extern ScreenExtra D_800C216C[];
-extern s32 D_800AB890;
-extern s32 D_800AB894;
-extern s32 D_800AB898;
-extern s32 D_800AB89C;
-extern s32 D_801198E8;
+extern ScreenExtra gVideoModeFlags[];
+extern s32 gRenderAntiAlias;
+extern s32 gViAntiAlias;
+extern s32 gRenderZModeInter;
+extern s32 gRenderImageRead;
+extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;
 
 s32 GetMemSize(void); /* osGetMemSize */
 void osViSetSpecialFeatures(u32 features); /* osViSetSpecialFeatures */
-void func_0042456C(s32 width, s32 height, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
+void Video_SetMode_2(s32 width, s32 height, s32 arg2, s32 arg3, s32 arg4, s32 arg5);
 
 void Video_ApplyResolution_2(void) {
     s32 *mode = NULL;
     ScreenExtra extra;
 
-    D_801198E8 = 2;
-    if (D_800C2038 == -1) {
+    gEngineApp_m_Game_m_CameraPool_m_bActiveChanged = 2;
+    if (gResolution == -1) {
         if (GetMemSize() != 0x400000) {
-            D_800C2038 = 1;
+            gResolution = 1;
         } else {
-            D_800C2038 = 0;
+            gResolution = 0;
         }
     }
-    switch (D_80000300) {
+    switch (osTvType) {
         case 1:
-            mode = (s32 *)&D_800C2054[0][D_800C2038];
+            mode = (s32 *)&gVideoModes[0][gResolution];
             break;
         case 0:
         case 2:
-            mode = (s32 *)&D_800C20E0[D_800C2038];
+            mode = (s32 *)&gVideoModesPAL[gResolution];
             break;
     }
     if (mode != NULL) {
-        extra = D_800C216C[D_800C2038];
+        extra = gVideoModeFlags[gResolution];
         D_800C2044 = extra.antialias;
-        D_800AB890 = extra.v[0];
-        D_800AB894 = extra.v[1];
-        D_800AB898 = extra.v[2];
-        D_800AB89C = extra.v[3];
-        D_800C2030 = mode[0];
-        D_800C2034 = mode[1];
-        func_0042456C(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
+        gRenderAntiAlias = extra.v[0];
+        gViAntiAlias = extra.v[1];
+        gRenderZModeInter = extra.v[2];
+        gRenderImageRead = extra.v[3];
+        gScreenWidth = mode[0];
+        gScreenHeight = mode[1];
+        Video_SetMode_2(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
         osViSetSpecialFeatures(D_800C2044 ? 0x40 : 0x80);
         osViSetSpecialFeatures(0x20);
         osViSetSpecialFeatures(2);

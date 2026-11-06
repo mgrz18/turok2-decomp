@@ -3,11 +3,11 @@
 #include "structs/vector.h"
 #include "structs/player.h"
 
-extern f32 D_800B6D28;      /* frame time */
-extern char D_800ADE70;     /* standing look tuning */
-extern char D_800ADE88;     /* crouching look tuning */
-extern char D_800ADDBC;     /* standing move tuning */
-extern char D_800ADE4C;     /* crouching move tuning */
+extern f32 gFrameIncrement;      /* frame time */
+extern char gStandLookTuning;     /* standing look tuning */
+extern char gCrouchLookTuning;     /* crouching look tuning */
+extern char gStandMoveTuning;     /* standing move tuning */
+extern char gCrouchMoveTuning;     /* crouching move tuning */
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void CPlayer__BobViewStride(CPlayer *player, CGameObjectInstance *body);
@@ -38,15 +38,15 @@ void PlayerWalk_Update(CPlayer *player, CGameObjectInstance *body) {
     Math_EaseToward(&player->m_vHeadRotOffset.z, 0.0f, 0.25f);
     crouching = 5.12f < player->m_DuckOffset;
     if (crouching) {
-        CPlayer__TurnAndLook(player, body, &D_800ADE88);
+        CPlayer__TurnAndLook(player, body, &gCrouchLookTuning);
     } else {
-        CPlayer__TurnAndLook(player, body, &D_800ADE70);
+        CPlayer__TurnAndLook(player, body, &gStandLookTuning);
     }
     crouching = 5.12f < player->m_DuckOffset;
     if (crouching) {
-        CPlayer__MoveOnFoot(player, body, &D_800ADE4C);
+        CPlayer__MoveOnFoot(player, body, &gCrouchMoveTuning);
     } else {
-        CPlayer__MoveOnFoot(player, body, &D_800ADDBC);
+        CPlayer__MoveOnFoot(player, body, &gStandMoveTuning);
     }
     if (try_jump(player, body)) {
         return;
@@ -55,7 +55,7 @@ void PlayerWalk_Update(CPlayer *player, CGameObjectInstance *body) {
         CPlayer__SetState(player, body, 2);
     }
     if ((body->m_AI.m_dwFlags & 0x400) && player->m_bOnGround != 0) {
-        time = player->m_SfxTimer + D_800B6D28;
+        time = player->m_SfxTimer + gFrameIncrement;
         player->m_SfxTimer = time;
         if (player->m_TotalSpeed > 5.12f && time >= 6.0f) {
             player->m_SfxTimer = time - 6.0f;

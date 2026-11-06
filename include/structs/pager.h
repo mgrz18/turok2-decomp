@@ -1,14 +1,14 @@
 #ifndef STRUCTS_PAGER_H
 #define STRUCTS_PAGER_H
 
-/* The resource pager, D_801206A0 (Rage Wars' src/SCHED/8023A284_*.CPP):
+/* The resource pager, gPager (Rage Wars' src/SCHED/8023A284_*.CPP):
  * code and data regions that live on the cartridge are mapped at virtual
  * pages through 24 TLB slots. A TLB miss in a thread is caught
  * (VM_HandleTLBMiss), the faulting page is read in by the manager thread
  * (VM_ManagerThread) through the reader thread (VM_ReaderThread) into the least
  * recently used slot, and the thread is resumed. The slots are kept in a
- * use-ordered list (chain): its head (also the symbol D_80121290) is the least
- * recently used, its tail (D_80121294) the last. tools/check_structs.py checks the
+ * use-ordered list (chain): its head (also the symbol gPager_chain_head) is the least
+ * recently used, its tail (gPager_chain_tail) the last. tools/check_structs.py checks the
  * offsets. */
 
 #include "common.h"
@@ -68,30 +68,30 @@ typedef struct Pager {
     /* 0x00C */ u8 unkC[0x20 - 0xC];
     /* 0x020 */ s16 event;
     /* 0x022 */ u8 _pad22[2];
-    /* 0x024 */ OSMesgQueue completion; /* D_801206C4 */
+    /* 0x024 */ OSMesgQueue completion; /* gPager_completion */
     /* 0x03C */ OSMesg completionMsgs[0x21];
     /* 0x0C0 */ u8 thread[0x230];       /* the manager thread (VM_ManagerThread) */
     /* 0x2F0 */ u8 stack[0x200];        /* its stack */
     /* 0x4F0 */ u8 readerThread[0x230]; /* the reader thread (VM_ReaderThread) */
-    /* 0x720 */ u8 readerStack[0x200];  /* D_80120DC0 is its top */
+    /* 0x720 */ u8 readerStack[0x200];  /* gPager_readerStack is its top */
     /* 0x920 */ PageMapping slots[24];
     /* 0xAA0 */ OSMesgQueue jobs;
     /* 0xAB8 */ OSMesg jobMsgs[8];
-    /* 0xAD8 */ OSMesgQueue pending;    /* D_80121178 */
+    /* 0xAD8 */ OSMesgQueue pending;    /* gPager_pending */
     /* 0xAF0 */ OSMesg pendingMsgs[8];
     /* 0xB10 */ u8 channels[8][0x1C];
-    /* 0xBF0 */ PageChain chain;        /* D_80121290 (head), D_80121294 (tail) */
+    /* 0xBF0 */ PageChain chain;        /* gPager_chain_head (head), gPager_chain_tail (tail) */
     /* 0xBF8 */ u8 lookup[0x80];
     /* 0xC78 */ PageEntry entries[24];
-    /* 0xCD8 */ PageRegion regions;     /* D_80121378: the first region */
+    /* 0xCD8 */ PageRegion regions;     /* gPager_regions: the first region */
     /* 0xCF0 */ s16 expanded;
     /* 0xCF2 */ s16 mapped;
     /* 0xCF4 */ u8 _padCF4[4];
 } Pager; /* size 0xCF8 */
 
-extern Pager D_801206A0;
-extern PageMapping *D_80121290;    /* D_801206A0.chain.head */
-extern PageMapping *D_80121294;    /* D_801206A0.chain.tail */
-extern PageRegion D_80121378;     /* D_801206A0.regions, the head of the region list */
+extern Pager gPager;
+extern PageMapping *gPager_chain_head;    /* gPager.chain.head */
+extern PageMapping *gPager_chain_tail;    /* gPager.chain.tail */
+extern PageRegion gPager_regions;     /* gPager.regions, the head of the region list */
 
 #endif

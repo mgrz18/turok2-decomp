@@ -3,21 +3,21 @@
 
 s32 CCache__Deallocate(s32, s32);                /* extern */
 s32 CCache__Flush(s32);                     /* extern */
-extern s32 D_800C2010;
-extern s32 D_800C2014;
+extern s32 gSaveBufferHandle;
+extern s32 gLoadBufferHandle;
 
 void Pak_FreeSaveBuffers(void) {
-    if ((D_800C2010 != 0) || (D_800C2014 != 0)) {
+    if ((gSaveBufferHandle != 0) || (gLoadBufferHandle != 0)) {
         CCache__Flush(0);
     }
-    if (D_800C2010 != 0) {
-        CCache__Deallocate(0, D_800C2010);
+    if (gSaveBufferHandle != 0) {
+        CCache__Deallocate(0, gSaveBufferHandle);
     }
-    if (D_800C2014 != 0) {
-        CCache__Deallocate(0, D_800C2014);
+    if (gLoadBufferHandle != 0) {
+        CCache__Deallocate(0, gLoadBufferHandle);
     }
-    D_800C2010 = 0;
-    D_800C2014 = 0;
-    D_800C2018 = 0;
-    D_800C201C = 0;
+    gSaveBufferHandle = 0;
+    gLoadBufferHandle = 0;
+    gSaveBuffer = 0;
+    gLoadBuffer = 0;
 }

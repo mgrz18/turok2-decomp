@@ -12,7 +12,7 @@ f32 func_0026841C(CGameObjectInstance *e);
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *e);
 s32 Action_CheckRequiredItem(CGameObjectInstance *e, u8 *p, CGameObjectInstance *me);
 void CAI__SetMode(CGameObjectInstance *e, u8 *p, s32 a);
-void CScene__CheckAutoActivation(CWorld *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *p1) {
+void CScene__CheckAutoActivation(CScene *lv, CGameObjectInstance *me, CVector3 *p0, CVector3 *p1) {
     s32 isB;
     s32 is1;
     f32 myBot;

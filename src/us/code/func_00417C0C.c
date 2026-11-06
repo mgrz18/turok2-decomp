@@ -16,7 +16,7 @@ typedef struct StatusStep {
 } StatusStep;
 
 extern StatusStep D_8011AB98[];
-extern CPlayerOptions D_8011AB58[];
+extern CPlayerOptions gEngineApp_m_Settings_slots[];
 extern s32 Controller_ConfirmPressed(ControllerProfile *slot);
 
 void Mp_JoinPressingController(void) {
@@ -32,9 +32,9 @@ void Mp_JoinPressingController(void) {
     }
     i = 0;
     active = 1;
-    settings = D_8011AB58;
+    settings = gEngineApp_m_Settings_slots;
     for (; i < 4; i++) {
-        if (Controller_ConfirmPressed(&D_800F5EC0[i]) != 0) {
+        if (Controller_ConfirmPressed(&gControllers[i]) != 0) {
             settings[i].m_bActive = active;
             settings[i].m_nController = i;
             break;

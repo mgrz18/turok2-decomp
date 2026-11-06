@@ -389,11 +389,11 @@ typedef struct {
     /* 0x134 */ f32 radius;
 } ShadowActor;
 
-extern u8 D_800F7148[];
-extern CCollisionInfo D_800F1B40;
-extern CCollisionResults D_800F1CE0;
-extern f32 D_800DD78C;
-extern Gfx *D_800D8E24;
+extern u8 gScene_m_Heap[];
+extern CCollisionInfo gCollisionInfoLineOfSight;
+extern CCollisionResults gCollisionResults;
+extern f32 gQuaternionSin;
+extern Gfx *gDList;
 
 void *MtxPool_Alloc(void *pool, s32 count);
 void CGameRegion__GetTiltRotation(CQuaternion *out, void *region);
@@ -426,7 +426,7 @@ void CParticle__DrawShadow(ShadowActor *actor) {
     f32 a;
     f32 size;
 
-    gmtx = MtxPool_Alloc(D_800F7148, 1);
+    gmtx = MtxPool_Alloc(gScene_m_Heap, 1);
     if (gmtx == NULL) {
         return;
     }
@@ -442,17 +442,17 @@ void CParticle__DrawShadow(ShadowActor *actor) {
         probe.m_vVelocity.x = 0;
         probe.m_vVelocity.y = 0;
         probe.m_vVelocity.z = 0;
-        Collision_MoveInstance(&probe, pos, &D_800F1B40);
-        if (D_800F1CE0.m_pInstance == NULL) {
+        Collision_MoveInstance(&probe, pos, &gCollisionInfoLineOfSight);
+        if (gCollisionResults.m_pInstance == NULL) {
             return;
         }
-        CQuaternion__FromDirection(&tilt, &D_800F1CE0.m_vNormal);
-        spin.x = D_800DD78C = func_002982F0(0.785398245f);
+        CQuaternion__FromDirection(&tilt, &gCollisionResults.m_vNormal);
+        spin.x = gQuaternionSin = func_002982F0(0.785398245f);
         spin.y = 0.0f;
         spin.z = 0.0f;
         spin.w = func_002974C0(0.785398245f);
         CQuaternion__Multiply(&rot, &spin, &tilt);
-        ground = D_800F1CE0.m_vInstancePos.y;
+        ground = gCollisionResults.m_vInstancePos.y;
     }
     height = actor->pos.y - ground;
     a = 200.0f - height * 0.30517578f;
@@ -474,11 +474,11 @@ void CParticle__DrawShadow(ShadowActor *actor) {
     CMtxF__ScaleAxes(&mtx, size, 1.0f, size);
     CMtxF__Translate(&mtx, pos.x, pos.y, pos.z);
     CMtxF__ToMtxAffine(&mtx, gmtx);
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE7000000; _g->w1 = 0; }
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE3000A01; _g->w1 = 0x100000; }
+    { Gfx *_g = (Gfx *) (gDList++); _g->w0 = 0xE7000000; _g->w1 = 0; }
+    { Gfx *_g = (Gfx *) (gDList++); _g->w0 = 0xE3000A01; _g->w1 = 0x100000; }
     Render_DrawShadowQuad(gmtx, 1, (u8) alpha);
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE7000000; _g->w1 = 0; }
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = 0xE3000A01; _g->w1 = 0; }
+    { Gfx *_g = (Gfx *) (gDList++); _g->w0 = 0xE7000000; _g->w1 = 0; }
+    { Gfx *_g = (Gfx *) (gDList++); _g->w0 = 0xE3000A01; _g->w1 = 0; }
 }
 
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/particle/8027A0F4_6.CPP, Particle_DrawSprite, with Turok 2's layouts. */
@@ -490,7 +490,7 @@ void CParticle__DrawShadow(ShadowActor *actor) {
  * its alpha from life, fade-in, fade-out and distance from the view, and
  * emits the colour and draw commands. */
 
-#define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
 typedef struct { u8 pad0[0x40]; } Mtx;
 
@@ -578,17 +578,17 @@ typedef struct {
 } ParticleView;
 
 
-extern Gfx *D_800D8E24;             /* display list head */
-extern u32 D_800C2214;              /* command buffer length, in commands */
-extern f32 D_800B6D28;              /* frame time */
-extern s32 D_800B6D1C;              /* matrix buffer index */
-extern s32 D_801198E0;
-extern void *D_801198D0; /* the current view */
-extern u8 D_8011AAEF;
-extern s32 D_8011AAD8;
-extern CCollisionInfo D_800F1B40;
-extern u8 D_800F1930[];             /* the sprite's four vertices */
-extern u8 D_800F7148[];             /* matrix pool */
+extern Gfx *gDList;             /* display list head */
+extern u32 gDisplayListSize;              /* command buffer length, in commands */
+extern f32 gFrameIncrement;              /* frame time */
+extern s32 gEvenOdd;              /* matrix buffer index */
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
+extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead; /* the current view */
+extern u8 gEngineApp_m_Settings_unk17;
+extern s32 gEngineApp_m_Settings;
+extern CCollisionInfo gCollisionInfoLineOfSight;
+extern u8 gParticleSpriteVtx[];             /* the sprite's four vertices */
+extern u8 gScene_m_Heap[];             /* matrix pool */
 
 extern void *Texture_Request(s32 *ref);
 extern void Texture_GetInfo(void *model, AnimInfo *info);
@@ -611,13 +611,13 @@ static __inline__ s32 Particle_Occluded(Particle *particle, ParticleView *view) 
         ParticleHead saved;
         saved = *inst;
         inst->pos = view->eye;
-        hit = Collision_MoveInstance(inst, particle->inst.pos, &D_800F1B40);
+        hit = Collision_MoveInstance(inst, particle->inst.pos, &gCollisionInfoLineOfSight);
         *inst = saved;
     } else {
         ParticleHead probe;
         probe = particle->inst;
         probe.pos = view->eye;
-        hit = Collision_MoveInstance(&probe, particle->inst.pos, &D_800F1B40);
+        hit = Collision_MoveInstance(&probe, particle->inst.pos, &gCollisionInfoLineOfSight);
     }
     return hit;
 }
@@ -628,7 +628,7 @@ static __inline__ s32 Particle_ColorMode(Particle *particle) {
     if (particle->desc->flags & 0x2000000) {
         if (particle->flags & 2) {
             mode = 2;
-        } else if (D_8011AAEF == 2) {
+        } else if (gEngineApp_m_Settings_unk17 == 2) {
             mode = 1;
         }
     }
@@ -667,7 +667,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     u8 *envFrom;
     u8 *primFrom;
 
-    if (D_800C2214 - ((u32)D_800D8E24 - (u32)D_800F7070->m_pDisplayList) / sizeof(Gfx) < 3000) {
+    if (gDisplayListSize - ((u32)gDList - (u32)gEngineApp_m_pCurrentFrameData->m_pDisplayList) / sizeof(Gfx) < 3000) {
         return;
     }
     if (particle->time < 0.0f) {
@@ -684,10 +684,10 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         }
         hit = Particle_Occluded(particle, view);
         if (!hit) {
-            fade = particle->opacity + D_800B6D28 * 128.0f;
+            fade = particle->opacity + gFrameIncrement * 128.0f;
             alpha = (fade > 255.0f) ? 255 : (s32)fade;
         } else {
-            fade = particle->opacity - D_800B6D28 * 128.0f;
+            fade = particle->opacity - gFrameIncrement * 128.0f;
             alpha = (fade < 0.0f) ? 0 : (s32)fade;
         }
         particle->opacity = alpha;
@@ -753,8 +753,8 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     }
 
     if (!(particle->flags & 0x100000)) {
-        if (D_801198E0 == 1) {
-            ParticleView *camera = D_801198D0;
+        if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
+            ParticleView *camera = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
             CVector3 local;
             f32 depth;
             CMtxF__TransformPoint(camera->viewMtx, &particle->inst.pos, &local);
@@ -762,9 +762,9 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
             if (depth < 0.0f) {
                 depth = -depth;
             }
-            CParticle__BuildMatrix(particle, &particle->mtx[D_800B6D1C], camera, depth);
+            CParticle__BuildMatrix(particle, &particle->mtx[gEvenOdd], camera, depth);
         } else {
-            CParticle__BuildMatrix(particle, &particle->mtx[D_800B6D1C], 0, 0.0f);
+            CParticle__BuildMatrix(particle, &particle->mtx[gEvenOdd], 0, 0.0f);
         }
         particle->builtFrame = frame;
         particle->flags |= 0x100000;
@@ -774,10 +774,10 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     if (dist < 0.0f) {
         dist = -dist;
     }
-    if (D_801198E0 == 1) {
-        GFX_CMD(0xDA380003, (u32)&particle->mtx[D_800B6D1C])
+    if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
+        GFX_CMD(0xDA380003, (u32)&particle->mtx[gEvenOdd])
     } else {
-        mtx = MtxPool_Alloc(D_800F7148, 1);
+        mtx = MtxPool_Alloc(gScene_m_Heap, 1);
         if (mtx == 0) {
             CCache__Unlock(0, model);
             return;
@@ -805,9 +805,9 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
     } else if ((desc->flags & 0x400) && desc->fade->unkE != 4) {
         Render_SetRenderMode(0xF);
     } else if (desc->flags & 0x4000) {
-        Render_SetRenderMode(!(D_8011AAD8 & 0x200) ? 0xD : 0x11);
+        Render_SetRenderMode(!(gEngineApp_m_Settings & 0x200) ? 0xD : 0x11);
     } else {
-        Render_SetRenderMode((D_8011AAD8 & 0x200) ? 0x12 : 0x13);
+        Render_SetRenderMode((gEngineApp_m_Settings & 0x200) ? 0x12 : 0x13);
     }
 
     alpha = 0xFF;
@@ -858,7 +858,7 @@ void CParticle__DrawSprite(Particle *particle, ParticleView *view) {
         }
     }
     alpha = (alpha > 255 ? 255 : alpha) < 0 ? 0 : (alpha > 255 ? 255 : alpha);
-    GFX_CMD(0x01004008, (u32)D_800F1930)
+    GFX_CMD(0x01004008, (u32)gParticleSpriteVtx)
     if (textured) {
         GFX_CMD(0xD7FF0002, (shiftS << 16) | (shiftT & 0xFFFF))
     }
@@ -898,8 +898,8 @@ typedef struct EffectActor {
     /* 0x1C0 */ void *list;
 } EffectActor;
 
-extern u8 D_800F8928[];
-extern u8 D_801102B8[];
+extern u8 gScene_m_ParticleSystem[];
+extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 s16 *CPlayer__GetFiringAmmo(u8 *, s32);
 void CParticle__StopLoopSound(EffectActor *);
@@ -927,13 +927,13 @@ void CParticleSystem__Free(u8 *mgr, EffectActor *actor) {
         child = actor->child;
         if (child != NULL && (kind = child->kind) == 2 && (child->flags & 0x100) &&
             (child->typeId == kind || child->typeId == 0x111)) {
-            CParticleSystem__Free(D_800F8928, child);
+            CParticleSystem__Free(gScene_m_ParticleSystem, child);
             CParticle__StopLoopSound(child);
         }
         CParticle__StopLoopSound(actor);
         if (actor->registered) {
             CParticle__BuildCameraMatrix(actor);
-            Trail_DetachOwner(D_801102B8, actor);
+            Trail_DetachOwner(gEngineApp_m_SwooshSystem, actor);
         }
         if (actor->sound != 0) {
             CDLightSet__Free(D_8010FF34, actor->sound);
@@ -1154,18 +1154,18 @@ typedef struct {
     /* 0x20C */ CMtxF view;
 } Camera;
 
-extern s32 D_8011ACA4;              /* frozen; the current player list is 0x1414 bytes before */
-extern u8 D_8011AAF1;
-extern u8 D_8011AAEF;
-extern CCollisionResults *D_800F1ADC;
-extern CCollisionResults D_800F1CE0;
+extern s32 gEngineApp_m_Settings_paused;              /* frozen; the current player list is 0x1414 bytes before */
+extern u8 gEngineApp_m_Settings_multiplayer;
+extern u8 gEngineApp_m_Settings_unk17;
+extern CCollisionResults *gCollisionResultsP;
+extern CCollisionResults gCollisionResults;
 extern Render D_800F1BA0;
-extern s32 D_801198E0;
-extern s32 D_800B6D1C;
-extern u8 D_800F7078[];
-extern u8 D_801102B8[];
+extern s32 gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount;
+extern s32 gEvenOdd;
+extern u8 gScene[];
+extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
-extern f32 D_800ACE10[2];
+extern f32 gProjectileSpeedScale[2];
 
 extern void *CISet__GetBlock(s32 resource, s32 index);
 extern s32 BinaryRange(Entry *entries, s32 count, s32 kind, s32 *first, s32 *last);
@@ -1261,20 +1261,20 @@ static __inline__ void aimEffect(Effect *effect, CVector3 *vel) {
     s32 targetTeam;
     CCollisionResults *scene;
 
-    if (D_800F1CE0.m_nInstanceNode != -1) {
+    if (gCollisionResults.m_nInstanceNode != -1) {
         effect->mode = -4;
-        targetActor = (Actor *)D_800F1CE0.m_pInstance;
-        targetTeam = D_800F1CE0.m_Frame.action;
-        CMtxF__FromMtxAffine(&targetMtx, &targetActor->bones[D_800F1CE0.m_nInstanceNode]);
+        targetActor = (Actor *)gCollisionResults.m_pInstance;
+        targetTeam = gCollisionResults.m_Frame.action;
+        CMtxF__FromMtxAffine(&targetMtx, &targetActor->bones[gCollisionResults.m_nInstanceNode]);
         CMtxF__InvertAffine(&targetInv, &targetMtx);
-        scene = &D_800F1CE0;
+        scene = &gCollisionResults;
         CMtxF__TransformPoint(&targetInv, &scene->m_vInstancePos, &effect->attachPos);
-        up = D_800F1CE0.m_vVelocity;
+        up = gCollisionResults.m_vVelocity;
         CVector3__Normalize(&up);
         CMtxF__RotateVector(&targetInv, &up, vel);
         effect->target = (s32) targetActor;
         effect->flags |= 0x10000;
-        effect->shake = D_800F1CE0.m_nInstanceNode;
+        effect->shake = gCollisionResults.m_nInstanceNode;
         if (targetActor->def->m_Type == 1) {
             if (effect->owner != 0) {
                 AI_HearNoise(targetActor, &targetActor->ai, &effect->owner->pos, 3);
@@ -1336,24 +1336,24 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
     f32 scale;
     f32 depth;
     s32 sound;
-    s32 *global = &D_8011ACA4;
+    s32 *global = &gEngineApp_m_Settings_paused;
 
     if (global[0] != 0) {
         return 0;
     }
     count = 0;
     resource = sys->resource;
-    D_800F1ADC = &target;
+    gCollisionResultsP = &target;
     block = CISet__GetBlock(resource, 1);
     numEntries = block->count;
     templates = block->entries;
     if (kind == 0xFC) {
-        CScene__Blast(D_800F7078, &pos);
+        CScene__Blast(gScene, &pos);
     }
     if (BinaryRange(templates, numEntries, kind, &first, &last) != 0) {
         entries = ((EntryBlock *) CISet__GetBlock(resource, 2))->entries;
         anchor = 0;
-        /* The current player list, D_80119890, addressed from D_8011ACA4. */
+        /* The current player list, gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead, addressed from gEngineApp_m_Settings_paused. */
         if (((Actor **) global)[-0x505] != 0) {
             anchor = ((Actor **) global)[-0x505];
         }
@@ -1371,7 +1371,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
             }
         }
         mask = 1;
-        if (D_8011AAF1 != 0) {
+        if (gEngineApp_m_Settings_multiplayer != 0) {
             mask = 2;
         }
         for (i = first; i <= last; i++) {
@@ -1435,12 +1435,12 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     break;
             }
             if (entry->flags & 0x2000000) {
-                if (D_8011AAEF == 0 || !(arg11 & 1)) {
+                if (gEngineApp_m_Settings_unk17 == 0 || !(arg11 & 1)) {
                     ok = 0;
                 }
             }
             if (entry->flags & 0x4000000) {
-                if (D_8011AAEF != 0) {
+                if (gEngineApp_m_Settings_unk17 != 0) {
                     ok = 0;
                 }
             }
@@ -1453,27 +1453,27 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 continue;
             }
             if (entry->params->event != 0) {
-                func_00225C08(D_800F7078, entry->params->event, &pos);
+                func_00225C08(gScene, entry->params->event, &pos);
             }
             extra = 0;
             if (entry->flags & 0x8000) {
                 switch (source->type) {
                     case 2:
                         if (!(source->flags & 0x100000)) {
-                            if (D_801198E0 == 1) {
-                                camera = D_801198D0;
+                            if (gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_nCount == 1) {
+                                camera = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
                                 CMtxF__TransformPoint(&camera->view, &source->pos, &aimDelta);
                                 depth = aimDelta.z;
                                 if (depth < 0.0f) {
                                     depth = -depth;
                                 }
-                                CParticle__BuildMatrix(source, &source->matrices[D_800B6D1C], camera, depth);
+                                CParticle__BuildMatrix(source, &source->matrices[gEvenOdd], camera, depth);
                             } else {
-                                CParticle__BuildMatrix(source, &source->matrices[D_800B6D1C], 0, 0.0f);
+                                CParticle__BuildMatrix(source, &source->matrices[gEvenOdd], 0, 0.0f);
                             }
                             source->flags |= 0x100000;
                         }
-                        CMtxF__FromMtxAffine(&mtx, &source->matrices[D_800B6D1C]);
+                        CMtxF__FromMtxAffine(&mtx, &source->matrices[gEvenOdd]);
                         scale = 0.09765625f;
                         if (source->model->large != 0) {
                             scale = 2.857143f;
@@ -1541,7 +1541,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                 if (effect->entry->flags & 0x2000000) {
                     if (effect->flags & 2) {
                         layer = 2;
-                    } else if (D_8011AAEF == 2) {
+                    } else if (gEngineApp_m_Settings_unk17 == 2) {
                         layer = 1;
                     }
                 }
@@ -1578,7 +1578,7 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     dirOut = dir;
                 }
                 if (mode == -8) {
-                    effect->direction = D_800F1CE0.m_vNormal;
+                    effect->direction = gCollisionResults.m_vNormal;
                     CVector3__Normalize(&effect->direction);
                 } else {
                     effect->direction = dirOut;
@@ -1696,20 +1696,20 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
                     }
                     effect->flags |= 0x1000000;
                 }
-                if ((D_800AD084[entry->model->type].m_Flags & 1) || kind == 0x68) {
+                if ((gImpactEventHandlers_m_Flags[entry->model->type].m_Flags & 1) || kind == 0x68) {
                     render->flags |= 0x80000000;
                 }
                 vel = &effect->velocity;
-                CVector3__Scale(vel, vel, D_800ACE10[0]);
+                CVector3__Scale(vel, vel, gProjectileSpeedScale[0]);
                 if ((kind == 0x2D || kind == 0x4F) && source->type == 2) {
-                    if (D_800F1CE0.m_pInstance != 0) {
+                    if (gCollisionResults.m_pInstance != 0) {
                         aimEffect(effect, vel);
                     }
                 }
-                effect->unk1BC = D_800ACE10[1];
+                effect->unk1BC = gProjectileSpeedScale[1];
                 CParticle__Attach(effect, 0, 0);
                 if (entry->unk6 != -1) {
-                    Trail_AddNode(D_801102B8, effect, entry->unk6);
+                    Trail_AddNode(gEngineApp_m_SwooshSystem, effect, entry->unk6);
                 }
                 if (entry->unk7 != -1) {
                     effect->sound = DLight_Spawn(D_8010FF34, entry->unk7);
@@ -1731,6 +1731,6 @@ s32 CParticleSystem__Spawn(EffectSystem *sys, Actor *source, Owner *owner, s32 *
             }
         }
     }
-    D_800F1ADC = &D_800F1CE0;
+    gCollisionResultsP = &gCollisionResults;
     return count;
 }

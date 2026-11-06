@@ -4,7 +4,7 @@
 #define BOSS_STAGE_AS_WORD
 #include "structs/boss.h"
 
-extern s32 D_8012F608;           /* stage */
+extern s32 gLevelScript;           /* stage */
 extern f32 Random_Blend(f32 lo, f32 hi);
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
@@ -21,44 +21,44 @@ typedef struct {
     /* 0x4 */ f32 waitMax;       /* 0x8012F61C */
 } BossWait;
 
-extern BossWait D_8012F618;
-extern BossAttack D_00430E30[];
-extern BossStep D_00430F28[];
-extern BossStep D_00430FB4[];
-extern BossStep D_00431004[];
-extern BossStep D_004310B8[];
-extern BossStep D_00431158[];
-extern BossStep D_00431220[];
+extern BossWait gLevelScript_swayPhase;
+extern BossAttack sPrimagenAttacks_2[];
+extern BossStep sPrimagenAttackScriptStage1_2[];
+extern BossStep sPrimagenAttackScript2Stage1_2[];
+extern BossStep sPrimagenAttackScriptStage2_2[];
+extern BossStep sPrimagenAttackScript2Stage2_2[];
+extern BossStep sPrimagenAttackScriptStage3_2[];
+extern BossStep sPrimagenAttackScript2Stage3_2[];
 
 s32 Primagen_RunAttackStep_2(CGameObjectInstance *obj, CAI *ai, f32 dist) {
     f32 scale;
 
-    if (D_8012F9DC.script.timer > 0.0f) {
+    if (gLevelScript_bossMode.script.timer > 0.0f) {
         return 0;
     }
-    switch (D_8012F9DC.script.steps[D_8012F9DC.script.current].type) {
+    switch (gLevelScript_bossMode.script.steps[gLevelScript_bossMode.script.current].type) {
         case 2:
-            if (D_8012F9DC.script.steps[D_8012F9DC.script.current].arg == 1) {
-                D_8012F618.waitMax = 2.5f;
-                D_8012F618.waitMin = 0.0f;
+            if (gLevelScript_bossMode.script.steps[gLevelScript_bossMode.script.current].arg == 1) {
+                gLevelScript_swayPhase.waitMax = 2.5f;
+                gLevelScript_swayPhase.waitMin = 0.0f;
             }
-            if (D_8012F9DC.script.steps[D_8012F9DC.script.current].arg == 2) {
-                D_8012F618.waitMin = Random_Blend(0.0f, 2.0f);
-                D_8012F618.waitMax = Random_Blend(3.0f, 4.5f);
+            if (gLevelScript_bossMode.script.steps[gLevelScript_bossMode.script.current].arg == 2) {
+                gLevelScript_swayPhase.waitMin = Random_Blend(0.0f, 2.0f);
+                gLevelScript_swayPhase.waitMax = Random_Blend(3.0f, 4.5f);
             }
-            if (D_8012F9DC.script.steps[D_8012F9DC.script.current].arg == 3) {
-                D_8012F618.waitMax = 4.0f;
-                D_8012F618.waitMin = 1.0f;
+            if (gLevelScript_bossMode.script.steps[gLevelScript_bossMode.script.current].arg == 3) {
+                gLevelScript_swayPhase.waitMax = 4.0f;
+                gLevelScript_swayPhase.waitMin = 1.0f;
             }
-            D_8012F9DC.mode = 9;
+            gLevelScript_bossMode.mode = 9;
             CAI__SetMode(obj, ai, 0x12);
             return 1;
         case 3:
             scale = 10.24f;
-            if (D_00430E30[D_8012F9DC.script.steps[D_8012F9DC.script.current].arg].minDist * scale <= dist
-                && dist <= D_00430E30[D_8012F9DC.script.steps[D_8012F9DC.script.current].arg].maxDist * scale) {
-                obj->m_AI.m_AnimSpeed = D_8012F9DC.script.steps[D_8012F9DC.script.current].animSpeed;
-                CAI__SetMode(obj, ai, D_00430E30[D_8012F9DC.script.steps[D_8012F9DC.script.current].arg].mode);
+            if (sPrimagenAttacks_2[gLevelScript_bossMode.script.steps[gLevelScript_bossMode.script.current].arg].minDist * scale <= dist
+                && dist <= sPrimagenAttacks_2[gLevelScript_bossMode.script.steps[gLevelScript_bossMode.script.current].arg].maxDist * scale) {
+                obj->m_AI.m_AnimSpeed = gLevelScript_bossMode.script.steps[gLevelScript_bossMode.script.current].animSpeed;
+                CAI__SetMode(obj, ai, sPrimagenAttacks_2[gLevelScript_bossMode.script.steps[gLevelScript_bossMode.script.current].arg].mode);
                 return 1;
             }
             break;
@@ -66,33 +66,33 @@ s32 Primagen_RunAttackStep_2(CGameObjectInstance *obj, CAI *ai, f32 dist) {
         case 5:
             break;
         case 6:
-            if (D_8012F608 == 1) {
-                D_8012F9DC.script.steps = D_00430FB4;
+            if (gLevelScript == 1) {
+                gLevelScript_bossMode.script.steps = sPrimagenAttackScript2Stage1_2;
             }
-            if (D_8012F608 == 2) {
-                D_8012F9DC.script.steps = D_004310B8;
+            if (gLevelScript == 2) {
+                gLevelScript_bossMode.script.steps = sPrimagenAttackScript2Stage2_2;
             }
-            if (D_8012F608 == 3) {
-                D_8012F9DC.script.steps = D_00431220;
+            if (gLevelScript == 3) {
+                gLevelScript_bossMode.script.steps = sPrimagenAttackScript2Stage3_2;
             }
-            D_8012F9DC.script.cursor = -1;
-            D_8012F9DC.script.current = -1;
-            D_8012F9DC.mode = 4;
+            gLevelScript_bossMode.script.cursor = -1;
+            gLevelScript_bossMode.script.current = -1;
+            gLevelScript_bossMode.mode = 4;
             CAI__SetMode(obj, ai, 0x12);
             return 1;
         case 7:
-            if (D_8012F608 == 1) {
-                D_8012F9DC.script.steps = D_00430F28;
+            if (gLevelScript == 1) {
+                gLevelScript_bossMode.script.steps = sPrimagenAttackScriptStage1_2;
             }
-            if (D_8012F608 == 2) {
-                D_8012F9DC.script.steps = D_00431004;
+            if (gLevelScript == 2) {
+                gLevelScript_bossMode.script.steps = sPrimagenAttackScriptStage2_2;
             }
-            if (D_8012F608 == 3) {
-                D_8012F9DC.script.steps = D_00431158;
+            if (gLevelScript == 3) {
+                gLevelScript_bossMode.script.steps = sPrimagenAttackScriptStage3_2;
             }
-            D_8012F9DC.script.cursor = -1;
-            D_8012F9DC.script.current = -1;
-            D_8012F9DC.mode = 2;
+            gLevelScript_bossMode.script.cursor = -1;
+            gLevelScript_bossMode.script.current = -1;
+            gLevelScript_bossMode.mode = 2;
             CAI__SetMode(obj, ai, 0x18);
             return 1;
     }

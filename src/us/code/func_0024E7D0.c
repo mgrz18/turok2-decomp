@@ -7,7 +7,7 @@ static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
     AmmoInfo *ammo;
     AmmoInfo *found;
     s32 i;
-    WeaponInfo *def = D_800AF618[weapon];
+    WeaponInfo *def = gWeaponInfoTable[weapon];
 
     if (player->m_UseLowerAmmo && (ammo = def->ammo[1]) != NULL
         && player->m_Data.m_AmmoList[ammo->type] > 0) {
@@ -27,9 +27,9 @@ static __inline__ AmmoInfo *GetWeaponAmmo(CPlayer *player, s32 weapon) {
     return found;
 }
 
-extern s16 D_800AF6A8[];
+extern s16 gAmmoIcons[];
 
-/* D_800AF6A8 entry of the current weapon ammo type, -1 if none. */
+/* gAmmoIcons entry of the current weapon ammo type, -1 if none. */
 s32 CPlayer__GetCurrentAmmoInfo(CPlayer *player) {
     AmmoInfo *ammo;
     s32 type;
@@ -39,7 +39,7 @@ s32 CPlayer__GetCurrentAmmoInfo(CPlayer *player) {
     type = (ammo != NULL) ? ammo->type : -1;
     value = -1;
     if (type != -1) {
-        value = D_800AF6A8[type];
+        value = gAmmoIcons[type];
     }
     return value;
 }

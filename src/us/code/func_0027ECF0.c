@@ -3,20 +3,20 @@
 #include "structs/camera.h"
 #include "structs/collision.h"
 
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
-extern f32 D_800B6CC4;          /* split screen margins: bottom, */
-extern f32 D_800B6CC8;          /* top, */
-extern f32 D_800B6CCC;          /* left (not yet a symbol of its own: D_800B6CC8 + 4 in the asm) */
-extern f32 D_800B6CD0;          /* right */
-extern u8 D_8011AAF3;           /* two players split side by side, not one above the other */
-extern s32 D_800B6D00[];        /* the visibility bits outside any region */
-extern CCameraPool D_801198B0;  /* the camera pool */
-extern CBox D_800F5A28;         /* the view boxes of all the active cameras together */
-extern CBox D_800F5A10;         /* and their widened (animation) boxes */
-extern u32 D_800F5A40;          /* and their visibility bits */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
+extern f32 gSplitScreenMarginBottom;          /* split screen margins: bottom, */
+extern f32 gSplitScreenMarginTop;          /* top, */
+extern f32 gSplitScreenMarginLeft;          /* left (not yet a symbol of its own: gSplitScreenMarginTop + 4 in the asm) */
+extern f32 gSplitScreenMarginRight;          /* right */
+extern u8 gEngineApp_m_Settings_unk1B;           /* two players split side by side, not one above the other */
+extern s32 gDefaultVisBits[];        /* the visibility bits outside any region */
+extern CCameraPool gEngineApp_m_Game_m_CameraPool;  /* the camera pool */
+extern CBox gCameraViewBox;         /* the view boxes of all the active cameras together */
+extern CBox gCameraVisibleBox;         /* and their widened (animation) boxes */
+extern u32 gCameraVisBits;          /* and their visibility bits */
 
-/* D_800F5A40 seen as a structure: the loop ORs into it through one. */
+/* gCameraVisBits seen as a structure: the loop ORs into it through one. */
 typedef struct {
     /* 0x0 */ u32 m_Bits;
 } CVisBits;
@@ -28,7 +28,7 @@ void CCamera__MoveViewport(CCamera *cam, f32 width, f32 height, f32 x, f32 y);
 void CCamera__Advance(CCamera *cam);
 
 /* A camera's m_pNext, read as a plain word (not as a structure field, which
- * would let GCC move the read above the store to D_800F5A40 before it). */
+ * would let GCC move the read above the store to gCameraVisBits before it). */
 #define NEXT_CAMERA(c) (*(CCamera **) ((u8 *) (c) + 4))
 
 /* Advances the camera pool (LibTEngine's CCameraPool Advance): returns the
@@ -51,21 +51,21 @@ void CCameraPool__Advance(CCameraPool *pool) {
     CVisBits *flags;
     f32 v;
 
-    right = (f32) D_800C2030;
+    right = (f32) gScreenWidth;
     left = 0.0f;
-    bottom = (f32) D_800C2034;
+    bottom = (f32) gScreenHeight;
     top = 0.0f;
     if ((u32) pool->m_ActiveList.m_nCount >= 2U) {
-        top = D_800B6CC8;
-        bottom -= D_800B6CC4;
-        left = D_800B6CCC;
-        right -= D_800B6CD0;
+        top = gSplitScreenMarginTop;
+        bottom -= gSplitScreenMarginBottom;
+        left = gSplitScreenMarginLeft;
+        right -= gSplitScreenMarginRight;
     }
     width = right - left;
     halfWidth = width * 0.5f;
     height = bottom - top;
     halfHeight = height * 0.5f;
-    shake = (CShake *) D_801198B0.m_ShakeActiveList.m_pHead;
+    shake = (CShake *) gEngineApp_m_Game_m_CameraPool.m_ShakeActiveList.m_pHead;
     view = &pool->m_MainCamera;
     if (shake != NULL) {
         do {
@@ -85,8 +85,8 @@ void CCameraPool__Advance(CCameraPool *pool) {
             view = &pool->m_MainCamera;
         } while (shake != NULL);
     }
-    view->m_Viewport.m_Width = (f32) D_800C2030;
-    view->m_Viewport.m_Height = (f32) D_800C2034;
+    view->m_Viewport.m_Width = (f32) gScreenWidth;
+    view->m_Viewport.m_Height = (f32) gScreenHeight;
     view->m_Viewport.m_ScreenPosX = 0;
     view->m_Viewport.m_ScreenPosY = 0;
     view = (CCamera *) pool->m_ActiveList.m_pHead;
@@ -95,7 +95,7 @@ void CCameraPool__Advance(CCameraPool *pool) {
         CCamera__MoveViewport(view, width, height, 0.0f, 0.0f);
         break;
     case 2:
-        if (D_8011AAF3 == 0) {
+        if (gEngineApp_m_Settings_unk1B == 0) {
             CCamera__MoveViewport(view, width, halfHeight, left, top);
             view = view->m_pNext;
             CCamera__MoveViewport(view, width, halfHeight, left, top + halfHeight);
@@ -124,21 +124,21 @@ void CCameraPool__Advance(CCameraPool *pool) {
         CCamera__MoveViewport(view, halfWidth, halfHeight, splitX, splitY);
         break;
     }
-    clip = &D_800F5A28;
+    clip = &gCameraViewBox;
     *clip = *(CBox *) &pool->m_MainCamera.m_ViewMin;
-    bounds = &D_800F5A10;
+    bounds = &gCameraVisibleBox;
     *bounds = *(CBox *) &pool->m_MainCamera.m_AnimMin;
-    D_800F5A40 = D_800B6D00[0];
+    gCameraVisBits = gDefaultVisBits[0];
     CCamera__Advance(&pool->m_MainCamera);
     view = (CCamera *) pool->m_ActiveList.m_pHead;
     if (view != NULL) {
         CCamera__Advance(view);
         *clip = *(CBox *) &view->m_ViewMin;
         *bounds = *(CBox *) &view->m_AnimMin;
-        D_800F5A40 = view->m_ViewParams.m_VisBits;
+        gCameraVisBits = view->m_ViewParams.m_VisBits;
         view = NEXT_CAMERA(view);
         if (view != NULL) {
-            flags = (CVisBits *) &D_800F5A40;
+            flags = (CVisBits *) &gCameraVisBits;
             do {
                 CCamera__Advance(view);
                 v = view->m_ViewMin.x;

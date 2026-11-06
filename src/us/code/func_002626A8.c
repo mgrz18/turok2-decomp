@@ -3,7 +3,7 @@
 
 typedef void (*AICallback)(void *actor, void *ai);
 
-extern u8 D_800B1DE0[];
+extern u8 gTurretModeTable[];
 void Turret_Step(void *actor, void *ai);
 void Turret_Hurt(void *actor, void *ai);
 void Turret_CalcOrientation(void *actor, void *ai);
@@ -18,7 +18,7 @@ void Turret_Setup(void *actor, CAI *ai) {
      * than $v1, so the value is pinned to $a0. */
     register AICallback unk108 asm("$4");
 
-    ai->m_pModeTable = D_800B1DE0;
+    ai->m_pModeTable = gTurretModeTable;
     ai->m_pfStep = Turret_Step;
     ai->m_pfHurt = Turret_Hurt;
     ai->m_pfCalculateOrientationMatrix = Turret_CalcOrientation;

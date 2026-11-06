@@ -16,7 +16,7 @@ typedef struct B21World {
     B21GameBlk blk;     /* 0x1460 (0x1860) */
 } B21World;
 extern B21World D_80119850;
-extern s32 D_8011ACF4;
+extern s32 gEngineApp_m_Settings_match_unk44;
 s32 MenuPool_CountOpen(void *a);
 s32 Cinema_PathPlaying();
 s32 Cinema_GetScriptId();
@@ -39,7 +39,7 @@ s32 func_00289F30(CEngineApp *g) {
             }
         }
     }
-    if (D_8011ACF4 != 0) {
+    if (gEngineApp_m_Settings_match_unk44 != 0) {
 check:
         r = Cinema_IsFinished();
         if (r) return 1;

@@ -23,7 +23,7 @@ typedef struct Entry0026C5C4 {
 s32 CScene__GetRegionInfo(s32, s32);
 
 s32 CGameRegion__FloodSetWaterSame(s32, s32);                    /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
     s32 temp_a0;
@@ -51,7 +51,7 @@ void CGameRegion__FloodSetWater(Entry0026C5C4 *arg0) {
                 CGameRegion__FloodSetWaterSame(temp_a0_3, temp_s0);
             }
         }
-        temp_v0 = CScene__GetRegionInfo((s32) &D_800F7078, (s32) arg0);
+        temp_v0 = CScene__GetRegionInfo((s32) &gScene, (s32) arg0);
         if (temp_v0 != 0) {
             ((Unk0022425C *)temp_v0)->unk5C = 2;
             ((Unk0022425C *)temp_v0)->flags = ((Unk0022425C *)temp_v0)->flags | 1;

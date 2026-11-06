@@ -13,9 +13,9 @@ typedef struct DirLight {
     /* 0x0C */ u8 color[4];
 } DirLight;
 
-extern u8 D_800F1850[];
-extern u8 D_800F18F0[];
-extern DirLight D_800F1930[4];
+extern u8 gParticleIntelligence[];
+extern u8 sParticleRotXMtx[];
+extern DirLight gParticleSpriteVtx[4];
 
 extern void CList__Construct(CList *list, s32 prevOffset, s32 nextOffset);
 extern s32 CList__AddTail(CList *list, void *node);
@@ -28,7 +28,7 @@ void CParticleSystem__Construct(CParticleSystem *sys, s32 arg1) {
     DirLight *light;
 
     for (i = 0; i < 128; i++) {
-        sys->m_ParticleVars[i].header.m_pIntelligence = (CIntelligence *)D_800F1850;
+        sys->m_ParticleVars[i].header.m_pIntelligence = (CIntelligence *)gParticleIntelligence;
         sys->m_ParticleVars[i].header.m_Type = 2;
         sys->m_ParticleVars[i].m_dwFlags = 0;
         sys->m_ParticleVars[i].unk_1B8 = 0;
@@ -42,9 +42,9 @@ void CParticleSystem__Construct(CParticleSystem *sys, s32 arg1) {
     for (i = 0; i < 3; i++) {
         CList__Construct(&sys->m_ActiveList[i], 0x1C4, 0x1C8);
     }
-    func_0027BD10(D_800F1850);
+    func_0027BD10(gParticleIntelligence);
     for (j = 0; j < 4; j++) {
-        light = &D_800F1930[j];
+        light = &gParticleSpriteVtx[j];
         switch (j) {
             case 0:
                 light->x = -1;
@@ -78,6 +78,6 @@ void CParticleSystem__Construct(CParticleSystem *sys, s32 arg1) {
         light->color[2] = 0xFF;
         light->color[3] = 0xFF;
     }
-    CMtxF__SetRotateX(D_800F18F0, 1.5707964f);
+    CMtxF__SetRotateX(sParticleRotXMtx, 1.5707964f);
     sys->m_pParticleData = (void *)arg1;
 }

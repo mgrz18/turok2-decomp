@@ -15,16 +15,16 @@ struct MenuItemRecAt14;
 typedef struct MenuItemRecAt14 MenuItemRecAt14;
 extern u8 D_800B3E88[];
 extern u8 D_800B3EA0[];
-extern s32 D_8011AC88;
+extern s32 gEngineApp_m_Settings_mode;
 extern u8 D_800B3E70[];
-extern u32 D_8011AAE0[];
+extern u32 gEngineApp_m_Settings_difficulty[];
 s32 OptionsMenu_DifficultyText_2(MenuItemRecAt14 *item) {
-    if (D_8011AC88 == 8) {
+    if (gEngineApp_m_Settings_mode == 8) {
         item->flags |= 0x01000000;
     } else {
         item->flags &= ~0x01000000;
     }
-    switch (D_8011AAE0[0]) {
+    switch (gEngineApp_m_Settings_difficulty[0]) {
     case 8:
         item->table = D_800B3E70;
         break;

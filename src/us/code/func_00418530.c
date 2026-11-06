@@ -5,7 +5,7 @@
 
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 FragTagMenu_StepTagLimit(void *first, void *second) {
-    GameSettings *options = &D_8011AAD8;
+    GameSettings *options = &gEngineApp_m_Settings;
     options->tagScoreLimit = Menu_StepValue(second, options->tagScoreLimit, 1, 0, 0x63, 1);
     return 0;
 }

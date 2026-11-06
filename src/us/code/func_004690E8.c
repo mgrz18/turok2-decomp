@@ -31,7 +31,7 @@ s32 Cont_ResetSlot_2(S5Ctl *c, s32 port) {
         c->ent[i].c = 0x30;
         c->ent[i].d = 0;
     }
-    c->f0 = ((D_800F6778[port].errno >> 3) ^ 1) & 1;
+    c->f0 = ((gContStatus[port].errno >> 3) ^ 1) & 1;
     c->fD0 = 0;
     c->fD4 = 0;
     RumblePool_Init(c->blkA, c->blkB, 3);

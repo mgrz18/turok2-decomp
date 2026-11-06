@@ -13,20 +13,20 @@ typedef struct {
     /* 0x3C0 */ GfxTask288318 *cur;
 } GfxState288318;
 
-extern u32 D_800B6D18; /* frame counter */
-extern s32 D_800B6D1C; /* double-buffer index */
-extern s32 D_800B6D20;
-extern u32 D_800C2210; /* task count */
-extern s32 D_80130A4C;
-extern s32 D_80130A50;
-extern s32 D_80130A80;
-extern s32 D_80130A84;
+extern u32 gFrameCount; /* frame counter */
+extern s32 gEvenOdd; /* double-buffer index */
+extern s32 gFrameCountGameplay;
+extern u32 gTotalFramebuffers; /* task count */
+extern s32 gLineList0;
+extern s32 gLineList1;
+extern s32 gDisplayList1;
+extern s32 gDisplayList0;
 
 void CEngineApp__AdvanceFrameData(GfxState288318 *gfx) {
-    D_800B6D18++;
-    D_800B6D20++;
-    D_800B6D1C ^= 1;
-    gfx->cur = &gfx->tasks[D_800B6D18 % D_800C2210];
-    gfx->cur->colorImage = D_800B6D1C ? D_80130A84 : D_80130A80;
-    gfx->cur->depthImage = D_800B6D1C ? D_80130A4C : D_80130A50;
+    gFrameCount++;
+    gFrameCountGameplay++;
+    gEvenOdd ^= 1;
+    gfx->cur = &gfx->tasks[gFrameCount % gTotalFramebuffers];
+    gfx->cur->colorImage = gEvenOdd ? gDisplayList0 : gDisplayList1;
+    gfx->cur->depthImage = gEvenOdd ? gLineList0 : gLineList1;
 }

@@ -10,7 +10,7 @@ typedef struct {
 } SoundOwner;
 
 s32 Sound__Play(s16, CVector3, s32, s32);    /* extern */
-extern s32 D_800B2A8C;
+extern s32 sLoopSoundsLastResumed;
 
 /* Restarts every looping sound of the owner. */
 void LoopSounds_Resume(SoundOwner *arg0) {
@@ -23,7 +23,7 @@ void LoopSounds_Resume(SoundOwner *arg0) {
             temp_v0 = Sound__Play(var_s0->sound.h.lo, var_s0->pos, var_s0->flags, -1);
             var_s0->handle = temp_v0;
             var_s0 = var_s0->next;
-            D_800B2A8C = temp_v0;
+            sLoopSoundsLastResumed = temp_v0;
         } while (var_s0 != NULL);
     }
     arg0->playing = 0;

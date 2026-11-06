@@ -13,7 +13,7 @@ typedef struct {
 
 s32 CScene__MarkGeneratorsSaved(s32);
 
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void BlindOne_PhaseMinionsInit_2(PosCopy *arg0) {
     CVector3 *temp_v0;
@@ -21,5 +21,5 @@ void BlindOne_PhaseMinionsInit_2(PosCopy *arg0) {
     temp_v0 = arg0->pos;
     arg0->y = temp_v0->y;
     arg0->z = temp_v0->z;
-    CScene__MarkGeneratorsSaved((s32) &D_800F7078);
+    CScene__MarkGeneratorsSaved((s32) &gScene);
 }

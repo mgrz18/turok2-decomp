@@ -6,7 +6,7 @@
 /* As CGameObjectInstance__DrawModel, for a model drawn from its cached "lit vertices"
  * resource (built by CGameObjectInstance__ConstructLitVertices, fixed up once by Model_PulseVertexColors). */
 
-extern s32 D_800ACAD8;
+extern s32 gLitVerticesKey;
 
 void CGameObjectInstance__DrawShadow(CGameObjectInstance *, s32, CDrawArgs *);
 void Render_QueueModelInstance(s32, s32, s32, void *, char *, s32, s32);
@@ -71,7 +71,7 @@ void CGameObjectInstance__DrawModelLitVertices(CGameObjectInstance *actor, s32 a
     if (params->m_bDraw == 0) {
         return;
     }
-    resource = CCache__RequestDecompression(0, actor->m_dwUniqueID | D_800ACAD8, params->m_hModel, 0, 0, actor,
+    resource = CCache__RequestDecompression(0, actor->m_dwUniqueID | gLitVerticesKey, params->m_hModel, 0, 0, actor,
                              CGameObjectInstance__ConstructLitVertices, "lit vertices", 1);
     if (resource == NULL) {
         return;

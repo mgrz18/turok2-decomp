@@ -7,7 +7,7 @@ typedef float f32;
 f32 AI_FindClearHeading(void *, s32, s32, s32, void *, f32);
 void Actor_TurnBy(void *, f32);
 extern f32 D_800A696C;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 typedef struct { u8 pad0[4]; s32 x, y, z; } B04Tg; /* Turok 2: pos at 0x4 */
 void AI_TurnTowardTarget(void *o, s32 a1, B04Tg *t, f32 lim) {
     f32 r, v, a;
@@ -16,7 +16,7 @@ void AI_TurnTowardTarget(void *o, s32 a1, B04Tg *t, f32 lim) {
         v = r;
         if (lim < r) r = lim;
         else if (r < -lim) r = -lim;
-        r = r * D_800B6D28;
+        r = r * gFrameIncrement;
         a = r;
         if (a < 0.0f) a = -a;
         if (v < 0.0f) {

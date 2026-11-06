@@ -19,11 +19,11 @@ typedef struct {
 
 VertexGroup *CISet__GetBlock(s32 *, s32);
 
-extern s32 D_800B6D18;
-extern s8 D_800ACAF4[];
+extern s32 gFrameCount;
+extern s8 gColorPulseTable[];
 
 void Model_PulseVertexColors(s32 *object, u8 *colors) {
-    s32 state = D_800B6D18;
+    s32 state = gFrameCount;
     s32 i = 0;
     s32 g, count;
 
@@ -40,7 +40,7 @@ void Model_PulseVertexColors(s32 *object, u8 *colors) {
                 u8 *color;
 
                 if (flags & 0x70) {
-                    amount = D_800ACAF4[(state + ((flags & 0x70) >> 2)) & 0x3F];
+                    amount = gColorPulseTable[(state + ((flags & 0x70) >> 2)) & 0x3F];
                     amount >>= (flags & 0xC) >> 2;
                     color = colors + i * 4;
 

@@ -115,18 +115,18 @@ struct M1Pad {
                 M1B1 stickX;
                 M1B1 stickY;
 };
-extern s32 D_800F7078[];
-extern u8 D_801102B8[];
+extern s32 gScene[];
+extern u8 gEngineApp_m_SwooshSystem[];
 void CScene__SetInstanceSavedBit(s32 *p, M1Actor *a, s32 n);
 void GameObject_FireTriggers(M1Actor *a, s32 b, M1Actor *c);
 void Sound__Play(s16 id, CVector3 pos, s32 a, s32 b);
 void Actor_SpawnParticle(M1Actor *a, s32 id, CVector3 pos, s32 n);
-void AI_SpawnParticlesOnce(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);
+void AI_DropPickupsOnce(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);
 void SwooshSet_FreeOwner(u8 *p, M1Actor *a);
 void Destructible_GoEnter(M1Actor *actor, M1State *state) {
     M1Info *info = &actor->def->info;
     s32 mode;
-    CScene__SetInstanceSavedBit(D_800F7078, actor, 1);
+    CScene__SetInstanceSavedBit(gScene, actor, 1);
     GameObject_FireTriggers(actor, 0x40000, actor);
     if (state->unk4 == 0) {
         actor->flags &= ~0x10000;
@@ -135,7 +135,7 @@ void Destructible_GoEnter(M1Actor *actor, M1State *state) {
         actor->flags &= ~0x2000;
         actor->flags &= ~0x100;
     }
-    mode = D_800F7078[0];
+    mode = gScene[0];
     if (mode == 4) {
         if (info->unk20.i != -1) {
             Sound__Play(info->unk20.h[1], actor->pos, 0, -1);
@@ -143,9 +143,9 @@ void Destructible_GoEnter(M1Actor *actor, M1State *state) {
         if (info->unk1C != -1) {
             Actor_SpawnParticle(actor, info->unk1C, actor->pos, 0);
         }
-        AI_SpawnParticlesOnce(actor, state, 4, info->unk24.i, info->unk28.i);
-        SwooshSet_FreeOwner(D_801102B8, actor);
-        if (D_800F7078[0] != mode) goto L;
+        AI_DropPickupsOnce(actor, state, 4, info->unk24.i, info->unk28.i);
+        SwooshSet_FreeOwner(gEngineApp_m_SwooshSystem, actor);
+        if (gScene[0] != mode) goto L;
     } else {
 L:
         actor->flags &= ~0x100;

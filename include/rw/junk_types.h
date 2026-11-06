@@ -8,9 +8,9 @@
 /* The shared types come from the shared headers: libultra's from
  * ultra_types.h, CVector3 (Rage Wars' Vec3f, M04Vec3, B19Vec3, O01Vec3) from
  * structs/vector.h, libaudio's ALHeap/ALFilter from structs/libaudio.h. The
- * sound manager types (Rage Wars' SndMgr, SndVoice, SndSeq, SndLock and the
+ * sound manager types (Rage Wars' CAudioWorld, SndVoice, SndSeq, SndLock and the
  * M04Emitter/M04VP/M04Ctx views of them) were the same layouts as
- * structs/sound.h's SndMgr, SndVoice, SndVoiceParams, SndSeq and CMutex: the
+ * structs/sound.h's CAudioWorld, SndVoice, SndVoiceParams, SndSeq and CMutex: the
  * files that used them include structs/sound.h now. */
 #include "common.h"
 #include "ultra_types.h"
@@ -188,8 +188,8 @@ typedef struct M04SortTab {
                s16 n;
                u32 v[1];
 } M04SortTab;
-/* The sound manager seen from its bank pointer (SndMgr.bank, 0x7C): snd is
- * SndMgr.handles. Kept as a view because addressing the handles through it
+/* The sound manager seen from its bank pointer (CAudioWorld.bank, 0x7C): snd is
+ * CAudioWorld.handles. Kept as a view because addressing the handles through it
  * is what the ROM does (SndVoicePool_FindSlot, SndVoicePool_ReleaseVoice). */
 typedef struct SndCore {
                  u8 pad0[0x60];

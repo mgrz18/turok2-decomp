@@ -44,20 +44,20 @@ void CMtxF__Copy(f32 *, void *);
 void CMtxF__ToMtxAffine(void *, f32 *);
 f32 HalfToFloat(s32);
 
-extern u8 D_800F7078[];
-extern s32 D_800ACAF0;
-extern s32 D_800B6D00;
+extern u8 gScene[];
+extern s32 gNextUniqueId;
+extern s32 gDefaultVisBits;
 extern u8 D_800B6D1B;
 
 static __inline__ s32 next_key(void) {
     s32 next;
 
-    next = D_800ACAF0 + 1;
-    D_800ACAF0 = next;
+    next = gNextUniqueId + 1;
+    gNextUniqueId = next;
     if (next == 0x3FFFFF) {
-        D_800ACAF0 = 0x380000;
+        gNextUniqueId = 0x380000;
     }
-    return D_800ACAF0;
+    return gNextUniqueId;
 }
 
 void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 owner, u8 *segments) {
@@ -68,7 +68,7 @@ void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 ow
     prop->id = record->id;
     prop->owner = owner;
     prop->field1C = 0;
-    prop->model = CScene__GetIntelligence(D_800F7078, record->model);
+    prop->model = CScene__GetIntelligence(gScene, record->model);
     prop->flags = record->flags;
     rotation[0] = record->rotation[0] * 0.007874016f;
     rotation[1] = record->rotation[1] * 0.007874016f;
@@ -87,7 +87,7 @@ void CStaticObject__Construct(PlacedProp *prop, PlacedPropRecord *record, s32 ow
         prop->max[1] = record->position.y + 102.399994f;
         prop->max[2] = record->position.z + 102.399994f;
         CMtxF__Copy(prop->matrix, matrix);
-        prop->value = D_800B6D00;
+        prop->value = gDefaultVisBits;
     } else {
         prop->min[0] = HalfToFloat(record->extents[0]) + record->position.x - 0.5f;
         prop->min[1] = HalfToFloat(record->extents[1]) + record->position.y - 0.5f;

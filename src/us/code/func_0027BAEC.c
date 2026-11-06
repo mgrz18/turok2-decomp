@@ -1,9 +1,9 @@
 #include "common.h"
 
-extern s32 D_800F56A8;
+extern s32 gLoadedFont;
 
 f32 COnScreen__GetFontAdvance(void) {
-    switch (D_800F56A8) {
+    switch (gLoadedFont) {
         case 5:
             return 6.0f;
         case 4:

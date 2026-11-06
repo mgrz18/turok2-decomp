@@ -5,6 +5,6 @@
 
 extern void OptionsMenu_Init();
 void OptionsMenu_Init(void) {
-    extern int D_80130930;
-    D_80130930 = 0;
+    extern int sResolutionToggleDelay;
+    sResolutionToggleDelay = 0;
 }

@@ -16,6 +16,6 @@ void SndSeq_FadeOut(SndSeq *s) {
         f = D_800A81E0;
     }
     s->unk30 = f;
-    s->unk28 = 0;
+    s->track = 0;
     s->fadeStep = (f32)s->volume.w / (f * D_800A81E4);
 }

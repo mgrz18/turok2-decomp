@@ -14,7 +14,7 @@ extern f32 func_002982F0(f32 angle);                                      /* sin
 extern f32 func_002974C0(f32 angle);                                      /* cos */
 
 extern s32 D_800F1F50[];
-extern s32 D_8012FA04[];        /* boss script index; an array so the store stays after the obj store */
+extern s32 gLevelScript_script_current[];        /* boss script index; an array so the store stays after the obj store */
 
 void Primagen_UpdateMode27_2(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -26,7 +26,7 @@ void Primagen_UpdateMode27_2(CGameObjectInstance *obj, CAI *ai) {
 
     if (ai->m_AnimRepeatedCount != 0) {
         obj->m_AI.m_AnimSpeed = 1.0f;
-        D_8012FA04[0] = -1;
+        gLevelScript_script_current[0] = -1;
         CAI__SetMode(obj, ai, 0x13);
     }
     D_800F1F50[0] |= 0x8000;

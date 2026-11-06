@@ -21,7 +21,7 @@ void MotherBoss_Mode06_RecallParts(CGameObjectInstance *obj, CAI *ai) {
         AI_TurnClamped(obj, ai, 0.261799425f, t2.m_Sight.m_Angle);
     }
     if (ai->m_AnimRepeatedCount) {
-        state = &D_8012FB70;
+        state = &gMotherBoss;
         for (i = 0; i < 6; i++) {
             CAI__SetMode(state->parts[i], &state->parts[i]->m_AI, 0);
         }

@@ -38,7 +38,7 @@ typedef struct SampledCurve SampledCurve;
 extern func_8020CA10_G1 D_800A8074;
 extern func_8020CA10_G1 D_800A8070;
 extern func_8020CA10_G1 D_800A8078;
-extern f32 D_8011B0A0[2];
+extern f32 gCurrentFB[2];
 s32 RumbleCurve_Advance(void *arg0) {
     PlayerRecAt8 *player = arg0;
     f32 temp_f1;
@@ -49,7 +49,7 @@ s32 RumbleCurve_Advance(void *arg0) {
     temp_v1 = temp_a0->type;
     switch (temp_v1) {
     case 0: {
-        f32 divisor = D_8011B0A0[1];
+        f32 divisor = gCurrentFB[1];
         temp_f1 = player->time + (D_800A8070.unk0 / divisor);
         player->time = temp_f1;
         if (temp_a0->length <= temp_f1) {
@@ -59,7 +59,7 @@ s32 RumbleCurve_Advance(void *arg0) {
     }
     case 1: {
         RandomCurve *random = (void *)temp_a0;
-        f32 divisor = D_8011B0A0[1];
+        f32 divisor = gCurrentFB[1];
         temp_f1_2 = player->time - (D_800A8074.unk0 / divisor);
         player->time = temp_f1_2;
         if (temp_f1_2 <= 0.0f) {

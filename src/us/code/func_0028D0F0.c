@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_8011F290;
+extern s32 gSavedPlayers;
 
 void SavedPlayers_Deactivate(void) {
-    D_8011F290 = 0;
+    gSavedPlayers = 0;
 }

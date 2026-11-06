@@ -27,26 +27,26 @@ typedef struct Thread {
 
 /* "\n": the string literal of the functions before this one in the same file (the ROM merges it), declared so this one does not emit its own copy. */
 extern u8 D_800AA0F0[];
-extern s32 D_800C2030;              /* screen width */
-extern s32 D_800C2034;              /* screen height */
-extern u16 *D_80130A88;             /* frame buffer */
-extern u16 *D_8011F180;             /* crash screen frame buffer */
-extern u16 D_8011F184;              /* text colour */
-extern u16 D_800B7498;              /* background colour */
-extern char D_8011F188[];           /* build string */
+extern s32 gScreenWidth;              /* screen width */
+extern s32 gScreenHeight;              /* screen height */
+extern u16 *gCFB;             /* frame buffer */
+extern u16 *sCrashFrameBuffer;             /* crash screen frame buffer */
+extern u16 sCrashTextColor;              /* text colour */
+extern u16 sCrashBgColor;              /* background colour */
+extern char gEngineTimestamp[];           /* build string */
 extern char D_8010FED4[];
-extern s32 D_80110030;              /* warping */
-extern s32 D_80110048;              /* warp id */
-extern CPlayer *D_80119890;     /* players */
-extern char *D_800B25E4;            /* failed assertion: file */
+extern s32 gScene_m_bWarpSpawn;              /* warping */
+extern s32 gScene_m_LevelID;              /* warp id */
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;     /* players */
+extern char *gAssertFile;            /* failed assertion: file */
 extern s32 D_800F1FF0;              /* failed assertion: line */
 extern char *D_800F1FF4;            /* failed assertion: expression */
-extern u8 D_800B749C[];             /* cause descriptions */
-extern u8 D_800C7C00[];             /* thread stacks */
-extern u8 D_800C7C80[];
-extern u8 D_800C5400[];
-extern u8 D_800CFC80[];
-extern volatile s32 D_800B75EC;  /* set when the crash screen may be left */
+extern u8 gCrashCauseDesc[];             /* cause descriptions */
+extern u8 gThreadStackIdle[];             /* thread stacks */
+extern u8 gThreadStackMain[];
+extern u8 gThreadStackAudio[];
+extern u8 gSchedulerStack[];
+extern volatile s32 sCrashCanExit;  /* set when the crash screen may be left */
 
 extern u64 osGetTime(void);                 /* osGetTime */
 extern void Video_SetResolution(s32);
@@ -59,11 +59,11 @@ extern void Crash_PrintStack(u8 *stack, s32 size, ThreadContext *context, u8 id)
 extern void osWritebackDCacheAll(void);
 
 static __inline__ void clearScreen(void) {
-    u16 *p = D_8011F180;
+    u16 *p = sCrashFrameBuffer;
     s32 i;
 
-    for (i = 0; i < D_800C2030 * D_800C2034; i++) {
-        *p++ = D_800B7498;
+    for (i = 0; i < gScreenWidth * gScreenHeight; i++) {
+        *p++ = sCrashBgColor;
     }
 }
 
@@ -104,26 +104,26 @@ void Crash_ShowScreen(Thread *thread) {
     do {
     } while ((f32)(((osGetTime() - start) * 64) / 3) * 0.000001f < 4.0f);
     Video_SetResolution(1);
-    osViSwapBuffer(D_80130A88);
-    D_8011F184 = 0xA529;
-    D_800B7498 = 0x2955;
-    D_8011F180 = D_80130A88;
+    osViSwapBuffer(gCFB);
+    sCrashTextColor = 0xA529;
+    sCrashBgColor = 0x2955;
+    sCrashFrameBuffer = gCFB;
     clearScreen();
     clearScreen();
-    D_8011F184 = 0xF7A9;
+    sCrashTextColor = 0xF7A9;
     printString((u8 *)"TUROK2 BUILD ");
-    printString((u8 *)D_8011F188);
+    printString((u8 *)gEngineTimestamp);
     printString(D_800AA0F0);
     printString((u8 *)D_8010FED4);
     printString((u8 *)" ");
-    if (D_80110030 != 0) {
+    if (gScene_m_bWarpSpawn != 0) {
         printString((u8 *)"WARP ID   ");
-        printInt(D_80110048);
+        printInt(gScene_m_LevelID);
     } else {
         printString((u8 *)"NO WARP ID");
     }
     printString(D_800AA0F0);
-    for (player = D_80119890, i = 0; player != NULL; player = player->m_pNext, i++) {
+    for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead, i = 0; player != NULL; player = player->m_pNext, i++) {
         printString((u8 *)"PLAYER");
         printInt(i);
         printString((u8 *)" XYZ ");
@@ -136,11 +136,11 @@ void Crash_ShowScreen(Thread *thread) {
         printString(D_800AA0F0);
     }
     printString(D_800AA0F0);
-    if (D_800B25E4 != NULL) {
+    if (gAssertFile != NULL) {
         printString((u8 *)"ASSERTION FAILED!! in thread ");
         printInt(thread->id);
         printString((u8 *)"\nFile: ");
-        printString((u8 *)D_800B25E4);
+        printString((u8 *)gAssertFile);
         printString((u8 *)"  Line: ");
         printInt(D_800F1FF0);
         printString(D_800AA0F0);
@@ -154,7 +154,7 @@ void Crash_ShowScreen(Thread *thread) {
         printString((u8 *)"Fault in thread ");
         printInt(thread->id);
         printString(D_800AA0F0);
-        Crash_PrintFlags(context->cause, "cause", D_800B749C);
+        Crash_PrintFlags(context->cause, "cause", gCrashCauseDesc);
     }
     printString(D_800AA0F0);
     Crash_PrintRegPair("pc", context->pc, "sp", context->sp);
@@ -165,19 +165,19 @@ void Crash_ShowScreen(Thread *thread) {
     Crash_PrintRegPair("sr", context->sr, "fpcsr", context->fpcsr);
     switch (thread->id) {
     case 0:
-        Crash_PrintStack(D_800C7C00, 0x80, context, thread->id);
+        Crash_PrintStack(gThreadStackIdle, 0x80, context, thread->id);
         break;
     case 8:
-        Crash_PrintStack(D_800C5400, 0x2800, context, thread->id);
+        Crash_PrintStack(gThreadStackAudio, 0x2800, context, thread->id);
         break;
     case 7:
-        Crash_PrintStack(D_800CFC80, 0x2000, context, thread->id);
+        Crash_PrintStack(gSchedulerStack, 0x2000, context, thread->id);
         break;
     case 1:
-        Crash_PrintStack(D_800C7C80, 0x8000, context, thread->id);
+        Crash_PrintStack(gThreadStackMain, 0x8000, context, thread->id);
         break;
     }
     osWritebackDCacheAll();
-    while (D_800B75EC == 0) {
+    while (sCrashCanExit == 0) {
     }
 }

@@ -3,8 +3,8 @@
 #include "gfx.h"
 #include "structs/camera.h"
 
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
 f32 func_00298470(f32 x);       /* square root */
 void Hud_DrawSprite(s32 sprite, s32 frame, s16 x, s16 y, f32 scaleX, f32 scaleY, s32 arg6);
 
@@ -25,16 +25,16 @@ void CCamera__DrawGlare(CCamera *cam, f32 x, f32 y, f32 alpha, s32 sun, s32 unus
     s32 i;
 
     if (alpha != 0.0f) {
-        dx = (f32) (D_800C2030 / 2) - x;
-        dy = (f32) (D_800C2034 / 2) - y;
+        dx = (f32) (gScreenWidth / 2) - x;
+        dy = (f32) (gScreenHeight / 2) - y;
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xE3001201;             /* gDPSetTextureFilter(bilerp) */
             g->w1 = 0x2000;
         }
         dist = func_00298470(dx * dx + dy * dy);
         if (sun == 0) {
-            t = dist / func_00298470((f32) (D_800C2030 * D_800C2030) * 0.25f + (f32) (D_800C2034 * D_800C2034) * 0.25f);
+            t = dist / func_00298470((f32) (gScreenWidth * gScreenWidth) * 0.25f + (f32) (gScreenHeight * gScreenHeight) * 0.25f);
             if (1.0f < t) {
                 alpha = 0.0f;
             } else {
@@ -57,8 +57,8 @@ void CCamera__DrawGlare(CCamera *cam, f32 x, f32 y, f32 alpha, s32 sun, s32 unus
             f32 border, a, b, c, e, m, m2;
 
             border = 35.2f;
-            a = (f32) D_800C2034 + border;
-            b = (f32) D_800C2030 + border;
+            a = (f32) gScreenHeight + border;
+            b = (f32) gScreenWidth + border;
             c = x + border;
             e = y + border;
             m = a - y;
@@ -101,16 +101,16 @@ void CCamera__DrawGlare(CCamera *cam, f32 x, f32 y, f32 alpha, s32 sun, s32 unus
             }
             t = size * 0.55f;
             radius = t * 16.0f;
-            if (!(-radius < x && x < (f32) D_800C2030 + radius && -radius < y && y < (f32) D_800C2034 + radius)) {
+            if (!(-radius < x && x < (f32) gScreenWidth + radius && -radius < y && y < (f32) gScreenHeight + radius)) {
                 return;
             }
             if (sun && i == 0) {
-                g = D_800D8E24++;
+                g = gDList++;
                 g->w0 = 0xFB000000;                     /* gDPSetEnvColor */
                 g->w1 = (u32) (alpha * 255.0f) | 0xFFFFFF00;
                 Hud_DrawSprite(0x258, 0, (s32) (x - radius), (s32) (y - radius), t, t, 1);
             } else {
-                g = D_800D8E24++;
+                g = gDList++;
                 g->w0 = 0xFB000000;
                 g->w1 = (u8) colours[i * 3] << 24 | (u8) colours[i * 3 + 1] << 16 | (u8) colours[i * 3 + 2] << 8
                       | ((u32) (opacities[i] * alpha) & 0xFF);

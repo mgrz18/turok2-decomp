@@ -5,7 +5,7 @@
 
 extern void VM_Free(s32 arg0);
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
-extern s32 D_801206C4;
+extern s32 gPager_completion;
 extern void CCache__Deallocate(void *arg0, void *arg1);
 void osCreateMesgQueue(void *arg0, s32 arg1, s32 arg2);
 void osSendMesg(void *arg0, void *arg1, s32 arg2);
@@ -20,7 +20,7 @@ void VM_Free(s32 arg0) {
     block.type = 2;
     block.value = arg0;
     block.data = sp10;
-    osSendMesg(&D_801206C4, &block, 1);
+    osSendMesg(&gPager_completion, &block, 1);
     osRecvMesg(sp10, &sp3C, 1);
     CCache__Deallocate(0, ((Draw *)(sp3C))->model);
 }

@@ -9,12 +9,12 @@ typedef struct {
     /* 0x04 */ CVector3 pos;
 } HitSource;
 
-/* The camera pool D_801198B0 (CCameraPool) seen to the settings D_8011AAD8
- * (+0x1228): the ROM reads them through this symbol, and through D_8011AAD8
+/* The camera pool gEngineApp_m_Game_m_CameraPool (CCameraPool) seen to the settings gEngineApp_m_Settings
+ * (+0x1228): the ROM reads them through this symbol, and through gEngineApp_m_Settings
  * the code no longer matches. */
-extern CGameFromCameraPool D_801198B0;
-extern s32 D_80110028;
-extern u8 D_800F7078[];         /* the level */
+extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
+extern s32 gScene_m_WarpState;
+extern u8 gScene[];         /* the level */
 extern char D_800B66D0[];
 
 s32 Cinema_IsActive(void);
@@ -56,10 +56,10 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     if (CPlayer__IsInMatchEndState(p)) {
         return;
     }
-    if (D_80110028) {
+    if (gScene_m_WarpState) {
         return;
     }
-    if ((D_801198B0.m_Settings.cheatFlags & 1) && type != 0x1D) {
+    if ((gEngineApp_m_Game_m_CameraPool.m_Settings.cheatFlags & 1) && type != 0x1D) {
         return;
     }
     if ((u16)p->m_Mode < 2) {
@@ -68,18 +68,18 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
     if (p->m_pOnEnemy) {
         damage /= 5;
     }
-    if (D_801198B0.m_Settings.multiplayer) {
+    if (gEngineApp_m_Game_m_CameraPool.m_Settings.multiplayer) {
         if (p->m_pOptions->m_Handicap) {
             damage = damage * (1.0f / 256) / ((p->m_pOptions->m_Handicap + f) * 0.3f) * 256.0f;
         }
     }
-    if (D_801198B0.m_Settings.cheatFlags & 0x10) {
+    if (gEngineApp_m_Game_m_CameraPool.m_Settings.cheatFlags & 0x10) {
         check = 1;
     } else {
         check = p->m_Data.m_SpecialPickupCount[384] & 0xF;
     }
     if (check && p->m_CharacterActor.header.m_pCurrentRegion != NULL) {
-        info = CScene__GetRegionInfo(D_800F7078, ((void *)p->m_CharacterActor.header.m_pCurrentRegion));
+        info = CScene__GetRegionInfo(gScene, ((void *)p->m_CharacterActor.header.m_pCurrentRegion));
         if (info != NULL && (info->m_dwFlags & 0x400000)) {
             return;
         }
@@ -106,8 +106,8 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
         alpha = ((damage >> 8) * 0xFF) / 20;
         alpha = (MIN(alpha, 0xFF) < 0x80) ? 0x80 : MIN(alpha, 0xFF);
         time = 0x1E;
-        if (old > 0xF00 && p->m_Data.m_Health <= 0xF00 && !D_801198B0.m_Settings.multiplayer) {
-            CCameraPool__AddText(&D_801198B0, ((void *)p->m_pCamera), D_800B66D0);
+        if (old > 0xF00 && p->m_Data.m_Health <= 0xF00 && !gEngineApp_m_Game_m_CameraPool.m_Settings.multiplayer) {
+            CCameraPool__AddText(&gEngineApp_m_Game_m_CameraPool, ((void *)p->m_pCamera), D_800B66D0);
             Sound__PlaySpeech(0x156);
         }
         amount = damage >> 8;
@@ -116,14 +116,14 @@ void CPlayer__Hurt(CPlayer *p, HitSource *src, s32 damage, s32 arg3, s32 type) {
             zero.x = 0;
             zero.y = 0;
             zero.z = 0;
-            CScene__StartRumbles(D_800F7078, p->m_ContState.m_pContState->rumblePool, 0x11, zero, 51.199997f, f);
+            CScene__StartRumbles(gScene, p->m_ContState.m_pContState->rumblePool, 0x11, zero, 51.199997f, f);
         }
     }
     if (!dead && (s16) (u16)p->m_Mode != 0xF) {
         CCamera__SetHitFlash(((void *)p->m_pCamera), alpha & 0xFF, time);
     }
     if ((old >> 8) != (p->m_Data.m_Health >> 8)) {
-        if (D_801198B0.m_Settings.multiplayer) {
+        if (gEngineApp_m_Game_m_CameraPool.m_Settings.multiplayer) {
             if (p->m_pOptions->m_TagMode == 1) {
                 Sound__Play2D(0x27DA);
             }

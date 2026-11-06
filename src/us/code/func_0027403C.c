@@ -2,8 +2,8 @@
 
 s32 SndVoice_Update(s32);
 
-extern s32 D_800B2A5C;
-extern s32 D_800B2A60;
+extern s32 sSndVoicesActive;
+extern s32 sSndVoicesPeak;
 
 /* 0xCC-byte slot; 16 of them follow the owner pointer. */
 typedef struct {
@@ -33,8 +33,8 @@ void SndVoicePool_Update(void **arg0) {
         var_s0 += 1;
         var_s1 += 0xCC;
     } while (var_s0 < 0x10);
-    D_800B2A5C = var_s2;
-    if (D_800B2A60 < var_s2) {
-        D_800B2A60 = var_s2;
+    sSndVoicesActive = var_s2;
+    if (sSndVoicesPeak < var_s2) {
+        sSndVoicesPeak = var_s2;
     }
 }

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800AB570;
+extern s32 sLoadedTexture;
 
 void Texture_InvalidateCache(void) {
-    D_800AB570 = 0;
+    sLoadedTexture = 0;
 }

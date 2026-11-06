@@ -13,11 +13,11 @@ typedef struct Slot {
 } Slot;
 
 void Demo_Update(void);
-extern Slot D_800F5F70[];
+extern Slot gControllers_buttons[];
 static __inline__ void fire(DemoStream *t) { t->decode(t); }
 static __inline__ void tick(DemoStream *t) { if (--t->frames <= 0) t->decode(t); }
 void Demo_UpdateStreams(void) {
-    DemoPlayer *s = &D_800F56B0;
+    DemoPlayer *s = &gDemoPlayer;
     s32 i;
 
     if (s->fastForward != 0) {
@@ -35,13 +35,13 @@ void Demo_UpdateStreams(void) {
     }
     for (i = 0; i < s->playerCount; i++) {
         if (s->done != 0) {
-            D_800F5F70[i].a = 0;
-            D_800F5F70[i].b = 0;
-            D_800F5F70[i].c = 0;
+            gControllers_buttons[i].a = 0;
+            gControllers_buttons[i].b = 0;
+            gControllers_buttons[i].c = 0;
         } else {
-            D_800F5F70[i].a = s->buttons[i].value;
-            D_800F5F70[i].b = s->stickX[i].value;
-            D_800F5F70[i].c = s->stickY[i].value;
+            gControllers_buttons[i].a = s->buttons[i].value;
+            gControllers_buttons[i].b = s->stickX[i].value;
+            gControllers_buttons[i].c = s->stickY[i].value;
         }
     }
     Demo_Update();

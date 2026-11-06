@@ -1,6 +1,6 @@
 #include "common.h"
 
-/* LevelScriptState (structs/boss.h) from scriptCOn on, D_8012F9D0 (+0x3C8). */
+/* LevelScriptState (structs/boss.h) from scriptCOn on, gLevelScript_scriptCOn (+0x3C8). */
 typedef struct {
     /* 0x00 */ s8 active;
     /* 0x01 */ u8 pad1[0x50 - 0x1];
@@ -9,12 +9,12 @@ typedef struct {
     /* 0x58 */ s32 unk58;
 } LevelScriptF9D0;
 
-extern u8 D_00431620[];
-extern LevelScriptF9D0 D_8012F9D0;
+extern u8 sPrimagenSoundScript4_2[];
+extern LevelScriptF9D0 gLevelScript_scriptCOn;
 
 void Primagen_EnterMode16_2(void) {
-    D_8012F9D0.active = 1;
-    D_8012F9D0.unk54 = -1;
-    D_8012F9D0.unk58 = -1;
-    D_8012F9D0.data = D_00431620;
+    gLevelScript_scriptCOn.active = 1;
+    gLevelScript_scriptCOn.unk54 = -1;
+    gLevelScript_scriptCOn.unk58 = -1;
+    gLevelScript_scriptCOn.data = sPrimagenSoundScript4_2;
 }

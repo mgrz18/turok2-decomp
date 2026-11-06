@@ -11,7 +11,7 @@ typedef struct {
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
 
-extern s32 D_8011AAA0;
+extern s32 gEngineApp_m_Game_m_DebugLines;
 
 void CPlayer__AnimateScope(HudModel *m, CPlayer *owner);
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
@@ -39,7 +39,7 @@ void CPlayer__UpdateZoom(CPlayer *p) {
     u16 model;
 
     target = 0.0f;
-    if ((s16) D_800AF618[p->m_Data.m_CurrentWeapon]->zoomModel <= 0 || p->m_SniperMode == 0) {
+    if ((s16) gWeaponInfoTable[p->m_Data.m_CurrentWeapon]->zoomModel <= 0 || p->m_SniperMode == 0) {
         p->m_SniperMode = 0;
         LowerScope(&p->m_Overlay);
     }
@@ -48,14 +48,14 @@ void CPlayer__UpdateZoom(CPlayer *p) {
             if (p->m_SniperMode != 0) {
                 p->m_SniperMode = 0;
                 LowerScope(&p->m_Overlay);
-            } else if (D_800AF618[p->m_Data.m_CurrentWeapon]->zoomModel != 0 && (D_8011AAA0 == 0 || !(p->m_ContState.m_dwButtons & 0x20))) {
+            } else if (gWeaponInfoTable[p->m_Data.m_CurrentWeapon]->zoomModel != 0 && (gEngineApp_m_Game_m_DebugLines == 0 || !(p->m_ContState.m_dwButtons & 0x20))) {
                 p->m_SniperMode = 1;
                 if (p->m_Data.m_CurrentWeapon == 0x1B) {
                     p->m_TargetZoomBlend = 0.7f;
                 } else {
                     p->m_TargetZoomBlend = 0.2f;
                 }
-                model = D_800AF618[p->m_Data.m_CurrentWeapon]->zoomModel;
+                model = gWeaponInfoTable[p->m_Data.m_CurrentWeapon]->zoomModel;
                 RaiseScope(&p->m_Overlay, model);
             }
         }

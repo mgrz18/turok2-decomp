@@ -20,9 +20,9 @@ typedef struct Shared_Game {
 typedef struct GameSession GameSession;
 
 extern Shared_Game D_8011A6D8;
-extern int D_801198A0;
-extern GameSession D_800F6CB0;
-extern void func_00430250(GameSession *);
+extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount;
+extern GameSession gEngineApp;
+extern void func_00469250(GameSession *);
 
 int StatsMenu_ContinueNo_2(int unused, Menu *menu) {
     RenderCounters *sync = &D_8011A6D8.counters;
@@ -33,8 +33,8 @@ int StatsMenu_ContinueNo_2(int unused, Menu *menu) {
             sync->unk40 = team;
         }
     }
-    if (D_801198A0 == 1) {
-        func_00430250(&D_800F6CB0);
+    if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount == 1) {
+        func_00469250(&gEngineApp);
     } else {
         menu->player->m_bActive = 0;
     }

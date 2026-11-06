@@ -8,7 +8,7 @@ extern void EnemyAI_SetGrabbed(void *actor, void *ai, s32 arg2);
 extern void CAI__SetMode(void *obj, void *state, s32 mode);
 extern f32 func_00298470(f32 x); /* sqrtf */
 
-extern s8 D_800F1F94[];
+extern s8 gThrowableCollisionInfo_m_InstanceBehavior[];
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x10C];
@@ -21,14 +21,14 @@ void Throwable_FlyingUpdate(CGameObjectInstance *obj, OwnedState *state) {
     f32 distSq;
 
     if (owner != NULL) {
-        D_800F1F94[0] = 0;
+        gThrowableCollisionInfo_m_InstanceBehavior[0] = 0;
         distSq = AI_FlatDistSqToPoint(obj, owner->header.m_vPos);
         if ((GameObject_GetCollisionRadius(obj) + GameObject_GetCollisionRadius(owner)) * (GameObject_GetCollisionRadius(obj) + GameObject_GetCollisionRadius(owner)) < distSq) {
             state->owner = NULL;
             EnemyAI_SetGrabbed(owner, (u8 *) owner + 0x140, 0);
         }
     } else {
-        D_800F1F94[0] = 2;
+        gThrowableCollisionInfo_m_InstanceBehavior[0] = 2;
     }
     if (obj->m_vVelocity.x == 0.0f && obj->m_vVelocity.y == 0.0f && obj->m_vVelocity.z == 0.0f) {
         CAI__SetMode(obj, state, 0);

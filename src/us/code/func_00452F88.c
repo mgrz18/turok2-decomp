@@ -16,10 +16,10 @@ struct RecordRecAt20V1 {
     char pad[0x20];
     struct ObjRecAtB0 *inner;
 };
-extern s32 D_800C1F78;
+extern s32 sSoundMenuTrack;
 s32 SoundMenu_StepMusicTrack_2(s32 arg0, struct RecordRecAt20V1 *arg1) {
     s32 var_a0;
-    var_a0 = D_800C1F78;
+    var_a0 = sSoundMenuTrack;
     if (arg1->inner->unkB0 & 0x20202) {
         var_a0 -= 1;
         if (var_a0 < 0) {
@@ -36,7 +36,7 @@ s32 SoundMenu_StepMusicTrack_2(s32 arg0, struct RecordRecAt20V1 *arg1) {
             var_a0 = 0xF;
         }
     }
-    D_800C1F78 = var_a0;
+    sSoundMenuTrack = var_a0;
     Music_SetTrack(var_a0);
     return 0;
 }

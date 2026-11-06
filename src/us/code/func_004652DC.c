@@ -5,14 +5,14 @@
 #include "structs/world.h"
 
 typedef struct { s32 field_0; } Shape_8011AADC;
-extern Shape_8011AADC D_8011AADC;
-extern void func_0042C338(char *);
-extern void func_0042C38C(char *);
+extern Shape_8011AADC gEngineApp_m_Settings_unlockedCheats;
+extern void CScene__LoadBitSections_2(char *);
+extern void CScene__LoadBitSections2_2(char *);
 
-void CScene__InitPersistentData_2(CWorld *world, s32 level) {
-    func_0042C338((char *)world);
-    func_0042C38C((char *)world);
+void CScene__InitPersistentData_2(CScene *world, s32 level) {
+    CScene__LoadBitSections_2((char *)world);
+    CScene__LoadBitSections2_2((char *)world);
     world->m_PreviewState = 0;
     world->m_PreviewTimer = 0x22;
-    world->m_PreviewOptions = D_8011AADC.field_0;
+    world->m_PreviewOptions = gEngineApp_m_Settings_unlockedCheats.field_0;
 }

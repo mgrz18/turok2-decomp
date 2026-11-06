@@ -15,16 +15,16 @@
  * CScene__DrawSortedList). The list is built in place behind a branch command that
  * jumps over it, and later views just call it (0xDE000000). */
 
-/* D_8011AAD8 (structs/game.h) seen from its difficulty, D_8011AAE0: the
+/* gEngineApp_m_Settings (structs/game.h) seen from its difficulty, gEngineApp_m_Settings_difficulty: the
  * ROM bases the CGame and camera-pool reads below on this symbol, and with
- * D_8011AAD8 / D_80119870 the code no longer matches. */
+ * gEngineApp_m_Settings / gEngineApp_m_Game the code no longer matches. */
 typedef struct {
     s32 mask;               /* 0x00 */
 } ViewState;
 
-extern ViewState D_8011AAE0;
-extern s32 D_800F5A40;
-extern Gfx *D_800ACDE0;     /* the level's display list, once built this frame */
+extern ViewState gEngineApp_m_Settings_difficulty;
+extern s32 gCameraVisBits;
+extern Gfx *gSceneGeometryDL;     /* the level's display list, once built this frame */
 
 void Render_ResetBatches(void);
 void Render_FlushBatches(void);
@@ -34,7 +34,7 @@ s32 Frustum_TestBox(void *, CBox *);
 void CStaticObject__Draw(CStaticObject *, CCamera *);
 void CLevelActor__Draw(CLevelActor *);
 
-void CScene__BuildGeometryDisplayList(CWorld *w) {
+void CScene__BuildGeometryDisplayList(CScene *w) {
     s32 r;
     s32 n;
     u8 *objs;
@@ -42,8 +42,8 @@ void CScene__BuildGeometryDisplayList(CWorld *w) {
     s32 mask;
     s32 vmask;
     CCamera *v;
-    CWorldSector *regions;
-    CWorldSector *region;
+    CSceneSector *regions;
+    CSceneSector *region;
     CRect *cell;
     void *grp;
     StrideTable *t;
@@ -57,48 +57,48 @@ void CScene__BuildGeometryDisplayList(CWorld *w) {
     s32 found;
     s32 c;
 
-    mask = D_8011AAE0.mask;
-    vmask = D_800F5A40;
-    if (D_800ACDE0 == NULL) {
-        views = *(CCamera **)((u8 *)&D_8011AAE0 - 0x1210);
+    mask = gEngineApp_m_Settings_difficulty.mask;
+    vmask = gCameraVisBits;
+    if (gSceneGeometryDL == NULL) {
+        views = *(CCamera **)((u8 *)&gEngineApp_m_Settings_difficulty - 0x1210);
         if (views == NULL) {
             return;
         }
-        D_800ACDE0 = D_800D8E24;
+        gSceneGeometryDL = gDList;
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDE010000;
             g->w1 = 0;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xE7000000;
             g->w1 = 0;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xE3000A01;
             g->w1 = 0x100000;
         }
         Render_ResetBatches();
         w->m_nDeferred = 0;
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB040004;
             g->w1 = 2;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB04000C;
             g->w1 = 2;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB040014;
             g->w1 = 0xFFFE;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB04001C;
             g->w1 = 0xFFFE;
         }
@@ -217,19 +217,19 @@ void CScene__BuildGeometryDisplayList(CWorld *w) {
         }
         Render_FlushBatches();
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDF000000;
             g->w1 = 0;
         }
         {
-            Gfx *g = D_800ACDE0++;
+            Gfx *g = gSceneGeometryDL++;
             g->w0 = 0xDE010000;
-            g->w1 = (u32)D_800D8E24;
+            g->w1 = (u32)gDList;
         }
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xDE000000;
-        g->w1 = (u32)D_800ACDE0;
+        g->w1 = (u32)gSceneGeometryDL;
     }
 }

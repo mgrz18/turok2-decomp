@@ -7,15 +7,15 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern s32 D_801309B8;
+extern s32 sGameNoteLoad;
 extern char D_800B49C4[];
 extern char D_800B49D0[];
 s32 GameNoteMenu_UpdateTitle_2(struct FieldRecAt14 *field) {
-    if (D_801309B8 != 0) {
+    if (sGameNoteLoad != 0) {
         field->text = D_800B49C4;
     } else {
         field->text = D_800B49D0;
     }
     return 0;
 }
-extern s32 D_801309B8;
+extern s32 sGameNoteLoad;

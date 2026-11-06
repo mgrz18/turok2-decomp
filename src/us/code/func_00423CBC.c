@@ -9,10 +9,10 @@ extern u8 D_800B51CC[];
 extern u8 D_800B5218[];
 extern u8 D_800B5264[];
 extern u8 D_800B52C4[];
-extern s32 D_801309B0;
+extern s32 gPakConfirmKind;
 
 s32 PakConfirmMenu_UpdateLine5(MenuItem *item) {
-    switch (D_801309B0) {
+    switch (gPakConfirmKind) {
         case 0:
         default:
             item->text = D_800B5180;

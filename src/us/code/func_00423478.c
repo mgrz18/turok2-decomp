@@ -5,28 +5,28 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern s32 D_80130990;
-extern s32 D_800C2028;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort;
 extern s32 PakMenu_CheckPak(Menu *action, s32 channel, s32 arg2);
 extern s32 PakMenu_CheckPak(Menu *, s32, s32);
-extern s32 D_8013099C;
+extern s32 sDamagedPakDone;
 extern s32 Controller_PakChanged(s32);
 extern s32 PakMenu_CheckPak(struct Menu *, s32, s32);
 static __inline__ s32 func_80409BDC_de(struct Menu *record) {
-    if (D_80130990 != 0) {
-        return D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        return gPakMenuPort;
     }
     return record->controller->port;
 }
 s32 DamagedPakMenu_Poll(struct Menu *record) {
-    if (D_8013099C == 0) {
+    if (sDamagedPakDone == 0) {
         if (func_80409BDC_de(record) != -1) {
             if (Controller_PakChanged(func_80409BDC_de(record)) != 0) {
                 if (PakMenu_CheckPak(record, func_80409BDC_de(record), 0) != 0) {
-                    D_8013099C = 1;
+                    sDamagedPakDone = 1;
                 }
             }
         }
     }
-    return D_8013099C;
+    return sDamagedPakDone;
 }

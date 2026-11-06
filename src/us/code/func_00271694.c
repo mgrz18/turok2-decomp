@@ -18,16 +18,16 @@ typedef struct SharedRecAt564V1 {
     CVector3 position;  /* 0x114 (0x128 in Rage Wars) */
 } SharedRecAt564V1;
 
-/* The camera pool D_801198B0 (CCameraPool, structs/camera.h) seen to the game
- * mode D_8011AAD8.mode (+0x13D8): the ROM reads the mode through this symbol,
- * and through D_8011AAD8 the code no longer matches. */
+/* The camera pool gEngineApp_m_Game_m_CameraPool (CCameraPool, structs/camera.h) seen to the game
+ * mode gEngineApp_m_Settings.mode (+0x13D8): the ROM reads the mode through this symbol,
+ * and through gEngineApp_m_Settings the code no longer matches. */
 typedef struct MenuMatchGlobals {
     char pad0[0x13D8];
-    s32 state;          /* 0x13D8 (D_8011AC88) */
+    s32 state;          /* 0x13D8 (gEngineApp_m_Settings_mode) */
 } MenuMatchGlobals;
 
-extern int D_800B2680;
-extern MenuMatchGlobals D_801198B0;
+extern int gAudioWorldReady;
+extern MenuMatchGlobals gEngineApp_m_Game_m_CameraPool;
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 extern void *CCameraPool__GetNearestCamera(MenuMatchGlobals *arg0, CVector3 *arg1);
 
@@ -35,9 +35,9 @@ void CAudioWorld__UpdateAmbientTrack(ContextRecAt2BC0 *arg0) {
     CVector3 zero;
     void *result;
     CVector3 *vec;
-    if (D_800B2680 != 0 &&
+    if (gAudioWorldReady != 0 &&
         arg0->field2BB4 != 0 &&
-        D_801198B0.state == 0xD && /* a call in Rage Wars */
+        gEngineApp_m_Game_m_CameraPool.state == 0xD && /* a call in Rage Wars */
         arg0->track > 0) {
         {
             register f32 value = 0.0f;
@@ -45,7 +45,7 @@ void CAudioWorld__UpdateAmbientTrack(ContextRecAt2BC0 *arg0) {
             zero.y = value;
             zero.x = value;
         }
-        result = CCameraPool__GetNearestCamera(&D_801198B0, &zero);
+        result = CCameraPool__GetNearestCamera(&gEngineApp_m_Game_m_CameraPool, &zero);
         vec = &((SharedRecAt564V1 *)(result))->position;
         if ((arg0->frame & 3) == 0) {
             CAudioWorld__PlaySound(arg0, arg0->track, *vec, 0, -1);

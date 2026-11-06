@@ -20,11 +20,11 @@ void CScene__SetInstanceSavedBitInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3
     s32 mask;
     s32 idx;
     s32 idx2;
-    if (((CWorld *)arg0)->m_Mode == 2) {
+    if (((CScene *)arg0)->m_Mode == 2) {
         return;
     }
-    if (((CWorld *)arg0)->m_nLevel == arg1) {
-        entry = (char *)((CWorld *)arg0)->m_pActors + (s32) arg2 * 0x288;
+    if (((CScene *)arg0)->m_nLevel == arg1) {
+        entry = (char *)((CScene *)arg0)->m_pActors + (s32) arg2 * 0x288;
         cond = ((CGameObjectInstance *)entry)->header.m_pIntelligence;
         if ((u32) (cond->m_Type - 9) < 2) {
             if (cond->m_dwFlags & 0x200) {
@@ -32,7 +32,7 @@ void CScene__SetInstanceSavedBitInLevel(void *arg0, s32 arg1, s32 arg2, s32 arg3
             }
         }
     }
-    field80 = ((CWorld *)arg0)->m_pBitSections;
+    field80 = ((CScene *)arg0)->m_pBitSections;
     temp_v0 = CISet__GetBlock(CISet__GetBlock(CISet__GetBlock(field80, 0), (s32) arg1), 0);
     CISet__GetBlock(temp_v0, 0);
     CISet__GetBlockSize((s32) temp_v0, 1);

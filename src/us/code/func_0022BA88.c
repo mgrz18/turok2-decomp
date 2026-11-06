@@ -11,11 +11,11 @@ extern void Sound__Play(s16 sound, CVector3 pos, s32, s32);
 extern void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);    /* out = in * s */
 extern void CParticleSystem__Free(void *sys, CParticle *p);
 extern void CParticle__StopLoopSound(CParticle *p);
-extern s32 D_800F1D7C;
-extern CVector3 D_800F1D80;
-extern s32 D_800F1D8C;
-extern CVector3 D_800F1DB8;
-extern u8 D_800F8928[];
+extern s32 gCollisionResults_m_pWallRegion;
+extern CVector3 gCollisionResults_m_vWallPos;
+extern s32 gCollisionResults_m_nWallEdge;
+extern CVector3 gCollisionResults_m_vVelocity;
+extern u8 gScene_m_ParticleSystem[];
 
 void CParticle__HitWall(CParticle *arg0) {
     CEventValue pair;
@@ -47,27 +47,27 @@ void CParticle__HitWall(CParticle *arg0) {
         pair = events->m_ImpactEventValue[surface];
         sound = desc->m_pImpact->m_ImpactSoundType[index];
         if (effect != 0xFFFF) {
-            ImpactEvent_Send(arg0, arg0, effect, -1, D_800F1D80, pair);
+            ImpactEvent_Send(arg0, arg0, effect, -1, gCollisionResults_m_vWallPos, pair);
         }
         if (particle != 0xFFFF) {
             if ((arg0->m_pEffect->m_dwFlags & 0x10) != 0) {
-                position = D_800F1DB8;
+                position = gCollisionResults_m_vVelocity;
             } else {
                 position = arg0->m_vVelocity;
             }
             CQuaternion__FromDirection(&rotation, &position);
-            CParticleSystem__Spawn(D_800F8928, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
-                          rotation, D_800F1D80, D_800F1D7C, D_800F1D8C, (arg0->m_dwFlags & 0x200006) | 1);
+            CParticleSystem__Spawn(gScene_m_ParticleSystem, arg0, arg0->m_pOwner, arg0->m_pOwnerCount, arg0->m_pTarget, particle, position,
+                          rotation, gCollisionResults_m_vWallPos, gCollisionResults_m_pWallRegion, gCollisionResults_m_nWallEdge, (arg0->m_dwFlags & 0x200006) | 1);
         }
         if (sound != 0xFFFF) {
-            Sound__Play((s16)sound, D_800F1D80, 0, -1);
+            Sound__Play((s16)sound, gCollisionResults_m_vWallPos, 0, -1);
         }
     }
 skip_effects:
     CVector3__Scale(&arg0->m_vRotSpeed, &arg0->m_vRotSpeed, arg0->m_RotationScale);
     arg0->m_dwFlags |= 0x400;
     if (arg0->m_bDieOnImpact == 1) {
-        CParticleSystem__Free(D_800F8928, arg0);
+        CParticleSystem__Free(gScene_m_ParticleSystem, arg0);
         CParticle__StopLoopSound(arg0);
     }
 }

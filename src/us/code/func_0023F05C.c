@@ -7,7 +7,7 @@ s32 CPlayer__CollectPickup(s32, s32, s32);
 s32 GameObject_GetTypeId(s32);
 
 s32 CGameRegion__FireTriggers(s32, s32, s32);           /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void CPlayer__TouchPickup(s32 arg0, CPooledLevelActor *arg1) {
     u16 temp_v0;
@@ -27,7 +27,7 @@ block_4:
                 CPooledLevelActor__Release((s32) arg1);
                 return;
             }
-            CScene__SetLevelActorKilled((s32) &D_800F7078, (s32) arg1, 1);
+            CScene__SetLevelActorKilled((s32) &gScene, (s32) arg1, 1);
             CGameRegion__FireTriggers(arg1->m_Actor.header.m_pCurrentRegion, 0x400, arg0);
         }
     }

@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern s32 Controller_Lock(s32 arg0);
-extern int D_80130C60[];
-extern int D_80130C70[];
-extern s8 D_800F6750;
+extern int gPakState[];
+extern int gPakError[];
+extern s8 gPakQueueState;
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 void Controller_ReadAll();
@@ -14,19 +14,19 @@ void Controller_Unlock();
 void Pak_Mount(s32);
 s32 osPfsRepairId(void *);
 s32 Pak_RepairIfDamaged(s32 arg0) {
-    extern char D_80130C80[];
+    extern char gPakFileSystems[];
     s32 temp_s0;
     s32 var_s0;
     temp_s0 = arg0 * 4;
-    if (D_80130C60[arg0] != 3) {
+    if (gPakState[arg0] != 3) {
         return -2;
     }
     ((void (*)(s32))Controller_Lock)(1);
     Controller_ReadAll();
-    var_s0 = D_80130C70[arg0];
-    D_800F6750 = 2;
+    var_s0 = gPakError[arg0];
+    gPakQueueState = 2;
     if (var_s0 == -4) {
-        var_s0 = osPfsRepairId((arg0 * 0x68) + D_80130C80);
+        var_s0 = osPfsRepairId((arg0 * 0x68) + gPakFileSystems);
         if (var_s0 != 0) {
             var_s0 = -1;
         }

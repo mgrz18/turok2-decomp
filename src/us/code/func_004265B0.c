@@ -3,9 +3,9 @@
 #include "common.h"
 #include "structs/pak.h"
 
-extern void **D_800C2228;
-extern s32 D_800C2220;
-extern u8 D_800F6750;
+extern void **gPakStateBuffer;
+extern s32 gPakDirectoryAllocated;
+extern u8 gPakQueueState;
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
@@ -27,17 +27,17 @@ s32 Pak_ReadNote(s32 ch, s32 file_no, void *dst, s32 size) {
     void *buf;
 
     blocks = (size + 0xFF) & ~0xFF;
-    if (D_80130C60[ch] != 3) {
+    if (gPakState[ch] != 3) {
         return -2;
     }
     handle = CCache__Allocate(0, blocks, 0x23, D_800C18B0);
     buf = *handle;
     Controller_Lock(1);
     Controller_ReadAll();
-    result = D_80130C70[ch];
-    D_800F6750 = 2;
+    result = gPakError[ch];
+    gPakQueueState = 2;
     if (result == 0) {
-        if ((result = osPfsReadWriteFile(&D_80130C80[ch], file_no, 0, 0, blocks, buf)) != 0) {
+        if ((result = osPfsReadWriteFile(&gPakFileSystems[ch], file_no, 0, 0, blocks, buf)) != 0) {
             result = -1;
         }
         if (result == 0) {

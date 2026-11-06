@@ -16,8 +16,8 @@ typedef struct ScenePool {
     /* 0x3608 */ s32 count;
 } ScenePool;
 
-extern CIntelligence D_800F1360;
-extern CIntelligence D_800F12C0;
+extern CIntelligence gLevelActorIntelligence;
+extern CIntelligence gLevelActorIntelligenceMP;
 
 extern void func_0027BD10(CIntelligence *def);
 extern void func_00227664(SceneActor *actor);
@@ -36,18 +36,18 @@ void SceneActorPool_Construct(ScenePool *pool) {
     pool->actors[0].prev = NULL;
     pool->actors[31].next = NULL;
 
-    func_0027BD10(&D_800F1360);
-    D_800F1360.m_Type = 8;
-    D_800F1360.m_dwTypeFlags = 1;
-    D_800F1360.m_nTexture = 0;
-    D_800F1360.m_dwFlags |= 4;
+    func_0027BD10(&gLevelActorIntelligence);
+    gLevelActorIntelligence.m_Type = 8;
+    gLevelActorIntelligence.m_dwTypeFlags = 1;
+    gLevelActorIntelligence.m_nTexture = 0;
+    gLevelActorIntelligence.m_dwFlags |= 4;
 
-    func_0027BD10(&D_800F12C0);
-    D_800F12C0.m_Type = 8;
-    D_800F12C0.m_dwTypeFlags = 0;
-    D_800F12C0.m_nTexture = 0;
-    D_800F12C0.m_dwFlags |= 4;
-    D_800F12C0.m_Pickup.m_CollisionHeight = D_800F12C0.m_Pickup.m_CollisionRadius = 122.88f;
+    func_0027BD10(&gLevelActorIntelligenceMP);
+    gLevelActorIntelligenceMP.m_Type = 8;
+    gLevelActorIntelligenceMP.m_dwTypeFlags = 0;
+    gLevelActorIntelligenceMP.m_nTexture = 0;
+    gLevelActorIntelligenceMP.m_dwFlags |= 4;
+    gLevelActorIntelligenceMP.m_Pickup.m_CollisionHeight = gLevelActorIntelligenceMP.m_Pickup.m_CollisionRadius = 122.88f;
 
     for (i = 0; i < 32; i++) {
         func_00227664(&pool->actors[i]);

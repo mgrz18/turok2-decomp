@@ -26,10 +26,10 @@ typedef struct VCtx {
                  s32 mode;
 } VCtx;
 typedef struct Vec3fv { f32 x, y, z; } Vec3fv;
-extern u8 D_800AB580[];
+extern u8 gShadowTexture[];
 extern u8 D_800ACFC8[];
 extern u8 D_8011AD48[];
-extern f32 D_800F5A10[6];
+extern f32 gCameraVisibleBox[6];
 void Render_InvalidateModeCache(void);
 void Texture_InvalidateCache(void);
 void CList__Remove(VList *, VNode *);
@@ -43,17 +43,17 @@ void func_00235C30(VCtx *c) {
     if (c->mode == 100) {
         return;
     }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xE7000000); _g->w1 = (0); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xE3000A01); _g->w1 = (0x100000); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xFD900000); _g->w1 = ((u32)D_800AB580); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xF5900000); _g->w1 = (0x07080200); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xE6000000); _g->w1 = (0); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xF3000000); _g->w1 = (0x0707F400); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xE7000000); _g->w1 = (0); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xF5880400); _g->w1 = (0x00080200); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xF2000000); _g->w1 = (0x0003C03C); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xFA000000); _g->w1 = (-0x38); }
-    { Gfx *_g = D_800D8E24++; _g->w0 = (0xDE000000); _g->w1 = ((u32)D_800ACFC8); }
+    { Gfx *_g = gDList++; _g->w0 = (0xE7000000); _g->w1 = (0); }
+    { Gfx *_g = gDList++; _g->w0 = (0xE3000A01); _g->w1 = (0x100000); }
+    { Gfx *_g = gDList++; _g->w0 = (0xFD900000); _g->w1 = ((u32)gShadowTexture); }
+    { Gfx *_g = gDList++; _g->w0 = (0xF5900000); _g->w1 = (0x07080200); }
+    { Gfx *_g = gDList++; _g->w0 = (0xE6000000); _g->w1 = (0); }
+    { Gfx *_g = gDList++; _g->w0 = (0xF3000000); _g->w1 = (0x0707F400); }
+    { Gfx *_g = gDList++; _g->w0 = (0xE7000000); _g->w1 = (0); }
+    { Gfx *_g = gDList++; _g->w0 = (0xF5880400); _g->w1 = (0x00080200); }
+    { Gfx *_g = gDList++; _g->w0 = (0xF2000000); _g->w1 = (0x0003C03C); }
+    { Gfx *_g = gDList++; _g->w0 = (0xFA000000); _g->w1 = (-0x38); }
+    { Gfx *_g = gDList++; _g->w0 = (0xDE000000); _g->w1 = ((u32)D_800ACFC8); }
     for (i = 0; i < 10; i++) {
         l = &c->lists[i];
         for (n = l->head; n != ((void *)0); n = next) {
@@ -62,13 +62,13 @@ void func_00235C30(VCtx *c) {
             v.x = p->x;
             v.y = p->y;
             v.z = p->z;
-            if (!(v.x < D_800F5A10[3] && v.y < D_800F5A10[4] && v.z < D_800F5A10[5] && D_800F5A10[0] <= v.x && D_800F5A10[1] <= v.y && D_800F5A10[2] <= v.z)) {
+            if (!(v.x < gCameraVisibleBox[3] && v.y < gCameraVisibleBox[4] && v.z < gCameraVisibleBox[5] && gCameraVisibleBox[0] <= v.x && gCameraVisibleBox[1] <= v.y && gCameraVisibleBox[2] <= v.z)) {
                 CList__Remove(l, n);
                 CList__AddTail((u8 *)c + 0x95A0, n);
             } else {
-                { Gfx *_g = D_800D8E24++; _g->w0 = (0xDA380003); _g->w1 = ((u32)p); }
-                { Gfx *_g = D_800D8E24++; _g->w0 = (0x01004008); _g->w1 = ((u32)D_8011AD48); }
-                { Gfx *_g = D_800D8E24++; _g->w0 = (0x06000204); _g->w1 = (0x00040600); }
+                { Gfx *_g = gDList++; _g->w0 = (0xDA380003); _g->w1 = ((u32)p); }
+                { Gfx *_g = gDList++; _g->w0 = (0x01004008); _g->w1 = ((u32)D_8011AD48); }
+                { Gfx *_g = gDList++; _g->w0 = (0x06000204); _g->w1 = (0x00040600); }
             }
         }
     }

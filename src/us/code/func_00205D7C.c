@@ -17,8 +17,8 @@ s32 __osDisableInt(void);
 void __osRestoreInt(s32);
 s32 CCache__FreeMemEntry(s32, s32);
 s32 CCache__AddToAddressList(s32, s32);
-extern s32 D_800D8DB0;
-extern s32 D_800D8DCC;
+extern s32 gCache_mutex;
+extern s32 gCache_mutex_count;
 s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
 {
   s32 temp_a0;
@@ -30,12 +30,12 @@ s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
   s32 temp_v1_2;
   s32 var_s0;
   temp_a0 = __osDisableInt();
-  temp_v1 = D_800D8DCC + 1;
-  D_800D8DCC = temp_v1;
+  temp_v1 = gCache_mutex_count + 1;
+  gCache_mutex_count = temp_v1;
   if (temp_v1 != 1)
   {
     __osRestoreInt(temp_a0);
-    osRecvMesg((s32) (&D_800D8DB0), 0, 1);
+    osRecvMesg((s32) (&gCache_mutex), 0, 1);
   }
   else
   {
@@ -68,20 +68,20 @@ s32 CCache__AllocateMemoryForDecompression(s32 arg0, void *arg1, s32 arg2)
     }
   }
   temp_v0_3 = __osDisableInt();
-  temp_v1_2 = D_800D8DCC - 1;
-  D_800D8DCC = temp_v1_2;
+  temp_v1_2 = gCache_mutex_count - 1;
+  gCache_mutex_count = temp_v1_2;
   if (temp_v1_2 != 0)
   {
-    if (temp_v1 || D_800D8DCC)
+    if (temp_v1 || gCache_mutex_count)
     {
       __osRestoreInt(temp_v0_3);
-      osSendMesg((s32) (&D_800D8DB0), 0, 1);
+      osSendMesg((s32) (&gCache_mutex), 0, 1);
       return var_s0;
     }
     else
     {
       __osRestoreInt(temp_v0_3);
-      osSendMesg((s32) (&D_800D8DB0), 0, 1);
+      osSendMesg((s32) (&gCache_mutex), 0, 1);
       return var_s0;
     }
   }

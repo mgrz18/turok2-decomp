@@ -7,25 +7,25 @@ u32 __osDisableInt(void);
 void __osRestoreInt(u32 mask);
 s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flag);
 s32 osRecvMesg(OSMesgQueue *mq, OSMesg *msg, s32 flag);
-extern OSMesgQueue D_800D8DB0;
-extern s32 D_800D8DCC;
+extern OSMesgQueue gCache_mutex;
+extern s32 gCache_mutex_count;
 B12Node *CCache__AllocateInternal(s32 a, s32 b, u32 c, s32 d);
 B12Node *CCache__Allocate(s32 unused, s32 a1, u32 a2, s32 a3) {
     u32 mask;
     u32 m2;
     B12Node *r;
     mask = __osDisableInt();
-    if (++D_800D8DCC != 1) {
+    if (++gCache_mutex_count != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(&D_800D8DB0, 0, 1);
+        osRecvMesg(&gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
     r = CCache__AllocateInternal(0, a1, a2, a3);
     m2 = __osDisableInt();
-    if (--D_800D8DCC != 0) {
+    if (--gCache_mutex_count != 0) {
         __osRestoreInt(m2);
-        osSendMesg(&D_800D8DB0, 0, 1);
+        osSendMesg(&gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(m2);
     }

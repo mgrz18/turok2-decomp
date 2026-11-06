@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern u32 D_80130E20[];
+extern u32 __osPfsPifRam[];
 extern u32 __osContAddressCrc(u32 arg0);
 void __osPackRamReadData(s32 arg0, s32 arg1) {
     Block40 packet;
@@ -12,9 +12,9 @@ void __osPackRamReadData(s32 arg0, s32 arg1) {
     u8 tail;
     u32 checksum;
     s32 shifted;
-    dst = (u8 *)D_80130E20;
+    dst = (u8 *)__osPfsPifRam;
     tail = 0xFF;
-    D_80130E20[0xF] = 1;
+    __osPfsPifRam[0xF] = 1;
     packet.bytes[0] = tail;
     packet.bytes[1] = 3;
     packet.bytes[2] = 0x21;

@@ -5,9 +5,9 @@
 
 extern char D_800B5118[];
 extern char D_800B510C[];
-extern s32 D_80130994;
+extern s32 gPakMenuIsLoad;
 s32 DamagedPakMenu_UpdateContinue(struct FieldRecAt14 *field) {
-    if (D_80130994 != 0) {
+    if (gPakMenuIsLoad != 0) {
         field->text = D_800B510C;
     } else {
         field->text = D_800B5118;

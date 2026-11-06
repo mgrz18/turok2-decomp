@@ -1,24 +1,24 @@
 #include "common.h"
 
 s32 Music_SetTrack(s32);
-s32 MenuPool_OpenChildMenu(s32, s32, s32);
+s32 MenuPool_OpenChildMenu_2(s32, s32, s32);
 
 s32 Sound__StopAllExcept(s32);                     /* extern */
 s32 Sound__SetForce2D(s32);                     /* extern */
 s32 Music_GetTrack();                                /* extern */
 s32 Controller_DisableMenuSounds();                            /* extern */
-extern s32 D_004393D4;
-extern s32 D_800C1F70;
-extern s32 D_800C1F74;
-extern s32 D_800C1F78;
+extern s32 gSoundOptionsMenuDesc_2;
+extern s32 sSoundMenuSavedTrack;
+extern s32 sSoundMenuActive;
+extern s32 sSoundMenuTrack;
 
 s32 TitleMenu_SoundOptions_2(s32 arg0, s32 arg1, s32 arg2) {
     Sound__StopAllExcept(-1);
-    D_800C1F70 = Music_GetTrack();
-    Music_SetTrack(D_800C1F78);
+    sSoundMenuSavedTrack = Music_GetTrack();
+    Music_SetTrack(sSoundMenuTrack);
     Sound__SetForce2D(1);
-    D_800C1F74 = 0;
+    sSoundMenuActive = 0;
     Controller_DisableMenuSounds();
-    MenuPool_OpenChildMenu(arg2, arg1, (s32) &D_004393D4);
+    MenuPool_OpenChildMenu_2(arg2, arg1, (s32) &gSoundOptionsMenuDesc_2);
     return 1;
 }

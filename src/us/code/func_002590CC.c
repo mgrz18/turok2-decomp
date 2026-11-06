@@ -5,7 +5,7 @@
 /* Weapon state: spins the barrel up while fire is held, else stops it. */
 
 
-extern f32 D_800B6D28; /* frame time scale */
+extern f32 gFrameIncrement; /* frame time scale */
 
 extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 extern s32 CAI__SetMode(void *obj, CAI *state, s32 mode);
@@ -32,7 +32,7 @@ void WeaponMode_SpinUpFire_Update(void *obj, CAI *state) {
         CPlayer__StartWeaponFiringSound(player, 0x1A7);
     }
     Math_EaseToward(&state->m_Weapon.m_BarrelSpeed, 0.2792527f, 0.4f);
-    state->m_ConditionTimer -= D_800B6D28;
+    state->m_ConditionTimer -= gFrameIncrement;
     if (state->m_ConditionTimer <= 0.0f) {
         state->m_ConditionTimer += 1.875f;
         CPlayer__FireWeapon(*(void **)((u8 *)obj + 0x1A8), 0x12B);

@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern s32 D_8011AADC;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
 s32 Cheat_FindWarpLevel_2(s32 index, s32 step, s32 mode) {
     s32 i;
     s32 mask;
@@ -53,7 +53,7 @@ s32 Cheat_FindWarpLevel_2(s32 index, s32 step, s32 mode) {
             mask = 0x4000000;
             break;
         }
-        flags = &D_8011AADC;
+        flags = &gEngineApp_m_Settings_unlockedCheats;
         if (*flags & mask) {
             return index;
         }

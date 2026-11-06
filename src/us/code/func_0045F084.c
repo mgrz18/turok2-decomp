@@ -3,7 +3,7 @@
 #include "common.h"
 #include "structs/pak.h"
 
-extern u8 D_800F6750;
+extern u8 gPakQueueState;
 extern char D_800C18B0[];
 extern char D_800C18C8[];
 extern u8 D_800C18E0[];
@@ -16,10 +16,10 @@ extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 extern void *func_0029E460(void *dst, const void *src, s32 size);
 extern s32 memcmp(void *a, void *b, s32 size);
-extern s32 func_00425AE0(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u8 *ext_name,
+extern s32 Pak_WriteNote_2(s32 ch, s32 size, void *data, u8 *game_name, s32 *file_no, u8 *ext_name,
                          u8 *company, u8 *code);
-extern s32 func_00425F84(s32 ch, s32 index);
-extern s32 func_00428C10(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
+extern s32 Pak_DeleteNote_2(s32 ch, s32 index);
+extern s32 osPfsReadWriteFile_2(OSPfs *pfs, s32 file_no, u8 flag, s32 offset, s32 size, void *data);
 
 /* Reads note file_no of the pak on channel ch into dst. */
 static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {
@@ -29,17 +29,17 @@ static __inline__ s32 readNote(s32 ch, s32 file_no, void *dst, s32 size) {
     void *buf;
 
     blocks = (size + 0xFF) & ~0xFF;
-    if (D_80130C60[ch] != 3) {
+    if (gPakState[ch] != 3) {
         return -2;
     }
     handle = CCache__Allocate(0, blocks, 0x23, D_800C18B0);
     buf = *handle;
     Controller_Lock(1);
     Controller_ReadAll();
-    result = D_80130C70[ch];
-    D_800F6750 = 2;
+    result = gPakError[ch];
+    gPakQueueState = 2;
     if (result == 0) {
-        if ((result = func_00428C10(&D_80130C80[ch], file_no, 0, 0, blocks, buf)) != 0) {
+        if ((result = osPfsReadWriteFile_2(&gPakFileSystems[ch], file_no, 0, 0, blocks, buf)) != 0) {
             result = -1;
         }
         if (result == 0) {
@@ -64,20 +64,20 @@ s32 Pak_SaveNoteVerified_2(s32 ch, s32 size, void *data, u8 *name, u8 *ext, u8 *
     s32 tries;
 
     blocks = (size + 0xFF) & ~0xFF;
-    if (D_80130C60[ch] != 3) {
+    if (gPakState[ch] != 3) {
         return -2;
     }
     handle = CCache__Allocate(0, blocks, 0x23, D_800C18C8);
     buf = *handle;
     for (tries = 0; tries < 4; tries++) {
-        result = func_00425AE0(ch, size, data, name, &file_no, ext, D_800C18E0, code);
+        result = Pak_WriteNote_2(ch, size, data, name, &file_no, ext, D_800C18E0, code);
         if (result != 0) {
             break;
         }
         if (readNote(ch, file_no, buf, blocks) == 0 && memcmp(buf, data, size) == 0) {
             break;
         }
-        if (func_00425F84(ch, file_no) != 0) {
+        if (Pak_DeleteNote_2(ch, file_no) != 0) {
             break;
         }
     }

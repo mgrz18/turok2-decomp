@@ -24,8 +24,8 @@ typedef struct MenuPlayer {
     /* 0x972 */ s8 owned[1];
 } MenuPlayer;
 
-extern u8 D_8011AAEA;
-extern Gfx *D_800D8E24;
+extern u8 gEngineApp_m_Settings_hudAlpha;
+extern Gfx *gDList;
 
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
 s32 CBarrel__CompareIcons();
@@ -54,7 +54,7 @@ void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer
     s32 blue;
 
     Sort_Quick(items, count, sizeof(CBarrelIcon), CBarrel__CompareIcons, CBarrel__SwapIcons);
-    level = D_8011AAEA + 0x40;
+    level = gEngineApp_m_Settings_hudAlpha + 0x40;
     fade = menu->m_Open * (level < 0x100 ? level : 255.0f);
     item = items;
     while (--count != -1) {
@@ -98,7 +98,7 @@ void CBarrel__DrawIcons(CBarrel *menu, CBarrelIcon *items, s32 count, MenuPlayer
                 }
             }
             {
-                Gfx *_g = D_800D8E24++;
+                Gfx *_g = gDList++;
                 _g->w0 = 0xFB000000;
                 _g->w1 = (red << 24) | ((green & 0xFF) << 16) | ((blue & 0xFF) << 8) |
                          ((u32)(alpha * fade) & 0xFF);

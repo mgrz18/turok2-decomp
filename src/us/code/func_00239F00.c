@@ -5,13 +5,13 @@
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-extern s32 D_800F7078[];
-extern f32 D_800B6D28;                  /* frame time, in 15ths of a second */
-extern CCollisionResults *D_800F1ADC;
-extern void (*D_800AD190[])(Sweep *);   /* the collision tests, NULL-ended */
+extern s32 gScene[];
+extern f32 gFrameIncrement;                  /* frame time, in 15ths of a second */
+extern CCollisionResults *gCollisionResultsP;
+extern void (*sCollisionTests[])(Sweep *);   /* the collision tests, NULL-ended */
 extern CCollisionInfo D_800F1E10;
 extern CCollisionInfo D_800F1CC0;
-extern CCollisionInfo D_800F1AE0;
+extern CCollisionInfo gCollisionInfoSight;
 extern CCollisionInfo D_800F1C60;
 
 CRegionInfo *CScene__GetRegionInfo(s32 *list, CGameRegion *region);
@@ -45,8 +45,8 @@ s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInf
     f32 ground;
     f32 dy;
 
-    info = CScene__GetRegionInfo(D_800F7078, obj->header.m_pCurrentRegion);
-    if (def != &D_800F1E10 && def != &D_800F1CC0 && def != &D_800F1AE0 && def != &D_800F1C60) {
+    info = CScene__GetRegionInfo(gScene, obj->header.m_pCurrentRegion);
+    if (def != &D_800F1E10 && def != &D_800F1CC0 && def != &gCollisionInfoSight && def != &D_800F1C60) {
         obj->m_pInstanceBelow = 0;
         if (obj->header.m_Type == 1) {
             obj->m_AI.m_dwFlags &= ~0x30000;
@@ -62,7 +62,7 @@ s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInf
     sweep.stop = 0;
     sweep.unkA0 = 0;
     sweep.lastKind = 0;
-    dt = D_800B6D28 * (1.0f / 15);
+    dt = gFrameIncrement * (1.0f / 15);
     if (def->m_dwFlags & 4) {
         passes = 1;
     } else if (def->m_dwFlags & 0x200000) {
@@ -103,7 +103,7 @@ s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInf
         obj->m_vVelocity.x += accel.x * dt;
         obj->m_vVelocity.y += accel.y * dt;
         obj->m_vVelocity.z += accel.z * dt;
-        D_800F1ADC->m_vVelocity = obj->m_vVelocity;
+        gCollisionResultsP->m_vVelocity = obj->m_vVelocity;
     }
     if (obj->header.m_vPos.x == sweep.end.x && obj->header.m_vPos.y == sweep.end.y && obj->header.m_vPos.z == sweep.end.z) {
         return 0;
@@ -124,12 +124,12 @@ s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInf
         if (sweep.physics) {
             sweep.hit.vel = obj->m_vVelocity;
         }
-        if (D_800AD190[0] != NULL && !sweep.stop) {
+        if (sCollisionTests[0] != NULL && !sweep.stop) {
             i = 0;
             do {
-                D_800AD190[i](&sweep);
+                sCollisionTests[i](&sweep);
                 i++;
-            } while (D_800AD190[i] != NULL && !sweep.stop);
+            } while (sCollisionTests[i] != NULL && !sweep.stop);
         }
         switch ((u32) sweep.hit.type) {
             case 2:
@@ -149,7 +149,7 @@ s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInf
                 obj->header.m_vPos = sweep.end;
                 break;
         }
-        if ((def->m_dwFlags & 0x800000) && D_800F1ADC->m_pWallRegion != 0) {
+        if ((def->m_dwFlags & 0x800000) && gCollisionResultsP->m_pWallRegion != 0) {
             return hits;
         }
         remaining -= sweep.hit.fraction * remaining;
@@ -171,9 +171,9 @@ s32 Collision_MoveInstance(CGameObjectInstance *obj, CVector3 pos, CCollisionInf
 
     if (def->m_WallBehavior != 0 && !(def->m_dwFlags & 0x01000000) && Sweep_GetGroundBehavior(&sweep, obj->header.m_pCurrentRegion)) {
         if (remaining > 0.01f) {
-            if (sweep.hit.posOut == &D_800F1ADC->m_vInstancePos) {
+            if (sweep.hit.posOut == &gCollisionResultsP->m_vInstancePos) {
                 more = def->m_InstanceBehavior != 1;
-            } else if (sweep.hit.posOut == &D_800F1ADC->m_vWallPos) {
+            } else if (sweep.hit.posOut == &gCollisionResultsP->m_vWallPos) {
                 more = def->m_WallBehavior != 1;
             } else {
                 more = 0;

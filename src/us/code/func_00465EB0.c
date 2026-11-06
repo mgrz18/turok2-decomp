@@ -15,8 +15,8 @@ typedef struct {
     /* 0x1C */ f32 height;
 } Emitter;
 
-extern Emitter D_800F1360;
-extern Emitter D_800F12C0;
+extern Emitter gLevelActorIntelligence;
+extern Emitter gLevelActorIntelligenceMP;
 
 void func_0027BD10(Emitter *emitter);
 void func_00227664(CPooledLevelActor *actor);
@@ -34,18 +34,18 @@ void SceneActorPool_Construct_2(CLevelActorPool *pool) {
     pool->m_Actors[0].m_pPrev = NULL;
     pool->m_Actors[31].m_pNext = NULL;
 
-    func_0027BD10(&D_800F1360);
-    D_800F1360.kind = 8;
-    D_800F1360.active = 1;
-    D_800F1360.count = 0;
-    D_800F1360.flags |= 4;
-    func_0027BD10(&D_800F12C0);
-    D_800F12C0.kind = 8;
-    D_800F12C0.active = 0;
-    D_800F12C0.count = 0;
-    D_800F12C0.flags |= 4;
-    D_800F12C0.width = 122.88f;
-    D_800F12C0.height = 122.88f;
+    func_0027BD10(&gLevelActorIntelligence);
+    gLevelActorIntelligence.kind = 8;
+    gLevelActorIntelligence.active = 1;
+    gLevelActorIntelligence.count = 0;
+    gLevelActorIntelligence.flags |= 4;
+    func_0027BD10(&gLevelActorIntelligenceMP);
+    gLevelActorIntelligenceMP.kind = 8;
+    gLevelActorIntelligenceMP.active = 0;
+    gLevelActorIntelligenceMP.count = 0;
+    gLevelActorIntelligenceMP.flags |= 4;
+    gLevelActorIntelligenceMP.width = 122.88f;
+    gLevelActorIntelligenceMP.height = 122.88f;
 
     for (i = 0; i < 32; i++) {
         func_00227664(&pool->m_Actors[i]);

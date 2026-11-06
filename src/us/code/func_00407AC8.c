@@ -6,7 +6,7 @@ extern void AI_TurnClamped(CGameObjectInstance *obj, CAI *ai, f32 turnRate, f32 
 extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1F50[];
-extern s32 D_8012FA04[];        /* boss script index; an array so the store stays after the obj store */
+extern s32 gLevelScript_script_current[];        /* boss script index; an array so the store stays after the obj store */
 
 void Primagen_UpdateMode11(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -17,7 +17,7 @@ void Primagen_UpdateMode11(CGameObjectInstance *obj, CAI *ai) {
     AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
     if (ai->m_AnimRepeatedCount != 0) {
         obj->m_AI.m_AnimSpeed = 1.0f;
-        D_8012FA04[0] = -1;
+        gLevelScript_script_current[0] = -1;
         CAI__SetMode(obj, ai, 7);
     }
 }

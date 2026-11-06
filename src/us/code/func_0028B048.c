@@ -5,8 +5,8 @@
 
 extern void *__scTaskReady(struct OSScTask_s *arg0);
 extern void *osViGetCurrentFramebuffer();
-extern s32 D_8011B098;
-extern s32 D_8011B0A0;
+extern s32 gPendingFB;
+extern s32 gCurrentFB;
 void *__scTaskReady(struct OSScTask_s *arg0) {
     s32 f1a;
     s32 f1b;
@@ -15,7 +15,7 @@ void *__scTaskReady(struct OSScTask_s *arg0) {
         return 0;
     }
     f1a = (s32)arg0->framebuffer;
-    if (f1a == D_8011B0A0) {
+    if (f1a == gCurrentFB) {
         return 0;
     }
     v2 = osViGetCurrentFramebuffer();
@@ -23,7 +23,7 @@ void *__scTaskReady(struct OSScTask_s *arg0) {
     if (f1b == (s32)v2) {
         return 0;
     }
-    if (f1b != D_8011B098) {
+    if (f1b != gPendingFB) {
         return arg0;
     }
     return 0;

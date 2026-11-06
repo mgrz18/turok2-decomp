@@ -5,18 +5,18 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-extern void func_004263A0(s32);
-void func_004263A0(s32);
-extern s32 D_800C2028;
+extern void Pak_ProbeSlot_2(s32);
+void Pak_ProbeSlot_2(s32);
+extern s32 gPakMenuPort;
 extern void PakMenu_ProbeOwnerPort_2(struct Menu *record);
-extern s32 D_80130990;
+extern s32 gPakMenuAnyPak;
 void PakMenu_ProbeOwnerPort_2(struct Menu *record) {
     s32 value;
-    if (D_80130990 != 0) {
-        value = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        value = gPakMenuPort;
     } else {
         value = record->controller->port;
     }
-    func_004263A0(value);
+    Pak_ProbeSlot_2(value);
 }
-extern s32 D_80130990;
+extern s32 gPakMenuAnyPak;

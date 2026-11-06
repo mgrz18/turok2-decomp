@@ -13,7 +13,7 @@ extern void ImpactEvent_Send(CGameObjectInstance *src, CGameObjectInstance *dst,
                           CVector3 pos, EffectParams params);
 
 extern s32 D_800F1F50[];
-extern s32 D_8012F988;          /* parts left (mode 1) */
+extern s32 gLevelScript_values;          /* parts left (mode 1) */
 extern s32 D_8012F990;          /* parts left (mode 2) */
 
 void Primagen_HandleAnimEvent(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVector3 pos, s32 event) {
@@ -36,7 +36,7 @@ void Primagen_HandleAnimEvent(s32 arg0, CGameObjectInstance *obj, s32 arg2, CVec
         params.b[3] = 0;
         ImpactEvent_Send(obj, obj, 3, -1, t.m_Sight.m_pTarget->header.m_vPos, params);
     }
-    if (event == 1 && t.m_Sight.m_Dist <= 716.8f && D_8012F988 > 0) {
+    if (event == 1 && t.m_Sight.m_Dist <= 716.8f && gLevelScript_values > 0) {
         params.upper = size * 256.0f;
         params.lower = 0x800;
         params.b[0] = 0;

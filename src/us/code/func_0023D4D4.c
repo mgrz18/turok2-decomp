@@ -16,7 +16,7 @@ typedef struct SweptModel {
     /* 0x10 */ void *data;
 } SweptModel;
 
-extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults *gCollisionResultsP;
 
 void CMtxF__TransformPoint(f32 (*mtx)[4], CVector3 *in, CVector3 *out);
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
@@ -74,24 +74,24 @@ void ModelSweep_TestTriangle(ModelSweep *ms, ProjVertex **v) {
         case 1:
         case 7:
         case 8:
-            if ((def->m_dwFlags & 8) && D_800F1ADC->m_pWaterRegion == 0 &&
+            if ((def->m_dwFlags & 8) && gCollisionResultsP->m_pWaterRegion == 0 &&
                 Sweep_HitPlane(sweep, &normal, &world[0], 1, 7, def->m_WaterFriction, 0)) {
-                sweep->hit.posOut = &D_800F1ADC->m_vWaterPos;
+                sweep->hit.posOut = &gCollisionResultsP->m_vWaterPos;
                 sweep->hit.regionOut = NULL;
-                sweep->hit.kindOut = &D_800F1ADC->m_nWaterKind;
+                sweep->hit.kindOut = &gCollisionResultsP->m_nWaterKind;
                 sweep->hit.kind = ms->kind;
-                sweep->hit.dataOut = (void **)&D_800F1ADC->m_pWaterRegion;
+                sweep->hit.dataOut = (void **)&gCollisionResultsP->m_pWaterRegion;
                 sweep->hit.data = ((SweptModel *)ms->model)->data;
             }
             break;
         default:
             if (Sweep_HitPlane(sweep, &normal, &world[0], 1, def->m_WallBehavior, def->m_GroundFriction, 0)) {
                 ms->hitDist = ms->scale * sweep->hit.fraction;
-                sweep->hit.posOut = &D_800F1ADC->m_vInstancePos;
-                sweep->hit.kindOut = &D_800F1ADC->m_nInstanceNode;
+                sweep->hit.posOut = &gCollisionResultsP->m_vInstancePos;
+                sweep->hit.kindOut = &gCollisionResultsP->m_nInstanceNode;
                 sweep->hit.regionOut = NULL;
                 sweep->hit.kind = -1;
-                sweep->hit.dataOut = (void **)&D_800F1ADC->m_pInstance;
+                sweep->hit.dataOut = (void **)&gCollisionResultsP->m_pInstance;
                 sweep->hit.data = ms->model;
                 if (def->m_dwFlags & 0x20000000) {
                     sweep->stop = 1;

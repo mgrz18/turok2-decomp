@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern u8 D_8011AAF0; /* D_8011AAD8 + 0x18 */
+extern u8 gEngineApp_m_Settings_unk18; /* gEngineApp_m_Settings + 0x18 */
 extern char D_800C1EE0[];
 extern char D_800C1EF8[];
 extern char D_800C1F10[];
@@ -10,7 +10,7 @@ extern char D_800C1F40[];
 extern char D_800C1F58[];
 
 s32 Menu_DebugModeLabel(MenuItem *a) {
-    switch (D_8011AAF0) {
+    switch (gEngineApp_m_Settings_unk18) {
     case 0:
         a->text = D_800C1EE0;
         break;

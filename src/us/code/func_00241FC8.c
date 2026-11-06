@@ -5,7 +5,7 @@
 typedef void (*FaceFunc)(CollisionQuad *quad, CVector3 *points);
 
 /* The side faces of a box: Quad_SetBoxTop, Quad_SetBoxSide3267, Quad_SetBoxSide4510, Quad_SetBoxSide0374, Quad_SetBoxSide2156. */
-extern FaceFunc D_800AD930[];
+extern FaceFunc sBoxSideFaceBuilders[];
 
 void Platform_GetCollisionBox(CGameObjectInstance *mover, CVector3 *points, CGameObjectInstance *collider);
 void Quad_SetBoxBottom(CollisionQuad *quad, CVector3 *points);
@@ -50,8 +50,8 @@ s32 Platform_CollideBox(Sweep *ctrl, CGameObjectInstance *mover) {
     result = 0;
     Platform_GetCollisionBox(mover, points, collider);
     i = 0;
-    while (D_800AD930[i] != NULL) {
-        D_800AD930[i++](&quad, points);
+    while (sBoxSideFaceBuilders[i] != NULL) {
+        sBoxSideFaceBuilders[i++](&quad, points);
         if (Plane_SegmentCrosses(&quad, &collider->header.m_vPos, &ctrl->end)
             && Plane_IntersectSegment(&quad, &collider->header.m_vPos, &ctrl->end, &hit)
             && Quad_ContainsPoint(&quad, hit.x, hit.y, hit.z)) {

@@ -26,9 +26,9 @@ typedef struct InstanceHit {
     /* 0x04 */ f32 t;
 } InstanceHit;
 
-extern CWorld D_800F7078;
-extern CCollisionResults *D_800F1ADC;
-extern u8 D_8011AAF1;
+extern CScene gScene;
+extern CCollisionResults *gCollisionResultsP;
+extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 Sweep_HitBox(Sweep *sweep, CBox *box, f32 *t);
 void Sort_Quick(void *base, s32 count, s32 size, s32 (*cmp)(), s32 (*swap)());
@@ -52,7 +52,7 @@ void Collision_SweepActors(Sweep *sweep) {
     CCollisionInfo *def;
     HitInst *inst;
     HitInst *other;
-    CWorld *world;
+    CScene *world;
     InstanceHit *hit;
     GameSettings *multi;
     s32 count;
@@ -74,14 +74,14 @@ void Collision_SweepActors(Sweep *sweep) {
     box.m_vMax.z = MAX(sweep->end.z, start->z);
     hit = hits;
     nHits = 0;
-    world = &D_800F7078;
+    world = &gScene;
     count = world->m_nMovers;
     for (i = 0; i < count && nHits < 0x80; i++) {
         other = (HitInst *)world->m_pMovers[i];
         if (inst == other) {
             continue;
         }
-        if (def->m_InstanceBehavior == 7 && (HitInst *)D_800F1ADC->m_pInstance == other) {
+        if (def->m_InstanceBehavior == 7 && (HitInst *)gCollisionResultsP->m_pInstance == other) {
             continue;
         }
         if ((def->m_dwFlags & 0x20000000) && other->typeId == 0x64F) {
@@ -91,7 +91,7 @@ void Collision_SweepActors(Sweep *sweep) {
             if (*inst->particleDef & 0x40) {
                 continue;
             }
-            if (D_8011AAF1) {
+            if (gEngineApp_m_Settings_multiplayer) {
                 continue;
             }
             switch (*other->def) {
@@ -121,7 +121,7 @@ void Collision_SweepActors(Sweep *sweep) {
                 break;
             }
             other = hit->inst;
-            if ((other->flags & 0x300000) && !(multi = &D_8011AAD8)->multiplayer) {
+            if ((other->flags & 0x300000) && !(multi = &gEngineApp_m_Settings)->multiplayer) {
                 Sweep_GetVolumeBounds(sweep, &volume);
                 Sweep_TestInstance(sweep, &volume, other);
             } else {

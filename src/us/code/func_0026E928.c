@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern CWorld D_800F7078;
+extern CScene gScene;
 extern void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2, f32 arg5, f32 arg6, void **arg7);
 void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
                    f32 arg5, f32 arg6, void **arg7) {
@@ -19,7 +19,7 @@ void Rumble_Init(NodeCode8028469C *arg0, Clip *arg1, CVector3 arg2,
         *arg7 = arg0;
     }
     RumbleCurve_Init(&arg0->amplitudeHandle,
-                  (unsigned int)CScene__GetCurve(&D_800F7078, arg1->mode));
+                  (unsigned int)CScene__GetCurve(&gScene, arg1->mode));
     RumbleCurve_Init(&arg0->lifetimeHandle,
-                  (unsigned int)CScene__GetCurve(&D_800F7078, arg1->frames));
+                  (unsigned int)CScene__GetCurve(&gScene, arg1->frames));
 }

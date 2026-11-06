@@ -338,7 +338,7 @@ struct TableRecAt8;
 struct Shared_Pickup;
 struct Record14;
 struct LevelActor;
-extern CWorld D_800F7078;
+extern CScene gScene;
 s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2);
 extern void AI_StopSound(void *, void *);
 s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {
@@ -346,10 +346,10 @@ s32 CAI__SetMode(void *arg0, void *arg1, s32 arg2) {
     StateEntry *entry;
     StateEntry *scan;
     s32 flags;
-    if (D_800F7078.m_Mode == 2) {
+    if (gScene.m_Mode == 2) {
         return 1;
     }
-    if (D_800F7078.m_Mode == 4) {
+    if (gScene.m_Mode == 4) {
         ((Source110 *)arg0)->flags |= 0x100;
     }
     ((Dest *)arg1)->requestedState = ((Dest *)arg1)->state;

@@ -1,0 +1,41 @@
+// Data names (tools/apply_names.py reads versions/names/data_*.us.txt): the
+// certain ones collected by round N2 (docs/NAMES.md, data_n4.txt) and enough
+// more to exercise every kind of data symbol the tool handles: .data, .bss,
+// interior symbols, a string in a C file's .rodata, a VM-module datum and its
+// second-module copy (_2, at the named address; linked 0x39000 lower).
+
+// AI and events (n4)
+gIntelligenceTypeInfo = 0x800ACB60; // [m_Type] -> {setup, advance, event handler pairs...}: Enemy 0x800B1760 ... Action 0x800B24B0 (func_0021F770, func_00219BC0)
+gEnemyBehaviorInfo = 0x800B1790; // CEnemyBehaviorInfo *[8] by behaviour value (struct name from the ROM debug types); func_0025C5F8
+gLevelEventHandlers = 0x800B2628; // [kind] -> {onActor, onEvent} pairs, 8 bytes into each gIntelligenceTypeInfo block; LevelEvent_Fire
+
+// Engine (Turok 3 tengine.c / tengine.h)
+gEngineModeTable = 0x800B6D78; // Turok 3's name; {Init, Retrace, Draw} x 18 (EngineModeNN_*)
+gFrameIncrement = 0x800B6D28; // Turok 3 "frame_increment": CEngineApp__Update sets it to gNextTicks * 15 / refresh rate, or the elapsed time while Cinema_PathPlaying
+gNextTicks = 0x8011AD10; // Turok 3: CEngineApp__Update sets it to frameRetraces(2), or (4) while Cinema_PathPlaying
+gEngineApp = 0x800F6CB0; // Turok 3's CEngineApp (structs/game.h CEngineApp), CEngineApp__Boot's object
+gEngineApp_m_pCurrentFrameData = 0x800F7070; // CEngineApp +0x3C0 (structs/game.h)
+gScene = 0x800F7078; // Turok 3's CScene (structs/world.h), CEngineApp +0x3C8: CScene__* take it as this
+gScene_m_InstancePool = 0x8010ABA0; // CScene +0x13B28, the CInstancePool (structs/world.h)
+
+// System resources (Turok 3 sysrc.h, cache.h)
+gHeap = 0x800D1CC0; // Turok 3 "sysrc_heap": CHeap__Alloc/AllocTop/Free(&gHeap, ...)
+gLoader = 0x800D1CD8; // Turok 3 "sysrc_loader": CLoader__LoadSync/LoadAsync(&gLoader, ...)
+gDecompressor = 0x800D6D68; // Turok 3 "sysrc_decompressor": CDecompressor__DecompressSync/Async(&gDecompressor, ...)
+gCache = 0x800D81D0; // Turok 3 cache.c's CCache (structs/cache.h; n1)
+
+// Collision (Turok 3)
+gCollisionResultsP = 0x800F1ADC; // Turok 3's name: the current hit buffer (n3)
+gCollisionResults = 0x800F1CE0; // Turok 3's name: the last collision test (n3)
+gCollisionSetupTable = 0x0042D510; // Turok 3's name: CCollisionInfo__Reset's caller passes it to CCollisionSetup__Construct; 34 0x28-byte records (src/us/asm/data_0042D50C.s)
+gCollisionSetupTable_2 = 0x00466430; // the second VM module's copy (src/us/asm/data_0046642C.s), linked at 0x0042D430
+
+// Sound (n5)
+gAudioWorld = 0x800F2A00; // Turok 3's CAudioWorld (audioworld.c)
+gLoopSounds = 0x800E6A90; // looping sounds: free CList at 0, used at 0x14 (LoopSounds_Get returns it)
+gAudioWorld_seq_track = 0x800F478C; // CAudioWorld +0x1D8C = seq (+0x1D64) .track (+0x28), the requested music track (Music_GetTrack / Music_SetTrack); was gAudioWorld_seq_track (round N3), interior per g5
+sCSPlayerFile = 0x800AA294; // "audio/csplayer.c", __assert's file argument in libaudio's csplayer.c; in func_0028FB80's .rodata (C), defined for the others by foreign_labels
+
+// Bosses (n7)
+gMotherSpawnPoints = 0x00431D20; // SpawnPoint[4] of the Mother fight (structs/boss.h; MotherBoss_DropPickupsAtSpawnPoints, MotherBoss_TeleportTarget)
+gMotherSpawnPoints_2 = 0x0046AC40; // the second VM module's copy, linked at 0x00431C40

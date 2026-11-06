@@ -3,12 +3,12 @@
 
 s32 CCache__Deallocate(s32, s32);
 
-s32 CPlayerPool__GetFirstActive(CPlayerList *);                       /* extern */
+s32 CPlayerPool__GetFirstActive(CPlayerPool *);                       /* extern */
 s32 Sound__StopFlags(s32);                     /* extern */
 s32 Sound__DetachAll();                            /* extern */
 s32 LoopSounds_StopAll(s32);                         /* extern */
 s32 LoopSounds_Get();                                /* extern */
-s32 func_0042EA24(s32);                         /* extern */
+s32 CPlayer__StopLoopingSounds_2(s32);                         /* extern */
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x98];
@@ -18,9 +18,9 @@ typedef struct {
 void CScene__UnloadLevel_2(Unk004658FC *arg0) {
     s32 temp_v0;
 
-    temp_v0 = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    temp_v0 = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     if (temp_v0 != 0) {
-        func_0042EA24(temp_v0);
+        CPlayer__StopLoopingSounds_2(temp_v0);
     }
     LoopSounds_StopAll(LoopSounds_Get());
     Sound__DetachAll();

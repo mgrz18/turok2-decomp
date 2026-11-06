@@ -13,10 +13,10 @@ struct IntPair;
 struct IntPair;
 struct IntPair;
 struct IntPair;
-extern s32 D_8011ACA4;
+extern s32 gEngineApp_m_Settings_paused;
 extern void AI_StartSound(u8 *, u8 *, s32);
 void func_00239350(void *unused, u8 *object, s32 third, struct IntPair pair, s32 fifth, s32 sixth) {
-    if (D_8011ACA4 == 0 && object != 0 && object[0] == 1) {
+    if (gEngineApp_m_Settings_paused == 0 && object != 0 && object[0] == 1) {
         do {
             AI_StartSound(object, object + 0x140, sixth);
         } while (0);

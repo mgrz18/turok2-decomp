@@ -6,5 +6,5 @@
 s32 CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 void MotherBoss_OnPhase2CinemaDone(void) {
-    CAI__SetMode(D_8012FB70.obj, &D_8012FB70.obj->m_AI, 0x14);
+    CAI__SetMode(gMotherBoss.obj, &gMotherBoss.obj->m_AI, 0x14);
 }

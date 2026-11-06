@@ -33,13 +33,13 @@ typedef struct PickupRow10 {
     /* 0x0C */ s32 (*handler)(Picker *picker, struct PickupRow10 *row, void *pickup);
 } PickupRow10;
 
-extern PickupRow18 D_800AD1B0[];
-extern PickupRow14 D_800AD498[];
-extern PickupRow18 D_800AD768[];
-extern PickupRow14 D_800AD810[];
-extern PickupRow10 D_800AD838[];
-extern s32 D_80110048;
-extern u8 D_801198B0[];
+extern PickupRow18 sWeaponPickups[];
+extern PickupRow14 sAmmoPickups[];
+extern PickupRow18 sHealthPickups[];
+extern PickupRow14 sLifeForcePickups[];
+extern PickupRow10 sItemPickups[];
+extern s32 gScene_m_LevelID;
+extern u8 gEngineApp_m_Game_m_CameraPool[];
 extern u8 D_800B37BC[];
 extern u8 D_800B37CC[];
 extern u8 D_800B37D8[];
@@ -73,7 +73,7 @@ void Sound__PlaySpeech(s32 arg0);
 /* Pickup_FindWeaponEntry */
 static __inline__ PickupRow18 *FindRowA(s32 id) {
     s32 i;
-    PickupRow18 *p = D_800AD1B0;
+    PickupRow18 *p = sWeaponPickups;
 
     for (i = 0x1E; i != -1; i--) {
         if (p->id == id) {
@@ -87,7 +87,7 @@ static __inline__ PickupRow18 *FindRowA(s32 id) {
 /* Pickup_FindAmmoEntry */
 static __inline__ PickupRow14 *FindRowB(s32 id) {
     s32 i;
-    PickupRow14 *p = D_800AD498;
+    PickupRow14 *p = sAmmoPickups;
 
     for (i = 0x23; i != -1; i--) {
         if (p->id == id) {
@@ -101,7 +101,7 @@ static __inline__ PickupRow14 *FindRowB(s32 id) {
 /* Pickup_FindHealthEntry */
 static __inline__ PickupRow18 *FindRowC(s32 id) {
     s32 i;
-    PickupRow18 *p = D_800AD768;
+    PickupRow18 *p = sHealthPickups;
 
     for (i = 6; i != -1; i--) {
         if (p->id == id) {
@@ -115,7 +115,7 @@ static __inline__ PickupRow18 *FindRowC(s32 id) {
 /* func_0023EFCC */
 static __inline__ PickupRow14 *FindRowD(s32 id) {
     s32 i;
-    PickupRow14 *p = D_800AD810;
+    PickupRow14 *p = sLifeForcePickups;
 
     for (i = 1; i != -1; i--) {
         if (p->id == id) {
@@ -129,7 +129,7 @@ static __inline__ PickupRow14 *FindRowD(s32 id) {
 /* Pickup_FindItemEntry */
 static __inline__ PickupRow10 *FindRowE(s32 id) {
     s32 i;
-    PickupRow10 *p = D_800AD838;
+    PickupRow10 *p = sItemPickups;
 
     for (i = 14; i != -1; i--) {
         if (p->id == id) {
@@ -247,7 +247,7 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
                     break;
                 case 0x10FE:
                     msg = D_800B3888;
-                    key = Level_GetHub(D_80110048) - 1;
+                    key = Level_GetHub(gScene_m_LevelID) - 1;
                     if (key < 6) {
                         picker->keys[key]++;
                     }
@@ -284,7 +284,7 @@ s32 CPlayer__CollectPickup(Picker *picker, void *pickup, s32 id) {
         }
         CCamera__StartFlash(picker->hud, 0x80, 0x32, 0x32, 0x4B, 0, 0, 2);
         if (msg != NULL) {
-            CCameraPool__AddText(D_801198B0, picker->hud, msg);
+            CCameraPool__AddText(gEngineApp_m_Game_m_CameraPool, picker->hud, msg);
         }
         if (sound != 0) {
             Sound__Play(sound, picker->x, picker->y, picker->z, 0, -1);

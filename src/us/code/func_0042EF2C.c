@@ -3,7 +3,7 @@
 #include "structs/demo.h"
 #include "structs/game.h"
 
-extern s32 D_800B6D60;
+extern s32 gAttractRunCount;
 
 extern void Demo_DecodeButtons();
 extern void Demo_DecodeStick();
@@ -22,7 +22,7 @@ static __inline__ void initSetting(DemoStream *t, DemoHeader *config, s32 index,
 
 /* Starts a match from config: sets up the per-player settings and the game setup. */
 void Demo_Start(DemoHeader *arg) {
-    DemoPlayer *s = &D_800F56B0;
+    DemoPlayer *s = &gDemoPlayer;
     GameSettings *setup;
     s32 i;
     s32 r;
@@ -30,17 +30,17 @@ void Demo_Start(DemoHeader *arg) {
     DemoHeader *owner = arg;
     DemoHeader *config = arg;
 
-    D_800B6D60++;
+    gAttractRunCount++;
     s->unk4 = 0;
     s->playing = 1;
     s->done = 0;
     s->fastForward = 1;
     if (s->saved == 0) {
         s->saved = 1;
-        s->settings = *(GameSettingsBlock *)&D_8011AAD8;
+        s->settings = *(GameSettingsBlock *)&gEngineApp_m_Settings;
     }
     {
-        GameSettings *g = &D_8011AAD8;
+        GameSettings *g = &gEngineApp_m_Settings;
         for (i = 0; i < 4; i++) {
             g->defaultSlot.m_bActive = 0;
             g->slots[i].m_bActive = 0;
@@ -55,8 +55,8 @@ void Demo_Start(DemoHeader *arg) {
     s->countdown = config->frames;
     s->time = 0;
     s->checksum = 0;
-    D_8011AAD8.matchMode = config->matchMode;
-    setup = &D_8011AAD8;
+    gEngineApp_m_Settings.matchMode = config->matchMode;
+    setup = &gEngineApp_m_Settings;
     GameSettings_SetDefaults(setup);
     if (s->playerCount >= 2) {
         do {
@@ -64,13 +64,13 @@ void Demo_Start(DemoHeader *arg) {
                 setup->slots[i].m_bActive = 1;
                 setup->slots[i].m_nCharacter = config->characters[i];
             }
-            D_8011AAD8.multiplayer = 1;
+            gEngineApp_m_Settings.multiplayer = 1;
         } while (0);
     } else {
         setup->defaultSlot.m_bActive = 1;
         setup->multiplayer = 0;
     }
-    setup = &D_8011AAD8;
+    setup = &gEngineApp_m_Settings;
     setup->unk17 = 0;
     setup->playerCount = s->playerCount;
     setup->cheatFlags = 12;

@@ -4,8 +4,8 @@
 #include "common.h"
 #include "structs/libaudio.h"
 
-extern ALGlobals *D_800B7760;
-extern s16 D_800B7900[]; /* eqpower */
+extern ALGlobals *alGlobals;
+extern s16 eqpower[]; /* eqpower */
 void __assert(const char *exp, const char *file, s32 line); /* __assert */
 #define assert_ln(EX, ln) ((EX) ? ((void)0) : __assert("EX", "audio/env.c", ln))
 void _freePVoice(ALSynth *drvr, PVoice *pvoice); /* _freePVoice */
@@ -28,7 +28,7 @@ void *alEnvmixerPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Ac
     if (e->ctrlList != 0) {
         while (e->ctrlList != 0) {
             one = 1;
-            eq = D_800B7900;
+            eq = eqpower;
             old = cur;
             cur = e->ctrlList->delta;
             delta = cur - old;
@@ -107,7 +107,7 @@ void *alEnvmixerPull(void *filter, s16 *outp, s32 outCount, s32 sampleOffset, Ac
                 (*e->filter.setParam)(e, 4, 0);
                 break;
             case 0: {
-                ALSynth *drvr = &D_800B7760->drvr;
+                ALSynth *drvr = &alGlobals->drvr;
                 ALFreeParam *pp = (ALFreeParam *)e->ctrlList;
                 pp->pvoice->offset = 0;
                 _freePVoice(drvr, pp->pvoice);

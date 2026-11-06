@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern s32 D_800C2028;
+extern s32 gPakMenuPort;
 extern void PakMenu_PickDefaultPort(void);
 void Pak_ProbeSlot(s32);
 s32 Pak_GetStatus(s32);
@@ -11,7 +11,7 @@ void PakMenu_PickDefaultPort(void) {
     s32 var_s0;
     s32 var_s1;
     s32 unavailable;
-    if (D_800C2028 == -1) {
+    if (gPakMenuPort == -1) {
         var_s0 = 0;
         var_s1 = 0;
     unavailable = -2;
@@ -30,6 +30,6 @@ loop_2:
         if (var_s1 == 4) {
             var_s0 = -1;
         }
-        D_800C2028 = var_s0;
+        gPakMenuPort = var_s0;
     }
 }

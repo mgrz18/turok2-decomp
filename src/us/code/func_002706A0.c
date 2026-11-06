@@ -14,7 +14,7 @@ void alSndpSetVol(void *p, s16 vol);
 void SndQueue_RequeueVoice(void *q, s32 a, s32 id);
 s32 SndVoicePool_GetVoiceState(void *pool, s16 idx, s32 id);
 void SndVoicePool_PlayVoice(void *pool, s16 idx);
-static __inline__ s32 find17(SndMgr *m, s32 id) {
+static __inline__ s32 find17(CAudioWorld *m, s32 id) {
     s32 i;
     SndVoice *vv;
     for (vv = m->pool.voices, i = 0; i < 17; i++, vv++) {
@@ -24,7 +24,7 @@ static __inline__ s32 find17(SndMgr *m, s32 id) {
     }
     return -1;
 }
-s32 CAudioWorld__StartVoice(SndMgr *m, s32 id)
+s32 CAudioWorld__StartVoice(CAudioWorld *m, s32 id)
 {
   s16 idx;
   SndVoiceParams *p;

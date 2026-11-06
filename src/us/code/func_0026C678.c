@@ -3,7 +3,7 @@
 
 CRegionInfo *CScene__GetRegionInfo(void *, void *);          /* extern */
 void CGameRegion__FloodClearWaterAll(CGameRegion *);                  /* extern */
-extern u8 D_800F7078[];
+extern u8 gScene[];
 
 void CGameRegion__FloodClearWater(CGameRegion *arg0) {
     CGameRegion *temp_a0;
@@ -29,7 +29,7 @@ void CGameRegion__FloodClearWater(CGameRegion *arg0) {
                 CGameRegion__FloodClearWaterAll(temp_a0_3);
             }
         }
-        temp_v0 = CScene__GetRegionInfo(D_800F7078, arg0);
+        temp_v0 = CScene__GetRegionInfo(gScene, arg0);
         if (temp_v0 != NULL) {
             temp_v0->unk_58 = 0;
             temp_v0->m_MapColour = 0;

@@ -5,7 +5,7 @@
 
  
 /* Index of the first of the seventeen voices playing id, -1 if none (or id is -1). */
-s32 CAudioWorld__FindVoice(SndMgr *ctx, s32 id) {
+s32 CAudioWorld__FindVoice(CAudioWorld *ctx, s32 id) {
     SndVoice *slot;
     s32 i;
 

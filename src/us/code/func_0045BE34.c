@@ -3,22 +3,22 @@
 #include "structs/menu.h"
 
 void Controller_WatchPak(s32 port);
-void func_004263A0(s32 port);
+void Pak_ProbeSlot_2(s32 port);
 
-extern s32 D_800C2020;
-extern s32 D_800C2028;
-extern s32 D_80130980;
-extern s32 D_80130984;
-extern s32 D_80130990;
-extern s32 D_80130994;
-extern s32 D_80130998;
-extern s32 D_801309A0;
+extern s32 gDamagedPakContinued;
+extern s32 gPakMenuPort;
+extern s32 sSavePortalChosen;
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuIsLoad;
+extern s32 gSavePortalActive;
+extern s32 gPakMenuWrites;
 extern s32 D_801309AC;
-extern s32 D_801309B4;
+extern s32 gPakMenuIsProfile;
 
 static __inline__ s32 GetPort(Menu *event) {
-    if (D_80130990 != 0) {
-        return D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        return gPakMenuPort;
     }
     return event->controller->port;
 }
@@ -34,16 +34,16 @@ void SavePortalMenu_Init_2(Menu *event) {
     ControllerProfile *controller = event->controller;
     PadSel sel;
 
-    D_80130990 = 0;
-    D_800C2020 = 0;
+    gPakMenuAnyPak = 0;
+    gDamagedPakContinued = 0;
     D_801309AC = 0;
-    D_80130998 = 1;
-    D_80130984 = 1;
-    D_801309A0 = 1;
-    D_80130994 = 0;
-    D_801309B4 = 0;
-    D_80130980 = 0;
+    gSavePortalActive = 1;
+    gPakMenuIsSave = 1;
+    gPakMenuWrites = 1;
+    gPakMenuIsLoad = 0;
+    gPakMenuIsProfile = 0;
+    sSavePortalChosen = 0;
     sel.v = controller->port;
     Controller_WatchPak(sel.v);
-    func_004263A0(GetPort(event));
+    Pak_ProbeSlot_2(GetPort(event));
 }

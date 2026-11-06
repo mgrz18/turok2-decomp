@@ -34,9 +34,9 @@ typedef struct {
     /* 0x1A8 */ BlastOwner *owner;
 } BlastActor;
 
-extern u8 D_8011AAF1;           /* multiplayer */
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
-extern HitFrame D_800F1970;       /* the shield CGameObjectInstance__GetNearestBox finds */
+extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
+extern HitFrame sBlastShieldFrame;       /* the shield CGameObjectInstance__GetNearestBox finds */
 
 s32 Blast_CanHit(BlastActor *victim, BlastActor *source);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
@@ -66,14 +66,14 @@ static __inline__ f32 blastScale(BlastActor *victim, BlastActor *source, CVector
     shielded = 1;
     scale = 1.0f;
     scaled = 1;
-    if (D_8011AAF1 != 0 && (flags & 0x400000)) {
+    if (gEngineApp_m_Settings_multiplayer != 0 && (flags & 0x400000)) {
         shielded = 0;
     }
-    if (source->kind == 2 && (BlastActor *)D_800F1CE0.m_pInstance == victim && D_800F1CE0.m_nInstanceNode != -1) {
-        shield = &D_800F1CE0.m_Frame;
+    if (source->kind == 2 && (BlastActor *)gCollisionResults.m_pInstance == victim && gCollisionResults.m_nInstanceNode != -1) {
+        shield = &gCollisionResults.m_Frame;
         falloff = 0;
     } else {
-        shield = CGameObjectInstance__GetNearestBox(victim, position, &D_800F1970) ? &D_800F1970 : NULL;
+        shield = CGameObjectInstance__GetNearestBox(victim, position, &sBlastShieldFrame) ? &sBlastShieldFrame : NULL;
     }
     *found = shield;
     if (shielded && shield != NULL) {

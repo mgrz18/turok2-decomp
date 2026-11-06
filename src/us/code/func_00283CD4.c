@@ -8,12 +8,12 @@ typedef struct GameState {
     s32 paused;             /* 0x1450 */
 } GameState;
 
-extern Cinema *D_800C1BB0;
-extern s32 D_800B6CE0;      /* last frame handled */
-extern s32 D_800B6D18;      /* frame counter */
-extern s32 D_8011ACA4;
-extern f32 D_800B6D28;      /* frame time */
-extern GameState D_801198A4;
+extern Cinema *gCinemaPlayerP;
+extern s32 sCinemaLastFrame;      /* last frame handled */
+extern s32 gFrameCount;      /* frame counter */
+extern s32 gEngineApp_m_Settings_paused;
+extern f32 gFrameIncrement;      /* frame time */
+extern GameState gEngineApp_m_Game_m_PlayerList_m_bCinema;
 
 extern s32 Cinema_StartPending(void);
 extern s32 Cinema_IsActive(void);
@@ -32,28 +32,28 @@ void Cinema_Update(void) {
     f32 value;
     f32 limit;
 
-    if (D_800B6CE0 == D_800B6D18) {
+    if (sCinemaLastFrame == gFrameCount) {
         return;
     }
-    D_800B6CE0 = D_800B6D18;
+    sCinemaLastFrame = gFrameCount;
     if (Cinema_StartPending() == 0) {
         if (Cinema_IsActive() != 0) {
-            if (D_8011ACA4 != 0 || Cinema_IsFinished() != 0) {
-                D_800C1BB0->prevTime = D_800C1BB0->time;
+            if (gEngineApp_m_Settings_paused != 0 || Cinema_IsFinished() != 0) {
+                gCinemaPlayerP->prevTime = gCinemaPlayerP->time;
             } else {
-                ctx = D_800C1BB0;
+                ctx = gCinemaPlayerP;
                 ctx->prevTime = *(volatile f32 *)&ctx->time;
-                ctx->time += D_800B6D28 * 0.06666667f;
+                ctx->time += gFrameIncrement * 0.06666667f;
                 if (ctx->startTime <= ctx->time) {
                     Cinema_Start();
                 }
-                value = D_800C1BB0->time;
-                limit = D_800C1BB0->clipEnd;
+                value = gCinemaPlayerP->time;
+                limit = gCinemaPlayerP->clipEnd;
                 if (limit <= value) {
-                    D_800C1BB0->time = limit;
-                    if (D_800C1BB0->stopAtEnd != 0) {
-                        D_800C1BB0->finished = 1;
-                        D_800C1BB0->stopAtEnd = 0;
+                    gCinemaPlayerP->time = limit;
+                    if (gCinemaPlayerP->stopAtEnd != 0) {
+                        gCinemaPlayerP->finished = 1;
+                        gCinemaPlayerP->stopAtEnd = 0;
                     }
                 }
             }
@@ -61,62 +61,62 @@ void Cinema_Update(void) {
         Cinema_FireCues();
     }
     Cinema_StartPending();
-    if (D_800C1BB0->fading != 0 && (D_800C1BB0->fade -= 2.0f * (D_800B6D28 * 0.06666667f)) < -0.5f) {
-        D_800C1BB0->fading = 0;
-        D_800C1BB0->fade = 0.0f;
+    if (gCinemaPlayerP->fading != 0 && (gCinemaPlayerP->fade -= 2.0f * (gFrameIncrement * 0.06666667f)) < -0.5f) {
+        gCinemaPlayerP->fading = 0;
+        gCinemaPlayerP->fade = 0.0f;
         if (Cinema_IsActive() != 0) {
             Cinema_RunEnd(1);
             Cinema_Close();
-            if (D_800C1BB0->owner != 0) {
-                CCache__Deallocate(0, D_800C1BB0->owner);
+            if (gCinemaPlayerP->owner != 0) {
+                CCache__Deallocate(0, gCinemaPlayerP->owner);
             }
-            D_800C1BB0->owner = 0;
-            D_800C1BB0->resource = 0;
-            D_800C1BB0->active = 0;
-            D_800C1BB0->finished = 0;
-            D_800C1BB0->fading = 0;
+            gCinemaPlayerP->owner = 0;
+            gCinemaPlayerP->resource = 0;
+            gCinemaPlayerP->active = 0;
+            gCinemaPlayerP->finished = 0;
+            gCinemaPlayerP->fading = 0;
         }
         return;
     }
     Cinema_StartPending();
-    if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0 && D_801198A4.busy == 0 && D_801198A4.paused == 0) {
-        if (D_800C1BB0->time >= D_800C1BB0->endTime && D_800C1BB0->ended == 0) {
+    if (Cinema_IsActive() != 0 && Cinema_IsFinished() == 0 && gEngineApp_m_Game_m_PlayerList_m_bCinema.busy == 0 && gEngineApp_m_Game_m_PlayerList_m_bCinema.paused == 0) {
+        if (gCinemaPlayerP->time >= gCinemaPlayerP->endTime && gCinemaPlayerP->ended == 0) {
             CinemaCallback cue;
 
             Sound__StopAllExcept(-1);
-            if (D_800C1BB0->restoreAtEnd != 0) {
+            if (gCinemaPlayerP->restoreAtEnd != 0) {
                 Cinema_RestorePlayer();
             }
-            ctx = D_800C1BB0;
+            ctx = gCinemaPlayerP;
             cue = ctx->onEnd;
             if (cue != 0) {
                 ctx->onEnd = 0;
                 cue();
             }
-            D_800C1BB0->ended = 1;
+            gCinemaPlayerP->ended = 1;
         }
-        if (D_800C1BB0->time >= D_800C1BB0->clipEnd && D_800C1BB0->closed == 0) {
-            if (D_800C1BB0->owner != 0) {
-                CCache__Deallocate(0, D_800C1BB0->owner);
+        if (gCinemaPlayerP->time >= gCinemaPlayerP->clipEnd && gCinemaPlayerP->closed == 0) {
+            if (gCinemaPlayerP->owner != 0) {
+                CCache__Deallocate(0, gCinemaPlayerP->owner);
             }
             {
-                CinemaCallback end = D_800C1BB0->onClose;
+                CinemaCallback end = gCinemaPlayerP->onClose;
 
-                D_800C1BB0->owner = 0;
-                D_800C1BB0->resource = 0;
-                D_800C1BB0->active = 0;
-                D_800C1BB0->finished = 0;
-                D_800C1BB0->fading = 0;
+                gCinemaPlayerP->owner = 0;
+                gCinemaPlayerP->resource = 0;
+                gCinemaPlayerP->active = 0;
+                gCinemaPlayerP->finished = 0;
+                gCinemaPlayerP->fading = 0;
                 if (end != 0) {
-                    D_800C1BB0->onClose = 0;
+                    gCinemaPlayerP->onClose = 0;
                     end();
                 }
             }
-            D_800C1BB0->closed = 1;
+            gCinemaPlayerP->closed = 1;
         }
     }
     Cinema_StartPending();
-    if (D_800C1BB0->active != 0) {
+    if (gCinemaPlayerP->active != 0) {
         CCache__SetFrameDelay(0xA);
     }
 }

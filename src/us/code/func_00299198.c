@@ -21,11 +21,11 @@ struct OSPifRam {
 };
 struct OSPifRam;
 typedef struct OSPifRam OSPifRam;
-extern OSPifRam D_80121430[4];
-extern u8 D_80121530[32];
-extern OSPifRam D_80121550[4];
-extern u8 D_80121650[32];
-extern s32 D_800B7A40[4];
+extern OSPifRam __osMotorStartData[4];
+extern u8 __osMotorStartBuf[32];
+extern OSPifRam __osMotorStopData[4];
+extern u8 __osMotorStopBuf[32];
+extern s32 __osMotorinitialized[4];
 extern s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer);
 extern s32 __osContRamWrite(OSMesgQueue *mq, int channel, u16 address, u8 *buffer, int force);
 extern u8 __osContAddressCrc(u16 address);
@@ -106,16 +106,16 @@ s32 osMotorInit(OSMesgQueue *mq, OSPfs *pfs, int channel)
     if (temp[31] != 0x80) {
         return 11;
     }
-    if (!D_800B7A40[channel]) {
-        for (i = 0; i < ((s32)(sizeof(D_80121530) / sizeof(D_80121530[0]))); i++) {
-            startbuf = D_80121530;
+    if (!__osMotorinitialized[channel]) {
+        for (i = 0; i < ((s32)(sizeof(__osMotorStartBuf) / sizeof(__osMotorStartBuf[0]))); i++) {
+            startbuf = __osMotorStartBuf;
             startbuf[i] = 1;
-            stopbuf = D_80121650;
+            stopbuf = __osMotorStopBuf;
             stopbuf[i] = 0;
         }
-        _MakeMotorData(channel, 0x600, D_80121530, &D_80121430[channel]);
-        _MakeMotorData(channel, 0x600, D_80121650, &D_80121550[channel]);
-        D_800B7A40[channel] = 1;
+        _MakeMotorData(channel, 0x600, __osMotorStartBuf, &__osMotorStartData[channel]);
+        _MakeMotorData(channel, 0x600, __osMotorStopBuf, &__osMotorStopData[channel]);
+        __osMotorinitialized[channel] = 1;
     }
     return 0;
 }

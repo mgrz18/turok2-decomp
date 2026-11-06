@@ -4,29 +4,29 @@
 
 void MenuPool_OpenMenu(char *dst, char *fmt, void *arg2, s32 arg3, s32 arg4);
 
-extern char D_0043BED0[];
-extern char D_0043BEF4[];
-extern char D_80119E2C[];
-extern s32 D_8011F148;
-extern s32 D_800C2020;
-extern s32 D_80130940;
-extern s32 D_80130990;
+extern char gSavePortalMenuDesc[];
+extern char gSavePortalMenuDescB[];
+extern char gEngineApp_m_Game_m_MenuPool[];
+extern s32 gPakCheckDone;
+extern s32 gDamagedPakContinued;
+extern s32 gCameraPoolHideViews;
+extern s32 gPakMenuAnyPak;
 
 s32 DamagedPakMenu_SelectContinue(s32 unused, Menu *event) {
     char *dst;
 
-    D_800C2020 = 1;
-    D_80130940 = 0;
-    if (D_80130990 != 0) {
-        D_8011F148 = 1;
+    gDamagedPakContinued = 1;
+    gCameraPoolHideViews = 0;
+    if (gPakMenuAnyPak != 0) {
+        gPakCheckDone = 1;
     } else {
         if (event->player != NULL) {
             dst = (char *)event->player->m_pCamera + 0x53C;
         } else {
-            dst = D_80119E2C;
+            dst = gEngineApp_m_Game_m_MenuPool;
         }
-        if (event->text == D_0043BEF4 || event->text == D_0043BED0) {
-            D_80130940 = 0;
+        if (event->text == gSavePortalMenuDescB || event->text == gSavePortalMenuDesc) {
+            gCameraPoolHideViews = 0;
         }
         MenuPool_OpenMenu(dst, event->text, event->player, event->controller, 0);
     }

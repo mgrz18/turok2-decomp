@@ -4,8 +4,8 @@
 
 /* Once every player has options byte 0x3D set to 1, turns the pending flag
  * into the done flag and returns 1. */
-s32 CPlayerPool__CheckAllReady(CPlayerList *list) {
-    GameMatch *state = &D_8011ACB0;
+s32 CPlayerPool__CheckAllReady(CPlayerPool *list) {
+    GameMatch *state = &gEngineApp_m_Settings_match;
     CPlayer *p;
     s32 n;
 
@@ -20,7 +20,7 @@ s32 CPlayerPool__CheckAllReady(CPlayerList *list) {
             }
         }
         if (n == list->m_ActiveList.m_nCount) {
-            GameMatch *s = &D_8011ACB0;
+            GameMatch *s = &gEngineApp_m_Settings_match;
 
             s->done = 1;
             s->over = 0;

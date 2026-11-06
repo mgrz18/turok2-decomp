@@ -3,9 +3,9 @@
 #include "structs/frame.h"
 
 /* One two-word display list command at the list head. */
-#define GFX_CMD(a, b) { Gfx *_g = D_800D8E24++; _g->w0 = (a); _g->w1 = (b); }
+#define GFX_CMD(a, b) { Gfx *_g = gDList++; _g->w0 = (a); _g->w1 = (b); }
 
-extern s32 D_800C2214;          /* display list capacity, in commands */
+extern s32 gDisplayListSize;          /* display list capacity, in commands */
 
 s32 Render_SetupMaterial(s32, s32);
 s32 *CISet__GetBlock(s32 *, s32);
@@ -22,7 +22,7 @@ void func_0020BBE4(s32 arg0, s32 renderMode, s32 **model, s32 matrix, s32 projec
     s32 i;
     s32 *seg;
 
-    if ((u32) (D_800C2214 - ((u32) ((u8 *) D_800D8E24 - (u8 *) D_800F7070->m_pDisplayList) >> 3)) < 3000) {
+    if ((u32) (gDisplayListSize - ((u32) ((u8 *) gDList - (u8 *) gEngineApp_m_pCurrentFrameData->m_pDisplayList) >> 3)) < 3000) {
         return;
     }
     if (Render_SetupMaterial(arg0, arg8) == 0) {

@@ -4,8 +4,8 @@
 #include "structs/cache.h"
 #include "common.h"
 
-extern s32 D_800AB0B0;
-extern u32 D_800AB0B4;
+extern s32 gHashSize;
+extern u32 gHashTableSize;
 struct EntryRecAtCV1;
 typedef struct EntryRecAtCV1 EntryRecAtCV1;
 struct EntryRecAtCV1;
@@ -15,11 +15,11 @@ struct EntryRecAtCV1 {
     s32 index;
     struct EntryRecAtCV1 *next;
 };
-extern s32 D_800D81C8;
-extern EntryRecAtCV1 *D_800D81C4;
+extern s32 gHashTableMask;
+extern EntryRecAtCV1 *gHashTable;
 extern void CHashTable__Construct(s32 capacity);
-extern s32 D_800D81C0;
-extern char D_800D1CC0;
+extern s32 gHashMask;
+extern char gHeap;
 extern EntryRecAtCV1 *CHeap__Alloc(void *, s32);
 void CHashTable__Construct(s32 capacity)
 {
@@ -39,15 +39,15 @@ void CHashTable__Construct(s32 capacity)
         top++;
     }
     half = 1 << top;
-    D_800AB0B4 = half * 2;
-    D_800AB0B0 = half;
-    D_800D81C0 = D_800AB0B4 - 2;
-    D_800D81C8 = D_800AB0B4 - 1;
-    D_800D81C4 = CHeap__Alloc(&D_800D1CC0, half << 5);
-    for (n = 0; n < D_800AB0B4; n++) {
-        D_800D81C4[n].value = 0;
-        D_800D81C4[n].key = 0;
-        D_800D81C4[n].next = 0;
-        D_800D81C4[n].index = n;
+    gHashTableSize = half * 2;
+    gHashSize = half;
+    gHashMask = gHashTableSize - 2;
+    gHashTableMask = gHashTableSize - 1;
+    gHashTable = CHeap__Alloc(&gHeap, half << 5);
+    for (n = 0; n < gHashTableSize; n++) {
+        gHashTable[n].value = 0;
+        gHashTable[n].key = 0;
+        gHashTable[n].next = 0;
+        gHashTable[n].index = n;
     }
 }

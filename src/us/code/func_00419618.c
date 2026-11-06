@@ -3,8 +3,8 @@
 s32 MenuPool_OpenMenu(s32, s32, s32, s32, s32);
 
 s32 func_00421250();                            /* extern */
-extern s32 D_0043B6F0;
-extern s32 D_80119E2C;
+extern s32 gPakLoadGameMenuDesc;
+extern s32 gEngineApp_m_Game_m_MenuPool;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x1C];
@@ -14,6 +14,6 @@ typedef struct {
 
 s32 SingleMenu_Load(s32 arg0, Unk00419618 *arg1) {
     func_00421250();
-    MenuPool_OpenMenu((s32) &D_80119E2C, (s32) &D_0043B6F0, arg1->unk1C, arg1->unk20, 0);
+    MenuPool_OpenMenu((s32) &gEngineApp_m_Game_m_MenuPool, (s32) &gPakLoadGameMenuDesc, arg1->unk1C, arg1->unk20, 0);
     return 1;
 }

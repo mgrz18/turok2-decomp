@@ -4,7 +4,7 @@
 #include "common.h"
 #include "structs/world.h"
 
-s32 CScene__FindObjectType(CWorld *lv, s32 id) {
+s32 CScene__FindObjectType(CScene *lv, s32 id) {
     s32 *t = lv->m_pObjectTypes;
     s32 n = t[1];
     u16 *p = (u16 *)(t + 2);

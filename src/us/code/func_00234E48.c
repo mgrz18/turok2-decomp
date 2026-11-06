@@ -45,8 +45,8 @@ typedef struct R8Cfg { u8 pad0[0x14]; s32 unk14; } R8Cfg;
 /* Turok 2 actor: matrices at 0x48, cfg at 0xF8 (Rage Wars 0x60 / 0x118). */
 typedef struct R8Actor { u8 pad0[0x48]; R8Mtx mtx[2]; u8 padC8[0x30]; R8Cfg *cfg; } R8Actor;
 typedef struct R8Mgr { u8 pad0[0x7520]; R8Emit *list; } R8Mgr;
-extern s32 D_800B6D1C;
-extern u8 D_801102B8[];
+extern s32 gEvenOdd;
+extern u8 gEngineApp_m_SwooshSystem[];
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
 void CMtxF__ClampEntries(void *);
@@ -73,10 +73,10 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
                     if (p->owner == (s32)who) {
                         if (who != ((void *)0)) {
                             if ((s32)who == -1) {
-                                p->mtx[D_800B6D1C] = p->mtx[D_800B6D1C ^ 1];
+                                p->mtx[gEvenOdd] = p->mtx[gEvenOdd ^ 1];
                                 p->owner = 0;
                             } else {
-                                CMtxF__FromMtxAffine(sp10, &who->mtx[D_800B6D1C]);
+                                CMtxF__FromMtxAffine(sp10, &who->mtx[gEvenOdd]);
                                 k = 0.01f;
                                 if (who->cfg->unk14 != 0) {
                                     k = 0.29257143f;
@@ -87,7 +87,7 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
                                 if (e->flags & 4) {
                                     CMtxF__GetScale(sp10, (u8 *)p + 0x1C);
                                 } else {
-                                    CMtxF__ToMtxAffine(sp10, &p->mtx[D_800B6D1C]);
+                                    CMtxF__ToMtxAffine(sp10, &p->mtx[gEvenOdd]);
                                 }
                             }
                             p->unk8 = e->info->unk8;
@@ -99,7 +99,7 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
             }
         } else if ((R8Actor *)e->owner == who) {
             if (e->flags & 2) {
-              register s32 t asm("$2") = D_800B6D1C;
+              register s32 t asm("$2") = gEvenOdd;
               register u8 *wm asm("$5") = (u8 *)((t << 6) + (s32)who);
               __asm__("" : "+r"(wm));
               if (e->unk24 > 0.0f) {
@@ -111,7 +111,7 @@ void Trail_DetachOwner(R8Mgr *mgr, R8Actor *who) {
                 }
                 CMtxF__ScaleAxes(sp10, k, k, k);
                 CMtxF__ClampEntries(sp10);
-                Swoosh_NewNode(D_801102B8, e, sp10);
+                Swoosh_NewNode(gEngineApp_m_SwooshSystem, e, sp10);
               }
             }
             if (e->owner != ((void *)0)) {

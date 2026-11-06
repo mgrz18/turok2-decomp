@@ -5,11 +5,11 @@
 
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
-extern u8 D_800F7078[];
-extern CEmitterDef *D_8010FF14;  /* emitter definitions */
-extern s32 D_8010FF18;          /* how many */
-extern f32 D_800B6D28;          /* the frame's time step */
-extern f32 D_800B6D34;
+extern u8 gScene[];
+extern CEmitterDef *gScene_m_pSections;  /* emitter definitions */
+extern s32 gScene_m_nSections;          /* how many */
+extern f32 gFrameIncrement;          /* the frame's time step */
+extern f32 gEmitterTimeScale;
 
 CRegionInfo *CScene__GetRegionInfo(void *world, s32 region);
 f32 CGameRegion__GetHeight(s32 region, f32 x, f32 z);
@@ -62,7 +62,7 @@ static __inline__ s32 UpdateEmitter(CEmitter *e, s32 mask, f32 fallback, s32 boo
 
     if (e->m_Mask & mask) {
         f32 up = e->m_Throttle;
-        up += def->m_ThrottleRate * D_800B6D28;
+        up += def->m_ThrottleRate * gFrameIncrement;
         if (1.0f < up) {
             up = 1.0f;
         }
@@ -72,12 +72,12 @@ static __inline__ s32 UpdateEmitter(CEmitter *e, s32 mask, f32 fallback, s32 boo
         if (e->m_Throttle == 0.0f) {
             return 1;
         }
-        dn = e->m_Throttle - def->m_ThrottleRate * D_800B6D28;
+        dn = e->m_Throttle - def->m_ThrottleRate * gFrameIncrement;
         dn = (dn < 0.0f) ? 0.0f : dn;
         e->m_Throttle = dn;
     }
-    e->m_Phase = e->m_Phase + D_800B6D28 * def->m_PhaseRate * e->m_PhaseScale;
-    step = D_800B6D28 * D_800B6D34 * def->m_SpinRate;
+    e->m_Phase = e->m_Phase + gFrameIncrement * def->m_PhaseRate * e->m_PhaseScale;
+    step = gFrameIncrement * gEmitterTimeScale * def->m_SpinRate;
     t = e->m_ScrollS + step * 1.536f;
     wrap = 20480.0f;
     e->m_ScrollS = t;
@@ -105,7 +105,7 @@ static __inline__ s32 UpdateEmitter(CEmitter *e, s32 mask, f32 fallback, s32 boo
 }
 
 /* Starts the emitters the camera's region asks for (one per bit of its mask,
- * from the table at D_8010FF14) and updates the running ones, giving back
+ * from the table at gScene_m_pSections) and updates the running ones, giving back
  * those that have wound down. Under a region flagged 1, the emitters get a
  * boost while the camera is below the region's height. */
 void CEmitterPool__Advance(CEmitterPool *owner, CCamera *camera) {
@@ -126,7 +126,7 @@ void CEmitterPool__Advance(CEmitterPool *owner, CCamera *camera) {
     if (region == 0) {
         return;
     }
-    info = CScene__GetRegionInfo(D_800F7078, region);
+    info = CScene__GetRegionInfo(gScene, region);
     if (info == NULL) {
         return;
     }
@@ -138,10 +138,10 @@ void CEmitterPool__Advance(CEmitterPool *owner, CCamera *camera) {
         below = CCamera__GetViewOrigin(camera).y < info->m_WaterHeight;
         boost = info->m_WaterHeight - depth;
     }
-    def = D_8010FF14;
+    def = gScene_m_pSections;
     mask = info->m_EmitterMask;
     bit = 1;
-    n = D_8010FF18;
+    n = gScene_m_nSections;
     while (--n != -1) {
         if ((mask & bit) && def->m_Texture != 0 && !(owner->m_ActiveMask & bit)) {
             e = TakeEmitter(owner);

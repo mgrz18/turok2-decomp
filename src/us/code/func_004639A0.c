@@ -23,10 +23,10 @@ struct SceneRecAt1B2B4 {
 struct SceneRecAt1B2B4;
 typedef struct SceneRecAt1B2B4 SceneRecAt1B2B4;
 extern float D_800A5EB0;
-extern u8 D_800AB0D0[];
-extern u8 D_800AB0D4[];
-extern u8 D_800AB0DC[];
-extern u8 D_800AB0E0[];
+extern u8 gSceneLights[];
+extern u8 gSceneLights_m_AmbColCopy[];
+extern u8 gSceneLights_m_ColCopy[];
+extern u8 gSceneLights_m_Dir[];
 extern f32 func_00298470(f32);
 extern void CVector3__Scale(f32 *, f32 *, f32);
 void CScene__LoadLightSettings_2(SceneRecAt1B2B4 *scene) {
@@ -37,13 +37,13 @@ void CScene__LoadLightSettings_2(SceneRecAt1B2B4 *scene) {
     u8 *light;
     for (i = 0; i < 3; i++) {
         c = scene->light->ambient[i];
-        light = D_800AB0D0;
+        light = gSceneLights;
         light[i] = c;
-        D_800AB0D4[i] = c;
+        gSceneLights_m_AmbColCopy[i] = c;
         c = scene->light->color[i];
         light[i + 8] = c;
-        D_800AB0DC[i] = c;
-        D_800AB0E0[i] = scene->light->dir[i];
+        gSceneLights_m_ColCopy[i] = c;
+        gSceneLights_m_Dir[i] = scene->light->dir[i];
     }
     v[0] = scene->light->dir[0];
     v[1] = scene->light->dir[1];

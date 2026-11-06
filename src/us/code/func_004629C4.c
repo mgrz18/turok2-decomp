@@ -4,7 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 extern s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_00429DE4(OSPfs *pfs);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
 extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
 extern s32 __osContRamWrite(void *queue, int channel, u16 address, u8 *buffer, int force);
 static __inline__ u16 sumcalc(u8 *ptr, int length) {
@@ -26,7 +26,7 @@ s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank)
     u8 *addr;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429DE4(pfs);
+        ret = __osPfsSelectBank_2(pfs);
         if (ret != 0)
             return ret;
     }

@@ -4,12 +4,12 @@
 /* One player's options, apart from structs/player.h so that structs/game.h
  * (GameSettings holds five of them) does not need the whole player. It was
  * GameSlot in structs/game.h and CPlayerOptions in structs/player.h: the same
- * 0x40 bytes (D_8011AB18 = D_8011AAD8 + 0x40). */
+ * 0x40 bytes (gEngineApp_m_Settings_defaultSlot = gEngineApp_m_Settings + 0x40). */
 
 
-/* A player's slot in the game options (GameSettings, D_8011AAD8): the
- * single player's at D_8011AB18 (+0x40, defaultSlot), the four multiplayer
- * ones from D_8011AB58 (+0x80, slots).
+/* A player's slot in the game options (GameSettings, gEngineApp_m_Settings): the
+ * single player's at gEngineApp_m_Settings_defaultSlot (+0x40, defaultSlot), the four multiplayer
+ * ones from gEngineApp_m_Settings_slots (+0x80, slots).
  * CPlayer::m_pOptions points at one. The counts are kept per opponent. */
 typedef struct CPlayerOptions {
     /* 0x00 */ u16 m_Suicides;

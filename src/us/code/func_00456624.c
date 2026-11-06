@@ -22,14 +22,14 @@ extern s32 CPlayerPool__GetIndex(void *table, void *player);
 s32 NameEntryMenu_DeleteChar_2(s32 unused, EntryRecAt1C *arg1) {
     s32 i;
     s32 count;
-    i = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, arg1->unk1C);
-    count = D_800C1FB0[i].length;
-    D_800C1FB0[i].timer = 0;
+    i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, arg1->unk1C);
+    count = gNameEntries[i].length;
+    gNameEntries[i].timer = 0;
     if (count == 0) {
         return 0;
     }
-    D_800C1FB0[i].length = count - 1;
-    D_800C1FB0[i].cursor--;
-    D_800C1FB0[i].name[D_800C1FB0[i].cursor] = 0;
+    gNameEntries[i].length = count - 1;
+    gNameEntries[i].cursor--;
+    gNameEntries[i].name[gNameEntries[i].cursor] = 0;
     return 0;
 }

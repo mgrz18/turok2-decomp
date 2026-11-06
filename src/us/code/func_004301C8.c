@@ -36,7 +36,7 @@ s32 Cont_ResetSlot(ControllerProfile *c, s32 port) {
         c->buttonHistory[i].repeat = 0x30;
         c->buttonHistory[i].held = 0;
     }
-    c->connected = ((D_800F6778[port].errno >> 3) ^ 1) & 1;
+    c->connected = ((gContStatus[port].errno >> 3) ^ 1) & 1;
     c->rumbleLevel = 0;
     c->rumbleTimer = 0;
     RumblePool_Init(c->rumblePool, c->rumbleNodes, 3);

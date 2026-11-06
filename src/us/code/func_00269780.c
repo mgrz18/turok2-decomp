@@ -6,7 +6,7 @@ typedef struct CollisionInfo {
     /* 0x00 */ s32 flags;
 } CollisionInfo;
 
-extern CollisionInfo D_800F1AE0;
+extern CollisionInfo gCollisionInfoSight;
 
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *actor);    /* height */
 s32 Collision_MoveInstance(CGameObjectInstance *actor, CVector3 pos, CollisionInfo *info);
@@ -21,7 +21,7 @@ s32 GameObject_CanSee(CGameObjectInstance *actor, CGameObjectInstance *target) {
     actor->header.m_vPos.y += GameObject_GetCollisionHeight(actor) * 0.8f;
     to = target->header.m_vPos;
     to.y += GameObject_GetCollisionHeight(target) * 0.8f;
-    hit = Collision_MoveInstance(actor, to, &D_800F1AE0);
+    hit = Collision_MoveInstance(actor, to, &gCollisionInfoSight);
     *(CObjectHead *) actor = saved;
     return hit == 0;
 }

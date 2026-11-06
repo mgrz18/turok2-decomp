@@ -11,29 +11,29 @@ void Controller_ReadAll(void);
 s32 RumblePool_Init(void *dst, void *src, s32 n);
 u32 osMotorStop(void *pfs);
 
-extern u8 D_800B6CF0;  /* controllers initialised */
-extern s8 D_800F6750;  /* pak queue state */
-extern u8 D_800F6758;  /* pak OSMesgQueue */
-extern u8 D_800F6798;  /* SI OSMesgQueue */
+extern u8 gControllersInitialised;  /* controllers initialised */
+extern s8 gPakQueueState;  /* pak queue state */
+extern u8 gPakAccessQueue;  /* pak OSMesgQueue */
+extern u8 gSiMessageQueue;  /* SI OSMesgQueue */
 
 /* Controller_ResetRumble, inlined here. */
 static __inline__ void rumbleReset(ControllerProfile *ctrl) {
-    if (D_800B6CF0 != 0 && ctrl->connected != 0) {
-        osRecvMesg(&D_800F6758, 0, 1);
+    if (gControllersInitialised != 0 && ctrl->connected != 0) {
+        osRecvMesg(&gPakAccessQueue, 0, 1);
         Controller_ReadAll();
-        D_800F6750 = 2;
+        gPakQueueState = 2;
         ctrl->rumbleOn = 0;
         ctrl->rumbleLevel = 0;
         ctrl->rumbleTimer = 0;
         RumblePool_Init(ctrl->rumblePool, ctrl->rumbleNodes, 3);
-        osMotorInit(&D_800F6798, ctrl->rumblePfs, ctrl->port);
+        osMotorInit(&gSiMessageQueue, ctrl->rumblePfs, ctrl->port);
         osMotorStop(ctrl->rumblePfs);
         osMotorStop(ctrl->rumblePfs);
-        if (osMotorInit(&D_800F6798, ctrl->rumblePfs, ctrl->port) == 0) {
+        if (osMotorInit(&gSiMessageQueue, ctrl->rumblePfs, ctrl->port) == 0) {
             ctrl->rumblePak = 1;
         }
-        D_800F6750 = 2;
-        osSendMesg((u8 *) &D_800F6750 + 8, 0, 0); /* same queue, addressed from the state byte */
+        gPakQueueState = 2;
+        osSendMesg((u8 *) &gPakQueueState + 8, 0, 0); /* same queue, addressed from the state byte */
     }
 }
 

@@ -17,7 +17,7 @@ extern void CCache__Unlock(s32 arg0, void **res);
 /* Reload the animation object info of every player's actor that has one. For
  * the player viewing through cam (while cam's word 0x24 is clear) it is the
  * weapon model instead, turned toward its owner's camera. */
-void CPlayerPool__ReloadAnimInfo(CPlayerList *list, CCamera *cam) {
+void CPlayerPool__ReloadAnimInfo(CPlayerPool *list, CCamera *cam) {
     CPlayer *p;
     CGameObjectInstance *obj;
     void **res;

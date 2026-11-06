@@ -10,8 +10,8 @@ typedef struct {
 } ActorPlacement;
 
 s32 CScene__SetInstanceSavedBitInLevel(s32 *, u16, u16, s32); /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void Action_EventGoRemote(ActorPlacement *arg0) {
-    CScene__SetInstanceSavedBitInLevel(&D_800F7078, arg0->level, arg0->actorIndex, 1);
+    CScene__SetInstanceSavedBitInLevel(&gScene, arg0->level, arg0->actorIndex, 1);
 }

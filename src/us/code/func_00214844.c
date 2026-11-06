@@ -37,13 +37,13 @@ typedef struct {
     /* 0x8 */ ColVtx v[1];
 } VtxChunk;
 
-/* What this reads around D_8011ACB0. */
+/* What this reads around gEngineApp_m_Settings_match. */
 
-extern u8 D_8011AAF1;           /* multiplayer */
-extern s32 D_800ACAD8;
+extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
+extern s32 gLitVerticesKey;
 extern char D_800A57F8[];
-extern s8 D_800ACAF4[];         /* the colour pulse, 64 steps */
-extern s32 D_800B6D18;          /* frame count */
+extern s8 gColorPulseTable[];         /* the colour pulse, 64 steps */
+extern s32 gFrameCount;          /* frame count */
 extern u8 D_800B6D1B;           /* its low byte */
 
 s32 Actor_GetTypeClass(void);
@@ -66,7 +66,7 @@ static __inline__ void pulseColors(s32 *object, u8 *colors) {
     ColVtx *record;
     ColVtx *end;
 
-    state = D_800B6D18;
+    state = gFrameCount;
     i = 0;
     if (!(state & 1)) {
         count = *object;
@@ -82,7 +82,7 @@ static __inline__ void pulseColors(s32 *object, u8 *colors) {
                     u8 *color;
 
                     if (flags & 0x70) {
-                        amount = D_800ACAF4[(state + ((flags & 0x70) >> 2)) & 0x3F];
+                        amount = gColorPulseTable[(state + ((flags & 0x70) >> 2)) & 0x3F];
                         amount >>= (flags & 0xC) >> 2;
                         color = colors + i * 4;
 
@@ -129,7 +129,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
         }
     } while (0);
     argument = prop->descriptor->argument;
-    if (D_8011AAF1) {
+    if (gEngineApp_m_Settings_multiplayer) {
         mode = Actor_GetTypeClass();
         switch (mode) {
             case 1:
@@ -142,7 +142,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
                 lod = prop->descriptor->lod;
                 break;
             default: {
-                GameMatch *game = &D_8011ACB0;
+                GameMatch *game = &gEngineApp_m_Settings_match;
                 if (game->tag) {
                     lod = ((s8 *) game)[-0x1B0];
                 } else {
@@ -158,7 +158,7 @@ void CStaticObject__Draw(PlacedProp *prop) {
     if (instance == NULL) {
         return;
     }
-    resource = CCache__RequestDecompression(0, prop->colorKey | D_800ACAD8, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
+    resource = CCache__RequestDecompression(0, prop->colorKey | gLitVerticesKey, instance, prop->cache, 8, prop, CStaticObject__BuildLitVerticesCallback, D_800A57F8, 0);
     if (resource != NULL) {
         CCache__LockForDisplayList(0, resource);
         header = *resource;

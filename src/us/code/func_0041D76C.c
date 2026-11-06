@@ -14,9 +14,9 @@ extern void MenuItem_SelectSubmenu(s32 menu, Menu *c, s32 pool);
  * an empty name resets the player's options. */
 s32 NameEntryMenu_Confirm(s32 menu, Menu *c, s32 pool) {
     CPlayer *player = c->player;
-    s32 i = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, player);
-    u8 *src = D_800C1FB0[i].name;
-    u8 *dst = D_80119870.m_Settings.slots[0].m_Name + (i << 6);
+    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, player);
+    u8 *src = gNameEntries[i].name;
+    u8 *dst = gEngineApp_m_Game.m_Settings.slots[0].m_Name + (i << 6);
     s32 n = 0;
     s32 j;
     u8 ch;

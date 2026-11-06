@@ -24,10 +24,10 @@ typedef struct {
     u16 ids[1];             /* 0x08 */
 } IdTable;
 
-extern u8 D_8011AAF1;       /* D_8011AAD8.multiplayer */
-extern s32 D_800B6D20;
+extern u8 gEngineApp_m_Settings_multiplayer;       /* gEngineApp_m_Settings.multiplayer */
+extern s32 gFrameCountGameplay;
 
-void CScene__BuildGeometryDisplayList(CWorld *);
+void CScene__BuildGeometryDisplayList(CScene *);
 CPlayer *CCamera__GetPlayer(CCamera *);
 s32 CPlayer__GetPickupCountLow(CPlayer *, s32);
 void Render_ResetBatches(void);
@@ -39,7 +39,7 @@ void CStaticObject__RequestLitVertices(CStaticObject *, CCamera *);
 void CStaticObject__Draw(CStaticObject *, CCamera *);
 void CLevelActor__Draw(CLevelActor *);
 
-void CScene__DrawGeometry(CWorld *w, CCamera *v_) {
+void CScene__DrawGeometry(CScene *w, CCamera *v_) {
     register CCamera *v asm("$18") = v_;
     u8 *base;
     void *grp;
@@ -55,8 +55,8 @@ void CScene__DrawGeometry(CWorld *w, CCamera *v_) {
     s32 si;
     u16 *ip;
     StrideTable *t;
-    CWorldSector *regions;
-    CWorldSector *region;
+    CSceneSector *regions;
+    CSceneSector *region;
     CRect *cell;
     CStaticObject *a;
     CLevelActor *p;
@@ -67,9 +67,9 @@ void CScene__DrawGeometry(CWorld *w, CCamera *v_) {
     s32 off;
     s32 c;
 
-    mask = D_8011AAD8.difficulty;
+    mask = gEngineApp_m_Settings.difficulty;
     vmask = v->m_ViewParams.m_VisBits;
-    if (D_8011AAD8.multiplayer != 0) {
+    if (gEngineApp_m_Settings.multiplayer != 0) {
         CScene__BuildGeometryDisplayList(w);
         return;
     }
@@ -89,18 +89,18 @@ void CScene__DrawGeometry(CWorld *w, CCamera *v_) {
     }
     idx = -1;
 found:
-    if (player != NULL && idx != -1 && CPlayer__GetPickupCountLow(player, 0x111F) != 0 && D_8011AAF1 == 0) {
+    if (player != NULL && idx != -1 && CPlayer__GetPickupCountLow(player, 0x111F) != 0 && gEngineApp_m_Settings_multiplayer == 0) {
         flag = 1;
     } else {
         flag = 0;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE7000000;
         g->w1 = 0;
     }
     {
-        Gfx *g = D_800D8E24++;
+        Gfx *g = gDList++;
         g->w0 = 0xE3000A01;
         g->w1 = 0x100000;
     }
@@ -108,43 +108,43 @@ found:
     w->m_nDeferred = 0;
     if (player != NULL && (player->m_ModeFlags & 0x100)) {
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB040004;
             g->w1 = 1;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB04000C;
             g->w1 = 1;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB040014;
             g->w1 = 0xFFFF;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB04001C;
             g->w1 = 0xFFFF;
         }
     } else {
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB040004;
             g->w1 = 2;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB04000C;
             g->w1 = 2;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB040014;
             g->w1 = 0xFFFE;
         }
         {
-            Gfx *g = D_800D8E24++;
+            Gfx *g = gDList++;
             g->w0 = 0xDB04001C;
             g->w1 = 0xFFFE;
         }
@@ -172,7 +172,7 @@ found:
                         a = (CStaticObject *)(base + off);
                         if (a->header.m_pIntelligence->m_dwFlags & mask) {
                             a->m_pOwner = region->m_hData;
-                            if (D_800B6D20 == 0) {
+                            if (gFrameCountGameplay == 0) {
                                 CStaticObject__RequestLitVertices(a, v);
                             }
                             if ((vmask & a->m_ViewMask)

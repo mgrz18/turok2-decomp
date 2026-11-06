@@ -4,7 +4,7 @@
 #include "structs/sound.h"
 #include "structs/camera.h"
 
-extern f32 D_800B2A30; /* hearing range squared */
+extern f32 sSoundHearingRangeSq; /* hearing range squared */
 
 f32 HalfToFloat(s32 x);
 s32 Cinema_IsActive(void);
@@ -19,8 +19,8 @@ void alSndpStop(void *sndp);
 void SndVoice_UpdateVolume(SndVoice *o) {
     SndVoiceParams *vp;
     SndEnv *env;
-    SndMgr *settings;
-    SndMgr *ctx;
+    CAudioWorld *settings;
+    CAudioWorld *ctx;
     f32 hear;
     f32 range;
     f32 rangeSq;
@@ -39,13 +39,13 @@ void SndVoice_UpdateVolume(SndVoice *o) {
     hear = o->mgr->listener->m_FarClip;
     range = MAX(hear, 3072.0f);
     rangeSq = range * MAX(hear, 3072.0f);
-    D_800B2A30 = rangeSq;
+    sSoundHearingRangeSq = rangeSq;
     switch (o->vp.distanceMode) {
         case 2:
-            D_800B2A30 = rangeSq + rangeSq * 0.5f;
+            sSoundHearingRangeSq = rangeSq + rangeSq * 0.5f;
             break;
         case 1:
-            D_800B2A30 = rangeSq + rangeSq * 0.25f;
+            sSoundHearingRangeSq = rangeSq + rangeSq * 0.25f;
             break;
         case 0:
             break;
@@ -69,10 +69,10 @@ void SndVoice_UpdateVolume(SndVoice *o) {
             CVector3 *q = &o->mgr->listener->m_vPos;
             d2 = (p->x - q->x) * (p->x - q->x) + (p->y - q->y) * (p->y - q->y) + (p->z - q->z) * (p->z - q->z);
         }
-        if (D_800B2A30 <= d2) {
+        if (sSoundHearingRangeSq <= d2) {
             f = 0.0f;
         } else {
-            f = 1.0f - d2 / D_800B2A30;
+            f = 1.0f - d2 / sSoundHearingRangeSq;
         }
         switch (vp->distanceMode) {
             case 2:

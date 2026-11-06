@@ -21,13 +21,13 @@ ModelRecord *CScene__GetRegionInfo(s32, s32);
 Found0xC45 *CScene__FindIntelligence(s32, s32, s32);
 
 s32 Cinema_SetNextCallbacks(s32, s32, s32 *);     /* extern */
-extern s32 D_800ACDE4;
-extern s32 D_800AE340;
-extern void *D_800F1FD0;
-extern u8 D_800F1FE4[];
-extern s32 D_800F7078;
-extern s32 D_8011001C;
-extern s32 D_80119878;
+extern s32 gCinemaHidesActors;
+extern s32 gDeathTint;
+extern void *sDeathCinemaPlayer;
+extern u8 gDeathTintColor[];
+extern s32 gScene;
+extern s32 gScene_m_bStreamAll;
+extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;
 extern s32 PlayerDeath_CinemaDone;
 
 void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
@@ -43,22 +43,22 @@ void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
     temp_a1 = arg0->m_CharacterActor.header.m_pCurrentRegion;
     var_s1 = 0;
     if (temp_a1 != 0) {
-        temp_v0 = CScene__GetRegionInfo((s32) &D_800F7078, temp_a1);
+        temp_v0 = CScene__GetRegionInfo((s32) &gScene, temp_a1);
         if (temp_v0 != 0) {
             var_s1 = temp_v0->flags;
         }
     }
-    if (D_8011001C != 0) {
+    if (gScene_m_bStreamAll != 0) {
         var_s0 = 0;
     }
     temp_a0 = arg0->m_ModeFlags & 0x8000;
     if (temp_a0 != 0) {
         var_s0 = 0;
     }
-    if (D_8011001C != 0) {
+    if (gScene_m_bStreamAll != 0) {
         var_s0 = 0;
     }
-    if (D_80119878 >= 2) {
+    if (gEngineApp_m_Game_m_PlayerList_m_nPlayers >= 2) {
         var_s0 = 0;
     }
     if (arg2 == 0xC) {
@@ -76,18 +76,18 @@ void CPlayer__StartDeathCinema(CPlayer *arg0, s32 arg1, s32 arg2) {
     arg0->m_DoDeathCin = var_s0;
     if (var_s0 != 0) {
         if (arg2 == 0x32) {
-            D_800AE340 = 1;
+            gDeathTint = 1;
             var_v1 = 0;
             do {
-                D_800F1FE4[var_v1] = arg0->m_pCamera->m_FogColor[var_v1];
+                gDeathTintColor[var_v1] = arg0->m_pCamera->m_FogColor[var_v1];
                 var_v1 += 1;
             } while (var_v1 < 4);
         }
-        D_800ACDE4 = 0;
-        D_800F1FD0 = arg0;
+        gCinemaHidesActors = 0;
+        sDeathCinemaPlayer = arg0;
         Cinema_SetNextCallbacks(arg2, 0, &PlayerDeath_CinemaDone);
     }
-    temp_v0_2 = CScene__FindIntelligence((s32) &D_800F7078, -1, 0xC45);
+    temp_v0_2 = CScene__FindIntelligence((s32) &gScene, -1, 0xC45);
     if (temp_v0_2 != 0) {
         arg0->m_CharacterActor.m_vScale.x = temp_v0_2->unk38;
         arg0->m_CharacterActor.m_vScale.y = temp_v0_2->unk3C;

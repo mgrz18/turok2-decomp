@@ -5,7 +5,7 @@
 
 extern s32 Menu_StepValue(void *, s32, s32, s32, s32, s32);
 s32 TeamBloodMenu_StepTimeLimit(void *first, void *second) {
-    GameSettings *opts = &D_8011AAD8;
+    GameSettings *opts = &gEngineApp_m_Settings;
     opts->teamTimeLimit = Menu_StepValue(second, opts->teamTimeLimit, 5, 0, 30, 1);
     return 0;
 }

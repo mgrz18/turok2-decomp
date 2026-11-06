@@ -3,7 +3,7 @@
 
 #include "rw/abu_types.h"
 
-extern struct IntPair D_801229A0[];
+extern struct IntPair __osEventStateTab[];
 void osSetEventMesg(s32 arg0, s32 arg1, s32 arg2) {
     extern void __osRestoreInt(u32);
     extern u32 __osDisableInt(void);
@@ -11,7 +11,7 @@ void osSetEventMesg(s32 arg0, s32 arg1, s32 arg2) {
     struct IntPair *e;
     temp_v0 = __osDisableInt();
     ;
-    (&D_801229A0[arg0])->field_0 = arg1;
-    (*(&D_801229A0[arg0])).field_4 = arg2;
+    (&__osEventStateTab[arg0])->field_0 = arg1;
+    (*(&__osEventStateTab[arg0])).field_4 = arg2;
     __osRestoreInt(temp_v0);
 }

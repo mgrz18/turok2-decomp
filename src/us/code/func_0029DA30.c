@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s32 osEPiRawReadIo(struct OSPiHandle_s *handle, u32 address, u32 *value);
-extern OSPiHandle_s *D_800B8980[];
+extern OSPiHandle_s *__osCurrentHandle[];
 extern s32 D_800AA9B0;
 extern s32 D_800AA9B4;
 extern void __assert(void *arg0, void *arg1, s32 arg2);
@@ -17,7 +17,7 @@ s32 osEPiRawReadIo(OSPiHandle_s *arg0, u32 arg1, u32 *arg2) {
     while ((*(volatile u32 *)(0xA4600010U)) & 3) {
     }
     index = arg0->domain;
-    previous = D_800B8980[index];
+    previous = __osCurrentHandle[index];
     if (previous != arg0) {
         if (index == 0) {
             if (previous->latency != arg0->latency) {
@@ -46,7 +46,7 @@ s32 osEPiRawReadIo(OSPiHandle_s *arg0, u32 arg1, u32 *arg2) {
                 (*(volatile u32 *)(0xA4600028U) = (arg0->pulse));
             }
         }
-        D_800B8980[index] = arg0;
+        __osCurrentHandle[index] = arg0;
     }
     *arg2 = (*(volatile u32 *)(arg0->baseAddress | arg1 | 0xA0000000U));
     return 0;

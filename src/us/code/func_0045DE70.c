@@ -3,11 +3,11 @@
 
 s32 Level_GetHub(s32);
 
-extern s32 D_80110048;
-extern s32 D_80130A30;
-extern s32 D_80130A34;
+extern s32 gScene_m_LevelID;
+extern s32 sMissionHub;
+extern s32 sMissionFailed;
 
 void MissionMenu_InitFailed_2(void) {
-    D_80130A30 = Level_GetHub(D_80110048);
-    D_80130A34 = 1;
+    sMissionHub = Level_GetHub(gScene_m_LevelID);
+    sMissionFailed = 1;
 }

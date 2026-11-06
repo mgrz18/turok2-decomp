@@ -28,7 +28,7 @@ typedef struct {
     /* 0x52 */ u16 flags2;
 } TargetInfo;
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 TargetInfo *CScene__GetRegionInfo(void *, s32);
 s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
 s32 EnemyAnim_NormalDeath_B0120(void *, void *);
@@ -60,7 +60,7 @@ s32 EnemyAnim_PickDeath(AttackActor *actor, AttackState *state) {
         return 0;
     }
     if (target != 0) {
-        t = CScene__GetRegionInfo(D_800F7078, target);
+        t = CScene__GetRegionInfo(gScene, target);
         if (t != NULL && ((t->flags & 0x400000) || (t->flags2 & 0xC0))) {
             result = EnemyAnim_NormalDeath_B0360(actor, state);
             if (result != -1) {

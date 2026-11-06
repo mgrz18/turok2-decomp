@@ -8,8 +8,8 @@ typedef struct {
 } TriggerData;
 
 s32 CScene__SetInstanceSavedBitInLevel(s32 *, u16, u16, s32); /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void InteractiveAnim_EventShowRemote(TriggerData *arg0) {
-    CScene__SetInstanceSavedBitInLevel(&D_800F7078, arg0->unkA, arg0->unk4, 0);
+    CScene__SetInstanceSavedBitInLevel(&gScene, arg0->unkA, arg0->unk4, 0);
 }

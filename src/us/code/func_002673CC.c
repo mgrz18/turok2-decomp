@@ -139,7 +139,7 @@ struct LevelActor;
 struct LevelActor;
 extern void CVector3__Normalize(f32 *arg0);
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 extern CQuatern CGameObjectInstance__GetRotation(char *);
 extern void CQuaternion__ToMatrix(CQuatern *, f32 *);
 extern char *CPlayerPool__FindNearest(void *, CVector3);
@@ -177,7 +177,7 @@ CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
         forward.z = 1.0f;
     }
     if (target == 0) {
-        found = CPlayerPool__FindNearest(&D_80119870.m_PlayerList, point);
+        found = CPlayerPool__FindNearest(&gEngineApp_m_Game.m_PlayerList, point);
         if (found != 0) {
             target = found;
         }
@@ -199,7 +199,7 @@ CQuatern GameObject_GetAimRotation(char *actor, CVector3 point) {
     turn.x = axis.x * scale;
     turn.y = axis.y * scale;
     turn.z = axis.z * scale;
-    D_800DD78C = scale;
+    gQuaternionSin = scale;
     turn.w = func_002974C0(angle);
     if (actor != 0 && *(u8 *)actor == 1) {
         CQuaternion__Multiply(&result, &aim, &turn);

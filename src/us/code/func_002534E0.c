@@ -30,14 +30,14 @@ void CPlayerPool__EndMatch(List002534E0 *arg0) {
     Node002534E0 *var_s0;
     List002534E0 *var_s1;
 
-    var_s0 = (Node002534E0 *) &D_8011ACB0;
-    var_s0 = (Node002534E0 *) &D_8011ACB0;
+    var_s0 = (Node002534E0 *) &gEngineApp_m_Settings_match;
+    var_s0 = (Node002534E0 *) &gEngineApp_m_Settings_match;
     var_s1 = arg0;
-    if ((D_8011ACB0.over == 0) && (D_8011ACB0.done == 0)) {
+    if ((gEngineApp_m_Settings_match.over == 0) && (gEngineApp_m_Settings_match.done == 0)) {
         Controller_SetRumbleOptionAll(0);
-        if (D_8011ACB0.teams != 0) {
-            if (D_8011ACB0.teamOver == 0) {
-                D_8011ACB0.teamOver = 1;
+        if (gEngineApp_m_Settings_match.teams != 0) {
+            if (gEngineApp_m_Settings_match.teamOver == 0) {
+                gEngineApp_m_Settings_match.teamOver = 1;
                 var_s0 = var_s1->head;
                 var_a0 = var_s0;
                 if (var_s0 != NULL) {
@@ -49,7 +49,7 @@ void CPlayerPool__EndMatch(List002534E0 *arg0) {
                 }
             }
         } else {
-            D_8011ACB0.over = 1;
+            gEngineApp_m_Settings_match.over = 1;
             var_s0 = var_s1->head;
             var_a0_2 = var_s0;
             if (var_s0 != NULL) {

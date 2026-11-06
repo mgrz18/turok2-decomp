@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 #include "structs/world.h"
 
-extern CWorld D_800F7078;
-extern s32 D_80110054;
-extern void func_0042C620(void *, int, int);
+extern CScene gScene;
+extern s32 gScene_m_PendingWarpID;
+extern void CScene__RequestWarp_2(void *, int, int);
 extern void Controller_UnwatchPak(void *);
 void func_0045A940(void *unused, void *object) {
     Controller_UnwatchPak(object);
-    func_0042C620(&D_800F7078, D_80110054, 2);
+    CScene__RequestWarp_2(&gScene, gScene_m_PendingWarpID, 2);
 }

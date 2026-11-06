@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s8 D_8011AAFF; /* D_8011AAD8 + 0x27: level */
+extern s8 gEngineApp_m_Settings_tagArena; /* gEngineApp_m_Settings + 0x27: level */
 extern char D_800B5F3C[];
 extern char D_800B61D8[];
 extern char D_800B61F0[];
@@ -12,7 +12,7 @@ extern char D_800B6250[];
 
 /* Label of the level item. */
 s32 FragTagMenu_LevelLabel(MenuItem *a) {
-    switch (D_8011AAFF) {
+    switch (gEngineApp_m_Settings_tagArena) {
     case 0:
         a->text = D_800B5F3C;
         break;

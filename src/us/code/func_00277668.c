@@ -5,19 +5,19 @@
 #include "gfx.h"
 
 
-extern Gfx *D_800D8E24;
+extern Gfx *gDList;
 
 #define _SHIFTL(v, s, w) (((u32) (v) & ((1U << (w)) - 1)) << (s))
 #define CLAMP0(v) ((v) > 0 ? (v) : 0)
 
 #define gDPPipeSync()                                                                      \
-    { Gfx *_g = (Gfx *) (D_800D8E24++); _g->w0 = _SHIFTL(0xE7, 24, 8); _g->w1 = 0; }
+    { Gfx *_g = (Gfx *) (gDList++); _g->w0 = _SHIFTL(0xE7, 24, 8); _g->w1 = 0; }
 #define gDPSetPrimColor(m, l, r, g, b, a)                                                  \
-    { Gfx *_g = (Gfx *) (D_800D8E24++);                                                    \
+    { Gfx *_g = (Gfx *) (gDList++);                                                    \
       _g->w0 = _SHIFTL(0xFA, 24, 8) | _SHIFTL(m, 8, 8) | _SHIFTL(l, 0, 8);           \
       _g->w1 = _SHIFTL(r, 24, 8) | _SHIFTL(g, 16, 8) | _SHIFTL(b, 8, 8) | _SHIFTL(a, 0, 8); }
 #define gDPFillRectangle(ulx, uly, lrx, lry)                                               \
-    { Gfx *_g = (Gfx *) (D_800D8E24++);                                                    \
+    { Gfx *_g = (Gfx *) (gDList++);                                                    \
       _g->w0 = _SHIFTL(0xF6, 24, 8) | _SHIFTL(lrx, 14, 10) | _SHIFTL(lry, 2, 10);    \
       _g->w1 = _SHIFTL(ulx, 14, 10) | _SHIFTL(uly, 2, 10); }
 

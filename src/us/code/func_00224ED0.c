@@ -7,7 +7,7 @@
 #include "structs/intelligence.h"
 #include "structs/world.h"
 void CLevelActorPool__Spawn(u8 *base, s32 zero, s32 a, CVector3 z, CVector3 v, s32 b, f32 f);
-void CScene__SpawnPoolActor(CWorld *lv, s32 a1, CVector3 v, s32 x, f32 f) {
+void CScene__SpawnPoolActor(CScene *lv, s32 a1, CVector3 v, s32 x, f32 f) {
     CVector3 z;
     z.x = 0;
     z.y = 0;

@@ -2,14 +2,14 @@
 #include "gfx.h"
 
 
-extern Gfx *D_800D8E24;         /* display list head */
-extern s32 D_800F56A8;
+extern Gfx *gDList;         /* display list head */
+extern s32 gLoadedFont;
 
 void *COnScreen__GetFontTexture(void);
 
 #define GFX(a, b)                   \
     {                               \
-        Gfx *_g = D_800D8E24++;     \
+        Gfx *_g = gDList++;     \
         _g->w0 = (a);               \
         _g->w1 = (b);               \
     }
@@ -20,7 +20,7 @@ void COnScreen__SelectFont3(void) {
     void *image = COnScreen__GetFontTexture();
 
     if (image != NULL) {
-        D_800F56A8 = 3;
+        gLoadedFont = 3;
         GFX(0xFD900000, (u32)image);            /* gDPSetTextureImage */
         GFX(0xF5900100, 0x07010040);            /* gDPSetTile */
         GFX(0xE6000000, 0);                     /* gDPLoadSync */

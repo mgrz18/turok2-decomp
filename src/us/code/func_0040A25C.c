@@ -17,9 +17,9 @@ typedef struct {
     /* 0x90 */ u32 part;
 } PartInfo;
 
-extern f32 D_800B6D28; /* frame time */
-extern f32 D_800C1900; /* fade timer */
-extern s32 D_800C1904; /* second value reached its peak */
+extern f32 gFrameIncrement; /* frame time */
+extern f32 sMotherBossFadeTimer; /* fade timer */
+extern s32 sMotherBossCinemaStarted; /* second value reached its peak */
 extern void CMtxF__ScaleAxes(void *arg0, f32 r, f32 g, f32 b);
 
 void MotherBoss_PartEffects(void *arg0, PartInfo *info) {
@@ -31,27 +31,27 @@ void MotherBoss_PartEffects(void *arg0, PartInfo *info) {
 
     switch (info->part) {
         case 0:
-            obj = D_8012FB70.obj;
+            obj = gMotherBoss.obj;
             if (obj->animState == 9) {
-                v = actor->m_AI.m_Mother.m_GrowScale + D_800B6D28 * 0.01f;
+                v = actor->m_AI.m_Mother.m_GrowScale + gFrameIncrement * 0.01f;
                 if (v > 1.0f) {
                     v = 1.0f;
                 }
                 actor->m_AI.m_Mother.m_GrowScale = v;
             }
             if (obj->animState == 0x13) {
-                t = D_800C1900;
+                t = sMotherBossFadeTimer;
                 if (t < 8.8f) {
-                    D_800C1900 = t + D_800B6D28 * (1.0f / 15);
-                } else if (D_800C1904 == 0) {
-                    dt = D_800B6D28;
+                    sMotherBossFadeTimer = t + gFrameIncrement * (1.0f / 15);
+                } else if (sMotherBossCinemaStarted == 0) {
+                    dt = gFrameIncrement;
                     actor->m_AI.m_Mother.m_PulseScale += dt * 0.4f;
                     if (actor->m_AI.m_Mother.m_PulseScale > 3.0f) {
-                        D_800C1904 = 1;
+                        sMotherBossCinemaStarted = 1;
                     }
-                    D_800C1900 = t + dt * (1.0f / 15);
+                    sMotherBossFadeTimer = t + dt * (1.0f / 15);
                 } else {
-                    v = actor->m_AI.m_Mother.m_PulseScale - D_800B6D28 * 0.12f;
+                    v = actor->m_AI.m_Mother.m_PulseScale - gFrameIncrement * 0.12f;
                     if (v < 1.0f) {
                         v = 1.0f;
                     }

@@ -173,7 +173,7 @@
   "0027AD00": "Starts a script on a HUD element: m_pScript = script, m_Mode = 2 (run), then runs the interpreter (func_00277328).",
   "00277CF0": "Draws a number digit by digit (thousands, hundreds, tens, units) through func_0027A7A0: the HUD counters (ammo, health, lives). Real name unknown.",
   "0024C648": "Draws the player HUD every frame: steps every overlay script, restarts ammo/lives/tokens/kill counters when their value changes (scripts in docs/HUD.md), draws icons (func_0027B320) and numbers (func_00277CF0). Health has no script: always drawn at its position, value (m_Health+0xFF)>>8.",
-  "0027C1E8": "Finds the player whose m_pCamera is this camera (player list from D_80119890 by m_pNext), then fills the viewport with the fog colour and the screen flash.",
+  "0027C1E8": "Finds the player whose m_pCamera is this camera (player list from gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead by m_pNext), then fills the viewport with the fog colour and the screen flash.",
   "0027B320": "Draws a HUD sprite: (id, frame, x, y, scaleX, scaleY, ?). 300 = box behind ammo/health, 0x1F7 = health icon."
  }
 }

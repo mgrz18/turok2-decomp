@@ -11,7 +11,7 @@ typedef struct {
     /* 0x1448 */ s32 lastDecompression;
 } CDecompressor;
 
-extern s32 D_800B6D18;                          /* gFrameCount */
+extern s32 gFrameCount;                          /* gFrameCount */
 s32 osRecvMesg(void *queue, void *msg, s32 flags);
 s32 osSendMesg(void *queue, void *msg, s32 flags);
 
@@ -22,7 +22,7 @@ void CDecompressor__Main(CDecompressor *thisx) {
 
     while (1) {
         osRecvMesg(&thisx->queue, &entry, 1);
-        thisx->lastDecompression = D_800B6D18;
+        thisx->lastDecompression = gFrameCount;
         entry->decompressCallback(entry->notifyId, entry);
         osSendMesg(entry->decompressReplyQueue, entry, 1);
     }

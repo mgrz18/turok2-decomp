@@ -8,7 +8,7 @@
 
 #include "rw/abu_protos.h"
 
-extern s32 D_8011ACE4;
+extern s32 gEngineApp_m_Settings_match_tag;
 
 void StatsMenu_InitContinue_2(Menu *arg0) {
     void *temp_a0;
@@ -34,7 +34,7 @@ void StatsMenu_InitContinue_2(Menu *arg0) {
     *(s32 *) ((s8 *) temp_v1_5 + ITEM_FLAGS(7)) = (s32) (*(s32 *) ((s8 *) temp_v1_5 + ITEM_FLAGS(7)) & 0xFE7FFFFF);
     temp_v1_6 = arg0->items;
     *(s32 *) ((s8 *) temp_v1_6 + ITEM_FLAGS(8)) = (s32) (*(s32 *) ((s8 *) temp_v1_6 + ITEM_FLAGS(8)) & 0xFE7FFFFF);
-    if (D_8011ACE4 != 0) {
+    if (gEngineApp_m_Settings_match_tag != 0) {
         temp_v0 = arg0->items;
         *(s32 *) ((s8 *) temp_v0 + ITEM_FLAGS(0)) = (s32) (*(s32 *) ((s8 *) temp_v0 + ITEM_FLAGS(0)) | 0x01000000);
         return;

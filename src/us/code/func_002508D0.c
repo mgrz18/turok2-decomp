@@ -9,9 +9,9 @@ typedef struct {
     /* 0x22 */ s16 strokeSound;
 } Tuning;
 
-extern f32 D_800B6D28;      /* frame time */
-extern char D_800ADE70;     /* standing look tuning */
-extern Tuning D_800ADEB8;   /* wading move tuning */
+extern f32 gFrameIncrement;      /* frame time */
+extern char gStandLookTuning;     /* standing look tuning */
+extern Tuning gWadeMoveTuning;   /* wading move tuning */
 
 void Math_EaseToward(f32 *value, f32 target, f32 rate);
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
@@ -49,8 +49,8 @@ void PlayerWade_Update(CPlayer *player, CGameObjectInstance *body) {
         player->m_Mode = 9;
     }
     Math_EaseToward(&player->m_vHeadRotOffset.z, 0.0f, 0.25f);
-    CPlayer__TurnAndLook(player, body, &D_800ADE70);
-    CPlayer__MoveOnFoot(player, body, &D_800ADEB8);
+    CPlayer__TurnAndLook(player, body, &gStandLookTuning);
+    CPlayer__MoveOnFoot(player, body, &gWadeMoveTuning);
     if (!(body->m_AI.m_dwFlags & 0x200)) {
         reset_strokes(&player->m_Barrel);
         CPlayer__SetState(player, body, 3);
@@ -84,9 +84,9 @@ void PlayerWade_Update(CPlayer *player, CGameObjectInstance *body) {
             player->m_CharAnim = 0x14;
         }
     }
-    player->m_SfxTimer += D_800B6D28;
+    player->m_SfxTimer += gFrameIncrement;
     if (5.12f < player->m_TotalSpeed && 11.25f < player->m_SfxTimer) {
         player->m_SfxTimer = 0.0f;
-        Sound__Play(D_800ADEB8.strokeSound, body->header.m_vPos, 0, -1);
+        Sound__Play(gWadeMoveTuning.strokeSound, body->header.m_vPos, 0, -1);
     }
 }

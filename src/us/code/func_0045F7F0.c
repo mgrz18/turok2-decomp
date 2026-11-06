@@ -5,26 +5,26 @@
 #include "structs/pak.h"
 
 extern s32 Controller_Lock(s32 arg0);
-extern s8 D_800F6750;
+extern s8 gPakQueueState;
 extern void Controller_ReadAll(void);
 extern void Controller_Unlock(void);
 void Controller_ReadAll();
 void Controller_Unlock();
-void func_00425808(s32);
-s32 func_00429050(void *);
+void Pak_Mount_2(s32);
+s32 osPfsRepairId_2(void *);
 s32 Pak_Repair_2(s32 arg0) {
     s32 var_s0;
-    if (D_80130C60[arg0] != 3) {
+    if (gPakState[arg0] != 3) {
         return -2;
     }
     ((void (*)(s32))Controller_Lock)(1);
     Controller_ReadAll();
-    D_800F6750 = 2;
-    var_s0 = func_00429050(&D_80130C80[arg0]);
+    gPakQueueState = 2;
+    var_s0 = osPfsRepairId_2(&gPakFileSystems[arg0]);
     if (var_s0 != 0) {
         var_s0 = -1;
     }
-    func_00425808(arg0);
+    Pak_Mount_2(arg0);
     Controller_Unlock();
     return var_s0;
 }

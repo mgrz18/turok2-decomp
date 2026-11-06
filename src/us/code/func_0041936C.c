@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern u8 D_8011AB06; /* D_8011AAD8 + 0x2E */
+extern u8 gEngineApp_m_Settings_teamCrosshairs; /* gEngineApp_m_Settings + 0x2E */
 extern char D_800B6164[];
 extern char D_800B617C[];
 
 s32 TeamBloodMenu_CrosshairsLabel(MenuItem *a) {
-    switch (D_8011AB06) {
+    switch (gEngineApp_m_Settings_teamCrosshairs) {
     case 0:
         a->text = D_800B617C;
         break;

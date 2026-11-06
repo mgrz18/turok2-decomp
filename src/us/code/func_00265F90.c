@@ -4,7 +4,7 @@
 typedef struct {
     /* 0x00 */ u8 pad0[0x16];
     /* 0x16 */ s16 item;    /* item given on pickup, 0: none */
-    /* 0x18 */ s16 message; /* index in D_800B69D8 when it cannot be taken */
+    /* 0x18 */ s16 message; /* index in gLevelMessages when it cannot be taken */
 } PickupInfo;
 
 typedef struct {
@@ -30,10 +30,10 @@ typedef struct {
     /* 0x1A8 */ CPlayer *owner;
 } Toucher;
 
-extern u8 D_801198B0[]; /* game */
-extern u8 D_801198F0[]; /* game + 0x40: fallback camera */
-extern char *D_800B69D8[]; /* {text, sound} pairs */
-extern s32 D_800B69DC[];  /* D_800B69D8 + 4 */
+extern u8 gEngineApp_m_Game_m_CameraPool[]; /* game */
+extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[]; /* game + 0x40: fallback camera */
+extern char *gLevelMessages[]; /* {text, sound} pairs */
+extern s32 D_800B69DC[];  /* gLevelMessages + 4 */
 
 extern s32 CPlayer__GetPickupCountLow(CPlayer *player, s32 item); /* can take it? */
 extern void CPlayer__UseSpecialPickup(CPlayer *player, s32 item);
@@ -57,12 +57,12 @@ s32 Action_CheckRequiredItem(Pickup *obj, PickupState *state, Toucher *toucher) 
     if (info->message == 0) {
         return 0;
     }
-    camera = D_801198F0;
+    camera = gEngineApp_m_Game_m_CameraPool_m_MainCamera;
     if (player->m_pCamera != NULL) {
         camera = player->m_pCamera;
     }
-    CCameraPool__AddMultiLineText(D_801198B0, camera,
-                  D_800B69D8[info->message * 2], obj, 4.0f);
+    CCameraPool__AddMultiLineText(gEngineApp_m_Game_m_CameraPool, camera,
+                  gLevelMessages[info->message * 2], obj, 4.0f);
     if (D_800B69DC[info->message * 2] != 0) {
         Sound__PlaySpeech(D_800B69DC[info->message * 2]);
     }

@@ -13,16 +13,16 @@ typedef struct {
     /* 0x18 */ s32 flag;
 } DrawInfo;
 
-extern ScriptAnimator D_8013023C[];   /* D_80130200.faders (structs/boss.h): the ROM uses this symbol */
-extern s32 D_800B6D1C;
-extern s32 D_800AB8B0;
+extern ScriptAnimator gBlindOne_faders[];   /* gBlindOne.faders (structs/boss.h): the ROM uses this symbol */
+extern s32 gEvenOdd;
+extern s32 gBlendState;
 
 extern void ScriptAnimator_Apply(ScriptAnimator *light);
 extern void ScreenTint_UpdateMode(void);
 extern void Render_DrawModel(s32 a, s32 model, s32 c, Matrix18 *mtx, s32 e, s32 f, s32 g);
 
 void BlindOne_Draw(CGameObjectInstance *actor, CAI *ai, DrawInfo *info) {
-    ScriptAnimator_Apply(&D_8013023C[ai->m_BlindOne.m_nFader]);
+    ScriptAnimator_Apply(&gBlindOne_faders[ai->m_BlindOne.m_nFader]);
     ScreenTint_UpdateMode();
     switch (actor->m_nTypeFlag) {
         case 0x450:
@@ -36,6 +36,6 @@ void BlindOne_Draw(CGameObjectInstance *actor, CAI *ai, DrawInfo *info) {
             }
             break;
     }
-    Render_DrawModel(info->unkC, actor->m_pmtDrawMtxs, 1, (Matrix18 *) actor->m_Lights[D_800B6D1C], 0, info->flag, actor->m_AI.m_nTexture);
-    D_800AB8B0 = 0;
+    Render_DrawModel(info->unkC, actor->m_pmtDrawMtxs, 1, (Matrix18 *) actor->m_Lights[gEvenOdd], 0, info->flag, actor->m_AI.m_nTexture);
+    gBlendState = 0;
 }

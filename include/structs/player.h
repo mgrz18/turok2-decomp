@@ -263,9 +263,9 @@ typedef struct CPlayer {
     /* 0x1324 */ s32 _pad3;                      /* sizeof is a multiple of 8 (Mtx) */
 } CPlayer; /* size 0x1328 */
 
-/* CPlayerCList and CPlayerList (D_80119870) are in structs/player_list.h. */
+/* CPlayerCList and CPlayerPool (gEngineApp_m_Game) are in structs/player_list.h. */
 
-/* The players saved for a restart, D_8011F290: SavedPlayers_Arm arms it (and
+/* The players saved for a restart, gSavedPlayers: SavedPlayers_Arm arms it (and
  * steps m_State), SavedPlayers_Save copies the players in, SavedPlayers_Restore copies
  * them back; SavedPlayers_GetWarpID reads m_WarpID. */
 typedef struct CSavedPlayers {
@@ -279,6 +279,6 @@ typedef struct CSavedPlayers {
     /* 0x13F0 */ s32 m_Region[4];      /* region indices (CScene__GetRegionIndex / CScene__GetRegion) */
 } CSavedPlayers; /* size 0x1400 */
 
-extern CSavedPlayers D_8011F290;
+extern CSavedPlayers gSavedPlayers;
 
 #endif

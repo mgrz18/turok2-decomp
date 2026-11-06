@@ -10,12 +10,12 @@ extern s32 CAudioWorld__PlaySoundIndex(void *, s32, CVector3, s32);
 extern int CAudioWorld__GetForce2D(struct ContextRecAt2BC0 *arg0);
 extern void CAudioWorld__SetForce2D(struct ContextRecAt2BC0 *arg0, int arg1);
 extern int CAudioWorld__PlaySoundIndex(void *arg0, int arg1, CVector3 arg2, int arg3);
-extern int D_8011ACA0;
+extern int gEngineApp_m_Settings_unk1C8;
 int Sound__PlayIndex2D(int arg0) {
-    extern signed char D_800F2A00;
+    extern signed char gAudioWorld;
     int temp_s0;
     int temp_s1;
-    if (D_8011ACA0 != 0) {
+    if (gEngineApp_m_Settings_unk1C8 != 0) {
         return -1;
     }
     {
@@ -24,10 +24,10 @@ int Sound__PlayIndex2D(int arg0) {
         vec.z = zero;
         vec.y = zero;
         vec.x = zero;
-        temp_s1 = CAudioWorld__GetForce2D(&D_800F2A00);
-        CAudioWorld__SetForce2D(&D_800F2A00, 1);
-        temp_s0 = CAudioWorld__PlaySoundIndex(&D_800F2A00, arg0, vec, 0);
-        CAudioWorld__SetForce2D(&D_800F2A00, temp_s1);
+        temp_s1 = CAudioWorld__GetForce2D(&gAudioWorld);
+        CAudioWorld__SetForce2D(&gAudioWorld, 1);
+        temp_s0 = CAudioWorld__PlaySoundIndex(&gAudioWorld, arg0, vec, 0);
+        CAudioWorld__SetForce2D(&gAudioWorld, temp_s1);
     }
     return temp_s0;
 }

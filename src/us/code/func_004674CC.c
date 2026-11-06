@@ -13,7 +13,7 @@ typedef struct PlayerList {
     /* 0x20 */ u8 list1[0x14];
 } PlayerList;
 
-extern s32 D_8011ACF0;
+extern s32 gEngineApp_m_Settings_match_tagPhase;
 extern char D_800A7080[]; /* in the engine's .rodata */
 
 extern void CList__Construct(void *list, s32 prevOffset, s32 nextOffset);
@@ -27,12 +27,12 @@ extern void Controller_SetRumbleOptionAll(s32);
 extern void memset(void *p, s32 c, s32 n); /* memset */
 extern void CPlayerContState__Init(void *, ControllerProfile *);
 extern void CPlayer__Reset(CPlayer *p);
-extern void func_0042DB38(CPlayer *p, s32 character, s32 arg2);
+extern void CPlayer__NewGame_2(CPlayer *p, s32 character, s32 arg2);
 
 /* CPlayer__Construct, inlined. */
 static __inline__ void initPlayer(CPlayer *p, s32 index, CPlayerOptions *options) {
     p->m_bActive = 0;
-    CPlayerContState__Init(&p->m_ContState, &D_800F5EC0[index]);
+    CPlayerContState__Init(&p->m_ContState, &gControllers[index]);
     p->m_nController = index;
     p->m_pOptions = options;
     p->m_pLoopingSound_WeaponBackground = 0;
@@ -53,7 +53,7 @@ void CPlayerPool__NewGame_2(PlayerList *list, s32 count, s32 arg2) {
     CList__Construct(list->list1, 0x131C, 0x1320);
     Controller_SetRumbleOptionAll(0);
     CCache__Flush(0);
-    flags = &D_8011AAD8;
+    flags = &gEngineApp_m_Settings;
     if (list->handle != NULL) {
         CCache__Deallocate(0, list->handle);
         list->handle = NULL;
@@ -77,7 +77,7 @@ void CPlayerPool__NewGame_2(PlayerList *list, s32 count, s32 arg2) {
             options = &flags->slots[i];
             initPlayer(p, i, options);
             if (options->m_bActive) {
-                func_0042DB38(p, options->m_nCharacter, 1);
+                CPlayer__NewGame_2(p, options->m_nCharacter, 1);
                 CList__Remove(list->list0, p);
                 CList__AddHead(list->list1, p);
             }
@@ -85,9 +85,9 @@ void CPlayerPool__NewGame_2(PlayerList *list, s32 count, s32 arg2) {
     } else {
         p = list->players;
         initPlayer(p, options->m_nController, options);
-        func_0042DB38(p, options->m_nCharacter, arg2);
+        CPlayer__NewGame_2(p, options->m_nCharacter, arg2);
         CList__Remove(list->list0, p);
         CList__AddHead(list->list1, p);
     }
-    D_8011ACF0 = 1;
+    gEngineApp_m_Settings_match_tagPhase = 1;
 }

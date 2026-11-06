@@ -4,8 +4,8 @@
 
 typedef signed int s32;
 extern void HostIo_Delay(int arg0);
-extern volatile s32 D_801270B0;
+extern volatile s32 sHostIoDelayCounter;
 void HostIo_Delay(s32 arg0) {
-    for (D_801270B0 = 0; D_801270B0 < arg0; D_801270B0++) {
+    for (sHostIoDelayCounter = 0; sHostIoDelayCounter < arg0; sHostIoDelayCounter++) {
     }
 }

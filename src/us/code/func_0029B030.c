@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern s32 D_800B8910;
+extern s32 __osThreadTail;
 
 typedef struct {
     /* 0x00 */ s32 *head;
@@ -12,8 +12,8 @@ typedef struct {
 } Unk0029B030;
 
 void osCreateMesgQueue(Unk0029B030 *arg0, s32 arg1, s32 arg2) {
-    arg0->head = &D_800B8910;
-    arg0->tail = &D_800B8910;
+    arg0->head = &__osThreadTail;
+    arg0->tail = &__osThreadTail;
     arg0->unk8 = 0;
     arg0->unkC = 0;
     arg0->count = arg2;

@@ -1,10 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800AB880;
-extern s32 D_800AB884;
+extern s32 gCurrentCombineMode;
+extern s32 gCurrentRenderMode;
 
 void Render_InvalidateModeCache(void) {
-    D_800AB884 = -1;
-    D_800AB880 = -1;
+    gCurrentRenderMode = -1;
+    gCurrentCombineMode = -1;
 }

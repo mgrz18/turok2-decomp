@@ -10,8 +10,8 @@ struct ObjRecAt18V2 {
     char pad0[0x14];
     s32 * unk18; /* at 0x14 in Turok 2 */
 };
-extern char D_800AE994[];
-extern void *D_800ACB60[];
+extern char gWeaponActorTypeInfo[];
+extern void *gIntelligenceTypeInfo[];
 void *CGameObjectInstance__GetBodySetup(char *arg0)
 {
     s32 type;
@@ -19,14 +19,14 @@ void *CGameObjectInstance__GetBodySetup(char *arg0)
     s32 count;
     s32 limit;
     char *object;
-    CPlayerList *list;
+    CPlayerPool *list;
     ObjRecAt18V2 *actor = (void *)arg0;
     type = *actor->unk18;
     if ((unsigned int)type >= 13) {
         return 0;
     }
     if (type == 11) {
-        list = &D_80119870.m_PlayerList;
+        list = &gEngineApp_m_Game.m_PlayerList;
         count = list->m_nPlayers;
         i = 0;
         if (count > 0) {
@@ -37,12 +37,12 @@ void *CGameObjectInstance__GetBodySetup(char *arg0)
                     return 0;
                 }
                 if (object + 0x288 == arg0) {
-                    return D_800AE994;
+                    return gWeaponActorTypeInfo;
                 }
                 i++;
                 object += 0x1328;
             } while (i < limit);
         }
     }
-    return D_800ACB60[type];
+    return gIntelligenceTypeInfo[type];
 }

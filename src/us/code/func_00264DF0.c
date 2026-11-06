@@ -6,8 +6,8 @@ extern s32 CGameObjectInstance__PickRandomAnim(void *actor, s32 action, s32 skip
 extern void CVector3__Lerp(f32 *out, f32 t, f32 *from, f32 *to);
 extern void CAI__SetMode(void *obj, void *state, s32 mode);
 
-extern f32 D_800B6D28; /* frame time scale */
-extern s8 D_800F1F94;
+extern f32 gFrameIncrement; /* frame time scale */
+extern s8 gThrowableCollisionInfo_m_InstanceBehavior;
 
 typedef struct {
     /* 0x000 */ u8 pad0[0x54];
@@ -25,7 +25,7 @@ void Throwable_PickedUpUpdate(CGameObjectInstance *obj, OwnedState *state) {
     s32 anim;
     CGameObjectInstance *owner = state->owner;
 
-    D_800F1F94 = 0;
+    gThrowableCollisionInfo_m_InstanceBehavior = 0;
     if (owner == NULL) {
         return;
     }
@@ -34,7 +34,7 @@ void Throwable_PickedUpUpdate(CGameObjectInstance *obj, OwnedState *state) {
         && owner->m_CurrentAnimation.m_nFrames * 0.3f <= owner->m_CurrentAnimation.m_AnimationFrame) {
         Throwable_GetCarryPoint(obj, state, target);
         state->tiltHeading = owner->m_RotY - obj->m_RotY;
-        state->blend += D_800B6D28 * 0.25f;
+        state->blend += gFrameIncrement * 0.25f;
         if (state->blend > 1.0f) {
             state->blend = 1.0f;
         }

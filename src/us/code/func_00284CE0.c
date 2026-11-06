@@ -4,29 +4,29 @@
 #include "rw/abu_types.h"
 
 extern int Controller_IsPakWatched(int arg0);
-extern int D_800F6788[];
+extern int gPakChanged[];
 extern void Controller_UpdatePakInsertion();
 extern int Controller_PakInserted(int arg0);
-extern s32 D_800F5EA8[];
-extern s32 D_800F67B0[];
+extern s32 gPakInserted[];
+extern s32 gPakRemoved[];
 void Controller_UpdatePakInsertion(void)
 {
     s32 i;
     for (i = 0; i < 4; i++) {
         if (Controller_IsPakWatched(i) != 0) {
             if (Controller_PakInserted(i) != 0) {
-                D_800F5EA8[i] = 1;
-                if (D_800F67B0[i] != 0) {
-                    D_800F6788[i] = 1;
-                    D_800F67B0[i] = 0;
+                gPakInserted[i] = 1;
+                if (gPakRemoved[i] != 0) {
+                    gPakChanged[i] = 1;
+                    gPakRemoved[i] = 0;
                 }
-            } else if (D_800F5EA8[i] != 0) {
-                D_800F67B0[i] = 1;
+            } else if (gPakInserted[i] != 0) {
+                gPakRemoved[i] = 1;
             }
         } else {
-            D_800F6788[i] = 0;
-            D_800F67B0[i] = 0;
-            D_800F5EA8[i] = 0;
+            gPakChanged[i] = 0;
+            gPakRemoved[i] = 0;
+            gPakInserted[i] = 0;
         }
     }
 }

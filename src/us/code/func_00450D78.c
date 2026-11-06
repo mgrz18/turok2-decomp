@@ -4,10 +4,10 @@
 typedef unsigned char u8;
 typedef signed int s32;
 typedef float f32;
-/* D_8011ACB0 (GameMatch in structs/game.h; unk24 is teams). Kept as a local
+/* gEngineApp_m_Settings_match (GameMatch in structs/game.h; unk24 is teams). Kept as a local
  * array view: through it the compiler bases the store and the argument on
- * D_8011ACB0 + 0x24, as the ROM does; through the struct it bases them on
- * D_8011ACB0. */
+ * gEngineApp_m_Settings_match + 0x24, as the ROM does; through the struct it bases them on
+ * gEngineApp_m_Settings_match. */
 typedef struct S10Game {
                u8 pad0[0x14];
                f32 unk14;
@@ -26,15 +26,15 @@ typedef struct S10Game {
                u8 pad7C[4];
                s32 unk80;
 } S10Game;
-extern S10Game D_8011ACB0[];
-extern f32 D_801308FC;
-extern f32 D_800B6D28;
+extern S10Game gEngineApp_m_Settings_match[];
+extern f32 sFinalScoreTimer;
+extern f32 gFrameIncrement;
 extern void CPlayerPool__EndMatch(void *p);
 s32 FinalScoreMenu_Poll_2(void) {
-    D_801308FC += D_800B6D28;
-    if (D_801308FC >= 120.0f) {
-        D_8011ACB0->unk24 = 0;
-        CPlayerPool__EndMatch((u8 *)D_8011ACB0 - 0x1440);
+    sFinalScoreTimer += gFrameIncrement;
+    if (sFinalScoreTimer >= 120.0f) {
+        gEngineApp_m_Settings_match->unk24 = 0;
+        CPlayerPool__EndMatch((u8 *)gEngineApp_m_Settings_match - 0x1440);
         return 1;
     }
     return 0;

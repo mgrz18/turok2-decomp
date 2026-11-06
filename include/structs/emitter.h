@@ -3,7 +3,7 @@
 
 /* The region emitters: textured layers a region turns on by the bits of its
  * CRegionInfo.m_EmitterMask (one bit per entry of the definition table
- * D_8010FF14, D_8010FF18 entries). Each running emitter is drawn as a
+ * gScene_m_pSections, gScene_m_nSections entries). Each running emitter is drawn as a
  * translucent fan over the camera's view corners (CCamera.m_vTCorners) at
  * its height, which follows the camera, the floor or the water surface
  * (CEmitterPool__Advance updates them, CEmitter__Draw draws one, CEmitterPool__Draw sorts
@@ -27,7 +27,7 @@ typedef struct UnitVtx {
 #define EMITTER_DEF_FLAG_CAMERA 0x01 /* the camera's height * m_CameraScale */
 #define EMITTER_DEF_FLAG_FLOOR  0x02 /* the floor under the camera */
 
-/* One entry of the definition table D_8010FF14. */
+/* One entry of the definition table gScene_m_pSections. */
 typedef struct CEmitterDef {
     /* 0x00 */ s16 m_Texture;               /* 0: unused entry */
     /* 0x02 */ u8 m_Red;

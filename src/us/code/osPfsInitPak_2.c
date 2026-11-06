@@ -7,13 +7,13 @@
 
 extern void __osSiGetAccess(void); /* __osSiGetAccess */
 extern void __osSiRelAccess(void); /* __osSiRelAccess */
-extern s32 func_00427EA0(OSMesgQueue *queue, int channel); /* __osPfsGetStatus */
-extern s32 func_00429DE4(OSPfs *pfs); /* __osPfsSelectBank */
+extern s32 __osPfsGetStatus_2(OSMesgQueue *queue, int channel); /* __osPfsGetStatus */
+extern s32 __osPfsSelectBank_2(OSPfs *pfs); /* __osPfsSelectBank */
 extern s32 __osContRamRead(OSMesgQueue *mq, int channel, u16 address, u8 *buffer); /* __osContRamRead */
-extern s32 func_00429CD4(u16 *ptr, u16 *csum, u16 *icsum); /* __osIdCheckSum */
-extern s32 func_00429668(OSPfs *pfs, __OSPackId *temp); /* __osCheckPackId */
-extern s32 func_00429380(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid); /* __osRepairPackId */
-extern s32 func_00428250(OSPfs *pfs); /* osPfsChecker */
+extern s32 __osIdCheckSum_2(u16 *ptr, u16 *csum, u16 *icsum); /* __osIdCheckSum */
+extern s32 __osCheckPackId_2(OSPfs *pfs, __OSPackId *temp); /* __osCheckPackId */
+extern s32 __osRepairPackId_2(OSPfs *pfs, __OSPackId *badid, __OSPackId *newid); /* __osRepairPackId */
+extern s32 osPfsChecker_2(OSPfs *pfs); /* osPfsChecker */
 
 s32 osPfsInitPak_2(OSMesgQueue *queue, OSPfs *pfs, int channel) {
     int k;
@@ -25,7 +25,7 @@ s32 osPfsInitPak_2(OSMesgQueue *queue, OSPfs *pfs, int channel) {
     __OSPackId newid;
 
     __osSiGetAccess();
-    ret = func_00427EA0(queue, channel);
+    ret = __osPfsGetStatus_2(queue, channel);
     __osSiRelAccess();
     if (ret != 0) {
         return ret;
@@ -36,18 +36,18 @@ s32 osPfsInitPak_2(OSMesgQueue *queue, OSPfs *pfs, int channel) {
     pfs->status = 0;
 
     pfs->activebank = 0;
-    if ((ret = func_00429DE4(pfs)) != 0) {
+    if ((ret = __osPfsSelectBank_2(pfs)) != 0) {
         return ret;
     }
     if ((ret = __osContRamRead(pfs->queue, pfs->channel, 1, temp)) != 0) {
         return ret;
     }
 
-    func_00429CD4((u16 *)temp, &sum, &isum);
+    __osIdCheckSum_2((u16 *)temp, &sum, &isum);
     id = (__OSPackId *)temp;
 
     if (id->checksum != sum || id->inverted_checksum != isum) {
-        ret = func_00429668(pfs, id);
+        ret = __osCheckPackId_2(pfs, id);
         if (ret != 0) {
             return ret;
         } else if (ret != 0) { /* duplicated check, as in 2.0I */
@@ -56,7 +56,7 @@ s32 osPfsInitPak_2(OSMesgQueue *queue, OSPfs *pfs, int channel) {
     }
 
     if (!(id->deviceid & 1)) {
-        ret = func_00429380(pfs, id, &newid);
+        ret = __osRepairPackId_2(pfs, id, &newid);
         if (ret != 0) {
             return ret;
         }
@@ -82,7 +82,7 @@ s32 osPfsInitPak_2(OSMesgQueue *queue, OSPfs *pfs, int channel) {
         return ret;
     }
 
-    ret = func_00428250(pfs);
+    ret = osPfsChecker_2(pfs);
     pfs->status |= PFS_INITIALIZED;
     return ret;
 }

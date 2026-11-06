@@ -9,10 +9,10 @@ typedef struct Row10 {
     s16 id;
     u8 pad6[10];
 } Row10;
-extern Row10 D_800AD838[];
+extern Row10 sItemPickups[];
 Row10 *Pickup_FindItemEntry(s32 id) {
     s32 i;
-    Row10 *p = D_800AD838;
+    Row10 *p = sItemPickups;
     for (i = 14; i != -1; i--) {
         if (p->id == id) {
             return p;

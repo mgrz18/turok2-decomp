@@ -143,7 +143,7 @@ typedef struct RootActor {
     /* 0xD4 */ u32 flags;
 } RootActor;
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 void CGameObjectInstance__FireAnimEvents(RootActor *actor, AnimPlayer *anim, f32 from, f32 to);
 void CAnimationState__GetBonePosition(AnimPlayer *anim, s32 bone, f32 time, CVector3 *out);
@@ -183,7 +183,7 @@ void CAnimationState__GetRootMotion(AnimPlayer *anim, CVector3 *delta, f32 *turn
     prevAngle = CAnimationState__GetRootYaw(anim, t);
     t1 = anim->time;
     if (!(actor->flags & 0x8000000)) {
-        anim->time = t1 + D_800B6D28 * clip->rate * (1.0f / 15);
+        anim->time = t1 + gFrameIncrement * clip->rate * (1.0f / 15);
     }
     CGameObjectInstance__FireAnimEvents(actor, anim, t1, anim->time);
     last = anim->frames - 1;

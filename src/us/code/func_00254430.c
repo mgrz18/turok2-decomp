@@ -4,8 +4,8 @@
 s32 CPlayer__Hurt(s32, s32, s32, s32, s32);
 
 s32 Sound__PlaySpeech(s32);                     /* extern */
-extern f32 D_800B6D28;
-extern u8 D_8011AAF1;
+extern f32 gFrameIncrement;
+extern u8 gEngineApp_m_Settings_multiplayer;
 
 void CPlayer__UpdateOxygen(CPlayer *arg0, s32 arg1) {
     f32 temp_f0;
@@ -15,9 +15,9 @@ void CPlayer__UpdateOxygen(CPlayer *arg0, s32 arg1) {
     s32 var_s1;
 
     temp_f1 = arg0->m_Oxygen;
-    temp_f0 = temp_f1 + D_800B6D28;
+    temp_f0 = temp_f1 + gFrameIncrement;
     arg0->m_Oxygen = temp_f0;
-    if ((temp_f1 < 300.0f) && (temp_f0 > 300.0f) && (D_8011AAF1 == 0)) {
+    if ((temp_f1 < 300.0f) && (temp_f0 > 300.0f) && (gEngineApp_m_Settings_multiplayer == 0)) {
         Sound__PlaySpeech(0x163);
     }
     if (arg0->m_Oxygen > 600.0f) {
@@ -30,7 +30,7 @@ void CPlayer__UpdateOxygen(CPlayer *arg0, s32 arg1) {
             }
         }
         if (arg0->m_bOxygenOut == 0) {
-            if (D_8011AAF1 == 0) {
+            if (gEngineApp_m_Settings_multiplayer == 0) {
                 Sound__PlaySpeech(0x164);
             }
         }

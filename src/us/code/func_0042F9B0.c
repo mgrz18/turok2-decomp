@@ -11,9 +11,9 @@ typedef struct IntPair {
     s32 field_4;
 } IntPair;
 
-extern s32 D_800C2030;
-extern s32 D_800C2034;
-extern IntPair D_800F5A40;
+extern s32 gScreenWidth;
+extern s32 gScreenHeight;
+extern IntPair gCameraVisBits;
 
 void CCameraViewParams__Construct(void *);
 void CMtxF__Identity(void *);
@@ -46,8 +46,8 @@ void CCamera__Construct(CCamera *view) {
     view->m_qViewAlign.x = zero;
     view->m_qViewAlign.w = one;
     CMtxF__Identity(view->m_mfInverseViewOrient);
-    view->m_Viewport.m_Width = (f32)D_800C2030;
-    view->m_Viewport.m_Height = (f32)D_800C2034;
+    view->m_Viewport.m_Width = (f32)gScreenWidth;
+    view->m_Viewport.m_Height = (f32)gScreenHeight;
     view->m_nCurrentRegionSet = -1;
     view->m_Viewport.m_ScreenPosX = zero;
     view->m_Viewport.m_ScreenPosY = zero;
@@ -93,7 +93,7 @@ void CCamera__Construct(CCamera *view) {
     f5->unkC = zero;
     f5->unk10 = zero;
     CCamera__SetMode(view, 0);
-    size = D_800C2030 * 2;
+    size = gScreenWidth * 2;
     for (i = 0; i < 2; i++) {
         view->m_vp[i].vscale[0] = size;
         view->m_vp[i].vscale[1] = size;
@@ -109,7 +109,7 @@ void CCamera__Construct(CCamera *view) {
     CMtxF__Identity(view->m_mfFaceScreen);
     CMtxF__Identity(view->m_mfFaceScreenYAxisUp);
     view->m_FlashMode = 0;
-    D_800F5A40.field_4 = 0;
+    gCameraVisBits.field_4 = 0;
     CList__Construct(&view->m_ActiveTextList, 0, 4);
     CCamera__ConstructSkySystem(view);
 }

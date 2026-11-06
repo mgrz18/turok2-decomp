@@ -21,8 +21,8 @@ typedef struct {
     /* 0x50 */ f32 yaw;
 } Projectile;
 
-extern CVector3 D_800B17B0;
-extern f32 D_800DD78C;
+extern CVector3 sProjectileMuzzleOffset;
+extern f32 gQuaternionSin;
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 scale);
 void CVector3__Add(CVector3 *out, CVector3 *a, CVector3 *b);
 void CQuaternion__Multiply(CQuaternion *out, CQuaternion *a, CQuaternion *b);
@@ -49,11 +49,11 @@ void Projectile_PlaceAtMuzzle(Projectile *self, CAI *ai) {
     yaw.x = 0.0f;
     yaw.y = s;
     yaw.z = 0.0f;
-    D_800DD78C = s;
+    gQuaternionSin = s;
     yaw.w = func_002974C0(self->yaw * 0.5f);
     CQuaternion__Multiply(&rot, &yaw, &self->rot);
     CQuaternion__ToMatrix(&rot, &m);
-    CMtxF__TransformPoint(&m, &D_800B17B0, &dir);
+    CMtxF__TransformPoint(&m, &sProjectileMuzzleOffset, &dir);
     CVector3__Scale(&dir, &dir, 10.24f);
     CVector3__Add(&self->pos, &self->pos, &dir);
 }

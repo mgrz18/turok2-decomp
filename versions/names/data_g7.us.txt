@@ -1,0 +1,265 @@
+// Data names, part g7: every D_ symbol not in 0x80xxxxxx: D_002xxxxx (engine segment), D_0042xxxx-D_0043xxxx
+// (VM module-1 data) and D_0046xxxx, plus module-2 copies (`_2`). Addresses are the D_ token's own address:
+// module-2 code refers to its data by LINK address, which sits 0xE0 below the module-1 original in this
+// range (D_00430E30 = D_00430F10 - 0xE0, ...), a `_2` line is at the NAMED address (link + 0x39000) like every module-2 name;
+// the coordinator converted g7's link addresses (round G2) and notes the link address on each line.
+// Module-1 data is ROM = vaddr - 0x2B6000; module-2 data ROM = link + 0x39000 - 0x2B6000 (checked byte for byte).
+// `s` = file-local data of one boss/menu source file; `g` = referenced across subsystems (menu descs the engine opens).
+// A D_ pointing inside an object is gObject_<field> (coordinator convention).
+
+// ---- Not named here (see the report): D_ tokens that are really FUNCTIONS already named, use the function name:
+// D_002041E4 = CCache__Main, D_00206990 = Texture_DecompressCallback, D_0026352C = Generator_Step,
+// D_00266814 = InteractiveAnim_Step, D_00266AB4 = InteractiveAnim_DrawAllModels, D_0026FB70 = __amMain,
+// D_0026FD4C = __amDmaNew, D_0028A020 = __scMain, D_0028E8A4 = VM_ReaderThread, D_00296118 = alEnvmixerParam,
+// D_00296360 = alMainBusPull, D_002972E0 = alSavePull, D_0029A890 = viMgrMain, D_0029BFE0 = __osException,
+// D_002A2650 = HostIo_ThreadMain.
+// Comment-only mentions (WRONG CUT notes): D_00200AD4, D_00200AE0, D_00202128, D_00206984, D_002150B8, D_0028D380.
+// Unnamed code labels used as data: D_0042B304, D_0042B5D0, D_0042C9D4 (CScene callbacks), D_00469400.
+// Junk fill words: D_0042D50C, D_0046642C. Magic constant: D_8F128560 (HostIo_MemoryTransfer's address offset).
+
+// ---- Collision setup table (player code's file head, asm/data_0042D50C.s / data_0046642C.s)
+gCollisionSetupTable = 0x0042D510; // Turok 3 colinfo.c name (references/turok3); 34 0x28-byte CCollisionSetup_t records, first word an engine object; CCollisionInfo__Reset -> CCollisionSetup__Construct
+gCollisionSetupTable_2 = 0x00466430; // module-2 copy of gCollisionSetupTable (same bytes; data_0046642C.s)
+
+// ---- Mantid Queen (WaveBossState, structs/boss.h)
+sMantidQueenMinions = 0x004307B0; // Part00401E30[2] {id, model, offset}: 0x1D4D / 0x1D4E; MantidQueen_Init finds each intelligence by id
+sMantidQueenMinions_model = 0x004307B4; // &sMantidQueenMinions[0].model (Part004028F4 view): MantidQueen_SpawnMinion's model and offset
+sMantidQueenScript = 0x00430824; // WaveBossStep[] (boss.h "D_00430824..."): the wave script MantidQueen_Init starts on
+sMantidQueenSpotHitScript = 0x00430924; // ScriptAnimator float script (5.0, 255,255,255,255, 6.0...); MantidQueen_Hurt flashes the hit weak spot
+sMantidQueenMode6SpotScript = 0x00430954; // ScriptAnimator script set on a weak spot by MantidQueen_UpdateMode6
+sMantidQueenSpotOpenScript = 0x00430C6C; // ScriptAnimator script; MantidQueen_EnterMode15 flashes the open weak spot
+sMantidQueenModeTable = 0x00430CA4; // CAIModeInfo rows {mode, enter, update...}: MantidQueen_EnterStart, _EnterIntro/_UpdateIntro...; m_pModeTable set by MantidQueen_InitAI
+
+// ---- Primagen (LevelScriptState D_8012F608, structs/boss.h)
+sPrimagenAttacks = 0x00430F10; // BossAttack[] {mode, minDist, maxDist}: Primagen_RunAttackStep picks the attack by distance
+sPrimagenAttacks_2 = 0x00469E30; // module-2 copy (Primagen_RunAttackStep_2) (linked at 0x00430E30)
+sPrimagenAttackScriptStage1 = 0x00431008; // BossStep[] script A, kind 1, stage 1 (Primagen_SetAttackScript; read by Primagen_RunAttackStep, Primagen_UpdateMode19)
+sPrimagenAttackScriptStage1_2 = 0x00469F28; // module-2 copy (linked at 0x00430F28)
+sPrimagenAttackScript2Stage1 = 0x00431094; // BossStep[] script A, kind 2, stage 1 (Primagen_SetAttackScript)
+sPrimagenAttackScript2Stage1_2 = 0x00469FB4; // module-2 copy (linked at 0x00430FB4)
+sPrimagenAttackScriptStage2 = 0x004310E4; // BossStep[] kind 1, stage 2
+sPrimagenAttackScriptStage2_2 = 0x0046A004; // module-2 copy (linked at 0x00431004)
+sPrimagenAttackScript2Stage2 = 0x00431198; // BossStep[] kind 2, stage 2
+sPrimagenAttackScript2Stage2_2 = 0x0046A0B8; // module-2 copy (linked at 0x004310B8)
+sPrimagenAttackScriptStage3 = 0x00431238; // BossStep[] kind 1, stage 3
+sPrimagenAttackScriptStage3_2 = 0x0046A158; // module-2 copy (linked at 0x00431158)
+sPrimagenAttackScript2Stage3 = 0x00431300; // BossStep[] kind 2, stage 3
+sPrimagenAttackScript2Stage3_2 = 0x0046A220; // module-2 copy (linked at 0x00431220)
+sPrimagenSpawnScript1 = 0x004313B4; // BossStep2[] script B #1 (Primagen_SetSpawnScript(1); also Primagen_UpdateMode28)
+sPrimagenSpawnScript1_2 = 0x0046A2D4; // module-2 copy (linked at 0x004312D4)
+sPrimagenSpawnScript2 = 0x00431424; // BossStep2[] script B #2
+sPrimagenSpawnScript2_2 = 0x0046A344; // module-2 copy (linked at 0x00431344)
+sPrimagenSpawnScript3 = 0x004314CC; // BossStep2[] script B #3
+sPrimagenSpawnScript3_2 = 0x0046A3EC; // module-2 copy (linked at 0x004313EC)
+sPrimagenSpawnScript4 = 0x00431558; // BossStep2[] script B #4
+sPrimagenSpawnScript4_2 = 0x0046A478; // module-2 copy (linked at 0x00431478)
+sPrimagenSpawnScript5 = 0x00431590; // BossStep2[] script B #5
+sPrimagenSpawnScript5_2 = 0x0046A4B0; // module-2 copy (linked at 0x004314B0)
+sPrimagenSoundScript2 = 0x00431624; // BossStep3[] script C #2 (Primagen_SetSoundScript(2))
+sPrimagenSoundScript2_2 = 0x0046A544; // module-2 copy (its pointers 0xE0 lower) (linked at 0x00431544)
+sPrimagenSoundScript1 = 0x00431660; // BossStep3[] script C #1
+sPrimagenSoundScript1_2 = 0x0046A580; // module-2 copy (linked at 0x00431580)
+sPrimagenSoundScript3 = 0x0043169C; // BossStep3[] script C #3 (also Primagen_UpdateMode28)
+sPrimagenSoundScript3_2 = 0x0046A5BC; // module-2 copy (linked at 0x004315BC)
+sPrimagenSoundScript4 = 0x00431700; // BossStep3[] script C #4 (Primagen_SetSoundScript(4), Primagen_EnterMode16)
+sPrimagenSoundScript4_2 = 0x0046A620; // module-2 copy (linked at 0x00431620)
+sPrimagenModeTable = 0x0043173C; // CAIModeInfo rows (Primagen_UpdateMode0, _EnterMode1/_UpdateMode1...); Primagen_InitAI
+sPrimagenModeTable_2 = 0x0046A65C; // module-2 copy (Primagen_InitAI_2) (linked at 0x0043165C)
+sPrimagenPartHitScript = 0x00431A7C; // ScriptAnimator script; Primagen_Hurt flashes a damaged part
+sPrimagenPartDestroyScript = 0x00431B0C; // ScriptAnimator script; Primagen_Hurt when a part's health reaches 0
+sPrimagenMode7PartScript = 0x00431B54; // ScriptAnimator script Primagen_EnterMode7 starts on the stage's parts
+sPrimagenMode7PartScript_2 = 0x0046AA74; // module-2 copy (Primagen_EnterMode7_2) (linked at 0x00431A74)
+sPrimagenTossTable = 0x00431CD4; // WeightedTable {type, weight}..-1 of tossed objects, stages 1-2 (Primagen_Step -> Primagen_SpawnTossedObject)
+sPrimagenTossTable_2 = 0x0046ABF4; // module-2 copy (linked at 0x00431BF4)
+sPrimagenTossTableStage3 = 0x00431CF0; // same, stage 3. CLASH: MotherBoss_UpdateSpotsAndPickups_2 also uses D_00431CF0, meaning sMotherBossDropTablePhase2_2
+sPrimagenTossTableStage3_2 = 0x0046AC10; // module-2 copy (linked at 0x00431C10)
+sPrimagenTossTable2 = 0x00431D0C; // WeightedTable for the third toss point, stages 1-2 (Primagen_Step)
+sPrimagenTossTable2_2 = 0x0046AC2C; // module-2 copy (linked at 0x00431C2C)
+sPrimagenTossTable2Stage3 = 0x00431D14; // same, stage 3
+sPrimagenTossTable2Stage3_2 = 0x0046AC34; // module-2 copy (linked at 0x00431C34)
+
+// ---- Mother (MotherBossState D_8012FB70, structs/boss.h)
+// sMotherBossSpawnPoints = 0x00431D20; // SpawnPoint[4] (boss.h); MotherBoss_DropPickupsAtSpawnPoints, _RandomSpawnPoint, _TeleportTarget  [coordinator: named gMotherSpawnPoints(_2) in data_seed.us.txt]
+// sMotherBossSpawnPoints_2 = 0x00431C40; // module-2 copy (boss.h "the second copy")  [coordinator: named gMotherSpawnPoints(_2) in data_seed.us.txt]
+sMotherBossPhase1PlayerPos = 0x00431D7C; // where MotherBoss_OnPhase1CinemaDone puts the player (CPlayer__SetPosition)
+sMotherBossPhase1PlayerPos_2 = 0x0046AC9C; // module-2 copy (linked at 0x00431C9C)
+sMotherBossPickupTable = 0x00431D94; // WeightedTable of pickups (MotherBoss_UpdateSpotsAndPickups, "pickup weights")
+sMotherBossPickupTable_2 = 0x0046ACB4; // module-2 copy (linked at 0x00431CB4)
+sMotherBossDropTablePhase1 = 0x00431DC4; // WeightedTable of phase-1 drops (dropTimer >= 526)
+sMotherBossDropTablePhase1_2 = 0x0046ACE4; // module-2 copy (linked at 0x00431CE4)
+sMotherBossDropTablePhase2 = 0x00431DD0; // WeightedTable of phase-2 drops (module-2 copy is D_00431CF0, see the clash above)
+sMotherBossDropTablePhase2_2 = 0x0046ACF0; // module-2 copy, linked at 0x00431CF0, the address of module 1's sPrimagenTossTableStage3 (coordinator: MotherBoss_UpdateSpotsAndPickups_2 declares it locally under this name)
+sMotherBossPhase1SpawnDrops = 0x00431DDC; // WeightedTable MotherBoss_SetupPhase1 drops at the spawn points (x3)
+sMotherBossPhase1SpawnDrops_2 = 0x0046ACFC; // module-2 copy (linked at 0x00431CFC)
+sMotherBossPhaseVisBits = 0x00431DE4; // s32[3] m_VisBits per phase (MotherBoss_SetupPhase0/1/2, _StartPhase2Cinema)
+sMotherBossPhaseVisBits_2 = 0x0046AD04; // module-2 copy (linked at 0x00431D04)
+sMotherBossPhaseActiveMasks = 0x00431DF0; // s32[3] active weak-spot mask per phase
+sMotherBossPhaseActiveMasks_2 = 0x0046AD10; // module-2 copy (linked at 0x00431D10)
+sMotherBossPhaseLiveMasks = 0x00431DFC; // s32[3] liveMask per phase
+sMotherBossPhaseLiveMasks_2 = 0x0046AD1C; // module-2 copy (linked at 0x00431D1C)
+sMotherBossSpotResetScript = 0x00431E08; // ScriptAnimator script the phase setups put the active spots on
+sMotherBossSpotResetScript_2 = 0x0046AD28; // module-2 copy (linked at 0x00431D28)
+sMotherBossHurtScript = 0x00431E54; // ScriptAnimator script; MotherBoss_Hurt -> MotherBoss_StartSpotAnims
+sMotherBossHurtScript_2 = 0x0046AD74; // module-2 copy (linked at 0x00431D74)
+sMotherBossSpotFlashScript = 0x00431EE4; // ScriptAnimator script of MotherBoss_FlashActiveSpots and the Mode01/10/21 FlashSpotsThenIdle steps
+sMotherBossSpotFlashScript_2 = 0x0046AE04; // module-2 copy (linked at 0x00431E04)
+sMotherBossModeTable = 0x00431F00; // CAIModeInfo rows (MotherBoss_StartIntro, _SetupPhase0/_Mode01...); MotherBoss_Init
+sMotherBossModeTable_2 = 0x0046AE20; // module-2 copy (MotherBoss_Init_2) (linked at 0x00431E20)
+
+// ---- Blind One (BlindOneState D_80130200, structs/boss.h)
+sBlindOneScript = 0x00432340; // BlindOneStep[] (boss.h "the script"); BlindOne_StartScript, BlindOne_BossInit
+sBlindOneScript_2 = 0x0046B260; // module-2 copy (linked at 0x00432260)
+sBlindOnePhases = 0x0043240C; // BlindOnePhase[] {init, update}: BlindOne_Setup, _PhaseWaitPlayerUpdate...; BlindOne_EnterPhase/_UpdateFight
+sBlindOnePhases_2 = 0x0046B32C; // module-2 copy (17 module-2 users) (linked at 0x0043232C)
+sBlindOnePhases_update = 0x00432410; // &sBlindOnePhases[0].update (BlindOne_UpdateFight)
+sBlindOnePhases_update_2 = 0x0046B330; // &sBlindOnePhases_2[0].update (BlindOne_UpdateFight_2) (linked at 0x00432330)
+sBlindOneHitScript = 0x00432464; // ScriptAnimator hit flash: BlindOne_BossHurt, BlindOne_ActorHurt
+sBlindOneHitScript_2 = 0x0046B384; // module-2 copy (linked at 0x00432384)
+sBlindOneMoverSeq1 = 0x00432494; // u32 actor bit masks played by mover 0 (BlindOne_PhaseGroup1Init -> BlindOne_UpdateMover)
+sBlindOneMoverSeq1_2 = 0x0046B3B4; // module-2 copy (linked at 0x004323B4)
+sBlindOneMoverSeq2 = 0x004324C8; // mover 1's sequence (BlindOne_PhaseGroup2Init)
+sBlindOneMoverSeq2_2 = 0x0046B3E8; // module-2 copy (linked at 0x004323E8)
+sBlindOneMoverSeq3 = 0x004324F4; // mover 2's sequence (BlindOne_PhaseGroup3Init)
+sBlindOneMoverSeq3_2 = 0x0046B414; // module-2 copy (linked at 0x00432414)
+
+// ---- Demo playback (structs/demo.h)
+gDemoTable = 0x004384E8; // NULL-terminated DemoHeader* list played in turn by Demo_PlayNext (demo.h)
+gDemoTable_2 = 0x00471408; // module-2 copy (Demo_PlayNext_2; pointers 0xE0 lower) (linked at 0x00438408)
+
+// ---- Menu descriptors (MenuDesc, structs/menu.h; identified by their init/poll callbacks read from the ROM)
+gRumbleNoticeMenuDesc = 0x00438670; // poll RumbleMenu_Poll; 'rumble pak compatible' notice, PlayerSetupMenu_Play
+gRumbleNoticeMenuDesc_2 = 0x00471590; // module-2 copy (linked at 0x00438590)
+gPlayerSetupMenuDesc = 0x00438748; // poll PlayerSetupMenu_Poll; opened by CharacterMenu_SelectCharacter, CharNoteMenu_SelectYes
+gPlayerSetupMenuDesc_2 = 0x00471668; // module-2 copy (linked at 0x00438668)
+gCharacterMenuDesc = 0x00438808; // init CharacterMenu_Init, poll CharacterMenu_Poll; TeamMenu_Choose*, PakMenu_SelectCancel
+gCharacterMenuDesc_2 = 0x00471728; // module-2 copy (linked at 0x00438728)
+gCharacterMenuAfterPakDesc = 0x0043882C; // same items, init 0x004181C8 (unnamed); the menu PakMenu_InitLoadProfile/GetReturnMenu go back to
+gCharacterMenuAfterPakDesc_2 = 0x0047174C; // module-2 copy (linked at 0x0043874C)
+sPlayerSpeedTable = 0x00438900; // ScaleTable {unk0, scale[16]} (-0.5..): MpMenu_StepPlayerSpeed
+sPlayerSpeedTable_scale_2 = 0x00471824; // &copy.scale[0] in module 2 (MpMenu_StepPlayerSpeed_2 indexes f32 from here) (linked at 0x00438824)
+gFragTagMenuDesc = 0x00438AAC; // 'frag tag' setup (DeathmatchMenu_OpenFragTag, MpMenu_StartFragTag)
+gFragTagMenuDesc_2 = 0x004719CC; // module-2 copy (linked at 0x004389CC)
+gBloodLustMenuDesc = 0x00438C38; // 'blood lust' setup (DeathmatchMenu_OpenBloodLust)
+gBloodLustMenuDesc_2 = 0x00471B58; // module-2 copy (linked at 0x00438B58)
+gTeamBloodMenuDesc = 0x00438DC4; // 'team blood' setup (DeathmatchMenu_OpenTeamBlood)
+gTeamBloodMenuDesc_2 = 0x00471CE4; // module-2 copy (linked at 0x00438CE4)
+gWeaponsMenuDesc = 0x00438F74; // 'customize weapons' (DeathmatchMenu_OpenWeapons)
+gWeaponsMenuDesc_2 = 0x00471E94; // module-2 copy (linked at 0x00438E94)
+gDeathmatchMenuDesc = 0x00439094; // 'deathmatch' (TitleMenu_Multi); parent of the four above
+gDeathmatchMenuDesc_2 = 0x00471FB4; // module-2 copy (linked at 0x00438FB4)
+gSingleMenuAfterPakDesc = 0x00439190; // 'single' items, init 0x00419594 (unnamed); returned to by the game-load pak menus (PakMenu_InitLoadGame...)
+gSingleMenuAfterPakDesc_2 = 0x004720B0; // module-2 copy (linked at 0x004390B0)
+gTitleMenuDesc = 0x004392B0; // title menu ('single', 'multi', 'enter cheat'...): EngineMode08_MainMenu_Init
+gQuitMenuDesc = 0x00439394; // init QuitMenu_Init; 'quit' 'are you sure?' (PauseMenu_Quit)
+gQuitMenuDesc_2 = 0x004722B4; // module-2 copy (linked at 0x004392B4)
+gSoundOptionsMenuDesc = 0x004394B4; // 'sound options' (PauseMenu_/TitleMenu_SoundOptions)
+gSoundOptionsMenuDesc_2 = 0x004723D4; // module-2 copy (linked at 0x004393D4)
+gPauseMenuDesc = 0x00439640; // init/close/update PauseMenu_*; CPlayerPool__Update, CPlayer__IsPausedOrInMenu
+gContinueMenuDesc = 0x004396DC; // 'continue ?' after a single-player death with lives left (PlayerState15_Enter)
+gGameOverMenuDesc = 0x00439748; // init GameOverMenu_Init, poll GameOverMenu_Poll (PlayerState15_Enter)
+sCheatCodes = 0x00439770; // CheatCode[12] (rw/abu_types.h) {code, unk4, flags, sound}: EnterCheatMenu_Enter
+sCheatCodes_unk4 = 0x00439774; // &sCheatCodes[0].unk4, the result text EnterCheatMenu_ResultLabel shows
+sCheatCodes_2 = 0x00472690; // module-2 copy (EnterCheatMenu_Enter_2) (linked at 0x00439690)
+sCheatCodes_unk4_2 = 0x00472694; // &sCheatCodes_2[0].unk4 (EnterCheatMenu_ResultLabel_2) (linked at 0x00439694)
+gEnterCheatMenuDesc = 0x00439CD4; // init EnterCheatMenu_Init (Pause/TitleMenu_EnterCheat)
+gEnterCheatMenuDesc_2 = 0x00472BF4; // module-2 copy (linked at 0x00439BF4)
+gCheatsMenuDesc = 0x00439FC8; // init CheatsMenu_Init (Pause/TitleMenu_Cheats)
+gCheatsMenuDesc_2 = 0x00472EE8; // module-2 copy (linked at 0x00439EE8)
+gOptionsMenuDesc = 0x0043A230; // init OptionsMenu_Init (Pause/TitleMenu_Options)
+gOptionsMenuDesc_2 = 0x00473150; // module-2 copy (linked at 0x0043A150)
+// Multiplayer stats, one MenuDesc per player (items D_0043A260/A4A0/A6E0/A920)
+gStatsContinueMenuDesc1 = 0x0043AB60; // init StatsMenu_InitContinue, poll StatsMenu_IsMatchOver, player 1 (PlayerState15_Enter)
+gStatsContinueMenuDesc2 = 0x0043AB84; // player 2
+gStatsContinueMenuDesc3 = 0x0043ABA8; // player 3
+gStatsContinueMenuDesc4 = 0x0043ABCC; // player 4
+gStatsSaveDoneMenuDesc1 = 0x0043ABF0; // init StatsMenu_InitSaveDone, player 1 (PlayerState16_Enter)
+gStatsSaveDoneMenuDesc2 = 0x0043AC14; // player 2
+gStatsSaveDoneMenuDesc3 = 0x0043AC38; // player 3
+gStatsSaveDoneMenuDesc4 = 0x0043AC5C; // player 4
+gStatsAfterPakMenuDesc1 = 0x0043AC80; // init StatsMenu_InitAfterPak, player 1 (PakMenu_GetReturnMenu, func_00421AEC)
+gStatsAfterPakMenuDesc2 = 0x0043ACA4; // player 2
+gStatsAfterPakMenuDesc3 = 0x0043ACC8; // player 3
+gStatsAfterPakMenuDesc4 = 0x0043ACEC; // player 4
+gStatsAfterPakMenuDesc1_2 = 0x00473BA0; // module-2 copies (linked at 0x0043ABA0)
+gStatsAfterPakMenuDesc2_2 = 0x00473BC4; (linked at 0x0043ABC4)
+gStatsAfterPakMenuDesc3_2 = 0x00473BE8; (linked at 0x0043ABE8)
+gStatsAfterPakMenuDesc4_2 = 0x00473C0C; (linked at 0x0043AC0C)
+gNameEntryMenuDesc = 0x0043B364; // init NameEntryMenu_Init, poll NameEntryMenu_IsMatchOver (PlayerSetupMenu_EditName)
+gNameEntryMenuDesc_2 = 0x00474284; // module-2 copy (linked at 0x0043B284)
+// Controller pak menus (items D_0043B390)
+gPakLoadProfileMenuDesc = 0x0043B6A8; // init PakMenu_InitLoadProfile, poll PakMenu_PollPak
+gPakSaveProfileMenuDesc = 0x0043B6CC; // init PakMenu_InitSaveProfile (StatsMenu_SaveProfile)
+gPakLoadGameMenuDesc = 0x0043B6F0; // init PakMenu_InitLoadGame, poll PakMenu_PollPakB (SingleMenu_Load)
+gPakSaveGameMenuDesc = 0x0043B714; // init PakMenu_InitSaveGame (SavePortalMenu_SelectSave)
+gPakSaveGameAnyPakMenuDesc = 0x0043B738; // init PakMenu_InitSaveGameAnyPak, poll PakMenu_PollBootPak (EngineMode00_PakCheck_Retrace)
+gPakLoadProfileMenuDesc_2 = 0x004745C8; // module-2 copies (linked at 0x0043B5C8)
+gPakSaveProfileMenuDesc_2 = 0x004745EC; (linked at 0x0043B5EC)
+gPakLoadGameMenuDesc_2 = 0x00474610; (linked at 0x0043B610)
+gPakSaveGameMenuDesc_2 = 0x00474634; (linked at 0x0043B634)
+gPakSaveGameAnyPakMenuDesc_2 = 0x00474658; (linked at 0x0043B658)
+gGameNoteLoadMenuDesc = 0x0043B8C4; // init GameNoteMenu_InitLoad (PakMenu_SelectNote)
+gGameNoteDeleteMenuDesc = 0x0043B8E8; // init GameNoteMenu_InitDelete
+gGameNoteLoadMenuDesc_2 = 0x004747E4; // module-2 copy (linked at 0x0043B7E4)
+gGameNoteDeleteMenuDesc_2 = 0x00474808; // module-2 copy (linked at 0x0043B808)
+gCharNoteLoadMenuDesc = 0x0043BA50; // init CharNoteMenu_InitLoad (PakMenu_SelectNote)
+gCharNoteDeleteMenuDesc = 0x0043BA74; // init CharNoteMenu_InitDelete
+gCharNoteMenuDesc3 = 0x0043BA98; // CharNote items, init 0x004221C4 (unnamed); PakMenu_SelectNote after the note-name check
+gCharNoteLoadMenuDesc_2 = 0x00474970; // module-2 copies (linked at 0x0043B970)
+gCharNoteDeleteMenuDesc_2 = 0x00474994; (linked at 0x0043B994)
+gCharNoteMenuDesc3_2 = 0x004749B8; (linked at 0x0043B9B8)
+// Pak messages (items D_0043BABC; one desc per PakMessage_Init*)
+gPakMsgPakFullDesc = 0x0043BBDC; // PakMessage_InitPakFull
+gPakMsgPakNotFoundDesc = 0x0043BC00; // PakMessage_InitPakNotFound
+gPakMsgInsertToManageDesc = 0x0043BC24; // PakMessage_InitInsertToManage
+gPakMsgInsertToSaveDesc = 0x0043BC48; // PakMessage_InitInsertToSave
+gPakMsgInsertToLoadDesc = 0x0043BC6C; // PakMessage_InitInsertToLoad
+gPakMsgInsertRumblePakDesc = 0x0043BC90; // PakMessage_InitInsertRumblePak
+gPakMsgCannotSaveDesc = 0x0043BCB4; // PakMessage_InitCannotSave
+gPakMsgPakChangedDesc = 0x0043BCD8; // PakMessage_InitPakChanged
+gPakMsgNoControllerDesc = 0x0043BCFC; // PakMessage_InitNoController
+gPakMsgRumblePakDesc = 0x0043BD20; // PakMessage_InitRumblePak
+gPakMsgRumblePakBDesc = 0x0043BD44; // PakMessage_InitRumblePakB (SingleMenu_NewGame)
+gPakMsgSaveDoneDesc = 0x0043BD68; // PakMessage_InitSaveDone
+gPakMsgDeleteDoneDesc = 0x0043BDB0; // PakMessage_InitDeleteDone
+gPakMsgRepairedDesc = 0x0043BDD4; // PakMessage_InitRepaired
+gPakMsgSaveFailedDesc = 0x0043BDF8; // PakMessage_InitSaveFailed
+gPakMsgDeleteFailedDesc = 0x0043BE1C; // PakMessage_InitDeleteFailed
+gPakMsgPakFullDesc_2 = 0x00474AFC; // module-2 copies (init PakMessage_*_2) (linked at 0x0043BAFC)
+gPakMsgPakNotFoundDesc_2 = 0x00474B20; (linked at 0x0043BB20)
+gPakMsgInsertToManageDesc_2 = 0x00474B44; (linked at 0x0043BB44)
+gPakMsgInsertToSaveDesc_2 = 0x00474B68; (linked at 0x0043BB68)
+gPakMsgInsertToLoadDesc_2 = 0x00474B8C; (linked at 0x0043BB8C)
+gPakMsgInsertRumblePakDesc_2 = 0x00474BB0; (linked at 0x0043BBB0)
+gPakMsgCannotSaveDesc_2 = 0x00474BD4; (linked at 0x0043BBD4)
+gPakMsgPakChangedDesc_2 = 0x00474BF8; (linked at 0x0043BBF8)
+gPakMsgNoControllerDesc_2 = 0x00474C1C; (linked at 0x0043BC1C)
+gPakMsgRumblePakDesc_2 = 0x00474C40; (linked at 0x0043BC40)
+gPakMsgRumblePakBDesc_2 = 0x00474C64; (linked at 0x0043BC64)
+gPakMsgSaveDoneDesc_2 = 0x00474C88; (linked at 0x0043BC88)
+gPakMsgDeleteDoneDesc_2 = 0x00474CD0; (linked at 0x0043BCD0)
+gPakMsgRepairedDesc_2 = 0x00474CF4; (linked at 0x0043BCF4)
+gPakMsgSaveFailedDesc_2 = 0x00474D18; (linked at 0x0043BD18)
+gPakMsgDeleteFailedDesc_2 = 0x00474D3C; (linked at 0x0043BD3C)
+gSavePortalMenuDesc = 0x0043BED0; // init/close/poll SavePortalMenu_*; also CPlayerPool__Update
+gSavePortalMenuDescB = 0x0043BEF4; // init SavePortalMenu_InitB
+gSavePortalMenuDesc_2 = 0x00474DF0; // module-2 copy (linked at 0x0043BDF0)
+gSavePortalMenuDescB_2 = 0x00474E14; // module-2 copy (linked at 0x0043BE14)
+gDamagedPakInGameMenuDesc = 0x0043C038; // init DamagedPakMenu_InitInGame, poll DamagedPakMenu_Poll
+gDamagedPakAtBootMenuDesc = 0x0043C05C; // init DamagedPakMenu_InitAtBoot
+gDamagedPakInGameMenuDesc_2 = 0x00474F58; // module-2 copy (linked at 0x0043BF58)
+gDamagedPakAtBootMenuDesc_2 = 0x00474F7C; // module-2 copy (linked at 0x0043BF7C)
+gPakConfirmRepairDesc = 0x0043C1A0; // PakConfirmMenu_InitRepair (poll PakConfirmMenu_Poll)
+gPakConfirmNoSpaceDesc = 0x0043C1C4; // PakConfirmMenu_InitNoSpace
+gPakConfirmNoSpaceAllDesc = 0x0043C1E8; // PakConfirmMenu_InitNoSpaceAll
+gPakConfirmOverwriteDesc = 0x0043C20C; // PakConfirmMenu_InitOverwrite
+gPakConfirmCorruptNoteDesc = 0x0043C230; // PakConfirmMenu_InitCorruptNote
+gPakConfirmRepairDesc_2 = 0x004750C0; // module-2 copies (linked at 0x0043C0C0)
+gPakConfirmNoSpaceDesc_2 = 0x004750E4; (linked at 0x0043C0E4)
+gPakConfirmNoSpaceAllDesc_2 = 0x00475108; (linked at 0x0043C108)
+gPakConfirmOverwriteDesc_2 = 0x0047512C; (linked at 0x0043C12C)
+gPakConfirmCorruptNoteDesc_2 = 0x00475150; (linked at 0x0043C150)
+gInventoryMenuDesc = 0x0043C944; // init InventoryMenu_Init (PauseMenu_Inventory)
+gInventoryMenuDesc_2 = 0x00475864; // module-2 copy (linked at 0x0043C864)
+gMissionStatusMenuDesc = 0x0043CA90; // init MissionMenu_InitStatus (PauseMenu_MissionStatus)
+gMissionStatusMenuDesc_2 = 0x004759B0; // module-2 copy (linked at 0x0043C9B0)
+gMissionFailedMenuDesc = 0x0043CAB4; // init MissionMenu_InitFailed: CPlayer__ShowLevelNotCompleteScreen, CPlayerPool__Update

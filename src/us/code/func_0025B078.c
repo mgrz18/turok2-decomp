@@ -27,7 +27,7 @@ typedef struct {
 } HitInfo;
 
 
-extern u8 D_8011AAEF;
+extern u8 gEngineApp_m_Settings_unk17;
 
 extern s32 Random_Next(void); /* rand */
 extern s32 CGameObjectInstance__PickRandomAnim(CGameObjectInstance *actor, s32 model, s32 arg2);
@@ -41,7 +41,7 @@ s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, s32 unused, HitInfo *hit) 
     s32 blast = 0;
 
     anims = &actor->header.m_pIntelligence->m_Enemy;
-    if (D_8011AAEF != 0 && (src = hit->source) != NULL) {
+    if (gEngineApp_m_Settings_unk17 != 0 && (src = hit->source) != NULL) {
         switch (src->kind) {
             case 2:
                 switch (src->type) {
@@ -103,7 +103,7 @@ s32 EnemyAI_PickDeathMode(CGameObjectInstance *actor, s32 unused, HitInfo *hit) 
                 break;
         }
     }
-    if (D_8011AAEF != 0 && (hit->flags & 0x800000) && anims->m_ExplodeDeathModel != -1) {
+    if (gEngineApp_m_Settings_unk17 != 0 && (hit->flags & 0x800000) && anims->m_ExplodeDeathModel != -1) {
         if (CGameObjectInstance__PickRandomAnim(actor, anims->m_GibModel + 1, -1) != -1) {
             return 0x35;
         }

@@ -13,9 +13,9 @@ typedef struct {
     /* 0x114 */ CVector3 pos;
 } Ui;
 
-extern f32 D_800B6D28;      /* frame time */
-extern char D_800ADF00;     /* swimming look tuning */
-extern Tuning D_800ADEDC;   /* swimming move tuning */
+extern f32 gFrameIncrement;      /* frame time */
+extern char gSwimLookTuning;     /* swimming look tuning */
+extern Tuning gSwimMoveTuning;   /* swimming move tuning */
 
 void CPlayer__TurnAndLook(CPlayer *player, CGameObjectInstance *body, void *tuning);
 void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, void *tuning);
@@ -42,15 +42,15 @@ void PlayerSwim_Update(CPlayer *player, CGameObjectInstance *body) {
     } else {
         player->m_Mode = 0xB;
     }
-    CPlayer__TurnAndLook(player, body, &D_800ADF00);
+    CPlayer__TurnAndLook(player, body, &gSwimLookTuning);
     player->m_vHeadWobbleRotOffset.x = func_002982F0(player->m_ModeTime * 0.06981318f) * 2 * 0.017453294f;
     player->m_vHeadWobbleRotOffset.y = func_002982F0(player->m_ModeTime * 0.087266475f) * 2 * 0.017453294f;
     player->m_vHeadWobbleRotOffset.z = func_002982F0(player->m_ModeTime * 0.104719765f) * 2 * 0.017453294f;
-    CPlayer__MoveInWater(player, body, &D_800ADEDC);
+    CPlayer__MoveInWater(player, body, &gSwimMoveTuning);
     if (!(body->m_AI.m_dwFlags & 0x80) && 2.0f < player->m_ModeTime) {
         reset_strokes(&player->m_Barrel);
         body->m_vVelocity.y = 0.0f;
-        if (!D_8011AAD8.multiplayer) {
+        if (!gEngineApp_m_Settings.multiplayer) {
             if (player->m_bOxygenOut) {
                 Sound__Play(0x3AC3, player->m_CharacterActor.header.m_vPos, &player->m_CharacterActor.header.m_vPos, -1);
             } else if (52.5f < player->m_Oxygen) {
@@ -78,9 +78,9 @@ void PlayerSwim_Update(CPlayer *player, CGameObjectInstance *body) {
             player->m_CharAnim = 0x14;
         }
     }
-    player->m_SfxTimer += D_800B6D28;
+    player->m_SfxTimer += gFrameIncrement;
     if (5.12f < player->m_TotalSpeed && 45.0f < player->m_SfxTimer) {
         player->m_SfxTimer = Random_Float(15.0f);
-        Sound__Play(D_800ADEDC.strokeSound, body->header.m_vPos, NULL, -1);
+        Sound__Play(gSwimMoveTuning.strokeSound, body->header.m_vPos, NULL, -1);
     }
 }

@@ -10,7 +10,7 @@
 #define AL_USEC_PER_FRAME 16000
 #define AL_SEQP_API_EVT 9
 
-extern ALGlobals *D_800B7760; /* alGlobals */
+extern ALGlobals *alGlobals; /* alGlobals */
 void *alHeapDBAlloc(char *file, s32 line, void *hp, s32 num, s32 size); /* alHeapDBAlloc */
 void __initChanState(ALSeqPlayer *seqp);                                   /* __initChanState */
 void alEvtqNew(ALEventQueue *evtq, void *items, s32 itemCount);     /* alEvtqNew */
@@ -29,7 +29,7 @@ void alSeqpNew(ALSeqPlayer *seqp, ALSeqpConfig *c) {
 
     seqp->bank = 0;
     seqp->target = 0;
-    seqp->drvr = &D_800B7760->drvr;
+    seqp->drvr = &alGlobals->drvr;
     seqp->chanMask = 0xFF;
     seqp->uspt = 488;
     seqp->nextDelta = 0;
@@ -68,5 +68,5 @@ void alSeqpNew(ALSeqPlayer *seqp, ALSeqpConfig *c) {
     seqp->node.next = 0;
     seqp->node.handler = __seqpVoiceHandler;
     seqp->node.clientData = seqp;
-    alSynAddPlayer(D_800B7760, &seqp->node);
+    alSynAddPlayer(alGlobals, &seqp->node);
 }

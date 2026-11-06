@@ -16,13 +16,51 @@ turns off. So each `.align` followed by an address label becomes `.org label - b
 which is what `.align` gives when the base is aligned, and the right thing
 when it is not. Lines this cannot resolve pass through unchanged.
 
+A label with a real name (tools/apply_names.py: `gEngineModeTable`) carries
+no address, so names are looked up in versions/symbols_names.us.txt.
+
 Usage: filter, stdin to stdout.
 """
 
 import re
 import sys
+from pathlib import Path
 
-LABEL = re.compile(r"^(?:\.globl\s+)?(?:D|jtbl)_([0-9A-F]{8}):?\s*$")
+LABEL_RE = re.compile(r"^(?:\.globl\s+)?([A-Za-z_]\w*):?\s*$")
+AUTO = re.compile(r"^(?:D|jtbl)_([0-9A-F]{8})$")
+NAMED = {}
+_syms = Path(__file__).resolve().parent.parent / "versions" / "symbols_names.us.txt"
+if _syms.exists():
+    for _l in _syms.read_text().splitlines():
+        _m = re.match(r"^(\w+)\s*=\s*0x([0-9A-Fa-f]+);", _l)
+        if _m:
+            NAMED[_m.group(1)] = int(_m.group(2), 16)
+
+
+class _Label:
+    """LABEL.match(line): a match whose group(1) is the label's address, hex."""
+
+    @staticmethod
+    def match(line):
+        m = LABEL_RE.match(line)
+        if not m:
+            return None
+        a = AUTO.match(m.group(1))
+        addr = int(a.group(1), 16) if a else NAMED.get(m.group(1))
+        if addr is None:
+            return None
+        return _Hit(addr)
+
+
+class _Hit:
+    def __init__(self, addr):
+        self.addr = addr
+
+    def group(self, _i):
+        return f"{self.addr:08X}"
+
+
+LABEL = _Label()
 
 
 def main():

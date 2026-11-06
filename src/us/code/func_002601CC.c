@@ -5,7 +5,7 @@ f32 Random_Blend(f32, f32);                        /* extern */
 s32 CAI__SetMode(void *, void *, s32);     /* extern */
 extern f32 D_800A797C;
 extern f32 D_800A7980;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 /* m_VarBuffer[6] holds a float timer here. */
 s32 EnemyAI_TryTeleportOut(CGameObjectInstance *arg0, CAI *arg1) {
@@ -13,7 +13,7 @@ s32 EnemyAI_TryTeleportOut(CGameObjectInstance *arg0, CAI *arg1) {
     s8 temp_v1;
 
     if (arg0->header.m_pIntelligence->m_Enemy.m_dwFlags & 0x40) {
-        temp_f0 = *(f32 *) &arg1->m_VarBuffer[6] - D_800B6D28;
+        temp_f0 = *(f32 *) &arg1->m_VarBuffer[6] - gFrameIncrement;
         *(f32 *) &arg1->m_VarBuffer[6] = temp_f0;
         if (temp_f0 < 0.0f) {
             *(f32 *) &arg1->m_VarBuffer[6] = 0.0f;

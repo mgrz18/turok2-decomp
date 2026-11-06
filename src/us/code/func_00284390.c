@@ -2,13 +2,13 @@
 #include "structs/cinema.h"
 
 f32 Cinema_GetFOV(f32);
-extern Cinema *D_800C1BB0;
+extern Cinema *gCinemaPlayerP;
 
 f32 Cinema_GetCameraFov(void) {
     f32 value;
 
-    if (D_800C1BB0->active != 0) {
-        value = Cinema_GetFOV(D_800C1BB0->time);
+    if (gCinemaPlayerP->active != 0) {
+        value = Cinema_GetFOV(gCinemaPlayerP->time);
     } else {
         value = 47.5f;
     }

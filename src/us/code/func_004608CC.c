@@ -5,7 +5,7 @@
 #include "ultra_types.h"
 extern s32 __osPfsReleasePages_2(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank,
                          __OSInodeUnit *last_page, int flag);
-extern s32 func_00427A6C(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank);
+extern s32 __osBlockSum_2(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank);
 s32 __osPfsReleasePages_2(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum, u8 bank,
                   __OSInodeUnit *last_page, int flag)
 {
@@ -27,7 +27,7 @@ s32 __osPfsReleasePages_2(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum,
     if (flag == 1) {
         inode->inode_page[start_page].ipage = 3;
     }
-    ret = func_00427A6C(pfs, start_page, sum, bank);
+    ret = __osBlockSum_2(pfs, start_page, sum, bank);
     if (ret != 0)
         return ret;
     if (next_page.ipage == 1) {
@@ -37,7 +37,7 @@ s32 __osPfsReleasePages_2(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum,
         old_page = next_page;
         next_page = inode->inode_page[next_page.inode_t.page];
         inode->inode_page[old_page.inode_t.page].ipage = 3;
-        ret = func_00427A6C(pfs, old_page.inode_t.page, sum, bank);
+        ret = __osBlockSum_2(pfs, old_page.inode_t.page, sum, bank);
         if (ret != 0)
             return ret;
         if (next_page.inode_t.bank != bank) {
@@ -50,4 +50,4 @@ s32 __osPfsReleasePages_2(OSPfs *pfs, __OSInode *inode, u8 start_page, u16 *sum,
     *last_page = next_page;
     return 0;
 }
-s32 func_00427A6C(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank);
+s32 __osBlockSum_2(OSPfs *pfs, u8 page_no, u16 *sum, u8 bank);

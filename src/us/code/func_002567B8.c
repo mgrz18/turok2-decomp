@@ -4,7 +4,7 @@
 #include "structs/game_object.h"
 
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 void *CScene__GetRegionInfo(void *tbl, s32 id);
 
 
@@ -12,7 +12,7 @@ s32 Actor_IsInRegionFlag40(CGameObjectInstance *actor)
 {
     s32 id = ((s32)actor->header.m_pCurrentRegion);
     if (id != 0) {
-        void *p = CScene__GetRegionInfo(D_800F7078, id);
+        void *p = CScene__GetRegionInfo(gScene, id);
         if (p != ((void *)0)) {
             if (*(u16 *)((u8 *)p + 0x52) & 0x40) {
                 return 1;

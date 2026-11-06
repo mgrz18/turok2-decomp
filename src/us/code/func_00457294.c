@@ -4,15 +4,15 @@
 /* Controller pak check for saving: a pad that already holds one of the game's two notes is usable as is
  * (0x7B blocks); otherwise checks the pak's free space against the save size and keeps the largest need. */
 
-extern char D_800B45C0[];
-extern char D_800B45CC[];
-extern s32 D_800C2028; /* pad */
+extern char gPakCharacterNoteName[];
+extern char gPakGameNoteName[];
+extern s32 gPakMenuPort; /* pad */
 extern s32 D_800F70A8;
-s32 func_00426898(s32 pad, s32 idx, u8 **out);
-void func_00426BA8(u8 *src, u8 *dst, s32 n);
-s32 func_00426C74(char *a, char *b);
-s32 func_004266C0(s32 pad, s32 *out);
-s32 func_0042662C(s32 pad, s32 *out);
+s32 Pak_GetNoteGameName_2(s32 pad, s32 idx, u8 **out);
+void func_0045FBA8(u8 *src, u8 *dst, s32 n);
+s32 Str_Compare_2(char *a, char *b);
+s32 Pak_GetFreePages_2(s32 pad, s32 *out);
+s32 Pak_CountEmptyNotes_2(s32 pad, s32 *out);
 s32 Pak_BytesToPages_2(s32 n);
 
 static __inline__ s32 FindNote(s32 pad, char *name) {
@@ -21,9 +21,9 @@ static __inline__ s32 FindNote(s32 pad, char *name) {
     s32 i;
 
     for (i = 0; i < 16; i++) {
-        func_00426898(pad, i, &ent);
-        func_00426BA8(ent, buf, 16);
-        if (func_00426C74((char *)buf, name) == 0) {
+        Pak_GetNoteGameName_2(pad, i, &ent);
+        func_0045FBA8(ent, buf, 16);
+        if (Str_Compare_2((char *)buf, name) == 0) {
             return 1;
         }
     }
@@ -38,16 +38,16 @@ s32 PakMenu_CheckSlotForSave_2(s32 unused, s32 pad, s32 *outPad, s32 *outBlocks)
     s32 b;
     s32 need;
 
-    f1 = FindNote(pad, D_800B45C0);
-    f2 = FindNote(pad, D_800B45CC);
+    f1 = FindNote(pad, gPakCharacterNoteName);
+    f2 = FindNote(pad, gPakGameNoteName);
     if (f1 != 0 || f2 != 0) {
         *outPad = pad;
         *outBlocks = 0x7B;
         return 1;
     }
-    r = func_004266C0(D_800C2028, &a);
+    r = Pak_GetFreePages_2(gPakMenuPort, &a);
     if (r == 0) {
-        r = func_0042662C(D_800C2028, &b);
+        r = Pak_CountEmptyNotes_2(gPakMenuPort, &b);
         if (r == 0) {
             need = Pak_BytesToPages_2(D_800F70A8 + 0x688);
             if (b == 0 || a < need) {

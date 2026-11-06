@@ -18,11 +18,11 @@ typedef union {
     f32 f;
 } fu;
 
-extern const du D_800AA830[]; /* P: polynomial coefficients */
-extern const du D_800AA858;   /* 1/pi */
-extern const du D_800AA860;   /* pi, high part */
-extern const du D_800AA868;   /* pi, low part */
-extern const fu D_800AA870;   /* 0.0f */
+extern const du sSinfP[]; /* P: polynomial coefficients */
+extern const du sSinfRpi;   /* 1/pi */
+extern const du sSinfPiHi;   /* pi, high part */
+extern const du sSinfPiLo;   /* pi, low part */
+extern const fu sSinfZero;   /* 0.0f */
 
 f32 func_002982F0(f32 x) {
     f32 dx;
@@ -42,25 +42,25 @@ f32 func_002982F0(f32 x) {
     if (xpt < 0xFF) {
         if (xpt >= 0xE6) {
             xsq = dx * dx;
-            fpoly = (((D_800AA830[4].d * xsq + D_800AA830[3].d) * xsq + D_800AA830[2].d) * xsq + D_800AA830[1].d);
+            fpoly = (((sSinfP[4].d * xsq + sSinfP[3].d) * xsq + sSinfP[2].d) * xsq + sSinfP[1].d);
             return dx + dx * xsq * fpoly;
         }
         return dx;
     }
 
     if (xpt < 0x136) {
-        dn = dx * D_800AA858.d;
+        dn = dx * sSinfRpi.d;
         if (dn >= 0.0f) {
             n = dn + 0.5f;
         } else {
             n = dn - 0.5f;
         }
         dn = n;
-        dx = dx - dn * D_800AA860.d;
-        dx = dx - dn * D_800AA868.d;
+        dx = dx - dn * sSinfPiHi.d;
+        dx = dx - dn * sSinfPiLo.d;
 
         xsq = dx * dx;
-        fpoly = (f32)(((D_800AA830[4].d * xsq + D_800AA830[3].d) * xsq + D_800AA830[2].d) * xsq + D_800AA830[1].d);
+        fpoly = (f32)(((sSinfP[4].d * xsq + sSinfP[3].d) * xsq + sSinfP[2].d) * xsq + sSinfP[1].d);
         result = dx + dx * xsq * fpoly;
 
         if (n & 1) {
@@ -69,5 +69,5 @@ f32 func_002982F0(f32 x) {
         return result;
     }
 
-    return D_800AA870.f;
+    return sSinfZero.f;
 }

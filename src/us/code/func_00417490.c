@@ -2,7 +2,7 @@
 #include "structs/game.h"
 #include "structs/controller.h"
 
-extern CPlayerOptions D_8011AB58[4]; /* D_8011AAD8.slots */
+extern CPlayerOptions gEngineApp_m_Settings_slots[4]; /* gEngineApp_m_Settings.slots */
 
 extern s32 Controller_ConfirmPressed(ControllerProfile *ctl);
 extern s32 Random_Next(void);
@@ -10,7 +10,7 @@ extern void func_00430454(void *a, s32 level);
 
 /* Mp_SetupMatchRules, inlined. */
 static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
-    GameMatch *m = &D_8011AAD8.match;
+    GameMatch *m = &gEngineApp_m_Settings.match;
 
     m->tag = started;
     m->teams = a3;
@@ -27,7 +27,7 @@ static __inline__ void StartMatch(f32 minutes, s32 a1, s32 started, s32 a3) {
 }
 
 s32 MpMenu_StartFragTag(void) {
-    GameSettings *setup = &D_8011AAD8;
+    GameSettings *setup = &gEngineApp_m_Settings;
     s32 level;
     s32 arg;
     s32 i;
@@ -38,9 +38,9 @@ s32 MpMenu_StartFragTag(void) {
     for (i = 3; i >= 0; i--) {
         setup->slots[i].m_nCharacter = 0;
     }
-    for (i = 0, ctl = D_800F5EC0; i < 4; i++, ctl++) {
+    for (i = 0, ctl = gControllers; i < 4; i++, ctl++) {
         if (Controller_ConfirmPressed(ctl)) {
-            CPlayerOptions *slot = &D_8011AB58[i];
+            CPlayerOptions *slot = &gEngineApp_m_Settings_slots[i];
 
             slot->m_bActive = 1;
             slot->m_nController = i;
@@ -56,6 +56,6 @@ s32 MpMenu_StartFragTag(void) {
     } else {
         arg = Random_Next() % 6 + 0x2337;
     }
-    func_00430454(&D_800F6CB0, arg);
+    func_00430454(&gEngineApp, arg);
     return 1;
 }

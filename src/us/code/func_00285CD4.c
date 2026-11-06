@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800B6CF8;
+extern s32 gMenuSoundsEnabled;
 
 void Controller_EnableMenuSounds(void) {
-    D_800B6CF8 = 1;
+    gMenuSoundsEnabled = 1;
 }

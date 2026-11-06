@@ -4,7 +4,7 @@
 #include "common.h"
 #include "ultra_types.h"
 extern s32 __osCheckId_2(OSPfs *pfs);
-extern s32 func_00429DE4(OSPfs *pfs);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
 extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
 s32 __osCheckId_2(OSPfs *pfs)
 {
@@ -13,7 +13,7 @@ s32 __osCheckId_2(OSPfs *pfs)
     s32 ret;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429DE4(pfs);
+        ret = __osPfsSelectBank_2(pfs);
         if (ret != 0)
             return ret;
     }

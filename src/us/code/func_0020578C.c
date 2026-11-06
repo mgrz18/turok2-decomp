@@ -1,8 +1,8 @@
 #include "common.h"
 
-extern char D_800D8450[];
+extern char gCache_queue[];
 extern void osSendMesg(void *, s32, s32);
 
 void CCache__PostDisplayListDone(s32 unused, s32 x) {
-    osSendMesg(D_800D8450, x, 1);
+    osSendMesg(gCache_queue, x, 1);
 }

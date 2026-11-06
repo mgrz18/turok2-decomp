@@ -37,7 +37,7 @@ typedef struct Emitter {
     /* 0x4C */ f32 totalLength;
 } Emitter;
 
-extern s32 D_800B6D1C;
+extern s32 gEvenOdd;
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
 void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
@@ -53,10 +53,10 @@ static __inline__ void placeNode(Emitter *e, EmitNode *n, CParticle *o) {
     f32 k;
 
     if (o == (CParticle *)-1) {
-        n->mtx[D_800B6D1C] = n->mtx[D_800B6D1C ^ 1];
+        n->mtx[gEvenOdd] = n->mtx[gEvenOdd ^ 1];
         n->owner = NULL;
     } else {
-        CMtxF__FromMtxAffine(m, o->m_mtxDraw[D_800B6D1C]);
+        CMtxF__FromMtxAffine(m, o->m_mtxDraw[gEvenOdd]);
         k = 0.01f;
         if (o->m_pEffect->m_pModel != NULL) {
             k = 0.29257143f;
@@ -67,7 +67,7 @@ static __inline__ void placeNode(Emitter *e, EmitNode *n, CParticle *o) {
         if (e->flags & 4) {
             CMtxF__GetScale(m, n->rot);
         } else {
-            CMtxF__ToMtxAffine(m, &n->mtx[D_800B6D1C]);
+            CMtxF__ToMtxAffine(m, &n->mtx[gEvenOdd]);
         }
     }
 }

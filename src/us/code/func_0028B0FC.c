@@ -5,18 +5,18 @@
 
 extern int D_800B6E60;
 extern void __scExec(struct View_func_8028FA60_de *, struct Scene_func_8028FA60_de *, struct Scene_func_8028FA60_de *);
-extern s64 D_8011F170;
-extern f32 D_8011F158;
-extern s64 D_8011F168;
+extern s64 sGfxTaskStartTime;
+extern f32 sGfxRspTime;
+extern s64 sRdpStartTime;
 extern s32 D_800B6E64;
-extern u64 D_8011F150;
-extern u64 D_8011F160;
+extern u64 sAudioTaskStartTime;
+extern u64 sGfxRspResumeTime;
 extern void osWritebackDCacheAll();
-extern u64 D_8011F150;
-extern f32 D_8011F158;
-extern u64 D_8011F160;
-extern s64 D_8011F168;
-extern s64 D_8011F170;
+extern u64 sAudioTaskStartTime;
+extern f32 sGfxRspTime;
+extern u64 sGfxRspResumeTime;
+extern s64 sRdpStartTime;
+extern s64 sGfxTaskStartTime;
 extern s32 D_800B6E64;
 extern s64 osGetTime(void);
 extern void osSpTaskLoad(s32 *mode);
@@ -25,18 +25,18 @@ extern void osDpSetNextBuffer(s32 music, s64 time);
 void __scExec(View_func_8028FA60_de *view, Scene_func_8028FA60_de *current, Scene_func_8028FA60_de *next) {
     s64 now;
     if (next != 0 && (next->options & 0x20) && !(next->flags & 0x10)) {
-        D_8011F168 = osGetTime();
+        sRdpStartTime = osGetTime();
     }
     if (current != 0) {
         if (current->mode == 2) {
             osWritebackDCacheAll();
-            D_8011F150 = osGetTime();
+            sAudioTaskStartTime = osGetTime();
         } else if (current->options & 0x20) {
             now = osGetTime();
-            D_8011F160 = now;
+            sGfxRspResumeTime = now;
             if (!(current->flags & 0x10)) {
-                D_8011F170 = now;
-                D_8011F158 = 0;
+                sGfxTaskStartTime = now;
+                sGfxRspTime = 0;
             }
         }
         current->flags &= ~0x30;

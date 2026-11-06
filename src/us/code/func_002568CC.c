@@ -15,7 +15,7 @@ void CPlayer__ResetControlState(CPlayer *player) {
     CVector3 *v;
     f32 zero;
 
-    CPlayerContState__Init((u8 *)player + 0xA40, &D_800F5EC0[player->m_nController]);
+    CPlayerContState__Init((u8 *)player + 0xA40, &gControllers[player->m_nController]);
     P_S32(player, 0xA78) = 0;
     P_S32(player, 0xA7C) = 0;
     P_S32(player, 0xA80) = 0;

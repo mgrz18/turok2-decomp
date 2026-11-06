@@ -2,8 +2,8 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-extern s32 D_80110058;
-extern s32 D_8011005C;
+extern s32 gScene_m_PreviewState;
+extern s32 gScene_m_PreviewTimer;
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
@@ -25,9 +25,9 @@ void CBarrel__Open(CBarrel *menu, s32 dir, CPlayer *player) {
     s32 alt;
 
     count = 0;
-    range = D_8011005C - D_80110058 + 1;
+    range = gScene_m_PreviewTimer - gScene_m_PreviewState + 1;
     for (i = 0; i < 35; i++) {
-        info = D_800AF618[i];
+        info = gWeaponInfoTable[i];
         if (player->m_Data.m_WeaponList[i] == 0) {
             ok = 0;
         } else if (!((player->m_WeaponActor.m_AI.m_dwFlags & 0x80) ? (info->flags & 2) : (info->flags & 1))) {

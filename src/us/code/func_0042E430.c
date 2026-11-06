@@ -3,11 +3,11 @@
 #include "structs/intelligence.h"
 #include "structs/player.h"
 
-extern u8 D_800F7078[];  /* the world */
-extern u8 D_8011AAF1;    /* multiplayer */
-extern s32 D_8011ACE4;
-extern s32 D_800ADB5C;
-extern s32 D_800ADB30[];
+extern u8 gScene[];  /* the world */
+extern u8 gEngineApp_m_Settings_multiplayer;    /* multiplayer */
+extern s32 gEngineApp_m_Settings_match_tag;
+extern s32 gTagModeModel;
+extern s32 gCharacterModels[];
 
 extern CIntelligence *CScene__FindIntelligence(void *world, s32 kind, s32 character);
 extern s32 Random_Next(void);
@@ -15,12 +15,12 @@ extern void CPlayer__GiveStartingWeapons(CPlayer *p);
 extern void CScene__SetInstanceObjectType(void *world, CPlayer *p, s32, s32);
 
 static __inline__ CIntelligence *findDef(s32 kind, s32 character) {
-    return CScene__FindIntelligence(D_800F7078, kind, character);
+    return CScene__FindIntelligence(gScene, kind, character);
 }
 
 void CPlayer__SetCharacter(CPlayer *p, s32 character) {
     CIntelligence *def;
-    s32 sound;
+    s32 modelId;
 
     p->m_Data.m_nDeathmatchCharacter = character;
     if (p->m_pOptions->m_TagMode == 1) {
@@ -45,13 +45,13 @@ void CPlayer__SetCharacter(CPlayer *p, s32 character) {
         p->m_CharacterActor.m_AI.m_nTexture = -1;
     }
     CPlayer__GiveStartingWeapons(p);
-    sound = 0x66;
-    if (D_8011AAF1) {
-        if (D_8011ACE4 != 0 && p->m_pOptions->m_TagMode != 0) {
-            sound = D_800ADB5C;
+    modelId = 0x66;
+    if (gEngineApp_m_Settings_multiplayer) {
+        if (gEngineApp_m_Settings_match_tag != 0 && p->m_pOptions->m_TagMode != 0) {
+            modelId = gTagModeModel;
         } else {
-            sound = D_800ADB30[p->m_CharacterActor.header.m_pIntelligence->m_Id];
+            modelId = gCharacterModels[p->m_CharacterActor.header.m_pIntelligence->m_Id];
         }
     }
-    CScene__SetInstanceObjectType(D_800F7078, p, sound, p->m_CharAnim);
+    CScene__SetInstanceObjectType(gScene, p, modelId, p->m_CharAnim);
 }

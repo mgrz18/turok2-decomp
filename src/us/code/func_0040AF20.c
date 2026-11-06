@@ -4,8 +4,8 @@
 
 /* AI state: once the anim is done, reset every active slot of the module state, then go to anim state 2. */
 
-extern s32 D_801301D0; /* active slot mask */
-extern u8 D_00431EE4[];
+extern s32 gMotherBoss_activeMask; /* active slot mask */
+extern u8 sMotherBossSpotFlashScript[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
@@ -15,11 +15,11 @@ void MotherBoss_Mode01_FlashSpotsThenIdle(void *obj, CAI *ai) {
     s32 i;
 
     if (ai->m_AnimRepeatedCount > 0) {
-        mask = D_801301D0;
-        state = &D_8012FB70;
+        mask = gMotherBoss_activeMask;
+        state = &gMotherBoss;
         for (i = 0; i < 15; i++) {
             if ((mask >> i) & 1) {
-                ScriptAnimator_SetScript(&state->slots[i].anim, D_00431EE4);
+                ScriptAnimator_SetScript(&state->slots[i].anim, sMotherBossSpotFlashScript);
             }
         }
         CAI__SetMode(obj, ai, 2);

@@ -4,17 +4,17 @@
 #include "rw/abu_types.h"
 
 extern void __osPfsRequestOneChannel_2(int channel);
-extern u8 D_80121420;
+extern u8 __osContLastCmd;
 void __osPfsRequestOneChannel_2(int channel)
 {
-    extern OSPifRam D_80130E20;
+    extern OSPifRam __osPfsPifRam;
     u8 *base;
     u8 *ptr;
     __OSContRequesFormatShort requestformat;
     int i;
-    D_80121420 = 0;
-    base = (u8 *)&D_80130E20;
-    D_80130E20.pifstatus = 1;
+    __osContLastCmd = 0;
+    base = (u8 *)&__osPfsPifRam;
+    __osPfsPifRam.pifstatus = 1;
     ptr = base;
     requestformat.txsize = 1;
     requestformat.rxsize = 3;

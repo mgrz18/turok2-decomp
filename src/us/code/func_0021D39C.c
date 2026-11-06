@@ -40,9 +40,9 @@ struct Actor {
 };
 
 extern char D_800A5AC4[];   /* "anim object info" */
-extern s32 D_8011ACA4;
-extern s32 D_800B6D1C;      /* current view */
-extern u8 D_800F7078[];
+extern s32 gEngineApp_m_Settings_paused;
+extern s32 gEvenOdd;      /* current view */
+extern u8 gScene[];
 
 void **CCache__Request(s32, s32, s32, s32, s32, s32, void *, s32);
 s32 CISet__GetBlock(void *, s32);
@@ -83,7 +83,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
         }
     } while (0);
     info = CISet__GetBlock(*anim, 0);
-    if (D_8011ACA4 != 0) {
+    if (gEngineApp_m_Settings_paused != 0) {
         actor->update(actor, actor->ai);
         CMtxF__TransformBox(actor->matrix, info, actor->boxMin);
     }
@@ -134,7 +134,7 @@ void CGameObjectInstance__Draw(Actor *actor, CCamera *view) {
                     pos = actor->pos;
                     pos.y += actor->height;
                     pos.y += GameObject_GetCollisionHeight(actor) * 0.5f;
-                    CScene__GetLightsAt(D_800F7078, &pos, actor->lights[D_800B6D1C]);
+                    CScene__GetLightsAt(gScene, &pos, actor->lights[gEvenOdd]);
                 }
                 actor->flags |= 0x200;
             }

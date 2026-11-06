@@ -7,7 +7,7 @@
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 
 void MotherBoss_StartSpotAnims(void *obj, void *src, s32 mask) {
-    MotherBossState *state = &D_8012FB70;
+    MotherBossState *state = &gMotherBoss;
     s32 i;
 
     for (i = 0; i < 15; i++) {

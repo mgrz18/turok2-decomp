@@ -20,7 +20,7 @@ struct StridedTable {
 struct StridedTable;
 typedef struct StridedTable StridedTable;
 extern s32 GameOverMenu_Poll_2(void);
-extern f32 D_8011ACC0;
+extern f32 gEngineApp_m_Settings_match_countdown;
 struct OSTask_t;
 struct OSTask_t {
     u32 type;
@@ -342,11 +342,11 @@ struct GameSession {
     s32 selector;
     s32 selectionActive;
 };
-extern GameSession D_800F6CB0;
-extern void func_00430250(void *);
+extern GameSession gEngineApp;
+extern void func_00469250(void *);
 s32 GameOverMenu_Poll_2(void) {
-    if (D_8011ACC0 <= 0.0f) {
-        func_00430250(&D_800F6CB0);
+    if (gEngineApp_m_Settings_match_countdown <= 0.0f) {
+        func_00469250(&gEngineApp);
         return 1;
     }
     return 0;

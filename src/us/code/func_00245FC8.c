@@ -3,8 +3,8 @@
 #include "structs/collision.h"
 
 struct CollisionInfo;
-extern struct CollisionInfo D_800F1B40;
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
+extern struct CollisionInfo gCollisionInfoLineOfSight;
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
 f32 GameObject_GetCollisionHeight(CGameObjectInstance *obj); /* the object's height */
 s32 Collision_MoveInstance(void *obj, CVector3 to, struct CollisionInfo *info);
 
@@ -21,8 +21,8 @@ s32 AI_IsLineOfSightBlocked(CGameObjectInstance *target, s32 unused, CGameObject
     to = target->header.m_vPos;
     to.y += GameObject_GetCollisionHeight(target);
     to.y += target->m_CollisionYOffset;
-    hit = Collision_MoveInstance(from, to, &D_800F1B40);
-    if (D_800F1CE0.m_pInstance == target) {
+    hit = Collision_MoveInstance(from, to, &gCollisionInfoLineOfSight);
+    if (gCollisionResults.m_pInstance == target) {
         hit = 0;
     }
     *(CObjectHead *) from = saved;

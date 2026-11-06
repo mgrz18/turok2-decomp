@@ -10,13 +10,13 @@ typedef struct HashEntry {
     /* 0x0C */ struct HashEntry *next;
 } HashEntry;
 
-extern char D_800D8D90[];           /* pending request list */
-extern u32 D_800D81C0;              /* hash mask */
-extern HashEntry *D_800D81C4;       /* hash table */
-extern char D_800D1CC0[];           /* heap */
-extern s32 D_800D81E0;              /* cached node list; the current node sits 8 bytes before it, the free node count 0xBCC after */
-extern char D_800D81F4[];           /* locked node list */
-extern CMemEntry **D_800D81D4; /* free node stack */
+extern char gCache_cachePendingList[];           /* pending request list */
+extern u32 gHashMask;              /* hash mask */
+extern HashEntry *gHashTable;       /* hash table */
+extern char gHeap[];           /* heap */
+extern s32 gCache_memAgeList;              /* cached node list; the current node sits 8 bytes before it, the free node count 0xBCC after */
+extern char gCache_memLockedList[];           /* locked node list */
+extern CMemEntry **gCache_memEntriesFree; /* free node stack */
 
 void CList__Remove(void *list, void *item);
 void CList__AddHead(void *list, void *item);
@@ -26,7 +26,7 @@ void CCache__FreeCacheEntry(s32 unused, CCacheEntry *request);
 void CHashTable__Insert(u32 key, CCacheEntry *value);
 
 static __inline__ void find(u32 key, CCacheEntry **out) {
-    HashEntry *node = D_800D81C4 + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & D_800D81C0);
+    HashEntry *node = gHashTable + (((key << 5) ^ (key >> 1) ^ (key >> 9) ^ (key >> 17)) & gHashMask);
 
     if (node->key == key) {
         *out = node->value;
@@ -43,24 +43,24 @@ static __inline__ void find(u32 key, CCacheEntry **out) {
 }
 
 static __inline__ void release(CMemEntry *node) {
-    CList__Remove(&D_800D81E0, node);
+    CList__Remove(&gCache_memAgeList, node);
     if (node->flags & 0x1000) {
-        CList__Remove(D_800D81F4, node);
+        CList__Remove(gCache_memLockedList, node);
     }
-    if (*(&D_800D81E0 - 2) == (s32) node) {
-        *(&D_800D81E0 - 2) = 0;
+    if (*(&gCache_memAgeList - 2) == (s32) node) {
+        *(&gCache_memAgeList - 2) = 0;
     }
     node->flags = 0;
-    D_800D81D4[*(&D_800D81E0 + 0x2F3)] = node;
-    *(&D_800D81E0 + 0x2F3) += 1;
+    gCache_memEntriesFree[*(&gCache_memAgeList + 0x2F3)] = node;
+    *(&gCache_memAgeList + 0x2F3) += 1;
 }
 
 CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropReference) {
     CCacheEntry *existing;
     CMemEntry *node;
 
-    CList__Remove(D_800D8D90, request);
-    CList__AddHead(D_800D8D90 - 0x14, request);
+    CList__Remove(gCache_cachePendingList, request);
+    CList__AddHead(gCache_cachePendingList - 0x14, request);
     if (request->memEntry != 0) {
         find(request->requestId, &existing);
         if (existing != 0) {
@@ -68,12 +68,12 @@ CCacheEntry *CCache__CompleteRequest(s32 unused, CCacheEntry *request, s32 dropR
                 CHashTable__Remove(existing->requestId);
                 existing->memEntry->cacheEntry = 0;
                 if (!(existing->memEntry->flags & 0x702)) {
-                    CHeap__Free(D_800D1CC0, existing->memEntry->data);
+                    CHeap__Free(gHeap, existing->memEntry->data);
                     release(existing->memEntry);
                 }
                 CCache__FreeCacheEntry(0, existing);
             } else {
-                CHeap__Free(D_800D1CC0, request->memEntry->data);
+                CHeap__Free(gHeap, request->memEntry->data);
                 release(request->memEntry);
                 CCache__FreeCacheEntry(0, request);
                 return existing;

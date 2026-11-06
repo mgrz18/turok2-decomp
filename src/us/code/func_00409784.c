@@ -8,13 +8,13 @@
  * arena (inlined MotherBoss_SpawnPickup) and, later, a pickup at every spawn point
  * (MotherBoss_DropPickupsAtSpawnPoints). */
 
-extern s32 D_801301F8;      /* arena radius range */
-extern s32 D_801301FC;
-extern u8 D_00431D94[];     /* pickup weights */
-extern u8 D_00431DC4[];
-extern u8 D_00431DD0[];
-extern u8 D_800F7078[];
-extern u8 D_80107590[];
+extern s32 gMotherBoss_minRadius;      /* arena radius range */
+extern s32 gMotherBoss_maxRadius;
+extern u8 sMotherBossPickupTable[];     /* pickup weights */
+extern u8 sMotherBossDropTablePhase1[];
+extern u8 sMotherBossDropTablePhase2[];
+extern u8 gScene[];
+extern u8 gScene_m_ActorPool[];
 
 extern void Animator_Update(void *slot);
 extern s32 Cinema_PathPlaying(void);
@@ -33,11 +33,11 @@ static __inline__ void spawnPickup(s32 id, s32 lifetime, CVector3 pos) {
     s32 region;
     CPooledLevelActor *pickup;
 
-    region = CScene__FindRegionAt(D_800F7078, &pos);
+    region = CScene__FindRegionAt(gScene, &pos);
     vel.x = 0.0f;
     vel.y = 512.0f;
     vel.z = 0.0f;
-    pickup = CLevelActorPool__Spawn(D_80107590, NULL, id, vel, pos, region, lifetime);
+    pickup = CLevelActorPool__Spawn(gScene_m_ActorPool, NULL, id, vel, pos, region, lifetime);
     if (pickup != NULL) {
         Actor_SpawnParticle(pickup, 0x11D, pos, 0);
     }
@@ -76,7 +76,7 @@ void MotherBoss_UpdateSpotsAndPickups(MotherBossState *s) {
         }
         if (s->dropTimer >= 526) {
             drop = 1;
-            table = D_00431DC4;
+            table = sMotherBossDropTablePhase1;
             dropLifetime = 330;
         }
         break;
@@ -87,7 +87,7 @@ void MotherBoss_UpdateSpotsAndPickups(MotherBossState *s) {
         }
         if (s->dropTimer >= 526) {
             drop = 1;
-            table = D_00431DD0;
+            table = sMotherBossDropTablePhase2;
             dropLifetime = 330;
         }
         break;
@@ -103,8 +103,8 @@ void MotherBoss_UpdateSpotsAndPickups(MotherBossState *s) {
     }
     if (spawn) {
         s->pickupTimer = 0;
-        id = (s16) WeightedTable_PickStatic(D_00431D94);
-        dist = Random_Blend(D_801301F8, D_801301FC);
+        id = (s16) WeightedTable_PickStatic(sMotherBossPickupTable);
+        dist = Random_Blend(gMotherBoss_minRadius, gMotherBoss_maxRadius);
         angle = Random_Blend(-3.1415927f, 3.1415927f);
         pos.x = dist * func_002982F0(angle);
         pos.z = dist * func_002974C0(angle);

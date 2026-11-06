@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/cinema.h"
 
-extern Cinema *D_800C1BB0;
+extern Cinema *gCinemaPlayerP;
 
 void Cinema__Initialize(void) {
-    Cinema *p = D_800C1BB0;
+    Cinema *p = gCinemaPlayerP;
 
     p->owner = 0;
     p->resource = 0;

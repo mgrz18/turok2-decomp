@@ -5,7 +5,7 @@
 #define OS_MESG_BLOCK 1
 #define OS_STATE_WAITING 8
 
-extern OSThread *D_800B8920; /* __osRunningThread */
+extern OSThread *__osRunningThread; /* __osRunningThread */
 u32 __osDisableInt(void);
 void __osRestoreInt(u32);
 void __osEnqueueAndYield(OSThread **);
@@ -20,7 +20,7 @@ s32 osSendMesg(OSMesgQueue *mq, OSMesg msg, s32 flags) {
 
     while (mq->validCount >= mq->msgCount) {
         if (flags == OS_MESG_BLOCK) {
-            D_800B8920->state = OS_STATE_WAITING;
+            __osRunningThread->state = OS_STATE_WAITING;
             __osEnqueueAndYield(&mq->fullqueue);
         } else {
             __osRestoreInt(saveMask);

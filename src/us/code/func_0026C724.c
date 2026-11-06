@@ -11,12 +11,12 @@ typedef struct {
 } Unk0022425C;
 
 void *CScene__GetRegionInfo(s32 *, s32);                /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void func_0026C724(s32 arg0) {
     Unk0022425C *temp_v0;
 
-    temp_v0 = CScene__GetRegionInfo(&D_800F7078, arg0);
+    temp_v0 = CScene__GetRegionInfo(&gScene, arg0);
     if (temp_v0 != NULL) {
         temp_v0->flags = temp_v0->flags | 0x80000;
     }

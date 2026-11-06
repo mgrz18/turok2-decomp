@@ -4,15 +4,15 @@
 #include "structs/player.h"
 #include "structs/camera.h"
 
-extern s32 D_8011001C;
-extern s32 D_80110048;
-extern s32 D_800C2034;          /* screen height */
-extern u8 D_800ADB60[];
-extern u8 D_800ADB74[];
-extern u8 D_800ADBB0[];
-extern u8 D_800ADBF0[];
-extern u8 D_800ADC30[];
-extern u8 D_800ADC70[];
+extern s32 gScene_m_bStreamAll;
+extern s32 gScene_m_LevelID;
+extern s32 gScreenHeight;          /* screen height */
+extern u8 gHealthOverlayScript[];
+extern u8 gAmmoOverlayScript[];
+extern u8 gLivesOverlayScript[];
+extern u8 gTokensOverlayScript[];
+extern u8 gTotalKillsOverlayScript[];
+extern u8 gTotalTagsOverlayScript[];
 /* In the engine's .rodata, the pool shared with CPlayer__FireWeapon. */
 extern f32 D_800A6AA0;          /* 437.5f */
 extern f32 D_800A6AA4;          /* -675.0f */
@@ -33,7 +33,7 @@ extern void Cinema_Enable(void);
 extern void CGameRegion__FireTriggers(s32, s32, CPlayer *p);
 
 void CPlayer__LevelStart_2(CPlayer *p) {
-    GameSettings *flags = &D_8011AAD8;
+    GameSettings *flags = &gEngineApp_m_Settings;
     CPlayerOverlay *c;
     s32 warp;
 
@@ -65,32 +65,32 @@ void CPlayer__LevelStart_2(CPlayer *p) {
     p->m_pDLFlashlight2 = NULL;
     p->m_pDLDarkCityLight = NULL;
     COverlay__Construct(&p->m_AmmoOverlay, 120, 96);
-    COverlay__StartScript(&p->m_AmmoOverlay, D_800ADB74);
+    COverlay__StartScript(&p->m_AmmoOverlay, gAmmoOverlayScript);
     COverlay__Construct(&p->m_HealthOverlay, 48, 96);
-    COverlay__StartScript(&p->m_HealthOverlay, D_800ADB60);
+    COverlay__StartScript(&p->m_HealthOverlay, gHealthOverlayScript);
     COverlay__Construct(&p->m_LivesOverlay, -64, 16);
-    COverlay__StartScript(&p->m_LivesOverlay, D_800ADBB0);
+    COverlay__StartScript(&p->m_LivesOverlay, gLivesOverlayScript);
     COverlay__Construct(&p->m_TokensOverlay, 40, 16);
-    COverlay__StartScript(&p->m_TokensOverlay, D_800ADBF0);
+    COverlay__StartScript(&p->m_TokensOverlay, gTokensOverlayScript);
     COverlay__Construct(&p->m_TotalKillsOverlay, 40, 42);
-    COverlay__StartScript(&p->m_TotalKillsOverlay, D_800ADC30);
+    COverlay__StartScript(&p->m_TotalKillsOverlay, gTotalKillsOverlayScript);
     COverlay__Construct(&p->m_TotalTagsOverlay, 40, 68);
-    COverlay__StartScript(&p->m_TotalTagsOverlay, D_800ADC70);
-    COverlay__Construct(&p->m_AirOverlay, 24, (s16) (D_800C2034 + 96));
+    COverlay__StartScript(&p->m_TotalTagsOverlay, gTotalTagsOverlayScript);
+    COverlay__Construct(&p->m_AirOverlay, 24, (s16) (gScreenHeight + 96));
     warp = 0;
-    COverlay__Construct(&p->m_BossOverlay, 24, (s16) (D_800C2034 + 96));
+    COverlay__Construct(&p->m_BossOverlay, 24, (s16) (gScreenHeight + 96));
     p->m_SfxTimer = 0.0f;
     p->m_SightIconFrame = 0.0f;
     p->PreviousCameraQuatern = p->m_pCamera->m_qViewAlign;
     CPlayer__Reset(p);
     if (!Cinema_IsActive()) {
-        warp = D_80110048 != 999;
+        warp = gScene_m_LevelID != 999;
     }
-    if (D_8011001C) {
+    if (gScene_m_bStreamAll) {
         warp = 1;
     }
     if (warp) {
-        p->m_Data.m_CheckPointWarpID = D_80110048;
+        p->m_Data.m_CheckPointWarpID = gScene_m_LevelID;
     }
     if (!flags->multiplayer && p->m_Data.m_WeaponList[21]) {
         /* the ROM adds the scaled index first: written index + array */

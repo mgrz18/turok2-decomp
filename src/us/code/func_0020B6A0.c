@@ -3,12 +3,12 @@
 #include "common.h"
 #include "structs/model.h"
 
-extern void **D_800D8E28;           /* batched model */
-extern s32 D_800D8E14;              /* its level of detail */
-extern s32 D_800D8E10;              /* its pass */
-extern s32 D_800D8E34;              /* queued instance count */
-extern s32 D_800DD170;              /* registered model count */
-extern void **D_800DD178[0x100];
+extern void **sBatchResource;           /* batched model */
+extern s32 sBatchLod;              /* its level of detail */
+extern s32 sBatchPass;              /* its pass */
+extern s32 sBatchInstanceCount;              /* queued instance count */
+extern s32 sBatchResourceCount;              /* registered model count */
+extern void **sBatchResources[0x100];
 
 void *CISet__GetBlock(void *resource, s32 index);
 void Render_FlushModelBatch(void);
@@ -25,18 +25,18 @@ void Render_QueueModelInstance(void **resource, void *matrix, s32 segment, void 
     if (lod < 0 || lod >= *parts) {
         return;
     }
-    if (D_800D8E28 != resource || D_800D8E14 != lod || D_800D8E10 != pass || D_800D8E34 == 0x20) {
+    if (sBatchResource != resource || sBatchLod != lod || sBatchPass != pass || sBatchInstanceCount == 0x20) {
         Render_FlushModelBatch();
-        if (D_800DD170 == 0x100) {
+        if (sBatchResourceCount == 0x100) {
             return;
         }
         CCache__TouchAndLock(0, resource);
-        D_800DD178[D_800DD170++] = resource;
+        sBatchResources[sBatchResourceCount++] = resource;
     }
-    D_800D8E28 = resource;
-    D_800D8E14 = lod;
-    D_800D8E10 = pass;
-    inst = &D_800DD578[D_800D8E34++];
+    sBatchResource = resource;
+    sBatchLod = lod;
+    sBatchPass = pass;
+    inst = &sBatchInstances[sBatchInstanceCount++];
     inst->m_pMatrix = matrix;
     inst->m_Segment = segment;
     inst->m_pLights = lights;

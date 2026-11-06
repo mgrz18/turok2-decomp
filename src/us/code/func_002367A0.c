@@ -1,7 +1,7 @@
 #include "common.h"
 
 s32 NodePool_Free(void *, void *);              /* extern */
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 /* A repeating timer: counts down by the frame time, fires its callback,
  * and is removed after its last repeat. */
@@ -31,7 +31,7 @@ void SwooshSystem_UpdateTimers(World002367A0 *arg0) {
     var_s0 = arg0->timerHead;
     if (var_s0 != NULL) {
         do {
-            temp_f1 = var_s0->time - D_800B6D28;
+            temp_f1 = var_s0->time - gFrameIncrement;
             temp_s1 = var_s0->next;
             var_s0->time = temp_f1;
             if (temp_f1 <= 0.0f) {

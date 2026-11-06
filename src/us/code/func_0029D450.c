@@ -15,13 +15,13 @@ typedef struct {
     /* 0x18 */ void *edma_func;
 } OSDevMgr; /* __osPiDevMgr */
 
-extern OSDevMgr D_800B8960;     /* __osPiDevMgr */
-extern s32 D_800B8990;          /* __osPiAccessQueueEnabled */
-extern u8 D_80123AE0[];         /* __osPiThread */
-extern u8 D_80124D10[];         /* __osPiEventQueue */
-extern u8 D_80124D28[];         /* __osPiEventBuf */
-extern u8 D_80124DB8[];         /* __osPiAccessQueue */
-extern u8 D_80123D10[];         /* __osPiThreadStack (its end is __osPiEventQueue) */
+extern OSDevMgr __osPiDevMgr;     /* __osPiDevMgr */
+extern s32 __osPiAccessQueueEnabled;          /* __osPiAccessQueueEnabled */
+extern u8 __osPiThread[];         /* __osPiThread */
+extern u8 __osPiEventQueue[];         /* __osPiEventQueue */
+extern u8 __osPiEventBuf[];         /* __osPiEventBuf */
+extern u8 __osPiAccessQueue[];         /* __osPiAccessQueue */
+extern u8 __osPiThreadStack[];         /* __osPiThreadStack (its end is __osPiEventQueue) */
 extern s32 osPiRawStartDma();
 extern s32 osEPiRawStartDma();     /* osEPiRawStartDma */
 extern void __osDevMgrMain(void *arg); /* __osDevMgrMain */
@@ -41,15 +41,15 @@ void osCreatePiManager(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
     s32 oldPri;
     s32 myPri;
 
-    if (!D_800B8960.initialized) {
+    if (!__osPiDevMgr.initialized) {
         osCreateMesgQueue(cmdQ, cmdBuf, cmdMsgCnt);
-        osCreateMesgQueue(D_80124D10, D_80124D28, 1);
+        osCreateMesgQueue(__osPiEventQueue, __osPiEventBuf, 1);
 
-        if (!D_800B8990) {
+        if (!__osPiAccessQueueEnabled) {
             __osPiCreateAccessQueue();
         }
 
-        osSetEventMesg(8, D_80124D10, (void *)0x22222222);
+        osSetEventMesg(8, __osPiEventQueue, (void *)0x22222222);
 
         oldPri = -1;
         myPri = osGetThreadPri(NULL);
@@ -60,16 +60,16 @@ void osCreatePiManager(s32 pri, void *cmdQ, void *cmdBuf, s32 cmdMsgCnt) {
 
         savedMask = __osDisableInt();
 
-        D_800B8960.initialized = 1;
-        D_800B8960.acsQueue = D_80124DB8;
-        D_800B8960.dma_func = osPiRawStartDma;
-        D_800B8960.edma_func = osEPiRawStartDma;
-        D_800B8960.evtQueue = D_80124D10;
-        D_800B8960.thread = D_80123AE0;
-        D_800B8960.cmdQueue = cmdQ;
+        __osPiDevMgr.initialized = 1;
+        __osPiDevMgr.acsQueue = __osPiAccessQueue;
+        __osPiDevMgr.dma_func = osPiRawStartDma;
+        __osPiDevMgr.edma_func = osEPiRawStartDma;
+        __osPiDevMgr.evtQueue = __osPiEventQueue;
+        __osPiDevMgr.thread = __osPiThread;
+        __osPiDevMgr.cmdQueue = cmdQ;
 
-        osCreateThread(D_80123AE0, 0, __osDevMgrMain, &D_800B8960, &D_80123D10[0x1000], pri);
-        osStartThread(D_80123AE0);
+        osCreateThread(__osPiThread, 0, __osDevMgrMain, &__osPiDevMgr, &__osPiThreadStack[0x1000], pri);
+        osStartThread(__osPiThread);
 
         __osRestoreInt(savedMask);
 

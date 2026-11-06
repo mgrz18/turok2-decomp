@@ -3,8 +3,8 @@
 
 #include "rw/abu_types.h"
 
-extern unsigned short D_800B8BAA;
-extern unsigned short D_800B8BAC;
+extern unsigned short sAdecHuffBits;
+extern unsigned short sAdecHuffBitsAvail;
 extern u16 adecReadBits(u16 *, u16, s32, s32, void *);
 s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                     u16 *arg3, void *arg4) {
@@ -28,8 +28,8 @@ s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
     tree = table->tree;
     output = 0;
     if (arg2 > 0) {
-        available = &D_800B8BAC;
-        bits = &D_800B8BAA;
+        available = &sAdecHuffBitsAvail;
+        bits = &sAdecHuffBits;
         do {
             if (*available != 0) {
                 (*available)--;
@@ -55,7 +55,7 @@ s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                         mask = (s16)output;
                         output++;
                         high = *bits;
-                        next = D_800B8BAC;
+                        next = sAdecHuffBitsAvail;
                         *bits = high << (16 - next);
                         arg1[(s16)mask] = value | (high >> next);
                     } else if (mask == 0xA00) {
@@ -91,7 +91,7 @@ s32 adecHuffDecode(DecodeBlock *arg0, u16 *arg1, s16 arg2,
                     node = mask;
                 }
             } else {
-                if (adecReadBits(&D_800B8BAA, 16, 1, 0, arg4) == 0) {
+                if (adecReadBits(&sAdecHuffBits, 16, 1, 0, arg4) == 0) {
                     return -1;
                 }
                 *available += 16;

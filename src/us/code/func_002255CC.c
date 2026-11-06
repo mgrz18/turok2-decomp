@@ -10,7 +10,7 @@ s32 func_002681BC(s32);
 s32 CGameObjectInstance__ClearDrawMatrices(s32);                         /* extern */
 
 /* Files a new actor into every actor list of the world it belongs to. */
-void CScene__FileInstance(CWorld *arg0, CGameObjectInstance *arg1) {
+void CScene__FileInstance(CScene *arg0, CGameObjectInstance *arg1) {
     s32 temp_a0;
     s32 temp_a0_2;
     s32 temp_a0_3;

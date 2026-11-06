@@ -7,12 +7,12 @@ extern void Music_SetTrack(s32 a);
 extern int QuitMenu_Yes_2(void);
 extern void Music_Stop();
 extern void Music_RestoreVolume();
-extern char D_800F6CB0[];
-extern void func_00430250(void *);
+extern char gEngineApp[];
+extern void func_00469250(void *);
 s32 QuitMenu_Yes_2(void) {
     Music_SetTrack(-1);
     Music_RestoreVolume();
     Music_Stop();
-    func_00430250(D_800F6CB0);
+    func_00469250(gEngineApp);
     return 1;
 }

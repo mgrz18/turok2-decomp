@@ -36,9 +36,9 @@ struct WarpPlayer {
     /* 0x1320 */ WarpPlayer *next;
 };
 
-extern s32 D_8011001C;
-extern s32 D_80110020;
-extern u8 D_800F7078[];
+extern s32 gScene_m_bStreamAll;
+extern s32 gScene_m_nLevel;
+extern u8 gScene[];
 
 void CPlayer__StopLoopingSounds(void);
 s32 Controller_SetRumbleOption(s32, s32);
@@ -55,7 +55,7 @@ static __inline__ f32 sumDistance(CWarpPoint *r) {
     f32 dist;
 
     dist = 0.0f;
-    for (other = (WarpPlayer *)D_80119870.m_PlayerList.m_ActiveList.m_pHead; other != NULL; other = other->next) {
+    for (other = (WarpPlayer *)gEngineApp_m_Game.m_PlayerList.m_ActiveList.m_pHead; other != NULL; other = other->next) {
         if (other->active) {
             dist += CVector3__Distance(&r->m_vPos, &other->pos);
         }
@@ -77,7 +77,7 @@ void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
     CPlayer__StopLoopingSounds();
     Controller_SetRumbleOption(pl->controller, 0);
 
-    if (D_8011001C && respawn) {
+    if (gScene_m_bStreamAll && respawn) {
         skip = TRUE;
     }
     if (!skip) {
@@ -207,8 +207,8 @@ void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
         break;
     }
 
-    if (D_80119870.m_Settings.multiplayer) {
-        count = CScene__FindWarpDests(D_800F7078, -1, warp, recs, 32);
+    if (gEngineApp_m_Game.m_Settings.multiplayer) {
+        count = CScene__FindWarpDests(gScene, -1, warp, recs, 32);
         best = -1;
         bestDist = 0.0f;
         for (i = 0; i < count; i++) {
@@ -222,22 +222,22 @@ void CPlayer__Warp(WarpPlayer *pl, s32 warp, s32 arg2, s32 respawn) {
             pl->spawnPos = recs[best].m_vPos;
             pl->pos = pl->spawnPos;
             pl->angle = pl->spawnAngle = recs[best].m_RotY;
-            pl->room = pl->spawnRoom = CScene__GetRegion(D_800F7078, recs[best].m_nID);
+            pl->room = pl->spawnRoom = CScene__GetRegion(gScene, recs[best].m_nID);
             CPlayer__LevelStart(pl);
             return;
         }
     } else {
         do { /* a block of its own: it decides which of the two addresses gets $s0 */
-            if (CScene__FindWarpDests(D_800F7078, -1, warp, &rec, 1) && rec.m_nLevel == D_80110020 &&
-                (D_80119870.m_Settings.multiplayer || D_8011001C)) {
+            if (CScene__FindWarpDests(gScene, -1, warp, &rec, 1) && rec.m_nLevel == gScene_m_nLevel &&
+                (gEngineApp_m_Game.m_Settings.multiplayer || gScene_m_bStreamAll)) {
                 pl->spawnPos = rec.m_vPos;
                 pl->pos = pl->spawnPos;
                 pl->angle = pl->spawnAngle = rec.m_RotY;
-                pl->room = pl->spawnRoom = CScene__GetRegion(D_800F7078, rec.m_nID);
+                pl->room = pl->spawnRoom = CScene__GetRegion(gScene, rec.m_nID);
                 CPlayer__LevelStart(pl);
                 return;
             }
         } while (0);
     }
-    CScene__RequestWarp(D_800F7078, warp, arg2);
+    CScene__RequestWarp(gScene, warp, arg2);
 }

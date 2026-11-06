@@ -17,22 +17,22 @@ typedef struct B01IoReq {
                s32 w18;
                OSMesgQueue *reply;
 } B01IoReq;
-extern s32 D_800BC304;
-extern OSMesgQueue D_80128370;
-extern OSMesgQueue D_80128540;
+extern s32 sHostIoState;
+extern OSMesgQueue sHostIoRequestQueue;
+extern OSMesgQueue sHostIoReplyQueue;
 void HostIo_StartThread(s32 arg);
 s32 PCinitThreaded(void) {
     B01IoReq req;
     OSMesg reply;
-    D_800BC304 = 2;
+    sHostIoState = 2;
     HostIo_StartThread(0xFF);
     req.w4 = 0;
     req.wC.i = 0x80000101;
     req.w10 = 0;
     req.w14 = 0;
     req.w18 = 0;
-    req.reply = &D_80128540;
-    osSendMesg(&D_80128370, &req, 1);
-    osRecvMesg(&D_80128540, &reply, 1);
+    req.reply = &sHostIoReplyQueue;
+    osSendMesg(&sHostIoRequestQueue, &req, 1);
+    osRecvMesg(&sHostIoReplyQueue, &reply, 1);
     return (s32)reply;
 }

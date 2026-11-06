@@ -20,9 +20,9 @@ typedef struct {
     /* 0xB8 */ f32 time;
 } HudModel; /* size 0xBC */
 
-extern u8 D_8011AAF1;           /* multiplayer */
-extern f32 D_800B6D28;          /* the frame's time step */
-extern u8 D_800F7078[];         /* the level */
+extern u8 gEngineApp_m_Settings_multiplayer;           /* multiplayer */
+extern f32 gFrameIncrement;          /* the frame's time step */
+extern u8 gScene[];         /* the level */
 
 s32 CScene__FindObjectType(void *level, s32 id);
 void *CScene__GetObject(void *level, s32 index);
@@ -50,9 +50,9 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
         m->roll = 3.141593f;
     }
     if (m->requested != m->current && m->state == 0) {
-        index = CScene__FindObjectType(D_800F7078, m->requested);
+        index = CScene__FindObjectType(gScene, m->requested);
         if (index != -1) {
-            m->model = CScene__GetObject(D_800F7078, index);
+            m->model = CScene__GetObject(gScene, index);
             m->state = 1;
             m->current = m->requested;
         } else {
@@ -63,13 +63,13 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
         case 0:
             break;
         case 1:
-            m->time += D_800B6D28;
+            m->time += gFrameIncrement;
             if (m->time >= 3.75f) {
                 m->state = 2;
                 m->time = 3.75f;
             }
             if (m->current == 0xC83) {
-                if (D_8011AAF1) {
+                if (gEngineApp_m_Settings_multiplayer) {
                     m->roll = 0.0f;
                     m->pitch = 0.0f;
                 } else {
@@ -84,14 +84,14 @@ void CPlayer__AnimateScope(HudModel *m, CPlayer *owner) {
             break;
         case 3:
             if (owner->m_ZoomBlend == 0.0f) {
-                m->time -= D_800B6D28;
+                m->time -= gFrameIncrement;
                 if (m->time <= 0.0f) {
                     m->state = 0;
                     m->time = 0.0f;
                 }
             }
             if (m->current == 0xC83) {
-                if (D_8011AAF1) {
+                if (gEngineApp_m_Settings_multiplayer) {
                     m->roll = 0.0f;
                 } else {
                     m->roll = ((1.0f - m->time * 0.26666668f) * 180.0f + 180.0f) * 0.017453294f;

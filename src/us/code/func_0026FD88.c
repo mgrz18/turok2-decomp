@@ -21,11 +21,11 @@ s32 Sound__Update();                            /* extern */
 s32 Sound__Lock();                            /* extern */
 s32 Sound__Unlock();                            /* extern */
 s32 Sched_SubmitTask(s32 *, void *);           /* extern */
-extern s32 D_800B2668;
-extern s32 D_800F27C0;
-extern s32 D_800F2820;
+extern s32 curAcmdList;
+extern s32 gAudioCmdLists;
+extern s32 gAudioReplyMsgQ;
 extern u16 D_800F283A;
-extern s32 D_8011AD90;
+extern s32 gScheduler;
 
 s32 __amHandleFrameMsg(FrameTask *arg0) {
     s32 sp10;
@@ -38,19 +38,19 @@ s32 __amHandleFrameMsg(FrameTask *arg0) {
     temp_s0 = osVirtualToPhysical(arg0->buffer);
     arg0->size = D_800F283A;
     Sound__Lock();
-    temp_s0_2 = alAudioFrame(*(((__typeof__(&D_800F27C0))((s8 *)&D_800F27C0 + (D_800B2668 * 4)))), (s32) &sp10, temp_s0, (s32) (s16) arg0->size);
+    temp_s0_2 = alAudioFrame(*(((__typeof__(&gAudioCmdLists))((s8 *)&gAudioCmdLists + (curAcmdList * 4)))), (s32) &sp10, temp_s0, (s32) (s16) arg0->size);
     Sound__Unlock();
     if (sp10 == 0) {
         return 0;
     }
-    temp_v0 = D_800B2668 * 4;
-    arg0->start = (s32) *(((__typeof__(&D_800F27C0))((s8 *)&D_800F27C0 + temp_v0)));
-    arg0->length = (s32) (((s32) (temp_s0_2 - *(((__typeof__(&D_800F27C0))((s8 *)&D_800F27C0 + temp_v0)))) >> 3) * 8);
+    temp_v0 = curAcmdList * 4;
+    arg0->start = (s32) *(((__typeof__(&gAudioCmdLists))((s8 *)&gAudioCmdLists + temp_v0)));
+    arg0->length = (s32) (((s32) (temp_s0_2 - *(((__typeof__(&gAudioCmdLists))((s8 *)&gAudioCmdLists + temp_v0)))) >> 3) * 8);
     osWritebackDCacheAll();
-    Sched_SubmitTask(&D_8011AD90, arg0->msg);
-    D_800B2668 ^= 1;
+    Sched_SubmitTask(&gScheduler, arg0->msg);
+    curAcmdList ^= 1;
     Sound__Update();
-    osRecvMesg((s32) &D_800F2820, (s32) &sp14, 1);
+    osRecvMesg((s32) &gAudioReplyMsgQ, (s32) &sp14, 1);
     osAiSetNextBuffer(arg0->buffer, (s16) arg0->size * 4);
     return 1;
 }

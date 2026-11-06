@@ -12,8 +12,8 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-extern u32 D_8011AADC; /* D_8011AAD8.flags (see Demo_End) */
-extern s32 D_80130924;
+extern u32 gEngineApp_m_Settings_unlockedCheats; /* gEngineApp_m_Settings.flags (see Demo_End) */
+extern s32 sCheatsMenuSelection;
 
 /* Picks the first of the 11 options whose flag is set in the settings (-1 if none). */
 void CheatsMenu_Init_2(Screen *screen) {
@@ -58,7 +58,7 @@ void CheatsMenu_Init_2(Screen *screen) {
             bit = 0x4000000;
             break;
         }
-        if (D_8011AADC & bit) {
+        if (gEngineApp_m_Settings_unlockedCheats & bit) {
             goto found;
         }
         index++;
@@ -70,7 +70,7 @@ void CheatsMenu_Init_2(Screen *screen) {
     }
     index = -1;
 found:
-    D_80130924 = index;
+    sCheatsMenuSelection = index;
     if (index != -1) {
         screen->layer->flags |= 0x1800000;
     } else {

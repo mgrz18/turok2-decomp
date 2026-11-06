@@ -9,17 +9,17 @@
 
 
 
-#define PROGRESS (&D_80119870.m_Settings)
-extern s32 D_80130924;
-extern u8 D_800F7078[];
+#define PROGRESS (&gEngineApp_m_Game.m_Settings)
+extern s32 sCheatsMenuSelection;
+extern u8 gScene[];
 
 extern s32 Controller_ConfirmPressed(s32 pad);
 extern s32 Controller_MenuLeft(s32 pad);
 extern s32 Controller_MenuRight(s32 pad);
-extern void Menu_ClaimPressingController(Menu *c);
+extern void Menu_ClaimPressingController_2(Menu *c);
 extern void CEngineApp__SetupFadeTo(void *game, s32 mode);
 extern void CEngineApp__StartGameAtWarp(void *game, s32 level);
-extern void func_0042C620(void *level, s32 id, s32 how);
+extern void CScene__RequestWarp_2(void *level, s32 id, s32 how);
 
 static __inline__ u32 levelKey(s32 level) {
     u32 bit;
@@ -69,8 +69,8 @@ static __inline__ s32 findLevel(s32 step) {
     s32 n;
     u32 keys;
 
-    sel = D_80130924;
-    keys = D_80119870.m_Settings.unlockedCheats;
+    sel = sCheatsMenuSelection;
+    keys = gEngineApp_m_Game.m_Settings.unlockedCheats;
     for (n = 0; n < 11; n++) {
         sel += step;
         if (sel > 10) {
@@ -88,7 +88,7 @@ static __inline__ s32 findLevel(s32 step) {
 s32 CheatsMenu_WarpSelect_2(void *menu, Menu *c) {
     s32 id;
 
-    switch (D_80130924) {
+    switch (sCheatsMenuSelection) {
     case 0:
     default:
         id = 1000;
@@ -128,24 +128,24 @@ s32 CheatsMenu_WarpSelect_2(void *menu, Menu *c) {
         if (id == 8000) {
             PROGRESS->multiplayer = 0;
             PROGRESS->playerCount = 1;
-            Menu_ClaimPressingController(c);
-            CEngineApp__SetupFadeTo(&D_800F6CB0, 16);
+            Menu_ClaimPressingController_2(c);
+            CEngineApp__SetupFadeTo(&gEngineApp, 16);
             return 1;
         }
-        if (D_80119870.m_Settings.mode == 13) {
-            func_0042C620(D_800F7078, id, 2);
+        if (gEngineApp_m_Game.m_Settings.mode == 13) {
+            CScene__RequestWarp_2(gScene, id, 2);
             return 0;
         }
         PROGRESS->multiplayer = 0;
         PROGRESS->playerCount = 1;
-        Menu_ClaimPressingController(c);
-        CEngineApp__StartGameAtWarp(&D_800F6CB0, id);
+        Menu_ClaimPressingController_2(c);
+        CEngineApp__StartGameAtWarp(&gEngineApp, id);
         return 1;
     }
     if (Controller_MenuLeft(c->controller) != 0) {
-        D_80130924 = findLevel(-1);
+        sCheatsMenuSelection = findLevel(-1);
     } else if (Controller_MenuRight(c->controller) != 0) {
-        D_80130924 = findLevel(1);
+        sCheatsMenuSelection = findLevel(1);
     } else {
         return 0;
     }

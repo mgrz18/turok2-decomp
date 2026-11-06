@@ -6,11 +6,11 @@ typedef unsigned int u32;
 typedef signed int s32;
 typedef float f32;
 typedef struct B19bV3f { f32 x, y, z; } B19bV3f;
-/* D_8011AAD8 (GameSettings in structs/game.h: cheatFlags, unkC). Kept as a local
- * array view: through it the compiler bases both loads on D_8011AAD8 + 0xC, as
- * the ROM does; through the struct it bases them on D_8011AAD8. */
+/* gEngineApp_m_Settings (GameSettings in structs/game.h: cheatFlags, unkC). Kept as a local
+ * array view: through it the compiler bases both loads on gEngineApp_m_Settings + 0xC, as
+ * the ROM does; through the struct it bases them on gEngineApp_m_Settings. */
 typedef struct B19bG8 { u32 flags; u8 pad4[0x8]; u32 fC; } B19bG8;
-extern B19bG8 D_8011AAD8[];
+extern B19bG8 gEngineApp_m_Settings[];
 typedef struct B19bLObj {
               u8 pad0[4];
               f32 f4;
@@ -48,9 +48,9 @@ void CScene__ComputeLights(B19bLObj **ents, s32 n, f32 *pos, u8 *out) {
     f32 m1_3, m2_3;
     f32 m1_4, m2_4;
     f32 m1_5, m2_5;
-    scale = (f32)D_8011AAD8->fC * 0.003921569f;
+    scale = (f32)gEngineApp_m_Settings->fC * 0.003921569f;
     last = 0;
-    if (D_8011AAD8->flags & 0x4000) {
+    if (gEngineApp_m_Settings->flags & 0x4000) {
         out[0] = out[4] = 0;
         out[1] = out[5] = 0;
         out[2] = out[6] = 0;

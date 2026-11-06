@@ -2,7 +2,7 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern s32 D_8011ACA8;
+extern s32 gEngineApp_m_Settings_matchMode;
 
 extern void CPlayer__NewGame(CPlayer *p, s32 arg1, s32 arg2);
 extern void CAI__SetMode(void *, void *, s32);
@@ -12,5 +12,5 @@ void CPlayer__Activate(CPlayer *p, s32 arg1) {
     p->m_pOptions->m_bActive = 1;
     CPlayer__NewGame(p, arg1, 1);
     CAI__SetMode(&p->m_WeaponActor, &p->m_WeaponActor.m_AI, 2);
-    CPlayer__Warp(p, D_8011ACA8, 0, 1);
+    CPlayer__Warp(p, gEngineApp_m_Settings_matchMode, 0, 1);
 }

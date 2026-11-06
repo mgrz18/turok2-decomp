@@ -6,12 +6,12 @@ s32 GetMemSize(void); /* osGetMemSize */
 
 #define MAX(a, b) ((a) >= (b) ? (a) : (b))
 
-extern s32 D_80000300; /* osTvType */
-extern s32 D_800C2030;
-extern s32 D_800C2034;
-extern s32 D_800C2038; /* current mode */
-extern s32 D_800C203C; /* previous mode */
-extern s32 D_800C204C[2]; /* mode count per TV region */
+extern s32 osTvType; /* osTvType */
+extern s32 gScreenWidth;
+extern s32 gScreenHeight;
+extern s32 gResolution; /* current mode */
+extern s32 gAppliedResolution; /* previous mode */
+extern s32 gVideoModeCounts[2]; /* mode count per TV region */
 
 /* Steps to the next video mode of the TV region that fits in memory. */
 void Video_NextResolution_2(void) {
@@ -19,7 +19,7 @@ void Video_NextResolution_2(void) {
     s32 *mode;
     s32 limit;
 
-    switch (D_80000300) {
+    switch (osTvType) {
         case 0:
         case 2:
             region = 1;
@@ -27,16 +27,16 @@ void Video_NextResolution_2(void) {
         case 1:
             break;
     }
-    mode = (s32 *)&D_800C2054[region][D_800C2038];
+    mode = (s32 *)&gVideoModes[region][gResolution];
     if (GetMemSize() != 0x400000) {
         limit = 0x2A300;
     } else {
         limit = 0xF660;
     }
-    D_800C2038 = (D_800C2038 + 1) % D_800C204C[region];
+    gResolution = (gResolution + 1) % gVideoModeCounts[region];
     while (mode[0] * mode[1] > limit) {
-        D_800C2038 = (D_800C2038 + 1) % D_800C204C[region];
+        gResolution = (gResolution + 1) % gVideoModeCounts[region];
     }
-    D_800C2030 = MAX(D_800C2054[region][D_800C2038].width, D_800C2054[region][D_800C203C].width);
-    D_800C2034 = MAX(D_800C2054[region][D_800C2038].height, D_800C2054[region][D_800C203C].height);
+    gScreenWidth = MAX(gVideoModes[region][gResolution].width, gVideoModes[region][gAppliedResolution].width);
+    gScreenHeight = MAX(gVideoModes[region][gResolution].height, gVideoModes[region][gAppliedResolution].height);
 }

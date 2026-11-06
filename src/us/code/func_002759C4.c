@@ -1,12 +1,12 @@
 #include "common.h"
 
 s32 Music_FadeOut();                            /* extern */
-extern s32 D_800F478C[];
-extern s32 D_8011ACA0[];
+extern s32 gAudioWorld_seq_track[];
+extern s32 gEngineApp_m_Settings_unk1C8[];
 
 void Music_SetTrack(s32 arg0) {
-    if ((D_8011ACA0[0] == 0) && (D_800F478C[0] != arg0)) {
-        D_800F478C[0] = arg0;
+    if ((gEngineApp_m_Settings_unk1C8[0] == 0) && (gAudioWorld_seq_track[0] != arg0)) {
+        gAudioWorld_seq_track[0] = arg0;
         if (arg0 == 0) {
             Music_FadeOut();
         }

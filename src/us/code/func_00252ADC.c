@@ -2,9 +2,9 @@
 #include "structs/player.h"
 #include "structs/game_object.h"
 
-extern s32 D_8011AC8C;
-extern s32 D_8011ACA4;
-extern f32 D_800B6D28;          /* frame time scale */
+extern s32 gEngineApp_m_Settings_nextMode;
+extern s32 gEngineApp_m_Settings_paused;
+extern f32 gFrameIncrement;          /* frame time scale */
 
 extern s32 Cinema_PathPlaying(void);
 extern void *LoopSounds_Get(void);
@@ -25,10 +25,10 @@ static __inline__ s32 menu_open(CPlayer *p) {
 
 /* Animate each living player's weapon model on its own (frame time kept),
  * then put it back on the player; stop the weapon sounds otherwise. */
-void CPlayerPool__AnimateWeapons(CPlayerList *list) {
+void CPlayerPool__AnimateWeapons(CPlayerPool *list) {
     CPlayer *p;
 
-    if (D_8011AC8C == 11 || D_8011AC8C == 8) {
+    if (gEngineApp_m_Settings_nextMode == 11 || gEngineApp_m_Settings_nextMode == 8) {
         return;
     }
     for (p = list->m_ActiveList.m_pHead; p != NULL; p = p->m_pNext) {
@@ -37,18 +37,18 @@ void CPlayerPool__AnimateWeapons(CPlayerList *list) {
             p->m_pLoopingSound_WeaponBackground = NULL;
             LoopSounds_Stop(LoopSounds_Get(), p->m_pLoopingSound_WeaponFiring);
             p->m_pLoopingSound_WeaponFiring = NULL;
-        } else if (D_8011ACA4 == 0) {
+        } else if (gEngineApp_m_Settings_paused == 0) {
             if (!menu_open(p)) {
                 CGameObjectInstance *weapon = &p->m_WeaponActor;
                 s32 old = p->m_CharAnim;
-                f32 frameTime = D_800B6D28;
+                f32 frameTime = gFrameIncrement;
 
                 p->m_WeaponActor.m_dwFlags |= 0x200;
                 weapon->m_dwHotPointFlags = 16;
                 weapon->m_dwFlags &= ~0x20000;
                 func_0021F1B4(weapon);
                 CGameObjectInstance__UpdateAnimation(weapon);
-                D_800B6D28 = frameTime;
+                gFrameIncrement = frameTime;
                 if (old != p->m_CharAnim) {
                     p->m_CharacterActor.m_CurrentAnimation.m_bCycleCompleted = 0;
                 }

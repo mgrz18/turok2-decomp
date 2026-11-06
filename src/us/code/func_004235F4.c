@@ -7,13 +7,13 @@ s32 sprintf(char *dst, const char *fmt, ...); /* sprintf */
 extern char D_800B50B4[];
 extern char D_800B50E4[];
 extern char D_800C1430[];
-extern s32 D_800C2028;
-extern s32 D_80130964;
-extern s32 D_80130990;
+extern s32 gPakMenuPort;
+extern s32 sDamagedPakInGame;
+extern s32 gPakMenuAnyPak;
 
 static __inline__ s32 GetPort(Menu *event) {
-    if (D_80130990 != 0) {
-        return D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        return gPakMenuPort;
     }
     return event->controller->port;
 }
@@ -21,7 +21,7 @@ static __inline__ s32 GetPort(Menu *event) {
 s32 DamagedPakMenu_UpdateLine3(MenuItem *item, Menu *event) {
     s32 port = GetPort(event);
 
-    if (D_80130964 != 0) {
+    if (sDamagedPakInGame != 0) {
         item->text = D_800B50B4;
     } else {
         item->text = D_800B50E4;

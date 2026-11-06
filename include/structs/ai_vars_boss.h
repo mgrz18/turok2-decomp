@@ -8,7 +8,7 @@
 
 #include "common.h"
 
-/* The Blind One (D_80130200, structs/boss.h) and its three groups of level
+/* The Blind One (gBlindOne, structs/boss.h) and its three groups of level
  * actors (types 0x454, 0x455, 0x456): BlindOne_BossInit sets up the boss,
  * BlindOne_Group1Init / BlindOne_Group2Init / BlindOne_Group3Init / BlindOne_ActorInit the actors
  * (second copies BlindOne_BossInit_2...). */
@@ -22,7 +22,7 @@ typedef struct {
     /* 0x10 */ f32 m_SightDist;   /* the flat distance to its sight target (BlindOne_ActorAimUpdate) */
 } CBlindOneAIVars; /* size 0x14 */
 
-/* The Mother boss (D_8012FB70, structs/boss.h): its 0x1DB1 parts and 0x1DB2
+/* The Mother boss (gMotherBoss, structs/boss.h): its 0x1DB1 parts and 0x1DB2
  * controller get m_bActive (MotherBoss_Init); the module actors
  * (MotherBossState.actors) keep two scales that MotherBoss_PartEffects animates with
  * the boss's anim state and applies to their parts. */

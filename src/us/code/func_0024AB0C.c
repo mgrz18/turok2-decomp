@@ -16,12 +16,12 @@ typedef struct B05P14 {
     u32 flagsA68;           /* 0xA68 */
 } B05P14;
 typedef struct B05Fx { u8 pad0[8]; void *unk8; f32 unkC; s16 unk10; s16 unk12; s16 unk14; s16 unk16; } B05Fx;
-extern s32 D_8011AAD8;
+extern s32 gEngineApp_m_Settings;
 extern u8 D_8010FF34[];
-extern u8 D_800ADB10[];
-extern u8 D_800ADB18[];
-extern u8 D_800ADB20[];
-extern u8 D_800ADB28[];
+extern u8 sFlashlightLight1[];
+extern u8 sFlashlightLight2[];
+extern u8 sDarkCityLight[];
+extern u8 sDarkCityLight2[];
 void CDLightSet__Free(u8 *, void *);
 s32 Random_Next();
 B05Fx *CDLightSet__Alloc(u8 *, u8 *);
@@ -54,7 +54,7 @@ static inline void fxupd(B05P14 *p, void **slot, u8 *tab, f32 offz, f32 k1, f32 
 }
 void CPlayer__UpdateFlashlight(B05P14 *p) {
     s32 vis;
-    if (D_8011AAD8 & 0x4000) {
+    if (gEngineApp_m_Settings & 0x4000) {
         p->timer = 0.0f;
     } else {
         if (p->fx3 != ((void *)0)) {
@@ -63,8 +63,8 @@ void CPlayer__UpdateFlashlight(B05P14 *p) {
         }
     }
     if (p->timer != 0.0f) {
-        fxupd(p, &p->fx1, D_800ADB10, 204.79999f, 0.5f, 1.0f);
-        fxupd(p, &p->fx2, D_800ADB18, 614.39996f, 0.5f, 1.0f);
+        fxupd(p, &p->fx1, sFlashlightLight1, 204.79999f, 0.5f, 1.0f);
+        fxupd(p, &p->fx2, sFlashlightLight2, 614.39996f, 0.5f, 1.0f);
         if (p->timer < 70.0f) {
             vis = 1;
             if (p->timer < 20.0f) {
@@ -89,13 +89,13 @@ void CPlayer__UpdateFlashlight(B05P14 *p) {
             p->fx2 = ((void *)0);
         }
     }
-    if (D_8011AAD8 & 0x4000) {
-        fxupd(p, &p->fx3, D_800ADB20, 0.0f, 0.5f, 1.0f);
+    if (gEngineApp_m_Settings & 0x4000) {
+        fxupd(p, &p->fx3, sDarkCityLight, 0.0f, 0.5f, 1.0f);
         if ((p->flagsA68 & 0x20) && p->fx3 != ((void *)0)) {
-            if (((B05Fx *)p->fx3)->unk8 == D_800ADB20) {
-                ((B05Fx *)p->fx3)->unk8 = D_800ADB28;
+            if (((B05Fx *)p->fx3)->unk8 == sDarkCityLight) {
+                ((B05Fx *)p->fx3)->unk8 = sDarkCityLight2;
             } else {
-                ((B05Fx *)p->fx3)->unk8 = D_800ADB20;
+                ((B05Fx *)p->fx3)->unk8 = sDarkCityLight;
             }
         }
     }

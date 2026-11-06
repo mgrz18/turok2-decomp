@@ -4,9 +4,9 @@
 
 /* AI draw callback: draws the actor faded in or out (dying / teleporting states). */
 
-extern s32 D_800AB8B0; /* fade mode */
-extern f32 D_800AB8C0[2]; /* fade level, alpha */
-extern s32 D_800B6D1C; /* current view */
+extern s32 gBlendState; /* fade mode */
+extern f32 gBlendFade[2]; /* fade level, alpha */
+extern s32 gEvenOdd; /* current view */
 extern u8 D_801100D4[];
 
 extern void CGameObjectInstance__DrawModelImmediate(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params);
@@ -20,7 +20,7 @@ void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
 
     if (ai->m_Mode == 0x20) {
         CGameObjectInstance__DrawModelImmediate(actor, ai, params);
-        Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[D_800B6D1C], 0, ((s8 *)params)[0x1B], -1);
+        Render_DrawModelShared(params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[gEvenOdd], 0, ((s8 *)params)[0x1B], -1);
         return;
     }
     if (ai->m_Enemy.m_Timer > 0.0f) {
@@ -33,17 +33,17 @@ void EnemyAI_DrawFaded(CGameObjectInstance *actor, CAI *ai, CDrawArgs *params) {
             }
         }
         if (alpha != 255) {
-            D_800AB8B0 = 1;
-            D_800AB8C0[0] = 255 - alpha;
+            gBlendState = 1;
+            gBlendFade[0] = 255 - alpha;
             CGameObjectInstance__DrawModelImmediate(actor, ai, params);
         }
         if (alpha != 0) {
-            D_800AB8C0[0] = alpha;
-            D_800AB8B0 = 1;
-            func_0020BBE4(D_801100D4, -1, params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[D_800B6D1C], 0,
+            gBlendFade[0] = alpha;
+            gBlendState = 1;
+            func_0020BBE4(D_801100D4, -1, params->m_hModel, actor->m_pmtDrawMtxs, 1, actor->m_Lights[gEvenOdd], 0,
                           params->m_nModel, actor->m_AI.m_nTexture);
         }
-        D_800AB8B0 = 0;
+        gBlendState = 0;
     } else {
         CGameObjectInstance__DrawModel(actor, ai, params);
     }

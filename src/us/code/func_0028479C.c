@@ -7,8 +7,8 @@ typedef struct {
 } Arg0;
 
 s32 func_00226160(s32 *, u8, s16);          /* extern */
-extern s32 D_800F7078;
+extern s32 gScene;
 
 void CPathTrack__GetCurrentPoint(Arg0 *arg0) {
-    func_00226160(&D_800F7078, arg0->unk1, arg0->unk2);
+    func_00226160(&gScene, arg0->unk1, arg0->unk2);
 }

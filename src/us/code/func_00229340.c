@@ -11,10 +11,10 @@ extern CMtxF *CParticle__GetParentTransform(CParticle *p, s32 arg1);         /* 
 extern void GameObject_TraceMove(CParticle *p, CVector3 to, CVector3 *outPos, void **outRegion, s32, s32);
 extern void CParticleSystem__Spawn(void *sys, CParticle *p, void *owner, s32 *ownerCount, void *target, s32 model, CVector3 dir,
                           CQuaternion rot, CVector3 pos, void *region, s32 arg2, s32 flags);
-extern CVector3 D_800F1DB8;
-extern CCollisionResults *D_800F1ADC;
-extern CCollisionResults D_800F1CE0;
-extern u8 D_800F8928[];
+extern CVector3 gCollisionResults_m_vVelocity;
+extern CCollisionResults *gCollisionResultsP;
+extern CCollisionResults gCollisionResults;
+extern u8 gScene_m_ParticleSystem[];
 
 static __inline__ f32 offset_x(CParticle *p) {
     if (p->m_pEffect->m_pModel != NULL) {
@@ -44,7 +44,7 @@ void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 flags) {
     CMtxF *parent;
 
     if (p->m_pEffect->m_dwFlags & 0x10) {
-        direction = D_800F1DB8;
+        direction = gCollisionResults_m_vVelocity;
     } else {
         direction = p->m_vVelocity;
     }
@@ -65,15 +65,15 @@ void CParticle__SpawnChild(CParticle *p, s32 model, s32 arg2, s32 flags) {
             carried = turned;
         }
         CVector3__Add(&moved, &carried, &p->header.m_vPos);
-        D_800F1ADC = &scratch;
+        gCollisionResultsP = &scratch;
         if (p->header.m_pCurrentRegion != NULL) {
             GameObject_TraceMove(p, moved, &point, &region, 0, 0);
         } else {
             point = moved;
             region = NULL;
         }
-        D_800F1ADC = &D_800F1CE0;
+        gCollisionResultsP = &gCollisionResults;
     }
-    CParticleSystem__Spawn(D_800F8928, p, p->m_pOwner, p->m_pOwnerCount, p->m_pTarget, model, direction, rotation, point, region,
+    CParticleSystem__Spawn(gScene_m_ParticleSystem, p, p->m_pOwner, p->m_pOwnerCount, p->m_pTarget, model, direction, rotation, point, region,
                   arg2, flags | (p->m_dwFlags & 0x200006));
 }

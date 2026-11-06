@@ -2,12 +2,12 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-extern BlindOneState D_80130200;
+extern BlindOneState gBlindOne;
 
 extern s32 CAI__SetMode(CGameObjectInstance *actor, void *ai, s32 state);
 
 void BlindOne_ActorDeathEnter(CGameObjectInstance *actor, CAI *ai) {
-    BlindOneState *counters = &D_80130200;
+    BlindOneState *counters = &gBlindOne;
     CGameObjectInstance *next;
 
     if (counters->boss->m_AI.m_Mode != 1) {

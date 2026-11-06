@@ -7,60 +7,60 @@
 #include "structs/menu.h"
 #include "structs/pak.h"
 
-extern s8 D_80130950[];
-extern s32 D_80130990;
-extern s32 D_800C2028;
-extern s32 D_801309BC;
-extern s32 D_80130960;
-extern s32 D_801309C4;
-extern u8 D_80119E2C[];
-extern u8 D_00438748[];
-extern u8 D_0043BDB0[];
-extern u8 D_0043BE1C[];
+extern s8 gPakProfileRead_character[];
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort;
+extern s32 gPakMenuLeaving;
+extern s32 sCharNoteLoad;
+extern s32 gPakNoteIndex;
+extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern u8 gPlayerSetupMenuDesc[];
+extern u8 gPakMsgDeleteDoneDesc[];
+extern u8 gPakMsgDeleteFailedDesc[];
 s32 PakMenu_CheckPak(Menu *o, s32 pad, s32 z);
-CPlayer *CPlayerPool__FindByController(CPlayerList *world, ControllerProfile *s);
+CPlayer *CPlayerPool__FindByController(CPlayerPool *world, ControllerProfile *s);
 void CPlayer__SetCharacter(CPlayer *a, s32 b);
 void MenuPool_OpenChildMenu(u8 *a, Menu *o, u8 *c);
 s32 Pak_DeleteNote(s32 pad, s32 idx);
 void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
-extern PakProfile D_80130968;
+extern PakProfile gPakProfile;
 /* Turok 2 inlines this (Rage Wars calls it) */
 static inline void O01Restore(CPlayer *a) {
     CPlayerOptions *s = a->m_pOptions;
     s32 i;
-    s->m_nCharacter = D_80130968.character;
-    s->m_Suicides = D_80130968.suicides;
-    s->m_Deaths = D_80130968.deaths;
-    s->m_Kills = D_80130968.kills;
-    s->m_Tags = D_80130968.tags;
+    s->m_nCharacter = gPakProfile.character;
+    s->m_Suicides = gPakProfile.suicides;
+    s->m_Deaths = gPakProfile.deaths;
+    s->m_Kills = gPakProfile.kills;
+    s->m_Tags = gPakProfile.tags;
     for (i = 0; i < 8; i++) {
-        s->m_Name[i] = D_80130968.name[i];
+        s->m_Name[i] = gPakProfile.name[i];
     }
 }
 s32 CharNoteMenu_SelectYes(s32 unused, Menu *own) {
     s32 pad;
     CPlayer *plr;
-    if (D_80130990 != 0) {
-        pad = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        pad = gPakMenuPort;
     } else {
         pad = own->controller->port;
     }
     if (PakMenu_CheckPak(own, pad, 0) != 0) {
-        D_801309BC = 1;
+        gPakMenuLeaving = 1;
         return 1;
     }
-    if (D_80130960 != 0) {
-        plr = CPlayerPool__FindByController(&D_80119870.m_PlayerList, own->controller);
+    if (sCharNoteLoad != 0) {
+        plr = CPlayerPool__FindByController(&gEngineApp_m_Game.m_PlayerList, own->controller);
         own->player = plr;
         O01Restore(plr);
-        CPlayer__SetCharacter(plr, D_80130950[0]);
-        MenuPool_OpenChildMenu((u8 *)plr->m_pCamera + 0x53C, own, D_00438748);
+        CPlayer__SetCharacter(plr, gPakProfileRead_character[0]);
+        MenuPool_OpenChildMenu((u8 *)plr->m_pCamera + 0x53C, own, gPlayerSetupMenuDesc);
         return 1;
     }
-    if (Pak_DeleteNote(pad, D_801309C4) == 0) {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BDB0, own->player, own->controller, (void *)own->context);
+    if (Pak_DeleteNote(pad, gPakNoteIndex) == 0) {
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteDoneDesc, own->player, own->controller, (void *)own->context);
     } else {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BE1C, own->player, own->controller, (void *)own->context);
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgDeleteFailedDesc, own->player, own->controller, (void *)own->context);
     }
     return 1;
 }

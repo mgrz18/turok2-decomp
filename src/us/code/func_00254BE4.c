@@ -5,7 +5,7 @@
 s32 MenuPool_CountOpen(s32);                             /* extern */
 
 /* Counts the active players whose camera's menu pool is idle. */
-s32 CPlayerPool__CountIdleMenus(CPlayerList *arg0) {
+s32 CPlayerPool__CountIdleMenus(CPlayerPool *arg0) {
     s32 var_s1;
     CPlayer *var_s0;
 

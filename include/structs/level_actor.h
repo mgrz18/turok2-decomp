@@ -47,7 +47,7 @@ typedef struct CLevelActor {
     /* 0x018 */ CVector3 m_vVelocity;
     /* 0x024 */ s32 unk24[4];               /* CObjectHead's water displacement and m_pInstanceBelow, cleared on a spawn */
     /* 0x034 */ s32 m_Resource;             /* CScene__GetObject (the model) */
-    /* 0x038 */ f32 m_Matrices[4][16];      /* its matrix, one per frame slot (D_800B6D1C), rebuilt once per frame */
+    /* 0x038 */ f32 m_Matrices[4][16];      /* its matrix, one per frame slot (gEvenOdd), rebuilt once per frame */
     /* 0x138 */ s32 unk138;
     /* 0x13C */ f32 m_Scale;
     /* 0x140 */ s32 unk140;
@@ -60,7 +60,7 @@ typedef struct CLevelActor {
     /* 0x16E */ u16 m_nKilledIndex;         /* its bit in the level's killed array */
     /* 0x170 */ f32 m_Timer;                /* the grow-in time (flag 0x10, CLevelActor__UpdateGrowIn), the morpher's animation clock (CLevelActor__Update) */
     /* 0x174 */ f32 m_AnimSpeed;            /* type 12 (morpher): the frame rate times its m_AnimSpeed (CLevelActor__UpdateAnimSpeed) */
-    /* 0x178 */ u8 m_Lights[0x18];          /* the lighting at its position (CScene__GetLightsAt, CScene__ComputeLights; D_800AB0D0 when placed) */
+    /* 0x178 */ u8 m_Lights[0x18];          /* the lighting at its position (CScene__GetLightsAt, CScene__ComputeLights; gSceneLights when placed) */
     /* 0x190 */ s32 m_ViewMask;             /* the views it shows in: the placement record's, then its region's m_VisBits (CLevelActor__Update) */
     /* 0x194 */ u8 m_DrawnFrame;            /* the frame (D_800B6D1B) its matrix was last built for */
     /* 0x195 */ u8 m_UpdatedFrame;          /* the frame its once-per-frame update (CLevelActor__Update) last ran */
@@ -79,7 +79,7 @@ typedef struct CPooledLevelActor {
     /* 0x1AC */ struct CPooledLevelActor *m_pNext;
 } CPooledLevelActor; /* size 0x1B0 */
 
-/* The world's level actor pool (CWorld.m_ActorPool, 0x10518): 32 slots, the
+/* The world's level actor pool (CScene.m_ActorPool, 0x10518): 32 slots, the
  * free list and the live list (newest at the head, oldest at the tail,
  * released first when no slot is free). */
 typedef struct CLevelActorPool {

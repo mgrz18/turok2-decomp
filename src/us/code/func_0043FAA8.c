@@ -9,26 +9,26 @@ extern void CAI__SetMode(CGameObjectInstance *obj, CAI *ai, s32 mode);
 
 extern s32 D_800F1C40[];
 extern s32 D_800F1F50[];
-extern BossStep2 D_004312D4[];
-extern BossStep2 D_00431344[];
-extern BossStep2 D_004313EC[];
+extern BossStep2 sPrimagenSpawnScript1_2[];
+extern BossStep2 sPrimagenSpawnScript2_2[];
+extern BossStep2 sPrimagenSpawnScript3_2[];
 
 /* Primagen_SetSpawnScript: start the second script for a stage. */
 static __inline__ void StartScript2(s32 stage) {
-    D_8012F608.script2.cursor = -1;
-    D_8012F608.script2On = 1;
-    D_8012F608.script2.current = -1;
+    gLevelScript.script2.cursor = -1;
+    gLevelScript.script2On = 1;
+    gLevelScript.script2.current = -1;
     if (stage == 0) {
-        D_8012F608.script2.steps = NULL;
+        gLevelScript.script2.steps = NULL;
     }
     if (stage == 1) {
-        D_8012F608.script2.steps = D_004312D4;
+        gLevelScript.script2.steps = sPrimagenSpawnScript1_2;
     }
     if (stage == 2) {
-        D_8012F608.script2.steps = D_00431344;
+        gLevelScript.script2.steps = sPrimagenSpawnScript2_2;
     }
     if (stage == 3) {
-        D_8012F608.script2.steps = D_004313EC;
+        gLevelScript.script2.steps = sPrimagenSpawnScript3_2;
     }
 }
 
@@ -38,35 +38,35 @@ void Primagen_UpdateMode24_2(CGameObjectInstance *obj, CAI *ai) {
     if (ai->m_AnimRepeatedCount == 0) {
         return;
     }
-    dy = obj->header.m_vPos.y - D_8012F608.dest.y;
+    dy = obj->header.m_vPos.y - gLevelScript.dest.y;
     if (!(ABS(dy) < 10.0f)) {
         return;
     }
     obj->m_vVelocity.x = 0.0f;
     obj->m_vVelocity.y = 0.0f;
     obj->m_vVelocity.z = 0.0f;
-    D_8012F608.unk3CA = 0;
-    D_8012F608.script.current = -1;
+    gLevelScript.unk3CA = 0;
+    gLevelScript.script.current = -1;
     D_800F1C40[0] &= ~0x300;
     D_800F1F50[0] &= ~0x300;
-    if (D_8012F608.bossState == 3) {
-        obj->header.m_vPos.x = D_8012F608.home.x;
-        obj->header.m_vPos.y = D_8012F608.home.y;
-        obj->header.m_vPos.z = D_8012F608.home.z;
+    if (gLevelScript.bossState == 3) {
+        obj->header.m_vPos.x = gLevelScript.home.x;
+        obj->header.m_vPos.y = gLevelScript.home.y;
+        obj->header.m_vPos.z = gLevelScript.home.z;
         obj->m_RotY = 0.0f;
-        D_8012F608.bossMode = 1;
-        if (D_8012F608.stage == 1) {
+        gLevelScript.bossMode = 1;
+        if (gLevelScript.stage == 1) {
             StartScript2(1);
         }
-        if (D_8012F608.stage == 2) {
+        if (gLevelScript.stage == 2) {
             StartScript2(2);
         }
-        if (D_8012F608.stage == 3) {
+        if (gLevelScript.stage == 3) {
             StartScript2(3);
         }
         CAI__SetMode(obj, ai, 5);
-    } else if (!D_8012F608.partActive) {
-        D_8012F608.bossMode = 2;
+    } else if (!gLevelScript.partActive) {
+        gLevelScript.bossMode = 2;
         CAI__SetMode(obj, ai, 7);
     } else {
         CAI__SetMode(obj, ai, 0x10);

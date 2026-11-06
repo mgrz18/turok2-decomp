@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/collision.h"
 
-extern MapSweep *D_800F1AB0;
+extern MapSweep *sMapSweep;
 
 f32 func_00268460(CGameObjectInstance *inst);
 void Collision_SweepRegionWalls(void *region);
@@ -28,11 +28,11 @@ void Collision_SweepMapWalls(Sweep *sweep) {
     if (inst->header.m_Type == 1 && !(inst->m_dwFlags & 0x300200)) {
         return;
     }
-    D_800F1AB0 = &ms;
-    D_800F1AB0->radius = func_00268460(inst);
-    D_800F1AB0->sweep = sweep;
-    D_800F1AB0->normal.y = 0.0f;
-    D_800F1AB0->wallPoint.y = 0.0f;
+    sMapSweep = &ms;
+    sMapSweep->radius = func_00268460(inst);
+    sMapSweep->sweep = sweep;
+    sMapSweep->normal.y = 0.0f;
+    sMapSweep->wallPoint.y = 0.0f;
     if (sweep->inst->m_vPos.x < sweep->end.x) {
         lo = sweep->inst->m_vPos.x;
         hi = sweep->end.x;
@@ -40,8 +40,8 @@ void Collision_SweepMapWalls(Sweep *sweep) {
         lo = sweep->end.x;
         hi = sweep->inst->m_vPos.x;
     }
-    D_800F1AB0->minX = lo - D_800F1AB0->radius;
-    D_800F1AB0->maxX = hi + D_800F1AB0->radius;
+    sMapSweep->minX = lo - sMapSweep->radius;
+    sMapSweep->maxX = hi + sMapSweep->radius;
     if (sweep->inst->m_vPos.z < sweep->end.z) {
         lo = sweep->inst->m_vPos.z;
         hi = sweep->end.z;
@@ -49,8 +49,8 @@ void Collision_SweepMapWalls(Sweep *sweep) {
         lo = sweep->end.z;
         hi = sweep->inst->m_vPos.z;
     }
-    D_800F1AB0->minZ = lo - D_800F1AB0->radius;
-    D_800F1AB0->maxZ = hi + D_800F1AB0->radius;
+    sMapSweep->minZ = lo - sMapSweep->radius;
+    sMapSweep->maxZ = hi + sMapSweep->radius;
     Collision_SweepRegionWalls(region);
     CGameRegion__ClearVisited(region);
 }

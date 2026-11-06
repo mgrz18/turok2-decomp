@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern s32 D_8011AAD8;          /* game flags */
+extern s32 gEngineApp_m_Settings;          /* game flags */
 
 /* The camera's fog colour, each channel to 5 bits, or black while flag
  * 0x4000 is up. */
 void CCamera__GetFogColor(CCamera *cam, u8 *red, u8 *green, u8 *blue) {
-    if (D_8011AAD8 & 0x4000) {
+    if (gEngineApp_m_Settings & 0x4000) {
         *red = 0;
         *green = 0;
         *blue = 0;

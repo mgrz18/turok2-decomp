@@ -7,7 +7,7 @@ extern float func_002974C0(float x);
 extern float func_002982F0(float x);
 extern FftTables *mdctFftInit(s32 n);
 extern float D_800AAC30;
-extern FftTables D_800B8A30;
+extern FftTables gMdctFftTables;
 FftTables *mdctFftInit(s32 n) {
     FftTables *tables;
     s32 half;
@@ -22,7 +22,7 @@ FftTables *mdctFftInit(s32 n) {
     f32 scale;
     f32 count;
     half = n >> 1;
-    tables = &D_800B8A30;
+    tables = &gMdctFftTables;
     i = 0;
     if (i < half) {
         scale = D_800AAC30;

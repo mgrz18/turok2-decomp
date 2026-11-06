@@ -3,11 +3,11 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern s32 D_801309C0;
+extern s32 gPakMessageKind;
 extern char D_800B4B9C[];
 extern char D_800B4BA4[];
 s32 PakMessage_UpdateHeading_2(MenuItem *item) {
-    switch (D_801309C0) {
+    switch (gPakMessageKind) {
     default:
     case 0:
         item->text = D_800B4B9C;

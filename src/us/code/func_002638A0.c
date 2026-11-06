@@ -197,13 +197,13 @@ typedef struct T2MotionState {
     s32 counter;               /* 0x110 (0x128) */
 } T2MotionState;
 
-extern char D_8010ABA0;
+extern char gScene_m_InstancePool;
 extern s32 CInstancePool__Spawn(void *arg0, s32 arg1, s32 arg2, s32 arg3,
                          s32 arg4, Triple arg5, f32 arg6, CVector3 arg7,
                          Triple arg8, void *arg9);
 void Generator_SpawnObject(T2Actor *arg0, T2MotionState *arg1, Triple arg2, Triple arg3,
                    s32 arg4, s32 arg5, s32 arg6) {
-    if (CInstancePool__Spawn(&D_8010ABA0, arg5, 0, arg6,
+    if (CInstancePool__Spawn(&gScene_m_InstancePool, arg5, 0, arg6,
                       arg4, arg2,
                       arg0->yaw,
                       arg0->position, arg3,

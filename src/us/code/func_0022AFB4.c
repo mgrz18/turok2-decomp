@@ -18,13 +18,13 @@ struct ContactHandler {
     /* 0x10 */ s32 (*func)(CPlayer *player, ContactHandler *handler);
 };
 
-extern f32 D_800B6D28;                  /* the frame's time step */
-extern f32 D_800B6D30;
-extern CCollisionResults D_800F1CE0;
-extern CPlayer *D_80119890;              /* current player */
-extern ContactHandler D_800ACE18[4];
-extern CCollisionResults *D_800F1ADC;
-extern u8 D_800F8928[];
+extern f32 gFrameIncrement;                  /* the frame's time step */
+extern f32 gParticleTimeScale;
+extern CCollisionResults gCollisionResults;
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;              /* current player */
+extern ContactHandler sParticleAmmoPickups[4];
+extern CCollisionResults *gCollisionResultsP;
+extern u8 gScene_m_ParticleSystem[];
 
 s32 Random_Next(void);
 s32 Collision_MoveInstance(CParticle *p, CVector3 pos, u32 *flags);
@@ -99,7 +99,7 @@ void CParticle__Update(CParticle *p) {
     if (p->m_dwFlags & 0x20000) {
         p->m_cFrame = 0.0f;
         p->m_nFrames = p->m_AnimSpeed * 32.0f;
-        half = p->m_Shake - D_800B6D28 * 6.0f;
+        half = p->m_Shake - gFrameIncrement * 6.0f;
         fade = (half < 0.0f) ? 0 : (s32) half;
         p->m_Shake = fade;
     }
@@ -178,18 +178,18 @@ void CParticle__Update(CParticle *p) {
             }
         }
     }
-    if ((p->m_dwFlags & 0x40000) && Collision_MoveInstance(p, p->header.m_vPos, &p->m_dwHitFlags) && D_800F1CE0.m_pFloorRegion != 0) {
+    if ((p->m_dwFlags & 0x40000) && Collision_MoveInstance(p, p->header.m_vPos, &p->m_dwHitFlags) && gCollisionResults.m_pFloorRegion != 0) {
         p->m_Alignment = -3;
     }
     if (p->m_dwFlags & 0x60000) {
-        for (player = D_80119890; player != NULL; player = player->m_pNext) {
+        for (player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; player != NULL; player = player->m_pNext) {
             if (player->m_Data.m_Health != 0 && player->m_Mode != 2) {
                 top = player->m_CharacterActor.header.m_vPos.y + player->m_CharacterActor.m_CollisionYOffset;
                 if (top - 20.479999f <= p->header.m_vPos.y && p->header.m_vPos.y <= top + GameObject_GetCollisionHeight(player) + 20.479999f) {
                     dist = func_00298470((player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x) * (player->m_CharacterActor.header.m_vPos.x - p->header.m_vPos.x)
                                          + (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z) * (player->m_CharacterActor.header.m_vPos.z - p->header.m_vPos.z));
                     if (dist < GameObject_GetCollisionRadius(player) + 51.199997f) {
-                        handler = D_800ACE18;
+                        handler = sParticleAmmoPickups;
                         for (i = 3; i != -1; handler++, i--) {
                             if (handler->type == p->header.m_nObjType && handler->func(player, handler)) {
                                 p->m_dwFlags |= 0x1000;
@@ -202,33 +202,33 @@ void CParticle__Update(CParticle *p) {
         }
     }
     p->m_vLastPos = p->header.m_vPos;
-    p->m_AnimFrame += D_800B6D28 * p->m_AnimSpeed * (D_800B6D30 * 0.06666667f);
+    p->m_AnimFrame += gFrameIncrement * p->m_AnimSpeed * (gParticleTimeScale * 0.06666667f);
     if (p->m_pEffect->m_dwFlags & 0x1000) {
-        step = D_800B6D28 * 10.24f;
+        step = gFrameIncrement * 10.24f;
         p->m_vSize.x += step * p->m_vGrowth.x;
         p->m_vSize.y += step * p->m_vGrowth.y;
-        p->m_vSize.z += D_800B6D28 * p->m_vGrowth.z;
+        p->m_vSize.z += gFrameIncrement * p->m_vGrowth.z;
         p->m_vSize.x = (p->m_vSize.x > 4096.0f) ? 4096.0f : p->m_vSize.x;
         p->m_vSize.y = (p->m_vSize.y > 4096.0f) ? 4096.0f : p->m_vSize.y;
         p->m_vSize.z = (p->m_vSize.z > 400.0f) ? 400.0f : p->m_vSize.z;
     } else {
         grow = MIN(p->m_vSize.x * p->m_vGrowth.x, 4096.0f);
-        p->m_vSize.x += (grow - p->m_vSize.x) * D_800B6D28;
+        p->m_vSize.x += (grow - p->m_vSize.x) * gFrameIncrement;
         grow = MIN(p->m_vSize.y * p->m_vGrowth.y, 4096.0f);
-        p->m_vSize.y += (grow - p->m_vSize.y) * D_800B6D28;
+        p->m_vSize.y += (grow - p->m_vSize.y) * gFrameIncrement;
         grow = MIN(p->m_vSize.z * p->m_vGrowth.z, 400.0f);
-        p->m_vSize.z += (grow - p->m_vSize.z) * D_800B6D28;
+        p->m_vSize.z += (grow - p->m_vSize.z) * gFrameIncrement;
         if (p->m_vSize.x < 0.0f || p->m_vSize.y < 0.0f || p->m_vSize.z < 0.0f) {
             CParticle__FireExpireEvent(p);
-            CParticleSystem__Free(D_800F8928, p);
+            CParticleSystem__Free(gScene_m_ParticleSystem, p);
             CParticle__StopLoopSound(p);
             return;
         }
     }
-    p->m_vRot.x += p->m_vRotSpeed.x * D_800B6D28;
-    p->m_vRot.y += p->m_vRotSpeed.y * D_800B6D28;
-    p->m_vRot.z += p->m_vRotSpeed.z * D_800B6D28;
-    D_800F1ADC->m_vVelocity = p->m_vVelocity;
+    p->m_vRot.x += p->m_vRotSpeed.x * gFrameIncrement;
+    p->m_vRot.y += p->m_vRotSpeed.y * gFrameIncrement;
+    p->m_vRot.z += p->m_vRotSpeed.z * gFrameIncrement;
+    gCollisionResultsP->m_vVelocity = p->m_vVelocity;
     CParticle__FireUpdateEvent(p);
     CParticle__Steer(p);
     if ((p->m_Gravity == 0.0f || (p->header.m_vPos.y == 0.0f && p->m_Gravity < 0.0f))
@@ -237,32 +237,32 @@ void CParticle__Update(CParticle *p) {
     }
     if (!(p->m_dwFlags & 0x72000)) {
         die = Collision_MoveInstance(p, p->header.m_vPos, &p->m_dwHitFlags);
-        if (p->header.m_nObjType == 0x68 && D_800F1CE0.m_pInstance != NULL) {
-            p->m_pTarget = (CGameObjectInstance *)D_800F1CE0.m_pInstance;
+        if (p->header.m_nObjType == 0x68 && gCollisionResults.m_pInstance != NULL) {
+            p->m_pTarget = (CGameObjectInstance *)gCollisionResults.m_pInstance;
         }
         if (die) {
-            if (D_800F1CE0.m_pInstance != NULL) {
-                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vInstancePos);
-            } else if (D_800F1CE0.m_pShape != 0) {
-                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vShapePos);
-            } else if (D_800F1CE0.m_pWallRegion != 0) {
-                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vWallPos);
-            } else if (D_800F1CE0.m_pFloorRegion != 0) {
-                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vFloorPos);
+            if (gCollisionResults.m_pInstance != NULL) {
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &gCollisionResults.m_vInstancePos);
+            } else if (gCollisionResults.m_pShape != 0) {
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &gCollisionResults.m_vShapePos);
+            } else if (gCollisionResults.m_pWallRegion != 0) {
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &gCollisionResults.m_vWallPos);
+            } else if (gCollisionResults.m_pFloorRegion != 0) {
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &gCollisionResults.m_vFloorPos);
                 if (p->m_Alignment == -7) {
                     p->m_Alignment = -3;
                 }
-            } else if (D_800F1CE0.m_pWaterRegion != 0) {
-                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &D_800F1CE0.m_vWaterPos);
+            } else if (gCollisionResults.m_pWaterRegion != 0) {
+                CVector3__Subtract(&p->m_vDirection, &p->header.m_vPos, &gCollisionResults.m_vWaterPos);
             }
             CVector3__Normalize(&p->m_vDirection);
         }
         CParticle__ReportCollision(p);
-        if (D_800F1CE0.m_pWaterRegion != 0) {
+        if (gCollisionResults.m_pWaterRegion != 0) {
             CParticle__HitWater(p);
         }
         if (p->m_dwFlags & 0x100) {
-            if (D_800F1CE0.m_pWallRegion != 0) {
+            if (gCollisionResults.m_pWallRegion != 0) {
                 if (!(p->m_pEffect->m_dwFlags & 0x10000000)) {
                     CParticle__HitWall(p);
                 }
@@ -271,15 +271,15 @@ void CParticle__Update(CParticle *p) {
                 }
             }
             if (p->m_dwFlags & 0x100) {
-                if (D_800F1CE0.m_pInstance != NULL) {
-                    if ((p->m_dwHitFlags & 0x1000000) && D_800F1CE0.m_pInstance->header.m_Type == 0) {
+                if (gCollisionResults.m_pInstance != NULL) {
+                    if ((p->m_dwHitFlags & 0x1000000) && gCollisionResults.m_pInstance->header.m_Type == 0) {
                         CParticle__HitInstanceBody(p);
                     } else {
                         CParticle__HitTarget(p);
                     }
                 }
-                if ((p->m_dwFlags & 0x100) && D_800F1CE0.m_nFloorKind != 0 && !(p->m_pEffect->m_dwFlags & 0x20000000)) {
-                    if (D_800F1CE0.m_nFloorKind == 1) {
+                if ((p->m_dwFlags & 0x100) && gCollisionResults.m_nFloorKind != 0 && !(p->m_pEffect->m_dwFlags & 0x20000000)) {
+                    if (gCollisionResults.m_nFloorKind == 1) {
                         CParticle__HitFloor(p);
                     } else {
                         CParticle__HitCeiling(p);

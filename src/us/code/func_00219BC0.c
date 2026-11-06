@@ -7,7 +7,7 @@ typedef struct {
     s32 words[6];
 } Lights1; /* libultra Lights1, copied as words */
 
-s32 CScene__FindObjectType(CWorld *, s32);
+s32 CScene__FindObjectType(CScene *, s32);
 CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *);
 void CAnimationState__Reset(CAnimationState *);
 void CGameObjectInstance__RequestAnim(CGameObjectInstance *, s32);
@@ -19,12 +19,12 @@ void CGameObjectInstance__SetupAnimation(CGameObjectInstance *, s32 *, s32, s32)
 s32 Instance_NextUniqueId(void);
 void CGameObjectInstance__DrawModelLitVertices(void);
 
-extern CWorld D_800F7078;
-extern s32 D_80119878;      /* player count */
-extern u8 *D_80119874;      /* players, 0x1328 bytes each */
-extern u8 D_800AE994[];
-extern void *D_800ACB60[];
-extern Lights1 D_800AB0E8;
+extern CScene gScene;
+extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;      /* player count */
+extern u8 *gEngineApp_m_Game_m_PlayerList_m_Players;      /* players, 0x1328 bytes each */
+extern u8 gWeaponActorTypeInfo[];
+extern void *gIntelligenceTypeInfo[];
+extern Lights1 gDefaultLights;
 
 /* The body (collision) setup for the object's intelligence type; a player's
  * second object (its body at +0x288) gets its own. */
@@ -38,17 +38,17 @@ static __inline__ void *body_setup(CGameObjectInstance *obj) {
         return 0;
     }
     if (type == 11) {
-        for (i = 0; i < D_80119878; i++) {
-            player = D_80119874 + i * 0x1328;
+        for (i = 0; i < gEngineApp_m_Game_m_PlayerList_m_nPlayers; i++) {
+            player = gEngineApp_m_Game_m_PlayerList_m_Players + i * 0x1328;
             if (player == (u8 *) obj) {
                 return 0;
             }
             if (player + 0x288 == (u8 *) obj) {
-                return D_800AE994;
+                return gWeaponActorTypeInfo;
             }
         }
     }
-    return D_800ACB60[type];
+    return gIntelligenceTypeInfo[type];
 }
 
 static __inline__ void clear_motion(CGameObjectInstance *obj) {
@@ -65,12 +65,12 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
                    void *region, f32 rotY, CVector3 pos, s32 flags, CVector3 scale, CVector3 velocity) {
     s32 animIndex;
     s32 frame;
-    CWorld *world;
+    CScene *world;
     f32 ground;
 
     obj->m_dwFlags &= ~0x40000;
     if (model == -1) {
-        model = CScene__FindObjectType(&D_800F7078, type);
+        model = CScene__FindObjectType(&gScene, type);
         if (model == -1) {
             return;
         }
@@ -122,7 +122,7 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
     if (sound != -1) {
         CPathTrack__StartAtNearestPoint((u8 *) obj + 0x1D4, sound, &obj->header.m_vPos);
     }
-    world = &D_800F7078;
+    world = &gScene;
     CGameObjectInstance__SetupAnimation(obj, world->m_pObjects, world->m_ObjectsKey, animIndex);
     if (frame != 0) {
         obj->m_CurrentAnimation.m_AnimationFrame = frame;
@@ -131,7 +131,7 @@ void CGameObjectInstance__Construct(CGameObjectInstance *obj, s32 model, s32 typ
     obj->m_dwUniqueID = Instance_NextUniqueId() << 10;
     if (obj->m_dwFlags & 8) {
         obj->m_AI.m_pfDraw = CGameObjectInstance__DrawModelLitVertices;
-        *(Lights1 *) obj->m_Lights[0] = D_800AB0E8;
-        *(Lights1 *) obj->m_Lights[1] = D_800AB0E8;
+        *(Lights1 *) obj->m_Lights[0] = gDefaultLights;
+        *(Lights1 *) obj->m_Lights[1] = gDefaultLights;
     }
 }

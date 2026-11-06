@@ -1,8 +1,8 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern s32 D_800C2034;          /* screen height */
-extern f32 D_800B6D28;          /* the frame's time step */
+extern s32 gScreenHeight;          /* screen height */
+extern f32 gFrameIncrement;          /* the frame's time step */
 void COnScreen__BeginText(void);
 void COnScreen__SelectTinyFont(void);
 void COnScreen__DrawString(char *string, s32 x, s32 y, s32 alpha, s32 arg4, s32 arg5, f32 scaleX, f32 scaleY);
@@ -29,7 +29,7 @@ void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam) {
     f = 9.0f;
     prev = cam->m_ActiveTextList.m_pHead;
     if (prev != NULL) {
-        prev->m_PositionY = D_800C2034 * 0.81f;
+        prev->m_PositionY = gScreenHeight * 0.81f;
         for (text = prev->m_pNext; text != NULL; text = text->m_pNext) {
             text->m_PositionY = prev->m_PositionY + f;
             prev = text;
@@ -39,7 +39,7 @@ void CCameraPool__AdvanceCinemaText(CCameraPool *pool, CCamera *cam) {
         COnScreen__DrawString(text->m_pString, text->m_PositionX, text->m_PositionY, text->m_nAlpha, 1, 1, 1.0f, 1.0f);
     }
     for (text = cam->m_ActiveTextList.m_pTail; text != NULL; text = text->m_pLast) {
-        f = D_800B6D28 * (1.0f / 15.0f);
+        f = gFrameIncrement * (1.0f / 15.0f);
         cur = text;
         switch (text->m_nMode) {
             case 1:                 /* waiting */

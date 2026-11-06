@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern u8 D_8011AAEE; /* D_8011AAD8 + 0x16: 0x80-centred setting */
+extern u8 gEngineApp_m_Settings_unk16; /* gEngineApp_m_Settings + 0x16: 0x80-centred setting */
 extern char D_800B65D0[];
 extern char D_800B65B8[];
 extern char D_800B65A0[];
@@ -13,7 +13,7 @@ extern void sprintf(char *dst, char *fmt, ...);
 
 /* Label of a slider setting: its value from -16 to 15, in steps of 8 raw units. */
 s32 SoundMenu_SpeechVolumeLabel(MenuItem *a) {
-    s32 v = (D_8011AAEE - 0x80) / 8;
+    s32 v = (gEngineApp_m_Settings_unk16 - 0x80) / 8;
 
     if (v == 0) {
         a->text = D_800B65D0;

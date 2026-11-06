@@ -1,10 +1,10 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_801309A4;
-extern s32 D_801309B0;
+extern s32 sPakConfirmDone;
+extern s32 gPakConfirmKind;
 
 void PakConfirmMenu_InitNoSpaceAll(void) {
-    D_801309B0 = 2;
-    D_801309A4 = 0;
+    gPakConfirmKind = 2;
+    sPakConfirmDone = 0;
 }

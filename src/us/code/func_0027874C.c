@@ -1,8 +1,8 @@
 /* After AbuN64/ragewars-decomp (Turok: Rage Wars), src/GFX/TEXT/802A8A94_2.CPP, func_802A88F0_de, with Turok 2's layouts. */
-/* Draw one line of text (up to '\n') in the current font style D_801100F0: set the environment and
+/* Draw one line of text (up to '\n') in the current font style gEngineApp_m_OnScreen: set the environment and
  * primitive colours (black, shifted by the style's shadow offset scaled to the screen, for the shadow
  * pass), load the font for the language, then draw each glyph through the language's lookup table,
- * advancing by the glyph width of the loaded font D_800F56A8 (kerned for language 0). In language 1
+ * advancing by the glyph width of the loaded font gLoadedFont (kerned for language 0). In language 1
  * the glyphs '%', '+' and '=' are drawn at screen scale. */
 
 #include "common.h"
@@ -22,12 +22,12 @@ typedef struct FontStyle {
     /* 0xC4 */ s32 shadowY;
 } FontStyle;
 
-extern FontStyle D_801100F0;
-extern u32 D_800F56A8;          /* the loaded font */
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
-extern u8 D_800F7078[];         /* the resource cache */
-extern u8 D_801101B8[];         /* glyph lookup */
+extern FontStyle gEngineApp_m_OnScreen;
+extern u32 gLoadedFont;          /* the loaded font */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
+extern u8 gScene[];         /* the resource cache */
+extern u8 gEngineApp_m_OnScreen_m_CharacterSmallLookUpPos[];         /* glyph lookup */
 extern u8 D_80110238[];         /* glyph lookup, language 0 */
 
 extern void *CScene__LoadGraphicSet(void *cache, s32 id, s32 kind, s32 flag);
@@ -39,7 +39,7 @@ extern void Hud_DrawImageFrame(void *font, s32 glyph, s16 x, s16 y, f32 sx, f32 
 static __inline__ f32 fontGlyphWidth(void) {
     f32 result;
 
-    switch (D_800F56A8) {
+    switch (gLoadedFont) {
     case 5:
         result = 6.0f;
         break;
@@ -63,7 +63,7 @@ static __inline__ f32 fontGlyphWidth(void) {
 }
 
 void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shadow, s32 alpha, s32 language) {
-    FontStyle *style = &D_801100F0;
+    FontStyle *style = &gEngineApp_m_OnScreen;
     void *font;
     s32 special = 0;
     s32 resource;
@@ -78,26 +78,26 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
 
     {
         Gfx *g;
-        g = D_800D8E24++;
+        g = gDList++;
         g->w0 = 0xE7000000;     /* gDPPipeSync */
         g->w1 = 0;
     }
     if (shadow) {
         Gfx *g;
-        g = D_800D8E24++;
+        g = gDList++;
         g->w0 = 0xFB000000;     /* gDPSetEnvColor(0, 0, 0, alpha) */
         g->w1 = (u8) alpha;
-        g = D_800D8E24++;
+        g = gDList++;
         g->w0 = 0xFA000000;     /* gDPSetPrimColor(0, 0, 0, 0, 0, 255) */
         g->w1 = 0xFF;
-        x += style->shadowX * (D_800C2030 / 284);
-        y += style->shadowY * (D_800C2034 / 222);
+        x += style->shadowX * (gScreenWidth / 284);
+        y += style->shadowY * (gScreenHeight / 222);
     } else {
         Gfx *g;
-        g = D_800D8E24++;
+        g = gDList++;
         g->w0 = 0xFB000000;     /* gDPSetEnvColor */
         g->w1 = ((u8) style->envR << 24) | ((u8) style->envG << 16) | ((u8) style->envB << 8) | (u8) alpha;
-        g = D_800D8E24++;
+        g = gDList++;
         g->w0 = 0xFA000000;     /* gDPSetPrimColor(0, 0, ...) */
         g->w1 = ((u8) style->primR << 24) | ((u8) style->primG << 16) | ((u8) style->primB << 8) | 0xFF;
     }
@@ -114,18 +114,18 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
         special = 1;
         break;
     }
-    font = CScene__LoadGraphicSet(D_800F7078, resource, 0x10, 1);
+    font = CScene__LoadGraphicSet(gScene, resource, 0x10, 1);
     if (font) {
         while (text && (ch = *text) && ch != 10) {
             next = text[1];
             switch (language) {
             case 2:
             default:
-                glyph = D_801101B8[ch];
+                glyph = gEngineApp_m_OnScreen_m_CharacterSmallLookUpPos[ch];
                 advance = fontGlyphWidth();
                 break;
             case 1:
-                glyph = D_801101B8[ch];
+                glyph = gEngineApp_m_OnScreen_m_CharacterSmallLookUpPos[ch];
                 advance = fontGlyphWidth();
                 break;
             case 0:
@@ -138,8 +138,8 @@ void COnScreen__DrawText(u8 *text, f32 x, f32 y, f32 width, f32 height, s32 shad
             sx = width;
             sy = height;
             if (special && (glyph == 0x25 || glyph == 0x2B || glyph == 0x3D)) {
-                sx = D_800C2030 * (1.0f / 284.0f);
-                sy = D_800C2034 * (1.0f / 222.0f);
+                sx = gScreenWidth * (1.0f / 284.0f);
+                sy = gScreenHeight * (1.0f / 222.0f);
             }
             if (glyph != 255) {
                 Hud_DrawImageFrame(font, glyph, (s16) x, (s16) y, sx, sy, 1);

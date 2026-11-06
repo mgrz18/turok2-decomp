@@ -20,7 +20,7 @@ struct Entity {
     char pad10[3];
     unsigned char index;
 };
-extern void *D_800F70E4;
+extern void *gScene_m_pBitSections;
 extern void *CISet__GetBlock(void *table, s32 index);
 extern s32 CISet__GetBlockSize(void *table, s32 index);
 extern void LevelEvent_Fire(Entity *entity);
@@ -42,7 +42,7 @@ void CScene__RestoreFiredEvent(World_func_8028787C_de *world, Entity *entity) {
     if (bits[index / 8] & bit) {
         if (entity->flag != 0) {
             flag = entity->flag;
-            flags = CISet__GetBlock(D_800F70E4, 1);
+            flags = CISet__GetBlock(gScene_m_pBitSections, 1);
             CISet__GetBlock(flags, 0);
             if (((unsigned char *)CISet__GetBlock(flags, 1))[flag] != 0) {
                 return;

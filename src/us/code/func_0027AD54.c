@@ -1,7 +1,7 @@
 #include "common.h"
 
 s32 COverlay__StartScript(void *, s32 *);           /* extern */
-extern s32 D_800B2C64;
+extern s32 sBossBar2OverlayScript;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x48];
@@ -15,5 +15,5 @@ void COnScreen__SetBoss2(Unk0027AD54 *arg0, s32 arg1, s32 arg2) {
     arg0->unk88 = arg1;
     arg0->unk84 = arg2;
     arg0->unk8C = 0x64;
-    COverlay__StartScript(arg0->sub48, &D_800B2C64);
+    COverlay__StartScript(arg0->sub48, &sBossBar2OverlayScript);
 }

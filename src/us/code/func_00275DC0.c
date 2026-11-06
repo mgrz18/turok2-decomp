@@ -1,7 +1,7 @@
 #include "common.h"
 
 s32 Sound__Stop(s32);                         /* extern */
-extern s32 D_800B2A88;
+extern s32 sLoopSoundsLastPaused;
 
 typedef struct Node00275DC0 {
     /* 0x0 */ u8 pad0[4];
@@ -26,7 +26,7 @@ void LoopSounds_Pause(List00275DC0 *arg0) {
             Sound__Stop(var_s0->id);
             temp_v0 = var_s0->id;
             var_s0 = var_s0->next;
-            D_800B2A88 = temp_v0;
+            sLoopSoundsLastPaused = temp_v0;
         } while (var_s0 != NULL);
     }
     arg0->done = 1;

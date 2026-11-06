@@ -1,14 +1,14 @@
 #ifndef STRUCTS_DEMO_H
 #define STRUCTS_DEMO_H
 
-/* The attract-mode demo player, D_800F56B0. A demo (DemoHeader, from the
- * zero-terminated list D_004384E8, played in turn by Demo_PlayNext) is a
+/* The attract-mode demo player, gDemoPlayer. A demo (DemoHeader, from the
+ * zero-terminated list gDemoTable, played in turn by Demo_PlayNext) is a
  * bit stream per input: for each player the buttons (decoded by
  * Demo_DecodeButtons), the stick x and y (Demo_DecodeStick), plus one stream for the
- * whole match (Demo_DecodeMatch, copied to D_8011AD10 each frame). Each value
+ * whole match (Demo_DecodeMatch, copied to gNextTicks each frame). Each value
  * lasts a run of frames read after it (Demo_ReadRunLength). Demo_Start starts
  * a demo (saving the game settings first), Demo_UpdateStreams feeds the decoded
- * values to the controllers (D_800F5F70) and keeps a checksum
+ * values to the controllers (gControllers_buttons) and keeps a checksum
  * (Demo_UpdateChecksum), Demo_End puts the saved settings back.
  * tools/check_structs.py checks the offsets. */
 
@@ -49,7 +49,7 @@ typedef struct DemoPlayer {
     /* 0x014 */ DemoStream buttons[4];
     /* 0x094 */ DemoStream stickX[4];
     /* 0x114 */ DemoStream stickY[4];
-    /* 0x194 */ DemoStream match;       /* D_800F5844 */
+    /* 0x194 */ DemoStream match;       /* gDemoPlayer_match */
     /* 0x1B4 */ s32 playerCount;
     /* 0x1B8 */ s32 unk1B8;
     /* 0x1BC */ s32 countdown;          /* frames left */
@@ -60,6 +60,6 @@ typedef struct DemoPlayer {
     /* 0x350 */ s32 index;              /* the next demo of the list */
 } DemoPlayer; /* size 0x354 */
 
-extern DemoPlayer D_800F56B0;
+extern DemoPlayer gDemoPlayer;
 
 #endif

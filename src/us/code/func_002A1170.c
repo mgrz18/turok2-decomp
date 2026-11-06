@@ -16,15 +16,15 @@ typedef struct DecodeState {
     void *cursor;
     u16 frame[336];
 } DecodeState;
-extern unsigned short D_800B8BA8;
-extern unsigned short D_800B8BAA;
-extern unsigned short D_800B8BAC;
-extern s16 D_800B8BAE;
-extern unsigned short D_800B8BB0;
-extern char D_80125C38;
+extern unsigned short sAdecBitsLeft;
+extern unsigned short sAdecHuffBits;
+extern unsigned short sAdecHuffBitsAvail;
+extern s16 sAdecHeaderDone;
+extern unsigned short sAdecImdctReady;
+extern char sAdecState;
 u32 adecStreamOpen(s32 *source, u32 divisor, s32 *first)
 {
-    DecodeState *state = &D_80125C38;
+    DecodeState *state = &sAdecState;
     state->source = source;
     state->cursor = source;
     state->first = *(s32 *)state->cursor;
@@ -34,11 +34,11 @@ u32 adecStreamOpen(s32 *source, u32 divisor, s32 *first)
     state->cursor = (s32 *)state->cursor + 1;
     state->third = *(s32 *)state->cursor;
     state->cursor = (s32 *)state->cursor + 1;
-    D_800B8BAE = 0;
-    D_800B8BB0 = 0;
-    D_800B8BA8 = 0;
-    D_800B8BAA = 0;
-    D_800B8BAC = 0;
+    sAdecHeaderDone = 0;
+    sAdecImdctReady = 0;
+    sAdecBitsLeft = 0;
+    sAdecHuffBits = 0;
+    sAdecHuffBitsAvail = 0;
     *first = state->first;
     return (u64)((s64)state->count * 0xF424000) / divisor;
 }

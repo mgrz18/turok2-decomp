@@ -11,7 +11,7 @@ void *CISet__GetBlock(void *table, s32 index);
 extern void CISet__GetBlockSize(s32 arg0, s32 arg1);
 
 /* Set or clear the actor's bit in the current level's saved-actor bitmap. */
-void CScene__SetInstanceSavedBit(CWorld *arg0, void *arg1, s32 arg2) {
+void CScene__SetInstanceSavedBit(CScene *arg0, void *arg1, s32 arg2) {
     CGameObjectInstance *entry;
     CIntelligence *cond;
     void *field80;

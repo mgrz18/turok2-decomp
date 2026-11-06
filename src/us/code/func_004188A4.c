@@ -6,25 +6,25 @@ extern s32 Menu_StepValue(void *menu, s32 value, s32 step, s32 minimum, s32 maxi
 extern s32 Controller_MenuRight(s32);
 extern s32 Controller_ConfirmPressed(s32);
 
-extern s32 D_800C1EA8;      /* selected entry, 0..15 */
+extern s32 gMpPlayerSpeed;      /* selected entry, 0..15 */
 typedef struct {
     /* 0x00 */ f32 unk0;
     /* 0x04 */ f32 scale[16];  /* per entry */
 } ScaleTable;
 
-extern ScaleTable D_00438900;
-extern f32 D_8011AAF4;      /* resulting scale */
+extern ScaleTable sPlayerSpeedTable;
+extern f32 gEngineApp_m_Settings_speed;      /* resulting scale */
 
 /* Steps the selection (twice when the controller reports busy) and sets the scale
  * from the table plus one, clamped to [0.5, 2.0]. */
 s32 MpMenu_StepPlayerSpeed(void *arg0, Menu *item) {
     f32 scale;
 
-    D_800C1EA8 = Menu_StepValue(item, D_800C1EA8, 1, 0, 15, 0);
+    gMpPlayerSpeed = Menu_StepValue(item, gMpPlayerSpeed, 1, 0, 15, 0);
     if (Controller_MenuRight(item->controller) != 0 || Controller_ConfirmPressed(item->controller) != 0) {
-        Menu_StepValue(item, D_800C1EA8, 1, 0, 15, 0);
+        Menu_StepValue(item, gMpPlayerSpeed, 1, 0, 15, 0);
     }
-    scale = D_00438900.scale[D_800C1EA8] + 1.0f;
+    scale = sPlayerSpeedTable.scale[gMpPlayerSpeed] + 1.0f;
     if (!(scale < 0.5f)) {
         if (!(scale > 2.0f)) {
             if (scale < 0.5f) {
@@ -36,6 +36,6 @@ s32 MpMenu_StepPlayerSpeed(void *arg0, Menu *item) {
     } else {
         scale = 0.5f;
     }
-    D_8011AAF4 = scale;
+    gEngineApp_m_Settings_speed = scale;
     return 0;
 }

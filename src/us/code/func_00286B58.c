@@ -49,25 +49,25 @@ typedef struct {
     /* 0x3C0 */ GfxTask *cur;
 } GfxState;
 
-extern u64 D_800BC330[]; /* rspboot */
-extern u64 D_800BC400[]; /* gfx ucode text */
-extern u64 rspbootTextEnd[]; /* = 0x800BC400, same address as D_800BC400: needs a linker symbol */
-extern u64 D_800BD790[]; /* second gfx ucode text */
-extern u64 D_800BF740[]; /* gfx ucode data */
-extern u64 D_800BFB60[]; /* second gfx ucode data */
-extern u64 D_800C4000[]; /* yield buffer */
-extern u8 D_8011AD28[];  /* message queue */
-extern u8 D_8011AD90[];
-extern u32 D_80130A44;   /* fifo size */
-extern u64 *D_80130A48;  /* fifo buffer */
-extern u32 D_800B6D18;   /* frame counter */
-extern s32 D_800B6D1C;   /* double-buffer index */
-extern s32 D_800B6D20;
-extern u32 D_800C2210;   /* task count */
-extern s32 D_80130A4C;
-extern s32 D_80130A50;
-extern s32 D_80130A80;
-extern s32 D_80130A84;
+extern u64 rspbootTextStart[]; /* rspboot */
+extern u64 gspF3DEX_NoN_fifoTextStart[]; /* gfx ucode text */
+extern u64 rspbootTextEnd[]; /* = 0x800BC400, same address as gspF3DEX_NoN_fifoTextStart: needs a linker symbol */
+extern u64 gspL3DEX_fifoTextStart[]; /* second gfx ucode text */
+extern u64 gspF3DEX_NoN_fifoDataStart[]; /* gfx ucode data */
+extern u64 gspL3DEX_fifoDataStart[]; /* second gfx ucode data */
+extern u64 gGfxYieldBuffer[]; /* yield buffer */
+extern u8 gGfxFrameMessageQueue[];  /* message queue */
+extern u8 gScheduler[];
+extern u32 gRspFifoSize;   /* fifo size */
+extern u64 *gRspFifoBuffer;  /* fifo buffer */
+extern u32 gFrameCount;   /* frame counter */
+extern s32 gEvenOdd;   /* double-buffer index */
+extern s32 gFrameCountGameplay;
+extern u32 gTotalFramebuffers;   /* task count */
+extern s32 gLineList0;
+extern s32 gLineList1;
+extern s32 gDisplayList1;
+extern s32 gDisplayList0;
 
 extern void osWritebackDCacheAll(void);
 extern void Sched_SubmitTask(void *, ScTask *);
@@ -84,22 +84,22 @@ void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
     t->list.data_ptr = task->dl[0];
     dataSize = task->dlSize[0];
     t->list.type = 1;
-    t->list.ucode_boot = D_800BC330;
-    t->list.ucode_boot_size = (u8 *)rspbootTextEnd - (u8 *)D_800BC330;
+    t->list.ucode_boot = rspbootTextStart;
+    t->list.ucode_boot_size = (u8 *)rspbootTextEnd - (u8 *)rspbootTextStart;
     t->list.ucode_size = 0x1000;
     t->list.ucode_data_size = 0x800;
-    t->list.yield_data_ptr = D_800C4000;
+    t->list.yield_data_ptr = gGfxYieldBuffer;
     t->list.yield_data_size = 0xC00;
-    t->list.ucode = D_800BC400;
-    t->list.ucode_data = D_800BF740;
+    t->list.ucode = gspF3DEX_NoN_fifoTextStart;
+    t->list.ucode_data = gspF3DEX_NoN_fifoDataStart;
     t->list.flags = 0;
     t->list.dram_stack = NULL;
     t->list.dram_stack_size = 0;
-    t->list.output_buff = D_80130A48;
-    t->list.output_buff_size = (u64 *)((u8 *)D_80130A48 + D_80130A44);
+    t->list.output_buff = gRspFifoBuffer;
+    t->list.output_buff_size = (u64 *)((u8 *)gRspFifoBuffer + gRspFifoSize);
     t->list.data_size = dataSize;
     task->sc[0].next = NULL;
-    t->msgQ = D_8011AD28;
+    t->msgQ = gGfxFrameMessageQueue;
     t->msg = &task->msg;
     t->framebuffer = task->framebuffer;
     if (task->twoTasks) {
@@ -112,37 +112,37 @@ void CEngineApp__SubmitGfxTask(GfxState *gfx, GfxTask *task) {
         t->list.data_ptr = task->dl[1];
         dataSize2 = task->dlSize[1];
         t->list.type = 1;
-        t->list.ucode_boot = D_800BC330;
-        t->list.ucode_boot_size = (u8 *)rspbootTextEnd - (u8 *)D_800BC330;
+        t->list.ucode_boot = rspbootTextStart;
+        t->list.ucode_boot_size = (u8 *)rspbootTextEnd - (u8 *)rspbootTextStart;
         t->list.ucode_size = 0x1000;
         t->list.ucode_data_size = 0x800;
-        t->list.yield_data_ptr = D_800C4000;
+        t->list.yield_data_ptr = gGfxYieldBuffer;
         t->list.yield_data_size = 0xC00;
-        t->list.ucode = D_800BD790;
-        t->list.ucode_data = D_800BFB60;
+        t->list.ucode = gspL3DEX_fifoTextStart;
+        t->list.ucode_data = gspL3DEX_fifoDataStart;
         t->list.flags = 0;
         t->list.dram_stack = NULL;
         t->list.dram_stack_size = 0;
-        t->list.output_buff = D_80130A48;
-        t->list.output_buff_size = (u64 *)((u8 *)D_80130A48 + D_80130A44);
+        t->list.output_buff = gRspFifoBuffer;
+        t->list.output_buff_size = (u64 *)((u8 *)gRspFifoBuffer + gRspFifoSize);
         t->list.data_size = dataSize2;
         task->sc[1].next = NULL;
         t->flags = 0x23;
-        t->msgQ = D_8011AD28;
+        t->msgQ = gGfxFrameMessageQueue;
         t->msg = &task->msg;
         t->framebuffer = task->framebuffer;
     }
     osWritebackDCacheAll();
-    Sched_SubmitTask(D_8011AD90, &task->sc[0]);
+    Sched_SubmitTask(gScheduler, &task->sc[0]);
     if (task->twoTasks) {
-        Sched_SubmitTask(D_8011AD90, &task->sc[1]);
+        Sched_SubmitTask(gScheduler, &task->sc[1]);
     }
-    D_800B6D18++;
-    idx = D_800B6D18 % D_800C2210;
-    D_800B6D20++;
-    D_800B6D1C ^= 1;
+    gFrameCount++;
+    idx = gFrameCount % gTotalFramebuffers;
+    gFrameCountGameplay++;
+    gEvenOdd ^= 1;
     gfx->cur = &gfx->tasks[idx];
-    gfx->tasks[idx].dl[0] = D_800B6D1C == 0 ? D_80130A80 : D_80130A84;
+    gfx->tasks[idx].dl[0] = gEvenOdd == 0 ? gDisplayList1 : gDisplayList0;
     cur = gfx->cur;
-    cur->dl[1] = D_800B6D1C == 0 ? D_80130A50 : D_80130A4C;
+    cur->dl[1] = gEvenOdd == 0 ? gLineList1 : gLineList0;
 }

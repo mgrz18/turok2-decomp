@@ -3,14 +3,14 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800E679C;
+extern float sAnimRemapMin;
 extern void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 count);
 extern float Bits_Normalize(float value, int bits);
 extern double D_800A5958;
 extern double D_800A5960;
 extern s32 D_800E6798;
 extern s32 D_800E6798;
-extern f32 D_800E67A0;
+extern f32 sAnimRemapMax;
 extern u32 Bits_Read(u32 *, u32);
 extern f32 Math_Remap(f32 value, f32 lower, f32 upper);
 extern f32 Bits_ReadFloat(u32 *stream, s32 bits, f32 base, f32 range);
@@ -39,8 +39,8 @@ void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 count) {
             converted += D_800A5960;
         }
         second = Bits_Normalize((f32)converted, 6);
-        first = Math_Remap(first, D_800E679C, D_800E67A0);
-        second = Math_Remap(second, D_800E679C, D_800E67A0);
+        first = Math_Remap(first, sAnimRemapMin, sAnimRemapMax);
+        second = Math_Remap(second, sAnimRemapMin, sAnimRemapMax);
     }
     decode.base = first;
     decode.range = second - first;

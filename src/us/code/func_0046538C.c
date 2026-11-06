@@ -3,8 +3,8 @@
 s32 CLoader__LoadSync(s32, s32, s32, s32);
 
 s32 SavedPlayers_IsActive();                                /* extern */
-extern s32 D_800D1CD8;
-extern s32 D_800E6AC0;
+extern s32 gLoader;
+extern s32 gGamePersistentData;
 
 typedef struct {
     /* 0x00 */ u8 pad0[0x2C];
@@ -15,6 +15,6 @@ typedef struct {
 
 void CScene__LoadBitSections2_2(Unk0046538C *arg0) {
     if (SavedPlayers_IsActive() == 0) {
-        CLoader__LoadSync((s32) &D_800D1CD8, arg0->unk2C, arg0->unk34, (s32) &D_800E6AC0);
+        CLoader__LoadSync((s32) &gLoader, arg0->unk2C, arg0->unk34, (s32) &gGamePersistentData);
     }
 }

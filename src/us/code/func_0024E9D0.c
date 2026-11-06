@@ -2,7 +2,7 @@
 #include "structs/region.h"
 #include "structs/player.h"
 
-extern u32 D_8011AAD8;              /* cheat flags */
+extern u32 gEngineApp_m_Settings;              /* cheat flags */
 
 CRegionInfo *GameObject_GetRegionInfo(void *actor);
 s32 CPlayer__SetState(CPlayer *player, void *actor, s32 state);
@@ -15,7 +15,7 @@ static __inline__ s32 func_0024E9D0_isSpecial(CPlayer *player) {
 }
 
 static __inline__ s32 func_0024E9D0_hasKey(CPlayer *player, s32 i) {
-    if (D_8011AAD8 & 0x10) {
+    if (gEngineApp_m_Settings & 0x10) {
         return 1;
     }
     return player->m_Data.m_SpecialPickupCount[382 + i] & 0xF;   /* the two key pickups of the region */

@@ -8,7 +8,7 @@
 /* The shared types come from the shared headers: libultra's (OSMesgQueue,
  * OSPfs and the Controller Pak internals) from ultra_types.h, CVector3 (Rage
  * Wars' Vec3) from structs/vector.h, libaudio's ALHeap, ALInstrument and Acmd
- * from structs/libaudio.h. The world D_800F7078 is structs/world.h's CWorld
+ * from structs/libaudio.h. The world gScene is structs/world.h's CScene
  * (Rage Wars' Shared_World has another layout). Gfx is gfx.h's: the files that write display lists
  * include it. RW_Mtx is Rage Wars' float matrix with named rows (not gbi.h's
  * fixed-point Mtx). */
@@ -1590,7 +1590,7 @@ struct ObjRecAtCV4 {
 typedef struct ObjRecAtCV4 ObjRecAtCV4;
 struct AudioRootD844 {
     char pad0[0x1DA8];
-    ALHeap heap; /* SndMgr.heap (structs/sound.h) */
+    ALHeap heap; /* CAudioWorld.heap (structs/sound.h) */
 };
 struct AudioStateD844 {
     struct AudioRootD844 *root;
@@ -2867,7 +2867,7 @@ struct MenuRecAt10 {
     struct EntryRecAt18V2 *entries;
     s32 count;
 };
-/* ControllerProfile: Turok 2's controller state, D_800F5EC0 (one definition). */
+/* ControllerProfile: Turok 2's controller state, gControllers (one definition). */
 #include "structs/controller.h"
 struct func_8022A404_S1;
 struct func_8022A404_S1 {

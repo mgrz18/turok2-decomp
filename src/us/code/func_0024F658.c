@@ -26,8 +26,8 @@ typedef struct {
     /* 0x04 */ u8 pad4[0x18 - 4];
 } Mode;
 
-extern f32 D_800B6D28;      /* frame time */
-extern Mode D_800ADF5C[];
+extern f32 gFrameIncrement;      /* frame time */
+extern Mode gPlayerStateTable_tuning[];
 
 f32 Math_DecayToZero(f32 value, f32 rate);
 f32 Math_StepClamped(f32 value, f32 delta, f32 limit);
@@ -64,7 +64,7 @@ void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, Tuning *tu
     ready = 1;
     if (!(value <= 0.0f)) {
         ready = 0;
-        player->m_BurstTimer = value - D_800B6D28;
+        player->m_BurstTimer = value - gFrameIncrement;
     }
     if (player->m_Data.m_CurrentWeapon == 0x12 || player->m_Data.m_CurrentWeapon == 0x21) {
         ready = 0;
@@ -143,7 +143,7 @@ void CPlayer__MoveInWater(CPlayer *player, CGameObjectInstance *body, Tuning *tu
     player->m_vDesiredPos.z += (forwardOut.z + strafeOut.z) * player->m_FrameIncrementScaled;
     if (body->m_vVelocity.y < 0.0f) {
         CVector3__Add(&sum, &forwardOut, &strafeOut);
-        body->m_vVelocity.y -= D_800ADF5C[player->m_Mode].physics->drag
+        body->m_vVelocity.y -= gPlayerStateTable_tuning[player->m_Mode].physics->drag
             * (func_00298470(sum.x * sum.x + sum.y * sum.y + sum.z * sum.z) / (tuning->max * 4.0f))
             * player->m_FrameIncrementScaled;
     }

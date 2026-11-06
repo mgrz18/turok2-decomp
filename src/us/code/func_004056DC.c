@@ -8,10 +8,10 @@ extern f32 Random_Blend(f32 lo, f32 hi);
 extern s32 Primagen_RunAttackStep(CGameObjectInstance *obj, CAI *ai, f32 dist);
 
 extern s32 D_800F1F50[];
-extern f32 D_800B6D28;          /* per-frame scale */
-extern f32 D_8012F9F8;         /* cooldown */
-extern BossStep *D_8012F9FC;   /* script */
-extern s32 D_8012FA00;         /* cursor */
+extern f32 gFrameIncrement;          /* per-frame scale */
+extern f32 gLevelScript_script;         /* cooldown */
+extern BossStep *gLevelScript_script_steps;   /* script */
+extern s32 gLevelScript_script_cursor;         /* cursor */
 
 void Primagen_UpdateMode1(CGameObjectInstance *obj, CAI *ai) {
     CAITargets t;
@@ -20,40 +20,40 @@ void Primagen_UpdateMode1(CGameObjectInstance *obj, CAI *ai) {
     AI_UpdateTargets(obj, ai, &t, 1, 1);
     D_800F1F50[0] &= ~0x8000;
 
-    if (D_8012F9D8.state == 10 && ai->m_AnimRepeatedCount != 0 && t.m_Sight.m_pTarget != 0) {
-        D_8012F9D8.mode = 2;
+    if (gLevelScript_bossState.state == 10 && ai->m_AnimRepeatedCount != 0 && t.m_Sight.m_pTarget != 0) {
+        gLevelScript_bossState.mode = 2;
         CAI__SetMode(obj, ai, 7);
         return;
     }
-    if (D_8012F9D8.state == 5 && ai->m_AnimRepeatedCount != 0 && D_8012F9D8.timer <= 0.0f) {
-        D_8012F9D8.mode = 1;
+    if (gLevelScript_bossState.state == 5 && ai->m_AnimRepeatedCount != 0 && gLevelScript_bossState.timer <= 0.0f) {
+        gLevelScript_bossState.mode = 1;
         CAI__SetMode(obj, ai, 5);
         return;
     }
-    if (D_8012F9D8.timer > 0.0f) {
-        D_8012F9D8.timer -= D_800B6D28;
+    if (gLevelScript_bossState.timer > 0.0f) {
+        gLevelScript_bossState.timer -= gFrameIncrement;
     }
-    if (D_8012F9D8.scriptOn && D_8012F9D8.state != 10) {
-        if (D_8012F9D8.script.current == -1) {
-            if (D_8012FA00 != -1) {
-                D_8012F9F8 = D_8012F9FC[D_8012FA00].delay;
+    if (gLevelScript_bossState.scriptOn && gLevelScript_bossState.state != 10) {
+        if (gLevelScript_bossState.script.current == -1) {
+            if (gLevelScript_script_cursor != -1) {
+                gLevelScript_script = gLevelScript_script_steps[gLevelScript_script_cursor].delay;
             } else {
-                D_8012F9F8 = 0.0f;
+                gLevelScript_script = 0.0f;
             }
             do {
-                D_8012FA00++;
-                if (D_8012F9FC[D_8012FA00].type == 5) {
-                    D_8012FA00 = 0;
+                gLevelScript_script_cursor++;
+                if (gLevelScript_script_steps[gLevelScript_script_cursor].type == 5) {
+                    gLevelScript_script_cursor = 0;
                 }
-                D_8012F9D8.script.current = D_8012FA00;
-            } while ((f32) D_8012F9FC[D_8012FA00].chance <= Random_Blend(0.0f, 100.0f));
+                gLevelScript_bossState.script.current = gLevelScript_script_cursor;
+            } while ((f32) gLevelScript_script_steps[gLevelScript_script_cursor].chance <= Random_Blend(0.0f, 100.0f));
         }
         if (Primagen_RunAttackStep(obj, ai, t.m_Sight.m_Dist)) {
             return;
         }
     }
-    if (D_8012F9D8.state == 6 && t.m_Sight.m_Dist > 460.8f) {
-        D_8012F9D8.mode = 2;
+    if (gLevelScript_bossState.state == 6 && t.m_Sight.m_Dist > 460.8f) {
+        gLevelScript_bossState.mode = 2;
         CAI__SetMode(obj, ai, 7);
     }
 }

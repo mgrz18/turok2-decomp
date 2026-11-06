@@ -10,34 +10,34 @@ extern char D_800B4888[];
 extern char D_800B4894[];
 extern char D_800B48A8[];
 extern char D_800B48E4[];
-extern s32 D_80130984;
-extern s32 D_80130990;
-extern s32 D_80130994;
-extern s32 D_801309B4;
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuIsLoad;
+extern s32 gPakMenuIsProfile;
 
 s32 PakMenu_UpdateSubtitle(MenuItem *item, s16 *id) {
     s32 n = *id;
     u32 k = n - 3;
 
-    if (D_80130994 != 0) {
-        if (D_801309B4 != 0) {
+    if (gPakMenuIsLoad != 0) {
+        if (gPakMenuIsProfile != 0) {
             item->text = D_800B4870;
         } else {
             item->text = D_800B4888;
         }
-    } else if (D_80130984 != 0) {
+    } else if (gPakMenuIsSave != 0) {
         if (k < 16) {
             item->text = D_800B48A8;
             return 0;
         }
         if (n == 21) {
             item->text = D_800C140C;
-        } else if (D_801309B4 != 0) {
+        } else if (gPakMenuIsProfile != 0) {
             item->text = D_800B487C;
         } else {
             item->text = D_800B4894;
         }
-    } else if (D_80130990 != 0) {
+    } else if (gPakMenuAnyPak != 0) {
         item->text = D_800B48E4;
     }
     return 0;

@@ -9,14 +9,14 @@ typedef signed long long s64;
 typedef unsigned long long u64;
 typedef float f32;
 typedef double f64;
-extern s8 D_801213E0;
+extern s8 __osContBuffer;
 void __osPackResetData(void)
 {
   s32 var_v0;
   s8 *var_v1;
   int new_var;
-  var_v1 = &D_801213E0;
-  *((s32 *) (((s8 *) (&D_801213E0)) + 0x3C)) = 1;
+  var_v1 = &__osContBuffer;
+  *((s32 *) (((s8 *) (&__osContBuffer)) + 0x3C)) = 1;
   new_var = 0xFD;
   var_v0 = 3;
   do

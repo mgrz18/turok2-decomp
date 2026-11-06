@@ -9,19 +9,19 @@
 /* Controller pak save: when the pak has room and an existing note can be replaced, writes the save note;
  * stops the pak sounds and shows the result (or the "not enough space" message). */
 
-extern s32 D_80130990;
-extern s32 D_800C2028; /* pad */
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort; /* pad */
 extern s32 D_800F70A8;
-extern s32 D_80130984;
-extern s32 D_800C2010;
-extern s32 D_800C2014;
-extern char D_800B45CC[];
-extern char D_800B45D8[];
-extern u8 D_80119E2C[];
-extern u8 D_0043C1C4[];
-extern u8 D_0043BD68[];
-extern u8 D_0043BDF8[];
-extern u8 D_0043BEF4[];
+extern s32 gPakMenuIsSave;
+extern s32 gSaveBufferHandle;
+extern s32 gLoadBufferHandle;
+extern char gPakGameNoteName[];
+extern char gPakGameCode[];
+extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern u8 gPakConfirmNoSpaceDesc[];
+extern u8 gPakMsgSaveDoneDesc[];
+extern u8 gPakMsgSaveFailedDesc[];
+extern u8 gSavePortalMenuDescB[];
 u32 Pak_BytesToPages(u32 n);
 s32 Pak_GetFreePages(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
@@ -34,19 +34,19 @@ void Cinema_RequestById(s32 a);
 void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, s32 e);
 
 static __inline__ void FreeAll(void) {
-    if (D_800C2010 != 0 || D_800C2014 != 0) {
+    if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
         CCache__Flush(0);
     }
-    if (D_800C2010 != 0) {
-        CCache__Deallocate(0, D_800C2010);
+    if (gSaveBufferHandle != 0) {
+        CCache__Deallocate(0, gSaveBufferHandle);
     }
-    if (D_800C2014 != 0) {
-        CCache__Deallocate(0, D_800C2014);
+    if (gLoadBufferHandle != 0) {
+        CCache__Deallocate(0, gLoadBufferHandle);
     }
-    D_800C2010 = 0;
-    D_800C2014 = 0;
-    D_800C2018 = 0;
-    D_800C201C = 0;
+    gSaveBufferHandle = 0;
+    gLoadBufferHandle = 0;
+    gSaveBuffer = 0;
+    gLoadBuffer = 0;
 }
 
 s32 PakMenu_WriteSaveGame(s32 unused, Menu *own) {
@@ -63,8 +63,8 @@ s32 PakMenu_WriteSaveGame(s32 unused, Menu *own) {
     s32 pv;
     CPlayer *pp;
 
-    if (D_80130990 != 0) {
-        pv = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        pv = gPakMenuPort;
         pp = NULL;
     } else {
         pv = own->controller->port;
@@ -75,7 +75,7 @@ s32 PakMenu_WriteSaveGame(s32 unused, Menu *own) {
     } while (0);
     plr = pp;
     size = D_800F70A8 + 0x688;
-    if (D_80130984 != 0) {
+    if (gPakMenuIsSave != 0) {
         need = Pak_BytesToPages(size);
         r = Pak_GetFreePages(pad.channel, &pad.freeBytes);
         if (r == 0) {
@@ -87,12 +87,12 @@ s32 PakMenu_WriteSaveGame(s32 unused, Menu *own) {
                     if (r == 0) {
                         written = 1;
                         padv = pad.channel;
-                        r = Pak_SaveNoteVerified(padv, size, D_800C2018, D_800B45CC, ext, D_800B45D8);
+                        r = Pak_SaveNoteVerified(padv, size, gSaveBuffer, gPakGameNoteName, ext, gPakGameCode);
                     }
                 }
             }
             if (ok != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043C1C4, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakConfirmNoSpaceDesc, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -107,9 +107,9 @@ s32 PakMenu_WriteSaveGame(s32 unused, Menu *own) {
     }
     err = r;
     if (err == 0) {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BD68, plr, plr->m_ContState.m_pContState, (s32)D_0043BEF4);
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc, plr, plr->m_ContState.m_pContState, (s32)gSavePortalMenuDescB);
     } else {
-        MenuPool_OpenMenu(D_80119E2C, D_0043BDF8, plr, plr->m_ContState.m_pContState, (s32)D_0043BEF4);
+        MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc, plr, plr->m_ContState.m_pContState, (s32)gSavePortalMenuDescB);
     }
     return 1;
 }

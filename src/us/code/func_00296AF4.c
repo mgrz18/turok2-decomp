@@ -7,7 +7,7 @@ extern const double D_800AA700;
 extern const float D_800AA708;
 extern void init_lpfilter(ALLowPass *lp);
 extern float D_800AA6F8;
-extern ALGlobals *D_800B7760;
+extern ALGlobals *alGlobals;
 s32 alFxParamHdl(ALFx *filter, s32 paramID, void *param)
 {
     ALFx *f = filter;
@@ -31,7 +31,7 @@ s32 alFxParamHdl(ALFx *filter, s32 paramID, void *param)
             f->delay[s].gain = (s16)val;
             break;
         case 5:
-            f->delay[s].rsinc = (((f32)val * D_800AA6F8) * 2.0f) / D_800B7760->drvr.outputRate;
+            f->delay[s].rsinc = (((f32)val * D_800AA6F8) * 2.0f) / alGlobals->drvr.outputRate;
             break;
         case 6: {
             f32 fval = (f32)val;

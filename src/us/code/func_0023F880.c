@@ -27,7 +27,7 @@ typedef struct EffectParams {
     /* 0x7 */ s8 b;
 } __attribute__((aligned(4))) EffectParams;
 
-extern CCollisionResults *D_800F1ADC;
+extern CCollisionResults *gCollisionResultsP;
 
 void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);
 void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
@@ -145,7 +145,7 @@ s32 Sweep_TestBoxFaces(Sweep *sweep, s32 unused, HitInst *other, CVector3 *start
                            sweep->def->m_GroundFriction, 0)) {
             continue;
         }
-        target = D_800F1ADC;
+        target = gCollisionResultsP;
         sweep->hit.kind = hitKind;
         sweep->hit.posOut = &target->m_vInstancePos;
         sweep->hit.regionOut = &target->m_pInstanceRegion;

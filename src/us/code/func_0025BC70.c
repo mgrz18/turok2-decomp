@@ -6,9 +6,9 @@
  * timers/flags from the actor definition. Types 0x44E..0x456 (except 0x44F and
  * 0x452) are left alone. */
 
-extern struct { u8 value; } D_8011AAF1;
-extern u8 D_800B0A60[];
-extern u8 D_800F7078[];
+extern struct { u8 value; } gEngineApp_m_Settings_multiplayer;
+extern u8 gEnemyGroundModeTable[];
+extern u8 gScene[];
 
 extern void EnemyAI_Update();
 extern void EnemyAI_CalcOrientationMatrix();
@@ -29,7 +29,7 @@ void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {
     actor->m_dwFlags |= 0x02000000;
     actor->m_dwFlags |= 0x04000000;
     info = &actor->header.m_pIntelligence->m_Enemy;
-    if (D_8011AAF1.value == 0) {
+    if (gEngineApp_m_Settings_multiplayer.value == 0) {
         actor->m_dwFlags |= 0x10000000;
     }
     switch (actor->m_nTypeFlag) {
@@ -42,7 +42,7 @@ void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {
     case 0x456:
         return;
     }
-    ai->m_pModeTable = D_800B0A60;
+    ai->m_pModeTable = gEnemyGroundModeTable;
     ai->m_pfStep = EnemyAI_Update;
     ai->m_pfCalculateOrientationMatrix = EnemyAI_CalcOrientationMatrix;
     ai->m_pfDraw = EnemyAI_DrawFaded;
@@ -50,7 +50,7 @@ void EnemyAI_Init(CGameObjectInstance *actor, CAI *ai) {
         ai->m_pfHit = NULL;
         ai->m_pfCollision = NULL;
         ai->m_pfHurt = NULL;
-        CScene__SetInstanceSavedBit(D_800F7078, actor, 0);
+        CScene__SetInstanceSavedBit(gScene, actor, 0);
     } else {
         ai->m_pfHit = EnemyAI_OnHit;
         ai->m_pfCollision = EnemyAI_CheckGrab;

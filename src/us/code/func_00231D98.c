@@ -79,7 +79,7 @@ struct B19Obj {
     u8 pad44[0xD4];
     s32 unk118;      /* 0x118 */
 };
-extern u8 D_801102B8[];
+extern u8 gEngineApp_m_SwooshSystem[];
 extern u8 D_8010FF34[];
 void CParticle__Attach(B19Obj *, s32, s32);
 void Trail_AddNode(void *, B19Obj *, s32);
@@ -89,7 +89,7 @@ void Sound__Play(s16, f32, f32, f32, s32, s32);
 void CParticle__StartEffects(B19Obj *o, B19Def *def) {
     s32 t;
     CParticle__Attach(o, 0, 0);
-    if (def->b6 != -1) Trail_AddNode(D_801102B8, o, def->b6);
+    if (def->b6 != -1) Trail_AddNode(gEngineApp_m_SwooshSystem, o, def->b6);
     if (def->b7 != -1) o->unk118 = DLight_Spawn(D_8010FF34, def->b7);
     else o->unk118 = 0;
     if (!(o->flags & 0x200000) && (t = def->sC) != 0) {

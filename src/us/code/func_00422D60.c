@@ -19,9 +19,9 @@ extern char D_800B4E34[];
 extern char D_800B4BF8[];
 extern char D_800B4E8C[];
 extern char D_800B4CA8[];
-extern u32 D_801309C0;
+extern u32 gPakMessageKind;
 s32 PakMessage_UpdateLine5(struct FieldRecAt14 *field) {
-    u32 state = D_801309C0;
+    u32 state = gPakMessageKind;
     if (state >= 16) {
         goto state_other;
     }

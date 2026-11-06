@@ -3,7 +3,7 @@
 #include "structs/game_object.h"
 #include "structs/boss.h"
 
-extern BlindOnePhase D_0043232C[];
+extern BlindOnePhase sBlindOnePhases_2[];
 
 extern s32 Cinema_IsIdle(BlindOneState *m);
 
@@ -29,8 +29,8 @@ void BlindOne_PhaseWaitCinemaUpdate_2(BlindOneState *m) {
             m->actors3[i]->m_AI.m_BlindOne.m_nPhaseHits = 0;
         }
         m->phase = cmd;
-        if (D_0043232C[cmd].init != NULL) {
-            D_0043232C[cmd].init(m);
+        if (sBlindOnePhases_2[cmd].init != NULL) {
+            sBlindOnePhases_2[cmd].init(m);
         }
     }
 }

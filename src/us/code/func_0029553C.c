@@ -6,9 +6,9 @@
 void alFilterNew(ALFilter *f, void *handler, void *setParam, s32 type);
 void *alHeapDBAlloc(u8 *file, s32 line, ALHeap *hp, s32 num, s32 size);
 void *alEnvmixerPull(void);
-s32 D_00296118(void *filter, s32 paramID, void *param);
+s32 alEnvmixerParam(void *filter, s32 paramID, void *param);
 void alEnvmixerNew(ALEnvMixer *e, ALHeap *hp) {
-    alFilterNew(&e->filter, alEnvmixerPull, D_00296118, 4);
+    alFilterNew(&e->filter, alEnvmixerPull, alEnvmixerParam, 4);
     e->state = alHeapDBAlloc(0, 0, hp, 1, 0x50);
     e->first = 1;
     e->motion = 0;

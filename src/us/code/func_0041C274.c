@@ -4,11 +4,11 @@
 #include "rw/abu_types.h"
 
 extern char D_800B3FC0[];
-extern u8 D_8011AAEF;
+extern u8 gEngineApp_m_Settings_unk17;
 extern char D_800B3FA8[];
 extern char D_800B3F90[];
 s32 OptionsMenu_BloodColorText(struct FieldRecAt14 *field) {
-    switch (D_8011AAEF) {
+    switch (gEngineApp_m_Settings_unk17) {
     case 0:
         field->text = D_800B3F90;
         break;

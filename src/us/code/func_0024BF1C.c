@@ -2,7 +2,7 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-extern f32 D_800AE2D8;              /* slot scale */
+extern f32 gBarrelSlotScale;              /* slot scale */
 
 s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
@@ -19,13 +19,13 @@ void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *pla
     for (i = 0; i < perRow * rows; i++) {
         menu->m_Items[i].m_Angle = -(i * (360.0f / (perRow * rows)) * 0.017453294f);
         menu->m_Items[i].m_Lift = 0;
-        menu->m_Items[i].m_Scale = D_800AE2D8;
+        menu->m_Items[i].m_Scale = gBarrelSlotScale;
     }
     n = 0;
     for (i = 0; i < rows; i++) {
         for (w = 0; w < 35; w++) {
             if (owned[w] != 0) {
-                info = D_800AF618[w];
+                info = gWeaponInfoTable[w];
                 ok = CPlayer__GetWeaponAmmo(player, w) != 0;
                 menu->m_Items[n].m_Weapon = w;
                 menu->m_Items[n].m_bAvailable = ok;

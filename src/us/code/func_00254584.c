@@ -4,12 +4,12 @@
 s32 CPlayer__Hurt(s32, s32, s32, s32, s32);
 s32 CPlayer__UpdateOxygen(s32, s32);
 
-extern s32 D_8011AAD8;
+extern s32 gEngineApp_m_Settings;
 
 void CPlayer__UpdateSubmerged(CPlayer *arg0, CGameObjectInstance *arg1) {
     s32 var_v0;
 
-    if (D_8011AAD8 & 0x10) {
+    if (gEngineApp_m_Settings & 0x10) {
         var_v0 = 1;
     } else {
         var_v0 = arg0->m_Data.m_SpecialPickupCount[380] & 0xF;

@@ -9,20 +9,20 @@ typedef struct ColorEntry {
     /* 0x04 */ u8 pad4[4];
 } ColorEntry;
 
-extern CGameFromCameraPool D_801198B0;
-extern ColorEntry D_800ACDE8[];
-extern f32 D_800B6D28;                  /* the frame's time step */
+extern CGameFromCameraPool gEngineApp_m_Game_m_CameraPool;
+extern ColorEntry gWarpFadeColors[];
+extern f32 gFrameIncrement;                  /* the frame's time step */
 extern u8 D_800B54E0[];
 
 void Cinema_Reset(ColorEntry *entry);
 void Cinema_StopAtEnd(void);
 void Cinema_RequestById(s32 arg0);
-s32 CScene__FindWarpDests(CWorld *world, s32 arg1, s32 id, CWarpPoint *spawn, s32 arg4);
-void CScene__LoadLevel(CWorld *world, s32 id, s32 flags);
+s32 CScene__FindWarpDests(CScene *world, s32 arg1, s32 id, CWarpPoint *spawn, s32 arg4);
+void CScene__LoadLevel(CScene *world, s32 id, s32 flags);
 s32 Demo_GetPlayerCount(void);
 void CCameraPool__AddTimedText(CGameFromCameraPool *game, void *camera, u8 *text, f32 time);
 
-static __inline__ s32 transitionId(CWorld *scene) {
+static __inline__ s32 transitionId(CScene *scene) {
     if (scene->m_bWarpSpawn != 0) {
         return scene->m_WarpSpawn.m_nLevel;
     }
@@ -31,8 +31,8 @@ static __inline__ s32 transitionId(CWorld *scene) {
 
 /* Runs the fade of a level transition: state 1 fades in to the entry length and then warps
  * (CScene__FindWarpDests, or straight to ~id for a negative id), state 2 fades back out. */
-void CScene__UpdateWarp(CWorld *scene) {
-    ColorEntry *entry = &D_800ACDE8[scene->m_WarpFade];
+void CScene__UpdateWarp(CScene *scene) {
+    ColorEntry *entry = &gWarpFadeColors[scene->m_WarpFade];
     s32 id;
     GameSettings *settings;
 
@@ -61,14 +61,14 @@ void CScene__UpdateWarp(CWorld *scene) {
                 id = transitionId(scene);
                 CScene__LoadLevel(scene, id, scene->m_bWarpSpawn);
                 if (scene->m_bWarpSpawn != 0) {
-                    settings = &D_801198B0.m_Settings;
+                    settings = &gEngineApp_m_Game_m_CameraPool.m_Settings;
                     if (scene->m_PreviewOptions != settings->unlockedCheats && !Demo_GetPlayerCount()) {
-                        CCameraPool__AddTimedText(&D_801198B0, D_801198B0.m_CameraPool + 0x40, D_800B54E0, 4.0f);
+                        CCameraPool__AddTimedText(&gEngineApp_m_Game_m_CameraPool, gEngineApp_m_Game_m_CameraPool.m_CameraPool + 0x40, D_800B54E0, 4.0f);
                         scene->m_PreviewOptions = settings->unlockedCheats;
                     }
                 }
             } else {
-                scene->m_WarpTime += D_800B6D28;
+                scene->m_WarpTime += gFrameIncrement;
                 if (entry->value < scene->m_WarpTime) {
                     scene->m_WarpTime = entry->value;
                 }
@@ -78,7 +78,7 @@ void CScene__UpdateWarp(CWorld *scene) {
             if (scene->m_WarpTime == 0.0f) {
                 scene->m_WarpState = 0;
             } else {
-                scene->m_WarpTime -= D_800B6D28;
+                scene->m_WarpTime -= gFrameIncrement;
                 if (scene->m_WarpTime < 0.0f) {
                     scene->m_WarpTime = 0.0f;
                 }

@@ -24,14 +24,14 @@ typedef struct {
     /* 0xB8 */ s32 prevAngle;
 } Obj00402A10;
 
-extern s32 D_8012F5F0[];
+extern s32 gMantidQueen_waveActive[];
 void AI_TurnHeadToTarget(s32 a0, Obj00402A10 *obj, s32 a2);
 void MantidQueen_Update(void *state);
 
 void MantidQueen_Step(s32 a0, Obj00402A10 *obj) {
     obj->prevPos = obj->pos;
     obj->prevAngle = obj->angle;
-    if (D_8012F5F0[0] != 0 || obj->kind == 15) {
+    if (gMantidQueen_waveActive[0] != 0 || obj->kind == 15) {
         obj->unk88 = 0;
         obj->flags |= 0x20000000;
     } else {
@@ -41,5 +41,5 @@ void MantidQueen_Step(s32 a0, Obj00402A10 *obj) {
     if (obj->def != NULL && obj->def->onReset != NULL) {
         obj->def->onReset(a0, obj);
     }
-    MantidQueen_Update(&D_8012F3A0);
+    MantidQueen_Update(&gMantidQueen);
 }

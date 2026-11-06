@@ -57,7 +57,7 @@ void MotherBoss_TeleportTarget_2(CGameObjectInstance *obj, s32 nearSelf) {
         if (idx >= 0) {
             break;
         }
-        CVector3__Subtract(&p, &target->header.m_vPos, &D_00431C40[i].pos);
+        CVector3__Subtract(&p, &target->header.m_vPos, &gMotherSpawnPoints_2[i].pos);
         if (func_00298470(p.x * p.x + p.y * p.y + p.z * p.z) < 460.8f) {
             idx = i;
         }
@@ -66,10 +66,10 @@ void MotherBoss_TeleportTarget_2(CGameObjectInstance *obj, s32 nearSelf) {
         height = 1024.0f;
         do {
             if (idx >= 0) {
-                baseX = D_00431C40[idx].pos.x;
-                baseZ = D_00431C40[idx].pos.z;
+                baseX = gMotherSpawnPoints_2[idx].pos.x;
+                baseZ = gMotherSpawnPoints_2[idx].pos.z;
                 r = Random_Blend(460.8f, 921.6f);
-                angle = Random_Blend(D_00431C40[idx].minAngle, D_00431C40[idx].maxAngle);
+                angle = Random_Blend(gMotherSpawnPoints_2[idx].minAngle, gMotherSpawnPoints_2[idx].maxAngle);
             } else {
                 baseX = target->header.m_vPos.x;
                 baseZ = target->header.m_vPos.z;
@@ -90,7 +90,7 @@ void MotherBoss_TeleportTarget_2(CGameObjectInstance *obj, s32 nearSelf) {
             p.y = height;
             p.z = baseZ;
             for (i = 0; i < 4 && !retry; i++) {
-                if (DistXZ(p, &D_00431C40[i].pos) < 460.8f) {
+                if (DistXZ(p, &gMotherSpawnPoints_2[i].pos) < 460.8f) {
                     retry = 1;
                 }
             }

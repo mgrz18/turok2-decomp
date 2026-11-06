@@ -14,14 +14,14 @@ typedef struct {
 extern s32 CPlayerPool__GetIndex(void *players, C960Player *player);
 extern void MenuPool_OpenMenu(void *pool, void *screen, C960Player *p, void *controller, s32);
 extern void func_00421250(void);
-extern u8 D_0043B6CC[];   /* menu template */
+extern u8 gPakSaveProfileMenuDesc[];   /* menu template */
 
 s32 StatsMenu_SaveProfile(s32 arg0, C960Arg *arg1) {
     C960Player *player;
 
     player = arg1->player;
-    CPlayerPool__GetIndex(&D_80119870.m_PlayerList, player);
+    CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, player);
     func_00421250();
-    MenuPool_OpenMenu(D_80119870.m_MenuPool, D_0043B6CC, player, player->controller, 0);
+    MenuPool_OpenMenu(gEngineApp_m_Game.m_MenuPool, gPakSaveProfileMenuDesc, player, player->controller, 0);
     return 1;
 }

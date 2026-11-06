@@ -19,7 +19,7 @@
 /* An ALCSPlayer, as this reads it. */
 
 extern char D_800AA290[];
-extern char D_800AA294[];
+extern char sCSPlayerFile[];
 
 void alCSeqNextEvent(void *seq, ALEvent *evt);            /* alCSeqNextEvent */
 s32 __alCSeqNextDelta(void *seq, s32 *deltaTicks);          /* __alCSeqNextDelta */
@@ -69,7 +69,7 @@ void __CSPHandleNextSeqEvent(ALCSPlayer *seqp) {
             postNextSeqEvent(seqp);
             break;
         default:
-            __assert(D_800AA290, D_800AA294, 400);
+            __assert(D_800AA290, sCSPlayerFile, 400);
             break;
     }
 }

@@ -1,20 +1,20 @@
 typedef signed int s32;
 
-extern char D_0043ABA0[];
-extern char D_0043ABC4[];
-extern char D_0043ABE8[];
-extern char D_0043AC0C[];
+extern char gStatsAfterPakMenuDesc1_2[];
+extern char gStatsAfterPakMenuDesc2_2[];
+extern char gStatsAfterPakMenuDesc3_2[];
+extern char gStatsAfterPakMenuDesc4_2[];
 
 char *func_0045AA0C(void *arg0, s32 kind) {
     switch (kind) {
         case 0:
         default:
-            return D_0043ABA0;
+            return gStatsAfterPakMenuDesc1_2;
         case 1:
-            return D_0043ABC4;
+            return gStatsAfterPakMenuDesc2_2;
         case 2:
-            return D_0043ABE8;
+            return gStatsAfterPakMenuDesc3_2;
         case 3:
-            return D_0043AC0C;
+            return gStatsAfterPakMenuDesc4_2;
     }
 }

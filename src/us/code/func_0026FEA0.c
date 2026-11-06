@@ -16,10 +16,10 @@ typedef struct {
 s32 alUnlink(void *);                      /* alUnlink */
 s32 alLink(void *, void *);              /* alLink */
 s32 osRecvMesg(s32 *, s32 *, s32);   /* extern */
-extern u32 D_800B2660;          /* audio frame */
-extern u32 D_800B2664;          /* DMAs issued this frame */
-extern s32 D_800F2778;          /* DMA message queue */
-extern DMAState D_800F2794;
+extern u32 audFrameCt;          /* audio frame */
+extern u32 nextDMA;          /* DMAs issued this frame */
+extern s32 gAudioDmaMessageQ;          /* DMA message queue */
+extern DMAState gAudioDmaState_firstUsed;
 
 /* Waits for this frame's audio DMAs and frees the buffers not used lately. */
 void __clearAudioDMA(void) {
@@ -30,28 +30,28 @@ void __clearAudioDMA(void) {
 
     var_s0 = 0;
     sp10 = 0;
-    if (D_800B2664 != 0) {
+    if (nextDMA != 0) {
         do {
-            osRecvMesg(&D_800F2778, &sp10, 1);
+            osRecvMesg(&gAudioDmaMessageQ, &sp10, 1);
             var_s0 += 1;
-        } while (var_s0 < (u32) D_800B2664);
+        } while (var_s0 < (u32) nextDMA);
     }
-    var_s0_2 = D_800F2794.firstUsed;
+    var_s0_2 = gAudioDmaState_firstUsed.firstUsed;
     if (var_s0_2 != NULL) {
         do {
             temp_s1 = var_s0_2->next;
-            if ((u32) (var_s0_2->lastFrame + 1) < (u32) D_800B2660) {
-                if (D_800F2794.firstUsed == var_s0_2) {
-                    D_800F2794.firstUsed = temp_s1;
+            if ((u32) (var_s0_2->lastFrame + 1) < (u32) audFrameCt) {
+                if (gAudioDmaState_firstUsed.firstUsed == var_s0_2) {
+                    gAudioDmaState_firstUsed.firstUsed = temp_s1;
                 }
                 alUnlink(var_s0_2);
-                if (D_800F2794.firstFree == NULL) {
-                    D_800F2794.firstFree = var_s0_2;
+                if (gAudioDmaState_firstUsed.firstFree == NULL) {
+                    gAudioDmaState_firstUsed.firstFree = var_s0_2;
                     var_s0_2->next = NULL;
                     var_s0_2->prev = 0;
                     goto block_11;
                 }
-                alLink(var_s0_2, D_800F2794.firstFree);
+                alLink(var_s0_2, gAudioDmaState_firstUsed.firstFree);
                 var_s0_2 = temp_s1;
             } else {
 block_11:
@@ -59,6 +59,6 @@ block_11:
             }
         } while (var_s0_2 != NULL);
     }
-    D_800B2664 = 0;
-    D_800B2660 += 1;
+    nextDMA = 0;
+    audFrameCt += 1;
 }

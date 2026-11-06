@@ -36,7 +36,7 @@ s32 CGameObjectInstance__PickRandomAnim(void *, s32, s32);
 s32 EnemyAnim_NormalDeath_B0390(void *, void *);
 s32 EnemyAnim_NormalDeath_B03C0(void *, void *);
 s32 GameObject_IsOnGround(void *);
-void AI_SpawnParticlesOnce(void *, void *, s32, s32, s32);
+void AI_DropPickupsOnce(void *, void *, s32, s32, s32);
 void CAI__SetMode(void *, void *, s32);
 void AI_StopSound(void *, void *);
 void CListedInstance__Free(void *);
@@ -83,7 +83,7 @@ finish:
         } else {
             state->flags |= 0x20;
             actor->flags &= ~0x01000000;
-            AI_SpawnParticlesOnce(actor, state, 4, info->unk0C, info->unk10);
+            AI_DropPickupsOnce(actor, state, 4, info->unk0C, info->unk10);
             actor->flags &= ~0x20000;
             if (state->time > 90.0f) {
                 CAI__SetMode(actor, state, 0x3C);

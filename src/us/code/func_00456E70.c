@@ -7,49 +7,49 @@
 #include "structs/pak.h"
 
 typedef struct O01Sel { s32 v; s32 w; } O01Sel;
-extern s32 D_80130984;
-extern s32 D_801309A0;
-extern s32 D_80130994;
-extern s32 D_801309B4;
-extern s32 D_800C2024;
-extern s32 D_801309BC;
-extern s32 D_80130990;
-extern s32 D_800C2020;
-extern s32 D_800C2028;
-extern PakProfile D_80130968;
-extern u8 D_80119E2C[];
-extern u8 D_0043BB68[];
-extern u8 D_0043BF7C[];
-extern u8 D_0043BB20[];
-extern u8 D_0043B5EC[];
-void func_004263A0(s32 ch);
-s32 func_0042647C(s32 ch);
-s32 func_004264B4(s32 ch);
-s32 func_00426AF8(s32 ch);
-void func_0041D948(Menu *o);
-u32 func_00426D98(u8 *data, s32 len, u32 crc);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, s32 d, void *e);
-extern u8 D_80130974[8];
-extern u8 D_0043ABA0[];
-extern u8 D_0043ABC4[];
-extern u8 D_0043ABE8[];
-extern u8 D_0043AC0C[];
+extern s32 gPakMenuIsSave;
+extern s32 gPakMenuWrites;
+extern s32 gPakMenuIsLoad;
+extern s32 gPakMenuIsProfile;
+extern s32 gPakMenuMode;
+extern s32 gPakMenuLeaving;
+extern s32 gPakMenuAnyPak;
+extern s32 gDamagedPakContinued;
+extern s32 gPakMenuPort;
+extern PakProfile gPakProfile;
+extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern u8 gPakMsgInsertToSaveDesc_2[];
+extern u8 gDamagedPakAtBootMenuDesc_2[];
+extern u8 gPakMsgPakNotFoundDesc_2[];
+extern u8 gPakSaveProfileMenuDesc_2[];
+void Pak_ProbeSlot_2(s32 ch);
+s32 Pak_GetStatus_2(s32 ch);
+s32 Pak_IsRumblePak_2(s32 ch);
+s32 Pak_NeedsRepair_2(s32 ch);
+void PakMenu_UpdateNoteRows_2(Menu *o);
+u32 Crc32_Compute_2(u8 *data, s32 len, u32 crc);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, s32 d, void *e);
+extern u8 gPakProfile_name[8];
+extern u8 gStatsAfterPakMenuDesc1_2[];
+extern u8 gStatsAfterPakMenuDesc2_2[];
+extern u8 gStatsAfterPakMenuDesc3_2[];
+extern u8 gStatsAfterPakMenuDesc4_2[];
 /* Static inlines in the Rage Wars source file (dropped by the importer). */
 static inline u8 *O01Pick(O01Sel *sel) {
     u8 *p;
     switch (sel->v) {
     default:
     case 0:
-        p = D_0043ABA0;
+        p = gStatsAfterPakMenuDesc1_2;
         break;
     case 1:
-        p = D_0043ABC4;
+        p = gStatsAfterPakMenuDesc2_2;
         break;
     case 2:
-        p = D_0043ABE8;
+        p = gStatsAfterPakMenuDesc3_2;
         break;
     case 3:
-        p = D_0043AC0C;
+        p = gStatsAfterPakMenuDesc4_2;
         break;
     }
     return p;
@@ -57,16 +57,16 @@ static inline u8 *O01Pick(O01Sel *sel) {
 static inline void O01Capture(CPlayer *a) {
     CPlayerOptions *p = a->m_pOptions;
     s32 i;
-    D_80130968.character = p->m_nCharacter;
-    D_80130968.suicides = p->m_Suicides;
-    D_80130968.deaths = p->m_Deaths;
-    D_80130968.kills = p->m_Kills;
-    D_80130968.tags = p->m_Tags;
-    D_80130968.reserved[0] = 0;
-    D_80130968.reserved[1] = 0;
-    D_80130968.reserved[2] = 0;
+    gPakProfile.character = p->m_nCharacter;
+    gPakProfile.suicides = p->m_Suicides;
+    gPakProfile.deaths = p->m_Deaths;
+    gPakProfile.kills = p->m_Kills;
+    gPakProfile.tags = p->m_Tags;
+    gPakProfile.reserved[0] = 0;
+    gPakProfile.reserved[1] = 0;
+    gPakProfile.reserved[2] = 0;
     for (i = 0; i < 8; i++) {
-        D_80130974[i] = p->m_Name[i];
+        gPakProfile_name[i] = p->m_Name[i];
     }
 }
 void PakMenu_InitSaveProfile_2(Menu *own) {
@@ -76,40 +76,40 @@ void PakMenu_InitSaveProfile_2(Menu *own) {
     s32 pad;
     CPlayer *pp;
     s32 pv;
-    D_80130984 = 1;
-    D_801309A0 = 1;
-    D_80130994 = 0;
-    D_801309B4 = 1;
-    D_800C2024 = 0;
-    D_801309BC = 0;
-    D_80130990 = 0;
+    gPakMenuIsSave = 1;
+    gPakMenuWrites = 1;
+    gPakMenuIsLoad = 0;
+    gPakMenuIsProfile = 1;
+    gPakMenuMode = 0;
+    gPakMenuLeaving = 0;
+    gPakMenuAnyPak = 0;
     pv = own->controller->port;
     pp = own->player;
     sel.v = pv;
     plr = pp;
     msg = O01Pick(&sel);
-    if (D_800C2020 != 0) {
-        D_801309BC = 1;
-        MenuPool_OpenMenu((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
+    if (gDamagedPakContinued != 0) {
+        gPakMenuLeaving = 1;
+        MenuPool_OpenMenu_2((u8 *)own->player->m_pCamera + 0x53C, msg, plr, plr->m_ContState.m_pContState, 0);
     } else {
-        if (D_80130990 != 0) {
-            pad = D_800C2028;
+        if (gPakMenuAnyPak != 0) {
+            pad = gPakMenuPort;
         } else {
             pad = own->controller->port;
         }
-        func_004263A0(pad);
-        if (func_0042647C(sel.v) == 0) {
+        Pak_ProbeSlot_2(pad);
+        if (Pak_GetStatus_2(sel.v) == 0) {
             O01Capture(plr);
-            D_80130968.checksum = func_00426D98((u8 *)&D_80130968, 0x14, 4);
-            func_0041D948(own);
+            gPakProfile.checksum = Crc32_Compute_2((u8 *)&gPakProfile, 0x14, 4);
+            PakMenu_UpdateNoteRows_2(own);
         } else {
-            D_801309BC = 1;
-            if (func_004264B4(sel.v) != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BB68, plr, plr->m_ContState.m_pContState, msg);
-            } else if (func_00426AF8(sel.v) != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BF7C, plr, plr->m_ContState.m_pContState, D_0043B5EC);
+            gPakMenuLeaving = 1;
+            if (Pak_IsRumblePak_2(sel.v) != 0) {
+                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgInsertToSaveDesc_2, plr, plr->m_ContState.m_pContState, msg);
+            } else if (Pak_NeedsRepair_2(sel.v) != 0) {
+                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gDamagedPakAtBootMenuDesc_2, plr, plr->m_ContState.m_pContState, gPakSaveProfileMenuDesc_2);
             } else {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BB20, plr, plr->m_ContState.m_pContState, msg);
+                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgPakNotFoundDesc_2, plr, plr->m_ContState.m_pContState, msg);
             }
         }
     }

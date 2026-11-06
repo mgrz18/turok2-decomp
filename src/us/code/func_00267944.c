@@ -5,7 +5,7 @@
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
 
-extern f32 D_800DD78C;
+extern f32 gQuaternionSin;
 
 s32 CGameRegion__IsSteep(void *region);
 void CGameRegion__GetNormal(CVector3 *normal, void *region);
@@ -36,10 +36,10 @@ static __inline__ CQuaternion floorTilt(CGameObjectInstance *obj) {
     CVector3__Cross(&axis, &up, &normal);
     CVector3__Normalize(&axis);
     angle = Math_AcosLookup(up.x * normal.x + up.y * normal.y + up.z * normal.z) * 0.5f;
-    D_800DD78C = func_002982F0(angle);
-    q.x = axis.x * D_800DD78C;
-    q.y = axis.y * D_800DD78C;
-    q.z = axis.z * D_800DD78C;
+    gQuaternionSin = func_002982F0(angle);
+    q.x = axis.x * gQuaternionSin;
+    q.y = axis.y * gQuaternionSin;
+    q.z = axis.z * gQuaternionSin;
     q.w = func_002974C0(angle);
     return q;
 }
@@ -76,10 +76,10 @@ CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *obj) {
                 CVector3__Cross(&axis, &up, &normal);
                 CVector3__Normalize(&axis);
                 slope = Math_AcosLookup(up.x * normal.x + up.y * normal.y + up.z * normal.z);
-                D_800DD78C = func_002982F0(MIN(slope, 0.43633235f) * 0.375f);
-                tilt.x = axis.x * D_800DD78C;
-                tilt.y = axis.y * D_800DD78C;
-                tilt.z = axis.z * D_800DD78C;
+                gQuaternionSin = func_002982F0(MIN(slope, 0.43633235f) * 0.375f);
+                tilt.x = axis.x * gQuaternionSin;
+                tilt.y = axis.y * gQuaternionSin;
+                tilt.z = axis.z * gQuaternionSin;
                 tilt.w = func_002974C0(MIN(slope, 0.43633235f) * 0.375f);
                 sine = func_002982F0(self->m_RotY);
                 cosine = func_002974C0(self->m_RotY);
@@ -87,10 +87,10 @@ CQuaternion GameObject_GetGroundRotation(CGameObjectInstance *obj) {
                 slope = MIN(slope, 25.0f) * 0.75f;
                 half = 0.5f;
                 angle = slope * half;
-                D_800DD78C = func_002982F0(angle);
+                gQuaternionSin = func_002982F0(angle);
                 lean.y = 0.0f;
-                lean.x = cosine * D_800DD78C;
-                lean.z = -sine * D_800DD78C;
+                lean.x = cosine * gQuaternionSin;
+                lean.z = -sine * gQuaternionSin;
                 lean.w = func_002974C0(angle);
                 CQuaternion__SlerpFast(&result, half, &lean, &tilt);
                 return result;

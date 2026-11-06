@@ -21,8 +21,8 @@ typedef struct {
     /* 0x234 */ void *drawHook;
 } WeaponActor;
 
-extern u8 D_8011AAF1; /* multiplayer */
-extern s32 D_800B6D1C;
+extern u8 gEngineApp_m_Settings_multiplayer; /* multiplayer */
+extern s32 gEvenOdd;
 
 extern s32 MenuPool_CountOpen(void *arg0);
 extern void EnemyAI_CalcOrientationMatrix(WeaponActor *actor, void *ai);
@@ -35,7 +35,7 @@ void WeaponActor_Draw(WeaponActor *obj, CAI *state, CDrawArgs *args) {
     WeaponActor *muzzle;
     s32 arg6 = -1;
 
-    if (D_8011AAF1 != 0 && MenuPool_CountOpen(((u8 *)player->m_pCamera) + 0x53C) != 0) {
+    if (gEngineApp_m_Settings_multiplayer != 0 && MenuPool_CountOpen(((u8 *)player->m_pCamera) + 0x53C) != 0) {
         return;
     }
     muzzle = ((WeaponActor *)player->m_pOnEnemy);
@@ -49,5 +49,5 @@ void WeaponActor_Draw(WeaponActor *obj, CAI *state, CDrawArgs *args) {
     if (player->m_Data.m_CurrentWeapon == 0x15) {
         arg6 = state->m_Weapon.m_nPass;
     }
-    Render_QueueModelInstance(args->m_hModel, obj->model, 1, obj->slots[D_800B6D1C], 0, state->m_Weapon.m_nLod, arg6);
+    Render_QueueModelInstance(args->m_hModel, obj->model, 1, obj->slots[gEvenOdd], 0, state->m_Weapon.m_nLod, arg6);
 }

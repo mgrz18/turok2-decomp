@@ -18,8 +18,8 @@ typedef struct {
     /* 0x8 */ LitVtx v[1];
 } VtxBlk;
 
-extern u32 D_8011AAD8;          /* game flags */
-extern u32 D_8011AAE4;          /* brightness, 0-255 */
+extern u32 gEngineApp_m_Settings;          /* game flags */
+extern u32 gEngineApp_m_Settings_unkC;          /* brightness, 0-255 */
 
 VtxBlk *CISet__GetBlock(s32 *file, s32 index); /* returns chunk `index` of a chunked file */
 
@@ -36,8 +36,8 @@ void Lighting_WriteVertexColors(s32 *file, CVector3 *src) {
     s32 j, v, r;
     s32 k = 0;
 
-    f = MN(1.0f, (f32) D_8011AAE4 * 0.003921568859f);
-    if (D_8011AAD8 & 0x4000) {
+    f = MN(1.0f, (f32) gEngineApp_m_Settings_unkC * 0.003921568859f);
+    if (gEngineApp_m_Settings & 0x4000) {
         for (j = 0; j < *file; j++) {
             s32 n;
             LitVtx *vp;

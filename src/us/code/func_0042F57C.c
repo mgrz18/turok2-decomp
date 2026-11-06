@@ -4,5 +4,5 @@
 
 
 void Demo_Enable(void) {
-    D_800F56B0.active = 1;
+    gDemoPlayer.active = 1;
 }

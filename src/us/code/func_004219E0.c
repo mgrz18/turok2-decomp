@@ -6,15 +6,15 @@
 extern void PakMenu_ProbeOwnerPort(struct Shared_PakMenu *record);
 extern void Pak_ProbeSlot(s32);
 void Pak_ProbeSlot(s32);
-extern s32 D_800C2028;
-extern s32 D_80130990;
+extern s32 gPakMenuPort;
+extern s32 gPakMenuAnyPak;
 void PakMenu_ProbeOwnerPort(struct Shared_PakMenu *record) {
     s32 value;
-    if (D_80130990 != 0) {
-        value = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        value = gPakMenuPort;
     } else {
         value = record->owner->unk4;
     }
     Pak_ProbeSlot(value);
 }
-extern s32 D_80130990;
+extern s32 gPakMenuAnyPak;

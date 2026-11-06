@@ -3,11 +3,11 @@
  * function. */
 #include "common.h"
 
-extern s32 D_80130924;
+extern s32 sCheatsMenuSelection;
 
 /* A time/score threshold per setting index. */
 s32 CheatMenu_GetWarpLevel(void) {
-    switch ((u32) D_80130924) {
+    switch ((u32) sCheatsMenuSelection) {
     case 0:
     default:
         return 1000;

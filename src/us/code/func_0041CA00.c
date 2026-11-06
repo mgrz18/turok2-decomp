@@ -18,8 +18,8 @@ typedef struct Shared_Game {
 } Shared_Game;
 
 extern Shared_Game D_8011A6D8;
-extern int D_801198A0;
-extern char D_800F6CB0[];
+extern int gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount;
+extern char gEngineApp[];
 extern void func_00430330(char *);
 
 int StatsMenu_ContinueNo(int unused, Menu *menu) {
@@ -31,8 +31,8 @@ int StatsMenu_ContinueNo(int unused, Menu *menu) {
             sync->unk40 = team;
         }
     }
-    if (D_801198A0 == 1) {
-        func_00430330(D_800F6CB0);
+    if (gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_nCount == 1) {
+        func_00430330(gEngineApp);
     } else {
         menu->player->m_bActive = 0;
     }

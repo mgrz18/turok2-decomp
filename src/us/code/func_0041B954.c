@@ -2,19 +2,19 @@
 #include "common.h"
 #include "structs/menu.h"
 
-extern u32 D_8011AAD8; /* game option bits */
-extern u32 D_8011AADC; /* unlocked option bits */
+extern u32 gEngineApp_m_Settings; /* game option bits */
+extern u32 gEngineApp_m_Settings_unlockedCheats; /* unlocked option bits */
 extern char D_800B5ABC[];
 extern char D_800B5AD8[];
 
 /* On/off option item for bit 0x4000: shown only when unlocked. */
 s32 CheatMenu_BlackoutText(MenuItem *a) {
-    if (D_8011AADC & 0x4000) {
+    if (gEngineApp_m_Settings_unlockedCheats & 0x4000) {
         a->flags |= 0x1000000;
     } else {
         a->flags &= ~0x1000000;
     }
-    if (D_8011AAD8 & 0x4000) {
+    if (gEngineApp_m_Settings & 0x4000) {
         a->text = D_800B5ABC;
     } else {
         a->text = D_800B5AD8;

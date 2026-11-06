@@ -37,17 +37,17 @@ typedef struct SortNode {
 } SortNode; /* size 0x20 */
 
 extern u8 D_800D8E13;               /* low byte of the pass */
-extern s32 D_800D8E14;              /* level of detail of the batched model */
-extern SortNode *D_800D8E18;        /* opaque tree root */
-extern SortNode *D_800D8E1C;        /* its first node */
-extern s32 D_800D8E20;              /* draw items used */
-extern void **D_800D8E28;           /* batched model */
-extern s32 D_800D8E2C;              /* sort nodes used */
-extern SortNode *D_800D8E30;        /* translucent tree root */
-extern s32 D_800D8E34;              /* queued instance count */
-extern SortNode *D_800D8E38;        /* its first node */
-extern DrawItem D_800D8E40[500];
-extern SortNode D_800DC4F0[100];
+extern s32 sBatchLod;              /* level of detail of the batched model */
+extern SortNode *sOpaqueSortRoot;        /* opaque tree root */
+extern SortNode *sOpaqueSortFirst;        /* its first node */
+extern s32 sDrawItemCount;              /* draw items used */
+extern void **sBatchResource;           /* batched model */
+extern s32 sSortNodeCount;              /* sort nodes used */
+extern SortNode *sTranslucentSortRoot;        /* translucent tree root */
+extern s32 sBatchInstanceCount;              /* queued instance count */
+extern SortNode *sTranslucentSortFirst;        /* its first node */
+extern DrawItem sDrawItems[500];
+extern SortNode sSortNodes[100];
 
 void *CISet__GetBlock(void *resource, s32 index);
 
@@ -87,32 +87,32 @@ void Render_FlushModelBatch(void) {
     DrawItem *item;
     CModelInstance *inst;
 
-    if (D_800D8E34 != 0) {
-        header = *D_800D8E28;
-        for (j = 0; j < D_800D8E34; j++) {
-            inst = &D_800DD578[j];
+    if (sBatchInstanceCount != 0) {
+        header = *sBatchResource;
+        for (j = 0; j < sBatchInstanceCount; j++) {
+            inst = &sBatchInstances[j];
             if (inst->m_pTextures == NULL) {
                 inst->m_pTextures = CISet__GetBlock(header, 0);
             }
         }
-        parts = CISet__GetBlock(CISet__GetBlock(header, 2), D_800D8E14);
+        parts = CISet__GetBlock(CISet__GetBlock(header, 2), sBatchLod);
         count = *parts;
         for (i = 0; i < count; i++) {
             part = CISet__GetBlock(parts, i);
             material = CISet__GetBlock(part, 0);
             key = (material->id << 8) | D_800D8E13;
             if (material->flags & 0x700) {
-                parent = find_node(D_800D8E30, key);
+                parent = find_node(sTranslucentSortRoot, key);
             } else {
-                parent = find_node(D_800D8E18, key);
+                parent = find_node(sOpaqueSortRoot, key);
             }
             if (parent != NULL && parent->key == key) {
                 node = parent;
             } else {
-                if (D_800D8E2C == 100) {
+                if (sSortNodeCount == 100) {
                     break;
                 }
-                node = &D_800DC4F0[D_800D8E2C++];
+                node = &sSortNodes[sSortNodeCount++];
                 node->key = key;
                 node->material = material;
                 node->tail = NULL;
@@ -129,8 +129,8 @@ void Render_FlushModelBatch(void) {
                                 parent->prev->next = node;
                             }
                             parent->prev = node;
-                            if (D_800D8E38 == parent) {
-                                D_800D8E38 = node;
+                            if (sTranslucentSortFirst == parent) {
+                                sTranslucentSortFirst = node;
                             }
                         } else {
                             parent->right = node;
@@ -144,8 +144,8 @@ void Render_FlushModelBatch(void) {
                             parent->next = node;
                         }
                     } else {
-                        D_800D8E30 = node;
-                        D_800D8E38 = node;
+                        sTranslucentSortRoot = node;
+                        sTranslucentSortFirst = node;
                         node->right = NULL;
                         node->left = NULL;
                         node->next = NULL;
@@ -163,8 +163,8 @@ void Render_FlushModelBatch(void) {
                                 parent->prev->next = node;
                             }
                             parent->prev = node;
-                            if (D_800D8E1C == parent) {
-                                D_800D8E1C = node;
+                            if (sOpaqueSortFirst == parent) {
+                                sOpaqueSortFirst = node;
                             }
                         } else {
                             parent->right = node;
@@ -178,8 +178,8 @@ void Render_FlushModelBatch(void) {
                             parent->next = node;
                         }
                     } else {
-                        D_800D8E18 = node;
-                        D_800D8E1C = node;
+                        sOpaqueSortRoot = node;
+                        sOpaqueSortFirst = node;
                         node->right = NULL;
                         node->left = NULL;
                         node->next = NULL;
@@ -188,10 +188,10 @@ void Render_FlushModelBatch(void) {
                 }
             }
             list = CISet__GetBlock(part, 1);
-            for (j = 0; j < D_800D8E34; j++) {
-                inst = &D_800DD578[j];
-                if (D_800D8E20 != 500) {
-                    item = &D_800D8E40[D_800D8E20++];
+            for (j = 0; j < sBatchInstanceCount; j++) {
+                inst = &sBatchInstances[j];
+                if (sDrawItemCount != 500) {
+                    item = &sDrawItems[sDrawItemCount++];
                     item->list = list;
                     item->matrix = inst->m_pMatrix;
                     item->lights = inst->m_pLights;
@@ -209,6 +209,6 @@ void Render_FlushModelBatch(void) {
                 }
             }
         }
-        D_800D8E34 = 0;
+        sBatchInstanceCount = 0;
     }
 }

@@ -17,11 +17,11 @@ typedef union {
     u32 w;
     f32 f;
 } fu;
-extern const du D_800AA750[]; /* P: polynomial coefficients */
-extern const du D_800AA778; /* 1/pi */
-extern const du D_800AA780; /* pi, high part */
-extern const du D_800AA788; /* pi, low part */
-extern const fu D_800AA790; /* 0.0f */
+extern const du sCosfP[]; /* P: polynomial coefficients */
+extern const du sCosfRpi; /* 1/pi */
+extern const du sCosfPiHi; /* pi, high part */
+extern const du sCosfPiLo; /* pi, low part */
+extern const fu sCosfZero; /* 0.0f */
 f32 func_002974C0(f32 x) {
     f64 dx;
     f64 xsq;
@@ -34,7 +34,7 @@ f32 func_002974C0(f32 x) {
     xpt = (ix >> 22) & 0x1FF;
     if (xpt < 0x136) {
         dx = __builtin_fabsf(x);
-        dn = dx * D_800AA778.d + 0.5;
+        dn = dx * sCosfRpi.d + 0.5;
         if (dn >= 0.0) {
             n = dn + 0.5;
         } else {
@@ -42,15 +42,15 @@ f32 func_002974C0(f32 x) {
         }
         dn = n;
         dn -= 0.5;
-        dx = dx - dn * D_800AA780.d;
-        dx = dx - dn * D_800AA788.d;
+        dx = dx - dn * sCosfPiHi.d;
+        dx = dx - dn * sCosfPiLo.d;
         xsq = dx * dx;
-        poly = (((D_800AA750[4].d * xsq + D_800AA750[3].d) * xsq + D_800AA750[2].d) * xsq + D_800AA750[1].d);
+        poly = (((sCosfP[4].d * xsq + sCosfP[3].d) * xsq + sCosfP[2].d) * xsq + sCosfP[1].d);
         poly = dx + dx * xsq * poly;
         if (!(n & 1)) {
             return (f32)poly;
         }
         return -(f32)poly;
     }
-    return D_800AA790.f;
+    return sCosfZero.f;
 }

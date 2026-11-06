@@ -3,8 +3,8 @@
 
 s32 AI_PickAnimFromTable(s32, s32, s32, s32);
 
-extern s32 D_800B0120;
+extern s32 sEnemyAnimNormalDeath_B0120;
 
 void EnemyAnim_NormalDeath_B0120(CGameObjectInstance *arg0, s32 arg1) {
-    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &D_800B0120, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
+    AI_PickAnimFromTable((s32) arg0, arg1, (s32) &sEnemyAnimNormalDeath_B0120, (s32) arg0->header.m_pIntelligence->m_Enemy.m_wNormalDeathAnimFlags);
 }

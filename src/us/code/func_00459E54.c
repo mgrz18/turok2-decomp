@@ -3,33 +3,33 @@
 #include "structs/player.h"
 #include "structs/menu.h"
 
-s32 func_0041DCB0(void *event, s32 port, s32 arg2);
-char *func_0041DB7C(void *event);
-void MenuPool_OpenMenu(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
+s32 PakMenu_CheckPak_2(void *event, s32 port, s32 arg2);
+char *PakMenu_GetReturnMenu_2(void *event);
+void MenuPool_OpenMenu_2(char *dst, char *fmt, CPlayer *player, s32 arg3, char *arg4);
 
-extern char D_0043BDF0[];
-extern char D_0043BE14[];
-extern char D_80119E2C[];
-extern s32 D_800C2028;
-extern s32 D_8011F148;
-extern s32 D_80130940;
-extern s32 D_80130990;
-extern u32 D_801309B0; /* menu state */
-extern s32 D_801309BC;
+extern char gSavePortalMenuDesc_2[];
+extern char gSavePortalMenuDescB_2[];
+extern char gEngineApp_m_Game_m_MenuPool[];
+extern s32 gPakMenuPort;
+extern s32 gPakCheckDone;
+extern s32 gCameraPoolHideViews;
+extern s32 gPakMenuAnyPak;
+extern u32 gPakConfirmKind; /* menu state */
+extern s32 gPakMenuLeaving;
 
 static __inline__ s32 GetPort(Menu *event) {
-    if (D_80130990 != 0) {
-        return D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        return gPakMenuPort;
     }
     return event->controller->port;
 }
 
 static __inline__ void ShowEvent(Menu *event) {
-    if (func_0041DCB0(event, GetPort(event), 1) != 0) {
-        D_801309BC = 1;
-        MenuPool_OpenMenu(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
+    if (PakMenu_CheckPak_2(event, GetPort(event), 1) != 0) {
+        gPakMenuLeaving = 1;
+        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
     } else {
-        MenuPool_OpenMenu(D_80119E2C, event->context, event->player, (s32) event->controller, NULL);
+        MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, event->context, event->player, (s32) event->controller, NULL);
     }
 }
 
@@ -37,7 +37,7 @@ s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
     char *text;
     char *dst;
 
-    switch (D_801309B0) {
+    switch (gPakConfirmKind) {
         case 4:
             ShowEvent(event);
             break;
@@ -49,25 +49,25 @@ s32 PakConfirmMenu_SelectNo_2(s32 unused, Menu *event) {
             break;
         case 1:
         case 2:
-            D_801309BC = 1;
-            D_80130940 = 0;
-            if (D_80130990 != 0) {
-                D_8011F148 = 1;
+            gPakMenuLeaving = 1;
+            gCameraPoolHideViews = 0;
+            if (gPakMenuAnyPak != 0) {
+                gPakCheckDone = 1;
                 return 1;
             }
-            text = func_0041DB7C(event);
+            text = PakMenu_GetReturnMenu_2(event);
             if (text == NULL) {
                 text = event->context;
             }
-            if (event->context == D_0043BE14 || event->context == D_0043BDF0) {
-                D_80130940 = 0;
+            if (event->context == gSavePortalMenuDescB_2 || event->context == gSavePortalMenuDesc_2) {
+                gCameraPoolHideViews = 0;
             }
             if (event->player != NULL) {
                 dst = (char *)event->player->m_pCamera + 0x53C;
             } else {
-                dst = D_80119E2C;
+                dst = gEngineApp_m_Game_m_MenuPool;
             }
-            MenuPool_OpenMenu(dst, text, event->player, (s32) event->controller, NULL);
+            MenuPool_OpenMenu_2(dst, text, event->player, (s32) event->controller, NULL);
             break;
     }
     return 1;

@@ -29,7 +29,7 @@ extern void CCache__Deallocate(s32, void *);
 void CScene__UnloadLevel(LevelState *level) {
     void *p;
 
-    p = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+    p = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
     if (p != NULL) {
         CPlayer__StopLoopingSounds(p);
     }

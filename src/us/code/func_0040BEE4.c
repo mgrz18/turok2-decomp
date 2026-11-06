@@ -12,7 +12,7 @@ typedef struct {
     /* 0x14C */ s32 partMask;
 } ModuleObj;
 
-extern s32 D_800B6D1C; /* current view */
+extern s32 gEvenOdd; /* current view */
 extern void CGameObjectInstance__DrawShadow(CGameObjectInstance *actor, void *ai, CDrawArgs *req);
 extern s32 Cinema_PathPlaying(void);
 extern void ScriptAnimator_Apply(void *slotData);
@@ -28,7 +28,7 @@ void MotherBoss_Draw(CGameObjectInstance *actor, void *ai, CDrawArgs *req) {
 
     i = 0;
     one = 1;
-    state = &D_8012FB70;
+    state = &gMotherBoss;
     mask = ((ModuleObj *)state->obj)->partMask;
     data = (u8 *) &state->slots[0].anim;
     do {
@@ -40,8 +40,8 @@ void MotherBoss_Draw(CGameObjectInstance *actor, void *ai, CDrawArgs *req) {
                 ScriptAnimator_Apply(data);
                 ScreenTint_UpdateMode();
             }
-            Render_DrawModel(req->m_hModel, actor->m_pmtDrawMtxs, 1, (CLights1 *) actor->m_Lights[D_800B6D1C], 0, i, actor->m_AI.m_nTexture);
-            D_800AB8B0.m_Mode = 0;
+            Render_DrawModel(req->m_hModel, actor->m_pmtDrawMtxs, 1, (CLights1 *) actor->m_Lights[gEvenOdd], 0, i, actor->m_AI.m_nTexture);
+            gBlendState.m_Mode = 0;
         }
         i++;
         data += sizeof(BossWeakSpot);

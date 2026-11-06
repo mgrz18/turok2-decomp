@@ -1,31 +1,31 @@
 #include "common.h"
 #include "structs/cinema.h"
 
-extern Cinema *D_800C1BB0;
-extern s32 D_8011ACA4;
-extern f32 D_800B6D28;          /* frame time scale */
+extern Cinema *gCinemaPlayerP;
+extern s32 gEngineApp_m_Settings_paused;
+extern f32 gFrameIncrement;          /* frame time scale */
 
 s32 Cinema_IsActive(void);
 s32 Cinema_IsFinished(void);
 void Cinema_Start(void);
 
-/* Advances the clock at D_800C1BB0 by one frame. */
+/* Advances the clock at gCinemaPlayerP by one frame. */
 void Cinema_AdvanceClock(void) {
     if (Cinema_IsActive()) {
-        if (D_8011ACA4 != 0 || Cinema_IsFinished()) {
-            D_800C1BB0->prevTime = D_800C1BB0->time;
+        if (gEngineApp_m_Settings_paused != 0 || Cinema_IsFinished()) {
+            gCinemaPlayerP->prevTime = gCinemaPlayerP->time;
             return;
         }
-        D_800C1BB0->prevTime = D_800C1BB0->time;
-        D_800C1BB0->time += D_800B6D28 * (1.0f / 15);
-        if (D_800C1BB0->time >= D_800C1BB0->startTime) {
+        gCinemaPlayerP->prevTime = gCinemaPlayerP->time;
+        gCinemaPlayerP->time += gFrameIncrement * (1.0f / 15);
+        if (gCinemaPlayerP->time >= gCinemaPlayerP->startTime) {
             Cinema_Start();
         }
-        if (D_800C1BB0->time >= D_800C1BB0->clipEnd) {
-            D_800C1BB0->time = D_800C1BB0->clipEnd;
-            if (D_800C1BB0->stopAtEnd) {
-                D_800C1BB0->finished = 1;
-                D_800C1BB0->stopAtEnd = 0;
+        if (gCinemaPlayerP->time >= gCinemaPlayerP->clipEnd) {
+            gCinemaPlayerP->time = gCinemaPlayerP->clipEnd;
+            if (gCinemaPlayerP->stopAtEnd) {
+                gCinemaPlayerP->finished = 1;
+                gCinemaPlayerP->stopAtEnd = 0;
             }
         }
     }

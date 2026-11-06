@@ -7,7 +7,7 @@ typedef struct {
 } Tuning;
 
 extern Tuning D_800C0530;
-extern f32 D_8012F9E4;
+extern f32 gLevelScript_timer;
 
 void Primagen_EnterMode23(CGameObjectInstance *obj) {
     f32 *speed = &D_800C0530.animSpeed;
@@ -15,6 +15,6 @@ void Primagen_EnterMode23(CGameObjectInstance *obj) {
     s32 *flags = &obj->m_dwFlags;
 
     *animSpeed = *speed;
-    D_8012F9E4 = *speed;
+    gLevelScript_timer = *speed;
     *flags = (s32) (*flags | 0x2000);
 }

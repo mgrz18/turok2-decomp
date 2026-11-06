@@ -3,7 +3,7 @@
 #include "structs/player.h"
 #include "structs/boss.h"
 
-extern u8 D_00431D7C[];
+extern u8 sMotherBossPhase1PlayerPos[];
 extern void AI_UpdateTargets(CGameObjectInstance *obj, void *ai, CAITargets *t, s32 f1, s32 f2);
 extern void CPlayer__SetPosition(CPlayer *player, void *arg1);
 extern void CPlayer__UpdateOrbitCamera(CPlayer *player, CPlayer *other);
@@ -25,7 +25,7 @@ static __inline__ f32 getTargetDist(CGameObjectInstance *obj, CGameObjectInstanc
 }
 
 void MotherBoss_OnPhase1CinemaDone(void) {
-    CGameObjectInstance *obj = D_8012FB70.obj;
+    CGameObjectInstance *obj = gMotherBoss.obj;
     CGameObjectInstance *found;
     CPlayer *player;
 
@@ -35,7 +35,7 @@ void MotherBoss_OnPhase1CinemaDone(void) {
         player = ((CPlayer *)found->m_AI.m_pParent);
     }
     if (player != NULL) {
-        CPlayer__SetPosition(player, D_00431D7C);
+        CPlayer__SetPosition(player, sMotherBossPhase1PlayerPos);
         CPlayer__UpdateOrbitCamera(player, player);
         player->m_WeaponActor.m_RotY = player->m_CharacterActor.m_RotY = 3.141593f;
         obj->m_RotY = 0.0f;

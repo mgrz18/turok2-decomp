@@ -8,15 +8,15 @@
 s32 CPlayerPool__GetIndex(void *state, void *player);
 
 s32 NameEntryMenu_AddChar_2(MenuItem *item, Menu *event) {
-    s32 i = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, event->player);
+    s32 i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, event->player);
 
-    D_800C1FB0[i].timer = 0.0f;
-    if (D_800C1FB0[i].length == 8) {
+    gNameEntries[i].timer = 0.0f;
+    if (gNameEntries[i].length == 8) {
         return 0;
     }
-    D_800C1FB0[i].name[D_800C1FB0[i].cursor] = item->text[0];
-    D_800C1FB0[i].cursor++;
-    D_800C1FB0[i].length++;
-    D_800C1FB0[i].name[D_800C1FB0[i].length] = '\0';
+    gNameEntries[i].name[gNameEntries[i].cursor] = item->text[0];
+    gNameEntries[i].cursor++;
+    gNameEntries[i].length++;
+    gNameEntries[i].name[gNameEntries[i].length] = '\0';
     return 0;
 }

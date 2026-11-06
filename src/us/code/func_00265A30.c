@@ -22,13 +22,13 @@ typedef struct {
     /* 0xF8 */ void (*onEvent)(CGameObjectInstance *, void *);
 } ActionState;
 
-extern u8 D_800B2330[];
+extern u8 gDestructibleModeTable[];
 extern void Destructible_Step(CGameObjectInstance *actor, void *state);
 extern void Destructible_Hurt(CGameObjectInstance *actor, void *state);
 extern void TotemDefense_Init(void);
 
 void Destructible_Setup(CGameObjectInstance *actor, ActionState *state) {
-    state->table = D_800B2330;
+    state->table = gDestructibleModeTable;
     state->update = Destructible_Step;
     state->onEvent = Destructible_Hurt;
     if (actor->m_nTypeFlag == 0x64D) {

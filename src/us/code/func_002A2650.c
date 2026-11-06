@@ -8,7 +8,7 @@
 #include "common.h"
 #include "ultra_types.h"
 
-/* Request block sent to the I/O thread through D_80128370. */
+/* Request block sent to the I/O thread through sHostIoRequestQueue. */
 typedef struct IoRequest {
     /* 0x00 */ u8 *buffer;
     /* 0x04 */ s32 size;
@@ -26,10 +26,10 @@ typedef struct IoRequest {
     /* 0x1C */ OSMesgQueue *reply;
 } IoRequest; /* size 0x20 */
 
-extern s32 D_800BC300;  /* DMA allowed */
-extern s32 D_800BC304;
-extern OSMesgQueue D_801270C0;
-extern OSMesgQueue D_80128370;
+extern s32 sHostIoPiReady;  /* DMA allowed */
+extern s32 sHostIoState;
+extern OSMesgQueue sHostIoEventQueue;
+extern OSMesgQueue sHostIoRequestQueue;
 extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern u32 HostIo_ReadWord(u32 address);
@@ -40,38 +40,38 @@ extern s32 HostIo_DisableInt(void);
 extern void HostIo_RestoreInt(s32 saved);
 extern s32 HostIo_Call(s32 cmd, s32 arg0, s32 arg1, s32 arg2);
 
-/* I/O thread: serve the requests sent through D_80128370 (send block, run command, read block, reply). */
+/* I/O thread: serve the requests sent through sHostIoRequestQueue (send block, run command, read block, reply). */
 void HostIo_ThreadMain(void *arg) {
     IoRequest *req;
     u32 len;
 
     for (;;) {
-        osRecvMesg(&D_80128370, &req, 1);
+        osRecvMesg(&sHostIoRequestQueue, &req, 1);
         if (req->size != 0 && req->write == 1) {
             if (req->wC.flags & 0x80000000) {
-                D_800BC300 = 0;
+                sHostIoPiReady = 0;
             }
             HostIo_WriteBlockDma(0xB1FF0000, req->buffer, req->size);
             if (req->wC.flags & 0x80000000) {
-                D_800BC300 = 1;
+                sHostIoPiReady = 1;
             }
         }
-        osRecvMesg(&D_801270C0, NULL, 0);
+        osRecvMesg(&sHostIoEventQueue, NULL, 0);
         HostIo_WriteWord(0xB1FFFFE4, req->arg0);
         HostIo_WriteWord(0xB1FFFFE8, req->arg1);
         HostIo_WriteWord(0xB1FFFFEC, req->arg2);
         HostIo_WriteWord(0xB1FFFFD8, 0x1010101);
         HostIo_WriteWord(0xB1FFFFE0, req->wC.h.cmd);
-        osRecvMesg(&D_801270C0, NULL, 1);
+        osRecvMesg(&sHostIoEventQueue, NULL, 1);
         if (req->size != 0 && req->write == 0) {
             len = HostIo_ReadWord(0xB1FFFFDC);
             if (len != 0) {
                 if (req->wC.flags & 0x80000000) {
-                    D_800BC300 = 0;
+                    sHostIoPiReady = 0;
                 }
                 HostIo_ReadBlockDma(0xB1FF0000, req->buffer, len);
                 if (req->wC.flags & 0x80000000) {
-                    D_800BC300 = 1;
+                    sHostIoPiReady = 1;
                 }
             }
         }

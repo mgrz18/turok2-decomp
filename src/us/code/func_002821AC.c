@@ -1,10 +1,10 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern u8 *D_800B35D4;
+extern u8 *sCinemaTextFadeOut;
 extern u8 *D_800B2CD0;
-extern s32 D_800C2030;      /* screen width */
-extern s32 D_800C2034;      /* screen height */
+extern s32 gScreenWidth;      /* screen width */
+extern s32 gScreenHeight;      /* screen height */
 void CList__Remove(CList *list, void *element);
 void CList__AddHead(CList *list, void *element);
 void CList__AddTail(CList *list, void *element);
@@ -32,7 +32,7 @@ CCameraText *CCameraPool__AddTextEx(CCameraPool *pool, CCamera *cam, u8 *string,
     u8 *c;
 
     text = NULL;
-    if (string == D_800B35D4) {
+    if (string == sCinemaTextFadeOut) {
         string = D_800B2CD0;
     }
     c = string;
@@ -54,8 +54,8 @@ CCameraText *CCameraPool__AddTextEx(CCameraPool *pool, CCamera *cam, u8 *string,
                     text->m_ModeDuration = 0.0f;
                     text->m_ScaleX = 1.0f;
                     text->m_ScaleY = 1.0f;
-                    text->m_PositionX = D_800C2030 / 2;
-                    text->m_PositionY = D_800C2034 - 80;
+                    text->m_PositionX = gScreenWidth / 2;
+                    text->m_PositionY = gScreenHeight - 80;
                 }
                 line = c + 1;
             }

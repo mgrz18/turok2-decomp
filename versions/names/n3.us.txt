@@ -58,7 +58,7 @@ AI_SetTargetOverride = 0x002460FC; // writes CAI m_pTargetOverride (0x78) and m_
 AI_UpdateTargets = 0x00246108; // counts m_TargetOverrideTime down (clearing the override), then AI_GetPathTargetInfo / AI_GetSightTargetInfo; 63 callers
 AI_AngleToPoint = 0x00246310; // signed angle between the actor's facing (0x50) and the direction to a point
 Actor_TurnBy = 0x00246440; // adds to m_RotY and wraps it
-AI_SpawnParticlesOnce = 0x0024646C; // once per flag bit: spawns the particles of two mask tables (D_800AD950, D_800ADA58) at the actor via func_00268C48
+AI_DropPickupsOnce = 0x0024646C; // once per flag bit: drops the pickups of two mask tables (sDropPickups, sDropPickups2) at the actor via GameObject_DropPickupAt (was AI_SpawnParticlesOnce; renamed round G2)
 ValuePair_Set = 0x00246588; // sets a value and its initial copy
 AI_NextInCycle = 0x00246594; // returns the next s16 of a -1-terminated list, wrapping to its start
 CAI__CallHurt = 0x002465C8; // calls m_pfHurt if set; 9 callers
@@ -69,7 +69,7 @@ AI_StartSound = 0x00246860; // replaces the AI state's sound with sound id at th
 AI_StopSound = 0x00246918; // stops and clears the AI's attached sound
 AI_PushAway = 0x0024699C; // moves b away from c by both radii plus a margin (func_002688C8)
 AI_SetTargetPoint = 0x00246A74; // fills a CAITarget of kind 3 with a fixed point (no target, zero offsets)
-AI_SpawnParticlesByMask = 0x00246B24; // spawns the particles of a mask table whose bit is in mask (func_00268C48)
+AI_DropPickupsByMask = 0x00246B24; // drops the pickups of a mask table whose bit is in mask (GameObject_DropPickupAt; was AI_SpawnParticlesByMask, renamed round G2)
 
 // The player (CPlayer, structs/player.h): input, scope, kills, ammo,
 // damage, death, drawing and the auto-aim.

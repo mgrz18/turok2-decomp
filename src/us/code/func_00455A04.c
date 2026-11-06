@@ -7,15 +7,15 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern s32 D_8011ACE4;
+extern s32 gEngineApp_m_Settings_match_tag;
 extern char D_800B5C6C[];
 extern char D_800B5C60[];
 s32 StatsMenu_HeaderText_2(struct FieldRecAt14 *field) {
-    if (D_8011ACE4 != 0) {
+    if (gEngineApp_m_Settings_match_tag != 0) {
         field->text = D_800B5C6C;
     } else {
         field->text = D_800B5C60;
     }
     return 0;
 }
-extern s32 D_8011ACE4;
+extern s32 gEngineApp_m_Settings_match_tag;

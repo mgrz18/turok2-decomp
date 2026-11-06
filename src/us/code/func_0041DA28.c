@@ -2,16 +2,16 @@
 #include "structs/menu.h"
 
 /* Greys out the controller pak notes that cannot be picked: a used note is
- * selectable unless it is this game's save (D_800B45C0 when loading, mode 1,
- * D_800B45CC in mode 2) with Turok 2's game and company codes. */
+ * selectable unless it is this game's save (gPakCharacterNoteName when loading, mode 1,
+ * gPakGameNoteName in mode 2) with Turok 2's game and company codes. */
 
-extern s32 D_80130990;
-extern s32 D_800C2028;
-extern s32 D_800C2024;
-extern char D_800B45C0[];
-extern char D_800B45CC[];
-extern char D_800B45D4[];
-extern char D_800B45D8[];
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort;
+extern s32 gPakMenuMode;
+extern char gPakCharacterNoteName[];
+extern char gPakGameNoteName[];
+extern char gPakCompanyCode[];
+extern char gPakGameCode[];
 
 extern s32 Pak_FindNote(s32 slot, s32 note, s32 *used, char *name, char *ext, s32 *size, char *company, char *game);
 extern s32 Str_Length(char *s);
@@ -20,7 +20,7 @@ extern s32 Str_Compare(char *a, char *b);
 /* Game code / company code check on the controller-pak note (as in PakMenu_SelectNote). */
 static __inline__ s32 k7_chk(char *gc, char *cc) {
     if (Str_Length(gc) == 4 && Str_Length(cc) == 2 &&
-        Str_Compare(gc, D_800B45D8) == 0 && Str_Compare(cc, D_800B45D4) == 0) {
+        Str_Compare(gc, gPakGameCode) == 0 && Str_Compare(cc, gPakCompanyCode) == 0) {
         return 1;
     }
     return 0;
@@ -47,8 +47,8 @@ void PakMenu_UpdateNoteRows(Menu *menu) {
     s32 ours;
     s32 err;
 
-    if (D_80130990) {
-        slot = D_800C2028;
+    if (gPakMenuAnyPak) {
+        slot = gPakMenuPort;
     } else {
         slot = menu->controller->port;
     }
@@ -56,16 +56,16 @@ void PakMenu_UpdateNoteRows(Menu *menu) {
         err = Pak_FindNote(slot, i, &used, name, ext, &size, company, game);
         ok = 1;
         if (err == 0 && used != 0) {
-            switch (D_800C2024) {
+            switch (gPakMenuMode) {
             case 1:
                 ours = k7_chk(game, company);
-                if (Str_Compare(name, D_800B45C0) == 0 && ours) {
+                if (Str_Compare(name, gPakCharacterNoteName) == 0 && ours) {
                     ok = 0;
                 }
                 break;
             case 2:
                 ours = k7_chk(game, company);
-                if (Str_Compare(name, D_800B45CC) == 0 && ours) {
+                if (Str_Compare(name, gPakGameNoteName) == 0 && ours) {
                     ok = 0;
                 }
                 break;

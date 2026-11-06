@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include "ultra_types.h"
-extern OSTimer *D_800B8930;
+extern OSTimer *__osTimerList;
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 mask);
 u64 __osInsertTimer(OSTimer *t)
@@ -11,13 +11,13 @@ u64 __osInsertTimer(OSTimer *t)
     OSTimer *timep;
     u64 tim;
     u32 savedMask = __osDisableInt();
-    timep = D_800B8930->next;
+    timep = __osTimerList->next;
     tim = t->value;
-    for (; timep != D_800B8930 && tim > timep->value; timep = timep->next) {
+    for (; timep != __osTimerList && tim > timep->value; timep = timep->next) {
         tim -= timep->value;
     }
     t->value = tim;
-    if (timep != D_800B8930) {
+    if (timep != __osTimerList) {
         timep->value -= tim;
     }
     t->next = timep;

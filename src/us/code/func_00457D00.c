@@ -6,28 +6,28 @@
 #include "structs/save.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
-extern s32 D_80130990;
-extern s32 D_800C2028;
-extern s32 D_80130984;
-extern char D_80130968[];
-extern char D_800B45C0[];
-extern u8 D_800B45D8[];
-extern u8 D_80119E2C[];
-extern u8 D_0043BAFC[];
-extern u8 D_0043BC88[];
-extern u8 D_0043BD18[];
-extern char D_0043ABA0[];
-extern char D_0043ABC4[];
-extern char D_0043ABE8[];
-extern char D_0043AC0C[];
-extern void *D_800C2010;
-extern void *D_800C2014;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort;
+extern s32 gPakMenuIsSave;
+extern char gPakProfile[];
+extern char gPakCharacterNoteName[];
+extern u8 gPakGameCode[];
+extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern u8 gPakMsgPakFullDesc_2[];
+extern u8 gPakMsgSaveDoneDesc_2[];
+extern u8 gPakMsgSaveFailedDesc_2[];
+extern char gStatsAfterPakMenuDesc1_2[];
+extern char gStatsAfterPakMenuDesc2_2[];
+extern char gStatsAfterPakMenuDesc3_2[];
+extern char gStatsAfterPakMenuDesc4_2[];
+extern void *gSaveBufferHandle;
+extern void *gLoadBufferHandle;
 s32 Pak_BytesToPages_2(s32 n);
-s32 func_004266C0(s32 pad, s32 *out);
-s32 func_0042662C(s32 pad, s32 *out);
-s32 func_004269B4(s32 pad, u8 *ext);
-s32 func_00426084(s32 pad, s32 size, char *n1, char *n2, u8 *ext, u8 *buf);
-void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
+s32 Pak_GetFreePages_2(s32 pad, s32 *out);
+s32 Pak_CountEmptyNotes_2(s32 pad, s32 *out);
+s32 Pak_FindFreeExtLetter_2(s32 pad, u8 *ext);
+s32 Pak_SaveNoteVerified_2(s32 pad, s32 size, char *n1, char *n2, u8 *ext, u8 *buf);
+void MenuPool_OpenMenu_2(u8 *a, void *b, void *c, void *d, void *e);
 void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, void *p);
 /* Controller-pak name for the selected pad (inlined). */
@@ -35,30 +35,30 @@ static __inline__ char *O01Pick(O01Pad *sel) {
     switch (sel->v) {
     case 0:
     default:
-        return D_0043ABA0;
+        return gStatsAfterPakMenuDesc1_2;
     case 1:
-        return D_0043ABC4;
+        return gStatsAfterPakMenuDesc2_2;
     case 2:
-        return D_0043ABE8;
+        return gStatsAfterPakMenuDesc3_2;
     case 3:
-        return D_0043AC0C;
+        return gStatsAfterPakMenuDesc4_2;
     }
 }
 /* Release the menu buffers (inlined). */
 static __inline__ void O01FreeAll(void) {
-    if (D_800C2010 != 0 || D_800C2014 != 0) {
+    if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
         CCache__Flush(0);
     }
-    if (D_800C2010 != 0) {
-        CCache__Deallocate(0, D_800C2010);
+    if (gSaveBufferHandle != 0) {
+        CCache__Deallocate(0, gSaveBufferHandle);
     }
-    if (D_800C2014 != 0) {
-        CCache__Deallocate(0, D_800C2014);
+    if (gLoadBufferHandle != 0) {
+        CCache__Deallocate(0, gLoadBufferHandle);
     }
-    D_800C2010 = 0;
-    D_800C2014 = 0;
-    D_800C2018 = 0;
-    D_800C201C = 0;
+    gSaveBufferHandle = 0;
+    gLoadBufferHandle = 0;
+    gSaveBuffer = 0;
+    gLoadBuffer = 0;
 }
 s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     CPlayer *plr;
@@ -71,8 +71,8 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     s32 flag = 0;
     s32 need;
     u32 nv;
-    if (D_80130990 != 0) {
-        pv = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        pv = gPakMenuPort;
         pp = 0;
     } else {
         pv = own->controller->port;
@@ -80,24 +80,24 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     }
     pad.v = pv;
     plr = pp;
-    if (D_80130984 != 0) {
+    if (gPakMenuIsSave != 0) {
         need = Pak_BytesToPages_2(0x18);
-        r = func_004266C0(pad.v, &pad.freeb);
+        r = Pak_GetFreePages_2(pad.v, &pad.freeb);
         if (r == 0) {
             if (pad.freeb >= need) {
-                r = func_0042662C(pad.v, &pad.cnt);
+                r = Pak_CountEmptyNotes_2(pad.v, &pad.cnt);
                 if (r == 0 && pad.cnt != 0) {
                     ok = 0;
-                    r = func_004269B4(pad.v, ext);
+                    r = Pak_FindFreeExtLetter_2(pad.v, ext);
                     if (r == 0) {
                         flag = 1;
                         nv = pad.v;
-                        r = func_00426084(nv, 0x18, D_80130968, D_800B45C0, ext, D_800B45D8);
+                        r = Pak_SaveNoteVerified_2(nv, 0x18, gPakProfile, gPakCharacterNoteName, ext, gPakGameCode);
                     }
                 }
             }
             if (ok != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BAFC, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgPakFullDesc_2, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -105,9 +105,9 @@ s32 PakMenu_WriteProfile_2(s32 unused, Menu *own, s32 unused3) {
     O01FreeAll();
     if (flag != 0) {
         if (r == 0) {
-            MenuPool_OpenMenu(D_80119E2C, D_0043BC88, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         } else {
-            MenuPool_OpenMenu(D_80119E2C, D_0043BD18, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu_2(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc_2, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         }
     }
     return 1;

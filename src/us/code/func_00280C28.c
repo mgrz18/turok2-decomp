@@ -5,7 +5,7 @@
 
 extern f32 D_800A9BD4;
 extern f32 D_800A9BD8;
-extern s32 D_800B6D00[];
+extern s32 gDefaultVisBits[];
 void CCameraViewParams__Construct(ObjInit *o) {
     CVector3 *p;
     f32 z;
@@ -25,5 +25,5 @@ void CCameraViewParams__Construct(ObjInit *o) {
     o->unk34 = 0;
     o->unk38 = z;
     o->unk3C = D_800A9BD8;
-    o->unk40 = D_800B6D00[0];
+    o->unk40 = gDefaultVisBits[0];
 }

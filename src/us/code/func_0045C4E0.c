@@ -7,15 +7,15 @@ struct FieldRecAt14 {
     char pad[0x14];
     char *text;
 };
-extern s32 D_80130964;
+extern s32 sDamagedPakInGame;
 extern char D_800B509C[];
 extern char D_800B50D4[];
 s32 DamagedPakMenu_UpdateLine2_2(struct FieldRecAt14 *field) {
-    if (D_80130964 != 0) {
+    if (sDamagedPakInGame != 0) {
         field->text = D_800B509C;
     } else {
         field->text = D_800B50D4;
     }
     return 0;
 }
-extern s32 D_80130964;
+extern s32 sDamagedPakInGame;

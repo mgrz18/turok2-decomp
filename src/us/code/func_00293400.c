@@ -3,11 +3,11 @@
 
 void alSynNew(ALSynth *drvr, ALSynConfig *c);
 
-extern ALGlobals *D_800B7760; /* alGlobals */
+extern ALGlobals *alGlobals; /* alGlobals */
 
 /* libultra's alInit (audio.c). The ROM keeps &alGlobals in a register. */
 void alInit(ALGlobals *g, ALSynConfig *c) {
-    ALGlobals **glob = &D_800B7760;
+    ALGlobals **glob = &alGlobals;
 
     if (*glob == NULL) {
         *glob = g;

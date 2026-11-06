@@ -20,7 +20,7 @@ s32 CPlayer__GetSelectableWeapons(CPlayer *arg0, s32 *arg1) {
     var_a3 = 0;
     var_t0 = 0;
     do {
-        temp_v1 = *(WeaponInfo **) ((s8 *) D_800AF618 + var_t0);
+        temp_v1 = *(WeaponInfo **) ((s8 *) gWeaponInfoTable + var_t0);
         if (*(s8 *) ((CPlayer *) ((s8 *) arg0 + var_a3))->m_Data.m_WeaponList == 0) {
             var_v1 = 0;
         } else {

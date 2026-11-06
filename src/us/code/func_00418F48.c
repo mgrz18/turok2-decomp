@@ -7,9 +7,9 @@ extern char D_800C0E8C[]; /* "none" */
 extern s32 MenuItem_TextLength(MenuItem *a);
 extern void sprintf(char *dst, char *fmt, ...);
 
-/* Prints the setting at D_8011AAD8+0x2A into the label, or "none". */
+/* Prints the setting at gEngineApp_m_Settings+0x2A into the label, or "none". */
 s32 TeamBloodMenu_TimeLimitLabel(MenuItem *a) {
-    GameSettings *setup = &D_8011AAD8;
+    GameSettings *setup = &gEngineApp_m_Settings;
 
     if (setup->teamTimeLimit != 0) {
         sprintf(a->text + (MenuItem_TextLength(a) - 4), D_800C0E84, setup->teamTimeLimit);

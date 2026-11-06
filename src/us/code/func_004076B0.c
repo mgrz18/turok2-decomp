@@ -17,9 +17,9 @@ void Primagen_UpdateMode23(CGameObjectInstance *obj, CAI *ai) {
     if (!(obj->header.m_vPos.y < 10.0f)) {
         return;
     }
-    D_8012F608.script.current = -1;
-    D_8012F608.unk3CA = 0;
-    D_8012F608.bossMode = 2;
+    gLevelScript.script.current = -1;
+    gLevelScript.unk3CA = 0;
+    gLevelScript.bossMode = 2;
     flat.x = obj->header.m_vPos.x;
     flat.y = 0.0f;
     flat.z = obj->header.m_vPos.z;
@@ -27,7 +27,7 @@ void Primagen_UpdateMode23(CGameObjectInstance *obj, CAI *ai) {
         D_800F1C40[0] &= ~0x300;
         D_800F1F50[0] &= ~0x300;
     }
-    if (!D_8012F608.partActive) {
+    if (!gLevelScript.partActive) {
         CAI__SetMode(obj, ai, 7);
     } else {
         CAI__SetMode(obj, ai, 0x10);

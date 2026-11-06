@@ -1,18 +1,18 @@
 
 #include "common.h"
 #include "structs/cinema.h"
-extern Cinema *D_800C1BB0;
+extern Cinema *gCinemaPlayerP;
 s32 Cinema_OverridesMusic2(void)
 {
-  if (0 != D_800C1BB0->active)
+  if (0 != gCinemaPlayerP->active)
   {
-    if (D_800C1BB0)
+    if (gCinemaPlayerP)
     {
-      return D_800C1BB0->spec.unk44;
+      return gCinemaPlayerP->spec.unk44;
     }
     else
     {
-      return D_800C1BB0->spec.unk44;
+      return gCinemaPlayerP->spec.unk44;
     }
   }
   return 0;

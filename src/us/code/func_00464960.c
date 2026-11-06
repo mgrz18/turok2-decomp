@@ -32,23 +32,23 @@ typedef struct Handle {
     void *data;
 } Handle;
 
-extern CVector3 D_80119928;
-extern s32 D_80119948;
+extern CVector3 gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos;
+extern s32 gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion;
 
-extern CPlayer *D_80119874;
-extern s32 D_80119878;
+extern CPlayer *gEngineApp_m_Game_m_PlayerList_m_Players;
+extern s32 gEngineApp_m_Game_m_PlayerList_m_nPlayers;
 
 extern s32 ProPackDecompress(Handle **handle, s32);
-extern s32 CScene__GetRegion(CWorld *world, s32);
+extern s32 CScene__GetRegion(CScene *world, s32);
 extern Handle *CCache__AllocateMemoryForDecompression(s32, Handle **handle, s32 size);
 extern void CUSet__Transpose(LevelNode *node, void *data, s32);
-extern s32 func_0042C480(CWorld *world, CVector3 *pos, s32 group, void *info);
-extern s32 func_0042C0B4(CWorld *world, s32 group, s32 key, CWarpPoint *out, s32 max);
-extern s32 *CScene__GetIntelligence(CWorld *world, u16 id);
+extern s32 func_00465480(CScene *world, CVector3 *pos, s32 group, void *info);
+extern s32 func_004650B4(CScene *world, s32 group, s32 key, CWarpPoint *out, s32 max);
+extern s32 *CScene__GetIntelligence(CScene *world, u16 id);
 extern void CGameObjectInstance__ConstructFromRecord(CGameObjectInstance *obj, LevelRecord *rec, s32 mode, s32 index);
-extern s32 CScene__FindRegionAt(CWorld *world, CVector3 *pos);
+extern s32 CScene__FindRegionAt(CScene *world, CVector3 *pos);
 extern void Angle_Wrap(f32 *angle);
-extern void func_0042D980(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
+extern void CPlayer__SetupActors_2(CPlayer *player, LevelRecord *rec, s32 mode, s32 index);
 extern s32 func_00267DBC(CGameObjectInstance *obj);
 extern s32 func_00267D94(CGameObjectInstance *obj);
 extern f32 AI_DistSqToPointAtHeight(CGameObjectInstance *obj, CVector3 pos);
@@ -59,7 +59,7 @@ extern void CCache__DeallocAndReplaceCompressedData(s32, Handle **handle, Handle
    the same definition. The spawn point is indexed afresh on each use and the position copied with
    memcpy (as in Rage Wars): both set loop.c's insn count and giv benefits, which decide the ROM's
    hoisting of the spawns base and of the angle constants. */
-void CScene__DecompressAnimatedInstances_2(CWorld *world, Handle **handle) {
+void CScene__DecompressAnimatedInstances_2(CScene *world, Handle **handle) {
     CWarpPoint spawns[4];
     CGameObjectInstance *objects;
     s32 mode;
@@ -97,7 +97,7 @@ void CScene__DecompressAnimatedInstances_2(CWorld *world, Handle **handle) {
             records = node->records;
             objects = hdr->objects;
             if (world->m_bWarpSpawn == 0) {
-                world->m_LevelID = func_0042C480(world, &node->records[0].pos, world->m_nLevel, &world->m_WarpSpawn);
+                world->m_LevelID = func_00465480(world, &node->records[0].pos, world->m_nLevel, &world->m_WarpSpawn);
                 if (world->m_LevelID != 0) {
                     world->m_bWarpSpawn = 1;
                 }
@@ -105,7 +105,7 @@ void CScene__DecompressAnimatedInstances_2(CWorld *world, Handle **handle) {
             spawnIndex = 0;
             nspawns = 0;
             if (world->m_bWarpSpawn != 0) {
-                nspawns = func_0042C0B4(world, world->m_nLevel, world->m_LevelID, spawns, 4);
+                nspawns = func_004650B4(world, world->m_nLevel, world->m_LevelID, spawns, 4);
             }
             world->m_pActors = (CGameObjectInstance *)objects;
             world->m_nActors = n;
@@ -131,11 +131,11 @@ void CScene__DecompressAnimatedInstances_2(CWorld *world, Handle **handle) {
                     continue;
                 }
                 world->m_nFirstActor++;
-                memcpy(&D_80119928, &rec->pos, sizeof(CVector3));
-                D_80119928.y += 204.79999f;
-                D_80119948 = CScene__FindRegionAt(world, &rec->pos);
-                for (playerIndex = 0; playerIndex < D_80119878; playerIndex++) {
-                    player = &D_80119874[playerIndex];
+                memcpy(&gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos, &rec->pos, sizeof(CVector3));
+                gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_vPos.y += 204.79999f;
+                gEngineApp_m_Game_m_CameraPool_m_MainCamera_m_ViewParams_m_pCurrentRegion = CScene__FindRegionAt(world, &rec->pos);
+                for (playerIndex = 0; playerIndex < gEngineApp_m_Game_m_PlayerList_m_nPlayers; playerIndex++) {
+                    player = &gEngineApp_m_Game_m_PlayerList_m_Players[playerIndex];
                     if (nspawns != 0) {
                         rec->spawnId = spawns[spawnIndex].m_nID;
                         Angle_Wrap(&spawns[spawnIndex].m_RotY);
@@ -160,7 +160,7 @@ void CScene__DecompressAnimatedInstances_2(CWorld *world, Handle **handle) {
                             spawnIndex = 0;
                         }
                     }
-                    func_0042D980(player, rec, mode, i);
+                    CPlayer__SetupActors_2(player, rec, mode, i);
                 }
             }
             for (i = world->m_nFirstActor; i < n; i++) {

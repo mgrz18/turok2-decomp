@@ -2,7 +2,7 @@
 #include "structs/light.h"
 #include "structs/model.h"
 
-extern s32 D_800B6D1C;
+extern s32 gEvenOdd;
 void CGameObjectInstance__DrawShadow(void *actor, void *state, CDrawArgs *req);
 void Render_QueueModelInstance(s32 anim, s32 model, s32 one, CLights1 *slot, s32 zero, s32 first, s32 second);
 
@@ -26,7 +26,7 @@ void Action_Draw(u8 *actor, u8 *state, CDrawArgs *req) {
         CGameObjectInstance__DrawShadow(actor, state, req);
     }
     if (req->m_bDraw != 0) {
-        Render_QueueModelInstance(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[D_800B6D1C], 0,
+        Render_QueueModelInstance(req->m_hModel, *(s32 *) (actor + 0x98), 1, &((CLights1 *) (actor + 0x110))[gEvenOdd], 0,
                       first, second);
     }
 }

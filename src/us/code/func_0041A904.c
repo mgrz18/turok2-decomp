@@ -5,8 +5,8 @@
  * highlight box (11 virtual pixels wide, scaled to the screen) at the cursor
  * column, faded by the item's alpha, then draws the item as usual. */
 
-extern s32 D_800C2030;
-extern s32 D_800C1BD0;
+extern s32 gScreenWidth;
+extern s32 gMenuCurrentFont;
 
 extern void Hud_SetupFillMode(void);
 extern void Hud_DrawBevelBox(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);
@@ -17,11 +17,11 @@ void EnterCheatMenu_DrawTextField(void *menu, MenuItemLayout *item, s32 arg2, Me
     f32 alpha;
     s32 x;
 
-    if (D_800C1F80.timer <= 6.0f) {
-        width = D_800C2030 * 11 / 284;
-        x = item->left + D_800C1F80.cursor * width;
+    if (gCheatEntry.timer <= 6.0f) {
+        width = gScreenWidth * 11 / 284;
+        x = item->left + gCheatEntry.cursor * width;
         alpha = win->fade * (win->alpha * 128.0f);
-        D_800C1BD0 = -1;
+        gMenuCurrentFont = -1;
         Hud_SetupFillMode();
         Hud_DrawBevelBox(x, item->bottom, x + width, item->bottom + 2, 0, 0, 0xFF, 0xFF, 0xFF, (u8) alpha);
     }

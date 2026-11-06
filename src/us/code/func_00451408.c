@@ -2,17 +2,17 @@
 #include "structs/game.h"
 #include "structs/menu.h"
 
-s32 MenuItem_TextLength(MenuItem *item); /* length of the item's text line */
+s32 MenuItem_TextLength_2(MenuItem *item); /* length of the item's text line */
 s32 sprintf(char *buf, const char *fmt, ...); /* sprintf */
 
 /* Writes setting unk25 (or "none" when 0) over the end of the item's text. */
 s32 func_00451408(MenuItem *item) {
-    GameSettings *s = &D_8011AAD8;
+    GameSettings *s = &gEngineApp_m_Settings;
 
     if (s->tagTimeLimit != 0) {
-        sprintf(&item->text[MenuItem_TextLength(item) - 4], "  %02d", s->tagTimeLimit);
+        sprintf(&item->text[MenuItem_TextLength_2(item) - 4], "  %02d", s->tagTimeLimit);
     } else {
-        sprintf(&item->text[MenuItem_TextLength(item) - 4], "none");
+        sprintf(&item->text[MenuItem_TextLength_2(item) - 4], "none");
     }
     return 0;
 }

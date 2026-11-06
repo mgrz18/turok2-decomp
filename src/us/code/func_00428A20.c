@@ -7,8 +7,8 @@
 /* osPfsIsPlug (libultra pfsisplug.c), with Turok 2's symbols. */
 #include "rw/abu_types.h"
 
-extern u8 D_801213DC; /* __osMaxControllers */
-extern char D_80130E20; /* __osPfsPifRam */
+extern u8 __osContNumControllers; /* __osMaxControllers */
+extern char __osPfsPifRam; /* __osPfsPifRam */
 extern void __osSiGetAccess(void); /* __osSiGetAccess */
 extern void __osSiRelAccess(void); /* __osSiRelAccess */
 extern s32 __osSiRawStartDma(s32 direction, void *dramAddr); /* __osSiRawStartDma */
@@ -31,27 +31,27 @@ s32 osPfsIsPlug(void *queue, u8 *pattern)
     do {
         __osPfsRequestData(0);
 
-        ret = __osSiRawStartDma(1, &D_80130E20);
+        ret = __osSiRawStartDma(1, &__osPfsPifRam);
         osRecvMesg(queue, &dummy, 1);
 
-        ret = __osSiRawStartDma(0, &D_80130E20);
+        ret = __osSiRawStartDma(0, &__osPfsPifRam);
         osRecvMesg(queue, &dummy, 1);
 
         __osPfsGetInitData(&bitpattern, contData);
 
-        for (channel = 0; channel < D_801213DC; channel++) {
+        for (channel = 0; channel < __osContNumControllers; channel++) {
             if ((contData[channel].team & 4) == 0) {
                 crcErrorCount--;
                 break;
             }
         }
 
-        if (channel == D_801213DC) {
+        if (channel == __osContNumControllers) {
             crcErrorCount = 0;
         }
     } while (crcErrorCount > 0);
 
-    for (channel = 0; channel < D_801213DC; channel++) {
+    for (channel = 0; channel < __osContNumControllers; channel++) {
         if ((contData[channel].slot == 0) && ((contData[channel].team & 1) != 0)) {
             bits |= (1 << channel);
         }

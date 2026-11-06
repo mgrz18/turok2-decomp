@@ -4,14 +4,14 @@
 #include "structs/player.h"
 #include "structs/weapon.h"
 
-extern s32 D_800ADCC8[8];   /* layouts: group 1, group 0, flag 0x80; then the same for D_8011AAF1 */
-extern s32 D_800ADCE8[8];
-extern s32 D_800ADD08[8];
-extern s32 D_800ADD28[8];
-extern s32 D_800ADD48[8];
-extern s32 D_800ADD68[8];
-extern f32 D_800AE2D8;              /* slot scale */
-extern u8 D_8011AAF1;
+extern s32 sBarrelLayoutGroup1[8];   /* layouts: group 1, group 0, flag 0x80; then the same for gEngineApp_m_Settings_multiplayer */
+extern s32 sBarrelLayoutGroup0[8];
+extern s32 sBarrelLayoutUnderwater[8];
+extern s32 sBarrelLayoutGroup1MP[8];
+extern s32 sBarrelLayoutGroup0MP[8];
+extern s32 sBarrelLayoutUnderwaterMP[8];
+extern f32 gBarrelSlotScale;              /* slot scale */
+extern u8 gEngineApp_m_Settings_multiplayer;
 
 s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 
@@ -27,22 +27,22 @@ void CBarrel__LayoutEight(CBarrel *menu, s32 group, CPlayer *player) {
     s32 ok;
 
     if (group != 0) {
-        layout = D_800ADCC8;
+        layout = sBarrelLayoutGroup1;
         menu->m_bUnderwater = 0;
-        if (D_8011AAF1 != 0) {
-            layout = D_800ADD28;
+        if (gEngineApp_m_Settings_multiplayer != 0) {
+            layout = sBarrelLayoutGroup1MP;
         }
     } else {
-        layout = D_800ADCE8;
+        layout = sBarrelLayoutGroup0;
         menu->m_bUnderwater = 0;
-        if (D_8011AAF1 != 0) {
-            layout = D_800ADD48;
+        if (gEngineApp_m_Settings_multiplayer != 0) {
+            layout = sBarrelLayoutGroup0MP;
         }
     }
     if (player->m_CharacterActor.m_AI.m_dwFlags & 0x80) {
-        layout = D_800ADD08;
-        if (D_8011AAF1 != 0) {
-            layout = D_800ADD68;
+        layout = sBarrelLayoutUnderwater;
+        if (gEngineApp_m_Settings_multiplayer != 0) {
+            layout = sBarrelLayoutUnderwaterMP;
         }
         menu->m_bUnderwater = 1;
     }
@@ -55,7 +55,7 @@ void CBarrel__LayoutEight(CBarrel *menu, s32 group, CPlayer *player) {
             menu->m_Items[i].m_bAvailable = 0;
         } else {
             if (!(player->m_CharacterActor.m_AI.m_dwFlags & 0x80)) {
-                alt = D_800AF618[w]->alternate;
+                alt = gWeaponInfoTable[w]->alternate;
                 if (alt != -1 && player->m_Data.m_WeaponList[alt] != 0 && player->m_Data.m_CurrentWeapon != alt) {
                     w = alt;
                 }
@@ -64,7 +64,7 @@ void CBarrel__LayoutEight(CBarrel *menu, s32 group, CPlayer *player) {
             if (player->m_Data.m_CurrentWeapon == w) {
                 menu->m_nCursor = i;
             }
-            menu->m_Items[i].m_pInfo = D_800AF618[w];
+            menu->m_Items[i].m_pInfo = gWeaponInfoTable[w];
             if (CPlayer__GetWeaponAmmo(player, w) == 0 || player->m_Data.m_WeaponList[w] == 0) {
                 ok = 0;
             } else {
@@ -72,7 +72,7 @@ void CBarrel__LayoutEight(CBarrel *menu, s32 group, CPlayer *player) {
             }
             menu->m_Items[i].m_bAvailable = ok;
             menu->m_Items[i].m_Lift = 0;
-            menu->m_Items[i].m_Scale = D_800AE2D8;
+            menu->m_Items[i].m_Scale = gBarrelSlotScale;
             menu->m_Items[i].m_Angle = i * 0.785398245f;
         }
     }

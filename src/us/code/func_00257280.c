@@ -9,7 +9,7 @@ typedef struct {
 } SlotOwner;
 
 s32 CPlayer__CanSelectWeapon(SlotOwner *self, s32 slot) {
-    WeaponInfo *def = D_800AF618[slot];
+    WeaponInfo *def = gWeaponInfoTable[slot];
 
     if (self->slots[slot] == 0) {
         return 0;

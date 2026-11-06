@@ -51,8 +51,8 @@ typedef struct {
     /* 0x10D */ u8 blendEnd;
 } AnimActor;
 
-extern s32 D_800F7078;          /* the world's mode */
-extern f32 D_800B6D28;          /* the frame's time step */
+extern s32 gScene;          /* the world's mode */
+extern f32 gFrameIncrement;          /* the frame's time step */
 
 void **CCache__Request(s32, s32, s32, s32, s32, s32, char *, s32);
 void CCache__Unlock(s32, void **);
@@ -84,7 +84,7 @@ void CGameObjectInstance__AdvanceAnimation(AnimActor *actor) {
     AnimTrack *track1;
     f32 value;
 
-    if (D_800F7078 == 4) {
+    if (gScene == 4) {
         if (actor->currentTrack.active == 0) {
             actor->currentTrack.blending = 1;
         }
@@ -135,7 +135,7 @@ void CGameObjectInstance__AdvanceAnimation(AnimActor *actor) {
                 f32 time;
                 f32 end;
 
-                time = actor->blendTime + D_800B6D28;
+                time = actor->blendTime + gFrameIncrement;
                 end = (f32) actor->blendFrames;
                 actor->blendTime = time;
                 if (end < time) {
@@ -143,7 +143,7 @@ void CGameObjectInstance__AdvanceAnimation(AnimActor *actor) {
                 } else {
                     f32 a = (f32) actor->blendEnd;
                     f32 b = (f32) actor->blendStart;
-                    f32 t = time / (end + D_800B6D28);
+                    f32 t = time / (end + gFrameIncrement);
 
                     actor->blend = ((a + -2.0f + b) * t * t * t) + (((3.0f - a) - (2.0f * b)) * t * t) + (b * t);
                     CAnimationState__GetRootMotion(&actor->previousTrack, &second, &second_value, actor);

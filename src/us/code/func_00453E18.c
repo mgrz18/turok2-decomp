@@ -17,12 +17,12 @@ struct EntryRecAt0V2 {
 };
 struct EntryRecAt0V2;
 typedef struct EntryRecAt0V2 EntryRecAt0V2;
-extern u32 D_80130920;
-extern EntryRecAt0V2 D_00439694[];
+extern u32 sEnterCheatResult;
+extern EntryRecAt0V2 sCheatCodes_unk4_2[];
 extern char D_800C1144;
 s32 EnterCheatMenu_ResultLabel_2(ObjRecAt14V1 *arg0) {
-    if (D_80130920 < 12) {
-        arg0->unk14 = D_00439694[D_80130920].ptr;
+    if (sEnterCheatResult < 12) {
+        arg0->unk14 = sCheatCodes_unk4_2[sEnterCheatResult].ptr;
     } else {
         arg0->unk14 = &D_800C1144;
     }

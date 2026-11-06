@@ -6,28 +6,28 @@
 #include "structs/save.h"
 
 typedef struct O01Pad { s32 v; s32 freeb; s32 cnt; } O01Pad;
-extern s32 D_80130990;
-extern s32 D_800C2028;
-extern s32 D_80130984;
-extern u8 D_80130968[];
-extern char D_800B45C0[];
-extern char D_800B45D8[];
-extern u8 D_80119E2C[];
-extern u8 D_0043BBDC[];
-extern u8 D_0043BD68[];
-extern u8 D_0043BDF8[];
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort;
+extern s32 gPakMenuIsSave;
+extern u8 gPakProfile[];
+extern char gPakCharacterNoteName[];
+extern char gPakGameCode[];
+extern u8 gEngineApp_m_Game_m_MenuPool[];
+extern u8 gPakMsgPakFullDesc[];
+extern u8 gPakMsgSaveDoneDesc[];
+extern u8 gPakMsgSaveFailedDesc[];
 s32 Pak_BytesToPages(s32 n);
 s32 Pak_GetFreePages(s32 pad, s32 *out);
 s32 Pak_CountEmptyNotes(s32 pad, s32 *out);
 s32 Pak_FindFreeExtLetter(s32 pad, u8 *ext);
 s32 Pak_SaveNoteVerified(s32 pad, s32 size, u8 *buf, char *n1, u8 *ext, char *n2);
 void MenuPool_OpenMenu(u8 *a, void *b, void *c, void *d, void *e);
-extern s32 D_800C2010;
-extern s32 D_800C2014;
-extern u8 D_0043AC80[];
-extern u8 D_0043ACA4[];
-extern u8 D_0043ACC8[];
-extern u8 D_0043ACEC[];
+extern s32 gSaveBufferHandle;
+extern s32 gLoadBufferHandle;
+extern u8 gStatsAfterPakMenuDesc1[];
+extern u8 gStatsAfterPakMenuDesc2[];
+extern u8 gStatsAfterPakMenuDesc3[];
+extern u8 gStatsAfterPakMenuDesc4[];
 void CCache__Flush(s32 a);
 void CCache__Deallocate(s32 a, s32 b);
 /* Static inlines in the Rage Wars source file (dropped by the importer). */
@@ -36,34 +36,34 @@ static inline u8 *O01Pick(O01Pad *sel) {
     switch (sel->v) {
     default:
     case 0:
-        p = D_0043AC80;
+        p = gStatsAfterPakMenuDesc1;
         break;
     case 1:
-        p = D_0043ACA4;
+        p = gStatsAfterPakMenuDesc2;
         break;
     case 2:
-        p = D_0043ACC8;
+        p = gStatsAfterPakMenuDesc3;
         break;
     case 3:
-        p = D_0043ACEC;
+        p = gStatsAfterPakMenuDesc4;
         break;
     }
     return p;
 }
 static inline void O01FreeAll(void) {
-    if (D_800C2010 != 0 || D_800C2014 != 0) {
+    if (gSaveBufferHandle != 0 || gLoadBufferHandle != 0) {
         CCache__Flush(0);
     }
-    if (D_800C2010 != 0) {
-        CCache__Deallocate(0, D_800C2010);
+    if (gSaveBufferHandle != 0) {
+        CCache__Deallocate(0, gSaveBufferHandle);
     }
-    if (D_800C2014 != 0) {
-        CCache__Deallocate(0, D_800C2014);
+    if (gLoadBufferHandle != 0) {
+        CCache__Deallocate(0, gLoadBufferHandle);
     }
-    D_800C2010 = 0;
-    D_800C2014 = 0;
-    D_800C2018 = 0;
-    D_800C201C = 0;
+    gSaveBufferHandle = 0;
+    gLoadBufferHandle = 0;
+    gSaveBuffer = 0;
+    gLoadBuffer = 0;
 }
 s32 PakMenu_WriteProfile(s32 unused, Menu *own, s32 unused3) {
     CPlayer *plr;
@@ -76,8 +76,8 @@ s32 PakMenu_WriteProfile(s32 unused, Menu *own, s32 unused3) {
     s32 flag = 0;
     s32 need;
     u32 nv;
-    if (D_80130990 != 0) {
-        pv = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        pv = gPakMenuPort;
         pp = 0;
     } else {
         pv = own->controller->port;
@@ -85,7 +85,7 @@ s32 PakMenu_WriteProfile(s32 unused, Menu *own, s32 unused3) {
     }
     pad.v = pv;
     plr = pp;
-    if (D_80130984 != 0) {
+    if (gPakMenuIsSave != 0) {
         need = Pak_BytesToPages(0x18);
         r = Pak_GetFreePages(pad.v, &pad.freeb);
         if (r == 0) {
@@ -97,12 +97,12 @@ s32 PakMenu_WriteProfile(s32 unused, Menu *own, s32 unused3) {
                     if (r == 0) {
                         flag = 1;
                         nv = pad.v;
-                        r = Pak_SaveNoteVerified(nv, 0x18, D_80130968, D_800B45C0, ext, D_800B45D8);
+                        r = Pak_SaveNoteVerified(nv, 0x18, gPakProfile, gPakCharacterNoteName, ext, gPakGameCode);
                     }
                 }
             }
             if (ok != 0) {
-                MenuPool_OpenMenu(D_80119E2C, D_0043BBDC, plr, plr->m_ContState.m_pContState, own->desc);
+                MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgPakFullDesc, plr, plr->m_ContState.m_pContState, own->desc);
                 return 0;
             }
         }
@@ -110,9 +110,9 @@ s32 PakMenu_WriteProfile(s32 unused, Menu *own, s32 unused3) {
     O01FreeAll();
     if (flag != 0) {
         if (r == 0) {
-            MenuPool_OpenMenu(D_80119E2C, D_0043BD68, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveDoneDesc, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         } else {
-            MenuPool_OpenMenu(D_80119E2C, D_0043BDF8, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
+            MenuPool_OpenMenu(gEngineApp_m_Game_m_MenuPool, gPakMsgSaveFailedDesc, plr, plr->m_ContState.m_pContState, O01Pick(&pad));
         }
     }
     return 1;

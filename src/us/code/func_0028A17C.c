@@ -36,18 +36,18 @@ typedef struct {
     /* 0x124 */ u32 minRetraces;
 } GfxTask;
 
-extern s32 D_800B6E54;          /* retraces before the thread priority is restored */
-extern u8 D_800D6D68[];         /* OSThread */
-extern s32 D_800B6E7C;          /* its priority */
-extern s32 D_8011AD88;          /* retraces since the last swap */
-extern s32 D_8011F130;          /* swap pending */
-extern s32 D_8011B098;          /* framebuffer just swapped in */
-extern s32 D_8011B0A0;          /* framebuffer on screen */
-extern s32 D_8011F138;          /* frames waiting to be shown */
-extern GfxTask *D_8011AD18[];
-extern u32 D_800F6CA4;          /* next frame to show */
-extern u32 D_800C2210;          /* task count */
-extern s32 D_800B6E50;          /* retrace counter */
+extern s32 gDecompressorBoostRetraces;          /* retraces before the thread priority is restored */
+extern u8 gDecompressor[];         /* OSThread */
+extern s32 gThreadPriorityDecompressorLow;          /* its priority */
+extern s32 gCurrentTick;          /* retraces since the last swap */
+extern s32 gNumTicksPending;          /* swap pending */
+extern s32 gPendingFB;          /* framebuffer just swapped in */
+extern s32 gCurrentFB;          /* framebuffer on screen */
+extern s32 gNumTicksWaiting;          /* frames waiting to be shown */
+extern GfxTask *gWaitingFrames[];
+extern u32 gNextFrameToShow;          /* next frame to show */
+extern u32 gTotalFramebuffers;          /* task count */
+extern s32 sSchedGfxWatchdog;          /* retrace counter */
 
 extern s32 osRecvMesg(void *queue, void *msg, s32 flag);
 extern s32 osSendMesg(void *queue, void *msg, s32 flag);
@@ -75,34 +75,34 @@ void __scHandleRetrace(Sched *sc) {
     rspTask = NULL;
     sp = NULL;
     dp = NULL;
-    if (D_800B6E54 != 0) {
-        D_800B6E54 = D_800B6E54 - 1;
-        if (D_800B6E54 == 0) {
-            osSetThreadPri(D_800D6D68, D_800B6E7C);
+    if (gDecompressorBoostRetraces != 0) {
+        gDecompressorBoostRetraces = gDecompressorBoostRetraces - 1;
+        if (gDecompressorBoostRetraces == 0) {
+            osSetThreadPri(gDecompressor, gThreadPriorityDecompressorLow);
         }
     }
     sc->frameCount = sc->frameCount + 1;
     while (osRecvMesg(sc->cmdQueue, &rspTask, 0) != -1) {
         __scAppendList(sc, rspTask);
     }
-    D_8011AD88 = D_8011AD88 + 1;
-    if (D_8011F130 != 0) {
-        D_8011AD88 = 0;
-        D_8011F130 = 0;
-        fb = D_8011B098;
-        D_8011B098 = 0;
-        D_8011B0A0 = fb;
+    gCurrentTick = gCurrentTick + 1;
+    if (gNumTicksPending != 0) {
+        gCurrentTick = 0;
+        gNumTicksPending = 0;
+        fb = gPendingFB;
+        gPendingFB = 0;
+        gCurrentFB = fb;
     }
-    if (D_8011F138 != 0) {
-        frame = D_8011AD18[D_800F6CA4];
-        if (!((u32)(D_8011AD88 + 1) < frame->minRetraces)) {
-            D_8011B098 = frame->framebuffer;
+    if (gNumTicksWaiting != 0) {
+        frame = gWaitingFrames[gNextFrameToShow];
+        if (!((u32)(gCurrentTick + 1) < frame->minRetraces)) {
+            gPendingFB = frame->framebuffer;
             osViSwapBuffer(frame->framebuffer);
-            D_8011F138 = D_8011F138 - 1;
-            D_8011F130 = D_8011F130 + 1;
-            D_800F6CA4 = D_800F6CA4 + 1;
-            if (!(D_800F6CA4 < D_800C2210)) {
-                D_800F6CA4 = 0;
+            gNumTicksWaiting = gNumTicksWaiting - 1;
+            gNumTicksPending = gNumTicksPending + 1;
+            gNextFrameToShow = gNextFrameToShow + 1;
+            if (!(gNextFrameToShow < gTotalFramebuffers)) {
+                gNextFrameToShow = 0;
             }
         }
     }
@@ -119,8 +119,8 @@ void __scHandleRetrace(Sched *sc) {
             __scHandleRSP(sc);
         }
     }
-    D_800B6E50 = D_800B6E50 + 1;
-    if (D_800B6E50 == 1200) {
+    sSchedGfxWatchdog = sSchedGfxWatchdog + 1;
+    if (sSchedGfxWatchdog == 1200) {
         *(u8 *)0 = 0;
     }
     if (sc->doAudio != 0 && sc->curRSPTask != NULL) {

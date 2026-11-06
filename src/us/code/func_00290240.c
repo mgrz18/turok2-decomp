@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern f32 alCents2Ratio(s32 arg0);
-extern char D_800AA294[];
+extern char sCSPlayerFile[];
 extern char D_800AA290[];
 void __CSPHandleMIDIMsg(void *object, ALEvent *message);
 extern float D_800AA360;
@@ -229,7 +229,7 @@ void __CSPHandleMIDIMsg(void *object, ALEvent *message)
         break;
     case 0xC0:
         if (seqp->bank == 0)
-            __assert(D_800AA290, D_800AA294, 711);
+            __assert(D_800AA290, sCSPlayerFile, 711);
         if (key < seqp->bank->instCount) {
             ALInstrument *inst = seqp->bank->instArray[key];
             __setInstChanState(seqp, inst, chan);

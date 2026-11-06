@@ -10,7 +10,7 @@ extern void CPlayer__Reset(CPlayer *p);
 
 void CPlayer__Construct(CPlayer *p, s32 index, void *options) {
     p->m_bActive = 0;
-    CPlayerContState__Init(&p->m_ContState, &D_800F5EC0[index]);
+    CPlayerContState__Init(&p->m_ContState, &gControllers[index]);
     p->m_nController = index;
     p->m_pOptions = options;
     p->m_pLoopingSound_WeaponBackground = 0;

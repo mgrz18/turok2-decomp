@@ -4,18 +4,18 @@
 #include "rw/abu_types.h"
 
 extern void Cinema_Close();
-extern Shared_MenuContext *D_800C1BB0;
+extern Shared_MenuContext *gCinemaPlayerP;
 extern void CCache__Deallocate(void *arg0, void *arg1);
 void Cinema_Close(void) {
-    if (D_800C1BB0->closed == 0) {
+    if (gCinemaPlayerP->closed == 0) {
         {
-            void *temp_a1 = D_800C1BB0->owner;
+            void *temp_a1 = gCinemaPlayerP->owner;
             if (temp_a1 != 0) {
                 CCache__Deallocate(0, temp_a1);
             }
         }
         {
-            void *record = D_800C1BB0;
+            void *record = gCinemaPlayerP;
             FuncPtr fn = ((Shared_MenuContext *)(record))->onClose;
             ((Shared_MenuContext *)(record))->owner = 0;
             ((Shared_MenuContext *)(record))->resource = 0;
@@ -27,6 +27,6 @@ void Cinema_Close(void) {
                 fn();
             }
         }
-        D_800C1BB0->closed = 1;
+        gCinemaPlayerP->closed = 1;
     }
 }

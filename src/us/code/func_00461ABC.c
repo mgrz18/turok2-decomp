@@ -3,17 +3,17 @@
 
 #include "rw/abu_types.h"
 
-extern u8 D_80121420;
+extern u8 __osContLastCmd;
 void __osPfsRequestData_2(u8 cmd) {
-    extern OSPifRam D_80130E20;
-    extern u8 D_801213DC;
+    extern OSPifRam __osPfsPifRam;
+    extern u8 __osContNumControllers;
     u8 *ptr;
     __OSContRequesFormat requestformat;
     s32 i;
     u8 *count;
-    D_80121420 = cmd;
-    ptr = (u8 *)&D_80130E20;
-    D_80130E20.pifstatus = 1;
+    __osContLastCmd = cmd;
+    ptr = (u8 *)&__osPfsPifRam;
+    __osPfsPifRam.pifstatus = 1;
     requestformat.dummy = 0xFF;
     requestformat.txsize = 1;
     requestformat.rxsize = 3;
@@ -22,7 +22,7 @@ void __osPfsRequestData_2(u8 cmd) {
     requestformat.typel = 0xFF;
     requestformat.status = 0xFF;
     requestformat.dummy1 = 0xFF;
-    count = &D_801213DC;
+    count = &__osContNumControllers;
     for (i = 0; i < *count; i++) {
         *(__OSContRequesFormat *)ptr = requestformat;
         ptr += sizeof(requestformat);

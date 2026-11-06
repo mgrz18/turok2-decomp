@@ -4,13 +4,13 @@
 
 #include "rw/abu_types.h"
 
-extern s32 func_00429D1C(OSPfs *pfs);
-extern s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00429DE4(OSPfs *pfs);
-extern s32 func_00429D1C(OSPfs *pfs);
-extern s32 func_004299C4(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
-extern s32 func_00429DE4(OSPfs *pfs);
+extern s32 __osCheckId_2(OSPfs *pfs);
+extern s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
+extern s32 __osCheckId_2(OSPfs *pfs);
+extern s32 __osPfsRWInode_2(OSPfs *pfs, __OSInode *inode, u8 flag, u8 bank);
+extern s32 __osPfsSelectBank_2(OSPfs *pfs);
 extern s32 __osContRamRead(void *queue, int channel, u16 address, u8 *buffer);
 s32 osPfsFileState_2(OSPfs *pfs, s32 file_no, NoteState *state)
 {
@@ -27,11 +27,11 @@ s32 osPfsFileState_2(OSPfs *pfs, s32 file_no, NoteState *state)
     }
     if ((pfs->status & 1) == 0)
         return 5;
-    if (func_00429D1C(pfs) == 2)
+    if (__osCheckId_2(pfs) == 2)
         return 2;
     if (pfs->activebank != 0) {
         pfs->activebank = 0;
-        ret = func_00429DE4(pfs);
+        ret = __osPfsSelectBank_2(pfs);
         if (ret != 0)
             return ret;
     }
@@ -48,7 +48,7 @@ s32 osPfsFileState_2(OSPfs *pfs, s32 file_no, NoteState *state)
     start_page = dir.start_page.inode_t.page;
     bank = dir.start_page.inode_t.bank;
     while (bank < pfs->banks) {
-        ret = func_004299C4(pfs, &inode, 0, bank);
+        ret = __osPfsRWInode_2(pfs, &inode, 0, bank);
         if (ret != 0)
             return ret;
         next_page = inode.inode_page[start_page];

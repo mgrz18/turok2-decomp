@@ -1,7 +1,7 @@
 #include "common.h"
 
-extern s32 D_80130C60;
+extern s32 gPakState;
 
 s32 Pak_IsRumblePak_2(s32 arg0) {
-    return *(((__typeof__(&D_80130C60))((s8 *)&D_80130C60 + (arg0 * 4)))) == 2;
+    return *(((__typeof__(&gPakState))((s8 *)&gPakState + (arg0 * 4)))) == 2;
 }

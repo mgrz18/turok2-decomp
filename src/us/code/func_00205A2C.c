@@ -3,19 +3,19 @@
 
 #include "rw/abu_types.h"
 
-extern int D_800D8DCC;
+extern int gCache_mutex_count;
 extern s32 osRecvMesg(OSMesgQueue *queue, void **message, s32 block);
 extern u32 __osDisableInt(void);
 extern void __osRestoreInt(u32 arg0);
 extern void __osRestoreInt(u32);
-extern s32 D_800D81E0;
-extern s32 D_800D8DF0;
-extern s32 D_800D81C0;
-extern s32 D_800D81C4;
+extern s32 gCache_memAgeList;
+extern s32 gCache_ageCount;
+extern s32 gHashMask;
+extern s32 gHashTable;
 extern void CList__MoveToHead(void *, s32);
 void CCache__Touch(s32 arg0, s32 arg1) {
     extern s32 osSendMesg(OSMesgQueue *, s32, s32);
-    extern OSMesgQueue D_800D8DB0;
+    extern OSMesgQueue gCache_mutex;
     s32 temp_v1;
     s32 temp_v1_2;
     u32 temp_a0;
@@ -24,18 +24,18 @@ void CCache__Touch(s32 arg0, s32 arg1) {
     void *value;
     void **out;
     temp_a0 = __osDisableInt();
-    temp_v1 = D_800D8DCC + 1;
-    D_800D8DCC = temp_v1;
+    temp_v1 = gCache_mutex_count + 1;
+    gCache_mutex_count = temp_v1;
     if (temp_v1 != 1) {
         __osRestoreInt(temp_a0);
-        osRecvMesg(&D_800D8DB0, 0, 1);
+        osRecvMesg(&gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(temp_a0);
     }
     out = &value;
-    node = (HashNode *)((s32)D_800D81C4 +
+    node = (HashNode *)((s32)gHashTable +
         ((((arg1 << 5) ^ ((u32)arg1 >> 1) ^ ((u32)arg1 >> 9) ^
-           ((u32)arg1 >> 17)) & D_800D81C0) * 0x10));
+           ((u32)arg1 >> 17)) & gHashMask) * 0x10));
     if (node->key != arg1) {
         goto not_initial;
     }
@@ -60,15 +60,15 @@ loop:
 found:
     if (value != 0) {
         void *object = *(void **)value;
-        ((CachedResource *)object)->stamp = D_800D8DF0;
-        CList__MoveToHead(&D_800D81E0, object);
+        ((CachedResource *)object)->stamp = gCache_ageCount;
+        CList__MoveToHead(&gCache_memAgeList, object);
     }
     temp_v0 = __osDisableInt();
-    temp_v1_2 = D_800D8DCC - 1;
-    D_800D8DCC = temp_v1_2;
+    temp_v1_2 = gCache_mutex_count - 1;
+    gCache_mutex_count = temp_v1_2;
     if (temp_v1_2 != 0) {
         __osRestoreInt(temp_v0);
-        osSendMesg(&D_800D8DB0, 0, 1);
+        osSendMesg(&gCache_mutex, 0, 1);
         return;
     }
     __osRestoreInt(temp_v0);

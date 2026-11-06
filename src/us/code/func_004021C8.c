@@ -4,7 +4,7 @@
 
 void CAI__SetMode(void *a0, void *a1, s32 event);
 void AI_PlayAnim(CGameObjectInstance *actor, void *ai, s32 state);
-extern CListedInstance *D_8010FEB4;
+extern CListedInstance *gScene_m_InstancePool_m_ActiveList;
 
 /* MantidQueen_NextStep */
 static __inline__ void State_NextStep(WaveBossState *s) {
@@ -42,7 +42,7 @@ static __inline__ s32 State_CountActive(WaveBossState *s) {
             n++;
         }
     }
-    for (e = D_8010FEB4; e != NULL; e = e->m_pNext) {
+    for (e = gScene_m_InstancePool_m_ActiveList; e != NULL; e = e->m_pNext) {
         if (e->m_Instance.m_AI.m_Health > 0) {
             n++;
         }
@@ -66,7 +66,7 @@ static __inline__ void State_UpdateBoss(WaveBossState *s) {
     }
 }
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 void Animator_Update(void *slot);
 s32 Cinema_PathPlaying(void);
 void MantidQueen_SendMinions(WaveBossState *s, s32 *active);
@@ -93,7 +93,7 @@ void MantidQueen_Update(WaveBossState *s) {
         State_NextStep(s);
     }
     State_UpdateBoss(s);
-    s->blinkTimer -= D_800B6D28;
+    s->blinkTimer -= gFrameIncrement;
     if (s->blinkTimer <= 0.0f) {
         s->blink ^= 1;
         if (s->blink) {

@@ -4,20 +4,20 @@
 s32 Controller_PakChanged(s32 port);
 s32 PakMenu_CheckPak(void *event, s32 port, s32 arg2);
 
-extern s32 D_800C2028;
-extern s32 D_80130980;
-extern s32 D_80130990;
+extern s32 gPakMenuPort;
+extern s32 sSavePortalChosen;
+extern s32 gPakMenuAnyPak;
 extern s32 D_801309AC;
 
 static __inline__ s32 GetPort(Menu *event) {
-    if (D_80130990 != 0) {
-        return D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        return gPakMenuPort;
     }
     return event->controller->port;
 }
 
 s32 SavePortalMenu_Poll(Menu *event) {
-    if (D_80130980 == 0 && D_801309AC == 0) {
+    if (sSavePortalChosen == 0 && D_801309AC == 0) {
         if (GetPort(event) != -1 && Controller_PakChanged(GetPort(event)) != 0) {
             if (PakMenu_CheckPak(event, GetPort(event), 0) != 0) {
                 D_801309AC = 1;

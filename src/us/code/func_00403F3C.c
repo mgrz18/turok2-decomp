@@ -22,12 +22,12 @@ typedef struct {
     /* 0x54 */ Vec3_00403F3C spawn;
 } Level00403F3C;
 
-extern f32 D_800B6D28;
-extern u8 D_00431CD4[];
-extern u8 D_00431CF0[];
-extern u8 D_00431D0C[];
-extern u8 D_00431D14[];
-extern u8 D_801100F0[];
+extern f32 gFrameIncrement;
+extern u8 sPrimagenTossTable[];
+extern u8 sPrimagenTossTableStage3[];
+extern u8 sPrimagenTossTable2[];
+extern u8 sPrimagenTossTable2Stage3[];
+extern u8 gEngineApp_m_OnScreen[];
 void AI_TurnHeadToTarget(Actor00403F3C *actor, Level00403F3C *level, s32 a2);
 void Animator_Update(void *light);
 s16 WeightedTable_PickStatic(void *table);
@@ -39,7 +39,7 @@ void CAI__SetMode(Actor00403F3C *actor, Level00403F3C *level, s32 event);
 
 #define COUNT_DOWN(t)              \
     if ((t) > 0.0f) {              \
-        (t) -= D_800B6D28;         \
+        (t) -= gFrameIncrement;         \
     }
 
 void Primagen_Step(Actor00403F3C *actor, Level00403F3C *level) {
@@ -52,82 +52,82 @@ void Primagen_Step(Actor00403F3C *actor, Level00403F3C *level) {
         level->def->onReset(actor, level);
     }
     for (i = 0; i < 8; i++) {
-        Animator_Update(&D_8012F608.anims[i]);
+        Animator_Update(&gLevelScript.anims[i]);
     }
-    if (D_8012F608.bossState == 1) {
-        level->spawn.x = D_8012F608.home.x;
-        level->spawn.y = D_8012F608.home.y;
-        level->spawn.z = D_8012F608.home.z;
+    if (gLevelScript.bossState == 1) {
+        level->spawn.x = gLevelScript.home.x;
+        level->spawn.y = gLevelScript.home.y;
+        level->spawn.z = gLevelScript.home.z;
     }
-    COUNT_DOWN(D_8012F608.waveTimer);
-    COUNT_DOWN(D_8012F608.script.timer);
-    COUNT_DOWN(D_8012F608.script2.timer);
-    COUNT_DOWN(D_8012F608.script3.timer);
-    COUNT_DOWN(D_8012F608.spawnTimer);
-    COUNT_DOWN(D_8012F608.swayTimer);
-    COUNT_DOWN(D_8012F608.nextTimer);
-    COUNT_DOWN(D_8012F608.timer3EC);
-    if (D_8012F608.stage == 3) {
-        if (D_8012F608.values[0][1] <= 0x95FF && D_8012F608.subStage == 0) {
-            D_8012F608.subStage = 1;
+    COUNT_DOWN(gLevelScript.waveTimer);
+    COUNT_DOWN(gLevelScript.script.timer);
+    COUNT_DOWN(gLevelScript.script2.timer);
+    COUNT_DOWN(gLevelScript.script3.timer);
+    COUNT_DOWN(gLevelScript.spawnTimer);
+    COUNT_DOWN(gLevelScript.swayTimer);
+    COUNT_DOWN(gLevelScript.nextTimer);
+    COUNT_DOWN(gLevelScript.timer3EC);
+    if (gLevelScript.stage == 3) {
+        if (gLevelScript.values[0][1] <= 0x95FF && gLevelScript.subStage == 0) {
+            gLevelScript.subStage = 1;
         }
-        if (D_8012F608.values[0][1] < 0x6400 && D_8012F608.subStage == 1) {
-            D_8012F608.subStage = 2;
+        if (gLevelScript.values[0][1] < 0x6400 && gLevelScript.subStage == 1) {
+            gLevelScript.subStage = 2;
         }
-        if (D_8012F608.values[0][1] < 0x3200 && D_8012F608.subStage == 2) {
-            D_8012F608.subStage = 3;
+        if (gLevelScript.values[0][1] < 0x3200 && gLevelScript.subStage == 2) {
+            gLevelScript.subStage = 3;
         }
     }
-    if (D_8012F608.timer3EC <= 0.0f) {
+    if (gLevelScript.timer3EC <= 0.0f) {
         offset.x = -2385.92f;
         offset.y = 0.0f;
         offset.z = 0.0f;
-        if (D_8012F608.stage == 3) {
-            type = WeightedTable_PickStatic(D_00431CF0);
+        if (gLevelScript.stage == 3) {
+            type = WeightedTable_PickStatic(sPrimagenTossTableStage3);
         } else {
-            type = WeightedTable_PickStatic(D_00431CD4);
+            type = WeightedTable_PickStatic(sPrimagenTossTable);
         }
         Primagen_SpawnTossedObject(type, 0x11D, offset);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = -2324.48f;
-        if (D_8012F608.stage == 3) {
-            type = WeightedTable_PickStatic(D_00431CF0);
+        if (gLevelScript.stage == 3) {
+            type = WeightedTable_PickStatic(sPrimagenTossTableStage3);
         } else {
-            type = WeightedTable_PickStatic(D_00431CD4);
+            type = WeightedTable_PickStatic(sPrimagenTossTable);
         }
         Primagen_SpawnTossedObject(type, 0x11D, offset);
         offset.x = 2314.24f;
         offset.y = 0.0f;
         offset.z = 0.0f;
-        if (D_8012F608.stage == 3) {
-            type = WeightedTable_PickStatic(D_00431D14);
+        if (gLevelScript.stage == 3) {
+            type = WeightedTable_PickStatic(sPrimagenTossTable2Stage3);
         } else {
-            type = WeightedTable_PickStatic(D_00431D0C);
+            type = WeightedTable_PickStatic(sPrimagenTossTable2);
         }
         Primagen_SpawnTossedObject(type, 0x11D, offset);
         offset.x = -460.8f;
         offset.y = 0.0f;
         offset.z = -460.8f;
-        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431CD4), 0x11D, offset);
+        Primagen_SpawnTossedObject(WeightedTable_PickStatic(sPrimagenTossTable), 0x11D, offset);
         offset.x = 460.8f;
         offset.y = 0.0f;
         offset.z = -460.8f;
-        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431CD4), 0x11D, offset);
+        Primagen_SpawnTossedObject(WeightedTable_PickStatic(sPrimagenTossTable), 0x11D, offset);
         offset.x = 0.0f;
         offset.y = 0.0f;
         offset.z = 614.39996f;
-        Primagen_SpawnTossedObject(WeightedTable_PickStatic(D_00431CD4), 0x11D, offset);
-        D_8012F608.timer3EC = 300.0f;
+        Primagen_SpawnTossedObject(WeightedTable_PickStatic(sPrimagenTossTable), 0x11D, offset);
+        gLevelScript.timer3EC = 300.0f;
     }
     Primagen_UpdateHealth(actor, level);
     Primagen_UpdateSpawner(actor, level);
-    COnScreen__SetBossPercent(D_801100F0, D_8012F608.total * 100 / D_8012F608.bonus);
+    COnScreen__SetBossPercent(gEngineApp_m_OnScreen, gLevelScript.total * 100 / gLevelScript.bonus);
     if (actor->pos.y < -204.79999f) {
-        D_8012F608.bossMode = 11;
-        D_8012F608.dest.x = 0.0f;
-        D_8012F608.dest.y = 0.0f;
-        D_8012F608.dest.z = 0.0f;
+        gLevelScript.bossMode = 11;
+        gLevelScript.dest.x = 0.0f;
+        gLevelScript.dest.y = 0.0f;
+        gLevelScript.dest.z = 0.0f;
         CAI__SetMode(actor, level, 0x19);
     }
 }

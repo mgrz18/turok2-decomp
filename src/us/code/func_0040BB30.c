@@ -17,7 +17,7 @@ void MotherBoss_Mode28_TeleportTarget(void *obj, CAI *ai) {
 
     AI_UpdateTargets(obj, ai, &t, 0, 1);
     AI_TurnClamped(obj, ai, 0.261799425f, t.m_Sight.m_Angle);
-    state = &D_8012FB70;
+    state = &gMotherBoss;
     if (state->counter % 3 == 0) {
         MotherBoss_TeleportTarget(obj, state->counter == 0);
     }

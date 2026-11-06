@@ -16,9 +16,9 @@ typedef struct Screen {
     /* 0xC */ Layer *layer;
 } Screen;
 
-extern s32 D_80130910[4];
-extern char D_800F5A50[];
-extern u8 D_8011AAF1; /* multiplayer */
+extern s32 sPauseRumbleOn[4];
+extern char gRumblePool[];
+extern u8 gEngineApp_m_Settings_multiplayer; /* multiplayer */
 
 void RumblePool_FreeAll(void *);
 void Controller_ResetAllRumble(void);
@@ -30,11 +30,11 @@ void PauseMenu_Init_2(Screen *screen) {
 
     screen->state = 2;
     for (i = 0; i < 4; i++) {
-        D_80130910[i] = D_800F5EC0[i].rumbleOn;
+        sPauseRumbleOn[i] = gControllers[i].rumbleOn;
     }
-    RumblePool_FreeAll(D_800F5A50);
+    RumblePool_FreeAll(gRumblePool);
     Controller_ResetAllRumble();
-    if (D_8011AAF1) {
+    if (gEngineApp_m_Settings_multiplayer) {
         screen->layer->flagsA &= ~0x800000;
         screen->layer->flagsB &= ~0x800000;
     } else {

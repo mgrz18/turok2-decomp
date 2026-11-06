@@ -14,7 +14,7 @@ typedef struct {
     /* 0x1A */ s8 boneCount;
 } AnimObjectInfo;
 
-extern CVector3 D_800B06A0; /* player position */
+extern CVector3 gEnemyAlertPoint; /* player position */
 
 extern s32 *CCache__Request(s32, s32, s32, s32, s32, s32, const char *, s32);
 extern AnimObjectInfo *CISet__GetBlock(s32 table, s32 index);
@@ -49,7 +49,7 @@ void AI_TurnHeadToTarget(CGameObjectInstance *actor, CAI *ai, f32 pitchOffset) {
             from.y = actor->header.m_vPos.y + GameObject_GetCollisionHeight(actor) * 0.9f + actor->m_CollisionYOffset;
             from.z = actor->header.m_vPos.z;
             if (ai->m_Mode == 0xC) {
-                to = D_800B06A0;
+                to = gEnemyAlertPoint;
             } else {
                 target = ai->m_pSightTarget;
                 to.x = target->header.m_vPos.x;

@@ -17,8 +17,8 @@ typedef struct {
     /* 0x140 */ u8 ai[4];
 } Mount;
 
-extern CCollisionResults D_800F1CE0;  /* m_pInstance: what the player is aiming at */
-extern CVector3 D_800ADCBC;             /* rider seat */
+extern CCollisionResults gCollisionResults;  /* m_pInstance: what the player is aiming at */
+extern CVector3 gRidingScale;             /* rider seat */
 
 f32 AI_AngleToPoint(CGameObjectInstance *body, CVector3 point);   /* angle to a point */
 void CVector3__Scale(CVector3 *out, CVector3 *in, f32 s);
@@ -43,15 +43,15 @@ s32 CPlayer__TryMount(CPlayer *p, CGameObjectInstance *body) {
     Mount *mount;
 
     if (p->m_pOnEnemy == NULL && !(p->m_ModeBeforeFlags & 0x8000)) {
-        if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
-            mount = (Mount *)D_800F1CE0.m_pInstance;
+        if (gCollisionResults.m_pInstance != NULL && gCollisionResults.m_pInstance->header.m_Type == 1) {
+            mount = (Mount *)gCollisionResults.m_pInstance;
             if (mount->type == 0x136 && ABS(AI_AngleToPoint(body, mount->pos)) < 0.785398245f) {
                 p->m_pOnEnemy = mount;
                 p->m_OnEnemyObjectType = 0x136;
-                p->m_vOnEnemyScale = D_800ADCBC;
+                p->m_vOnEnemyScale = gRidingScale;
                 CVector3__Scale(&p->m_vOnEnemyScale, &p->m_vOnEnemyScale, 0.03f);
                 body->m_RotY = mount->yaw;
-                CPlayerContState__Init(&p->m_ContState, &D_800F5EC0[p->m_nController]);
+                CPlayerContState__Init(&p->m_ContState, &gControllers[p->m_nController]);
                 p->m_Speed = 0;
                 p->m_SideSpeed = 0;
                 p->m_TotalSpeed = 0;

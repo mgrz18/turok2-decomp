@@ -11,7 +11,7 @@ s32 SndVoicePool_StopGroupVoice(SndVoicePool *p, s16 tag, s16 key) {
     s32 j;
     SndVoice *v = p->voices;
     SndVoice *s;
-    SndMgr *m;
+    CAudioWorld *m;
     i = 0;
     for (; i < 16; i++) {
         if (v->unk8 != -1 && p->owner->pendingCue != i && v->soundId == tag && (v->flags & 0x40) != 0 && v->vp.channel == key) {

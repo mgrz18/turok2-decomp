@@ -16,8 +16,8 @@
 #include "structs/game.h"
 #include "structs/weapon.h"
 
-extern s32 D_80110058;
-extern s32 D_8011005C;
+extern s32 gScene_m_PreviewState;
+extern s32 gScene_m_PreviewTimer;
 
 void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *player);
 
@@ -27,13 +27,13 @@ void CBarrel__Fill(CBarrel *menu, s32 rows, s32 *owned, s32 perRow, CPlayer *pla
 void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player) {
     s32 shown[0x23];
     s32 count = 0;
-    s32 range = D_8011005C - D_80110058 + 1;
+    s32 range = gScene_m_PreviewTimer - gScene_m_PreviewState + 1;
     s32 rows;
     s32 slots;
     s32 i;
 
     for (i = 0; i < 0x23; i++) {
-        WeaponInfo *info = D_800AF618[i];
+        WeaponInfo *info = gWeaponInfoTable[i];
         s32 show;
 
         if (!player->m_Data.m_WeaponList[i]) {
@@ -74,16 +74,16 @@ void CBarrel__OpenWheel(CBarrel *menu, CPlayer *player) {
 #include "structs/camera.h"
 
 /* An animated HUD item (COverlay__Update ticks it, COverlay__StartScript restarts it). */
-extern s32 D_8011AC8C;          /* game state */
-extern u8 D_8011AAEA;           /* HUD alpha */
-extern s32 D_800C2030;          /* screen width */
-extern s32 D_800C2034;          /* screen height */
-extern s32 D_8011ACE4;
-extern u8 D_800ADB84[];
-extern u8 D_800ADBC0[];
-extern u8 D_800ADC00[];
-extern u8 D_800ADC40[];
-extern u8 D_800ADC80[];
+extern s32 gEngineApp_m_Settings_nextMode;          /* game state */
+extern u8 gEngineApp_m_Settings_hudAlpha;           /* HUD alpha */
+extern s32 gScreenWidth;          /* screen width */
+extern s32 gScreenHeight;          /* screen height */
+extern s32 gEngineApp_m_Settings_match_tag;
+extern u8 gAmmoOverlayChangeScript[];
+extern u8 gLivesOverlayChangeScript[];
+extern u8 gTokensOverlayChangeScript[];
+extern u8 gTotalKillsOverlayChangeScript[];
+extern u8 gTotalTagsOverlayChangeScript[];
 
 void COverlay__Update(COverlay *item);
 void COverlay__StartScript(COverlay *item, u8 *anim);
@@ -102,7 +102,7 @@ void func_00254768(CPlayer *player, CCamera *view);
  * head is loaded and stored by symbol; a post-increment written in place
  * keeps the address of the head in a register instead. */
 static __inline__ Gfx *dl_next(void) {
-    return D_800D8E24++;
+    return gDList++;
 }
 
 /* Draw a player's HUD: tick the item animations, the crosshair and strokes,
@@ -123,7 +123,7 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     CBarrel *strokes;
 
     showAmmo = 1;
-    if (D_8011AC8C == 0xB || D_8011AC8C == 8) {
+    if (gEngineApp_m_Settings_nextMode == 0xB || gEngineApp_m_Settings_nextMode == 8) {
         return;
     }
     COverlay__Update(&player->m_AmmoOverlay);
@@ -149,14 +149,14 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
     } else {
         CBarrel__DrawRing(strokes, view, player);
     }
-    Hud_SetupTextureMode(D_8011AAEA);
-    sx = view->m_Viewport.m_Width / (f32)D_800C2030;
+    Hud_SetupTextureMode(gEngineApp_m_Settings_hudAlpha);
+    sx = view->m_Viewport.m_Width / (f32)gScreenWidth;
     shift = sx * 32.0f;
-    sy = view->m_Viewport.m_Height / (f32)D_800C2034;
+    sy = view->m_Viewport.m_Height / (f32)gScreenHeight;
 
     ammo = CPlayer__GetWeaponAmmo(player, player->m_Data.m_CurrentWeapon);
     if (player->m_AmmoOverlay.m_Value != ammo) {
-        COverlay__StartScript(&player->m_AmmoOverlay, D_800ADB84);
+        COverlay__StartScript(&player->m_AmmoOverlay, gAmmoOverlayChangeScript);
         player->m_AmmoOverlay.m_Value = ammo;
     }
     icon = CPlayer__GetCurrentAmmoInfo(player);
@@ -188,7 +188,7 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
 
     lives = player->m_Data.m_LifeForce;
     if (player->m_TokensOverlay.m_Value != lives) {
-        COverlay__StartScript(&player->m_TokensOverlay, D_800ADC00);
+        COverlay__StartScript(&player->m_TokensOverlay, gTokensOverlayChangeScript);
         player->m_TokensOverlay.m_Value = lives;
     }
     if (player->m_TokensOverlay.m_bOnScreen && player->m_TokensOverlay.m_Mode) {
@@ -199,10 +199,10 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
         Hud_DrawNumber(player->m_Data.m_LifeForce, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
     }
 
-    if (!D_8011AAD8.multiplayer) {
+    if (!gEngineApp_m_Settings.multiplayer) {
         value = player->m_Data.m_Lives;
         if (player->m_LivesOverlay.m_Value != value) {
-            COverlay__StartScript(&player->m_LivesOverlay, D_800ADBC0);
+            COverlay__StartScript(&player->m_LivesOverlay, gLivesOverlayChangeScript);
             player->m_LivesOverlay.m_Value = value;
         }
         if (player->m_LivesOverlay.m_bOnScreen && player->m_LivesOverlay.m_Mode) {
@@ -213,10 +213,10 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
             Hud_DrawNumber(player->m_Data.m_Lives, x + sx * 30.0f, y + sy * 24.0f, sx, sy, 1, 0, 0);
         }
     }
-    if (D_8011AAD8.multiplayer) {
+    if (gEngineApp_m_Settings.multiplayer) {
         value = player->m_pOptions->m_Kills;
         if (player->m_TotalKillsOverlay.m_Value != value) {
-            COverlay__StartScript(&player->m_TotalKillsOverlay, D_800ADC40);
+            COverlay__StartScript(&player->m_TotalKillsOverlay, gTotalKillsOverlayChangeScript);
             player->m_TotalKillsOverlay.m_Value = value;
         }
         if (player->m_TotalKillsOverlay.m_bOnScreen && player->m_TotalKillsOverlay.m_Mode) {
@@ -225,10 +225,10 @@ void CPlayer__DrawHud(CPlayer *player, CCamera *view) {
             Hud_DrawSprite(0x1FA, 0, x, y + sy * 8.0f, sx, sy, 1);
             Hud_DrawNumber(player->m_pOptions->m_Kills, x + sx * -7.0f, y + sy * 20.0f, sx, sy, 1, 1, 0);
         }
-        if (D_8011ACE4) {
+        if (gEngineApp_m_Settings_match_tag) {
             value = player->m_pOptions->m_Tags;
             if (player->m_TotalTagsOverlay.m_Value != value) {
-                COverlay__StartScript(&player->m_TotalTagsOverlay, D_800ADC80);
+                COverlay__StartScript(&player->m_TotalTagsOverlay, gTotalTagsOverlayChangeScript);
                 player->m_TotalTagsOverlay.m_Value = value;
             }
             if (player->m_TotalTagsOverlay.m_bOnScreen && player->m_TotalTagsOverlay.m_Mode) {
@@ -255,8 +255,8 @@ typedef struct Orbit {
 
 #define MAX(a, b) ((a) < (b) ? (b) : (a))
 
-extern f32 D_800AE308;
-extern f32 D_800AE30C;
+extern f32 sOrbitCameraAngle;
+extern f32 sOrbitCameraDistance;
 
 f32 func_002982F0(f32);             /* sin */
 f32 func_002974C0(f32);             /* cos */
@@ -281,18 +281,18 @@ void CPlayer__UpdateOrbitCamera(CPlayer *player, CGameObjectInstance *target) {
                       MAX(player->m_vEyeOffset.y + player->m_ActualCameraVertEyeOffset - player->m_DuckOffset, 40.96f), target->m_qGround, target->header.m_pCurrentRegion, player->m_ZoomBlend, 3.0f);
     } else if (player->m_bActive == 2) {
         if (player->m_ContState.m_dwButtons & 0x200) {
-            D_800AE308 += 0.069813177f;
+            sOrbitCameraAngle += 0.069813177f;
         } else if (player->m_ContState.m_dwButtons & 0x100) {
-            D_800AE308 -= 0.069813177f;
+            sOrbitCameraAngle -= 0.069813177f;
         } else if (player->m_ContState.m_dwButtons & 0x800) {
-            D_800AE30C -= 4.096f;
+            sOrbitCameraDistance -= 4.096f;
         } else if (player->m_ContState.m_dwButtons & 0x400) {
-            D_800AE30C += 4.096f;
+            sOrbitCameraDistance += 4.096f;
         }
-        angle = target->m_RotY + D_800AE308;
-        x = target->header.m_vPos.x + D_800AE30C * func_002982F0(angle);
+        angle = target->m_RotY + sOrbitCameraAngle;
+        x = target->header.m_vPos.x + sOrbitCameraDistance * func_002982F0(angle);
         CCamera__SetViewParams(camera, 1, angle, 0.0f, 0.0f, 0.0f, x, target->header.m_vPos.y + 81.92f,
-                      target->header.m_vPos.z + D_800AE30C * func_002974C0(angle), 0.0f, target->m_qGround, target->header.m_pCurrentRegion, 0.0f, 3.0f);
+                      target->header.m_vPos.z + sOrbitCameraDistance * func_002974C0(angle), 0.0f, target->m_qGround, target->header.m_pCurrentRegion, 0.0f, 3.0f);
     }
 }
 
@@ -320,13 +320,13 @@ void CPlayer__UpdateWeaponSet(CPlayer *player) {
     weapon = player->m_Data.m_CurrentWeapon;
     switch (player->m_LastFrameAllowedWeaponType) {
     case 0:
-        if (!(D_800AF618[weapon]->flags & 1)) {
+        if (!(gWeaponInfoTable[weapon]->flags & 1)) {
             goto no;
         }
         keep = 1;
         break;
     case 1:
-        if (!(D_800AF618[weapon]->flags & 2)) {
+        if (!(gWeaponInfoTable[weapon]->flags & 2)) {
             goto no;
         }
         keep = 1;
@@ -507,20 +507,20 @@ typedef struct PlayerStateInfo {
 } PlayerStateInfo;
 
 
-extern f32 D_800B6D28;              /* frame time */
-extern s32 D_8011AAA0;
-extern s32 D_8011ACE4;
-extern s32 D_800B6D1C;
-extern f32 D_800ADD88[];           /* health regeneration per character */
-extern PlayerStateInfo D_800ADF54[];
+extern f32 gFrameIncrement;              /* frame time */
+extern s32 gEngineApp_m_Game_m_DebugLines;
+extern s32 gEngineApp_m_Settings_match_tag;
+extern s32 gEvenOdd;
+extern f32 gCharacterHealthRegen[];           /* health regeneration per character */
+extern PlayerStateInfo gPlayerStateTable[];
 extern u32 D_800F1E30;
 extern u32 D_800F1F10;
-extern CCollisionResults D_800F1CE0;  /* the last collision test (m_pInstance: what it hit) */
-extern s32 D_800F1D90;
-extern u8 D_800F7078;
-extern s32 D_80110054;
-extern s32 D_800ADB30[];
-extern s32 D_800ADB5C;
+extern CCollisionResults gCollisionResults;  /* the last collision test (m_pInstance: what it hit) */
+extern s32 gCollisionResults_m_nFloorKind;
+extern u8 gScene;
+extern s32 gScene_m_PendingWarpID;
+extern s32 gCharacterModels[];
+extern s32 gTagModeModel;
 
 s32 Cinema_PathPlaying(void);
 void CCache__SetFrameDelay(s32);
@@ -571,7 +571,7 @@ void CBarrel__Update(s32 *, Player *, u8 *);
 void Player_UpdateAim(Player *);
 
 static __inline__ s32 link_enabled(u8 *bits) {
-    if (D_8011AAD8.cheatFlags & 0x10) {
+    if (gEngineApp_m_Settings.cheatFlags & 0x10) {
         return 1;
     }
     return *bits & 0xF;
@@ -636,19 +636,19 @@ void CPlayer__Update(Player *p) {
     s32 second;
     s32 low;
     s32 high;
-    s32 sound;
+    s32 modelId;
     s32 i;
     s32 j;
 
     linkFlags = 0;
-    scale = D_800B6D28;
+    scale = gFrameIncrement;
     actor = p;
     soundFlags = 0;
     human = p->control == 2;
     if (Cinema_PathPlaying()) {
         human = 1;
     }
-    game = &D_8011AAD8;
+    game = &gEngineApp_m_Settings;
     if (game->multiplayer) {
         human = 1;
         CCache__SetFrameDelay(8);
@@ -657,20 +657,20 @@ void CPlayer__Update(Player *p) {
     p->owner = p;
     p->unk430 = p;
     if ((p->aiFlags & 0x80) && game->multiplayer == 0) {
-        enable = *(u32 *) ((u8 *) game - 0xCAC) == 0; /* D_80119E2C, the block before */
+        enable = *(u32 *) ((u8 *) game - 0xCAC) == 0; /* gEngineApp_m_Game_m_MenuPool, the block before */
     }
     Sound__SetMuted(enable);
-    if (D_8011AAD8.multiplayer == 0) {
-        if (!(D_8011AAA0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
+    if (gEngineApp_m_Settings.multiplayer == 0) {
+        if (!(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x800)) {
             if (p->unk12A4 != 0) {
                 p->unk12A4 = 0;
             } else {
                 p->unk12A4 = 1;
             }
         }
-        if (D_8011AAD8.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
-            && !(D_8011AAA0 != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
-            WeaponInfo *info = D_800AF618[p->nextWeapon];
+        if (gEngineApp_m_Settings.multiplayer == 0 && !(p->unk1050 != 0 && p->unkCD0 != 0)
+            && !(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20)) && (p->input.pressed & 0x200)) {
+            WeaponInfo *info = gWeaponInfoTable[p->nextWeapon];
             s16 next = info->alternate;
 
             if (next != -1 && p->owned[next] != 0) {
@@ -679,13 +679,13 @@ void CPlayer__Update(Player *p) {
         }
     }
     regen = 0.0f;   /* also serves the comparisons with 0 (f2 in the ROM) */
-    if (D_8011AAD8.multiplayer != 0 && (rate = D_800ADD88[p->character]) != 0.0f) {
+    if (gEngineApp_m_Settings.multiplayer != 0 && (rate = gCharacterHealthRegen[p->character]) != 0.0f) {
         f32 health = p->health;
 
         if (health != 0.0f && p->options->m_TagMode == 0) {
             f32 max;
 
-            regen = health + (f32) (s32) (rate * 256.0f) * (D_800B6D28 * 0.06666667f);
+            regen = health + (f32) (s32) (rate * 256.0f) * (gFrameIncrement * 0.06666667f);
             max = (u32) (p->def->m_Player.m_StartHealth << 8);
             if (!(max <= regen)) {
                 max = regen;
@@ -698,7 +698,7 @@ void CPlayer__Update(Player *p) {
     if (human) {
         CGameObjectInstance__UpdateAnimation(actor);
     }
-    D_800B6D28 = scale;
+    gFrameIncrement = scale;
     AI_RideMovingPlatform(actor, &actor->aiFlags);
     if (link_enabled(&p->unk6A9)) {
         linkFlags |= 0x800;
@@ -712,7 +712,7 @@ void CPlayer__Update(Player *p) {
     }
     Cinema_PathPlaying();
     if (p->unkAAC > 0.0f) {
-        f32 left = p->unkAAC - D_800B6D28;
+        f32 left = p->unkAAC - gFrameIncrement;
 
         if (left < 0.0f) {
             left = 0.0f;
@@ -720,7 +720,7 @@ void CPlayer__Update(Player *p) {
         p->unkAAC = left;
     }
     if (p->unkA28 > 0.0f) {
-        f32 left = p->unkA28 - D_800B6D28;
+        f32 left = p->unkA28 - gFrameIncrement;
 
         if (left < 0.0f) {
             left = 0.0f;
@@ -729,7 +729,7 @@ void CPlayer__Update(Player *p) {
     }
     /* Run the frame in steps (one, here): the input's edges are seen once. */
     saved = p->input;
-    for (remaining = D_800B6D28; remaining > 0.0f;) {
+    for (remaining = gFrameIncrement; remaining > 0.0f;) {
         remaining = 0.0f;
         AI_UpdateRegionFlags(actor, &actor->aiFlags);
         p->prevState = (u16) p->state;
@@ -737,7 +737,7 @@ void CPlayer__Update(Player *p) {
         model = actor->model;
         material = GameObject_GetRegionInfo(actor);
         CPlayer__UpdateSpeedScale(p, actor, material);
-        if (D_8011AAD8.multiplayer == 0) {
+        if (gEngineApp_m_Settings.multiplayer == 0) {
             CVector3 *pos = &p->pos;
 
             if (model != NULL && pos != NULL && (model->flags & 0x40)) {
@@ -753,9 +753,9 @@ void CPlayer__Update(Player *p) {
             }
         }
         if (material != NULL) {
-            p->step = D_800B6D28 * p->unkB28;
+            p->step = gFrameIncrement * p->unkB28;
         } else {
-            p->step = D_800B6D28;
+            p->step = gFrameIncrement;
         }
         CPlayer__EaseEyeOffset(p, actor);
         p->speed = func_00298470(p->velX * p->velX + p->velZ * p->velZ);
@@ -768,13 +768,13 @@ void CPlayer__Update(Player *p) {
             p->goal.y += Random_Float(1.0f) * 10.24f;
             p->yaw += (Random_Float(20.0f) - 10.0f) * 0.017453294f;
             p->unkAC8 += Random_Float(0.5f) - 0.25f;
-            if (D_800B6D1C != 0) {
+            if (gEvenOdd != 0) {
                 DamageEvent_Set(&damage, p->unk12AC, 0x19, 25.599998f, 0x100000, 0);
                 Player_OnMultiplayerKill(p, &p->aiFlags, &damage);
             }
             Sound__Play(0x227, p->pos, 0, -1);
         }
-        p->stateTime += D_800B6D28;
+        p->stateTime += gFrameIncrement;
         {
             s32 ground = GameObject_IsOnGround(actor);
 
@@ -784,7 +784,7 @@ void CPlayer__Update(Player *p) {
             p->onGround = ground;
             p->lastVelY = actor->velY;
             if (ground == 0 && p->state != 14 && !(actor->aiFlags & 0x200)) {
-                p->airTime += D_800B6D28;
+                p->airTime += gFrameIncrement;
             } else {
                 p->airTime = 0.0f;
             }
@@ -797,7 +797,7 @@ void CPlayer__Update(Player *p) {
             CPlayer__UpdateZoom(p);
         }
         if (!Cinema_PathPlaying() || (u32) ((u16) p->state - 19) < 12) {
-            void (*update)(Player *, Player *) = D_800ADF54[p->state].update;
+            void (*update)(Player *, Player *) = gPlayerStateTable[p->state].update;
 
             if (update != NULL) {
                 update(p, actor);
@@ -810,7 +810,7 @@ void CPlayer__Update(Player *p) {
                 CPlayer__Hurt(p, actor, 0x3E700, 0, 0x1D);
             }
         }
-        stateFlags = D_800ADF54[p->state].flags;
+        stateFlags = gPlayerStateTable[p->state].flags;
         if (p->state == 14) {
             stateFlags = &D_800F1E30;
             if (p->velX >= 0.0f) {
@@ -821,7 +821,7 @@ void CPlayer__Update(Player *p) {
         if (actor->aiFlags & 0x6000) {
             flag = 1;
         } else if ((u32) ((u16) p->state - 2) < 2) {
-            if ((p->input.pressed & 0x400) && D_8011AAD8.multiplayer == 0 && !(D_8011AAA0 != 0 && (p->input.held & 0x20))) {
+            if ((p->input.pressed & 0x400) && gEngineApp_m_Settings.multiplayer == 0 && !(gEngineApp_m_Game_m_DebugLines != 0 && (p->input.held & 0x20))) {
                 p->crouchToggle ^= 1;
             }
         } else {
@@ -838,7 +838,7 @@ void CPlayer__Update(Player *p) {
             } else {
                 change = -p->crouch * 0.25f;
             }
-            p->crouch += change * D_800B6D28;
+            p->crouch += change * gFrameIncrement;
             change = 40.96f - p->crouch;
             if (-10.24f <= change && change <= 10.24f) {
                 *stateFlags |= 0x80;
@@ -848,7 +848,7 @@ void CPlayer__Update(Player *p) {
         }
         CPlayer__UpdateWaterRegion(p, actor, material);
         if (p->unkA30 > 0.0f) {
-            p->unkA30 -= D_800B6D28;
+            p->unkA30 -= gFrameIncrement;
             if (p->unkA30 < 0.0f) {
                 p->unkA30 = 0.0f;
             }
@@ -870,18 +870,18 @@ void CPlayer__Update(Player *p) {
             CGameRegion__FireTriggers(oldModel, linkFlags | 2, actor);
             CGameRegion__FireTriggers(model, linkFlags | 1, actor);
         }
-        CScene__CheckAutoActivation(&D_800F7078, actor, &prev, &actor->pos);
+        CScene__CheckAutoActivation(&gScene, actor, &prev, &actor->pos);
         landed = 0;
         if (hit) {
-            if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 1) {
-                GameObject_FireTriggers((u8 *)D_800F1CE0.m_pInstance, soundFlags | 2, actor);
+            if (gCollisionResults.m_pInstance != NULL && gCollisionResults.m_pInstance->header.m_Type == 1) {
+                GameObject_FireTriggers((u8 *)gCollisionResults.m_pInstance, soundFlags | 2, actor);
             }
-            if (D_800F1CE0.m_pWallRegion != NULL) {
-                CGameRegion__FireTriggers((Model *)D_800F1CE0.m_pWallRegion, linkFlags | 4, actor);
+            if (gCollisionResults.m_pWallRegion != NULL) {
+                CGameRegion__FireTriggers((Model *)gCollisionResults.m_pWallRegion, linkFlags | 4, actor);
             }
             CPlayer__RamWithMount(p, actor, stateFlags);
             landed = CPlayer__TryMount(p, actor, stateFlags);
-            if (D_800F1D90 == 2 && (u32) ((u16) p->state - 4) < 2) {
+            if (gCollisionResults_m_nFloorKind == 2 && (u32) ((u16) p->state - 4) < 2) {
                 if (actor->velY > 0.0f) {
                     actor->velY = 0.0f;
                 }
@@ -890,8 +890,8 @@ void CPlayer__Update(Player *p) {
                 p->velX *= 0.1f;
             }
         }
-        if (D_800F1CE0.m_pInstance != NULL && D_800F1CE0.m_pInstance->header.m_Type == 3) {
-            CPlayer__TouchPickup(p, (u8 *)D_800F1CE0.m_pInstance);
+        if (gCollisionResults.m_pInstance != NULL && gCollisionResults.m_pInstance->header.m_Type == 3) {
+            CPlayer__TouchPickup(p, (u8 *)gCollisionResults.m_pInstance);
         }
         if (before != NULL && material != NULL) {
             if ((p->stateFlags & 0x8000) && !landed && !(before->unk54 & 8) && (material->unk54 & 8)) {
@@ -905,7 +905,7 @@ void CPlayer__Update(Player *p) {
             if (material->flags & 0x8000000) {
                 p->item = material->item;
                 p->lastItem = material->item;
-                D_80110054 = material->item;
+                gScene_m_PendingWarpID = material->item;
             }
             enter_surface(p, actor, before, material, model);
         }
@@ -915,7 +915,7 @@ void CPlayer__Update(Player *p) {
         p->input.unk34 = 0;
     }
     p->input = saved;
-    D_800B6D28 = scale;
+    gFrameIncrement = scale;
     under = GameObject_GetRegionInfo(actor);
     if (under != NULL && (under->flags & 0x4000)) {
         f32 x2 = actor->pos.x * actor->pos.x;
@@ -938,15 +938,15 @@ void CPlayer__Update(Player *p) {
         }
     }
     if (human) {
-        sound = 102;
-        if (D_8011AAD8.multiplayer != 0) {
-            if (D_8011ACE4 != 0 && p->options->m_TagMode != 0) {
-                sound = D_800ADB5C;
+        modelId = 102;
+        if (gEngineApp_m_Settings.multiplayer != 0) {
+            if (gEngineApp_m_Settings_match_tag != 0 && p->options->m_TagMode != 0) {
+                modelId = gTagModeModel;
             } else {
-                sound = D_800ADB30[p->def->m_Id];
+                modelId = gCharacterModels[p->def->m_Id];
             }
         }
-        CScene__SetInstanceObjectType(&D_800F7078, p, sound, p->action);
+        CScene__SetInstanceObjectType(&gScene, p, modelId, p->action);
         if (p->lastAction != p->action) {
             if (!CGameObjectInstance__SetAnimByAction(actor, p->action, 0) && Cinema_PathPlaying()) {
                 CGameObjectInstance__SetAnimByAction(actor, 7000, 0);
@@ -982,7 +982,7 @@ void CPlayer__Update(Player *p) {
     p->emitterModel = p->model;
     p->emitter40 = p->unk40;
     p->lastPos = p->pos;
-    if (D_8011AAD8.cheatFlags & 8) {
+    if (gEngineApp_m_Settings.cheatFlags & 8) {
         for (i = 0; i < 31; i++) {
             if (i != 21) {
                 p->ammo[i] = 0;
@@ -994,7 +994,7 @@ void CPlayer__Update(Player *p) {
             if (i == 21) {
                 continue;
             }
-            info = D_800AF618[i];
+            info = gWeaponInfoTable[i];
             for (j = 0; j < 3; j++) {
                 AmmoInfo *def = info->ammo[j];
                 s16 *slot;
@@ -1007,12 +1007,12 @@ void CPlayer__Update(Player *p) {
             }
         }
     }
-    if (D_8011AAD8.cheatFlags & 4) {
-        if (D_8011AAD8.multiplayer == 0 && p->owned[21] == 0) {
+    if (gEngineApp_m_Settings.cheatFlags & 4) {
+        if (gEngineApp_m_Settings.multiplayer == 0 && p->owned[21] == 0) {
             *(p->ammo + *CPlayer__GetFiringAmmo(p, 21)) = 1;
         }
         for (i = 0; i < 35; i++) {
-            if ((i >= 24) ^ !D_8011AAD8.multiplayer) {
+            if ((i >= 24) ^ !gEngineApp_m_Settings.multiplayer) {
                 p->owned[i] = 1;
             }
         }
@@ -1020,7 +1020,7 @@ void CPlayer__Update(Player *p) {
     CPlayer__UpdateWeaponSet((CPlayer *) p);
     CBarrel__Update(&p->unkCD0, p, p->unk3C8);
     if (p->shake > 0.0f) {
-        p->shake -= D_800B6D28;
+        p->shake -= gFrameIncrement;
         if (p->shake > 0.0f) {
             p->flags |= 0x800000;
         } else {
@@ -1029,6 +1029,6 @@ void CPlayer__Update(Player *p) {
     }
     Player_UpdateAim(p);
     p->input.controller->pos = p->pos;
-    CScene__SetInstanceObjectType(&D_800F7078, p->emitter, D_800AF618[p->weapon]->model, p->voice->bank);
+    CScene__SetInstanceObjectType(&gScene, p->emitter, gWeaponInfoTable[p->weapon]->model, p->voice->bank);
     p->lastAction = p->action;
 }

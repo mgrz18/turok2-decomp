@@ -4,7 +4,7 @@ extern u8 D_800AA0DC[];   /* ": " */
 extern u8 D_800AA0EC[];   /* "   " */
 extern u8 D_800AA0F0[];   /* "\n" */
 
-extern u16 D_8011F184;     /* debug console foreground colour */
+extern u16 sCrashTextColor;     /* debug console foreground colour */
 
 extern void Crash_PutChar(s32 c);       /* print a character */
 extern void Crash_PrintHex8(s32 byte);    /* print a byte in hex */
@@ -31,10 +31,10 @@ void Crash_PrintRegPairHighlight(u8 *name1, u32 value1, u8 *name2, u32 value2) {
     PrintString(D_800AA0DC);
     PrintHex32(value1);
     PrintString(D_800AA0EC);
-    D_8011F184 = 0xF7A9;
+    sCrashTextColor = 0xF7A9;
     PrintString(name2);
     PrintString(D_800AA0DC);
     PrintHex32(value2);
-    D_8011F184 = 0xA529;
+    sCrashTextColor = 0xA529;
     PrintString(D_800AA0F0);
 }

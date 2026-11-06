@@ -5,10 +5,10 @@ s32 WeaponActor_Update(s32, s32);
 s32 WeaponActor_SwitchToRequestedInline(s32, s32);
 s32 WeaponActor_Draw(s32, s32, s32);
 
-extern M2C_UNK D_800AE394;
+extern M2C_UNK sWeaponActorModeTable;
 
 void WeaponActor_InitAI(s32 arg0, void *arg1) {
-    M2C_FIELD(arg1, M2C_UNK **, 0x2C) = &D_800AE394;
+    M2C_FIELD(arg1, M2C_UNK **, 0x2C) = &sWeaponActorModeTable;
     M2C_FIELD(arg1, s32 (**)(s32, s32), 0xF0) = WeaponActor_Update;
     M2C_FIELD(arg1, s32 (**)(s32, s32, s32), 0xF4) = WeaponActor_Draw;
     M2C_FIELD(arg1, s32 *, 0x10C) = 0;

@@ -4,7 +4,7 @@
 #include "rw/abu_types.h"
 
 extern s16 _getRate(f64 vol, f64 tgt, s32 count, u16 *ratel);
-extern s16 D_800B7900[128];
+extern s16 eqpower[128];
 extern char D_800AA540[];
 extern char D_800AA544[];
 extern void __assert(const char *, const char *, s32);
@@ -22,9 +22,9 @@ Acmd *_pullSubFrame(void *filter, s16 *inp, s16 *outp, s32 outCount, s32 sampleO
     { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(8) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0x08) & (0xFFFFFFFFU >> (32 - (8)))) << (16)) | (((unsigned int)(1408 + *outp) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(1728 + *outp) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(2048 + *outp) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
     if (e->first) {
         e->first = 0;
-        e->ltgt = (e->volume * D_800B7900[e->pan]) >> 15;
+        e->ltgt = (e->volume * eqpower[e->pan]) >> 15;
         e->lratm = _getRate((f64)e->cvolL, (f64)e->ltgt, e->segEnd, &(e->lratl));
-        e->rtgt = (e->volume * D_800B7900[128 - e->pan - 1]) >> 15;
+        e->rtgt = (e->volume * eqpower[128 - e->pan - 1]) >> 15;
         e->rratm = _getRate((f64)e->cvolR, (f64)e->rtgt, e->segEnd, &(e->rratl));
         { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0x02 | 0x04) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(e->cvolL) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };
         { Acmd *_a = (Acmd *)(ptr++); _a->words.w0 = (((unsigned int)(9) & (0xFFFFFFFFU >> (32 - (8)))) << (24)) | (((unsigned int)(0x00 | 0x04) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(e->cvolR) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); _a->words.w1 = (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (16)) | (((unsigned int)(0) & (0xFFFFFFFFU >> (32 - (16)))) << (0)); };

@@ -1,0 +1,339 @@
+// Data names, part g5: D_800C1600-D_8011002B (343 symbols referenced from src/include).
+// Not applied yet (tools/apply_names.py names functions only this round).
+// Symbols that point INSIDE a struct object are named gObject_<field> (the struct's exact
+// field name; nested: gObject_<field>_<subfield>) so a later pass can turn them into
+// gObject.<field>. Fields the struct only calls unk_* are left unnamed (listed at the end).
+
+// ---- VM module 1 data: bosses (0x800C18F0-0x800C1AFF) ----
+gPrimagenPaths = 0x800C18F0; // CVector3 *[][] boss paths ended by a point with y < 0, read by Primagen_EnterMode19/UpdateMode19; also the first word of module 1's data (IsDataPointer's range starts here)
+sMotherBossFadeTimer = 0x800C1900; // f32, zeroed by MotherBoss_StartPhase2Cinema, advanced by MotherBoss_PartEffects (the file's "fade timer")
+sMotherBossCinemaStarted = 0x800C1904; // s32 flag, 0 then 1 in MotherBoss_StartPhase2Cinema, tested by MotherBoss_PartEffects
+gBlindOneBossModeTable = 0x800C1910; // CAIModeInfo rows installed as m_pModeTable by BlindOne_BossInit
+gBlindOneMinionModeTable = 0x800C1A90; // CAIModeInfo rows installed by BlindOne_ActorInit and BlindOne_Group1Init..Group3Init
+
+// ---- Cinema (0x800C1BB0) ----
+gCinemaPlayerP = 0x800C1BB0; // Cinema * (structs/cinema.h): Turok 3's gCinemaPlayerP (cinema.h, "the cinema player"), used by every Cinema_* function (460 uses)
+gCinemaEnabled = 0x800C1BB8; // s32: Cinema_Enable/Cinema_Disable write it, Cinema_IsEnabled returns it
+
+// ---- Menus (0x800C1BD0-0x800C1FFF, module-1 menu code) ----
+gMenuCurrentFont = 0x800C1BD0; // s32, the font/draw mode last selected (-1 resets): NameEntryMenu_DrawName, EnterCheatMenu_DrawTextField, InventoryMenu_DrawItem, MenuItem_FormatBinding
+gMenuTextStyles = 0x800C1BD4; // MenuTextStyle[9] (structs/menu.h), picked by MenuItem_GetTextStyle / MenuItem_FormatBinding
+gCharacterSelectSounds = 0x800C1E78; // CharacterSound[] by deathmatch character: CharacterMenu_SelectCharacter plays .sound
+gMpPlayerSpeed = 0x800C1EA8; // s32 0..15, the multiplayer player-speed option: MpMenu_StepPlayerSpeed, MpMenu_PlayerSpeedLabel (prints value - 5)
+sSoundMenuSavedTrack = 0x800C1F70; // s32, Music_GetTrack() saved when the sound options open (Pause/TitleMenu_SoundOptions), restored by SoundMenu_GoBack
+sSoundMenuActive = 0x800C1F74; // s32 flag: 1 while the sound options menu is open (set by *_SoundOptions, cleared by SoundMenu_GoBack)
+sSoundMenuTrack = 0x800C1F78; // s32, the music track the sound menu plays: SoundMenu_StepMusicTrack, SoundMenu_MusicTrackLabel
+gCheatEntry = 0x800C1F80; // TextEntry {cursor, timer...} of the enter-cheat screen: EnterCheatMenu_InsertLetter/Backspace/DrawTextField/UpdateTextField
+gCheatEntryText = 0x800C1F8C; // u8[0x64], the typed cheat code (EnterCheatMenu_Enter clears it, EnterCheatMenu_MatchesCode compares it XOR-ed with the index)
+gNameEntries = 0x800C1FB0; // NameEntry[4] (structs/menu.h), one per player: NameEntryMenu_Init/AddChar/DeleteChar/Confirm/DrawName
+
+// ---- Controller pak menus and save buffers (0x800C2010-0x800C202F) ----
+gSaveBufferHandle = 0x800C2010; // the CCache handle of gSaveBuffer: SaveGame_Build allocates it, Pak_FreeSaveBuffers frees it
+gLoadBufferHandle = 0x800C2014; // the CCache handle of gLoadBuffer: PakMenu_SelectNote allocates it, Pak_FreeSaveBuffers frees it
+gSaveBuffer = 0x800C2018; // SaveGame * (structs/save.h) being built for writing: SaveGame_Build, PakMenu_WriteSaveGame/WriteProfile
+gLoadBuffer = 0x800C201C; // SaveGame * read from a note: PakMenu_SelectNote reads into it, SaveGame_Restore and GameNoteMenu_Update* show it
+gDamagedPakContinued = 0x800C2020; // s32: 1 when the player picked Continue on the damaged-pak dialog (DamagedPakMenu_SelectContinue); PakMenu_Init* then skip the pak; cleared when a pak is watched again
+gPakMenuMode = 0x800C2024; // s32, which notes the pak menu lists: 1 game saves, 2 load (PakMenu_InitLoadGame), 0...; switched on by PakMenu_UpdateNoteRows
+gPakMenuPort = 0x800C2028; // s32, the controller port the pak menus work on (71 functions: PakMenu_*, DamagedPakMenu_*, PakConfirmMenu_*)
+sPakMenuStartLatched = 0x800C202C; // s32: START seen once (PakMenu_PollStartPressed; set by PakMenu_InitSaveGameAnyPak)
+
+// ---- Video modes and screen (0x800C2030-0x800C21FF) ----
+gScreenWidth = 0x800C2030; // s32: Turok 3's gScreenWidth ("screen_width"); set from gVideoModes by Video_UpdateResolution, read by the camera, HUD and fill code (188 uses)
+gScreenHeight = 0x800C2034; // s32: Turok 3's gScreenHeight ("screen_height")
+gResolution = 0x800C2038; // s32, the resolution set (1 with the expansion pak), index in gVideoModes: Video_SetResolution/NextResolution/GetResolutionText
+gAppliedResolution = 0x800C203C; // s32, the resolution last applied: Video_UpdateResolution copies gResolution into it once gVideoClearFrames runs out
+gVideoClearFrames = 0x800C2040; // s32, frames left to clear the screen around a mode change (Video_UpdateResolution sets 0x14, CEngineApp__Draw)
+gVideoModeCounts = 0x800C204C; // s32[2], resolutions per TV region: Video_NextResolution wraps gResolution with it
+gVideoModes = 0x800C2054; // VideoMode[2][5] (structs/frame.h): NTSC then PAL/MPAL modes, Video_ApplyResolution, Video_NextResolution
+gVideoModesPAL = 0x800C20E0; // VideoMode[5] = gVideoModes[1]: frame.h says some files use it as a symbol of its own (Video_ApplyResolution)
+gVideoModeFlags = 0x800C216C; // VideoFlags[] by resolution: Video_ApplyResolution passes them to the VI setup
+
+// ---- Frame buffers and display lists (0x800C2210) ----
+gTotalFramebuffers = 0x800C2210; // u32 (3): Turok 3's gTotalFramebuffers ("total_frame_buffers"); CEngineApp__Construct/AdvanceFrameData, GfxPool_Alloc, __scHandleRetrace
+gDisplayListSize = 0x800C2214; // u32 (0x53E8 commands): the display list length the draw code checks (Render_DrawModel, Hud_DrawSprite) and GfxPool_Alloc allocates
+gLineListSize = 0x800C2218; // u32 (0x800 commands): the line list length, GfxPool_Alloc
+
+// ---- Controller pak driver (0x800C2220-0x800C22FF) ----
+gPakDirectoryAllocated = 0x800C2220; // s32: Pak_AllocDirectory sets, Pak_FreeDirectory clears, Pak_IsDirectoryAllocated returns
+gPakDirectories = 0x800C2224; // the cached directory per port (structs/pak.h; n8): Pak_FindNote, Pak_DeleteNote, Pak_GetFreePages, Pak_RefreshNotes
+gPakStateBuffer = 0x800C2228; // the 0x810-byte "Mempak pakstate" block Pak_AllocDirectory allocates, Pak_FreeDirectory frees
+gPakCharTable = 0x800C222C; // u8[], the N64 controller pak character set: Pak_EncodeText/Pak_DecodeText translate through it
+
+// ---- Boot: stacks, RSP yield buffer (0x800C4000-0x800D1CBF) ----
+gGfxYieldBuffer = 0x800C4000; // the RSP yield buffer: CEngineApp__SubmitGfxTask sets t->list.yield_data_ptr; also the start of the block func_0028D380 clears up to D_8014A000
+gThreadStackAudio = 0x800C5400; // u8[0x2800], the audio thread's stack: Turok 3's gThreadStackAudio ("audio_stack"); amCreateAudioMgr, Crash_ShowScreen
+gThreadStackIdle = 0x800C7C00; // u8[0x80], the idle thread's stack: Turok 3's gThreadStackIdle ("idle_thread_stack"); CEngineApp__Boot
+gThreadStackMain = 0x800C7C80; // u8[0x8000], the main thread's stack: Turok 3's gThreadStackMain ("main_thread_stack"); CEngineApp__Idle
+gSchedulerStack = 0x800CFC80; // u8[0x2000], the scheduler's stack: Turok 3's gSchedulerStack ("schedule_stack"); CEngineApp__Construct (osCreateScheduler), CEngineApp__Idle
+
+// ---- System resources: heap, loader, decompressor (0x800D1CC0-0x800D7BDF) ----
+gHeap = 0x800D1CC0; // CHeap: Turok 3's gHeap ("sysrc_heap"); CHeap__Construct in InitializeSystemResources, CHeap__Alloc/Free by the cache and CHashTable__Construct
+gHeap_usedHead = 0x800D1CD0; // gHeap + 0x10: Turok 3's CHeap.usedHead ("pUsedHead"); CCache__DrawDebug walks it
+gLoader = 0x800D1CD8; // CLoader: Turok 3's gLoader ("sysrc_loader"); CLoader__Construct in InitializeSystemResources, CLoader__LoadSync/LoadAsync (CCache__Request, CScene__LoadBitSections, VM_*)
+gDecompressor = 0x800D6D68; // CDecompressor: Turok 3's gDecompressor ("sysrc_decompressor"); CDecompressor__Construct/DecompressSync/Flush (CCache__Main, CCache__RequestDecompression)
+
+// ---- Hash table and the resource cache (0x800D81C0-0x800D8DFF) ----
+// The cache has Turok 3's CCache layout (cache.h), with one more CList (the locked
+// entries) after memAgeList, so everything from dlistValid on sits 0x14 later.
+gHashMask = 0x800D81C0; // u32: Turok 3's gHashMask (hash.c: (size*2 - 1) & ~1, here size*2 - 2); the bucket mask of every lookup (CCache__Request, CHashTable__Insert)
+gHashTable = 0x800D81C4; // HashEntry *: Turok 3's gHashTable, allocated by CHashTable__Construct
+gHashTableMask = 0x800D81C8; // u32: Turok 3's gHashTableMask (size*2 - 1), CHashTable__Insert's probe wrap
+gCache = 0x800D81D0; // CCache: Turok 3's gCache (cache.c); n1. Its first field memEntries; the later fields are separate symbols below
+gCache_memEntriesFree = 0x800D81D4; // CMemEntry **: Turok 3's CCache.memEntriesFree ("FreeEntries"); CCache__AllocMemEntry/FreeMemEntry/PopFreeMemEntry
+gCache_currentCompressPos = 0x800D81D8; // CMemEntry *: Turok 3's CCache.currentCompressPos ("pCurrentCompressPos"); CCache__Compact, CCache__FreeMemEntry
+gCache_memAgeList = 0x800D81E0; // CList: Turok 3's CCache.memAgeList ("MemAgeList"), resident entries by age; CCache__Touch, CCache__FreeOldestMemEntry
+gCache_memAgeList_m_pTail = 0x800D81E4; // memAgeList.m_pTail: CCache__FreeOldestMemEntry walks from the oldest
+gCache_memAgeList_m_nCount = 0x800D81F0; // memAgeList.m_nCount: CCache__GetMemEntryCount
+gCache_memLockedList = 0x800D81F4; // CList of the locked entries sorted by address (links at CMemEntry 0x20/0x24; Turok 2 only, structs/cache.h): CCache__AddToAddressList, CCache__Compact
+gCache_dlistValid = 0x800D8208; // s32[2]: Turok 3's CCache.dlistValid ("DListValid"); CCache__ClearCurrentDisplayList, CCache__WaitForDisplayLists
+gCache_dlistBlocking = 0x800D8210; // s32[2]: Turok 3's CCache.dlistBlocking ("DListBlocking"); CCache__ReleaseDisplayList, CCache__WaitForDisplayLists
+gCache_currentDlist = 0x800D8218; // s32: Turok 3's CCache.currentDlist ("CurrentDisplayList")
+gCache_queue = 0x800D8450; // OSMesgQueue: Turok 3's CCache.queue ("Queue"), the cache thread's requests; CCache__Request, CCache__PostDisplayListDone
+gCache_cacheFreeList = 0x800D8D68; // CList: Turok 3's CCache.cacheFreeList ("CacheFreeList"); CCache__AllocCacheEntry, CCache__TakeFreeCacheEntry
+gCache_cacheFreeList_m_nCount = 0x800D8D78; // cacheFreeList.m_nCount: CCache__GetFreeCacheEntryCount
+gCache_cacheUsedList = 0x800D8D7C; // CList: Turok 3's CCache.cacheUsedList ("CacheUsedList"); CCache__AllocCacheEntry/DetachCacheEntry/FreeCacheEntry
+gCache_cachePendingList = 0x800D8D90; // CList: Turok 3's CCache.cachePendingList ("CachePendingList"); CCache__CompleteRequest
+gCache_dlistCount = 0x800D8DA4; // s32[2]: Turok 3's CCache.dlistCount ("MemDListCount"); CCache__ReleaseDisplayList, CCache__ClearDisplayListLocks
+gCache_freeEntryCount = 0x800D8DAC; // s32: Turok 3's CCache.freeEntryCount ("nFreeEntries"); CCache__GetFreeMemEntryCount, the free stack's top in CCache__AllocMemEntry
+gCache_mutex = 0x800D8DB0; // CMutex: Turok 3's CCache.mutex ("Mutex"), the cache lock (osRecvMesg/osSendMesg in CCache__Allocate, Lock, Touch...)
+gCache_mutex_count = 0x800D8DCC; // CMutex.count ("Count"), the lock depth taken with gCache_mutex (110 uses)
+gCache_blocker = 0x800D8DD0; // CBlocker: Turok 3's CCache.blocker ("Blocker"); CCache__ReleaseDisplayList, CCache__WaitForDisplayLists
+gCache_frameDelay = 0x800D8DEC; // s32: CCache__SetFrameDelay/GetFrameDelay, counted down by CCache__Advance (Turok 3 has bSynchronous in this slot)
+gCache_ageCount = 0x800D8DF0; // u32: Turok 3's CCache.ageCount ("AgeCount"), the frame stamp CMemEntry.age is compared with (CCache__Touch, CCache__FindOldestMemEntry)
+
+// ---- Texture and model batching statics (0x800D8E00-0x800DD783) ----
+sTexLastFrame = 0x800D8E00; // s32, the texture frame Texture_Load last set up (skips the reload when unchanged)
+sTexLastPalette = 0x800D8E04; // s32, the secondary palette Texture_Load last used
+sTexLastWrapS = 0x800D8E08; // s32, Texture_Load's last S wrap mode
+sTexLastWrapT = 0x800D8E0C; // s32, Texture_Load's last T wrap mode
+sBatchPass = 0x800D8E10; // s32, the pass of the model being batched (Render_QueueModelByKey/QueueModelInstance)
+sBatchLod = 0x800D8E14; // s32, the level of detail being batched (Render_FlushModelBatch reads its parts)
+sOpaqueSortRoot = 0x800D8E18; // SortNode *, root of the opaque material sort tree (Render_FlushModelBatch; reset by Render_ResetBatches)
+sOpaqueSortFirst = 0x800D8E1C; // SortNode *, first node of the opaque tree in key order (Render_DrawBatches starts there)
+sDrawItemCount = 0x800D8E20; // s32, used entries of sDrawItems (max 500)
+gDList = 0x800D8E24; // Gfx *, the display list write position: Turok 3's gDList ("pDList"); gfx.h, 682 uses
+sBatchResource = 0x800D8E28; // the model resource being batched (Render_QueueModel*, Render_FlushModelBatch)
+sSortNodeCount = 0x800D8E2C; // s32, used entries of sSortNodes (max 100)
+sTranslucentSortRoot = 0x800D8E30; // SortNode *, root of the translucent (material flags 0x700) sort tree
+sBatchInstanceCount = 0x800D8E34; // s32, instances queued in sBatchInstances (flush at 0x20)
+sTranslucentSortFirst = 0x800D8E38; // SortNode *, first node of the translucent tree in key order
+sDrawItems = 0x800D8E40; // DrawItem[500], Render_FlushModelBatch's draw items
+sSortNodes = 0x800DC4F0; // SortNode[100], Render_FlushModelBatch's sort nodes
+sBatchResourceCount = 0x800DD170; // s32, entries of sBatchResources (max 0x100)
+sBatchResources = 0x800DD178; // void **[0x100], the resources locked for the frame (Render_FlushBatches releases them)
+sBatchInstances = 0x800DD578; // CModelInstance[32] queued for the batched model (structs/model.h)
+
+// ---- Random numbers, quaternions, lighting (0x800DD784-0x800E678F) ----
+gRandomValue = 0x800DD784; // u32 LCG seed A: Turok 3's gRandomValue (graphu64.c RandomSwapWord); Random_Next, Random_Float, Random_Seed
+gRandomValueB = 0x800DD788; // u32 LCG seed B: Random_NextB (re-seeded from the frame count in demos), Random_Seed
+gQuaternionSin = 0x800DD78C; // f32 written by the inlined axis-angle quaternion builder (sin of the half angle) in 21 functions (CQuaternion__FromDirection, Turret_CalcOrientation...)
+sLitVertexOffsets = 0x800DD790; // CVector3[], Lighting_BuildLitVertices' per-vertex offsets (Model_ApplyPackedOffsets)
+
+// ---- Animation decoding and bone posing statics (0x800E6790-0x800E68AF) ----
+sAnimRemapMin = 0x800E679C; // f32, Math_Remap's low bound in Anim_DecodeQuantizedChannel / AnimCurve_Init
+sAnimRemapMax = 0x800E67A0; // f32, Math_Remap's high bound
+sAnimTrackCount = 0x800E67A4; // s32, the tracks Anim_Decompress found (Anim_DecodeTracks)
+sAnimFrameCount = 0x800E67A8; // s32, the frames of the decoded animation (Anim_DecodeTracks, Anim_Decompress)
+sPoseChildren = 0x800E67B0; // BoneList *, CGameObjectInstance__PoseBone's children (file statics D_800E67B0-D_800E6878)
+sPoseMtx = 0x800E67C0; // f32[4][4], the bone matrix PoseBone builds
+sPosePos = 0x800E6800; // CVector3, the blended bone position
+sPosePosA = 0x800E6810; // CVector3, the position from the main keys
+sPosePosB = 0x800E6820; // CVector3, the position from the blend keys
+sPoseRot = 0x800E6830; // CQuaternion, the blended rotation
+sPoseRotA = 0x800E6840; // CQuaternion, the rotation from the main keys
+sPoseRotB = 0x800E6850; // CQuaternion, the rotation from the blend keys
+sPoseBoneType = 0x800E6860; // s32, *obj->def, switched on by PoseBone
+sPoseBoneData = 0x800E6864; // u8 *, the bone's data
+sPoseFlags = 0x800E6868; // u8, the bone's flags (& 0xC7 == 0xC3 / 0xC7)
+sPoseRegion = 0x800E686C; // CGameRegion *, the object's region when it has a ceiling
+sPoseCeilingHeight = 0x800E6870; // f32, CGameRegion__GetCeilingHeight there
+sPoseCollisionHeight = 0x800E6874; // f32, GameObject_GetCollisionHeight
+sPoseCeilingOverlap = 0x800E6878; // f32, how far the head goes through the ceiling (pushed down)
+sBoneMatrixProfile = 0x800E6880; // Profile, CGameObjectInstance__BuildBoneMatrices' timer
+sBoneMatrixCount = 0x800E6898; // s32[], incremented by CGameObjectInstance__BuildBoneMatrices
+
+// ---- Level data buffers, loop sounds (0x800E68B0-0x800F12BF) ----
+gLoopSoundEntries = 0x800E68B0; // the 15 entries of gLoopSounds (LoopSounds_Construct(gLoopSounds, this, 0xF) in CScene__LoadLevel)
+gLoopSounds = 0x800E6A90; // looping sounds (n5): LoopSounds_Get returns it
+gGamePersistentData = 0x800E6AC0; // u8[0x5000]: the scene's m_pBitSections2 (CScene__Construct, CScene__LoadBitSections2); Turok 3's gGamePersistentData ("game_persistent_data") by its role (not saved)
+gLoadSavePersistentData = 0x800EBAC0; // u8[0x5800]: the per-level bits m_pBitSections, copied into and out of the save game (SaveGame_Build/Restore); Turok 3's gLoadSavePersistentData ("load_save_persistent_data") by its role
+
+// ---- Level actors, dynamic lights, particles (0x800F12C0-0x800F19DF) ----
+gLevelActorIntelligenceMP = 0x800F12C0; // CIntelligence (m_Type 8) the level actor pool gives its actors in multiplayer (CLevelActorPool__Spawn; built by SceneActorPool_Construct)
+gLevelActorIntelligence = 0x800F1360; // CIntelligence of level actors in single player (CLevelActorPool__Spawn, CLevelActor__Construct, CPooledLevelActor__Update)
+gDLightBuffer = 0x800F1400; // UnitLight[] filled by DLights_Load, two halves swapped each frame
+gDLightBufferIndex = 0x800F1800; // s32, the half of gDLightBuffer in use (DLights_SwapBuffers adds 8)
+sParticleParentMtx = 0x800F1810; // CMtxF, CParticle__GetParentTransform's result
+gParticleIntelligence = 0x800F1850; // CIntelligence every particle gets (CParticleSystem__Construct)
+sParticleRotXMtx = 0x800F18F0; // CMtxF, the 90-degree X rotation CParticleSystem__Construct builds and CParticle__GetParentTransform applies
+gParticleSpriteVtx = 0x800F1930; // the sprite's four vertices (CParticleSystem__Construct fills, CParticle__BuildMatrix loads them)
+sBlastShieldFrame = 0x800F1970; // HitFrame, the shield CGameObjectInstance__GetNearestBox finds for Blast_GetReach / ImpactEvent_ApplyBlast
+
+// ---- Path search statics (Path_ExpandNode, 0x800F19E0-0x800F1A4B) ----
+sPathNeighbour = 0x800F19E0; // CGameRegion *, the neighbour being tried
+sPathCandidates = 0x800F19F0; // Candidate[3], the neighbours found
+sPathSorted = 0x800F1A10; // Candidate *[3], sPathCandidates sorted by distance
+sPathSwap = 0x800F1A1C; // Candidate *, the sort's swap temporary
+sPathCandidateCount = 0x800F1A20; // s32
+sPathEdge = 0x800F1A24; // s32, the edge of the current region being tried
+sPathDepth = 0x800F1A28; // s32, the node's count (parent + 1)
+sPathBackEdge = 0x800F1A2C; // s32, the neighbour's edge back to the region
+sPathCentre = 0x800F1A30; // CVector3, the neighbour's centroid / offset
+sPathCost = 0x800F1A3C; // f32, the node's cost
+sPathFound = 0x800F1A40; // s32 flag
+sPathCrossed = 0x800F1A44; // s32, Sweep_CrossRegionEdge's result
+sPathSearch = 0x800F1A48; // PathSearch *, the search kept on Path_FindRegionPath's stack
+
+// ---- Collision (0x800F1AB0-0x800F1FFF) ----
+sMapSweep = 0x800F1AB0; // MapSweep * Collision_SweepMapWalls points at its stack copy while Collision_SweepRegionWalls walks (collision.h)
+gCollisionResultsP = 0x800F1ADC; // CCollisionResults *: Turok 3's gCollisionResultsP ("p_collision_results"); n3
+gCollisionInfoSight = 0x800F1AE0; // CCollisionInfo of the eye-line probes (AI_IsEyeLineBlocked, GameObject_CanSee); Collision_MoveInstance treats it as a probe
+gCollisionInfoTestMove = 0x800F1B00; // CCollisionInfo GameObject_TestMove uses for an actor that can leave water
+gCollisionInfoLineOfSight = 0x800F1B40; // CCollisionInfo of line-of-sight probes (AI_IsLineOfSightBlocked, AI_FindBestTarget, CCamera__CanSeeTarget, Actor_ProbeMove)
+gCollisionInfoTestMoveWater = 0x800F1B80; // CCollisionInfo GameObject_TestMove uses for an actor that cannot leave water
+gCollisionResults = 0x800F1CE0; // CCollisionResults: Turok 3's gCollisionResults ("collision_results"); n3, 187 uses
+gCollisionResults_m_Frame = 0x800F1CF8; // + 0x18 (collision.h: the copy of the hit node's HitFrame)
+gCollisionResults_m_Frame_flags = 0x800F1D5D; // + 0x7D = m_Frame.flags (CParticle__HitTarget: & 3 == 1)
+gCollisionResults_m_pWallRegion = 0x800F1D7C; // + 0x9C (CParticle__HitWall)
+gCollisionResults_m_vWallPos = 0x800F1D80; // + 0xA0
+gCollisionResults_m_nWallEdge = 0x800F1D8C; // + 0xAC
+gCollisionResults_m_nFloorKind = 0x800F1D90; // + 0xB0 (CBarrel__OpenWheel)
+gCollisionResults_m_pFloorRegion = 0x800F1D94; // + 0xB4 (CParticle__HitFloor/HitCeiling)
+gCollisionResults_m_vFloorPos = 0x800F1D98; // + 0xB8
+gCollisionResults_m_pWaterRegion = 0x800F1DA4; // + 0xC4 (CParticle__HitWater)
+gCollisionResults_m_vWaterPos = 0x800F1DA8; // + 0xC8
+gCollisionResults_m_nWaterKind = 0x800F1DB4; // + 0xD4
+gCollisionResults_m_vVelocity = 0x800F1DB8; // + 0xD8, the mover's velocity (CParticle__Hit*, CParticle__SpawnAt*Hit)
+gThrowableCollisionInfo_m_InstanceBehavior = 0x800F1F94; // CCollisionInfo at 0x800F1F90 + 4: the Throwable_* updates set 0 / 2
+gThrowableCollisionInfo_m_GravityAcceleration = 0x800F1F98; // + 8, the gravity Throwable_FlyingEnter divides by
+
+// ---- Player cinemas (0x800F1FD0-0x800F1FEF) ----
+sDeathCinemaPlayer = 0x800F1FD0; // CPlayer *, set by CPlayer__StartDeathCinema, read by PlayerDeath_CinemaDone
+sCinema50Player = 0x800F1FD8; // CPlayer *, set by PlayerCinema50_Enter, read by PlayerCinema50_Done
+gDeathTintColor = 0x800F1FE4; // u8[4], the camera fog colour CPlayer__StartDeathCinema keeps for CCamera__DrawTints
+
+// ---- Region geometry statics (CGameRegion__*, 0x800F2000-0x800F203B) ----
+sRegionCeilingNormal = 0x800F2000; // CVector3, CGameRegion__GetCeilingNormalRaw/GetCeilingHeight/IntersectSegmentCeiling
+sRegionCeilingUnitNormal = 0x800F2010; // CVector3, CGameRegion__GetCeilingNormal
+sRegionNormal = 0x800F2020; // CVector3 (edge cross product), CGameRegion__GetNormalRaw/GetHeight/IsSteep...
+sRegionNormal_y = 0x800F2024; // sRegionNormal.y (CGameRegion__GetTiltRotation, IsSteep)
+sRegionNormal_z = 0x800F2028; // sRegionNormal.z
+sRegionUnitNormal = 0x800F2030; // CVector3, the normalized sRegionNormal (CGameRegion__GetNormal)
+sRegionUnitNormal_y = 0x800F2034; // .y
+sRegionUnitNormal_z = 0x800F2038; // .z
+
+// ---- Audio manager (the SDK audiomgr.c pattern: amCreateAudioMgr, __amMain, __amDMA; 0x800F2040-0x800F28FF) ----
+gAudioRomBase = 0x800F2040; // s32, the ROM address of the audio data (0x20F194): CAudioWorld__Initialize sets it, __amDMA adds it
+gAudioFrameMsgBuf = 0x800F2048; // OSMesg[10], SDK __am.audioFrameMsgBuf (gAudioFrameMsgQ's buffer)
+gAudioReplyMsgBuf = 0x800F2070; // OSMesg[10], SDK __am.audioReplyMsgBuf
+gAudioThread = 0x800F2098; // OSThread, SDK __am.thread (amCreateAudioMgr starts __amMain on gThreadStackAudio)
+gAudioDmaBuffers = 0x800F22C8; // AMDMABuffer[0x3C] of 0x300 bytes, SDK dmaBuffs (amCreateAudioMgr links them)
+gAudioDmaMessageQ = 0x800F2778; // OSMesgQueue, SDK audDMAMessageQ (__amDMA, __clearAudioDMA)
+gAudioDmaState = 0x800F2790; // AMDMAState {initialized, firstUsed, firstFree}, SDK dmaState (__amDmaNew)
+gAudioDmaState_firstUsed = 0x800F2794; // dmaState.firstUsed (__amDMA, __clearAudioDMA)
+gAudioDmaState_firstFree = 0x800F2798; // dmaState.firstFree (__amDMA)
+gAudioDmaCache = 0x800F279C; // the DMA cache list AudioDMA_CacheBlock searches (Turok's addition; n4)
+gAudioFrameMsgQ = 0x800F27A0; // OSMesgQueue, SDK __am.audioFrameMsgQ: retrace messages from the scheduler (osScAddClient), __amMain waits on it
+gAudioCmdLists = 0x800F27C0; // Acmd *[2], SDK __am.ACMDList (__amHandleFrameMsg passes one to alAudioFrame)
+gAudioInfo = 0x800F27C8; // AMAudioInfo *[3], SDK __am.audioInfo (one per output buffer)
+gAudioGlobals = 0x800F27D4; // ALGlobals, SDK __am.g (alInit/alClose)
+gAudioReplyMsgQ = 0x800F2820; // OSMesgQueue, SDK __am.audioReplyMsgQ (done messages of the audio tasks)
+gAudioFrameSize = 0x800F2838; // s32, SDK frameSize: samples per frame rounded up to 16
+gAudioMaxRSPCmds = 0x800F283C; // s32, SDK maxRSPCmds (= ALSynConfig maxACMDSize)
+gAudioHeap = 0x800F2840; // ALHeap *, the heap the audio manager allocates DMA cache entries from (AudioDMA_CacheBlock)
+gAudioDmaMessageBuf = 0x800F2848; // OSMesg[0x3C], SDK audDMAMessageBuf
+
+// ---- Sound (0x800F2940-0x800F55FF) ----
+gSndVolumeCurve = 0x800F2940; // s16[], built by SndVoicePool_Construct, read by SndVoice_InitVolume
+gAudioWorld = 0x800F2A00; // CAudioWorld (our SndMgr, structs/sound.h): Turok 3's audioworld.c object (n5)
+gAudioWorld_track = 0x800F2B34; // SndMgr.track (+0x134): Sound__SetAmbientTrack
+
+// ---- HUD text, demo player (0x800F5600-0x800F59FF) ----
+gLoadedFont = 0x800F56A8; // s32, which font texture COnScreen has loaded (COnScreen__Select*Font, COnScreen__DrawText)
+gDemoPlayer = 0x800F56B0; // DemoPlayer (structs/demo.h): the attract-mode demo player (n5, n8)
+gDemoPlayer_fastForward = 0x800F56BC; // DemoPlayer.fastForward (+0x0C): Demo_AdvanceMatchStream
+gDemoPlayer_match = 0x800F5844; // DemoPlayer.match (+0x194), the ROM reaches it by its own symbol (demo.h)
+gDemoPlayer_match_decode = 0x800F5858; // DemoPlayer.match.decode (+0x1A8): Demo_AdvanceMatchStream calls it
+
+// ---- Camera view boxes (0x800F5A10-0x800F5A4F) ----
+gCameraVisibleBox = 0x800F5A10; // CBox of what the active cameras can see, widened for animation (collision.h): CLevelActorPool__CollectVisible, CScene__CollectSectorObjects
+gCameraViewBox = 0x800F5A28; // CBox, the cameras' plain view boxes (CCameraPool__Advance)
+gCameraVisBits = 0x800F5A40; // the visibility bits of the active views (CCameraPool__Advance, CScene__BuildGeometryDisplayList)
+gScreenClearTime = 0x800F5A44; // f32, seconds the screen is cleared for while the view moves (CCamera__MoveViewport, CCameraPool__Draw)
+
+// ---- Rumble and controllers (0x800F5A50-0x800F67FF) ----
+gRumblePool = 0x800F5A50; // the rumble pool: RumblePool_Init/FreeAll/FreeFinished (Cont_InitAll, Controller_UpdateRumble, ImpactEvent_Rumble, PauseMenu_*)
+gRumbleEntries = 0x800F5A80; // the 8 entries of gRumblePool (RumblePool_Init(gRumblePool, this, 8))
+gContPadData = 0x800F5C60; // OSContPad[4] osContGetReadData fills (Controller_ReadAll)
+gMergedController = 0x800F5C78; // ControllerProfile (structs/controller.h): the fifth one, the four merged (menus that take any pad)
+gMergedController_buttons = 0x800F5D28; // .buttons (+0xB0): EngineMode08_MainMenu_Retrace
+gMergedController_buttonsSingle = 0x800F5D2C; // .buttonsSingle (+0xB4): CEngineApp__TimedModeSwitch, the ending modes, Demo_Update
+gPakMesgBuf = 0x800F5E9C; // OSMesg[1] of gPakAccessQueue (Cont_InitAll)
+gPakWatched = 0x800F5EA0; // u8[4]: Controller_WatchPak/UnwatchPak/IsPakWatched/AnyPakWatched
+gPakInserted = 0x800F5EA8; // s32[4]: set by Controller_UpdatePakInsertion when a watched port has a pak
+gFirstControllerPort = 0x800F5EB8; // s16, the lowest port with a controller (-1 none; Cont_InitAll)
+gControllers = 0x800F5EC0; // ControllerProfile[4] (structs/controller.h; Rage Wars' ControllerProfile D_8010F328[]): one per port
+gControllers_buttons = 0x800F5F70; // gControllers[0].buttons (+0xB0): the demo player writes the ports' buttons through it (Demo_UpdateStreams)
+gControllers_rumbleOn = 0x800F5F8C; // gControllers[0].rumbleOn (+0xCC): PauseMenu_Close_2
+gPakQueueState = 0x800F6750; // s8, the pak rescan request / queue state (Pak_* and Controller_*: 61 uses)
+gPakAccessQueue = 0x800F6758; // OSMesgQueue, the pak access lock (Controller_Lock/Unlock, Controller_Service)
+gSiMesgBuf = 0x800F6770; // OSMesg, the buffer of gSiMessageQueue
+gContStatus = 0x800F6778; // OSContStatus[4] (osContInit, Pak_Mount, Controller_ReadAll)
+gPakChanged = 0x800F6788; // s32[4]: Controller_PakChanged/TakePakChanged; set by Controller_UpdatePakInsertion
+gSiMessageQueue = 0x800F6798; // OSMesgQueue of the serial interface events (osContInit, osContStartQuery, osMotorInit)
+gPakRemoved = 0x800F67B0; // s32[4]: a pak went out of a watched port; the next insertion sets gPakChanged (Controller_UpdatePakInsertion)
+sExpansionPakMtx = 0x800F67C0; // f32[][16], per-frame model matrices of EngineMode03_ExpansionPak_Draw
+
+// ---- Threads and the engine (0x800F6840-0x800F7077) ----
+gThreadIdle = 0x800F6840; // OSThread: Turok 3's gThreadIdle ("idleThread"); created by CEngineApp__Boot
+gThreadMain = 0x800F6A70; // OSThread: Turok 3's gThreadMain ("mainThread"); created by CEngineApp__Idle (mainproc)
+sCreditsLine = 0x800F6CA0; // s32, the first credits line on screen (Credits_Draw/Update; zeroed by EngineMode15/16_Ending_Init)
+gNextFrameToShow = 0x800F6CA4; // u32, index of the next frame buffer to show, wraps at gTotalFramebuffers (CEngineApp__Main, __scHandleRetrace)
+gEngineApp = 0x800F6CB0; // CEngineApp (structs/game.h, our GameSession): Turok 3's gEngineApp ("engine_app"); frame data, then the scene at +0x3C8
+gEngineApp_m_pCurrentFrameData = 0x800F7070; // CFrameData * (+0x3C0): Turok 3's m_pCurrentFrameData, the frame being built (frame.h)
+gEngineApp_m_CartridgeIndex = 0x800F7074; // +0x3C4, the ROM address of the cartridge index (CScene__FindWarpDests loads it)
+
+// ---- The scene (gEngineApp.m_Scene, CWorld in structs/world.h, 0x800F7078-0x801100EF) ----
+gScene = 0x800F7078; // CScene (our CWorld): Turok 3's CScene, gEngineApp.m_Scene; name seeded by the tooling agent (614 uses)
+gScene_m_CinemasKey = 0x800F709C; // +0x24 (Cinema_*)
+gScene_m_pCinemas = 0x800F70D8; // +0x60
+gScene_m_pBitSections = 0x800F70E4; // +0x6C (CScene__RestoreFiredEvent)
+gScene_m_Heap = 0x800F7148; // +0xD0, the matrix pool (MtxPool_Alloc in the shadow and bone code)
+gScene_m_pActors = 0x800F7158; // +0xE0, the level's actors (LevelEvent_Fire)
+gScene_m_nDrawActors = 0x800F7964; // +0x8EC (Collision_TestInstances)
+gScene_m_pRegistered = 0x800F7C70; // +0xBF8, the auto-aim candidates (Player_FindAutoAimTarget)
+gScene_m_nRegistered = 0x800F7E70; // +0xDF8
+gScene_m_Kind1Cursor = 0x800F7F78; // +0xF00 (AI_GetPathTargetInfo, AI_GetSightTargetInfo compare it with the plan's m_PathFindCount)
+gScene_m_nSectors = 0x800F8520; // +0x14A8, read with the sectors as {count, cells} by Collision_TestModels
+gScene_m_ParticleSystem = 0x800F8928; // +0x18B0, the CParticleSystem (CParticleSystem__Spawn/Free; 52 uses)
+gScene_m_ActorPool = 0x80107590; // +0x10518, the CLevelActorPool (CLevelActorPool__Spawn: pickups)
+gScene_m_InstancePool = 0x8010ABA0; // +0x13B28, CInstancePool (structs/game_object.h): CInstancePool__Spawn (n2)
+gScene_m_InstancePool_m_FreeList = 0x8010FEA0; // m_InstancePool.m_FreeList (CListedInstance__Free)
+gScene_m_InstancePool_m_ActiveList = 0x8010FEB4; // m_InstancePool.m_ActiveList: the live dynamic objects (boss and totem code walk it; 58 uses)
+gScene_m_pLevelHeader = 0x8010FEC8; // +0x18E50 (Lighting_ApplyDirectional reads the light direction from it)
+gScene_m_pSections = 0x8010FF14; // +0x18E9C; CEmitterPool__Advance reads it as the emitter definition table (emitter.h): the world.h name may be wrong
+gScene_m_nSections = 0x8010FF18; // +0x18EA0; the emitter definition count for CEmitterPool__Advance
+gScene_m_qSky = 0x8010FF20; // +0x18EA8, CQuaternion (CLevelActor__BuildMatrix/Draw)
+gScene_m_bStreamAll = 0x8011001C; // +0x18FA4 (40 uses: CInstancePool__Alloc, AI_Get*TargetInfo, CPlayer__LevelStart...)
+gScene_m_nLevel = 0x80110020; // +0x18FA8, the loaded level (LevelEvent_Fire, Cinema_Start, CPlayer__Warp)
+gScene_m_WarpFade = 0x80110024; // +0x18FAC (Cinema_RestorePlayer)
+gScene_m_WarpState = 0x80110028; // +0x18FB0, nonzero during a warp fade (CPlayer__Hurt, Controller_UpdateRumble, CParticleSystem__Update)
+
+// Not named (left for the coordinator):
+// - literal strings passed inline (allocation descriptions 0x800C1810-0x800C18E0, 0x800C1768 " ",
+//   debug mode labels 0x800C1EE0-0x800C1F58): should become literals.
+// - interior symbols of unk_* fields: D_800F70A8 (gScene+0x30 unk_30: the save size table, 62 uses),
+//   D_8010FF34 (gScene+0x18EBC unk_18EBC: the CDLightSet, n2), D_8010FED4 (+0x18E5C, a string the crash
+//   screen prints), D_8010753C (inside m_ParticleSystem), D_8010AB90/94/98 (inside m_ActorPool),
+//   D_8010C080 / D_8010F328 (inside m_InstancePool, comment-only), D_800F478C (gAudioWorld+0x1D8C =
+//   seq.unk28, n5's gMusicTrack; the coordinator named it gAudioWorld_seq_track in data_seed), D_800F55F4 (gAudioWorld+0x2BF4, in fx's pad).
+// - other interiors: D_800C1E7A (gCharacterSelectSounds+2), D_800C1CD2 (MenuColorInit[] at +2 of a
+//   table at 0x800C1CD0), D_800C203B (low byte of gResolution), D_800C21AA, D_800F1CC6 (+6 of the
+//   CCollisionInfo 0x800F1CC0), D_800F283A (low half of gAudioFrameSize), D_800F5A18 / D_800F5A34 (inside the view boxes), D_800F5C66, D_800F5EA3,
+//   D_800F677A / D_800F677B (bytes of gContStatus[0]) are not.
+// - D_800D7BE0: declared B12Mgr but only used with offsets >= 0x5F0, i.e. as gCache - 0x5F0; the
+//   accesses belong to gCache.
+// - unclear: D_800C1BC4 / D_800C1BC8 (Cinema_SplineSecondDerivs), D_800C1E54 (a menu for
+//   PlayerState17_Enter), D_800C2044, D_800C894C (stack-limit address), D_800E6790-D_800E6798,
+//   D_800F1BA0, D_800F5618, D_800F6CA8, D_800F1FF0/D_800F1FF4 (crash screen), the other
+//   CCollisionInfo globals 0x800F1B60-0x800F1F50 (D_800F1C40 / D_800F1F50 used by the Primagen).

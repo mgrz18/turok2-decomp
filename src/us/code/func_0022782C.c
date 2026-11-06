@@ -32,8 +32,8 @@ typedef struct WorldRecAt3C08 {
 
 extern float D_800A6064;
 extern f32 D_800A6068;
-extern s32 D_800AB8B0;
-extern f32 D_800AB8C0;
+extern s32 gBlendState;
+extern f32 gBlendFade;
 extern void Render_ResetBatches();
 extern void Render_FlushBatches();
 extern s32 Frustum_TestBox(void *arg0, void *arg1);
@@ -63,13 +63,13 @@ void CLevelActorPool__Draw(char *arg0, char *arg1) {
                 (camera->clipBounds[0].y < entry->maxY) &&
                 (Frustum_TestBox(camera->clipPlanes, &entry->minX) != 0)) {
                 value = entry->lifetime;
-                D_800AB8B0 = 0;
+                gBlendState = 0;
                 if ((value > zero) && (value <= upper)) {
-                    D_800AB8B0 = 1;
-                    D_800AB8C0 = value * scale;
+                    gBlendState = 1;
+                    gBlendFade = value * scale;
                 }
                 CLevelActor__Draw(entry);
-                D_800AB8B0 = 0;
+                gBlendState = 0;
             }
             entry = entry->next;
         } while (entry != 0);

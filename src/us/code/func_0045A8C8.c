@@ -22,14 +22,14 @@ struct RecordRecAt20V2 {
 };
 struct RecordRecAt20V2;
 struct PakMenuSlot;
-extern s32 D_800C2028;
+extern s32 gPakMenuPort;
 extern s32 PakMenu_GetPlayerAndPort_2(struct RecordRecAt20V2 *record, s32 *out);
-extern s32 D_80130990;
+extern s32 gPakMenuAnyPak;
 s32 PakMenu_GetPlayerAndPort_2(struct RecordRecAt20V2 *record, s32 *out) {
     s32 value;
     s32 result;
-    if (D_80130990 != 0) {
-        value = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        value = gPakMenuPort;
         result = 0;
     } else {
         value = record->inner->unk4;
@@ -38,4 +38,4 @@ s32 PakMenu_GetPlayerAndPort_2(struct RecordRecAt20V2 *record, s32 *out) {
     *out = value;
     return result;
 }
-extern s32 D_80130990;
+extern s32 gPakMenuAnyPak;

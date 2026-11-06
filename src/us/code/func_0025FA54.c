@@ -6,7 +6,7 @@ typedef struct {
 } Obj64;
 
 extern f32 D_800A7948;
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 extern void CAI__SetMode(void *, void *, s32);
 
 /* Has the shape of an AI step function, stepFunc(pThis, pAI) in LibTEngine:
@@ -15,7 +15,7 @@ void EnemyMode_ReactionBlinded_Update(void *self, Obj64 *o) {
     if (o->v > D_800A7948) {
         o->v = D_800A7948;
     }
-    o->v -= D_800B6D28;
+    o->v -= gFrameIncrement;
     if (o->v <= 0.0f) {
         CAI__SetMode(self, o, 10);
     }

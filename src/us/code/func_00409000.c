@@ -11,7 +11,7 @@
  * dies plays the stagger animation and clears its bit; when all spots of the
  * phase are gone, moves the boss to its next state. */
 
-extern u8 D_00431E54[];
+extern u8 sMotherBossHurtScript[];
 
 extern void MotherBoss_StartSpotAnims(void *obj, void *sounds, s32 flags);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
@@ -32,7 +32,7 @@ void MotherBoss_Hurt(void *obj, CAI *ai, DamageEvent *hit) {
     }
     i = 0;
     spot = -1;
-    s = &D_8012FB70;
+    s = &gMotherBoss;
     mask = s->activeMask & hit->frame->unk_6C;
     for (; i < 15; i++) {
         if (spot >= 0) {
@@ -107,7 +107,7 @@ void MotherBoss_Hurt(void *obj, CAI *ai, DamageEvent *hit) {
     damage = s->slots[target].health < hit->damage ? (s->slots + target)->health : hit->damage;
     s->slots[target].health -= damage;
     s->health -= damage;
-    MotherBoss_StartSpotAnims(obj, D_00431E54, fx);
+    MotherBoss_StartSpotAnims(obj, sMotherBossHurtScript, fx);
     if (s->slots[target].health > 0) {
         return;
     }

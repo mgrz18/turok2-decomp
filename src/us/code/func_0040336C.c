@@ -14,13 +14,13 @@ typedef struct {
     /* 0xF8 */ s32 unkF8;
 } Item0040336C;
 
-void CPlayerPool__SetInvincibility(CPlayerList *list, f32 value);
+void CPlayerPool__SetInvincibility(CPlayerPool *list, f32 value);
 s32 Cinema_IsIdle(void);
-CPlayer *CPlayerPool__GetFirstActive(CPlayerList *list);
+CPlayer *CPlayerPool__GetFirstActive(CPlayerPool *list);
 void CPlayer__Warp(CPlayer *player, s32 a1, s32 a2, s32 a3);
 
 void MantidQueen_UpdateDeath(Obj0040336C *obj, Item0040336C *item) {
-    CGame *game = &D_80119870;
+    CGame *game = &gEngineApp_m_Game;
     CPlayer *player;
 
     CPlayerPool__SetInvincibility(&game->m_PlayerList, 900.0f);

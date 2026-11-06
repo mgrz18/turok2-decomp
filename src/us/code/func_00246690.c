@@ -9,7 +9,7 @@ typedef struct SpawnObj {
     /* 0x1C0 */ s32 target;
 } SpawnObj;
 
-extern u8 D_800F8928[];
+extern u8 gScene_m_ParticleSystem[];
 
 void GameObject_TraceMove(SpawnObj *obj, CVector3 pos, CVector3 *outPos, s32 *outRegion, s32 x, s32 y);
 CQuaternion CGameObjectInstance__GetRotation(SpawnObj *obj);
@@ -51,5 +51,5 @@ void Actor_SpawnParticle(SpawnObj *obj, s32 kind, CVector3 at) {
         rot = func_002156D4(obj);
         break;
     }
-    CParticleSystem__Spawn(D_800F8928, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
+    CParticleSystem__Spawn(gScene_m_ParticleSystem, obj, obj, NULL, target, kind, vel, rot, pos, region, -1, mode);
 }

@@ -4,17 +4,17 @@
 #include "rw/abu_types.h"
 
 extern s32 __osAiDeviceBusy();
-extern u8 D_800B7A20[];
+extern u8 hdwrBugFlag[];
 extern u32 osVirtualToPhysical(void *);
 s32 osAiSetNextBuffer(void *bufPtr, u32 size) {
     char *bptr = bufPtr;
-    if (D_800B7A20[0] != 0) {
+    if (hdwrBugFlag[0] != 0) {
         bptr -= 0x2000;
     }
     if ((((u32)bufPtr + size) & 0x1FFF) == 0) {
-        D_800B7A20[0] = 1;
+        hdwrBugFlag[0] = 1;
     } else {
-        D_800B7A20[0] = 0;
+        hdwrBugFlag[0] = 0;
     }
     if (__osAiDeviceBusy() != 0) {
         return -1;

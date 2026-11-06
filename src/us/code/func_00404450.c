@@ -10,36 +10,36 @@ void Primagen_UpdateHealth(s32 a0, s32 a1) {
     s32 bit;
 
     count = 0;
-    D_8012F608.bonus = 0;
-    D_8012F608.total = 0;
+    gLevelScript.bonus = 0;
+    gLevelScript.total = 0;
     for (i = 0; i < 8; i++) {
         bit = 1 << i;
-        if (D_8012F608.partsDone & bit) {
-            D_8012F608.bonus += D_8012F608.values[1][i];
-            if (D_8012F608.values[0][i] > 0) {
-                D_8012F608.total += D_8012F608.values[0][i];
+        if (gLevelScript.partsDone & bit) {
+            gLevelScript.bonus += gLevelScript.values[1][i];
+            if (gLevelScript.values[0][i] > 0) {
+                gLevelScript.total += gLevelScript.values[0][i];
                 count++;
             }
         }
     }
-    if (D_8012F608.partActive == 0) {
-        if (D_8012F608.stage == 3) {
+    if (gLevelScript.partActive == 0) {
+        if (gLevelScript.stage == 3) {
             if (count == 0) {
                 CAI__SetMode(a0, a1, 0x1D);
             }
         } else if (count == 0) {
-            D_8012F608.stage++;
-            if (D_8012F608.stage >= 2) {
-                D_8012F608.bossMode = 3;
-                D_8012F608.bossState = 3;
-                D_8012F608.armed = 0;
-                D_8012F608.scriptOn = 0;
-                D_8012F608.dest.x = D_8012F608.home.x;
-                D_8012F608.dest.y = D_8012F608.home.y;
-                D_8012F608.dest.z = D_8012F608.home.z;
+            gLevelScript.stage++;
+            if (gLevelScript.stage >= 2) {
+                gLevelScript.bossMode = 3;
+                gLevelScript.bossState = 3;
+                gLevelScript.armed = 0;
+                gLevelScript.scriptOn = 0;
+                gLevelScript.dest.x = gLevelScript.home.x;
+                gLevelScript.dest.y = gLevelScript.home.y;
+                gLevelScript.dest.z = gLevelScript.home.z;
                 CAI__SetMode(a0, a1, 0x12);
             }
-            Primagen_SetStage(D_8012F608.stage);
+            Primagen_SetStage(gLevelScript.stage);
         }
     }
 }

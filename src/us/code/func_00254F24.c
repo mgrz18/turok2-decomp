@@ -1,6 +1,6 @@
 #include "common.h"
 
-extern f32 D_800B6D28;
+extern f32 gFrameIncrement;
 
 s32 CBarrel__ShouldClose(u8 *self, u8 *other) {
     if (*(s32 *)(self + 0x380) != 0) {
@@ -10,6 +10,6 @@ s32 CBarrel__ShouldClose(u8 *self, u8 *other) {
         *(s32 *)(self + 0x37C) = -1;
         return 1;
     }
-    *(f32 *)(self + 4) -= D_800B6D28;
+    *(f32 *)(self + 4) -= gFrameIncrement;
     return *(f32 *)(self + 4) <= 0.0f;
 }

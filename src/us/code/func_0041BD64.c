@@ -7,19 +7,19 @@ extern int Controller_MenuLeft(struct ControllerProfile *object);
 extern int Controller_MenuRight(struct ControllerProfile *object);
 s32 Controller_ConfirmPressed(char *);
 s32 OptionsMenu_CycleDifficulty(void) {
-    extern u32 D_8011AAE0[];
- if(((s32 (*)(char *))Controller_MenuLeft)((char *)&D_800F5C78)) {
- switch(D_8011AAE0[0]) {
- case 8: D_8011AAE0[0]=32; break;
- case 16: D_8011AAE0[0]=8; break;
- case 32: D_8011AAE0[0]=16; break;
+    extern u32 gEngineApp_m_Settings_difficulty[];
+ if(((s32 (*)(char *))Controller_MenuLeft)((char *)&gMergedController)) {
+ switch(gEngineApp_m_Settings_difficulty[0]) {
+ case 8: gEngineApp_m_Settings_difficulty[0]=32; break;
+ case 16: gEngineApp_m_Settings_difficulty[0]=8; break;
+ case 32: gEngineApp_m_Settings_difficulty[0]=16; break;
  }
  }
- if(((s32 (*)(char *))Controller_MenuRight)((char *)&D_800F5C78) || Controller_ConfirmPressed((char *)&D_800F5C78)) {
- switch(D_8011AAE0[0]) {
- case 8: D_8011AAE0[0]=16; break;
- case 16: D_8011AAE0[0]=32; break;
- case 32: D_8011AAE0[0]=8; break;
+ if(((s32 (*)(char *))Controller_MenuRight)((char *)&gMergedController) || Controller_ConfirmPressed((char *)&gMergedController)) {
+ switch(gEngineApp_m_Settings_difficulty[0]) {
+ case 8: gEngineApp_m_Settings_difficulty[0]=16; break;
+ case 16: gEngineApp_m_Settings_difficulty[0]=32; break;
+ case 32: gEngineApp_m_Settings_difficulty[0]=8; break;
  }
  }
  return 0;

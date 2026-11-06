@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_8012FB60[];
+extern s32 gTotemDefense_kills[];
 
 void TotemDefense_AddKill(void) {
-    D_8012FB60[0] += 1;
+    gTotemDefense_kills[0] += 1;
 }

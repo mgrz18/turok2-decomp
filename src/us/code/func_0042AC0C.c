@@ -19,14 +19,14 @@ extern char D_800A5F00[]; /* "level paths" */
 extern char D_800A5F0C[]; /* "level info" */
 extern char D_800A5F18[]; /* "sky layers" */
 extern char D_800A5F24[];
-extern s32 D_800AB8A0;
-extern s32 D_800B6D20;
-extern u8 D_800D6D68[];
-extern u8 D_800E68B0[];
-extern u8 D_800E6A90[];
-extern u8 D_801102B8[];
-extern u8 *D_80119890; /* player list */
-extern u8 D_8011AAF1;  /* multiplayer */
+extern s32 gFogEnabled;
+extern s32 gFrameCountGameplay;
+extern u8 gDecompressor[];
+extern u8 gLoopSoundEntries[];
+extern u8 gLoopSounds[];
+extern u8 gEngineApp_m_SwooshSystem[];
+extern u8 *gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead; /* player list */
+extern u8 gEngineApp_m_Settings_multiplayer;  /* multiplayer */
 
 extern s32 ProPack__Decompress(s32, s32);
 extern void CCollisionInfo__Reset(void);
@@ -36,14 +36,14 @@ extern void **CCache__Allocate(s32 unused, s32 size, s32 mode, char *name);
 extern void CCache__Deallocate(s32 unused, void **block);
 extern void CCache__Flush(s32);
 extern void **CCache__LoadPersistantIndex(s32 unused, void **out, s32 key, char *name);
-extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CWorld *owner, void *callback, char *name);
+extern void **CCache__LoadPersistantSubBlock(s32 unused, void *file, s32 index, s32 key, CScene *owner, void *callback, char *name);
 extern void CCache__SetFrameDelay(s32);
 extern void CGameObjectInstance__UpdateAnimation(u8 *actor);
 extern void func_0021E5D4(u8 *actor);
 extern void func_0021F1B4(u8 *actor);
-extern void CScene__GetLevelName(CWorld *w, s32 level, void *out, s32 mask);
-extern void CScene__ClearListCounts(CWorld *w);
-extern void CScene__ReleaseSectors(CWorld *w);
+extern void CScene__GetLevelName(CScene *w, s32 level, void *out, s32 mask);
+extern void CScene__ClearListCounts(CScene *w);
+extern void CScene__ReleaseSectors(CScene *w);
 extern void *CPlayerPool__GetFirstActive(void *players);
 extern void Sound__StopFlags(s32);
 extern void Sound__DetachAll(void);
@@ -55,13 +55,13 @@ extern void CCameraPool__Advance(void *);
 extern s32 Cinema_IsActive(void);
 extern void Cinema_RequestOnce(s32 sound);
 extern void MatrixHeap_Construct(void *heap, void *data, s32 size);
-extern void CScene__LoadLightSettings(CWorld *w);
+extern void CScene__LoadLightSettings(CScene *w);
 extern s32 CScene__DecompressLinks(s32, s32);
 extern s32 CScene__DecompressCollision(s32, s32);
 extern s32 CScene__DecompressAnimatedInstances(s32, s32);
-extern void CScene__StreamAllSections(CWorld *w);
-extern void func_0042C79C(CWorld *w);
-extern void func_0042C840(CWorld *w);
+extern void CScene__StreamAllSections(CScene *w);
+extern void func_0042C79C(CScene *w);
+extern void func_0042C840(CScene *w);
 extern void func_0042C96C(void);
 extern s32 CScene__DecompressPaths(s32, s32);
 extern void SceneActorPool_Construct(void *);
@@ -74,7 +74,7 @@ extern void CPlayer__StopLoopingSounds(void *);
 extern void func_0042EBBC(void *);
 extern void CCameraPool__ResetEmitterPools(void *);
 
-void CScene__LoadLevel(CWorld *w, s32 level, s32 announce) {
+void CScene__LoadLevel(CScene *w, s32 level, s32 announce) {
     void **block;
     u8 *data;
     u8 *player;
@@ -115,10 +115,10 @@ void CScene__LoadLevel(CWorld *w, s32 level, s32 announce) {
 loaded:
     CScene__ReleaseSectors(w);
     w->m_Mode = 0;
-    CDecompressor__Flush(D_800D6D68);
+    CDecompressor__Flush(gDecompressor);
     CCache__Flush(0);
     if (w->m_nLevel != -1) {
-        ptr = CPlayerPool__GetFirstActive(&D_80119870.m_PlayerList);
+        ptr = CPlayerPool__GetFirstActive(&gEngineApp_m_Game.m_PlayerList);
         if (ptr != NULL) {
             CPlayer__StopLoopingSounds(ptr);
         }
@@ -137,17 +137,17 @@ loaded:
         CCache__Deallocate(0, w->m_hHeap);
     }
     CCache__Flush(0);
-    D_800B6D20 = 0;
+    gFrameCountGameplay = 0;
     CCache__SetFrameDelay(8);
     CScene__ClearListCounts(w);
     CParticleSystem__Construct(w->m_ParticleSystem, *w->m_pParticleEffects);
     SceneActorPool_Construct(w->m_ActorPool);
     CInstancePool__Construct(&w->m_InstancePool);
-    func_0042D410(D_801102B8);
+    func_0042D410(gEngineApp_m_SwooshSystem);
     CCollisionInfo__Reset();
     func_0042D120(w->unk_18EBC);
-    LoopSounds_Construct(D_800E6A90, D_800E68B0, 0xF);
-    func_0042EBBC(D_801102B8 - 0x1C8);
+    LoopSounds_Construct(gLoopSounds, gLoopSoundEntries, 0xF);
+    func_0042EBBC(gEngineApp_m_SwooshSystem - 0x1C8);
     if (*w->m_pLevels < level) {
         level = *w->m_pLevels - 1;
         announce = 0;
@@ -193,7 +193,7 @@ loaded:
             size = 0x320;
             break;
     }
-    if (D_8011AAF1 != 0) {
+    if (gEngineApp_m_Settings_multiplayer != 0) {
         size += 0x200;
     }
     block = CCache__Allocate(0, size << 6, 3, D_800A5EB4);
@@ -215,7 +215,7 @@ loaded:
     w->m_hLevelHeader = block;
     w->m_pLevelHeader = *block;
     CScene__LoadLightSettings(w);
-    D_800AB8A0 = (w->m_pLevelHeader->m_Flags >> 2) & 1;
+    gFogEnabled = (w->m_pLevelHeader->m_Flags >> 2) & 1;
     block = CCache__LoadPersistantSubBlock(0, w->m_pLevelFile, 6, key, w, ProPack__Decompress, D_800A5F18);
     w->m_hSections = block;
     data = *block;
@@ -233,7 +233,7 @@ loaded:
     for (; i < count; i++) {
         func_0021E5D4((u8 *)w->m_pActors + i * 0x288);
     }
-    player = D_80119890;
+    player = gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead;
     actor = player;
     while (player != NULL) {
         func_0021E5D4(actor);
@@ -251,10 +251,10 @@ loaded:
         CGameObjectInstance__UpdateAnimation(p);
     }
     w->m_Mode = 4;
-    CPlayerPool__LevelStart(&D_80119870.m_PlayerList);
-    CCameraPool__ResetEmitterPools(D_80119870.m_CameraPool);
-    CCameraPool__Advance(D_80119870.m_CameraPool);
-    if (D_80119870.m_Settings.multiplayer != 0 || w->m_bStreamAll != 0) {
+    CPlayerPool__LevelStart(&gEngineApp_m_Game.m_PlayerList);
+    CCameraPool__ResetEmitterPools(gEngineApp_m_Game.m_CameraPool);
+    CCameraPool__Advance(gEngineApp_m_Game.m_CameraPool);
+    if (gEngineApp_m_Game.m_Settings.multiplayer != 0 || w->m_bStreamAll != 0) {
         CScene__StreamAllSections(w);
     }
 }

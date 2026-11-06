@@ -16,13 +16,13 @@ typedef struct {
 
 extern s32 D_800F70A8; /* size of the extra data */
 
-/* Struct pointee: the load of ->data is scheduled before the D_800C2010 store. */
+/* Struct pointee: the load of ->data is scheduled before the gSaveBufferHandle store. */
 typedef struct {
     void *data;
 } MemHandle;
 
-extern MemHandle *D_800C2010; /* handle of the save block */
-extern u8 D_800EBAC0[];
+extern MemHandle *gSaveBufferHandle; /* handle of the save block */
+extern u8 gLoadSavePersistentData[];
 extern char D_800C13F0[];
 
 void CCache__Flush(s32 heap);
@@ -36,22 +36,22 @@ void SaveGame_Build_2(CPlayer *player) {
     s32 allocSize;
     SaveGame *data;
 
-    if (D_800C2010 != NULL) {
+    if (gSaveBufferHandle != NULL) {
         CCache__Flush(0);
-        CCache__Deallocate(0, D_800C2010);
+        CCache__Deallocate(0, gSaveBufferHandle);
     }
     allocSize = D_800F70A8 + 0x688;
-    D_800C2010 = CCache__Allocate(0, allocSize, 0x33, D_800C13F0);
-    D_800C2018 = D_800C2010->data;
-    memset(D_800C2018, 0, allocSize);
-    D_800C2018->player = player->m_Data;
-    D_800C2018->settings = *(GameSettingsBlock *)&D_8011AAD8;
-    data = D_800C2018;
-    data->frames = D_8011ACB0.frames;
-    data->seconds = D_8011ACB0.seconds;
-    data->minutes = D_8011ACB0.minutes;
-    data->hours = D_8011ACB0.hours;
+    gSaveBufferHandle = CCache__Allocate(0, allocSize, 0x33, D_800C13F0);
+    gSaveBuffer = gSaveBufferHandle->data;
+    memset(gSaveBuffer, 0, allocSize);
+    gSaveBuffer->player = player->m_Data;
+    gSaveBuffer->settings = *(GameSettingsBlock *)&gEngineApp_m_Settings;
+    data = gSaveBuffer;
+    data->frames = gEngineApp_m_Settings_match.frames;
+    data->seconds = gEngineApp_m_Settings_match.seconds;
+    data->minutes = gEngineApp_m_Settings_match.minutes;
+    data->hours = gEngineApp_m_Settings_match.hours;
     data->size = size;
     data->levelFlagsSize = ((ExtraInfo *) &D_800F70A8)->size;
-    func_0029E460(data->levelFlags, D_800EBAC0, ((ExtraInfo *) &D_800F70A8)->size);
+    func_0029E460(data->levelFlags, gLoadSavePersistentData, ((ExtraInfo *) &D_800F70A8)->size);
 }

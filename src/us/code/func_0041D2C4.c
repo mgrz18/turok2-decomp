@@ -7,25 +7,25 @@
 
 extern int Controller_MenuLeft(struct ControllerProfile *object);
 extern int Controller_MenuRight(struct ControllerProfile *object);
-extern f32 D_800B6D28;
-extern s32 CPlayerPool__GetIndex(CPlayerList *, s32);
+extern f32 gFrameIncrement;
+extern s32 CPlayerPool__GetIndex(CPlayerPool *, s32);
 s32 NameEntryMenu_UpdateName(void *unused, MenuRecAt20V1 *menu) {
     s32 i;
     f32 t;
-    i = CPlayerPool__GetIndex(&D_80119870.m_PlayerList, menu->id);
-    t = D_800C1FB0[i].timer + D_800B6D28;
-    D_800C1FB0[i].timer = t;
+    i = CPlayerPool__GetIndex(&gEngineApp_m_Game.m_PlayerList, menu->id);
+    t = gNameEntries[i].timer + gFrameIncrement;
+    gNameEntries[i].timer = t;
     if (t >= (15.0f)) {
-        D_800C1FB0[i].timer = t - (15.0f);
+        gNameEntries[i].timer = t - (15.0f);
     }
     if (menu->state == 1) {
-        if (((s32 (*)(s32))Controller_MenuLeft)(menu->input) != 0 && D_800C1FB0[i].cursor > 0) {
-            D_800C1FB0[i].cursor--;
-            D_800C1FB0[i].timer = 0.0f;
+        if (((s32 (*)(s32))Controller_MenuLeft)(menu->input) != 0 && gNameEntries[i].cursor > 0) {
+            gNameEntries[i].cursor--;
+            gNameEntries[i].timer = 0.0f;
         } else if (((s32 (*)(s32))Controller_MenuRight)(menu->input) != 0) {
-            if (D_800C1FB0[i].cursor < D_800C1FB0[i].length) {
-                D_800C1FB0[i].cursor++;
-                D_800C1FB0[i].timer = 0.0f;
+            if (gNameEntries[i].cursor < gNameEntries[i].length) {
+                gNameEntries[i].cursor++;
+                gNameEntries[i].timer = 0.0f;
             }
         }
     }

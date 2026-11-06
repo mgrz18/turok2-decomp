@@ -13,22 +13,22 @@ void ScreenTint_UpdateMode(void) {
     f32 alpha;
     f32 fade;
 
-    clamp255(&D_800AB8B0.m_Color.x);
-    clamp255(&D_800AB8B0.m_Color.y);
-    clamp255(&D_800AB8B0.m_Color.z);
-    clamp255(&D_800AB8C0[0]);
-    clamp255(&D_800AB8C0[1]);
+    clamp255(&gBlendState.m_Color.x);
+    clamp255(&gBlendState.m_Color.y);
+    clamp255(&gBlendState.m_Color.z);
+    clamp255(&gBlendFade[0]);
+    clamp255(&gBlendFade[1]);
 
-    fade = D_800AB8C0[0];
-    alpha = D_800AB8C0[1];
+    fade = gBlendFade[0];
+    alpha = gBlendFade[1];
     if (alpha == 255.0f && fade == 0.0f) {
-        D_800AB8B0.m_Mode = 0;
+        gBlendState.m_Mode = 0;
     } else if (alpha != 255.0f && fade == 0.0f) {
-        D_800AB8B0.m_Mode = 1;
-        D_800AB8C0[0] = D_800AB8C0[1];
+        gBlendState.m_Mode = 1;
+        gBlendFade[0] = gBlendFade[1];
     } else if (alpha == 255.0f && fade != 0.0f) {
-        D_800AB8B0.m_Mode = 3;
+        gBlendState.m_Mode = 3;
     } else if (alpha != 255.0f && fade != 0.0f) {
-        D_800AB8B0.m_Mode = 6;
+        gBlendState.m_Mode = 6;
     }
 }

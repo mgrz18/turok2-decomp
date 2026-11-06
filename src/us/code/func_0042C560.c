@@ -21,7 +21,7 @@ typedef struct SearchPoints {
     SearchPoint points[1];
 } SearchPoints;
 
-extern s32 D_800F7074;
+extern s32 gEngineApp_m_CartridgeIndex;
 extern char D_800A5D8C[];
 extern char D_800A5FC4[];
 
@@ -47,7 +47,7 @@ s32 CScene__FindNearestWarpDest(void *world, void *position, s32 type, SearchPoi
     void **handle;
     void *table;
 
-    pool = D_800F7074;
+    pool = gEngineApp_m_CartridgeIndex;
     CCache__LoadPersistantIndex(0, &resource, pool, D_800A5D8C);
     i = 0;
     best = 0;

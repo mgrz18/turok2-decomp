@@ -4,11 +4,11 @@
 
 /* Ends a demo: puts back the game settings saved when it started. */
 void Demo_End(void) {
-    DemoPlayer *s = &D_800F56B0;
+    DemoPlayer *s = &gDemoPlayer;
 
     if (s->saved != 0) {
         s->saved = 0;
-        *(GameSettingsBlock *)&D_8011AAD8 = s->settings;
+        *(GameSettingsBlock *)&gEngineApp_m_Settings = s->settings;
     }
     s->active = 0;
     s->unk4 = 0;

@@ -5,7 +5,7 @@
 
 extern s32 CCache__FreeOldestMemEntry(s32 unused0, s32 unused1, s32 keep_recent);
 extern void *CCache__HeapAlloc(s32 arg0, u32 arg1, s32 arg2, u32 arg3);
-extern char D_800D1CC0;
+extern char gHeap;
 extern void *CHeap__AllocTop(void *arg0, s32 arg1);
 extern void *CHeap__Alloc(void *, s32);
 void *CCache__HeapAlloc(s32 arg0, u32 arg1, s32 arg2, u32 arg3)
@@ -14,16 +14,16 @@ void *CCache__HeapAlloc(s32 arg0, u32 arg1, s32 arg2, u32 arg3)
   s32 value;
   if (arg2 != 0)
   {
-    result = CHeap__AllocTop(&D_800D1CC0, arg1);
+    result = CHeap__AllocTop(&gHeap, arg1);
   }
   else
     if (value)
   {
-    result = CHeap__Alloc(&D_800D1CC0, arg1);
+    result = CHeap__Alloc(&gHeap, arg1);
   }
   else
   {
-    result = CHeap__Alloc(&D_800D1CC0, arg1);
+    result = CHeap__Alloc(&gHeap, arg1);
   }
   if (result == 0)
   {
@@ -37,11 +37,11 @@ void *CCache__HeapAlloc(s32 arg0, u32 arg1, s32 arg2, u32 arg3)
     {
       if (arg2 != 0)
       {
-        result = CHeap__AllocTop(&D_800D1CC0, arg1);
+        result = CHeap__AllocTop(&gHeap, arg1);
       }
       else
       {
-        result = CHeap__Alloc(&D_800D1CC0, arg1);
+        result = CHeap__Alloc(&gHeap, arg1);
       }
     }
   }

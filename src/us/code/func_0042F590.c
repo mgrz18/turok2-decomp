@@ -3,17 +3,17 @@
 
 s32 Demo_Start(s32);
 
-extern s32 D_004384E8;
+extern s32 gDemoTable;
 
 void Demo_PlayNext(void) {
-    DemoPlayer *state = &D_800F56B0;
+    DemoPlayer *state = &gDemoPlayer;
     s32 temp_v0;
 
     if (state->active != 0) {
-        Demo_Start(*(((__typeof__(&D_004384E8))((s8 *)&D_004384E8 + (state->index * 4)))));
+        Demo_Start(*(((__typeof__(&gDemoTable))((s8 *)&gDemoTable + (state->index * 4)))));
         temp_v0 = state->index + 1;
         state->index = temp_v0;
-        if (*(((__typeof__(&D_004384E8))((s8 *)&D_004384E8 + (temp_v0 * 4)))) == 0) {
+        if (*(((__typeof__(&gDemoTable))((s8 *)&gDemoTable + (temp_v0 * 4)))) == 0) {
             state->index = 0;
         }
     }

@@ -1,8 +1,8 @@
 #include "common.h"
 #include "m2c_macros.h"
 
-extern s32 D_800C2028;
+extern s32 gPakMenuPort;
 
 s32 PakMenu_HasPort(void) {
-    return ~D_800C2028 != 0;
+    return ~gPakMenuPort != 0;
 }

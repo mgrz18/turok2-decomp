@@ -4,14 +4,14 @@
 #include "common.h"
 #include "structs/game.h"
 
-extern s32 D_800AB8A0;
-extern u8 D_800F7078[];
-extern u8 D_801198F0[];
-extern s32 D_800B6D1C;              /* frame buffer index */
-extern f32 D_800F67C0[][16];        /* per-frame matrices */
-extern u8 D_800AB0E8[];
-extern u8 D_800B36F4[];
-extern s32 D_800C2030;              /* screen width */
+extern s32 gFogEnabled;
+extern u8 gScene[];
+extern u8 gEngineApp_m_Game_m_CameraPool_m_MainCamera[];
+extern s32 gEvenOdd;              /* frame buffer index */
+extern f32 sExpansionPakMtx[][16];        /* per-frame matrices */
+extern u8 gDefaultLights[];
+extern u8 sExpansionPakText[];
+extern s32 gScreenWidth;              /* screen width */
 
 extern s32 CScene__FindObjectType(void *, s32);
 extern void CCamera__DisplayListSetup(void *);
@@ -30,19 +30,19 @@ void EngineMode03_ExpansionPak_Draw(CEngineApp *view) {
     s32 id;
     s32 key;
 
-    D_800AB8A0 = 0;
-    id = CScene__FindObjectType(D_800F7078, 0xE10);
+    gFogEnabled = 0;
+    id = CScene__FindObjectType(gScene, 0xE10);
     if (id == -1) {
         return;
     }
-    CCamera__DisplayListSetup(D_801198F0);
+    CCamera__DisplayListSetup(gEngineApp_m_Game_m_CameraPool_m_MainCamera);
     CMtxF__SetTranslate(mtx, 0.0f, -100.0f, -500.0f);
     CMtxF__PreRotateY(mtx, view->m_Settings.modeTimer * 0.17453295f);
     CMtxF__SwapYZRows(mtx);
-    CMtxF__ToMtxAffine(mtx, D_800F67C0[D_800B6D1C]);
-    key = CScene__GetObject(D_800F7078, id);
+    CMtxF__ToMtxAffine(mtx, sExpansionPakMtx[gEvenOdd]);
+    key = CScene__GetObject(gScene, id);
     Render_ResetBatches();
-    Render_QueueModelByKey(key, D_800F67C0[D_800B6D1C], D_800AB0E8, 0, -1);
+    Render_QueueModelByKey(key, sExpansionPakMtx[gEvenOdd], gDefaultLights, 0, -1);
     Render_FlushBatches();
-    Render_DrawTextLines(view, 0, D_800B36F4, D_800C2030 / 2, 0xBE, 0xA, 0.8f, 1.0f);
+    Render_DrawTextLines(view, 0, sExpansionPakText, gScreenWidth / 2, 0xBE, 0xA, 0.8f, 1.0f);
 }

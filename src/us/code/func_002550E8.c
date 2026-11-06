@@ -7,7 +7,7 @@ extern s32 CPlayer__GetWeaponAmmo(CPlayer *player, s32 weapon);
 /* Fills entry index with a weapon, selecting it if none is and it is the
  * player's requested weapon. */
 void CBarrel__SetEntry(CBarrel *list, s32 weapon, s32 index, CPlayer *player) {
-    WeaponInfo *def = D_800AF618[weapon];
+    WeaponInfo *def = gWeaponInfoTable[weapon];
     s32 hasAmmo = CPlayer__GetWeaponAmmo(player, weapon) != 0;
 
     list->m_Items[index].m_Weapon = weapon;

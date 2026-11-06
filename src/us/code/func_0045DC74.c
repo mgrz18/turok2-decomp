@@ -3,9 +3,9 @@
 #include "structs/menu.h"
 
 s32 CScene__GetLinkGroupCount(void *arg0, s32 arg1);
-s32 MenuItem_TextLength(void *item);
+s32 MenuItem_TextLength_2(void *item);
 
-extern u8 D_800F7078[];
+extern u8 gScene[];
 extern char D_800C1768[];
 extern char D_800B43D0[];
 extern char D_800B441C[];
@@ -13,12 +13,12 @@ extern char D_800B4470[];
 extern char D_800B450C[];
 extern char D_800B4574[];
 extern char D_800B4588[];
-extern s32 D_80130A30;
+extern s32 sMissionHub;
 
 s32 MissionMenu_UpdateObjective2Count_2(MenuItem *item) {
     s32 rank = -1;
 
-    switch (D_80130A30) {
+    switch (sMissionHub) {
         case -1:
         case 0:
         default:
@@ -26,21 +26,21 @@ s32 MissionMenu_UpdateObjective2Count_2(MenuItem *item) {
             break;
         case 1:
             item->text = D_800B43D0;
-            rank = CScene__GetLinkGroupCount(D_800F7078, 3);
+            rank = CScene__GetLinkGroupCount(gScene, 3);
             if (rank != -1) {
                 rank = 4 - rank;
             }
             break;
         case 2:
             item->text = D_800B441C;
-            rank = CScene__GetLinkGroupCount(D_800F7078, 5);
+            rank = CScene__GetLinkGroupCount(gScene, 5);
             if (rank != -1) {
                 rank = 3 - rank;
             }
             break;
         case 3:
             item->text = D_800B4470;
-            rank = CScene__GetLinkGroupCount(D_800F7078, 7);
+            rank = CScene__GetLinkGroupCount(gScene, 7);
             if (rank != -1) {
                 rank = 3 - rank;
             }
@@ -50,14 +50,14 @@ s32 MissionMenu_UpdateObjective2Count_2(MenuItem *item) {
             break;
         case 5:
             item->text = D_800B450C;
-            rank = CScene__GetLinkGroupCount(D_800F7078, 10);
+            rank = CScene__GetLinkGroupCount(gScene, 10);
             if (rank != -1) {
                 rank = 1 - rank;
             }
             break;
         case 6:
             item->text = D_800B4588;
-            rank = CScene__GetLinkGroupCount(D_800F7078, 12);
+            rank = CScene__GetLinkGroupCount(gScene, 12);
             if (rank != -1) {
                 rank = 3 - rank;
                 if (rank == 3) {
@@ -67,7 +67,7 @@ s32 MissionMenu_UpdateObjective2Count_2(MenuItem *item) {
             break;
     }
     if (rank != -1) {
-        item->text[MenuItem_TextLength(item) - 6] = rank + '0';
+        item->text[MenuItem_TextLength_2(item) - 6] = rank + '0';
     }
     return 0;
 }

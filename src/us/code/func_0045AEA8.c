@@ -1,5 +1,5 @@
 /* WRONG CUT: the real function starts at 0x0045AEA8 (size 0xD8 = 216): splat
- * cut its first two words (lui/lw D_800C201C) as GameNoteMenu_UpdateLevel_2. */
+ * cut its first two words (lui/lw gLoadBuffer) as GameNoteMenu_UpdateLevel_2. */
 #include "common.h"
 #include "structs/menu.h"
 #include "structs/save.h"
@@ -18,7 +18,7 @@ extern char D_800B4A9C[];
 s32 Level_GetHub(s32 id);
 
 s32 GameNoteMenu_UpdateLevel_2(MenuItem *item) {
-    switch (Level_GetHub(D_800C201C->player.m_CheckPointWarpID)) {
+    switch (Level_GetHub(gLoadBuffer->player.m_CheckPointWarpID)) {
     case -1:
     default:
         item->text = D_800B4ABC;

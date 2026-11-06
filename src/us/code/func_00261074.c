@@ -10,7 +10,7 @@ typedef struct {
 f32 Math_DecayToZero(f32, f32);
 s32 EnemyAI_GetBehaviorIndex(s32, s32);
 extern f32 D_800A7A38[];
-extern f32 D_800B6D28;                              /* frame delta */
+extern f32 gFrameIncrement;                              /* frame delta */
 
 void EnemyRam_Advance(s32 arg0, CAI *arg1) {
     f32 temp_f0;
@@ -24,7 +24,7 @@ void EnemyRam_Advance(s32 arg0, CAI *arg1) {
         ((AITurnVars *) arg1->m_VarBuffer)->angle0 = Math_DecayToZero(((AITurnVars *) arg1->m_VarBuffer)->angle0, temp_f20);
     }
     if (arg1->m_Action == 0) {
-        temp_f0 = arg1->m_ActionTime - D_800B6D28;
+        temp_f0 = arg1->m_ActionTime - gFrameIncrement;
         arg1->m_ActionTime = temp_f0;
         if (temp_f0 < 0.0f) {
             arg1->m_Action = 1;

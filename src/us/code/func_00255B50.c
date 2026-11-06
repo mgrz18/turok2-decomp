@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern char D_800ADF18;
-extern char D_800ADF30;
+extern char gPlayerState12LookTuning;
+extern char gPlayerState12MoveTuning;
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern void CPlayer__MoveInWater(void *, void *, void *);
 extern s32 CPlayer__SetState(void *, void *, s32);
@@ -20,8 +20,8 @@ void PlayerState12_Update(CPlayer *player, CGameObjectInstance *body) {
     } else {
         player->m_Mode = 0xD;
     }
-    CPlayer__TurnAndLook(player, body, &D_800ADF18);
-    CPlayer__MoveInWater(player, body, &D_800ADF30);
+    CPlayer__TurnAndLook(player, body, &gPlayerState12LookTuning);
+    CPlayer__MoveInWater(player, body, &gPlayerState12MoveTuning);
     busy = 0;
     if (player->m_CharAnim == 0x1144) {
         busy = (s8)player->m_CharacterActor.m_CurrentAnimation.m_bCycleCompleted == 0;

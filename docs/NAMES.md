@@ -1,11 +1,13 @@
-# Function names
+# Function and data names
 
-Every function starts as `func_VRAM`. A real name goes into a names file with
-the evidence for it, and `tools/apply_names.py` puts it everywhere at once:
+Every function starts as `func_VRAM` and every data symbol as `D_VRAM`. A real
+name goes into a names file with the evidence for it, and
+`tools/apply_names.py` puts it everywhere at once:
 
 ```
-versions/names.us.txt          names with outside evidence (Turok 3 matches, libultra, LNK)
-versions/names/<part>.us.txt   one file per address range, so parallel work never collides
+versions/names.us.txt              function names with outside evidence (Turok 3 matches, libultra, LNK)
+versions/names/<part>.us.txt       function names, one file per address range, so parallel work never collides
+versions/names/data_<part>.us.txt  data names (see "Data names" below)
 ```
 
 Each line is `Name = 0xVRAM; // evidence`. `apply_names.py` refuses a name or an
@@ -14,7 +16,8 @@ file), drops the address scan's entry for each named function, and rewrites
 `func_VRAM` to the name in every C file and header, in
 `versions/function_sizes.us.txt` and in `versions/manual_stubs.us.txt`. File
 names stay `func_VRAM.c`, so a file can always be found by address. Then
-`make setup` and `make verify`.
+`make setup` and `make verify`. `python3 tools/apply_names.py --check` runs every
+check and writes nothing.
 
 Round N2 (eight parallel parts, then a merge) brought the count from 90 to
 **3,932 names**: 3,823 of the 4,146 functions the C files define (649 of those
@@ -44,13 +47,15 @@ are module-2 copies), the rest asm. 323 C functions are still `func_`
   (anim flag + the low address bits of its table, which tell the variants
   apart), `EngineMode00_PakCheck_Init`/`_Retrace`/`_Draw`.
 
-Names that differ from ours:
+Structs renamed to Acclaim's names in round N3 (each header notes the old
+name; the header files keep theirs):
 
-| Acclaim (Turok 3) | Our struct | Object |
-| --- | --- | --- |
-| `CScene` | `CWorld` (structs/world.h) | D_800F7078, the level |
-| `CPlayerPool` | `CPlayerList` (structs/player_list.h) | D_80119870.m_PlayerList |
-| `CAudioWorld` | `SndMgr` | D_800F2A00, sound and music |
+| Now | Was | Header | Object |
+| --- | --- | --- | --- |
+| `CScene` (+ `CSceneSector`, `CSceneRecord`) | `CWorld` (`CWorldSector`, `CWorldRecord`) | structs/world.h | `gScene`, the level |
+| `CPlayerPool` | `CPlayerList` | structs/player_list.h | D_80119870, CGame's first member |
+| `CAudioWorld` | `SndMgr` (and its inlines `SndMgr_Lock`/`_Unlock`) | structs/sound.h | `gAudioWorld`, sound and music |
+| `CAutomap`, CGame's `m_Automap` | `CDebugLines`, `m_DebugLines` | structs/game.h | CGame+0x1230 (no Turok 3 or Rage Wars name) |
 
 ## Where the evidence comes from
 
@@ -146,43 +151,215 @@ n4 329, n5 517, n6 280, n7 1,076 (485 of them `_2`), n8 497 (239 `_2`).
   +0x23/+0x28/+0x2D (texture sets) and +0x24/+0x29/+0x2E (crosshairs), now
   named so.
 
-## Data names for the next round
+## Data names
 
-Not applied (the tool names functions only). From `versions/names/data_*.txt`,
-the parts' notes and their file comments:
+Data names live in `versions/names/data_<part>.us.txt`, same line format
+(`gName = 0x800XXXXX; // evidence`). `data_seed.us.txt` holds round N3's 24
+certain ones (it absorbed n4's `data_n4.txt`).
 
-| Address | Name | Evidence |
+Conventions:
+
+- **`g` + CamelCase** for a global object or table: `gScene`, `gEngineApp`,
+  `gCache`, `gEngineModeTable`. Turok 3's own name when the object is the same
+  (`gFrameIncrement`, `gHeap`, `gCollisionResultsP`).
+- **`s` + CamelCase** for data only one source file uses: a string or table in
+  a file's own `.rodata` (`sCSPlayerFile`, "audio/csplayer.c").
+- **`gObject_<field>`** for a symbol that points inside a named object (the
+  code takes the field's address directly): `gEngineApp_m_pCurrentFrameData`
+  (0x800F7070), `gScene_m_InstancePool` (0x8010ABA0). Field names as the
+  struct header spells them.
+- **`_2`** for the second VM module's copy, at its *named* address (the copy of
+  `gMotherSpawnPoints` 0x00431D20 is `gMotherSpawnPoints_2` 0x0046AC40,
+  linked at 0x00431C40), as for functions.
+- Library data as the library spells it.
+- Skipped: jump tables (`jtbl_`), float and string pools a C file owns that
+  nothing else reads, and anything whose object is not certain. A wrong name
+  costs more than `D_`.
+
+What `apply_names.py` does with them:
+
+- **splat**: each name becomes a plain symbol in `versions/symbols_names.us.txt`,
+  with no type and no size. splat accepts only its own types and spimdisasm's
+  (`f32`, `asciz`...), which change how the bytes are disassembled. With a size,
+  spimdisasm writes every reference inside the object as `name + 0xN`, and the
+  `D_` labels inside it that C still uses vanish (and interior names would
+  not be used). The regenerated asm defines and uses the label under the name,
+  and `undefined_syms_auto` lists it under the name.
+- **Text**: `D_VRAM` becomes the name in every `.c`, `.h` and hand-written
+  `.s` under `src/` and `include/` (comments included), and in the tracked
+  files that spell data symbols: `symbols_manual`, `foreign_labels`,
+  `undefined_funcs_extra`, `symbol_addrs`, `function_sizes`, `manual_stubs`,
+  `tools/ghidra/annotations.json`. The generated ones (`undefined_syms_auto`,
+  `undefined_funcs_auto`, the linker script, `us/asm`) come back from
+  `make setup`. `cuts.us.txt`, `asm_origin.us.txt` and the yaml mention `D_`
+  addresses in comments only and keep them; so do the names files.
+- **Duplicates**: an address or a name given twice, a name both a function and
+  data, an address both: refused, across all the files.
+- **`--check`** also reports names that collide with a C keyword, a typedef,
+  a struct/union/enum tag, a macro, an `extern` global or a function (ours,
+  `references/ultralib`'s, splat's include), syntax errors, names already used
+  as fields or locals, addresses nothing refers to by `D_`, `_2` names outside
+  the second module (and second-module names without `_2`), and first-module
+  files that would take a `_2` name (below).
+- `tools/fix_data_align.py` turns `.align` into `.org` by the label's address,
+  which it read from the `D_`/`jtbl_` name; named labels are looked up in
+  `symbols_names.us.txt`. `tools/ghidra/annotate.py` applies the data names as
+  data labels.
+
+Traps:
+
+- **Second-module data.** Its names do not go to splat: a symbol inside
+  `virtual_rodata_1` changed how spimdisasm split that pool, and with it a
+  word 0x00470100 in libultra's data became a reference to a new label there,
+  which links 0x39000 lower (one changed word in the ROM;
+  `can_be_referenced:False` does not help, the reference is to the new
+  label). They go to ld instead, at the link address
+  (`versions/symbols_names_ld.us.txt`, generated and tracked, filtered by
+  `filter_defined_syms.py`, which drops the ones a hand-written `.s` defines,
+  like `gCollisionSetupTable_2`).
+- **Link addresses.** The second module's code and C reach its data at the
+  link address, which lies in the first module's range (its data overlaps
+  0x4307B0-0x43CA00). `D_<link>` becomes the `_2` name when the link address
+  has no name of its own; in a module-2 file that declares `extern ...
+  D_<link>` itself, even when it has one (a header's declaration is shared and
+  keeps the first module's name). `--check` lists first-module files that would
+  get a `_2` name this way.
+- **Data inside C.** No C object defines a global data symbol: a function's
+  `.rodata` slice in C has only local labels, so a name there (`sCSPlayerFile`)
+  is still defined by ld (`foreign_labels`, `undefined_syms_auto`) and never
+  twice. `filter_defined_syms.py` drops any script definition an object does
+  define.
+- **Interior and negative offsets.** Names at addresses inside another named
+  object are plain symbols too; nothing is sized, so splat keeps every label.
+  C that reaches an object from another symbol (`D_801102B8 - 0x1C8` is
+  0x801100F0) keeps working when both are renamed; rewrite it to the right
+  name by hand when one is.
+- **Tools that read `D_` names**: `auto_match.py` (m2c drafts, `%lo(D_X)`
+  rodata ownership, `M2C_FIELD(&D_X...)`) and `fix_cut.py` (`.word D_X`) only
+  see `D_` names; a named symbol is invisible to those heuristics.
+
+### Round G2: the globals
+
+Seven parts (g1-g7, one address range each) named the data, then a merge.
+**1,204 data names** now: data_seed 24, g1 5, g2 182, g3 102, g4 117,
+g5 261, g6 304, g7 228 (19 lines repeat a seed name at the same address),
+105 of them `_2`. Of the 2,266 distinct `D_` symbols the C and headers used
+before the round, 1,179 are names now; **1,087 are left**, on purpose:
+
+| Left as `D_` | Count | Why |
 | --- | --- | --- |
-| 0x800ACB60 | `gIntelligenceTypeInfo` | per-AI-type {setup, advance, handlers} blocks (n4) |
-| 0x800B1790 | `gEnemyBehaviorInfo` | CEnemyBehaviorInfo *[8] by behaviour (n4) |
-| 0x800B2628 | `gLevelEventHandlers` | [kind] -> {onActor, onEvent} (n4) |
-| 0x800B6D78 | `gEngineModeTable` | Turok 3's name; {Init, Retrace, Draw} x 18 (n5) |
-| 0x800F2A00 | `gAudioWorld` | CAudioWorld, Turok 3 audioworld.c (n5) |
-| 0x800E6A90 | `gLoopSounds` | looping sounds: free/used CLists (n5) |
-| 0x800F478C | `gMusicTrack` | the playing track (n5) |
-| 0x800ADF54 | player state table | {enter, update, tuning, flags, anim} rows (n3) |
-| 0x800F1ADC / 0x800F1CE0 | `gCollisionResultsP` / `gCollisionResults` | Turok 3's names (n3) |
-| 0x0042D510 | `gCollisionSetupTable` | n3 |
-| 0x80119878 | player pool `m_nPlayers` | CPlayerPool (n3) |
-| 0x800B0720, 0x800B0A80, 0x800B0EA0, 0x800B1220 | enemy mode tables | base table and the three locomotion tables (n3) |
-| 0x800AE394 | default weapon mode table | WeaponActor_InitAI (n3) |
-| 0x800D81D0 | `gCache` | Turok 3 cache.c (n1) |
-| 0x800F7078 | the CScene | n2 (our CWorld) |
-| 0x8010ABA0 | the CInstancePool | n2 |
-| 0x8010FF34 | the dynamic light set | n2 |
-| 0x800AD080 | impact event handlers | n2 |
-| 0x801102B8 | the swoosh system | n2 |
-| 0x801100F0 | `g_OnScreen` | COnScreen (n5) |
-| 0x800F56B0 | the demo player | n5, n8 |
-| 0x800C1BB0 | the cinema state pointer | n5 |
-| 0x800F5EC0 | ControllerProfile[4] | n5 |
-| 0x8011F290 | CSavedPlayers | n5 |
-| 0x8012F3A0 | Mantid Queen state (WaveBossState) | n7 |
-| 0x8012F608 | Primagen state (LevelScriptState) | n7 |
-| 0x8012FB70 | Mother state | n7 |
-| 0x80130200 | Blind One state | n7 |
-| 0x80130A58 | GfxPool | n8 |
-| 0x80130C60 / 0x80130C70 / 0x800C2224 | pak kind / status / cached directory per port | n8 |
+| strings in `.rodata` | 539 | literals one C file owns (`CCache__Request` descriptions, printf formats, asserts): should become C string literals |
+| float pools and other `.rodata` | 445 | float/double literals and small constant tables one function owns: should become C literals |
+| interiors of `unk*` fields, unclear BSS, labels in code | 103 | listed in the part files' "not named" comments (data_g5, data_g7) |
+
+Jump tables are `jtbl_` and were never in scope.
+
+The data by address (each part file has the detail, with the evidence per line):
+
+| Span | Part | What is there |
+| --- | --- | --- |
+| 0x80000300-0x8000033F | g1 | libultra boot parameters: `osTvType`, `osRomBase`, `osResetType`, `osMemSize`, `osAppNMIBuffer` |
+| 0x800A51F8-0x800A81A7 | g1 | the engine's `.rodata`: float pools, `CCache__Request` description strings, jump tables (nothing named) |
+| 0x800A81A8-0x800B00BF | g2 | hash/cache constants (Turok 3), scene lights, render/blend state, falloff tables, AI drop tables, `gPlayerStateTable`, `gWeaponInfoTable`, 43 enemy animation pick tables `sEnemyAnim<Kind>_<addr>` |
+| 0x800B00C0-0x800B5117 | g3 | AI mode tables (`gEnemyGroundModeTable`...), `gEnemyBehaviorInfo`, `gLevelEventHandlers`, CAudioWorld state, the SDK audio manager's statics, HUD font tables, boot screens' text tables, pak note identity |
+| 0x800B5118-0x800C15FF | g4 | cameras, cinema, controllers, visibility, engine timing (Turok 3's tengine.c: `gFrameCount`, `gFrameIncrement`...), thread priorities, scheduler, crash screen, `gBootSignature` ("sexysteve"), libultra/libaudio/libc globals, Acclaim's audio decoder, SN host I/O, RSP microcode symbols |
+| 0x800C1600-0x800F7077 | g5 | module-1 boss data in `.data`, `gCinemaPlayerP`, menus, controller pak menus, video modes, frame buffers, stacks, `gHeap`/`gLoader`/`gDecompressor`, `gCache` and its fields, texture/model batching, random numbers, animation statics, level buffers, paths, collision, the audio manager, `gAudioWorld`, `gDemoPlayer`, controllers and rumble, threads |
+| 0x800F7078-0x8011002B | g5 | `gScene` (CScene) and the fields the code takes the address of (`gScene_m_InstancePool`...) |
+| 0x8011002C-0x8FFFFFFF | g6 | the rest of `gScene`, `gEngineApp_m_OnScreen`, `gEngineApp_m_SwooshSystem`, `gEngineApp_m_Game_*` (CGame), `gEngineApp_m_Settings` (891 uses) and ~50 of its fields, Turok 3's scheduler/frame globals, `gPager`, libultra BSS (Rage Wars' names), the audio decoder, host I/O, the automap, boss states (`gMantidQueen`, `gLevelScript` (Primagen), `gMotherBoss`, `gBlindOne`, `gTotemDefense`), menu state, `gPoolBuffers`, framebuffers, pak state |
+| 0x0020xxxx-0x002Axxxx, 0x0042D510-0x0043CAD7 (+ copies) | g7 | the first VM module's data: `gCollisionSetupTable`, boss scripts and tables, `gDemoTable`, ~75 MenuDesc (`g<Menu>MenuDesc`), `sCheatCodes`; and their module-2 copies (`_2`) |
+
+What the merge decided:
+
+- **g7's `_2` addresses** were the link addresses (where the module-2 code
+  reaches them, 0xE0 below the module-1 original in that range). They are the
+  named addresses now (link + 0x39000), like every other `_2` name; each line
+  notes its link address. Interior `_2` names end in `_2`
+  (`sBlindOnePhases_update_2`, `sPlayerSpeedTable_scale_2`, `sCheatCodes_unk4_2`).
+- **One address, two data**: module 1's `sPrimagenTossTableStage3`
+  (0x00431CF0) is also the link address of `sMotherBossDropTablePhase2_2`
+  (named 0x0046ACF0). `MotherBoss_UpdateSpotsAndPickups_2` declares the
+  token itself, so the tool gives it the `_2` name there; both symbols are
+  defined at 0x00431CF0.
+- **Seed vs part**: g7's `sMotherBossSpawnPoints(_2)` are the seed's
+  `gMotherSpawnPoints(_2)`, kept. The seed's `gMusicTrack` is
+  `gAudioWorld_seq_track` (gAudioWorld+0x1D8C, `SndSeq.unk28` renamed `track`).
+- **`D_` tokens that are functions** (g7): `CCache__Main`, `Generator_Step`,
+  `InteractiveAnim_Step`, `InteractiveAnim_DrawAllModels`, `__amMain`,
+  `__amDmaNew`, `alEnvmixerParam`, `viMgrMain`, `__osException`,
+  `HostIo_ThreadMain` are spelled so in C now (the `D_` lines in
+  `symbols_manual`/`foreign_labels` stay, aliases at the same address).
+- **Library names**: data named as libultra spells it (`__osRunQueue`,
+  `alGlobals`, `osViModeTable`...) meets ultralib's own `extern`; `--check`
+  reports that as a warning now, and the build checks the declarations agree.
+- `osMemSize` stays a constant-address `#define` in `HostIo_Init`
+  (func_002A2104.c): `extern u32 osMemSize` schedules differently.
+- Field renames, all still matching: `CScene.unk_18FDC` -> `m_PendingWarpID`
+  (`gScene_m_PendingWarpID`), `SndSeq.unk28` -> `track`. Function renames:
+  `AI_SpawnParticlesOnce`/`ByMask` -> `AI_DropPickupsOnce`/`ByMask` (they call
+  `GameObject_DropPickupAt`). CPlayer__SetCharacter's local `sound` is
+  `modelId`.
+
+Field names the round found but did not apply (each needs a struct change or
+is not certain):
+
+- `CEngineApp` +0x19440 is a COnScreen (`COnScreen__Construct((u8 *)e +
+  0x19440)`) and +0x19608 the swoosh system: the symbols are
+  `gEngineApp_m_OnScreen` and `gEngineApp_m_SwooshSystem`, but CEngineApp
+  still has `unk19440` bytes there; the members are to add.
+- `CScene.m_PreviewState` / `m_PreviewTimer` (+0x18FE0/+0x18FE4) are read as
+  the first usable weapon - 1 and the weapon count (`CBarrel__Open`,
+  `CPlayer__GetNextUsableWeapon`): the names look wrong; the symbols keep them.
+- `CScene.m_pSections`/`m_nSections` and `m_bStreamAll` look misnamed
+  (`CEmitterPool__Advance` reads the first as the emitter definition table, g5).
+- `GameSettings` +0x0C is the brightness (`gEngineApp_m_Settings_unkC`);
+  +0x16 is the speech volume per SoundMenu_StepSpeechVolume, which sound.h's
+  copy calls `musicVolume`: one of the two is wrong.
+- `gTotemDefense_kills` (+0x10) lies past the local BossFight struct.
+- `D_800D7BE0` is declared `B12Mgr` but only used at offsets >= 0x5F0: it is
+  `gCache - 0x5F0`; those accesses belong to gCache.
+
+Names to accept or revisit: g2's `gPlayerStateTable_tuning`/`_anim` (fields
+`unk8`/`unk14` in the local structs) and `gWeaponInfoTable_22`
+(`&gWeaponInfoTable[22]`); g4's seven aliases into array rows are left as
+comments, not names.
+
+Wrong declared types, the input for a types round. 341 data names are declared
+with more than one type across the C; many of those are only address uses
+(`u8 []`, `char`) and harmless. The ones that matter, where the real type is
+known:
+
+| Symbol | Declared as (count) | Real type |
+| --- | --- | --- |
+| `gScene` | `u8 []` 126, `s32` 71, `CScene` 25, `s32 []` 11, `char`... | `CScene` |
+| `gEngineApp_m_Settings` | `s32` 383, `u32` 5, `B19bG8 []`, `GameSettings` 1 | `GameSettings` |
+| `gEngineApp` | `u8 []` 13, `s32` 7, `GameSession` 3, `View []`, `FrameSchedule []`, `CEngineApp` 1 | `CEngineApp` |
+| `gEngineApp_m_Game_m_PlayerList_m_ActiveList_m_pHead` | `CPlayer *` 13, `void *` 6, `u8 *` 3, `CGameObjectInstance *` 2, `B18Ent *`, `ProjNode *`, `s32` | `CPlayer *` |
+| `gEngineApp_m_Game_m_CameraPool` | `u8 []` 16, `char []` 9, `MenuMatchGlobals` 4, `CGameFromCameraPool` 3, `CCameraPool` 1 | `CCameraPool` (the settings are read through it as `CGameFromCameraPool`) |
+| `gEngineApp_m_Game_m_MenuPool` | `u8 []` 30, `char []` 15, `s32` 8, `MenuPool` 2, `Globals` 2 | `MenuPool` |
+| `gEngineApp_m_Settings_unlockedCheats` | `s32` 179, `u32` 3, `Shape_8011AADC` | `u32` |
+| `gEnemyBehaviorInfo` | `ModeHandler *[]` | `CEnemyBehaviorInfo *[8]` (ROM debug type `s_CEnemyBehaviorInfo`) |
+| `gBlendState_m_Color` | `f32 [5]`, `O06Cam` | the `m_Color` field of the blend state |
+| `gHeap` | `u8 []` 4, `char` 3, `s32` 2 | `CHeap` |
+| `gLoader` | `s32` 4, `char []` 4, `u8 []` 2 | `CLoader` |
+| `gHashTable` | `s32` 4, `EntryRecAtCV1 *` 2, `ResourceHashEntry *`, `HashEntry *` | the cache's hash table |
+| `gCinemaPlayerP` | `Cinema *` 28, `void *`, `func_802457D0_S1 *`, `Shared_MenuContext *` | `Cinema *` |
+| `gAudioWorld` | `s32` 23, `u8 []` 3, `char` | `CAudioWorld` |
+| `gCache_mutex` | `s32` 8, `OSMesgQueue` 6, `u8 []` 3 | CCache's `mutex` member |
+| `gSiMessageQueue` | `u8 []` 8, `OSMesgQueue` 4, `u8` 2 | `OSMesgQueue` |
+| `__osContBuffer`, `__osPfsPifRam` | `s32`, `char`, `u8 []`, `OSPifRam` | `OSPifRam` |
+| `__osRunningThread` | `OSThread *` 4, `void *` 2, `ThreadNode *`, `Unk0029B150 *` | `OSThread *` |
+| `__osPiDevMgr` | `OSDevMgr`, `int`, `s32`, `State` | `OSDevMgr` |
+| `gPakDirectories` | `int *` 2, `s32`, `RecordRecAt4V2 *`, `PakDirectory *` | `PakDirectory *` |
+| `gPakProfile` | `PakProfile` 7, `u16 []`, `u8 []` | `PakProfile` |
+| `gSavedPlayers` | `char`, `s32 []`, `s32`, `CSavedPlayers` | `CSavedPlayers` |
+| `gEngineApp_m_Settings_match` | `s32` 7, `S10Game []`, `GameMatch` | `GameMatch` |
+| `gCollisionInfoLineOfSight` | `u8 []` 3, `CCollisionInfo` 2, `struct CollisionInfo` 2 | `CCollisionInfo` |
+| `gLevelScript` | `s32` 4, `ModeState0040457C` 2, `LevelScriptState` | `LevelScriptState` |
+| g1's literal pools | `Tuning`, `Unk800A71A8`, `Unk800A7990`, `func_8020CA10_G1` structs | float pools, not structs |
+
+The full list comes from scanning every `extern` of a named symbol (round G2
+coordinator's script; easy to redo: group the declarations by name, keep the
+names with more than one type).
 
 ## Open questions
 
@@ -194,10 +371,12 @@ the parts' notes and their file comments:
 - Names by behaviour only, with no Acclaim source to confirm them: most of the
   bosses, menus and AI-type callbacks (both Rage Wars decomps leave those
   `func_`).
-- Module-2 C files still call many functions by their link address as
-  `func_XXXXXXXX` (about 390 calls, e.g. `func_004263A0` for
-  `Pak_ProbeSlot_2`); they could use the module-2 names, as the two fixed cases
-  above do.
+- Module-2 calls (round N3): `apply_names.py` rewrites a module-2 C file's
+  `func_<link>` or first-module name at a link address to the name at link +
+  0x39000, in code only (comments keep the first module's). Unnamed targets now
+  say `func_<named>`. Left: `__osIdCheckSum` in the pfs copies (no function at
+  link + 0x39000, in the 0xE0-shifted region) and three `func_` uses that are
+  data labels (0x00438728, 0x00438800, 0x0043908C).
 - `func_00430500` clears the automap's counts and vertex buffers, but is not
-  named; the automap struct is still `CDebugLines`.
+  named.
 - 323 C functions are still `func_`.

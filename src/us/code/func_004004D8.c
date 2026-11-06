@@ -11,7 +11,7 @@
 
 #define GFX(a, b)                       \
     {                                   \
-        Gfx *_g = D_800D8E24++;         \
+        Gfx *_g = gDList++;         \
         _g->w0 = (a);                   \
         _g->w1 = (b);                   \
     }
@@ -55,24 +55,24 @@ typedef struct {
     /* 0x110 */ void *colorImage;
 } FrameBuffers;
 
-extern s32 D_800B6D1C;      /* buffer index */
-extern s32 D_800B6D54;
-extern s32 D_800C2030;      /* screen width */
-extern s32 D_800C2034;      /* screen height */
-extern FrameBuffers *D_800F7070[]; /* CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (D_800F6CB0.m_pCurrentFrameData would need game.h, whose D_8011AAD8 is not this file's s32) */
-extern CWorld D_800F7078;
-extern s32 D_8011AAD8;
-extern s32 D_8011AC8C;
-extern Vp D_8011B0A8[];
-extern Mtx D_80129100[2];
-extern Mtx D_80129180[2];
-extern u16 D_80129200[];    /* line vertex indices */
-extern Mtx D_80129A00;
-extern MapVtx D_80129A40[2][0x200];
-extern MapVtx D_8012DA40[2][8];
-extern MapVtx D_8012F340[2][3];
-extern u8 D_800AB100[];
-extern u8 D_800AB130[];
+extern s32 gEvenOdd;      /* buffer index */
+extern s32 gPersistentDataLoaded;
+extern s32 gScreenWidth;      /* screen width */
+extern s32 gScreenHeight;      /* screen height */
+extern FrameBuffers *gEngineApp_m_pCurrentFrameData[]; /* CFrameData * (structs/frame.h); declared as an array here: as a scalar the code is scheduled differently (gEngineApp.m_pCurrentFrameData would need game.h, whose gEngineApp_m_Settings is not this file's s32) */
+extern CScene gScene;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_nextMode;
+extern Vp gScreenViewport[];
+extern Mtx sAutomapWorldMtx[2];
+extern Mtx sAutomapScreenMtx[2];
+extern u16 sAutomapLineIndices[];    /* line vertex indices */
+extern Mtx sAutomapOrthoMtx;
+extern MapVtx sAutomapLineVtx[2][0x200];
+extern MapVtx sAutomapMagentaVtx[2][8];
+extern MapVtx sAutomapYellowVtx[2][3];
+extern u8 gRspInitDL[];
+extern u8 gRdpInitDL[];
 
 extern char *CISet__GetBlock(s32 *data, s32 index);
 extern void CMtxF__InvertAffine(f32 *out, f32 *m);
@@ -138,7 +138,7 @@ void Automap_Draw(MapView *view) {
     CVector3 *p1;
     CVector3 *a;
     char *data;
-    CWorld *w;
+    CScene *w;
     f32 s;
     f32 c;
     f32 cx;
@@ -167,20 +167,20 @@ void Automap_Draw(MapView *view) {
     s32 k;
     s32 *code;
 
-    vp = &D_8011B0A8[D_800B6D1C];
-    if (D_8011AC8C == 1) {
+    vp = &gScreenViewport[gEvenOdd];
+    if (gEngineApp_m_Settings_nextMode == 1) {
         return;
     }
-    guOrtho(&D_80129A00, 0.0f, D_800C2030 - 1, 0.0f, D_800C2034 - 1, -200.0f, 200.0f, 32.0f);
-    if (view->visible == 0 || D_800B6D54 == 0) {
+    guOrtho(&sAutomapOrthoMtx, 0.0f, gScreenWidth - 1, 0.0f, gScreenHeight - 1, -200.0f, 200.0f, 32.0f);
+    if (view->visible == 0 || gPersistentDataLoaded == 0) {
         return;
     }
     GFX(0xDB060000, 0);                                 /* gSPSegment(0, 0) */
-    GFX(0xDE000000, (u32) D_800AB100);                  /* gSPDisplayList */
-    GFX(0xDE000000, (u32) D_800AB130);
-    GFX(0xED000000, ((((s32) ((f32) (D_800C2030 - 1) * 4.0f)) & 0xFFF) << 12) |
-                        (((s32) ((f32) (D_800C2034 - 1) * 4.0f)) & 0xFFF)); /* gDPSetScissor */
-    GFX(0xFF100000 | ((D_800C2030 - 1) & 0xFFF), (u32) D_800F7070[0]->colorImage); /* gDPSetColorImage */
+    GFX(0xDE000000, (u32) gRspInitDL);                  /* gSPDisplayList */
+    GFX(0xDE000000, (u32) gRdpInitDL);
+    GFX(0xED000000, ((((s32) ((f32) (gScreenWidth - 1) * 4.0f)) & 0xFFF) << 12) |
+                        (((s32) ((f32) (gScreenHeight - 1) * 4.0f)) & 0xFFF)); /* gDPSetScissor */
+    GFX(0xFF100000 | ((gScreenWidth - 1) & 0xFFF), (u32) gEngineApp_m_pCurrentFrameData[0]->colorImage); /* gDPSetColorImage */
     GFX(0xDC080008, (u32) vp);                          /* gSPViewport */
     GFX(0xE7000000, 0);                                 /* gDPPipeSync */
     GFX(0xE3000A01, 0);                                 /* gDPSetCycleType(G_CYC_1CYCLE) */
@@ -193,7 +193,7 @@ void Automap_Draw(MapView *view) {
     GFX(0xDB04000C, 6);
     GFX(0xDB040014, 0xFFFA);
     GFX(0xDB04001C, 0xFFFA);
-    GFX(0xDA380007, (u32) &D_80129A00);                 /* gSPMatrix(projection, load) */
+    GFX(0xDA380007, (u32) &sAutomapOrthoMtx);                 /* gSPMatrix(projection, load) */
 
     cx = view->pos.x;
     cz = view->pos.z;
@@ -208,24 +208,24 @@ void Automap_Draw(MapView *view) {
     CMtxF__ScaleColumns(world, scaleX, scaleZ, 1.0f);
     CMtxF__RotateZ(world, view->angle + 3.1415929f);
     {
-        f32 centreY = D_800C2034 / 2;
+        f32 centreY = gScreenHeight / 2;
 
         centreY -= 16.0f;
-        CMtxF__Translate(world, D_800C2030 / 2, centreY, 0.0f);
+        CMtxF__Translate(world, gScreenWidth / 2, centreY, 0.0f);
     }
     CMtxF__InvertAffine(inverse, world);
 
     corners[0].x = 0.0f;
     corners[0].y = 0.0f;
     corners[0].z = 0.0f;
-    corners[1].x = D_800C2030;
+    corners[1].x = gScreenWidth;
     corners[1].y = 0.0f;
     corners[1].z = 0.0f;
-    corners[2].x = D_800C2030;
-    corners[2].y = D_800C2034;
+    corners[2].x = gScreenWidth;
+    corners[2].y = gScreenHeight;
     corners[2].z = 0.0f;
     corners[3].x = 0.0f;
-    corners[3].y = D_800C2034;
+    corners[3].y = gScreenHeight;
     corners[3].z = 0.0f;
     for (i = 0; i < 4; i++) {
         CMtxF__TransformPoint(inverse, &corners[i], &viewCorners[i]);
@@ -240,11 +240,11 @@ void Automap_Draw(MapView *view) {
         box.maxZ = !(box.maxZ <= a->y) ? box.maxZ : a->y;
     }
 
-    CMtxF__ToMtxAffine(world, &D_80129100[D_800B6D1C]);
-    GFX(0xDA380003, (u32) &D_80129100[D_800B6D1C]);    /* gSPMatrix(modelview, load) */
+    CMtxF__ToMtxAffine(world, &sAutomapWorldMtx[gEvenOdd]);
+    GFX(0xDA380003, (u32) &sAutomapWorldMtx[gEvenOdd]);    /* gSPMatrix(modelview, load) */
 
-    vtx = D_80129A40[D_800B6D1C];
-    w = &D_800F7078;
+    vtx = sAutomapLineVtx[gEvenOdd];
+    w = &gScene;
     regions = (CGameRegion *) (CISet__GetBlock(w->m_pRegionData, 2) + 8);
     data = CISet__GetBlock(w->m_pRegionData, 3);
     areas = (Area *) (data + 8);
@@ -253,7 +253,7 @@ void Automap_Draw(MapView *view) {
     nIdx = 0;
     base = 0;
     nVtx = 0;
-    showAll = TestFlag(D_8011AAD8, 0x2000) != 0;
+    showAll = TestFlag(gEngineApp_m_Settings, 0x2000) != 0;
     for (n = 0; n < areaCount; n++) {
         area = &areas[n];
         if (area->maxX > box.minX && area->minX < box.maxX && area->maxZ > box.minZ && area->minZ < box.maxZ) {
@@ -313,7 +313,7 @@ void Automap_Draw(MapView *view) {
                         newVtx = vtx[nVtx - 1].ob[1] != (s16) p0->z;
                     }
                     if (newVtx) {
-                        D_80129200[nIdx++] = nVtx;
+                        sAutomapLineIndices[nIdx++] = nVtx;
                         vtx[nVtx].ob[0] = p0->x;
                         vtx[nVtx].ob[1] = p0->z;
                         height = (p0->y - view->pos.y) * 0.390625f;
@@ -395,9 +395,9 @@ void Automap_Draw(MapView *view) {
                         vtx[nVtx].cn[3] = fade * view->fade;
                         nVtx++;
                     } else {
-                        D_80129200[nIdx++] = nVtx - 1;
+                        sAutomapLineIndices[nIdx++] = nVtx - 1;
                     }
-                    D_80129200[nIdx++] = nVtx;
+                    sAutomapLineIndices[nIdx++] = nVtx;
                     vtx[nVtx].ob[0] = p1->x;
                     vtx[nVtx].ob[1] = p1->z;
                     height = (p0->y - view->pos.y) * 0.390625f;
@@ -498,11 +498,11 @@ draw:
     while (remaining >= 2) {
         count = MIN(remaining, 32);
         GFX(VTX_W0(count), (u32) &vtx[nVtx]);
-        while (D_80129200[i + 1] - nVtx < count && i < nIdx - 1) {
-            GFX(LINE_W0(D_80129200[i] - nVtx, D_80129200[i + 1] - nVtx), 0);
+        while (sAutomapLineIndices[i + 1] - nVtx < count && i < nIdx - 1) {
+            GFX(LINE_W0(sAutomapLineIndices[i] - nVtx, sAutomapLineIndices[i + 1] - nVtx), 0);
             i += 2;
         }
-        if (D_80129200[i + 1] - nVtx == count) {
+        if (sAutomapLineIndices[i + 1] - nVtx == count) {
             count--;
         }
         remaining -= count;
@@ -510,7 +510,7 @@ draw:
     }
 
     /* The player's arrow. */
-    vtx = D_8012F340[D_800B6D1C];
+    vtx = sAutomapYellowVtx[gEvenOdd];
     len = 40.0f;
     wid = 25.0f;
     alpha = view->fade * 255.0f;
@@ -528,11 +528,11 @@ draw:
     GFX(LINE_W0(0, 2), 0);
 
     /* The compass. */
-    vtx = D_8012DA40[D_800B6D1C];
+    vtx = sAutomapMagentaVtx[gEvenOdd];
     CMtxF__SetScale(screen, 0.5f, 0.5f, 1.0f);
-    CMtxF__Translate(screen, D_800C2030 / 2, 32.0f, 0.0f);
-    CMtxF__ToMtxAffine(screen, &D_80129180[D_800B6D1C]);
-    GFX(0xDA380003, (u32) &D_80129180[D_800B6D1C]);
+    CMtxF__Translate(screen, gScreenWidth / 2, 32.0f, 0.0f);
+    CMtxF__ToMtxAffine(screen, &sAutomapScreenMtx[gEvenOdd]);
+    GFX(0xDA380003, (u32) &sAutomapScreenMtx[gEvenOdd]);
     alpha = view->fade * 255.0f;
     radius = 15.0f;
     vtx[0].ob[0] = func_002982F0(view->angle) * radius;

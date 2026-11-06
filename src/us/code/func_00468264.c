@@ -12,12 +12,12 @@ typedef struct Slot {
     /* 0x18 */ u8 pad18[0x224 - 0x18];
 } Slot;
 
-void func_0042F0E4(void);
-extern Slot D_800F5F70[];
+void Demo_Update_2(void);
+extern Slot gControllers_buttons[];
 static __inline__ void fire(DemoStream *t) { t->decode(t); }
 static __inline__ void tick(DemoStream *t) { if (--t->frames <= 0) t->decode(t); }
 void Demo_UpdateStreams_2(void) {
-    DemoPlayer *s = &D_800F56B0;
+    DemoPlayer *s = &gDemoPlayer;
     s32 i;
 
     if (s->fastForward != 0) {
@@ -35,14 +35,14 @@ void Demo_UpdateStreams_2(void) {
     }
     for (i = 0; i < s->playerCount; i++) {
         if (s->done != 0) {
-            D_800F5F70[i].a = 0;
-            D_800F5F70[i].b = 0;
-            D_800F5F70[i].c = 0;
+            gControllers_buttons[i].a = 0;
+            gControllers_buttons[i].b = 0;
+            gControllers_buttons[i].c = 0;
         } else {
-            D_800F5F70[i].a = s->buttons[i].value;
-            D_800F5F70[i].b = s->stickX[i].value;
-            D_800F5F70[i].c = s->stickY[i].value;
+            gControllers_buttons[i].a = s->buttons[i].value;
+            gControllers_buttons[i].b = s->stickX[i].value;
+            gControllers_buttons[i].c = s->stickY[i].value;
         }
     }
-    func_0042F0E4();
+    Demo_Update_2();
 }

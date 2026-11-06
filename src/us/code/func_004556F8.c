@@ -10,20 +10,20 @@ struct RecordRecAt14 {
     char padC[0x14 - 0xC];
     s32 value;
 };
-extern f32 D_80130930;
-extern f32 D_800B6D28;
+extern f32 sResolutionToggleDelay;
+extern f32 gFrameIncrement;
 extern s32 GetMemSize(void);
-extern s32 func_00424500();
+extern s32 Video_GetResolutionText_2();
 s32 OptionsMenu_ResolutionText_2(struct RecordRecAt14 *record) {
-    D_80130930 -= D_800B6D28;
-    if (D_80130930 <= 0.0f) {
-        D_80130930 = 0.0f;
+    sResolutionToggleDelay -= gFrameIncrement;
+    if (sResolutionToggleDelay <= 0.0f) {
+        sResolutionToggleDelay = 0.0f;
     }
     if (GetMemSize() != 0x400000) {
         record->flags |= 0x1000000;
     } else {
         record->flags &= ~0x1000000;
     }
-    record->value = func_00424500();
+    record->value = Video_GetResolutionText_2();
     return 0;
 }

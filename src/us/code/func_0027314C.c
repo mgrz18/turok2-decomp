@@ -7,10 +7,10 @@
 /* The bank seen from 0x7C: the ROM addresses its sound ids from there. */
 typedef struct SoundVoice {
     /* 0x00 */ u8 pad0[0x60];
-    /* 0x60 */ s16 ids[1];                     /* SndMgr.handles */
+    /* 0x60 */ s16 ids[1];                     /* CAudioWorld.handles */
 } SoundVoice;
 
-extern u8 D_801198B0[];
+extern u8 gEngineApp_m_Game_m_CameraPool[];
 
 extern s32 CCameraPool__GetNearestCamera(void *game, CVector3 *pos);
 extern void alSndpSetSound(void *player, s32 id);    /* alSndpSetSound */
@@ -23,11 +23,11 @@ extern void SndVoice_UpdatePan(SndVoice *s);
 extern void SndVoice_UpdatePitch(SndVoice *s);
 
 void SndVoice_Update(SndVoice *s) {
-    SndMgr *bank;
+    CAudioWorld *bank;
     s32 playing;
     void *player;
 
-    s->mgr->listener = CCameraPool__GetNearestCamera(D_801198B0, &s->vp.pos);
+    s->mgr->listener = CCameraPool__GetNearestCamera(gEngineApp_m_Game_m_CameraPool, &s->vp.pos);
     bank = s->mgr;
     alSndpSetSound(&bank->player, bank->handles[s->index]);
     playing = alSndpGetState(&bank->player);
@@ -39,7 +39,7 @@ void SndVoice_Update(SndVoice *s) {
     }
     if (playing) {
         if (s->stopping) {
-            SndMgr *b = s->mgr;
+            CAudioWorld *b = s->mgr;
             s->stopping = 1;
             s->vp.follow = NULL;
             player = &b->player;
@@ -62,7 +62,7 @@ void SndVoice_Update(SndVoice *s) {
         return;
     }
     if (!playing) {
-        SndMgr *b = s->mgr;
+        CAudioWorld *b = s->mgr;
         SoundVoice *v = (SoundVoice *)((u8 *)b + 0x7C);
         alSndpDeallocate(&b->player, v->ids[s->index]);
         v->ids[s->index] = -1;

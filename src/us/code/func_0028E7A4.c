@@ -9,9 +9,9 @@
 #include "structs/pager.h"
 
 
-extern char D_80120DC0[];               /* the reader thread's stack; its OSThread is 0x230 below */
-extern char D_800D1CD8[];               /* the cartridge reader */
-extern char D_80132000[];               /* the page array, 0x1000 per page */
+extern char gPager_readerStack[];               /* the reader thread's stack; its OSThread is 0x230 below */
+extern char gLoader[];               /* the cartridge reader */
+extern char gVMPages[];               /* the page array, 0x1000 per page */
 
 void memset(void *dst, s32 value, s32 size);
 void osCreateThread(void *thread, s32 id, void (*entry)(void *), void *arg, void *sp, s32 pri);
@@ -32,11 +32,11 @@ void VM_ReaderThread(void *unused);
 void VM_ManagerThread(void) {
     void *request;
 
-    memset(D_80120DC0, 0x62, 0x200);
-    osCreateThread(D_80120DC0 - 0x230, 0x62, VM_ReaderThread, NULL, D_80120DC0 + 0x200, 0x94);
-    osStartThread(D_80120DC0 - 0x230);
+    memset(gPager_readerStack, 0x62, 0x200);
+    osCreateThread(gPager_readerStack - 0x230, 0x62, VM_ReaderThread, NULL, gPager_readerStack + 0x200, 0x94);
+    osStartThread(gPager_readerStack - 0x230);
     for (;;) {
-        osRecvMesg(&D_801206A0.completion, &request, 1);
+        osRecvMesg(&gPager.completion, &request, 1);
         switch (((PageJob *)request)->type) {
             case 0:
                 VM_HandleTLBMiss();

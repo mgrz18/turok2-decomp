@@ -16,10 +16,10 @@ typedef struct {
     /* 0x08 */ TriGroup groups[1];
 } TriGroupList;
 
-extern s32 D_800B6D54;          /* level loaded */
-extern CWorld D_800F7078;
-extern CGameRegion *D_800B2608;    /* triangle of the cached raw normal */
-extern CVector3 D_800F2020;        /* cached raw normal */
+extern s32 gPersistentDataLoaded;          /* level loaded */
+extern CScene gScene;
+extern CGameRegion *sCachedRawNormalRegion;    /* triangle of the cached raw normal */
+extern CVector3 sRegionNormal;        /* cached raw normal */
 
 extern void *CISet__GetBlock(void *file, s32 index); /* a block of a file */
 extern void CVector3__Subtract(CVector3 *out, CVector3 *a, CVector3 *b);   /* out = a - b */
@@ -61,11 +61,11 @@ static __inline__ f32 TriHeight(CGameRegion *tri, f32 x, f32 z) {
     if (tri == NULL) {
         return -14336.0f;
     }
-    if (tri != D_800B2608) {
-        cross_edges(&D_800F2020, tri);
+    if (tri != sCachedRawNormalRegion) {
+        cross_edges(&sRegionNormal, tri);
     }
-    normal = D_800F2020;
-    D_800B2608 = tri;
+    normal = sRegionNormal;
+    sCachedRawNormalRegion = tri;
     if (normal.y == 0.0f) {
         return (tri->m_pVertices[0]->y + tri->m_pVertices[1]->y + tri->m_pVertices[2]->y) * (1.0f / 3);
     }
@@ -75,7 +75,7 @@ static __inline__ f32 TriHeight(CGameRegion *tri, f32 x, f32 z) {
 
 /* The level triangle nearest below pos (other than skip), NULL if none. */
 CGameRegion *CGameRegion__FindBelow(CGameRegion *skip, CVector3 pos) {
-    CWorld *world;
+    CScene *world;
     CGameRegion *tris;
     TriGroupList *list;
     TriGroup *groups;
@@ -90,10 +90,10 @@ CGameRegion *CGameRegion__FindBelow(CGameRegion *skip, CVector3 pos) {
     s32 i;
     u32 j;
 
-    if (!D_800B6D54) {
+    if (!gPersistentDataLoaded) {
         return NULL;
     }
-    world = &D_800F7078;
+    world = &gScene;
     tris = (CGameRegion *) ((u8 *) CISet__GetBlock(world->m_pRegionData, 2) + 8);
     list = CISet__GetBlock(world->m_pRegionData, 3);
     n = list->count;

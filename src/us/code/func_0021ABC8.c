@@ -37,7 +37,7 @@ typedef struct BoneInfo {
     char pad0[0x6C];
     s32 mask;
 } BoneInfo;
-extern int D_800ACB94;
+extern int gAnimEventCount;
 extern void CMtxF__TransformPoint(void *arg0, void *arg1, void *arg2);
 extern void *CISet__GetBlock(void *, s32);
 extern void CCache__Unlock(void *heap, s32 *resource);
@@ -84,7 +84,7 @@ void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from,
                 local.z = events[i].local.y;
                 CMtxF__TransformPoint(obj->transform, &local, &pos);
             } else {
-                if (checkMask && (D_800AD084[events[i].effect].m_Flags & 4)) {
+                if (checkMask && (gImpactEventHandlers_m_Flags[events[i].effect].m_Flags & 4)) {
                     if (resource == 0) {
                         resource = CGameObjectInstance__LoadGeometry(obj);
                         if (resource == 0) {
@@ -107,7 +107,7 @@ void CGameObjectInstance__FireAnimEvents(ObjectLinks *obj, void *anim, f32 from,
             }
             if (fire != 0) {
                 ImpactEvent_Send(obj, obj, events[i].effect, -1, pos, events[i].params);
-                D_800ACB94++;
+                gAnimEventCount++;
             }
         }
     }

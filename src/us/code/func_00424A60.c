@@ -1,12 +1,12 @@
-/* First-module twin of src/us/code/Mission_LevelObjectivesDone_2.c. The flag test is an inline helper, so &D_800F7078 is re-addressed by symbol at each call. */
+/* First-module twin of src/us/code/Mission_LevelObjectivesDone_2.c. The flag test is an inline helper, so &gScene is re-addressed by symbol at each call. */
 #include "common.h"
 
 s32 CScene__GetLinkGroupCount(void *arg0, s32 arg1);
 
-extern s32 D_800F7078;
+extern s32 gScene;
 
 static __inline__ s32 IsSet(s32 flag) {
-    return CScene__GetLinkGroupCount(&D_800F7078, flag);
+    return CScene__GetLinkGroupCount(&gScene, flag);
 }
 
 s32 Mission_LevelObjectivesDone(s32 level) {

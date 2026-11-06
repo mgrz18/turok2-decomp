@@ -2,8 +2,8 @@
 #include "common.h"
 #include "structs/player.h"
 
-extern char D_800ADE70;
-extern char D_800ADDBC;
+extern char gStandLookTuning;
+extern char gStandMoveTuning;
 extern void Math_EaseToward(f32 *value, f32 target, f32 rate);
 extern void CPlayer__TurnAndLook(void *, void *, void *);
 extern void CPlayer__MoveOnFoot(void *, void *, void *);
@@ -15,9 +15,9 @@ extern f32 GameObject_GetGroundHeight(void *body, s32 arg);
  * (falling) picks animation 0x7F8 when the slope speed is under 61.44. */
 void PlayerFall_Update(CPlayer *player, CGameObjectInstance *body) {
     Math_EaseToward(&player->m_vHeadRotOffset.z, 0.0f, 0.25f);
-    CPlayer__TurnAndLook(player, body, &D_800ADE70);
+    CPlayer__TurnAndLook(player, body, &gStandLookTuning);
     if (!(player->m_ModeBeforeFlags & 0x8000)) {
-        CPlayer__MoveOnFoot(player, body, &D_800ADDBC);
+        CPlayer__MoveOnFoot(player, body, &gStandMoveTuning);
     }
     if (body->m_vVelocity.y <= 0.0f) {
         if (GameObject_IsOnGround(body) != 0) {

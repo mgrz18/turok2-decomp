@@ -8,7 +8,7 @@
 #include "common.h"
 #include "ultra_types.h"
 
-/* Request block sent to the I/O thread through D_80128370. */
+/* Request block sent to the I/O thread through sHostIoRequestQueue. */
 typedef struct IoRequest {
     /* 0x00 */ u8 *buffer;
     /* 0x04 */ s32 size;
@@ -26,10 +26,10 @@ typedef struct IoRequest {
     /* 0x1C */ OSMesgQueue *reply;
 } IoRequest; /* size 0x20 */
 
-extern s32 D_800BC300;  /* DMA allowed */
-extern s32 D_800BC304;
-extern OSMesgQueue D_801270C0;
-extern OSMesgQueue D_80128370;
+extern s32 sHostIoPiReady;  /* DMA allowed */
+extern s32 sHostIoState;
+extern OSMesgQueue sHostIoEventQueue;
+extern OSMesgQueue sHostIoRequestQueue;
 extern s32 osRecvMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern s32 osSendMesg(OSMesgQueue *mq, void *msg, s32 flag);
 extern u32 HostIo_ReadWord(u32 address);
@@ -45,7 +45,7 @@ s32 PCinit(void) {
     s32 result;
 
     saved = HostIo_DisableInt();
-    D_800BC304 = 1;
+    sHostIoState = 1;
     result = HostIo_Call(0x101, 0, 0, 0);
     HostIo_RestoreInt(saved);
     return result;

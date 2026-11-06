@@ -27,9 +27,9 @@ extern const f32 D_800A5B38;
 extern const f32 D_800A5B3C;
 extern const f32 D_800A5B40;
 extern const f32 D_800A5B44;
-extern f32 D_800DD78C;
-extern B10Obj *D_800F7C70[];
-extern s32 D_800F7E70;
+extern f32 gQuaternionSin;
+extern B10Obj *gScene_m_pRegistered[];
+extern s32 gScene_m_nRegistered;
 f32 func_002982F0(f32 x);
 f32 func_002974C0(f32 x);
 void CGameObjectInstance__GetRotation(B10Q4 *out, B10Obj *o);
@@ -80,9 +80,9 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
     CMtxF__TransformPoint(&mA0, &v20, &v30);
     best = 0;
     thr = func_002974C0(new_var2 * D_800A5B30);
-    n = D_800F7E70;
+    n = gScene_m_nRegistered;
     for (i = 0; i < n; i++) {
-        obj = D_800F7C70[i];
+        obj = gScene_m_pRegistered[i];
         if (obj == self) {
             continue;
         }
@@ -111,7 +111,7 @@ B10Q4 *func_0021B038(B10Q4 *out, B10Obj *self, CVector3 dir, B10Q4 *outq, f32 an
         t *= func_00298470(func_00298470(D_800A5B3C - t / (new_var2 * D_800A5B38)));
         t *= D_800A5B40;
         s = func_002982F0(t);
-        D_800DD78C = s;
+        gQuaternionSin = s;
         q80.x = v40.x * s;
         q80.y = v40.y * s;
         q80.z = v40.z * s;

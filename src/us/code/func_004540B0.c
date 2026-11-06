@@ -2,11 +2,11 @@
  * (0x30 bytes); the cases follow up to 0x454130. */
 #include "common.h"
 
-extern s32 D_80130924; /* the selected option (see CheatsMenu_WarpSelect_2) */
+extern s32 sCheatsMenuSelection; /* the selected option (see CheatsMenu_WarpSelect_2) */
 
 /* The level of the selected option. */
 s32 CheatMenu_GetWarpLevel_2(void) {
-    switch (D_80130924) {
+    switch (sCheatsMenuSelection) {
     case 0:
     default:
         return 1000;

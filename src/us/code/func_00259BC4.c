@@ -19,5 +19,5 @@ void WeaponMode_AE7F4_Enter(CGameObjectInstance *obj, CAI *ai) {
     temp_v0 = &temp_v1->m_vPos;
     Sound__Play(0x1BB, *temp_v0, (s32) temp_v0, -1);
     ai->m_ModeTime = 0.0f;
-    *(f32 *) &ai->m_VarBuffer[3] = (f32) (D_800AF618[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A7348.scale);
+    *(f32 *) &ai->m_VarBuffer[3] = (f32) (gWeaponInfoTable[((CPlayer *) obj->m_AI.m_pParent)->m_Data.m_CurrentWeapon]->fireDelay * D_800A7348.scale);
 }

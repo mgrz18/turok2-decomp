@@ -18,14 +18,14 @@ typedef struct {
     u8 value_15;                /* 0x015 */
 } Settings;
 
-extern Settings D_8011AAF1;
+extern Settings gEngineApp_m_Settings_multiplayer;
 
 u8 Hud_GetSpriteValue(s32 unused, s32 id) {
     Settings *settings;
     SubSettings *sub;
 
     if (id == 0x2DA) {
-        settings = &D_8011AAF1;
+        settings = &gEngineApp_m_Settings_multiplayer;
         sub = (SubSettings *)((char *)settings + 0x1BF);
         if (settings->enabled != 0) {
             if (sub->unk_34 == 0) {

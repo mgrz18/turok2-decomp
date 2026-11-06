@@ -11,10 +11,10 @@ typedef struct LineVtx {
 } LineVtx;
 
 /* Two (double-buffered) sets of debug vertex buffers, one colour each. */
-extern LineVtx D_80129A40[2][0x200]; /* green */
-extern LineVtx D_8012DA40[2][8];     /* magenta */
-extern LineVtx D_8012DB40[2][0xC0];  /* red */
-extern LineVtx D_8012F340[2][3];     /* yellow */
+extern LineVtx sAutomapLineVtx[2][0x200]; /* green */
+extern LineVtx sAutomapMagentaVtx[2][8];     /* magenta */
+extern LineVtx sAutomapRedVtx[2][0xC0];  /* red */
+extern LineVtx sAutomapYellowVtx[2][3];     /* yellow */
 
 #define SET_VTX(v, r, g, b)  \
     (v).ob[0] = 0;          \
@@ -28,7 +28,7 @@ extern LineVtx D_8012F340[2][3];     /* yellow */
     (v).cn[2] = (b);        \
     (v).cn[3] = 0xFF;
 
-void func_00430500(CDebugLines *s) {
+void func_00430500(CAutomap *s) {
     s32 i;
     s32 j;
 
@@ -48,16 +48,16 @@ void func_00430500(CDebugLines *s) {
     s->unk8 = 0;
     for (j = 0; j < 2; j++) {
         for (i = 0; i < 0x200; i++) {
-            SET_VTX(D_80129A40[j][i], 0, 0xC8, 0);
+            SET_VTX(sAutomapLineVtx[j][i], 0, 0xC8, 0);
         }
         for (i = 0; i < 3; i++) {
-            SET_VTX(D_8012F340[j][i], 0xC8, 0xC8, 0);
+            SET_VTX(sAutomapYellowVtx[j][i], 0xC8, 0xC8, 0);
         }
         for (i = 0; i < 0xC0; i++) {
-            SET_VTX(D_8012DB40[j][i], 0xC8, 0, 0);
+            SET_VTX(sAutomapRedVtx[j][i], 0xC8, 0, 0);
         }
         for (i = 0; i < 8; i++) {
-            SET_VTX(D_8012DA40[j][i], 0xC8, 0, 0xC8);
+            SET_VTX(sAutomapMagentaVtx[j][i], 0xC8, 0, 0xC8);
         }
     }
 }

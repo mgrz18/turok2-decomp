@@ -9,32 +9,32 @@ typedef struct {
     s32 a, b, c, d, e;
 } VideoFlags;
 
-extern s32 D_80000300; /* osTvType */
-extern s32 D_801198E8;
-extern s32 D_800C2030; /* screen width */
-extern s32 D_800C2034; /* screen height */
-extern s32 D_800C2038; /* resolution set, -1 until decided */
+extern s32 osTvType; /* osTvType */
+extern s32 gEngineApp_m_Game_m_CameraPool_m_bActiveChanged;
+extern s32 gScreenWidth; /* screen width */
+extern s32 gScreenHeight; /* screen height */
+extern s32 gResolution; /* resolution set, -1 until decided */
 extern s32 D_800C2044;
-extern s32 D_800AB890;
-extern s32 D_800AB894;
-extern s32 D_800AB898;
-extern s32 D_800AB89C;
-extern VideoFlags D_800C216C[];
+extern s32 gRenderAntiAlias;
+extern s32 gViAntiAlias;
+extern s32 gRenderZModeInter;
+extern s32 gRenderImageRead;
+extern VideoFlags gVideoModeFlags[];
 extern s32 GetMemSize(void); /* osGetMemSize */
 extern void Video_SetMode(s32 width, s32 height, s32 a2, s32 a3, s32 a4, s32 a5);
 extern void osViSetSpecialFeatures(s32 flags);
 
 static __inline__ void SetConfig(s32 a, s32 b, s32 c, s32 d, s32 e) {
     D_800C2044 = a;
-    D_800AB890 = b;
-    D_800AB894 = c;
-    D_800AB898 = d;
-    D_800AB89C = e;
+    gRenderAntiAlias = b;
+    gViAntiAlias = c;
+    gRenderZModeInter = d;
+    gRenderImageRead = e;
 }
 
 static __inline__ void SetMode(s32 *mode) {
-    D_800C2030 = mode[0];
-    D_800C2034 = mode[1];
+    gScreenWidth = mode[0];
+    gScreenHeight = mode[1];
     Video_SetMode(mode[0], mode[1], mode[2], mode[3], mode[4], mode[5]);
 }
 
@@ -42,25 +42,25 @@ void Video_ApplyResolution(void) {
     VideoMode *mode = NULL;
     s32 flag;
 
-    D_801198E8 = 2;
-    if (D_800C2038 == -1) {
+    gEngineApp_m_Game_m_CameraPool_m_bActiveChanged = 2;
+    if (gResolution == -1) {
         if (GetMemSize() != 0x400000) {
-            D_800C2038 = 1;
+            gResolution = 1;
         } else {
-            D_800C2038 = 0;
+            gResolution = 0;
         }
     }
-    switch (D_80000300) {
+    switch (osTvType) {
         case 1:
-            mode = &D_800C2054[0][D_800C2038];
+            mode = &gVideoModes[0][gResolution];
             break;
         case 0:
         case 2:
-            mode = &D_800C20E0[D_800C2038];
+            mode = &gVideoModesPAL[gResolution];
             break;
     }
     if (mode != NULL) {
-        VideoFlags flags = D_800C216C[D_800C2038];
+        VideoFlags flags = gVideoModeFlags[gResolution];
 
         SetConfig(flags.a, flags.b, flags.c, flags.d, flags.e);
         SetMode((s32 *)mode);

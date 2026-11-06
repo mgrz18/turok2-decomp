@@ -1,12 +1,12 @@
 #include "common.h"
 #include "structs/libaudio.h"
 
-extern ALGlobals *D_800B7760; /* alGlobals */
+extern ALGlobals *alGlobals; /* alGlobals */
 
 /* libultra's __freeParam (synthesizer.c): push an ALParam back onto the free
  * list of alGlobals->drvr. */
 void __freeParam(ALParam *param) {
-    ALSynth *drvr = &D_800B7760->drvr;
+    ALSynth *drvr = &alGlobals->drvr;
 
     param->next = drvr->paramList;
     drvr->paramList = param;

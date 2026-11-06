@@ -72,7 +72,7 @@ holds are listed in docs/MATCHING.md, "Shared headers".
   BreakableDefinition, B01Def, DeathAnims...) or read its first word as
   `*(s32 *)`: they were not in either branch that converted the rest.
 - **Player** (`structs/player.h`): see the next section.
-- **World and regions** (`structs/world.h`: CWorld, D_800F7078, 0x19078
+- **World and regions** (`structs/world.h`: CScene, D_800F7078, 0x19078
   bytes with its warp, sector, record and level-header types;
   `structs/region.h`: CGameRegion and CRegionInfo, the floor triangles and
   their attributes, D_800B2608 caching the last one). The World, Level,
@@ -98,7 +98,7 @@ holds are listed in docs/MATCHING.md, "Shared headers".
   header so that game.h does not need the whole player. Left: local views of
   D_8011AB18 / D_8011AB58 named PlayerOptions (8 files), MenuOptions (3),
   SetupSlot (5), PlayerSettings (2), Settings, Part.
-- **Sound** (`structs/sound.h`: SndMgr, SndVoice, SndVoiceParams, SndEnv,
+- **Sound** (`structs/sound.h`: CAudioWorld, SndVoice, SndVoiceParams, SndEnv,
   SndSeq, SndSource, SoundEffectInfo and the libaudio ALBank/ALInstrument/
   ALFilter/ALMainBus/ALAuxBus/Acmd the manager uses) and **libultra**
   (`include/ultra_types.h`: OSThread, OSMesgQueue, OSTimer, OSPfs and the
@@ -137,14 +137,14 @@ matches, `make verify` passes, matched (959,788 bytes) and readable
 - **The rw/ headers** (t7) no longer carry their own copies of shared types:
   ultralib_types.h, junk_types.h and abu_types.h include common.h,
   ultra_types.h, structs/vector.h and structs/libaudio.h (new: the libaudio
-  types moved out of sound.h). junk's sound manager types (SndMgr, SndVoice,
+  types moved out of sound.h). junk's sound manager types (CAudioWorld, SndVoice,
   SndSeq, SndLock, the M04Emitter/M04VP/M04Ctx views) were sound.h's
   layouts, and their 8 users include structs/sound.h now (func_00273370 and
   func_00274A98 keep the SndCore view of the handles: addressing them
-  through SndMgr.handles adds an instruction); B12Mgr's lock is a CMutex;
+  through CAudioWorld.handles adds an instruction); B12Mgr's lock is a CMutex;
   Vec3/Vec3f/M04Vec3/B19Vec3/O01Vec3 are CVector3; abu's Gfx is gfx.h's, its
   OSThread_s/OSTimer_s/ALFilter_s are ultra_types.h's and libaudio.h's, its
-  Shared_World users take CWorld (structs/world.h), the pak menu's player is
+  Shared_World users take CScene (structs/world.h), the pak menu's player is
   a struct CPlayer *, and its float Mtx is renamed RW_Mtx. The dead
   CVector3_t copies of 31 imported files are gone. __OSInodeCache is in
   ultra_types.h; the 11 files that were readable only on paper have struct
@@ -254,14 +254,14 @@ GameSettingsBlock, below).
   m_Destructible, m_Action, m_Player). BossWeakSpot.anim (structs/boss.h)
   is a ScriptAnimator: its 20 users pass `&slots[i].anim`.
 - **The instance pool and the engine** (u3). CListedInstance is 0x298 and
-  CInstancePool (D_8010ABA0, CWorld.m_InstancePool at 0x13B28: the 32
+  CInstancePool (D_8010ABA0, CScene.m_InstancePool at 0x13B28: the 32
   dynamic objects and their free / active lists) is in game_object.h, which
   includes list.h; the D_8010FEB4 views (Enemy, Enemy0040457C,
   Actor004035F8, ActorNode, ListedObject) and the pool functions use them.
   CEngineApp (D_800F6CB0, game.h) is laid out after Turok 3's tengine.h:
   CFrameData m_FrameData[3], m_pCurrentFrameData (D_800F7070),
   m_CartridgeIndex, the world as bytes, CGame m_Game (m_Settings also a
-  direct member); CSun in GameSettings, CDebugLines in CGame,
+  direct member); CSun in GameSettings, CAutomap in CGame,
   CGameFromCameraPool for the files that read the settings through
   D_801198B0; GameSettings names hudAlphaSetting / hudAlpha (0x10, 0x12).
   The GameMode / GameState / GameSetup / HUD views read D_8011AAD8 /
@@ -287,7 +287,7 @@ GameSettingsBlock, below).
   func_00273EC0) include it; func_00294B58 / func_00294B84 (was NodePool)
   are __allocParam / __freeParam, func_00293400 / func_00293430 alInit /
   alClose, func_0028FA10 alCSPNew, func_00270240's config an ALSynConfig.
-  SndMgr's playerConfig / player are an ALSndpConfig / ALSndPlayer (users
+  CAudioWorld's playerConfig / player are an ALSndpConfig / ALSndPlayer (users
   pass `&m->player`). D_800B7AC4 is libultra's __osViNext, an
   __OSViContext (ultra_types.h, with OSViMode and __OSViScale), not audio
   state.
@@ -418,7 +418,7 @@ declared under three or more local types (the table below is empty).
   CLevelActor (placed by func_002150C0, drawn by func_002152AC, updated by
   func_002156FC / func_002157F0; 0x178 is its lighting, D_800AB0D0 when
   placed), its pool slot CPooledLevelActor (0x1B0, links at 0x1A0..0x1AC)
-  and the pool CLevelActorPool (CWorld.m_ActorPool; its free / head / tail
+  and the pool CLevelActorPool (CScene.m_ActorPool; its free / head / tail
   are also D_8010AB90/94/98), replacing the PoolActor, ActorPool, Node, Pool
   and PoolItem views; CStaticObject (0x90) is the scenery of the level
   display list. The Body (player movement, 14 files), Mover / Collider
@@ -458,7 +458,7 @@ declared under three or more local types (the table below is empty).
   eight pickup handlers), `structs/rect.h` (CRect, the ground rectangles of
   sector, triangle and sweep bounds) and `structs/particle_event.h`
   (CEventFlags D_800AD084, the per-kind flags of the particle event table
-  D_800AD080). The TableOwner views are CWorld, the Surface views
+  D_800AD080). The TableOwner views are CScene, the Surface views
   CIntelligence and CGameRegion.
 
 The merges: z5 and z7 both added a `structs/event.h`, for unrelated
@@ -510,7 +510,7 @@ at 0xC10 after a pad, and CPlayer is 0x1328 (arrays of players step 0x1328).
 m_WeaponList is s8, as every reader loads it.
 
 player.h includes structs/weapon.h (CBarrel, the weapon wheel at 0xCD0),
-structs/player_list.h (CPlayerList / CPlayerCList, the player list at the
+structs/player_list.h (CPlayerPool / CPlayerCList, the player list at the
 start of CGame, D_80119870; D_80119890 is its active list) and
 structs/controller.h (ControllerProfile, `m_ContState.m_pContState`).
 The local Player,
@@ -572,7 +572,7 @@ views were replaced in about 230 files. Still local, and why:
   func_0028EA88, func_0028EB54 and func_0028ED10 still declare D_801206A0 /
   D_80121290 / D_80121378 with views of their own.
 - **Audio leftovers** (u4): abu's AudioStateD844 / AudioRootD844
-  (func_00274F34) are sound.h's SndSeq / SndMgr (SndSeq's unk10 / csp are
+  (func_00274F34) are sound.h's SndSeq / CAudioWorld (SndSeq's unk10 / csp are
   the ALCSeq * and ALCSPlayer *); junk's B12AiCfg and func_00270240's AiCfg
   are the audio manager config (output rate, frames per field, max ACMD
   size); junk's NodePool / DLList (func_0026D330) are not libaudio.
@@ -930,7 +930,7 @@ as written.
 
 `tools/progress.py` counted these as readable (no m2c offset macros), but
 they reached fields by raw pointer arithmetic (`*(s32 *) ((u8 *) p + 0x1C)`
-and the like). None are left: the 12 files of this list now use SndMgr/CMutex
+and the like). None are left: the 12 files of this list now use CAudioWorld/CMutex
 (func_00271904, func_002715F0, func_00271570), GameMatch (func_004194F8,
 func_004533F4), CIntelligence (func_00268534, func_00268080,
 func_002680D0), MenuItem (func_0041B9DC), ALSeq (func_00293254), B12Node

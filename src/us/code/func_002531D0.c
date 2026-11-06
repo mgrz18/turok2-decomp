@@ -4,7 +4,7 @@
 
 void CPlayer__DrawWeaponOverlay(void *, void *);                 /* extern */
 
-void CPlayerPool__DrawWeaponOverlays(CPlayerList *arg0, CCamera *arg1) {
+void CPlayerPool__DrawWeaponOverlays(CPlayerPool *arg0, CCamera *arg1) {
     CPlayer *var_s0;
 
     var_s0 = arg0->m_ActiveList.m_pHead;

@@ -4,9 +4,9 @@
 #include "rw/abu_types.h"
 
 extern void CCache__ClearDisplayListLocks(s32, s32);
-extern s32 D_800D81D0;
-extern s32 D_800D8DA4[];
-extern int D_800AB0C0;
+extern s32 gCache;
+extern s32 gCache_dlistCount[];
+extern int gCacheEntryCount;
 void CCache__ClearDisplayListLocks(s32 arg0, s32 arg1)
 {
   s32 mask;
@@ -20,19 +20,19 @@ void CCache__ClearDisplayListLocks(s32 arg0, s32 arg1)
   {
     mask = -0x401;
   }
- do { count = 0; limit = D_800AB0C0; } while (0);
+ do { count = 0; limit = gCacheEntryCount; } while (0);
   new_var2 = limit;
   if (limit != 0)
   {
     offset = count;
     do
     {
-      new_var = offset + D_800D81D0;
+      new_var = offset + gCache;
       count += 1;
       *((s32 *) (new_var + 0xC)) &= mask;
       offset += 0x28;
     }
     while (count < new_var2);
   }
-  D_800D8DA4[arg1] = 0;
+  gCache_dlistCount[arg1] = 0;
 }

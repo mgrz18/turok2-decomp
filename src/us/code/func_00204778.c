@@ -9,7 +9,7 @@
 #include "common.h"
 #include "gfx.h"
 
-/* A tracked allocation (list at D_800D81F4). */
+/* A tracked allocation (list at gCache_memLockedList). */
 typedef struct HeapNode HeapNode;
 struct HeapNode {
     /* 0x00 */ u32 start;
@@ -21,7 +21,7 @@ struct HeapNode {
     /* 0x24 */ HeapNode *next;
 };
 
-/* A span of the heap (list at D_800D1CD0). */
+/* A span of the heap (list at gHeap_usedHead). */
 typedef struct HeapSpan HeapSpan;
 struct HeapSpan {
     /* 0x00 */ u8 pad0[0xC];
@@ -30,11 +30,11 @@ struct HeapSpan {
     /* 0x14 */ u32 free;
 };
 
-extern char D_800D8DB0[]; /* OSMesgQueue, the heap lock */
-extern s32 D_800D8DCC;    /* heap lock depth */
-extern u32 D_800D8DF0[];  /* frame stamp */
-extern HeapSpan *D_800D1CD0[];
-extern HeapNode *D_800D81F4[];
+extern char gCache_mutex[]; /* OSMesgQueue, the heap lock */
+extern s32 gCache_mutex_count;    /* heap lock depth */
+extern u32 gCache_ageCount[];  /* frame stamp */
+extern HeapSpan *gHeap_usedHead[];
+extern HeapNode *gCache_memLockedList[];
 extern u32 __osDisableInt(void);   /* __osDisableInt */
 extern void __osRestoreInt(u32);   /* __osRestoreInt */
 extern s32 osRecvMesg(void *mq, void *msg, s32 flag);
@@ -89,38 +89,38 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
     u32 rg;
     s32 select;
 
-    gDPPipeSync(D_800D8E24++);
-    gDPSetCycleType1Cycle(D_800D8E24++);
+    gDPPipeSync(gDList++);
+    gDPSetCycleType1Cycle(gDList++);
     Render_SetCombineMode(0x19);
     Render_SetRenderMode(0x15);
-    gDPSetPrimColor(D_800D8E24++, 0, 0, 0xA0, 0xA0, 0xA0, 0x00);
-    gDPFillRectangle(D_800D8E24++, left - 1, top - 1, right + 1, bottom + 1);
+    gDPSetPrimColor(gDList++, 0, 0, 0xA0, 0xA0, 0xA0, 0x00);
+    gDPFillRectangle(gDList++, left - 1, top - 1, right + 1, bottom + 1);
     Render_SetRenderMode(0x1B);
-    gDPSetPrimColor(D_800D8E24++, 0, 0, 0xA0, 0xA0, 0xA0, 0xFF);
-    gDPFillRectangle(D_800D8E24++, left, top, right, bottom);
+    gDPSetPrimColor(gDList++, 0, 0, 0xA0, 0xA0, 0xA0, 0xFF);
+    gDPFillRectangle(gDList++, left, top, right, bottom);
 
     mask = __osDisableInt();
-    if (++D_800D8DCC != 1) {
+    if (++gCache_mutex_count != 1) {
         __osRestoreInt(mask);
-        osRecvMesg(D_800D8DB0, 0, 1);
+        osRecvMesg(gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
 
     base = 0x80000000;
-    span = D_800D1CD0[0];
+    span = gHeap_usedHead[0];
     total = (u32) span - base;
     for (; span != 0; span = span->next) {
         total += span->size + span->free;
     }
 
-    gDPSetPrimColor(D_800D8E24++, 0, 0, 0x64, 0x64, 0x00, 0xFF);
-    upper = (bottom - (u32) (((u32) D_800D1CD0[0] - base) * (bottom - top)) / total) - 1;
+    gDPSetPrimColor(gDList++, 0, 0, 0x64, 0x64, 0x00, 0xFF);
+    upper = (bottom - (u32) (((u32) gHeap_usedHead[0] - base) * (bottom - top)) / total) - 1;
     height = bottom - top;
-    RECTA(D_800D8E24++, left, upper, right, bottom + 1);
+    RECTA(gDList++, left, upper, right, bottom + 1);
 
     for (pass = 0; pass < 2; pass++) {
-        for (node = D_800D81F4[0]; node != 0; node = node->next) {
+        for (node = gCache_memLockedList[0]; node != 0; node = node->next) {
             if (pass != 0) {
                 select = (node->flags & 0x101) == 0x100;
             } else {
@@ -132,33 +132,33 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
                 else if (node->flags & 0x600) { r = 0; g = 0; b = 0xFF; }
                 else { r = 0; g = 0xFF; b = 0; }
 
-                gDPSetPrimColor(D_800D8E24++, 0, 0, r, g, b, 0xFF);
+                gDPSetPrimColor(gDList++, 0, 0, r, g, b, 0xFF);
                 upper = (bottom - (u32) (((node->start + node->size) - base) * height) / total) - 1;
                 lower = (bottom - (u32) (((node->start - base) - 0x20) * height) / total) - 1;
                 if (upper < lower) {
-                    RECTA(D_800D8E24++, left, upper, right, lower);
+                    RECTA(gDList++, left, upper, right, lower);
                 }
-                gDPSetPrimColor(D_800D8E24++, 0, 0, HALF(r), HALF(g), HALF(b), 0xFF);
-                RECTA(D_800D8E24++, left, lower - 1, right, lower);
+                gDPSetPrimColor(gDList++, 0, 0, HALF(r), HALF(g), HALF(b), 0xFF);
+                RECTA(gDList++, left, lower - 1, right, lower);
 
                 if (!(node->flags & 0x702)) {
                     b = 0xFF;
-                    if (D_800D8DF0[0] - node->stamp >= 5) {
-                        gDPSetPrimColor(D_800D8E24++, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF);
+                    if (gCache_ageCount[0] - node->stamp >= 5) {
+                        gDPSetPrimColor(gDList++, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF);
                         if (upper < lower) {
-                            gDPFillRectangle(D_800D8E24++, left + 8, upper, right, lower);
+                            gDPFillRectangle(gDList++, left + 8, upper, right, lower);
                         } else {
                             upper = lower;
                         }
                         /* 1.5 times the highlight colour, clamped; rg in a variable keeps fold from merging
                          * its constant with the 0xFF (the ROM has lui 0xFFFF / or / ori 0xFF). */
                         rg = 0xFFFF0000;
-                        PRIMC(D_800D8E24++, ({
+                        PRIMC(gDList++, ({
                             s32 bright = ((s32) b * 3) >> 1;
                             bright < 0x100 ? (rg | ((bright & 0xFF) << 8)) | 0xFF : 0xFFFFFFFF;
                         }));
                         do { } while (0); /* sched1 barrier: keeps the colour store before the next lw */
-                        gDPFillRectangle(D_800D8E24++, left + 8, lower - 1, right, lower);
+                        gDPFillRectangle(gDList++, left + 8, lower - 1, right, lower);
                     }
                 }
             }
@@ -166,9 +166,9 @@ void CCache__DrawDebug(s32 unused, s32 left, s32 top, s32 right, s32 bottom) {
     }
 
     mask2 = __osDisableInt();
-    if (--D_800D8DCC != 0) {
+    if (--gCache_mutex_count != 0) {
         __osRestoreInt(mask2);
-        osSendMesg(D_800D8DB0, 0, 1);
+        osSendMesg(gCache_mutex, 0, 1);
     } else {
         __osRestoreInt(mask2);
     }

@@ -4,18 +4,18 @@
 #include "rw/abu_types.h"
 
 extern u32 __amDMA(s32 offset, s32 length);
-extern int D_800F2040;
-extern Window *D_800F2798;
-extern char D_800D1CD8;
+extern int gAudioRomBase;
+extern Window *gAudioDmaState_firstFree;
+extern char gLoader;
 extern void CLoader__LoadAsync(void *, u32, s32, s32, void *, s32, s32);
 u32 __amDMA(s32 offset, s32 length) {
     extern u32 osVirtualToPhysical(s32);
     extern void alLink(Window *, Window *);
     extern void alUnlink(Window *);
-    extern Window *D_800F2794;
-    extern char D_800F2778;
-    extern s32 D_800B2664;
-    extern s32 D_800B2660;
+    extern Window *gAudioDmaState_firstUsed;
+    extern char gAudioDmaMessageQ;
+    extern s32 nextDMA;
+    extern s32 audFrameCt;
     Window *window;
     Window *after;
     Window **pool;
@@ -25,9 +25,9 @@ u32 __amDMA(s32 offset, s32 length) {
     s32 odd;
     s32 word;
     after = 0;
-    address = offset + D_800F2040;
+    address = offset + gAudioRomBase;
     end = address + length;
-    for (window = D_800F2794; window != 0; window = window->next) {
+    for (window = gAudioDmaState_firstUsed; window != 0; window = window->next) {
         top = window->base + 0x300;
         word = window->base;
         if (address < word) {
@@ -35,11 +35,11 @@ u32 __amDMA(s32 offset, s32 length) {
         }
         after = window;
         if (top >= end) {
-            window->frame = D_800B2660;
+            window->frame = audFrameCt;
             return osVirtualToPhysical(window->buffer + address - window->base);
         }
     }
-    pool = &D_800F2798;
+    pool = &gAudioDmaState_firstFree;
     window = *pool;
     *pool = window->next;
     alUnlink(window);
@@ -59,9 +59,9 @@ u32 __amDMA(s32 offset, s32 length) {
     odd = address & 1;
     address -= odd;
     window->base = address;
-    window->frame = D_800B2660;
+    window->frame = audFrameCt;
     word = window->buffer;
-    D_800B2664++;
-    CLoader__LoadAsync(&D_800D1CD8, address, 0x300, word, &D_800F2778, 0, 1);
+    nextDMA++;
+    CLoader__LoadAsync(&gLoader, address, 0x300, word, &gAudioDmaMessageQ, 0, 1);
     return osVirtualToPhysical(word) + odd;
 }

@@ -11,8 +11,8 @@ extern s32 D_800B2A34[];
 extern s32 D_800B2A44[];
 s16 alSndpAllocate(void *p, s32 a, void *owner);
 void alSndpSetPriority(void *p, s16 id, s32 pri);
-void CAudioWorld__Lock(SndMgr *m);
-void CAudioWorld__Unlock(SndMgr *m);
+void CAudioWorld__Lock(CAudioWorld *m);
+void CAudioWorld__Unlock(CAudioWorld *m);
 s16 SndVoicePool_FindSlot(SndVoicePool *p, s16 a, s16 b, s16 c, s32 d);
 s16 SoundEffectInfo_GetGroup(SoundEffectInfo *i);
 s8 SoundEffectInfo_GetPriority(SoundEffectInfo *i);
@@ -23,8 +23,8 @@ s32 Random_NextB();
 SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, int tag, s32 a3)
 {
   s16 *snd;
-  SndMgr *m3;
-  SndMgr *m;
+  CAudioWorld *m3;
+  CAudioWorld *m;
   s32 i;
   s16 idx;
   u8 *core;
@@ -35,7 +35,7 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, int ta
   u16 flag;
   f32 f;
   u8 *new_var2;
-  SndMgr *m2;
+  CAudioWorld *m2;
   s16 *new_var;
   s32 r;
   SndVoice *v;

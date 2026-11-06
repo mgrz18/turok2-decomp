@@ -16,9 +16,9 @@ typedef struct IoReq {
                s32 a2;
                OSMesgQueue *reply;
 } IoReq;
-extern s32 D_800BC304;
-extern OSMesgQueue D_80128370;
-extern OSMesgQueue D_80128540;
+extern s32 sHostIoState;
+extern OSMesgQueue sHostIoRequestQueue;
+extern OSMesgQueue sHostIoReplyQueue;
 s32 HostIo_DisableInt();
 void HostIo_RestoreInt(s32 mask);
 s32 HostIo_Call(s32 a, s32 b, s32 c, s32 d);
@@ -26,15 +26,15 @@ s32 PClseek(s32 a0, s32 a1, s32 a2) {
     IoReq req;
     s32 result;
     s32 mask;
-    if (D_800BC304 == 2) {
+    if (sHostIoState == 2) {
         req.unk4 = 0;
         req.cmd = 0x80000707;
         req.a0 = a0;
         req.a1 = a1;
         req.a2 = a2;
-        req.reply = &D_80128540;
-        osSendMesg(&D_80128370, &req, 1);
-        osRecvMesg(&D_80128540, (OSMesg *)&result, 1);
+        req.reply = &sHostIoReplyQueue;
+        osSendMesg(&sHostIoRequestQueue, &req, 1);
+        osRecvMesg(&sHostIoReplyQueue, (OSMesg *)&result, 1);
     } else {
         mask = HostIo_DisableInt();
         result = HostIo_Call(0x707, a0, a1, a2);

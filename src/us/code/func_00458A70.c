@@ -5,15 +5,15 @@
 /* Controller pak note list item: prints a note's name (16 characters), extension (4) and size in blocks
  * into the item's text; an empty slot prints blanks. */
 
-extern s32 D_801309BC;
-extern s32 D_80130990;
-extern s32 D_800C2028; /* pad */
+extern s32 gPakMenuLeaving;
+extern s32 gPakMenuAnyPak;
+extern s32 gPakMenuPort; /* pad */
 extern char D_800B48D4[];
 extern char D_800B48E0[];
 extern u8 D_800C1404[];
-s32 func_00425D94(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
-s32 func_00426D5C(u8 *p, s32 n);
-char *func_00426D24(char *dst, char *src);
+s32 Pak_FindNote_2(s32 pad, s32 idx, s32 *valid, u8 *name, u8 *ext, s32 *blocks, u8 *company, u8 *game);
+s32 Pak_TextHasInvalidChar_2(u8 *p, s32 n);
+char *Str_Copy_2(char *dst, char *src);
 void sprintf(char *dst, u8 *fmt, s32 a);
 
 s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
@@ -33,22 +33,22 @@ s32 PakMenu_NoteText_2(MenuItem *item, Menu *own) {
 
     idx = item->index - 3;
     c = 0x20;
-    if (D_801309BC != 0) {
+    if (gPakMenuLeaving != 0) {
         return 0;
     }
-    if (D_80130990 != 0) {
-        pad = D_800C2028;
+    if (gPakMenuAnyPak != 0) {
+        pad = gPakMenuPort;
     } else {
         pad = own->controller->port;
     }
-    r = func_00425D94(pad, idx, &valid, name, ext, &blocks, company, game);
+    r = Pak_FindNote_2(pad, idx, &valid, name, ext, &blocks, company, game);
     if (valid != 0 && r == 0) {
-        if (func_00426D5C(name, 16) != 0) {
-            func_00426D24((char *)name, D_800B48D4);
+        if (Pak_TextHasInvalidChar_2(name, 16) != 0) {
+            Str_Copy_2((char *)name, D_800B48D4);
         }
     } else {
-        func_00426D24((char *)name, D_800B48E0);
-        func_00426D24((char *)ext, D_800B48E0);
+        Str_Copy_2((char *)name, D_800B48E0);
+        Str_Copy_2((char *)ext, D_800B48E0);
         blocks = 0;
     }
     dst = (u8 *)item->text;

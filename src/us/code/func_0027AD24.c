@@ -15,12 +15,12 @@ typedef struct {
     /* 0x00 */ HudMeter meters[2];
 } HudMeters;
 
-extern u8 D_800B2C50[];
+extern u8 sBossBarOverlayScript[];
 extern void COverlay__StartScript(void *, void *);
 
 void COnScreen__SetBoss(HudMeters *arg0, s32 arg1, s32 arg2) {
     arg0->meters[0].active = arg1;
     arg0->meters[0].unk3C = arg2;
     arg0->meters[0].percent = 100;
-    COverlay__StartScript(arg0, D_800B2C50);
+    COverlay__StartScript(arg0, sBossBarOverlayScript);
 }

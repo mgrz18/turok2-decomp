@@ -63,17 +63,17 @@ typedef struct B12Mgr {
                  B12Bucket * buckets;
 } B12Mgr;
 extern B12Mgr D_800D7BE0;
-extern s32 D_800D8DCC;
-extern u32 D_800AB0C0;
-extern s32 D_800B6E8C;
-extern u8 D_800D1CC0[];
+extern s32 gCache_mutex_count;
+extern u32 gCacheEntryCount;
+extern s32 gThreadPriorityCache;
+extern u8 gHeap[];
 void CMutex__Construct(void *lock);
 u32 GetMemSize(void);
 u8 *CHeap__Alloc(void *heap, u32 size);
 void CList__Construct(CList *l, s32 prevOff, s32 nextOff);
 void CList__AddTail(CList *l, void *n);
 void CHashTable__Construct(u32 n);
-void D_002041E4(void *arg);
+void CCache__Main(void *arg);
 void CCache__Construct(s32 unused, s32 id) {
     u32 mask;
     u32 m2;
@@ -84,26 +84,26 @@ void CCache__Construct(s32 unused, s32 id) {
     s32 *t;
     CMutex__Construct(&D_800D7BE0.q11D0);
     mask = __osDisableInt();
-    if (++D_800D8DCC != 1) {
+    if (++gCache_mutex_count != 1) {
         __osRestoreInt(mask);
         osRecvMesg(&D_800D7BE0.q11D0, 0, 1);
     } else {
         __osRestoreInt(mask);
     }
-    D_800AB0C0 = 0x400;
+    gCacheEntryCount = 0x400;
     if (GetMemSize() > 0x400000) {
-        D_800AB0C0 *= 2;
+        gCacheEntryCount *= 2;
     }
-    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 0x28);
-    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 4);
-    D_800D7BE0.pool2 = CHeap__Alloc(D_800D1CC0, D_800AB0C0 * 0x2C);
+    D_800D7BE0.nodes = (B12Node *)CHeap__Alloc(gHeap, gCacheEntryCount * 0x28);
+    D_800D7BE0.stk = (B12Node **)CHeap__Alloc(gHeap, gCacheEntryCount * 4);
+    D_800D7BE0.pool2 = CHeap__Alloc(gHeap, gCacheEntryCount * 0x2C);
     osCreateMesgQueue(&D_800D7BE0.q11F0, &D_800D7BE0.buf11F0, 1);
     D_800D7BE0.tbl630[1] = 0;
     D_800D7BE0.tbl630[0] = 0;
     CList__Construct(&D_800D7BE0.lists[0], 0x18, 0x1C);
     CList__Construct(&D_800D7BE0.lists[1], 0x20, 0x24);
     D_800D7BE0.cnt = 0;
-    for (i = 0; i < D_800AB0C0; i++) {
+    for (i = 0; i < gCacheEntryCount; i++) {
         n1 = D_800D7BE0.nodes;
         n1 = (B12Node *)((u8 *)n1 + i * 0x28);
         n1->flags = 0;
@@ -122,22 +122,22 @@ void CCache__Construct(s32 unused, s32 id) {
     CList__Construct(&D_800D7BE0.lists3[0], 0x28, 0x24);
     CList__Construct(&D_800D7BE0.lists3[1], 0x28, 0x24);
     CList__Construct(&D_800D7BE0.lists3[2], 0x28, 0x24);
-    for (i = 0; i < D_800AB0C0; i++) {
+    for (i = 0; i < gCacheEntryCount; i++) {
         n = (B12Node *)D_800D7BE0.pool2;
         n = (B12Node *)((u8 *)n + i * 0x2C);
         n->unk10 = 0;
         CList__AddTail(&D_800D7BE0.lists3[0], n);
     }
-    CHashTable__Construct(D_800AB0C0);
+    CHashTable__Construct(gCacheEntryCount);
     osCreateMesgQueue(&D_800D7BE0.q870, D_800D7BE0.buf870, 0x40);
     m2 = __osDisableInt();
-    if (--D_800D8DCC != 0) {
+    if (--gCache_mutex_count != 0) {
         __osRestoreInt(m2);
         osSendMesg(&D_800D7BE0.q11D0, 0, 1);
     } else {
         __osRestoreInt(m2);
     }
     memset(D_800D7BE0.stack, (u8)id, 0x800);
-    osCreateThread(&D_800D7BE0.thread, id, D_002041E4, 0, D_800D7BE0.stack + 0x800, D_800B6E8C);
+    osCreateThread(&D_800D7BE0.thread, id, CCache__Main, 0, D_800D7BE0.stack + 0x800, gThreadPriorityCache);
     osStartThread(&D_800D7BE0.thread);
 }

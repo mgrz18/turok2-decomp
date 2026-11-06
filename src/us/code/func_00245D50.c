@@ -3,7 +3,7 @@
 #include "structs/player.h"
 
 
-extern s32 D_8011001C;
+extern s32 gScene_m_bStreamAll;
 
 /* WRONG CUT: the ROM splits this function at 0x245E20 (func_00245E20 = its last 10 words,
    reached by branches from here). Compiled whole it is 0xF8 bytes; the first 0xD0 match
@@ -30,7 +30,7 @@ s32 AI_GetTargetKind(CGameObjectInstance *self, CAI *target, CGameObjectInstance
     if (actor->m_nTypeFlag == 0x64F) {
         return 7;
     }
-    if (D_8011001C == 0) {
+    if (gScene_m_bStreamAll == 0) {
         if (actor->m_dwFlags & 0x300000) {
             owner = ((CPlayer *)actor->m_AI.m_pParent);
             if (0.0f < owner->m_FleeTime) {

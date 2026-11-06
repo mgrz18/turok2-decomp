@@ -2,7 +2,7 @@
 #include "structs/vector.h"
 #include "structs/collision.h"
 
-extern CCollisionResults *D_800F1ADC;     /* current hit buffer */
+extern CCollisionResults *gCollisionResultsP;     /* current hit buffer */
 extern s8 D_800F1CC6[];           /* collision info D_800F1CC0 + 6 */
 
 void Collision_MoveInstance(CInstanceHeader *actor, CVector3 pos, void *info);
@@ -19,15 +19,15 @@ void GameObject_TraceMove(CInstanceHeader *actor, CVector3 pos, CVector3 *outPos
     s8 *flags;
 
     saved = *actor;
-    oldHits = D_800F1ADC;
-    D_800F1ADC = &hits;
+    oldHits = gCollisionResultsP;
+    gCollisionResultsP = &hits;
     flags = D_800F1CC6;
     oldA = flags[0];
     oldB = flags[-2];
     flags[0] = flagA;
     flags[-2] = flagB;
     Collision_MoveInstance(actor, pos, flags - 6);
-    D_800F1ADC = oldHits;
+    gCollisionResultsP = oldHits;
     actor->m_vPos.y = pos.y;
     end.x = actor->m_vPos.x;
     end.y = pos.y;

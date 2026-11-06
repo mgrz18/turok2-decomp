@@ -2,7 +2,7 @@
 #include "common.h"
 
 /* Pak font code -> character. */
-extern u8 D_800C222C[];
+extern u8 gPakCharTable[];
 
 /* Decodes n pak font codes from src into characters at dst; codes past the table become '~'. */
 void Pak_DecodeText(u8 *src, u8 *dst, s32 n) {
@@ -10,7 +10,7 @@ void Pak_DecodeText(u8 *src, u8 *dst, s32 n) {
 
     for (i = 0; i < n; i++) {
         if (src[i] < 0x42) {
-            *dst = D_800C222C[src[i]];
+            *dst = gPakCharTable[src[i]];
         } else {
             *dst = '~';
         }

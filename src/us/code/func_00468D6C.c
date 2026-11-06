@@ -4,7 +4,7 @@
 void *memset(void *destination, s32 value, u32 size);
 s32 CCamera__Advance(s32);
 
-s32 func_0042F8D0(void *);                      /* extern */
+s32 CCamera__Construct_2(void *);                      /* extern */
 
 /* Manager block cleared and set up here (0x11F0 bytes): three lists and
  * an embedded sub-object at 0x40. */
@@ -42,6 +42,6 @@ void CCameraPool__Construct_2(Unk00468D6C *arg0) {
     arg0->unkF04 = 0;
     arg0->unkF08 = 0;
     arg0->unk38 = 2;
-    func_0042F8D0(temp_s1);
+    CCamera__Construct_2(temp_s1);
     CCamera__Advance((s32) temp_s1);
 }

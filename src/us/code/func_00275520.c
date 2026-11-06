@@ -1,8 +1,8 @@
 #include "common.h"
 
 s32 CAudioWorld__Initialize(s32 *);                   /* extern */
-extern s32 D_800F2A00;
+extern s32 gAudioWorld;
 
 void Sound__Initialize(void) {
-    CAudioWorld__Initialize(&D_800F2A00);
+    CAudioWorld__Initialize(&gAudioWorld);
 }

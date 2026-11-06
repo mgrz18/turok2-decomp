@@ -7,13 +7,13 @@
  * 2.25 s, and at zero health goes to anim state 6. */
 
 
-extern BlindOneState D_80130200;
-extern u8 D_00432464[];
+extern BlindOneState gBlindOne;
+extern u8 sBlindOneHitScript[];
 extern void ScriptAnimator_SetScript(void *dst, void *src);
 extern void CAI__SetMode(void *obj, CAI *ai, s32 state);
 
 void BlindOne_ActorHurt(void *obj, CAI *ai, DamageEvent *event) {
-    BlindOneState *state = &D_80130200;
+    BlindOneState *state = &gBlindOne;
     s32 health;
 
     if (ai->m_Health != 0) {
@@ -24,7 +24,7 @@ void BlindOne_ActorHurt(void *obj, CAI *ai, DamageEvent *event) {
         ai->m_Health = health;
         if (ai->m_BlindOne.m_HitTimer == 0.0f) {
             ai->m_BlindOne.m_HitTimer = 2.25f;
-            ScriptAnimator_SetScript(&state->faders[ai->m_BlindOne.m_nFader], D_00432464);
+            ScriptAnimator_SetScript(&state->faders[ai->m_BlindOne.m_nFader], sBlindOneHitScript);
         }
         if (ai->m_Health == 0) {
             CAI__SetMode(obj, ai, 6);

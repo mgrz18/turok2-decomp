@@ -4,17 +4,17 @@
 #include "rw/abu_types.h"
 
 extern void VM_FreeRegion(OwnerRecAt8V2 *arg0);
-extern Slot_func_8023CCD4_de D_80120FC0[];
+extern Slot_func_8023CCD4_de gPager_slots[];
 void VM_FreeRegion(OwnerRecAt8V2 *arg0) {
     extern s32 osSendMesg(s32, Node_func_8023CCD4_de *, s32);
     extern void VM_UnmapTLBEntry(Slot_func_8023CCD4_de *);
-    extern Node_func_8023CCD4_de D_80121378;
+    extern Node_func_8023CCD4_de gPager_regions;
     Node_func_8023CCD4_de *node;
     Node_func_8023CCD4_de *prev;
     u8 *slot;
     s32 i;
     u32 key;
-    node = &D_80121378;
+    node = &gPager_regions;
     key = arg0->handle >> 12;
     prev = 0;
     while (node != 0) {
@@ -28,8 +28,8 @@ void VM_FreeRegion(OwnerRecAt8V2 *arg0) {
     slot = node->slots;
     for (i = 0; i < node->count; i++) {
         if (*slot != 0xFF) {
-            VM_UnmapTLBEntry(&D_80120FC0[*slot]);
-            D_80120FC0[*slot].id = 0xFFFF;
+            VM_UnmapTLBEntry(&gPager_slots[*slot]);
+            gPager_slots[*slot].id = 0xFFFF;
         }
         slot++;
     }

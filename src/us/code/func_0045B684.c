@@ -1,7 +1,7 @@
 #include "common.h"
 
 s32 Controller_DisableMenuSounds(void *, void *);              /* extern */
-extern s32 D_801309C0;
+extern s32 gPakMessageKind;
 
 void PakMessage_InitNoController_2(void *arg0)
 {
@@ -12,7 +12,7 @@ void PakMessage_InitNoController_2(void *arg0)
   *((s32 *) (((s8 *) temp_a1) + 0x120)) = (s32) ((*((s32 *) (((s8 *) temp_a1) + 0x120))) & 0xFBFFFFFF);
   temp_a0 = *((void **) (((s8 *) arg0) + 0xC));
   new_var = (s32) ((*((s32 *) (((s8 *) temp_a0) + 0x120))) | 8);
-  D_801309C0 = 8;
+  gPakMessageKind = 8;
   *((s32 *) (((s8 *) temp_a0) + 0x120)) = new_var;
   Controller_DisableMenuSounds(temp_a0, temp_a1);
 }

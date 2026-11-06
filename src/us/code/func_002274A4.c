@@ -3,8 +3,8 @@
 #include "structs/collision.h"
 #include "structs/level_actor.h"
 
-extern f32 D_800B6D28;                  /* the frame's time step */
-extern CBox D_800F5A10;               /* visible bounds */
+extern f32 gFrameIncrement;                  /* the frame's time step */
+extern CBox gCameraVisibleBox;               /* visible bounds */
 
 void CPooledLevelActor__Update(CPooledLevelActor *actor);
 
@@ -46,14 +46,14 @@ void CLevelActorPool__Update(CLevelActorPool *pool) {
         next = next->m_pNext;
         expired = 0;
         if (actor->m_Lifetime > 0.0f) {
-            actor->m_Lifetime -= D_800B6D28;
+            actor->m_Lifetime -= gFrameIncrement;
             if (actor->m_Lifetime <= 0.0f) {
                 expired = 1;
             }
         }
-        if (!(D_800F5A10.m_vMax.x > actor->m_Actor.m_Bounds.m_vMin.x && D_800F5A10.m_vMin.x < actor->m_Actor.m_Bounds.m_vMax.x
-              && D_800F5A10.m_vMax.z > actor->m_Actor.m_Bounds.m_vMin.z && D_800F5A10.m_vMin.z < actor->m_Actor.m_Bounds.m_vMax.z
-              && D_800F5A10.m_vMax.y > actor->m_Actor.m_Bounds.m_vMin.y && D_800F5A10.m_vMin.y < actor->m_Actor.m_Bounds.m_vMax.y)) {
+        if (!(gCameraVisibleBox.m_vMax.x > actor->m_Actor.m_Bounds.m_vMin.x && gCameraVisibleBox.m_vMin.x < actor->m_Actor.m_Bounds.m_vMax.x
+              && gCameraVisibleBox.m_vMax.z > actor->m_Actor.m_Bounds.m_vMin.z && gCameraVisibleBox.m_vMin.z < actor->m_Actor.m_Bounds.m_vMax.z
+              && gCameraVisibleBox.m_vMax.y > actor->m_Actor.m_Bounds.m_vMin.y && gCameraVisibleBox.m_vMin.y < actor->m_Actor.m_Bounds.m_vMax.y)) {
             expired = 1;
         }
         if (expired) {

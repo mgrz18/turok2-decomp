@@ -41,7 +41,7 @@ struct SharedRecAt564V1 {
 };
 struct MenuRules;
 typedef struct MenuRules MenuRules;
-extern int D_800B2680;
+extern int gAudioWorldReady;
 struct MenuRules;
 struct MenuRules {
     char pad0[0x1C];
@@ -210,7 +210,7 @@ typedef struct Table_func_804428F8_de Table_func_804428F8_de;
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 struct ContextRecAt2BC0;
 extern s32 CAudioWorld__Update(void *arg0);
-extern u8 D_8011AAED;
+extern u8 gEngineApp_m_Settings_unk15;
 extern f32 D_800A80D0;
 struct GameplayCamera;
 typedef struct Lights Lights;
@@ -361,19 +361,19 @@ typedef struct MenuMatchGlobals {
     u8 unobserved1810[0x186C - 0x1810];
     s32 regenPaused;
 } MenuMatchGlobals;
-extern MenuMatchGlobals D_801198B0;
+extern MenuMatchGlobals gEngineApp_m_Game_m_CameraPool;
 extern void SndVoicePool_Update(void **arg0);
 extern void SndSeq_UpdateFade(void *arg0);
 extern u32 __osDisableInt(void);
 extern void SndQueue_Update(void *arg0);
 extern void SpeechPlayer_Update(void *arg0);
 extern void SndSeq_Update(void *arg0);
-extern s32 D_8011AC88; /* game mode */
+extern s32 gEngineApp_m_Settings_mode; /* game mode */
 extern void *CCameraPool__GetNearestCamera(MenuMatchGlobals *arg0, CVector3 *arg1);
 extern s32 CAudioWorld__PlaySound(void *, s32, CVector3, s32, s32);
 s32 CAudioWorld__Update(void *arg0) {
     char *object = arg0;
-    u8 *bytes = &D_8011AAED;
+    u8 *bytes = &gEngineApp_m_Settings_unk15;
     char *queue;
     u32 mask;
     s32 count;
@@ -409,9 +409,9 @@ s32 CAudioWorld__Update(void *arg0) {
     queue = object + 0x1D64;
     SndSeq_UpdateFade(queue);
     SndSeq_Update(queue);
-    if (D_800B2680 != 0 &&
+    if (gAudioWorldReady != 0 &&
         ((struct ContextRecAt2BC0 *)(object))->field2BB4 != 0 &&
-        D_8011AC88 == 13 &&
+        gEngineApp_m_Settings_mode == 13 &&
         ((struct ContextRecAt2BC0 *)(object))->track > 0) {
         CVector3 zero;
         void *result;
@@ -419,7 +419,7 @@ s32 CAudioWorld__Update(void *arg0) {
         zero.z = 0.0f;
         zero.y = 0.0f;
         zero.x = 0.0f;
-        result = CCameraPool__GetNearestCamera(&D_801198B0, &zero);
+        result = CCameraPool__GetNearestCamera(&gEngineApp_m_Game_m_CameraPool, &zero);
         vec = &((struct SharedRecAt564V1 *)(result))->position;
         if ((((struct ContextRecAt2BC0 *)(object))->frame & 3) == 0) {
             CAudioWorld__PlaySound(object, ((struct ContextRecAt2BC0 *)(object))->track, *vec, 0, -1);

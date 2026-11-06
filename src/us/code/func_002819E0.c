@@ -3,7 +3,7 @@
 s32 CList__AddHead(s32, s32);
 s32 CList__Remove(s32, s32);
 
-extern void *D_801198D0;
+extern void *gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
 
 void CCameraPool__ReleaseAllTexts(s32 arg0)
 {
@@ -30,7 +30,7 @@ void CCameraPool__ReleaseAllTexts(s32 arg0)
     }
     while (var_s1 != 0);
   }
-  var_s2 = D_801198D0;
+  var_s2 = gEngineApp_m_Game_m_CameraPool_m_ActiveList_m_pHead;
   if (var_s2 != 0)
   {
     do

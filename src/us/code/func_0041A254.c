@@ -15,9 +15,9 @@ typedef struct {
 } A254Menu;
 
 
-extern s32 D_80130910[4];
-extern u8 D_800F5A50[];
-extern u8 D_8011AAF1;   /* D_8011AAD8 + 0x19 */
+extern s32 sPauseRumbleOn[4];
+extern u8 gRumblePool[];
+extern u8 gEngineApp_m_Settings_multiplayer;   /* gEngineApp_m_Settings + 0x19 */
 extern void Controller_ResetAllRumble(void);
 extern void RumblePool_FreeAll(void *);
 extern s32 LoopSounds_Get(void);
@@ -28,11 +28,11 @@ void PauseMenu_Init(A254Menu *menu) {
 
     menu->state = 2;
     for (i = 0; i < 4; i++) {
-        D_80130910[i] = D_800F5EC0[i].rumbleOn;
+        sPauseRumbleOn[i] = gControllers[i].rumbleOn;
     }
-    RumblePool_FreeAll(D_800F5A50);
+    RumblePool_FreeAll(gRumblePool);
     Controller_ResetAllRumble();
-    if (D_8011AAF1) {
+    if (gEngineApp_m_Settings_multiplayer) {
         menu->screen->flags80 &= ~0x800000;
         menu->screen->flagsA8 &= ~0x800000;
     } else {

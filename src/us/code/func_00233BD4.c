@@ -51,9 +51,9 @@ typedef struct Owner3F94 {
     u8 pad0[0xD4];
     u32 flags; /* Turok 2: 0xD4 */
 } Owner3F94;
-extern f32 D_800B6D28;
-extern f32 D_800B6D2C;
-extern f32 D_800B6D30;
+extern f32 gFrameIncrement;
+extern f32 gEnemyTimeScale;
+extern f32 gParticleTimeScale;
 void SwooshGroup_Remove(s32 a, SSlot *s, SEnt *e);
 void func_002368B0(SSlot *s);
 s32 Swoosh_Update(s32 a0, SSlot *s) {
@@ -61,12 +61,12 @@ s32 Swoosh_Update(s32 a0, SSlot *s) {
     SEnt *e, *next;
     Owner3F94 *ow;
     s32 r;
-    saved = D_800B6D28;
+    saved = gFrameIncrement;
     if (s->flags & 2) {
-        D_800B6D28 = saved * D_800B6D30;
+        gFrameIncrement = saved * gParticleTimeScale;
     }
     if (s->flags & 1) {
-        D_800B6D28 = D_800B6D28 * D_800B6D2C;
+        gFrameIncrement = gFrameIncrement * gEnemyTimeScale;
     }
     if (s->flags & 8) {
         s->unk50 = s->unk50 + 1;
@@ -75,9 +75,9 @@ s32 Swoosh_Update(s32 a0, SSlot *s) {
         }
     }
     if (s->unk2C >= 0.0f) {
-        s->unk30 = s->unk30 + D_800B6D28;
+        s->unk30 = s->unk30 + gFrameIncrement;
     }
-    s->unk24 = s->unk24 - D_800B6D28;
+    s->unk24 = s->unk24 - gFrameIncrement;
     if (s->unk24 < 0.0f) {
         s->unk24 = 0.0f;
     }
@@ -96,7 +96,7 @@ s32 Swoosh_Update(s32 a0, SSlot *s) {
                     SwooshGroup_Remove(a0, s, e);
                 }
             } else {
-                e->unk8 = e->unk8 - D_800B6D28;
+                e->unk8 = e->unk8 - gFrameIncrement;
                 if (e->unk8 < 0.0f) {
                     e->unk8 = 0.0f;
                 }
@@ -108,7 +108,7 @@ s32 Swoosh_Update(s32 a0, SSlot *s) {
     if (ow != 0 && (s->flags & 1) && !(ow->flags & 0x200)) {
         func_002368B0(s);
     }
-    D_800B6D28 = saved;
+    gFrameIncrement = saved;
     if (s->unk48 != 0 || (s->unk24 != 0.0f && s->owner != 0)) {
         return 1;
     }

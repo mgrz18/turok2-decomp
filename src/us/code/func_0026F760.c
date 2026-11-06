@@ -10,29 +10,29 @@ void *memset(void *s, int c, u32 n);
 void osCreateThread(OSThread *thread, OSId id, void (*entry)(void *), void *arg, void *sp, OSPri pri);
 void osCreateMesgQueue(OSMesgQueue *mq, OSMesg *msgBuf, s32 count);
 s32 osAiSetFrequency(u32 freq);
-extern s8 D_800F2790[];
-extern s32 D_800F2838;
-extern s32 D_800F283C;
-extern s32 D_800F2840;
-extern s32 D_800F279C;
-extern B12DbEnt2 D_800F22C8[];
-extern void *D_800F27C0[];
-extern B12AiTask *D_800F27C8[];
-extern u8 D_800F27D4[];
-extern OSMesgQueue D_800F2820;
-extern OSMesgQueue D_800F27A0;
-extern OSMesgQueue D_800F2778;
-extern OSMesg D_800F2070[];
-extern OSMesg D_800F2048[];
-extern OSMesg D_800F2848[];
-extern OSThread D_800F2098;
-extern u8 D_800C5400[];
-extern u8 D_800BC330[];
-extern u8 D_800BC400[];
-extern u8 D_800BE920[];
-extern u8 D_800BFF50[];
-void D_0026FD4C(void);
-void D_0026FB70(void *arg);
+extern s8 gAudioDmaState[];
+extern s32 gAudioFrameSize;
+extern s32 gAudioMaxRSPCmds;
+extern s32 gAudioHeap;
+extern s32 gAudioDmaCache;
+extern B12DbEnt2 gAudioDmaBuffers[];
+extern void *gAudioCmdLists[];
+extern B12AiTask *gAudioInfo[];
+extern u8 gAudioGlobals[];
+extern OSMesgQueue gAudioReplyMsgQ;
+extern OSMesgQueue gAudioFrameMsgQ;
+extern OSMesgQueue gAudioDmaMessageQ;
+extern OSMesg gAudioReplyMsgBuf[];
+extern OSMesg gAudioFrameMsgBuf[];
+extern OSMesg gAudioDmaMessageBuf[];
+extern OSThread gAudioThread;
+extern u8 gThreadStackAudio[];
+extern u8 rspbootTextStart[];
+extern u8 gspF3DEX_NoN_fifoTextStart[];
+extern u8 aspMainTextStart[];
+extern u8 aspMainDataStart[];
+void __amDmaNew(void);
+void __amMain(void *arg);
 void alInit(void *g, ALSynConfig *c);
 void *alHeapDBAlloc(u8 *file, s32 line, void *hp, s32 num, s32 size);
 void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
@@ -45,51 +45,51 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
     u8 *a20;
     s32 a24;
     s32 n4;
-    D_800F2790[0] = 0;
-    cfg->dmaproc = (void *)D_0026FD4C;
+    gAudioDmaState[0] = 0;
+    cfg->dmaproc = (void *)__amDmaNew;
     freq = osAiSetFrequency(c2->unk0);
     cfg->outputRate = freq;
     t = (f32)c2->unk4 * (f32)freq * 0.016666668f;
     n = (s32)t;
-    D_800F2838 = n;
+    gAudioFrameSize = n;
     if ((f32)n < t) {
-        D_800F2838 = n + 1;
+        gAudioFrameSize = n + 1;
     }
-    if (D_800F2838 & 0xF) {
-        D_800F2838 = (D_800F2838 & ~0xF) + 0x10;
+    if (gAudioFrameSize & 0xF) {
+        gAudioFrameSize = (gAudioFrameSize & ~0xF) + 0x10;
     }
-    alInit(D_800F27D4, cfg);
-    D_800F22C8[0].link.prev = 0;
-    D_800F22C8[0].link.next = 0;
+    alInit(gAudioGlobals, cfg);
+    gAudioDmaBuffers[0].link.prev = 0;
+    gAudioDmaBuffers[0].link.next = 0;
     for (i = 0; i < 0x3B; i++) {
-        ALLink *next = &D_800F22C8[i + 1].link;
-        ALLink *prev = &D_800F22C8[i].link;
+        ALLink *next = &gAudioDmaBuffers[i + 1].link;
+        ALLink *prev = &gAudioDmaBuffers[i].link;
         alLink(next, prev);
-        D_800F22C8[i].data = alHeapDBAlloc(0, 0, cfg->heap, 1, 0x300);
+        gAudioDmaBuffers[i].data = alHeapDBAlloc(0, 0, cfg->heap, 1, 0x300);
     }
-    D_800F22C8[i].data = alHeapDBAlloc(0, 0, cfg->heap, 1, 0x300);
+    gAudioDmaBuffers[i].data = alHeapDBAlloc(0, 0, cfg->heap, 1, 0x300);
     for (i = 0; i < 2; i++) {
-        D_800F27C0[i] = alHeapDBAlloc(0, 0, cfg->heap, 1, c2->unk8 * 8);
+        gAudioCmdLists[i] = alHeapDBAlloc(0, 0, cfg->heap, 1, c2->unk8 * 8);
     }
-    D_800F283C = c2->unk8;
+    gAudioMaxRSPCmds = c2->unk8;
     i = 0;
-    a20 = D_800BC330;
-    a24 = D_800BC400 - D_800BC330;
-    tp = D_800F27C8;
+    a20 = rspbootTextStart;
+    a24 = gspF3DEX_NoN_fifoTextStart - rspbootTextStart;
+    tp = gAudioInfo;
     for (; i < 3; i++) {
         tk = alHeapDBAlloc(0, 0, cfg->heap, 1, 0x70);
-        n4 = D_800F2838 * 4;
+        n4 = gAudioFrameSize * 4;
         *tp = tk;
         (*tp)->cmd = alHeapDBAlloc(0, 0, cfg->heap, 1, n4);
-        (*tp)->f58 = &D_800F2820;
+        (*tp)->f58 = &gAudioReplyMsgQ;
         (*tp)->f5C = *tp;
         (*tp)->f18 = 2;
         (*tp)->f20 = a20;
         (*tp)->f24 = a24;
         (*tp)->f1C = 0;
-        (*tp)->f28 = D_800BE920;
+        (*tp)->f28 = aspMainTextStart;
         (*tp)->f2C = 0x1000;
-        (*tp)->f30 = D_800BFF50;
+        (*tp)->f30 = aspMainDataStart;
         (*tp)->f34 = 0x800;
         (*tp)->f50 = 0;
         (*tp)->f54 = 0;
@@ -99,14 +99,14 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
         (*tp)->f44 = 0;
         tp++;
     }
-    osCreateMesgQueue(&D_800F2820, D_800F2070, 10);
-    osCreateMesgQueue(&D_800F27A0, D_800F2048, 10);
-    osCreateMesgQueue(&D_800F2778, D_800F2848, 0x3C);
-    osSetEventMesg(6, &D_800F27A0, (OSMesg)7);
-    D_800F279C = 0;
-    D_800F2840 = (s32)cfg->heap;
-    memset(D_800C5400, 8, 0x2800);
-    osCreateThread(&D_800F2098, 8, D_0026FB70, 0, D_800C5400 + 0x2800, pri);
-    osStartThread(&D_800F2098);
-    osSendMesg(&D_800F27A0, (OSMesg)7, 0);
+    osCreateMesgQueue(&gAudioReplyMsgQ, gAudioReplyMsgBuf, 10);
+    osCreateMesgQueue(&gAudioFrameMsgQ, gAudioFrameMsgBuf, 10);
+    osCreateMesgQueue(&gAudioDmaMessageQ, gAudioDmaMessageBuf, 0x3C);
+    osSetEventMesg(6, &gAudioFrameMsgQ, (OSMesg)7);
+    gAudioDmaCache = 0;
+    gAudioHeap = (s32)cfg->heap;
+    memset(gThreadStackAudio, 8, 0x2800);
+    osCreateThread(&gAudioThread, 8, __amMain, 0, gThreadStackAudio + 0x2800, pri);
+    osStartThread(&gAudioThread);
+    osSendMesg(&gAudioFrameMsgQ, (OSMesg)7, 0);
 }

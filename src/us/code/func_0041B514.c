@@ -5,58 +5,58 @@
 
 extern char D_800B58FC[];
 extern char D_800B5918[];
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
 s32 CheatMenu_TinyModeText(struct StateRecAt14 *item) {
-    if (D_8011AADC & 0x40) {
+    if (gEngineApp_m_Settings_unlockedCheats & 0x40) {
         item->unk8 |= 0x1000000;
     } else {
         item->unk8 &= ~0x1000000;
     }
-    if (D_8011AAD8 & 0x40) {
+    if (gEngineApp_m_Settings & 0x40) {
         item->unk14 = D_800B58FC;
     } else {
         item->unk14 = D_800B5918;
     }
     return 0;
 }
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
-extern s32 D_8011AAD8;
-extern s32 D_8011AAD8;
-extern s32 D_8011AADC;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings;
+extern s32 gEngineApp_m_Settings_unlockedCheats;
