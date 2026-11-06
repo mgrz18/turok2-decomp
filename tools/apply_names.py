@@ -225,8 +225,14 @@ def check(funcs, data, by_name):
             continue                        # already in the build under this name
         k = known.get(name)
         if k:
-            (errs if kind == "data" or k not in ("function prototype", "C function") else warns).append(
-                f"{where}: {name} (0x{addr:08X}) collides with a {k} of that name")
+            # A library datum named as the library spells it meets the
+            # library's own extern (or a struct tag, another namespace): the
+            # declarations must agree, which the build checks.
+            soft = (k in ("function prototype", "C function") if kind != "data"
+                    else k in ("libultra global", "global", "struct/union/enum tag"))
+            (warns if soft else errs).append(
+                f"{where}: {name} (0x{addr:08X}) collides with a {k} of that name"
+                + (" (a library name? the declarations must agree)" if soft and kind == "data" else ""))
     # Every token in the sources, to see what the data names would replace.
     tokens = set()
     texts = []
