@@ -1,7 +1,7 @@
 #include "common.h"
 #include "structs/camera.h"
 
-extern u8 *sCinemaTextFadeOut;
+extern u8 *sCinemaTextFadeOut; /* local type: the symbol is the string itself (char[0x24], globals/hud.h), but the ROM loads its first word (lw) and compares the text pointer to that */
 extern u8 *D_800B2CD0;
 extern s32 gScreenWidth;      /* screen width */
 extern s32 gScreenHeight;      /* screen height */
