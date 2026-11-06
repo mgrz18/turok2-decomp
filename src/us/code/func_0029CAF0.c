@@ -84,7 +84,6 @@ typedef struct OSPiHandle_s {
 extern OSPiHandle *__osDiskHandle;
 
 extern u32 __OSGlobalIntMask;          /* __OSGlobalIntMask */
-extern OSPiHandle *__osDiskHandle;  /* __osDiskHandle */
 void __osLeoAbnormalResume(void);
 void __osLeoResume(void);
 s32 osEPiRawStartDma(OSPiHandle *pihandle, s32 dir, u32 cart_addr, void *dram_addr, u32 size); /* osEPiRawStartDma */
