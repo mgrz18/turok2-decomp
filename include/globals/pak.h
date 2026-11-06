@@ -14,6 +14,7 @@ extern s32 gPakMenuMode;            /* which notes the pak menu lists */
 extern s32 gPakMenuPort;            /* the controller port the pak menus work on */
 extern s32 sPakMenuStartLatched;    /* START seen once */
 extern s32 gPakDirectoryAllocated;
+extern CMemEntry *gPakStateBuffer;   /* the CCache handle of the 0x810-byte directory block (gPakDirectories) */
 extern u8 gPakCharTable[];          /* the controller pak character set */
 extern s8 gPakQueueState;           /* the pak rescan request / queue state */
 extern OSMesgQueue gPakAccessQueue; /* the pak access lock */

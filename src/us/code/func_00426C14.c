@@ -5,7 +5,6 @@
 #include "globals/pak.h"
 #include "globals/controller.h"
 
-extern void **gPakStateBuffer;
 
 extern void **CCache__Allocate(s32, s32, s32, char *);
 extern void CCache__Flush(s32);
