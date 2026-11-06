@@ -1,0 +1,214 @@
+// Data names for 0x800A81A8-0x800B00BF (part g2). Not applied yet.
+// 0x800A81A8-0x800AB0AF is the code segment's .rodata (float/double pools, assert and
+// crash-screen literals: skipped); 0x800AB0B0 on is its .data, which follows the
+// source files in .text order (hash table, cache, lights, render, ... player, weapons, enemy anims).
+
+// rodata: boot (func_0028D380) and libultra cosf/sinf statics (ultralib cosf.c/sinf.c: P, rpi, pihi, pilo, zero)
+sBootMarker = 0x800AA200; // Marker (15-char string) copied to D_800B75F0 and compared on reset to detect a warm boot; only func_0028D380
+sCosfP = 0x800AA750; // const du P[] of ultralib cosf.c, the polynomial; func_002974C0 (cosf, unnamed: GCC builtin)
+sCosfRpi = 0x800AA778; // const du rpi (1/pi) of cosf.c
+sCosfPiHi = 0x800AA780; // const du pihi of cosf.c
+sCosfPiLo = 0x800AA788; // const du pilo of cosf.c
+sCosfZero = 0x800AA790; // const fu zero of cosf.c
+sSinfP = 0x800AA830; // const du P[] of ultralib sinf.c; func_002982F0 (sinf, unnamed: GCC builtin)
+sSinfRpi = 0x800AA858; // const du rpi of sinf.c
+sSinfPiHi = 0x800AA860; // const du pihi of sinf.c
+sSinfPiLo = 0x800AA868; // const du pilo of sinf.c
+sSinfZero = 0x800AA870; // const fu zero of sinf.c
+
+// hash table and cache (Turok 3 hash.c / cache.c)
+gHashSize = 0x800AB0B0; // Turok 3 hash.c gHashSize: CHashTable__Construct writes RoundToPowerOfTwo(n), CHashTable__GetLongestChain loops to it (IsDataPointer uses its address as a bound)
+gHashTableSize = 0x800AB0B4; // Turok 3 hash.c gHashTableSize = gHashSize * 2 (CHashTable__Construct); D_800D81C0/C8 are gHashMask/gHashTableMask
+gCacheEntryCount = 0x800AB0C0; // Turok 3 cache.c gCacheEntryCount (0x400, doubled with the expansion pak): CCache__Construct, CCache__ClearDisplayListLocks, CCache__ReleaseDisplayList
+
+// lights and the RSP/RDP init display lists
+gSceneLights = 0x800AB0D0; // CLights1 (structs/light.h) "the scene light": CScene__LoadLightSettings, CScene__GetLightsAt fallback, CLevelActor__Construct default, CCamera__CycleLightAndFog
+gSceneLights_m_AmbColCopy = 0x800AB0D4; // = &gSceneLights.m_AmbColCopy (CScene__LoadLightSettings_2 writes it as its own symbol)
+gSceneLights_m_ColCopy = 0x800AB0DC; // = &gSceneLights.m_ColCopy (CScene__LoadLightSettings_2)
+gSceneLights_m_Dir = 0x800AB0E0; // = &gSceneLights.m_Dir (CScene__LoadLightSettings_2)
+gDefaultLights = 0x800AB0E8; // Lights1 copied into both m_Lights of an instance drawn with lit vertices (CGameObjectInstance__Construct), the lights of menu models (MenuModel_DrawUnselected) and EngineMode03_ExpansionPak_Draw
+gRspInitDL = 0x800AB100; // Gfx[]: geometry mode, G_MW_NUMLIGHT, gSceneLights moves; called first by CEngineApp__BeginDisplayList, CCamera__DisplayListSetup, CCameraPool__Draw, Automap_Draw
+gRdpInitDL = 0x800AB130; // Gfx[]: the G_SETOTHERMODE defaults (cycle type, texture filter, ...), called right after gRspInitDL by the same four
+
+// textures and render state (Texture_Load, Render_SetRenderMode file)
+sTextureLoadDL_Detail = 0x800AB190; // Gfx[] Texture_Load uses for detail modes 0/1 (G_TD_CLAMP / G_TD_SHARPEN)
+sTextureLoadDL_DetailMirror = 0x800AB210; // the same with wrapS bit 1 set (Texture_Load)
+sTextureLoadDL_Mode2 = 0x800AB290; // Texture_Load, info[5] == 2 and default
+sTextureLoadDL_Mode3 = 0x800AB328; // Texture_Load, info[5] == 3
+sTextureLoadDL_I16 = 0x800AB3C0; // Texture_Load, format 5 (loads the image as G_IM_FMT_I 16b)
+sShadowQuadDL = 0x800AB458; // Gfx[] for pass 0 of Render_DrawShadowQuad
+sShadowQuadDL2 = 0x800AB4E0; // Gfx[] for pass != 0 of Render_DrawShadowQuad
+sLoadedTexture = 0x800AB570; // the texture data last loaded (compared with D_800D8E00/04/08/0C to skip reloads): Texture_Load, cleared by Texture_InvalidateCache
+gShadowTexture = 0x800AB580; // u8[16*16] I8 texture: Render_DrawShadowQuad and func_00235C30
+gCurrentCombineMode = 0x800AB880; // cached Render_SetCombineMode index (-1 = none): Render_InvalidateModeCache, Render_DrawShadowQuad, Render_DrawModelFlat
+gCurrentRenderMode = 0x800AB884; // cached Render_SetRenderMode index (-1 = none), same users
+gRenderAntiAlias = 0x800AB890; // VideoFlags.b of the video mode (Video_ApplyResolution): picks the AA variants of the render modes in Render_SetRenderMode
+gViAntiAlias = 0x800AB894; // VideoFlags.c: Video_SetMode adds 2 (anti-aliased VI mode) to the osViModeTable index
+gRenderZModeInter = 0x800AB898; // VideoFlags.d: Render_SetupMaterial picks render modes 8/9 (ZMODE_INTER, 0x400) over 10/11
+gRenderImageRead = 0x800AB89C; // VideoFlags.e: Render_SetupMaterial picks modes 8/10 (IM_RD, 0x40) over 9/11
+gFogEnabled = 0x800AB8A0; // level header flag 4 (CScene__LoadLevel, CScene__SetupLighting); func_0020B554 derives the three fog globals below from it
+gFogGeometryMode = 0x800AB8A4; // 0 or 0x10000 (G_FOG) ORed into the geometry mode (Render_SetupMaterial, Render_DrawModelFlat, func_00209658)
+gFogRenderModeFogA = 0x800AB8A8; // blender cycle 1: 0xC4000000 (fog colour by fog alpha) or 0x0C080000 (pass) (func_0020B554); Render_SetRenderMode mode 30
+gFogRenderModeShadeA = 0x800AB8AC; // blender cycle 1: 0xC8000000 (G_RM_FOG_SHADE_A) or pass; ORed into the z-buffered render modes of Render_SetRenderMode
+gBlendState = 0x800AB8B0; // CBlendState (structs/light.h) "the draw colour override": ScreenTint_UpdateMode, Render_SetupMaterial, every *_Draw that fades (EnemyAI_DrawFaded, Action_DrawFade, bosses)
+gBlendState_m_Color = 0x800AB8B4; // = &gBlendState.m_Color (declared f32[5] / O06Cam in Render_SetupMaterial, Player_DrawNodeCallback, MenuModel_DrawSelected)
+gBlendFade = 0x800AB8C0; // f32[2] right after gBlendState: [0] fade (env alpha), [1] alpha (prim alpha) (structs/light.h); ScreenTint_UpdateMode
+gPrimColorOverride = 0x800AB8C8; // u8 flag: Render_SetupMaterial uses gPrimColorOverrideR/G/B instead of the material's prim colour
+gPrimColorOverrideR = 0x800AB8C9; // u8, Render_SetupMaterial
+gPrimColorOverrideG = 0x800AB8CA; // u8, Render_SetupMaterial
+gPrimColorOverrideB = 0x800AB8CB; // u8, Render_SetupMaterial
+gPrimAlphaOverride = 0x800AB8CC; // u8 flag: use gPrimAlphaOverrideValue as prim alpha; set/cleared by CPlayer__DrawScope
+gPrimAlphaOverrideValue = 0x800AB8CD; // u8, Render_SetupMaterial, CPlayer__DrawScope
+
+// math / lighting tables
+gAcosTable = 0x800AB8D0; // f32[1024] Math_AcosLookup (interpolated; pi - [1023] for the negative end)
+sLightSphereFalloff = 0x800AC8D0; // f32[] by squared distance, shape 0 (sphere) of Actors_GetLightVolumeFalloff
+sLightConeFalloff = 0x800AC9D4; // f32[] by squared radial distance, shape 2 (cone) of Actors_GetLightVolumeFalloff
+
+// scene / instances / animation
+gLitVerticesKey = 0x800ACAD8; // GameSettings+0xC | 0x100/0x200 from cheatFlags 0x4000/0x8000 (CScene__Update); ORed into the cache keys of lit vertices (CStaticObject__RequestLitVertices/TouchLitVertices, CGameObjectInstance__DrawModelLitVertices)
+gLitVerticesKeyChanged = 0x800ACADC; // set by CScene__Update when gLitVerticesKey changed (then CCache__SetFrameDelay); CScene__CollectSectorObjects
+gLevelLightsEnabled = 0x800ACAE0; // initialised 1, never written: 0 makes CScene__GetLightsAt return gSceneLights and Lighting_BuildLitVertices skip the level lights (debug switch)
+gNextUniqueId = 0x800ACAF0; // starts 0x380000; Instance_NextUniqueId returns it and increments; reset by CStaticObject__Construct(Compact)
+gColorPulseTable = 0x800ACAF4; // s8[64] colour pulse: Model_PulseVertexColors, LightVolume_GetFlicker, CStaticObject__Draw
+gIntelligenceTypeInfo = 0x800ACB60; // (n4) [m_Type] -> {setup, advance, event handler pairs}: CGameObjectInstance__Construct/GetBodySetup, func_0021E5D4, func_0021F770
+gAnimEventCount = 0x800ACB94; // incremented by CGameObjectInstance__FireAnimEvents for each event it fires (never read: a debug count)
+gSwingAmplitudes = 0x800ACB98; // f32[25] swing amplitude per remaining step: CGameObjectInstance__PoseBone, func_0021F7F4
+sWobbleSineTable = 0x800ACBF8; // SineTable (120 values) of func_0021B59C (RW func_802480F0_de), the time-based wobble matrix
+gSceneGeometryDL = 0x800ACDE0; // Gfx *: the level's display list once built this frame (CScene__BuildGeometryDisplayList), cleared by CScene__Update
+gCinemaHidesActors = 0x800ACDE4; // initialised 1; while a cinema path plays CScene__BuildActorLists draws only actors flagged 0x200; 0 during the death cinema (CPlayer__StartDeathCinema, back to 1 in PlayerDeath_CinemaDone)
+gWarpFadeColors = 0x800ACDE8; // the warp fade table indexed by CScene.m_WarpFade (structs/world.h): CScene__UpdateWarp, CScene__DrawWarpFade
+gDLightBufferOffset = 0x800ACE00; // 0 / 0x20, flipped by DLights_SwapBuffers (the previous value goes to D_800F1800)
+
+// particles, impacts, trails, swooshes
+gProjectileSpeedScale = 0x800ACE10; // f32 set by CPlayer__FireWeapon from gWeaponChargeScale; scales the particle velocity (CParticleSystem__Free / CParticle__BuildMatrix)
+gProjectilePower = 0x800ACE14; // f32 = the player's weapon_particle_damage_scaler, set by CPlayer__FireWeapon
+sParticleAmmoPickups = 0x800ACE18; // ContactHandler[4]: rows like the ammo pickup rows (message, ammo, handler Pickup_GiveAmmo) a particle gives when it touches the player; CParticle__Update
+sTrailTextures = 0x800ACFB0; // pointers to the trail texture records (0x800ACE70...), by Trail tex0/tex1; Trail_AddNode
+sSwooshSpawned = 0x800ACFC0; // cleared each frame by SwooshSystem_Update; func_002364A4 adds at most one swoosh while it is set
+gImpactEventHandlers = 0x800AD080; // (n2 "impact event handlers", structs/particle_event.h) per event kind {handler, flags}: ImpactEvent_Send, ImpactEvent_Call, ImpactEvent_Call2
+gImpactEventHandlers_m_Flags = 0x800AD084; // = the flags of gImpactEventHandlers[0], CEventFlags[] (structs/particle_event.h): CParticle__HitTarget, CParticle__HitInstanceBody, CGameObjectInstance__FireAnimEvents
+
+// collision and pickups
+sCollisionTests = 0x800AD190; // void (*[])(Sweep *), NULL-ended (structs/collision.h); slot 0 Collision_TestInstances; Collision_MoveInstance
+sWeaponPickups = 0x800AD1B0; // PickupRow18[31], handler Pickup_GiveWeapon: Pickup_FindWeaponEntry, CPlayer__CollectPickup
+sAmmoPickups = 0x800AD498; // PickupRow14[36], handler Pickup_GiveAmmo: Pickup_FindAmmoEntry
+sHealthPickups = 0x800AD768; // PickupRow18[7], handler Pickup_GiveHealth: Pickup_FindHealthEntry
+sLifeForcePickups = 0x800AD810; // PickupRow14[2] (ids 0x6A9, 0x6AA; amounts 1, 10), handler Pickup_GiveLifeForce: func_0023EFCC
+sItemPickups = 0x800AD838; // PickupRow10[15], handler Pickup_GiveItem: Pickup_FindItemEntry
+sBoxSideFaceBuilders = 0x800AD930; // FaceFunc[], NULL-ended: Quad_SetBoxTop, Quad_SetBoxSide3267/4510/0374/2156; Platform_CollideBox
+
+// AI drops, player input, flashlight
+sDropPickups = 0x800AD950; // {mask, pickup id}[] 0-ended (ids 0x6A5...): one GameObject_DropPickupAt per bit of the first mask; AI_SpawnParticlesOnce (which drops pickups, not particles)
+sDropPickups2 = 0x800ADA58; // the same for the second mask (id 0xBC3); AI_SpawnParticlesOnce
+sControlSide1ButtonMap = 0x800ADA70; // ButtonMap {mask, bits}[]: the button remap for CPlayerOptions m_ControlSide 1; CPlayer__ReadInput
+sFlashlightLight1 = 0x800ADB10; // dynamic light description for m_pDLFlashlight1 (CPlayer__UpdateFlashlight)
+sFlashlightLight2 = 0x800ADB18; // for m_pDLFlashlight2 (CPlayer__UpdateFlashlight)
+sDarkCityLight = 0x800ADB20; // for m_pDLDarkCityLight (settings flag 0x4000), alternated with sDarkCityLight2 (CPlayer__UpdateFlashlight)
+sDarkCityLight2 = 0x800ADB28; // the other m_pDLDarkCityLight description (CPlayer__UpdateFlashlight)
+
+// player: characters and HUD overlays
+gCharacterModels = 0x800ADB30; // s32[11] multiplayer character model ids (0x460/0x461) by intelligence m_Id: CPlayer__LoadCharacterModel, CPlayer__SetCharacter, CPlayer__DrawCharacter, MenuItem_DrawModel
+gTagModeModel = 0x800ADB5C; // the model of a tagged player (0x462) in tag mode; same users + Player_DrawNodeCallback
+gHealthOverlayScript = 0x800ADB60; // COverlay script started on m_HealthOverlay by CPlayer__LevelStart
+gAmmoOverlayScript = 0x800ADB74; // on m_AmmoOverlay by CPlayer__LevelStart
+gAmmoOverlayChangeScript = 0x800ADB84; // on m_AmmoOverlay by CPlayer__DrawHud when the ammo changes
+gLivesOverlayScript = 0x800ADBB0; // on m_LivesOverlay by CPlayer__LevelStart
+gLivesOverlayChangeScript = 0x800ADBC0; // CPlayer__DrawHud when the lives change
+gTokensOverlayScript = 0x800ADBF0; // on m_TokensOverlay by CPlayer__LevelStart
+gTokensOverlayChangeScript = 0x800ADC00; // CPlayer__DrawHud when m_LifeForce changes
+gTotalKillsOverlayScript = 0x800ADC30; // on m_TotalKillsOverlay by CPlayer__LevelStart
+gTotalKillsOverlayChangeScript = 0x800ADC40; // CPlayer__DrawHud when m_Kills changes
+gTotalTagsOverlayScript = 0x800ADC70; // on m_TotalTagsOverlay by CPlayer__LevelStart
+gTotalTagsOverlayChangeScript = 0x800ADC80; // CPlayer__DrawHud when m_Tags changes
+gRidingEyeOffset = 0x800ADCB0; // CVector3 (0, 16, 0): the eye offset riding object type 0x136 (CPlayer__UpdateRiding)
+gRidingScale = 0x800ADCBC; // CVector3 (0.16 x3) copied to m_vOnEnemyScale: CPlayer__TryMount, CPlayer__UpdateRiding
+
+// weapon wheel (CBarrel) layouts
+sBarrelLayoutGroup1 = 0x800ADCC8; // s32[8] slot layout for group != 0, single player: CBarrel__LayoutEight
+sBarrelLayoutGroup0 = 0x800ADCE8; // group 0, single player
+sBarrelLayoutUnderwater = 0x800ADD08; // actor flag 0x80 (sets m_bUnderwater), single player
+sBarrelLayoutGroup1MP = 0x800ADD28; // group != 0, multiplayer (D_8011AAF1)
+sBarrelLayoutGroup0MP = 0x800ADD48; // group 0, multiplayer
+sBarrelLayoutUnderwaterMP = 0x800ADD68; // underwater, multiplayer
+gCharacterHealthRegen = 0x800ADD88; // f32[] health regained per second by character (CPlayer__RegenerateHealth, CPlayer__Update)
+
+// player movement tunings (CPlayer__TurnAndLook / MoveOnFoot / MoveInWater arguments)
+gStandMoveTuning = 0x800ADDBC; // "standing move tuning": PlayerWalk_Update, PlayerFall_Update
+gRidingForwardMoveTuning = 0x800ADDE0; // CPlayer__UpdateRiding (+4 = D_800ADDE4, its charge speed)
+gRidingBackwardMoveTuning = 0x800ADE04; // CPlayer__UpdateRiding
+gDodgeMoveTuning = 0x800ADE28; // PlayerDodgeFall_Update (state 7)
+gCrouchMoveTuning = 0x800ADE4C; // "crouching move tuning": PlayerWalk_Update
+gStandLookTuning = 0x800ADE70; // "standing look tuning": PlayerStand/Walk/Fall/Wade/JumpPad/DodgeFall_Update
+gCrouchLookTuning = 0x800ADE88; // PlayerStand_Update, PlayerWalk_Update
+gRidingLookTuning = 0x800ADEA0; // CPlayer__UpdateRiding
+gWadeMoveTuning = 0x800ADEB8; // Tuning (strokeSound at 0x22): PlayerWade_Update
+gSwimMoveTuning = 0x800ADEDC; // PlayerSwim_Update
+gSwimLookTuning = 0x800ADF00; // PlayerSwim_Update
+gPlayerState12LookTuning = 0x800ADF18; // PlayerState12_Update (states 12-13)
+gPlayerState12MoveTuning = 0x800ADF30; // PlayerState12_Update (through CPlayer__MoveInWater)
+gPlayerStateTable = 0x800ADF54; // (n3) PlayerStateInfo[] 0x18-byte rows {enter, update, tuning, flags, ?, anim}: CPlayer__SetState, CPlayer__Update
+gPlayerStateTable_tuning = 0x800ADF5C; // = &gPlayerStateTable[0] + 8 (the tuning pointer; local field names unk8/physics): CPlayer__MoveInWater, AI_FindBestTarget
+gPlayerStateTable_anim = 0x800ADF68; // = &gPlayerStateTable[0] + 0x14 (s16 pose/anim): WeaponActor_Update, WeaponMode_Idle_Update, WeaponMode_Ready_Update
+gLivesSpeech = 0x800AE2B4; // s16[] speech by number of lives (Sound__PlaySpeech): CPlayer__LoseLife, CPlayer__ResetHealth, CPlayer__StartGame
+gBarrelSlotScale = 0x800AE2D8; // f32 slot scale of the weapon wheel: CBarrel__Reset/Fill/LayoutEight/DrawRing/DrawEight
+sOrbitCameraAngle = 0x800AE308; // f32 turned by buttons 0x100/0x200: CPlayer__UpdateOrbitCamera (m_bActive 2)
+sOrbitCameraDistance = 0x800AE30C; // f32 (102.4) moved by the same: CPlayer__UpdateOrbitCamera
+gDeathTint = 0x800AE340; // set by CPlayer__StartDeathCinema for death kind 0x32 (colour saved in D_800F1FE4), cleared in PlayerDeath_CinemaDone; CCamera__DrawTints forces the tint
+
+// weapons
+gWeaponChargeScale = 0x800AE350; // f32 (1.0) set by WeaponMode_WindUp_Update (0.5-2), copied to gProjectileSpeedScale by CPlayer__FireWeapon
+sWeaponFlipX = 0x800AE37C; // s32 (0), WeaponActor_BuildMatrix mirrors X when set (debug)
+sWeaponFlipY = 0x800AE380; // s32, idem Y
+sWeaponFlipZ = 0x800AE384; // s32, idem Z
+sWeaponActorModeTable = 0x800AE394; // (n3 "default weapon mode table") CAIModeInfo rows installed by WeaponActor_InitAI
+gWeaponActorTypeInfo = 0x800AE994; // intelligence type block {setup WeaponActor_InitAI, ...} of a player's second object (+0x288): CGameObjectInstance__GetBodySetup, Construct, func_0021E5D4
+gWeaponInfoTable = 0x800AF618; // WeaponInfo *[] (structs/weapon.h "the weapon table", Rage Wars struct WeaponInfo), by weapon number; 50+ users (CPlayer__*, CBarrel__*, WeaponMode_*)
+gWeaponInfoTable_22 = 0x800AF670; // = &gWeaponInfoTable[22] (declared WeaponInfo *): CPlayer__CollectKeyPiece
+gAmmoIcons = 0x800AF6A8; // s16[] HUD icon (0xC8...) by ammo type, -1 none: CPlayer__GetCurrentAmmoInfo -> CPlayer__DrawHud
+
+// enemy animation pick tables ({flag, animId} rows, -1 ended; AI_PickAnimFromTable); named as part g3 does: sEnemyAnim<Kind>_<low address>
+sEnemyAnimIdle_AF6F0 = 0x800AF6F0; // EnemyAnim_Idle_AF6F0, EnemyAnim_InteractiveIdle (mode 0, flagsA), EnemyAnim_JoypadTestPlayAnim, InteractiveAnim_Update
+sEnemyAnimIdle_AF720 = 0x800AF720; // EnemyAnim_Idle_AF720, EnemyAnim_InteractiveIdle (mode 1)
+sEnemyAnimIdle_AF750 = 0x800AF750; // EnemyAnim_Idle_AF750, EnemyAnim_InteractiveIdle (mode 2)
+sEnemyAnimIdle_AF780 = 0x800AF780; // EnemyAnim_InteractiveIdle (mode 0, flagsB)
+sEnemyAnimIdle_AF7B0 = 0x800AF7B0; // EnemyAnim_InteractiveIdle (mode 1, flagsB)
+sEnemyAnimIdle_AF7E0 = 0x800AF7E0; // EnemyAnim_InteractiveIdle (mode 2, flagsB)
+sEnemyAnimAlert_AF810 = 0x800AF810; // EnemyAnim_Alert_AF810
+sEnemyAnimAlert_AF840 = 0x800AF840; // EnemyAnim_Alert_AF840
+sEnemyAnimAlert_AF870 = 0x800AF870; // EnemyAnim_Alert_AF870
+sEnemyAnimTakeCover_AF8A0 = 0x800AF8A0; // EnemyAnim_TakeCover_AF8A0
+sEnemyAnimTakeCover_AF8D0 = 0x800AF8D0; // EnemyAnim_TakeCover_AF8D0
+sEnemyAnimTakeCover_AF900 = 0x800AF900; // EnemyAnim_TakeCover_AF900
+sEnemyAnimLeftArmWound_AF930 = 0x800AF930; // EnemyAnim_LeftArmWound_AF930
+sEnemyAnimLeftArmWound_AF960 = 0x800AF960; // EnemyAnim_LeftArmWound_AF960
+sEnemyAnimLeftArmWound_AF990 = 0x800AF990; // EnemyAnim_LeftArmWound_AF990
+sEnemyAnimRightArmWound_AF9C0 = 0x800AF9C0; // EnemyAnim_RightArmWound_AF9C0
+sEnemyAnimRightArmWound_AF9F0 = 0x800AF9F0; // EnemyAnim_RightArmWound_AF9F0
+sEnemyAnimRightArmWound_AFA20 = 0x800AFA20; // EnemyAnim_RightArmWound_AFA20
+sEnemyAnimPatrol_AFA50 = 0x800AFA50; // EnemyAnim_Patrol_AFA50
+sEnemyAnimPatrol_AFA80 = 0x800AFA80; // EnemyAnim_Patrol_AFA80
+sEnemyAnimPatrol_AFAB0 = 0x800AFAB0; // EnemyAnim_Patrol_AFAB0
+sEnemyAnimMove_AFAE0 = 0x800AFAE0; // EnemyAnim_Move_AFAE0
+sEnemyAnimMove_AFB68 = 0x800AFB68; // EnemyAnim_Move_AFB68
+sEnemyAnimMove_AFBF0 = 0x800AFBF0; // EnemyAnim_Move_AFBF0
+sEnemyAnimMove_AFC78 = 0x800AFC78; // EnemyAnim_Move_AFC78
+sEnemyAnimMove_AFCA8 = 0x800AFCA8; // EnemyAnim_Move_AFCA8
+sEnemyAnimMove_AFCD8 = 0x800AFCD8; // EnemyAnim_Move_AFCD8
+sEnemyAnimFlee_AFD08 = 0x800AFD08; // EnemyAnim_Flee_AFD08
+sEnemyAnimFlee_AFD38 = 0x800AFD38; // EnemyAnim_Flee_AFD38
+sEnemyAnimFlee_AFD68 = 0x800AFD68; // EnemyAnim_Flee_AFD68
+sEnemyAnimComboEnd_AFD98 = 0x800AFD98; // EnemyAnim_ComboEnd_AFD98
+sEnemyAnimComboEnd_AFDC8 = 0x800AFDC8; // EnemyAnim_ComboEnd_AFDC8
+sEnemyAnimComboEnd_AFDF8 = 0x800AFDF8; // EnemyAnim_ComboEnd_AFDF8
+sEnemyAnimCombat_AFE28 = 0x800AFE28; // EnemyAnim_Combat_AFE28
+sEnemyAnimCombat_AFE58 = 0x800AFE58; // EnemyAnim_Combat_AFE58
+sEnemyAnimCombat_AFE88 = 0x800AFE88; // EnemyAnim_Combat_AFE88
+sEnemyAnimLeap_AFEB8 = 0x800AFEB8; // EnemyAnim_Leap_AFEB8
+sEnemyAnimLeap_AFEE8 = 0x800AFEE8; // EnemyAnim_Leap_AFEE8
+sEnemyAnimLeap_AFF18 = 0x800AFF18; // EnemyAnim_Leap_AFF18, also the fallback of EnemyAnim_DartFallback_AFF18 / EnemyAnim_ProjectileFallback_AFF18
+sEnemyAnimDart_AFF48 = 0x800AFF48; // EnemyAnim_Dart_AFF48
+sEnemyAnimDart_AFF78 = 0x800AFF78; // EnemyAnim_Dart_AFF78
+sEnemyAnimProjectile_AFFD8 = 0x800AFFD8; // EnemyAnim_Projectile_AFFD8
+sEnemyAnimProjectile_B0008 = 0x800B0008; // EnemyAnim_Projectile_B0008
+sEnemyAnimWeapon_B0068 = 0x800B0068; // EnemyAnim_Weapon_B0068
