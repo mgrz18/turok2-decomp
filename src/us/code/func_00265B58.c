@@ -121,7 +121,7 @@ void CScene__SetInstanceSavedBit(s32 *p, M1Actor *a, s32 n);
 void GameObject_FireTriggers(M1Actor *a, s32 b, M1Actor *c);
 void Sound__Play(s16 id, CVector3 pos, s32 a, s32 b);
 void Actor_SpawnParticle(M1Actor *a, s32 id, CVector3 pos, s32 n);
-void AI_SpawnParticlesOnce(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);
+void AI_DropPickupsOnce(M1Actor *a, M1State *s, s32 n, s32 x, s32 y);
 void SwooshSet_FreeOwner(u8 *p, M1Actor *a);
 void Destructible_GoEnter(M1Actor *actor, M1State *state) {
     M1Info *info = &actor->def->info;
@@ -143,7 +143,7 @@ void Destructible_GoEnter(M1Actor *actor, M1State *state) {
         if (info->unk1C != -1) {
             Actor_SpawnParticle(actor, info->unk1C, actor->pos, 0);
         }
-        AI_SpawnParticlesOnce(actor, state, 4, info->unk24.i, info->unk28.i);
+        AI_DropPickupsOnce(actor, state, 4, info->unk24.i, info->unk28.i);
         SwooshSet_FreeOwner(D_801102B8, actor);
         if (gScene[0] != mode) goto L;
     } else {

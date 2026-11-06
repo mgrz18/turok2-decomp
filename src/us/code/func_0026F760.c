@@ -31,8 +31,8 @@ extern u8 D_800BC330[];
 extern u8 D_800BC400[];
 extern u8 D_800BE920[];
 extern u8 D_800BFF50[];
-void D_0026FD4C(void);
-void D_0026FB70(void *arg);
+void __amDmaNew(void);
+void __amMain(void *arg);
 void alInit(void *g, ALSynConfig *c);
 void *alHeapDBAlloc(u8 *file, s32 line, void *hp, s32 num, s32 size);
 void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
@@ -46,7 +46,7 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
     s32 a24;
     s32 n4;
     D_800F2790[0] = 0;
-    cfg->dmaproc = (void *)D_0026FD4C;
+    cfg->dmaproc = (void *)__amDmaNew;
     freq = osAiSetFrequency(c2->unk0);
     cfg->outputRate = freq;
     t = (f32)c2->unk4 * (f32)freq * 0.016666668f;
@@ -106,7 +106,7 @@ void amCreateAudioMgr(ALSynConfig *cfg, s32 pri, B12AiCfg *c2) {
     D_800F279C = 0;
     D_800F2840 = (s32)cfg->heap;
     memset(D_800C5400, 8, 0x2800);
-    osCreateThread(&D_800F2098, 8, D_0026FB70, 0, D_800C5400 + 0x2800, pri);
+    osCreateThread(&D_800F2098, 8, __amMain, 0, D_800C5400 + 0x2800, pri);
     osStartThread(&D_800F2098);
     osSendMesg(&D_800F27A0, (OSMesg)7, 0);
 }

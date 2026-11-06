@@ -9,7 +9,7 @@ gScene_m_bWarpSpawn = 0x80110030; // CWorld +0x18FB8; Cinema_Start, Crash_ShowSc
 gScene_m_WarpSpawn = 0x80110034; // CWorld +0x18FBC (CWarpPoint); Cinema_Start
 gScene_m_LevelID = 0x80110048; // CWorld +0x18FD0, the warp id of the loaded level; 28 users (Cinema_Start, CPlayer__LevelStart, TotemDefense_Update, MissionMenu_InitStatus...)
 gScene_m_WarpID = 0x8011004C; // CWorld +0x18FD4; Cinema_RestorePlayer
-gScene_unk_18FDC = 0x80110054; // CWorld +0x18FDC: a warp id kept for later (CPlayer__Update stores material->item, PakMessage_SelectOk passes it to CScene__RequestWarp); the field could be m_PendingWarpID
+gScene_m_PendingWarpID = 0x80110054; // CWorld +0x18FDC: a warp id kept for later (CPlayer__Update stores material->item, PakMessage_SelectOk passes it to CScene__RequestWarp) (field renamed from unk_18FDC, round G2)
 gScene_m_PreviewState = 0x80110058; // CWorld +0x18FE0; NOTE CBarrel__Open and CPlayer__GetNextUsableWeapon read it as the first usable weapon - 1: the field name looks wrong
 gScene_m_PreviewTimer = 0x8011005C; // CWorld +0x18FE4; NOTE read as the weapon count by CBarrel__Open, CPlayer__GetNextUsableWeapon (set to 0x22 next to m_PreviewState = 0): the field name looks wrong
 gScene_m_PreviewOptions = 0x80110060; // CWorld +0x18FE8: the unlocked-cheat bits last announced (SaveGame_Restore, EnterCheatMenu_Enter, GameNoteMenu_SelectYes copy unlockedCheats in)

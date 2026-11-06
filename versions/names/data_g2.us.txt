@@ -99,8 +99,8 @@ sItemPickups = 0x800AD838; // PickupRow10[15], handler Pickup_GiveItem: Pickup_F
 sBoxSideFaceBuilders = 0x800AD930; // FaceFunc[], NULL-ended: Quad_SetBoxTop, Quad_SetBoxSide3267/4510/0374/2156; Platform_CollideBox
 
 // AI drops, player input, flashlight
-sDropPickups = 0x800AD950; // {mask, pickup id}[] 0-ended (ids 0x6A5...): one GameObject_DropPickupAt per bit of the first mask; AI_SpawnParticlesOnce (which drops pickups, not particles)
-sDropPickups2 = 0x800ADA58; // the same for the second mask (id 0xBC3); AI_SpawnParticlesOnce
+sDropPickups = 0x800AD950; // {mask, pickup id}[] 0-ended (ids 0x6A5...): one GameObject_DropPickupAt per bit of the first mask; AI_DropPickupsOnce
+sDropPickups2 = 0x800ADA58; // the same for the second mask (id 0xBC3); AI_DropPickupsOnce
 sControlSide1ButtonMap = 0x800ADA70; // ButtonMap {mask, bits}[]: the button remap for CPlayerOptions m_ControlSide 1; CPlayer__ReadInput
 sFlashlightLight1 = 0x800ADB10; // dynamic light description for m_pDLFlashlight1 (CPlayer__UpdateFlashlight)
 sFlashlightLight2 = 0x800ADB18; // for m_pDLFlashlight2 (CPlayer__UpdateFlashlight)

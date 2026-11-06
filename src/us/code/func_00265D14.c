@@ -86,7 +86,7 @@ extern void GameObject_FireTriggers(struct Shared_Actor *arg0, s32 arg1, void *a
 extern void Actor_SpawnParticle(void *, s32, Triple, s32);
 extern s32 Sound__Play(s16, CVector3, s32, s32);
 struct Player;
-extern void AI_SpawnParticlesOnce(struct Player *, s32 *, s32, s32, s32);
+extern void AI_DropPickupsOnce(struct Player *, s32 *, s32, s32, s32);
 typedef struct {
     s16 hi;
     s16 id;
@@ -494,6 +494,6 @@ void Destructible_GoDeathEnter(Obj54E0 *arg0, void *arg1) {
         if (rec->unk30 != -1) {
             Actor_SpawnParticle(arg0, rec->unk30, arg0->pos.t, 0);
         }
-        AI_SpawnParticlesOnce(arg0, arg1, 8, rec->unk38, rec->unk3C);
+        AI_DropPickupsOnce(arg0, arg1, 8, rec->unk38, rec->unk3C);
     }
 }

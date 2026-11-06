@@ -53,12 +53,12 @@ typedef struct B01Info {
                 f32 unk6C;
 } B01Info;
 extern s32 gScene[];
-void AI_SpawnParticlesOnce(CGameObjectInstance *actor, CAI *state, s32 kind, s32 a, s32 b);
+void AI_DropPickupsOnce(CGameObjectInstance *actor, CAI *state, s32 kind, s32 a, s32 b);
 void CScene__SetInstanceSavedBit(void *mgr, CGameObjectInstance *actor, s32 flag);
 void GameObject_FireTriggers(CGameObjectInstance *actor, s32 flags, CGameObjectInstance *actor2);
 void Turret_DeathEnter(CGameObjectInstance *actor, CAI *state) {
     B01Info *info = ((B01Info *)((u8 *)(actor->header.m_pIntelligence) + 0x14));
-    AI_SpawnParticlesOnce(actor, state, 4, info->unkC.i, info->unk10.i);
+    AI_DropPickupsOnce(actor, state, 4, info->unkC.i, info->unk10.i);
     state->m_pfHurt = 0;
     CScene__SetInstanceSavedBit(gScene, actor, 1);
     GameObject_FireTriggers(actor, 1, actor);

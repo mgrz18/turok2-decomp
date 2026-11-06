@@ -20,7 +20,7 @@ static __inline__ CIntelligence *findDef(s32 kind, s32 character) {
 
 void CPlayer__SetCharacter(CPlayer *p, s32 character) {
     CIntelligence *def;
-    s32 sound;
+    s32 modelId;
 
     p->m_Data.m_nDeathmatchCharacter = character;
     if (p->m_pOptions->m_TagMode == 1) {
@@ -45,13 +45,13 @@ void CPlayer__SetCharacter(CPlayer *p, s32 character) {
         p->m_CharacterActor.m_AI.m_nTexture = -1;
     }
     CPlayer__GiveStartingWeapons(p);
-    sound = 0x66;
+    modelId = 0x66;
     if (D_8011AAF1) {
         if (D_8011ACE4 != 0 && p->m_pOptions->m_TagMode != 0) {
-            sound = D_800ADB5C;
+            modelId = D_800ADB5C;
         } else {
-            sound = D_800ADB30[p->m_CharacterActor.header.m_pIntelligence->m_Id];
+            modelId = D_800ADB30[p->m_CharacterActor.header.m_pIntelligence->m_Id];
         }
     }
-    CScene__SetInstanceObjectType(gScene, p, sound, p->m_CharAnim);
+    CScene__SetInstanceObjectType(gScene, p, modelId, p->m_CharAnim);
 }

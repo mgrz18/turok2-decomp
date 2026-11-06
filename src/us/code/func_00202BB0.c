@@ -73,7 +73,7 @@ u8 *CHeap__Alloc(void *heap, u32 size);
 void CList__Construct(CList *l, s32 prevOff, s32 nextOff);
 void CList__AddTail(CList *l, void *n);
 void CHashTable__Construct(u32 n);
-void D_002041E4(void *arg);
+void CCache__Main(void *arg);
 void CCache__Construct(s32 unused, s32 id) {
     u32 mask;
     u32 m2;
@@ -138,6 +138,6 @@ void CCache__Construct(s32 unused, s32 id) {
         __osRestoreInt(m2);
     }
     memset(D_800D7BE0.stack, (u8)id, 0x800);
-    osCreateThread(&D_800D7BE0.thread, id, D_002041E4, 0, D_800D7BE0.stack + 0x800, D_800B6E8C);
+    osCreateThread(&D_800D7BE0.thread, id, CCache__Main, 0, D_800D7BE0.stack + 0x800, D_800B6E8C);
     osStartThread(&D_800D7BE0.thread);
 }

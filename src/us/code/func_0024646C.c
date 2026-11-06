@@ -12,7 +12,7 @@ typedef struct { u32 mask; s32 val; } B04Ent;
 extern B04Ent D_800AD950[];
 extern B04Ent D_800ADA58[];
 typedef struct { u8 pad0[4]; s32 x, y, z; /* pos at 0x4 */ } B04O;
-void AI_SpawnParticlesOnce(B04O *o, u32 *flags, u32 bit, u32 m1, u32 m2) {
+void AI_DropPickupsOnce(B04O *o, u32 *flags, u32 bit, u32 m1, u32 m2) {
     B04Ent *e;
     if (!(*flags & bit)) {
         *flags |= bit;

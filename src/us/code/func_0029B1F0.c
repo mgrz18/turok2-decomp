@@ -10,7 +10,7 @@ extern int __osSiRawWriteIo(unsigned int devAddr, unsigned int data);
 extern s32 osPiRawReadIo(s32 arg0, s32 *arg1);
 extern void osMapTLBRdb();
 extern u32 D_80122998;
-extern Quad_func_802A1BE0_de D_0029BFE0[];
+extern Quad_func_802A1BE0_de __osException[];
 extern u64 D_80122990;
 extern s32 D_800B8900;
 extern unsigned char D_8000031C[];
@@ -37,10 +37,10 @@ __osGetSR
     while (__osSiRawWriteIo(0x1FC007FC, pifdata | 8)) {
         ;
     }
-    *(Quad_func_802A1BE0_de *)0x80000000 = *D_0029BFE0;
-    *(Quad_func_802A1BE0_de *)0x80000080 = *D_0029BFE0;
-    *(Quad_func_802A1BE0_de *)0x80000100 = *D_0029BFE0;
-    *(Quad_func_802A1BE0_de *)0x80000180 = *D_0029BFE0;
+    *(Quad_func_802A1BE0_de *)0x80000000 = *__osException;
+    *(Quad_func_802A1BE0_de *)0x80000080 = *__osException;
+    *(Quad_func_802A1BE0_de *)0x80000100 = *__osException;
+    *(Quad_func_802A1BE0_de *)0x80000180 = *__osException;
     osWritebackDCache((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(Quad_func_802A1BE0_de));
     osInvalICache((void *)0x80000000, 0x80000180 - 0x80000000 + sizeof(Quad_func_802A1BE0_de));
     osMapTLBRdb();

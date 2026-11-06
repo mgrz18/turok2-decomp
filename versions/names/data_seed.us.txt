@@ -33,7 +33,7 @@ gCollisionSetupTable_2 = 0x00466430; // the second VM module's copy (src/us/asm/
 // Sound (n5)
 gAudioWorld = 0x800F2A00; // Turok 3's CAudioWorld (audioworld.c)
 gLoopSounds = 0x800E6A90; // looping sounds: free CList at 0, used at 0x14 (LoopSounds_Get returns it)
-gMusicTrack = 0x800F478C; // the playing track (Music_GetTrack / Music_SetTrack)
+gAudioWorld_seq_track = 0x800F478C; // CAudioWorld +0x1D8C = seq (+0x1D64) .track (+0x28), the requested music track (Music_GetTrack / Music_SetTrack); was gAudioWorld_seq_track (round N3), interior per g5
 sCSPlayerFile = 0x800AA294; // "audio/csplayer.c", __assert's file argument in libaudio's csplayer.c; in func_0028FB80's .rodata (C), defined for the others by foreign_labels
 
 // Bosses (n7)

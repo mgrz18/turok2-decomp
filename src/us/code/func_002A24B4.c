@@ -20,7 +20,7 @@ extern OSMesgQueue D_80128370;
 extern OSMesg D_80128388[];
 extern OSThread D_80128390;
 extern OSMesgQueue D_80128540;
-void D_002A2650(void *arg);
+void HostIo_ThreadMain(void *arg);
 void HostIo_StartThread(s32 pri) {
     if (D_800BC300 == 0) {
         D_800BC300 = 1;
@@ -29,7 +29,7 @@ void HostIo_StartThread(s32 pri) {
         osCreateMesgQueue(&D_80128540, D_80128388, 1);
         osCreateMesgQueue(&D_801270C0, D_801270B4, 1);
         osSetEventMesg(0, &D_801270C0, (OSMesg)1);
-        osCreateThread(&D_80128390, 0x4653, D_002A2650, 0, D_801280DC + 4, pri);
+        osCreateThread(&D_80128390, 0x4653, HostIo_ThreadMain, 0, D_801280DC + 4, pri);
         osStartThread(&D_80128390);
     }
 }

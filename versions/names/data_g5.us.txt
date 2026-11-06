@@ -326,7 +326,7 @@ gScene_m_WarpState = 0x80110028; // +0x18FB0, nonzero during a warp fade (CPlaye
 //   D_8010FF34 (gScene+0x18EBC unk_18EBC: the CDLightSet, n2), D_8010FED4 (+0x18E5C, a string the crash
 //   screen prints), D_8010753C (inside m_ParticleSystem), D_8010AB90/94/98 (inside m_ActorPool),
 //   D_8010C080 / D_8010F328 (inside m_InstancePool, comment-only), D_800F478C (gAudioWorld+0x1D8C =
-//   seq.unk28, n5's gMusicTrack), D_800F55F4 (gAudioWorld+0x2BF4, in fx's pad).
+//   seq.unk28, n5's gMusicTrack; the coordinator named it gAudioWorld_seq_track in data_seed), D_800F55F4 (gAudioWorld+0x2BF4, in fx's pad).
 // - other interiors: D_800C1E7A (gCharacterSelectSounds+2), D_800C1CD2 (MenuColorInit[] at +2 of a
 //   table at 0x800C1CD0), D_800C203B (low byte of gResolution), D_800C21AA, D_800F1CC6 (+6 of the
 //   CCollisionInfo 0x800F1CC0), D_800F283A (low half of gAudioFrameSize), D_800F5A18 / D_800F5A34 (inside the view boxes), D_800F5C66, D_800F5EA3,

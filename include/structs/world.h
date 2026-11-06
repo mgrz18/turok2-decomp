@@ -166,7 +166,7 @@ typedef struct CScene {
     /* 0x18FD0 */ s32 m_LevelID;                    /* the warp id of the loaded level */
     /* 0x18FD4 */ s32 m_WarpID;                     /* where the pending warp goes (~id: a level index) */
     /* 0x18FD8 */ s32 unk_18FD8;
-    /* 0x18FDC */ s32 unk_18FDC;
+    /* 0x18FDC */ s32 m_PendingWarpID; /* warp id kept for later: CPlayer__Update stores it, PakMessage_SelectOk passes it to CScene__RequestWarp */
     /* 0x18FE0 */ s32 m_PreviewState;
     /* 0x18FE4 */ s32 m_PreviewTimer;
     /* 0x18FE8 */ s32 m_PreviewOptions;             /* the option flags last announced */

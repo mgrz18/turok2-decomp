@@ -4,7 +4,7 @@
 
 /* The input state the controller reader fills (D_8011AAD8, 0x184 bytes). */
 
-extern s32 D_800ACAD8;      /* buttons this frame */
+extern s32 D_800ACAD8;      /* lit-vertices cache key (GameSettings+0xC, cheat bits 0x100/0x200) */
 extern s32 D_800ACADC;      /* buttons changed */
 extern s32 D_800ACDE0;
 extern f32 gFrameIncrement;      /* frame time scale */

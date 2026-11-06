@@ -10,7 +10,7 @@ typedef struct MemoryBoundaryInit {
     /* 0x4 */ u32 flags;
 } MemoryBoundaryInit; /* i 0x8 */
 
-#define osMemSize (*(u32 *) 0x80000318)
+extern u32 osMemSize; /* 0x80000318 (ultralib), defined by the linker script */
 extern MemoryBoundaryInit D_800B7600[];
 extern u8 D_80128880;
 extern u8 D_80128882;

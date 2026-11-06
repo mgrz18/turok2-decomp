@@ -11,14 +11,14 @@ typedef struct ActorMotionState {
     char pad30[0xC0];
     void *update;
 } ActorMotionState;
-extern int D_0026352C;
+void Generator_Step();
 extern int D_800B2008;
 void Generator_Setup(void *arg0, void *arg1) {
     CGameObjectInstance *actor = arg0;
     ActorMotionState *state = arg1;
     CDestructibleIntelligence *inner = &actor->header.m_pIntelligence->m_Destructible;
     state->table = &D_800B2008;
-    state->update = &D_0026352C;
+    state->update = &Generator_Step;
     if ((actor->m_nTypeFlag == 0x644) ||
         (inner->m_dwFlags & 8)) {
         actor->m_dwFlags &= ~0x2000;

@@ -636,7 +636,7 @@ void CPlayer__Update(Player *p) {
     s32 second;
     s32 low;
     s32 high;
-    s32 sound;
+    s32 modelId;
     s32 i;
     s32 j;
 
@@ -938,15 +938,15 @@ void CPlayer__Update(Player *p) {
         }
     }
     if (human) {
-        sound = 102;
+        modelId = 102;
         if (D_8011AAD8.multiplayer != 0) {
             if (D_8011ACE4 != 0 && p->options->m_TagMode != 0) {
-                sound = D_800ADB5C;
+                modelId = D_800ADB5C;
             } else {
-                sound = D_800ADB30[p->def->m_Id];
+                modelId = D_800ADB30[p->def->m_Id];
             }
         }
-        CScene__SetInstanceObjectType(&gScene, p, sound, p->action);
+        CScene__SetInstanceObjectType(&gScene, p, modelId, p->action);
         if (p->lastAction != p->action) {
             if (!CGameObjectInstance__SetAnimByAction(actor, p->action, 0) && Cinema_PathPlaying()) {
                 CGameObjectInstance__SetAnimByAction(actor, 7000, 0);

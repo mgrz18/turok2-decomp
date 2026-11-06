@@ -134,7 +134,7 @@ typedef struct {
         } h;
     } volume;
     /* 0x24 */ s32 unk24;
-    /* 0x28 */ s32 unk28;
+    /* 0x28 */ s32 track;      /* requested music track, -1 none (Music_GetTrack/Music_SetTrack: gAudioWorld_seq_track) */
     /* 0x2C */ f32 vol;
     /* 0x30 */ f32 unk30;
     /* 0x34 */ f32 fadeStep;
