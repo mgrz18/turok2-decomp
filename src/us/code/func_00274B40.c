@@ -58,10 +58,6 @@ struct Track {
 };
 extern f32 D_800A81A0;
 extern f32 D_800A81A8;
-extern f32 D_800A81B0;
-extern f32 D_800A81B4;
-extern f32 D_800A81B8;
-extern f32 D_800A81BC;
 extern f32 D_800A81C0;
 extern void alCSPPlay(s32);
 extern int alCSPGetState(void *object);
@@ -180,13 +176,13 @@ void SndSeq_Update(Track *arg0) {
                 goto block_37;
             }
             temp_v0_5 = arg0->unk0;
-            var_f20 = (f32) arg0->unk24 * (temp_v0_5->unk2BA4 * D_800A81B0);
+            var_f20 = (f32) arg0->unk24 * (temp_v0_5->unk2BA4 * 0.01f);
             if (temp_v0_5->unk2BB8 != 0) {
-                var_f20 *= D_800A81B4;
+                var_f20 *= 0.7f;
             }
             if (var_f20 != arg0->unk2C) {
 block_37:
-                alCSPSetVol(arg0->unk14, (s16) (s32) (var_f20 * D_800A81B8));
+                alCSPSetVol(arg0->unk14, (s16) (s32) (var_f20 * 32767.0f));
                 arg0->unk2C = var_f20;
             }
         }
@@ -195,7 +191,7 @@ block_37:
                 var_f2 = arg0->unk30;
                 arg0->unk1C = 2;
                 arg0->unk18 = 0x20;
-                arg0->unk20 = (s32) (arg0->unk2C * D_800A81BC);
+                arg0->unk20 = (s32) (arg0->unk2C * 32767.0f);
                 if (!(var_f2 >= D_800A81C0)) {
                     var_f2 = D_800A81C0;
                 }

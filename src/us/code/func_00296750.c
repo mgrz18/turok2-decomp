@@ -5,8 +5,6 @@
 
 extern void *_filterBuffer(void *arg0, s32 arg1, s32 arg2, void *arg3);
 extern Acmd *_loadBuffer(ALFx *, s16 *, s32, s32, Acmd *);
-extern char D_800AA6C0[];
-extern char D_800AA6C4[];
 extern void __assert(char *, char *, s32);
 extern Acmd *_loadOutputBuffer(ALFx *, ALDelay *, s32, s32, Acmd *);
 extern Acmd *_loadBuffer(ALFx *, s16 *, s32, s32, Acmd *);
@@ -20,7 +18,7 @@ Acmd *alFxPull(ALFx *filter, s16 *outp, s32 outCount, s32 sampleOffset, Acmd *p)
     s16 *in_ptr, *out_ptr, gain, *prev_out_ptr = 0;
     ALDelay *d, *pd;
     if (!source)
-        __assert(D_800AA6C0, D_800AA6C4, 75);
+        __assert("EX", "audio/reverb.c", 75);
     ptr = (*source->handler)(source, outp, outCount, sampleOffset, p);
     input = 1728;
     output = 2048;

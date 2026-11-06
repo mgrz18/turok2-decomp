@@ -4,11 +4,10 @@
 #include "rw/abu_types.h"
 
 extern float D_800A54FC;
-extern float D_800A54F8;
 void CMtxF__FromMtxAffine(f32 *dst, PackedMatrixWords *src) {
     u32 upper;
     u32 lower;
-    f32 scale = D_800A54F8;
+    f32 scale = 1.5258789e-5f;
     upper = src->upper[0]; lower = src->lower[0]; dst[(0) * 2] = (f32)(s32)((upper & 0xFFFF0000) | (lower >> 16)) * scale; dst[(0) * 2 + 1] = (f32)(s32)((upper << 16) | (lower & 0xFFFF)) * scale;
     upper = src->upper[1]; lower = src->lower[1]; dst[(1) * 2] = (f32)(s32)(upper | (lower >> 16)) * scale; dst[(1) * 2 + 1] = 0.0f;
     upper = src->upper[2]; lower = src->lower[2]; dst[(2) * 2] = (f32)(s32)((upper & 0xFFFF0000) | (lower >> 16)) * scale; dst[(2) * 2 + 1] = (f32)(s32)((upper << 16) | (lower & 0xFFFF)) * scale;

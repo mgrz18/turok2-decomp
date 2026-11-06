@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5410;
 void CMtxF__MultiplyAffine(f32 *out, f32 *left, f32 *right)
 {
     out[(0) * 4 + (0)] = (left[(0) * 4] * right[(0)]) + (left[(0) * 4 + 1] * right[4 + (0)]) + (left[(0) * 4 + 2] * right[8 + (0)]);
@@ -22,5 +21,5 @@ void CMtxF__MultiplyAffine(f32 *out, f32 *left, f32 *right)
     out[14] = (left[12] * right[2]) + (left[13] * right[6]) +
               (left[14] * right[10]) + right[14];
     out[3] = out[7] = out[11] = 0.0f;
-    out[15] = D_800A5410;
+    out[15] = 1.0f;
 }

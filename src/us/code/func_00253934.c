@@ -16,18 +16,16 @@ struct Actor { /* Turok 2 layout */
     s32 unkBEC;         /* Rage Wars: 0x848 */
 };
 extern f32 D_800A70E4[];
-extern f32 D_800A70EC;
-extern f32 D_800A70F0;
 extern f32 D_800A70F4[];
 f32 func_00253934(Actor *a) {
     f32 t = a->unkBE4 - D_800A70E4[1];
     register f32 tmp asm("$f0");
     register f32 v asm("$f1");
     if (a->unkBEC != 0) goto c0;
-    tmp = t * D_800A70EC;
+    tmp = t * 0.06666667f;
     __asm__("" : "+f"(tmp));
     v = tmp;
-    if (D_800A70F0 < v) {
+    if (1.0f < v) {
 c0:
         v = D_800A70F4[0];
     }

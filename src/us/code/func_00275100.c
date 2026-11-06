@@ -4,7 +4,6 @@
 #include "structs/sound.h"
 #include "rw/junk_types.h" /* SndNodeRec */
 
-extern f32 D_800A81D8;
 s32 BinarySearch(void *tab, s32 n, s32 key);
 SndNodeRec *CISet__GetBlock(void *node, s32 idx);
 f32 HalfToFloat(u16 v);
@@ -21,7 +20,7 @@ s32 SndSeq_SelectSong(SndSeq *s, s32 key) {
         s->unk24 = n->w0;
         s->unk30 = HalfToFloat(n->h4);
         if (s->unk30 <= 0.0f) {
-            s->unk30 = D_800A81D8;
+            s->unk30 = 0.1f;
         }
         res = (s32)r;
     } else {

@@ -5,11 +5,7 @@
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern float func_002982F0(float x);
-extern float D_800A97E0;
 extern void CShake__ApplyOffset(Effect33920 *arg0, CVector3 position, CVector3 *out);
-extern float D_800A97E8;
-extern float D_800A97E4;
-extern float D_800A97EC;
 extern f32 SmoothStep(f32 arg0);
 extern void CVector3__Subtract(CVector3 *, CVector3 *, CVector3 *);
 extern f32 func_00298470(f32);
@@ -22,11 +18,11 @@ void CShake__ApplyOffset(Effect33920 *arg0, CVector3 position, CVector3 *out) {
                              (position.y * position.y) +
                              (position.z * position.z));
     if (distance < arg0->radius) {
-        distance = SmoothStep(D_800A97E0 - (distance / arg0->radius));
+        distance = SmoothStep(1.0f - (distance / arg0->radius));
         wave = &arg0->x;
         if (wave->mode == 0) goto x_sine;
         if (wave->mode != 1) goto x_zero;
-        value = func_002982F0(wave->accumulator * D_800A97E4) * wave->rate;
+        value = func_002982F0(wave->accumulator * 0.017453294f) * wave->rate;
         goto x_done;
 x_sine:
         value = Random_Blend(-wave->rate, wave->rate);
@@ -38,7 +34,7 @@ x_done:
         wave = &arg0->y;
         if (wave->mode == 0) goto y_sine;
         if (wave->mode != 1) goto y_zero;
-        value = func_002982F0(wave->accumulator * D_800A97E8) * wave->rate;
+        value = func_002982F0(wave->accumulator * 0.017453294f) * wave->rate;
         goto y_done;
 y_sine:
         value = Random_Blend(-wave->rate, wave->rate);
@@ -50,7 +46,7 @@ y_done:
         wave = &arg0->z;
         if (wave->mode == 0) goto z_sine;
         if (wave->mode != 1) goto z_zero;
-        value = func_002982F0(wave->accumulator * D_800A97EC) * wave->rate;
+        value = func_002982F0(wave->accumulator * 0.017453294f) * wave->rate;
         goto z_done;
 z_sine:
         value = Random_Blend(-wave->rate, wave->rate);

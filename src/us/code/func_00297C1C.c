@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800AA7CC;
 void guMtxF2L(f32 *arg0, s32 *arg1) {
     s32 *outLo;
     s32 *outHi;
@@ -20,7 +19,7 @@ void guMtxF2L(f32 *arg0, s32 *arg1) {
     outLo = arg1;
     outHi = arg1 + 8;
     i = 0;
-    mult = D_800AA7CC;
+    mult = 65536.0f;
     mask = 0xFFFF0000;
     inRow = arg0;
     do {

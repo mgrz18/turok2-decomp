@@ -59,8 +59,6 @@ struct Emit {
                s32 unk48;
                f32 unk4C;
 };
-extern f32 D_800A6534;
-extern f32 D_800A6538;
 void CMtxF__ToMtxAffine(void *, void *);
 void CMtxF__FromMtxAffine(void *, void *);
 void CMtxF__ClampEntries(void *);
@@ -78,9 +76,9 @@ void func_00236A34(Emit *e, EmitNode *n) {
             n->unkB0 = ((void *)0);
         } else {
             CMtxF__FromMtxAffine(m, (u8 *)o + ((gEvenOdd << 6) + 0x48));
-            s = D_800A6534;
+            s = 0.01f;
             if (o->info->unk14 != 0) {
-                s = D_800A6538;
+                s = 0.29257143f;
             }
             CMtxF__ScaleAxes(m, s, s, s);
             CMtxF__ClampEntries(m);

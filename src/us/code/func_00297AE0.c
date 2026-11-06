@@ -5,8 +5,6 @@ typedef unsigned char u8;
 typedef signed int s32;
 typedef unsigned int u32;
 typedef float f32;
-extern float D_800AA7C0;
-extern float D_800AA7C4;
 void guMtxIdent(s32 *arg0) {
     f32 matrix[16];
     u8 *diagBase;
@@ -29,7 +27,7 @@ void guMtxIdent(s32 *arg0) {
     s32 i;
     s32 j;
     r = 0;
-    one = D_800AA7C0;
+    one = 1.0f;
     diagBase = (u8 *)matrix;
     row = (u8 *)matrix;
     do {
@@ -52,7 +50,7 @@ void guMtxIdent(s32 *arg0) {
     outLo = arg0;
     outHi = arg0 + 8;
     i = 0;
-    mult = D_800AA7C4;
+    mult = 65536.0f;
     mask = 0xFFFF0000;
     inRow = matrix;
     do {

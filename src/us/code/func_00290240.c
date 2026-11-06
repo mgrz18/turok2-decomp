@@ -7,9 +7,6 @@
 extern f32 alCents2Ratio(s32 arg0);
 extern char D_800AA290[];
 void __CSPHandleMIDIMsg(void *object, ALEvent *message);
-extern float D_800AA360;
-extern float D_800AA364;
-extern float D_800AA368;
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, s32);
 extern void __assert(void *arg0, void *arg1, s32 arg2);
 extern void *__lookupSoundQuick(void *, s32, s32, s32);
@@ -82,7 +79,7 @@ void __CSPHandleMIDIMsg(void *object, ALEvent *message)
                 vstate->phase = 0;
             cents = (key - sound->keyMap->keyBase) * 100 + sound->keyMap->detune;
             vstate->pitch = alCents2Ratio(cents);
-            initialOscValue = D_800AA360;
+            initialOscValue = 127.0f;
             vstate->envGain = sound->envelope->attackVolume;
             vstate->envEndTime = seqp->curTime + sound->envelope->attackTime;
             vstate->flags = 0;
@@ -102,13 +99,13 @@ void __CSPHandleMIDIMsg(void *object, ALEvent *message)
                 }
             }
             tremeloSlot = &vstate->tremelo;
-            if (!(oscValue >= D_800AA364)) {
+            if (!(oscValue >= 2.1474836e9f)) {
                 tremelo = (s32)oscValue;
             } else {
-                tremelo = (s32)(oscValue - D_800AA364);
+                tremelo = (s32)(oscValue - 2.1474836e9f);
                 tremelo |= 0x80000000;
             }
-            initialOscValue = D_800AA368;
+            initialOscValue = 1.0f;
             *tremeloSlot = tremelo;
             oscValue = initialOscValue;
             if (inst->vibType) {

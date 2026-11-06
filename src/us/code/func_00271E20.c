@@ -4,8 +4,6 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 f32 func_002982F0(f32 x);
-extern f32 D_800A80F0;
-extern f32 D_800A80F4;
 extern f32 D_800A80F8;
 void CVector3__Subtract(CVector3 *out, void *src, s32 a);
 void CMtxF__InverseRotateVector(void *src, CVector3 *a, CVector3 *out);
@@ -23,7 +21,7 @@ s32 Sound_CalcPan(s32 a0, u8 *obj) {
         return 0x40;
     }
     CVector3__Subtract(&d, obj + 0x114, a0);
-    if (d.x * d.x + d.z * d.z < D_800A80F0) {
+    if (d.x * d.x + d.z * d.z < 1.0e2f) {
         return 0x40;
     }
     CMtxF__InverseRotateVector(obj + 0x14C, &d, &w);
@@ -31,7 +29,7 @@ s32 Sound_CalcPan(s32 a0, u8 *obj) {
     zero = w.y;
     r.y = zero;
     r.x = zero;
-    r.z = D_800A80F4;
+    r.z = 1.0f;
     CVector3__Normalize(&w);
     s = func_002982F0(Math_AcosLookup(w.x * r.x + w.y * r.y + w.z * r.z));
     if (w.x == zero) {

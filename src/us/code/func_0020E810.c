@@ -7,12 +7,6 @@
 extern f32 Math_AcosLookup(f32 arg0);
 extern float func_002974C0(float x);
 extern float func_002982F0(float x);
-extern float D_800A554C;
-extern float D_800A5554;
-extern float D_800A5550;
-extern float D_800A5544;
-extern float D_800A5548;
-extern float D_800A5558;
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
 extern f32 func_00298470(f32);
@@ -35,23 +29,23 @@ Vector4f CQuaternion__FromDirection(CVector3 *input) {
         result.z = 0.0f;
         result.y = 0.0f;
         result.x = 0.0f;
-        result.w = D_800A5544;
+        result.w = 1.0f;
     } else {
         f32 normalizationScale;
-        normalizationScale = D_800A5548 / magnitude;
+        normalizationScale = 1.0f / magnitude;
         normalized.x = input->x * normalizationScale;
         normalized.y = input->y * normalizationScale;
         normalized.z = input->z * normalizationScale;
         basis.x = 0.0f;
         basis.y = 0.0f;
-        basis.z = D_800A5548;
+        basis.z = 1.0f;
         if (normalized.z < 0.0f) {
-            if (D_800A554C < -normalized.z) {
+            if (0.99999f < -normalized.z) {
                 goto pole;
             }
             goto general;
         }
-        if (D_800A5550 < normalized.z) {
+        if (0.99999f < normalized.z) {
 pole:
         {
             f32 halfAngle;
@@ -80,12 +74,12 @@ general:
                                           (axis.z * axis.z));
             if (axisMagnitude != 0.0f) {
                 f32 axisScale;
-                axisScale = D_800A5554 / axisMagnitude;
+                axisScale = 1.0f / axisMagnitude;
                 axis.x *= axisScale;
                 axis.y *= axisScale;
                 axis.z *= axisScale;
             }
-            halfAngle = angle * D_800A5558;
+            halfAngle = angle * 0.5f;
             scale = func_002982F0(halfAngle);
             result.x = axis.x * scale;
             result.y = axis.y * scale;

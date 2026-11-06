@@ -4,7 +4,6 @@
 #include "structs/game.h"
 #include "structs/controller.h"
 
-extern f32 D_800A9DE4;
 
 s32 CEngineApp__TimedModeSwitch(CEngineApp *ctx, f32 value, s32 normalNext, s32 forcedNext) {
     s32 *flag = &gMergedController.buttonsSingle;
@@ -15,7 +14,7 @@ s32 CEngineApp__TimedModeSwitch(CEngineApp *ctx, f32 value, s32 normalNext, s32 
         *flag = 0;
         return 1;
     }
-    if (value * D_800A9DE4 < ctx->m_Settings.modeTimer) {
+    if (value * 15.0f < ctx->m_Settings.modeTimer) {
         ctx->m_Settings.fadeMode = 2;
         ctx->m_Settings.nextMode = normalNext;
         return 1;

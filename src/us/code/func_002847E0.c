@@ -17,7 +17,6 @@ typedef struct M04Pad {
     u8 err;
     u8 pad;
 } M04Pad;
-extern f32 D_800A9CE0;
 extern M04Pad gContPadData[];
 void Controller_UpdateConnection(ControllerProfile *c);
 void Controller_ProcessInput(ControllerProfile *c, s8 x, s8 y, u16 b);
@@ -64,10 +63,10 @@ void Controller_ReadAll(void) {
             gMergedController.inputButtonsDouble |= gControllers[i].inputButtonsDouble;
             gMergedController.inputButtonsRepeat |= gControllers[i].inputButtonsRepeat;
         }
-        gMergedController.inputStickX = (s8)((f32)(s8)gMergedController.inputStickX * D_800A9CE0);
-        gMergedController.inputStickY = (s8)((f32)(s8)gMergedController.inputStickY * D_800A9CE0);
-        gMergedController.stickX = (s8)((f32)(s8)gMergedController.stickX * D_800A9CE0);
-        gMergedController.stickY = (s8)((f32)(s8)gMergedController.stickY * D_800A9CE0);
+        gMergedController.inputStickX = (s8)((f32)(s8)gMergedController.inputStickX * 0.25f);
+        gMergedController.inputStickY = (s8)((f32)(s8)gMergedController.inputStickY * 0.25f);
+        gMergedController.stickX = (s8)((f32)(s8)gMergedController.stickX * 0.25f);
+        gMergedController.stickY = (s8)((f32)(s8)gMergedController.stickY * 0.25f);
         break;
     case 1:
         osRecvMesg(&gSiMessageQueue, &gSiMesgBuf, 1);

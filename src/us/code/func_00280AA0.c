@@ -20,7 +20,6 @@ typedef struct CGlareSource {
 } CGlareSource;
 
 extern CGlareSource *D_8010753C;
-extern f32 D_800A9BD0;
 void Hud_SetupTextureMode(s32 a);
 void Render_SetRenderMode(s32 a);
 void CMtxF__TransformPointProjective(CMtxF *m, CVector3 *in, CVector3 *out);
@@ -60,7 +59,7 @@ void CCamera__DrawGlares(CCamera *cam) {
     for (e = D_8010753C; e != NULL; e = e->m_pNext) {
         if ((e->m_CameraMask & mask) && (*e->m_pFlags & 0x80000)) {
             ScreenPos(cam, &e->m_vPos, &sx, &sy);
-            CCamera__DrawGlare(cam, sx, sy, e->m_GlareScale * D_800A9BD0, 0, 0);
+            CCamera__DrawGlare(cam, sx, sy, e->m_GlareScale * 0.003921569f, 0, 0);
         }
     }
 }

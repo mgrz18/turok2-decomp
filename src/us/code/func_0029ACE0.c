@@ -4,8 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/libultra.h"
 
-extern float D_800AA8D8;
-extern double D_800AA8D0;
 extern void __osViSwapContext();
 extern u32 osVirtualToPhysical(void *addr);
 void __osViSwapContext(void)
@@ -36,16 +34,16 @@ void __osViSwapContext(void)
         yscalep = &vc->y.scale;
         nom = (s32)nomValue;
         if ((s32)nomValue < 0) {
-            nom += D_800AA8D0;
+            nom += 4294967296.0;
         }
         scale = vc->y.factor * (f32)nom;
-        if (scale >= D_800AA8D8) {
+        if (scale >= 2.1474836e9f) {
             goto large;
         }
         yscale = (s32)scale;
         goto converted;
     large:
-        yscale = (s32)(scale - D_800AA8D8) | 0x80000000;
+        yscale = (s32)(scale - 2.1474836e9f) | 0x80000000;
     converted:
         *yscalep = yscale;
         vc->y.scale |= vm->fldRegs[field].yScale & ~0xFFF;

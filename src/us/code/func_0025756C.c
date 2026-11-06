@@ -4,9 +4,6 @@
 #include "rw/abu_types.h"
 
 extern void Sound__SetReverb(f32 arg0);
-extern float D_800A7238;
-extern float D_800A7234;
-extern float D_800A7230;
 extern f32 CGameRegion__GetCeilingHeight(void *arg0, f32 arg1, f32 arg2);
 extern f32 CGameRegion__GetHeight(s32, f32, f32);
 void Sound_SetUnderwaterFilter(void *arg0, CVector3 *arg1) {
@@ -18,8 +15,8 @@ void Sound_SetUnderwaterFilter(void *arg0, CVector3 *arg1) {
             arg1->x, arg1->z);
         amount = (f32)(s32)(first - CGameRegion__GetHeight(arg0,
             arg1->x, arg1->z));
-        if (amount < D_800A7230) {
-            Sound__SetReverb(D_800A7238 - (amount * D_800A7234));
+        if (amount < 1024.0f) {
+            Sound__SetReverb(1.0f - (amount * 0.0009765625f));
             return;
         }
     }

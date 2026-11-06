@@ -6,7 +6,6 @@
 #include "common.h"
 #include "ultra_types.h"
 #include "structs/sound.h"
-extern f32 D_800A80C8;
 void alSndpSetPitch(void *p, s32 pitch);
 void alSndpSetFXMix(void *p, s32 mix);
 void alSndpSetPan(void *p, u8 pan);
@@ -75,11 +74,11 @@ s32 CAudioWorld__StartVoice(CAudioWorld *m, s32 id)
       {
         if (m->sfxVolume)
         {
-          f *= D_800A80C8;
+          f *= 0.5f;
         }
         else
         {
-          f *= D_800A80C8;
+          f *= 0.5f;
         }
       }
     }

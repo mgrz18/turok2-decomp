@@ -4,13 +4,12 @@
 
 s32 CGameObjectInstance__DrawModelImmediate(s32, s32, s32);
 
-extern f32 D_800A7CAC;
 
 
 void Action_DrawFade(s32 arg0, CAI *arg1, s32 arg2) {
     f32 var_f1;
 
-    var_f1 = D_800A7CAC - (arg1->m_ModeTime * 8.5f);
+    var_f1 = 255.0f - (arg1->m_ModeTime * 8.5f);
     gBlendState = 1;
     if (var_f1 < 0.0f) {
         var_f1 = 0.0f;

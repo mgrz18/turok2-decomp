@@ -4,9 +4,6 @@
 #include "structs/sound.h"
 #include "rw/junk_types.h" /* M04Bank2 */
 
-extern f32 D_800A8160;
-extern f32 D_800A8164;
-extern f32 D_800A8168;
 extern s32 D_800B2A34[];
 extern s32 D_800B2A44[];
 s16 alSndpAllocate(void *p, s32 a, void *owner);
@@ -78,20 +75,20 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, int ta
         CAudioWorld__Unlock(p->owner);
         return 0;
       }
-      f = ((f32) ((s16) flag)) * D_800A8160;
+      f = ((f32) ((s16) flag)) * 1.27f;
       (*((u16 *) (core + 0x80)))++;
       v->sound = a3;
       m3 = p->owner;
       v->id = m3->soundCounter++;
       v->unk8 = snd[idx];
       v->delay = *new_var;
-      if (!(D_800A8164 <= f))
+      if (!(2.1474836e9f <= f))
       {
         pr = (s32) f;
       }
       else
       {
-        pr = (s32) (f - D_800A8164);
+        pr = (s32) (f - 2.1474836e9f);
         pr = pr | 0x80000000;
       }
       alSndpSetPriority(new_var2, snd[idx], pr & 0xFF);
@@ -114,7 +111,7 @@ SndVoice *SndVoicePool_AllocVoice(SndVoicePool *p, SoundEffectInfo *info, int ta
       vp->channel = pri;
       vp->s2C = tag;
       vp->frame = p->owner->frame;
-      vp->doppler = D_800A8168;
+      vp->doppler = 1.0f;
       vp->distanceMode = SoundEffectInfo_GetPan(info);
       v->flags = SoundEffectInfo_GetFlags(info);
       vp->follow = 0;

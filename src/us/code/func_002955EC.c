@@ -4,8 +4,6 @@
 #include "rw/abu_types.h"
 
 extern void init_lpfilter(ALLowPass *lp);
-extern const f64 D_800AA528;
-extern const f64 D_800AA530;
 void init_lpfilter(ALLowPass *lp)
 {
     s32 i, temp;
@@ -18,9 +16,9 @@ void init_lpfilter(ALLowPass *lp)
     for (i = 0; i < 8; i++)
         lp->fcvec.fccoef[i] = 0;
     lp->fcvec.fccoef[i++] = fc;
-    fcoef = ffc = (f64)fc * D_800AA528;
+    fcoef = ffc = (f64)fc * 6.103515625e-5;
     for (; i < 16; i++) {
         fcoef *= ffc;
-        lp->fcvec.fccoef[i] = (s16)(fcoef * D_800AA530);
+        lp->fcvec.fccoef[i] = (s16)(fcoef * 16384.0);
     }
 }

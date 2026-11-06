@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern double D_800A59E0;
 f32 Bits_ReadFloat(u32 *stream, Func802608ECResult range) {
     u32 bitAddress;
     u32 *streamPtr;
@@ -34,7 +33,7 @@ f32 Bits_ReadFloat(u32 *stream, Func802608ECResult range) {
     }
     converted = (s32) value;
     if ((s32) value < 0) {
-        converted += D_800A59E0;
+        converted += 4294967296.0;
     }
     result = (f32) converted;
     result /= (f32) ((1 << width) - 1);

@@ -14,7 +14,6 @@ extern s32 BinarySearch(void *entries, s32 count, s32 id);
 extern s32 CISet__GetROMAddressAndSize(s32 arg0, s32 arg1, s32 index, s32 *out);
 extern s32 CCache__Request(s32 arg0, s32 arg1, s32 arg2, s32 flags, s32 arg4, void *arg5, void *arg6, s32 arg7);
 extern u8 ProPack__Decompress[];
-extern u8 D_800A5F48[];
 
 s32 CScene__LoadGraphicSet(Owner *owner, s32 id, s32 flags, s32 arg3) {
     s32 index;
@@ -43,5 +42,5 @@ s32 CScene__LoadGraphicSet(Owner *owner, s32 id, s32 flags, s32 arg3) {
         break;
     }
     return CCache__Request(0, CISet__GetROMAddressAndSize(owner->unk48, owner->unk1C, index, &out), out, flags, 0,
-                         ProPack__Decompress, D_800A5F48, arg3);
+                         ProPack__Decompress, "graphicset", arg3);
 }

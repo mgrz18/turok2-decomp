@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800A5768;
 extern void CMtxF__TransformPoint(void *, void *, void *);
 extern void CMtxF__RotateVector(void *arg0, void *arg1, void *arg2);
 extern void CVector3__Normalize(f32 *);
@@ -46,7 +45,7 @@ s32 Actors_EvaluateLightVolume(ObjectRecAtBC *arg0, CVector3 arg1, CVector3 arg4
         }
         objectValue = arg0->value;
         value = amount * (objectValue +
-                          (dot * (D_800A5768 - objectValue)));
+                          (dot * (1.0f - objectValue)));
         amount = value;
         if (value <= 0.0f) {
             amount = 0.0f;

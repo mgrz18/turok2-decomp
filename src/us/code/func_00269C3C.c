@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 #include "globals/region.h"
 
-extern float D_800A7F68;
 extern int sRegionCeilingNormal;
 extern int sRegionCeilingNormal;
 extern void CVector3__Cross(CVector3 *, CVector3 *, CVector3 *);
@@ -44,7 +43,7 @@ f32 CGameRegion__GetCeilingHeight(Node75 *node, f32 x, f32 z) {
     if (normal.y == 0.0f) {
         return (((CollisionBuildVertex *)node->prev)->ceiling +
                 ((CollisionBuildVertex *)node->cur)->ceiling +
-                ((CollisionBuildVertex *)node->next)->ceiling) * D_800A7F68;
+                ((CollisionBuildVertex *)node->next)->ceiling) * 0.33333334f;
     }
     p = node->prev;
     point.x = ((CollisionBuildVertex *)p)->x;

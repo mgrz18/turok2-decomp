@@ -5,14 +5,13 @@
 
 extern void Angle_Wrap(f32 *value);
 extern f32 Angle_Difference(f32 arg0, f32 arg1);
-extern float D_800A5638;
 f32 Angle_Difference(f32 arg0, f32 arg1) {
     extern f32 D_800A563C[];
     f32 var_f3;
     Angle_Wrap(&arg0);
     Angle_Wrap(&arg1);
     if (arg0 > arg1) {
-        var_f3 = arg1 + D_800A5638;
+        var_f3 = arg1 + 6.2831855f;
         if ((var_f3 - arg0) < (arg0 - arg1)) {
             arg1 = var_f3;
         }

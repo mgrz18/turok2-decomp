@@ -3,8 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern double D_800AA240;
-extern float D_800AA248;
 void alCSeqNew(RuntimeStateRecAtB8 *state, u32 base) {
     extern u32 __readVarLen(RuntimeStateRecAtB8 *state, u32 index);
     f64 converted;
@@ -34,7 +32,7 @@ void alCSeqNew(RuntimeStateRecAtB8 *state, u32 base) {
     count = state->resources->entries[16];
     converted = (f64)count;
     if (count < 0) {
-        converted += D_800AA240;
+        converted += 4294967296.0;
     }
-    state->scale = D_800AA248 / (f32)converted;
+    state->scale = 1.0f / (f32)converted;
 }

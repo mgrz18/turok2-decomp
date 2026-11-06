@@ -6,8 +6,6 @@
 extern float sAnimRemapMin;
 extern void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 count);
 extern float Bits_Normalize(float value, int bits);
-extern double D_800A5958;
-extern double D_800A5960;
 extern s32 D_800E6798;
 extern s32 D_800E6798;
 extern f32 sAnimRemapMax;
@@ -31,12 +29,12 @@ void Anim_DecodeQuantizedChannel(u32 *stream, Output8025EF54 *out, s32 count) {
         decode.second_bits = Bits_Read(&decode.stream, 6);
         converted = (f64)decode.first_bits;
         if (decode.first_bits < 0) {
-            converted += D_800A5958;
+            converted += 4294967296.0;
         }
         first = Bits_Normalize((f32)converted, 6);
         converted = (f64)decode.second_bits;
         if (decode.second_bits < 0) {
-            converted += D_800A5960;
+            converted += 4294967296.0;
         }
         second = Bits_Normalize((f32)converted, 6);
         first = Math_Remap(first, sAnimRemapMin, sAnimRemapMax);

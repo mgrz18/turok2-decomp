@@ -4,8 +4,6 @@
 #include "rw/abu_types.h"
 
 extern float func_002974C0(float x);
-extern float D_800A7D1C;
-extern float D_800A7D18;
 extern float D_800A7D20;
 extern f32 SmoothStep(f32 arg0);
 f32 SmoothStep(f32 arg0)
@@ -20,11 +18,11 @@ f32 SmoothStep(f32 arg0)
   }
   else
   {
-    var_f1 = D_800A7D18;
+    var_f1 = 1.0f;
     if (var_f1 < var_f0)
     {
       var_f0 = var_f1;
     }
   }
-  return (D_800A7D20 - func_002974C0(var_f0 * D_800A7D1C)) * (((struct func_802077F4_S2 *) ((char *) (&D_800A7D20)))->unk4);
+  return (D_800A7D20 - func_002974C0(var_f0 * 3.141593f)) * (((struct func_802077F4_S2 *) ((char *) (&D_800A7D20)))->unk4);
 }

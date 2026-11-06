@@ -22,7 +22,6 @@ typedef struct SoundEvent {
 } SoundEvent;
 
 extern void CMtxF__RotateX(void *arg0, f32 arg1);
-extern float D_800A71FC;
 
 void Actor_PlayRangedSound(void *arg0, void *arg1) {
     SoundRange *range;
@@ -43,7 +42,7 @@ void Actor_PlayRangedSound(void *arg0, void *arg1) {
     actor = ((CPlayer *)object->m_AI.m_pParent);
     amount = -actor->m_vHeadRotOffset.x;
     if (actor->m_Mode == 0xE) {
-        amount += D_800A71FC;
+        amount += 1.5707965f;
     }
     CMtxF__RotateX(arg0, amount / (f32)range->divisor);
 }

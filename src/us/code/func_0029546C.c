@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern float D_800AA520;
 extern s32 alResamplePull;
 extern s32 alResampleParam;
 void alFilterNew(void *arg0, void *a, void *b, s32 c);
@@ -13,7 +12,7 @@ void alResampleNew(ALResampler *arg0, s32 arg1) {
     f32 k;
     alFilterNew(arg0, &alResamplePull, &alResampleParam, 1);
     result = alHeapDBAlloc(0, 0, arg1, 1, 0x20);
-    k = D_800AA520;
+    k = 1.0f;
     arg0->state = (void *)result;
     arg0->delta = 0;
     arg0->first = 1;

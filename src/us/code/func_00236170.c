@@ -6,8 +6,6 @@ s32 CMtxF__ClampEntries(s32);
 s32 Swoosh_NewNode(s32, s32, s32);
 
 s32 CMtxF__ScaleAxes(s32 *, f32, f32, f32);    /* extern */
-extern f32 D_800A6514;
-extern f32 D_800A6518;
 
 /* A drawn instance; 0xF8 points at its render info, 0x1D0 links it in the
  * world's draw list at 0xEC14. */
@@ -63,9 +61,9 @@ void Swoosh_AddParticleNode(World00236170 *arg0, CRenderInst *arg1, s32 arg2) {
                 if (temp_f0 > 0.0f) {
                     if (temp_f0 > 0.0f) {
                         CMtxF__FromMtxAffine((s32) sp10, arg2);
-                        var_f0 = D_800A6514;
+                        var_f0 = 0.01f;
                         if (arg1->info->unk14 != 0) {
-                            var_f0 = D_800A6518;
+                            var_f0 = 0.29257143f;
                         }
                         CMtxF__ScaleAxes(sp10, var_f0, var_f0, var_f0);
                         CMtxF__ClampEntries((s32) sp10);

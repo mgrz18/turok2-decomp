@@ -5,7 +5,6 @@
 #include "globals/adec.h"
 
 extern s32 adecDequantize(f32 *out, s16 *in);
-extern float D_800AAC34;
 s32 adecDequantize(f32 *out, s16 *in) {
     s16 *scale;
     s16 band;
@@ -20,7 +19,7 @@ s32 adecDequantize(f32 *out, s16 *in) {
     band = 0;
     ends = gAdecBandEnds;
     steps = gAdecStepSizes;
-    gain = D_800AAC34;
+    gain = 3.0517578e-5f;
     for (; band < 16; band++) {
         for (i = start; i < ends[band]; i++) {
             out[i] = (f32)values[i] / steps[*(scale = &in[band])] * gain;

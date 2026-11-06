@@ -6,12 +6,10 @@
 
 struct Kind;
 typedef struct Kind Kind;
-extern float D_800A65E0;
 struct ParamsRecAt4;
 typedef struct ParamsRecAt4 ParamsRecAt4;
 struct ObjectRecAt17C;
 typedef struct ObjectRecAt17C ObjectRecAt17C;
-extern float D_800A65E4;
 struct ParamsRecAt4;
 struct ParamsRecAt4 {
     s16 unk0;
@@ -58,9 +56,9 @@ void func_00238EE4(ObjectRecAt17C *arg0, ObjectRecAt17C *arg1, s32 arg2, CVector
     case 1:
         if (arg1->kind->value == arg1->type) {
             if (global[-115] & 0x40) {
-                scale = D_800A65E0;
+                scale = 2.5f;
             } else if (global[-115] & 0x20) {
-                scale = D_800A65E4;
+                scale = 0.35f;
             }
         }
         if ((arg1->mask & (1 << arg6.team)) == 0) {

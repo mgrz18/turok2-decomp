@@ -5,7 +5,6 @@
 #include "gfx.h"
 #include "globals/engine.h"
 
-extern float D_800A6488;
 Vtx *RibbonVtxPool_Alloc(func_802A66B4_S1 *pool, s32 count);
 void Morph_BlendVertices(Actor_func_802A274C_de *actor, ObjRecAt28V1 *clock, Vtx *vertices, Morph *morph);
 void Trail_DrawUntextured(func_802A66B4_S1 *pool, Actor_func_802A274C_de *actor) {
@@ -19,8 +18,8 @@ void Trail_DrawUntextured(func_802A66B4_S1 *pool, Actor_func_802A274C_de *actor)
     morph->count = actor->track->count;
     if (actor->flags & 2) { morph->first = actor->first; morph->second = actor->second; }
     else { morph->first = actor->first; morph->second = actor->first; }
-    morph->scaleS = actor->track->scaleS * D_800A6488;
-    morph->scaleT = actor->track->scaleT * D_800A6488;
+    morph->scaleS = actor->track->scaleS * 3.125f;
+    morph->scaleT = actor->track->scaleT * 3.125f;
     clock = actor->clock;
     next = clock->next;
     count = actor->track->count;

@@ -3,7 +3,6 @@
 
 #include "rw/abu_types.h"
 
-extern double D_800A59D0;
 extern f32 Bits_PeekFloat(s32 bitAddress, Func802608ECResult range);
 f32 Bits_PeekFloat(s32 bitAddress, Func802608ECResult range) {
     s32 shift;
@@ -27,7 +26,7 @@ f32 Bits_PeekFloat(s32 bitAddress, Func802608ECResult range) {
     }
     converted = (s32) value;
     if ((s32) value < 0) {
-        converted += D_800A59D0;
+        converted += 4294967296.0;
     }
     result = (f32) converted;
     result /= (f32) ((1 << range.value) - 1);

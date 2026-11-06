@@ -3,19 +3,16 @@
 
 #include "structs/sound.h"
 
-extern f32 D_800A81DC;
-extern f32 D_800A81E0;
-extern f32 D_800A81E4;
 void SndSeq_FadeOut(SndSeq *s) {
     f32 f;
     s->flags = 2;
     s->unk18 = 0x20;
-    s->volume.w = (s32)(s->vol * D_800A81DC);
+    s->volume.w = (s32)(s->vol * 32767.0f);
     f = s->unk30;
-    if (!(D_800A81E0 <= f)) {
-        f = D_800A81E0;
+    if (!(0.1f <= f)) {
+        f = 0.1f;
     }
     s->unk30 = f;
     s->track = 0;
-    s->fadeStep = (f32)s->volume.w / (f * D_800A81E4);
+    s->fadeStep = (f32)s->volume.w / (f * 6.0e1f);
 }

@@ -5,7 +5,6 @@
 
 extern void CVector3__Lerp(CVector3 *out, f32 t, CVector3 *a, CVector3 *b);
 extern f32 GameObject_GetCollisionHeight(CPlayer *player);
-extern f32 D_800A65B0;
 
 s32 Blast_GetSourcePos(CGameObjectInstance *actor, CVector3 *pos) {
     s32 ret = 0;
@@ -22,7 +21,7 @@ s32 Blast_GetSourcePos(CGameObjectInstance *actor, CVector3 *pos) {
                 a = *pos;
                 b = player->m_CharacterActor.header.m_vPos;
                 CVector3__Lerp(pos, 0.75f, &a, &b);
-                pos->y += GameObject_GetCollisionHeight(player) * D_800A65B0;
+                pos->y += GameObject_GetCollisionHeight(player) * 0.5f;
                 ret = 1;
             }
         }

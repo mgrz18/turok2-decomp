@@ -19,7 +19,6 @@ typedef struct Out41D8 {
     V16 c;
     V16 d;
 } Out41D8;
-extern f32 D_800A646C;
 void CVector3__Subtract(void *out, void *a, void *b);
 void CVector3__Scale(void *out, void *a, f32 s);
 void CVector3__Cross(void *out, void *a, void *b);
@@ -33,7 +32,7 @@ void Trail_ComputeNodeFrame(Ent41D8 *e0, Ent41D8 *e1, u8 *arg2, Out41D8 *out) {
     CVector3__Normalize(&v20);
     *(s32 *)&v10.x = 0;
     *(s32 *)&v10.y = 0;
-    v10.z = D_800A646C;
+    v10.z = 1.0f;
     CMtxF__RotateVector(arg2 + 0x18C, &v10, &v30);
     ty = -v30.y;
     tz = -v30.z;

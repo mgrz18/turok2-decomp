@@ -2,9 +2,6 @@
  * The same code in Turok 2; symbols renamed to Turok 2's by tools/import_ref.py. */
 
 #include "structs/game_object.h"
-extern f32 D_800A7EC4;
-extern f32 D_800A7EC8;
-extern f32 D_800A7ECC;
 f32 GameObject_GetWallRadius(CGameObjectInstance *a) {
     switch (a->header.m_pIntelligence->m_Type) {
     case 11:
@@ -13,17 +10,17 @@ f32 GameObject_GetWallRadius(CGameObjectInstance *a) {
         return a->header.m_pIntelligence->m_Enemy.m_CollisionWallRadius;
     case 2:
         if (a->header.m_pIntelligence->m_Platform.m_CollisionType == 0) {
-            return D_800A7EC4;
+            return 256.0f;
         }
         return a->header.m_pIntelligence->m_Platform.m_CollisionRadius;
     case 5:
         return a->header.m_pIntelligence->m_Throwable.m_CollisionRadius;
     case 8:
         if (a->header.m_pIntelligence->m_Pickup.m_dwFlags & 1) {
-            return D_800A7EC8;
+            return 81.92f;
         }
         return a->header.m_pIntelligence->m_Pickup.m_CollisionRadius;
     default:
-        return D_800A7ECC;
+        return 61.44f;
     }
 }

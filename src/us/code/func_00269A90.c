@@ -15,8 +15,6 @@ struct Node75 {
     CVector3 *next;
     u8 reserved10[0x10];
 };
-extern float D_800A7F60;
-extern float D_800A7F64;
 typedef struct CollisionBuildVertex {
     f32 x;
     f32 y;
@@ -38,7 +36,7 @@ static __inline__ CVector3 *cross_edges(CVector3 *out, Node75 *node) {
     if (node == 0) {
         ((CVector3 *)&sRegionCeilingNormal)->x = 0;
         ((CVector3 *)&sRegionCeilingNormal)->z = 0;
-        ((CVector3 *)&sRegionCeilingNormal)->y = D_800A7F64;
+        ((CVector3 *)&sRegionCeilingNormal)->y = -1.0f;
     } else if ((struct CGameRegion *)node != sCachedCeilingRawNormalRegion) {
         p = node->cur;
         q = node->prev;
@@ -68,7 +66,7 @@ CVector3 *CGameRegion__GetCeilingNormal(CVector3 *out, Node75 *node) {
     if (node == 0) {
         ((CVector3 *)&sRegionCeilingUnitNormal)->x = 0;
         ((CVector3 *)&sRegionCeilingUnitNormal)->z = 0;
-        ((CVector3 *)&sRegionCeilingUnitNormal)->y = D_800A7F60;
+        ((CVector3 *)&sRegionCeilingUnitNormal)->y = -1.0f;
     } else if ((struct CGameRegion *)node != sCachedCeilingNormalRegion) {
         cross_edges((CVector3 *)&sRegionCeilingUnitNormal, node);
         CVector3__Normalize((CVector3 *)&sRegionCeilingUnitNormal);

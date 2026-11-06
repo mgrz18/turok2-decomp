@@ -4,7 +4,6 @@
 #include "rw/abu_types.h"
 
 s32 _DivS32ByF32(s32 val, f32 div);
-extern const f32 D_800AA484;
 extern void _handleEvent(ALSndPlayer * arg0, ALSndpEvent * arg1);
 extern void alEvtqPostEvent(ALEventQueue *, ALEvent *, s32);
 extern s32 alSynAllocVoice(ALSynth *, ALVoice *, ALVoiceConfig *);
@@ -87,7 +86,7 @@ void _handleEvent(ALSndPlayer *sndp, ALSndpEvent *event)
             break;
         case 4:
             {
-                f32 min = D_800AA484;
+                f32 min = 0.0001f;
                 if ((state->pitch = event_view->pitch.pitch) < min)
                     state->pitch = min;
             }

@@ -5,12 +5,11 @@
 
 extern f32 Random_Blend(f32 arg0, f32 arg1);
 extern float func_002982F0(float x);
-extern float D_800A9C2C;
 extern f32 CShakeAxis__GetOffset(struct Wave *wave);
 f32 CShakeAxis__GetOffset(struct Wave *wave) {
     switch (wave->kind) {
     case 1:
-        return func_002982F0(wave->phase * D_800A9C2C) * wave->amplitude;
+        return func_002982F0(wave->phase * 0.017453294f) * wave->amplitude;
     case 0:
         return Random_Blend(-wave->amplitude, wave->amplitude);
     }
